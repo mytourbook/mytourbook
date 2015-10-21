@@ -1,0 +1,53 @@
+
+html 
+{
+	overflow-y: 			scroll;
+}
+
+body 
+{
+	font-size:				13px;
+	color:					#fff;
+	background-color:		#333;
+	margin:					5px;
+}
+
+p,td,ul 
+{
+	line-height:			130%;
+}
+
+p 
+{
+	margin:					0px;
+}
+
+img 
+{
+	border: 				0;
+}
+
+table
+{
+	border-collapse:		collapse;
+}
+
+
+body,p,h1,h2,h3,h4,table,td,th,ul,ol,textarea,input 
+{
+	font-family: 			Segoe UI, helvetica, arial, sans-serif;
+}
+
+td.auto-import-button
+{
+	xborder:					1px solid;
+	text-align:				center;
+	max-width: 				10em;
+	padding: 				5px;
+}
+
+td.auto-import-button:HOVER
+{
+	background-color: 		#888;
+	cursor:					pointer;
+}

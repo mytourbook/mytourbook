@@ -16,10 +16,13 @@
 package net.tourbook.ui.views.rawData;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URISyntaxException;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.GregorianCalendar;
@@ -53,6 +56,7 @@ import net.tourbook.importdata.ImportConfigItem;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.SpeedVertex;
 import net.tourbook.importdata.TourTypeConfig;
+import net.tourbook.photo.ImageUtils;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageImport;
 import net.tourbook.tag.TagMenuManager;
@@ -78,6 +82,7 @@ import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.ui.views.TableViewerTourInfoToolTip;
 import net.tourbook.ui.views.TourInfoToolTipCellLabelProvider;
+import net.tourbook.web.WEB;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
@@ -116,6 +121,12 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.SWTError;
+import org.eclipse.swt.browser.Browser;
+import org.eclipse.swt.browser.LocationAdapter;
+import org.eclipse.swt.browser.LocationEvent;
+import org.eclipse.swt.browser.ProgressAdapter;
+import org.eclipse.swt.browser.ProgressEvent;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
@@ -123,11 +134,9 @@ import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -135,6 +144,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
@@ -150,6 +160,8 @@ import org.eclipse.ui.part.ViewPart;
 public class RawDataView extends ViewPart implements ITourProviderAll, ITourViewer3 {
 
 	public static final String				ID											= "net.tourbook.views.rawData.RawDataView"; //$NON-NLS-1$
+	//
+	private static final String				TOUR_IMPORT_CSS								= "/tourbook/resources/tour-import.css";	//$NON-NLS-1$
 	//
 	public static final int					COLUMN_DATE									= 0;
 	public static final int					COLUMN_TITLE								= 1;
@@ -245,8 +257,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private TagMenuManager					_tagMenuMgr;
 	private TourDoubleClickState			_tourDoubleClickState						= new TourDoubleClickState();
 	//
-	private int								_linkDefaultWidth;
-	//
 	private HashMap<Long, Image>			_configImages								= new HashMap<>();
 	private HashMap<Long, Integer>			_configImageHash							= new HashMap<>();
 
@@ -268,10 +278,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/*
 	 * UI controls
 	 */
-	private PageBook						_pageBook;
-	private Composite						_pageImportActions;
+	private PageBook						_pageBook_Import;
+	private Composite						_pageImport_Actions;
+	private Composite						_pageImport_Viewer;
 
-	private Composite						_pageViewerContainer;
+	private PageBook						_pageBook_Actions;
+	private Composite						_pageActions_NoBrowser;
+	private Composite						_pageActions_Content;
+
 	private Composite						_innerAutoImportContainer;
 	private Composite						_outerAutoImportContainer;
 	private TableViewer						_tourViewer;
@@ -279,8 +293,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private PixelConverter					_pc;
 
-	private Color							_fgActionColor;
-	private Color							_bgActionColor;
+	private Browser							_browser;
+	private Text							_txtNoBrowser;
+	private String							_htmlCss;
 
 	private class ActionAutoImport extends Action {
 
@@ -499,10 +514,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			RawDataManager.getInstance().saveImportConfig(importConfig);
 
-			createUI_14_AutoImport_InnerContainer();
+//			createUI_74_AutoImport_InnerContainer();
+//
+//			// the size could be larger
+//			_pageImport_Actions.layout(true, true);
 
-			// the size could be larger
-			_pageImportActions.layout(true, true);
+			updateUI_Browser();
 		}
 	}
 
@@ -709,6 +726,94 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_tagMenuMgr = new TagMenuManager(this, true);
 	}
 
+	private String createHTML_10_Head() {
+
+		final String html = ""// //$NON-NLS-1$
+				+ "	<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />\n" //$NON-NLS-1$
+				+ "	<meta http-equiv='X-UA-Compatible' content='IE=edge' />\n" //$NON-NLS-1$
+				+ _htmlCss
+				+ "\n"; //$NON-NLS-1$
+
+		return html;
+	}
+
+	private String createHTML_20_Body() {
+
+		final String sb = createHTML_50_AutoImportItems();
+
+		return sb;
+	}
+
+	private String createHTML_50_AutoImportItems() {
+
+		final ImportConfig importConfig = RawDataManager.getInstance().getAutoImportConfigs();
+		final ArrayList<ImportConfigItem> configItems = importConfig.configItems;
+		final int numColumns = importConfig.numUIColumns;
+
+		if (configItems.size() == 0) {
+			return UI.EMPTY_STRING;
+		}
+
+		boolean isTrOpen = false;
+
+		final StringBuilder sb = new StringBuilder();
+
+		// enforce equal column width
+		sb.append("<table style='table-layout: fixed;'><tbody>\n");
+
+		for (int configIndex = 0; configIndex < configItems.size(); configIndex++) {
+
+			if (configIndex % numColumns == 0) {
+				sb.append("<tr>\n");
+				isTrOpen = true;
+			}
+
+			final ImportConfigItem configItem = configItems.get(configIndex);
+
+			// enforce equal column width
+			sb.append("<td style='width:" + 100 / numColumns + "%' class='auto-import-button'>");
+			sb.append(createHTML_52_ConfigItem(configItem));
+			sb.append("</td>\n");
+
+			if (configIndex % numColumns == numColumns - 1) {
+				sb.append("</tr>\n");
+				isTrOpen = false;
+			}
+		}
+
+		if (isTrOpen) {
+			sb.append("</tr>\n");
+		}
+
+		sb.append("</tbody></table>\n");
+
+		return sb.toString();
+	}
+
+	private String createHTML_52_ConfigItem(final ImportConfigItem configItem) {
+
+		final Image configImage = getImportConfigImage(configItem);
+
+		String htmlImage = UI.EMPTY_STRING;
+
+		if (configImage != null) {
+
+			final byte[] pngImageData = ImageUtils.saveImage(configImage, SWT.IMAGE_PNG);
+			final String base64Encoded = Base64.getEncoder().encodeToString(pngImageData);
+
+			htmlImage = "<img src='data:image/png;base64," + base64Encoded + "'>";
+		}
+
+		final String html =
+		//
+		("<a>\n") //
+				+ htmlImage
+				+ ("</br>" + configItem.name)
+				+ ("</a>");
+
+		return html;
+	}
+
 	@Override
 	public void createPartControl(final Composite parent) {
 
@@ -734,7 +839,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_activePerson = TourbookPlugin.getActivePerson();
 
 		// set default page
-		_pageBook.showPage(_pageImportActions);
+		_pageBook_Import.showPage(_pageImport_Actions);
+		updateUI_Browser();
 
 		restoreState();
 	}
@@ -748,45 +854,103 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_imageDescDelete = TourbookPlugin.getImageDescriptor(Messages.Image__delete);
 
 		try {
+
 			final Display display = Display.getCurrent();
+
 			_imageDatabase = (Image) _imageDescDatabase.createResource(display);
 			_imageDatabaseOtherPerson = (Image) _imageDescDatabaseOtherPerson.createResource(display);
 			_imageDatabaseAssignMergedTour = (Image) _imageDescDatabaseAssignMergedTour.createResource(display);
 			_imageDatabasePlaceholder = (Image) _imageDescDatabasePlaceholder.createResource(display);
 			_imageDelete = (Image) _imageDescDelete.createResource(display);
+
 		} catch (final DeviceResourceException e) {
-			e.printStackTrace();
+			StatusUtil.log(e);
 		}
 
 	}
 
 	private void createUI(final Composite parent) {
 
-		_pageBook = new PageBook(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageBook);
+		_pageBook_Import = new PageBook(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageBook_Import);
 
-		_pageImportActions = createUI_10_Page_ImportActions(_pageBook);
+		_pageImport_Actions = createUI_20_Page_ImportActions_HTML(_pageBook_Import);
 
-		_pageViewerContainer = new Composite(_pageBook, SWT.NONE);
-		GridLayoutFactory.fillDefaults().applyTo(_pageViewerContainer);
+		_pageImport_Viewer = new Composite(_pageBook_Import, SWT.NONE);
+		GridLayoutFactory.fillDefaults().applyTo(_pageImport_Viewer);
 		{
-			createUI_20_Page_TourViewer(_pageViewerContainer);
+			createUI_90_Page_TourViewer(_pageImport_Viewer);
 		}
-
-		final int bg = 0xf8;
-		final int fg = 0x0;
-
-		// set colors
-		final RGB ACTION_BG_COLOR = new RGB(bg, bg, bg);
-		final RGB ACTION_FB_COLOR = new RGB(fg, fg, fg);
-
-		_fgActionColor = new Color(parent.getDisplay(), ACTION_FB_COLOR);
-		_bgActionColor = new Color(parent.getDisplay(), ACTION_BG_COLOR);
-
-//		UI.setChildColors(_pageImportActions, _fgActionColor, _bgActionColor);
 	}
 
-	private Composite createUI_10_Page_ImportActions(final Composite parent) {
+	private Composite createUI_20_Page_ImportActions_HTML(final Composite parent) {
+
+		_pageBook_Actions = new PageBook(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageBook_Actions);
+
+		_pageActions_NoBrowser = new Composite(_pageBook_Actions, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageActions_NoBrowser);
+		GridLayoutFactory.swtDefaults().numColumns(1).applyTo(_pageActions_NoBrowser);
+		_pageActions_NoBrowser.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+		{
+			_txtNoBrowser = new Text(_pageActions_NoBrowser, SWT.WRAP | SWT.READ_ONLY);
+			GridDataFactory.fillDefaults()//
+					.grab(true, true)
+					.align(SWT.FILL, SWT.BEGINNING)
+					.applyTo(_txtNoBrowser);
+			_txtNoBrowser.setText(Messages.UI_Label_BrowserCannotBeCreated);
+		}
+
+		_pageActions_Content = new Composite(_pageBook_Actions, SWT.NONE);
+		GridLayoutFactory.fillDefaults().applyTo(_pageActions_Content);
+		{
+			createUI_22_Browser(_pageActions_Content);
+		}
+
+		return _pageBook_Actions;
+	}
+
+	private void createUI_22_Browser(final Composite parent) {
+
+		try {
+
+			try {
+
+				// use default browser
+				_browser = new Browser(parent, SWT.NONE);
+
+			} catch (final Exception e) {
+
+				/*
+				 * Use mozilla browser, this is necessary for Linux when default browser fails
+				 * however the XULrunner needs to be installed.
+				 */
+				_browser = new Browser(parent, SWT.MOZILLA);
+			}
+
+			GridDataFactory.fillDefaults().grab(true, true).applyTo(_browser);
+
+			_browser.addLocationListener(new LocationAdapter() {
+				@Override
+				public void changing(final LocationEvent event) {
+//					onBrowserLocationChanging(event);
+				}
+			});
+
+			_browser.addProgressListener(new ProgressAdapter() {
+				@Override
+				public void completed(final ProgressEvent event) {
+//					onBrowserCompleted(event);
+				}
+			});
+
+		} catch (final SWTError e) {
+
+			_txtNoBrowser.setText(NLS.bind(Messages.UI_Label_BrowserCannotBeCreated_Error, e.getMessage()));
+		}
+	}
+
+	private Composite createUI_70_Page_ImportActions_SWT(final Composite parent) {
 
 		// scrolled container
 		final ScrolledComposite importContainer = new ScrolledComposite(parent, SWT.V_SCROLL);
@@ -813,7 +977,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		{
 			// action: Automated import from files
-			createUI_12_AutoImport(container);
+			createUI_72_AutoImport(container);
 
 			// action: Import from files
 			ToolBar tb = createUI_ImportAction(container, //
@@ -842,7 +1006,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		return importContainer;
 	}
 
-	private void createUI_12_AutoImport(final Composite parent) {
+	private void createUI_72_AutoImport(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
@@ -881,11 +1045,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				.applyTo(_outerAutoImportContainer);
 		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(_outerAutoImportContainer);
 		{
-			createUI_14_AutoImport_InnerContainer();
+			createUI_74_AutoImport_InnerContainer();
 		}
 	}
 
-	private void createUI_14_AutoImport_InnerContainer() {
+	private void createUI_74_AutoImport_InnerContainer() {
 
 		if (_innerAutoImportContainer != null) {
 			_innerAutoImportContainer.dispose();
@@ -913,7 +1077,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 				final ImportConfigItem configItem = configItems.get(configIndex);
 
-				final String configName = configItem.name;
+				final String configName = createHTML_52_ConfigItem(configItem);
 				final String configTooltip = createUI_ConfigTooltip(configItem);
 
 				final String actionText = configName.trim().length() == 0 //
@@ -938,7 +1102,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * @param parent
 	 */
-	private void createUI_20_Page_TourViewer(final Composite parent) {
+	private void createUI_90_Page_TourViewer(final Composite parent) {
 
 		// table
 		final Table table = new Table(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.MULTI);
@@ -976,13 +1140,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		// set tour info tooltip provider
 		_tourInfoToolTip = new TableViewerTourInfoToolTip(_tourViewer);
 
-		createUI_22_ContextMenu();
+		createUI_92_ContextMenu();
 	}
 
 	/**
 	 * create the views context menu
 	 */
-	private void createUI_22_ContextMenu() {
+	private void createUI_92_ContextMenu() {
 
 		final Table table = (Table) _tourViewer.getControl();
 
@@ -1022,7 +1186,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		/*
 		 * Config name
 		 */
-		final String configName = importConfig.name;
+		final String configName = createHTML_52_ConfigItem(importConfig);
 		if (configName.length() > 0) {
 
 			sb.append(configName);
@@ -1680,9 +1844,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	@Override
 	public void dispose() {
 
-		Util.disposeResource(_fgActionColor);
-		Util.disposeResource(_bgActionColor);
-
 		Util.disposeResource(_imageDatabase);
 		Util.disposeResource(_imageDatabaseOtherPerson);
 		Util.disposeResource(_imageDatabaseAssignMergedTour);
@@ -2066,7 +2227,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			return image;
 		}
 
-		final Display display = _pageBook.getDisplay();
+		final Display display = _pageBook_Import.getDisplay();
 
 		final Enum<TourTypeConfig> tourTypeConfig = importConfig.tourTypeConfig;
 		final net.tourbook.ui.UI ui = net.tourbook.ui.UI.getInstance();
@@ -2208,7 +2369,26 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		_pc = new PixelConverter(parent);
 
-		_linkDefaultWidth = _pc.convertWidthInCharsToPixels(40);
+		try {
+
+			/*
+			 * load css from file
+			 */
+			final File cssFile = WEB.getFile(TOUR_IMPORT_CSS);
+			final String cssContent = Util.readContentFromFile(cssFile.getAbsolutePath());
+
+			_htmlCss = "<style>" + cssContent + "</style>\n"; //$NON-NLS-1$ //$NON-NLS-2$
+
+			/*
+			 * set image urls
+			 */
+//			_actionEditImageUrl = net.tourbook.ui.UI.getIconUrl(Messages.Image__quick_edit);
+//			_actionHideMarkerUrl = net.tourbook.ui.UI.getIconUrl(Messages.Image__Remove);
+//			_actionShowMarkerUrl = net.tourbook.ui.UI.getIconUrl(Messages.Image__Eye);
+
+		} catch (final IOException | URISyntaxException e) {
+			StatusUtil.showStatus(e);
+		}
 	}
 
 	/**
@@ -2271,16 +2451,16 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	@Override
 	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
 
-		_pageViewerContainer.setRedraw(false);
+		_pageImport_Viewer.setRedraw(false);
 		{
 			_tourViewer.getTable().dispose();
-			createUI_20_Page_TourViewer(_pageViewerContainer);
-			_pageViewerContainer.layout();
+			createUI_90_Page_TourViewer(_pageImport_Viewer);
+			_pageImport_Viewer.layout();
 
 			// update the viewer
 			reloadViewer();
 		}
-		_pageViewerContainer.setRedraw(true);
+		_pageImport_Viewer.setRedraw(true);
 
 		return _tourViewer;
 	}
@@ -2311,14 +2491,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 						public void run(final IProgressMonitor monitor) throws InvocationTargetException,
 								InterruptedException {
 
-							reimportAllImportFilesRunnable(monitor, prevImportedFiles, canCancelable);
+							reimportAllImportFiles_Runnable(monitor, prevImportedFiles, canCancelable);
 						}
 					});
 
-		} catch (final InvocationTargetException e) {
-			e.printStackTrace();
-		} catch (final InterruptedException e) {
-			e.printStackTrace();
+		} catch (final Exception e) {
+			StatusUtil.log(e);
 		}
 	}
 
@@ -2329,9 +2507,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	 * @param importedFiles
 	 * @param canCancelable
 	 */
-	private void reimportAllImportFilesRunnable(final IProgressMonitor monitor,
-												final String[] importedFiles,
-												final boolean canCancelable) {
+	private void reimportAllImportFiles_Runnable(	final IProgressMonitor monitor,
+													final String[] importedFiles,
+													final boolean canCancelable) {
 
 		int workedDone = 0;
 		final int workedAll = importedFiles.length;
@@ -2424,7 +2602,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		final Object[] rawData = _rawDataMgr.getImportedTours().values().toArray();
 
-		_pageBook.showPage(rawData.length > 0 ? _pageViewerContainer : _pageImportActions);
+		_pageBook_Import.showPage(rawData.length > 0 ? _pageImport_Viewer : _pageImport_Actions);
 
 		// update tour data viewer
 		_tourViewer.setInput(rawData);
@@ -2595,12 +2773,48 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 	}
 
+	private void showBrowserPage() {
+
+		_pageBook_Actions.showPage(_browser == null ? _pageActions_NoBrowser : _pageActions_Content);
+	}
+
 	private void updateToolTipState() {
 
 		_isToolTipInDate = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURIMPORT_DATE);
 		_isToolTipInTime = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURIMPORT_TIME);
 		_isToolTipInTitle = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURIMPORT_TITLE);
 		_isToolTipInTags = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURIMPORT_TAGS);
+	}
+
+	/**
+	 * Update the UI from {@link #_tourData}.
+	 */
+	private void updateUI_Browser() {
+
+		showBrowserPage();
+
+		if (_browser == null) {
+			return;
+		}
+
+//		Force Internet Explorer to not use compatibility mode. Internet Explorer believes that websites under
+//		several domains (including "ibm.com") require compatibility mode. You may see your web application run
+//		normally under "localhost", but then fail when hosted under another domain (e.g.: "ibm.com").
+//		Setting "IE=Edge" will force the latest standards mode for the version of Internet Explorer being used.
+//		This is supported for Internet Explorer 8 and later. You can also ease your testing efforts by forcing
+//		specific versions of Internet Explorer to render using the standards mode of previous versions. This
+//		prevents you from exploiting the latest features, but may offer you compatibility and stability. Lookup
+//		the online documentation for the "X-UA-Compatible" META tag to find which value is right for you.
+
+		final String html = "" // //$NON-NLS-1$
+				+ "<!DOCTYPE html>\n" // ensure that IE is using the newest version and not the quirk mode //$NON-NLS-1$
+				+ "<html style='height: 100%; width: 100%; margin: 0px; padding: 0px;'>\n" //$NON-NLS-1$
+				+ ("<head>\n" + createHTML_10_Head() + "\n</head>\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("<body>\n" + createHTML_20_Body() + "\n</body>\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ "</html>"; //$NON-NLS-1$
+
+		_browser.setRedraw(true);
+		_browser.setText(html);
 	}
 
 	/**

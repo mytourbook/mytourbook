@@ -62,7 +62,7 @@ public class WEB {
 	 * It is very complicated to support testing for language translators, therefore it is currently
 	 * not yet implemented.
 	 */
-//	static boolean				IS_DEBUG_NLS							= true;
+//	static boolean							IS_DEBUG_NLS							= true;
 
 	static String							DEFAULT_LANGUAGE						= "en";										//$NON-NLS-1$
 
