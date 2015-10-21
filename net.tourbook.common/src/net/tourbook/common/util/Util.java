@@ -1254,6 +1254,14 @@ public class Util {
 		return value;
 	}
 
+	/**
+	 * @param xmlMemento
+	 * @param key
+	 * @param defaultValue
+	 * @param minValue
+	 * @param maxValue
+	 * @return
+	 */
 	public static int getXmlInteger(final IMemento xmlMemento,
 									final String key,
 									final int defaultValue,

@@ -1132,6 +1132,67 @@ public class UI {
 						| ColumnViewerEditor.KEYBOARD_ACTIVATION);
 	}
 
+	/**
+	 * Update colors for all decendants.
+	 * 
+	 * @param child
+	 * @param bgColor
+	 * @param fgColor
+	 */
+	public static void setChildColors(final Control child, final Color fgColor, final Color bgColor) {
+
+		/*
+		 * ignore these controls because they do not look very good on Linux & OSX
+		 */
+		if (child instanceof Spinner || child instanceof Combo) {
+			return;
+		}
+
+		/*
+		 * Toolbar action render awfully on Win7.
+		 */
+		if (child instanceof ToolBar) {
+
+			/*
+			 * FOREGROUND CANNOT BE SET
+			 */
+
+//			final ToolBar tb = (ToolBar) child;
+//
+//			for (final ToolItem toolItem : tb.getItems()) {
+//
+//				final Object data = toolItem.getData();
+//
+//				if (data instanceof ActionContributionItem) {
+//
+//					final ActionContributionItem action = (ActionContributionItem) data;
+//
+//					final Widget widget = action.getWidget();
+//
+//					if (widget instanceof Button) {
+//
+//						final Button button = (Button) widget;
+//
+//						button.setForeground(fgColor);
+//					}
+//				}
+//			}
+		}
+
+		child.setForeground(fgColor);
+		child.setBackground(bgColor);
+
+		if (child instanceof Composite) {
+
+			for (final Control element : ((Composite) child).getChildren()) {
+
+				if (element != null && element.isDisposed() == false) {
+					setChildColors(element, fgColor, bgColor);
+				}
+			}
+		}
+	}
+
 	public static void setColorForAllChildren(final Control parent, final Color fgColor, final Color bgColor) {
 
 		parent.setForeground(fgColor);
@@ -1382,43 +1443,6 @@ public class UI {
 
 	public static String timeStampNano() {
 		return (new Timestamp()).toString();
-	}
-
-	/**
-	 * Update colors for all decendants.
-	 * 
-	 * @param child
-	 * @param bgColor
-	 * @param fgColor
-	 */
-	public static void updateChildColors(final Control child, final Color fgColor, final Color bgColor) {
-
-		/*
-		 * ignore these controls because they do not look very good on Linux & OSX
-		 */
-		if (child instanceof Spinner || child instanceof Combo) {
-			return;
-		}
-
-		/*
-		 * Toolbar action render awfully on Win7.
-		 */
-		if (child instanceof ToolBar) {
-//			return;
-		}
-
-		child.setForeground(fgColor);
-		child.setBackground(bgColor);
-
-		if (child instanceof Composite) {
-			final Control[] children = ((Composite) child).getChildren();
-			for (final Control element : children) {
-
-				if (element != null && element.isDisposed() == false) {
-					updateChildColors(element, fgColor, bgColor);
-				}
-			}
-		}
 	}
 
 	public static void updateScrolledContent(final Composite composite) {

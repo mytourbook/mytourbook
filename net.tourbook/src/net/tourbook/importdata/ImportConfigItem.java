@@ -21,7 +21,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourType;
 
-public class AutomatedImportConfig implements Cloneable, Comparable<AutomatedImportConfig> {
+public class ImportConfigItem implements Cloneable, Comparable<ImportConfigItem> {
 
 	public String					name			= UI.EMPTY_STRING;
 	public String					backupFolder	= UI.EMPTY_STRING;
@@ -40,19 +40,19 @@ public class AutomatedImportConfig implements Cloneable, Comparable<AutomatedImp
 	private long					_id;
 	private static long				_idCreator;
 
-	AutomatedImportConfig() {
+	ImportConfigItem() {
 
 		_id = ++_idCreator;
 	}
 
 	@Override
-	protected AutomatedImportConfig clone() {
+	protected ImportConfigItem clone() {
 
-		AutomatedImportConfig clonedObject = null;
+		ImportConfigItem clonedObject = null;
 
 		try {
 
-			clonedObject = (AutomatedImportConfig) super.clone();
+			clonedObject = (ImportConfigItem) super.clone();
 
 			clonedObject._id = ++_idCreator;
 
@@ -69,7 +69,7 @@ public class AutomatedImportConfig implements Cloneable, Comparable<AutomatedImp
 	}
 
 	@Override
-	public int compareTo(final AutomatedImportConfig otherConfig) {
+	public int compareTo(final ImportConfigItem otherConfig) {
 
 		return name.compareTo(otherConfig.name);
 	}
@@ -85,7 +85,7 @@ public class AutomatedImportConfig implements Cloneable, Comparable<AutomatedImp
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		final AutomatedImportConfig other = (AutomatedImportConfig) obj;
+		final ImportConfigItem other = (ImportConfigItem) obj;
 		if (_id != other._id) {
 			return false;
 		}

@@ -345,7 +345,7 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
 		final Color fgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOREGROUND);
 		final Color bgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND);
 
-		net.tourbook.common.UI.updateChildColors(_shellContainer, fgColor, bgColor);
+		net.tourbook.common.UI.setChildColors(_shellContainer, fgColor, bgColor);
 
 		_shellContainer.addDisposeListener(new DisposeListener() {
 

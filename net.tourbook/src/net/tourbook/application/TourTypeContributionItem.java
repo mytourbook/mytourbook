@@ -139,9 +139,10 @@ public class TourTypeContributionItem extends CustomControlContribution {
 		container.addMouseWheelListener(_mouseWheelListener);
 		GridLayoutFactory.fillDefaults()//
 				.numColumns(2)
+//				.extendedMargins(10, 10, 10, 50)
 				.spacing(0, 0)
 				.applyTo(container);
-//		_filterContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
 			createUI_10_FilterIcon(container);
 			createUI_20_FilterText(container);

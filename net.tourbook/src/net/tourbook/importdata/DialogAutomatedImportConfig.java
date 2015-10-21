@@ -98,7 +98,6 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
@@ -110,29 +109,29 @@ import org.eclipse.ui.part.PageBook;
  */
 public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITourViewer {
 
-	private static final String					ID							= "net.tourbook.importdata.DialogAutomatedImportConfig";	//$NON-NLS-1$
+	private static final String			ID							= "net.tourbook.importdata.DialogAutomatedImportConfig";	//$NON-NLS-1$
 	//
-	private static final String					STATE_SELECTED_CONFIG_NAME	= "STATE_SELECTED_CONFIG_NAME";							//$NON-NLS-1$
+	private static final String			STATE_SELECTED_CONFIG_NAME	= "STATE_SELECTED_CONFIG_NAME";							//$NON-NLS-1$
 	//
-	private static final String					DATA_KEY_TOUR_TYPE_ID		= "DATA_KEY_TOUR_TYPE_ID";									//$NON-NLS-1$
-	private static final String					DATA_KEY_VERTEX_INDEX		= "DATA_KEY_VERTEX_INDEX";									//$NON-NLS-1$
+	private static final String			DATA_KEY_TOUR_TYPE_ID		= "DATA_KEY_TOUR_TYPE_ID";									//$NON-NLS-1$
+	private static final String			DATA_KEY_VERTEX_INDEX		= "DATA_KEY_VERTEX_INDEX";									//$NON-NLS-1$
 	//
 	//
-	private final IDialogSettings				_state						= TourbookPlugin.getState(ID);
+	private final IDialogSettings		_state						= TourbookPlugin.getState(ID);
 	//
-	private SelectionAdapter					_defaultSelectionListener;
-	private SelectionAdapter					_vertexTourTypeListener;
-	private MouseWheelListener					_vertexValueMouseWheelListener;
+	private SelectionAdapter			_defaultSelectionListener;
+	private SelectionAdapter			_vertexTourTypeListener;
+	private MouseWheelListener			_defaultMouseWheelListener;
 	//
-	private ActionAddVertex						_action_VertexAdd;
-	private ActionDeleteVertex[]				_actionVertex_Delete;
-	private ActionOpenPrefDialog				_actionOpenTourTypePrefs;
-	private ActionSortVertices					_action_VertexSort;
+	private ActionAddVertex				_action_VertexAdd;
+	private ActionDeleteVertex[]		_actionVertex_Delete;
+	private ActionOpenPrefDialog		_actionOpenTourTypePrefs;
+	private ActionSortVertices			_action_VertexSort;
 	//
 
-	private PixelConverter						_pc;
+	private PixelConverter				_pc;
 
-	private final static SpeedVertex[]			DEFAULT_VERTICES;
+	private final static SpeedVertex[]	DEFAULT_VERTICES;
 
 	static {
 
@@ -147,68 +146,67 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 	}
 
 	/** Model for all configs. */
-	private ArrayList<AutomatedImportConfig>	_dialogConfigs;
+	private ImportConfig				_dialogConfig;
 
 	/** Model for the currently selected config. */
-	private AutomatedImportConfig				_currentConfig;
+	private ImportConfigItem			_currentConfigItem;
 
-	private RawDataView							_rawDataView;
+	private RawDataView					_rawDataView;
 
-	private TableViewer							_configViewer;
+	private TableViewer					_configViewer;
 
-	private ColumnManager						_columnManager;
-	private TableColumnDefinition				_colDefProfileImage;
-	private int									_columnIndexConfigImage;
+	private ColumnManager				_columnManager;
+	private TableColumnDefinition		_colDefProfileImage;
+	private int							_columnIndexConfigImage;
 
-	private AutomatedImportConfig				_initialConfig;
+	private ImportConfigItem			_initialConfig;
 
-	private HashMap<Long, Image>				_configImages				= new HashMap<>();
-	private HashMap<Long, Integer>				_configImageHash			= new HashMap<>();
+	private HashMap<Long, Image>		_configImages				= new HashMap<>();
+	private HashMap<Long, Integer>		_configImageHash			= new HashMap<>();
 
-	private long								_dragStart;
+	private long						_dragStart;
 
 	/*
 	 * UI controls
 	 */
-	private Composite							_parent;
+	private Composite					_parent;
 
-	private Composite							_vertexOuterContainer;
-	private Composite							_vertexContainer;
-	private Composite							_viewerContainer;
+	private Composite					_vertexOuterContainer;
+	private Composite					_vertexContainer;
+	private Composite					_viewerContainer;
 
-	private ScrolledComposite					_vertexScrolledContainer;
+	private ScrolledComposite			_vertexScrolledContainer;
 
-	private PageBook							_pagebookTourType;
-	private Label								_pageTourType_NotUsed;
-	private Composite							_pageTourType_OneForAll;
-	private Composite							_pageTourType_BySpeed;
+	private PageBook					_pagebookTourType;
+	private Label						_pageTourType_NotUsed;
+	private Composite					_pageTourType_OneForAll;
+	private Composite					_pageTourType_BySpeed;
 
-	private Button								_btnConfig_Copy;
-	private Button								_btnConfig_New;
-	private Button								_btnConfig_Remove;
-	private Button								_btnSelectBackupFolder;
-	private Button								_btnSelectDeviceFolder;
+	private Button						_btnConfig_Copy;
+	private Button						_btnConfig_New;
+	private Button						_btnConfig_Remove;
+	private Button						_btnSelectBackupFolder;
+	private Button						_btnSelectDeviceFolder;
 
-	private Combo								_comboBackupPath;
-	private Combo								_comboDevicePath;
-	private Combo								_comboTourTypeConfig;
+	private Combo						_comboBackupPath;
+	private Combo						_comboDevicePath;
+	private Combo						_comboTourTypeConfig;
 
-	private Label								_lblBackupFolder;
-	private Label								_lblConfigName;
-	private Label								_lblDeviceFolder;
-	private Label								_lblOneTourTypeIcon;
-	private Label								_lblTourType;
-	private Label[]								_lblVertex_SpeedUnit;
-	private Label[]								_lblVertex_TourTypeIcon;
+	private Label						_lblBackupFolder;
+	private Label						_lblConfigName;
+	private Label						_lblDeviceFolder;
+	private Label						_lblOneTourTypeIcon;
+	private Label						_lblTourType;
+	private Label[]						_lblVertex_SpeedUnit;
+	private Label[]						_lblVertex_TourTypeIcon;
 
-	private Link[]								_linkVertex_TourType;
-	private Link								_linkOneTourType;
+	private Link[]						_linkVertex_TourType;
+	private Link						_linkOneTourType;
 
-	private Spinner[]							_spinnerVertex_AvgSpeed;
+	private Spinner						_spinnerUIColumns;
+	private Spinner[]					_spinnerVertex_AvgSpeed;
 
-	private Text								_txtConfigName;
-
-	private TableColumn							_tcConfigImage;
+	private Text						_txtConfigName;
 
 	private class ActionAddVertex extends Action {
 
@@ -352,7 +350,10 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 
 		@Override
 		public Object[] getElements(final Object parent) {
-			return _dialogConfigs.toArray(new AutomatedImportConfig[_dialogConfigs.size()]);
+
+			final ArrayList<ImportConfigItem> configItems = _dialogConfig.configItems;
+
+			return configItems.toArray(new ImportConfigItem[configItems.size()]);
 		}
 
 		@Override
@@ -362,7 +363,7 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 	}
 
 	public DialogAutomatedImportConfig(	final Shell parentShell,
-										final ArrayList<AutomatedImportConfig> importConfigs,
+										final ImportConfig importConfig,
 										final RawDataView rawDataView) {
 
 		super(parentShell);
@@ -372,7 +373,9 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 		// make dialog resizable
 		setShellStyle(getShellStyle() | SWT.RESIZE);
 
-		setupConfigs(importConfigs);
+		setDefaultImage(TourbookPlugin.getImageDescriptor(Messages.Image__options).createImage());
+
+		setupConfigs(importConfig);
 	}
 
 	@Override
@@ -432,7 +435,7 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 		table.setSelection(table.getSelectionIndex());
 
 		// set focus
-		if (_dialogConfigs.size() == 1) {
+		if (_dialogConfig.configItems.size() == 1) {
 			_txtConfigName.setFocus();
 		} else {
 			table.setFocus();
@@ -477,16 +480,16 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 	 * 
 	 * @return Returns the created config.
 	 */
-	private AutomatedImportConfig createDefaultConfig() {
+	private ImportConfigItem createDefaultConfig() {
 
-		final AutomatedImportConfig defaultConfig = new AutomatedImportConfig();
+		final ImportConfigItem defaultConfig = new ImportConfigItem();
 		final ArrayList<SpeedVertex> speedVertices = defaultConfig.speedVertices;
 
 		for (final SpeedVertex speedVertex : DEFAULT_VERTICES) {
 			speedVertices.add(speedVertex.clone());
 		}
 
-		_dialogConfigs.add(defaultConfig);
+		_dialogConfig.configItems.add(defaultConfig);
 
 		return defaultConfig;
 	}
@@ -536,16 +539,12 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
 		GridLayoutFactory.swtDefaults()//
-				.numColumns(2)
-//				.spacing(10, 8)
 				.applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GREEN));
 		{
 			final Composite configContainer = new Composite(container, SWT.NONE);
 			GridDataFactory.fillDefaults()//
 					.grab(true, true)
-					.span(2, 1)
-//					.hint(SWT.DEFAULT, convertVerticalDLUsToPixels(88))
 					.applyTo(configContainer);
 			GridLayoutFactory.fillDefaults()//
 					.numColumns(2)
@@ -554,13 +553,12 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 				createUI_20_ConfigTitle(configContainer);
 				createUI_22_ConfigViewer_Container(configContainer);
 				createUI_24_ConfigActions(configContainer);
-				createUI_26_DragDropHint(configContainer);
 			}
+			createUI_26_DragDropHint(container);
 
 			final Group group = new Group(container, SWT.NONE);
 			GridDataFactory.fillDefaults()//
 					.grab(true, false)
-					.span(2, 1)
 //					.hint(SWT.DEFAULT, convertVerticalDLUsToPixels(188))
 					.indent(0, convertVerticalDLUsToPixels(8))
 					.applyTo(group);
@@ -573,6 +571,8 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 				createUI_52_BackupFolder(group);
 				createUI_80_TourType(group);
 			}
+
+			createUI_90_ConfigUI(container);
 		}
 	}
 
@@ -691,10 +691,8 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 		 */
 		_configViewer = new TableViewer(table);
 
-//		_columnManager.setColumnLayout(new TableColumnLayout());
 		_columnManager.createColumns(_configViewer);
 
-		_tcConfigImage = _colDefProfileImage.getTableColumn();
 		_columnIndexConfigImage = _colDefProfileImage.getCreateIndex();
 
 		_configViewer.setUseHashlookup(true);
@@ -777,9 +775,9 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 				if (data instanceof StructuredSelection) {
 					final StructuredSelection selection = (StructuredSelection) data;
 
-					if (selection.getFirstElement() instanceof AutomatedImportConfig) {
+					if (selection.getFirstElement() instanceof ImportConfigItem) {
 
-						final AutomatedImportConfig filterItem = (AutomatedImportConfig) selection.getFirstElement();
+						final ImportConfigItem filterItem = (ImportConfigItem) selection.getFirstElement();
 
 						final int location = getCurrentLocation();
 						final Table filterTable = _configViewer.getTable();
@@ -857,7 +855,7 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 	private void createUI_26_DragDropHint(final Composite parent) {
 
 		final Label label = new Label(parent, SWT.WRAP);
-		GridDataFactory.fillDefaults().span(2, 1).applyTo(label);
+//		GridDataFactory.fillDefaults().span(2, 1).applyTo(label);
 		label.setText(Messages.Dialog_AutoImportConfig_Info_ConfigDragDrop);
 	}
 
@@ -1131,14 +1129,14 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 	 */
 	private void createUI_88_VertexFields() {
 
-		if (_currentConfig == null) {
+		if (_currentConfigItem == null) {
 
 			updateUI_ClearVertices();
 
 			return;
 		}
 
-		final int vertexSize = _currentConfig.speedVertices.size();
+		final int vertexSize = _currentConfigItem.speedVertices.size();
 
 		// check if required vertex fields are already available
 		if (_spinnerVertex_AvgSpeed != null && _spinnerVertex_AvgSpeed.length == vertexSize) {
@@ -1180,7 +1178,7 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 				spinnerValue.setMinimum(RawDataManager.CONFIG_SPEED_MIN);
 				spinnerValue.setMaximum(RawDataManager.CONFIG_SPEED_MAX);
 				spinnerValue.setToolTipText(Messages.Dialog_AutoImportConfig_Spinner_Speed_Tooltip);
-				spinnerValue.addMouseWheelListener(_vertexValueMouseWheelListener);
+				spinnerValue.addMouseWheelListener(_defaultMouseWheelListener);
 
 				/*
 				 * Label: Speed unit
@@ -1276,6 +1274,35 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 		return vertexContainer;
 	}
 
+	private void createUI_90_ConfigUI(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+				.grab(true, false)
+				.indent(0, 10)
+				.applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		{
+
+			/*
+			 * Label: Number of columns
+			 */
+			final Label label = new Label(container, SWT.NONE);
+			label.setText(Messages.Dialog_AutoImportConfig_Label_ConfigUIColumns);
+			label.setToolTipText(Messages.Dialog_AutoImportConfig_Label_ConfigUIColumns_Tooltip);
+			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+
+			/*
+			 * Spinner: Speed value
+			 */
+			_spinnerUIColumns = new Spinner(container, SWT.BORDER);
+			_spinnerUIColumns.setMinimum(1);
+			_spinnerUIColumns.setMaximum(10);
+			_spinnerUIColumns.addMouseWheelListener(_defaultMouseWheelListener);
+			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_spinnerUIColumns);
+		}
+	}
+
 	/**
 	 * Creates an action in a toolbar.
 	 * 
@@ -1317,7 +1344,7 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 			@Override
 			public void update(final ViewerCell cell) {
 
-				cell.setText(((AutomatedImportConfig) cell.getElement()).name);
+				cell.setText(((ImportConfigItem) cell.getElement()).name);
 			}
 		});
 	}
@@ -1400,7 +1427,7 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 
 						final Integer vertexIndex = (Integer) label.getData(DATA_KEY_VERTEX_INDEX);
 
-						final SpeedVertex vertex = _currentConfig.speedVertices.get(vertexIndex);
+						final SpeedVertex vertex = _currentConfigItem.speedVertices.get(vertexIndex);
 						final long tourTypeId = vertex.tourTypeId;
 
 						label.setImage(net.tourbook.ui.UI.getInstance().getTourTypeImage(tourTypeId));
@@ -1446,7 +1473,7 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 	private void fillTourTypeMenu(final IMenuManager menuMgr) {
 
 		// get tour type which will be checked in the menu
-		final TourType checkedTourType = _currentConfig.oneTourType;
+		final TourType checkedTourType = _currentConfigItem.oneTourType;
 
 		// add all tour types to the menu
 		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
@@ -1506,8 +1533,8 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 //		return null;
 	}
 
-	public ArrayList<AutomatedImportConfig> getModifiedConfigs() {
-		return _dialogConfigs;
+	public ImportConfig getModifiedConfig() {
+		return _dialogConfig;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -1569,7 +1596,7 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 		/*
 		 * Vertex listener
 		 */
-		_vertexValueMouseWheelListener = new MouseWheelListener() {
+		_defaultMouseWheelListener = new MouseWheelListener() {
 			@Override
 			public void mouseScrolled(final MouseEvent event) {
 				UI.adjustSpinnerValueOnMouseScroll(event);
@@ -1598,9 +1625,10 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 		update_Model_From_UI();
 
 		// update model
+		final ArrayList<ImportConfigItem> configItems = _dialogConfig.configItems;
+		ImportConfigItem newConfig;
 
-		AutomatedImportConfig newConfig;
-		if (_dialogConfigs.size() == 0) {
+		if (configItems.size() == 0) {
 
 			/*
 			 * Setup default config
@@ -1612,17 +1640,17 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 
 			if (isCopy) {
 
-				newConfig = _currentConfig.clone();
+				newConfig = _currentConfigItem.clone();
 
 				// make the close more visible
 				newConfig.name = newConfig.name + UI.SPACE + newConfig.getCreateId();
 
 			} else {
 
-				newConfig = new AutomatedImportConfig();
+				newConfig = new ImportConfigItem();
 			}
 
-			_dialogConfigs.add(newConfig);
+			configItems.add(newConfig);
 		}
 
 		// update UI
@@ -1648,28 +1676,29 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 
 	private void onConfig_ModifyName() {
 
-		if (_currentConfig == null) {
+		if (_currentConfigItem == null) {
 			return;
 		}
 
 		// update model
-		_currentConfig.name = _txtConfigName.getText();
+		_currentConfigItem.name = _txtConfigName.getText();
 
 		// update UI
-		_configViewer.update(_currentConfig, null);
+		_configViewer.update(_currentConfigItem, null);
 	}
 
 	private void onConfig_Remove() {
 
 		final StructuredSelection selection = (StructuredSelection) _configViewer.getSelection();
-		final AutomatedImportConfig selectedConfig = (AutomatedImportConfig) selection.getFirstElement();
+		final ImportConfigItem selectedConfig = (ImportConfigItem) selection.getFirstElement();
 
 		int selectedIndex = 0;
+		final ArrayList<ImportConfigItem> configItems = _dialogConfig.configItems;
 
 		// get index of the selected config
-		for (int configIndex = 0; configIndex < _dialogConfigs.size(); configIndex++) {
+		for (int configIndex = 0; configIndex < configItems.size(); configIndex++) {
 
-			final AutomatedImportConfig config = _dialogConfigs.get(configIndex);
+			final ImportConfigItem config = configItems.get(configIndex);
 
 			if (config.equals(selectedConfig)) {
 				selectedIndex = configIndex;
@@ -1678,18 +1707,18 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 		}
 
 		// update model
-		_dialogConfigs.remove(selectedIndex);
+		configItems.remove(selectedIndex);
 
 		// update UI
 		_configViewer.refresh();
 
 		// select config at the same position
 
-		if (_dialogConfigs.size() == 0) {
+		if (configItems.size() == 0) {
 
 			// all configs are removed, setup empty UI
 
-			_currentConfig = null;
+			_currentConfigItem = null;
 
 			_comboDevicePath.setText(UI.EMPTY_STRING);
 			_txtConfigName.setText(UI.EMPTY_STRING);
@@ -1701,11 +1730,11 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 
 		} else {
 
-			if (selectedIndex >= _dialogConfigs.size()) {
+			if (selectedIndex >= configItems.size()) {
 				selectedIndex--;
 			}
 
-			final AutomatedImportConfig nextConfig = _dialogConfigs.get(selectedIndex);
+			final ImportConfigItem nextConfig = configItems.get(selectedIndex);
 
 			_configViewer.setSelection(new StructuredSelection(nextConfig), true);
 		}
@@ -1741,7 +1770,7 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 		}
 
 		final TableItem item = (TableItem) event.item;
-		final AutomatedImportConfig importConfig = (AutomatedImportConfig) item.getData();
+		final ImportConfigItem importConfig = (ImportConfigItem) item.getData();
 
 		switch (event.type) {
 		case SWT.MeasureItem:
@@ -1776,10 +1805,9 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 
 	private void onSelectConfig(final ISelection selection) {
 
-		final AutomatedImportConfig selectedConfig = (AutomatedImportConfig) ((StructuredSelection) selection)
-				.getFirstElement();
+		final ImportConfigItem selectedConfig = (ImportConfigItem) ((StructuredSelection) selection).getFirstElement();
 
-		if (_currentConfig == selectedConfig) {
+		if (_currentConfigItem == selectedConfig) {
 			// this is already selected
 			return;
 		}
@@ -1788,7 +1816,7 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 		update_Model_From_UI();
 
 		// set new model
-		_currentConfig = selectedConfig;
+		_currentConfigItem = selectedConfig;
 
 		update_UI_From_Model();
 
@@ -1814,7 +1842,7 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 
 		update_Model_From_UI();
 
-		final ArrayList<SpeedVertex> speedVertices = _currentConfig.speedVertices;
+		final ArrayList<SpeedVertex> speedVertices = _currentConfigItem.speedVertices;
 
 		// update model
 		speedVertices.add(0, new SpeedVertex());
@@ -1836,7 +1864,7 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 		// update model
 		update_Model_From_UI();
 
-		final ArrayList<SpeedVertex> speedVertices = _currentConfig.speedVertices;
+		final ArrayList<SpeedVertex> speedVertices = _currentConfigItem.speedVertices;
 
 		final SpeedVertex removedVertex = speedVertices.get(vertexIndex);
 
@@ -1905,8 +1933,9 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 		 * Reselect previous selected config
 		 */
 		final String stateConfigName = Util.getStateString(_state, STATE_SELECTED_CONFIG_NAME, UI.EMPTY_STRING);
+		final ArrayList<ImportConfigItem> configItems = _dialogConfig.configItems;
 
-		for (final AutomatedImportConfig config : _dialogConfigs) {
+		for (final ImportConfigItem config : configItems) {
 
 			if (config.name.equals(stateConfigName)) {
 
@@ -1917,32 +1946,37 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 
 		if (_initialConfig == null) {
 
-			_initialConfig = _dialogConfigs.get(0);
+			_initialConfig = configItems.get(0);
 		}
+
+		_spinnerUIColumns.setSelection(_dialogConfig.numUIColumns);
 	}
 
 	private void saveState() {
 
-		_state.put(STATE_SELECTED_CONFIG_NAME, _currentConfig == null ? UI.EMPTY_STRING : _currentConfig.name);
+		_state.put(STATE_SELECTED_CONFIG_NAME, _currentConfigItem == null ? UI.EMPTY_STRING : _currentConfigItem.name);
 
 		_columnManager.saveState(_state);
 
 		/*
 		 * Create config list in the table sort order
 		 */
-		final ArrayList<AutomatedImportConfig> tableConfigs = new ArrayList<>();
+		final ArrayList<ImportConfigItem> tableConfigs = new ArrayList<>();
 
 		for (final TableItem tableItem : _configViewer.getTable().getItems()) {
 
 			final Object itemData = tableItem.getData();
 
-			if (itemData instanceof AutomatedImportConfig) {
-				tableConfigs.add((AutomatedImportConfig) itemData);
+			if (itemData instanceof ImportConfigItem) {
+				tableConfigs.add((ImportConfigItem) itemData);
 			}
 		}
 
-		_dialogConfigs.clear();
-		_dialogConfigs.addAll(tableConfigs);
+		final ArrayList<ImportConfigItem> configItems = _dialogConfig.configItems;
+		configItems.clear();
+		configItems.addAll(tableConfigs);
+
+		_dialogConfig.numUIColumns = _spinnerUIColumns.getSelection();
 	}
 
 	private void selectTourTypePage(final Enum<TourTypeConfig> selectedConfig) {
@@ -1963,22 +1997,25 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 		}
 	}
 
-	private void setupConfigs(final ArrayList<AutomatedImportConfig> importConfigs) {
+	private void setupConfigs(final ImportConfig importConfig) {
 
 		/*
 		 * Clone original configs, only the backup will be modified in the dialog.
 		 */
-		_dialogConfigs = new ArrayList<>();
+		_dialogConfig = new ImportConfig();
+		final ArrayList<ImportConfigItem> configItems = _dialogConfig.configItems = new ArrayList<>();
 
-		for (final AutomatedImportConfig importConfig : importConfigs) {
-			_dialogConfigs.add(importConfig.clone());
+		for (final ImportConfigItem autoImportConfig : importConfig.configItems) {
+			configItems.add(autoImportConfig.clone());
 		}
 
-		if (_dialogConfigs.size() == 0) {
+		if (configItems.size() == 0) {
 
 			// Setup default config
 			createDefaultConfig();
 		}
+
+		_dialogConfig.numUIColumns = importConfig.numUIColumns;
 	}
 
 	/**
@@ -1986,23 +2023,23 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 	 */
 	private void update_Model_From_UI() {
 
-		if (_currentConfig == null) {
+		if (_currentConfigItem == null) {
 			return;
 		}
 
 		final Enum<TourTypeConfig> selectedTourTypeConfig = getSelectedTourTypeConfig();
 
-		_currentConfig.backupFolder = _comboBackupPath.getText();
-		_currentConfig.deviceFolder = _comboDevicePath.getText();
-		_currentConfig.tourTypeConfig = selectedTourTypeConfig;
-		_currentConfig.name = _txtConfigName.getText();
+		_currentConfigItem.backupFolder = _comboBackupPath.getText();
+		_currentConfigItem.deviceFolder = _comboDevicePath.getText();
+		_currentConfigItem.tourTypeConfig = selectedTourTypeConfig;
+		_currentConfigItem.name = _txtConfigName.getText();
 
 		/*
 		 * Set tour type data
 		 */
 		if (selectedTourTypeConfig.equals(TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED)) {
 
-			final ArrayList<SpeedVertex> speedVertices = _currentConfig.speedVertices;
+			final ArrayList<SpeedVertex> speedVertices = _currentConfigItem.speedVertices;
 
 			if (_spinnerVertex_AvgSpeed != null) {
 
@@ -2038,7 +2075,7 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 				speedVertices.addAll(newVertices);
 			}
 
-			_currentConfig.setupConfigImage();
+			_currentConfigItem.setupConfigImage();
 
 		} else if (selectedTourTypeConfig.equals(TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL)) {
 
@@ -2048,7 +2085,7 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 
 			// this is the default or TourTypeConfig.TOUR_TYPE_CONFIG_NOT_USED
 
-			_currentConfig.setupConfigImage();
+			_currentConfigItem.setupConfigImage();
 		}
 
 	}
@@ -2058,29 +2095,29 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 		final Object tourTypeId = _linkOneTourType.getData(DATA_KEY_TOUR_TYPE_ID);
 
 		if (tourTypeId instanceof Long) {
-			_currentConfig.oneTourType = TourDatabase.getTourType((long) tourTypeId);
+			_currentConfigItem.oneTourType = TourDatabase.getTourType((long) tourTypeId);
 		} else {
 
-			_currentConfig.oneTourType = null;
+			_currentConfigItem.oneTourType = null;
 		}
 
-		_currentConfig.setupConfigImage();
+		_currentConfigItem.setupConfigImage();
 	}
 
 	private void update_UI_From_Model() {
 
-		if (_currentConfig == null) {
+		if (_currentConfigItem == null) {
 			return;
 		}
 
-		final Enum<TourTypeConfig> tourTypeConfig = _currentConfig.tourTypeConfig;
+		final Enum<TourTypeConfig> tourTypeConfig = _currentConfigItem.tourTypeConfig;
 
-		_configViewer.update(_currentConfig, null);
+		_configViewer.update(_currentConfigItem, null);
 
-		_comboBackupPath.setText(_currentConfig.backupFolder);
-		_comboDevicePath.setText(_currentConfig.deviceFolder);
+		_comboBackupPath.setText(_currentConfigItem.backupFolder);
+		_comboDevicePath.setText(_currentConfigItem.deviceFolder);
 		_comboTourTypeConfig.select(getTourTypeConfigIndex(tourTypeConfig));
-		_txtConfigName.setText(_currentConfig.name);
+		_txtConfigName.setText(_currentConfigItem.name);
 
 		/*
 		 * Setup tour type UI
@@ -2094,7 +2131,7 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 				// check and create vertex fields
 				createUI_88_VertexFields();
 
-				final ArrayList<SpeedVertex> speedVertices = _currentConfig.speedVertices;
+				final ArrayList<SpeedVertex> speedVertices = _currentConfigItem.speedVertices;
 
 				final int vertexSize = speedVertices.size();
 
@@ -2143,7 +2180,7 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 
 			TourType tourType = null;
 
-			final TourType oneTourType = _currentConfig.oneTourType;
+			final TourType oneTourType = _currentConfigItem.oneTourType;
 			if (oneTourType != null) {
 
 				final long tourTypeId = oneTourType.getTypeId();

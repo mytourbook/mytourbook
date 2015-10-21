@@ -195,7 +195,7 @@ public class DialogPhotoProperties extends AnimatedToolTipShell implements IPhot
 
 		updateUI();
 
-		net.tourbook.common.UI.updateChildColors(parent, _fgColor, _bgColor);
+		net.tourbook.common.UI.setChildColors(parent, _fgColor, _bgColor);
 
 		if (_oldMapFilterData != null) {
 

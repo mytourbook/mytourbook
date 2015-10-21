@@ -622,7 +622,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 		final Color fgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOREGROUND);
 		final Color bgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND);
 
-		net.tourbook.common.UI.updateChildColors(tree, fgColor, bgColor);
+		net.tourbook.common.UI.setChildColors(tree, fgColor, bgColor);
 	}
 
 	private void createUI_30_Actions(final Composite parent) {

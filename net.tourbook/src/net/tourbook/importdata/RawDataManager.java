@@ -89,25 +89,25 @@ public class RawDataManager {
 	public static final int						ADJUST_IMPORT_YEAR_IS_DISABLED		= -1;
 
 	private static final String					XML_STATE_AUTOMATED_IMPORT_CONFIG	= "XML_STATE_AUTOMATED_IMPORT_CONFIG";						//$NON-NLS-1$
+	//
 	private static final String					TAG_IMPORT_CONFIG					= "Config";												//$NON-NLS-1$
 	private static final String					TAG_IMPORT_CONFIG_ROOT				= "AutomatedImportConfig";									//$NON-NLS-1$
 	private static final String					TAG_SPEED_VERTEX					= "Speed";													//$NON-NLS-1$
-
+	//
 	private static final String					ATTR_AVG_SPEED						= "avgSpeed";												//$NON-NLS-1$
 	private static final String					ATTR_CONFIG_NAME					= "name";													//$NON-NLS-1$
 	private static final String					ATTR_CONFIG_BACKUP_FOLDER			= "backupFolder";											//$NON-NLS-1$
 	private static final String					ATTR_CONFIG_DEVICE_FOLDER			= "deviceFolder";											//$NON-NLS-1$
+	private static final String					ATTR_NUM_UI_COLUMNS					= "uiColumns";												//$NON-NLS-1$
 	private static final String					ATTR_TOUR_TYPE_CONFIG				= "tourTypeConfig";										//$NON-NLS-1$
 	private static final String					ATTR_TOUR_TYPE_ID					= "tourTypeId";											//$NON-NLS-1$
-
+	//
 	static final int							CONFIG_SPEED_MIN					= 0;
 	static final int							CONFIG_SPEED_MAX					= 3000;
-
 	private static final int					CONFIG_SPEED_DEFAULT				= 0;
-
+	//
 	static final ComboEnumEntry<TourTypeConfig>	DEFAULT_TOUR_TYPE_CONFIG;
 	static final ComboEnumEntry<?>[]			ALL_IMPORT_TOUR_TYPE_CONFIG;
-
 	static {
 
 		DEFAULT_TOUR_TYPE_CONFIG = new ComboEnumEntry<>(Messages.Import_Data_TourTypeConfig_NotUsed,//
@@ -181,7 +181,7 @@ public class RawDataManager {
 	 */
 	private IPath								_previousSelectedReimportFolder;
 
-	private ArrayList<AutomatedImportConfig>	_importConfigs;
+	private ImportConfig						_importConfig;
 
 	public static enum ReImport {
 
@@ -1024,13 +1024,13 @@ public class RawDataManager {
 		}
 	}
 
-	public ArrayList<AutomatedImportConfig> getAutoImportConfigs() {
+	public ImportConfig getAutoImportConfigs() {
 
-		if (_importConfigs == null) {
-			_importConfigs = loadImportConfig();
+		if (_importConfig == null) {
+			_importConfig = loadImportConfig();
 		}
 
-		return _importConfigs;
+		return _importConfig;
 	}
 
 	public DeviceData getDeviceData() {
@@ -1491,9 +1491,9 @@ public class RawDataManager {
 		return newFile.getAbsolutePath();
 	}
 
-	private ArrayList<AutomatedImportConfig> loadImportConfig() {
+	private ImportConfig loadImportConfig() {
 
-		final ArrayList<AutomatedImportConfig> importConfigs = new ArrayList<>();
+		final ImportConfig importConfig = new ImportConfig();
 
 		final String stateValue = Util.getStateString(_state, XML_STATE_AUTOMATED_IMPORT_CONFIG, null);
 
@@ -1503,36 +1503,38 @@ public class RawDataManager {
 
 				final Reader reader = new StringReader(stateValue);
 
-				loadImportConfig_Data(XMLMemento.createReadRoot(reader), importConfigs);
+				loadImportConfig_Data(XMLMemento.createReadRoot(reader), importConfig);
 
 			} catch (final WorkbenchException e) {
 				// ignore
 			}
 		}
 
-		return importConfigs;
+		return importConfig;
 	}
 
-	private void loadImportConfig_Data(final XMLMemento xmlMemento, final ArrayList<AutomatedImportConfig> importConfigs) {
+	private void loadImportConfig_Data(final XMLMemento xmlMemento, final ImportConfig importConfig) {
+
+		importConfig.numUIColumns = Util.getXmlInteger(xmlMemento, ATTR_NUM_UI_COLUMNS, 2, 1, 10);
 
 		for (final IMemento xmlConfig : xmlMemento.getChildren()) {
 
-			final AutomatedImportConfig importConfig = new AutomatedImportConfig();
+			final ImportConfigItem configItem = new ImportConfigItem();
 
-			importConfig.name = Util.getXmlString(xmlConfig, ATTR_CONFIG_NAME, UI.EMPTY_STRING);
-			importConfig.backupFolder = Util.getXmlString(xmlConfig, ATTR_CONFIG_BACKUP_FOLDER, UI.EMPTY_STRING);
-			importConfig.deviceFolder = Util.getXmlString(xmlConfig, ATTR_CONFIG_DEVICE_FOLDER, UI.EMPTY_STRING);
+			configItem.name = Util.getXmlString(xmlConfig, ATTR_CONFIG_NAME, UI.EMPTY_STRING);
+			configItem.backupFolder = Util.getXmlString(xmlConfig, ATTR_CONFIG_BACKUP_FOLDER, UI.EMPTY_STRING);
+			configItem.deviceFolder = Util.getXmlString(xmlConfig, ATTR_CONFIG_DEVICE_FOLDER, UI.EMPTY_STRING);
 
 			final Enum<TourTypeConfig> ttConfig = Util.getXmlEnum(
 					xmlConfig,
 					ATTR_TOUR_TYPE_CONFIG,
 					TourTypeConfig.TOUR_TYPE_CONFIG_NOT_USED);
 
-			importConfig.tourTypeConfig = ttConfig;
+			configItem.tourTypeConfig = ttConfig;
 
 			if (TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED.equals(ttConfig)) {
 
-				final ArrayList<SpeedVertex> speedVertices = importConfig.speedVertices;
+				final ArrayList<SpeedVertex> speedVertices = configItem.speedVertices;
 
 				for (final IMemento xmlSpeed : xmlConfig.getChildren()) {
 
@@ -1564,7 +1566,7 @@ public class RawDataManager {
 
 				final Long xmlTourTypeId = Util.getXmlLong(xmlConfig, ATTR_TOUR_TYPE_ID, null);
 
-				importConfig.oneTourType = TourDatabase.getTourType(xmlTourTypeId);
+				configItem.oneTourType = TourDatabase.getTourType(xmlTourTypeId);
 
 			} else {
 
@@ -1572,9 +1574,9 @@ public class RawDataManager {
 
 			}
 
-			importConfig.setupConfigImage();
+			configItem.setupConfigImage();
 
-			importConfigs.add(importConfig);
+			importConfig.configItems.add(configItem);
 		}
 	}
 
@@ -1632,12 +1634,12 @@ public class RawDataManager {
 		}
 	}
 
-	public void saveImportConfig(final ArrayList<AutomatedImportConfig> modifiedConfigs) {
+	public void saveImportConfig(final ImportConfig importConfig) {
 
 		// Build the XML block for writing the bindings and active scheme.
 		final XMLMemento xmlMemento = XMLMemento.createWriteRoot(TAG_IMPORT_CONFIG_ROOT);
 
-		saveImportConfig_Data(xmlMemento, modifiedConfigs);
+		saveImportConfig_Data(xmlMemento, importConfig);
 
 		// Write the XML block to the state store.
 		final Writer writer = new StringWriter();
@@ -1660,23 +1662,24 @@ public class RawDataManager {
 		}
 	}
 
-	private void saveImportConfig_Data(	final XMLMemento xmlMemento,
-										final ArrayList<AutomatedImportConfig> modifiedConfigs) {
+	private void saveImportConfig_Data(final XMLMemento xmlMemento, final ImportConfig importConfig) {
 
-		for (final AutomatedImportConfig importConfig : modifiedConfigs) {
+		xmlMemento.putInteger(ATTR_NUM_UI_COLUMNS, importConfig.numUIColumns);
+
+		for (final ImportConfigItem configItem : importConfig.configItems) {
 
 			final IMemento xmlConfig = xmlMemento.createChild(TAG_IMPORT_CONFIG);
 
-			xmlConfig.putString(ATTR_CONFIG_NAME, importConfig.name);
-			xmlConfig.putString(ATTR_CONFIG_BACKUP_FOLDER, importConfig.backupFolder);
-			xmlConfig.putString(ATTR_CONFIG_DEVICE_FOLDER, importConfig.deviceFolder);
+			xmlConfig.putString(ATTR_CONFIG_NAME, configItem.name);
+			xmlConfig.putString(ATTR_CONFIG_BACKUP_FOLDER, configItem.backupFolder);
+			xmlConfig.putString(ATTR_CONFIG_DEVICE_FOLDER, configItem.deviceFolder);
 
-			final Enum<TourTypeConfig> ttConfig = importConfig.tourTypeConfig;
+			final Enum<TourTypeConfig> ttConfig = configItem.tourTypeConfig;
 			Util.setXmlEnum(xmlConfig, ATTR_TOUR_TYPE_CONFIG, ttConfig);
 
 			if (TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED.equals(ttConfig)) {
 
-				for (final SpeedVertex speedVertex : importConfig.speedVertices) {
+				for (final SpeedVertex speedVertex : configItem.speedVertices) {
 
 					final IMemento xmlSpeedVertex = xmlConfig.createChild(TAG_SPEED_VERTEX);
 
@@ -1686,7 +1689,7 @@ public class RawDataManager {
 
 			} else if (TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL.equals(ttConfig)) {
 
-				final TourType oneTourType = importConfig.oneTourType;
+				final TourType oneTourType = configItem.oneTourType;
 
 				if (oneTourType != null) {
 					Util.setXmlLong(xmlConfig, ATTR_TOUR_TYPE_ID, oneTourType.getTypeId());

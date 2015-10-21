@@ -47,8 +47,9 @@ import net.tourbook.data.TourType;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.extension.export.ActionExport;
-import net.tourbook.importdata.AutomatedImportConfig;
 import net.tourbook.importdata.DialogAutomatedImportConfig;
+import net.tourbook.importdata.ImportConfig;
+import net.tourbook.importdata.ImportConfigItem;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.SpeedVertex;
 import net.tourbook.importdata.TourTypeConfig;
@@ -122,14 +123,15 @@ import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
@@ -148,46 +150,43 @@ import org.eclipse.ui.part.ViewPart;
 public class RawDataView extends ViewPart implements ITourProviderAll, ITourViewer3 {
 
 	public static final String				ID											= "net.tourbook.views.rawData.RawDataView"; //$NON-NLS-1$
-
+	//
 	public static final int					COLUMN_DATE									= 0;
-
 	public static final int					COLUMN_TITLE								= 1;
 	public static final int					COLUMN_DATA_FORMAT							= 2;
 	public static final int					COLUMN_FILE_NAME							= 3;
+	//
 	private static final String				STATE_IMPORTED_FILENAMES					= "importedFilenames";						//$NON-NLS-1$
-
 	private static final String				STATE_SELECTED_TOUR_INDICES					= "SelectedTourIndices";					//$NON-NLS-1$
 	private static final String				STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED		= "STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED"; //$NON-NLS-1$
-
 	public static final String				STATE_IS_MERGE_TRACKS						= "isMergeTracks";							//$NON-NLS-1$
-
 	public static final String				STATE_IS_CHECKSUM_VALIDATION				= "isChecksumValidation";					//$NON-NLS-1$
 	public static final String				STATE_IS_CONVERT_WAYPOINTS					= "STATE_IS_CONVERT_WAYPOINTS";			//$NON-NLS-1$
 	public static final String				STATE_IS_CREATE_TOUR_ID_WITH_TIME			= "isCreateTourIdWithTime";				//$NON-NLS-1$
 	public static final boolean				STATE_IS_MERGE_TRACKS_DEFAULT				= false;
-
 	public static final boolean				STATE_IS_CHECKSUM_VALIDATION_DEFAULT		= true;
 	public static final boolean				STATE_IS_CONVERT_WAYPOINTS_DEFAULT			= true;
 	public static final boolean				STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT	= false;
+	//
 	public static final String				IMAGE_DATA_TRANSFER							= "IMAGE_DATA_TRANSFER";					//$NON-NLS-1$
-
 	public static final String				IMAGE_DATA_TRANSFER_DIRECT					= "IMAGE_DATA_TRANSFER_DIRECT";			//$NON-NLS-1$
 	public static final String				IMAGE_IMPORT								= "IMAGE_IMPORT";							//$NON-NLS-1$
 	public static final String				IMAGE_AUTOMATED_IMPORT						= "IMAGE_AUTOMATED_IMPORT";				//$NON-NLS-1$
+
+//	private static final RGB				BACKGROUND_COLOR							= new RGB(0x20, 0x20, 0x50);
+	//
 	private final IPreferenceStore			_prefStore									= TourbookPlugin.getPrefStore();
-
 	private final IDialogSettings			_state										= TourbookPlugin.getState(ID);
+	//
 	private RawDataManager					_rawDataMgr									= RawDataManager.getInstance();
-
+	//
 	private PostSelectionProvider			_postSelectionProvider;
-
 	private IPartListener2					_partListener;
 	private ISelectionListener				_postSelectionListener;
 	private IPropertyChangeListener			_prefChangeListener;
 	private ITourEventListener				_tourEventListener;
 	// context menu actions
 	private ActionClearView					_actionClearView;
-
 	private ActionExport					_actionExportTour;
 	private ActionEditQuick					_actionEditQuick;
 	private ActionEditTour					_actionEditTour;
@@ -204,27 +203,24 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private ActionSaveTourInDatabase		_actionSaveTour;
 	private ActionSaveTourInDatabase		_actionSaveTourWithPerson;
 	private ActionSetTourTypeMenu			_actionSetTourType;
-	// view actions
 	private ActionRemoveToursWhenClosed		_actionRemoveToursWhenClosed;
 //	private ActionAdjustYear				_actionAdjustImportedYear;
 //	private ActionCreateTourIdWithTime		_actionCreateTourIdWithTime;
 //	private ActionDisableChecksumValidation	_actionDisableChecksumValidation;
 //	private ActionMergeGPXTours				_actionMergeGPXTours;
-
+	//
 	protected TourPerson					_activePerson;
-
 	protected TourPerson					_newActivePerson;
+	//
 	protected boolean						_isPartVisible								= false;
-
 	protected boolean						_isViewerPersonDataDirty					= false;
+	//
 	private ColumnManager					_columnManager;
-
+	//
 	private final Calendar					_calendar									= GregorianCalendar
 																								.getInstance();
-
 	private final DateFormat				_dateFormatter								= DateFormat
 																								.getDateInstance(DateFormat.SHORT);
-
 	private final DateFormat				_timeFormatter								= DateFormat
 																								.getTimeInstance(DateFormat.SHORT);
 	private final DateFormat				_durationFormatter							= DateFormat.getTimeInstance(
@@ -232,7 +228,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 																								Locale.GERMAN);
 	private final NumberFormat				_nf1										= NumberFormat
 																								.getNumberInstance();
-
 	private final NumberFormat				_nf3										= NumberFormat
 																								.getNumberInstance();
 	{
@@ -241,31 +236,32 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_nf3.setMinimumFractionDigits(3);
 		_nf3.setMaximumFractionDigits(3);
 	}
+	//
 	private boolean							_isToolTipInDate;
-
 	private boolean							_isToolTipInTime;
 	private boolean							_isToolTipInTitle;
 	private boolean							_isToolTipInTags;
+	//
 	private TagMenuManager					_tagMenuMgr;
-
 	private TourDoubleClickState			_tourDoubleClickState						= new TourDoubleClickState();
+	//
 	private int								_linkDefaultWidth;
-
+	//
 	private HashMap<Long, Image>			_configImages								= new HashMap<>();
-
 	private HashMap<Long, Integer>			_configImageHash							= new HashMap<>();
+
 	/*
 	 * resources
 	 */
 	private ImageDescriptor					_imageDescDatabase;
-
 	private ImageDescriptor					_imageDescDatabaseOtherPerson;
+
 	private ImageDescriptor					_imageDescDatabaseAssignMergedTour;
 	private ImageDescriptor					_imageDescDatabasePlaceholder;
 	private ImageDescriptor					_imageDescDelete;
 	private Image							_imageDatabase;
-
 	private Image							_imageDatabaseOtherPerson;
+
 	private Image							_imageDatabaseAssignMergedTour;
 	private Image							_imageDatabasePlaceholder;
 	private Image							_imageDelete;
@@ -273,18 +269,18 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	 * UI controls
 	 */
 	private PageBook						_pageBook;
-
 	private Composite						_pageImportActions;
+
 	private Composite						_pageViewerContainer;
 	private Composite						_innerAutoImportContainer;
 	private Composite						_outerAutoImportContainer;
 	private TableViewer						_tourViewer;
-
 	private TableViewerTourInfoToolTip		_tourInfoToolTip;
 
 	private PixelConverter					_pc;
 
-	private ScrolledComposite				_pageTipsScrolledContainer;
+	private Color							_fgActionColor;
+	private Color							_bgActionColor;
 
 	private class ActionAutoImport extends Action {
 
@@ -299,6 +295,29 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		public void run() {
 			actionRunAutoImport(__configIndex);
 		}
+	}
+
+	private class ActionImport extends Action {
+
+		private ImportAction	__importAction;
+
+		public ActionImport(final ImportAction importAction) {
+
+			__importAction = importAction;
+		}
+
+		@Override
+		public void run() {
+			actionImport(__importAction);
+		}
+	}
+
+	private enum ImportAction {
+
+		FROM_FILES, //
+		AUTOMATED_IMPORT_CONFIG, //
+		DATA_TRANSFER, //
+		DATA_TRANSFER_DIRECTLY, //
 	}
 
 	private class TourDataContentProvider implements IStructuredContentProvider {
@@ -328,6 +347,31 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		// don't throw the selection again
 		_postSelectionProvider.clearSelection();
+	}
+
+	private void actionImport(final ImportAction importAction) {
+
+		switch (importAction) {
+
+		case FROM_FILES:
+			_rawDataMgr.actionImportFromFile();
+			break;
+
+		case AUTOMATED_IMPORT_CONFIG:
+			actionSetupAutomatedImport();
+			break;
+
+		case DATA_TRANSFER:
+			_rawDataMgr.actionImportFromDevice();
+			break;
+
+		case DATA_TRANSFER_DIRECTLY:
+			_rawDataMgr.actionImportFromDeviceDirect();
+			break;
+
+		default:
+			break;
+		}
 	}
 
 	void actionMergeTours(final TourData mergeFromTour, final TourData mergeIntoTour) {
@@ -440,18 +484,20 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		final Shell shell = Display.getDefault().getActiveShell();
 
-		final ArrayList<AutomatedImportConfig> importConfigs = RawDataManager.getInstance().getAutoImportConfigs();
+		final ImportConfig importConfig = RawDataManager.getInstance().getAutoImportConfigs();
 
-		final DialogAutomatedImportConfig dialog = new DialogAutomatedImportConfig(shell, importConfigs, this);
+		final DialogAutomatedImportConfig dialog = new DialogAutomatedImportConfig(shell, importConfig, this);
 
 		if (dialog.open() == Window.OK) {
 
-			final ArrayList<AutomatedImportConfig> modifiedConfigs = dialog.getModifiedConfigs();
+			final ImportConfig modifiedConfig = dialog.getModifiedConfig();
 
-			importConfigs.clear();
-			importConfigs.addAll(modifiedConfigs);
+			importConfig.configItems.clear();
+			importConfig.configItems.addAll(modifiedConfig.configItems);
 
-			RawDataManager.getInstance().saveImportConfig(importConfigs);
+			importConfig.numUIColumns = modifiedConfig.numUIColumns;
+
+			RawDataManager.getInstance().saveImportConfig(importConfig);
 
 			createUI_14_AutoImport_InnerContainer();
 
@@ -726,129 +772,113 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		{
 			createUI_20_Page_TourViewer(_pageViewerContainer);
 		}
+
+		final int bg = 0xf8;
+		final int fg = 0x0;
+
+		// set colors
+		final RGB ACTION_BG_COLOR = new RGB(bg, bg, bg);
+		final RGB ACTION_FB_COLOR = new RGB(fg, fg, fg);
+
+		_fgActionColor = new Color(parent.getDisplay(), ACTION_FB_COLOR);
+		_bgActionColor = new Color(parent.getDisplay(), ACTION_BG_COLOR);
+
+//		UI.setChildColors(_pageImportActions, _fgActionColor, _bgActionColor);
 	}
 
 	private Composite createUI_10_Page_ImportActions(final Composite parent) {
 
 		// scrolled container
-		_pageTipsScrolledContainer = new ScrolledComposite(parent, SWT.V_SCROLL);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(_pageTipsScrolledContainer);
-		_pageTipsScrolledContainer.setExpandVertical(true);
-		_pageTipsScrolledContainer.setExpandHorizontal(true);
+		final ScrolledComposite importContainer = new ScrolledComposite(parent, SWT.V_SCROLL);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(importContainer);
+		importContainer.setExpandVertical(true);
+		importContainer.setExpandHorizontal(true);
 
 		// vertex container
-		final Composite container = new Composite(_pageTipsScrolledContainer, SWT.NONE);
+		final Composite container = new Composite(importContainer, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
 		GridLayoutFactory.swtDefaults()//
-				.numColumns(2)
+				.numColumns(1)
+//				.spacing(10, 10)
+				.margins(10, 10)
 				.applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY));
-
-		_pageTipsScrolledContainer.setContent(container);
-
-		_pageTipsScrolledContainer.addControlListener(new ControlAdapter() {
+		importContainer.setContent(container);
+		importContainer.addControlListener(new ControlAdapter() {
 			@Override
 			public void controlResized(final ControlEvent e) {
-				_pageTipsScrolledContainer.setMinSize(container.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+				importContainer.setMinSize(container.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 			}
 		});
+//		container.setBackground(_bgActionColor);
 
 		{
-			/*
-			 * label: info
-			 */
-			Label label = new Label(container, SWT.WRAP);
-			GridDataFactory.fillDefaults()//
-					.hint(_linkDefaultWidth, SWT.DEFAULT)
-					.grab(true, false)
-					.span(2, 1)
-					.applyTo(label);
-			label.setText(Messages.Import_Data_Label_Info);
-
-			/*
-			 * Link: Import from files
-			 */
-			final Link linkImport = createUI_Link(container, //
-					IMAGE_IMPORT,
-					Messages.Import_Data_Link_Import);
-
-			linkImport.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					_rawDataMgr.actionImportFromFile();
-				}
-			});
-
-			/*
-			 * Link: Automated import from files
-			 */
-			final Link linkAutomatedImportConfig = createUI_Link(container, //
-					IMAGE_AUTOMATED_IMPORT,
-					Messages.Import_Data_Link_AutomatedImport);
-
-			linkAutomatedImportConfig.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					actionSetupAutomatedImport();
-				}
-			});
-
+			// action: Automated import from files
 			createUI_12_AutoImport(container);
 
-			// spacer
-			label = new Label(container, SWT.NONE);
-			GridDataFactory.fillDefaults().span(2, 1).applyTo(label);
+			// action: Import from files
+			ToolBar tb = createUI_ImportAction(container, //
+					Messages.Import_Data_Link_Import,
+					IMAGE_IMPORT,
+					ImportAction.FROM_FILES,
+					false);
+			GridDataFactory.fillDefaults().indent(0, 30).applyTo(tb);
 
-			/*
-			 * link: data transfer
-			 */
-			final Link linkTransfer = createUI_Link(container,//
+			// action: data transfer
+			tb = createUI_ImportAction(container, //
+					Messages.Import_Data_Link_ReceiveFromSerialPort_Configured,
 					IMAGE_DATA_TRANSFER,
-					Messages.Import_Data_Link_ReceiveFromSerialPort_Configured);
+					ImportAction.DATA_TRANSFER,
+					false);
+			GridDataFactory.fillDefaults().indent(0, 20).applyTo(tb);
 
-			linkTransfer.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					_rawDataMgr.actionImportFromDevice();
-				}
-			});
-
-			/*
-			 * link: direct data transfer
-			 */
-			final Link linkTransferDirect = createUI_Link(container,//
+			// action: direct data transfer
+			createUI_ImportAction(container, //
+					Messages.Import_Data_Link_ReceiveFromSerialPort_Directly,
 					IMAGE_DATA_TRANSFER_DIRECT,
-					Messages.Import_Data_Link_ReceiveFromSerialPort_Directly);
-			linkTransferDirect.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					_rawDataMgr.actionImportFromDeviceDirect();
-				}
-			});
-
-			/*
-			 * label: hint
-			 */
-			label = new Label(container, SWT.WRAP);
-			GridDataFactory.fillDefaults()//
-					.hint(_linkDefaultWidth, SWT.DEFAULT)
-					.grab(true, false)
-					.indent(0, 20)
-					.span(2, 1)
-					.applyTo(label);
-			label.setText(Messages.Import_Data_Label_Hint);
+					ImportAction.DATA_TRANSFER_DIRECTLY,
+					false);
 		}
 
-		return _pageTipsScrolledContainer;
+		return importContainer;
 	}
 
 	private void createUI_12_AutoImport(final Composite parent) {
 
-		// left column
-		new Label(parent, SWT.NONE);
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+				.grab(true, false)
+				.indent(0, 0)
+				.applyTo(container);
+//		container.setBackground(_bgActionColor);
+
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		{
+			/*
+			 * label
+			 */
+			final Label label = new Label(container, SWT.NONE);
+			GridDataFactory.fillDefaults()//
+					.align(SWT.FILL, SWT.CENTER)
+					.applyTo(label);
+			label.setText(Messages.Import_Data_Label_AutomatedImport);
+//			label.setForeground(_fgActionColor);
+//			label.setBackground(_bgActionColor);
+
+			/*
+			 * action: configure automated import from files
+			 */
+			final ActionImport action = new ActionImport(ImportAction.AUTOMATED_IMPORT_CONFIG);
+
+			action.setToolTipText(Messages.Import_Data_Action_AutomatedImportConfig_Tooltip);
+			action.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__tour_options));
+
+			createUI_ImportAction(container, action, false);
+		}
 
 		_outerAutoImportContainer = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(_outerAutoImportContainer);
+		GridDataFactory.fillDefaults()//
+				.grab(true, false)
+				.applyTo(_outerAutoImportContainer);
 		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(_outerAutoImportContainer);
 		{
 			createUI_14_AutoImport_InnerContainer();
@@ -861,84 +891,46 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			_innerAutoImportContainer.dispose();
 		}
 
+		final ImportConfig importConfig = RawDataManager.getInstance().getAutoImportConfigs();
+
 		_innerAutoImportContainer = new Composite(_outerAutoImportContainer, SWT.NONE);
+//		_innerAutoImportContainer.setBackground(_bgActionColor);
+
 		GridDataFactory.fillDefaults()//
-				.grab(false, false)
+				.grab(true, false)
+//				.align(SWT.CENTER, SWT.FILL)
 				.applyTo(_innerAutoImportContainer);
 		GridLayoutFactory.fillDefaults()//
-				.numColumns(1)
-				.spacing(0, 0)
+				.numColumns(importConfig.numUIColumns)
+				.equalWidth(true)
 				.applyTo(_innerAutoImportContainer);
-//		_innerAutoImportContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY));
+//		_innerAutoImportContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_BLUE));
 		{
-
-			final ArrayList<AutomatedImportConfig> importConfigs = RawDataManager.getInstance().getAutoImportConfigs();
+			final ArrayList<ImportConfigItem> configItems = importConfig.configItems;
 
 			// create an action for each import configuration
-			for (int configIndex = 0; configIndex < importConfigs.size(); configIndex++) {
+			for (int configIndex = 0; configIndex < configItems.size(); configIndex++) {
 
-				final AutomatedImportConfig importConfig = importConfigs.get(configIndex);
+				final ImportConfigItem configItem = configItems.get(configIndex);
 
-				final String configName = importConfig.name;
-				final String configTooltip = createUI_ConfigTooltip(importConfig);
+				final String configName = configItem.name;
+				final String configTooltip = createUI_ConfigTooltip(configItem);
 
-				final String actionText = configName.length() == 0 //
+				final String actionText = configName.trim().length() == 0 //
 						? Messages.Import_Data_Link_ConfigName
 						: configName;
 
-				final Image importConfigImage = getImportConfigImage(importConfig);
+				final Image importConfigImage = getImportConfigImage(configItem);
 
-				/*
-				 * Icon
-				 */
-//				{
-//
-//					if (importConfigImage == null) {
-//
-//						// fill left column
-//						new Label(_innerAutoImportContainer, SWT.NONE);
-//
-//					} else {
-//
-//						final ActionAutoImport actionAutoImportIcon = new ActionAutoImport(configIndex);
-//						actionAutoImportIcon.setToolTipText(configTooltip);
-//						actionAutoImportIcon.setImageDescriptor(ImageDescriptor.createFromImage(importConfigImage));
-//
-//						final ToolBar toolbar = new ToolBar(_innerAutoImportContainer, SWT.FLAT);
-//						GridDataFactory.fillDefaults()//
-//								.align(SWT.END, SWT.FILL)
-//								.applyTo(toolbar);
-//						final ToolBarManager tbm = new ToolBarManager(toolbar);
-//						tbm.add(actionAutoImportIcon);
-//						tbm.update(true);
-//					}
-//				}
+				final ActionAutoImport action = new ActionAutoImport(configIndex);
+				action.setText(actionText);
+				action.setToolTipText(configTooltip);
 
-				/*
-				 * Text
-				 */
-				{
-					final ActionAutoImport actionAutoImportText = new ActionAutoImport(configIndex);
-					actionAutoImportText.setText(actionText);
-					actionAutoImportText.setToolTipText(configTooltip);
-
-					if (importConfigImage != null) {
-						actionAutoImportText.setImageDescriptor(ImageDescriptor.createFromImage(importConfigImage));
-					}
-
-					final ActionContributionItem item = new ActionContributionItem(actionAutoImportText);
-					item.setMode(ActionContributionItem.MODE_FORCE_TEXT);
-
-					final ToolBar toolbar = new ToolBar(_innerAutoImportContainer, SWT.FLAT | SWT.RIGHT);
-					GridDataFactory.fillDefaults()//
-//							.grab(true, false)
-//							.align(SWT.END, SWT.FILL)
-							.applyTo(toolbar);
-
-					final ToolBarManager tbm = new ToolBarManager(toolbar);
-					tbm.add(item);
-					tbm.update(true);
+				if (importConfigImage != null) {
+					action.setImageDescriptor(ImageDescriptor.createFromImage(importConfigImage));
 				}
+
+				createUI_ImportAction(_innerAutoImportContainer, action, true);
 			}
 		}
 	}
@@ -1021,7 +1013,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_columnManager.createHeaderContextMenu(table, tableContextMenu);
 	}
 
-	private String createUI_ConfigTooltip(final AutomatedImportConfig importConfig) {
+	private String createUI_ConfigTooltip(final ImportConfigItem importConfig) {
 
 		final Enum<TourTypeConfig> tourTypeConfig = importConfig.tourTypeConfig;
 
@@ -1075,26 +1067,51 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		return sb.toString();
 	}
 
-	private Link createUI_Link(final Composite parent, final String image, final String text) {
+	private ToolBar createUI_ImportAction(final Composite parent, final Action action, final boolean isCenter) {
 
-		final Label iconImport = new Label(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-//				.indent(0, 10)
-				.hint(16, 16)
-				.applyTo(iconImport);
-		iconImport.setImage(net.tourbook.ui.UI.IMAGE_REGISTRY.get(image));
+		final ActionContributionItem item = new ActionContributionItem(action);
 
-		final Link linkImport = new Link(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-				.hint(_linkDefaultWidth, SWT.DEFAULT)
-				.align(SWT.FILL, SWT.CENTER)
-				.grab(true, false)
-//				.indent(0, 10)
-				.applyTo(linkImport);
+		item.setMode(ActionContributionItem.MODE_FORCE_TEXT);
 
-		linkImport.setText(text);
+		ToolBar tb;
 
-		return linkImport;
+		if (isCenter) {
+
+			tb = new ToolBar(parent, SWT.FLAT);
+
+			GridDataFactory.fillDefaults()//
+					.align(SWT.CENTER, SWT.CENTER)
+					.applyTo(tb);
+
+		} else {
+
+			tb = new ToolBar(parent, SWT.FLAT | SWT.RIGHT);
+		}
+
+//		tb.setBackground(_bgActionColor);
+
+		final ToolBarManager tbm = new ToolBarManager(tb);
+
+		tbm.add(item);
+		tbm.update(true);
+
+		return tb;
+	}
+
+	private ToolBar createUI_ImportAction(	final Composite parent,
+											final String text,
+											final String imageId,
+											final ImportAction importAction,
+											final boolean isCenter) {
+
+		final Image actionImage = net.tourbook.ui.UI.IMAGE_REGISTRY.get(imageId);
+
+		final ActionImport action = new ActionImport(importAction);
+
+		action.setText(text);
+		action.setImageDescriptor(ImageDescriptor.createFromImage(actionImage));
+
+		return createUI_ImportAction(parent, action, isCenter);
 	}
 
 	/**
@@ -1663,21 +1680,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	@Override
 	public void dispose() {
 
-		if (_imageDatabase != null) {
-			_imageDescDatabase.destroyResource(_imageDatabase);
-		}
-		if (_imageDatabaseOtherPerson != null) {
-			_imageDescDatabaseOtherPerson.destroyResource(_imageDatabaseOtherPerson);
-		}
-		if (_imageDatabaseAssignMergedTour != null) {
-			_imageDescDatabaseAssignMergedTour.destroyResource(_imageDatabaseAssignMergedTour);
-		}
-		if (_imageDatabasePlaceholder != null) {
-			_imageDescDatabasePlaceholder.destroyResource(_imageDatabasePlaceholder);
-		}
-		if (_imageDelete != null) {
-			_imageDescDelete.destroyResource(_imageDelete);
-		}
+		Util.disposeResource(_fgActionColor);
+		Util.disposeResource(_bgActionColor);
+
+		Util.disposeResource(_imageDatabase);
+		Util.disposeResource(_imageDatabaseOtherPerson);
+		Util.disposeResource(_imageDatabaseAssignMergedTour);
+		Util.disposeResource(_imageDatabasePlaceholder);
+		Util.disposeResource(_imageDelete);
 
 		// don't throw the selection again
 		_postSelectionProvider.clearSelection();
@@ -2041,7 +2051,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		return dbImage;
 	}
 
-	public Image getImportConfigImage(final AutomatedImportConfig importConfig) {
+	public Image getImportConfigImage(final ImportConfigItem importConfig) {
 
 		final int imageWidth = importConfig.imageWidth;
 
@@ -2207,7 +2217,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	 * @return Returns <code>true</code> when the image is valid, returns <code>false</code> when
 	 *         the profile image must be created,
 	 */
-	private boolean isConfigImageValid(final Image image, final AutomatedImportConfig importConfig) {
+	private boolean isConfigImageValid(final Image image, final ImportConfigItem importConfig) {
 
 		if (image == null || image.isDisposed()) {
 
