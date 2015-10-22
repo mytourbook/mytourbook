@@ -114,7 +114,7 @@ public class ImportConfigItem implements Cloneable, Comparable<ImportConfigItem>
 			final int numVertices = speedVertices.size();
 
 			imageHash = speedVertices.hashCode();
-			imageWidth = numVertices * UI.TOUR_TYPE_IMAGE_SIZE;
+			imageWidth = numVertices * TourType.TOUR_TYPE_IMAGE_SIZE;
 
 		} else if (TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL.equals(tourTypeConfig)) {
 
@@ -126,7 +126,7 @@ public class ImportConfigItem implements Cloneable, Comparable<ImportConfigItem>
 			} else {
 
 				imageHash = oneTourType.hashCode();
-				imageWidth = UI.TOUR_TYPE_IMAGE_SIZE;
+				imageWidth = TourType.TOUR_TYPE_IMAGE_SIZE;
 			}
 
 		} else {

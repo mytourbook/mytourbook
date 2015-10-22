@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package net.tourbook.data;
 
 import javax.persistence.Basic;
@@ -30,14 +29,25 @@ import org.eclipse.swt.graphics.RGB;
 @Entity
 public class TourType implements Comparable<Object> {
 
-	public static final int	DB_LENGTH_NAME	= 100;
+	public static final int	DB_LENGTH_NAME			= 100;
+
+	/** Width/height of the tour type image. */
+	public static final int	TOUR_TYPE_IMAGE_SIZE	= 16;
+
+	/** Color which is transparent in the tour type image. */
+	public static final RGB	TRANSPARENT_COLOR		= new RGB(0x01, 0xfe, 0x00);
+
+	/** Color value which is transparent in the tour type image. */
+	public static final int	TRANSPARENT_COLOR_VALUE	= (TRANSPARENT_COLOR.red & 0xFF) << 8 //
+															| (TRANSPARENT_COLOR.green & 0xFF) << 16
+															| (TRANSPARENT_COLOR.blue & 0xFF) << 24;
 
 	/**
 	 * contains the entity id
 	 */
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long			typeId			= TourDatabase.ENTITY_IS_NOT_SAVED;
+	private long			typeId					= TourDatabase.ENTITY_IS_NOT_SAVED;
 
 	@Basic(optional = false)
 	private String			name;
@@ -63,13 +73,13 @@ public class TourType implements Comparable<Object> {
 	 * persisted
 	 */
 	@Transient
-	private long			_createId		= 0;
+	private long			_createId				= 0;
 
 	/**
 	 * manually created marker or imported marker create a unique id to identify them, saved marker
 	 * are compared with the marker id
 	 */
-	private static int		_createCounter	= 0;
+	private static int		_createCounter			= 0;
 
 	/**
 	 * default constructor used in ejb
@@ -196,7 +206,7 @@ public class TourType implements Comparable<Object> {
 	 * @param text
 	 */
 	public void setColors(final RGB bright, final RGB dark, final RGB line, final RGB text) {
-		
+
 		setColorBright(bright);
 		setColorDark(dark);
 		setColorLine(line);

@@ -6,8 +6,8 @@ html
 
 body 
 {
-	font-size:				13px;
-	color:					#fff;
+	font-size:				12px;
+	color:					#888;
 	background-color:		#333;
 	margin:					5px;
 }
@@ -38,16 +38,64 @@ body,p,h1,h2,h3,h4,table,td,th,ul,ol,textarea,input
 	font-family: 			Segoe UI, helvetica, arial, sans-serif;
 }
 
-td.auto-import-button
+td.auto-import
 {
 	xborder:					1px solid;
 	text-align:				center;
-	max-width: 				10em;
-	padding: 				5px;
+	xmax-width: 				10em;
+	padding: 				10px;
 }
 
-td.auto-import-button:HOVER
+div.auto-import
+{
+	background-color: 		#444;
+	cursor:					pointer;
+	min-height: 			7em;
+	max-height: 			7em;
+	min-width: 				7em;
+	max-width: 				7em;
+	
+	position:				relative;
+	overflow:	 			hidden;
+}
+
+div.auto-import:HOVER
 {
 	background-color: 		#888;
-	cursor:					pointer;
+}
+
+a.auto-import
+{
+	position:				absolute;
+	bottom:					0px;
+	display: 				inline-block;
+	width:					100%;
+	min-height: 			100%;
+	max-height: 			100%;
+	
+	xbackground-color: 		yellow;
+}
+
+div.auto-import-image
+{
+	padding:				5px;
+	
+	xbackground-color: 		#008;
+}
+
+div.auto-import-name
+{
+	position:				absolute;
+	bottom:					5px;
+	text-align: 			center;
+	width: 					100%;
+
+	xbackground-color: 		green;
+}
+
+a:LINK,
+a:VISITED 
+{
+	color:					#ddd;	
+    text-decoration:		none;
 }

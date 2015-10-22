@@ -134,6 +134,7 @@ import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
@@ -759,7 +760,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		final StringBuilder sb = new StringBuilder();
 
 		// enforce equal column width
-		sb.append("<table style='table-layout: fixed;'><tbody>\n");
+		sb.append("<table xstyle='table-layout: fixed;'><tbody>\n");
 
 		for (int configIndex = 0; configIndex < configItems.size(); configIndex++) {
 
@@ -771,7 +772,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			final ImportConfigItem configItem = configItems.get(configIndex);
 
 			// enforce equal column width
-			sb.append("<td style='width:" + 100 / numColumns + "%' class='auto-import-button'>");
+			sb.append("<td style='width:" + 100 / numColumns + "%' class='auto-import'>");
 			sb.append(createHTML_52_ConfigItem(configItem));
 			sb.append("</td>\n");
 
@@ -804,12 +805,16 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			htmlImage = "<img src='data:image/png;base64," + base64Encoded + "'>";
 		}
 
-		final String html =
+		final String html = ""
 		//
-		("<a>\n") //
-				+ htmlImage
-				+ ("</br>" + configItem.name)
-				+ ("</a>");
+				+ ("<div class='auto-import'>")
+				+ ("<a href='#' class='auto-import'>\n")
+				+ ("	<div class='auto-import-image'>" + htmlImage + "</div>")
+				+ ("	<div class='auto-import-name'>" + configItem.name + "</div>")
+				+ ("</a>")
+				+ ("</div>")
+		//
+		;
 
 		return html;
 	}
@@ -2235,41 +2240,48 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		if (TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED.equals(tourTypeConfig)) {
 
 			final ArrayList<SpeedVertex> speedVertices = importConfig.speedVertices;
-			final int imageSize = UI.TOUR_TYPE_IMAGE_SIZE;
+			final int imageSize = TourType.TOUR_TYPE_IMAGE_SIZE;
 
-			final Image ttConfigImage = new Image(display, imageWidth, imageSize);
-			final GC gcImage = new GC(ttConfigImage);
+			final Image tempImage = new Image(display, imageWidth, imageSize);
 			{
-				for (int imageIndex = 0; imageIndex < speedVertices.size(); imageIndex++) {
+				final GC gcImage = new GC(tempImage);
+				final Color colorTransparent = new Color(display, TourType.TRANSPARENT_COLOR);
+				{
+					// fill with transparent color
+					gcImage.setBackground(colorTransparent);
+					gcImage.fillRectangle(0, 0, imageWidth, imageSize);
 
-					final SpeedVertex vertex = speedVertices.get(imageIndex);
+					for (int imageIndex = 0; imageIndex < speedVertices.size(); imageIndex++) {
 
-					final Image ttImage = ui.getTourTypeImage(vertex.tourTypeId);
+						final SpeedVertex vertex = speedVertices.get(imageIndex);
 
-					gcImage.drawImage(ttImage, //
-							0,
-							0,
-							imageSize,
-							imageSize,
+						final Image ttImage = ui.getTourTypeImage(vertex.tourTypeId);
 
-							imageSize * imageIndex,
-							0,
-							imageSize,
-							imageSize);
+						gcImage.drawImage(ttImage, //
+								0,
+								0,
+								imageSize,
+								imageSize,
+
+								imageSize * imageIndex,
+								0,
+								imageSize,
+								imageSize);
+					}
 				}
+				gcImage.dispose();
+				colorTransparent.dispose();
+
+				/*
+				 * set transparency
+				 */
+				final ImageData imageData = tempImage.getImageData();
+				imageData.transparentPixel = TourType.TRANSPARENT_COLOR_VALUE;
+
+
+				image = new Image(display, imageData);
 			}
-			gcImage.dispose();
-
-			/*
-			 * set transparency
-			 */
-			final ImageData imageData = ttConfigImage.getImageData();
-			ttConfigImage.dispose();
-
-			final int transparentPixel = imageData.getPixel(0, 0);
-			imageData.transparentPixel = transparentPixel;
-
-			image = new Image(display, imageData);
+			tempImage.dispose();
 
 		} else if (TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL.equals(tourTypeConfig)) {
 
@@ -2278,24 +2290,32 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			if (tourType != null) {
 
 				// create a copy because the copied image can be disposed
-				final Image newImage = new Image(display, UI.TOUR_TYPE_IMAGE_SIZE, UI.TOUR_TYPE_IMAGE_SIZE);
-				final GC gcImage = new GC(newImage);
+				final Image tempImage = new Image(display, TourType.TOUR_TYPE_IMAGE_SIZE, TourType.TOUR_TYPE_IMAGE_SIZE);
 				{
-					final Image ttImage = ui.getTourTypeImage(tourType.getTypeId());
-					gcImage.drawImage(ttImage, 0, 0);
+
+					final GC gcImage = new GC(tempImage);
+					final Color colorTransparent = new Color(display, TourType.TRANSPARENT_COLOR);
+					{
+						// fill with transparent color
+						gcImage.setBackground(colorTransparent);
+						gcImage.fillRectangle(0, 0, TourType.TOUR_TYPE_IMAGE_SIZE, TourType.TOUR_TYPE_IMAGE_SIZE);
+
+						final Image ttImage = ui.getTourTypeImage(tourType.getTypeId());
+						gcImage.drawImage(ttImage, 0, 0);
+					}
+					gcImage.dispose();
+					colorTransparent.dispose();
+
+					/*
+					 * set transparency
+					 */
+					final ImageData imageData = tempImage.getImageData();
+					imageData.transparentPixel = TourType.TRANSPARENT_COLOR_VALUE;
+
+					image = new Image(display, imageData);
+
 				}
-				gcImage.dispose();
-
-				/*
-				 * set transparency
-				 */
-				final ImageData imageData = newImage.getImageData();
-				newImage.dispose();
-
-				final int transparentPixel = imageData.getPixel(0, 0);
-				imageData.transparentPixel = transparentPixel;
-
-				image = new Image(display, imageData);
+				tempImage.dispose();
 			}
 
 		} else {

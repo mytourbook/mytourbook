@@ -148,7 +148,6 @@ public class UI {
 	public static final String				LINK_TAG_START							= "<a>";																	//$NON-NLS-1$
 
 	public static final int					FORM_FIRST_COLUMN_INDENT				= 16;
-	public static final int					TOUR_TYPE_IMAGE_SIZE					= 16;
 
 	/**
 	 * The ellipsis is the string that is used to represent shortened text.

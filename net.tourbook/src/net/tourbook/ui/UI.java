@@ -1329,10 +1329,9 @@ public class UI {
 
 		final Display display = Display.getCurrent();
 
-		final Image tourTypeImage = new Image(
-				display,
-				net.tourbook.common.UI.TOUR_TYPE_IMAGE_SIZE,
-				net.tourbook.common.UI.TOUR_TYPE_IMAGE_SIZE);
+		final Image tourTypeImage = new Image(display, TourType.TOUR_TYPE_IMAGE_SIZE, TourType.TOUR_TYPE_IMAGE_SIZE);
+//		tourTypeImage.setBackground(color);
+
 		final GC gcImage = new GC(tourTypeImage);
 		{
 			drawTourTypeImage(typeId, gcImage);
@@ -1381,25 +1380,25 @@ public class UI {
 			return;
 		}
 
-		final int tourTypeImageSize = net.tourbook.common.UI.TOUR_TYPE_IMAGE_SIZE;
+		final int imageSize = TourType.TOUR_TYPE_IMAGE_SIZE;
 		final Display display = Display.getCurrent();
 		final DrawingColors drawingColors = getTourTypeColors(display, typeId);
 
 		final Color colorBright = drawingColors.colorBright;
 		final Color colorDark = drawingColors.colorDark;
 		final Color colorLine = drawingColors.colorLine;
-		final Color colorTransparent = new Color(display, 0x01, 0x00, 0x00);
+		final Color colorTransparent = new Color(display, TourType.TRANSPARENT_COLOR);
+		{
+			gcImage.setBackground(colorTransparent);
+			gcImage.fillRectangle(0, 0, imageSize, imageSize);
 
-		gcImage.setBackground(colorTransparent);
-		gcImage.fillRectangle(0, 0, tourTypeImageSize, tourTypeImageSize);
+			gcImage.setForeground(colorBright);
+			gcImage.setBackground(colorDark);
+			gcImage.fillGradientRectangle(4, 4, imageSize - 8, imageSize - 8, false);
 
-		gcImage.setForeground(colorBright);
-		gcImage.setBackground(colorDark);
-		gcImage.fillGradientRectangle(4, 4, tourTypeImageSize - 8, tourTypeImageSize - 8, false);
-
-		gcImage.setForeground(colorLine);
-		gcImage.drawRectangle(3, 3, tourTypeImageSize - 7, tourTypeImageSize - 7);
-
+			gcImage.setForeground(colorLine);
+			gcImage.drawRectangle(3, 3, imageSize - 7, imageSize - 7);
+		}
 		drawingColors.dispose();
 		colorTransparent.dispose();
 	}
@@ -1540,10 +1539,7 @@ public class UI {
 
 		final Display display = Display.getCurrent();
 
-		final Image tourTypeImage = new Image(
-				display,
-				net.tourbook.common.UI.TOUR_TYPE_IMAGE_SIZE,
-				net.tourbook.common.UI.TOUR_TYPE_IMAGE_SIZE);
+		final Image tourTypeImage = new Image(display, TourType.TOUR_TYPE_IMAGE_SIZE, TourType.TOUR_TYPE_IMAGE_SIZE);
 		GC gc = new GC(tourTypeImage);
 		{
 			drawTourTypeImage(typeId, gc);
