@@ -19,7 +19,10 @@ import java.util.ArrayList;
 
 public class ImportConfig {
 
-	public int							numUIColumns	= 2;
+	public int							backgroundOpacity	= 5;					// 0.05
 
-	public ArrayList<ImportConfigItem>	configItems		= new ArrayList<>();
+	public int							numUIColumns		= 5;
+
+	public ArrayList<ImportConfigItem>	configItems			= new ArrayList<>();
+
 }

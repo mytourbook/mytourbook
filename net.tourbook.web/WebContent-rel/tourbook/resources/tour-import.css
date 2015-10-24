@@ -7,9 +7,13 @@ html
 body 
 {
 	font-size:				12px;
-	color:					#888;
-	background-color:		#333;
-	margin:					5px;
+	color:					#fff;
+	background-color:		#888;
+}
+
+html, body 
+{
+	margin:					0px;
 }
 
 p,td,ul 
@@ -38,17 +42,38 @@ body,p,h1,h2,h3,h4,table,td,th,ul,ol,textarea,input
 	font-family: 			Segoe UI, helvetica, arial, sans-serif;
 }
 
+div.import-container
+{
+	position:				relative;
+	height:					100vh;
+}
+
+div.import-background
+{
+	position:				absolute;
+	top: 					0;
+	left: 					0;
+	height: 				100%;
+	width: 					100%;
+	
+	/* background is inline embedded */
+}
+
+div.import-content
+{
+	position:				absolute;
+}
+
 td.auto-import
 {
-	xborder:					1px solid;
-	text-align:				center;
-	xmax-width: 				10em;
+	xborder:				1px solid;
 	padding: 				10px;
 }
 
 div.auto-import
 {
-	background-color: 		#444;
+	xbackground-color: 		#444;
+	border:					1px #444 solid;
 	cursor:					pointer;
 	min-height: 			7em;
 	max-height: 			7em;
@@ -61,8 +86,10 @@ div.auto-import
 
 div.auto-import:HOVER
 {
-	background-color: 		#888;
-}
+	xbackground-color: 		#888;
+	xopacity:					0.7;
+	border:					1px #ddd solid;
+}	
 
 a.auto-import
 {
@@ -96,6 +123,6 @@ div.auto-import-name
 a:LINK,
 a:VISITED 
 {
-	color:					#ddd;	
-    text-decoration:		none;
+	color:					#fff;
+   text-decoration:			none;
 }

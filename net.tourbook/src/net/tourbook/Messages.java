@@ -112,30 +112,32 @@ public class Messages extends NLS {
 	public static String		dialog_export_shell_text;
 	public static String		dialog_export_txt_filePath_tooltip;
 
-	public static String		Dialog_AutoImportConfig_Action_AddSpeed_Tooltip;
-	public static String		Dialog_AutoImportConfig_Action_RemoveSpeed_Tooltip;
-	public static String		Dialog_AutoImportConfig_Action_SortVertices_Tooltip;
-	public static String		Dialog_AutoImportConfig_Checkbox_SetTourType;
-	public static String		Dialog_AutoImportConfig_Column_Name;
+	public static String		Dialog_ImportConfig_Action_AddSpeed_Tooltip;
+	public static String		Dialog_ImportConfig_Action_RemoveSpeed_Tooltip;
+	public static String		Dialog_ImportConfig_Action_SortVertices_Tooltip;
+	public static String		Dialog_ImportConfig_Checkbox_SetTourType;
+	public static String		Dialog_ImportConfig_Column_Name;
+	public static String		Dialog_ImportConfig_Column_TourType;
+	public static String		Dialog_ImportConfig_Dialog_Message;
+	public static String		Dialog_ImportConfig_Dialog_Title;
+	public static String		Dialog_ImportConfig_Group_Configuration;
+	public static String		Dialog_ImportConfig_Group_TourType;
+	public static String		Dialog_ImportConfig_Info_ConfigDragDrop;
+	public static String		Dialog_ImportConfig_Label_BackupFolder;
+	public static String		Dialog_ImportConfig_Label_ConfigName;
+	public static String		Dialog_ImportConfig_Label_ConfigTitle;
+	public static String		Dialog_ImportConfig_Label_DeviceFolder;
 
-	public static String		Dialog_AutoImportConfig_Column_TourType;
-	public static String		Dialog_AutoImportConfig_Dialog_Message;
-	public static String		Dialog_AutoImportConfig_Dialog_Title;
-	public static String		Dialog_AutoImportConfig_Group_Configuration;
-	public static String		Dialog_AutoImportConfig_Group_TourType;
+	public static String	Dialog_ImportConfig_Label_ImportBackgroundOpacity;
 
-	public static String		Dialog_AutoImportConfig_Info_ConfigDragDrop;
-	public static String		Dialog_AutoImportConfig_Label_BackupFolder;
-	public static String		Dialog_AutoImportConfig_Label_ConfigName;
-	public static String		Dialog_AutoImportConfig_Label_ConfigTitle;
+	public static String	Dialog_ImportConfig_Label_ImportBackgroundOpacity_Tooltip;
 
-	public static String	Dialog_AutoImportConfig_Label_ConfigUIColumns;
+	public static String	Dialog_ImportConfig_Label_ImportColumns;
 
-	public static String	Dialog_AutoImportConfig_Label_ConfigUIColumns_Tooltip;
-	public static String		Dialog_AutoImportConfig_Label_DeviceFolder;
-	public static String		Dialog_AutoImportConfig_Label_TourType;
-	public static String		Dialog_AutoImportConfig_Link_TourType;
-	public static String		Dialog_AutoImportConfig_Spinner_Speed_Tooltip;
+	public static String	Dialog_ImportConfig_Label_ImportColumns_Tooltip;
+	public static String		Dialog_ImportConfig_Label_TourType;
+	public static String		Dialog_ImportConfig_Link_TourType;
+	public static String		Dialog_ImportConfig_Spinner_Speed_Tooltip;
 
 	public static String		Dialog_HRZone_Button_AddZone;
 	public static String		Dialog_HRZone_Button_EditHrZones;
@@ -794,7 +796,7 @@ public class Messages extends NLS {
 	public static String		import_data_updateDataFromDatabase_subTask;
 	public static String		import_data_updateDataFromDatabase_task;
 
-	public static String	Import_Data_Action_AutomatedImportConfig_Tooltip;
+	public static String		Import_Data_Action_AutomatedImportConfig_Tooltip;
 
 	public static String		Import_Data_Action_EditImportPreferences;
 	public static String		Import_Data_Action_Reimport_EntireTour;
@@ -824,7 +826,7 @@ public class Messages extends NLS {
 	public static String		Import_Data_Dialog_ReimportIsInvalid_WrongSliceNumbers_Message;
 	public static String		Import_Data_Error_CreatingFileName_Message;
 	public static String		Import_Data_Error_CreatingFileName_Title;
-	public static String	Import_Data_Label_AutomatedImport;
+	public static String		Import_Data_Label_AutomatedImport;
 
 	public static String		Import_Data_Label_Hint;
 	public static String		Import_Data_Label_Info;

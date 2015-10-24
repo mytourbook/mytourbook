@@ -50,7 +50,7 @@ import net.tourbook.data.TourType;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.extension.export.ActionExport;
-import net.tourbook.importdata.DialogAutomatedImportConfig;
+import net.tourbook.importdata.DialogImportConfig;
 import net.tourbook.importdata.ImportConfig;
 import net.tourbook.importdata.ImportConfigItem;
 import net.tourbook.importdata.RawDataManager;
@@ -160,33 +160,35 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class RawDataView extends ViewPart implements ITourProviderAll, ITourViewer3 {
 
-	public static final String				ID											= "net.tourbook.views.rawData.RawDataView"; //$NON-NLS-1$
+	public static final String				ID											= "net.tourbook.views.rawData.RawDataView";	//$NON-NLS-1$
 	//
-	private static final String				TOUR_IMPORT_CSS								= "/tourbook/resources/tour-import.css";	//$NON-NLS-1$
+	private static final String				TOUR_IMPORT_CSS								= "/tourbook/resources/tour-import.css";		//$NON-NLS-1$
+	private static final String				TOUR_IMPORT_BG_IMAGE						= "/tourbook/resources/mytourbook-icon.svg";	//$NON-NLS-1$
+	//
+	private static final String				CSS_IMPORT_BACKGROUND						= "div.import-background";
 	//
 	public static final int					COLUMN_DATE									= 0;
 	public static final int					COLUMN_TITLE								= 1;
 	public static final int					COLUMN_DATA_FORMAT							= 2;
 	public static final int					COLUMN_FILE_NAME							= 3;
 	//
-	private static final String				STATE_IMPORTED_FILENAMES					= "importedFilenames";						//$NON-NLS-1$
-	private static final String				STATE_SELECTED_TOUR_INDICES					= "SelectedTourIndices";					//$NON-NLS-1$
-	private static final String				STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED		= "STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED"; //$NON-NLS-1$
-	public static final String				STATE_IS_MERGE_TRACKS						= "isMergeTracks";							//$NON-NLS-1$
-	public static final String				STATE_IS_CHECKSUM_VALIDATION				= "isChecksumValidation";					//$NON-NLS-1$
-	public static final String				STATE_IS_CONVERT_WAYPOINTS					= "STATE_IS_CONVERT_WAYPOINTS";			//$NON-NLS-1$
-	public static final String				STATE_IS_CREATE_TOUR_ID_WITH_TIME			= "isCreateTourIdWithTime";				//$NON-NLS-1$
+	private static final String				STATE_IMPORTED_FILENAMES					= "importedFilenames";							//$NON-NLS-1$
+	private static final String				STATE_SELECTED_TOUR_INDICES					= "SelectedTourIndices";						//$NON-NLS-1$
+	private static final String				STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED		= "STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED";	//$NON-NLS-1$
+	public static final String				STATE_IS_MERGE_TRACKS						= "isMergeTracks";								//$NON-NLS-1$
+	public static final String				STATE_IS_CHECKSUM_VALIDATION				= "isChecksumValidation";						//$NON-NLS-1$
+	public static final String				STATE_IS_CONVERT_WAYPOINTS					= "STATE_IS_CONVERT_WAYPOINTS";				//$NON-NLS-1$
+	public static final String				STATE_IS_CREATE_TOUR_ID_WITH_TIME			= "isCreateTourIdWithTime";					//$NON-NLS-1$
 	public static final boolean				STATE_IS_MERGE_TRACKS_DEFAULT				= false;
 	public static final boolean				STATE_IS_CHECKSUM_VALIDATION_DEFAULT		= true;
 	public static final boolean				STATE_IS_CONVERT_WAYPOINTS_DEFAULT			= true;
 	public static final boolean				STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT	= false;
 	//
-	public static final String				IMAGE_DATA_TRANSFER							= "IMAGE_DATA_TRANSFER";					//$NON-NLS-1$
-	public static final String				IMAGE_DATA_TRANSFER_DIRECT					= "IMAGE_DATA_TRANSFER_DIRECT";			//$NON-NLS-1$
-	public static final String				IMAGE_IMPORT								= "IMAGE_IMPORT";							//$NON-NLS-1$
-	public static final String				IMAGE_AUTOMATED_IMPORT						= "IMAGE_AUTOMATED_IMPORT";				//$NON-NLS-1$
-
-//	private static final RGB				BACKGROUND_COLOR							= new RGB(0x20, 0x20, 0x50);
+	public static final String				IMAGE_DATA_TRANSFER							= "IMAGE_DATA_TRANSFER";						//$NON-NLS-1$
+	public static final String				IMAGE_DATA_TRANSFER_DIRECT					= "IMAGE_DATA_TRANSFER_DIRECT";				//$NON-NLS-1$
+	public static final String				IMAGE_IMPORT								= "IMAGE_IMPORT";								//$NON-NLS-1$
+	public static final String				IMAGE_AUTOMATED_IMPORT						= "IMAGE_AUTOMATED_IMPORT";					//$NON-NLS-1$
+	//
 	//
 	private final IPreferenceStore			_prefStore									= TourbookPlugin.getPrefStore();
 	private final IDialogSettings			_state										= TourbookPlugin.getState(ID);
@@ -260,6 +262,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	//
 	private HashMap<Long, Image>			_configImages								= new HashMap<>();
 	private HashMap<Long, Integer>			_configImageHash							= new HashMap<>();
+	//
+	private String							_htmlCss;
+	private String							_htmlBackground;
+	//
+	private int								_liveBackgroundOpacity;
+	private boolean							_isLiveUpdate;
+	//
+	private PixelConverter					_pc;
 
 	/*
 	 * resources
@@ -292,11 +302,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private TableViewer						_tourViewer;
 	private TableViewerTourInfoToolTip		_tourInfoToolTip;
 
-	private PixelConverter					_pc;
-
 	private Browser							_browser;
 	private Text							_txtNoBrowser;
-	private String							_htmlCss;
 
 	private class ActionAutoImport extends Action {
 
@@ -502,7 +509,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		final ImportConfig importConfig = RawDataManager.getInstance().getAutoImportConfigs();
 
-		final DialogAutomatedImportConfig dialog = new DialogAutomatedImportConfig(shell, importConfig, this);
+		final DialogImportConfig dialog = new DialogImportConfig(shell, importConfig, this);
 
 		if (dialog.open() == Window.OK) {
 
@@ -512,6 +519,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			importConfig.configItems.addAll(modifiedConfig.configItems);
 
 			importConfig.numUIColumns = modifiedConfig.numUIColumns;
+			importConfig.backgroundOpacity = modifiedConfig.backgroundOpacity;
 
 			RawDataManager.getInstance().saveImportConfig(importConfig);
 
@@ -520,8 +528,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 //			// the size could be larger
 //			_pageImport_Actions.layout(true, true);
 
-			updateUI_Browser();
 		}
+
+		// update always because with the live update feature the background can have been changed
+		updateUI_Browser();
 	}
 
 	private void addPartListener() {
@@ -727,12 +737,35 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_tagMenuMgr = new TagMenuManager(this, true);
 	}
 
+	private String createHTML() {
+
+//		Force Internet Explorer to not use compatibility mode. Internet Explorer believes that websites under
+//		several domains (including "ibm.com") require compatibility mode. You may see your web application run
+//		normally under "localhost", but then fail when hosted under another domain (e.g.: "ibm.com").
+//		Setting "IE=Edge" will force the latest standards mode for the version of Internet Explorer being used.
+//		This is supported for Internet Explorer 8 and later. You can also ease your testing efforts by forcing
+//		specific versions of Internet Explorer to render using the standards mode of previous versions. This
+//		prevents you from exploiting the latest features, but may offer you compatibility and stability. Lookup
+//		the online documentation for the "X-UA-Compatible" META tag to find which value is right for you.
+
+		final String html = "" // //$NON-NLS-1$
+				+ "<!DOCTYPE html>\n" // ensure that IE is using the newest version and not the quirk mode //$NON-NLS-1$
+				+ "<html style='height: 100%; width: 100%; margin: 0px; padding: 0px;'>\n" //$NON-NLS-1$
+				+ ("<head>\n" + createHTML_10_Head() + "\n</head>\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("<body>\n" + createHTML_20_Body() + "\n</body>\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ "</html>"; //$NON-NLS-1$
+
+		return html;
+	}
+
 	private String createHTML_10_Head() {
 
 		final String html = ""// //$NON-NLS-1$
 				+ "	<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />\n" //$NON-NLS-1$
 				+ "	<meta http-equiv='X-UA-Compatible' content='IE=edge' />\n" //$NON-NLS-1$
 				+ _htmlCss
+				+ _htmlBackground
+				+ getBackgroundOpacity()
 				+ "\n"; //$NON-NLS-1$
 
 		return html;
@@ -748,8 +781,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private String createHTML_50_AutoImportItems() {
 
 		final ImportConfig importConfig = RawDataManager.getInstance().getAutoImportConfigs();
-		final ArrayList<ImportConfigItem> configItems = importConfig.configItems;
+
 		final int numColumns = importConfig.numUIColumns;
+		final ArrayList<ImportConfigItem> configItems = importConfig.configItems;
 
 		if (configItems.size() == 0) {
 			return UI.EMPTY_STRING;
@@ -759,8 +793,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		final StringBuilder sb = new StringBuilder();
 
+//		<div class='import'>
+
+		sb.append("<div class='import-container'>");
+		sb.append("<div class='import-background'></div>");
+
+		sb.append("<div class='import'>");
+
 		// enforce equal column width
-		sb.append("<table xstyle='table-layout: fixed;'><tbody>\n");
+		sb.append("<table><tbody>\n");
 
 		for (int configIndex = 0; configIndex < configItems.size(); configIndex++) {
 
@@ -787,6 +828,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 
 		sb.append("</tbody></table>\n");
+		sb.append("</div>");
+		sb.append("</div>");
 
 		return sb.toString();
 	}
@@ -1883,6 +1926,18 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_configImageHash.clear();
 	}
 
+	public void doLiveUpdate(final int backgroundOpacity) {
+		// TODO Auto-generated method stub
+
+		_liveBackgroundOpacity = backgroundOpacity;
+
+		_isLiveUpdate = true;
+
+		updateUI_Browser();
+
+		_isLiveUpdate = false;
+	}
+
 	/**
 	 * After tours are saved, the internal structures and ui viewers must be updated
 	 * 
@@ -2198,6 +2253,20 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		return selectedTourData;
 	}
 
+	private String getBackgroundOpacity() {
+
+		final ImportConfig importConfig = RawDataManager.getInstance().getAutoImportConfigs();
+
+		final int opacity = _isLiveUpdate ? _liveBackgroundOpacity : importConfig.backgroundOpacity;
+
+		final String htmlBackground = "" + //
+				"<style>\n"
+				+ (CSS_IMPORT_BACKGROUND + " { opacity:" + (float) opacity / 100 + ";}\n") //
+				+ "</style>\n"; //$NON-NLS-1$
+
+		return htmlBackground;
+	}
+
 	@Override
 	public ColumnManager getColumnManager() {
 		return _columnManager;
@@ -2277,7 +2346,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				 */
 				final ImageData imageData = tempImage.getImageData();
 				imageData.transparentPixel = TourType.TRANSPARENT_COLOR_VALUE;
-
 
 				image = new Image(display, imageData);
 			}
@@ -2392,19 +2460,31 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		try {
 
 			/*
-			 * load css from file
+			 * Load css from file
 			 */
-			final File cssFile = WEB.getFile(TOUR_IMPORT_CSS);
-			final String cssContent = Util.readContentFromFile(cssFile.getAbsolutePath());
+			File webFile = WEB.getFile(TOUR_IMPORT_CSS);
+			String webContent = Util.readContentFromFile(webFile.getAbsolutePath());
 
-			_htmlCss = "<style>" + cssContent + "</style>\n"; //$NON-NLS-1$ //$NON-NLS-2$
+			_htmlCss = "<style>" + webContent + "</style>\n"; //$NON-NLS-1$ //$NON-NLS-2$
 
 			/*
-			 * set image urls
+			 * Set background image
 			 */
-//			_actionEditImageUrl = net.tourbook.ui.UI.getIconUrl(Messages.Image__quick_edit);
-//			_actionHideMarkerUrl = net.tourbook.ui.UI.getIconUrl(Messages.Image__Remove);
-//			_actionShowMarkerUrl = net.tourbook.ui.UI.getIconUrl(Messages.Image__Eye);
+			webFile = WEB.getFile(TOUR_IMPORT_BG_IMAGE);
+			webContent = Util.readContentFromFile(webFile.getAbsolutePath());
+			final String base64Encoded = Base64.getEncoder().encodeToString(webContent.getBytes());
+
+			_htmlBackground = "<style>\n" //
+
+					+ CSS_IMPORT_BACKGROUND
+					+ "{"
+					+ ("	background:				url('data:image/svg+xml;base64," + base64Encoded + "');\n")
+					+ ("	background-repeat:		no-repeat;\n")
+					+ ("	background-size: 		contain;\n")
+					+ ("	background-position: 	center center;\n")
+					+ "}\n"
+
+					+ "</style>\n"; //$NON-NLS-1$
 
 		} catch (final IOException | URISyntaxException e) {
 			StatusUtil.showStatus(e);
@@ -2817,21 +2897,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			return;
 		}
 
-//		Force Internet Explorer to not use compatibility mode. Internet Explorer believes that websites under
-//		several domains (including "ibm.com") require compatibility mode. You may see your web application run
-//		normally under "localhost", but then fail when hosted under another domain (e.g.: "ibm.com").
-//		Setting "IE=Edge" will force the latest standards mode for the version of Internet Explorer being used.
-//		This is supported for Internet Explorer 8 and later. You can also ease your testing efforts by forcing
-//		specific versions of Internet Explorer to render using the standards mode of previous versions. This
-//		prevents you from exploiting the latest features, but may offer you compatibility and stability. Lookup
-//		the online documentation for the "X-UA-Compatible" META tag to find which value is right for you.
-
-		final String html = "" // //$NON-NLS-1$
-				+ "<!DOCTYPE html>\n" // ensure that IE is using the newest version and not the quirk mode //$NON-NLS-1$
-				+ "<html style='height: 100%; width: 100%; margin: 0px; padding: 0px;'>\n" //$NON-NLS-1$
-				+ ("<head>\n" + createHTML_10_Head() + "\n</head>\n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("<body>\n" + createHTML_20_Body() + "\n</body>\n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ "</html>"; //$NON-NLS-1$
+		final String html = createHTML();
 
 		_browser.setRedraw(true);
 		_browser.setText(html);

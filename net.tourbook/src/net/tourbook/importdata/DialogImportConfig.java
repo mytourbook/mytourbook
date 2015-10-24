@@ -107,7 +107,7 @@ import org.eclipse.ui.part.PageBook;
 /**
  * This is a template for a title area dialog
  */
-public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITourViewer {
+public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 
 	private static final String			ID							= "net.tourbook.importdata.DialogAutomatedImportConfig";	//$NON-NLS-1$
 	//
@@ -203,6 +203,7 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 	private Link[]						_linkVertex_TourType;
 	private Link						_linkOneTourType;
 
+	private Spinner						_spinnerBgOpacity;
 	private Spinner						_spinnerUIColumns;
 	private Spinner[]					_spinnerVertex_AvgSpeed;
 
@@ -214,7 +215,7 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 
 			super(null, AS_PUSH_BUTTON);
 
-			setToolTipText(Messages.Dialog_AutoImportConfig_Action_AddSpeed_Tooltip);
+			setToolTipText(Messages.Dialog_ImportConfig_Action_AddSpeed_Tooltip);
 			setImageDescriptor(TourbookPlugin.getImageDescriptor(net.tourbook.Messages.Image__App_Add));
 		}
 
@@ -232,7 +233,7 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 
 			super(null, AS_PUSH_BUTTON);
 
-			setToolTipText(Messages.Dialog_AutoImportConfig_Action_RemoveSpeed_Tooltip);
+			setToolTipText(Messages.Dialog_ImportConfig_Action_RemoveSpeed_Tooltip);
 
 			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Trash));
 			setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Trash_Disabled));
@@ -328,7 +329,7 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 
 			super(null, AS_PUSH_BUTTON);
 
-			setToolTipText(Messages.Dialog_AutoImportConfig_Action_SortVertices_Tooltip);
+			setToolTipText(Messages.Dialog_ImportConfig_Action_SortVertices_Tooltip);
 
 			setImageDescriptor(TourbookPlugin.getImageDescriptor(net.tourbook.Messages.Image__App_Sort));
 			setDisabledImageDescriptor(TourbookPlugin
@@ -362,9 +363,7 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 		}
 	}
 
-	public DialogAutomatedImportConfig(	final Shell parentShell,
-										final ImportConfig importConfig,
-										final RawDataView rawDataView) {
+	public DialogImportConfig(final Shell parentShell, final ImportConfig importConfig, final RawDataView rawDataView) {
 
 		super(parentShell);
 
@@ -391,7 +390,7 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 
 		super.configureShell(shell);
 
-		shell.setText(Messages.Dialog_AutoImportConfig_Dialog_Title);
+		shell.setText(Messages.Dialog_ImportConfig_Dialog_Title);
 
 //		shell.addListener(SWT.Resize, new Listener() {
 //			@Override
@@ -416,8 +415,8 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 
 		super.create();
 
-		setTitle(Messages.Dialog_AutoImportConfig_Dialog_Title);
-		setMessage(Messages.Dialog_AutoImportConfig_Dialog_Message);
+		setTitle(Messages.Dialog_ImportConfig_Dialog_Title);
+		setMessage(Messages.Dialog_ImportConfig_Dialog_Message);
 
 		restoreState();
 
@@ -563,7 +562,7 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 					.indent(0, convertVerticalDLUsToPixels(8))
 					.applyTo(group);
 			GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
-			group.setText(Messages.Dialog_AutoImportConfig_Group_Configuration);
+			group.setText(Messages.Dialog_ImportConfig_Group_Configuration);
 //			vertexContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_CYAN));
 			{
 				createUI_40_Name(group);
@@ -580,7 +579,7 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 
 		final Label label = new Label(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().span(2, 1).applyTo(label);
-		label.setText(Messages.Dialog_AutoImportConfig_Label_ConfigTitle);
+		label.setText(Messages.Dialog_ImportConfig_Label_ConfigTitle);
 	}
 
 	private void createUI_22_ConfigViewer_Container(final Composite parent) {
@@ -856,7 +855,7 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 
 		final Label label = new Label(parent, SWT.WRAP);
 //		GridDataFactory.fillDefaults().span(2, 1).applyTo(label);
-		label.setText(Messages.Dialog_AutoImportConfig_Info_ConfigDragDrop);
+		label.setText(Messages.Dialog_ImportConfig_Info_ConfigDragDrop);
 	}
 
 	private void createUI_40_Name(final Composite parent) {
@@ -870,7 +869,7 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 		GridDataFactory.fillDefaults()//
 				.align(SWT.FILL, SWT.CENTER)
 				.applyTo(_lblConfigName);
-		_lblConfigName.setText(Messages.Dialog_AutoImportConfig_Label_ConfigName);
+		_lblConfigName.setText(Messages.Dialog_ImportConfig_Label_ConfigName);
 
 		// text
 		_txtConfigName = new Text(parent, SWT.BORDER);
@@ -895,7 +894,7 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 		GridDataFactory.fillDefaults()//
 				.align(SWT.FILL, SWT.CENTER)
 				.applyTo(_lblDeviceFolder);
-		_lblDeviceFolder.setText(Messages.Dialog_AutoImportConfig_Label_DeviceFolder);
+		_lblDeviceFolder.setText(Messages.Dialog_ImportConfig_Label_DeviceFolder);
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -952,7 +951,7 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 		GridDataFactory.fillDefaults()//
 				.align(SWT.FILL, SWT.CENTER)
 				.applyTo(_lblBackupFolder);
-		_lblBackupFolder.setText(Messages.Dialog_AutoImportConfig_Label_BackupFolder);
+		_lblBackupFolder.setText(Messages.Dialog_ImportConfig_Label_BackupFolder);
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -1005,7 +1004,7 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 		GridDataFactory.fillDefaults()//
 				.align(SWT.FILL, SWT.CENTER)
 				.applyTo(_lblTourType);
-		_lblTourType.setText(Messages.Dialog_AutoImportConfig_Label_TourType);
+		_lblTourType.setText(Messages.Dialog_ImportConfig_Label_TourType);
 
 		_comboTourTypeConfig = new Combo(parent, SWT.READ_ONLY);
 		_comboTourTypeConfig.addSelectionListener(new SelectionAdapter() {
@@ -1067,7 +1066,7 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 			 */
 			_linkOneTourType = new Link(container, SWT.NONE);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(_linkOneTourType);
-			_linkOneTourType.setText(Messages.Dialog_AutoImportConfig_Link_TourType);
+			_linkOneTourType.setText(Messages.Dialog_ImportConfig_Link_TourType);
 			_linkOneTourType.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
@@ -1177,7 +1176,7 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(spinnerValue);
 				spinnerValue.setMinimum(RawDataManager.CONFIG_SPEED_MIN);
 				spinnerValue.setMaximum(RawDataManager.CONFIG_SPEED_MAX);
-				spinnerValue.setToolTipText(Messages.Dialog_AutoImportConfig_Spinner_Speed_Tooltip);
+				spinnerValue.setToolTipText(Messages.Dialog_ImportConfig_Spinner_Speed_Tooltip);
 				spinnerValue.addMouseWheelListener(_defaultMouseWheelListener);
 
 				/*
@@ -1283,23 +1282,52 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 				.applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 		{
+			{
+				/*
+				 * Number of columns
+				 */
+				// label
+				final Label label = new Label(container, SWT.NONE);
+				label.setText(Messages.Dialog_ImportConfig_Label_ImportColumns);
+				label.setToolTipText(Messages.Dialog_ImportConfig_Label_ImportColumns_Tooltip);
+				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
 
-			/*
-			 * Label: Number of columns
-			 */
-			final Label label = new Label(container, SWT.NONE);
-			label.setText(Messages.Dialog_AutoImportConfig_Label_ConfigUIColumns);
-			label.setToolTipText(Messages.Dialog_AutoImportConfig_Label_ConfigUIColumns_Tooltip);
-			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+				// spinner
+				_spinnerUIColumns = new Spinner(container, SWT.BORDER);
+				_spinnerUIColumns.setMinimum(1);
+				_spinnerUIColumns.setMaximum(10);
+				_spinnerUIColumns.addMouseWheelListener(_defaultMouseWheelListener);
+				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_spinnerUIColumns);
+			}
+			{
+				/*
+				 * Background opacity
+				 */
+				// label
+				final Label label = new Label(container, SWT.NONE);
+				label.setText(Messages.Dialog_ImportConfig_Label_ImportBackgroundOpacity);
+				label.setToolTipText(Messages.Dialog_ImportConfig_Label_ImportBackgroundOpacity_Tooltip);
+				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
 
-			/*
-			 * Spinner: Speed value
-			 */
-			_spinnerUIColumns = new Spinner(container, SWT.BORDER);
-			_spinnerUIColumns.setMinimum(1);
-			_spinnerUIColumns.setMaximum(10);
-			_spinnerUIColumns.addMouseWheelListener(_defaultMouseWheelListener);
-			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_spinnerUIColumns);
+				// spinner
+				_spinnerBgOpacity = new Spinner(container, SWT.BORDER);
+				_spinnerBgOpacity.setMinimum(0);
+				_spinnerBgOpacity.setMaximum(100);
+				_spinnerBgOpacity.addMouseWheelListener(new MouseWheelListener() {
+					@Override
+					public void mouseScrolled(final MouseEvent event) {
+						UI.adjustSpinnerValueOnMouseScroll(event);
+						onSelectBackgroundOpacity();
+					}
+				});
+				_spinnerBgOpacity.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						onSelectBackgroundOpacity();
+					}
+				});
+				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_spinnerBgOpacity);
+			}
 		}
 	}
 
@@ -1331,8 +1359,8 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 
 		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "configName", SWT.LEAD); //$NON-NLS-1$
 
-		colDef.setColumnLabel(Messages.Dialog_AutoImportConfig_Column_Name);
-		colDef.setColumnHeaderText(Messages.Dialog_AutoImportConfig_Column_Name);
+		colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_Name);
+		colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_Name);
 
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
 		colDef.setColumnWeightData(new ColumnWeightData(10));
@@ -1357,8 +1385,8 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "colorImage", SWT.LEAD); //$NON-NLS-1$
 		_colDefProfileImage = colDef;
 
-		colDef.setColumnLabel(Messages.Dialog_AutoImportConfig_Column_TourType);
-		colDef.setColumnHeaderText(Messages.Dialog_AutoImportConfig_Column_TourType);
+		colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_TourType);
+		colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_TourType);
 
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(20));
 		colDef.setColumnWeightData(new ColumnWeightData(3));
@@ -1803,6 +1831,16 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 		}
 	}
 
+	/**
+	 * Do live update for this feature.
+	 */
+	private void onSelectBackgroundOpacity() {
+
+		final int selectedOpacity = _spinnerBgOpacity.getSelection();
+
+		_rawDataView.doLiveUpdate(selectedOpacity);
+	}
+
 	private void onSelectConfig(final ISelection selection) {
 
 		final ImportConfigItem selectedConfig = (ImportConfigItem) ((StructuredSelection) selection).getFirstElement();
@@ -1949,6 +1987,7 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 			_initialConfig = configItems.get(0);
 		}
 
+		_spinnerBgOpacity.setSelection(_dialogConfig.backgroundOpacity);
 		_spinnerUIColumns.setSelection(_dialogConfig.numUIColumns);
 	}
 
@@ -1976,6 +2015,7 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 		configItems.clear();
 		configItems.addAll(tableConfigs);
 
+		_dialogConfig.backgroundOpacity = _spinnerBgOpacity.getSelection();
 		_dialogConfig.numUIColumns = _spinnerUIColumns.getSelection();
 	}
 
@@ -2016,6 +2056,7 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 		}
 
 		_dialogConfig.numUIColumns = importConfig.numUIColumns;
+		_dialogConfig.backgroundOpacity = importConfig.backgroundOpacity;
 	}
 
 	/**
@@ -2154,7 +2195,7 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 						// tour type is not yet set
 
 						linkTourType.setData(DATA_KEY_TOUR_TYPE_ID, null);
-						linkTourType.setText(Messages.Dialog_AutoImportConfig_Link_TourType);
+						linkTourType.setText(Messages.Dialog_ImportConfig_Link_TourType);
 						labelTourTypeIcon.setImage(null);
 
 					} else {
@@ -2236,7 +2277,7 @@ public class DialogAutomatedImportConfig extends TitleAreaDialog implements ITou
 
 			_lblOneTourTypeIcon.setImage(null);
 
-			_linkOneTourType.setText(Messages.Dialog_AutoImportConfig_Link_TourType);
+			_linkOneTourType.setText(Messages.Dialog_ImportConfig_Link_TourType);
 			_linkOneTourType.setData(DATA_KEY_TOUR_TYPE_ID, null);
 
 		} else {

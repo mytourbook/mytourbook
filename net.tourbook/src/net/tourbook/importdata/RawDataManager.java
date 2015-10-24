@@ -95,6 +95,7 @@ public class RawDataManager {
 	private static final String					TAG_SPEED_VERTEX					= "Speed";													//$NON-NLS-1$
 	//
 	private static final String					ATTR_AVG_SPEED						= "avgSpeed";												//$NON-NLS-1$
+	private static final String					ATTR_BACKGROUND_OPACITY				= "backgroundOpacity";										//$NON-NLS-1$
 	private static final String					ATTR_CONFIG_NAME					= "name";													//$NON-NLS-1$
 	private static final String					ATTR_CONFIG_BACKUP_FOLDER			= "backupFolder";											//$NON-NLS-1$
 	private static final String					ATTR_CONFIG_DEVICE_FOLDER			= "deviceFolder";											//$NON-NLS-1$
@@ -108,6 +109,7 @@ public class RawDataManager {
 	//
 	static final ComboEnumEntry<TourTypeConfig>	DEFAULT_TOUR_TYPE_CONFIG;
 	static final ComboEnumEntry<?>[]			ALL_IMPORT_TOUR_TYPE_CONFIG;
+
 	static {
 
 		DEFAULT_TOUR_TYPE_CONFIG = new ComboEnumEntry<>(Messages.Import_Data_TourTypeConfig_NotUsed,//
@@ -1515,7 +1517,8 @@ public class RawDataManager {
 
 	private void loadImportConfig_Data(final XMLMemento xmlMemento, final ImportConfig importConfig) {
 
-		importConfig.numUIColumns = Util.getXmlInteger(xmlMemento, ATTR_NUM_UI_COLUMNS, 2, 1, 10);
+		importConfig.numUIColumns = Util.getXmlInteger(xmlMemento, ATTR_NUM_UI_COLUMNS, 5, 1, 10);
+		importConfig.backgroundOpacity = Util.getXmlInteger(xmlMemento, ATTR_BACKGROUND_OPACITY, 5, 0, 100);
 
 		for (final IMemento xmlConfig : xmlMemento.getChildren()) {
 
@@ -1665,6 +1668,7 @@ public class RawDataManager {
 	private void saveImportConfig_Data(final XMLMemento xmlMemento, final ImportConfig importConfig) {
 
 		xmlMemento.putInteger(ATTR_NUM_UI_COLUMNS, importConfig.numUIColumns);
+		xmlMemento.putInteger(ATTR_BACKGROUND_OPACITY, importConfig.backgroundOpacity);
 
 		for (final ImportConfigItem configItem : importConfig.configItems) {
 
