@@ -37,11 +37,6 @@ public class TourType implements Comparable<Object> {
 	/** Color which is transparent in the tour type image. */
 	public static final RGB	TRANSPARENT_COLOR		= new RGB(0x01, 0xfe, 0x00);
 
-	/** Color value which is transparent in the tour type image. */
-	public static final int	TRANSPARENT_COLOR_VALUE	= (TRANSPARENT_COLOR.red & 0xFF) << 8 //
-															| (TRANSPARENT_COLOR.green & 0xFF) << 16
-															| (TRANSPARENT_COLOR.blue & 0xFF) << 24;
-
 	/**
 	 * contains the entity id
 	 */

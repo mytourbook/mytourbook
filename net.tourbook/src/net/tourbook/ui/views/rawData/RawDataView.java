@@ -2345,7 +2345,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				 * set transparency
 				 */
 				final ImageData imageData = tempImage.getImageData();
-				imageData.transparentPixel = TourType.TRANSPARENT_COLOR_VALUE;
+				imageData.transparentPixel = imageData.getPixel(0, 0);
 
 				image = new Image(display, imageData);
 			}
@@ -2378,7 +2378,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 					 * set transparency
 					 */
 					final ImageData imageData = tempImage.getImageData();
-					imageData.transparentPixel = TourType.TRANSPARENT_COLOR_VALUE;
+					imageData.transparentPixel = imageData.getPixel(0, 0);
 
 					image = new Image(display, imageData);
 
