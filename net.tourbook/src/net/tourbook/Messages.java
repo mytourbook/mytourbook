@@ -113,18 +113,33 @@ public class Messages extends NLS {
 	public static String		dialog_export_txt_filePath_tooltip;
 
 	public static String		Dialog_ImportConfig_Action_AddSpeed_Tooltip;
+
+	public static String	Dialog_ImportConfig_Action_NewOneTourType_Tooltip;
 	public static String		Dialog_ImportConfig_Action_RemoveSpeed_Tooltip;
 	public static String		Dialog_ImportConfig_Action_SortVertices_Tooltip;
+	public static String	Dialog_ImportConfig_Checkbox_LiveUpdate;
+
+	public static String	Dialog_ImportConfig_Checkbox_LiveUpdate_Tooltip;
+
 	public static String		Dialog_ImportConfig_Checkbox_SetTourType;
 	public static String		Dialog_ImportConfig_Column_Name;
 	public static String		Dialog_ImportConfig_Column_TourType;
 	public static String		Dialog_ImportConfig_Dialog_Message;
 	public static String		Dialog_ImportConfig_Dialog_Title;
-	public static String		Dialog_ImportConfig_Group_Configuration;
+	public static String	Dialog_ImportConfig_Group_Dashboard;
+
+	public static String	Dialog_ImportConfig_Group_TourFile;
+
 	public static String		Dialog_ImportConfig_Group_TourType;
 	public static String		Dialog_ImportConfig_Info_ConfigDragDrop;
 	public static String		Dialog_ImportConfig_Label_BackupFolder;
+	public static String	Dialog_ImportConfig_Label_ConfigDescription;
+
 	public static String		Dialog_ImportConfig_Label_ConfigName;
+	public static String	Dialog_ImportConfig_Label_ConfigTileSize;
+
+	public static String	Dialog_ImportConfig_Label_ConfigTileSize_Tooltip;
+
 	public static String		Dialog_ImportConfig_Label_ConfigTitle;
 	public static String		Dialog_ImportConfig_Label_DeviceFolder;
 

@@ -508,9 +508,10 @@ public class UI {
 		accelerator *= isShiftKey ? 5 : 1;
 
 		final Spinner spinner = (Spinner) event.widget;
-		final int newValue = ((event.count > 0 ? 1 : -1) * accelerator);
+		final int valueAdjustment = ((event.count > 0 ? 1 : -1) * accelerator);
 
-		spinner.setSelection(spinner.getSelection() + newValue);
+		final int oldValue = spinner.getSelection();
+		spinner.setSelection(oldValue + valueAdjustment);
 	}
 
 	/**

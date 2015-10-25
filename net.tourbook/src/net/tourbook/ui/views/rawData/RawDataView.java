@@ -52,7 +52,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.importdata.DialogImportConfig;
 import net.tourbook.importdata.ImportConfig;
-import net.tourbook.importdata.ImportConfigItem;
+import net.tourbook.importdata.ImportTourTypeItem;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.SpeedVertex;
 import net.tourbook.importdata.TourTypeConfig;
@@ -127,9 +127,6 @@ import org.eclipse.swt.browser.LocationAdapter;
 import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.browser.ProgressAdapter;
 import org.eclipse.swt.browser.ProgressEvent;
-import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -141,7 +138,6 @@ import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
@@ -166,6 +162,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private static final String				TOUR_IMPORT_BG_IMAGE						= "/tourbook/resources/mytourbook-icon.svg";	//$NON-NLS-1$
 	//
 	private static final String				CSS_IMPORT_BACKGROUND						= "div.import-background";
+	private static final String				CSS_AUTO_IMPORT_ITEM						= "div.auto-import-item";
 	//
 	public static final int					COLUMN_DATE									= 0;
 	public static final int					COLUMN_TITLE								= 1;
@@ -189,6 +186,30 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	public static final String				IMAGE_IMPORT								= "IMAGE_IMPORT";								//$NON-NLS-1$
 	public static final String				IMAGE_AUTOMATED_IMPORT						= "IMAGE_AUTOMATED_IMPORT";					//$NON-NLS-1$
 	//
+	private static final String				EXTERNAL_LINK_URL							= "http";										//$NON-NLS-1$
+	private static final String				HREF_TOKEN									= "#";											//$NON-NLS-1$
+	private static final String				PAGE_ABOUT_BLANK							= "about:blank";								//$NON-NLS-1$
+
+	/**
+	 * This is necessary otherwise XULrunner in Linux do not fire a location change event.
+	 */
+	private static final String				HTTP_DUMMY									= "http://dummy";								//$NON-NLS-1$
+
+	private static final String				ACTION_SETUP_AUTO_IMPORT					= "SetupAutoImport";							//$NON-NLS-1$
+
+	public static final int					TILE_SIZE_DEFAULT							= 50;
+	public static final int					TILE_SIZE_MIN								= 20;
+	public static final int					TILE_SIZE_MAX								= 300;
+	public static final int					NUM_HTILES_DEFAULT							= 5;
+	public static final int					NUM_HTILES_MIN								= 1;
+	public static final int					NUM_HTILES_MAX								= 50;
+
+	private static String					HREF_SETUP_AUTO_IMPORT;
+
+	static {
+
+		HREF_SETUP_AUTO_IMPORT = HREF_TOKEN + ACTION_SETUP_AUTO_IMPORT + HREF_TOKEN;
+	}
 	//
 	private final IPreferenceStore			_prefStore									= TourbookPlugin.getPrefStore();
 	private final IDialogSettings			_state										= TourbookPlugin.getState(ID);
@@ -263,11 +284,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private HashMap<Long, Image>			_configImages								= new HashMap<>();
 	private HashMap<Long, Integer>			_configImageHash							= new HashMap<>();
 	//
-	private String							_htmlCss;
-	private String							_htmlBackground;
-	//
-	private int								_liveBackgroundOpacity;
-	private boolean							_isLiveUpdate;
+	private String							_cssFromFile;
+	private String							_cssCustomStyles;
+	private String							_actionResource_AutoImportConfig;
 	//
 	private PixelConverter					_pc;
 
@@ -297,8 +316,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private Composite						_pageActions_NoBrowser;
 	private Composite						_pageActions_Content;
 
-	private Composite						_innerAutoImportContainer;
-	private Composite						_outerAutoImportContainer;
 	private TableViewer						_tourViewer;
 	private TableViewerTourInfoToolTip		_tourInfoToolTip;
 
@@ -511,27 +528,29 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		final DialogImportConfig dialog = new DialogImportConfig(shell, importConfig, this);
 
+		boolean isOK = false;
+
 		if (dialog.open() == Window.OK) {
-
-			final ImportConfig modifiedConfig = dialog.getModifiedConfig();
-
-			importConfig.configItems.clear();
-			importConfig.configItems.addAll(modifiedConfig.configItems);
-
-			importConfig.numUIColumns = modifiedConfig.numUIColumns;
-			importConfig.backgroundOpacity = modifiedConfig.backgroundOpacity;
-
-			RawDataManager.getInstance().saveImportConfig(importConfig);
-
-//			createUI_74_AutoImport_InnerContainer();
-//
-//			// the size could be larger
-//			_pageImport_Actions.layout(true, true);
-
+			isOK = true;
 		}
 
-		// update always because with the live update feature the background can have been changed
-		updateUI_Browser();
+		final ImportConfig modifiedConfig = dialog.getModifiedConfig();
+		final boolean isLiveUpdate = modifiedConfig.isLiveUpdate;
+
+		if (isOK) {
+
+			// keep none live update values
+
+			importConfig.tourTypeItems.clear();
+			importConfig.tourTypeItems.addAll(modifiedConfig.tourTypeItems);
+		}
+
+		if (isLiveUpdate || isOK) {
+
+			updateModel_ImportConfig(dialog);
+		}
+
+		updateUI_Dashboard();
 	}
 
 	private void addPartListener() {
@@ -763,9 +782,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		final String html = ""// //$NON-NLS-1$
 				+ "	<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />\n" //$NON-NLS-1$
 				+ "	<meta http-equiv='X-UA-Compatible' content='IE=edge' />\n" //$NON-NLS-1$
-				+ _htmlCss
-				+ _htmlBackground
-				+ getBackgroundOpacity()
+				+ _cssFromFile
+				+ _cssCustomStyles
+				+ getCustomCSS()
 				+ "\n"; //$NON-NLS-1$
 
 		return html;
@@ -773,35 +792,68 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private String createHTML_20_Body() {
 
-		final String sb = createHTML_50_AutoImportItems();
+		final StringBuilder sb = new StringBuilder();
 
-		return sb;
+		sb.append("<div class='import-container'>\n");
+		{
+			/*
+			 * Very tricky: When a parent has an opacity, a child cannot modify it. Therefore the
+			 * different divs with position relative/absolute. It took me some time to
+			 * find/implement this tricky but simple solution.
+			 */
+			sb.append("<div class='import-background'></div>\n");
+
+			sb.append("<div class='import-content'>\n");
+			{
+				createHTML_50_AutoImport_Header(sb);
+				createHTML_52_AutoImport_Items(sb);
+			}
+			sb.append("</div>\n");
+		}
+		sb.append("</div>\n");
+
+		return sb.toString();
 	}
 
-	private String createHTML_50_AutoImportItems() {
+	private void createHTML_50_AutoImport_Header(final StringBuilder sb) {
+
+		final String hrefOpenMarker = HTTP_DUMMY + HREF_SETUP_AUTO_IMPORT;
+
+		final String htmlActionImportConfig = createHtml_Action(
+				hrefOpenMarker,
+				"this is the text",
+				_actionResource_AutoImportConfig);
+
+		final String html = "" // //$NON-NLS-1$
+
+				+ "<div class='auto-import-header'>\n" //$NON-NLS-1$
+				+ ("	<table><tbody><tr>\n") //$NON-NLS-1$
+				+ ("		<td>" + Messages.Import_Data_Label_AutomatedImport + "</td>\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("		<td>\n") //$NON-NLS-1$
+				+ ("			<div style='padding-left:10px;'>" + htmlActionImportConfig + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("		</td>\n")
+				+ "	</tr></tbody></table>\n" // //$NON-NLS-1$
+				+ "</div>\n"; //$NON-NLS-1$
+
+		sb.append(html);
+	}
+
+	private void createHTML_52_AutoImport_Items(final StringBuilder sb) {
 
 		final ImportConfig importConfig = RawDataManager.getInstance().getAutoImportConfigs();
 
-		final int numColumns = importConfig.numUIColumns;
-		final ArrayList<ImportConfigItem> configItems = importConfig.configItems;
+		final int numColumns = importConfig.numHorizontalTiles;
+
+		final ArrayList<ImportTourTypeItem> configItems = importConfig.tourTypeItems;
 
 		if (configItems.size() == 0) {
-			return UI.EMPTY_STRING;
+			return;
 		}
 
 		boolean isTrOpen = false;
 
-		final StringBuilder sb = new StringBuilder();
-
-//		<div class='import'>
-
-		sb.append("<div class='import-container'>");
-		sb.append("<div class='import-background'></div>");
-
-		sb.append("<div class='import'>");
-
-		// enforce equal column width
-		sb.append("<table><tbody>\n");
+		// width=10px: disable expanding of the table to the right side
+		sb.append("<table style='width:10px;'><tbody>\n");
 
 		for (int configIndex = 0; configIndex < configItems.size(); configIndex++) {
 
@@ -810,10 +862,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				isTrOpen = true;
 			}
 
-			final ImportConfigItem configItem = configItems.get(configIndex);
+			final ImportTourTypeItem configItem = configItems.get(configIndex);
 
 			// enforce equal column width
-			sb.append("<td style='width:" + 100 / numColumns + "%' class='auto-import'>");
+			sb.append("<td style='width:" + 100 / numColumns + "%' class='auto-import-item'>\n");
 			sb.append(createHTML_52_ConfigItem(configItem));
 			sb.append("</td>\n");
 
@@ -824,17 +876,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 
 		if (isTrOpen) {
-			sb.append("</tr>\n");
+			sb.append("	</tr>\n");
 		}
 
 		sb.append("</tbody></table>\n");
-		sb.append("</div>");
-		sb.append("</div>");
-
-		return sb.toString();
 	}
 
-	private String createHTML_52_ConfigItem(final ImportConfigItem configItem) {
+	private String createHTML_52_ConfigItem(final ImportTourTypeItem configItem) {
 
 		final Image configImage = getImportConfigImage(configItem);
 
@@ -849,17 +897,31 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 
 		final String html = ""
-		//
-				+ ("<div class='auto-import'>")
-				+ ("<a href='#' class='auto-import'>\n")
-				+ ("	<div class='auto-import-image'>" + htmlImage + "</div>")
-				+ ("	<div class='auto-import-name'>" + configItem.name + "</div>")
-				+ ("</a>")
-				+ ("</div>")
-		//
+
+				+ ("<div class='auto-import-item'>\n")
+				+ ("<a href='#' class='auto-import-item'>\n")
+				+ ("	<div class='auto-import-image'>" + htmlImage + "</div>\n")
+				+ ("	<div class='auto-import-name'>\n")
+
+				// needs a new div that padding on the right side works !!!
+				+ ("		<div class='auto-import-name-padding'>" + configItem.name + "</div>\n")
+
+				+ ("	</div>\n")
+				+ ("</a>\n")
+				+ ("</div>\n")
+
 		;
 
 		return html;
+	}
+
+	private String createHtml_Action(final String href, final String title, final String backgroundImage) {
+
+		return "<a class='action'" // //$NON-NLS-1$
+				+ (" title='" + title + "'") //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" href='" + href + "'") //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" style='background-image: url(" + backgroundImage + ");'") //$NON-NLS-1$ //$NON-NLS-2$
+				+ "></a>"; // //$NON-NLS-1$
 	}
 
 	@Override
@@ -888,12 +950,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		// set default page
 		_pageBook_Import.showPage(_pageImport_Actions);
-		updateUI_Browser();
+		updateUI_Dashboard();
 
 		restoreState();
 	}
 
-	private void createResources() {
+	private void createResources_Image() {
 
 		_imageDescDatabase = TourbookPlugin.getImageDescriptor(Messages.Image__database);
 		_imageDescDatabaseOtherPerson = TourbookPlugin.getImageDescriptor(Messages.Image__database_other_person);
@@ -915,6 +977,45 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			StatusUtil.log(e);
 		}
 
+	}
+
+	private void createResources_Web() {
+
+		try {
+
+			/*
+			 * Load css from file
+			 */
+			File webFile = WEB.getFile(TOUR_IMPORT_CSS);
+			String webContent = Util.readContentFromFile(webFile.getAbsolutePath());
+
+			_cssFromFile = "<style>" + webContent + "</style>\n"; //$NON-NLS-1$ //$NON-NLS-2$
+
+			/*
+			 * Set background image
+			 */
+			webFile = WEB.getFile(TOUR_IMPORT_BG_IMAGE);
+			webContent = Util.readContentFromFile(webFile.getAbsolutePath());
+			final String base64Encoded = Base64.getEncoder().encodeToString(webContent.getBytes());
+
+			_cssCustomStyles = "<style>\n" //
+
+					// set background image
+					+ CSS_IMPORT_BACKGROUND
+					+ "{"
+					+ ("	background:				url('data:image/svg+xml;base64," + base64Encoded + "');\n")
+					+ ("	background-repeat:		no-repeat;\n")
+					+ ("	background-size: 		contain;\n")
+					+ ("	background-position: 	center center;\n")
+					+ "}\n"
+
+					+ "</style>\n"; //$NON-NLS-1$
+
+			_actionResource_AutoImportConfig = net.tourbook.ui.UI.getIconUrl(Messages.Image__tour_options);
+
+		} catch (final IOException | URISyntaxException e) {
+			StatusUtil.showStatus(e);
+		}
 	}
 
 	private void createUI(final Composite parent) {
@@ -998,155 +1099,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 	}
 
-	private Composite createUI_70_Page_ImportActions_SWT(final Composite parent) {
-
-		// scrolled container
-		final ScrolledComposite importContainer = new ScrolledComposite(parent, SWT.V_SCROLL);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(importContainer);
-		importContainer.setExpandVertical(true);
-		importContainer.setExpandHorizontal(true);
-
-		// vertex container
-		final Composite container = new Composite(importContainer, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-		GridLayoutFactory.swtDefaults()//
-				.numColumns(1)
-//				.spacing(10, 10)
-				.margins(10, 10)
-				.applyTo(container);
-		importContainer.setContent(container);
-		importContainer.addControlListener(new ControlAdapter() {
-			@Override
-			public void controlResized(final ControlEvent e) {
-				importContainer.setMinSize(container.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-			}
-		});
-//		container.setBackground(_bgActionColor);
-
-		{
-			// action: Automated import from files
-			createUI_72_AutoImport(container);
-
-			// action: Import from files
-			ToolBar tb = createUI_ImportAction(container, //
-					Messages.Import_Data_Link_Import,
-					IMAGE_IMPORT,
-					ImportAction.FROM_FILES,
-					false);
-			GridDataFactory.fillDefaults().indent(0, 30).applyTo(tb);
-
-			// action: data transfer
-			tb = createUI_ImportAction(container, //
-					Messages.Import_Data_Link_ReceiveFromSerialPort_Configured,
-					IMAGE_DATA_TRANSFER,
-					ImportAction.DATA_TRANSFER,
-					false);
-			GridDataFactory.fillDefaults().indent(0, 20).applyTo(tb);
-
-			// action: direct data transfer
-			createUI_ImportAction(container, //
-					Messages.Import_Data_Link_ReceiveFromSerialPort_Directly,
-					IMAGE_DATA_TRANSFER_DIRECT,
-					ImportAction.DATA_TRANSFER_DIRECTLY,
-					false);
-		}
-
-		return importContainer;
-	}
-
-	private void createUI_72_AutoImport(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-				.grab(true, false)
-				.indent(0, 0)
-				.applyTo(container);
-//		container.setBackground(_bgActionColor);
-
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-		{
-			/*
-			 * label
-			 */
-			final Label label = new Label(container, SWT.NONE);
-			GridDataFactory.fillDefaults()//
-					.align(SWT.FILL, SWT.CENTER)
-					.applyTo(label);
-			label.setText(Messages.Import_Data_Label_AutomatedImport);
-//			label.setForeground(_fgActionColor);
-//			label.setBackground(_bgActionColor);
-
-			/*
-			 * action: configure automated import from files
-			 */
-			final ActionImport action = new ActionImport(ImportAction.AUTOMATED_IMPORT_CONFIG);
-
-			action.setToolTipText(Messages.Import_Data_Action_AutomatedImportConfig_Tooltip);
-			action.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__tour_options));
-
-			createUI_ImportAction(container, action, false);
-		}
-
-		_outerAutoImportContainer = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-				.grab(true, false)
-				.applyTo(_outerAutoImportContainer);
-		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(_outerAutoImportContainer);
-		{
-			createUI_74_AutoImport_InnerContainer();
-		}
-	}
-
-	private void createUI_74_AutoImport_InnerContainer() {
-
-		if (_innerAutoImportContainer != null) {
-			_innerAutoImportContainer.dispose();
-		}
-
-		final ImportConfig importConfig = RawDataManager.getInstance().getAutoImportConfigs();
-
-		_innerAutoImportContainer = new Composite(_outerAutoImportContainer, SWT.NONE);
-//		_innerAutoImportContainer.setBackground(_bgActionColor);
-
-		GridDataFactory.fillDefaults()//
-				.grab(true, false)
-//				.align(SWT.CENTER, SWT.FILL)
-				.applyTo(_innerAutoImportContainer);
-		GridLayoutFactory.fillDefaults()//
-				.numColumns(importConfig.numUIColumns)
-				.equalWidth(true)
-				.applyTo(_innerAutoImportContainer);
-//		_innerAutoImportContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_BLUE));
-		{
-			final ArrayList<ImportConfigItem> configItems = importConfig.configItems;
-
-			// create an action for each import configuration
-			for (int configIndex = 0; configIndex < configItems.size(); configIndex++) {
-
-				final ImportConfigItem configItem = configItems.get(configIndex);
-
-				final String configName = createHTML_52_ConfigItem(configItem);
-				final String configTooltip = createUI_ConfigTooltip(configItem);
-
-				final String actionText = configName.trim().length() == 0 //
-						? Messages.Import_Data_Link_ConfigName
-						: configName;
-
-				final Image importConfigImage = getImportConfigImage(configItem);
-
-				final ActionAutoImport action = new ActionAutoImport(configIndex);
-				action.setText(actionText);
-				action.setToolTipText(configTooltip);
-
-				if (importConfigImage != null) {
-					action.setImageDescriptor(ImageDescriptor.createFromImage(importConfigImage));
-				}
-
-				createUI_ImportAction(_innerAutoImportContainer, action, true);
-			}
-		}
-	}
-
 	/**
 	 * @param parent
 	 */
@@ -1225,7 +1177,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_columnManager.createHeaderContextMenu(table, tableContextMenu);
 	}
 
-	private String createUI_ConfigTooltip(final ImportConfigItem importConfig) {
+	private String createUI_ConfigTooltip(final ImportTourTypeItem importConfig) {
 
 		final Enum<TourTypeConfig> tourTypeConfig = importConfig.tourTypeConfig;
 
@@ -1926,16 +1878,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_configImageHash.clear();
 	}
 
-	public void doLiveUpdate(final int backgroundOpacity) {
-		// TODO Auto-generated method stub
+	public void doLiveUpdate(final DialogImportConfig dialogImportConfig) {
 
-		_liveBackgroundOpacity = backgroundOpacity;
+		updateModel_ImportConfig(dialogImportConfig);
 
-		_isLiveUpdate = true;
-
-		updateUI_Browser();
-
-		_isLiveUpdate = false;
+		updateUI_Dashboard();
 	}
 
 	/**
@@ -2253,23 +2200,35 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		return selectedTourData;
 	}
 
-	private String getBackgroundOpacity() {
-
-		final ImportConfig importConfig = RawDataManager.getInstance().getAutoImportConfigs();
-
-		final int opacity = _isLiveUpdate ? _liveBackgroundOpacity : importConfig.backgroundOpacity;
-
-		final String htmlBackground = "" + //
-				"<style>\n"
-				+ (CSS_IMPORT_BACKGROUND + " { opacity:" + (float) opacity / 100 + ";}\n") //
-				+ "</style>\n"; //$NON-NLS-1$
-
-		return htmlBackground;
-	}
-
 	@Override
 	public ColumnManager getColumnManager() {
 		return _columnManager;
+	}
+
+	private String getCustomCSS() {
+
+		final ImportConfig importConfig = RawDataManager.getInstance().getAutoImportConfigs();
+
+		final int itemSize = importConfig.tileSize;
+		final int opacity = importConfig.backgroundOpacity;
+
+		final String customCSS = ""
+		//
+				+ "<style>\n"
+
+				+ (CSS_IMPORT_BACKGROUND + " { opacity:" + (float) opacity / 100 + ";}\n") //
+
+				+ (CSS_AUTO_IMPORT_ITEM)
+				+ ("{")
+				+ ("	min-height: " + itemSize + "px;")
+				+ ("	max-height: " + itemSize + "px;")
+				+ ("	min-width: " + itemSize + "px;")
+				+ ("	max-width: " + itemSize + "px;")
+				+ ("}")
+
+				+ "</style>\n"; //$NON-NLS-1$
+
+		return customCSS;
 	}
 
 	Image getDbImage(final TourData tourData) {
@@ -2286,7 +2245,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		return dbImage;
 	}
 
-	public Image getImportConfigImage(final ImportConfigItem importConfig) {
+	public Image getImportConfigImage(final ImportTourTypeItem importConfig) {
 
 		final int imageWidth = importConfig.imageWidth;
 
@@ -2453,42 +2412,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private void initUI(final Composite parent) {
 
-		createResources();
-
 		_pc = new PixelConverter(parent);
 
-		try {
-
-			/*
-			 * Load css from file
-			 */
-			File webFile = WEB.getFile(TOUR_IMPORT_CSS);
-			String webContent = Util.readContentFromFile(webFile.getAbsolutePath());
-
-			_htmlCss = "<style>" + webContent + "</style>\n"; //$NON-NLS-1$ //$NON-NLS-2$
-
-			/*
-			 * Set background image
-			 */
-			webFile = WEB.getFile(TOUR_IMPORT_BG_IMAGE);
-			webContent = Util.readContentFromFile(webFile.getAbsolutePath());
-			final String base64Encoded = Base64.getEncoder().encodeToString(webContent.getBytes());
-
-			_htmlBackground = "<style>\n" //
-
-					+ CSS_IMPORT_BACKGROUND
-					+ "{"
-					+ ("	background:				url('data:image/svg+xml;base64," + base64Encoded + "');\n")
-					+ ("	background-repeat:		no-repeat;\n")
-					+ ("	background-size: 		contain;\n")
-					+ ("	background-position: 	center center;\n")
-					+ "}\n"
-
-					+ "</style>\n"; //$NON-NLS-1$
-
-		} catch (final IOException | URISyntaxException e) {
-			StatusUtil.showStatus(e);
-		}
+		createResources_Image();
+		createResources_Web();
 	}
 
 	/**
@@ -2497,7 +2424,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	 * @return Returns <code>true</code> when the image is valid, returns <code>false</code> when
 	 *         the profile image must be created,
 	 */
-	private boolean isConfigImageValid(final Image image, final ImportConfigItem importConfig) {
+	private boolean isConfigImageValid(final Image image, final ImportTourTypeItem importConfig) {
 
 		if (image == null || image.isDisposed()) {
 
@@ -2878,6 +2805,20 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_pageBook_Actions.showPage(_browser == null ? _pageActions_NoBrowser : _pageActions_Content);
 	}
 
+	private void updateModel_ImportConfig(final DialogImportConfig dialog) {
+
+		final ImportConfig modifiedConfig = dialog.getModifiedConfig();
+		final ImportConfig importConfig = RawDataManager.getInstance().getAutoImportConfigs();
+
+		// keep live update values, other values MUST already have been set
+		importConfig.backgroundOpacity = modifiedConfig.backgroundOpacity;
+		importConfig.isLiveUpdate = modifiedConfig.isLiveUpdate;
+		importConfig.numHorizontalTiles = modifiedConfig.numHorizontalTiles;
+		importConfig.tileSize = modifiedConfig.tileSize;
+
+		RawDataManager.getInstance().saveImportConfig(importConfig);
+	}
+
 	private void updateToolTipState() {
 
 		_isToolTipInDate = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURIMPORT_DATE);
@@ -2889,7 +2830,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * Update the UI from {@link #_tourData}.
 	 */
-	private void updateUI_Browser() {
+	private void updateUI_Dashboard() {
 
 		showBrowserPage();
 

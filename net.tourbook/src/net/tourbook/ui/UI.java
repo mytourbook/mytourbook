@@ -1322,15 +1322,12 @@ public class UI {
 		}
 	}
 
-	/**
-	 * create image tour type image from scratch
-	 */
-	private Image createTourTypeImage(final long typeId, final String colorId) {
+	private ImageData createTourTypeImage(final long typeId) {
 
-		final Display display = Display.getCurrent();
-
-		final Image tourTypeImage = new Image(display, TourType.TOUR_TYPE_IMAGE_SIZE, TourType.TOUR_TYPE_IMAGE_SIZE);
-//		tourTypeImage.setBackground(color);
+		final Image tourTypeImage = new Image(
+				Display.getCurrent(),
+				TourType.TOUR_TYPE_IMAGE_SIZE,
+				TourType.TOUR_TYPE_IMAGE_SIZE);
 
 		final GC gcImage = new GC(tourTypeImage);
 		{
@@ -1347,12 +1344,47 @@ public class UI {
 		final int transparentPixel = imageData.getPixel(0, 0);
 		imageData.transparentPixel = transparentPixel;
 
-		final Image transparentImage = new Image(display, imageData);
+		return imageData;
+	}
+
+	/**
+	 * create image tour type image from scratch
+	 */
+	private Image createTourTypeImage_New(final long typeId, final String colorId) {
+
+		final ImageData imageData = createTourTypeImage(typeId);
+
+		final Image transparentImage = new Image(Display.getCurrent(), imageData);
 
 		// keep image in cache
 		_imageCache.put(colorId, transparentImage);
 
 		return transparentImage;
+	}
+
+	/**
+	 * updates an existing tour type image
+	 * 
+	 * @param existingImage
+	 */
+	private Image createTourTypeImage_Update(final Image existingImage, final long typeId, final String keyColorId) {
+
+		final ImageData imageData = createTourTypeImage(typeId);
+
+		/*
+		 * update existing image
+		 */
+		final Image transparentImage = new Image(Display.getCurrent(), imageData);
+		final GC gc = new GC(existingImage);
+		{
+			gc.drawImage(transparentImage, 0, 0);
+		}
+		gc.dispose();
+		transparentImage.dispose();
+
+		_dirtyImages.remove(keyColorId);
+
+		return existingImage;
 	}
 
 	/**
@@ -1375,7 +1407,12 @@ public class UI {
 
 	private void drawTourTypeImage(final long typeId, final GC gcImage) {
 
-		if (typeId == TourDatabase.ENTITY_IS_NOT_SAVED) {
+		if (typeId == -2) {
+
+			// create a default image
+
+		} else if (typeId == TourDatabase.ENTITY_IS_NOT_SAVED) {
+
 			// make the image invisible
 			return;
 		}
@@ -1422,7 +1459,7 @@ public class UI {
 			}
 		}
 
-		if (colorTourType == null || colorTourType.getTypeId() == TourDatabase.ENTITY_IS_NOT_SAVED) {
+		if (tourTypeId == -2 || colorTourType == null || colorTourType.getTypeId() == TourDatabase.ENTITY_IS_NOT_SAVED) {
 
 			// tour type was not found use default color
 
@@ -1468,13 +1505,13 @@ public class UI {
 
 		if (existingImage == null || existingImage.isDisposed()) {
 
-			return createTourTypeImage(typeId, keyColorId);
+			return createTourTypeImage_New(typeId, keyColorId);
 
 		} else {
 
 			// old tour type image is available and not disposed but needs to be updated
 
-			return updateTourTypeImage(existingImage, typeId, keyColorId);
+			return createTourTypeImage_Update(existingImage, typeId, keyColorId);
 		}
 	}
 
@@ -1528,46 +1565,5 @@ public class UI {
 		}
 
 		_imageCacheDescriptor.clear();
-	}
-
-	/**
-	 * updates an existing tour type image
-	 * 
-	 * @param existingImage
-	 */
-	private Image updateTourTypeImage(final Image existingImage, final long typeId, final String keyColorId) {
-
-		final Display display = Display.getCurrent();
-
-		final Image tourTypeImage = new Image(display, TourType.TOUR_TYPE_IMAGE_SIZE, TourType.TOUR_TYPE_IMAGE_SIZE);
-		GC gc = new GC(tourTypeImage);
-		{
-			drawTourTypeImage(typeId, gc);
-		}
-		gc.dispose();
-
-		/*
-		 * set transparency
-		 */
-		final ImageData imageData = tourTypeImage.getImageData();
-		tourTypeImage.dispose();
-
-		final int transparentPixel = imageData.getPixel(0, 0);
-		imageData.transparentPixel = transparentPixel;
-
-		/*
-		 * update existing image
-		 */
-		final Image transparentImage = new Image(display, imageData);
-		gc = new GC(existingImage);
-		{
-			gc.drawImage(transparentImage, 0, 0);
-		}
-		gc.dispose();
-		transparentImage.dispose();
-
-		_dirtyImages.remove(keyColorId);
-
-		return existingImage;
 	}
 }

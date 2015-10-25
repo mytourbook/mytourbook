@@ -99,7 +99,9 @@ public class RawDataManager {
 	private static final String					ATTR_CONFIG_NAME					= "name";													//$NON-NLS-1$
 	private static final String					ATTR_CONFIG_BACKUP_FOLDER			= "backupFolder";											//$NON-NLS-1$
 	private static final String					ATTR_CONFIG_DEVICE_FOLDER			= "deviceFolder";											//$NON-NLS-1$
+	private static final String					ATTR_IS_LIVE_UPDATE					= "isLiveUpdate";											//$NON-NLS-1$
 	private static final String					ATTR_NUM_UI_COLUMNS					= "uiColumns";												//$NON-NLS-1$
+	private static final String					ATTR_TILE_SIZE						= "tileSize";												//$NON-NLS-1$
 	private static final String					ATTR_TOUR_TYPE_CONFIG				= "tourTypeConfig";										//$NON-NLS-1$
 	private static final String					ATTR_TOUR_TYPE_ID					= "tourTypeId";											//$NON-NLS-1$
 	//
@@ -1517,16 +1519,32 @@ public class RawDataManager {
 
 	private void loadImportConfig_Data(final XMLMemento xmlMemento, final ImportConfig importConfig) {
 
-		importConfig.numUIColumns = Util.getXmlInteger(xmlMemento, ATTR_NUM_UI_COLUMNS, 5, 1, 10);
+		importConfig.isLiveUpdate = Util.getXmlBoolean(xmlMemento, ATTR_IS_LIVE_UPDATE, true);
+
 		importConfig.backgroundOpacity = Util.getXmlInteger(xmlMemento, ATTR_BACKGROUND_OPACITY, 5, 0, 100);
+
+		importConfig.numHorizontalTiles = Util.getXmlInteger(
+				xmlMemento,
+				ATTR_NUM_UI_COLUMNS,
+				RawDataView.NUM_HTILES_DEFAULT,
+				RawDataView.NUM_HTILES_MIN,
+				RawDataView.NUM_HTILES_MAX);
+
+		importConfig.tileSize = Util.getXmlInteger(
+				xmlMemento,
+				ATTR_TILE_SIZE,
+				RawDataView.TILE_SIZE_DEFAULT,
+				RawDataView.TILE_SIZE_MIN,
+				RawDataView.TILE_SIZE_MAX);
+
+		importConfig.backupFolder = Util.getXmlString(xmlMemento, ATTR_CONFIG_BACKUP_FOLDER, UI.EMPTY_STRING);
+		importConfig.deviceFolder = Util.getXmlString(xmlMemento, ATTR_CONFIG_DEVICE_FOLDER, UI.EMPTY_STRING);
 
 		for (final IMemento xmlConfig : xmlMemento.getChildren()) {
 
-			final ImportConfigItem configItem = new ImportConfigItem();
+			final ImportTourTypeItem configItem = new ImportTourTypeItem();
 
 			configItem.name = Util.getXmlString(xmlConfig, ATTR_CONFIG_NAME, UI.EMPTY_STRING);
-			configItem.backupFolder = Util.getXmlString(xmlConfig, ATTR_CONFIG_BACKUP_FOLDER, UI.EMPTY_STRING);
-			configItem.deviceFolder = Util.getXmlString(xmlConfig, ATTR_CONFIG_DEVICE_FOLDER, UI.EMPTY_STRING);
 
 			final Enum<TourTypeConfig> ttConfig = Util.getXmlEnum(
 					xmlConfig,
@@ -1577,9 +1595,9 @@ public class RawDataManager {
 
 			}
 
-			configItem.setupConfigImage();
+			configItem.setupItemImage();
 
-			importConfig.configItems.add(configItem);
+			importConfig.tourTypeItems.add(configItem);
 		}
 	}
 
@@ -1667,16 +1685,20 @@ public class RawDataManager {
 
 	private void saveImportConfig_Data(final XMLMemento xmlMemento, final ImportConfig importConfig) {
 
-		xmlMemento.putInteger(ATTR_NUM_UI_COLUMNS, importConfig.numUIColumns);
-		xmlMemento.putInteger(ATTR_BACKGROUND_OPACITY, importConfig.backgroundOpacity);
+		xmlMemento.putBoolean(ATTR_IS_LIVE_UPDATE, importConfig.isLiveUpdate);
 
-		for (final ImportConfigItem configItem : importConfig.configItems) {
+		xmlMemento.putInteger(ATTR_BACKGROUND_OPACITY, importConfig.backgroundOpacity);
+		xmlMemento.putInteger(ATTR_NUM_UI_COLUMNS, importConfig.numHorizontalTiles);
+		xmlMemento.putInteger(ATTR_TILE_SIZE, importConfig.tileSize);
+
+		xmlMemento.putString(ATTR_CONFIG_BACKUP_FOLDER, importConfig.backupFolder);
+		xmlMemento.putString(ATTR_CONFIG_DEVICE_FOLDER, importConfig.deviceFolder);
+
+		for (final ImportTourTypeItem configItem : importConfig.tourTypeItems) {
 
 			final IMemento xmlConfig = xmlMemento.createChild(TAG_IMPORT_CONFIG);
 
 			xmlConfig.putString(ATTR_CONFIG_NAME, configItem.name);
-			xmlConfig.putString(ATTR_CONFIG_BACKUP_FOLDER, configItem.backupFolder);
-			xmlConfig.putString(ATTR_CONFIG_DEVICE_FOLDER, configItem.deviceFolder);
 
 			final Enum<TourTypeConfig> ttConfig = configItem.tourTypeConfig;
 			Util.setXmlEnum(xmlConfig, ATTR_TOUR_TYPE_CONFIG, ttConfig);

@@ -21,11 +21,10 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourType;
 
-public class ImportConfigItem implements Cloneable, Comparable<ImportConfigItem> {
+public class ImportTourTypeItem implements Cloneable, Comparable<ImportTourTypeItem> {
 
 	public String					name			= UI.EMPTY_STRING;
-	public String					backupFolder	= UI.EMPTY_STRING;
-	public String					deviceFolder	= UI.EMPTY_STRING;
+	public String					description		= UI.EMPTY_STRING;
 
 	public Enum<TourTypeConfig>		tourTypeConfig	= TourTypeConfig.TOUR_TYPE_CONFIG_NOT_USED;
 
@@ -40,19 +39,19 @@ public class ImportConfigItem implements Cloneable, Comparable<ImportConfigItem>
 	private long					_id;
 	private static long				_idCreator;
 
-	ImportConfigItem() {
+	ImportTourTypeItem() {
 
 		_id = ++_idCreator;
 	}
 
 	@Override
-	protected ImportConfigItem clone() {
+	protected ImportTourTypeItem clone() {
 
-		ImportConfigItem clonedObject = null;
+		ImportTourTypeItem clonedObject = null;
 
 		try {
 
-			clonedObject = (ImportConfigItem) super.clone();
+			clonedObject = (ImportTourTypeItem) super.clone();
 
 			clonedObject._id = ++_idCreator;
 
@@ -69,7 +68,7 @@ public class ImportConfigItem implements Cloneable, Comparable<ImportConfigItem>
 	}
 
 	@Override
-	public int compareTo(final ImportConfigItem otherConfig) {
+	public int compareTo(final ImportTourTypeItem otherConfig) {
 
 		return name.compareTo(otherConfig.name);
 	}
@@ -85,7 +84,7 @@ public class ImportConfigItem implements Cloneable, Comparable<ImportConfigItem>
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		final ImportConfigItem other = (ImportConfigItem) obj;
+		final ImportTourTypeItem other = (ImportTourTypeItem) obj;
 		if (_id != other._id) {
 			return false;
 		}
@@ -107,7 +106,7 @@ public class ImportConfigItem implements Cloneable, Comparable<ImportConfigItem>
 	/**
 	 * Setup data for the tour type config image.
 	 */
-	void setupConfigImage() {
+	void setupItemImage() {
 
 		if (TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED.equals(tourTypeConfig)) {
 

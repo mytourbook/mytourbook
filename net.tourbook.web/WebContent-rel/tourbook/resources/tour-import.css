@@ -8,7 +8,7 @@ body
 {
 	font-size:				12px;
 	color:					#fff;
-	background-color:		#888;
+	background-color:		#444;
 }
 
 html, body 
@@ -42,6 +42,7 @@ body,p,h1,h2,h3,h4,table,td,th,ul,ol,textarea,input
 	font-family: 			Segoe UI, helvetica, arial, sans-serif;
 }
 
+
 div.import-container
 {
 	position:				relative;
@@ -61,19 +62,28 @@ div.import-background
 
 div.import-content
 {
+	/* VERY IMPORTANT: otherwise links, pointer, hovers and propably others do not work !!! */
 	position:				absolute;
 }
 
-td.auto-import
+
+div.auto-import-header
 {
-	xborder:				1px solid;
-	padding: 				10px;
+	padding-left: 			10px;
+	padding-top: 			10px;
 }
 
-div.auto-import
+td.auto-import-item
 {
-	xbackground-color: 		#444;
-	border:					1px #444 solid;
+	xborder:				1px solid;
+	padding-left: 			10px;
+	padding-top: 			10px;
+}
+
+div.auto-import-item
+{
+	background-color: 		#434343;
+	border:					1px #555 solid;
 	cursor:					pointer;
 	min-height: 			7em;
 	max-height: 			7em;
@@ -84,14 +94,13 @@ div.auto-import
 	overflow:	 			hidden;
 }
 
-div.auto-import:HOVER
+div.auto-import-item:HOVER
 {
 	xbackground-color: 		#888;
-	xopacity:					0.7;
 	border:					1px #ddd solid;
 }	
 
-a.auto-import
+a.auto-import-item
 {
 	position:				absolute;
 	bottom:					0px;
@@ -103,14 +112,15 @@ a.auto-import
 	xbackground-color: 		yellow;
 }
 
-div.auto-import-image
+.auto-import-image
 {
 	padding:				5px;
+	text-align:				center;
 	
 	xbackground-color: 		#008;
 }
 
-div.auto-import-name
+.auto-import-name
 {
 	position:				absolute;
 	bottom:					5px;
@@ -120,9 +130,39 @@ div.auto-import-name
 	xbackground-color: 		green;
 }
 
+.auto-import-name-padding
+{
+	padding-left:			5px;
+	padding-right:			5px;
+}
+
 a:LINK,
 a:VISITED 
 {
 	color:					#fff;
    text-decoration:			none;
 }
+
+a.action:LINK,
+a.action:VISITED 
+{
+	cursor: 				pointer; 
+	display:				block;
+	width: 					20px; 
+	height: 				20px; 
+
+	text-decoration:		none;
+	
+	background-repeat:		no-repeat;
+	background-position:	center;
+
+	border:					1px solid transparent;
+	border-radius:			3px;
+}
+
+a.action:HOVER 
+{ 
+	border: 				1px solid #fff;
+	border-radius:			3px;
+}
+

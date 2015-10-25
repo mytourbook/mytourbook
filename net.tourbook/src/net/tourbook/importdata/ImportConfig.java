@@ -17,12 +17,19 @@ package net.tourbook.importdata;
 
 import java.util.ArrayList;
 
+import net.tourbook.common.UI;
+
 public class ImportConfig {
 
-	public int							backgroundOpacity	= 5;					// 0.05
+	public boolean							isLiveUpdate;
 
-	public int							numUIColumns		= 5;
+	public String							backupFolder	= UI.EMPTY_STRING;
+	public String							deviceFolder	= UI.EMPTY_STRING;
 
-	public ArrayList<ImportConfigItem>	configItems			= new ArrayList<>();
+	public int								backgroundOpacity;
+	public int								numHorizontalTiles;
+	public int								tileSize;
+
+	public ArrayList<ImportTourTypeItem>	tourTypeItems	= new ArrayList<>();
 
 }
