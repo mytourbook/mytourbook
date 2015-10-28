@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -96,6 +96,41 @@ public class ImageUtils {
 		};
 	}
 
+	/**
+	 * @param image
+	 * @param format
+	 * @return Returns a formatted image, the format parameter can have one of the following values:
+	 *         <p>
+	 *         <dl>
+	 *         <dt><code>IMAGE_BMP</code></dt>
+	 *         <dd>Windows BMP file format, no compression</dd>
+	 *         <dt><code>IMAGE_BMP_RLE</code></dt>
+	 *         <dd>Windows BMP file format, RLE compression if appropriate</dd>
+	 *         <dt><code>IMAGE_GIF</code></dt>
+	 *         <dd>GIF file format</dd>
+	 *         <dt><code>IMAGE_ICO</code></dt>
+	 *         <dd>Windows ICO file format</dd>
+	 *         <dt><code>IMAGE_JPEG</code></dt>
+	 *         <dd>JPEG file format</dd>
+	 *         <dt><code>IMAGE_PNG</code></dt>
+	 *         <dd>PNG file format</dd>
+	 *         </dl>
+	 */
+	public static byte[] formatImage(final Image image, final int format) {
+
+		if (image == null) {
+			return null;
+		}
+
+		final ImageLoader il = new ImageLoader();
+		il.data = new ImageData[] { image.getImageData() };
+		final ByteArrayOutputStream bas = new ByteArrayOutputStream();
+
+		il.save(bas, format);
+
+		return bas.toByteArray();
+	}
+
 	public static double getBestRatio(final int originalX, final int originalY, final int maxX, final int maxY) {
 
 		final double widthRatio = (double) originalX / (double) maxX;
@@ -130,6 +165,17 @@ public class ImageUtils {
 		return !(img.getWidth() == width && img.getHeight() == height);
 	}
 
+//	public Image resize(int w, int h, Image img) {
+//		Image newImage = new Image(Display.getDefault(), w, h);
+//		GC gc = new GC(newImage);
+//		gc.setAntialias(SWT.ON);
+//		gc.setInterpolation(SWT.HIGH);
+//		gc.drawImage(img, 0, 0, img.getBounds().width, img.getBounds().height, 0, 0, w, h);
+//		gc.dispose();
+//		img.dispose();
+//		return newImage;
+//	}
+
 	/**
 	 * Returns a new scaled image. new Image must be disposed after use.
 	 * 
@@ -141,17 +187,6 @@ public class ImageUtils {
 	public static Image resize(final Display display, final Image image, final int width, final int height) {
 		return resize(display, image, width, height, SWT.ON, SWT.HIGH, null);
 	}
-
-//	public Image resize(int w, int h, Image img) {
-//		Image newImage = new Image(Display.getDefault(), w, h);
-//		GC gc = new GC(newImage);
-//		gc.setAntialias(SWT.ON);
-//		gc.setInterpolation(SWT.HIGH);
-//		gc.drawImage(img, 0, 0, img.getBounds().width, img.getBounds().height, 0, 0, w, h);
-//		gc.dispose();
-//		img.dispose();
-//		return newImage;
-//	}
 
 	public static/* synchronized */Image resize(	final Display display,
 												final Image srcImage,
@@ -314,18 +349,6 @@ public class ImageUtils {
 
 		// Resize image
 		return ImageUtils.resize(display, img, newSize.x, newSize.y);
-	}
-
-	public static byte[] saveImage(final Image image, final int format) {
-		if (image == null) {
-			return null;
-		}
-
-		final ImageLoader il = new ImageLoader();
-		il.data = new ImageData[] { image.getImageData() };
-		final ByteArrayOutputStream bas = new ByteArrayOutputStream();
-		il.save(bas, format);
-		return bas.toByteArray();
 	}
 
 }

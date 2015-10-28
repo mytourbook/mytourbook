@@ -13,29 +13,30 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.importdata;
+package net.tourbook.ui.views.rawData;
 
-import net.tourbook.common.util.Util;
-import net.tourbook.ui.views.rawData.RawDataView;
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 
-import org.eclipse.core.commands.AbstractHandler;
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.ui.IViewPart;
+import org.eclipse.jface.action.Action;
 
-public class ActionHandler_AutomatedImportConfiguration extends AbstractHandler {
+public class ActionSetupImport extends Action {
+
+	private final RawDataView	_rawDataView;
+
+	public ActionSetupImport(final RawDataView rawDataView) {
+
+		_rawDataView = rawDataView;
+
+		setToolTipText(Messages.Import_Data_Action_AutomatedImportConfig_Tooltip);
+
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__tour_options));
+		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__tour_options_disabled));
+	}
 
 	@Override
-	public Object execute(final ExecutionEvent arg0) throws ExecutionException {
-
-		final IViewPart importView = Util.showView(RawDataView.ID, true);
-
-		if (importView instanceof RawDataView) {
-
-			((RawDataView) importView).actionSetupAutomatedImport();
-		}
-
-		return null;
+	public void run() {
+		_rawDataView.actionSetupImport();
 	}
 
 }

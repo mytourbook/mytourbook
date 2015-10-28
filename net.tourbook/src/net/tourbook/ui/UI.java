@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -42,7 +42,6 @@ import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.views.rawData.RawDataView;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
 import org.eclipse.core.runtime.FileLocator;
@@ -302,20 +301,6 @@ public class UI {
 		IMAGE_REGISTRY.put(
 				IMAGE_TOUR_TYPE_FILTER_SYSTEM,
 				TourbookPlugin.getImageDescriptor(Messages.Image__undo_tour_type_filter_system));
-
-		// import/data transfer
-		IMAGE_REGISTRY.put(
-				RawDataView.IMAGE_AUTOMATED_IMPORT,
-				TourbookPlugin.getImageDescriptor(Messages.Image__RawData_AutomatedImport));
-		IMAGE_REGISTRY.put(
-				RawDataView.IMAGE_DATA_TRANSFER,
-				TourbookPlugin.getImageDescriptor(Messages.Image__RawData_Transfer));
-		IMAGE_REGISTRY.put(
-				RawDataView.IMAGE_DATA_TRANSFER_DIRECT,
-				TourbookPlugin.getImageDescriptor(Messages.Image__RawData_TransferDirect));
-		IMAGE_REGISTRY.put(//
-				RawDataView.IMAGE_IMPORT,
-				TourbookPlugin.getImageDescriptor(Messages.Image__RawData_Import));
 
 		// photo
 		IMAGE_REGISTRY.put(

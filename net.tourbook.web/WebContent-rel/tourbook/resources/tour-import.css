@@ -1,4 +1,3 @@
-
 html 
 {
 	overflow-y: 			scroll;
@@ -9,6 +8,7 @@ body
 	font-size:				12px;
 	color:					#fff;
 	background-color:		#444;
+	padding-left:			5px;
 }
 
 html, body 
@@ -43,104 +43,11 @@ body,p,h1,h2,h3,h4,table,td,th,ul,ol,textarea,input
 }
 
 
-div.import-container
-{
-	position:				relative;
-	height:					100vh;
-}
-
-div.import-background
-{
-	position:				absolute;
-	top: 					0;
-	left: 					0;
-	height: 				100%;
-	width: 					100%;
-	
-	/* background is inline embedded */
-}
-
-div.import-content
-{
-	/* VERY IMPORTANT: otherwise links, pointer, hovers and propably others do not work !!! */
-	position:				absolute;
-}
-
-
-div.auto-import-header
-{
-	padding-left: 			10px;
-	padding-top: 			10px;
-}
-
-td.auto-import-item
-{
-	xborder:				1px solid;
-	padding-left: 			10px;
-	padding-top: 			10px;
-}
-
-div.auto-import-item
-{
-	background-color: 		#434343;
-	border:					1px #555 solid;
-	cursor:					pointer;
-	min-height: 			7em;
-	max-height: 			7em;
-	min-width: 				7em;
-	max-width: 				7em;
-	
-	position:				relative;
-	overflow:	 			hidden;
-}
-
-div.auto-import-item:HOVER
-{
-	xbackground-color: 		#888;
-	border:					1px #ddd solid;
-}	
-
-a.auto-import-item
-{
-	position:				absolute;
-	bottom:					0px;
-	display: 				inline-block;
-	width:					100%;
-	min-height: 			100%;
-	max-height: 			100%;
-	
-	xbackground-color: 		yellow;
-}
-
-.auto-import-image
-{
-	padding:				5px;
-	text-align:				center;
-	
-	xbackground-color: 		#008;
-}
-
-.auto-import-name
-{
-	position:				absolute;
-	bottom:					5px;
-	text-align: 			center;
-	width: 					100%;
-
-	xbackground-color: 		green;
-}
-
-.auto-import-name-padding
-{
-	padding-left:			5px;
-	padding-right:			5px;
-}
-
 a:LINK,
 a:VISITED 
 {
 	color:					#fff;
-   text-decoration:			none;
+	text-decoration:		none;
 }
 
 a.action:LINK,
@@ -166,3 +73,149 @@ a.action:HOVER
 	border-radius:			3px;
 }
 
+.title
+{
+	font-size:				20px;
+	font-family:			Nunito, sans-serif;
+	padding-left:			5px;
+}
+
+.import-container
+{
+	position:				relative;
+	height:					100vh;
+}
+
+.import-background
+{
+	position:				absolute;
+	top: 					0;
+	left: 					0;
+	height: 				100%;
+	width: 					100%;
+	
+	/* background is inline embedded */
+}
+
+.import-content
+{
+	/* VERY IMPORTANT: otherwise links, pointer, hovers and propably others do not work !!! */
+	position:				absolute;
+}
+
+
+.auto-import-header
+{
+	padding-top: 			10px;
+}
+
+.get-tours-title
+{
+	
+	padding-top: 			30px;
+}
+
+.get-tours-items
+{
+	padding-top: 			0px;
+}
+
+/*
+
+ import-tile
+
+*/
+table.import-tiles
+{
+	/* disable expanding of the table to the right side */
+	width:					10px;
+}
+
+td.import-tile
+{
+	xbackground-color: green;
+}
+
+div.import-tile
+{
+	position:				relative;
+	z-index: 				10;
+
+	background-color: 		#434343;
+	border:					1px #555 solid;
+	cursor:					pointer;
+	min-height: 			7em;
+	max-height: 			7em;
+	min-width: 				7em;
+	max-width: 				7em;
+	
+	overflow:	 			hidden;
+	xtransition: 			color				1.5s ease 0s;
+	xtransition: 			background-color	0.2s ease 0s;
+	
+	box-shadow:				0;
+	transition: 			box-shadow			.5s ease .1s;
+	
+	margin:					5px;
+	xpadding:				5px;
+	xbackground-color: 		red;
+}
+
+div.import-tile:HOVER
+{
+	z-index: 				0;
+	box-shadow:				0 0 50px #FF4C00;
+}	
+
+div.import-tile:HOVER .import-tile-name
+{
+	color:					#fff;
+}
+
+a.import-tile
+{
+	position:				absolute;
+	z-index: 				10;
+
+	bottom:					0px;
+	display: 				inline-block;
+	width:					100%;
+	min-height: 			100%;
+	max-height: 			100%;
+	
+	xbackground-color: 		yellow;
+}
+
+a.import-tile:FOCUS
+{
+	background-color: 		#FF4C00;
+}
+a.import-tile:FOCUS .import-tile-name
+{
+	color:			 		#000;
+}
+
+.import-tile-image
+{
+	padding:				5px;
+	text-align:				center;
+	
+	xbackground-color: 		#008;
+}
+
+.import-tile-name
+{
+	position:				absolute;
+	bottom:					5px;
+	text-align: 			center;
+	width: 					100%;
+	color:					#888;
+
+	xbackground-color: 		green;
+}
+
+.import-tile-name-padding
+{
+	padding-left:			5px;
+	padding-right:			5px;
+}

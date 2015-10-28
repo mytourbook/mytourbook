@@ -21,7 +21,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourType;
 
-public class ImportTourTypeItem implements Cloneable, Comparable<ImportTourTypeItem> {
+public class AutoImportTile implements Cloneable, Comparable<AutoImportTile> {
 
 	public String					name			= UI.EMPTY_STRING;
 	public String					description		= UI.EMPTY_STRING;
@@ -39,19 +39,19 @@ public class ImportTourTypeItem implements Cloneable, Comparable<ImportTourTypeI
 	private long					_id;
 	private static long				_idCreator;
 
-	ImportTourTypeItem() {
+	AutoImportTile() {
 
 		_id = ++_idCreator;
 	}
 
 	@Override
-	protected ImportTourTypeItem clone() {
+	protected AutoImportTile clone() {
 
-		ImportTourTypeItem clonedObject = null;
+		AutoImportTile clonedObject = null;
 
 		try {
 
-			clonedObject = (ImportTourTypeItem) super.clone();
+			clonedObject = (AutoImportTile) super.clone();
 
 			clonedObject._id = ++_idCreator;
 
@@ -68,7 +68,7 @@ public class ImportTourTypeItem implements Cloneable, Comparable<ImportTourTypeI
 	}
 
 	@Override
-	public int compareTo(final ImportTourTypeItem otherConfig) {
+	public int compareTo(final AutoImportTile otherConfig) {
 
 		return name.compareTo(otherConfig.name);
 	}
@@ -84,7 +84,7 @@ public class ImportTourTypeItem implements Cloneable, Comparable<ImportTourTypeI
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		final ImportTourTypeItem other = (ImportTourTypeItem) obj;
+		final AutoImportTile other = (AutoImportTile) obj;
 		if (_id != other._id) {
 			return false;
 		}

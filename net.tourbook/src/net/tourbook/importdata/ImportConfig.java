@@ -30,6 +30,6 @@ public class ImportConfig {
 	public int								numHorizontalTiles;
 	public int								tileSize;
 
-	public ArrayList<ImportTourTypeItem>	tourTypeItems	= new ArrayList<>();
+	public ArrayList<AutoImportTile>	tourTypeItems	= new ArrayList<>();
 
 }

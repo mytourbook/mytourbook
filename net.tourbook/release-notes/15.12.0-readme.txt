@@ -14,7 +14,11 @@ Version 15.12.0 Beta                                  ?. ? 2015
     sudo update-alternatives --config java
     sudo update-alternatives --config javac
 
- 
+
+
+
+
+ Import background image can be slow, set opacity to 0 to disable it. 
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

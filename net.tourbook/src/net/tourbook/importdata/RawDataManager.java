@@ -1542,7 +1542,7 @@ public class RawDataManager {
 
 		for (final IMemento xmlConfig : xmlMemento.getChildren()) {
 
-			final ImportTourTypeItem configItem = new ImportTourTypeItem();
+			final AutoImportTile configItem = new AutoImportTile();
 
 			configItem.name = Util.getXmlString(xmlConfig, ATTR_CONFIG_NAME, UI.EMPTY_STRING);
 
@@ -1694,7 +1694,7 @@ public class RawDataManager {
 		xmlMemento.putString(ATTR_CONFIG_BACKUP_FOLDER, importConfig.backupFolder);
 		xmlMemento.putString(ATTR_CONFIG_DEVICE_FOLDER, importConfig.deviceFolder);
 
-		for (final ImportTourTypeItem configItem : importConfig.tourTypeItems) {
+		for (final AutoImportTile configItem : importConfig.tourTypeItems) {
 
 			final IMemento xmlConfig = xmlMemento.createChild(TAG_IMPORT_CONFIG);
 

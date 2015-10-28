@@ -90,6 +90,7 @@ public class WEB {
 
 	private static final String				WEB_CONTENT_DEVELOPMENT_FOLDER			= "/WebContent-dev";							//$NON-NLS-1$
 	private static final String				WEB_CONTENT_RELEASE_FOLDER				= "/WebContent-rel";							//$NON-NLS-1$
+	private static final String				RESOURCE_PATH							= "/tourbook/resources/";						//$NON-NLS-1$
 
 	/**
 	 * Root folder for web content in the web plugin.
@@ -263,6 +264,29 @@ public class WEB {
 	}
 
 	/**
+	 * @param fileName
+	 * @return Returns a file from the resource folder {@value #RESOURCE_PATH}.
+	 * @throws IOException
+	 * @throws URISyntaxException
+	 */
+	public static File getResourceFile(final String fileName) throws IOException, URISyntaxException {
+
+		final String bundleFileName = WEB_CONTENT_FOLDER + RESOURCE_PATH + fileName;
+
+		final URL bundleUrl = Activator.getDefault().getBundle().getEntry(bundleFileName);
+
+		if (bundleUrl == null) {
+			StatusUtil.log("File is not available: " + bundleFileName);//$NON-NLS-1$
+			return null;
+		}
+
+		final URL fileUrl = FileLocator.toFileURL(bundleUrl);
+		final File file = new File(fileUrl.toURI());
+
+		return file;
+	}
+
+	/**
 	 * @param filePathName
 	 * @return Returns the root of the WebContent folder.
 	 * @throws IOException
@@ -341,7 +365,6 @@ public class WEB {
 	private static void openUrl_WithExternalBrowser(final String externalWebBrowser, final String url) {
 
 		final String encodedUrl = Util.encodeSpace(url);
-
 
 		final ArrayList<String> commands = new ArrayList<String>();
 

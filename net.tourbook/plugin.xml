@@ -455,12 +455,6 @@
 				label="%command_device_importFromFile"
 				mnemonic="%command_device_importFromFile_mnemonic"/>
 				
-			<command
-				commandId="net.tourbook.command.device.ImportAutomated"
-				icon="icons/import-automated.png"
-				label="%Command_Device_ImportAutomated"
-				mnemonic="%Command_Device_ImportAutomated_Mnemonic"/>
-
 			<separator
 				name="net.tourbook.separator.device"
 				visible="true"/>
@@ -973,13 +967,6 @@
 				label="%command_device_importFromFile"
 				mnemonic="%command_device_importFromFile_mnemonic"
 			/>
-			<command
-				commandId="net.tourbook.command.device.ImportAutomated"
-				icon="icons/import-automated.png"
-				label="%Command_Device_ImportAutomated"
-				mnemonic="%Command_Device_ImportAutomated_Mnemonic"
-				tooltip="%Command_Device_ImportAutomated_Tooltip"
-			/>
 
 			<separator
 				name="net.tourbook.separator.device"
@@ -1184,12 +1171,6 @@
             name="%command_device_importFromFile">
       </command>
       
-		<command
-			id="net.tourbook.command.device.ImportAutomated"
-			defaultHandler="net.tourbook.importdata.ActionHandler_AutomatedImportConfiguration"
-			name="%Command_Device_ImportAutomatedConfiguration"
-		/>
-
       <command
             id="net.tourbook.command.device.synchronize.direct"
             defaultHandler="net.tourbook.importdata.ActionHandlerImportFromDeviceDirect"

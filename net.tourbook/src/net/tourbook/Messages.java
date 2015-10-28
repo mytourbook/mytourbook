@@ -663,9 +663,7 @@ public class Messages extends NLS {
 	public static String		Image__App_Edit_Paste;
 	public static String		Image__App_OK;
 	public static String		Image__App_RestoreDefault;
-
 	public static String		Image__App_Sort;
-
 	public static String		Image__App_Sort_Disabled;
 	public static String		Image__App_Trash;
 	public static String		Image__App_Trash_Disabled;
@@ -741,7 +739,6 @@ public class Messages extends NLS {
 	public static String		Image__PulseZones;
 	public static String		Image__PulseZones_Disabled;
 	public static String		Image__quick_edit;
-	public static String		Image__RawData_AutomatedImport;
 	public static String		Image__RawData_Import;
 	public static String		Image__RawData_Transfer;
 	public static String		Image__RawData_TransferDirect;
@@ -773,6 +770,7 @@ public class Messages extends NLS {
 	public static String		Image__tour_new;
 	public static String		Image__tour_new_disabled;
 	public static String		Image__tour_options;
+	public static String		Image__tour_options_disabled;
 	public static String		Image__tour_viewer;
 	public static String		Image__TourBook_Month;
 	public static String		Image__TourBook_SelectAll;
@@ -842,6 +840,8 @@ public class Messages extends NLS {
 	public static String		Import_Data_Error_CreatingFileName_Message;
 	public static String		Import_Data_Error_CreatingFileName_Title;
 	public static String		Import_Data_Label_AutomatedImport;
+
+	public static String	Import_Data_Label_GetTours;
 
 	public static String		Import_Data_Label_Hint;
 	public static String		Import_Data_Label_Info;

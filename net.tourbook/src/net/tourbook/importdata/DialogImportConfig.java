@@ -151,7 +151,7 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 	private ImportConfig				_dialogConfig;
 
 	/** Model for the currently selected config. */
-	private ImportTourTypeItem			_currentTTItem;
+	private AutoImportTile			_currentTTItem;
 
 	private RawDataView					_rawDataView;
 
@@ -161,7 +161,7 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 	private TableColumnDefinition		_colDefProfileImage;
 	private int							_columnIndexConfigImage;
 
-	private ImportTourTypeItem			_initialConfig;
+	private AutoImportTile			_initialConfig;
 
 	private HashMap<Long, Image>		_configImages				= new HashMap<>();
 	private HashMap<Long, Integer>		_configImageHash			= new HashMap<>();
@@ -184,7 +184,7 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 	private Composite					_pageTourType_OneForAll;
 	private Composite					_pageTourType_BySpeed;
 
-	private Button						_btnConfig_Copy;
+	private Button						_btnConfig_Duplicate;
 	private Button						_btnConfig_New;
 	private Button						_btnConfig_NewOne;
 	private Button						_btnConfig_Remove;
@@ -388,9 +388,9 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 		@Override
 		public Object[] getElements(final Object parent) {
 
-			final ArrayList<ImportTourTypeItem> configItems = _dialogConfig.tourTypeItems;
+			final ArrayList<AutoImportTile> configItems = _dialogConfig.tourTypeItems;
 
-			return configItems.toArray(new ImportTourTypeItem[configItems.size()]);
+			return configItems.toArray(new AutoImportTile[configItems.size()]);
 		}
 
 		@Override
@@ -515,9 +515,9 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 	 * 
 	 * @return Returns the created config.
 	 */
-	private ImportTourTypeItem createDefaultConfig() {
+	private AutoImportTile createDefaultConfig() {
 
-		final ImportTourTypeItem defaultConfig = new ImportTourTypeItem();
+		final AutoImportTile defaultConfig = new AutoImportTile();
 		final ArrayList<SpeedVertex> speedVertices = defaultConfig.speedVertices;
 
 		for (final SpeedVertex speedVertex : DEFAULT_VERTICES) {
@@ -754,7 +754,7 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 		final Table table = new Table(parent, //
 				SWT.H_SCROLL //
 						| SWT.V_SCROLL
-						| SWT.BORDER
+//						| SWT.BORDER
 						| SWT.FULL_SELECTION);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
 
@@ -865,9 +865,9 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 				if (data instanceof StructuredSelection) {
 					final StructuredSelection selection = (StructuredSelection) data;
 
-					if (selection.getFirstElement() instanceof ImportTourTypeItem) {
+					if (selection.getFirstElement() instanceof AutoImportTile) {
 
-						final ImportTourTypeItem filterItem = (ImportTourTypeItem) selection.getFirstElement();
+						final AutoImportTile filterItem = (AutoImportTile) selection.getFirstElement();
 
 						final int location = getCurrentLocation();
 						final Table filterTable = _configViewer.getTable();
@@ -992,17 +992,17 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 			setButtonLayoutData(_btnConfig_New);
 
 			/*
-			 * Button: Copy
+			 * Button: Duplicate
 			 */
-			_btnConfig_Copy = new Button(container, SWT.NONE);
-			_btnConfig_Copy.setText(Messages.App_Action_Copy);
-			_btnConfig_Copy.addSelectionListener(new SelectionAdapter() {
+			_btnConfig_Duplicate = new Button(container, SWT.NONE);
+			_btnConfig_Duplicate.setText(Messages.App_Action_Duplicate);
+			_btnConfig_Duplicate.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					onTourType_Add(true);
 				}
 			});
-			setButtonLayoutData(_btnConfig_Copy);
+			setButtonLayoutData(_btnConfig_Duplicate);
 
 			/*
 			 * button: remove
@@ -1067,14 +1067,20 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 			// label
 			_lblConfigDescription = new Label(parent, SWT.NONE);
 			GridDataFactory.fillDefaults()//
-					.align(SWT.FILL, SWT.CENTER)
+					.align(SWT.FILL, SWT.BEGINNING)
 					.applyTo(_lblConfigDescription);
 			_lblConfigDescription.setText(Messages.Dialog_ImportConfig_Label_ConfigDescription);
 
 			// text
-			_txtTTConfigDescription = new Text(parent, SWT.BORDER | SWT.WRAP | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL);
+			_txtTTConfigDescription = new Text(parent, //
+					SWT.BORDER | //
+							SWT.WRAP
+							| SWT.MULTI
+							| SWT.V_SCROLL
+							| SWT.H_SCROLL);
 			GridDataFactory.fillDefaults()//
 					.grab(true, false)
+					.hint(SWT.DEFAULT, convertHeightInCharsToPixels(3))
 					.applyTo(_txtTTConfigDescription);
 		}
 	}
@@ -1517,7 +1523,7 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 			@Override
 			public void update(final ViewerCell cell) {
 
-				cell.setText(((ImportTourTypeItem) cell.getElement()).name);
+				cell.setText(((AutoImportTile) cell.getElement()).name);
 			}
 		});
 	}
@@ -1653,7 +1659,7 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 //		_lblBackupFolder.setEnabled(true);
 //		_lblDeviceFolder.setEnabled(true);
 
-		_btnConfig_Copy.setEnabled(isConfigSelected);
+		_btnConfig_Duplicate.setEnabled(isConfigSelected);
 		_btnConfig_Remove.setEnabled(isConfigSelected);
 
 		_comboTourTypeConfig.setEnabled(isConfigSelected);
@@ -1872,7 +1878,7 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 		}
 
 		final TableItem item = (TableItem) event.item;
-		final ImportTourTypeItem importConfig = (ImportTourTypeItem) item.getData();
+		final AutoImportTile importConfig = (AutoImportTile) item.getData();
 
 		switch (event.type) {
 		case SWT.MeasureItem:
@@ -1907,7 +1913,7 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 
 	private void onSelectConfig(final ISelection selection) {
 
-		final ImportTourTypeItem selectedConfig = (ImportTourTypeItem) ((StructuredSelection) selection)
+		final AutoImportTile selectedConfig = (AutoImportTile) ((StructuredSelection) selection)
 				.getFirstElement();
 
 		if (_currentTTItem == selectedConfig) {
@@ -1947,8 +1953,8 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 		update_Model_From_UI();
 
 		// update model
-		final ArrayList<ImportTourTypeItem> configItems = _dialogConfig.tourTypeItems;
-		ImportTourTypeItem newConfig;
+		final ArrayList<AutoImportTile> configItems = _dialogConfig.tourTypeItems;
+		AutoImportTile newConfig;
 
 		if (configItems.size() == 0) {
 
@@ -1969,7 +1975,7 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 
 			} else {
 
-				newConfig = new ImportTourTypeItem();
+				newConfig = new AutoImportTile();
 			}
 
 			configItems.add(newConfig);
@@ -1996,7 +2002,7 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 		update_Model_From_UI();
 
 		// create new tt item
-		final ImportTourTypeItem newTTItem = new ImportTourTypeItem();
+		final AutoImportTile newTTItem = new AutoImportTile();
 
 		newTTItem.tourTypeConfig = TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL;
 		newTTItem.oneTourType = tourType;
@@ -2039,15 +2045,15 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 	private void onTourType_Remove() {
 
 		final StructuredSelection selection = (StructuredSelection) _configViewer.getSelection();
-		final ImportTourTypeItem selectedConfig = (ImportTourTypeItem) selection.getFirstElement();
+		final AutoImportTile selectedConfig = (AutoImportTile) selection.getFirstElement();
 
 		int selectedIndex = 0;
-		final ArrayList<ImportTourTypeItem> configItems = _dialogConfig.tourTypeItems;
+		final ArrayList<AutoImportTile> configItems = _dialogConfig.tourTypeItems;
 
 		// get index of the selected config
 		for (int configIndex = 0; configIndex < configItems.size(); configIndex++) {
 
-			final ImportTourTypeItem config = configItems.get(configIndex);
+			final AutoImportTile config = configItems.get(configIndex);
 
 			if (config.equals(selectedConfig)) {
 				selectedIndex = configIndex;
@@ -2084,7 +2090,7 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 				selectedIndex--;
 			}
 
-			final ImportTourTypeItem nextConfig = configItems.get(selectedIndex);
+			final AutoImportTile nextConfig = configItems.get(selectedIndex);
 
 			_configViewer.setSelection(new StructuredSelection(nextConfig), true);
 		}
@@ -2187,9 +2193,9 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 		 * Reselect previous selected config
 		 */
 		final String stateConfigName = Util.getStateString(_state, STATE_SELECTED_CONFIG_NAME, UI.EMPTY_STRING);
-		final ArrayList<ImportTourTypeItem> configItems = _dialogConfig.tourTypeItems;
+		final ArrayList<AutoImportTile> configItems = _dialogConfig.tourTypeItems;
 
-		for (final ImportTourTypeItem config : configItems) {
+		for (final AutoImportTile config : configItems) {
 
 			if (config.name.equals(stateConfigName)) {
 
@@ -2215,18 +2221,18 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 		/*
 		 * Create config list in the table sort order
 		 */
-		final ArrayList<ImportTourTypeItem> tableConfigs = new ArrayList<>();
+		final ArrayList<AutoImportTile> tableConfigs = new ArrayList<>();
 
 		for (final TableItem tableItem : _configViewer.getTable().getItems()) {
 
 			final Object itemData = tableItem.getData();
 
-			if (itemData instanceof ImportTourTypeItem) {
-				tableConfigs.add((ImportTourTypeItem) itemData);
+			if (itemData instanceof AutoImportTile) {
+				tableConfigs.add((AutoImportTile) itemData);
 			}
 		}
 
-		final ArrayList<ImportTourTypeItem> configItems = _dialogConfig.tourTypeItems;
+		final ArrayList<AutoImportTile> configItems = _dialogConfig.tourTypeItems;
 		configItems.clear();
 		configItems.addAll(tableConfigs);
 
@@ -2259,9 +2265,9 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 	private void setupConfigs(final ImportConfig importConfig) {
 
 		_dialogConfig = new ImportConfig();
-		final ArrayList<ImportTourTypeItem> configItems = _dialogConfig.tourTypeItems = new ArrayList<>();
+		final ArrayList<AutoImportTile> configItems = _dialogConfig.tourTypeItems = new ArrayList<>();
 
-		for (final ImportTourTypeItem autoImportConfig : importConfig.tourTypeItems) {
+		for (final AutoImportTile autoImportConfig : importConfig.tourTypeItems) {
 			configItems.add(autoImportConfig.clone());
 		}
 
