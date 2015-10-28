@@ -75,8 +75,9 @@ a.action:HOVER
 
 .title
 {
-	font-size:				20px;
-	font-family:			Nunito, sans-serif;
+	font-size:				30px;
+	font-family:			NothingYouCouldDo, sans-serif;
+	font-weight:			bold;
 	padding-left:			5px;
 }
 
@@ -104,7 +105,7 @@ a.action:HOVER
 }
 
 
-.auto-import-header
+.auto-import-title
 {
 	padding-top: 			10px;
 }
@@ -136,64 +137,60 @@ td.import-tile
 	xbackground-color: green;
 }
 
-div.import-tile
+a.import-tile
 {
 	position:				relative;
 	z-index: 				10;
 
 	background-color: 		#434343;
-	border:					1px #555 solid;
-	cursor:					pointer;
+	xbackground-color: 		#777;
+	
+	display: 				block;
+	margin:					5px;
+	padding:				5px;
+	bottom:					0px;
 	min-height: 			7em;
 	max-height: 			7em;
 	min-width: 				7em;
 	max-width: 				7em;
 	
+	cursor:					pointer;
 	overflow:	 			hidden;
-	xtransition: 			color				1.5s ease 0s;
-	xtransition: 			background-color	0.2s ease 0s;
+
+	border:					1px #555 solid;
 	
 	box-shadow:				0;
-	transition: 			box-shadow			.5s ease .1s;
-	
-	margin:					5px;
-	xpadding:				5px;
-	xbackground-color: 		red;
-}
-
-div.import-tile:HOVER
-{
-	z-index: 				0;
-	box-shadow:				0 0 50px #FF4C00;
-}	
-
-div.import-tile:HOVER .import-tile-name
-{
-	color:					#fff;
-}
-
-a.import-tile
-{
-	position:				absolute;
-	z-index: 				10;
-
-	bottom:					0px;
-	display: 				inline-block;
-	width:					100%;
-	min-height: 			100%;
-	max-height: 			100%;
+	transition: 			box-shadow		.5s ease 0s;
 	
 	xbackground-color: 		yellow;
 }
 
+a.import-tile:HOVER
+{
+	z-index: 				0;
+	box-shadow:				0 0 40px #FF4C00;
+	border:					1px solid transparent;
+}	
+
+a.import-tile:HOVER .import-tile-name
+{
+	color:					#fff;
+}
+
 a.import-tile:FOCUS
 {
-	background-color: 		#FF4C00;
+	border:					1px solid transparent;
+	border-top-color:		#434343;
+	border-bottom-color:	#E85D1F;
+	
+	background:				transparent linear-gradient(180deg, #434343 50%, #E85D1F 85%) repeat scroll 0% 0%;
 }
+
 a.import-tile:FOCUS .import-tile-name
 {
-	color:			 		#000;
+	color:			 		#fff;
 }
+
 
 .import-tile-image
 {
@@ -209,13 +206,12 @@ a.import-tile:FOCUS .import-tile-name
 	bottom:					5px;
 	text-align: 			center;
 	width: 					100%;
-	color:					#888;
+	color:					#bbb;
 
 	xbackground-color: 		green;
 }
 
 .import-tile-name-padding
 {
-	padding-left:			5px;
-	padding-right:			5px;
+	padding-right:			10px;
 }

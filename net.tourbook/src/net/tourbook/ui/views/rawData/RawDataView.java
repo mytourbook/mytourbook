@@ -161,7 +161,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	public static final String				ID											= "net.tourbook.views.rawData.RawDataView"; //$NON-NLS-1$
 	//
-	private static final String				WEB_RESOURCE_NUNITO_BOLD_TTF				= "Nunito-Bold.ttf";						//$NON-NLS-1$
+	//private static final String				WEB_RESOURCE_NUNITO_BOLD_TTF				= "Nunito-Bold.ttf";						//$NON-NLS-1$
+	private static final String				WEB_RESOURCE_NothingYouCouldDo_TTF			= "NothingYouCouldDo.ttf";					//$NON-NLS-1$
 	private static final String				WEB_RESOURCE_TOUR_IMPORT_BG_IMAGE			= "mytourbook-icon.svg";					//$NON-NLS-1$
 	private static final String				WEB_RESOURCE_TOUR_IMPORT_CSS				= "tour-import.css";						//$NON-NLS-1$
 	//
@@ -812,6 +813,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				+ ("	max-width: " + itemSize + "px;\n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("}\n"); //$NON-NLS-1$
 
+		/*
+		 * CSS
+		 */
 		final String customCSS = "" // //$NON-NLS-1$
 
 				+ "<style>\n" // //$NON-NLS-1$
@@ -887,7 +891,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		final String html = "" // //$NON-NLS-1$
 
-				+ "<div class='auto-import-header title'>\n" //$NON-NLS-1$
+				+ "<div class='auto-import-title title'>\n" //$NON-NLS-1$
 				+ ("	" + Messages.Import_Data_Label_AutomatedImport + "\n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ "</div>\n"; //$NON-NLS-1$
 
@@ -953,7 +957,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		final String html = "" //$NON-NLS-1$
 
-				+ ("<div class='import-tile'>\n") //$NON-NLS-1$
 				+ ("<a href='#' class='import-tile'>\n") //$NON-NLS-1$
 				+ ("	<div class='import-tile-image'>" + htmlImage + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("	<div class='import-tile-name'>\n") //$NON-NLS-1$
@@ -963,7 +966,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 				+ ("	</div>\n") //$NON-NLS-1$
 				+ ("</a>\n") //$NON-NLS-1$
-				+ ("</div>\n") //$NON-NLS-1$
 
 		;
 
@@ -1085,7 +1087,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			/*
 			 * Font css must be on the top
 			 */
-			final File fontFile = WEB.getResourceFile(WEB_RESOURCE_NUNITO_BOLD_TTF);
+			final File fontFile = WEB.getResourceFile(WEB_RESOURCE_NothingYouCouldDo_TTF);
 
 			final Path path = Paths.get(fontFile.getAbsolutePath());
 			final byte[] data = Files.readAllBytes(path);
@@ -1095,7 +1097,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 					+ ("@font-face\n") //$NON-NLS-1$
 					+ ("{\n") //$NON-NLS-1$
-					+ ("	font-family:	'Nunito';\n") //$NON-NLS-1$
+					+ ("	font-family:	'NothingYouCouldDo';\n") //$NON-NLS-1$
 					+ ("	font-weight:	700;\n") //$NON-NLS-1$
 					+ ("	font-style:		bold;\n") //$NON-NLS-1$
 					+ ("	src:			url(data:font/truetype;charset=utf-8;base64," + base64Encoded + ") format('truetype');") //$NON-NLS-1$ //$NON-NLS-2$
