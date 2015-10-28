@@ -159,17 +159,14 @@ a.import-tile
 
 	border:					1px #555 solid;
 	
-	box-shadow:				0;
-	transition: 			box-shadow		.5s ease 0s;
-	
 	xbackground-color: 		yellow;
 }
 
 a.import-tile:HOVER
 {
 	z-index: 				0;
-	box-shadow:				0 0 40px #FF4C00;
 	border:					1px solid transparent;
+	background:				#555;
 }	
 
 a.import-tile:HOVER .import-tile-name
@@ -180,10 +177,8 @@ a.import-tile:HOVER .import-tile-name
 a.import-tile:FOCUS
 {
 	border:					1px solid transparent;
-	border-top-color:		#434343;
-	border-bottom-color:	#E85D1F;
 	
-	background:				transparent linear-gradient(180deg, #434343 50%, #E85D1F 85%) repeat scroll 0% 0%;
+	background:				#666;
 }
 
 a.import-tile:FOCUS .import-tile-name

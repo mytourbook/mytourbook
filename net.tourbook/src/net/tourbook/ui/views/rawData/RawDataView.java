@@ -165,9 +165,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private static final String				WEB_RESOURCE_NothingYouCouldDo_TTF			= "NothingYouCouldDo.ttf";					//$NON-NLS-1$
 	private static final String				WEB_RESOURCE_TOUR_IMPORT_BG_IMAGE			= "mytourbook-icon.svg";					//$NON-NLS-1$
 	private static final String				WEB_RESOURCE_TOUR_IMPORT_CSS				= "tour-import.css";						//$NON-NLS-1$
+	private static final String				WEB_RESOURCE_TOUR_IMPORT_CSS3				= "tour-import-css3.css";					//$NON-NLS-1$
 	//
 	private static final String				CSS_IMPORT_BACKGROUND						= "div.import-background";					//$NON-NLS-1$
-	private static final String				CSS_IMPORT_TILE								= "div.import-tile";						//$NON-NLS-1$
+	private static final String				CSS_IMPORT_TILE								= "a.import-tile";							//$NON-NLS-1$
 	//
 	public static final int					COLUMN_DATE									= 0;
 	public static final int					COLUMN_TITLE								= 1;
@@ -1108,10 +1109,25 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			/*
 			 * Webpage css
 			 */
-			final File webFile = WEB.getResourceFile(WEB_RESOURCE_TOUR_IMPORT_CSS);
-			final String webContent = Util.readContentFromFile(webFile.getAbsolutePath());
+			File webFile = WEB.getResourceFile(WEB_RESOURCE_TOUR_IMPORT_CSS);
+			final String css = Util.readContentFromFile(webFile.getAbsolutePath());
 
-			_cssFromFile = "<style>\n" + webContent + "</style>\n"; //$NON-NLS-1$ //$NON-NLS-2$
+			String css3 = UI.EMPTY_STRING;
+
+			/*
+			 * Eclipse 3.8 with Linux has only a limited css3 support -> DISABLED
+			 */
+			if (UI.IS_WIN) {
+
+				webFile = WEB.getResourceFile(WEB_RESOURCE_TOUR_IMPORT_CSS3);
+				css3 = Util.readContentFromFile(webFile.getAbsolutePath());
+			}
+
+			_cssFromFile = ""//
+					+ "<style>\n"
+					+ css
+					+ css3
+					+ "</style>\n";
 
 			/*
 			 * Image urls
