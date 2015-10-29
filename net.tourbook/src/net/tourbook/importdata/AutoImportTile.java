@@ -91,7 +91,10 @@ public class AutoImportTile implements Cloneable, Comparable<AutoImportTile> {
 		return true;
 	}
 
-	public long getCreateId() {
+	/**
+	 * @return Returns a unique id for this import tile.
+	 */
+	public long getId() {
 		return _id;
 	}
 

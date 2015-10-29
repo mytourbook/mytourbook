@@ -50,28 +50,6 @@ a:VISITED
 	text-decoration:		none;
 }
 
-a.action:LINK,
-a.action:VISITED 
-{
-	cursor: 				pointer; 
-	display:				block;
-	width: 					20px; 
-	height: 				20px; 
-
-	text-decoration:		none;
-	
-	background-repeat:		no-repeat;
-	background-position:	center;
-
-	border:					1px solid transparent;
-	border-radius:			3px;
-}
-
-a.action:HOVER 
-{ 
-	border: 				1px solid #fff;
-	border-radius:			3px;
-}
 
 .title
 {
@@ -209,4 +187,13 @@ a.import-tile:FOCUS .import-tile-name
 .import-tile-name-padding
 {
 	padding-right:			10px;
+}
+
+.action
+{
+	width: 					100%; 
+	height: 				16px; 
+
+	background-repeat:		no-repeat;
+	background-position:	center;
 }

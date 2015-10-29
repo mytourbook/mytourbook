@@ -88,15 +88,12 @@ import net.tourbook.ui.views.TourInfoToolTipCellLabelProvider;
 import net.tourbook.web.WEB;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -145,7 +142,6 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchActionConstants;
@@ -187,7 +183,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	public static final boolean				STATE_IS_CONVERT_WAYPOINTS_DEFAULT			= true;
 	public static final boolean				STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT	= false;
 	//
-	private static final String				EXTERNAL_LINK_URL							= "http";									//$NON-NLS-1$
 	private static final String				HREF_TOKEN									= "#";										//$NON-NLS-1$
 	private static final String				PAGE_ABOUT_BLANK							= "about:blank";							//$NON-NLS-1$
 
@@ -196,21 +191,31 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	 */
 	private static final String				HTTP_DUMMY									= "http://dummy";							//$NON-NLS-1$
 
-//	private static final String				ACTION_SETUP_AUTO_IMPORT					= "SetupAutoImport";							//$NON-NLS-1$
+	private static String					ACTION_AUTO_IMPORT							= "AutoImport";							//$NON-NLS-1$
+	private static final String				ACTION_IMPORT_FROM_FILES					= "ImportFromFiles";						//$NON-NLS-1$
+	private static final String				ACTION_SERIAL_PORT_CONFIGURED				= "SerialPortConfigured";					//$NON-NLS-1$
+	private static final String				ACTION_SERIAL_PORT_DIRECTLY					= "SerialPortDirectly";					//$NON-NLS-1$
 
-	public static final int					TILE_SIZE_DEFAULT							= 50;
+	private static String					HREF_AUTO_IMPORT;
+	private static String					HREF_IMPORT_FROM_FILES;
+	private static String					HREF_SERIAL_PORT_CONFIGURED;
+	private static String					HREF_SERIAL_PORT_DIRECTLY;
+
+	static {
+
+		HREF_AUTO_IMPORT = HREF_TOKEN + ACTION_AUTO_IMPORT;
+		HREF_IMPORT_FROM_FILES = HREF_TOKEN + ACTION_IMPORT_FROM_FILES;
+		HREF_SERIAL_PORT_CONFIGURED = HREF_TOKEN + ACTION_SERIAL_PORT_CONFIGURED;
+		HREF_SERIAL_PORT_DIRECTLY = HREF_TOKEN + ACTION_SERIAL_PORT_DIRECTLY;
+	}
+
+	public static final int					TILE_SIZE_DEFAULT							= 80;
 	public static final int					TILE_SIZE_MIN								= 20;
 	public static final int					TILE_SIZE_MAX								= 300;
 	public static final int					NUM_HTILES_DEFAULT							= 5;
 	public static final int					NUM_HTILES_MIN								= 1;
 	public static final int					NUM_HTILES_MAX								= 50;
 
-	private static String					HREF_SETUP_AUTO_IMPORT;
-
-	static {
-
-//		HREF_SETUP_AUTO_IMPORT = HREF_TOKEN + ACTION_SETUP_AUTO_IMPORT + HREF_TOKEN;
-	}
 	//
 	private final IPreferenceStore			_prefStore									= TourbookPlugin.getPrefStore();
 	private final IDialogSettings			_state										= TourbookPlugin.getState(ID);
@@ -243,10 +248,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private ActionSaveTourInDatabase		_actionSaveTourWithPerson;
 	private ActionSetupImport				_actionSetupImport;
 	private ActionSetTourTypeMenu			_actionSetTourType;
-//	private ActionAdjustYear				_actionAdjustImportedYear;
-//	private ActionCreateTourIdWithTime		_actionCreateTourIdWithTime;
-//	private ActionDisableChecksumValidation	_actionDisableChecksumValidation;
-//	private ActionMergeGPXTours				_actionMergeGPXTours;
 	//
 	protected TourPerson					_activePerson;
 	protected TourPerson					_newActivePerson;
@@ -291,8 +292,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private String							_cssFromFile;
 	//
 	private String							_imageUrl_ImportFromFile;
-	private String							_imageUrl_SerialPort_Transfer;
-	private String							_imageUrl_SerialPort_TransferDirect;
+	private String							_imageUrl_SerialPort_Configured;
+	private String							_imageUrl_SerialPort_Directly;
 	//
 	private PixelConverter					_pc;
 
@@ -301,16 +302,16 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	 */
 	private ImageDescriptor					_imageDescDatabase;
 	private ImageDescriptor					_imageDescDatabaseOtherPerson;
-
 	private ImageDescriptor					_imageDescDatabaseAssignMergedTour;
 	private ImageDescriptor					_imageDescDatabasePlaceholder;
 	private ImageDescriptor					_imageDescDelete;
+	//
 	private Image							_imageDatabase;
 	private Image							_imageDatabaseOtherPerson;
-
 	private Image							_imageDatabaseAssignMergedTour;
 	private Image							_imageDatabasePlaceholder;
 	private Image							_imageDelete;
+
 	/*
 	 * UI controls
 	 */
@@ -327,43 +328,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private Browser							_browser;
 	private Text							_txtNoBrowser;
-
-	private class ActionAutoImport extends Action {
-
-		private int	__configIndex;
-
-		public ActionAutoImport(final int configIndex) {
-
-			__configIndex = configIndex;
-		}
-
-		@Override
-		public void run() {
-			actionRunAutoImport(__configIndex);
-		}
-	}
-
-	private class ActionImport extends Action {
-
-		private ImportAction	__importAction;
-
-		public ActionImport(final ImportAction importAction) {
-
-			__importAction = importAction;
-		}
-
-		@Override
-		public void run() {
-			actionImport(__importAction);
-		}
-	}
-
-	private enum ImportAction {
-
-		FROM_FILES, //
-		DATA_TRANSFER, //
-		DATA_TRANSFER_DIRECTLY, //
-	}
 
 	private class TourDataContentProvider implements IStructuredContentProvider {
 
@@ -392,27 +356,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		// don't throw the selection again
 		_postSelectionProvider.clearSelection();
-	}
-
-	private void actionImport(final ImportAction importAction) {
-
-		switch (importAction) {
-
-		case FROM_FILES:
-			_rawDataMgr.actionImportFromFile();
-			break;
-
-		case DATA_TRANSFER:
-			_rawDataMgr.actionImportFromDevice();
-			break;
-
-		case DATA_TRANSFER_DIRECTLY:
-			_rawDataMgr.actionImportFromDeviceDirect();
-			break;
-
-		default:
-			break;
-		}
 	}
 
 	void actionMergeTours(final TourData mergeFromTour, final TourData mergeIntoTour) {
@@ -472,11 +415,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		// update the table viewer
 		reloadViewer();
-	}
-
-	private void actionRunAutoImport(final int configIndex) {
-		// TODO Auto-generated method stub
-
 	}
 
 	void actionSaveTour(final TourPerson person) {
@@ -542,8 +480,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			// keep none live update values
 
-			importConfig.tourTypeItems.clear();
-			importConfig.tourTypeItems.addAll(modifiedConfig.tourTypeItems);
+			importConfig.autoImportTiles.clear();
+			importConfig.autoImportTiles.addAll(modifiedConfig.autoImportTiles);
 		}
 
 		if (isLiveUpdate || isOK) {
@@ -787,13 +725,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				final String webContent = Util.readContentFromFile(webFile.getAbsolutePath());
 				final String base64Encoded = Base64.getEncoder().encodeToString(webContent.getBytes());
 
-				bgImage = CSS_IMPORT_BACKGROUND //
-						+ "{" //$NON-NLS-1$
+				bgImage = (CSS_IMPORT_BACKGROUND + "\n")// //$NON-NLS-1$
+						+ "{\n" //$NON-NLS-1$
 						+ ("	background:				url('data:image/svg+xml;base64," + base64Encoded + "');\n") //$NON-NLS-1$ //$NON-NLS-2$
 						+ ("	background-repeat:		no-repeat;\n") //$NON-NLS-1$
 						+ ("	background-size: 		contain;\n") //$NON-NLS-1$
 						+ ("	background-position: 	center center;\n") //$NON-NLS-1$
-						+ ("	opacity:				" + (float) opacity / 100 + ";") //$NON-NLS-1$ //$NON-NLS-2$
+						+ ("	opacity:				" + (float) opacity / 100 + ";\n") //$NON-NLS-1$ //$NON-NLS-2$
 						+ "}\n"; //$NON-NLS-1$
 
 			} catch (IOException | URISyntaxException e) {
@@ -806,7 +744,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		 */
 		final String tileSize = "" // //$NON-NLS-1$
 				//
-				+ (CSS_IMPORT_TILE)
+				+ (CSS_IMPORT_TILE + "\n") //$NON-NLS-1$
 				+ ("{\n") //$NON-NLS-1$
 				+ ("	min-height: " + itemSize + "px;\n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("	max-height: " + itemSize + "px;\n") //$NON-NLS-1$ //$NON-NLS-2$
@@ -876,8 +814,21 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			sb.append("<div class='import-content'>\n"); //$NON-NLS-1$
 			{
-				createHTML_50_AutoImport_Header(sb);
-				createHTML_52_AutoImport_Tiles(sb);
+				/*
+				 * Auto Import
+				 */
+				sb.append("<div class='auto-import-title title'>\n"); //$NON-NLS-1$
+				sb.append("	" + Messages.Import_Data_Label_AutomatedImport + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+				sb.append("</div>\n"); //$NON-NLS-1$
+
+				createHTML_50_AutoImport_Tiles(sb);
+
+				/*
+				 * Get Tours
+				 */
+				sb.append("<div class='get-tours-title title'>\n"); //$NON-NLS-1$
+				sb.append("	" + Messages.Import_Data_Label_GetTours + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+				sb.append("</div>\n"); //$NON-NLS-1$
 
 				createHTML_60_GetTours(sb);
 			}
@@ -888,24 +839,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		return sb.toString();
 	}
 
-	private void createHTML_50_AutoImport_Header(final StringBuilder sb) {
-
-		final String html = "" // //$NON-NLS-1$
-
-				+ "<div class='auto-import-title title'>\n" //$NON-NLS-1$
-				+ ("	" + Messages.Import_Data_Label_AutomatedImport + "\n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ "</div>\n"; //$NON-NLS-1$
-
-		sb.append(html);
-	}
-
-	private void createHTML_52_AutoImport_Tiles(final StringBuilder sb) {
+	private void createHTML_50_AutoImport_Tiles(final StringBuilder sb) {
 
 		final ImportConfig importConfig = getImportConfig();
 
 		final int numHTiles = importConfig.numHorizontalTiles;
 
-		final ArrayList<AutoImportTile> configItems = importConfig.tourTypeItems;
+		final ArrayList<AutoImportTile> configItems = importConfig.autoImportTiles;
 
 		if (configItems.size() == 0) {
 			return;
@@ -926,7 +866,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			// enforce equal column width
 			sb.append("<td style='width:" + 100 / numHTiles + "%' class='import-tile'>\n"); //$NON-NLS-1$ //$NON-NLS-2$
-			sb.append(createHTML_52_ImportTile(configItem));
+			sb.append(createHTML_52_AutoImport_Tile(configItem));
 			sb.append("</td>\n"); //$NON-NLS-1$
 
 			if (configIndex % numHTiles == numHTiles - 1) {
@@ -942,7 +882,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		sb.append("</tbody></table>\n"); //$NON-NLS-1$
 	}
 
-	private String createHTML_52_ImportTile(final AutoImportTile importTile) {
+	private String createHTML_52_AutoImport_Tile(final AutoImportTile importTile) {
 
 		final Image tileImage = getImportConfigImage(importTile);
 
@@ -956,9 +896,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			htmlImage = "<img src='data:image/png;base64," + base64Encoded + "'>"; //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
+		final String href = HTTP_DUMMY + HREF_AUTO_IMPORT + HREF_TOKEN + importTile.getId();
+
 		final String html = "" //$NON-NLS-1$
 
-				+ ("<a href='#' class='import-tile'>\n") //$NON-NLS-1$
+				+ ("<a href='" + href + "' class='import-tile'>\n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("	<div class='import-tile-image'>" + htmlImage + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("	<div class='import-tile-name'>\n") //$NON-NLS-1$
 
@@ -975,52 +917,62 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private void createHTML_60_GetTours(final StringBuilder sb) {
 
-//		(Messages.Import_Data_Link_Import);
-//		(Messages.Import_Data_Link_ReceiveFromSerialPort_Configured);
-//		(Messages.Import_Data_Link_ReceiveFromSerialPort_Directly);
-
-//		final String htmlActionImportConfig = createHtml_Action(
-//				Messages.Import_Data_Action_AutomatedImportConfig_Tooltip,
-//				HTTP_DUMMY + HREF_SETUP_AUTO_IMPORT,
-//				_imageUrl_AutoImportConfig);
-
-		sb.append("<div class='get-tours-title title'>" + Messages.Import_Data_Label_GetTours + "</div>\n"); //$NON-NLS-1$ //$NON-NLS-2$
-
 		sb.append("<div class='get-tours-items'>\n"); //$NON-NLS-1$
 		sb.append("	<table><tbody><tr>\n"); //$NON-NLS-1$
+		{
+			createHTML_TileAction(
+					sb,
+					Messages.Import_Data_Action_ImportFromFiles,
+					Messages.Import_Data_Action_ImportFromFiles_Tooltip,
+					(HTTP_DUMMY + HREF_IMPORT_FROM_FILES),
+					_imageUrl_ImportFromFile);
 
-		createHTML_TileAction(sb);
+			createHTML_TileAction(
+					sb,
+					Messages.Import_Data_Action_ReceiveFromSerialPort_Configured,
+					Messages.Import_Data_Link_ReceiveFromSerialPort_Configured,
+					(HTTP_DUMMY + HREF_SERIAL_PORT_CONFIGURED),
+					_imageUrl_SerialPort_Configured);
 
+			createHTML_TileAction(
+					sb,
+					Messages.Import_Data_Action_ReceiveFromSerialPort_Directly,
+					Messages.Import_Data_Link_ReceiveFromSerialPort_Directly,
+					(HTTP_DUMMY + HREF_SERIAL_PORT_DIRECTLY),
+					_imageUrl_SerialPort_Directly);
+		}
 		sb.append("	</tr></tbody></table>\n"); // //$NON-NLS-1$
 		sb.append("</div>\n"); //$NON-NLS-1$
+
 	}
 
-	private String createHtml_Action(final String title, final String href, final String backgroundImage) {
+	private void createHTML_TileAction(	final StringBuilder sb,
+										final String name,
+										final String tooltip,
+										final String href,
+										final String imageUrl) {
 
-		return "<a class='action'" // //$NON-NLS-1$
-				+ (" title='" + title + "'") //$NON-NLS-1$ //$NON-NLS-2$
-				+ (" href='" + href + "'") //$NON-NLS-1$ //$NON-NLS-2$
-				+ (" style='background-image: url(" + backgroundImage + ");'") //$NON-NLS-1$ //$NON-NLS-2$
-				+ "></a>"; // //$NON-NLS-1$
-	}
+		final String htmlImage = "style='" // //$NON-NLS-1$
 
-	private void createHTML_TileAction(final StringBuilder sb) {
+				+ ("background-image:	url(" + imageUrl + ");\n") //$NON-NLS-1$ //$NON-NLS-2$
+				//
+				+ "'"; //$NON-NLS-1$
 
 		final String html = "" //$NON-NLS-1$
 
-				+ ("<td>\n") //$NON-NLS-1$
-				+ ("<div class='import-tile'>\n") //$NON-NLS-1$
-				+ ("<a href='#' class='import-tile'>\n") //$NON-NLS-1$
-
-				+ ("	<div class='import-tile-image'>" + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("<td>") //$NON-NLS-1$
+				+ ("<a href='" + href + "' title='" + tooltip + "' class='import-tile'>\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				+ ("	<div class='import-tile-image action' " + htmlImage + "></div>\n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("	<div class='import-tile-name'>\n") //$NON-NLS-1$
-				// it needs a NEW div that padding on the right side works !!!
-				+ ("		<div class='import-tile-name-padding'>" + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("	</div>\n") //$NON-NLS-1$
 
+				// it needs a NEW div that padding on the right side works !!!
+				+ ("		<div class='import-tile-name-padding'>" + name + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$
+
+				+ ("	</div>\n") //$NON-NLS-1$
 				+ ("</a>\n") //$NON-NLS-1$
-				+ ("</div>\n") //$NON-NLS-1$
-				+ ("</td>\n"); //$NON-NLS-1$
+				+ ("</td>") //$NON-NLS-1$
+
+		;
 
 		sb.append(html);
 	}
@@ -1123,18 +1075,18 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				css3 = Util.readContentFromFile(webFile.getAbsolutePath());
 			}
 
-			_cssFromFile = ""//
-					+ "<style>\n"
+			_cssFromFile = ""// //$NON-NLS-1$
+					+ "<style>\n" //$NON-NLS-1$
 					+ css
 					+ css3
-					+ "</style>\n";
+					+ "</style>\n"; //$NON-NLS-1$
 
 			/*
 			 * Image urls
 			 */
 			_imageUrl_ImportFromFile = net.tourbook.ui.UI.getIconUrl(Messages.Image__RawData_Import);
-			_imageUrl_SerialPort_Transfer = net.tourbook.ui.UI.getIconUrl(Messages.Image__RawData_Transfer);
-			_imageUrl_SerialPort_TransferDirect = net.tourbook.ui.UI.getIconUrl(Messages.Image__RawData_TransferDirect);
+			_imageUrl_SerialPort_Configured = net.tourbook.ui.UI.getIconUrl(Messages.Image__RawData_Transfer);
+			_imageUrl_SerialPort_Directly = net.tourbook.ui.UI.getIconUrl(Messages.Image__RawData_TransferDirect);
 
 		} catch (final IOException | URISyntaxException e) {
 			StatusUtil.showStatus(e);
@@ -1298,107 +1250,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		getSite().registerContextMenu(menuMgr, _tourViewer);
 
 		_columnManager.createHeaderContextMenu(table, tableContextMenu);
-	}
-
-	private String createUI_ConfigTooltip(final AutoImportTile importConfig) {
-
-		final Enum<TourTypeConfig> tourTypeConfig = importConfig.tourTypeConfig;
-
-		final StringBuilder sb = new StringBuilder();
-
-		/*
-		 * Config name
-		 */
-		final String configName = createHTML_52_ImportTile(importConfig);
-		if (configName.length() > 0) {
-
-			sb.append(configName);
-
-			sb.append(UI.NEW_LINE);
-			sb.append(UI.NEW_LINE);
-		}
-
-		/*
-		 * Tour types
-		 */
-		if (TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED.equals(tourTypeConfig)) {
-
-			for (final SpeedVertex vertex : importConfig.speedVertices) {
-
-				final float speed = vertex.avgSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
-
-				sb.append('<');
-				sb.append((int) speed);
-				sb.append(UI.SPACE2);
-				sb.append(UI.UNIT_LABEL_SPEED);
-				sb.append(UI.SPACE2);
-				sb.append(TourDatabase.getTourTypeName(vertex.tourTypeId));
-				sb.append(UI.NEW_LINE);
-			}
-
-		} else if (TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL.equals(tourTypeConfig)) {
-
-			if (importConfig.oneTourType != null) {
-
-				sb.append(TourDatabase.getTourTypeName(importConfig.oneTourType.getTypeId()));
-				sb.append(UI.NEW_LINE);
-			}
-
-		} else {
-
-			// this is the default or TourTypeConfig.TOUR_TYPE_CONFIG_NOT_USED
-
-			sb.append(Messages.Import_Data_TourTypeConfig_NotUsed);
-		}
-
-		return sb.toString();
-	}
-
-	private ToolBar createUI_ImportAction(final Composite parent, final Action action, final boolean isCenter) {
-
-		final ActionContributionItem item = new ActionContributionItem(action);
-
-		item.setMode(ActionContributionItem.MODE_FORCE_TEXT);
-
-		ToolBar tb;
-
-		if (isCenter) {
-
-			tb = new ToolBar(parent, SWT.FLAT);
-
-			GridDataFactory.fillDefaults()//
-					.align(SWT.CENTER, SWT.CENTER)
-					.applyTo(tb);
-
-		} else {
-
-			tb = new ToolBar(parent, SWT.FLAT | SWT.RIGHT);
-		}
-
-//		tb.setBackground(_bgActionColor);
-
-		final ToolBarManager tbm = new ToolBarManager(tb);
-
-		tbm.add(item);
-		tbm.update(true);
-
-		return tb;
-	}
-
-	private ToolBar createUI_ImportAction(	final Composite parent,
-											final String text,
-											final String imageId,
-											final ImportAction importAction,
-											final boolean isCenter) {
-
-		final Image actionImage = net.tourbook.ui.UI.IMAGE_REGISTRY.get(imageId);
-
-		final ActionImport action = new ActionImport(importAction);
-
-		action.setText(text);
-		action.setImageDescriptor(ImageDescriptor.createFromImage(actionImage));
-
-		return createUI_ImportAction(parent, action, isCenter);
 	}
 
 	/**
@@ -2001,6 +1852,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_configImageHash.clear();
 	}
 
+	private void doAutoImport(final AutoImportTile importTile) {
+
+
+	}
+
 	public void doLiveUpdate(final DialogImportConfig dialogImportConfig) {
 
 		updateModel_ImportConfig(dialogImportConfig);
@@ -2366,7 +2222,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			return null;
 		}
 
-		final long configId = importConfig.getCreateId();
+		final long configId = importConfig.getId();
 		Image image = _configImages.get(configId);
 
 		if (isConfigImageValid(image, importConfig)) {
@@ -2544,7 +2400,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			return false;
 		}
 
-		final Integer imageHash = _configImageHash.get(importConfig.getCreateId());
+		final Integer imageHash = _configImageHash.get(importConfig.getId());
 
 		if (imageHash == null || imageHash != importConfig.imageHash) {
 
@@ -2589,26 +2445,17 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		final String location = event.location;
 
-//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//				+ ("\tonBrowser_LocationChanging: " + event));
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
 		final String[] locationParts = location.split(HREF_TOKEN);
 
 		if (locationParts.length > 1) {
 
-			final String hrefAction = locationParts[1];
-
-//			if (ACTION_SETUP_AUTO_IMPORT.equals(hrefAction)) {
-//
-//				// end loading of the browser and start a new action
-//				_browser.getDisplay().asyncExec(new Runnable() {
-//					@Override
-//					public void run() {
-//						actionSetupImport();
-//					}
-//				});
-//			}
+			// end loading of the browser and start a new action
+			_browser.getDisplay().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					onBrowser_LocationChanging_Runnable(locationParts);
+				}
+			});
 		}
 
 		// prevent to load a new url
@@ -2620,9 +2467,42 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 	}
 
-	private void onSelectImportConfig(final SelectionEvent e) {
+	private void onBrowser_LocationChanging_Runnable(final String[] locationParts) {
 
-		final int configIndex = (int) e.widget.getData();
+		final String hrefAction = locationParts[1];
+
+		if (ACTION_AUTO_IMPORT.equals(hrefAction)) {
+
+			final long tileId = Long.parseLong(locationParts[2]);
+
+			onSelectAutoTile(tileId);
+
+		} else if (ACTION_IMPORT_FROM_FILES.equals(hrefAction)) {
+
+			_rawDataMgr.actionImportFromFile();
+
+		} else if (ACTION_SERIAL_PORT_CONFIGURED.equals(hrefAction)) {
+
+			_rawDataMgr.actionImportFromDevice();
+
+		} else if (ACTION_SERIAL_PORT_DIRECTLY.equals(hrefAction)) {
+
+			_rawDataMgr.actionImportFromDeviceDirect();
+		}
+	}
+
+	private void onSelectAutoTile(final long tileId) {
+
+		final ImportConfig importConfig = getImportConfig();
+
+		for (final AutoImportTile importTile : importConfig.autoImportTiles) {
+
+			if (importTile.getId() == tileId) {
+
+				doAutoImport(importTile);
+				break;
+			}
+		}
 	}
 
 	private void onSelectionChanged(final ISelection selection) {

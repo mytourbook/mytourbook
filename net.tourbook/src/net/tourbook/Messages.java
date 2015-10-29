@@ -114,42 +114,42 @@ public class Messages extends NLS {
 
 	public static String		Dialog_ImportConfig_Action_AddSpeed_Tooltip;
 
-	public static String	Dialog_ImportConfig_Action_NewOneTourType_Tooltip;
+	public static String		Dialog_ImportConfig_Action_NewOneTourType_Tooltip;
 	public static String		Dialog_ImportConfig_Action_RemoveSpeed_Tooltip;
 	public static String		Dialog_ImportConfig_Action_SortVertices_Tooltip;
-	public static String	Dialog_ImportConfig_Checkbox_LiveUpdate;
+	public static String		Dialog_ImportConfig_Checkbox_LiveUpdate;
 
-	public static String	Dialog_ImportConfig_Checkbox_LiveUpdate_Tooltip;
+	public static String		Dialog_ImportConfig_Checkbox_LiveUpdate_Tooltip;
 
 	public static String		Dialog_ImportConfig_Checkbox_SetTourType;
 	public static String		Dialog_ImportConfig_Column_Name;
 	public static String		Dialog_ImportConfig_Column_TourType;
 	public static String		Dialog_ImportConfig_Dialog_Message;
 	public static String		Dialog_ImportConfig_Dialog_Title;
-	public static String	Dialog_ImportConfig_Group_Dashboard;
+	public static String		Dialog_ImportConfig_Group_Dashboard;
 
-	public static String	Dialog_ImportConfig_Group_TourFile;
+	public static String		Dialog_ImportConfig_Group_TourFile;
 
 	public static String		Dialog_ImportConfig_Group_TourType;
 	public static String		Dialog_ImportConfig_Info_ConfigDragDrop;
 	public static String		Dialog_ImportConfig_Label_BackupFolder;
-	public static String	Dialog_ImportConfig_Label_ConfigDescription;
+	public static String		Dialog_ImportConfig_Label_ConfigDescription;
 
 	public static String		Dialog_ImportConfig_Label_ConfigName;
-	public static String	Dialog_ImportConfig_Label_ConfigTileSize;
+	public static String		Dialog_ImportConfig_Label_ConfigTileSize;
 
-	public static String	Dialog_ImportConfig_Label_ConfigTileSize_Tooltip;
+	public static String		Dialog_ImportConfig_Label_ConfigTileSize_Tooltip;
 
 	public static String		Dialog_ImportConfig_Label_ConfigTitle;
 	public static String		Dialog_ImportConfig_Label_DeviceFolder;
 
-	public static String	Dialog_ImportConfig_Label_ImportBackgroundOpacity;
+	public static String		Dialog_ImportConfig_Label_ImportBackgroundOpacity;
 
-	public static String	Dialog_ImportConfig_Label_ImportBackgroundOpacity_Tooltip;
+	public static String		Dialog_ImportConfig_Label_ImportBackgroundOpacity_Tooltip;
 
-	public static String	Dialog_ImportConfig_Label_ImportColumns;
+	public static String		Dialog_ImportConfig_Label_ImportColumns;
 
-	public static String	Dialog_ImportConfig_Label_ImportColumns_Tooltip;
+	public static String		Dialog_ImportConfig_Label_ImportColumns_Tooltip;
 	public static String		Dialog_ImportConfig_Label_TourType;
 	public static String		Dialog_ImportConfig_Link_TourType;
 	public static String		Dialog_ImportConfig_Spinner_Speed_Tooltip;
@@ -810,8 +810,15 @@ public class Messages extends NLS {
 	public static String		import_data_updateDataFromDatabase_task;
 
 	public static String		Import_Data_Action_AutomatedImportConfig_Tooltip;
-
 	public static String		Import_Data_Action_EditImportPreferences;
+
+	public static String	Import_Data_Action_ImportFromFiles;
+
+	public static String	Import_Data_Action_ImportFromFiles_Tooltip;
+	public static String	Import_Data_Action_ReceiveFromSerialPort_Configured;
+
+	public static String	Import_Data_Action_ReceiveFromSerialPort_Directly;
+
 	public static String		Import_Data_Action_Reimport_EntireTour;
 	public static String		Import_Data_Action_Reimport_OnlyAltitudeValues;
 	public static String		Import_Data_Action_Reimport_OnlyGearValues;
@@ -840,9 +847,7 @@ public class Messages extends NLS {
 	public static String		Import_Data_Error_CreatingFileName_Message;
 	public static String		Import_Data_Error_CreatingFileName_Title;
 	public static String		Import_Data_Label_AutomatedImport;
-
-	public static String	Import_Data_Label_GetTours;
-
+	public static String		Import_Data_Label_GetTours;
 	public static String		Import_Data_Label_Hint;
 	public static String		Import_Data_Label_Info;
 	public static String		Import_Data_Link_AutomatedImportConfig;

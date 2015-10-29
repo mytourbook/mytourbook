@@ -3,8 +3,6 @@ a.import-tile
 {	
 	box-shadow:				0;
 	transition: 			box-shadow		.2s ease 0s;
-	
-	xbackground-color: 		yellow;
 }
 
 a.import-tile:HOVER
@@ -19,13 +17,9 @@ a.import-tile:HOVER
 
 a.import-tile:FOCUS
 {
-	border-top-color:		#434343;
-	xborder-bottom-color:	#E85D1F;
 	border-top-color:		#47A3FF;
 	border-bottom-color:	#47A3FF;
-	
-	xbackground:				transparent linear-gradient(180deg, #434343 30%, #E85D1F 70%) repeat scroll 0% 0%;
-	
+		
 	background-color: 		#434343;
 	background-image:		radial-gradient(
 								circle 
@@ -37,6 +31,5 @@ a.import-tile:FOCUS
 
 a.import-tile:HOVER:FOCUS
 {
-	xbox-shadow:				0 0 40px #FF4C00;
 	box-shadow:				0 0 40px #47A3FF;
 }

@@ -1597,7 +1597,7 @@ public class RawDataManager {
 
 			configItem.setupItemImage();
 
-			importConfig.tourTypeItems.add(configItem);
+			importConfig.autoImportTiles.add(configItem);
 		}
 	}
 
@@ -1694,7 +1694,7 @@ public class RawDataManager {
 		xmlMemento.putString(ATTR_CONFIG_BACKUP_FOLDER, importConfig.backupFolder);
 		xmlMemento.putString(ATTR_CONFIG_DEVICE_FOLDER, importConfig.deviceFolder);
 
-		for (final AutoImportTile configItem : importConfig.tourTypeItems) {
+		for (final AutoImportTile configItem : importConfig.autoImportTiles) {
 
 			final IMemento xmlConfig = xmlMemento.createChild(TAG_IMPORT_CONFIG);
 
