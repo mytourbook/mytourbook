@@ -83,7 +83,7 @@ a:VISITED
 }
 
 
-.auto-import-title
+.auto-import-header
 {
 	padding-top: 			10px;
 }
@@ -196,4 +196,37 @@ a.import-tile:FOCUS .import-tile-name
 
 	background-repeat:		no-repeat;
 	background-position:	center;
+}
+
+.action-button
+{
+	width: 					100%; 
+	height: 				16px; 
+
+	background-repeat:		no-repeat;
+	background-position:	center;
+}
+
+
+a.action-button:LINK,
+a.action-button:VISITED 
+{
+	cursor: 				pointer; 
+	display:				block;
+	width: 					20px; 
+	height: 				20px; 
+
+	text-decoration:		none;
+	
+	background-repeat:		no-repeat;
+	background-position:	center;
+
+	border:					1px solid transparent;
+	border-radius:			3px;
+}
+
+a.action-button:HOVER 
+{ 
+	border: 				1px solid #fff;
+	xborder-radius:			3px;
 }

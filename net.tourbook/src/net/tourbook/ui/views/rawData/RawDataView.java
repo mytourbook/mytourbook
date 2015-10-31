@@ -195,18 +195,20 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private static final String				ACTION_IMPORT_FROM_FILES					= "ImportFromFiles";						//$NON-NLS-1$
 	private static final String				ACTION_SERIAL_PORT_CONFIGURED				= "SerialPortConfigured";					//$NON-NLS-1$
 	private static final String				ACTION_SERIAL_PORT_DIRECTLY					= "SerialPortDirectly";					//$NON-NLS-1$
+	private static final String				ACTION_SETUP_AUTO_IMPORT					= "SetupAutoImport";						//$NON-NLS-1$
 
 	private static String					HREF_AUTO_IMPORT;
 	private static String					HREF_IMPORT_FROM_FILES;
 	private static String					HREF_SERIAL_PORT_CONFIGURED;
 	private static String					HREF_SERIAL_PORT_DIRECTLY;
+	private static String					HREF_SETUP_AUTO_IMPORT;
 
 	static {
-
 		HREF_AUTO_IMPORT = HREF_TOKEN + ACTION_AUTO_IMPORT;
 		HREF_IMPORT_FROM_FILES = HREF_TOKEN + ACTION_IMPORT_FROM_FILES;
 		HREF_SERIAL_PORT_CONFIGURED = HREF_TOKEN + ACTION_SERIAL_PORT_CONFIGURED;
 		HREF_SERIAL_PORT_DIRECTLY = HREF_TOKEN + ACTION_SERIAL_PORT_DIRECTLY;
+		HREF_SETUP_AUTO_IMPORT = HREF_TOKEN + ACTION_SETUP_AUTO_IMPORT + HREF_TOKEN;
 	}
 
 	public static final int					TILE_SIZE_DEFAULT							= 80;
@@ -291,6 +293,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private String							_cssFonts;
 	private String							_cssFromFile;
 	//
+	private String							_imageUrl_AutoImportConfig;
 	private String							_imageUrl_ImportFromFile;
 	private String							_imageUrl_SerialPort_Configured;
 	private String							_imageUrl_SerialPort_Directly;
@@ -817,11 +820,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				/*
 				 * Auto Import
 				 */
-				sb.append("<div class='auto-import-title title'>\n"); //$NON-NLS-1$
-				sb.append("	" + Messages.Import_Data_Label_AutomatedImport + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
-				sb.append("</div>\n"); //$NON-NLS-1$
-
-				createHTML_50_AutoImport_Tiles(sb);
+				createHTML_50_AutoImport_Header(sb);
+				createHTML_52_AutoImport_Tiles(sb);
 
 				/*
 				 * Get Tours
@@ -839,7 +839,39 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		return sb.toString();
 	}
 
-	private void createHTML_50_AutoImport_Tiles(final StringBuilder sb) {
+	private void createHTML_50_AutoImport_Header(final StringBuilder sb) {
+
+//		sb.append("<div class='auto-import-title title'>\n"); //$NON-NLS-1$
+//		sb.append("	" + Messages.Import_Data_Label_AutomatedImport + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+//		sb.append("</div>\n"); //$NON-NLS-1$
+
+		final String hrefOpenMarker = HTTP_DUMMY + HREF_SETUP_AUTO_IMPORT;
+
+		final String htmlActionImportConfig = ""// //$NON-NLS-1$
+				+ "<a class='action-button'" // //$NON-NLS-1$
+				+ (" title='" + Messages.Import_Data_Action_AutomatedImportConfig_Tooltip + "'") //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" href='" + hrefOpenMarker + "'") //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" style='background-image: url(" + _imageUrl_AutoImportConfig + ");'") //$NON-NLS-1$ //$NON-NLS-2$
+				+ "></a>"; //$NON-NLS-1$
+
+		final String html = "" // //$NON-NLS-1$
+
+				+ "<div class='auto-import-header'>\n" //$NON-NLS-1$
+				+ ("	<table><tbody><tr>\n") //$NON-NLS-1$
+
+				+ ("		<td class='title'>" + Messages.Import_Data_Label_AutomatedImport + "</td>\n") //$NON-NLS-1$ //$NON-NLS-2$
+
+				+ ("		<td>\n") //$NON-NLS-1$
+				+ ("			<div style='padding-left:10px;'>" + htmlActionImportConfig + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("		</td>\n") //$NON-NLS-1$
+
+				+ "	</tr></tbody></table>\n" // //$NON-NLS-1$
+				+ "</div>\n"; //$NON-NLS-1$
+
+		sb.append(html);
+	}
+
+	private void createHTML_52_AutoImport_Tiles(final StringBuilder sb) {
 
 		final ImportConfig importConfig = getImportConfig();
 
@@ -866,7 +898,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			// enforce equal column width
 			sb.append("<td style='width:" + 100 / numHTiles + "%' class='import-tile'>\n"); //$NON-NLS-1$ //$NON-NLS-2$
-			sb.append(createHTML_52_AutoImport_Tile(configItem));
+			sb.append(createHTML_54_AutoImport_Tile(configItem));
 			sb.append("</td>\n"); //$NON-NLS-1$
 
 			if (configIndex % numHTiles == numHTiles - 1) {
@@ -882,7 +914,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		sb.append("</tbody></table>\n"); //$NON-NLS-1$
 	}
 
-	private String createHTML_52_AutoImport_Tile(final AutoImportTile importTile) {
+	private String createHTML_54_AutoImport_Tile(final AutoImportTile importTile) {
 
 		final Image tileImage = getImportConfigImage(importTile);
 
@@ -1087,6 +1119,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			_imageUrl_ImportFromFile = net.tourbook.ui.UI.getIconUrl(Messages.Image__RawData_Import);
 			_imageUrl_SerialPort_Configured = net.tourbook.ui.UI.getIconUrl(Messages.Image__RawData_Transfer);
 			_imageUrl_SerialPort_Directly = net.tourbook.ui.UI.getIconUrl(Messages.Image__RawData_TransferDirect);
+			_imageUrl_AutoImportConfig = net.tourbook.ui.UI.getIconUrl(Messages.Image__tour_options);
 
 		} catch (final IOException | URISyntaxException e) {
 			StatusUtil.showStatus(e);
@@ -1854,7 +1887,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private void doAutoImport(final AutoImportTile importTile) {
 
-
 	}
 
 	public void doLiveUpdate(final DialogImportConfig dialogImportConfig) {
@@ -2488,6 +2520,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		} else if (ACTION_SERIAL_PORT_DIRECTLY.equals(hrefAction)) {
 
 			_rawDataMgr.actionImportFromDeviceDirect();
+
+		} else if (ACTION_SETUP_AUTO_IMPORT.equals(hrefAction)) {
+
+			actionSetupImport();
 		}
 	}
 
