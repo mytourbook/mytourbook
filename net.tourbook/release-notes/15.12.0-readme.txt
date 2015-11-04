@@ -31,12 +31,10 @@ Version 15.12.0 Beta                                  ?. ? 2015
 New Last Minute Feature
 =======================
 
-* Collated Tours
-
-
+* 
+  - Remove current folder from the history with <Ctrl>+<Delete.
 
 Improvements
 ============	
 
-* NMEA import
-	- Merged date fix from Alexey.
+* 

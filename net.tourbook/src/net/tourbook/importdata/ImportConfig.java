@@ -21,15 +21,15 @@ import net.tourbook.common.UI;
 
 public class ImportConfig {
 
-	public boolean						isLiveUpdate;
+	public boolean					isLiveUpdate;
 
-	public String						backupFolder		= UI.EMPTY_STRING;
-	public String						deviceFolder		= UI.EMPTY_STRING;
+	public String					backupFolder	= UI.EMPTY_STRING;
+	public String					deviceFolder	= UI.EMPTY_STRING;
 
-	public int							backgroundOpacity;
-	public int							numHorizontalTiles;
-	public int							tileSize;
+	public int						backgroundOpacity;
+	public int						numHorizontalTiles;
+	public int						tileSize;
 
-	public ArrayList<AutoImportTile>	autoImportTiles	= new ArrayList<>();
+	public ArrayList<TourTypeItem>	tourTypeItems	= new ArrayList<>();
 
 }

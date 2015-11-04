@@ -36,7 +36,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 
 import net.tourbook.common.UI;
 
@@ -115,6 +119,20 @@ public class Util {
 		final int newValue = ((event.count > 0 ? 1 : -1) * accelerator);
 
 		spinner.setSelection(spinner.getSelection() + newValue);
+	}
+
+	/**
+	 * Revers an array sort order.
+	 * 
+	 * @param arr
+	 * @return
+	 */
+	public static Object[] arrayReverse(final Object[] arr) {
+
+		final List<Object> list = Arrays.asList(arr);
+		Collections.reverse(list);
+
+		return list.toArray();
 	}
 
 	/**
@@ -1060,7 +1078,56 @@ public class Util {
 	 * @param maxItems
 	 * @return
 	 */
+	public static ArrayList<String> getUniqueItems(	final ArrayList<String> allItems,
+													final String newItem,
+													final int maxItems) {
+
+		if (newItem == null) {
+
+			// there is no new item
+			return allItems;
+		}
+
+		final List<String> uniqueList = new ArrayList<String>(new HashSet<String>(allItems));
+
+//		Collections.sort(uniqueList);
+
+		final ArrayList<String> newItems = new ArrayList<String>();
+
+		newItems.add(newItem);
+
+		for (final String oldItem : allItems) {
+
+			// ignore duplicate entries
+			if (newItem.equals(oldItem) == false) {
+				newItems.add(oldItem);
+			}
+
+			if (maxItems > 0) {
+				if (newItems.size() >= maxItems) {
+					break;
+				}
+			}
+		}
+
+		return newItems;
+	}
+
+	/**
+	 * Remove duplicate items from a list and add a new item.
+	 * 
+	 * @param allItems
+	 * @param newItem
+	 * @param maxItems
+	 * @return
+	 */
 	public static String[] getUniqueItems(final String[] allItems, final String newItem, final int maxItems) {
+
+		if (newItem == null) {
+
+			// there is no new item
+			return allItems;
+		}
 
 		final ArrayList<String> newItems = new ArrayList<String>();
 

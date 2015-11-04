@@ -155,7 +155,7 @@ public class DataTransferWizard extends Wizard {
 					true);
 		}
 
-		rawDataManager.updateTourDataFromDb(null);
+		rawDataManager.updateTourData_InImportView_FromDb(null);
 
 		// show imported data in the raw data view
 		final RawDataView importView = (RawDataView) Util.showView(RawDataView.ID, true);

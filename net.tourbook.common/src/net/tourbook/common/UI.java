@@ -167,6 +167,13 @@ public class UI {
 			'<',
 			'>',
 			'|',																	};
+	private static final char[]				INVALID_FILEPATH_CHARS					= new char[] {
+			'*',
+			'?',
+			'"',
+			'<',
+			'>',
+			'|',																	};
 
 	public static final boolean				IS_LINUX								= "gtk".equals(SWT.getPlatform());											//$NON-NLS-1$
 	public static final boolean				IS_OSX									= "carbon".equals(SWT.getPlatform()) || "cocoa".equals(SWT.getPlatform());	//$NON-NLS-1$ //$NON-NLS-2$
@@ -1474,12 +1481,30 @@ public class UI {
 	}
 
 	public static VerifyListener verifyFilenameInput() {
+
 		return new VerifyListener() {
 			@Override
 			public void verifyText(final VerifyEvent e) {
 
 				// check invalid chars
 				for (final char invalidChar : INVALID_FILENAME_CHARS) {
+					if (invalidChar == e.character) {
+						e.doit = false;
+						return;
+					}
+				}
+			}
+		};
+	}
+
+	public static VerifyListener verifyFilePathInput() {
+
+		return new VerifyListener() {
+			@Override
+			public void verifyText(final VerifyEvent e) {
+
+				// check invalid chars
+				for (final char invalidChar : INVALID_FILEPATH_CHARS) {
 					if (invalidChar == e.character) {
 						e.doit = false;
 						return;

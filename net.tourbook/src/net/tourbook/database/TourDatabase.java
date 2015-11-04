@@ -1375,16 +1375,11 @@ public class TourDatabase {
 					@Override
 					public void run() {
 
-						Connection conn = null;
-						Statement stmt = null;
-						String sqlQuery = null;
+						try (Connection conn = getInstance().getConnection(); //
+								Statement stmt = conn.createStatement()) {
 
-						try {
-
-							conn = getInstance().getConnection();
-							stmt = conn.createStatement();
-
-							sqlQuery = "SELECT" //$NON-NLS-1$
+							final String sqlQuery = ""//
+									+ "SELECT" //$NON-NLS-1$
 									+ " DISTINCT" //$NON-NLS-1$
 									+ " " + fieldname //$NON-NLS-1$
 									+ " FROM " + db //$NON-NLS-1$
@@ -1407,9 +1402,6 @@ public class TourDatabase {
 
 						} catch (final SQLException e) {
 							UI.showSQLException(e);
-						} finally {
-							Util.closeSql(stmt);
-							Util.closeSql(conn);
 						}
 
 						/*

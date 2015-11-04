@@ -53,12 +53,12 @@ import net.tourbook.data.TourType;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.extension.export.ActionExport;
-import net.tourbook.importdata.AutoImportTile;
 import net.tourbook.importdata.DialogImportConfig;
 import net.tourbook.importdata.ImportConfig;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.SpeedVertex;
 import net.tourbook.importdata.TourTypeConfig;
+import net.tourbook.importdata.TourTypeItem;
 import net.tourbook.photo.ImageUtils;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageImport;
@@ -483,8 +483,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			// keep none live update values
 
-			importConfig.autoImportTiles.clear();
-			importConfig.autoImportTiles.addAll(modifiedConfig.autoImportTiles);
+			importConfig.tourTypeItems.clear();
+			importConfig.tourTypeItems.addAll(modifiedConfig.tourTypeItems);
 		}
 
 		if (isLiveUpdate || isOK) {
@@ -572,7 +572,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				} else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
 
 					// update tour type in the raw data
-					_rawDataMgr.updateTourDataFromDb(null);
+					_rawDataMgr.updateTourData_InImportView_FromDb(null);
 
 					_tourViewer.refresh();
 
@@ -663,7 +663,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 				} else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED) {
 
-					_rawDataMgr.updateTourDataFromDb(null);
+					_rawDataMgr.updateTourData_InImportView_FromDb(null);
 
 					reloadViewer();
 				}
@@ -841,10 +841,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private void createHTML_50_AutoImport_Header(final StringBuilder sb) {
 
-//		sb.append("<div class='auto-import-title title'>\n"); //$NON-NLS-1$
-//		sb.append("	" + Messages.Import_Data_Label_AutomatedImport + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
-//		sb.append("</div>\n"); //$NON-NLS-1$
-
 		final String hrefOpenMarker = HTTP_DUMMY + HREF_SETUP_AUTO_IMPORT;
 
 		final String htmlActionImportConfig = ""// //$NON-NLS-1$
@@ -877,7 +873,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		final int numHTiles = importConfig.numHorizontalTiles;
 
-		final ArrayList<AutoImportTile> configItems = importConfig.autoImportTiles;
+		final ArrayList<TourTypeItem> configItems = importConfig.tourTypeItems;
 
 		if (configItems.size() == 0) {
 			return;
@@ -894,7 +890,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				isTrOpen = true;
 			}
 
-			final AutoImportTile configItem = configItems.get(configIndex);
+			final TourTypeItem configItem = configItems.get(configIndex);
 
 			// enforce equal column width
 			sb.append("<td style='width:" + 100 / numHTiles + "%' class='import-tile'>\n"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -914,7 +910,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		sb.append("</tbody></table>\n"); //$NON-NLS-1$
 	}
 
-	private String createHTML_54_AutoImport_Tile(final AutoImportTile importTile) {
+	private String createHTML_54_AutoImport_Tile(final TourTypeItem importTile) {
 
 		final Image tileImage = getImportConfigImage(importTile);
 
@@ -1885,10 +1881,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_configImageHash.clear();
 	}
 
-	private void doAutoImport(final AutoImportTile importTile) {
-
-	}
-
 	public void doLiveUpdate(final DialogImportConfig dialogImportConfig) {
 
 		updateModel_ImportConfig(dialogImportConfig);
@@ -2243,10 +2235,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private ImportConfig getImportConfig() {
 
-		return RawDataManager.getInstance().getAutoImportConfigs();
+		return RawDataManager.getInstance().getAutoImportConfig();
 	}
 
-	public Image getImportConfigImage(final AutoImportTile importConfig) {
+	public Image getImportConfigImage(final TourTypeItem importConfig) {
 
 		final int imageWidth = importConfig.imageWidth;
 
@@ -2425,7 +2417,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	 * @return Returns <code>true</code> when the image is valid, returns <code>false</code> when
 	 *         the profile image must be created,
 	 */
-	private boolean isConfigImageValid(final Image image, final AutoImportTile importConfig) {
+	private boolean isConfigImageValid(final Image image, final TourTypeItem importConfig) {
 
 		if (image == null || image.isDisposed()) {
 
@@ -2531,11 +2523,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		final ImportConfig importConfig = getImportConfig();
 
-		for (final AutoImportTile importTile : importConfig.autoImportTiles) {
+		for (final TourTypeItem importTile : importConfig.tourTypeItems) {
 
 			if (importTile.getId() == tileId) {
 
-				doAutoImport(importTile);
+				RawDataManager.getInstance().doAutoImport(importTile);
 				break;
 			}
 		}
@@ -2558,7 +2550,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			if (_isPartVisible) {
 
-				_rawDataMgr.updateTourDataFromDb(null);
+				_rawDataMgr.updateTourData_InImportView_FromDb(null);
 
 				// update the table viewer
 				reloadViewer();
@@ -2671,7 +2663,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		if (importedFileCounter > 0) {
 
-			_rawDataMgr.updateTourDataFromDb(monitor);
+			_rawDataMgr.updateTourData_InImportView_FromDb(monitor);
 
 			Display.getDefault().asyncExec(new Runnable() {
 				@Override
@@ -2911,6 +2903,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		importConfig.numHorizontalTiles = modifiedConfig.numHorizontalTiles;
 		importConfig.tileSize = modifiedConfig.tileSize;
 
+		importConfig.backupFolder = modifiedConfig.backupFolder;
+		importConfig.deviceFolder = modifiedConfig.deviceFolder;
+
 		RawDataManager.getInstance().saveImportConfig(importConfig);
 	}
 
@@ -2950,7 +2945,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		enableActions();
 
 		// update person in the raw data
-		_rawDataMgr.updateTourDataFromDb(null);
+		_rawDataMgr.updateTourData_InImportView_FromDb(null);
 
 		_tourViewer.refresh();
 	}

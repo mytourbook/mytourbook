@@ -21,12 +21,12 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourType;
 
-public class AutoImportTile implements Cloneable, Comparable<AutoImportTile> {
+public class TourTypeItem implements Cloneable, Comparable<TourTypeItem> {
+
+	public Enum<TourTypeConfig>		tourTypeConfig	= TourTypeConfig.TOUR_TYPE_CONFIG_NOT_USED;
 
 	public String					name			= UI.EMPTY_STRING;
 	public String					description		= UI.EMPTY_STRING;
-
-	public Enum<TourTypeConfig>		tourTypeConfig	= TourTypeConfig.TOUR_TYPE_CONFIG_NOT_USED;
 
 	public TourType					oneTourType;
 	public ArrayList<SpeedVertex>	speedVertices	= new ArrayList<>();
@@ -39,19 +39,19 @@ public class AutoImportTile implements Cloneable, Comparable<AutoImportTile> {
 	private long					_id;
 	private static long				_idCreator;
 
-	AutoImportTile() {
+	TourTypeItem() {
 
 		_id = ++_idCreator;
 	}
 
 	@Override
-	protected AutoImportTile clone() {
+	protected TourTypeItem clone() {
 
-		AutoImportTile clonedObject = null;
+		TourTypeItem clonedObject = null;
 
 		try {
 
-			clonedObject = (AutoImportTile) super.clone();
+			clonedObject = (TourTypeItem) super.clone();
 
 			clonedObject._id = ++_idCreator;
 
@@ -68,7 +68,7 @@ public class AutoImportTile implements Cloneable, Comparable<AutoImportTile> {
 	}
 
 	@Override
-	public int compareTo(final AutoImportTile otherConfig) {
+	public int compareTo(final TourTypeItem otherConfig) {
 
 		return name.compareTo(otherConfig.name);
 	}
@@ -84,7 +84,7 @@ public class AutoImportTile implements Cloneable, Comparable<AutoImportTile> {
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		final AutoImportTile other = (AutoImportTile) obj;
+		final TourTypeItem other = (TourTypeItem) obj;
 		if (_id != other._id) {
 			return false;
 		}
