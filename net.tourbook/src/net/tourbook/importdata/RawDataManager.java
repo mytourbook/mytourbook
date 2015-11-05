@@ -542,7 +542,7 @@ public class RawDataManager {
 
 				if (isReImported) {
 
-					updateTourData_InImportView_FromDb(null);
+					updateTourData_InImportView_FromDb(monitor);
 
 					// reselect tours, run in UI thread
 					Display.getDefault().asyncExec(new Runnable() {
