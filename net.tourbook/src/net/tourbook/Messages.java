@@ -146,6 +146,8 @@ public class Messages extends NLS {
 	public static String		Dialog_ImportConfig_Info_ConfigDragDrop;
 
 	public static String	Dialog_ImportConfig_Info_NoDeviceName;
+
+	public static String	Dialog_ImportConfig_Info_RetrievingVolumeInfo;
 	public static String		Dialog_ImportConfig_Label_BackupFolder;
 
 	public static String	Dialog_ImportConfig_Label_BackupFolder_Tooltip;
@@ -1461,6 +1463,8 @@ public class Messages extends NLS {
 	public static String		Tour_Database_Dialog_ValidateFields_Title;
 	public static String		Tour_Database_load_all_tours;
 	public static String		Tour_Database_PostUpdate_028_SetAvgPulse;
+
+	public static String	Tour_Database_PostUpdate_029_SetImportFileName;
 	public static String		Tour_Database_PostUpdate011_SetTourCreateTime;
 	public static String		Tour_Database_PostUpdate020_ConvertIntToFloat;
 	public static String		Tour_Database_PostUpdate021_SetTourStartEndTime;

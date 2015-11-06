@@ -19,6 +19,7 @@ import java.beans.PropertyVetoException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.file.Path;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -49,6 +50,7 @@ import javax.persistence.Query;
 import net.tourbook.Messages;
 import net.tourbook.application.MyTourbookSplashHandler;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.NIO;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourBike;
@@ -95,8 +97,9 @@ public class TourDatabase {
 	/**
 	 * version for the database which is required that the tourbook application works successfully
 	 */
-	private static final int						TOURBOOK_DB_VERSION							= 28;
+	private static final int						TOURBOOK_DB_VERSION							= 29;
 
+//	private static final int						TOURBOOK_DB_VERSION							= 29;	// 15.12
 //	private static final int						TOURBOOK_DB_VERSION							= 28;	// 15.6
 //	private static final int						TOURBOOK_DB_VERSION							= 27;	// 15.3.1
 //	private static final int						TOURBOOK_DB_VERSION							= 26;	// 14.14 / 15.3
@@ -1178,13 +1181,8 @@ public class TourDatabase {
 
 		final ArrayList<Long> tourIds = new ArrayList<Long>();
 
-		Connection conn = null;
-		Statement stmt = null;
-
-		try {
-
-			conn = getInstance().getConnection();
-			stmt = conn.createStatement();
+		try (Connection conn = getInstance().getConnection(); //
+				Statement stmt = conn.createStatement()) {
 
 			final ResultSet result = stmt.executeQuery("SELECT tourId FROM " + TourDatabase.TABLE_TOUR_DATA); //$NON-NLS-1$
 
@@ -1194,9 +1192,6 @@ public class TourDatabase {
 
 		} catch (final SQLException e) {
 			UI.showSQLException(e);
-		} finally {
-			Util.closeSql(stmt);
-			Util.closeSql(conn);
 		}
 
 		return tourIds;
@@ -1378,7 +1373,7 @@ public class TourDatabase {
 						try (Connection conn = getInstance().getConnection(); //
 								Statement stmt = conn.createStatement()) {
 
-							final String sqlQuery = ""//
+							final String sqlQuery = ""// //$NON-NLS-1$
 									+ "SELECT" //$NON-NLS-1$
 									+ " DISTINCT" //$NON-NLS-1$
 									+ " " + fieldname //$NON-NLS-1$
@@ -2188,19 +2183,19 @@ public class TourDatabase {
 		/*
 		 * CREATE INDEX YearMonth
 		 */
-		sql = "CREATE INDEX YearMonth" + " ON " + TABLE_TOUR_DATA + " (startYear, startMonth)"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		sql = "CREATE INDEX YearMonth ON " + TABLE_TOUR_DATA + " (startYear, startMonth)"; //$NON-NLS-1$ //$NON-NLS-2$
 		exec(stmt, sql);
 
 		/*
 		 * CREATE INDEX TourType
 		 */
-		sql = "CREATE INDEX TourType" + " ON " + TABLE_TOUR_DATA + " (" + KEY_TYPE + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		sql = "CREATE INDEX TourType ON " + TABLE_TOUR_DATA + " (" + KEY_TYPE + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		exec(stmt, sql);
 
 		/*
 		 * CREATE INDEX TourPerson
 		 */
-		sql = "CREATE INDEX TourPerson" + " ON " + TABLE_TOUR_DATA + " (" + KEY_PERSON + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		sql = "CREATE INDEX TourPerson ON " + TABLE_TOUR_DATA + " (" + KEY_PERSON + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		exec(stmt, sql);
 	}
 
@@ -2219,13 +2214,32 @@ public class TourDatabase {
 		/*
 		 * CREATE INDEX TourStartTime
 		 */
-		sql = "CREATE INDEX TourStartTime" + " ON " + TABLE_TOUR_DATA + " (TourStartTime)"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		sql = "CREATE INDEX TourStartTime ON " + TABLE_TOUR_DATA + " (TourStartTime)"; //$NON-NLS-1$ //$NON-NLS-2$
 		exec(stmt, sql);
 
 		/*
 		 * CREATE INDEX TourEndTime
 		 */
-		sql = "CREATE INDEX TourEndTime" + " ON " + TABLE_TOUR_DATA + " (TourEndTime)"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		sql = "CREATE INDEX TourEndTime ON " + TABLE_TOUR_DATA + " (TourEndTime)"; //$NON-NLS-1$ //$NON-NLS-2$
+		exec(stmt, sql);
+	}
+
+	/**
+	 * Create index for {@link TourData}. *
+	 * <p>
+	 * 
+	 * @param stmt
+	 * @throws SQLException
+	 * @since Db version 29
+	 */
+	private void createIndex_TourData_029(final Statement stmt) throws SQLException {
+
+		String sql;
+
+		/*
+		 * CREATE INDEX TourEndTime
+		 */
+		sql = "CREATE INDEX TourImportFileName ON " + TABLE_TOUR_DATA + " (TourImportFileName)"; //$NON-NLS-1$ //$NON-NLS-2$
 		exec(stmt, sql);
 	}
 
@@ -2522,7 +2536,7 @@ public class TourDatabase {
 				//
 				// version 21 end ---------
 
-				// version 22 start  -  12.12.0
+				// version 22 start  -  12.12
 				//
 				+ "	TourStartTime			BIGINT DEFAULT 0,												\n" //$NON-NLS-1$
 				+ "	TourEndTime				BIGINT DEFAULT 0,												\n" //$NON-NLS-1$
@@ -2532,7 +2546,7 @@ public class TourDatabase {
 				//
 				// version 22 end ---------
 
-				// version 23 start  -  13.2.0
+				// version 23 start  -  13.2
 				//
 				+ "	numberOfTimeSlices		INTEGER DEFAULT 0,												\n" //$NON-NLS-1$
 				+ "	numberOfPhotos			INTEGER DEFAULT 0,												\n" //$NON-NLS-1$
@@ -2540,12 +2554,18 @@ public class TourDatabase {
 				//
 				// version 23 end ---------
 
-				// version 27 start  -  15.5.0
+				// version 27 start  -  15.5
 				//
 				+ "	frontShiftCount			INTEGER DEFAULT 0,												\n" //$NON-NLS-1$
 				+ "	rearShiftCount			INTEGER DEFAULT 0,												\n" //$NON-NLS-1$
 				//
 				// version 27 end ---------
+
+				// version 29 start  -  15.10
+				//
+				+ "	TourImportFileName		VARCHAR(" + TourData.DB_LENGTH_TOUR_IMPORT_FILE_NAME + "),		\n" //$NON-NLS-1$ //$NON-NLS-2$
+				//
+				// version 29 end ---------
 
 				+ "	serieData				BLOB 															\n" //$NON-NLS-1$
 
@@ -2553,6 +2573,7 @@ public class TourDatabase {
 
 		createIndex_TourData_005(stmt);
 		createIndex_TourData_022(stmt);
+		createIndex_TourData_029(stmt);
 	}
 
 	/**
@@ -3211,12 +3232,14 @@ public class TourDatabase {
 		return false;
 	}
 
-	private void logDbUpdateEnd(final int dbVersion) {
+	private void logDb_UpdateEnd(final int dbVersion) {
+
 		System.out.println(NLS.bind(Messages.Tour_Database_UpdateDone, dbVersion));
 		System.out.println();
 	}
 
-	private void logDbUpdateStart(final int dbVersion) {
+	private void logDb_UpdateStart(final int dbVersion) {
+
 		System.out.println();
 		System.out.println(NLS.bind(Messages.Tour_Database_Update, dbVersion));
 	}
@@ -4009,6 +4032,15 @@ public class TourDatabase {
 			}
 
 			/*
+			 * 28 -> 29
+			 */
+			boolean isPostUpdate29 = false;
+			if (currentDbVersion == 28) {
+				isPostUpdate29 = true;
+				currentDbVersion = newVersion = updateDbDesign_028_to_029(conn, monitor);
+			}
+
+			/*
 			 * update version number
 			 */
 			updateDbDesign_VersionNumber(conn, newVersion);
@@ -4045,9 +4077,11 @@ public class TourDatabase {
 			if (isPostUpdate25) {
 				updateDbDesign_024_to_025_PostUpdate(conn, monitor);
 			}
-
 			if (isPostUpdate28) {
 				updateDbDesign_027_to_028_PostUpdate(conn, monitor);
+			}
+			if (isPostUpdate29) {
+				updateDbDesign_028_to_029_PostUpdate(conn, monitor);
 			}
 
 		} catch (final SQLException e) {
@@ -4069,7 +4103,7 @@ public class TourDatabase {
 
 		final int dbVersion = 2;
 
-		logDbUpdateStart(dbVersion);
+		logDb_UpdateStart(dbVersion);
 
 		String sql;
 		final Statement stmt = conn.createStatement();
@@ -4085,14 +4119,14 @@ public class TourDatabase {
 		}
 		stmt.close();
 
-		logDbUpdateEnd(dbVersion);
+		logDb_UpdateEnd(dbVersion);
 	}
 
 	private void updateDbDesign_002_003(final Connection conn) throws SQLException {
 
 		final int dbVersion = 3;
 
-		logDbUpdateStart(dbVersion);
+		logDb_UpdateStart(dbVersion);
 
 		String sql;
 		final Statement stmt = conn.createStatement();
@@ -4105,14 +4139,14 @@ public class TourDatabase {
 		}
 		stmt.close();
 
-		logDbUpdateEnd(dbVersion);
+		logDb_UpdateEnd(dbVersion);
 	}
 
 	private void updateDbDesign_003_004(final Connection conn, final IProgressMonitor monitor) throws SQLException {
 
 		final int dbVersion = 4;
 
-		logDbUpdateStart(dbVersion);
+		logDb_UpdateStart(dbVersion);
 
 		String sql;
 		final Statement stmt = conn.createStatement();
@@ -4204,14 +4238,14 @@ public class TourDatabase {
 		_emFactory.close();
 		_emFactory = null;
 
-		logDbUpdateEnd(dbVersion);
+		logDb_UpdateEnd(dbVersion);
 	}
 
 	private void updateDbDesign_004_005(final Connection conn, final IProgressMonitor monitor) throws SQLException {
 
 		final int dbVersion = 5;
 
-		logDbUpdateStart(dbVersion);
+		logDb_UpdateStart(dbVersion);
 
 		if (monitor != null) {
 			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, 5));
@@ -4225,14 +4259,14 @@ public class TourDatabase {
 		}
 		stmt.close();
 
-		logDbUpdateEnd(dbVersion);
+		logDb_UpdateEnd(dbVersion);
 	}
 
 	private void updateDbDesign_005_006(final Connection conn, final IProgressMonitor monitor) throws SQLException {
 
 		final int dbVersion = 6;
 
-		logDbUpdateStart(dbVersion);
+		logDb_UpdateStart(dbVersion);
 
 		if (monitor != null) {
 			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, 6));
@@ -4246,14 +4280,14 @@ public class TourDatabase {
 		}
 		stmt.close();
 
-		logDbUpdateEnd(dbVersion);
+		logDb_UpdateEnd(dbVersion);
 	}
 
 	private void updateDbDesign_006_007(final Connection conn, final IProgressMonitor monitor) throws SQLException {
 
 		final int dbVersion = 7;
 
-		logDbUpdateStart(dbVersion);
+		logDb_UpdateStart(dbVersion);
 
 		if (monitor != null) {
 			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, 7));
@@ -4279,14 +4313,14 @@ public class TourDatabase {
 		}
 		stmt.close();
 
-		logDbUpdateEnd(dbVersion);
+		logDb_UpdateEnd(dbVersion);
 	}
 
 	private void updateDbDesign_007_008(final Connection conn, final IProgressMonitor monitor) throws SQLException {
 
 		final int dbVersion = 8;
 
-		logDbUpdateStart(dbVersion);
+		logDb_UpdateStart(dbVersion);
 
 		if (monitor != null) {
 			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, 8));
@@ -4312,18 +4346,16 @@ public class TourDatabase {
 		}
 		stmt.close();
 
-		logDbUpdateEnd(dbVersion);
+		logDb_UpdateEnd(dbVersion);
 	}
 
 	private void updateDbDesign_008_009(final Connection conn, final IProgressMonitor monitor) throws SQLException {
 
 		final int dbVersion = 9;
 
-		logDbUpdateStart(dbVersion);
+		logDb_UpdateStart(dbVersion);
 
-		if (monitor != null) {
-			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, dbVersion));
-		}
+		updateMonitor(monitor, dbVersion);
 
 		String sql;
 		final Statement stmt = conn.createStatement();
@@ -4333,7 +4365,7 @@ public class TourDatabase {
 		}
 		stmt.close();
 
-		logDbUpdateEnd(dbVersion);
+		logDb_UpdateEnd(dbVersion);
 	}
 
 	private void updateDbDesign_008_009_PostUpdate(final Connection conn, final IProgressMonitor monitor)
@@ -4355,11 +4387,9 @@ public class TourDatabase {
 
 		final int dbVersion = 10;
 
-		logDbUpdateStart(dbVersion);
+		logDb_UpdateStart(dbVersion);
 
-		if (monitor != null) {
-			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, dbVersion));
-		}
+		updateMonitor(monitor, dbVersion);
 
 		final Statement stmt = conn.createStatement();
 		{
@@ -4403,18 +4433,16 @@ public class TourDatabase {
 
 		stmt.close();
 
-		logDbUpdateEnd(dbVersion);
+		logDb_UpdateEnd(dbVersion);
 	}
 
 	private int updateDbDesign_010_011(final Connection conn, final IProgressMonitor monitor) throws SQLException {
 
 		final int dbVersion = 11;
 
-		logDbUpdateStart(dbVersion);
+		logDb_UpdateStart(dbVersion);
 
-		if (monitor != null) {
-			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, dbVersion));
-		}
+		updateMonitor(monitor, dbVersion);
 
 		String sql;
 		final Statement stmt = conn.createStatement();
@@ -4427,7 +4455,7 @@ public class TourDatabase {
 		}
 		stmt.close();
 
-		logDbUpdateEnd(dbVersion);
+		logDb_UpdateEnd(dbVersion);
 
 		return dbVersion;
 	}
@@ -4512,11 +4540,9 @@ public class TourDatabase {
 
 		final int newDbVersion = 12;
 
-		logDbUpdateStart(newDbVersion);
+		logDb_UpdateStart(newDbVersion);
 
-		if (monitor != null) {
-			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, newDbVersion));
-		}
+		updateMonitor(monitor, newDbVersion);
 
 		String sql;
 		final Statement stmt = conn.createStatement();
@@ -4540,7 +4566,7 @@ public class TourDatabase {
 		}
 		stmt.close();
 
-		logDbUpdateEnd(newDbVersion);
+		logDb_UpdateEnd(newDbVersion);
 
 		return newDbVersion;
 	}
@@ -4549,11 +4575,9 @@ public class TourDatabase {
 
 		final int newDbVersion = 13;
 
-		logDbUpdateStart(newDbVersion);
+		logDb_UpdateStart(newDbVersion);
 
-		if (monitor != null) {
-			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, newDbVersion));
-		}
+		updateMonitor(monitor, newDbVersion);
 
 //			+ "	TemperatureScale			INTEGER DEFAULT 1, 				\n" //$NON-NLS-1$
 //			+ " Weather 					" + varCharNoKomma(TourData.DB_LENGTH_WEATHER) //$NON-NLS-1$
@@ -4569,7 +4593,7 @@ public class TourDatabase {
 		}
 		stmt.close();
 
-		logDbUpdateEnd(newDbVersion);
+		logDb_UpdateEnd(newDbVersion);
 
 		return newDbVersion;
 	}
@@ -4596,11 +4620,9 @@ public class TourDatabase {
 
 		final int newDbVersion = 14;
 
-		logDbUpdateStart(newDbVersion);
+		logDb_UpdateStart(newDbVersion);
 
-		if (monitor != null) {
-			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, newDbVersion));
-		}
+		updateMonitor(monitor, newDbVersion);
 
 //		+ "	ConconiDeflection			INTEGER DEFAULT 0, 				\n" //$NON-NLS-1$
 
@@ -4612,7 +4634,7 @@ public class TourDatabase {
 		}
 		stmt.close();
 
-		logDbUpdateEnd(newDbVersion);
+		logDb_UpdateEnd(newDbVersion);
 
 		return newDbVersion;
 	}
@@ -4621,11 +4643,9 @@ public class TourDatabase {
 
 		final int newDbVersion = 15;
 
-		logDbUpdateStart(newDbVersion);
+		logDb_UpdateStart(newDbVersion);
 
-		if (monitor != null) {
-			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, newDbVersion));
-		}
+		updateMonitor(monitor, newDbVersion);
 
 //		TOURPERSON TOURPERSON TOURPERSON TOURPERSON TOURPERSON TOURPERSON
 //
@@ -4639,7 +4659,7 @@ public class TourDatabase {
 		}
 		stmt.close();
 
-		logDbUpdateEnd(newDbVersion);
+		logDb_UpdateEnd(newDbVersion);
 
 		return newDbVersion;
 	}
@@ -4648,11 +4668,9 @@ public class TourDatabase {
 
 		final int newDbVersion = 16;
 
-		logDbUpdateStart(newDbVersion);
+		logDb_UpdateStart(newDbVersion);
 
-		if (monitor != null) {
-			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, newDbVersion));
-		}
+		updateMonitor(monitor, newDbVersion);
 
 		String sql;
 		final Statement stmt = conn.createStatement();
@@ -4683,7 +4701,7 @@ public class TourDatabase {
 		}
 		stmt.close();
 
-		logDbUpdateEnd(newDbVersion);
+		logDb_UpdateEnd(newDbVersion);
 
 		return newDbVersion;
 	}
@@ -4692,7 +4710,7 @@ public class TourDatabase {
 
 		final int newDbVersion = 17;
 
-		logDbUpdateStart(newDbVersion);
+		logDb_UpdateStart(newDbVersion);
 
 		String sql;
 		final Statement stmt = conn.createStatement();
@@ -4775,7 +4793,7 @@ public class TourDatabase {
 		}
 		stmt.close();
 
-		logDbUpdateEnd(newDbVersion);
+		logDb_UpdateEnd(newDbVersion);
 
 		return newDbVersion;
 	}
@@ -4784,11 +4802,9 @@ public class TourDatabase {
 
 		final int newDbVersion = 18;
 
-		logDbUpdateStart(newDbVersion);
+		logDb_UpdateStart(newDbVersion);
 
-		if (monitor != null) {
-			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, newDbVersion));
-		}
+		updateMonitor(monitor, newDbVersion);
 
 		String sql;
 		final Statement stmt = conn.createStatement();
@@ -4839,7 +4855,7 @@ public class TourDatabase {
 		}
 		stmt.close();
 
-		logDbUpdateEnd(newDbVersion);
+		logDb_UpdateEnd(newDbVersion);
 
 		return newDbVersion;
 	}
@@ -4848,11 +4864,9 @@ public class TourDatabase {
 
 		final int newDbVersion = 19;
 
-		logDbUpdateStart(newDbVersion);
+		logDb_UpdateStart(newDbVersion);
 
-		if (monitor != null) {
-			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, newDbVersion));
-		}
+		updateMonitor(monitor, newDbVersion);
 
 		String sql;
 		final Statement stmt = conn.createStatement();
@@ -4881,7 +4895,7 @@ public class TourDatabase {
 		}
 		stmt.close();
 
-		logDbUpdateEnd(newDbVersion);
+		logDb_UpdateEnd(newDbVersion);
 
 		return newDbVersion;
 	}
@@ -4890,18 +4904,16 @@ public class TourDatabase {
 
 		final int newDbVersion = 20;
 
-		logDbUpdateStart(newDbVersion);
+		logDb_UpdateStart(newDbVersion);
 
-		if (monitor != null) {
-			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, newDbVersion));
-		}
+		updateMonitor(monitor, newDbVersion);
 
 		{
 			updateDbDesign_019_to_020_10DataSerieBlobSize(conn);
 			updateDbDesign_019_to_020_20AlterColumns(conn);
 		}
 
-		logDbUpdateEnd(newDbVersion);
+		logDb_UpdateEnd(newDbVersion);
 
 		return newDbVersion;
 	}
@@ -5018,11 +5030,9 @@ public class TourDatabase {
 
 		final int newDbVersion = 21;
 
-		logDbUpdateStart(newDbVersion);
+		logDb_UpdateStart(newDbVersion);
 
-		if (monitor != null) {
-			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, newDbVersion));
-		}
+		updateMonitor(monitor, newDbVersion);
 
 		final Statement stmt = conn.createStatement();
 		{
@@ -5049,7 +5059,7 @@ public class TourDatabase {
 		}
 		stmt.close();
 
-		logDbUpdateEnd(newDbVersion);
+		logDb_UpdateEnd(newDbVersion);
 
 		return newDbVersion;
 	}
@@ -5058,11 +5068,9 @@ public class TourDatabase {
 
 		final int newDbVersion = 22;
 
-		logDbUpdateStart(newDbVersion);
+		logDb_UpdateStart(newDbVersion);
 
-		if (monitor != null) {
-			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, newDbVersion));
-		}
+		updateMonitor(monitor, newDbVersion);
 
 		final Statement stmt = conn.createStatement();
 		{
@@ -5121,7 +5129,7 @@ public class TourDatabase {
 		}
 		stmt.close();
 
-		logDbUpdateEnd(newDbVersion);
+		logDb_UpdateEnd(newDbVersion);
 
 		return newDbVersion;
 	}
@@ -5207,11 +5215,9 @@ public class TourDatabase {
 
 		final int newDbVersion = 23;
 
-		logDbUpdateStart(newDbVersion);
+		logDb_UpdateStart(newDbVersion);
 
-		if (monitor != null) {
-			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, newDbVersion));
-		}
+		updateMonitor(monitor, newDbVersion);
 
 		final Statement stmt = conn.createStatement();
 		{
@@ -5291,7 +5297,7 @@ public class TourDatabase {
 
 		stmt.close();
 
-		logDbUpdateEnd(newDbVersion);
+		logDb_UpdateEnd(newDbVersion);
 
 		return newDbVersion;
 	}
@@ -5344,11 +5350,9 @@ public class TourDatabase {
 
 		final int newDbVersion = 24;
 
-		logDbUpdateStart(newDbVersion);
+		logDb_UpdateStart(newDbVersion);
 
-		if (monitor != null) {
-			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, newDbVersion));
-		}
+		updateMonitor(monitor, newDbVersion);
 
 		final Statement stmt = conn.createStatement();
 		{
@@ -5411,7 +5415,7 @@ public class TourDatabase {
 		}
 		stmt.close();
 
-		logDbUpdateEnd(newDbVersion);
+		logDb_UpdateEnd(newDbVersion);
 
 		return newDbVersion;
 	}
@@ -5420,11 +5424,9 @@ public class TourDatabase {
 
 		final int newDbVersion = 25;
 
-		logDbUpdateStart(newDbVersion);
+		logDb_UpdateStart(newDbVersion);
 
-		if (monitor != null) {
-			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, newDbVersion));
-		}
+		updateMonitor(monitor, newDbVersion);
 
 		final Statement stmt = conn.createStatement();
 		{
@@ -5443,7 +5445,7 @@ public class TourDatabase {
 		}
 		stmt.close();
 
-		logDbUpdateEnd(newDbVersion);
+		logDb_UpdateEnd(newDbVersion);
 
 		return newDbVersion;
 	}
@@ -5567,11 +5569,9 @@ public class TourDatabase {
 		 * This version is never used but is not deleted to keep this info.
 		 */
 
-		logDbUpdateStart(newDbVersion);
+		logDb_UpdateStart(newDbVersion);
 
-		if (monitor != null) {
-			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, newDbVersion));
-		}
+		updateMonitor(monitor, newDbVersion);
 
 		final Statement stmt = conn.createStatement();
 		{
@@ -5591,7 +5591,7 @@ public class TourDatabase {
 		}
 		stmt.close();
 
-		logDbUpdateEnd(newDbVersion);
+		logDb_UpdateEnd(newDbVersion);
 
 		return newDbVersion;
 	}
@@ -5600,11 +5600,8 @@ public class TourDatabase {
 
 		final int newDbVersion = 27;
 
-		logDbUpdateStart(newDbVersion);
-
-		if (monitor != null) {
-			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, newDbVersion));
-		}
+		logDb_UpdateStart(newDbVersion);
+		updateMonitor(monitor, newDbVersion);
 
 		final Statement stmt = conn.createStatement();
 		{
@@ -5621,7 +5618,7 @@ public class TourDatabase {
 		}
 		stmt.close();
 
-		logDbUpdateEnd(newDbVersion);
+		logDb_UpdateEnd(newDbVersion);
 
 		return newDbVersion;
 	}
@@ -5630,11 +5627,8 @@ public class TourDatabase {
 
 		final int newDbVersion = 28;
 
-		logDbUpdateStart(newDbVersion);
-
-		if (monitor != null) {
-			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, newDbVersion));
-		}
+		logDb_UpdateStart(newDbVersion);
+		updateMonitor(monitor, newDbVersion);
 
 		final Statement stmt = conn.createStatement();
 		{
@@ -5669,7 +5663,7 @@ public class TourDatabase {
 		}
 		stmt.close();
 
-		logDbUpdateEnd(newDbVersion);
+		logDb_UpdateEnd(newDbVersion);
 
 		return newDbVersion;
 	}
@@ -5758,6 +5752,104 @@ public class TourDatabase {
 		}
 	}
 
+	private int updateDbDesign_028_to_029(final Connection conn, final IProgressMonitor monitor) throws SQLException {
+
+		final int newDbVersion = 29;
+
+		logDb_UpdateStart(newDbVersion);
+		updateMonitor(monitor, newDbVersion);
+
+		try (final Statement stmt = conn.createStatement()) {
+
+			// check if db is updated to version 29
+			if (isColumnAvailable(conn, TABLE_TOUR_DATA, "TourImportFileName") == false) { //$NON-NLS-1$
+
+				// TABLE_TOUR_DATA: add column TourImportFileName
+				SQL.AddCol_VarCar(stmt, //
+						TABLE_TOUR_DATA,
+						"TourImportFileName", //$NON-NLS-1$
+						TourData.DB_LENGTH_TOUR_IMPORT_FILE_NAME);
+
+				createIndex_TourData_029(stmt);
+			}
+		}
+
+		logDb_UpdateEnd(newDbVersion);
+
+		return newDbVersion;
+	}
+
+	/**
+	 * Set tour start/end time from the tour date and duration
+	 * 
+	 * @param conn
+	 * @param monitor
+	 * @throws SQLException
+	 */
+	private void updateDbDesign_028_to_029_PostUpdate(final Connection conn, final IProgressMonitor monitor)
+			throws SQLException {
+
+		final int numTours = getAllTourIds().size();
+
+		final PreparedStatement stmtSelect = conn.prepareStatement(""// //$NON-NLS-1$
+				//
+				+ "SELECT" //									//$NON-NLS-1$
+							//
+				+ " TourID," // 					// 1 //$NON-NLS-1$
+				+ " TourImportFilePath" //	 		// 2 //$NON-NLS-1$
+				//
+				+ " FROM " + TABLE_TOUR_DATA //		//$NON-NLS-1$
+		);
+
+		final PreparedStatement stmtUpdate = conn.prepareStatement(""// //$NON-NLS-1$
+				//
+				+ "UPDATE " + TABLE_TOUR_DATA //				//$NON-NLS-1$
+				//
+				+ " SET" //							//$NON-NLS-1$
+				//
+				+ " TourImportFileName=?," //		// 1 //$NON-NLS-1$
+				+ " TourImportFilePath=?" //		// 1 //$NON-NLS-1$
+				//
+				+ " WHERE TourID=?"); //			// 2 //$NON-NLS-1$
+
+		int tourIndex = 0;
+
+		final ResultSet result = stmtSelect.executeQuery();
+
+		while (result.next()) {
+
+			if (monitor != null) {
+				monitor.subTask(NLS.bind(//
+						Messages.Tour_Database_PostUpdate_029_SetImportFileName,
+						new Object[] { ++tourIndex, numTours }));
+			}
+
+			// get data from database
+			final long dbTourId = result.getLong(1);
+			final String dbFilePath = result.getString(2);
+
+			// get NIO path
+			final Path filePath = NIO.getPath(dbFilePath);
+			if (filePath != null) {
+
+				// extract file name
+				final Path fileName = filePath.getFileName();
+				if (fileName != null) {
+
+					// extract folder
+					final Path folderPath = filePath.getParent();
+
+					// set file name
+					stmtUpdate.setString(1, fileName.toString());
+					stmtUpdate.setString(2, folderPath.toString());
+					stmtUpdate.setLong(3, dbTourId);
+
+					stmtUpdate.executeUpdate();
+				}
+			}
+		}
+	}
+
 	private void updateDbDesign_VersionNumber(final Connection conn, final int newVersion) throws SQLException {
 
 		final String sql = "UPDATE " + TABLE_DB_VERSION + " SET VERSION=" + newVersion; //$NON-NLS-1$ //$NON-NLS-2$
@@ -5765,6 +5857,13 @@ public class TourDatabase {
 		conn.createStatement().executeUpdate(sql);
 
 		_dbVersionAfterUpdate = newVersion;
+	}
+
+	private void updateMonitor(final IProgressMonitor monitor, final int newDbVersion) {
+
+		if (monitor != null) {
+			monitor.subTask(NLS.bind(Messages.Tour_Database_Update, newDbVersion));
+		}
 	}
 
 }

@@ -1040,30 +1040,9 @@ public class RawDataManager {
 
 	public void doAutoImport(final TourTypeItem tourTypeItem) {
 
-		final ImportConfig importConfig = getAutoImportConfig();
+		final String validDeviceFolder = doAutoImport_10_GetValidDeviceFolder();
 
-		final String deviceFolderRaw = importConfig.deviceFolder;
-		final String deviceFolder = NIO.convertToOSPath(deviceFolderRaw);
-
-		boolean isFolderValid = false;
-
-		try {
-
-			final Path devicePath = Paths.get(deviceFolder);
-
-			if (Files.exists(devicePath)) {
-				isFolderValid = true;
-			}
-
-		} catch (final Exception e) {}
-
-		if (isFolderValid == false) {
-
-			MessageDialog.openInformation(
-					Display.getCurrent().getActiveShell(),
-					Messages.Import_Data_Dialog_AutoImport_Title,
-					NLS.bind(Messages.Import_Data_Error_DeviceFolderDoNotExist, deviceFolder));
-
+		if (validDeviceFolder == null) {
 			return;
 		}
 
@@ -1086,7 +1065,7 @@ public class RawDataManager {
 
 				final List<Path> devicePaths = new ArrayList<>();
 
-				try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(Paths.get(deviceFolder))) {
+				try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(Paths.get(validDeviceFolder))) {
 					for (final Path path : directoryStream) {
 						devicePaths.add(path);
 					}
@@ -1136,6 +1115,55 @@ public class RawDataManager {
 		} catch (final Exception e) {
 			StatusUtil.log(e);
 		}
+	}
+
+	/**
+	 * @return Returns the device OS path or <code>null</code> when this folder is not valid.
+	 */
+	private String doAutoImport_10_GetValidDeviceFolder() {
+
+		final ImportConfig importConfig = getAutoImportConfig();
+
+		final String deviceFolderRaw = importConfig.deviceFolder;
+		final String[] deviceFolder = { null };
+
+		if (NIO.isDeviceNameFolder(deviceFolderRaw)) {
+
+			BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
+				@Override
+				public void run() {
+
+					deviceFolder[0] = NIO.convertToOSPath(deviceFolderRaw);
+				}
+			});
+		} else {
+
+			deviceFolder[0] = deviceFolderRaw;
+		}
+
+		boolean isFolderValid = false;
+
+		try {
+
+			final Path devicePath = Paths.get(deviceFolder[0]);
+
+			if (Files.exists(devicePath)) {
+				isFolderValid = true;
+			}
+
+		} catch (final Exception e) {}
+
+		if (isFolderValid == false) {
+
+			MessageDialog.openInformation(
+					Display.getCurrent().getActiveShell(),
+					Messages.Import_Data_Dialog_AutoImport_Title,
+					NLS.bind(Messages.Import_Data_Error_DeviceFolderDoNotExist, deviceFolderRaw));
+
+			return null;
+		}
+
+		return deviceFolder[0];
 	}
 
 	private void doAutoImport_20_Backup(final ImportConfig importConfig) {

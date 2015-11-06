@@ -23,6 +23,8 @@ import java.awt.Point;
 import java.io.File;
 import java.io.PrintStream;
 import java.io.StringWriter;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -119,6 +121,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	public static final int										DB_LENGTH_TOUR_START_PLACE			= 255;
 	public static final int										DB_LENGTH_TOUR_END_PLACE			= 255;
 	public static final int										DB_LENGTH_TOUR_IMPORT_FILE_PATH		= 255;
+	public static final int										DB_LENGTH_TOUR_IMPORT_FILE_NAME		= 255;
 
 	public static final int										DB_LENGTH_WEATHER					= 1000;
 	public static final int										DB_LENGTH_WEATHER_CLOUDS			= 255;
@@ -457,10 +460,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	private long												dateTimeModified;																			// db-version 11
 
-	/**
-	 * file path for the imported tour
-	 */
+	/** Folder path from the import file. */
 	private String												tourImportFilePath;																		// db-version 6
+
+	/** File name from the import file. */
+	private String												tourImportFileName;																		// db-version 6
 
 	/**
 	 * Tolerance for the Douglas Peucker algorithm.
@@ -3555,7 +3559,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	 * @return
 	 */
 	public ArrayList<TourSegment> createSegmenterSegments(final BreakTimeTool btConfig) {
- 
+
 		if ((segmentSerieIndex == null) || (segmentSerieIndex.length < 2)) {
 
 			// at least two points are required to build a segment
@@ -5650,7 +5654,12 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		return tourId;
 	}
 
+	public String getTourImportFileName() {
+		return tourImportFileName;
+	}
+
 	public String getTourImportFilePath() {
+
 		if ((tourImportFilePath == null) || (tourImportFilePath.length() == 0)) {
 			if (isManualTour()) {
 				return UI.EMPTY_STRING;
@@ -6061,6 +6070,21 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 			return false;
 		} else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
 			tourImportFilePath = tourImportFilePath.substring(0, DB_LENGTH_TOUR_IMPORT_FILE_PATH);
+		}
+
+		/*
+		 * check: tour import file name
+		 */
+		fieldValidation = TourDatabase.isFieldValidForSave(
+				tourImportFileName,
+				DB_LENGTH_TOUR_IMPORT_FILE_NAME,
+				Messages.Db_Field_TourData_TourImportFilePath,
+				true);
+
+		if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
+			return false;
+		} else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
+			tourImportFileName = tourImportFileName.substring(0, DB_LENGTH_TOUR_IMPORT_FILE_NAME);
 		}
 
 		/*
@@ -6604,7 +6628,15 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	 * @param tourImportFilePath
 	 */
 	public void setTourImportFilePath(final String tourImportFilePath) {
-		this.tourImportFilePath = tourImportFilePath;
+
+		final Path filePath = Paths.get(tourImportFilePath);
+
+		final Path fileName = filePath.getFileName();
+		final Path folderPath = filePath.getParent();
+
+		// extract file name
+		this.tourImportFileName = fileName.toString();
+		this.tourImportFilePath = folderPath.toString();
 	}
 
 	public void setTourMarkers(final Set<TourMarker> tourMarkers) {

@@ -17,8 +17,12 @@ package net.tourbook.common;
 
 import java.nio.file.FileStore;
 import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import net.tourbook.common.util.StatusUtil;
 
 public class NIO {
 
@@ -78,6 +82,27 @@ public class NIO {
 		}
 
 		return osPath;
+	}
+
+	/**
+	 * @param fileName
+	 * @return Returns a path or <code>null</code> when an exception occures.
+	 */
+	public static Path getPath(final String fileName) {
+
+		if (fileName == null) {
+			return null;
+		}
+
+		try {
+
+			return Paths.get(fileName);
+
+		} catch (final Exception e) {
+			StatusUtil.log(e);
+		}
+
+		return null;
 	}
 
 	public static boolean isDeviceNameFolder(final String folderName) {

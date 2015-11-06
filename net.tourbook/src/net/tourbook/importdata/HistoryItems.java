@@ -31,6 +31,10 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.fieldassist.ControlDecoration;
+import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Label;
 
@@ -39,20 +43,25 @@ import org.eclipse.swt.widgets.Label;
  */
 class HistoryItems {
 
-	private static final String		NO_DEVICE_NAME				= "[?]";													//$NON-NLS-1$
+	private static final String		NO_DEVICE_NAME			= "[?]";													//$NON-NLS-1$
 
-	private static final int		COMBO_HISTORY_LENGTH		= 20;
-	private static final String		COMBO_SEPARATOR				= "- - - - - - - - - - - - - - - - - - - - - - - - - - -";	//$NON-NLS-1$
+	private static final int		COMBO_HISTORY_LENGTH	= 20;
+	private static final String		COMBO_SEPARATOR			= "- - - - - - - - - - - - - - - - - - - - - - - - - - -";	//$NON-NLS-1$
 
-	private LinkedHashSet<String>	_folderItems				= new LinkedHashSet<>();
+	private LinkedHashSet<String>	_folderItems			= new LinkedHashSet<>();
 
 	/** Contains paths with the device name and not the drive letter (only for Windows). */
-	private LinkedHashSet<String>	_deviceNameItems			= new LinkedHashSet<>();
+	private LinkedHashSet<String>	_deviceNameItems		= new LinkedHashSet<>();
+
+	private boolean					_isFolderValid;
+
+	/*
+	 * UI controls
+	 */
+	private Combo					_combo;
+	private ControlDecoration		_comboError;
 
 	private Label					_labelFolderInfo;
-	private Combo					_combo;
-
-
 
 	private String cleanupFolderDeviceName(final String deviceNameFolder) {
 
@@ -121,6 +130,7 @@ class HistoryItems {
 					: newDeviceNameFolder == null ? UI.EMPTY_STRING : newDeviceNameFolder;
 		}
 
+//		_labelFolderInfo.setText(_isFolderValid ? folderInfo : Messages.Dialog_ImportConfig_Error_FolderIsInvalid);
 		_labelFolderInfo.setText(folderInfo);
 		_combo.setText(folderText);
 
@@ -338,6 +348,17 @@ class HistoryItems {
 
 		_combo = comboFolder;
 		_labelFolderInfo = lblFolderPath;
+
+		final Image image = FieldDecorationRegistry
+				.getDefault()
+				.getFieldDecoration(FieldDecorationRegistry.DEC_ERROR)
+				.getImage();
+
+		_comboError = new ControlDecoration(_combo, SWT.LEFT | SWT.TOP);
+
+		_comboError.setImage(image);
+		_comboError.setDescriptionText(Messages.Dialog_ImportConfig_Error_FolderIsInvalid);
+
 	}
 
 	private void updateHistory(final LinkedHashSet<String> historyItems, final String newItem) {
@@ -386,7 +407,8 @@ class HistoryItems {
 
 		final String modifiedFolder = _combo.getText().trim();
 
-		if (modifiedFolder.length() == 0) {
+		if (modifiedFolder.length() == 0
+				|| modifiedFolder.equals(Messages.Dialog_ImportConfig_Info_RetrievingVolumeInfo)) {
 
 			isFolderValid = true;
 			_labelFolderInfo.setText(UI.EMPTY_STRING);
@@ -433,12 +455,14 @@ class HistoryItems {
 
 		if (isFolderValid) {
 
-			dialogImportConfig.setErrorMessage(null);
+			_comboError.hide();
 
 		} else {
 
+			_comboError.show();
 			_labelFolderInfo.setText(UI.EMPTY_STRING);
-			dialogImportConfig.setErrorMessage(Messages.Dialog_ImportConfig_Error_FolderIsInvalid);
 		}
+
+		_isFolderValid = isFolderValid;
 	}
 }
