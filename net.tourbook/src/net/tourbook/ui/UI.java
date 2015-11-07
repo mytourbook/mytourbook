@@ -1392,7 +1392,7 @@ public class UI {
 
 	private void drawTourTypeImage(final long typeId, final GC gcImage) {
 
-		if (typeId == -2) {
+		if (typeId == TourType.IMAGE_KEY_DIALOG_SELECTION) {
 
 			// create a default image
 
@@ -1444,13 +1444,15 @@ public class UI {
 			}
 		}
 
-		if (tourTypeId == -2 || colorTourType == null || colorTourType.getTypeId() == TourDatabase.ENTITY_IS_NOT_SAVED) {
+		if (tourTypeId == TourType.IMAGE_KEY_DIALOG_SELECTION
+				|| colorTourType == null
+				|| colorTourType.getTypeId() == TourDatabase.ENTITY_IS_NOT_SAVED) {
 
 			// tour type was not found use default color
 
-			drawingColors.colorBright = display.getSystemColor(SWT.COLOR_WHITE);
-			drawingColors.colorDark = drawingColors.colorBright;
-			drawingColors.colorLine = display.getSystemColor(SWT.COLOR_DARK_GRAY);
+			drawingColors.colorBright = display.getSystemColor(SWT.COLOR_YELLOW);
+			drawingColors.colorDark = display.getSystemColor(SWT.COLOR_DARK_YELLOW);
+			drawingColors.colorLine = display.getSystemColor(SWT.COLOR_BLACK);
 
 			// prevent disposing the colors
 			drawingColors.mustBeDisposed = false;

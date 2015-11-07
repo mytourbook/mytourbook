@@ -29,52 +29,54 @@ import org.eclipse.swt.graphics.RGB;
 @Entity
 public class TourType implements Comparable<Object> {
 
-	public static final int	DB_LENGTH_NAME			= 100;
+	public static final int		DB_LENGTH_NAME				= 100;
 
 	/** Width/height of the tour type image. */
-	public static final int	TOUR_TYPE_IMAGE_SIZE	= 16;
+	public static final int		TOUR_TYPE_IMAGE_SIZE		= 16;
 
 	/** Color which is transparent in the tour type image. */
-	public static final RGB	TRANSPARENT_COLOR		= new RGB(0x01, 0xfe, 0x00);
+	public static final RGB		TRANSPARENT_COLOR			= new RGB(0x01, 0xfe, 0x00);
+
+	public static final long	IMAGE_KEY_DIALOG_SELECTION	= -2;
 
 	/**
 	 * contains the entity id
 	 */
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long			typeId					= TourDatabase.ENTITY_IS_NOT_SAVED;
+	private long				typeId						= TourDatabase.ENTITY_IS_NOT_SAVED;
 
 	@Basic(optional = false)
-	private String			name;
+	private String				name;
 
-	private short			colorBrightRed;
-	private short			colorBrightGreen;
-	private short			colorBrightBlue;
+	private short				colorBrightRed;
+	private short				colorBrightGreen;
+	private short				colorBrightBlue;
 
-	private short			colorDarkRed;
-	private short			colorDarkGreen;
-	private short			colorDarkBlue;
+	private short				colorDarkRed;
+	private short				colorDarkGreen;
+	private short				colorDarkBlue;
 
-	private short			colorLineRed;
-	private short			colorLineGreen;
-	private short			colorLineBlue;
+	private short				colorLineRed;
+	private short				colorLineGreen;
+	private short				colorLineBlue;
 
-	private short			colorTextRed;
-	private short			colorTextGreen;
-	private short			colorTextBlue;
+	private short				colorTextRed;
+	private short				colorTextGreen;
+	private short				colorTextBlue;
 
 	/**
 	 * unique id for manually created tour types because the {@link #typeId} is -1 when it's not
 	 * persisted
 	 */
 	@Transient
-	private long			_createId				= 0;
+	private long				_createId					= 0;
 
 	/**
 	 * manually created marker or imported marker create a unique id to identify them, saved marker
 	 * are compared with the marker id
 	 */
-	private static int		_createCounter			= 0;
+	private static int			_createCounter				= 0;
 
 	/**
 	 * default constructor used in ejb

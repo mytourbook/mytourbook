@@ -23,7 +23,7 @@ import net.tourbook.data.TourType;
 
 public class TourTypeItem implements Cloneable, Comparable<TourTypeItem> {
 
-	public Enum<TourTypeConfig>		tourTypeConfig	= TourTypeConfig.TOUR_TYPE_CONFIG_NOT_USED;
+	public Enum<TourTypeConfig>		configType	= TourTypeConfig.TOUR_TYPE_CONFIG_NOT_USED;
 
 	public String					name			= UI.EMPTY_STRING;
 	public String					description		= UI.EMPTY_STRING;
@@ -111,14 +111,14 @@ public class TourTypeItem implements Cloneable, Comparable<TourTypeItem> {
 	 */
 	void setupItemImage() {
 
-		if (TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED.equals(tourTypeConfig)) {
+		if (TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED.equals(configType)) {
 
 			final int numVertices = speedVertices.size();
 
 			imageHash = speedVertices.hashCode();
 			imageWidth = numVertices * TourType.TOUR_TYPE_IMAGE_SIZE;
 
-		} else if (TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL.equals(tourTypeConfig)) {
+		} else if (TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL.equals(configType)) {
 
 			if (oneTourType == null) {
 
@@ -146,7 +146,7 @@ public class TourTypeItem implements Cloneable, Comparable<TourTypeItem> {
 		//
 				+ ("name=" + name + ", ")
 				+ ("speedVertices=" + speedVertices + ", ")
-				+ ("tourTypeConfig=" + tourTypeConfig + ", ")
+				+ ("tourTypeConfig=" + configType + ", ")
 
 				+ "]";
 	}

@@ -53,8 +53,6 @@ class HistoryItems {
 	/** Contains paths with the device name and not the drive letter (only for Windows). */
 	private LinkedHashSet<String>	_deviceNameItems		= new LinkedHashSet<>();
 
-	private boolean					_isFolderValid;
-
 	/*
 	 * UI controls
 	 */
@@ -116,6 +114,7 @@ class HistoryItems {
 
 	private void fillControls(final String newFolder, final String newDeviceNameFolder, final String selectedFolder) {
 
+		// prevent to remove the combo text field
 		_combo.removeAll();
 
 		String folderText = UI.EMPTY_STRING;
@@ -130,7 +129,6 @@ class HistoryItems {
 					: newDeviceNameFolder == null ? UI.EMPTY_STRING : newDeviceNameFolder;
 		}
 
-//		_labelFolderInfo.setText(_isFolderValid ? folderInfo : Messages.Dialog_ImportConfig_Error_FolderIsInvalid);
 		_labelFolderInfo.setText(folderInfo);
 		_combo.setText(folderText);
 
@@ -139,12 +137,12 @@ class HistoryItems {
 		/*
 		 * Combo items
 		 */
-		if (newFolder != null) {
+		if (newFolder != null && newFolder.length() > 0) {
 			_combo.add(newFolder);
 			isAdded = true;
 		}
 
-		if (newDeviceNameFolder != null) {
+		if (newDeviceNameFolder != null && newDeviceNameFolder.length() > 0) {
 			_combo.add(newDeviceNameFolder);
 			isAdded = true;
 		}
@@ -274,16 +272,11 @@ class HistoryItems {
 	 */
 	void removeFromHistory(final String itemText) {
 
-		if (NIO.isDeviceNameFolder(itemText)) {
-
-			// this is a device name folder
-
-			_deviceNameItems.remove(itemText);
-
-		} else {
-
-			_folderItems.remove(itemText);
-		}
+		/*
+		 * Remove from both histories because it could be in the wrong list
+		 */
+		_folderItems.remove(itemText);
+		_deviceNameItems.remove(itemText);
 
 		fillControls(null, null, null);
 	}
@@ -361,6 +354,35 @@ class HistoryItems {
 
 	}
 
+	/**
+	 * Set selected/entered folder in the combo box into the history. This maintains the history
+	 * with manually created paths.
+	 */
+	void updateHistory() {
+
+		final String selectedFolderRaw = _combo.getText();
+
+		String selectedFolder = null;
+
+		if (NIO.isDeviceNameFolder(selectedFolderRaw)) {
+			selectedFolder = NIO.convertToOSPath(selectedFolderRaw);
+		} else {
+			selectedFolder = selectedFolderRaw;
+		}
+
+		if (selectedFolder == null || selectedFolder.trim().length() == 0) {
+			return;
+		}
+
+		final Path newPath = Paths.get(selectedFolder);
+
+		final String deviceName = getDeviceName(newPath);
+		final String deviceNameFolder = createDeviceNameFolder(newPath, deviceName);
+
+		updateModel(selectedFolder, deviceNameFolder);
+		fillControls(selectedFolder, deviceNameFolder, selectedFolderRaw);
+	}
+
 	private void updateHistory(final LinkedHashSet<String> historyItems, final String newItem) {
 
 		if (newItem == null || newItem.trim().length() == 0) {
@@ -408,7 +430,10 @@ class HistoryItems {
 		final String modifiedFolder = _combo.getText().trim();
 
 		if (modifiedFolder.length() == 0
-				|| modifiedFolder.equals(Messages.Dialog_ImportConfig_Info_RetrievingVolumeInfo)) {
+				|| COMBO_SEPARATOR.equals(modifiedFolder)
+				|| Messages.Dialog_ImportConfig_Info_RetrievingVolumeInfo.equals(modifiedFolder)) {
+
+			// ignore special texts
 
 			isFolderValid = true;
 			_labelFolderInfo.setText(UI.EMPTY_STRING);
@@ -442,6 +467,7 @@ class HistoryItems {
 							if (deviceFolder == null) {
 								isFolderValid = false;
 							} else {
+
 								_labelFolderInfo.setText(deviceFolder);
 							}
 						}
@@ -460,9 +486,7 @@ class HistoryItems {
 		} else {
 
 			_comboError.show();
-			_labelFolderInfo.setText(UI.EMPTY_STRING);
+			_labelFolderInfo.setText(Messages.Dialog_ImportConfig_Error_FolderIsInvalid);
 		}
-
-		_isFolderValid = isFolderValid;
 	}
 }

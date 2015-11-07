@@ -34,6 +34,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -53,6 +54,7 @@ import net.tourbook.data.TourType;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.extension.export.ActionExport;
+import net.tourbook.importdata.AutoImportManager;
 import net.tourbook.importdata.DialogImportConfig;
 import net.tourbook.importdata.ImportConfig;
 import net.tourbook.importdata.RawDataManager;
@@ -214,9 +216,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	public static final int					TILE_SIZE_DEFAULT							= 80;
 	public static final int					TILE_SIZE_MIN								= 20;
 	public static final int					TILE_SIZE_MAX								= 300;
-	public static final int					NUM_HTILES_DEFAULT							= 5;
-	public static final int					NUM_HTILES_MIN								= 1;
-	public static final int					NUM_HTILES_MAX								= 50;
+	public static final int					NUM_HORIZONTAL_TILES_DEFAULT				= 5;
+	public static final int					NUM_HORIZONTAL_TILES_MIN					= 1;
+	public static final int					NUM_HORIZONTAL_TILES_MAX					= 50;
 
 	//
 	private final IPreferenceStore			_prefStore									= TourbookPlugin.getPrefStore();
@@ -287,6 +289,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private TagMenuManager					_tagMenuMgr;
 	private TourDoubleClickState			_tourDoubleClickState						= new TourDoubleClickState();
 	//
+	private Thread							_deviceThread;
+	private AtomicBoolean					_isReadingImportFiles						= new AtomicBoolean();
+	//
 	private HashMap<Long, Image>			_configImages								= new HashMap<>();
 	private HashMap<Long, Integer>			_configImageHash							= new HashMap<>();
 	//
@@ -318,9 +323,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/*
 	 * UI controls
 	 */
-	private PageBook						_pageBook_Import;
-	private Composite						_pageImport_Actions;
-	private Composite						_pageImport_Viewer;
+	private PageBook						_pageBook;
+	private Composite						_pageImportDashboard;
+	private Composite						_pageImportViewer;
 
 	private PageBook						_pageBook_Actions;
 	private Composite						_pageActions_NoBrowser;
@@ -1030,7 +1035,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_activePerson = TourbookPlugin.getActivePerson();
 
 		// set default page
-		_pageBook_Import.showPage(_pageImport_Actions);
+		updateUI_ActivePage(_pageImportDashboard);
 		updateUI_Dashboard();
 		enableActions();
 
@@ -1124,15 +1129,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private void createUI(final Composite parent) {
 
-		_pageBook_Import = new PageBook(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageBook_Import);
+		_pageBook = new PageBook(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageBook);
 
-		_pageImport_Actions = createUI_20_Page_ImportActions_HTML(_pageBook_Import);
+		_pageImportDashboard = createUI_20_Page_ImportActions_HTML(_pageBook);
 
-		_pageImport_Viewer = new Composite(_pageBook_Import, SWT.NONE);
-		GridLayoutFactory.fillDefaults().applyTo(_pageImport_Viewer);
+		_pageImportViewer = new Composite(_pageBook, SWT.NONE);
+		GridLayoutFactory.fillDefaults().applyTo(_pageImportViewer);
 		{
-			createUI_90_Page_TourViewer(_pageImport_Viewer);
+			createUI_90_Page_TourViewer(_pageImportViewer);
 		}
 	}
 
@@ -1847,6 +1852,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	@Override
 	public void dispose() {
 
+		_deviceThread.interrupt();
+
 		Util.disposeResource(_imageDatabase);
 		Util.disposeResource(_imageDatabaseOtherPerson);
 		Util.disposeResource(_imageDatabaseAssignMergedTour);
@@ -2235,7 +2242,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private ImportConfig getImportConfig() {
 
-		return RawDataManager.getInstance().getAutoImportConfig();
+		return AutoImportManager.getInstance().getAutoImportConfig();
 	}
 
 	public Image getImportConfigImage(final TourTypeItem importConfig) {
@@ -2253,9 +2260,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			return image;
 		}
 
-		final Display display = _pageBook_Import.getDisplay();
+		final Display display = _pageBook.getDisplay();
 
-		final Enum<TourTypeConfig> tourTypeConfig = importConfig.tourTypeConfig;
+		final Enum<TourTypeConfig> tourTypeConfig = importConfig.configType;
 		final net.tourbook.ui.UI ui = net.tourbook.ui.UI.getInstance();
 
 		if (TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED.equals(tourTypeConfig)) {
@@ -2409,6 +2416,37 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		createResources_Image();
 		createResources_Web();
+
+		initUI_Dashboard();
+	}
+
+	private void initUI_Dashboard() {
+
+		_deviceThread = new Thread("PollDevice") { //$NON-NLS-1$
+			@Override
+			public void run() {
+
+				while (!isInterrupted()) {
+
+					try {
+
+						Thread.sleep(1000);
+
+						if (_isReadingImportFiles.get()) {
+							pollImportFiles();
+						}
+
+					} catch (final InterruptedException e) {
+						interrupt();
+					} catch (final Exception e) {
+						StatusUtil.log(e);
+					}
+				}
+			}
+		};
+
+		_deviceThread.setDaemon(true);
+		_deviceThread.start();
 	}
 
 	/**
@@ -2527,7 +2565,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			if (importTile.getId() == tileId) {
 
-				RawDataManager.getInstance().doAutoImport(importTile);
+				AutoImportManager.getInstance().runImport(importTile);
 				break;
 			}
 		}
@@ -2560,19 +2598,24 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 	}
 
+	private void pollImportFiles() {
+		// TODO Auto-generated method stub
+
+	}
+
 	@Override
 	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
 
-		_pageImport_Viewer.setRedraw(false);
+		_pageImportViewer.setRedraw(false);
 		{
 			_tourViewer.getTable().dispose();
-			createUI_90_Page_TourViewer(_pageImport_Viewer);
-			_pageImport_Viewer.layout();
+			createUI_90_Page_TourViewer(_pageImportViewer);
+			_pageImportViewer.layout();
 
 			// update the viewer
 			reloadViewer();
 		}
-		_pageImport_Viewer.setRedraw(true);
+		_pageImportViewer.setRedraw(true);
 
 		return _tourViewer;
 	}
@@ -2714,7 +2757,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		final Object[] rawData = _rawDataMgr.getImportedTours().values().toArray();
 
-		_pageBook_Import.showPage(rawData.length > 0 ? _pageImport_Viewer : _pageImport_Actions);
+		updateUI_ActivePage(rawData.length > 0 ? _pageImportViewer : _pageImportDashboard);
 
 		// update tour data viewer
 		_tourViewer.setInput(rawData);
@@ -2906,7 +2949,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		importConfig.backupFolder = modifiedConfig.backupFolder;
 		importConfig.deviceFolder = modifiedConfig.deviceFolder;
 
-		RawDataManager.getInstance().saveImportConfig(importConfig);
+		AutoImportManager.getInstance().saveImportConfig(importConfig);
 	}
 
 	private void updateToolTipState() {
@@ -2915,6 +2958,24 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_isToolTipInTime = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURIMPORT_TIME);
 		_isToolTipInTitle = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURIMPORT_TITLE);
 		_isToolTipInTags = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURIMPORT_TAGS);
+	}
+
+	private void updateUI_ActivePage(final Composite activePage) {
+
+		_pageBook.showPage(activePage);
+
+		if (activePage == _pageImportDashboard && _browser != null) {
+
+			// dashboard is visible, activate background task
+
+			_isReadingImportFiles.set(true);
+
+		} else {
+
+			// deactivate background task
+
+			_isReadingImportFiles.set(false);
+		}
 	}
 
 	/**
