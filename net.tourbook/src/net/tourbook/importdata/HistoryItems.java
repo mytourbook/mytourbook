@@ -87,6 +87,10 @@ class HistoryItems {
 
 	private String createDeviceNameFolder(final Path folderPath, final String deviceName) {
 
+		if (!UI.IS_WIN) {
+			return folderPath.toString();
+		}
+
 		final int nameCount = folderPath.getNameCount();
 		final Comparable<?> subPath = nameCount > 0 ? folderPath.subpath(0, nameCount) : UI.EMPTY_STRING;
 
@@ -113,6 +117,8 @@ class HistoryItems {
 	}
 
 	private void fillControls(final String newFolder, final String newDeviceNameFolder, final String selectedFolder) {
+
+		final boolean canShowDeviceName = UI.IS_WIN;
 
 		// prevent to remove the combo text field
 		_combo.removeAll();
@@ -142,21 +148,24 @@ class HistoryItems {
 			isAdded = true;
 		}
 
-		if (newDeviceNameFolder != null && newDeviceNameFolder.length() > 0) {
-			_combo.add(newDeviceNameFolder);
-			isAdded = true;
-		}
+		if (canShowDeviceName) {
 
-		if (_deviceNameItems.size() > 0) {
-
-			if (isAdded) {
-				_combo.add(COMBO_SEPARATOR);
+			if (newDeviceNameFolder != null && newDeviceNameFolder.length() > 0) {
+				_combo.add(newDeviceNameFolder);
+				isAdded = true;
 			}
 
-			isAdded = true;
+			if (_deviceNameItems.size() > 0) {
 
-			for (final String deviceFolder : reverseHistory(_deviceNameItems)) {
-				_combo.add(deviceFolder);
+				if (isAdded) {
+					_combo.add(COMBO_SEPARATOR);
+				}
+
+				isAdded = true;
+
+				for (final String deviceFolder : reverseHistory(_deviceNameItems)) {
+					_combo.add(deviceFolder);
+				}
 			}
 		}
 
@@ -459,22 +468,29 @@ class HistoryItems {
 
 					if (isFolderValid) {
 
-						if (NIO.isDeviceNameFolder(cleanedFolderName)) {
+						if (UI.IS_WIN) {
 
-							// this is a device folder name
+							if (NIO.isDeviceNameFolder(cleanedFolderName)) {
 
-							_labelFolderInfo.setText(osFolder);
+								// this is a device folder name
+
+								_labelFolderInfo.setText(osFolder);
+
+							} else {
+
+								final String deviceFolder = convertTo_DeviceNameFolder(osFolder);
+
+								if (deviceFolder == null) {
+									isFolderValid = false;
+								} else {
+
+									_labelFolderInfo.setText(deviceFolder);
+								}
+							}
 
 						} else {
 
-							final String deviceFolder = convertTo_DeviceNameFolder(osFolder);
-
-							if (deviceFolder == null) {
-								isFolderValid = false;
-							} else {
-
-								_labelFolderInfo.setText(deviceFolder);
-							}
+							_labelFolderInfo.setText(UI.EMPTY_STRING);
 						}
 					}
 

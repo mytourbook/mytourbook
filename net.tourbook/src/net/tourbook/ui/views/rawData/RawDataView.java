@@ -757,7 +757,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 
 		String animation = UI.EMPTY_STRING;
-		if (_isAnimationRun == false && animationDuration > 0) {
+		if (_isAnimationRun == false && animationDuration > 0 && UI.IS_WIN) {
 
 			// do unimation only once
 			_isAnimationRun = true;
