@@ -228,9 +228,10 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 	private Link[]						_linkVertex_TourType;
 	private Link						_linkOneTourType;
 
+	private Spinner						_spinnerAnimationDuration;
 	private Spinner						_spinnerBgOpacity;
-	private Spinner						_spinnerTileSize;
 	private Spinner						_spinnerNumHTiles;
+	private Spinner						_spinnerTileSize;
 	private Spinner[]					_spinnerVertex_AvgSpeed;
 
 	private Text						_txtTTConfigDescription;
@@ -714,6 +715,7 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 			_comboBackupFolder.addVerifyListener(net.tourbook.common.UI.verifyFilePathInput());
 			_comboBackupFolder.addModifyListener(_folderModifyListener);
 			_comboBackupFolder.addKeyListener(_folderKeyListener);
+			_comboBackupFolder.addFocusListener(_folderFocusListener);
 			_comboBackupFolder.setData(_backupHistoryItems);
 			_comboBackupFolder.setToolTipText(Messages.Dialog_ImportConfig_Combo_Folder_Tooltip);
 			GridDataFactory.fillDefaults()//
@@ -762,15 +764,14 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 				.indent(0, 10)
 				.applyTo(group);
 		GridLayoutFactory.swtDefaults()//
-				.numColumns(4)
+				.numColumns(2)
 				.spacing(30, 5)
 				.applyTo(group);
 //		group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
 
-			createUI_90_Dashboard_1(group);
-			createUI_90_Dashboard_2(group);
-			createUI_92_Dashboard_3(group);
+			createUI_90_Dashboard_Left(group);
+			createUI_92_Dashboard_Right(group);
 			createUI_99_Dashboard_LiveUpdate(group);
 		}
 	}
@@ -815,7 +816,7 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 		_viewerContainer = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
 				.grab(true, true)
-				.hint(SWT.DEFAULT, convertVerticalDLUsToPixels(200))
+				.hint(SWT.DEFAULT, convertHeightInCharsToPixels(20))
 				.applyTo(_viewerContainer);
 		GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
 //		_viewerContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
@@ -1161,7 +1162,7 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 							| SWT.H_SCROLL);
 			GridDataFactory.fillDefaults()//
 					.grab(true, false)
-					.hint(SWT.DEFAULT, convertHeightInCharsToPixels(3))
+					.hint(convertWidthInCharsToPixels(40), convertHeightInCharsToPixels(5))
 					.applyTo(_txtTTConfigDescription);
 		}
 	}
@@ -1441,7 +1442,7 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 		return vertexContainer;
 	}
 
-	private void createUI_90_Dashboard_1(final Group parent) {
+	private void createUI_90_Dashboard_Left(final Group parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
@@ -1451,7 +1452,7 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 		{
 			{
 				/*
-				 * Item size
+				 * Tile size
 				 */
 				// label
 				final Label label = new Label(container, SWT.NONE);
@@ -1467,17 +1468,6 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 				_spinnerTileSize.addMouseWheelListener(_liveUpdateMouseWheelListener);
 				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_spinnerTileSize);
 			}
-		}
-	}
-
-	private void createUI_90_Dashboard_2(final Group parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-//				.grab(true, false)
-				.applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-		{
 			{
 				/*
 				 * Number of columns
@@ -1499,13 +1489,14 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 		}
 	}
 
-	private void createUI_92_Dashboard_3(final Group parent) {
+	private void createUI_92_Dashboard_Right(final Group parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
 //				.grab(true, false)
 				.applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 		{
 			{
 				/*
@@ -1513,8 +1504,8 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 				 */
 				// label
 				final Label label = new Label(container, SWT.NONE);
-				label.setText(Messages.Dialog_ImportConfig_Label_ImportBackgroundOpacity);
-				label.setToolTipText(Messages.Dialog_ImportConfig_Label_ImportBackgroundOpacity_Tooltip);
+				label.setText(Messages.Dialog_ImportConfig_Label_BackgroundOpacity);
+				label.setToolTipText(Messages.Dialog_ImportConfig_Label_BackgroundOpacity_Tooltip);
 				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
 
 				// spinner
@@ -1523,7 +1514,33 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 				_spinnerBgOpacity.setMaximum(100);
 				_spinnerBgOpacity.addSelectionListener(_liveUpdateListener);
 				_spinnerBgOpacity.addMouseWheelListener(_liveUpdateMouseWheelListener);
-				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_spinnerBgOpacity);
+			}
+			{
+				/*
+				 * Animation duration
+				 */
+				// label
+				Label label = new Label(container, SWT.NONE);
+				label.setText(Messages.Dialog_ImportConfig_Label_AnimationDuration);
+				label.setToolTipText(Messages.Dialog_ImportConfig_Label_AnimationDuration_Tooltip);
+				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+
+				final Composite animationContainer = new Composite(container, SWT.NONE);
+				GridLayoutFactory.fillDefaults().numColumns(2).applyTo(animationContainer);
+				{
+					// spinner
+					_spinnerAnimationDuration = new Spinner(animationContainer, SWT.BORDER);
+					_spinnerAnimationDuration.setMinimum(0);
+					_spinnerAnimationDuration.setMaximum(100);
+					_spinnerAnimationDuration.setDigits(1);
+					_spinnerAnimationDuration.addSelectionListener(_liveUpdateListener);
+					_spinnerAnimationDuration.addMouseWheelListener(_liveUpdateMouseWheelListener);
+					GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_spinnerAnimationDuration);
+
+					// label
+					label = new Label(animationContainer, SWT.NONE);
+					label.setText(Messages.App_Unit_Seconds_Small);
+				}
 			}
 		}
 	}
@@ -1545,6 +1562,7 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 		GridDataFactory.fillDefaults()//
 				.grab(true, false)
 				.align(SWT.END, SWT.FILL)
+				.span(2, 1)
 				.applyTo(_chkLiveUpdate);
 	}
 
@@ -1567,10 +1585,11 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 
 		defineColumn_10_ProfileName();
 		defineColumn_20_ColorImage();
+		defineColumn_30_Description();
 	}
 
 	/**
-	 * column: profile name
+	 * Column: Item name
 	 */
 	private void defineColumn_10_ProfileName() {
 
@@ -1579,16 +1598,15 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 		colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_Name);
 		colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_Name);
 
-		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
-		colDef.setColumnWeightData(new ColumnWeightData(10));
+		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(20));
+		colDef.setColumnWeightData(new ColumnWeightData(20));
 
 		colDef.setIsDefaultColumn();
-		colDef.setIsColumnMoveable(false);
 		colDef.setCanModifyVisibility(false);
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
-
 				cell.setText(((TourTypeItem) cell.getElement()).name);
 			}
 		});
@@ -1605,23 +1623,38 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 		colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_TourType);
 		colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_TourType);
 
-		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(20));
-		colDef.setColumnWeightData(new ColumnWeightData(3));
+		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(15));
+		colDef.setColumnWeightData(new ColumnWeightData(15));
 
 		colDef.setIsDefaultColumn();
-		colDef.setIsColumnMoveable(false);
 		colDef.setCanModifyVisibility(false);
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 
 			// !!! set dummy label provider, otherwise an error occures !!!
 			@Override
 			public void update(final ViewerCell cell) {}
 		});
+	}
 
-		colDef.setControlListener(new ControlAdapter() {
+	/**
+	 * Column: Item description
+	 */
+	private void defineColumn_30_Description() {
+
+		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "configDescription", SWT.LEAD); //$NON-NLS-1$
+
+		colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_Description);
+		colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_Description);
+
+		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(25));
+		colDef.setColumnWeightData(new ColumnWeightData(25));
+
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
-			public void controlResized(final ControlEvent e) {
-//				onResizeImageColumn();
+			public void update(final ViewerCell cell) {
+				cell.setText(((TourTypeItem) cell.getElement()).description);
 			}
 		});
 	}
@@ -2362,6 +2395,7 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 
 		_chkLiveUpdate.setSelection(_dialogConfig.isLiveUpdate);
 
+		_spinnerAnimationDuration.setSelection(_dialogConfig.animationDuration);
 		_spinnerBgOpacity.setSelection(_dialogConfig.backgroundOpacity);
 		_spinnerNumHTiles.setSelection(_dialogConfig.numHorizontalTiles);
 		_spinnerTileSize.setSelection(_dialogConfig.tileSize);
@@ -2443,6 +2477,7 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 
 		_dialogConfig.isLiveUpdate = importConfig.isLiveUpdate;
 
+		_dialogConfig.animationDuration = importConfig.animationDuration;
 		_dialogConfig.backgroundOpacity = importConfig.backgroundOpacity;
 		_dialogConfig.numHorizontalTiles = importConfig.numHorizontalTiles;
 		_dialogConfig.tileSize = importConfig.tileSize;
@@ -2461,6 +2496,7 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 
 		_dialogConfig.isLiveUpdate = _chkLiveUpdate.getSelection();
 
+		_dialogConfig.animationDuration = _spinnerAnimationDuration.getSelection();
 		_dialogConfig.backgroundOpacity = _spinnerBgOpacity.getSelection();
 		_dialogConfig.numHorizontalTiles = _spinnerNumHTiles.getSelection();
 		_dialogConfig.tileSize = _spinnerTileSize.getSelection();
@@ -2581,6 +2617,7 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 
 		_comboTourTypeConfig.select(getTourTypeConfigIndex(tourTypeConfig));
 		_txtTTConfigName.setText(_currentTTItem.name);
+		_txtTTConfigDescription.setText(_currentTTItem.description);
 
 		/*
 		 * Setup tour type UI

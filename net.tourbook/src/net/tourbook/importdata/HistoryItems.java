@@ -299,8 +299,13 @@ class HistoryItems {
 			}
 		}
 
-		_folderItems.addAll(Arrays.asList(restoredFolderItems));
-		_deviceNameItems.addAll(Arrays.asList(restoredDeviceItems));
+		if (restoredFolderItems != null) {
+			_folderItems.addAll(Arrays.asList(restoredFolderItems));
+		}
+
+		if (restoredDeviceItems != null) {
+			_deviceNameItems.addAll(Arrays.asList(restoredDeviceItems));
+		}
 
 		String itemFolder = null;
 		String deviceNameFolder = null;

@@ -62,9 +62,11 @@ public class AutoImportManager {
 	private static final String			TAG_IMPORT_CONFIG_ROOT				= "AutomatedImportConfig";						//$NON-NLS-1$
 	private static final String			TAG_SPEED_VERTEX					= "Speed";										//$NON-NLS-1$
 	//
+	private static final String			ATTR_ANIMATION_DURATION				= "animationDuration";							//$NON-NLS-1$
 	private static final String			ATTR_AVG_SPEED						= "avgSpeed";									//$NON-NLS-1$
 	private static final String			ATTR_BACKGROUND_OPACITY				= "backgroundOpacity";							//$NON-NLS-1$
 	private static final String			ATTR_CONFIG_NAME					= "name";										//$NON-NLS-1$
+	private static final String			ATTR_CONFIG_DESCRIPTION				= "description";								//$NON-NLS-1$
 	private static final String			ATTR_CONFIG_BACKUP_FOLDER			= "backupFolder";								//$NON-NLS-1$
 	private static final String			ATTR_CONFIG_DEVICE_FOLDER			= "deviceFolder";								//$NON-NLS-1$
 	private static final String			ATTR_IS_LIVE_UPDATE					= "isLiveUpdate";								//$NON-NLS-1$
@@ -127,6 +129,7 @@ public class AutoImportManager {
 
 		importConfig.isLiveUpdate = Util.getXmlBoolean(xmlMemento, ATTR_IS_LIVE_UPDATE, true);
 
+		importConfig.animationDuration = Util.getXmlInteger(xmlMemento, ATTR_ANIMATION_DURATION, 40, 0, 100);
 		importConfig.backgroundOpacity = Util.getXmlInteger(xmlMemento, ATTR_BACKGROUND_OPACITY, 5, 0, 100);
 
 		importConfig.numHorizontalTiles = Util.getXmlInteger(
@@ -151,6 +154,7 @@ public class AutoImportManager {
 			final TourTypeItem configItem = new TourTypeItem();
 
 			configItem.name = Util.getXmlString(xmlConfig, ATTR_CONFIG_NAME, UI.EMPTY_STRING);
+			configItem.description = Util.getXmlString(xmlConfig, ATTR_CONFIG_DESCRIPTION, UI.EMPTY_STRING);
 
 			final Enum<TourTypeConfig> ttConfig = Util.getXmlEnum(
 					xmlConfig,
@@ -358,7 +362,7 @@ public class AutoImportManager {
 			sb.append('\'');
 
 			// escape single quotes
-			sb.append(fileName.replace("\'", "\\\'"));
+			sb.append(fileName.replace("\'", "\\\'")); //$NON-NLS-1$ //$NON-NLS-2$
 
 			sb.append('\'');
 		}
@@ -372,7 +376,7 @@ public class AutoImportManager {
 					+ "SELECT" //															//$NON-NLS-1$
 					+ " TourImportFileName" //												//$NON-NLS-1$
 					+ " FROM " + TourDatabase.TABLE_TOUR_DATA //							//$NON-NLS-1$
-					+ (" WHERE TourImportFileName IN (" + deviceFileNameINList + ")") //	//$NON-NLS-1$
+					+ (" WHERE TourImportFileName IN (" + deviceFileNameINList + ")") //	//$NON-NLS-1$ //$NON-NLS-2$
 					+ " ORDER BY TourImportFileName"; //									//$NON-NLS-1$
 
 			final ResultSet result = stmt.executeQuery(sqlQuery);
@@ -436,6 +440,7 @@ public class AutoImportManager {
 
 		xmlMemento.putBoolean(ATTR_IS_LIVE_UPDATE, importConfig.isLiveUpdate);
 
+		xmlMemento.putInteger(ATTR_ANIMATION_DURATION, importConfig.animationDuration);
 		xmlMemento.putInteger(ATTR_BACKGROUND_OPACITY, importConfig.backgroundOpacity);
 		xmlMemento.putInteger(ATTR_NUM_UI_COLUMNS, importConfig.numHorizontalTiles);
 		xmlMemento.putInteger(ATTR_TILE_SIZE, importConfig.tileSize);
@@ -448,6 +453,7 @@ public class AutoImportManager {
 			final IMemento xmlConfig = xmlMemento.createChild(TAG_IMPORT_CONFIG);
 
 			xmlConfig.putString(ATTR_CONFIG_NAME, configItem.name);
+			xmlConfig.putString(ATTR_CONFIG_DESCRIPTION, configItem.description);
 
 			final Enum<TourTypeConfig> ttConfig = configItem.configType;
 			Util.setXmlEnum(xmlConfig, ATTR_TOUR_TYPE_CONFIG, ttConfig);

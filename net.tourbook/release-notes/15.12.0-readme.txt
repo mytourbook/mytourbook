@@ -32,8 +32,9 @@ New
 ===
 
 * Auto import
-  - Only the file name is checked and NOT the file path (folders) when retrieving not yet imported tour files.
+  - Only the file name is checked and NOT the file path (folders) when fetching new imported tour files.
   - Remove current folder from the history with <Ctrl>+<Delete.
+  - Import dashboard animation can be disabled when animation duration is set to 0.
 
 Improvements
 ============	

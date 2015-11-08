@@ -256,6 +256,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	protected TourPerson					_activePerson;
 	protected TourPerson					_newActivePerson;
 	//
+	private boolean							_isAnimationRun;
+	private boolean							_isInUIStartup								= true;
 	protected boolean						_isPartVisible								= false;
 	protected boolean						_isViewerPersonDataDirty					= false;
 	//
@@ -289,8 +291,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private TagMenuManager					_tagMenuMgr;
 	private TourDoubleClickState			_tourDoubleClickState						= new TourDoubleClickState();
 	//
-	private Thread							_deviceThread;
-	private AtomicBoolean					_isReadingImportFiles						= new AtomicBoolean();
+	private Thread							_devicePollingThread;
+	private AtomicBoolean					_isPollingImportFiles						= new AtomicBoolean();
 	//
 	private HashMap<Long, Image>			_configImages								= new HashMap<>();
 	private HashMap<Long, Integer>			_configImageHash							= new HashMap<>();
@@ -323,19 +325,22 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/*
 	 * UI controls
 	 */
-	private PageBook						_pageBook;
-	private Composite						_pageImportDashboard;
-	private Composite						_pageImportViewer;
+	private PageBook						_topPageBook;
+	private Composite						_topPage_Startup;
+	private Composite						_topPage_Dashboard;
+	private Composite						_topPage_ImportViewer;
 
-	private PageBook						_pageBook_Actions;
-	private Composite						_pageActions_NoBrowser;
-	private Composite						_pageActions_Content;
+	private PageBook						_dashboard_PageBook;
+	private Composite						_dashboardPage_NoBrowser;
+	private Composite						_dashboardPage_WithBrowser;
+
+	private Composite						_parent;
+	private Text							_txtNoBrowser;
 
 	private TableViewer						_tourViewer;
 	private TableViewerTourInfoToolTip		_tourInfoToolTip;
 
 	private Browser							_browser;
-	private Text							_txtNoBrowser;
 
 	private class TourDataContentProvider implements IStructuredContentProvider {
 
@@ -543,6 +548,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				if (RawDataView.this == partRef.getPart(false)) {
 					_isPartVisible = true;
 					if (_isViewerPersonDataDirty || (_newActivePerson != _activePerson)) {
+
+						// run animation after recreation
+						_isAnimationRun = false;
+
 						reloadViewer();
 						updateViewerPersonData();
 						_newActivePerson = _activePerson;
@@ -717,9 +726,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		final ImportConfig importConfig = getImportConfig();
 		final int itemSize = importConfig.tileSize;
 		final int opacity = importConfig.backgroundOpacity;
+		final int animationDuration = importConfig.animationDuration;
 
 		String bgImage = UI.EMPTY_STRING;
-
 		if (opacity > 0) {
 
 			/*
@@ -747,6 +756,41 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			}
 		}
 
+		String animation = UI.EMPTY_STRING;
+		if (_isAnimationRun == false && animationDuration > 0) {
+
+			// do unimation only once
+			_isAnimationRun = true;
+
+			animation = ""//
+
+					+ ("body\n")
+					+ ("{\n")
+					+ ("	animation:					fadeinBody;\n")
+					+ ("	animation-duration:			" + _nf1.format(animationDuration / 10.0) + "s;\n")
+					+ ("	animation-timing-function:	ease;\n")
+					+ ("}\n")
+
+					+ ("@keyframes fadeinBody												\n")
+					+ ("{																	\n")
+
+					+ ("	from															\n")
+					+ ("	{																\n")
+					+ ("		opacity:				0.0;								\n")
+					+ ("		background-color:		ButtonFace;							\n")
+					+ ("		transform:				rotateX(50deg) rotateY(-60deg);	\n")
+					+ ("		xtransform-origin: 		50% 200%;							\n")
+					+ ("	}																\n")
+//		transform:				rotateX(-80deg) rotateY(-80deg);
+//		transform-origin: 		50% 200%;
+
+					+ ("	to																\n")
+					+ ("	{																\n")
+					+ ("		opacity:				0.9;								\n")
+					+ ("	}																\n")
+					+ ("}																	\n"); //$NON-NLS-1$
+		}
+
 		/*
 		 * Tile size
 		 */
@@ -766,6 +810,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		final String customCSS = "" // //$NON-NLS-1$
 
 				+ "<style>\n" // //$NON-NLS-1$
+				+ animation
 				+ bgImage
 				+ tileSize
 				+ "</style>\n"; //$NON-NLS-1$
@@ -917,10 +962,36 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private String createHTML_54_AutoImport_Tile(final TourTypeItem importTile) {
 
+		/*
+		 * Tooltip
+		 */
+		final StringBuilder sb = new StringBuilder();
+
+		final String tileName = importTile.name.trim();
+		final String tileDescription = importTile.description.trim();
+		boolean isAdded = false;
+
+		if (tileName.length() > 0) {
+			sb.append(tileName);
+			isAdded = true;
+		}
+
+		if (tileDescription.length() > 0) {
+
+			if (isAdded) {
+				sb.append(UI.NEW_LINE2);
+			}
+
+			sb.append(tileDescription);
+		}
+
+		final String tooltip = sb.toString();
+
+		/*
+		 * Tile image
+		 */
 		final Image tileImage = getImportConfigImage(importTile);
-
 		String htmlImage = UI.EMPTY_STRING;
-
 		if (tileImage != null) {
 
 			final byte[] pngImageData = ImageUtils.formatImage(tileImage, SWT.IMAGE_PNG);
@@ -929,20 +1000,17 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			htmlImage = "<img src='data:image/png;base64," + base64Encoded + "'>"; //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
+		/*
+		 * Tile HTML
+		 */
 		final String href = HTTP_DUMMY + HREF_AUTO_IMPORT + HREF_TOKEN + importTile.getId();
 
 		final String html = "" //$NON-NLS-1$
 
-				+ ("<a href='" + href + "' class='import-tile'>\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("<a href='" + href + "' title='" + tooltip + "' class='import-tile'>\n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("	<div class='import-tile-image'>" + htmlImage + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("	<div class='import-tile-name'>\n") //$NON-NLS-1$
-
-				// it needs a NEW div that padding on the right side works !!!
-				+ ("		<div class='import-tile-name-padding'>" + importTile.name + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$
-
-				+ ("	</div>\n") //$NON-NLS-1$
+				+ ("	<div class='import-tile-name'>" + importTile.name + "</div>\n") //$NON-NLS-1$
 				+ ("</a>\n") //$NON-NLS-1$
-
 		;
 
 		return html;
@@ -996,15 +1064,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				+ ("<td>") //$NON-NLS-1$
 				+ ("<a href='" + href + "' title='" + tooltip + "' class='import-tile'>\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				+ ("	<div class='import-tile-image action' " + htmlImage + "></div>\n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("	<div class='import-tile-name'>\n") //$NON-NLS-1$
-
-				// it needs a NEW div that padding on the right side works !!!
-				+ ("		<div class='import-tile-name-padding'>" + name + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$
-
-				+ ("	</div>\n") //$NON-NLS-1$
+				+ ("	<div class='import-tile-name'>" + name + "</div>\n") //$NON-NLS-1$
 				+ ("</a>\n") //$NON-NLS-1$
 				+ ("</td>") //$NON-NLS-1$
-
 		;
 
 		sb.append(html);
@@ -1034,12 +1096,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		_activePerson = TourbookPlugin.getActivePerson();
 
-		// set default page
-		updateUI_ActivePage(_pageImportDashboard);
-		updateUI_Dashboard();
 		enableActions();
-
 		restoreState();
+
+		updateUI_TopPage();
 	}
 
 	private void createResources_Image() {
@@ -1129,29 +1189,38 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private void createUI(final Composite parent) {
 
-		_pageBook = new PageBook(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageBook);
+		_topPageBook = new PageBook(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(_topPageBook);
 
-		_pageImportDashboard = createUI_20_Page_ImportActions_HTML(_pageBook);
+		_topPage_Startup = createUI_10_Page_Startup(_topPageBook);
+		_topPage_Dashboard = createUI_20_Page_Dashboard(_topPageBook);
+		_topPage_ImportViewer = createUI_90_Page_TourViewer(_topPageBook);
 
-		_pageImportViewer = new Composite(_pageBook, SWT.NONE);
-		GridLayoutFactory.fillDefaults().applyTo(_pageImportViewer);
-		{
-			createUI_90_Page_TourViewer(_pageImportViewer);
-		}
+		_topPageBook.showPage(_topPage_Startup);
 	}
 
-	private Composite createUI_20_Page_ImportActions_HTML(final Composite parent) {
+	/**
+	 * This page is displayed until the first page of the browser is loaded.
+	 * 
+	 * @param parent
+	 * @return
+	 */
+	private Composite createUI_10_Page_Startup(final Composite parent) {
 
-		_pageBook_Actions = new PageBook(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageBook_Actions);
+		return new Composite(parent, SWT.NONE);
+	}
 
-		_pageActions_NoBrowser = new Composite(_pageBook_Actions, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageActions_NoBrowser);
-		GridLayoutFactory.swtDefaults().numColumns(1).applyTo(_pageActions_NoBrowser);
-		_pageActions_NoBrowser.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+	private Composite createUI_20_Page_Dashboard(final Composite parent) {
+
+		_dashboard_PageBook = new PageBook(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(_dashboard_PageBook);
+
+		_dashboardPage_NoBrowser = new Composite(_dashboard_PageBook, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(_dashboardPage_NoBrowser);
+		GridLayoutFactory.swtDefaults().numColumns(1).applyTo(_dashboardPage_NoBrowser);
+		_dashboardPage_NoBrowser.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 		{
-			_txtNoBrowser = new Text(_pageActions_NoBrowser, SWT.WRAP | SWT.READ_ONLY);
+			_txtNoBrowser = new Text(_dashboardPage_NoBrowser, SWT.WRAP | SWT.READ_ONLY);
 			GridDataFactory.fillDefaults()//
 					.grab(true, true)
 					.align(SWT.FILL, SWT.BEGINNING)
@@ -1159,13 +1228,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			_txtNoBrowser.setText(Messages.UI_Label_BrowserCannotBeCreated);
 		}
 
-		_pageActions_Content = new Composite(_pageBook_Actions, SWT.NONE);
-		GridLayoutFactory.fillDefaults().applyTo(_pageActions_Content);
+		_dashboardPage_WithBrowser = new Composite(_dashboard_PageBook, SWT.NONE);
+		GridLayoutFactory.fillDefaults().applyTo(_dashboardPage_WithBrowser);
 		{
-			createUI_22_Browser(_pageActions_Content);
+			createUI_22_Browser(_dashboardPage_WithBrowser);
 		}
 
-		return _pageBook_Actions;
+		return _dashboard_PageBook;
 	}
 
 	private void createUI_22_Browser(final Composite parent) {
@@ -1176,6 +1245,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 				// use default browser
 				_browser = new Browser(parent, SWT.NONE);
+
+				// initial setup
+				_browser.setRedraw(false);
 
 			} catch (final Exception e) {
 
@@ -1208,10 +1280,21 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 	}
 
+	private Composite createUI_90_Page_TourViewer(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridLayoutFactory.fillDefaults().applyTo(container);
+		{
+			createUI_92_TourViewer(container);
+		}
+
+		return container;
+	}
+
 	/**
 	 * @param parent
 	 */
-	private void createUI_90_Page_TourViewer(final Composite parent) {
+	private void createUI_92_TourViewer(final Composite parent) {
 
 		// table
 		final Table table = new Table(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.MULTI);
@@ -1249,13 +1332,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		// set tour info tooltip provider
 		_tourInfoToolTip = new TableViewerTourInfoToolTip(_tourViewer);
 
-		createUI_92_ContextMenu();
+		createUI_94_ContextMenu();
 	}
 
 	/**
 	 * create the views context menu
 	 */
-	private void createUI_92_ContextMenu() {
+	private void createUI_94_ContextMenu() {
 
 		final Table table = (Table) _tourViewer.getControl();
 
@@ -1852,7 +1935,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	@Override
 	public void dispose() {
 
-		_deviceThread.interrupt();
+		_devicePollingThread.interrupt();
 
 		Util.disposeResource(_imageDatabase);
 		Util.disposeResource(_imageDatabaseOtherPerson);
@@ -2260,7 +2343,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			return image;
 		}
 
-		final Display display = _pageBook.getDisplay();
+		final Display display = _parent.getDisplay();
 
 		final Enum<TourTypeConfig> tourTypeConfig = importConfig.configType;
 		final net.tourbook.ui.UI ui = net.tourbook.ui.UI.getInstance();
@@ -2412,6 +2495,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private void initUI(final Composite parent) {
 
+		_parent = parent;
 		_pc = new PixelConverter(parent);
 
 		createResources_Image();
@@ -2422,7 +2506,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private void initUI_Dashboard() {
 
-		_deviceThread = new Thread("PollDevice") { //$NON-NLS-1$
+		_devicePollingThread = new Thread("PollingImportFiles") { //$NON-NLS-1$
 			@Override
 			public void run() {
 
@@ -2432,7 +2516,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 						Thread.sleep(1000);
 
-						if (_isReadingImportFiles.get()) {
+						if (_isPollingImportFiles.get()) {
 							pollImportFiles();
 						}
 
@@ -2445,8 +2529,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			}
 		};
 
-		_deviceThread.setDaemon(true);
-		_deviceThread.start();
+		_devicePollingThread.setDaemon(true);
+		_devicePollingThread.start();
 	}
 
 	/**
@@ -2475,6 +2559,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	}
 
 	private void onBrowser_Completed(final ProgressEvent event) {
+
+		if (_isInUIStartup = true) {
+
+			_isInUIStartup = false;
+
+			_topPageBook.showPage(_topPage_Dashboard);
+
+			_browser.setRedraw(true);
+		}
 
 //		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
 //				+ ("\tonBrowser_Completed: " + event));
@@ -2606,16 +2699,16 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	@Override
 	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
 
-		_pageImportViewer.setRedraw(false);
+		_topPage_ImportViewer.setRedraw(false);
 		{
 			_tourViewer.getTable().dispose();
-			createUI_90_Page_TourViewer(_pageImportViewer);
-			_pageImportViewer.layout();
+			createUI_92_TourViewer(_topPage_ImportViewer);
+			_topPage_ImportViewer.layout();
 
 			// update the viewer
 			reloadViewer();
 		}
-		_pageImportViewer.setRedraw(true);
+		_topPage_ImportViewer.setRedraw(true);
 
 		return _tourViewer;
 	}
@@ -2755,11 +2848,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	@Override
 	public void reloadViewer() {
 
-		final Object[] rawData = _rawDataMgr.getImportedTours().values().toArray();
-
-		updateUI_ActivePage(rawData.length > 0 ? _pageImportViewer : _pageImportDashboard);
+		updateUI_TopPage();
 
 		// update tour data viewer
+		final Object[] rawData = _rawDataMgr.getImportedTours().values().toArray();
 		_tourViewer.setInput(rawData);
 
 		enableActions();
@@ -2930,17 +3022,21 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 	}
 
-	private void showBrowserPage() {
-
-		_pageBook_Actions.showPage(_browser == null ? _pageActions_NoBrowser : _pageActions_Content);
-	}
-
+	/**
+	 * Keep live update values, other values MUST already have been set.
+	 */
 	private void updateModel_ImportConfig(final DialogImportConfig dialog) {
 
 		final ImportConfig modifiedConfig = dialog.getModifiedConfig();
 		final ImportConfig importConfig = getImportConfig();
 
-		// keep live update values, other values MUST already have been set
+		if (importConfig.animationDuration != modifiedConfig.animationDuration) {
+
+			// run animation only when it was modified
+			_isAnimationRun = false;
+		}
+		importConfig.animationDuration = modifiedConfig.animationDuration;
+
 		importConfig.backgroundOpacity = modifiedConfig.backgroundOpacity;
 		importConfig.isLiveUpdate = modifiedConfig.isLiveUpdate;
 		importConfig.numHorizontalTiles = modifiedConfig.numHorizontalTiles;
@@ -2960,39 +3056,76 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_isToolTipInTags = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURIMPORT_TAGS);
 	}
 
-	private void updateUI_ActivePage(final Composite activePage) {
-
-		_pageBook.showPage(activePage);
-
-		if (activePage == _pageImportDashboard && _browser != null) {
-
-			// dashboard is visible, activate background task
-
-			_isReadingImportFiles.set(true);
-
-		} else {
-
-			// deactivate background task
-
-			_isReadingImportFiles.set(false);
-		}
-	}
-
 	/**
-	 * Update the UI from {@link #_tourData}.
+	 * Set/create dashboard page.
 	 */
 	private void updateUI_Dashboard() {
 
-		showBrowserPage();
+		final boolean isBrowserAvailable = _browser != null;
 
-		if (_browser == null) {
+		// set dashboard page
+		_dashboard_PageBook.showPage(isBrowserAvailable//
+				? _dashboardPage_WithBrowser
+				: _dashboardPage_NoBrowser);
+
+		if (!isBrowserAvailable) {
 			return;
 		}
 
 		final String html = createHTML();
 
-		_browser.setRedraw(true);
 		_browser.setText(html);
+	}
+
+	/**
+	 * Set top page.
+	 */
+	private void updateUI_TopPage() {
+
+		/*
+		 * When imported tours are available then the import viewer page will ALLWAYS be displayed.
+		 */
+		final int numImportedTours = _rawDataMgr.getImportedTours().size();
+		if (numImportedTours > 0) {
+
+			_topPageBook.showPage(_topPage_ImportViewer);
+
+		} else {
+
+			/*
+			 * Run async that the first page in the top pagebook is visible and to prevent
+			 * flickering when the view toolbar is first drawn on the left side of the view !!!
+			 */
+
+			_parent.getDisplay().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+
+					if (_isInUIStartup) {
+
+						// dashboard is not yet created
+						updateUI_Dashboard();
+
+					} else {
+
+						_topPageBook.showPage(_topPage_Dashboard);
+					}
+
+					if (_browser != null) {
+
+						// dashboard is visible, activate background task
+
+						_isPollingImportFiles.set(true);
+
+					} else {
+
+						// deactivate background task
+
+						_isPollingImportFiles.set(false);
+					}
+				}
+			});
+		}
 	}
 
 	/**

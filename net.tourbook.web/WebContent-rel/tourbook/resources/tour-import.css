@@ -42,7 +42,6 @@ body,p,h1,h2,h3,h4,table,td,th,ul,ol,textarea,input
 	font-family: 			Segoe UI, helvetica, arial, sans-serif;
 }
 
-
 a:LINK,
 a:VISITED 
 {
@@ -56,7 +55,7 @@ a:VISITED
 	font-size:				30px;
 	font-family:			NothingYouCouldDo, sans-serif;
 	font-weight:			bold;
-	padding-left:			5px;
+	padding-left:			3px;
 }
 
 .import-container
@@ -125,7 +124,7 @@ a.import-tile
 	
 	display: 				block;
 	margin:					5px;
-	padding:				5px;
+	xpadding:				3px;
 	bottom:					0px;
 	min-height: 			7em;
 	max-height: 			7em;
@@ -167,8 +166,10 @@ a.import-tile:FOCUS .import-tile-name
 
 .import-tile-image
 {
-	padding:				5px;
+	position:				absolute;
+	top:					5px;
 	text-align:				center;
+	width:					100%;
 	
 	xbackground-color: 		#008;
 }
@@ -176,17 +177,17 @@ a.import-tile:FOCUS .import-tile-name
 .import-tile-name
 {
 	position:				absolute;
-	bottom:					5px;
+	bottom:					3px;
 	text-align: 			center;
-	width: 					100%;
+	width: 					calc(100% - 6px);
+	padding-left:			3px;
+
+	white-space: 			nowrap;
+	overflow:				hidden;
+	xtext-overflow:			"...";		/* this is not working */
+	
 	color:					#bbb;
-
 	xbackground-color: 		green;
-}
-
-.import-tile-name-padding
-{
-	padding-right:			10px;
 }
 
 .action

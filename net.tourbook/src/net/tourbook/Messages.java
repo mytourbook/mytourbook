@@ -120,6 +120,8 @@ public class Messages extends NLS {
 	public static String		Dialog_ImportConfig_Checkbox_LiveUpdate;
 	public static String		Dialog_ImportConfig_Checkbox_LiveUpdate_Tooltip;
 	public static String		Dialog_ImportConfig_Checkbox_SetTourType;
+	public static String	Dialog_ImportConfig_Column_Description;
+
 	public static String		Dialog_ImportConfig_Column_Name;
 	public static String		Dialog_ImportConfig_Column_TourType;
 	public static String		Dialog_ImportConfig_Combo_Folder_Tooltip;
@@ -136,6 +138,14 @@ public class Messages extends NLS {
 	public static String		Dialog_ImportConfig_Info_ConfigDragDrop;
 	public static String		Dialog_ImportConfig_Info_NoDeviceName;
 	public static String		Dialog_ImportConfig_Info_RetrievingVolumeInfo;
+	public static String	Dialog_ImportConfig_Label_AnimationDuration;
+
+	public static String	Dialog_ImportConfig_Label_AnimationDuration_Tooltip;
+
+	public static String	Dialog_ImportConfig_Label_BackgroundOpacity;
+
+	public static String	Dialog_ImportConfig_Label_BackgroundOpacity_Tooltip;
+
 	public static String		Dialog_ImportConfig_Label_BackupFolder;
 	public static String		Dialog_ImportConfig_Label_BackupFolder_Tooltip;
 	public static String		Dialog_ImportConfig_Label_ConfigDescription;
@@ -145,8 +155,6 @@ public class Messages extends NLS {
 	public static String		Dialog_ImportConfig_Label_ConfigTitle;
 	public static String		Dialog_ImportConfig_Label_DeviceFolder;
 	public static String		Dialog_ImportConfig_Label_DeviceFolder_Tooltip;
-	public static String		Dialog_ImportConfig_Label_ImportBackgroundOpacity;
-	public static String		Dialog_ImportConfig_Label_ImportBackgroundOpacity_Tooltip;
 	public static String		Dialog_ImportConfig_Label_ImportColumns;
 	public static String		Dialog_ImportConfig_Label_ImportColumns_Tooltip;
 	public static String		Dialog_ImportConfig_Label_TourType;

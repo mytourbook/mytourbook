@@ -33,6 +33,9 @@ public class ImportConfig {
 	/** Background opacity in %. */
 	public int						backgroundOpacity	= 5;
 
+	/** Duration in seconds/10 */
+	public int						animationDuration	= 40;
+
 	public ArrayList<TourTypeItem>	tourTypeItems		= new ArrayList<>();
 
 	/**
@@ -40,4 +43,5 @@ public class ImportConfig {
 	 * tour database.
 	 */
 	public ArrayList<String>		notImportedFiles;
+
 }
