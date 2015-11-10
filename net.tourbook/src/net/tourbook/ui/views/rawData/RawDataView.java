@@ -55,6 +55,7 @@ import net.tourbook.data.TourWayPoint;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.importdata.AutoImportManager;
+import net.tourbook.importdata.DeviceFile;
 import net.tourbook.importdata.DialogImportConfig;
 import net.tourbook.importdata.ImportConfig;
 import net.tourbook.importdata.RawDataManager;
@@ -199,6 +200,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private static final String				ACTION_SERIAL_PORT_DIRECTLY					= "SerialPortDirectly";					//$NON-NLS-1$
 	private static final String				ACTION_SETUP_AUTO_IMPORT					= "SetupAutoImport";						//$NON-NLS-1$
 
+	private static final String				DOM_ID_DEVICE_STATE							= "deviceState";							//$NON-NLS-1$
+
 	private static String					HREF_AUTO_IMPORT;
 	private static String					HREF_IMPORT_FROM_FILES;
 	private static String					HREF_SERIAL_PORT_CONFIGURED;
@@ -292,10 +295,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private TourDoubleClickState			_tourDoubleClickState						= new TourDoubleClickState();
 	//
 	private Thread							_devicePollingThread;
-	private AtomicBoolean					_isPollingImportFiles						= new AtomicBoolean();
+	private AtomicBoolean					_canDoPollingImportFiles					= new AtomicBoolean();
+	private AtomicBoolean					_browserTask_DeviceState					= new AtomicBoolean();
 	//
 	private HashMap<Long, Image>			_configImages								= new HashMap<>();
 	private HashMap<Long, Integer>			_configImageHash							= new HashMap<>();
+	//
+	private boolean							_isBrowserCompleted;
 	//
 	private String							_cssFonts;
 	private String							_cssFromFile;
@@ -500,6 +506,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		if (isLiveUpdate || isOK) {
 
 			updateModel_ImportConfig(dialog);
+
+			AutoImportManager.getInstance().getNotImportedFiles(true);
+
+			updateUI_DeviceState();
 		}
 
 		updateUI_Dashboard();
@@ -762,32 +772,32 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			// do unimation only once
 			_isAnimationRun = true;
 
-			animation = ""//
+			animation = ""// //$NON-NLS-1$
 
-					+ ("body\n")
-					+ ("{\n")
-					+ ("	animation:					fadeinBody;\n")
-					+ ("	animation-duration:			" + _nf1.format(animationDuration / 10.0) + "s;\n")
-					+ ("	animation-timing-function:	ease;\n")
-					+ ("}\n")
+					+ ("body\n") //$NON-NLS-1$
+					+ ("{\n") //$NON-NLS-1$
+					+ ("	animation:					fadeinBody;\n") //$NON-NLS-1$
+					+ ("	animation-duration:			" + _nf1.format(animationDuration / 10.0) + "s;\n") //$NON-NLS-1$ //$NON-NLS-2$
+					+ ("	animation-timing-function:	ease;\n") //$NON-NLS-1$
+					+ ("}\n") //$NON-NLS-1$
 
-					+ ("@keyframes fadeinBody												\n")
-					+ ("{																	\n")
+					+ ("@keyframes fadeinBody												\n") //$NON-NLS-1$
+					+ ("{																	\n") //$NON-NLS-1$
 
-					+ ("	from															\n")
-					+ ("	{																\n")
-					+ ("		opacity:				0.0;								\n")
-					+ ("		background-color:		ButtonFace;							\n")
-					+ ("		transform:				rotateX(50deg) rotateY(-60deg);	\n")
-					+ ("		xtransform-origin: 		50% 200%;							\n")
-					+ ("	}																\n")
+					+ ("	from															\n") //$NON-NLS-1$
+					+ ("	{																\n") //$NON-NLS-1$
+					+ ("		opacity:				0.0;								\n") //$NON-NLS-1$
+					+ ("		background-color:		ButtonFace;							\n") //$NON-NLS-1$
+					+ ("		transform:				rotateX(50deg) rotateY(-60deg);	\n") //$NON-NLS-1$
+					+ ("		xtransform-origin: 		50% 200%;							\n") //$NON-NLS-1$
+					+ ("	}																\n") //$NON-NLS-1$
 //		transform:				rotateX(-80deg) rotateY(-80deg);
 //		transform-origin: 		50% 200%;
 
-					+ ("	to																\n")
-					+ ("	{																\n")
-					+ ("		opacity:				0.9;								\n")
-					+ ("	}																\n")
+					+ ("	to																\n") //$NON-NLS-1$
+					+ ("	{																\n") //$NON-NLS-1$
+					+ ("		opacity:				0.9;								\n") //$NON-NLS-1$
+					+ ("	}																\n") //$NON-NLS-1$
 					+ ("}																	\n"); //$NON-NLS-1$
 		}
 
@@ -907,8 +917,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 				+ ("		<td class='title'>" + Messages.Import_Data_Label_AutomatedImport + "</td>\n") //$NON-NLS-1$ //$NON-NLS-2$
 
+				// Action: Import config
 				+ ("		<td>\n") //$NON-NLS-1$
 				+ ("			<div style='padding-left:10px;'>" + htmlActionImportConfig + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("		</td>\n") //$NON-NLS-1$
+
+				// Device state
+				+ ("		<td>\n") //$NON-NLS-1$
+				+ ("			<div id='" + DOM_ID_DEVICE_STATE + "' style='padding-left:10px;'></div>\n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("		</td>\n") //$NON-NLS-1$
 
 				+ "	</tr></tbody></table>\n" // //$NON-NLS-1$
@@ -1007,9 +1023,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		final String html = "" //$NON-NLS-1$
 
-				+ ("<a href='" + href + "' title='" + tooltip + "' class='import-tile'>\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("<a href='" + href + "' title='" + tooltip + "' class='import-tile'>\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				+ ("	<div class='import-tile-image'>" + htmlImage + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("	<div class='import-tile-name'>" + importTile.name + "</div>\n") //$NON-NLS-1$
+				+ ("	<div class='import-tile-name'>" + importTile.name + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("</a>\n") //$NON-NLS-1$
 		;
 
@@ -1064,7 +1080,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				+ ("<td>") //$NON-NLS-1$
 				+ ("<a href='" + href + "' title='" + tooltip + "' class='import-tile'>\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				+ ("	<div class='import-tile-image action' " + htmlImage + "></div>\n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("	<div class='import-tile-name'>" + name + "</div>\n") //$NON-NLS-1$
+				+ ("	<div class='import-tile-name'>" + name + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("</a>\n") //$NON-NLS-1$
 				+ ("</td>") //$NON-NLS-1$
 		;
@@ -1936,6 +1952,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	public void dispose() {
 
 		_devicePollingThread.interrupt();
+		AutoImportManager.getInstance().reset();
 
 		Util.disposeResource(_imageDatabase);
 		Util.disposeResource(_imageDatabaseOtherPerson);
@@ -2516,8 +2533,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 						Thread.sleep(1000);
 
-						if (_isPollingImportFiles.get()) {
-							pollImportFiles();
+						if (_canDoPollingImportFiles.get()) {
+
+							final boolean isRetrieved = AutoImportManager.getInstance().getNotImportedFiles(false);
+
+							if (isRetrieved) {
+								updateUI_DeviceState();
+							}
 						}
 
 					} catch (final InterruptedException e) {
@@ -2594,6 +2616,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 //		});
 //
 //		_reloadedTourMarkerId = null;
+
+		if (_browserTask_DeviceState.getAndSet(false)) {
+
+			updateUI_DeviceState_Task();
+		}
+
+		_isBrowserCompleted = true;
 	}
 
 	private void onBrowser_LocationChanging(final LocationEvent event) {
@@ -2650,6 +2679,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 	}
 
+	private void onBrowser_SetText(final String html) {
+
+		_isBrowserCompleted = false;
+
+		_browser.setText(html);
+	}
+
 	private void onSelectAutoTile(final long tileId) {
 
 		final ImportConfig importConfig = getImportConfig();
@@ -2689,11 +2725,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				_isViewerPersonDataDirty = true;
 			}
 		}
-	}
-
-	private void pollImportFiles() {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
@@ -3074,7 +3105,98 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		final String html = createHTML();
 
-		_browser.setText(html);
+		onBrowser_SetText(html);
+	}
+
+	private void updateUI_DeviceState() {
+
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+
+				if (_isBrowserCompleted) {
+					updateUI_DeviceState_Task();
+				} else {
+					_browserTask_DeviceState.set(true);
+				}
+			}
+		});
+	}
+
+	private void updateUI_DeviceState_Task() {
+
+		final ImportConfig impoortConfig = getImportConfig();
+		final ArrayList<DeviceFile> notImportedFiles = impoortConfig.notImportedFiles;
+		final int numNotImported = notImportedFiles.size();
+
+		String htmlImportFiles = UI.EMPTY_STRING;
+
+		if (numNotImported > 0) {
+
+			final StringBuilder sb = new StringBuilder();
+
+			sb.append("<table class='deviceList'><tbody>");
+
+//			sb.append(fileName.replace("\'", "\\\'")); //$NON-NLS-1$ //$NON-NLS-2$
+
+			for (final DeviceFile deviceFile : notImportedFiles) {
+
+				sb.append("<tr>");
+
+				sb.append("<td>");
+				sb.append(deviceFile.fileName);
+				sb.append("</td>");
+
+				sb.append("<td>");
+				sb.append(deviceFile.size);
+				sb.append("</td>");
+
+				sb.append("<td>");
+				sb.append(_dateFormatter.format(deviceFile.modifiedTime));
+				sb.append("</td>");
+
+				sb.append("<td>");
+				sb.append(_timeFormatter.format(deviceFile.modifiedTime));
+				sb.append("</td>");
+
+				sb.append("</tr>");
+			}
+
+			sb.append("</tbody><table>");
+
+			htmlImportFiles = sb.toString();
+		}
+
+		/*
+		 * Show overflow scrollbar ONLY when more than 10 entries are available because it looks
+		 * ugly.
+		 */
+		String cssOverflow = UI.EMPTY_STRING;
+		if (numNotImported > 10) {
+			cssOverflow = "style='overflow-y: scroll;'";
+		}
+
+		final String jsUpdateState = ""//
+
+				+ "var tooltip =\""
+
+				+ "<div class='importState'>"
+				+ Integer.toString(numNotImported)
+
+				+ ("<span class='stateTooltip' " + cssOverflow + ">" + htmlImportFiles + "</span>")
+
+				+ "</div>"
+
+				+ "\";\n"
+
+				+ ("document.getElementById(\"" + DOM_ID_DEVICE_STATE + "\").innerHTML = tooltip;\n")
+		//
+		;
+
+		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\n\n" + jsUpdateState));
+		// TODO remove SYSTEM.OUT.PRINTLN
+
+		_browser.execute(jsUpdateState);
 	}
 
 	/**
@@ -3115,13 +3237,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 						// dashboard is visible, activate background task
 
-						_isPollingImportFiles.set(true);
+						_canDoPollingImportFiles.set(true);
 
 					} else {
 
 						// deactivate background task
 
-						_isPollingImportFiles.set(false);
+						_canDoPollingImportFiles.set(false);
 					}
 				}
 			});

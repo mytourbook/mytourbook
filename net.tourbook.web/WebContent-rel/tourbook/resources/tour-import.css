@@ -231,3 +231,49 @@ a.action-button:HOVER
 	border: 				1px solid #fff;
 	xborder-radius:			3px;
 }
+
+/*
+	.stateTooltip
+*/
+.importState
+{
+	cursor:					pointer;
+	
+	padding:				10px;
+}
+
+.stateTooltip
+{
+	max-height:				80vh;
+}
+
+.stateTooltip
+{
+	display:				none; 
+	z-index:				2000;
+	
+	margin-top:				25px;
+	left:					50px;
+	
+	padding:				2px 0px 2px 5px;
+}
+
+.importState:hover	.stateTooltip
+{
+	display:				inline; 
+	position:				absolute; 
+	
+	cursor:					default;
+
+	xcolor:					#111;
+	xbackground:				#ffffF0;
+	color:					#fff;
+	background:				#555;
+	xborder:					1px solid #dda; 
+}
+    
+.deviceList td
+{
+	text-align:				right;
+	padding-right: 			8px;
+}

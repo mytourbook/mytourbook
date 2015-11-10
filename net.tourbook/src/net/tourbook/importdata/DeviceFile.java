@@ -15,33 +15,14 @@
  *******************************************************************************/
 package net.tourbook.importdata;
 
-import java.util.ArrayList;
+import java.nio.file.Path;
 
-import net.tourbook.common.UI;
-import net.tourbook.ui.views.rawData.RawDataView;
+public class DeviceFile {
 
-public class ImportConfig {
+	public Path		path;
 
-	public boolean					isLiveUpdate		= true;
-
-	public String					backupFolder		= UI.EMPTY_STRING;
-	public String					deviceFolder		= UI.EMPTY_STRING;
-
-	public int						numHorizontalTiles	= RawDataView.NUM_HORIZONTAL_TILES_DEFAULT;
-	public int						tileSize			= RawDataView.TILE_SIZE_DEFAULT;
-
-	/** Background opacity in %. */
-	public int						backgroundOpacity	= 5;
-
-	/** Duration in seconds/10 */
-	public int						animationDuration	= 40;
-
-	public ArrayList<TourTypeItem>	tourTypeItems		= new ArrayList<>();
-
-	/**
-	 * Contains files which are available in the device folder but they are not available in the
-	 * tour database.
-	 */
-	public ArrayList<DeviceFile>	notImportedFiles;
+	public String	fileName;
+	public long		size;
+	public long		modifiedTime;
 
 }

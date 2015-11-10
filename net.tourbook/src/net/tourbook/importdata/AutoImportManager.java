@@ -21,18 +21,23 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.file.DirectoryStream;
+import java.nio.file.FileStore;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributeView;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 
-import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.NIO;
 import net.tourbook.common.UI;
@@ -44,10 +49,6 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.views.rawData.RawDataView;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.custom.BusyIndicator;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.XMLMemento;
@@ -85,6 +86,8 @@ public class AutoImportManager {
 
 	private ImportConfig				_importConfig;
 
+	private String						_fileStoresHash;
+
 	public static AutoImportManager getInstance() {
 
 		if (_instance == null) {
@@ -101,6 +104,96 @@ public class AutoImportManager {
 		}
 
 		return _importConfig;
+	}
+
+	/**
+	 * @return Returns a list with a files which has not yet been imported
+	 */
+	private ArrayList<DeviceFile> getImportFiles() {
+
+		final ArrayList<DeviceFile> notImportedFiles = new ArrayList<>();
+
+		final String validDeviceFolder = runImport_10_GetDeviceFolder();
+
+		if (validDeviceFolder == null) {
+			return notImportedFiles;
+		}
+
+		final List<DeviceFile> deviceFileNames = runImport_12_GetDeviceFileNames(validDeviceFolder);
+
+		if (deviceFileNames.size() == 0) {
+			// there is nothing to be imported
+			return notImportedFiles;
+		}
+
+		final HashSet<String> dbFileNames = runImport_14_GetDbFileNames(deviceFileNames);
+
+		for (final DeviceFile deviceFileName : deviceFileNames) {
+
+			if (dbFileNames.contains(deviceFileName.fileName) == false) {
+				notImportedFiles.add(deviceFileName);
+			}
+		}
+		
+		// sort by date/time
+		Collections.sort(notImportedFiles, new Comparator<DeviceFile>() {
+			@Override
+			public int compare(final DeviceFile file1, final DeviceFile file2) {
+				return Long.compare(file1.modifiedTime, file2.modifiedTime);
+			}
+		});
+
+		return notImportedFiles;
+	}
+
+	/**
+	 * @param isForceUpdate
+	 * @return Returns <code>true</code> when import files have newly retrieved, otherwise
+	 *         <code>false</code>.
+	 *         <p>
+	 *         {@link ImportConfig#notImportedFiles} contains the files which are available in the
+	 *         device folder but not available in the tour database.
+	 */
+	public boolean getNotImportedFiles(final boolean isForceUpdate) {
+
+		final long start = System.nanoTime();
+
+		/*
+		 * Get hashcode vor all files stores
+		 */
+		final Iterable<FileStore> fileStores = FileSystems.getDefault().getFileStores();
+		final StringBuilder sb = new StringBuilder();
+
+		for (final FileStore store : fileStores) {
+			sb.append(store);
+			sb.append(' ');
+		}
+		final String fileStoresHash = sb.toString();
+
+		final ImportConfig importConfig = getAutoImportConfig();
+
+		/*
+		 * Check if files stores has changed
+		 */
+		if (isForceUpdate == false && fileStoresHash.equals(_fileStoresHash)) {
+			return false;
+		}
+
+		_fileStoresHash = fileStoresHash;
+
+		/*
+		 * Filestore has changed, a device was added/removed.
+		 */
+		importConfig.notImportedFiles = getImportFiles();
+
+		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+				+ (String.format("%7.1f ms", (float) (System.nanoTime() - start) / 1000000))
+				+ ("\tnotImportedFiles: " + importConfig.notImportedFiles.size())
+				+ ("\tdeviceFolder: " + importConfig.deviceFolder)
+				+ ("\tbackupFolder: " + importConfig.backupFolder));
+		// TODO remove SYSTEM.OUT.PRINTLN
+
+		return true;
 	}
 
 	private ImportConfig loadImportConfig() {
@@ -211,35 +304,16 @@ public class AutoImportManager {
 		}
 	}
 
+	/**
+	 * Reset stored values.
+	 */
+	public void reset() {
+
+		// force that it will be reloaded
+		_fileStoresHash = null;
+	}
+
 	public void runImport(final TourTypeItem tourTypeItem) {
-
-		final String validDeviceFolder = runImport_10_GetDeviceFolder();
-
-		if (validDeviceFolder == null) {
-			return;
-		}
-
-		final List<String> deviceFileNames = runImport_12_GetDeviceFileNames(validDeviceFolder);
-
-		if (deviceFileNames.size() == 0) {
-			// there is nothing to be imported
-			return;
-		}
-
-		final HashSet<String> dbFileNames = runImport_14_GetDbFileNames(deviceFileNames);
-
-		final ArrayList<String> notImportedFiles = new ArrayList<>();
-
-		for (final String deviceFileName : deviceFileNames) {
-
-			if (dbFileNames.contains(deviceFileName) == false) {
-				notImportedFiles.add(deviceFileName);
-			}
-		}
-
-		final ImportConfig importConfig = getAutoImportConfig();
-
-		importConfig.notImportedFiles = notImportedFiles;
 
 //
 //						(\\[^\\]*\\[^\\]*$)
@@ -291,13 +365,8 @@ public class AutoImportManager {
 
 		if (NIO.isDeviceNameFolder(deviceFolderRaw)) {
 
-			BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-				@Override
-				public void run() {
+			deviceFolder[0] = NIO.convertToOSPath(deviceFolderRaw);
 
-					deviceFolder[0] = NIO.convertToOSPath(deviceFolderRaw);
-				}
-			});
 		} else {
 
 			deviceFolder[0] = deviceFolderRaw;
@@ -316,26 +385,33 @@ public class AutoImportManager {
 		} catch (final Exception e) {}
 
 		if (isFolderValid == false) {
-
-			MessageDialog.openInformation(
-					Display.getCurrent().getActiveShell(),
-					Messages.Import_Data_Dialog_AutoImport_Title,
-					NLS.bind(Messages.Import_Data_Error_DeviceFolderDoNotExist, deviceFolderRaw));
-
 			return null;
 		}
 
 		return deviceFolder[0];
 	}
 
-	private List<String> runImport_12_GetDeviceFileNames(final String validDeviceFolder) {
+	private List<DeviceFile> runImport_12_GetDeviceFileNames(final String validDeviceFolder) {
 
-		final List<String> deviceFileNames = new ArrayList<>();
+		final List<DeviceFile> deviceFileNames = new ArrayList<>();
 
 		try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(Paths.get(validDeviceFolder))) {
 
 			for (final Path path : directoryStream) {
-				deviceFileNames.add(path.getFileName().toString());
+
+				final BasicFileAttributeView fileAttributesView = Files.getFileAttributeView(
+						path,
+						BasicFileAttributeView.class);
+
+				final BasicFileAttributes fileAttributes = fileAttributesView.readAttributes();
+
+				final DeviceFile deviceFile = new DeviceFile();
+				deviceFile.path = path;
+				deviceFile.fileName = path.getFileName().toString();
+				deviceFile.size = fileAttributes.size();
+				deviceFile.modifiedTime = fileAttributes.lastModifiedTime().toMillis();
+
+				deviceFileNames.add(deviceFile);
 			}
 
 		} catch (final IOException ex) {
@@ -345,15 +421,19 @@ public class AutoImportManager {
 		return deviceFileNames;
 	}
 
-	private HashSet<String> runImport_14_GetDbFileNames(final List<String> deviceFileNames) {
+	private HashSet<String> runImport_14_GetDbFileNames(final List<DeviceFile> deviceFileNames) {
 
 		final HashSet<String> dbFileNames = new HashSet<>();
 
+		/*
+		 * Create a IN list with all device file names which are searched in the db.
+		 */
 		final StringBuilder sb = new StringBuilder();
 
 		for (int fileIndex = 0; fileIndex < deviceFileNames.size(); fileIndex++) {
 
-			final String fileName = deviceFileNames.get(fileIndex);
+			final DeviceFile deviceFile = deviceFileNames.get(fileIndex);
+			final String fileName = deviceFile.fileName;
 
 			if (fileIndex > 0) {
 				sb.append(',');

@@ -48,6 +48,8 @@ class HistoryItems {
 	private static final int		COMBO_HISTORY_LENGTH	= 20;
 	private static final String		COMBO_SEPARATOR			= "- - - - - - - - - - - - - - - - - - - - - - - - - - -";	//$NON-NLS-1$
 
+	private boolean					_canShowDeviceName		= UI.IS_WIN;
+
 	private LinkedHashSet<String>	_folderItems			= new LinkedHashSet<>();
 
 	/** Contains paths with the device name and not the drive letter (only for Windows). */
@@ -87,7 +89,7 @@ class HistoryItems {
 
 	private String createDeviceNameFolder(final Path folderPath, final String deviceName) {
 
-		if (!UI.IS_WIN) {
+		if (!_canShowDeviceName) {
 			return folderPath.toString();
 		}
 
@@ -118,7 +120,6 @@ class HistoryItems {
 
 	private void fillControls(final String newFolder, final String newDeviceNameFolder, final String selectedFolder) {
 
-		final boolean canShowDeviceName = UI.IS_WIN;
 
 		// prevent to remove the combo text field
 		_combo.removeAll();
@@ -148,7 +149,7 @@ class HistoryItems {
 			isAdded = true;
 		}
 
-		if (canShowDeviceName) {
+		if (_canShowDeviceName) {
 
 			if (newDeviceNameFolder != null && newDeviceNameFolder.length() > 0) {
 				_combo.add(newDeviceNameFolder);
@@ -192,7 +193,7 @@ class HistoryItems {
 		/*
 		 * This feature is available only for windows.
 		 */
-		if (!UI.IS_WIN) {
+		if (!_canShowDeviceName) {
 			return null;
 		}
 
@@ -468,7 +469,7 @@ class HistoryItems {
 
 					if (isFolderValid) {
 
-						if (UI.IS_WIN) {
+						if (_canShowDeviceName) {
 
 							if (NIO.isDeviceNameFolder(cleanedFolderName)) {
 
