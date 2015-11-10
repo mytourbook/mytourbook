@@ -26,8 +26,6 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.BasicFileAttributeView;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -134,7 +132,7 @@ public class AutoImportManager {
 				notImportedFiles.add(deviceFileName);
 			}
 		}
-		
+
 		// sort by date/time
 		Collections.sort(notImportedFiles, new Comparator<DeviceFile>() {
 			@Override
@@ -399,17 +397,22 @@ public class AutoImportManager {
 
 			for (final Path path : directoryStream) {
 
-				final BasicFileAttributeView fileAttributesView = Files.getFileAttributeView(
-						path,
-						BasicFileAttributeView.class);
-
-				final BasicFileAttributes fileAttributes = fileAttributesView.readAttributes();
-
 				final DeviceFile deviceFile = new DeviceFile();
 				deviceFile.path = path;
 				deviceFile.fileName = path.getFileName().toString();
-				deviceFile.size = fileAttributes.size();
-				deviceFile.modifiedTime = fileAttributes.lastModifiedTime().toMillis();
+
+//				try {
+//					final BasicFileAttributeView fileAttributesView = Files.getFileAttributeView(
+//							path,
+//							BasicFileAttributeView.class);
+//
+//					final BasicFileAttributes fileAttributes = fileAttributesView.readAttributes();
+//					deviceFile.size = fileAttributes.size();
+//					deviceFile.modifiedTime = fileAttributes.lastModifiedTime().toMillis();
+//
+//				} catch (final Exception e) {
+//					StatusUtil.log(e);
+//				}
 
 				deviceFileNames.add(deviceFile);
 			}

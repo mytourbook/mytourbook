@@ -3147,15 +3147,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				sb.append(deviceFile.fileName);
 				sb.append("</td>");
 
-				sb.append("<td>");
+				sb.append("<td style='right'>");
 				sb.append(deviceFile.size);
 				sb.append("</td>");
 
-				sb.append("<td>");
+				sb.append("<td style='right'>");
 				sb.append(_dateFormatter.format(deviceFile.modifiedTime));
 				sb.append("</td>");
 
-				sb.append("<td>");
+				sb.append("<td style='right'>");
 				sb.append(_timeFormatter.format(deviceFile.modifiedTime));
 				sb.append("</td>");
 

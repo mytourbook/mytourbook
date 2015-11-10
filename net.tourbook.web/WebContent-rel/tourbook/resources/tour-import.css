@@ -272,7 +272,7 @@ a.action-button:HOVER
 	xborder:					1px solid #dda; 
 }
     
-.deviceList td
+.deviceList td.right
 {
 	text-align:				right;
 	padding-right: 			8px;
