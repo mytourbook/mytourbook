@@ -17,6 +17,7 @@ package net.tourbook.importdata;
 
 import java.util.ArrayList;
 
+import net.tourbook.common.NIO;
 import net.tourbook.common.UI;
 import net.tourbook.ui.views.rawData.RawDataView;
 
@@ -44,4 +45,30 @@ public class ImportConfig {
 	 */
 	public ArrayList<DeviceFile>	notImportedFiles;
 
+	public String getBackupOSFolder() {
+
+		if (NIO.isDeviceNameFolder(backupFolder)) {
+
+			return NIO.convertToOSPath(backupFolder);
+
+		} else {
+
+			return backupFolder;
+		}
+	}
+
+	/**
+	 * @return Returns the device OS folder or <code>null</code> when not available.
+	 */
+	public String getDeviceOSFolder() {
+
+		if (NIO.isDeviceNameFolder(deviceFolder)) {
+
+			return NIO.convertToOSPath(deviceFolder);
+
+		} else {
+
+			return deviceFolder;
+		}
+	}
 }

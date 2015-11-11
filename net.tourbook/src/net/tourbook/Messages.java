@@ -719,6 +719,8 @@ public class Messages extends NLS {
 	public static String		Image__graph_tour_compare;
 	public static String		Image__graph_tour_compare_disabled;
 	public static String		Image__icon_placeholder;
+
+	public static String	Image__ImportantInfo;
 	public static String		Image__layout_flat;
 	public static String		Image__layout_hierarchical;
 	public static String		Image__link;
@@ -746,6 +748,12 @@ public class Messages extends NLS {
 	public static String		Image__PulseZones;
 	public static String		Image__PulseZones_Disabled;
 	public static String		Image__quick_edit;
+	public static String	Image__RawData_DeviceFolder;
+
+	public static String	Image__RawData_DeviceFolder_NotAvailable;
+
+	public static String	Image__RawData_DeviceFolder_NotDefined;
+
 	public static String		Image__RawData_Import;
 	public static String		Image__RawData_Transfer;
 	public static String		Image__RawData_TransferDirect;
@@ -861,10 +869,17 @@ public class Messages extends NLS {
 	public static String		Import_Data_Error_CreatingFileName_Title;
 
 	public static String		Import_Data_Error_DeviceFolderDoNotExist;
+
+	public static String	Import_Data_Error_FolderIsNotAvailable;
+
+	public static String	Import_Data_Error_NoDeviceFolder;
 	public static String		Import_Data_Label_AutomatedImport;
+
 	public static String		Import_Data_Label_GetTours;
 	public static String		Import_Data_Label_Hint;
 	public static String		Import_Data_Label_Info;
+
+	public static String	Import_Data_Label_NotImportedFiles;
 	public static String		Import_Data_Link_AutomatedImportConfig;
 	public static String		Import_Data_Link_ConfigName;
 	public static String		Import_Data_Link_Import;

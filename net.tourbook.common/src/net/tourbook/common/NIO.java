@@ -105,6 +105,11 @@ public class NIO {
 		return null;
 	}
 
+	/**
+	 * @param folderName
+	 * @return Returns <code>true</code> when the folder name starts with
+	 *         {@value #DEVICE_FOLDER_NAME_START}.
+	 */
 	public static boolean isDeviceNameFolder(final String folderName) {
 
 		if (folderName == null) {

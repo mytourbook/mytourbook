@@ -26,6 +26,8 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributeView;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -111,20 +113,20 @@ public class AutoImportManager {
 
 		final ArrayList<DeviceFile> notImportedFiles = new ArrayList<>();
 
-		final String validDeviceFolder = runImport_10_GetDeviceFolder();
+		final String validDeviceFolder = getImportFiles_10_GetDeviceFolder();
 
 		if (validDeviceFolder == null) {
 			return notImportedFiles;
 		}
 
-		final List<DeviceFile> deviceFileNames = runImport_12_GetDeviceFileNames(validDeviceFolder);
+		final List<DeviceFile> deviceFileNames = getImportFiles_12_GetDeviceFileNames(validDeviceFolder);
 
 		if (deviceFileNames.size() == 0) {
 			// there is nothing to be imported
 			return notImportedFiles;
 		}
 
-		final HashSet<String> dbFileNames = runImport_14_GetDbFileNames(deviceFileNames);
+		final HashSet<String> dbFileNames = getImportFiles_14_GetDbFileNames(deviceFileNames);
 
 		for (final DeviceFile deviceFileName : deviceFileNames) {
 
@@ -137,11 +139,146 @@ public class AutoImportManager {
 		Collections.sort(notImportedFiles, new Comparator<DeviceFile>() {
 			@Override
 			public int compare(final DeviceFile file1, final DeviceFile file2) {
-				return Long.compare(file1.modifiedTime, file2.modifiedTime);
+//				return Long.compare(file1.modifiedTime, file2.modifiedTime);
+				return file1.fileName.compareTo(file2.fileName);
 			}
 		});
 
 		return notImportedFiles;
+	}
+
+	/**
+	 * @return Returns the device OS path or <code>null</code> when this folder is not valid.
+	 */
+	private String getImportFiles_10_GetDeviceFolder() {
+
+		final ImportConfig importConfig = getAutoImportConfig();
+
+		final String deviceFolderRaw = importConfig.deviceFolder;
+		final String deviceFolder;
+
+		if (NIO.isDeviceNameFolder(deviceFolderRaw)) {
+
+			deviceFolder = NIO.convertToOSPath(deviceFolderRaw);
+
+		} else {
+
+			deviceFolder = deviceFolderRaw;
+		}
+
+		boolean isFolderValid = false;
+
+		try {
+
+			final Path devicePath = Paths.get(deviceFolder);
+
+			if (Files.exists(devicePath)) {
+				isFolderValid = true;
+			}
+
+		} catch (final Exception e) {}
+
+		if (isFolderValid == false) {
+			return null;
+		}
+
+		return deviceFolder;
+	}
+
+	private List<DeviceFile> getImportFiles_12_GetDeviceFileNames(final String validDeviceFolder) {
+
+		final List<DeviceFile> deviceFileNames = new ArrayList<>();
+
+		try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(Paths.get(validDeviceFolder))) {
+
+			for (final Path path : directoryStream) {
+
+				try {
+
+					final BasicFileAttributeView fileAttributesView = Files.getFileAttributeView(
+							path,
+							BasicFileAttributeView.class);
+
+					final BasicFileAttributes fileAttributes = fileAttributesView.readAttributes();
+
+					// ignore not regular files
+					if (fileAttributes.isRegularFile()) {
+
+						final DeviceFile deviceFile = new DeviceFile();
+
+						deviceFile.path = path;
+						deviceFile.fileName = path.getFileName().toString();
+						deviceFile.size = fileAttributes.size();
+						deviceFile.modifiedTime = fileAttributes.lastModifiedTime().toMillis();
+
+						deviceFileNames.add(deviceFile);
+					}
+
+				} catch (final Exception e) {
+//					StatusUtil.log(e);
+				}
+
+			}
+
+		} catch (final IOException ex) {
+			StatusUtil.log(ex);
+		}
+
+		return deviceFileNames;
+	}
+
+	private HashSet<String> getImportFiles_14_GetDbFileNames(final List<DeviceFile> deviceFileNames) {
+
+		final HashSet<String> dbFileNames = new HashSet<>();
+
+		/*
+		 * Create a IN list with all device file names which are searched in the db.
+		 */
+		final StringBuilder sb = new StringBuilder();
+
+		for (int fileIndex = 0; fileIndex < deviceFileNames.size(); fileIndex++) {
+
+			final DeviceFile deviceFile = deviceFileNames.get(fileIndex);
+			final String fileName = deviceFile.fileName;
+
+			if (fileIndex > 0) {
+				sb.append(',');
+			}
+
+			sb.append('\'');
+
+			// escape single quotes
+			sb.append(fileName.replace("\'", "\\\'")); //$NON-NLS-1$ //$NON-NLS-2$
+
+			sb.append('\'');
+		}
+
+		final String deviceFileNameINList = sb.toString();
+
+		try (Connection conn = TourDatabase.getInstance().getConnection(); //
+				Statement stmt = conn.createStatement()) {
+
+			final String sqlQuery = ""// 													//$NON-NLS-1$
+					+ "SELECT" //															//$NON-NLS-1$
+					+ " TourImportFileName" //												//$NON-NLS-1$
+					+ " FROM " + TourDatabase.TABLE_TOUR_DATA //							//$NON-NLS-1$
+					+ (" WHERE TourImportFileName IN (" + deviceFileNameINList + ")") //	//$NON-NLS-1$ //$NON-NLS-2$
+					+ " ORDER BY TourImportFileName"; //									//$NON-NLS-1$
+
+			final ResultSet result = stmt.executeQuery(sqlQuery);
+
+			while (result.next()) {
+
+				final String dbFileName = result.getString(1);
+
+				dbFileNames.add(dbFileName);
+			}
+
+		} catch (final SQLException e) {
+			SQL.showException(e);
+		}
+
+		return dbFileNames;
 	}
 
 	/**
@@ -154,7 +291,7 @@ public class AutoImportManager {
 	 */
 	public boolean getNotImportedFiles(final boolean isForceUpdate) {
 
-		final long start = System.nanoTime();
+//		final long start = System.nanoTime();
 
 		/*
 		 * Get hashcode vor all files stores
@@ -184,12 +321,12 @@ public class AutoImportManager {
 		 */
 		importConfig.notImportedFiles = getImportFiles();
 
-		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-				+ (String.format("%7.1f ms", (float) (System.nanoTime() - start) / 1000000))
-				+ ("\tnotImportedFiles: " + importConfig.notImportedFiles.size())
-				+ ("\tdeviceFolder: " + importConfig.deviceFolder)
-				+ ("\tbackupFolder: " + importConfig.backupFolder));
-		// TODO remove SYSTEM.OUT.PRINTLN
+//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//				+ (String.format("%7.1f ms", (float) (System.nanoTime() - start) / 1000000))
+//				+ ("\tnotImportedFiles: " + importConfig.notImportedFiles.size())
+//				+ ("\tdeviceFolder: " + importConfig.deviceFolder)
+//				+ ("\tbackupFolder: " + importConfig.backupFolder));
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		return true;
 	}
@@ -349,133 +486,6 @@ public class AutoImportManager {
 //		} catch (final Exception e) {
 //			StatusUtil.log(e);
 //		}
-	}
-
-	/**
-	 * @return Returns the device OS path or <code>null</code> when this folder is not valid.
-	 */
-	private String runImport_10_GetDeviceFolder() {
-
-		final ImportConfig importConfig = getAutoImportConfig();
-
-		final String deviceFolderRaw = importConfig.deviceFolder;
-		final String[] deviceFolder = { null };
-
-		if (NIO.isDeviceNameFolder(deviceFolderRaw)) {
-
-			deviceFolder[0] = NIO.convertToOSPath(deviceFolderRaw);
-
-		} else {
-
-			deviceFolder[0] = deviceFolderRaw;
-		}
-
-		boolean isFolderValid = false;
-
-		try {
-
-			final Path devicePath = Paths.get(deviceFolder[0]);
-
-			if (Files.exists(devicePath)) {
-				isFolderValid = true;
-			}
-
-		} catch (final Exception e) {}
-
-		if (isFolderValid == false) {
-			return null;
-		}
-
-		return deviceFolder[0];
-	}
-
-	private List<DeviceFile> runImport_12_GetDeviceFileNames(final String validDeviceFolder) {
-
-		final List<DeviceFile> deviceFileNames = new ArrayList<>();
-
-		try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(Paths.get(validDeviceFolder))) {
-
-			for (final Path path : directoryStream) {
-
-				final DeviceFile deviceFile = new DeviceFile();
-				deviceFile.path = path;
-				deviceFile.fileName = path.getFileName().toString();
-
-//				try {
-//					final BasicFileAttributeView fileAttributesView = Files.getFileAttributeView(
-//							path,
-//							BasicFileAttributeView.class);
-//
-//					final BasicFileAttributes fileAttributes = fileAttributesView.readAttributes();
-//					deviceFile.size = fileAttributes.size();
-//					deviceFile.modifiedTime = fileAttributes.lastModifiedTime().toMillis();
-//
-//				} catch (final Exception e) {
-//					StatusUtil.log(e);
-//				}
-
-				deviceFileNames.add(deviceFile);
-			}
-
-		} catch (final IOException ex) {
-			StatusUtil.log(ex);
-		}
-
-		return deviceFileNames;
-	}
-
-	private HashSet<String> runImport_14_GetDbFileNames(final List<DeviceFile> deviceFileNames) {
-
-		final HashSet<String> dbFileNames = new HashSet<>();
-
-		/*
-		 * Create a IN list with all device file names which are searched in the db.
-		 */
-		final StringBuilder sb = new StringBuilder();
-
-		for (int fileIndex = 0; fileIndex < deviceFileNames.size(); fileIndex++) {
-
-			final DeviceFile deviceFile = deviceFileNames.get(fileIndex);
-			final String fileName = deviceFile.fileName;
-
-			if (fileIndex > 0) {
-				sb.append(',');
-			}
-
-			sb.append('\'');
-
-			// escape single quotes
-			sb.append(fileName.replace("\'", "\\\'")); //$NON-NLS-1$ //$NON-NLS-2$
-
-			sb.append('\'');
-		}
-
-		final String deviceFileNameINList = sb.toString();
-
-		try (Connection conn = TourDatabase.getInstance().getConnection(); //
-				Statement stmt = conn.createStatement()) {
-
-			final String sqlQuery = ""// 													//$NON-NLS-1$
-					+ "SELECT" //															//$NON-NLS-1$
-					+ " TourImportFileName" //												//$NON-NLS-1$
-					+ " FROM " + TourDatabase.TABLE_TOUR_DATA //							//$NON-NLS-1$
-					+ (" WHERE TourImportFileName IN (" + deviceFileNameINList + ")") //	//$NON-NLS-1$ //$NON-NLS-2$
-					+ " ORDER BY TourImportFileName"; //									//$NON-NLS-1$
-
-			final ResultSet result = stmt.executeQuery(sqlQuery);
-
-			while (result.next()) {
-
-				final String dbFileName = result.getString(1);
-
-				dbFileNames.add(dbFileName);
-			}
-
-		} catch (final SQLException e) {
-			SQL.showException(e);
-		}
-
-		return dbFileNames;
 	}
 
 	private void runImport_50_Backup(final ImportConfig importConfig) {

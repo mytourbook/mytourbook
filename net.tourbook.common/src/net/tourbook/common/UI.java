@@ -132,6 +132,7 @@ public class UI {
 	public static final String				SYMBOL_SUN								= "\u263C";																//$NON-NLS-1$
 	public static final String				SYMBOL_TAU								= "\u03c4";																//$NON-NLS-1$
 
+	public static final CharSequence		SYMBOL_BACKSLASH						= "\\";																	//$NON-NLS-1$
 	public static final String				SYMBOL_COLON							= ":";																		//$NON-NLS-1$
 	public static final String				SYMBOL_DOT								= ".";																		//$NON-NLS-1$
 	public static final String				SYMBOL_EQUAL							= "=";																		//$NON-NLS-1$
@@ -143,6 +144,8 @@ public class UI {
 	public static final String				SYMBOL_STAR								= "*";																		//$NON-NLS-1$
 	public static final String				SYMBOL_UNDERSCORE						= "_";																		//$NON-NLS-1$
 	public static final String				SYMBOL_WIND_WITH_SPACE					= "W ";																	//$NON-NLS-1$
+
+	public static final CharSequence		SYMBOL_HTML_BACKSLASH					= "&#92;";																	//$NON-NLS-1$
 
 	public static final String				LINK_TAG_END							= "</a>";																	//$NON-NLS-1$
 	public static final String				LINK_TAG_START							= "<a>";																	//$NON-NLS-1$
