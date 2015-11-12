@@ -138,6 +138,10 @@ public class Messages extends NLS {
 	public static String		Dialog_ImportConfig_Info_ConfigDragDrop;
 	public static String		Dialog_ImportConfig_Info_NoDeviceName;
 	public static String		Dialog_ImportConfig_Info_RetrievingVolumeInfo;
+	public static String	Dialog_ImportConfig_Label_AnimationCrazyFactor;
+
+	public static String	Dialog_ImportConfig_Label_AnimationCrazyFactor_Tooltip;
+
 	public static String	Dialog_ImportConfig_Label_AnimationDuration;
 
 	public static String	Dialog_ImportConfig_Label_AnimationDuration_Tooltip;

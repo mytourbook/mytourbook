@@ -23,6 +23,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 
 import net.tourbook.Messages;
@@ -54,6 +55,9 @@ class HistoryItems {
 
 	/** Contains paths with the device name and not the drive letter (only for Windows). */
 	private LinkedHashSet<String>	_deviceNameItems		= new LinkedHashSet<>();
+
+	/** Toggle history sorting. */
+	private boolean					_isSortHistoryReversed;
 
 	/*
 	 * UI controls
@@ -119,7 +123,6 @@ class HistoryItems {
 	}
 
 	private void fillControls(final String newFolder, final String newDeviceNameFolder, final String selectedFolder) {
-
 
 		// prevent to remove the combo text field
 		_combo.removeAll();
@@ -367,6 +370,38 @@ class HistoryItems {
 		_comboError.setImage(image);
 		_comboError.setDescriptionText(Messages.Dialog_ImportConfig_Error_FolderIsInvalid);
 
+	}
+
+	void sortHistory() {
+
+		// toggle sorting
+		_isSortHistoryReversed = !_isSortHistoryReversed;
+
+		/*
+		 * Sort folder items
+		 */
+		final ArrayList<String> folderItems = new ArrayList<String>(_folderItems);
+		Collections.sort(folderItems);
+		if (_isSortHistoryReversed) {
+			Collections.reverse(folderItems);
+		}
+		_folderItems.clear();
+		_folderItems.addAll(folderItems);
+
+		/*
+		 * Sort named folder items
+		 */
+		final ArrayList<String> namedFolderItems = new ArrayList<String>(_deviceNameItems);
+		Collections.sort(namedFolderItems);
+		if (_isSortHistoryReversed) {
+			Collections.reverse(namedFolderItems);
+		}
+		_deviceNameItems.clear();
+		_deviceNameItems.addAll(namedFolderItems);
+
+		// update UI
+		final String selectedFolderRaw = _combo.getText();
+		fillControls(null, null, selectedFolderRaw);
 	}
 
 	/**

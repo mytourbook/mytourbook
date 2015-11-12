@@ -15,17 +15,19 @@
  *******************************************************************************/
 package net.tourbook.ui.views.rawData;
 
+import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
+import java.nio.file.ClosedWatchServiceException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardWatchEventKinds;
-import java.nio.file.WatchEvent;
-import java.nio.file.WatchEvent.Kind;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.text.DateFormat;
@@ -265,7 +267,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	protected TourPerson					_activePerson;
 	protected TourPerson					_newActivePerson;
 	//
-	private boolean							_isAnimationRun;
+	private boolean							_isRunAnimation								= true;
 	private boolean							_isInUIStartup								= true;
 	protected boolean						_isPartVisible								= false;
 	protected boolean						_isViewerPersonDataDirty					= false;
@@ -301,10 +303,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private TourDoubleClickState			_tourDoubleClickState						= new TourDoubleClickState();
 	//
 	private Thread							_devicePollingThread;
+	private Thread							_watchFolderThread;
+	private WatchService					_watcher;
+	private WatchKey						_watchKey;
+	private boolean							_isCancelWatchFolder;
 	private AtomicBoolean					_canPollImportFiles							= new AtomicBoolean();
 	private AtomicBoolean					_browserTask_DeviceState					= new AtomicBoolean();
-	private WatchKey						_watchKey;
-	private String							_watchKeyFolder;
 	//
 	private HashMap<Long, Image>			_configImages								= new HashMap<>();
 	private HashMap<Long, Integer>			_configImageHash							= new HashMap<>();
@@ -518,7 +522,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			updateUI_DeviceState();
 
-			registerWatchService();
+			watchDeviceFolder();
 		}
 
 		updateUI_Dashboard();
@@ -568,8 +572,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 					_isPartVisible = true;
 					if (_isViewerPersonDataDirty || (_newActivePerson != _activePerson)) {
 
-						// run animation after recreation
-						_isAnimationRun = false;
+//						// run animation after recreation
+//						_isAnimationRun = false;
 
 						reloadViewer();
 						updateViewerPersonData();
@@ -746,6 +750,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		final int itemSize = importConfig.tileSize;
 		final int opacity = importConfig.backgroundOpacity;
 		final int animationDuration = importConfig.animationDuration;
+		final int crazyFactor = importConfig.animationCrazyFactor;
 
 		String bgImage = UI.EMPTY_STRING;
 		if (opacity > 0) {
@@ -776,10 +781,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 
 		String animation = UI.EMPTY_STRING;
-		if (_isAnimationRun == false && animationDuration > 0 && UI.IS_WIN) {
+		if (_isRunAnimation && animationDuration > 0 && UI.IS_WIN) {
 
-			// do unimation only once
-			_isAnimationRun = true;
+			// run unimation only once
+			_isRunAnimation = false;
+
+			final double rotateX = Math.random() * 20 * crazyFactor;
+			final double rotateY = Math.random() * 20 * crazyFactor;
 
 			animation = ""// //$NON-NLS-1$
 
@@ -797,7 +805,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 					+ ("	{																\n") //$NON-NLS-1$
 					+ ("		opacity:				0.0;								\n") //$NON-NLS-1$
 					+ ("		background-color:		ButtonFace;							\n") //$NON-NLS-1$
-					+ ("		transform:				rotateX(50deg) rotateY(-60deg);	\n") //$NON-NLS-1$
+					+ ("		transform:				rotateX(" + (int) rotateX + "deg) rotateY(" + (int) rotateY + "deg);	\n") //$NON-NLS-1$
 					+ ("		xtransform-origin: 		50% 200%;							\n") //$NON-NLS-1$
 					+ ("	}																\n") //$NON-NLS-1$
 //		transform:				rotateX(-80deg) rotateY(-80deg);
@@ -921,11 +929,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				+ ("		<td>\n") //$NON-NLS-1$
 				+ ("			<div id='" + DOM_ID_DEVICE_STATE + "' style='padding-left:20px;'>" + createHTML_DeviceState() + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				+ ("		</td>\n") //$NON-NLS-1$
-
-//				// Action: Import config
-//				+ ("		<td>\n") //$NON-NLS-1$
-//				+ ("			<div style='padding-left:10px;'>" + htmlActionImportConfig + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$
-//				+ ("		</td>\n") //$NON-NLS-1$
 
 				+ "	</tr></tbody></table>\n" // //$NON-NLS-1$
 				+ "</div>\n"; //$NON-NLS-1$
@@ -2132,7 +2135,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	@Override
 	public void dispose() {
 
-		registerWatchService_Deregister();
+		watchDeviceFolder_Cancel();
 
 		_devicePollingThread.interrupt();
 		AutoImportManager.getInstance().reset();
@@ -2927,90 +2930,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		return _tourViewer;
 	}
 
-	private void registerWatchService() {
-
-		try {
-
-			// check new folder
-			final String deviceFolder = getImportConfig().getDeviceOSFolder();
-			if (deviceFolder == null) {
-				return;
-			}
-
-			// check file
-			final Path watchFolder = Paths.get(deviceFolder);
-			if (!Files.exists(watchFolder)) {
-				return;
-			}
-
-			// check if the same folder
-			if (_watchKey != null && _watchKeyFolder.equalsIgnoreCase(deviceFolder)) {
-				// this folder is already watched
-				return;
-			}
-
-			// deregister old folder
-			if (_watchKey != null) {
-				registerWatchService_Deregister();
-			}
-
-			/*
-			 * Watch new folder
-			 */
-			final WatchService watchService = FileSystems.getDefault().newWatchService();
-
-			_watchKey = watchFolder.register(watchService, //
-					StandardWatchEventKinds.ENTRY_CREATE,
-					StandardWatchEventKinds.ENTRY_DELETE);
-			_watchKeyFolder = deviceFolder;
-
-			boolean valid = true;
-
-			do {
-
-				final WatchKey watchKey = watchService.take();
-
-				for (final WatchEvent<?> event : watchKey.pollEvents()) {
-
-					final Kind<?> kind = event.kind();
-
-					if (StandardWatchEventKinds.ENTRY_CREATE.equals(kind)
-							|| StandardWatchEventKinds.ENTRY_DELETE.equals(kind)) {
-
-						final String fileName = event.context().toString();
-
-						System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-								+ ("\tregisterWatchService: File created/deleted: " + fileName));
-						// TODO remove SYSTEM.OUT.PRINTLN
-
-						updateUI_DeviceState();
-					}
-				}
-
-				valid = watchKey.reset();
-			}
-			while (valid);
-
-		} catch (final IOException e) {
-			StatusUtil.log(e);
-		} catch (final InterruptedException e) {
-			StatusUtil.log(e);
-		}
-
-	}
-
-	private void registerWatchService_Deregister() {
-
-		if (_watchKey == null) {
-			return;
-		}
-
-		_watchKey.cancel();
-
-		_watchKey = null;
-		_watchKeyFolder = null;
-	}
-
 	/**
 	 * Update {@link TourData} from the database for all imported tours, displays a progress dialog.
 	 * 
@@ -3344,11 +3263,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		final ImportConfig modifiedConfig = dialog.getModifiedConfig();
 		final ImportConfig importConfig = getImportConfig();
 
-		if (importConfig.animationDuration != modifiedConfig.animationDuration) {
+		if (importConfig.animationDuration != modifiedConfig.animationDuration
+				|| importConfig.animationCrazyFactor != modifiedConfig.animationCrazyFactor) {
 
 			// run animation only when it was modified
-			_isAnimationRun = false;
+			_isRunAnimation = true;
 		}
+		importConfig.animationCrazyFactor = modifiedConfig.animationCrazyFactor;
 		importConfig.animationDuration = modifiedConfig.animationDuration;
 
 		importConfig.backgroundOpacity = modifiedConfig.backgroundOpacity;
@@ -3412,7 +3333,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private void updateUI_DeviceState_Task() {
 
-		final String jsHTML = createHTML_DeviceState().replace("\"", "\\\""); //$NON-NLS-1$ //$NON-NLS-2$
+		final String deviceState = createHTML_DeviceState();
+		final String jsHTML = deviceState.replace("\"", "\\\""); //$NON-NLS-1$ //$NON-NLS-2$
 
 		final String js = "\n" //$NON-NLS-1$
 				+ ("var htmlDeviceState =\"" + jsHTML + "\";\n") //$NON-NLS-1$ //$NON-NLS-2$
@@ -3466,7 +3388,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 						_canPollImportFiles.set(true);
 
-						registerWatchService();
+						watchDeviceFolder();
 
 					} else {
 
@@ -3474,7 +3396,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 						_canPollImportFiles.set(false);
 
-						registerWatchService_Deregister();
+						watchDeviceFolder_Cancel();
 					}
 				}
 			});
@@ -3495,5 +3417,122 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_rawDataMgr.updateTourData_InImportView_FromDb(null);
 
 		_tourViewer.refresh();
+	}
+
+	private void watchDeviceFolder() {
+
+		// cancel previous watcher
+		watchDeviceFolder_Cancel();
+
+		try {
+
+			// check new folder
+			final String deviceFolder = getImportConfig().getDeviceOSFolder();
+			if (deviceFolder == null) {
+				return;
+			}
+
+			// check file
+			final Path watchFolder = Paths.get(deviceFolder);
+			if (!Files.exists(watchFolder)) {
+				return;
+			}
+
+			final Runnable runnable = new Runnable() {
+				@Override
+				public void run() {
+
+					try {
+
+						_watcher = FileSystems.getDefault().newWatchService();
+
+						watchFolder.register(_watcher, ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE);
+
+						// wait for the next event
+						_watchKey = _watcher.take();
+
+						while (_watchKey != null) {
+
+							if (_isCancelWatchFolder) {
+								break;
+							}
+
+							// get polled events
+//							for (final WatchEvent<?> event : _watchKey.pollEvents()) {
+//
+//								final WatchEvent.Kind<?> kind = event.kind();
+//								System.out.printf("Received %s WatchEvent on %s\n", kind, event.context());
+//							}
+
+							AutoImportManager.getInstance().getNotImportedFiles(true);
+							updateUI_DeviceState();
+
+							if (_watchKey.reset()) {
+
+								// wait for the next event
+								_watchKey = _watcher.take();
+
+							} else {
+
+								break;
+							}
+						}
+
+					} catch (final InterruptedException e) {
+						//
+					} catch (final ClosedWatchServiceException e) {
+						//
+					} catch (final Exception e) {
+						StatusUtil.log(e);
+					} finally {
+
+						if (_watchKey != null) {
+							_watchKey.cancel();
+						}
+
+						if (_watcher != null) {
+							try {
+								_watcher.close();
+							} catch (final IOException e) {
+								StatusUtil.log(e);
+							}
+						}
+					}
+				}
+			};
+
+			_watchFolderThread = new Thread(runnable, "WatchingDeviceFolder: " + deviceFolder);
+			_watchFolderThread.setDaemon(true);
+			_watchFolderThread.start();
+
+		} catch (final Exception e) {
+			StatusUtil.log(e);
+		}
+	}
+
+	private void watchDeviceFolder_Cancel() {
+
+		if (_watchFolderThread != null) {
+
+			try {
+
+				if (_watchKey != null) {
+					_watchKey.cancel();
+				}
+
+				if (_watcher != null) {
+					try {
+						_watcher.close();
+					} catch (final IOException e) {
+						StatusUtil.log(e);
+					}
+				}
+
+				_watchFolderThread.join();
+
+			} catch (final Exception e) {
+				StatusUtil.log(e);
+			}
+		}
 	}
 }

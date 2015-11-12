@@ -63,6 +63,7 @@ public class AutoImportManager {
 	private static final String			TAG_IMPORT_CONFIG_ROOT				= "AutomatedImportConfig";						//$NON-NLS-1$
 	private static final String			TAG_SPEED_VERTEX					= "Speed";										//$NON-NLS-1$
 	//
+	private static final String			ATTR_ANIMATION_CRAZY_FACTOR			= "animationCrazyFactor";						//$NON-NLS-1$
 	private static final String			ATTR_ANIMATION_DURATION				= "animationDuration";							//$NON-NLS-1$
 	private static final String			ATTR_AVG_SPEED						= "avgSpeed";									//$NON-NLS-1$
 	private static final String			ATTR_BACKGROUND_OPACITY				= "backgroundOpacity";							//$NON-NLS-1$
@@ -357,6 +358,7 @@ public class AutoImportManager {
 
 		importConfig.isLiveUpdate = Util.getXmlBoolean(xmlMemento, ATTR_IS_LIVE_UPDATE, true);
 
+		importConfig.animationCrazyFactor = Util.getXmlInteger(xmlMemento, ATTR_ANIMATION_CRAZY_FACTOR, 3, -100, 100);
 		importConfig.animationDuration = Util.getXmlInteger(xmlMemento, ATTR_ANIMATION_DURATION, 40, 0, 100);
 		importConfig.backgroundOpacity = Util.getXmlInteger(xmlMemento, ATTR_BACKGROUND_OPACITY, 5, 0, 100);
 
@@ -533,6 +535,7 @@ public class AutoImportManager {
 
 		xmlMemento.putBoolean(ATTR_IS_LIVE_UPDATE, importConfig.isLiveUpdate);
 
+		xmlMemento.putInteger(ATTR_ANIMATION_CRAZY_FACTOR, importConfig.animationCrazyFactor);
 		xmlMemento.putInteger(ATTR_ANIMATION_DURATION, importConfig.animationDuration);
 		xmlMemento.putInteger(ATTR_BACKGROUND_OPACITY, importConfig.backgroundOpacity);
 		xmlMemento.putInteger(ATTR_NUM_UI_COLUMNS, importConfig.numHorizontalTiles);

@@ -228,6 +228,7 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 	private Link[]						_linkVertex_TourType;
 	private Link						_linkOneTourType;
 
+	private Spinner						_spinnerAnimationCrazyFactor;
 	private Spinner						_spinnerAnimationDuration;
 	private Spinner						_spinnerBgOpacity;
 	private Spinner						_spinnerNumHTiles;
@@ -764,14 +765,16 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 				.indent(0, 10)
 				.applyTo(group);
 		GridLayoutFactory.swtDefaults()//
-				.numColumns(2)
+				.numColumns(3)
 				.spacing(30, 5)
 				.applyTo(group);
 //		group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
 
-			createUI_90_Dashboard_Left(group);
-			createUI_92_Dashboard_Right(group);
+			createUI_90_Dashboard_1(group);
+			createUI_92_Dashboard_2(group);
+			createUI_92_Dashboard_3(group);
+
 			createUI_99_Dashboard_LiveUpdate(group);
 		}
 	}
@@ -1442,7 +1445,7 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 		return vertexContainer;
 	}
 
-	private void createUI_90_Dashboard_Left(final Group parent) {
+	private void createUI_90_Dashboard_1(final Group parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
@@ -1489,7 +1492,63 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 		}
 	}
 
-	private void createUI_92_Dashboard_Right(final Group parent) {
+	private void createUI_92_Dashboard_2(final Group parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+//				.grab(true, false)
+				.applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+		{
+			{
+				/*
+				 * Animation duration
+				 */
+				// label
+				Label label = new Label(container, SWT.NONE);
+				label.setText(Messages.Dialog_ImportConfig_Label_AnimationDuration);
+				label.setToolTipText(Messages.Dialog_ImportConfig_Label_AnimationDuration_Tooltip);
+				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+
+				// spinner
+				_spinnerAnimationDuration = new Spinner(container, SWT.BORDER);
+				_spinnerAnimationDuration.setMinimum(0);
+				_spinnerAnimationDuration.setMaximum(100);
+				_spinnerAnimationDuration.setDigits(1);
+				_spinnerAnimationDuration.addSelectionListener(_liveUpdateListener);
+				_spinnerAnimationDuration.addMouseWheelListener(_liveUpdateMouseWheelListener);
+				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_spinnerAnimationDuration);
+
+				// label
+				label = new Label(container, SWT.NONE);
+				label.setText(Messages.App_Unit_Seconds_Small);
+			}
+			{
+				/*
+				 * Animation crazy factor
+				 */
+				// label
+				final Label label = new Label(container, SWT.NONE);
+				label.setText(Messages.Dialog_ImportConfig_Label_AnimationCrazyFactor);
+				label.setToolTipText(Messages.Dialog_ImportConfig_Label_AnimationCrazyFactor_Tooltip);
+				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+
+				// spinner
+				_spinnerAnimationCrazyFactor = new Spinner(container, SWT.BORDER);
+				_spinnerAnimationCrazyFactor.setMinimum(-100);
+				_spinnerAnimationCrazyFactor.setMaximum(100);
+				_spinnerAnimationCrazyFactor.addSelectionListener(_liveUpdateListener);
+				_spinnerAnimationCrazyFactor.addMouseWheelListener(_liveUpdateMouseWheelListener);
+				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_spinnerAnimationCrazyFactor);
+
+				// fill column
+				new Label(container, SWT.NONE);
+			}
+		}
+	}
+
+	private void createUI_92_Dashboard_3(final Group parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
@@ -1515,33 +1574,6 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 				_spinnerBgOpacity.addSelectionListener(_liveUpdateListener);
 				_spinnerBgOpacity.addMouseWheelListener(_liveUpdateMouseWheelListener);
 			}
-			{
-				/*
-				 * Animation duration
-				 */
-				// label
-				Label label = new Label(container, SWT.NONE);
-				label.setText(Messages.Dialog_ImportConfig_Label_AnimationDuration);
-				label.setToolTipText(Messages.Dialog_ImportConfig_Label_AnimationDuration_Tooltip);
-				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
-
-				final Composite animationContainer = new Composite(container, SWT.NONE);
-				GridLayoutFactory.fillDefaults().numColumns(2).applyTo(animationContainer);
-				{
-					// spinner
-					_spinnerAnimationDuration = new Spinner(animationContainer, SWT.BORDER);
-					_spinnerAnimationDuration.setMinimum(0);
-					_spinnerAnimationDuration.setMaximum(100);
-					_spinnerAnimationDuration.setDigits(1);
-					_spinnerAnimationDuration.addSelectionListener(_liveUpdateListener);
-					_spinnerAnimationDuration.addMouseWheelListener(_liveUpdateMouseWheelListener);
-					GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_spinnerAnimationDuration);
-
-					// label
-					label = new Label(animationContainer, SWT.NONE);
-					label.setText(Messages.App_Unit_Seconds_Small);
-				}
-			}
 		}
 	}
 
@@ -1562,7 +1594,7 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 		GridDataFactory.fillDefaults()//
 				.grab(true, false)
 				.align(SWT.END, SWT.FILL)
-				.span(2, 1)
+				.span(3, 1)
 				.applyTo(_chkLiveUpdate);
 	}
 
@@ -1992,9 +2024,10 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 
 	private void onFolder_KeyPressed(final KeyEvent event) {
 
+		final int keyCode = event.keyCode;
 		final boolean isCtrlKey = (event.stateMask & SWT.MOD1) > 0;
 
-		if (isCtrlKey && event.keyCode == SWT.DEL) {
+		if (isCtrlKey && keyCode == SWT.DEL) {
 
 			// delete this item from the history
 
@@ -2002,6 +2035,15 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 			final HistoryItems historyItems = (HistoryItems) combo.getData();
 
 			historyItems.removeFromHistory(combo.getText());
+
+		} else if (isCtrlKey && (keyCode == 's' || keyCode == 'S')) {
+
+			// sort history by folder name
+
+			final Combo combo = (Combo) event.widget;
+			final HistoryItems historyItems = (HistoryItems) combo.getData();
+
+			historyItems.sortHistory();
 		}
 	}
 
@@ -2395,6 +2437,7 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 
 		_chkLiveUpdate.setSelection(_dialogConfig.isLiveUpdate);
 
+		_spinnerAnimationCrazyFactor.setSelection(_dialogConfig.animationCrazyFactor);
 		_spinnerAnimationDuration.setSelection(_dialogConfig.animationDuration);
 		_spinnerBgOpacity.setSelection(_dialogConfig.backgroundOpacity);
 		_spinnerNumHTiles.setSelection(_dialogConfig.numHorizontalTiles);
@@ -2477,6 +2520,7 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 
 		_dialogConfig.isLiveUpdate = importConfig.isLiveUpdate;
 
+		_dialogConfig.animationCrazyFactor = importConfig.animationCrazyFactor;
 		_dialogConfig.animationDuration = importConfig.animationDuration;
 		_dialogConfig.backgroundOpacity = importConfig.backgroundOpacity;
 		_dialogConfig.numHorizontalTiles = importConfig.numHorizontalTiles;
@@ -2496,6 +2540,7 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 
 		_dialogConfig.isLiveUpdate = _chkLiveUpdate.getSelection();
 
+		_dialogConfig.animationCrazyFactor = _spinnerAnimationCrazyFactor.getSelection();
 		_dialogConfig.animationDuration = _spinnerAnimationDuration.getSelection();
 		_dialogConfig.backgroundOpacity = _spinnerBgOpacity.getSelection();
 		_dialogConfig.numHorizontalTiles = _spinnerNumHTiles.getSelection();

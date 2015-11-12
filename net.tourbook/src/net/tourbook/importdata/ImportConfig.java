@@ -23,21 +23,22 @@ import net.tourbook.ui.views.rawData.RawDataView;
 
 public class ImportConfig {
 
-	public boolean					isLiveUpdate		= true;
+	public boolean					isLiveUpdate			= true;
 
-	public String					backupFolder		= UI.EMPTY_STRING;
-	public String					deviceFolder		= UI.EMPTY_STRING;
+	public String					backupFolder			= UI.EMPTY_STRING;
+	public String					deviceFolder			= UI.EMPTY_STRING;
 
-	public int						numHorizontalTiles	= RawDataView.NUM_HORIZONTAL_TILES_DEFAULT;
-	public int						tileSize			= RawDataView.TILE_SIZE_DEFAULT;
+	public int						numHorizontalTiles		= RawDataView.NUM_HORIZONTAL_TILES_DEFAULT;
+	public int						tileSize				= RawDataView.TILE_SIZE_DEFAULT;
 
 	/** Background opacity in %. */
-	public int						backgroundOpacity	= 5;
+	public int						backgroundOpacity		= 5;
 
 	/** Duration in seconds/10 */
-	public int						animationDuration	= 40;
+	public int						animationDuration		= 40;
+	public int						animationCrazyFactor	= 3;
 
-	public ArrayList<TourTypeItem>	tourTypeItems		= new ArrayList<>();
+	public ArrayList<TourTypeItem>	tourTypeItems			= new ArrayList<>();
 
 	/**
 	 * Contains files which are available in the device folder but they are not available in the
