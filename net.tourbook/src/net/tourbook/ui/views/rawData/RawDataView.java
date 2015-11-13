@@ -64,6 +64,7 @@ import net.tourbook.data.TourWayPoint;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.importdata.AutoImportManager;
+import net.tourbook.importdata.AutoImportState;
 import net.tourbook.importdata.DeviceFile;
 import net.tourbook.importdata.DialogImportConfig;
 import net.tourbook.importdata.ImportConfig;
@@ -307,6 +308,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private Thread							_watchFolderThread;
 	private WatchService					_watcher;
 	private WatchKey						_watchKey;
+	private boolean							_isStopPollingThread;
 	private boolean							_isCancelWatchFolder;
 	private AtomicBoolean					_canPollImportFiles							= new AtomicBoolean();
 	private AtomicBoolean					_browserTask_DeviceState					= new AtomicBoolean();
@@ -519,10 +521,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			updateModel_ImportConfig_LiveUpdate(dialog, false);
 			updateModel_ImportConfig(dialog);
 
-			AutoImportManager.getInstance().getNotImportedFiles(true);
+			AutoImportManager.getInstance().checkImportedFiles(true);
 			updateUI_DeviceState();
 
-			watchDeviceFolder();
+			setupThread_WatchDeviceFolder();
 		}
 
 		updateUI_Dashboard();
@@ -707,6 +709,46 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			}
 		};
 		TourManager.getInstance().addTourEventListener(_tourEventListener);
+	}
+
+	/**
+	 * Thread is not interrupted it could cause SQL exceptions.
+	 */
+	private void cancelThread_PollingStores() {
+
+		_isStopPollingThread = true;
+	}
+
+	/**
+	 * Thread is not interrupted it could cause SQL exceptions.
+	 */
+	private void cancelThread_WatchDeviceFolder() {
+
+		if (_watchFolderThread != null) {
+
+			try {
+
+				if (_watchKey != null) {
+					_watchKey.cancel();
+					_watchKey = null;
+				}
+
+				if (_watcher != null) {
+					try {
+						_watcher.close();
+					} catch (final IOException e) {
+						StatusUtil.log(e);
+					} finally {
+						_watcher = null;
+					}
+				}
+
+			} catch (final Exception e) {
+				StatusUtil.log(e);
+			} finally {
+				_watchFolderThread = null;
+			}
+		}
 	}
 
 	private void createActions() {
@@ -1151,7 +1193,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			sb.append("<div class='folder-container'>"); //$NON-NLS-1$
 			sb.append("<span class='folder-name'>" + deviceFolder + "</span>"); //$NON-NLS-1$ //$NON-NLS-2$
-			sb.append(Messages.Import_Data_Label_NotImportedFiles);
+			sb.append(NLS.bind(Messages.Import_Data_Label_NotImportedFiles, //
+					numNotImported,
+					importConfig.numDeviceFiles));
 			sb.append("</div>"); //$NON-NLS-1$
 
 			if (numNotImported > 0) {
@@ -2141,9 +2185,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	@Override
 	public void dispose() {
 
-		watchDeviceFolder_Cancel();
-
-		_devicePollingThread.interrupt();
+		cancelThread_WatchDeviceFolder();
+		cancelThread_PollingStores();
 		AutoImportManager.getInstance().reset();
 
 		Util.disposeResource(_imageDatabase);
@@ -2710,41 +2753,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		createResources_Image();
 		createResources_Web();
 
-		initUI_Dashboard();
-	}
-
-	private void initUI_Dashboard() {
-
-		_devicePollingThread = new Thread("WatchingStores") { //$NON-NLS-1$
-			@Override
-			public void run() {
-
-				while (!isInterrupted()) {
-
-					try {
-
-						Thread.sleep(1000);
-
-						if (_canPollImportFiles.get()) {
-
-							final boolean isRetrieved = AutoImportManager.getInstance().getNotImportedFiles(false);
-
-							if (isRetrieved) {
-								updateUI_DeviceState();
-							}
-						}
-
-					} catch (final InterruptedException e) {
-						interrupt();
-					} catch (final Exception e) {
-						StatusUtil.log(e);
-					}
-				}
-			}
-		};
-
-		_devicePollingThread.setDaemon(true);
-		_devicePollingThread.start();
+		setupThread_PollingStores();
 	}
 
 	/**
@@ -3245,6 +3254,153 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 	}
 
+	private void setupThread_PollingStores() {
+
+		_devicePollingThread = new Thread("WatchingStores") { //$NON-NLS-1$
+			@Override
+			public void run() {
+
+				while (!isInterrupted()) {
+
+					try {
+
+						Thread.sleep(1000);
+
+						if (_isStopPollingThread) {
+							break;
+						}
+
+						if (_canPollImportFiles.get()) {
+
+							final AutoImportState importState = AutoImportManager.getInstance().checkImportedFiles(
+									false);
+
+							if (importState.areTheSameStores == false) {
+
+								// stores has changed, update the folder watcher
+
+								setupThread_WatchDeviceFolder();
+							}
+
+							if (importState.areFilesRetrieved) {
+
+								// import files have been retrieved, update the UI
+
+								updateUI_DeviceState();
+							}
+						}
+
+					} catch (final InterruptedException e) {
+						interrupt();
+					} catch (final Exception e) {
+						StatusUtil.log(e);
+					}
+				}
+			}
+		};
+
+		_devicePollingThread.setDaemon(true);
+		_devicePollingThread.start();
+	}
+
+	private void setupThread_WatchDeviceFolder() {
+
+		// cancel previous watcher
+		cancelThread_WatchDeviceFolder();
+
+		try {
+
+			// check new folder
+			final String deviceFolder = getImportConfig().getDeviceOSFolder();
+			if (deviceFolder == null) {
+				return;
+			}
+
+			// check file
+			final Path watchFolder = Paths.get(deviceFolder);
+			if (!Files.exists(watchFolder)) {
+				return;
+			}
+
+			final Runnable runnable = new Runnable() {
+				@Override
+				public void run() {
+
+					try {
+
+						System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+								+ ("\twatchDeviceFolder: " + deviceFolder));
+						// TODO remove SYSTEM.OUT.PRINTLN
+
+						_watcher = FileSystems.getDefault().newWatchService();
+
+						watchFolder.register(_watcher, ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE);
+
+						// wait for the next event
+						_watchKey = _watcher.take();
+
+						while (_watchKey != null) {
+
+							if (_isCancelWatchFolder) {
+								break;
+							}
+
+							// get polled events, they are not used, it's just for logging
+							for (final WatchEvent<?> event : _watchKey.pollEvents()) {
+
+								final WatchEvent.Kind<?> kind = event.kind();
+
+								System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+										+ (String.format("Event: %s\tFile: %s", kind, event.context())));
+								// TODO remove SYSTEM.OUT.PRINTLN
+							}
+
+							AutoImportManager.getInstance().checkImportedFiles(true);
+							updateUI_DeviceState();
+
+							if (_watchKey.reset()) {
+
+								// wait for the next event
+								_watchKey = _watcher.take();
+
+							} else {
+
+								break;
+							}
+						}
+
+					} catch (final InterruptedException e) {
+						//
+					} catch (final ClosedWatchServiceException e) {
+						//
+					} catch (final Exception e) {
+						StatusUtil.log(e);
+					} finally {
+
+						if (_watchKey != null) {
+							_watchKey.cancel();
+						}
+
+						if (_watcher != null) {
+							try {
+								_watcher.close();
+							} catch (final IOException e) {
+								StatusUtil.log(e);
+							}
+						}
+					}
+				}
+			};
+
+			_watchFolderThread = new Thread(runnable, "WatchingDeviceFolder: " + deviceFolder); //$NON-NLS-1$
+			_watchFolderThread.setDaemon(true);
+			_watchFolderThread.start();
+
+		} catch (final Exception e) {
+			StatusUtil.log(e);
+		}
+	}
+
 	/**
 	 * Keep live update values, other values MUST already have been set.
 	 */
@@ -3394,7 +3550,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 						_canPollImportFiles.set(true);
 
-						watchDeviceFolder();
+						setupThread_WatchDeviceFolder();
 
 					} else {
 
@@ -3402,7 +3558,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 						_canPollImportFiles.set(false);
 
-						watchDeviceFolder_Cancel();
+						cancelThread_WatchDeviceFolder();
 					}
 				}
 			});
@@ -3423,125 +3579,5 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_rawDataMgr.updateTourData_InImportView_FromDb(null);
 
 		_tourViewer.refresh();
-	}
-
-	private void watchDeviceFolder() {
-
-		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\twatchDeviceFolder")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		// TODO remove SYSTEM.OUT.PRINTLN
-
-		// cancel previous watcher
-		watchDeviceFolder_Cancel();
-
-		try {
-
-			// check new folder
-			final String deviceFolder = getImportConfig().getDeviceOSFolder();
-			if (deviceFolder == null) {
-				return;
-			}
-
-			// check file
-			final Path watchFolder = Paths.get(deviceFolder);
-			if (!Files.exists(watchFolder)) {
-				return;
-			}
-
-			final Runnable runnable = new Runnable() {
-				@Override
-				public void run() {
-
-					try {
-
-						_watcher = FileSystems.getDefault().newWatchService();
-
-						watchFolder.register(_watcher, ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE);
-
-						// wait for the next event
-						_watchKey = _watcher.take();
-
-						while (_watchKey != null) {
-
-							if (_isCancelWatchFolder) {
-								break;
-							}
-
-							// get polled events
-							for (final WatchEvent<?> event : _watchKey.pollEvents()) {
-
-								final WatchEvent.Kind<?> kind = event.kind();
-								System.out.printf("Received %s WatchEvent on %s\n", kind, event.context()); //$NON-NLS-1$
-							}
-
-							AutoImportManager.getInstance().getNotImportedFiles(true);
-							updateUI_DeviceState();
-
-							if (_watchKey.reset()) {
-
-								// wait for the next event
-								_watchKey = _watcher.take();
-
-							} else {
-
-								break;
-							}
-						}
-
-					} catch (final InterruptedException e) {
-						//
-					} catch (final ClosedWatchServiceException e) {
-						//
-					} catch (final Exception e) {
-						StatusUtil.log(e);
-					} finally {
-
-						if (_watchKey != null) {
-							_watchKey.cancel();
-						}
-
-						if (_watcher != null) {
-							try {
-								_watcher.close();
-							} catch (final IOException e) {
-								StatusUtil.log(e);
-							}
-						}
-					}
-				}
-			};
-
-			_watchFolderThread = new Thread(runnable, "WatchingDeviceFolder: " + deviceFolder); //$NON-NLS-1$
-			_watchFolderThread.setDaemon(true);
-			_watchFolderThread.start();
-
-		} catch (final Exception e) {
-			StatusUtil.log(e);
-		}
-	}
-
-	private void watchDeviceFolder_Cancel() {
-
-		if (_watchFolderThread != null) {
-
-			try {
-
-				if (_watchKey != null) {
-					_watchKey.cancel();
-				}
-
-				if (_watcher != null) {
-					try {
-						_watcher.close();
-					} catch (final IOException e) {
-						StatusUtil.log(e);
-					}
-				}
-
-//				_watchFolderThread.join();
-
-			} catch (final Exception e) {
-				StatusUtil.log(e);
-			}
-		}
 	}
 }

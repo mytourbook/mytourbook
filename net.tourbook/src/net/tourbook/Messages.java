@@ -120,7 +120,7 @@ public class Messages extends NLS {
 	public static String		Dialog_ImportConfig_Checkbox_LiveUpdate;
 	public static String		Dialog_ImportConfig_Checkbox_LiveUpdate_Tooltip;
 	public static String		Dialog_ImportConfig_Checkbox_SetTourType;
-	public static String	Dialog_ImportConfig_Column_Description;
+	public static String		Dialog_ImportConfig_Column_Description;
 
 	public static String		Dialog_ImportConfig_Column_Name;
 	public static String		Dialog_ImportConfig_Column_TourType;
@@ -138,17 +138,17 @@ public class Messages extends NLS {
 	public static String		Dialog_ImportConfig_Info_ConfigDragDrop;
 	public static String		Dialog_ImportConfig_Info_NoDeviceName;
 	public static String		Dialog_ImportConfig_Info_RetrievingVolumeInfo;
-	public static String	Dialog_ImportConfig_Label_AnimationCrazyFactor;
+	public static String		Dialog_ImportConfig_Label_AnimationCrazyFactor;
 
-	public static String	Dialog_ImportConfig_Label_AnimationCrazyFactor_Tooltip;
+	public static String		Dialog_ImportConfig_Label_AnimationCrazyFactor_Tooltip;
 
-	public static String	Dialog_ImportConfig_Label_AnimationDuration;
+	public static String		Dialog_ImportConfig_Label_AnimationDuration;
 
-	public static String	Dialog_ImportConfig_Label_AnimationDuration_Tooltip;
+	public static String		Dialog_ImportConfig_Label_AnimationDuration_Tooltip;
 
-	public static String	Dialog_ImportConfig_Label_BackgroundOpacity;
+	public static String		Dialog_ImportConfig_Label_BackgroundOpacity;
 
-	public static String	Dialog_ImportConfig_Label_BackgroundOpacity_Tooltip;
+	public static String		Dialog_ImportConfig_Label_BackgroundOpacity_Tooltip;
 
 	public static String		Dialog_ImportConfig_Label_BackupFolder;
 	public static String		Dialog_ImportConfig_Label_BackupFolder_Tooltip;
@@ -724,7 +724,7 @@ public class Messages extends NLS {
 	public static String		Image__graph_tour_compare_disabled;
 	public static String		Image__icon_placeholder;
 
-	public static String	Image__ImportantInfo;
+	public static String		Image__ImportantInfo;
 	public static String		Image__layout_flat;
 	public static String		Image__layout_hierarchical;
 	public static String		Image__link;
@@ -752,11 +752,11 @@ public class Messages extends NLS {
 	public static String		Image__PulseZones;
 	public static String		Image__PulseZones_Disabled;
 	public static String		Image__quick_edit;
-	public static String	Image__RawData_DeviceFolder;
+	public static String		Image__RawData_DeviceFolder;
 
-	public static String	Image__RawData_DeviceFolder_NotAvailable;
+	public static String		Image__RawData_DeviceFolder_NotAvailable;
 
-	public static String	Image__RawData_DeviceFolder_NotDefined;
+	public static String		Image__RawData_DeviceFolder_NotDefined;
 
 	public static String		Image__RawData_Import;
 	public static String		Image__RawData_Transfer;
@@ -830,14 +830,10 @@ public class Messages extends NLS {
 
 	public static String		Import_Data_Action_AutomatedImportConfig_Tooltip;
 	public static String		Import_Data_Action_EditImportPreferences;
-
 	public static String		Import_Data_Action_ImportFromFiles;
-
 	public static String		Import_Data_Action_ImportFromFiles_Tooltip;
 	public static String		Import_Data_Action_ReceiveFromSerialPort_Configured;
-
 	public static String		Import_Data_Action_ReceiveFromSerialPort_Directly;
-
 	public static String		Import_Data_Action_Reimport_EntireTour;
 	public static String		Import_Data_Action_Reimport_OnlyAltitudeValues;
 	public static String		Import_Data_Action_Reimport_OnlyGearValues;
@@ -849,11 +845,8 @@ public class Messages extends NLS {
 	public static String		Import_Data_Action_RemoveTour;
 	public static String		Import_Data_Action_RemoveToursWhenClosed;
 	public static String		Import_Data_AutoImport_SubTask;
-
 	public static String		Import_Data_AutoImport_Task;
-
 	public static String		Import_Data_Dialog_AutoImport_Title;
-
 	public static String		Import_Data_Dialog_ConfirmReimport_Message;
 	public static String		Import_Data_Dialog_ConfirmReimportAltitudeValues_Message;
 	public static String		Import_Data_Dialog_ConfirmReimportGearValues_Message;
@@ -871,21 +864,15 @@ public class Messages extends NLS {
 	public static String		Import_Data_Dialog_ReimportIsInvalid_WrongSliceNumbers_Message;
 	public static String		Import_Data_Error_CreatingFileName_Message;
 	public static String		Import_Data_Error_CreatingFileName_Title;
-
 	public static String		Import_Data_Error_DeviceFolderDoNotExist;
-
-	public static String	Import_Data_Error_FolderIsNotAvailable;
-
-	public static String	Import_Data_Error_NoDeviceFolder;
+	public static String		Import_Data_Error_FolderIsNotAvailable;
+	public static String		Import_Data_Error_NoDeviceFolder;
 	public static String		Import_Data_Label_AutomatedImport;
-
 	public static String		Import_Data_Label_GetTours;
 	public static String		Import_Data_Label_Hint;
 	public static String		Import_Data_Label_Info;
-
-	public static String	Import_Data_Label_NoImportedFiles;
-
-	public static String	Import_Data_Label_NotImportedFiles;
+	public static String		Import_Data_Label_NoImportedFiles;
+	public static String		Import_Data_Label_NotImportedFiles;
 	public static String		Import_Data_Link_AutomatedImportConfig;
 	public static String		Import_Data_Link_ConfigName;
 	public static String		Import_Data_Link_Import;

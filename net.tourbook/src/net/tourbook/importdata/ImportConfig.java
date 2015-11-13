@@ -46,6 +46,9 @@ public class ImportConfig {
 	 */
 	public ArrayList<DeviceFile>	notImportedFiles;
 
+	/** Number of files in the device folder */
+	public int						numDeviceFiles;
+
 	public String getBackupOSFolder() {
 
 		if (NIO.isDeviceNameFolder(backupFolder)) {

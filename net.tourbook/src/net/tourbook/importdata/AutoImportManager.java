@@ -101,6 +101,66 @@ public class AutoImportManager {
 		return _instance;
 	}
 
+	/**
+	 * @param isForceRetrieveFiles
+	 *            When <code>true</code> files will be retrieved even when the stores have not
+	 *            changed.
+	 * @return Returns <code>true</code> when import files have been retrieved, otherwise
+	 *         <code>false</code>.
+	 *         <p>
+	 *         {@link ImportConfig#notImportedFiles} contains the files which are available in the
+	 *         device folder but not available in the tour database.
+	 */
+	public AutoImportState checkImportedFiles(final boolean isForceRetrieveFiles) {
+
+		final AutoImportState returnState = new AutoImportState();
+
+		// this is called from multiple threads and propably cause problems
+		STORE_LOCK.lock();
+		{
+			try {
+
+				/*
+				 * Create hashcode vor all file stores
+				 */
+				final Iterable<FileStore> fileStores = FileSystems.getDefault().getFileStores();
+				final StringBuilder sb = new StringBuilder();
+
+				for (final FileStore store : fileStores) {
+					sb.append(store);
+					sb.append(' ');
+				}
+				final String fileStoresHash = sb.toString();
+
+				/*
+				 * Check if stores has changed
+				 */
+				final boolean areTheSameStores = fileStoresHash.equals(_fileStoresHash);
+				returnState.areTheSameStores = areTheSameStores;
+
+				if (areTheSameStores && isForceRetrieveFiles == false) {
+
+					returnState.areFilesRetrieved = false;
+
+					return returnState;
+				}
+
+				/*
+				 * Filestore has changed, a device was added/removed.
+				 */
+				_fileStoresHash = fileStoresHash;
+				getImportFiles();
+
+			} finally {
+				STORE_LOCK.unlock();
+			}
+		}
+
+		returnState.areFilesRetrieved = true;
+
+		return returnState;
+	}
+
 	public ImportConfig getAutoImportConfig() {
 
 		if (_importConfig == null) {
@@ -111,23 +171,30 @@ public class AutoImportManager {
 	}
 
 	/**
-	 * @return Returns a list with a files which has not yet been imported
 	 */
-	private ArrayList<DeviceFile> getImportFiles() {
+	private void getImportFiles() {
 
 		final ArrayList<DeviceFile> notImportedFiles = new ArrayList<>();
+
+		final ImportConfig importConfig = getAutoImportConfig();
+
+		// update config
+		importConfig.notImportedFiles = notImportedFiles;
 
 		final String validDeviceFolder = getImportFiles_10_GetDeviceFolder();
 
 		if (validDeviceFolder == null) {
-			return notImportedFiles;
+			return;
 		}
 
 		final List<DeviceFile> deviceFileNames = getImportFiles_12_GetDeviceFileNames(validDeviceFolder);
 
+		// update config
+		importConfig.numDeviceFiles = deviceFileNames.size();
+
 		if (deviceFileNames.size() == 0) {
 			// there is nothing to be imported
-			return notImportedFiles;
+			return;
 		}
 
 		final HashSet<String> dbFileNames = getImportFiles_14_GetDbFileNames(deviceFileNames);
@@ -147,8 +214,6 @@ public class AutoImportManager {
 				return file1.fileName.compareTo(file2.fileName);
 			}
 		});
-
-		return notImportedFiles;
 	}
 
 	/**
@@ -283,66 +348,6 @@ public class AutoImportManager {
 		}
 
 		return dbFileNames;
-	}
-
-	/**
-	 * @param isForceUpdate
-	 * @return Returns <code>true</code> when import files have newly retrieved, otherwise
-	 *         <code>false</code>.
-	 *         <p>
-	 *         {@link ImportConfig#notImportedFiles} contains the files which are available in the
-	 *         device folder but not available in the tour database.
-	 */
-	public boolean getNotImportedFiles(final boolean isForceUpdate) {
-
-//		final long start = System.nanoTime();
-
-		// this is called from multiple threads and propably cause problems
-		STORE_LOCK.lock();
-		{
-			try {
-
-				/*
-				 * Get hashcode vor all files stores
-				 */
-				final Iterable<FileStore> fileStores = FileSystems.getDefault().getFileStores();
-				final StringBuilder sb = new StringBuilder();
-
-				for (final FileStore store : fileStores) {
-					sb.append(store);
-					sb.append(' ');
-				}
-				final String fileStoresHash = sb.toString();
-
-				final ImportConfig importConfig = getAutoImportConfig();
-
-				/*
-				 * Check if files stores has changed
-				 */
-				if (isForceUpdate == false && fileStoresHash.equals(_fileStoresHash)) {
-					return false;
-				}
-
-				_fileStoresHash = fileStoresHash;
-
-				/*
-				 * Filestore has changed, a device was added/removed.
-				 */
-				importConfig.notImportedFiles = getImportFiles();
-
-//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//				+ (String.format("%7.1f ms", (float) (System.nanoTime() - start) / 1000000))
-//				+ ("\tnotImportedFiles: " + importConfig.notImportedFiles.size())
-//				+ ("\tdeviceFolder: " + importConfig.deviceFolder)
-//				+ ("\tbackupFolder: " + importConfig.backupFolder));
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
-			} finally {
-				STORE_LOCK.unlock();
-			}
-		}
-
-		return true;
 	}
 
 	private ImportConfig loadImportConfig() {
