@@ -260,13 +260,19 @@ a.action-button:HOVER
 	display:				none; 
 	z-index:				2000;
 	
-	max-height:				80vh;
-	width:					400px;
-	margin-left:			-200px;
-	
 	padding:				5px;
+
+	width:					300px;
+	margin-left:			-150px;
 }
 
+.withList
+{
+	width:					400px;
+	margin-left:			-200px;
+	max-height:				80vh;
+}
+	
 .importState:hover	.stateTooltip
 {
 	display:				inline; 
@@ -283,10 +289,10 @@ a.action-button:HOVER
 	font-weight: 			lighter;
 }
 
-.folder-title
+.folder-name
 {
 	display:				block;
-	padding-top:			5px;
+	padding-bottom:			5px;
 	font-size: 				16px;
 }
 

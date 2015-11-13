@@ -37,6 +37,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.NIO;
@@ -88,6 +89,8 @@ public class AutoImportManager {
 	private ImportConfig				_importConfig;
 
 	private String						_fileStoresHash;
+
+	private ReentrantLock				STORE_LOCK							= new ReentrantLock();
 
 	public static AutoImportManager getInstance() {
 
@@ -294,33 +297,38 @@ public class AutoImportManager {
 
 //		final long start = System.nanoTime();
 
-		/*
-		 * Get hashcode vor all files stores
-		 */
-		final Iterable<FileStore> fileStores = FileSystems.getDefault().getFileStores();
-		final StringBuilder sb = new StringBuilder();
+		// this is called from multiple threads and propably cause problems
+		STORE_LOCK.lock();
+		{
+			try {
 
-		for (final FileStore store : fileStores) {
-			sb.append(store);
-			sb.append(' ');
-		}
-		final String fileStoresHash = sb.toString();
+				/*
+				 * Get hashcode vor all files stores
+				 */
+				final Iterable<FileStore> fileStores = FileSystems.getDefault().getFileStores();
+				final StringBuilder sb = new StringBuilder();
 
-		final ImportConfig importConfig = getAutoImportConfig();
+				for (final FileStore store : fileStores) {
+					sb.append(store);
+					sb.append(' ');
+				}
+				final String fileStoresHash = sb.toString();
 
-		/*
-		 * Check if files stores has changed
-		 */
-		if (isForceUpdate == false && fileStoresHash.equals(_fileStoresHash)) {
-			return false;
-		}
+				final ImportConfig importConfig = getAutoImportConfig();
 
-		_fileStoresHash = fileStoresHash;
+				/*
+				 * Check if files stores has changed
+				 */
+				if (isForceUpdate == false && fileStoresHash.equals(_fileStoresHash)) {
+					return false;
+				}
 
-		/*
-		 * Filestore has changed, a device was added/removed.
-		 */
-		importConfig.notImportedFiles = getImportFiles();
+				_fileStoresHash = fileStoresHash;
+
+				/*
+				 * Filestore has changed, a device was added/removed.
+				 */
+				importConfig.notImportedFiles = getImportFiles();
 
 //		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
 //				+ (String.format("%7.1f ms", (float) (System.nanoTime() - start) / 1000000))
@@ -328,6 +336,11 @@ public class AutoImportManager {
 //				+ ("\tdeviceFolder: " + importConfig.deviceFolder)
 //				+ ("\tbackupFolder: " + importConfig.backupFolder));
 //		// TODO remove SYSTEM.OUT.PRINTLN
+
+			} finally {
+				STORE_LOCK.unlock();
+			}
+		}
 
 		return true;
 	}

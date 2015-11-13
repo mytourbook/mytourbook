@@ -424,13 +424,19 @@ class HistoryItems {
 			return;
 		}
 
-		final Path newPath = Paths.get(selectedFolder);
+		try {
 
-		final String deviceName = getDeviceName(newPath);
-		final String deviceNameFolder = createDeviceNameFolder(newPath, deviceName);
+			final Path newPath = Paths.get(selectedFolder);
 
-		updateModel(selectedFolder, deviceNameFolder);
-		fillControls(selectedFolder, deviceNameFolder, selectedFolderRaw);
+			final String deviceName = getDeviceName(newPath);
+			final String deviceNameFolder = createDeviceNameFolder(newPath, deviceName);
+
+			updateModel(selectedFolder, deviceNameFolder);
+			fillControls(selectedFolder, deviceNameFolder, selectedFolderRaw);
+
+		} catch (final Exception e) {
+			// this can occure when the entered path is totally invalid
+		}
 	}
 
 	private void updateHistory(final LinkedHashSet<String> historyItems, final String newItem) {

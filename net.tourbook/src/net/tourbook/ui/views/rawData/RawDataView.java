@@ -28,6 +28,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.text.DateFormat;
@@ -519,7 +520,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			updateModel_ImportConfig(dialog);
 
 			AutoImportManager.getInstance().getNotImportedFiles(true);
-
 			updateUI_DeviceState();
 
 			watchDeviceFolder();
@@ -805,7 +805,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 					+ ("	{																\n") //$NON-NLS-1$
 					+ ("		opacity:				0.0;								\n") //$NON-NLS-1$
 					+ ("		background-color:		ButtonFace;							\n") //$NON-NLS-1$
-					+ ("		transform:				rotateX(" + (int) rotateX + "deg) rotateY(" + (int) rotateY + "deg);	\n") //$NON-NLS-1$
+					+ ("		transform:				rotateX(" + (int) rotateX + "deg) rotateY(" + (int) rotateY + "deg);	\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					+ ("		xtransform-origin: 		50% 200%;							\n") //$NON-NLS-1$
 					+ ("	}																\n") //$NON-NLS-1$
 //		transform:				rotateX(-80deg) rotateY(-80deg);
@@ -1140,39 +1140,49 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		final StringBuilder sb = new StringBuilder();
 
-		sb.append("<div class='folder-container'>"); //$NON-NLS-1$
-		sb.append(Messages.Import_Data_Label_NotImportedFiles);
-		sb.append("<span class='folder-title'>" + deviceFolder + "</span>"); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append("</div>"); //$NON-NLS-1$
+		if (numNotImported == 0) {
 
-		if (numNotImported > 0) {
+			sb.append("<div class='folder-container'>"); //$NON-NLS-1$
+			sb.append("<span class='folder-name'>" + deviceFolder + "</span>"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append(Messages.Import_Data_Label_NoImportedFiles);
+			sb.append("</div>"); //$NON-NLS-1$
 
-			sb.append("<table class='deviceList'><tbody>"); //$NON-NLS-1$
+		} else {
 
-			for (final DeviceFile deviceFile : notImportedFiles) {
+			sb.append("<div class='folder-container'>"); //$NON-NLS-1$
+			sb.append("<span class='folder-name'>" + deviceFolder + "</span>"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append(Messages.Import_Data_Label_NotImportedFiles);
+			sb.append("</div>"); //$NON-NLS-1$
 
-				sb.append("<tr>"); //$NON-NLS-1$
+			if (numNotImported > 0) {
 
-				sb.append("<td class='column name'>"); //$NON-NLS-1$
-				sb.append(deviceFile.fileName);
-				sb.append("</td>"); //$NON-NLS-1$
+				sb.append("<table class='deviceList'><tbody>"); //$NON-NLS-1$
 
-				sb.append("<td class='right column'>"); //$NON-NLS-1$
-				sb.append(deviceFile.size);
-				sb.append("</td>"); //$NON-NLS-1$
+				for (final DeviceFile deviceFile : notImportedFiles) {
 
-				sb.append("<td class='right column'>"); //$NON-NLS-1$
-				sb.append(_dateFormatter.format(deviceFile.modifiedTime));
-				sb.append("</td>"); //$NON-NLS-1$
+					sb.append("<tr>"); //$NON-NLS-1$
 
-				sb.append("<td class='right'>"); //$NON-NLS-1$
-				sb.append(_timeFormatter.format(deviceFile.modifiedTime));
-				sb.append("</td>"); //$NON-NLS-1$
+					sb.append("<td class='column name'>"); //$NON-NLS-1$
+					sb.append(deviceFile.fileName);
+					sb.append("</td>"); //$NON-NLS-1$
 
-				sb.append("</tr>"); //$NON-NLS-1$
+					sb.append("<td class='right column'>"); //$NON-NLS-1$
+					sb.append(deviceFile.size);
+					sb.append("</td>"); //$NON-NLS-1$
+
+					sb.append("<td class='right column'>"); //$NON-NLS-1$
+					sb.append(_dateFormatter.format(deviceFile.modifiedTime));
+					sb.append("</td>"); //$NON-NLS-1$
+
+					sb.append("<td class='right'>"); //$NON-NLS-1$
+					sb.append(_timeFormatter.format(deviceFile.modifiedTime));
+					sb.append("</td>"); //$NON-NLS-1$
+
+					sb.append("</tr>"); //$NON-NLS-1$
+				}
+
+				sb.append("</tbody></table>"); //$NON-NLS-1$
 			}
-
-			sb.append("</tbody></table>"); //$NON-NLS-1$
 		}
 
 		htmlImportFiles = sb.toString();
@@ -1181,20 +1191,18 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		 * Show overflow scrollbar ONLY when more than 10 entries are available because it looks
 		 * ugly.
 		 */
-		String cssOverflow = UI.EMPTY_STRING;
-		if (numNotImported > 10) {
-			cssOverflow = "style='overflow-y: scroll;'"; //$NON-NLS-1$
-		}
+		final String cssOverflow = numNotImported > 10 ? "style='overflow-y: scroll;'" : UI.EMPTY_STRING; //$NON-NLS-1$
+		final String withList = numNotImported > 0 ? " withList" : UI.EMPTY_STRING; //$NON-NLS-1$
 
 		final String htmlImage = createHTML_BgImage(_imageUrl_DeviceFolder);
 
 		final String htmlDeviceState = ""// //$NON-NLS-1$
 
-				+ "<div class='importState'>" //$NON-NLS-1$
+				+ ("<div class='importState'>") //$NON-NLS-1$
 				+ ("<div class='stateIcon' " + htmlImage + ">") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("   <div class='stateIconValue'>" + Integer.toString(numNotImported) + "</div>") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("</div>") //$NON-NLS-1$
-				+ ("<div class='stateTooltip' " + cssOverflow + ">" + htmlImportFiles + "</div>") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				+ ("<div class='stateTooltip" + withList + "' " + cssOverflow + ">" + htmlImportFiles + "</div>") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 				+ "</div>"; //$NON-NLS-1$
 
 		return htmlDeviceState;
@@ -1209,10 +1217,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		final StringBuilder sb = new StringBuilder();
 		sb.append("<div class='folder-container'>"); //$NON-NLS-1$
+		sb.append("<span class='folder-name'>" + deviceFolder + "</span>"); //$NON-NLS-1$ //$NON-NLS-2$
 		sb.append(Messages.Import_Data_Error_FolderIsNotAvailable);
-		sb.append("<span class='folder-title'>"); //$NON-NLS-1$
-		sb.append(deviceFolder);
-		sb.append("</span>"); //$NON-NLS-1$
 		sb.append("</div>"); //$NON-NLS-1$
 
 		final String htmlInfo = sb.toString();
@@ -1230,7 +1236,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private String createHTML_DeviceState_NotDefined() {
 
 		final String htmlImage = createHTML_BgImage(_imageUrl_DeviceFolderNotDefined);
-		final String htmlInfo = Messages.Import_Data_Error_NoDeviceFolder.replace("\n", "<br>");
+		final String htmlInfo = Messages.Import_Data_Error_NoDeviceFolder.replace("\n", "<br>"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		final String htmlDeviceState = ""// //$NON-NLS-1$
 
@@ -2709,7 +2715,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private void initUI_Dashboard() {
 
-		_devicePollingThread = new Thread("PollingImportFiles") { //$NON-NLS-1$
+		_devicePollingThread = new Thread("WatchingStores") { //$NON-NLS-1$
 			@Override
 			public void run() {
 
@@ -3421,6 +3427,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private void watchDeviceFolder() {
 
+		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\twatchDeviceFolder")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		// TODO remove SYSTEM.OUT.PRINTLN
+
 		// cancel previous watcher
 		watchDeviceFolder_Cancel();
 
@@ -3458,11 +3467,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 							}
 
 							// get polled events
-//							for (final WatchEvent<?> event : _watchKey.pollEvents()) {
-//
-//								final WatchEvent.Kind<?> kind = event.kind();
-//								System.out.printf("Received %s WatchEvent on %s\n", kind, event.context());
-//							}
+							for (final WatchEvent<?> event : _watchKey.pollEvents()) {
+
+								final WatchEvent.Kind<?> kind = event.kind();
+								System.out.printf("Received %s WatchEvent on %s\n", kind, event.context()); //$NON-NLS-1$
+							}
 
 							AutoImportManager.getInstance().getNotImportedFiles(true);
 							updateUI_DeviceState();
@@ -3501,7 +3510,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				}
 			};
 
-			_watchFolderThread = new Thread(runnable, "WatchingDeviceFolder: " + deviceFolder);
+			_watchFolderThread = new Thread(runnable, "WatchingDeviceFolder: " + deviceFolder); //$NON-NLS-1$
 			_watchFolderThread.setDaemon(true);
 			_watchFolderThread.start();
 
@@ -3528,7 +3537,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 					}
 				}
 
-				_watchFolderThread.join();
+//				_watchFolderThread.join();
 
 			} catch (final Exception e) {
 				StatusUtil.log(e);
