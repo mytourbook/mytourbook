@@ -5661,13 +5661,18 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	public String getTourImportFilePath() {
 
 		if ((tourImportFilePath == null) || (tourImportFilePath.length() == 0)) {
+
 			if (isManualTour()) {
 				return UI.EMPTY_STRING;
 			} else {
 				return Messages.tour_data_label_feature_since_version_9_01;
 			}
+
 		} else {
-			return tourImportFilePath;
+
+			final Path importPath = Paths.get(tourImportFilePath, tourImportFileName);
+
+			return importPath.toString();
 		}
 	}
 

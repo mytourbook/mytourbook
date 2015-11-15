@@ -72,23 +72,16 @@ import org.eclipse.ui.WorkbenchException;
 
 public class RawDataManager {
 
+	private static final String				RAW_DATA_LAST_SELECTED_PATH			= "raw-data-view.last-selected-import-path";				//$NON-NLS-1$
+	private static final String				TEMP_IMPORTED_FILE					= "received-device-data.txt";								//$NON-NLS-1$
 
-	private static final String					RAW_DATA_LAST_SELECTED_PATH			= "raw-data-view.last-selected-import-path";				//$NON-NLS-1$
-	private static final String					TEMP_IMPORTED_FILE					= "received-device-data.txt";								//$NON-NLS-1$
-
-	public static final int						ADJUST_IMPORT_YEAR_IS_DISABLED		= -1;
+	public static final int					ADJUST_IMPORT_YEAR_IS_DISABLED		= -1;
 	//
-	static final ComboEnumEntry<TourTypeConfig>	DEFAULT_TOUR_TYPE_CONFIG;
-	static final ComboEnumEntry<?>[]			ALL_IMPORT_TOUR_TYPE_CONFIG;
+	static final ComboEnumEntry<?>[]		ALL_IMPORT_TOUR_TYPE_CONFIG;
 
 	static {
 
-		DEFAULT_TOUR_TYPE_CONFIG = new ComboEnumEntry<>(Messages.Import_Data_TourTypeConfig_NotUsed,//
-				TourTypeConfig.TOUR_TYPE_CONFIG_NOT_USED);
-
 		ALL_IMPORT_TOUR_TYPE_CONFIG = new ComboEnumEntry<?>[] {
-
-		DEFAULT_TOUR_TYPE_CONFIG,
 
 		new ComboEnumEntry<>(Messages.Import_Data_TourTypeConfig_OneForAll,//
 				TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL),
@@ -99,59 +92,59 @@ public class RawDataManager {
 		};
 	}
 
-	private static RawDataManager				_instance							= null;
+	private static RawDataManager			_instance							= null;
 
-	private final IPreferenceStore				_prefStore							= TourbookPlugin.getPrefStore();
+	private final IPreferenceStore			_prefStore							= TourbookPlugin.getPrefStore();
 
 	/**
 	 * contains the device data imported from the device/file
 	 */
-	private final DeviceData					_deviceData							= new DeviceData();
+	private final DeviceData				_deviceData							= new DeviceData();
 
 	/**
 	 * Contains tours which are imported or received and displayed in the import view.
 	 */
-	private final HashMap<Long, TourData>		_toursInImportView					= new HashMap<Long, TourData>();
+	private final HashMap<Long, TourData>	_toursInImportView					= new HashMap<Long, TourData>();
 
 	/**
 	 * Contains tours which are imported from the last file name.
 	 */
-	private final HashMap<Long, TourData>		_newlyImportedTours					= new HashMap<Long, TourData>();
+	private final HashMap<Long, TourData>	_newlyImportedTours					= new HashMap<Long, TourData>();
 
-	private String								_lastImportedFileName;
+	private String							_lastImportedFileName;
 
 	/**
 	 * Contains the filenames for all imported files which are displayed in the import view
 	 */
-	private final HashSet<String>				_importedFileNames					= new HashSet<String>();
+	private final HashSet<String>			_importedFileNames					= new HashSet<String>();
 
 	/**
 	 * Contains filenames which are not directly imported but is imported from other imported files
 	 */
-	private final HashSet<String>				_importedFileNamesChildren			= new HashSet<String>();
+	private final HashSet<String>			_importedFileNamesChildren			= new HashSet<String>();
 
-	private boolean								_isImported;
+	private boolean							_isImported;
 
-	private boolean								_isImportCanceled;
+	private boolean							_isImportCanceled;
 	//
-	private int									_importState_ImportYear				= ADJUST_IMPORT_YEAR_IS_DISABLED;
+	private int								_importState_ImportYear				= ADJUST_IMPORT_YEAR_IS_DISABLED;
 
-	private boolean								_importState_IsConvertWayPoints		= RawDataView.STATE_IS_CONVERT_WAYPOINTS_DEFAULT;
-	private boolean								_importState_IsCreateTourIdWithTime	= RawDataView.STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT;
-	private boolean								_importState_IsMergeTracks			= RawDataView.STATE_IS_MERGE_TRACKS_DEFAULT;
-	private boolean								_importState_IsChecksumValidation	= RawDataView.STATE_IS_CHECKSUM_VALIDATION_DEFAULT;
+	private boolean							_importState_IsConvertWayPoints		= RawDataView.STATE_IS_CONVERT_WAYPOINTS_DEFAULT;
+	private boolean							_importState_IsCreateTourIdWithTime	= RawDataView.STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT;
+	private boolean							_importState_IsMergeTracks			= RawDataView.STATE_IS_MERGE_TRACKS_DEFAULT;
+	private boolean							_importState_IsChecksumValidation	= RawDataView.STATE_IS_CHECKSUM_VALIDATION_DEFAULT;
 
-	private List<TourbookDevice>				_devicesBySortPriority;
+	private List<TourbookDevice>			_devicesBySortPriority;
 
-	private HashMap<String, TourbookDevice>		_devicesByExtension;
+	private HashMap<String, TourbookDevice>	_devicesByExtension;
 
-	private final ArrayList<TourType>			_tempTourTypes						= new ArrayList<TourType>();
-	private final ArrayList<TourTag>			_tempTourTags						= new ArrayList<TourTag>();
+	private final ArrayList<TourType>		_tempTourTypes						= new ArrayList<TourType>();
+	private final ArrayList<TourTag>		_tempTourTags						= new ArrayList<TourTag>();
 
 	/**
 	 * Filepath from the previous reimported tour
 	 */
-	private IPath								_previousSelectedReimportFolder;
+	private IPath							_previousSelectedReimportFolder;
 
 	public static enum ReImport {
 
@@ -277,10 +270,21 @@ public class RawDataManager {
 			return;
 		}
 
-		final IPath filePath = new org.eclipse.core.runtime.Path(firstFilePathName).removeLastSegments(1);
 		final String[] selectedFileNames = fileDialog.getFileNames();
 
+		actionImportFromFile_DoTheImport(firstFilePathName, selectedFileNames);
+	}
+
+	public void actionImportFromFile_DoTheImport(final String firstFilePathName, final String[] selectedFileNames) {
+
+		if (selectedFileNames == null || selectedFileNames.length == 0) {
+			return;
+		}
+
+		final IPath filePath = new org.eclipse.core.runtime.Path(firstFilePathName).removeLastSegments(1);
+
 		// keep last selected path
+		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 		final String selectedPath = filePath.makeAbsolute().toString();
 		prefStore.putValue(RAW_DATA_LAST_SELECTED_PATH, selectedPath);
 

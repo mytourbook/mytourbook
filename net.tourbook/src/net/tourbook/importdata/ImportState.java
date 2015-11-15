@@ -15,15 +15,7 @@
  *******************************************************************************/
 package net.tourbook.importdata;
 
-import java.nio.file.Path;
+public class ImportState {
 
-public class DeviceFile {
-
-	public Path		path;
-
-	public String	fileName;
-
-	public long		size;
-	public long		modifiedTime;
-
+	public boolean	isOpenSetup;
 }

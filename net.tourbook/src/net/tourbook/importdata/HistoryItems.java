@@ -67,6 +67,8 @@ class HistoryItems {
 
 	private Label					_labelFolderInfo;
 
+	private boolean					_isValidateFolder		= true;
+
 	private String cleanupFolderDeviceName(final String deviceNameFolder) {
 
 		final String cleanedDeviceNameFolder = deviceNameFolder.replace(
@@ -372,6 +374,10 @@ class HistoryItems {
 
 	}
 
+	void setIsValidateFolder(final boolean isValidateFolder) {
+		_isValidateFolder = isValidateFolder;
+	}
+
 	void sortHistory() {
 
 		// toggle sorting
@@ -479,14 +485,24 @@ class HistoryItems {
 		updateHistory(_deviceNameItems, deviceNamePath);
 	}
 
-	void validateModifiedPath(final DialogImportConfig dialogImportConfig) {
+	/**
+	 */
+	void validateModifiedPath() {
+
+		if (_isValidateFolder == false) {
+
+			_comboError.hide();
+			_labelFolderInfo.setText(UI.EMPTY_STRING);
+
+
+			return;
+		}
 
 		boolean isFolderValid = false;
 
 		final String modifiedFolder = _combo.getText().trim();
 
-		if (modifiedFolder.length() == 0
-				|| COMBO_SEPARATOR.equals(modifiedFolder)
+		if (COMBO_SEPARATOR.equals(modifiedFolder)
 				|| Messages.Dialog_ImportConfig_Info_RetrievingVolumeInfo.equals(modifiedFolder)) {
 
 			// ignore special texts

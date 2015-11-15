@@ -39,6 +39,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
+import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.NIO;
 import net.tourbook.common.UI;
@@ -50,6 +51,9 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.views.rawData.RawDataView;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.XMLMemento;
@@ -72,7 +76,9 @@ public class AutoImportManager {
 	private static final String			ATTR_CONFIG_DESCRIPTION				= "description";								//$NON-NLS-1$
 	private static final String			ATTR_CONFIG_BACKUP_FOLDER			= "backupFolder";								//$NON-NLS-1$
 	private static final String			ATTR_CONFIG_DEVICE_FOLDER			= "deviceFolder";								//$NON-NLS-1$
+	private static final String			ATTR_IS_CREATE_BACKUP				= "isCreateBackup";							//$NON-NLS-1$
 	private static final String			ATTR_IS_LIVE_UPDATE					= "isLiveUpdate";								//$NON-NLS-1$
+	private static final String			ATTR_IS_SET_TOUR_TYPE				= "isSetTourType";								//$NON-NLS-1$
 	private static final String			ATTR_NUM_UI_COLUMNS					= "uiColumns";									//$NON-NLS-1$
 	private static final String			ATTR_TILE_SIZE						= "tileSize";									//$NON-NLS-1$
 	private static final String			ATTR_TOUR_TYPE_CONFIG				= "tourTypeConfig";							//$NON-NLS-1$
@@ -350,6 +356,30 @@ public class AutoImportManager {
 		return dbFileNames;
 	}
 
+	private boolean isFolderValid(final String deviceOSFolder, final String invalidMessage) {
+
+		boolean isFolderValid = false;
+
+		if (deviceOSFolder != null && deviceOSFolder.trim().length() > 0) {
+
+			// check file
+			final Path deviceFolderPath = Paths.get(deviceOSFolder);
+			if (Files.exists(deviceFolderPath)) {
+				isFolderValid = true;
+			}
+		}
+
+		if (!isFolderValid) {
+
+			MessageDialog.openError(
+					Display.getDefault().getActiveShell(),
+					Messages.Import_Data_Error_AutoImport_Title,
+					NLS.bind(invalidMessage, deviceOSFolder));
+		}
+
+		return isFolderValid;
+	}
+
 	private ImportConfig loadImportConfig() {
 
 		final ImportConfig importConfig = new ImportConfig();
@@ -376,7 +406,7 @@ public class AutoImportManager {
 
 		importConfig.isLiveUpdate = Util.getXmlBoolean(xmlMemento, ATTR_IS_LIVE_UPDATE, true);
 
-		importConfig.animationCrazyFactor = Util.getXmlInteger(xmlMemento, ATTR_ANIMATION_CRAZY_FACTOR, 3, -100, 100);
+		importConfig.animationCrazinessFactor = Util.getXmlInteger(xmlMemento, ATTR_ANIMATION_CRAZY_FACTOR, 3, -100, 100);
 		importConfig.animationDuration = Util.getXmlInteger(xmlMemento, ATTR_ANIMATION_DURATION, 40, 0, 100);
 		importConfig.backgroundOpacity = Util.getXmlInteger(xmlMemento, ATTR_BACKGROUND_OPACITY, 5, 0, 100);
 
@@ -394,22 +424,24 @@ public class AutoImportManager {
 				RawDataView.TILE_SIZE_MIN,
 				RawDataView.TILE_SIZE_MAX);
 
+		importConfig.isCreateBackup = Util.getXmlBoolean(xmlMemento, ATTR_IS_CREATE_BACKUP, true);
 		importConfig.backupFolder = Util.getXmlString(xmlMemento, ATTR_CONFIG_BACKUP_FOLDER, UI.EMPTY_STRING);
 		importConfig.deviceFolder = Util.getXmlString(xmlMemento, ATTR_CONFIG_DEVICE_FOLDER, UI.EMPTY_STRING);
 
 		for (final IMemento xmlConfig : xmlMemento.getChildren()) {
 
-			final TourTypeItem configItem = new TourTypeItem();
+			final AutoImportLauncher configItem = new AutoImportLauncher();
 
 			configItem.name = Util.getXmlString(xmlConfig, ATTR_CONFIG_NAME, UI.EMPTY_STRING);
 			configItem.description = Util.getXmlString(xmlConfig, ATTR_CONFIG_DESCRIPTION, UI.EMPTY_STRING);
+			configItem.isSetTourType = Util.getXmlBoolean(xmlMemento, ATTR_IS_SET_TOUR_TYPE, false);
 
 			final Enum<TourTypeConfig> ttConfig = Util.getXmlEnum(
 					xmlConfig,
 					ATTR_TOUR_TYPE_CONFIG,
-					TourTypeConfig.TOUR_TYPE_CONFIG_NOT_USED);
+					TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL);
 
-			configItem.configType = ttConfig;
+			configItem.tourTypeConfig = ttConfig;
 
 			if (TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED.equals(ttConfig)) {
 
@@ -455,7 +487,7 @@ public class AutoImportManager {
 
 			configItem.setupItemImage();
 
-			importConfig.tourTypeItems.add(configItem);
+			importConfig.autoImportLaunchers.add(configItem);
 		}
 	}
 
@@ -468,7 +500,62 @@ public class AutoImportManager {
 		_fileStoresHash = null;
 	}
 
-	public void runImport(final TourTypeItem tourTypeItem) {
+	public ImportState runImport(final AutoImportLauncher aiLauncher) {
+
+		final ImportState importState = new ImportState();
+
+		final ImportConfig importConfig = getAutoImportConfig();
+
+		/*
+		 * Check device folder
+		 */
+		final String deviceOSFolder = importConfig.getDeviceOSFolder();
+		if (!isFolderValid(deviceOSFolder, Messages.Import_Data_Error_AutoImport_InvalidDeviceFolder_Message)) {
+
+			importState.isOpenSetup = true;
+
+			return importState;
+		}
+
+		/*
+		 * Check backup folder
+		 */
+		if (importConfig.isCreateBackup) {
+
+			final String backupOSFolder = importConfig.getBackupOSFolder();
+			if (!isFolderValid(backupOSFolder, Messages.Import_Data_Error_AutoImport_InvalidBackupFolder_Message)) {
+
+				importState.isOpenSetup = true;
+
+				return importState;
+			}
+		}
+
+		final ArrayList<DeviceFile> notImportedPaths = importConfig.notImportedFiles;
+		if (notImportedPaths.size() == 0) {
+
+			MessageDialog.openError(
+					Display.getDefault().getActiveShell(),
+					Messages.Import_Data_Error_AutoImport_Title,
+					NLS.bind(Messages.Import_Data_Error_AutoImport_NoImportFiles_Message, deviceOSFolder));
+
+			return importState;
+		}
+
+		final ArrayList<String> notImportedFileNames = new ArrayList<>();
+
+		for (final DeviceFile deviceFile : notImportedPaths) {
+			notImportedFileNames.add(deviceFile.fileName);
+		}
+
+		final String firstFilePathName = notImportedPaths.get(0).path.toString();
+		final String[] fileNames = notImportedFileNames.toArray(new String[notImportedFileNames.size()]);
+
+		RawDataManager.getInstance().actionImportFromFile_DoTheImport(firstFilePathName, fileNames);
+
+		return importState;
+
+//		aiLauncher.
 
 //
 //						(\\[^\\]*\\[^\\]*$)
@@ -508,19 +595,6 @@ public class AutoImportManager {
 //		}
 	}
 
-	private void runImport_50_Backup(final ImportConfig importConfig) {
-
-		final String backupFolder = importConfig.backupFolder;
-		final boolean isBackup = backupFolder != null && backupFolder.trim().length() > 0;
-
-		if (isBackup) {
-
-			final Path backupPath = Paths.get(backupFolder);
-
-			Files.exists(backupPath);
-		}
-	}
-
 	public void saveImportConfig(final ImportConfig importConfig) {
 
 		// Build the XML block for writing the bindings and active scheme.
@@ -553,23 +627,25 @@ public class AutoImportManager {
 
 		xmlMemento.putBoolean(ATTR_IS_LIVE_UPDATE, importConfig.isLiveUpdate);
 
-		xmlMemento.putInteger(ATTR_ANIMATION_CRAZY_FACTOR, importConfig.animationCrazyFactor);
+		xmlMemento.putInteger(ATTR_ANIMATION_CRAZY_FACTOR, importConfig.animationCrazinessFactor);
 		xmlMemento.putInteger(ATTR_ANIMATION_DURATION, importConfig.animationDuration);
 		xmlMemento.putInteger(ATTR_BACKGROUND_OPACITY, importConfig.backgroundOpacity);
 		xmlMemento.putInteger(ATTR_NUM_UI_COLUMNS, importConfig.numHorizontalTiles);
 		xmlMemento.putInteger(ATTR_TILE_SIZE, importConfig.tileSize);
 
+		xmlMemento.putBoolean(ATTR_IS_CREATE_BACKUP, importConfig.isCreateBackup);
 		xmlMemento.putString(ATTR_CONFIG_BACKUP_FOLDER, importConfig.backupFolder);
 		xmlMemento.putString(ATTR_CONFIG_DEVICE_FOLDER, importConfig.deviceFolder);
 
-		for (final TourTypeItem configItem : importConfig.tourTypeItems) {
+		for (final AutoImportLauncher configItem : importConfig.autoImportLaunchers) {
 
 			final IMemento xmlConfig = xmlMemento.createChild(TAG_IMPORT_CONFIG);
 
 			xmlConfig.putString(ATTR_CONFIG_NAME, configItem.name);
 			xmlConfig.putString(ATTR_CONFIG_DESCRIPTION, configItem.description);
+			xmlConfig.putBoolean(ATTR_IS_SET_TOUR_TYPE, configItem.isSetTourType);
 
-			final Enum<TourTypeConfig> ttConfig = configItem.configType;
+			final Enum<TourTypeConfig> ttConfig = configItem.tourTypeConfig;
 			Util.setXmlEnum(xmlConfig, ATTR_TOUR_TYPE_CONFIG, ttConfig);
 
 			if (TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED.equals(ttConfig)) {

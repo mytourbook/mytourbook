@@ -17,8 +17,6 @@ package net.tourbook.importdata;
 
 public enum TourTypeConfig {
 
-	TOUR_TYPE_CONFIG_NOT_USED,
-
 	TOUR_TYPE_CONFIG_ONE_FOR_ALL,
 
 	TOUR_TYPE_CONFIG_BY_SPEED,

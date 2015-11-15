@@ -2082,6 +2082,10 @@ public class Util {
 
 	public static <E extends Enum<E>> void setXmlEnum(final IMemento xml, final String attrName, final Enum<E> value) {
 
+		if (value == null) {
+			return;
+		}
+
 		xml.putString(attrName, value.name());
 	}
 

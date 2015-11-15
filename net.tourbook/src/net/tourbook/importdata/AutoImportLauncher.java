@@ -21,12 +21,13 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourType;
 
-public class TourTypeItem implements Cloneable, Comparable<TourTypeItem> {
+public class AutoImportLauncher implements Cloneable, Comparable<AutoImportLauncher> {
 
-	public Enum<TourTypeConfig>		configType	= TourTypeConfig.TOUR_TYPE_CONFIG_NOT_USED;
-
-	public String					name			= UI.EMPTY_STRING;
 	public String					description		= UI.EMPTY_STRING;
+	public String					name			= UI.EMPTY_STRING;
+
+	public Enum<TourTypeConfig>		tourTypeConfig	= null;
+	public boolean					isSetTourType	= false;
 
 	public TourType					oneTourType;
 	public ArrayList<SpeedVertex>	speedVertices	= new ArrayList<>();
@@ -37,21 +38,22 @@ public class TourTypeItem implements Cloneable, Comparable<TourTypeItem> {
 	public int						imageWidth;
 
 	private long					_id;
+
 	private static long				_idCreator;
 
-	TourTypeItem() {
+	public AutoImportLauncher() {
 
 		_id = ++_idCreator;
 	}
 
 	@Override
-	protected TourTypeItem clone() {
+	protected AutoImportLauncher clone() {
 
-		TourTypeItem clonedObject = null;
+		AutoImportLauncher clonedObject = null;
 
 		try {
 
-			clonedObject = (TourTypeItem) super.clone();
+			clonedObject = (AutoImportLauncher) super.clone();
 
 			clonedObject._id = ++_idCreator;
 
@@ -68,7 +70,7 @@ public class TourTypeItem implements Cloneable, Comparable<TourTypeItem> {
 	}
 
 	@Override
-	public int compareTo(final TourTypeItem otherConfig) {
+	public int compareTo(final AutoImportLauncher otherConfig) {
 
 		return name.compareTo(otherConfig.name);
 	}
@@ -84,7 +86,7 @@ public class TourTypeItem implements Cloneable, Comparable<TourTypeItem> {
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		final TourTypeItem other = (TourTypeItem) obj;
+		final AutoImportLauncher other = (AutoImportLauncher) obj;
 		if (_id != other._id) {
 			return false;
 		}
@@ -111,14 +113,14 @@ public class TourTypeItem implements Cloneable, Comparable<TourTypeItem> {
 	 */
 	void setupItemImage() {
 
-		if (TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED.equals(configType)) {
+		if (TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED.equals(tourTypeConfig)) {
 
 			final int numVertices = speedVertices.size();
 
 			imageHash = speedVertices.hashCode();
 			imageWidth = numVertices * TourType.TOUR_TYPE_IMAGE_SIZE;
 
-		} else if (TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL.equals(configType)) {
+		} else if (TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL.equals(tourTypeConfig)) {
 
 			if (oneTourType == null) {
 
@@ -142,11 +144,11 @@ public class TourTypeItem implements Cloneable, Comparable<TourTypeItem> {
 
 	@Override
 	public String toString() {
-		return "AutomatedImportConfig ["
+		return "AutoImportLauncher ["
 		//
 				+ ("name=" + name + ", ")
 				+ ("speedVertices=" + speedVertices + ", ")
-				+ ("tourTypeConfig=" + configType + ", ")
+				+ ("configType=" + tourTypeConfig + ", ")
 
 				+ "]";
 	}

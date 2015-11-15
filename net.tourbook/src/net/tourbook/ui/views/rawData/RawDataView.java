@@ -41,6 +41,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -63,15 +64,16 @@ import net.tourbook.data.TourType;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.extension.export.ActionExport;
+import net.tourbook.importdata.AutoImportLauncher;
 import net.tourbook.importdata.AutoImportManager;
 import net.tourbook.importdata.AutoImportState;
 import net.tourbook.importdata.DeviceFile;
 import net.tourbook.importdata.DialogImportConfig;
 import net.tourbook.importdata.ImportConfig;
+import net.tourbook.importdata.ImportState;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.SpeedVertex;
 import net.tourbook.importdata.TourTypeConfig;
-import net.tourbook.importdata.TourTypeItem;
 import net.tourbook.photo.ImageUtils;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageImport;
@@ -321,6 +323,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private String							_cssFonts;
 	private String							_cssFromFile;
 	//
+	private String							_imageUrl_AppStateError;
+	private String							_imageUrl_AppStateOK;
 	private String							_imageUrl_DeviceFolder;
 	private String							_imageUrl_DeviceFolderNotDefined;
 	private String							_imageUrl_DeviceFolderNotAvailable;
@@ -515,14 +519,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			// keep none live update values
 
-			importConfig.tourTypeItems.clear();
-			importConfig.tourTypeItems.addAll(modifiedConfig.tourTypeItems);
+			importConfig.autoImportLaunchers.clear();
+			importConfig.autoImportLaunchers.addAll(modifiedConfig.autoImportLaunchers);
 
 			updateModel_ImportConfig_LiveUpdate(dialog, false);
-			updateModel_ImportConfig(dialog);
+			updateModel_ImportConfig_AndSave(dialog);
 
-			AutoImportManager.getInstance().checkImportedFiles(true);
-			updateUI_DeviceState();
+			updateDeviceState();
 
 			setupThread_WatchDeviceFolder();
 		}
@@ -792,7 +795,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		final int itemSize = importConfig.tileSize;
 		final int opacity = importConfig.backgroundOpacity;
 		final int animationDuration = importConfig.animationDuration;
-		final int crazyFactor = importConfig.animationCrazyFactor;
+		final int crazyFactor = importConfig.animationCrazinessFactor;
 
 		String bgImage = UI.EMPTY_STRING;
 		if (opacity > 0) {
@@ -825,11 +828,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		String animation = UI.EMPTY_STRING;
 		if (_isRunAnimation && animationDuration > 0 && UI.IS_WIN) {
 
-			// run unimation only once
+			// run animation only once
 			_isRunAnimation = false;
 
-			final double rotateX = Math.random() * 20 * crazyFactor;
-			final double rotateY = Math.random() * 20 * crazyFactor;
+			final double rotateX = Math.random() * 10 * crazyFactor;
+			final double rotateY = Math.random() * 10 * crazyFactor;
 
 			animation = ""// //$NON-NLS-1$
 
@@ -885,6 +888,18 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				+ "</style>\n"; //$NON-NLS-1$
 
 		return customCSS;
+	}
+
+	private void createDefaultImportLauncher() {
+
+		final ImportConfig importConfig = getImportConfig();
+
+		final AutoImportLauncher defaultLauncher = new AutoImportLauncher();
+		importConfig.autoImportLaunchers.add(defaultLauncher);
+
+		defaultLauncher.name = Messages.Import_Data_Default_AutoImportLauncher_Name;
+		defaultLauncher.description = Messages.Import_Data_Default_AutoImportLauncher_Description;
+		defaultLauncher.isSetTourType = false;
 	}
 
 	private String createHTML() {
@@ -946,7 +961,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				 * Get Tours
 				 */
 				sb.append("<div class='get-tours-title title'>\n"); //$NON-NLS-1$
-				sb.append("	" + Messages.Import_Data_Label_GetTours + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+				sb.append("	" + Messages.Import_Data_HTML_GetTours + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 				sb.append("</div>\n"); //$NON-NLS-1$
 
 				createHTML_60_GetTours(sb);
@@ -965,7 +980,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				+ "<div class='auto-import-header'>\n" //$NON-NLS-1$
 				+ ("	<table><tbody><tr>\n") //$NON-NLS-1$
 
-				+ ("		<td class='title'>" + Messages.Import_Data_Label_AutomatedImport + "</td>\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("		<td class='title'>" + Messages.Import_Data_HTML_AutomatedImport + "</td>\n") //$NON-NLS-1$ //$NON-NLS-2$
 
 				// Device state
 				+ ("		<td>\n") //$NON-NLS-1$
@@ -984,10 +999,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		final int numHTiles = importConfig.numHorizontalTiles;
 
-		final ArrayList<TourTypeItem> configItems = importConfig.tourTypeItems;
+		final ArrayList<AutoImportLauncher> configItems = importConfig.autoImportLaunchers;
 
 		if (configItems.size() == 0) {
-			return;
+
+			/*
+			 * Make life easier and create a default auto import launcher.
+			 */
+			createDefaultImportLauncher();
 		}
 
 		boolean isTrOpen = false;
@@ -1001,7 +1020,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				isTrOpen = true;
 			}
 
-			final TourTypeItem configItem = configItems.get(configIndex);
+			final AutoImportLauncher configItem = configItems.get(configIndex);
 
 			// enforce equal column width
 			sb.append("<td style='width:" + 100 / numHTiles + "%' class='import-tile'>\n"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -1021,7 +1040,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		sb.append("</tbody></table>\n"); //$NON-NLS-1$
 	}
 
-	private String createHTML_54_AutoImport_Tile(final TourTypeItem importTile) {
+	private String createHTML_54_AutoImport_Tile(final AutoImportLauncher importTile) {
 
 		/*
 		 * Tooltip
@@ -1084,22 +1103,22 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		{
 			createHTML_TileAction(
 					sb,
-					Messages.Import_Data_Action_ImportFromFiles,
-					Messages.Import_Data_Action_ImportFromFiles_Tooltip,
+					Messages.Import_Data_HTML_ImportFromFiles_Action,
+					Messages.Import_Data_HTML_ImportFromFiles_ActionTooltip,
 					(HTTP_DUMMY + HREF_IMPORT_FROM_FILES),
 					_imageUrl_ImportFromFile);
 
 			createHTML_TileAction(
 					sb,
-					Messages.Import_Data_Action_ReceiveFromSerialPort_Configured,
-					Messages.Import_Data_Link_ReceiveFromSerialPort_Configured,
+					Messages.Import_Data_HTML_ReceiveFromSerialPort_ConfiguredAction,
+					Messages.Import_Data_HTML_ReceiveFromSerialPort_ConfiguredLink,
 					(HTTP_DUMMY + HREF_SERIAL_PORT_CONFIGURED),
 					_imageUrl_SerialPort_Configured);
 
 			createHTML_TileAction(
 					sb,
-					Messages.Import_Data_Action_ReceiveFromSerialPort_Directly,
-					Messages.Import_Data_Link_ReceiveFromSerialPort_Directly,
+					Messages.Import_Data_HTML_ReceiveFromSerialPort_DirectlyAction,
+					Messages.Import_Data_HTML_ReceiveFromSerialPort_DirectlyLink,
 					(HTTP_DUMMY + HREF_SERIAL_PORT_DIRECTLY),
 					_imageUrl_SerialPort_Directly);
 		}
@@ -1176,26 +1195,40 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		final ArrayList<DeviceFile> notImportedFiles = importConfig.notImportedFiles;
 		final int numNotImported = notImportedFiles.size();
 
-		String htmlImportFiles = UI.EMPTY_STRING;
-
-		final String deviceFolder = importConfig.deviceFolder.replace(UI.SYMBOL_BACKSLASH, UI.SYMBOL_HTML_BACKSLASH);
-
 		final StringBuilder sb = new StringBuilder();
+
+		if (importConfig.isCreateBackup) {
+
+			final String backupFolder = importConfig.backupFolder.replace(//
+					UI.SYMBOL_BACKSLASH,
+					UI.SYMBOL_HTML_BACKSLASH);
+
+			createHTML_FolderState(sb, backupFolder, Messages.Import_Data_HTML_BackupFolder);
+		}
+
+		final String deviceFolder = importConfig.deviceFolder.replace(//
+				UI.SYMBOL_BACKSLASH,
+				UI.SYMBOL_HTML_BACKSLASH);
 
 		if (numNotImported == 0) {
 
 			sb.append("<div class='folder-container'>"); //$NON-NLS-1$
+			sb.append(Messages.Import_Data_HTML_DeviceFolder);
 			sb.append("<span class='folder-name'>" + deviceFolder + "</span>"); //$NON-NLS-1$ //$NON-NLS-2$
-			sb.append(Messages.Import_Data_Label_NoImportedFiles);
+			sb.append(Messages.Import_Data_HTML_NoImportedFiles);
 			sb.append("</div>"); //$NON-NLS-1$
 
 		} else {
 
-			sb.append("<div class='folder-container'>"); //$NON-NLS-1$
-			sb.append("<span class='folder-name'>" + deviceFolder + "</span>"); //$NON-NLS-1$ //$NON-NLS-2$
-			sb.append(NLS.bind(Messages.Import_Data_Label_NotImportedFiles, //
+			final String htmlNotImportedFiles = NLS.bind(
+					Messages.Import_Data_HTML_NotImportedFiles,
 					numNotImported,
-					importConfig.numDeviceFiles));
+					importConfig.numDeviceFiles);
+
+			sb.append("<div class='folder-container'>"); //$NON-NLS-1$
+			sb.append(Messages.Import_Data_HTML_DeviceFolder);
+			sb.append("<span class='folder-name'>" + deviceFolder + "</span>"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append(htmlNotImportedFiles);
 			sb.append("</div>"); //$NON-NLS-1$
 
 			if (numNotImported > 0) {
@@ -1229,7 +1262,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			}
 		}
 
-		htmlImportFiles = sb.toString();
+		final String htmlTooltip = sb.toString();
 
 		/*
 		 * Show overflow scrollbar ONLY when more than 10 entries are available because it looks
@@ -1246,7 +1279,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				+ ("<div class='stateIcon' " + htmlImage + ">") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("   <div class='stateIconValue'>" + Integer.toString(numNotImported) + "</div>") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("</div>") //$NON-NLS-1$
-				+ ("<div class='stateTooltip" + withList + "' " + cssOverflow + ">" + htmlImportFiles + "</div>") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				+ ("<div class='stateTooltip" + withList + "' " + cssOverflow + ">" + htmlTooltip + "</div>") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 				+ "</div>"; //$NON-NLS-1$
 
 		return htmlDeviceState;
@@ -1262,7 +1295,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		final StringBuilder sb = new StringBuilder();
 		sb.append("<div class='folder-container'>"); //$NON-NLS-1$
 		sb.append("<span class='folder-name'>" + deviceFolder + "</span>"); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append(Messages.Import_Data_Error_FolderIsNotAvailable);
+		sb.append(Messages.Import_Data_HTML_FolderIsNotAvailable);
 		sb.append("</div>"); //$NON-NLS-1$
 
 		final String htmlInfo = sb.toString();
@@ -1280,7 +1313,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private String createHTML_DeviceState_NotDefined() {
 
 		final String htmlImage = createHTML_BgImage(_imageUrl_DeviceFolderNotDefined);
-		final String htmlInfo = Messages.Import_Data_Error_NoDeviceFolder.replace("\n", "<br>"); //$NON-NLS-1$ //$NON-NLS-2$
+		final String htmlInfo = Messages.Import_Data_HTML_NoDeviceFolder.replace("\n", "<br>"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		final String htmlDeviceState = ""// //$NON-NLS-1$
 
@@ -1290,6 +1323,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				+ "</div>"; //$NON-NLS-1$
 
 		return htmlDeviceState;
+	}
+
+	private void createHTML_FolderState(final StringBuilder sb, final String folderLocation, final String folderName) {
+
+		sb.append("<div class='folder-container'>"); //$NON-NLS-1$
+		sb.append(folderName);
+		sb.append("<span class='folder-name'>" + folderLocation + "</span>"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append("</div>"); //$NON-NLS-1$
 	}
 
 	private void createHTML_TileAction(	final StringBuilder sb,
@@ -1423,6 +1464,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			/*
 			 * Image urls
 			 */
+			_imageUrl_AppStateOK = net.tourbook.ui.UI.getIconUrl(Messages.Image__App_State_OK);
+			_imageUrl_AppStateError = net.tourbook.ui.UI.getIconUrl(Messages.Image__App_State_Error);
 			_imageUrl_ImportFromFile = net.tourbook.ui.UI.getIconUrl(Messages.Image__RawData_Import);
 			_imageUrl_SerialPort_Configured = net.tourbook.ui.UI.getIconUrl(Messages.Image__RawData_Transfer);
 			_imageUrl_SerialPort_Directly = net.tourbook.ui.UI.getIconUrl(Messages.Image__RawData_TransferDirect);
@@ -1617,6 +1660,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		getSite().registerContextMenu(menuMgr, _tourViewer);
 
 		_columnManager.createHeaderContextMenu(table, tableContextMenu);
+	}
+
+	private void deactivateBackgroundTask() {
+
+		// deactivate background task
+
+		_canPollImportFiles.set(false);
+
+		cancelThread_WatchDeviceFolder();
 	}
 
 	/**
@@ -2580,7 +2632,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		return AutoImportManager.getInstance().getAutoImportConfig();
 	}
 
-	public Image getImportConfigImage(final TourTypeItem importConfig) {
+	public Image getImportConfigImage(final AutoImportLauncher importConfig) {
 
 		final int imageWidth = importConfig.imageWidth;
 
@@ -2597,7 +2649,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		final Display display = _parent.getDisplay();
 
-		final Enum<TourTypeConfig> tourTypeConfig = importConfig.configType;
+		final Enum<TourTypeConfig> tourTypeConfig = importConfig.tourTypeConfig;
 		final net.tourbook.ui.UI ui = net.tourbook.ui.UI.getInstance();
 
 		if (TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED.equals(tourTypeConfig)) {
@@ -2762,7 +2814,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	 * @return Returns <code>true</code> when the image is valid, returns <code>false</code> when
 	 *         the profile image must be created,
 	 */
-	private boolean isConfigImageValid(final Image image, final TourTypeItem importConfig) {
+	private boolean isConfigImageValid(final Image image, final AutoImportLauncher importConfig) {
 
 		if (image == null || image.isDisposed()) {
 
@@ -2830,11 +2882,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		final String location = event.location;
 
+//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//				+ ("\tonBrowser_LocationChanging: " + location));
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
 		final String[] locationParts = location.split(HREF_TOKEN);
 
 		if (locationParts.length > 1) {
 
-			// end loading of the browser and start a new action
+			// end loading of the browser page and start a new action
 			_browser.getDisplay().asyncExec(new Runnable() {
 				@Override
 				public void run() {
@@ -2860,7 +2916,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			final long tileId = Long.parseLong(locationParts[2]);
 
-			onSelectAutoTile(tileId);
+			onSelectImportTile(tileId);
 
 		} else if (ACTION_IMPORT_FROM_FILES.equals(hrefAction)) {
 
@@ -2887,15 +2943,25 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_browser.setText(html);
 	}
 
-	private void onSelectAutoTile(final long tileId) {
+	private void onSelectImportTile(final long tileId) {
 
 		final ImportConfig importConfig = getImportConfig();
 
-		for (final TourTypeItem importTile : importConfig.tourTypeItems) {
+		for (final AutoImportLauncher importTile : importConfig.autoImportLaunchers) {
 
 			if (importTile.getId() == tileId) {
 
-				AutoImportManager.getInstance().runImport(importTile);
+				final ImportState importState = AutoImportManager.getInstance().runImport(importTile);
+
+				if (importState.isOpenSetup) {
+					_parent.getDisplay().asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							actionSetupImport();
+						}
+					});
+				}
+
 				break;
 			}
 		}
@@ -3328,10 +3394,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 					try {
 
-						System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-								+ ("\twatchDeviceFolder: " + deviceFolder));
-						// TODO remove SYSTEM.OUT.PRINTLN
-
 						_watcher = FileSystems.getDefault().newWatchService();
 
 						watchFolder.register(_watcher, ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE);
@@ -3345,20 +3407,25 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 								break;
 							}
 
-							// get polled events, they are not used, it's just for logging
-							for (final WatchEvent<?> event : _watchKey.pollEvents()) {
+							/*
+							 * Events MUST be polled otherwise this will be an endless loop.
+							 */
+							@SuppressWarnings("unused")
+							final List<WatchEvent<?>> polledEvents = _watchKey.pollEvents();
 
-								final WatchEvent.Kind<?> kind = event.kind();
+// log events, they are not used
+//							for (final WatchEvent<?> event : polledEvents) {
+//
+//								final WatchEvent.Kind<?> kind = event.kind();
+//
+//								System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//										+ (String.format("Event: %s\tFile: %s", kind, event.context())));
+//								// TODO remove SYSTEM.OUT.PRINTLN
+//							}
 
-								System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-										+ (String.format("Event: %s\tFile: %s", kind, event.context())));
-								// TODO remove SYSTEM.OUT.PRINTLN
-							}
+							updateDeviceState();
 
-							AutoImportManager.getInstance().checkImportedFiles(true);
-							updateUI_DeviceState();
-
-							if (_watchKey.reset()) {
+							if (_watchKey != null && _watchKey.reset()) {
 
 								// wait for the next event
 								_watchKey = _watcher.take();
@@ -3402,13 +3469,23 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	}
 
 	/**
-	 * Keep live update values, other values MUST already have been set.
+	 * Retrieve files from the device folder and update the UI.
 	 */
-	private void updateModel_ImportConfig(final DialogImportConfig dialog) {
+	private void updateDeviceState() {
+
+		AutoImportManager.getInstance().checkImportedFiles(true);
+		updateUI_DeviceState();
+	}
+
+	/**
+	 * Keep none live values.
+	 */
+	private void updateModel_ImportConfig_AndSave(final DialogImportConfig dialog) {
 
 		final ImportConfig modifiedConfig = dialog.getModifiedConfig();
 		final ImportConfig importConfig = getImportConfig();
 
+		importConfig.isCreateBackup = modifiedConfig.isCreateBackup;
 		importConfig.backupFolder = modifiedConfig.backupFolder;
 		importConfig.deviceFolder = modifiedConfig.deviceFolder;
 
@@ -3426,12 +3503,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		final ImportConfig importConfig = getImportConfig();
 
 		if (importConfig.animationDuration != modifiedConfig.animationDuration
-				|| importConfig.animationCrazyFactor != modifiedConfig.animationCrazyFactor) {
+				|| importConfig.animationCrazinessFactor != modifiedConfig.animationCrazinessFactor) {
 
 			// run animation only when it was modified
 			_isRunAnimation = true;
 		}
-		importConfig.animationCrazyFactor = modifiedConfig.animationCrazyFactor;
+		importConfig.animationCrazinessFactor = modifiedConfig.animationCrazinessFactor;
 		importConfig.animationDuration = modifiedConfig.animationDuration;
 
 		importConfig.backgroundOpacity = modifiedConfig.backgroundOpacity;
@@ -3521,6 +3598,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		final int numImportedTours = _rawDataMgr.getImportedTours().size();
 		if (numImportedTours > 0) {
 
+			deactivateBackgroundTask();
+
 			_topPageBook.showPage(_topPage_ImportViewer);
 
 		} else {
@@ -3548,17 +3627,19 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 						// dashboard is visible, activate background task
 
+						_browser.setFocus();
+
 						_canPollImportFiles.set(true);
 
 						setupThread_WatchDeviceFolder();
+
+						updateDeviceState();
 
 					} else {
 
 						// deactivate background task
 
-						_canPollImportFiles.set(false);
-
-						cancelThread_WatchDeviceFolder();
+						deactivateBackgroundTask();
 					}
 				}
 			});
