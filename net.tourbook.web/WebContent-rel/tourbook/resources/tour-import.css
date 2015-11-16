@@ -206,16 +206,8 @@ a.action-button:VISITED
 {
 	cursor: 				pointer; 
 	display:				block;
-	xwidth: 					20px; 
-	xheight: 				20px; 
 
 	text-decoration:		none;
-	
-	xbackground-repeat:		no-repeat;
-	xbackground-position:	center;
-
-	xborder:					1px solid transparent;
-	xborder-radius:			3px;
 }
 
 a.action-button:HOVER 
@@ -225,10 +217,11 @@ a.action-button:HOVER
 }
 
 /*
-	.stateTooltip
+ Import state
 */
 .importState
 {
+	display: 				block;	
 	cursor:					pointer;
 	
 	width:					32px;
@@ -262,13 +255,9 @@ a.action-button:HOVER
 	
 	padding:				5px;
 
-	width:					300px;
-	margin-left:			-150px;
-}
-
-.withList
-{
-	width:					400px;
+	xwidth:					100%;
+	min-width:				500px;
+	xmax-width:				600px;
 	margin-left:			-200px;
 	max-height:				80vh;
 }
@@ -283,17 +272,23 @@ a.action-button:HOVER
 	border:					1px solid #777; 
 }
 
-.folder-container
+.folderContainer
 {
 	xpadding-bottom: 		10px;
 	font-weight: 			lighter;
 }
 
-.folder-name
+.folderLocation
 {
-	display:				block;
-	padding-bottom:			5px;
+	xpadding-bottom:			5px;
+	font-weight: 			600;
 	font-size: 				16px;
+}
+
+.folderError
+{
+	color:					red;
+	font-weight:			500;
 }
 
 .deviceList

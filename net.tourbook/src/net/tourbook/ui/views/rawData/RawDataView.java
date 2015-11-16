@@ -325,9 +325,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	//
 	private String							_imageUrl_AppStateError;
 	private String							_imageUrl_AppStateOK;
-	private String							_imageUrl_DeviceFolder;
-	private String							_imageUrl_DeviceFolderNotDefined;
-	private String							_imageUrl_DeviceFolderNotAvailable;
+	private String							_imageUrl_DeviceFolder_OK;
+	private String							_imageUrl_DeviceFolder_NotAvailable;
 	private String							_imageUrl_ImportFromFile;
 	private String							_imageUrl_SerialPort_Configured;
 	private String							_imageUrl_SerialPort_Directly;
@@ -1140,197 +1139,171 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private String createHTML_DeviceState() {
 
-		String htmlDeviceState;
-
 		final ImportConfig importConfig = getImportConfig();
-		final String deviceFolder = importConfig.deviceFolder;
-
-		if (deviceFolder == null || deviceFolder.trim().length() == 0) {
-
-			// device folder is not defined
-
-			htmlDeviceState = createHTML_DeviceState_NotDefined();
-
-		} else {
-
-			final String deviceOSFolder = importConfig.getDeviceOSFolder();
-
-			try {
-
-				if (deviceOSFolder != null && Files.exists(Paths.get(deviceOSFolder))) {
-
-					// device folder exists
-					htmlDeviceState = createHTML_DeviceState_Available();
-
-				} else {
-
-					// device folder do not exist
-					htmlDeviceState = createHTML_DeviceState_NotAvailable();
-				}
-
-			} catch (final Exception e) {
-				htmlDeviceState = createHTML_DeviceState_NotAvailable();
-			}
-		}
-
-		final String hrefAction = HTTP_DUMMY + HREF_SETUP_AUTO_IMPORT;
-
-		final String htmlActionImportConfig = ""// //$NON-NLS-1$
-				+ "<a class=''" // //$NON-NLS-1$
-				+ (" href='" + hrefAction + "'") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ">" //$NON-NLS-1$
-				+ htmlDeviceState
-				+ "</a>"; //$NON-NLS-1$
-
-//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//				+ ("createHTML_DeviceState\n\nhtmlDeviceState:\n" + htmlActionImportConfig + "\n"));
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
-		return htmlActionImportConfig;
-	}
-
-	private String createHTML_DeviceState_Available() {
-
-		final ImportConfig importConfig = getImportConfig();
+		final boolean isCreateBackup = importConfig.isCreateBackup;
 		final ArrayList<DeviceFile> notImportedFiles = importConfig.notImportedFiles;
 		final int numNotImported = notImportedFiles.size();
 
 		final StringBuilder sb = new StringBuilder();
 
-		if (importConfig.isCreateBackup) {
+		boolean isFolderOK = true;
+
+		/*
+		 * Local folder
+		 */
+		if (isCreateBackup) {
 
 			final String backupFolder = importConfig.backupFolder.replace(//
 					UI.SYMBOL_BACKSLASH,
 					UI.SYMBOL_HTML_BACKSLASH);
 
-			createHTML_FolderState(sb, backupFolder, Messages.Import_Data_HTML_BackupFolder);
+			final String backupOSFolder = importConfig.getBackupOSFolder();
+
+			isFolderOK &= createHTML_FolderState(
+					sb,
+					Messages.Import_Data_HTML_BackupFolder,
+					backupFolder,
+					backupOSFolder,
+					UI.EMPTY_STRING);
 		}
 
+		/*
+		 * Device folder
+		 */
 		final String deviceFolder = importConfig.deviceFolder.replace(//
 				UI.SYMBOL_BACKSLASH,
 				UI.SYMBOL_HTML_BACKSLASH);
 
-		if (numNotImported == 0) {
+		final String deviceOSFolder = importConfig.getDeviceOSFolder();
 
-			sb.append("<div class='folder-container'>"); //$NON-NLS-1$
-			sb.append(Messages.Import_Data_HTML_DeviceFolder);
-			sb.append("<span class='folder-name'>" + deviceFolder + "</span>"); //$NON-NLS-1$ //$NON-NLS-2$
-			sb.append(Messages.Import_Data_HTML_NoImportedFiles);
-			sb.append("</div>"); //$NON-NLS-1$
+		final String paddingTop = importConfig.isCreateBackup ? "padding-top:10px;" : UI.EMPTY_STRING; //$NON-NLS-1$
 
-		} else {
+		final boolean isDeviceFolderOK = createHTML_FolderState(
+				sb,
+				Messages.Import_Data_HTML_DeviceFolder,
+				deviceFolder,
+				deviceOSFolder,
+				paddingTop);
 
-			final String htmlNotImportedFiles = NLS.bind(
-					Messages.Import_Data_HTML_NotImportedFiles,
-					numNotImported,
-					importConfig.numDeviceFiles);
+		isFolderOK &= isDeviceFolderOK;
 
-			sb.append("<div class='folder-container'>"); //$NON-NLS-1$
-			sb.append(Messages.Import_Data_HTML_DeviceFolder);
-			sb.append("<span class='folder-name'>" + deviceFolder + "</span>"); //$NON-NLS-1$ //$NON-NLS-2$
-			sb.append(htmlNotImportedFiles);
-			sb.append("</div>"); //$NON-NLS-1$
-
-			if (numNotImported > 0) {
-
-				sb.append("<table class='deviceList'><tbody>"); //$NON-NLS-1$
-
-				for (final DeviceFile deviceFile : notImportedFiles) {
-
-					sb.append("<tr>"); //$NON-NLS-1$
-
-					sb.append("<td class='column name'>"); //$NON-NLS-1$
-					sb.append(deviceFile.fileName);
-					sb.append("</td>"); //$NON-NLS-1$
-
-					sb.append("<td class='right column'>"); //$NON-NLS-1$
-					sb.append(deviceFile.size);
-					sb.append("</td>"); //$NON-NLS-1$
-
-					sb.append("<td class='right column'>"); //$NON-NLS-1$
-					sb.append(_dateFormatter.format(deviceFile.modifiedTime));
-					sb.append("</td>"); //$NON-NLS-1$
-
-					sb.append("<td class='right'>"); //$NON-NLS-1$
-					sb.append(_timeFormatter.format(deviceFile.modifiedTime));
-					sb.append("</td>"); //$NON-NLS-1$
-
-					sb.append("</tr>"); //$NON-NLS-1$
-				}
-
-				sb.append("</tbody></table>"); //$NON-NLS-1$
-			}
+		if (numNotImported > 0) {
+			createHTML_NotImportedFiles(sb, notImportedFiles);
 		}
 
 		final String htmlTooltip = sb.toString();
+
+		/*
+		 * Different html
+		 */
+		final String hrefAction = HTTP_DUMMY + HREF_SETUP_AUTO_IMPORT;
+		final String imageUrl = isFolderOK ? _imageUrl_DeviceFolder_OK : _imageUrl_DeviceFolder_NotAvailable;
+		final String stateImage = createHTML_BgImage(imageUrl);
+		final String stateIconValue = isDeviceFolderOK ? Integer.toString(numNotImported) : UI.EMPTY_STRING;
 
 		/*
 		 * Show overflow scrollbar ONLY when more than 10 entries are available because it looks
 		 * ugly.
 		 */
 		final String cssOverflow = numNotImported > 10 ? "style='overflow-y: scroll;'" : UI.EMPTY_STRING; //$NON-NLS-1$
-		final String withList = numNotImported > 0 ? " withList" : UI.EMPTY_STRING; //$NON-NLS-1$
 
-		final String htmlImage = createHTML_BgImage(_imageUrl_DeviceFolder);
+		final String html = ""// //$NON-NLS-1$
 
-		final String htmlDeviceState = ""// //$NON-NLS-1$
+				+ "<a class='importState'" // //$NON-NLS-1$
+				+ (" href='" + hrefAction + "'") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ">" //$NON-NLS-1$
 
-				+ ("<div class='importState'>") //$NON-NLS-1$
-				+ ("<div class='stateIcon' " + htmlImage + ">") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("   <div class='stateIconValue'>" + Integer.toString(numNotImported) + "</div>") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("<div class='stateIcon' " + stateImage + ">") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("   <div class='stateIconValue'>" + stateIconValue + "</div>") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("</div>") //$NON-NLS-1$
-				+ ("<div class='stateTooltip" + withList + "' " + cssOverflow + ">" + htmlTooltip + "</div>") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-				+ "</div>"; //$NON-NLS-1$
+				+ ("<div class='stateTooltip' " + cssOverflow + ">" + htmlTooltip + "</div>") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-		return htmlDeviceState;
+				+ "</a>"; //$NON-NLS-1$
+
+//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//				+ ("createHTML_DeviceState\n\nhtmlDeviceState:\n" + htmlActionImportConfig + "\n"));
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
+		return html;
 	}
 
-	private String createHTML_DeviceState_NotAvailable() {
 
-		final String htmlImage = createHTML_BgImage(_imageUrl_DeviceFolderNotAvailable);
-		final String deviceFolder = getImportConfig().deviceFolder.replace(
-				UI.SYMBOL_BACKSLASH,
-				UI.SYMBOL_HTML_BACKSLASH);
+	private boolean createHTML_FolderState(	final StringBuilder sb,
+											final String folderLabel,
+											final String folderLocation,
+											final String osFolder,
+											final String style) {
 
-		final StringBuilder sb = new StringBuilder();
-		sb.append("<div class='folder-container'>"); //$NON-NLS-1$
-		sb.append("<span class='folder-name'>" + deviceFolder + "</span>"); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append(Messages.Import_Data_HTML_FolderIsNotAvailable);
+		boolean isOSFolderValid = false;
+
+		try {
+
+			if (osFolder != null && osFolder.trim().length() > 0 && Files.exists(Paths.get(osFolder))) {
+
+				// device folder exists
+				isOSFolderValid = true;
+			}
+
+		} catch (final Exception e) {}
+
+		String errorState;
+		if (isOSFolderValid) {
+			errorState = UI.EMPTY_STRING;
+		} else {
+			errorState = "<div class='folderError'>" + Messages.Import_Data_HTML_FolderIsNotAvailable + "</div>"; //$NON-NLS-1$ //$NON-NLS-2$
+		}
+
+		final String imageUrl = isOSFolderValid ? _imageUrl_AppStateOK : _imageUrl_AppStateError;
+		final String folderStateIcon = "<img src='" //$NON-NLS-1$
+				+ imageUrl
+				+ "' style='padding-left:5px; vertical-align:text-bottom;'>"; //$NON-NLS-1$
+
+		sb.append("<div class='folderContainer' style='" + style + "'>"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append(folderLabel);
+		sb.append("<div class='folderLocation'>" + folderLocation + folderStateIcon + "</div>"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append(errorState);
 		sb.append("</div>"); //$NON-NLS-1$
 
-		final String htmlInfo = sb.toString();
-
-		final String htmlDeviceState = ""// //$NON-NLS-1$
-
-				+ "<div class='importState'>" //$NON-NLS-1$
-				+ ("<div class='stateIcon' " + htmlImage + ">&nbsp;</div>") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("<div class='stateTooltip'>" + htmlInfo.replace('"', '\'') + "</div>") //$NON-NLS-1$ //$NON-NLS-2$
-				+ "</div>"; //$NON-NLS-1$
-
-		return htmlDeviceState;
+		return isOSFolderValid;
 	}
 
-	private String createHTML_DeviceState_NotDefined() {
+	private void createHTML_NotImportedFiles(final StringBuilder sb, final ArrayList<DeviceFile> notImportedFiles) {
 
-		final String htmlImage = createHTML_BgImage(_imageUrl_DeviceFolderNotDefined);
-		final String htmlInfo = Messages.Import_Data_HTML_NoDeviceFolder.replace("\n", "<br>"); //$NON-NLS-1$ //$NON-NLS-2$
+		final ImportConfig importConfig = getImportConfig();
 
-		final String htmlDeviceState = ""// //$NON-NLS-1$
+		final String htmlNotImportedFiles = NLS.bind(
+				Messages.Import_Data_HTML_NotImportedFiles,
+				notImportedFiles.size(),
+				importConfig.numDeviceFiles);
 
-				+ "<div class='importState'>" //$NON-NLS-1$
-				+ ("<div class='stateIcon' " + htmlImage + "></div>") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("<div class='stateTooltip'>" + htmlInfo + "</div>") //$NON-NLS-1$ //$NON-NLS-2$
-				+ "</div>"; //$NON-NLS-1$
+		sb.append(htmlNotImportedFiles);
 
-		return htmlDeviceState;
-	}
+		sb.append("<table class='deviceList'><tbody>"); //$NON-NLS-1$
 
-	private void createHTML_FolderState(final StringBuilder sb, final String folderLocation, final String folderName) {
+		for (final DeviceFile deviceFile : notImportedFiles) {
 
-		sb.append("<div class='folder-container'>"); //$NON-NLS-1$
-		sb.append(folderName);
-		sb.append("<span class='folder-name'>" + folderLocation + "</span>"); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append("</div>"); //$NON-NLS-1$
+			sb.append("<tr>"); //$NON-NLS-1$
+
+			sb.append("<td class='column name'>"); //$NON-NLS-1$
+			sb.append(deviceFile.fileName);
+			sb.append("</td>"); //$NON-NLS-1$
+
+			sb.append("<td class='right column'>"); //$NON-NLS-1$
+			sb.append(deviceFile.size);
+			sb.append("</td>"); //$NON-NLS-1$
+
+			sb.append("<td class='right column'>"); //$NON-NLS-1$
+			sb.append(_dateFormatter.format(deviceFile.modifiedTime));
+			sb.append("</td>"); //$NON-NLS-1$
+
+			sb.append("<td class='right'>"); //$NON-NLS-1$
+			sb.append(_timeFormatter.format(deviceFile.modifiedTime));
+			sb.append("</td>"); //$NON-NLS-1$
+
+			sb.append("</tr>"); //$NON-NLS-1$
+		}
+
+		sb.append("</tbody></table>"); //$NON-NLS-1$
 	}
 
 	private void createHTML_TileAction(	final StringBuilder sb,
@@ -1469,11 +1442,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			_imageUrl_ImportFromFile = net.tourbook.ui.UI.getIconUrl(Messages.Image__RawData_Import);
 			_imageUrl_SerialPort_Configured = net.tourbook.ui.UI.getIconUrl(Messages.Image__RawData_Transfer);
 			_imageUrl_SerialPort_Directly = net.tourbook.ui.UI.getIconUrl(Messages.Image__RawData_TransferDirect);
-			_imageUrl_DeviceFolder = net.tourbook.ui.UI.getIconUrl(Messages.Image__RawData_DeviceFolder);
-			_imageUrl_DeviceFolderNotDefined = net.tourbook.ui.UI
+			_imageUrl_DeviceFolder_OK = net.tourbook.ui.UI.getIconUrl(Messages.Image__RawData_DeviceFolder);
+			_imageUrl_DeviceFolder_NotAvailable = net.tourbook.ui.UI
 					.getIconUrl(Messages.Image__RawData_DeviceFolder_NotDefined);
-			_imageUrl_DeviceFolderNotAvailable = net.tourbook.ui.UI
-					.getIconUrl(Messages.Image__RawData_DeviceFolder_NotAvailable);
 
 		} catch (final IOException | URISyntaxException e) {
 			StatusUtil.showStatus(e);

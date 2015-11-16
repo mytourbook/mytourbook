@@ -136,11 +136,14 @@ public class Messages extends NLS {
 	public static String		Dialog_ImportConfig_Dialog_Message;
 	public static String		Dialog_ImportConfig_Dialog_Title;
 	public static String		Dialog_ImportConfig_Error_FolderIsInvalid;
-	public static String		Dialog_ImportConfig_Group_AutoImportActions;
 	public static String		Dialog_ImportConfig_Group_Dashboard;
 	public static String		Dialog_ImportConfig_Group_DeviceFolder;
 
+	public static String	Dialog_ImportConfig_Group_ImportActions;
+
 	public static String		Dialog_ImportConfig_Group_ImportLauncher;
+
+	public static String	Dialog_ImportConfig_Group_ImportLauncherActions;
 
 	public static String		Dialog_ImportConfig_Group_ImportLauncherConfig;
 	public static String		Dialog_ImportConfig_Info_ConfigDragDrop;
@@ -152,18 +155,23 @@ public class Messages extends NLS {
 	public static String		Dialog_ImportConfig_Label_AnimationDuration_Tooltip;
 	public static String		Dialog_ImportConfig_Label_BackgroundOpacity;
 	public static String		Dialog_ImportConfig_Label_BackgroundOpacity_Tooltip;
-	public static String		Dialog_ImportConfig_Label_BackupFolder;
-	public static String		Dialog_ImportConfig_Label_BackupFolder_Tooltip;
+
+	public static String	Dialog_ImportConfig_Label_BackupFolder;
+
+	public static String	Dialog_ImportConfig_Label_BackupFolder_Tooltip;
 	public static String		Dialog_ImportConfig_Label_ConfigDescription;
 	public static String		Dialog_ImportConfig_Label_ConfigName;
 	public static String		Dialog_ImportConfig_Label_ConfigTileSize;
 	public static String		Dialog_ImportConfig_Label_ConfigTileSize_Tooltip;
 	public static String		Dialog_ImportConfig_Label_ConfigTitle;
 	public static String		Dialog_ImportConfig_Label_DeviceFolder;
+
+	public static String	Dialog_ImportConfig_Label_DeviceFolder_Tooltip;
 	public static String		Dialog_ImportConfig_Label_ImportColumns;
 	public static String		Dialog_ImportConfig_Label_ImportColumns_Tooltip;
 
 	public static String		Dialog_ImportConfig_Label_ImportLauncher;
+
 	public static String		Dialog_ImportConfig_Label_TourType;
 	public static String		Dialog_ImportConfig_Link_TourType;
 	public static String		Dialog_ImportConfig_Spinner_Speed_Tooltip;
@@ -871,13 +879,14 @@ public class Messages extends NLS {
 	public static String		Import_Data_Error_CreatingFileName_Title;
 	public static String		Import_Data_Error_DeviceFolderDoNotExist;
 	public static String		Import_Data_HTML_AutomatedImport;
-	public static String		Import_Data_HTML_BackupFolder;
 
+	public static String	Import_Data_HTML_BackupFolder;
 	public static String		Import_Data_HTML_DeviceFolder;
 	public static String		Import_Data_HTML_FolderIsNotAvailable;
 	public static String		Import_Data_HTML_GetTours;
 	public static String		Import_Data_HTML_ImportFromFiles_Action;
 	public static String		Import_Data_HTML_ImportFromFiles_ActionTooltip;
+
 	public static String		Import_Data_HTML_NoDeviceFolder;
 	public static String		Import_Data_HTML_NoImportedFiles;
 	public static String		Import_Data_HTML_NotImportedFiles;

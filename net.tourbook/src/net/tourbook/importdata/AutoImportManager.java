@@ -41,7 +41,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.NIO;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.StatusUtil;
@@ -228,36 +227,27 @@ public class AutoImportManager {
 	private String getImportFiles_10_GetDeviceFolder() {
 
 		final ImportConfig importConfig = getAutoImportConfig();
-
-		final String deviceFolderRaw = importConfig.deviceFolder;
-		final String deviceFolder;
-
-		if (NIO.isDeviceNameFolder(deviceFolderRaw)) {
-
-			deviceFolder = NIO.convertToOSPath(deviceFolderRaw);
-
-		} else {
-
-			deviceFolder = deviceFolderRaw;
-		}
+		final String deviceOSFolder = importConfig.getDeviceOSFolder();
 
 		boolean isFolderValid = false;
 
-		try {
+		if (deviceOSFolder != null && deviceOSFolder.trim().length() > 0) {
+			try {
 
-			final Path devicePath = Paths.get(deviceFolder);
+				final Path devicePath = Paths.get(deviceOSFolder);
 
-			if (Files.exists(devicePath)) {
-				isFolderValid = true;
-			}
+				if (Files.exists(devicePath)) {
+					isFolderValid = true;
+				}
 
-		} catch (final Exception e) {}
+			} catch (final Exception e) {}
+		}
 
 		if (isFolderValid == false) {
 			return null;
 		}
 
-		return deviceFolder;
+		return deviceOSFolder;
 	}
 
 	private List<DeviceFile> getImportFiles_12_GetDeviceFileNames(final String validDeviceFolder) {
@@ -406,7 +396,12 @@ public class AutoImportManager {
 
 		importConfig.isLiveUpdate = Util.getXmlBoolean(xmlMemento, ATTR_IS_LIVE_UPDATE, true);
 
-		importConfig.animationCrazinessFactor = Util.getXmlInteger(xmlMemento, ATTR_ANIMATION_CRAZY_FACTOR, 3, -100, 100);
+		importConfig.animationCrazinessFactor = Util.getXmlInteger(
+				xmlMemento,
+				ATTR_ANIMATION_CRAZY_FACTOR,
+				3,
+				-100,
+				100);
 		importConfig.animationDuration = Util.getXmlInteger(xmlMemento, ATTR_ANIMATION_DURATION, 40, 0, 100);
 		importConfig.backgroundOpacity = Util.getXmlInteger(xmlMemento, ATTR_BACKGROUND_OPACITY, 5, 0, 100);
 
@@ -434,7 +429,7 @@ public class AutoImportManager {
 
 			configItem.name = Util.getXmlString(xmlConfig, ATTR_CONFIG_NAME, UI.EMPTY_STRING);
 			configItem.description = Util.getXmlString(xmlConfig, ATTR_CONFIG_DESCRIPTION, UI.EMPTY_STRING);
-			configItem.isSetTourType = Util.getXmlBoolean(xmlMemento, ATTR_IS_SET_TOUR_TYPE, false);
+			configItem.isSetTourType = Util.getXmlBoolean(xmlConfig, ATTR_IS_SET_TOUR_TYPE, false);
 
 			final Enum<TourTypeConfig> ttConfig = Util.getXmlEnum(
 					xmlConfig,

@@ -220,7 +220,7 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 	private Combo						_comboTTConfig;
 
 	private Label						_lblBackupFolder;
-	private Label						_lblBackupFolderPath;
+	private Label						_lblLocalFolderPath;
 	private Label						_lblDeviceFolder;
 	private Label						_lblDeviceFolderPath;
 	private Label						_lblTTConfigDescription;
@@ -529,7 +529,7 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 		enableTTControls();
 
 		// set focus
-		_comboDeviceFolder.setFocus();
+		_comboBackupFolder.setFocus();
 	}
 
 	private void createActions() {
@@ -631,98 +631,16 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 		GridLayoutFactory.swtDefaults()//
 				.applyTo(container);
 		{
-			createUI_10_DeviceFolder(container);
 			createUI_30_ImportActions(container);
 			createUI_50_ImportLauncher(container);
 			createUI_90_Dashboard(container);
 		}
 	}
 
-	private void createUI_10_DeviceFolder(final Composite parent) {
-
-		final Group groupConfig = new Group(parent, SWT.NONE);
-		groupConfig.setText(Messages.Dialog_ImportConfig_Group_DeviceFolder);
-		GridDataFactory.fillDefaults()//
-				.grab(true, false)
-				.applyTo(groupConfig);
-		GridLayoutFactory.swtDefaults()//
-				.numColumns(1)
-				.applyTo(groupConfig);
-//		groupConfig.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-		{
-			createUI_21_DeviceFolder(groupConfig);
-		}
-	}
-
-	private void createUI_21_DeviceFolder(final Composite parent) {
-
-		/*
-		 * Label: device folder
-		 */
-		_lblDeviceFolder = new Label(parent, SWT.NONE);
-		_lblDeviceFolder.setText(Messages.Dialog_ImportConfig_Label_DeviceFolder);
-		GridDataFactory.fillDefaults()//
-				.align(SWT.FILL, SWT.CENTER)
-//				.indent(_leftPadding, 0)
-				.applyTo(_lblDeviceFolder);
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults()//
-				.numColumns(2)
-//				.extendedMargins(-CONTROL_DECORATION_WIDTH, 0, 0, 0)
-				.applyTo(container);
-		{
-			/*
-			 * Combo: path
-			 */
-			_comboDeviceFolder = new Combo(container, SWT.SINGLE | SWT.BORDER);
-			_comboDeviceFolder.setVisibleItemCount(44);
-			_comboDeviceFolder.addVerifyListener(net.tourbook.common.UI.verifyFilePathInput());
-			_comboDeviceFolder.addModifyListener(_folderModifyListener);
-			_comboDeviceFolder.addKeyListener(_folderKeyListener);
-			_comboDeviceFolder.addFocusListener(_folderFocusListener);
-			_comboDeviceFolder.setData(_deviceHistoryItems);
-			_comboDeviceFolder.setToolTipText(Messages.Dialog_ImportConfig_Combo_Folder_Tooltip);
-			GridDataFactory.fillDefaults()//
-					.grab(true, false)
-					.align(SWT.FILL, SWT.CENTER)
-					.applyTo(_comboDeviceFolder);
-
-			/*
-			 * Button: browse...
-			 */
-			_btnSelectDeviceFolder = new Button(container, SWT.PUSH);
-			_btnSelectDeviceFolder.setText(Messages.app_btn_browse);
-			_btnSelectDeviceFolder.setData(_comboDeviceFolder);
-			_btnSelectDeviceFolder.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onSelectFolder_Device();
-				}
-			});
-			GridDataFactory.fillDefaults()//
-					.align(SWT.FILL, SWT.CENTER)
-					.applyTo(_btnSelectDeviceFolder);
-			setButtonLayoutData(_btnSelectDeviceFolder);
-		}
-
-		/*
-		 * Label: device folder absolute path
-		 */
-		_lblDeviceFolderPath = new Label(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-				.grab(true, false)
-				.indent(convertHorizontalDLUsToPixels(4), 0)
-				.applyTo(_lblDeviceFolderPath);
-
-		_deviceHistoryItems.setControls(_comboDeviceFolder, _lblDeviceFolderPath);
-	}
-
 	private void createUI_30_ImportActions(final Composite parent) {
 
 		final Group groupConfig = new Group(parent, SWT.NONE);
-		groupConfig.setText(Messages.Dialog_ImportConfig_Group_AutoImportActions);
+		groupConfig.setText(Messages.Dialog_ImportConfig_Group_ImportActions);
 		GridDataFactory.fillDefaults()//
 				.grab(true, false)
 				.indent(0, VERTICAL_GROUP_DISTANCE)
@@ -730,10 +648,10 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 		GridLayoutFactory.swtDefaults()//
 				.numColumns(2)
 				.applyTo(groupConfig);
-//		groupConfig.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+//		groupConfig.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 		{
 			createUI_32_BackupFolder(groupConfig);
-			createUI_34_ImportAction(groupConfig);
+			createUI_34_DeviceFolder(groupConfig);
 		}
 	}
 
@@ -760,7 +678,7 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 				.applyTo(_chkCreateBackup);
 
 		/*
-		 * Label: Backup folder
+		 * Label: Local folder
 		 */
 		_lblBackupFolder = new Label(parent, SWT.NONE);
 		_lblBackupFolder.setText(Messages.Dialog_ImportConfig_Label_BackupFolder);
@@ -776,7 +694,7 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 				.applyTo(container);
 		GridLayoutFactory.fillDefaults()//
 				.numColumns(2)
-				.extendedMargins(CONTROL_DECORATION_WIDTH, 0, 0, 0)
+//				.extendedMargins(CONTROL_DECORATION_WIDTH, 0, 0, 0)
 				.applyTo(container);
 		{
 			/*
@@ -792,6 +710,7 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 			_comboBackupFolder.setToolTipText(Messages.Dialog_ImportConfig_Combo_Folder_Tooltip);
 			GridDataFactory.fillDefaults()//
 					.grab(true, false)
+					.indent(CONTROL_DECORATION_WIDTH, 0)
 					.align(SWT.FILL, SWT.CENTER)
 					.applyTo(_comboBackupFolder);
 
@@ -812,28 +731,27 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 			setButtonLayoutData(_btnSelectBackupFolder);
 		}
 
+		/*
+		 * Backup folder info
+		 */
 		{
-			/*
-			 * Backup folder info
-			 */
-
-			// left column
+			// fill left column
 			new Label(parent, SWT.NONE);
 
 			/*
-			 * Label: device folder absolute path
+			 * Label: local folder absolute path
 			 */
-			_lblBackupFolderPath = new Label(parent, SWT.NONE);
+			_lblLocalFolderPath = new Label(parent, SWT.NONE);
 			GridDataFactory.fillDefaults()//
 					.grab(true, false)
 					.indent(CONTROL_DECORATION_WIDTH + convertHorizontalDLUsToPixels(4), 0)
-					.applyTo(_lblBackupFolderPath);
+					.applyTo(_lblLocalFolderPath);
 
-			_backupHistoryItems.setControls(_comboBackupFolder, _lblBackupFolderPath);
+			_backupHistoryItems.setControls(_comboBackupFolder, _lblLocalFolderPath);
 		}
 	}
 
-	private void createUI_34_ImportAction(final Composite parent) {
+	private void createUI_34_DeviceFolder(final Composite parent) {
 
 		/*
 		 * Checkbox: Import tour files
@@ -843,11 +761,84 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 		_chkImportFiles.addSelectionListener(_defaultSelectionListener);
 		GridDataFactory.fillDefaults()//
 				.span(2, 1)
+				.indent(0, convertVerticalDLUsToPixels(8))
 				.applyTo(_chkImportFiles);
 
 		// this control is just for info and to have a consistent UI
 		_chkImportFiles.setSelection(true);
 		_chkImportFiles.setEnabled(false);
+
+		/*
+		 * Label: device folder
+		 */
+		_lblDeviceFolder = new Label(parent, SWT.NONE);
+		_lblDeviceFolder.setText(Messages.Dialog_ImportConfig_Label_DeviceFolder);
+		_lblDeviceFolder.setToolTipText(Messages.Dialog_ImportConfig_Label_DeviceFolder_Tooltip);
+		GridDataFactory.fillDefaults()//
+				.align(SWT.FILL, SWT.CENTER)
+				.indent(_leftPadding, 0)
+				.applyTo(_lblDeviceFolder);
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults()//
+				.numColumns(2)
+//				.extendedMargins(-CONTROL_DECORATION_WIDTH, 0, 0, 0)
+				.applyTo(container);
+		{
+			/*
+			 * Combo: path
+			 */
+			_comboDeviceFolder = new Combo(container, SWT.SINGLE | SWT.BORDER);
+			_comboDeviceFolder.setVisibleItemCount(44);
+			_comboDeviceFolder.addVerifyListener(net.tourbook.common.UI.verifyFilePathInput());
+			_comboDeviceFolder.addModifyListener(_folderModifyListener);
+			_comboDeviceFolder.addKeyListener(_folderKeyListener);
+			_comboDeviceFolder.addFocusListener(_folderFocusListener);
+			_comboDeviceFolder.setData(_deviceHistoryItems);
+			_comboDeviceFolder.setToolTipText(Messages.Dialog_ImportConfig_Combo_Folder_Tooltip);
+			GridDataFactory.fillDefaults()//
+					.grab(true, false)
+					.indent(CONTROL_DECORATION_WIDTH, 0)
+					.align(SWT.FILL, SWT.CENTER)
+					.applyTo(_comboDeviceFolder);
+
+			/*
+			 * Button: browse...
+			 */
+			_btnSelectDeviceFolder = new Button(container, SWT.PUSH);
+			_btnSelectDeviceFolder.setText(Messages.app_btn_browse);
+			_btnSelectDeviceFolder.setData(_comboDeviceFolder);
+			_btnSelectDeviceFolder.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onSelectFolder_Device();
+				}
+			});
+			GridDataFactory.fillDefaults()//
+					.align(SWT.FILL, SWT.CENTER)
+					.applyTo(_btnSelectDeviceFolder);
+			setButtonLayoutData(_btnSelectDeviceFolder);
+		}
+
+		/*
+		 * Backup folder info
+		 */
+		{
+			// fill left column
+			new Label(parent, SWT.NONE);
+
+			/*
+			 * Label: device folder absolute path
+			 */
+			_lblDeviceFolderPath = new Label(parent, SWT.NONE);
+			GridDataFactory.fillDefaults()//
+					.grab(true, false)
+					.indent(CONTROL_DECORATION_WIDTH + convertHorizontalDLUsToPixels(4), 0)
+					.applyTo(_lblDeviceFolderPath);
+
+			_deviceHistoryItems.setControls(_comboDeviceFolder, _lblDeviceFolderPath);
+		}
 	}
 
 	private void createUI_50_ImportLauncher(final Composite parent) {
@@ -872,16 +863,32 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 			createUI_51_ILViewer_Container(group);
 			createUI_54_ILActions(group);
 
-			final Group groupIL = new Group(group, SWT.NONE);
-			groupIL.setText(Messages.Dialog_ImportConfig_Group_ImportLauncherConfig);
+			final Composite container = new Composite(group, SWT.NONE);
 			GridDataFactory.fillDefaults()//
-					.grab(true, true)
+					.grab(true, false)
 					.indent(convertWidthInCharsToPixels(3), 0)
-					.applyTo(groupIL);
-			GridLayoutFactory.swtDefaults().numColumns(2).applyTo(groupIL);
+					.applyTo(container);
+			GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
 			{
-				createUI_57_ILName(groupIL);
-				createUI_80_ILTourType(groupIL);
+				final Group groupIL = new Group(container, SWT.NONE);
+				groupIL.setText(Messages.Dialog_ImportConfig_Group_ImportLauncherConfig);
+				GridDataFactory.fillDefaults()//
+						.grab(true, false)
+						.applyTo(groupIL);
+				GridLayoutFactory.swtDefaults().numColumns(2).applyTo(groupIL);
+				{
+					createUI_57_ILName(groupIL);
+				}
+
+				final Group groupILActions = new Group(container, SWT.NONE);
+				groupILActions.setText(Messages.Dialog_ImportConfig_Group_ImportLauncherActions);
+				GridDataFactory.fillDefaults()//
+						.grab(true, true)
+						.applyTo(groupILActions);
+				GridLayoutFactory.swtDefaults().numColumns(2).applyTo(groupILActions);
+				{
+					createUI_80_ILTourType(groupILActions);
+				}
 			}
 
 			createUI_56_DragDropHint(group);
@@ -1287,12 +1294,13 @@ public class DialogImportConfig extends TitleAreaDialog implements ITourViewer {
 		}
 
 		// fill left column
-		new Label(parent, SWT.NONE);
+//		new Label(parent, SWT.NONE);
 
 		_pagebookTourType = new PageBook(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
 				.grab(true, true)
-				.indent(0, 8)
+				.span(2, 1)
+				.indent(_leftPadding, 8)
 				.applyTo(_pagebookTourType);
 		{
 			_pageTourType_NoTourType = createUI_81_Page_NoTourType(_pagebookTourType);

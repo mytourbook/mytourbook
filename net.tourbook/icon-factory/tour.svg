@@ -20,6 +20,29 @@
   <defs
      id="defs2987">
     <linearGradient
+       inkscape:collect="always"
+       id="linearGradient4984">
+      <stop
+         style="stop-color:#41a2f7;stop-opacity:1;"
+         offset="0"
+         id="stop4986" />
+      <stop
+         style="stop-color:#41a2f7;stop-opacity:0;"
+         offset="1"
+         id="stop4988" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient4975">
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="0"
+         id="stop4977" />
+      <stop
+         id="stop4982"
+         offset="1"
+         style="stop-color:#369df7;stop-opacity:1;" />
+    </linearGradient>
+    <linearGradient
        id="linearGradient5006">
       <stop
          id="stop5008"
@@ -3979,14 +4002,14 @@
          id="stop5168-17" />
     </linearGradient>
     <linearGradient
-       y2="102.36218"
-       x2="168"
-       y1="92.362183"
-       x1="168"
+       y2="102.18745"
+       x2="117.92217"
+       y1="94.895409"
+       x1="117.92217"
        gradientTransform="translate(-10.000003,-1.1628125e-6)"
        gradientUnits="userSpaceOnUse"
        id="linearGradient7960"
-       xlink:href="#linearGradient5160-45"
+       xlink:href="#linearGradient4975"
        inkscape:collect="always" />
     <linearGradient
        y2="102.36218"
@@ -4102,6 +4125,15 @@
        x2="306.875"
        y2="38.353222"
        gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4984"
+       id="linearGradient4990"
+       x1="107.95667"
+       y1="102.2816"
+       x2="107.95667"
+       y2="84.559723"
+       gradientUnits="userSpaceOnUse" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -4110,21 +4142,22 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="8"
-     inkscape:cx="153.04019"
-     inkscape:cy="921.60326"
+     inkscape:zoom="22.627417"
+     inkscape:cx="117.24212"
+     inkscape:cy="949.21039"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
-     inkscape:window-width="1676"
-     inkscape:window-height="963"
-     inkscape:window-x="330"
-     inkscape:window-y="136"
+     inkscape:window-width="1466"
+     inkscape:window-height="1407"
+     inkscape:window-x="475"
+     inkscape:window-y="0"
      inkscape:window-maximized="0"
      inkscape:snap-grids="true"
      inkscape:snap-page="false"
      inkscape:snap-to-guides="false"
-     inkscape:snap-nodes="false">
+     inkscape:snap-nodes="false"
+     showguides="true">
     <inkscape:grid
        type="xygrid"
        id="grid2993"
@@ -4323,19 +4356,19 @@
        sodipodi:nodetypes="cccc" />
     <path
        style="fill:url(#linearGradient7960);fill-opacity:1;stroke:none"
-       d="m 100,102.36218 16,0 c 0,0 0,0 0,-3.999994 -2,-3 -4.85534,-5 -8,-5 -3.14466,0 -6,2 -8,5 0,3.999994 0,3.999994 0,3.999994 z"
+       d="m 100,102.36218 16,0 c 0,-3.995947 -2.99203,-8.999994 -8,-8.999994 -5.06318,0 -8,4.952838 -8,8.999994 z"
        id="path5150"
        inkscape:connector-curvature="0"
-       sodipodi:nodetypes="cccscc"
+       sodipodi:nodetypes="cccc"
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\tour-chart.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <path
-       style="fill:none;stroke:#41a2f7;stroke-width:0.38299995999999997;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       d="m 100.1915,102.17068 15.617,0 c 0,0 0,0 0,-3.829798 -1.9521,-2.872305 -4.7391,-4.787202 -7.80849,-4.787202 -3.06937,0 -5.85637,1.914897 -7.80851,4.787202 0,3.829798 0,3.829798 0,3.829798 z"
+       style="fill:none;stroke:url(#linearGradient4990);stroke-width:0.38299996;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 100.1915,102.17068 15.617,0 c 0,-3.918026 -2.86149,-8.617 -7.80849,-8.617 -5.01658,0 -7.80851,4.779898 -7.80851,8.617 z"
        id="path5150-8"
        inkscape:connector-curvature="0"
-       sodipodi:nodetypes="cccscc"
+       sodipodi:nodetypes="cccc"
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\tour-chart.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />

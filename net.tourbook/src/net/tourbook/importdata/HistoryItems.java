@@ -37,6 +37,7 @@ import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 
 /**
@@ -561,11 +562,13 @@ class HistoryItems {
 		if (isFolderValid) {
 
 			_comboError.hide();
+			_labelFolderInfo.setForeground(null);
 
 		} else {
 
 			_comboError.show();
 			_labelFolderInfo.setText(Messages.Dialog_ImportConfig_Error_FolderIsInvalid);
+			_labelFolderInfo.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		}
 	}
 }
