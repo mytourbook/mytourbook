@@ -6403,6 +6403,24 @@ public class ChartComponentGraph extends Canvas {
 			return;
 		}
 
+		// use external mouse event listener
+		final ChartMouseEvent externalMouseEvent = _chart.onExternalMouseDown(
+				event.time & 0xFFFFFFFFL,
+				devXMouse,
+				devYMouse,
+				event.stateMask);
+
+		if (externalMouseEvent.isWorked) {
+
+			// stop dragging because x-sliders are selected by selecting a tour segmenter segment
+//			if (externalMouseEvent.isDisableSliderDragging) {
+//				_xSliderDragged = null;
+//			}
+
+			setChartCursor(externalMouseEvent.cursor);
+			return;
+		}
+
 		if (_xSliderDragged != null) {
 
 			// x-slider is dragged
@@ -6487,88 +6505,65 @@ public class ChartComponentGraph extends Canvas {
 					redraw();
 				}
 
-			} else {
+			} else if (_isXSliderVisible //
+					//
+					// x-slider is NOT dragged
+					&& _xSliderDragged == null
+					//
+					&& (isShift || isCtrl || _isSetXSliderPositionLeft || _isSetXSliderPositionRight)) {
 
-				// use external mouse event listener
-				final ChartMouseEvent externalMouseEvent = _chart.onExternalMouseDown(
-						event.time & 0xFFFFFFFFL,
-						devXMouse,
-						devYMouse,
-						event.stateMask);
+				// position the x-slider and start dragging it
 
-				if (externalMouseEvent.isWorked) {
-
-					// stop dragging because x-sliders are selected by selecting a tour segmenter segment
-//				if (externalMouseEvent.isDisableSliderDragging) {
-//					_xSliderDragged = null;
-//				}
-
-					setChartCursor(externalMouseEvent.cursor);
-
-					return;
+				if (_isSetXSliderPositionLeft) {
+					_xSliderDragged = getLeftSlider();
+				} else if (_isSetXSliderPositionRight) {
+					_xSliderDragged = getRightSlider();
+				} else if (isCtrl) {
+					// ctrl is pressed -> left slider
+					_xSliderDragged = getRightSlider();
+				} else {
+					// shift is pressed -> right slider
+					_xSliderDragged = getLeftSlider();
 				}
 
-				if (_isXSliderVisible //
-						//
-						// x-slider is NOT dragged
-						&& _xSliderDragged == null
-						//
-						&& (isShift || isCtrl || _isSetXSliderPositionLeft || _isSetXSliderPositionRight)) {
+				_xSliderOnTop = _xSliderDragged;
+				_xSliderOnBottom = _xSliderOnTop == _xSliderA ? _xSliderB : _xSliderA;
 
-					// position the x-slider and start dragging it
+				// the left x-slider is now the selected x-slider
+				_selectedXSlider = _xSliderDragged;
+				_isSelectionVisible = true;
 
-					if (_isSetXSliderPositionLeft) {
-						_xSliderDragged = getLeftSlider();
-					} else if (_isSetXSliderPositionRight) {
-						_xSliderDragged = getRightSlider();
-					} else if (isCtrl) {
-						// ctrl is pressed -> left slider
-						_xSliderDragged = getRightSlider();
-					} else {
-						// shift is pressed -> right slider
-						_xSliderDragged = getLeftSlider();
-					}
+				/*
+				 * move the left slider to the mouse down position
+				 */
 
-					_xSliderOnTop = _xSliderDragged;
-					_xSliderOnBottom = _xSliderOnTop == _xSliderA ? _xSliderB : _xSliderA;
+				_xSliderDragged.setDevXClickOffset(devXMouse - _xxDevViewPortLeftBorder);
 
-					// the left x-slider is now the selected x-slider
-					_selectedXSlider = _xSliderDragged;
-					_isSelectionVisible = true;
+				// keep position of the slider line
+				final int devXSliderLinePos = devXMouse;
+				_devXDraggedXSliderLine = devXSliderLinePos;
 
-					/*
-					 * move the left slider to the mouse down position
-					 */
+				moveXSlider(_xSliderDragged, devXSliderLinePos);
 
-					_xSliderDragged.setDevXClickOffset(devXMouse - _xxDevViewPortLeftBorder);
+				_isSliderDirty = true;
+				redraw();
 
-					// keep position of the slider line
-					final int devXSliderLinePos = devXMouse;
-					_devXDraggedXSliderLine = devXSliderLinePos;
+			} else if (_graphZoomRatio > 1) {
 
-					moveXSlider(_xSliderDragged, devXSliderLinePos);
+				// start dragging the chart
 
-					_isSliderDirty = true;
-					redraw();
+				/*
+				 * to prevent flickering with the double click event, dragged started is used
+				 */
+				_isChartDraggedStarted = true;
 
-				} else if (_graphZoomRatio > 1) {
+				_draggedChartStartPos = new Point(event.x, event.y);
 
-					// start dragging the chart
-
-					/*
-					 * to prevent flickering with the double click event, dragged started is used
-					 */
-					_isChartDraggedStarted = true;
-
-					_draggedChartStartPos = new Point(event.x, event.y);
-
-					/*
-					 * set also the move position because when changing the data model, the old
-					 * position will be used and the chart is painted on the wrong position on mouse
-					 * down
-					 */
-					_draggedChartDraggedPos = _draggedChartStartPos;
-				}
+				/*
+				 * set also the move position because when changing the data model, the old position
+				 * will be used and the chart is painted on the wrong position on mouse down
+				 */
+				_draggedChartDraggedPos = _draggedChartStartPos;
 			}
 		}
 
