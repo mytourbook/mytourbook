@@ -81,17 +81,25 @@ class HistoryItems {
 
 	private String convertTo_DeviceNameFolder(final String osFolder) {
 
-		final Path newPath = Paths.get(osFolder);
+		try {
 
-		final String deviceName = getDeviceName(newPath);
+			final Path newPath = Paths.get(osFolder);
 
-		if (deviceName == null) {
-			return null;
+			final String deviceName = getDeviceName(newPath);
+
+			if (deviceName == null) {
+				return null;
+			}
+
+			final String deviceFolderName = createDeviceNameFolder(newPath, deviceName);
+
+			return deviceFolderName;
+
+		} catch (final Exception e) {
+			// folder can be invalid
 		}
 
-		final String deviceFolderName = createDeviceNameFolder(newPath, deviceName);
-
-		return deviceFolderName;
+		return null;
 	}
 
 	private String createDeviceNameFolder(final Path folderPath, final String deviceName) {
@@ -272,13 +280,19 @@ class HistoryItems {
 	 */
 	void onSelectFolderInDialog(final String newFolder) {
 
-		final Path newPath = Paths.get(newFolder);
+		try {
 
-		final String deviceName = getDeviceName(newPath);
-		final String deviceNameFolder = createDeviceNameFolder(newPath, deviceName);
+			final Path newPath = Paths.get(newFolder);
 
-		updateModel(newFolder, deviceNameFolder);
-		fillControls(newFolder, deviceNameFolder, newFolder);
+			final String deviceName = getDeviceName(newPath);
+			final String deviceNameFolder = createDeviceNameFolder(newPath, deviceName);
+
+			updateModel(newFolder, deviceNameFolder);
+			fillControls(newFolder, deviceNameFolder, newFolder);
+
+		} catch (final Exception e) {
+			// folder can be invalid
+		}
 	}
 
 	/**
@@ -494,7 +508,6 @@ class HistoryItems {
 
 			_comboError.hide();
 			_labelFolderInfo.setText(UI.EMPTY_STRING);
-
 
 			return;
 		}

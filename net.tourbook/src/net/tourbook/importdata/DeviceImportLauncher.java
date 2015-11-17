@@ -21,16 +21,19 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourType;
 
-public class AutoImportLauncher implements Cloneable, Comparable<AutoImportLauncher> {
+public class DeviceImportLauncher implements Cloneable, Comparable<DeviceImportLauncher> {
 
 	public String					description		= UI.EMPTY_STRING;
 	public String					name			= UI.EMPTY_STRING;
 
+	/**
+	 * When <code>null</code> then the tour type is not set.
+	 */
 	public Enum<TourTypeConfig>		tourTypeConfig	= null;
-	public boolean					isSetTourType	= false;
 
 	public TourType					oneTourType;
-	public ArrayList<SpeedVertex>	speedVertices	= new ArrayList<>();
+
+	public ArrayList<SpeedTourType>	speedTourTypes	= new ArrayList<>();
 
 	/** Contains the image hash or 0 when an image is not displayed. */
 	public int						imageHash;
@@ -41,25 +44,25 @@ public class AutoImportLauncher implements Cloneable, Comparable<AutoImportLaunc
 
 	private static long				_idCreator;
 
-	public AutoImportLauncher() {
+	public DeviceImportLauncher() {
 
 		_id = ++_idCreator;
 	}
 
 	@Override
-	protected AutoImportLauncher clone() {
+	protected DeviceImportLauncher clone() {
 
-		AutoImportLauncher clonedObject = null;
+		DeviceImportLauncher clonedObject = null;
 
 		try {
 
-			clonedObject = (AutoImportLauncher) super.clone();
+			clonedObject = (DeviceImportLauncher) super.clone();
 
 			clonedObject._id = ++_idCreator;
 
-			clonedObject.speedVertices = new ArrayList<>();
-			for (final SpeedVertex speedVertex : speedVertices) {
-				clonedObject.speedVertices.add(speedVertex.clone());
+			clonedObject.speedTourTypes = new ArrayList<>();
+			for (final SpeedTourType speedVertex : speedTourTypes) {
+				clonedObject.speedTourTypes.add(speedVertex.clone());
 			}
 
 		} catch (final CloneNotSupportedException e) {
@@ -70,7 +73,7 @@ public class AutoImportLauncher implements Cloneable, Comparable<AutoImportLaunc
 	}
 
 	@Override
-	public int compareTo(final AutoImportLauncher otherConfig) {
+	public int compareTo(final DeviceImportLauncher otherConfig) {
 
 		return name.compareTo(otherConfig.name);
 	}
@@ -86,7 +89,7 @@ public class AutoImportLauncher implements Cloneable, Comparable<AutoImportLaunc
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		final AutoImportLauncher other = (AutoImportLauncher) obj;
+		final DeviceImportLauncher other = (DeviceImportLauncher) obj;
 		if (_id != other._id) {
 			return false;
 		}
@@ -115,9 +118,9 @@ public class AutoImportLauncher implements Cloneable, Comparable<AutoImportLaunc
 
 		if (TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED.equals(tourTypeConfig)) {
 
-			final int numVertices = speedVertices.size();
+			final int numVertices = speedTourTypes.size();
 
-			imageHash = speedVertices.hashCode();
+			imageHash = speedTourTypes.hashCode();
 			imageWidth = numVertices * TourType.TOUR_TYPE_IMAGE_SIZE;
 
 		} else if (TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL.equals(tourTypeConfig)) {
@@ -147,7 +150,7 @@ public class AutoImportLauncher implements Cloneable, Comparable<AutoImportLaunc
 		return "AutoImportLauncher ["
 		//
 				+ ("name=" + name + ", ")
-				+ ("speedVertices=" + speedVertices + ", ")
+				+ ("speedVertices=" + speedTourTypes + ", ")
 				+ ("configType=" + tourTypeConfig + ", ")
 
 				+ "]";

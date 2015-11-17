@@ -5670,10 +5670,18 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 
 		} else {
 
-			final Path importPath = Paths.get(tourImportFilePath, tourImportFileName);
+			try {
 
-			return importPath.toString();
+				final Path importPath = Paths.get(tourImportFilePath, tourImportFileName);
+
+				return importPath.toString();
+
+			} catch (final Exception e) {
+				// folder can be invalid
+			}
 		}
+
+		return UI.EMPTY_STRING;
 	}
 
 	/**
@@ -6634,14 +6642,20 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	 */
 	public void setTourImportFilePath(final String tourImportFilePath) {
 
-		final Path filePath = Paths.get(tourImportFilePath);
+		try {
 
-		final Path fileName = filePath.getFileName();
-		final Path folderPath = filePath.getParent();
+			final Path filePath = Paths.get(tourImportFilePath);
 
-		// extract file name
-		this.tourImportFileName = fileName.toString();
-		this.tourImportFilePath = folderPath.toString();
+			final Path fileName = filePath.getFileName();
+			final Path folderPath = filePath.getParent();
+
+			// extract file name
+			this.tourImportFileName = fileName.toString();
+			this.tourImportFilePath = folderPath.toString();
+
+		} catch (final Exception e) {
+			// folder can be invalid
+		}
 	}
 
 	public void setTourMarkers(final Set<TourMarker> tourMarkers) {

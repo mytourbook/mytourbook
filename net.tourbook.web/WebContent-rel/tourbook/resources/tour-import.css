@@ -278,6 +278,18 @@ a.action-button:HOVER
 	font-weight: 			lighter;
 }
 
+.folderTitle
+{
+	xfont-size: 				larger;
+	xfont-weight: 			600;
+}
+
+.folderInfo
+{
+	padding-left:			20px;
+	font-size: 				smaller;	
+}
+
 .folderLocation
 {
 	xpadding-bottom:			5px;

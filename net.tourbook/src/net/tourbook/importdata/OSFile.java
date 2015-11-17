@@ -15,9 +15,15 @@
  *******************************************************************************/
 package net.tourbook.importdata;
 
-public class AutoImportState {
+import java.nio.file.Path;
 
-	public boolean	areFilesRetrieved;
-	public boolean	areTheSameStores;
+public class OSFile {
+
+	public Path		path;
+
+	public String	fileName;
+
+	public long		size;
+	public long		modifiedTime;
 
 }

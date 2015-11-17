@@ -57,50 +57,49 @@ import org.eclipse.ui.IMemento;
 import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.XMLMemento;
 
-public class AutoImportManager {
+public class DeviceImportManager {
 
-	private static final String			ID									= "net.tourbook.importdata.AutoImportManager";	//$NON-NLS-1$
+	private static final String			ID								= "net.tourbook.importdata.DeviceImportManager";	//$NON-NLS-1$
 	//
-	private static final String			XML_STATE_AUTOMATED_IMPORT_CONFIG	= "XML_STATE_AUTOMATED_IMPORT_CONFIG";			//$NON-NLS-1$
+	private static final String			XML_STATE_DEVICE_IMPORT_CONFIG	= "XML_STATE_DEVICE_IMPORT_CONFIG";				//$NON-NLS-1$
 	//
-	private static final String			TAG_IMPORT_CONFIG					= "Config";									//$NON-NLS-1$
-	private static final String			TAG_IMPORT_CONFIG_ROOT				= "AutomatedImportConfig";						//$NON-NLS-1$
-	private static final String			TAG_SPEED_VERTEX					= "Speed";										//$NON-NLS-1$
+	private static final String			TAG_IMPORT_CONFIG				= "Config";										//$NON-NLS-1$
+	private static final String			TAG_IMPORT_CONFIG_ROOT			= "DeviceImportConfig";							//$NON-NLS-1$
+	private static final String			TAG_SPEED_VERTEX				= "Speed";											//$NON-NLS-1$
 	//
-	private static final String			ATTR_ANIMATION_CRAZY_FACTOR			= "animationCrazyFactor";						//$NON-NLS-1$
-	private static final String			ATTR_ANIMATION_DURATION				= "animationDuration";							//$NON-NLS-1$
-	private static final String			ATTR_AVG_SPEED						= "avgSpeed";									//$NON-NLS-1$
-	private static final String			ATTR_BACKGROUND_OPACITY				= "backgroundOpacity";							//$NON-NLS-1$
-	private static final String			ATTR_CONFIG_NAME					= "name";										//$NON-NLS-1$
-	private static final String			ATTR_CONFIG_DESCRIPTION				= "description";								//$NON-NLS-1$
-	private static final String			ATTR_CONFIG_BACKUP_FOLDER			= "backupFolder";								//$NON-NLS-1$
-	private static final String			ATTR_CONFIG_DEVICE_FOLDER			= "deviceFolder";								//$NON-NLS-1$
-	private static final String			ATTR_IS_CREATE_BACKUP				= "isCreateBackup";							//$NON-NLS-1$
-	private static final String			ATTR_IS_LIVE_UPDATE					= "isLiveUpdate";								//$NON-NLS-1$
-	private static final String			ATTR_IS_SET_TOUR_TYPE				= "isSetTourType";								//$NON-NLS-1$
-	private static final String			ATTR_NUM_UI_COLUMNS					= "uiColumns";									//$NON-NLS-1$
-	private static final String			ATTR_TILE_SIZE						= "tileSize";									//$NON-NLS-1$
-	private static final String			ATTR_TOUR_TYPE_CONFIG				= "tourTypeConfig";							//$NON-NLS-1$
-	private static final String			ATTR_TOUR_TYPE_ID					= "tourTypeId";								//$NON-NLS-1$
+	private static final String			ATTR_ANIMATION_CRAZY_FACTOR		= "animationCrazyFactor";							//$NON-NLS-1$
+	private static final String			ATTR_ANIMATION_DURATION			= "animationDuration";								//$NON-NLS-1$
+	private static final String			ATTR_AVG_SPEED					= "avgSpeed";										//$NON-NLS-1$
+	private static final String			ATTR_BACKGROUND_OPACITY			= "backgroundOpacity";								//$NON-NLS-1$
+	private static final String			ATTR_CONFIG_NAME				= "name";											//$NON-NLS-1$
+	private static final String			ATTR_CONFIG_DESCRIPTION			= "description";									//$NON-NLS-1$
+	private static final String			ATTR_CONFIG_BACKUP_FOLDER		= "backupFolder";									//$NON-NLS-1$
+	private static final String			ATTR_CONFIG_DEVICE_FOLDER		= "deviceFolder";									//$NON-NLS-1$
+	private static final String			ATTR_IS_CREATE_BACKUP			= "isCreateBackup";								//$NON-NLS-1$
+	private static final String			ATTR_IS_LIVE_UPDATE				= "isLiveUpdate";									//$NON-NLS-1$
+	private static final String			ATTR_NUM_UI_COLUMNS				= "uiColumns";										//$NON-NLS-1$
+	private static final String			ATTR_TILE_SIZE					= "tileSize";										//$NON-NLS-1$
+	private static final String			ATTR_TOUR_TYPE_CONFIG			= "tourTypeConfig";								//$NON-NLS-1$
+	private static final String			ATTR_TOUR_TYPE_ID				= "tourTypeId";									//$NON-NLS-1$
 	//
-	static final int					CONFIG_SPEED_MIN					= 0;
-	static final int					CONFIG_SPEED_MAX					= 3000;
-	private static final int			CONFIG_SPEED_DEFAULT				= 0;
+	static final int					CONFIG_SPEED_MIN				= 0;
+	static final int					CONFIG_SPEED_MAX				= 3000;
+	private static final int			CONFIG_SPEED_DEFAULT			= 0;
 	//
-	private static AutoImportManager	_instance;
+	private static DeviceImportManager	_instance;
 
-	private final IDialogSettings		_state								= TourbookPlugin.getState(ID);
+	private final IDialogSettings		_state							= TourbookPlugin.getState(ID);
 
 	private ImportConfig				_importConfig;
 
 	private String						_fileStoresHash;
 
-	private ReentrantLock				STORE_LOCK							= new ReentrantLock();
+	private ReentrantLock				STORE_LOCK						= new ReentrantLock();
 
-	public static AutoImportManager getInstance() {
+	public static DeviceImportManager getInstance() {
 
 		if (_instance == null) {
-			_instance = new AutoImportManager();
+			_instance = new DeviceImportManager();
 		}
 
 		return _instance;
@@ -116,9 +115,9 @@ public class AutoImportManager {
 	 *         {@link ImportConfig#notImportedFiles} contains the files which are available in the
 	 *         device folder but not available in the tour database.
 	 */
-	public AutoImportState checkImportedFiles(final boolean isForceRetrieveFiles) {
+	public DeviceImportState checkImportedFiles(final boolean isForceRetrieveFiles) {
 
-		final AutoImportState returnState = new AutoImportState();
+		final DeviceImportState returnState = new DeviceImportState();
 
 		// this is called from multiple threads and propably cause problems
 		STORE_LOCK.lock();
@@ -126,7 +125,7 @@ public class AutoImportManager {
 			try {
 
 				/*
-				 * Create hashcode vor all file stores
+				 * Create hashcode for all file stores
 				 */
 				final Iterable<FileStore> fileStores = FileSystems.getDefault().getFileStores();
 				final StringBuilder sb = new StringBuilder();
@@ -166,95 +165,16 @@ public class AutoImportManager {
 		return returnState;
 	}
 
-	public ImportConfig getAutoImportConfig() {
+	private HashSet<String> getBackupFiles(final String folder) {
 
-		if (_importConfig == null) {
-			_importConfig = loadImportConfig();
+		final HashSet<String> backupFiles = new HashSet<>();
+
+		final Path validPath = getValidPath(folder);
+		if (validPath == null) {
+			return backupFiles;
 		}
 
-		return _importConfig;
-	}
-
-	/**
-	 */
-	private void getImportFiles() {
-
-		final ArrayList<DeviceFile> notImportedFiles = new ArrayList<>();
-
-		final ImportConfig importConfig = getAutoImportConfig();
-
-		// update config
-		importConfig.notImportedFiles = notImportedFiles;
-
-		final String validDeviceFolder = getImportFiles_10_GetDeviceFolder();
-
-		if (validDeviceFolder == null) {
-			return;
-		}
-
-		final List<DeviceFile> deviceFileNames = getImportFiles_12_GetDeviceFileNames(validDeviceFolder);
-
-		// update config
-		importConfig.numDeviceFiles = deviceFileNames.size();
-
-		if (deviceFileNames.size() == 0) {
-			// there is nothing to be imported
-			return;
-		}
-
-		final HashSet<String> dbFileNames = getImportFiles_14_GetDbFileNames(deviceFileNames);
-
-		for (final DeviceFile deviceFileName : deviceFileNames) {
-
-			if (dbFileNames.contains(deviceFileName.fileName) == false) {
-				notImportedFiles.add(deviceFileName);
-			}
-		}
-
-		// sort by date/time
-		Collections.sort(notImportedFiles, new Comparator<DeviceFile>() {
-			@Override
-			public int compare(final DeviceFile file1, final DeviceFile file2) {
-//				return Long.compare(file1.modifiedTime, file2.modifiedTime);
-				return file1.fileName.compareTo(file2.fileName);
-			}
-		});
-	}
-
-	/**
-	 * @return Returns the device OS path or <code>null</code> when this folder is not valid.
-	 */
-	private String getImportFiles_10_GetDeviceFolder() {
-
-		final ImportConfig importConfig = getAutoImportConfig();
-		final String deviceOSFolder = importConfig.getDeviceOSFolder();
-
-		boolean isFolderValid = false;
-
-		if (deviceOSFolder != null && deviceOSFolder.trim().length() > 0) {
-			try {
-
-				final Path devicePath = Paths.get(deviceOSFolder);
-
-				if (Files.exists(devicePath)) {
-					isFolderValid = true;
-				}
-
-			} catch (final Exception e) {}
-		}
-
-		if (isFolderValid == false) {
-			return null;
-		}
-
-		return deviceOSFolder;
-	}
-
-	private List<DeviceFile> getImportFiles_12_GetDeviceFileNames(final String validDeviceFolder) {
-
-		final List<DeviceFile> deviceFileNames = new ArrayList<>();
-
-		try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(Paths.get(validDeviceFolder))) {
+		try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(validPath)) {
 
 			for (final Path path : directoryStream) {
 
@@ -269,17 +189,11 @@ public class AutoImportManager {
 					// ignore not regular files
 					if (fileAttributes.isRegularFile()) {
 
-						final DeviceFile deviceFile = new DeviceFile();
-
-						deviceFile.path = path;
-						deviceFile.fileName = path.getFileName().toString();
-						deviceFile.size = fileAttributes.size();
-						deviceFile.modifiedTime = fileAttributes.lastModifiedTime().toMillis();
-
-						deviceFileNames.add(deviceFile);
+						backupFiles.add(path.getFileName().toString());
 					}
 
 				} catch (final Exception e) {
+// this can occure too often
 //					StatusUtil.log(e);
 				}
 
@@ -289,10 +203,10 @@ public class AutoImportManager {
 			StatusUtil.log(ex);
 		}
 
-		return deviceFileNames;
+		return backupFiles;
 	}
 
-	private HashSet<String> getImportFiles_14_GetDbFileNames(final List<DeviceFile> deviceFileNames) {
+	private HashSet<String> getDbFileNames(final List<OSFile> deviceFileNames) {
 
 		final HashSet<String> dbFileNames = new HashSet<>();
 
@@ -303,7 +217,7 @@ public class AutoImportManager {
 
 		for (int fileIndex = 0; fileIndex < deviceFileNames.size(); fileIndex++) {
 
-			final DeviceFile deviceFile = deviceFileNames.get(fileIndex);
+			final OSFile deviceFile = deviceFileNames.get(fileIndex);
 			final String fileName = deviceFile.fileName;
 
 			if (fileIndex > 0) {
@@ -346,6 +260,153 @@ public class AutoImportManager {
 		return dbFileNames;
 	}
 
+	public ImportConfig getDeviceImportConfig() {
+
+		if (_importConfig == null) {
+			_importConfig = loadImportConfig();
+		}
+
+		return _importConfig;
+	}
+
+	/**
+	 */
+	private void getImportFiles() {
+
+		final ArrayList<OSFile> notImportedFiles = new ArrayList<>();
+		final ArrayList<String> notBackedUpFiles = new ArrayList<>();
+
+		final ImportConfig importConfig = getDeviceImportConfig();
+		importConfig.notImportedFiles = notImportedFiles;
+		importConfig.notBackedUpFiles = notBackedUpFiles;
+
+		/*
+		 * Get backup files
+		 */
+		HashSet<String> existingBackupFiles = null;
+		if (importConfig.isCreateBackup) {
+
+			existingBackupFiles = getBackupFiles(importConfig.getBackupOSFolder());
+		}
+
+		/*
+		 * Get device files
+		 */
+		final List<OSFile> existingDeviceFiles = getOSFiles(importConfig.getDeviceOSFolder());
+		importConfig.numDeviceFiles = existingDeviceFiles.size();
+
+		/*
+		 * Get files which are not yet backed up
+		 */
+		if (existingBackupFiles != null) {
+
+			for (final OSFile deviceFile : existingDeviceFiles) {
+
+				final String deviceFileName = deviceFile.fileName;
+
+				if (existingBackupFiles.contains(deviceFileName) == false) {
+					notBackedUpFiles.add(deviceFileName);
+				}
+			}
+		}
+
+		if (existingDeviceFiles.size() == 0) {
+			// there is nothing to be imported
+			return;
+		}
+
+		/*
+		 * Get files which are not yet imported
+		 */
+		final HashSet<String> dbFileNames = getDbFileNames(existingDeviceFiles);
+
+		for (final OSFile deviceFile : existingDeviceFiles) {
+
+			if (dbFileNames.contains(deviceFile.fileName) == false) {
+				notImportedFiles.add(deviceFile);
+			}
+		}
+
+		// sort by date/time
+		Collections.sort(notImportedFiles, new Comparator<OSFile>() {
+			@Override
+			public int compare(final OSFile file1, final OSFile file2) {
+//				return Long.compare(file1.modifiedTime, file2.modifiedTime);
+				return file1.fileName.compareTo(file2.fileName);
+			}
+		});
+	}
+
+	private List<OSFile> getOSFiles(final String folder) {
+
+		final List<OSFile> osFiles = new ArrayList<>();
+
+		final Path validPath = getValidPath(folder);
+		if (validPath == null) {
+			return osFiles;
+		}
+
+		try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(validPath)) {
+
+			for (final Path path : directoryStream) {
+
+				try {
+
+					final BasicFileAttributeView fileAttributesView = Files.getFileAttributeView(
+							path,
+							BasicFileAttributeView.class);
+
+					final BasicFileAttributes fileAttributes = fileAttributesView.readAttributes();
+
+					// ignore not regular files
+					if (fileAttributes.isRegularFile()) {
+
+						final OSFile deviceFile = new OSFile();
+
+						deviceFile.path = path;
+						deviceFile.fileName = path.getFileName().toString();
+						deviceFile.size = fileAttributes.size();
+						deviceFile.modifiedTime = fileAttributes.lastModifiedTime().toMillis();
+
+						osFiles.add(deviceFile);
+					}
+
+				} catch (final Exception e) {
+// this can occure too often
+//					StatusUtil.log(e);
+				}
+
+			}
+
+		} catch (final IOException ex) {
+			StatusUtil.log(ex);
+		}
+
+		return osFiles;
+	}
+
+	/**
+	 * @param osFolder
+	 * @return Returns the device OS path or <code>null</code> when this folder is not valid.
+	 */
+	private Path getValidPath(final String osFolder) {
+
+		if (osFolder != null && osFolder.trim().length() > 0) {
+
+			try {
+
+				final Path devicePath = Paths.get(osFolder);
+
+				if (Files.exists(devicePath)) {
+					return devicePath;
+				}
+
+			} catch (final Exception e) {}
+		}
+
+		return null;
+	}
+
 	private boolean isFolderValid(final String deviceOSFolder, final String invalidMessage) {
 
 		boolean isFolderValid = false;
@@ -353,9 +414,15 @@ public class AutoImportManager {
 		if (deviceOSFolder != null && deviceOSFolder.trim().length() > 0) {
 
 			// check file
-			final Path deviceFolderPath = Paths.get(deviceOSFolder);
-			if (Files.exists(deviceFolderPath)) {
-				isFolderValid = true;
+			try {
+
+				final Path deviceFolderPath = Paths.get(deviceOSFolder);
+				if (Files.exists(deviceFolderPath)) {
+					isFolderValid = true;
+				}
+
+			} catch (final Exception e) {
+				// path can be invalid
 			}
 		}
 
@@ -363,7 +430,7 @@ public class AutoImportManager {
 
 			MessageDialog.openError(
 					Display.getDefault().getActiveShell(),
-					Messages.Import_Data_Error_AutoImport_Title,
+					Messages.Import_Data_Error_DeviceImport_Title,
 					NLS.bind(invalidMessage, deviceOSFolder));
 		}
 
@@ -374,7 +441,7 @@ public class AutoImportManager {
 
 		final ImportConfig importConfig = new ImportConfig();
 
-		final String stateValue = Util.getStateString(_state, XML_STATE_AUTOMATED_IMPORT_CONFIG, null);
+		final String stateValue = Util.getStateString(_state, XML_STATE_DEVICE_IMPORT_CONFIG, null);
 
 		if ((stateValue != null) && (stateValue.length() > 0)) {
 
@@ -425,11 +492,10 @@ public class AutoImportManager {
 
 		for (final IMemento xmlConfig : xmlMemento.getChildren()) {
 
-			final AutoImportLauncher configItem = new AutoImportLauncher();
+			final DeviceImportLauncher configItem = new DeviceImportLauncher();
 
 			configItem.name = Util.getXmlString(xmlConfig, ATTR_CONFIG_NAME, UI.EMPTY_STRING);
 			configItem.description = Util.getXmlString(xmlConfig, ATTR_CONFIG_DESCRIPTION, UI.EMPTY_STRING);
-			configItem.isSetTourType = Util.getXmlBoolean(xmlConfig, ATTR_IS_SET_TOUR_TYPE, false);
 
 			final Enum<TourTypeConfig> ttConfig = Util.getXmlEnum(
 					xmlConfig,
@@ -440,7 +506,7 @@ public class AutoImportManager {
 
 			if (TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED.equals(ttConfig)) {
 
-				final ArrayList<SpeedVertex> speedVertices = configItem.speedVertices;
+				final ArrayList<SpeedTourType> speedVertices = configItem.speedTourTypes;
 
 				for (final IMemento xmlSpeed : xmlConfig.getChildren()) {
 
@@ -453,7 +519,7 @@ public class AutoImportManager {
 
 					if (tourType != null) {
 
-						final SpeedVertex speedVertex = new SpeedVertex();
+						final SpeedTourType speedVertex = new SpeedTourType();
 
 						speedVertex.tourTypeId = xmlTourTypeId;
 
@@ -476,13 +542,13 @@ public class AutoImportManager {
 
 			} else {
 
-				// this is the default, TourTypeConfig.TOUR_TYPE_CONFIG_NOT_USED
+				// this is the default, tour type is not set
 
 			}
 
 			configItem.setupItemImage();
 
-			importConfig.autoImportLaunchers.add(configItem);
+			importConfig.deviceImportLaunchers.add(configItem);
 		}
 	}
 
@@ -495,17 +561,17 @@ public class AutoImportManager {
 		_fileStoresHash = null;
 	}
 
-	public ImportState runImport(final AutoImportLauncher aiLauncher) {
+	public ImportState runImport(final DeviceImportLauncher aiLauncher) {
 
 		final ImportState importState = new ImportState();
 
-		final ImportConfig importConfig = getAutoImportConfig();
+		final ImportConfig importConfig = getDeviceImportConfig();
 
 		/*
 		 * Check device folder
 		 */
 		final String deviceOSFolder = importConfig.getDeviceOSFolder();
-		if (!isFolderValid(deviceOSFolder, Messages.Import_Data_Error_AutoImport_InvalidDeviceFolder_Message)) {
+		if (!isFolderValid(deviceOSFolder, Messages.Import_Data_Error_DeviceImport_InvalidDeviceFolder_Message)) {
 
 			importState.isOpenSetup = true;
 
@@ -518,7 +584,7 @@ public class AutoImportManager {
 		if (importConfig.isCreateBackup) {
 
 			final String backupOSFolder = importConfig.getBackupOSFolder();
-			if (!isFolderValid(backupOSFolder, Messages.Import_Data_Error_AutoImport_InvalidBackupFolder_Message)) {
+			if (!isFolderValid(backupOSFolder, Messages.Import_Data_Error_DeviceImport_InvalidBackupFolder_Message)) {
 
 				importState.isOpenSetup = true;
 
@@ -526,20 +592,20 @@ public class AutoImportManager {
 			}
 		}
 
-		final ArrayList<DeviceFile> notImportedPaths = importConfig.notImportedFiles;
+		final ArrayList<OSFile> notImportedPaths = importConfig.notImportedFiles;
 		if (notImportedPaths.size() == 0) {
 
 			MessageDialog.openError(
 					Display.getDefault().getActiveShell(),
-					Messages.Import_Data_Error_AutoImport_Title,
-					NLS.bind(Messages.Import_Data_Error_AutoImport_NoImportFiles_Message, deviceOSFolder));
+					Messages.Import_Data_Error_DeviceImport_Title,
+					NLS.bind(Messages.Import_Data_Error_DeviceImport_NoImportFiles_Message, deviceOSFolder));
 
 			return importState;
 		}
 
 		final ArrayList<String> notImportedFileNames = new ArrayList<>();
 
-		for (final DeviceFile deviceFile : notImportedPaths) {
+		for (final OSFile deviceFile : notImportedPaths) {
 			notImportedFileNames.add(deviceFile.fileName);
 		}
 
@@ -549,45 +615,6 @@ public class AutoImportManager {
 		RawDataManager.getInstance().actionImportFromFile_DoTheImport(firstFilePathName, fileNames);
 
 		return importState;
-
-//		aiLauncher.
-
-//
-//						(\\[^\\]*\\[^\\]*$)
-//
-//						2015-11-04 18:34:57.307'790 [] 	C:\DAT\_DEVICE data\705\2014\2014-07-03-10-47-25.tcx
-//						2015-11-04 18:34:57.308'029 [] 	C:\DAT\_DEVICE data\705\2014\2014-07-06-13-55-18.fit
-//						2015-11-04 18:34:57.387'047 [] 	C:\DAT\_DEVICE data\HAC4\2012-01-14.dat
-//						2015-11-04 18:34:57.387'271 [] 	C:\DAT\_DEVICE data\HAC4\2012-01-14.dat
-//						2015-11-04 18:34:57.473'234 [] 	M:\DEVICE data\DAUM Ergometer\0198  06_01_2010 19_48_48   12min    5_1km  Manuelles Training (Watt).csv
-//						2015-11-04 18:34:57.473'457 [] 	M:\DEVICE data\DAUM Ergometer\0200  08_01_2010 19_12_47   40min   15_9km  Coaching - 009 - 2_4.csv
-//
-//		final IRunnableWithProgress importRunnable = new IRunnableWithProgress() {
-//
-//			@Override
-//			public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-//
-//				final int imported = 0;
-//
-//				monitor.beginTask(Messages.Import_Data_AutoImport_Task, 2);
-//
-//				monitor.worked(1);
-//				monitor.subTask(NLS.bind(Messages.Import_Data_AutoImport_SubTask, //
-//						0));
-//				if (monitor.isCanceled()) {
-//					// stop autoimport
-////					break;
-//				}
-//
-//
-//			}
-//		};
-//
-//		try {
-//			new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(true, true, importRunnable);
-//		} catch (final Exception e) {
-//			StatusUtil.log(e);
-//		}
 	}
 
 	public void saveImportConfig(final ImportConfig importConfig) {
@@ -602,7 +629,7 @@ public class AutoImportManager {
 		try {
 
 			xmlMemento.save(writer);
-			_state.put(XML_STATE_AUTOMATED_IMPORT_CONFIG, writer.toString());
+			_state.put(XML_STATE_DEVICE_IMPORT_CONFIG, writer.toString());
 
 		} catch (final IOException e) {
 
@@ -632,20 +659,19 @@ public class AutoImportManager {
 		xmlMemento.putString(ATTR_CONFIG_BACKUP_FOLDER, importConfig.backupFolder);
 		xmlMemento.putString(ATTR_CONFIG_DEVICE_FOLDER, importConfig.deviceFolder);
 
-		for (final AutoImportLauncher configItem : importConfig.autoImportLaunchers) {
+		for (final DeviceImportLauncher configItem : importConfig.deviceImportLaunchers) {
 
 			final IMemento xmlConfig = xmlMemento.createChild(TAG_IMPORT_CONFIG);
 
 			xmlConfig.putString(ATTR_CONFIG_NAME, configItem.name);
 			xmlConfig.putString(ATTR_CONFIG_DESCRIPTION, configItem.description);
-			xmlConfig.putBoolean(ATTR_IS_SET_TOUR_TYPE, configItem.isSetTourType);
 
 			final Enum<TourTypeConfig> ttConfig = configItem.tourTypeConfig;
 			Util.setXmlEnum(xmlConfig, ATTR_TOUR_TYPE_CONFIG, ttConfig);
 
 			if (TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED.equals(ttConfig)) {
 
-				for (final SpeedVertex speedVertex : configItem.speedVertices) {
+				for (final SpeedTourType speedVertex : configItem.speedTourTypes) {
 
 					final IMemento xmlSpeedVertex = xmlConfig.createChild(TAG_SPEED_VERTEX);
 
@@ -663,8 +689,7 @@ public class AutoImportManager {
 
 			} else {
 
-				// this is the default or TourTypeConfig.TOUR_TYPE_CONFIG_NOT_USED
-
+				// this is the default, a tour type is not set
 			}
 		}
 	}

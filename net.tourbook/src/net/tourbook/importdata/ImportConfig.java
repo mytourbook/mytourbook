@@ -41,16 +41,19 @@ public class ImportConfig {
 	public int								animationDuration			= 40;
 	public int								animationCrazinessFactor	= 3;
 
-	public ArrayList<AutoImportLauncher>	autoImportLaunchers			= new ArrayList<>();
+	public ArrayList<DeviceImportLauncher>	deviceImportLaunchers		= new ArrayList<>();
+
+	/** Files which are not yet backed up. */
+	public ArrayList<String>				notBackedUpFiles			= new ArrayList<>();
+
+	/** Number of files in the device folder. */
+	public int								numDeviceFiles;
 
 	/**
 	 * Contains files which are available in the device folder but they are not available in the
 	 * tour database.
 	 */
-	public ArrayList<DeviceFile>			notImportedFiles			= new ArrayList<>();
-
-	/** Number of files in the device folder */
-	public int								numDeviceFiles;
+	public ArrayList<OSFile>				notImportedFiles			= new ArrayList<>();
 
 	public String getBackupOSFolder() {
 

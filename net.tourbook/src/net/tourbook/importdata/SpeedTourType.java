@@ -18,27 +18,27 @@ package net.tourbook.importdata;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.database.TourDatabase;
 
-public class SpeedVertex implements Comparable<Object>, Cloneable {
+public class SpeedTourType implements Comparable<Object>, Cloneable {
 
 	public int	avgSpeed;
 	public long	tourTypeId	= TourDatabase.ENTITY_IS_NOT_SAVED;
 
-	public SpeedVertex() {}
+	public SpeedTourType() {}
 
-	public SpeedVertex(final int value) {
+	public SpeedTourType(final int value) {
 
 		this.avgSpeed = value;
 
 	}
 
 	@Override
-	public SpeedVertex clone() {
+	public SpeedTourType clone() {
 
-		SpeedVertex clonedObject = null;
+		SpeedTourType clonedObject = null;
 
 		try {
 
-			clonedObject = (SpeedVertex) super.clone();
+			clonedObject = (SpeedTourType) super.clone();
 
 		} catch (final CloneNotSupportedException e) {
 			StatusUtil.log(e);
@@ -50,7 +50,7 @@ public class SpeedVertex implements Comparable<Object>, Cloneable {
 	@Override
 	public int compareTo(final Object anotherObject) throws ClassCastException {
 
-		final int anotherValue = ((SpeedVertex) anotherObject).avgSpeed;
+		final int anotherValue = ((SpeedTourType) anotherObject).avgSpeed;
 
 		return avgSpeed - anotherValue;
 	}

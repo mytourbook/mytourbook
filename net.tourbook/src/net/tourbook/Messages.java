@@ -143,10 +143,11 @@ public class Messages extends NLS {
 
 	public static String		Dialog_ImportConfig_Group_ImportLauncher;
 
-	public static String	Dialog_ImportConfig_Group_ImportLauncherActions;
-
 	public static String		Dialog_ImportConfig_Group_ImportLauncherConfig;
 	public static String		Dialog_ImportConfig_Info_ConfigDragDrop;
+
+	public static String	Dialog_ImportConfig_Info_MoreImportActions;
+
 	public static String		Dialog_ImportConfig_Info_NoDeviceName;
 	public static String		Dialog_ImportConfig_Info_RetrievingVolumeInfo;
 	public static String		Dialog_ImportConfig_Label_AnimationCrazyFactor;
@@ -853,8 +854,10 @@ public class Messages extends NLS {
 	public static String		Import_Data_Action_RemoveToursWhenClosed;
 	public static String		Import_Data_AutoImport_SubTask;
 	public static String		Import_Data_AutoImport_Task;
-	public static String		Import_Data_Default_AutoImportLauncher_Description;
-	public static String		Import_Data_Default_AutoImportLauncher_Name;
+	public static String	Import_Data_Default_DeviceImportLauncher_Description;
+
+	public static String	Import_Data_Default_DeviceImportLauncher_Name;
+
 	public static String		Import_Data_Dialog_AutoImport_Title;
 	public static String		Import_Data_Dialog_ConfirmReimport_Message;
 	public static String		Import_Data_Dialog_ConfirmReimportAltitudeValues_Message;
@@ -871,17 +874,21 @@ public class Messages extends NLS {
 	public static String		Import_Data_Dialog_ReimportIsInvalid_CommonError_Message;
 	public static String		Import_Data_Dialog_ReimportIsInvalid_DifferentTourId_Message;
 	public static String		Import_Data_Dialog_ReimportIsInvalid_WrongSliceNumbers_Message;
-	public static String		Import_Data_Error_AutoImport_InvalidBackupFolder_Message;
-	public static String		Import_Data_Error_AutoImport_InvalidDeviceFolder_Message;
-	public static String		Import_Data_Error_AutoImport_NoImportFiles_Message;
-	public static String		Import_Data_Error_AutoImport_Title;
 	public static String		Import_Data_Error_CreatingFileName_Message;
 	public static String		Import_Data_Error_CreatingFileName_Title;
 	public static String		Import_Data_Error_DeviceFolderDoNotExist;
-	public static String		Import_Data_HTML_AutomatedImport;
+	public static String	Import_Data_Error_DeviceImport_InvalidBackupFolder_Message;
+
+	public static String	Import_Data_Error_DeviceImport_InvalidDeviceFolder_Message;
+
+	public static String	Import_Data_Error_DeviceImport_NoImportFiles_Message;
+
+	public static String	Import_Data_Error_DeviceImport_Title;
 
 	public static String	Import_Data_HTML_BackupFolder;
 	public static String		Import_Data_HTML_DeviceFolder;
+
+	public static String	Import_Data_HTML_DeviceImport;
 	public static String		Import_Data_HTML_FolderIsNotAvailable;
 	public static String		Import_Data_HTML_GetTours;
 	public static String		Import_Data_HTML_ImportFromFiles_Action;
@@ -889,7 +896,10 @@ public class Messages extends NLS {
 
 	public static String		Import_Data_HTML_NoDeviceFolder;
 	public static String		Import_Data_HTML_NoImportedFiles;
-	public static String		Import_Data_HTML_NotImportedFiles;
+
+	public static String	Import_Data_HTML_NotBackedUpFiles;
+
+	public static String	Import_Data_HTML_NotImportedFiles;
 	public static String		Import_Data_HTML_ReceiveFromSerialPort_ConfiguredAction;
 	public static String		Import_Data_HTML_ReceiveFromSerialPort_ConfiguredLink;
 	public static String		Import_Data_HTML_ReceiveFromSerialPort_DirectlyAction;
