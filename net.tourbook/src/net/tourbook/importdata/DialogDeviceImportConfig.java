@@ -1252,7 +1252,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 
 		{
 			/*
-			 * Checkbox: Set tour type
+			 * Checkbox: Show in dashboard
 			 */
 			_chkTTShowInDashboard = new Button(parent, SWT.CHECK);
 			_chkTTShowInDashboard.setText(Messages.Dialog_ImportConfig_Checkbox_ShowInDashboard);
@@ -1381,7 +1381,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 		{
 
 			createUI_84_SpeedTourTypes(container);
-			createUI_86_SpeedTourType_Actions(container);
+			createUI_87_SpeedTourType_Actions(container);
 		}
 
 		return container;
@@ -1401,19 +1401,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 		GridLayoutFactory.fillDefaults().applyTo(_speedTourType_OuterContainer);
 //		_vertexOuterContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 
-		createUI_88_SpeedTourType_Fields();
-	}
-
-	private void createUI_86_SpeedTourType_Actions(final Composite parent) {
-
-		final ToolBar toolbar = new ToolBar(parent, SWT.FLAT);
-
-		final ToolBarManager tbm = new ToolBarManager(toolbar);
-
-		tbm.add(_actionTTSpeed_Add);
-		tbm.add(_actionTTSpeed_Sort);
-
-		tbm.update(true);
+		createUI_85_SpeedTourType_Fields();
 	}
 
 	/**
@@ -1421,7 +1409,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 	 * 
 	 * @param parent
 	 */
-	private void createUI_88_SpeedTourType_Fields() {
+	private void createUI_85_SpeedTourType_Fields() {
 
 		if (_currentIL == null) {
 
@@ -1448,7 +1436,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 			_speedTourType_ScrolledContainer.dispose();
 		}
 
-		_speedTourType_Container = createUI_89_SpeedTourType_ScrolledContainer(_speedTourType_OuterContainer);
+		_speedTourType_Container = createUI_86_SpeedTourType_ScrolledContainer(_speedTourType_OuterContainer);
 //		_vertexContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 
 		/*
@@ -1541,7 +1529,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 		}
 	}
 
-	private Composite createUI_89_SpeedTourType_ScrolledContainer(final Composite parent) {
+	private Composite createUI_86_SpeedTourType_ScrolledContainer(final Composite parent) {
 
 		// scrolled container
 		_speedTourType_ScrolledContainer = new ScrolledComposite(parent, SWT.V_SCROLL);
@@ -1566,6 +1554,18 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 		});
 
 		return vertexContainer;
+	}
+
+	private void createUI_87_SpeedTourType_Actions(final Composite parent) {
+
+		final ToolBar toolbar = new ToolBar(parent, SWT.FLAT);
+
+		final ToolBarManager tbm = new ToolBarManager(toolbar);
+
+		tbm.add(_actionTTSpeed_Add);
+		tbm.add(_actionTTSpeed_Sort);
+
+		tbm.update(true);
 	}
 
 	private void createUI_90_Dashboard(final Composite parent) {
@@ -2531,7 +2531,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 			_chkTTShowInDashboard.setEnabled(true);
 
 			// remove vertex fields
-			createUI_88_SpeedTourType_Fields();
+			createUI_85_SpeedTourType_Fields();
 
 			enableTTControls();
 
@@ -2840,7 +2840,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 			_speedTourType_OuterContainer.setRedraw(false);
 			{
 				// check and create vertex fields
-				createUI_88_SpeedTourType_Fields();
+				createUI_85_SpeedTourType_Fields();
 
 				final ArrayList<SpeedTourType> speedVertices = _currentIL.speedTourTypes;
 

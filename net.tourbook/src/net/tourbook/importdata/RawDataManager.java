@@ -275,13 +275,14 @@ public class RawDataManager {
 		actionImportFromFile_DoTheImport(firstFilePathName, selectedFileNames);
 	}
 
-	public void actionImportFromFile_DoTheImport(final String firstFilePathName, final String[] selectedFileNames) {
+	public void actionImportFromFile_DoTheImport(final String importFilePathName, final String[] selectedFileNames) {
 
 		if (selectedFileNames == null || selectedFileNames.length == 0) {
 			return;
 		}
 
-		final IPath filePath = new org.eclipse.core.runtime.Path(firstFilePathName).removeLastSegments(1);
+		// extract the file path (folder)
+		final IPath filePath = new org.eclipse.core.runtime.Path(importFilePathName).removeLastSegments(1);
 
 		// keep last selected path
 		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();

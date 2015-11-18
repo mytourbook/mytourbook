@@ -17,7 +17,6 @@ package net.tourbook.ui.views.rawData;
 
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
-import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 
 import java.io.File;
 import java.io.IOException;
@@ -3014,7 +3013,20 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			if (importTile.getId() == tileId) {
 
-				final ImportState importState = DeviceImportManager.getInstance().runImport(importTile);
+				ImportState importState;
+
+				try {
+
+					importConfig.isUpdateDeviceState.set(false);
+
+					importState = DeviceImportManager.getInstance().runImport(importTile);
+
+				} finally {
+
+					importConfig.isUpdateDeviceState.set(true);
+
+					updateDeviceState();
+				}
 
 				// open import config dialog to solve problems
 				if (importState.isOpenSetup) {
@@ -3439,18 +3451,52 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		// cancel previous watcher
 		cancelThread_WatchDeviceFolder();
 
+		final ImportConfig importConfig = getImportConfig();
+
+		final boolean isDeviceFolderValid[] = { false };
+		final boolean isBackupFolderValid[] = { false };
+
 		try {
 
-			// check new folder
-			final String deviceFolder = getImportConfig().getDeviceOSFolder();
-			if (deviceFolder == null) {
-				return;
+			final Path watchDeviceFolder[] = new Path[1];
+			final Path watchBackupFolder[] = new Path[1];
+
+			/*
+			 * Check device folder
+			 */
+			final String deviceFolder = importConfig.getDeviceOSFolder();
+			if (deviceFolder != null) {
+
+				try {
+
+					watchDeviceFolder[0] = Paths.get(deviceFolder);
+
+					if (Files.exists(watchDeviceFolder[0])) {
+						isDeviceFolderValid[0] = true;
+					}
+
+				} catch (final Exception e) {}
 			}
 
-			// check file
-			final Path watchFolder = Paths.get(deviceFolder);
-			if (!Files.exists(watchFolder)) {
-				return;
+			/*
+			 * Check backup folder
+			 */
+			final String backupFolder = importConfig.getBackupOSFolder();
+			if (backupFolder != null) {
+
+				try {
+
+					watchBackupFolder[0] = Paths.get(backupFolder);
+
+					if (Files.exists(watchBackupFolder[0])) {
+						isBackupFolderValid[0] = true;
+					}
+
+				} catch (final Exception e) {}
+			}
+
+			if (isDeviceFolderValid[0] == false && isBackupFolderValid[0] == false) {
+				// both are invalid, there is nothing to watch
 			}
 
 			final Runnable runnable = new Runnable() {
@@ -3461,7 +3507,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 						_watcher = FileSystems.getDefault().newWatchService();
 
-						watchFolder.register(_watcher, ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE);
+						if (isDeviceFolderValid[0]) {
+							watchDeviceFolder[0].register(_watcher, ENTRY_CREATE, ENTRY_DELETE);
+						}
+						if (isBackupFolderValid[0]) {
+							watchBackupFolder[0].register(_watcher, ENTRY_CREATE, ENTRY_DELETE);
+						}
 
 						// wait for the next event
 						_watchKey = _watcher.take();
@@ -3473,12 +3524,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 							}
 
 							/*
-							 * Events MUST be polled otherwise this will be an endless loop.
+							 * Events MUST be polled otherwise this will stay in an endless loop.
 							 */
 							@SuppressWarnings("unused")
 							final List<WatchEvent<?>> polledEvents = _watchKey.pollEvents();
 
-// log events, they are not used
+//// log events, they are not used
 //							for (final WatchEvent<?> event : polledEvents) {
 //
 //								final WatchEvent.Kind<?> kind = event.kind();
@@ -3488,7 +3539,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 //								// TODO remove SYSTEM.OUT.PRINTLN
 //							}
 
-							updateDeviceState();
+							// do not update the device state when the import is running otherwise the import file list can be wrong
+							if (importConfig.isUpdateDeviceState.get()) {
+								updateDeviceState();
+							}
 
 							if (_watchKey != null && _watchKey.reset()) {
 

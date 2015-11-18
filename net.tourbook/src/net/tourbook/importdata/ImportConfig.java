@@ -16,6 +16,7 @@
 package net.tourbook.importdata;
 
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.tourbook.common.NIO;
 import net.tourbook.common.UI;
@@ -54,6 +55,11 @@ public class ImportConfig {
 	 * tour database.
 	 */
 	public ArrayList<OSFile>				notImportedFiles			= new ArrayList<>();
+
+	public AtomicBoolean					isUpdateDeviceState			= new AtomicBoolean();
+	{
+		isUpdateDeviceState.set(true);
+	}
 
 	public String getBackupOSFolder() {
 

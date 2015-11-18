@@ -20,6 +20,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.FileStore;
 import java.nio.file.FileSystems;
@@ -35,8 +36,10 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.concurrent.locks.ReentrantLock;
 
 import net.tourbook.Messages;
@@ -45,12 +48,16 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
+import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.views.rawData.RawDataView;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IMemento;
@@ -328,11 +335,10 @@ public class DeviceImportManager {
 			}
 		}
 
-		// sort by date/time
+		// sort by filename
 		Collections.sort(notImportedFiles, new Comparator<OSFile>() {
 			@Override
 			public int compare(final OSFile file1, final OSFile file2) {
-//				return Long.compare(file1.modifiedTime, file2.modifiedTime);
 				return file1.fileName.compareTo(file2.fileName);
 			}
 		});
@@ -408,16 +414,20 @@ public class DeviceImportManager {
 		return null;
 	}
 
-	private boolean isFolderValid(final String deviceOSFolder, final String invalidMessage) {
+	private boolean isFolderValid(final String osFolder, final String invalidMessage, final String originalFolder) {
 
 		boolean isFolderValid = false;
 
-		if (deviceOSFolder != null && deviceOSFolder.trim().length() > 0) {
+		String displayedFolder = null;
+
+		if (osFolder != null && osFolder.trim().length() > 0) {
+
+			displayedFolder = osFolder;
 
 			// check file
 			try {
 
-				final Path deviceFolderPath = Paths.get(deviceOSFolder);
+				final Path deviceFolderPath = Paths.get(osFolder);
 				if (Files.exists(deviceFolderPath)) {
 					isFolderValid = true;
 				}
@@ -425,6 +435,10 @@ public class DeviceImportManager {
 			} catch (final Exception e) {
 				// path can be invalid
 			}
+
+		} else {
+
+			displayedFolder = originalFolder;
 		}
 
 		if (!isFolderValid) {
@@ -432,7 +446,7 @@ public class DeviceImportManager {
 			MessageDialog.openError(
 					Display.getDefault().getActiveShell(),
 					Messages.Import_Data_Error_DeviceImport_Title,
-					NLS.bind(invalidMessage, deviceOSFolder));
+					NLS.bind(invalidMessage, displayedFolder));
 		}
 
 		return isFolderValid;
@@ -578,7 +592,11 @@ public class DeviceImportManager {
 		 * Check device folder
 		 */
 		final String deviceOSFolder = importConfig.getDeviceOSFolder();
-		if (!isFolderValid(deviceOSFolder, Messages.Import_Data_Error_DeviceImport_InvalidDeviceFolder_Message)) {
+
+		if (!isFolderValid(
+				deviceOSFolder,
+				Messages.Import_Data_Error_DeviceImport_InvalidDeviceFolder_Message,
+				importConfig.deviceFolder)) {
 
 			importState.isOpenSetup = true;
 
@@ -591,7 +609,12 @@ public class DeviceImportManager {
 		if (importConfig.isCreateBackup) {
 
 			final String backupOSFolder = importConfig.getBackupOSFolder();
-			if (!isFolderValid(backupOSFolder, Messages.Import_Data_Error_DeviceImport_InvalidBackupFolder_Message)) {
+
+			if (!isFolderValid(
+
+					backupOSFolder,
+					Messages.Import_Data_Error_DeviceImport_InvalidBackupFolder_Message,
+					importConfig.backupFolder)) {
 
 				importState.isOpenSetup = true;
 
@@ -599,6 +622,15 @@ public class DeviceImportManager {
 			}
 		}
 
+		// folder are valid, run the backup
+		final boolean isCanceled = runImport_Backup();
+		if (isCanceled) {
+			return importState;
+		}
+
+		/*
+		 * Check import files
+		 */
 		final ArrayList<OSFile> notImportedPaths = importConfig.notImportedFiles;
 		if (notImportedPaths.size() == 0) {
 
@@ -610,6 +642,9 @@ public class DeviceImportManager {
 			return importState;
 		}
 
+		/*
+		 * Get not imported files
+		 */
 		final ArrayList<String> notImportedFileNames = new ArrayList<>();
 
 		for (final OSFile deviceFile : notImportedPaths) {
@@ -621,7 +656,88 @@ public class DeviceImportManager {
 
 		RawDataManager.getInstance().actionImportFromFile_DoTheImport(firstFilePathName, fileNames);
 
+		runImport_SetPathAndTourType();
+
 		return importState;
+	}
+
+	/**
+	 * @return Returns <code>true</code> when the backup is canceled.
+	 */
+	private boolean runImport_Backup() {
+
+		final boolean isCanceled[] = { false };
+
+		final IRunnableWithProgress importRunnable = new IRunnableWithProgress() {
+
+			@Override
+			public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+
+				final ImportConfig importConfig = getDeviceImportConfig();
+
+				final String deviceOSFolder = importConfig.getDeviceOSFolder();
+				final String backupOSFolder = importConfig.getBackupOSFolder();
+
+				final Path backupPath = Paths.get(backupOSFolder);
+
+				final ArrayList<String> notBackedUpFiles = importConfig.notBackedUpFiles;
+				final int numBackupFiles = notBackedUpFiles.size();
+				int copied = 0;
+
+				monitor.beginTask(Messages.Import_Data_Task_Backup, numBackupFiles);
+
+				for (final String backupFileName : notBackedUpFiles) {
+
+					if (monitor.isCanceled()) {
+						// stop this task
+						isCanceled[0] = true;
+						break;
+					}
+
+					// for debugging
+//					Thread.sleep(800);
+
+					monitor.worked(1);
+					monitor.subTask(NLS.bind(Messages.Import_Data_Task_Backup_SubTask, //
+							new Object[] { ++copied, numBackupFiles, backupFileName }));
+
+					try {
+
+						final Path devicePath = Paths.get(deviceOSFolder, backupFileName);
+
+						Files.copy(devicePath, backupPath.resolve(backupFileName));
+
+					} catch (final IOException e) {
+						StatusUtil.log(e);
+					}
+				}
+			}
+		};
+
+		try {
+			new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(true, true, importRunnable);
+		} catch (final Exception e) {
+			StatusUtil.log(e);
+		}
+
+		return isCanceled[0];
+	}
+
+	private void runImport_SetPathAndTourType() {
+
+		final HashMap<Long, TourData> importedTours = RawDataManager.getInstance().getImportedTours();
+
+		if (importedTours.size() == 0) {
+			// nothing is imported
+			return;
+		}
+
+		final ImportConfig importConfig = getDeviceImportConfig();
+
+		for (final Entry<Long, TourData> entry : importedTours.entrySet()) {
+
+			final TourData tourData = entry.getValue();
+		}
 	}
 
 	public void saveImportConfig(final ImportConfig importConfig) {
