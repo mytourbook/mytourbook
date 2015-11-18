@@ -144,9 +144,9 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 	private SelectionAdapter				_vertexTourTypeListener;
 	//
 	private ActionOpenPrefDialog			_actionOpenTourTypePrefs;
-	private ActionAddVertex					_actionTTVertex_Add;
-	private ActionDeleteVertex[]			_actionTTVertex_Delete;
-	private ActionSortVertices				_actionTTVertex_Sort;
+	private ActionAddVertex					_actionTTSpeed_Add;
+	private ActionDeleteVertex[]			_actionTTSpeed_Delete;
+	private ActionSortVertices				_actionTTSpeed_Sort;
 	//
 
 	private PixelConverter					_pc;
@@ -543,8 +543,8 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 
 	private void createActions() {
 
-		_actionTTVertex_Add = new ActionAddVertex();
-		_actionTTVertex_Sort = new ActionSortVertices();
+		_actionTTSpeed_Add = new ActionAddVertex();
+		_actionTTSpeed_Sort = new ActionSortVertices();
 
 		_actionOpenTourTypePrefs = new ActionOpenPrefDialog(
 				Messages.action_tourType_modify_tourTypes,
@@ -1397,8 +1397,8 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 
 		final ToolBarManager tbm = new ToolBarManager(toolbar);
 
-		tbm.add(_actionTTVertex_Add);
-		tbm.add(_actionTTVertex_Sort);
+		tbm.add(_actionTTSpeed_Add);
+		tbm.add(_actionTTSpeed_Sort);
 
 		tbm.update(true);
 	}
@@ -1441,7 +1441,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 		/*
 		 * fields
 		 */
-		_actionTTVertex_Delete = new ActionDeleteVertex[vertexSize];
+		_actionTTSpeed_Delete = new ActionDeleteVertex[vertexSize];
 		_lblTTSpeed_TourTypeIcon = new Label[vertexSize];
 		_lblTTSpeed_SpeedUnit = new Label[vertexSize];
 		_linkTTSpeed_TourType = new Link[vertexSize];
@@ -1511,7 +1511,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 				/*
 				 * Keep vertex controls
 				 */
-				_actionTTVertex_Delete[vertexIndex] = actionDeleteVertex;
+				_actionTTSpeed_Delete[vertexIndex] = actionDeleteVertex;
 				_lblTTSpeed_TourTypeIcon[vertexIndex] = lblTourTypeIcon;
 				_lblTTSpeed_SpeedUnit[vertexIndex] = lblUnit;
 				_linkTTSpeed_TourType[vertexIndex] = linkTourType;
@@ -1886,9 +1886,9 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 
 					isSetTourType = true;
 
-					if (_actionTTVertex_Delete != null) {
+					if (_actionTTSpeed_Delete != null) {
 
-						for (final ActionDeleteVertex action : _actionTTVertex_Delete) {
+						for (final ActionDeleteVertex action : _actionTTSpeed_Delete) {
 							action.setEnabled(isILSelected);
 						}
 
@@ -1923,8 +1923,8 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 						}
 					}
 
-					_actionTTVertex_Add.setEnabled(isILSelected);
-					_actionTTVertex_Sort.setEnabled(isILSelected && _spinnerTTVertex_AvgSpeed.length > 1);
+					_actionTTSpeed_Add.setEnabled(isILSelected);
+					_actionTTSpeed_Sort.setEnabled(isILSelected && _spinnerTTVertex_AvgSpeed.length > 1);
 
 				} else if (TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL.equals(selectedTourTypeConfig)) {
 
@@ -2742,7 +2742,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 
 					final SpeedTourType speedVertex = new SpeedTourType();
 
-					speedVertex.avgSpeed = spinnerAvgSpeed.getSelection();
+					speedVertex.avgSpeed = spinnerAvgSpeed.getSelection() * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
 					final Object tourTypeId = linkTourType.getData(DATA_KEY_TOUR_TYPE_ID);
 					if (tourTypeId instanceof Long) {
@@ -2833,15 +2833,16 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 
 				for (int vertexIndex = 0; vertexIndex < vertexSize; vertexIndex++) {
 
-					final SpeedTourType vertex = speedVertices.get(vertexIndex);
-					final long tourTypeId = vertex.tourTypeId;
+					final SpeedTourType speedTT = speedVertices.get(vertexIndex);
+					final long tourTypeId = speedTT.tourTypeId;
 
 					final Spinner spinnerAvgSpeed = _spinnerTTVertex_AvgSpeed[vertexIndex];
 					final Link linkTourType = _linkTTSpeed_TourType[vertexIndex];
 					final Label labelTourTypeIcon = _lblTTSpeed_TourTypeIcon[vertexIndex];
 
 					// update UI
-					spinnerAvgSpeed.setSelection(vertex.avgSpeed);
+					final double avgSpeed = (speedTT.avgSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE) + 0.0001;
+					spinnerAvgSpeed.setSelection((int) avgSpeed);
 
 					if (tourTypeId == TourDatabase.ENTITY_IS_NOT_SAVED) {
 
@@ -2864,7 +2865,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 					labelTourTypeIcon.setData(DATA_KEY_VERTEX_INDEX, vertexIndex);
 					linkTourType.setData(DATA_KEY_VERTEX_INDEX, vertexIndex);
 					spinnerAvgSpeed.setData(DATA_KEY_VERTEX_INDEX, vertexIndex);
-					_actionTTVertex_Delete[vertexIndex].setData(DATA_KEY_VERTEX_INDEX, vertexIndex);
+					_actionTTSpeed_Delete[vertexIndex].setData(DATA_KEY_VERTEX_INDEX, vertexIndex);
 
 				}
 			}
@@ -2917,7 +2918,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 			_speedTourType_ScrolledContainer.dispose();
 			_speedTourType_ScrolledContainer = null;
 
-			_actionTTVertex_Delete = null;
+			_actionTTSpeed_Delete = null;
 			_lblTTSpeed_TourTypeIcon = null;
 			_lblTTSpeed_SpeedUnit = null;
 			_linkTTSpeed_TourType = null;

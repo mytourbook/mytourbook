@@ -1527,6 +1527,10 @@ public class UI {
 		return newImageDesc;
 	}
 
+	/**
+	 * @param tourTypeId
+	 * @return Returns the name of a {@link TourType}.
+	 */
 	public String getTourTypeLabel(final long tourTypeId) {
 
 		for (final TourType tourType : TourDatabase.getAllTourTypes()) {

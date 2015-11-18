@@ -20,8 +20,12 @@ import net.tourbook.database.TourDatabase;
 
 public class SpeedTourType implements Comparable<Object>, Cloneable {
 
-	public int	avgSpeed;
-	public long	tourTypeId	= TourDatabase.ENTITY_IS_NOT_SAVED;
+	/**
+	 * Average speed for this tour type in km/h.
+	 */
+	public float	avgSpeed;
+
+	public long		tourTypeId	= TourDatabase.ENTITY_IS_NOT_SAVED;
 
 	public SpeedTourType() {}
 
@@ -50,9 +54,9 @@ public class SpeedTourType implements Comparable<Object>, Cloneable {
 	@Override
 	public int compareTo(final Object anotherObject) throws ClassCastException {
 
-		final int anotherValue = ((SpeedTourType) anotherObject).avgSpeed;
+		final float anotherValue = ((SpeedTourType) anotherObject).avgSpeed;
 
-		return avgSpeed - anotherValue;
+		return Float.compare(avgSpeed, anotherValue);
 	}
 
 	@Override

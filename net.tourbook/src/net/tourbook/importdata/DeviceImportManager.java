@@ -508,29 +508,34 @@ public class DeviceImportManager {
 
 				final ArrayList<SpeedTourType> speedVertices = configItem.speedTourTypes;
 
-				for (final IMemento xmlSpeed : xmlConfig.getChildren()) {
+				for (final IMemento memento : xmlConfig.getChildren()) {
 
-					final Long xmlTourTypeId = Util.getXmlLong(xmlSpeed, ATTR_TOUR_TYPE_ID, null);
+					if (memento instanceof XMLMemento) {
 
-					/*
-					 * Check if the loaded tour type id is valid
-					 */
-					final TourType tourType = TourDatabase.getTourType(xmlTourTypeId);
+						final XMLMemento xmlSpeed = (XMLMemento) memento;
 
-					if (tourType != null) {
+						final Long xmlTourTypeId = Util.getXmlLong(xmlSpeed, ATTR_TOUR_TYPE_ID, null);
 
-						final SpeedTourType speedVertex = new SpeedTourType();
+						/*
+						 * Check if the loaded tour type id is valid
+						 */
+						final TourType tourType = TourDatabase.getTourType(xmlTourTypeId);
 
-						speedVertex.tourTypeId = xmlTourTypeId;
+						if (tourType != null) {
 
-						speedVertex.avgSpeed = Util.getXmlInteger(
-								xmlSpeed,
-								ATTR_AVG_SPEED,
-								CONFIG_SPEED_DEFAULT,
-								CONFIG_SPEED_MIN,
-								CONFIG_SPEED_MAX);
+							final SpeedTourType speedVertex = new SpeedTourType();
 
-						speedVertices.add(speedVertex);
+							speedVertex.tourTypeId = xmlTourTypeId;
+
+							speedVertex.avgSpeed = Util.getXmlFloatFloat(
+									xmlSpeed,
+									ATTR_AVG_SPEED,
+									CONFIG_SPEED_DEFAULT,
+									CONFIG_SPEED_MIN,
+									CONFIG_SPEED_MAX);
+
+							speedVertices.add(speedVertex);
+						}
 					}
 				}
 
@@ -673,10 +678,15 @@ public class DeviceImportManager {
 
 				for (final SpeedTourType speedVertex : configItem.speedTourTypes) {
 
-					final IMemento xmlSpeedVertex = xmlConfig.createChild(TAG_SPEED_VERTEX);
+					final IMemento memento = xmlConfig.createChild(TAG_SPEED_VERTEX);
 
-					Util.setXmlLong(xmlSpeedVertex, ATTR_TOUR_TYPE_ID, speedVertex.tourTypeId);
-					xmlSpeedVertex.putInteger(ATTR_AVG_SPEED, speedVertex.avgSpeed);
+					if (memento instanceof XMLMemento) {
+
+						final XMLMemento xmlSpeedVertex = (XMLMemento) memento;
+
+						Util.setXmlLong(xmlSpeedVertex, ATTR_TOUR_TYPE_ID, speedVertex.tourTypeId);
+						xmlSpeedVertex.putFloat(ATTR_AVG_SPEED, speedVertex.avgSpeed);
+					}
 				}
 
 			} else if (TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL.equals(ttConfig)) {

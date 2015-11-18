@@ -625,13 +625,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 					// measurement system has changed
 
-					net.tourbook.ui.UI.updateUnits();
-
 					_columnManager.saveState(_state);
 					_columnManager.clearColumns();
 					defineAllColumns();
 
 					_tourViewer = (TableViewer) recreateViewer(_tourViewer);
+
+					updateUI_Dashboard();
 
 				} else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
@@ -978,9 +978,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				+ "<div class='auto-import-header'>\n" //$NON-NLS-1$
 				+ ("	<table><tbody><tr>\n") //$NON-NLS-1$
 
+				// device import
 				+ ("		<td class='title'>" + Messages.Import_Data_HTML_DeviceImport + "</td>\n") //$NON-NLS-1$ //$NON-NLS-2$
 
-				// Device state
+				// device state icon
 				+ ("		<td>\n") //$NON-NLS-1$
 				+ ("			<div id='" + DOM_ID_DEVICE_STATE + "' style='padding-left:20px;'>" + createHTML_DeviceState() + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				+ ("		</td>\n") //$NON-NLS-1$
@@ -1042,27 +1043,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		/*
 		 * Tooltip
 		 */
-		final StringBuilder sb = new StringBuilder();
-
-		final String tileName = importTile.name.trim();
-		final String tileDescription = importTile.description.trim();
-		boolean isAdded = false;
-
-		if (tileName.length() > 0) {
-			sb.append(tileName);
-			isAdded = true;
-		}
-
-		if (tileDescription.length() > 0) {
-
-			if (isAdded) {
-				sb.append(UI.NEW_LINE2);
-			}
-
-			sb.append(tileDescription);
-		}
-
-		final String tooltip = sb.toString();
+		final String tooltip = createHTML_TileTooltip(importTile);
 
 		/*
 		 * Tile image
@@ -1339,6 +1320,86 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		;
 
 		sb.append(html);
+	}
+
+	private String createHTML_TileTooltip(final DeviceImportLauncher importTile) {
+
+		boolean isTextAdded = false;
+
+		final StringBuilder sb = new StringBuilder();
+
+		final String tileName = importTile.name.trim();
+		final String tileDescription = importTile.description.trim();
+
+		final StringBuilder ttText = new StringBuilder();
+		final Enum<TourTypeConfig> ttConfig = importTile.tourTypeConfig;
+
+		if (TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED.equals(ttConfig)) {
+
+			final ArrayList<SpeedTourType> speedTourTypes = importTile.speedTourTypes;
+			boolean isSpeedAdded = false;
+
+			for (final SpeedTourType speedTT : speedTourTypes) {
+
+				if (isSpeedAdded) {
+					ttText.append(UI.NEW_LINE);
+				}
+
+				final long tourTypeId = speedTT.tourTypeId;
+				final double avgSpeed = (speedTT.avgSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE) + 0.0001;
+
+				ttText.append((int) avgSpeed);
+				ttText.append(UI.SPACE);
+				ttText.append(UI.UNIT_LABEL_SPEED);
+				ttText.append(UI.SPACE2);
+				ttText.append(net.tourbook.ui.UI.getInstance().getTourTypeLabel(tourTypeId));
+
+				isSpeedAdded = true;
+			}
+
+		} else if (TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL.equals(ttConfig)) {
+
+			final TourType oneTourType = importTile.oneTourType;
+			if (oneTourType != null) {
+
+				final String ttName = oneTourType.getName();
+
+				// show this text only when the name is different
+				if (!tileName.equals(ttName)) {
+					ttText.append(ttName);
+				}
+			}
+		}
+
+		// tour type name
+		if (tileName.length() > 0) {
+
+			sb.append(tileName);
+			isTextAdded = true;
+		}
+
+		// tour type description
+		if (tileDescription.length() > 0) {
+
+			if (isTextAdded) {
+				sb.append(UI.NEW_LINE2);
+			}
+
+			sb.append(tileDescription);
+			isTextAdded = true;
+		}
+
+		// tour type text
+		if (ttText.length() > 0) {
+
+			if (isTextAdded) {
+				sb.append(UI.NEW_LINE2);
+			}
+
+			sb.append(ttText);
+		}
+
+		return sb.toString();
 	}
 
 	@Override
@@ -2949,7 +3010,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 				final ImportState importState = DeviceImportManager.getInstance().runImport(importTile);
 
+				// open import config dialog to solve problems
 				if (importState.isOpenSetup) {
+
 					_parent.getDisplay().asyncExec(new Runnable() {
 						@Override
 						public void run() {

@@ -255,10 +255,8 @@ a.action-button:HOVER
 	
 	padding:				5px;
 
-	xwidth:					100%;
+	left:					5px;
 	min-width:				500px;
-	xmax-width:				600px;
-	margin-left:			-200px;
 	max-height:				80vh;
 }
 	
@@ -281,13 +279,13 @@ a.action-button:HOVER
 .folderTitle
 {
 	xfont-size: 				larger;
-	xfont-weight: 			600;
+	font-weight: 			600;
 }
 
 .folderInfo
 {
 	padding-left:			20px;
-	font-size: 				smaller;	
+	xfont-size: 				smaller;	
 }
 
 .folderLocation
@@ -314,12 +312,12 @@ a.action-button:HOVER
 .deviceList td
 {
 	xborder:					1px solid #ddd;
-	font-weight: 			lighter;
+	xfont-weight: 			lighter;
 }
 
 .deviceList td.name
 {
-	font-weight: 			normal;
+	xfont-weight: 			normal;
 }
 
 .deviceList td.right
