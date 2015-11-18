@@ -215,6 +215,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 	private Button							_chkImportFiles;
 	private Button							_chkLiveUpdate;
 	private Button							_chkTTSetTourType;
+	private Button							_chkTTShowInDashboard;
 	private Button							_btnSelectBackupFolder;
 	private Button							_btnSelectDeviceFolder;
 	private Button							_btnTTConfig_Duplicate;
@@ -1222,7 +1223,6 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 			GridDataFactory.fillDefaults()//
 					.grab(true, false)
 					.applyTo(_txtTTConfigName);
-
 		}
 
 		{
@@ -1248,6 +1248,19 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 					.grab(true, false)
 					.hint(convertWidthInCharsToPixels(40), convertHeightInCharsToPixels(5))
 					.applyTo(_txtTTConfigDescription);
+		}
+
+		{
+			/*
+			 * Checkbox: Set tour type
+			 */
+			_chkTTShowInDashboard = new Button(parent, SWT.CHECK);
+			_chkTTShowInDashboard.setText(Messages.Dialog_ImportConfig_Checkbox_ShowInDashboard);
+			_chkTTShowInDashboard.setToolTipText(Messages.Dialog_ImportConfig_Checkbox_ShowInDashboard_Tooltip);
+			GridDataFactory.fillDefaults()//
+					.span(2, 1)
+//					.indent(0, VERTICAL_GROUP_DISTANCE / 2)
+					.applyTo(_chkTTShowInDashboard);
 		}
 	}
 
@@ -1944,6 +1957,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 
 		_txtTTConfigName.setEnabled(isILSelected);
 		_txtTTConfigDescription.setEnabled(isILSelected);
+		_chkTTShowInDashboard.setEnabled(isILSelected);
 		_lblTTTourType.setEnabled(isILSelected && isSetTourType);
 		_comboTTConfig.setEnabled(isILSelected && isSetTourType);
 
@@ -2514,6 +2528,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 
 			_txtTTConfigName.setText(UI.EMPTY_STRING);
 			_txtTTConfigDescription.setText(UI.EMPTY_STRING);
+			_chkTTShowInDashboard.setEnabled(true);
 
 			// remove vertex fields
 			createUI_88_SpeedTourType_Fields();
@@ -2718,6 +2733,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 
 		_currentIL.name = _txtTTConfigName.getText();
 		_currentIL.description = _txtTTConfigDescription.getText();
+		_currentIL.isShowInDashboard = _chkTTShowInDashboard.getSelection();
 
 		_currentIL.tourTypeConfig = selectedTourTypeConfig;
 
@@ -2807,6 +2823,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 
 		_txtTTConfigName.setText(_currentIL.name);
 		_txtTTConfigDescription.setText(_currentIL.description);
+		_chkTTShowInDashboard.setSelection(_currentIL.isShowInDashboard);
 
 		_chkTTSetTourType.setSelection(isSetTourType);
 

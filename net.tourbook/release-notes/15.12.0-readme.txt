@@ -23,6 +23,8 @@ Version 15.12.0 Beta                                  ?. ? 2015
  
  * The embedded browser in Linux cannot show all CSS3 features, e.g. background image, gradient, box-shadow is expanding the focus therefor CSS3 is disabled.
  
+ 
+ * Clicking on the dashboard state icon works sometimes only with the 2nd and further clicks.
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

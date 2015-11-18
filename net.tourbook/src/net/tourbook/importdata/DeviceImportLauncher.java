@@ -23,17 +23,17 @@ import net.tourbook.data.TourType;
 
 public class DeviceImportLauncher implements Cloneable, Comparable<DeviceImportLauncher> {
 
-	public String					description		= UI.EMPTY_STRING;
-	public String					name			= UI.EMPTY_STRING;
+	public String					description			= UI.EMPTY_STRING;
+	public String					name				= UI.EMPTY_STRING;
 
 	/**
 	 * When <code>null</code> then the tour type is not set.
 	 */
-	public Enum<TourTypeConfig>		tourTypeConfig	= null;
+	public Enum<TourTypeConfig>		tourTypeConfig		= null;
 
 	public TourType					oneTourType;
 
-	public ArrayList<SpeedTourType>	speedTourTypes	= new ArrayList<>();
+	public ArrayList<SpeedTourType>	speedTourTypes		= new ArrayList<>();
 
 	/** Contains the image hash or 0 when an image is not displayed. */
 	public int						imageHash;
@@ -41,6 +41,11 @@ public class DeviceImportLauncher implements Cloneable, Comparable<DeviceImportL
 	public int						imageWidth;
 
 	private long					_id;
+
+	/**
+	 * Show/hid this launcher in the dashboard.
+	 */
+	public boolean					isShowInDashboard	= true;
 
 	private static long				_idCreator;
 

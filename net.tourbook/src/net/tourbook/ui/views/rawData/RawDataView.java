@@ -1008,26 +1008,32 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 
 		boolean isTrOpen = false;
+		int tileIndex = 0;
 
 		sb.append("<table class='import-tiles'><tbody>\n"); //$NON-NLS-1$
 
 		for (int configIndex = 0; configIndex < configItems.size(); configIndex++) {
 
-			if (configIndex % numHorizontalTiles == 0) {
-				sb.append("<tr>\n"); //$NON-NLS-1$
-				isTrOpen = true;
-			}
-
 			final DeviceImportLauncher configItem = configItems.get(configIndex);
 
-			// enforce equal column width
-			sb.append("<td style='width:" + 100 / numHorizontalTiles + "%' class='import-tile'>\n"); //$NON-NLS-1$ //$NON-NLS-2$
-			sb.append(createHTML_54_DeviceImport_Tile(configItem));
-			sb.append("</td>\n"); //$NON-NLS-1$
+			if (configItem.isShowInDashboard) {
 
-			if (configIndex % numHorizontalTiles == numHorizontalTiles - 1) {
-				sb.append("</tr>\n"); //$NON-NLS-1$
-				isTrOpen = false;
+				if (tileIndex % numHorizontalTiles == 0) {
+					sb.append("<tr>\n"); //$NON-NLS-1$
+					isTrOpen = true;
+				}
+
+				// enforce equal column width
+				sb.append("<td style='width:" + 100 / numHorizontalTiles + "%' class='import-tile'>\n"); //$NON-NLS-1$ //$NON-NLS-2$
+				sb.append(createHTML_54_DeviceImport_Tile(configItem));
+				sb.append("</td>\n"); //$NON-NLS-1$
+
+				if (tileIndex % numHorizontalTiles == numHorizontalTiles - 1) {
+					sb.append("</tr>\n"); //$NON-NLS-1$
+					isTrOpen = false;
+				}
+
+				tileIndex++;
 			}
 		}
 

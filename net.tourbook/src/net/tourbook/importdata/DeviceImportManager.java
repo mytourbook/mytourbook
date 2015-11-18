@@ -59,42 +59,43 @@ import org.eclipse.ui.XMLMemento;
 
 public class DeviceImportManager {
 
-	private static final String			ID								= "net.tourbook.importdata.DeviceImportManager";	//$NON-NLS-1$
+	private static final String			ID									= "net.tourbook.importdata.DeviceImportManager";	//$NON-NLS-1$
 	//
-	private static final String			XML_STATE_DEVICE_IMPORT_CONFIG	= "XML_STATE_DEVICE_IMPORT_CONFIG";				//$NON-NLS-1$
+	private static final String			XML_STATE_DEVICE_IMPORT_CONFIG		= "XML_STATE_DEVICE_IMPORT_CONFIG";				//$NON-NLS-1$
 	//
-	private static final String			TAG_IMPORT_CONFIG				= "Config";										//$NON-NLS-1$
-	private static final String			TAG_IMPORT_CONFIG_ROOT			= "DeviceImportConfig";							//$NON-NLS-1$
-	private static final String			TAG_SPEED_VERTEX				= "Speed";											//$NON-NLS-1$
+	private static final String			TAG_IMPORT_CONFIG					= "Config";										//$NON-NLS-1$
+	private static final String			TAG_IMPORT_CONFIG_ROOT				= "DeviceImportConfig";							//$NON-NLS-1$
+	private static final String			TAG_SPEED_VERTEX					= "Speed";											//$NON-NLS-1$
 	//
-	private static final String			ATTR_ANIMATION_CRAZY_FACTOR		= "animationCrazyFactor";							//$NON-NLS-1$
-	private static final String			ATTR_ANIMATION_DURATION			= "animationDuration";								//$NON-NLS-1$
-	private static final String			ATTR_AVG_SPEED					= "avgSpeed";										//$NON-NLS-1$
-	private static final String			ATTR_BACKGROUND_OPACITY			= "backgroundOpacity";								//$NON-NLS-1$
-	private static final String			ATTR_CONFIG_NAME				= "name";											//$NON-NLS-1$
-	private static final String			ATTR_CONFIG_DESCRIPTION			= "description";									//$NON-NLS-1$
-	private static final String			ATTR_CONFIG_BACKUP_FOLDER		= "backupFolder";									//$NON-NLS-1$
-	private static final String			ATTR_CONFIG_DEVICE_FOLDER		= "deviceFolder";									//$NON-NLS-1$
-	private static final String			ATTR_IS_CREATE_BACKUP			= "isCreateBackup";								//$NON-NLS-1$
-	private static final String			ATTR_IS_LIVE_UPDATE				= "isLiveUpdate";									//$NON-NLS-1$
-	private static final String			ATTR_NUM_UI_COLUMNS				= "uiColumns";										//$NON-NLS-1$
-	private static final String			ATTR_TILE_SIZE					= "tileSize";										//$NON-NLS-1$
-	private static final String			ATTR_TOUR_TYPE_CONFIG			= "tourTypeConfig";								//$NON-NLS-1$
-	private static final String			ATTR_TOUR_TYPE_ID				= "tourTypeId";									//$NON-NLS-1$
+	private static final String			ATTR_ANIMATION_CRAZY_FACTOR			= "animationCrazyFactor";							//$NON-NLS-1$
+	private static final String			ATTR_ANIMATION_DURATION				= "animationDuration";								//$NON-NLS-1$
+	private static final String			ATTR_AVG_SPEED						= "avgSpeed";										//$NON-NLS-1$
+	private static final String			ATTR_BACKGROUND_OPACITY				= "backgroundOpacity";								//$NON-NLS-1$
+	private static final String			ATTR_CONFIG_BACKUP_FOLDER			= "backupFolder";									//$NON-NLS-1$
+	private static final String			ATTR_CONFIG_DESCRIPTION				= "description";									//$NON-NLS-1$
+	private static final String			ATTR_CONFIG_DEVICE_FOLDER			= "deviceFolder";									//$NON-NLS-1$
+	private static final String			ATTR_CONFIG_NAME					= "name";											//$NON-NLS-1$
+	private static final String			ATTR_CONFIG_IS_SHOW_IN_DASHBOARD	= "isShowInDashBoard";								//$NON-NLS-1$
+	private static final String			ATTR_IS_CREATE_BACKUP				= "isCreateBackup";								//$NON-NLS-1$
+	private static final String			ATTR_IS_LIVE_UPDATE					= "isLiveUpdate";									//$NON-NLS-1$
+	private static final String			ATTR_NUM_UI_COLUMNS					= "uiColumns";										//$NON-NLS-1$
+	private static final String			ATTR_TILE_SIZE						= "tileSize";										//$NON-NLS-1$
+	private static final String			ATTR_TOUR_TYPE_CONFIG				= "tourTypeConfig";								//$NON-NLS-1$
+	private static final String			ATTR_TOUR_TYPE_ID					= "tourTypeId";									//$NON-NLS-1$
 	//
-	static final int					CONFIG_SPEED_MIN				= 0;
-	static final int					CONFIG_SPEED_MAX				= 3000;
-	private static final int			CONFIG_SPEED_DEFAULT			= 0;
+	static final int					CONFIG_SPEED_MIN					= 0;
+	static final int					CONFIG_SPEED_MAX					= 3000;
+	private static final int			CONFIG_SPEED_DEFAULT				= 0;
 	//
 	private static DeviceImportManager	_instance;
 
-	private final IDialogSettings		_state							= TourbookPlugin.getState(ID);
+	private final IDialogSettings		_state								= TourbookPlugin.getState(ID);
 
 	private ImportConfig				_importConfig;
 
 	private String						_fileStoresHash;
 
-	private ReentrantLock				STORE_LOCK						= new ReentrantLock();
+	private ReentrantLock				STORE_LOCK							= new ReentrantLock();
 
 	public static DeviceImportManager getInstance() {
 
@@ -496,6 +497,7 @@ public class DeviceImportManager {
 
 			configItem.name = Util.getXmlString(xmlConfig, ATTR_CONFIG_NAME, UI.EMPTY_STRING);
 			configItem.description = Util.getXmlString(xmlConfig, ATTR_CONFIG_DESCRIPTION, UI.EMPTY_STRING);
+			configItem.isShowInDashboard = Util.getXmlBoolean(xmlConfig, ATTR_CONFIG_IS_SHOW_IN_DASHBOARD, true);
 
 			final Enum<TourTypeConfig> ttConfig = Util.getXmlEnum(
 					xmlConfig,
@@ -670,6 +672,7 @@ public class DeviceImportManager {
 
 			xmlConfig.putString(ATTR_CONFIG_NAME, configItem.name);
 			xmlConfig.putString(ATTR_CONFIG_DESCRIPTION, configItem.description);
+			xmlConfig.putBoolean(ATTR_CONFIG_IS_SHOW_IN_DASHBOARD, configItem.isShowInDashboard);
 
 			final Enum<TourTypeConfig> ttConfig = configItem.tourTypeConfig;
 			Util.setXmlEnum(xmlConfig, ATTR_TOUR_TYPE_CONFIG, ttConfig);
