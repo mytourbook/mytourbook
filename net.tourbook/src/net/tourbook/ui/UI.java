@@ -1010,6 +1010,36 @@ public class UI {
 		return null;
 	}
 
+	/**
+	 * @param tourTypeId
+	 * @return Returns the {@link TourType} or <code>null</code>.
+	 */
+	public static TourType getTourType(final long tourTypeId) {
+	
+		for (final TourType tourType : TourDatabase.getAllTourTypes()) {
+			if (tourType.getTypeId() == tourTypeId) {
+				return tourType;
+			}
+		}
+	
+		return null;
+	}
+
+	/**
+	 * @param tourTypeId
+	 * @return Returns the name of a {@link TourType}.
+	 */
+	public static String getTourTypeLabel(final long tourTypeId) {
+
+		for (final TourType tourType : TourDatabase.getAllTourTypes()) {
+			if (tourType.getTypeId() == tourTypeId) {
+				return tourType.getName();
+			}
+		}
+
+		return UI.EMPTY_STRING;
+	}
+
 	public static ImageData rotate(final ImageData srcData, final int direction) {
 
 		final int bytesPerPixel = srcData.bytesPerLine / srcData.width;
@@ -1502,6 +1532,7 @@ public class UI {
 		}
 	}
 
+
 	/**
 	 * The image descriptor is cached because the creation takes system resources and it's called
 	 * very often
@@ -1525,21 +1556,6 @@ public class UI {
 		_imageCacheDescriptor.put(keyColorId, newImageDesc);
 
 		return newImageDesc;
-	}
-
-	/**
-	 * @param tourTypeId
-	 * @return Returns the name of a {@link TourType}.
-	 */
-	public String getTourTypeLabel(final long tourTypeId) {
-
-		for (final TourType tourType : TourDatabase.getAllTourTypes()) {
-			if (tourType.getTypeId() == tourTypeId) {
-				return tourType.getName();
-			}
-		}
-
-		return UI.EMPTY_STRING;
 	}
 
 	/**

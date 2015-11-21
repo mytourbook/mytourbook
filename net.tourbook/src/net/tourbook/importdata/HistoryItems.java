@@ -17,7 +17,6 @@ package net.tourbook.importdata;
 
 import java.io.File;
 import java.nio.file.FileStore;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -220,7 +219,7 @@ class HistoryItems {
 		String deviceDrive = root.toString();
 		deviceDrive = deviceDrive.substring(0, 2);
 
-		final Iterable<FileStore> fileStores = FileSystems.getDefault().getFileStores();
+		final Iterable<FileStore> fileStores = NIO.getFileStores();
 
 		for (final FileStore store : fileStores) {
 
@@ -234,6 +233,8 @@ class HistoryItems {
 
 		return null;
 	}
+
+
 
 	String getOSPath(final String defaultFolder, final String configFolder) {
 

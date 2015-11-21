@@ -111,6 +111,7 @@ public class TurDeviceReader extends TourbookDevice {
 		return false;
 	}
 
+	@Override
 	public String getDeviceModeName(final int modeId) {
 		return UI.EMPTY_STRING;
 	}
@@ -130,6 +131,7 @@ public class TurDeviceReader extends TourbookDevice {
 		return null;
 	}
 
+	@Override
 	public int getTransferDataSize() {
 		// We dont't have a com-port device so this is not neccessary
 		return 0;
@@ -154,8 +156,7 @@ public class TurDeviceReader extends TourbookDevice {
 
 			final TourData tourData = new TourData();
 
-			tourData.importRawDataFile = importFilePath;
-			tourData.setTourImportFilePath(importFilePath);
+			tourData.setImportFilePath(importFilePath);
 
 			tourData.setDeviceMode(Short.parseShort(turDeviceData.deviceMode));
 //			tourData.setDeviceTotalDown(Integer.parseInt(turDeviceData.deviceAltDown));
@@ -411,6 +412,7 @@ public class TurDeviceReader extends TourbookDevice {
 		}
 	}
 
+	@Override
 	public boolean validateRawData(final String fileName) {
 
 		boolean isValid = false;

@@ -1592,7 +1592,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 				if (element instanceof TVICollatedTour_Tour) {
 
 					final long tourTypeId = ((TVICollatedTour_Tour) element).getTourTypeId();
-					cell.setText(net.tourbook.ui.UI.getInstance().getTourTypeLabel(tourTypeId));
+					cell.setText(net.tourbook.ui.UI.getTourTypeLabel(tourTypeId));
 				}
 			}
 		});

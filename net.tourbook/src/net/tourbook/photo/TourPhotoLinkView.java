@@ -246,12 +246,15 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 	private class ContentProvider implements IStructuredContentProvider {
 
+		@Override
 		public void dispose() {}
 
+		@Override
 		public Object[] getElements(final Object inputElement) {
 			return _visibleTourPhotoLinks.toArray();
 		}
 
+		@Override
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 	}
 
@@ -449,28 +452,36 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 	private void addPartListener() {
 		_partListener = new IPartListener2() {
 
+			@Override
 			public void partActivated(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourPhotoLinkView.this) {
 					onPartActivate();
 				}
 			}
 
+			@Override
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourPhotoLinkView.this) {
 					onPartClosed();
 				}
 			}
 
+			@Override
 			public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partHidden(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partOpened(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partVisible(final IWorkbenchPartReference partRef) {}
 		};
 		getViewSite().getPage().addPartListener(_partListener);
@@ -479,6 +490,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 	private void addPrefListener() {
 
 		_prefChangeListener = new IPropertyChangeListener() {
+			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
@@ -529,6 +541,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 	private void addSelectionListener() {
 
 		_postSelectionListener = new ISelectionListener() {
+			@Override
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 				if (part == TourPhotoLinkView.this) {
 					return;
@@ -573,6 +586,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 		menuMgr.setRemoveAllWhenShown(true);
 
 		menuMgr.addMenuListener(new IMenuListener() {
+			@Override
 			public void menuAboutToShow(final IMenuManager menuMgr2) {
 				fillContextMenu(menuMgr2);
 			}
@@ -722,6 +736,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 			});
 			_spinnerHours.addMouseWheelListener(new MouseWheelListener() {
+				@Override
 				public void mouseScrolled(final MouseEvent event) {
 					Util.adjustSpinnerValueOnMouseScroll(event);
 					onSelectTimeAdjustment();
@@ -747,6 +762,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 			});
 			_spinnerMinutes.addMouseWheelListener(new MouseWheelListener() {
+				@Override
 				public void mouseScrolled(final MouseEvent event) {
 					Util.adjustSpinnerValueOnMouseScroll(event);
 					onSelectTimeAdjustment();
@@ -772,6 +788,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 			});
 			_spinnerSeconds.addMouseWheelListener(new MouseWheelListener() {
+				@Override
 				public void mouseScrolled(final MouseEvent event) {
 					Util.adjustSpinnerValueOnMouseScroll(event);
 					onSelectTimeAdjustment();
@@ -799,6 +816,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 		_tourViewer.setComparator(new ContentComparator());
 
 		_tourViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
 			public void selectionChanged(final SelectionChangedEvent event) {
 				final ISelection eventSelection = event.getSelection();
 				if (eventSelection instanceof StructuredSelection) {
@@ -1170,7 +1188,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 						if (tourTypeId == -1) {
 							cell.setText(UI.EMPTY_STRING);
 						} else {
-							cell.setText(net.tourbook.ui.UI.getInstance().getTourTypeLabel(tourTypeId));
+							cell.setText(net.tourbook.ui.UI.getTourTypeLabel(tourTypeId));
 						}
 					}
 
@@ -1273,6 +1291,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 		return _allTourCamerasSorted[cameraIndex];
 	}
 
+	@Override
 	public ArrayList<TourData> getSelectedTours() {
 		return new ArrayList<TourData>();
 	}
@@ -1675,6 +1694,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 		if (numberOfPhotos > 100) {
 
 			BusyIndicator.showWhile(_pageBook.getDisplay(), new Runnable() {
+				@Override
 				public void run() {
 					updateUI(null, _visibleTourPhotoLinks);
 				}
@@ -1755,6 +1775,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 		// tour viewer update can be a longer task, update other UI element before
 		_pageBook.getDisplay().asyncExec(new Runnable() {
+			@Override
 			public void run() {
 
 				if (_tourViewer.getTable().isDisposed()) {

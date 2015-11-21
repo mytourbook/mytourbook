@@ -999,8 +999,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 		_tourData.setDeviceTimeInterval((short) -1);
 
-		_tourData.importRawDataFile = _importFilePath;
-		_tourData.setTourImportFilePath(_importFilePath);
+		_tourData.setImportFilePath(_importFilePath);
 
 		_tourData.setTourMarkers(_allMarker);
 		_tourData.setWayPoints(_allWayPoints);

@@ -126,6 +126,7 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 		return false;
 	}
 
+	@Override
 	public String getDeviceModeName(final int profileId) {
 
 		// "2E" bike2 (CM414M)
@@ -165,6 +166,7 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 		return null;
 	}
 
+	@Override
 	public int getTransferDataSize() {
 		return CM4XXM_DATA_SIZE;
 	}
@@ -243,8 +245,7 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 				final TourData tourData = new TourData();
 
 				tourData.setDeviceTimeInterval(CM4XXM_TIMESLICE);
-				tourData.importRawDataFile = importFilePath;
-				tourData.setTourImportFilePath(importFilePath);
+				tourData.setImportFilePath(importFilePath);
 
 				final StartBlock startBlock = readStartBlock(fileRawData, tourData);
 
@@ -651,6 +652,7 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 	 * 
 	 * @return true for a valid HAC4 data format
 	 */
+	@Override
 	public boolean validateRawData(final String fileName) {
 
 		boolean isValid = false;

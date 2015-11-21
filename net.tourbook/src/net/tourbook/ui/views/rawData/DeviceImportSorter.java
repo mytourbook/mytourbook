@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,7 +19,6 @@
  *
  * 
  */
-
 package net.tourbook.ui.views.rawData;
 
 import net.tourbook.data.TourData;
@@ -58,16 +57,20 @@ public class DeviceImportSorter extends ViewerSorter {
 
 		case RawDataView.COLUMN_FILE_NAME:
 
+			final String importFilePath1 = tourData1.getImportFilePath();
+			final String importFilePath2 = tourData2.getImportFilePath();
+
 			// sort by file name
-			if (tourData1.importRawDataFile == null || tourData2.importRawDataFile == null) {
+			if (importFilePath1 == null || importFilePath2 == null) {
 				break;
 			}
 
-			result = tourData1.importRawDataFile.compareTo(tourData2.importRawDataFile);
+			result = importFilePath1.compareTo(importFilePath2);
 
 			if (result == 0) {
 				result = compareDateTime(tourData1, tourData2);
 			}
+
 			break;
 
 		case RawDataView.COLUMN_DATA_FORMAT:

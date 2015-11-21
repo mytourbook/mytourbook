@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.ReentrantLock;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -163,6 +164,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
+import org.joda.time.DateTime;
 
 /**
  *
@@ -226,13 +228,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		HREF_SERIAL_PORT_DIRECTLY = HREF_TOKEN + ACTION_SERIAL_PORT_DIRECTLY;
 		HREF_SETUP_DEVICE_IMPORT = HREF_TOKEN + ACTION_SETUP_DEVICE_IMPORT + HREF_TOKEN;
 	}
-
-	public static final int					TILE_SIZE_DEFAULT							= 80;
-	public static final int					TILE_SIZE_MIN								= 20;
-	public static final int					TILE_SIZE_MAX								= 300;
-	public static final int					NUM_HORIZONTAL_TILES_DEFAULT				= 5;
-	public static final int					NUM_HORIZONTAL_TILES_MIN					= 1;
-	public static final int					NUM_HORIZONTAL_TILES_MAX					= 50;
 
 	//
 	private final IPreferenceStore			_prefStore									= TourbookPlugin.getPrefStore();
@@ -305,14 +300,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private TagMenuManager					_tagMenuMgr;
 	private TourDoubleClickState			_tourDoubleClickState						= new TourDoubleClickState();
 	//
-	private Thread							_devicePollingThread;
-	private Thread							_watchFolderThread;
+	private Thread							_watchingStoresThread;
+	private Thread							_watchingFolderThread;
 	private WatchService					_watcher;
 	private WatchKey						_watchKey;
-	private boolean							_isStopPollingThread;
+	private boolean							_isStopWatchingStoresThread;
 	private boolean							_isCancelWatchFolder;
 	private AtomicBoolean					_canPollImportFiles							= new AtomicBoolean();
 	private AtomicBoolean					_browserTask_DeviceState					= new AtomicBoolean();
+	private ReentrantLock					WATCH_LOCK									= new ReentrantLock();
 	//
 	private HashMap<Long, Image>			_configImages								= new HashMap<>();
 	private HashMap<Long, Integer>			_configImageHash							= new HashMap<>();
@@ -326,6 +322,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private String							_imageUrl_AppStateOK;
 	private String							_imageUrl_DeviceFolder_OK;
 	private String							_imageUrl_DeviceFolder_NotAvailable;
+	private String							_imageUrl_DeviceFolder_NotChecked;
 	private String							_imageUrl_ImportFromFile;
 	private String							_imageUrl_SerialPort_Configured;
 	private String							_imageUrl_SerialPort_Directly;
@@ -346,6 +343,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private Image							_imageDatabaseAssignMergedTour;
 	private Image							_imageDatabasePlaceholder;
 	private Image							_imageDelete;
+
+	private DialogDeviceImportConfig		_dialogImportConfig;
 
 	/*
 	 * UI controls
@@ -385,6 +384,16 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	void actionClearView() {
 
+		/*
+		 * Show dashboard immediately otherwise it is displayed delayed
+		 */
+//		_topPageBook.showPage(_topPage_Dashboard);
+
+		//
+//		Display.getCurrent().asyncExec(new Runnable() {
+//			@Override
+//			public void run() {
+//
 		// remove all tours
 		_rawDataMgr.removeAllTours();
 
@@ -394,6 +403,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		// don't throw the selection again
 		_postSelectionProvider.clearSelection();
+//			}
+//		});
 	}
 
 	void actionMergeTours(final TourData mergeFromTour, final TourData mergeIntoTour) {
@@ -499,19 +510,24 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	void actionSetupImport() {
 
+		// prevent that the dialog is opened multiple times, this occured when testing
+		if (_dialogImportConfig != null) {
+			return;
+		}
+
 		final Shell shell = Display.getDefault().getActiveShell();
 
 		final ImportConfig importConfig = getImportConfig();
 
-		final DialogDeviceImportConfig dialog = new DialogDeviceImportConfig(shell, importConfig, this);
+		_dialogImportConfig = new DialogDeviceImportConfig(shell, importConfig, this);
 
 		boolean isOK = false;
 
-		if (dialog.open() == Window.OK) {
+		if (_dialogImportConfig.open() == Window.OK) {
 			isOK = true;
 		}
 
-		final ImportConfig modifiedConfig = dialog.getModifiedConfig();
+		final ImportConfig modifiedConfig = _dialogImportConfig.getModifiedConfig();
 
 		if (isOK) {
 
@@ -520,15 +536,17 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			importConfig.deviceImportLaunchers.clear();
 			importConfig.deviceImportLaunchers.addAll(modifiedConfig.deviceImportLaunchers);
 
-			updateModel_ImportConfig_LiveUpdate(dialog, false);
-			updateModel_ImportConfig_AndSave(dialog);
+			updateModel_ImportConfig_LiveUpdate(_dialogImportConfig, false);
+			updateModel_ImportConfig_AndSave(_dialogImportConfig);
 
 			updateDeviceState();
 
-			setupThread_WatchDeviceFolder();
+			thread_WatchDeviceFolder(true);
 		}
 
-		updateUI_Dashboard();
+		updateUI_Dashboard(true);
+
+		_dialogImportConfig = null;
 	}
 
 	private void addPartListener() {
@@ -630,7 +648,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 					_tourViewer = (TableViewer) recreateViewer(_tourViewer);
 
-					updateUI_Dashboard();
+					updateUI_Dashboard(true);
 
 				} else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
@@ -710,46 +728,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			}
 		};
 		TourManager.getInstance().addTourEventListener(_tourEventListener);
-	}
-
-	/**
-	 * Thread is not interrupted it could cause SQL exceptions.
-	 */
-	private void cancelThread_PollingStores() {
-
-		_isStopPollingThread = true;
-	}
-
-	/**
-	 * Thread is not interrupted it could cause SQL exceptions.
-	 */
-	private void cancelThread_WatchDeviceFolder() {
-
-		if (_watchFolderThread != null) {
-
-			try {
-
-				if (_watchKey != null) {
-					_watchKey.cancel();
-					_watchKey = null;
-				}
-
-				if (_watcher != null) {
-					try {
-						_watcher.close();
-					} catch (final IOException e) {
-						StatusUtil.log(e);
-					} finally {
-						_watcher = null;
-					}
-				}
-
-			} catch (final Exception e) {
-				StatusUtil.log(e);
-			} finally {
-				_watchFolderThread = null;
-			}
-		}
 	}
 
 	private void createActions() {
@@ -890,16 +868,16 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private void createDefaultDeviceImportLauncher() {
 
-		final ImportConfig importConfig = getImportConfig();
-
 		final DeviceImportLauncher defaultLauncher = new DeviceImportLauncher();
-		importConfig.deviceImportLaunchers.add(defaultLauncher);
 
 		defaultLauncher.name = Messages.Import_Data_Default_DeviceImportLauncher_Name;
 		defaultLauncher.description = Messages.Import_Data_Default_DeviceImportLauncher_Description;
+
+		final ImportConfig importConfig = getImportConfig();
+		importConfig.deviceImportLaunchers.add(defaultLauncher);
 	}
 
-	private String createHTML() {
+	private String createHTML(final boolean isUpdateDeviceState) {
 
 //		Force Internet Explorer to not use compatibility mode. Internet Explorer believes that websites under
 //		several domains (including "ibm.com") require compatibility mode. You may see your web application run
@@ -914,7 +892,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				+ "<!DOCTYPE html>\n" // ensure that IE is using the newest version and not the quirk mode //$NON-NLS-1$
 				+ "<html style='height: 100%; width: 100%; margin: 0px; padding: 0px;'>\n" //$NON-NLS-1$
 				+ ("<head>\n" + createHTML_10_Head() + "\n</head>\n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("<body>\n" + createHTML_20_Body() + "\n</body>\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("<body>\n" + createHTML_20_Body(isUpdateDeviceState) + "\n</body>\n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ "</html>"; //$NON-NLS-1$
 
 		return html;
@@ -933,7 +911,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		return html;
 	}
 
-	private String createHTML_20_Body() {
+	private String createHTML_20_Body(final boolean isUpdateDeviceState) {
 
 		final StringBuilder sb = new StringBuilder();
 
@@ -951,7 +929,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				/*
 				 * Device Import
 				 */
-				createHTML_50_DeviceImport_Header(sb);
+				createHTML_50_DeviceImport_Header(sb, isUpdateDeviceState);
 				createHTML_52_DeviceImport_Tiles(sb);
 
 				/*
@@ -970,7 +948,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		return sb.toString();
 	}
 
-	private void createHTML_50_DeviceImport_Header(final StringBuilder sb) {
+	private void createHTML_50_DeviceImport_Header(final StringBuilder sb, final boolean isUpdateDeviceState) {
+
+		final String htmlDeviceState = createHTML_DeviceState(isUpdateDeviceState);
 
 		final String html = "" // //$NON-NLS-1$
 
@@ -982,7 +962,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 				// device state icon
 				+ ("		<td>\n") //$NON-NLS-1$
-				+ ("			<div id='" + DOM_ID_DEVICE_STATE + "' style='padding-left:20px;'>" + createHTML_DeviceState() + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				+ ("			<div id='" + DOM_ID_DEVICE_STATE + "' style='padding-left:20px;'>" + htmlDeviceState + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				+ ("		</td>\n") //$NON-NLS-1$
 
 				+ "	</tr></tbody></table>\n" // //$NON-NLS-1$
@@ -995,10 +975,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		final ImportConfig importConfig = getImportConfig();
 
-		final int numHorizontalTiles = importConfig.numHorizontalTiles;
+		final ArrayList<DeviceImportLauncher> allImportLauncher = importConfig.deviceImportLaunchers;
 
-		final ArrayList<DeviceImportLauncher> configItems = importConfig.deviceImportLaunchers;
-		if (configItems.size() == 0) {
+		if (allImportLauncher.size() == 0 && importConfig.isLastLauncherRemoved == false) {
 
 			/*
 			 * Make life easier and create a default import launcher.
@@ -1006,16 +985,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			createDefaultDeviceImportLauncher();
 		}
 
-		boolean isTrOpen = false;
 		int tileIndex = 0;
+		final int numHorizontalTiles = importConfig.numHorizontalTiles;
+		boolean isTrOpen = false;
 
 		sb.append("<table class='import-tiles'><tbody>\n"); //$NON-NLS-1$
 
-		for (int configIndex = 0; configIndex < configItems.size(); configIndex++) {
+		for (final DeviceImportLauncher importLauncher : allImportLauncher) {
 
-			final DeviceImportLauncher configItem = configItems.get(configIndex);
-
-			if (configItem.isShowInDashboard) {
+			if (importLauncher.isShowInDashboard) {
 
 				if (tileIndex % numHorizontalTiles == 0) {
 					sb.append("<tr>\n"); //$NON-NLS-1$
@@ -1024,7 +1002,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 				// enforce equal column width
 				sb.append("<td style='width:" + 100 / numHorizontalTiles + "%' class='import-tile'>\n"); //$NON-NLS-1$ //$NON-NLS-2$
-				sb.append(createHTML_54_DeviceImport_Tile(configItem));
+				sb.append(createHTML_54_DeviceImport_Tile(importLauncher));
 				sb.append("</td>\n"); //$NON-NLS-1$
 
 				if (tileIndex % numHorizontalTiles == numHorizontalTiles - 1) {
@@ -1112,126 +1090,150 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private String createHTML_BgImage(final String imageUrl) {
 
-		final String htmlImage = "style='" // //$NON-NLS-1$
-
-				+ ("background-image:	url(" + imageUrl + ");") //$NON-NLS-1$ //$NON-NLS-2$
-				//
-				+ "'"; //$NON-NLS-1$
-
-		return htmlImage;
+		return "style='background-image: url(" + imageUrl + ");'"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
-	private String createHTML_DeviceState() {
+	private String createHTML_DeviceState(final boolean isUpdateFolder) {
 
 		final ImportConfig importConfig = getImportConfig();
-		final int numDeviceFiles = importConfig.numDeviceFiles;
-		final String deviceOSFolder = importConfig.getDeviceOSFolder();
-		final boolean isDeviceFolderOK = isOSFolderValid(deviceOSFolder);
 
-		final StringBuilder sb = new StringBuilder();
+		String html = null;
 
-		boolean isFolderOK = true;
+		if (isUpdateFolder) {
 
-		/*
-		 * Backup folder
-		 */
-		final boolean isCreateBackup = importConfig.isCreateBackup;
-		if (isCreateBackup) {
+			final int numDeviceFiles = importConfig.numDeviceFiles;
+			final String deviceOSFolder = importConfig.getDeviceOSFolder();
+			final boolean isDeviceFolderOK = isOSFolderValid(deviceOSFolder);
 
-			final String htmlBackupFolder = importConfig.backupFolder.replace(//
+			final StringBuilder sb = new StringBuilder();
+
+			boolean isFolderOK = true;
+
+			/*
+			 * Backup folder
+			 */
+			final boolean isCreateBackup = importConfig.isCreateBackup;
+			if (isCreateBackup) {
+
+				final String htmlBackupFolder = importConfig.getBackupFolder().replace(//
+						UI.SYMBOL_BACKSLASH,
+						UI.SYMBOL_HTML_BACKSLASH);
+
+				// check OS folder
+				final String backupOSFolder = importConfig.getBackupOSFolder();
+				final boolean isBackupFolderOK = isOSFolderValid(backupOSFolder);
+				isFolderOK &= isBackupFolderOK;
+
+				final String folderTitle = Messages.Import_Data_HTML_BackupFolder;
+				String folderInfo = null;
+
+				/*
+				 * Show back folder info only when device folder is OK because they are related
+				 * together.
+				 */
+				if (isDeviceFolderOK) {
+
+					final int numNotBackedUpFiles = importConfig.notBackedUpFiles.size();
+
+					folderInfo = numNotBackedUpFiles == 0 //
+							? Messages.Import_Data_HTML_AllFilesAreBackedUp
+							: NLS.bind(Messages.Import_Data_HTML_NotBackedUpFiles, numNotBackedUpFiles, numDeviceFiles);
+
+				}
+
+				createHTML_FolderState(//
+						sb,
+						htmlBackupFolder,
+						isBackupFolderOK,
+						UI.EMPTY_STRING,
+						folderTitle,
+						folderInfo);
+			}
+
+			/*
+			 * Device folder
+			 */
+			final String htmlDeviceFolder = importConfig.getDeviceFolder().replace(//
 					UI.SYMBOL_BACKSLASH,
 					UI.SYMBOL_HTML_BACKSLASH);
 
-			// check OS folder
-			final String backupOSFolder = importConfig.getBackupOSFolder();
-			final boolean isBackupFolderOK = isOSFolderValid(backupOSFolder);
-			isFolderOK &= isBackupFolderOK;
+			final String folderTitle = Messages.Import_Data_HTML_DeviceFolder;
+			final String folderInfo = NLS.bind(Messages.Import_Data_HTML_NotImportedFiles,//
+					importConfig.notImportedFiles.size(),
+					numDeviceFiles);
 
-			final String folderTitle = Messages.Import_Data_HTML_BackupFolder;
-
-			/*
-			 * Show back folder info only when device folder is OK because they are related
-			 * together.
-			 */
-			final String folderInfo = isDeviceFolderOK //
-					? NLS.bind(
-							Messages.Import_Data_HTML_NotBackedUpFiles,
-							importConfig.notBackedUpFiles.size(),
-							numDeviceFiles) //
-					: null;
+			final String paddingTop = importConfig.isCreateBackup ? "padding-top:10px;" : UI.EMPTY_STRING; //$NON-NLS-1$
 
 			createHTML_FolderState(//
 					sb,
-					htmlBackupFolder,
-					isBackupFolderOK,
-					UI.EMPTY_STRING,
+					htmlDeviceFolder,
+					isDeviceFolderOK,
+					paddingTop,
 					folderTitle,
 					folderInfo);
+
+			isFolderOK &= isDeviceFolderOK;
+
+			// create html list with not imported files
+			final ArrayList<OSFile> notImportedFiles = importConfig.notImportedFiles;
+			final int numNotImported = notImportedFiles.size();
+			if (numNotImported > 0) {
+				createHTML_NotImportedFiles(sb, notImportedFiles);
+			}
+
+			final String htmlTooltip = sb.toString();
+
+			/*
+			 * Different html
+			 */
+			final String hrefAction = HTTP_DUMMY + HREF_SETUP_DEVICE_IMPORT;
+			final String imageUrl = isFolderOK ? _imageUrl_DeviceFolder_OK : _imageUrl_DeviceFolder_NotAvailable;
+			final String stateImage = createHTML_BgImage(imageUrl);
+			final String stateIconValue = isDeviceFolderOK ? Integer.toString(numNotImported) : UI.EMPTY_STRING;
+
+			/*
+			 * Show overflow scrollbar ONLY when more than 10 entries are available because it looks
+			 * ugly.
+			 */
+			final String cssOverflow = numNotImported > 10 //
+					? "style='overflow-y: scroll;'" //$NON-NLS-1$
+					: UI.EMPTY_STRING;
+
+			html = ""// //$NON-NLS-1$
+
+					+ "<a class='importState'" // //$NON-NLS-1$
+					+ (" href='" + hrefAction + "'") //$NON-NLS-1$ //$NON-NLS-2$
+					+ ">" //$NON-NLS-1$
+
+					+ ("<div class='stateIcon' " + stateImage + ">") //$NON-NLS-1$ //$NON-NLS-2$
+					+ ("   <div class='stateIconValue'>" + stateIconValue + "</div>") //$NON-NLS-1$ //$NON-NLS-2$
+					+ ("</div>") //$NON-NLS-1$
+					+ ("<div class='stateTooltip' " + cssOverflow + ">" + htmlTooltip + "</div>") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+					+ "</a>"; //$NON-NLS-1$
+
+		} else {
+
+			/*
+			 * Create the startup state without the device info because this is retrieved in a
+			 * background thread otherwise it is blocking the UI !!!
+			 */
+
+			final String stateImage = createHTML_BgImage(_imageUrl_DeviceFolder_NotChecked);
+
+			final String htmlTooltip = Messages.Import_Data_HTML_AcquireDeviceInfo;
+
+			html = ""// //$NON-NLS-1$
+
+					+ "<div class='importState'>" // //$NON-NLS-1$
+
+					+ ("<div class='stateIcon' " + stateImage + ">") //$NON-NLS-1$ //$NON-NLS-2$
+					+ ("   <div class='stateIconValue'></div>") //$NON-NLS-1$
+					+ ("</div>") //$NON-NLS-1$
+					+ ("<div class='stateTooltip'>" + htmlTooltip + "</div>") //$NON-NLS-1$ //$NON-NLS-2$
+
+					+ "</div>"; //$NON-NLS-1$
 		}
-
-		/*
-		 * Device folder
-		 */
-		final String htmlDeviceFolder = importConfig.deviceFolder.replace(//
-				UI.SYMBOL_BACKSLASH,
-				UI.SYMBOL_HTML_BACKSLASH);
-
-		final String folderTitle = Messages.Import_Data_HTML_DeviceFolder;
-		final String folderInfo = NLS.bind(Messages.Import_Data_HTML_NotImportedFiles,//
-				importConfig.notImportedFiles.size(),
-				numDeviceFiles);
-
-		final String paddingTop = importConfig.isCreateBackup ? "padding-top:10px;" : UI.EMPTY_STRING; //$NON-NLS-1$
-
-		createHTML_FolderState(//
-				sb,
-				htmlDeviceFolder,
-				isDeviceFolderOK,
-				paddingTop,
-				folderTitle,
-				folderInfo);
-
-		isFolderOK &= isDeviceFolderOK;
-
-		// create html list with not imported files
-		final ArrayList<OSFile> notImportedFiles = importConfig.notImportedFiles;
-		final int numNotImported = notImportedFiles.size();
-		if (numNotImported > 0) {
-			createHTML_NotImportedFiles(sb, notImportedFiles);
-		}
-
-		final String htmlTooltip = sb.toString();
-
-		/*
-		 * Different html
-		 */
-		final String hrefAction = HTTP_DUMMY + HREF_SETUP_DEVICE_IMPORT;
-		final String imageUrl = isFolderOK ? _imageUrl_DeviceFolder_OK : _imageUrl_DeviceFolder_NotAvailable;
-		final String stateImage = createHTML_BgImage(imageUrl);
-		final String stateIconValue = isDeviceFolderOK ? Integer.toString(numNotImported) : UI.EMPTY_STRING;
-
-		/*
-		 * Show overflow scrollbar ONLY when more than 10 entries are available because it looks
-		 * ugly.
-		 */
-		final String cssOverflow = numNotImported > 10 ? "style='overflow-y: scroll;'" : UI.EMPTY_STRING; //$NON-NLS-1$
-
-		final String html = ""// //$NON-NLS-1$
-
-				+ "<a class='importState'" // //$NON-NLS-1$
-				+ (" href='" + hrefAction + "'") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ">" //$NON-NLS-1$
-
-				+ ("<div class='stateIcon' " + stateImage + ">") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("   <div class='stateIconValue'>" + stateIconValue + "</div>") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("</div>") //$NON-NLS-1$
-				+ ("<div class='stateTooltip' " + cssOverflow + ">" + htmlTooltip + "</div>") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-
-				+ "</a>"; //$NON-NLS-1$
-
-//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//				+ ("createHTML_DeviceState\n\nhtmlDeviceState:\n" + htmlActionImportConfig + "\n"));
-//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		return html;
 	}
@@ -1327,21 +1329,21 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		sb.append(html);
 	}
 
-	private String createHTML_TileTooltip(final DeviceImportLauncher importTile) {
+	private String createHTML_TileTooltip(final DeviceImportLauncher importLauncher) {
 
 		boolean isTextAdded = false;
 
 		final StringBuilder sb = new StringBuilder();
 
-		final String tileName = importTile.name.trim();
-		final String tileDescription = importTile.description.trim();
+		final String tileName = importLauncher.name.trim();
+		final String tileDescription = importLauncher.description.trim();
 
 		final StringBuilder ttText = new StringBuilder();
-		final Enum<TourTypeConfig> ttConfig = importTile.tourTypeConfig;
+		final Enum<TourTypeConfig> ttConfig = importLauncher.tourTypeConfig;
 
 		if (TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED.equals(ttConfig)) {
 
-			final ArrayList<SpeedTourType> speedTourTypes = importTile.speedTourTypes;
+			final ArrayList<SpeedTourType> speedTourTypes = importLauncher.speedTourTypes;
 			boolean isSpeedAdded = false;
 
 			for (final SpeedTourType speedTT : speedTourTypes) {
@@ -1356,15 +1358,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				ttText.append((int) avgSpeed);
 				ttText.append(UI.SPACE);
 				ttText.append(UI.UNIT_LABEL_SPEED);
-				ttText.append(UI.SPACE2);
-				ttText.append(net.tourbook.ui.UI.getInstance().getTourTypeLabel(tourTypeId));
+				ttText.append(UI.DASH_WITH_DOUBLE_SPACE);
+				ttText.append(net.tourbook.ui.UI.getTourTypeLabel(tourTypeId));
 
 				isSpeedAdded = true;
 			}
 
 		} else if (TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL.equals(ttConfig)) {
 
-			final TourType oneTourType = importTile.oneTourType;
+			final TourType oneTourType = importLauncher.oneTourType;
 			if (oneTourType != null) {
 
 				final String ttName = oneTourType.getName();
@@ -1402,6 +1404,20 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			}
 
 			sb.append(ttText);
+			isTextAdded = true;
+		}
+
+		// save tour
+		{
+			if (isTextAdded) {
+				sb.append(UI.NEW_LINE2);
+			}
+
+			sb.append(importLauncher.isSaveTour
+					? Messages.Import_Data_HTML_SaveTour_Yes
+					: Messages.Import_Data_HTML_SaveTour_No);
+
+			isTextAdded = true;
 		}
 
 		return sb.toString();
@@ -1518,9 +1534,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			_imageUrl_ImportFromFile = net.tourbook.ui.UI.getIconUrl(Messages.Image__RawData_Import);
 			_imageUrl_SerialPort_Configured = net.tourbook.ui.UI.getIconUrl(Messages.Image__RawData_Transfer);
 			_imageUrl_SerialPort_Directly = net.tourbook.ui.UI.getIconUrl(Messages.Image__RawData_TransferDirect);
+
 			_imageUrl_DeviceFolder_OK = net.tourbook.ui.UI.getIconUrl(Messages.Image__RawData_DeviceFolder);
-			_imageUrl_DeviceFolder_NotAvailable = net.tourbook.ui.UI
-					.getIconUrl(Messages.Image__RawData_DeviceFolder_NotDefined);
+			_imageUrl_DeviceFolder_NotAvailable = net.tourbook.ui.UI.getIconUrl(//
+					Messages.Image__RawData_DeviceFolder_NotDefined);
+			_imageUrl_DeviceFolder_NotChecked = net.tourbook.ui.UI.getIconUrl(//
+					Messages.Image__RawData_DeviceFolder_NotChecked);
 
 		} catch (final IOException | URISyntaxException e) {
 			StatusUtil.showStatus(e);
@@ -1547,7 +1566,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	 */
 	private Composite createUI_10_Page_Startup(final Composite parent) {
 
-		return new Composite(parent, SWT.NONE);
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+
+		return container;
 	}
 
 	private Composite createUI_20_Page_Dashboard(final Composite parent) {
@@ -1715,7 +1738,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		_canPollImportFiles.set(false);
 
-		cancelThread_WatchDeviceFolder();
+		thread_WatchDeviceFolder(false);
 	}
 
 	/**
@@ -1822,6 +1845,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private void defineColumnAvgSpeed() {
 
 		final ColumnDefinition colDef = TableColumnFactory.AVG_SPEED.createColumn(_columnManager, _pc);
+
+		// show avg speed to verify the tour type by speed
+		colDef.setIsDefaultColumn();
 
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -2284,8 +2310,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	@Override
 	public void dispose() {
 
-		cancelThread_WatchDeviceFolder();
-		cancelThread_PollingStores();
+		// this must be canceled before the watch folder thread because this could launch a new watch folder thread
+		thread_WatchingStores_Cancel();
+		thread_WatchDeviceFolder(false);
 		DeviceImportManager.getInstance().reset();
 
 		Util.disposeResource(_imageDatabase);
@@ -2326,7 +2353,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		updateModel_ImportConfig_LiveUpdate(dialogImportConfig, true);
 
-		updateUI_Dashboard();
+		updateUI_Dashboard(true);
+//		updateUI_DeviceState_Task();
+//		updateUI_DeviceState();
 	}
 
 	/**
@@ -2852,7 +2881,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		createResources_Image();
 		createResources_Web();
 
-		setupThread_PollingStores();
+		thread_WatchingStores();
 	}
 
 	/**
@@ -2952,7 +2981,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		if (locationParts.length > 1) {
 
-			// end loading of the browser page and start a new action
+			// finalize loading of the browser page and then start the action
 			_browser.getDisplay().asyncExec(new Runnable() {
 				@Override
 				public void run() {
@@ -3009,38 +3038,51 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		final ImportConfig importConfig = getImportConfig();
 
-		for (final DeviceImportLauncher importTile : importConfig.deviceImportLaunchers) {
+		/*
+		 * Get import launcher
+		 */
+		DeviceImportLauncher importLauncher = null;
 
-			if (importTile.getId() == tileId) {
-
-				ImportState importState;
-
-				try {
-
-					importConfig.isUpdateDeviceState.set(false);
-
-					importState = DeviceImportManager.getInstance().runImport(importTile);
-
-				} finally {
-
-					importConfig.isUpdateDeviceState.set(true);
-
-					updateDeviceState();
-				}
-
-				// open import config dialog to solve problems
-				if (importState.isOpenSetup) {
-
-					_parent.getDisplay().asyncExec(new Runnable() {
-						@Override
-						public void run() {
-							actionSetupImport();
-						}
-					});
-				}
-
+		for (final DeviceImportLauncher launcher : importConfig.deviceImportLaunchers) {
+			if (launcher.getId() == tileId) {
+				importLauncher = launcher;
 				break;
 			}
+		}
+
+		if (importLauncher == null) {
+			// this should not occure
+			return;
+		}
+
+		ImportState importState;
+
+		try {
+
+			importConfig.isUpdateDeviceState.set(false);
+
+			importState = DeviceImportManager.getInstance().runImport(importLauncher);
+
+		} finally {
+
+			importConfig.isUpdateDeviceState.set(true);
+
+			updateDeviceState();
+		}
+
+		// open import config dialog to solve problems
+		if (importState.isOpenSetup) {
+
+			_parent.getDisplay().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					actionSetupImport();
+				}
+			});
+		}
+
+		if (importState.isUpdateImportViewer) {
+			_tourViewer.update(RawDataManager.getInstance().getImportedTours().values().toArray(), null);
 		}
 	}
 
@@ -3397,9 +3439,208 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 	}
 
-	private void setupThread_PollingStores() {
+	/**
+	 * @param isStartWatching
+	 *            When <code>true</code> start a new watcher, otherwise cancel this thread.
+	 */
+	private void thread_WatchDeviceFolder(final boolean isStartWatching) {
 
-		_devicePollingThread = new Thread("WatchingStores") { //$NON-NLS-1$
+		WATCH_LOCK.lock();
+		try {
+
+			// cancel previous watcher
+			thread_WatchDeviceFolder_Cancel();
+
+			if (_watchingFolderThread != null) {
+				throw new RuntimeException();
+			}
+
+			if (isStartWatching) {
+
+				final Runnable runnable = thread_WatchDeviceFolder_Runnable();
+
+				_watchingFolderThread = new Thread(runnable, "WatchDeviceFolder - " + new DateTime()); //$NON-NLS-1$
+				_watchingFolderThread.setDaemon(true);
+				_watchingFolderThread.start();
+			}
+
+		} finally {
+			WATCH_LOCK.unlock();
+		}
+	}
+
+	/**
+	 * <b>!!! This thread is not interrupted it could cause SQL exceptions !!!</b>
+	 */
+	private void thread_WatchDeviceFolder_Cancel() {
+
+		if (_watchingFolderThread != null) {
+
+			try {
+
+				if (_watchKey != null) {
+
+					_watchKey.cancel();
+					_watchKey = null;
+				}
+
+				if (_watcher != null) {
+
+					try {
+						_watcher.close();
+					} catch (final IOException e) {
+						StatusUtil.log(e);
+					} finally {
+						_watcher = null;
+					}
+				}
+
+			} catch (final Exception e) {
+				StatusUtil.log(e);
+			} finally {
+
+				try {
+					_watchingFolderThread.join();
+				} catch (final InterruptedException e) {
+					StatusUtil.log(e);
+				} finally {
+					_watchingFolderThread = null;
+				}
+			}
+		}
+	}
+
+	private Runnable thread_WatchDeviceFolder_Runnable() {
+
+		return new Runnable() {
+			@Override
+			public void run() {
+
+				try {
+
+					_watcher = FileSystems.getDefault().newWatchService();
+
+					final ImportConfig importConfig = getImportConfig();
+
+					/*
+					 * Check device folder
+					 */
+					boolean isDeviceFolderValid = false;
+					final String deviceFolder = importConfig.getDeviceOSFolder();
+
+					if (deviceFolder != null) {
+
+						try {
+
+							final Path deviceFolderPath = Paths.get(deviceFolder);
+
+							if (Files.exists(deviceFolderPath)) {
+
+								isDeviceFolderValid = true;
+
+								deviceFolderPath.register(_watcher, ENTRY_CREATE, ENTRY_DELETE);
+							}
+
+						} catch (final Exception e) {}
+					}
+
+					if (isDeviceFolderValid) {
+
+						Thread.currentThread().setName(//
+								"WatchingDeviceFolder: " + deviceFolder + " - " + new DateTime()); //$NON-NLS-1$ //$NON-NLS-2$
+
+					} else {
+
+						// the device folder not available but is required to update the folder state
+
+						return;
+					}
+
+					/*
+					 * Check backup folder
+					 */
+					final String backupFolder = importConfig.getBackupOSFolder();
+					if (backupFolder != null) {
+
+						try {
+
+							final Path watchBackupFolder = Paths.get(backupFolder);
+
+							if (Files.exists(watchBackupFolder)) {
+								watchBackupFolder.register(_watcher, ENTRY_CREATE, ENTRY_DELETE);
+							}
+
+						} catch (final Exception e) {}
+					}
+
+					// wait for the next event
+					_watchKey = _watcher.take();
+
+					while (_watchKey != null) {
+
+						if (_isCancelWatchFolder) {
+							break;
+						}
+
+						/*
+						 * Events MUST be polled otherwise this will stay in an endless loop.
+						 */
+						@SuppressWarnings("unused")
+						final List<WatchEvent<?>> polledEvents = _watchKey.pollEvents();
+
+//// log events, they are not used
+//							for (final WatchEvent<?> event : polledEvents) {
+//
+//								final WatchEvent.Kind<?> kind = event.kind();
+//
+//								System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//										+ (String.format("Event: %s\tFile: %s", kind, event.context())));
+//								// TODO remove SYSTEM.OUT.PRINTLN
+//							}
+
+						// do not update the device state when the import is running otherwise the import file list can be wrong
+						if (importConfig.isUpdateDeviceState.get()) {
+							updateDeviceState();
+						}
+
+						if (_watchKey != null && _watchKey.reset()) {
+
+							// wait for the next event
+							_watchKey = _watcher.take();
+
+						} else {
+
+							break;
+						}
+					}
+
+				} catch (final InterruptedException e) {
+					//
+				} catch (final ClosedWatchServiceException e) {
+					//
+				} catch (final Exception e) {
+					StatusUtil.log(e);
+				} finally {
+
+					if (_watchKey != null) {
+						_watchKey.cancel();
+					}
+
+					if (_watcher != null) {
+						try {
+							_watcher.close();
+						} catch (final IOException e) {
+							StatusUtil.log(e);
+						}
+					}
+				}
+			}
+		};
+	}
+
+	private void thread_WatchingStores() {
+
+		_watchingStoresThread = new Thread("WatchingStores") { //$NON-NLS-1$
 			@Override
 			public void run() {
 
@@ -3407,29 +3648,37 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 					try {
 
-						Thread.sleep(1000);
+						Thread.sleep(2000);
 
-						if (_isStopPollingThread) {
+						if (_isStopWatchingStoresThread) {
 							break;
 						}
 
+						// check if polling is currently enabled
 						if (_canPollImportFiles.get()) {
 
-							final DeviceImportState importState = DeviceImportManager.getInstance().checkImportedFiles(
-									false);
+							final ImportConfig importConfig = getImportConfig();
 
-							if (importState.areTheSameStores == false) {
+							// check if anything should be watched
+							if (importConfig.isWatchAnything()) {
 
-								// stores has changed, update the folder watcher
+								final DeviceImportState importState = DeviceImportManager
+										.getInstance()
+										.checkImportedFiles(false);
 
-								setupThread_WatchDeviceFolder();
-							}
+								if (importState.areTheSameStores == false) {
 
-							if (importState.areFilesRetrieved) {
+									// stores have changed, update the folder watcher
 
-								// import files have been retrieved, update the UI
+									thread_WatchDeviceFolder(true);
+								}
 
-								updateUI_DeviceState();
+								if (importState.areFilesRetrieved) {
+
+									// import files have been retrieved, update the UI
+
+									updateUI_DeviceState();
+								}
 							}
 						}
 
@@ -3442,149 +3691,42 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			}
 		};
 
-		_devicePollingThread.setDaemon(true);
-		_devicePollingThread.start();
+		_watchingStoresThread.setDaemon(true);
+		_watchingStoresThread.start();
 	}
 
-	private void setupThread_WatchDeviceFolder() {
+	/**
+	 * Thread is not interrupted it could cause SQL exceptions.
+	 */
+	private void thread_WatchingStores_Cancel() {
 
-		// cancel previous watcher
-		cancelThread_WatchDeviceFolder();
+		_isStopWatchingStoresThread = true;
 
-		final ImportConfig importConfig = getImportConfig();
-
-		final boolean isDeviceFolderValid[] = { false };
-		final boolean isBackupFolderValid[] = { false };
-
+		// run with progress, duration can be 0...5 seconds
 		try {
 
-			final Path watchDeviceFolder[] = new Path[1];
-			final Path watchBackupFolder[] = new Path[1];
-
-			/*
-			 * Check device folder
-			 */
-			final String deviceFolder = importConfig.getDeviceOSFolder();
-			if (deviceFolder != null) {
-
-				try {
-
-					watchDeviceFolder[0] = Paths.get(deviceFolder);
-
-					if (Files.exists(watchDeviceFolder[0])) {
-						isDeviceFolderValid[0] = true;
-					}
-
-				} catch (final Exception e) {}
-			}
-
-			/*
-			 * Check backup folder
-			 */
-			final String backupFolder = importConfig.getBackupOSFolder();
-			if (backupFolder != null) {
-
-				try {
-
-					watchBackupFolder[0] = Paths.get(backupFolder);
-
-					if (Files.exists(watchBackupFolder[0])) {
-						isBackupFolderValid[0] = true;
-					}
-
-				} catch (final Exception e) {}
-			}
-
-			if (isDeviceFolderValid[0] == false && isBackupFolderValid[0] == false) {
-				// both are invalid, there is nothing to watch
-			}
-
-			final Runnable runnable = new Runnable() {
+			final IRunnableWithProgress runnable = new IRunnableWithProgress() {
 				@Override
-				public void run() {
+				public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
 					try {
 
-						_watcher = FileSystems.getDefault().newWatchService();
+						monitor.beginTask(Messages.Import_Data_Task_CloseDeviceInfo, IProgressMonitor.UNKNOWN);
 
-						if (isDeviceFolderValid[0]) {
-							watchDeviceFolder[0].register(_watcher, ENTRY_CREATE, ENTRY_DELETE);
-						}
-						if (isBackupFolderValid[0]) {
-							watchBackupFolder[0].register(_watcher, ENTRY_CREATE, ENTRY_DELETE);
-						}
-
-						// wait for the next event
-						_watchKey = _watcher.take();
-
-						while (_watchKey != null) {
-
-							if (_isCancelWatchFolder) {
-								break;
-							}
-
-							/*
-							 * Events MUST be polled otherwise this will stay in an endless loop.
-							 */
-							@SuppressWarnings("unused")
-							final List<WatchEvent<?>> polledEvents = _watchKey.pollEvents();
-
-//// log events, they are not used
-//							for (final WatchEvent<?> event : polledEvents) {
-//
-//								final WatchEvent.Kind<?> kind = event.kind();
-//
-//								System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//										+ (String.format("Event: %s\tFile: %s", kind, event.context())));
-//								// TODO remove SYSTEM.OUT.PRINTLN
-//							}
-
-							// do not update the device state when the import is running otherwise the import file list can be wrong
-							if (importConfig.isUpdateDeviceState.get()) {
-								updateDeviceState();
-							}
-
-							if (_watchKey != null && _watchKey.reset()) {
-
-								// wait for the next event
-								_watchKey = _watcher.take();
-
-							} else {
-
-								break;
-							}
-						}
+						_watchingStoresThread.join();
 
 					} catch (final InterruptedException e) {
-						//
-					} catch (final ClosedWatchServiceException e) {
-						//
-					} catch (final Exception e) {
 						StatusUtil.log(e);
-					} finally {
-
-						if (_watchKey != null) {
-							_watchKey.cancel();
-						}
-
-						if (_watcher != null) {
-							try {
-								_watcher.close();
-							} catch (final IOException e) {
-								StatusUtil.log(e);
-							}
-						}
 					}
 				}
 			};
 
-			_watchFolderThread = new Thread(runnable, "WatchingDeviceFolder: " + deviceFolder); //$NON-NLS-1$
-			_watchFolderThread.setDaemon(true);
-			_watchFolderThread.start();
+			new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(true, true, runnable);
 
-		} catch (final Exception e) {
+		} catch (InvocationTargetException | InterruptedException e) {
 			StatusUtil.log(e);
 		}
+
 	}
 
 	/**
@@ -3592,8 +3734,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	 */
 	private void updateDeviceState() {
 
-		DeviceImportManager.getInstance().checkImportedFiles(true);
-		updateUI_DeviceState();
+		final ImportConfig importConfig = getImportConfig();
+
+		if (importConfig.isWatchAnything()) {
+
+			DeviceImportManager.getInstance().checkImportedFiles(true);
+			updateUI_DeviceState();
+		}
 	}
 
 	/**
@@ -3605,8 +3752,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		final ImportConfig importConfig = getImportConfig();
 
 		importConfig.isCreateBackup = modifiedConfig.isCreateBackup;
-		importConfig.backupFolder = modifiedConfig.backupFolder;
-		importConfig.deviceFolder = modifiedConfig.deviceFolder;
+		importConfig.isLastLauncherRemoved = modifiedConfig.isLastLauncherRemoved;
+
+		importConfig.setBackupFolder(modifiedConfig.getBackupFolder());
+		importConfig.setDeviceFolder(modifiedConfig.getDeviceFolder());
 
 		DeviceImportManager.getInstance().saveImportConfig(importConfig);
 	}
@@ -3650,8 +3799,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	/**
 	 * Set/create dashboard page.
+	 * 
+	 * @param isUpdateDeviceState
+	 *            When <code>true</code> then the folder/device state will be updated, this can
+	 *            delay the creation of the html because this info must be retieved from the
+	 *            filesystem.
 	 */
-	private void updateUI_Dashboard() {
+	private void updateUI_Dashboard(final boolean isUpdateDeviceState) {
 
 		final boolean isBrowserAvailable = _browser != null;
 
@@ -3664,7 +3818,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			return;
 		}
 
-		final String html = createHTML();
+		final String html = createHTML(isUpdateDeviceState);
 
 		onBrowser_SetText(html);
 	}
@@ -3691,7 +3845,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private void updateUI_DeviceState_Task() {
 
-		final String deviceState = createHTML_DeviceState();
+		final String deviceState = createHTML_DeviceState(true);
 		final String jsHTML = deviceState.replace("\"", "\\\""); //$NON-NLS-1$ //$NON-NLS-2$
 
 		final String js = "\n" //$NON-NLS-1$
@@ -3699,11 +3853,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				+ ("document.getElementById(\"" + DOM_ID_DEVICE_STATE + "\").innerHTML = htmlDeviceState;\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		_browser.execute(js);
-
-//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//				+ ("updateUI_DeviceState_Task\n" + js));
-//		//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-//		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
 	/**
@@ -3735,7 +3884,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 					if (_isInUIStartup) {
 
 						// dashboard is not yet created
-						updateUI_Dashboard();
+						updateUI_Dashboard(false);
 
 					} else {
 
@@ -3746,13 +3895,16 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 						// dashboard is visible, activate background task
 
+						if (_browser.isDisposed()) {
+							// this occured when testing very fast by open/close the import view
+							return;
+						}
+
 						_browser.setFocus();
 
 						_canPollImportFiles.set(true);
 
-						setupThread_WatchDeviceFolder();
-
-						updateDeviceState();
+						thread_WatchDeviceFolder(true);
 
 					} else {
 

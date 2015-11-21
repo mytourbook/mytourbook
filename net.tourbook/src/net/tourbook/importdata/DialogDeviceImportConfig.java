@@ -118,139 +118,130 @@ import org.eclipse.ui.part.PageBook;
  */
 public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourViewer {
 
-	private static final int				VERTICAL_GROUP_DISTANCE				= 10;
-	private static final String				ID									= "net.tourbook.importdata.DialogDeviceImportConfig";	//$NON-NLS-1$
+	private static final String		ID									= "net.tourbook.importdata.DialogDeviceImportConfig";	//$NON-NLS-1$
 	//
-	private static final String				STATE_BACKUP_DEVICE_HISTORY_ITEMS	= "STATE_BACKUP_DEVICE_HISTORY_ITEMS";					//$NON-NLS-1$
-	private static final String				STATE_BACKUP_FOLDER_HISTORY_ITEMS	= "STATE_BACKUP_FOLDER_HISTORY_ITEMS";					//$NON-NLS-1$
-	private static final String				STATE_DEVICE_DEVICE_HISTORY_ITEMS	= "STATE_DEVICE_DEVICE_HISTORY_ITEMS";					//$NON-NLS-1$
-	private static final String				STATE_DEVICE_FOLDER_HISTORY_ITEMS	= "STATE_DEVICE_FOLDER_HISTORY_ITEMS";					//$NON-NLS-1$
-	private static final String				STATE_IMPORT_LAUNCHER				= "STATE_IMPORT_LAUNCHER";								//$NON-NLS-1$
+	private static final String		STATE_BACKUP_DEVICE_HISTORY_ITEMS	= "STATE_BACKUP_DEVICE_HISTORY_ITEMS";					//$NON-NLS-1$
+	private static final String		STATE_BACKUP_FOLDER_HISTORY_ITEMS	= "STATE_BACKUP_FOLDER_HISTORY_ITEMS";					//$NON-NLS-1$
+	private static final String		STATE_DEVICE_DEVICE_HISTORY_ITEMS	= "STATE_DEVICE_DEVICE_HISTORY_ITEMS";					//$NON-NLS-1$
+	private static final String		STATE_DEVICE_FOLDER_HISTORY_ITEMS	= "STATE_DEVICE_FOLDER_HISTORY_ITEMS";					//$NON-NLS-1$
+	private static final String		STATE_IMPORT_LAUNCHER				= "STATE_IMPORT_LAUNCHER";								//$NON-NLS-1$
 	//
-	private static final String				DATA_KEY_TOUR_TYPE_ID				= "DATA_KEY_TOUR_TYPE_ID";								//$NON-NLS-1$
-	private static final String				DATA_KEY_VERTEX_INDEX				= "DATA_KEY_VERTEX_INDEX";								//$NON-NLS-1$
+	private static final String		DATA_KEY_TOUR_TYPE_ID				= "DATA_KEY_TOUR_TYPE_ID";								//$NON-NLS-1$
+	private static final String		DATA_KEY_VERTEX_INDEX				= "DATA_KEY_VERTEX_INDEX";								//$NON-NLS-1$
 	//
-	private static final int				CONTROL_DECORATION_WIDTH			= 6;
+	private static final int		CONTROL_DECORATION_WIDTH			= 6;
+	private static final int		VERTICAL_GROUP_DISTANCE				= 0;
 	//
-	private final IDialogSettings			_state								= TourbookPlugin.getState(ID);
+	private final IDialogSettings	_state								= TourbookPlugin.getState(ID);
 	//
-	private MouseWheelListener				_defaultMouseWheelListener;
-	private SelectionAdapter				_defaultSelectionListener;
-	private FocusListener					_folderFocusListener;
-	private KeyAdapter						_folderKeyListener;
-	private ModifyListener					_folderModifyListener;
-	private SelectionAdapter				_liveUpdateListener;
-	private MouseWheelListener				_liveUpdateMouseWheelListener;
-	private SelectionAdapter				_vertexTourTypeListener;
+	private MouseWheelListener		_defaultMouseWheelListener;
+	private SelectionAdapter		_defaultSelectionListener;
+	private FocusListener			_folderFocusListener;
+	private KeyAdapter				_folderKeyListener;
+	private ModifyListener			_folderModifyListener;
+	private ModifyListener			_importLauncherModifyListener;
+	private SelectionAdapter		_importLauncherSelectionListener;
+	private SelectionAdapter		_liveUpdateListener;
+	private MouseWheelListener		_liveUpdateMouseWheelListener;
+	private SelectionAdapter		_vertexTourTypeListener;
 	//
-	private ActionOpenPrefDialog			_actionOpenTourTypePrefs;
-	private ActionAddVertex					_actionTTSpeed_Add;
-	private ActionDeleteVertex[]			_actionTTSpeed_Delete;
-	private ActionSortVertices				_actionTTSpeed_Sort;
+	private ActionOpenPrefDialog	_actionOpenTourTypePrefs;
+	private ActionAddVertex			_actionTTSpeed_Add;
+	private ActionDeleteVertex[]	_actionTTSpeed_Delete;
+	private ActionSortVertices		_actionTTSpeed_Sort;
 	//
 
-	private PixelConverter					_pc;
-
-	private final static SpeedTourType[]	DEFAULT_VERTICES;
-
-	static {
-
-		DEFAULT_VERTICES = new SpeedTourType[] {
-			//
-			new SpeedTourType(10),
-			new SpeedTourType(30),
-			new SpeedTourType(150),
-			new SpeedTourType(300)
-		//
-		};
-	}
+	private PixelConverter			_pc;
 
 	/** Model for all configs. */
-	private ImportConfig					_dialogConfig;
+	private ImportConfig			_dialogConfig;
 
 	/** Model for the currently selected config. */
-	private DeviceImportLauncher			_currentIL;
+	private DeviceImportLauncher	_currentIL;
 
-	private RawDataView						_rawDataView;
+	private RawDataView				_rawDataView;
 
-	private TableViewer						_ilViewer;
+	private TableViewer				_ilViewer;
 
-	private ColumnManager					_columnManager;
-	private TableColumnDefinition			_colDefProfileImage;
-	private int								_columnIndexConfigImage;
+	private ColumnManager			_columnManager;
+	private TableColumnDefinition	_colDefProfileImage;
+	private int						_columnIndexConfigImage;
 
-	private DeviceImportLauncher			_initialImportLauncher;
+	private DeviceImportLauncher	_initialImportLauncher;
 
-	private HashMap<Long, Image>			_configImages						= new HashMap<>();
-	private HashMap<Long, Integer>			_configImageHash					= new HashMap<>();
+	private HashMap<Long, Image>	_configImages						= new HashMap<>();
+	private HashMap<Long, Integer>	_configImageHash					= new HashMap<>();
 
-	private HistoryItems					_deviceHistoryItems					= new HistoryItems();
-	private HistoryItems					_backupHistoryItems					= new HistoryItems();
+	private HistoryItems			_deviceHistoryItems					= new HistoryItems();
+	private HistoryItems			_backupHistoryItems					= new HistoryItems();
 
-	private long							_dragStart;
-	private int								_leftPadding;
+	private long					_dragStart;
+	private int						_leftPadding;
 
 	/*
 	 * UI resources
 	 */
-	private Font							_boldFont;
+	private Font					_boldFont;
 
 	/*
 	 * UI controls
 	 */
-	private Composite						_parent;
+	private Composite				_parent;
 
-	private Composite						_speedTourType_OuterContainer;
-	private Composite						_speedTourType_Container;
-	private Composite						_viewerContainer;
+	private Composite				_speedTourType_OuterContainer;
+	private Composite				_speedTourType_Container;
+	private Composite				_viewerContainer;
 
-	private ScrolledComposite				_speedTourType_ScrolledContainer;
+	private ScrolledComposite		_speedTourType_ScrolledContainer;
 
-	private PageBook						_pagebookTourType;
-	private Label							_pageTourType_NoTourType;
-	private Composite						_pageTourType_OneForAll;
-	private Composite						_pageTourType_BySpeed;
+	private PageBook				_pagebookTourType;
+	private Label					_pageTourType_NoTourType;
+	private Composite				_pageTourType_OneForAll;
+	private Composite				_pageTourType_BySpeed;
 
-	private Button							_chkCreateBackup;
-	private Button							_chkImportFiles;
-	private Button							_chkLiveUpdate;
-	private Button							_chkTTSetTourType;
-	private Button							_chkTTShowInDashboard;
-	private Button							_btnSelectBackupFolder;
-	private Button							_btnSelectDeviceFolder;
-	private Button							_btnTTConfig_Duplicate;
-	private Button							_btnTTConfig_New;
-	private Button							_btnTTConfig_NewOne;
-	private Button							_btnTTConfig_Remove;
+	private Button					_chkCreateBackup;
+	private Button					_chkImportFiles;
+	private Button					_chkLiveUpdate;
+	private Button					_chkIL_SaveTour;
+	private Button					_chkIL_SetTourType;
+	private Button					_chkIL_ShowInDashboard;
 
-	private Combo							_comboBackupFolder;
-	private Combo							_comboDeviceFolder;
-	private Combo							_comboTTConfig;
+	private Button					_btnSelectBackupFolder;
+	private Button					_btnSelectDeviceFolder;
+	private Button					_btnIL_Config_Duplicate;
+	private Button					_btnTT_Config_New;
+	private Button					_btnTT_Config_NewOne;
+	private Button					_btnIL_Config_Remove;
 
-	private Label							_lblBackupFolder;
-	private Label							_lblLocalFolderPath;
-	private Label							_lblDeviceFolder;
-	private Label							_lblDeviceFolderPath;
-	private Label							_lblTTConfigDescription;
-	private Label							_lblTTConfigName;
-	private Label							_lblTTHint;
-	private Label							_lblTTOne_TourTypeIcon;
-	private Label							_lblTTTourType;
-	private Label[]							_lblTTSpeed_SpeedUnit;
-	private Label[]							_lblTTSpeed_TourTypeIcon;
+	private Combo					_comboBackupFolder;
+	private Combo					_comboDeviceFolder;
+	private Combo					_comboIL_Config;
 
-	private Link[]							_linkTTSpeed_TourType;
-	private Link							_linkTTOne_TourType;
+	private Label					_lblBackupFolder;
+	private Label					_lblLocalFolderPath;
+	private Label					_lblDeviceFolder;
+	private Label					_lblDeviceFolderPath;
+	private Label					_lblIL_ConfigDescription;
+	private Label					_lblIL_ConfigName;
+	private Label					_lblIL_Hint;
+	private Label					_lblIL_One_TourTypeIcon;
+	private Label					_lblIL_OtherImportActions;
+	private Label					_lblIL_TourType;
+	private Label[]					_lblIL_Speed_SpeedUnit;
+	private Label[]					_lblIL_Speed_TourTypeIcon;
 
-	private Spinner							_spinnerAnimationCrazinessFactor;
-	private Spinner							_spinnerAnimationDuration;
-	private Spinner							_spinnerBgOpacity;
-	private Spinner							_spinnerNumHTiles;
-	private Spinner							_spinnerTileSize;
-	private Spinner[]						_spinnerTTVertex_AvgSpeed;
+	private Link[]					_linkTT_Speed_TourType;
+	private Link					_linkTT_One_TourType;
 
-	private Text							_txtTTConfigDescription;
-	private Text							_txtTTConfigName;
+	private Spinner					_spinnerAnimationCrazinessFactor;
+	private Spinner					_spinnerAnimationDuration;
+	private Spinner					_spinnerBgOpacity;
+	private Spinner					_spinnerNumHTiles;
+	private Spinner					_spinnerTileSize;
+	private Spinner[]				_spinnerTTVertex_AvgSpeed;
+
+	private Text					_txtIL_ConfigDescription;
+	private Text					_txtIL_ConfigName;
 
 	private class ActionAddVertex extends Action {
 
@@ -475,8 +466,10 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 		_dialogConfig.tileSize = importConfig.tileSize;
 
 		_dialogConfig.isCreateBackup = importConfig.isCreateBackup;
-		_dialogConfig.backupFolder = importConfig.backupFolder;
-		_dialogConfig.deviceFolder = importConfig.deviceFolder;
+		_dialogConfig.isLastLauncherRemoved = importConfig.isLastLauncherRemoved;
+
+		_dialogConfig.setBackupFolder(importConfig.getBackupFolder());
+		_dialogConfig.setDeviceFolder(importConfig.getDeviceFolder());
 	}
 
 	@Override
@@ -536,7 +529,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 		}
 
 		enableControls();
-		enableTTControls();
+		enableILControls();
 
 		// set focus
 		_comboBackupFolder.setFocus();
@@ -575,25 +568,6 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 		_columnManager.createHeaderContextMenu(table, tableContextMenu);
 	}
 
-	/**
-	 * Creates a configuration from the {@link #DEFAULT_VERTICES}.
-	 * 
-	 * @return Returns the created config.
-	 */
-	private DeviceImportLauncher createDefaultConfig() {
-
-		final DeviceImportLauncher defaultConfig = new DeviceImportLauncher();
-		final ArrayList<SpeedTourType> speedVertices = defaultConfig.speedTourTypes;
-
-		for (final SpeedTourType speedVertex : DEFAULT_VERTICES) {
-			speedVertices.add(speedVertex.clone());
-		}
-
-		_dialogConfig.deviceImportLaunchers.add(defaultConfig);
-
-		return defaultConfig;
-	}
-
 	@Override
 	protected Control createDialogArea(final Composite parent) {
 
@@ -626,8 +600,8 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 				fillTourTypeMenu(menuMgr);
 			}
 		});
-		final Menu ttContextMenu = menuMgr.createContextMenu(_linkTTOne_TourType);
-		_linkTTOne_TourType.setMenu(ttContextMenu);
+		final Menu ttContextMenu = menuMgr.createContextMenu(_linkTT_One_TourType);
+		_linkTT_One_TourType.setMenu(ttContextMenu);
 	}
 
 	/**
@@ -669,33 +643,37 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 		/*
 		 * Checkbox: Create backup
 		 */
-		_chkCreateBackup = new Button(parent, SWT.CHECK);
-		_chkCreateBackup.setText(Messages.Dialog_ImportConfig_Checkbox_CreateBackup);
-		_chkCreateBackup.setToolTipText(Messages.Dialog_ImportConfig_Checkbox_CreateBackup_Tooltip);
-		_chkCreateBackup.addSelectionListener(_defaultSelectionListener);
-		_chkCreateBackup.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				if (_chkCreateBackup.getSelection()) {
-					_comboBackupFolder.setFocus();
+		{
+			_chkCreateBackup = new Button(parent, SWT.CHECK);
+			_chkCreateBackup.setText(Messages.Dialog_ImportConfig_Checkbox_CreateBackup);
+			_chkCreateBackup.setToolTipText(Messages.Dialog_ImportConfig_Checkbox_CreateBackup_Tooltip);
+			_chkCreateBackup.addSelectionListener(_defaultSelectionListener);
+			_chkCreateBackup.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					if (_chkCreateBackup.getSelection()) {
+						_comboBackupFolder.setFocus();
+					}
 				}
-			}
-		});
-		GridDataFactory.fillDefaults()//
-				.span(2, 1)
+			});
+			GridDataFactory.fillDefaults()//
+					.span(2, 1)
 //				.indent(0, convertVerticalDLUsToPixels(8))
-				.applyTo(_chkCreateBackup);
+					.applyTo(_chkCreateBackup);
+		}
 
 		/*
 		 * Label: Local folder
 		 */
-		_lblBackupFolder = new Label(parent, SWT.NONE);
-		_lblBackupFolder.setText(Messages.Dialog_ImportConfig_Label_BackupFolder);
-		_lblBackupFolder.setToolTipText(Messages.Dialog_ImportConfig_Label_BackupFolder_Tooltip);
-		GridDataFactory.fillDefaults()//
-				.align(SWT.FILL, SWT.CENTER)
-				.indent(_leftPadding, 0)
-				.applyTo(_lblBackupFolder);
+		{
+			_lblBackupFolder = new Label(parent, SWT.NONE);
+			_lblBackupFolder.setText(Messages.Dialog_ImportConfig_Label_BackupFolder);
+			_lblBackupFolder.setToolTipText(Messages.Dialog_ImportConfig_Label_BackupFolder_Tooltip);
+			GridDataFactory.fillDefaults()//
+					.align(SWT.FILL, SWT.CENTER)
+					.indent(_leftPadding, 0)
+					.applyTo(_lblBackupFolder);
+		}
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
@@ -1093,11 +1071,11 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 
 	private void createUI_53_DragDropHint(final Composite parent) {
 
-		_lblTTHint = new Label(parent, SWT.WRAP);
-		_lblTTHint.setText(Messages.Dialog_ImportConfig_Info_ConfigDragDrop);
+		_lblIL_Hint = new Label(parent, SWT.WRAP);
+		_lblIL_Hint.setText(Messages.Dialog_ImportConfig_Info_ConfigDragDrop);
 		GridDataFactory.fillDefaults()//
 				.span(3, 1)
-				.applyTo(_lblTTHint);
+				.applyTo(_lblIL_Hint);
 	}
 
 	private void createUI_60_ILActions(final Composite parent) {
@@ -1110,18 +1088,18 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 			/*
 			 * Button: New one tour type
 			 */
-			_btnTTConfig_NewOne = new Button(container, SWT.NONE);
-			_btnTTConfig_NewOne.setImage(//
+			_btnTT_Config_NewOne = new Button(container, SWT.NONE);
+			_btnTT_Config_NewOne.setImage(//
 					net.tourbook.ui.UI.getInstance().getTourTypeImage(TourType.IMAGE_KEY_DIALOG_SELECTION));
-			_btnTTConfig_NewOne.setText(Messages.Dialog_ImportConfig_Action_NewOneTourType);
-			_btnTTConfig_NewOne.setToolTipText(Messages.Dialog_ImportConfig_Action_NewOneTourType_Tooltip);
-			_btnTTConfig_NewOne.addSelectionListener(new SelectionAdapter() {
+			_btnTT_Config_NewOne.setText(Messages.Dialog_ImportConfig_Action_NewOneTourType);
+			_btnTT_Config_NewOne.setToolTipText(Messages.Dialog_ImportConfig_Action_NewOneTourType_Tooltip);
+			_btnTT_Config_NewOne.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					UI.openControlMenu(_btnTTConfig_NewOne);
+					UI.openControlMenu(_btnTT_Config_NewOne);
 				}
 			});
-			setButtonLayoutData(_btnTTConfig_NewOne);
+			setButtonLayoutData(_btnTT_Config_NewOne);
 
 			/*
 			 * Context menu: Tour type
@@ -1134,50 +1112,50 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 					fillTourTypeOneMenu(menuMgr);
 				}
 			});
-			final Menu ttContextMenu = menuMgr.createContextMenu(_btnTTConfig_NewOne);
-			_btnTTConfig_NewOne.setMenu(ttContextMenu);
+			final Menu ttContextMenu = menuMgr.createContextMenu(_btnTT_Config_NewOne);
+			_btnTT_Config_NewOne.setMenu(ttContextMenu);
 
 			/*
 			 * Button: New
 			 */
-			_btnTTConfig_New = new Button(container, SWT.NONE);
-			_btnTTConfig_New.setText(Messages.App_Action_New);
-			_btnTTConfig_New.addSelectionListener(new SelectionAdapter() {
+			_btnTT_Config_New = new Button(container, SWT.NONE);
+			_btnTT_Config_New.setText(Messages.App_Action_New);
+			_btnTT_Config_New.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					onTourType_Add(false);
 				}
 			});
-			setButtonLayoutData(_btnTTConfig_New);
+			setButtonLayoutData(_btnTT_Config_New);
 
 			/*
 			 * Button: Duplicate
 			 */
-			_btnTTConfig_Duplicate = new Button(container, SWT.NONE);
-			_btnTTConfig_Duplicate.setText(Messages.App_Action_Duplicate);
-			_btnTTConfig_Duplicate.addSelectionListener(new SelectionAdapter() {
+			_btnIL_Config_Duplicate = new Button(container, SWT.NONE);
+			_btnIL_Config_Duplicate.setText(Messages.App_Action_Duplicate);
+			_btnIL_Config_Duplicate.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					onTourType_Add(true);
 				}
 			});
-			setButtonLayoutData(_btnTTConfig_Duplicate);
+			setButtonLayoutData(_btnIL_Config_Duplicate);
 
 			/*
 			 * button: remove
 			 */
-			_btnTTConfig_Remove = new Button(container, SWT.NONE);
-			_btnTTConfig_Remove.setText(Messages.App_Action_Remove_Immediate);
-			_btnTTConfig_Remove.addSelectionListener(new SelectionAdapter() {
+			_btnIL_Config_Remove = new Button(container, SWT.NONE);
+			_btnIL_Config_Remove.setText(Messages.App_Action_Remove_Immediate);
+			_btnIL_Config_Remove.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					onTourType_Remove();
 				}
 			});
-			setButtonLayoutData(_btnTTConfig_Remove);
+			setButtonLayoutData(_btnIL_Config_Remove);
 
 			// align to the end
-			final GridData gd = (GridData) _btnTTConfig_Remove.getLayoutData();
+			final GridData gd = (GridData) _btnIL_Config_Remove.getLayoutData();
 			gd.grabExcessHorizontalSpace = true;
 			gd.horizontalAlignment = SWT.END;
 		}
@@ -1195,6 +1173,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 		{
 			createUI_72_ILName(group);
 			createUI_80_ILTourType(group);
+			createUI_73_ILSave(group);
 		}
 	}
 
@@ -1206,23 +1185,18 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 			 */
 
 			// label
-			_lblTTConfigName = new Label(parent, SWT.NONE);
-			_lblTTConfigName.setText(Messages.Dialog_ImportConfig_Label_ConfigName);
+			_lblIL_ConfigName = new Label(parent, SWT.NONE);
+			_lblIL_ConfigName.setText(Messages.Dialog_ImportConfig_Label_ConfigName);
 			GridDataFactory.fillDefaults()//
 					.align(SWT.FILL, SWT.CENTER)
-					.applyTo(_lblTTConfigName);
+					.applyTo(_lblIL_ConfigName);
 
 			// text
-			_txtTTConfigName = new Text(parent, SWT.BORDER);
-			_txtTTConfigName.addModifyListener(new ModifyListener() {
-				@Override
-				public void modifyText(final ModifyEvent e) {
-					onTourType_ModifyName();
-				}
-			});
+			_txtIL_ConfigName = new Text(parent, SWT.BORDER);
+			_txtIL_ConfigName.addModifyListener(_importLauncherModifyListener);
 			GridDataFactory.fillDefaults()//
 					.grab(true, false)
-					.applyTo(_txtTTConfigName);
+					.applyTo(_txtIL_ConfigName);
 		}
 
 		{
@@ -1231,36 +1205,54 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 			 */
 
 			// label
-			_lblTTConfigDescription = new Label(parent, SWT.NONE);
-			_lblTTConfigDescription.setText(Messages.Dialog_ImportConfig_Label_ConfigDescription);
+			_lblIL_ConfigDescription = new Label(parent, SWT.NONE);
+			_lblIL_ConfigDescription.setText(Messages.Dialog_ImportConfig_Label_ConfigDescription);
 			GridDataFactory.fillDefaults()//
 					.align(SWT.FILL, SWT.BEGINNING)
-					.applyTo(_lblTTConfigDescription);
+					.applyTo(_lblIL_ConfigDescription);
 
 			// text
-			_txtTTConfigDescription = new Text(parent, //
+			_txtIL_ConfigDescription = new Text(parent, //
 					SWT.BORDER | //
 							SWT.WRAP
 							| SWT.MULTI
 							| SWT.V_SCROLL
 							| SWT.H_SCROLL);
+			_txtIL_ConfigDescription.addModifyListener(_importLauncherModifyListener);
+
 			GridDataFactory.fillDefaults()//
 					.grab(true, false)
 					.hint(convertWidthInCharsToPixels(40), convertHeightInCharsToPixels(5))
-					.applyTo(_txtTTConfigDescription);
+					.applyTo(_txtIL_ConfigDescription);
 		}
+	}
 
+	private void createUI_73_ILSave(final Composite parent) {
+
+		{
+			/*
+			 * Checkbox: Save
+			 */
+			_chkIL_SaveTour = new Button(parent, SWT.CHECK);
+			_chkIL_SaveTour.setText(Messages.Dialog_ImportConfig_Checkbox_SaveTour);
+			_chkIL_SaveTour.addSelectionListener(_importLauncherSelectionListener);
+			_chkIL_SaveTour.setToolTipText(Messages.Dialog_ImportConfig_Checkbox_SaveTour_Tooltip);
+			GridDataFactory.fillDefaults()//
+					.span(2, 1)
+					.indent(0, 5)
+					.applyTo(_chkIL_SaveTour);
+		}
 		{
 			/*
 			 * Checkbox: Show in dashboard
 			 */
-			_chkTTShowInDashboard = new Button(parent, SWT.CHECK);
-			_chkTTShowInDashboard.setText(Messages.Dialog_ImportConfig_Checkbox_ShowInDashboard);
-			_chkTTShowInDashboard.setToolTipText(Messages.Dialog_ImportConfig_Checkbox_ShowInDashboard_Tooltip);
+			_chkIL_ShowInDashboard = new Button(parent, SWT.CHECK);
+			_chkIL_ShowInDashboard.setText(Messages.Dialog_ImportConfig_Checkbox_ShowInDashboard);
+			_chkIL_ShowInDashboard.setToolTipText(Messages.Dialog_ImportConfig_Checkbox_ShowInDashboard_Tooltip);
 			GridDataFactory.fillDefaults()//
 					.span(2, 1)
-//					.indent(0, VERTICAL_GROUP_DISTANCE / 2)
-					.applyTo(_chkTTShowInDashboard);
+//					.indent(0, 10)
+					.applyTo(_chkIL_ShowInDashboard);
 		}
 	}
 
@@ -1276,42 +1268,42 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 		/*
 		 * Label: Additonal launcher actions
 		 */
-		final Label label = new Label(parent, SWT.NONE);
-		label.setText(Messages.Dialog_ImportConfig_Info_MoreImportActions);
-		label.setFont(_boldFont);
+		_lblIL_OtherImportActions = new Label(parent, SWT.NONE);
+		_lblIL_OtherImportActions.setText(Messages.Dialog_ImportConfig_Info_MoreImportActions);
+		_lblIL_OtherImportActions.setFont(_boldFont);
 		GridDataFactory.fillDefaults()//
 				.span(2, 1)
-				.indent(0, VERTICAL_GROUP_DISTANCE)
-				.applyTo(label);
+				.indent(0, 10)
+				.applyTo(_lblIL_OtherImportActions);
 
 		/*
 		 * Checkbox: Set tour type
 		 */
-		_chkTTSetTourType = new Button(parent, SWT.CHECK);
-		_chkTTSetTourType.setText(Messages.Dialog_ImportConfig_Checkbox_TourType);
-		_chkTTSetTourType.setToolTipText(Messages.Dialog_ImportConfig_Checkbox_TourType_Tooltip);
-		_chkTTSetTourType.addSelectionListener(ttListener);
+		_chkIL_SetTourType = new Button(parent, SWT.CHECK);
+		_chkIL_SetTourType.setText(Messages.Dialog_ImportConfig_Checkbox_TourType);
+		_chkIL_SetTourType.setToolTipText(Messages.Dialog_ImportConfig_Checkbox_TourType_Tooltip);
+		_chkIL_SetTourType.addSelectionListener(ttListener);
 		GridDataFactory.fillDefaults()//
 				.span(2, 1)
-				.indent(0, VERTICAL_GROUP_DISTANCE / 2)
-				.applyTo(_chkTTSetTourType);
+				.indent(0, 5)
+				.applyTo(_chkIL_SetTourType);
 
 		/*
 		 * Label: Tour type
 		 */
-		_lblTTTourType = new Label(parent, SWT.NONE);
-		_lblTTTourType.setText(Messages.Dialog_ImportConfig_Label_TourType);
+		_lblIL_TourType = new Label(parent, SWT.NONE);
+		_lblIL_TourType.setText(Messages.Dialog_ImportConfig_Label_TourType);
 		GridDataFactory.fillDefaults()//
 				.align(SWT.FILL, SWT.CENTER)
 				.indent(convertHorizontalDLUsToPixels(11), 0)
-				.applyTo(_lblTTTourType);
+				.applyTo(_lblIL_TourType);
 
-		_comboTTConfig = new Combo(parent, SWT.READ_ONLY);
-		_comboTTConfig.addSelectionListener(ttListener);
+		_comboIL_Config = new Combo(parent, SWT.READ_ONLY);
+		_comboIL_Config.addSelectionListener(ttListener);
 
 		// fill combo
 		for (final ComboEnumEntry<?> tourTypeItem : RawDataManager.ALL_IMPORT_TOUR_TYPE_CONFIG) {
-			_comboTTConfig.add(tourTypeItem.label);
+			_comboIL_Config.add(tourTypeItem.label);
 		}
 
 		// fill left column
@@ -1321,7 +1313,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 		GridDataFactory.fillDefaults()//
 				.grab(true, true)
 				.span(2, 1)
-				.indent(_leftPadding, 8)
+				.indent(_leftPadding, 0)
 				.applyTo(_pagebookTourType);
 		{
 			_pageTourType_NoTourType = createUI_81_Page_NoTourType(_pagebookTourType);
@@ -1350,22 +1342,22 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 		{
-			_lblTTOne_TourTypeIcon = new Label(container, SWT.NONE);
+			_lblIL_One_TourTypeIcon = new Label(container, SWT.NONE);
 			GridDataFactory.fillDefaults()//
 					.hint(16, 16)
-					.applyTo(_lblTTOne_TourTypeIcon);
-			_lblTTOne_TourTypeIcon.setText(UI.EMPTY_STRING);
+					.applyTo(_lblIL_One_TourTypeIcon);
+			_lblIL_One_TourTypeIcon.setText(UI.EMPTY_STRING);
 
 			/*
 			 * tour type
 			 */
-			_linkTTOne_TourType = new Link(container, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(_linkTTOne_TourType);
-			_linkTTOne_TourType.setText(Messages.Dialog_ImportConfig_Link_TourType);
-			_linkTTOne_TourType.addSelectionListener(new SelectionAdapter() {
+			_linkTT_One_TourType = new Link(container, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_linkTT_One_TourType);
+			_linkTT_One_TourType.setText(Messages.Dialog_ImportConfig_Link_TourType);
+			_linkTT_One_TourType.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
-					net.tourbook.common.UI.openControlMenu(_linkTTOne_TourType);
+					net.tourbook.common.UI.openControlMenu(_linkTT_One_TourType);
 				}
 			});
 		}
@@ -1380,14 +1372,26 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
 		{
 
-			createUI_84_SpeedTourTypes(container);
-			createUI_87_SpeedTourType_Actions(container);
+			createUI_832_SpeedTourType_Actions(container);
+			createUI_834_SpeedTourTypes(container);
 		}
 
 		return container;
 	}
 
-	private void createUI_84_SpeedTourTypes(final Composite parent) {
+	private void createUI_832_SpeedTourType_Actions(final Composite parent) {
+
+		final ToolBar toolbar = new ToolBar(parent, SWT.FLAT);
+
+		final ToolBarManager tbm = new ToolBarManager(toolbar);
+
+		tbm.add(_actionTTSpeed_Add);
+		tbm.add(_actionTTSpeed_Sort);
+
+		tbm.update(true);
+	}
+
+	private void createUI_834_SpeedTourTypes(final Composite parent) {
 
 		/*
 		 * vertex fields container
@@ -1401,7 +1405,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 		GridLayoutFactory.fillDefaults().applyTo(_speedTourType_OuterContainer);
 //		_vertexOuterContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 
-		createUI_85_SpeedTourType_Fields();
+		createUI_835_SpeedTourType_Fields();
 	}
 
 	/**
@@ -1409,7 +1413,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 	 * 
 	 * @param parent
 	 */
-	private void createUI_85_SpeedTourType_Fields() {
+	private void createUI_835_SpeedTourType_Fields() {
 
 		if (_currentIL == null) {
 
@@ -1436,16 +1440,16 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 			_speedTourType_ScrolledContainer.dispose();
 		}
 
-		_speedTourType_Container = createUI_86_SpeedTourType_ScrolledContainer(_speedTourType_OuterContainer);
+		_speedTourType_Container = createUI_836_SpeedTourType_ScrolledContainer(_speedTourType_OuterContainer);
 //		_vertexContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 
 		/*
 		 * fields
 		 */
 		_actionTTSpeed_Delete = new ActionDeleteVertex[vertexSize];
-		_lblTTSpeed_TourTypeIcon = new Label[vertexSize];
-		_lblTTSpeed_SpeedUnit = new Label[vertexSize];
-		_linkTTSpeed_TourType = new Link[vertexSize];
+		_lblIL_Speed_TourTypeIcon = new Label[vertexSize];
+		_lblIL_Speed_SpeedUnit = new Label[vertexSize];
+		_linkTT_Speed_TourType = new Link[vertexSize];
 		_spinnerTTVertex_AvgSpeed = new Spinner[vertexSize];
 
 		_speedTourType_Container.setRedraw(false);
@@ -1513,9 +1517,9 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 				 * Keep vertex controls
 				 */
 				_actionTTSpeed_Delete[vertexIndex] = actionDeleteVertex;
-				_lblTTSpeed_TourTypeIcon[vertexIndex] = lblTourTypeIcon;
-				_lblTTSpeed_SpeedUnit[vertexIndex] = lblUnit;
-				_linkTTSpeed_TourType[vertexIndex] = linkTourType;
+				_lblIL_Speed_TourTypeIcon[vertexIndex] = lblTourTypeIcon;
+				_lblIL_Speed_SpeedUnit[vertexIndex] = lblUnit;
+				_linkTT_Speed_TourType[vertexIndex] = linkTourType;
 				_spinnerTTVertex_AvgSpeed[vertexIndex] = spinnerValue;
 			}
 		}
@@ -1529,7 +1533,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 		}
 	}
 
-	private Composite createUI_86_SpeedTourType_ScrolledContainer(final Composite parent) {
+	private Composite createUI_836_SpeedTourType_ScrolledContainer(final Composite parent) {
 
 		// scrolled container
 		_speedTourType_ScrolledContainer = new ScrolledComposite(parent, SWT.V_SCROLL);
@@ -1556,18 +1560,6 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 		return vertexContainer;
 	}
 
-	private void createUI_87_SpeedTourType_Actions(final Composite parent) {
-
-		final ToolBar toolbar = new ToolBar(parent, SWT.FLAT);
-
-		final ToolBarManager tbm = new ToolBarManager(toolbar);
-
-		tbm.add(_actionTTSpeed_Add);
-		tbm.add(_actionTTSpeed_Sort);
-
-		tbm.update(true);
-	}
-
 	private void createUI_90_Dashboard(final Composite parent) {
 
 		final Group group = new Group(parent, SWT.NONE);
@@ -1583,15 +1575,15 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 //		group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
 
-			createUI_90_Dashboard_1(group);
-			createUI_92_Dashboard_2(group);
-			createUI_92_Dashboard_3(group);
+			createUI_902_Dashboard_1(group);
+			createUI_904_Dashboard_2(group);
+			createUI_906_Dashboard_3(group);
 
 			createUI_99_Dashboard_LiveUpdate(group);
 		}
 	}
 
-	private void createUI_90_Dashboard_1(final Group parent) {
+	private void createUI_902_Dashboard_1(final Group parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
@@ -1611,8 +1603,8 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 
 				// spinner
 				_spinnerTileSize = new Spinner(container, SWT.BORDER);
-				_spinnerTileSize.setMinimum(RawDataView.TILE_SIZE_MIN);
-				_spinnerTileSize.setMaximum(RawDataView.TILE_SIZE_MAX);
+				_spinnerTileSize.setMinimum(ImportConfig.TILE_SIZE_MIN);
+				_spinnerTileSize.setMaximum(ImportConfig.TILE_SIZE_MAX);
 				_spinnerTileSize.addSelectionListener(_liveUpdateListener);
 				_spinnerTileSize.addMouseWheelListener(_liveUpdateMouseWheelListener);
 				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_spinnerTileSize);
@@ -1629,8 +1621,8 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 
 				// spinner
 				_spinnerNumHTiles = new Spinner(container, SWT.BORDER);
-				_spinnerNumHTiles.setMinimum(RawDataView.NUM_HORIZONTAL_TILES_MIN);
-				_spinnerNumHTiles.setMaximum(RawDataView.NUM_HORIZONTAL_TILES_MAX);
+				_spinnerNumHTiles.setMinimum(ImportConfig.HORIZONTAL_TILES_MIN);
+				_spinnerNumHTiles.setMaximum(ImportConfig.HORIZONTAL_TILES_MAX);
 				_spinnerNumHTiles.addSelectionListener(_liveUpdateListener);
 				_spinnerNumHTiles.addMouseWheelListener(_liveUpdateMouseWheelListener);
 				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_spinnerNumHTiles);
@@ -1638,7 +1630,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 		}
 	}
 
-	private void createUI_92_Dashboard_2(final Group parent) {
+	private void createUI_904_Dashboard_2(final Group parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
@@ -1659,8 +1651,8 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 
 				// spinner
 				_spinnerAnimationDuration = new Spinner(container, SWT.BORDER);
-				_spinnerAnimationDuration.setMinimum(0);
-				_spinnerAnimationDuration.setMaximum(100);
+				_spinnerAnimationDuration.setMinimum(ImportConfig.ANIMATION_DURATION_MIN);
+				_spinnerAnimationDuration.setMaximum(ImportConfig.ANIMATION_DURATION_MAX);
 				_spinnerAnimationDuration.setDigits(1);
 				_spinnerAnimationDuration.addSelectionListener(_liveUpdateListener);
 				_spinnerAnimationDuration.addMouseWheelListener(_liveUpdateMouseWheelListener);
@@ -1682,8 +1674,8 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 
 				// spinner
 				_spinnerAnimationCrazinessFactor = new Spinner(container, SWT.BORDER);
-				_spinnerAnimationCrazinessFactor.setMinimum(-100);
-				_spinnerAnimationCrazinessFactor.setMaximum(100);
+				_spinnerAnimationCrazinessFactor.setMinimum(ImportConfig.ANIMATION_CRAZINESS_FACTOR_MIN);
+				_spinnerAnimationCrazinessFactor.setMaximum(ImportConfig.ANIMATION_CRAZINESS_FACTOR_MAX);
 				_spinnerAnimationCrazinessFactor.addSelectionListener(_liveUpdateListener);
 				_spinnerAnimationCrazinessFactor.addMouseWheelListener(_liveUpdateMouseWheelListener);
 				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_spinnerAnimationCrazinessFactor);
@@ -1694,7 +1686,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 		}
 	}
 
-	private void createUI_92_Dashboard_3(final Group parent) {
+	private void createUI_906_Dashboard_3(final Group parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
@@ -1715,8 +1707,8 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 
 				// spinner
 				_spinnerBgOpacity = new Spinner(container, SWT.BORDER);
-				_spinnerBgOpacity.setMinimum(0);
-				_spinnerBgOpacity.setMaximum(100);
+				_spinnerBgOpacity.setMinimum(ImportConfig.BACKGROUND_OPACITY_MIN);
+				_spinnerBgOpacity.setMaximum(ImportConfig.BACKGROUND_OPACITY_MAX);
 				_spinnerBgOpacity.addSelectionListener(_liveUpdateListener);
 				_spinnerBgOpacity.addMouseWheelListener(_liveUpdateMouseWheelListener);
 			}
@@ -1763,7 +1755,8 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 
 		defineColumn_10_ProfileName();
 		defineColumn_20_ColorImage();
-		defineColumn_30_Description();
+		defineColumn_30_IsSaveTour();
+		defineColumn_90_Description();
 	}
 
 	/**
@@ -1776,8 +1769,8 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 		colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_Name);
 		colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_Name);
 
-		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(20));
-		colDef.setColumnWeightData(new ColumnWeightData(20));
+		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(17));
+		colDef.setColumnWeightData(new ColumnWeightData(17));
 
 		colDef.setIsDefaultColumn();
 		colDef.setCanModifyVisibility(false);
@@ -1791,7 +1784,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 	}
 
 	/**
-	 * Column: Color image
+	 * Column: Tour type
 	 */
 	private void defineColumn_20_ColorImage() {
 
@@ -1801,8 +1794,8 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 		colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_TourType);
 		colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_TourType);
 
-		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(15));
-		colDef.setColumnWeightData(new ColumnWeightData(15));
+		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(12));
+		colDef.setColumnWeightData(new ColumnWeightData(12));
 
 		colDef.setIsDefaultColumn();
 		colDef.setCanModifyVisibility(false);
@@ -1816,9 +1809,37 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 	}
 
 	/**
+	 * Column: Is visible
+	 */
+	private void defineColumn_30_IsSaveTour() {
+
+		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "isSaveTour", SWT.LEAD); //$NON-NLS-1$
+
+		colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_Save);
+		colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_Save);
+		colDef.setColumnHeaderToolTipText(Messages.Dialog_ImportConfig_Column_Save_Tooltip);
+
+		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(7));
+		colDef.setColumnWeightData(new ColumnWeightData(7));
+
+		colDef.setIsDefaultColumn();
+
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final DeviceImportLauncher importLauncher = (DeviceImportLauncher) cell.getElement();
+				cell.setText(importLauncher.isSaveTour //
+						? Messages.App_Label_BooleanYes
+						: Messages.App_Label_BooleanNo);
+			}
+		});
+	}
+
+	/**
 	 * Column: Item description
 	 */
-	private void defineColumn_30_Description() {
+	private void defineColumn_90_Description() {
 
 		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "configDescription", SWT.LEAD); //$NON-NLS-1$
 
@@ -1882,7 +1903,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 		_backupHistoryItems.validateModifiedPath();
 	}
 
-	private void enableTTControls() {
+	private void enableILControls() {
 
 		final boolean isLauncherAvailable = _dialogConfig.deviceImportLaunchers.size() > 0;
 
@@ -1909,15 +1930,15 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 							spinner.setEnabled(isILSelected);
 						}
 
-						for (final Link link : _linkTTSpeed_TourType) {
+						for (final Link link : _linkTT_Speed_TourType) {
 							link.setEnabled(isILSelected);
 						}
 
-						for (final Label label : _lblTTSpeed_SpeedUnit) {
+						for (final Label label : _lblIL_Speed_SpeedUnit) {
 							label.setEnabled(isILSelected);
 						}
 
-						for (final Label label : _lblTTSpeed_TourTypeIcon) {
+						for (final Label label : _lblIL_Speed_TourTypeIcon) {
 
 							if (isILSelected) {
 
@@ -1943,23 +1964,34 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 
 					isSetTourType = true;
 
-					_linkTTOne_TourType.setEnabled(isILSelected);
+					_linkTT_One_TourType.setEnabled(isILSelected);
 				}
 			}
 		}
 
-		_btnTTConfig_Duplicate.setEnabled(isILSelected);
-		_btnTTConfig_Remove.setEnabled(isILSelected);
+		if ((isILSelected && isSetTourType) == false) {
 
-		_lblTTConfigName.setEnabled(isILSelected);
-		_lblTTConfigDescription.setEnabled(isILSelected);
-		_lblTTHint.setEnabled(isLauncherAvailable);
+			// a tour type is not selected, hide tour type page
+			showTourTypePage(null);
+		}
 
-		_txtTTConfigName.setEnabled(isILSelected);
-		_txtTTConfigDescription.setEnabled(isILSelected);
-		_chkTTShowInDashboard.setEnabled(isILSelected);
-		_lblTTTourType.setEnabled(isILSelected && isSetTourType);
-		_comboTTConfig.setEnabled(isILSelected && isSetTourType);
+		_btnIL_Config_Duplicate.setEnabled(isILSelected);
+		_btnIL_Config_Remove.setEnabled(isILSelected);
+
+		_chkIL_SaveTour.setEnabled(isILSelected);
+		_chkIL_ShowInDashboard.setEnabled(isILSelected);
+		_chkIL_SetTourType.setEnabled(isILSelected);
+
+		_comboIL_Config.setEnabled(isILSelected && isSetTourType);
+
+		_lblIL_ConfigName.setEnabled(isILSelected);
+		_lblIL_ConfigDescription.setEnabled(isILSelected);
+		_lblIL_Hint.setEnabled(isLauncherAvailable);
+		_lblIL_OtherImportActions.setEnabled(isILSelected);
+		_lblIL_TourType.setEnabled(isILSelected && isSetTourType);
+
+		_txtIL_ConfigName.setEnabled(isILSelected);
+		_txtIL_ConfigDescription.setEnabled(isILSelected);
 
 		_ilViewer.getTable().setEnabled(isLauncherAvailable);
 
@@ -2055,11 +2087,11 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 	@SuppressWarnings("unchecked")
 	private Enum<TourTypeConfig> getSelectedTourTypeConfig() {
 
-		final boolean isSetTourType = _chkTTSetTourType.getSelection();
+		final boolean isSetTourType = _chkIL_SetTourType.getSelection();
 
 		if (isSetTourType) {
 
-			int configIndex = _comboTTConfig.getSelectionIndex();
+			int configIndex = _comboIL_Config.getSelectionIndex();
 
 			if (configIndex == -1) {
 				configIndex = 0;
@@ -2118,6 +2150,20 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				enableControls();
+			}
+		};
+
+		_importLauncherModifyListener = new ModifyListener() {
+			@Override
+			public void modifyText(final ModifyEvent e) {
+				onImportLauncher_Modified();
+			}
+		};
+
+		_importLauncherSelectionListener = new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				onImportLauncher_Modified();
 			}
 		};
 
@@ -2237,6 +2283,22 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 		historyItems.validateModifiedPath();
 	}
 
+	private void onImportLauncher_Modified() {
+
+		if (_currentIL == null) {
+			return;
+		}
+
+		// update model
+		_currentIL.name = _txtIL_ConfigName.getText();
+
+//this is not working!!!
+//		update_Model_From_UI_SelectedLauncher();
+
+		// update UI
+		_ilViewer.update(_currentIL, null);
+	}
+
 	private void onPaintViewer(final Event event) {
 
 		if (event.index != _columnIndexConfigImage) {
@@ -2281,7 +2343,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 
 		final String filterOSPath = _backupHistoryItems.getOSPath(
 				_comboBackupFolder.getText(),
-				_dialogConfig.backupFolder);
+				_dialogConfig.getBackupFolder());
 
 		final DirectoryDialog dialog = new DirectoryDialog(_parent.getShell(), SWT.SAVE);
 
@@ -2303,7 +2365,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 
 		final String filterOSPath = _deviceHistoryItems.getOSPath(
 				_comboDeviceFolder.getText(),
-				_dialogConfig.deviceFolder);
+				_dialogConfig.getDeviceFolder());
 
 		final DirectoryDialog dialog = new DirectoryDialog(_parent.getShell(), SWT.SAVE);
 
@@ -2339,7 +2401,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 
 		update_UI_From_Model_TourTypes();
 
-		enableTTControls();
+		enableILControls();
 	}
 
 	private void onSelectTourTypeConfig() {
@@ -2351,7 +2413,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 		update_Model_From_UI_SelectedTourTypeItem();
 		update_UI_From_Model_TourTypes();
 
-		enableTTControls();
+		enableILControls();
 	}
 
 	private void onSpeedTourType_Add() {
@@ -2369,7 +2431,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 		// update UI + model
 		update_UI_From_Model_TourTypes();
 
-		enableTTControls();
+		enableILControls();
 
 		// set focus to the new vertex
 		_spinnerTTVertex_AvgSpeed[0].setFocus();
@@ -2389,7 +2451,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 		// update UI
 		update_UI_From_Model_TourTypes();
 
-		enableTTControls();
+		enableILControls();
 	}
 
 	private void onTourType_Add(final boolean isCopy) {
@@ -2401,30 +2463,19 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 		final ArrayList<DeviceImportLauncher> configItems = _dialogConfig.deviceImportLaunchers;
 		DeviceImportLauncher newConfig;
 
-		if (configItems.size() == 0) {
+		if (isCopy) {
 
-			/*
-			 * Setup default config
-			 */
+			newConfig = _currentIL.clone();
 
-			newConfig = createDefaultConfig();
+			// make the clone more visible
+			newConfig.name = newConfig.name + UI.SPACE + newConfig.getId();
 
 		} else {
 
-			if (isCopy) {
-
-				newConfig = _currentIL.clone();
-
-				// make the close more visible
-				newConfig.name = newConfig.name + UI.SPACE + newConfig.getId();
-
-			} else {
-
-				newConfig = new DeviceImportLauncher();
-			}
-
-			configItems.add(newConfig);
+			newConfig = new DeviceImportLauncher();
 		}
+
+		configItems.add(newConfig);
 
 		// update UI
 		_ilViewer.refresh();
@@ -2434,10 +2485,10 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 
 		_ilViewer.setSelection(new StructuredSelection(newConfig), true);
 
-		_txtTTConfigName.setFocus();
+		_txtIL_ConfigName.setFocus();
 
 		if (isCopy) {
-			_txtTTConfigName.selectAll();
+			_txtIL_ConfigName.selectAll();
 		}
 	}
 
@@ -2464,27 +2515,14 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 
 		_ilViewer.setSelection(new StructuredSelection(newTTItem), true);
 
-		_txtTTConfigName.setFocus();
-		_txtTTConfigName.selectAll();
+		_txtIL_ConfigName.setFocus();
+		_txtIL_ConfigName.selectAll();
 	}
 
 	private void onTourType_DblClick() {
 
-		_txtTTConfigName.setFocus();
-		_txtTTConfigName.selectAll();
-	}
-
-	private void onTourType_ModifyName() {
-
-		if (_currentIL == null) {
-			return;
-		}
-
-		// update model
-		_currentIL.name = _txtTTConfigName.getText();
-
-		// update UI
-		_ilViewer.update(_currentIL, null);
+		_txtIL_ConfigName.setFocus();
+		_txtIL_ConfigName.selectAll();
 	}
 
 	private void onTourType_Remove() {
@@ -2526,14 +2564,15 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 
 			_currentIL = null;
 
-			_txtTTConfigName.setText(UI.EMPTY_STRING);
-			_txtTTConfigDescription.setText(UI.EMPTY_STRING);
-			_chkTTShowInDashboard.setEnabled(true);
+			_txtIL_ConfigName.setText(UI.EMPTY_STRING);
+			_txtIL_ConfigDescription.setText(UI.EMPTY_STRING);
 
 			// remove vertex fields
-			createUI_85_SpeedTourType_Fields();
+			createUI_835_SpeedTourType_Fields();
 
-			enableTTControls();
+			enableILControls();
+
+			_dialogConfig.isLastLauncherRemoved = true;
 
 		} else {
 
@@ -2555,8 +2594,8 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 		 * Update UI
 		 */
 		final Image image = net.tourbook.ui.UI.getInstance().getTourTypeImage(tourType.getTypeId());
-		final Label ttIcon = _lblTTSpeed_TourTypeIcon[vertexIndex];
-		final Link ttLink = _linkTTSpeed_TourType[vertexIndex];
+		final Label ttIcon = _lblIL_Speed_TourTypeIcon[vertexIndex];
+		final Link ttLink = _linkTT_Speed_TourType[vertexIndex];
 
 		ttIcon.setImage(image);
 
@@ -2647,15 +2686,15 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 						_deviceHistoryItems.restoreState(
 								_state.getArray(STATE_DEVICE_FOLDER_HISTORY_ITEMS),
 								_state.getArray(STATE_DEVICE_DEVICE_HISTORY_ITEMS),
-								_dialogConfig.deviceFolder);
+								_dialogConfig.getDeviceFolder());
 
 						_backupHistoryItems.restoreState(
 								_state.getArray(STATE_BACKUP_FOLDER_HISTORY_ITEMS),
 								_state.getArray(STATE_BACKUP_DEVICE_HISTORY_ITEMS),
-								_dialogConfig.backupFolder);
+								_dialogConfig.getBackupFolder());
 
-						_comboBackupFolder.setText(_dialogConfig.backupFolder);
-						_comboDeviceFolder.setText(_dialogConfig.deviceFolder);
+						_comboBackupFolder.setText(_dialogConfig.getBackupFolder());
+						_comboDeviceFolder.setText(_dialogConfig.getDeviceFolder());
 					}
 				});
 			}
@@ -2691,8 +2730,8 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 	private void update_Model_From_UI_Folder() {
 
 		_dialogConfig.isCreateBackup = _chkCreateBackup.getSelection();
-		_dialogConfig.backupFolder = _comboBackupFolder.getText();
-		_dialogConfig.deviceFolder = _comboDeviceFolder.getText();
+		_dialogConfig.setBackupFolder(_comboBackupFolder.getText());
+		_dialogConfig.setDeviceFolder(_comboDeviceFolder.getText());
 	}
 
 	private void update_Model_From_UI_LiveUpdateValues() {
@@ -2708,7 +2747,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 
 	private void update_Model_From_UI_OneTourType() {
 
-		final Object tourTypeId = _linkTTOne_TourType.getData(DATA_KEY_TOUR_TYPE_ID);
+		final Object tourTypeId = _linkTT_One_TourType.getData(DATA_KEY_TOUR_TYPE_ID);
 
 		if (tourTypeId instanceof Long) {
 			_currentIL.oneTourType = TourDatabase.getTourType((long) tourTypeId);
@@ -2720,6 +2759,14 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 		_currentIL.setupItemImage();
 	}
 
+	private void update_Model_From_UI_SelectedLauncher() {
+		
+		_currentIL.name = _txtIL_ConfigName.getText();
+		_currentIL.description = _txtIL_ConfigDescription.getText();
+		_currentIL.isShowInDashboard = _chkIL_ShowInDashboard.getSelection();
+		_currentIL.isSaveTour = _chkIL_SaveTour.getSelection();
+	}
+
 	/**
 	 * Set data from the UI into the model.
 	 */
@@ -2729,11 +2776,9 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 			return;
 		}
 
-		final Enum<TourTypeConfig> selectedTourTypeConfig = getSelectedTourTypeConfig();
+		update_Model_From_UI_SelectedLauncher();
 
-		_currentIL.name = _txtTTConfigName.getText();
-		_currentIL.description = _txtTTConfigDescription.getText();
-		_currentIL.isShowInDashboard = _chkTTShowInDashboard.getSelection();
+		final Enum<TourTypeConfig> selectedTourTypeConfig = getSelectedTourTypeConfig();
 
 		_currentIL.tourTypeConfig = selectedTourTypeConfig;
 
@@ -2754,7 +2799,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 					 * create vertices from UI controls
 					 */
 					final Spinner spinnerAvgSpeed = _spinnerTTVertex_AvgSpeed[vertexIndex];
-					final Link linkTourType = _linkTTSpeed_TourType[vertexIndex];
+					final Link linkTourType = _linkTT_Speed_TourType[vertexIndex];
 
 					final SpeedTourType speedVertex = new SpeedTourType();
 
@@ -2821,14 +2866,15 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 
 		_ilViewer.update(_currentIL, null);
 
-		_txtTTConfigName.setText(_currentIL.name);
-		_txtTTConfigDescription.setText(_currentIL.description);
-		_chkTTShowInDashboard.setSelection(_currentIL.isShowInDashboard);
+		_txtIL_ConfigName.setText(_currentIL.name);
+		_txtIL_ConfigDescription.setText(_currentIL.description);
+		_chkIL_SaveTour.setSelection(_currentIL.isSaveTour);
+		_chkIL_ShowInDashboard.setSelection(_currentIL.isShowInDashboard);
 
-		_chkTTSetTourType.setSelection(isSetTourType);
+		_chkIL_SetTourType.setSelection(isSetTourType);
 
 		if (isSetTourType) {
-			_comboTTConfig.select(getTourTypeConfigIndex(tourTypeConfig));
+			_comboIL_Config.select(getTourTypeConfigIndex(tourTypeConfig));
 		}
 
 		/*
@@ -2840,7 +2886,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 			_speedTourType_OuterContainer.setRedraw(false);
 			{
 				// check and create vertex fields
-				createUI_85_SpeedTourType_Fields();
+				createUI_835_SpeedTourType_Fields();
 
 				final ArrayList<SpeedTourType> speedVertices = _currentIL.speedTourTypes;
 
@@ -2854,8 +2900,8 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 					final long tourTypeId = speedTT.tourTypeId;
 
 					final Spinner spinnerAvgSpeed = _spinnerTTVertex_AvgSpeed[vertexIndex];
-					final Link linkTourType = _linkTTSpeed_TourType[vertexIndex];
-					final Label labelTourTypeIcon = _lblTTSpeed_TourTypeIcon[vertexIndex];
+					final Link linkTourType = _linkTT_Speed_TourType[vertexIndex];
+					final Label labelTourTypeIcon = _lblIL_Speed_TourTypeIcon[vertexIndex];
 
 					// update UI
 					final double avgSpeed = (speedTT.avgSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE) + 0.0001;
@@ -2873,7 +2919,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 
 						linkTourType.setData(DATA_KEY_TOUR_TYPE_ID, tourTypeId);
 						linkTourType.setText(UI.LINK_TAG_START
-								+ uiInstance.getTourTypeLabel(tourTypeId)
+								+ net.tourbook.ui.UI.getTourTypeLabel(tourTypeId)
 								+ UI.LINK_TAG_END);
 						labelTourTypeIcon.setImage(uiInstance.getTourTypeImage(tourTypeId));
 					}
@@ -2936,9 +2982,9 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 			_speedTourType_ScrolledContainer = null;
 
 			_actionTTSpeed_Delete = null;
-			_lblTTSpeed_TourTypeIcon = null;
-			_lblTTSpeed_SpeedUnit = null;
-			_linkTTSpeed_TourType = null;
+			_lblIL_Speed_TourTypeIcon = null;
+			_lblIL_Speed_SpeedUnit = null;
+			_linkTT_Speed_TourType = null;
 			_spinnerTTVertex_AvgSpeed = null;
 		}
 	}
@@ -2947,19 +2993,19 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 
 		if (tourType == null) {
 
-			_lblTTOne_TourTypeIcon.setImage(null);
+			_lblIL_One_TourTypeIcon.setImage(null);
 
-			_linkTTOne_TourType.setText(Messages.Dialog_ImportConfig_Link_TourType);
-			_linkTTOne_TourType.setData(DATA_KEY_TOUR_TYPE_ID, null);
+			_linkTT_One_TourType.setText(Messages.Dialog_ImportConfig_Link_TourType);
+			_linkTT_One_TourType.setData(DATA_KEY_TOUR_TYPE_ID, null);
 
 		} else {
 
 			final Image image = net.tourbook.ui.UI.getInstance().getTourTypeImage(tourType.getTypeId());
 
-			_lblTTOne_TourTypeIcon.setImage(image);
+			_lblIL_One_TourTypeIcon.setImage(image);
 
-			_linkTTOne_TourType.setText(UI.LINK_TAG_START + tourType.getName() + UI.LINK_TAG_END);
-			_linkTTOne_TourType.setData(DATA_KEY_TOUR_TYPE_ID, tourType.getTypeId());
+			_linkTT_One_TourType.setText(UI.LINK_TAG_START + tourType.getName() + UI.LINK_TAG_END);
+			_linkTT_One_TourType.setData(DATA_KEY_TOUR_TYPE_ID, tourType.getTypeId());
 		}
 
 		// update the model that the table displays the correct image

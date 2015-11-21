@@ -128,6 +128,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 		return false;
 	}
 
+	@Override
 	public String getDeviceModeName(final int profileId) {
 
 		// 0: bike1
@@ -179,6 +180,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 		return 4;
 	}
 
+	@Override
 	public int getTransferDataSize() {
 		return 0x10007;
 	}
@@ -269,8 +271,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 
 				final TourData tourData = new TourData();
 
-				tourData.importRawDataFile = importFilePath;
-				tourData.setTourImportFilePath(importFilePath);
+				tourData.setImportFilePath(importFilePath);
 
 				/*
 				 * save AA record data
@@ -641,6 +642,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
 	 * 
 	 * @return true for a valid HAC5 data format
 	 */
+	@Override
 	public boolean validateRawData(final String fileName) {
 
 		boolean isValid = false;

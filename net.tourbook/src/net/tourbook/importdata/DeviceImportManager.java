@@ -23,7 +23,6 @@ import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.FileStore;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -44,6 +43,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.NIO;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.StatusUtil;
@@ -51,7 +51,6 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.ui.views.rawData.RawDataView;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -78,13 +77,15 @@ public class DeviceImportManager {
 	private static final String			ATTR_ANIMATION_DURATION				= "animationDuration";								//$NON-NLS-1$
 	private static final String			ATTR_AVG_SPEED						= "avgSpeed";										//$NON-NLS-1$
 	private static final String			ATTR_BACKGROUND_OPACITY				= "backgroundOpacity";								//$NON-NLS-1$
-	private static final String			ATTR_CONFIG_BACKUP_FOLDER			= "backupFolder";									//$NON-NLS-1$
-	private static final String			ATTR_CONFIG_DESCRIPTION				= "description";									//$NON-NLS-1$
-	private static final String			ATTR_CONFIG_DEVICE_FOLDER			= "deviceFolder";									//$NON-NLS-1$
-	private static final String			ATTR_CONFIG_NAME					= "name";											//$NON-NLS-1$
-	private static final String			ATTR_CONFIG_IS_SHOW_IN_DASHBOARD	= "isShowInDashBoard";								//$NON-NLS-1$
+	private static final String			ATTR_BACKUP_FOLDER					= "backupFolder";									//$NON-NLS-1$
+	private static final String			ATTR_DEVICE_FOLDER					= "deviceFolder";									//$NON-NLS-1$
 	private static final String			ATTR_IS_CREATE_BACKUP				= "isCreateBackup";								//$NON-NLS-1$
+	private static final String			ATTR_IS_LAST_LAUNCHER_REMOVED		= "isLastLauncherRemoved";							//$NON-NLS-1$
 	private static final String			ATTR_IS_LIVE_UPDATE					= "isLiveUpdate";									//$NON-NLS-1$
+	private static final String			ATTR_LAUNCHER_DESCRIPTION			= "description";									//$NON-NLS-1$
+	private static final String			ATTR_LAUNCHER_NAME					= "name";											//$NON-NLS-1$
+	private static final String			ATTR_LAUNCHER_IS_SAVE_TOUR			= "isSaveTour";									//$NON-NLS-1$
+	private static final String			ATTR_LAUNCHER_IS_SHOW_IN_DASHBOARD	= "isShowInDashBoard";								//$NON-NLS-1$
 	private static final String			ATTR_NUM_UI_COLUMNS					= "uiColumns";										//$NON-NLS-1$
 	private static final String			ATTR_TILE_SIZE						= "tileSize";										//$NON-NLS-1$
 	private static final String			ATTR_TOUR_TYPE_CONFIG				= "tourTypeConfig";								//$NON-NLS-1$
@@ -135,7 +136,7 @@ public class DeviceImportManager {
 				/*
 				 * Create hashcode for all file stores
 				 */
-				final Iterable<FileStore> fileStores = FileSystems.getDefault().getFileStores();
+				final Iterable<FileStore> fileStores = NIO.getFileStores();
 				final StringBuilder sb = new StringBuilder();
 
 				for (final FileStore store : fileStores) {
@@ -476,42 +477,50 @@ public class DeviceImportManager {
 
 	private void loadImportConfig_Data(final XMLMemento xmlMemento, final ImportConfig importConfig) {
 
-		importConfig.isLiveUpdate = Util.getXmlBoolean(xmlMemento, ATTR_IS_LIVE_UPDATE, true);
-
-		importConfig.animationCrazinessFactor = Util.getXmlInteger(
-				xmlMemento,
+		importConfig.animationCrazinessFactor = Util.getXmlInteger(xmlMemento,//
 				ATTR_ANIMATION_CRAZY_FACTOR,
-				3,
-				-100,
-				100);
-		importConfig.animationDuration = Util.getXmlInteger(xmlMemento, ATTR_ANIMATION_DURATION, 40, 0, 100);
-		importConfig.backgroundOpacity = Util.getXmlInteger(xmlMemento, ATTR_BACKGROUND_OPACITY, 5, 0, 100);
+				ImportConfig.ANIMATION_CRAZINESS_FACTOR_DEFAULT,
+				ImportConfig.ANIMATION_CRAZINESS_FACTOR_MIN,
+				ImportConfig.ANIMATION_CRAZINESS_FACTOR_MAX);
 
-		importConfig.numHorizontalTiles = Util.getXmlInteger(
-				xmlMemento,
+		importConfig.animationDuration = Util.getXmlInteger(xmlMemento,//
+				ATTR_ANIMATION_DURATION,
+				ImportConfig.ANIMATION_DURATION_DEFAULT,
+				ImportConfig.ANIMATION_DURATION_MIN,
+				ImportConfig.ANIMATION_DURATION_MAX);
+
+		importConfig.backgroundOpacity = Util.getXmlInteger(xmlMemento,//
+				ATTR_BACKGROUND_OPACITY,
+				ImportConfig.BACKGROUND_OPACITY_DEFAULT,
+				ImportConfig.BACKGROUND_OPACITY_MIN,
+				ImportConfig.BACKGROUND_OPACITY_MAX);
+
+		importConfig.numHorizontalTiles = Util.getXmlInteger(xmlMemento,//
 				ATTR_NUM_UI_COLUMNS,
-				RawDataView.NUM_HORIZONTAL_TILES_DEFAULT,
-				RawDataView.NUM_HORIZONTAL_TILES_MIN,
-				RawDataView.NUM_HORIZONTAL_TILES_MAX);
+				ImportConfig.HORIZONTAL_TILES_DEFAULT,
+				ImportConfig.HORIZONTAL_TILES_MIN,
+				ImportConfig.HORIZONTAL_TILES_MAX);
 
-		importConfig.tileSize = Util.getXmlInteger(
-				xmlMemento,
+		importConfig.tileSize = Util.getXmlInteger(xmlMemento,//
 				ATTR_TILE_SIZE,
-				RawDataView.TILE_SIZE_DEFAULT,
-				RawDataView.TILE_SIZE_MIN,
-				RawDataView.TILE_SIZE_MAX);
+				ImportConfig.TILE_SIZE_DEFAULT,
+				ImportConfig.TILE_SIZE_MIN,
+				ImportConfig.TILE_SIZE_MAX);
 
 		importConfig.isCreateBackup = Util.getXmlBoolean(xmlMemento, ATTR_IS_CREATE_BACKUP, true);
-		importConfig.backupFolder = Util.getXmlString(xmlMemento, ATTR_CONFIG_BACKUP_FOLDER, UI.EMPTY_STRING);
-		importConfig.deviceFolder = Util.getXmlString(xmlMemento, ATTR_CONFIG_DEVICE_FOLDER, UI.EMPTY_STRING);
+		importConfig.isLastLauncherRemoved = Util.getXmlBoolean(xmlMemento, ATTR_IS_LAST_LAUNCHER_REMOVED, false);
+		importConfig.isLiveUpdate = Util.getXmlBoolean(xmlMemento, ATTR_IS_LIVE_UPDATE, true);
+		importConfig.setBackupFolder(Util.getXmlString(xmlMemento, ATTR_BACKUP_FOLDER, UI.EMPTY_STRING));
+		importConfig.setDeviceFolder(Util.getXmlString(xmlMemento, ATTR_DEVICE_FOLDER, UI.EMPTY_STRING));
 
 		for (final IMemento xmlConfig : xmlMemento.getChildren()) {
 
 			final DeviceImportLauncher configItem = new DeviceImportLauncher();
 
-			configItem.name = Util.getXmlString(xmlConfig, ATTR_CONFIG_NAME, UI.EMPTY_STRING);
-			configItem.description = Util.getXmlString(xmlConfig, ATTR_CONFIG_DESCRIPTION, UI.EMPTY_STRING);
-			configItem.isShowInDashboard = Util.getXmlBoolean(xmlConfig, ATTR_CONFIG_IS_SHOW_IN_DASHBOARD, true);
+			configItem.name = Util.getXmlString(xmlConfig, ATTR_LAUNCHER_NAME, UI.EMPTY_STRING);
+			configItem.description = Util.getXmlString(xmlConfig, ATTR_LAUNCHER_DESCRIPTION, UI.EMPTY_STRING);
+			configItem.isSaveTour = Util.getXmlBoolean(xmlConfig, ATTR_LAUNCHER_IS_SAVE_TOUR, false);
+			configItem.isShowInDashboard = Util.getXmlBoolean(xmlConfig, ATTR_LAUNCHER_IS_SHOW_IN_DASHBOARD, true);
 
 			final Enum<TourTypeConfig> ttConfig = Util.getXmlEnum(
 					xmlConfig,
@@ -582,7 +591,7 @@ public class DeviceImportManager {
 		_fileStoresHash = null;
 	}
 
-	public ImportState runImport(final DeviceImportLauncher aiLauncher) {
+	public ImportState runImport(final DeviceImportLauncher importLauncher) {
 
 		final ImportState importState = new ImportState();
 
@@ -596,7 +605,7 @@ public class DeviceImportManager {
 		if (!isFolderValid(
 				deviceOSFolder,
 				Messages.Import_Data_Error_DeviceImport_InvalidDeviceFolder_Message,
-				importConfig.deviceFolder)) {
+				importConfig.getDeviceFolder())) {
 
 			importState.isOpenSetup = true;
 
@@ -614,7 +623,7 @@ public class DeviceImportManager {
 
 					backupOSFolder,
 					Messages.Import_Data_Error_DeviceImport_InvalidBackupFolder_Message,
-					importConfig.backupFolder)) {
+					importConfig.getBackupFolder())) {
 
 				importState.isOpenSetup = true;
 
@@ -651,12 +660,18 @@ public class DeviceImportManager {
 			notImportedFileNames.add(deviceFile.fileName);
 		}
 
+		/*
+		 * Import files
+		 */
 		final String firstFilePathName = notImportedPaths.get(0).path.toString();
 		final String[] fileNames = notImportedFileNames.toArray(new String[notImportedFileNames.size()]);
 
 		RawDataManager.getInstance().actionImportFromFile_DoTheImport(firstFilePathName, fileNames);
 
-		runImport_SetPathAndTourType();
+		/*
+		 * Update tour data.
+		 */
+		runImport_SetPathAndTourType(importLauncher, importState);
 
 		return importState;
 	}
@@ -723,7 +738,7 @@ public class DeviceImportManager {
 		return isCanceled[0];
 	}
 
-	private void runImport_SetPathAndTourType() {
+	private void runImport_SetPathAndTourType(final DeviceImportLauncher importLauncher, final ImportState importState) {
 
 		final HashMap<Long, TourData> importedTours = RawDataManager.getInstance().getImportedTours();
 
@@ -733,10 +748,23 @@ public class DeviceImportManager {
 		}
 
 		final ImportConfig importConfig = getDeviceImportConfig();
+		final String backupOSFolder = importConfig.getBackupOSFolder();
 
 		for (final Entry<Long, TourData> entry : importedTours.entrySet()) {
 
 			final TourData tourData = entry.getValue();
+
+			setTourType(tourData, importLauncher);
+
+			if (importConfig.isCreateBackup) {
+
+				// use backup folder as import folder and not the device folder
+
+				// set backup file path
+				tourData.setImportBackupFileFolder(backupOSFolder);
+
+				importState.isUpdateImportViewer = true;
+			}
 		}
 	}
 
@@ -770,8 +798,6 @@ public class DeviceImportManager {
 
 	private void saveImportConfig_Data(final XMLMemento xmlMemento, final ImportConfig importConfig) {
 
-		xmlMemento.putBoolean(ATTR_IS_LIVE_UPDATE, importConfig.isLiveUpdate);
-
 		xmlMemento.putInteger(ATTR_ANIMATION_CRAZY_FACTOR, importConfig.animationCrazinessFactor);
 		xmlMemento.putInteger(ATTR_ANIMATION_DURATION, importConfig.animationDuration);
 		xmlMemento.putInteger(ATTR_BACKGROUND_OPACITY, importConfig.backgroundOpacity);
@@ -779,23 +805,26 @@ public class DeviceImportManager {
 		xmlMemento.putInteger(ATTR_TILE_SIZE, importConfig.tileSize);
 
 		xmlMemento.putBoolean(ATTR_IS_CREATE_BACKUP, importConfig.isCreateBackup);
-		xmlMemento.putString(ATTR_CONFIG_BACKUP_FOLDER, importConfig.backupFolder);
-		xmlMemento.putString(ATTR_CONFIG_DEVICE_FOLDER, importConfig.deviceFolder);
+		xmlMemento.putBoolean(ATTR_IS_LAST_LAUNCHER_REMOVED, importConfig.isLastLauncherRemoved);
+		xmlMemento.putBoolean(ATTR_IS_LIVE_UPDATE, importConfig.isLiveUpdate);
+		xmlMemento.putString(ATTR_BACKUP_FOLDER, importConfig.getBackupFolder());
+		xmlMemento.putString(ATTR_DEVICE_FOLDER, importConfig.getDeviceFolder());
 
-		for (final DeviceImportLauncher configItem : importConfig.deviceImportLaunchers) {
+		for (final DeviceImportLauncher importLauncher : importConfig.deviceImportLaunchers) {
 
 			final IMemento xmlConfig = xmlMemento.createChild(TAG_IMPORT_CONFIG);
 
-			xmlConfig.putString(ATTR_CONFIG_NAME, configItem.name);
-			xmlConfig.putString(ATTR_CONFIG_DESCRIPTION, configItem.description);
-			xmlConfig.putBoolean(ATTR_CONFIG_IS_SHOW_IN_DASHBOARD, configItem.isShowInDashboard);
+			xmlConfig.putString(ATTR_LAUNCHER_NAME, importLauncher.name);
+			xmlConfig.putString(ATTR_LAUNCHER_DESCRIPTION, importLauncher.description);
+			xmlConfig.putBoolean(ATTR_LAUNCHER_IS_SAVE_TOUR, importLauncher.isSaveTour);
+			xmlConfig.putBoolean(ATTR_LAUNCHER_IS_SHOW_IN_DASHBOARD, importLauncher.isShowInDashboard);
 
-			final Enum<TourTypeConfig> ttConfig = configItem.tourTypeConfig;
+			final Enum<TourTypeConfig> ttConfig = importLauncher.tourTypeConfig;
 			Util.setXmlEnum(xmlConfig, ATTR_TOUR_TYPE_CONFIG, ttConfig);
 
 			if (TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED.equals(ttConfig)) {
 
-				for (final SpeedTourType speedVertex : configItem.speedTourTypes) {
+				for (final SpeedTourType speedVertex : importLauncher.speedTourTypes) {
 
 					final IMemento memento = xmlConfig.createChild(TAG_SPEED_VERTEX);
 
@@ -810,7 +839,7 @@ public class DeviceImportManager {
 
 			} else if (TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL.equals(ttConfig)) {
 
-				final TourType oneTourType = configItem.oneTourType;
+				final TourType oneTourType = importLauncher.oneTourType;
 
 				if (oneTourType != null) {
 					Util.setXmlLong(xmlConfig, ATTR_TOUR_TYPE_ID, oneTourType.getTypeId());
@@ -820,6 +849,69 @@ public class DeviceImportManager {
 
 				// this is the default, a tour type is not set
 			}
+		}
+	}
+
+	/**
+	 * Set tour type by speed
+	 * 
+	 * @param tourData
+	 * @param importLauncher
+	 */
+	private void setTourType(final TourData tourData, final DeviceImportLauncher importLauncher) {
+
+		final Enum<TourTypeConfig> ttConfig = importLauncher.tourTypeConfig;
+
+		if (TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED.equals(ttConfig)) {
+
+			// set tour type by speed
+
+			final float tourDistanceKm = tourData.getTourDistance();
+			final long drivingTime = tourData.getTourDrivingTime();
+
+			double tourAvgSpeed = 0;
+
+			if (drivingTime != 0) {
+				tourAvgSpeed = tourDistanceKm / drivingTime * 3.6;
+			}
+
+			long tourTypeId = -1;
+
+			// find tour type for the tour avg speed
+			for (final SpeedTourType speedTourType : importLauncher.speedTourTypes) {
+
+				if (tourAvgSpeed <= speedTourType.avgSpeed) {
+
+					tourTypeId = speedTourType.tourTypeId;
+					break;
+				}
+			}
+
+			if (tourTypeId == -1) {
+
+				// tour avg speed is above the last speed tour type -> use the last
+
+				if (importLauncher.speedTourTypes.size() > 0) {
+					tourTypeId = importLauncher.speedTourTypes.get(0).tourTypeId;
+				}
+			}
+
+			if (tourTypeId != -1) {
+
+				final TourType tourType = net.tourbook.ui.UI.getTourType(tourTypeId);
+				tourData.setTourType(tourType);
+			}
+
+		} else if (TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL.equals(ttConfig)) {
+
+			// set one tour type
+
+			tourData.setTourType(importLauncher.oneTourType);
+
+		} else {
+
+			// tour type is not set
+
 		}
 	}
 }

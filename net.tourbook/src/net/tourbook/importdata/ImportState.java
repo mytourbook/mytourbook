@@ -18,4 +18,5 @@ package net.tourbook.importdata;
 public class ImportState {
 
 	public boolean	isOpenSetup;
+	public boolean	isUpdateImportViewer;
 }

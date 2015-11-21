@@ -308,8 +308,7 @@ public class NmeaDataReader extends TourbookDevice {
 				_calendar.get(Calendar.SECOND));
 
 		tourData.setDeviceTimeInterval((short) -1);
-		tourData.importRawDataFile = _importFilePath;
-		tourData.setTourImportFilePath(_importFilePath);
+		tourData.setImportFilePath(_importFilePath);
 
 		tourData.setDeviceId(deviceId);
 		tourData.setDeviceName(visibleName);

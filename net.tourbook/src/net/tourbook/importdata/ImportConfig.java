@@ -20,32 +20,51 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.tourbook.common.NIO;
 import net.tourbook.common.UI;
-import net.tourbook.ui.views.rawData.RawDataView;
 
 public class ImportConfig {
 
-	public boolean							isLiveUpdate				= true;
+	static final int						ANIMATION_DURATION_DEFAULT			= 20;									// seconds/10
+	static final int						ANIMATION_DURATION_MIN				= 0;
+	static final int						ANIMATION_DURATION_MAX				= 100;									// ->10 seconds
 
-	public String							backupFolder				= UI.EMPTY_STRING;
-	public String							deviceFolder				= UI.EMPTY_STRING;
+	static final int						ANIMATION_CRAZINESS_FACTOR_DEFAULT	= 1;
+	static final int						ANIMATION_CRAZINESS_FACTOR_MIN		= -100;
+	static final int						ANIMATION_CRAZINESS_FACTOR_MAX		= 100;
+
+	static final int						BACKGROUND_OPACITY_DEFAULT			= 5;
+	static final int						BACKGROUND_OPACITY_MAX				= 100;
+	static final int						BACKGROUND_OPACITY_MIN				= 0;
+
+	static final int						HORIZONTAL_TILES_DEFAULT			= 5;
+	static final int						HORIZONTAL_TILES_MIN				= 1;
+	static final int						HORIZONTAL_TILES_MAX				= 50;
+
+	static final int						TILE_SIZE_DEFAULT					= 80;
+	static final int						TILE_SIZE_MIN						= 20;
+	static final int						TILE_SIZE_MAX						= 300;
+
+	public boolean							isLiveUpdate						= true;
+
+	private String							_backupFolder						= UI.EMPTY_STRING;
+	private String							_deviceFolder						= UI.EMPTY_STRING;
 
 	/** When <code>true</code> then a backup of the tour file is done. */
-	public boolean							isCreateBackup				= true;
+	public boolean							isCreateBackup						= true;
 
-	public int								numHorizontalTiles			= RawDataView.NUM_HORIZONTAL_TILES_DEFAULT;
-	public int								tileSize					= RawDataView.TILE_SIZE_DEFAULT;
+	public int								numHorizontalTiles					= HORIZONTAL_TILES_DEFAULT;
+	public int								tileSize							= TILE_SIZE_DEFAULT;
 
 	/** Background opacity in %. */
-	public int								backgroundOpacity			= 5;
+	public int								backgroundOpacity					= BACKGROUND_OPACITY_DEFAULT;
 
 	/** Duration in seconds/10 */
-	public int								animationDuration			= 40;
-	public int								animationCrazinessFactor	= 3;
+	public int								animationDuration					= ANIMATION_DURATION_DEFAULT;
+	public int								animationCrazinessFactor			= ANIMATION_CRAZINESS_FACTOR_DEFAULT;
 
-	public ArrayList<DeviceImportLauncher>	deviceImportLaunchers		= new ArrayList<>();
+	public ArrayList<DeviceImportLauncher>	deviceImportLaunchers				= new ArrayList<>();
 
 	/** Files which are not yet backed up. */
-	public ArrayList<String>				notBackedUpFiles			= new ArrayList<>();
+	public ArrayList<String>				notBackedUpFiles					= new ArrayList<>();
 
 	/** Number of files in the device folder. */
 	public int								numDeviceFiles;
@@ -54,37 +73,83 @@ public class ImportConfig {
 	 * Contains files which are available in the device folder but they are not available in the
 	 * tour database.
 	 */
-	public ArrayList<OSFile>				notImportedFiles			= new ArrayList<>();
+	public ArrayList<OSFile>				notImportedFiles					= new ArrayList<>();
 
-	public AtomicBoolean					isUpdateDeviceState			= new AtomicBoolean();
+	public AtomicBoolean					isUpdateDeviceState					= new AtomicBoolean();
+
+	/**
+	 * When <code>true</code> prevent that a default launcher is created.
+	 */
+	public boolean							isLastLauncherRemoved;
+
 	{
 		isUpdateDeviceState.set(true);
 	}
 
+	public String getBackupFolder() {
+		return _backupFolder;
+	}
+
+	/**
+	 * @return Returns the backup OS folder or <code>null</code> when not available.
+	 */
 	public String getBackupOSFolder() {
 
-		if (NIO.isDeviceNameFolder(backupFolder)) {
-
-			return NIO.convertToOSPath(backupFolder);
-
-		} else {
-
-			return backupFolder;
+		if (isCreateBackup) {
+			return getOSFolder(_backupFolder);
 		}
+
+		return null;
+	}
+
+	public String getDeviceFolder() {
+		return _deviceFolder;
 	}
 
 	/**
 	 * @return Returns the device OS folder or <code>null</code> when not available.
 	 */
 	public String getDeviceOSFolder() {
+		return getOSFolder(_deviceFolder);
+	}
 
-		if (NIO.isDeviceNameFolder(deviceFolder)) {
+	private String getOSFolder(final String folder) {
 
-			return NIO.convertToOSPath(deviceFolder);
+		if (folder == null || folder.trim().length() == 0) {
+			return null;
+		}
+
+		if (NIO.isDeviceNameFolder(folder)) {
+
+			return NIO.convertToOSPath(folder);
 
 		} else {
 
-			return deviceFolder;
+			return folder;
 		}
+	}
+
+	/**
+	 * @return Returns <code>true</code> when the device or backup folder should be watched.
+	 *         <p>
+	 *         The folders are not checked in the filesystem only the definition. This prevents
+	 *         delays when accessing the fs.
+	 */
+	public boolean isWatchAnything() {
+
+		final boolean isWatch_DeviceFolder = _deviceFolder != null && _deviceFolder.trim().length() > 0;
+		final boolean isWatch_BackupFolder = _backupFolder != null && _backupFolder.trim().length() > 0;
+
+		return isWatch_DeviceFolder || (isCreateBackup && isWatch_BackupFolder);
+	}
+
+	public void setBackupFolder(final String backupFolder) {
+
+		_backupFolder = backupFolder;
+	}
+
+	public void setDeviceFolder(final String deviceFolder) {
+
+		_deviceFolder = deviceFolder;
 	}
 }

@@ -29,7 +29,7 @@ public class DeviceImportLauncher implements Cloneable, Comparable<DeviceImportL
 	/**
 	 * When <code>null</code> then the tour type is not set.
 	 */
-	public Enum<TourTypeConfig>		tourTypeConfig		= null;
+	public Enum<TourTypeConfig>		tourTypeConfig;
 
 	public TourType					oneTourType;
 
@@ -43,9 +43,14 @@ public class DeviceImportLauncher implements Cloneable, Comparable<DeviceImportL
 	private long					_id;
 
 	/**
-	 * Show/hid this launcher in the dashboard.
+	 * Show/hide this launcher in the dashboard.
 	 */
 	public boolean					isShowInDashboard	= true;
+
+	/**
+	 * When <code>true</code> save the tour for the active person.
+	 */
+	public boolean					isSaveTour;
 
 	private static long				_idCreator;
 
@@ -64,8 +69,8 @@ public class DeviceImportLauncher implements Cloneable, Comparable<DeviceImportL
 			clonedObject = (DeviceImportLauncher) super.clone();
 
 			clonedObject._id = ++_idCreator;
-
 			clonedObject.speedTourTypes = new ArrayList<>();
+
 			for (final SpeedTourType speedVertex : speedTourTypes) {
 				clonedObject.speedTourTypes.add(speedVertex.clone());
 			}

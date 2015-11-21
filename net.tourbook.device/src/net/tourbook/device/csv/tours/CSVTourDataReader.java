@@ -368,8 +368,7 @@ public class CSVTourDataReader extends TourbookDevice {
 					// not all tokens are defined
 				} finally {
 
-					tourData.importRawDataFile = importFilePath;
-					tourData.setTourImportFilePath(importFilePath);
+					tourData.setImportFilePath(importFilePath);
 
 					tourData.setDeviceId(deviceId);
 					tourData.setDeviceName(visibleName);

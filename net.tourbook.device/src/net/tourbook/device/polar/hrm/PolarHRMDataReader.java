@@ -467,8 +467,7 @@ public class PolarHRMDataReader extends TourbookDevice {
 
 		tourData.setDeviceTimeInterval((short) _sectionParams.mtInterval);
 
-		tourData.importRawDataFile = _importFilePath;
-		tourData.setTourImportFilePath(_importFilePath);
+		tourData.setImportFilePath(_importFilePath);
 
 //		tourData.setCalories(_calories);
 		tourData.setRestPulse(_sectionParams.restHR == Integer.MIN_VALUE ? 0 : _sectionParams.restHR);
@@ -683,6 +682,7 @@ public class PolarHRMDataReader extends TourbookDevice {
 		}
 	}
 
+	@Override
 	public String getDeviceModeName(final int profileId) {
 		return null;
 	}
@@ -708,6 +708,7 @@ public class PolarHRMDataReader extends TourbookDevice {
 		return -1;
 	}
 
+	@Override
 	public int getTransferDataSize() {
 		return -1;
 	}
@@ -1645,6 +1646,7 @@ public class PolarHRMDataReader extends TourbookDevice {
 			_lastUsedImportId = _deviceData.importId;
 
 			Display.getDefault().syncExec(new Runnable() {
+				@Override
 				public void run() {
 
 					MessageDialog.openError(
@@ -1824,6 +1826,7 @@ public class PolarHRMDataReader extends TourbookDevice {
 	/**
 	 * @return Return <code>true</code> when the file has a valid .hrm data format
 	 */
+	@Override
 	public boolean validateRawData(final String fileName) {
 
 		BufferedReader fileReader = null;

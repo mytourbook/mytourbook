@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.ui;
 
-import java.io.File;
-
 import net.tourbook.common.UI;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
@@ -612,9 +610,12 @@ public abstract class TableColumnFactory {
 			colDef.setLabelProvider(new CellLabelProvider() {
 				@Override
 				public void update(final ViewerCell cell) {
-					final String importRawDataFile = ((TourData) cell.getElement()).importRawDataFile;
-					if (importRawDataFile != null) {
-						cell.setText(new File(importRawDataFile).getParentFile().getPath());
+					
+					final TourData tourData = (TourData) cell.getElement();
+					final String importFilePath = tourData.getImportFilePath();
+					
+					if (importFilePath != null) {
+						cell.setText(importFilePath);
 					}
 				}
 			});
@@ -638,9 +639,12 @@ public abstract class TableColumnFactory {
 			colDef.setLabelProvider(new CellLabelProvider() {
 				@Override
 				public void update(final ViewerCell cell) {
-					final String importRawDataFile = ((TourData) cell.getElement()).importRawDataFile;
-					if (importRawDataFile != null) {
-						cell.setText(new File(importRawDataFile).getName());
+					
+					final TourData tourData = (TourData) cell.getElement();
+					final String importFileName = tourData.getImportFileName();
+					
+					if (importFileName != null) {
+						cell.setText(importFileName);
 					}
 				}
 			});

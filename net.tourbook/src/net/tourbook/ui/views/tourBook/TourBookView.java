@@ -1740,7 +1740,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				if (element instanceof TVITourBookTour) {
 
 					final long tourTypeId = ((TVITourBookTour) element).getTourTypeId();
-					cell.setText(net.tourbook.ui.UI.getInstance().getTourTypeLabel(tourTypeId));
+					cell.setText(net.tourbook.ui.UI.getTourTypeLabel(tourTypeId));
 				}
 			}
 		});
@@ -2235,7 +2235,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		{
 			if (isTour) {
 				final long tourTypeId = tviTour.getTourTypeId();
-				sb.append(net.tourbook.ui.UI.getInstance().getTourTypeLabel(tourTypeId));
+				sb.append(net.tourbook.ui.UI.getTourTypeLabel(tourTypeId));
 			}
 			sb.append(UI.TAB);
 		}

@@ -53,21 +53,26 @@ public class ActionSaveTourInDatabase extends Action {
 
 	private class PeopleContentProvider implements IStructuredContentProvider {
 
+		@Override
 		public void dispose() {}
 
+		@Override
 		public Object[] getElements(final Object inputElement) {
 			return _people.toArray();
 		}
 
+		@Override
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 	}
 
 	private class PeopleLabelProvider extends LabelProvider implements ITableLabelProvider {
 
+		@Override
 		public Image getColumnImage(final Object element, final int columnIndex) {
 			return null;
 		}
 
+		@Override
 		public String getColumnText(final Object element, final int columnIndex) {
 
 			final TourPerson person = (TourPerson) element;
@@ -92,8 +97,17 @@ public class ActionSaveTourInDatabase extends Action {
 		// setToolTipText("Save tour(s) in the database so it can be viewed in
 		// other views");
 		setEnabled(false);
+	}
 
-		_deviceList = DeviceManager.getExternalDeviceList();
+	private List<ExternalDevice> getDeviceList() {
+
+		if (_deviceList == null) {
+
+			// lazy initialization
+			_deviceList = DeviceManager.getExternalDeviceList();
+		}
+
+		return _deviceList;
 	}
 
 	/**
@@ -107,7 +121,7 @@ public class ActionSaveTourInDatabase extends Action {
 		final String deviceId = person.getDeviceReaderId();
 
 		if (deviceId != null) {
-			for (final ExternalDevice device : _deviceList) {
+			for (final ExternalDevice device : getDeviceList()) {
 				if (deviceId.equals(device.deviceId)) {
 					return " (" + device.visibleName + ")";//$NON-NLS-1$ //$NON-NLS-2$
 				}

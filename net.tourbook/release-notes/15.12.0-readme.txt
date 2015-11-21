@@ -25,6 +25,13 @@ Version 15.12.0 Beta                                  ?. ? 2015
  
  
  * Clicking on the dashboard state icon works sometimes only with the 2nd and further clicks.
+ 
+ 
+ * "Starting tour import ..." message: There is a delay when opening the import view, it is caused by a system function to get device info.
+ 
+ * The device and backup folders are observed but when these folders are deleted/moved this will not be recognized. Workaround: close and reopen the import view.
+ 
+ * Disable device import: Set device folder empty AND deselect create backup.
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

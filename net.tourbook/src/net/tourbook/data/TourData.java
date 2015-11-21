@@ -464,7 +464,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	private String												tourImportFilePath;																		// db-version 6
 
 	/** File name from the import file. */
-	private String												tourImportFileName;																		// db-version 6
+	private String												tourImportFileName;																		// db-version 29
 
 	/**
 	 * Tolerance for the Douglas Peucker algorithm.
@@ -952,11 +952,10 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	public float[]												segmentSeriePulse;
 
 	/**
-	 * Contains the filename from which the data is imported. When <code>null</code> the data is not
-	 * imported it is from the database.
+	 * Keep original import file path, this is used when the tour file should be deleted.
 	 */
 	@Transient
-	public String												importRawDataFile;
+	public String												importFilePathOriginal;
 
 	/**
 	 * Latitude for the center position in the map or {@link Double#MIN_VALUE} when the position is
@@ -5091,6 +5090,80 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	}
 
 	/**
+	 * @return Returns the import file name or <code>null</code> when not available.
+	 */
+	public String getImportFileName() {
+
+		if (tourImportFileName == null || tourImportFileName.length() == 0) {
+			return null;
+		}
+
+		return tourImportFileName;
+	}
+
+	/**
+	 * @return Returns the import file path (folder) or <code>null</code> when not available.
+	 */
+	public String getImportFilePath() {
+
+		if (tourImportFilePath == null || tourImportFilePath.length() == 0) {
+			return null;
+		}
+
+		return tourImportFilePath;
+	}
+
+	/**
+	 * @return Returns the full import file path name or <code>null</code> when not available.
+	 */
+	public String getImportFilePathName() {
+
+		if (tourImportFilePath != null || tourImportFilePath.length() > 0) {
+
+			try {
+
+				final Path importPath = Paths.get(tourImportFilePath, tourImportFileName);
+
+				return importPath.toString();
+
+			} catch (final Exception e) {
+				// folder can be invalid
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * @return Returns the full import file path name or an empty string when not available.
+	 */
+	public String getImportFilePathNameText() {
+
+		if (tourImportFilePath == null || tourImportFilePath.length() == 0) {
+
+			if (isManualTour()) {
+				return UI.EMPTY_STRING;
+			} else {
+				return Messages.tour_data_label_feature_since_version_9_01;
+			}
+
+		} else {
+
+			try {
+
+				final Path importPath = Paths.get(tourImportFilePath, tourImportFileName);
+
+				return importPath.toString();
+
+			} catch (final Exception e) {
+				// folder can be invalid
+			}
+		}
+
+		return UI.EMPTY_STRING;
+	}
+
+	/**
 	 * @return the maxAltitude
 	 */
 	public float getMaxAltitude() {
@@ -5654,48 +5727,6 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		return tourId;
 	}
 
-	public String getTourImportFileName() {
-		return tourImportFileName;
-	}
-
-	public String getTourImportFilePath() {
-
-		if ((tourImportFilePath == null) || (tourImportFilePath.length() == 0)) {
-
-			if (isManualTour()) {
-				return UI.EMPTY_STRING;
-			} else {
-				return Messages.tour_data_label_feature_since_version_9_01;
-			}
-
-		} else {
-
-			try {
-
-				final Path importPath = Paths.get(tourImportFilePath, tourImportFileName);
-
-				return importPath.toString();
-
-			} catch (final Exception e) {
-				// folder can be invalid
-			}
-		}
-
-		return UI.EMPTY_STRING;
-	}
-
-	/**
-	 * @return Returns the import file path or <code>null</code> when not available.
-	 */
-	public String getTourImportFilePathRaw() {
-
-		if ((tourImportFilePath == null) || (tourImportFilePath.length() == 0)) {
-			return null;
-		} else {
-			return tourImportFilePath;
-		}
-	}
-
 	/**
 	 * @return Returns a set with all {@link TourMarker} for the tour or an empty set when markers
 	 *         are not available.
@@ -5985,15 +6016,6 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		}
 
 		return timeSerieWithTimeZoneAdjustment != null;
-	}
-
-	public boolean isTourImportFilePathAvailable() {
-
-		if (tourImportFilePath != null && tourImportFilePath.length() > 0) {
-			return true;
-		}
-
-		return false;
 	}
 
 	/**
@@ -6471,6 +6493,44 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	}
 
 	/**
+	 * Set only the import folder.
+	 * 
+	 * @param backupOSFolder
+	 */
+	public void setImportBackupFileFolder(final String backupOSFolder) {
+
+		// keep original which is used when this file and the backup file should be deleted
+		this.importFilePathOriginal = tourImportFilePath;
+
+		// overwrite import file path with the backup folder
+		this.tourImportFilePath = backupOSFolder;
+	}
+
+	/**
+	 * Sets the file path (folder + file name) for the imported file, this is displayed in the
+	 * {@link TourDataEditorView}
+	 * 
+	 * @param tourImportFilePath
+	 */
+	public void setImportFilePath(final String tourImportFilePath) {
+
+		try {
+
+			final Path filePath = Paths.get(tourImportFilePath);
+
+			final Path fileName = filePath.getFileName();
+			final Path folderPath = filePath.getParent();
+
+			// extract file name
+			this.tourImportFileName = fileName.toString();
+			this.tourImportFilePath = folderPath.toString();
+
+		} catch (final Exception e) {
+			// folder can be invalid
+		}
+	}
+
+	/**
 	 * Set state if the distance is from a sensor or not, default is <code>false</code>
 	 * 
 	 * @param isFromSensor
@@ -6633,29 +6693,6 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 
 	private void setTourEndTimeMS() {
 		tourEndTime = tourStartTime + (tourRecordingTime * 1000);
-	}
-
-	/**
-	 * Sets the file path for the imported file, this is displayed in the {@link TourDataEditorView}
-	 * 
-	 * @param tourImportFilePath
-	 */
-	public void setTourImportFilePath(final String tourImportFilePath) {
-
-		try {
-
-			final Path filePath = Paths.get(tourImportFilePath);
-
-			final Path fileName = filePath.getFileName();
-			final Path folderPath = filePath.getParent();
-
-			// extract file name
-			this.tourImportFileName = fileName.toString();
-			this.tourImportFilePath = folderPath.toString();
-
-		} catch (final Exception e) {
-			// folder can be invalid
-		}
 	}
 
 	public void setTourMarkers(final Set<TourMarker> tourMarkers) {

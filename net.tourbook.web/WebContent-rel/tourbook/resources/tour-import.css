@@ -260,7 +260,8 @@ a.action-button:HOVER
 	max-height:				80vh;
 }
 	
-.importState:hover	.stateTooltip
+.importState:HOVER	.stateTooltip,
+.importState:FOCUS	.stateTooltip
 {
 	display:				inline; 
 	position:				absolute; 

@@ -113,8 +113,7 @@ public class PolarPDDDataReader extends TourbookDevice {
 		 */
 		exerciseData.setTourStartTime(_currentExercise.startTime);
 
-		exerciseData.importRawDataFile = _importFilePath;
-		exerciseData.setTourImportFilePath(_importFilePath);
+		exerciseData.setImportFilePath(_importFilePath);
 
 		// set title
 		final String title = _currentExercise.title;
@@ -196,8 +195,7 @@ public class PolarPDDDataReader extends TourbookDevice {
 		}
 
 		// overwrite path and set it to pdd file so that a reimport works
-		hrmTourData.importRawDataFile = _importFilePath;
-		hrmTourData.setTourImportFilePath(_importFilePath);
+		hrmTourData.setImportFilePath(_importFilePath);
 
 		// set title
 		final String title = _currentExercise.title;
@@ -447,6 +445,7 @@ public class PolarPDDDataReader extends TourbookDevice {
 		return null;
 	}
 
+	@Override
 	public String getDeviceModeName(final int profileId) {
 		return null;
 	}
@@ -477,6 +476,7 @@ public class PolarPDDDataReader extends TourbookDevice {
 		}
 	}
 
+	@Override
 	public int getTransferDataSize() {
 		return -1;
 	}
@@ -1008,6 +1008,7 @@ public class PolarPDDDataReader extends TourbookDevice {
 	/**
 	 * @return Return <code>true</code> when the file has a valid .hrm data format
 	 */
+	@Override
 	public boolean validateRawData(final String fileName) {
 
 		BufferedReader fileReader = null;

@@ -203,6 +203,7 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 		// System.out.println("Up: " + logUp + " Down: " + logDown);
 	}
 
+	@Override
 	public String getDeviceModeName(final int profileId) {
 
 		// 1: run
@@ -248,6 +249,7 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 		return 4;
 	}
 
+	@Override
 	public int getTransferDataSize() {
 		return 0x1009A;
 	}
@@ -338,8 +340,7 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 
 				final TourData tourData = new TourData();
 
-				tourData.importRawDataFile = importFilePath;
-				tourData.setTourImportFilePath(importFilePath);
+				tourData.setImportFilePath(importFilePath);
 
 				/*
 				 * save AA record data
@@ -675,6 +676,7 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 	 * 
 	 * @return true for a valid HAC4Pro data format
 	 */
+	@Override
 	public boolean validateRawData(final String fileName) {
 
 		boolean isValid = false;

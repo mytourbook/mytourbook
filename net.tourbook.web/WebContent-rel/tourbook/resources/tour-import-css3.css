@@ -26,7 +26,8 @@ a.import-tile:FOCUS
 								farthest-corner at 50% 120%, 
 								#47A3FF 0%, 
 								rgba(255, 255, 255, 0.0) 50%, 
-								rgba(255, 255, 255, 0.0) 100%);
+								rgba(255, 255, 255, 0.0) 100%
+							);
 }
 
 a.import-tile:HOVER:FOCUS

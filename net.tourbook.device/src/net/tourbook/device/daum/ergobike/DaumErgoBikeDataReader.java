@@ -58,6 +58,7 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 		return false;
 	}
 
+	@Override
 	public String getDeviceModeName(final int profileId) {
 		return null;
 	}
@@ -72,6 +73,7 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 		return -1;
 	}
 
+	@Override
 	public int getTransferDataSize() {
 		return -1;
 	}
@@ -184,8 +186,7 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 			tourData.setDeviceMode((short) 0);
 			tourData.setDeviceTimeInterval((short) -1);
 
-			tourData.importRawDataFile = importFilePath;
-			tourData.setTourImportFilePath(importFilePath);
+			tourData.setImportFilePath(importFilePath);
 
 			/*
 			 * set time serie from the imported trackpoints
@@ -302,6 +303,7 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 	 * 
 	 * @return true for a valid .crp data format
 	 */
+	@Override
 	public boolean validateRawData(final String fileName) {
 
 		BufferedReader fileReader = null;

@@ -554,8 +554,7 @@ public class GarminSAXHandler extends DefaultHandler {
 
 		tourData.setIsDistanceFromSensor(_isDistanceFromSensor);
 		tourData.setDeviceTimeInterval((short) -1);
-		tourData.importRawDataFile = _importFilePath;
-		tourData.setTourImportFilePath(_importFilePath);
+		tourData.setImportFilePath(_importFilePath);
 
 		tourData.setDeviceModeName(_activitySport);
 		tourData.setCalories(_tourCalories);

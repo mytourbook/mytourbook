@@ -92,8 +92,7 @@ public class FitContext {
 //				tourData.setTourTitle(getTourTitle());
 //				tourData.setTourDescription(getTourDescription());
 
-				tourData.importRawDataFile = _importFilePathName;
-				tourData.setTourImportFilePath(_importFilePathName);
+				tourData.setImportFilePath(_importFilePathName);
 
 				tourData.setDeviceId(getDeviceId());
 				tourData.setDeviceName(getDeviceName());

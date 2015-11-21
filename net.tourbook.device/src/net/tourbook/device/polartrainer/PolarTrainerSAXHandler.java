@@ -384,9 +384,7 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
 
 		tourData.setDeviceTimeInterval(_currentExercise.timeInterval);
 
-		tourData.importRawDataFile = _importFilePath;
-
-		tourData.setTourImportFilePath(_importFilePath);
+		tourData.setImportFilePath(_importFilePath);
 
 		tourData.setTourTitle(_currentExercise.tourTitle);
 		tourData.setCalories(_currentExercise.calories);

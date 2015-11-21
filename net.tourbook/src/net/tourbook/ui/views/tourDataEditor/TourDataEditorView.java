@@ -6594,9 +6594,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				: Messages.Tour_Editor_Label_Sensor_No);
 
 		// import file path
-		final String importFilePath = _tourData.isTourImportFilePathAvailable()
-				? _tourData.getTourImportFilePath()
-				: UI.EMPTY_STRING;
+		final String importFilePath = _tourData.getImportFilePathNameText();
 		_txtImportFilePath.setText(importFilePath);
 		_txtImportFilePath.setToolTipText(importFilePath);
 

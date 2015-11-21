@@ -627,74 +627,60 @@ public class RawDataManager {
 
 				final Shell activeShell = Display.getDefault().getActiveShell();
 
-				/*
-				 * use path when tour is already imported
-				 */
-				final String importedFilePath = tourData.importRawDataFile;
-				if (importedFilePath != null) {
+				// get import file name
+				final String oldImportFilePathName = tourData.getImportFilePathName();
+
+				if (oldImportFilePathName == null) {
+
+					// in older versions the file path name is not saved
+
+					final String tourDateTimeShort = TourManager.getTourDateTimeShort(tourData);
+
+					MessageDialog.openInformation(
+							activeShell,
+							NLS.bind(Messages.Import_Data_Dialog_Reimport_Title, tourDateTimeShort),
+							NLS.bind(Messages.Import_Data_Dialog_GetReimportedFilePath_Message,//
+									tourDateTimeShort,
+									tourDateTimeShort));
+
+				} else {
+
 					// check import file
-					final File importFile = new File(importedFilePath);
+					final File importFile = new File(oldImportFilePathName);
 					if (importFile.exists()) {
-						reimportFilePathName[0] = importedFilePath;
-					}
-				}
 
-				String oldImportFilePathName = null;
-
-				if (reimportFilePathName[0] == null) {
-
-					// get import file name
-					oldImportFilePathName = tourData.getTourImportFilePathRaw();
-					if (oldImportFilePathName == null) {
-
-						final String tourDateTimeShort = TourManager.getTourDateTimeShort(tourData);
-						MessageDialog.openInformation(
-								activeShell,
-								NLS.bind(Messages.Import_Data_Dialog_Reimport_Title, tourDateTimeShort),
-								NLS.bind(Messages.Import_Data_Dialog_GetReimportedFilePath_Message,//
-										tourDateTimeShort,
-										tourDateTimeShort));
+						reimportFilePathName[0] = oldImportFilePathName;
 
 					} else {
 
-						// check import file
-						final File importFile = new File(oldImportFilePathName);
-						if (importFile.exists()) {
+						if (_previousSelectedReimportFolder != null) {
 
-							reimportFilePathName[0] = oldImportFilePathName;
+							/*
+							 * try to use the folder from the previously reimported tour
+							 */
 
-						} else {
+							final String oldImportFileName = new org.eclipse.core.runtime.Path(oldImportFilePathName)
+									.lastSegment();
+							final IPath newImportFilePath = _previousSelectedReimportFolder.append(oldImportFileName);
 
-							if (_previousSelectedReimportFolder != null) {
+							final String newImportFilePathName = newImportFilePath.toOSString();
+							final File newImportFile = new File(newImportFilePathName);
+							if (newImportFile.exists()) {
 
-								/*
-								 * try to use the folder from the previously reimported tour
-								 */
-
-								final String oldImportFileName = new org.eclipse.core.runtime.Path(
-										oldImportFilePathName).lastSegment();
-								final IPath newImportFilePath = _previousSelectedReimportFolder
-										.append(oldImportFileName);
-
-								final String newImportFilePathName = newImportFilePath.toOSString();
-								final File newImportFile = new File(newImportFilePathName);
-								if (newImportFile.exists()) {
-
-									// reimport file exists in the same folder
-									reimportFilePathName[0] = newImportFilePathName;
-								}
+								// reimport file exists in the same folder
+								reimportFilePathName[0] = newImportFilePathName;
 							}
+						}
 
-							if (reimportFilePathName[0] == null) {
+						if (reimportFilePathName[0] == null) {
 
-								MessageDialog.openInformation(
-								//
-										activeShell,
-										Messages.import_data_dlg_reimport_title,
-										NLS.bind(
-												Messages.Import_Data_Dialog_GetAlternativePath_Message,
-												oldImportFilePathName));
-							}
+							MessageDialog.openInformation(
+							//
+									activeShell,
+									Messages.import_data_dlg_reimport_title,
+									NLS.bind(
+											Messages.Import_Data_Dialog_GetAlternativePath_Message,
+											oldImportFilePathName));
 						}
 					}
 				}
@@ -727,6 +713,7 @@ public class RawDataManager {
 		});
 
 		if (reimportFilePathName[0] == null) {
+
 			// user has canceled the file dialog
 			return null;
 		}
@@ -766,7 +753,7 @@ public class RawDataManager {
 				isTourReImported = true;
 
 				// set reimport file path as new location
-				newTourData.setTourImportFilePath(reimportedFile.getAbsolutePath());
+				newTourData.setImportFilePath(reimportedFile.getAbsolutePath());
 
 				// check if tour is saved
 				final TourPerson tourPerson = oldTourData.getTourPerson();
@@ -1487,8 +1474,8 @@ public class RawDataManager {
 		}
 
 		/*
-		 * Check if all tours from a file are removed, when yes, remove file path that the file will
-		 * not reimported. When at least one tour is still used, all tours will be reimported
+		 * Check if all tours from a file are removed, when yes, remove file path that the file can
+		 * not be reimported. When at least one tour is still used, all tours will be reimported
 		 * because it's not yet saved which tours are removed from a file and which are not.
 		 */
 		for (final Object item : oldFileNames) {
@@ -1499,7 +1486,7 @@ public class RawDataManager {
 
 				for (final TourData tourData : _toursInImportView.values()) {
 
-					final String tourFilePath = tourData.getTourImportFilePathRaw();
+					final String tourFilePath = tourData.getImportFilePath();
 
 					if (tourFilePath != null && tourFilePath.equals(oldFilePath)) {
 						isNeeded = true;
@@ -1508,6 +1495,7 @@ public class RawDataManager {
 				}
 
 				if (isNeeded == false) {
+
 					// file path is not needed any more
 					_importedFileNames.remove(oldFilePath);
 				}
@@ -1658,7 +1646,7 @@ public class RawDataManager {
 					/*
 					 * tour is saved in the database, set rawdata file name to display the filepath
 					 */
-					dbTourData.importRawDataFile = mapTourData.importRawDataFile;
+//					dbTourData.importRawDataFile = mapTourData.importRawDataFile;
 
 					final Long dbTourId = dbTourData.getTourId();
 

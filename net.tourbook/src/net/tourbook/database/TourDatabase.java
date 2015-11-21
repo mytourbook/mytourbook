@@ -2561,7 +2561,7 @@ public class TourDatabase {
 				//
 				// version 27 end ---------
 
-				// version 29 start  -  15.10
+				// version 29 start  -  15.12
 				//
 				+ "	TourImportFileName		VARCHAR(" + TourData.DB_LENGTH_TOUR_IMPORT_FILE_NAME + "),		\n" //$NON-NLS-1$ //$NON-NLS-2$
 				//

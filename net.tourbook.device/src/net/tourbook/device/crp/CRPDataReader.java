@@ -47,6 +47,7 @@ public class CRPDataReader extends TourbookDevice {
 		return false;
 	}
 
+	@Override
 	public String getDeviceModeName(final int profileId) {
 
 		// 0: Run
@@ -88,6 +89,7 @@ public class CRPDataReader extends TourbookDevice {
 		return -1;
 	}
 
+	@Override
 	public int getTransferDataSize() {
 		return -1;
 	}
@@ -223,8 +225,7 @@ public class CRPDataReader extends TourbookDevice {
 
 			tourData.setDeviceTimeInterval((short) interval);
 
-			tourData.importRawDataFile = importFilePath;
-			tourData.setTourImportFilePath(importFilePath);
+			tourData.setImportFilePath(importFilePath);
 
 			// tourData.setStartDistance((int) DeviceReaderTools.get4ByteData(buffer, 8));
 			// tourData.setStartAltitude((short) DeviceReaderTools.get2ByteData(buffer, 12));
@@ -407,6 +408,7 @@ public class CRPDataReader extends TourbookDevice {
 	 * 
 	 * @return true for a valid .crp data format
 	 */
+	@Override
 	public boolean validateRawData(final String fileName) {
 
 		BufferedReader fileReader = null;

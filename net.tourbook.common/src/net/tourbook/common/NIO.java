@@ -57,7 +57,7 @@ public class NIO {
 			// replace device name with drive letter, [MEDIA]\CACHE ->  D:\CACHE
 
 			final String deviceName = parseDeviceName(folder);
-			final Iterable<FileStore> fileStores = FileSystems.getDefault().getFileStores();
+			final Iterable<FileStore> fileStores = getFileStores();
 
 			for (final FileStore store : fileStores) {
 
@@ -82,6 +82,13 @@ public class NIO {
 		}
 
 		return osPath;
+	}
+
+	public static Iterable<FileStore> getFileStores() {
+
+		final Iterable<FileStore> fileStores = FileSystems.getDefault().getFileStores();
+
+		return fileStores;
 	}
 
 	/**

@@ -576,8 +576,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
 
 			tourData.setTourDescription(tourDescription.toString());
 
-			tourData.importRawDataFile = importFilePath;
-			tourData.setTourImportFilePath(importFilePath);
+			tourData.setImportFilePath(importFilePath);
 
 			/*
 			 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

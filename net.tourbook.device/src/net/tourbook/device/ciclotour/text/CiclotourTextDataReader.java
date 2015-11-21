@@ -103,6 +103,7 @@ public class CiclotourTextDataReader extends TourbookDevice {
 		return cal;
 	}
 
+	@Override
 	public String getDeviceModeName(final int modeId) {
 		return null;
 	}
@@ -130,6 +131,7 @@ public class CiclotourTextDataReader extends TourbookDevice {
 		return -1;
 	}
 
+	@Override
 	public int getTransferDataSize() {
 		return -1;
 	}
@@ -251,8 +253,7 @@ public class CiclotourTextDataReader extends TourbookDevice {
 
 			tourData.setStartDistance(Math.round(distance));
 
-			tourData.importRawDataFile = importFilePath;
-			tourData.setTourImportFilePath(importFilePath);
+			tourData.setImportFilePath(importFilePath);
 
 			tourData.setDeviceId(deviceId);
 			tourData.setDeviceName(visibleName);
@@ -294,6 +295,7 @@ public class CiclotourTextDataReader extends TourbookDevice {
 	 * @return <code>true</code> if the file appears to be a valid CicloTour Text file, otherwise
 	 *         <code>false</code>.
 	 */
+	@Override
 	public boolean validateRawData(final String fileName) {
 
 		BufferedReader reader = null;

@@ -133,6 +133,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 		return false;
 	}
 
+	@Override
 	public String getDeviceModeName(final int profileId) {
 
 		// "81" jogging
@@ -179,6 +180,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 		return null;
 	}
 
+	@Override
 	public int getTransferDataSize() {
 		return HAC4_DATA_SIZE;
 	}
@@ -257,8 +259,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 				final TourData tourData = new TourData();
 
 				tourData.setDeviceTimeInterval(HAC4_TIMESLICE);
-				tourData.importRawDataFile = importFilePath;
-				tourData.setTourImportFilePath(importFilePath);
+				tourData.setImportFilePath(importFilePath);
 
 				final StartBlock startBlock = readStartBlock(fileRawData, tourData);
 
@@ -678,6 +679,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 	 * 
 	 * @return true for a valid HAC4 data format
 	 */
+	@Override
 	public boolean validateRawData(final String fileName) {
 
 		boolean isValid = false;

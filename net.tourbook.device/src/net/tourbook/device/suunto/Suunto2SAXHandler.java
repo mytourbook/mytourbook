@@ -330,6 +330,7 @@ public class Suunto2SAXHandler extends DefaultHandler {
 						} catch (final ParseException e3) {
 
 							Display.getDefault().syncExec(new Runnable() {
+								@Override
 								public void run() {
 									final String message = e3.getMessage();
 									MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", message); //$NON-NLS-1$
@@ -437,8 +438,7 @@ public class Suunto2SAXHandler extends DefaultHandler {
 		tourData.setTourStartTime(new DateTime(_sampleList.get(0).absoluteTime));
 
 		tourData.setDeviceTimeInterval((short) -1);
-		tourData.importRawDataFile = _importFilePath;
-		tourData.setTourImportFilePath(_importFilePath);
+		tourData.setImportFilePath(_importFilePath);
 
 		tourData.setCalories(_tourCalories);
 

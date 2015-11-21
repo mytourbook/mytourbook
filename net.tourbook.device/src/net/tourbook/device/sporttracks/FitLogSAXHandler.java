@@ -266,8 +266,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 			tourData.setAvgTemperature(weatherTemperature);
 		}
 
-		tourData.importRawDataFile = _importFilePath;
-		tourData.setTourImportFilePath(_importFilePath);
+		tourData.setImportFilePath(_importFilePath);
 
 		tourData.setDeviceTimeInterval((short) -1);
 
