@@ -118,16 +118,16 @@ import org.eclipse.ui.part.PageBook;
  */
 public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourViewer {
 
-	private static final String				ID									= "net.tourbook.importdata.DialogDeviceImportConfig";	//$NON-NLS-1$
+	private static final String				ID									= "DialogDeviceImportConfig";			//$NON-NLS-1$
 	//
-	private static final String				STATE_BACKUP_DEVICE_HISTORY_ITEMS	= "STATE_BACKUP_DEVICE_HISTORY_ITEMS";					//$NON-NLS-1$
-	private static final String				STATE_BACKUP_FOLDER_HISTORY_ITEMS	= "STATE_BACKUP_FOLDER_HISTORY_ITEMS";					//$NON-NLS-1$
-	private static final String				STATE_DEVICE_DEVICE_HISTORY_ITEMS	= "STATE_DEVICE_DEVICE_HISTORY_ITEMS";					//$NON-NLS-1$
-	private static final String				STATE_DEVICE_FOLDER_HISTORY_ITEMS	= "STATE_DEVICE_FOLDER_HISTORY_ITEMS";					//$NON-NLS-1$
-	private static final String				STATE_IMPORT_LAUNCHER				= "STATE_IMPORT_LAUNCHER";								//$NON-NLS-1$
+	private static final String				STATE_BACKUP_DEVICE_HISTORY_ITEMS	= "STATE_BACKUP_DEVICE_HISTORY_ITEMS";	//$NON-NLS-1$
+	private static final String				STATE_BACKUP_FOLDER_HISTORY_ITEMS	= "STATE_BACKUP_FOLDER_HISTORY_ITEMS";	//$NON-NLS-1$
+	private static final String				STATE_DEVICE_DEVICE_HISTORY_ITEMS	= "STATE_DEVICE_DEVICE_HISTORY_ITEMS";	//$NON-NLS-1$
+	private static final String				STATE_DEVICE_FOLDER_HISTORY_ITEMS	= "STATE_DEVICE_FOLDER_HISTORY_ITEMS";	//$NON-NLS-1$
+	private static final String				STATE_IMPORT_LAUNCHER				= "STATE_IMPORT_LAUNCHER";				//$NON-NLS-1$
 	//
-	private static final String				DATA_KEY_TOUR_TYPE_ID				= "DATA_KEY_TOUR_TYPE_ID";								//$NON-NLS-1$
-	private static final String				DATA_KEY_VERTEX_INDEX				= "DATA_KEY_VERTEX_INDEX";								//$NON-NLS-1$
+	private static final String				DATA_KEY_TOUR_TYPE_ID				= "DATA_KEY_TOUR_TYPE_ID";				//$NON-NLS-1$
+	private static final String				DATA_KEY_VERTEX_INDEX				= "DATA_KEY_VERTEX_INDEX";				//$NON-NLS-1$
 	//
 	private static final int				CONTROL_DECORATION_WIDTH			= 6;
 	private static final int				VERTICAL_GROUP_DISTANCE				= 0;
@@ -1289,36 +1289,39 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 				.applyTo(_chkIL_SetTourType);
 
 		/*
-		 * Label: Tour type
+		 * Tour type options
 		 */
-		_lblIL_TourType = new Label(parent, SWT.NONE);
-		_lblIL_TourType.setText(Messages.Dialog_ImportConfig_Label_TourType);
-		GridDataFactory.fillDefaults()//
-				.align(SWT.FILL, SWT.CENTER)
-				.indent(convertHorizontalDLUsToPixels(11), 0)
-				.applyTo(_lblIL_TourType);
-
-		_comboIL_Config = new Combo(parent, SWT.READ_ONLY);
-		_comboIL_Config.addSelectionListener(ttListener);
-
-		// fill combo
-		for (final ComboEnumEntry<?> tourTypeItem : RawDataManager.ALL_IMPORT_TOUR_TYPE_CONFIG) {
-			_comboIL_Config.add(tourTypeItem.label);
-		}
-
-		// fill left column
-//		new Label(parent, SWT.NONE);
-
-		_pagebookTourType = new PageBook(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-				.grab(true, true)
-				.span(2, 1)
-				.indent(_leftPadding, 0)
-				.applyTo(_pagebookTourType);
 		{
-			_pageTourType_NoTourType = createUI_81_Page_NoTourType(_pagebookTourType);
-			_pageTourType_OneForAll = createUI_82_Page_OneForAll(_pagebookTourType);
-			_pageTourType_BySpeed = createUI_83_Page_BySpeed(_pagebookTourType);
+			// label
+			_lblIL_TourType = new Label(parent, SWT.NONE);
+			_lblIL_TourType.setText(Messages.Dialog_ImportConfig_Label_TourType);
+			GridDataFactory.fillDefaults()//
+					.align(SWT.FILL, SWT.CENTER)
+					.indent(convertHorizontalDLUsToPixels(11), 0)
+					.applyTo(_lblIL_TourType);
+
+			// combo
+			_comboIL_Config = new Combo(parent, SWT.READ_ONLY);
+			_comboIL_Config.addSelectionListener(ttListener);
+
+			// fill combo
+			for (final ComboEnumEntry<?> tourTypeItem : RawDataManager.ALL_IMPORT_TOUR_TYPE_CONFIG) {
+				_comboIL_Config.add(tourTypeItem.label);
+			}
+
+			// options
+			_pagebookTourType = new PageBook(parent, SWT.NONE);
+			GridDataFactory.fillDefaults()//
+					.grab(true, true)
+					.span(2, 1)
+					.indent(_leftPadding, 0)
+					.hint(SWT.DEFAULT, convertHeightInCharsToPixels(10))
+					.applyTo(_pagebookTourType);
+			{
+				_pageTourType_NoTourType = createUI_81_Page_NoTourType(_pagebookTourType);
+				_pageTourType_OneForAll = createUI_82_Page_OneForAll(_pagebookTourType);
+				_pageTourType_BySpeed = createUI_83_Page_BySpeed(_pagebookTourType);
+			}
 		}
 	}
 

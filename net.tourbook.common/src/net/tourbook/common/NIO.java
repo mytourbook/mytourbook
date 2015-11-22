@@ -86,7 +86,13 @@ public class NIO {
 
 	public static Iterable<FileStore> getFileStores() {
 
+//		final long start = System.nanoTime();
+//
 		final Iterable<FileStore> fileStores = FileSystems.getDefault().getFileStores();
+//
+//		System.out.println((UI.timeStampNano() + " " + NIO.class.getName() + " \t")
+//				+ (((float) (System.nanoTime() - start) / 1000000) + " ms"));
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		return fileStores;
 	}

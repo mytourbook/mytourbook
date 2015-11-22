@@ -65,31 +65,31 @@ import org.eclipse.ui.XMLMemento;
 
 public class DeviceImportManager {
 
-	private static final String			ID									= "net.tourbook.importdata.DeviceImportManager";	//$NON-NLS-1$
+	private static final String			ID									= "DeviceImportManager";			//$NON-NLS-1$
 	//
-	private static final String			XML_STATE_DEVICE_IMPORT_CONFIG		= "XML_STATE_DEVICE_IMPORT_CONFIG";				//$NON-NLS-1$
+	private static final String			XML_STATE_DEVICE_IMPORT_CONFIG		= "XML_STATE_DEVICE_IMPORT_CONFIG"; //$NON-NLS-1$
 	//
-	private static final String			TAG_IMPORT_CONFIG					= "Config";										//$NON-NLS-1$
-	private static final String			TAG_IMPORT_CONFIG_ROOT				= "DeviceImportConfig";							//$NON-NLS-1$
-	private static final String			TAG_SPEED_VERTEX					= "Speed";											//$NON-NLS-1$
+	private static final String			TAG_IMPORT_CONFIG					= "Config";						//$NON-NLS-1$
+	private static final String			TAG_IMPORT_CONFIG_ROOT				= "DeviceImportConfig";			//$NON-NLS-1$
+	private static final String			TAG_SPEED_VERTEX					= "Speed";							//$NON-NLS-1$
 	//
-	private static final String			ATTR_ANIMATION_CRAZY_FACTOR			= "animationCrazyFactor";							//$NON-NLS-1$
-	private static final String			ATTR_ANIMATION_DURATION				= "animationDuration";								//$NON-NLS-1$
-	private static final String			ATTR_AVG_SPEED						= "avgSpeed";										//$NON-NLS-1$
-	private static final String			ATTR_BACKGROUND_OPACITY				= "backgroundOpacity";								//$NON-NLS-1$
-	private static final String			ATTR_BACKUP_FOLDER					= "backupFolder";									//$NON-NLS-1$
-	private static final String			ATTR_DEVICE_FOLDER					= "deviceFolder";									//$NON-NLS-1$
-	private static final String			ATTR_IS_CREATE_BACKUP				= "isCreateBackup";								//$NON-NLS-1$
-	private static final String			ATTR_IS_LAST_LAUNCHER_REMOVED		= "isLastLauncherRemoved";							//$NON-NLS-1$
-	private static final String			ATTR_IS_LIVE_UPDATE					= "isLiveUpdate";									//$NON-NLS-1$
-	private static final String			ATTR_LAUNCHER_DESCRIPTION			= "description";									//$NON-NLS-1$
-	private static final String			ATTR_LAUNCHER_NAME					= "name";											//$NON-NLS-1$
-	private static final String			ATTR_LAUNCHER_IS_SAVE_TOUR			= "isSaveTour";									//$NON-NLS-1$
-	private static final String			ATTR_LAUNCHER_IS_SHOW_IN_DASHBOARD	= "isShowInDashBoard";								//$NON-NLS-1$
-	private static final String			ATTR_NUM_UI_COLUMNS					= "uiColumns";										//$NON-NLS-1$
-	private static final String			ATTR_TILE_SIZE						= "tileSize";										//$NON-NLS-1$
-	private static final String			ATTR_TOUR_TYPE_CONFIG				= "tourTypeConfig";								//$NON-NLS-1$
-	private static final String			ATTR_TOUR_TYPE_ID					= "tourTypeId";									//$NON-NLS-1$
+	private static final String			ATTR_ANIMATION_CRAZY_FACTOR			= "animationCrazyFactor";			//$NON-NLS-1$
+	private static final String			ATTR_ANIMATION_DURATION				= "animationDuration";				//$NON-NLS-1$
+	private static final String			ATTR_AVG_SPEED						= "avgSpeed";						//$NON-NLS-1$
+	private static final String			ATTR_BACKGROUND_OPACITY				= "backgroundOpacity";				//$NON-NLS-1$
+	private static final String			ATTR_BACKUP_FOLDER					= "backupFolder";					//$NON-NLS-1$
+	private static final String			ATTR_DEVICE_FOLDER					= "deviceFolder";					//$NON-NLS-1$
+	private static final String			ATTR_IS_CREATE_BACKUP				= "isCreateBackup";				//$NON-NLS-1$
+	private static final String			ATTR_IS_LAST_LAUNCHER_REMOVED		= "isLastLauncherRemoved";			//$NON-NLS-1$
+	private static final String			ATTR_IS_LIVE_UPDATE					= "isLiveUpdate";					//$NON-NLS-1$
+	private static final String			ATTR_LAUNCHER_DESCRIPTION			= "description";					//$NON-NLS-1$
+	private static final String			ATTR_LAUNCHER_NAME					= "name";							//$NON-NLS-1$
+	private static final String			ATTR_LAUNCHER_IS_SAVE_TOUR			= "isSaveTour";					//$NON-NLS-1$
+	private static final String			ATTR_LAUNCHER_IS_SHOW_IN_DASHBOARD	= "isShowInDashBoard";				//$NON-NLS-1$
+	private static final String			ATTR_NUM_UI_COLUMNS					= "uiColumns";						//$NON-NLS-1$
+	private static final String			ATTR_TILE_SIZE						= "tileSize";						//$NON-NLS-1$
+	private static final String			ATTR_TOUR_TYPE_CONFIG				= "tourTypeConfig";				//$NON-NLS-1$
+	private static final String			ATTR_TOUR_TYPE_ID					= "tourTypeId";					//$NON-NLS-1$
 	//
 	static final int					CONFIG_SPEED_MIN					= 0;
 	static final int					CONFIG_SPEED_MAX					= 3000;
@@ -629,12 +629,12 @@ public class DeviceImportManager {
 
 				return importState;
 			}
-		}
 
-		// folder are valid, run the backup
-		final boolean isCanceled = runImport_Backup();
-		if (isCanceled) {
-			return importState;
+			// folder is valid, run the backup
+			final boolean isCanceled = runImport_Backup();
+			if (isCanceled) {
+				return importState;
+			}
 		}
 
 		/*
@@ -762,9 +762,9 @@ public class DeviceImportManager {
 
 				// set backup file path
 				tourData.setImportBackupFileFolder(backupOSFolder);
-
-				importState.isUpdateImportViewer = true;
 			}
+
+			importState.isUpdateImportViewer = true;
 		}
 	}
 

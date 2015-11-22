@@ -1098,6 +1098,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		final ImportConfig importConfig = getImportConfig();
 
 		String html = null;
+		final String hrefAction = HTTP_DUMMY + HREF_SETUP_DEVICE_IMPORT;
 
 		if (isUpdateFolder) {
 
@@ -1186,7 +1187,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			/*
 			 * Different html
 			 */
-			final String hrefAction = HTTP_DUMMY + HREF_SETUP_DEVICE_IMPORT;
 			final String imageUrl = isFolderOK ? _imageUrl_DeviceFolder_OK : _imageUrl_DeviceFolder_NotAvailable;
 			final String stateImage = createHTML_BgImage(imageUrl);
 			final String stateIconValue = isDeviceFolderOK ? Integer.toString(numNotImported) : UI.EMPTY_STRING;
@@ -1215,8 +1215,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		} else {
 
 			/*
-			 * Create the startup state without the device info because this is retrieved in a
-			 * background thread otherwise it is blocking the UI !!!
+			 * On startup, set the folder state without device info because this is retrieved in a
+			 * background thread, when not it is blocking the UI !!!
 			 */
 
 			final String stateImage = createHTML_BgImage(_imageUrl_DeviceFolder_NotChecked);
@@ -1225,14 +1225,16 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			html = ""// //$NON-NLS-1$
 
-					+ "<div class='importState'>" // //$NON-NLS-1$
+					+ "<a class='importState'" // //$NON-NLS-1$
+					+ (" href='" + hrefAction + "'") //$NON-NLS-1$ //$NON-NLS-2$
+					+ ">" //$NON-NLS-1$
 
 					+ ("<div class='stateIcon' " + stateImage + ">") //$NON-NLS-1$ //$NON-NLS-2$
 					+ ("   <div class='stateIconValue'></div>") //$NON-NLS-1$
 					+ ("</div>") //$NON-NLS-1$
 					+ ("<div class='stateTooltip'>" + htmlTooltip + "</div>") //$NON-NLS-1$ //$NON-NLS-2$
 
-					+ "</div>"; //$NON-NLS-1$
+					+ "</a>"; //$NON-NLS-1$
 		}
 
 		return html;
@@ -2935,32 +2937,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			_browser.setRedraw(true);
 		}
 
-//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//				+ ("\tonBrowser_Completed: " + event));
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
-//		if (_reloadedTourMarkerId == null) {
-//			return;
-//		}
-//
-//		// get local copy
-//		final long reloadedTourMarkerId = _reloadedTourMarkerId;
-//
-//		/*
-//		 * This must be run async otherwise an endless loop will happen
-//		 */
-//		_browser.getDisplay().asyncExec(new Runnable() {
-//			@Override
-//			public void run() {
-//
-//				final String href = "location.href='" + createHtml_MarkerName(reloadedTourMarkerId) + "'"; //$NON-NLS-1$ //$NON-NLS-2$
-//
-//				_browser.execute(href);
-//			}
-//		});
-//
-//		_reloadedTourMarkerId = null;
-
 		if (_browserTask_DeviceState.getAndSet(false)) {
 
 			updateUI_DeviceState_Task();
@@ -2972,10 +2948,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private void onBrowser_LocationChanging(final LocationEvent event) {
 
 		final String location = event.location;
-
-//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//				+ ("\tonBrowser_LocationChanging: " + location));
-//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		final String[] locationParts = location.split(HREF_TOKEN);
 
@@ -3551,7 +3523,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 					} else {
 
-						// the device folder not available but is required to update the folder state
+						// the device folder is not available, update the folder state
+
+						updateUI_DeviceState();
 
 						return;
 					}
@@ -3595,7 +3569,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 //
 //								System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
 //										+ (String.format("Event: %s\tFile: %s", kind, event.context())));
-//								// TODO remove SYSTEM.OUT.PRINTLN
 //							}
 
 						// do not update the device state when the import is running otherwise the import file list can be wrong
@@ -3648,7 +3621,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 					try {
 
-						Thread.sleep(2000);
+						Thread.sleep(1000);
 
 						if (_isStopWatchingStoresThread) {
 							break;
