@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -29,10 +29,14 @@ public class ColorDefinition {
 
 	private final IPreferenceStore	_commonPrefStore	= CommonActivator.getPrefStore();
 
-	private String					_prefName;
+	private String					_colorDefinitionId;
 	private String					_visibleName;
+	private String					_graphPrefNamePrefix;
 
-	private GraphColorItem[]		_colorParts;
+	/**
+	 * These are children in the tree viewer.
+	 */
+	private GraphColorItem[]		_graphColorItems;
 
 	private RGB						_lineColor_Active;
 	private RGB						_lineColor_Default;
@@ -84,7 +88,7 @@ public class ColorDefinition {
 								final RGB defaultTextColor,
 								final Map2ColorProfile defaultMapColorProfile) {
 
-		_prefName = prefName;
+		_colorDefinitionId = prefName;
 		_visibleName = visibleName;
 
 		_gradientBright_Default = defaultGradientBright;
@@ -94,12 +98,13 @@ public class ColorDefinition {
 
 		_map2ColorProfile_Default = defaultMapColorProfile;
 
-		final String graphPrefName = getGraphPrefName();
+		_graphPrefNamePrefix = ICommonPreferences.GRAPH_COLORS + _colorDefinitionId + ".";
 
 		/*
 		 * set gradient bright from pref store or default
 		 */
-		final String prefColorGradientBright = graphPrefName + GraphColorManager.PREF_COLOR_BRIGHT;
+		final String prefColorGradientBright = getGraphPrefName(GraphColorManager.PREF_COLOR_BRIGHT);
+
 		if (_commonPrefStore.contains(prefColorGradientBright)) {
 			_gradientBright_Active = PreferenceConverter.getColor(_commonPrefStore, prefColorGradientBright);
 		} else {
@@ -110,7 +115,8 @@ public class ColorDefinition {
 		/*
 		 * gradient dark
 		 */
-		final String prefColorGradientDark = graphPrefName + GraphColorManager.PREF_COLOR_DARK;
+		final String prefColorGradientDark = getGraphPrefName(GraphColorManager.PREF_COLOR_DARK);
+
 		if (_commonPrefStore.contains(prefColorGradientDark)) {
 			_gradientDark_Active = PreferenceConverter.getColor(_commonPrefStore, prefColorGradientDark);
 		} else {
@@ -121,7 +127,8 @@ public class ColorDefinition {
 		/*
 		 * line color
 		 */
-		final String prefColorLine = graphPrefName + GraphColorManager.PREF_COLOR_LINE;
+		final String prefColorLine = getGraphPrefName(GraphColorManager.PREF_COLOR_LINE);
+
 		if (_commonPrefStore.contains(prefColorLine)) {
 			_lineColor_Active = PreferenceConverter.getColor(_commonPrefStore, prefColorLine);
 		} else {
@@ -132,7 +139,8 @@ public class ColorDefinition {
 		/*
 		 * text color
 		 */
-		final String prefColorText = graphPrefName + GraphColorManager.PREF_COLOR_TEXT;
+		final String prefColorText = getGraphPrefName(GraphColorManager.PREF_COLOR_TEXT);
+
 		if (_commonPrefStore.contains(prefColorText)) {
 			_textColor_Active = PreferenceConverter.getColor(_commonPrefStore, prefColorText);
 		} else {
@@ -155,15 +163,19 @@ public class ColorDefinition {
 		}
 
 		final ColorDefinition other = (ColorDefinition) obj;
-		if (_prefName == null) {
-			if (other._prefName != null) {
+		if (_colorDefinitionId == null) {
+			if (other._colorDefinitionId != null) {
 				return false;
 			}
-		} else if (!_prefName.equals(other._prefName)) {
+		} else if (!_colorDefinitionId.equals(other._colorDefinitionId)) {
 			return false;
 		}
 
 		return true;
+	}
+
+	public String getColorDefinitionId() {
+		return _colorDefinitionId;
 	}
 
 	public RGB getGradientBright_Active() {
@@ -190,16 +202,15 @@ public class ColorDefinition {
 		return _gradientDark_New;
 	}
 
-	public GraphColorItem[] getGraphColorParts() {
-		return _colorParts;
+	public GraphColorItem[] getGraphColorItems() {
+		return _graphColorItems;
 	}
 
-	public String getGraphPrefName() {
-		return ICommonPreferences.GRAPH_COLORS + _prefName + "."; //$NON-NLS-1$
-	}
+	public String getGraphPrefName(final String graphColorName) {
 
-	public String getImageId() {
-		return _prefName;
+		final String graphPrefName = _graphPrefNamePrefix + graphColorName;
+
+		return graphPrefName;
 	}
 
 	public RGB getLineColor_Active() {
@@ -226,10 +237,6 @@ public class ColorDefinition {
 		return _map2ColorProfile_New;
 	}
 
-	public String getPrefName() {
-		return _prefName;
-	}
-
 	public RGB getTextColor_Active() {
 		return _textColor_Active;
 	}
@@ -250,17 +257,17 @@ public class ColorDefinition {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((_prefName == null) ? 0 : _prefName.hashCode());
+		result = prime * result + ((_colorDefinitionId == null) ? 0 : _colorDefinitionId.hashCode());
 		return result;
 	}
 
 	/**
-	 * set color names for this color definition, the color names are children in the tree
+	 * Set color names for this color definition, the color names are children in the tree.
 	 * 
 	 * @param children
 	 */
 	public void setColorNames(final GraphColorItem[] children) {
-		_colorParts = children;
+		_graphColorItems = children;
 	}
 
 	public void setGradientBright_Active(final RGB gradientBright) {
@@ -293,10 +300,6 @@ public class ColorDefinition {
 
 	public void setMap2Color_New(final Map2ColorProfile newMapColor) {
 		_map2ColorProfile_New = newMapColor;
-	}
-
-	public void setPrefName(final String prefName) {
-		_prefName = prefName;
 	}
 
 	public void setTextColor_Active(final RGB textColor) {

@@ -142,16 +142,19 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 	 */
 	private static class ColorContentProvider implements ITreeContentProvider {
 
+		@Override
 		public void dispose() {}
 
+		@Override
 		public Object[] getChildren(final Object parentElement) {
 			if (parentElement instanceof ColorDefinition) {
 				final ColorDefinition graphDefinition = (ColorDefinition) parentElement;
-				return graphDefinition.getGraphColorParts();
+				return graphDefinition.getGraphColorItems();
 			}
 			return null;
 		}
 
+		@Override
 		public Object[] getElements(final Object inputElement) {
 			if (inputElement instanceof PrefPageAppearanceColors) {
 				return GraphColorManager.getInstance().getGraphColorDefinitions();
@@ -159,10 +162,12 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 			return null;
 		}
 
+		@Override
 		public Object getParent(final Object element) {
 			return null;
 		}
 
+		@Override
 		public boolean hasChildren(final Object element) {
 			if (element instanceof ColorDefinition) {
 				return true;
@@ -170,6 +175,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 			return false;
 		}
 
+		@Override
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 
 	}
@@ -293,12 +299,14 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 		_graphColorPainter = new GraphColorPainter(this);
 
 		_colorViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
 			public void selectionChanged(final SelectionChangedEvent event) {
 				onSelectColorInColorViewer();
 			}
 		});
 
 		_colorViewer.addDoubleClickListener(new IDoubleClickListener() {
+			@Override
 			public void doubleClick(final DoubleClickEvent event) {
 
 				final Object selection = ((IStructuredSelection) _colorViewer.getSelection()).getFirstElement();
@@ -340,6 +348,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 
 		_colorViewer.addTreeListener(new ITreeViewerListener() {
 
+			@Override
 			public void treeCollapsed(final TreeExpansionEvent event) {
 
 				if (event.getElement() instanceof ColorDefinition) {
@@ -347,6 +356,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 				}
 			}
 
+			@Override
 			public void treeExpanded(final TreeExpansionEvent event) {
 
 				final Object element = event.getElement();
@@ -359,6 +369,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 					}
 
 					Display.getCurrent().asyncExec(new Runnable() {
+						@Override
 						public void run() {
 							_colorViewer.expandToLevel(treeItem, 1);
 							_expandedItem = treeItem;
@@ -389,6 +400,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 			_colorSelector.setEnabled(false);
 			setButtonLayoutData(_colorSelector.getButton());
 			_colorSelector.addListener(new IPropertyChangeListener() {
+				@Override
 				public void propertyChange(final PropertyChangeEvent event) {
 					onSelectColorInColorSelector(event);
 				}
@@ -458,13 +470,13 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 
 				if (element instanceof ColorDefinition) {
 
-					cell.setImage(_graphColorPainter.drawDefinitionImage(
+					cell.setImage(_graphColorPainter.drawColorDefinitionImage(
 							(ColorDefinition) element,
 							numberOfHorizontalImages));
 
 				} else if (element instanceof GraphColorItem) {
 
-					cell.setImage(_graphColorPainter.drawColorImage(//
+					cell.setImage(_graphColorPainter.drawGraphColorImage(//
 							(GraphColorItem) element,
 							numberOfHorizontalImages));
 
@@ -477,14 +489,17 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 		treeLayout.setColumnData(tc, new ColumnPixelData(colorWidth, true));
 	}
 
+	@Override
 	public IGradientColorProvider getMapLegendColorProvider() {
 		return _legendImageColorProvider;
 	}
 
+	@Override
 	public TreeViewer getTreeViewer() {
 		return _colorViewer;
 	}
 
+	@Override
 	public void init(final IWorkbench workbench) {
 		setPreferenceStore(_commonPrefStore);
 	}
@@ -517,14 +532,14 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 			// color has changed
 
 			// update the data model
-			_selectedColor.setNewRGB(newValue);
+			_selectedColor.setRGB(newValue);
 
 			/*
 			 * dispose the old color/image from the graph
 			 */
-			_graphColorPainter.disposeResources(_selectedColor.getColorId(), _selectedColor
-					.getColorDefinition()
-					.getImageId());
+			_graphColorPainter.recreateResources(//
+					_selectedColor.getColorId(),
+					_selectedColor.getColorDefinition().getColorDefinitionId());
 
 			/*
 			 * update the tree viewer, the color images will then be recreated
@@ -566,7 +581,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 				// 'normal' color is selected
 
 				// prepare color selector
-				_colorSelector.setColorValue(graphColor.getNewRGB());
+				_colorSelector.setColorValue(graphColor.getRGB());
 				_colorSelector.setEnabled(true);
 			}
 
@@ -680,7 +695,9 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 		/*
 		 * dispose old color and image for the graph
 		 */
-		_graphColorPainter.disposeResources(_selectedColor.getColorId(), selectedColorDefinition.getImageId());
+		_graphColorPainter.recreateResources(//
+				_selectedColor.getColorId(),
+				selectedColorDefinition.getColorDefinitionId());
 
 		/*
 		 * update the tree viewer, the color images will be recreated

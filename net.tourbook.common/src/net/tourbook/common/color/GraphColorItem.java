@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,6 +24,8 @@ public class GraphColorItem {
 	private String			_colorPrefName;
 	private String			_visibleName;
 
+	private String			_colorId;
+
 	/**
 	 * Is <code>true</code> when this {@link GraphColorItem} is used as for a map color.
 	 */
@@ -40,6 +42,8 @@ public class GraphColorItem {
 		_visibleName = visibleName;
 
 		_isMapColor = isMapColor;
+
+		_colorId = _colorDefinition.getColorDefinitionId() + "." + _colorPrefName;
 	}
 
 	public ColorDefinition getColorDefinition() {
@@ -47,31 +51,31 @@ public class GraphColorItem {
 	}
 
 	public String getColorId() {
-		return _colorDefinition.getPrefName() + "." + _colorPrefName; //$NON-NLS-1$
+		return _colorId;
 	}
 
 	public String getName() {
 		return _visibleName;
 	}
 
-	public RGB getNewRGB() {
+	public RGB getRGB() {
 
-		if (_colorPrefName.compareTo(GraphColorManager.PREF_COLOR_LINE) == 0) {
+		if (GraphColorManager.PREF_COLOR_LINE.equals(_colorPrefName)) {
+
 			return _colorDefinition.getLineColor_New();
 
-		} else if (_colorPrefName.compareTo(GraphColorManager.PREF_COLOR_TEXT) == 0) {
+		} else if (GraphColorManager.PREF_COLOR_TEXT.equals(_colorPrefName)) {
+
 			return _colorDefinition.getTextColor_New();
 
-		} else if (_colorPrefName.compareTo(GraphColorManager.PREF_COLOR_BRIGHT) == 0) {
+		} else if (GraphColorManager.PREF_COLOR_BRIGHT.equals(_colorPrefName)) {
+
 			return _colorDefinition.getGradientBright_New();
 
 		} else {
+
 			return _colorDefinition.getGradientDark_New();
 		}
-	}
-
-	String getPrefName() {
-		return _colorPrefName;
 	}
 
 	/**
@@ -82,30 +86,27 @@ public class GraphColorItem {
 		return _isMapColor;
 	}
 
-	public void setName(final String fName) {
-		this._visibleName = fName;
+	public void setName(final String name) {
+		_visibleName = name;
 	}
 
-	public void setNewRGB(final RGB rgb) {
+	public void setRGB(final RGB rgb) {
 
-		if (_colorPrefName.compareTo(GraphColorManager.PREF_COLOR_LINE) == 0) {
+		if (GraphColorManager.PREF_COLOR_LINE.equals(_colorPrefName)) {
 
 			_colorDefinition.setLineColor_New(rgb);
 
-		} else if (_colorPrefName.compareTo(GraphColorManager.PREF_COLOR_TEXT) == 0) {
+		} else if (GraphColorManager.PREF_COLOR_TEXT.equals(_colorPrefName)) {
 
 			_colorDefinition.setTextColor_New(rgb);
 
-		} else if (_colorPrefName.compareTo(GraphColorManager.PREF_COLOR_BRIGHT) == 0) {
+		} else if (GraphColorManager.PREF_COLOR_BRIGHT.equals(_colorPrefName)) {
 
 			_colorDefinition.setGradientBright_New(rgb);
 
 		} else {
+
 			_colorDefinition.setGradientDark_New(rgb);
 		}
-	}
-
-	void setPrefName(final String fPrefName) {
-		this._colorPrefName = fPrefName;
 	}
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -32,7 +32,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.Messages;
-import net.tourbook.common.preferences.ICommonPreferences;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
@@ -248,26 +247,24 @@ public class GraphColorManager {
 
 		for (final ColorDefinition graphDefinition : getInstance().getGraphColorDefinitions()) {
 
-			final String prefGraphName = ICommonPreferences.GRAPH_COLORS + graphDefinition.getPrefName() + "."; //$NON-NLS-1$
-
 			PreferenceConverter.setValue(
 					commonPrefStore,
-					prefGraphName + PREF_COLOR_BRIGHT,
+					graphDefinition.getGraphPrefName(PREF_COLOR_BRIGHT),
 					graphDefinition.getGradientBright_New());
 
 			PreferenceConverter.setValue(
 					commonPrefStore,
-					prefGraphName + PREF_COLOR_DARK,
+					graphDefinition.getGraphPrefName(PREF_COLOR_DARK),
 					graphDefinition.getGradientDark_New());
 
 			PreferenceConverter.setValue(
 					commonPrefStore,
-					prefGraphName + PREF_COLOR_LINE,
+					graphDefinition.getGraphPrefName(PREF_COLOR_LINE),
 					graphDefinition.getLineColor_New());
 
 			PreferenceConverter.setValue(
 					commonPrefStore,
-					prefGraphName + PREF_COLOR_TEXT,
+					graphDefinition.getGraphPrefName(PREF_COLOR_TEXT),
 					graphDefinition.getTextColor_New());
 		}
 	}
@@ -298,7 +295,7 @@ public class GraphColorManager {
 				}
 
 				final IMemento mementoLegendColor = xmlMemento.createChild(MEMENTO_CHILD_LEGEND_COLOR);
-				mementoLegendColor.putString(TAG_LEGEND_COLOR_PREF_NAME, graphDefinition.getPrefName());
+				mementoLegendColor.putString(TAG_LEGEND_COLOR_PREF_NAME, graphDefinition.getColorDefinitionId());
 
 				for (final ColorValue valueColor : mapColor.getColorValues()) {
 
@@ -494,7 +491,7 @@ public class GraphColorManager {
 		final ColorDefinition[] colorDefinitions = getGraphColorDefinitions();
 
 		for (final ColorDefinition colorDefinition : colorDefinitions) {
-			if (colorDefinition.getPrefName().equals(preferenceName)) {
+			if (colorDefinition.getColorDefinitionId().equals(preferenceName)) {
 				return colorDefinition;
 			}
 		}
@@ -640,7 +637,7 @@ public class GraphColorManager {
 				 */
 				for (final ColorDefinition colorDefinition : _graphColorDefinitions) {
 
-					if (colorDefinition.getPrefName().equals(prefName)) {
+					if (colorDefinition.getColorDefinitionId().equals(prefName)) {
 
 						// color definition found
 

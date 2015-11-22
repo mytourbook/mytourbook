@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -38,7 +38,10 @@ public class GraphColorPainter {
 	private final HashMap<String, Image>	_imageCache			= new HashMap<String, Image>();
 	private final HashMap<String, Color>	_colorCache			= new HashMap<String, Color>();
 
-	private final int						_treeItemHeight;
+	private final int						_itemHeight;
+
+	private String							_recreateColorId;
+	private String							_recreateColorDefinitionId;
 
 	/**
 	 * @param colorTree
@@ -46,61 +49,61 @@ public class GraphColorPainter {
 	GraphColorPainter(final IColorTreeViewer colorTreeViewer) {
 
 		_colorTreeViewer = colorTreeViewer;
-		_treeItemHeight = _colorTreeViewer.getTreeViewer().getTree().getItemHeight();
+		_itemHeight = _colorTreeViewer.getTreeViewer().getTree().getItemHeight();
 	}
 
 	void disposeAllResources() {
 
 		for (final Image image : _imageCache.values()) {
-			(image).dispose();
+			image.dispose();
 		}
 		_imageCache.clear();
 
 		for (final Color color : _colorCache.values()) {
-			(color).dispose();
+			color.dispose();
 		}
 		_colorCache.clear();
 	}
 
-	public void disposeResources(final String colorId, final String imageId) {
-
-		final Image image = _imageCache.get(colorId);
-		if (image != null && !image.isDisposed()) {
-			image.dispose();
-		}
-		_imageCache.remove(colorId);
-
-		final Color color = _colorCache.get(colorId);
-		if (color != null && !color.isDisposed()) {
-			color.dispose();
-		}
-		_colorCache.remove(colorId);
-
-		/*
-		 * dispose color image for the graph definition
-		 */
-		_imageCache.remove(imageId);
-	}
-
-	Image drawColorImage(final GraphColorItem graphColorItem, final int horizontalImages) {
+	Image drawGraphColorImage(final GraphColorItem graphColorItem, final int horizontalImages) {
 
 		final Display display = Display.getCurrent();
 
 		final String colorId = graphColorItem.getColorId();
-		Image image = _imageCache.get(colorId);
 
-		if (image == null || image.isDisposed()) {
+		if (colorId.equals(_recreateColorId)) {
+
+			/*
+			 * Dispose graph color image/color
+			 */
+
+			_recreateColorId = null;
+
+			final Image image = _imageCache.remove(colorId);
+			if (image != null && !image.isDisposed()) {
+				image.dispose();
+			}
+
+			final Color color = _colorCache.remove(colorId);
+			if (color != null && !color.isDisposed()) {
+				color.dispose();
+			}
+		}
+
+		Image colorImage = _imageCache.get(colorId);
+
+		if (colorImage == null || colorImage.isDisposed()) {
 
 			final int borderSize = 0;
 
-			final int imageSize = _treeItemHeight - 2;
+			final int imageSize = _itemHeight - 2;
 			final int imageSpacing = GRAPH_COLOR_SPACING;
 			final int imageOffsetX = imageSize + imageSpacing;
 
 			final int imageWidth = (horizontalImages * imageSize) + ((horizontalImages - 1) * imageSpacing);
 			final int imageHeight = imageSize;
 
-			image = new Image(//
+			colorImage = new Image(//
 					display,
 					imageWidth,
 					imageHeight);
@@ -111,7 +114,7 @@ public class GraphColorPainter {
 					imageWidth - imageOffsetX,
 					imageHeight);
 
-			final GC gc = new GC(image);
+			final GC gc = new GC(colorImage);
 			{
 				if (graphColorItem.isMapColor()) {
 
@@ -156,10 +159,10 @@ public class GraphColorPainter {
 			}
 			gc.dispose();
 
-			_imageCache.put(colorId, image);
+			_imageCache.put(colorId, colorImage);
 		}
 
-		return image;
+		return colorImage;
 	}
 
 	/**
@@ -167,27 +170,41 @@ public class GraphColorPainter {
 	 * 
 	 * @param horizontalImages
 	 */
-	Image drawDefinitionImage(final ColorDefinition colorDefinition, final int horizontalImages) {
+	Image drawColorDefinitionImage(final ColorDefinition colorDefinition, final int horizontalImages) {
 
 		final Display display = Display.getCurrent();
-		final GraphColorItem[] graphColors = colorDefinition.getGraphColorParts();
 
-		final String imageId = colorDefinition.getImageId();
-		Image defImage = _imageCache.get(imageId);
+		final String colorDefinitionId = colorDefinition.getColorDefinitionId();
 
-		if (defImage == null || defImage.isDisposed()) {
+		if (colorDefinitionId.equals(_recreateColorDefinitionId)) {
+
+			/*
+			 * Dispose image for the color definition
+			 */
+
+			_recreateColorDefinitionId = null;
+
+			final Image image = _imageCache.remove(colorDefinitionId);
+			if (image != null && !image.isDisposed()) {
+				image.dispose();
+			}
+		}
+
+		Image colorDefinitionImage = _imageCache.get(colorDefinitionId);
+		final GraphColorItem[] graphColors = colorDefinition.getGraphColorItems();
+
+		if (colorDefinitionImage == null || colorDefinitionImage.isDisposed()) {
 
 			final int borderSize = 0;
-
 			final int imageSpacing = GRAPH_COLOR_SPACING;
-			final int imageSize = _treeItemHeight - 2;
+			final int imageSize = _itemHeight - 2;
 
-			defImage = new Image(//
+			colorDefinitionImage = new Image(//
 					display,
 					(horizontalImages * imageSize) + ((horizontalImages - 1) * imageSpacing),
 					imageSize);
 
-			final GC gc = new GC(defImage);
+			final GC gc = new GC(colorDefinitionImage);
 			{
 				for (int colorIndex = 0; colorIndex < graphColors.length; colorIndex++) {
 
@@ -246,10 +263,10 @@ public class GraphColorPainter {
 			}
 			gc.dispose();
 
-			_imageCache.put(imageId, defImage);
+			_imageCache.put(colorDefinitionId, colorDefinitionImage);
 		}
 
-		return defImage;
+		return colorDefinitionImage;
 	}
 
 	/**
@@ -264,11 +281,17 @@ public class GraphColorPainter {
 		Color imageColor = _colorCache.get(colorId);
 
 		if (imageColor == null) {
-			imageColor = new Color(display, graphColor.getNewRGB());
+			imageColor = new Color(display, graphColor.getRGB());
 			_colorCache.put(colorId, imageColor);
 		}
 
 		return imageColor;
+	}
+
+	public void recreateResources(final String colorId, final String colorDefinitionId) {
+
+		_recreateColorId = colorId;
+		_recreateColorDefinitionId = colorDefinitionId;
 	}
 
 }

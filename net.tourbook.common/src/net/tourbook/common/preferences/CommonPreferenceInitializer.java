@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -36,26 +36,22 @@ public class CommonPreferenceInitializer extends AbstractPreferenceInitializer {
 		/*
 		 * graph color preferences
 		 */
-		for (final ColorDefinition graphDefinition : GraphColorManager.getInstance().getGraphColorDefinitions()) {
-
-			final String graphPrefName = graphDefinition.getGraphPrefName();
+		for (final ColorDefinition colorDefinition : GraphColorManager.getInstance().getGraphColorDefinitions()) {
 
 			PreferenceConverter.setDefault(
 					commonPrefStore,
-					graphPrefName + GraphColorManager.PREF_COLOR_BRIGHT,
-					graphDefinition.getGradientBright_Default());
+					colorDefinition.getGraphPrefName(GraphColorManager.PREF_COLOR_BRIGHT),
+					colorDefinition.getGradientBright_Default());
 
 			PreferenceConverter.setDefault(
 					commonPrefStore,
-					graphPrefName + GraphColorManager.PREF_COLOR_DARK,
-					graphDefinition.getGradientDark_Default());
+					colorDefinition.getGraphPrefName(GraphColorManager.PREF_COLOR_DARK),
+					colorDefinition.getGradientDark_Default());
 
 			PreferenceConverter.setDefault(
 					commonPrefStore,
-					graphPrefName + GraphColorManager.PREF_COLOR_LINE,
-					graphDefinition.getLineColor_Default());
-
+					colorDefinition.getGraphPrefName(GraphColorManager.PREF_COLOR_LINE),
+					colorDefinition.getLineColor_Default());
 		}
-
 	}
 }

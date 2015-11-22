@@ -67,6 +67,7 @@ public class TourTypeColorDefinition extends ColorDefinition implements Comparab
 		_tourType = tourType;
 	}
 
+	@Override
 	public int compareTo(final Object obj) {
 
 		if (obj instanceof TourTypeColorDefinition) {
@@ -112,7 +113,7 @@ public class TourTypeColorDefinition extends ColorDefinition implements Comparab
 		return result;
 	}
 
-	public void setTourType(final TourType fTourType) {
-		this._tourType = fTourType;
+	public void setTourType(final TourType tourType) {
+		_tourType = tourType;
 	}
 }

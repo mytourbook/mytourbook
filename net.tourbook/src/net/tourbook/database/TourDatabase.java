@@ -225,7 +225,7 @@ public class TourDatabase {
 
 	private static ArrayList<TourType>				_activeTourTypes;
 
-	private static volatile ArrayList<TourType>		_tourTypes;
+	private static volatile ArrayList<TourType>		_dbTourTypes;
 
 	/**
 	 * Key is tag ID.
@@ -773,9 +773,9 @@ public class TourDatabase {
 	 */
 	public static synchronized void clearTourTypes() {
 
-		if (_tourTypes != null) {
-			_tourTypes.clear();
-			_tourTypes = null;
+		if (_dbTourTypes != null) {
+			_dbTourTypes.clear();
+			_dbTourTypes = null;
 		}
 
 		UI.getInstance().setTourTypeImagesDirty();
@@ -1297,24 +1297,25 @@ public class TourDatabase {
 	}
 
 	/**
-	 * @return Returns the backend of all tour types which are stored in the database sorted by name
+	 * @return Returns the backend of all tour types which are stored in the database sorted by
+	 *         name.
 	 */
 	@SuppressWarnings("unchecked")
 	public static ArrayList<TourType> getAllTourTypes() {
 
-		if (_tourTypes != null) {
-			return _tourTypes;
+		if (_dbTourTypes != null) {
+			return _dbTourTypes;
 		}
 
 		synchronized (DB_LOCK) {
 
 			// check again, field must be volatile to work correctly
-			if (_tourTypes != null) {
-				return _tourTypes;
+			if (_dbTourTypes != null) {
+				return _dbTourTypes;
 			}
 
 			// create empty list
-			_tourTypes = new ArrayList<TourType>();
+			_dbTourTypes = new ArrayList<TourType>();
 
 			final EntityManager em = TourDatabase.getInstance().getEntityManager();
 			if (em != null) {
@@ -1325,13 +1326,13 @@ public class TourDatabase {
 								+ (" FROM TourType AS tourType") //$NON-NLS-1$
 								+ (" ORDER  BY tourType.name")); //$NON-NLS-1$
 
-				_tourTypes = (ArrayList<TourType>) emQuery.getResultList();
+				_dbTourTypes = (ArrayList<TourType>) emQuery.getResultList();
 
 				em.close();
 			}
 		}
 
-		return _tourTypes;
+		return _dbTourTypes;
 	}
 
 	public static String getDatabasePath() {
@@ -2005,7 +2006,7 @@ public class TourDatabase {
 
 				// all tour types are selected
 
-				_activeTourTypes = _tourTypes;
+				_activeTourTypes = _dbTourTypes;
 				return;
 
 			} else {
