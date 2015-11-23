@@ -57,6 +57,7 @@ import net.tourbook.common.color.MapUnits;
 import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.tooltip.OpenDialogManager;
 import net.tourbook.common.util.SWTPopupOverAWT;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -1676,7 +1677,12 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		final View view = _wwCanvas.getView();
 
-		_state.put(STATE_MAP3_VIEW, view.getRestorableState());
+		try {
+			_state.put(STATE_MAP3_VIEW, view.getRestorableState());
+		} catch (final Exception e) {
+			// this can occure
+			StatusUtil.log(e);
+		}
 	}
 
 	private void setAnnotationColors(final TourData tourData, final int positionIndex, final GlobeAnnotation trackPoint) {
