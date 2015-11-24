@@ -43,7 +43,7 @@ public class GraphColorItem {
 
 		_isMapColor = isMapColor;
 
-		_colorId = _colorDefinition.getColorDefinitionId() + "." + _colorPrefName;
+		_colorId = _colorDefinition.getColorDefinitionId() + "." + _colorPrefName; //$NON-NLS-1$
 	}
 
 	public ColorDefinition getColorDefinition() {
@@ -112,12 +112,12 @@ public class GraphColorItem {
 
 	@Override
 	public String toString() {
-		return "GraphColorItem ["
+		return "GraphColorItem [" //$NON-NLS-1$
 
-				+ ("_visibleName=" + _visibleName + ", ")
-				+ ("_colorId=" + _colorId + ", ")
-				+ ("_colorPrefName=" + _colorPrefName)
+				+ ("_visibleName=" + _visibleName + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("_colorId=" + _colorId + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("_colorPrefName=" + _colorPrefName) //$NON-NLS-1$
 
-				+ "]";
+				+ "]"; //$NON-NLS-1$
 	}
 }

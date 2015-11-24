@@ -629,6 +629,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 				} else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
 
+					// tour type images can have been changed
+					disposeConfigImages();
+
 					// update tour type in the raw data
 					_rawDataMgr.updateTourData_InImportView_FromDb(null);
 

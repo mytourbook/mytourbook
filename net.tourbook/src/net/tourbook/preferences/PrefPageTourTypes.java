@@ -820,7 +820,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 			// create the same color definition but with the correct id's
 			final TourTypeColorDefinition newColorDefinition = new TourTypeColorDefinition(//
 					savedTourType,
-					"tourType." + savedTourType.getTypeId(),
+					"tourType." + savedTourType.getTypeId(), //$NON-NLS-1$
 					tourTypeName);
 
 			// overwrite tour type object

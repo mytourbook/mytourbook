@@ -34,7 +34,7 @@ public class NIO {
 	private final static Pattern	DEVICE_NAME_PATTERN			= Pattern.compile("\\s*\\[([^]]*)");	//$NON-NLS-1$
 
 	/** <code>([\\].*)</code> */
-	private final static Pattern	DEVICE_NAME_PATH_PATTERN	= Pattern.compile("([\\\\].*)");
+	private final static Pattern	DEVICE_NAME_PATH_PATTERN	= Pattern.compile("([\\\\].*)"); //$NON-NLS-1$
 
 	/**
 	 * Replace device name with drive letter, e.g. [MEDIA]\CACHE -> D:\CACHE. This do not validate

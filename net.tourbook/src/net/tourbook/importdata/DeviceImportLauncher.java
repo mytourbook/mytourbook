@@ -148,7 +148,7 @@ public class DeviceImportLauncher implements Cloneable, Comparable<DeviceImportL
 
 		} else {
 
-			// this is the default or TourTypeConfig.TOUR_TYPE_CONFIG_NOT_USED
+			// this is the default, no image
 
 			imageHash = 0;
 			imageWidth = 0;
@@ -157,12 +157,12 @@ public class DeviceImportLauncher implements Cloneable, Comparable<DeviceImportL
 
 	@Override
 	public String toString() {
-		return "AutoImportLauncher ["
+		return "DeviceImportLauncher [" //$NON-NLS-1$
 		//
-				+ ("name=" + name + ", ")
-				+ ("speedVertices=" + speedTourTypes + ", ")
-				+ ("configType=" + tourTypeConfig + ", ")
+				+ ("name=" + name + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("speedTourTypes=" + speedTourTypes + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("tourTypeConfig=" + tourTypeConfig + ", ") //$NON-NLS-1$ //$NON-NLS-2$
 
-				+ "]";
+				+ "]"; //$NON-NLS-1$
 	}
 }

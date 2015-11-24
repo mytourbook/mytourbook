@@ -99,7 +99,7 @@ public class ColorDefinition {
 
 		_map2ColorProfile_Default = defaultMapColorProfile;
 
-		_graphPrefNamePrefix = ICommonPreferences.GRAPH_COLORS + _colorDefinitionId + ".";
+		_graphPrefNamePrefix = ICommonPreferences.GRAPH_COLORS + _colorDefinitionId + "."; //$NON-NLS-1$
 
 		/*
 		 * set gradient bright from pref store or default
@@ -317,13 +317,13 @@ public class ColorDefinition {
 
 	@Override
 	public String toString() {
-		return "ColorDefinition ["
+		return "ColorDefinition [" //$NON-NLS-1$
 
-				+ ("_colorDefinitionId=" + _colorDefinitionId + ", ")
-				+ ("_graphPrefNamePrefix=" + _graphPrefNamePrefix + ", ")
+				+ ("_colorDefinitionId=" + _colorDefinitionId + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("_graphPrefNamePrefix=" + _graphPrefNamePrefix + ", ") //$NON-NLS-1$ //$NON-NLS-2$
 //				+ ("_graphColorItems=" + Arrays.toString(_graphColorItems))
 
-				+ "]";
+				+ "]"; //$NON-NLS-1$
 	}
 
 }

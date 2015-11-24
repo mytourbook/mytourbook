@@ -222,7 +222,7 @@ public class TourType implements Comparable<Object> {
 
 	@Override
 	public String toString() {
-		return "TourType [typeId=" + typeId + ", name=" + name + "]";
+		return "TourType [typeId=" + typeId + ", name=" + name + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 }

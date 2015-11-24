@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,11 +28,9 @@ import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.TableColumnDefinition;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.widgets.ComboEnumEntry;
-import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tour.TourManager;
 import net.tourbook.ui.views.rawData.RawDataView;
 
 import org.eclipse.jface.action.Action;
@@ -46,9 +44,12 @@ import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.LocalSelectionTransfer;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ColumnWeightData;
@@ -127,12 +128,15 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 	private static final String				STATE_IMPORT_LAUNCHER				= "STATE_IMPORT_LAUNCHER";				//$NON-NLS-1$
 	//
 	private static final String				DATA_KEY_TOUR_TYPE_ID				= "DATA_KEY_TOUR_TYPE_ID";				//$NON-NLS-1$
-	private static final String				DATA_KEY_VERTEX_INDEX				= "DATA_KEY_VERTEX_INDEX";				//$NON-NLS-1$
+	private static final String				DATA_KEY_SPEED_TOUR_TYPE_INDEX		= "DATA_KEY_SPEED_TOUR_TYPE_INDEX";	//$NON-NLS-1$
 	//
 	private static final int				CONTROL_DECORATION_WIDTH			= 6;
 	private static final int				VERTICAL_GROUP_DISTANCE				= 0;
 	//
+	private final IPreferenceStore			_prefStore							= TourbookPlugin.getPrefStore();
 	private final IDialogSettings			_state								= TourbookPlugin.getState(ID);
+	//
+	private IPropertyChangeListener			_prefChangeListener;
 	//
 	private MouseWheelListener				_defaultMouseWheelListener;
 	private SelectionAdapter				_defaultSelectionListener;
@@ -143,8 +147,8 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 	private SelectionAdapter				_importLauncherSelectionListener;
 	private SelectionAdapter				_liveUpdateListener;
 	private MouseWheelListener				_liveUpdateMouseWheelListener;
-	private SelectionAdapter				_vertexTourTypeListener;
-	//
+	private SelectionAdapter				_speedTourTypeListener;
+
 	private ActionOpenPrefDialog			_actionOpenTourTypePrefs;
 	private ActionSpeedTourType_Add			_actionTTSpeed_Add;
 	private ActionSpeedTourType_Delete[]	_actionTTSpeed_Delete;
@@ -250,11 +254,6 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 
 		/**
 		 * @param tourType
-		 * @param vertexIndex
-		 * @param isSaveTour
-		 *            when <code>true</code> the tour will be saved and a
-		 *            {@link TourManager#TOUR_CHANGED} event is fired, otherwise the
-		 *            {@link TourData} from the tour provider is only updated
 		 */
 		public ActionIL_NewOneTourType(final TourType tourType) {
 
@@ -279,11 +278,6 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 
 		/**
 		 * @param tourType
-		 * @param vertexIndex
-		 * @param isSaveTour
-		 *            when <code>true</code> the tour will be saved and a
-		 *            {@link TourManager#TOUR_CHANGED} event is fired, otherwise the
-		 *            {@link TourData} from the tour provider is only updated
 		 */
 		public ActionIL_SetOneTourType(final TourType tourType, final boolean isChecked) {
 
@@ -320,13 +314,13 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 
 		@Override
 		public void run() {
-			onSpeedTourType_Add();
+			onSpeedTT_Add();
 		}
 	}
 
 	private class ActionSpeedTourType_Delete extends Action {
 
-		private int	_vertexIndex;
+		private int	_speedTTIndex;
 
 		public ActionSpeedTourType_Delete() {
 
@@ -340,33 +334,29 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 
 		@Override
 		public void run() {
-			onSpeedTourType_Remove(_vertexIndex);
+			onSpeedTT_Remove(_speedTTIndex);
 		}
 
-		public void setData(final String key, final int vertexIndex) {
+		public void setData(final String key, final int speedTTIndex) {
 
-			_vertexIndex = vertexIndex;
+			_speedTTIndex = speedTTIndex;
 		}
 	}
 
 	private class ActionSpeedTourType_SetInMenu extends Action {
 
-		private int			_vertexIndex;
+		private int			_speedTTIndex;
 		private TourType	_tourType;
 
 		/**
 		 * @param tourType
-		 * @param vertexIndex
-		 * @param isSaveTour
-		 *            when <code>true</code> the tour will be saved and a
-		 *            {@link TourManager#TOUR_CHANGED} event is fired, otherwise the
-		 *            {@link TourData} from the tour provider is only updated
+		 * @param speedTTIndex
 		 */
-		public ActionSpeedTourType_SetInMenu(final TourType tourType, final boolean isChecked, final int vertexIndex) {
+		public ActionSpeedTourType_SetInMenu(final TourType tourType, final boolean isChecked, final int speedTTIndex) {
 
 			super(tourType.getName(), AS_CHECK_BOX);
 
-			_vertexIndex = vertexIndex;
+			_speedTTIndex = speedTTIndex;
 
 			if (isChecked == false) {
 
@@ -383,7 +373,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 
 		@Override
 		public void run() {
-			onSpeedTourType_SetTourType(_vertexIndex, _tourType);
+			onSpeedTT_SetTourType(_speedTTIndex, _tourType);
 		}
 	}
 
@@ -393,7 +383,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 
 			super(null, AS_PUSH_BUTTON);
 
-			setToolTipText(Messages.Dialog_ImportConfig_Action_SortVertices_Tooltip);
+			setToolTipText(Messages.Dialog_ImportConfig_Action_SortBySpeed_Tooltip);
 
 			setImageDescriptor(TourbookPlugin.getImageDescriptor(net.tourbook.Messages.Image__App_Sort));
 			setDisabledImageDescriptor(TourbookPlugin
@@ -402,7 +392,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 
 		@Override
 		public void run() {
-			onSpeedTourType_Sort();
+			onSpeedTT_Sort();
 		}
 	}
 
@@ -441,6 +431,27 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 		setDefaultImage(TourbookPlugin.getImageDescriptor(Messages.Image__options).createImage());
 
 		cloneImportConfig(importConfig);
+	}
+
+	private void addPrefListener() {
+
+		_prefChangeListener = new IPropertyChangeListener() {
+			@Override
+			public void propertyChange(final PropertyChangeEvent event) {
+
+				final String property = event.getProperty();
+
+				if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
+
+					// tour type images can have been changed
+
+					_ilViewer.refresh(true);
+					update_UI_From_Model_TourTypes();
+				}
+			}
+		};
+
+		_prefStore.addPropertyChangeListener(_prefChangeListener);
 	}
 
 	/**
@@ -581,6 +592,8 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 
 		createUI(ui);
 		createMenus();
+
+		addPrefListener();
 
 		return ui;
 	}
@@ -1397,22 +1410,20 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 	private void createUI_834_SpeedTourTypes(final Composite parent) {
 
 		/*
-		 * vertex fields container
+		 * Speed tour type fields container
 		 */
 		_speedTourType_OuterContainer = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
 				.grab(true, true)
-//				.indent(_pc.convertHorizontalDLUsToPixels(10), 0)
 				.applyTo(_speedTourType_OuterContainer);
 
 		GridLayoutFactory.fillDefaults().applyTo(_speedTourType_OuterContainer);
-//		_vertexOuterContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 
 		createUI_835_SpeedTourType_Fields();
 	}
 
 	/**
-	 * Create the vertex fields from the vertex list
+	 * Create the speed tour type fields from a list.
 	 * 
 	 * @param parent
 	 */
@@ -1420,15 +1431,15 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 
 		if (_currentIL == null) {
 
-			updateUI_ClearVertices();
+			updateUI_ClearSpeedTourTypes();
 
 			return;
 		}
 
-		final int vertexSize = _currentIL.speedTourTypes.size();
+		final int speedTTSize = _currentIL.speedTourTypes.size();
 
-		// check if required vertex fields are already available
-		if (_spinnerTT_Speed_AvgSpeed != null && _spinnerTT_Speed_AvgSpeed.length == vertexSize) {
+		// check if required fields are already available
+		if (_spinnerTT_Speed_AvgSpeed != null && _spinnerTT_Speed_AvgSpeed.length == speedTTSize) {
 			return;
 		}
 
@@ -1444,20 +1455,19 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 		}
 
 		_speedTourType_Container = createUI_836_SpeedTourType_ScrolledContainer(_speedTourType_OuterContainer);
-//		_vertexContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 
 		/*
 		 * fields
 		 */
-		_actionTTSpeed_Delete = new ActionSpeedTourType_Delete[vertexSize];
-		_lblTT_Speed_TourTypeIcon = new Label[vertexSize];
-		_lblTT_Speed_SpeedUnit = new Label[vertexSize];
-		_linkTT_Speed_TourType = new Link[vertexSize];
-		_spinnerTT_Speed_AvgSpeed = new Spinner[vertexSize];
+		_actionTTSpeed_Delete = new ActionSpeedTourType_Delete[speedTTSize];
+		_lblTT_Speed_TourTypeIcon = new Label[speedTTSize];
+		_lblTT_Speed_SpeedUnit = new Label[speedTTSize];
+		_linkTT_Speed_TourType = new Link[speedTTSize];
+		_spinnerTT_Speed_AvgSpeed = new Spinner[speedTTSize];
 
 		_speedTourType_Container.setRedraw(false);
 		{
-			for (int vertexIndex = 0; vertexIndex < vertexSize; vertexIndex++) {
+			for (int speedTTIndex = 0; speedTTIndex < speedTTSize; speedTTIndex++) {
 
 				/*
 				 * Spinner: Speed value
@@ -1494,7 +1504,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 						.align(SWT.FILL, SWT.CENTER)
 						.applyTo(linkTourType);
 				linkTourType.setText(Messages.tour_editor_label_tour_type);
-				linkTourType.addSelectionListener(_vertexTourTypeListener);
+				linkTourType.addSelectionListener(_speedTourTypeListener);
 
 				/*
 				 * Context menu: Tour type
@@ -1511,19 +1521,19 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 				linkTourType.setMenu(ttContextMenu);
 
 				/*
-				 * Action: Delete vertex
+				 * Action: Delete speed tour type
 				 */
-				final ActionSpeedTourType_Delete actionDeleteVertex = new ActionSpeedTourType_Delete();
-				createUI_ActionButton(_speedTourType_Container, actionDeleteVertex);
+				final ActionSpeedTourType_Delete actionDeleteSpeedTT = new ActionSpeedTourType_Delete();
+				createUI_ActionButton(_speedTourType_Container, actionDeleteSpeedTT);
 
 				/*
-				 * Keep vertex controls
+				 * Keep controls
 				 */
-				_actionTTSpeed_Delete[vertexIndex] = actionDeleteVertex;
-				_lblTT_Speed_TourTypeIcon[vertexIndex] = lblTourTypeIcon;
-				_lblTT_Speed_SpeedUnit[vertexIndex] = lblUnit;
-				_linkTT_Speed_TourType[vertexIndex] = linkTourType;
-				_spinnerTT_Speed_AvgSpeed[vertexIndex] = spinnerValue;
+				_actionTTSpeed_Delete[speedTTIndex] = actionDeleteSpeedTT;
+				_lblTT_Speed_TourTypeIcon[speedTTIndex] = lblTourTypeIcon;
+				_lblTT_Speed_SpeedUnit[speedTTIndex] = lblUnit;
+				_linkTT_Speed_TourType[speedTTIndex] = linkTourType;
+				_spinnerTT_Speed_AvgSpeed[speedTTIndex] = spinnerValue;
 			}
 		}
 		_speedTourType_Container.setRedraw(true);
@@ -1544,23 +1554,22 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 		_speedTourType_ScrolledContainer.setExpandVertical(true);
 		_speedTourType_ScrolledContainer.setExpandHorizontal(true);
 
-		// vertex container
-		final Composite vertexContainer = new Composite(_speedTourType_ScrolledContainer, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(vertexContainer);
+		// container
+		final Composite speedTTContainer = new Composite(_speedTourType_ScrolledContainer, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(speedTTContainer);
 		GridLayoutFactory.fillDefaults()//
 				.numColumns(5)
-				.applyTo(vertexContainer);
-//		vertexContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
+				.applyTo(speedTTContainer);
 
-		_speedTourType_ScrolledContainer.setContent(vertexContainer);
+		_speedTourType_ScrolledContainer.setContent(speedTTContainer);
 		_speedTourType_ScrolledContainer.addControlListener(new ControlAdapter() {
 			@Override
 			public void controlResized(final ControlEvent e) {
-				_speedTourType_ScrolledContainer.setMinSize(vertexContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+				_speedTourType_ScrolledContainer.setMinSize(speedTTContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 			}
 		});
 
-		return vertexContainer;
+		return speedTTContainer;
 	}
 
 	private void createUI_90_Dashboard(final Composite parent) {
@@ -1948,10 +1957,10 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 
 							if (isILSelected) {
 
-								final Integer vertexIndex = (Integer) label.getData(DATA_KEY_VERTEX_INDEX);
+								final Integer speedTTIndex = (Integer) label.getData(DATA_KEY_SPEED_TOUR_TYPE_INDEX);
 
-								final SpeedTourType vertex = _currentIL.speedTourTypes.get(vertexIndex);
-								final long tourTypeId = vertex.tourTypeId;
+								final SpeedTourType speedTT = _currentIL.speedTourTypes.get(speedTTIndex);
+								final long tourTypeId = speedTT.tourTypeId;
 
 								label.setImage(net.tourbook.ui.UI.getInstance().getTourTypeImage(tourTypeId));
 
@@ -2008,7 +2017,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 		// get tour type which will be checked in the menu
 		final TourType checkedTourType = null;
 
-		final int vertexIndex = (int) linkTourType.getData(DATA_KEY_VERTEX_INDEX);
+		final int speedTTIndex = (int) linkTourType.getData(DATA_KEY_SPEED_TOUR_TYPE_INDEX);
 
 		// add all tour types to the menu
 		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
@@ -2023,7 +2032,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 			final ActionSpeedTourType_SetInMenu action = new ActionSpeedTourType_SetInMenu(
 					tourType,
 					isChecked,
-					vertexIndex);
+					speedTTIndex);
 
 			menuMgr.add(action);
 		}
@@ -2216,7 +2225,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 		};
 
 		/*
-		 * Vertex listener
+		 * Default mouse listener
 		 */
 		_defaultMouseWheelListener = new MouseWheelListener() {
 			@Override
@@ -2225,7 +2234,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 			}
 		};
 
-		_vertexTourTypeListener = new SelectionAdapter() {
+		_speedTourTypeListener = new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
 				UI.openControlMenu((Link) event.widget);
@@ -2248,6 +2257,8 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 	private void onDispose() {
 
 		disposeConfigImages();
+
+		_prefStore.removePropertyChangeListener(_prefChangeListener);
 	}
 
 	private void onFolder_FocusLost(final FocusEvent event) {
@@ -2425,7 +2436,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 			_txtIL_ConfigName.setText(UI.EMPTY_STRING);
 			_txtIL_ConfigDescription.setText(UI.EMPTY_STRING);
 
-			// remove vertex fields
+			// remove fields
 			createUI_835_SpeedTourType_Fields();
 
 			enableILControls();
@@ -2453,7 +2464,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 		}
 
 		final TableItem item = (TableItem) event.item;
-		final DeviceImportLauncher importConfig = (DeviceImportLauncher) item.getData();
+		final DeviceImportLauncher importLauncher = (DeviceImportLauncher) item.getData();
 
 		switch (event.type) {
 		case SWT.MeasureItem:
@@ -2463,14 +2474,14 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 			 * will be adjusted when an item is expanded.
 			 */
 
-			event.width += importConfig.imageWidth;
+			event.width += importLauncher.imageWidth;
 //			event.height = PROFILE_IMAGE_HEIGHT;
 
 			break;
 
 		case SWT.PaintItem:
 
-			final Image image = _rawDataView.getImportConfigImage(importConfig);
+			final Image image = _rawDataView.getImportConfigImage(importLauncher);
 
 			if (image != null && !image.isDisposed()) {
 
@@ -2561,54 +2572,60 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 		update_UI_From_Model_TourTypes();
 
 		enableILControls();
+
+		redrawILViewer();
 	}
 
-	private void onSpeedTourType_Add() {
+	private void onSpeedTT_Add() {
 
 		update_Model_From_UI_Launcher();
 
-		final ArrayList<SpeedTourType> speedVertices = _currentIL.speedTourTypes;
+		final ArrayList<SpeedTourType> speedTourTypes = _currentIL.speedTourTypes;
 
 		// update model
-		speedVertices.add(0, new SpeedTourType());
+		speedTourTypes.add(0, new SpeedTourType());
 
-		// sort vertices by value
-		Collections.sort(speedVertices);
+		// sort by speed
+		Collections.sort(speedTourTypes);
 
 		// update UI + model
 		update_UI_From_Model_TourTypes();
 
 		enableILControls();
 
-		// set focus to the new vertex
+		// set focus to the speed
 		_spinnerTT_Speed_AvgSpeed[0].setFocus();
+
+		redrawILViewer();
 	}
 
-	private void onSpeedTourType_Remove(final int vertexIndex) {
+	private void onSpeedTT_Remove(final int speedTTIndex) {
 
 		// update model
 		update_Model_From_UI_Launcher();
 
-		final ArrayList<SpeedTourType> speedVertices = _currentIL.speedTourTypes;
+		final ArrayList<SpeedTourType> speedTourTypes = _currentIL.speedTourTypes;
 
-		final SpeedTourType removedVertex = speedVertices.get(vertexIndex);
+		final SpeedTourType removedSpeedTT = speedTourTypes.get(speedTTIndex);
 
-		speedVertices.remove(removedVertex);
+		speedTourTypes.remove(removedSpeedTT);
 
 		// update UI
 		update_UI_From_Model_TourTypes();
 
 		enableILControls();
+
+		redrawILViewer();
 	}
 
-	private void onSpeedTourType_SetTourType(final int vertexIndex, final TourType tourType) {
+	private void onSpeedTT_SetTourType(final int speedTTIndex, final TourType tourType) {
 
 		/*
 		 * Update UI
 		 */
 		final Image image = net.tourbook.ui.UI.getInstance().getTourTypeImage(tourType.getTypeId());
-		final Label ttIcon = _lblTT_Speed_TourTypeIcon[vertexIndex];
-		final Link ttLink = _linkTT_Speed_TourType[vertexIndex];
+		final Label ttIcon = _lblTT_Speed_TourTypeIcon[speedTTIndex];
+		final Link ttLink = _linkTT_Speed_TourType[speedTTIndex];
 
 		ttIcon.setImage(image);
 
@@ -2616,12 +2633,20 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 		ttLink.setData(DATA_KEY_TOUR_TYPE_ID, tourType.getTypeId());
 
 		_speedTourType_OuterContainer.layout();
+
+		// update UI with modified tour type
+		update_Model_From_UI_Launcher();
+		_ilViewer.update(_currentIL, null);
+
+		redrawILViewer();
 	}
 
-	private void onSpeedTourType_Sort() {
+	private void onSpeedTT_Sort() {
 
 		update_Model_From_UI_Launcher();
 		update_UI_From_Model_TourTypes();
+
+		redrawILViewer();
 	}
 
 	@Override
@@ -2644,6 +2669,12 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 		_viewerContainer.setRedraw(true);
 
 		return _ilViewer;
+	}
+
+	private void redrawILViewer() {
+
+		// IL viewer MUST be redrawn to show modified tour type image
+		_ilViewer.getTable().redraw();
 	}
 
 	@Override
@@ -2756,7 +2787,10 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 			return;
 		}
 
-		update_Model_From_UI_LauncherValues();
+		_currentIL.name = _txtIL_ConfigName.getText();
+		_currentIL.description = _txtIL_ConfigDescription.getText();
+		_currentIL.isShowInDashboard = _chkIL_ShowInDashboard.getSelection();
+		_currentIL.isSaveTour = _chkIL_SaveTour.getSelection();
 
 		final Enum<TourTypeConfig> selectedTourTypeConfig = getSelectedTourTypeConfig();
 
@@ -2767,40 +2801,37 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 		 */
 		if (TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED.equals(selectedTourTypeConfig)) {
 
-			final ArrayList<SpeedTourType> speedVertices = _currentIL.speedTourTypes;
+			final ArrayList<SpeedTourType> speedTourTypes = _currentIL.speedTourTypes;
 
 			if (_spinnerTT_Speed_AvgSpeed != null) {
 
-				final ArrayList<SpeedTourType> newVertices = new ArrayList<SpeedTourType>();
+				final ArrayList<SpeedTourType> newSpeedTourTypes = new ArrayList<SpeedTourType>();
 
-				for (int vertexIndex = 0; vertexIndex < speedVertices.size(); vertexIndex++) {
+				for (int speedTTIndex = 0; speedTTIndex < speedTourTypes.size(); speedTTIndex++) {
 
-					/*
-					 * create vertices from UI controls
-					 */
-					final Spinner spinnerAvgSpeed = _spinnerTT_Speed_AvgSpeed[vertexIndex];
-					final Link linkTourType = _linkTT_Speed_TourType[vertexIndex];
+					final Spinner spinnerAvgSpeed = _spinnerTT_Speed_AvgSpeed[speedTTIndex];
+					final Link linkTourType = _linkTT_Speed_TourType[speedTTIndex];
 
-					final SpeedTourType speedVertex = new SpeedTourType();
+					final SpeedTourType speedTourType = new SpeedTourType();
 
-					speedVertex.avgSpeed = spinnerAvgSpeed.getSelection() * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+					speedTourType.avgSpeed = spinnerAvgSpeed.getSelection() * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
 					final Object tourTypeId = linkTourType.getData(DATA_KEY_TOUR_TYPE_ID);
 					if (tourTypeId instanceof Long) {
-						speedVertex.tourTypeId = (long) tourTypeId;
+						speedTourType.tourTypeId = (long) tourTypeId;
 					} else {
-						speedVertex.tourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
+						speedTourType.tourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
 					}
 
-					newVertices.add(speedVertex);
+					newSpeedTourTypes.add(speedTourType);
 				}
 
-				// sort vertices by value
-				Collections.sort(newVertices);
+				// sort value
+				Collections.sort(newSpeedTourTypes);
 
 				// update model
-				speedVertices.clear();
-				speedVertices.addAll(newVertices);
+				speedTourTypes.clear();
+				speedTourTypes.addAll(newSpeedTourTypes);
 			}
 
 			_currentIL.setupItemImage();
@@ -2811,18 +2842,10 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 
 		} else {
 
-			// this is the default or TourTypeConfig.TOUR_TYPE_CONFIG_NOT_USED
+			// this is the default
 
 			_currentIL.setupItemImage();
 		}
-	}
-
-	private void update_Model_From_UI_LauncherValues() {
-
-		_currentIL.name = _txtIL_ConfigName.getText();
-		_currentIL.description = _txtIL_ConfigDescription.getText();
-		_currentIL.isShowInDashboard = _chkIL_ShowInDashboard.getSelection();
-		_currentIL.isSaveTour = _chkIL_SaveTour.getSelection();
 	}
 
 	private void update_Model_From_UI_LiveUpdateValues() {
@@ -2879,8 +2902,6 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 		final Enum<TourTypeConfig> tourTypeConfig = _currentIL.tourTypeConfig;
 		final boolean isSetTourType = tourTypeConfig != null;
 
-//		_ilViewer.update(_currentIL, null);
-//
 		_txtIL_ConfigName.setText(_currentIL.name);
 		_txtIL_ConfigDescription.setText(_currentIL.description);
 		_chkIL_SaveTour.setSelection(_currentIL.isSaveTour);
@@ -2900,23 +2921,23 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 
 			_speedTourType_OuterContainer.setRedraw(false);
 			{
-				// check and create vertex fields
+				// check and create fields
 				createUI_835_SpeedTourType_Fields();
 
-				final ArrayList<SpeedTourType> speedVertices = _currentIL.speedTourTypes;
+				final ArrayList<SpeedTourType> speedTourTypes = _currentIL.speedTourTypes;
 
-				final int vertexSize = speedVertices.size();
+				final int speedTTSize = speedTourTypes.size();
 
 				final net.tourbook.ui.UI uiInstance = net.tourbook.ui.UI.getInstance();
 
-				for (int vertexIndex = 0; vertexIndex < vertexSize; vertexIndex++) {
+				for (int speedTTIndex = 0; speedTTIndex < speedTTSize; speedTTIndex++) {
 
-					final SpeedTourType speedTT = speedVertices.get(vertexIndex);
+					final SpeedTourType speedTT = speedTourTypes.get(speedTTIndex);
 					final long tourTypeId = speedTT.tourTypeId;
 
-					final Spinner spinnerAvgSpeed = _spinnerTT_Speed_AvgSpeed[vertexIndex];
-					final Link linkTourType = _linkTT_Speed_TourType[vertexIndex];
-					final Label labelTourTypeIcon = _lblTT_Speed_TourTypeIcon[vertexIndex];
+					final Spinner spinnerAvgSpeed = _spinnerTT_Speed_AvgSpeed[speedTTIndex];
+					final Link linkTourType = _linkTT_Speed_TourType[speedTTIndex];
+					final Label labelTourTypeIcon = _lblTT_Speed_TourTypeIcon[speedTTIndex];
 
 					// update UI
 					final double avgSpeed = (speedTT.avgSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE) + 0.0001;
@@ -2939,11 +2960,11 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 						labelTourTypeIcon.setImage(uiInstance.getTourTypeImage(tourTypeId));
 					}
 
-					// keep vertex references
-					labelTourTypeIcon.setData(DATA_KEY_VERTEX_INDEX, vertexIndex);
-					linkTourType.setData(DATA_KEY_VERTEX_INDEX, vertexIndex);
-					spinnerAvgSpeed.setData(DATA_KEY_VERTEX_INDEX, vertexIndex);
-					_actionTTSpeed_Delete[vertexIndex].setData(DATA_KEY_VERTEX_INDEX, vertexIndex);
+					// keep references
+					labelTourTypeIcon.setData(DATA_KEY_SPEED_TOUR_TYPE_INDEX, speedTTIndex);
+					linkTourType.setData(DATA_KEY_SPEED_TOUR_TYPE_INDEX, speedTTIndex);
+					spinnerAvgSpeed.setData(DATA_KEY_SPEED_TOUR_TYPE_INDEX, speedTTIndex);
+					_actionTTSpeed_Delete[speedTTIndex].setData(DATA_KEY_SPEED_TOUR_TYPE_INDEX, speedTTIndex);
 
 				}
 			}
@@ -2967,31 +2988,12 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 			// this is the default, a tour type is not set
 		}
 
-		/*
-		 * Clear UI for the other tour type configs that they do not be displayed when another
-		 * import config is selected.
-		 */
-//		if (TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED.equals(tourTypeConfig)) {
-//
-//			updateUI_OneTourType(null);
-//
-//		} else if (TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL.equals(tourTypeConfig)) {
-//
-//			updateUI_ClearVertices();
-//
-//		} else {
-//
-//			// this is the default or TourTypeConfig.TOUR_TYPE_CONFIG_NOT_USED
-//
-//			updateUI_ClearVertices();
-//		}
-
 		showTourTypePage(tourTypeConfig);
 
 		_isInUIUpdate = false;
 	}
 
-	private void updateUI_ClearVertices() {
+	private void updateUI_ClearSpeedTourTypes() {
 
 		if (_speedTourType_ScrolledContainer != null) {
 
@@ -3028,7 +3030,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 		// update the model that the table displays the correct image
 		update_Model_From_UI_OneTourType();
 
-		_ilViewer.getTable().redraw();
+		redrawILViewer();
 	}
 
 }

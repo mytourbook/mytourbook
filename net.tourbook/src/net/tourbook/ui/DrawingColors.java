@@ -42,13 +42,11 @@ public class DrawingColors {
 
 	@Override
 	public String toString() {
-		return "DrawingColors [colorBright="
-				+ colorBright
-				+ ", colorDark="
-				+ colorDark
-				+ ", colorLine="
-				+ colorLine
-				+ "]";
+		return "DrawingColors [" //$NON-NLS-1$
+				+ ("colorBright=" + colorBright + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("colorDark=" + colorDark + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("colorLine=" + colorLine) //$NON-NLS-1$
+				+ "]"; //$NON-NLS-1$
 	}
 
 }

@@ -61,12 +61,12 @@ public class SpeedTourType implements Comparable<Object>, Cloneable {
 
 	@Override
 	public String toString() {
-		return "\nSpeedVertex ["
+		return "\nSpeedTourType [" //$NON-NLS-1$
 		//
-				+ ("avgSpeed=" + avgSpeed + ", ")
-				+ ("tourTypeId=" + tourTypeId + ", ")
+				+ ("avgSpeed=" + avgSpeed + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("tourTypeId=" + tourTypeId + ", ") //$NON-NLS-1$ //$NON-NLS-2$
 				//
-				+ "]";
+				+ "]"; //$NON-NLS-1$
 	}
 
 }
