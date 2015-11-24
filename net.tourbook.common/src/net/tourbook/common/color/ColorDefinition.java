@@ -59,14 +59,15 @@ public class ColorDefinition {
 	 * situation.
 	 */
 	private Map2ColorProfile		_map2ColorProfile_Active;
+
 	private Map2ColorProfile		_map2ColorProfile_Default;
 	private Map2ColorProfile		_map2ColorProfile_New;
 
 	/**
 	 * Sets the color for the default, current and changes
 	 * 
-	 * @param prefName
-	 *            preference name
+	 * @param colorDefinitionId
+	 *            Unique id
 	 * @param visibleName
 	 *            visible name
 	 * @param defaultGradientBright
@@ -80,7 +81,7 @@ public class ColorDefinition {
 	 * @param defaultMapColorProfile
 	 *            Map color configuration or <code>null</code> when not available.
 	 */
-	protected ColorDefinition(	final String prefName,
+	protected ColorDefinition(	final String colorDefinitionId,
 								final String visibleName,
 								final RGB defaultGradientBright,
 								final RGB defaultGradientDark,
@@ -88,7 +89,7 @@ public class ColorDefinition {
 								final RGB defaultTextColor,
 								final Map2ColorProfile defaultMapColorProfile) {
 
-		_colorDefinitionId = prefName;
+		_colorDefinitionId = colorDefinitionId;
 		_visibleName = visibleName;
 
 		_gradientBright_Default = defaultGradientBright;
@@ -312,6 +313,17 @@ public class ColorDefinition {
 
 	public void setVisibleName(final String visibleName) {
 		_visibleName = visibleName;
+	}
+
+	@Override
+	public String toString() {
+		return "ColorDefinition ["
+
+				+ ("_colorDefinitionId=" + _colorDefinitionId + ", ")
+				+ ("_graphPrefNamePrefix=" + _graphPrefNamePrefix + ", ")
+//				+ ("_graphColorItems=" + Arrays.toString(_graphColorItems))
+
+				+ "]";
 	}
 
 }

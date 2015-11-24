@@ -65,6 +65,111 @@ public class GraphColorPainter {
 		_colorCache.clear();
 	}
 
+	/**
+	 * Draw graph and map colors into the defintion image.
+	 * 
+	 * @param horizontalImages
+	 */
+	Image drawColorDefinitionImage(final ColorDefinition colorDefinition, final int horizontalImages) {
+
+		final Display display = Display.getCurrent();
+
+		final String colorDefinitionId = colorDefinition.getColorDefinitionId();
+
+		if (colorDefinitionId.equals(_recreateColorDefinitionId)) {
+
+			/*
+			 * Dispose image for the color definition
+			 */
+
+			_recreateColorDefinitionId = null;
+
+			final Image image = _imageCache.remove(colorDefinitionId);
+			if (image != null && !image.isDisposed()) {
+				image.dispose();
+			}
+		}
+
+		Image colorDefinitionImage = _imageCache.get(colorDefinitionId);
+
+		if (colorDefinitionImage == null || colorDefinitionImage.isDisposed()) {
+
+			final GraphColorItem[] graphColors = colorDefinition.getGraphColorItems();
+
+			final int borderSize = 0;
+			final int imageSpacing = GRAPH_COLOR_SPACING;
+			final int imageSize = _itemHeight - 2;
+
+			colorDefinitionImage = new Image(//
+					display,
+					(horizontalImages * imageSize) + ((horizontalImages - 1) * imageSpacing),
+					imageSize);
+
+			final GC gc = new GC(colorDefinitionImage);
+			{
+				for (int colorIndex = 0; colorIndex < graphColors.length; colorIndex++) {
+
+					final int colorX = colorIndex * (imageSize + imageSpacing);
+					final int colorY = 0;
+
+					final int contentWidth = imageSize - 2 * borderSize;
+					final int contentHeight = imageSize - 2 * borderSize;
+
+					final Rectangle imageBounds = new Rectangle(//
+							colorX,
+							colorY,
+							imageSize,
+							imageSize);
+
+					final GraphColorItem graphColorItem = graphColors[colorIndex];
+
+					if (graphColorItem.isMapColor()) {
+
+						// draw 2D map color
+
+						// tell the legend provider how to draw the legend
+						final IGradientColorProvider colorProvider = _colorTreeViewer.getMapLegendColorProvider();
+						colorProvider.setColorProfile(graphColorItem.getColorDefinition().getMap2Color_New());
+
+						TourMapPainter.drawMap2Legend(//
+								gc,
+								imageBounds,
+								colorProvider,
+								false);
+
+					} else {
+
+						// draw graph color
+
+						final Color graphColor = getGraphColor(display, graphColorItem);
+
+						// draw border
+//						gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
+						gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+						gc.drawRectangle(//
+								colorX,
+								colorY,
+								imageBounds.width - 1,
+								imageBounds.height - 1);
+
+						// draw graph color
+						gc.setBackground(graphColor);
+						gc.fillRectangle(//
+								colorX + borderSize,
+								colorY + borderSize,
+								contentWidth,
+								contentHeight);
+					}
+				}
+			}
+			gc.dispose();
+
+			_imageCache.put(colorDefinitionId, colorDefinitionImage);
+		}
+
+		return colorDefinitionImage;
+	}
+
 	Image drawGraphColorImage(final GraphColorItem graphColorItem, final int horizontalImages) {
 
 		final Display display = Display.getCurrent();
@@ -166,110 +271,6 @@ public class GraphColorPainter {
 	}
 
 	/**
-	 * Draw graph and map colors into the defintion image.
-	 * 
-	 * @param horizontalImages
-	 */
-	Image drawColorDefinitionImage(final ColorDefinition colorDefinition, final int horizontalImages) {
-
-		final Display display = Display.getCurrent();
-
-		final String colorDefinitionId = colorDefinition.getColorDefinitionId();
-
-		if (colorDefinitionId.equals(_recreateColorDefinitionId)) {
-
-			/*
-			 * Dispose image for the color definition
-			 */
-
-			_recreateColorDefinitionId = null;
-
-			final Image image = _imageCache.remove(colorDefinitionId);
-			if (image != null && !image.isDisposed()) {
-				image.dispose();
-			}
-		}
-
-		Image colorDefinitionImage = _imageCache.get(colorDefinitionId);
-		final GraphColorItem[] graphColors = colorDefinition.getGraphColorItems();
-
-		if (colorDefinitionImage == null || colorDefinitionImage.isDisposed()) {
-
-			final int borderSize = 0;
-			final int imageSpacing = GRAPH_COLOR_SPACING;
-			final int imageSize = _itemHeight - 2;
-
-			colorDefinitionImage = new Image(//
-					display,
-					(horizontalImages * imageSize) + ((horizontalImages - 1) * imageSpacing),
-					imageSize);
-
-			final GC gc = new GC(colorDefinitionImage);
-			{
-				for (int colorIndex = 0; colorIndex < graphColors.length; colorIndex++) {
-
-					final int colorX = colorIndex * (imageSize + imageSpacing);
-					final int colorY = 0;
-
-					final int contentWidth = imageSize - 2 * borderSize;
-					final int contentHeight = imageSize - 2 * borderSize;
-
-					final Rectangle imageBounds = new Rectangle(//
-							colorX,
-							colorY,
-							imageSize,
-							imageSize);
-
-					final GraphColorItem graphColorItem = graphColors[colorIndex];
-
-					if (graphColorItem.isMapColor()) {
-
-						// draw 2D map color
-
-						// tell the legend provider how to draw the legend
-						final IGradientColorProvider colorProvider = _colorTreeViewer.getMapLegendColorProvider();
-						colorProvider.setColorProfile(graphColorItem.getColorDefinition().getMap2Color_New());
-
-						TourMapPainter.drawMap2Legend(//
-								gc,
-								imageBounds,
-								colorProvider,
-								false);
-
-					} else {
-
-						// draw graph color
-
-						final Color graphColor = getGraphColor(display, graphColorItem);
-
-						// draw border
-//						gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
-						gc.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-						gc.drawRectangle(//
-								colorX,
-								colorY,
-								imageBounds.width - 1,
-								imageBounds.height - 1);
-
-						// draw graph color
-						gc.setBackground(graphColor);
-						gc.fillRectangle(//
-								colorX + borderSize,
-								colorY + borderSize,
-								contentWidth,
-								contentHeight);
-					}
-				}
-			}
-			gc.dispose();
-
-			_imageCache.put(colorDefinitionId, colorDefinitionImage);
-		}
-
-		return colorDefinitionImage;
-	}
-
-	/**
 	 * @param display
 	 * @param graphColor
 	 * @return return the {@link Color} for the graph
@@ -288,7 +289,7 @@ public class GraphColorPainter {
 		return imageColor;
 	}
 
-	public void recreateResources(final String colorId, final String colorDefinitionId) {
+	public void invalidateResources(final String colorId, final String colorDefinitionId) {
 
 		_recreateColorId = colorId;
 		_recreateColorDefinitionId = colorDefinitionId;

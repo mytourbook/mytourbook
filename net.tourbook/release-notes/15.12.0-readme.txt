@@ -49,3 +49,9 @@ Improvements
 ============	
 
 * 
+
+Bugfixes
+========
+
+* Fixed historic bug that a new tour type do not display the colors correctly until the pref dialog is reopened.
+

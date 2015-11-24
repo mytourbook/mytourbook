@@ -109,4 +109,15 @@ public class GraphColorItem {
 			_colorDefinition.setGradientDark_New(rgb);
 		}
 	}
+
+	@Override
+	public String toString() {
+		return "GraphColorItem ["
+
+				+ ("_visibleName=" + _visibleName + ", ")
+				+ ("_colorId=" + _colorId + ", ")
+				+ ("_colorPrefName=" + _colorPrefName)
+
+				+ "]";
+	}
 }

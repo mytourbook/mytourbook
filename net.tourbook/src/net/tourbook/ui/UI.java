@@ -1451,6 +1451,7 @@ public class UI {
 			gcImage.setForeground(colorLine);
 			gcImage.drawRectangle(3, 3, imageSize - 7, imageSize - 7);
 		}
+
 		drawingColors.dispose();
 		colorTransparent.dispose();
 	}

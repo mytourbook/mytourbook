@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -33,13 +33,13 @@ public class TourTypeColorDefinition extends ColorDefinition implements Comparab
 	 * Create tour type color definition with default ugly color
 	 * 
 	 * @param tourType
-	 * @param prefName
+	 * @param colorDefinitionId
 	 * @param visibleName
 	 */
-	public TourTypeColorDefinition(final TourType tourType, final String prefName, final String visibleName) {
+	public TourTypeColorDefinition(final TourType tourType, final String colorDefinitionId, final String visibleName) {
 
 		// rgb values must be cloned that each tour type has it's own color
-		super(prefName, visibleName, //
+		super(colorDefinitionId, visibleName, //
 				new RGB(DEFAULT_GRADIENT_BRIGHT.red, DEFAULT_GRADIENT_BRIGHT.green, DEFAULT_GRADIENT_BRIGHT.blue), //
 				new RGB(DEFAULT_GRADIENT_DARK.red, DEFAULT_GRADIENT_DARK.green, DEFAULT_GRADIENT_DARK.blue),
 				new RGB(DEFAULT_LINE_COLOR.red, DEFAULT_LINE_COLOR.green, DEFAULT_LINE_COLOR.blue),
@@ -49,15 +49,24 @@ public class TourTypeColorDefinition extends ColorDefinition implements Comparab
 		_tourType = tourType;
 	}
 
+	/**
+	 * @param tourType
+	 * @param colorDefinitionId
+	 * @param visibleName
+	 * @param defaultGradientBright
+	 * @param defaultGradientDark
+	 * @param defaultLineColor
+	 * @param defaultTextColor
+	 */
 	public TourTypeColorDefinition(	final TourType tourType,
-									final String prefName,
+									final String colorDefinitionId,
 									final String visibleName,
 									final RGB defaultGradientBright,
 									final RGB defaultGradientDark,
 									final RGB defaultLineColor,
 									final RGB defaultTextColor) {
 
-		super(prefName, visibleName, //
+		super(colorDefinitionId, visibleName, //
 				defaultGradientBright,
 				defaultGradientDark,
 				defaultLineColor,
@@ -71,8 +80,10 @@ public class TourTypeColorDefinition extends ColorDefinition implements Comparab
 	public int compareTo(final Object obj) {
 
 		if (obj instanceof TourTypeColorDefinition) {
-			final TourTypeColorDefinition otherColorDef = (TourTypeColorDefinition) obj;
-			return _tourType.compareTo(otherColorDef.getTourType());
+
+			final TourTypeColorDefinition otherColorDefinition = (TourTypeColorDefinition) obj;
+
+			return _tourType.compareTo(otherColorDefinition.getTourType());
 		}
 
 		return 0;
@@ -114,6 +125,7 @@ public class TourTypeColorDefinition extends ColorDefinition implements Comparab
 	}
 
 	public void setTourType(final TourType tourType) {
+
 		_tourType = tourType;
 	}
 }

@@ -537,7 +537,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 			/*
 			 * dispose the old color/image from the graph
 			 */
-			_graphColorPainter.recreateResources(//
+			_graphColorPainter.invalidateResources(//
 					_selectedColor.getColorId(),
 					_selectedColor.getColorDefinition().getColorDefinitionId());
 
@@ -695,7 +695,7 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 		/*
 		 * dispose old color and image for the graph
 		 */
-		_graphColorPainter.recreateResources(//
+		_graphColorPainter.invalidateResources(//
 				_selectedColor.getColorId(),
 				selectedColorDefinition.getColorDefinitionId());
 
