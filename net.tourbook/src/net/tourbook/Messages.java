@@ -131,7 +131,6 @@ public class Messages extends NLS {
 	public static String		Dialog_ImportConfig_Column_Description;
 	public static String		Dialog_ImportConfig_Column_Name;
 	public static String		Dialog_ImportConfig_Column_Save;
-	public static String		Dialog_ImportConfig_Column_Save_Tooltip;
 	public static String		Dialog_ImportConfig_Column_TourType;
 	public static String		Dialog_ImportConfig_Combo_Folder_Tooltip;
 	public static String		Dialog_ImportConfig_Dialog_BackupFolder_Message;
@@ -674,6 +673,8 @@ public class Messages extends NLS {
 	public static String		Image__App_Edit_Paste;
 	public static String		Image__App_OK;
 	public static String		Image__App_RestoreDefault;
+	public static String	Image__App_SaveTour;
+
 	public static String		Image__App_Sort;
 	public static String		Image__App_Sort_Disabled;
 	public static String		Image__App_State_Error;
@@ -858,10 +859,13 @@ public class Messages extends NLS {
 	public static String		Import_Data_Error_CreatingFileName_Title;
 	public static String		Import_Data_Error_DeviceImport_InvalidBackupFolder_Message;
 	public static String		Import_Data_Error_DeviceImport_InvalidDeviceFolder_Message;
-	public static String		Import_Data_Error_DeviceImport_NoImportFiles_Message;
 	public static String		Import_Data_Error_DeviceImport_Title;
+
+	public static String	Import_Data_Error_NoActivePersion_Message;
 	public static String		Import_Data_HTML_AcquireDeviceInfo;
 	public static String		Import_Data_HTML_AllFilesAreBackedUp;
+
+	public static String	Import_Data_HTML_AllFilesAreImported;
 	public static String		Import_Data_HTML_BackupFolder;
 	public static String		Import_Data_HTML_DeviceFolder;
 	public static String		Import_Data_HTML_DeviceImport;
@@ -877,6 +881,8 @@ public class Messages extends NLS {
 	public static String		Import_Data_HTML_ReceiveFromSerialPort_DirectlyLink;
 	public static String		Import_Data_HTML_SaveTour_No;
 	public static String		Import_Data_HTML_SaveTour_Yes;
+
+	public static String	Import_Data_Info_DeviceImport_NoImportFiles_Message;
 	public static String		Import_Data_Task_Backup;
 	public static String		Import_Data_Task_Backup_SubTask;
 	public static String		Import_Data_Task_CloseDeviceInfo;

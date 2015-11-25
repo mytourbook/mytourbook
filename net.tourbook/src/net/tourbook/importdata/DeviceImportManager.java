@@ -591,9 +591,9 @@ public class DeviceImportManager {
 		_fileStoresHash = null;
 	}
 
-	public ImportState runImport(final DeviceImportLauncher importLauncher) {
+	public ImportDeviceState runImport(final DeviceImportLauncher importLauncher) {
 
-		final ImportState importState = new ImportState();
+		final ImportDeviceState importState = new ImportDeviceState();
 
 		final ImportConfig importConfig = getDeviceImportConfig();
 
@@ -643,10 +643,13 @@ public class DeviceImportManager {
 		final ArrayList<OSFile> notImportedPaths = importConfig.notImportedFiles;
 		if (notImportedPaths.size() == 0) {
 
-			MessageDialog.openError(
+			MessageDialog.openInformation(
 					Display.getDefault().getActiveShell(),
 					Messages.Import_Data_Error_DeviceImport_Title,
-					NLS.bind(Messages.Import_Data_Error_DeviceImport_NoImportFiles_Message, deviceOSFolder));
+					NLS.bind(Messages.Import_Data_Info_DeviceImport_NoImportFiles_Message, deviceOSFolder));
+
+			// there is nothing more to do
+			importState.isImportCanceled = true;
 
 			return importState;
 		}
@@ -666,7 +669,9 @@ public class DeviceImportManager {
 		final String firstFilePathName = notImportedPaths.get(0).path.toString();
 		final String[] fileNames = notImportedFileNames.toArray(new String[notImportedFileNames.size()]);
 
-		RawDataManager.getInstance().actionImportFromFile_DoTheImport(firstFilePathName, fileNames);
+		final ImportRunState importRunState = RawDataManager.getInstance().doTheImport(firstFilePathName, fileNames);
+
+		importState.isImportCanceled = importRunState.isImportCanceled;
 
 		/*
 		 * Update tour data.
@@ -738,7 +743,8 @@ public class DeviceImportManager {
 		return isCanceled[0];
 	}
 
-	private void runImport_SetPathAndTourType(final DeviceImportLauncher importLauncher, final ImportState importState) {
+	private void runImport_SetPathAndTourType(	final DeviceImportLauncher importLauncher,
+												final ImportDeviceState importState) {
 
 		final HashMap<Long, TourData> importedTours = RawDataManager.getInstance().getImportedTours();
 
@@ -875,10 +881,11 @@ public class DeviceImportManager {
 				tourAvgSpeed = tourDistanceKm / drivingTime * 3.6;
 			}
 
+			final ArrayList<SpeedTourType> speedTourTypes = importLauncher.speedTourTypes;
 			long tourTypeId = -1;
 
 			// find tour type for the tour avg speed
-			for (final SpeedTourType speedTourType : importLauncher.speedTourTypes) {
+			for (final SpeedTourType speedTourType : speedTourTypes) {
 
 				if (tourAvgSpeed <= speedTourType.avgSpeed) {
 
@@ -891,14 +898,17 @@ public class DeviceImportManager {
 
 				// tour avg speed is above the last speed tour type -> use the last
 
-				if (importLauncher.speedTourTypes.size() > 0) {
-					tourTypeId = importLauncher.speedTourTypes.get(0).tourTypeId;
+				final int numTourTypes = speedTourTypes.size();
+
+				if (numTourTypes > 0) {
+					tourTypeId = speedTourTypes.get(numTourTypes - 1).tourTypeId;
 				}
 			}
 
 			if (tourTypeId != -1) {
 
 				final TourType tourType = net.tourbook.ui.UI.getTourType(tourTypeId);
+
 				tourData.setTourType(tourType);
 			}
 

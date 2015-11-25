@@ -22,6 +22,7 @@ import java.util.Iterator;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.ITourItem;
@@ -190,7 +191,9 @@ public class ActionDeleteTour extends Action {
 		if (selectedTours < 2) {
 
 			final Runnable deleteRunnable = new Runnable() {
+				@Override
 				public void run() {
+
 					// delete selected tours
 					deleteTours(selection, selectionRemovedTours, null);
 				}
@@ -200,17 +203,18 @@ public class ActionDeleteTour extends Action {
 		} else {
 
 			final IRunnableWithProgress deleteRunnable = new IRunnableWithProgress() {
+				@Override
 				public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+
 					// delete selected tours
 					deleteTours(selection, selectionRemovedTours, monitor);
 				}
 			};
+
 			try {
 				new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, false, deleteRunnable);
-			} catch (final InvocationTargetException e) {
-				e.printStackTrace();
-			} catch (final InterruptedException e) {
-				e.printStackTrace();
+			} catch (InvocationTargetException | InterruptedException e) {
+				StatusUtil.log(e);
 			}
 		}
 

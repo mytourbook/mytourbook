@@ -21,7 +21,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourType;
 
-public class DeviceImportLauncher implements Cloneable, Comparable<DeviceImportLauncher> {
+public class DeviceImportLauncher implements Cloneable {
 
 	public String					description			= UI.EMPTY_STRING;
 	public String					name				= UI.EMPTY_STRING;
@@ -80,12 +80,6 @@ public class DeviceImportLauncher implements Cloneable, Comparable<DeviceImportL
 		}
 
 		return clonedObject;
-	}
-
-	@Override
-	public int compareTo(final DeviceImportLauncher otherConfig) {
-
-		return name.compareTo(otherConfig.name);
 	}
 
 	@Override
@@ -158,7 +152,7 @@ public class DeviceImportLauncher implements Cloneable, Comparable<DeviceImportL
 	@Override
 	public String toString() {
 		return "DeviceImportLauncher [" //$NON-NLS-1$
-		//
+				//
 				+ ("name=" + name + ", ") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("speedTourTypes=" + speedTourTypes + ", ") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("tourTypeConfig=" + tourTypeConfig + ", ") //$NON-NLS-1$ //$NON-NLS-2$

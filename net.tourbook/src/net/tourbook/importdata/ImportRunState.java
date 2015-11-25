@@ -15,8 +15,7 @@
  *******************************************************************************/
 package net.tourbook.importdata;
 
-public class ImportState {
+public class ImportRunState {
 
-	public boolean	isOpenSetup;
-	public boolean	isUpdateImportViewer;
+	public boolean	isImportCanceled;
 }

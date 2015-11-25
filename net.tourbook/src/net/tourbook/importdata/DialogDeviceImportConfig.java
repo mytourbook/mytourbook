@@ -1832,7 +1832,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 
 		colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_Save);
 		colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_Save);
-		colDef.setColumnHeaderToolTipText(Messages.Dialog_ImportConfig_Column_Save_Tooltip);
+		colDef.setColumnHeaderToolTipText(Messages.Dialog_ImportConfig_Checkbox_SaveTour_Tooltip);
 
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(7));
 		colDef.setColumnWeightData(new ColumnWeightData(7));

@@ -175,11 +175,11 @@ a.import-tile:FOCUS .import-tile-name
 	xbackground-color: 		#008;
 }
 
-.import-tile-name
+.import-tile-config
 {
 	position:				absolute;
 	bottom:					3px;
-	text-align: 			center;
+	xtext-align: 			center;
 	width: 					calc(100% - 6px);
 	padding-left:			3px;
 
@@ -189,6 +189,15 @@ a.import-tile:FOCUS .import-tile-name
 	
 	color:					#bbb;
 	xbackground-color: 		green;
+}
+
+.action-button-16
+{
+	width: 					16px; 
+	height: 				16px; 
+
+	background-repeat:		no-repeat;
+	background-position:	center;
 }
 
 .action-button
@@ -208,12 +217,6 @@ a.action-button:VISITED
 	display:				block;
 
 	text-decoration:		none;
-}
-
-a.action-button:HOVER 
-{ 
-	xborder: 				1px solid #fff;
-	xborder-radius:			3px;
 }
 
 /*

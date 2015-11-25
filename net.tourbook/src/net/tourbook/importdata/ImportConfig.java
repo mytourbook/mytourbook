@@ -16,7 +16,6 @@
 package net.tourbook.importdata;
 
 import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.tourbook.common.NIO;
 import net.tourbook.common.UI;
@@ -75,16 +74,12 @@ public class ImportConfig {
 	 */
 	public ArrayList<OSFile>				notImportedFiles					= new ArrayList<>();
 
-	public AtomicBoolean					isUpdateDeviceState					= new AtomicBoolean();
+	public boolean							isUpdateDeviceState					= true;
 
 	/**
 	 * When <code>true</code> prevent that a default launcher is created.
 	 */
 	public boolean							isLastLauncherRemoved;
-
-	{
-		isUpdateDeviceState.set(true);
-	}
 
 	public String getBackupFolder() {
 		return _backupFolder;
