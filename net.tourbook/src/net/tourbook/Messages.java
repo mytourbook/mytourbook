@@ -827,6 +827,8 @@ public class Messages extends NLS {
 	public static String		import_data_updateDataFromDatabase_task;
 
 	public static String		Import_Data_Action_AutomatedImportConfig_Tooltip;
+
+	public static String	Import_Data_Action_DeleteTourFiles;
 	public static String		Import_Data_Action_EditImportPreferences;
 	public static String		Import_Data_Action_Reimport_EntireTour;
 	public static String		Import_Data_Action_Reimport_OnlyAltitudeValues;
@@ -847,6 +849,12 @@ public class Messages extends NLS {
 	public static String		Import_Data_Dialog_ConfirmReimportTemperatureValues_Message;
 	public static String		Import_Data_Dialog_ConfirmReimportTimeSlices_Message;
 	public static String		Import_Data_Dialog_ConfirmReimportTourMarker_Message;
+	public static String	Import_Data_Dialog_DeleteTourFiles_LastChance_Message;
+
+	public static String	Import_Data_Dialog_DeleteTourFiles_Message;
+
+	public static String	Import_Data_Dialog_DeleteTourFiles_Title;
+
 	public static String		Import_Data_Dialog_GetAlternativePath_Message;
 	public static String		Import_Data_Dialog_GetReimportedFilePath_Message;
 	public static String		Import_Data_Dialog_Reimport_SubTask;
@@ -882,7 +890,13 @@ public class Messages extends NLS {
 	public static String		Import_Data_HTML_SaveTour_No;
 	public static String		Import_Data_HTML_SaveTour_Yes;
 
+	public static String	Import_Data_Info_DeviceImport_DeletedImportFiles_Message;
+
 	public static String	Import_Data_Info_DeviceImport_NoImportFiles_Message;
+
+	public static String	Import_Data_Monitor_DeleteTourFiles;
+
+	public static String	Import_Data_Monitor_DeleteTourFiles_Subtask;
 	public static String		Import_Data_Task_Backup;
 	public static String		Import_Data_Task_Backup_SubTask;
 	public static String		Import_Data_Task_CloseDeviceInfo;
@@ -1451,7 +1465,6 @@ public class Messages extends NLS {
 	public static String		Tour_Book_Label_chart_title;
 
 	public static String		Tour_Book_Monitor_CollateSubtask;
-
 	public static String		Tour_Book_Monitor_CollateTask;
 
 	public static String		Tour_Data_LoadTourData_Monitor;
@@ -1465,7 +1478,6 @@ public class Messages extends NLS {
 	public static String		Tour_Database_Dialog_ValidateFields_Title;
 	public static String		Tour_Database_load_all_tours;
 	public static String		Tour_Database_PostUpdate_028_SetAvgPulse;
-
 	public static String		Tour_Database_PostUpdate_029_SetImportFileName;
 	public static String		Tour_Database_PostUpdate011_SetTourCreateTime;
 	public static String		Tour_Database_PostUpdate020_ConvertIntToFloat;

@@ -244,6 +244,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	//
 	// context menu actions
 	private ActionClearView					_actionClearView;
+	private ActionDeleteTourFiles			_actionDeleteTourFile;
 	private ActionExport					_actionExportTour;
 	private ActionEditQuick					_actionEditQuick;
 	private ActionEditTour					_actionEditTour;
@@ -398,6 +399,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		// update device state because an import can changed it
 		updateDeviceState();
+	}
+
+	void actionDeleteTourFiles() {
+
+		doDeleteTourFiles();
 	}
 
 	void actionMergeTours(final TourData mergeFromTour, final TourData mergeIntoTour) {
@@ -694,10 +700,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private void createActions() {
 
-		_actionClearView = new ActionClearView(this);
 		_actionEditImportPreferences = new ActionOpenPrefDialog(
 				Messages.Import_Data_Action_EditImportPreferences,
 				PrefPageImport.ID);
+
+		_actionClearView = new ActionClearView(this);
+		_actionDeleteTourFile = new ActionDeleteTourFiles(this);
 		_actionEditTour = new ActionEditTour(this);
 		_actionEditQuick = new ActionEditQuick(this);
 		_actionExportTour = new ActionExport(this);
@@ -837,6 +845,16 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		final ImportConfig importConfig = getImportConfig();
 		importConfig.deviceImportLaunchers.add(defaultLauncher);
+	}
+
+	private void createFilesLog(final StringBuilder sb, final ArrayList<String> fileNames, final String message) {
+
+		sb.append(message + fileNames.size());
+
+		for (final String fileName : fileNames) {
+			sb.append(UI.NEW_LINE);
+			sb.append(fileName);
+		}
 	}
 
 	private String createHTML(final boolean isUpdateDeviceState) {
@@ -1053,7 +1071,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	}
 
 	private String createHTML_BgImage(final String imageUrl) {
-		return "background-image: url(" + imageUrl + ");";
+		return "background-image: url(" + imageUrl + ");"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	private String createHTML_BgImageStyle(final String imageUrl) {
@@ -1267,13 +1285,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			final String imageSaveTour = createHTML_BgImage(_imageUrl_SaveTour);
 
-			htmlSaveTour = "<div style='float: right;" + imageSaveTour + "' class='action-button-16'></div>";
+			htmlSaveTour = "<div style='float: right;" + imageSaveTour + "' class='action-button-16'></div>"; //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		final StringBuilder sb = new StringBuilder();
 
 		sb.append(htmlSaveTour);
-		sb.append("<div style='float:left;'>" + importTile.name + "</div>"); //$NON-NLS-1$
+		sb.append("<div style='float:left;'>" + importTile.name + "</div>"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		return sb.toString();
 	}
@@ -2312,6 +2330,29 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		});
 	}
 
+	private void deleteFile(final ArrayList<String> deletedFiles,
+							final ArrayList<String> notDeletedFiles,
+							final String fileFolder,
+							final String fileName) {
+
+		Path filePath = null;
+
+		try {
+
+			filePath = Paths.get(fileFolder, fileName);
+
+			Files.delete(filePath);
+
+			deletedFiles.add(filePath.toString());
+
+		} catch (final Exception e) {
+
+			// file can be invalid
+
+			notDeletedFiles.add('"' + fileFolder + '"' + UI.SPACE + '"' + fileName + '"');
+		}
+	}
+
 	@Override
 	public void dispose() {
 
@@ -2352,6 +2393,85 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		_configImages.clear();
 		_configImageHash.clear();
+	}
+
+	private void doDeleteTourFiles() {
+
+		if (MessageDialog.openConfirm(
+				_parent.getShell(),
+				Messages.Import_Data_Dialog_DeleteTourFiles_Title,
+				Messages.Import_Data_Dialog_DeleteTourFiles_Message) == false) {
+			return;
+		}
+
+		if (MessageDialog.openConfirm(
+				_parent.getShell(),
+				Messages.Import_Data_Dialog_DeleteTourFiles_Title,
+				Messages.Import_Data_Dialog_DeleteTourFiles_LastChance_Message) == false) {
+			return;
+		}
+
+		final ArrayList<String> deletedFiles = new ArrayList<>();
+		final ArrayList<String> notDeletedFiles = new ArrayList<>();
+		final ArrayList<TourData> selectedTours = getAnySelectedTours();
+
+		final IRunnableWithProgress saveRunnable = new IRunnableWithProgress() {
+			@Override
+			public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+
+				int saveCounter = 0;
+
+				final int selectionSize = selectedTours.size();
+
+				monitor.beginTask(Messages.Import_Data_Monitor_DeleteTourFiles, selectionSize);
+
+				// loop: all selected tours, selected tours can already be saved
+				for (final TourData tourData : selectedTours) {
+
+					monitor.subTask(NLS.bind(
+							Messages.Import_Data_Monitor_DeleteTourFiles_Subtask,
+							++saveCounter,
+							selectionSize));
+
+					final String originalFilePath = tourData.importFilePathOriginal;
+
+					final String importFilePath = tourData.getImportFilePath();
+					final String importFileName = tourData.getImportFileName();
+
+					deleteFile(deletedFiles, notDeletedFiles, importFilePath, importFileName);
+					deleteFile(deletedFiles, notDeletedFiles, originalFilePath, importFileName);
+
+					monitor.worked(1);
+				}
+			}
+		};
+
+		try {
+
+			new ProgressMonitorDialog(_parent.getShell()).run(true, false, saveRunnable);
+
+		} catch (InvocationTargetException | InterruptedException e) {
+			StatusUtil.showStatus(e);
+		}
+
+		/*
+		 * Log deleted files
+		 */
+		final StringBuilder sb = new StringBuilder();
+		sb.append("Deleted tour files log");//$NON-NLS-1$
+
+		sb.append(UI.NEW_LINE2);
+		createFilesLog(sb, deletedFiles, "Deleted tour files: ");//$NON-NLS-1$
+
+		sb.append(UI.NEW_LINE2);
+		createFilesLog(sb, notDeletedFiles, "Not deleted tour files with errors: ");//$NON-NLS-1$
+
+		StatusUtil.logInfo(sb.toString());
+
+		MessageDialog.openInformation(
+				_parent.getShell(),
+				Messages.Import_Data_Dialog_DeleteTourFiles_Title,
+				NLS.bind(Messages.Import_Data_Info_DeviceImport_DeletedImportFiles_Message, deletedFiles.size()));
 	}
 
 	private void doDeviceImport(final long tileId) {
@@ -2454,14 +2574,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private void doSaveTour(final TourPerson person) {
 
-		// get selected tours, this must be outside of the runnable !!!
-		final IStructuredSelection selection = ((IStructuredSelection) _tourViewer.getSelection());
-
-		final ArrayList<TourData> selectedTours = new ArrayList<TourData>();
-
-		for (final Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
-			selectedTours.add((TourData) iterator.next());
-		}
+		final ArrayList<TourData> selectedTours = getAnySelectedTours();
 
 		doSaveTour(person, selectedTours);
 	}
@@ -2686,6 +2799,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_actionOpenMarkerDialog.setEnabled(isOneSavedAndNotDeleteTour);
 		_actionOpenAdjustAltitudeDialog.setEnabled(isOneSavedAndNotDeleteTour);
 
+		_actionDeleteTourFile.setEnabled(isTourAvailable);
+
 		// set double click state
 		_tourDoubleClickState.canEditTour = isOneSavedAndNotDeleteTour;
 		_tourDoubleClickState.canQuickEditTour = isOneSavedAndNotDeleteTour;
@@ -2695,8 +2810,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
 		_actionSetTourType.setEnabled(isSavedTourSelected && (tourTypes.size() > 0));
-
-//		_actionAddTag.setEnabled(isTourSelected);
 
 		final ArrayList<Long> existingTagIds = new ArrayList<Long>();
 		long existingTourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
@@ -2754,6 +2867,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		menuMgr.add(_actionReimportSubMenu);
 		menuMgr.add(_actionEditImportPreferences);
 		menuMgr.add(_actionRemoveTour);
+		menuMgr.add(_actionDeleteTourFile);
 
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionEditQuick);
@@ -2849,11 +2963,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 					selectedTourData.add(tourData);
 
 				} else {
+
 					/*
 					 * get the data from the database because the tag names could be changed and
 					 * this is not reflected in the tours which are displayed in the raw data view
 					 */
+
 					final TourData tourDataInDb = tourManager.getTourData(tourData.getTourId());
+
 					if (tourDataInDb != null) {
 						selectedTourData.add(tourDataInDb);
 					}
@@ -2862,6 +2979,20 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 
 		return selectedTourData;
+	}
+
+	private ArrayList<TourData> getAnySelectedTours() {
+
+		final ArrayList<TourData> selectedTours = new ArrayList<TourData>();
+
+		// get selected tours, this must be outside of the runnable !!!
+		final IStructuredSelection selection = ((IStructuredSelection) _tourViewer.getSelection());
+
+		for (final Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
+			selectedTours.add((TourData) iterator.next());
+		}
+
+		return selectedTours;
 	}
 
 	@Override

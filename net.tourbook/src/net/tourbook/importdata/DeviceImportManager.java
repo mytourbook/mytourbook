@@ -686,6 +686,20 @@ public class DeviceImportManager {
 	 */
 	private boolean runImport_Backup() {
 
+		final ImportConfig importConfig = getDeviceImportConfig();
+
+		final String deviceOSFolder = importConfig.getDeviceOSFolder();
+		final String backupOSFolder = importConfig.getBackupOSFolder();
+
+		final Path backupPath = Paths.get(backupOSFolder);
+
+		final ArrayList<String> notBackedUpFiles = importConfig.notBackedUpFiles;
+		final int numBackupFiles = notBackedUpFiles.size();
+
+		if (numBackupFiles == 0) {
+			return false;
+		}
+
 		final boolean isCanceled[] = { false };
 
 		final IRunnableWithProgress importRunnable = new IRunnableWithProgress() {
@@ -693,15 +707,6 @@ public class DeviceImportManager {
 			@Override
 			public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
-				final ImportConfig importConfig = getDeviceImportConfig();
-
-				final String deviceOSFolder = importConfig.getDeviceOSFolder();
-				final String backupOSFolder = importConfig.getBackupOSFolder();
-
-				final Path backupPath = Paths.get(backupOSFolder);
-
-				final ArrayList<String> notBackedUpFiles = importConfig.notBackedUpFiles;
-				final int numBackupFiles = notBackedUpFiles.size();
 				int copied = 0;
 
 				monitor.beginTask(Messages.Import_Data_Task_Backup, numBackupFiles);
