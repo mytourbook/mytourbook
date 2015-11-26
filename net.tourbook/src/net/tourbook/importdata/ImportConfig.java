@@ -38,6 +38,9 @@ public class ImportConfig {
 	static final int						HORIZONTAL_TILES_MIN				= 1;
 	static final int						HORIZONTAL_TILES_MAX				= 50;
 
+	static final int						LAST_MARKER_DISTANCE_MIN			= 0;
+	static final int						LAST_MARKER_DISTANCE_MAX			= 100;									// km/10
+
 	static final int						TILE_SIZE_DEFAULT					= 80;
 	static final int						TILE_SIZE_MIN						= 20;
 	static final int						TILE_SIZE_MAX						= 300;

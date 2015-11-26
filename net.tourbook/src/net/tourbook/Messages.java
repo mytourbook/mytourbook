@@ -120,6 +120,10 @@ public class Messages extends NLS {
 	public static String		Dialog_ImportConfig_Checkbox_CreateBackup;
 	public static String		Dialog_ImportConfig_Checkbox_CreateBackup_Tooltip;
 	public static String		Dialog_ImportConfig_Checkbox_ImportFiles;
+	public static String	Dialog_ImportConfig_Checkbox_LastMarker;
+
+	public static String	Dialog_ImportConfig_Checkbox_LastMarker_Tooltip;
+
 	public static String		Dialog_ImportConfig_Checkbox_LiveUpdate;
 	public static String		Dialog_ImportConfig_Checkbox_LiveUpdate_Tooltip;
 	public static String		Dialog_ImportConfig_Checkbox_SaveTour;
@@ -165,6 +169,12 @@ public class Messages extends NLS {
 	public static String		Dialog_ImportConfig_Label_ImportColumns;
 	public static String		Dialog_ImportConfig_Label_ImportColumns_Tooltip;
 	public static String		Dialog_ImportConfig_Label_ImportLauncher;
+
+	public static String	Dialog_ImportConfig_Label_LastMarkerDistance;
+
+	public static String	Dialog_ImportConfig_Label_LastMarkerDistance_Tooltip;
+
+	public static String	Dialog_ImportConfig_Label_LastMarkerText;
 	public static String		Dialog_ImportConfig_Label_TourType;
 	public static String		Dialog_ImportConfig_Link_TourType;
 	public static String		Dialog_ImportConfig_Spinner_Speed_Tooltip;
