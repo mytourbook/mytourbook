@@ -3678,7 +3678,7 @@
      inkscape:window-height="1337"
      inkscape:window-x="391"
      inkscape:window-y="71"
-     inkscape:window-maximized="0"
+     inkscape:window-maximized="1"
      inkscape:snap-grids="true"
      inkscape:snap-page="true"
      inkscape:snap-to-guides="true"
@@ -3729,16 +3729,7 @@
        y="10.362183"
        x="159"
        id="image4958"
-       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAAA3NCSVQICAjb4U/gAAABnklEQVQo
-kZWSP0hbURjFfy9JFVMMgj4hqGCxTeugi3/gCRkcHFuwUuogNlCoSEYLQhFy1aVLBYWIooubIg5K
-bAepgvCQOjhKTbeWivRa1Gok0ujn8PD5jDh4hsu995zzfd+9HENEAMAwDK6glHJXB64MERERpZRl
-WS6ttdZau0fLspRSjhJHrbW2bfsug23bWutvXU0iEnBvI5GIV+TY3H2BveC/uAAMpVQ8HgdSqRR3
-IPRvr/3L0OHw8tjyesBLxGIxgKN9QqW4f3B6fNz5KFf17Ly6DtZ9+dVEGHjB60qWJsj9BxjuLM78
-zba9cfhAvmFxnO0NgNFeJt9jPWfzc85fcNbS7vA3O+jfTPUD+B8AZDOszQI/HkcpDN4yiDD0imyG
-skpmduibJhhymO+RVld1PVLtzle2N3jaxKc1ih4Sfkv0JR+7OTk8KqnIN/j+/GzYmv9VUb/a2CNz
-89dtn3QETw+8UxsiMqgSH/ZXzsM1J+9G8CQqD8lkMpFI+IDm3c1cdd1Wa69ZXm6apmmajsK8Qjqd
-9j71fuEz7hvvS/1KxP9BDwDbAAAAAElFTkSuQmCC
-"
+       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAAA3NCSVQICAjb4U/gAAABnklEQVQo kZWSP0hbURjFfy9JFVMMgj4hqGCxTeugi3/gCRkcHFuwUuogNlCoSEYLQhFy1aVLBYWIooubIg5K bAepgvCQOjhKTbeWivRa1Gok0ujn8PD5jDh4hsu995zzfd+9HENEAMAwDK6glHJXB64MERERpZRl WS6ttdZau0fLspRSjhJHrbW2bfsug23bWutvXU0iEnBvI5GIV+TY3H2BveC/uAAMpVQ8HgdSqRR3 IPRvr/3L0OHw8tjyesBLxGIxgKN9QqW4f3B6fNz5KFf17Ly6DtZ9+dVEGHjB60qWJsj9BxjuLM78 zba9cfhAvmFxnO0NgNFeJt9jPWfzc85fcNbS7vA3O+jfTPUD+B8AZDOszQI/HkcpDN4yiDD0imyG skpmduibJhhymO+RVld1PVLtzle2N3jaxKc1ih4Sfkv0JR+7OTk8KqnIN/j+/GzYmv9VUb/a2CNz 89dtn3QETw+8UxsiMqgSH/ZXzsM1J+9G8CQqD8lkMpFI+IDm3c1cdd1Wa69ZXm6apmmajsK8Qjqd 9j71fuEz7hvvS/1KxP9BDwDbAAAAAElFTkSuQmCC "
        style="image-rendering:optimizeSpeed"
        preserveAspectRatio="none"
        height="16"
@@ -4643,7 +4634,7 @@ skpmduibJhhymO+RVld1PVLtzle2N3jaxKc1ih4Sfkv0JR+7OTk8KqnIN/j+/GzYmv9VUb/a2CNz
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <path
-       style="fill:#b4b4b4;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="fill:#d8d8d8;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 129.99999,159.34886 2.9867,-2.98667 10.1333,0 2.88001,2.98027 -1e-5,10.13974 -2.88,2.8736 -10.24,0.006 -2.88,-2.98663 z"
        id="path4978"
        inkscape:connector-curvature="0"
@@ -4722,7 +4713,7 @@ skpmduibJhhymO+RVld1PVLtzle2N3jaxKc1ih4Sfkv0JR+7OTk8KqnIN/j+/GzYmv9VUb/a2CNz
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <path
-       style="display:inline;fill:#b4b4b4;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="display:inline;fill:#d8d8d8;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 149.99999,159.34886 2.9867,-2.98667 10.1333,0 2.88001,2.98027 -1e-5,10.13974 -2.88,2.8736 -10.24,0.006 -2.88,-2.98663 z"
        id="path4978-8"
        inkscape:connector-curvature="0"
@@ -4793,7 +4784,7 @@ skpmduibJhhymO+RVld1PVLtzle2N3jaxKc1ih4Sfkv0JR+7OTk8KqnIN/j+/GzYmv9VUb/a2CNz
        inkscape:connector-curvature="0"
        id="rect4952-4"
        d="m 171,160.36219 13.99995,0 0,10.00002 -13.99995,0 z"
-       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#6b6b6b;fill-opacity:1;fill-rule:nonzero;stroke:#b4b4b4;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#6b6b6b;fill-opacity:1;fill-rule:nonzero;stroke:#d8d8d8;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\import-get-tours.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
@@ -4809,29 +4800,22 @@ skpmduibJhhymO+RVld1PVLtzle2N3jaxKc1ih4Sfkv0JR+7OTk8KqnIN/j+/GzYmv9VUb/a2CNz
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\import-get-tours.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
-    <g
-       id="g5191"
+    <path
+       inkscape:connector-curvature="0"
+       id="rect4952-8-58"
+       d="m 170,156.36219 6.99999,0 0,3 -6.99999,0 z"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#d8d8d8;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1.00381029;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\import-get-tours.png"
        inkscape:export-xdpi="90"
-       inkscape:export-ydpi="90"
-       style="fill:#b4b4b4;fill-opacity:1">
-      <path
-         inkscape:export-ydpi="90"
-         inkscape:export-xdpi="90"
-         inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\import-get-tours.png"
-         style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#b4b4b4;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1.00381029;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
-         d="m 170,156.36219 5.99999,0 0,3 -5.99999,0 z"
-         id="rect4952-8-58"
-         inkscape:connector-curvature="0" />
-      <path
-         inkscape:export-ydpi="90"
-         inkscape:export-xdpi="90"
-         inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\import-get-tours.png"
-         style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#b4b4b4;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1.00381029;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
-         d="m 170,158.36219 15.99995,0 0,3 -15.99995,0 z"
-         id="rect4952-8-5-3"
-         inkscape:connector-curvature="0" />
-    </g>
+       inkscape:export-ydpi="90" />
+    <path
+       inkscape:connector-curvature="0"
+       id="rect4952-8-5-3"
+       d="m 170,158.36219 15.99995,0 0,3 -15.99995,0 z"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#d8d8d8;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1.00381029;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\import-get-tours.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
     <path
        style="display:inline;fill:#ffd800;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 175,164.36219 2,0 0,-2 2,0 0,2 2,0 0,2.00001 -2,0 0,2 -2,0 0,-2 -2,0 z"
