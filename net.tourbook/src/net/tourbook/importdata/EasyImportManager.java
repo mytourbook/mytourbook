@@ -63,11 +63,11 @@ import org.eclipse.ui.IMemento;
 import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.XMLMemento;
 
-public class DeviceImportManager {
+public class EasyImportManager {
 
 	private static final String			ID									= "DeviceImportManager";			//$NON-NLS-1$
 	//
-	private static final String			XML_STATE_DEVICE_IMPORT_CONFIG		= "XML_STATE_DEVICE_IMPORT_CONFIG"; //$NON-NLS-1$
+	private static final String			XML_STATE_EASY_IMPORT_CONFIG		= "XML_STATE_EASY_IMPORT_CONFIG";	//$NON-NLS-1$
 	//
 	private static final String			TAG_IMPORT_CONFIG					= "Config";						//$NON-NLS-1$
 	private static final String			TAG_IMPORT_CONFIG_ROOT				= "DeviceImportConfig";			//$NON-NLS-1$
@@ -95,7 +95,7 @@ public class DeviceImportManager {
 	static final int					CONFIG_SPEED_MAX					= 3000;
 	private static final int			CONFIG_SPEED_DEFAULT				= 0;
 	//
-	private static DeviceImportManager	_instance;
+	private static EasyImportManager	_instance;
 
 	private final IDialogSettings		_state								= TourbookPlugin.getState(ID);
 
@@ -105,10 +105,10 @@ public class DeviceImportManager {
 
 	private ReentrantLock				STORE_LOCK							= new ReentrantLock();
 
-	public static DeviceImportManager getInstance() {
+	public static EasyImportManager getInstance() {
 
 		if (_instance == null) {
-			_instance = new DeviceImportManager();
+			_instance = new EasyImportManager();
 		}
 
 		return _instance;
@@ -457,7 +457,7 @@ public class DeviceImportManager {
 
 		final ImportConfig importConfig = new ImportConfig();
 
-		final String stateValue = Util.getStateString(_state, XML_STATE_DEVICE_IMPORT_CONFIG, null);
+		final String stateValue = Util.getStateString(_state, XML_STATE_EASY_IMPORT_CONFIG, null);
 
 		if ((stateValue != null) && (stateValue.length() > 0)) {
 
@@ -791,7 +791,7 @@ public class DeviceImportManager {
 		try {
 
 			xmlMemento.save(writer);
-			_state.put(XML_STATE_DEVICE_IMPORT_CONFIG, writer.toString());
+			_state.put(XML_STATE_EASY_IMPORT_CONFIG, writer.toString());
 
 		} catch (final IOException e) {
 

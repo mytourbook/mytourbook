@@ -65,9 +65,9 @@ import net.tourbook.data.TourWayPoint;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.importdata.DeviceImportLauncher;
-import net.tourbook.importdata.DeviceImportManager;
+import net.tourbook.importdata.EasyImportManager;
 import net.tourbook.importdata.DeviceImportState;
-import net.tourbook.importdata.DialogDeviceImportConfig;
+import net.tourbook.importdata.DialogEasyImportConfig;
 import net.tourbook.importdata.ImportConfig;
 import net.tourbook.importdata.ImportDeviceState;
 import net.tourbook.importdata.OSFile;
@@ -316,6 +316,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private HashMap<Long, Integer>			_configImageHash							= new HashMap<>();
 	//
 	private boolean							_isBrowserCompleted;
+	private boolean							_isUpdateImportState;
 	//
 	private String							_cssFonts;
 	private String							_cssFromFile;
@@ -347,7 +348,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private Image							_imageDatabasePlaceholder;
 	private Image							_imageDelete;
 
-	private DialogDeviceImportConfig		_dialogImportConfig;
+	private DialogEasyImportConfig		_dialogImportConfig;
 
 	/*
 	 * UI controls
@@ -387,6 +388,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	void actionClearView() {
 
+		// update device state because an import can have changed it
+		_isUpdateImportState = true;
+		_isInUIStartup = true;
+
 		// remove all tours
 		_rawDataMgr.removeAllTours();
 
@@ -396,9 +401,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		// don't throw the selection again
 		_postSelectionProvider.clearSelection();
-
-		// update device state because an import can changed it
-		updateDeviceState();
 	}
 
 	void actionDeleteTourFiles() {
@@ -481,7 +483,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		final ImportConfig importConfig = getImportConfig();
 
-		_dialogImportConfig = new DialogDeviceImportConfig(shell, importConfig, this);
+		_dialogImportConfig = new DialogEasyImportConfig(shell, importConfig, this);
 
 		boolean isOK = false;
 
@@ -2359,7 +2361,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		// this must be canceled before the watch folder thread because this could launch a new watch folder thread
 		thread_WatchingStores_Cancel();
 		thread_WatchDeviceFolder(false);
-		DeviceImportManager.getInstance().reset();
+		EasyImportManager.getInstance().reset();
 
 		Util.disposeResource(_imageDatabase);
 		Util.disposeResource(_imageDatabaseOtherPerson);
@@ -2522,7 +2524,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			importConfig.isUpdateDeviceState = false;
 
-			importState = DeviceImportManager.getInstance().runImport(importLauncher);
+			importState = EasyImportManager.getInstance().runImport(importLauncher);
 
 		} finally {
 
@@ -2563,7 +2565,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	}
 
-	public void doLiveUpdate(final DialogDeviceImportConfig dialogImportConfig) {
+	public void doLiveUpdate(final DialogEasyImportConfig dialogImportConfig) {
 
 		updateModel_ImportConfig_LiveUpdate(dialogImportConfig, true);
 
@@ -3016,7 +3018,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private ImportConfig getImportConfig() {
 
-		return DeviceImportManager.getInstance().getDeviceImportConfig();
+		return EasyImportManager.getInstance().getDeviceImportConfig();
 	}
 
 	public Image getImportConfigImage(final DeviceImportLauncher importConfig) {
@@ -3860,7 +3862,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 							// check if anything should be watched
 							if (importConfig.isWatchAnything()) {
 
-								final DeviceImportState importState = DeviceImportManager
+								final DeviceImportState importState = EasyImportManager
 										.getInstance()
 										.checkImportedFiles(false);
 
@@ -3871,7 +3873,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 									thread_WatchDeviceFolder(true);
 								}
 
-								if (importState.areFilesRetrieved) {
+								if (importState.areFilesRetrieved || _isUpdateImportState) {
+
+									_isUpdateImportState = false;
 
 									// import files have been retrieved, update the UI
 
@@ -3936,7 +3940,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		if (importConfig.isWatchAnything()) {
 
-			DeviceImportManager.getInstance().checkImportedFiles(true);
+			EasyImportManager.getInstance().checkImportedFiles(true);
 			updateUI_DeviceState();
 		}
 	}
@@ -3944,7 +3948,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * Keep none live values.
 	 */
-	private void updateModel_ImportConfig_AndSave(final DialogDeviceImportConfig dialog) {
+	private void updateModel_ImportConfig_AndSave(final DialogEasyImportConfig dialog) {
 
 		final ImportConfig modifiedConfig = dialog.getModifiedConfig();
 		final ImportConfig importConfig = getImportConfig();
@@ -3955,7 +3959,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		importConfig.setBackupFolder(modifiedConfig.getBackupFolder());
 		importConfig.setDeviceFolder(modifiedConfig.getDeviceFolder());
 
-		DeviceImportManager.getInstance().saveImportConfig(importConfig);
+		EasyImportManager.getInstance().saveImportConfig(importConfig);
 	}
 
 	/**
@@ -3963,7 +3967,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	 * 
 	 * @param isSaveConfig
 	 */
-	private void updateModel_ImportConfig_LiveUpdate(final DialogDeviceImportConfig dialog, final boolean isSaveConfig) {
+	private void updateModel_ImportConfig_LiveUpdate(final DialogEasyImportConfig dialog, final boolean isSaveConfig) {
 
 		final ImportConfig modifiedConfig = dialog.getModifiedConfig();
 		final ImportConfig importConfig = getImportConfig();
@@ -3983,7 +3987,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		importConfig.tileSize = modifiedConfig.tileSize;
 
 		if (isSaveConfig) {
-			DeviceImportManager.getInstance().saveImportConfig(importConfig);
+			EasyImportManager.getInstance().saveImportConfig(importConfig);
 		}
 	}
 

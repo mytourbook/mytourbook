@@ -117,9 +117,9 @@ import org.eclipse.ui.part.PageBook;
 /**
  * Dialog to configure the device import.
  */
-public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourViewer {
+public class DialogEasyImportConfig extends TitleAreaDialog implements ITourViewer {
 
-	private static final String				ID									= "DialogDeviceImportConfig";			//$NON-NLS-1$
+	private static final String				ID									= "DialogEasyImportConfig";			//$NON-NLS-1$
 	//
 	private static final String				STATE_BACKUP_DEVICE_HISTORY_ITEMS	= "STATE_BACKUP_DEVICE_HISTORY_ITEMS";	//$NON-NLS-1$
 	private static final String				STATE_BACKUP_FOLDER_HISTORY_ITEMS	= "STATE_BACKUP_FOLDER_HISTORY_ITEMS";	//$NON-NLS-1$
@@ -417,7 +417,7 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 		}
 	}
 
-	public DialogDeviceImportConfig(final Shell parentShell,
+	public DialogEasyImportConfig(	final Shell parentShell,
 									final ImportConfig importConfig,
 									final RawDataView rawDataView) {
 
@@ -1474,8 +1474,8 @@ public class DialogDeviceImportConfig extends TitleAreaDialog implements ITourVi
 				 */
 				final Spinner spinnerValue = new Spinner(_speedTourType_Container, SWT.BORDER);
 				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(spinnerValue);
-				spinnerValue.setMinimum(DeviceImportManager.CONFIG_SPEED_MIN);
-				spinnerValue.setMaximum(DeviceImportManager.CONFIG_SPEED_MAX);
+				spinnerValue.setMinimum(EasyImportManager.CONFIG_SPEED_MIN);
+				spinnerValue.setMaximum(EasyImportManager.CONFIG_SPEED_MAX);
 				spinnerValue.setToolTipText(Messages.Dialog_ImportConfig_Spinner_Speed_Tooltip);
 				spinnerValue.addMouseWheelListener(_defaultMouseWheelListener);
 

@@ -673,7 +673,7 @@ public class Messages extends NLS {
 	public static String		Image__App_Edit_Paste;
 	public static String		Image__App_OK;
 	public static String		Image__App_RestoreDefault;
-	public static String	Image__App_SaveTour;
+	public static String		Image__App_SaveTour;
 
 	public static String		Image__App_Sort;
 	public static String		Image__App_Sort_Disabled;
@@ -827,8 +827,7 @@ public class Messages extends NLS {
 	public static String		import_data_updateDataFromDatabase_task;
 
 	public static String		Import_Data_Action_AutomatedImportConfig_Tooltip;
-
-	public static String	Import_Data_Action_DeleteTourFiles;
+	public static String		Import_Data_Action_DeleteTourFiles;
 	public static String		Import_Data_Action_EditImportPreferences;
 	public static String		Import_Data_Action_Reimport_EntireTour;
 	public static String		Import_Data_Action_Reimport_OnlyAltitudeValues;
@@ -849,12 +848,9 @@ public class Messages extends NLS {
 	public static String		Import_Data_Dialog_ConfirmReimportTemperatureValues_Message;
 	public static String		Import_Data_Dialog_ConfirmReimportTimeSlices_Message;
 	public static String		Import_Data_Dialog_ConfirmReimportTourMarker_Message;
-	public static String	Import_Data_Dialog_DeleteTourFiles_LastChance_Message;
-
-	public static String	Import_Data_Dialog_DeleteTourFiles_Message;
-
-	public static String	Import_Data_Dialog_DeleteTourFiles_Title;
-
+	public static String		Import_Data_Dialog_DeleteTourFiles_LastChance_Message;
+	public static String		Import_Data_Dialog_DeleteTourFiles_Message;
+	public static String		Import_Data_Dialog_DeleteTourFiles_Title;
 	public static String		Import_Data_Dialog_GetAlternativePath_Message;
 	public static String		Import_Data_Dialog_GetReimportedFilePath_Message;
 	public static String		Import_Data_Dialog_Reimport_SubTask;
@@ -868,12 +864,10 @@ public class Messages extends NLS {
 	public static String		Import_Data_Error_DeviceImport_InvalidBackupFolder_Message;
 	public static String		Import_Data_Error_DeviceImport_InvalidDeviceFolder_Message;
 	public static String		Import_Data_Error_DeviceImport_Title;
-
-	public static String	Import_Data_Error_NoActivePersion_Message;
+	public static String		Import_Data_Error_NoActivePersion_Message;
 	public static String		Import_Data_HTML_AcquireDeviceInfo;
 	public static String		Import_Data_HTML_AllFilesAreBackedUp;
-
-	public static String	Import_Data_HTML_AllFilesAreImported;
+	public static String		Import_Data_HTML_AllFilesAreImported;
 	public static String		Import_Data_HTML_BackupFolder;
 	public static String		Import_Data_HTML_DeviceFolder;
 	public static String		Import_Data_HTML_DeviceImport;
@@ -889,14 +883,10 @@ public class Messages extends NLS {
 	public static String		Import_Data_HTML_ReceiveFromSerialPort_DirectlyLink;
 	public static String		Import_Data_HTML_SaveTour_No;
 	public static String		Import_Data_HTML_SaveTour_Yes;
-
-	public static String	Import_Data_Info_DeviceImport_DeletedImportFiles_Message;
-
-	public static String	Import_Data_Info_DeviceImport_NoImportFiles_Message;
-
-	public static String	Import_Data_Monitor_DeleteTourFiles;
-
-	public static String	Import_Data_Monitor_DeleteTourFiles_Subtask;
+	public static String		Import_Data_Info_DeviceImport_DeletedImportFiles_Message;
+	public static String		Import_Data_Info_DeviceImport_NoImportFiles_Message;
+	public static String		Import_Data_Monitor_DeleteTourFiles;
+	public static String		Import_Data_Monitor_DeleteTourFiles_Subtask;
 	public static String		Import_Data_Task_Backup;
 	public static String		Import_Data_Task_Backup_SubTask;
 	public static String		Import_Data_Task_CloseDeviceInfo;

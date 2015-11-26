@@ -451,24 +451,20 @@
 
 			<command
 				commandId="net.tourbook.command.device.importFromFile"
-				icon="icons/folder_open_add.gif"
+				icon="icons/import-get-tours.png"
 				label="%command_device_importFromFile"
 				mnemonic="%command_device_importFromFile_mnemonic"/>
 				
-			<separator
-				name="net.tourbook.separator.device"
-				visible="true"/>
-				
 			<command
 				commandId="net.tourbook.command.device.synchronize"
-				icon="icons/device-synchronize.gif"
+				icon="icons/device-synchronize.png"
 				label="%Command_Device_ReceiveFromSerialPort_Configured"
 				mnemonic="%Command_Device_ReceiveFromSerialPort_Configured_Mnemonic"
 				tooltip="%Command_Device_ReceiveFromSerialPort_Configured_Tooltip"/>
 				
 			<command
 				commandId="net.tourbook.command.device.synchronize.direct"
-				icon="icons/device-synchronize-direct.gif"
+				icon="icons/device-synchronize-direct.png"
 				label="%Command_Device_ReceiveFromSerialPort_Directly"
 				mnemonic="%Command_Device_ReceiveFromSerialPort_Directly_Mnemonic"
 				tooltip="%Command_Device_ReceiveFromSerialPort_Directly_Tooltip"/>
@@ -963,19 +959,14 @@
 		
 			<command
 				commandId="net.tourbook.command.device.importFromFile"
-				icon="icons/open_folder_add.gif"
+				icon="icons/import-get-tours.png"
 				label="%command_device_importFromFile"
 				mnemonic="%command_device_importFromFile_mnemonic"
 			/>
 
-			<separator
-				name="net.tourbook.separator.device"
-				visible="true"
-			/>
-
 			<command
 				commandId="net.tourbook.command.device.synchronize"
-				icon="icons/device-synchronize.gif"
+				icon="icons/device-synchronize.png"
 				label="%Command_Device_ReceiveFromSerialPort_Configured"
 				mnemonic="%Command_Device_ReceiveFromSerialPort_Configured_Mnemonic"
 				style="push"
@@ -983,7 +974,7 @@
 			/>
 			<command
 				commandId="net.tourbook.command.device.synchronize.direct"
-				icon="icons/device-synchronize-direct.gif"
+				icon="icons/device-synchronize-direct.png"
 				label="%Command_Device_ReceiveFromSerialPort_Directly"
 				mnemonic="%Command_Device_ReceiveFromSerialPort_Directly_Mnemonic"
 				style="push"
