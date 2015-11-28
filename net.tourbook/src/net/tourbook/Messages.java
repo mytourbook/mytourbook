@@ -133,8 +133,17 @@ public class Messages extends NLS {
 	public static String		Dialog_ImportConfig_Checkbox_TourType;
 	public static String		Dialog_ImportConfig_Checkbox_TourType_Tooltip;
 	public static String		Dialog_ImportConfig_Column_Description;
+	public static String	Dialog_ImportConfig_Column_LastMarker_Header;
+
+	public static String	Dialog_ImportConfig_Column_LastMarker_Lable;
+
+	public static String	Dialog_ImportConfig_Column_LastMarker_Tooltip;
+
 	public static String		Dialog_ImportConfig_Column_Name;
-	public static String		Dialog_ImportConfig_Column_Save;
+	public static String	Dialog_ImportConfig_Column_Save_Header;
+
+	public static String	Dialog_ImportConfig_Column_Save_Label;
+
 	public static String		Dialog_ImportConfig_Column_TourType;
 	public static String		Dialog_ImportConfig_Combo_Folder_Tooltip;
 	public static String		Dialog_ImportConfig_Dialog_BackupFolder_Message;
@@ -683,12 +692,8 @@ public class Messages extends NLS {
 	public static String		Image__App_Edit_Paste;
 	public static String		Image__App_OK;
 	public static String		Image__App_RestoreDefault;
-	public static String		Image__App_SaveTour;
-
 	public static String		Image__App_Sort;
 	public static String		Image__App_Sort_Disabled;
-	public static String		Image__App_State_Error;
-	public static String		Image__App_State_OK;
 	public static String		Image__App_Trash;
 	public static String		Image__App_Trash_Disabled;
 	public static String		Image__ArrowDown;
@@ -789,6 +794,14 @@ public class Messages extends NLS {
 	public static String		Image__synch_statistics_Disabled;
 	public static String		Image__SearchExternal;
 	public static String		Image__SearchExternal_Disabled;
+	public static String	Image__State_Error;
+
+	public static String	Image__State_OK;
+
+	public static String	Image__State_SaveTour;
+
+	public static String	Image__State_TourMarker;
+
 	public static String		Image__Synced;
 	public static String		Image__tag;
 	public static String		Image__tag_category;
@@ -878,13 +891,15 @@ public class Messages extends NLS {
 	public static String		Import_Data_HTML_AcquireDeviceInfo;
 	public static String		Import_Data_HTML_AllFilesAreBackedUp;
 	public static String		Import_Data_HTML_AllFilesAreImported;
-	public static String		Import_Data_HTML_BackupFolder;
-	public static String		Import_Data_HTML_DeviceFolder;
 	public static String		Import_Data_HTML_DeviceImport;
 	public static String		Import_Data_HTML_FolderIsNotAvailable;
 	public static String		Import_Data_HTML_GetTours;
 	public static String		Import_Data_HTML_ImportFromFiles_Action;
 	public static String		Import_Data_HTML_ImportFromFiles_ActionTooltip;
+	public static String	Import_Data_HTML_LastMarker_No;
+
+	public static String	Import_Data_HTML_LastMarker_Yes;
+
 	public static String		Import_Data_HTML_NotBackedUpFiles;
 	public static String		Import_Data_HTML_NotImportedFiles;
 	public static String		Import_Data_HTML_ReceiveFromSerialPort_ConfiguredAction;
@@ -893,6 +908,11 @@ public class Messages extends NLS {
 	public static String		Import_Data_HTML_ReceiveFromSerialPort_DirectlyLink;
 	public static String		Import_Data_HTML_SaveTour_No;
 	public static String		Import_Data_HTML_SaveTour_Yes;
+
+	public static String	Import_Data_HTML_Title_Backup;
+
+	public static String	Import_Data_HTML_Title_Device;
+
 	public static String		Import_Data_Info_DeviceImport_DeletedImportFiles_Message;
 	public static String		Import_Data_Info_DeviceImport_NoImportFiles_Message;
 	public static String		Import_Data_Monitor_DeleteTourFiles;

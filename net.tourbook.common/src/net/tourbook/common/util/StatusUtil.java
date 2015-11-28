@@ -173,6 +173,10 @@ public class StatusUtil {
 		return new Status(severity, pluginId, IStatus.OK, message, getCause(exception));
 	}
 
+	public static void showInfo(final String message) {
+		handleStatus(message, null, StatusManager.SHOW | StatusManager.BLOCK, IStatus.OK);
+	}
+
 	public static void showStatus(final String message) {
 		handleStatus(message, null, StatusManager.SHOW | StatusManager.BLOCK, IStatus.ERROR);
 	}

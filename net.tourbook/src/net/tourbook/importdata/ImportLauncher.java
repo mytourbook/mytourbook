@@ -21,7 +21,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourType;
 
-public class DeviceImportLauncher implements Cloneable {
+public class ImportLauncher implements Cloneable {
 
 	public String					description			= UI.EMPTY_STRING;
 	public String					name				= UI.EMPTY_STRING;
@@ -52,21 +52,32 @@ public class DeviceImportLauncher implements Cloneable {
 	 */
 	public boolean					isSaveTour;
 
+	/**
+	 * When <code>true</code> then the text of the last marker is set.
+	 */
+	public boolean					isSetLastMarker;
+
+	/**
+	 * Last marker distance in meters.
+	 */
+	public int						lastMarkerDistance;
+	public String					lastMarkerText		= UI.EMPTY_STRING;
+
 	private static long				_idCreator;
 
-	public DeviceImportLauncher() {
+	public ImportLauncher() {
 
 		_id = ++_idCreator;
 	}
 
 	@Override
-	protected DeviceImportLauncher clone() {
+	protected ImportLauncher clone() {
 
-		DeviceImportLauncher clonedObject = null;
+		ImportLauncher clonedObject = null;
 
 		try {
 
-			clonedObject = (DeviceImportLauncher) super.clone();
+			clonedObject = (ImportLauncher) super.clone();
 
 			clonedObject._id = ++_idCreator;
 			clonedObject.speedTourTypes = new ArrayList<>();
@@ -93,7 +104,7 @@ public class DeviceImportLauncher implements Cloneable {
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		final DeviceImportLauncher other = (DeviceImportLauncher) obj;
+		final ImportLauncher other = (ImportLauncher) obj;
 		if (_id != other._id) {
 			return false;
 		}
@@ -154,8 +165,9 @@ public class DeviceImportLauncher implements Cloneable {
 		return "DeviceImportLauncher [" //$NON-NLS-1$
 				//
 				+ ("name=" + name + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("speedTourTypes=" + speedTourTypes + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("tourTypeConfig=" + tourTypeConfig + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+//				+ ("speedTourTypes=" + speedTourTypes + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+//				+ ("tourTypeConfig=" + tourTypeConfig + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("lastMarkerDistance=" + lastMarkerDistance + ", ") //$NON-NLS-1$ //$NON-NLS-2$
 
 				+ "]"; //$NON-NLS-1$
 	}

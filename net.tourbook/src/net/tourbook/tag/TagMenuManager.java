@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -55,16 +55,13 @@ import org.eclipse.swt.widgets.Menu;
 
 public class TagMenuManager {
 
-	private static final String				SETTINGS_SECTION_RECENT_TAGS	= "TagManager.RecentTags";						//$NON-NLS-1$
-	private static final String				STATE_RECENT_TAGS				= "tagId";										//$NON-NLS-1$
-	private static final String				STATE_PREVIOUS_TAGS				= "";											//$NON-NLS-1$
+	private static final String				SETTINGS_SECTION_RECENT_TAGS	= "TagManager.RecentTags";							//$NON-NLS-1$
+	private static final String				STATE_RECENT_TAGS				= "tagId";											//$NON-NLS-1$
+	private static final String				STATE_PREVIOUS_TAGS				= "";												//$NON-NLS-1$
 
-	private static final IPreferenceStore	_prefStore						= TourbookPlugin.getDefault() //
-																					.getPreferenceStore();
-
-	private static final IDialogSettings	_state							= TourbookPlugin.getDefault() //
-																					.getDialogSettingsSection(
-																							SETTINGS_SECTION_RECENT_TAGS);
+	private static final IPreferenceStore	_prefStore						= TourbookPlugin.getPrefStore();
+	private static final IDialogSettings	_state							= TourbookPlugin
+																					.getState(SETTINGS_SECTION_RECENT_TAGS);
 	private static IPropertyChangeListener	_prefChangeListener;
 
 	private static TagMenuManager			_currentInstance;
@@ -778,9 +775,7 @@ public class TagMenuManager {
 	 * Set/Save one tour tag
 	 * 
 	 * @param tag
-	 * @param tourProvider
 	 * @param isAddMode
-	 * @param isSaveTour
 	 */
 	void saveTourTags(final TourTag tag, final boolean isAddMode) {
 

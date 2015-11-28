@@ -22,67 +22,72 @@ import net.tourbook.common.UI;
 
 public class ImportConfig {
 
-	static final int						ANIMATION_DURATION_DEFAULT			= 20;									// seconds/10
-	static final int						ANIMATION_DURATION_MIN				= 0;
-	static final int						ANIMATION_DURATION_MAX				= 100;									// ->10 seconds
+	static final int					ANIMATION_DURATION_DEFAULT			= 20;									// seconds/10
+	static final int					ANIMATION_DURATION_MIN				= 0;
+	static final int					ANIMATION_DURATION_MAX				= 100;									// ->10 seconds
 
-	static final int						ANIMATION_CRAZINESS_FACTOR_DEFAULT	= 1;
-	static final int						ANIMATION_CRAZINESS_FACTOR_MIN		= -100;
-	static final int						ANIMATION_CRAZINESS_FACTOR_MAX		= 100;
+	static final int					ANIMATION_CRAZINESS_FACTOR_DEFAULT	= 1;
+	static final int					ANIMATION_CRAZINESS_FACTOR_MIN		= -100;
+	static final int					ANIMATION_CRAZINESS_FACTOR_MAX		= 100;
 
-	static final int						BACKGROUND_OPACITY_DEFAULT			= 5;
-	static final int						BACKGROUND_OPACITY_MAX				= 100;
-	static final int						BACKGROUND_OPACITY_MIN				= 0;
+	static final int					BACKGROUND_OPACITY_DEFAULT			= 5;
+	static final int					BACKGROUND_OPACITY_MAX				= 100;
+	static final int					BACKGROUND_OPACITY_MIN				= 0;
 
-	static final int						HORIZONTAL_TILES_DEFAULT			= 5;
-	static final int						HORIZONTAL_TILES_MIN				= 1;
-	static final int						HORIZONTAL_TILES_MAX				= 50;
+	static final int					HORIZONTAL_TILES_DEFAULT			= 5;
+	static final int					HORIZONTAL_TILES_MIN				= 1;
+	static final int					HORIZONTAL_TILES_MAX				= 50;
 
-	static final int						LAST_MARKER_DISTANCE_MIN			= 0;
-	static final int						LAST_MARKER_DISTANCE_MAX			= 100;									// km/10
+	static final int					LAST_MARKER_DISTANCE_DEFAULT		= 2000;								// 2 km
+	static final int					LAST_MARKER_DISTANCE_MIN			= 0;
+	static final int					LAST_MARKER_DISTANCE_MAX			= 10000;								// 10 km
 
-	static final int						TILE_SIZE_DEFAULT					= 80;
-	static final int						TILE_SIZE_MIN						= 20;
-	static final int						TILE_SIZE_MAX						= 300;
+	static final int					TILE_SIZE_DEFAULT					= 80;
+	static final int					TILE_SIZE_MIN						= 20;
+	static final int					TILE_SIZE_MAX						= 300;
 
-	public boolean							isLiveUpdate						= true;
+	static final int					TOUR_TYPE_AVG_SPEED_MIN				= 0;
+	static final int					TOUR_TYPE_AVG_SPEED_MAX				= 3000;
+	static final int					TOUR_TYPE_AVG_SPEED_DEFAULT			= 0;
 
-	private String							_backupFolder						= UI.EMPTY_STRING;
-	private String							_deviceFolder						= UI.EMPTY_STRING;
+	public boolean						isLiveUpdate						= true;
+
+	private String						_backupFolder						= UI.EMPTY_STRING;
+	private String						_deviceFolder						= UI.EMPTY_STRING;
 
 	/** When <code>true</code> then a backup of the tour file is done. */
-	public boolean							isCreateBackup						= true;
+	public boolean						isCreateBackup						= true;
 
-	public int								numHorizontalTiles					= HORIZONTAL_TILES_DEFAULT;
-	public int								tileSize							= TILE_SIZE_DEFAULT;
+	public int							numHorizontalTiles					= HORIZONTAL_TILES_DEFAULT;
+	public int							tileSize							= TILE_SIZE_DEFAULT;
 
 	/** Background opacity in %. */
-	public int								backgroundOpacity					= BACKGROUND_OPACITY_DEFAULT;
+	public int							backgroundOpacity					= BACKGROUND_OPACITY_DEFAULT;
 
 	/** Duration in seconds/10 */
-	public int								animationDuration					= ANIMATION_DURATION_DEFAULT;
-	public int								animationCrazinessFactor			= ANIMATION_CRAZINESS_FACTOR_DEFAULT;
+	public int							animationDuration					= ANIMATION_DURATION_DEFAULT;
+	public int							animationCrazinessFactor			= ANIMATION_CRAZINESS_FACTOR_DEFAULT;
 
-	public ArrayList<DeviceImportLauncher>	deviceImportLaunchers				= new ArrayList<>();
+	public ArrayList<ImportLauncher>	importLaunchers						= new ArrayList<>();
 
 	/** Files which are not yet backed up. */
-	public ArrayList<String>				notBackedUpFiles					= new ArrayList<>();
+	public ArrayList<String>			notBackedUpFiles					= new ArrayList<>();
 
 	/** Number of files in the device folder. */
-	public int								numDeviceFiles;
+	public int							numDeviceFiles;
 
 	/**
 	 * Contains files which are available in the device folder but they are not available in the
 	 * tour database.
 	 */
-	public ArrayList<OSFile>				notImportedFiles					= new ArrayList<>();
+	public ArrayList<OSFile>			notImportedFiles					= new ArrayList<>();
 
-	public boolean							isUpdateDeviceState					= true;
+	public boolean						isUpdateDeviceState					= true;
 
 	/**
 	 * When <code>true</code> prevent that a default launcher is created.
 	 */
-	public boolean							isLastLauncherRemoved;
+	public boolean						isLastLauncherRemoved;
 
 	public String getBackupFolder() {
 		return _backupFolder;

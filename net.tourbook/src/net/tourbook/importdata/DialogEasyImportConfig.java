@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.importdata;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -46,7 +47,6 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -88,7 +88,6 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -160,7 +159,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 	private ImportConfig					_dialogConfig;
 
 	/** Model for the currently selected config. */
-	private DeviceImportLauncher			_currentIL;
+	private ImportLauncher					_currentIL;
 
 	private RawDataView						_rawDataView;
 
@@ -170,7 +169,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 	private TableColumnDefinition			_colDefProfileImage;
 	private int								_columnIndexConfigImage;
 
-	private DeviceImportLauncher			_initialImportLauncher;
+	private ImportLauncher					_initialImportLauncher;
 
 	private HashMap<Long, Image>			_configImages						= new HashMap<>();
 	private HashMap<Long, Integer>			_configImageHash					= new HashMap<>();
@@ -183,10 +182,15 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 
 	private boolean							_isInUIUpdate;
 
+	private final NumberFormat				_nf1								= NumberFormat.getNumberInstance();
+	{
+		_nf1.setMinimumFractionDigits(1);
+		_nf1.setMaximumFractionDigits(1);
+	}
 	/*
 	 * UI resources
 	 */
-	private Font							_boldFont;
+//	private Font							_boldFont;
 
 	/*
 	 * UI controls
@@ -207,7 +211,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 	private Button							_chkCreateBackup;
 	private Button							_chkImportFiles;
 	private Button							_chkLiveUpdate;
-	private Button							_chkIL_LastMarker;
+	private Button							_chkIL_SetLastMarker;
 	private Button							_chkIL_SaveTour;
 	private Button							_chkIL_SetTourType;
 	private Button							_chkIL_ShowInDashboard;
@@ -221,7 +225,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 
 	private Combo							_comboBackupFolder;
 	private Combo							_comboDeviceFolder;
-	private Combo							_comboIL_Config;
+	private Combo							_comboIL_TourType;
 
 	private Label							_lblBackupFolder;
 	private Label							_lblLocalFolderPath;
@@ -234,8 +238,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 	private Label							_lblIL_LastMarkerDistanceUnit;
 	private Label							_lblIL_LastMarkerText;
 	private Label							_lblIL_One_TourTypeIcon;
-	private Label							_lblIL_OtherImportActions;
-	private Label							_lblIL_TourType;
+//	private Label							_lblIL_OtherImportActions;
 	private Label[]							_lblTT_Speed_SpeedUnit;
 	private Label[]							_lblTT_Speed_TourTypeIcon;
 
@@ -412,9 +415,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 		@Override
 		public Object[] getElements(final Object parent) {
 
-			final ArrayList<DeviceImportLauncher> configItems = _dialogConfig.deviceImportLaunchers;
+			final ArrayList<ImportLauncher> configItems = _dialogConfig.importLaunchers;
 
-			return configItems.toArray(new DeviceImportLauncher[configItems.size()]);
+			return configItems.toArray(new ImportLauncher[configItems.size()]);
 		}
 
 		@Override
@@ -469,9 +472,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 
 		_dialogConfig = new ImportConfig();
 
-		final ArrayList<DeviceImportLauncher> importLaunchers = _dialogConfig.deviceImportLaunchers = new ArrayList<>();
+		final ArrayList<ImportLauncher> importLaunchers = _dialogConfig.importLaunchers = new ArrayList<>();
 
-		for (final DeviceImportLauncher launcher : importConfig.deviceImportLaunchers) {
+		for (final ImportLauncher launcher : importConfig.importLaunchers) {
 			importLaunchers.add(launcher.clone());
 		}
 
@@ -678,7 +681,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 			});
 			GridDataFactory.fillDefaults()//
 					.span(2, 1)
-//				.indent(0, convertVerticalDLUsToPixels(8))
 					.applyTo(_chkCreateBackup);
 		}
 
@@ -701,7 +703,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 				.applyTo(container);
 		GridLayoutFactory.fillDefaults()//
 				.numColumns(2)
-//				.extendedMargins(CONTROL_DECORATION_WIDTH, 0, 0, 0)
 				.applyTo(container);
 		{
 			/*
@@ -768,7 +769,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 		_chkImportFiles.addSelectionListener(_defaultSelectionListener);
 		GridDataFactory.fillDefaults()//
 				.span(2, 1)
-				.indent(0, convertVerticalDLUsToPixels(8))
+				.indent(0, convertVerticalDLUsToPixels(4))
 				.applyTo(_chkImportFiles);
 
 		// this control is just for info and to have a consistent UI
@@ -1012,9 +1013,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 				if (data instanceof StructuredSelection) {
 					final StructuredSelection selection = (StructuredSelection) data;
 
-					if (selection.getFirstElement() instanceof DeviceImportLauncher) {
+					if (selection.getFirstElement() instanceof ImportLauncher) {
 
-						final DeviceImportLauncher filterItem = (DeviceImportLauncher) selection.getFirstElement();
+						final ImportLauncher filterItem = (ImportLauncher) selection.getFirstElement();
 
 						final int location = getCurrentLocation();
 						final Table filterTable = _ilViewer.getTable();
@@ -1190,6 +1191,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 				.indent(convertWidthInCharsToPixels(3), 0)
 				.applyTo(group);
 		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
+//		group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
 		{
 			createUI_610_IL_Name(group);
 			createUI_800_IL_TourType(group);
@@ -1243,30 +1245,58 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 
 			GridDataFactory.fillDefaults()//
 					.grab(true, false)
-					.hint(convertWidthInCharsToPixels(40), convertHeightInCharsToPixels(5))
+					.hint(convertWidthInCharsToPixels(40), convertHeightInCharsToPixels(2))
 					.applyTo(_txtIL_ConfigDescription);
 		}
+
+//		{
+//			/*
+//			 * Label: Other import actions
+//			 */
+//			_lblIL_OtherImportActions = new Label(parent, SWT.NONE);
+//			_lblIL_OtherImportActions.setText(Messages.Dialog_ImportConfig_Info_MoreImportActions);
+//			_lblIL_OtherImportActions.setFont(_boldFont);
+//			GridDataFactory.fillDefaults()//
+//					.span(2, 1)
+//					.indent(0, 10)
+//					.applyTo(_lblIL_OtherImportActions);
+//		}
 	}
 
 	private void createUI_620_IL_LastMarker(final Composite parent) {
+
+		final SelectionAdapter lastMarkerSelectionListener = new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+
+				onIL_Modified();
+				enableILControls();
+			}
+		};
+
+		final MouseWheelListener lastMarkerMouseWheelListener = new MouseWheelListener() {
+
+			@Override
+			public void mouseScrolled(final MouseEvent e) {
+				UI.adjustSpinnerValueOnMouseScroll(e);
+
+				onIL_Modified();
+				enableILControls();
+			}
+		};
 
 		{
 			/*
 			 * Checkbox: Last marker
 			 */
-			_chkIL_LastMarker = new Button(parent, SWT.CHECK);
-			_chkIL_LastMarker.setText(Messages.Dialog_ImportConfig_Checkbox_LastMarker);
-			_chkIL_LastMarker.setToolTipText(Messages.Dialog_ImportConfig_Checkbox_LastMarker_Tooltip);
-			_chkIL_LastMarker.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					enableILControls();
-				}
-			});
+			_chkIL_SetLastMarker = new Button(parent, SWT.CHECK);
+			_chkIL_SetLastMarker.setText(Messages.Dialog_ImportConfig_Checkbox_LastMarker);
+			_chkIL_SetLastMarker.setToolTipText(Messages.Dialog_ImportConfig_Checkbox_LastMarker_Tooltip);
+			_chkIL_SetLastMarker.addSelectionListener(lastMarkerSelectionListener);
 			GridDataFactory.fillDefaults()//
 					.span(2, 1)
 					.indent(0, 5)
-					.applyTo(_chkIL_LastMarker);
+					.applyTo(_chkIL_SetLastMarker);
 		}
 
 		{
@@ -1279,18 +1309,20 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 			_lblIL_LastMarker.setToolTipText(Messages.Dialog_ImportConfig_Label_LastMarkerDistance_Tooltip);
 			GridDataFactory.fillDefaults()//
 					.align(SWT.FILL, SWT.CENTER)
-					.indent(convertHorizontalDLUsToPixels(11), 0)
+					.indent(_leftPadding, 0)
 					.applyTo(_lblIL_LastMarker);
 
 			final Composite container = new Composite(parent, SWT.NONE);
 //			GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 			{
-				// spinner: distance
+				// spinner: distance 1.1 km
 				_spinnerIL_LastMarkerDistance = new Spinner(container, SWT.BORDER);
 				_spinnerIL_LastMarkerDistance.setMinimum(ImportConfig.LAST_MARKER_DISTANCE_MIN);
 				_spinnerIL_LastMarkerDistance.setMaximum(ImportConfig.LAST_MARKER_DISTANCE_MAX);
-				_spinnerIL_LastMarkerDistance.addMouseWheelListener(_defaultMouseWheelListener);
+				_spinnerIL_LastMarkerDistance.setDigits(1);
+				_spinnerIL_LastMarkerDistance.addMouseWheelListener(lastMarkerMouseWheelListener);
+				_spinnerIL_LastMarkerDistance.addSelectionListener(lastMarkerSelectionListener);
 				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_spinnerIL_LastMarkerDistance);
 
 				// label: unit
@@ -1310,7 +1342,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 			_lblIL_LastMarkerText.setText(Messages.Dialog_ImportConfig_Label_LastMarkerText);
 			GridDataFactory.fillDefaults()//
 					.align(SWT.FILL, SWT.CENTER)
-					.indent(convertHorizontalDLUsToPixels(11), 0)
+					.indent(_leftPadding, 0)
 					.applyTo(_lblIL_LastMarkerText);
 
 			// text
@@ -1359,17 +1391,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 		};
 
 		/*
-		 * Label: Additonal launcher actions
-		 */
-		_lblIL_OtherImportActions = new Label(parent, SWT.NONE);
-		_lblIL_OtherImportActions.setText(Messages.Dialog_ImportConfig_Info_MoreImportActions);
-		_lblIL_OtherImportActions.setFont(_boldFont);
-		GridDataFactory.fillDefaults()//
-				.span(2, 1)
-				.indent(0, 10)
-				.applyTo(_lblIL_OtherImportActions);
-
-		/*
 		 * Checkbox: Set tour type
 		 */
 		_chkIL_SetTourType = new Button(parent, SWT.CHECK);
@@ -1385,21 +1406,18 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 		 * Tour type options
 		 */
 		{
-			// label
-			_lblIL_TourType = new Label(parent, SWT.NONE);
-			_lblIL_TourType.setText(Messages.Dialog_ImportConfig_Label_TourType);
-			GridDataFactory.fillDefaults()//
-					.align(SWT.FILL, SWT.CENTER)
-					.indent(convertHorizontalDLUsToPixels(11), 0)
-					.applyTo(_lblIL_TourType);
-
 			// combo
-			_comboIL_Config = new Combo(parent, SWT.READ_ONLY);
-			_comboIL_Config.addSelectionListener(ttListener);
+			_comboIL_TourType = new Combo(parent, SWT.READ_ONLY);
+			_comboIL_TourType.addSelectionListener(ttListener);
+			GridDataFactory.fillDefaults()//
+					.span(2, 1)
+					.align(SWT.BEGINNING, SWT.FILL)
+					.indent(_leftPadding, 0)
+					.applyTo(_comboIL_TourType);
 
 			// fill combo
 			for (final ComboEnumEntry<?> tourTypeItem : RawDataManager.ALL_IMPORT_TOUR_TYPE_CONFIG) {
-				_comboIL_Config.add(tourTypeItem.label);
+				_comboIL_TourType.add(tourTypeItem.label);
 			}
 
 			// options
@@ -1554,8 +1572,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 				 */
 				final Spinner spinnerValue = new Spinner(_speedTourType_Container, SWT.BORDER);
 				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(spinnerValue);
-				spinnerValue.setMinimum(EasyImportManager.CONFIG_SPEED_MIN);
-				spinnerValue.setMaximum(EasyImportManager.CONFIG_SPEED_MAX);
+				spinnerValue.setMinimum(ImportConfig.TOUR_TYPE_AVG_SPEED_MIN);
+				spinnerValue.setMaximum(ImportConfig.TOUR_TYPE_AVG_SPEED_MAX);
 				spinnerValue.setToolTipText(Messages.Dialog_ImportConfig_Spinner_Speed_Tooltip);
 				spinnerValue.addMouseWheelListener(_defaultMouseWheelListener);
 
@@ -1851,6 +1869,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 		defineColumn_10_ProfileName();
 		defineColumn_20_ColorImage();
 		defineColumn_30_IsSaveTour();
+		defineColumn_40_LastMarkerDistance();
 		defineColumn_90_Description();
 	}
 
@@ -1873,7 +1892,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
-				cell.setText(((DeviceImportLauncher) cell.getElement()).name);
+				cell.setText(((ImportLauncher) cell.getElement()).name);
 			}
 		});
 	}
@@ -1904,14 +1923,14 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 	}
 
 	/**
-	 * Column: Is visible
+	 * Column: Is save tour
 	 */
 	private void defineColumn_30_IsSaveTour() {
 
 		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "isSaveTour", SWT.LEAD); //$NON-NLS-1$
 
-		colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_Save);
-		colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_Save);
+		colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_Save_Label);
+		colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_Save_Header);
 		colDef.setColumnHeaderToolTipText(Messages.Dialog_ImportConfig_Checkbox_SaveTour_Tooltip);
 
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(7));
@@ -1923,10 +1942,46 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 			@Override
 			public void update(final ViewerCell cell) {
 
-				final DeviceImportLauncher importLauncher = (DeviceImportLauncher) cell.getElement();
+				final ImportLauncher importLauncher = (ImportLauncher) cell.getElement();
 				cell.setText(importLauncher.isSaveTour //
 						? Messages.App_Label_BooleanYes
-						: Messages.App_Label_BooleanNo);
+						: UI.EMPTY_STRING);
+			}
+		});
+	}
+
+	/**
+	 * Column: Set last marker
+	 */
+	private void defineColumn_40_LastMarkerDistance() {
+
+		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "isSetLastMarker", SWT.TRAIL); //$NON-NLS-1$
+
+		colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_LastMarker_Lable);
+		colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_LastMarker_Header);
+		colDef.setColumnHeaderToolTipText(Messages.Dialog_ImportConfig_Column_LastMarker_Tooltip);
+
+		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(7));
+		colDef.setColumnWeightData(new ColumnWeightData(7));
+
+		colDef.setIsDefaultColumn();
+
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final ImportLauncher importLauncher = (ImportLauncher) cell.getElement();
+
+				if (importLauncher.isSetLastMarker) {
+
+					final double distance = getMarkerDistanceValue(importLauncher);
+
+					cell.setText(_nf1.format(distance));
+
+				} else {
+
+					cell.setText(UI.EMPTY_STRING);
+				}
 			}
 		});
 	}
@@ -1948,7 +2003,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
-				cell.setText(((DeviceImportLauncher) cell.getElement()).description);
+				cell.setText(((ImportLauncher) cell.getElement()).description);
 			}
 		});
 	}
@@ -2000,11 +2055,11 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 
 	private void enableILControls() {
 
-		final boolean isLauncherAvailable = _dialogConfig.deviceImportLaunchers.size() > 0;
+		final boolean isLauncherAvailable = _dialogConfig.importLaunchers.size() > 0;
 
 		final boolean isILSelected = _currentIL != null;
 
-		final boolean isLastMarkerSelected = isILSelected && _chkIL_LastMarker.getSelection();
+		final boolean isLastMarkerSelected = isILSelected && _chkIL_SetLastMarker.getSelection();
 		boolean isSetTourType = false;
 
 		if (isILSelected) {
@@ -2075,12 +2130,12 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 		_btnIL_Duplicate.setEnabled(isILSelected);
 		_btnIL_Remove.setEnabled(isILSelected);
 
-		_chkIL_LastMarker.setEnabled(isILSelected);
+		_chkIL_SetLastMarker.setEnabled(isILSelected);
 		_chkIL_SaveTour.setEnabled(isILSelected);
 		_chkIL_ShowInDashboard.setEnabled(isILSelected);
 		_chkIL_SetTourType.setEnabled(isILSelected);
 
-		_comboIL_Config.setEnabled(isILSelected && isSetTourType);
+		_comboIL_TourType.setEnabled(isILSelected && isSetTourType);
 
 		_lblIL_ConfigName.setEnabled(isILSelected);
 		_lblIL_ConfigDescription.setEnabled(isILSelected);
@@ -2088,8 +2143,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 		_lblIL_LastMarker.setEnabled(isLastMarkerSelected);
 		_lblIL_LastMarkerDistanceUnit.setEnabled(isLastMarkerSelected);
 		_lblIL_LastMarkerText.setEnabled(isLastMarkerSelected);
-		_lblIL_OtherImportActions.setEnabled(isILSelected);
-		_lblIL_TourType.setEnabled(isILSelected && isSetTourType);
+//		_lblIL_OtherImportActions.setEnabled(isILSelected);
 
 		_spinnerIL_LastMarkerDistance.setEnabled(isLastMarkerSelected);
 
@@ -2183,8 +2237,30 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 //		return null;
 	}
 
+	/**
+	 * @param importLauncher
+	 * @return Returns from the model the last marker distance value in the current measurment
+	 *         system.
+	 */
+	private double getMarkerDistanceValue(final ImportLauncher importLauncher) {
+
+		return importLauncher.lastMarkerDistance / 1000.0 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+	}
+
 	public ImportConfig getModifiedConfig() {
 		return _dialogConfig;
+	}
+
+	/**
+	 * @return Returns the selected distance of the last marker in meters.
+	 */
+	private int getSelectedLastMarkerDistance() {
+
+		final float lastMarkerDistance = _spinnerIL_LastMarkerDistance.getSelection()
+				* net.tourbook.ui.UI.UNIT_VALUE_DISTANCE
+				* 100;
+
+		return (int) lastMarkerDistance;
 	}
 
 	/**
@@ -2198,7 +2274,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 
 		if (isSetTourType) {
 
-			int configIndex = _comboIL_Config.getSelectionIndex();
+			int configIndex = _comboIL_TourType.getSelectionIndex();
 
 			if (configIndex == -1) {
 				configIndex = 0;
@@ -2243,7 +2319,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 		_pc = new PixelConverter(parent);
 
 		_leftPadding = convertHorizontalDLUsToPixels(11);
-		_boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
+//		_boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 
 		parent.addDisposeListener(new DisposeListener() {
 
@@ -2398,8 +2474,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 		update_Model_From_UI_Launcher();
 
 		// update model
-		final ArrayList<DeviceImportLauncher> configItems = _dialogConfig.deviceImportLaunchers;
-		DeviceImportLauncher newConfig;
+		final ArrayList<ImportLauncher> configItems = _dialogConfig.importLaunchers;
+		ImportLauncher newConfig;
 
 		if (isCopy) {
 
@@ -2410,7 +2486,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 
 		} else {
 
-			newConfig = new DeviceImportLauncher();
+			newConfig = new ImportLauncher();
 		}
 
 		configItems.add(newConfig);
@@ -2436,14 +2512,14 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 		update_Model_From_UI_Launcher();
 
 		// create new tt item
-		final DeviceImportLauncher newTTItem = new DeviceImportLauncher();
+		final ImportLauncher newTTItem = new ImportLauncher();
 
 		newTTItem.tourTypeConfig = TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL;
 		newTTItem.oneTourType = tourType;
 		newTTItem.name = tourType.getName();
 
 		// update model
-		_dialogConfig.deviceImportLaunchers.add(newTTItem);
+		_dialogConfig.importLaunchers.add(newTTItem);
 
 		// update UI
 		_ilViewer.refresh();
@@ -2476,6 +2552,10 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 		// update model which is displayed in the IL viewer
 		_currentIL.name = _txtIL_ConfigName.getText();
 		_currentIL.description = _txtIL_ConfigDescription.getText();
+
+		_currentIL.isSetLastMarker = _chkIL_SetLastMarker.getSelection();
+		_currentIL.lastMarkerDistance = getSelectedLastMarkerDistance();
+
 		_currentIL.isSaveTour = _chkIL_SaveTour.getSelection();
 
 		// update UI
@@ -2485,15 +2565,15 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 	private void onIL_Remove() {
 
 		final StructuredSelection selection = (StructuredSelection) _ilViewer.getSelection();
-		final DeviceImportLauncher selectedConfig = (DeviceImportLauncher) selection.getFirstElement();
+		final ImportLauncher selectedConfig = (ImportLauncher) selection.getFirstElement();
 
 		int selectedIndex = -1;
-		final ArrayList<DeviceImportLauncher> configItems = _dialogConfig.deviceImportLaunchers;
+		final ArrayList<ImportLauncher> configItems = _dialogConfig.importLaunchers;
 
 		// get index of the selected config
 		for (int configIndex = 0; configIndex < configItems.size(); configIndex++) {
 
-			final DeviceImportLauncher config = configItems.get(configIndex);
+			final ImportLauncher config = configItems.get(configIndex);
 
 			if (config.equals(selectedConfig)) {
 				selectedIndex = configIndex;
@@ -2537,7 +2617,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 				selectedIndex--;
 			}
 
-			final DeviceImportLauncher nextConfig = configItems.get(selectedIndex);
+			final ImportLauncher nextConfig = configItems.get(selectedIndex);
 
 			_ilViewer.setSelection(new StructuredSelection(nextConfig), true);
 		}
@@ -2552,7 +2632,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 		}
 
 		final TableItem item = (TableItem) event.item;
-		final DeviceImportLauncher importLauncher = (DeviceImportLauncher) item.getData();
+		final ImportLauncher importLauncher = (ImportLauncher) item.getData();
 
 		switch (event.type) {
 		case SWT.MeasureItem:
@@ -2631,8 +2711,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 
 	private void onSelectIL(final ISelection selection) {
 
-		final DeviceImportLauncher selectedIL = (DeviceImportLauncher) ((StructuredSelection) selection)
-				.getFirstElement();
+		final ImportLauncher selectedIL = (ImportLauncher) ((StructuredSelection) selection).getFirstElement();
 
 		if (_currentIL == selectedIL) {
 			// this is already selected
@@ -2777,9 +2856,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 		 * Reselect previous selected config when available
 		 */
 		final String stateILName = Util.getStateString(_state, STATE_IMPORT_LAUNCHER, UI.EMPTY_STRING);
-		final ArrayList<DeviceImportLauncher> importLaunchers = _dialogConfig.deviceImportLaunchers;
+		final ArrayList<ImportLauncher> importLaunchers = _dialogConfig.importLaunchers;
 
-		for (final DeviceImportLauncher importLauncher : importLaunchers) {
+		for (final ImportLauncher importLauncher : importLaunchers) {
 
 			if (importLauncher.name.equals(stateILName)) {
 
@@ -2877,8 +2956,13 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 
 		_currentIL.name = _txtIL_ConfigName.getText();
 		_currentIL.description = _txtIL_ConfigDescription.getText();
-		_currentIL.isShowInDashboard = _chkIL_ShowInDashboard.getSelection();
 		_currentIL.isSaveTour = _chkIL_SaveTour.getSelection();
+		_currentIL.isShowInDashboard = _chkIL_ShowInDashboard.getSelection();
+
+		// last marker
+		_currentIL.isSetLastMarker = _chkIL_SetLastMarker.getSelection();
+		_currentIL.lastMarkerDistance = getSelectedLastMarkerDistance();
+		_currentIL.lastMarkerText = _txtIL_LastMarker.getText();
 
 		final Enum<TourTypeConfig> selectedTourTypeConfig = getSelectedTourTypeConfig();
 
@@ -2966,15 +3050,15 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 	 */
 	private void update_Model_From_UI_TourTypeItems_Sorted() {
 
-		final ArrayList<DeviceImportLauncher> importTiles = _dialogConfig.deviceImportLaunchers;
+		final ArrayList<ImportLauncher> importTiles = _dialogConfig.importLaunchers;
 		importTiles.clear();
 
 		for (final TableItem tableItem : _ilViewer.getTable().getItems()) {
 
 			final Object itemData = tableItem.getData();
 
-			if (itemData instanceof DeviceImportLauncher) {
-				importTiles.add((DeviceImportLauncher) itemData);
+			if (itemData instanceof ImportLauncher) {
+				importTiles.add((ImportLauncher) itemData);
 			}
 		}
 	}
@@ -2990,15 +3074,25 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 		final Enum<TourTypeConfig> tourTypeConfig = _currentIL.tourTypeConfig;
 		final boolean isSetTourType = tourTypeConfig != null;
 
+		final double distance = getMarkerDistanceValue(_currentIL);
+		final double distance10 = distance * 10;
+		final int distanceValue = (int) (distance10 + 0.5);
+		final String lastMarkerText = _currentIL.lastMarkerText;
+
 		_txtIL_ConfigName.setText(_currentIL.name);
 		_txtIL_ConfigDescription.setText(_currentIL.description);
 		_chkIL_SaveTour.setSelection(_currentIL.isSaveTour);
 		_chkIL_ShowInDashboard.setSelection(_currentIL.isShowInDashboard);
 
+		// last marker
+		_chkIL_SetLastMarker.setSelection(_currentIL.isSetLastMarker);
+		_spinnerIL_LastMarkerDistance.setSelection(distanceValue);
+		_txtIL_LastMarker.setText(lastMarkerText == null ? UI.EMPTY_STRING : lastMarkerText);
+
 		_chkIL_SetTourType.setSelection(isSetTourType);
 
 		if (isSetTourType) {
-			_comboIL_Config.select(getTourTypeConfigIndex(tourTypeConfig));
+			_comboIL_TourType.select(getTourTypeConfigIndex(tourTypeConfig));
 		}
 
 		/*
