@@ -1089,7 +1089,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			final boolean isDeviceFolderOK = isOSFolderValid(deviceOSFolder);
 
 			final StringBuilder sb = new StringBuilder();
-			sb.append("<table><tbody>");
+			sb.append("<table><tbody>"); //$NON-NLS-1$
 
 			boolean isFolderOK = true;
 
@@ -1160,7 +1160,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 					folderTitle,
 					folderInfo);
 
-			sb.append("</tbody></table>");
+			sb.append("</tbody></table>"); //$NON-NLS-1$
 
 			isFolderOK &= isDeviceFolderOK;
 
@@ -1268,15 +1268,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				+ "' style='padding-left:5px; vertical-align:text-bottom;'>"; //$NON-NLS-1$
 
 		sb.append("<tr>"); //$NON-NLS-1$
-		sb.append("<td " + paddingTop + " class='folderTitle'>" + folderTitle + "</td>");
-		sb.append("<td " + paddingTop + " class='folderLocation'>" + folderLocation + folderStateIcon); //$NON-NLS-1$
+		sb.append("<td " + paddingTop + " class='folderTitle'>" + folderTitle + "</td>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		sb.append("<td " + paddingTop + " class='folderLocation'>" + folderLocation + folderStateIcon); //$NON-NLS-1$ //$NON-NLS-2$
 		sb.append(htmlErrorState);
-		sb.append("</td>");
+		sb.append("</td>"); //$NON-NLS-1$
 		sb.append("</tr>"); //$NON-NLS-1$
 
 		sb.append("<tr>"); //$NON-NLS-1$
-		sb.append("<td></td>");
-		sb.append("<td>" + htmlFolderInfo + "</td>");
+		sb.append("<td></td>"); //$NON-NLS-1$
+		sb.append("<td>" + htmlFolderInfo + "</td>"); //$NON-NLS-1$ //$NON-NLS-2$
 		sb.append("</tr>"); //$NON-NLS-1$
 
 	}

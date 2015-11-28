@@ -120,10 +120,8 @@ public class Messages extends NLS {
 	public static String		Dialog_ImportConfig_Checkbox_CreateBackup;
 	public static String		Dialog_ImportConfig_Checkbox_CreateBackup_Tooltip;
 	public static String		Dialog_ImportConfig_Checkbox_ImportFiles;
-	public static String	Dialog_ImportConfig_Checkbox_LastMarker;
-
-	public static String	Dialog_ImportConfig_Checkbox_LastMarker_Tooltip;
-
+	public static String		Dialog_ImportConfig_Checkbox_LastMarker;
+	public static String		Dialog_ImportConfig_Checkbox_LastMarker_Tooltip;
 	public static String		Dialog_ImportConfig_Checkbox_LiveUpdate;
 	public static String		Dialog_ImportConfig_Checkbox_LiveUpdate_Tooltip;
 	public static String		Dialog_ImportConfig_Checkbox_SaveTour;
@@ -133,17 +131,12 @@ public class Messages extends NLS {
 	public static String		Dialog_ImportConfig_Checkbox_TourType;
 	public static String		Dialog_ImportConfig_Checkbox_TourType_Tooltip;
 	public static String		Dialog_ImportConfig_Column_Description;
-	public static String	Dialog_ImportConfig_Column_LastMarker_Header;
-
-	public static String	Dialog_ImportConfig_Column_LastMarker_Lable;
-
-	public static String	Dialog_ImportConfig_Column_LastMarker_Tooltip;
-
+	public static String		Dialog_ImportConfig_Column_LastMarker_Header;
+	public static String		Dialog_ImportConfig_Column_LastMarker_Lable;
+	public static String		Dialog_ImportConfig_Column_LastMarker_Tooltip;
 	public static String		Dialog_ImportConfig_Column_Name;
-	public static String	Dialog_ImportConfig_Column_Save_Header;
-
-	public static String	Dialog_ImportConfig_Column_Save_Label;
-
+	public static String		Dialog_ImportConfig_Column_Save_Header;
+	public static String		Dialog_ImportConfig_Column_Save_Label;
 	public static String		Dialog_ImportConfig_Column_TourType;
 	public static String		Dialog_ImportConfig_Combo_Folder_Tooltip;
 	public static String		Dialog_ImportConfig_Dialog_BackupFolder_Message;
@@ -178,13 +171,9 @@ public class Messages extends NLS {
 	public static String		Dialog_ImportConfig_Label_ImportColumns;
 	public static String		Dialog_ImportConfig_Label_ImportColumns_Tooltip;
 	public static String		Dialog_ImportConfig_Label_ImportLauncher;
-
-	public static String	Dialog_ImportConfig_Label_LastMarkerDistance;
-
-	public static String	Dialog_ImportConfig_Label_LastMarkerDistance_Tooltip;
-
-	public static String	Dialog_ImportConfig_Label_LastMarkerText;
-	public static String		Dialog_ImportConfig_Label_TourType;
+	public static String		Dialog_ImportConfig_Label_LastMarkerDistance;
+	public static String		Dialog_ImportConfig_Label_LastMarkerDistance_Tooltip;
+	public static String		Dialog_ImportConfig_Label_LastMarkerText;
 	public static String		Dialog_ImportConfig_Link_TourType;
 	public static String		Dialog_ImportConfig_Spinner_Speed_Tooltip;
 
@@ -794,14 +783,10 @@ public class Messages extends NLS {
 	public static String		Image__synch_statistics_Disabled;
 	public static String		Image__SearchExternal;
 	public static String		Image__SearchExternal_Disabled;
-	public static String	Image__State_Error;
-
-	public static String	Image__State_OK;
-
-	public static String	Image__State_SaveTour;
-
-	public static String	Image__State_TourMarker;
-
+	public static String		Image__State_Error;
+	public static String		Image__State_OK;
+	public static String		Image__State_SaveTour;
+	public static String		Image__State_TourMarker;
 	public static String		Image__Synced;
 	public static String		Image__tag;
 	public static String		Image__tag_category;
@@ -896,10 +881,8 @@ public class Messages extends NLS {
 	public static String		Import_Data_HTML_GetTours;
 	public static String		Import_Data_HTML_ImportFromFiles_Action;
 	public static String		Import_Data_HTML_ImportFromFiles_ActionTooltip;
-	public static String	Import_Data_HTML_LastMarker_No;
-
-	public static String	Import_Data_HTML_LastMarker_Yes;
-
+	public static String		Import_Data_HTML_LastMarker_No;
+	public static String		Import_Data_HTML_LastMarker_Yes;
 	public static String		Import_Data_HTML_NotBackedUpFiles;
 	public static String		Import_Data_HTML_NotImportedFiles;
 	public static String		Import_Data_HTML_ReceiveFromSerialPort_ConfiguredAction;
@@ -908,11 +891,8 @@ public class Messages extends NLS {
 	public static String		Import_Data_HTML_ReceiveFromSerialPort_DirectlyLink;
 	public static String		Import_Data_HTML_SaveTour_No;
 	public static String		Import_Data_HTML_SaveTour_Yes;
-
-	public static String	Import_Data_HTML_Title_Backup;
-
-	public static String	Import_Data_HTML_Title_Device;
-
+	public static String		Import_Data_HTML_Title_Backup;
+	public static String		Import_Data_HTML_Title_Device;
 	public static String		Import_Data_Info_DeviceImport_DeletedImportFiles_Message;
 	public static String		Import_Data_Info_DeviceImport_NoImportFiles_Message;
 	public static String		Import_Data_Monitor_DeleteTourFiles;

@@ -47,6 +47,7 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -88,6 +89,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -190,7 +192,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 	/*
 	 * UI resources
 	 */
-//	private Font							_boldFont;
+	private Font							_boldFont;
 
 	/*
 	 * UI controls
@@ -238,7 +240,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 	private Label							_lblIL_LastMarkerDistanceUnit;
 	private Label							_lblIL_LastMarkerText;
 	private Label							_lblIL_One_TourTypeIcon;
-//	private Label							_lblIL_OtherImportActions;
+	private Label							_lblIL_OtherImportActions;
 	private Label[]							_lblTT_Speed_SpeedUnit;
 	private Label[]							_lblTT_Speed_TourTypeIcon;
 
@@ -1249,18 +1251,17 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 					.applyTo(_txtIL_ConfigDescription);
 		}
 
-//		{
-//			/*
-//			 * Label: Other import actions
-//			 */
-//			_lblIL_OtherImportActions = new Label(parent, SWT.NONE);
-//			_lblIL_OtherImportActions.setText(Messages.Dialog_ImportConfig_Info_MoreImportActions);
-//			_lblIL_OtherImportActions.setFont(_boldFont);
-//			GridDataFactory.fillDefaults()//
-//					.span(2, 1)
-//					.indent(0, 10)
-//					.applyTo(_lblIL_OtherImportActions);
-//		}
+		{
+			/*
+			 * Label: Other import actions
+			 */
+			_lblIL_OtherImportActions = new Label(parent, SWT.NONE);
+			_lblIL_OtherImportActions.setText(Messages.Dialog_ImportConfig_Info_MoreImportActions);
+			_lblIL_OtherImportActions.setFont(_boldFont);
+			GridDataFactory.fillDefaults()//
+					.span(2, 1)
+					.applyTo(_lblIL_OtherImportActions);
+		}
 	}
 
 	private void createUI_620_IL_LastMarker(final Composite parent) {
@@ -2143,7 +2144,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 		_lblIL_LastMarker.setEnabled(isLastMarkerSelected);
 		_lblIL_LastMarkerDistanceUnit.setEnabled(isLastMarkerSelected);
 		_lblIL_LastMarkerText.setEnabled(isLastMarkerSelected);
-//		_lblIL_OtherImportActions.setEnabled(isILSelected);
+		_lblIL_OtherImportActions.setEnabled(isILSelected);
 
 		_spinnerIL_LastMarkerDistance.setEnabled(isLastMarkerSelected);
 
@@ -2319,7 +2320,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 		_pc = new PixelConverter(parent);
 
 		_leftPadding = convertHorizontalDLUsToPixels(11);
-//		_boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
+		_boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 
 		parent.addDisposeListener(new DisposeListener() {
 
