@@ -1,4 +1,4 @@
-Version 15.12.0 Beta                                  ?. ? 2015
+Version 15.12.0 Experimental                                  ?. ? 2015
 
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -31,7 +31,7 @@ Version 15.12.0 Beta                                  ?. ? 2015
  
  * The device and backup folders are observed but when these folders are deleted/moved this will not be recognized. Workaround: close and reopen the import view.
  
- * Disable device import: Set device folder empty AND deselect create backup.
+ * Disable easy import: Set device folder empty AND deselect create backup.
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
