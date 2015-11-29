@@ -448,7 +448,7 @@ public class EasyImportManager {
 
 			MessageDialog.openError(
 					Display.getDefault().getActiveShell(),
-					Messages.Import_Data_Dialog_EazyImport_Title,
+					Messages.Import_Data_Dialog_EasyImport_Title,
 					NLS.bind(invalidMessage, displayedFolder));
 		}
 
@@ -616,7 +616,7 @@ public class EasyImportManager {
 
 		if (!isFolderValid(
 				deviceOSFolder,
-				Messages.Import_Data_Dialog_EazyImport_InvalidDeviceFolder_Message,
+				Messages.Import_Data_Dialog_EasyImport_InvalidDeviceFolder_Message,
 				importConfig.getDeviceFolder())) {
 
 			importState.isOpenSetup = true;
@@ -634,7 +634,7 @@ public class EasyImportManager {
 			if (!isFolderValid(
 
 					backupOSFolder,
-					Messages.Import_Data_Dialog_EazyImport_InvalidBackupFolder_Message,
+					Messages.Import_Data_Dialog_EasyImport_InvalidBackupFolder_Message,
 					importConfig.getBackupFolder())) {
 
 				importState.isOpenSetup = true;
@@ -657,8 +657,8 @@ public class EasyImportManager {
 
 			MessageDialog.openInformation(
 					Display.getDefault().getActiveShell(),
-					Messages.Import_Data_Dialog_EazyImport_Title,
-					NLS.bind(Messages.Import_Data_Dialog_EazyImport_NoImportFiles_Message, deviceOSFolder));
+					Messages.Import_Data_Dialog_EasyImport_Title,
+					NLS.bind(Messages.Import_Data_Dialog_EasyImport_NoImportFiles_Message, deviceOSFolder));
 
 			// there is nothing more to do
 			importState.isImportCanceled = true;

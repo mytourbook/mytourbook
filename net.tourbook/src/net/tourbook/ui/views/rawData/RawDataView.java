@@ -834,8 +834,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		final ImportLauncher defaultLauncher = new ImportLauncher();
 
-		defaultLauncher.name = Messages.Import_Data_Default_FirstEazyImportLauncher_Name;
-		defaultLauncher.description = Messages.Import_Data_Default_FirstEazyImportLauncher_Description;
+		defaultLauncher.name = Messages.Import_Data_Default_FirstEasyImportLauncher_Name;
+		defaultLauncher.description = Messages.Import_Data_Default_FirstEasyImportLauncher_Description;
 
 		final ImportConfig importConfig = getImportConfig();
 		importConfig.importLaunchers.add(defaultLauncher);
@@ -932,7 +932,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				+ ("	<table><tbody><tr>\n") //$NON-NLS-1$
 
 				// device import
-				+ ("		<td class='title'>" + Messages.Import_Data_HTML_EazyImport + "</td>\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("		<td class='title'>" + Messages.Import_Data_HTML_EasyImport + "</td>\n") //$NON-NLS-1$ //$NON-NLS-2$
 
 				// device state icon
 				+ ("		<td>\n") //$NON-NLS-1$
@@ -2529,7 +2529,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 				MessageDialog.openError(
 						_parent.getShell(),
-						Messages.Import_Data_Dialog_EazyImport_Title,
+						Messages.Import_Data_Dialog_EasyImport_Title,
 						Messages.Import_Data_Dialog_NoActivePersion_Message);
 				return;
 			}
