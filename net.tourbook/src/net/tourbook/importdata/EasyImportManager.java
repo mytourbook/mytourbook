@@ -915,17 +915,6 @@ public class EasyImportManager {
 				}
 			}
 
-			if (tourTypeId == -1) {
-
-				// tour avg speed is above the last speed tour type -> use the last
-
-				final int numTourTypes = speedTourTypes.size();
-
-				if (numTourTypes > 0) {
-					tourTypeId = speedTourTypes.get(numTourTypes - 1).tourTypeId;
-				}
-			}
-
 			if (tourTypeId != -1) {
 
 				final TourType tourType = net.tourbook.ui.UI.getTourType(tourTypeId);
