@@ -448,7 +448,7 @@ public class EasyImportManager {
 
 			MessageDialog.openError(
 					Display.getDefault().getActiveShell(),
-					Messages.Import_Data_Error_DeviceImport_Title,
+					Messages.Import_Data_Dialog_EazyImport_Title,
 					NLS.bind(invalidMessage, displayedFolder));
 		}
 
@@ -616,7 +616,7 @@ public class EasyImportManager {
 
 		if (!isFolderValid(
 				deviceOSFolder,
-				Messages.Import_Data_Error_DeviceImport_InvalidDeviceFolder_Message,
+				Messages.Import_Data_Dialog_EazyImport_InvalidDeviceFolder_Message,
 				importConfig.getDeviceFolder())) {
 
 			importState.isOpenSetup = true;
@@ -634,7 +634,7 @@ public class EasyImportManager {
 			if (!isFolderValid(
 
 					backupOSFolder,
-					Messages.Import_Data_Error_DeviceImport_InvalidBackupFolder_Message,
+					Messages.Import_Data_Dialog_EazyImport_InvalidBackupFolder_Message,
 					importConfig.getBackupFolder())) {
 
 				importState.isOpenSetup = true;
@@ -657,8 +657,8 @@ public class EasyImportManager {
 
 			MessageDialog.openInformation(
 					Display.getDefault().getActiveShell(),
-					Messages.Import_Data_Error_DeviceImport_Title,
-					NLS.bind(Messages.Import_Data_Info_DeviceImport_NoImportFiles_Message, deviceOSFolder));
+					Messages.Import_Data_Dialog_EazyImport_Title,
+					NLS.bind(Messages.Import_Data_Dialog_EazyImport_NoImportFiles_Message, deviceOSFolder));
 
 			// there is nothing more to do
 			importState.isImportCanceled = true;
@@ -721,7 +721,7 @@ public class EasyImportManager {
 
 				int copied = 0;
 
-				monitor.beginTask(Messages.Import_Data_Task_Backup, numBackupFiles);
+				monitor.beginTask(Messages.Import_Data_Monitor_Backup, numBackupFiles);
 
 				for (final String backupFileName : notBackedUpFiles) {
 
@@ -735,7 +735,7 @@ public class EasyImportManager {
 //					Thread.sleep(800);
 
 					monitor.worked(1);
-					monitor.subTask(NLS.bind(Messages.Import_Data_Task_Backup_SubTask, //
+					monitor.subTask(NLS.bind(Messages.Import_Data_Monitor_Backup_SubTask, //
 							new Object[] { ++copied, numBackupFiles, backupFileName }));
 
 					try {

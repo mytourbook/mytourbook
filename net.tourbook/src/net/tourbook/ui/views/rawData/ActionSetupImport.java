@@ -28,7 +28,7 @@ public class ActionSetupImport extends Action {
 
 		_rawDataView = rawDataView;
 
-		setToolTipText(Messages.Import_Data_Action_AutomatedImportConfig_Tooltip);
+		setToolTipText(Messages.Import_Data_Action_SetupEazyImport_Tooltip);
 
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__tour_options));
 		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__tour_options_disabled));

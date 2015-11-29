@@ -132,7 +132,7 @@ public class Messages extends NLS {
 	public static String		Dialog_ImportConfig_Checkbox_TourType_Tooltip;
 	public static String		Dialog_ImportConfig_Column_Description;
 	public static String		Dialog_ImportConfig_Column_LastMarker_Header;
-	public static String		Dialog_ImportConfig_Column_LastMarker_Lable;
+	public static String		Dialog_ImportConfig_Column_LastMarker_Label;
 	public static String		Dialog_ImportConfig_Column_LastMarker_Tooltip;
 	public static String		Dialog_ImportConfig_Column_Name;
 	public static String		Dialog_ImportConfig_Column_Save_Header;
@@ -834,7 +834,6 @@ public class Messages extends NLS {
 	public static String		import_data_updateDataFromDatabase_subTask;
 	public static String		import_data_updateDataFromDatabase_task;
 
-	public static String		Import_Data_Action_AutomatedImportConfig_Tooltip;
 	public static String		Import_Data_Action_DeleteTourFiles;
 	public static String		Import_Data_Action_EditImportPreferences;
 	public static String		Import_Data_Action_Reimport_EntireTour;
@@ -847,8 +846,9 @@ public class Messages extends NLS {
 	public static String		Import_Data_Action_Reimport_Tour;
 	public static String		Import_Data_Action_RemoveTour;
 	public static String		Import_Data_Action_RemoveToursWhenClosed;
-	public static String		Import_Data_Default_DeviceImportLauncher_Description;
-	public static String		Import_Data_Default_DeviceImportLauncher_Name;
+	public static String		Import_Data_Action_SetupEazyImport_Tooltip;
+	public static String		Import_Data_Default_FirstEazyImportLauncher_Description;
+	public static String		Import_Data_Default_FirstEazyImportLauncher_Name;
 	public static String		Import_Data_Dialog_ConfirmReimport_Message;
 	public static String		Import_Data_Dialog_ConfirmReimportAltitudeValues_Message;
 	public static String		Import_Data_Dialog_ConfirmReimportGearValues_Message;
@@ -856,6 +856,7 @@ public class Messages extends NLS {
 	public static String		Import_Data_Dialog_ConfirmReimportTemperatureValues_Message;
 	public static String		Import_Data_Dialog_ConfirmReimportTimeSlices_Message;
 	public static String		Import_Data_Dialog_ConfirmReimportTourMarker_Message;
+	public static String		Import_Data_Dialog_DeletedImportFiles_Message;
 	public static String		Import_Data_Dialog_DeleteTourFiles_LastChance_Message;
 	public static String		Import_Data_Dialog_DeleteTourFiles_Message;
 	public static String		Import_Data_Dialog_DeleteTourFiles_Title;
@@ -869,14 +870,14 @@ public class Messages extends NLS {
 	public static String		Import_Data_Dialog_ReimportIsInvalid_WrongSliceNumbers_Message;
 	public static String		Import_Data_Error_CreatingFileName_Message;
 	public static String		Import_Data_Error_CreatingFileName_Title;
-	public static String		Import_Data_Error_DeviceImport_InvalidBackupFolder_Message;
-	public static String		Import_Data_Error_DeviceImport_InvalidDeviceFolder_Message;
-	public static String		Import_Data_Error_DeviceImport_Title;
-	public static String		Import_Data_Error_NoActivePersion_Message;
+	public static String		Import_Data_Dialog_EazyImport_InvalidBackupFolder_Message;
+	public static String		Import_Data_Dialog_EazyImport_InvalidDeviceFolder_Message;
+	public static String		Import_Data_Dialog_EazyImport_Title;
+	public static String		Import_Data_Dialog_NoActivePersion_Message;
 	public static String		Import_Data_HTML_AcquireDeviceInfo;
 	public static String		Import_Data_HTML_AllFilesAreBackedUp;
 	public static String		Import_Data_HTML_AllFilesAreImported;
-	public static String		Import_Data_HTML_DeviceImport;
+	public static String		Import_Data_HTML_EazyImport;
 	public static String		Import_Data_HTML_FolderIsNotAvailable;
 	public static String		Import_Data_HTML_GetTours;
 	public static String		Import_Data_HTML_ImportFromFiles_Action;
@@ -893,12 +894,11 @@ public class Messages extends NLS {
 	public static String		Import_Data_HTML_SaveTour_Yes;
 	public static String		Import_Data_HTML_Title_Backup;
 	public static String		Import_Data_HTML_Title_Device;
-	public static String		Import_Data_Info_DeviceImport_DeletedImportFiles_Message;
-	public static String		Import_Data_Info_DeviceImport_NoImportFiles_Message;
+	public static String		Import_Data_Dialog_EazyImport_NoImportFiles_Message;
+	public static String		Import_Data_Monitor_Backup;
+	public static String		Import_Data_Monitor_Backup_SubTask;
 	public static String		Import_Data_Monitor_DeleteTourFiles;
 	public static String		Import_Data_Monitor_DeleteTourFiles_Subtask;
-	public static String		Import_Data_Task_Backup;
-	public static String		Import_Data_Task_Backup_SubTask;
 	public static String		Import_Data_Task_CloseDeviceInfo;
 	public static String		Import_Data_TourTypeConfig_BySpeed;
 	public static String		Import_Data_TourTypeConfig_OneForAll;

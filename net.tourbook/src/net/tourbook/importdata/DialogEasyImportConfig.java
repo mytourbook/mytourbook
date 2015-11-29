@@ -1320,7 +1320,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 				// spinner: distance 1.1 km
 				_spinnerIL_LastMarkerDistance = new Spinner(container, SWT.BORDER);
 				_spinnerIL_LastMarkerDistance.setMinimum(ImportConfig.LAST_MARKER_DISTANCE_MIN);
-				_spinnerIL_LastMarkerDistance.setMaximum(ImportConfig.LAST_MARKER_DISTANCE_MAX);
+				_spinnerIL_LastMarkerDistance.setMaximum(ImportConfig.LAST_MARKER_DISTANCE_MAX / 100);
 				_spinnerIL_LastMarkerDistance.setDigits(1);
 				_spinnerIL_LastMarkerDistance.addMouseWheelListener(lastMarkerMouseWheelListener);
 				_spinnerIL_LastMarkerDistance.addSelectionListener(lastMarkerSelectionListener);
@@ -1958,7 +1958,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 
 		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "isSetLastMarker", SWT.TRAIL); //$NON-NLS-1$
 
-		colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_LastMarker_Lable);
+		colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_LastMarker_Label);
 		colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_LastMarker_Header);
 		colDef.setColumnHeaderToolTipText(Messages.Dialog_ImportConfig_Column_LastMarker_Tooltip);
 

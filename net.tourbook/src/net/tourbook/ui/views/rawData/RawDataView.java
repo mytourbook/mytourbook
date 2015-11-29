@@ -834,8 +834,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		final ImportLauncher defaultLauncher = new ImportLauncher();
 
-		defaultLauncher.name = Messages.Import_Data_Default_DeviceImportLauncher_Name;
-		defaultLauncher.description = Messages.Import_Data_Default_DeviceImportLauncher_Description;
+		defaultLauncher.name = Messages.Import_Data_Default_FirstEazyImportLauncher_Name;
+		defaultLauncher.description = Messages.Import_Data_Default_FirstEazyImportLauncher_Description;
 
 		final ImportConfig importConfig = getImportConfig();
 		importConfig.importLaunchers.add(defaultLauncher);
@@ -932,7 +932,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				+ ("	<table><tbody><tr>\n") //$NON-NLS-1$
 
 				// device import
-				+ ("		<td class='title'>" + Messages.Import_Data_HTML_DeviceImport + "</td>\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("		<td class='title'>" + Messages.Import_Data_HTML_EazyImport + "</td>\n") //$NON-NLS-1$ //$NON-NLS-2$
 
 				// device state icon
 				+ ("		<td>\n") //$NON-NLS-1$
@@ -2493,7 +2493,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		MessageDialog.openInformation(
 				_parent.getShell(),
 				Messages.Import_Data_Dialog_DeleteTourFiles_Title,
-				NLS.bind(Messages.Import_Data_Info_DeviceImport_DeletedImportFiles_Message, deletedFiles.size()));
+				NLS.bind(Messages.Import_Data_Dialog_DeletedImportFiles_Message, deletedFiles.size()));
 	}
 
 	private void doEasyImport(final long tileId) {
@@ -2529,8 +2529,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 				MessageDialog.openError(
 						_parent.getShell(),
-						Messages.Import_Data_Error_DeviceImport_Title,
-						Messages.Import_Data_Error_NoActivePersion_Message);
+						Messages.Import_Data_Dialog_EazyImport_Title,
+						Messages.Import_Data_Dialog_NoActivePersion_Message);
 				return;
 			}
 		}
@@ -3763,7 +3763,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			try {
 
-
 				if (_folderWatcher != null) {
 
 					try {
@@ -3868,7 +3867,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 						// wait for the next event
 						watchKey = folderWatcher.take();
-
 
 						/*
 						 * Events MUST be polled otherwise this will stay in an endless loop.
