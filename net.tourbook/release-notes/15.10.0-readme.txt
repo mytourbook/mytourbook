@@ -1,15 +1,97 @@
-Version 15.10.0 Beta                                  26. September 2015
+Version 15.10.0                                         12. October 2015
 
-   
+
 New Last Minute Feature
 =======================
 
 * Collated Tours
+    - Collate tours by tour type.
+    - This brand-new feature have not yet the same quality as other 
+      features, e.g. tours are not reselected/expanded after reopening.
 
+
+New I
+=====	
+
+* Tour Chart
+    - Show multiple tours.
+    - Show title and tour info tooltip for each tour.
+    - Customize tour info.
+    - HR zones can only be displayed for multiple tours when an active 
+      person is selected, it is not available when 'All People' is 
+      selected.
+    - Show only (filter) tour markers which contain a description.
+    - Show relative position value in the zoom marker.
+    - Zoom in/out with smaller steps when <Alt> key is pressed.
+    - Accelerate horizontal scrolling with mouse wheel and 
+      <Ctrl>+<Shift> keys.
+    - Force min/max values for all graphs.
+
+Limits
+------
+This new feature is not yet optimized for all areas in the application.
+Some lists, e.g. time slice list in the tour editor or segment list in 
+the tour segmenter can freeze the App when hundreds or thousands of 
+tours are selected, it depends on the number of time slices. To prevent 
+this, just hide or close critical views.
+
+The above chart contains more than 4'000'000 time slices and works very 
+well in the tour chart. The graph is optimized but currently it lacks 
+some details (can be improved).
+
+
+New II
+======	
+
+* Tour Segmenter
+    - Support multiple tours.
+    - Set properties (value, font, opacity ...) how segments are 
+      displayed in the tour chart.
+
+* Tour Segments in the Tour Chart
+    - Show segment values for all graphs.
+    - Segment tooltip.
+    - Navigate/select tour segments in the tour chart with mouse or 
+      keyboard.
 
 
 Improvements
 ============	
 
+* Map2
+    - Draw map scale with rounded units and without black/white color 
+      (I always puzzled how to interpret the scale colors).
+    - Prevent redrawing for multiple tours.
+    - Center map with both sliders, e.g. when a segment or multiple 
+      segments are selected in the tour segmenter 
+      (this solved a very long annoying behaviour).
+
+* Tour Editor
+    - Customize number of displayed digits for the lat/lon column 
+      values.
+
+* Tour Marker View
+    - Support multiple selected tours.
+
+* FIT Import
+    - Ignore tour markers at the end of the tour, can be configured in 
+      the Fit pref pages.
+    - Replace time slices when it exceeds a selected duration.
+      This fixes a device bug because the .fit file contained a time 
+      slice with more than 17 years.
+
 * NMEA import
 	- Merged date fix from Alexey.
+
+* Reimport
+	A tour reimport can now also be done only for
+    - Tour markers.
+    - Power and speed values.
+
+
+Bugfix
+======	
+
+* Photo
+    - Fixed ArrayIndexOutOfBoundsException when tour contains only 
+      1 time slice.
