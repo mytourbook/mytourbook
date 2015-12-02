@@ -1120,7 +1120,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 					final int numNotBackedUpFiles = importConfig.notBackedUpFiles.size();
 
 					folderInfo = numNotBackedUpFiles == 0 //
-							? Messages.Import_Data_HTML_AllFilesAreBackedUp
+							? NLS.bind(Messages.Import_Data_HTML_AllFilesAreBackedUp, numDeviceFiles)
 							: NLS.bind(Messages.Import_Data_HTML_NotBackedUpFiles, numNotBackedUpFiles, numDeviceFiles);
 
 				}
@@ -1149,7 +1149,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			final String folderTitle = Messages.Import_Data_HTML_Title_Device;
 
 			final String folderInfo = numNotImportedFiles == 0 //
-					? Messages.Import_Data_HTML_AllFilesAreImported
+					? NLS.bind(Messages.Import_Data_HTML_AllFilesAreImported, numDeviceFiles)
 					: NLS.bind(Messages.Import_Data_HTML_NotImportedFiles, numNotImportedFiles, numDeviceFiles);
 
 			createHTML_FolderState(//
