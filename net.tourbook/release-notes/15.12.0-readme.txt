@@ -1,57 +1,53 @@
-Version 15.12.0 Experimental                                  ?. ? 2015
+Version 15.12.0 Experimental                            2. December 2015
 
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
- * JAVA 8 - because of Base64 in OpenJDK 8 for Ubuntu 14.04 LTS
- 
- 
- 	How to install:
-
-    sudo add-apt-repository ppa:openjdk-r/ppa
-    sudo apt-get update
-    sudo apt-get install openjdk-8-jdk
-    sudo update-alternatives --config java
-    sudo update-alternatives --config javac
-
-
-
-
-
- * Import background image can be slow, set opacity to 0 to disable it. 
- 
- 
- * The embedded browser in Linux cannot show all CSS3 features, e.g. background image, gradient, box-shadow is expanding the focus therefor CSS3 is disabled.
- 
- 
- * Clicking on the dashboard state icon works sometimes only with the 2nd and further clicks.
- 
- 
- * "Starting tour import ..." message: There is a delay when opening the import view, it is caused by a system function to get device info.
- 
- * The device and backup folders are observed but when these folders are deleted/moved this will not be recognized. Workaround: close and reopen the import view.
- 
- * Disable easy import: Set device folder empty AND deselect create backup.
-
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-
-   
 New
-===
+===	
 
-* Auto import
-  - Only the file name is checked and NOT the file path (folders) when fetching new imported tour files.
-  - Remove current folder from the history with <Ctrl>+<Delete.
-  - Import dashboard animation can be disabled when animation duration is set to 0.
+* Tour Import
+  - New dashboard.
+  - Delete tour files.
 
-Improvements
-============	
 
-* 
+Bugfix
+======	
 
-Bugfixes
-========
+* Tour Type Color
+  - Fixed historic bug: Modified colors of a tour type were not display
+    until the pref dialog was reopened.
 
-* Fixed historic bug that a new tour type do not display the colors correctly until the pref dialog is reopened.
 
+
+System
+======
+
+* Java 8 is required to run this application.
+
+ 
+
+Why is this an experimental version?
+------------------------------------
+
+In the new dashboard there are 2 hidden tasks which are observing
+devices and folders in the filesystem. Because there was no experience
+for using this feature, it needs more tests to be sure they are running
+flawlessly also with other device configurations.
+
+Testing with Win7 and Ubuntu 14.04 with VMware 12 works now very well
+(after many fixes).
+
+
+This version has some issues but they are non-serious
+-----------------------------------------------------
+
+* Import background image can be slow, set opacity to 0 to disable it.
+* The embedded browser in Linux cannot show all CSS3 features, e.g.
+  background image, gradient, box-shadow is expanding the focus,
+  therefore CSS3 is disabled.
+* Clicking on the dashboard state icon works sometimes only with the 2nd
+  and further clicks.
+* The device and backup folders are observed but when these folders
+  are deleted/moved this will not be recognized. Workaround: close and
+  reopen the import view.
+* Disable easy import: Set device folder empty AND deselect create
+  backup.
