@@ -5842,7 +5842,7 @@ public class TourDatabase {
 
 					// set file name
 					stmtUpdate.setString(1, fileName.toString());
-					stmtUpdate.setString(2, folderPath.toString());
+					stmtUpdate.setString(2, folderPath == null ? UI.EMPTY_STRING : folderPath.toString());
 					stmtUpdate.setLong(3, dbTourId);
 
 					stmtUpdate.executeUpdate();

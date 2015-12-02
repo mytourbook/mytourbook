@@ -6522,8 +6522,8 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 			final Path folderPath = filePath.getParent();
 
 			// extract file name
-			this.tourImportFileName = fileName.toString();
-			this.tourImportFilePath = folderPath.toString();
+			this.tourImportFileName = fileName == null ? UI.EMPTY_STRING : fileName.toString();
+			this.tourImportFilePath = folderPath == null ? UI.EMPTY_STRING : folderPath.toString();
 
 		} catch (final Exception e) {
 			// folder can be invalid
