@@ -757,9 +757,14 @@ public class Messages extends NLS {
 	public static String		Image__PulseZones;
 	public static String		Image__PulseZones_Disabled;
 	public static String		Image__quick_edit;
+	public static String		Image__RawData_Device_TurnOff;
+	public static String		Image__RawData_Device_TurnOff_Disabled;
+	public static String		Image__RawData_Device_TurnOn;
+	public static String		Image__RawData_Device_TurnOn_Disabled;
 	public static String		Image__RawData_DeviceFolder;
 	public static String		Image__RawData_DeviceFolder_NotChecked;
 	public static String		Image__RawData_DeviceFolder_NotDefined;
+	public static String		Image__RawData_DeviceFolderDisabled;
 	public static String		Image__RawData_Import;
 	public static String		Image__RawData_Transfer;
 	public static String		Image__RawData_TransferDirect;
@@ -877,6 +882,8 @@ public class Messages extends NLS {
 	public static String		Import_Data_HTML_AcquireDeviceInfo;
 	public static String		Import_Data_HTML_AllFilesAreBackedUp;
 	public static String		Import_Data_HTML_AllFilesAreImported;
+	public static String		Import_Data_HTML_DeviceOff_Tooltip;
+	public static String		Import_Data_HTML_DeviceOn_Tooltip;
 	public static String		Import_Data_HTML_EasyImport;
 	public static String		Import_Data_HTML_FolderIsNotAvailable;
 	public static String		Import_Data_HTML_GetTours;
@@ -894,12 +901,14 @@ public class Messages extends NLS {
 	public static String		Import_Data_HTML_SaveTour_Yes;
 	public static String		Import_Data_HTML_Title_Backup;
 	public static String		Import_Data_HTML_Title_Device;
+	public static String		Import_Data_HTML_WatchingIsOff;
 	public static String		Import_Data_Dialog_EasyImport_NoImportFiles_Message;
 	public static String		Import_Data_Monitor_Backup;
 	public static String		Import_Data_Monitor_Backup_SubTask;
 	public static String		Import_Data_Monitor_DeleteTourFiles;
 	public static String		Import_Data_Monitor_DeleteTourFiles_Subtask;
 	public static String		Import_Data_Task_CloseDeviceInfo;
+	public static String		Import_Data_Task_CloseDeviceInfo_CannotClose;
 	public static String		Import_Data_TourTypeConfig_BySpeed;
 	public static String		Import_Data_TourTypeConfig_OneForAll;
 

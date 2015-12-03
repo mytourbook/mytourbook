@@ -326,3 +326,16 @@ a.action-button:VISITED
 }
 
 
+/*
+	Device On/Off
+*/
+.deviceOnOff
+{
+	display: 				block;	
+	cursor:					pointer;
+	
+	xwidth:					32px;
+	xheight:					29px;
+}
+
+

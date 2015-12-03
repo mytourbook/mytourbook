@@ -17,6 +17,7 @@ package net.tourbook.ui.views.rawData;
 
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
+import static net.tourbook.ui.UI.getIconUrl;
 
 import java.io.File;
 import java.io.IOException;
@@ -209,25 +210,29 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private static final String				HTTP_DUMMY									= "http://dummy";							//$NON-NLS-1$
 
 	private static String					ACTION_DEVICE_IMPORT						= "DeviceImport";							//$NON-NLS-1$
+	private static String					ACTION_DEVICE_WATCHING_ON_OFF				= "DeviceOnOff";							//$NON-NLS-1$
 	private static final String				ACTION_IMPORT_FROM_FILES					= "ImportFromFiles";						//$NON-NLS-1$
 	private static final String				ACTION_SERIAL_PORT_CONFIGURED				= "SerialPortConfigured";					//$NON-NLS-1$
 	private static final String				ACTION_SERIAL_PORT_DIRECTLY					= "SerialPortDirectly";					//$NON-NLS-1$
-	private static final String				ACTION_SETUP_DEVICE_IMPORT					= "SetupDeviceImport";						//$NON-NLS-1$
+	private static final String				ACTION_SETUP_EASY_IMPORT					= "SetupEasyImport";						//$NON-NLS-1$
 
+	private static final String				DOM_ID_DEVICE_ON_OFF						= "deviceOnOff";							//$NON-NLS-1$
 	private static final String				DOM_ID_DEVICE_STATE							= "deviceState";							//$NON-NLS-1$
 
-	private static String					HREF_DEVICE_IMPORT;
-	private static String					HREF_IMPORT_FROM_FILES;
-	private static String					HREF_SERIAL_PORT_CONFIGURED;
-	private static String					HREF_SERIAL_PORT_DIRECTLY;
-	private static String					HREF_SETUP_DEVICE_IMPORT;
+	private static String					HREF_ACTION_DEVICE_IMPORT;
+	private static String					HREF_ACTION_DEVICE_WATCHING_ON_OFF;
+	private static String					HREF_ACTION_IMPORT_FROM_FILES;
+	private static String					HREF_ACTION_SERIAL_PORT_CONFIGURED;
+	private static String					HREF_ACTION_SERIAL_PORT_DIRECTLY;
+	private static String					HREF_ACTION_SETUP_EASY_IMPORT;
 
 	static {
-		HREF_DEVICE_IMPORT = HREF_TOKEN + ACTION_DEVICE_IMPORT;
-		HREF_IMPORT_FROM_FILES = HREF_TOKEN + ACTION_IMPORT_FROM_FILES;
-		HREF_SERIAL_PORT_CONFIGURED = HREF_TOKEN + ACTION_SERIAL_PORT_CONFIGURED;
-		HREF_SERIAL_PORT_DIRECTLY = HREF_TOKEN + ACTION_SERIAL_PORT_DIRECTLY;
-		HREF_SETUP_DEVICE_IMPORT = HREF_TOKEN + ACTION_SETUP_DEVICE_IMPORT + HREF_TOKEN;
+		HREF_ACTION_DEVICE_IMPORT = HREF_TOKEN + ACTION_DEVICE_IMPORT;
+		HREF_ACTION_DEVICE_WATCHING_ON_OFF = HREF_TOKEN + ACTION_DEVICE_WATCHING_ON_OFF;
+		HREF_ACTION_IMPORT_FROM_FILES = HREF_TOKEN + ACTION_IMPORT_FROM_FILES;
+		HREF_ACTION_SERIAL_PORT_CONFIGURED = HREF_TOKEN + ACTION_SERIAL_PORT_CONFIGURED;
+		HREF_ACTION_SERIAL_PORT_DIRECTLY = HREF_TOKEN + ACTION_SERIAL_PORT_DIRECTLY;
+		HREF_ACTION_SETUP_EASY_IMPORT = HREF_TOKEN + ACTION_SETUP_EASY_IMPORT + HREF_TOKEN;
 	}
 
 	//
@@ -318,7 +323,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private String							_cssFonts;
 	private String							_cssFromFile;
 	//
+	private String							_imageUrl_Device_TurnOff;
+	private String							_imageUrl_Device_TurnOff_Disabled;
+	private String							_imageUrl_Device_TurnOn;
+	private String							_imageUrl_Device_TurnOn_Disabled;
 	private String							_imageUrl_DeviceFolder_OK;
+	private String							_imageUrl_DeviceFolder_Disabled;
 	private String							_imageUrl_DeviceFolder_NotAvailable;
 	private String							_imageUrl_DeviceFolder_NotChecked;
 	private String							_imageUrl_ImportFromFile;
@@ -469,6 +479,24 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		doSaveTour(person);
 	}
 
+	private void actionSetDeviceWatchingOnOff() {
+
+		if (_watchingStoresThread == null) {
+
+			// start watching
+
+			setWatcherOn();
+
+		} else {
+
+			// stop watching
+
+			setWatcherOff();
+		}
+
+		updateUI_DeviceState();
+	}
+
 	void actionSetupEasyImport() {
 
 		// prevent that the dialog is opened multiple times, this occured when testing
@@ -500,7 +528,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			updateModel_ImportConfig_LiveUpdate(_dialogImportConfig, false);
 			updateModel_ImportConfig_AndSave(_dialogImportConfig);
 
-			thread_ActivateWatcher();
+			thread_FolderWatcher_Activate();
 		}
 
 		updateUI_Dashboard(true);
@@ -903,8 +931,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				/*
 				 * Device Import
 				 */
-				createHTML_50_DeviceImport_Header(sb, isUpdateDeviceState);
-				createHTML_52_DeviceImport_Tiles(sb);
+				createHTML_50_EasyImport_Header(sb, isUpdateDeviceState);
+				createHTML_52_EasyImport_Tiles(sb);
 
 				/*
 				 * Get Tours
@@ -913,7 +941,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				sb.append("	" + Messages.Import_Data_HTML_GetTours + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 				sb.append("</div>\n"); //$NON-NLS-1$
 
-				createHTML_60_GetTours(sb);
+				createHTML_60_SimpleImport(sb);
 			}
 			sb.append("</div>\n"); //$NON-NLS-1$
 		}
@@ -922,14 +950,20 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		return sb.toString();
 	}
 
-	private void createHTML_50_DeviceImport_Header(final StringBuilder sb, final boolean isUpdateDeviceState) {
+	private void createHTML_50_EasyImport_Header(final StringBuilder sb, final boolean isUpdateDeviceState) {
 
 		final String htmlDeviceState = createHTML_DeviceState(isUpdateDeviceState);
+		final String htmlDeviceOnOff = createHTML_DeviceState_OnOff();
 
 		final String html = "" // //$NON-NLS-1$
 
 				+ "<div class='auto-import-header'>\n" //$NON-NLS-1$
 				+ ("	<table><tbody><tr>\n") //$NON-NLS-1$
+
+				// device state on/off
+				+ ("		<td>\n") //$NON-NLS-1$
+				+ ("			<div id='" + DOM_ID_DEVICE_ON_OFF + "' style='padding-left:0px;'>" + htmlDeviceOnOff + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				+ ("		</td>\n") //$NON-NLS-1$
 
 				// device import
 				+ ("		<td class='title'>" + Messages.Import_Data_HTML_EasyImport + "</td>\n") //$NON-NLS-1$ //$NON-NLS-2$
@@ -945,7 +979,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		sb.append(html);
 	}
 
-	private void createHTML_52_DeviceImport_Tiles(final StringBuilder sb) {
+	private void createHTML_52_EasyImport_Tiles(final StringBuilder sb) {
 
 		final ImportConfig importConfig = getImportConfig();
 
@@ -976,7 +1010,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 				// enforce equal column width
 				sb.append("<td style='width:" + 100 / numHorizontalTiles + "%' class='import-tile'>\n"); //$NON-NLS-1$ //$NON-NLS-2$
-				sb.append(createHTML_54_DeviceImport_Tile(importLauncher));
+				sb.append(createHTML_54_EasyImport_Tile(importLauncher));
 				sb.append("</td>\n"); //$NON-NLS-1$
 
 				if (tileIndex % numHorizontalTiles == numHorizontalTiles - 1) {
@@ -995,7 +1029,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		sb.append("</tbody></table>\n"); //$NON-NLS-1$
 	}
 
-	private String createHTML_54_DeviceImport_Tile(final ImportLauncher importTile) {
+	private String createHTML_54_EasyImport_Tile(final ImportLauncher importTile) {
 
 		/*
 		 * Tooltip
@@ -1018,7 +1052,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		/*
 		 * Tile HTML
 		 */
-		final String href = HTTP_DUMMY + HREF_DEVICE_IMPORT + HREF_TOKEN + importTile.getId();
+		final String href = HTTP_DUMMY + HREF_ACTION_DEVICE_IMPORT + HREF_TOKEN + importTile.getId();
 
 		final String htmlConfig = createHTML_ILConfig(importTile);
 
@@ -1033,7 +1067,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		return html;
 	}
 
-	private void createHTML_60_GetTours(final StringBuilder sb) {
+	private void createHTML_60_SimpleImport(final StringBuilder sb) {
 
 		sb.append("<div class='get-tours-items'>\n"); //$NON-NLS-1$
 		sb.append("	<table><tbody><tr>\n"); //$NON-NLS-1$
@@ -1042,21 +1076,21 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 					sb,
 					Messages.Import_Data_HTML_ImportFromFiles_Action,
 					Messages.Import_Data_HTML_ImportFromFiles_ActionTooltip,
-					(HTTP_DUMMY + HREF_IMPORT_FROM_FILES),
+					(HTTP_DUMMY + HREF_ACTION_IMPORT_FROM_FILES),
 					_imageUrl_ImportFromFile);
 
 			createHTML_TileAction(
 					sb,
 					Messages.Import_Data_HTML_ReceiveFromSerialPort_ConfiguredAction,
 					Messages.Import_Data_HTML_ReceiveFromSerialPort_ConfiguredLink,
-					(HTTP_DUMMY + HREF_SERIAL_PORT_CONFIGURED),
+					(HTTP_DUMMY + HREF_ACTION_SERIAL_PORT_CONFIGURED),
 					_imageUrl_SerialPort_Configured);
 
 			createHTML_TileAction(
 					sb,
 					Messages.Import_Data_HTML_ReceiveFromSerialPort_DirectlyAction,
 					Messages.Import_Data_HTML_ReceiveFromSerialPort_DirectlyLink,
-					(HTTP_DUMMY + HREF_SERIAL_PORT_DIRECTLY),
+					(HTTP_DUMMY + HREF_ACTION_SERIAL_PORT_DIRECTLY),
 					_imageUrl_SerialPort_Directly);
 		}
 		sb.append("	</tr></tbody></table>\n"); // //$NON-NLS-1$
@@ -1080,9 +1114,29 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		final ImportConfig importConfig = getImportConfig();
 
 		String html = null;
-		final String hrefAction = HTTP_DUMMY + HREF_SETUP_DEVICE_IMPORT;
+		final String hrefAction = HTTP_DUMMY + HREF_ACTION_SETUP_EASY_IMPORT;
 
-		if (isUpdateFolder) {
+		if (_watchingStoresThread == null) {
+
+			// watching is off
+
+			final String stateImage = createHTML_BgImageStyle(_imageUrl_DeviceFolder_Disabled);
+			final String htmlTooltip = Messages.Import_Data_HTML_WatchingIsOff;
+
+			html = ""// //$NON-NLS-1$
+
+					+ "<a class='importState'" // //$NON-NLS-1$
+					+ (" href='" + HTTP_DUMMY + "'") //$NON-NLS-1$ //$NON-NLS-2$
+					+ ">" //$NON-NLS-1$
+
+					+ ("<div class='stateIcon' " + stateImage + ">") //$NON-NLS-1$ //$NON-NLS-2$
+					+ ("   <div class='stateIconValue'></div>") //$NON-NLS-1$
+					+ ("</div>") //$NON-NLS-1$
+					+ ("<div class='stateTooltip'>" + htmlTooltip + "</div>") //$NON-NLS-1$ //$NON-NLS-2$
+
+					+ "</a>"; //$NON-NLS-1$
+
+		} else if (isUpdateFolder) {
 
 			final int numDeviceFiles = importConfig.numDeviceFiles;
 			final String deviceOSFolder = importConfig.getDeviceOSFolder();
@@ -1223,6 +1277,37 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 					+ "</a>"; //$NON-NLS-1$
 		}
+
+		return html;
+	}
+
+	private String createHTML_DeviceState_OnOff() {
+
+		final boolean isWatchingOn = _watchingStoresThread != null;
+
+		final String tooltip = isWatchingOn
+				? Messages.Import_Data_HTML_DeviceOff_Tooltip
+				: Messages.Import_Data_HTML_DeviceOn_Tooltip;
+
+		final String imageUrl = isWatchingOn //
+				? _imageUrl_Device_TurnOff
+				: _imageUrl_Device_TurnOn;
+
+		final String hrefAction = HTTP_DUMMY + HREF_ACTION_DEVICE_WATCHING_ON_OFF;
+		final String onOffImage = createHTML_BgImageStyle(imageUrl);
+
+		final String html = ""// //$NON-NLS-1$
+
+				+ "<a class='importState'" // //$NON-NLS-1$
+				+ ("title='" + tooltip + "'") //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" href='" + hrefAction + "'") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ">" //$NON-NLS-1$
+
+				+ ("<div class='stateIcon' " + onOffImage + ">") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("   <div class='stateIconValue'></div>") //$NON-NLS-1$
+				+ ("</div>") //$NON-NLS-1$
+
+				+ "</a>"; //$NON-NLS-1$
 
 		return html;
 	}
@@ -1493,7 +1578,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		enableActions();
 		restoreState();
 
-		thread_WatchStores();
+		setWatcherOn();
 
 		updateUI_TopPage();
 	}
@@ -1574,20 +1659,24 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			/*
 			 * Image urls
 			 */
-			_imageUrl_ImportFromFile = net.tourbook.ui.UI.getIconUrl(Messages.Image__RawData_Import);
-			_imageUrl_SerialPort_Configured = net.tourbook.ui.UI.getIconUrl(Messages.Image__RawData_Transfer);
-			_imageUrl_SerialPort_Directly = net.tourbook.ui.UI.getIconUrl(Messages.Image__RawData_TransferDirect);
+			_imageUrl_ImportFromFile = getIconUrl(Messages.Image__RawData_Import);
+			_imageUrl_SerialPort_Configured = getIconUrl(Messages.Image__RawData_Transfer);
+			_imageUrl_SerialPort_Directly = getIconUrl(Messages.Image__RawData_TransferDirect);
 
-			_imageUrl_State_Error = net.tourbook.ui.UI.getIconUrl(Messages.Image__State_Error);
-			_imageUrl_State_OK = net.tourbook.ui.UI.getIconUrl(Messages.Image__State_OK);
-			_imageUrl_State_SaveTour = net.tourbook.ui.UI.getIconUrl(Messages.Image__State_SaveTour);
-			_imageUrl_State_TourMarker = net.tourbook.ui.UI.getIconUrl(Messages.Image__State_TourMarker);
+			_imageUrl_State_Error = getIconUrl(Messages.Image__State_Error);
+			_imageUrl_State_OK = getIconUrl(Messages.Image__State_OK);
+			_imageUrl_State_SaveTour = getIconUrl(Messages.Image__State_SaveTour);
+			_imageUrl_State_TourMarker = getIconUrl(Messages.Image__State_TourMarker);
 
-			_imageUrl_DeviceFolder_OK = net.tourbook.ui.UI.getIconUrl(Messages.Image__RawData_DeviceFolder);
-			_imageUrl_DeviceFolder_NotAvailable = net.tourbook.ui.UI.getIconUrl(//
-					Messages.Image__RawData_DeviceFolder_NotDefined);
-			_imageUrl_DeviceFolder_NotChecked = net.tourbook.ui.UI.getIconUrl(//
-					Messages.Image__RawData_DeviceFolder_NotChecked);
+			_imageUrl_Device_TurnOff = getIconUrl(Messages.Image__RawData_Device_TurnOff);
+			_imageUrl_Device_TurnOff_Disabled = getIconUrl(Messages.Image__RawData_Device_TurnOff_Disabled);
+			_imageUrl_Device_TurnOn = getIconUrl(Messages.Image__RawData_Device_TurnOn);
+			_imageUrl_Device_TurnOn_Disabled = getIconUrl(Messages.Image__RawData_Device_TurnOn_Disabled);
+
+			_imageUrl_DeviceFolder_OK = getIconUrl(Messages.Image__RawData_DeviceFolder);
+			_imageUrl_DeviceFolder_Disabled = getIconUrl(Messages.Image__RawData_DeviceFolderDisabled);
+			_imageUrl_DeviceFolder_NotAvailable = getIconUrl(Messages.Image__RawData_DeviceFolder_NotDefined);
+			_imageUrl_DeviceFolder_NotChecked = getIconUrl(Messages.Image__RawData_DeviceFolder_NotChecked);
 
 		} catch (final IOException | URISyntaxException e) {
 			StatusUtil.showStatus(e);
@@ -2377,9 +2466,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	@Override
 	public void dispose() {
 
-		// !!! This must be canceled before the watch folder thread because it could launch a new watch folder thread !!!
-		thread_WatchStores_Cancel();
-		thread_WatchFolders(false);
+		setWatcherOff();
 
 		EasyImportManager.getInstance().reset();
 
@@ -3374,9 +3461,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			_rawDataMgr.actionImportFromDeviceDirect();
 
-		} else if (ACTION_SETUP_DEVICE_IMPORT.equals(hrefAction)) {
+		} else if (ACTION_SETUP_EASY_IMPORT.equals(hrefAction)) {
 
 			actionSetupEasyImport();
+
+		} else if (ACTION_DEVICE_WATCHING_ON_OFF.equals(hrefAction)) {
+
+			actionSetDeviceWatchingOnOff();
 		}
 	}
 
@@ -3705,7 +3796,25 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 	}
 
-	private void thread_ActivateWatcher() {
+	private void setWatcherOff() {
+
+		if (_watchingStoresThread != null) {
+
+			// !!! Store watching must be canceled before the watch folder thread because it could launch a new watch folder thread !!!
+			thread_WatchStores_Cancel();
+
+			thread_WatchFolders(false);
+		}
+	}
+
+	private void setWatcherOn() {
+
+		thread_WatchStores();
+
+		thread_FolderWatcher_Activate();
+	}
+
+	private void thread_FolderWatcher_Activate() {
 
 		// activate store watching
 		_isWatchingStores.set(true);
@@ -3714,13 +3823,27 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		thread_WatchFolders(true);
 	}
 
-	private void thread_DeactivateWatcher() {
+	private void thread_FolderWatcher_Deactivate() {
 
 		// deactivate background tasks
 
 		_isWatchingStores.set(false);
 
 		thread_WatchFolders(false);
+	}
+
+	/**
+	 * Retrieve files from the device folder and update the UI.
+	 */
+	private void thread_UpdateDeviceState() {
+
+		final ImportConfig importConfig = getImportConfig();
+
+		if (importConfig.isWatchAnything()) {
+
+			EasyImportManager.getInstance().checkImportedFiles(true);
+			updateUI_DeviceState();
+		}
 	}
 
 	/**
@@ -3860,7 +3983,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 					// do not update the device state when the import is running otherwise the import file list can be wrong
 					if (importConfig.isUpdateDeviceState) {
-						updateDeviceState();
+						thread_UpdateDeviceState();
 					}
 
 					do {
@@ -3885,7 +4008,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 						// do not update the device state when the import is running otherwise the import file list can be wrong
 						if (importConfig.isUpdateDeviceState) {
-							updateDeviceState();
+							thread_UpdateDeviceState();
 						}
 
 					}
@@ -3928,6 +4051,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 						Thread.sleep(1000);
 
 						if (_isStopWatchingStoresThread) {
+
+							_isStopWatchingStoresThread = false;
+
 							break;
 						}
 
@@ -3939,7 +4065,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 							// check if anything should be watched
 							if (importConfig.isWatchAnything()) {
 
-								final DeviceImportState importState = EasyImportManager.getInstance()//
+								final DeviceImportState importState = EasyImportManager
+										.getInstance()
 										.checkImportedFiles(false);
 
 								if (importState.areTheSameStores == false) {
@@ -3989,10 +4116,32 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 						monitor.beginTask(Messages.Import_Data_Task_CloseDeviceInfo, IProgressMonitor.UNKNOWN);
 
-						_watchingStoresThread.join();
+						final int waitingTime = 10000;
+
+						_watchingStoresThread.join(waitingTime);
+
+						if (_watchingStoresThread.isAlive()) {
+
+							// thread is still allive
+
+							_watchingStoresThread.interrupt();
+
+							Display.getDefault().asyncExec(new Runnable() {
+								@Override
+								public void run() {
+
+									StatusUtil.showInfo(NLS.bind(//
+											Messages.Import_Data_Task_CloseDeviceInfo_CannotClose,
+											waitingTime / 1000));
+								}
+							});
+						}
 
 					} catch (final InterruptedException e) {
 						StatusUtil.log(e);
+					} finally {
+
+						_watchingStoresThread = null;
 					}
 				}
 			};
@@ -4003,20 +4152,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			StatusUtil.log(e);
 		}
 
-	}
-
-	/**
-	 * Retrieve files from the device folder and update the UI.
-	 */
-	private void updateDeviceState() {
-
-		final ImportConfig importConfig = getImportConfig();
-
-		if (importConfig.isWatchAnything()) {
-
-			EasyImportManager.getInstance().checkImportedFiles(true);
-			updateUI_DeviceState();
-		}
 	}
 
 	/**
@@ -4123,12 +4258,20 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private void updateUI_DeviceState_Task() {
 
-		final String deviceState = createHTML_DeviceState(true);
-		final String jsHTML = deviceState.replace("\"", "\\\""); //$NON-NLS-1$ //$NON-NLS-2$
+		final String htmlDeviceState = createHTML_DeviceState(true);
+		final String jsDeviceState = htmlDeviceState.replace("\"", "\\\""); //$NON-NLS-1$ //$NON-NLS-2$
+
+		final String htmlDeviceOnOff = createHTML_DeviceState_OnOff();
+		final String jsDeviceOnOff = htmlDeviceOnOff.replace("\"", "\\\""); //$NON-NLS-1$ //$NON-NLS-2$
 
 		final String js = "\n" //$NON-NLS-1$
-				+ ("var htmlDeviceState =\"" + jsHTML + "\";\n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("document.getElementById(\"" + DOM_ID_DEVICE_STATE + "\").innerHTML = htmlDeviceState;\n"); //$NON-NLS-1$ //$NON-NLS-2$
+
+				+ ("var htmlDeviceState =\"" + jsDeviceState + "\";\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("document.getElementById(\"" + DOM_ID_DEVICE_STATE + "\").innerHTML = htmlDeviceState;\n") //$NON-NLS-1$ //$NON-NLS-2$
+
+				+ ("var htmlDeviceOnOff=\"" + jsDeviceOnOff + "\";\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("document.getElementById(\"" + DOM_ID_DEVICE_ON_OFF + "\").innerHTML = htmlDeviceOnOff;\n") //$NON-NLS-1$ //$NON-NLS-2$
+		;
 
 		_browser.execute(js);
 	}
@@ -4144,7 +4287,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		final int numImportedTours = _rawDataMgr.getImportedTours().size();
 		if (numImportedTours > 0) {
 
-			thread_DeactivateWatcher();
+			thread_FolderWatcher_Deactivate();
 
 			_topPageBook.showPage(_topPage_ImportViewer);
 
@@ -4180,13 +4323,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 						_browser.setFocus();
 
-						thread_ActivateWatcher();
+						thread_FolderWatcher_Activate();
 
 					} else {
 
 						// deactivate background task
 
-						thread_DeactivateWatcher();
+						thread_FolderWatcher_Deactivate();
 					}
 				}
 			});
