@@ -215,10 +215,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private static final String				ACTION_SERIAL_PORT_CONFIGURED				= "SerialPortConfigured";					//$NON-NLS-1$
 	private static final String				ACTION_SERIAL_PORT_DIRECTLY					= "SerialPortDirectly";					//$NON-NLS-1$
 	private static final String				ACTION_SETUP_EASY_IMPORT					= "SetupEasyImport";						//$NON-NLS-1$
-
+	//
+	private static final String				DOM_CLASS_DEVICE_ON							= "deviceOn";								//$NON-NLS-1$
+	private static final String				DOM_CLASS_DEVICE_OFF						= "deviceOff";								//$NON-NLS-1$
+	//
 	private static final String				DOM_ID_DEVICE_ON_OFF						= "deviceOnOff";							//$NON-NLS-1$
 	private static final String				DOM_ID_DEVICE_STATE							= "deviceState";							//$NON-NLS-1$
-
+	private static final String				DOM_ID_IMPORT_TILES							= "importTiles";							//$NON-NLS-1$
+	//
 	private static String					HREF_ACTION_DEVICE_IMPORT;
 	private static String					HREF_ACTION_DEVICE_WATCHING_ON_OFF;
 	private static String					HREF_ACTION_IMPORT_FROM_FILES;
@@ -272,8 +276,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	protected TourPerson					_activePerson;
 	protected TourPerson					_newActivePerson;
 	//
-	private boolean							_isRunAnimation								= true;
-	private boolean							_isInUIStartup								= true;
 	protected boolean						_isPartVisible								= false;
 	protected boolean						_isViewerPersonDataDirty					= false;
 	//
@@ -319,14 +321,21 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private HashMap<Long, Integer>			_configImageHash							= new HashMap<>();
 	//
 	private boolean							_isBrowserCompleted;
+	private boolean							_isInUIStartup								= true;
+	private boolean							_isRunAnimation								= true;
+
+	/**
+	 * When <code>true</code> then the folder/device state will be updated, this can delay the
+	 * creation of the html because this info must be retieved from the filesystem.
+	 */
+	private boolean							_isUpdateFolderState;
+	private boolean							_isWatcherAnimation;
 	//
 	private String							_cssFonts;
 	private String							_cssFromFile;
 	//
 	private String							_imageUrl_Device_TurnOff;
-	private String							_imageUrl_Device_TurnOff_Disabled;
 	private String							_imageUrl_Device_TurnOn;
-	private String							_imageUrl_Device_TurnOn_Disabled;
 	private String							_imageUrl_DeviceFolder_OK;
 	private String							_imageUrl_DeviceFolder_Disabled;
 	private String							_imageUrl_DeviceFolder_NotAvailable;
@@ -474,6 +483,106 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		reloadViewer();
 	}
 
+	private void actionRunEasyImport(final long tileId) {
+
+		final ImportConfig importConfig = getImportConfig();
+
+		/*
+		 * Get import launcher
+		 */
+		ImportLauncher importLauncher = null;
+
+		for (final ImportLauncher launcher : importConfig.importLaunchers) {
+			if (launcher.getId() == tileId) {
+				importLauncher = launcher;
+				break;
+			}
+		}
+
+		if (importLauncher == null) {
+			// this should not occure
+			return;
+		}
+
+		/*
+		 * Check person
+		 */
+		TourPerson person = null;
+		if (importLauncher.isSaveTour) {
+
+			person = TourbookPlugin.getActivePerson();
+
+			if (person == null) {
+
+				MessageDialog.openError(
+						_parent.getShell(),
+						Messages.Import_Data_Dialog_EasyImport_Title,
+						Messages.Import_Data_Dialog_NoActivePersion_Message);
+				return;
+			}
+		}
+
+		/*
+		 * Run the import
+		 */
+		ImportDeviceState importState = null;
+
+		try {
+
+			// disable state update during import, this causes lots of problems !!!
+			importConfig.isUpdateDeviceState = false;
+
+			importState = EasyImportManager.getInstance().runImport(importLauncher);
+
+		} finally {
+
+			importConfig.isUpdateDeviceState = true;
+		}
+
+		/*
+		 * Update viewer with newly imported files
+		 */
+		final Collection<TourData> importedToursCollection = RawDataManager.getInstance().getImportedTours().values();
+		final ArrayList<TourData> importedTours = new ArrayList<>(importedToursCollection);
+
+		if (importState.isUpdateImportViewer) {
+			_tourViewer.update(importedToursCollection.toArray(), null);
+		}
+
+		// stop all other actions when canceled
+		if (importState.isImportCanceled) {
+			return;
+		}
+
+		// open import config dialog to solve problems
+		if (importState.isOpenSetup) {
+
+			_parent.getDisplay().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					actionSetupEasyImport();
+				}
+			});
+
+			return;
+		}
+
+		/*
+		 * 4. Set last marker text
+		 */
+		if (importLauncher.isSetLastMarker) {
+			doSetLastMarker(importLauncher, importedTours);
+		}
+
+		/*
+		 * 99. Save imported tours
+		 */
+		if (importLauncher.isSaveTour) {
+			doSaveTour(person, importedTours);
+		}
+
+	}
+
 	void actionSaveTour(final TourPerson person) {
 
 		doSaveTour(person);
@@ -481,17 +590,19 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private void actionSetDeviceWatchingOnOff() {
 
-		if (_watchingStoresThread == null) {
+		_isWatcherAnimation = true;
 
-			// start watching
-
-			setWatcherOn();
-
-		} else {
+		if (isWatchingOn()) {
 
 			// stop watching
 
 			setWatcherOff();
+
+		} else {
+
+			// start watching
+
+			setWatcherOn();
 		}
 
 		updateUI_DeviceState();
@@ -517,6 +628,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 
 		final ImportConfig modifiedConfig = _dialogImportConfig.getModifiedConfig();
+		final boolean isWatchingOn = isWatchingOn();
 
 		if (isOK) {
 
@@ -528,10 +640,16 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			updateModel_ImportConfig_LiveUpdate(_dialogImportConfig, false);
 			updateModel_ImportConfig_AndSave(_dialogImportConfig);
 
-			thread_FolderWatcher_Activate();
+			if (isWatchingOn) {
+				thread_FolderWatcher_Activate();
+			}
+
 		}
 
-		updateUI_Dashboard(true);
+		if (isWatchingOn) {
+			_isUpdateFolderState = true;
+			updateUI_Dashboard();
+		}
 
 		_dialogImportConfig = null;
 	}
@@ -638,7 +756,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 					_tourViewer = (TableViewer) recreateViewer(_tourViewer);
 
-					updateUI_Dashboard(true);
+					_isUpdateFolderState = true;
+					updateUI_Dashboard();
 
 				} else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
@@ -879,7 +998,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 	}
 
-	private String createHTML(final boolean isUpdateDeviceState) {
+	private String createHTML() {
 
 //		Force Internet Explorer to not use compatibility mode. Internet Explorer believes that websites under
 //		several domains (including "ibm.com") require compatibility mode. You may see your web application run
@@ -894,7 +1013,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				+ "<!DOCTYPE html>\n" // ensure that IE is using the newest version and not the quirk mode //$NON-NLS-1$
 				+ "<html style='height: 100%; width: 100%; margin: 0px; padding: 0px;'>\n" //$NON-NLS-1$
 				+ ("<head>\n" + createHTML_10_Head() + "\n</head>\n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("<body>\n" + createHTML_20_Body(isUpdateDeviceState) + "\n</body>\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("<body>\n" + createHTML_20_Body() + "\n</body>\n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ "</html>"; //$NON-NLS-1$
 
 		return html;
@@ -913,7 +1032,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		return html;
 	}
 
-	private String createHTML_20_Body(final boolean isUpdateDeviceState) {
+	private String createHTML_20_Body() {
 
 		final StringBuilder sb = new StringBuilder();
 
@@ -931,7 +1050,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				/*
 				 * Device Import
 				 */
-				createHTML_50_EasyImport_Header(sb, isUpdateDeviceState);
+				createHTML_50_EasyImport_Header(sb);
 				createHTML_52_EasyImport_Tiles(sb);
 
 				/*
@@ -950,9 +1069,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		return sb.toString();
 	}
 
-	private void createHTML_50_EasyImport_Header(final StringBuilder sb, final boolean isUpdateDeviceState) {
+	private void createHTML_50_EasyImport_Header(final StringBuilder sb) {
 
-		final String htmlDeviceState = createHTML_DeviceState(isUpdateDeviceState);
+		final String htmlDeviceState = createHTML_DeviceState();
 		final String htmlDeviceOnOff = createHTML_DeviceState_OnOff();
 
 		final String html = "" // //$NON-NLS-1$
@@ -997,7 +1116,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		final int numHorizontalTiles = importConfig.numHorizontalTiles;
 		boolean isTrOpen = false;
 
-		sb.append("<table class='import-tiles'><tbody>\n"); //$NON-NLS-1$
+		sb.append("<table id='" + DOM_ID_IMPORT_TILES + "'><tbody>\n"); //$NON-NLS-1$
 
 		for (final ImportLauncher importLauncher : allImportLauncher) {
 
@@ -1109,14 +1228,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		return "style='" + bgImage + "'"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
-	private String createHTML_DeviceState(final boolean isUpdateFolder) {
+	private String createHTML_DeviceState() {
 
 		final ImportConfig importConfig = getImportConfig();
 
 		String html = null;
 		final String hrefAction = HTTP_DUMMY + HREF_ACTION_SETUP_EASY_IMPORT;
 
-		if (_watchingStoresThread == null) {
+		if (!isWatchingOn()) {
 
 			// watching is off
 
@@ -1132,11 +1251,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 					+ ("<div class='stateIcon' " + stateImage + ">") //$NON-NLS-1$ //$NON-NLS-2$
 					+ ("   <div class='stateIconValue'></div>") //$NON-NLS-1$
 					+ ("</div>") //$NON-NLS-1$
-					+ ("<div class='stateTooltip'>" + htmlTooltip + "</div>") //$NON-NLS-1$ //$NON-NLS-2$
+					+ ("<div class='stateTooltip stateTooltipMessage'>" + htmlTooltip + "</div>") //$NON-NLS-1$ //$NON-NLS-2$
 
 					+ "</a>"; //$NON-NLS-1$
 
-		} else if (isUpdateFolder) {
+		} else if (_isUpdateFolderState) {
+
+			_isUpdateFolderState = false;
 
 			final int numDeviceFiles = importConfig.numDeviceFiles;
 			final String deviceOSFolder = importConfig.getDeviceOSFolder();
@@ -1273,7 +1394,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 					+ ("<div class='stateIcon' " + stateImage + ">") //$NON-NLS-1$ //$NON-NLS-2$
 					+ ("   <div class='stateIconValue'></div>") //$NON-NLS-1$
 					+ ("</div>") //$NON-NLS-1$
-					+ ("<div class='stateTooltip'>" + htmlTooltip + "</div>") //$NON-NLS-1$ //$NON-NLS-2$
+					+ ("<div class='stateTooltip stateTooltipMessage'>" + htmlTooltip + "</div>") //$NON-NLS-1$ //$NON-NLS-2$
 
 					+ "</a>"; //$NON-NLS-1$
 		}
@@ -1283,7 +1404,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private String createHTML_DeviceState_OnOff() {
 
-		final boolean isWatchingOn = _watchingStoresThread != null;
+		final boolean isWatchingOn = isWatchingOn();
 
 		final String tooltip = isWatchingOn
 				? Messages.Import_Data_HTML_DeviceOff_Tooltip
@@ -1551,6 +1672,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		return sb.toString();
 	}
 
+	private String createJS_SetDOMClassName(final String elementId1, final String elementId2, final String className) {
+
+		final String js = ("document.getElementById(\"" + elementId1 + "\").className ='" + className + "';\n")
+				+ ("document.getElementById(\"" + elementId2 + "\").className ='" + className + "';\n");
+
+		return js;
+	}
+
 	@Override
 	public void createPartControl(final Composite parent) {
 
@@ -1669,9 +1798,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			_imageUrl_State_TourMarker = getIconUrl(Messages.Image__State_TourMarker);
 
 			_imageUrl_Device_TurnOff = getIconUrl(Messages.Image__RawData_Device_TurnOff);
-			_imageUrl_Device_TurnOff_Disabled = getIconUrl(Messages.Image__RawData_Device_TurnOff_Disabled);
 			_imageUrl_Device_TurnOn = getIconUrl(Messages.Image__RawData_Device_TurnOn);
-			_imageUrl_Device_TurnOn_Disabled = getIconUrl(Messages.Image__RawData_Device_TurnOn_Disabled);
 
 			_imageUrl_DeviceFolder_OK = getIconUrl(Messages.Image__RawData_DeviceFolder);
 			_imageUrl_DeviceFolder_Disabled = getIconUrl(Messages.Image__RawData_DeviceFolderDisabled);
@@ -2583,111 +2710,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				NLS.bind(Messages.Import_Data_Dialog_DeletedImportFiles_Message, deletedFiles.size()));
 	}
 
-	private void doEasyImport(final long tileId) {
-
-		final ImportConfig importConfig = getImportConfig();
-
-		/*
-		 * Get import launcher
-		 */
-		ImportLauncher importLauncher = null;
-
-		for (final ImportLauncher launcher : importConfig.importLaunchers) {
-			if (launcher.getId() == tileId) {
-				importLauncher = launcher;
-				break;
-			}
-		}
-
-		if (importLauncher == null) {
-			// this should not occure
-			return;
-		}
-
-		/*
-		 * Check person
-		 */
-		TourPerson person = null;
-		if (importLauncher.isSaveTour) {
-
-			person = TourbookPlugin.getActivePerson();
-
-			if (person == null) {
-
-				MessageDialog.openError(
-						_parent.getShell(),
-						Messages.Import_Data_Dialog_EasyImport_Title,
-						Messages.Import_Data_Dialog_NoActivePersion_Message);
-				return;
-			}
-		}
-
-		/*
-		 * Run the import
-		 */
-		ImportDeviceState importState = null;
-
-		try {
-
-			// disable state update during import, this causes lots of problems !!!
-			importConfig.isUpdateDeviceState = false;
-
-			importState = EasyImportManager.getInstance().runImport(importLauncher);
-
-		} finally {
-
-			importConfig.isUpdateDeviceState = true;
-		}
-
-		/*
-		 * Update viewer with newly imported files
-		 */
-		final Collection<TourData> importedToursCollection = RawDataManager.getInstance().getImportedTours().values();
-		final ArrayList<TourData> importedTours = new ArrayList<>(importedToursCollection);
-
-		if (importState.isUpdateImportViewer) {
-			_tourViewer.update(importedToursCollection.toArray(), null);
-		}
-
-		// stop all other actions when canceled
-		if (importState.isImportCanceled) {
-			return;
-		}
-
-		// open import config dialog to solve problems
-		if (importState.isOpenSetup) {
-
-			_parent.getDisplay().asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					actionSetupEasyImport();
-				}
-			});
-
-			return;
-		}
-
-		/*
-		 * 4. Set last marker text
-		 */
-		if (importLauncher.isSetLastMarker) {
-			doSetLastMarker(importLauncher, importedTours);
-		}
-
-		/*
-		 * 99. Save imported tours
-		 */
-		if (importLauncher.isSaveTour) {
-			doSaveTour(person, importedTours);
-		}
-
-	}
-
 	public void doLiveUpdate(final DialogEasyImportConfig dialogImportConfig) {
 
 		updateModel_ImportConfig_LiveUpdate(dialogImportConfig, true);
 
-		updateUI_Dashboard(true);
+		_isUpdateFolderState = true;
+		updateUI_Dashboard();
 	}
 
 	private void doSaveTour(final TourPerson person) {
@@ -3395,6 +3423,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		return false;
 	}
 
+	/**
+	 * @return Returns <code>true</code> when the devices are watched.
+	 */
+	private boolean isWatchingOn() {
+
+		return _watchingStoresThread != null;
+	}
+
 	private void onBrowser_Completed(final ProgressEvent event) {
 
 		if (_isInUIStartup = true) {
@@ -3407,7 +3443,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 
 		if (_isDeviceStateUpdateDelayed.getAndSet(false)) {
-			updateUI_DeviceState_Task();
+			updateDOM_DeviceState();
 		}
 
 		_isBrowserCompleted = true;
@@ -3447,7 +3483,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			final long tileId = Long.parseLong(locationParts[2]);
 
-			doEasyImport(tileId);
+			actionRunEasyImport(tileId);
 
 		} else if (ACTION_IMPORT_FROM_FILES.equals(hrefAction)) {
 
@@ -3798,16 +3834,40 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private void setWatcherOff() {
 
-		if (_watchingStoresThread != null) {
+		if (isWatchingOn()) {
 
 			// !!! Store watching must be canceled before the watch folder thread because it could launch a new watch folder thread !!!
 			thread_WatchStores_Cancel();
 
 			thread_WatchFolders(false);
+
+			if (_isWatcherAnimation && _browser != null && !_browser.isDisposed()) {
+
+				_isWatcherAnimation = false;
+
+				final String js = createJS_SetDOMClassName(
+						DOM_ID_IMPORT_TILES,
+						DOM_ID_DEVICE_STATE,
+						DOM_CLASS_DEVICE_OFF);
+
+				_browser.execute(js);
+			}
 		}
 	}
 
 	private void setWatcherOn() {
+
+		if (_isWatcherAnimation && _browser != null && !_browser.isDisposed()) {
+
+			_isWatcherAnimation = false;
+
+			final String js = createJS_SetDOMClassName(//
+					DOM_ID_IMPORT_TILES,
+					DOM_ID_DEVICE_STATE,
+					DOM_CLASS_DEVICE_ON);
+
+			_browser.execute(js);
+		}
 
 		thread_WatchStores();
 
@@ -4154,6 +4214,27 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	}
 
+	private void updateDOM_DeviceState() {
+
+		_isUpdateFolderState = true;
+		final String htmlDeviceState = createHTML_DeviceState();
+		final String jsDeviceState = htmlDeviceState.replace("\"", "\\\""); //$NON-NLS-1$ //$NON-NLS-2$
+
+		final String htmlDeviceOnOff = createHTML_DeviceState_OnOff();
+		final String jsDeviceOnOff = htmlDeviceOnOff.replace("\"", "\\\""); //$NON-NLS-1$ //$NON-NLS-2$
+
+		final String js = "\n" //$NON-NLS-1$
+
+				+ ("var htmlDeviceState =\"" + jsDeviceState + "\";\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("document.getElementById(\"" + DOM_ID_DEVICE_STATE + "\").innerHTML = htmlDeviceState;\n") //$NON-NLS-1$ //$NON-NLS-2$
+
+				+ ("var htmlDeviceOnOff=\"" + jsDeviceOnOff + "\";\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("document.getElementById(\"" + DOM_ID_DEVICE_ON_OFF + "\").innerHTML = htmlDeviceOnOff;\n") //$NON-NLS-1$ //$NON-NLS-2$
+		;
+
+		_browser.execute(js);
+	}
+
 	/**
 	 * Keep none live values.
 	 */
@@ -4210,13 +4291,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	/**
 	 * Set/create dashboard page.
-	 * 
-	 * @param isUpdateDeviceState
-	 *            When <code>true</code> then the folder/device state will be updated, this can
-	 *            delay the creation of the html because this info must be retieved from the
-	 *            filesystem.
 	 */
-	private void updateUI_Dashboard(final boolean isUpdateDeviceState) {
+	private void updateUI_Dashboard() {
 
 		final boolean isBrowserAvailable = _browser != null;
 
@@ -4229,7 +4305,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			return;
 		}
 
-		final String html = createHTML(isUpdateDeviceState);
+		final String html = createHTML();
 
 		_isBrowserCompleted = false;
 
@@ -4248,32 +4324,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				}
 
 				if (_isBrowserCompleted) {
-					updateUI_DeviceState_Task();
+					updateDOM_DeviceState();
 				} else {
 					_isDeviceStateUpdateDelayed.set(true);
 				}
 			}
 		});
-	}
-
-	private void updateUI_DeviceState_Task() {
-
-		final String htmlDeviceState = createHTML_DeviceState(true);
-		final String jsDeviceState = htmlDeviceState.replace("\"", "\\\""); //$NON-NLS-1$ //$NON-NLS-2$
-
-		final String htmlDeviceOnOff = createHTML_DeviceState_OnOff();
-		final String jsDeviceOnOff = htmlDeviceOnOff.replace("\"", "\\\""); //$NON-NLS-1$ //$NON-NLS-2$
-
-		final String js = "\n" //$NON-NLS-1$
-
-				+ ("var htmlDeviceState =\"" + jsDeviceState + "\";\n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("document.getElementById(\"" + DOM_ID_DEVICE_STATE + "\").innerHTML = htmlDeviceState;\n") //$NON-NLS-1$ //$NON-NLS-2$
-
-				+ ("var htmlDeviceOnOff=\"" + jsDeviceOnOff + "\";\n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("document.getElementById(\"" + DOM_ID_DEVICE_ON_OFF + "\").innerHTML = htmlDeviceOnOff;\n") //$NON-NLS-1$ //$NON-NLS-2$
-		;
-
-		_browser.execute(js);
 	}
 
 	/**
@@ -4305,7 +4361,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 					if (_isInUIStartup) {
 
 						// show dashboard without folder state
-						updateUI_Dashboard(false);
+						_isUpdateFolderState = false;
+						updateUI_Dashboard();
 
 					} else {
 

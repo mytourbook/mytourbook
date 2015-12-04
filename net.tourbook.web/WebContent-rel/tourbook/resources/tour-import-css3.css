@@ -34,3 +34,34 @@ a.import-tile:HOVER:FOCUS
 {
 	box-shadow:				0 0 40px #47A3FF;
 }
+
+
+
+/*
+	Device On/Off
+*/
+.deviceOn
+{
+	animation:					deviceOnAnimation;
+	animation-duration:			2.0s;
+	animation-timing-function:	ease;
+}
+
+@keyframes deviceOnAnimation
+{
+	from	{		opacity:				0.2;	}
+	to		{		opacity:				1.0;	}
+}
+
+.deviceOff
+{
+	animation:					deviceOffAnimation;
+	animation-duration:			2.0s;
+	animation-timing-function:	ease;
+}
+
+@keyframes deviceOffAnimation
+{
+	from	{		opacity:				1.0;	}
+	to		{		opacity:				0.2;	}
+}

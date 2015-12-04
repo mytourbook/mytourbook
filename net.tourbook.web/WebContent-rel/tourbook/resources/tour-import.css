@@ -101,20 +101,9 @@ a:VISITED
 
 /*
 
- import-tile
+ Import tile
 
 */
-table.import-tiles
-{
-	/* disable expanding of the table to the right side */
-	width:					10px;
-}
-
-td.import-tile
-{
-	xbackground-color: green;
-}
-
 a.import-tile
 {
 	position:				relative;
@@ -262,6 +251,12 @@ a.action-button:VISITED
 	min-width:				500px;
 	max-height:				80vh;
 }
+
+.stateTooltipMessage /* overwrite obove css */
+{
+	left:					auto;
+	min-width:				0;
+}
 	
 .importState:HOVER	.stateTooltip,
 .importState:FOCUS	.stateTooltip
@@ -333,9 +328,16 @@ a.action-button:VISITED
 {
 	display: 				block;	
 	cursor:					pointer;
-	
-	xwidth:					32px;
-	xheight:					29px;
+}
+
+.deviceOn
+{
+	opacity:				1.0;
+}
+
+.deviceOff
+{	
+	opacity:				0.2;	
 }
 
 

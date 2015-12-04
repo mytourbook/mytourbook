@@ -3668,9 +3668,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="7.9999995"
-     inkscape:cx="72.77352"
-     inkscape:cy="855.73153"
+     inkscape:zoom="11.313708"
+     inkscape:cx="59.365968"
+     inkscape:cy="834.81416"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -4835,7 +4835,7 @@
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <path
-       style="fill:none;fill-rule:evenodd;stroke:#00c604;stroke-width:3.52782321;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:none;fill-rule:evenodd;stroke:#00c604;stroke-width:3.528;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="m 27.487527,184.42514 0,14.1173 0,0 0,0"
        id="path4995"
        inkscape:connector-curvature="0"
@@ -4845,16 +4845,16 @@
     <rect
        style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#00c604;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
        id="rect4997"
-       width="21.999443"
+       width="21.999441"
        height="3.666615"
-       x="52.899696"
+       x="95"
        y="203.69557"
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\device-turn-off.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <path
        style="fill:#00c604;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 52.900253,200.02888 21.999443,0 -10.999721,-16.49974 z"
+       d="m 95.000563,200.02888 21.999447,0 -10.99972,-16.49974 z"
        id="path4999"
        inkscape:connector-curvature="0"
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\device-turn-off.png"
@@ -4897,5 +4897,22 @@
          id="rect4952-8-5-9-5-1"
          style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#a7a7a7;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1.00381029;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" />
     </g>
+    <circle
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#fd0000;stroke-width:3.59991789;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
+       id="path5010"
+       cx="67.514"
+       cy="194.84818"
+       r="10.714043"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\device-turn-off.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="display:inline;fill:none;fill-rule:evenodd;stroke:#fd0000;stroke-width:3.52800012;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 67.487527,189.76993 0,10.18144 0,0 0,0"
+       id="path4995-4"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\device-turn-off.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
   </g>
 </svg>
