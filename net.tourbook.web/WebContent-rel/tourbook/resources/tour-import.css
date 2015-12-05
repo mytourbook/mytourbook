@@ -217,8 +217,8 @@ a.action-button:VISITED
 	cursor:					pointer;
 	
 	width:					32px;
-	height:					29px;
-	xbackground-color: 		#111;
+	height:					25px;
+	xbackground-color: 		#800;
 }
 
 .stateIcon
@@ -235,7 +235,7 @@ a.action-button:VISITED
 .stateIconValue
 {
 	position:				absolute;
-	bottom:					5px;
+	bottom:					3px;
 	width: 					100%; 
 	text-align: 			center;
 }
@@ -324,10 +324,17 @@ a.action-button:VISITED
 /*
 	Device On/Off
 */
-.deviceOnOff
+.onOffIcon
 {
-	display: 				block;	
+	display: 				block;
+	margin-left:			5px;
+	margin-right:			5px;
+	
 	cursor:					pointer;
+	
+	width:					25px;
+	height:					25px;
+	xbackground-color: 		#800;
 }
 
 .deviceOn
@@ -337,7 +344,7 @@ a.action-button:VISITED
 
 .deviceOff
 {	
-	opacity:				0.2;	
+	opacity:				0.1;	
 }
 
 

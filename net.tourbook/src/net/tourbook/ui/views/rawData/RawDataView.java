@@ -1071,8 +1071,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private void createHTML_50_EasyImport_Header(final StringBuilder sb) {
 
-		final String htmlDeviceState = createHTML_DeviceState();
 		final String htmlDeviceOnOff = createHTML_DeviceState_OnOff();
+		final String htmlDeviceState = createHTML_DeviceState();
+
+		final String watchClass = isWatchingOn() ? DOM_CLASS_DEVICE_ON : DOM_CLASS_DEVICE_OFF;
 
 		final String html = "" // //$NON-NLS-1$
 
@@ -1081,7 +1083,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 				// device state on/off
 				+ ("		<td>\n") //$NON-NLS-1$
-				+ ("			<div id='" + DOM_ID_DEVICE_ON_OFF + "' style='padding-left:0px;'>" + htmlDeviceOnOff + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				+ ("			<div id='" + DOM_ID_DEVICE_ON_OFF + "'>" + htmlDeviceOnOff + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				+ ("		</td>\n") //$NON-NLS-1$
 
 				// device import
@@ -1089,7 +1091,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 				// device state icon
 				+ ("		<td>\n") //$NON-NLS-1$
-				+ ("			<div id='" + DOM_ID_DEVICE_STATE + "' style='padding-left:20px;'>" + htmlDeviceState + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				+ ("			<div id='" + DOM_ID_DEVICE_STATE + "' style='padding-left:20px;' class='" + watchClass + "'>" + htmlDeviceState + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				+ ("		</td>\n") //$NON-NLS-1$
 
 				+ "	</tr></tbody></table>\n" // //$NON-NLS-1$
@@ -1116,7 +1118,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		final int numHorizontalTiles = importConfig.numHorizontalTiles;
 		boolean isTrOpen = false;
 
-		sb.append("<table id='" + DOM_ID_IMPORT_TILES + "'><tbody>\n"); //$NON-NLS-1$
+		final String watchClass = isWatchingOn() ? DOM_CLASS_DEVICE_ON : DOM_CLASS_DEVICE_OFF;
+
+		sb.append("<table id='" + DOM_ID_IMPORT_TILES + "' class='" + watchClass + "'><tbody>\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		for (final ImportLauncher importLauncher : allImportLauncher) {
 
@@ -1244,7 +1248,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			html = ""// //$NON-NLS-1$
 
-					+ "<a class='importState'" // //$NON-NLS-1$
+					+ "<a class='importState dash-action'" // //$NON-NLS-1$
 					+ (" href='" + HTTP_DUMMY + "'") //$NON-NLS-1$ //$NON-NLS-2$
 					+ ">" //$NON-NLS-1$
 
@@ -1363,7 +1367,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			html = ""// //$NON-NLS-1$
 
-					+ "<a class='importState'" // //$NON-NLS-1$
+					+ "<a class='importState dash-action'" // //$NON-NLS-1$
 					+ (" href='" + hrefAction + "'") //$NON-NLS-1$ //$NON-NLS-2$
 					+ ">" //$NON-NLS-1$
 
@@ -1387,7 +1391,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			html = ""// //$NON-NLS-1$
 
-					+ "<a class='importState'" // //$NON-NLS-1$
+					+ "<a class='importState dash-action'" // //$NON-NLS-1$
 					+ (" href='" + hrefAction + "'") //$NON-NLS-1$ //$NON-NLS-2$
 					+ ">" //$NON-NLS-1$
 
@@ -1410,23 +1414,22 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				? Messages.Import_Data_HTML_DeviceOff_Tooltip
 				: Messages.Import_Data_HTML_DeviceOn_Tooltip;
 
+		// shwo red image when off
 		final String imageUrl = isWatchingOn //
-				? _imageUrl_Device_TurnOff
-				: _imageUrl_Device_TurnOn;
+				? _imageUrl_Device_TurnOn
+				: _imageUrl_Device_TurnOff;
 
 		final String hrefAction = HTTP_DUMMY + HREF_ACTION_DEVICE_WATCHING_ON_OFF;
 		final String onOffImage = createHTML_BgImageStyle(imageUrl);
 
 		final String html = ""// //$NON-NLS-1$
 
-				+ "<a class='importState'" // //$NON-NLS-1$
+				+ "<a class='onOffIcon dash-action'" // //$NON-NLS-1$
 				+ ("title='" + tooltip + "'") //$NON-NLS-1$ //$NON-NLS-2$
 				+ (" href='" + hrefAction + "'") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ">" //$NON-NLS-1$
 
-				+ ("<div class='stateIcon' " + onOffImage + ">") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("   <div class='stateIconValue'></div>") //$NON-NLS-1$
-				+ ("</div>") //$NON-NLS-1$
+				+ ("<div class='stateIcon' " + onOffImage + "></div>") //$NON-NLS-1$ //$NON-NLS-2$
 
 				+ "</a>"; //$NON-NLS-1$
 
@@ -1674,8 +1677,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private String createJS_SetDOMClassName(final String elementId1, final String elementId2, final String className) {
 
-		final String js = ("document.getElementById(\"" + elementId1 + "\").className ='" + className + "';\n")
-				+ ("document.getElementById(\"" + elementId2 + "\").className ='" + className + "';\n");
+		final String js = ("document.getElementById(\"" + elementId1 + "\").className ='" + className + "';\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				+ ("document.getElementById(\"" + elementId2 + "\").className ='" + className + "';\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 		return js;
 	}
@@ -3435,8 +3438,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		if (_isInUIStartup = true) {
 
-			_isInUIStartup = false;
-
 			_topPageBook.showPage(_topPage_Dashboard);
 
 			_browser.setRedraw(true);
@@ -4125,9 +4126,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 							// check if anything should be watched
 							if (importConfig.isWatchAnything()) {
 
-								final DeviceImportState importState = EasyImportManager
-										.getInstance()
-										.checkImportedFiles(false);
+								final boolean isCheckFiles = _isInUIStartup;
+
+								_isInUIStartup = false;
+
+								final DeviceImportState importState = EasyImportManager.getInstance()//
+										.checkImportedFiles(isCheckFiles);
 
 								if (importState.areTheSameStores == false) {
 

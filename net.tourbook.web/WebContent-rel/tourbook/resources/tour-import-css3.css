@@ -1,11 +1,13 @@
 
-a.import-tile
+a.import-tile,
+.dash-action
 {	
 	box-shadow:				0;
 	transition: 			box-shadow		.2s ease 0s;
 }
 
-a.import-tile:HOVER
+a.import-tile:HOVER,
+.dash-action:HOVER
 {
 	z-index:				10;
 
@@ -15,7 +17,8 @@ a.import-tile:HOVER
 	background-color: 		#434343;
 }	
 
-a.import-tile:FOCUS
+a.import-tile:FOCUS,
+.dash-action:FOCUS
 {
 	border-top-color:		#47A3FF;
 	border-bottom-color:	#47A3FF;
@@ -30,7 +33,8 @@ a.import-tile:FOCUS
 							);
 }
 
-a.import-tile:HOVER:FOCUS
+a.import-tile:HOVER:FOCUS,
+.dash-action:HOVER:FOCUS
 {
 	box-shadow:				0 0 40px #47A3FF;
 }
@@ -46,11 +50,10 @@ a.import-tile:HOVER:FOCUS
 	animation-duration:			2.0s;
 	animation-timing-function:	ease;
 }
-
 @keyframes deviceOnAnimation
 {
-	from	{		opacity:				0.2;	}
-	to		{		opacity:				1.0;	}
+	from	{	opacity:	0.1;	}
+	to		{	opacity:	1.0;	}
 }
 
 .deviceOff
@@ -59,9 +62,38 @@ a.import-tile:HOVER:FOCUS
 	animation-duration:			2.0s;
 	animation-timing-function:	ease;
 }
-
 @keyframes deviceOffAnimation
 {
-	from	{		opacity:				1.0;	}
-	to		{		opacity:				0.2;	}
+	from	{	opacity:	1.0;	}
+	to		{	opacity:	0.1;	}
+}
+
+/*
+	State tooltip
+*/
+.importState	.stateTooltip
+{
+	opacity:					1;
+
+	animation:					stateTooltipAnimationOff;
+	animation-duration:			2.0s;
+	animation-timing-function:	ease;
+}
+@keyframes stateTooltipAnimationOff
+{
+	from	{	opacity:	1;	}
+	to		{	opacity:	0;	}
+}
+
+.importState:HOVER	.stateTooltip,
+.importState:FOCUS	.stateTooltip
+{
+	animation:					stateTooltipAnimationOn;
+	animation-duration:			1.0s;
+	animation-timing-function:	ease;
+}
+@keyframes stateTooltipAnimationOn
+{
+	from	{	opacity:	0;	}
+	to		{	opacity:	1;	}
 }
