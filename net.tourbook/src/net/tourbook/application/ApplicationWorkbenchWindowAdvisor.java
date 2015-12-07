@@ -436,7 +436,6 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		 * DISPLAY THE WRONG DATA. E.G. COLLATED TOURS SHOWS ALL TOURS AND NOT FOR THE SELECTED
 		 * TOURTYPE.
 		 */
-		UI.updateUnits();
 		TourTypeFilterManager.restoreState();
 	}
 
@@ -533,6 +532,11 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 	@Override
 	public IStatus restoreState(final IMemento memento) {
+
+		// this is the first entry point - setup unit values otherwise views show "null"
+
+		UI.updateUnits();
+
 		return super.restoreState(memento);
 	}
 
