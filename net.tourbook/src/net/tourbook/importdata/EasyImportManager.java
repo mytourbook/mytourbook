@@ -78,6 +78,7 @@ public class EasyImportManager {
 	private static final String			ATTR_DEVICE_FOLDER					= "deviceFolder";								//$NON-NLS-1$
 	private static final String			ATTR_IS_CREATE_BACKUP				= "isCreateBackup";							//$NON-NLS-1$
 	private static final String			ATTR_IS_LAST_LAUNCHER_REMOVED		= "isLastLauncherRemoved";						//$NON-NLS-1$
+	private static final String			ATTR_IS_TURN_OFF_WATCHING			= "isTurnOffWatching";							//$NON-NLS-1$
 	private static final String			ATTR_TOUR_TYPE_CONFIG				= "tourTypeConfig";							//$NON-NLS-1$
 	private static final String			ATTR_TOUR_TYPE_ID					= "tourTypeId";								//$NON-NLS-1$
 	//
@@ -512,6 +513,8 @@ public class EasyImportManager {
 		importConfig.isCreateBackup = Util.getXmlBoolean(xmlMemento, ATTR_IS_CREATE_BACKUP, true);
 		importConfig.isLastLauncherRemoved = Util.getXmlBoolean(xmlMemento, ATTR_IS_LAST_LAUNCHER_REMOVED, false);
 		importConfig.isLiveUpdate = Util.getXmlBoolean(xmlMemento, ATTR_DASH_IS_LIVE_UPDATE, true);
+		importConfig.isTurnOffWatching = Util.getXmlBoolean(xmlMemento, ATTR_IS_TURN_OFF_WATCHING, false);
+
 		importConfig.setBackupFolder(Util.getXmlString(xmlMemento, ATTR_BACKUP_FOLDER, UI.EMPTY_STRING));
 		importConfig.setDeviceFolder(Util.getXmlString(xmlMemento, ATTR_DEVICE_FOLDER, UI.EMPTY_STRING));
 
@@ -823,14 +826,16 @@ public class EasyImportManager {
 		xmlMemento.putInteger(ATTR_DASH_ANIMATION_CRAZY_FACTOR, importConfig.animationCrazinessFactor);
 		xmlMemento.putInteger(ATTR_DASH_ANIMATION_DURATION, importConfig.animationDuration);
 		xmlMemento.putInteger(ATTR_DASH_BACKGROUND_OPACITY, importConfig.backgroundOpacity);
+		xmlMemento.putBoolean(ATTR_DASH_IS_LIVE_UPDATE, importConfig.isLiveUpdate);
 		xmlMemento.putInteger(ATTR_DASH_NUM_UI_COLUMNS, importConfig.numHorizontalTiles);
 		xmlMemento.putInteger(ATTR_DASH_TILE_SIZE, importConfig.tileSize);
 
-		xmlMemento.putBoolean(ATTR_IS_CREATE_BACKUP, importConfig.isCreateBackup);
-		xmlMemento.putBoolean(ATTR_IS_LAST_LAUNCHER_REMOVED, importConfig.isLastLauncherRemoved);
-		xmlMemento.putBoolean(ATTR_DASH_IS_LIVE_UPDATE, importConfig.isLiveUpdate);
 		xmlMemento.putString(ATTR_BACKUP_FOLDER, importConfig.getBackupFolder());
 		xmlMemento.putString(ATTR_DEVICE_FOLDER, importConfig.getDeviceFolder());
+
+		xmlMemento.putBoolean(ATTR_IS_CREATE_BACKUP, importConfig.isCreateBackup);
+		xmlMemento.putBoolean(ATTR_IS_LAST_LAUNCHER_REMOVED, importConfig.isLastLauncherRemoved);
+		xmlMemento.putBoolean(ATTR_IS_TURN_OFF_WATCHING, importConfig.isTurnOffWatching);
 
 		for (final ImportLauncher importLauncher : importConfig.importLaunchers) {
 

@@ -218,6 +218,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	//
 	private static final String				DOM_CLASS_DEVICE_ON							= "deviceOn";								//$NON-NLS-1$
 	private static final String				DOM_CLASS_DEVICE_OFF						= "deviceOff";								//$NON-NLS-1$
+	private static final String				DOM_CLASS_DEVICE_ON_ANIMATED				= "deviceOnAnimated";						//$NON-NLS-1$
+	private static final String				DOM_CLASS_DEVICE_OFF_ANIMATED				= "deviceOffAnimated";						//$NON-NLS-1$
 	//
 	private static final String				DOM_ID_DEVICE_ON_OFF						= "deviceOnOff";							//$NON-NLS-1$
 	private static final String				DOM_ID_DEVICE_STATE							= "deviceState";							//$NON-NLS-1$
@@ -581,6 +583,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			doSaveTour(person, importedTours);
 		}
 
+		/*
+		 * 100. Turn watching off
+		 */
+		if (importConfig.isTurnOffWatching) {
+			setWatcherOff();
+		}
+
+		updateUI_DeviceState();
 	}
 
 	void actionSaveTour(final TourPerson person) {
@@ -1091,7 +1101,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 				// device state icon
 				+ ("		<td>\n") //$NON-NLS-1$
-				+ ("			<div id='" + DOM_ID_DEVICE_STATE + "' style='padding-left:20px;' class='" + watchClass + "'>" + htmlDeviceState + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				+ ("			<div id='" + DOM_ID_DEVICE_STATE + "' style='padding-left:20px;' class='" + watchClass + "'>" + htmlDeviceState + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 				+ ("		</td>\n") //$NON-NLS-1$
 
 				+ "	</tr></tbody></table>\n" // //$NON-NLS-1$
@@ -1120,7 +1130,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		final String watchClass = isWatchingOn() ? DOM_CLASS_DEVICE_ON : DOM_CLASS_DEVICE_OFF;
 
-		sb.append("<table id='" + DOM_ID_IMPORT_TILES + "' class='" + watchClass + "'><tbody>\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append("<table id='" + DOM_ID_IMPORT_TILES + "' class='" + watchClass + "'><tbody>\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 		for (final ImportLauncher importLauncher : allImportLauncher) {
 
@@ -3849,7 +3859,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				final String js = createJS_SetDOMClassName(
 						DOM_ID_IMPORT_TILES,
 						DOM_ID_DEVICE_STATE,
-						DOM_CLASS_DEVICE_OFF);
+						DOM_CLASS_DEVICE_OFF_ANIMATED);
 
 				_browser.execute(js);
 			}
@@ -3865,7 +3875,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			final String js = createJS_SetDOMClassName(//
 					DOM_ID_IMPORT_TILES,
 					DOM_ID_DEVICE_STATE,
-					DOM_CLASS_DEVICE_ON);
+					DOM_CLASS_DEVICE_ON_ANIMATED);
 
 			_browser.execute(js);
 		}
@@ -4249,6 +4259,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		importConfig.isCreateBackup = modifiedConfig.isCreateBackup;
 		importConfig.isLastLauncherRemoved = modifiedConfig.isLastLauncherRemoved;
+		importConfig.isTurnOffWatching = modifiedConfig.isTurnOffWatching;
 
 		importConfig.setBackupFolder(modifiedConfig.getBackupFolder());
 		importConfig.setDeviceFolder(modifiedConfig.getDeviceFolder());

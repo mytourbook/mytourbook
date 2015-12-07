@@ -337,12 +337,14 @@ a.action-button:VISITED
 	xbackground-color: 		#800;
 }
 
-.deviceOn
+.deviceOn,
+.deviceOnAnimated
 {
 	opacity:				1.0;
 }
 
-.deviceOff
+.deviceOff,
+.deviceOffAnimated
 {	
 	opacity:				0.1;	
 }

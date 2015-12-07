@@ -119,6 +119,8 @@ public class Messages extends NLS {
 	public static String		Dialog_ImportConfig_Action_SortBySpeed_Tooltip;
 	public static String		Dialog_ImportConfig_Checkbox_CreateBackup;
 	public static String		Dialog_ImportConfig_Checkbox_CreateBackup_Tooltip;
+	public static String		Dialog_ImportConfig_Checkbox_DeviceWatching;
+	public static String		Dialog_ImportConfig_Checkbox_DeviceWatching_Tooltip;
 	public static String		Dialog_ImportConfig_Checkbox_ImportFiles;
 	public static String		Dialog_ImportConfig_Checkbox_LastMarker;
 	public static String		Dialog_ImportConfig_Checkbox_LastMarker_Tooltip;
@@ -148,9 +150,12 @@ public class Messages extends NLS {
 	public static String		Dialog_ImportConfig_Error_FolderIsInvalid;
 	public static String		Dialog_ImportConfig_Group_Dashboard;
 	public static String		Dialog_ImportConfig_Group_ImportActions;
+	public static String		Dialog_ImportConfig_Group_ImportActions_I;
+	public static String		Dialog_ImportConfig_Group_ImportActions_III;
 	public static String		Dialog_ImportConfig_Group_ImportLauncher;
 	public static String		Dialog_ImportConfig_Group_ImportLauncherConfig;
 	public static String		Dialog_ImportConfig_Info_ConfigDragDrop;
+	public static String		Dialog_ImportConfig_Info_ImportActions_II;
 	public static String		Dialog_ImportConfig_Info_MoreImportActions;
 	public static String		Dialog_ImportConfig_Info_NoDeviceName;
 	public static String		Dialog_ImportConfig_Info_RetrievingVolumeInfo;

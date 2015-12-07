@@ -42,9 +42,9 @@ a.import-tile:HOVER:FOCUS,
 
 
 /*
-	Device On/Off
+	Switch device on/Off
 */
-.deviceOn
+.deviceOnAnimated
 {
 	animation:					deviceOnAnimation;
 	animation-duration:			2.0s;
@@ -56,7 +56,7 @@ a.import-tile:HOVER:FOCUS,
 	to		{	opacity:	1.0;	}
 }
 
-.deviceOff
+.deviceOffAnimated
 {
 	animation:					deviceOffAnimation;
 	animation-duration:			2.0s;

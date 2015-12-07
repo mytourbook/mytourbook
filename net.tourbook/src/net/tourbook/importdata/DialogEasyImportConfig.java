@@ -47,7 +47,6 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -89,7 +88,6 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -189,10 +187,11 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
 	}
+
 	/*
 	 * UI resources
 	 */
-	private Font							_boldFont;
+//	private Font							_boldFont;
 
 	/*
 	 * UI controls
@@ -217,6 +216,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 	private Button							_chkIL_SaveTour;
 	private Button							_chkIL_SetTourType;
 	private Button							_chkIL_ShowInDashboard;
+	private Button							_chkTurnOffWatching;
 
 	private Button							_btnSelectBackupFolder;
 	private Button							_btnSelectDeviceFolder;
@@ -480,16 +480,16 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 			importLaunchers.add(launcher.clone());
 		}
 
-		_dialogConfig.isLiveUpdate = importConfig.isLiveUpdate;
-
 		_dialogConfig.animationCrazinessFactor = importConfig.animationCrazinessFactor;
 		_dialogConfig.animationDuration = importConfig.animationDuration;
 		_dialogConfig.backgroundOpacity = importConfig.backgroundOpacity;
+		_dialogConfig.isLiveUpdate = importConfig.isLiveUpdate;
 		_dialogConfig.numHorizontalTiles = importConfig.numHorizontalTiles;
 		_dialogConfig.tileSize = importConfig.tileSize;
 
 		_dialogConfig.isCreateBackup = importConfig.isCreateBackup;
 		_dialogConfig.isLastLauncherRemoved = importConfig.isLastLauncherRemoved;
+		_dialogConfig.isTurnOffWatching = importConfig.isTurnOffWatching;
 
 		_dialogConfig.setBackupFolder(importConfig.getBackupFolder());
 		_dialogConfig.setDeviceFolder(importConfig.getDeviceFolder());
@@ -640,26 +640,35 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 		GridLayoutFactory.swtDefaults().applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 		{
-			createUI_30_ImportActions(container);
+			createUI_30_ImportActions_I(container);
 			createUI_50_ImportLauncher(container);
-			createUI_900_Dashboard(container);
+
+			final Composite container3 = new Composite(container, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(container3);
+			GridLayoutFactory.fillDefaults()//
+					.numColumns(2)
+					.applyTo(container3);
+			{
+				createUI_850_ImportActions_III(container3);
+				createUI_900_Dashboard(container3);
+			}
 		}
 	}
 
-	private void createUI_30_ImportActions(final Composite parent) {
+	private void createUI_30_ImportActions_I(final Composite parent) {
 
-		final Group groupConfig = new Group(parent, SWT.NONE);
-		groupConfig.setText(Messages.Dialog_ImportConfig_Group_ImportActions);
+		final Group group = new Group(parent, SWT.NONE);
+		group.setText(Messages.Dialog_ImportConfig_Group_ImportActions_I);
 		GridDataFactory.fillDefaults()//
 				.grab(true, false)
-				.applyTo(groupConfig);
+				.applyTo(group);
 		GridLayoutFactory.swtDefaults()//
 				.numColumns(2)
-				.applyTo(groupConfig);
-//		groupConfig.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+				.applyTo(group);
+//		groupConfig.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 		{
-			createUI_32_BackupFolder(groupConfig);
-			createUI_34_DeviceFolder(groupConfig);
+			createUI_32_BackupFolder(group);
+			createUI_34_DeviceFolder(group);
 		}
 	}
 
@@ -1256,8 +1265,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 			 * Label: Other import actions
 			 */
 			_lblIL_OtherImportActions = new Label(parent, SWT.NONE);
-			_lblIL_OtherImportActions.setText(Messages.Dialog_ImportConfig_Info_MoreImportActions);
-			_lblIL_OtherImportActions.setFont(_boldFont);
+			_lblIL_OtherImportActions.setText(Messages.Dialog_ImportConfig_Info_ImportActions_II);
+//			_lblIL_OtherImportActions.setFont(_boldFont);
 			GridDataFactory.fillDefaults()//
 					.span(2, 1)
 					.applyTo(_lblIL_OtherImportActions);
@@ -1671,6 +1680,38 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 		return speedTTContainer;
 	}
 
+	private void createUI_850_ImportActions_III(final Composite parent) {
+
+		final Group group = new Group(parent, SWT.NONE);
+		group.setText(Messages.Dialog_ImportConfig_Group_ImportActions_III);
+		GridDataFactory.fillDefaults()//
+				.grab(true, false)
+				.applyTo(group);
+
+		GridLayoutFactory.swtDefaults()//
+				.numColumns(2)
+				.applyTo(group);
+//		groupConfig.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+		{
+			createUI_852_DeviceWatching(group);
+		}
+	}
+
+	private void createUI_852_DeviceWatching(final Composite parent) {
+
+		{
+			/*
+			 * Checkbox: Show in dashboard
+			 */
+			_chkTurnOffWatching = new Button(parent, SWT.CHECK);
+			_chkTurnOffWatching.setText(Messages.Dialog_ImportConfig_Checkbox_DeviceWatching);
+			_chkTurnOffWatching.setToolTipText(Messages.Import_Data_HTML_DeviceOff_Tooltip);
+			GridDataFactory.fillDefaults()//
+					.span(2, 1)
+					.applyTo(_chkTurnOffWatching);
+		}
+	}
+
 	private void createUI_900_Dashboard(final Composite parent) {
 
 		final Group group = new Group(parent, SWT.NONE);
@@ -1680,17 +1721,14 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 				.indent(0, VERTICAL_GROUP_DISTANCE)
 				.applyTo(group);
 		GridLayoutFactory.swtDefaults()//
-				.numColumns(3)
-				.spacing(30, 5)
+				.numColumns(2)
+//				.spacing(30, 5)
 				.applyTo(group);
 //		group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
 
 			createUI_902_Dashboard_1(group);
 			createUI_904_Dashboard_2(group);
-			createUI_906_Dashboard_3(group);
-
-			createUI_999_Dashboard_LiveUpdate(group);
 		}
 	}
 
@@ -1738,6 +1776,23 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 				_spinnerDash_NumHTiles.addMouseWheelListener(_liveUpdateMouseWheelListener);
 				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_spinnerDash_NumHTiles);
 			}
+			{
+				/*
+				 * Background opacity
+				 */
+				// label
+				final Label label = new Label(container, SWT.NONE);
+				label.setText(Messages.Dialog_ImportConfig_Label_BackgroundOpacity);
+				label.setToolTipText(Messages.Dialog_ImportConfig_Label_BackgroundOpacity_Tooltip);
+				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+
+				// spinner
+				_spinnerDash_BgOpacity = new Spinner(container, SWT.BORDER);
+				_spinnerDash_BgOpacity.setMinimum(ImportConfig.BACKGROUND_OPACITY_MIN);
+				_spinnerDash_BgOpacity.setMaximum(ImportConfig.BACKGROUND_OPACITY_MAX);
+				_spinnerDash_BgOpacity.addSelectionListener(_liveUpdateListener);
+				_spinnerDash_BgOpacity.addMouseWheelListener(_liveUpdateMouseWheelListener);
+			}
 		}
 	}
 
@@ -1746,6 +1801,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
 //				.grab(true, false)
+				.indent(convertHorizontalDLUsToPixels(12), 0)
 				.applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
@@ -1797,57 +1853,26 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 				// fill column
 				new Label(container, SWT.NONE);
 			}
-		}
-	}
-
-	private void createUI_906_Dashboard_3(final Group parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-//				.grab(true, false)
-				.applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
-		{
 			{
 				/*
-				 * Background opacity
+				 * Checkbox: live update
 				 */
-				// label
-				final Label label = new Label(container, SWT.NONE);
-				label.setText(Messages.Dialog_ImportConfig_Label_BackgroundOpacity);
-				label.setToolTipText(Messages.Dialog_ImportConfig_Label_BackgroundOpacity_Tooltip);
-				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
-
-				// spinner
-				_spinnerDash_BgOpacity = new Spinner(container, SWT.BORDER);
-				_spinnerDash_BgOpacity.setMinimum(ImportConfig.BACKGROUND_OPACITY_MIN);
-				_spinnerDash_BgOpacity.setMaximum(ImportConfig.BACKGROUND_OPACITY_MAX);
-				_spinnerDash_BgOpacity.addSelectionListener(_liveUpdateListener);
-				_spinnerDash_BgOpacity.addMouseWheelListener(_liveUpdateMouseWheelListener);
+				_chkLiveUpdate = new Button(container, SWT.CHECK);
+				_chkLiveUpdate.setText(Messages.Dialog_ImportConfig_Checkbox_LiveUpdate);
+				_chkLiveUpdate.setToolTipText(Messages.Dialog_ImportConfig_Checkbox_LiveUpdate_Tooltip);
+				_chkLiveUpdate.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						doLiveUpdate();
+					}
+				});
+				GridDataFactory.fillDefaults()//
+//						.grab(true, false)
+//						.align(SWT.END, SWT.FILL)
+						.span(2, 1)
+						.applyTo(_chkLiveUpdate);
 			}
 		}
-	}
-
-	private void createUI_999_Dashboard_LiveUpdate(final Composite parent) {
-
-		/*
-		 * Checkbox: live update
-		 */
-		_chkLiveUpdate = new Button(parent, SWT.CHECK);
-		_chkLiveUpdate.setText(Messages.Dialog_ImportConfig_Checkbox_LiveUpdate);
-		_chkLiveUpdate.setToolTipText(Messages.Dialog_ImportConfig_Checkbox_LiveUpdate_Tooltip);
-		_chkLiveUpdate.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				doLiveUpdate();
-			}
-		});
-		GridDataFactory.fillDefaults()//
-				.grab(true, false)
-				.align(SWT.END, SWT.FILL)
-				.span(3, 1)
-				.applyTo(_chkLiveUpdate);
 	}
 
 	/**
@@ -2320,7 +2345,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 		_pc = new PixelConverter(parent);
 
 		_leftPadding = convertHorizontalDLUsToPixels(11);
-		_boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
+//		_boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 
 		parent.addDisposeListener(new DisposeListener() {
 
@@ -2884,6 +2909,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 		 * Loading the volume information can delay the startup of the dialog
 		 */
 		_chkCreateBackup.setSelection(_dialogConfig.isCreateBackup);
+		_chkTurnOffWatching.setSelection(_dialogConfig.isTurnOffWatching);
 		_comboBackupFolder.setText(Messages.Dialog_ImportConfig_Info_RetrievingVolumeInfo);
 		_comboDeviceFolder.setText(Messages.Dialog_ImportConfig_Info_RetrievingVolumeInfo);
 
@@ -2942,6 +2968,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 	private void update_Model_From_UI_Folder() {
 
 		_dialogConfig.isCreateBackup = _chkCreateBackup.getSelection();
+		_dialogConfig.isTurnOffWatching = _chkTurnOffWatching.getSelection();
+
 		_dialogConfig.setBackupFolder(_comboBackupFolder.getText());
 		_dialogConfig.setDeviceFolder(_comboDeviceFolder.getText());
 	}

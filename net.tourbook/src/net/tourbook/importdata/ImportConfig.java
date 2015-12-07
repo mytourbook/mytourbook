@@ -58,6 +58,9 @@ public class ImportConfig {
 	/** When <code>true</code> then a backup of the tour file is done. */
 	public boolean						isCreateBackup						= true;
 
+	/** When <code>true</code> then the device watching is turned off after tours are imported. */
+	public boolean						isTurnOffWatching					= false;
+
 	public int							numHorizontalTiles					= HORIZONTAL_TILES_DEFAULT;
 	public int							tileSize							= TILE_SIZE_DEFAULT;
 
