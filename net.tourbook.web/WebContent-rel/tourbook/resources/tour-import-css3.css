@@ -40,7 +40,6 @@ a.import-tile:HOVER:FOCUS,
 }
 
 
-
 /*
 	Switch device on/Off
 */
@@ -69,7 +68,7 @@ a.import-tile:HOVER:FOCUS,
 }
 
 /*
-	State tooltip
+	State tooltip animation, AnimationOff IS NOT WORKING only AnimationOn
 */
 .importState	.stateTooltip
 {

@@ -324,6 +324,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	//
 	private boolean							_isBrowserCompleted;
 	private boolean							_isInUIStartup								= true;
+	private boolean							_isInWatchingStartup						= true;
 	private boolean							_isRunAnimation								= true;
 
 	/**
@@ -412,6 +413,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		// update device state because an import can have changed it
 		_isInUIStartup = true;
+		_isInWatchingStartup = true;
 
 		reloadViewer();
 
@@ -945,17 +947,16 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 					+ ("	from															\n") //$NON-NLS-1$
 					+ ("	{																\n") //$NON-NLS-1$
-					+ ("		opacity:				0.0;								\n") //$NON-NLS-1$
+					+ ("		opacity:				0;									\n") //$NON-NLS-1$
 					+ ("		background-color:		ButtonFace;							\n") //$NON-NLS-1$
 					+ ("		transform:				rotateX(" + (int) rotateX + "deg) rotateY(" + (int) rotateY + "deg);	\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-					+ ("		xtransform-origin: 		50% 200%;							\n") //$NON-NLS-1$
 					+ ("	}																\n") //$NON-NLS-1$
-//		transform:				rotateX(-80deg) rotateY(-80deg);
-//		transform-origin: 		50% 200%;
+//								transform:				rotateX(-80deg) rotateY(-80deg);
+//								transform-origin: 		50% 200%;
 
 					+ ("	to																\n") //$NON-NLS-1$
 					+ ("	{																\n") //$NON-NLS-1$
-					+ ("		opacity:				0.9;								\n") //$NON-NLS-1$
+					+ ("		opacity:				1;									\n") //$NON-NLS-1$
 					+ ("	}																\n") //$NON-NLS-1$
 					+ ("}																	\n"); //$NON-NLS-1$
 		}
@@ -963,7 +964,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		/*
 		 * Tile size
 		 */
-		final String tileSize = "" // //$NON-NLS-1$
+		final String tileSize = UI.EMPTY_STRING
 				//
 				+ (CSS_IMPORT_TILE + "\n") //$NON-NLS-1$
 				+ ("{\n") //$NON-NLS-1$
@@ -1276,11 +1277,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			final int numDeviceFiles = importConfig.numDeviceFiles;
 			final String deviceOSFolder = importConfig.getDeviceOSFolder();
 			final boolean isDeviceFolderOK = isOSFolderValid(deviceOSFolder);
+			boolean isFolderOK = true;
 
 			final StringBuilder sb = new StringBuilder();
 			sb.append("<table><tbody>"); //$NON-NLS-1$
-
-			boolean isFolderOK = true;
 
 			/*
 			 * Backup folder
@@ -1328,30 +1328,54 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			 */
 			final ArrayList<OSFile> notImportedFiles = importConfig.notImportedFiles;
 			final int numNotImportedFiles = notImportedFiles.size();
+			{
+				final String htmlDeviceFolder = importConfig.getDeviceFolder().replace(//
+						UI.SYMBOL_BACKSLASH,
+						UI.SYMBOL_HTML_BACKSLASH);
 
-			final String htmlDeviceFolder = importConfig.getDeviceFolder().replace(//
-					UI.SYMBOL_BACKSLASH,
-					UI.SYMBOL_HTML_BACKSLASH);
+				final boolean isTopMargin = importConfig.isCreateBackup;
 
-			final boolean isTopMargin = importConfig.isCreateBackup;
+				final String folderTitle = Messages.Import_Data_HTML_Title_Device;
 
-			final String folderTitle = Messages.Import_Data_HTML_Title_Device;
+				final String folderInfo = numNotImportedFiles == 0 //
+						? NLS.bind(Messages.Import_Data_HTML_AllFilesAreImported, numDeviceFiles)
+						: NLS.bind(Messages.Import_Data_HTML_NotImportedFiles, numNotImportedFiles, numDeviceFiles);
 
-			final String folderInfo = numNotImportedFiles == 0 //
-					? NLS.bind(Messages.Import_Data_HTML_AllFilesAreImported, numDeviceFiles)
-					: NLS.bind(Messages.Import_Data_HTML_NotImportedFiles, numNotImportedFiles, numDeviceFiles);
+				createHTML_FolderState(//
+						sb,
+						htmlDeviceFolder,
+						isDeviceFolderOK,
+						isTopMargin,
+						folderTitle,
+						folderInfo);
 
-			createHTML_FolderState(//
-					sb,
-					htmlDeviceFolder,
-					isDeviceFolderOK,
-					isTopMargin,
-					folderTitle,
-					folderInfo);
+				isFolderOK &= isDeviceFolderOK;
+			}
+
+			/*
+			 * 100. Turn off device watching
+			 */
+			{
+				final boolean isWatchingOff = importConfig.isTurnOffWatching;
+
+				final String watchingText = isWatchingOff
+						? Messages.Import_Data_HTML_WatchingOff
+						: Messages.Import_Data_HTML_WatchingOn;
+
+				// shwo red image when off
+				final String imageUrl = isWatchingOff //
+						? _imageUrl_Device_TurnOff
+						: _imageUrl_Device_TurnOn;
+
+				final String onOffImage = createHTML_BgImageStyle(imageUrl);
+
+				sb.append("<tr>"); //$NON-NLS-1$
+				sb.append("<td><div class='action-button-25' " + onOffImage + "></div></td>"); //$NON-NLS-1$ //$NON-NLS-2$
+				sb.append("<td class='folderInfo'>" + watchingText + "</td>"); //$NON-NLS-1$ //$NON-NLS-2$
+				sb.append("</tr>"); //$NON-NLS-1$
+			}
 
 			sb.append("</tbody></table>"); //$NON-NLS-1$
-
-			isFolderOK &= isDeviceFolderOK;
 
 			// create html list with not imported files
 			if (numNotImportedFiles > 0) {
@@ -1361,7 +1385,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			final String htmlTooltip = sb.toString();
 
 			/*
-			 * Different html
+			 * All states
 			 */
 			final String imageUrl = isFolderOK ? _imageUrl_DeviceFolder_OK : _imageUrl_DeviceFolder_NotAvailable;
 			final String stateImage = createHTML_BgImageStyle(imageUrl);
@@ -1846,6 +1870,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+//		{
+//			final Label label = new Label(container, SWT.NONE);
+//			GridDataFactory.fillDefaults().grab(true, true).align(SWT.CENTER, SWT.CENTER).applyTo(label);
+//			label.setText("TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST TEST ");
+//		}
 
 		return container;
 	}
@@ -3446,11 +3475,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private void onBrowser_Completed(final ProgressEvent event) {
 
-		if (_isInUIStartup = true) {
+		if (_isInUIStartup) {
+
+			_isInUIStartup = false;
 
 			_topPageBook.showPage(_topPage_Dashboard);
 
 			_browser.setRedraw(true);
+
+			_browser.setFocus();
 		}
 
 		if (_isDeviceStateUpdateDelayed.getAndSet(false)) {
@@ -3458,6 +3491,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 
 		_isBrowserCompleted = true;
+
 	}
 
 	private void onBrowser_LocationChanging(final LocationEvent event) {
@@ -4136,9 +4170,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 							// check if anything should be watched
 							if (importConfig.isWatchAnything()) {
 
-								final boolean isCheckFiles = _isInUIStartup;
+								final boolean isCheckFiles = _isInWatchingStartup;
 
-								_isInUIStartup = false;
+								_isInWatchingStartup = false;
 
 								final DeviceImportState importState = EasyImportManager.getInstance()//
 										.checkImportedFiles(isCheckFiles);
@@ -4196,7 +4230,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 						if (_watchingStoresThread.isAlive()) {
 
-							// thread is still allive
+							// thread is still alive
 
 							_watchingStoresThread.interrupt();
 
@@ -4365,7 +4399,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		} else {
 
 			/*
-			 * Run async that the first page in the top pagebook is visible and to prevent
+			 * !!! Run async that the first page in the top pagebook is visible and to prevent
 			 * flickering when the view toolbar is first drawn on the left side of the view !!!
 			 */
 
@@ -4373,15 +4407,17 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				@Override
 				public void run() {
 
+					_topPageBook.showPage(_topPage_Dashboard);
+
 					if (_isInUIStartup) {
 
 						// show dashboard without folder state
 						_isUpdateFolderState = false;
+
 						updateUI_Dashboard();
 
 					} else {
 
-						_topPageBook.showPage(_topPage_Dashboard);
 					}
 
 					if (_browser != null) {
@@ -4392,8 +4428,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 							// this occured when testing very fast by open/close the import view
 							return;
 						}
-
-						_browser.setFocus();
 
 						thread_FolderWatcher_Activate();
 

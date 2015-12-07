@@ -120,7 +120,6 @@ public class Messages extends NLS {
 	public static String		Dialog_ImportConfig_Checkbox_CreateBackup;
 	public static String		Dialog_ImportConfig_Checkbox_CreateBackup_Tooltip;
 	public static String		Dialog_ImportConfig_Checkbox_DeviceWatching;
-	public static String		Dialog_ImportConfig_Checkbox_DeviceWatching_Tooltip;
 	public static String		Dialog_ImportConfig_Checkbox_ImportFiles;
 	public static String		Dialog_ImportConfig_Checkbox_LastMarker;
 	public static String		Dialog_ImportConfig_Checkbox_LastMarker_Tooltip;
@@ -149,14 +148,12 @@ public class Messages extends NLS {
 	public static String		Dialog_ImportConfig_Dialog_Title;
 	public static String		Dialog_ImportConfig_Error_FolderIsInvalid;
 	public static String		Dialog_ImportConfig_Group_Dashboard;
-	public static String		Dialog_ImportConfig_Group_ImportActions;
 	public static String		Dialog_ImportConfig_Group_ImportActions_I;
 	public static String		Dialog_ImportConfig_Group_ImportActions_III;
 	public static String		Dialog_ImportConfig_Group_ImportLauncher;
 	public static String		Dialog_ImportConfig_Group_ImportLauncherConfig;
 	public static String		Dialog_ImportConfig_Info_ConfigDragDrop;
 	public static String		Dialog_ImportConfig_Info_ImportActions_II;
-	public static String		Dialog_ImportConfig_Info_MoreImportActions;
 	public static String		Dialog_ImportConfig_Info_NoDeviceName;
 	public static String		Dialog_ImportConfig_Info_RetrievingVolumeInfo;
 	public static String		Dialog_ImportConfig_Label_AnimationCrazyFactor;
@@ -763,9 +760,7 @@ public class Messages extends NLS {
 	public static String		Image__PulseZones_Disabled;
 	public static String		Image__quick_edit;
 	public static String		Image__RawData_Device_TurnOff;
-	public static String		Image__RawData_Device_TurnOff_Disabled;
 	public static String		Image__RawData_Device_TurnOn;
-	public static String		Image__RawData_Device_TurnOn_Disabled;
 	public static String		Image__RawData_DeviceFolder;
 	public static String		Image__RawData_DeviceFolder_NotChecked;
 	public static String		Image__RawData_DeviceFolder_NotDefined;
@@ -907,6 +902,8 @@ public class Messages extends NLS {
 	public static String		Import_Data_HTML_Title_Backup;
 	public static String		Import_Data_HTML_Title_Device;
 	public static String		Import_Data_HTML_WatchingIsOff;
+	public static String		Import_Data_HTML_WatchingOff;
+	public static String		Import_Data_HTML_WatchingOn;
 	public static String		Import_Data_Dialog_EasyImport_NoImportFiles_Message;
 	public static String		Import_Data_Monitor_Backup;
 	public static String		Import_Data_Monitor_Backup_SubTask;

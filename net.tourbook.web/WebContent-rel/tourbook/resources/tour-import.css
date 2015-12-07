@@ -189,6 +189,15 @@ a.import-tile:FOCUS .import-tile-name
 	background-position:	center;
 }
 
+.action-button-25
+{
+	width: 					25px; 
+	height: 				25px; 
+
+	background-repeat:		no-repeat;
+	background-position:	center;
+}
+
 .action-button
 {
 	width: 					100%; 
@@ -230,12 +239,16 @@ a.action-button:VISITED
 
 	background-repeat:		no-repeat;
 	background-position:	center;
+
+	/* this IS VERY TRICKY to have a bottom padding that hovering shows the tooltip and that the bg image is correctly displayed */
+    padding-bottom:			10px;
+    background-position-y:	0px;
 }
 
 .stateIconValue
 {
 	position:				absolute;
-	bottom:					3px;
+	bottom:					13px;
 	width: 					100%; 
 	text-align: 			center;
 }
