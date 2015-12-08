@@ -238,11 +238,10 @@ a.action-button:VISITED
 	height: 				100%; 
 
 	background-repeat:		no-repeat;
-	background-position:	center;
 
 	/* this IS VERY TRICKY to have a bottom padding that hovering shows the tooltip and that the bg image is correctly displayed */
     padding-bottom:			10px;
-    background-position-y:	0px;
+    xbackground-position-y:	0px;  /* this do not work in firefox */
 }
 
 .stateIconValue
