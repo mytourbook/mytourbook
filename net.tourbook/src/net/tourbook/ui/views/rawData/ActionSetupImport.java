@@ -36,7 +36,7 @@ public class ActionSetupImport extends Action {
 
 	@Override
 	public void run() {
-		_rawDataView.actionSetupEasyImport();
+		_rawDataView.action_Easy_SetupImport();
 	}
 
 }
