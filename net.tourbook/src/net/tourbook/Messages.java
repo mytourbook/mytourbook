@@ -764,6 +764,8 @@ public class Messages extends NLS {
 	public static String		Image__RawData_DeviceFolder;
 	public static String		Image__RawData_DeviceFolder_NotChecked;
 	public static String		Image__RawData_DeviceFolder_NotDefined;
+
+	public static String	Image__RawData_DeviceFolder_NotSetup;
 	public static String		Image__RawData_DeviceFolderDisabled;
 	public static String		Image__RawData_Import;
 	public static String		Image__RawData_Transfer;
@@ -892,6 +894,7 @@ public class Messages extends NLS {
 	public static String		Import_Data_HTML_LastMarker_No;
 	public static String		Import_Data_HTML_LastMarker_Yes;
 	public static String		Import_Data_HTML_NotBackedUpFiles;
+	public static String		Import_Data_HTML_NothingIsWatched;
 	public static String		Import_Data_HTML_NotImportedFiles;
 	public static String		Import_Data_HTML_ReceiveFromSerialPort_ConfiguredAction;
 	public static String		Import_Data_HTML_ReceiveFromSerialPort_ConfiguredLink;

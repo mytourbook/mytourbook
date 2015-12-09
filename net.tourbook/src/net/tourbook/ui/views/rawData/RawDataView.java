@@ -342,6 +342,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private String							_imageUrl_DeviceFolder_Disabled;
 	private String							_imageUrl_DeviceFolder_NotAvailable;
 	private String							_imageUrl_DeviceFolder_NotChecked;
+	private String							_imageUrl_DeviceFolder_NotSetup;
 	private String							_imageUrl_ImportFromFile;
 	private String							_imageUrl_SerialPort_Configured;
 	private String							_imageUrl_SerialPort_Directly;
@@ -1236,10 +1237,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private String createHTML_DeviceState() {
 
-		final ImportConfig importConfig = getImportConfig();
+		final String hrefSetupAction = HTTP_DUMMY + HREF_ACTION_SETUP_EASY_IMPORT;
 
+		final ImportConfig importConfig = getImportConfig();
 		String html = null;
-		final String hrefAction = HTTP_DUMMY + HREF_ACTION_SETUP_EASY_IMPORT;
+
+		final boolean isWatchAnything = importConfig.isWatchAnything();
 
 		if (!isWatchingOn()) {
 
@@ -1261,145 +1264,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 					+ "</a>"; //$NON-NLS-1$
 
-		} else if (_isDeviceStateValid) {
+		} else if (isWatchAnything && _isDeviceStateValid) {
 
-			final int numDeviceFiles = importConfig.numDeviceFiles;
-			final String deviceOSFolder = importConfig.getDeviceOSFolder();
-			final boolean isDeviceFolderOK = isOSFolderValid(deviceOSFolder);
-			boolean isFolderOK = true;
-
-			final StringBuilder sb = new StringBuilder();
-			sb.append("<table><tbody>"); //$NON-NLS-1$
-
-			/*
-			 * Backup folder
-			 */
-			final boolean isCreateBackup = importConfig.isCreateBackup;
-			if (isCreateBackup) {
-
-				final String htmlBackupFolder = importConfig.getBackupFolder().replace(//
-						UI.SYMBOL_BACKSLASH,
-						UI.SYMBOL_HTML_BACKSLASH);
-
-				// check OS folder
-				final String backupOSFolder = importConfig.getBackupOSFolder();
-				final boolean isBackupFolderOK = isOSFolderValid(backupOSFolder);
-				isFolderOK &= isBackupFolderOK;
-
-				final String folderTitle = Messages.Import_Data_HTML_Title_Backup;
-				String folderInfo = null;
-
-				/*
-				 * Show back folder info only when device folder is OK because they are related
-				 * together.
-				 */
-				if (isDeviceFolderOK) {
-
-					final int numNotBackedUpFiles = importConfig.notBackedUpFiles.size();
-
-					folderInfo = numNotBackedUpFiles == 0 //
-							? NLS.bind(Messages.Import_Data_HTML_AllFilesAreBackedUp, numDeviceFiles)
-							: NLS.bind(Messages.Import_Data_HTML_NotBackedUpFiles, numNotBackedUpFiles, numDeviceFiles);
-
-				}
-
-				createHTML_FolderState(//
-						sb,
-						htmlBackupFolder,
-						isBackupFolderOK,
-						false,
-						folderTitle,
-						folderInfo);
-			}
-
-			/*
-			 * Device folder
-			 */
-			final ArrayList<OSFile> notImportedFiles = importConfig.notImportedFiles;
-			final int numNotImportedFiles = notImportedFiles.size();
-			{
-				final String htmlDeviceFolder = importConfig.getDeviceFolder().replace(//
-						UI.SYMBOL_BACKSLASH,
-						UI.SYMBOL_HTML_BACKSLASH);
-
-				final boolean isTopMargin = importConfig.isCreateBackup;
-
-				final String folderTitle = Messages.Import_Data_HTML_Title_Device;
-
-				final String folderInfo = numNotImportedFiles == 0 //
-						? NLS.bind(Messages.Import_Data_HTML_AllFilesAreImported, numDeviceFiles)
-						: NLS.bind(Messages.Import_Data_HTML_NotImportedFiles, numNotImportedFiles, numDeviceFiles);
-
-				createHTML_FolderState(//
-						sb,
-						htmlDeviceFolder,
-						isDeviceFolderOK,
-						isTopMargin,
-						folderTitle,
-						folderInfo);
-
-				isFolderOK &= isDeviceFolderOK;
-			}
-
-			/*
-			 * 100. Turn off device watching
-			 */
-			{
-				final boolean isWatchingOff = importConfig.isTurnOffWatching;
-
-				final String watchingText = isWatchingOff
-						? Messages.Import_Data_HTML_WatchingOff
-						: Messages.Import_Data_HTML_WatchingOn;
-
-				// shwo red image when off
-				final String imageUrl = isWatchingOff //
-						? _imageUrl_Device_TurnOff
-						: _imageUrl_Device_TurnOn;
-
-				final String onOffImage = createHTML_BgImage(imageUrl);
-
-				sb.append("<tr>"); //$NON-NLS-1$
-				sb.append("<td><div class='action-button-25' style='padding-top:10px; " + onOffImage + "'></div></td>"); //$NON-NLS-1$ //$NON-NLS-2$
-				sb.append("<td class='folderInfo' style='padding-top:10px;'>" + watchingText + "</td>"); //$NON-NLS-1$ //$NON-NLS-2$
-				sb.append("</tr>"); //$NON-NLS-1$
-			}
-
-			sb.append("</tbody></table>"); //$NON-NLS-1$
-
-			// create html list with not imported files
-			if (numNotImportedFiles > 0) {
-				createHTML_NotImportedFiles(sb, notImportedFiles);
-			}
-
-			final String htmlTooltip = sb.toString();
-
-			/*
-			 * All states
-			 */
-			final String imageUrl = isFolderOK ? _imageUrl_DeviceFolder_OK : _imageUrl_DeviceFolder_NotAvailable;
-			final String stateImage = createHTML_BgImageStyle(imageUrl);
-			final String stateIconValue = isDeviceFolderOK ? Integer.toString(numNotImportedFiles) : UI.EMPTY_STRING;
-
-			/*
-			 * Show overflow scrollbar ONLY when more than 10 entries are available because it looks
-			 * ugly.
-			 */
-			final String cssOverflow = numNotImportedFiles > 10 //
-					? "style='overflow-y: scroll;'" //$NON-NLS-1$
-					: UI.EMPTY_STRING;
-
-			html = ""// //$NON-NLS-1$
-
-					+ "<a class='importState dash-action'" // //$NON-NLS-1$
-					+ (" href='" + hrefAction + "'") //$NON-NLS-1$ //$NON-NLS-2$
-					+ ">" //$NON-NLS-1$
-
-					+ ("<div class='stateIcon' " + stateImage + ">") //$NON-NLS-1$ //$NON-NLS-2$
-					+ ("   <div class='stateIconValue'>" + stateIconValue + "</div>") //$NON-NLS-1$ //$NON-NLS-2$
-					+ ("</div>") //$NON-NLS-1$
-					+ ("<div class='stateTooltip' " + cssOverflow + ">" + htmlTooltip + "</div>") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-
-					+ "</a>"; //$NON-NLS-1$
+			html = createHTML_DeviceState_IsValid(importConfig, hrefSetupAction);
 
 		} else {
 
@@ -1408,14 +1275,18 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			 * background thread, if not, it is blocking the UI !!!
 			 */
 
-			final String stateImage = createHTML_BgImageStyle(_imageUrl_DeviceFolder_NotChecked);
+			final String stateImage = createHTML_BgImageStyle(isWatchAnything
+					? _imageUrl_DeviceFolder_NotChecked
+					: _imageUrl_DeviceFolder_NotSetup);
 
-			final String htmlTooltip = Messages.Import_Data_HTML_AcquireDeviceInfo;
+			final String htmlTooltip = isWatchAnything
+					? Messages.Import_Data_HTML_AcquireDeviceInfo
+					: Messages.Import_Data_HTML_NothingIsWatched;
 
 			html = ""// //$NON-NLS-1$
 
 					+ "<a class='importState dash-action'" // //$NON-NLS-1$
-					+ (" href='" + hrefAction + "'") //$NON-NLS-1$ //$NON-NLS-2$
+					+ (" href='" + hrefSetupAction + "'") //$NON-NLS-1$ //$NON-NLS-2$
 					+ ">" //$NON-NLS-1$
 
 					+ ("<div class='stateIcon' " + stateImage + ">") //$NON-NLS-1$ //$NON-NLS-2$
@@ -1429,6 +1300,149 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		return html;
 	}
 
+	private String createHTML_DeviceState_IsValid(final ImportConfig importConfig, final String hrefAction) {
+
+		final int numDeviceFiles = importConfig.numDeviceFiles;
+		final String deviceOSFolder = importConfig.getDeviceOSFolder();
+		final boolean isDeviceFolderOK = isOSFolderValid(deviceOSFolder);
+		boolean isFolderOK = true;
+
+		final StringBuilder sb = new StringBuilder();
+		sb.append("<table><tbody>"); //$NON-NLS-1$
+
+		/*
+		 * Backup folder
+		 */
+		final boolean isCreateBackup = importConfig.isCreateBackup;
+		if (isCreateBackup) {
+
+			final String htmlBackupFolder = importConfig.getBackupFolder().replace(//
+					UI.SYMBOL_BACKSLASH,
+					UI.SYMBOL_HTML_BACKSLASH);
+
+			// check OS folder
+			final String backupOSFolder = importConfig.getBackupOSFolder();
+			final boolean isBackupFolderOK = isOSFolderValid(backupOSFolder);
+			isFolderOK &= isBackupFolderOK;
+
+			final String folderTitle = Messages.Import_Data_HTML_Title_Backup;
+			String folderInfo = null;
+
+			/*
+			 * Show back folder info only when device folder is OK because they are related
+			 * together.
+			 */
+			if (isDeviceFolderOK) {
+
+				final int numNotBackedUpFiles = importConfig.notBackedUpFiles.size();
+
+				folderInfo = numNotBackedUpFiles == 0 //
+						? NLS.bind(Messages.Import_Data_HTML_AllFilesAreBackedUp, numDeviceFiles)
+						: NLS.bind(Messages.Import_Data_HTML_NotBackedUpFiles, numNotBackedUpFiles, numDeviceFiles);
+
+			}
+
+			createHTML_FolderState(//
+					sb,
+					htmlBackupFolder,
+					isBackupFolderOK,
+					false,
+					folderTitle,
+					folderInfo);
+		}
+
+		/*
+		 * Device folder
+		 */
+		final ArrayList<OSFile> notImportedFiles = importConfig.notImportedFiles;
+		final int numNotImportedFiles = notImportedFiles.size();
+		{
+			final String htmlDeviceFolder = importConfig.getDeviceFolder().replace(//
+					UI.SYMBOL_BACKSLASH,
+					UI.SYMBOL_HTML_BACKSLASH);
+
+			final boolean isTopMargin = importConfig.isCreateBackup;
+
+			final String folderTitle = Messages.Import_Data_HTML_Title_Device;
+
+			final String folderInfo = numNotImportedFiles == 0 //
+					? NLS.bind(Messages.Import_Data_HTML_AllFilesAreImported, numDeviceFiles)
+					: NLS.bind(Messages.Import_Data_HTML_NotImportedFiles, numNotImportedFiles, numDeviceFiles);
+
+			createHTML_FolderState(//
+					sb,
+					htmlDeviceFolder,
+					isDeviceFolderOK,
+					isTopMargin,
+					folderTitle,
+					folderInfo);
+
+			isFolderOK &= isDeviceFolderOK;
+		}
+
+		/*
+		 * 100. Turn off device watching
+		 */
+		{
+			final boolean isWatchingOff = importConfig.isTurnOffWatching;
+
+			final String watchingText = isWatchingOff
+					? Messages.Import_Data_HTML_WatchingOff
+					: Messages.Import_Data_HTML_WatchingOn;
+
+			// shwo red image when off
+			final String imageUrl = isWatchingOff //
+					? _imageUrl_Device_TurnOff
+					: _imageUrl_Device_TurnOn;
+
+			final String onOffImage = createHTML_BgImage(imageUrl);
+
+			sb.append("<tr>"); //$NON-NLS-1$
+			sb.append("<td><div class='action-button-25' style='padding-top:10px; " + onOffImage + "'></div></td>"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append("<td class='folderInfo' style='padding-top:10px;'>" + watchingText + "</td>"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append("</tr>"); //$NON-NLS-1$
+		}
+
+		sb.append("</tbody></table>"); //$NON-NLS-1$
+
+		// create html list with not imported files
+		if (numNotImportedFiles > 0) {
+			createHTML_NotImportedFiles(sb, notImportedFiles);
+		}
+
+		final String htmlTooltip = sb.toString();
+
+		/*
+		 * All states
+		 */
+		final String imageUrl = isFolderOK ? _imageUrl_DeviceFolder_OK : _imageUrl_DeviceFolder_NotAvailable;
+		final String stateImage = createHTML_BgImageStyle(imageUrl);
+		final String stateIconValue = isDeviceFolderOK ? Integer.toString(numNotImportedFiles) : UI.EMPTY_STRING;
+
+		/*
+		 * Show overflow scrollbar ONLY when more than 10 entries are available because it looks
+		 * ugly.
+		 */
+		final String cssOverflow = numNotImportedFiles > 10 //
+				? "style='overflow-y: scroll;'" //$NON-NLS-1$
+				: UI.EMPTY_STRING;
+
+		final String html = ""// //$NON-NLS-1$
+
+				+ "<a class='importState dash-action'" // //$NON-NLS-1$
+				+ (" href='" + hrefAction + "'") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ">" //$NON-NLS-1$
+
+				+ ("<div class='stateIcon' " + stateImage + ">") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("   <div class='stateIconValue'>" + stateIconValue + "</div>") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("</div>") //$NON-NLS-1$
+				+ ("<div class='stateTooltip' " + cssOverflow + ">" + htmlTooltip + "</div>") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+				+ "</a>"; //$NON-NLS-1$
+
+		return html;
+	}
+
 	private String createHTML_DeviceState_OnOff() {
 
 		final boolean isWatchingOn = isWatchingOn();
@@ -1437,7 +1451,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				? Messages.Import_Data_HTML_DeviceOff_Tooltip
 				: Messages.Import_Data_HTML_DeviceOn_Tooltip;
 
-		tooltip = tooltip.replace("\n", "\\n");
+		tooltip = replaceNewLine(tooltip);
 
 		// shwo red image when off
 		final String imageUrl = isWatchingOn //
@@ -1826,6 +1840,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			_imageUrl_DeviceFolder_Disabled = getIconUrl(Messages.Image__RawData_DeviceFolderDisabled);
 			_imageUrl_DeviceFolder_NotAvailable = getIconUrl(Messages.Image__RawData_DeviceFolder_NotDefined);
 			_imageUrl_DeviceFolder_NotChecked = getIconUrl(Messages.Image__RawData_DeviceFolder_NotChecked);
+			_imageUrl_DeviceFolder_NotSetup = getIconUrl(Messages.Image__RawData_DeviceFolder_NotSetup);
 
 		} catch (final IOException | URISyntaxException e) {
 			StatusUtil.showStatus(e);
@@ -3483,7 +3498,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 
 		if (_isDeviceStateUpdateDelayed.getAndSet(false)) {
-			updateDOM_DeviceState();
+			updateUI_DeviceState_DOM();
 		}
 	}
 
@@ -3770,6 +3785,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				tourData.isTourDeleted = true;
 			}
 		}
+	}
+
+	private String replaceNewLine(final String text) {
+		return text.replace("\n", "\\n"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	private void restoreState() {
@@ -4245,26 +4264,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_watchingStoresThread.start();
 	}
 
-	private void updateDOM_DeviceState() {
-
-		final String htmlDeviceState = createHTML_DeviceState();
-		final String jsDeviceState = htmlDeviceState.replace("\"", "\\\""); //$NON-NLS-1$ //$NON-NLS-2$
-
-		final String htmlDeviceOnOff = createHTML_DeviceState_OnOff();
-		final String jsDeviceOnOff = htmlDeviceOnOff.replace("\"", "\\\""); //$NON-NLS-1$ //$NON-NLS-2$
-
-		final String js = "\n" //$NON-NLS-1$
-
-				+ ("var htmlDeviceState =\"" + jsDeviceState + "\";\n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("document.getElementById(\"" + DOM_ID_DEVICE_STATE + "\").innerHTML = htmlDeviceState;\n") //$NON-NLS-1$ //$NON-NLS-2$
-
-				+ ("var htmlDeviceOnOff=\"" + jsDeviceOnOff + "\";\n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("document.getElementById(\"" + DOM_ID_DEVICE_ON_OFF + "\").innerHTML = htmlDeviceOnOff;\n") //$NON-NLS-1$ //$NON-NLS-2$
-		;
-
-		_browser.execute(js);
-	}
-
 	/**
 	 * Keep none live values.
 	 */
@@ -4401,12 +4400,40 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				}
 
 				if (_isBrowserCompleted) {
-					updateDOM_DeviceState();
+					updateUI_DeviceState_DOM();
 				} else {
 					_isDeviceStateUpdateDelayed.set(true);
 				}
 			}
 		});
+	}
+
+	private void updateUI_DeviceState_DOM() {
+
+		final String htmlDeviceOnOff = createHTML_DeviceState_OnOff();
+		String jsDeviceOnOff = htmlDeviceOnOff.replace("\"", "\\\""); //$NON-NLS-1$ //$NON-NLS-2$
+		jsDeviceOnOff = replaceNewLine(jsDeviceOnOff);
+
+		final String htmlDeviceState = createHTML_DeviceState();
+		String jsDeviceState = htmlDeviceState.replace("\"", "\\\""); //$NON-NLS-1$ //$NON-NLS-2$
+		jsDeviceState = replaceNewLine(jsDeviceState);
+
+		final String js = "\n" //$NON-NLS-1$
+
+				+ ("var htmlDeviceOnOff=\"" + jsDeviceOnOff + "\";\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("document.getElementById(\"" + DOM_ID_DEVICE_ON_OFF + "\").innerHTML = htmlDeviceOnOff;\n") //$NON-NLS-1$ //$NON-NLS-2$
+
+				+ ("var htmlDeviceState =\"" + jsDeviceState + "\";\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("document.getElementById(\"" + DOM_ID_DEVICE_STATE + "\").innerHTML = htmlDeviceState;\n") //$NON-NLS-1$ //$NON-NLS-2$
+		;
+
+		final boolean isSuccess = _browser.execute(js);
+
+		if (!isSuccess) {
+			System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //$NON-NLS-1$ //$NON-NLS-2$
+					+ ("\tupdateDOM_DeviceState: " + isSuccess + js)); //$NON-NLS-1$
+			// TODO remove SYSTEM.OUT.PRINTLN
+		}
 	}
 
 	private void updateUI_WatcherAnimation(final String domClassState) {
