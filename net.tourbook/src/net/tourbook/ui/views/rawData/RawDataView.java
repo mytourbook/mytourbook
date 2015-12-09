@@ -1358,11 +1358,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 						? _imageUrl_Device_TurnOff
 						: _imageUrl_Device_TurnOn;
 
-				final String onOffImage = createHTML_BgImageStyle(imageUrl);
+				final String onOffImage = createHTML_BgImage(imageUrl);
 
 				sb.append("<tr>"); //$NON-NLS-1$
-				sb.append("<td><div class='action-button-25' " + onOffImage + "></div></td>"); //$NON-NLS-1$ //$NON-NLS-2$
-				sb.append("<td class='folderInfo'>" + watchingText + "</td>"); //$NON-NLS-1$ //$NON-NLS-2$
+				sb.append("<td><div class='action-button-25' style='padding-top:10px; " + onOffImage + "'></div></td>"); //$NON-NLS-1$ //$NON-NLS-2$
+				sb.append("<td class='folderInfo' style='padding-top:10px;'>" + watchingText + "</td>"); //$NON-NLS-1$ //$NON-NLS-2$
 				sb.append("</tr>"); //$NON-NLS-1$
 			}
 

@@ -68,7 +68,7 @@ a.import-tile:HOVER:FOCUS,
 }
 
 /*
-	State tooltip animation, AnimationOff IS NOT WORKING only AnimationOn
+	State tooltip animation, !!! AnimationOff IS NOT WORKING only AnimationOn !!!
 */
 .importState	.stateTooltip
 {
@@ -88,7 +88,7 @@ a.import-tile:HOVER:FOCUS,
 .importState:FOCUS	.stateTooltip
 {
 	animation:					stateTooltipAnimationOn;
-	animation-duration:			1.0s;
+	animation-duration:			0.5s;
 	animation-timing-function:	ease;
 }
 @keyframes stateTooltipAnimationOn
