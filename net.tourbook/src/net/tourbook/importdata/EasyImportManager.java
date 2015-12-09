@@ -691,7 +691,7 @@ public class EasyImportManager {
 		/*
 		 * Update tour data.
 		 */
-		runImport_SetPathAndTourType(importLauncher, importState);
+		runImport_UpdateTourData(importLauncher, importState);
 
 		return importState;
 	}
@@ -763,7 +763,7 @@ public class EasyImportManager {
 		return isCanceled[0];
 	}
 
-	private void runImport_SetPathAndTourType(final ImportLauncher importLauncher, final ImportDeviceState importState) {
+	private void runImport_UpdateTourData(final ImportLauncher importLauncher, final ImportDeviceState importState) {
 
 		final HashMap<Long, TourData> importedTours = RawDataManager.getInstance().getImportedTours();
 
@@ -779,8 +779,20 @@ public class EasyImportManager {
 
 			final TourData tourData = entry.getValue();
 
+			if (tourData.getTourPerson() != null) {
+
+				/*
+				 * Do not change already saved tours. This case can occure when the device is not
+				 * watched any more but an import launcher is still startet.
+				 */
+
+				continue;
+			}
+
+			// set tour type
 			setTourType(tourData, importLauncher);
 
+			// set import path
 			if (importConfig.isCreateBackup) {
 
 				// use backup folder as import folder and not the device folder

@@ -565,9 +565,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			updateModel_ImportConfig_LiveUpdate(_dialogImportConfig, false);
 			updateModel_ImportConfig_AndSave(_dialogImportConfig);
 
-			if (isWatchingOn()) {
-				updateUI_2_Dashboard();
-			}
+			updateUI_2_Dashboard();
 		}
 
 		_dialogImportConfig = null;
