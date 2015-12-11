@@ -22,7 +22,6 @@ public class OSFile {
 	public Path		path;
 
 	public String	fileName;
-
 	public long		size;
 	public long		modifiedTime;
 

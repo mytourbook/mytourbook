@@ -209,6 +209,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	 */
 	private static final String				HTTP_DUMMY									= "http://dummy";							//$NON-NLS-1$
 
+	private static final String				HTML_STYLE_TITLE_VERTICAL_PADDING			= "style='padding-top:10px;'";				//$NON-NLS-1$
+
 	private static String					ACTION_DEVICE_IMPORT						= "DeviceImport";							//$NON-NLS-1$
 	private static String					ACTION_DEVICE_WATCHING_ON_OFF				= "DeviceOnOff";							//$NON-NLS-1$
 	private static final String				ACTION_IMPORT_FROM_FILES					= "ImportFromFiles";						//$NON-NLS-1$
@@ -566,6 +568,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			updateModel_ImportConfig_LiveUpdate(_dialogImportConfig, false);
 			updateModel_ImportConfig_AndSave(_dialogImportConfig);
 
+			_isDeviceStateValid = false;
 			updateUI_2_Dashboard();
 		}
 
@@ -1381,6 +1384,20 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 
 		/*
+		 * Device files
+		 */
+		String deviceFiles = importConfig.deviceFiles;
+		if (importConfig.deviceFiles.trim().length() == 0) {
+			deviceFiles = ImportConfig.DEVICE_FILES_DEFAULT;
+		}
+
+		sb.append("<tr>"); //$NON-NLS-1$
+		sb
+				.append("<td " + HTML_STYLE_TITLE_VERTICAL_PADDING + " class='folderTitle'>" + Messages.Import_Data_HTML_Title_Files + "</td>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		sb.append("<td " + HTML_STYLE_TITLE_VERTICAL_PADDING + " class='folderLocation'>" + deviceFiles + "</td>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		sb.append("</tr>"); //$NON-NLS-1$
+
+		/*
 		 * 100. Turn off device watching
 		 */
 		{
@@ -1507,7 +1524,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 
 		final String paddingTop = isTopMargin //
-				? "style='padding-top:10px;'" //$NON-NLS-1$
+				? HTML_STYLE_TITLE_VERTICAL_PADDING
 				: UI.EMPTY_STRING;
 
 		final String imageUrl = isOSFolderValid ? _imageUrl_State_OK : _imageUrl_State_Error;
@@ -4276,6 +4293,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		importConfig.isLastLauncherRemoved = modifiedConfig.isLastLauncherRemoved;
 		importConfig.isTurnOffWatching = modifiedConfig.isTurnOffWatching;
 
+		importConfig.deviceFiles = modifiedConfig.deviceFiles;
 		importConfig.setBackupFolder(modifiedConfig.getBackupFolder());
 		importConfig.setDeviceFolder(modifiedConfig.getDeviceFolder());
 

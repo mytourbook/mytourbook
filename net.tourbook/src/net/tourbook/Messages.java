@@ -168,6 +168,10 @@ public class Messages extends NLS {
 	public static String		Dialog_ImportConfig_Label_ConfigName;
 	public static String		Dialog_ImportConfig_Label_ConfigTileSize;
 	public static String		Dialog_ImportConfig_Label_ConfigTileSize_Tooltip;
+	public static String	Dialog_ImportConfig_Label_DeviceFiles;
+
+	public static String	Dialog_ImportConfig_Label_DeviceFiles_Tooltip;
+
 	public static String		Dialog_ImportConfig_Label_DeviceFolder;
 	public static String		Dialog_ImportConfig_Label_DeviceFolder_Tooltip;
 	public static String		Dialog_ImportConfig_Label_ImportColumns;
@@ -904,6 +908,8 @@ public class Messages extends NLS {
 	public static String		Import_Data_HTML_SaveTour_Yes;
 	public static String		Import_Data_HTML_Title_Backup;
 	public static String		Import_Data_HTML_Title_Device;
+
+	public static String	Import_Data_HTML_Title_Files;
 	public static String		Import_Data_HTML_WatchingIsOff;
 	public static String		Import_Data_HTML_WatchingOff;
 	public static String		Import_Data_HTML_WatchingOn;

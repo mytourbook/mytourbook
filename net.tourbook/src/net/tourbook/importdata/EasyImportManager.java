@@ -75,6 +75,7 @@ public class EasyImportManager {
 	//
 	private static final String			ATTR_AVG_SPEED						= "avgSpeed";									//$NON-NLS-1$
 	private static final String			ATTR_BACKUP_FOLDER					= "backupFolder";								//$NON-NLS-1$
+	private static final String			ATTR_DEVICE_FILES					= "deviceFiles";								//$NON-NLS-1$
 	private static final String			ATTR_DEVICE_FOLDER					= "deviceFolder";								//$NON-NLS-1$
 	private static final String			ATTR_IS_CREATE_BACKUP				= "isCreateBackup";							//$NON-NLS-1$
 	private static final String			ATTR_IS_LAST_LAUNCHER_REMOVED		= "isLastLauncherRemoved";						//$NON-NLS-1$
@@ -304,7 +305,7 @@ public class EasyImportManager {
 		/*
 		 * Get device files
 		 */
-		final List<OSFile> existingDeviceFiles = getOSFiles(importConfig.getDeviceOSFolder());
+		final List<OSFile> existingDeviceFiles = getOSFiles(importConfig.getDeviceOSFolder(), importConfig.deviceFiles);
 		importConfig.numDeviceFiles = existingDeviceFiles.size();
 
 		/*
@@ -348,7 +349,7 @@ public class EasyImportManager {
 		});
 	}
 
-	private List<OSFile> getOSFiles(final String folder) {
+	private List<OSFile> getOSFiles(final String folder, final String deviceFiles) {
 
 		final List<OSFile> osFiles = new ArrayList<>();
 
@@ -357,7 +358,14 @@ public class EasyImportManager {
 			return osFiles;
 		}
 
-		try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(validPath)) {
+
+		String globPattern = deviceFiles.trim();
+
+		if (globPattern.length() == 0) {
+			globPattern = ImportConfig.DEVICE_FILES_DEFAULT;
+		}
+
+		try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(validPath, globPattern)) {
 
 			for (final Path path : directoryStream) {
 
@@ -515,6 +523,7 @@ public class EasyImportManager {
 		importConfig.isLiveUpdate = Util.getXmlBoolean(xmlMemento, ATTR_DASH_IS_LIVE_UPDATE, true);
 		importConfig.isTurnOffWatching = Util.getXmlBoolean(xmlMemento, ATTR_IS_TURN_OFF_WATCHING, false);
 
+		importConfig.deviceFiles = Util.getXmlString(xmlMemento, ATTR_DEVICE_FILES, ImportConfig.DEVICE_FILES_DEFAULT);
 		importConfig.setBackupFolder(Util.getXmlString(xmlMemento, ATTR_BACKUP_FOLDER, UI.EMPTY_STRING));
 		importConfig.setDeviceFolder(Util.getXmlString(xmlMemento, ATTR_DEVICE_FOLDER, UI.EMPTY_STRING));
 
@@ -842,6 +851,7 @@ public class EasyImportManager {
 		xmlMemento.putInteger(ATTR_DASH_NUM_UI_COLUMNS, importConfig.numHorizontalTiles);
 		xmlMemento.putInteger(ATTR_DASH_TILE_SIZE, importConfig.tileSize);
 
+		xmlMemento.putString(ATTR_DEVICE_FILES, importConfig.deviceFiles);
 		xmlMemento.putString(ATTR_BACKUP_FOLDER, importConfig.getBackupFolder());
 		xmlMemento.putString(ATTR_DEVICE_FOLDER, importConfig.getDeviceFolder());
 

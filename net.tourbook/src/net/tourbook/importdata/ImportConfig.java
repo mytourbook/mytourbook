@@ -50,10 +50,13 @@ public class ImportConfig {
 	static final int					TOUR_TYPE_AVG_SPEED_MAX				= 3000;
 	static final int					TOUR_TYPE_AVG_SPEED_DEFAULT			= 0;
 
+	public static final String			DEVICE_FILES_DEFAULT				= "*";									//$NON-NLS-1$
+
 	public boolean						isLiveUpdate						= true;
 
 	private String						_backupFolder						= UI.EMPTY_STRING;
 	private String						_deviceFolder						= UI.EMPTY_STRING;
+	public String						deviceFiles							= DEVICE_FILES_DEFAULT;
 
 	/** When <code>true</code> then a backup of the tour file is done. */
 	public boolean						isCreateBackup						= true;

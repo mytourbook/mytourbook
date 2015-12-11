@@ -231,6 +231,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 
 	private Label							_lblBackupFolder;
 	private Label							_lblLocalFolderPath;
+	private Label							_lblDeviceFiles;
 	private Label							_lblDeviceFolder;
 	private Label							_lblDeviceFolderPath;
 	private Label							_lblIL_ConfigDescription;
@@ -255,6 +256,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 	private Spinner							_spinnerIL_LastMarkerDistance;
 	private Spinner[]						_spinnerTT_Speed_AvgSpeed;
 
+	private Text							_txtDeviceFiles;
 	private Text							_txtIL_ConfigDescription;
 	private Text							_txtIL_ConfigName;
 	private Text							_txtIL_LastMarker;
@@ -487,6 +489,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 		_dialogConfig.numHorizontalTiles = importConfig.numHorizontalTiles;
 		_dialogConfig.tileSize = importConfig.tileSize;
 
+		_dialogConfig.deviceFiles = importConfig.deviceFiles;
 		_dialogConfig.isCreateBackup = importConfig.isCreateBackup;
 		_dialogConfig.isLastLauncherRemoved = importConfig.isLastLauncherRemoved;
 		_dialogConfig.isTurnOffWatching = importConfig.isTurnOffWatching;
@@ -665,10 +668,10 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 		GridLayoutFactory.swtDefaults()//
 				.numColumns(2)
 				.applyTo(group);
-//		groupConfig.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+//		group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 		{
 			createUI_32_BackupFolder(group);
-			createUI_34_DeviceFolder(group);
+			createUI_34_DeviceFileFolder(group);
 		}
 	}
 
@@ -770,7 +773,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 		}
 	}
 
-	private void createUI_34_DeviceFolder(final Composite parent) {
+	private void createUI_34_DeviceFileFolder(final Composite parent) {
 
 		/*
 		 * Checkbox: Import tour files
@@ -802,9 +805,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory.fillDefaults()//
 				.numColumns(2)
-//				.extendedMargins(-CONTROL_DECORATION_WIDTH, 0, 0, 0)
 				.applyTo(container);
 		{
+
 			/*
 			 * Combo: path
 			 */
@@ -841,7 +844,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 		}
 
 		/*
-		 * Backup folder info
+		 * Device folder info
 		 */
 		{
 			// fill left column
@@ -858,6 +861,27 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 
 			_deviceHistoryItems.setControls(_comboDeviceFolder, _lblDeviceFolderPath);
 		}
+
+		/*
+		 * Label: file name
+		 */
+		_lblDeviceFiles = new Label(parent, SWT.NONE);
+		_lblDeviceFiles.setText(Messages.Dialog_ImportConfig_Label_DeviceFiles);
+		_lblDeviceFiles.setToolTipText(Messages.Dialog_ImportConfig_Label_DeviceFiles_Tooltip);
+		GridDataFactory.fillDefaults()//
+				.align(SWT.FILL, SWT.CENTER)
+				.indent(_leftPadding, 0)
+				.applyTo(_lblDeviceFiles);
+
+		/*
+		 * Text: file name
+		 */
+		_txtDeviceFiles = new Text(parent, SWT.BORDER);
+		GridDataFactory.fillDefaults()//
+//					.grab(true, false)
+				.indent(CONTROL_DECORATION_WIDTH, 0)
+				.hint(convertWidthInCharsToPixels(20), SWT.DEFAULT)
+				.applyTo(_txtDeviceFiles);
 	}
 
 	private void createUI_50_ImportLauncher(final Composite parent) {
@@ -2912,6 +2936,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 		_chkTurnOffWatching.setSelection(_dialogConfig.isTurnOffWatching);
 		_comboBackupFolder.setText(Messages.Dialog_ImportConfig_Info_RetrievingVolumeInfo);
 		_comboDeviceFolder.setText(Messages.Dialog_ImportConfig_Info_RetrievingVolumeInfo);
+		_txtDeviceFiles.setText(_dialogConfig.deviceFiles);
 
 		Display.getCurrent().asyncExec(new Runnable() {
 			@Override
@@ -2967,6 +2992,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements ITourView
 
 	private void update_Model_From_UI_Folder() {
 
+		_dialogConfig.deviceFiles = _txtDeviceFiles.getText();
 		_dialogConfig.isCreateBackup = _chkCreateBackup.getSelection();
 		_dialogConfig.isTurnOffWatching = _chkTurnOffWatching.getSelection();
 
