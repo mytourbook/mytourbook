@@ -1422,7 +1422,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		sb.append("</tbody></table>"); //$NON-NLS-1$
 
-		// create html list with not imported files
+		/*
+		 * Import files
+		 */
 		if (numNotImportedFiles > 0) {
 			createHTML_NotImportedFiles(sb, notImportedFiles);
 		}
