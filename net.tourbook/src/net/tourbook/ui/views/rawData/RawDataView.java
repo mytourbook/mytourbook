@@ -67,6 +67,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.importdata.DeviceImportState;
 import net.tourbook.importdata.DialogEasyImportConfig;
+import net.tourbook.importdata.EasyConfig;
 import net.tourbook.importdata.EasyImportManager;
 import net.tourbook.importdata.ImportConfig;
 import net.tourbook.importdata.ImportDeviceState;
@@ -334,6 +335,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private boolean							_isDeviceStateValid;
 	private boolean							_isRunDashboardAnimation					= true;
 	private boolean							_isShowWatcherAnimation;
+	private boolean							_isUpdateDeviceState;
 	//
 	private String							_cssFonts;
 	private String							_cssFromFile;
@@ -410,14 +412,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private void action_Easy_RunImport(final long tileId) {
 
-		final ImportConfig importConfig = getImportConfig();
+		final EasyConfig easyConfig = getEasyConfig();
+		final ImportConfig importConfig = easyConfig.getActiveImportConfig();
 
 		/*
 		 * Get import launcher
 		 */
 		ImportLauncher importLauncher = null;
 
-		for (final ImportLauncher launcher : importConfig.importLaunchers) {
+		for (final ImportLauncher launcher : easyConfig.importLaunchers) {
 			if (launcher.getId() == tileId) {
 				importLauncher = launcher;
 				break;
@@ -455,13 +458,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		try {
 
 			// disable state update during import, this causes lots of problems !!!
-			importConfig.isUpdateDeviceState = false;
+			_isUpdateDeviceState = false;
 
 			importState = EasyImportManager.getInstance().runImport(importLauncher);
 
 		} finally {
 
-			importConfig.isUpdateDeviceState = true;
+			_isUpdateDeviceState = true;
 		}
 
 		/*
@@ -485,7 +488,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			_parent.getDisplay().asyncExec(new Runnable() {
 				@Override
 				public void run() {
-					action_Easy_SetupImport();
+					action_Easy_SetupImport(0);
 				}
 			});
 
@@ -537,7 +540,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		updateUI_DeviceState();
 	}
 
-	void action_Easy_SetupImport() {
+	/**
+	 * @param selectedTab
+	 *            Tab which should be selected when config dialog is opened, -1 will select the
+	 *            restored tab index.
+	 */
+	void action_Easy_SetupImport(final int selectedTab) {
 
 		// prevent that the dialog is opened multiple times, this occured when testing
 		if (_dialogImportConfig != null) {
@@ -546,9 +554,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		final Shell shell = Display.getDefault().getActiveShell();
 
-		final ImportConfig importConfig = getImportConfig();
+		final EasyConfig dashConfig = getEasyConfig();
 
-		_dialogImportConfig = new DialogEasyImportConfig(shell, importConfig, this);
+		_dialogImportConfig = new DialogEasyImportConfig(shell, dashConfig, this, selectedTab);
 
 		boolean isOK = false;
 
@@ -560,10 +568,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			// keep none live update values
 
-			final ImportConfig modifiedConfig = _dialogImportConfig.getModifiedConfig();
+			final EasyConfig modifiedConfig = _dialogImportConfig.getModifiedConfig();
 
-			importConfig.importLaunchers.clear();
-			importConfig.importLaunchers.addAll(modifiedConfig.importLaunchers);
+			dashConfig.importLaunchers.clear();
+			dashConfig.importLaunchers.addAll(modifiedConfig.importLaunchers);
 
 			updateModel_ImportConfig_LiveUpdate(_dialogImportConfig, false);
 			updateModel_ImportConfig_AndSave(_dialogImportConfig);
@@ -885,11 +893,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		/*
 		 * Import background image
 		 */
-		final ImportConfig importConfig = getImportConfig();
-		final int itemSize = importConfig.tileSize;
-		final int opacity = importConfig.backgroundOpacity;
-		final int animationDuration = importConfig.animationDuration;
-		final int crazyFactor = importConfig.animationCrazinessFactor;
+		final EasyConfig easyConfig = getEasyConfig();
+
+		final int itemSize = easyConfig.tileSize;
+		final int opacity = easyConfig.backgroundOpacity;
+		final int animationDuration = easyConfig.animationDuration;
+		final int crazyFactor = easyConfig.animationCrazinessFactor;
 
 		String bgImage = UI.EMPTY_STRING;
 		if (opacity > 0) {
@@ -983,15 +992,23 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		return customCSS;
 	}
 
-	private void createDefaultDeviceImportLauncher() {
+	private void createDefault_ImportConfig() {
+
+		final ImportConfig defaultConfig = new ImportConfig();
+
+		defaultConfig.name = Messages.Import_Data_Default_ImportConfig_Name;
+
+		getEasyConfig().importConfigs.add(defaultConfig);
+	}
+
+	private void createDefault_ImportLauncher() {
 
 		final ImportLauncher defaultLauncher = new ImportLauncher();
 
 		defaultLauncher.name = Messages.Import_Data_Default_FirstEasyImportLauncher_Name;
 		defaultLauncher.description = Messages.Import_Data_Default_FirstEasyImportLauncher_Description;
 
-		final ImportConfig importConfig = getImportConfig();
-		importConfig.importLaunchers.add(defaultLauncher);
+		getEasyConfig().importLaunchers.add(defaultLauncher);
 	}
 
 	private void createFilesLog(final StringBuilder sb, final ArrayList<String> fileNames, final String message) {
@@ -1108,20 +1125,26 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private void createHTML_52_Easy_Tiles(final StringBuilder sb) {
 
-		final ImportConfig importConfig = getImportConfig();
+		final EasyConfig easyConfig = getEasyConfig();
 
-		final ArrayList<ImportLauncher> allImportLauncher = importConfig.importLaunchers;
+		final ArrayList<ImportLauncher> allImportLauncher = easyConfig.importLaunchers;
 
-		if (allImportLauncher.size() == 0 && importConfig.isLastLauncherRemoved == false) {
+		if (allImportLauncher.size() == 0 && easyConfig.isLastLauncherRemoved == false) {
 
 			/*
 			 * Make life easier and create a default import launcher.
 			 */
-			createDefaultDeviceImportLauncher();
+			createDefault_ImportLauncher();
+		}
+
+		final ArrayList<ImportConfig> allImportConfigs = easyConfig.importConfigs;
+		if (allImportConfigs.size() == 0) {
+
+			createDefault_ImportConfig();
 		}
 
 		int tileIndex = 0;
-		final int numHorizontalTiles = importConfig.numHorizontalTiles;
+		final int numHorizontalTiles = easyConfig.numHorizontalTiles;
 		boolean isTrOpen = false;
 
 		final String watchClass = isWatchingOn() ? DOM_CLASS_DEVICE_ON : DOM_CLASS_DEVICE_OFF;
@@ -1242,7 +1265,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		final String hrefSetupAction = HTTP_DUMMY + HREF_ACTION_SETUP_EASY_IMPORT;
 
-		final ImportConfig importConfig = getImportConfig();
+		final EasyConfig easyConfig = getEasyConfig();
+		final ImportConfig importConfig = easyConfig.getActiveImportConfig();
+
 		String html = null;
 
 		final boolean isWatchAnything = importConfig.isWatchAnything();
@@ -1269,7 +1294,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		} else if (isWatchAnything && _isDeviceStateValid) {
 
-			html = createHTML_DeviceState_IsValid(importConfig, hrefSetupAction);
+			html = createHTML_DeviceState_IsValid(easyConfig, hrefSetupAction);
 
 		} else {
 
@@ -1303,9 +1328,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		return html;
 	}
 
-	private String createHTML_DeviceState_IsValid(final ImportConfig importConfig, final String hrefAction) {
+	private String createHTML_DeviceState_IsValid(final EasyConfig easyConfig, final String hrefAction) {
 
-		final int numDeviceFiles = importConfig.numDeviceFiles;
+		final ImportConfig importConfig = easyConfig.getActiveImportConfig();
+
+		final int numDeviceFiles = easyConfig.numDeviceFiles;
 		final String deviceOSFolder = importConfig.getDeviceOSFolder();
 		final boolean isDeviceFolderOK = isOSFolderValid(deviceOSFolder);
 		boolean isFolderOK = true;
@@ -1337,7 +1364,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			 */
 			if (isDeviceFolderOK) {
 
-				final int numNotBackedUpFiles = importConfig.notBackedUpFiles.size();
+				final int numNotBackedUpFiles = easyConfig.notBackedUpFiles.size();
 
 				folderInfo = numNotBackedUpFiles == 0 //
 						? NLS.bind(Messages.Import_Data_HTML_AllFilesAreBackedUp, numDeviceFiles)
@@ -1357,7 +1384,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		/*
 		 * Device folder
 		 */
-		final ArrayList<OSFile> notImportedFiles = importConfig.notImportedFiles;
+		final ArrayList<OSFile> notImportedFiles = easyConfig.notImportedFiles;
 		final int numNotImportedFiles = notImportedFiles.size();
 		{
 			final String htmlDeviceFolder = importConfig.getDeviceFolder().replace(//
@@ -3265,9 +3292,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		return dbImage;
 	}
 
-	private ImportConfig getImportConfig() {
+	private EasyConfig getEasyConfig() {
 
-		return EasyImportManager.getInstance().getDeviceImportConfig();
+		return EasyImportManager.getInstance().getEasyConfig();
 	}
 
 	public Image getImportConfigImage(final ImportLauncher importConfig) {
@@ -3571,7 +3598,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		} else if (ACTION_SETUP_EASY_IMPORT.equals(hrefAction)) {
 
-			action_Easy_SetupImport();
+			action_Easy_SetupImport(-1);
 
 		} else if (ACTION_DEVICE_WATCHING_ON_OFF.equals(hrefAction)) {
 
@@ -3959,9 +3986,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	 */
 	private void thread_UpdateDeviceState() {
 
-		final ImportConfig importConfig = getImportConfig();
+		final EasyConfig importConfig = getEasyConfig();
 
-		if (importConfig.isWatchAnything()) {
+		if (importConfig.getActiveImportConfig().isWatchAnything()) {
 
 			EasyImportManager.getInstance().checkImportedFiles(true);
 			updateUI_DeviceState();
@@ -4053,7 +4080,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 					// keep watcher local because it could be set to null !!!
 					folderWatcher = _folderWatcher = FileSystems.getDefault().newWatchService();
 
-					final ImportConfig importConfig = getImportConfig();
+					final EasyConfig easyConfig = getEasyConfig();
+					final ImportConfig importConfig = easyConfig.getActiveImportConfig();
 
 					/*
 					 * Check device folder
@@ -4109,7 +4137,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 					}
 
 					// do not update the device state when the import is running otherwise the import file list can be wrong
-					if (importConfig.isUpdateDeviceState) {
+					if (_isUpdateDeviceState) {
 						thread_UpdateDeviceState();
 					}
 
@@ -4134,7 +4162,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 //							}
 
 						// do not update the device state when the import is running otherwise the import file list can be wrong
-						if (importConfig.isUpdateDeviceState) {
+						if (_isUpdateDeviceState) {
 							thread_UpdateDeviceState();
 						}
 
@@ -4242,10 +4270,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 						// check if polling is currently enabled
 						if (_isWatchingStores.get()) {
 
-							final ImportConfig importConfig = getImportConfig();
+							final EasyConfig importConfig = getEasyConfig();
 
 							// check if anything should be watched
-							if (importConfig.isWatchAnything()) {
+							if (importConfig.getActiveImportConfig().isWatchAnything()) {
 
 								final boolean isCheckFiles = _isDeviceStateValid == false;
 
@@ -4288,18 +4316,25 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	 */
 	private void updateModel_ImportConfig_AndSave(final DialogEasyImportConfig dialog) {
 
-		final ImportConfig modifiedConfig = dialog.getModifiedConfig();
-		final ImportConfig importConfig = getImportConfig();
+		final EasyConfig modifiedEasyConfig = dialog.getModifiedConfig();
+		final ImportConfig modifiedImportConfig = modifiedEasyConfig.getActiveImportConfig();
 
-		importConfig.isCreateBackup = modifiedConfig.isCreateBackup;
-		importConfig.isLastLauncherRemoved = modifiedConfig.isLastLauncherRemoved;
-		importConfig.isTurnOffWatching = modifiedConfig.isTurnOffWatching;
+		final EasyConfig easyConfig = getEasyConfig();
+		final ImportConfig importConfig = easyConfig.getActiveImportConfig();
 
-		importConfig.deviceFiles = modifiedConfig.deviceFiles;
-		importConfig.setBackupFolder(modifiedConfig.getBackupFolder());
-		importConfig.setDeviceFolder(modifiedConfig.getDeviceFolder());
+		easyConfig.isLastLauncherRemoved = modifiedEasyConfig.isLastLauncherRemoved;
 
-		EasyImportManager.getInstance().saveImportConfig(importConfig);
+		importConfig.name = modifiedImportConfig.name;
+
+		importConfig.isCreateBackup = modifiedImportConfig.isCreateBackup;
+		importConfig.isTurnOffWatching = modifiedImportConfig.isTurnOffWatching;
+
+		importConfig.setBackupFolder(modifiedImportConfig.getBackupFolder());
+		importConfig.setDeviceFolder(modifiedImportConfig.getDeviceFolder());
+
+		importConfig.deviceFiles = modifiedImportConfig.deviceFiles;
+
+		EasyImportManager.getInstance().saveEasyConfig(easyConfig);
 	}
 
 	/**
@@ -4309,25 +4344,25 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	 */
 	private void updateModel_ImportConfig_LiveUpdate(final DialogEasyImportConfig dialog, final boolean isSaveConfig) {
 
-		final ImportConfig modifiedConfig = dialog.getModifiedConfig();
-		final ImportConfig importConfig = getImportConfig();
+		final EasyConfig modifiedEasyConfig = dialog.getModifiedConfig();
+		final EasyConfig easyConfig = getEasyConfig();
 
-		if (importConfig.animationDuration != modifiedConfig.animationDuration
-				|| importConfig.animationCrazinessFactor != modifiedConfig.animationCrazinessFactor) {
+		if (easyConfig.animationDuration != modifiedEasyConfig.animationDuration
+				|| easyConfig.animationCrazinessFactor != modifiedEasyConfig.animationCrazinessFactor) {
 
 			// run animation only when it was modified
 			_isRunDashboardAnimation = true;
 		}
-		importConfig.animationCrazinessFactor = modifiedConfig.animationCrazinessFactor;
-		importConfig.animationDuration = modifiedConfig.animationDuration;
+		easyConfig.animationCrazinessFactor = modifiedEasyConfig.animationCrazinessFactor;
+		easyConfig.animationDuration = modifiedEasyConfig.animationDuration;
 
-		importConfig.backgroundOpacity = modifiedConfig.backgroundOpacity;
-		importConfig.isLiveUpdate = modifiedConfig.isLiveUpdate;
-		importConfig.numHorizontalTiles = modifiedConfig.numHorizontalTiles;
-		importConfig.tileSize = modifiedConfig.tileSize;
+		easyConfig.backgroundOpacity = modifiedEasyConfig.backgroundOpacity;
+		easyConfig.isLiveUpdate = modifiedEasyConfig.isLiveUpdate;
+		easyConfig.numHorizontalTiles = modifiedEasyConfig.numHorizontalTiles;
+		easyConfig.tileSize = modifiedEasyConfig.tileSize;
 
 		if (isSaveConfig) {
-			EasyImportManager.getInstance().saveImportConfig(importConfig);
+			EasyImportManager.getInstance().saveEasyConfig(easyConfig);
 		}
 	}
 

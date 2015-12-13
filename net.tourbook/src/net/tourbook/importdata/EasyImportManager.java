@@ -69,17 +69,22 @@ public class EasyImportManager {
 	//
 	private static final String			XML_STATE_EASY_IMPORT_CONFIG		= "XML_STATE_EASY_IMPORT_CONFIG";				//$NON-NLS-1$
 	//
-	private static final String			TAG_IMPORT_CONFIG					= "Config";									//$NON-NLS-1$
-	private static final String			TAG_IMPORT_CONFIG_ROOT				= "DeviceImportConfig";						//$NON-NLS-1$
-	private static final String			TAG_SPEED_VERTEX					= "Speed";										//$NON-NLS-1$
+	private static final String			TAG_ROOT							= "EasyImportConfig";							//$NON-NLS-1$
+	private static final String			TAG_CONFIG							= "Config";
+	private static final String			TAG_DASH_CONFIG						= "DashConfig";
+	private static final String			TAG_IMPORT_CONFIG					= "ImportConfig";
+	private static final String			TAG_LAUNCHER_CONFIG					= "LauncherConfig";							//$NON-NLS-1$
+	private static final String			TAG_TOUR_TYPE_BY_SPEED				= "Speed";										//$NON-NLS-1$
 	//
 	private static final String			ATTR_AVG_SPEED						= "avgSpeed";									//$NON-NLS-1$
 	private static final String			ATTR_BACKUP_FOLDER					= "backupFolder";								//$NON-NLS-1$
 	private static final String			ATTR_DEVICE_FILES					= "deviceFiles";								//$NON-NLS-1$
 	private static final String			ATTR_DEVICE_FOLDER					= "deviceFolder";								//$NON-NLS-1$
+	private static final String			ATTR_IS_ACTIVE_CONFIG				= "isActiveConfig";
 	private static final String			ATTR_IS_CREATE_BACKUP				= "isCreateBackup";							//$NON-NLS-1$
 	private static final String			ATTR_IS_LAST_LAUNCHER_REMOVED		= "isLastLauncherRemoved";						//$NON-NLS-1$
 	private static final String			ATTR_IS_TURN_OFF_WATCHING			= "isTurnOffWatching";							//$NON-NLS-1$
+	private static final String			ATTR_NAME							= "name";										//$NON-NLS-1$
 	private static final String			ATTR_TOUR_TYPE_CONFIG				= "tourTypeConfig";							//$NON-NLS-1$
 	private static final String			ATTR_TOUR_TYPE_ID					= "tourTypeId";								//$NON-NLS-1$
 	//
@@ -91,7 +96,6 @@ public class EasyImportManager {
 	private static final String			ATTR_DASH_TILE_SIZE					= "tileSize";									//$NON-NLS-1$
 	//
 	private static final String			ATTR_IL_DESCRIPTION					= "description";								//$NON-NLS-1$
-	private static final String			ATTR_IL_NAME						= "name";										//$NON-NLS-1$
 	private static final String			ATTR_IL_IS_SAVE_TOUR				= "isSaveTour";								//$NON-NLS-1$
 	private static final String			ATTR_IL_IS_SHOW_IN_DASHBOARD		= "isShowInDashBoard";							//$NON-NLS-1$
 	private static final String			ATTR_IL_IS_SET_LAST_MARKER			= "isSetLastMarker";							//$NON-NLS-1$
@@ -102,7 +106,7 @@ public class EasyImportManager {
 
 	private final IDialogSettings		_state								= TourbookPlugin.getState(ID);
 
-	private ImportConfig				_importConfig;
+	private EasyConfig					_easyConfig;
 
 	private String						_fileStoresHash;
 
@@ -273,13 +277,13 @@ public class EasyImportManager {
 		return dbFileNames;
 	}
 
-	public ImportConfig getDeviceImportConfig() {
+	public EasyConfig getEasyConfig() {
 
-		if (_importConfig == null) {
-			_importConfig = loadImportConfig();
+		if (_easyConfig == null) {
+			_easyConfig = loadEasyConfig();
 		}
 
-		return _importConfig;
+		return _easyConfig;
 	}
 
 	/**
@@ -289,9 +293,11 @@ public class EasyImportManager {
 		final ArrayList<OSFile> notImportedFiles = new ArrayList<>();
 		final ArrayList<String> notBackedUpFiles = new ArrayList<>();
 
-		final ImportConfig importConfig = getDeviceImportConfig();
-		importConfig.notImportedFiles = notImportedFiles;
-		importConfig.notBackedUpFiles = notBackedUpFiles;
+		final EasyConfig easyConfig = getEasyConfig();
+		final ImportConfig importConfig = easyConfig.getActiveImportConfig();
+
+		easyConfig.notImportedFiles = notImportedFiles;
+		easyConfig.notBackedUpFiles = notBackedUpFiles;
 
 		/*
 		 * Get backup files
@@ -306,7 +312,7 @@ public class EasyImportManager {
 		 * Get device files
 		 */
 		final List<OSFile> existingDeviceFiles = getOSFiles(importConfig.getDeviceOSFolder(), importConfig.deviceFiles);
-		importConfig.numDeviceFiles = existingDeviceFiles.size();
+		easyConfig.numDeviceFiles = existingDeviceFiles.size();
 
 		/*
 		 * Get files which are not yet backed up
@@ -357,7 +363,6 @@ public class EasyImportManager {
 		if (validPath == null) {
 			return osFiles;
 		}
-
 
 		String globPattern = deviceFiles.trim();
 
@@ -464,146 +469,199 @@ public class EasyImportManager {
 		return isFolderValid;
 	}
 
-	private ImportConfig loadImportConfig() {
+	private EasyConfig loadEasyConfig() {
+
+		final EasyConfig easyConfig = new EasyConfig();
+
+		final String stateValue = Util.getStateString(_state, XML_STATE_EASY_IMPORT_CONFIG, null);
+		if (stateValue == null || stateValue.length() <= 0) {
+			return easyConfig;
+		}
+
+		try {
+
+			final Reader reader = new StringReader(stateValue);
+			final XMLMemento xmlMemento = XMLMemento.createReadRoot(reader);
+
+			for (final IMemento memento : xmlMemento.getChildren()) {
+
+				final XMLMemento xmlConfig = (XMLMemento) memento;
+
+				switch (xmlConfig.getType()) {
+
+				case TAG_CONFIG:
+
+					loadEasyConfig_10_Common(xmlConfig, easyConfig);
+					break;
+
+				case TAG_DASH_CONFIG:
+
+					loadEasyConfig_20_Dash(xmlConfig, easyConfig);
+					break;
+
+				case TAG_IMPORT_CONFIG:
+
+					loadEasyConfig_30_Config(xmlConfig, easyConfig);
+					break;
+
+				case TAG_LAUNCHER_CONFIG:
+
+					loadEasyConfig_40_Launcher(xmlConfig, easyConfig);
+					break;
+
+				default:
+					break;
+				}
+
+			}
+
+		} catch (final WorkbenchException e) {
+			// ignore
+		}
+
+		return easyConfig;
+	}
+
+	private void loadEasyConfig_10_Common(final XMLMemento xmlMemento, final EasyConfig dashConfig) {
+
+		dashConfig.isLastLauncherRemoved = Util.getXmlBoolean(xmlMemento, ATTR_IS_LAST_LAUNCHER_REMOVED, false);
+	}
+
+	private void loadEasyConfig_20_Dash(final XMLMemento xmlMemento, final EasyConfig dashConfig) {
+
+		dashConfig.animationCrazinessFactor = Util.getXmlInteger(xmlMemento,//
+				ATTR_DASH_ANIMATION_CRAZY_FACTOR,
+				EasyConfig.ANIMATION_CRAZINESS_FACTOR_DEFAULT,
+				EasyConfig.ANIMATION_CRAZINESS_FACTOR_MIN,
+				EasyConfig.ANIMATION_CRAZINESS_FACTOR_MAX);
+
+		dashConfig.animationDuration = Util.getXmlInteger(xmlMemento,//
+				ATTR_DASH_ANIMATION_DURATION,
+				EasyConfig.ANIMATION_DURATION_DEFAULT,
+				EasyConfig.ANIMATION_DURATION_MIN,
+				EasyConfig.ANIMATION_DURATION_MAX);
+
+		dashConfig.backgroundOpacity = Util.getXmlInteger(xmlMemento,//
+				ATTR_DASH_BACKGROUND_OPACITY,
+				EasyConfig.BACKGROUND_OPACITY_DEFAULT,
+				EasyConfig.BACKGROUND_OPACITY_MIN,
+				EasyConfig.BACKGROUND_OPACITY_MAX);
+
+		dashConfig.numHorizontalTiles = Util.getXmlInteger(xmlMemento,//
+				ATTR_DASH_NUM_UI_COLUMNS,
+				EasyConfig.HORIZONTAL_TILES_DEFAULT,
+				EasyConfig.HORIZONTAL_TILES_MIN,
+				EasyConfig.HORIZONTAL_TILES_MAX);
+
+		dashConfig.tileSize = Util.getXmlInteger(xmlMemento,//
+				ATTR_DASH_TILE_SIZE,
+				EasyConfig.TILE_SIZE_DEFAULT,
+				EasyConfig.TILE_SIZE_MIN,
+				EasyConfig.TILE_SIZE_MAX);
+
+		dashConfig.isLiveUpdate = Util.getXmlBoolean(xmlMemento,//
+				ATTR_DASH_IS_LIVE_UPDATE,
+				EasyConfig.LIVE_UPDATE_DEFAULT);
+	}
+
+	private void loadEasyConfig_30_Config(final XMLMemento xmlConfig, final EasyConfig dashConfig) {
 
 		final ImportConfig importConfig = new ImportConfig();
 
-		final String stateValue = Util.getStateString(_state, XML_STATE_EASY_IMPORT_CONFIG, null);
+		dashConfig.importConfigs.add(importConfig);
 
-		if ((stateValue != null) && (stateValue.length() > 0)) {
+		importConfig.name = Util.getXmlString(xmlConfig, ATTR_NAME, UI.EMPTY_STRING);
 
-			try {
+		importConfig.isCreateBackup = Util.getXmlBoolean(xmlConfig, ATTR_IS_CREATE_BACKUP, true);
+		importConfig.isTurnOffWatching = Util.getXmlBoolean(xmlConfig, ATTR_IS_TURN_OFF_WATCHING, false);
 
-				final Reader reader = new StringReader(stateValue);
+		importConfig.setBackupFolder(Util.getXmlString(xmlConfig, ATTR_BACKUP_FOLDER, UI.EMPTY_STRING));
+		importConfig.setDeviceFolder(Util.getXmlString(xmlConfig, ATTR_DEVICE_FOLDER, UI.EMPTY_STRING));
 
-				loadImportConfig_Data(XMLMemento.createReadRoot(reader), importConfig);
+		importConfig.deviceFiles = Util.getXmlString(xmlConfig, ATTR_DEVICE_FILES, ImportConfig.DEVICE_FILES_DEFAULT);
 
-			} catch (final WorkbenchException e) {
-				// ignore
-			}
+		/*
+		 * Set active config
+		 */
+		final boolean isActiveConfig = Util.getXmlBoolean(xmlConfig, ATTR_IS_ACTIVE_CONFIG, false);
+		if (isActiveConfig) {
+			dashConfig.setActiveImportConfig(importConfig);
 		}
-
-		return importConfig;
 	}
 
-	private void loadImportConfig_Data(final XMLMemento xmlMemento, final ImportConfig importConfig) {
+	private void loadEasyConfig_40_Launcher(final XMLMemento xmlConfig, final EasyConfig dashConfig) {
 
-		importConfig.animationCrazinessFactor = Util.getXmlInteger(xmlMemento,//
-				ATTR_DASH_ANIMATION_CRAZY_FACTOR,
-				ImportConfig.ANIMATION_CRAZINESS_FACTOR_DEFAULT,
-				ImportConfig.ANIMATION_CRAZINESS_FACTOR_MIN,
-				ImportConfig.ANIMATION_CRAZINESS_FACTOR_MAX);
+		final ImportLauncher importLauncher = new ImportLauncher();
 
-		importConfig.animationDuration = Util.getXmlInteger(xmlMemento,//
-				ATTR_DASH_ANIMATION_DURATION,
-				ImportConfig.ANIMATION_DURATION_DEFAULT,
-				ImportConfig.ANIMATION_DURATION_MIN,
-				ImportConfig.ANIMATION_DURATION_MAX);
+		dashConfig.importLaunchers.add(importLauncher);
 
-		importConfig.backgroundOpacity = Util.getXmlInteger(xmlMemento,//
-				ATTR_DASH_BACKGROUND_OPACITY,
-				ImportConfig.BACKGROUND_OPACITY_DEFAULT,
-				ImportConfig.BACKGROUND_OPACITY_MIN,
-				ImportConfig.BACKGROUND_OPACITY_MAX);
+		importLauncher.name = Util.getXmlString(xmlConfig, ATTR_NAME, UI.EMPTY_STRING);
+		importLauncher.description = Util.getXmlString(xmlConfig, ATTR_IL_DESCRIPTION, UI.EMPTY_STRING);
+		importLauncher.isSaveTour = Util.getXmlBoolean(xmlConfig, ATTR_IL_IS_SAVE_TOUR, false);
+		importLauncher.isShowInDashboard = Util.getXmlBoolean(xmlConfig, ATTR_IL_IS_SHOW_IN_DASHBOARD, true);
 
-		importConfig.numHorizontalTiles = Util.getXmlInteger(xmlMemento,//
-				ATTR_DASH_NUM_UI_COLUMNS,
-				ImportConfig.HORIZONTAL_TILES_DEFAULT,
-				ImportConfig.HORIZONTAL_TILES_MIN,
-				ImportConfig.HORIZONTAL_TILES_MAX);
+		// last marker
+		importLauncher.isSetLastMarker = Util.getXmlBoolean(xmlConfig, ATTR_IL_IS_SET_LAST_MARKER, false);
+		importLauncher.lastMarkerText = Util.getXmlString(xmlConfig, ATTR_IL_LAST_MARKER_TEXT, UI.EMPTY_STRING);
+		importLauncher.lastMarkerDistance = Util.getXmlInteger(
+				xmlConfig,
+				ATTR_IL_LAST_MARKER_DISTANCE,
+				EasyConfig.LAST_MARKER_DISTANCE_DEFAULT,
+				EasyConfig.LAST_MARKER_DISTANCE_MIN,
+				EasyConfig.LAST_MARKER_DISTANCE_MAX);
 
-		importConfig.tileSize = Util.getXmlInteger(xmlMemento,//
-				ATTR_DASH_TILE_SIZE,
-				ImportConfig.TILE_SIZE_DEFAULT,
-				ImportConfig.TILE_SIZE_MIN,
-				ImportConfig.TILE_SIZE_MAX);
+		final Enum<TourTypeConfig> ttConfig = Util.getXmlEnum(
+				xmlConfig,
+				ATTR_TOUR_TYPE_CONFIG,
+				TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL);
 
-		importConfig.isCreateBackup = Util.getXmlBoolean(xmlMemento, ATTR_IS_CREATE_BACKUP, true);
-		importConfig.isLastLauncherRemoved = Util.getXmlBoolean(xmlMemento, ATTR_IS_LAST_LAUNCHER_REMOVED, false);
-		importConfig.isLiveUpdate = Util.getXmlBoolean(xmlMemento, ATTR_DASH_IS_LIVE_UPDATE, true);
-		importConfig.isTurnOffWatching = Util.getXmlBoolean(xmlMemento, ATTR_IS_TURN_OFF_WATCHING, false);
+		importLauncher.tourTypeConfig = ttConfig;
 
-		importConfig.deviceFiles = Util.getXmlString(xmlMemento, ATTR_DEVICE_FILES, ImportConfig.DEVICE_FILES_DEFAULT);
-		importConfig.setBackupFolder(Util.getXmlString(xmlMemento, ATTR_BACKUP_FOLDER, UI.EMPTY_STRING));
-		importConfig.setDeviceFolder(Util.getXmlString(xmlMemento, ATTR_DEVICE_FOLDER, UI.EMPTY_STRING));
+		if (TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED.equals(ttConfig)) {
 
-		for (final IMemento xmlConfig : xmlMemento.getChildren()) {
+			final ArrayList<SpeedTourType> speedVertices = importLauncher.speedTourTypes;
 
-			final ImportLauncher importLauncher = new ImportLauncher();
+			for (final IMemento memento : xmlConfig.getChildren()) {
 
-			importLauncher.name = Util.getXmlString(xmlConfig, ATTR_IL_NAME, UI.EMPTY_STRING);
-			importLauncher.description = Util.getXmlString(xmlConfig, ATTR_IL_DESCRIPTION, UI.EMPTY_STRING);
-			importLauncher.isSaveTour = Util.getXmlBoolean(xmlConfig, ATTR_IL_IS_SAVE_TOUR, false);
-			importLauncher.isShowInDashboard = Util.getXmlBoolean(xmlConfig, ATTR_IL_IS_SHOW_IN_DASHBOARD, true);
+				final XMLMemento xmlSpeed = (XMLMemento) memento;
 
-			// last marker
-			importLauncher.isSetLastMarker = Util.getXmlBoolean(xmlConfig, ATTR_IL_IS_SET_LAST_MARKER, false);
-			importLauncher.lastMarkerText = Util.getXmlString(xmlConfig, ATTR_IL_LAST_MARKER_TEXT, UI.EMPTY_STRING);
-			importLauncher.lastMarkerDistance = Util.getXmlInteger(
-					xmlConfig,
-					ATTR_IL_LAST_MARKER_DISTANCE,
-					ImportConfig.LAST_MARKER_DISTANCE_DEFAULT,
-					ImportConfig.LAST_MARKER_DISTANCE_MIN,
-					ImportConfig.LAST_MARKER_DISTANCE_MAX);
+				final Long xmlTourTypeId = Util.getXmlLong(xmlSpeed, ATTR_TOUR_TYPE_ID, null);
 
-			final Enum<TourTypeConfig> ttConfig = Util.getXmlEnum(
-					xmlConfig,
-					ATTR_TOUR_TYPE_CONFIG,
-					TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL);
+				/*
+				 * Check if the loaded tour type id is valid
+				 */
+				final TourType tourType = TourDatabase.getTourType(xmlTourTypeId);
 
-			importLauncher.tourTypeConfig = ttConfig;
+				if (tourType != null) {
 
-			if (TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED.equals(ttConfig)) {
+					final SpeedTourType speedVertex = new SpeedTourType();
 
-				final ArrayList<SpeedTourType> speedVertices = importLauncher.speedTourTypes;
+					speedVertex.tourTypeId = xmlTourTypeId;
 
-				for (final IMemento memento : xmlConfig.getChildren()) {
+					speedVertex.avgSpeed = Util.getXmlFloatFloat(
+							xmlSpeed,
+							ATTR_AVG_SPEED,
+							EasyConfig.TOUR_TYPE_AVG_SPEED_DEFAULT,
+							EasyConfig.TOUR_TYPE_AVG_SPEED_MIN,
+							EasyConfig.TOUR_TYPE_AVG_SPEED_MAX);
 
-					if (memento instanceof XMLMemento) {
-
-						final XMLMemento xmlSpeed = (XMLMemento) memento;
-
-						final Long xmlTourTypeId = Util.getXmlLong(xmlSpeed, ATTR_TOUR_TYPE_ID, null);
-
-						/*
-						 * Check if the loaded tour type id is valid
-						 */
-						final TourType tourType = TourDatabase.getTourType(xmlTourTypeId);
-
-						if (tourType != null) {
-
-							final SpeedTourType speedVertex = new SpeedTourType();
-
-							speedVertex.tourTypeId = xmlTourTypeId;
-
-							speedVertex.avgSpeed = Util.getXmlFloatFloat(
-									xmlSpeed,
-									ATTR_AVG_SPEED,
-									ImportConfig.TOUR_TYPE_AVG_SPEED_DEFAULT,
-									ImportConfig.TOUR_TYPE_AVG_SPEED_MIN,
-									ImportConfig.TOUR_TYPE_AVG_SPEED_MAX);
-
-							speedVertices.add(speedVertex);
-						}
-					}
+					speedVertices.add(speedVertex);
 				}
-
-			} else if (TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL.equals(ttConfig)) {
-
-				final Long xmlTourTypeId = Util.getXmlLong(xmlConfig, ATTR_TOUR_TYPE_ID, null);
-
-				importLauncher.oneTourType = TourDatabase.getTourType(xmlTourTypeId);
-
-			} else {
-
-				// this is the default, tour type is not set
-
 			}
 
-			importLauncher.setupItemImage();
+		} else if (TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL.equals(ttConfig)) {
 
-			importConfig.importLaunchers.add(importLauncher);
+			final Long xmlTourTypeId = Util.getXmlLong(xmlConfig, ATTR_TOUR_TYPE_ID, null);
+
+			importLauncher.oneTourType = TourDatabase.getTourType(xmlTourTypeId);
+
+		} else {
+
+			// this is the default, tour type is not set
+
 		}
+
+		importLauncher.setupItemImage();
 	}
 
 	/**
@@ -619,7 +677,8 @@ public class EasyImportManager {
 
 		final ImportDeviceState importState = new ImportDeviceState();
 
-		final ImportConfig importConfig = getDeviceImportConfig();
+		final EasyConfig easyConfig = getEasyConfig();
+		final ImportConfig importConfig = easyConfig.getActiveImportConfig();
 
 		/*
 		 * Check device folder
@@ -664,7 +723,7 @@ public class EasyImportManager {
 		/*
 		 * Check import files
 		 */
-		final ArrayList<OSFile> notImportedPaths = importConfig.notImportedFiles;
+		final ArrayList<OSFile> notImportedPaths = easyConfig.notImportedFiles;
 		if (notImportedPaths.size() == 0) {
 
 			MessageDialog.openInformation(
@@ -710,14 +769,15 @@ public class EasyImportManager {
 	 */
 	private boolean runImport_Backup() {
 
-		final ImportConfig importConfig = getDeviceImportConfig();
+		final EasyConfig easyConfig = getEasyConfig();
+		final ImportConfig importConfig = easyConfig.getActiveImportConfig();
 
 		final String deviceOSFolder = importConfig.getDeviceOSFolder();
 		final String backupOSFolder = importConfig.getBackupOSFolder();
 
 		final Path backupPath = Paths.get(backupOSFolder);
 
-		final ArrayList<String> notBackedUpFiles = importConfig.notBackedUpFiles;
+		final ArrayList<String> notBackedUpFiles = easyConfig.notBackedUpFiles;
 		final int numBackupFiles = notBackedUpFiles.size();
 
 		if (numBackupFiles == 0) {
@@ -781,7 +841,8 @@ public class EasyImportManager {
 			return;
 		}
 
-		final ImportConfig importConfig = getDeviceImportConfig();
+		final ImportConfig importConfig = getEasyConfig().getActiveImportConfig();
+
 		final String backupOSFolder = importConfig.getBackupOSFolder();
 
 		for (final Entry<Long, TourData> entry : importedTours.entrySet()) {
@@ -814,12 +875,12 @@ public class EasyImportManager {
 		}
 	}
 
-	public void saveImportConfig(final ImportConfig importConfig) {
+	public void saveEasyConfig(final EasyConfig dashConfig) {
 
 		// Build the XML block for writing the bindings and active scheme.
-		final XMLMemento xmlMemento = XMLMemento.createWriteRoot(TAG_IMPORT_CONFIG_ROOT);
+		final XMLMemento xmlMemento = XMLMemento.createWriteRoot(TAG_ROOT);
 
-		saveImportConfig_Data(xmlMemento, importConfig);
+		saveEasyConfig_Data(xmlMemento, dashConfig);
 
 		// Write the XML block to the state store.
 		final Writer writer = new StringWriter();
@@ -842,28 +903,60 @@ public class EasyImportManager {
 		}
 	}
 
-	private void saveImportConfig_Data(final XMLMemento xmlMemento, final ImportConfig importConfig) {
+	private void saveEasyConfig_Data(final XMLMemento xmlMemento, final EasyConfig dashConfig) {
 
-		xmlMemento.putInteger(ATTR_DASH_ANIMATION_CRAZY_FACTOR, importConfig.animationCrazinessFactor);
-		xmlMemento.putInteger(ATTR_DASH_ANIMATION_DURATION, importConfig.animationDuration);
-		xmlMemento.putInteger(ATTR_DASH_BACKGROUND_OPACITY, importConfig.backgroundOpacity);
-		xmlMemento.putBoolean(ATTR_DASH_IS_LIVE_UPDATE, importConfig.isLiveUpdate);
-		xmlMemento.putInteger(ATTR_DASH_NUM_UI_COLUMNS, importConfig.numHorizontalTiles);
-		xmlMemento.putInteger(ATTR_DASH_TILE_SIZE, importConfig.tileSize);
+		/*
+		 * Common config
+		 */
+		{
+			final IMemento xmlConfig = xmlMemento.createChild(TAG_CONFIG);
 
-		xmlMemento.putString(ATTR_DEVICE_FILES, importConfig.deviceFiles);
-		xmlMemento.putString(ATTR_BACKUP_FOLDER, importConfig.getBackupFolder());
-		xmlMemento.putString(ATTR_DEVICE_FOLDER, importConfig.getDeviceFolder());
+			xmlConfig.putBoolean(ATTR_IS_LAST_LAUNCHER_REMOVED, dashConfig.isLastLauncherRemoved);
+		}
 
-		xmlMemento.putBoolean(ATTR_IS_CREATE_BACKUP, importConfig.isCreateBackup);
-		xmlMemento.putBoolean(ATTR_IS_LAST_LAUNCHER_REMOVED, importConfig.isLastLauncherRemoved);
-		xmlMemento.putBoolean(ATTR_IS_TURN_OFF_WATCHING, importConfig.isTurnOffWatching);
+		/*
+		 * Dashboard config
+		 */
+		{
+			final IMemento xmlConfig = xmlMemento.createChild(TAG_DASH_CONFIG);
 
-		for (final ImportLauncher importLauncher : importConfig.importLaunchers) {
+			xmlConfig.putInteger(ATTR_DASH_ANIMATION_CRAZY_FACTOR, dashConfig.animationCrazinessFactor);
+			xmlConfig.putInteger(ATTR_DASH_ANIMATION_DURATION, dashConfig.animationDuration);
+			xmlConfig.putInteger(ATTR_DASH_BACKGROUND_OPACITY, dashConfig.backgroundOpacity);
+			xmlConfig.putBoolean(ATTR_DASH_IS_LIVE_UPDATE, dashConfig.isLiveUpdate);
+			xmlConfig.putInteger(ATTR_DASH_NUM_UI_COLUMNS, dashConfig.numHorizontalTiles);
+			xmlConfig.putInteger(ATTR_DASH_TILE_SIZE, dashConfig.tileSize);
+		}
+
+		/*
+		 * Import configs
+		 */
+		for (final ImportConfig importConfig : dashConfig.importConfigs) {
+
+			final boolean isActiveConfig = dashConfig.getActiveImportConfig().equals(importConfig);
 
 			final IMemento xmlConfig = xmlMemento.createChild(TAG_IMPORT_CONFIG);
 
-			xmlConfig.putString(ATTR_IL_NAME, importLauncher.name);
+			xmlConfig.putString(ATTR_NAME, importConfig.name);
+
+			xmlConfig.putBoolean(ATTR_IS_ACTIVE_CONFIG, isActiveConfig);
+			xmlConfig.putBoolean(ATTR_IS_CREATE_BACKUP, importConfig.isCreateBackup);
+			xmlConfig.putBoolean(ATTR_IS_TURN_OFF_WATCHING, importConfig.isTurnOffWatching);
+
+			xmlConfig.putString(ATTR_BACKUP_FOLDER, importConfig.getBackupFolder());
+			xmlConfig.putString(ATTR_DEVICE_FOLDER, importConfig.getDeviceFolder());
+
+			xmlConfig.putString(ATTR_DEVICE_FILES, importConfig.deviceFiles);
+		}
+
+		/*
+		 * Import laucher configs
+		 */
+		for (final ImportLauncher importLauncher : dashConfig.importLaunchers) {
+
+			final IMemento xmlConfig = xmlMemento.createChild(TAG_LAUNCHER_CONFIG);
+
+			xmlConfig.putString(ATTR_NAME, importLauncher.name);
 			xmlConfig.putString(ATTR_IL_DESCRIPTION, importLauncher.description);
 			xmlConfig.putBoolean(ATTR_IL_IS_SAVE_TOUR, importLauncher.isSaveTour);
 			xmlConfig.putBoolean(ATTR_IL_IS_SHOW_IN_DASHBOARD, importLauncher.isShowInDashboard);
@@ -880,7 +973,7 @@ public class EasyImportManager {
 
 				for (final SpeedTourType speedVertex : importLauncher.speedTourTypes) {
 
-					final IMemento memento = xmlConfig.createChild(TAG_SPEED_VERTEX);
+					final IMemento memento = xmlConfig.createChild(TAG_TOUR_TYPE_BY_SPEED);
 
 					if (memento instanceof XMLMemento) {
 

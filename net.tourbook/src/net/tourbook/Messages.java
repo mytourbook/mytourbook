@@ -148,11 +148,15 @@ public class Messages extends NLS {
 	public static String		Dialog_ImportConfig_Dialog_Title;
 	public static String		Dialog_ImportConfig_Error_FolderIsInvalid;
 	public static String		Dialog_ImportConfig_Group_Dashboard;
+	public static String	Dialog_ImportConfig_Group_ImportActions;
+
 	public static String		Dialog_ImportConfig_Group_ImportActions_I;
 	public static String		Dialog_ImportConfig_Group_ImportActions_III;
 	public static String		Dialog_ImportConfig_Group_ImportLauncher;
 	public static String		Dialog_ImportConfig_Group_ImportLauncherConfig;
 	public static String		Dialog_ImportConfig_Info_ConfigDragDrop;
+	public static String	Dialog_ImportConfig_Info_ImportActions;
+
 	public static String		Dialog_ImportConfig_Info_ImportActions_II;
 	public static String		Dialog_ImportConfig_Info_NoDeviceName;
 	public static String		Dialog_ImportConfig_Info_RetrievingVolumeInfo;
@@ -180,8 +184,16 @@ public class Messages extends NLS {
 	public static String		Dialog_ImportConfig_Label_LastMarkerDistance;
 	public static String		Dialog_ImportConfig_Label_LastMarkerDistance_Tooltip;
 	public static String		Dialog_ImportConfig_Label_LastMarkerText;
+	public static String	Dialog_ImportConfig_Link_OtherActions;
+
 	public static String		Dialog_ImportConfig_Link_TourType;
 	public static String		Dialog_ImportConfig_Spinner_Speed_Tooltip;
+
+	public static String	Dialog_ImportConfig_Tab_Configuration;
+
+	public static String	Dialog_ImportConfig_Tab_Dashboard;
+
+	public static String	Dialog_ImportConfig_Tab_Launcher;
 
 	public static String		Dialog_HRZone_Button_AddZone;
 	public static String		Dialog_HRZone_Button_EditHrZones;
@@ -860,6 +872,8 @@ public class Messages extends NLS {
 	public static String		Import_Data_Action_SetupEasyImport_Tooltip;
 	public static String		Import_Data_Default_FirstEasyImportLauncher_Description;
 	public static String		Import_Data_Default_FirstEasyImportLauncher_Name;
+
+	public static String	Import_Data_Default_ImportConfig_Name;
 	public static String		Import_Data_Dialog_ConfirmReimport_Message;
 	public static String		Import_Data_Dialog_ConfirmReimportAltitudeValues_Message;
 	public static String		Import_Data_Dialog_ConfirmReimportGearValues_Message;

@@ -15,85 +15,71 @@
  *******************************************************************************/
 package net.tourbook.importdata;
 
-import java.util.ArrayList;
-
 import net.tourbook.common.NIO;
 import net.tourbook.common.UI;
+import net.tourbook.common.util.StatusUtil;
 
-public class ImportConfig {
+public class ImportConfig implements Cloneable {
 
-	static final int					ANIMATION_DURATION_DEFAULT			= 20;									// seconds/10
-	static final int					ANIMATION_DURATION_MIN				= 0;
-	static final int					ANIMATION_DURATION_MAX				= 100;									// ->10 seconds
+	public static final String	DEVICE_FILES_DEFAULT	= "*";												//$NON-NLS-1$
 
-	static final int					ANIMATION_CRAZINESS_FACTOR_DEFAULT	= 1;
-	static final int					ANIMATION_CRAZINESS_FACTOR_MIN		= -100;
-	static final int					ANIMATION_CRAZINESS_FACTOR_MAX		= 100;
+	public String				name					= UI.EMPTY_STRING;
 
-	static final int					BACKGROUND_OPACITY_DEFAULT			= 5;
-	static final int					BACKGROUND_OPACITY_MAX				= 100;
-	static final int					BACKGROUND_OPACITY_MIN				= 0;
+	/** When <code>true</code> then a backup of the tour file is created. */
+	public boolean				isCreateBackup			= true;
 
-	static final int					HORIZONTAL_TILES_DEFAULT			= 5;
-	static final int					HORIZONTAL_TILES_MIN				= 1;
-	static final int					HORIZONTAL_TILES_MAX				= 50;
+	private String				_backupFolder			= UI.EMPTY_STRING;
+	private String				_deviceFolder			= UI.EMPTY_STRING;
 
-	static final int					LAST_MARKER_DISTANCE_DEFAULT		= 2000;								// 2 km
-	static final int					LAST_MARKER_DISTANCE_MIN			= 0;
-	static final int					LAST_MARKER_DISTANCE_MAX			= 10000;								// 10 km
-
-	static final int					TILE_SIZE_DEFAULT					= 80;
-	static final int					TILE_SIZE_MIN						= 20;
-	static final int					TILE_SIZE_MAX						= 300;
-
-	static final int					TOUR_TYPE_AVG_SPEED_MIN				= 0;
-	static final int					TOUR_TYPE_AVG_SPEED_MAX				= 3000;
-	static final int					TOUR_TYPE_AVG_SPEED_DEFAULT			= 0;
-
-	public static final String			DEVICE_FILES_DEFAULT				= "*";									//$NON-NLS-1$
-
-	public boolean						isLiveUpdate						= true;
-
-	private String						_backupFolder						= UI.EMPTY_STRING;
-	private String						_deviceFolder						= UI.EMPTY_STRING;
-	public String						deviceFiles							= DEVICE_FILES_DEFAULT;
-
-	/** When <code>true</code> then a backup of the tour file is done. */
-	public boolean						isCreateBackup						= true;
+	public String				deviceFiles				= DEVICE_FILES_DEFAULT;
 
 	/** When <code>true</code> then the device watching is turned off after tours are imported. */
-	public boolean						isTurnOffWatching					= false;
+	public boolean				isTurnOffWatching		= false;
 
-	public int							numHorizontalTiles					= HORIZONTAL_TILES_DEFAULT;
-	public int							tileSize							= TILE_SIZE_DEFAULT;
+	private long				_id;
 
-	/** Background opacity in %. */
-	public int							backgroundOpacity					= BACKGROUND_OPACITY_DEFAULT;
+	private static long			_idCreator;
 
-	/** Duration in seconds/10 */
-	public int							animationDuration					= ANIMATION_DURATION_DEFAULT;
-	public int							animationCrazinessFactor			= ANIMATION_CRAZINESS_FACTOR_DEFAULT;
+	public ImportConfig() {
 
-	public ArrayList<ImportLauncher>	importLaunchers						= new ArrayList<>();
+		_id = ++_idCreator;
+	}
 
-	/** Files which are not yet backed up. */
-	public ArrayList<String>			notBackedUpFiles					= new ArrayList<>();
+	@Override
+	protected ImportConfig clone() {
 
-	/** Number of files in the device folder. */
-	public int							numDeviceFiles;
+		ImportConfig clonedObject = null;
 
-	/**
-	 * Contains files which are available in the device folder but they are not available in the
-	 * tour database.
-	 */
-	public ArrayList<OSFile>			notImportedFiles					= new ArrayList<>();
+		try {
 
-	public boolean						isUpdateDeviceState					= true;
+			clonedObject = (ImportConfig) super.clone();
 
-	/**
-	 * When <code>true</code> prevent that a default launcher is created.
-	 */
-	public boolean						isLastLauncherRemoved;
+			clonedObject._id = ++_idCreator;
+
+		} catch (final CloneNotSupportedException e) {
+			StatusUtil.log(e);
+		}
+
+		return clonedObject;
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final ImportConfig other = (ImportConfig) obj;
+		if (_id != other._id) {
+			return false;
+		}
+		return true;
+	}
 
 	public String getBackupFolder() {
 		return _backupFolder;
@@ -136,6 +122,14 @@ public class ImportConfig {
 
 			return folder;
 		}
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (_id ^ (_id >>> 32));
+		return result;
 	}
 
 	/**
