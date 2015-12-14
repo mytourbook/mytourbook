@@ -234,8 +234,6 @@ class HistoryItems {
 		return null;
 	}
 
-
-
 	String getOSPath(final String defaultFolder, final String configFolder) {
 
 		String osPath = null;
@@ -312,23 +310,23 @@ class HistoryItems {
 		fillControls(null, null, null);
 	}
 
-	void restoreState(final String[] restoredFolderItems, final String[] restoredDeviceItems, final String configFolder) {
+	void restoreState(final String[] restoredFolderItems, final String[] restoredDeviceItems) {
 
-		final boolean isDeviceNameFolder = NIO.isDeviceNameFolder(configFolder);
-
-		if (configFolder.trim().length() > 0) {
-
-			if (isDeviceNameFolder) {
-
-				// this is a device folder name
-
-				_deviceNameItems.add(cleanupFolderDeviceName(configFolder));
-
-			} else {
-
-				_folderItems.add(configFolder);
-			}
-		}
+//		final boolean isDeviceNameFolder = NIO.isDeviceNameFolder(configFolder);
+//
+//		if (configFolder.trim().length() > 0) {
+//
+//			if (isDeviceNameFolder) {
+//
+//				// this is a device folder name
+//
+//				_deviceNameItems.add(cleanupFolderDeviceName(configFolder));
+//
+//			} else {
+//
+//				_folderItems.add(configFolder);
+//			}
+//		}
 
 		if (restoredFolderItems != null) {
 			_folderItems.addAll(Arrays.asList(restoredFolderItems));
@@ -338,23 +336,23 @@ class HistoryItems {
 			_deviceNameItems.addAll(Arrays.asList(restoredDeviceItems));
 		}
 
-		String itemFolder = null;
-		String deviceNameFolder = null;
-
-		if (isDeviceNameFolder) {
-
-			// this is a device name folder
-
-			itemFolder = NIO.convertToOSPath(configFolder);
-			deviceNameFolder = configFolder;
-
-		} else {
-
-			itemFolder = configFolder;
-			deviceNameFolder = convertTo_DeviceNameFolder(configFolder);
-		}
-
-		fillControls(itemFolder, deviceNameFolder, configFolder);
+//		String itemFolder = null;
+//		String deviceNameFolder = null;
+//
+//		if (isDeviceNameFolder) {
+//
+//			// this is a device name folder
+//
+//			itemFolder = NIO.convertToOSPath(configFolder);
+//			deviceNameFolder = configFolder;
+//
+//		} else {
+//
+//			itemFolder = configFolder;
+//			deviceNameFolder = convertTo_DeviceNameFolder(configFolder);
+//		}
+//
+//		fillControls(itemFolder, deviceNameFolder, configFolder);
 	}
 
 	private String[] reverseHistory(final LinkedHashSet<String> folderHistory) {
@@ -365,6 +363,13 @@ class HistoryItems {
 		return reversedArray;
 	}
 
+	/**
+	 * Save history items.
+	 * 
+	 * @param state
+	 * @param stateFolderHistoryItems
+	 * @param stateDeviceHistoryItems
+	 */
 	void saveState(	final IDialogSettings state,
 					final String stateFolderHistoryItems,
 					final String stateDeviceHistoryItems) {

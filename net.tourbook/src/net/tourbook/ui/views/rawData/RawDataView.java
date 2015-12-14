@@ -554,9 +554,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		final Shell shell = Display.getDefault().getActiveShell();
 
-		final EasyConfig dashConfig = getEasyConfig();
+		final EasyConfig easyConfig = getEasyConfig();
 
-		_dialogImportConfig = new DialogEasyImportConfig(shell, dashConfig, this, selectedTab);
+		_dialogImportConfig = new DialogEasyImportConfig(shell, easyConfig, this, selectedTab);
 
 		boolean isOK = false;
 
@@ -568,13 +568,16 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			// keep none live update values
 
-			final EasyConfig modifiedConfig = _dialogImportConfig.getModifiedConfig();
+			final EasyConfig modifiedEasyConfig = _dialogImportConfig.getModifiedConfig();
 
-			dashConfig.importLaunchers.clear();
-			dashConfig.importLaunchers.addAll(modifiedConfig.importLaunchers);
+			easyConfig.importConfigs.clear();
+			easyConfig.importConfigs.addAll(modifiedEasyConfig.importConfigs);
 
-			updateModel_ImportConfig_LiveUpdate(_dialogImportConfig, false);
-			updateModel_ImportConfig_AndSave(_dialogImportConfig);
+			easyConfig.importLaunchers.clear();
+			easyConfig.importLaunchers.addAll(modifiedEasyConfig.importLaunchers);
+
+			updateModel_EasyConfig_Dashboard(_dialogImportConfig, false);
+			updateModel_EasyConfig_AndSave(_dialogImportConfig);
 
 			_isDeviceStateValid = false;
 			updateUI_2_Dashboard();
@@ -992,25 +995,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		return customCSS;
 	}
 
-	private void createDefault_ImportConfig() {
-
-		final ImportConfig defaultConfig = new ImportConfig();
-
-		defaultConfig.name = Messages.Import_Data_Default_ImportConfig_Name;
-
-		getEasyConfig().importConfigs.add(defaultConfig);
-	}
-
-	private void createDefault_ImportLauncher() {
-
-		final ImportLauncher defaultLauncher = new ImportLauncher();
-
-		defaultLauncher.name = Messages.Import_Data_Default_FirstEasyImportLauncher_Name;
-		defaultLauncher.description = Messages.Import_Data_Default_FirstEasyImportLauncher_Description;
-
-		getEasyConfig().importLaunchers.add(defaultLauncher);
-	}
-
 	private void createFilesLog(final StringBuilder sb, final ArrayList<String> fileNames, final String message) {
 
 		sb.append(message + fileNames.size());
@@ -1128,19 +1112,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		final EasyConfig easyConfig = getEasyConfig();
 
 		final ArrayList<ImportLauncher> allImportLauncher = easyConfig.importLaunchers;
-
-		if (allImportLauncher.size() == 0 && easyConfig.isLastLauncherRemoved == false) {
-
-			/*
-			 * Make life easier and create a default import launcher.
-			 */
-			createDefault_ImportLauncher();
-		}
-
 		final ArrayList<ImportConfig> allImportConfigs = easyConfig.importConfigs;
-		if (allImportConfigs.size() == 0) {
 
-			createDefault_ImportConfig();
+		if (allImportLauncher.size() == 0 || allImportConfigs.size() == 0) {
+
+			// this case should not happen
+			StatusUtil.showStatus(new Exception("Import config/launcher are not setup correctly."));//$NON-NLS-1$
+
+			return;
 		}
 
 		int tileIndex = 0;
@@ -2800,7 +2779,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	public void doLiveUpdate(final DialogEasyImportConfig dialogImportConfig) {
 
-		updateModel_ImportConfig_LiveUpdate(dialogImportConfig, true);
+		updateModel_EasyConfig_Dashboard(dialogImportConfig, true);
 
 		_isDeviceStateValid = false;
 		updateUI_2_Dashboard();
@@ -4314,15 +4293,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * Keep none live values.
 	 */
-	private void updateModel_ImportConfig_AndSave(final DialogEasyImportConfig dialog) {
+	private void updateModel_EasyConfig_AndSave(final DialogEasyImportConfig dialog) {
 
 		final EasyConfig modifiedEasyConfig = dialog.getModifiedConfig();
 		final ImportConfig modifiedImportConfig = modifiedEasyConfig.getActiveImportConfig();
 
 		final EasyConfig easyConfig = getEasyConfig();
 		final ImportConfig importConfig = easyConfig.getActiveImportConfig();
-
-		easyConfig.isLastLauncherRemoved = modifiedEasyConfig.isLastLauncherRemoved;
 
 		importConfig.name = modifiedImportConfig.name;
 
@@ -4342,7 +4319,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	 * 
 	 * @param isSaveConfig
 	 */
-	private void updateModel_ImportConfig_LiveUpdate(final DialogEasyImportConfig dialog, final boolean isSaveConfig) {
+	private void updateModel_EasyConfig_Dashboard(final DialogEasyImportConfig dialog, final boolean isSaveConfig) {
 
 		final EasyConfig modifiedEasyConfig = dialog.getModifiedConfig();
 		final EasyConfig easyConfig = getEasyConfig();

@@ -89,26 +89,9 @@ public class EasyConfig {
 	public ArrayList<OSFile>			notImportedFiles					= new ArrayList<>();
 
 	/**
-	 * When <code>true</code> prevent that a default launcher is created.
-	 */
-	public boolean						isLastLauncherRemoved;
-
-	/**
-	 * @return Returns the active import config, when not available a new default config is created.
+	 * @return Returns the active import config which is used when importing tours.
 	 */
 	public ImportConfig getActiveImportConfig() {
-
-		if (_activeImportConfig == null) {
-
-			if (importConfigs.size() == 0) {
-
-				final ImportConfig newImportConfig = new ImportConfig();
-				importConfigs.add(newImportConfig);
-			}
-
-			return importConfigs.get(0);
-		}
-
 		return _activeImportConfig;
 	}
 

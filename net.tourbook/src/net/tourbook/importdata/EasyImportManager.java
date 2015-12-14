@@ -67,7 +67,7 @@ public class EasyImportManager {
 
 	private static final String			ID									= "net.tourbook.importdata.EasyImportManager";	//$NON-NLS-1$
 	//
-	private static final String			XML_STATE_EASY_IMPORT_CONFIG		= "XML_STATE_EASY_IMPORT_CONFIG";				//$NON-NLS-1$
+	private static final String			XML_STATE_EASY_IMPORT				= "XML_STATE_EASY_IMPORT";						//$NON-NLS-1$
 	//
 	private static final String			TAG_ROOT							= "EasyImportConfig";							//$NON-NLS-1$
 	private static final String			TAG_CONFIG							= "Config";
@@ -82,7 +82,6 @@ public class EasyImportManager {
 	private static final String			ATTR_DEVICE_FOLDER					= "deviceFolder";								//$NON-NLS-1$
 	private static final String			ATTR_IS_ACTIVE_CONFIG				= "isActiveConfig";
 	private static final String			ATTR_IS_CREATE_BACKUP				= "isCreateBackup";							//$NON-NLS-1$
-	private static final String			ATTR_IS_LAST_LAUNCHER_REMOVED		= "isLastLauncherRemoved";						//$NON-NLS-1$
 	private static final String			ATTR_IS_TURN_OFF_WATCHING			= "isTurnOffWatching";							//$NON-NLS-1$
 	private static final String			ATTR_NAME							= "name";										//$NON-NLS-1$
 	private static final String			ATTR_TOUR_TYPE_CONFIG				= "tourTypeConfig";							//$NON-NLS-1$
@@ -473,50 +472,81 @@ public class EasyImportManager {
 
 		final EasyConfig easyConfig = new EasyConfig();
 
-		final String stateValue = Util.getStateString(_state, XML_STATE_EASY_IMPORT_CONFIG, null);
-		if (stateValue == null || stateValue.length() <= 0) {
-			return easyConfig;
-		}
+		final String stateValue = Util.getStateString(_state, XML_STATE_EASY_IMPORT, null);
+		if (stateValue != null) {
 
-		try {
+			try {
 
-			final Reader reader = new StringReader(stateValue);
-			final XMLMemento xmlMemento = XMLMemento.createReadRoot(reader);
+				final Reader reader = new StringReader(stateValue);
+				final XMLMemento xmlMemento = XMLMemento.createReadRoot(reader);
 
-			for (final IMemento memento : xmlMemento.getChildren()) {
+				for (final IMemento memento : xmlMemento.getChildren()) {
 
-				final XMLMemento xmlConfig = (XMLMemento) memento;
+					final XMLMemento xmlConfig = (XMLMemento) memento;
 
-				switch (xmlConfig.getType()) {
+					switch (xmlConfig.getType()) {
 
-				case TAG_CONFIG:
+					case TAG_CONFIG:
 
-					loadEasyConfig_10_Common(xmlConfig, easyConfig);
-					break;
+						loadEasyConfig_10_Common(xmlConfig, easyConfig);
+						break;
 
-				case TAG_DASH_CONFIG:
+					case TAG_DASH_CONFIG:
 
-					loadEasyConfig_20_Dash(xmlConfig, easyConfig);
-					break;
+						loadEasyConfig_20_Dash(xmlConfig, easyConfig);
+						break;
 
-				case TAG_IMPORT_CONFIG:
+					case TAG_IMPORT_CONFIG:
 
-					loadEasyConfig_30_Config(xmlConfig, easyConfig);
-					break;
+						loadEasyConfig_30_Config(xmlConfig, easyConfig);
+						break;
 
-				case TAG_LAUNCHER_CONFIG:
+					case TAG_LAUNCHER_CONFIG:
 
-					loadEasyConfig_40_Launcher(xmlConfig, easyConfig);
-					break;
+						loadEasyConfig_40_Launcher(xmlConfig, easyConfig);
+						break;
 
-				default:
-					break;
+					default:
+						break;
+					}
+
 				}
 
+			} catch (final WorkbenchException e) {
+				// ignore
 			}
+		}
 
-		} catch (final WorkbenchException e) {
-			// ignore
+		/*
+		 * Create default import config.
+		 */
+		final ArrayList<ImportConfig> importConfigs = easyConfig.importConfigs;
+		if (importConfigs.size() == 0) {
+
+			final ImportConfig defaultConfig = new ImportConfig();
+
+			defaultConfig.name = Messages.Import_Data_Default_ImportConfig_Name;
+
+			importConfigs.add(defaultConfig);
+		}
+
+		// ensure that an active import config is setup
+		if (easyConfig.getActiveImportConfig() == null) {
+			easyConfig.setActiveImportConfig(importConfigs.get(0));
+		}
+
+		/*
+		 * Create default import launcher
+		 */
+		final ArrayList<ImportLauncher> importLaunchers = easyConfig.importLaunchers;
+		if (importLaunchers.size() == 0) {
+
+			final ImportLauncher defaultLauncher = new ImportLauncher();
+
+			defaultLauncher.name = Messages.Import_Data_Default_FirstEasyImportLauncher_Name;
+			defaultLauncher.description = Messages.Import_Data_Default_FirstEasyImportLauncher_Description;
+
+			importLaunchers.add(defaultLauncher);
 		}
 
 		return easyConfig;
@@ -524,7 +554,6 @@ public class EasyImportManager {
 
 	private void loadEasyConfig_10_Common(final XMLMemento xmlMemento, final EasyConfig dashConfig) {
 
-		dashConfig.isLastLauncherRemoved = Util.getXmlBoolean(xmlMemento, ATTR_IS_LAST_LAUNCHER_REMOVED, false);
 	}
 
 	private void loadEasyConfig_20_Dash(final XMLMemento xmlMemento, final EasyConfig dashConfig) {
@@ -887,7 +916,7 @@ public class EasyImportManager {
 		try {
 
 			xmlMemento.save(writer);
-			_state.put(XML_STATE_EASY_IMPORT_CONFIG, writer.toString());
+			_state.put(XML_STATE_EASY_IMPORT, writer.toString());
 
 		} catch (final IOException e) {
 
@@ -909,9 +938,7 @@ public class EasyImportManager {
 		 * Common config
 		 */
 		{
-			final IMemento xmlConfig = xmlMemento.createChild(TAG_CONFIG);
 
-			xmlConfig.putBoolean(ATTR_IS_LAST_LAUNCHER_REMOVED, dashConfig.isLastLauncherRemoved);
 		}
 
 		/*
@@ -931,9 +958,11 @@ public class EasyImportManager {
 		/*
 		 * Import configs
 		 */
+		final ImportConfig activeImportConfig = dashConfig.getActiveImportConfig();
+
 		for (final ImportConfig importConfig : dashConfig.importConfigs) {
 
-			final boolean isActiveConfig = dashConfig.getActiveImportConfig().equals(importConfig);
+			final boolean isActiveConfig = activeImportConfig.equals(importConfig);
 
 			final IMemento xmlConfig = xmlMemento.createChild(TAG_IMPORT_CONFIG);
 

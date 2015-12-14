@@ -21,7 +21,7 @@ import net.tourbook.common.util.StatusUtil;
 
 public class ImportConfig implements Cloneable {
 
-	public static final String	DEVICE_FILES_DEFAULT	= "*";												//$NON-NLS-1$
+	public static final String	DEVICE_FILES_DEFAULT	= "*";					//$NON-NLS-1$
 
 	public String				name					= UI.EMPTY_STRING;
 
@@ -108,6 +108,10 @@ public class ImportConfig implements Cloneable {
 		return getOSFolder(_deviceFolder);
 	}
 
+	public long getId() {
+		return _id;
+	}
+
 	private String getOSFolder(final String folder) {
 
 		if (folder == null || folder.trim().length() == 0) {
@@ -147,12 +151,26 @@ public class ImportConfig implements Cloneable {
 	}
 
 	public void setBackupFolder(final String backupFolder) {
-
 		_backupFolder = backupFolder;
 	}
 
 	public void setDeviceFolder(final String deviceFolder) {
-
 		_deviceFolder = deviceFolder;
+	}
+
+	@Override
+	public String toString() {
+
+		return "ImportConfig [\n"
+
+				+ ("name=" + name + ", \n")
+				+ ("isCreateBackup=" + isCreateBackup + ", \n")
+				+ ("isTurnOffWatching=" + isTurnOffWatching + ", \n")
+				+ ("_id=" + _id + ", \n")
+				+ ("_backupFolder=" + _backupFolder + ", \n")
+				+ ("_deviceFolder=" + _deviceFolder + ", \n")
+				+ ("deviceFiles=" + deviceFiles)
+
+				+ "\n]";
 	}
 }
