@@ -141,6 +141,7 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
 import org.eclipse.swt.browser.Browser;
+import org.eclipse.swt.browser.BrowserFunction;
 import org.eclipse.swt.browser.LocationAdapter;
 import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.browser.ProgressAdapter;
@@ -174,6 +175,7 @@ import org.joda.time.DateTime;
  */
 public class RawDataView extends ViewPart implements ITourProviderAll, ITourViewer3 {
 
+	private static final String				JS_FUNCTION_ON_SELECT_IMPORT_CONFIG			= "onSelectImportConfig";
 	public static final String				ID											= "net.tourbook.views.rawData.RawDataView"; //$NON-NLS-1$
 	//
 	private static final String				WEB_RESOURCE_TITLE_FONT						= "Nunito-Bold.ttf";						//$NON-NLS-1$
@@ -335,7 +337,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private boolean							_isDeviceStateValid;
 	private boolean							_isRunDashboardAnimation					= true;
 	private boolean							_isShowWatcherAnimation;
-	private boolean							_isUpdateDeviceState;
+	private boolean							_isUpdateDeviceState						= true;
 	//
 	private String							_cssFonts;
 	private String							_cssFromFile;
@@ -393,6 +395,34 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private TableViewerTourInfoToolTip		_tourInfoToolTip;
 
 	private Browser							_browser;
+
+	private class JS_OnSelectImportConfig extends BrowserFunction {
+
+		JS_OnSelectImportConfig(final Browser browser, final String name) {
+			super(browser, name);
+		}
+
+		@Override
+		public Object function(final Object[] arguments) {
+
+			final int selectedIndex = ((Number) arguments[0]).intValue();
+
+			Display.getCurrent().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+
+					onSelectImportConfig(selectedIndex);
+				}
+			});
+
+//// this can be used to show created JS in the debugger
+//			if (true) {
+//				throw new RuntimeException();
+//			}
+
+			return null;
+		}
+	}
 
 	private class TourDataContentProvider implements IStructuredContentProvider {
 
@@ -570,14 +600,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			final EasyConfig modifiedEasyConfig = _dialogImportConfig.getModifiedConfig();
 
+			easyConfig.setActiveImportConfig(modifiedEasyConfig.getActiveImportConfig());
+
 			easyConfig.importConfigs.clear();
 			easyConfig.importConfigs.addAll(modifiedEasyConfig.importConfigs);
 
 			easyConfig.importLaunchers.clear();
 			easyConfig.importLaunchers.addAll(modifiedEasyConfig.importLaunchers);
 
-			updateModel_EasyConfig_Dashboard(_dialogImportConfig, false);
-			updateModel_EasyConfig_AndSave(_dialogImportConfig);
+			updateModel_EasyConfig_Dashboard(_dialogImportConfig.getModifiedConfig());
 
 			_isDeviceStateValid = false;
 			updateUI_2_Dashboard();
@@ -1058,7 +1089,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				 * Device Import
 				 */
 				createHTML_50_Easy_Header(sb);
-				createHTML_52_Easy_Tiles(sb);
+				createHTML_80_Easy_Tiles(sb);
 
 				/*
 				 * Get Tours
@@ -1067,7 +1098,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				sb.append("	" + Messages.Import_Data_HTML_GetTours + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 				sb.append("</div>\n"); //$NON-NLS-1$
 
-				createHTML_60_SimpleImport(sb);
+				createHTML_90_SimpleImport(sb);
 			}
 			sb.append("</div>\n"); //$NON-NLS-1$
 		}
@@ -1078,28 +1109,30 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private void createHTML_50_Easy_Header(final StringBuilder sb) {
 
-		final String htmlDeviceOnOff = createHTML_DeviceState_OnOff();
-		final String htmlDeviceState = createHTML_DeviceState();
-
 		final String watchClass = isWatchingOn() ? DOM_CLASS_DEVICE_ON : DOM_CLASS_DEVICE_OFF;
 
 		final String html = "" // //$NON-NLS-1$
 
 				+ "<div class='auto-import-header'>\n" //$NON-NLS-1$
-				+ ("	<table><tbody><tr>\n") //$NON-NLS-1$
+				+ ("	<table border=0><tbody><tr>\n") //$NON-NLS-1$
 
 				// device state on/off
 				+ ("		<td>\n") //$NON-NLS-1$
-				+ ("			<div id='" + DOM_ID_DEVICE_ON_OFF + "'>" + htmlDeviceOnOff + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				+ ("			<div id='" + DOM_ID_DEVICE_ON_OFF + "'>" + createHTML_52_DeviceState_OnOff() + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				+ ("		</td>\n") //$NON-NLS-1$
 
-				// device import
-				+ ("		<td class='title'>" + Messages.Import_Data_HTML_EasyImport + "</td>\n") //$NON-NLS-1$ //$NON-NLS-2$
+				// title
+				+ ("		<td><span class='title'>" + Messages.Import_Data_HTML_EasyImport + "</span></td>\n") //$NON-NLS-1$ //$NON-NLS-2$
 
-				// device state icon
+				// state icon
 				+ ("		<td>\n") //$NON-NLS-1$
-				+ ("			<div id='" + DOM_ID_DEVICE_STATE + "' style='padding-left:20px;' class='" + watchClass + "'>" + htmlDeviceState + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				+ ("			<div id='" + DOM_ID_DEVICE_STATE + "' style='padding-left:25px;' class='" + watchClass + "'>\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				+ (createHTML_54_DeviceState())
+				+ ("			</div>\n") //$NON-NLS-1$
 				+ ("		</td>\n") //$NON-NLS-1$
+
+				// selected config
+				+ ("		<td>" + createHTML_60_SelectImportConfig() + "</td>\n") //$NON-NLS-1$ //$NON-NLS-2$
 
 				+ "	</tr></tbody></table>\n" // //$NON-NLS-1$
 				+ "</div>\n"; //$NON-NLS-1$
@@ -1107,140 +1140,39 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		sb.append(html);
 	}
 
-	private void createHTML_52_Easy_Tiles(final StringBuilder sb) {
+	private String createHTML_52_DeviceState_OnOff() {
 
-		final EasyConfig easyConfig = getEasyConfig();
+		final boolean isWatchingOn = isWatchingOn();
 
-		final ArrayList<ImportLauncher> allImportLauncher = easyConfig.importLaunchers;
-		final ArrayList<ImportConfig> allImportConfigs = easyConfig.importConfigs;
+		String tooltip = isWatchingOn
+				? Messages.Import_Data_HTML_DeviceOff_Tooltip
+				: Messages.Import_Data_HTML_DeviceOn_Tooltip;
 
-		if (allImportLauncher.size() == 0 || allImportConfigs.size() == 0) {
+		tooltip = replaceNewLine(tooltip);
 
-			// this case should not happen
-			StatusUtil.showStatus(new Exception("Import config/launcher are not setup correctly."));//$NON-NLS-1$
+		// shwo red image when off
+		final String imageUrl = isWatchingOn //
+				? _imageUrl_Device_TurnOn
+				: _imageUrl_Device_TurnOff;
 
-			return;
-		}
+		final String hrefAction = HTTP_DUMMY + HREF_ACTION_DEVICE_WATCHING_ON_OFF;
+		final String onOffImage = createHTML_BgImageStyle(imageUrl);
 
-		int tileIndex = 0;
-		final int numHorizontalTiles = easyConfig.numHorizontalTiles;
-		boolean isTrOpen = false;
+		final String html = ""// //$NON-NLS-1$
 
-		final String watchClass = isWatchingOn() ? DOM_CLASS_DEVICE_ON : DOM_CLASS_DEVICE_OFF;
+				+ "<a class='onOffIcon dash-action'" // //$NON-NLS-1$
+				+ ("title='" + tooltip + "'") //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" href='" + hrefAction + "'") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ">" //$NON-NLS-1$
 
-		sb.append("<table id='" + DOM_ID_IMPORT_TILES + "' class='" + watchClass + "'><tbody>\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				+ ("<div class='stateIcon' " + onOffImage + "></div>") //$NON-NLS-1$ //$NON-NLS-2$
 
-		for (final ImportLauncher importLauncher : allImportLauncher) {
-
-			if (importLauncher.isShowInDashboard) {
-
-				if (tileIndex % numHorizontalTiles == 0) {
-					sb.append("<tr>\n"); //$NON-NLS-1$
-					isTrOpen = true;
-				}
-
-				// enforce equal column width
-				sb.append("<td style='width:" + 100 / numHorizontalTiles + "%' class='import-tile'>\n"); //$NON-NLS-1$ //$NON-NLS-2$
-				sb.append(createHTML_54_Easy_Tile(importLauncher));
-				sb.append("</td>\n"); //$NON-NLS-1$
-
-				if (tileIndex % numHorizontalTiles == numHorizontalTiles - 1) {
-					sb.append("</tr>\n"); //$NON-NLS-1$
-					isTrOpen = false;
-				}
-
-				tileIndex++;
-			}
-		}
-
-		if (isTrOpen) {
-			sb.append("	</tr>\n"); //$NON-NLS-1$
-		}
-
-		sb.append("</tbody></table>\n"); //$NON-NLS-1$
-	}
-
-	private String createHTML_54_Easy_Tile(final ImportLauncher importTile) {
-
-		/*
-		 * Tooltip
-		 */
-		final String tooltip = createHTML_TileTooltip(importTile);
-
-		/*
-		 * Tile image
-		 */
-		final Image tileImage = getImportConfigImage(importTile);
-		String htmlImage = UI.EMPTY_STRING;
-		if (tileImage != null) {
-
-			final byte[] pngImageData = ImageUtils.formatImage(tileImage, SWT.IMAGE_PNG);
-			final String base64Encoded = Base64.getEncoder().encodeToString(pngImageData);
-
-			htmlImage = "<img src='data:image/png;base64," + base64Encoded + "'>"; //$NON-NLS-1$ //$NON-NLS-2$
-		}
-
-		/*
-		 * Tile HTML
-		 */
-		final String href = HTTP_DUMMY + HREF_ACTION_DEVICE_IMPORT + HREF_TOKEN + importTile.getId();
-
-		final String htmlConfig = createHTML_ILConfig(importTile);
-
-		final String html = "" //$NON-NLS-1$
-
-				+ ("<a href='" + href + "' title='" + tooltip + "' class='import-tile'>\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				+ ("	<div class='import-tile-image'>" + htmlImage + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("	<div class='import-tile-config'>" + htmlConfig + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("</a>\n") //$NON-NLS-1$
-		;
+				+ "</a>"; //$NON-NLS-1$
 
 		return html;
 	}
 
-	private void createHTML_60_SimpleImport(final StringBuilder sb) {
-
-		sb.append("<div class='get-tours-items'>\n"); //$NON-NLS-1$
-		sb.append("	<table><tbody><tr>\n"); //$NON-NLS-1$
-		{
-			createHTML_TileAction(
-					sb,
-					Messages.Import_Data_HTML_ImportFromFiles_Action,
-					Messages.Import_Data_HTML_ImportFromFiles_ActionTooltip,
-					(HTTP_DUMMY + HREF_ACTION_IMPORT_FROM_FILES),
-					_imageUrl_ImportFromFile);
-
-			createHTML_TileAction(
-					sb,
-					Messages.Import_Data_HTML_ReceiveFromSerialPort_ConfiguredAction,
-					Messages.Import_Data_HTML_ReceiveFromSerialPort_ConfiguredLink,
-					(HTTP_DUMMY + HREF_ACTION_SERIAL_PORT_CONFIGURED),
-					_imageUrl_SerialPort_Configured);
-
-			createHTML_TileAction(
-					sb,
-					Messages.Import_Data_HTML_ReceiveFromSerialPort_DirectlyAction,
-					Messages.Import_Data_HTML_ReceiveFromSerialPort_DirectlyLink,
-					(HTTP_DUMMY + HREF_ACTION_SERIAL_PORT_DIRECTLY),
-					_imageUrl_SerialPort_Directly);
-		}
-		sb.append("	</tr></tbody></table>\n"); // //$NON-NLS-1$
-		sb.append("</div>\n"); //$NON-NLS-1$
-
-	}
-
-	private String createHTML_BgImage(final String imageUrl) {
-		return "background-image: url(" + imageUrl + ");"; //$NON-NLS-1$ //$NON-NLS-2$
-	}
-
-	private String createHTML_BgImageStyle(final String imageUrl) {
-
-		final String bgImage = createHTML_BgImage(imageUrl);
-
-		return "style='" + bgImage + "'"; //$NON-NLS-1$ //$NON-NLS-2$
-	}
-
-	private String createHTML_DeviceState() {
+	private String createHTML_54_DeviceState() {
 
 		final String hrefSetupAction = HTTP_DUMMY + HREF_ACTION_SETUP_EASY_IMPORT;
 
@@ -1258,22 +1190,22 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			final String stateImage = createHTML_BgImageStyle(_imageUrl_DeviceFolder_Disabled);
 			final String htmlTooltip = Messages.Import_Data_HTML_WatchingIsOff;
 
-			html = ""// //$NON-NLS-1$
+			html = "\n"// //$NON-NLS-1$
 
 					+ "<a class='importState dash-action'" // //$NON-NLS-1$
 					+ (" href='" + HTTP_DUMMY + "'") //$NON-NLS-1$ //$NON-NLS-2$
 					+ ">" //$NON-NLS-1$
 
-					+ ("<div class='stateIcon' " + stateImage + ">") //$NON-NLS-1$ //$NON-NLS-2$
-					+ ("   <div class='stateIconValue'></div>") //$NON-NLS-1$
-					+ ("</div>") //$NON-NLS-1$
-					+ ("<div class='stateTooltip stateTooltipMessage'>" + htmlTooltip + "</div>") //$NON-NLS-1$ //$NON-NLS-2$
+					+ ("<div class='stateIcon' " + stateImage + ">\n") //$NON-NLS-1$ //$NON-NLS-2$
+					+ ("   <div class='stateIconValue'></div>\n") //$NON-NLS-1$
+					+ ("</div>\n") //$NON-NLS-1$
+					+ ("<div class='stateTooltip stateTooltipMessage'>" + htmlTooltip + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$
 
-					+ "</a>"; //$NON-NLS-1$
+					+ "</a>\n"; //$NON-NLS-1$
 
 		} else if (isWatchAnything && _isDeviceStateValid) {
 
-			html = createHTML_DeviceState_IsValid(easyConfig, hrefSetupAction);
+			html = createHTML_55_DeviceState_IsValid(easyConfig, hrefSetupAction);
 
 		} else {
 
@@ -1290,24 +1222,24 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 					? Messages.Import_Data_HTML_AcquireDeviceInfo
 					: Messages.Import_Data_HTML_NothingIsWatched;
 
-			html = ""// //$NON-NLS-1$
+			html = "\n"// //$NON-NLS-1$
 
 					+ "<a class='importState dash-action'" // //$NON-NLS-1$
 					+ (" href='" + hrefSetupAction + "'") //$NON-NLS-1$ //$NON-NLS-2$
-					+ ">" //$NON-NLS-1$
+					+ ">\n" //$NON-NLS-1$
 
-					+ ("<div class='stateIcon' " + stateImage + ">") //$NON-NLS-1$ //$NON-NLS-2$
-					+ ("   <div class='stateIconValue'></div>") //$NON-NLS-1$
-					+ ("</div>") //$NON-NLS-1$
-					+ ("<div class='stateTooltip stateTooltipMessage'>" + htmlTooltip + "</div>") //$NON-NLS-1$ //$NON-NLS-2$
+					+ ("<div class='stateIcon' " + stateImage + ">\n") //$NON-NLS-1$ //$NON-NLS-2$
+					+ ("   <div class='stateIconValue'></div>\n") //$NON-NLS-1$
+					+ ("</div>\n") //$NON-NLS-1$
+					+ ("<div class='stateTooltip stateTooltipMessage'>" + htmlTooltip + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$
 
-					+ "</a>"; //$NON-NLS-1$
+					+ "</a>\n"; //$NON-NLS-1$
 		}
 
 		return html;
 	}
 
-	private String createHTML_DeviceState_IsValid(final EasyConfig easyConfig, final String hrefAction) {
+	private String createHTML_55_DeviceState_IsValid(final EasyConfig easyConfig, final String hrefAction) {
 
 		final ImportConfig importConfig = easyConfig.getActiveImportConfig();
 
@@ -1317,7 +1249,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		boolean isFolderOK = true;
 
 		final StringBuilder sb = new StringBuilder();
-		sb.append("<table><tbody>"); //$NON-NLS-1$
+		sb.append("<table border=0><tbody>"); //$NON-NLS-1$
+
+		/*
+		 * Title
+		 */
+		sb.append("<tr>"); //$NON-NLS-1$
+		sb.append("<td colspan=2 class='importConfigTitle'>" + importConfig.name + "</td>"); //$NON-NLS-1$
+		sb.append("</tr>"); //$NON-NLS-1$
 
 		/*
 		 * Backup folder
@@ -1351,7 +1290,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			}
 
-			createHTML_FolderState(//
+			createHTML_56_FolderState(//
 					sb,
 					htmlBackupFolder,
 					isBackupFolderOK,
@@ -1378,7 +1317,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 					? NLS.bind(Messages.Import_Data_HTML_AllFilesAreImported, numDeviceFiles)
 					: NLS.bind(Messages.Import_Data_HTML_NotImportedFiles, numNotImportedFiles, numDeviceFiles);
 
-			createHTML_FolderState(//
+			createHTML_56_FolderState(//
 					sb,
 					htmlDeviceFolder,
 					isDeviceFolderOK,
@@ -1421,8 +1360,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			final String onOffImage = createHTML_BgImage(imageUrl);
 
 			sb.append("<tr>"); //$NON-NLS-1$
-			sb.append("<td><div class='action-button-25' style='padding-top:10px; " + onOffImage + "'></div></td>"); //$NON-NLS-1$ //$NON-NLS-2$
-			sb.append("<td class='folderInfo' style='padding-top:10px;'>" + watchingText + "</td>"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append("<td " + HTML_STYLE_TITLE_VERTICAL_PADDING + ">"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append("	<div class='action-button-25' style='" + onOffImage + "'></div>"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append("</td>"); //$NON-NLS-1$
+			sb.append("<td class='folderInfo' " + HTML_STYLE_TITLE_VERTICAL_PADDING + ">" + watchingText + "</td>"); //$NON-NLS-1$ //$NON-NLS-2$
 			sb.append("</tr>"); //$NON-NLS-1$
 		}
 
@@ -1432,7 +1373,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		 * Import files
 		 */
 		if (numNotImportedFiles > 0) {
-			createHTML_NotImportedFiles(sb, notImportedFiles);
+			createHTML_58_NotImportedFiles(sb, notImportedFiles);
 		}
 
 		final String htmlTooltip = sb.toString();
@@ -1452,50 +1393,18 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				? "style='overflow-y: scroll;'" //$NON-NLS-1$
 				: UI.EMPTY_STRING;
 
-		final String html = ""// //$NON-NLS-1$
+		final String html = "\n"// //$NON-NLS-1$
 
 				+ "<a class='importState dash-action'" // //$NON-NLS-1$
 				+ (" href='" + hrefAction + "'") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ">" //$NON-NLS-1$
 
-				+ ("<div class='stateIcon' " + stateImage + ">") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("   <div class='stateIconValue'>" + stateIconValue + "</div>") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("</div>") //$NON-NLS-1$
-				+ ("<div class='stateTooltip' " + cssOverflow + ">" + htmlTooltip + "</div>") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				+ ("	<div class='stateIcon' " + stateImage + ">\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("		<div class='stateIconValue'>" + stateIconValue + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("	</div>\n") //$NON-NLS-1$
+				+ ("	<div class='stateTooltip' " + cssOverflow + ">" + htmlTooltip + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-				+ "</a>"; //$NON-NLS-1$
-
-		return html;
-	}
-
-	private String createHTML_DeviceState_OnOff() {
-
-		final boolean isWatchingOn = isWatchingOn();
-
-		String tooltip = isWatchingOn
-				? Messages.Import_Data_HTML_DeviceOff_Tooltip
-				: Messages.Import_Data_HTML_DeviceOn_Tooltip;
-
-		tooltip = replaceNewLine(tooltip);
-
-		// shwo red image when off
-		final String imageUrl = isWatchingOn //
-				? _imageUrl_Device_TurnOn
-				: _imageUrl_Device_TurnOff;
-
-		final String hrefAction = HTTP_DUMMY + HREF_ACTION_DEVICE_WATCHING_ON_OFF;
-		final String onOffImage = createHTML_BgImageStyle(imageUrl);
-
-		final String html = ""// //$NON-NLS-1$
-
-				+ "<a class='onOffIcon dash-action'" // //$NON-NLS-1$
-				+ ("title='" + tooltip + "'") //$NON-NLS-1$ //$NON-NLS-2$
-				+ (" href='" + hrefAction + "'") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ">" //$NON-NLS-1$
-
-				+ ("<div class='stateIcon' " + onOffImage + "></div>") //$NON-NLS-1$ //$NON-NLS-2$
-
-				+ "</a>"; //$NON-NLS-1$
+				+ "</a>\n"; //$NON-NLS-1$
 
 		return html;
 	}
@@ -1508,12 +1417,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	 * @param folderTitle
 	 * @param folderInfo
 	 */
-	private void createHTML_FolderState(final StringBuilder sb,
-										final String folderLocation,
-										final boolean isOSFolderValid,
-										final boolean isTopMargin,
-										final String folderTitle,
-										final String folderInfo) {
+	private void createHTML_56_FolderState(	final StringBuilder sb,
+											final String folderLocation,
+											final boolean isOSFolderValid,
+											final boolean isTopMargin,
+											final String folderTitle,
+											final String folderInfo) {
 
 		String htmlErrorState;
 		String htmlFolderInfo;
@@ -1554,34 +1463,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	}
 
-	private String createHTML_ILConfig(final ImportLauncher importTile) {
-
-		String htmlSaveTour = UI.EMPTY_STRING;
-		if (importTile.isSaveTour) {
-
-			final String stateImage = createHTML_BgImage(_imageUrl_State_SaveTour);
-
-			htmlSaveTour = "<div style='float: right;" + stateImage + "' class='action-button-16'></div>"; //$NON-NLS-1$ //$NON-NLS-2$
-		}
-
-		String htmlLastMarker = UI.EMPTY_STRING;
-		if (importTile.isSetLastMarker) {
-
-			final String stateImage = createHTML_BgImage(_imageUrl_State_TourMarker);
-
-			htmlLastMarker = "<div style='float: right;" + stateImage + "' class='action-button-16'></div>"; //$NON-NLS-1$ //$NON-NLS-2$
-		}
-
-		final StringBuilder sb = new StringBuilder();
-
-		sb.append(htmlSaveTour);
-		sb.append(htmlLastMarker);
-		sb.append("<div style='float:left;'>" + importTile.name + "</div>"); //$NON-NLS-1$ //$NON-NLS-2$
-
-		return sb.toString();
-	}
-
-	private void createHTML_NotImportedFiles(final StringBuilder sb, final ArrayList<OSFile> notImportedFiles) {
+	private void createHTML_58_NotImportedFiles(final StringBuilder sb, final ArrayList<OSFile> notImportedFiles) {
 
 		sb.append("<table class='deviceList'><tbody>"); //$NON-NLS-1$
 
@@ -1611,32 +1493,138 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		sb.append("</tbody></table>"); //$NON-NLS-1$
 	}
 
-	private void createHTML_TileAction(	final StringBuilder sb,
-										final String name,
-										final String tooltip,
-										final String href,
-										final String imageUrl) {
+	private String createHTML_60_SelectImportConfig() {
 
-		final String htmlImage = "style='" // //$NON-NLS-1$
+		final String onChange = "onchange='" + JS_FUNCTION_ON_SELECT_IMPORT_CONFIG + "(this.selectedIndex)'";
 
-				+ ("background-image:	url(" + imageUrl + ");\n") //$NON-NLS-1$ //$NON-NLS-2$
-				//
-				+ "'"; //$NON-NLS-1$
+		final EasyConfig easyConfig = getEasyConfig();
+		final ImportConfig selectedConfig = easyConfig.getActiveImportConfig();
+
+		final StringBuilder sb = new StringBuilder();
+
+		sb.append("<div class='selectConfigContainer'>");
+		sb.append("<select class='selectConfig dash-action' " + onChange + ">");
+
+		for (final ImportConfig importConfig : easyConfig.importConfigs) {
+
+			final String isSelected = importConfig.equals(selectedConfig)//
+					? "selected"
+					: UI.EMPTY_STRING;
+
+			sb.append("<option class='selectOption' " + isSelected + ">" + importConfig.name + "</option>");
+		}
+		sb.append("</select>");
+		sb.append("</div>");
+
+		return sb.toString();
+	}
+
+	private void createHTML_80_Easy_Tiles(final StringBuilder sb) {
+
+		final EasyConfig easyConfig = getEasyConfig();
+
+		final ArrayList<ImportLauncher> allImportLauncher = easyConfig.importLaunchers;
+		final ArrayList<ImportConfig> allImportConfigs = easyConfig.importConfigs;
+
+		if (allImportLauncher.size() == 0 || allImportConfigs.size() == 0) {
+
+			// this case should not happen
+			StatusUtil.showStatus(new Exception("Import config/launcher are not setup correctly."));//$NON-NLS-1$
+
+			return;
+		}
+
+		// get available launcher
+		int availableLauncher = 0;
+		for (final ImportLauncher importLauncher : allImportLauncher) {
+			if (importLauncher.isShowInDashboard) {
+				availableLauncher++;
+			}
+		}
+
+		int tileIndex = 0;
+		int numHorizontalTiles = easyConfig.numHorizontalTiles;
+		boolean isTrOpen = false;
+
+		// reduce max tiles, otherwise there would be a BIG gap between tiles
+		if (availableLauncher < numHorizontalTiles) {
+			numHorizontalTiles = availableLauncher;
+		}
+
+		final String watchClass = isWatchingOn() ? DOM_CLASS_DEVICE_ON : DOM_CLASS_DEVICE_OFF;
+
+		sb
+				.append("<table border=0 id='" + DOM_ID_IMPORT_TILES + "' style='margin-top:5px;' class='" + watchClass + "'><tbody>\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+		for (final ImportLauncher importLauncher : allImportLauncher) {
+
+			if (importLauncher.isShowInDashboard) {
+
+				if (tileIndex % numHorizontalTiles == 0) {
+					sb.append("<tr>\n"); //$NON-NLS-1$
+					isTrOpen = true;
+				}
+
+				// enforce equal column width
+				sb.append("<td style='width:" + 100 / numHorizontalTiles + "%' class='import-tile'>\n"); //$NON-NLS-1$ //$NON-NLS-2$
+				sb.append(createHTML_82_Easy_Tile(importLauncher));
+				sb.append("</td>\n"); //$NON-NLS-1$
+
+				if (tileIndex % numHorizontalTiles == numHorizontalTiles - 1) {
+					sb.append("</tr>\n"); //$NON-NLS-1$
+					isTrOpen = false;
+				}
+
+				tileIndex++;
+			}
+		}
+
+		if (isTrOpen) {
+			sb.append("	</tr>\n"); //$NON-NLS-1$
+		}
+
+		sb.append("</tbody></table>\n"); //$NON-NLS-1$
+	}
+
+	private String createHTML_82_Easy_Tile(final ImportLauncher importTile) {
+
+		/*
+		 * Tooltip
+		 */
+		final String tooltip = createHTML_84_TileTooltip(importTile);
+
+		/*
+		 * Tile image
+		 */
+		final Image tileImage = getImportConfigImage(importTile);
+		String htmlImage = UI.EMPTY_STRING;
+		if (tileImage != null) {
+
+			final byte[] pngImageData = ImageUtils.formatImage(tileImage, SWT.IMAGE_PNG);
+			final String base64Encoded = Base64.getEncoder().encodeToString(pngImageData);
+
+			htmlImage = "<img src='data:image/png;base64," + base64Encoded + "'>"; //$NON-NLS-1$ //$NON-NLS-2$
+		}
+
+		/*
+		 * Tile HTML
+		 */
+		final String href = HTTP_DUMMY + HREF_ACTION_DEVICE_IMPORT + HREF_TOKEN + importTile.getId();
+
+		final String htmlConfig = createHTML_86_ILConfig(importTile);
 
 		final String html = "" //$NON-NLS-1$
 
-				+ ("<td>") //$NON-NLS-1$
 				+ ("<a href='" + href + "' title='" + tooltip + "' class='import-tile'>\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				+ ("	<div class='import-tile-image action-button' " + htmlImage + "></div>\n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("	<div class='import-tile-config'>" + name + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("	<div class='import-tile-image'>" + htmlImage + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("	<div class='import-tile-config'>" + htmlConfig + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("</a>\n") //$NON-NLS-1$
-				+ ("</td>") //$NON-NLS-1$
 		;
 
-		sb.append(html);
+		return html;
 	}
 
-	private String createHTML_TileTooltip(final ImportLauncher importLauncher) {
+	private String createHTML_84_TileTooltip(final ImportLauncher importLauncher) {
 
 		boolean isTextAdded = false;
 
@@ -1737,6 +1725,100 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 
 		return sb.toString();
+	}
+
+	private String createHTML_86_ILConfig(final ImportLauncher importTile) {
+
+		String htmlSaveTour = UI.EMPTY_STRING;
+		if (importTile.isSaveTour) {
+
+			final String stateImage = createHTML_BgImage(_imageUrl_State_SaveTour);
+
+			htmlSaveTour = "<div style='float: right;" + stateImage + "' class='action-button-16'></div>"; //$NON-NLS-1$ //$NON-NLS-2$
+		}
+
+		String htmlLastMarker = UI.EMPTY_STRING;
+		if (importTile.isSetLastMarker) {
+
+			final String stateImage = createHTML_BgImage(_imageUrl_State_TourMarker);
+
+			htmlLastMarker = "<div style='float: right;" + stateImage + "' class='action-button-16'></div>"; //$NON-NLS-1$ //$NON-NLS-2$
+		}
+
+		final StringBuilder sb = new StringBuilder();
+
+		sb.append(htmlSaveTour);
+		sb.append(htmlLastMarker);
+		sb.append("<div style='float:left;'>" + importTile.name + "</div>"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		return sb.toString();
+	}
+
+	private void createHTML_90_SimpleImport(final StringBuilder sb) {
+
+		sb.append("<div class='get-tours-items'>\n"); //$NON-NLS-1$
+		sb.append("	<table><tbody><tr>\n"); //$NON-NLS-1$
+		{
+			createHTML_92_TileAction(
+					sb,
+					Messages.Import_Data_HTML_ImportFromFiles_Action,
+					Messages.Import_Data_HTML_ImportFromFiles_ActionTooltip,
+					(HTTP_DUMMY + HREF_ACTION_IMPORT_FROM_FILES),
+					_imageUrl_ImportFromFile);
+
+			createHTML_92_TileAction(
+					sb,
+					Messages.Import_Data_HTML_ReceiveFromSerialPort_ConfiguredAction,
+					Messages.Import_Data_HTML_ReceiveFromSerialPort_ConfiguredLink,
+					(HTTP_DUMMY + HREF_ACTION_SERIAL_PORT_CONFIGURED),
+					_imageUrl_SerialPort_Configured);
+
+			createHTML_92_TileAction(
+					sb,
+					Messages.Import_Data_HTML_ReceiveFromSerialPort_DirectlyAction,
+					Messages.Import_Data_HTML_ReceiveFromSerialPort_DirectlyLink,
+					(HTTP_DUMMY + HREF_ACTION_SERIAL_PORT_DIRECTLY),
+					_imageUrl_SerialPort_Directly);
+		}
+		sb.append("	</tr></tbody></table>\n"); // //$NON-NLS-1$
+		sb.append("</div>\n"); //$NON-NLS-1$
+
+	}
+
+	private void createHTML_92_TileAction(	final StringBuilder sb,
+											final String name,
+											final String tooltip,
+											final String href,
+											final String imageUrl) {
+
+		final String htmlImage = "style='" // //$NON-NLS-1$
+
+				+ ("background-image:	url(" + imageUrl + ");\n") //$NON-NLS-1$ //$NON-NLS-2$
+				//
+				+ "'"; //$NON-NLS-1$
+
+		final String html = "" //$NON-NLS-1$
+
+				+ ("<td>") //$NON-NLS-1$
+				+ ("<a href='" + href + "' title='" + tooltip + "' class='import-tile'>\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				+ ("	<div class='import-tile-image action-button' " + htmlImage + "></div>\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("	<div class='import-tile-config'>" + name + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("</a>\n") //$NON-NLS-1$
+				+ ("</td>") //$NON-NLS-1$
+		;
+
+		sb.append(html);
+	}
+
+	private String createHTML_BgImage(final String imageUrl) {
+		return "background-image: url(" + imageUrl + ");"; //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	private String createHTML_BgImageStyle(final String imageUrl) {
+
+		final String bgImage = createHTML_BgImage(imageUrl);
+
+		return "style='" + bgImage + "'"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	@Override
@@ -1954,7 +2036,17 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			GridDataFactory.fillDefaults().grab(true, true).applyTo(_browser);
 
+			final BrowserFunction function = new JS_OnSelectImportConfig(_browser, JS_FUNCTION_ON_SELECT_IMPORT_CONFIG);
+
 			_browser.addLocationListener(new LocationAdapter() {
+
+				@Override
+				public void changed(final LocationEvent event) {
+
+//					_browser.removeLocationListener(this);
+//					function.dispose();
+				}
+
 				@Override
 				public void changing(final LocationEvent event) {
 					onBrowser_LocationChanging(event);
@@ -1964,7 +2056,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			_browser.addProgressListener(new ProgressAdapter() {
 				@Override
 				public void completed(final ProgressEvent event) {
+
 					onBrowser_Completed(event);
+
 				}
 			});
 
@@ -2779,7 +2873,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	public void doLiveUpdate(final DialogEasyImportConfig dialogImportConfig) {
 
-		updateModel_EasyConfig_Dashboard(dialogImportConfig, true);
+		updateModel_EasyConfig_Dashboard(dialogImportConfig.getModifiedConfig());
 
 		_isDeviceStateValid = false;
 		updateUI_2_Dashboard();
@@ -3585,6 +3679,23 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 	}
 
+	/**
+	 * Import config is selected in the dashboard.
+	 * 
+	 * @param selectedIndex
+	 */
+	private void onSelectImportConfig(final int selectedIndex) {
+
+		final EasyConfig easyConfig = getEasyConfig();
+
+		final ImportConfig selectedConfig = easyConfig.importConfigs.get(selectedIndex);
+
+		easyConfig.setActiveImportConfig(selectedConfig);
+
+		_isDeviceStateValid = false;
+		updateUI_2_Dashboard();
+	}
+
 	private void onSelectionChanged(final ISelection selection) {
 
 		if (selection instanceof SelectionDeletedTours) {
@@ -4132,13 +4243,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 						final List<WatchEvent<?>> polledEvents = watchKey.pollEvents();
 
 //// log events, they are not used
-//							for (final WatchEvent<?> event : polledEvents) {
+//						for (final WatchEvent<?> event : polledEvents) {
 //
-//								final WatchEvent.Kind<?> kind = event.kind();
+//							final WatchEvent.Kind<?> kind = event.kind();
 //
-//								System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//										+ (String.format("Event: %s\tFile: %s", kind, event.context())));
-//							}
+//							System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//									+ (String.format("Event: %s\tFile: %s", kind, event.context())));
+//							// TODO remove SYSTEM.OUT.PRINTLN
+//						}
 
 						// do not update the device state when the import is running otherwise the import file list can be wrong
 						if (_isUpdateDeviceState) {
@@ -4291,56 +4403,27 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	}
 
 	/**
-	 * Keep none live values.
-	 */
-	private void updateModel_EasyConfig_AndSave(final DialogEasyImportConfig dialog) {
-
-		final EasyConfig modifiedEasyConfig = dialog.getModifiedConfig();
-		final ImportConfig modifiedImportConfig = modifiedEasyConfig.getActiveImportConfig();
-
-		final EasyConfig easyConfig = getEasyConfig();
-		final ImportConfig importConfig = easyConfig.getActiveImportConfig();
-
-		importConfig.name = modifiedImportConfig.name;
-
-		importConfig.isCreateBackup = modifiedImportConfig.isCreateBackup;
-		importConfig.isTurnOffWatching = modifiedImportConfig.isTurnOffWatching;
-
-		importConfig.setBackupFolder(modifiedImportConfig.getBackupFolder());
-		importConfig.setDeviceFolder(modifiedImportConfig.getDeviceFolder());
-
-		importConfig.deviceFiles = modifiedImportConfig.deviceFiles;
-
-		EasyImportManager.getInstance().saveEasyConfig(easyConfig);
-	}
-
-	/**
 	 * Keep live update values, other values MUST already have been set.
-	 * 
-	 * @param isSaveConfig
 	 */
-	private void updateModel_EasyConfig_Dashboard(final DialogEasyImportConfig dialog, final boolean isSaveConfig) {
+	private void updateModel_EasyConfig_Dashboard(final EasyConfig modifiedConfig) {
 
-		final EasyConfig modifiedEasyConfig = dialog.getModifiedConfig();
 		final EasyConfig easyConfig = getEasyConfig();
 
-		if (easyConfig.animationDuration != modifiedEasyConfig.animationDuration
-				|| easyConfig.animationCrazinessFactor != modifiedEasyConfig.animationCrazinessFactor) {
+		if (easyConfig.animationDuration != modifiedConfig.animationDuration
+				|| easyConfig.animationCrazinessFactor != modifiedConfig.animationCrazinessFactor) {
 
 			// run animation only when it was modified
 			_isRunDashboardAnimation = true;
 		}
-		easyConfig.animationCrazinessFactor = modifiedEasyConfig.animationCrazinessFactor;
-		easyConfig.animationDuration = modifiedEasyConfig.animationDuration;
+		easyConfig.animationCrazinessFactor = modifiedConfig.animationCrazinessFactor;
+		easyConfig.animationDuration = modifiedConfig.animationDuration;
 
-		easyConfig.backgroundOpacity = modifiedEasyConfig.backgroundOpacity;
-		easyConfig.isLiveUpdate = modifiedEasyConfig.isLiveUpdate;
-		easyConfig.numHorizontalTiles = modifiedEasyConfig.numHorizontalTiles;
-		easyConfig.tileSize = modifiedEasyConfig.tileSize;
+		easyConfig.backgroundOpacity = modifiedConfig.backgroundOpacity;
+		easyConfig.isLiveUpdate = modifiedConfig.isLiveUpdate;
+		easyConfig.numHorizontalTiles = modifiedConfig.numHorizontalTiles;
+		easyConfig.tileSize = modifiedConfig.tileSize;
 
-		if (isSaveConfig) {
-			EasyImportManager.getInstance().saveEasyConfig(easyConfig);
-		}
+		EasyImportManager.getInstance().saveEasyConfig(easyConfig);
 	}
 
 	private void updateToolTipState() {
@@ -4442,11 +4525,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private void updateUI_DeviceState_DOM() {
 
-		final String htmlDeviceOnOff = createHTML_DeviceState_OnOff();
+		final String htmlDeviceOnOff = createHTML_52_DeviceState_OnOff();
 		String jsDeviceOnOff = htmlDeviceOnOff.replace("\"", "\\\""); //$NON-NLS-1$ //$NON-NLS-2$
 		jsDeviceOnOff = replaceNewLine(jsDeviceOnOff);
 
-		final String htmlDeviceState = createHTML_DeviceState();
+		final String htmlDeviceState = createHTML_54_DeviceState();
 		String jsDeviceState = htmlDeviceState.replace("\"", "\\\""); //$NON-NLS-1$ //$NON-NLS-2$
 		jsDeviceState = replaceNewLine(jsDeviceState);
 

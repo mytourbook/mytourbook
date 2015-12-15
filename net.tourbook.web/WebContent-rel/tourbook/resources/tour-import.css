@@ -259,7 +259,7 @@ a.action-button:VISITED
 	
 	padding:				5px;
 
-	left:					5px;
+	left:					4px;
 	min-width:				500px;
 	max-height:				80vh;
 }
@@ -281,6 +281,58 @@ a.action-button:VISITED
 	border:					1px solid #777; 
 }
 
+
+/*
+	Select import config
+*/
+.selectConfigContainer 
+{ 
+	margin-left:			20px;
+}
+
+.selectConfig
+{
+	xposition:				relative;
+	xtop:					-2px;
+    xpadding:				2px;
+    xmargin:					0;
+	border:					0; 
+	
+	margin:					1px solid #666;
+	color:					#bbb; 
+	background:				transparent;
+	font-size:				16px; 
+    cursor:					pointer;
+}
+
+.selectConfig:HOVER
+{
+	margin:					1px solid transparent;
+}
+
+.selectOption
+{
+	color:					#bbb; 
+	background:				#444;
+	xfont-size:				20px;
+	font-weight: 			lighter;
+}
+
+/* Hide drop-down arrow for IE 11 */
+select::-ms-expand { 
+    display: none;
+}
+
+
+.importConfigTitle
+{
+	font-size: 				20px;
+	font-weight: 			bold;
+}
+
+/*
+	Folder
+*/
 .folderTitle
 {
 	font-size: 				16px;

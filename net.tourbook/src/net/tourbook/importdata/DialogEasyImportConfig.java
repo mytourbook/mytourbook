@@ -125,7 +125,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 	private static final String				STATE_BACKUP_FOLDER_HISTORY_ITEMS	= "STATE_BACKUP_FOLDER_HISTORY_ITEMS";	//$NON-NLS-1$
 	private static final String				STATE_DEVICE_DEVICE_HISTORY_ITEMS	= "STATE_DEVICE_DEVICE_HISTORY_ITEMS";	//$NON-NLS-1$
 	private static final String				STATE_DEVICE_FOLDER_HISTORY_ITEMS	= "STATE_DEVICE_FOLDER_HISTORY_ITEMS";	//$NON-NLS-1$
-	private static final String				STATE_SELECTED_IMPORT_CONFIG		= "STATE_SELECTED_IMPORT_CONFIG";		//$NON-NLS-1$
 	private static final String				STATE_SELECTED_IMPORT_LAUNCHER		= "STATE_SELECTED_IMPORT_LAUNCHER";	//$NON-NLS-1$
 	private static final String				STATE_SELECTED_TAB_FOLDER			= "STATE_SELECTED_TAB_FOLDER";			//$NON-NLS-1$
 	//
@@ -142,7 +141,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 	private IPropertyChangeListener			_prefChangeListener;
 	//
 	private MouseWheelListener				_defaultMouseWheelListener;
-	private SelectionAdapter				_defaultSelectionListener;
+	private SelectionAdapter				_icSelectionListener;
 	private FocusListener					_folderFocusListener;
 	private KeyAdapter						_folderKeyListener;
 	private ModifyListener					_folderModifyListener;
@@ -248,7 +247,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 	private Label							_lblIC_DeviceFolderPath;
 	private Label							_lblIL_ConfigDescription;
 	private Label							_lblIL_ConfigName;
-	private Label							_lblIL_Hint;
 	private Label							_lblIL_LastMarker;
 	private Label							_lblIL_LastMarkerDistanceUnit;
 	private Label							_lblIL_LastMarkerText;
@@ -547,7 +545,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 	}
 
 	public DialogEasyImportConfig(	final Shell parentShell,
-									final EasyConfig dashConfig,
+									final EasyConfig easyConfig,
 									final RawDataView rawDataView,
 									final int initialTab) {
 
@@ -561,7 +559,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
 		setDefaultImage(TourbookPlugin.getImageDescriptor(Messages.Image__options).createImage());
 
-		cloneImportConfig(dashConfig);
+		cloneEasyConfig(easyConfig);
 	}
 
 	private void addPrefListener() {
@@ -588,28 +586,36 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 	/**
 	 * Clone original configs, only the backup will be modified in the dialog.
 	 * 
-	 * @param dashConfig
+	 * @param easyConfig
 	 */
-	private void cloneImportConfig(final EasyConfig dashConfig) {
+	private void cloneEasyConfig(final EasyConfig easyConfig) {
 
 		_dialogEasyConfig = new EasyConfig();
 
-		_dialogEasyConfig.animationCrazinessFactor = dashConfig.animationCrazinessFactor;
-		_dialogEasyConfig.animationDuration = dashConfig.animationDuration;
-		_dialogEasyConfig.backgroundOpacity = dashConfig.backgroundOpacity;
-		_dialogEasyConfig.isLiveUpdate = dashConfig.isLiveUpdate;
-		_dialogEasyConfig.numHorizontalTiles = dashConfig.numHorizontalTiles;
-		_dialogEasyConfig.tileSize = dashConfig.tileSize;
+		_dialogEasyConfig.animationCrazinessFactor = easyConfig.animationCrazinessFactor;
+		_dialogEasyConfig.animationDuration = easyConfig.animationDuration;
+		_dialogEasyConfig.backgroundOpacity = easyConfig.backgroundOpacity;
+		_dialogEasyConfig.isLiveUpdate = easyConfig.isLiveUpdate;
+		_dialogEasyConfig.numHorizontalTiles = easyConfig.numHorizontalTiles;
+		_dialogEasyConfig.tileSize = easyConfig.tileSize;
 
-		_dialogEasyConfig.setActiveImportConfig(dashConfig.getActiveImportConfig());
+		final ImportConfig activeImportConfig = easyConfig.getActiveImportConfig();
 
 		/*
 		 * Import configs
 		 */
 		final ArrayList<ImportConfig> importConfigs = _dialogEasyConfig.importConfigs = new ArrayList<>();
 
-		for (final ImportConfig importConfig : dashConfig.importConfigs) {
-			importConfigs.add(importConfig.clone());
+		for (final ImportConfig importConfig : easyConfig.importConfigs) {
+
+			final ImportConfig clonedConfig = importConfig.clone();
+
+			importConfigs.add(clonedConfig);
+
+			// keep active config but using the clone (id)
+			if (importConfig.equals(activeImportConfig)) {
+				_dialogEasyConfig.setActiveImportConfig(clonedConfig);
+			}
 		}
 
 		/*
@@ -617,7 +623,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 		 */
 		final ArrayList<ImportLauncher> importLaunchers = _dialogEasyConfig.importLaunchers = new ArrayList<>();
 
-		for (final ImportLauncher launcher : dashConfig.importLaunchers) {
+		for (final ImportLauncher launcher : easyConfig.importLaunchers) {
 			importLaunchers.add(launcher.clone());
 		}
 	}
@@ -665,8 +671,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
 		restoreState();
 
-		enableControls();
-		enableILControls();
+		enable_IC_Controls();
+		enable_IL_Controls();
 
 		// set focus
 		_comboIC_DeviceFolder.setFocus();
@@ -712,52 +718,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 		addPrefListener();
 
 		return ui;
-	}
-
-	/**
-	 * create the views context menu
-	 */
-	private void createICContextMenu() {
-
-		final MenuManager menuMgr = new MenuManager();
-
-		menuMgr.setRemoveAllWhenShown(true);
-
-//		menuMgr.addMenuListener(new IMenuListener() {
-//			public void menuAboutToShow(final IMenuManager menuMgr2) {
-////				fillContextMenu(menuMgr2);
-//			}
-//		});
-
-		final Table table = _icViewer.getTable();
-		final Menu tableContextMenu = menuMgr.createContextMenu(table);
-
-		table.setMenu(tableContextMenu);
-
-		_icColumnManager.createHeaderContextMenu(table, tableContextMenu);
-	}
-
-	/**
-	 * create the views context menu
-	 */
-	private void createILContextMenu() {
-
-		final MenuManager menuMgr = new MenuManager();
-
-		menuMgr.setRemoveAllWhenShown(true);
-
-//		menuMgr.addMenuListener(new IMenuListener() {
-//			public void menuAboutToShow(final IMenuManager menuMgr2) {
-////				fillContextMenu(menuMgr2);
-//			}
-//		});
-
-		final Table table = _ilViewer.getTable();
-		final Menu tableContextMenu = menuMgr.createContextMenu(table);
-
-		table.setMenu(tableContextMenu);
-
-		_ilColumnManager.createHeaderContextMenu(table, tableContextMenu);
 	}
 
 	/**
@@ -828,6 +788,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 			{
 				createUI_210_IC_Viewer(icContainer);
 				createUI_230_IC_Actions(icContainer);
+				createUI_239_IC_DragDropHint(icContainer);
+
 				createUI_240_IC_Detail(icContainer);
 			}
 		}
@@ -906,18 +868,182 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 		_icViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			@Override
 			public void selectionChanged(final SelectionChangedEvent event) {
-				onSelect_IC(event.getSelection());
+				onIC_Select(event.getSelection());
 			}
 		});
 
 		_icViewer.addDoubleClickListener(new IDoubleClickListener() {
 			@Override
 			public void doubleClick(final DoubleClickEvent event) {
-				onIL_DblClick();
+				onIC_DblClick();
 			}
 		});
 
-		createICContextMenu();
+		createUI_213_IC_ContextMenu();
+		createUI_214_IC_DragDrop();
+	}
+
+	/**
+	 * create the views context menu
+	 */
+	private void createUI_213_IC_ContextMenu() {
+
+		final MenuManager menuMgr = new MenuManager();
+
+		menuMgr.setRemoveAllWhenShown(true);
+
+//		menuMgr.addMenuListener(new IMenuListener() {
+//			public void menuAboutToShow(final IMenuManager menuMgr2) {
+////				fillContextMenu(menuMgr2);
+//			}
+//		});
+
+		final Table table = _icViewer.getTable();
+		final Menu tableContextMenu = menuMgr.createContextMenu(table);
+
+		table.setMenu(tableContextMenu);
+
+		_icColumnManager.createHeaderContextMenu(table, tableContextMenu);
+	}
+
+	private void createUI_214_IC_DragDrop() {
+
+		/*
+		 * set drag adapter
+		 */
+		_icViewer.addDragSupport(
+				DND.DROP_MOVE,
+				new Transfer[] { LocalSelectionTransfer.getTransfer() },
+				new DragSourceListener() {
+
+					@Override
+					public void dragFinished(final DragSourceEvent event) {
+
+						final LocalSelectionTransfer transfer = LocalSelectionTransfer.getTransfer();
+
+						if (event.doit == false) {
+							return;
+						}
+
+						transfer.setSelection(null);
+						transfer.setSelectionSetTime(0);
+					}
+
+					@Override
+					public void dragSetData(final DragSourceEvent event) {
+						// data are set in LocalSelectionTransfer
+					}
+
+					@Override
+					public void dragStart(final DragSourceEvent event) {
+
+						final LocalSelectionTransfer transfer = LocalSelectionTransfer.getTransfer();
+						final ISelection selection = _icViewer.getSelection();
+
+						transfer.setSelection(selection);
+						transfer.setSelectionSetTime(_dragStart = event.time & 0xFFFFFFFFL);
+
+						event.doit = !selection.isEmpty();
+					}
+				});
+
+		/*
+		 * set drop adapter
+		 */
+		final ViewerDropAdapter viewerDropAdapter = new ViewerDropAdapter(_icViewer) {
+
+			private Widget	__dragItem;
+
+			@Override
+			public void dragOver(final DropTargetEvent dropEvent) {
+
+				// keep table item
+				__dragItem = dropEvent.item;
+
+				super.dragOver(dropEvent);
+			}
+
+			@Override
+			public boolean performDrop(final Object data) {
+
+				if (data instanceof StructuredSelection) {
+					final StructuredSelection selection = (StructuredSelection) data;
+
+					if (selection.getFirstElement() instanceof ImportConfig) {
+
+						final ImportConfig selectedItem = (ImportConfig) selection.getFirstElement();
+
+						final int location = getCurrentLocation();
+						final Table filterTable = _icViewer.getTable();
+
+						/*
+						 * check if drag was startet from this filter, remove the filter item before
+						 * the new filter is inserted
+						 */
+						if (LocalSelectionTransfer.getTransfer().getSelectionSetTime() == _dragStart) {
+							_icViewer.remove(selectedItem);
+						}
+
+						int filterIndex;
+
+						if (__dragItem == null) {
+
+							_icViewer.add(selectedItem);
+							filterIndex = filterTable.getItemCount() - 1;
+
+						} else {
+
+							// get index of the target in the table
+							filterIndex = filterTable.indexOf((TableItem) __dragItem);
+							if (filterIndex == -1) {
+								return false;
+							}
+
+							if (location == LOCATION_BEFORE) {
+								_icViewer.insert(selectedItem, filterIndex);
+							} else if (location == LOCATION_AFTER || location == LOCATION_ON) {
+								_icViewer.insert(selectedItem, ++filterIndex);
+							}
+						}
+
+						// reselect filter item
+						_icViewer.setSelection(new StructuredSelection(selectedItem));
+
+						// set focus to selection
+						filterTable.setSelection(filterIndex);
+						filterTable.setFocus();
+
+						return true;
+					}
+				}
+
+				return false;
+			}
+
+			@Override
+			public boolean validateDrop(final Object target, final int operation, final TransferData transferType) {
+
+				final ISelection selection = LocalSelectionTransfer.getTransfer().getSelection();
+				if (selection instanceof StructuredSelection) {
+					final Object dragFilter = ((StructuredSelection) selection).getFirstElement();
+					if (target == dragFilter) {
+						return false;
+					}
+				}
+
+				if (LocalSelectionTransfer.getTransfer().isSupportedType(transferType) == false) {
+					return false;
+				}
+
+				return true;
+			}
+
+		};
+
+		_icViewer.addDropSupport(
+				DND.DROP_MOVE,
+				new Transfer[] { LocalSelectionTransfer.getTransfer() },
+				viewerDropAdapter);
 	}
 
 	private void createUI_230_IC_Actions(final Composite parent) {
@@ -979,12 +1105,23 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 		}
 	}
 
+	private void createUI_239_IC_DragDropHint(final Composite parent) {
+
+		final Label label = new Label(parent, SWT.WRAP);
+		label.setText(Messages.Dialog_ImportConfig_Info_ConfigDragDrop);
+		GridDataFactory.fillDefaults()//
+				.span(2, 1)
+				.indent(0, -4)
+				.applyTo(label);
+	}
+
 	private void createUI_240_IC_Detail(final Composite parent) {
 
 		final Group group = new Group(parent, SWT.NONE);
 		group.setText(Messages.Dialog_ImportConfig_Group_ImportActions);
 		GridDataFactory.fillDefaults()//
 				.grab(true, false)
+				.indent(0, 8)
 				.span(2, 1)
 				.applyTo(group);
 		GridLayoutFactory.swtDefaults()//
@@ -1033,7 +1170,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 			_chkIC_CreateBackup = new Button(parent, SWT.CHECK);
 			_chkIC_CreateBackup.setText(Messages.Dialog_ImportConfig_Checkbox_CreateBackup);
 			_chkIC_CreateBackup.setToolTipText(Messages.Dialog_ImportConfig_Checkbox_CreateBackup_Tooltip);
-			_chkIC_CreateBackup.addSelectionListener(_defaultSelectionListener);
+			_chkIC_CreateBackup.addSelectionListener(_icSelectionListener);
 			_chkIC_CreateBackup.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
@@ -1130,7 +1267,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 		 */
 		_chkIC_ImportFiles = new Button(parent, SWT.CHECK);
 		_chkIC_ImportFiles.setText(Messages.Dialog_ImportConfig_Checkbox_ImportFiles);
-		_chkIC_ImportFiles.addSelectionListener(_defaultSelectionListener);
+		_chkIC_ImportFiles.addSelectionListener(_icSelectionListener);
 		GridDataFactory.fillDefaults()//
 				.span(2, 1)
 				.indent(0, convertVerticalDLUsToPixels(4))
@@ -1380,7 +1517,34 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 			}
 		});
 
-		createILContextMenu();
+		createUI_513_IL_ContextMenu();
+		createUI_514_IL_DragDrop();
+	}
+
+	/**
+	 * create the views context menu
+	 */
+	private void createUI_513_IL_ContextMenu() {
+
+		final MenuManager menuMgr = new MenuManager();
+
+		menuMgr.setRemoveAllWhenShown(true);
+
+//		menuMgr.addMenuListener(new IMenuListener() {
+//			public void menuAboutToShow(final IMenuManager menuMgr2) {
+////				fillContextMenu(menuMgr2);
+//			}
+//		});
+
+		final Table table = _ilViewer.getTable();
+		final Menu tableContextMenu = menuMgr.createContextMenu(table);
+
+		table.setMenu(tableContextMenu);
+
+		_ilColumnManager.createHeaderContextMenu(table, tableContextMenu);
+	}
+
+	private void createUI_514_IL_DragDrop() {
 
 		/*
 		 * set drag adapter
@@ -1426,13 +1590,13 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 		 */
 		final ViewerDropAdapter viewerDropAdapter = new ViewerDropAdapter(_ilViewer) {
 
-			private Widget	_tableItem;
+			private Widget	__dragItem;
 
 			@Override
 			public void dragOver(final DropTargetEvent dropEvent) {
 
 				// keep table item
-				_tableItem = dropEvent.item;
+				__dragItem = dropEvent.item;
 
 				super.dragOver(dropEvent);
 			}
@@ -1460,7 +1624,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
 						int filterIndex;
 
-						if (_tableItem == null) {
+						if (__dragItem == null) {
 
 							_ilViewer.add(filterItem);
 							filterIndex = filterTable.getItemCount() - 1;
@@ -1468,7 +1632,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 						} else {
 
 							// get index of the target in the table
-							filterIndex = filterTable.indexOf((TableItem) _tableItem);
+							filterIndex = filterTable.indexOf((TableItem) __dragItem);
 							if (filterIndex == -1) {
 								return false;
 							}
@@ -1965,11 +2129,11 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
 	private void createUI_590_IL_DragDropHint(final Composite parent) {
 
-		_lblIL_Hint = new Label(parent, SWT.WRAP);
-		_lblIL_Hint.setText(Messages.Dialog_ImportConfig_Info_ConfigDragDrop);
+		final Label label = new Label(parent, SWT.WRAP);
+		label.setText(Messages.Dialog_ImportConfig_Info_ConfigDragDrop);
 		GridDataFactory.fillDefaults()//
 				.span(3, 1)
-				.applyTo(_lblIL_Hint);
+				.applyTo(label);
 	}
 
 	private void createUI_590_IL_LastMarker(final Composite parent) {
@@ -1979,7 +2143,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 			public void widgetSelected(final SelectionEvent e) {
 
 				onIL_Modified();
-				enableILControls();
+				enable_IL_Controls();
 			}
 		};
 
@@ -1990,7 +2154,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 				UI.adjustSpinnerValueOnMouseScroll(e);
 
 				onIL_Modified();
-				enableILControls();
+				enable_IL_Controls();
 			}
 		};
 
@@ -2094,13 +2258,15 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
+				.grab(true, true)
 				.applyTo(container);
 		GridLayoutFactory.swtDefaults()//
-				.numColumns(3)
+				.numColumns(1)
 				.applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
 			createUI_902_Dashboard(container);
+			createUI_904_Actions(container);
 		}
 
 		return container;
@@ -2111,6 +2277,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
 				.grab(true, true)
+				.align(SWT.CENTER, SWT.CENTER)
 				.applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
 		{
@@ -2235,6 +2402,16 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 				// fill 3rd column
 				new Label(container, SWT.NONE);
 			}
+		}
+	}
+
+	private void createUI_904_Actions(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+		{
 			{
 				/*
 				 * Checkbox: live update
@@ -2248,22 +2425,12 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 						doLiveUpdate();
 					}
 				});
-				GridDataFactory.fillDefaults()//
-//						.grab(true, true)
-						.align(SWT.BEGINNING, SWT.END)
-						.span(2, 1)
-						.applyTo(_chkDash_LiveUpdate);
 			}
 			{
 				/*
 				 * Restore action
 				 */
 				final ToolBar toolbar = new ToolBar(container, SWT.FLAT);
-				GridDataFactory.fillDefaults()//
-						.grab(true, true)
-						.align(SWT.END, SWT.END)
-						.applyTo(toolbar);
-
 				final ToolBarManager tbm = new ToolBarManager(toolbar);
 
 				tbm.add(_actionRestoreDefaults);
@@ -2312,8 +2479,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 		colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_Name);
 		colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_Name);
 
-		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(17));
-		colDef.setColumnWeightData(new ColumnWeightData(17));
+		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(30));
+		colDef.setColumnWeightData(new ColumnWeightData(10));
 
 		colDef.setIsDefaultColumn();
 		colDef.setCanModifyVisibility(false);
@@ -2494,8 +2661,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 		}
 	}
 
-	private void enableControls() {
+	private void enable_IC_Controls() {
 
+		final int numConfigs = _dialogEasyConfig.importConfigs.size();
 		final boolean isBackup = _chkIC_CreateBackup.getSelection();
 
 		_btnIC_SelectBackupFolder.setEnabled(isBackup);
@@ -2504,9 +2672,11 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
 		_backupHistoryItems.setIsValidateFolder(isBackup);
 		_backupHistoryItems.validateModifiedPath();
+
+		_btnIC_Remove.setEnabled(numConfigs > 1);
 	}
 
-	private void enableILControls() {
+	private void enable_IL_Controls() {
 
 		final int numLaunchers = _dialogEasyConfig.importLaunchers.size();
 		final boolean isLauncherAvailable = numLaunchers > 0;
@@ -2593,7 +2763,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
 		_lblIL_ConfigName.setEnabled(isILSelected);
 		_lblIL_ConfigDescription.setEnabled(isILSelected);
-		_lblIL_Hint.setEnabled(isLauncherAvailable);
 		_lblIL_LastMarker.setEnabled(isLastMarkerSelected);
 		_lblIL_LastMarkerDistanceUnit.setEnabled(isLastMarkerSelected);
 		_lblIL_LastMarkerText.setEnabled(isLastMarkerSelected);
@@ -2773,10 +2942,10 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 			}
 		});
 
-		_defaultSelectionListener = new SelectionAdapter() {
+		_icSelectionListener = new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
-				enableControls();
+				enable_IC_Controls();
 			}
 		};
 
@@ -2861,10 +3030,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 	protected void okPressed() {
 
 		update_Model_From_UI_IC();
-
 		update_Model_From_UI_IL();
-		update_Model_From_UI_TourTypeItems_Sorted();
-
+		update_Model_From_UI_SortedLists();
 		update_Model_From_UI_LiveUpdateValues();
 
 		super.okPressed();
@@ -2957,6 +3124,20 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 		}
 	}
 
+	private void onIC_DblClick() {
+
+		/*
+		 * Set active config and close the dialog.
+		 */
+
+		final StructuredSelection selection = (StructuredSelection) _icViewer.getSelection();
+		final ImportConfig selectedIC = (ImportConfig) selection.getFirstElement();
+
+		_dialogEasyConfig.setActiveImportConfig(selectedIC);
+
+		okPressed();
+	}
+
 	private void onIC_Modified() {
 
 		if (_isInUIUpdate) {
@@ -2977,6 +3158,26 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 	private void onIC_Remove() {
 		// TODO Auto-generated method stub
 
+	}
+
+	private void onIC_Select(final ISelection selection) {
+
+		final ImportConfig selectedIC = (ImportConfig) ((StructuredSelection) selection).getFirstElement();
+
+		if (_selectedIC == selectedIC) {
+			// this is already selected
+			return;
+		}
+
+		// update model from the old selected config
+		update_Model_From_UI_IC();
+
+		// set new model
+		_selectedIC = selectedIC;
+
+		update_UI_From_Model_IC();
+
+//		enableICControls();
 	}
 
 	private void onIL_Add(final boolean isCopy) {
@@ -3160,26 +3361,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 		}
 	}
 
-	private void onSelect_IC(final ISelection selection) {
-
-		final ImportConfig selectedIC = (ImportConfig) ((StructuredSelection) selection).getFirstElement();
-
-		if (_selectedIC == selectedIC) {
-			// this is already selected
-			return;
-		}
-
-		// update model from the old selected config
-		update_Model_From_UI_IC();
-
-		// set new model
-		_selectedIC = selectedIC;
-
-		update_UI_From_Model_IC();
-
-//		enableICControls();
-	}
-
 	private void onSelect_IC_Folder_Backup() {
 
 		final String filterOSPath = _backupHistoryItems.getOSPath(//
@@ -3247,7 +3428,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
 		update_UI_From_Model_IL();
 
-		enableILControls();
+		enable_IL_Controls();
 	}
 
 	private void onSelect_IL_TourType() {
@@ -3259,7 +3440,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 		update_Model_From_UI_IL();
 		update_UI_From_Model_IL();
 
-		enableILControls();
+		enable_IL_Controls();
 
 		redrawILViewer();
 	}
@@ -3279,7 +3460,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 		// update UI + model
 		update_UI_From_Model_IL();
 
-		enableILControls();
+		enable_IL_Controls();
 
 		// set focus to the speed
 		_spinnerTT_Speed_AvgSpeed[0].setFocus();
@@ -3301,7 +3482,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 		// update UI
 		update_UI_From_Model_IL();
 
-		enableILControls();
+		enable_IL_Controls();
 
 		redrawILViewer();
 	}
@@ -3381,29 +3562,27 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 				_state.getArray(STATE_DEVICE_FOLDER_HISTORY_ITEMS),
 				_state.getArray(STATE_DEVICE_DEVICE_HISTORY_ITEMS));
 
-		final String stateICName = Util.getStateString(_state, STATE_SELECTED_IMPORT_CONFIG, UI.EMPTY_STRING);
-		final ArrayList<ImportConfig> importConfigs = _dialogEasyConfig.importConfigs;
+		// select active config, compare by name because a clone has a different it
+		final ImportConfig activeIC = _dialogEasyConfig.getActiveImportConfig();
 
+		final ArrayList<ImportConfig> importConfigs = _dialogEasyConfig.importConfigs;
 		ImportConfig initialIC = null;
 
 		for (final ImportConfig importConfig : importConfigs) {
-
-			if (importConfig.name.equals(stateICName)) {
+			if (importConfig.name.equals(activeIC.name)) {
 				initialIC = importConfig;
 				break;
 			}
 		}
 
-		// select first import config
-		if (initialIC == null && importConfigs.size() > 0) {
+		if (initialIC == null) {
 			initialIC = importConfigs.get(0);
 		}
-
-		final Table icTable = _icViewer.getTable();
 
 		_icViewer.setSelection(new StructuredSelection(initialIC));
 
 		// ensure that the selected also has the focus, these are 2 different things
+		final Table icTable = _icViewer.getTable();
 		icTable.setSelection(icTable.getSelectionIndex());
 
 		/*
@@ -3415,7 +3594,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 		ImportLauncher initialIL = null;
 
 		for (final ImportLauncher importLauncher : importLaunchers) {
-
 			if (importLauncher.name.equals(stateILName)) {
 				initialIL = importLauncher;
 				break;
@@ -3423,7 +3601,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 		}
 
 		// select first import launcher
-		if (initialIL == null && importLaunchers.size() > 0) {
+		if (initialIL == null) {
 			initialIL = importLaunchers.get(0);
 		}
 
@@ -3447,11 +3625,12 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
 	private void saveState() {
 
-		_state.put(STATE_SELECTED_IMPORT_CONFIG, _selectedIC == null ? UI.EMPTY_STRING : _selectedIC.name);
 		_state.put(STATE_SELECTED_IMPORT_LAUNCHER, _selectedIL == null ? UI.EMPTY_STRING : _selectedIL.name);
 
 		_icColumnManager.saveState(_state);
 		_ilColumnManager.saveState(_state2);
+
+//		tom & jenny
 
 		_backupHistoryItems.saveState(_state, STATE_BACKUP_FOLDER_HISTORY_ITEMS, STATE_BACKUP_DEVICE_HISTORY_ITEMS);
 		_deviceHistoryItems.saveState(_state, STATE_DEVICE_FOLDER_HISTORY_ITEMS, STATE_DEVICE_DEVICE_HISTORY_ITEMS);
@@ -3595,19 +3774,37 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 	}
 
 	/**
-	 * Create config list in the table sort order
+	 * Create config lists in the table sort order.
 	 */
-	private void update_Model_From_UI_TourTypeItems_Sorted() {
+	private void update_Model_From_UI_SortedLists() {
 
-		final ArrayList<ImportLauncher> importTiles = _dialogEasyConfig.importLaunchers;
-		importTiles.clear();
+		/*
+		 * Import configs
+		 */
+		final ArrayList<ImportConfig> importConfigs = _dialogEasyConfig.importConfigs;
+		importConfigs.clear();
+
+		for (final TableItem tableItem : _icViewer.getTable().getItems()) {
+
+			final Object itemData = tableItem.getData();
+
+			if (itemData instanceof ImportConfig) {
+				importConfigs.add((ImportConfig) itemData);
+			}
+		}
+
+		/*
+		 * Import launchers
+		 */
+		final ArrayList<ImportLauncher> importLauchers = _dialogEasyConfig.importLaunchers;
+		importLauchers.clear();
 
 		for (final TableItem tableItem : _ilViewer.getTable().getItems()) {
 
 			final Object itemData = tableItem.getData();
 
 			if (itemData instanceof ImportLauncher) {
-				importTiles.add((ImportLauncher) itemData);
+				importLauchers.add((ImportLauncher) itemData);
 			}
 		}
 	}
@@ -3785,5 +3982,4 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
 		redrawILViewer();
 	}
-
 }

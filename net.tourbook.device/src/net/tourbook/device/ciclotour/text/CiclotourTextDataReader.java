@@ -267,7 +267,7 @@ public class CiclotourTextDataReader extends TourbookDevice {
 
 			// check if the tour is in the tour map
 			if (alreadyImportedTours.containsKey(tourId) == false) {
-				
+
 				// add new tour to the map
 				newlyImportedTours.put(tourId, tourData);
 
@@ -301,9 +301,14 @@ public class CiclotourTextDataReader extends TourbookDevice {
 		BufferedReader reader = null;
 
 		try {
+
 			reader = new BufferedReader(new FileReader(fileName));
 
 			final String header = reader.readLine();
+
+			if (header == null) {
+				return false;
+			}
 
 			if (header.startsWith(FILE_HEADER_EN)) {
 				return true;

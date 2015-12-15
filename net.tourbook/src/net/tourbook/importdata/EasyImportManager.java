@@ -70,9 +70,9 @@ public class EasyImportManager {
 	private static final String			XML_STATE_EASY_IMPORT				= "XML_STATE_EASY_IMPORT";						//$NON-NLS-1$
 	//
 	private static final String			TAG_ROOT							= "EasyImportConfig";							//$NON-NLS-1$
-	private static final String			TAG_CONFIG							= "Config";
-	private static final String			TAG_DASH_CONFIG						= "DashConfig";
-	private static final String			TAG_IMPORT_CONFIG					= "ImportConfig";
+	private static final String			TAG_CONFIG							= "Config"; //$NON-NLS-1$
+	private static final String			TAG_DASH_CONFIG						= "DashConfig"; //$NON-NLS-1$
+	private static final String			TAG_IMPORT_CONFIG					= "ImportConfig"; //$NON-NLS-1$
 	private static final String			TAG_LAUNCHER_CONFIG					= "LauncherConfig";							//$NON-NLS-1$
 	private static final String			TAG_TOUR_TYPE_BY_SPEED				= "Speed";										//$NON-NLS-1$
 	//
@@ -80,7 +80,7 @@ public class EasyImportManager {
 	private static final String			ATTR_BACKUP_FOLDER					= "backupFolder";								//$NON-NLS-1$
 	private static final String			ATTR_DEVICE_FILES					= "deviceFiles";								//$NON-NLS-1$
 	private static final String			ATTR_DEVICE_FOLDER					= "deviceFolder";								//$NON-NLS-1$
-	private static final String			ATTR_IS_ACTIVE_CONFIG				= "isActiveConfig";
+	private static final String			ATTR_IS_ACTIVE_CONFIG				= "isActiveConfig"; //$NON-NLS-1$
 	private static final String			ATTR_IS_CREATE_BACKUP				= "isCreateBackup";							//$NON-NLS-1$
 	private static final String			ATTR_IS_TURN_OFF_WATCHING			= "isTurnOffWatching";							//$NON-NLS-1$
 	private static final String			ATTR_NAME							= "name";										//$NON-NLS-1$
