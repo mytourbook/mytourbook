@@ -36,6 +36,8 @@ public class ImportConfig implements Cloneable {
 	/** When <code>true</code> then the device watching is turned off after tours are imported. */
 	public boolean				isTurnOffWatching		= false;
 
+	public boolean				isDeleteDeviceFiles		= false;
+
 	private long				_id;
 
 	private static long			_idCreator;
@@ -165,6 +167,7 @@ public class ImportConfig implements Cloneable {
 
 				+ ("name=" + name + ", \n")
 				+ ("isCreateBackup=" + isCreateBackup + ", \n")
+				+ ("isDeleteDeviceFiles=" + isDeleteDeviceFiles + ", \n")
 				+ ("isTurnOffWatching=" + isTurnOffWatching + ", \n")
 				+ ("_id=" + _id + ", \n")
 				+ ("_backupFolder=" + _backupFolder + ", \n")

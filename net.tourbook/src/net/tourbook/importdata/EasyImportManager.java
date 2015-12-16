@@ -70,9 +70,9 @@ public class EasyImportManager {
 	private static final String			XML_STATE_EASY_IMPORT				= "XML_STATE_EASY_IMPORT";						//$NON-NLS-1$
 	//
 	private static final String			TAG_ROOT							= "EasyImportConfig";							//$NON-NLS-1$
-	private static final String			TAG_CONFIG							= "Config"; //$NON-NLS-1$
-	private static final String			TAG_DASH_CONFIG						= "DashConfig"; //$NON-NLS-1$
-	private static final String			TAG_IMPORT_CONFIG					= "ImportConfig"; //$NON-NLS-1$
+	private static final String			TAG_CONFIG							= "Config";									//$NON-NLS-1$
+	private static final String			TAG_DASH_CONFIG						= "DashConfig";								//$NON-NLS-1$
+	private static final String			TAG_IMPORT_CONFIG					= "ImportConfig";								//$NON-NLS-1$
 	private static final String			TAG_LAUNCHER_CONFIG					= "LauncherConfig";							//$NON-NLS-1$
 	private static final String			TAG_TOUR_TYPE_BY_SPEED				= "Speed";										//$NON-NLS-1$
 	//
@@ -80,8 +80,9 @@ public class EasyImportManager {
 	private static final String			ATTR_BACKUP_FOLDER					= "backupFolder";								//$NON-NLS-1$
 	private static final String			ATTR_DEVICE_FILES					= "deviceFiles";								//$NON-NLS-1$
 	private static final String			ATTR_DEVICE_FOLDER					= "deviceFolder";								//$NON-NLS-1$
-	private static final String			ATTR_IS_ACTIVE_CONFIG				= "isActiveConfig"; //$NON-NLS-1$
+	private static final String			ATTR_IS_ACTIVE_CONFIG				= "isActiveConfig";							//$NON-NLS-1$
 	private static final String			ATTR_IS_CREATE_BACKUP				= "isCreateBackup";							//$NON-NLS-1$
+	private static final String			ATTR_IS_DELETE_DEVICE_FILES			= "isDeleteDeviceFiles";						//$NON-NLS-1$
 	private static final String			ATTR_IS_TURN_OFF_WATCHING			= "isTurnOffWatching";							//$NON-NLS-1$
 	private static final String			ATTR_NAME							= "name";										//$NON-NLS-1$
 	private static final String			ATTR_TOUR_TYPE_CONFIG				= "tourTypeConfig";							//$NON-NLS-1$
@@ -602,6 +603,7 @@ public class EasyImportManager {
 		importConfig.name = Util.getXmlString(xmlConfig, ATTR_NAME, UI.EMPTY_STRING);
 
 		importConfig.isCreateBackup = Util.getXmlBoolean(xmlConfig, ATTR_IS_CREATE_BACKUP, true);
+		importConfig.isDeleteDeviceFiles = Util.getXmlBoolean(xmlConfig, ATTR_IS_DELETE_DEVICE_FILES, false);
 		importConfig.isTurnOffWatching = Util.getXmlBoolean(xmlConfig, ATTR_IS_TURN_OFF_WATCHING, false);
 
 		importConfig.setBackupFolder(Util.getXmlString(xmlConfig, ATTR_BACKUP_FOLDER, UI.EMPTY_STRING));
@@ -970,6 +972,7 @@ public class EasyImportManager {
 
 			xmlConfig.putBoolean(ATTR_IS_ACTIVE_CONFIG, isActiveConfig);
 			xmlConfig.putBoolean(ATTR_IS_CREATE_BACKUP, importConfig.isCreateBackup);
+			xmlConfig.putBoolean(ATTR_IS_DELETE_DEVICE_FILES, importConfig.isDeleteDeviceFiles);
 			xmlConfig.putBoolean(ATTR_IS_TURN_OFF_WATCHING, importConfig.isTurnOffWatching);
 
 			xmlConfig.putString(ATTR_BACKUP_FOLDER, importConfig.getBackupFolder());

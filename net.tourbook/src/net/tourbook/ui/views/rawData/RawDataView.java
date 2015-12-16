@@ -175,8 +175,15 @@ import org.joda.time.DateTime;
  */
 public class RawDataView extends ViewPart implements ITourProviderAll, ITourViewer3 {
 
-	private static final String				JS_FUNCTION_ON_SELECT_IMPORT_CONFIG			= "onSelectImportConfig";
 	public static final String				ID											= "net.tourbook.views.rawData.RawDataView"; //$NON-NLS-1$
+	//
+	private static final String				HTML_TD										= "<td>";									//$NON-NLS-1$
+	private static final String				HTML_TD_SPACE								= "<td ";									//$NON-NLS-1$
+	private static final String				HTML_TD_END									= "</td>";									//$NON-NLS-1$
+	private static final String				HTML_TR										= "<tr>";									//$NON-NLS-1$
+	private static final String				HTML_TR_END									= "</tr>";									//$NON-NLS-1$
+	//
+	private static final String				JS_FUNCTION_ON_SELECT_IMPORT_CONFIG			= "onSelectImportConfig";					//$NON-NLS-1$
 	//
 	private static final String				WEB_RESOURCE_TITLE_FONT						= "Nunito-Bold.ttf";						//$NON-NLS-1$
 //	private static final String				WEB_RESOURCE_TITLE_FONT						= "NothingYouCouldDo.ttf";					//$NON-NLS-1$
@@ -228,6 +235,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	//
 	private static final String				DOM_ID_DEVICE_ON_OFF						= "deviceOnOff";							//$NON-NLS-1$
 	private static final String				DOM_ID_DEVICE_STATE							= "deviceState";							//$NON-NLS-1$
+	private static final String				DOM_ID_IMPORT_CONFIG						= "importConfig";							//$NON-NLS-1$
 	private static final String				DOM_ID_IMPORT_TILES							= "importTiles";							//$NON-NLS-1$
 	//
 	private static String					HREF_ACTION_DEVICE_IMPORT;
@@ -354,6 +362,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private String							_imageUrl_SerialPort_Directly;
 	private String							_imageUrl_State_Error;
 	private String							_imageUrl_State_OK;
+	private String							_imageUrl_State_DeleteFiles;
 	private String							_imageUrl_State_SaveTour;
 	private String							_imageUrl_State_TourMarker;
 	//
@@ -540,7 +549,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 
 		/*
-		 * 100. Turn watching off
+		 * 100. Delete device files
+		 */
+		if (importConfig.isDeleteDeviceFiles) {
+			doDeleteTourFiles(false);
+		}
+
+		/*
+		 * 101. Turn watching off
 		 */
 		if (importConfig.isTurnOffWatching) {
 			setWatcher_Off();
@@ -636,7 +652,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	void actionDeleteTourFiles() {
 
-		doDeleteTourFiles();
+		doDeleteTourFiles(true);
 	}
 
 	void actionMergeTours(final TourData mergeFromTour, final TourData mergeIntoTour) {
@@ -1132,7 +1148,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				+ ("		</td>\n") //$NON-NLS-1$
 
 				// selected config
-				+ ("		<td>" + createHTML_60_SelectImportConfig() + "</td>\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("		<td>") //$NON-NLS-1$
+				+ ("			<div id='" + DOM_ID_IMPORT_CONFIG + "' class='" + watchClass + "'>") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				+ (createHTML_60_SelectImportConfig())
+				+ ("			</div>") //$NON-NLS-1$
+				+ ("		</td>") //$NON-NLS-1$
 
 				+ "	</tr></tbody></table>\n" // //$NON-NLS-1$
 				+ "</div>\n"; //$NON-NLS-1$
@@ -1254,9 +1274,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		/*
 		 * Title
 		 */
-		sb.append("<tr>"); //$NON-NLS-1$
-		sb.append("<td colspan=2 class='importConfigTitle'>" + importConfig.name + "</td>"); //$NON-NLS-1$
-		sb.append("</tr>"); //$NON-NLS-1$
+		sb.append(HTML_TR);
+		sb.append("<td colspan=2 class='importConfigTitle'>" + importConfig.name + HTML_TD_END); //$NON-NLS-1$
+		sb.append(HTML_TR_END);
 
 		/*
 		 * Backup folder
@@ -1331,19 +1351,49 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		/*
 		 * Device files
 		 */
-		String deviceFiles = importConfig.deviceFiles;
-		if (importConfig.deviceFiles.trim().length() == 0) {
-			deviceFiles = ImportConfig.DEVICE_FILES_DEFAULT;
+		{
+			final String deviceFiles = importConfig.deviceFiles.trim().length() == 0
+					? ImportConfig.DEVICE_FILES_DEFAULT
+					: importConfig.deviceFiles;
+
+			sb.append(HTML_TR);
+
+			sb.append(HTML_TD_SPACE + HTML_STYLE_TITLE_VERTICAL_PADDING + " class='folderTitle'>"); //$NON-NLS-1$
+			sb.append(Messages.Import_Data_HTML_Title_Files);
+			sb.append(HTML_TD_END);
+
+			sb.append(HTML_TD_SPACE + HTML_STYLE_TITLE_VERTICAL_PADDING + " class='folderLocation'>"); //$NON-NLS-1$
+			sb.append(deviceFiles);
+			sb.append(HTML_TD_END);
+
+			sb.append(HTML_TR_END);
 		}
 
-		sb.append("<tr>"); //$NON-NLS-1$
-		sb
-				.append("<td " + HTML_STYLE_TITLE_VERTICAL_PADDING + " class='folderTitle'>" + Messages.Import_Data_HTML_Title_Files + "</td>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		sb.append("<td " + HTML_STYLE_TITLE_VERTICAL_PADDING + " class='folderLocation'>" + deviceFiles + "</td>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		sb.append("</tr>"); //$NON-NLS-1$
+		/*
+		 * 100. Delete device files
+		 */
+		{
+			final boolean isDeleteDeviceFiles = importConfig.isDeleteDeviceFiles;
+
+			final String deleteFiles = isDeleteDeviceFiles
+					? Messages.Import_Data_HTML_DeleteFilesYES
+					: Messages.Import_Data_HTML_DeleteFilesNO;
+
+			sb.append(HTML_TR);
+
+			sb.append(HTML_TD_SPACE + HTML_STYLE_TITLE_VERTICAL_PADDING + " class='folderTitle'>"); //$NON-NLS-1$
+			sb.append(Messages.Import_Data_HTML_Title_Delete);
+			sb.append(HTML_TD_END);
+
+			sb.append(HTML_TD_SPACE + HTML_STYLE_TITLE_VERTICAL_PADDING + " class='folderLocation'>"); //$NON-NLS-1$
+			sb.append(deleteFiles);
+			sb.append(HTML_TD_END);
+
+			sb.append(HTML_TR_END);
+		}
 
 		/*
-		 * 100. Turn off device watching
+		 * 101. Turn off device watching
 		 */
 		{
 			final boolean isWatchingOff = importConfig.isTurnOffWatching;
@@ -1359,12 +1409,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			final String onOffImage = createHTML_BgImage(imageUrl);
 
-			sb.append("<tr>"); //$NON-NLS-1$
-			sb.append("<td " + HTML_STYLE_TITLE_VERTICAL_PADDING + ">"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append(HTML_TR);
+
+			sb.append(HTML_TD_SPACE + HTML_STYLE_TITLE_VERTICAL_PADDING + ">"); //$NON-NLS-1$
 			sb.append("	<div class='action-button-25' style='" + onOffImage + "'></div>"); //$NON-NLS-1$ //$NON-NLS-2$
-			sb.append("</td>"); //$NON-NLS-1$
-			sb.append("<td class='folderInfo' " + HTML_STYLE_TITLE_VERTICAL_PADDING + ">" + watchingText + "</td>"); //$NON-NLS-1$ //$NON-NLS-2$
-			sb.append("</tr>"); //$NON-NLS-1$
+			sb.append(HTML_TD_END);
+			sb.append("<td class='folderInfo' " + HTML_STYLE_TITLE_VERTICAL_PADDING + ">" + watchingText + HTML_TD_END); //$NON-NLS-1$ //$NON-NLS-2$
+
+			sb.append(HTML_TR_END);
 		}
 
 		sb.append("</tbody></table>"); //$NON-NLS-1$
@@ -1449,17 +1501,17 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				+ imageUrl
 				+ "' style='padding-left:5px; vertical-align:text-bottom;'>"; //$NON-NLS-1$
 
-		sb.append("<tr>"); //$NON-NLS-1$
-		sb.append("<td " + paddingTop + " class='folderTitle'>" + folderTitle + "</td>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		sb.append("<td " + paddingTop + " class='folderLocation'>" + folderLocation + folderStateIcon); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append(HTML_TR);
+		sb.append(HTML_TD_SPACE + paddingTop + " class='folderTitle'>" + folderTitle + HTML_TD_END); //$NON-NLS-1$
+		sb.append(HTML_TD_SPACE + paddingTop + " class='folderLocation'>" + folderLocation + folderStateIcon); //$NON-NLS-1$
 		sb.append(htmlErrorState);
-		sb.append("</td>"); //$NON-NLS-1$
-		sb.append("</tr>"); //$NON-NLS-1$
+		sb.append(HTML_TD_END);
+		sb.append(HTML_TR_END);
 
-		sb.append("<tr>"); //$NON-NLS-1$
+		sb.append(HTML_TR);
 		sb.append("<td></td>"); //$NON-NLS-1$
-		sb.append("<td>" + htmlFolderInfo + "</td>"); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append("</tr>"); //$NON-NLS-1$
+		sb.append(HTML_TD + htmlFolderInfo + HTML_TD_END);
+		sb.append(HTML_TR_END);
 
 	}
 
@@ -1469,25 +1521,25 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		for (final OSFile deviceFile : notImportedFiles) {
 
-			sb.append("<tr>"); //$NON-NLS-1$
+			sb.append(HTML_TR);
 
 			sb.append("<td class='column name'>"); //$NON-NLS-1$
 			sb.append(deviceFile.fileName);
-			sb.append("</td>"); //$NON-NLS-1$
+			sb.append(HTML_TD_END);
 
 			sb.append("<td class='right column'>"); //$NON-NLS-1$
 			sb.append(_dateFormatter.format(deviceFile.modifiedTime));
-			sb.append("</td>"); //$NON-NLS-1$
+			sb.append(HTML_TD_END);
 
 			sb.append("<td class='right'>"); //$NON-NLS-1$
 			sb.append(_timeFormatter.format(deviceFile.modifiedTime));
-			sb.append("</td>"); //$NON-NLS-1$
+			sb.append(HTML_TD_END);
 
 			sb.append("<td class='right column'>"); //$NON-NLS-1$
 			sb.append(deviceFile.size);
-			sb.append("</td>"); //$NON-NLS-1$
+			sb.append(HTML_TD_END);
 
-			sb.append("</tr>"); //$NON-NLS-1$
+			sb.append(HTML_TR_END);
 		}
 
 		sb.append("</tbody></table>"); //$NON-NLS-1$
@@ -1495,26 +1547,26 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private String createHTML_60_SelectImportConfig() {
 
-		final String onChange = "onchange='" + JS_FUNCTION_ON_SELECT_IMPORT_CONFIG + "(this.selectedIndex)'";
+		final String onChange = "onchange='" + JS_FUNCTION_ON_SELECT_IMPORT_CONFIG + "(this.selectedIndex)'"; //$NON-NLS-1$ //$NON-NLS-2$
 
 		final EasyConfig easyConfig = getEasyConfig();
 		final ImportConfig selectedConfig = easyConfig.getActiveImportConfig();
 
 		final StringBuilder sb = new StringBuilder();
 
-		sb.append("<div class='selectConfigContainer'>");
-		sb.append("<select class='selectConfig dash-action' " + onChange + ">");
+		sb.append("<div class='selectConfigContainer'>"); //$NON-NLS-1$
+		sb.append("	<select class='selectConfig dash-action' " + onChange + ">"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		for (final ImportConfig importConfig : easyConfig.importConfigs) {
 
 			final String isSelected = importConfig.equals(selectedConfig)//
-					? "selected"
+					? "selected" //$NON-NLS-1$
 					: UI.EMPTY_STRING;
 
-			sb.append("<option class='selectOption' " + isSelected + ">" + importConfig.name + "</option>");
+			sb.append("		<option class='selectOption' " + isSelected + ">" + importConfig.name + "</option>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		}
-		sb.append("</select>");
-		sb.append("</div>");
+		sb.append("	</select>"); //$NON-NLS-1$
+		sb.append("</div>"); //$NON-NLS-1$
 
 		return sb.toString();
 	}
@@ -1551,10 +1603,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			numHorizontalTiles = availableLauncher;
 		}
 
-		final String watchClass = isWatchingOn() ? DOM_CLASS_DEVICE_ON : DOM_CLASS_DEVICE_OFF;
+		final String watchClass = isWatchingOn() //
+				? DOM_CLASS_DEVICE_ON
+				: DOM_CLASS_DEVICE_OFF;
 
-		sb
-				.append("<table border=0 id='" + DOM_ID_IMPORT_TILES + "' style='margin-top:5px;' class='" + watchClass + "'><tbody>\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		sb.append("<table border=0" //$NON-NLS-1$
+				+ (" id='" + DOM_ID_IMPORT_TILES + "'") //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" style='margin-top:5px;'") //$NON-NLS-1$
+				+ (" class='" + watchClass + "'") //$NON-NLS-1$ //$NON-NLS-2$
+				+ "><tbody>\n"); //$NON-NLS-1$
 
 		for (final ImportLauncher importLauncher : allImportLauncher) {
 
@@ -1580,7 +1637,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 
 		if (isTrOpen) {
-			sb.append("	</tr>\n"); //$NON-NLS-1$
+			sb.append("</tr>\n"); //$NON-NLS-1$
 		}
 
 		sb.append("</tbody></table>\n"); //$NON-NLS-1$
@@ -1611,7 +1668,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		 */
 		final String href = HTTP_DUMMY + HREF_ACTION_DEVICE_IMPORT + HREF_TOKEN + importTile.getId();
 
-		final String htmlConfig = createHTML_86_ILConfig(importTile);
+		final String htmlConfig = createHTML_86_Annotations(importTile);
 
 		final String html = "" //$NON-NLS-1$
 
@@ -1724,31 +1781,60 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 					: Messages.Import_Data_HTML_SaveTour_No);
 		}
 
+		// delete device files
+		{
+			sb.append(UI.NEW_LINE);
+
+			sb.append(getEasyConfig().getActiveImportConfig().isDeleteDeviceFiles
+					? Messages.Import_Data_HTML_DeleteDeviceFiles_Yes
+					: Messages.Import_Data_HTML_DeleteDeviceFiles_No);
+		}
+
 		return sb.toString();
 	}
 
-	private String createHTML_86_ILConfig(final ImportLauncher importTile) {
+	private String createHTML_86_Annotations(final ImportLauncher importTile) {
 
+		/*
+		 * Save tour
+		 */
 		String htmlSaveTour = UI.EMPTY_STRING;
 		if (importTile.isSaveTour) {
 
 			final String stateImage = createHTML_BgImage(_imageUrl_State_SaveTour);
 
-			htmlSaveTour = "<div style='float: right;" + stateImage + "' class='action-button-16'></div>"; //$NON-NLS-1$ //$NON-NLS-2$
+			htmlSaveTour = createHTML_TileAnnotation(stateImage);
 		}
 
+		/*
+		 * Marker
+		 */
 		String htmlLastMarker = UI.EMPTY_STRING;
 		if (importTile.isSetLastMarker) {
 
 			final String stateImage = createHTML_BgImage(_imageUrl_State_TourMarker);
 
-			htmlLastMarker = "<div style='float: right;" + stateImage + "' class='action-button-16'></div>"; //$NON-NLS-1$ //$NON-NLS-2$
+			htmlLastMarker = createHTML_TileAnnotation(stateImage);
+		}
+
+		/*
+		 * Delete device files
+		 */
+		String htmlDeleteFiles = UI.EMPTY_STRING;
+		if (getEasyConfig().getActiveImportConfig().isDeleteDeviceFiles) {
+
+			final String stateImage = createHTML_BgImage(_imageUrl_State_DeleteFiles);
+
+			htmlDeleteFiles = createHTML_TileAnnotation(stateImage);
 		}
 
 		final StringBuilder sb = new StringBuilder();
 
+		// order is reverted that it looks in the correct order
+		sb.append(htmlDeleteFiles);
 		sb.append(htmlSaveTour);
 		sb.append(htmlLastMarker);
+
 		sb.append("<div style='float:left;'>" + importTile.name + "</div>"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		return sb.toString();
@@ -1799,13 +1885,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		final String html = "" //$NON-NLS-1$
 
-				+ ("<td>") //$NON-NLS-1$
+				+ HTML_TD
 				+ ("<a href='" + href + "' title='" + tooltip + "' class='import-tile'>\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				+ ("	<div class='import-tile-image action-button' " + htmlImage + "></div>\n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("	<div class='import-tile-config'>" + name + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("</a>\n") //$NON-NLS-1$
-				+ ("</td>") //$NON-NLS-1$
-		;
+				+ HTML_TD_END;
 
 		sb.append(html);
 	}
@@ -1819,6 +1904,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		final String bgImage = createHTML_BgImage(imageUrl);
 
 		return "style='" + bgImage + "'"; //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	private String createHTML_TileAnnotation(final String imageBgStyle) {
+
+		return "<div style='float: right;" + imageBgStyle + "' class='action-button-16'></div>"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	@Override
@@ -1937,6 +2027,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			_imageUrl_State_Error = getIconUrl(Messages.Image__State_Error);
 			_imageUrl_State_OK = getIconUrl(Messages.Image__State_OK);
+			_imageUrl_State_DeleteFiles = getIconUrl(Messages.Image__State_Delete);
 			_imageUrl_State_SaveTour = getIconUrl(Messages.Image__State_SaveTour);
 			_imageUrl_State_TourMarker = getIconUrl(Messages.Image__State_TourMarker);
 
@@ -2036,7 +2127,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			GridDataFactory.fillDefaults().grab(true, true).applyTo(_browser);
 
-			final BrowserFunction function = new JS_OnSelectImportConfig(_browser, JS_FUNCTION_ON_SELECT_IMPORT_CONFIG);
+//			final BrowserFunction function =
+			new JS_OnSelectImportConfig(_browser, JS_FUNCTION_ON_SELECT_IMPORT_CONFIG);
 
 			_browser.addLocationListener(new LocationAdapter() {
 
@@ -2792,20 +2884,29 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_configImageHash.clear();
 	}
 
-	private void doDeleteTourFiles() {
+	/**
+	 * @param isDeleteAllFiles
+	 *            When <code>true</code> then all files (device and backup) will be deleted,
+	 *            otherwise only device files will be deleted without any confirmation dialog and
+	 *            the backup files are not touched.
+	 */
+	private void doDeleteTourFiles(final boolean isDeleteAllFiles) {
 
-		if (MessageDialog.openConfirm(
-				_parent.getShell(),
-				Messages.Import_Data_Dialog_DeleteTourFiles_Title,
-				Messages.Import_Data_Dialog_DeleteTourFiles_Message) == false) {
-			return;
-		}
+		if (isDeleteAllFiles) {
 
-		if (MessageDialog.openConfirm(
-				_parent.getShell(),
-				Messages.Import_Data_Dialog_DeleteTourFiles_Title,
-				Messages.Import_Data_Dialog_DeleteTourFiles_LastChance_Message) == false) {
-			return;
+			if (MessageDialog.openConfirm(
+					_parent.getShell(),
+					Messages.Import_Data_Dialog_DeleteTourFiles_Title,
+					Messages.Import_Data_Dialog_DeleteTourFiles_Message) == false) {
+				return;
+			}
+
+			if (MessageDialog.openConfirm(
+					_parent.getShell(),
+					Messages.Import_Data_Dialog_DeleteTourFiles_Title,
+					Messages.Import_Data_Dialog_DeleteTourFiles_LastChance_Message) == false) {
+				return;
+			}
 		}
 
 		final ArrayList<String> deletedFiles = new ArrayList<>();
@@ -2832,10 +2933,16 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 					final String originalFilePath = tourData.importFilePathOriginal;
 
+					// this is the backup folder when an backup is created
 					final String importFilePath = tourData.getImportFilePath();
 					final String importFileName = tourData.getImportFileName();
 
-					deleteFile(deletedFiles, notDeletedFiles, importFilePath, importFileName);
+					// delete backup files
+					if (isDeleteAllFiles) {
+						deleteFile(deletedFiles, notDeletedFiles, importFilePath, importFileName);
+					}
+
+					// delete device files
 					deleteFile(deletedFiles, notDeletedFiles, originalFilePath, importFileName);
 
 					monitor.worked(1);
@@ -2865,10 +2972,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		StatusUtil.logInfo(sb.toString());
 
-		MessageDialog.openInformation(
-				_parent.getShell(),
-				Messages.Import_Data_Dialog_DeleteTourFiles_Title,
-				NLS.bind(Messages.Import_Data_Dialog_DeletedImportFiles_Message, deletedFiles.size()));
+		if (isDeleteAllFiles) {
+
+			MessageDialog.openInformation(
+					_parent.getShell(),
+					Messages.Import_Data_Dialog_DeleteTourFiles_Title,
+					NLS.bind(Messages.Import_Data_Dialog_DeletedImportFiles_Message, deletedFiles.size()));
+		}
 	}
 
 	public void doLiveUpdate(final DialogEasyImportConfig dialogImportConfig) {
@@ -4559,7 +4669,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			final String js = UI.EMPTY_STRING//
 					+ ("document.getElementById(\"" + DOM_ID_IMPORT_TILES + "\").className ='" + domClassState + "';\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-					+ ("document.getElementById(\"" + DOM_ID_DEVICE_STATE + "\").className ='" + domClassState + "';\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					+ ("document.getElementById(\"" + DOM_ID_DEVICE_STATE + "\").className ='" + domClassState + "';\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					+ ("document.getElementById(\"" + DOM_ID_IMPORT_CONFIG + "\").className ='" + domClassState + "';\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			;
 
 			_browser.execute(js);
 		}
