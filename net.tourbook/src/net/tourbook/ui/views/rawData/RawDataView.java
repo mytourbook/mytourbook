@@ -121,6 +121,7 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.DeviceResourceException;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellLabelProvider;
@@ -146,6 +147,7 @@ import org.eclipse.swt.browser.LocationAdapter;
 import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.browser.ProgressAdapter;
 import org.eclipse.swt.browser.ProgressEvent;
+import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -157,6 +159,8 @@ import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
@@ -201,15 +205,17 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	//
 	private static final String				STATE_IMPORTED_FILENAMES					= "importedFilenames";						//$NON-NLS-1$
 	private static final String				STATE_SELECTED_TOUR_INDICES					= "SelectedTourIndices";					//$NON-NLS-1$
+	//
+	public static final String				STATE_IS_CHECKSUM_VALIDATION				= "isChecksumValidation";					//$NON-NLS-1$
+	public static final boolean				STATE_IS_CHECKSUM_VALIDATION_DEFAULT		= true;
+	public static final String				STATE_IS_CONVERT_WAYPOINTS					= "STATE_IS_CONVERT_WAYPOINTS";			//$NON-NLS-1$
+	public static final boolean				STATE_IS_CONVERT_WAYPOINTS_DEFAULT			= true;
+	public static final String				STATE_IS_CREATE_TOUR_ID_WITH_TIME			= "isCreateTourIdWithTime";				//$NON-NLS-1$
+	public static final boolean				STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT	= false;
+	private static final String				STATE_IS_NEW_UI								= "STATE_IS_NEW_UI";						//$NON-NLS-1$
 	private static final String				STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED		= "STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED"; //$NON-NLS-1$
 	public static final String				STATE_IS_MERGE_TRACKS						= "isMergeTracks";							//$NON-NLS-1$
-	public static final String				STATE_IS_CHECKSUM_VALIDATION				= "isChecksumValidation";					//$NON-NLS-1$
-	public static final String				STATE_IS_CONVERT_WAYPOINTS					= "STATE_IS_CONVERT_WAYPOINTS";			//$NON-NLS-1$
-	public static final String				STATE_IS_CREATE_TOUR_ID_WITH_TIME			= "isCreateTourIdWithTime";				//$NON-NLS-1$
 	public static final boolean				STATE_IS_MERGE_TRACKS_DEFAULT				= false;
-	public static final boolean				STATE_IS_CHECKSUM_VALIDATION_DEFAULT		= true;
-	public static final boolean				STATE_IS_CONVERT_WAYPOINTS_DEFAULT			= true;
-	public static final boolean				STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT	= false;
 	//
 	private static final String				HREF_TOKEN									= "#";										//$NON-NLS-1$
 	private static final String				PAGE_ABOUT_BLANK							= "about:blank";							//$NON-NLS-1$
@@ -224,6 +230,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private static String					ACTION_DEVICE_IMPORT						= "DeviceImport";							//$NON-NLS-1$
 	private static String					ACTION_DEVICE_WATCHING_ON_OFF				= "DeviceOnOff";							//$NON-NLS-1$
 	private static final String				ACTION_IMPORT_FROM_FILES					= "ImportFromFiles";						//$NON-NLS-1$
+	private static final String				ACTION_OLD_UI								= "OldUI";									//$NON-NLS-1$
 	private static final String				ACTION_SERIAL_PORT_CONFIGURED				= "SerialPortConfigured";					//$NON-NLS-1$
 	private static final String				ACTION_SERIAL_PORT_DIRECTLY					= "SerialPortDirectly";					//$NON-NLS-1$
 	private static final String				ACTION_SETUP_EASY_IMPORT					= "SetupEasyImport";						//$NON-NLS-1$
@@ -241,6 +248,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private static String					HREF_ACTION_DEVICE_IMPORT;
 	private static String					HREF_ACTION_DEVICE_WATCHING_ON_OFF;
 	private static String					HREF_ACTION_IMPORT_FROM_FILES;
+	private static String					HREF_ACTION_OLD_UI;
 	private static String					HREF_ACTION_SERIAL_PORT_CONFIGURED;
 	private static String					HREF_ACTION_SERIAL_PORT_DIRECTLY;
 	private static String					HREF_ACTION_SETUP_EASY_IMPORT;
@@ -249,6 +257,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		HREF_ACTION_DEVICE_IMPORT = HREF_TOKEN + ACTION_DEVICE_IMPORT;
 		HREF_ACTION_DEVICE_WATCHING_ON_OFF = HREF_TOKEN + ACTION_DEVICE_WATCHING_ON_OFF;
 		HREF_ACTION_IMPORT_FROM_FILES = HREF_TOKEN + ACTION_IMPORT_FROM_FILES;
+		HREF_ACTION_OLD_UI = HREF_TOKEN + ACTION_OLD_UI;
 		HREF_ACTION_SERIAL_PORT_CONFIGURED = HREF_TOKEN + ACTION_SERIAL_PORT_CONFIGURED;
 		HREF_ACTION_SERIAL_PORT_DIRECTLY = HREF_TOKEN + ACTION_SERIAL_PORT_DIRECTLY;
 		HREF_ACTION_SETUP_EASY_IMPORT = HREF_TOKEN + ACTION_SETUP_EASY_IMPORT + HREF_TOKEN;
@@ -259,6 +268,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private final IDialogSettings			_state										= TourbookPlugin.getState(ID);
 	//
 	private RawDataManager					_rawDataMgr									= RawDataManager.getInstance();
+	private TableViewer						_tourViewer;
+	private TableViewerTourInfoToolTip		_tourInfoToolTip;
 	//
 	private PostSelectionProvider			_postSelectionProvider;
 	private IPartListener2					_partListener;
@@ -335,8 +346,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private HashMap<Long, Image>			_configImages								= new HashMap<>();
 	private HashMap<Long, Integer>			_configImageHash							= new HashMap<>();
 	//
-	private boolean							_isInUIStartup;
 	private boolean							_isBrowserCompleted;
+	private boolean							_isInUIStartup;
+	private boolean							_isNewUI;
 
 	/**
 	 * When <code>false</code> then the background WatchStores task must set it valid. Only when it
@@ -389,9 +401,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	 * UI controls
 	 */
 	private PageBook						_topPageBook;
-	private Composite						_topPage_Startup;
 	private Composite						_topPage_Dashboard;
 	private Composite						_topPage_ImportViewer;
+	private Composite						_topPage_OldUI;
+	private Composite						_topPage_Startup;
 
 	private PageBook						_dashboard_PageBook;
 	private Composite						_dashboardPage_NoBrowser;
@@ -399,11 +412,16 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private Composite						_parent;
 	private Text							_txtNoBrowser;
-
-	private TableViewer						_tourViewer;
-	private TableViewerTourInfoToolTip		_tourInfoToolTip;
+	private Link							_linkImport;
 
 	private Browser							_browser;
+
+	/*
+	 * OLD UI
+	 */
+	public static final String				IMAGE_DATA_TRANSFER							= "IMAGE_DATA_TRANSFER";					//$NON-NLS-1$
+	public static final String				IMAGE_DATA_TRANSFER_DIRECT					= "IMAGE_DATA_TRANSFER_DIRECT";			//$NON-NLS-1$
+	public static final String				IMAGE_IMPORT								= "IMAGE_IMPORT";							//$NON-NLS-1$
 
 	private class JS_OnSelectImportConfig extends BrowserFunction {
 
@@ -1865,6 +1883,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 					Messages.Import_Data_HTML_ReceiveFromSerialPort_DirectlyLink,
 					(HTTP_DUMMY + HREF_ACTION_SERIAL_PORT_DIRECTLY),
 					_imageUrl_SerialPort_Directly);
+
+			createHTML_92_TileAction(
+					sb,
+					Messages.Import_Data_HTML_Action_OldUI,
+					Messages.Import_Data_HTML_Action_OldUI_Tooltip,
+					(HTTP_DUMMY + HREF_ACTION_OLD_UI),
+					null);
 		}
 		sb.append("	</tr></tbody></table>\n"); // //$NON-NLS-1$
 		sb.append("</div>\n"); //$NON-NLS-1$
@@ -1877,16 +1902,23 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 											final String href,
 											final String imageUrl) {
 
-		final String htmlImage = "style='" // //$NON-NLS-1$
+		String htmlImage = UI.EMPTY_STRING;
 
-				+ ("background-image:	url(" + imageUrl + ");\n") //$NON-NLS-1$ //$NON-NLS-2$
-				//
-				+ "'"; //$NON-NLS-1$
+		if (imageUrl != null) {
+
+			htmlImage = "style='" // //$NON-NLS-1$
+
+					+ ("background-image:	url(" + imageUrl + ");\n") //$NON-NLS-1$ //$NON-NLS-2$
+					//
+					+ "'"; //$NON-NLS-1$
+		}
+
+		final String validTooltip = tooltip.replace("'", ""); //$NON-NLS-1$ //$NON-NLS-2$
 
 		final String html = "" //$NON-NLS-1$
 
 				+ HTML_TD
-				+ ("<a href='" + href + "' title='" + tooltip + "' class='import-tile'>\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				+ ("<a href='" + href + "' title='" + validTooltip + "' class='import-tile'>\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				+ ("	<div class='import-tile-image action-button' " + htmlImage + "></div>\n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("	<div class='import-tile-config'>" + name + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("</a>\n") //$NON-NLS-1$
@@ -2050,11 +2082,151 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_topPageBook = new PageBook(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(_topPageBook);
 
+		_topPage_OldUI = createUI_05_Page_OldUI(_topPageBook);
 		_topPage_Startup = createUI_10_Page_Startup(_topPageBook);
 		_topPage_Dashboard = createUI_20_Page_Dashboard(_topPageBook);
 		_topPage_ImportViewer = createUI_90_Page_TourViewer(_topPageBook);
 
 		_topPageBook.showPage(_topPage_Startup);
+	}
+
+	private Composite createUI_05_Page_OldUI(final Composite parent) {
+
+		final ImageRegistry imageRegistry = net.tourbook.ui.UI.IMAGE_REGISTRY;
+
+		final int defaultWidth = 300;
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+		{
+			{
+				/*
+				 * label: info
+				 */
+				final Label label = new Label(container, SWT.WRAP);
+				GridDataFactory.fillDefaults()//
+						.hint(defaultWidth, SWT.DEFAULT)
+						.grab(true, false)
+						.span(2, 1)
+						.applyTo(label);
+				label.setText(Messages.Import_Data_OldUI_Label_Info);
+			}
+
+			{
+				/*
+				 * link: import
+				 */
+				final CLabel iconImport = new CLabel(container, SWT.NONE);
+				GridDataFactory.fillDefaults().indent(0, 10).applyTo(iconImport);
+				iconImport.setImage(imageRegistry.get(IMAGE_IMPORT));
+
+				_linkImport = new Link(container, SWT.NONE);
+				GridDataFactory.fillDefaults()//
+						.hint(defaultWidth, SWT.DEFAULT)
+						.align(SWT.FILL, SWT.CENTER)
+						.grab(true, false)
+						.indent(0, 10)
+						.applyTo(_linkImport);
+				_linkImport.setText(Messages.Import_Data_OldUI_Link_Import);
+				_linkImport.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						_rawDataMgr.actionImportFromFile();
+					}
+				});
+			}
+
+			{
+				/*
+				 * link: data transfer
+				 */
+				final CLabel iconTransfer = new CLabel(container, SWT.NONE);
+				GridDataFactory.fillDefaults().indent(0, 10).applyTo(iconTransfer);
+				iconTransfer.setImage(imageRegistry.get(IMAGE_DATA_TRANSFER));
+
+				final Link linkTransfer = new Link(container, SWT.NONE);
+				GridDataFactory.fillDefaults()//
+						.hint(defaultWidth, SWT.DEFAULT)
+						.align(SWT.FILL, SWT.CENTER)
+						.grab(true, false)
+						.indent(0, 10)
+						.applyTo(linkTransfer);
+				//			<a>Transfer tours from a sportcomputer</a>
+				//			<a>Touren von einem Sportcomputer übertragen</a>
+				linkTransfer.setText(Messages.Import_Data_OldUI_Link_ReceiveFromSerialPort_Configured);
+				linkTransfer.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						_rawDataMgr.actionImportFromDevice();
+					}
+				});
+			}
+
+			{
+				/*
+				 * link: direct data transfer
+				 */
+				final CLabel iconDirectTransfer = new CLabel(container, SWT.NONE);
+				GridDataFactory.fillDefaults().indent(0, 10).applyTo(iconDirectTransfer);
+				iconDirectTransfer.setImage(imageRegistry.get(IMAGE_DATA_TRANSFER_DIRECT));
+
+				final Link linkTransferDirect = new Link(container, SWT.NONE);
+				GridDataFactory.fillDefaults() //
+						.hint(defaultWidth, SWT.DEFAULT)
+						.align(SWT.FILL, SWT.CENTER)
+						.grab(true, false)
+						.indent(0, 10)
+						.applyTo(linkTransferDirect);
+				//			<a>Transfer tours from a sportcomputer with previous configuration</a>
+				//			<a>Touren von einem Sportcomputer übertragen, mit vorheriger Konfiguration</a>
+				linkTransferDirect.setText(Messages.Import_Data_OldUI_Link_ReceiveFromSerialPort_Directly);
+				linkTransferDirect.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						_rawDataMgr.actionImportFromDeviceDirect();
+					}
+				});
+			}
+
+			{
+				/*
+				 * label: hint
+				 */
+				final Label label = new Label(container, SWT.WRAP);
+				GridDataFactory.fillDefaults()//
+						.hint(defaultWidth, SWT.DEFAULT)
+						.grab(true, false)
+						.indent(0, 20)
+						.span(2, 1)
+						.applyTo(label);
+				label.setText(Messages.Import_Data_OldUI_Label_Hint);
+			}
+
+			{
+				/*
+				 * Link: New UI
+				 */
+				final Link link = new Link(container, SWT.NONE);
+				GridDataFactory.fillDefaults()//
+						.hint(defaultWidth, SWT.DEFAULT)
+						.align(SWT.FILL, SWT.CENTER)
+						.grab(true, false)
+						.indent(0, 10)
+						.span(2, 1)
+						.applyTo(link);
+				link.setText(Messages.Import_Data_OldUI_Link_ShowNewUI);
+				link.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						onSelectUI_New();
+					}
+				});
+			}
+		}
+
+		return container;
 	}
 
 	/**
@@ -2846,9 +3018,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	@Override
 	public void dispose() {
 
-		setWatcher_Off();
-
-		EasyImportManager.getInstance().reset();
+		resetEasyImport();
 
 		Util.disposeResource(_imageDatabase);
 		Util.disposeResource(_imageDatabaseOtherPerson);
@@ -3767,6 +3937,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			action_Easy_RunImport(tileId);
 
+		} else if (ACTION_SETUP_EASY_IMPORT.equals(hrefAction)) {
+
+			action_Easy_SetupImport(-1);
+
+		} else if (ACTION_DEVICE_WATCHING_ON_OFF.equals(hrefAction)) {
+
+			action_Easy_SetDeviceWatching_OnOff();
+
 		} else if (ACTION_IMPORT_FROM_FILES.equals(hrefAction)) {
 
 			_rawDataMgr.actionImportFromFile();
@@ -3779,13 +3957,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			_rawDataMgr.actionImportFromDeviceDirect();
 
-		} else if (ACTION_SETUP_EASY_IMPORT.equals(hrefAction)) {
+		} else if (ACTION_OLD_UI.equals(hrefAction)) {
 
-			action_Easy_SetupImport(-1);
-
-		} else if (ACTION_DEVICE_WATCHING_ON_OFF.equals(hrefAction)) {
-
-			action_Easy_SetDeviceWatching_OnOff();
+			onSelectUI_Old();
 		}
 	}
 
@@ -3837,6 +4011,20 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				_isViewerPersonDataDirty = true;
 			}
 		}
+	}
+
+	private void onSelectUI_New() {
+
+		_isNewUI = true;
+		updateUI_1_TopPage(true);
+	}
+
+	private void onSelectUI_Old() {
+
+		resetEasyImport();
+
+		_isNewUI = false;
+		updateUI_1_TopPage(true);
 	}
 
 	@Override
@@ -4037,7 +4225,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		return text.replace("\n", "\\n"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
+	private void resetEasyImport() {
+
+		setWatcher_Off();
+		EasyImportManager.getInstance().reset();
+	}
+
 	private void restoreState() {
+
+		_isNewUI = Util.getStateBoolean(_state, STATE_IS_NEW_UI, false);
 
 		_actionRemoveToursWhenClosed.setChecked(Util.getStateBoolean(
 				_state,
@@ -4090,6 +4286,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		// keep selected tours
 		Util.setState(_state, STATE_SELECTED_TOUR_INDICES, table.getSelectionIndices());
+
+		_state.put(STATE_IS_NEW_UI, _isNewUI);
 
 		_columnManager.saveState(_state);
 	}
@@ -4566,27 +4764,36 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			 * flickering when the view toolbar is first drawn on the left side of the view !!!
 			 */
 
-			_parent.getDisplay().asyncExec(new Runnable() {
-				@Override
-				public void run() {
+			if (_isNewUI) {
 
-					_isInUIStartup = isInStartUp;
+				_parent.getDisplay().asyncExec(new Runnable() {
+					@Override
+					public void run() {
 
-					_topPageBook.showPage(_topPage_Dashboard);
+						_isInUIStartup = isInStartUp;
 
-					// create dashboard UI
-					updateUI_2_Dashboard();
+						_topPageBook.showPage(_topPage_Dashboard);
 
-					if (_browser == null) {
+						// create dashboard UI
+						updateUI_2_Dashboard();
 
-						// deactivate background task
+						if (_browser == null) {
 
-						setWatcher_Off();
+							// deactivate background task
+
+							setWatcher_Off();
+						}
+
+						// the watcher is started in onBrowser_Completed
 					}
+				});
 
-					// the watcher is started in onBrowser_Completed
-				}
-			});
+			} else {
+
+				_topPageBook.showPage(_topPage_OldUI);
+
+				_linkImport.setFocus();
+			}
 		}
 	}
 

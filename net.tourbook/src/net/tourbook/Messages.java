@@ -119,10 +119,8 @@ public class Messages extends NLS {
 	public static String		Dialog_ImportConfig_Action_SortBySpeed_Tooltip;
 	public static String		Dialog_ImportConfig_Checkbox_CreateBackup;
 	public static String		Dialog_ImportConfig_Checkbox_CreateBackup_Tooltip;
-	public static String	Dialog_ImportConfig_Checkbox_DeleteDeviceFiles;
-
-	public static String	Dialog_ImportConfig_Checkbox_DeleteDeviceFiles_Tooltip;
-
+	public static String		Dialog_ImportConfig_Checkbox_DeleteDeviceFiles;
+	public static String		Dialog_ImportConfig_Checkbox_DeleteDeviceFiles_Tooltip;
 	public static String		Dialog_ImportConfig_Checkbox_DeviceWatching;
 	public static String		Dialog_ImportConfig_Checkbox_ImportFiles;
 	public static String		Dialog_ImportConfig_Checkbox_LastMarker;
@@ -135,36 +133,25 @@ public class Messages extends NLS {
 	public static String		Dialog_ImportConfig_Checkbox_ShowInDashboard_Tooltip;
 	public static String		Dialog_ImportConfig_Checkbox_TourType;
 	public static String		Dialog_ImportConfig_Checkbox_TourType_Tooltip;
-	public static String	Dialog_ImportConfig_Column_Backup;
-
-	public static String	Dialog_ImportConfig_Column_DeleteFiles_Header;
-
-	public static String	Dialog_ImportConfig_Column_DeleteFiles_Label;
-
-	public static String	Dialog_ImportConfig_Column_DeleteFiles_Tooltip;
-
+	public static String		Dialog_ImportConfig_Column_Backup;
+	public static String		Dialog_ImportConfig_Column_DeleteFiles_Header;
+	public static String		Dialog_ImportConfig_Column_DeleteFiles_Label;
+	public static String		Dialog_ImportConfig_Column_DeleteFiles_Tooltip;
 	public static String		Dialog_ImportConfig_Column_Description;
-
-	public static String	Dialog_ImportConfig_Column_Device;
-
-	public static String	Dialog_ImportConfig_Column_DeviceFiles;
+	public static String		Dialog_ImportConfig_Column_Device;
+	public static String		Dialog_ImportConfig_Column_DeviceFiles;
 	public static String		Dialog_ImportConfig_Column_LastMarker_Header;
 	public static String		Dialog_ImportConfig_Column_LastMarker_Label;
 	public static String		Dialog_ImportConfig_Column_LastMarker_Tooltip;
 	public static String		Dialog_ImportConfig_Column_Name;
 	public static String		Dialog_ImportConfig_Column_Save_Header;
 	public static String		Dialog_ImportConfig_Column_Save_Label;
-	public static String	Dialog_ImportConfig_Column_ShowInDash_Header;
-
-	public static String	Dialog_ImportConfig_Column_ShowInDash_Label;
-
+	public static String		Dialog_ImportConfig_Column_ShowInDash_Header;
+	public static String		Dialog_ImportConfig_Column_ShowInDash_Label;
 	public static String		Dialog_ImportConfig_Column_TourType;
-	public static String	Dialog_ImportConfig_Column_TurnOFF_Header;
-
-	public static String	Dialog_ImportConfig_Column_TurnOFF_Label;
-
-	public static String	Dialog_ImportConfig_Column_TurnOFF_Tooltip;
-
+	public static String		Dialog_ImportConfig_Column_TurnOFF_Header;
+	public static String		Dialog_ImportConfig_Column_TurnOFF_Label;
+	public static String		Dialog_ImportConfig_Column_TurnOFF_Tooltip;
 	public static String		Dialog_ImportConfig_Combo_Folder_Tooltip;
 	public static String		Dialog_ImportConfig_Dialog_BackupFolder_Message;
 	public static String		Dialog_ImportConfig_Dialog_BackupFolder_Title;
@@ -174,18 +161,15 @@ public class Messages extends NLS {
 	public static String		Dialog_ImportConfig_Dialog_Title;
 	public static String		Dialog_ImportConfig_Error_FolderIsInvalid;
 	public static String		Dialog_ImportConfig_Group_Dashboard;
-	public static String	Dialog_ImportConfig_Group_ImportActions;
-
+	public static String		Dialog_ImportConfig_Group_ImportActions;
 	public static String		Dialog_ImportConfig_Group_ImportActions_I;
 	public static String		Dialog_ImportConfig_Group_ImportActions_III;
 	public static String		Dialog_ImportConfig_Group_ImportLauncher;
 	public static String		Dialog_ImportConfig_Group_ImportLauncherConfig;
 	public static String		Dialog_ImportConfig_Info_ConfigDragDrop;
-	public static String	Dialog_ImportConfig_Info_ImportActions;
-
+	public static String		Dialog_ImportConfig_Info_ImportActions;
 	public static String		Dialog_ImportConfig_Info_ImportActions_II;
-
-	public static String	Dialog_ImportConfig_Info_MovedDeviceFiles;
+	public static String		Dialog_ImportConfig_Info_MovedDeviceFiles;
 	public static String		Dialog_ImportConfig_Info_NoDeviceName;
 	public static String		Dialog_ImportConfig_Info_RetrievingVolumeInfo;
 	public static String		Dialog_ImportConfig_Label_AnimationCrazyFactor;
@@ -200,10 +184,8 @@ public class Messages extends NLS {
 	public static String		Dialog_ImportConfig_Label_ConfigName;
 	public static String		Dialog_ImportConfig_Label_ConfigTileSize;
 	public static String		Dialog_ImportConfig_Label_ConfigTileSize_Tooltip;
-	public static String	Dialog_ImportConfig_Label_DeviceFiles;
-
-	public static String	Dialog_ImportConfig_Label_DeviceFiles_Tooltip;
-
+	public static String		Dialog_ImportConfig_Label_DeviceFiles;
+	public static String		Dialog_ImportConfig_Label_DeviceFiles_Tooltip;
 	public static String		Dialog_ImportConfig_Label_DeviceFolder;
 	public static String		Dialog_ImportConfig_Label_DeviceFolder_Tooltip;
 	public static String		Dialog_ImportConfig_Label_ImportColumns;
@@ -212,20 +194,14 @@ public class Messages extends NLS {
 	public static String		Dialog_ImportConfig_Label_LastMarkerDistance;
 	public static String		Dialog_ImportConfig_Label_LastMarkerDistance_Tooltip;
 	public static String		Dialog_ImportConfig_Label_LastMarkerText;
-	public static String	Dialog_ImportConfig_Link_OtherActions;
-
+	public static String		Dialog_ImportConfig_Link_OtherActions;
 	public static String		Dialog_ImportConfig_Link_TourType;
 	public static String		Dialog_ImportConfig_Spinner_Speed_Tooltip;
-
-	public static String	Dialog_ImportConfig_State_OFF;
-
-	public static String	Dialog_ImportConfig_State_ON;
-
-	public static String	Dialog_ImportConfig_Tab_Configuration;
-
-	public static String	Dialog_ImportConfig_Tab_Dashboard;
-
-	public static String	Dialog_ImportConfig_Tab_Launcher;
+	public static String		Dialog_ImportConfig_State_OFF;
+	public static String		Dialog_ImportConfig_State_ON;
+	public static String		Dialog_ImportConfig_Tab_Configuration;
+	public static String		Dialog_ImportConfig_Tab_Dashboard;
+	public static String		Dialog_ImportConfig_Tab_Launcher;
 
 	public static String		Dialog_HRZone_Button_AddZone;
 	public static String		Dialog_HRZone_Button_EditHrZones;
@@ -812,8 +788,7 @@ public class Messages extends NLS {
 	public static String		Image__RawData_DeviceFolder;
 	public static String		Image__RawData_DeviceFolder_NotChecked;
 	public static String		Image__RawData_DeviceFolder_NotDefined;
-
-	public static String	Image__RawData_DeviceFolder_NotSetup;
+	public static String		Image__RawData_DeviceFolder_NotSetup;
 	public static String		Image__RawData_DeviceFolderDisabled;
 	public static String		Image__RawData_Import;
 	public static String		Image__RawData_Transfer;
@@ -838,8 +813,7 @@ public class Messages extends NLS {
 	public static String		Image__synch_statistics_Disabled;
 	public static String		Image__SearchExternal;
 	public static String		Image__SearchExternal_Disabled;
-	public static String	Image__State_Delete;
-
+	public static String		Image__State_Delete;
 	public static String		Image__State_Error;
 	public static String		Image__State_OK;
 	public static String		Image__State_SaveTour;
@@ -906,8 +880,7 @@ public class Messages extends NLS {
 	public static String		Import_Data_Action_SetupEasyImport_Tooltip;
 	public static String		Import_Data_Default_FirstEasyImportLauncher_Description;
 	public static String		Import_Data_Default_FirstEasyImportLauncher_Name;
-
-	public static String	Import_Data_Default_ImportConfig_Name;
+	public static String		Import_Data_Default_ImportConfig_Name;
 	public static String		Import_Data_Dialog_ConfirmReimport_Message;
 	public static String		Import_Data_Dialog_ConfirmReimportAltitudeValues_Message;
 	public static String		Import_Data_Dialog_ConfirmReimportGearValues_Message;
@@ -934,16 +907,14 @@ public class Messages extends NLS {
 	public static String		Import_Data_Dialog_EasyImport_Title;
 	public static String		Import_Data_Dialog_NoActivePersion_Message;
 	public static String		Import_Data_HTML_AcquireDeviceInfo;
+	public static String		Import_Data_HTML_Action_OldUI;
+	public static String		Import_Data_HTML_Action_OldUI_Tooltip;
 	public static String		Import_Data_HTML_AllFilesAreBackedUp;
 	public static String		Import_Data_HTML_AllFilesAreImported;
-	public static String	Import_Data_HTML_DeleteDeviceFiles_No;
-
-	public static String	Import_Data_HTML_DeleteDeviceFiles_Yes;
-
-	public static String	Import_Data_HTML_DeleteFilesNO;
-
-	public static String	Import_Data_HTML_DeleteFilesYES;
-
+	public static String		Import_Data_HTML_DeleteDeviceFiles_No;
+	public static String		Import_Data_HTML_DeleteDeviceFiles_Yes;
+	public static String		Import_Data_HTML_DeleteFilesNO;
+	public static String		Import_Data_HTML_DeleteFilesYES;
 	public static String		Import_Data_HTML_DeviceOff_Tooltip;
 	public static String		Import_Data_HTML_DeviceOn_Tooltip;
 	public static String		Import_Data_HTML_EasyImport;
@@ -963,11 +934,9 @@ public class Messages extends NLS {
 	public static String		Import_Data_HTML_SaveTour_No;
 	public static String		Import_Data_HTML_SaveTour_Yes;
 	public static String		Import_Data_HTML_Title_Backup;
-	public static String	Import_Data_HTML_Title_Delete;
-
+	public static String		Import_Data_HTML_Title_Delete;
 	public static String		Import_Data_HTML_Title_Device;
-
-	public static String	Import_Data_HTML_Title_Files;
+	public static String		Import_Data_HTML_Title_Files;
 	public static String		Import_Data_HTML_WatchingIsOff;
 	public static String		Import_Data_HTML_WatchingOff;
 	public static String		Import_Data_HTML_WatchingOn;
@@ -980,6 +949,12 @@ public class Messages extends NLS {
 	public static String		Import_Data_Task_CloseDeviceInfo_CannotClose;
 	public static String		Import_Data_TourTypeConfig_BySpeed;
 	public static String		Import_Data_TourTypeConfig_OneForAll;
+	public static String		Import_Data_OldUI_Label_Hint;
+	public static String		Import_Data_OldUI_Label_Info;
+	public static String		Import_Data_OldUI_Link_Import;
+	public static String		Import_Data_OldUI_Link_ReceiveFromSerialPort_Configured;
+	public static String		Import_Data_OldUI_Link_ReceiveFromSerialPort_Directly;
+	public static String		Import_Data_OldUI_Link_ShowNewUI;
 
 	public static String		Import_Wizard_Control_combo_person_default_settings;
 	public static String		Import_Wizard_Control_combo_ports_not_available;

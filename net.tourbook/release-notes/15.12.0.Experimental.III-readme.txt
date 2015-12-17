@@ -12,6 +12,7 @@ New
   - Device watcher switch 
   
   Since Experimental III
+  - Show old import page as default.
   - Multiple import configurations 
   - Delete device files, this is the same as moving the device files to a backup folder because the delete feature can only be used when also backup files are created.
   - SORRY, I had to change the structure of the easy import configuration and there is no automatic migration, it has to be done manually.

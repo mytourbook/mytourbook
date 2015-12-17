@@ -42,6 +42,7 @@ import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.views.rawData.RawDataView;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
 import org.eclipse.core.runtime.FileLocator;
@@ -293,6 +294,17 @@ public class UI {
 				MapGraphId.Temperature,
 				Messages.Image__graph_temperature,
 				Messages.Image__graph_temperature_disabled);
+
+		// data transfer
+		IMAGE_REGISTRY.put(
+				RawDataView.IMAGE_DATA_TRANSFER,
+				TourbookPlugin.getImageDescriptor(Messages.Image__RawData_Transfer));
+		IMAGE_REGISTRY.put(
+				RawDataView.IMAGE_DATA_TRANSFER_DIRECT,
+				TourbookPlugin.getImageDescriptor(Messages.Image__RawData_TransferDirect));
+		IMAGE_REGISTRY.put(//
+				RawDataView.IMAGE_IMPORT,
+				TourbookPlugin.getImageDescriptor(Messages.Image__RawData_Import));
 
 		// tour type images
 		IMAGE_REGISTRY.put(
