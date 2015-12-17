@@ -2192,6 +2192,27 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			{
 				/*
+				 * Link: New UI
+				 */
+				final Link link = new Link(container, SWT.NONE);
+				GridDataFactory.fillDefaults()//
+						.hint(defaultWidth, SWT.DEFAULT)
+						.align(SWT.FILL, SWT.CENTER)
+						.grab(true, false)
+						.indent(28, 10)
+						.span(2, 1)
+						.applyTo(link);
+				link.setText(Messages.Import_Data_OldUI_Link_ShowNewUI);
+				link.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						onSelectUI_New();
+					}
+				});
+			}
+
+			{
+				/*
 				 * label: hint
 				 */
 				final Label label = new Label(container, SWT.WRAP);
@@ -2202,27 +2223,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 						.span(2, 1)
 						.applyTo(label);
 				label.setText(Messages.Import_Data_OldUI_Label_Hint);
-			}
-
-			{
-				/*
-				 * Link: New UI
-				 */
-				final Link link = new Link(container, SWT.NONE);
-				GridDataFactory.fillDefaults()//
-						.hint(defaultWidth, SWT.DEFAULT)
-						.align(SWT.FILL, SWT.CENTER)
-						.grab(true, false)
-						.indent(0, 10)
-						.span(2, 1)
-						.applyTo(link);
-				link.setText(Messages.Import_Data_OldUI_Link_ShowNewUI);
-				link.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(final SelectionEvent e) {
-						onSelectUI_New();
-					}
-				});
 			}
 		}
 
