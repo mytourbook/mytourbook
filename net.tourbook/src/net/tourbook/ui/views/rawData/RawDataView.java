@@ -119,8 +119,6 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.resource.DeviceResourceException;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -180,6 +178,17 @@ import org.joda.time.DateTime;
 public class RawDataView extends ViewPart implements ITourProviderAll, ITourViewer3 {
 
 	public static final String				ID											= "net.tourbook.views.rawData.RawDataView"; //$NON-NLS-1$
+	//
+	private static final String				IMAGE_ASSIGN_MERGED_TOUR					= "IMAGE_ASSIGN_MERGED_TOUR";				//$NON-NLS-1$
+	private static final String				IMAGE_DATABASE								= "IMAGE_DATABASE";						//$NON-NLS-1$
+	private static final String				IMAGE_DATABASE_OTHER_PERSON					= "IMAGE_DATABASE_OTHER_PERSON";			//$NON-NLS-1$
+	private static final String				IMAGE_DELETE								= "IMAGE_DELETE";							//$NON-NLS-1$
+	private static final String				IMAGE_ICON_PLACEHOLDER						= "IMAGE_ICON_PLACEHOLDER";				//$NON-NLS-1$
+	// OLD UI
+	private static final String				IMAGE_DATA_TRANSFER							= "IMAGE_DATA_TRANSFER";					//$NON-NLS-1$
+	private static final String				IMAGE_DATA_TRANSFER_DIRECT					= "IMAGE_DATA_TRANSFER_DIRECT";			//$NON-NLS-1$
+	private static final String				IMAGE_IMPORT_FROM_FILES						= "IMAGE_IMPORT_FROM_FILES";				//$NON-NLS-1$
+	private static final String				IMAGE_NEW_UI								= "IMAGE_NEW_UI";							//$NON-NLS-1$
 	//
 	private static final String				HTML_TD										= "<td>";									//$NON-NLS-1$
 	private static final String				HTML_TD_SPACE								= "<td ";									//$NON-NLS-1$
@@ -383,17 +392,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/*
 	 * resources
 	 */
-	private ImageDescriptor					_imageDescDatabase;
-	private ImageDescriptor					_imageDescDatabaseOtherPerson;
-	private ImageDescriptor					_imageDescDatabaseAssignMergedTour;
-	private ImageDescriptor					_imageDescDatabasePlaceholder;
-	private ImageDescriptor					_imageDescDelete;
-	//
-	private Image							_imageDatabase;
-	private Image							_imageDatabaseOtherPerson;
-	private Image							_imageDatabaseAssignMergedTour;
-	private Image							_imageDatabasePlaceholder;
-	private Image							_imageDelete;
+	private ImageRegistry					_images;
 
 	private DialogEasyImportConfig			_dialogImportConfig;
 
@@ -415,13 +414,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private Link							_linkImport;
 
 	private Browser							_browser;
-
-	/*
-	 * OLD UI
-	 */
-	public static final String				IMAGE_DATA_TRANSFER							= "IMAGE_DATA_TRANSFER";					//$NON-NLS-1$
-	public static final String				IMAGE_DATA_TRANSFER_DIRECT					= "IMAGE_DATA_TRANSFER_DIRECT";			//$NON-NLS-1$
-	public static final String				IMAGE_IMPORT								= "IMAGE_IMPORT";							//$NON-NLS-1$
 
 	private class JS_OnSelectImportConfig extends BrowserFunction {
 
@@ -1979,25 +1971,33 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private void createResources_Image() {
 
-		_imageDescDatabase = TourbookPlugin.getImageDescriptor(Messages.Image__database);
-		_imageDescDatabaseOtherPerson = TourbookPlugin.getImageDescriptor(Messages.Image__database_other_person);
-		_imageDescDatabaseAssignMergedTour = TourbookPlugin.getImageDescriptor(Messages.Image__assignMergedTour);
-		_imageDescDatabasePlaceholder = TourbookPlugin.getImageDescriptor(Messages.Image__icon_placeholder);
-		_imageDescDelete = TourbookPlugin.getImageDescriptor(Messages.Image__delete);
+		_images = new ImageRegistry();
 
-		try {
+		/*
+		 * Database
+		 */
+		_images.put(IMAGE_DATABASE, //
+				TourbookPlugin.getImageDescriptor(Messages.Image__database));
+		_images.put(IMAGE_DATABASE_OTHER_PERSON,//
+				TourbookPlugin.getImageDescriptor(Messages.Image__database_other_person));
+		_images.put(IMAGE_ASSIGN_MERGED_TOUR, //
+				TourbookPlugin.getImageDescriptor(Messages.Image__assignMergedTour));
+		_images.put(IMAGE_ICON_PLACEHOLDER, //
+				TourbookPlugin.getImageDescriptor(Messages.Image__icon_placeholder));
+		_images.put(IMAGE_DELETE, //
+				TourbookPlugin.getImageDescriptor(Messages.Image__delete));
 
-			final Display display = Display.getCurrent();
-
-			_imageDatabase = (Image) _imageDescDatabase.createResource(display);
-			_imageDatabaseOtherPerson = (Image) _imageDescDatabaseOtherPerson.createResource(display);
-			_imageDatabaseAssignMergedTour = (Image) _imageDescDatabaseAssignMergedTour.createResource(display);
-			_imageDatabasePlaceholder = (Image) _imageDescDatabasePlaceholder.createResource(display);
-			_imageDelete = (Image) _imageDescDelete.createResource(display);
-
-		} catch (final DeviceResourceException e) {
-			StatusUtil.log(e);
-		}
+		/*
+		 * Data transfer
+		 */
+		_images.put(IMAGE_DATA_TRANSFER, //
+				TourbookPlugin.getImageDescriptor(Messages.Image__RawData_Transfer));
+		_images.put(IMAGE_DATA_TRANSFER_DIRECT,//
+				TourbookPlugin.getImageDescriptor(Messages.Image__RawData_TransferDirect));
+		_images.put(IMAGE_IMPORT_FROM_FILES, //
+				TourbookPlugin.getImageDescriptor(Messages.Image__RawData_Import));
+		_images.put(IMAGE_NEW_UI, //
+				TourbookPlugin.getImageDescriptor(Messages.Image__RawData_DeviceFolder));
 
 	}
 
@@ -2092,8 +2092,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private Composite createUI_05_Page_OldUI(final Composite parent) {
 
-		final ImageRegistry imageRegistry = net.tourbook.ui.UI.IMAGE_REGISTRY;
-
 		final int defaultWidth = 300;
 
 		final Composite container = new Composite(parent, SWT.NONE);
@@ -2103,32 +2101,32 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		{
 			{
 				/*
-				 * label: info
+				 * Import info
 				 */
 				final Label label = new Label(container, SWT.WRAP);
+				label.setText(Messages.Import_Data_OldUI_Label_Info);
 				GridDataFactory.fillDefaults()//
 						.hint(defaultWidth, SWT.DEFAULT)
 						.grab(true, false)
 						.span(2, 1)
 						.applyTo(label);
-				label.setText(Messages.Import_Data_OldUI_Label_Info);
 			}
 
 			{
 				/*
-				 * link: import
+				 * Import
 				 */
+				// icon
 				final CLabel iconImport = new CLabel(container, SWT.NONE);
-				GridDataFactory.fillDefaults().indent(0, 10).applyTo(iconImport);
-				iconImport.setImage(imageRegistry.get(IMAGE_IMPORT));
-
-				_linkImport = new Link(container, SWT.NONE);
+				iconImport.setImage(_images.get(IMAGE_IMPORT_FROM_FILES));
 				GridDataFactory.fillDefaults()//
-						.hint(defaultWidth, SWT.DEFAULT)
-						.align(SWT.FILL, SWT.CENTER)
-						.grab(true, false)
 						.indent(0, 10)
-						.applyTo(_linkImport);
+						.align(SWT.CENTER, SWT.BEGINNING)
+//						.grab(true, false)
+						.applyTo(iconImport);
+
+				// link
+				_linkImport = new Link(container, SWT.NONE);
 				_linkImport.setText(Messages.Import_Data_OldUI_Link_Import);
 				_linkImport.addSelectionListener(new SelectionAdapter() {
 					@Override
@@ -2136,25 +2134,29 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 						_rawDataMgr.actionImportFromFile();
 					}
 				});
-			}
-
-			{
-				/*
-				 * link: data transfer
-				 */
-				final CLabel iconTransfer = new CLabel(container, SWT.NONE);
-				GridDataFactory.fillDefaults().indent(0, 10).applyTo(iconTransfer);
-				iconTransfer.setImage(imageRegistry.get(IMAGE_DATA_TRANSFER));
-
-				final Link linkTransfer = new Link(container, SWT.NONE);
 				GridDataFactory.fillDefaults()//
 						.hint(defaultWidth, SWT.DEFAULT)
 						.align(SWT.FILL, SWT.CENTER)
 						.grab(true, false)
 						.indent(0, 10)
-						.applyTo(linkTransfer);
-				//			<a>Transfer tours from a sportcomputer</a>
-				//			<a>Touren von einem Sportcomputer übertragen</a>
+						.applyTo(_linkImport);
+			}
+
+			{
+				/*
+				 * Data transfer
+				 */
+				// icon
+				final CLabel iconTransfer = new CLabel(container, SWT.NONE);
+				iconTransfer.setImage(_images.get(IMAGE_DATA_TRANSFER));
+				GridDataFactory.fillDefaults()//
+						.align(SWT.CENTER, SWT.BEGINNING)
+//						.grab(true, false)
+						.indent(0, 10)
+						.applyTo(iconTransfer);
+
+				// link
+				final Link linkTransfer = new Link(container, SWT.NONE);
 				linkTransfer.setText(Messages.Import_Data_OldUI_Link_ReceiveFromSerialPort_Configured);
 				linkTransfer.addSelectionListener(new SelectionAdapter() {
 					@Override
@@ -2162,25 +2164,29 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 						_rawDataMgr.actionImportFromDevice();
 					}
 				});
+				GridDataFactory.fillDefaults()//
+						.hint(defaultWidth, SWT.DEFAULT)
+						.align(SWT.FILL, SWT.CENTER)
+//						.grab(true, false)
+						.indent(0, 10)
+						.applyTo(linkTransfer);
 			}
 
 			{
 				/*
-				 * link: direct data transfer
+				 * Direct data transfer
 				 */
+				// icon
 				final CLabel iconDirectTransfer = new CLabel(container, SWT.NONE);
-				GridDataFactory.fillDefaults().indent(0, 10).applyTo(iconDirectTransfer);
-				iconDirectTransfer.setImage(imageRegistry.get(IMAGE_DATA_TRANSFER_DIRECT));
-
-				final Link linkTransferDirect = new Link(container, SWT.NONE);
-				GridDataFactory.fillDefaults() //
-						.hint(defaultWidth, SWT.DEFAULT)
-						.align(SWT.FILL, SWT.CENTER)
-						.grab(true, false)
+				iconDirectTransfer.setImage(_images.get(IMAGE_DATA_TRANSFER_DIRECT));
+				GridDataFactory.fillDefaults()//
+						.align(SWT.CENTER, SWT.BEGINNING)
+//						.grab(true, false)
 						.indent(0, 10)
-						.applyTo(linkTransferDirect);
-				//			<a>Transfer tours from a sportcomputer with previous configuration</a>
-				//			<a>Touren von einem Sportcomputer übertragen, mit vorheriger Konfiguration</a>
+						.applyTo(iconDirectTransfer);
+
+				// link
+				final Link linkTransferDirect = new Link(container, SWT.NONE);
 				linkTransferDirect.setText(Messages.Import_Data_OldUI_Link_ReceiveFromSerialPort_Directly);
 				linkTransferDirect.addSelectionListener(new SelectionAdapter() {
 					@Override
@@ -2188,20 +2194,25 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 						_rawDataMgr.actionImportFromDeviceDirect();
 					}
 				});
+				GridDataFactory.fillDefaults() //
+						.hint(defaultWidth, SWT.DEFAULT)
+						.align(SWT.FILL, SWT.CENTER)
+						.grab(true, false)
+						.indent(0, 10)
+						.applyTo(linkTransferDirect);
 			}
 
 			{
 				/*
-				 * Link: New UI
+				 * New UI
 				 */
+				// icon
+				final CLabel icon = new CLabel(container, SWT.NONE);
+				icon.setImage(_images.get(IMAGE_NEW_UI));
+				GridDataFactory.fillDefaults().indent(0, 10).applyTo(icon);
+
+				// link
 				final Link link = new Link(container, SWT.NONE);
-				GridDataFactory.fillDefaults()//
-						.hint(defaultWidth, SWT.DEFAULT)
-						.align(SWT.FILL, SWT.CENTER)
-						.grab(true, false)
-						.indent(28, 10)
-						.span(2, 1)
-						.applyTo(link);
 				link.setText(Messages.Import_Data_OldUI_Link_ShowNewUI);
 				link.addSelectionListener(new SelectionAdapter() {
 					@Override
@@ -2209,20 +2220,26 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 						onSelectUI_New();
 					}
 				});
+				GridDataFactory.fillDefaults()//
+						.hint(defaultWidth, SWT.DEFAULT)
+						.align(SWT.FILL, SWT.CENTER)
+						.grab(true, false)
+						.indent(0, 10)
+						.applyTo(link);
 			}
 
 			{
 				/*
-				 * label: hint
+				 * Hint
 				 */
 				final Label label = new Label(container, SWT.WRAP);
+				label.setText(Messages.Import_Data_OldUI_Label_Hint);
 				GridDataFactory.fillDefaults()//
 						.hint(defaultWidth, SWT.DEFAULT)
 						.grab(true, false)
 						.indent(0, 20)
 						.span(2, 1)
 						.applyTo(label);
-				label.setText(Messages.Import_Data_OldUI_Label_Hint);
 			}
 		}
 
@@ -3020,11 +3037,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		resetEasyImport();
 
-		Util.disposeResource(_imageDatabase);
-		Util.disposeResource(_imageDatabaseOtherPerson);
-		Util.disposeResource(_imageDatabaseAssignMergedTour);
-		Util.disposeResource(_imageDatabasePlaceholder);
-		Util.disposeResource(_imageDelete);
+		_images.dispose();
 
 		// don't throw the selection again
 		_postSelectionProvider.clearSelection();
@@ -3635,13 +3648,28 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		final TourPerson tourPerson = tourData.getTourPerson();
 		final long activePersonId = _activePerson == null ? -1 : _activePerson.getPersonId();
 
-		final Image dbImage = tourData.isTourDeleted ? //
-				_imageDelete
-				: tourData.getMergeTargetTourId() != null ? //
-						_imageDatabaseAssignMergedTour
-						: tourPerson == null ? _imageDatabasePlaceholder : tourPerson.getPersonId() == activePersonId
-								? _imageDatabase
-								: _imageDatabaseOtherPerson;
+		final Image dbImage;
+		if (tourData.isTourDeleted) {
+
+			dbImage = _images.get(IMAGE_DELETE);
+
+		} else if (tourData.getMergeTargetTourId() != null) {
+
+			dbImage = _images.get(IMAGE_ASSIGN_MERGED_TOUR);
+
+		} else if (tourPerson == null) {
+
+			dbImage = _images.get(IMAGE_ICON_PLACEHOLDER);
+
+		} else if (tourPerson.getPersonId() == activePersonId) {
+
+			dbImage = _images.get(IMAGE_DATABASE);
+
+		} else {
+
+			dbImage = _images.get(IMAGE_DATABASE_OTHER_PERSON);
+		}
+
 		return dbImage;
 	}
 
@@ -4322,7 +4350,27 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	@Override
 	public void setFocus() {
 
-		_tourViewer.getControl().setFocus();
+		/*
+		 * When imported tours are available then the import viewer page will ALLWAYS be displayed.
+		 */
+		final int numImportedTours = _rawDataMgr.getImportedTours().size();
+		if (numImportedTours > 0) {
+
+			_tourViewer.getControl().setFocus();
+
+		} else {
+
+			if (_isNewUI) {
+
+				if (_browser != null) {
+					_browser.setFocus();
+				}
+
+			} else {
+
+				_topPageBook.setFocus();
+			}
+		}
 
 		if (_postSelectionProvider.getSelection() == null) {
 

@@ -1905,7 +1905,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 					.grab(true, true)
 					.span(2, 1)
 					.indent(_leftPadding, 0)
-					.hint(SWT.DEFAULT, convertHeightInCharsToPixels(12))
+					.hint(SWT.DEFAULT, convertHeightInCharsToPixels(2))
 					.applyTo(_pagebookTourType);
 			{
 				_pageTourType_NoTourType = createUI_552_IL_Page_NoTourType(_pagebookTourType);
@@ -2273,6 +2273,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 			_chkIL_ShowInDashboard.addSelectionListener(_ilSelectionListener);
 			GridDataFactory.fillDefaults()//
 					.span(2, 1)
+					.indent(0, convertVerticalDLUsToPixels(10))
 					.applyTo(_chkIL_ShowInDashboard);
 		}
 	}
@@ -2503,8 +2504,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 		defineColumnIL_20_ColorImage();
 		defineColumnIL_30_IsSaveTour();
 		defineColumnIL_40_LastMarkerDistance();
-		defineColumnIL_90_Description();
-		defineColumnIL_99_ShowInDashboard();
+		defineColumnIL_50_ShowInDashboard();
+		defineColumnIL_60_Description();
 	}
 
 	/**
@@ -2791,31 +2792,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 	}
 
 	/**
-	 * Column: Item description
-	 */
-	private void defineColumnIL_90_Description() {
-
-		final TableColumnDefinition colDef = new TableColumnDefinition(_ilColumnManager, "configDescription", SWT.LEAD); //$NON-NLS-1$
-
-		colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_Description);
-		colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_Description);
-
-		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(25));
-		colDef.setColumnWeightData(new ColumnWeightData(25));
-
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				cell.setText(((ImportLauncher) cell.getElement()).description);
-			}
-		});
-	}
-
-	/**
 	 * Column: Show in dashboard
 	 */
-	private void defineColumnIL_99_ShowInDashboard() {
+	private void defineColumnIL_50_ShowInDashboard() {
 
 		final TableColumnDefinition colDef = new TableColumnDefinition(_ilColumnManager, "showInDash", SWT.LEAD); //$NON-NLS-1$
 
@@ -2833,6 +2812,28 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 				cell.setText(((ImportLauncher) cell.getElement()).isShowInDashboard
 						? Messages.App_Label_BooleanYes
 						: Messages.App_Label_BooleanNo);
+			}
+		});
+	}
+
+	/**
+	 * Column: Item description
+	 */
+	private void defineColumnIL_60_Description() {
+
+		final TableColumnDefinition colDef = new TableColumnDefinition(_ilColumnManager, "configDescription", SWT.LEAD); //$NON-NLS-1$
+
+		colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_Description);
+		colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_Description);
+
+		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(25));
+		colDef.setColumnWeightData(new ColumnWeightData(25));
+
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				cell.setText(((ImportLauncher) cell.getElement()).description);
 			}
 		});
 	}
@@ -3373,15 +3374,15 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 			return;
 		}
 
+		// update model which is displayed in the IC viewer
+		update_Model_From_UI_IC();
+
 		if (_selectedIC.isCreateBackup == false) {
 
-			// remove delete file data
+			// disable deletion, deletion requires backup
 
 			_chkIC_DeleteDeviceFiles.setSelection(false);
 		}
-
-		// update model which is displayed in the IC viewer
-		update_Model_From_UI_IC();
 
 		// update UI
 		_icViewer.update(_selectedIC, null);
