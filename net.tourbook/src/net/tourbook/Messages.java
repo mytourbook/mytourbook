@@ -160,15 +160,10 @@ public class Messages extends NLS {
 	public static String		Dialog_ImportConfig_Dialog_Message;
 	public static String		Dialog_ImportConfig_Dialog_Title;
 	public static String		Dialog_ImportConfig_Error_FolderIsInvalid;
-	public static String		Dialog_ImportConfig_Group_Dashboard;
 	public static String		Dialog_ImportConfig_Group_ImportActions;
-	public static String		Dialog_ImportConfig_Group_ImportActions_I;
-	public static String		Dialog_ImportConfig_Group_ImportActions_III;
-	public static String		Dialog_ImportConfig_Group_ImportLauncher;
 	public static String		Dialog_ImportConfig_Group_ImportLauncherConfig;
 	public static String		Dialog_ImportConfig_Info_ConfigDragDrop;
 	public static String		Dialog_ImportConfig_Info_ImportActions;
-	public static String		Dialog_ImportConfig_Info_ImportActions_II;
 	public static String		Dialog_ImportConfig_Info_MovedDeviceFiles;
 	public static String		Dialog_ImportConfig_Info_NoDeviceName;
 	public static String		Dialog_ImportConfig_Info_RetrievingVolumeInfo;
@@ -783,6 +778,7 @@ public class Messages extends NLS {
 	public static String		Image__PulseZones;
 	public static String		Image__PulseZones_Disabled;
 	public static String		Image__quick_edit;
+	public static String		Image__RawData_DashboardUI;
 	public static String		Image__RawData_Device_TurnOff;
 	public static String		Image__RawData_Device_TurnOn;
 	public static String		Image__RawData_DeviceFolder;

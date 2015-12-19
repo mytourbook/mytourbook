@@ -461,6 +461,16 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private void action_Easy_RunImport(final long tileId) {
 
+		if (isWatchingOn() == false) {
+
+			/*
+			 * It can be dangerous pressing an import tile and the UI is dimmed, so it's almost
+			 * invisible what is clicked.
+			 */
+
+			return;
+		}
+
 		final EasyConfig easyConfig = getEasyConfig();
 		final ImportConfig importConfig = easyConfig.getActiveImportConfig();
 
@@ -1997,7 +2007,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_images.put(IMAGE_IMPORT_FROM_FILES, //
 				TourbookPlugin.getImageDescriptor(Messages.Image__RawData_Import));
 		_images.put(IMAGE_NEW_UI, //
-				TourbookPlugin.getImageDescriptor(Messages.Image__RawData_DeviceFolder));
+				TourbookPlugin.getImageDescriptor(Messages.Image__RawData_DashboardUI));
 
 	}
 
