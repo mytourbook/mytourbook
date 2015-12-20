@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -109,6 +109,7 @@ public class ColumnManager {
 	private final Listener						_colItemListener;
 	{
 		_colItemListener = new Listener() {
+			@Override
 			public void handleEvent(final Event event) {
 				onSelectColumnItem(event);
 			}
@@ -127,6 +128,7 @@ public class ColumnManager {
 		// larger tables/trees needs more time to resize
 
 		BusyIndicator.showWhile(_columnViewer.getControl().getDisplay(), new Runnable() {
+			@Override
 			public void run() {
 
 				boolean isColumn0Visible = true;
@@ -254,6 +256,7 @@ public class ColumnManager {
 
 		// add the context menu to the table
 		_tableMenuDetectListener = new Listener() {
+			@Override
 			public void handleEvent(final Event event) {
 
 				final Display display = table.getShell().getDisplay();
@@ -312,6 +315,7 @@ public class ColumnManager {
 
 		// add the context menu to the tree viewer
 		_treeMenuDetectListener = new Listener() {
+			@Override
 			public void handleEvent(final Event event) {
 
 				final Decorations shell = tree.getShell();
@@ -344,6 +348,7 @@ public class ColumnManager {
 		 * will be disposed automatically)
 		 */
 		composite.addListener(SWT.Dispose, new Listener() {
+			@Override
 			public void handleEvent(final Event event) {
 
 				headerContextMenu.dispose();
@@ -367,6 +372,7 @@ public class ColumnManager {
 		final MenuItem fitMenuItem = new MenuItem(contextMenu, SWT.PUSH);
 		fitMenuItem.setText(Messages.Action_App_SizeAllColumnsToFit);
 		fitMenuItem.addListener(SWT.Selection, new Listener() {
+			@Override
 			public void handleEvent(final Event event) {
 				actionFitAllColumnSize();
 			}
@@ -378,6 +384,7 @@ public class ColumnManager {
 		final MenuItem allColumnsMenuItem = new MenuItem(contextMenu, SWT.PUSH);
 		allColumnsMenuItem.setText(Messages.Action_ColumnManager_ShowAllColumns);
 		allColumnsMenuItem.addListener(SWT.Selection, new Listener() {
+			@Override
 			public void handleEvent(final Event event) {
 				actionShowAllColumns();
 			}
@@ -389,6 +396,7 @@ public class ColumnManager {
 		final MenuItem defaultColumnsMenuItem = new MenuItem(contextMenu, SWT.PUSH);
 		defaultColumnsMenuItem.setText(Messages.Action_ColumnManager_ShowDefaultColumns);
 		defaultColumnsMenuItem.addListener(SWT.Selection, new Listener() {
+			@Override
 			public void handleEvent(final Event event) {
 				actionShowDefaultColumns();
 			}
@@ -401,6 +409,7 @@ public class ColumnManager {
 		configMenuItem.setText(Messages.Action_App_ConfigureColumns);
 		configMenuItem.setImage(UI.IMAGE_REGISTRY.get(UI.IMAGE_CONFIGURE_COLUMNS));
 		configMenuItem.addListener(SWT.Selection, new Listener() {
+			@Override
 			public void handleEvent(final Event event) {
 				openColumnDialog();
 			}
@@ -1019,13 +1028,13 @@ public class ColumnManager {
 			final ArrayList<String> columnIds = new ArrayList<String>();
 			int createIndex = 0;
 
-			for (final ColumnDefinition columnDef : _allDefinedColumnDefinitions) {
-				if (columnDef.isDefaultColumn()) {
+			for (final ColumnDefinition colDef : _allDefinedColumnDefinitions) {
+				if (colDef.isDefaultColumn()) {
 
-					columnDef.setCreateIndex(createIndex++);
+					colDef.setCreateIndex(createIndex++);
 
-					_visibleColumnDefinitions.add(columnDef);
-					columnIds.add(columnDef.getColumnId());
+					_visibleColumnDefinitions.add(colDef);
+					columnIds.add(colDef.getColumnId());
 				}
 			}
 
@@ -1044,6 +1053,46 @@ public class ColumnManager {
 
 			_visibleColumnIds = new String[1];
 			_visibleColumnIds[0] = firstColumn.getColumnId();
+		}
+
+		/*
+		 * Ensure that all columns which must be visible, are also displayed. This case can happen
+		 * when new columns are added.
+		 */
+		final ArrayList<ColumnDefinition> notAddedColumns = new ArrayList<ColumnDefinition>();
+
+		for (final ColumnDefinition colDef : _allDefinedColumnDefinitions) {
+
+			if (colDef.canModifyVisibility() == false) {
+
+				if (_visibleColumnDefinitions.contains(colDef) == false) {
+					notAddedColumns.add(colDef);
+				}
+			}
+		}
+
+		if (notAddedColumns.size() > 0) {
+
+			_visibleColumnDefinitions.addAll(notAddedColumns);
+
+			/*
+			 * Set create index, otherwise save/restore do not work!!!
+			 */
+			int createIndex = 0;
+			for (final ColumnDefinition colDef : _visibleColumnDefinitions) {
+				colDef.setCreateIndex(createIndex++);
+			}
+
+			/*
+			 * Set visible id's
+			 */
+			final ArrayList<String> columnIds = new ArrayList<String>();
+
+			for (final ColumnDefinition colDef : _visibleColumnDefinitions) {
+				columnIds.add(colDef._columnId);
+			}
+
+			_visibleColumnIds = columnIds.toArray(new String[columnIds.size()]);
 		}
 	}
 

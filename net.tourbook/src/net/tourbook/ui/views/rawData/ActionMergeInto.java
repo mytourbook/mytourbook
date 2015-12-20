@@ -55,7 +55,7 @@ public class ActionMergeInto extends Action {
 		setText(sb.toString());
 
 		// show database icon
-		setImageDescriptor(ImageDescriptor.createFromImage(_rawDataView.getDbImage(_intoTourData)));
+		setImageDescriptor(ImageDescriptor.createFromImage(_rawDataView.getStateImage_Db(_intoTourData)));
 
 		// check menu item when the from tour is merge into the into tour
 		final Long mergeIntoTourId = mergeFromTour.getMergeTargetTourId();

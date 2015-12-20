@@ -166,7 +166,6 @@ public class Messages extends NLS {
 	public static String		Dialog_ImportConfig_Info_ImportActions;
 	public static String		Dialog_ImportConfig_Info_MovedDeviceFiles;
 	public static String		Dialog_ImportConfig_Info_NoDeviceName;
-	public static String		Dialog_ImportConfig_Info_RetrievingVolumeInfo;
 	public static String		Dialog_ImportConfig_Label_AnimationCrazyFactor;
 	public static String		Dialog_ImportConfig_Label_AnimationCrazyFactor_Tooltip;
 	public static String		Dialog_ImportConfig_Label_AnimationDuration;
@@ -809,8 +808,12 @@ public class Messages extends NLS {
 	public static String		Image__synch_statistics_Disabled;
 	public static String		Image__SearchExternal;
 	public static String		Image__SearchExternal_Disabled;
-	public static String		Image__State_Delete;
+	public static String	Image__State_DeletedTour_View;
+
 	public static String		Image__State_Error;
+	public static String		Image__State_MovedTour;
+
+	public static String	Image__State_MovedTour_View;
 	public static String		Image__State_OK;
 	public static String		Image__State_SaveTour;
 	public static String		Image__State_TourMarker;

@@ -178,12 +178,15 @@ import org.joda.time.DateTime;
 public class RawDataView extends ViewPart implements ITourProviderAll, ITourViewer3 {
 
 	public static final String				ID											= "net.tourbook.views.rawData.RawDataView"; //$NON-NLS-1$
-	//
+	// db state
 	private static final String				IMAGE_ASSIGN_MERGED_TOUR					= "IMAGE_ASSIGN_MERGED_TOUR";				//$NON-NLS-1$
 	private static final String				IMAGE_DATABASE								= "IMAGE_DATABASE";						//$NON-NLS-1$
 	private static final String				IMAGE_DATABASE_OTHER_PERSON					= "IMAGE_DATABASE_OTHER_PERSON";			//$NON-NLS-1$
 	private static final String				IMAGE_DELETE								= "IMAGE_DELETE";							//$NON-NLS-1$
 	private static final String				IMAGE_ICON_PLACEHOLDER						= "IMAGE_ICON_PLACEHOLDER";				//$NON-NLS-1$
+	// import state
+	private static final String				IMAGE_STATE_DELETE							= "IMAGE_STATE_DELETE";					//$NON-NLS-1$
+	private static final String				IMAGE_STATE_MOVED							= "IMAGE_STATE_MOVED";						//$NON-NLS-1$
 	// OLD UI
 	private static final String				IMAGE_DATA_TRANSFER							= "IMAGE_DATA_TRANSFER";					//$NON-NLS-1$
 	private static final String				IMAGE_DATA_TRANSFER_DIRECT					= "IMAGE_DATA_TRANSFER_DIRECT";			//$NON-NLS-1$
@@ -383,7 +386,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private String							_imageUrl_SerialPort_Directly;
 	private String							_imageUrl_State_Error;
 	private String							_imageUrl_State_OK;
-	private String							_imageUrl_State_DeleteFiles;
+	private String							_imageUrl_State_MovedFiles;
 	private String							_imageUrl_State_SaveTour;
 	private String							_imageUrl_State_TourMarker;
 	//
@@ -572,7 +575,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		 * 100. Delete device files
 		 */
 		if (importConfig.isDeleteDeviceFiles) {
-			doDeleteTourFiles(false);
+
+			// use newly saved/not saved tours
+
+			doDeleteTourFiles(false, _rawDataMgr.getImportedTourList());
 		}
 
 		/*
@@ -670,9 +676,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_postSelectionProvider.clearSelection();
 	}
 
+	/**
+	 * Delete selected tour files.
+	 */
 	void actionDeleteTourFiles() {
 
-		doDeleteTourFiles(true);
+		final ArrayList<TourData> selectedTours = getAnySelectedTours();
+
+		doDeleteTourFiles(true, selectedTours);
 	}
 
 	void actionMergeTours(final TourData mergeFromTour, final TourData mergeIntoTour) {
@@ -1843,7 +1854,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		String htmlDeleteFiles = UI.EMPTY_STRING;
 		if (getEasyConfig().getActiveImportConfig().isDeleteDeviceFiles) {
 
-			final String stateImage = createHTML_BgImage(_imageUrl_State_DeleteFiles);
+			final String stateImage = createHTML_BgImage(_imageUrl_State_MovedFiles);
 
 			htmlDeleteFiles = createHTML_TileAnnotation(stateImage);
 		}
@@ -1998,6 +2009,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				TourbookPlugin.getImageDescriptor(Messages.Image__delete));
 
 		/*
+		 * Import state
+		 */
+		_images.put(IMAGE_STATE_DELETE, //
+				TourbookPlugin.getImageDescriptor(Messages.Image__State_DeletedTour_View));
+		_images.put(IMAGE_STATE_MOVED, //
+				TourbookPlugin.getImageDescriptor(Messages.Image__State_MovedTour_View));
+
+		/*
 		 * Data transfer
 		 */
 		_images.put(IMAGE_DATA_TRANSFER, //
@@ -2069,7 +2088,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			_imageUrl_State_Error = getIconUrl(Messages.Image__State_Error);
 			_imageUrl_State_OK = getIconUrl(Messages.Image__State_OK);
-			_imageUrl_State_DeleteFiles = getIconUrl(Messages.Image__State_Delete);
+			_imageUrl_State_MovedFiles = getIconUrl(Messages.Image__State_MovedTour);
 			_imageUrl_State_SaveTour = getIconUrl(Messages.Image__State_SaveTour);
 			_imageUrl_State_TourMarker = getIconUrl(Messages.Image__State_TourMarker);
 
@@ -2456,34 +2475,35 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	 */
 	private void defineAllColumns() {
 
-		defineColumnDatabase();
-		defineColumnDate();
-		defineColumnTime();
-		defineColumnTourType();
-		defineColumnTourTypeText();
-		defineColumnRecordingTime();
-		defineColumnDrivingTime();
-		defineColumnCalories();
-		defineColumnDistance();
-		defineColumnAvgSpeed();
-		defineColumnAvgPace();
-		defineColumnAltitudeUp();
-		defineColumnAltitudeDown();
-		defineColumnWeatherClouds();
-		defineColumnTitle();
-		defineColumnTags();
-		defineColumnDeviceName();
-		defineColumnDeviceProfile();
-		defineColumnMarker();
-		defineColumnTimeInterval();
-		defineColumnImportFileName();
-		defineColumnImportFilePath();
+		defineColumn_State_Import();
+		defineColumn_State_Database();
+		defineColumn_Date();
+		defineColumn_Time();
+		defineColumn_TourType();
+		defineColumn_TourTypeText();
+		defineColumn_RecordingTime();
+		defineColumn_DrivingTime();
+		defineColumn_Calories();
+		defineColumn_Distance();
+		defineColumn_AvgSpeed();
+		defineColumn_AvgPace();
+		defineColumn_AltitudeUp();
+		defineColumn_AltitudeDown();
+		defineColumn_WeatherClouds();
+		defineColumn_Title();
+		defineColumn_Tags();
+		defineColumn_DeviceName();
+		defineColumn_DeviceProfile();
+		defineColumn_Marker();
+		defineColumn_TimeInterval();
+		defineColumn_ImportFileName();
+		defineColumn_ImportFilePath();
 	}
 
 	/**
 	 * column: altitude down
 	 */
-	private void defineColumnAltitudeDown() {
+	private void defineColumn_AltitudeDown() {
 
 		final ColumnDefinition colDef = TableColumnFactory.ALTITUDE_DOWN_SUMMARIZED_BORDER.createColumn(
 				_columnManager,
@@ -2503,7 +2523,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: altitude up
 	 */
-	private void defineColumnAltitudeUp() {
+	private void defineColumn_AltitudeUp() {
 
 		final ColumnDefinition colDef = TableColumnFactory.ALTITUDE_UP_SUMMARIZED_BORDER.createColumn(
 				_columnManager,
@@ -2524,7 +2544,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: average pace
 	 */
-	private void defineColumnAvgPace() {
+	private void defineColumn_AvgPace() {
 
 		final ColumnDefinition colDef = TableColumnFactory.AVG_PACE.createColumn(_columnManager, _pc);
 
@@ -2549,7 +2569,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: avg speed
 	 */
-	private void defineColumnAvgSpeed() {
+	private void defineColumn_AvgSpeed() {
 
 		final ColumnDefinition colDef = TableColumnFactory.AVG_SPEED.createColumn(_columnManager, _pc);
 
@@ -2578,7 +2598,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: calories (cal)
 	 */
-	private void defineColumnCalories() {
+	private void defineColumn_Calories() {
 
 		final ColumnDefinition colDef = TableColumnFactory.CALORIES.createColumn(_columnManager, _pc);
 
@@ -2594,27 +2614,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	}
 
 	/**
-	 * column: database indicator
-	 */
-	private void defineColumnDatabase() {
-
-		final ColumnDefinition colDef = TableColumnFactory.DB_STATUS.createColumn(_columnManager, _pc);
-
-		colDef.setIsDefaultColumn();
-		colDef.setCanModifyVisibility(false);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				// show the database indicator for the person who owns the tour
-				cell.setImage(getDbImage((TourData) cell.getElement()));
-			}
-		});
-	}
-
-	/**
 	 * column: date
 	 */
-	private void defineColumnDate() {
+	private void defineColumn_Date() {
 
 		final ColumnDefinition colDef = TableColumnFactory.TOUR_DATE.createColumn(_columnManager, _pc);
 
@@ -2654,7 +2656,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: device name
 	 */
-	private void defineColumnDeviceName() {
+	private void defineColumn_DeviceName() {
 
 		final ColumnDefinition colDef = TableColumnFactory.DEVICE_NAME.createColumn(_columnManager, _pc);
 
@@ -2670,7 +2672,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: device profile
 	 */
-	private void defineColumnDeviceProfile() {
+	private void defineColumn_DeviceProfile() {
 
 		TableColumnFactory.DEVICE_PROFILE.createColumn(_columnManager, _pc);
 	}
@@ -2678,7 +2680,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: distance (km/mile)
 	 */
-	private void defineColumnDistance() {
+	private void defineColumn_Distance() {
 
 		final ColumnDefinition colDef = TableColumnFactory.DISTANCE.createColumn(_columnManager, _pc);
 
@@ -2699,7 +2701,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: driving time
 	 */
-	private void defineColumnDrivingTime() {
+	private void defineColumn_DrivingTime() {
 
 		final ColumnDefinition colDef = TableColumnFactory.DRIVING_TIME.createColumn(_columnManager, _pc);
 
@@ -2722,7 +2724,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: import file name
 	 */
-	private void defineColumnImportFileName() {
+	private void defineColumn_ImportFileName() {
 
 		final ColumnDefinition colDef = TableColumnFactory.IMPORT_FILE_NAME.createColumn(_columnManager, _pc);
 
@@ -2738,14 +2740,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: import file path
 	 */
-	private void defineColumnImportFilePath() {
+	private void defineColumn_ImportFilePath() {
 		TableColumnFactory.IMPORT_FILE_PATH.createColumn(_columnManager, _pc);
 	}
 
 	/**
 	 * column: markers
 	 */
-	private void defineColumnMarker() {
+	private void defineColumn_Marker() {
 
 		final ColumnDefinition colDef = TableColumnFactory.TOUR_MARKERS.createColumn(_columnManager, _pc);
 
@@ -2779,7 +2781,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: recording time
 	 */
-	private void defineColumnRecordingTime() {
+	private void defineColumn_RecordingTime() {
 
 		final ColumnDefinition colDef = TableColumnFactory.RECORDING_TIME.createColumn(_columnManager, _pc);
 
@@ -2806,9 +2808,52 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	}
 
 	/**
+	 * Column: Database state
+	 */
+	private void defineColumn_State_Database() {
+
+		final ColumnDefinition colDef = TableColumnFactory.DB_STATUS.createColumn(_columnManager, _pc);
+
+		colDef.setIsDefaultColumn();
+		colDef.setCanModifyVisibility(false);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				// show the database indicator for the person who owns the tour
+
+				final TourData tourData = (TourData) cell.getElement();
+
+				cell.setImage(getStateImage_Db(tourData));
+			}
+		});
+	}
+
+	/**
+	 * Column: Import state
+	 */
+	private void defineColumn_State_Import() {
+
+		final ColumnDefinition colDef = TableColumnFactory.IMPORT_STATE.createColumn(_columnManager, _pc);
+
+		colDef.setIsDefaultColumn();
+		colDef.setCanModifyVisibility(false);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourData tourData = (TourData) cell.getElement();
+				final Image stateImage = getStateImage_Import(tourData);
+
+				cell.setImage(stateImage);
+			}
+		});
+	}
+
+	/**
 	 * column: tags
 	 */
-	private void defineColumnTags() {
+	private void defineColumn_Tags() {
 
 		final ColumnDefinition colDef = TableColumnFactory.TOUR_TAGS.createColumn(_columnManager, _pc);
 
@@ -2852,7 +2897,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: time
 	 */
-	private void defineColumnTime() {
+	private void defineColumn_Time() {
 
 		final ColumnDefinition colDef = TableColumnFactory.TOUR_START_TIME.createColumn(_columnManager, _pc);
 
@@ -2892,7 +2937,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: time interval
 	 */
-	private void defineColumnTimeInterval() {
+	private void defineColumn_TimeInterval() {
 
 		TableColumnFactory.TIME_INTERVAL.createColumn(_columnManager, _pc);
 	}
@@ -2900,7 +2945,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: tour title
 	 */
-	private void defineColumnTitle() {
+	private void defineColumn_Title() {
 
 		final ColumnDefinition colDef = TableColumnFactory.TOUR_TITLE.createColumn(_columnManager, _pc);
 
@@ -2935,7 +2980,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: tour type image
 	 */
-	private void defineColumnTourType() {
+	private void defineColumn_TourType() {
 
 		final ColumnDefinition colDef = TableColumnFactory.TOUR_TYPE.createColumn(_columnManager, _pc);
 
@@ -2969,7 +3014,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: tour type text
 	 */
-	private void defineColumnTourTypeText() {
+	private void defineColumn_TourTypeText() {
 
 		final ColumnDefinition colDef = TableColumnFactory.TOUR_TYPE_TEXT.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -2989,7 +3034,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	/**
 	 * column: clouds
 	 */
-	private void defineColumnWeatherClouds() {
+	private void defineColumn_WeatherClouds() {
 
 		final ColumnDefinition colDef = TableColumnFactory.CLOUDS.createColumn(_columnManager, _pc);
 
@@ -3030,7 +3075,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			filePath = Paths.get(fileFolder, fileName);
 
-			Files.delete(filePath);
+//			Files.delete(filePath);
 
 			deletedFiles.add(filePath.toString());
 
@@ -3079,11 +3124,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	/**
 	 * @param isDeleteAllFiles
-	 *            When <code>true</code> then all files (device and backup) will be deleted,
-	 *            otherwise only device files will be deleted without any confirmation dialog and
-	 *            the backup files are not touched.
+	 *            When <code>true</code> then all files (device and backup) will be deleted.
+	 *            Otherwise only device files will be deleted without any confirmation dialog, the
+	 *            backup files are not touched, this feature is used to move device files to the
+	 *            backup folder.
 	 */
-	private void doDeleteTourFiles(final boolean isDeleteAllFiles) {
+	private void doDeleteTourFiles(final boolean isDeleteAllFiles, final ArrayList<TourData> allTourData) {
 
 		if (isDeleteAllFiles) {
 
@@ -3104,7 +3150,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		final ArrayList<String> deletedFiles = new ArrayList<>();
 		final ArrayList<String> notDeletedFiles = new ArrayList<>();
-		final ArrayList<TourData> selectedTours = getAnySelectedTours();
 
 		final IRunnableWithProgress saveRunnable = new IRunnableWithProgress() {
 			@Override
@@ -3112,12 +3157,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 				int saveCounter = 0;
 
-				final int selectionSize = selectedTours.size();
+				final int selectionSize = allTourData.size();
 
 				monitor.beginTask(Messages.Import_Data_Monitor_DeleteTourFiles, selectionSize);
 
 				// loop: all selected tours, selected tours can already be saved
-				for (final TourData tourData : selectedTours) {
+				for (final TourData tourData : allTourData) {
 
 					monitor.subTask(NLS.bind(
 							Messages.Import_Data_Monitor_DeleteTourFiles_Subtask,
@@ -3138,6 +3183,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 					// delete device files
 					deleteFile(deletedFiles, notDeletedFiles, originalFilePath, importFileName);
 
+					// set state
+					if (isDeleteAllFiles) {
+						tourData.isTourFileDeleted = true;
+					} else {
+						tourData.isTourFileMoved = true;
+					}
+
 					monitor.worked(1);
 				}
 			}
@@ -3150,6 +3202,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		} catch (InvocationTargetException | InterruptedException e) {
 			StatusUtil.showStatus(e);
 		}
+
+		// show delete state in UI
+		_tourViewer.update(allTourData.toArray(), null);
 
 		/*
 		 * Log deleted files
@@ -3167,6 +3222,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		if (isDeleteAllFiles) {
 
+			// show state
 			MessageDialog.openInformation(
 					_parent.getShell(),
 					Messages.Import_Data_Dialog_DeleteTourFiles_Title,
@@ -3256,8 +3312,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		tourData.setTourBike(person.getTourBike());
 
 		final TourData savedTour = TourDatabase.saveTour(tourData, true);
+
 		if (savedTour != null) {
+
 			savedTours.add(savedTour);
+
+			// update fields which are not saved but are used in the UI
+			savedTour.isTourFileDeleted = tourData.isTourFileDeleted;
+			savedTour.isTourFileMoved = tourData.isTourFileMoved;
 		}
 	}
 
@@ -3654,35 +3716,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		return _columnManager;
 	}
 
-	Image getDbImage(final TourData tourData) {
-		final TourPerson tourPerson = tourData.getTourPerson();
-		final long activePersonId = _activePerson == null ? -1 : _activePerson.getPersonId();
-
-		final Image dbImage;
-		if (tourData.isTourDeleted) {
-
-			dbImage = _images.get(IMAGE_DELETE);
-
-		} else if (tourData.getMergeTargetTourId() != null) {
-
-			dbImage = _images.get(IMAGE_ASSIGN_MERGED_TOUR);
-
-		} else if (tourPerson == null) {
-
-			dbImage = _images.get(IMAGE_ICON_PLACEHOLDER);
-
-		} else if (tourPerson.getPersonId() == activePersonId) {
-
-			dbImage = _images.get(IMAGE_DATABASE);
-
-		} else {
-
-			dbImage = _images.get(IMAGE_DATABASE_OTHER_PERSON);
-		}
-
-		return dbImage;
-	}
-
 	private EasyConfig getEasyConfig() {
 
 		return EasyImportManager.getInstance().getEasyConfig();
@@ -3846,6 +3879,47 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 
 		return selectedTourData;
+	}
+
+	Image getStateImage_Db(final TourData tourData) {
+
+		final TourPerson tourPerson = tourData.getTourPerson();
+		final long activePersonId = _activePerson == null ? -1 : _activePerson.getPersonId();
+
+		if (tourData.isTourDeleted) {
+
+			return _images.get(IMAGE_DELETE);
+
+		} else if (tourData.getMergeTargetTourId() != null) {
+
+			return _images.get(IMAGE_ASSIGN_MERGED_TOUR);
+
+		} else if (tourPerson == null) {
+
+			return _images.get(IMAGE_ICON_PLACEHOLDER);
+
+		} else if (tourPerson.getPersonId() == activePersonId) {
+
+			return _images.get(IMAGE_DATABASE);
+
+		} else {
+
+			return _images.get(IMAGE_DATABASE_OTHER_PERSON);
+		}
+	}
+
+	private Image getStateImage_Import(final TourData tourData) {
+
+		if (tourData.isTourFileDeleted) {
+
+			return _images.get(IMAGE_STATE_DELETE);
+
+		} else if (tourData.isTourFileMoved) {
+
+			return _images.get(IMAGE_STATE_MOVED);
+		}
+
+		return null;
 	}
 
 	@Override

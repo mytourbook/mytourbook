@@ -175,9 +175,9 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_clouds;
 	public static String		ColumnFactory_clouds_tooltip;
 
-	public static String	ColumnFactory_CollateEvent_Label;
+	public static String		ColumnFactory_CollateEvent_Label;
 
-	public static String	ColumnFactory_CollateEvent_Tooltip;
+	public static String		ColumnFactory_CollateEvent_Tooltip;
 	public static String		ColumnFactory_Diff_Header;
 	public static String		ColumnFactory_DistanceDelta_Label;
 	public static String		ColumnFactory_DistanceDelta_Tooltip;
@@ -198,6 +198,9 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_GearTeeth_Tooltip;
 	public static String		ColumnFactory_Id_Label;
 	public static String		ColumnFactory_Id_Tooltip;
+	public static String		ColumnFactory_ImportStatus_Header;
+	public static String		ColumnFactory_ImportStatus_Label;
+	public static String		ColumnFactory_ImportStatus_Tooltip;
 	public static String		ColumnFactory_InetAddress_Label;
 	public static String		ColumnFactory_InetAddress_Url;
 	public static String		ColumnFactory_NumberOfGPSPhotos_Header;
@@ -302,18 +305,18 @@ public class Messages extends NLS {
 	public static String		message_manager_sMessageSummary;
 	public static String		message_manager_sWarningSummary;
 
-	public static String	Segmenter_Tooltip_Label_Altimeter;
+	public static String		Segmenter_Tooltip_Label_Altimeter;
 
 	public static String		Segmenter_Tooltip_Label_AltitudeDifference;
 	public static String		Segmenter_Tooltip_Label_BreakTime;
 
-	public static String	Segmenter_Tooltip_Label_Distance;
+	public static String		Segmenter_Tooltip_Label_Distance;
 
-	public static String	Segmenter_Tooltip_Label_Gradient;
+	public static String		Segmenter_Tooltip_Label_Gradient;
 
-	public static String	Segmenter_Tooltip_Label_MovingTime;
+	public static String		Segmenter_Tooltip_Label_MovingTime;
 
-	public static String	Segmenter_Tooltip_Label_RecordingTime;
+	public static String		Segmenter_Tooltip_Label_RecordingTime;
 	public static String		Segmenter_Tooltip_Label_Title;
 
 	public static String		Tooltip_WayPoint_Label_Altitude;

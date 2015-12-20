@@ -121,7 +121,6 @@ import org.eclipse.ui.part.PageBook;
 public class DialogEasyImportConfig extends TitleAreaDialog {
 
 	private static final String				ID									= "DialogEasyImportConfig";			//$NON-NLS-1$
-
 	//
 	private static final String				STATE_BACKUP_DEVICE_HISTORY_ITEMS	= "STATE_BACKUP_DEVICE_HISTORY_ITEMS";	//$NON-NLS-1$
 	private static final String				STATE_BACKUP_FOLDER_HISTORY_ITEMS	= "STATE_BACKUP_FOLDER_HISTORY_ITEMS";	//$NON-NLS-1$
@@ -134,11 +133,11 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 	private static final String				DATA_KEY_SPEED_TOUR_TYPE_INDEX		= "DATA_KEY_SPEED_TOUR_TYPE_INDEX";	//$NON-NLS-1$
 	//
 	private static final int				CONTROL_DECORATION_WIDTH			= 6;
-
 	//
 	private final IPreferenceStore			_prefStore							= TourbookPlugin.getPrefStore();
 	private final IDialogSettings			_state								= TourbookPlugin.getState(ID);
-	private final IDialogSettings			_state2								= TourbookPlugin.getState(ID + "2");	//$NON-NLS-1$
+	private final IDialogSettings			_stateIC							= TourbookPlugin.getState(ID + "_IC");	//$NON-NLS-1$
+	private final IDialogSettings			_stateIL							= TourbookPlugin.getState(ID + "_IL");	//$NON-NLS-1$
 	//
 	private IPropertyChangeListener			_prefChangeListener;
 	//
@@ -153,8 +152,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 	private SelectionAdapter				_liveUpdateListener;
 	private MouseWheelListener				_liveUpdateMouseWheelListener;
 	private SelectionAdapter				_speedTourTypeListener;
+	//
 	private ActionOpenPrefDialog			_actionOpenTourTypePrefs;
-
 	private Action							_actionRestoreDefaults;
 	private ActionSpeedTourType_Add			_actionTTSpeed_Add;
 	private ActionSpeedTourType_Delete[]	_actionTTSpeed_Delete;
@@ -168,28 +167,25 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 	/** Model for the currently selected config. */
 	private ImportConfig					_selectedIC;
 	private ImportLauncher					_selectedIL;
-
+	//
 	private RawDataView						_rawDataView;
-
 	private TableViewer						_icViewer;
 	private TableViewer						_ilViewer;
 	private ICColumnViewer					_icColumnViewer						= new ICColumnViewer();
 	private ILColumnViewer					_ilColumnViewer						= new ILColumnViewer();
-
 	private ColumnManager					_icColumnManager;
 	private ColumnManager					_ilColumnManager;
-
+	//
 	private TableColumnDefinition			_colDefProfileImage;
 	private int								_columnIndexConfigImage;
-
+	//
 	private HashMap<Long, Image>			_configImages						= new HashMap<>();
-
 	private HashMap<Long, Integer>			_configImageHash					= new HashMap<>();
+	//
 	private HistoryItems					_deviceHistoryItems					= new HistoryItems();
-
 	private HistoryItems					_backupHistoryItems					= new HistoryItems();
+	//
 	private long							_dragStart;
-
 	private int								_leftPadding;
 	private int								_defaultPaneWidth;
 	private boolean							_isInUIUpdate;
@@ -817,7 +813,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 	private void createUI_210_IC_Viewer(final Composite parent) {
 
 		// define all columns for the viewer
-		_icColumnManager = new ColumnManager(_icColumnViewer, _state);
+		_icColumnManager = new ColumnManager(_icColumnViewer, _stateIC);
 		defineAll_ICColumns();
 
 		_icViewerContainer = new Composite(parent, SWT.NONE);
@@ -1468,7 +1464,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 	private void createUI_510_IL_Viewer(final Composite parent) {
 
 		// define all columns for the viewer
-		_ilColumnManager = new ColumnManager(_ilColumnViewer, _state);
+		_ilColumnManager = new ColumnManager(_ilColumnViewer, _stateIL);
 		defineAll_ILColumns();
 
 		_ilViewerContainer = new Composite(parent, SWT.NONE);
@@ -2519,7 +2515,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 		colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_Name);
 
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(30));
-		colDef.setColumnWeightData(new ColumnWeightData(10));
+		colDef.setColumnWeightData(new ColumnWeightData(30));
 
 		colDef.setIsDefaultColumn();
 		colDef.setCanModifyVisibility(false);
@@ -2543,7 +2539,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 		colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_Backup);
 
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(30));
-//		colDef.setColumnWeightData(new ColumnWeightData(10));
+		colDef.setColumnWeightData(new ColumnWeightData(30));
 
 		colDef.setIsDefaultColumn();
 
@@ -2571,7 +2567,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 		colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_Device);
 
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(30));
-//		colDef.setColumnWeightData(new ColumnWeightData(10));
+		colDef.setColumnWeightData(new ColumnWeightData(30));
 
 		colDef.setIsDefaultColumn();
 
@@ -2597,7 +2593,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 		colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_DeviceFiles);
 
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
-//		colDef.setColumnWeightData(new ColumnWeightData(2));
+		colDef.setColumnWeightData(new ColumnWeightData(10));
 
 		colDef.setIsDefaultColumn();
 
@@ -2661,7 +2657,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 		colDef.setColumnHeaderToolTipText(Messages.Dialog_ImportConfig_Column_TurnOFF_Tooltip);
 
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
-//		colDef.setColumnWeightData(new ColumnWeightData(2));
+		colDef.setColumnWeightData(new ColumnWeightData(10));
 
 		colDef.setIsDefaultColumn();
 
@@ -2802,7 +2798,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 		colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_ShowInDash_Header);
 
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
-//		colDef.setColumnWeightData(new ColumnWeightData(25));
+		colDef.setColumnWeightData(new ColumnWeightData(8));
 
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -3905,10 +3901,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
 		_state.put(STATE_SELECTED_IMPORT_LAUNCHER, _selectedIL == null ? UI.EMPTY_STRING : _selectedIL.name);
 
-		_icColumnManager.saveState(_state);
-		_ilColumnManager.saveState(_state2);
+		_icColumnManager.saveState(_stateIC);
+		_ilColumnManager.saveState(_stateIL);
 
-//		tom & jenny
 
 		_backupHistoryItems.saveState(_state, STATE_BACKUP_FOLDER_HISTORY_ITEMS, STATE_BACKUP_DEVICE_HISTORY_ITEMS);
 		_deviceHistoryItems.saveState(_state, STATE_DEVICE_FOLDER_HISTORY_ITEMS, STATE_DEVICE_DEVICE_HISTORY_ITEMS);

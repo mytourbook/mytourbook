@@ -22,6 +22,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -1034,6 +1035,17 @@ public class RawDataManager {
 
 	public HashSet<String> getImportedFiles() {
 		return _importedFileNames;
+	}
+
+	/**
+	 * @return Returns an {@link ArrayList} containing the imported tours.
+	 */
+	public ArrayList<TourData> getImportedTourList() {
+
+		final Collection<TourData> importedToursCollection = _toursInImportView.values();
+		final ArrayList<TourData> importedTours = new ArrayList<>(importedToursCollection);
+
+		return importedTours;
 	}
 
 	/**

@@ -312,22 +312,6 @@ class HistoryItems {
 
 	void restoreState(final String[] restoredFolderItems, final String[] restoredDeviceItems) {
 
-//		final boolean isDeviceNameFolder = NIO.isDeviceNameFolder(configFolder);
-//
-//		if (configFolder.trim().length() > 0) {
-//
-//			if (isDeviceNameFolder) {
-//
-//				// this is a device folder name
-//
-//				_deviceNameItems.add(cleanupFolderDeviceName(configFolder));
-//
-//			} else {
-//
-//				_folderItems.add(configFolder);
-//			}
-//		}
-
 		if (restoredFolderItems != null) {
 			_folderItems.addAll(Arrays.asList(restoredFolderItems));
 		}
@@ -336,23 +320,8 @@ class HistoryItems {
 			_deviceNameItems.addAll(Arrays.asList(restoredDeviceItems));
 		}
 
-//		String itemFolder = null;
-//		String deviceNameFolder = null;
-//
-//		if (isDeviceNameFolder) {
-//
-//			// this is a device name folder
-//
-//			itemFolder = NIO.convertToOSPath(configFolder);
-//			deviceNameFolder = configFolder;
-//
-//		} else {
-//
-//			itemFolder = configFolder;
-//			deviceNameFolder = convertTo_DeviceNameFolder(configFolder);
-//		}
-//
-//		fillControls(itemFolder, deviceNameFolder, configFolder);
+		// fill history
+		fillControls(null, null, null);
 	}
 
 	private String[] reverseHistory(final LinkedHashSet<String> folderHistory) {
@@ -392,7 +361,6 @@ class HistoryItems {
 
 		_comboError.setImage(image);
 		_comboError.setDescriptionText(Messages.Dialog_ImportConfig_Error_FolderIsInvalid);
-
 	}
 
 	void setIsValidateFolder(final boolean isValidateFolder) {
@@ -522,8 +490,7 @@ class HistoryItems {
 
 		final String modifiedFolder = _combo.getText().trim();
 
-		if (COMBO_SEPARATOR.equals(modifiedFolder)
-				|| Messages.Dialog_ImportConfig_Info_RetrievingVolumeInfo.equals(modifiedFolder)) {
+		if (COMBO_SEPARATOR.equals(modifiedFolder)) {
 
 			// ignore special texts
 

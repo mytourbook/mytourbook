@@ -375,7 +375,7 @@ public abstract class TableColumnFactory {
 			return colDef;
 		};
 	};
-
+	
 	public static final TableColumnFactory DEVICE_PROFILE = new TableColumnFactory() {
 		
 		@Override
@@ -649,6 +649,22 @@ public abstract class TableColumnFactory {
 				}
 			});
 	
+			return colDef;
+		};
+	};
+
+	public static final TableColumnFactory IMPORT_STATE = new TableColumnFactory() {
+		
+		@Override
+		public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+			
+			final ColumnDefinition colDef = new TableColumnDefinition(columnManager, "importStatus", SWT.CENTER); //$NON-NLS-1$
+			
+			colDef.setColumnLabel(Messages.ColumnFactory_ImportStatus_Label);
+			colDef.setColumnHeaderText(Messages.ColumnFactory_ImportStatus_Header);
+			colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_ImportStatus_Tooltip);
+			colDef.setDefaultColumnWidth(20);
+			
 			return colDef;
 		};
 	};

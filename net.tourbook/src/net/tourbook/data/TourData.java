@@ -1170,6 +1170,19 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	@Transient
 	private boolean												_isImportedMTTour;
 
+	/**
+	 * Is <code>true</code> when tour file is deleted in the device and in the backup folder.
+	 */
+	@Transient
+	public boolean												isTourFileDeleted;
+
+	/**
+	 * Is <code>true</code> when the tour file is deleted in the device folder but is kept in the
+	 * backup folder.
+	 */
+	@Transient
+	public boolean												isTourFileMoved;
+
 	public TourData() {}
 
 	/**

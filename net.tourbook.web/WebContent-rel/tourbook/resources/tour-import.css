@@ -414,4 +414,8 @@ select::-ms-expand {
 	opacity:				0.1;	
 }
 
+.deleteState
+{
+	color:					#abfe11;
+}
 
