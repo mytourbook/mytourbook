@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -83,10 +83,13 @@ public class EasyConfig {
 	public int							numDeviceFiles;
 
 	/**
-	 * Contains files which are available in the device folder but they are not available in the
-	 * tour database.
+	 * Contains files which are available in the device AND backup folder but they are not yet
+	 * available in the tour database.
 	 */
 	public ArrayList<OSFile>			notImportedFiles					= new ArrayList<>();
+
+	/** Contains files which are available in the backup folder but not in the device folder. */
+	public ArrayList<OSFile>			movedFiles;
 
 	/**
 	 * @return Returns the active import config which is used when importing tours.

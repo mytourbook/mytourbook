@@ -370,11 +370,6 @@ select::-ms-expand {
 	xfont-weight: 			lighter;
 }
 
-.deviceList td.name
-{
-	xfont-weight: 			normal;
-}
-
 .deviceList td.right
 {
 	text-align:				right;

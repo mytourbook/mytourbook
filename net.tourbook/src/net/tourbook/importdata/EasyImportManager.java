@@ -235,7 +235,7 @@ public class EasyImportManager {
 		for (int fileIndex = 0; fileIndex < deviceFileNames.size(); fileIndex++) {
 
 			final OSFile deviceFile = deviceFileNames.get(fileIndex);
-			final String fileName = deviceFile.fileName;
+			final String fileName = deviceFile.getFileName();
 
 			if (fileIndex > 0) {
 				sb.append(',');
@@ -290,58 +290,92 @@ public class EasyImportManager {
 	 */
 	private void getImportFiles() {
 
+		final ArrayList<OSFile> movedFiles = new ArrayList<>();
 		final ArrayList<OSFile> notImportedFiles = new ArrayList<>();
 		final ArrayList<String> notBackedUpFiles = new ArrayList<>();
 
 		final EasyConfig easyConfig = getEasyConfig();
 		final ImportConfig importConfig = easyConfig.getActiveImportConfig();
 
+		easyConfig.movedFiles = movedFiles;
 		easyConfig.notImportedFiles = notImportedFiles;
 		easyConfig.notBackedUpFiles = notBackedUpFiles;
 
 		/*
 		 * Get backup files
 		 */
-		HashSet<String> existingBackupFiles = null;
+		HashSet<String> availableBackupFiles = null;
 		if (importConfig.isCreateBackup) {
 
-			existingBackupFiles = getBackupFiles(importConfig.getBackupOSFolder());
+			availableBackupFiles = getBackupFiles(importConfig.getBackupOSFolder());
 		}
 
 		/*
 		 * Get device files
 		 */
-		final List<OSFile> existingDeviceFiles = getOSFiles(importConfig.getDeviceOSFolder(), importConfig.deviceFiles);
+		final List<OSFile> existingDeviceFiles = getOSFiles(
+				importConfig.getDeviceOSFolder(),
+				importConfig.fileGlobPattern);
+
 		easyConfig.numDeviceFiles = existingDeviceFiles.size();
+
+		/*
+		 * Get moved files, these are files which are available in the backup folder but not in the
+		 * device folder. This case can occure when files are imported, deleted in the device folder
+		 * but not saved in MT.
+		 */
+		if (importConfig.isCreateBackup) {
+
+			// files can be moved in the backup folder
+
+			final List<OSFile> existingBackupFiles = getOSFiles(
+					importConfig.getBackupOSFolder(),
+					importConfig.fileGlobPattern);
+
+			for (final OSFile backupFile : existingBackupFiles) {
+
+				if (existingDeviceFiles.contains(backupFile) == false) {
+
+					backupFile.isBackupImportFile = true;
+
+					movedFiles.add(backupFile);
+				}
+			}
+		}
 
 		/*
 		 * Get files which are not yet backed up
 		 */
-		if (existingBackupFiles != null) {
+		if (availableBackupFiles != null) {
 
 			for (final OSFile deviceFile : existingDeviceFiles) {
 
-				final String deviceFileName = deviceFile.fileName;
+				final String deviceFileName = deviceFile.getFileName();
 
-				if (existingBackupFiles.contains(deviceFileName) == false) {
+				if (availableBackupFiles.contains(deviceFileName) == false) {
 					notBackedUpFiles.add(deviceFileName);
 				}
 			}
 		}
 
-		if (existingDeviceFiles.size() == 0) {
+		if (existingDeviceFiles.size() == 0 && movedFiles.size() == 0) {
+
 			// there is nothing to be imported
 			return;
 		}
 
+		final List<OSFile> availableFiles = new ArrayList<>();
+		availableFiles.addAll(existingDeviceFiles);
+		availableFiles.addAll(movedFiles);
+
 		/*
 		 * Get files which are not yet imported
 		 */
-		final HashSet<String> dbFileNames = getDbFileNames(existingDeviceFiles);
+		final HashSet<String> dbFileNames = getDbFileNames(availableFiles);
 
-		for (final OSFile deviceFile : existingDeviceFiles) {
+		for (final OSFile deviceFile : availableFiles) {
 
-			if (dbFileNames.contains(deviceFile.fileName) == false) {
+			if (dbFileNames.contains(deviceFile.getFileName()) == false) {
 				notImportedFiles.add(deviceFile);
 			}
 		}
@@ -350,12 +384,12 @@ public class EasyImportManager {
 		Collections.sort(notImportedFiles, new Comparator<OSFile>() {
 			@Override
 			public int compare(final OSFile file1, final OSFile file2) {
-				return file1.fileName.compareTo(file2.fileName);
+				return file1.getFileName().compareTo(file2.getFileName());
 			}
 		});
 	}
 
-	private List<OSFile> getOSFiles(final String folder, final String deviceFiles) {
+	private List<OSFile> getOSFiles(final String folder, final String globFilePattern) {
 
 		final List<OSFile> osFiles = new ArrayList<>();
 
@@ -364,7 +398,7 @@ public class EasyImportManager {
 			return osFiles;
 		}
 
-		String globPattern = deviceFiles.trim();
+		String globPattern = globFilePattern.trim();
 
 		if (globPattern.length() == 0) {
 			globPattern = ImportConfig.DEVICE_FILES_DEFAULT;
@@ -385,10 +419,8 @@ public class EasyImportManager {
 					// ignore not regular files
 					if (fileAttributes.isRegularFile()) {
 
-						final OSFile deviceFile = new OSFile();
+						final OSFile deviceFile = new OSFile(path);
 
-						deviceFile.path = path;
-						deviceFile.fileName = path.getFileName().toString();
 						deviceFile.size = fileAttributes.size();
 						deviceFile.modifiedTime = fileAttributes.lastModifiedTime().toMillis();
 
@@ -609,7 +641,10 @@ public class EasyImportManager {
 		importConfig.setBackupFolder(Util.getXmlString(xmlConfig, ATTR_BACKUP_FOLDER, UI.EMPTY_STRING));
 		importConfig.setDeviceFolder(Util.getXmlString(xmlConfig, ATTR_DEVICE_FOLDER, UI.EMPTY_STRING));
 
-		importConfig.deviceFiles = Util.getXmlString(xmlConfig, ATTR_DEVICE_FILES, ImportConfig.DEVICE_FILES_DEFAULT);
+		importConfig.fileGlobPattern = Util.getXmlString(
+				xmlConfig,
+				ATTR_DEVICE_FILES,
+				ImportConfig.DEVICE_FILES_DEFAULT);
 
 		/*
 		 * Set active config
@@ -754,8 +789,8 @@ public class EasyImportManager {
 		/*
 		 * Check import files
 		 */
-		final ArrayList<OSFile> notImportedPaths = easyConfig.notImportedFiles;
-		if (notImportedPaths.size() == 0) {
+		final ArrayList<OSFile> notImportedFiles = easyConfig.notImportedFiles;
+		if (notImportedFiles.size() == 0) {
 
 			MessageDialog.openInformation(
 					Display.getDefault().getActiveShell(),
@@ -769,21 +804,9 @@ public class EasyImportManager {
 		}
 
 		/*
-		 * Get not imported files
-		 */
-		final ArrayList<String> notImportedFileNames = new ArrayList<>();
-
-		for (final OSFile deviceFile : notImportedPaths) {
-			notImportedFileNames.add(deviceFile.fileName);
-		}
-
-		/*
 		 * Import files
 		 */
-		final String firstFilePathName = notImportedPaths.get(0).path.toString();
-		final String[] fileNames = notImportedFileNames.toArray(new String[notImportedFileNames.size()]);
-
-		final ImportRunState importRunState = RawDataManager.getInstance().doTheImport(firstFilePathName, fileNames);
+		final ImportRunState importRunState = RawDataManager.getInstance().runImport(notImportedFiles);
 
 		importState.isImportCanceled = importRunState.isImportCanceled;
 
@@ -978,7 +1001,7 @@ public class EasyImportManager {
 			xmlConfig.putString(ATTR_BACKUP_FOLDER, importConfig.getBackupFolder());
 			xmlConfig.putString(ATTR_DEVICE_FOLDER, importConfig.getDeviceFolder());
 
-			xmlConfig.putString(ATTR_DEVICE_FILES, importConfig.deviceFiles);
+			xmlConfig.putString(ATTR_DEVICE_FILES, importConfig.fileGlobPattern);
 		}
 
 		/*

@@ -21,6 +21,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -147,6 +149,19 @@ public class RawDataManager {
 	 */
 	private IPath							_previousSelectedReimportFolder;
 
+	/**
+	 * This is a wrapper to keep the {@link #isBackupImportFile} state.
+	 */
+	private class ImportFile {
+
+		IPath	filePath;
+		boolean	isBackupImportFile;
+
+		public ImportFile(final org.eclipse.core.runtime.Path iPath) {
+			filePath = iPath;
+		}
+	}
+
 	public static enum ReImport {
 
 		AllTimeSlices, //
@@ -254,8 +269,7 @@ public class RawDataManager {
 			deviceIndex++;
 		}
 
-		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
-		final String lastSelectedPath = prefStore.getString(RAW_DATA_LAST_SELECTED_PATH);
+		final String lastSelectedPath = _prefStore.getString(RAW_DATA_LAST_SELECTED_PATH);
 
 		// setup open dialog
 		final FileDialog fileDialog = new FileDialog(Display.getDefault().getActiveShell(), (SWT.OPEN | SWT.MULTI));
@@ -271,9 +285,25 @@ public class RawDataManager {
 			return;
 		}
 
+		final Path firstFilePath = Paths.get(firstFilePathName);
+		final String filePathFolder = firstFilePath.getParent().toString();
+
+		// keep last selected path
+		_prefStore.putValue(RAW_DATA_LAST_SELECTED_PATH, filePathFolder);
+
 		final String[] selectedFileNames = fileDialog.getFileNames();
 
-		doTheImport(firstFilePathName, selectedFileNames);
+		final ArrayList<OSFile> osFiles = new ArrayList<>();
+
+		for (final String fileName : selectedFileNames) {
+
+			final Path filePath = Paths.get(filePathFolder, fileName);
+			final OSFile osFile = new OSFile(filePath);
+
+			osFiles.add(osFile);
+		}
+
+		runImport(osFiles);
 	}
 
 	/**
@@ -856,146 +886,6 @@ public class RawDataManager {
 		}
 	}
 
-	public ImportRunState doTheImport(final String importFilePathName, final String[] selectedFileNames) {
-
-		final ImportRunState importRunState = new ImportRunState();
-
-		if (selectedFileNames == null || selectedFileNames.length == 0) {
-			return importRunState;
-		}
-
-		// extract the file path (folder)
-		final IPath filePath = new org.eclipse.core.runtime.Path(importFilePathName).removeLastSegments(1);
-
-		// keep last selected path
-		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
-		final String selectedPath = filePath.makeAbsolute().toString();
-		prefStore.putValue(RAW_DATA_LAST_SELECTED_PATH, selectedPath);
-
-		// create path for each file
-		final ArrayList<IPath> selectedFilePaths = new ArrayList<IPath>();
-		for (final String fileName : selectedFileNames) {
-
-			// replace filename, keep the directory path
-			final IPath filePathWithName = filePath.append(fileName);
-			final IPath absolutePath = filePathWithName.makeAbsolute();
-			final String filePathName = absolutePath.toString();
-
-			selectedFilePaths.add(new org.eclipse.core.runtime.Path(filePathName));
-		}
-
-		// check if devices are loaded
-		if (_devicesByExtension == null) {
-			getDeviceListSortedByPriority();
-		}
-
-		// resort files by extension priority
-		Collections.sort(selectedFilePaths, new Comparator<IPath>() {
-
-			@Override
-			public int compare(final IPath path1, final IPath path2) {
-
-				final String file1Extension = path1.getFileExtension();
-				final String file2Extension = path2.getFileExtension();
-
-				if (file1Extension != null
-						&& file1Extension.length() > 0
-						&& file2Extension != null
-						&& file2Extension.length() > 0) {
-
-					final TourbookDevice file1Device = _devicesByExtension.get(file1Extension.toLowerCase());
-					final TourbookDevice file2Device = _devicesByExtension.get(file2Extension.toLowerCase());
-
-					if (file1Device != null && file2Device != null) {
-						return file1Device.extensionSortPriority - file2Device.extensionSortPriority;
-					}
-				}
-
-				// sort invalid files to the end
-				return Integer.MAX_VALUE;
-			}
-		});
-
-		setImportCanceled(false);
-
-		final IRunnableWithProgress importRunnable = new IRunnableWithProgress() {
-
-			@Override
-			public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-
-				int imported = 0;
-				final int importSize = selectedFilePaths.size();
-
-				monitor.beginTask(Messages.import_data_importTours_task, importSize);
-
-				setImportId();
-
-				int importCounter = 0;
-				final ArrayList<String> notImportedFiles = new ArrayList<String>();
-
-				// loop: import all selected files
-				for (final IPath filePath : selectedFilePaths) {
-
-					if (monitor.isCanceled()) {
-
-						// stop importing but process imported tours
-
-						importRunState.isImportCanceled = true;
-
-						break;
-					}
-
-					monitor.worked(1);
-					monitor.subTask(NLS.bind(Messages.import_data_importTours_subTask, //
-							new Object[] { ++imported, importSize, filePath }));
-
-					final String osFilePath = filePath.toOSString();
-
-					// ignore files which are imported as children from other imported files
-					if (_importedFileNamesChildren.contains(osFilePath)) {
-						continue;
-					}
-
-					if (importRawData(new File(osFilePath), null, false, null, true)) {
-						importCounter++;
-					} else {
-						notImportedFiles.add(osFilePath);
-					}
-				}
-
-				if (importCounter > 0) {
-
-					updateTourData_InImportView_FromDb(monitor);
-
-					Display.getDefault().syncExec(new Runnable() {
-						@Override
-						public void run() {
-
-							final RawDataView view = showRawDataView();
-
-							if (view != null) {
-								view.reloadViewer();
-								view.selectFirstTour();
-							}
-						}
-					});
-				}
-
-				if (notImportedFiles.size() > 0) {
-					showMsgBoxInvalidFormat(notImportedFiles);
-				}
-			}
-		};
-
-		try {
-			new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(true, true, importRunnable);
-		} catch (final Exception e) {
-			StatusUtil.log(e);
-		}
-
-		return importRunState;
-	}
-
 	public DeviceData getDeviceData() {
 		return _deviceData;
 	}
@@ -1176,7 +1066,7 @@ public class RawDataManager {
 						}
 
 						// device file extension was found in the filename extension
-						if (importRawData10(
+						if (importRawData_10(
 								device,
 								importFilePathName,
 								destinationPath,
@@ -1207,7 +1097,7 @@ public class RawDataManager {
 					 * the file extension
 					 */
 					for (final TourbookDevice device : deviceList) {
-						if (importRawData10(
+						if (importRawData_10(
 								device,
 								importFilePathName,
 								destinationPath,
@@ -1262,12 +1152,12 @@ public class RawDataManager {
 	 * @param isTourDisplayedInImportView
 	 * @return Returns <code>true</code> when data has been imported.
 	 */
-	private boolean importRawData10(final TourbookDevice device,
-									String sourceFileName,
-									final String destinationPath,
-									final boolean buildNewFileName,
-									FileCollisionBehavior fileCollision,
-									final boolean isTourDisplayedInImportView) {
+	private boolean importRawData_10(	final TourbookDevice device,
+										String sourceFileName,
+										final String destinationPath,
+										final boolean buildNewFileName,
+										FileCollisionBehavior fileCollision,
+										final boolean isTourDisplayedInImportView) {
 
 		if (fileCollision == null) {
 			fileCollision = new FileCollisionBehavior();
@@ -1292,7 +1182,7 @@ public class RawDataManager {
 			// copy file to destinationPath
 			if (destinationPath != null) {
 
-				final String newFileName = importRawData20CopyFile(
+				final String newFileName = importRawData_20_CopyFile(
 						device,
 						sourceFileName,
 						destinationPath,
@@ -1334,11 +1224,11 @@ public class RawDataManager {
 
 	}
 
-	private String importRawData20CopyFile(	final TourbookDevice device,
-											final String sourceFileName,
-											final String destinationPath,
-											final boolean buildNewFileName,
-											final FileCollisionBehavior fileCollision) {
+	private String importRawData_20_CopyFile(	final TourbookDevice device,
+												final String sourceFileName,
+												final String destinationPath,
+												final boolean buildNewFileName,
+												final FileCollisionBehavior fileCollision) {
 
 		String destFileName = new File(sourceFileName).getName();
 
@@ -1521,6 +1411,149 @@ public class RawDataManager {
 				}
 			}
 		}
+	}
+
+	public ImportRunState runImport(final ArrayList<OSFile> importFiles) {
+
+		final ImportRunState importRunState = new ImportRunState();
+
+		if (importFiles.size() == 0) {
+			return importRunState;
+		}
+
+		// check if devices are loaded
+		if (_devicesByExtension == null) {
+			getDeviceListSortedByPriority();
+		}
+
+		final List<ImportFile> importFilePaths = new ArrayList<>();
+
+		/*
+		 * Convert to IPath because NIO Path DO NOT SUPPORT EXTENSIONS :-(((
+		 */
+		for (final OSFile osFile : importFiles) {
+
+			final String absolutePath = osFile.getPath().toString();
+			final org.eclipse.core.runtime.Path iPath = new org.eclipse.core.runtime.Path(absolutePath);
+
+			final ImportFile importFile = new ImportFile(iPath);
+			importFile.isBackupImportFile = osFile.isBackupImportFile;
+
+			importFilePaths.add(importFile);
+		}
+
+		// resort files by extension priority
+		Collections.sort(importFilePaths, new Comparator<ImportFile>() {
+
+			@Override
+			public int compare(final ImportFile path1, final ImportFile path2) {
+
+				final String file1Extension = path1.filePath.getFileExtension();
+				final String file2Extension = path2.filePath.getFileExtension();
+
+				if (file1Extension != null
+						&& file1Extension.length() > 0
+						&& file2Extension != null
+						&& file2Extension.length() > 0) {
+
+					final TourbookDevice file1Device = _devicesByExtension.get(file1Extension.toLowerCase());
+					final TourbookDevice file2Device = _devicesByExtension.get(file2Extension.toLowerCase());
+
+					if (file1Device != null && file2Device != null) {
+						return file1Device.extensionSortPriority - file2Device.extensionSortPriority;
+					}
+				}
+
+				// sort invalid files to the end
+				return Integer.MAX_VALUE;
+			}
+		});
+
+		setImportCanceled(false);
+
+		final IRunnableWithProgress importRunnable = new IRunnableWithProgress() {
+
+			@Override
+			public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+
+				int imported = 0;
+				final int importSize = importFilePaths.size();
+
+				monitor.beginTask(Messages.import_data_importTours_task, importSize);
+
+				setImportId();
+
+				int importCounter = 0;
+				final ArrayList<String> notImportedFiles = new ArrayList<String>();
+
+				// loop: import all selected files
+				for (final ImportFile filePath : importFilePaths) {
+
+					if (monitor.isCanceled()) {
+
+						// stop importing but process imported tours
+
+						importRunState.isImportCanceled = true;
+
+						break;
+					}
+
+					monitor.worked(1);
+					monitor.subTask(NLS.bind(Messages.import_data_importTours_subTask, //
+							new Object[] { ++imported, importSize, filePath }));
+
+					final String osFilePath = filePath.filePath.toOSString();
+
+					// ignore files which are imported as children from other imported files
+					if (_importedFileNamesChildren.contains(osFilePath)) {
+						continue;
+					}
+
+					if (importRawData(new File(osFilePath), null, false, null, true)) {
+
+						importCounter++;
+
+						// update state
+						for (final TourData importedTourData : _newlyImportedTours.values()) {
+							importedTourData.isBackupImportFile = filePath.isBackupImportFile;
+						}
+
+					} else {
+						notImportedFiles.add(osFilePath);
+					}
+				}
+
+				if (importCounter > 0) {
+
+					updateTourData_InImportView_FromDb(monitor);
+
+					Display.getDefault().syncExec(new Runnable() {
+						@Override
+						public void run() {
+
+							final RawDataView view = showRawDataView();
+
+							if (view != null) {
+								view.reloadViewer();
+								view.selectFirstTour();
+							}
+						}
+					});
+				}
+
+				if (notImportedFiles.size() > 0) {
+					showMsgBoxInvalidFormat(notImportedFiles);
+				}
+			}
+		};
+
+		try {
+			new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(true, true, importRunnable);
+		} catch (final Exception e) {
+			StatusUtil.log(e);
+		}
+
+		return importRunState;
 	}
 
 	public void setCreateTourIdWithTime(final boolean isActionChecked) {

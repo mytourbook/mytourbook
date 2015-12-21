@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1199,7 +1199,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				? Messages.Import_Data_HTML_DeviceOff_Tooltip
 				: Messages.Import_Data_HTML_DeviceOn_Tooltip;
 
-		tooltip = replaceNewLine(tooltip);
+		tooltip = replaceHTML_NewLine(tooltip);
 
 		// shwo red image when off
 		final String imageUrl = isWatchingOn //
@@ -1294,8 +1294,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		final ImportConfig importConfig = easyConfig.getActiveImportConfig();
 
-		final int numDeviceFiles = easyConfig.numDeviceFiles;
 		final String deviceOSFolder = importConfig.getDeviceOSFolder();
+		final ArrayList<OSFile> notImportedFiles = easyConfig.notImportedFiles;
+
+		final int numDeviceFiles = easyConfig.numDeviceFiles;
+		final int numMovedFiles = easyConfig.movedFiles.size();
+		final int numNotImportedFiles = notImportedFiles.size();
+		final int numAllFiles = numDeviceFiles + numMovedFiles;
+
 		final boolean isDeviceFolderOK = isOSFolderValid(deviceOSFolder);
 		boolean isFolderOK = true;
 
@@ -1315,9 +1321,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		final boolean isCreateBackup = importConfig.isCreateBackup;
 		if (isCreateBackup) {
 
-			final String htmlBackupFolder = importConfig.getBackupFolder().replace(//
-					UI.SYMBOL_BACKSLASH,
-					UI.SYMBOL_HTML_BACKSLASH);
+			final String htmlBackupFolder = replaceHTML_BackSlash(importConfig.getBackupFolder());
 
 			// check OS folder
 			final String backupOSFolder = importConfig.getBackupOSFolder();
@@ -1353,20 +1357,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		/*
 		 * Device folder
 		 */
-		final ArrayList<OSFile> notImportedFiles = easyConfig.notImportedFiles;
-		final int numNotImportedFiles = notImportedFiles.size();
 		{
-			final String htmlDeviceFolder = importConfig.getDeviceFolder().replace(//
-					UI.SYMBOL_BACKSLASH,
-					UI.SYMBOL_HTML_BACKSLASH);
+			final String htmlDeviceFolder = replaceHTML_BackSlash(importConfig.getDeviceFolder());
 
 			final boolean isTopMargin = importConfig.isCreateBackup;
 
 			final String folderTitle = Messages.Import_Data_HTML_Title_Device;
-
 			final String folderInfo = numNotImportedFiles == 0 //
-					? NLS.bind(Messages.Import_Data_HTML_AllFilesAreImported, numDeviceFiles)
-					: NLS.bind(Messages.Import_Data_HTML_NotImportedFiles, numNotImportedFiles, numDeviceFiles);
+					? NLS.bind(Messages.Import_Data_HTML_AllFilesAreImported, numAllFiles)
+					: NLS.bind(Messages.Import_Data_HTML_NotImportedFiles, numNotImportedFiles, numAllFiles);
 
 			createHTML_56_FolderState(//
 					sb,
@@ -1380,12 +1379,30 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 
 		/*
+		 * Moved files
+		 */
+		if (numMovedFiles > 0) {
+
+			sb.append(HTML_TR);
+
+			sb.append(HTML_TD_SPACE + HTML_STYLE_TITLE_VERTICAL_PADDING + " class='folderTitle'>"); //$NON-NLS-1$
+			sb.append(Messages.Import_Data_HTML_Title_Moved);
+			sb.append(HTML_TD_END);
+
+			sb.append(HTML_TD_SPACE + HTML_STYLE_TITLE_VERTICAL_PADDING + " class='folderLocation'>"); //$NON-NLS-1$
+			sb.append(NLS.bind(Messages.Import_Data_HTML_MovedFiles, numMovedFiles));
+			sb.append(HTML_TD_END);
+
+			sb.append(HTML_TR_END);
+		}
+
+		/*
 		 * Device files
 		 */
 		{
-			final String deviceFiles = importConfig.deviceFiles.trim().length() == 0
+			final String deviceFiles = importConfig.fileGlobPattern.trim().length() == 0
 					? ImportConfig.DEVICE_FILES_DEFAULT
-					: importConfig.deviceFiles;
+					: importConfig.fileGlobPattern;
 
 			sb.append(HTML_TR);
 
@@ -1548,25 +1565,37 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private void createHTML_58_NotImportedFiles(final StringBuilder sb, final ArrayList<OSFile> notImportedFiles) {
 
-		sb.append("<table class='deviceList'><tbody>"); //$NON-NLS-1$
+		sb.append("<table border=0 class='deviceList'><tbody>"); //$NON-NLS-1$
 
 		for (final OSFile deviceFile : notImportedFiles) {
 
+			final String fileMoveState = deviceFile.isBackupImportFile ? "M" : UI.EMPTY_STRING;
+			final String filePathName = replaceHTML_BackSlash(deviceFile.getPath().getParent().toString());
+
 			sb.append(HTML_TR);
 
-			sb.append("<td class='column name'>"); //$NON-NLS-1$
-			sb.append(deviceFile.fileName);
+			sb.append("<td width=1 class='column'>"); //$NON-NLS-1$
+			sb.append(fileMoveState);
 			sb.append(HTML_TD_END);
 
-			sb.append("<td class='right column'>"); //$NON-NLS-1$
+			sb.append("<td class='column'>"); //$NON-NLS-1$
+			sb.append(deviceFile.getFileName());
+			sb.append(HTML_TD_END);
+
+// this is for debugging
+			sb.append("<td class='column'>"); //$NON-NLS-1$
+			sb.append(filePathName);
+			sb.append(HTML_TD_END);
+
+			sb.append("<td class='column right'>"); //$NON-NLS-1$
 			sb.append(_dateFormatter.format(deviceFile.modifiedTime));
 			sb.append(HTML_TD_END);
 
-			sb.append("<td class='right'>"); //$NON-NLS-1$
+			sb.append("<td class='column right'>"); //$NON-NLS-1$
 			sb.append(_timeFormatter.format(deviceFile.modifiedTime));
 			sb.append(HTML_TD_END);
 
-			sb.append("<td class='right column'>"); //$NON-NLS-1$
+			sb.append("<td class='right'>"); //$NON-NLS-1$
 			sb.append(deviceFile.size);
 			sb.append(HTML_TD_END);
 
@@ -3075,7 +3104,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			filePath = Paths.get(fileFolder, fileName);
 
-//			Files.delete(filePath);
+			Files.delete(filePath);
 
 			deletedFiles.add(filePath.toString());
 
@@ -3168,6 +3197,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 							Messages.Import_Data_Monitor_DeleteTourFiles_Subtask,
 							++saveCounter,
 							selectionSize));
+
+					if (tourData.isBackupImportFile && isDeleteAllFiles == false) {
+
+						/*
+						 * Do not delete files which are imported from the backup folder
+						 */
+
+						continue;
+					}
 
 					final String originalFilePath = tourData.importFilePathOriginal;
 
@@ -3317,9 +3355,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			savedTours.add(savedTour);
 
-			// update fields which are not saved but are used in the UI
+			// update fields which are not saved but used in the UI
 			savedTour.isTourFileDeleted = tourData.isTourFileDeleted;
 			savedTour.isTourFileMoved = tourData.isTourFileMoved;
+			savedTour.isBackupImportFile = tourData.isBackupImportFile;
 		}
 	}
 
@@ -4333,7 +4372,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 	}
 
-	private String replaceNewLine(final String text) {
+	private String replaceHTML_BackSlash(final String folder) {
+		
+		return folder.replace(//
+				UI.SYMBOL_BACKSLASH,
+				UI.SYMBOL_HTML_BACKSLASH);
+	}
+
+	private String replaceHTML_NewLine(final String text) {
+
 		return text.replace("\n", "\\n"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
@@ -4976,11 +5023,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		final String htmlDeviceOnOff = createHTML_52_DeviceState_OnOff();
 		String jsDeviceOnOff = htmlDeviceOnOff.replace("\"", "\\\""); //$NON-NLS-1$ //$NON-NLS-2$
-		jsDeviceOnOff = replaceNewLine(jsDeviceOnOff);
+		jsDeviceOnOff = replaceHTML_NewLine(jsDeviceOnOff);
 
 		final String htmlDeviceState = createHTML_54_DeviceState();
 		String jsDeviceState = htmlDeviceState.replace("\"", "\\\""); //$NON-NLS-1$ //$NON-NLS-2$
-		jsDeviceState = replaceNewLine(jsDeviceState);
+		jsDeviceState = replaceHTML_NewLine(jsDeviceState);
 
 		final String js = "\n" //$NON-NLS-1$
 

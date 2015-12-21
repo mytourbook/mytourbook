@@ -31,7 +31,10 @@ public class ImportConfig implements Cloneable {
 	private String				_backupFolder			= UI.EMPTY_STRING;
 	private String				_deviceFolder			= UI.EMPTY_STRING;
 
-	public String				deviceFiles				= DEVICE_FILES_DEFAULT;
+	/**
+	 * Glob pattern to get device files.
+	 */
+	public String				fileGlobPattern			= DEVICE_FILES_DEFAULT;
 
 	/** When <code>true</code> then the device watching is turned off after tours are imported. */
 	public boolean				isTurnOffWatching		= false;
@@ -172,7 +175,7 @@ public class ImportConfig implements Cloneable {
 				+ ("_id=" + _id + ", \n")
 				+ ("_backupFolder=" + _backupFolder + ", \n")
 				+ ("_deviceFolder=" + _deviceFolder + ", \n")
-				+ ("deviceFiles=" + deviceFiles)
+				+ ("deviceFiles=" + fileGlobPattern)
 
 				+ "\n]";
 	}

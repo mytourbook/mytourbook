@@ -2603,7 +2603,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
 				final ImportConfig importConfig = (ImportConfig) cell.getElement();
 
-				cell.setText(importConfig.deviceFiles);
+				cell.setText(importConfig.fileGlobPattern);
 			}
 		});
 	}
@@ -3944,7 +3944,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 		_selectedIC.setBackupFolder(_comboIC_BackupFolder.getText());
 		_selectedIC.setDeviceFolder(_comboIC_DeviceFolder.getText());
 
-		_selectedIC.deviceFiles = _txtIC_DeviceFiles.getText();
+		_selectedIC.fileGlobPattern = _txtIC_DeviceFiles.getText();
 	}
 
 	/**
@@ -4100,7 +4100,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 			_comboIC_BackupFolder.setText(_selectedIC.getBackupFolder());
 			_comboIC_DeviceFolder.setText(_selectedIC.getDeviceFolder());
 
-			_txtIC_DeviceFiles.setText(_selectedIC.deviceFiles);
+			_txtIC_DeviceFiles.setText(_selectedIC.fileGlobPattern);
 			_lblIC_DeleteFilesInfo.setText(createUIText_MovedFiles());
 		}
 		_isInUIUpdate = false;

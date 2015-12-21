@@ -34,7 +34,7 @@ public class NIO {
 	private final static Pattern	DEVICE_NAME_PATTERN			= Pattern.compile("\\s*\\[([^]]*)");	//$NON-NLS-1$
 
 	/** <code>([\\].*)</code> */
-	private final static Pattern	DEVICE_NAME_PATH_PATTERN	= Pattern.compile("([\\\\].*)"); //$NON-NLS-1$
+	private final static Pattern	DEVICE_NAME_PATH_PATTERN	= Pattern.compile("([\\\\].*)");		//$NON-NLS-1$
 
 	/**
 	 * Replace device name with drive letter, e.g. [MEDIA]\CACHE -> D:\CACHE. This do not validate
@@ -83,6 +83,17 @@ public class NIO {
 
 		return osPath;
 	}
+
+//	public static String getFileExtionsion(final String fileName) {
+//
+//		final int i = fileName.lastIndexOf('.');
+//		if (i >= 0) {
+//
+//			return fileName.substring(i + 1);
+//		}
+//
+//		return UI.EMPTY_STRING;
+//	}
 
 	public static Iterable<FileStore> getFileStores() {
 

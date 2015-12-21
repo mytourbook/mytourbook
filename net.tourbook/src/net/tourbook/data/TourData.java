@@ -1183,6 +1183,15 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	@Transient
 	public boolean												isTourFileMoved;
 
+	/**
+	 * Is <code>true</code> when the tour import file existed in the backup folder and not in the
+	 * device folder.
+	 * <p>
+	 * <b>THIS FILE SHOULD NOT BE DELETED.</b>
+	 */
+	@Transient
+	public boolean												isBackupImportFile;
+
 	public TourData() {}
 
 	/**

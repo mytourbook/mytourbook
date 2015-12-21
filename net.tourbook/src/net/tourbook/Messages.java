@@ -808,12 +808,12 @@ public class Messages extends NLS {
 	public static String		Image__synch_statistics_Disabled;
 	public static String		Image__SearchExternal;
 	public static String		Image__SearchExternal_Disabled;
-	public static String	Image__State_DeletedTour_View;
+	public static String		Image__State_DeletedTour_View;
 
 	public static String		Image__State_Error;
 	public static String		Image__State_MovedTour;
 
-	public static String	Image__State_MovedTour_View;
+	public static String		Image__State_MovedTour_View;
 	public static String		Image__State_OK;
 	public static String		Image__State_SaveTour;
 	public static String		Image__State_TourMarker;
@@ -923,6 +923,7 @@ public class Messages extends NLS {
 	public static String		Import_Data_HTML_ImportFromFiles_ActionTooltip;
 	public static String		Import_Data_HTML_LastMarker_No;
 	public static String		Import_Data_HTML_LastMarker_Yes;
+	public static String		Import_Data_HTML_MovedFiles;
 	public static String		Import_Data_HTML_NotBackedUpFiles;
 	public static String		Import_Data_HTML_NothingIsWatched;
 	public static String		Import_Data_HTML_NotImportedFiles;
@@ -936,6 +937,7 @@ public class Messages extends NLS {
 	public static String		Import_Data_HTML_Title_Delete;
 	public static String		Import_Data_HTML_Title_Device;
 	public static String		Import_Data_HTML_Title_Files;
+	public static String		Import_Data_HTML_Title_Moved;
 	public static String		Import_Data_HTML_WatchingIsOff;
 	public static String		Import_Data_HTML_WatchingOff;
 	public static String		Import_Data_HTML_WatchingOn;
