@@ -133,6 +133,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 	private static final String				DATA_KEY_SPEED_TOUR_TYPE_INDEX		= "DATA_KEY_SPEED_TOUR_TYPE_INDEX";	//$NON-NLS-1$
 	//
 	private static final int				CONTROL_DECORATION_WIDTH			= 6;
+	private static final String				CSS_PX								= "px";								//$NON-NLS-1$
 	//
 	private final IPreferenceStore			_prefStore							= TourbookPlugin.getPrefStore();
 	private final IDialogSettings			_state								= TourbookPlugin.getState(ID);
@@ -265,6 +266,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 	private Spinner							_spinnerDash_AnimationDuration;
 	private Spinner							_spinnerDash_BgOpacity;
 	private Spinner							_spinnerDash_NumHTiles;
+	private Spinner							_spinnerDash_StateTooltipWidth;
 	private Spinner							_spinnerDash_TileSize;
 	private Spinner							_spinnerIL_LastMarkerDistance;
 	private Spinner[]						_spinnerTT_Speed_AvgSpeed;
@@ -600,6 +602,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 		_dialogEasyConfig.backgroundOpacity = easyConfig.backgroundOpacity;
 		_dialogEasyConfig.isLiveUpdate = easyConfig.isLiveUpdate;
 		_dialogEasyConfig.numHorizontalTiles = easyConfig.numHorizontalTiles;
+		_dialogEasyConfig.stateToolTipWidth = easyConfig.stateToolTipWidth;
 		_dialogEasyConfig.tileSize = easyConfig.tileSize;
 
 		final ImportConfig activeImportConfig = easyConfig.getActiveImportConfig();
@@ -2349,6 +2352,29 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 			}
 			{
 				/*
+				 * State tooltip width
+				 */
+				// label
+				Label label = new Label(container, SWT.NONE);
+				label.setText(Messages.Dialog_ImportConfig_Label_StateTooltipWidth);
+				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+
+				// spinner
+				_spinnerDash_StateTooltipWidth = new Spinner(container, SWT.BORDER);
+				_spinnerDash_StateTooltipWidth.setMinimum(EasyConfig.STATE_TOOLTIP_WIDTH_MIN);
+				_spinnerDash_StateTooltipWidth.setMaximum(EasyConfig.STATE_TOOLTIP_WIDTH_MAX);
+				_spinnerDash_StateTooltipWidth.addSelectionListener(_liveUpdateListener);
+				_spinnerDash_StateTooltipWidth.addMouseWheelListener(_liveUpdateMouseWheelListener);
+				GridDataFactory.fillDefaults()//
+						.align(SWT.FILL, SWT.CENTER)
+						.applyTo(_spinnerDash_StateTooltipWidth);
+
+				// label: px
+				label = new Label(container, SWT.NONE);
+				label.setText(CSS_PX);
+			}
+			{
+				/*
 				 * Animation duration
 				 */
 				// label
@@ -3806,6 +3832,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 		_spinnerDash_AnimationDuration.setSelection(EasyConfig.ANIMATION_DURATION_DEFAULT);
 		_spinnerDash_BgOpacity.setSelection(EasyConfig.BACKGROUND_OPACITY_DEFAULT);
 		_spinnerDash_NumHTiles.setSelection(EasyConfig.HORIZONTAL_TILES_DEFAULT);
+		_spinnerDash_StateTooltipWidth.setSelection(EasyConfig.STATE_TOOLTIP_WIDTH_DEFAULT);
 		_spinnerDash_TileSize.setSelection(EasyConfig.TILE_SIZE_DEFAULT);
 
 		doLiveUpdate();
@@ -3894,6 +3921,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 		_spinnerDash_AnimationDuration.setSelection(_dialogEasyConfig.animationDuration);
 		_spinnerDash_BgOpacity.setSelection(_dialogEasyConfig.backgroundOpacity);
 		_spinnerDash_NumHTiles.setSelection(_dialogEasyConfig.numHorizontalTiles);
+		_spinnerDash_StateTooltipWidth.setSelection(_dialogEasyConfig.stateToolTipWidth);
 		_spinnerDash_TileSize.setSelection(_dialogEasyConfig.tileSize);
 	}
 
@@ -3903,7 +3931,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
 		_icColumnManager.saveState(_stateIC);
 		_ilColumnManager.saveState(_stateIL);
-
 
 		_backupHistoryItems.saveState(_state, STATE_BACKUP_FOLDER_HISTORY_ITEMS, STATE_BACKUP_DEVICE_HISTORY_ITEMS);
 		_deviceHistoryItems.saveState(_state, STATE_DEVICE_FOLDER_HISTORY_ITEMS, STATE_DEVICE_DEVICE_HISTORY_ITEMS);
@@ -4030,6 +4057,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 		_dialogEasyConfig.animationDuration = _spinnerDash_AnimationDuration.getSelection();
 		_dialogEasyConfig.backgroundOpacity = _spinnerDash_BgOpacity.getSelection();
 		_dialogEasyConfig.numHorizontalTiles = _spinnerDash_NumHTiles.getSelection();
+		_dialogEasyConfig.stateToolTipWidth = _spinnerDash_StateTooltipWidth.getSelection();
 		_dialogEasyConfig.tileSize = _spinnerDash_TileSize.getSelection();
 	}
 

@@ -188,6 +188,8 @@ public class Messages extends NLS {
 	public static String		Dialog_ImportConfig_Label_LastMarkerDistance;
 	public static String		Dialog_ImportConfig_Label_LastMarkerDistance_Tooltip;
 	public static String		Dialog_ImportConfig_Label_LastMarkerText;
+
+	public static String	Dialog_ImportConfig_Label_StateTooltipWidth;
 	public static String		Dialog_ImportConfig_Link_OtherActions;
 	public static String		Dialog_ImportConfig_Link_TourType;
 	public static String		Dialog_ImportConfig_Spinner_Speed_Tooltip;
@@ -786,6 +788,7 @@ public class Messages extends NLS {
 	public static String		Image__RawData_DeviceFolder_NotSetup;
 	public static String		Image__RawData_DeviceFolderDisabled;
 	public static String		Image__RawData_Import;
+	public static String		Image__RawData_ImportLog;
 	public static String		Image__RawData_Transfer;
 	public static String		Image__RawData_TransferDirect;
 	public static String		Image__Remove;
@@ -866,6 +869,10 @@ public class Messages extends NLS {
 
 	public static String		Import_Data_Action_DeleteTourFiles;
 	public static String		Import_Data_Action_EditImportPreferences;
+
+	public static String	Import_Data_Action_OpenLogView;
+
+	public static String	Import_Data_Action_OpenLogView_Tooltip;
 	public static String		Import_Data_Action_Reimport_EntireTour;
 	public static String		Import_Data_Action_Reimport_OnlyAltitudeValues;
 	public static String		Import_Data_Action_Reimport_OnlyGearValues;

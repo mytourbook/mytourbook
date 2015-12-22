@@ -1,0 +1,70 @@
+html 
+{
+	overflow-y: 			scroll;
+}
+
+body 
+{
+	font-size:				12px;
+	xcolor:					#fff;
+	xbackground-color:		#444;
+	xpadding-left:			5px;
+}
+
+html, body 
+{
+	margin:					5px;
+}
+
+p,td,ul 
+{
+	line-height:			130%;
+}
+
+p 
+{
+	margin:					0px;
+}
+
+img 
+{
+	border: 				0;
+}
+
+table
+{
+	border-collapse:		collapse;
+}
+
+
+body,p,h1,h2,h3,h4,table,td,th,ul,ol,textarea,input 
+{
+	font-family: 			sans-serif; /* Segoe UI, helvetica, arial, */
+}
+
+a:LINK,
+a:VISITED 
+{
+	color:					#fff;
+	text-decoration:		none;
+}
+
+.logItem
+{
+	white-space:			nowrap;
+}
+
+.stateOK
+{
+	color: 					#0d0;
+	font-weight: 			bold;
+}
+
+.stateError
+{
+	color: 					red;
+	font-weight: 			bold;
+}
+
+
+

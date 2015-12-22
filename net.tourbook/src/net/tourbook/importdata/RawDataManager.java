@@ -30,6 +30,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.application.PerspectiveFactoryRawData;
@@ -46,6 +47,7 @@ import net.tourbook.data.TourType;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.views.rawData.ImportLogView;
 import net.tourbook.ui.views.rawData.RawDataView;
 import net.tourbook.ui.views.tourBook.TVITourBookTour;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
@@ -75,12 +77,12 @@ import org.eclipse.ui.WorkbenchException;
 
 public class RawDataManager {
 
-	private static final String				RAW_DATA_LAST_SELECTED_PATH			= "raw-data-view.last-selected-import-path";				//$NON-NLS-1$
-	private static final String				TEMP_IMPORTED_FILE					= "received-device-data.txt";								//$NON-NLS-1$
+	private static final String								RAW_DATA_LAST_SELECTED_PATH			= "raw-data-view.last-selected-import-path";				//$NON-NLS-1$
+	private static final String								TEMP_IMPORTED_FILE					= "received-device-data.txt";								//$NON-NLS-1$
 
-	public static final int					ADJUST_IMPORT_YEAR_IS_DISABLED		= -1;
+	public static final int									ADJUST_IMPORT_YEAR_IS_DISABLED		= -1;
 	//
-	static final ComboEnumEntry<?>[]		ALL_IMPORT_TOUR_TYPE_CONFIG;
+	static final ComboEnumEntry<?>[]						ALL_IMPORT_TOUR_TYPE_CONFIG;
 
 	static {
 
@@ -95,59 +97,64 @@ public class RawDataManager {
 		};
 	}
 
-	private static RawDataManager			_instance							= null;
+	private static RawDataManager							_instance							= null;
 
-	private final IPreferenceStore			_prefStore							= TourbookPlugin.getPrefStore();
+	private static final CopyOnWriteArrayList<ImportLog>	_importLogs							= new CopyOnWriteArrayList<>();
+
+	private final IPreferenceStore							_prefStore							= TourbookPlugin
+																										.getPrefStore();
 
 	/**
 	 * contains the device data imported from the device/file
 	 */
-	private final DeviceData				_deviceData							= new DeviceData();
+	private final DeviceData								_deviceData							= new DeviceData();
 
 	/**
 	 * Contains tours which are imported or received and displayed in the import view.
 	 */
-	private final HashMap<Long, TourData>	_toursInImportView					= new HashMap<Long, TourData>();
+	private final HashMap<Long, TourData>					_toursInImportView					= new HashMap<Long, TourData>();
 
 	/**
 	 * Contains tours which are imported from the last file name.
 	 */
-	private final HashMap<Long, TourData>	_newlyImportedTours					= new HashMap<Long, TourData>();
+	private final HashMap<Long, TourData>					_newlyImportedTours					= new HashMap<Long, TourData>();
 
-	private String							_lastImportedFileName;
+	private String											_lastImportedFileName;
 
 	/**
 	 * Contains the filenames for all imported files which are displayed in the import view
 	 */
-	private final HashSet<String>			_importedFileNames					= new HashSet<String>();
+	private final HashSet<String>							_importedFileNames					= new HashSet<String>();
 
 	/**
 	 * Contains filenames which are not directly imported but is imported from other imported files
 	 */
-	private final HashSet<String>			_importedFileNamesChildren			= new HashSet<String>();
+	private final HashSet<String>							_importedFileNamesChildren			= new HashSet<String>();
 
-	private boolean							_isImported;
+	private boolean											_isImported;
 
-	private boolean							_isImportCanceled;
+	private boolean											_isImportCanceled;
 	//
-	private int								_importState_ImportYear				= ADJUST_IMPORT_YEAR_IS_DISABLED;
+	private int												_importState_ImportYear				= ADJUST_IMPORT_YEAR_IS_DISABLED;
 
-	private boolean							_importState_IsConvertWayPoints		= RawDataView.STATE_IS_CONVERT_WAYPOINTS_DEFAULT;
-	private boolean							_importState_IsCreateTourIdWithTime	= RawDataView.STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT;
-	private boolean							_importState_IsMergeTracks			= RawDataView.STATE_IS_MERGE_TRACKS_DEFAULT;
-	private boolean							_importState_IsChecksumValidation	= RawDataView.STATE_IS_CHECKSUM_VALIDATION_DEFAULT;
+	private boolean											_importState_IsConvertWayPoints		= RawDataView.STATE_IS_CONVERT_WAYPOINTS_DEFAULT;
+	private boolean											_importState_IsCreateTourIdWithTime	= RawDataView.STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT;
+	private boolean											_importState_IsMergeTracks			= RawDataView.STATE_IS_MERGE_TRACKS_DEFAULT;
+	private boolean											_importState_IsChecksumValidation	= RawDataView.STATE_IS_CHECKSUM_VALIDATION_DEFAULT;
 
-	private List<TourbookDevice>			_devicesBySortPriority;
+	private List<TourbookDevice>							_devicesBySortPriority;
 
-	private HashMap<String, TourbookDevice>	_devicesByExtension;
+	private HashMap<String, TourbookDevice>					_devicesByExtension;
 
-	private final ArrayList<TourType>		_tempTourTypes						= new ArrayList<TourType>();
-	private final ArrayList<TourTag>		_tempTourTags						= new ArrayList<TourTag>();
+	private final ArrayList<TourType>						_tempTourTypes						= new ArrayList<TourType>();
+	private final ArrayList<TourTag>						_tempTourTags						= new ArrayList<TourTag>();
 
 	/**
 	 * Filepath from the previous reimported tour
 	 */
-	private IPath							_previousSelectedReimportFolder;
+	private IPath											_previousSelectedReimportFolder;
+
+	private ImportLogView									_logView;
 
 	/**
 	 * This is a wrapper to keep the {@link #isBackupImportFile} state.
@@ -173,7 +180,15 @@ public class RawDataManager {
 		Tour, //
 	}
 
-	private RawDataManager() {}
+	private RawDataManager() {
+
+		// set first log entry
+		_importLogs.add(new ImportLog("Import initialized"));
+	}
+
+	public static CopyOnWriteArrayList<ImportLog> getImportLogs() {
+		return _importLogs;
+	}
 
 	public static RawDataManager getInstance() {
 
@@ -886,6 +901,18 @@ public class RawDataManager {
 		}
 	}
 
+	private void addImportLog(final String message) {
+
+		final ImportLog importLog = new ImportLog(message);
+
+		// update model
+		_importLogs.add(importLog);
+
+		// update UI
+		_logView.addLog(importLog);
+
+	}
+
 	public DeviceData getDeviceData() {
 		return _deviceData;
 	}
@@ -1421,6 +1448,16 @@ public class RawDataManager {
 			return importRunState;
 		}
 
+		final long start = System.currentTimeMillis();
+
+		_logView = (ImportLogView) Util.showView(ImportLogView.ID, true);
+
+		// reset import log
+		_logView.clear();
+		_importLogs.clear();
+
+		addImportLog("Import start");
+
 		// check if devices are loaded
 		if (_devicesByExtension == null) {
 			getDeviceListSortedByPriority();
@@ -1513,13 +1550,18 @@ public class RawDataManager {
 
 						importCounter++;
 
+						addImportLog("<span class='stateOK'>OK</span> " + osFilePath);
+
 						// update state
 						for (final TourData importedTourData : _newlyImportedTours.values()) {
 							importedTourData.isBackupImportFile = filePath.isBackupImportFile;
 						}
 
 					} else {
+
 						notImportedFiles.add(osFilePath);
+
+						addImportLog("<span class='stateError'>Error</span> " + osFilePath);
 					}
 				}
 
@@ -1542,7 +1584,7 @@ public class RawDataManager {
 				}
 
 				if (notImportedFiles.size() > 0) {
-					showMsgBoxInvalidFormat(notImportedFiles);
+//					showMsgBoxInvalidFormat(notImportedFiles);
 				}
 			}
 		};
@@ -1552,6 +1594,9 @@ public class RawDataManager {
 		} catch (final Exception e) {
 			StatusUtil.log(e);
 		}
+
+		final double time = (System.currentTimeMillis() - start) / 1000.0;
+		addImportLog(String.format("Import end, %.3f s", time));
 
 		return importRunState;
 	}

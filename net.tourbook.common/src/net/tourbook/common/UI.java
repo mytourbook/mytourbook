@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -107,6 +107,13 @@ public class UI {
 	public static final String				SPACE3									= "   ";																	//$NON-NLS-1$
 	public static final String				SPACE4									= "    ";																	//$NON-NLS-1$
 	public static final String				ZERO									= "0";																		//$NON-NLS-1$
+
+	private static final String				JS_APOSTROPHE							= "'";
+	private static final String				JS_APOSTROPHE_REPLACEMENT				= "\\'";
+	private static final String				JS_QUOTA_MARK							= "\"";
+	private static final String				JS_QUOTA_MARK_REPLACEMENT				= "\\\"";
+	private static final String				JS_BACKSLASH_REPLACEMENT				= "\\\\";
+	private static final String				HTML_NEW_LINE							= "\\n";
 
 	public static final String				SYMBOL_ARROW_UP							= "\u2191";																//$NON-NLS-1$
 	public static final String				SYMBOL_ARROW_DOWN						= "\u2193";																//$NON-NLS-1$
@@ -573,6 +580,13 @@ public class UI {
 		return pageNoData;
 	}
 
+	public static Color disposeResource(final Color resource) {
+		if ((resource != null) && !resource.isDisposed()) {
+			resource.dispose();
+		}
+		return null;
+	}
+
 // this conversion is not working for all png images, found SWT2Dutil.java
 //
 //	/**
@@ -680,13 +694,6 @@ public class UI {
 //
 //		return null;
 //	}
-
-	public static Color disposeResource(final Color resource) {
-		if ((resource != null) && !resource.isDisposed()) {
-			resource.dispose();
-		}
-		return null;
-	}
 
 	public static Cursor disposeResource(final Cursor resource) {
 		if ((resource != null) && !resource.isDisposed()) {
@@ -924,6 +931,35 @@ public class UI {
 			contextMenu.setLocation(pt.x, pt.y);
 			contextMenu.setVisible(true);
 		}
+	}
+
+	public static String replaceHTML_BackSlash(final String filePath) {
+
+		return filePath.replace(//
+				UI.SYMBOL_BACKSLASH,
+				UI.SYMBOL_HTML_BACKSLASH);
+	}
+
+	public static String replaceHTML_NewLine(final String text) {
+
+		return text.replace(NEW_LINE1, HTML_NEW_LINE);
+	}
+
+	public static String replaceJS_Apostrophe(final String js) {
+
+		return js.replace(JS_APOSTROPHE, JS_APOSTROPHE_REPLACEMENT);
+	}
+
+	public static String replaceJS_BackSlash(final String filePath) {
+
+		return filePath.replace(//
+				UI.SYMBOL_BACKSLASH,
+				JS_BACKSLASH_REPLACEMENT);
+	}
+
+	public static String replaceJS_QuotaMark(final String js) {
+
+		return js.replace(JS_QUOTA_MARK, JS_QUOTA_MARK_REPLACEMENT);
 	}
 
 	public static void resetInitialLocation(final IDialogSettings _state, final String statePrefix) {

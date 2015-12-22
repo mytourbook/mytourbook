@@ -291,6 +291,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	//
 	// context menu actions
 	private ActionClearView					_actionClearView;
+	private ActionOpenLogView				_actionOpenLogView;
 	private ActionDeleteTourFiles			_actionDeleteTourFile;
 	private ActionExport					_actionExportTour;
 	private ActionEditQuick					_actionEditQuick;
@@ -950,9 +951,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_actionMergeIntoTour = new ActionMergeIntoMenu(this);
 		_actionMergeTour = new ActionMergeTour(this);
 		_actionModifyColumns = new ActionModifyColumns(this);
-		_actionOpenTour = new ActionOpenTour(this);
-		_actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
 		_actionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this);
+		_actionOpenLogView = new ActionOpenLogView();
+		_actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
+		_actionOpenTour = new ActionOpenTour(this);
 		_actionReimportSubMenu = new ActionReimportSubMenu(this);
 		_actionRemoveTour = new ActionRemoveTour(this);
 		_actionRemoveToursWhenClosed = new ActionRemoveToursWhenClosed();
@@ -1059,6 +1061,27 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				+ ("	max-width: " + itemSize + "px;\n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("}\n"); //$NON-NLS-1$
 
+//
+//		{
+//			display:				none;
+//			z-index:				2000;
+//
+//			padding:				5px;
+//
+//			left:					6px;
+//			max-height:				80vh;
+//		}
+
+		/*
+		 * State tooltip
+		 */
+		final String stateTooltip = UI.EMPTY_STRING
+		//
+				+ (".stateTooltip\n") //$NON-NLS-1$
+				+ ("{\n") //$NON-NLS-1$
+				+ ("	min-width:" + easyConfig.stateToolTipWidth + "px;\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("}\n"); //$NON-NLS-1$
+
 		/*
 		 * CSS
 		 */
@@ -1068,6 +1091,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				+ animation
 				+ bgImage
 				+ tileSize
+				+ stateTooltip
 				+ "</style>\n"; //$NON-NLS-1$
 
 		return customCSS;
@@ -1199,7 +1223,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				? Messages.Import_Data_HTML_DeviceOff_Tooltip
 				: Messages.Import_Data_HTML_DeviceOn_Tooltip;
 
-		tooltip = replaceHTML_NewLine(tooltip);
+		tooltip = UI.replaceHTML_NewLine(tooltip);
 
 		// shwo red image when off
 		final String imageUrl = isWatchingOn //
@@ -1321,7 +1345,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		final boolean isCreateBackup = importConfig.isCreateBackup;
 		if (isCreateBackup) {
 
-			final String htmlBackupFolder = replaceHTML_BackSlash(importConfig.getBackupFolder());
+			final String htmlBackupFolder = UI.replaceHTML_BackSlash(importConfig.getBackupFolder());
 
 			// check OS folder
 			final String backupOSFolder = importConfig.getBackupOSFolder();
@@ -1358,7 +1382,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		 * Device folder
 		 */
 		{
-			final String htmlDeviceFolder = replaceHTML_BackSlash(importConfig.getDeviceFolder());
+			final String htmlDeviceFolder = UI.replaceHTML_BackSlash(importConfig.getDeviceFolder());
 
 			final boolean isTopMargin = importConfig.isCreateBackup;
 
@@ -1569,8 +1593,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		for (final OSFile deviceFile : notImportedFiles) {
 
-			final String fileMoveState = deviceFile.isBackupImportFile ? "M" : UI.EMPTY_STRING;
-			final String filePathName = replaceHTML_BackSlash(deviceFile.getPath().getParent().toString());
+			final String fileMoveState = deviceFile.isBackupImportFile ? "M" : UI.EMPTY_STRING; //$NON-NLS-1$
+			final String filePathName = UI.replaceHTML_BackSlash(deviceFile.getPath().getParent().toString());
 
 			sb.append(HTML_TR);
 
@@ -3662,6 +3686,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		tbm.add(new Separator());
 
 		tbm.add(_actionClearView);
+		tbm.add(_actionOpenLogView);
 		tbm.add(_actionSetupImport);
 
 		/*
@@ -4372,18 +4397,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 	}
 
-	private String replaceHTML_BackSlash(final String folder) {
-		
-		return folder.replace(//
-				UI.SYMBOL_BACKSLASH,
-				UI.SYMBOL_HTML_BACKSLASH);
-	}
-
-	private String replaceHTML_NewLine(final String text) {
-
-		return text.replace("\n", "\\n"); //$NON-NLS-1$ //$NON-NLS-2$
-	}
-
 	private void resetEasyImport() {
 
 		setWatcher_Off();
@@ -4908,6 +4921,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		easyConfig.backgroundOpacity = modifiedConfig.backgroundOpacity;
 		easyConfig.isLiveUpdate = modifiedConfig.isLiveUpdate;
 		easyConfig.numHorizontalTiles = modifiedConfig.numHorizontalTiles;
+		easyConfig.stateToolTipWidth = modifiedConfig.stateToolTipWidth;
 		easyConfig.tileSize = modifiedConfig.tileSize;
 
 		EasyImportManager.getInstance().saveEasyConfig(easyConfig);
@@ -5022,12 +5036,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private void updateUI_DeviceState_DOM() {
 
 		final String htmlDeviceOnOff = createHTML_52_DeviceState_OnOff();
-		String jsDeviceOnOff = htmlDeviceOnOff.replace("\"", "\\\""); //$NON-NLS-1$ //$NON-NLS-2$
-		jsDeviceOnOff = replaceHTML_NewLine(jsDeviceOnOff);
+		String jsDeviceOnOff = UI.replaceJS_QuotaMark(htmlDeviceOnOff);
+		jsDeviceOnOff = UI.replaceHTML_NewLine(jsDeviceOnOff);
 
 		final String htmlDeviceState = createHTML_54_DeviceState();
-		String jsDeviceState = htmlDeviceState.replace("\"", "\\\""); //$NON-NLS-1$ //$NON-NLS-2$
-		jsDeviceState = replaceHTML_NewLine(jsDeviceState);
+		String jsDeviceState = UI.replaceJS_QuotaMark(htmlDeviceState);
+		jsDeviceState = UI.replaceHTML_NewLine(jsDeviceState);
 
 		final String js = "\n" //$NON-NLS-1$
 

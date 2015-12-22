@@ -28,14 +28,18 @@ public class EasyConfig {
 	static final int					ANIMATION_CRAZINESS_FACTOR_MAX		= 100;
 
 	static final int					BACKGROUND_OPACITY_DEFAULT			= 5;
-	static final int					BACKGROUND_OPACITY_MAX				= 100;
 	static final int					BACKGROUND_OPACITY_MIN				= 0;
+	static final int					BACKGROUND_OPACITY_MAX				= 100;
 
 	static final int					HORIZONTAL_TILES_DEFAULT			= 5;
 	static final int					HORIZONTAL_TILES_MIN				= 1;
 	static final int					HORIZONTAL_TILES_MAX				= 50;
 
 	static final boolean				LIVE_UPDATE_DEFAULT					= true;
+
+	static final int					STATE_TOOLTIP_WIDTH_DEFAULT			= 500;
+	static final int					STATE_TOOLTIP_WIDTH_MIN				= 300;
+	static final int					STATE_TOOLTIP_WIDTH_MAX				= 2000;
 
 	static final int					TILE_SIZE_DEFAULT					= 80;
 	static final int					TILE_SIZE_MIN						= 20;
@@ -67,6 +71,7 @@ public class EasyConfig {
 	public int							animationDuration					= ANIMATION_DURATION_DEFAULT;
 	public int							animationCrazinessFactor			= ANIMATION_CRAZINESS_FACTOR_DEFAULT;
 
+	public int							stateToolTipWidth					= STATE_TOOLTIP_WIDTH_DEFAULT;
 	/*
 	 * Launcher fields
 	 */

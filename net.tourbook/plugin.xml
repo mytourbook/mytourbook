@@ -1054,6 +1054,11 @@
             defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTourImport"
             />
       <command
+            id="command.net.tourbook.views.rawData.ImportLogView"
+            name="%view_name_Data_ImportLog"
+            defaultHandler="net.tourbook.ui.views.ActionHandler_OpenView_TourImportLog"
+            />
+      <command
             id="command.net.tourbook.views.tourListView"
             name="%view_name_Book"
             defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTourBook"
@@ -1371,7 +1376,7 @@
 
 		<!-- 1. Tour Directories -->
 		<category	id="net.tourbook.category.tourList"	name="%view_category_tourDirectory"/>
-		            
+
 			<view
 				category="net.tourbook.category.tourList"
 				class="net.tourbook.ui.views.rawData.RawDataView"
@@ -1420,6 +1425,12 @@
 				icon="icons/tour-marker-all.png"
 				id="net.tourbook.ui.views.TourMarkerAllView"
 				name="%View_Name_TourMarkerAll"/>
+			<view
+				category="net.tourbook.category.tourList"
+				class="net.tourbook.ui.views.rawData.ImportLogView"
+				icon="icons/imported-tours-log.png"
+				id="net.tourbook.views.rawData.ImportLogView"
+				name="%view_name_Data_ImportLog"/>
 
 
 		<!-- 2. Tour Properties -->

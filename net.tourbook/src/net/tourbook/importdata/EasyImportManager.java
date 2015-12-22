@@ -93,6 +93,7 @@ public class EasyImportManager {
 	private static final String			ATTR_DASH_ANIMATION_DURATION		= "animationDuration";							//$NON-NLS-1$
 	private static final String			ATTR_DASH_IS_LIVE_UPDATE			= "isLiveUpdate";								//$NON-NLS-1$
 	private static final String			ATTR_DASH_NUM_UI_COLUMNS			= "uiColumns";									//$NON-NLS-1$
+	private static final String			ATTR_DASH_STATE_TOOLTIP_WIDTH		= "stateTooltipWidth";							//$NON-NLS-1$
 	private static final String			ATTR_DASH_TILE_SIZE					= "tileSize";									//$NON-NLS-1$
 	//
 	private static final String			ATTR_IL_DESCRIPTION					= "description";								//$NON-NLS-1$
@@ -615,6 +616,12 @@ public class EasyImportManager {
 				EasyConfig.HORIZONTAL_TILES_MIN,
 				EasyConfig.HORIZONTAL_TILES_MAX);
 
+		dashConfig.stateToolTipWidth = Util.getXmlInteger(xmlMemento,//
+				ATTR_DASH_STATE_TOOLTIP_WIDTH,
+				EasyConfig.STATE_TOOLTIP_WIDTH_DEFAULT,
+				EasyConfig.STATE_TOOLTIP_WIDTH_MIN,
+				EasyConfig.STATE_TOOLTIP_WIDTH_MAX);
+
 		dashConfig.tileSize = Util.getXmlInteger(xmlMemento,//
 				ATTR_DASH_TILE_SIZE,
 				EasyConfig.TILE_SIZE_DEFAULT,
@@ -977,6 +984,7 @@ public class EasyImportManager {
 			xmlConfig.putInteger(ATTR_DASH_BACKGROUND_OPACITY, dashConfig.backgroundOpacity);
 			xmlConfig.putBoolean(ATTR_DASH_IS_LIVE_UPDATE, dashConfig.isLiveUpdate);
 			xmlConfig.putInteger(ATTR_DASH_NUM_UI_COLUMNS, dashConfig.numHorizontalTiles);
+			xmlConfig.putInteger(ATTR_DASH_STATE_TOOLTIP_WIDTH, dashConfig.stateToolTipWidth);
 			xmlConfig.putInteger(ATTR_DASH_TILE_SIZE, dashConfig.tileSize);
 		}
 
