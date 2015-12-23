@@ -15,31 +15,30 @@
  *******************************************************************************/
 package net.tourbook.importdata;
 
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.DateTimeFormatterBuilder;
+public enum ImportLogState {
 
-public class ImportLog {
+	/**
+	 * 
+	 */
+	DEFAULT, //
 
-	private final DateTimeFormatter	_dtFormatterTime	= new DateTimeFormatterBuilder()
-																.appendHourOfDay(2)
-																.appendLiteral(':')
-																.appendMinuteOfHour(2)
-																.appendLiteral(':')
-																.appendSecondOfMinute(2)
-																.appendLiteral(',')
-																.appendFractionOfSecond(3, 3)
-																.toFormatter();
+	/**
+	 * 
+	 */
+	OK, //
 
-	public String					time;
-	public ImportLogState			state;
-	public String					message;
+	/**
+	 * 
+	 */
+	ERROR, //
 
-	ImportLog(final ImportLogState state, final String message) {
+	/**
+	 * File is copied to the backup folder.
+	 */
+	COPY, //
 
-		this.time = _dtFormatterTime.print(System.currentTimeMillis());
-
-		this.state = state;
-		this.message = message;
-	}
-
+	/**
+	 * File is deleted in the device folder.
+	 */
+	DELETE, //
 }

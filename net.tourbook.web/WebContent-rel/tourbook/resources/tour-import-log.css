@@ -49,22 +49,27 @@ a:VISITED
 	text-decoration:		none;
 }
 
+.icon
+{
+	width: 					16px; 
+	height: 				16px; 
+	min-width:				16px; 			/* force with otherwise it can be smaller */
+
+	background-repeat:		no-repeat;
+	background-position-x:	5px;			/* this must be the same as .column otherwise it is not centered */
+	background-position-y:	center;
+}
+
+.column
+{
+	padding-left:			5px;
+}
+
 .logItem
 {
 	white-space:			nowrap;
 }
 
-.stateOK
-{
-	color: 					#0d0;
-	font-weight: 			bold;
-}
-
-.stateError
-{
-	color: 					red;
-	font-weight: 			bold;
-}
 
 
 

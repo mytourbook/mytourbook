@@ -811,6 +811,10 @@ public class Messages extends NLS {
 	public static String		Image__synch_statistics_Disabled;
 	public static String		Image__SearchExternal;
 	public static String		Image__SearchExternal_Disabled;
+	public static String	Image__State_Copy;
+
+	public static String	Image__State_Delete;
+
 	public static String		Image__State_DeletedTour_View;
 
 	public static String		Image__State_Error;
@@ -945,6 +949,8 @@ public class Messages extends NLS {
 	public static String		Import_Data_HTML_Title_Device;
 	public static String		Import_Data_HTML_Title_Files;
 	public static String		Import_Data_HTML_Title_Moved;
+
+	public static String	Import_Data_HTML_Title_Moved_State;
 	public static String		Import_Data_HTML_WatchingIsOff;
 	public static String		Import_Data_HTML_WatchingOff;
 	public static String		Import_Data_HTML_WatchingOn;
@@ -1310,8 +1316,11 @@ public class Messages extends NLS {
 	public static String		Pref_TourTypes_root_title;
 	public static String		Pref_TourTypes_Title;
 
+	public static String	PrefPage_Import_Checkbox_AutoOpenImportLogView;
+
 	public static String		PrefPage_Import_Checkbox_CreateTourIdWithTime;
 	public static String		PrefPage_Import_Checkbox_CreateTourIdWithTime_Tooltip;
+
 	public static String		PrefPage_Import_Label_Info;
 
 	public static String		PrefPage_ViewActions_Group;

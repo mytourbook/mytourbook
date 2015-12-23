@@ -260,7 +260,7 @@ a.action-button:VISITED
 	padding:				5px;
 
 	left:					6px;
-	min-width:				500px;
+	width:					500px;
 	max-height:				80vh;
 }
 

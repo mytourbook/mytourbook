@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.ui.views.rawData;
 
+import static net.tourbook.ui.UI.getIconUrl;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -36,97 +38,134 @@ import org.eclipse.swt.SWTError;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.ProgressAdapter;
 import org.eclipse.swt.browser.ProgressEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.DateTimeFormatterBuilder;
 
 /**
  * Import log view.
  */
 public class ImportLogView extends ViewPart {
 
-	public static final String		ID									= "net.tourbook.views.rawData.ImportLogView";	//$NON-NLS-1$
+	public static final String	ID									= "net.tourbook.views.rawData.ImportLogView";	//$NON-NLS-1$
 	//
-	private static final String		WEB_RESOURCE_TOUR_IMPORT_LOG_CSS	= "tour-import-log.css";						//$NON-NLS-1$
-	private static final String		DOM_ID_LOG							= "logs";
+	private static final String	STATE_COPY							= "COPY";										//$NON-NLS-1$
+	private static final String	STATE_DELETE						= "DELETE";									//$NON-NLS-1$
+	private static final String	STATE_ERROR							= "ERROR";										//$NON-NLS-1$
+	private static final String	STATE_OK							= "OK";										//$NON-NLS-1$
 	//
-	private boolean					_isBrowserCompleted;
-	private String					_cssFromFile;
-
-	private final DateTimeFormatter	_dtFormatterTime					= new DateTimeFormatterBuilder()
-																				.appendHourOfDay(2)
-																				.appendLiteral(':')
-																				.appendMinuteOfHour(2)
-																				.appendLiteral(':')
-																				.appendSecondOfMinute(2)
-																				.appendLiteral(',')
-																				.appendFractionOfSecond(3, 3)
-																				.toFormatter();
-
+	private static final String	DOM_ID_LOG							= "logs";										//$NON-NLS-1$
+	private static final String	WEB_RESOURCE_TOUR_IMPORT_LOG_CSS	= "tour-import-log.css";						//$NON-NLS-1$
+	//
+	private boolean				_isBrowserCompleted;
+	private String				_cssFromFile;
+	private String				_noBrowserLog						= UI.EMPTY_STRING;
+	//
+	private String				_imageUrl_StateCopy					= getIconUrl(Messages.Image__State_Copy);
+	private String				_imageUrl_StateDelete				= getIconUrl(Messages.Image__State_DeletedTour_View);
+	private String				_imageUrl_StateError				= getIconUrl(Messages.Image__State_Error);
+	private String				_imageUrl_StateOK					= getIconUrl(Messages.Image__State_OK);
+	//
 	/*
 	 * UI controls
 	 */
-	private Browser					_browser;
+	private Browser				_browser;
 
-	private PageBook				_pageBook;
-	private Composite				_page_NoBrowser;
-	private Composite				_page_WithBrowser;
+	private PageBook			_pageBook;
+	private Composite			_page_NoBrowser;
+	private Composite			_page_WithBrowser;
 
-	private Text					_txtNoBrowser;
+	private Text				_txtNoBrowser;
 
 	public void addLog(final ImportLog importLog) {
 
-		if (_isBrowserCompleted == false) {
+		final boolean isBrowserAvailable = _browser != null && _browser.isDisposed() == false;
+
+		if (isBrowserAvailable && _isBrowserCompleted == false) {
+
 			// this occures when the view is opening but not yet ready
 			return;
 		}
 
 		String jsText = UI.replaceJS_BackSlash(importLog.message);
 		jsText = UI.replaceJS_Apostrophe(jsText);
+		final String message = jsText;
 
-		final String message = _dtFormatterTime.print(System.currentTimeMillis()) + UI.SPACE + jsText;
+		final String stateNoBrowser[] = { UI.EMPTY_STRING };
+		final String stateWithBrowser[] = { UI.EMPTY_STRING };
 
-		if (_browser == null) {
-			StatusUtil.logInfo(message);
-			return;
-		}
+		getImportState(importLog, stateNoBrowser, stateWithBrowser);
 
-		final String js = UI.EMPTY_STRING//
+		// Run always async that the flow is not blocked.
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
 
-				+ ("var para = document.createElement('P');\n")
-				+ ("para.className='logItem';\n")
-				+ ("para.innerHTML='" + message + "';\n")
+				final String noBrowserText = importLog.time + UI.SPACE + stateNoBrowser[0] + UI.SPACE + message;
 
-				+ ("document.getElementById(\"" + DOM_ID_LOG + "\").appendChild(para);\n") //$NON-NLS-1$ //$NON-NLS-2$
-		;
+//				System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//						+ ("\t" + noBrowserText));
+//				// TODO remove SYSTEM.OUT.PRINTLN
 
-		final Display display = Display.getDefault();
+				if (isBrowserAvailable) {
 
-		if (Thread.currentThread() == display.getThread()) {
+					final String js = UI.EMPTY_STRING//
 
-			_browser.execute(js);
+							+ ("var tr = document.createElement('TR');\n") //$NON-NLS-1$
+
+							// time
+							+ ("var td = document.createElement('TD');\n") //$NON-NLS-1$
+							+ ("td.appendChild(document.createTextNode('" + importLog.time + "'));\n") //$NON-NLS-1$ //$NON-NLS-2$
+							+ ("tr.appendChild(td);\n") //$NON-NLS-1$
+
+							// state
+							+ ("var td = document.createElement('TD');\n") //$NON-NLS-1$
+							+ ("td.className='column icon';\n") //$NON-NLS-1$
+							+ stateWithBrowser[0]
+							+ ("tr.appendChild(td);\n") //$NON-NLS-1$
+
+							// message
+							+ ("var td = document.createElement('TD');\n") //$NON-NLS-1$
+							+ ("td.className='column logItem';\n") //$NON-NLS-1$
+							+ ("td.appendChild(document.createTextNode('" + message + "'));\n") //$NON-NLS-1$ //$NON-NLS-2$
+							+ ("tr.appendChild(td);\n") //$NON-NLS-1$
+
+							+ ("document.getElementById(\"" + DOM_ID_LOG + "\").tBodies[0].appendChild(tr);\n") //$NON-NLS-1$ //$NON-NLS-2$
+					;
+
+					_browser.execute(js);
+
+				} else {
+
+					addNoBrowserLog(noBrowserText);
+				}
+			}
+		});
+	}
+
+	private void addNoBrowserLog(final String newLogText) {
+
+		if (_noBrowserLog.length() == 0) {
+
+			_noBrowserLog = newLogText;
 
 		} else {
 
-			display.asyncExec(new Runnable() {
-				@Override
-				public void run() {
-
-					_browser.execute(js);
-				}
-			});
+			_noBrowserLog += UI.NEW_LINE1 + newLogText;
 		}
 
+		_txtNoBrowser.setText(_noBrowserLog);
 	}
 
 	/**
 	 * Clear browser.
 	 */
 	public void clear() {
+
+		_noBrowserLog = UI.EMPTY_STRING;
 		updateUI_InitBrowser();
 	}
 
@@ -157,8 +196,8 @@ public class ImportLogView extends ViewPart {
 
 		final StringBuilder sb = new StringBuilder();
 
-		sb.append("<div id='" + DOM_ID_LOG + "' class=''>\n"); //$NON-NLS-1$
-		sb.append("</div>\n"); //$NON-NLS-1$
+		sb.append("<table id='" + DOM_ID_LOG + "'><tbody>\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append("</tbody></table>\n"); //$NON-NLS-1$
 
 		return sb.toString();
 	}
@@ -175,20 +214,24 @@ public class ImportLogView extends ViewPart {
 
 	private void createUI(final Composite parent) {
 
+		final Color bgColor = Display.getCurrent().getSystemColor(SWT.COLOR_LIST_BACKGROUND);
+
 		_pageBook = new PageBook(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageBook);
 
 		_page_NoBrowser = new Composite(_pageBook, SWT.NONE);
-		_page_NoBrowser.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+		_page_NoBrowser.setBackground(bgColor);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(_page_NoBrowser);
 		GridLayoutFactory.swtDefaults().numColumns(1).applyTo(_page_NoBrowser);
 		{
-			_txtNoBrowser = new Text(_page_NoBrowser, SWT.WRAP | SWT.READ_ONLY);
-			_txtNoBrowser.setText(Messages.UI_Label_BrowserCannotBeCreated);
+			_txtNoBrowser = new Text(_page_NoBrowser, SWT.MULTI | SWT.READ_ONLY);
+			_txtNoBrowser.setBackground(bgColor);
 			GridDataFactory.fillDefaults()//
 					.grab(true, true)
-					.align(SWT.FILL, SWT.BEGINNING)
+					.align(SWT.FILL, SWT.FILL)
 					.applyTo(_txtNoBrowser);
+
+			addNoBrowserLog(Messages.UI_Label_BrowserCannotBeCreated);
 		}
 
 		_page_WithBrowser = new Composite(_pageBook, SWT.NONE);
@@ -219,19 +262,53 @@ public class ImportLogView extends ViewPart {
 				_browser = new Browser(parent, SWT.MOZILLA);
 			}
 
-			GridDataFactory.fillDefaults().grab(true, true).applyTo(_browser);
+			if (_browser != null) {
 
-			_browser.addProgressListener(new ProgressAdapter() {
-				@Override
-				public void completed(final ProgressEvent event) {
+				GridDataFactory.fillDefaults().grab(true, true).applyTo(_browser);
 
-					onBrowser_Completed(event);
-				}
-			});
+				_browser.addProgressListener(new ProgressAdapter() {
+					@Override
+					public void completed(final ProgressEvent event) {
+
+						onBrowser_Completed(event);
+					}
+				});
+			}
 
 		} catch (final SWTError e) {
 
-			_txtNoBrowser.setText(NLS.bind(Messages.UI_Label_BrowserCannotBeCreated_Error, e.getMessage()));
+			addNoBrowserLog(NLS.bind(Messages.UI_Label_BrowserCannotBeCreated_Error, e.getMessage()));
+		}
+	}
+
+	private void getImportState(final ImportLog importLog,
+								final String[] stateNoBrowser,
+								final String[] stateWithBrowser) {
+
+		switch (importLog.state) {
+
+		case OK:
+			stateNoBrowser[0] = STATE_OK;
+			stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateOK);
+			break;
+
+		case ERROR:
+			stateNoBrowser[0] = STATE_ERROR;
+			stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateError);
+			break;
+
+		case DELETE:
+			stateNoBrowser[0] = STATE_DELETE;
+			stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateDelete);
+			break;
+
+		case COPY:
+			stateNoBrowser[0] = STATE_COPY;
+			stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateCopy);
+			break;
+
+		default:
+			break;
 		}
 	}
 
@@ -254,6 +331,16 @@ public class ImportLogView extends ViewPart {
 			StatusUtil.log(e);
 		}
 
+	}
+
+	public boolean isDisposed() {
+
+		return _pageBook == null || _pageBook.isDisposed();
+	}
+
+	private String js_SetStyleBgImage(final String imageUrl) {
+		
+		return "td.style.backgroundImage=\"url('" + imageUrl + "')\";\n"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	private void onBrowser_Completed(final ProgressEvent event) {
@@ -283,14 +370,14 @@ public class ImportLogView extends ViewPart {
 	 */
 	private void updateUI() {
 
-		final boolean isBrowserAvailable = _browser != null;
+		final boolean isBrowserAvailable = _browser != null && _browser.isDisposed() == false;
 
 		// set dashboard page
 		_pageBook.showPage(isBrowserAvailable//
 				? _page_WithBrowser
 				: _page_NoBrowser);
 
-		if (!isBrowserAvailable) {
+		if (isBrowserAvailable == false) {
 			return;
 		}
 
@@ -299,7 +386,7 @@ public class ImportLogView extends ViewPart {
 
 	private void updateUI_InitBrowser() {
 
-		if (_browser.isDisposed()) {
+		if (_browser == null || _browser.isDisposed()) {
 			return;
 		}
 

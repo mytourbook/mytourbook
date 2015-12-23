@@ -41,7 +41,7 @@ public class EasyConfig {
 	static final int					STATE_TOOLTIP_WIDTH_MIN				= 300;
 	static final int					STATE_TOOLTIP_WIDTH_MAX				= 2000;
 
-	static final int					TILE_SIZE_DEFAULT					= 80;
+	static final int					TILE_SIZE_DEFAULT					= 100;
 	static final int					TILE_SIZE_MIN						= 20;
 	static final int					TILE_SIZE_MAX						= 300;
 

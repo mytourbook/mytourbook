@@ -769,12 +769,13 @@ public class EasyImportManager {
 		}
 
 		/*
-		 * Check backup folder
+		 * 01. Backup
 		 */
 		if (importConfig.isCreateBackup) {
 
 			final String backupOSFolder = importConfig.getBackupOSFolder();
 
+			// check backup folder
 			if (!isFolderValid(
 
 					backupOSFolder,
@@ -787,7 +788,7 @@ public class EasyImportManager {
 			}
 
 			// folder is valid, run the backup
-			final boolean isCanceled = runImport_Backup();
+			final boolean isCanceled = runImport_01_Backup();
 			if (isCanceled) {
 				return importState;
 			}
@@ -811,7 +812,7 @@ public class EasyImportManager {
 		}
 
 		/*
-		 * Import files
+		 * 02. Import files
 		 */
 		final ImportRunState importRunState = RawDataManager.getInstance().runImport(notImportedFiles);
 
@@ -828,7 +829,7 @@ public class EasyImportManager {
 	/**
 	 * @return Returns <code>true</code> when the backup is canceled.
 	 */
-	private boolean runImport_Backup() {
+	private boolean runImport_01_Backup() {
 
 		final EasyConfig easyConfig = getEasyConfig();
 		final ImportConfig importConfig = easyConfig.getActiveImportConfig();
@@ -844,6 +845,8 @@ public class EasyImportManager {
 		if (numBackupFiles == 0) {
 			return false;
 		}
+
+		RawDataManager.importLog_Add(ImportLogState.DEFAULT, "Backup tour files");
 
 		final boolean isCanceled[] = { false };
 
@@ -874,8 +877,11 @@ public class EasyImportManager {
 					try {
 
 						final Path devicePath = Paths.get(deviceOSFolder, backupFileName);
+						final Path targetPath = backupPath.resolve(backupFileName);
 
-						Files.copy(devicePath, backupPath.resolve(backupFileName));
+						Files.copy(devicePath, targetPath);
+
+						RawDataManager.importLog_Add(ImportLogState.COPY, devicePath + " -> " + targetPath);
 
 					} catch (final IOException e) {
 						StatusUtil.log(e);

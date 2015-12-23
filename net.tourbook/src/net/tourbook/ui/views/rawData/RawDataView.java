@@ -72,6 +72,7 @@ import net.tourbook.importdata.EasyImportManager;
 import net.tourbook.importdata.ImportConfig;
 import net.tourbook.importdata.ImportDeviceState;
 import net.tourbook.importdata.ImportLauncher;
+import net.tourbook.importdata.ImportLogState;
 import net.tourbook.importdata.OSFile;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.SpeedTourType;
@@ -225,6 +226,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	public static final String				STATE_IS_CREATE_TOUR_ID_WITH_TIME			= "isCreateTourIdWithTime";				//$NON-NLS-1$
 	public static final boolean				STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT	= false;
 	private static final String				STATE_IS_NEW_UI								= "STATE_IS_NEW_UI";						//$NON-NLS-1$
+	public static final String				STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW			= "STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW";	//$NON-NLS-1$
+	public static final boolean				STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW_DEFAULT	= true;
 	private static final String				STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED		= "STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED"; //$NON-NLS-1$
 	public static final String				STATE_IS_MERGE_TRACKS						= "isMergeTracks";							//$NON-NLS-1$
 	public static final boolean				STATE_IS_MERGE_TRACKS_DEFAULT				= false;
@@ -517,6 +520,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		 * Run the import
 		 */
 		ImportDeviceState importState = null;
+
+		RawDataManager.importLog_Reset();
 
 		try {
 
@@ -1061,17 +1066,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				+ ("	max-width: " + itemSize + "px;\n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("}\n"); //$NON-NLS-1$
 
-//
-//		{
-//			display:				none;
-//			z-index:				2000;
-//
-//			padding:				5px;
-//
-//			left:					6px;
-//			max-height:				80vh;
-//		}
-
 		/*
 		 * State tooltip
 		 */
@@ -1079,7 +1073,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		//
 				+ (".stateTooltip\n") //$NON-NLS-1$
 				+ ("{\n") //$NON-NLS-1$
-				+ ("	min-width:" + easyConfig.stateToolTipWidth + "px;\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("	width:" + easyConfig.stateToolTipWidth + "px;\n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("}\n"); //$NON-NLS-1$
 
 		/*
@@ -1593,7 +1587,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		for (final OSFile deviceFile : notImportedFiles) {
 
-			final String fileMoveState = deviceFile.isBackupImportFile ? "M" : UI.EMPTY_STRING; //$NON-NLS-1$
+			final String fileMoveState = deviceFile.isBackupImportFile
+					? Messages.Import_Data_HTML_Title_Moved_State
+					: UI.EMPTY_STRING;
+
 			final String filePathName = UI.replaceHTML_BackSlash(deviceFile.getPath().getParent().toString());
 
 			sb.append(HTML_TR);
@@ -2350,20 +2347,23 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private Composite createUI_20_Page_Dashboard(final Composite parent) {
 
+		final Color bgColor = Display.getCurrent().getSystemColor(SWT.COLOR_LIST_BACKGROUND);
+
 		_dashboard_PageBook = new PageBook(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(_dashboard_PageBook);
 
 		_dashboardPage_NoBrowser = new Composite(_dashboard_PageBook, SWT.NONE);
+		_dashboardPage_NoBrowser.setBackground(bgColor);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(_dashboardPage_NoBrowser);
 		GridLayoutFactory.swtDefaults().numColumns(1).applyTo(_dashboardPage_NoBrowser);
-		_dashboardPage_NoBrowser.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 		{
 			_txtNoBrowser = new Text(_dashboardPage_NoBrowser, SWT.WRAP | SWT.READ_ONLY);
+			_txtNoBrowser.setText(Messages.UI_Label_BrowserCannotBeCreated);
+			_txtNoBrowser.setBackground(bgColor);
 			GridDataFactory.fillDefaults()//
 					.grab(true, true)
 					.align(SWT.FILL, SWT.BEGINNING)
 					.applyTo(_txtNoBrowser);
-			_txtNoBrowser.setText(Messages.UI_Label_BrowserCannotBeCreated);
 		}
 
 		_dashboardPage_WithBrowser = new Composite(_dashboard_PageBook, SWT.NONE);
@@ -2396,38 +2396,44 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				_browser = new Browser(parent, SWT.MOZILLA);
 			}
 
-			GridDataFactory.fillDefaults().grab(true, true).applyTo(_browser);
+			if (_browser != null) {
 
-//			final BrowserFunction function =
-			new JS_OnSelectImportConfig(_browser, JS_FUNCTION_ON_SELECT_IMPORT_CONFIG);
+				GridDataFactory.fillDefaults().grab(true, true).applyTo(_browser);
 
-			_browser.addLocationListener(new LocationAdapter() {
+				new JS_OnSelectImportConfig(_browser, JS_FUNCTION_ON_SELECT_IMPORT_CONFIG);
 
-				@Override
-				public void changed(final LocationEvent event) {
+				_browser.addLocationListener(new LocationAdapter() {
 
-//					_browser.removeLocationListener(this);
-//					function.dispose();
-				}
+					@Override
+					public void changed(final LocationEvent event) {
 
-				@Override
-				public void changing(final LocationEvent event) {
-					onBrowser_LocationChanging(event);
-				}
-			});
+//						_browser.removeLocationListener(this);
+//						function.dispose();
+					}
 
-			_browser.addProgressListener(new ProgressAdapter() {
-				@Override
-				public void completed(final ProgressEvent event) {
+					@Override
+					public void changing(final LocationEvent event) {
+						onBrowser_LocationChanging(event);
+					}
+				});
 
-					onBrowser_Completed(event);
+				_browser.addProgressListener(new ProgressAdapter() {
+					@Override
+					public void completed(final ProgressEvent event) {
 
-				}
-			});
+						onBrowser_Completed(event);
+
+					}
+				});
+			}
 
 		} catch (final SWTError e) {
 
 			_txtNoBrowser.setText(NLS.bind(Messages.UI_Label_BrowserCannotBeCreated_Error, e.getMessage()));
+
+		} finally {
+
+			showFailbackUI();
 		}
 	}
 
@@ -3127,10 +3133,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		try {
 
 			filePath = Paths.get(fileFolder, fileName);
+			final String filePathName = filePath.toString();
 
 			Files.delete(filePath);
 
-			deletedFiles.add(filePath.toString());
+			RawDataManager.importLog_Add(ImportLogState.DELETE, filePathName);
+
+			deletedFiles.add(filePathName);
 
 		} catch (final Exception e) {
 
@@ -3183,6 +3192,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	 *            backup folder.
 	 */
 	private void doDeleteTourFiles(final boolean isDeleteAllFiles, final ArrayList<TourData> allTourData) {
+
+		RawDataManager.importLog_Add(ImportLogState.DEFAULT, "Delete tour files");
 
 		if (isDeleteAllFiles) {
 
@@ -4193,6 +4204,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		_isNewUI = true;
 		updateUI_1_TopPage(true);
+
+		showFailbackUI();
 	}
 
 	private void onSelectUI_Old() {
@@ -4418,7 +4431,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		// restore: set merge tracks status before the tours are imported
 		final boolean isCreateTourIdWithTime = _state.getBoolean(STATE_IS_CREATE_TOUR_ID_WITH_TIME);
-		_rawDataMgr.setCreateTourIdWithTime(isCreateTourIdWithTime);
+		_rawDataMgr.setState_CreateTourIdWithTime(isCreateTourIdWithTime);
+
+		// auto open import log view
+		final boolean isAutoOpenLogView = Util.getStateBoolean(_state,//
+				STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW,
+				RawDataView.STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW_DEFAULT);
+		_rawDataMgr.setState_IsOpenImportLogView(isAutoOpenLogView);
 
 		// restore: is checksum validation
 		final boolean isValidation = _state.getBoolean(STATE_IS_CHECKSUM_VALIDATION);
@@ -4551,6 +4570,21 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		thread_WatchStores_Start();
 		thread_FolderWatcher_Activate();
+	}
+
+	private void showFailbackUI() {
+
+		if (_browser == null || _browser.isDisposed()) {
+
+			// show OLD UI after 5 seconds
+			Display.getDefault().timerExec(5000, new Runnable() {
+				@Override
+				public void run() {
+
+					onSelectUI_Old();
+				}
+			});
+		}
 	}
 
 	private void thread_FolderWatcher_Activate() {

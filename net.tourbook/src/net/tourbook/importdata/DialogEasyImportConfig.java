@@ -2050,8 +2050,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 				 */
 				final Spinner spinnerValue = new Spinner(_speedTourType_Container, SWT.BORDER);
 				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(spinnerValue);
-				spinnerValue.setMinimum(EasyConfig.TOUR_TYPE_AVG_SPEED_MIN);
 				spinnerValue.setMaximum(EasyConfig.TOUR_TYPE_AVG_SPEED_MAX);
+				spinnerValue.setMinimum(EasyConfig.TOUR_TYPE_AVG_SPEED_MIN);
 				spinnerValue.setToolTipText(Messages.Dialog_ImportConfig_Spinner_Speed_Tooltip);
 				spinnerValue.addMouseWheelListener(_defaultMouseWheelListener);
 
@@ -2212,8 +2212,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 			{
 				// spinner: distance 1.1 km
 				_spinnerIL_LastMarkerDistance = new Spinner(container, SWT.BORDER);
-				_spinnerIL_LastMarkerDistance.setMinimum(EasyConfig.LAST_MARKER_DISTANCE_MIN);
 				_spinnerIL_LastMarkerDistance.setMaximum(EasyConfig.LAST_MARKER_DISTANCE_MAX / 100);
+				_spinnerIL_LastMarkerDistance.setMinimum(EasyConfig.LAST_MARKER_DISTANCE_MIN);
 				_spinnerIL_LastMarkerDistance.setDigits(1);
 				_spinnerIL_LastMarkerDistance.addMouseWheelListener(lastMarkerMouseWheelListener);
 				_spinnerIL_LastMarkerDistance.addSelectionListener(lastMarkerSelectionListener);
@@ -2309,23 +2309,24 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 				 * Tile size
 				 */
 				// label
-				final Label label = new Label(container, SWT.NONE);
+				Label label = new Label(container, SWT.NONE);
 				label.setText(Messages.Dialog_ImportConfig_Label_ConfigTileSize);
 				label.setToolTipText(Messages.Dialog_ImportConfig_Label_ConfigTileSize_Tooltip);
 				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
 
 				// spinner
 				_spinnerDash_TileSize = new Spinner(container, SWT.BORDER);
-				_spinnerDash_TileSize.setMinimum(EasyConfig.TILE_SIZE_MIN);
 				_spinnerDash_TileSize.setMaximum(EasyConfig.TILE_SIZE_MAX);
+				_spinnerDash_TileSize.setMinimum(EasyConfig.TILE_SIZE_MIN);
 				_spinnerDash_TileSize.addSelectionListener(_liveUpdateListener);
 				_spinnerDash_TileSize.addMouseWheelListener(_liveUpdateMouseWheelListener);
 				GridDataFactory.fillDefaults()//
 						.align(SWT.FILL, SWT.CENTER)
 						.applyTo(_spinnerDash_TileSize);
 
-				// fill 3rd column
-				new Label(container, SWT.NONE);
+				// label: px
+				label = new Label(container, SWT.NONE);
+				label.setText(CSS_PX);
 			}
 			{
 				/*
@@ -2339,8 +2340,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
 				// spinner
 				_spinnerDash_NumHTiles = new Spinner(container, SWT.BORDER);
-				_spinnerDash_NumHTiles.setMinimum(EasyConfig.HORIZONTAL_TILES_MIN);
 				_spinnerDash_NumHTiles.setMaximum(EasyConfig.HORIZONTAL_TILES_MAX);
+				_spinnerDash_NumHTiles.setMinimum(EasyConfig.HORIZONTAL_TILES_MIN);
 				_spinnerDash_NumHTiles.addSelectionListener(_liveUpdateListener);
 				_spinnerDash_NumHTiles.addMouseWheelListener(_liveUpdateMouseWheelListener);
 				GridDataFactory.fillDefaults()//
@@ -2361,8 +2362,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
 				// spinner
 				_spinnerDash_StateTooltipWidth = new Spinner(container, SWT.BORDER);
-				_spinnerDash_StateTooltipWidth.setMinimum(EasyConfig.STATE_TOOLTIP_WIDTH_MIN);
 				_spinnerDash_StateTooltipWidth.setMaximum(EasyConfig.STATE_TOOLTIP_WIDTH_MAX);
+				_spinnerDash_StateTooltipWidth.setMinimum(EasyConfig.STATE_TOOLTIP_WIDTH_MIN);
 				_spinnerDash_StateTooltipWidth.addSelectionListener(_liveUpdateListener);
 				_spinnerDash_StateTooltipWidth.addMouseWheelListener(_liveUpdateMouseWheelListener);
 				GridDataFactory.fillDefaults()//
@@ -2385,8 +2386,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
 				// spinner
 				_spinnerDash_AnimationDuration = new Spinner(container, SWT.BORDER);
-				_spinnerDash_AnimationDuration.setMinimum(EasyConfig.ANIMATION_DURATION_MIN);
 				_spinnerDash_AnimationDuration.setMaximum(EasyConfig.ANIMATION_DURATION_MAX);
+				_spinnerDash_AnimationDuration.setMinimum(EasyConfig.ANIMATION_DURATION_MIN);
 				_spinnerDash_AnimationDuration.setDigits(1);
 				_spinnerDash_AnimationDuration.addSelectionListener(_liveUpdateListener);
 				_spinnerDash_AnimationDuration.addMouseWheelListener(_liveUpdateMouseWheelListener);
@@ -2412,8 +2413,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
 				// spinner
 				_spinnerDash_AnimationCrazinessFactor = new Spinner(container, SWT.BORDER);
-				_spinnerDash_AnimationCrazinessFactor.setMinimum(EasyConfig.ANIMATION_CRAZINESS_FACTOR_MIN);
 				_spinnerDash_AnimationCrazinessFactor.setMaximum(EasyConfig.ANIMATION_CRAZINESS_FACTOR_MAX);
+				_spinnerDash_AnimationCrazinessFactor.setMinimum(EasyConfig.ANIMATION_CRAZINESS_FACTOR_MIN);
 				_spinnerDash_AnimationCrazinessFactor.addSelectionListener(_liveUpdateListener);
 				_spinnerDash_AnimationCrazinessFactor.addMouseWheelListener(_liveUpdateMouseWheelListener);
 				GridDataFactory.fillDefaults()//
@@ -2437,8 +2438,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
 				// spinner
 				_spinnerDash_BgOpacity = new Spinner(container, SWT.BORDER);
-				_spinnerDash_BgOpacity.setMinimum(EasyConfig.BACKGROUND_OPACITY_MIN);
 				_spinnerDash_BgOpacity.setMaximum(EasyConfig.BACKGROUND_OPACITY_MAX);
+				_spinnerDash_BgOpacity.setMinimum(EasyConfig.BACKGROUND_OPACITY_MIN);
 				_spinnerDash_BgOpacity.addSelectionListener(_liveUpdateListener);
 				_spinnerDash_BgOpacity.addMouseWheelListener(_liveUpdateMouseWheelListener);
 				GridDataFactory.fillDefaults()//

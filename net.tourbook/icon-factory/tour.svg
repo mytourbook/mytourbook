@@ -20,6 +20,17 @@
   <defs
      id="defs2987">
     <linearGradient
+       id="linearGradient5160">
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="0"
+         id="stop6518" />
+      <stop
+         id="stop6520"
+         offset="1"
+         style="stop-color:#369df7;stop-opacity:1;" />
+    </linearGradient>
+    <linearGradient
        inkscape:collect="always"
        id="linearGradient4984">
       <stop
@@ -378,7 +389,7 @@
          id="stop4089" />
     </linearGradient>
     <linearGradient
-       id="linearGradient5160">
+       id="linearGradient6522">
       <stop
          id="stop5162"
          offset="0"
@@ -3976,7 +3987,7 @@
          offset="0"
          style="stop-color:#ffffff;stop-opacity:1;" />
       <stop
-         style="stop-color:#369df7;stop-opacity:1;"
+         style="stop-color:#969696;stop-opacity:1;"
          offset="1"
          id="stop5168-48-8" />
     </linearGradient>
@@ -4142,17 +4153,17 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="22.627418"
-     inkscape:cx="198.9085"
-     inkscape:cy="919.82742"
+     inkscape:zoom="32.000001"
+     inkscape:cx="129.94589"
+     inkscape:cy="851.3786"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
-     inkscape:window-width="1542"
-     inkscape:window-height="1337"
-     inkscape:window-x="298"
-     inkscape:window-y="71"
-     inkscape:window-maximized="1"
+     inkscape:window-width="1530"
+     inkscape:window-height="1362"
+     inkscape:window-x="369"
+     inkscape:window-y="46"
+     inkscape:window-maximized="0"
      inkscape:snap-grids="true"
      inkscape:snap-page="false"
      inkscape:snap-to-guides="false"
@@ -4943,7 +4954,7 @@
        height="16"
        x="120.00002"
        y="186.36218"
-       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\state-trash.png"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\state-delete.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <path
@@ -4952,7 +4963,7 @@
        id="path5040"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="ccc"
-       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\state-trash.png"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\state-delete.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <path
@@ -4961,7 +4972,7 @@
        id="rect5042"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="ccccc"
-       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\state-trash.png"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\state-delete.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <path
@@ -4970,7 +4981,7 @@
        id="rect5042-8"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="ccccc"
-       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\state-trash.png"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\state-delete.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <path
@@ -4979,7 +4990,7 @@
        id="path5040-6"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="ccc"
-       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\state-trash.png"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\state-delete.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <path
@@ -4988,7 +4999,7 @@
        id="path5040-6-4"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="ccc"
-       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\state-trash.png"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\state-delete.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <rect
@@ -5292,6 +5303,34 @@
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="ccc"
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\imported-tours-log.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:#969696;fill-opacity:1;stroke:none"
+       d="m 140,97.362183 13.78461,0 c -0.0276,-3.492472 -2.62437,-7.726776 -6.89231,-7.753837 -4.25561,0 -6.85424,4.310498 -6.8923,7.753837 z"
+       id="path5150-9-29-7"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccc"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\state-copy.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:#369df7;fill-opacity:1;stroke:none"
+       d="m 142,99.362182 13.78461,0 c -0.0276,-3.492471 -2.62437,-7.726775 -6.89231,-7.753835 -4.25561,0 -6.85424,4.310498 -6.8923,7.753836 z"
+       id="path5150-9-29"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccc"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\state-copy.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <rect
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:none;stroke:#158cf7;stroke-width:0;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
+       id="rect4471-8-7"
+       width="16"
+       height="16"
+       x="140"
+       y="86.362175"
+       inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\state-copy.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
   </g>

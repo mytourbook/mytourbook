@@ -137,10 +137,11 @@ public class RawDataManager {
 	//
 	private int												_importState_ImportYear				= ADJUST_IMPORT_YEAR_IS_DISABLED;
 
+	private static boolean									_importState_IsAutoOpenImportLog	= RawDataView.STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW_DEFAULT;
 	private boolean											_importState_IsConvertWayPoints		= RawDataView.STATE_IS_CONVERT_WAYPOINTS_DEFAULT;
 	private boolean											_importState_IsCreateTourIdWithTime	= RawDataView.STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT;
-	private boolean											_importState_IsMergeTracks			= RawDataView.STATE_IS_MERGE_TRACKS_DEFAULT;
 	private boolean											_importState_IsChecksumValidation	= RawDataView.STATE_IS_CHECKSUM_VALIDATION_DEFAULT;
+	private boolean											_importState_IsMergeTracks			= RawDataView.STATE_IS_MERGE_TRACKS_DEFAULT;
 
 	private List<TourbookDevice>							_devicesBySortPriority;
 
@@ -154,7 +155,7 @@ public class RawDataManager {
 	 */
 	private IPath											_previousSelectedReimportFolder;
 
-	private ImportLogView									_logView;
+	private static ImportLogView							_logView;
 
 	/**
 	 * This is a wrapper to keep the {@link #isBackupImportFile} state.
@@ -183,7 +184,22 @@ public class RawDataManager {
 	private RawDataManager() {
 
 		// set first log entry
-		_importLogs.add(new ImportLog("Import initialized"));
+		_importLogs.add(new ImportLog(ImportLogState.DEFAULT, "Import initialized"));
+	}
+
+	private static void autoOpenLogView() {
+
+		if (_logView == null || _logView.isDisposed()) {
+
+			_logView = (ImportLogView) Util.showView(ImportLogView.ID, true);
+		}
+	}
+
+	private static boolean canDisplayImportLog() {
+
+		final boolean isLogViewOpen = _logView != null && _logView.isDisposed();
+
+		return _importState_IsAutoOpenImportLog || isLogViewOpen;
 	}
 
 	public static CopyOnWriteArrayList<ImportLog> getImportLogs() {
@@ -206,6 +222,34 @@ public class RawDataManager {
 		return TourbookPlugin.getDefault().getStateLocation().toFile().getAbsolutePath();
 	}
 
+	public static void importLog_Add(final ImportLogState logState, final String message) {
+
+		final ImportLog importLog = new ImportLog(logState, message);
+
+		// update model
+		_importLogs.add(importLog);
+
+		// update UI
+		if (canDisplayImportLog()) {
+
+			autoOpenLogView();
+			_logView.addLog(importLog);
+		}
+	}
+
+	public static void importLog_Reset() {
+
+		// update model
+		_importLogs.clear();
+
+		// update UI
+		if (canDisplayImportLog()) {
+
+			autoOpenLogView();
+			_logView.clear();
+		}
+	}
+
 	public static void showMsgBoxInvalidFormat(final ArrayList<String> notImportedFiles) {
 
 		Display.getDefault().syncExec(new Runnable() {
@@ -220,7 +264,7 @@ public class RawDataManager {
 
 				final String errorMessage = NLS.bind(Messages.DataImport_Error_invalid_data_format, fileText.toString());
 				MessageDialog.openError(Display.getDefault().getActiveShell(), Messages.app_error_title, errorMessage);
-
+				a = 0;
 				System.out.println(errorMessage);
 			}
 		});
@@ -317,6 +361,8 @@ public class RawDataManager {
 
 			osFiles.add(osFile);
 		}
+
+		importLog_Reset();
 
 		runImport(osFiles);
 	}
@@ -901,18 +947,6 @@ public class RawDataManager {
 		}
 	}
 
-	private void addImportLog(final String message) {
-
-		final ImportLog importLog = new ImportLog(message);
-
-		// update model
-		_importLogs.add(importLog);
-
-		// update UI
-		_logView.addLog(importLog);
-
-	}
-
 	public DeviceData getDeviceData() {
 		return _deviceData;
 	}
@@ -1450,13 +1484,7 @@ public class RawDataManager {
 
 		final long start = System.currentTimeMillis();
 
-		_logView = (ImportLogView) Util.showView(ImportLogView.ID, true);
-
-		// reset import log
-		_logView.clear();
-		_importLogs.clear();
-
-		addImportLog("Import start");
+		importLog_Add(ImportLogState.DEFAULT, "Import tour files");
 
 		// check if devices are loaded
 		if (_devicesByExtension == null) {
@@ -1550,7 +1578,7 @@ public class RawDataManager {
 
 						importCounter++;
 
-						addImportLog("<span class='stateOK'>OK</span> " + osFilePath);
+						importLog_Add(ImportLogState.OK, osFilePath);
 
 						// update state
 						for (final TourData importedTourData : _newlyImportedTours.values()) {
@@ -1561,7 +1589,7 @@ public class RawDataManager {
 
 						notImportedFiles.add(osFilePath);
 
-						addImportLog("<span class='stateError'>Error</span> " + osFilePath);
+						importLog_Add(ImportLogState.ERROR, osFilePath);
 					}
 				}
 
@@ -1582,10 +1610,6 @@ public class RawDataManager {
 						}
 					});
 				}
-
-				if (notImportedFiles.size() > 0) {
-//					showMsgBoxInvalidFormat(notImportedFiles);
-				}
 			}
 		};
 
@@ -1596,13 +1620,9 @@ public class RawDataManager {
 		}
 
 		final double time = (System.currentTimeMillis() - start) / 1000.0;
-		addImportLog(String.format("Import end, %.3f s", time));
+		importLog_Add(ImportLogState.DEFAULT, String.format("Import end, %.3f s", time));
 
 		return importRunState;
-	}
-
-	public void setCreateTourIdWithTime(final boolean isActionChecked) {
-		_importState_IsCreateTourIdWithTime = isActionChecked;
 	}
 
 	public void setImportCanceled(final boolean importCanceled) {
@@ -1629,8 +1649,15 @@ public class RawDataManager {
 	}
 
 	public void setState_ConvertWayPoints(final boolean isConvertWayPoints) {
-
 		_importState_IsConvertWayPoints = isConvertWayPoints;
+	}
+
+	public void setState_CreateTourIdWithTime(final boolean isActionChecked) {
+		_importState_IsCreateTourIdWithTime = isActionChecked;
+	}
+
+	public void setState_IsOpenImportLogView(final boolean isOpenImportLog) {
+		_importState_IsAutoOpenImportLog = isOpenImportLog;
 	}
 
 	private RawDataView showRawDataView() {

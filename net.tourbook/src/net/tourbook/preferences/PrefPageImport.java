@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -38,11 +38,11 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageImport extends PreferencePage implements IWorkbenchPreferencePage {
 
-	public static final String		ID				= "net.tourbook.preferences.PrefPageImport";	//$NON-NLS-1$
+	public static final String		ID			= "net.tourbook.preferences.PrefPageImport";	//$NON-NLS-1$
 
-	private final IDialogSettings	_importState	= TourbookPlugin.getState(RawDataView.ID);
+	private final IDialogSettings	_state		= TourbookPlugin.getState(RawDataView.ID);
 
-	private RawDataManager			_rawDataMgr		= RawDataManager.getInstance();
+	private RawDataManager			_rawDataMgr	= RawDataManager.getInstance();
 
 	private PixelConverter			_pc;
 
@@ -50,6 +50,7 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
 	 * UI controls
 	 */
 	private Button					_chkCreateTourIdWithTime;
+	private Button					_chkAutoOpenImportLog;
 
 	private Label					_txtIdInfo;
 
@@ -72,19 +73,37 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
 		{
-			// label: common info
 			{
+				/*
+				 * Label: common info
+				 */
 				final Label label = new Label(container, SWT.NONE);
-				GridDataFactory.fillDefaults().applyTo(label);
 				label.setText(Messages.PrefPage_Import_Label_Info);
+				GridDataFactory.fillDefaults().applyTo(label);
 			}
 
-			// checkbox: create tour id with time
 			{
-				_chkCreateTourIdWithTime = new Button(container, SWT.CHECK);
+				/*
+				 * Checkbox: Open import log
+				 */
+				_chkAutoOpenImportLog = new Button(container, SWT.CHECK);
+				_chkAutoOpenImportLog.setText(Messages.PrefPage_Import_Checkbox_AutoOpenImportLogView);
+				_chkAutoOpenImportLog.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						enableControls();
+					}
+				});
 				GridDataFactory.fillDefaults()//
 						.indent(0, _pc.convertVerticalDLUsToPixels(4))
-						.applyTo(_chkCreateTourIdWithTime);
+						.applyTo(_chkAutoOpenImportLog);
+			}
+
+			{
+				/*
+				 * Checkbox: create tour id with time
+				 */
+				_chkCreateTourIdWithTime = new Button(container, SWT.CHECK);
 				_chkCreateTourIdWithTime.setText(Messages.PrefPage_Import_Checkbox_CreateTourIdWithTime);
 				_chkCreateTourIdWithTime.addSelectionListener(new SelectionAdapter() {
 					@Override
@@ -92,17 +111,22 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
 						enableControls();
 					}
 				});
+				GridDataFactory.fillDefaults()//
+//						.indent(0, _pc.convertVerticalDLUsToPixels(4))
+						.applyTo(_chkCreateTourIdWithTime);
 			}
 
-			// text: id info
 			{
+				/*
+				 * Text: id info
+				 */
 				_txtIdInfo = new Label(container, SWT.WRAP | SWT.READ_ONLY);
+				_txtIdInfo.setText(Messages.PrefPage_Import_Checkbox_CreateTourIdWithTime_Tooltip);
 				GridDataFactory.fillDefaults()//
 						.grab(true, false)
 						.indent(_pc.convertHorizontalDLUsToPixels(10), 0)
 						.hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
 						.applyTo(_txtIdInfo);
-				_txtIdInfo.setText(Messages.PrefPage_Import_Checkbox_CreateTourIdWithTime_Tooltip);
 			}
 		}
 
@@ -151,18 +175,29 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
 	private void restoreState() {
 
 		final boolean isCreateTourIdWithTime = Util.getStateBoolean(
-				_importState,
+				_state,
 				RawDataView.STATE_IS_CREATE_TOUR_ID_WITH_TIME,
 				RawDataView.STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT);
 
+		final boolean isOpenImportLog = Util.getStateBoolean(
+				_state,
+				RawDataView.STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW,
+				RawDataView.STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW_DEFAULT);
+
 		_chkCreateTourIdWithTime.setSelection(isCreateTourIdWithTime);
+		_chkAutoOpenImportLog.setSelection(isOpenImportLog);
 	}
 
 	private void saveState() {
 
 		final boolean isCreateTourIdWithTime = _chkCreateTourIdWithTime.getSelection();
-		_importState.put(RawDataView.STATE_IS_CREATE_TOUR_ID_WITH_TIME, isCreateTourIdWithTime);
-		_rawDataMgr.setCreateTourIdWithTime(isCreateTourIdWithTime);
+		final boolean isOpenImportLog = _chkAutoOpenImportLog.getSelection();
+
+		_state.put(RawDataView.STATE_IS_CREATE_TOUR_ID_WITH_TIME, isCreateTourIdWithTime);
+		_state.put(RawDataView.STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW, isOpenImportLog);
+
+		_rawDataMgr.setState_CreateTourIdWithTime(isCreateTourIdWithTime);
+		_rawDataMgr.setState_IsOpenImportLogView(isOpenImportLog);
 	}
 
 }
