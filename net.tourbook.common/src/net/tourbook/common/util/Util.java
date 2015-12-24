@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -68,9 +68,6 @@ import org.joda.time.DateTime;
 import org.xml.sax.Attributes;
 
 public class Util {
-
-	private static final String	URL_SPACE								= " ";					//$NON-NLS-1$
-	private static final String	URL_SPACE_REPLACEMENT					= "%20";				//$NON-NLS-1$
 
 //	public static final String	UNIQUE_ID_SUFFIX_CICLO_TOUR				= "83582";				//$NON-NLS-1$
 	public static final String	UNIQUE_ID_SUFFIX_GARMIN_FIT				= "12653";				//$NON-NLS-1$
@@ -503,10 +500,6 @@ public class Util {
 		}
 
 		return sb.toString();
-	}
-
-	public static String encodeSpace(final String urlString) {
-		return urlString.replaceAll(URL_SPACE, URL_SPACE_REPLACEMENT);
 	}
 
 	public static boolean getBoolean(final Object data) {

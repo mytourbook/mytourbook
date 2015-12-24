@@ -100,7 +100,9 @@ public class WEB {
 																							: WEB_CONTENT_RELEASE_FOLDER;
 
 	public static final String				UTF_8									= "UTF-8";										//$NON-NLS-1$
-	private static final String				ENCODED_SPACE							= "%20";										//$NON-NLS-1$
+
+	private static final String				URL_SPACE								= " ";											//$NON-NLS-1$
+	private static final String				URL_SPACE_REPLACEMENT					= "%20";										//$NON-NLS-1$
 
 	public static final String				RESPONSE_HEADER_ACCEPT_LANGUAGE			= "Accept-Language";							//$NON-NLS-1$
 	private static final String				RESPONSE_HEADER_CONTENT_ENCODING		= "Content-Encoding";							//$NON-NLS-1$
@@ -147,20 +149,8 @@ public class WEB {
 	/**
 	 * Replace space characters with <code>%20</code>.
 	 */
-	private static String encodeUrlForSpaces(final char[] url) {
-
-		final StringBuffer encodedUrl = new StringBuffer(url.length);
-
-		for (final char element : url) {
-
-			if (element == ' ') {
-				encodedUrl.append(ENCODED_SPACE);
-			} else {
-				encodedUrl.append(element);
-			}
-		}
-
-		return encodedUrl.toString();
+	public static String encodeSpace(final String urlString) {
+		return urlString.replaceAll(URL_SPACE, URL_SPACE_REPLACEMENT);
 	}
 
 	/**
@@ -281,7 +271,9 @@ public class WEB {
 		}
 
 		final URL fileUrl = FileLocator.toFileURL(bundleUrl);
-		final File file = new File(fileUrl.toURI());
+		final String encodedFileUrl = encodeSpace(fileUrl.toExternalForm());
+		final URI uri = new URI(encodedFileUrl);
+		final File file = new File(uri);
 
 		return file;
 	}
@@ -353,7 +345,7 @@ public class WEB {
 		try {
 
 			final IWebBrowser browser = support.getExternalBrowser();
-			browser.openURL(new URL(encodeUrlForSpaces(href.toCharArray())));
+			browser.openURL(new URL(encodeSpace(href)));
 
 		} catch (final MalformedURLException e) {
 			StatusUtil.showStatus(e);
@@ -364,7 +356,7 @@ public class WEB {
 
 	private static void openUrl_WithExternalBrowser(final String externalWebBrowser, final String url) {
 
-		final String encodedUrl = Util.encodeSpace(url);
+		final String encodedUrl = encodeSpace(url);
 
 		final ArrayList<String> commands = new ArrayList<String>();
 
