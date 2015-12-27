@@ -1,39 +1,46 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.views.rawData;
+package net.tourbook.tour;
 
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.util.Util;
 
-import org.eclipse.jface.action.Action;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.DateTimeFormatterBuilder;
 
-public class ActionOpenLogView extends Action {
+public class TourLog {
 
-	public ActionOpenLogView() {
+	private final DateTimeFormatter	_dtFormatterTime	= new DateTimeFormatterBuilder()
+																.appendHourOfDay(2)
+																.appendLiteral(':')
+																.appendMinuteOfHour(2)
+																.appendLiteral(':')
+																.appendSecondOfMinute(2)
+																.appendLiteral(',')
+																.appendFractionOfSecond(3, 3)
+																.toFormatter();
 
-		setText(Messages.Import_Data_Action_OpenLogView);
-		setToolTipText(Messages.Import_Data_Action_OpenLogView_Tooltip);
+	public String					time;
+	public TourLogState				state;
+	public String					message;
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__RawData_ImportLog));
-	}
+	public TourLog(final TourLogState state, final String message) {
 
-	@Override
-	public void run() {
-		Util.showView(ImportLogView.ID, true);
+		this.time = _dtFormatterTime.print(System.currentTimeMillis());
+
+		this.state = state;
+		this.message = message;
 	}
 
 }

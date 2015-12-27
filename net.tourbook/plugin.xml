@@ -761,6 +761,13 @@
 			<separator
 				name="g_Log"
 				visible="true"/>
+				
+			<!-- Tour Log-->
+			<command
+         commandId="command.net.tourbook.tour.TourLogView"
+         icon="icons/tour-log.png"
+         label="%Command_TourLog_View"
+         mnemonic="%Command_TourLog_View_Mnemonic"/>
 			
 			<!-- Error Log -->
 			<command
@@ -1054,9 +1061,9 @@
             defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTourImport"
             />
       <command
-            id="command.net.tourbook.views.rawData.ImportLogView"
-            name="%view_name_Data_ImportLog"
-            defaultHandler="net.tourbook.ui.views.ActionHandler_OpenView_TourImportLog"
+            id="command.net.tourbook.tour.TourLogView"
+            name="%View_Name_TourLog"
+            defaultHandler="net.tourbook.ui.views.ActionHandler_OpenView_TourLog"
             />
       <command
             id="command.net.tourbook.views.tourListView"
@@ -1427,10 +1434,10 @@
 				name="%View_Name_TourMarkerAll"/>
 			<view
 				category="net.tourbook.category.tourList"
-				class="net.tourbook.ui.views.rawData.ImportLogView"
-				icon="icons/imported-tours-log.png"
-				id="net.tourbook.views.rawData.ImportLogView"
-				name="%view_name_Data_ImportLog"/>
+				class="net.tourbook.tour.TourLogView"
+				icon="icons/tour-log.png"
+				id="net.tourbook.tour.TourLogView"
+				name="%View_Name_TourLog"/>
 
 
 		<!-- 2. Tour Properties -->

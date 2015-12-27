@@ -72,7 +72,6 @@ import net.tourbook.importdata.EasyImportManager;
 import net.tourbook.importdata.ImportConfig;
 import net.tourbook.importdata.ImportDeviceState;
 import net.tourbook.importdata.ImportLauncher;
-import net.tourbook.importdata.ImportLogState;
 import net.tourbook.importdata.OSFile;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.SpeedTourType;
@@ -91,6 +90,9 @@ import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourDoubleClickState;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourLogManager;
+import net.tourbook.tour.TourLogState;
+import net.tourbook.tour.TourLogView;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourTypeMenuManager;
 import net.tourbook.ui.ITourProviderAll;
@@ -294,7 +296,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	//
 	// context menu actions
 	private ActionClearView					_actionClearView;
-	private ActionOpenLogView				_actionOpenLogView;
+	private ActionOpenTourLogView			_actionOpenTourLogView;
 	private ActionDeleteTourFiles			_actionDeleteTourFile;
 	private ActionExport					_actionExportTour;
 	private ActionEditQuick					_actionEditQuick;
@@ -466,138 +468,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
 	}
 
-	private void action_Easy_RunImport(final long tileId) {
-
-		if (isWatchingOn() == false) {
-
-			/*
-			 * It can be dangerous pressing an import tile and the UI is dimmed, so it's almost
-			 * invisible what is clicked.
-			 */
-
-			return;
-		}
-
-		final EasyConfig easyConfig = getEasyConfig();
-		final ImportConfig importConfig = easyConfig.getActiveImportConfig();
-
-		/*
-		 * Get import launcher
-		 */
-		ImportLauncher importLauncher = null;
-
-		for (final ImportLauncher launcher : easyConfig.importLaunchers) {
-			if (launcher.getId() == tileId) {
-				importLauncher = launcher;
-				break;
-			}
-		}
-
-		if (importLauncher == null) {
-			// this should not occure
-			return;
-		}
-
-		/*
-		 * Check person
-		 */
-		TourPerson person = null;
-		if (importLauncher.isSaveTour) {
-
-			person = TourbookPlugin.getActivePerson();
-
-			if (person == null) {
-
-				MessageDialog.openError(
-						_parent.getShell(),
-						Messages.Import_Data_Dialog_EasyImport_Title,
-						Messages.Import_Data_Dialog_NoActivePersion_Message);
-				return;
-			}
-		}
-
-		/*
-		 * Run the import
-		 */
-		ImportDeviceState importState = null;
-
-		RawDataManager.importLog_Reset();
-
-		try {
-
-			// disable state update during import, this causes lots of problems !!!
-			_isUpdateDeviceState = false;
-
-			importState = EasyImportManager.getInstance().runImport(importLauncher);
-
-		} finally {
-
-			_isUpdateDeviceState = true;
-		}
-
-		/*
-		 * Update viewer with newly imported files
-		 */
-		final Collection<TourData> importedToursCollection = RawDataManager.getInstance().getImportedTours().values();
-		final ArrayList<TourData> importedTours = new ArrayList<>(importedToursCollection);
-
-		if (importState.isUpdateImportViewer) {
-			_tourViewer.update(importedToursCollection.toArray(), null);
-		}
-
-		// stop all other actions when canceled
-		if (importState.isImportCanceled) {
-			return;
-		}
-
-		// open import config dialog to solve problems
-		if (importState.isOpenSetup) {
-
-			_parent.getDisplay().asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					action_Easy_SetupImport(0);
-				}
-			});
-
-			return;
-		}
-
-		/*
-		 * 4. Set last marker text
-		 */
-		if (importLauncher.isSetLastMarker) {
-			doSetLastMarker(importLauncher, importedTours);
-		}
-
-		/*
-		 * 99. Save imported tours
-		 */
-		if (importLauncher.isSaveTour) {
-			doSaveTour(person, importedTours);
-		}
-
-		/*
-		 * 100. Delete device files
-		 */
-		if (importConfig.isDeleteDeviceFiles) {
-
-			// use newly saved/not saved tours
-
-			doDeleteTourFiles(false, _rawDataMgr.getImportedTourList());
-		}
-
-		/*
-		 * 101. Turn watching off
-		 */
-		if (importConfig.isTurnOffWatching) {
-			setWatcher_Off();
-		}
-
-		thread_FolderWatcher_Activate();
-		updateUI_DeviceState();
-	}
-
 	private void action_Easy_SetDeviceWatching_OnOff() {
 
 		_isShowWatcherAnimation = true;
@@ -689,7 +559,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		final ArrayList<TourData> selectedTours = getAnySelectedTours();
 
-		doDeleteTourFiles(true, selectedTours);
+		runImport_100_DeleteTourFiles(true, selectedTours, false);
 	}
 
 	void actionMergeTours(final TourData mergeFromTour, final TourData mergeIntoTour) {
@@ -957,7 +827,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_actionMergeTour = new ActionMergeTour(this);
 		_actionModifyColumns = new ActionModifyColumns(this);
 		_actionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this);
-		_actionOpenLogView = new ActionOpenLogView();
+		_actionOpenTourLogView = new ActionOpenTourLogView();
 		_actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
 		_actionOpenTour = new ActionOpenTour(this);
 		_actionReimportSubMenu = new ActionReimportSubMenu(this);
@@ -1562,7 +1432,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				? HTML_STYLE_TITLE_VERTICAL_PADDING
 				: UI.EMPTY_STRING;
 
-		final String imageUrl = isOSFolderValid ? _imageUrl_State_OK : _imageUrl_State_Error;
+		final String imageUrl = isOSFolderValid //
+				? _imageUrl_State_OK
+				: _imageUrl_State_Error;
+
 		final String folderStateIcon = "<img src='" //$NON-NLS-1$
 				+ imageUrl
 				+ "' style='padding-left:5px; vertical-align:text-bottom;'>"; //$NON-NLS-1$
@@ -1599,12 +1472,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			sb.append(fileMoveState);
 			sb.append(HTML_TD_END);
 
-			sb.append("<td class='column'>"); //$NON-NLS-1$
+			sb.append("<td class='column content'>"); //$NON-NLS-1$
 			sb.append(deviceFile.getFileName());
 			sb.append(HTML_TD_END);
 
 // this is for debugging
-			sb.append("<td class='column'>"); //$NON-NLS-1$
+			sb.append("<td class='column content'>"); //$NON-NLS-1$
 			sb.append(filePathName);
 			sb.append(HTML_TD_END);
 
@@ -3121,7 +2994,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private void deleteFile(final ArrayList<String> deletedFiles,
 							final ArrayList<String> notDeletedFiles,
 							final String fileFolder,
-							final String fileName) {
+							final String fileName,
+							final TourLogState importLogState) {
 
 		if (fileFolder == null || fileFolder.trim().length() == 0) {
 			// there is no folder
@@ -3137,16 +3011,21 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			Files.delete(filePath);
 
-			RawDataManager.importLog_Add(ImportLogState.DELETE, filePathName);
-
 			deletedFiles.add(filePathName);
+
+			TourLogManager.addLog(importLogState, filePathName);
 
 		} catch (final Exception e) {
 
 			// file can be invalid
 
-			notDeletedFiles.add('"' + fileFolder + '"' + UI.SPACE + '"' + fileName + '"');
+			final String fileNamePath = '"' + fileFolder + '"' + UI.SPACE + '"' + fileName + '"';
+			notDeletedFiles.add(fileNamePath);
+
+			TourLogManager.addLog(TourLogState.IMPORT_ERROR, fileNamePath);
 		}
+
+		return;
 	}
 
 	@Override
@@ -3184,125 +3063,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_configImageHash.clear();
 	}
 
-	/**
-	 * @param isDeleteAllFiles
-	 *            When <code>true</code> then all files (device and backup) will be deleted.
-	 *            Otherwise only device files will be deleted without any confirmation dialog, the
-	 *            backup files are not touched, this feature is used to move device files to the
-	 *            backup folder.
-	 */
-	private void doDeleteTourFiles(final boolean isDeleteAllFiles, final ArrayList<TourData> allTourData) {
-
-		RawDataManager.importLog_Add(ImportLogState.DEFAULT, "Delete tour files");
-
-		if (isDeleteAllFiles) {
-
-			if (MessageDialog.openConfirm(
-					_parent.getShell(),
-					Messages.Import_Data_Dialog_DeleteTourFiles_Title,
-					Messages.Import_Data_Dialog_DeleteTourFiles_Message) == false) {
-				return;
-			}
-
-			if (MessageDialog.openConfirm(
-					_parent.getShell(),
-					Messages.Import_Data_Dialog_DeleteTourFiles_Title,
-					Messages.Import_Data_Dialog_DeleteTourFiles_LastChance_Message) == false) {
-				return;
-			}
-		}
-
-		final ArrayList<String> deletedFiles = new ArrayList<>();
-		final ArrayList<String> notDeletedFiles = new ArrayList<>();
-
-		final IRunnableWithProgress saveRunnable = new IRunnableWithProgress() {
-			@Override
-			public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-
-				int saveCounter = 0;
-
-				final int selectionSize = allTourData.size();
-
-				monitor.beginTask(Messages.Import_Data_Monitor_DeleteTourFiles, selectionSize);
-
-				// loop: all selected tours, selected tours can already be saved
-				for (final TourData tourData : allTourData) {
-
-					monitor.subTask(NLS.bind(
-							Messages.Import_Data_Monitor_DeleteTourFiles_Subtask,
-							++saveCounter,
-							selectionSize));
-
-					if (tourData.isBackupImportFile && isDeleteAllFiles == false) {
-
-						/*
-						 * Do not delete files which are imported from the backup folder
-						 */
-
-						continue;
-					}
-
-					final String originalFilePath = tourData.importFilePathOriginal;
-
-					// this is the backup folder when an backup is created
-					final String importFilePath = tourData.getImportFilePath();
-					final String importFileName = tourData.getImportFileName();
-
-					// delete backup files
-					if (isDeleteAllFiles) {
-						deleteFile(deletedFiles, notDeletedFiles, importFilePath, importFileName);
-					}
-
-					// delete device files
-					deleteFile(deletedFiles, notDeletedFiles, originalFilePath, importFileName);
-
-					// set state
-					if (isDeleteAllFiles) {
-						tourData.isTourFileDeleted = true;
-					} else {
-						tourData.isTourFileMoved = true;
-					}
-
-					monitor.worked(1);
-				}
-			}
-		};
-
-		try {
-
-			new ProgressMonitorDialog(_parent.getShell()).run(true, false, saveRunnable);
-
-		} catch (InvocationTargetException | InterruptedException e) {
-			StatusUtil.showStatus(e);
-		}
-
-		// show delete state in UI
-		_tourViewer.update(allTourData.toArray(), null);
-
-		/*
-		 * Log deleted files
-		 */
-		final StringBuilder sb = new StringBuilder();
-		sb.append("DELETED TOUR FILES LOG");//$NON-NLS-1$
-
-		sb.append(UI.NEW_LINE2);
-		createFilesLog(sb, deletedFiles, "Deleted tour files: ");//$NON-NLS-1$
-
-		sb.append(UI.NEW_LINE2);
-		createFilesLog(sb, notDeletedFiles, "Not deleted tour files with errors: ");//$NON-NLS-1$
-
-		StatusUtil.logInfo(sb.toString());
-
-		if (isDeleteAllFiles) {
-
-			// show state
-			MessageDialog.openInformation(
-					_parent.getShell(),
-					Messages.Import_Data_Dialog_DeleteTourFiles_Title,
-					NLS.bind(Messages.Import_Data_Dialog_DeletedImportFiles_Message, deletedFiles.size()));
-		}
-	}
-
 	public void doLiveUpdate(final DialogEasyImportConfig dialogImportConfig) {
 
 		updateModel_EasyConfig_Dashboard(dialogImportConfig.getModifiedConfig());
@@ -3315,43 +3075,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		final ArrayList<TourData> selectedTours = getAnySelectedTours();
 
-		doSaveTour(person, selectedTours);
-	}
-
-	private void doSaveTour(final TourPerson person, final ArrayList<TourData> selectedTours) {
-
-		final ArrayList<TourData> savedTours = new ArrayList<TourData>();
-
-		final IRunnableWithProgress saveRunnable = new IRunnableWithProgress() {
-			@Override
-			public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-
-				int saveCounter = 0;
-				final int selectionSize = selectedTours.size();
-
-				monitor.beginTask(Messages.Tour_Data_SaveTour_Monitor, selectionSize);
-
-				// loop: all selected tours, selected tours can already be saved
-				for (final TourData tourData : selectedTours) {
-
-					monitor.subTask(NLS.bind(Messages.Tour_Data_SaveTour_MonitorSubtask, ++saveCounter, selectionSize));
-
-					doSaveTour_OneTour(tourData, person, savedTours, false);
-
-					monitor.worked(1);
-				}
-			}
-		};
-
-		try {
-
-			new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, false, saveRunnable);
-
-		} catch (InvocationTargetException | InterruptedException e) {
-			StatusUtil.showStatus(e);
-		}
-
-		doSaveTour_PostActions(savedTours);
+		runImport_099_SaveTour(person, selectedTours, false);
 	}
 
 	/**
@@ -3438,50 +3162,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		 * tours can not be modified in the tour data editor
 		 */
 		TourManager.fireEventWithCustomData(TourEventId.UPDATE_UI, new SelectionTourIds(savedToursIds), this);
-	}
-
-	private void doSetLastMarker(final ImportLauncher importLauncher, final ArrayList<TourData> importedTours) {
-
-		final String lastMarkerText = importLauncher.lastMarkerText;
-		if (lastMarkerText == null || lastMarkerText.trim().length() == 0) {
-			// there is nothing to do
-			return;
-		}
-
-		final int ilLastMarkerDistance = importLauncher.lastMarkerDistance;
-
-		for (final TourData tourData : importedTours) {
-
-			// check if distance is available
-			final float[] distancSerie = tourData.distanceSerie;
-			if (distancSerie == null || distancSerie.length == 0) {
-				continue;
-			}
-
-			final ArrayList<TourMarker> tourMarkers = tourData.getTourMarkersSorted();
-			final int numMarkers = tourMarkers.size();
-
-			// check if markers are available
-			if (numMarkers == 0) {
-				continue;
-			}
-
-			// get last marker
-			final TourMarker lastMarker = tourMarkers.get(numMarkers - 1);
-
-			final int markerIndex = lastMarker.getSerieIndex();
-
-			final float lastMarkerDistance = distancSerie[markerIndex];
-			final float tourDistance = tourData.getTourDistance();
-			final float distanceDiff = tourDistance - lastMarkerDistance;
-
-			if (distanceDiff <= ilLastMarkerDistance) {
-
-				// this marker is in the range of the last marker distance -> set the tour marker text
-
-				lastMarker.setLabel(lastMarkerText);
-			}
-		}
 	}
 
 	private void enableActions() {
@@ -3697,7 +3377,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		tbm.add(new Separator());
 
 		tbm.add(_actionClearView);
-		tbm.add(_actionOpenLogView);
+		tbm.add(_actionOpenTourLogView);
 		tbm.add(_actionSetupImport);
 
 		/*
@@ -4122,7 +3802,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			final long tileId = Long.parseLong(locationParts[2]);
 
-			action_Easy_RunImport(tileId);
+			runImport(tileId);
 
 		} else if (ACTION_SETUP_EASY_IMPORT.equals(hrefAction)) {
 
@@ -4249,6 +3929,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 //			reimportAllImportFilesTask(null, prevImportedFiles);
 //		} else {
 
+		if (RawDataManager.isAutoOpenImportLog()) {
+			TourLogManager.openLogView();
+		}
+		TourLogManager.addLog(TourLogState.DEFAULT, RawDataManager.LOG_REIMPORT_PREVIOUS_FILES);
+
 		try {
 			new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(
 					true,
@@ -4302,11 +3987,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 						new Object[] { workedDone++, workedAll, fileName }));
 			}
 
+
 			final File file = new File(fileName);
 			if (file.exists()) {
 				if (_rawDataMgr.importRawData(file, null, false, null, true)) {
+					TourLogManager.addLog(TourLogState.IMPORT_OK, fileName);
 					importedFileCounter++;
 				} else {
+					TourLogManager.addLog(TourLogState.IMPORT_ERROR, fileName);
 					notImportedFiles.add(fileName);
 				}
 			}
@@ -4360,8 +4048,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			});
 		}
 
+		// show error log
 		if (notImportedFiles.size() > 0) {
-			RawDataManager.showMsgBoxInvalidFormat(notImportedFiles);
+			TourLogManager.openLogView();
 		}
 	}
 
@@ -4451,6 +4140,374 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				reimportAllImportFiles(true);
 			}
 		});
+	}
+
+	private void runImport(final long tileId) {
+
+		final long start = System.currentTimeMillis();
+		TourLogManager.addLog(TourLogState.DEFAULT, EasyImportManager.LOG_EASY_IMPORT_000_IMPORT_START);
+
+		if (isWatchingOn() == false) {
+
+			/*
+			 * It can be dangerous pressing an import tile and the UI is dimmed, so it's almost
+			 * invisible what is clicked.
+			 */
+
+			return;
+		}
+
+		final EasyConfig easyConfig = getEasyConfig();
+		final ImportConfig importConfig = easyConfig.getActiveImportConfig();
+
+		/*
+		 * Get import launcher
+		 */
+		ImportLauncher importLauncher = null;
+
+		for (final ImportLauncher launcher : easyConfig.importLaunchers) {
+			if (launcher.getId() == tileId) {
+				importLauncher = launcher;
+				break;
+			}
+		}
+
+		if (importLauncher == null) {
+			// this should not occure
+			return;
+		}
+
+		/*
+		 * Check person
+		 */
+		TourPerson person = null;
+		if (importLauncher.isSaveTour) {
+
+			person = TourbookPlugin.getActivePerson();
+
+			if (person == null) {
+
+				MessageDialog.openError(
+						_parent.getShell(),
+						Messages.Import_Data_Dialog_EasyImport_Title,
+						Messages.Import_Data_Dialog_NoActivePersion_Message);
+				return;
+			}
+		}
+
+		/*
+		 * Run the import
+		 */
+		ImportDeviceState importState = null;
+
+		try {
+
+			// disable state update during import, this causes lots of problems !!!
+			_isUpdateDeviceState = false;
+
+			importState = EasyImportManager.getInstance().runImport(importLauncher);
+
+		} finally {
+
+			_isUpdateDeviceState = true;
+		}
+
+		/*
+		 * Update viewer with newly imported files
+		 */
+		final Collection<TourData> importedToursCollection = RawDataManager.getInstance().getImportedTours().values();
+		final ArrayList<TourData> importedTours = new ArrayList<>(importedToursCollection);
+
+		if (importState.isUpdateImportViewer) {
+			_tourViewer.update(importedToursCollection.toArray(), null);
+		}
+
+		// stop all other actions when canceled
+		if (importState.isImportCanceled) {
+			return;
+		}
+
+		// open import config dialog to solve problems
+		if (importState.isOpenSetup) {
+
+			_parent.getDisplay().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					action_Easy_SetupImport(0);
+				}
+			});
+
+			return;
+		}
+
+		/*
+		 * 4. Set last marker text
+		 */
+		if (importLauncher.isSetLastMarker) {
+			runImport_004_SetLastMarker(importLauncher, importedTours);
+		}
+
+		/*
+		 * 99. Save imported tours
+		 */
+		if (importLauncher.isSaveTour) {
+			runImport_099_SaveTour(person, importedTours, true);
+		}
+
+		/*
+		 * 100. Delete device files
+		 */
+		if (importConfig.isDeleteDeviceFiles) {
+
+			// use newly saved/not saved tours
+
+			runImport_100_DeleteTourFiles(false, _rawDataMgr.getImportedTourList(), true);
+		}
+
+		/*
+		 * 101. Turn watching off
+		 */
+		if (importConfig.isTurnOffWatching) {
+
+			TourLogManager.addLog(TourLogState.DEFAULT, EasyImportManager.LOG_EASY_IMPORT_101_TURN_WATCHING_OFF);
+
+			setWatcher_Off();
+		}
+
+		thread_FolderWatcher_Activate();
+		updateUI_DeviceState();
+
+		/*
+		 * Import end
+		 */
+		final double time = (System.currentTimeMillis() - start) / 1000.0;
+		TourLogManager.addLog(
+				TourLogState.DEFAULT,
+				String.format(EasyImportManager.LOG_EASY_IMPORT_999_IMPORT_END, time));
+	}
+
+	private void runImport_004_SetLastMarker(	final ImportLauncher importLauncher,
+												final ArrayList<TourData> importedTours) {
+
+		final String lastMarkerText = importLauncher.lastMarkerText;
+		if (lastMarkerText == null || lastMarkerText.trim().length() == 0) {
+			// there is nothing to do
+			return;
+		}
+
+		TourLogManager.addLog(TourLogState.DEFAULT, EasyImportManager.LOG_EASY_IMPORT_004_SET_LAST_MARKER);
+
+		final int ilLastMarkerDistance = importLauncher.lastMarkerDistance;
+
+		for (final TourData tourData : importedTours) {
+
+			// check if distance is available
+			final float[] distancSerie = tourData.distanceSerie;
+			if (distancSerie == null || distancSerie.length == 0) {
+				continue;
+			}
+
+			final ArrayList<TourMarker> tourMarkers = tourData.getTourMarkersSorted();
+			final int numMarkers = tourMarkers.size();
+
+			// check if markers are available
+			if (numMarkers == 0) {
+				continue;
+			}
+
+			// get last marker
+			final TourMarker lastMarker = tourMarkers.get(numMarkers - 1);
+
+			final int markerIndex = lastMarker.getSerieIndex();
+
+			final float lastMarkerDistance = distancSerie[markerIndex];
+			final float tourDistance = tourData.getTourDistance();
+			final float distanceDiff = tourDistance - lastMarkerDistance;
+
+			if (distanceDiff <= ilLastMarkerDistance) {
+
+				// this marker is in the range of the last marker distance -> set the tour marker text
+
+				lastMarker.setLabel(lastMarkerText);
+			}
+		}
+	}
+
+	private void runImport_099_SaveTour(final TourPerson person,
+										final ArrayList<TourData> selectedTours,
+										final boolean isEasyImport) {
+
+		TourLogManager.addLog(TourLogState.DEFAULT, isEasyImport
+				? EasyImportManager.LOG_EASY_IMPORT_099_SAVE_TOUR
+				: TourLogView.LOG_SAVE_TOUR);
+
+		final ArrayList<TourData> savedTours = new ArrayList<TourData>();
+
+		final IRunnableWithProgress saveRunnable = new IRunnableWithProgress() {
+			@Override
+			public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+
+				int saveCounter = 0;
+				final int selectionSize = selectedTours.size();
+
+				monitor.beginTask(Messages.Tour_Data_SaveTour_Monitor, selectionSize);
+
+				// loop: all selected tours, selected tours can already be saved
+				for (final TourData tourData : selectedTours) {
+
+					monitor.subTask(NLS.bind(Messages.Tour_Data_SaveTour_MonitorSubtask, ++saveCounter, selectionSize));
+
+					doSaveTour_OneTour(tourData, person, savedTours, false);
+
+					TourLogManager.addLog(TourLogState.TOUR_SAVED, tourData.getImportFilePathNameText());
+
+					monitor.worked(1);
+				}
+			}
+		};
+
+		try {
+
+			new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, false, saveRunnable);
+
+		} catch (InvocationTargetException | InterruptedException e) {
+			StatusUtil.showStatus(e);
+		}
+
+		doSaveTour_PostActions(savedTours);
+	}
+
+	/**
+	 * @param isDeleteAllFiles
+	 *            When <code>true</code> then all files (device and backup) will be deleted.
+	 *            Otherwise only device files will be deleted without any confirmation dialog, the
+	 *            backup files are not touched, this feature is used to move device files to the
+	 *            backup folder.
+	 */
+	private void runImport_100_DeleteTourFiles(	final boolean isDeleteAllFiles,
+												final ArrayList<TourData> allTourData,
+												final boolean isEasyImport) {
+
+		TourLogManager.addLog(TourLogState.DEFAULT, isEasyImport
+				? EasyImportManager.LOG_EASY_IMPORT_100_DELETE_TOUR_FILES
+				: RawDataManager.LOG_IMPORT_DELETE_TOUR_FILE);
+
+		if (isDeleteAllFiles) {
+
+			if (MessageDialog.openConfirm(
+					_parent.getShell(),
+					Messages.Import_Data_Dialog_DeleteTourFiles_Title,
+					Messages.Import_Data_Dialog_DeleteTourFiles_Message) == false) {
+				return;
+			}
+
+			if (MessageDialog.openConfirm(
+					_parent.getShell(),
+					Messages.Import_Data_Dialog_DeleteTourFiles_Title,
+					Messages.Import_Data_Dialog_DeleteTourFiles_LastChance_Message) == false) {
+				return;
+			}
+		}
+
+		final ArrayList<String> deletedFiles = new ArrayList<>();
+		final ArrayList<String> notDeletedFiles = new ArrayList<>();
+
+		final IRunnableWithProgress saveRunnable = new IRunnableWithProgress() {
+			@Override
+			public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+
+				int saveCounter = 0;
+
+				final int selectionSize = allTourData.size();
+
+				monitor.beginTask(Messages.Import_Data_Monitor_DeleteTourFiles, selectionSize);
+
+				// loop: all selected tours, selected tours can already be saved
+				for (final TourData tourData : allTourData) {
+
+					monitor.subTask(NLS.bind(
+							Messages.Import_Data_Monitor_DeleteTourFiles_Subtask,
+							++saveCounter,
+							selectionSize));
+
+					if (tourData.isBackupImportFile && isDeleteAllFiles == false) {
+
+						/*
+						 * Do not delete files which are imported from the backup folder
+						 */
+
+						continue;
+					}
+
+					final String originalFilePath = tourData.importFilePathOriginal;
+
+					// this is the backup folder when an backup is created
+					final String importFilePath = tourData.getImportFilePath();
+					final String importFileName = tourData.getImportFileName();
+
+					// delete backup files
+					if (isDeleteAllFiles) {
+						deleteFile(
+								deletedFiles,
+								notDeletedFiles,
+								importFilePath,
+								importFileName,
+								TourLogState.EASY_IMPORT_DELETE_BACKUP);
+					}
+
+					// delete device files
+					deleteFile(
+							deletedFiles,
+							notDeletedFiles,
+							originalFilePath,
+							importFileName,
+							TourLogState.EASY_IMPORT_DELETE_DEVICE);
+
+					// set state
+					if (isDeleteAllFiles) {
+						tourData.isTourFileDeleted = true;
+					} else {
+						tourData.isTourFileMoved = true;
+					}
+
+					monitor.worked(1);
+				}
+			}
+		};
+
+		try {
+
+			new ProgressMonitorDialog(_parent.getShell()).run(true, false, saveRunnable);
+
+		} catch (InvocationTargetException | InterruptedException e) {
+			StatusUtil.showStatus(e);
+		}
+
+		// show delete state in UI
+		_tourViewer.update(allTourData.toArray(), null);
+
+		/*
+		 * Log deleted files
+		 */
+		final StringBuilder sb = new StringBuilder();
+		sb.append("DELETED TOUR FILES LOG");//$NON-NLS-1$
+
+		sb.append(UI.NEW_LINE2);
+		createFilesLog(sb, deletedFiles, "Deleted tour files: ");//$NON-NLS-1$
+
+		sb.append(UI.NEW_LINE2);
+		createFilesLog(sb, notDeletedFiles, "Not deleted tour files with errors: ");//$NON-NLS-1$
+
+		StatusUtil.logInfo(sb.toString());
+
+		if (isDeleteAllFiles) {
+
+			// show state
+			MessageDialog.openInformation(
+					_parent.getShell(),
+					Messages.Import_Data_Dialog_DeleteTourFiles_Title,
+					NLS.bind(Messages.Import_Data_Dialog_DeletedImportFiles_Message, deletedFiles.size()));
+		}
 	}
 
 	private void saveState() {

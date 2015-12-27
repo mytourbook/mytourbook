@@ -24,9 +24,12 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.TreeViewerItem;
+import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.ITourItem;
 import net.tourbook.tour.SelectionDeletedTours;
+import net.tourbook.tour.TourLogManager;
+import net.tourbook.tour.TourLogState;
 import net.tourbook.tour.TourManager;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -87,7 +90,13 @@ public class ActionDeleteTour extends Action {
 
 				final TVITourBookTour tourItem = (TVITourBookTour) treeItem;
 
-				if (TourDatabase.deleteTour(tourItem.getTourId())) {
+				final Long tourId = tourItem.getTourId();
+				if (TourDatabase.deleteTour(tourId)) {
+
+					// log deletion
+					final TourData tourData = TourManager.getTour(tourId);
+					final String tourTitle = TourManager.getTourTitleDetailed(tourData);
+					TourLogManager.addLog(TourLogState.TOUR_DELETED, tourTitle);
 
 					removedTours.add(tourItem);
 
@@ -185,6 +194,8 @@ public class ActionDeleteTour extends Action {
 				return;
 			}
 		}
+
+		TourLogManager.openLogView();
 
 		final SelectionDeletedTours selectionRemovedTours = new SelectionDeletedTours();
 

@@ -815,6 +815,10 @@ public class Messages extends NLS {
 
 	public static String	Image__State_Delete;
 
+	public static String	Image__State_Deleted_Backup;
+
+	public static String	Image__State_Deleted_Device;
+
 	public static String		Image__State_DeletedTour_View;
 
 	public static String		Image__State_Error;
@@ -822,6 +826,8 @@ public class Messages extends NLS {
 
 	public static String		Image__State_MovedTour_View;
 	public static String		Image__State_OK;
+	public static String	Image__State_Save;
+
 	public static String		Image__State_SaveTour;
 	public static String		Image__State_TourMarker;
 	public static String		Image__Synced;
@@ -840,6 +846,8 @@ public class Messages extends NLS {
 	public static String		Image__TourChart;
 	public static String		Image__TourInfo;
 	public static String		Image__TourInfo_Disabled;
+
+	public static String	Image__TourLog;
 	public static String		Image__TourMarker;
 	public static String		Image__TourSegments;
 	public static String		Image__TourSegments_Disabled;
@@ -1316,7 +1324,7 @@ public class Messages extends NLS {
 	public static String		Pref_TourTypes_root_title;
 	public static String		Pref_TourTypes_Title;
 
-	public static String	PrefPage_Import_Checkbox_AutoOpenImportLogView;
+	public static String	PrefPage_Import_Checkbox_AutoOpenTourLogView;
 
 	public static String		PrefPage_Import_Checkbox_CreateTourIdWithTime;
 	public static String		PrefPage_Import_Checkbox_CreateTourIdWithTime_Tooltip;
@@ -1580,6 +1588,8 @@ public class Messages extends NLS {
 	public static String		Tour_Editor_Label_Sensor_Yes;
 	public static String		Tour_Editor_Label_Weather;
 	public static String		Tour_Editor_Label_WindDirection_Unit;
+
+	public static String	Tour_Log_Action_Clear_Tooltip;
 
 	public static String		Tour_Marker_Column_Description_ShortCut;
 	public static String		Tour_Marker_Column_Description_Tooltip;

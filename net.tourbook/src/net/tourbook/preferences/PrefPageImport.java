@@ -87,7 +87,7 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
 				 * Checkbox: Open import log
 				 */
 				_chkAutoOpenImportLog = new Button(container, SWT.CHECK);
-				_chkAutoOpenImportLog.setText(Messages.PrefPage_Import_Checkbox_AutoOpenImportLogView);
+				_chkAutoOpenImportLog.setText(Messages.PrefPage_Import_Checkbox_AutoOpenTourLogView);
 				_chkAutoOpenImportLog.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(final SelectionEvent e) {

@@ -262,6 +262,8 @@ a.action-button:VISITED
 	left:					6px;
 	width:					500px;
 	max-height:				80vh;
+	
+	xoverflow: 				scroll;
 }
 
 .stateTooltipMessage /* overwrite obove css */
@@ -370,14 +372,19 @@ select::-ms-expand {
 	xfont-weight: 			lighter;
 }
 
-.deviceList td.right
+.deviceList .right
 {
 	text-align:				right;
 }
 
-.deviceList td.column
+.deviceList .column
 {
 	padding-right: 			10px;
+}
+
+.deviceList .content
+{
+	white-space: 			nowrap;
 }
 
 

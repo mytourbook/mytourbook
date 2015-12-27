@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.views.rawData;
+package net.tourbook.tour;
 
 import static net.tourbook.ui.UI.getIconUrl;
 
@@ -23,13 +23,14 @@ import java.net.URISyntaxException;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
-import net.tourbook.importdata.ImportLog;
-import net.tourbook.importdata.RawDataManager;
 import net.tourbook.web.WEB;
 
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.osgi.util.NLS;
@@ -42,45 +43,74 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
 /**
- * Import log view.
+ * Tour log view.
  */
-public class ImportLogView extends ViewPart {
+public class TourLogView extends ViewPart {
 
-	public static final String	ID									= "net.tourbook.views.rawData.ImportLogView";	//$NON-NLS-1$
+	public static final String	ID									= "net.tourbook.tour.TourLogView";					//$NON-NLS-1$
+
 	//
-	private static final String	STATE_COPY							= "COPY";										//$NON-NLS-1$
-	private static final String	STATE_DELETE						= "DELETE";									//$NON-NLS-1$
-	private static final String	STATE_ERROR							= "ERROR";										//$NON-NLS-1$
-	private static final String	STATE_OK							= "OK";										//$NON-NLS-1$
+	public static final String	LOG_SAVE_TOUR						= "Save tours";									//$NON-NLS-1$
 	//
-	private static final String	DOM_ID_LOG							= "logs";										//$NON-NLS-1$
-	private static final String	WEB_RESOURCE_TOUR_IMPORT_LOG_CSS	= "tour-import-log.css";						//$NON-NLS-1$
+	private static final String	STATE_COPY							= "COPY";											//$NON-NLS-1$
+	private static final String	STATE_DELETE						= "DELETE";										//$NON-NLS-1$
+	private static final String	STATE_ERROR							= "ERROR";											//$NON-NLS-1$
+	private static final String	STATE_OK							= "OK";											//$NON-NLS-1$
+	private static final String	STATE_SAVE							= "SAVE";											//$NON-NLS-1$
+	//
+	private static final String	DOM_ID_LOG							= "logs";											//$NON-NLS-1$
+	private static final String	WEB_RESOURCE_TOUR_IMPORT_LOG_CSS	= "tour-import-log.css";							//$NON-NLS-1$
+	//
+	private IPartListener2		_partListener;
+	//
+	private Action				_actionReset;
 	//
 	private boolean				_isBrowserCompleted;
 	private String				_cssFromFile;
 	private String				_noBrowserLog						= UI.EMPTY_STRING;
 	//
 	private String				_imageUrl_StateCopy					= getIconUrl(Messages.Image__State_Copy);
-	private String				_imageUrl_StateDelete				= getIconUrl(Messages.Image__State_DeletedTour_View);
+	private String				_imageUrl_StateDeleteDevice			= getIconUrl(Messages.Image__State_Deleted_Device);
+	private String				_imageUrl_StateDeleteBackup			= getIconUrl(Messages.Image__State_Deleted_Backup);
 	private String				_imageUrl_StateError				= getIconUrl(Messages.Image__State_Error);
 	private String				_imageUrl_StateOK					= getIconUrl(Messages.Image__State_OK);
-	//
+	private String				_imageUrl_StateSave					= getIconUrl(Messages.Image__State_Save);
 	/*
 	 * UI controls
 	 */
 	private Browser				_browser;
-
 	private PageBook			_pageBook;
+
 	private Composite			_page_NoBrowser;
 	private Composite			_page_WithBrowser;
-
 	private Text				_txtNoBrowser;
 
-	public void addLog(final ImportLog importLog) {
+	public class ActionReset extends Action {
+
+		public ActionReset() {
+
+			setText(Messages.Tour_Log_Action_Clear_Tooltip);
+			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__remove_all));
+		}
+
+		@Override
+		public void run() {
+			actionClearView();
+		}
+	}
+
+	private void actionClearView() {
+
+		TourLogManager.clear();
+	}
+
+	public void addLog(final TourLog importLog) {
 
 		final boolean isBrowserAvailable = _browser != null && _browser.isDisposed() == false;
 
@@ -160,13 +190,59 @@ public class ImportLogView extends ViewPart {
 		_txtNoBrowser.setText(_noBrowserLog);
 	}
 
+	private void addPartListener() {
+
+		_partListener = new IPartListener2() {
+
+			@Override
+			public void partActivated(final IWorkbenchPartReference partRef) {}
+
+			@Override
+			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
+
+			@Override
+			public void partClosed(final IWorkbenchPartReference partRef) {
+				if (partRef.getPart(false) == TourLogView.this) {
+					TourLogManager.setLogView(null);
+				}
+			}
+
+			@Override
+			public void partDeactivated(final IWorkbenchPartReference partRef) {}
+
+			@Override
+			public void partHidden(final IWorkbenchPartReference partRef) {}
+
+			@Override
+			public void partInputChanged(final IWorkbenchPartReference partRef) {}
+
+			@Override
+			public void partOpened(final IWorkbenchPartReference partRef) {
+				if (partRef.getPart(false) == TourLogView.this) {
+					TourLogManager.setLogView(TourLogView.this);
+				}
+			}
+
+			@Override
+			public void partVisible(final IWorkbenchPartReference partRef) {}
+		};
+
+		getViewSite().getPage().addPartListener(_partListener);
+	}
+
 	/**
-	 * Clear browser.
+	 * Clear logs.
 	 */
 	public void clear() {
 
 		_noBrowserLog = UI.EMPTY_STRING;
+
 		updateUI_InitBrowser();
+	}
+
+	private void createActions() {
+
+		_actionReset = new ActionReset();
 	}
 
 	private String createHTML() {
@@ -207,7 +283,13 @@ public class ImportLogView extends ViewPart {
 
 		initUI(parent);
 
+		createActions();
+
 		createUI(parent);
+
+		fillToolbar();
+
+		addPartListener();
 
 		updateUI();
 	}
@@ -281,30 +363,56 @@ public class ImportLogView extends ViewPart {
 		}
 	}
 
-	private void getImportState(final ImportLog importLog,
-								final String[] stateNoBrowser,
-								final String[] stateWithBrowser) {
+	@Override
+	public void dispose() {
+
+		getViewSite().getPage().removePartListener(_partListener);
+
+		super.dispose();
+	}
+
+	private void fillToolbar() {
+
+		/*
+		 * fill view toolbar
+		 */
+		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
+
+		tbm.add(_actionReset);
+	}
+
+	private void getImportState(final TourLog importLog, final String[] stateNoBrowser, final String[] stateWithBrowser) {
 
 		switch (importLog.state) {
 
-		case OK:
+		case IMPORT_OK:
 			stateNoBrowser[0] = STATE_OK;
 			stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateOK);
 			break;
 
-		case ERROR:
+		case EASY_IMPORT_COPY:
+			stateNoBrowser[0] = STATE_COPY;
+			stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateCopy);
+			break;
+
+		case EASY_IMPORT_DELETE_BACKUP:
+			stateNoBrowser[0] = STATE_DELETE;
+			stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateDeleteBackup);
+			break;
+
+		case EASY_IMPORT_DELETE_DEVICE:
+			stateNoBrowser[0] = STATE_DELETE;
+			stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateDeleteDevice);
+			break;
+
+		case IMPORT_ERROR:
 			stateNoBrowser[0] = STATE_ERROR;
 			stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateError);
 			break;
 
-		case DELETE:
-			stateNoBrowser[0] = STATE_DELETE;
-			stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateDelete);
-			break;
-
-		case COPY:
-			stateNoBrowser[0] = STATE_COPY;
-			stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateCopy);
+		case TOUR_SAVED:
+			stateNoBrowser[0] = STATE_SAVE;
+			stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateSave);
 			break;
 
 		default:
@@ -339,7 +447,7 @@ public class ImportLogView extends ViewPart {
 	}
 
 	private String js_SetStyleBgImage(final String imageUrl) {
-		
+
 		return "td.style.backgroundImage=\"url('" + imageUrl + "')\";\n"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
@@ -351,8 +459,8 @@ public class ImportLogView extends ViewPart {
 		_browser.setRedraw(true);
 
 		// show already logged items
-		final CopyOnWriteArrayList<ImportLog> importLogs = RawDataManager.getImportLogs();
-		for (final ImportLog importLog : importLogs) {
+		final CopyOnWriteArrayList<TourLog> importLogs = TourLogManager.getLogs();
+		for (final TourLog importLog : importLogs) {
 			addLog(importLog);
 		}
 	}

@@ -51,6 +51,9 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.tour.TourLogManager;
+import net.tourbook.tour.TourLogState;
+import net.tourbook.tour.TourManager;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -65,53 +68,65 @@ import org.eclipse.ui.XMLMemento;
 
 public class EasyImportManager {
 
-	private static final String			ID									= "net.tourbook.importdata.EasyImportManager";	//$NON-NLS-1$
+	private static final String			ID										= "net.tourbook.importdata.EasyImportManager";	//$NON-NLS-1$
 	//
-	private static final String			XML_STATE_EASY_IMPORT				= "XML_STATE_EASY_IMPORT";						//$NON-NLS-1$
+	private static final String			XML_STATE_EASY_IMPORT					= "XML_STATE_EASY_IMPORT";						//$NON-NLS-1$
 	//
-	private static final String			TAG_ROOT							= "EasyImportConfig";							//$NON-NLS-1$
-	private static final String			TAG_CONFIG							= "Config";									//$NON-NLS-1$
-	private static final String			TAG_DASH_CONFIG						= "DashConfig";								//$NON-NLS-1$
-	private static final String			TAG_IMPORT_CONFIG					= "ImportConfig";								//$NON-NLS-1$
-	private static final String			TAG_LAUNCHER_CONFIG					= "LauncherConfig";							//$NON-NLS-1$
-	private static final String			TAG_TOUR_TYPE_BY_SPEED				= "Speed";										//$NON-NLS-1$
+	private static final String			TAG_ROOT								= "EasyImportConfig";							//$NON-NLS-1$
+	private static final String			TAG_CONFIG								= "Config";									//$NON-NLS-1$
+	private static final String			TAG_DASH_CONFIG							= "DashConfig";								//$NON-NLS-1$
+	private static final String			TAG_IMPORT_CONFIG						= "ImportConfig";								//$NON-NLS-1$
+	private static final String			TAG_LAUNCHER_CONFIG						= "LauncherConfig";							//$NON-NLS-1$
+	private static final String			TAG_TOUR_TYPE_BY_SPEED					= "Speed";										//$NON-NLS-1$
 	//
-	private static final String			ATTR_AVG_SPEED						= "avgSpeed";									//$NON-NLS-1$
-	private static final String			ATTR_BACKUP_FOLDER					= "backupFolder";								//$NON-NLS-1$
-	private static final String			ATTR_DEVICE_FILES					= "deviceFiles";								//$NON-NLS-1$
-	private static final String			ATTR_DEVICE_FOLDER					= "deviceFolder";								//$NON-NLS-1$
-	private static final String			ATTR_IS_ACTIVE_CONFIG				= "isActiveConfig";							//$NON-NLS-1$
-	private static final String			ATTR_IS_CREATE_BACKUP				= "isCreateBackup";							//$NON-NLS-1$
-	private static final String			ATTR_IS_DELETE_DEVICE_FILES			= "isDeleteDeviceFiles";						//$NON-NLS-1$
-	private static final String			ATTR_IS_TURN_OFF_WATCHING			= "isTurnOffWatching";							//$NON-NLS-1$
-	private static final String			ATTR_NAME							= "name";										//$NON-NLS-1$
-	private static final String			ATTR_TOUR_TYPE_CONFIG				= "tourTypeConfig";							//$NON-NLS-1$
-	private static final String			ATTR_TOUR_TYPE_ID					= "tourTypeId";								//$NON-NLS-1$
+	private static final String			ATTR_AVG_SPEED							= "avgSpeed";									//$NON-NLS-1$
+	private static final String			ATTR_BACKUP_FOLDER						= "backupFolder";								//$NON-NLS-1$
+	private static final String			ATTR_DEVICE_FILES						= "deviceFiles";								//$NON-NLS-1$
+	private static final String			ATTR_DEVICE_FOLDER						= "deviceFolder";								//$NON-NLS-1$
+	private static final String			ATTR_IS_ACTIVE_CONFIG					= "isActiveConfig";							//$NON-NLS-1$
+	private static final String			ATTR_IS_CREATE_BACKUP					= "isCreateBackup";							//$NON-NLS-1$
+	private static final String			ATTR_IS_DELETE_DEVICE_FILES				= "isDeleteDeviceFiles";						//$NON-NLS-1$
+	private static final String			ATTR_IS_TURN_OFF_WATCHING				= "isTurnOffWatching";							//$NON-NLS-1$
+	private static final String			ATTR_NAME								= "name";										//$NON-NLS-1$
+	private static final String			ATTR_TOUR_TYPE_CONFIG					= "tourTypeConfig";							//$NON-NLS-1$
+	private static final String			ATTR_TOUR_TYPE_ID						= "tourTypeId";								//$NON-NLS-1$
 	//
-	private static final String			ATTR_DASH_BACKGROUND_OPACITY		= "backgroundOpacity";							//$NON-NLS-1$
-	private static final String			ATTR_DASH_ANIMATION_CRAZY_FACTOR	= "animationCrazyFactor";						//$NON-NLS-1$
-	private static final String			ATTR_DASH_ANIMATION_DURATION		= "animationDuration";							//$NON-NLS-1$
-	private static final String			ATTR_DASH_IS_LIVE_UPDATE			= "isLiveUpdate";								//$NON-NLS-1$
-	private static final String			ATTR_DASH_NUM_UI_COLUMNS			= "uiColumns";									//$NON-NLS-1$
-	private static final String			ATTR_DASH_STATE_TOOLTIP_WIDTH		= "stateTooltipWidth";							//$NON-NLS-1$
-	private static final String			ATTR_DASH_TILE_SIZE					= "tileSize";									//$NON-NLS-1$
+	private static final String			ATTR_DASH_BACKGROUND_OPACITY			= "backgroundOpacity";							//$NON-NLS-1$
+	private static final String			ATTR_DASH_ANIMATION_CRAZY_FACTOR		= "animationCrazyFactor";						//$NON-NLS-1$
+	private static final String			ATTR_DASH_ANIMATION_DURATION			= "animationDuration";							//$NON-NLS-1$
+	private static final String			ATTR_DASH_IS_LIVE_UPDATE				= "isLiveUpdate";								//$NON-NLS-1$
+	private static final String			ATTR_DASH_NUM_UI_COLUMNS				= "uiColumns";									//$NON-NLS-1$
+	private static final String			ATTR_DASH_STATE_TOOLTIP_WIDTH			= "stateTooltipWidth";							//$NON-NLS-1$
+	private static final String			ATTR_DASH_TILE_SIZE						= "tileSize";									//$NON-NLS-1$
 	//
-	private static final String			ATTR_IL_DESCRIPTION					= "description";								//$NON-NLS-1$
-	private static final String			ATTR_IL_IS_SAVE_TOUR				= "isSaveTour";								//$NON-NLS-1$
-	private static final String			ATTR_IL_IS_SHOW_IN_DASHBOARD		= "isShowInDashBoard";							//$NON-NLS-1$
-	private static final String			ATTR_IL_IS_SET_LAST_MARKER			= "isSetLastMarker";							//$NON-NLS-1$
-	private static final String			ATTR_IL_LAST_MARKER_TEXT			= "lastMarkerText";							//$NON-NLS-1$
-	private static final String			ATTR_IL_LAST_MARKER_DISTANCE		= "lastMarkerDistance";						//$NON-NLS-1$
+	private static final String			ATTR_IL_DESCRIPTION						= "description";								//$NON-NLS-1$
+	private static final String			ATTR_IL_IS_SAVE_TOUR					= "isSaveTour";								//$NON-NLS-1$
+	private static final String			ATTR_IL_IS_SHOW_IN_DASHBOARD			= "isShowInDashBoard";							//$NON-NLS-1$
+	private static final String			ATTR_IL_IS_SET_LAST_MARKER				= "isSetLastMarker";							//$NON-NLS-1$
+	private static final String			ATTR_IL_LAST_MARKER_TEXT				= "lastMarkerText";							//$NON-NLS-1$
+	private static final String			ATTR_IL_LAST_MARKER_DISTANCE			= "lastMarkerDistance";						//$NON-NLS-1$
+	//
+	public static final String			LOG_EASY_IMPORT_000_IMPORT_START		= "Easy import start";							//$NON-NLS-1$
+	public static final String			LOG_EASY_IMPORT_001_BACKUP_TOUR_FILES	= "1. Backup tour files";						//$NON-NLS-1$
+	public static final String			LOG_EASY_IMPORT_001_COPY				= "%s -> %s";									//$NON-NLS-1$
+	public static final String			LOG_EASY_IMPORT_002_TOUR_FILES_START	= "2. Import tour files";						//$NON-NLS-1$
+	public static final String			LOG_EASY_IMPORT_002_END					= "2. Imported in %.3f s";						//$NON-NLS-1$
+	public static final String			LOG_EASY_IMPORT_003_TOUR_TYPE			= "3. Tour type: %s - %s";
+	public static final String			LOG_EASY_IMPORT_004_SET_LAST_MARKER		= "4. Set last marker";						//$NON-NLS-1$
+	public static final String			LOG_EASY_IMPORT_099_SAVE_TOUR			= "99. Save tour";								//$NON-NLS-1$
+	public static final String			LOG_EASY_IMPORT_100_DELETE_TOUR_FILES	= "100. Delete tour files";					//$NON-NLS-1$
+	public static final String			LOG_EASY_IMPORT_101_TURN_WATCHING_OFF	= "101. Turn watching off";					//$NON-NLS-1$
+	public static final String			LOG_EASY_IMPORT_999_IMPORT_END			= "Import end, %.3f s";						//$NON-NLS-1$
 	//
 	private static EasyImportManager	_instance;
 
-	private final IDialogSettings		_state								= TourbookPlugin.getState(ID);
+	private final IDialogSettings		_state									= TourbookPlugin.getState(ID);
 
 	private EasyConfig					_easyConfig;
 
 	private String						_fileStoresHash;
 
-	private ReentrantLock				STORE_LOCK							= new ReentrantLock();
+	private ReentrantLock				STORE_LOCK								= new ReentrantLock();
 
 	public static EasyImportManager getInstance() {
 
@@ -846,7 +861,7 @@ public class EasyImportManager {
 			return false;
 		}
 
-		RawDataManager.importLog_Add(ImportLogState.DEFAULT, "Backup tour files");
+		TourLogManager.addLog(TourLogState.DEFAULT, LOG_EASY_IMPORT_001_BACKUP_TOUR_FILES);
 
 		final boolean isCanceled[] = { false };
 
@@ -881,7 +896,9 @@ public class EasyImportManager {
 
 						Files.copy(devicePath, targetPath);
 
-						RawDataManager.importLog_Add(ImportLogState.COPY, devicePath + " -> " + targetPath);
+						TourLogManager.addLog(
+								TourLogState.EASY_IMPORT_COPY,
+								String.format(LOG_EASY_IMPORT_001_COPY, devicePath, targetPath));
 
 					} catch (final IOException e) {
 						StatusUtil.log(e);
@@ -1076,6 +1093,8 @@ public class EasyImportManager {
 	 */
 	private void setTourType(final TourData tourData, final ImportLauncher importLauncher) {
 
+		String tourTypeName = UI.EMPTY_STRING;
+
 		final Enum<TourTypeConfig> ttConfig = importLauncher.tourTypeConfig;
 
 		if (TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED.equals(ttConfig)) {
@@ -1107,6 +1126,7 @@ public class EasyImportManager {
 			if (tourTypeId != -1) {
 
 				final TourType tourType = net.tourbook.ui.UI.getTourType(tourTypeId);
+				tourTypeName = tourType.getName();
 
 				tourData.setTourType(tourType);
 			}
@@ -1115,12 +1135,21 @@ public class EasyImportManager {
 
 			// set one tour type
 
-			tourData.setTourType(importLauncher.oneTourType);
+			final TourType tourType = importLauncher.oneTourType;
+			tourTypeName = tourType.getName();
+
+			tourData.setTourType(tourType);
 
 		} else {
 
 			// tour type is not set
-
 		}
+
+		TourLogManager.addLog(//
+				TourLogState.DEFAULT,
+				String.format(//
+						LOG_EASY_IMPORT_003_TOUR_TYPE,
+						tourTypeName,
+						TourManager.getTourTitleDetailed(tourData)));
 	}
 }
