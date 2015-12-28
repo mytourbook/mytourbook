@@ -6,8 +6,8 @@ html
 body 
 {
 	font-size:				12px;
-	xcolor:					#fff;
-	xbackground-color:		#444;
+	color:					#fff;
+	background-color:		#444;
 	xpadding-left:			5px;
 }
 
@@ -70,6 +70,16 @@ a:VISITED
 	white-space:			nowrap;
 }
 
+.subItem
+{
+	padding-left:			25px;
+}
+
+.title
+{
+	color:					#ABFE11;
+	font-weight: 			bold;
+}
 
 
 

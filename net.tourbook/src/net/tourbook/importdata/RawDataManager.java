@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,6 +34,7 @@ import java.util.List;
 import net.tourbook.Messages;
 import net.tourbook.application.PerspectiveFactoryRawData;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.ITourViewer3;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
@@ -46,6 +47,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourLogState;
+import net.tourbook.tour.TourLogView;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.views.rawData.RawDataView;
 import net.tourbook.ui.views.tourBook.TVITourBookTour;
@@ -80,7 +82,11 @@ public class RawDataManager {
 	private static final String				TEMP_IMPORTED_FILE					= "received-device-data.txt";								//$NON-NLS-1$
 	//
 	public static final String				LOG_IMPORT_DELETE_TOUR_FILE			= "Delete tour files";										//$NON-NLS-1$
+	public static final String				LOG_IMPORT_DELETE_TOUR_FILE_END		= "Deleted: %d - Not deleted with errors: %d";
+	private static final String				LOG_IMPORT_TOUR						= "Import tours";
+	private static final String				LOG_IMPORT_TOUR_END					= "Imported in %.3f s";
 	public static final String				LOG_REIMPORT_PREVIOUS_FILES			= "Reimport previous files";								//$NON-NLS-1$
+	public static final String				LOG_REIMPORT_PREVIOUS_FILES_END		= "Reimported in %.3f s";									//$NON-NLS-1$
 	//
 	public static final int					ADJUST_IMPORT_YEAR_IS_DISABLED		= -1;
 	//
@@ -178,11 +184,7 @@ public class RawDataManager {
 		Tour, //
 	}
 
-	private RawDataManager() {
-
-		// set first log entry
-		TourLogManager.addLog(TourLogState.DEFAULT, "Import initialized");
-	}
+	private RawDataManager() {}
 
 	public static RawDataManager getInstance() {
 
@@ -300,7 +302,7 @@ public class RawDataManager {
 			TourLogManager.openLogView();
 		}
 
-		runImport(osFiles);
+		runImport(osFiles, false);
 	}
 
 	/**
@@ -650,7 +652,7 @@ public class RawDataManager {
 
 				isTourReImported = true;
 
-				TourLogManager.addLog(TourLogState.IMPORT_OK, reimportFileNamePath);
+				TourLogManager.addSubLog(TourLogState.IMPORT_OK, reimportFileNamePath);
 
 				// set reimport file path as new location
 				newTourData.setImportFilePath(reimportFileNamePath);
@@ -682,12 +684,12 @@ public class RawDataManager {
 
 			} else {
 
-				TourLogManager.addLog(TourLogState.IMPORT_ERROR, reimportFileNamePath);
+				TourLogManager.addSubLog(TourLogState.IMPORT_ERROR, reimportFileNamePath);
 			}
 
 		} else {
 
-			TourLogManager.addLog(TourLogState.IMPORT_ERROR, reimportFileNamePath);
+			TourLogManager.addSubLog(TourLogState.IMPORT_ERROR, reimportFileNamePath);
 
 			if (oldTourDataInImportView != null) {
 
@@ -1403,9 +1405,9 @@ public class RawDataManager {
 
 				for (final TourData tourData : _toursInImportView.values()) {
 
-					final String tourFilePath = tourData.getImportFilePath();
+					final String tourFilePathName = tourData.getImportFilePathName();
 
-					if (tourFilePath != null && tourFilePath.equals(oldFilePath)) {
+					if (tourFilePathName != null && tourFilePathName.equals(oldFilePath)) {
 						isNeeded = true;
 						break;
 					}
@@ -1420,7 +1422,7 @@ public class RawDataManager {
 		}
 	}
 
-	public ImportRunState runImport(final ArrayList<OSFile> importFiles) {
+	public ImportRunState runImport(final ArrayList<OSFile> importFiles, final boolean isEasyImport) {
 
 		final ImportRunState importRunState = new ImportRunState();
 
@@ -1430,7 +1432,18 @@ public class RawDataManager {
 
 		final long start = System.currentTimeMillis();
 
-		TourLogManager.addLog(TourLogState.DEFAULT, EasyImportManager.LOG_EASY_IMPORT_002_TOUR_FILES_START);
+		/*
+		 * Log import
+		 */
+		final String css = isEasyImport //
+				? UI.EMPTY_STRING
+				: TourLogView.CSS_LOG_TITLE;
+
+		final String message = isEasyImport
+				? EasyImportManager.LOG_EASY_IMPORT_002_TOUR_FILES_START
+				: RawDataManager.LOG_IMPORT_TOUR;
+
+		TourLogManager.addLog(TourLogState.DEFAULT, message, css);
 
 		// check if devices are loaded
 		if (_devicesByExtension == null) {
@@ -1509,11 +1522,13 @@ public class RawDataManager {
 						break;
 					}
 
-					monitor.worked(1);
-					monitor.subTask(NLS.bind(Messages.import_data_importTours_subTask, //
-							new Object[] { ++imported, importSize, filePath }));
-
 					final String osFilePath = filePath.filePath.toOSString();
+
+					final String subTask = NLS.bind(Messages.import_data_importTours_subTask, //
+							new Object[] { ++imported, importSize, osFilePath });
+
+					monitor.worked(1);
+					monitor.subTask(subTask);
 
 					// ignore files which are imported as children from other imported files
 					if (_importedFileNamesChildren.contains(osFilePath)) {
@@ -1524,7 +1539,7 @@ public class RawDataManager {
 
 						importCounter++;
 
-						TourLogManager.addLog(TourLogState.IMPORT_OK, osFilePath);
+						TourLogManager.addSubLog(TourLogState.IMPORT_OK, osFilePath);
 
 						// update state
 						for (final TourData importedTourData : _newlyImportedTours.values()) {
@@ -1535,7 +1550,7 @@ public class RawDataManager {
 
 						notImportedFiles.add(osFilePath);
 
-						TourLogManager.addLog(TourLogState.IMPORT_ERROR, osFilePath);
+						TourLogManager.addSubLog(TourLogState.IMPORT_ERROR, osFilePath);
 					}
 				}
 
@@ -1566,7 +1581,9 @@ public class RawDataManager {
 		}
 
 		final double time = (System.currentTimeMillis() - start) / 1000.0;
-		TourLogManager.addLog(TourLogState.DEFAULT, String.format(EasyImportManager.LOG_EASY_IMPORT_002_END, time));
+		TourLogManager.addLog(TourLogState.DEFAULT, String.format(isEasyImport
+				? EasyImportManager.LOG_EASY_IMPORT_002_END
+				: RawDataManager.LOG_IMPORT_TOUR_END, time));
 
 		return importRunState;
 	}

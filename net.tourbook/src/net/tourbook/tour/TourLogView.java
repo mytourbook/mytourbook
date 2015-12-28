@@ -54,15 +54,15 @@ import org.eclipse.ui.part.ViewPart;
 public class TourLogView extends ViewPart {
 
 	public static final String	ID									= "net.tourbook.tour.TourLogView";					//$NON-NLS-1$
-
-	//
-	public static final String	LOG_SAVE_TOUR						= "Save tours";									//$NON-NLS-1$
 	//
 	private static final String	STATE_COPY							= "COPY";											//$NON-NLS-1$
 	private static final String	STATE_DELETE						= "DELETE";										//$NON-NLS-1$
 	private static final String	STATE_ERROR							= "ERROR";											//$NON-NLS-1$
 	private static final String	STATE_OK							= "OK";											//$NON-NLS-1$
 	private static final String	STATE_SAVE							= "SAVE";											//$NON-NLS-1$
+	//
+	public static final String	CSS_LOG_TITLE						= "title";
+	private static final String	CSS_LOG_SUB_ITEM					= "subItem";
 	//
 	private static final String	DOM_ID_LOG							= "logs";											//$NON-NLS-1$
 	private static final String	WEB_RESOURCE_TOUR_IMPORT_LOG_CSS	= "tour-import-log.css";							//$NON-NLS-1$
@@ -110,7 +110,7 @@ public class TourLogView extends ViewPart {
 		TourLogManager.clear();
 	}
 
-	public void addLog(final TourLog importLog) {
+	public void addLog(final TourLog tourLog) {
 
 		final boolean isBrowserAvailable = _browser != null && _browser.isDisposed() == false;
 
@@ -120,21 +120,23 @@ public class TourLogView extends ViewPart {
 			return;
 		}
 
-		String jsText = UI.replaceJS_BackSlash(importLog.message);
+		String jsText = UI.replaceJS_BackSlash(tourLog.message);
 		jsText = UI.replaceJS_Apostrophe(jsText);
 		final String message = jsText;
+		final String subItem = tourLog.isSubLogItem ? CSS_LOG_SUB_ITEM : UI.EMPTY_STRING;
+		final String css = tourLog.css == null ? UI.EMPTY_STRING : tourLog.css;
 
 		final String stateNoBrowser[] = { UI.EMPTY_STRING };
 		final String stateWithBrowser[] = { UI.EMPTY_STRING };
 
-		getImportState(importLog, stateNoBrowser, stateWithBrowser);
+		getImportState(tourLog, stateNoBrowser, stateWithBrowser);
 
 		// Run always async that the flow is not blocked.
 		Display.getDefault().asyncExec(new Runnable() {
 			@Override
 			public void run() {
 
-				final String noBrowserText = importLog.time + UI.SPACE + stateNoBrowser[0] + UI.SPACE + message;
+				final String noBrowserText = tourLog.time + UI.SPACE + stateNoBrowser[0] + UI.SPACE + message;
 
 //				System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
 //						+ ("\t" + noBrowserText));
@@ -148,7 +150,7 @@ public class TourLogView extends ViewPart {
 
 							// time
 							+ ("var td = document.createElement('TD');\n") //$NON-NLS-1$
-							+ ("td.appendChild(document.createTextNode('" + importLog.time + "'));\n") //$NON-NLS-1$ //$NON-NLS-2$
+							+ ("td.appendChild(document.createTextNode('" + tourLog.time + "'));\n") //$NON-NLS-1$ //$NON-NLS-2$
 							+ ("tr.appendChild(td);\n") //$NON-NLS-1$
 
 							// state
@@ -159,11 +161,18 @@ public class TourLogView extends ViewPart {
 
 							// message
 							+ ("var td = document.createElement('TD');\n") //$NON-NLS-1$
-							+ ("td.className='column logItem';\n") //$NON-NLS-1$
+							+ ("td.className='column logItem " + subItem + " " + css + "';\n") //$NON-NLS-1$
 							+ ("td.appendChild(document.createTextNode('" + message + "'));\n") //$NON-NLS-1$ //$NON-NLS-2$
 							+ ("tr.appendChild(td);\n") //$NON-NLS-1$
 
-							+ ("document.getElementById(\"" + DOM_ID_LOG + "\").tBodies[0].appendChild(tr);\n") //$NON-NLS-1$ //$NON-NLS-2$
+							+ ("var logTable = document.getElementById(\"" + DOM_ID_LOG + "\");\n") //$NON-NLS-1$ //$NON-NLS-2$
+							+ ("logTable.tBodies[0].appendChild(tr);\n") //$NON-NLS-1$
+
+							// scroll to the bottom -> this do not work
+//							+ ("debugger;\n") //$NON-NLS-1$
+							+ ("var html = document.documentElement;\n") //$NON-NLS-1$
+							+ ("var scrollHeight = html.scrollHeight;\n") //$NON-NLS-1$
+							+ ("html.scrollTop = scrollHeight;\n") //$NON-NLS-1$
 					;
 
 					_browser.execute(js);
@@ -408,6 +417,11 @@ public class TourLogView extends ViewPart {
 		case IMPORT_ERROR:
 			stateNoBrowser[0] = STATE_ERROR;
 			stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateError);
+			break;
+
+		case TOUR_DELETED:
+			stateNoBrowser[0] = STATE_DELETE;
+			stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateDeleteBackup);
 			break;
 
 		case TOUR_SAVED:

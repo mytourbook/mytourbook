@@ -7312,22 +7312,19 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 
 	@Override
 	public String toString() {
+		return "TourData [\n" //																		//$NON-NLS-1$
 
-		return new StringBuilder()//
-				.append("[TourData]") //$NON-NLS-1$
-				//
-//				.append(" tourId:") //$NON-NLS-1$
-//				.append(tourId)
-				//
-				.append(" object:") //$NON-NLS-1$
-				.append(super.toString())
-				.append(" identityHashCode:") //$NON-NLS-1$
-				.append(System.identityHashCode(this))
+				+ ("start=" + startYear + "-" + startMonth + "-" + startDay + " ") //					//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				+ (startHour + ":" + startMinute + ":" + startSecond + "\n") //							//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-				.append("\n\tsize:" + tourMarkers.size()) //$NON-NLS-1$
-				.append(" " + tourMarkers) //$NON-NLS-1$
+				+ ("tourId=" + tourId + "\n") ///														/$NON-NLS-1$ //$NON-NLS-2$
 
-				.toString();
+				+ ("object=" + super.toString() + "\n") //												//$NON-NLS-1$ //$NON-NLS-2$
+				+ ("identityHashCode=" + System.identityHashCode(this) + "\n") //						//$NON-NLS-1$ //$NON-NLS-2$
+
+//				+ ("marker size:" + tourMarkers.size() + " " + tourMarkers+"\n") //$NON-NLS-1$
+
+				+ "]"; //$NON-NLS-1$
 	}
 
 	public String toStringWithHash() {

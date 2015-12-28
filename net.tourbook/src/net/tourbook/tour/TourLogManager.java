@@ -17,28 +17,51 @@ package net.tourbook.tour;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 
 public class TourLogManager {
 
-	public static final String							LOG_DELETE_TOUR	= "Tour deleted: %s";			//$NON-NLS-1$
-	//
-	private static final CopyOnWriteArrayList<TourLog>	_tourLogs		= new CopyOnWriteArrayList<>();
+	public static final String							LOG_DELETE_TOURS	= "Delete tours";				//$NON-NLS-1$
+	public static final String							LOG_SAVE_TOURS		= "Save tours";				//$NON-NLS-1$
+
+	private static final CopyOnWriteArrayList<TourLog>	_tourLogs			= new CopyOnWriteArrayList<>();
 
 	private static TourLogView							_logView;
 
-	public static void addLog(final TourLogState logState, final String message) {
-
-		final TourLog importLog = new TourLog(logState, message);
+	private static void addLog(final TourLog tourLog) {
 
 		// update model
-		_tourLogs.add(importLog);
+		_tourLogs.add(tourLog);
 
 		// update UI
 		if (isTourLogOpen()) {
-			_logView.addLog(importLog);
+			_logView.addLog(tourLog);
 		}
+	}
+
+	public static void addLog(final TourLogState logState, final String message) {
+
+		final TourLog tourLog = new TourLog(logState, message);
+
+		addLog(tourLog);
+	}
+
+	public static void addLog(final TourLogState logState, final String message, final String css) {
+
+		final TourLog tourLog = new TourLog(logState, message);
+
+		tourLog.css = css;
+
+		addLog(tourLog);
+	}
+
+	public static void addSubLog(final TourLogState logState, final String message) {
+
+		final TourLog tourLog = new TourLog(logState, message);
+
+		tourLog.isSubLogItem = true;
+
+		addLog(tourLog);
 	}
 
 	public static void clear() {
@@ -54,11 +77,7 @@ public class TourLogManager {
 
 	private static boolean isTourLogOpen() {
 
-		final boolean isLogViewOpen = _logView != null && _logView.isDisposed();
-
-		System.out.println((UI.timeStampNano() + " [" + TourLogManager.class.getSimpleName() + "] ")
-				+ ("\tisLogViewOpen: " + isLogViewOpen));
-		// TODO remove SYSTEM.OUT.PRINTLN
+		final boolean isLogViewOpen = _logView != null && _logView.isDisposed() == false;
 
 		return isLogViewOpen;
 	}

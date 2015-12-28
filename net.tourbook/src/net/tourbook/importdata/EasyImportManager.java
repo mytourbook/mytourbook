@@ -53,7 +53,6 @@ import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourLogState;
-import net.tourbook.tour.TourManager;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -111,12 +110,13 @@ public class EasyImportManager {
 	public static final String			LOG_EASY_IMPORT_001_COPY				= "%s -> %s";									//$NON-NLS-1$
 	public static final String			LOG_EASY_IMPORT_002_TOUR_FILES_START	= "2. Import tour files";						//$NON-NLS-1$
 	public static final String			LOG_EASY_IMPORT_002_END					= "2. Imported in %.3f s";						//$NON-NLS-1$
-	public static final String			LOG_EASY_IMPORT_003_TOUR_TYPE			= "3. Tour type: %s - %s";
+	public static final String			LOG_EASY_IMPORT_003_TOUR_TYPE			= "3. Set tour type";
+	public static final String			LOG_EASY_IMPORT_003_TOUR_TYPE_ITEM		= "%s - %s";
 	public static final String			LOG_EASY_IMPORT_004_SET_LAST_MARKER		= "4. Set last marker";						//$NON-NLS-1$
 	public static final String			LOG_EASY_IMPORT_099_SAVE_TOUR			= "99. Save tour";								//$NON-NLS-1$
 	public static final String			LOG_EASY_IMPORT_100_DELETE_TOUR_FILES	= "100. Delete tour files";					//$NON-NLS-1$
 	public static final String			LOG_EASY_IMPORT_101_TURN_WATCHING_OFF	= "101. Turn watching off";					//$NON-NLS-1$
-	public static final String			LOG_EASY_IMPORT_999_IMPORT_END			= "Import end, %.3f s";						//$NON-NLS-1$
+	public static final String			LOG_EASY_IMPORT_999_IMPORT_END			= "Easy import end, %.3f s";					//$NON-NLS-1$
 	//
 	private static EasyImportManager	_instance;
 
@@ -829,7 +829,7 @@ public class EasyImportManager {
 		/*
 		 * 02. Import files
 		 */
-		final ImportRunState importRunState = RawDataManager.getInstance().runImport(notImportedFiles);
+		final ImportRunState importRunState = RawDataManager.getInstance().runImport(notImportedFiles, true);
 
 		importState.isImportCanceled = importRunState.isImportCanceled;
 
@@ -896,7 +896,7 @@ public class EasyImportManager {
 
 						Files.copy(devicePath, targetPath);
 
-						TourLogManager.addLog(
+						TourLogManager.addSubLog(
 								TourLogState.EASY_IMPORT_COPY,
 								String.format(LOG_EASY_IMPORT_001_COPY, devicePath, targetPath));
 
@@ -924,6 +924,8 @@ public class EasyImportManager {
 			// nothing is imported
 			return;
 		}
+
+		TourLogManager.addLog(TourLogState.DEFAULT, LOG_EASY_IMPORT_003_TOUR_TYPE);
 
 		final ImportConfig importConfig = getEasyConfig().getActiveImportConfig();
 
@@ -1136,20 +1138,24 @@ public class EasyImportManager {
 			// set one tour type
 
 			final TourType tourType = importLauncher.oneTourType;
-			tourTypeName = tourType.getName();
 
-			tourData.setTourType(tourType);
+			if (tourType != null) {
+
+				tourTypeName = tourType.getName();
+
+				tourData.setTourType(tourType);
+			}
 
 		} else {
 
 			// tour type is not set
 		}
 
-		TourLogManager.addLog(//
+		TourLogManager.addSubLog(//
 				TourLogState.DEFAULT,
 				String.format(//
-						LOG_EASY_IMPORT_003_TOUR_TYPE,
-						tourTypeName,
-						TourManager.getTourTitleDetailed(tourData)));
+						LOG_EASY_IMPORT_003_TOUR_TYPE_ITEM,
+						UI.DTFormatterShort.print(tourData.getTourStartTimeMS()),
+						tourTypeName));
 	}
 }

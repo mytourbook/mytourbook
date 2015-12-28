@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,6 +21,7 @@ import java.util.Iterator;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.TreeViewerItem;
@@ -30,6 +31,7 @@ import net.tourbook.tour.ITourItem;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourLogState;
+import net.tourbook.tour.TourLogView;
 import net.tourbook.tour.TourManager;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -46,12 +48,12 @@ import org.eclipse.swt.widgets.Display;
 
 public class ActionDeleteTour extends Action {
 
-	private TourBookView	_tourViewer;
+	private TourBookView	_tourBookView;
 	private TreeViewerItem	_nextSelectedTreeItem;
 
 	public ActionDeleteTour(final TourBookView tourBookView) {
 
-		_tourViewer = tourBookView;
+		_tourBookView = tourBookView;
 
 		setText(Messages.Tour_Book_Action_delete_selected_tours);
 
@@ -62,6 +64,8 @@ public class ActionDeleteTour extends Action {
 	private void deleteTours(	final IStructuredSelection selection,
 								final SelectionDeletedTours selectionRemovedTours,
 								final IProgressMonitor monitor) {
+
+		TourLogManager.addLog(TourLogState.DEFAULT, TourLogManager.LOG_DELETE_TOURS, TourLogView.CSS_LOG_TITLE);
 
 		final int selectionSize = selection.size();
 		int tourCounter = 0;
@@ -74,15 +78,19 @@ public class ActionDeleteTour extends Action {
 		if (monitor != null) {
 			monitor.beginTask(Messages.Tour_Book_Action_DeleteSelectedTours_Monitor, selectionSize);
 		}
-
 		// loop: selected tours
 		for (final Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
 
 			if (monitor != null) {
+
 				monitor.subTask(NLS.bind(
 						Messages.Tour_Book_Action_DeleteSelectedTours_MonitorSubtask,
 						++tourCounter,
 						selectionSize));
+
+				if (monitor.isCanceled()) {
+					break;
+				}
 			}
 
 			final Object treeItem = iterator.next();
@@ -91,12 +99,13 @@ public class ActionDeleteTour extends Action {
 				final TVITourBookTour tourItem = (TVITourBookTour) treeItem;
 
 				final Long tourId = tourItem.getTourId();
+				final TourData tourData = TourManager.getTour(tourId);
+				final String tour = UI.DTFormatterShort.print(tourData.getTourStartTimeMS());
+
 				if (TourDatabase.deleteTour(tourId)) {
 
 					// log deletion
-					final TourData tourData = TourManager.getTour(tourId);
-					final String tourTitle = TourManager.getTourTitleDetailed(tourData);
-					TourLogManager.addLog(TourLogState.TOUR_DELETED, tourTitle);
+					TourLogManager.addSubLog(TourLogState.TOUR_DELETED, tour);
 
 					removedTours.add(tourItem);
 
@@ -104,9 +113,13 @@ public class ActionDeleteTour extends Action {
 
 					// get the index for the first selected tour item
 					if (firstSelectedTourIndex == -1) {
+
 						final ArrayList<TreeViewerItem> parentTourItems = tourParent.getChildren();
+
 						for (final TreeViewerItem firstTourItem : parentTourItems) {
+
 							firstSelectedTourIndex++;
+
 							if (firstTourItem == tourItem) {
 								firstSelectedParent = tourParent;
 								break;
@@ -148,7 +161,7 @@ public class ActionDeleteTour extends Action {
 				 * it's possible that the parent does not have any children, then also this parent
 				 * must be removed (to be done later)
 				 */
-				_nextSelectedTreeItem = firstSelectedParent;
+//				_nextSelectedTreeItem = firstSelectedParent;
 				// for (TreeViewerItem tourParent : tourParents) {
 				//
 				// }
@@ -171,8 +184,9 @@ public class ActionDeleteTour extends Action {
 			return;
 		}
 
+		final ColumnViewer treeViewer = _tourBookView.getViewer();
+
 		// get selected tours
-		final ColumnViewer treeViewer = _tourViewer.getViewer();
 		final IStructuredSelection selection = (IStructuredSelection) treeViewer.getSelection();
 
 		int selectedTours = 0;
@@ -195,6 +209,7 @@ public class ActionDeleteTour extends Action {
 			}
 		}
 
+		// log deletions
 		TourLogManager.openLogView();
 
 		final SelectionDeletedTours selectionRemovedTours = new SelectionDeletedTours();
@@ -223,13 +238,13 @@ public class ActionDeleteTour extends Action {
 			};
 
 			try {
-				new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, false, deleteRunnable);
+				new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, true, deleteRunnable);
 			} catch (InvocationTargetException | InterruptedException e) {
 				StatusUtil.log(e);
 			}
 		}
 
-		final PostSelectionProvider postSelectionProvider = _tourViewer.getPostSelectionProvider();
+		final PostSelectionProvider postSelectionProvider = _tourBookView.getPostSelectionProvider();
 
 		// fire post selection
 		postSelectionProvider.setSelection(selectionRemovedTours);
@@ -238,8 +253,11 @@ public class ActionDeleteTour extends Action {
 		selectionRemovedTours.removedTours.clear();
 		postSelectionProvider.clearSelection();
 
+		// ensure that the deleted item is removed
+		_tourBookView.reloadViewer();
+
 		if (_nextSelectedTreeItem != null) {
-			_tourViewer.getViewer().setSelection(new StructuredSelection(_nextSelectedTreeItem), true);
+			treeViewer.setSelection(new StructuredSelection(_nextSelectedTreeItem), true);
 		}
 	}
 

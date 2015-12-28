@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.application;
 
+import net.tourbook.tour.TourLogView;
 import net.tourbook.ui.tourChart.TourChartView;
 import net.tourbook.ui.views.rawData.RawDataView;
 
@@ -29,6 +30,7 @@ public class PerspectiveFactoryRawData implements IPerspectiveFactory {
 	private static final String	FOLDER_ID_TOP	= "top";								//$NON-NLS-1$
 	private static final String	FOLDER_ID_LEFT	= "left";								//$NON-NLS-1$
 
+	@Override
 	public void createInitialLayout(final IPageLayout layout) {
 
 		layout.setEditorAreaVisible(false);
@@ -50,6 +52,7 @@ public class PerspectiveFactoryRawData implements IPerspectiveFactory {
 				IPageLayout.ID_EDITOR_AREA);
 
 		topFolder.addView(TourChartView.ID);
+		topFolder.addPlaceholder(TourLogView.ID);
 	}
 
 }

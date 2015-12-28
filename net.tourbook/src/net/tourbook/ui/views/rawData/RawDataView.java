@@ -3013,7 +3013,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			deletedFiles.add(filePathName);
 
-			TourLogManager.addLog(importLogState, filePathName);
+			TourLogManager.addSubLog(importLogState, filePathName);
 
 		} catch (final Exception e) {
 
@@ -3022,7 +3022,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			final String fileNamePath = '"' + fileFolder + '"' + UI.SPACE + '"' + fileName + '"';
 			notDeletedFiles.add(fileNamePath);
 
-			TourLogManager.addLog(TourLogState.IMPORT_ERROR, fileNamePath);
+			TourLogManager.addSubLog(TourLogState.IMPORT_ERROR, fileNamePath);
 		}
 
 		return;
@@ -3080,11 +3080,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	/**
 	 * @param tourData
-	 *            {@link TourData} which is not yet saved
+	 *            {@link TourData} which is not yet saved.
 	 * @param person
-	 *            person for which the tour is being saved
+	 *            Person for which the tour is being saved.
 	 * @param savedTours
-	 *            the saved tour is added to this list
+	 *            The saved tour is added to this list.
 	 */
 	private void doSaveTour_OneTour(final TourData tourData,
 									final TourPerson person,
@@ -3114,10 +3114,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			savedTours.add(savedTour);
 
-			// update fields which are not saved but used in the UI
+			// update fields which are not saved but used in the UI and easy setup
 			savedTour.isTourFileDeleted = tourData.isTourFileDeleted;
 			savedTour.isTourFileMoved = tourData.isTourFileMoved;
 			savedTour.isBackupImportFile = tourData.isBackupImportFile;
+			savedTour.importFilePathOriginal = tourData.importFilePathOriginal;
 		}
 	}
 
@@ -3925,14 +3926,17 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			return;
 		}
 
-//		if (prevImportedFiles.length < 5) {
-//			reimportAllImportFilesTask(null, prevImportedFiles);
-//		} else {
+		// Log reimport
+		TourLogManager.addLog(
+				TourLogState.DEFAULT,
+				RawDataManager.LOG_REIMPORT_PREVIOUS_FILES,
+				TourLogView.CSS_LOG_TITLE);
+
+		final long start = System.currentTimeMillis();
 
 		if (RawDataManager.isAutoOpenImportLog()) {
 			TourLogManager.openLogView();
 		}
-		TourLogManager.addLog(TourLogState.DEFAULT, RawDataManager.LOG_REIMPORT_PREVIOUS_FILES);
 
 		try {
 			new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(
@@ -3949,7 +3953,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 					});
 
 		} catch (final Exception e) {
+
 			StatusUtil.log(e);
+
+		} finally {
+
+			final double time = (System.currentTimeMillis() - start) / 1000.0;
+			TourLogManager.addLog(//
+					TourLogState.DEFAULT,
+					String.format(RawDataManager.LOG_REIMPORT_PREVIOUS_FILES_END, time));
 		}
 	}
 
@@ -3987,14 +3999,16 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 						new Object[] { workedDone++, workedAll, fileName }));
 			}
 
-
 			final File file = new File(fileName);
 			if (file.exists()) {
-				if (_rawDataMgr.importRawData(file, null, false, null, true)) {
-					TourLogManager.addLog(TourLogState.IMPORT_OK, fileName);
+
+				final boolean isImported = _rawDataMgr.importRawData(file, null, false, null, true);
+
+				if (isImported) {
+					TourLogManager.addSubLog(TourLogState.IMPORT_OK, fileName);
 					importedFileCounter++;
 				} else {
-					TourLogManager.addLog(TourLogState.IMPORT_ERROR, fileName);
+					TourLogManager.addSubLog(TourLogState.IMPORT_ERROR, fileName);
 					notImportedFiles.add(fileName);
 				}
 			}
@@ -4145,7 +4159,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private void runImport(final long tileId) {
 
 		final long start = System.currentTimeMillis();
-		TourLogManager.addLog(TourLogState.DEFAULT, EasyImportManager.LOG_EASY_IMPORT_000_IMPORT_START);
+		TourLogManager.addLog(
+				TourLogState.DEFAULT,
+				EasyImportManager.LOG_EASY_IMPORT_000_IMPORT_START,
+				TourLogView.CSS_LOG_TITLE);
 
 		if (isWatchingOn() == false) {
 
@@ -4200,6 +4217,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		 */
 		ImportDeviceState importState = null;
 
+		if (RawDataManager.isAutoOpenImportLog()) {
+			TourLogManager.openLogView();
+		}
+
 		try {
 
 			// disable state update during import, this causes lots of problems !!!
@@ -4247,11 +4268,18 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			runImport_004_SetLastMarker(importLauncher, importedTours);
 		}
 
+		ArrayList<TourData> importedAndSavedTours;
+
 		/*
 		 * 99. Save imported tours
 		 */
 		if (importLauncher.isSaveTour) {
-			runImport_099_SaveTour(person, importedTours, true);
+
+			importedAndSavedTours = runImport_099_SaveTour(person, importedTours, true);
+
+		} else {
+
+			importedAndSavedTours = _rawDataMgr.getImportedTourList();
 		}
 
 		/*
@@ -4261,7 +4289,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			// use newly saved/not saved tours
 
-			runImport_100_DeleteTourFiles(false, _rawDataMgr.getImportedTourList(), true);
+			runImport_100_DeleteTourFiles(false, importedAndSavedTours, true);
 		}
 
 		/*
@@ -4329,17 +4357,30 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				// this marker is in the range of the last marker distance -> set the tour marker text
 
 				lastMarker.setLabel(lastMarkerText);
+
+				TourLogManager.addSubLog(TourLogState.DEFAULT, TourManager.getTourDateTimeShort(tourData));
 			}
 		}
 	}
 
-	private void runImport_099_SaveTour(final TourPerson person,
-										final ArrayList<TourData> selectedTours,
-										final boolean isEasyImport) {
+	/**
+	 * @param person
+	 * @param selectedTours
+	 * @param isEasyImport
+	 * @return Returns list with saved tours.
+	 */
+	private ArrayList<TourData> runImport_099_SaveTour(	final TourPerson person,
+														final ArrayList<TourData> selectedTours,
+														final boolean isEasyImport) {
 
-		TourLogManager.addLog(TourLogState.DEFAULT, isEasyImport
+		final String css = isEasyImport //
+				? UI.EMPTY_STRING
+				: TourLogView.CSS_LOG_TITLE;
+		final String message = isEasyImport //
 				? EasyImportManager.LOG_EASY_IMPORT_099_SAVE_TOUR
-				: TourLogView.LOG_SAVE_TOUR);
+				: TourLogManager.LOG_SAVE_TOURS;
+
+		TourLogManager.addLog(TourLogState.DEFAULT, message, css);
 
 		final ArrayList<TourData> savedTours = new ArrayList<TourData>();
 
@@ -4359,7 +4400,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 					doSaveTour_OneTour(tourData, person, savedTours, false);
 
-					TourLogManager.addLog(TourLogState.TOUR_SAVED, tourData.getImportFilePathNameText());
+					TourLogManager.addSubLog(TourLogState.TOUR_SAVED, tourData.getImportFilePathNameText());
 
 					monitor.worked(1);
 				}
@@ -4375,6 +4416,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 
 		doSaveTour_PostActions(savedTours);
+
+		return savedTours;
 	}
 
 	/**
@@ -4388,9 +4431,18 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 												final ArrayList<TourData> allTourData,
 												final boolean isEasyImport) {
 
-		TourLogManager.addLog(TourLogState.DEFAULT, isEasyImport
+		// open log view always then tour files are deleted
+		TourLogManager.openLogView();
+
+		final String css = isEasyImport //
+				? UI.EMPTY_STRING
+				: TourLogView.CSS_LOG_TITLE;
+
+		final String message = isEasyImport
 				? EasyImportManager.LOG_EASY_IMPORT_100_DELETE_TOUR_FILES
-				: RawDataManager.LOG_IMPORT_DELETE_TOUR_FILE);
+				: RawDataManager.LOG_IMPORT_DELETE_TOUR_FILE;
+
+		TourLogManager.addLog(TourLogState.DEFAULT, message, css);
 
 		if (isDeleteAllFiles) {
 
@@ -4489,16 +4541,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		/*
 		 * Log deleted files
 		 */
-		final StringBuilder sb = new StringBuilder();
-		sb.append("DELETED TOUR FILES LOG");//$NON-NLS-1$
-
-		sb.append(UI.NEW_LINE2);
-		createFilesLog(sb, deletedFiles, "Deleted tour files: ");//$NON-NLS-1$
-
-		sb.append(UI.NEW_LINE2);
-		createFilesLog(sb, notDeletedFiles, "Not deleted tour files with errors: ");//$NON-NLS-1$
-
-		StatusUtil.logInfo(sb.toString());
+		final String logText = String.format(
+				RawDataManager.LOG_IMPORT_DELETE_TOUR_FILE_END,
+				deletedFiles.size(),
+				notDeletedFiles.size());
+		TourLogManager.addLog(TourLogState.DEFAULT, logText);
 
 		if (isDeleteAllFiles) {
 
@@ -4517,6 +4564,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		if (table.isDisposed()) {
 			return;
 		}
+
+		EasyImportManager.getInstance().saveEasyConfig(getEasyConfig());
 
 		/*
 		 * save imported file names

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,6 +18,7 @@ package net.tourbook.application;
 import net.tourbook.map2.view.Map2View;
 import net.tourbook.photo.PicDirView;
 import net.tourbook.statistic.TourStatisticsView;
+import net.tourbook.tour.TourLogView;
 import net.tourbook.ui.tourChart.TourChartView;
 import net.tourbook.ui.views.TourWaypointView;
 import net.tourbook.ui.views.calendar.CalendarView;
@@ -59,6 +60,7 @@ public class PerspectiveFactoryTourBook implements IPerspectiveFactory {
 		mapFolder.addView(Map2View.ID);
 		mapFolder.addPlaceholder(IExternalIds.VIEW_ID_NET_TOURBOOK_MAP3_MAP3_VIEW_ID);
 		mapFolder.addView(TourDataEditorView.ID);
+		mapFolder.addPlaceholder(TourLogView.ID);
 
 		//--------------------------------------------------------------------------------
 

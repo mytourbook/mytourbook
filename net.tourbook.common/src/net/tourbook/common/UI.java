@@ -305,6 +305,7 @@ public class UI {
 	public static final SimpleDateFormat	MonthFormatter							= new SimpleDateFormat("MMM");												//$NON-NLS-1$
 	public static final SimpleDateFormat	WeekDayFormatter						= new SimpleDateFormat("EEEE");											//$NON-NLS-1$
 	public static final DateTimeFormatter	DTFormatterShort						= DateTimeFormat.shortDateTime();
+	public static final DateTimeFormatter	DTFormatterMedium						= DateTimeFormat.mediumDateTime();
 
 	public static final Font				AWT_FONT_ARIAL_8						= Font.decode("Arial-plain-8");											//$NON-NLS-1$
 	public static final Font				AWT_FONT_ARIAL_10						= Font.decode("Arial-plain-10");											//$NON-NLS-1$

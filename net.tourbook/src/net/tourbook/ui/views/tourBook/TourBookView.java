@@ -1954,6 +1954,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		final boolean isTourSelected = tourItems > 0;
 		final boolean isOneTour = tourItems == 1;
 		boolean isDeviceTour = false;
+		boolean canMergeTours = false;
 
 		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
 
@@ -1963,7 +1964,12 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 		if (isOneTour) {
 			firstSavedTour = TourManager.getInstance().getTourData(firstTour.getTourId());
+		}
+
+		if (firstSavedTour != null) {
+
 			isDeviceTour = firstSavedTour.isManualTour() == false;
+			canMergeTours = isOneTour && isDeviceTour && firstSavedTour.getMergeSourceTourId() != null;
 		}
 
 		/*
@@ -1983,7 +1989,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		_actionExportTour.setEnabled(isTourSelected);
 		_actionExportViewCSV.setEnabled(selectedItems > 0);
 		_actionJoinTours.setEnabled(tourItems > 1);
-		_actionMergeTour.setEnabled(isOneTour && isDeviceTour && firstSavedTour.getMergeSourceTourId() != null);
+		_actionMergeTour.setEnabled(canMergeTours);
 		_actionOpenAdjustAltitudeDialog.setEnabled(isOneTour && isDeviceTour);
 		_actionOpenMarkerDialog.setEnabled(isOneTour && isDeviceTour);
 		_actionOpenTour.setEnabled(isOneTour);

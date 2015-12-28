@@ -15,11 +15,10 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
-
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.DateTimeFormatterBuilder;
 
-public class TourLog {
+class TourLog {
 
 	private final DateTimeFormatter	_dtFormatterTime	= new DateTimeFormatterBuilder()
 																.appendHourOfDay(2)
@@ -32,8 +31,13 @@ public class TourLog {
 																.toFormatter();
 
 	public String					time;
+
 	public TourLogState				state;
+
 	public String					message;
+	public boolean					isSubLogItem;
+
+	public String					css;
 
 	public TourLog(final TourLogState state, final String message) {
 
