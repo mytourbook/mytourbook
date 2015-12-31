@@ -80,22 +80,22 @@ public class RawDataManager {
 	private static final String				RAW_DATA_LAST_SELECTED_PATH			= "raw-data-view.last-selected-import-path";				//$NON-NLS-1$
 	private static final String				TEMP_IMPORTED_FILE					= "received-device-data.txt";								//$NON-NLS-1$
 	//
-	public static final String				LOG_IMPORT_DELETE_TOUR_FILE			= "Delete tour files";										//$NON-NLS-1$
-	public static final String				LOG_IMPORT_DELETE_TOUR_FILE_END		= "Deleted: %d - Not deleted with errors: %d";				//$NON-NLS-1$
-	private static final String				LOG_IMPORT_TOUR						= "Import tours";											//$NON-NLS-1$
-	public static final String				LOG_IMPORT_TOUR_IMPORTED			= "%s <- %s";												//$NON-NLS-1$
-	private static final String				LOG_IMPORT_TOUR_END					= "Imported in %.3f s";									//$NON-NLS-1$
+	public static final String				LOG_IMPORT_DELETE_TOUR_FILE			= Messages.Log_Import_DeleteTourFiles;
+	public static final String				LOG_IMPORT_DELETE_TOUR_FILE_END		= Messages.Log_Import_DeleteTourFiles_End;
+	private static final String				LOG_IMPORT_TOUR						= Messages.Log_Import_Tour;
+	public static final String				LOG_IMPORT_TOUR_IMPORTED			= Messages.Log_Import_Tour_Imported;
+	private static final String				LOG_IMPORT_TOUR_END					= Messages.Log_Import_Tour_End;
 	//
-	public static final String				LOG_REIMPORT_PREVIOUS_FILES			= "Reimport previous files";								//$NON-NLS-1$
-	public static final String				LOG_REIMPORT_END					= "Reimported in %.3f s";									//$NON-NLS-1$
+	public static final String				LOG_REIMPORT_PREVIOUS_FILES			= Messages.Log_Reimport_PreviousFiles;
+	public static final String				LOG_REIMPORT_END					= Messages.Log_Reimport_PreviousFiles_End;
 	//
-	private static final String				LOG_REIMPORT_ALL_TIME_SLICES		= "Reimport all timeslices";								//$NON-NLS-1$
-	private static final String				LOG_REIMPORT_ONLY_ALTITUDE			= "Reimport only altitude";								//$NON-NLS-1$
-	private static final String				LOG_REIMPORT_ONLY_GEAR				= "Reimport only gear";									//$NON-NLS-1$
-	private static final String				LOG_REIMPORT_ONLY_POWER_SPEED		= "Reimport only speed and power";							//$NON-NLS-1$
-	private static final String				LOG_REIMPORT_ONLY_MARKER			= "Reimport only marker";									//$NON-NLS-1$
-	private static final String				LOG_REIMPORT_ONLY_TEMPERATURE		= "Reimport only temperature";								//$NON-NLS-1$
-	private static final String				LOG_REIMPORT_TOUR					= "Reimport tour";											//$NON-NLS-1$
+	private static final String				LOG_REIMPORT_ALL_TIME_SLICES		= Messages.Log_Reimport_AllTimeSlices;
+	private static final String				LOG_REIMPORT_ONLY_ALTITUDE			= Messages.Log_Reimport_Only_Altitude;
+	private static final String				LOG_REIMPORT_ONLY_GEAR				= Messages.Log_Reimport_Only_Gear;
+	private static final String				LOG_REIMPORT_ONLY_POWER_SPEED		= Messages.Log_Reimport_Only_PowerSpeed;
+	private static final String				LOG_REIMPORT_ONLY_MARKER			= Messages.Log_Reimport_Only_TourMarker;
+	private static final String				LOG_REIMPORT_ONLY_TEMPERATURE		= Messages.Log_Reimport_Only_Temperature;
+	private static final String				LOG_REIMPORT_TOUR					= Messages.Log_Reimport_Tour;
 	//
 	public static final int					ADJUST_IMPORT_YEAR_IS_DISABLED		= -1;
 	//

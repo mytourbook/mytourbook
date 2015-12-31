@@ -65,7 +65,7 @@ public class ActionDeleteTour extends Action {
 								final SelectionDeletedTours selectionRemovedTours,
 								final IProgressMonitor monitor) {
 
-		TourLogManager.addLog(TourLogState.DEFAULT, TourLogManager.LOG_DELETE_TOURS, TourLogView.CSS_LOG_TITLE);
+		TourLogManager.addLog(TourLogState.DEFAULT, TourLogManager.LOG_TOUR_DELETE_TOURS, TourLogView.CSS_LOG_TITLE);
 
 		final int selectionSize = selection.size();
 		int tourCounter = 0;

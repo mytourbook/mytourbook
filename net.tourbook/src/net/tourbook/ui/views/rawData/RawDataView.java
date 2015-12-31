@@ -4383,7 +4383,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				: TourLogView.CSS_LOG_TITLE;
 		final String message = isEasyImport //
 				? EasyImportManager.LOG_EASY_IMPORT_099_SAVE_TOUR
-				: TourLogManager.LOG_SAVE_TOURS;
+				: TourLogManager.LOG_TOUR_SAVE_TOURS;
 
 		TourLogManager.addLog(TourLogState.DEFAULT, message, css);
 
@@ -4408,7 +4408,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 					TourLogManager.addSubLog(
 							TourLogState.TOUR_SAVED,
 							String.format(
-									TourLogManager.LOG_SAVE_TOURS_FILE,
+									TourLogManager.LOG_TOUR_SAVE_TOURS_FILE,
 									UI.DTFormatterShort.print(tourData.getTourStartTimeMS()),
 									tourData.getImportFilePathNameText()));
 

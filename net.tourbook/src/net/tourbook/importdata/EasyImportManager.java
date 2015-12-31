@@ -104,18 +104,18 @@ public class EasyImportManager {
 	private static final String			ATTR_IL_LAST_MARKER_TEXT				= "lastMarkerText";							//$NON-NLS-1$
 	private static final String			ATTR_IL_LAST_MARKER_DISTANCE			= "lastMarkerDistance";						//$NON-NLS-1$
 	//
-	public static final String			LOG_EASY_IMPORT_000_IMPORT_START		= "Easy import start";							//$NON-NLS-1$
-	public static final String			LOG_EASY_IMPORT_001_BACKUP_TOUR_FILES	= "1. Backup tour files";						//$NON-NLS-1$
-	public static final String			LOG_EASY_IMPORT_001_COPY				= "%s -> %s";									//$NON-NLS-1$
-	public static final String			LOG_EASY_IMPORT_002_TOUR_FILES_START	= "2. Import tour files, %s";					//$NON-NLS-1$
-	public static final String			LOG_EASY_IMPORT_002_END					= "2. Imported in %.3f s";						//$NON-NLS-1$
-	public static final String			LOG_EASY_IMPORT_003_TOUR_TYPE			= "3. Set tour type"; //$NON-NLS-1$
-	public static final String			LOG_EASY_IMPORT_003_TOUR_TYPE_ITEM		= "%s - %s"; //$NON-NLS-1$
-	public static final String			LOG_EASY_IMPORT_004_SET_LAST_MARKER		= "4. Set last marker";						//$NON-NLS-1$
-	public static final String			LOG_EASY_IMPORT_099_SAVE_TOUR			= "99. Save tour";								//$NON-NLS-1$
-	public static final String			LOG_EASY_IMPORT_100_DELETE_TOUR_FILES	= "100. Delete tour files";					//$NON-NLS-1$
-	public static final String			LOG_EASY_IMPORT_101_TURN_WATCHING_OFF	= "101. Turn watching off";					//$NON-NLS-1$
-	public static final String			LOG_EASY_IMPORT_999_IMPORT_END			= "Easy import end, %.3f s";					//$NON-NLS-1$
+	public static final String			LOG_EASY_IMPORT_000_IMPORT_START		= Messages.Log_EasyImport_000_ImportStart;
+	public static final String			LOG_EASY_IMPORT_001_BACKUP_TOUR_FILES	= Messages.Log_EasyImport_001_BackupTourFiles;
+	public static final String			LOG_EASY_IMPORT_001_COPY				= Messages.Log_EasyImport_001_Copy;
+	public static final String			LOG_EASY_IMPORT_002_TOUR_FILES_START	= Messages.Log_EasyImport_002_TourFilesStart;
+	public static final String			LOG_EASY_IMPORT_002_END					= Messages.Log_EasyImport_002_End;
+	public static final String			LOG_EASY_IMPORT_003_TOUR_TYPE			= Messages.Log_EasyImport_003_TourType;
+	public static final String			LOG_EASY_IMPORT_003_TOUR_TYPE_ITEM		= Messages.Log_EasyImport_003_TourType_Item;
+	public static final String			LOG_EASY_IMPORT_004_SET_LAST_MARKER		= Messages.Log_EasyImport_004_SetLastMarker;
+	public static final String			LOG_EASY_IMPORT_099_SAVE_TOUR			= Messages.Log_EasyImport_099_SaveTour;
+	public static final String			LOG_EASY_IMPORT_100_DELETE_TOUR_FILES	= Messages.Log_EasyImport_100_DeleteTourFiles;
+	public static final String			LOG_EASY_IMPORT_101_TURN_WATCHING_OFF	= Messages.Log_EasyImport_101_TurnWatchingOff;
+	public static final String			LOG_EASY_IMPORT_999_IMPORT_END			= Messages.Log_EasyImport_999_ImportEnd;
 	//
 	private static EasyImportManager	_instance;
 

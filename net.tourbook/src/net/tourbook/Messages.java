@@ -979,6 +979,39 @@ public class Messages extends NLS {
 	public static String		Import_Wizard_Monitor_wait_for_data;
 	public static String		Import_Wizard_Thread_name_read_device_data;
 
+	public static String		Log_EasyImport_000_ImportStart;
+	public static String		Log_EasyImport_001_BackupTourFiles;
+	public static String		Log_EasyImport_001_Copy;
+	public static String		Log_EasyImport_002_End;
+	public static String		Log_EasyImport_002_TourFilesStart;
+	public static String		Log_EasyImport_003_TourType;
+	public static String		Log_EasyImport_003_TourType_Item;
+	public static String		Log_EasyImport_004_SetLastMarker;
+	public static String		Log_EasyImport_099_SaveTour;
+	public static String		Log_EasyImport_100_DeleteTourFiles;
+	public static String		Log_EasyImport_101_TurnWatchingOff;
+	public static String		Log_EasyImport_999_ImportEnd;
+
+	public static String		Log_Import_DeleteTourFiles;
+	public static String		Log_Import_DeleteTourFiles_End;
+	public static String		Log_Import_Tour;
+	public static String		Log_Import_Tour_End;
+	public static String		Log_Import_Tour_Imported;
+
+	public static String		Log_Reimport_AllTimeSlices;
+	public static String		Log_Reimport_Only_Altitude;
+	public static String		Log_Reimport_Only_Gear;
+	public static String		Log_Reimport_Only_PowerSpeed;
+	public static String		Log_Reimport_Only_Temperature;
+	public static String		Log_Reimport_Only_TourMarker;
+	public static String		Log_Reimport_PreviousFiles;
+	public static String		Log_Reimport_PreviousFiles_End;
+	public static String		Log_Reimport_Tour;
+
+	public static String		Log_Tour_DeleteTours;
+	public static String		Log_Tour_SaveTours;
+	public static String		Log_Tour_SaveTours_File;
+
 	public static String		merge_tour_dlg_invalid_serie_data_message;
 	public static String		merge_tour_dlg_invalid_tour_data_message;
 	public static String		merge_tour_dlg_invalid_tour_message;

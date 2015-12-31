@@ -764,10 +764,10 @@
 				
 			<!-- Tour Log-->
 			<command
-         commandId="command.net.tourbook.tour.TourLogView"
-         icon="icons/tour-log.png"
-         label="%Command_TourLog_View"
-         mnemonic="%Command_TourLog_View_Mnemonic"/>
+				commandId="command.net.tourbook.tour.TourLogView"
+				icon="icons/tour-log.png"
+				label="%Command_TourLog_View"
+				mnemonic="%Command_TourLog_View_Mnemonic"/>
 			
 			<!-- Error Log -->
 			<command
@@ -1432,12 +1432,6 @@
 				icon="icons/tour-marker-all.png"
 				id="net.tourbook.ui.views.TourMarkerAllView"
 				name="%View_Name_TourMarkerAll"/>
-			<view
-				category="net.tourbook.category.tourList"
-				class="net.tourbook.tour.TourLogView"
-				icon="icons/tour-log.png"
-				id="net.tourbook.tour.TourLogView"
-				name="%View_Name_TourLog"/>
 
 
 		<!-- 2. Tour Properties -->
@@ -1511,46 +1505,54 @@
 				id="de.byteholder.geoclipse.poi.poiView"
 				name="%View_Name_SearchPOI"
 			/>
-			
+
 			<view
 				category="net.tourbook.category.Tools"
 				class="net.tourbook.ui.tourChart.ConconiChartView"
 				icon="icons/conconi-chart.png"
 				id="net.tourbook.views.ConconiChartView"
-				name="%View_Name_ConconiChart">
-			</view>
-			
+				name="%View_Name_ConconiChart"
+			/>
+
 			<view
 				category="net.tourbook.category.Tools"
 				class="net.tourbook.ui.views.TourChartAnalyzerView"
 				icon="icons/chart-analyzer.gif"
 				id="net.tourbook.views.TourChartAnalyzer"
-				name="%view_name_Analyzer">
-			</view>
-			
+				name="%view_name_Analyzer"
+			/>
+
 			<view
 				category="net.tourbook.category.Tools"
 				class="net.tourbook.ui.views.tourSegmenter.TourSegmenterView"
 				icon="icons/tour-segmenter.gif"
 				id="net.tourbook.views.TourSegmenter"
-				name="%view_name_Segmenter">
-			</view>
-			
-			<view
-				category="net.tourbook.category.Tools"
-				class="net.tourbook.training.TrainingView"
-				icon="icons/pulse-zones.png"
-				id="net.tourbook.training.TrainingView"
-				name="%View_Name_Training">
-			</view>
-			
+				name="%view_name_Segmenter"
+			/>
+
 			<view
 				category="net.tourbook.category.Tools"
 				class="net.tourbook.ui.views.TourChartSmoothingView"
 				icon="icons/smooth.png"
 				id="net.tourbook.ui.views.TourChartSmoothingView"
-				name="%View_Name_TourChartSmoothing">
-			</view>
+				name="%View_Name_TourChartSmoothing"
+			/>
+
+			<view
+				category="net.tourbook.category.Tools"
+				class="net.tourbook.tour.TourLogView"
+				icon="icons/tour-log.png"
+				id="net.tourbook.tour.TourLogView"
+				name="%View_Name_TourLog"
+			/>
+
+			<view
+				category="net.tourbook.category.Tools"
+				class="net.tourbook.training.TrainingView"
+				icon="icons/pulse-zones.png"
+				id="net.tourbook.training.TrainingView"
+				name="%View_Name_Training"
+			/>
 
 
       <category
