@@ -321,10 +321,7 @@ public class TourBlogView extends ViewPart {
 		showInvalidPage();
 	}
 
-	private String convertLineBreaks(final String text) {
 
-		return text.replaceAll("\\r\\n|\\r|\\n", "<br>"); //$NON-NLS-1$ //$NON-NLS-2$
-	}
 
 	private String create_10_Head() {
 
@@ -433,7 +430,7 @@ public class TourBlogView extends ViewPart {
 					 * Description
 					 */
 					if (isDescription) {
-						sb.append("<p class='description'>" + convertLineBreaks(tourDescription) + "</p>\n"); //$NON-NLS-1$ //$NON-NLS-2$
+						sb.append("<p class='description'>" + WEB.convertHTML_LineBreaks(tourDescription) + "</p>\n"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 
 					/*
@@ -441,7 +438,7 @@ public class TourBlogView extends ViewPart {
 					 */
 					if (isWeather) {
 						sb.append("<div class='title'>" + Messages.tour_editor_section_weather + "</div>\n"); //$NON-NLS-1$ //$NON-NLS-2$
-						sb.append("<p class='description'>" + convertLineBreaks(tourWeather) + "</p>\n"); //$NON-NLS-1$ //$NON-NLS-2$
+						sb.append("<p class='description'>" + WEB.convertHTML_LineBreaks(tourWeather) + "</p>\n"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				}
 				sb.append("</div>\n"); //$NON-NLS-1$
@@ -530,7 +527,7 @@ public class TourBlogView extends ViewPart {
 		 */
 		final String description = tourMarker.getDescription();
 		sb.append("<a class='label-text' href='" + hrefOpenMarker + "' title='" + hoverOpenMarker + "'>\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		sb.append("	<p class='description'" + htmlMarkerStyle + ">" + convertLineBreaks(description) + "</p>\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		sb.append("	<p class='description'" + htmlMarkerStyle + ">" + WEB.convertHTML_LineBreaks(description) + "</p>\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		sb.append("</a>\n"); //$NON-NLS-1$
 	}
 

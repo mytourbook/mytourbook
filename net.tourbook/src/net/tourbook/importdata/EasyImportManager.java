@@ -46,7 +46,6 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.NIO;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.SQL;
-import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
@@ -227,13 +226,13 @@ public class EasyImportManager {
 
 				} catch (final Exception e) {
 // this can occure too often
-//					StatusUtil.log(e);
+//					TourLogManager.logEx(e);
 				}
 
 			}
 
 		} catch (final IOException ex) {
-			StatusUtil.log(ex);
+			TourLogManager.logEx(ex);
 		}
 
 		return backupFiles;
@@ -445,13 +444,13 @@ public class EasyImportManager {
 
 				} catch (final Exception e) {
 // this can occure too often
-//					StatusUtil.log(e);
+//					TourLogManager.logEx(e);
 				}
 
 			}
 
 		} catch (final IOException ex) {
-			StatusUtil.log(ex);
+			TourLogManager.logEx(ex);
 		}
 
 		return osFiles;
@@ -901,7 +900,7 @@ public class EasyImportManager {
 								String.format(LOG_EASY_IMPORT_001_COPY, devicePath, targetPath));
 
 					} catch (final IOException e) {
-						StatusUtil.log(e);
+						TourLogManager.logEx(e);
 					}
 				}
 			}
@@ -910,7 +909,7 @@ public class EasyImportManager {
 		try {
 			new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(true, true, importRunnable);
 		} catch (final Exception e) {
-			StatusUtil.log(e);
+			TourLogManager.logEx(e);
 		}
 
 		return isCanceled[0];
@@ -977,14 +976,14 @@ public class EasyImportManager {
 
 		} catch (final IOException e) {
 
-			StatusUtil.log(e);
+			TourLogManager.logEx(e);
 
 		} finally {
 
 			try {
 				writer.close();
 			} catch (final IOException e) {
-				StatusUtil.log(e);
+				TourLogManager.logEx(e);
 			}
 		}
 	}

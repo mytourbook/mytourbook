@@ -33,6 +33,11 @@ public enum TourLogState {
 	IMPORT_ERROR, //
 
 	/**
+	 * 
+	 */
+	IMPORT_EXCEPTION, //
+
+	/**
 	 * File is copied to the backup folder.
 	 */
 	EASY_IMPORT_COPY, //
@@ -56,4 +61,5 @@ public enum TourLogState {
 	 * A saved tour is deleted.
 	 */
 	TOUR_DELETED, //
+
 }

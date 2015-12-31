@@ -882,7 +882,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 						+ "}\n"; //$NON-NLS-1$
 
 			} catch (IOException | URISyntaxException e) {
-				StatusUtil.log(e);
+				TourLogManager.logEx(e);
 			}
 		}
 
@@ -1535,7 +1535,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		if (allImportLauncher.size() == 0 || allImportConfigs.size() == 0) {
 
 			// this case should not happen
-			StatusUtil.showStatus(new Exception("Import config/launcher are not setup correctly."));//$NON-NLS-1$
+			TourLogManager.logEx(new Exception("Import config/launcher are not setup correctly."));//$NON-NLS-1$
 
 			return;
 		}
@@ -2025,7 +2025,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			_imageUrl_DeviceFolder_NotSetup = getIconUrl(Messages.Image__RawData_DeviceFolder_NotSetup);
 
 		} catch (final IOException | URISyntaxException e) {
-			StatusUtil.showStatus(e);
+			TourLogManager.logEx(e);
 		}
 	}
 
@@ -2262,11 +2262,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			} catch (final Exception e) {
 
-				/*
-				 * Use mozilla browser, this is necessary for Linux when default browser fails
-				 * however the XULrunner needs to be installed.
-				 */
-				_browser = new Browser(parent, SWT.MOZILLA);
+//				/*
+//				 * Use mozilla browser, this is necessary for Linux when default browser fails
+//				 * however the XULrunner needs to be installed.
+//				 */
+//				_browser = new Browser(parent, SWT.MOZILLA);
 			}
 
 			if (_browser != null) {
@@ -3871,6 +3871,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 				// force the store watcher to update the device state
 				_isDeviceStateValid = false;
+//				thread_FolderWatcher_Activate();
 
 				// update the table viewer
 				reloadViewer();
@@ -3954,14 +3955,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		} catch (final Exception e) {
 
-			StatusUtil.log(e);
+			TourLogManager.logEx(e);
 
 		} finally {
 
 			final double time = (System.currentTimeMillis() - start) / 1000.0;
 			TourLogManager.addLog(//
 					TourLogState.DEFAULT,
-					String.format(RawDataManager.LOG_REIMPORT_PREVIOUS_FILES_END, time));
+					String.format(RawDataManager.LOG_REIMPORT_END, time));
 		}
 	}
 
@@ -4159,6 +4160,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private void runImport(final long tileId) {
 
 		final long start = System.currentTimeMillis();
+
+		/*
+		 * Log import start
+		 */
 		TourLogManager.addLog(
 				TourLogState.DEFAULT,
 				EasyImportManager.LOG_EASY_IMPORT_000_IMPORT_START,
@@ -4213,7 +4218,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 
 		/*
-		 * Run the import
+		 * Run easy import
 		 */
 		ImportDeviceState importState = null;
 
@@ -4302,11 +4307,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			setWatcher_Off();
 		}
 
-		thread_FolderWatcher_Activate();
-		updateUI_DeviceState();
+//		thread_FolderWatcher_Activate();
+//		updateUI_DeviceState();
 
 		/*
-		 * Import end
+		 * Log import end
 		 */
 		final double time = (System.currentTimeMillis() - start) / 1000.0;
 		TourLogManager.addLog(
@@ -4400,7 +4405,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 					doSaveTour_OneTour(tourData, person, savedTours, false);
 
-					TourLogManager.addSubLog(TourLogState.TOUR_SAVED, tourData.getImportFilePathNameText());
+					TourLogManager.addSubLog(
+							TourLogState.TOUR_SAVED,
+							String.format(
+									TourLogManager.LOG_SAVE_TOURS_FILE,
+									UI.DTFormatterShort.print(tourData.getTourStartTimeMS()),
+									tourData.getImportFilePathNameText()));
 
 					monitor.worked(1);
 				}
@@ -4412,7 +4422,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, false, saveRunnable);
 
 		} catch (InvocationTargetException | InterruptedException e) {
-			StatusUtil.showStatus(e);
+			TourLogManager.logEx(e);
 		}
 
 		doSaveTour_PostActions(savedTours);
@@ -4532,7 +4542,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			new ProgressMonitorDialog(_parent.getShell()).run(true, false, saveRunnable);
 
 		} catch (InvocationTargetException | InterruptedException e) {
-			StatusUtil.showStatus(e);
+			TourLogManager.logEx(e);
 		}
 
 		// show delete state in UI
@@ -4546,15 +4556,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				deletedFiles.size(),
 				notDeletedFiles.size());
 		TourLogManager.addLog(TourLogState.DEFAULT, logText);
-
-		if (isDeleteAllFiles) {
-
-			// show state
-			MessageDialog.openInformation(
-					_parent.getShell(),
-					Messages.Import_Data_Dialog_DeleteTourFiles_Title,
-					NLS.bind(Messages.Import_Data_Dialog_DeletedImportFiles_Message, deletedFiles.size()));
-		}
 	}
 
 	private void saveState() {
@@ -4775,20 +4776,27 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 					try {
 						_folderWatcher.close();
 					} catch (final IOException e) {
-						StatusUtil.log(e);
+						TourLogManager.logEx(e);
 					} finally {
 						_folderWatcher = null;
 					}
 				}
 
 			} catch (final Exception e) {
-				StatusUtil.log(e);
+				TourLogManager.logEx(e);
 			} finally {
 
 				try {
-					_watchingFolderThread.join();
+
+					// it occured that the join never ended
+//					_watchingFolderThread.join();
+					_watchingFolderThread.join(10000);
+
+					// force interrupt
+					_watchingFolderThread.interrupt();
+
 				} catch (final InterruptedException e) {
-					StatusUtil.log(e);
+					TourLogManager.logEx(e);
 				} finally {
 					_watchingFolderThread = null;
 				}
@@ -4905,7 +4913,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				} catch (final ClosedWatchServiceException e) {
 					//
 				} catch (final Exception e) {
-					StatusUtil.log(e);
+					TourLogManager.logEx(e);
 				} finally {
 
 					if (watchKey != null) {
@@ -4916,7 +4924,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 						try {
 							folderWatcher.close();
 						} catch (final IOException e) {
-							StatusUtil.log(e);
+							TourLogManager.logEx(e);
 						}
 					}
 				}
@@ -4964,7 +4972,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 						}
 
 					} catch (final InterruptedException e) {
-						StatusUtil.log(e);
+						TourLogManager.logEx(e);
 					} finally {
 
 						_watchingStoresThread = null;
@@ -4975,7 +4983,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(true, false, runnable);
 
 		} catch (InvocationTargetException | InterruptedException e) {
-			StatusUtil.log(e);
+			TourLogManager.logEx(e);
 		}
 
 	}
@@ -5032,7 +5040,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 					} catch (final InterruptedException e) {
 						interrupt();
 					} catch (final Exception e) {
-						StatusUtil.log(e);
+						TourLogManager.logEx(e);
 					}
 				}
 			}

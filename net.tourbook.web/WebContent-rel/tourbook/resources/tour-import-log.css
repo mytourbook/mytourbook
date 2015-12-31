@@ -57,7 +57,12 @@ a:VISITED
 
 	background-repeat:		no-repeat;
 	background-position-x:	5px;			/* this must be the same as .column otherwise it is not centered */
-	background-position-y:	center;
+	xbackground-position-y:	center;			/* prevent v-center when multiple lines are displayed */
+}
+
+.row
+{
+	vertical-align: 		top;
 }
 
 .column

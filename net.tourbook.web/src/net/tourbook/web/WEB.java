@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -104,6 +104,8 @@ public class WEB {
 	private static final String				URL_SPACE								= " ";											//$NON-NLS-1$
 	private static final String				URL_SPACE_REPLACEMENT					= "%20";										//$NON-NLS-1$
 
+	public static final String				HTML_ELEMENT_BR							= "<br>";
+
 	public static final String				RESPONSE_HEADER_ACCEPT_LANGUAGE			= "Accept-Language";							//$NON-NLS-1$
 	private static final String				RESPONSE_HEADER_CONTENT_ENCODING		= "Content-Encoding";							//$NON-NLS-1$
 	public static final String				RESPONSE_HEADER_CONTENT_RANGE			= "Content-Range";								//$NON-NLS-1$
@@ -146,10 +148,21 @@ public class WEB {
 	private static final IDialogSettings	_state									= Activator.getState(WEB.class
 																							.getCanonicalName());
 
+	public static String convertHTML_LineBreaks(final String text) {
+
+		return text.replaceAll("\\r\\n|\\r|\\n", HTML_ELEMENT_BR); //$NON-NLS-1$
+	}
+
+	public static String convertJS_LineBreaks(final String text) {
+
+		return text.replaceAll("\\r\\n|\\r|\\n", "\\\\n"); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
 	/**
 	 * Replace space characters with <code>%20</code>.
 	 */
 	public static String encodeSpace(final String urlString) {
+
 		return urlString.replaceAll(URL_SPACE, URL_SPACE_REPLACEMENT);
 	}
 

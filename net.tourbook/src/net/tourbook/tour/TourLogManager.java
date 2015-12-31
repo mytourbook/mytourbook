@@ -17,12 +17,17 @@ package net.tourbook.tour;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
+import net.tourbook.web.WEB;
+
+import org.eclipse.swt.widgets.Display;
 
 public class TourLogManager {
 
 	public static final String							LOG_DELETE_TOURS	= "Delete tours";				//$NON-NLS-1$
 	public static final String							LOG_SAVE_TOURS		= "Save tours";				//$NON-NLS-1$
+	public static final String							LOG_SAVE_TOURS_FILE	= "%s <- %s";
 
 	private static final CopyOnWriteArrayList<TourLog>	_tourLogs			= new CopyOnWriteArrayList<>();
 
@@ -80,6 +85,26 @@ public class TourLogManager {
 		final boolean isLogViewOpen = _logView != null && _logView.isDisposed() == false;
 
 		return isLogViewOpen;
+	}
+
+	public static void logEx(final Exception e) {
+
+		String message = Util.getStackTrace(e);
+		message = WEB.convertHTML_LineBreaks(message);
+
+		final TourLog tourLog = new TourLog(TourLogState.IMPORT_EXCEPTION, message);
+
+		addLog(tourLog);
+
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				openLogView();
+			}
+		});
+
+		// ensure it is logged when crashing
+		StatusUtil.log(e);
 	}
 
 	public static void openLogView() {

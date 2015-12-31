@@ -36,7 +36,6 @@ import net.tourbook.application.PerspectiveFactoryRawData;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.ITourViewer3;
-import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.widgets.ComboEnumEntry;
 import net.tourbook.data.TourData;
@@ -82,11 +81,21 @@ public class RawDataManager {
 	private static final String				TEMP_IMPORTED_FILE					= "received-device-data.txt";								//$NON-NLS-1$
 	//
 	public static final String				LOG_IMPORT_DELETE_TOUR_FILE			= "Delete tour files";										//$NON-NLS-1$
-	public static final String				LOG_IMPORT_DELETE_TOUR_FILE_END		= "Deleted: %d - Not deleted with errors: %d";
-	private static final String				LOG_IMPORT_TOUR						= "Import tours";
-	private static final String				LOG_IMPORT_TOUR_END					= "Imported in %.3f s";
+	public static final String				LOG_IMPORT_DELETE_TOUR_FILE_END		= "Deleted: %d - Not deleted with errors: %d";				//$NON-NLS-1$
+	private static final String				LOG_IMPORT_TOUR						= "Import tours";											//$NON-NLS-1$
+	public static final String				LOG_IMPORT_TOUR_IMPORTED			= "%s <- %s";
+	private static final String				LOG_IMPORT_TOUR_END					= "Imported in %.3f s";									//$NON-NLS-1$
+	//
 	public static final String				LOG_REIMPORT_PREVIOUS_FILES			= "Reimport previous files";								//$NON-NLS-1$
-	public static final String				LOG_REIMPORT_PREVIOUS_FILES_END		= "Reimported in %.3f s";									//$NON-NLS-1$
+	public static final String				LOG_REIMPORT_END					= "Reimported in %.3f s";									//$NON-NLS-1$
+	//
+	private static final String				LOG_REIMPORT_ALL_TIME_SLICES		= "Reimport all timeslices";								//$NON-NLS-1$
+	private static final String				LOG_REIMPORT_ONLY_ALTITUDE			= "Reimport only altitude";								//$NON-NLS-1$
+	private static final String				LOG_REIMPORT_ONLY_GEAR				= "Reimport only gear";									//$NON-NLS-1$
+	private static final String				LOG_REIMPORT_ONLY_POWER_SPEED		= "Reimport only speed and power";							//$NON-NLS-1$
+	private static final String				LOG_REIMPORT_ONLY_MARKER			= "Reimport only marker";									//$NON-NLS-1$
+	private static final String				LOG_REIMPORT_ONLY_TEMPERATURE		= "Reimport only temperature";								//$NON-NLS-1$
+	private static final String				LOG_REIMPORT_TOUR					= "Reimport tour";											//$NON-NLS-1$
 	//
 	public static final int					ADJUST_IMPORT_YEAR_IS_DISABLED		= -1;
 	//
@@ -313,6 +322,8 @@ public class RawDataManager {
 	 */
 	public void actionReimportTour(final ReImport reimportId, final ITourViewer3 tourViewer) {
 
+		final long start = System.currentTimeMillis();
+
 		// check if the tour editor contains a modified tour
 		if (TourManager.isTourEditorModified()) {
 			return;
@@ -419,7 +430,14 @@ public class RawDataManager {
 		try {
 			new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(true, true, importRunnable);
 		} catch (final Exception e) {
-			StatusUtil.log(e);
+			TourLogManager.logEx(e);
+		} finally {
+
+			final double time = (System.currentTimeMillis() - start) / 1000.0;
+			TourLogManager.addLog(//
+					TourLogState.DEFAULT,
+					String.format(RawDataManager.LOG_REIMPORT_END, time));
+
 		}
 	}
 
@@ -430,6 +448,11 @@ public class RawDataManager {
 			if (actionReimportTour_12_ConfirmDialog(
 					ITourbookPreferences.TOGGLE_STATE_REIMPORT_TOUR,
 					Messages.Import_Data_Dialog_ConfirmReimport_Message)) {
+
+				TourLogManager.addLog(TourLogState.DEFAULT, //
+						LOG_REIMPORT_TOUR,
+						TourLogView.CSS_LOG_TITLE);
+
 				return true;
 			}
 
@@ -438,6 +461,11 @@ public class RawDataManager {
 			if (actionReimportTour_12_ConfirmDialog(
 					ITourbookPreferences.TOGGLE_STATE_REIMPORT_ALL_TIME_SLICES,
 					Messages.Import_Data_Dialog_ConfirmReimportTimeSlices_Message)) {
+
+				TourLogManager.addLog(TourLogState.DEFAULT,//
+						LOG_REIMPORT_ALL_TIME_SLICES,
+						TourLogView.CSS_LOG_TITLE);
+
 				return true;
 			}
 
@@ -446,6 +474,10 @@ public class RawDataManager {
 			if (actionReimportTour_12_ConfirmDialog(
 					ITourbookPreferences.TOGGLE_STATE_REIMPORT_ALTITUDE_VALUES,
 					Messages.Import_Data_Dialog_ConfirmReimportAltitudeValues_Message)) {
+
+				TourLogManager.addLog(TourLogState.DEFAULT,//
+						LOG_REIMPORT_ONLY_ALTITUDE,
+						TourLogView.CSS_LOG_TITLE);
 				return true;
 			}
 
@@ -454,6 +486,11 @@ public class RawDataManager {
 			if (actionReimportTour_12_ConfirmDialog(
 					ITourbookPreferences.TOGGLE_STATE_REIMPORT_GEAR_VALUES,
 					Messages.Import_Data_Dialog_ConfirmReimportGearValues_Message)) {
+
+				TourLogManager.addLog(TourLogState.DEFAULT,//
+						LOG_REIMPORT_ONLY_GEAR,
+						TourLogView.CSS_LOG_TITLE);
+
 				return true;
 			}
 
@@ -462,6 +499,11 @@ public class RawDataManager {
 			if (actionReimportTour_12_ConfirmDialog(
 					ITourbookPreferences.TOGGLE_STATE_REIMPORT_POWER_AND_SPEED_VALUES,
 					Messages.Import_Data_Dialog_ConfirmReimportPowerAndSpeedValues_Message)) {
+
+				TourLogManager.addLog(TourLogState.DEFAULT,//
+						LOG_REIMPORT_ONLY_POWER_SPEED,
+						TourLogView.CSS_LOG_TITLE);
+
 				return true;
 			}
 
@@ -470,6 +512,11 @@ public class RawDataManager {
 			if (actionReimportTour_12_ConfirmDialog(
 					ITourbookPreferences.TOGGLE_STATE_REIMPORT_TOUR_MARKER,
 					Messages.Import_Data_Dialog_ConfirmReimportTourMarker_Message)) {
+
+				TourLogManager.addLog(TourLogState.DEFAULT,//
+						LOG_REIMPORT_ONLY_MARKER,
+						TourLogView.CSS_LOG_TITLE);
+
 				return true;
 			}
 
@@ -478,6 +525,11 @@ public class RawDataManager {
 			if (actionReimportTour_12_ConfirmDialog(
 					ITourbookPreferences.TOGGLE_STATE_REIMPORT_TEMPERATURE_VALUES,
 					Messages.Import_Data_Dialog_ConfirmReimportTemperatureValues_Message)) {
+
+				TourLogManager.addLog(TourLogState.DEFAULT,//
+						LOG_REIMPORT_ONLY_TEMPERATURE,
+						TourLogView.CSS_LOG_TITLE);
+
 				return true;
 			}
 		}
@@ -1217,7 +1269,7 @@ public class RawDataManager {
 						_toursInImportView,
 						_newlyImportedTours);
 			} catch (final Exception e) {
-				StatusUtil.log(e);
+				TourLogManager.logEx(e);
 			}
 
 			if (isTourDisplayedInImportView) {
@@ -1248,7 +1300,7 @@ public class RawDataManager {
 			try {
 				destFileName = device.buildFileNameFromRawData(sourceFileName);
 			} catch (final Exception e) {
-				StatusUtil.log(e);
+				TourLogManager.logEx(e);
 			} finally {
 
 				if (destFileName == null) {
@@ -1336,10 +1388,10 @@ public class RawDataManager {
 			outReader.close();
 
 		} catch (final FileNotFoundException e) {
-			StatusUtil.log(e);
+			TourLogManager.logEx(e);
 			return null;
 		} catch (final IOException e) {
-			StatusUtil.log(e);
+			TourLogManager.logEx(e);
 			return null;
 		} finally {
 			// close the files
@@ -1347,7 +1399,7 @@ public class RawDataManager {
 				try {
 					inReader.close();
 				} catch (final IOException e) {
-					StatusUtil.log(e);
+					TourLogManager.logEx(e);
 					return null;
 				}
 			}
@@ -1355,7 +1407,7 @@ public class RawDataManager {
 				try {
 					outReader.close();
 				} catch (final IOException e) {
-					StatusUtil.log(e);
+					TourLogManager.logEx(e);
 					return null;
 				}
 			}
@@ -1539,12 +1591,23 @@ public class RawDataManager {
 
 						importCounter++;
 
-						TourLogManager.addSubLog(TourLogState.IMPORT_OK, osFilePath);
-
 						// update state
+						TourData tourData = null;
 						for (final TourData importedTourData : _newlyImportedTours.values()) {
+
 							importedTourData.isBackupImportFile = filePath.isBackupImportFile;
+
+							if (tourData == null) {
+								tourData = importedTourData;
+							}
 						}
+
+						TourLogManager.addSubLog(//
+								TourLogState.IMPORT_OK,
+								String.format(//
+										LOG_IMPORT_TOUR_IMPORTED,
+										UI.DTFormatterShort.print(tourData.getTourStartTimeMS()),
+										osFilePath));
 
 					} else {
 
@@ -1577,7 +1640,7 @@ public class RawDataManager {
 		try {
 			new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(true, true, importRunnable);
 		} catch (final Exception e) {
-			StatusUtil.log(e);
+			TourLogManager.logEx(e);
 		}
 
 		final double time = (System.currentTimeMillis() - start) / 1000.0;
@@ -1642,7 +1705,7 @@ public class RawDataManager {
 			return (RawDataView) Util.showView(RawDataView.ID, true);
 
 		} catch (final WorkbenchException e) {
-			StatusUtil.log(e);
+			TourLogManager.logEx(e);
 		}
 		return null;
 	}
@@ -1684,9 +1747,9 @@ public class RawDataManager {
 							});
 
 				} catch (final InvocationTargetException e) {
-					StatusUtil.log(e);
+					TourLogManager.logEx(e);
 				} catch (final InterruptedException e) {
-					StatusUtil.log(e);
+					TourLogManager.logEx(e);
 				}
 			} else {
 				updateTourData_InImportView_FromDb_Runnable(monitor);
@@ -1713,18 +1776,18 @@ public class RawDataManager {
 			}
 		}
 
-		for (final TourData mapTourData : _toursInImportView.values()) {
+		for (final TourData importedTourData : _toursInImportView.values()) {
 
 			if (monitor != null) {
 				monitor.worked(1);
 				monitor.subTask(NLS.bind(Messages.import_data_updateDataFromDatabase_subTask, workedDone++, workedAll));
 			}
 
-			if (mapTourData.isTourDeleted) {
+			if (importedTourData.isTourDeleted) {
 				continue;
 			}
 
-			final Long tourId = mapTourData.getTourId();
+			final Long tourId = importedTourData.getTourId();
 
 			try {
 
@@ -1732,9 +1795,14 @@ public class RawDataManager {
 				if (dbTourData != null) {
 
 					/*
-					 * tour is saved in the database, set rawdata file name to display the filepath
+					 * Imported tour is saved in the database, set transient fields.
 					 */
-//					dbTourData.importRawDataFile = mapTourData.importRawDataFile;
+
+					// used to delete the device import file
+					dbTourData.isTourFileDeleted = importedTourData.isTourFileDeleted;
+					dbTourData.isTourFileMoved = importedTourData.isTourFileMoved;
+					dbTourData.isBackupImportFile = importedTourData.isBackupImportFile;
+					dbTourData.importFilePathOriginal = importedTourData.importFilePathOriginal;
 
 					final Long dbTourId = dbTourData.getTourId();
 
@@ -1753,7 +1821,7 @@ public class RawDataManager {
 					}
 				}
 			} catch (final Exception e) {
-				StatusUtil.log(e);
+				TourLogManager.logEx(e);
 			}
 		}
 

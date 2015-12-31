@@ -25,7 +25,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
-import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.web.WEB;
 
@@ -58,11 +57,12 @@ public class TourLogView extends ViewPart {
 	private static final String	STATE_COPY							= "COPY";											//$NON-NLS-1$
 	private static final String	STATE_DELETE						= "DELETE";										//$NON-NLS-1$
 	private static final String	STATE_ERROR							= "ERROR";											//$NON-NLS-1$
+	private static final String	STATE_EXCEPTION						= "EXCEPTION";										//$NON-NLS-1$
 	private static final String	STATE_OK							= "OK";											//$NON-NLS-1$
 	private static final String	STATE_SAVE							= "SAVE";											//$NON-NLS-1$
 	//
-	public static final String	CSS_LOG_TITLE						= "title";
-	private static final String	CSS_LOG_SUB_ITEM					= "subItem";
+	public static final String	CSS_LOG_TITLE						= "title";											//$NON-NLS-1$
+	private static final String	CSS_LOG_SUB_ITEM					= "subItem";										//$NON-NLS-1$
 	//
 	private static final String	DOM_ID_LOG							= "logs";											//$NON-NLS-1$
 	private static final String	WEB_RESOURCE_TOUR_IMPORT_LOG_CSS	= "tour-import-log.css";							//$NON-NLS-1$
@@ -144,9 +144,26 @@ public class TourLogView extends ViewPart {
 
 				if (isBrowserAvailable) {
 
+					final String[] messageSplitted = message.split(WEB.HTML_ELEMENT_BR);
+
+					String tdContent;
+					if (messageSplitted.length == 1) {
+
+						tdContent = "td.appendChild(document.createTextNode('" + message + "'));\n"; //$NON-NLS-1$ //$NON-NLS-2$
+
+					} else {
+
+						tdContent = UI.EMPTY_STRING
+						//
+								+ "var span = document.createElement('SPAN');\n" //$NON-NLS-1$
+								+ ("span.innerHTML='" + message + "';\n") //$NON-NLS-1$ //$NON-NLS-2$
+								+ "td.appendChild(span);\n"; //$NON-NLS-1$
+					}
+
 					final String js = UI.EMPTY_STRING//
 
 							+ ("var tr = document.createElement('TR');\n") //$NON-NLS-1$
+							+ ("tr.className='row';\n") //$NON-NLS-1$
 
 							// time
 							+ ("var td = document.createElement('TD');\n") //$NON-NLS-1$
@@ -161,8 +178,9 @@ public class TourLogView extends ViewPart {
 
 							// message
 							+ ("var td = document.createElement('TD');\n") //$NON-NLS-1$
-							+ ("td.className='column logItem " + subItem + " " + css + "';\n") //$NON-NLS-1$
-							+ ("td.appendChild(document.createTextNode('" + message + "'));\n") //$NON-NLS-1$ //$NON-NLS-2$
+							+ ("td.className='column logItem " + subItem + " " + css + "';\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+							+ tdContent
+
 							+ ("tr.appendChild(td);\n") //$NON-NLS-1$
 
 							+ ("var logTable = document.getElementById(\"" + DOM_ID_LOG + "\");\n") //$NON-NLS-1$ //$NON-NLS-2$
@@ -245,6 +263,7 @@ public class TourLogView extends ViewPart {
 	public void clear() {
 
 		_noBrowserLog = UI.EMPTY_STRING;
+		_txtNoBrowser.setText(_noBrowserLog);
 
 		updateUI_InitBrowser();
 	}
@@ -346,11 +365,11 @@ public class TourLogView extends ViewPart {
 
 			} catch (final Exception e) {
 
-				/*
-				 * Use mozilla browser, this is necessary for Linux when default browser fails
-				 * however the XULrunner needs to be installed.
-				 */
-				_browser = new Browser(parent, SWT.MOZILLA);
+//				/*
+//				 * Use mozilla browser, this is necessary for Linux when default browser fails
+//				 * however the XULrunner needs to be installed.
+//				 */
+//				_browser = new Browser(parent, SWT.MOZILLA);
 			}
 
 			if (_browser != null) {
@@ -399,6 +418,16 @@ public class TourLogView extends ViewPart {
 			stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateOK);
 			break;
 
+		case IMPORT_ERROR:
+			stateNoBrowser[0] = STATE_ERROR;
+			stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateError);
+			break;
+
+		case IMPORT_EXCEPTION:
+			stateNoBrowser[0] = STATE_EXCEPTION;
+			stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateError);
+			break;
+
 		case EASY_IMPORT_COPY:
 			stateNoBrowser[0] = STATE_COPY;
 			stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateCopy);
@@ -412,11 +441,6 @@ public class TourLogView extends ViewPart {
 		case EASY_IMPORT_DELETE_DEVICE:
 			stateNoBrowser[0] = STATE_DELETE;
 			stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateDeleteDevice);
-			break;
-
-		case IMPORT_ERROR:
-			stateNoBrowser[0] = STATE_ERROR;
-			stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateError);
 			break;
 
 		case TOUR_DELETED:
@@ -450,7 +474,7 @@ public class TourLogView extends ViewPart {
 					+ "</style>\n"; //$NON-NLS-1$
 
 		} catch (IOException | URISyntaxException e) {
-			StatusUtil.log(e);
+			TourLogManager.logEx(e);
 		}
 
 	}

@@ -354,8 +354,7 @@ select::-ms-expand {
 
 .folderError
 {
-	xpadding-left:			20px;
-	color:					red;
+	color:					#ff2d2b;
 }
 
 .deviceList
