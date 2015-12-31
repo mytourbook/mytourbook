@@ -188,8 +188,7 @@ public class Messages extends NLS {
 	public static String		Dialog_ImportConfig_Label_LastMarkerDistance;
 	public static String		Dialog_ImportConfig_Label_LastMarkerDistance_Tooltip;
 	public static String		Dialog_ImportConfig_Label_LastMarkerText;
-
-	public static String	Dialog_ImportConfig_Label_StateTooltipWidth;
+	public static String		Dialog_ImportConfig_Label_StateTooltipWidth;
 	public static String		Dialog_ImportConfig_Link_OtherActions;
 	public static String		Dialog_ImportConfig_Link_TourType;
 	public static String		Dialog_ImportConfig_Spinner_Speed_Tooltip;
@@ -352,8 +351,6 @@ public class Messages extends NLS {
 
 	public static String		app_dlg_confirmFileOverwrite_message;
 	public static String		app_dlg_confirmFileOverwrite_title;
-
-	public static String		app_error_title;
 
 	public static String		app_unit_minutes;
 	public static String		app_unit_seconds;
@@ -544,7 +541,6 @@ public class Messages extends NLS {
 
 	public static String		DataImport_Error_file_does_not_exist_msg;
 	public static String		DataImport_Error_file_does_not_exist_title;
-	public static String		DataImport_Error_invalid_data_format;
 
 	public static String		DataImport_ConfirmImport_title;
 
@@ -788,7 +784,6 @@ public class Messages extends NLS {
 	public static String		Image__RawData_DeviceFolder_NotSetup;
 	public static String		Image__RawData_DeviceFolderDisabled;
 	public static String		Image__RawData_Import;
-	public static String		Image__RawData_ImportLog;
 	public static String		Image__RawData_Transfer;
 	public static String		Image__RawData_TransferDirect;
 	public static String		Image__Remove;
@@ -811,23 +806,15 @@ public class Messages extends NLS {
 	public static String		Image__synch_statistics_Disabled;
 	public static String		Image__SearchExternal;
 	public static String		Image__SearchExternal_Disabled;
-	public static String	Image__State_Copy;
-
-	public static String	Image__State_Delete;
-
-	public static String	Image__State_Deleted_Backup;
-
-	public static String	Image__State_Deleted_Device;
-
+	public static String		Image__State_Copy;
+	public static String		Image__State_Deleted_Backup;
+	public static String		Image__State_Deleted_Device;
 	public static String		Image__State_DeletedTour_View;
-
 	public static String		Image__State_Error;
 	public static String		Image__State_MovedTour;
-
 	public static String		Image__State_MovedTour_View;
 	public static String		Image__State_OK;
-	public static String	Image__State_Save;
-
+	public static String		Image__State_Save;
 	public static String		Image__State_SaveTour;
 	public static String		Image__State_TourMarker;
 	public static String		Image__Synced;
@@ -846,8 +833,7 @@ public class Messages extends NLS {
 	public static String		Image__TourChart;
 	public static String		Image__TourInfo;
 	public static String		Image__TourInfo_Disabled;
-
-	public static String	Image__TourLog;
+	public static String		Image__TourLog;
 	public static String		Image__TourMarker;
 	public static String		Image__TourSegments;
 	public static String		Image__TourSegments_Disabled;
@@ -881,10 +867,8 @@ public class Messages extends NLS {
 
 	public static String		Import_Data_Action_DeleteTourFiles;
 	public static String		Import_Data_Action_EditImportPreferences;
-
-	public static String	Import_Data_Action_OpenLogView;
-
-	public static String	Import_Data_Action_OpenLogView_Tooltip;
+	public static String		Import_Data_Action_OpenLogView;
+	public static String		Import_Data_Action_OpenLogView_Tooltip;
 	public static String		Import_Data_Action_Reimport_EntireTour;
 	public static String		Import_Data_Action_Reimport_OnlyAltitudeValues;
 	public static String		Import_Data_Action_Reimport_OnlyGearValues;
@@ -906,7 +890,6 @@ public class Messages extends NLS {
 	public static String		Import_Data_Dialog_ConfirmReimportTemperatureValues_Message;
 	public static String		Import_Data_Dialog_ConfirmReimportTimeSlices_Message;
 	public static String		Import_Data_Dialog_ConfirmReimportTourMarker_Message;
-	public static String		Import_Data_Dialog_DeletedImportFiles_Message;
 	public static String		Import_Data_Dialog_DeleteTourFiles_LastChance_Message;
 	public static String		Import_Data_Dialog_DeleteTourFiles_Message;
 	public static String		Import_Data_Dialog_DeleteTourFiles_Title;
@@ -957,8 +940,7 @@ public class Messages extends NLS {
 	public static String		Import_Data_HTML_Title_Device;
 	public static String		Import_Data_HTML_Title_Files;
 	public static String		Import_Data_HTML_Title_Moved;
-
-	public static String	Import_Data_HTML_Title_Moved_State;
+	public static String		Import_Data_HTML_Title_Moved_State;
 	public static String		Import_Data_HTML_WatchingIsOff;
 	public static String		Import_Data_HTML_WatchingOff;
 	public static String		Import_Data_HTML_WatchingOn;
@@ -1324,11 +1306,9 @@ public class Messages extends NLS {
 	public static String		Pref_TourTypes_root_title;
 	public static String		Pref_TourTypes_Title;
 
-	public static String	PrefPage_Import_Checkbox_AutoOpenTourLogView;
-
+	public static String		PrefPage_Import_Checkbox_AutoOpenTourLogView;
 	public static String		PrefPage_Import_Checkbox_CreateTourIdWithTime;
 	public static String		PrefPage_Import_Checkbox_CreateTourIdWithTime_Tooltip;
-
 	public static String		PrefPage_Import_Label_Info;
 
 	public static String		PrefPage_ViewActions_Group;
@@ -1589,7 +1569,7 @@ public class Messages extends NLS {
 	public static String		Tour_Editor_Label_Weather;
 	public static String		Tour_Editor_Label_WindDirection_Unit;
 
-	public static String	Tour_Log_Action_Clear_Tooltip;
+	public static String		Tour_Log_Action_Clear_Tooltip;
 
 	public static String		Tour_Marker_Column_Description_ShortCut;
 	public static String		Tour_Marker_Column_Description_Tooltip;

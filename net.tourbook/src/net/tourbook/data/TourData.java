@@ -7317,7 +7317,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 				+ ("start=" + startYear + "-" + startMonth + "-" + startDay + " ") //					//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 				+ (startHour + ":" + startMinute + ":" + startSecond + "\n") //							//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-				+ ("tourId=" + tourId + "\n") ///														/$NON-NLS-1$ //$NON-NLS-2$
+				+ ("tourId=" + tourId + "\n") //														//$NON-NLS-1$ //$NON-NLS-2$
 
 				+ ("object=" + super.toString() + "\n") //												//$NON-NLS-1$ //$NON-NLS-2$
 				+ ("identityHashCode=" + System.identityHashCode(this) + "\n") //						//$NON-NLS-1$ //$NON-NLS-2$

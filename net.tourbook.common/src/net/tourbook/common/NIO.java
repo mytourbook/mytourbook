@@ -84,17 +84,6 @@ public class NIO {
 		return osPath;
 	}
 
-//	public static String getFileExtionsion(final String fileName) {
-//
-//		final int i = fileName.lastIndexOf('.');
-//		if (i >= 0) {
-//
-//			return fileName.substring(i + 1);
-//		}
-//
-//		return UI.EMPTY_STRING;
-//	}
-
 	public static Iterable<FileStore> getFileStores() {
 
 //		final long start = System.nanoTime();

@@ -108,12 +108,12 @@ public class UI {
 	public static final String				SPACE4									= "    ";																	//$NON-NLS-1$
 	public static final String				ZERO									= "0";																		//$NON-NLS-1$
 
-	private static final String				JS_APOSTROPHE							= "'";
-	private static final String				JS_APOSTROPHE_REPLACEMENT				= "\\'";
-	private static final String				JS_QUOTA_MARK							= "\"";
-	private static final String				JS_QUOTA_MARK_REPLACEMENT				= "\\\"";
-	private static final String				JS_BACKSLASH_REPLACEMENT				= "\\\\";
-	private static final String				HTML_NEW_LINE							= "\\n";
+	private static final String				JS_APOSTROPHE							= "'"; //$NON-NLS-1$
+	private static final String				JS_APOSTROPHE_REPLACEMENT				= "\\'"; //$NON-NLS-1$
+	private static final String				JS_QUOTA_MARK							= "\""; //$NON-NLS-1$
+	private static final String				JS_QUOTA_MARK_REPLACEMENT				= "\\\""; //$NON-NLS-1$
+	private static final String				JS_BACKSLASH_REPLACEMENT				= "\\\\"; //$NON-NLS-1$
+	private static final String				HTML_NEW_LINE							= "\\n"; //$NON-NLS-1$
 
 	public static final String				SYMBOL_ARROW_UP							= "\u2191";																//$NON-NLS-1$
 	public static final String				SYMBOL_ARROW_DOWN						= "\u2193";																//$NON-NLS-1$

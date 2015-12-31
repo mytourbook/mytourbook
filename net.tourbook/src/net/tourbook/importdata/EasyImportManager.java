@@ -107,10 +107,10 @@ public class EasyImportManager {
 	public static final String			LOG_EASY_IMPORT_000_IMPORT_START		= "Easy import start";							//$NON-NLS-1$
 	public static final String			LOG_EASY_IMPORT_001_BACKUP_TOUR_FILES	= "1. Backup tour files";						//$NON-NLS-1$
 	public static final String			LOG_EASY_IMPORT_001_COPY				= "%s -> %s";									//$NON-NLS-1$
-	public static final String			LOG_EASY_IMPORT_002_TOUR_FILES_START	= "2. Import tour files";						//$NON-NLS-1$
+	public static final String			LOG_EASY_IMPORT_002_TOUR_FILES_START	= "2. Import tour files, %s";					//$NON-NLS-1$
 	public static final String			LOG_EASY_IMPORT_002_END					= "2. Imported in %.3f s";						//$NON-NLS-1$
-	public static final String			LOG_EASY_IMPORT_003_TOUR_TYPE			= "3. Set tour type";
-	public static final String			LOG_EASY_IMPORT_003_TOUR_TYPE_ITEM		= "%s - %s";
+	public static final String			LOG_EASY_IMPORT_003_TOUR_TYPE			= "3. Set tour type"; //$NON-NLS-1$
+	public static final String			LOG_EASY_IMPORT_003_TOUR_TYPE_ITEM		= "%s - %s"; //$NON-NLS-1$
 	public static final String			LOG_EASY_IMPORT_004_SET_LAST_MARKER		= "4. Set last marker";						//$NON-NLS-1$
 	public static final String			LOG_EASY_IMPORT_099_SAVE_TOUR			= "99. Save tour";								//$NON-NLS-1$
 	public static final String			LOG_EASY_IMPORT_100_DELETE_TOUR_FILES	= "100. Delete tour files";					//$NON-NLS-1$
@@ -828,7 +828,10 @@ public class EasyImportManager {
 		/*
 		 * 02. Import files
 		 */
-		final ImportRunState importRunState = RawDataManager.getInstance().runImport(notImportedFiles, true);
+		final ImportRunState importRunState = RawDataManager.getInstance().runImport(
+				notImportedFiles,
+				true,
+				importConfig.fileGlobPattern);
 
 		importState.isImportCanceled = importRunState.isImportCanceled;
 

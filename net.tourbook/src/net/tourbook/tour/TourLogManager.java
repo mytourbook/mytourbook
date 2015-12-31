@@ -27,7 +27,7 @@ public class TourLogManager {
 
 	public static final String							LOG_DELETE_TOURS	= "Delete tours";				//$NON-NLS-1$
 	public static final String							LOG_SAVE_TOURS		= "Save tours";				//$NON-NLS-1$
-	public static final String							LOG_SAVE_TOURS_FILE	= "%s <- %s";
+	public static final String							LOG_SAVE_TOURS_FILE	= "%s <- %s"; //$NON-NLS-1$
 
 	private static final CopyOnWriteArrayList<TourLog>	_tourLogs			= new CopyOnWriteArrayList<>();
 

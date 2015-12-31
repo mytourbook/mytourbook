@@ -83,7 +83,7 @@ public class RawDataManager {
 	public static final String				LOG_IMPORT_DELETE_TOUR_FILE			= "Delete tour files";										//$NON-NLS-1$
 	public static final String				LOG_IMPORT_DELETE_TOUR_FILE_END		= "Deleted: %d - Not deleted with errors: %d";				//$NON-NLS-1$
 	private static final String				LOG_IMPORT_TOUR						= "Import tours";											//$NON-NLS-1$
-	public static final String				LOG_IMPORT_TOUR_IMPORTED			= "%s <- %s";
+	public static final String				LOG_IMPORT_TOUR_IMPORTED			= "%s <- %s";												//$NON-NLS-1$
 	private static final String				LOG_IMPORT_TOUR_END					= "Imported in %.3f s";									//$NON-NLS-1$
 	//
 	public static final String				LOG_REIMPORT_PREVIOUS_FILES			= "Reimport previous files";								//$NON-NLS-1$
@@ -311,7 +311,7 @@ public class RawDataManager {
 			TourLogManager.openLogView();
 		}
 
-		runImport(osFiles, false);
+		runImport(osFiles, false, null);
 	}
 
 	/**
@@ -1474,7 +1474,9 @@ public class RawDataManager {
 		}
 	}
 
-	public ImportRunState runImport(final ArrayList<OSFile> importFiles, final boolean isEasyImport) {
+	public ImportRunState runImport(final ArrayList<OSFile> importFiles,
+									final boolean isEasyImport,
+									final String fileGlobPattern) {
 
 		final ImportRunState importRunState = new ImportRunState();
 
@@ -1491,8 +1493,8 @@ public class RawDataManager {
 				? UI.EMPTY_STRING
 				: TourLogView.CSS_LOG_TITLE;
 
-		final String message = isEasyImport
-				? EasyImportManager.LOG_EASY_IMPORT_002_TOUR_FILES_START
+		final String message = isEasyImport //
+				? String.format(EasyImportManager.LOG_EASY_IMPORT_002_TOUR_FILES_START, fileGlobPattern)
 				: RawDataManager.LOG_IMPORT_TOUR;
 
 		TourLogManager.addLog(TourLogState.DEFAULT, message, css);

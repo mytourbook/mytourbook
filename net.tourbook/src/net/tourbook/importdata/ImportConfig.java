@@ -166,17 +166,17 @@ public class ImportConfig implements Cloneable {
 	@Override
 	public String toString() {
 
-		return "ImportConfig [\n"
+		return "ImportConfig [\n" //$NON-NLS-1$
 
-				+ ("name=" + name + ", \n")
-				+ ("isCreateBackup=" + isCreateBackup + ", \n")
-				+ ("isDeleteDeviceFiles=" + isDeleteDeviceFiles + ", \n")
-				+ ("isTurnOffWatching=" + isTurnOffWatching + ", \n")
-				+ ("_id=" + _id + ", \n")
-				+ ("_backupFolder=" + _backupFolder + ", \n")
-				+ ("_deviceFolder=" + _deviceFolder + ", \n")
-				+ ("deviceFiles=" + fileGlobPattern)
+				+ ("name=" + name + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("isCreateBackup=" + isCreateBackup + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("isDeleteDeviceFiles=" + isDeleteDeviceFiles + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("isTurnOffWatching=" + isTurnOffWatching + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("_id=" + _id + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("_backupFolder=" + _backupFolder + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("_deviceFolder=" + _deviceFolder + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("deviceFiles=" + fileGlobPattern) //$NON-NLS-1$
 
-				+ "\n]";
+				+ "\n]"; //$NON-NLS-1$
 	}
 }
