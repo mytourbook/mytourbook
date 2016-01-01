@@ -1,24 +1,42 @@
-Version 15.12.0 Experimental III                         9. December 2015
+Version 15.12.0 Experimental III                       31. December 2015
 
 
 New
 ===	
 
 * Tour Import
-  - New dashboard.
-  - Delete tour files.
+  - New dashboard
+  - Delete tour files
   
   Since Experimental II
   - Device watcher switch 
   
   Since Experimental III
-  - Show old import page as default.
+  - Show old import page as default
+  - Show tour logs
   - Multiple import configurations 
-  - Delete device files, this is the same as moving the device files to a backup folder because the delete feature can only be used when also backup files are created.
-  - SORRY, I had to change the structure of the easy import configuration and there is no automatic migration, it has to be done manually.
-  The old structure can be found in C:\Users\<user>\mytourbook\.metadata\.plugins\net.tourbook\dialog_settings.xml
-  in the section "net.tourbook.importdata.EasyImportManager"
-  THIS DATA WILL BE OVERWRITTEN WHEN THE NEW VERSION IS USED.
+  - Delete device files, this is the same as moving the device files to 
+    a backup folder because the delete feature can only be used when 
+    also backup files are created.
+
+Experimental III Changes
+------------------------
+The data structure for saving the easy import configuration had to be 
+changed in Experimental III because of the new features. All previous 
+easy import configuration settings will be discarded when you run the 
+new version, an automatic migration is not available, it has to be done 
+manually. Sorry for this bad news.
+
+The old structure can be found in the file 
+C:\Users\<user>\mytourbook\.metadata\.plugins\net.tourbook\dialog_settings.xml
+in the section net.tourbook.importdata.EasyImportManager
+
+THIS DATA WILL BE OVERWRITTEN WHEN THE NEW VERSION IS USED.
+
+It's propably faster to get the old configuration settings, by making 
+screenshots and then enter the data.
+
+
 
 Bugfix
 ======	
@@ -60,5 +78,3 @@ This version has some issues but they are non-serious
 * The device and backup folders are observed but when these folders
   are deleted/moved this will not be recognized. Workaround: close and
   reopen the import view.
-* Disable easy import: Set device folder empty AND deselect create
-  backup.
