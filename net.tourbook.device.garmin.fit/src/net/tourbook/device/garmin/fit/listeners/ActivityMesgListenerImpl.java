@@ -1,7 +1,7 @@
 package net.tourbook.device.garmin.fit.listeners;
 
-import net.tourbook.common.util.StatusUtil;
 import net.tourbook.device.garmin.fit.FitContext;
+import net.tourbook.tour.TourLogManager;
 
 import com.garmin.fit.ActivityMesg;
 import com.garmin.fit.ActivityMesgListener;
@@ -19,11 +19,10 @@ public class ActivityMesgListenerImpl extends AbstractMesgListener implements Ac
 
 		if (numSessions == null || numSessions < 1) {
 
-			final String message = context.getTourTitle() + " - Invalid number of sessions: " //$NON-NLS-1$
-					+ numSessions
-					+ ", expected at least one session.";//$NON-NLS-1$
-
-			StatusUtil.logError(message);
+			TourLogManager.logSubInfo(String.format(
+					"%s - Invalid number of sessions: %d, expected at least one session.",
+					context.getTourTitle(),
+					numSessions));
 
 			/*
 			 * Do not throw an exception because the import can still be successful.

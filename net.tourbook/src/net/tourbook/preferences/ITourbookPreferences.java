@@ -437,4 +437,9 @@ public interface ITourbookPreferences {
 	 */
 	public static final String	TOUR_SEGMENTER_CHART_VALUE_FONT					= "TOUR_SEGMENTER_CHART_VALUE_FONT";						//$NON-NLS-1$
 
+	/*
+	 * Tour import
+	 */
+	public static final String	IMPORT_IS_NEW_UI								= "IMPORT_IS_NEW_UI";										//$NON-NLS-1$
+
 }

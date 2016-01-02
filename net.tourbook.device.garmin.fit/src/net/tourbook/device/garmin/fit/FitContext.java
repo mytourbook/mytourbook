@@ -8,13 +8,13 @@ import java.util.Map;
 import java.util.Set;
 
 import net.tourbook.common.UI;
-import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.GearData;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.importdata.TourbookDevice;
+import net.tourbook.tour.TourLogManager;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.joda.time.DateTime;
@@ -108,14 +108,13 @@ public class FitContext {
 
 				if (recordStartTime != sessionStartTime) {
 
-					StatusUtil
-							.log(String
-									.format(
-											"Import file %s has other session start time, sessionStartTime=%s recordStartTime=%s, Difference=%d sec",//$NON-NLS-1$
-											_importFilePathName,
-											new DateTime(sessionStartTime),
-											new DateTime(recordStartTime),
-											(recordStartTime - sessionStartTime) / 1000));
+					final String message = "Import file %s has other session start time, sessionStartTime=%s recordStartTime=%s, Difference=%d sec";//$NON-NLS-1$
+					TourLogManager.logSubInfo(String.format(
+							message,
+							_importFilePathName,
+							new DateTime(sessionStartTime),
+							new DateTime(recordStartTime),
+							(recordStartTime - sessionStartTime) / 1000));
 				}
 
 				tourData.setTourStartTime(new DateTime(recordStartTime));
@@ -187,8 +186,6 @@ public class FitContext {
 						 * ]
 						 * </code>
 						 */
-
-//						StatusUtil.log(new Exception("Wrong gear data, rearTeeth=0"));
 
 						/*
 						 * Set valid value but make it visible that the values are wrong, visible

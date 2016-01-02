@@ -463,5 +463,10 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		 */
 		store.setDefault(ITourbookPreferences.MAP3_IS_COLOR_SELECTOR_DISPLAYED, true);
 		store.setDefault(ITourbookPreferences.MAP3_NUMBER_OF_COLOR_SELECTORS, 10);
+
+		/*
+		 * Tour import
+		 */
+		store.setDefault(ITourbookPreferences.IMPORT_IS_NEW_UI, false);
 	}
 }

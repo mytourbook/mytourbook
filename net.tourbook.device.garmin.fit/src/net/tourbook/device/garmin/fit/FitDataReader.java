@@ -19,7 +19,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 
-import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
 import net.tourbook.device.garmin.fit.listeners.ActivityMesgListenerImpl;
 import net.tourbook.device.garmin.fit.listeners.BikeProfileMesgListenerImpl;
@@ -33,6 +32,7 @@ import net.tourbook.device.garmin.fit.listeners.SessionMesgListenerImpl;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
+import net.tourbook.tour.TourLogManager;
 
 import org.apache.commons.io.IOUtils;
 import org.joda.time.DateTime;
@@ -268,7 +268,7 @@ public class FitDataReader extends TourbookDevice {
 			returnValue = true;
 
 		} catch (final FileNotFoundException e) {
-			StatusUtil.log("Could not read data file '" + importFilePath + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
+			TourLogManager.logEx(String.format("Could not read data file '%s'", importFilePath), e); //$NON-NLS-1$
 		} finally {
 			IOUtils.closeQuietly(fis);
 		}
@@ -286,9 +286,9 @@ public class FitDataReader extends TourbookDevice {
 			fis = new FileInputStream(fileName);
 			returnValue = Decode.checkIntegrity(fis);
 		} catch (final FileNotFoundException e) {
-			StatusUtil.log("Could not read data file '" + fileName + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
+			TourLogManager.logEx(String.format("Could not read data file '%s'", fileName), e); //$NON-NLS-1$
 		} catch (final FitRuntimeException e) {
-			StatusUtil.log("Invalid data file '" + fileName + "'", e); //$NON-NLS-1$ //$NON-NLS-2$
+			TourLogManager.logEx(String.format("Invalid data file '%s'", fileName), e); //$NON-NLS-1$
 		} finally {
 			IOUtils.closeQuietly(fis);
 		}

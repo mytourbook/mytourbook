@@ -227,7 +227,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	public static final boolean				STATE_IS_CONVERT_WAYPOINTS_DEFAULT			= true;
 	public static final String				STATE_IS_CREATE_TOUR_ID_WITH_TIME			= "isCreateTourIdWithTime";				//$NON-NLS-1$
 	public static final boolean				STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT	= false;
-	private static final String				STATE_IS_NEW_UI								= "STATE_IS_NEW_UI";						//$NON-NLS-1$
 	public static final String				STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW			= "STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW";	//$NON-NLS-1$
 	public static final boolean				STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW_DEFAULT	= true;
 	private static final String				STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED		= "STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED"; //$NON-NLS-1$
@@ -2036,7 +2035,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		_topPage_OldUI = createUI_05_Page_OldUI(_topPageBook);
 		_topPage_Startup = createUI_10_Page_Startup(_topPageBook);
-		_topPage_Dashboard = createUI_20_Page_Dashboard(_topPageBook);
 		_topPage_ImportViewer = createUI_90_Page_TourViewer(_topPageBook);
 
 		_topPageBook.showPage(_topPage_Startup);
@@ -2397,6 +2395,18 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		getSite().registerContextMenu(menuMgr, _tourViewer);
 
 		_columnManager.createHeaderContextMenu(table, tableContextMenu);
+	}
+
+	private void createUI_NewUI() {
+
+		/*
+		 * Create new UI only when it is used to prevent that the app is crashing when the old UI is
+		 * used
+		 */
+		if (_topPage_Dashboard == null) {
+
+			_topPage_Dashboard = createUI_20_Page_Dashboard(_topPageBook);
+		}
 	}
 
 	/**
@@ -3885,6 +3895,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private void onSelectUI_New() {
 
 		_isNewUI = true;
+		_prefStore.setValue(ITourbookPreferences.IMPORT_IS_NEW_UI, _isNewUI);
+
 		updateUI_1_TopPage(true);
 
 		showFailbackUI();
@@ -3895,6 +3907,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		resetEasyImport();
 
 		_isNewUI = false;
+		_prefStore.setValue(ITourbookPreferences.IMPORT_IS_NEW_UI, _isNewUI);
+
 		updateUI_1_TopPage(true);
 	}
 
@@ -4122,7 +4136,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private void restoreState() {
 
-		_isNewUI = Util.getStateBoolean(_state, STATE_IS_NEW_UI, false);
+		_isNewUI = _prefStore.getBoolean(ITourbookPreferences.IMPORT_IS_NEW_UI);
 
 		_actionRemoveToursWhenClosed.setChecked(Util.getStateBoolean(
 				_state,
@@ -4584,8 +4598,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		// keep selected tours
 		Util.setState(_state, STATE_SELECTED_TOUR_INDICES, table.getSelectionIndices());
-
-		_state.put(STATE_IS_NEW_UI, _isNewUI);
 
 		_columnManager.saveState(_state);
 	}
@@ -5113,6 +5125,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 						_isInUIStartup = isInStartUp;
 
+						createUI_NewUI();
 						_topPageBook.showPage(_topPage_Dashboard);
 
 						// create dashboard UI

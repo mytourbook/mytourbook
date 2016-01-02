@@ -1604,12 +1604,15 @@ public class RawDataManager {
 							}
 						}
 
-						TourLogManager.addSubLog(//
-								TourLogState.IMPORT_OK,
-								String.format(//
-										LOG_IMPORT_TOUR_IMPORTED,
-										UI.DTFormatterShort.print(tourData.getTourStartTimeMS()),
-										osFilePath));
+						if (tourData != null) {
+
+							TourLogManager.addSubLog(//
+									TourLogState.IMPORT_OK,
+									String.format(//
+											LOG_IMPORT_TOUR_IMPORTED,
+											UI.DTFormatterShort.print(tourData.getTourStartTimeMS()),
+											osFilePath));
+						}
 
 					} else {
 

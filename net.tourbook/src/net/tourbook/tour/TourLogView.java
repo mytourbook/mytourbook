@@ -26,6 +26,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.web.WEB;
 
 import org.eclipse.jface.action.Action;
@@ -58,11 +59,14 @@ public class TourLogView extends ViewPart {
 	private static final String	STATE_DELETE						= "DELETE";										//$NON-NLS-1$
 	private static final String	STATE_ERROR							= "ERROR";											//$NON-NLS-1$
 	private static final String	STATE_EXCEPTION						= "EXCEPTION";										//$NON-NLS-1$
+	private static final String	STATE_INFO							= "INFO";											//$NON-NLS-1$
 	private static final String	STATE_OK							= "OK";											//$NON-NLS-1$
 	private static final String	STATE_SAVE							= "SAVE";											//$NON-NLS-1$
 	//
-	public static final String	CSS_LOG_TITLE						= "title";											//$NON-NLS-1$
+	public static final String	CSS_LOG_INFO						= "info";											//$NON-NLS-1$
+	private static final String	CSS_LOG_ITEM						= "logItem";
 	private static final String	CSS_LOG_SUB_ITEM					= "subItem";										//$NON-NLS-1$
+	public static final String	CSS_LOG_TITLE						= "title";											//$NON-NLS-1$
 	//
 	private static final String	DOM_ID_LOG							= "logs";											//$NON-NLS-1$
 	private static final String	WEB_RESOURCE_TOUR_IMPORT_LOG_CSS	= "tour-import-log.css";							//$NON-NLS-1$
@@ -71,6 +75,7 @@ public class TourLogView extends ViewPart {
 	//
 	private Action				_actionReset;
 	//
+	private boolean				_isNewUI;
 	private boolean				_isBrowserCompleted;
 	private String				_cssFromFile;
 	private String				_noBrowserLog						= UI.EMPTY_STRING;
@@ -79,6 +84,7 @@ public class TourLogView extends ViewPart {
 	private String				_imageUrl_StateDeleteDevice			= getIconUrl(Messages.Image__State_Deleted_Device);
 	private String				_imageUrl_StateDeleteBackup			= getIconUrl(Messages.Image__State_Deleted_Backup);
 	private String				_imageUrl_StateError				= getIconUrl(Messages.Image__State_Error);
+	private String				_imageUrl_StateInfo					= getIconUrl(Messages.Image__State_Info);
 	private String				_imageUrl_StateOK					= getIconUrl(Messages.Image__State_OK);
 	private String				_imageUrl_StateSave					= getIconUrl(Messages.Image__State_Save);
 	/*
@@ -120,23 +126,29 @@ public class TourLogView extends ViewPart {
 			return;
 		}
 
-		String jsText = UI.replaceJS_BackSlash(tourLog.message);
-		jsText = UI.replaceJS_Apostrophe(jsText);
-		final String message = jsText;
-		final String subItem = tourLog.isSubLogItem ? CSS_LOG_SUB_ITEM : UI.EMPTY_STRING;
-		final String css = tourLog.css == null ? UI.EMPTY_STRING : tourLog.css;
-
-		final String stateNoBrowser[] = { UI.EMPTY_STRING };
-		final String stateWithBrowser[] = { UI.EMPTY_STRING };
-
-		getImportState(tourLog, stateNoBrowser, stateWithBrowser);
-
 		// Run always async that the flow is not blocked.
 		Display.getDefault().asyncExec(new Runnable() {
 			@Override
 			public void run() {
 
-				final String noBrowserText = tourLog.time + UI.SPACE + stateNoBrowser[0] + UI.SPACE + message;
+				String jsText = UI.replaceJS_BackSlash(tourLog.message);
+				jsText = UI.replaceJS_Apostrophe(jsText);
+				final String message = jsText;
+
+				final String subItem = tourLog.isSubLogItem //
+						? CSS_LOG_SUB_ITEM
+						: UI.EMPTY_STRING;
+
+				final String css = tourLog.css == null //
+						? CSS_LOG_ITEM
+						: tourLog.css;
+
+				final String stateWithBrowser[] = { UI.EMPTY_STRING };
+				final String stateNoBrowser[] = { UI.EMPTY_STRING };
+
+				setImportState(tourLog, stateNoBrowser, stateWithBrowser);
+
+				final String noBrowserText = createNoBrowserText(tourLog, stateNoBrowser[0]);
 
 //				System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
 //						+ ("\t" + noBrowserText));
@@ -178,7 +190,7 @@ public class TourLogView extends ViewPart {
 
 							// message
 							+ ("var td = document.createElement('TD');\n") //$NON-NLS-1$
-							+ ("td.className='column logItem " + subItem + " " + css + "';\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+							+ ("td.className='column " + subItem + " " + css + "';\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 							+ tdContent
 
 							+ ("tr.appendChild(td);\n") //$NON-NLS-1$
@@ -197,13 +209,13 @@ public class TourLogView extends ViewPart {
 
 				} else {
 
-					addNoBrowserLog(noBrowserText);
+					addLog_NoBrowser(noBrowserText);
 				}
 			}
 		});
 	}
 
-	private void addNoBrowserLog(final String newLogText) {
+	private void addLog_NoBrowser(final String newLogText) {
 
 		if (_noBrowserLog.length() == 0) {
 
@@ -229,6 +241,7 @@ public class TourLogView extends ViewPart {
 
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
+
 				if (partRef.getPart(false) == TourLogView.this) {
 					TourLogManager.setLogView(null);
 				}
@@ -306,6 +319,13 @@ public class TourLogView extends ViewPart {
 		return sb.toString();
 	}
 
+	private String createNoBrowserText(final TourLog tourLog, final String stateNoBrowser) {
+
+		final String subIndent = tourLog.isSubLogItem ? UI.SPACE4 : UI.EMPTY_STRING;
+
+		return tourLog.time + UI.SPACE3 + stateNoBrowser + subIndent + UI.SPACE3 + tourLog.message;
+	}
+
 	@Override
 	public void createPartControl(final Composite parent) {
 
@@ -314,6 +334,7 @@ public class TourLogView extends ViewPart {
 		createActions();
 
 		createUI(parent);
+		restoreState();
 
 		fillToolbar();
 
@@ -332,22 +353,14 @@ public class TourLogView extends ViewPart {
 		_page_NoBrowser = new Composite(_pageBook, SWT.NONE);
 		_page_NoBrowser.setBackground(bgColor);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(_page_NoBrowser);
-		GridLayoutFactory.swtDefaults().numColumns(1).applyTo(_page_NoBrowser);
+		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(_page_NoBrowser);
 		{
-			_txtNoBrowser = new Text(_page_NoBrowser, SWT.MULTI | SWT.READ_ONLY);
+			_txtNoBrowser = new Text(_page_NoBrowser, SWT.MULTI | SWT.READ_ONLY | SWT.H_SCROLL | SWT.V_SCROLL);
 			_txtNoBrowser.setBackground(bgColor);
 			GridDataFactory.fillDefaults()//
 					.grab(true, true)
 					.align(SWT.FILL, SWT.FILL)
 					.applyTo(_txtNoBrowser);
-
-			addNoBrowserLog(Messages.UI_Label_BrowserCannotBeCreated);
-		}
-
-		_page_WithBrowser = new Composite(_pageBook, SWT.NONE);
-		GridLayoutFactory.fillDefaults().applyTo(_page_WithBrowser);
-		{
-			createUI_10_Browser(_page_WithBrowser);
 		}
 	}
 
@@ -387,7 +400,20 @@ public class TourLogView extends ViewPart {
 
 		} catch (final SWTError e) {
 
-			addNoBrowserLog(NLS.bind(Messages.UI_Label_BrowserCannotBeCreated_Error, e.getMessage()));
+			addLog_NoBrowser(NLS.bind(Messages.UI_Label_BrowserCannotBeCreated_Error, e.getMessage()));
+		}
+	}
+
+	private void createUI_NewUI() {
+
+		if (_page_WithBrowser == null) {
+
+			_page_WithBrowser = new Composite(_pageBook, SWT.NONE);
+
+			GridLayoutFactory.fillDefaults().applyTo(_page_WithBrowser);
+			{
+				createUI_10_Browser(_page_WithBrowser);
+			}
 		}
 	}
 
@@ -407,55 +433,6 @@ public class TourLogView extends ViewPart {
 		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
 		tbm.add(_actionReset);
-	}
-
-	private void getImportState(final TourLog importLog, final String[] stateNoBrowser, final String[] stateWithBrowser) {
-
-		switch (importLog.state) {
-
-		case IMPORT_OK:
-			stateNoBrowser[0] = STATE_OK;
-			stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateOK);
-			break;
-
-		case IMPORT_ERROR:
-			stateNoBrowser[0] = STATE_ERROR;
-			stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateError);
-			break;
-
-		case IMPORT_EXCEPTION:
-			stateNoBrowser[0] = STATE_EXCEPTION;
-			stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateError);
-			break;
-
-		case EASY_IMPORT_COPY:
-			stateNoBrowser[0] = STATE_COPY;
-			stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateCopy);
-			break;
-
-		case EASY_IMPORT_DELETE_BACKUP:
-			stateNoBrowser[0] = STATE_DELETE;
-			stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateDeleteBackup);
-			break;
-
-		case EASY_IMPORT_DELETE_DEVICE:
-			stateNoBrowser[0] = STATE_DELETE;
-			stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateDeleteDevice);
-			break;
-
-		case TOUR_DELETED:
-			stateNoBrowser[0] = STATE_DELETE;
-			stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateDeleteBackup);
-			break;
-
-		case TOUR_SAVED:
-			stateNoBrowser[0] = STATE_SAVE;
-			stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateSave);
-			break;
-
-		default:
-			break;
-		}
 	}
 
 	private void initUI(final Composite parent) {
@@ -503,6 +480,11 @@ public class TourLogView extends ViewPart {
 		}
 	}
 
+	private void restoreState() {
+
+		_isNewUI = TourbookPlugin.getPrefStore().getBoolean(ITourbookPreferences.IMPORT_IS_NEW_UI);
+	}
+
 	@Override
 	public void setFocus() {
 
@@ -511,23 +493,101 @@ public class TourLogView extends ViewPart {
 		}
 	}
 
+	private void setImportState(final TourLog importLog, final String[] stateNoBrowser, final String[] stateWithBrowser) {
+
+		switch (importLog.state) {
+
+		case IMPORT_OK:
+			stateNoBrowser[0] = STATE_OK;
+			stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateOK);
+			break;
+
+		case IMPORT_ERROR:
+			stateNoBrowser[0] = STATE_ERROR;
+			stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateError);
+			break;
+
+		case IMPORT_EXCEPTION:
+			stateNoBrowser[0] = STATE_EXCEPTION;
+			stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateError);
+			break;
+
+		case IMPORT_INFO:
+			stateNoBrowser[0] = STATE_INFO;
+			stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateInfo);
+			break;
+
+		case EASY_IMPORT_COPY:
+			stateNoBrowser[0] = STATE_COPY;
+			stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateCopy);
+			break;
+
+		case EASY_IMPORT_DELETE_BACKUP:
+			stateNoBrowser[0] = STATE_DELETE;
+			stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateDeleteBackup);
+			break;
+
+		case EASY_IMPORT_DELETE_DEVICE:
+			stateNoBrowser[0] = STATE_DELETE;
+			stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateDeleteDevice);
+			break;
+
+		case TOUR_DELETED:
+			stateNoBrowser[0] = STATE_DELETE;
+			stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateDeleteBackup);
+			break;
+
+		case TOUR_SAVED:
+			stateNoBrowser[0] = STATE_SAVE;
+			stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateSave);
+			break;
+
+		default:
+			break;
+		}
+	}
+
 	/**
 	 * Set/create dashboard page.
 	 */
 	private void updateUI() {
 
-		final boolean isBrowserAvailable = _browser != null && _browser.isDisposed() == false;
+		if (_isNewUI) {
 
-		// set dashboard page
-		_pageBook.showPage(isBrowserAvailable//
-				? _page_WithBrowser
-				: _page_NoBrowser);
+			createUI_NewUI();
 
-		if (isBrowserAvailable == false) {
-			return;
+			final boolean isBrowserAvailable = _browser != null && _browser.isDisposed() == false;
+
+			// set dashboard page
+			_pageBook.showPage(isBrowserAvailable//
+					? _page_WithBrowser
+					: _page_NoBrowser);
+
+			if (isBrowserAvailable == false) {
+				return;
+			}
+
+			updateUI_InitBrowser();
+
+		} else {
+
+			_pageBook.showPage(_page_NoBrowser);
+
+			/*
+			 * Show already available log entries
+			 */
+			for (final TourLog tourLog : TourLogManager.getLogs()) {
+
+				final String stateWithBrowser[] = { UI.EMPTY_STRING };
+				final String stateNoBrowser[] = { UI.EMPTY_STRING };
+
+				setImportState(tourLog, stateNoBrowser, stateWithBrowser);
+				final String noBrowserText = createNoBrowserText(tourLog, stateNoBrowser[0]);
+
+				addLog_NoBrowser(noBrowserText);
+			}
 		}
 
-		updateUI_InitBrowser();
 	}
 
 	private void updateUI_InitBrowser() {

@@ -811,6 +811,8 @@ public class Messages extends NLS {
 	public static String		Image__State_Deleted_Device;
 	public static String		Image__State_DeletedTour_View;
 	public static String		Image__State_Error;
+
+	public static String	Image__State_Info;
 	public static String		Image__State_MovedTour;
 	public static String		Image__State_MovedTour_View;
 	public static String		Image__State_OK;

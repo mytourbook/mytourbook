@@ -38,6 +38,11 @@ public enum TourLogState {
 	IMPORT_EXCEPTION, //
 
 	/**
+	 * 
+	 */
+	IMPORT_INFO, //
+
+	/**
 	 * File is copied to the backup folder.
 	 */
 	EASY_IMPORT_COPY, //

@@ -18,6 +18,7 @@ package net.tourbook.tour;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import net.tourbook.Messages;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.web.WEB;
@@ -88,12 +89,32 @@ public class TourLogManager {
 		return isLogViewOpen;
 	}
 
+	public static void logError(final String message) {
+
+		final TourLog tourLog = new TourLog(TourLogState.IMPORT_ERROR, message);
+
+		addLog(tourLog);
+	}
+
 	public static void logEx(final Exception e) {
 
-		String message = Util.getStackTrace(e);
-		message = WEB.convertHTML_LineBreaks(message);
+		final String stackTrace = Util.getStackTrace(e);
 
-		final TourLog tourLog = new TourLog(TourLogState.IMPORT_EXCEPTION, message);
+		logException(stackTrace, e);
+	}
+
+	public static void logEx(final String message, final Exception e) {
+
+		final String stackTrace = Util.getStackTrace(e);
+
+		logException(message + UI.NEW_LINE + stackTrace, e);
+	}
+
+	private static void logException(final String message, final Exception e) {
+
+		final String logMessage = WEB.convertHTML_LineBreaks(message);
+
+		final TourLog tourLog = new TourLog(TourLogState.IMPORT_EXCEPTION, logMessage);
 
 		addLog(tourLog);
 
@@ -106,6 +127,25 @@ public class TourLogManager {
 
 		// ensure it is logged when crashing
 		StatusUtil.log(e);
+	}
+
+	public static void logInfo(final String message) {
+
+		final TourLog tourLog = new TourLog(TourLogState.IMPORT_INFO, message);
+
+		tourLog.css = TourLogView.CSS_LOG_INFO;
+
+		addLog(tourLog);
+	}
+
+	public static void logSubInfo(final String message) {
+
+		final TourLog tourLog = new TourLog(TourLogState.IMPORT_INFO, message);
+
+		tourLog.css = TourLogView.CSS_LOG_INFO;
+		tourLog.isSubLogItem = true;
+
+		addLog(tourLog);
 	}
 
 	public static void openLogView() {
