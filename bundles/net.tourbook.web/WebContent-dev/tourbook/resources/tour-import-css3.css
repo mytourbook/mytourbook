@@ -1,0 +1,98 @@
+
+a.import-tile,
+.dash-action
+{	
+	box-shadow:				0;
+	transition: 			box-shadow		.2s ease 0s;
+}
+
+a.import-tile:HOVER,
+.dash-action:HOVER
+{
+	z-index:				10;
+
+	box-shadow:				0 0 30px #888;
+	
+	/* overwrite none CSS3 value */
+	background-color: 		#434343;
+}	
+
+a.import-tile:FOCUS,
+.dash-action:FOCUS
+{
+	border-top-color:		#47A3FF;
+	border-bottom-color:	#47A3FF;
+		
+	background-color: 		#434343;
+	background-image:		radial-gradient(
+								circle 
+								farthest-corner at 50% 120%, 
+								#47A3FF 0%, 
+								rgba(255, 255, 255, 0.0) 50%, 
+								rgba(255, 255, 255, 0.0) 100%
+							);
+}
+
+a.import-tile:HOVER:FOCUS,
+.dash-action:HOVER:FOCUS
+{
+	box-shadow:				0 0 40px #47A3FF;
+}
+
+
+/*
+	Switch device on/Off
+*/
+.deviceOnAnimated
+{
+	animation:					deviceOnAnimation;
+	animation-duration:			2.0s;
+	animation-timing-function:	ease;
+}
+@keyframes deviceOnAnimation
+{
+	from	{	opacity:	0.1;	}
+	to		{	opacity:	1.0;	}
+}
+
+.deviceOffAnimated
+{
+	animation:					deviceOffAnimation;
+	animation-duration:			2.0s;
+	animation-timing-function:	ease;
+}
+@keyframes deviceOffAnimation
+{
+	from	{	opacity:	1.0;	}
+	to		{	opacity:	0.1;	}
+}
+
+/*
+	State tooltip animation, !!! AnimationOff IS NOT WORKING only AnimationOn !!!
+*/
+.importState	.stateTooltip
+{
+	opacity:					1;
+
+	animation:					stateTooltipAnimationOff;
+	animation-duration:			2.0s;
+	animation-timing-function:	ease;
+}
+@keyframes stateTooltipAnimationOff
+{
+	from	{	opacity:	1;	}
+	to		{	opacity:	0;	}
+}
+
+.importState:HOVER	.stateTooltip,
+.importState:FOCUS	.stateTooltip
+{
+	animation:					stateTooltipAnimationOn;
+	animation-duration:			0.5s;
+	animation-timing-function:	ease;
+}
+@keyframes stateTooltipAnimationOn
+{
+	from	{	opacity:	0;	}
+	to		{	opacity:	1;	}
+}

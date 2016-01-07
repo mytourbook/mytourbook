@@ -1,0 +1,90 @@
+html 
+{
+	overflow-y: 			scroll;
+}
+
+body 
+{
+	font-size:				12px;
+	color:					#fff;
+	background-color:		#444;
+	xpadding-left:			5px;
+}
+
+html, body 
+{
+	margin:					5px;
+}
+
+p,td,ul 
+{
+	line-height:			130%;
+}
+
+p 
+{
+	margin:					0px;
+}
+
+img 
+{
+	border: 				0;
+}
+
+table
+{
+	border-collapse:		collapse;
+}
+
+
+body,p,h1,h2,h3,h4,table,td,th,ul,ol,textarea,input 
+{
+	font-family: 			sans-serif; /* Segoe UI, helvetica, arial, */
+}
+
+a:LINK,
+a:VISITED 
+{
+	color:					#fff;
+	text-decoration:		none;
+}
+
+.icon
+{
+	width: 					16px; 
+	height: 				16px; 
+	min-width:				16px; 			/* force with otherwise it can be smaller */
+
+	background-repeat:		no-repeat;
+	background-position-x:	5px;			/* this must be the same as .column otherwise it is not centered */
+	xbackground-position-y:	center;			/* prevent v-center when multiple lines are displayed */
+}
+
+.row
+{
+	vertical-align: 		top;
+}
+
+.column
+{
+	padding-left:			5px;
+}
+
+.logItem
+{
+	white-space:			nowrap;
+}
+
+.subItem
+{
+	padding-left:			25px;
+}
+
+.title
+{
+	color:					#ABFE11;
+	font-weight: 			bold;
+}
+
+
+
