@@ -237,29 +237,29 @@ public class FitDataReader extends TourbookDevice {
 			broadcaster.addListener(new RecordMesgListenerImpl(context));
 			broadcaster.addListener(new SessionMesgListenerImpl(context));
 
-//			//
-//			// START - show debug info
-//			//
-//
-//			System.out.println();
-//			System.out.println();
-//			System.out.println((System.currentTimeMillis() + " [" + getClass().getSimpleName() + "]")
-//					+ (" \t" + importFilePath));
-//			System.out.println();
-//			System.out.println(String.format(//
-//					"%s %-5s %-30s %20s %s", //$NON-NLS-1$
-//					"Timestamp",
-//					"Num",
-//					"Name",
-//					"Value",
-//					"Units"));
-//			System.out.println();
-//
-//			addAllLogListener(broadcaster);
-//
-//			//
-//			// END - show debug info
-//			//
+			//
+			// START - show debug info
+			//
+
+			System.out.println();
+			System.out.println();
+			System.out.println((System.currentTimeMillis() + " [" + getClass().getSimpleName() + "]")
+					+ (" \t" + importFilePath));
+			System.out.println();
+			System.out.println(String.format(//
+					"%s %-5s %-30s %20s %s", //$NON-NLS-1$
+					"Timestamp",
+					"Num",
+					"Name",
+					"Value",
+					"Units"));
+			System.out.println();
+
+			addAllLogListener(broadcaster);
+
+			//
+			// END - show debug info
+			//
 
 			broadcaster.run(fis);
 

@@ -15,4 +15,4 @@ Bundle-ActivationPolicy: lazy
 Bundle-Vendor: MyTourbook
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ClassPath: .,
- fit-14.10.jar
+ fit-16.40.0.jar
