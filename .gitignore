@@ -1,3 +1,4 @@
 bin
+target
 *.js.map
 *.js.uncompressed.js
