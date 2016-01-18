@@ -4700,7 +4700,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				@Override
 				public void run() {
 
-					onSelectUI_Old();
+					if (_parent.isDisposed()) {
+						return;
+					}
+
+					// check again because the browser could be set
+					if (_browser == null || _browser.isDisposed()) {
+						onSelectUI_Old();
+					}
 				}
 			});
 		}
