@@ -1,0 +1,37 @@
+Version 16.1                                            18. January 2016
+
+New
+===	
+
+* Tour Import
+
+  - New dashboard
+  - The old import page is displayed as default
+
+
+* Tour Log
+
+  - Show tour logs
+
+
+This version is almost the same as 15.12 Experimental III, the only 
+difference is, that the tour import is still usable when the embedded 
+browser in the import dashboard crashes, in this case it shows the old 
+import UI (after a restart :-)
+ 
+
+Bugfix
+======	
+
+* Tour Type Color
+
+  - Fixed historic bug: Modified colors of a tour type were not display
+    until the pref dialog was reopened
+
+
+System
+======	
+
+* Java 8
+
+  - Java 8 is required to run this application
