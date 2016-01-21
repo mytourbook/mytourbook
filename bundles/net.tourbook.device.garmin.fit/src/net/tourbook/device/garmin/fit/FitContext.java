@@ -109,6 +109,7 @@ public class FitContext {
 				if (recordStartTime != sessionStartTime) {
 
 					final String message = "Import file %s has other session start time, sessionStartTime=%s recordStartTime=%s, Difference=%d sec";//$NON-NLS-1$
+					
 					TourLogManager.logSubInfo(String.format(
 							message,
 							_importFilePathName,
