@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project 
+
+	xsi:schemaLocation	="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" 
+	xmlns				="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi			="http://www.w3.org/2001/XMLSchema-instance">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<artifactId>mytourbook-product</artifactId>		<groupId>net.tourbook</groupId><version>16.1.0-SNAPSHOT</version>
+	<packaging>eclipse-repository</packaging>
+
+	<parent>
+		<artifactId>mytourbook-build</artifactId>	<groupId>net.tourbook</groupId><version>16.1.0-SNAPSHOT</version>
+		<relativePath>..</relativePath>
+	</parent>
+
+	<build>
+	
+	    <finalName>myproduct-${unqualifiedVersion}</finalName>
+	    
+		<plugins>
+
+			<plugin>
+			
+				<artifactId>tycho-p2-director-plugin</artifactId>			<groupId>org.eclipse.tycho</groupId><version>${tycho.version}</version>
+			
+				<executions>
+					<execution>
+						<id>create-distributions</id>
+						<goals>
+							<goal>materialize-products</goal>
+							<goal>archive-products</goal>
+						</goals>
+					</execution>
+				</executions>
+				
+				<configuration>
+					<products>
+						<product>
+						
+							<!-- select product with ID other.product.id for the classifiers "other-<os>.<ws>.<arch>" -->
+							<id>net.tourbook.product</id>
+							
+							<!--
+							<attachId>mytourbook_attachId</attachId>
+							-->
+
+					        <!-- optional parameters -->
+					        <rootFolder>mytourbook</rootFolder>
+					        
+							<!-- 
+							${project.version}
+							<archiveFileName>CUSTOM_PREFIX__${unqualifiedVersion}__${buildQualifier}__</archiveFileName>
+							-->
+							<archiveFileName>mytourbook-${unqualifiedVersion}</archiveFileName>
+
+						</product>
+					</products>
+				</configuration>
+  			</plugin>
+
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>	<version>1.8</version>
+				<executions>
+					<execution>
+						<id>create-win-installer</id>
+						<phase>package</phase>
+						<goals><goal>run</goal></goals>
+						<configuration>
+							<target>
+
+								<echo message="Hello from ant in between materialize-products and archive-products" />
+
+							</target>
+<!-- 
+							<target>
+							
+								<echo>it worked :-)</echo>
+							
+							</target>
+
+							<target>
+								<move verbose="true" todir="${project.build.directory}/products">
+								    <mapper type="regexp" from="^(Installer-)(.*)$$"
+								        to="\1N-${maven.build.timestamp}-\2" />
+								
+								    <fileset dir="${project.build.directory}/products">
+								        <include name="*.zip" />
+								    </fileset>
+								</move>
+							</target>
+						    
+						    <target>
+						        <delete file="${project.build.directory}/repository/content.jar" />
+						        <delete file="${project.build.directory}/repository/artifacts.jar" />
+						    </target>
+							
+							<tasks>
+								<exec
+									dir="${project.basedir}"
+									executable="${project.basedir}/src/main/sh/do-something.sh"
+									failonerror="true">
+									<arg line="arg1 arg2 arg3 arg4" />
+								</exec>
+							</tasks>
+ -->							
+ 
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>

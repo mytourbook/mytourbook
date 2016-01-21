@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>build.parent.pom</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+	</buildSpec>
+	<natures>
+	</natures>
+	<linkedResources>
+		
+		<!-- MyTourbook App -->
+		<link>
+			<name>pom.xml</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/pom.xml</locationURI>
+		</link>
+
+		<link>
+			<name>pom-build.xml</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PARENT_LOC/build/pom.xml</locationURI>
+		</link>
+		<link>
+			<name>pom-bundles.xml</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/bundles/pom.xml</locationURI>
+		</link>
+		<link>
+			<name>pom-features.xml</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/features/pom.xml</locationURI>
+		</link>
+		<link>
+			<name>pom-product.xml</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/build/build.net.tourbook.product/pom.xml</locationURI>
+		</link>
+		<link>
+			<name>pom-LANGUAGE-FRAGMENTS.xml</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/LANGUAGE-FRAGMENTS/pom.xml</locationURI>
+		</link>
+	</linkedResources>
+</projectDescription>

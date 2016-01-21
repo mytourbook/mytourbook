@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project 
+
+	xmlns				="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi			="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation	="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	
+	<modelVersion>4.0.0</modelVersion>
+	
+	<name>MyTourbook App</name>
+
+	<artifactId>mytourbook-app</artifactId>		<groupId>net.tourbook</groupId><version>16.1.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	
+	<properties>
+		<tycho.version>0.24.0</tycho.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>  
+	</properties>
+
+	<modules>
+	
+		<!-- artifact.bundles -->
+		<module>../../mytourbook-BUILD-autocreated/core</module>
+		
+		<!-- artifact.mytourbook.plugins.i18 -->
+		<module>../../mytourbook-BUILD-autocreated/translation</module>
+		
+		<module>features</module>
+		<module>build</module>
+
+	</modules>
+
+	<repositories>
+	
+		<repository>
+			<id>juno</id>													<layout>p2</layout>
+			<url>http://download.eclipse.org/eclipse/updates/3.8</url>
+		</repository>
+	
+		<repository>
+			<id>eclipse.3.8.2.nl</id>										<layout>p2</layout>
+			<url>file:build/build.eclipse.3.8.2.nl.update-site</url>
+		</repository>
+		
+	</repositories>
+	
+	<build>
+	
+<!-- 
+		<defaultGoal>clean verify</defaultGoal>
+-->
+	
+		<plugins>
+        			
+			<plugin>
+				<artifactId>tycho-maven-plugin</artifactId>					<groupId>org.eclipse.tycho</groupId><version>${tycho.version}</version>
+				<extensions>true</extensions>
+			</plugin>
+
+			<plugin>
+				<artifactId>tycho-compiler-plugin</artifactId>				<groupId>org.eclipse.tycho</groupId><version>${tycho.version}</version>
+				<configuration>
+
+
+					<!-- Fix this problem (and propably others)
+					
+					 Access restriction: The method 'BaseDateTime.getMillis()' is not API 
+					 (restriction on classpath entry 'C:\DAT\MT\mytourbook\bundles\net.tourbook.ext.jars\joda-time-2.1.jar')
+					 
+					 -->
+					<compilerArgument>-warn:none</compilerArgument>     
+					<compilerArgument>-err:none</compilerArgument>      
+				</configuration>
+			</plugin>
+			
+			<plugin>
+				<artifactId>tycho-packaging-plugin</artifactId>				<groupId>org.eclipse.tycho</groupId><version>${tycho.version}</version>
+				<configuration>
+				
+					<!-- !!! Hide default user name in manifest files and set a new name !!! -->
+					<archive>
+						<addMavenDescriptor>false</addMavenDescriptor>
+						<manifestEntries>
+							<Built-By>MyTourbook App Builder</Built-By>
+						</manifestEntries>
+					</archive>
+					
+					<!-- set qualifier date format -->
+					<format>yyyyMMdd-HHmm</format>
+					
+				</configuration>
+			</plugin>			
+			
+			<plugin>
+				<artifactId>target-platform-configuration</artifactId>		<groupId>org.eclipse.tycho</groupId><version>${tycho.version}</version>
+				<configuration>
+					<resolver>p2</resolver>
+					<environments>
+						<environment>	<os>win32</os>	<ws>win32</ws>	<arch>x86</arch>		</environment>
+						<environment>	<os>win32</os>	<ws>win32</ws>	<arch>x86_64</arch>		</environment>
+						<environment>	<os>linux</os>	<ws>gtk</ws>	<arch>x86</arch>		</environment>
+						<environment>	<os>linux</os>	<ws>gtk</ws>	<arch>x86_64</arch>		</environment>
+					</environments>
+				</configuration>
+			</plugin>
+
+		</plugins>
+	</build>
+
+</project>

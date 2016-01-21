@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="create-win-installer" basedir=".">
+
+	<property name="path-product" location="target/products"/>
+
+	
+    <target name="unzip">
+    	
+		<property name="zip-file" value="${path-translated-archive}/mt-${param archive-language}.zip" />
+
+        
+    	<unzip dest="${path-product}">
+    		
+    		<fileset dir="${path-product}" id="fileset-id">
+			    <include name="*win32*"/>
+			</fileset>
+    	
+
+			<mapper>
+				
+			</mapper>			
+    		
+    	</unzip>
+    	
+    </target>
+
+</project>
