@@ -1,7 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <project name="CreateDojoFiles" default="all" basedir=".">
 
-	<!-- THIS FOLDER IS ALSO SET IN "mytourbook-app.profile.js" -->
+	<!-- 
+		THIS FOLDER IS ALSO SET IN "mytourbook-app.profile.js" 
+	-->
 	<property name="dojoToolkitFolder"				value="C:/E/js-resources/dojo/MyTourbook-DojoToolkit" />
 	
 	<property name="WebContentDev"					value="../WebContent-dev" />
@@ -13,8 +15,12 @@
 	<property name="tourbookBasePath"				value="${dojoToolkitFolder}" />
 	<property name="tourbookInDojoToolkitFolder"	value="${tourbookBasePath}/tourbook" />
 	
-	<property name="dojoBuildFolder"				value="../../../../mytourbook-BUILD-dojo" />
-	<property name="dojoBuildReleaseFolder"			value="${dojoBuildFolder}/mt-dojo-release" />
+	<!--
+		C:\DAT\MT\mytourbook\releng\net.tourbook.build
+		C:\DAT\mytourbook-BUILD-dojo
+	-->
+	<property name="path-build-dojo"				value="../../../../../mytourbook-BUILD-dojo" />
+	<property name="path-dojoBuildRelease"			value="${path-build-dojo}/mt-dojo-release" />
 
 	<target name="all" depends="cleanBuildFiles,cleanMTRelease,shrink,copyResources,compress,cleanBuildFiles" />
 
@@ -25,7 +31,7 @@
 		<delete dir="${tourbookInDojoToolkitFolder}" />
 		
 		<delete includeEmptyDirs="true">
-			<fileset dir="${dojoBuildFolder}" includes="**/*" defaultexcludes="no"/>
+			<fileset dir="${path-build-dojo}" includes="**/*" defaultexcludes="no"/>
 		</delete>
 	</target>
 
@@ -63,7 +69,7 @@
 			<arg value="basePath=${tourbookBasePath}" />
 			
 			<!-- release folder -->
-			<arg value="releaseDir=${dojoBuildReleaseFolder}" />
+			<arg value="releaseDir=${path-dojoBuildRelease}" />
 			
 			<!-- major profile -->
 			<arg value="profile=${basedir}/mytourbook-app.profile.js" />
@@ -74,7 +80,8 @@
 			    // vvvvv is valid ONLY in the arg line
 		    	check-args              print computed raw command line input, including raw profiles, then terminate
 			    check-discovery         print all discovered resources, then terminate
-			    debug-check             print computed profile, including internal structures -->
+			    debug-check             print computed profile, including internal structures 
+			-->
 			<arg value="action=release" />
 
 			<arg value="load=build" />
@@ -86,13 +93,13 @@
 
 		<!--compress minimized files and create it in the src folder -->
 		<mkdir dir="${WebContentRel}/dojo"/>	
-		<gzip  	src="${dojoBuildReleaseFolder}/dojo/dojo.js" 
+		<gzip  	src="${path-dojoBuildRelease}/dojo/dojo.js" 
 				destfile="${WebContentRel}/dojo/dojo.js.jgz"/>
 		
-		<gzip  	src="${dojoBuildReleaseFolder}/tourbook/search/SearchApp.js" 
+		<gzip  	src="${path-dojoBuildRelease}/tourbook/search/SearchApp.js" 
 				destfile="${WebContentRelTourbook}/search/SearchApp.js.jgz"/>
 		
-		<gzip  	src="${dojoBuildReleaseFolder}/tourbook/search/search.css" 
+		<gzip  	src="${path-dojoBuildRelease}/tourbook/search/search.css" 
 				destfile="${WebContentRelTourbook}/search/search.css.jgz"/>
 
 		<!-- finally cleanup all temp files -->
@@ -136,7 +143,7 @@
 		-->
 		<echo level="info" message="### Copying nls resources, build->rel ..." />
 		<copy todir="${WebContentRel}/tourbook/search/nls" preservelastmodified="no" includeemptydirs="false" verbose="yes">
-			<fileset dir="${dojoBuildReleaseFolder}/tourbook/search/nls">
+			<fileset dir="${path-dojoBuildRelease}/tourbook/search/nls">
 				
 				<include name="*.js"/>
 				

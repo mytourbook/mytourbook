@@ -14,7 +14,9 @@
  */
 var profile = (function() {
 
+	// ---------------------------------------------------
 	// THIS FOLDER IS ALSO SET IN 'Create-Dojo-Bundle.xml'
+	// ---------------------------------------------------
 	var dojoSource = "C:/E/js-resources/dojo/MyTourbook-DojoToolkit";
 
 	return {
