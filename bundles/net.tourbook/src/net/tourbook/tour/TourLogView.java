@@ -64,7 +64,7 @@ public class TourLogView extends ViewPart {
 	private static final String	STATE_SAVE							= "SAVE";											//$NON-NLS-1$
 	//
 	public static final String	CSS_LOG_INFO						= "info";											//$NON-NLS-1$
-	private static final String	CSS_LOG_ITEM						= "logItem";
+	private static final String	CSS_LOG_ITEM						= "logItem"; //$NON-NLS-1$
 	private static final String	CSS_LOG_SUB_ITEM					= "subItem";										//$NON-NLS-1$
 	public static final String	CSS_LOG_TITLE						= "title";											//$NON-NLS-1$
 	//
