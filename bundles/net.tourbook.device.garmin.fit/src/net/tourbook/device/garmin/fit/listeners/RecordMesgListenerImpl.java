@@ -120,6 +120,7 @@ public class RecordMesgListenerImpl extends AbstractMesgListener implements Reco
 			}
 		}
 
+
 		final Integer positionLat = mesg.getPositionLat();
 		if (positionLat != null) {
 			timeData.latitude = DataConverters.convertSemicirclesToDegrees(positionLat);
@@ -161,6 +162,9 @@ public class RecordMesgListenerImpl extends AbstractMesgListener implements Reco
 		if (power != null) {
 			timeData.power = power;
 		}
+
+		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tpower: " + power));
+		// TODO remove SYSTEM.OUT.PRINTLN
 
 		final Byte mesgTemperature = mesg.getTemperature();
 		if (mesgTemperature != null) {

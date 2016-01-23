@@ -8,7 +8,7 @@ import com.garmin.fit.Fit;
 public enum Manufacturer {
 
 	GARMIN(1), //
-	GARMIN_FR405_ANTFS(2), // 		// Do not use.  Used by FR405 for ANTFS man id.
+	GARMIN_FR405_ANTFS(2), //  // Do not use.  Used by FR405 for ANTFS man id.
 	ZEPHYR(3), //
 	DAYTON(4), //
 	IDT(5), //
@@ -95,7 +95,31 @@ public enum Manufacturer {
 	TACX(89), //
 	DIRECTION_TECHNOLOGY(90), //
 	MAGTONIC(91), //
+	_1PARTCARBON(92), //
+	INSIDE_RIDE_TECHNOLOGIES(93), //
+	SOUND_OF_MOTION(94), //
+	STRYD(95), //
+	ICG(96), //  // Indoorcycling Group
+	MI_PULSE(97), //
+	BSX_ATHLETICS(98), //
+	LOOK(99), //
+	CAMPAGNOLO_SRL(100), //
+	BODY_BIKE_SMART(101), //
+	PRAXISWORKS(102), //
 	DEVELOPMENT(255), //
+	HEALTHANDLIFE(257), //
+	LEZYNE(258), //
+	SCRIBE_LABS(259), //
+	ZWIFT(260), //
+	WATTEAM(261), //
+	RECON(262), //
+	FAVERO_ELECTRONICS(263), //
+	DYNOVELO(264), //
+	STRAVA(265), //
+	PRECOR(266), //  // Amer Sports
+	BRYTON(267), //
+	SRAM(268), //
+	NAVMAN(269), //  // MiTAC Global Corporation (Mio Technology)
 	ACTIGRAPHCORP(5759), //
 	INVALID(Fit.UINT16_INVALID), //
 

@@ -52,6 +52,14 @@ import com.garmin.fit.MesgListener;
  */
 public class FitDataReader extends TourbookDevice {
 
+//	2016-01-11T15:11:11.000+01:00 1452521471 821455871 29    accumulated_power                            779542 watts
+//	2016-01-11T15:11:11.000+01:00 1452521471 821455871 7     power                                            98 watts
+//	2016-01-11T15:11:11.000+01:00 1452521471 821455871 30    left_right_balance                              178
+//	2016-01-11T15:11:11.000+01:00 1452521471 821455871 43    left_torque_effectiveness                      59.5 percent
+//	2016-01-11T15:11:11.000+01:00 1452521471 821455871 44    right_torque_effectiveness                      0.0 percent
+//	2016-01-11T15:11:11.000+01:00 1452521471 821455871 45    left_pedal_smoothness                          17.0 percent
+//	2016-01-11T15:11:11.000+01:00 1452521471 821455871 46    right_pedal_smoothness                         51.5 percent
+
 	@SuppressWarnings("unused")
 	private void addAllLogListener(final MesgBroadcaster broadcaster) {
 
