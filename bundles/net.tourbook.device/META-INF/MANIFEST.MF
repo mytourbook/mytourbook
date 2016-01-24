@@ -18,5 +18,7 @@ Import-Package: net.tourbook.chart,
  net.tourbook.common,
  net.tourbook.common.util,
  net.tourbook.common.weather,
+ net.tourbook.data,
+ net.tourbook.importdata,
  org.joda.time,
  org.joda.time.format

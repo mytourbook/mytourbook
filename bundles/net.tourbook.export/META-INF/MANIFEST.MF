@@ -13,7 +13,8 @@ Require-Bundle: org.eclipse.core.runtime,
  net.tourbook.ext.velocity
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
-Import-Package: net.tourbook.ext.velocity,
+Import-Package: net.tourbook,
+ net.tourbook.ext.velocity,
  org.apache.velocity,
  org.apache.velocity.app,
  org.dinopolis.gpstool.gpsinput,

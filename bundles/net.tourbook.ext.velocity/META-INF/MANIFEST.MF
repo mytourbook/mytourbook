@@ -61,3 +61,4 @@ Export-Package: net.tourbook.ext.velocity,
  org.dinopolis.util.resource,
  org.dinopolis.util.servicediscovery,
  org.dinopolis.util.text
+Import-Package: net.tourbook.common.util

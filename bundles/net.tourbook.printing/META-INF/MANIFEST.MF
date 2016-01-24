@@ -13,7 +13,8 @@ Require-Bundle: org.eclipse.ui,
  net.tourbook.ext.jars.printing
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
-Import-Package: org.apache.fop.apps,
+Import-Package: net.tourbook.application,
+ org.apache.fop.apps,
  org.apache.xmlgraphics.util,
  org.joda.time,
  org.joda.time.format
