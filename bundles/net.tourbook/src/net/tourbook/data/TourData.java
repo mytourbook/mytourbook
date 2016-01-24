@@ -5140,7 +5140,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	 */
 	public String getImportFilePathName() {
 
-		if (tourImportFilePath != null || tourImportFilePath.length() > 0) {
+		if (tourImportFilePath != null && tourImportFilePath.length() > 0) {
 
 			try {
 
