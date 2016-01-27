@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -160,6 +160,29 @@ public class FitDataReader extends TourbookDevice {
 							|| fieldName.equals("avg_stance_time") //$NON-NLS-1$
 							|| fieldName.equals("avg_stance_time_percent") //$NON-NLS-1$
 							|| fieldName.equals("avg_vertical_oscillation") //$NON-NLS-1$
+
+							// power
+							|| fieldName.equals("power") //$NON-NLS-1$
+							|| fieldName.equals("accumulated_power") //$NON-NLS-1$
+							|| fieldName.equals("left_right_balance") //$NON-NLS-1$
+							|| fieldName.equals("left_torque_effectiveness") //$NON-NLS-1$
+							|| fieldName.equals("right_torque_effectiveness") //$NON-NLS-1$
+							|| fieldName.equals("left_pedal_smoothness") //$NON-NLS-1$
+							|| fieldName.equals("right_pedal_smoothness") //$NON-NLS-1$
+
+							// device
+							|| fieldName.equals("manufacturer") //$NON-NLS-1$
+//							|| fieldName.equals("product") //$NON-NLS-1$
+							|| fieldName.equals("software_version") //$NON-NLS-1$
+							|| fieldName.equals("hardware_version") //$NON-NLS-1$
+//							|| fieldName.equals("battery_voltage") //$NON-NLS-1$
+//							|| fieldName.equals("battery_status") //$NON-NLS-1$
+							|| fieldName.equals("ant_network") //$NON-NLS-1$
+							|| fieldName.equals("source_type") //$NON-NLS-1$
+//							|| fieldName.equals("serial_number") //$NON-NLS-1$
+							|| fieldName.equals("cum_operating_time") //$NON-NLS-1$
+
+
 							//
 							|| fieldName.equals("unknown") //$NON-NLS-1$
 					//

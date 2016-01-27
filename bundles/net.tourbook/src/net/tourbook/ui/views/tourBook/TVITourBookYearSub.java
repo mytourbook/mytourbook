@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -107,8 +107,25 @@ public class TVITourBookYearSub extends TVITourBookItem {
 				+ "dpTolerance, " //								34	//$NON-NLS-1$
 				//
 				+ "frontShiftCount, " //							35	//$NON-NLS-1$
-				+ "rearShiftCount" //								36	//$NON-NLS-1$
+				+ "rearShiftCount," //								36	//$NON-NLS-1$
 				//
+				// ---------- POWER -------------
+				//
+				+ "power_Avg," //									37	//$NON-NLS-1$
+				+ "power_Max, " //									38	//$NON-NLS-1$
+				+ "power_Normalized, " //							39	//$NON-NLS-1$
+				+ "power_FTP, " //									40	//$NON-NLS-1$
+
+				+ "power_TotalWork, " //							41	//$NON-NLS-1$
+				+ "power_TrainingStressScore, " //					42	//$NON-NLS-1$
+				+ "power_IntensityFactor, " //						43	//$NON-NLS-1$
+
+				+ "power_PedalLeftRightBalance, " //				44	//$NON-NLS-1$
+				+ "power_AvgLeftTorqueEffectiveness, " //			45	//$NON-NLS-1$
+				+ "power_AvgRightTorqueEffectiveness, " //			46	//$NON-NLS-1$
+				+ "power_AvgLeftPedalSmoothness, " //				47	//$NON-NLS-1$
+				+ "power_AvgRightPedalSmoothness " //				48	//$NON-NLS-1$
+
 				+ UI.NEW_LINE
 
 				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + " TourData" + UI.NEW_LINE) //			//$NON-NLS-1$ //$NON-NLS-2$
@@ -223,6 +240,23 @@ public class TVITourBookYearSub extends TVITourBookItem {
 
 					tourItem.colFrontShiftCount = result.getInt(35);
 					tourItem.colRearShiftCount = result.getInt(36);
+
+					// ----------------- POWER ------------------
+
+					tourItem.colPower_Avg = result.getInt(37);
+					tourItem.colPower_Max = result.getInt(38);
+					tourItem.colPower_Normalized = result.getInt(39);
+					tourItem.colPower_FTP = result.getInt(40);
+
+					tourItem.colPower_TotalWork = result.getLong(41);
+					tourItem.colPower_TrainingStressScore = result.getFloat(42);
+					tourItem.colPower_IntensityFactor = result.getFloat(43);
+
+					tourItem.colPower_PedalLeftRightBalance = result.getInt(44);
+					tourItem.colPower_AvgLeftTorqueEffectiveness = result.getFloat(45);
+					tourItem.colPower_AvgRightTorqueEffectiveness = result.getFloat(46);
+					tourItem.colPower_AvgLeftPedalSmoothness = result.getFloat(47);
+					tourItem.colPower_AvgRightPedalSmoothness = result.getFloat(48);
 
 					// -----------------------------------------------
 

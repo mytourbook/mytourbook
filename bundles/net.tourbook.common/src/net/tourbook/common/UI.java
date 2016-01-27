@@ -108,12 +108,12 @@ public class UI {
 	public static final String				SPACE4									= "    ";																	//$NON-NLS-1$
 	public static final String				ZERO									= "0";																		//$NON-NLS-1$
 
-	private static final String				JS_APOSTROPHE							= "'"; //$NON-NLS-1$
-	private static final String				JS_APOSTROPHE_REPLACEMENT				= "\\'"; //$NON-NLS-1$
-	private static final String				JS_QUOTA_MARK							= "\""; //$NON-NLS-1$
-	private static final String				JS_QUOTA_MARK_REPLACEMENT				= "\\\""; //$NON-NLS-1$
-	private static final String				JS_BACKSLASH_REPLACEMENT				= "\\\\"; //$NON-NLS-1$
-	private static final String				HTML_NEW_LINE							= "\\n"; //$NON-NLS-1$
+	private static final String				JS_APOSTROPHE							= "'";																		//$NON-NLS-1$
+	private static final String				JS_APOSTROPHE_REPLACEMENT				= "\\'";																	//$NON-NLS-1$
+	private static final String				JS_QUOTA_MARK							= "\"";																	//$NON-NLS-1$
+	private static final String				JS_QUOTA_MARK_REPLACEMENT				= "\\\"";																	//$NON-NLS-1$
+	private static final String				JS_BACKSLASH_REPLACEMENT				= "\\\\";																	//$NON-NLS-1$
+	private static final String				HTML_NEW_LINE							= "\\n";																	//$NON-NLS-1$
 
 	public static final String				SYMBOL_ARROW_UP							= "\u2191";																//$NON-NLS-1$
 	public static final String				SYMBOL_ARROW_DOWN						= "\u2193";																//$NON-NLS-1$
@@ -241,6 +241,9 @@ public class UI {
 	public static final String				UNIT_PACE_MIN_P_MILE					= "min/mi";																//$NON-NLS-1$
 
 	public static final String				UNIT_LABEL_POWER						= "Watt";																	//$NON-NLS-1$
+	public static final String				UNIT_LABEL_JOULE						= "J";																		//$NON-NLS-1$
+	public static final String				UNIT_LABEL_JOULE_KILO					= "kJ";																	//$NON-NLS-1$
+	public static final String				UNIT_LABEL_JOULE_MEGA					= "MJ";																	//$NON-NLS-1$
 	public static final String				UNIT_LABEL_MS							= "ms";																	//$NON-NLS-1$
 
 	public static final PeriodFormatter		DEFAULT_DURATION_FORMATTER;
