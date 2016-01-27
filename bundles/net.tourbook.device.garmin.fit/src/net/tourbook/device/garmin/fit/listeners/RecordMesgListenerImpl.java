@@ -163,9 +163,6 @@ public class RecordMesgListenerImpl extends AbstractMesgListener implements Reco
 			timeData.power = power;
 		}
 
-		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tpower: " + power));
-		// TODO remove SYSTEM.OUT.PRINTLN
-
 		final Byte mesgTemperature = mesg.getTemperature();
 		if (mesgTemperature != null) {
 

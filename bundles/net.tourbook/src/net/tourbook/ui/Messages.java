@@ -19,7 +19,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-	private static final String	BUNDLE_NAME	= "net.tourbook.ui.messages";			//$NON-NLS-1$
+	private static final String	BUNDLE_NAME	= "net.tourbook.ui.messages";					//$NON-NLS-1$
 
 	public static String		Action_configure_columns;
 	public static String		Action_configure_columns_tooltip;
@@ -174,9 +174,7 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_clouds_label;
 	public static String		ColumnFactory_clouds;
 	public static String		ColumnFactory_clouds_tooltip;
-
 	public static String		ColumnFactory_CollateEvent_Label;
-
 	public static String		ColumnFactory_CollateEvent_Tooltip;
 	public static String		ColumnFactory_Diff_Header;
 	public static String		ColumnFactory_DistanceDelta_Label;
@@ -221,10 +219,45 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_NumberOfTours_Header;
 	public static String		ColumnFactory_NumberOfTours_Label;
 	public static String		ColumnFactory_NumberOfTours_Tooltip;
-
 	public static String		ColumnFactory_PhotoTimeAdjustment_Header;
 	public static String		ColumnFactory_PhotoTimeAdjustment_Label;
 	public static String		ColumnFactory_PhotoTimeAdjustment_Tooltip;
+	public static String		ColumnFactory_Power_Avg_Header;
+	public static String		ColumnFactory_Power_Avg_Label;
+	public static String		ColumnFactory_Power_Avg_Tooltip;
+	public static String		ColumnFactory_Power_AvgLeftPedalSmoothness_Header;
+	public static String		ColumnFactory_Power_AvgLeftPedalSmoothness_Label;
+	public static String		ColumnFactory_Power_AvgLeftPedalSmoothness_Tooltip;
+	public static String		ColumnFactory_Power_AvgLeftTorqueEffectiveness_Header;
+	public static String		ColumnFactory_Power_AvgLeftTorqueEffectiveness_Label;
+	public static String		ColumnFactory_Power_AvgLeftTorqueEffectiveness_Tooltip;
+	public static String		ColumnFactory_Power_AvgRightPedalSmoothness_Header;
+	public static String		ColumnFactory_Power_AvgRightPedalSmoothness_Label;
+	public static String		ColumnFactory_Power_AvgRightPedalSmoothness_Tooltip;
+	public static String		ColumnFactory_Power_AvgRightTorqueEffectiveness_Header;
+	public static String		ColumnFactory_Power_AvgRightTorqueEffectiveness_Label;
+	public static String		ColumnFactory_Power_AvgRightTorqueEffectiveness_Tooltip;
+	public static String		ColumnFactory_Power_FTP_Header;
+	public static String		ColumnFactory_Power_FTP_Label;
+	public static String		ColumnFactory_Power_FTP_Tooltip;
+	public static String		ColumnFactory_Power_IntensityFactor_Header;
+	public static String		ColumnFactory_Power_IntensityFactor_Label;
+	public static String		ColumnFactory_Power_IntensityFactor_Tooltip;
+	public static String		ColumnFactory_Power_LeftRightBalance_Header;
+	public static String		ColumnFactory_Power_LeftRightBalance_Label;
+	public static String		ColumnFactory_Power_LeftRightBalance_Tooltip;
+	public static String		ColumnFactory_Power_Max_Header;
+	public static String		ColumnFactory_Power_Max_Label;
+	public static String		ColumnFactory_Power_Max_Tooltip;
+	public static String		ColumnFactory_Power_Normalized_Header;
+	public static String		ColumnFactory_Power_Normalized_Label;
+	public static String		ColumnFactory_Power_Normalized_Tooltip;
+	public static String		ColumnFactory_Power_TotalWork_Header;
+	public static String		ColumnFactory_Power_TotalWork_Label;
+	public static String		ColumnFactory_Power_TotalWork_Tooltip;
+	public static String		ColumnFactory_Power_TrainingStressScore_Header;
+	public static String		ColumnFactory_Power_TrainingStressScore_Label;
+	public static String		ColumnFactory_Power_TrainingStressScore_Tooltip;
 	public static String		ColumnFactory_restpulse_label;
 	public static String		ColumnFactory_restpulse;
 	public static String		ColumnFactory_restpulse_tooltip;
@@ -306,16 +339,11 @@ public class Messages extends NLS {
 	public static String		message_manager_sWarningSummary;
 
 	public static String		Segmenter_Tooltip_Label_Altimeter;
-
 	public static String		Segmenter_Tooltip_Label_AltitudeDifference;
 	public static String		Segmenter_Tooltip_Label_BreakTime;
-
 	public static String		Segmenter_Tooltip_Label_Distance;
-
 	public static String		Segmenter_Tooltip_Label_Gradient;
-
 	public static String		Segmenter_Tooltip_Label_MovingTime;
-
 	public static String		Segmenter_Tooltip_Label_RecordingTime;
 	public static String		Segmenter_Tooltip_Label_Title;
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -425,16 +425,39 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 *        already float but not the database field.
 	 */
 	private float												avgTemperature;																			// db-version 4
+
+	// ############################################# WEATHER #############################################
+
 	private int													weatherWindDir;																			// db-version 8
 
 	private int													weatherWindSpd;																			// db-version 8
 	private String												weatherClouds;																				// db-version 8
 	private String												weather;																					// db-version 13
 
-	@XmlElement
-	private String												tourTitle;																					// db-version 4
+	// ############################################# POWER #############################################
+
+	private int													power_Avg;
+	private int													power_Max;
+	private int													power_Normalized;
+
+	/** Functional Threshold Power (FTP) */
+	private int													power_FTP;
+
+	private long												power_TotalWork;
+	private float												power_TrainingStressScore;
+	private float												power_IntensityFactor;
+
+	private int													power_PedalLeftRightBalance;
+	private float												power_AvgLeftTorqueEffectiveness;
+	private float												power_AvgRightTorqueEffectiveness;
+	private float												power_AvgLeftPedalSmoothness;
+	private float												power_AvgRightPedalSmoothness;
+
 
 	// ############################################# OTHER TOUR/DEVICE DATA #############################################
+
+	@XmlElement
+	private String												tourTitle;																					// db-version 4
 
 	@XmlElement
 	private String												tourDescription;																			// db-version 4
@@ -5313,6 +5336,54 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		return photoTimeAdjustment;
 	}
 
+	public int getPower_Avg() {
+		return power_Avg;
+	}
+
+	public float getPower_AvgLeftPedalSmoothness() {
+		return power_AvgLeftPedalSmoothness;
+	}
+
+	public float getPower_AvgLeftTorqueEffectiveness() {
+		return power_AvgLeftTorqueEffectiveness;
+	}
+
+	public float getPower_AvgRightPedalSmoothness() {
+		return power_AvgRightPedalSmoothness;
+	}
+
+	public float getPower_AvgRightTorqueEffectiveness() {
+		return power_AvgRightTorqueEffectiveness;
+	}
+
+	public float getPower_IntensityFactor() {
+		return power_IntensityFactor;
+	}
+
+	public int getPower_Max() {
+		return power_Max;
+	}
+
+	public int getPower_Normalized() {
+		return power_Normalized;
+	}
+
+	public int getPower_PedalLeftRightBalance() {
+		return power_PedalLeftRightBalance;
+	}
+
+	public int getPower_Power() {
+		return power_FTP;
+	}
+
+	public long getPower_TotalWork() {
+		return power_TotalWork;
+	}
+
+	public float getPower_TrainingStressScore() {
+		return power_TrainingStressScore;
+	}
+
 	public float[] getPowerSerie() {
 
 		if ((powerSerie != null) || isPowerSerieFromDevice) {
@@ -6595,6 +6666,54 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 
 	public void setMergeTargetTourId(final Long mergeTargetTourId) {
 		this.mergeTargetTourId = mergeTargetTourId;
+	}
+
+	public void setPower_Avg(final int avgPower) {
+		this.power_Avg = avgPower;
+	}
+
+	public void setPower_AvgLeftPedalSmoothness(final float avgLeftPedalSmoothness) {
+		this.power_AvgLeftPedalSmoothness = avgLeftPedalSmoothness;
+	}
+
+	public void setPower_AvgLeftTorqueEffectiveness(final float avgLeftTorqueEffectiveness) {
+		this.power_AvgLeftTorqueEffectiveness = avgLeftTorqueEffectiveness;
+	}
+
+	public void setPower_AvgRightPedalSmoothness(final float avgRightPedalSmoothness) {
+		this.power_AvgRightPedalSmoothness = avgRightPedalSmoothness;
+	}
+
+	public void setPower_AvgRightTorqueEffectiveness(final float avgRightTorqueEffectiveness) {
+		this.power_AvgRightTorqueEffectiveness = avgRightTorqueEffectiveness;
+	}
+
+	public void setPower_FTP(final int ftp) {
+		this.power_FTP = ftp;
+	}
+
+	public void setPower_IntensityFactor(final float intensityFactor) {
+		this.power_IntensityFactor = intensityFactor;
+	}
+
+	public void setPower_Max(final int maxPower) {
+		this.power_Max = maxPower;
+	}
+
+	public void setPower_Normalized(final int normalizedPower) {
+		this.power_Normalized = normalizedPower;
+	}
+
+	public void setPower_PedalLeftRightBalance(final int leftRightBalance) {
+		this.power_PedalLeftRightBalance = leftRightBalance;
+	}
+
+	public void setPower_TotalWork(final long totalWork) {
+		this.power_TotalWork = totalWork;
+	}
+
+	public void setPower_TrainingStressScore(final float trainingStressScore) {
+		this.power_TrainingStressScore = trainingStressScore;
 	}
 
 	/**

@@ -97,8 +97,9 @@ public class TourDatabase {
 	/**
 	 * version for the database which is required that the tourbook application works successfully
 	 */
-	private static final int						TOURBOOK_DB_VERSION							= 29;
+	private static final int						TOURBOOK_DB_VERSION							= 30;
 
+//	private static final int						TOURBOOK_DB_VERSION							= 30;	// 16.?
 //	private static final int						TOURBOOK_DB_VERSION							= 29;	// 15.12
 //	private static final int						TOURBOOK_DB_VERSION							= 28;	// 15.6
 //	private static final int						TOURBOOK_DB_VERSION							= 27;	// 15.3.1
@@ -2568,6 +2569,25 @@ public class TourDatabase {
 				//
 				// version 29 end ---------
 
+				// version 30 start  -  16.x
+				//
+				+ "	power_Avg								INTEGER DEFAULT 0,								\n" //$NON-NLS-1$
+				+ "	power_Max								INTEGER DEFAULT 0,								\n" //$NON-NLS-1$
+				+ "	power_Normalized						INTEGER DEFAULT 0,								\n" //$NON-NLS-1$
+				+ "	power_FTP								INTEGER DEFAULT 0,								\n" //$NON-NLS-1$
+
+				+ " power_TotalWork							BIGINT DEFAULT 0,								\n" //$NON-NLS-1$
+				+ " power_TrainingStressScore				FLOAT DEFAULT 0,								\n" //$NON-NLS-1$
+				+ " power_IntensityFactor					FLOAT DEFAULT 0,								\n" //$NON-NLS-1$
+
+				+ " power_PedalLeftRightBalance				INTEGER DEFAULT 0,								\n" //$NON-NLS-1$
+				+ " power_AvgLeftTorqueEffectiveness		FLOAT DEFAULT 0,								\n" //$NON-NLS-1$
+				+ " power_AvgRightTorqueEffectiveness		FLOAT DEFAULT 0,								\n" //$NON-NLS-1$
+				+ " power_AvgLeftPedalSmoothness			FLOAT DEFAULT 0,								\n" //$NON-NLS-1$
+				+ " power_AvgRightPedalSmoothness			FLOAT DEFAULT 0,								\n" //$NON-NLS-1$
+				//
+				// version 30 end ---------
+
 				+ "	serieData				BLOB 															\n" //$NON-NLS-1$
 
 				+ ")"); //$NON-NLS-1$
@@ -4039,6 +4059,13 @@ public class TourDatabase {
 			if (currentDbVersion == 28) {
 				isPostUpdate29 = true;
 				currentDbVersion = newVersion = updateDbDesign_028_to_029(conn, monitor);
+			}
+
+			/*
+			 * 29 -> 30
+			 */
+			if (currentDbVersion == 29) {
+				currentDbVersion = newVersion = updateDbDesign_029_to_030(conn, monitor);
 			}
 
 			/*
@@ -5854,6 +5881,42 @@ public class TourDatabase {
 				}
 			}
 		}
+	}
+
+	private int updateDbDesign_029_to_030(final Connection conn, final IProgressMonitor monitor) throws SQLException {
+
+		final int newDbVersion = 30;
+
+		logDb_UpdateStart(newDbVersion);
+		updateMonitor(monitor, newDbVersion);
+
+		final Statement stmt = conn.createStatement();
+		{
+			// check if db is updated to version 30
+			if (isColumnAvailable(conn, TABLE_TOUR_DATA, "power_Avg") == false) { //$NON-NLS-1$
+
+				// Add new columns
+				SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "power_Avg", DEFAULT_0); //$NON-NLS-1$
+				SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "power_Max", DEFAULT_0); //$NON-NLS-1$
+				SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "power_Normalized", DEFAULT_0); //$NON-NLS-1$
+				SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "power_FTP", DEFAULT_0); //$NON-NLS-1$
+
+				SQL.AddCol_BigInt(stmt, TABLE_TOUR_DATA, "power_TotalWork", DEFAULT_0);//$NON-NLS-1$
+				SQL.AddCol_Float(stmt, TABLE_TOUR_DATA, "power_TrainingStressScore", DEFAULT_0); //$NON-NLS-1$
+				SQL.AddCol_Float(stmt, TABLE_TOUR_DATA, "power_IntensityFactor", DEFAULT_0); //$NON-NLS-1$
+
+				SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "power_PedalLeftRightBalance", DEFAULT_0); //$NON-NLS-1$
+				SQL.AddCol_Float(stmt, TABLE_TOUR_DATA, "power_AvgLeftTorqueEffectiveness", DEFAULT_0); //$NON-NLS-1$
+				SQL.AddCol_Float(stmt, TABLE_TOUR_DATA, "power_AvgRightTorqueEffectiveness", DEFAULT_0); //$NON-NLS-1$
+				SQL.AddCol_Float(stmt, TABLE_TOUR_DATA, "power_AvgLeftPedalSmoothness", DEFAULT_0); //$NON-NLS-1$
+				SQL.AddCol_Float(stmt, TABLE_TOUR_DATA, "power_AvgRightPedalSmoothness", DEFAULT_0); //$NON-NLS-1$
+			}
+		}
+		stmt.close();
+
+		logDb_UpdateEnd(newDbVersion);
+
+		return newDbVersion;
 	}
 
 	private void updateDbDesign_VersionNumber(final Connection conn, final int newVersion) throws SQLException {

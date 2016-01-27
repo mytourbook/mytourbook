@@ -85,6 +85,67 @@ public class SessionMesgListenerImpl extends AbstractMesgListener implements Ses
 			tourData.setTourDrivingTime(Math.round(totalTimerTime));
 		}
 
+		// -----------------------POWER -----------------------
+
+		final Integer avgPower = mesg.getAvgPower();
+		if (avgPower != null) {
+			tourData.setPower_Avg(avgPower);
+		}
+		final Integer maxPower = mesg.getMaxPower();
+		if (maxPower != null) {
+			tourData.setPower_Max(maxPower);
+		}
+
+		final Integer normalizedPower = mesg.getNormalizedPower();
+		if (normalizedPower != null) {
+			tourData.setPower_Normalized(normalizedPower);
+		}
+
+		final Integer leftRightBalance = mesg.getLeftRightBalance();
+		if (leftRightBalance != null) {
+			tourData.setPower_PedalLeftRightBalance(leftRightBalance);
+		}
+
+		final Float avgLeftTorqueEffectiveness = mesg.getAvgLeftTorqueEffectiveness();
+		if (avgLeftTorqueEffectiveness != null) {
+			tourData.setPower_AvgLeftTorqueEffectiveness(avgLeftTorqueEffectiveness);
+		}
+
+		final Float avgRightTorqueEffectiveness = mesg.getAvgRightTorqueEffectiveness();
+		if (avgRightTorqueEffectiveness != null) {
+			tourData.setPower_AvgRightTorqueEffectiveness(avgRightTorqueEffectiveness);
+		}
+
+		final Float avgLeftPedalSmoothness = mesg.getAvgLeftPedalSmoothness();
+		if (avgLeftPedalSmoothness != null) {
+			tourData.setPower_AvgLeftPedalSmoothness(avgLeftPedalSmoothness);
+		}
+
+		final Float avgRightPedalSmoothness = mesg.getAvgRightPedalSmoothness();
+		if (avgRightPedalSmoothness != null) {
+			tourData.setPower_AvgRightPedalSmoothness(avgRightPedalSmoothness);
+		}
+
+		final Long totalWork = mesg.getTotalWork();
+		if (totalWork != null) {
+			tourData.setPower_TotalWork(totalWork);
+		}
+
+		final Float trainingStressScore = mesg.getTrainingStressScore();
+		if (trainingStressScore != null) {
+			tourData.setPower_TrainingStressScore(trainingStressScore);
+		}
+
+		final Float intensityFactor = mesg.getIntensityFactor();
+		if (intensityFactor != null) {
+			tourData.setPower_IntensityFactor(intensityFactor);
+		}
+
+		final Integer ftp = mesg.getThresholdPower();
+		if (ftp != null) {
+			tourData.setPower_FTP(ftp);
+		}
+
 		context.onMesgSession_20_After();
 	}
 }

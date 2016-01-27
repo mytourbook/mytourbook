@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -218,6 +218,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private final DateTimeFormatter						_dtFormatter;
 	private final DateTimeFormatter						_isoFormatter;
 	private final NumberFormat							_nf1;
+	private final NumberFormat							_nf3;
 	private final NumberFormat							_nf1_NoGroup;
 
 	private final Calendar								_calendar;
@@ -227,6 +228,10 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		_nf1 = NumberFormat.getNumberInstance();
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
+
+		_nf3 = NumberFormat.getNumberInstance();
+		_nf3.setMinimumFractionDigits(3);
+		_nf3.setMaximumFractionDigits(3);
 
 		_nf1_NoGroup = NumberFormat.getNumberInstance();
 		_nf1_NoGroup.setMinimumFractionDigits(1);
@@ -837,6 +842,21 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		defineColumn_DeviceDistance();
 		defineColumn_DPTolerance();
 
+		defineColumn_Power_Avg();
+		defineColumn_Power_Max();
+		defineColumn_Power_Normalized();
+		defineColumn_Power_FTP();
+
+		defineColumn_Power_IntensityFactor();
+		defineColumn_Power_TotalWork();
+		defineColumn_Power_TrainingStressScore();
+
+		defineColumn_Power_PedalLeftRightBalance();
+		defineColumn_Power_AvgLeftPedalSmoothness();
+		defineColumn_Power_AvgRightPedalSmoothness();
+		defineColumn_Power_AvgLeftTorqueEffectiveness();
+		defineColumn_Power_AvgRightTorqueEffectiveness();
+
 		defineColumn_Person();
 	}
 
@@ -1335,6 +1355,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private void defineColumn_Person() {
 
 		final TreeColumnDefinition colDef = TreeColumnFactory.PERSON.createColumn(_columnManager, _pc);
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -1357,6 +1378,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private void defineColumn_Photos() {
 
 		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_PHOTOS.createColumn(_columnManager, _pc);
+
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -1369,6 +1391,312 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 					cell.setText(UI.EMPTY_STRING);
 				} else {
 					cell.setText(Integer.toString(numberOfPhotos));
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
+	 * Column: avg power
+	 */
+	private void defineColumn_Power_Avg() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.POWER_AVG.createColumn(_columnManager, _pc);
+
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final int dbValue = ((TVITourBookItem) element).colPower_Avg;
+
+				if (dbValue == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(Integer.toString(dbValue));
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
+	 * column: AvgLeftPedalSmoothness
+	 */
+	private void defineColumn_Power_AvgLeftPedalSmoothness() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.POWER_AVG_LEFT_PEDAL_SMOOTHNESS.createColumn(
+				_columnManager,
+				_pc);
+
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final float dbValue = ((TVITourBookItem) element).colPower_AvgLeftPedalSmoothness;
+
+				if (dbValue == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(_nf1.format(dbValue));
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
+	 * column: AvgLeftTorqueEffectiveness
+	 */
+	private void defineColumn_Power_AvgLeftTorqueEffectiveness() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.POWER_AVG_LEFT_TORQUE_EFFECTIVENESS.createColumn(
+				_columnManager,
+				_pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final float dbValue = ((TVITourBookItem) element).colPower_AvgLeftTorqueEffectiveness;
+
+				if (dbValue == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(_nf1.format(dbValue));
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
+	 * column: AvgRightPedalSmoothness
+	 */
+	private void defineColumn_Power_AvgRightPedalSmoothness() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.POWER_AVG_RIGHT_PEDAL_SMOOTHNESS.createColumn(
+				_columnManager,
+				_pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final float dbValue = ((TVITourBookItem) element).colPower_AvgRightPedalSmoothness;
+
+				if (dbValue == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(_nf1.format(dbValue));
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
+	 * column: AvgRightTorqueEffectiveness
+	 */
+	private void defineColumn_Power_AvgRightTorqueEffectiveness() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.POWER_AVG_RIGHT_TORQUE_EFFECTIVENESS.createColumn(
+				_columnManager,
+				_pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final float dbValue = ((TVITourBookItem) element).colPower_AvgRightTorqueEffectiveness;
+
+				if (dbValue == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(_nf1.format(dbValue));
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
+	 * Column: FTP
+	 */
+	private void defineColumn_Power_FTP() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.POWER_FTP.createColumn(_columnManager, _pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final int dbValue = ((TVITourBookItem) element).colPower_FTP;
+
+				if (dbValue == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(Integer.toString(dbValue));
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
+	 * column: PowerIntensityFactor
+	 */
+	private void defineColumn_Power_IntensityFactor() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.POWER_INTENSITY_FACTOR.createColumn(_columnManager, _pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final float dbValue = ((TVITourBookItem) element).colPower_IntensityFactor;
+
+				if (dbValue == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(_nf3.format(dbValue));
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
+	 * Column: max power
+	 */
+	private void defineColumn_Power_Max() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.POWER_MAX.createColumn(_columnManager, _pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final int dbValue = ((TVITourBookItem) element).colPower_Max;
+
+				if (dbValue == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(Integer.toString(dbValue));
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
+	 * Column: normalized power
+	 */
+	private void defineColumn_Power_Normalized() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.POWER_NORMALIZED.createColumn(_columnManager, _pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final int dbValue = ((TVITourBookItem) element).colPower_Normalized;
+
+				if (dbValue == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(Integer.toString(dbValue));
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
+	 * Column: Pedal left/right balance
+	 */
+	private void defineColumn_Power_PedalLeftRightBalance() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.POWER_PEDAL_LEFT_RIGHT_BALANCE.createColumn(//
+				_columnManager,
+				_pc);
+
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final int dbValue = ((TVITourBookItem) element).colPower_PedalLeftRightBalance;
+
+				if (dbValue == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(Integer.toString(dbValue));
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
+	 * Column: Total work
+	 */
+	private void defineColumn_Power_TotalWork() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.POWER_TOTAL_WORK.createColumn(_columnManager, _pc);
+
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final long dbValue = ((TVITourBookItem) element).colPower_TotalWork;
+
+				if (dbValue == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(_nf3.format((double) dbValue / 1000000));
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
+	 * column: PowerTrainingStressScore
+	 */
+	private void defineColumn_Power_TrainingStressScore() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.POWER_TRAINING_STRESS_SCORE.createColumn(
+				_columnManager,
+				_pc);
+
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final float dbValue = ((TVITourBookItem) element).colPower_TrainingStressScore;
+
+				if (dbValue == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(_nf1.format(dbValue));
 				}
 
 				setCellColor(cell, element);
