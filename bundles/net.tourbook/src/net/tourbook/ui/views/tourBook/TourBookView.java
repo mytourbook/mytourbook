@@ -842,20 +842,24 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		defineColumn_DeviceDistance();
 		defineColumn_DPTolerance();
 
+		// Antrieb/Pedal
+		defineColumn_Power_AvgLeftPedalSmoothness();
+		defineColumn_Power_AvgLeftTorqueEffectiveness();
+		defineColumn_Power_AvgRightPedalSmoothness();
+		defineColumn_Power_AvgRightTorqueEffectiveness();
+		defineColumn_Power_PedalLeftRightBalance();
+
+		// Leistung
 		defineColumn_Power_Avg();
 		defineColumn_Power_Max();
 		defineColumn_Power_Normalized();
-		defineColumn_Power_FTP();
-
-		defineColumn_Power_IntensityFactor();
 		defineColumn_Power_TotalWork();
-		defineColumn_Power_TrainingStressScore();
 
-		defineColumn_Power_PedalLeftRightBalance();
-		defineColumn_Power_AvgLeftPedalSmoothness();
-		defineColumn_Power_AvgRightPedalSmoothness();
-		defineColumn_Power_AvgLeftTorqueEffectiveness();
-		defineColumn_Power_AvgRightTorqueEffectiveness();
+		// Trainingsanalyse
+		defineColumn_Power_FTP();
+		defineColumn_Power_PowerToWeightRatio();
+		defineColumn_Power_IntensityFactor();
+		defineColumn_Power_TrainingStressScore();
 
 		defineColumn_Person();
 	}
@@ -1647,6 +1651,27 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 					cell.setText(Integer.toString(dbValue));
 				}
 
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	private void defineColumn_Power_PowerToWeightRatio() {
+		
+		final TreeColumnDefinition colDef = TreeColumnFactory.POWER_POWER_TO_WEIGHT.createColumn(_columnManager, _pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				
+				final Object element = cell.getElement();
+				final float dbValue = ((TVITourBookItem) element).colPower_PowerToWeight;
+				
+				if (dbValue == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(_nf3.format(dbValue));
+				}
+				
 				setCellColor(cell, element);
 			}
 		});

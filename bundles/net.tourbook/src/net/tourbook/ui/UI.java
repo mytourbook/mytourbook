@@ -201,6 +201,12 @@ public class UI {
 	 */
 	public static float										UNIT_VALUE_TEMPERATURE			= 1;
 
+	/**
+	 * Contains the system of measurement value for the power, is set to <code>1</code> for the
+	 * metric system Watt/Kg.
+	 */
+	public static float										UNIT_VALUE_POWER;
+
 	// (Celcius * 9/5) + 32 = Fahrenheit
 	public static final float								UNIT_FAHRENHEIT_MULTI			= 1.8f;
 	public static final float								UNIT_FAHRENHEIT_ADD				= 32;
@@ -1015,13 +1021,13 @@ public class UI {
 	 * @return Returns the {@link TourType} or <code>null</code>.
 	 */
 	public static TourType getTourType(final long tourTypeId) {
-	
+
 		for (final TourType tourType : TourDatabase.getAllTourTypes()) {
 			if (tourType.getTypeId() == tourTypeId) {
 				return tourType;
 			}
 		}
-	
+
 		return null;
 	}
 
@@ -1532,7 +1538,6 @@ public class UI {
 			return createTourTypeImage_Update(existingImage, typeId, keyColorId);
 		}
 	}
-
 
 	/**
 	 * The image descriptor is cached because the creation takes system resources and it's called

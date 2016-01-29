@@ -172,7 +172,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
 				// label: ms
 				_lblAutoOpenMS = new Label(autoTagContainer, SWT.NONE);
-				_lblAutoOpenMS.setText(UI.UNIT_LABEL_MS);
+				_lblAutoOpenMS.setText(UI.UNIT_MS);
 
 				// check: show animation
 				_chkTaggingAnimation = new Button(autoTagContainer, SWT.CHECK);

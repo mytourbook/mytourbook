@@ -135,20 +135,22 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
 	// ----------- POWER ---------
 
-	int								colPower_Avg;
-	int								colPower_Max;
-	int								colPower_Normalized;
-	int								colPower_FTP;
-
-	long							colPower_TotalWork;
-	float							colPower_TrainingStressScore;
-	float							colPower_IntensityFactor;
-
-	int								colPower_PedalLeftRightBalance;
 	float							colPower_AvgLeftTorqueEffectiveness;
 	float							colPower_AvgRightTorqueEffectiveness;
 	float							colPower_AvgLeftPedalSmoothness;
 	float							colPower_AvgRightPedalSmoothness;
+	int								colPower_PedalLeftRightBalance;
+
+	int								colPower_Avg;
+	int								colPower_Max;
+	int								colPower_Normalized;
+	long							colPower_TotalWork;
+
+	int								colPower_FTP;
+	float							colPower_TrainingStressScore;
+	float							colPower_IntensityFactor;
+
+	float							colPower_PowerToWeight;
 
 	TVITourBookItem(final TourBookView view) {
 

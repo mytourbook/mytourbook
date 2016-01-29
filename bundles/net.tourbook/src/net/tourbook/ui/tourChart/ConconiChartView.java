@@ -628,7 +628,7 @@ public class ConconiChartView extends ViewPart {
 					// label: power unit
 					label = new Label(containerValues, SWT.NONE);
 					GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
-					label.setText(UI.UNIT_LABEL_POWER);
+					label.setText(UI.UNIT_POWER);
 				}
 			}
 		}

@@ -52,14 +52,6 @@ import com.garmin.fit.MesgListener;
  */
 public class FitDataReader extends TourbookDevice {
 
-//	2016-01-11T15:11:11.000+01:00 1452521471 821455871 29    accumulated_power                            779542 watts
-//	2016-01-11T15:11:11.000+01:00 1452521471 821455871 7     power                                            98 watts
-//	2016-01-11T15:11:11.000+01:00 1452521471 821455871 30    left_right_balance                              178
-//	2016-01-11T15:11:11.000+01:00 1452521471 821455871 43    left_torque_effectiveness                      59.5 percent
-//	2016-01-11T15:11:11.000+01:00 1452521471 821455871 44    right_torque_effectiveness                      0.0 percent
-//	2016-01-11T15:11:11.000+01:00 1452521471 821455871 45    left_pedal_smoothness                          17.0 percent
-//	2016-01-11T15:11:11.000+01:00 1452521471 821455871 46    right_pedal_smoothness                         51.5 percent
-
 	@SuppressWarnings("unused")
 	private void addAllLogListener(final MesgBroadcaster broadcaster) {
 
@@ -268,29 +260,29 @@ public class FitDataReader extends TourbookDevice {
 			broadcaster.addListener(new RecordMesgListenerImpl(context));
 			broadcaster.addListener(new SessionMesgListenerImpl(context));
 
-			//
-			// START - show debug info
-			//
-
-			System.out.println();
-			System.out.println();
-			System.out.println((System.currentTimeMillis() + " [" + getClass().getSimpleName() + "]")
-					+ (" \t" + importFilePath));
-			System.out.println();
-			System.out.println(String.format(//
-					"%s %-5s %-30s %20s %s", //$NON-NLS-1$
-					"Timestamp",
-					"Num",
-					"Name",
-					"Value",
-					"Units"));
-			System.out.println();
-
-			addAllLogListener(broadcaster);
-
-			//
-			// END - show debug info
-			//
+//			//
+//			// START - show debug info
+//			//
+//
+//			System.out.println();
+//			System.out.println();
+//			System.out.println((System.currentTimeMillis() + " [" + getClass().getSimpleName() + "]")
+//					+ (" \t" + importFilePath));
+//			System.out.println();
+//			System.out.println(String.format(//
+//					"%s %-5s %-30s %20s %s", //$NON-NLS-1$
+//					"Timestamp",
+//					"Num",
+//					"Name",
+//					"Value",
+//					"Units"));
+//			System.out.println();
+//
+//			addAllLogListener(broadcaster);
+//
+//			//
+//			// END - show debug info
+//			//
 
 			broadcaster.run(fis);
 
@@ -315,7 +307,7 @@ public class FitDataReader extends TourbookDevice {
 
 		try {
 			fis = new FileInputStream(fileName);
-			returnValue = Decode.checkIntegrity(fis);
+			returnValue = new Decode().checkFileIntegrity(fis);
 		} catch (final FileNotFoundException e) {
 			TourLogManager.logEx(String.format("Could not read data file '%s'", fileName), e); //$NON-NLS-1$
 		} catch (final FitRuntimeException e) {

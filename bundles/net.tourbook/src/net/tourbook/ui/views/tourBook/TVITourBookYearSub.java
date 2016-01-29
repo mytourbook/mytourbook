@@ -124,7 +124,9 @@ public class TVITourBookYearSub extends TVITourBookItem {
 				+ "power_AvgLeftTorqueEffectiveness, " //			45	//$NON-NLS-1$
 				+ "power_AvgRightTorqueEffectiveness, " //			46	//$NON-NLS-1$
 				+ "power_AvgLeftPedalSmoothness, " //				47	//$NON-NLS-1$
-				+ "power_AvgRightPedalSmoothness " //				48	//$NON-NLS-1$
+				+ "power_AvgRightPedalSmoothness, " //				48	//$NON-NLS-1$
+
+				+ "bikerWeight " //									49	//$NON-NLS-1$
 
 				+ UI.NEW_LINE
 
@@ -243,7 +245,10 @@ public class TVITourBookYearSub extends TVITourBookItem {
 
 					// ----------------- POWER ------------------
 
-					tourItem.colPower_Avg = result.getInt(37);
+					final int dbAvgPower = result.getInt(37);
+					final float dbBodyWeight = result.getFloat(49);
+
+					tourItem.colPower_Avg = dbAvgPower;
 					tourItem.colPower_Max = result.getInt(38);
 					tourItem.colPower_Normalized = result.getInt(39);
 					tourItem.colPower_FTP = result.getInt(40);
@@ -257,6 +262,8 @@ public class TVITourBookYearSub extends TVITourBookItem {
 					tourItem.colPower_AvgRightTorqueEffectiveness = result.getFloat(46);
 					tourItem.colPower_AvgLeftPedalSmoothness = result.getFloat(47);
 					tourItem.colPower_AvgRightPedalSmoothness = result.getFloat(48);
+
+					tourItem.colPower_PowerToWeight = dbAvgPower / dbBodyWeight;
 
 					// -----------------------------------------------
 

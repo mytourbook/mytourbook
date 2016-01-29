@@ -76,17 +76,18 @@ public abstract class TreeColumnFactory {
 	public static final TreeColumnFactory	POWER_AVG;
 	public static final TreeColumnFactory	POWER_MAX;
 	public static final TreeColumnFactory	POWER_NORMALIZED;
-	public static final TreeColumnFactory	POWER_FTP;
-
 	public static final TreeColumnFactory	POWER_TOTAL_WORK;
-	public static final TreeColumnFactory	POWER_INTENSITY_FACTOR;
-	public static final TreeColumnFactory	POWER_TRAINING_STRESS_SCORE;
 
-	public static final TreeColumnFactory	POWER_PEDAL_LEFT_RIGHT_BALANCE;
 	public static final TreeColumnFactory	POWER_AVG_LEFT_PEDAL_SMOOTHNESS;
 	public static final TreeColumnFactory	POWER_AVG_RIGHT_PEDAL_SMOOTHNESS;
 	public static final TreeColumnFactory	POWER_AVG_LEFT_TORQUE_EFFECTIVENESS;
 	public static final TreeColumnFactory	POWER_AVG_RIGHT_TORQUE_EFFECTIVENESS;
+	public static final TreeColumnFactory	POWER_PEDAL_LEFT_RIGHT_BALANCE;
+
+	public static final TreeColumnFactory	POWER_FTP;
+	public static final TreeColumnFactory	POWER_POWER_TO_WEIGHT;
+	public static final TreeColumnFactory	POWER_INTENSITY_FACTOR;
+	public static final TreeColumnFactory	POWER_TRAINING_STRESS_SCORE;
 
 	static {
 
@@ -946,9 +947,9 @@ public abstract class TreeColumnFactory {
 						SWT.TRAIL);
 
 				colDef.setColumnLabel(Messages.ColumnFactory_Power_TotalWork_Label);
-				colDef.setColumnHeaderText(UI.UNIT_LABEL_JOULE_MEGA);
+				colDef.setColumnHeaderText(UI.UNIT_JOULE_MEGA);
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Power_TotalWork_Tooltip);
-				colDef.setColumnUnit(UI.UNIT_LABEL_JOULE_MEGA);
+				colDef.setColumnUnit(UI.UNIT_JOULE_MEGA);
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
 				return colDef;
@@ -968,6 +969,26 @@ public abstract class TreeColumnFactory {
 				colDef.setColumnLabel(Messages.ColumnFactory_Power_TrainingStressScore_Label);
 				colDef.setColumnHeaderText(Messages.ColumnFactory_Power_TrainingStressScore_Header);
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Power_TrainingStressScore_Tooltip);
+				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
+
+				return colDef;
+			};
+		};
+
+		POWER_POWER_TO_WEIGHT = new TreeColumnFactory() {
+			@Override
+			public TreeColumnDefinition createColumn(	final ColumnManager columnManager,
+														final PixelConverter pixelConverter) {
+
+				final TreeColumnDefinition colDef = new TreeColumnDefinition(//
+						columnManager,
+						"PowerToWeightRatio", //$NON-NLS-1$
+						SWT.TRAIL);
+
+				colDef.setColumnLabel(Messages.ColumnFactory_Power_PowerToWeight_Label);
+				colDef.setColumnHeaderText(Messages.ColumnFactory_Power_PowerToWeight_Header);
+				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Power_PowerToWeight_Tooltip);
+				colDef.setColumnUnit(UI.UNIT_POWER_TO_WEIGHT_RATIO);
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
 
 				return colDef;

@@ -222,29 +222,29 @@ public class UI {
 	/*
 	 * Labels for the different measurement systems
 	 */
-	public static final String				UNIT_METER								= "m";																		//$NON-NLS-1$
-	public static final String				UNIT_ALTITUDE_M							= "m";																		//$NON-NLS-1$
-	public static final String				UNIT_DISTANCE_KM						= "km";																	//$NON-NLS-1$
-	public static final String				UNIT_SPEED_KM_H							= "km/h";																	//$NON-NLS-1$
-	public static final String				UNIT_TEMPERATURE_C						= "\u00B0C";																//$NON-NLS-1$
 	public static final String				UNIT_ALTIMETER_M_H						= "m/h";																	//$NON-NLS-1$
-	public static final String				UNIT_PACE_MIN_P_KM						= "min/km";																//$NON-NLS-1$
-	public static final String				UNIT_WEIGHT_KG							= "kg";																	//$NON-NLS-1$
-	public static final String				UNIT_MBYTES								= "MByte";																	//$NON-NLS-1$
-
-	public static final String				UNIT_DISTANCE_YARD						= "yd";																	//$NON-NLS-1$
-	public static final String				UNIT_ALTITUDE_FT						= "ft";																	//$NON-NLS-1$
-	public static final String				UNIT_DISTANCE_MI						= "mi";																	//$NON-NLS-1$
-	public static final String				UNIT_SPEED_MPH							= "mph";																	//$NON-NLS-1$
-	public static final String				UNIT_TEMPERATURE_F						= "\u00B0F";																//$NON-NLS-1$
 	public static final String				UNIT_ALTIMETER_FT_H						= "ft/h";																	//$NON-NLS-1$
+	public static final String				UNIT_ALTITUDE_M							= "m";																		//$NON-NLS-1$
+	public static final String				UNIT_ALTITUDE_FT						= "ft";																	//$NON-NLS-1$
+	public static final String				UNIT_DISTANCE_KM						= "km";																	//$NON-NLS-1$
+	public static final String				UNIT_DISTANCE_MI						= "mi";																	//$NON-NLS-1$
+	public static final String				UNIT_DISTANCE_YARD						= "yd";																	//$NON-NLS-1$
+	public static final String				UNIT_PACE_MIN_P_KM						= "min/km";																//$NON-NLS-1$
 	public static final String				UNIT_PACE_MIN_P_MILE					= "min/mi";																//$NON-NLS-1$
+	public static final String				UNIT_SPEED_KM_H							= "km/h";																	//$NON-NLS-1$
+	public static final String				UNIT_SPEED_MPH							= "mph";																	//$NON-NLS-1$
+	public static final String				UNIT_TEMPERATURE_C						= "\u00B0C";																//$NON-NLS-1$
+	public static final String				UNIT_TEMPERATURE_F						= "\u00B0F";																//$NON-NLS-1$
 
-	public static final String				UNIT_LABEL_POWER						= "Watt";																	//$NON-NLS-1$
-	public static final String				UNIT_LABEL_JOULE						= "J";																		//$NON-NLS-1$
-	public static final String				UNIT_LABEL_JOULE_KILO					= "kJ";																	//$NON-NLS-1$
-	public static final String				UNIT_LABEL_JOULE_MEGA					= "MJ";																	//$NON-NLS-1$
-	public static final String				UNIT_LABEL_MS							= "ms";																	//$NON-NLS-1$
+	public static final String				UNIT_JOULE								= "J";																		//$NON-NLS-1$
+	public static final String				UNIT_JOULE_KILO							= "kJ";																	//$NON-NLS-1$
+	public static final String				UNIT_JOULE_MEGA							= "MJ";																	//$NON-NLS-1$
+	public static final String				UNIT_MBYTES								= "MByte";																	//$NON-NLS-1$
+	public static final String				UNIT_METER								= "m";																		//$NON-NLS-1$
+	public static final String				UNIT_MS									= "ms";																	//$NON-NLS-1$
+	public static final String				UNIT_POWER_TO_WEIGHT_RATIO				= "Watt/Kg";																//$NON-NLS-1$
+	public static final String				UNIT_POWER								= "Watt";																	//$NON-NLS-1$
+	public static final String				UNIT_WEIGHT_KG							= "kg";																	//$NON-NLS-1$
 
 	public static final PeriodFormatter		DEFAULT_DURATION_FORMATTER;
 	public static final PeriodFormatter		DEFAULT_DURATION_FORMATTER_SHORT;
