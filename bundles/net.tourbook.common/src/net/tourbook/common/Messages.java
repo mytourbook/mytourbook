@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,6 +20,30 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.common.messages";				//$NON-NLS-1$
+
+	public static String		App_Action_New;
+	public static String		App_Action_Remove;
+
+	public static String		Action_App_ConfigureColumns;
+	public static String		Action_App_SizeAllColumnsToFit;
+
+	public static String		Action_ColumnManager_ShowAllColumns;
+	public static String		Action_ColumnManager_ShowDefaultColumns;
+
+	public static String		Advanced_Menu_AnimationSymbol;
+
+	public static String		ColumnModifyDialog_Button_default;
+	public static String		ColumnModifyDialog_Button_deselect_all;
+	public static String		ColumnModifyDialog_Button_move_down;
+	public static String		ColumnModifyDialog_Button_move_up;
+	public static String		ColumnModifyDialog_Button_select_all;
+	public static String		ColumnModifyDialog_column_column;
+	public static String		ColumnModifyDialog_column_unit;
+	public static String		ColumnModifyDialog_column_width;
+	public static String		ColumnModifyDialog_Dialog_title;
+	public static String		ColumnModifyDialog_Label_Hints;
+	public static String		ColumnModifyDialog_Label_info;
+	public static String		ColumnModifyDialog_Label_Profile;
 
 	public static String		color_chooser_hexagon;
 	public static String		color_chooser_rgb;
@@ -44,7 +68,7 @@ public class Messages extends NLS {
 	public static String		Color_Chooser_Link_CustomColors_Tooltip;
 	public static String		Color_Chooser_SelectedColor_Tooltip;
 
-	public static String	Font_Editor_Label_FontSize;
+	public static String		Font_Editor_Label_FontSize;
 
 	public static String		Graph_Label_Altimeter;
 	public static String		Graph_Label_Altitude;
@@ -65,8 +89,7 @@ public class Messages extends NLS {
 	public static String		Graph_Label_Speed;
 	public static String		Graph_Label_Temperature;
 	public static String		Graph_Label_TimeDuration;
-	public static String	Graph_Label_Time;
-
+	public static String		Graph_Label_Time;
 	public static String		Graph_Label_TimeOfDay;
 	public static String		Graph_Label_Tour;
 	public static String		Graph_Label_Tour_Compare;

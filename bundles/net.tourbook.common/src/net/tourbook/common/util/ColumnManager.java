@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
+import net.tourbook.common.Messages;
 import net.tourbook.common.UI;
 
 import org.eclipse.jface.dialogs.IDialogSettings;

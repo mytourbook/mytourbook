@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.common.util;
 
+import net.tourbook.common.Messages;
 import net.tourbook.common.UI;
 
 import org.eclipse.jface.action.ActionContributionItem;
