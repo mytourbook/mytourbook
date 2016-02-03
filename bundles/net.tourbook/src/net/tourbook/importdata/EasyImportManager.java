@@ -971,8 +971,7 @@ public class EasyImportManager {
 		saveEasyConfig_Data(xmlMemento, dashConfig);
 
 		// Write the XML block to the state store.
-		final Writer writer = new StringWriter();
-		try {
+		try (final Writer writer = new StringWriter()) {
 
 			xmlMemento.save(writer);
 			_state.put(XML_STATE_EASY_IMPORT, writer.toString());
@@ -980,14 +979,6 @@ public class EasyImportManager {
 		} catch (final IOException e) {
 
 			TourLogManager.logEx(e);
-
-		} finally {
-
-			try {
-				writer.close();
-			} catch (final IOException e) {
-				TourLogManager.logEx(e);
-			}
 		}
 	}
 

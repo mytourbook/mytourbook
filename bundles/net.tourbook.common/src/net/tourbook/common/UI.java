@@ -242,7 +242,7 @@ public class UI {
 	public static final String				UNIT_MBYTES								= "MByte";																	//$NON-NLS-1$
 	public static final String				UNIT_METER								= "m";																		//$NON-NLS-1$
 	public static final String				UNIT_MS									= "ms";																	//$NON-NLS-1$
-	public static final String				UNIT_POWER_TO_WEIGHT_RATIO				= "Watt/Kg";																//$NON-NLS-1$
+	public static final String				UNIT_POWER_TO_WEIGHT_RATIO				= "W/Kg";																	//$NON-NLS-1$
 	public static final String				UNIT_POWER								= "Watt";																	//$NON-NLS-1$
 	public static final String				UNIT_WEIGHT_KG							= "kg";																	//$NON-NLS-1$
 

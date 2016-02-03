@@ -24,6 +24,8 @@ public class Messages extends NLS {
 	public static String		App_Action_New;
 	public static String		App_Action_Remove;
 
+	public static String	App_Action_Remove_NoConfirm;
+
 	public static String		Action_App_ConfigureColumns;
 	public static String		Action_App_SizeAllColumnsToFit;
 
@@ -31,6 +33,10 @@ public class Messages extends NLS {
 	public static String		Action_ColumnManager_ShowDefaultColumns;
 
 	public static String		Advanced_Menu_AnimationSymbol;
+
+	public static String	Column_Profile_Name_Default;
+
+	public static String	Column_Profile_Name_New;
 
 	public static String		ColumnModifyDialog_Button_default;
 	public static String		ColumnModifyDialog_Button_deselect_all;

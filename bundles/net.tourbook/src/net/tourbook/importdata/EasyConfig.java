@@ -72,11 +72,11 @@ public class EasyConfig {
 	public int							animationCrazinessFactor			= ANIMATION_CRAZINESS_FACTOR_DEFAULT;
 
 	public int							stateToolTipWidth					= STATE_TOOLTIP_WIDTH_DEFAULT;
+
 	/*
 	 * Launcher fields
 	 */
 	public ArrayList<ImportLauncher>	importLaunchers						= new ArrayList<>();
-
 	public ArrayList<ImportConfig>		importConfigs						= new ArrayList<>();
 
 	private ImportConfig				_activeImportConfig;

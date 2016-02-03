@@ -946,7 +946,7 @@ public abstract class TreeColumnFactory {
 						"PowerTotalWork", //$NON-NLS-1$
 						SWT.TRAIL);
 
-				colDef.setColumnLabel(Messages.ColumnFactory_Power_TotalWork_Label);
+				colDef.setColumnLabel(Messages.ColumnFactory_Power_TotalWork_Tooltip);
 				colDef.setColumnHeaderText(UI.UNIT_JOULE_MEGA);
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Power_TotalWork_Tooltip);
 				colDef.setColumnUnit(UI.UNIT_JOULE_MEGA);
@@ -985,7 +985,7 @@ public abstract class TreeColumnFactory {
 						"PowerToWeightRatio", //$NON-NLS-1$
 						SWT.TRAIL);
 
-				colDef.setColumnLabel(Messages.ColumnFactory_Power_PowerToWeight_Label);
+				colDef.setColumnLabel(Messages.ColumnFactory_Power_PowerToWeight_Tooltip);
 				colDef.setColumnHeaderText(Messages.ColumnFactory_Power_PowerToWeight_Header);
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Power_PowerToWeight_Tooltip);
 				colDef.setColumnUnit(UI.UNIT_POWER_TO_WEIGHT_RATIO);

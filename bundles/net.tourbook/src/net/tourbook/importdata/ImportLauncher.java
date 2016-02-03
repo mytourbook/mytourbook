@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -40,7 +40,6 @@ public class ImportLauncher implements Cloneable {
 
 	public int						imageWidth;
 
-	private long					_id;
 
 	/**
 	 * Show/hide this launcher in the dashboard.
@@ -63,6 +62,7 @@ public class ImportLauncher implements Cloneable {
 	public int						lastMarkerDistance;
 	public String					lastMarkerText		= UI.EMPTY_STRING;
 
+	private long					_id;
 	private static long				_idCreator;
 
 	public ImportLauncher() {
