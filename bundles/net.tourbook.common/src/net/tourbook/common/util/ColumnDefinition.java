@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -381,6 +381,12 @@ public class ColumnDefinition implements Cloneable {
 
 	@Override
 	public String toString() {
-		return _columnId + ":" + _columnWidth + " (" + _defaultColumnWidth + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		return "ColumnDefinition [" //$NON-NLS-1$
+//				+ ("_label=" + _label + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("_isCheckedInDialog=" + _isCheckedInDialog + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("_columnId=" + _columnId + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+//				+ ("_columnWidth=" + _columnWidth + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+//				+ ("_defaultColumnWidth=" + _defaultColumnWidth) //$NON-NLS-1$
+				+ "]\n"; //$NON-NLS-1$
 	}
 }

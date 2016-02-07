@@ -58,9 +58,4 @@ public class TableColumnDefinition extends ColumnDefinition {
 		_columnIndex = tcIndex;
 	}
 
-	@Override
-	public String toString() {
-		return _columnId;
-	}
-
 }

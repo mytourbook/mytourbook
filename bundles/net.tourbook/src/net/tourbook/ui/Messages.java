@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,9 +20,6 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.ui.messages";					//$NON-NLS-1$
-
-	public static String		Action_configure_columns;
-	public static String		Action_configure_columns_tooltip;
 
 	public static String		ColumnFactory_altitude_computed_difference_tooltip;
 	public static String		ColumnFactory_altitude_difference_label;
@@ -330,7 +327,6 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_Waypoint_Time_Tooltip;
 	public static String		ColumnFactory_Waypoint_Time_Unit;
 
-	public static String		Image_configure_columns;
 	public static String		Image_ToolTip_TourInfo;
 	public static String		Image_ToolTip_TourInfo_Hovered;
 

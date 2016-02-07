@@ -348,7 +348,7 @@ public class UI {
 				CommonActivator.getImageDescriptor(Messages.Image_Action_PhotoFilter_Disabled));
 
 		IMAGE_REGISTRY.put(IMAGE_CONFIGURE_COLUMNS, //
-				CommonActivator.getImageDescriptor(Messages.Image__ConfigureColumns));
+				CommonActivator.getImageDescriptor(Messages.Image__CustomizeProfilesColumns));
 		IMAGE_REGISTRY.put(IMAGE_EMPTY_16, //
 				CommonActivator.getImageDescriptor(Messages.Image___Empty16));
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,10 +15,10 @@
  *******************************************************************************/
 package net.tourbook.ui.action;
 
-import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.Messages;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
-import net.tourbook.ui.Messages;
 
 import org.eclipse.jface.action.Action;
 
@@ -30,10 +30,8 @@ public class ActionModifyColumns extends Action {
 
 		_tourViewer = tourViewer;
 
-		setText(Messages.Action_configure_columns);
-		setToolTipText(Messages.Action_configure_columns_tooltip);
-
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_configure_columns));
+		setText(Messages.Action_App_CustomizeColumnsAndProfiles);
+		setImageDescriptor(CommonActivator.getImageDescriptor(Messages.Image__CustomizeProfilesColumns));
 	}
 
 	@Override

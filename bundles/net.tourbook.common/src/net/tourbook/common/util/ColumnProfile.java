@@ -65,12 +65,44 @@ public class ColumnProfile implements Cloneable {
 	}
 
 	@Override
-	public String toString() {
-		return "ColumnProfile [" //
+	public boolean equals(final Object obj) {
 
-				+ ("name=" + name + ", ")
-				+ ("_id=" + _id)
-
-				+ "]";
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final ColumnProfile other = (ColumnProfile) obj;
+		if (_id != other._id) {
+			return false;
+		}
+		return true;
 	}
+
+	public long getID() {
+		return _id;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (_id ^ (_id >>> 32));
+		return result;
+	}
+
+	@Override
+	public String toString() {
+		return "ColumnProfile [" // //$NON-NLS-1$
+
+				+ ("name=" + name + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("_id=" + _id) //$NON-NLS-1$
+
+				+ "]"; //$NON-NLS-1$
+	}
+
 }

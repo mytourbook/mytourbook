@@ -21,22 +21,22 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.common.messages";				//$NON-NLS-1$
 
-	public static String		App_Action_New;
+	public static String		App_Action_New_WithConfirm;
 	public static String		App_Action_Remove;
+	public static String		App_Action_Remove_NoConfirm;
+	public static String		App_Action_Rename_WithConfirm;
 
-	public static String	App_Action_Remove_NoConfirm;
-
-	public static String		Action_App_ConfigureColumns;
+	public static String		Action_App_CustomizeColumnsAndProfiles;
 	public static String		Action_App_SizeAllColumnsToFit;
 
+	public static String		Action_ColumnManager_Column_Info;
+	public static String		Action_ColumnManager_Profile_Info;
 	public static String		Action_ColumnManager_ShowAllColumns;
 	public static String		Action_ColumnManager_ShowDefaultColumns;
 
 	public static String		Advanced_Menu_AnimationSymbol;
 
-	public static String	Column_Profile_Name_Default;
-
-	public static String	Column_Profile_Name_New;
+	public static String		Column_Profile_Name_Default;
 
 	public static String		ColumnModifyDialog_Button_default;
 	public static String		ColumnModifyDialog_Button_deselect_all;
@@ -46,7 +46,11 @@ public class Messages extends NLS {
 	public static String		ColumnModifyDialog_column_column;
 	public static String		ColumnModifyDialog_column_unit;
 	public static String		ColumnModifyDialog_column_width;
+	public static String		ColumnModifyDialog_Dialog_Profile_Title;
+	public static String		ColumnModifyDialog_Dialog_ProfileNew_Message;
+	public static String		ColumnModifyDialog_Dialog_ProfileRename_Message;
 	public static String		ColumnModifyDialog_Dialog_title;
+	public static String		ColumnModifyDialog_Label_Column;
 	public static String		ColumnModifyDialog_Label_Hints;
 	public static String		ColumnModifyDialog_Label_info;
 	public static String		ColumnModifyDialog_Label_Profile;
@@ -110,7 +114,7 @@ public class Messages extends NLS {
 	public static String		Graph_Pref_ColorText;
 
 	public static String		Image___Empty16;
-	public static String		Image__ConfigureColumns;
+	public static String		Image__CustomizeProfilesColumns;
 	public static String		Image__options;
 	public static String		Image__weather_sunny;
 	public static String		Image__weather_cloudy;

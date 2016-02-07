@@ -21,6 +21,8 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import net.tourbook.common.Messages;
 import net.tourbook.common.UI;
@@ -95,9 +97,10 @@ public class ColumnManager {
 	/** Active column profile */
 	private ColumnProfile						_activeProfile;
 
-	private AbstractColumnLayout				_columnLayout;
+	private Comparator<ColumnProfile>			_profileSorter;
 
 	private final ITourViewer					_tourViewer;
+	private AbstractColumnLayout				_columnLayout;
 
 	/**
 	 * Viewer which is managed by this {@link ColumnManager}.
@@ -116,6 +119,13 @@ public class ColumnManager {
 			@Override
 			public void handleEvent(final Event event) {
 				onSelectColumnItem(event);
+			}
+		};
+
+		_profileSorter = new Comparator<ColumnProfile>() {
+			@Override
+			public int compare(final ColumnProfile colProfile1, final ColumnProfile colProfile2) {
+				return colProfile1.name.compareTo(colProfile2.name);
 			}
 		};
 	}
@@ -222,7 +232,7 @@ public class ColumnManager {
 
 		_columnViewer = columnViewer;
 
-		setVisibleColumnDefinitions(_activeProfile);
+		setVisibleColDefs(_activeProfile);
 
 		if (columnViewer instanceof TableViewer) {
 
@@ -413,11 +423,11 @@ public class ColumnManager {
 		}
 
 		/*
-		 * Action: Customize &Columns...
+		 * Action: &Customize Profiles/Columns...
 		 */
 		{
 			final MenuItem configMenuItem = new MenuItem(contextMenu, SWT.PUSH);
-			configMenuItem.setText(Messages.Action_App_ConfigureColumns);
+			configMenuItem.setText(Messages.Action_App_CustomizeColumnsAndProfiles);
 			configMenuItem.setImage(UI.IMAGE_REGISTRY.get(UI.IMAGE_CONFIGURE_COLUMNS));
 			configMenuItem.addListener(SWT.Selection, new Listener() {
 				@Override
@@ -431,7 +441,51 @@ public class ColumnManager {
 		new MenuItem(contextMenu, SWT.SEPARATOR);
 
 		/*
-		 * Action: All columns
+		 * Action: Profiles
+		 */
+		{
+			final MenuItem menuItem = new MenuItem(contextMenu, SWT.PUSH);
+			menuItem.setText(Messages.Action_ColumnManager_Profile_Info);
+			menuItem.setEnabled(false);
+		}
+
+		/*
+		 * Actions: All profiles
+		 */
+		Collections.sort(_allProfiles, _profileSorter);
+
+		for (final ColumnProfile columnProfile : _allProfiles) {
+
+			final boolean isChecked = columnProfile == _activeProfile;
+
+			final String menuText = columnProfile.name
+					+ LABEL_UNIT_SEPARATOR
+					+ Integer.toString(columnProfile.visibleColumnIds.length);
+
+			final MenuItem menuItem = new MenuItem(contextMenu, SWT.CHECK);
+
+			menuItem.setText(menuText);
+//			menuItem.setEnabled(true);
+			menuItem.setSelection(isChecked);
+
+			menuItem.setData(columnProfile);
+			menuItem.addListener(SWT.Selection, _colItemListener);
+		}
+
+		// separator
+		new MenuItem(contextMenu, SWT.SEPARATOR);
+
+		/*
+		 * Action: Columns
+		 */
+		{
+			final MenuItem menuItem = new MenuItem(contextMenu, SWT.PUSH);
+			menuItem.setText(Messages.Action_ColumnManager_Column_Info);
+			menuItem.setEnabled(false);
+		}
+
+		/*
+		 * Actions: All columns
 		 */
 		for (final ColumnDefinition colDef : getRearrangedColumns()) {
 
@@ -796,6 +850,7 @@ public class ColumnManager {
 	 */
 	private ArrayList<ColumnDefinition> getRearrangedColumns() {
 
+		final ArrayList<ColumnDefinition> allRearrangedColumns = new ArrayList<ColumnDefinition>();
 		final ArrayList<ColumnDefinition> allColDefClone = new ArrayList<ColumnDefinition>();
 
 		try {
@@ -805,8 +860,6 @@ public class ColumnManager {
 		} catch (final CloneNotSupportedException e) {
 			StatusUtil.log(e);
 		}
-
-		final ArrayList<ColumnDefinition> allDialogColumns = new ArrayList<ColumnDefinition>();
 
 		int[] columnOrder = null;
 
@@ -845,7 +898,7 @@ public class ColumnManager {
 				colDef.setColumnWidth(getColumnWidth(colDef._columnId));
 
 				// keep the column
-				allDialogColumns.add(colDef);
+				allRearrangedColumns.add(colDef);
 
 				allColDefClone.remove(colDef);
 			}
@@ -862,10 +915,10 @@ public class ColumnManager {
 			// set column default width
 			colDef.setColumnWidth(colDef.getDefaultColumnWidth());
 
-			allDialogColumns.add(colDef);
+			allRearrangedColumns.add(colDef);
 		}
 
-		return allDialogColumns;
+		return allRearrangedColumns;
 	}
 
 	private void onSelectColumnItem(final Event event) {
@@ -875,9 +928,16 @@ public class ColumnManager {
 			final MenuItem menuItem = (MenuItem) event.widget;
 
 			final Object data = menuItem.getData();
+
 			if (data instanceof ColumnDefinition) {
 
 				updateColumns(menuItem.getParent().getItems());
+
+			} else if (data instanceof ColumnProfile) {
+
+				final ColumnProfile profile = (ColumnProfile) data;
+
+				updateColumns(profile);
 			}
 		}
 	}
@@ -1090,9 +1150,11 @@ public class ColumnManager {
 	}
 
 	/**
-	 * Set column definitions which are visible in the viewer from the visible ids.
+	 * Set column definitions in the {@link ColumnProfile} from the visible id's.
+	 * 
+	 * @param columnProfile
 	 */
-	void setVisibleColumnDefinitions(final ColumnProfile columnProfile) {
+	void setVisibleColDefs(final ColumnProfile columnProfile) {
 
 		final ArrayList<ColumnDefinition> visibleColDefs = columnProfile.visibleColumnDefinitions;
 
@@ -1259,19 +1321,24 @@ public class ColumnManager {
 		// recreate columns in the correct sort order
 		for (final MenuItem menuItem : menuItems) {
 
-			final boolean isChecked = menuItem.getSelection();
+			final Object itemData = menuItem.getData();
 
-			if (isChecked) {
+			if (itemData instanceof ColumnDefinition) {
 
-				// data in the table item contains the input items for the viewer
-				final ColumnDefinition colDef = (ColumnDefinition) menuItem.getData();
+				final boolean isChecked = menuItem.getSelection();
 
-				// set the visible columns
-				visibleColumnIds.add(colDef.getColumnId());
+				if (isChecked) {
 
-				// set column id and width
-				columnIdsAndWidth.add(colDef.getColumnId());
-				columnIdsAndWidth.add(Integer.toString(colDef.getColumnWidth()));
+					// data in the table item contains the input items for the viewer
+					final ColumnDefinition colDef = (ColumnDefinition) itemData;
+
+					// set the visible columns
+					visibleColumnIds.add(colDef.getColumnId());
+
+					// set column id and width
+					columnIdsAndWidth.add(colDef.getColumnId());
+					columnIdsAndWidth.add(Integer.toString(colDef.getColumnWidth()));
+				}
 			}
 		}
 
@@ -1321,6 +1388,13 @@ public class ColumnManager {
 		_activeProfile.visibleColumnIdsAndWidth = getColumns_FromViewer_IdAndWidth();
 	}
 
+	private void updateColumns(final ColumnProfile profile) {
+
+		_activeProfile = profile;
+
+		_columnViewer = _tourViewer.recreateViewer(_columnViewer);
+	}
+
 	/**
 	 * Update the viewer with the columns from the {@link DialogModifyColumns}
 	 * 
@@ -1331,6 +1405,7 @@ public class ColumnManager {
 	void updateColumns(final ColumnProfile dialogActiveProfile, final TableItem[] tableItems) {
 
 		_activeProfile = dialogActiveProfile;
+
 		setVisibleColumnIds_FromModifyDialog(_activeProfile, tableItems);
 
 		_columnViewer = _tourViewer.recreateViewer(_columnViewer);
