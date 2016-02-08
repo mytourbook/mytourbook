@@ -14,11 +14,20 @@ Export-Package: net.tourbook.device,
  net.tourbook.device.polar.hrm
 Bundle-Vendor: MyTourbook
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Import-Package: net.tourbook.chart,
+Import-Package: de.byteholder.geoclipse.map,
+ net.tourbook,
+ net.tourbook.application,
+ net.tourbook.chart,
  net.tourbook.common,
  net.tourbook.common.util,
  net.tourbook.common.weather,
  net.tourbook.data,
+ net.tourbook.database,
  net.tourbook.importdata,
+ net.tourbook.preferences,
+ net.tourbook.tour,
+ net.tourbook.ui,
+ net.tourbook.ui.tourChart,
+ net.tourbook.ui.views.rawData,
  org.joda.time,
  org.joda.time.format

@@ -13,6 +13,18 @@ Require-Bundle: org.eclipse.ui,
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: %Bundle-Vendor
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Import-Package: net.tourbook.data,
+Import-Package: net.tourbook,
+ net.tourbook.application,
+ net.tourbook.chart,
+ net.tourbook.common,
+ net.tourbook.common.color,
+ net.tourbook.common.preferences,
+ net.tourbook.common.util,
+ net.tourbook.data,
+ net.tourbook.database,
+ net.tourbook.preferences,
+ net.tourbook.statistic,
+ net.tourbook.tour,
  net.tourbook.ui,
+ net.tourbook.ui.action,
  org.eclipse.ui.forms.widgets

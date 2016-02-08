@@ -16,5 +16,9 @@ Bundle-Vendor: MyTourbook
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ClassPath: .,
  fit-16.40.0.jar
-Import-Package: net.tourbook.data,
- net.tourbook.importdata
+Import-Package: net.tourbook.common,
+ net.tourbook.common.util,
+ net.tourbook.data,
+ net.tourbook.importdata,
+ net.tourbook.tour,
+ net.tourbook.ui.tourChart

@@ -18,5 +18,7 @@ Import-Package: net.tourbook.common,
  net.tourbook.common.preferences,
  net.tourbook.common.util,
  net.tourbook.data,
+ net.tourbook.importdata,
+ net.tourbook.ui,
  org.joda.time,
  org.joda.time.format

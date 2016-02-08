@@ -14,5 +14,8 @@ Bundle-ActivationPolicy: lazy
 Export-Package: net.tourbook.chart
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Import-Package: gnu.trove.list.array,
+ net.tourbook.common,
+ net.tourbook.common.form,
+ net.tourbook.common.util,
  org.joda.time,
  org.joda.time.format

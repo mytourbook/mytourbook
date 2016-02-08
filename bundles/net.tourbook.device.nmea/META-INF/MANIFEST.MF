@@ -11,6 +11,8 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: MyTourbook
 Import-Package: net.tourbook.common.util,
- net.tourbook.device
+ net.tourbook.data,
+ net.tourbook.device,
+ net.tourbook.importdata
 Bundle-ClassPath: org.opengts.util-MT-2015-02-23.jar,
  .
