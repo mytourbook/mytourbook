@@ -1,3 +1,165 @@
+
+
+###########################
+
+Build with POM (since 16.2)
+
+###########################
+
+- Switch to workspace "C:\DAT\ws_MT-e38"
+
+
+
+- Switch to workspace "C:\DAT\ws_MT-e38
+
+	Set version number / year in
+		- about.mappings
+		- net.tourbook.application.ApplicationVersion
+
+	"feature.net.tourbook.app"
+		- Set version number in "feature.xml"
+		- Force feature version number into net.tourbook.* plugins
+		- Set synch option back to "synch versions on build (recommended)"
+
+	"build.net.tourbook.product"
+		- Set version number in "net.tourbook.product" 
+		
+	Win-Installer
+		- Set version number in "INSTALL-UPDATES\installer-net.tourbook\win-Inno.Setup\mytourbook-include-app.iss"
+	
+	pom.xml
+		- Replace text "16.1.0-SNAPSHOT" to "16.2.0-SNAPSHOT" in all "pom*.xml" files
+		
+	
+	Run script "CREATE_MT_BuildFiles.xml" in project "build.net.tourbook"
+	
+	Open cmd
+		- Select folder "C:\DAT\MT\mytourbook"
+		- Run "mvn verify"
+
+	
+- Switch to workspace "C:\DAT\mytourbook-BUILD-ws"
+	
+	- refresh all projects with F5
+	- run Project/clean... for all projects
+
+	- update version number in build.feature.net.tourbook.product
+	- replace feature net.tourbook.product.feature with new version number
+	- set build target correctly ???
+	- delete old exported files when a reexport is done, 
+	  export will add new files to an existing product archive
+	- run product export wizard in the product file
+
+
+
+
+
+
+
+
+
+
+
+
+vvvv --- BUILD COMMANDS UNTIL 16.1 --- vvvv
+
+
+
+
+##########################
+
+Create Dojo files, when net.tourbook.web is modified
+
+##########################
+
+	- Set "IS_DEBUG = false" in net.tourbook.web.WEB 
+	- 1. run script /net.tourbook.ant/build-files/Convert-i18-To-Dojo.xml
+	- 2. run script /net.tourbook.web/build-files/Create-Dojo-Bundle.xml
+
+
+
+##########################
+
+Create Translation Archive
+
+##########################
+
+- switch to workspace "C:\DAT\ws_MT-e38"
+
+	- set version number in "feature.net.tourbook.app"
+	- force feature version number into net.tourbook.* plugins
+	- set synch option back to "synch versions on build (recommended)"
+
+
+- switch to workspace "C:\DAT\ws_mt-NL-projects" 
+
+	- refresh all projects with F5
+
+	- set version number into "feature.xml" in "feature.net.tourbook.app.nl"
+	- force feature version number into the *.nl fragments
+	- set synch option back to "synch versions on build (recommended)"
+
+	- set version number into "feature.xml" in "feature.z-Dummy-Host"
+	- force feature version number into dummy host plugins
+	- set synch option back to "synch versions on build (recommended)"
+
+	
+- switch to workspace "C:\DAT\ws_MT-e38"
+
+	- run script "Create_Translation_Archive"
+
+
+- test translations
+	
+	- select favorite mt-TRANSLATION-TEST in Q-Dir
+	- select folder "C:\DAT\ws_mt-Translation-TEST"
+	- delete all folders but NOT ".metadata"
+	- extract "mt-translations.zip" into this folder
+
+	- switch to workspace "C:\DAT\ws_mt-Translation-TEST"
+		- refresh all projects with F5
+		- run Project/clean... for all projects
+	
+
+############
+
+Create Build
+
+############
+
+
+
+
+##################
+
+Create Update Site
+
+##################
+
+- check which plugins needs to be contained in the update site and update plugin version number
+
+- create translation archive when necessary, see above instructions
+
+- switch to workspace "C:\DAT\ws_mt-with-GIT or ws_MT-E4"
+
+	- run script "Create_MyTourbook_BuildFiles"
+
+
+- switch to workspace "C:\DAT\mytourbook-BUILD-ws"
+	
+	- refresh all projects with F5
+	- run Project/clean... for all projects
+
+- run script "clear-update-site.xml" in the project "update-site.mytourbook"
+- build the update site within site.xml
+
+
+
+
+
+
+------------------------------------------------------------------------------------
+
 All MT app + build files
 
 
@@ -72,130 +234,4 @@ All MT app + build files
 /z-DUMMY-HOST.net.tourbook.web
 
 
-
-
-
-
-
-
-
-
-
-
-
-vvvv --- BUILD COMMANDS UNTIL 16.1 --- vvvv
-
-
-
-
-##########################
-
-	Create Dojo files, when net.tourbook.web is modified
-
-##########################
-
-	- Set "IS_DEBUG = false" in net.tourbook.web.WEB 
-	- 1. run script /net.tourbook.ant/build-files/Convert-i18-To-Dojo.xml
-	- 2. run script /net.tourbook.web/build-files/Create-Dojo-Bundle.xml
-
-
-
-##########################
-
-Create Translation Archive
-
-##########################
-
-- switch to workspace "C:\DAT\ws_MT-e38"
-
-	- set version number in "feature.net.tourbook.app"
-	- force feature version number into net.tourbook.* plugins
-	- set synch option back to "synch versions on build (recommended)"
-
-
-- switch to workspace "C:\DAT\ws_mt-NL-projects" 
-
-	- refresh all projects with F5
-
-	- set version number into "feature.xml" in "feature.net.tourbook.app.nl"
-	- force feature version number into the *.nl fragments
-	- set synch option back to "synch versions on build (recommended)"
-
-	- set version number into "feature.xml" in "feature.z-Dummy-Host"
-	- force feature version number into dummy host plugins
-	- set synch option back to "synch versions on build (recommended)"
-
-	
-- switch to workspace "C:\DAT\ws_MT-e38"
-
-	- run script "Create_Translation_Archive"
-
-
-- test translations
-	
-	- select favorite mt-TRANSLATION-TEST in Q-Dir
-	- select folder "C:\DAT\ws_mt-Translation-TEST"
-	- delete all folders but NOT ".metadata"
-	- extract "mt-translations.zip" into this folder
-
-	- switch to workspace "C:\DAT\ws_mt-Translation-TEST"
-		- refresh all projects with F5
-		- run Project/clean... for all projects
-	
-
-############
-
-Create Build
-
-############
-
-requirements:
-
-- buckminster is installed to see better error messages
-  (buckminster developemnet is not continued, TYCHO is used to build eclipse projects)
-
-- switch to workspace "C:\DAT\ws_mt-with-GIT or ws_MT-E4"
-
-	- set version number in
-		- about.mappings
-		- net.tourbook.application.ApplicationVersion
-	
-	- run script "Create_MyTourbook_BuildFiles" in plugin net.tourbook/build-files
-
-	
-- switch to workspace "C:\DAT\mytourbook-BUILD-ws"
-	
-	- refresh all projects with F5
-	- run Project/clean... for all projects
-
-	- update version number in build.feature.net.tourbook.product
-	- replace feature net.tourbook.product.feature with new version number
-	- set build target correctly ???
-	- delete old exported files when a reexport is done, 
-	  export will add new files to an existing product archive
-	- run product export wizard in the product file
-
-
-##################
-
-Create Update Site
-
-##################
-
-- check which plugins needs to be contained in the update site and update plugin version number
-
-- create translation archive when necessary, see above instructions
-
-- switch to workspace "C:\DAT\ws_mt-with-GIT or ws_MT-E4"
-
-	- run script "Create_MyTourbook_BuildFiles"
-
-
-- switch to workspace "C:\DAT\mytourbook-BUILD-ws"
-	
-	- refresh all projects with F5
-	- run Project/clean... for all projects
-
-- run script "clear-update-site.xml" in the project "update-site.mytourbook"
-- build the update site within site.xml
 
