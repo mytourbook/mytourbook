@@ -37,27 +37,6 @@ Build with POM (since 16.2)
 		- Select folder "C:\DAT\MT\mytourbook"
 		- Run "mvn verify"
 
-	
-- Switch to workspace "C:\DAT\mytourbook-BUILD-ws"
-	
-	- refresh all projects with F5
-	- run Project/clean... for all projects
-
-	- update version number in build.feature.net.tourbook.product
-	- replace feature net.tourbook.product.feature with new version number
-	- set build target correctly ???
-	- delete old exported files when a reexport is done, 
-	  export will add new files to an existing product archive
-	- run product export wizard in the product file
-
-
-
-
-
-
-
-
-
 
 
 
@@ -119,7 +98,7 @@ Create Translation Archive
 	- switch to workspace "C:\DAT\ws_mt-Translation-TEST"
 		- refresh all projects with F5
 		- run Project/clean... for all projects
-	
+
 
 ############
 
@@ -127,8 +106,33 @@ Create Build
 
 ############
 
+requirements:
 
+- buckminster is installed to see better error messages
+  (buckminster developemnet is not continued, TYCHO is used to build eclipse projects)
 
+- switch to workspace "C:\DAT\ws_mt-with-GIT or ws_MT-E4"
+
+	- set version number in
+		- about.mappings
+		- net.tourbook.application.ApplicationVersion
+	
+	- run script "Create_MyTourbook_BuildFiles" in plugin net.tourbook/build-files
+
+	
+- switch to workspace "C:\DAT\mytourbook-BUILD-ws"
+	
+	- refresh all projects with F5
+	- run Project/clean... for all projects
+
+	- update version number in build.feature.net.tourbook.product
+	- replace feature net.tourbook.product.feature with new version number
+	- set build target correctly ???
+	- delete old exported files when a reexport is done, 
+	  export will add new files to an existing product archive
+	- run product export wizard in the product file
+
+	
 
 ##################
 

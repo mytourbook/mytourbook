@@ -21,11 +21,7 @@ Require-Bundle: org.eclipse.ui,
  net.tourbook.ext.jars,
  net.tourbook.ext.ejb3,
  net.tourbook.ext.rxtx_2.2,
- net.tourbook.ext.worldwind_2.0,
- net.tourbook.common,
- net.tourbook.chart,
- net.tourbook.photo,
- net.tourbook.web
+ net.tourbook.ext.worldwind_2.0
 Export-Package: de.byteholder.geoclipse.map,
  de.byteholder.geoclipse.map.event,
  de.byteholder.geoclipse.mapprovider,
@@ -68,5 +64,6 @@ Import-Package: cop.swt.widgets.viewers.table.celleditors,
  org.geotools.data.wms.request,
  org.geotools.data.wms.response,
  org.geotools.ows,
- org.opengis.geometry
+ org.opengis.geometry,
+ tourbook.search.nls
 
