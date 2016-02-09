@@ -59,7 +59,7 @@ public class ApplicationVersion {
 				// this text is used to identify development versions
 				DEVELOPMENT_VERSION_TEXT
 				//
-				: qualifier.substring(0, 8) + UI.DASH + qualifier.substring(8);
+				: qualifier;
 
 		_qualifierText += _subVersion;
 

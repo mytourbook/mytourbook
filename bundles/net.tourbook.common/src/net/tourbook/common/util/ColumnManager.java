@@ -77,7 +77,7 @@ public class ColumnManager {
 	private static final String					ATTR_VISIBLE_COLUMN_IDS				= "visibleColumnIds";					//$NON-NLS-1$
 	private static final String					ATTR_VISIBLE_COLUMN_IDS_AND_WIDTH	= "visibleColumnIdsAndWidth";			//$NON-NLS-1$
 	//
-	private static final String					LABEL_UNIT_SEPARATOR				= "   ·   ";							//$NON-NLS-1$
+	private static final String					LABEL_UNIT_SEPARATOR				= "   \u00B7   ";						//$NON-NLS-1$
 
 	/**
 	 * Minimum column width, when the column width is 0, there was a bug that this happened.
@@ -253,6 +253,186 @@ public class ColumnManager {
 	}
 
 	/**
+	 * Create header context menu which has the action to modify columns
+	 * 
+	 * @param composite
+	 * @param defaultContextMenu
+	 * @return
+	 */
+	private Menu createHCM_0_Menu(final Composite composite, final Menu defaultContextMenu) {
+
+		final Decorations shell = composite.getShell();
+		final Menu headerContextMenu = new Menu(shell, SWT.POP_UP);
+
+		/*
+		 * IMPORTANT: Dispose the menus (only the current menu, when menu is set with setMenu() it
+		 * will be disposed automatically)
+		 */
+		composite.addListener(SWT.Dispose, new Listener() {
+			@Override
+			public void handleEvent(final Event event) {
+
+				headerContextMenu.dispose();
+
+				if (defaultContextMenu != null) {
+					defaultContextMenu.dispose();
+				}
+			}
+		});
+
+		return headerContextMenu;
+	}
+
+	private void createHCM_0_MenuItems(final Menu contextMenu) {
+
+		setVisibleColumnIds_FromViewer();
+
+		createHCM_10_Various(contextMenu);
+
+		// separator
+		new MenuItem(contextMenu, SWT.SEPARATOR);
+
+		createHCM_20_Profiles(contextMenu);
+
+		// separator
+		new MenuItem(contextMenu, SWT.SEPARATOR);
+
+		createHCM_30_Columns(contextMenu);
+	}
+
+	private void createHCM_10_Various(final Menu contextMenu) {
+
+		/*
+		 * Action: Size All Columns to Fit
+		 */
+		{
+			final MenuItem fitMenuItem = new MenuItem(contextMenu, SWT.PUSH);
+			fitMenuItem.setText(Messages.Action_App_SizeAllColumnsToFit);
+			fitMenuItem.addListener(SWT.Selection, new Listener() {
+				@Override
+				public void handleEvent(final Event event) {
+					actionFitAllColumnSize();
+				}
+			});
+		}
+
+		/*
+		 * Action: Show all columns
+		 */
+		{
+			final MenuItem allColumnsMenuItem = new MenuItem(contextMenu, SWT.PUSH);
+			allColumnsMenuItem.setText(Messages.Action_ColumnManager_ShowAllColumns);
+			allColumnsMenuItem.addListener(SWT.Selection, new Listener() {
+				@Override
+				public void handleEvent(final Event event) {
+					actionShowAllColumns();
+				}
+			});
+		}
+
+		/*
+		 * Action: Show default columns
+		 */
+		{
+			final MenuItem defaultColumnsMenuItem = new MenuItem(contextMenu, SWT.PUSH);
+			defaultColumnsMenuItem.setText(Messages.Action_ColumnManager_ShowDefaultColumns);
+			defaultColumnsMenuItem.addListener(SWT.Selection, new Listener() {
+				@Override
+				public void handleEvent(final Event event) {
+					actionShowDefaultColumns();
+				}
+			});
+		}
+
+		/*
+		 * Action: &Customize Profiles/Columns...
+		 */
+		{
+			final MenuItem configMenuItem = new MenuItem(contextMenu, SWT.PUSH);
+			configMenuItem.setText(Messages.Action_App_CustomizeColumnsAndProfiles);
+			configMenuItem.setImage(UI.IMAGE_REGISTRY.get(UI.IMAGE_CONFIGURE_COLUMNS));
+			configMenuItem.addListener(SWT.Selection, new Listener() {
+				@Override
+				public void handleEvent(final Event event) {
+					openColumnDialog();
+				}
+			});
+		}
+	}
+
+	/**
+	 * Action: Profiles
+	 */
+	private void createHCM_20_Profiles(final Menu contextMenu) {
+
+		{
+			final MenuItem menuItem = new MenuItem(contextMenu, SWT.PUSH);
+			menuItem.setText(Messages.Action_ColumnManager_Profile_Info);
+			menuItem.setEnabled(false);
+		}
+
+		/*
+		 * Actions: All profiles
+		 */
+		Collections.sort(_allProfiles, _profileSorter);
+
+		for (final ColumnProfile columnProfile : _allProfiles) {
+
+			final boolean isChecked = columnProfile == _activeProfile;
+
+			final String menuText = columnProfile.name
+					+ LABEL_UNIT_SEPARATOR
+					+ Integer.toString(columnProfile.visibleColumnIds.length);
+
+			final MenuItem menuItem = new MenuItem(contextMenu, SWT.CHECK);
+
+			menuItem.setText(menuText);
+//			menuItem.setEnabled(true);
+			menuItem.setSelection(isChecked);
+
+			menuItem.setData(columnProfile);
+			menuItem.addListener(SWT.Selection, _colItemListener);
+		}
+	}
+
+	/**
+	 * Action: Columns
+	 */
+	private void createHCM_30_Columns(final Menu contextMenu) {
+
+		{
+			final MenuItem menuItem = new MenuItem(contextMenu, SWT.PUSH);
+			menuItem.setText(Messages.Action_ColumnManager_Column_Info);
+			menuItem.setEnabled(false);
+		}
+
+		/*
+		 * Actions: All columns
+		 */
+		for (final ColumnDefinition colDef : getRearrangedColumns()) {
+
+			final MenuItem colMenuItem = new MenuItem(contextMenu, SWT.CHECK);
+
+			final String label = colDef.getColumnLabel();
+			final String unit = colDef.getColumnUnit();
+
+			String menuText = UI.EMPTY_STRING;
+			if (label != null) {
+				menuText = unit == null //
+						? label
+						: label + LABEL_UNIT_SEPARATOR + unit;
+			}
+
+			colMenuItem.setText(menuText);
+			colMenuItem.setEnabled(colDef.canModifyVisibility());
+			colMenuItem.setSelection(colDef.isCheckedInDialog());
+
+			colMenuItem.setData(colDef);
+			colMenuItem.addListener(SWT.Selection, _colItemListener);
+		}
+	}
+
+	/**
 	 * set context menu depending on the position of the mouse
 	 * 
 	 * @param table
@@ -266,7 +446,7 @@ public class ColumnManager {
 			table.removeListener(SWT.MenuDetect, _tableMenuDetectListener);
 		}
 
-		final Menu headerContextMenu = createHeaderContextMenu_Menu(table, defaultContextMenu);
+		final Menu headerContextMenu = createHCM_0_Menu(table, defaultContextMenu);
 
 		// add the context menu to the table
 		_tableMenuDetectListener = new Listener() {
@@ -325,7 +505,7 @@ public class ColumnManager {
 			tree.removeListener(SWT.MenuDetect, _treeMenuDetectListener);
 		}
 
-		final Menu headerContextMenu = createHeaderContextMenu_Menu(tree, defaultContextMenu);
+		final Menu headerContextMenu = createHCM_0_Menu(tree, defaultContextMenu);
 
 		// add the context menu to the tree viewer
 		_treeMenuDetectListener = new Listener() {
@@ -343,171 +523,6 @@ public class ColumnManager {
 			}
 		};
 		tree.addListener(SWT.MenuDetect, _treeMenuDetectListener);
-	}
-
-	/**
-	 * Create header context menu which has the action to modify columns
-	 * 
-	 * @param composite
-	 * @param defaultContextMenu
-	 * @return
-	 */
-	private Menu createHeaderContextMenu_Menu(final Composite composite, final Menu defaultContextMenu) {
-
-		final Decorations shell = composite.getShell();
-		final Menu headerContextMenu = new Menu(shell, SWT.POP_UP);
-
-		/*
-		 * IMPORTANT: Dispose the menus (only the current menu, when menu is set with setMenu() it
-		 * will be disposed automatically)
-		 */
-		composite.addListener(SWT.Dispose, new Listener() {
-			@Override
-			public void handleEvent(final Event event) {
-
-				headerContextMenu.dispose();
-
-				if (defaultContextMenu != null) {
-					defaultContextMenu.dispose();
-				}
-			}
-		});
-
-		return headerContextMenu;
-	}
-
-	private void createHeaderContextMenu_MenuItems(final Menu contextMenu) {
-
-		setVisibleColumnIds_FromViewer();
-
-		/*
-		 * Action: Size All Columns to Fit
-		 */
-		{
-			final MenuItem fitMenuItem = new MenuItem(contextMenu, SWT.PUSH);
-			fitMenuItem.setText(Messages.Action_App_SizeAllColumnsToFit);
-			fitMenuItem.addListener(SWT.Selection, new Listener() {
-				@Override
-				public void handleEvent(final Event event) {
-					actionFitAllColumnSize();
-				}
-			});
-		}
-
-		/*
-		 * Action: Show all columns
-		 */
-		{
-			final MenuItem allColumnsMenuItem = new MenuItem(contextMenu, SWT.PUSH);
-			allColumnsMenuItem.setText(Messages.Action_ColumnManager_ShowAllColumns);
-			allColumnsMenuItem.addListener(SWT.Selection, new Listener() {
-				@Override
-				public void handleEvent(final Event event) {
-					actionShowAllColumns();
-				}
-			});
-		}
-
-		/*
-		 * Action: Show default columns
-		 */
-		{
-			final MenuItem defaultColumnsMenuItem = new MenuItem(contextMenu, SWT.PUSH);
-			defaultColumnsMenuItem.setText(Messages.Action_ColumnManager_ShowDefaultColumns);
-			defaultColumnsMenuItem.addListener(SWT.Selection, new Listener() {
-				@Override
-				public void handleEvent(final Event event) {
-					actionShowDefaultColumns();
-				}
-			});
-		}
-
-		/*
-		 * Action: &Customize Profiles/Columns...
-		 */
-		{
-			final MenuItem configMenuItem = new MenuItem(contextMenu, SWT.PUSH);
-			configMenuItem.setText(Messages.Action_App_CustomizeColumnsAndProfiles);
-			configMenuItem.setImage(UI.IMAGE_REGISTRY.get(UI.IMAGE_CONFIGURE_COLUMNS));
-			configMenuItem.addListener(SWT.Selection, new Listener() {
-				@Override
-				public void handleEvent(final Event event) {
-					openColumnDialog();
-				}
-			});
-		}
-
-		// separator
-		new MenuItem(contextMenu, SWT.SEPARATOR);
-
-		/*
-		 * Action: Profiles
-		 */
-		{
-			final MenuItem menuItem = new MenuItem(contextMenu, SWT.PUSH);
-			menuItem.setText(Messages.Action_ColumnManager_Profile_Info);
-			menuItem.setEnabled(false);
-		}
-
-		/*
-		 * Actions: All profiles
-		 */
-		Collections.sort(_allProfiles, _profileSorter);
-
-		for (final ColumnProfile columnProfile : _allProfiles) {
-
-			final boolean isChecked = columnProfile == _activeProfile;
-
-			final String menuText = columnProfile.name
-					+ LABEL_UNIT_SEPARATOR
-					+ Integer.toString(columnProfile.visibleColumnIds.length);
-
-			final MenuItem menuItem = new MenuItem(contextMenu, SWT.CHECK);
-
-			menuItem.setText(menuText);
-//			menuItem.setEnabled(true);
-			menuItem.setSelection(isChecked);
-
-			menuItem.setData(columnProfile);
-			menuItem.addListener(SWT.Selection, _colItemListener);
-		}
-
-		// separator
-		new MenuItem(contextMenu, SWT.SEPARATOR);
-
-		/*
-		 * Action: Columns
-		 */
-		{
-			final MenuItem menuItem = new MenuItem(contextMenu, SWT.PUSH);
-			menuItem.setText(Messages.Action_ColumnManager_Column_Info);
-			menuItem.setEnabled(false);
-		}
-
-		/*
-		 * Actions: All columns
-		 */
-		for (final ColumnDefinition colDef : getRearrangedColumns()) {
-
-			final MenuItem colMenuItem = new MenuItem(contextMenu, SWT.CHECK);
-
-			final String label = colDef.getColumnLabel();
-			final String unit = colDef.getColumnUnit();
-
-			String menuText = UI.EMPTY_STRING;
-			if (label != null) {
-				menuText = unit == null //
-						? label
-						: label + LABEL_UNIT_SEPARATOR + unit;
-			}
-
-			colMenuItem.setText(menuText);
-			colMenuItem.setEnabled(colDef.canModifyVisibility());
-			colMenuItem.setSelection(colDef.isCheckedInDialog());
-
-			colMenuItem.setData(colDef);
-			colMenuItem.addListener(SWT.Selection, _colItemListener);
-		}
 	}
 
 	/**
@@ -832,7 +847,7 @@ public class ColumnManager {
 				menuItem.dispose();
 			}
 
-			createHeaderContextMenu_MenuItems(headerContextMenu);
+			createHCM_0_MenuItems(headerContextMenu);
 
 		} else {
 

@@ -5163,6 +5163,16 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	 */
 	private void updateUI_2_Dashboard() {
 
+		if (_dashboard_PageBook == null) {
+
+			/*
+			 * This occures when the app is started the first time and the measurement selection
+			 * dialog which fires an event
+			 */
+
+			return;
+		}
+
 		final boolean isBrowserAvailable = _browser != null;
 
 		// set dashboard page
