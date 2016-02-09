@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.photo;
+package net.tourbook.tour.photo;
 
 import java.util.ArrayList;
 
@@ -22,6 +22,14 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
+import net.tourbook.photo.IPhotoEventListener;
+import net.tourbook.photo.IPhotoGalleryProvider;
+import net.tourbook.photo.IPhotoPreferences;
+import net.tourbook.photo.Photo;
+import net.tourbook.photo.PhotoEventId;
+import net.tourbook.photo.PhotoGallery;
+import net.tourbook.photo.PhotoManager;
+import net.tourbook.photo.PhotoSelection;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;

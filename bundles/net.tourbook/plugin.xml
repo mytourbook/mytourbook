@@ -1245,7 +1245,7 @@
 		<command
 	        id="command.net.tourbook.PhotoFilter"
 	        name="%Action_TourPhotoFilter"
-	        defaultHandler="net.tourbook.photo.ActionHandlerPhotoFilter">
+	        defaultHandler="net.tourbook.tour.photo.ActionHandlerPhotoFilter">
 
 			<state
 				class="org.eclipse.ui.handlers.RegistryToggleState:false"
@@ -1261,30 +1261,30 @@
 		<command
 			id="command.net.tourbook.photo.LinkPhotoWithTourInFolder"
 			name="%Action_PhotoDirectory_LinkPhotoWithTourInFolder"
-			defaultHandler="net.tourbook.photo.ActionHandlerLinkPhotoWithTourInFolder"
+			defaultHandler="net.tourbook.tour.photo.ActionHandlerLinkPhotoWithTourInFolder"
 			/>
 		
 		<command
 			id="command.net.tourbook.photo.LinkPhotoWithTourInGallerySelected"
 			name="%Action_PhotoDirectory_LinkPhotoWithTourInGallerySelected"
-			defaultHandler="net.tourbook.photo.ActionHandlerLinkPhotoWithTourInGallerySelected"
+			defaultHandler="net.tourbook.tour.photo.ActionHandlerLinkPhotoWithTourInGallerySelected"
 			/>
 		
 		<command id="command.net.tourbook.photo.LinkPhotoWithTourInGalleryAll"
 			name="%Action_PhotoDirectory_LinkPhotoWithTourInGalleryAll"
-			defaultHandler="net.tourbook.photo.ActionHandlerLinkPhotoWithTourInGalleryAll"
+			defaultHandler="net.tourbook.tour.photo.ActionHandlerLinkPhotoWithTourInGalleryAll"
 			/>
 		
 		<command
 			id="command.net.tourbook.photo.TourPhotosView"
 			name="%View_Name_PhotoTourPhotos"
-			defaultHandler="net.tourbook.photo.ActionHandlerOpenTourPhotosView"
+			defaultHandler="net.tourbook.tour.photo.ActionHandlerOpenTourPhotosView"
 			/>
 		         
 		<command
 	        id="command.net.tourbook.PicDir.SyncPhotoWithTour"
 	        name="%Command_PicDir_SyncPhotoWithTour"
-	        defaultHandler="net.tourbook.photo.ActionHandlerSyncPhotoWithTour">
+	        defaultHandler="net.tourbook.tour.photo.ActionHandlerSyncPhotoWithTour">
 
 			<state
 				class="org.eclipse.ui.handlers.RegistryToggleState"
@@ -1600,13 +1600,13 @@
 			      
 			<view
 				category="net.tourbook.category.photo"
-				class="net.tourbook.photo.TourPhotoLinkView"
+				class="net.tourbook.tour.photo.TourPhotoLinkView"
 				icon="icons/photo-and-tours-view.png"
 				id="net.tourbook.photo.PhotosAndToursView.ID"
 				name="%View_Name_PhotosAndTours"/>
 			<view
 				category="net.tourbook.category.photo"
-				class="net.tourbook.photo.TourPhotosView"
+				class="net.tourbook.tour.photo.TourPhotosView"
 				icon="icons/photo-tour-photos.png"
 				id="net.tourbook.photo.TourPhotosView.ID"
 				name="%View_Name_PhotoTourPhotos"/>

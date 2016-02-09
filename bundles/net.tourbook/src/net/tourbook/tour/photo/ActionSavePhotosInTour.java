@@ -13,34 +13,26 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.photo;
+package net.tourbook.tour.photo;
 
 import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionFilterOneHistoryTour extends Action {
+public class ActionSavePhotosInTour extends Action {
 
 	private TourPhotoLinkView	_photosAndToursView;
 
-	public ActionFilterOneHistoryTour(final TourPhotoLinkView photosAndToursView) {
+	public ActionSavePhotosInTour(final TourPhotoLinkView photosAndToursView) {
 
-		super(null, AS_CHECK_BOX);
+		super(Messages.Action_PhotosAndTours_SavePhotoInTour, AS_PUSH_BUTTON);
 
 		_photosAndToursView = photosAndToursView;
-
-		setToolTipText(Messages.Action_PhotosAndTours_FilterNoTours_Tooltip);
-
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(//
-				Messages.Image__Photo_FilterOneHistoryTour));
-		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(//
-				Messages.Image__Photo_FilterOneHistoryTour_Disabled));
 	}
 
 	@Override
 	public void run() {
-		_photosAndToursView.actionFilterOneHistoryTour();
+		_photosAndToursView.actionSavePhotoInTour();
 	}
 
 }

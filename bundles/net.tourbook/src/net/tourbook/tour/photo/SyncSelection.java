@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,30 +13,39 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.photo;
+package net.tourbook.tour.photo;
 
-public class PhotoPropertiesEvent {
+import net.tourbook.photo.ISelectionConverter;
 
-	/**
-	 * Number of selected rating stars.
-	 */
-	public int	filterRatingStars;
+import org.eclipse.jface.viewers.ISelection;
 
-	/**
-	 * Can be one of these operators:
-	 * <p>
-	 * {@link DialogPhotoProperties#OPERATOR_IS_EQUAL}, {@link DialogPhotoProperties#OPERATOR_IS_LESS_OR_EQUAL} or
-	 * {@link DialogPhotoProperties#OPERATOR_IS_MORE_OR_EQUAL}
-	 */
-	public int	fiterRatingStarOperator;
+public class SyncSelection implements ISelection, ISelectionConverter {
+
+	private ISelection	originalSelection;
+
+	@Override
+	public ISelection convertSelection(final ISelection selection) {
+
+		originalSelection = selection;
+
+		// ensure link view is opened
+		TourPhotoManager.openLinkView();
+
+		return this;
+	}
+
+	public ISelection getSelection() {
+		return originalSelection;
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return false;
+	}
 
 	@Override
 	public String toString() {
-		return "PhotoPropertiesEvent [ratingStars=" //$NON-NLS-1$
-				+ filterRatingStars
-				+ "{)}, ratingStarOperator=" //$NON-NLS-1$
-				+ fiterRatingStarOperator
-				+ "]"; //$NON-NLS-1$
+		return "SyncSelection [originalSelection=" + originalSelection + "]"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 }

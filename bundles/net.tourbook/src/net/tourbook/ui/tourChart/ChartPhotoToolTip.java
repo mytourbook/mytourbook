@@ -21,7 +21,7 @@ import net.tourbook.common.PointLong;
 import net.tourbook.photo.PhotoEventId;
 import net.tourbook.photo.PhotoManager;
 import net.tourbook.photo.PhotoSelection;
-import net.tourbook.photo.PhotoToolTipUI;
+import net.tourbook.tour.photo.PhotoToolTipUI;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.graphics.Point;

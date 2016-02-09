@@ -17,8 +17,8 @@ package net.tourbook.application;
 
 import net.tourbook.map2.view.Map2View;
 import net.tourbook.photo.PicDirView;
-import net.tourbook.photo.TourPhotoLinkView;
-import net.tourbook.photo.TourPhotosView;
+import net.tourbook.tour.photo.TourPhotoLinkView;
+import net.tourbook.tour.photo.TourPhotosView;
 import net.tourbook.ui.tourChart.TourChartView;
 
 import org.eclipse.ui.IFolderLayout;

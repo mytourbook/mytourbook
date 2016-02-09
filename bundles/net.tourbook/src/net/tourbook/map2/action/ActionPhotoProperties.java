@@ -20,7 +20,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.map2.Messages;
 import net.tourbook.map2.view.Map2View;
 import net.tourbook.map2.view.MapFilterData;
-import net.tourbook.photo.DialogPhotoProperties;
+import net.tourbook.tour.photo.DialogPhotoProperties;
 
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.dialogs.IDialogSettings;

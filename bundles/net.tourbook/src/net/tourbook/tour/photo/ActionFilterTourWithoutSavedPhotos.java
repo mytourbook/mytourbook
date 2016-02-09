@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,34 +13,34 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.photo;
+package net.tourbook.tour.photo;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionFilterTourWithPhotos extends Action {
+public class ActionFilterTourWithoutSavedPhotos extends Action {
 
 	private TourPhotoLinkView	_photosAndToursView;
 
-	public ActionFilterTourWithPhotos(final TourPhotoLinkView photosAndToursView) {
+	public ActionFilterTourWithoutSavedPhotos(final TourPhotoLinkView photosAndToursView) {
 
 		super(null, AS_CHECK_BOX);
 
 		_photosAndToursView = photosAndToursView;
 
-		setToolTipText(Messages.Action_PhotosAndTours_FilterPhotos_Tooltip);
+		setToolTipText(Messages.Action_PhotosAndTours_FilterNotSavedPhotos_Tooltip);
 
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(//
-				Messages.Image__Photo_FilterTourWithPhotos));
+				Messages.Image__Photo_FilterNotSavedPhotos));
 		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(//
-				Messages.Image__Photo_FilterTourWithPhotos_Disabled));
+				Messages.Image__Photo_FilterNotSavedPhotos_Disabled));
 	}
 
 	@Override
 	public void run() {
-		_photosAndToursView.actionFilterPhotos();
+		_photosAndToursView.actionFilterNotSavedPhotos();
 	}
 
 }

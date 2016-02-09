@@ -31,6 +31,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tour.printing.PrintTourExtension;
 import net.tourbook.ui.ImageComboLabel;
 
 import org.apache.fop.apps.FOPException;

@@ -20,6 +20,7 @@ import javax.xml.transform.stream.StreamSource;
 import net.tourbook.common.UI;
 import net.tourbook.data.IXmlSerializable;
 import net.tourbook.data.TourData;
+import net.tourbook.tour.printing.PrintTourExtension;
 import net.tourbook.ui.FileCollisionBehavior;
 
 import org.apache.fop.apps.FOPException;

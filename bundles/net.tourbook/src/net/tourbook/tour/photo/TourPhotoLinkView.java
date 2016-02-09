@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.photo;
+package net.tourbook.tour.photo;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -34,6 +34,12 @@ import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPhoto;
+import net.tourbook.photo.Camera;
+import net.tourbook.photo.Photo;
+import net.tourbook.photo.PhotoEventId;
+import net.tourbook.photo.PhotoManager;
+import net.tourbook.photo.PhotoSelection;
+import net.tourbook.photo.PicDirView;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.TourManager;

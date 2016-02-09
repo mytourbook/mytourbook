@@ -13,12 +13,13 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.photo;
+package net.tourbook.tour.photo;
 
 import java.util.ArrayList;
 
 import net.tourbook.data.HistoryData;
 import net.tourbook.data.TourData;
+import net.tourbook.photo.Photo;
 
 import org.joda.time.DateTime;
 import org.joda.time.Period;

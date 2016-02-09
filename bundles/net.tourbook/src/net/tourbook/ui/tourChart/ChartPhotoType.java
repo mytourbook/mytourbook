@@ -16,8 +16,8 @@
 package net.tourbook.ui.tourChart;
 
 import net.tourbook.data.TourData;
-import net.tourbook.photo.TourPhotoLink;
-import net.tourbook.photo.TourPhotoLinkView;
+import net.tourbook.tour.photo.TourPhotoLink;
+import net.tourbook.tour.photo.TourPhotoLinkView;
 
 /**
  * Distingishes if photos are saved in a tour or they are from a {@link TourPhotoLink} which are

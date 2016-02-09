@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.photo;
+package net.tourbook.tour.photo;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -42,6 +42,16 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPhoto;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.photo.Camera;
+import net.tourbook.photo.IPhotoServiceProvider;
+import net.tourbook.photo.ImagePathReplacement;
+import net.tourbook.photo.Photo;
+import net.tourbook.photo.PhotoCache;
+import net.tourbook.photo.PhotoEventId;
+import net.tourbook.photo.PhotoImageMetadata;
+import net.tourbook.photo.PhotoManager;
+import net.tourbook.photo.PhotosWithExifSelection;
+import net.tourbook.photo.TourPhotoReference;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourManager;

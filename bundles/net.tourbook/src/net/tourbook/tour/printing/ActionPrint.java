@@ -1,12 +1,12 @@
-package net.tourbook.printing;
+package net.tourbook.tour.printing;
 
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourData;
-import net.tourbook.printing.PrintTourExtension;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tour.printing.PrintTourExtension;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourProviderAll;
 import net.tourbook.ui.UI;
