@@ -906,10 +906,28 @@ public class RawDataManager {
 
 			final boolean isDevicePower = reimportedTourData.isPowerSerieFromDevice();
 			if (isDevicePower) {
+
 				final float[] powerSerie = reimportedTourData.getPowerSerie();
 				if (powerSerie != null) {
 					oldTourData.setPowerSerie(powerSerie);
 				}
+
+				//SET_FORMATTING_OFF
+				oldTourData.setPower_Avg(							reimportedTourData.getPower_Avg());
+				oldTourData.setPower_Max(							reimportedTourData.getPower_Max());
+				oldTourData.setPower_Normalized(					reimportedTourData.getPower_Normalized());
+				oldTourData.setPower_FTP(							reimportedTourData.getPower_FTP());
+				
+				oldTourData.setPower_TotalWork(						reimportedTourData.getPower_TotalWork());
+				oldTourData.setPower_TrainingStressScore(			reimportedTourData.getPower_TrainingStressScore());
+				oldTourData.setPower_IntensityFactor(				reimportedTourData.getPower_IntensityFactor());
+
+				oldTourData.setPower_PedalLeftRightBalance(			reimportedTourData.getPower_PedalLeftRightBalance());
+				oldTourData.setPower_AvgLeftPedalSmoothness(		reimportedTourData.getPower_AvgLeftPedalSmoothness());
+				oldTourData.setPower_AvgLeftTorqueEffectiveness(	reimportedTourData.getPower_AvgLeftTorqueEffectiveness());
+				oldTourData.setPower_AvgRightPedalSmoothness(		reimportedTourData.getPower_AvgRightPedalSmoothness());
+				oldTourData.setPower_AvgRightTorqueEffectiveness(	reimportedTourData.getPower_AvgRightTorqueEffectiveness());
+				//SET_FORMATTING_ON
 			}
 
 			final boolean isDeviceSpeed = reimportedTourData.isSpeedSerieFromDevice();

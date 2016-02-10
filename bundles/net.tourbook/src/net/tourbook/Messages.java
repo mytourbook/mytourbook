@@ -812,7 +812,7 @@ public class Messages extends NLS {
 	public static String		Image__State_DeletedTour_View;
 	public static String		Image__State_Error;
 
-	public static String	Image__State_Info;
+	public static String		Image__State_Info;
 	public static String		Image__State_MovedTour;
 	public static String		Image__State_MovedTour_View;
 	public static String		Image__State_OK;
@@ -1790,6 +1790,7 @@ public class Messages extends NLS {
 	public static String		tour_segmenter_type_byComputedAltiUpDown;
 	public static String		tour_segmenter_type_byDistance;
 	public static String		tour_segmenter_type_byMarker;
+	public static String		tour_segmenter_type_byPower;
 	public static String		tour_segmenter_type_byPulse;
 
 	public static String		tour_statistic_label_years;

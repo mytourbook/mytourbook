@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -126,6 +126,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private static final int						SEGMENTER_REQUIRES_DISTANCE							= 0x02;
 	private static final int						SEGMENTER_REQUIRES_PULSE							= 0x04;
 	private static final int						SEGMENTER_REQUIRES_MARKER							= 0x08;
+	private static final int						SEGMENTER_REQUIRES_POWER							= 0x10;
 
 	private static final int						MAX_DISTANCE_SPINNER_MILE							= 80;
 	private static final int						MAX_DISTANCE_SPINNER_METRIC							= 100;
@@ -203,6 +204,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 	private float									_dpToleranceAltitude;
 	private float									_dpToleranceAltitudeMultipleTours;
+	private float									_dpTolerancePower;
 	private float									_dpTolerancePulse;
 	private float									_savedDpToleranceAltitude							= -1;
 
@@ -289,6 +291,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				SEGMENTER_REQUIRES_DISTANCE));
 
 		_allTourSegmenter.add(new TourSegmenter(
+				SegmenterType.ByPowerWithDP,
+				Messages.tour_segmenter_type_byPower,
+				SEGMENTER_REQUIRES_POWER));
+
+		_allTourSegmenter.add(new TourSegmenter(
 				SegmenterType.ByPulseWithDP,
 				Messages.tour_segmenter_type_byPulse,
 				SEGMENTER_REQUIRES_PULSE));
@@ -341,17 +348,18 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private Composite								_containerBreakTime;
 	private Composite								_containerViewer;
 	private Composite								_pageSegmenter;
-	private Composite								_pageBreakByAvgSliceSpeed;
-	private Composite								_pageBreakByAvgSpeed;
-	private Composite								_pageBreakBySliceSpeed;
-	private Composite								_pageBreakByTimeDistance;
+	private Composite								_pageBreakBy_AvgSliceSpeed;
+	private Composite								_pageBreakBy_AvgSpeed;
+	private Composite								_pageBreakBy_SliceSpeed;
+	private Composite								_pageBreakBy_TimeDistance;
 	private Composite								_pageNoData;
-	private Composite								_pageSegTypeDPAltitude;
-	private Composite								_pageSegTypeDPPulse;
-	private Composite								_pageSegTypeByMarker;
-	private Composite								_pageSegTypeByDistance;
-	private Composite								_pageSegTypeByAltiUpDown;
-	private Composite								_pageSegTypeByBreakTime;
+	private Composite								_pageSegType_DPAltitude;
+	private Composite								_pageSegType_DPPower;
+	private Composite								_pageSegType_DPPulse;
+	private Composite								_pageSegType_ByMarker;
+	private Composite								_pageSegType_ByDistance;
+	private Composite								_pageSegType_ByAltiUpDown;
+	private Composite								_pageSegType_ByBreakTime;
 
 	private Combo									_comboBreakMethod;
 	private Combo									_comboSegmenterType;
@@ -365,17 +373,18 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private Label									_lblMinAltitude;
 	private Label									_lblTourBreakTime;
 
-	private Spinner									_spinnerBreakMinAvgSpeedAS;
-	private Spinner									_spinnerBreakMinSliceSpeedAS;
-	private Spinner									_spinnerBreakMinSliceTimeAS;
-	private Spinner									_spinnerBreakMinAvgSpeed;
-	private Spinner									_spinnerBreakMinSliceSpeed;
-	private Spinner									_spinnerBreakShortestTime;
-	private Spinner									_spinnerBreakMaxDistance;
-	private Spinner									_spinnerBreakSliceDiff;
+	private Spinner									_spinnerBreak_MinAvgSpeedAS;
+	private Spinner									_spinnerBreak_MinSliceSpeedAS;
+	private Spinner									_spinnerBreak_MinSliceTimeAS;
+	private Spinner									_spinnerBreak_MinAvgSpeed;
+	private Spinner									_spinnerBreak_MinSliceSpeed;
+	private Spinner									_spinnerBreak_ShortestTime;
+	private Spinner									_spinnerBreak_MaxDistance;
+	private Spinner									_spinnerBreak_SliceDiff;
 	private Spinner									_spinnerDistance;
-	private Spinner									_spinnerDPToleranceAltitude;
-	private Spinner									_spinnerDPTolerancePulse;
+	private Spinner									_spinnerDPTolerance_Altitude;
+	private Spinner									_spinnerDPTolerance_Power;
+	private Spinner									_spinnerDPTolerance_Pulse;
 	private Spinner									_spinnerMinAltitude;
 
 	private TableViewer								_segmentViewer;
@@ -389,6 +398,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	public static enum SegmenterType {
 		ByAltitudeWithDP, //
 		ByAltitudeWithDPMerged, //
+		ByPowerWithDP, //
 		ByPulseWithDP, //
 		ByMarker, //
 		ByDistance, //
@@ -775,8 +785,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private int checkSegmenterData(final TourData tourData) {
 
 		final float[] altitudeSerie = tourData.getAltitudeSmoothedSerie(false);
+		final float[] powerSerie = tourData.getPowerSerie();
 		final float[] metricDistanceSerie = tourData.getMetricDistanceSerie();
 		final float[] pulseSerie = tourData.pulseSerie;
+
 		final Set<TourMarker> markerSerie = tourData.getTourMarkers();
 
 		int checkedSegmenterData = 0;
@@ -787,6 +799,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		checkedSegmenterData |= metricDistanceSerie != null && metricDistanceSerie.length > 1
 				? SEGMENTER_REQUIRES_DISTANCE
+				: 0;
+
+		checkedSegmenterData |= powerSerie != null && powerSerie.length > 1 ? //
+				SEGMENTER_REQUIRES_POWER
 				: 0;
 
 		checkedSegmenterData |= pulseSerie != null && pulseSerie.length > 1 ? //
@@ -934,6 +950,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		} else if (selectedSegmenterType == SegmenterType.ByAltitudeWithDPMerged) {
 
 			createSegmentsBy_AltitudeWithDPMerged();
+
+		} else if (selectedSegmenterType == SegmenterType.ByPowerWithDP) {
+
+			createSegmentsBy_PowerWithDP();
 
 		} else if (selectedSegmenterType == SegmenterType.ByPulseWithDP) {
 
@@ -1147,10 +1167,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		if (breakMethodId.equals(BreakTimeTool.BREAK_TIME_METHOD_BY_TIME_DISTANCE)) {
 
-			_breakUIShortestBreakTime = _spinnerBreakShortestTime.getSelection();
-			_breakUIMaxDistance = _spinnerBreakMaxDistance.getSelection()
+			_breakUIShortestBreakTime = _spinnerBreak_ShortestTime.getSelection();
+			_breakUIMaxDistance = _spinnerBreak_MaxDistance.getSelection()
 					* net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_SMALL;
-			_breakUISliceDiff = _spinnerBreakSliceDiff.getSelection();
+			_breakUISliceDiff = _spinnerBreak_SliceDiff.getSelection();
 
 			breakTimeResult = BreakTimeTool.computeBreakTimeByTimeDistance(
 					_tourData,
@@ -1160,7 +1180,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		} else if (breakMethodId.equals(BreakTimeTool.BREAK_TIME_METHOD_BY_SLICE_SPEED)) {
 
-			_breakUIMinSliceSpeed = _spinnerBreakMinSliceSpeed.getSelection()
+			_breakUIMinSliceSpeed = _spinnerBreak_MinSliceSpeed.getSelection()
 					/ SPEED_DIGIT_VALUE
 					/ net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
@@ -1168,7 +1188,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		} else if (breakMethodId.equals(BreakTimeTool.BREAK_TIME_METHOD_BY_AVG_SPEED)) {
 
-			_breakUIMinAvgSpeed = _spinnerBreakMinAvgSpeed.getSelection()//
+			_breakUIMinAvgSpeed = _spinnerBreak_MinAvgSpeed.getSelection()//
 					/ SPEED_DIGIT_VALUE
 					/ net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
@@ -1176,15 +1196,15 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		} else if (breakMethodId.equals(BreakTimeTool.BREAK_TIME_METHOD_BY_AVG_SLICE_SPEED)) {
 
-			_breakUIMinAvgSpeedAS = _spinnerBreakMinAvgSpeedAS.getSelection()//
+			_breakUIMinAvgSpeedAS = _spinnerBreak_MinAvgSpeedAS.getSelection()//
 					/ SPEED_DIGIT_VALUE
 					/ net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
-			_breakUIMinSliceSpeedAS = _spinnerBreakMinSliceSpeedAS.getSelection()
+			_breakUIMinSliceSpeedAS = _spinnerBreak_MinSliceSpeedAS.getSelection()
 					/ SPEED_DIGIT_VALUE
 					/ net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
-			_breakUIMinSliceTimeAS = _spinnerBreakMinSliceTimeAS.getSelection();
+			_breakUIMinSliceTimeAS = _spinnerBreak_MinSliceTimeAS.getSelection();
 
 			breakTimeResult = BreakTimeTool.computeBreakTimeByAvgSliceSpeed(
 					_tourData,
@@ -1319,6 +1339,41 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	}
 
 	/**
+	 * Create Douglas-Peucker segments from time and power.
+	 */
+	private void createSegmentsBy_PowerWithDP() {
+
+		final int[] timeSerie = _tourData.timeSerie;
+		final float[] powerSerie = _tourData.getPowerSerie();
+
+		if (powerSerie == null || powerSerie.length < 2) {
+			_tourData.segmentSerieIndex = null;
+			return;
+		}
+
+		// convert data series into points
+		final DPPoint graphPoints[] = new DPPoint[timeSerie.length];
+		for (int serieIndex = 0; serieIndex < graphPoints.length; serieIndex++) {
+			graphPoints[serieIndex] = new DPPoint(timeSerie[serieIndex], powerSerie[serieIndex], serieIndex);
+		}
+
+		final Object[] simplePoints = new DouglasPeuckerSimplifier(//
+				_dpTolerancePower,
+				graphPoints,
+				getForcedIndices()).simplify();
+
+		/*
+		 * copie the data index for the simplified points into the tour data
+		 */
+		final int[] segmentSerieIndex = _tourData.segmentSerieIndex = new int[simplePoints.length];
+
+		for (int iPoint = 0; iPoint < simplePoints.length; iPoint++) {
+			final DPPoint point = (DPPoint) simplePoints[iPoint];
+			segmentSerieIndex[iPoint] = point.serieIndex;
+		}
+	}
+
+	/**
 	 * create Douglas-Peucker segments from time and pulse
 	 */
 	private void createSegmentsBy_PulseWithDP() {
@@ -1415,12 +1470,13 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			_pageBookSegmenter = new PageBook(container, SWT.NONE);
 			GridDataFactory.fillDefaults().grab(true, false).span(3, 1).applyTo(_pageBookSegmenter);
 			{
-				_pageSegTypeDPAltitude = createUI_42_SegmenterBy_DPAltitude(_pageBookSegmenter);
-				_pageSegTypeDPPulse = createUI_42_SegmenterBy_DPPulse(_pageBookSegmenter);
-				_pageSegTypeByMarker = createUI_43_SegmenterBy_Marker(_pageBookSegmenter);
-				_pageSegTypeByDistance = createUI_44_SegmenterBy_Distance(_pageBookSegmenter);
-				_pageSegTypeByAltiUpDown = createUI_45_SegmenterBy_MinAltitude(_pageBookSegmenter);
-				_pageSegTypeByBreakTime = createUI_50_SegmenterBy_BreakTime(_pageBookSegmenter);
+				_pageSegType_DPAltitude = createUI_42_SegmenterBy_DPAltitude(_pageBookSegmenter);
+				_pageSegType_DPPulse = createUI_43_SegmenterBy_DPPulse(_pageBookSegmenter);
+				_pageSegType_DPPower = createUI_44_SegmenterBy_DPPower(_pageBookSegmenter);
+				_pageSegType_ByMarker = createUI_45_SegmenterBy_Marker(_pageBookSegmenter);
+				_pageSegType_ByDistance = createUI_46_SegmenterBy_Distance(_pageBookSegmenter);
+				_pageSegType_ByAltiUpDown = createUI_48_SegmenterBy_MinAltitude(_pageBookSegmenter);
+				_pageSegType_ByBreakTime = createUI_50_SegmenterBy_BreakTime(_pageBookSegmenter);
 			}
 		}
 	}
@@ -1431,7 +1487,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
 		{
-			_spinnerDPToleranceAltitude = createUI_DP_Tolerance(container);
+			_spinnerDPTolerance_Altitude = createUI_DP_Tolerance(container);
 			_lblAltitudeUpDP = createUI_DP_Info(container);
 			_btnSaveTourDP = createUI_DB_SaveTour(container);
 		}
@@ -1439,19 +1495,31 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		return container;
 	}
 
-	private Composite createUI_42_SegmenterBy_DPPulse(final Composite parent) {
+	private Composite createUI_43_SegmenterBy_DPPulse(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 		{
-			_spinnerDPTolerancePulse = createUI_DP_Tolerance(container);
+			_spinnerDPTolerance_Pulse = createUI_DP_Tolerance(container);
 		}
 
 		return container;
 	}
 
-	private Composite createUI_43_SegmenterBy_Marker(final Composite parent) {
+	private Composite createUI_44_SegmenterBy_DPPower(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		{
+			_spinnerDPTolerance_Power = createUI_DP_Tolerance(container);
+		}
+
+		return container;
+	}
+
+	private Composite createUI_45_SegmenterBy_Marker(final Composite parent) {
 
 		/*
 		 * display NONE, this is not easy to do - or I didn't find an easier way
@@ -1467,7 +1535,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		return container;
 	}
 
-	private Composite createUI_44_SegmenterBy_Distance(final Composite parent) {
+	private Composite createUI_46_SegmenterBy_Distance(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -1511,7 +1579,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		return container;
 	}
 
-	private Composite createUI_45_SegmenterBy_MinAltitude(final Composite parent) {
+	private Composite createUI_48_SegmenterBy_MinAltitude(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -1643,10 +1711,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			_pageBookBreakTime = new PageBook(container, SWT.NONE);
 			GridDataFactory.fillDefaults().span(2, 1).grab(true, false).applyTo(_pageBookBreakTime);
 			{
-				_pageBreakByAvgSliceSpeed = createUI_53_BreakBy_AvgSliceSpeed(_pageBookBreakTime);
-				_pageBreakByAvgSpeed = createUI_54_BreakBy_AvgSpeed(_pageBookBreakTime);
-				_pageBreakBySliceSpeed = createUI_55_BreakBy_SliceSpeed(_pageBookBreakTime);
-				_pageBreakByTimeDistance = createUI_56_BreakBy_TimeDistance(_pageBookBreakTime);
+				_pageBreakBy_AvgSliceSpeed = createUI_53_BreakBy_AvgSliceSpeed(_pageBookBreakTime);
+				_pageBreakBy_AvgSpeed = createUI_54_BreakBy_AvgSpeed(_pageBookBreakTime);
+				_pageBreakBy_SliceSpeed = createUI_55_BreakBy_SliceSpeed(_pageBookBreakTime);
+				_pageBreakBy_TimeDistance = createUI_56_BreakBy_TimeDistance(_pageBookBreakTime);
 			}
 
 			/*
@@ -1678,13 +1746,13 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				_firstColBreakTime.add(label);
 
 				// spinner: minimum speed
-				_spinnerBreakMinAvgSpeedAS = new Spinner(container, SWT.BORDER);
+				_spinnerBreak_MinAvgSpeedAS = new Spinner(container, SWT.BORDER);
 				GridDataFactory.fillDefaults()//
-						.applyTo(_spinnerBreakMinAvgSpeedAS);
-				_spinnerBreakMinAvgSpeedAS.setMinimum(0); // 0.0 km/h
-				_spinnerBreakMinAvgSpeedAS.setMaximum(PrefPageComputedValues.BREAK_MAX_SPEED_KM_H); // 10.0 km/h
-				_spinnerBreakMinAvgSpeedAS.setDigits(1);
-				_spinnerBreakMinAvgSpeedAS.addMouseWheelListener(new MouseWheelListener() {
+						.applyTo(_spinnerBreak_MinAvgSpeedAS);
+				_spinnerBreak_MinAvgSpeedAS.setMinimum(0); // 0.0 km/h
+				_spinnerBreak_MinAvgSpeedAS.setMaximum(PrefPageComputedValues.BREAK_MAX_SPEED_KM_H); // 10.0 km/h
+				_spinnerBreak_MinAvgSpeedAS.setDigits(1);
+				_spinnerBreak_MinAvgSpeedAS.addMouseWheelListener(new MouseWheelListener() {
 					@Override
 					public void mouseScrolled(final MouseEvent event) {
 						UI.adjustSpinnerValueOnMouseScroll(event);
@@ -1707,13 +1775,13 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				_firstColBreakTime.add(label);
 
 				// spinner: minimum speed
-				_spinnerBreakMinSliceSpeedAS = new Spinner(container, SWT.BORDER);
+				_spinnerBreak_MinSliceSpeedAS = new Spinner(container, SWT.BORDER);
 				GridDataFactory.fillDefaults()//
-						.applyTo(_spinnerBreakMinSliceSpeedAS);
-				_spinnerBreakMinSliceSpeedAS.setMinimum(0); // 0.0 km/h
-				_spinnerBreakMinSliceSpeedAS.setMaximum(PrefPageComputedValues.BREAK_MAX_SPEED_KM_H); // 10.0 km/h
-				_spinnerBreakMinSliceSpeedAS.setDigits(1);
-				_spinnerBreakMinSliceSpeedAS.addMouseWheelListener(new MouseWheelListener() {
+						.applyTo(_spinnerBreak_MinSliceSpeedAS);
+				_spinnerBreak_MinSliceSpeedAS.setMinimum(0); // 0.0 km/h
+				_spinnerBreak_MinSliceSpeedAS.setMaximum(PrefPageComputedValues.BREAK_MAX_SPEED_KM_H); // 10.0 km/h
+				_spinnerBreak_MinSliceSpeedAS.setDigits(1);
+				_spinnerBreak_MinSliceSpeedAS.addMouseWheelListener(new MouseWheelListener() {
 					@Override
 					public void mouseScrolled(final MouseEvent event) {
 						UI.adjustSpinnerValueOnMouseScroll(event);
@@ -1736,12 +1804,12 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				_firstColBreakTime.add(label);
 
 				// spinner: minimum slice time
-				_spinnerBreakMinSliceTimeAS = new Spinner(container, SWT.BORDER);
+				_spinnerBreak_MinSliceTimeAS = new Spinner(container, SWT.BORDER);
 				GridDataFactory.fillDefaults()//
-						.applyTo(_spinnerBreakMinSliceTimeAS);
-				_spinnerBreakMinSliceTimeAS.setMinimum(0); // 0 sec
-				_spinnerBreakMinSliceTimeAS.setMaximum(10); // 10 sec
-				_spinnerBreakMinSliceTimeAS.addMouseWheelListener(new MouseWheelListener() {
+						.applyTo(_spinnerBreak_MinSliceTimeAS);
+				_spinnerBreak_MinSliceTimeAS.setMinimum(0); // 0 sec
+				_spinnerBreak_MinSliceTimeAS.setMaximum(10); // 10 sec
+				_spinnerBreak_MinSliceTimeAS.addMouseWheelListener(new MouseWheelListener() {
 					@Override
 					public void mouseScrolled(final MouseEvent event) {
 						UI.adjustSpinnerValueOnMouseScroll(event);
@@ -1775,18 +1843,18 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			_firstColBreakTime.add(label);
 
 			// spinner: minimum speed
-			_spinnerBreakMinAvgSpeed = new Spinner(container, SWT.BORDER);
-			GridDataFactory.fillDefaults().hint(_spinnerWidth, SWT.DEFAULT).applyTo(_spinnerBreakMinAvgSpeed);
-			_spinnerBreakMinAvgSpeed.setMinimum(0); // 0.0 km/h
-			_spinnerBreakMinAvgSpeed.setMaximum(PrefPageComputedValues.BREAK_MAX_SPEED_KM_H); // 10.0 km/h
-			_spinnerBreakMinAvgSpeed.setDigits(1);
-			_spinnerBreakMinAvgSpeed.addSelectionListener(new SelectionAdapter() {
+			_spinnerBreak_MinAvgSpeed = new Spinner(container, SWT.BORDER);
+			GridDataFactory.fillDefaults().hint(_spinnerWidth, SWT.DEFAULT).applyTo(_spinnerBreak_MinAvgSpeed);
+			_spinnerBreak_MinAvgSpeed.setMinimum(0); // 0.0 km/h
+			_spinnerBreak_MinAvgSpeed.setMaximum(PrefPageComputedValues.BREAK_MAX_SPEED_KM_H); // 10.0 km/h
+			_spinnerBreak_MinAvgSpeed.setDigits(1);
+			_spinnerBreak_MinAvgSpeed.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					onSelect_BreakTime();
 				}
 			});
-			_spinnerBreakMinAvgSpeed.addMouseWheelListener(new MouseWheelListener() {
+			_spinnerBreak_MinAvgSpeed.addMouseWheelListener(new MouseWheelListener() {
 				@Override
 				public void mouseScrolled(final MouseEvent event) {
 					UI.adjustSpinnerValueOnMouseScroll(event);
@@ -1819,18 +1887,18 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			_firstColBreakTime.add(label);
 
 			// spinner: minimum speed
-			_spinnerBreakMinSliceSpeed = new Spinner(container, SWT.BORDER);
-			GridDataFactory.fillDefaults().hint(_spinnerWidth, SWT.DEFAULT).applyTo(_spinnerBreakMinSliceSpeed);
-			_spinnerBreakMinSliceSpeed.setMinimum(0); // 0.0 km/h
-			_spinnerBreakMinSliceSpeed.setMaximum(PrefPageComputedValues.BREAK_MAX_SPEED_KM_H); // 10.0 km/h
-			_spinnerBreakMinSliceSpeed.setDigits(1);
-			_spinnerBreakMinSliceSpeed.addSelectionListener(new SelectionAdapter() {
+			_spinnerBreak_MinSliceSpeed = new Spinner(container, SWT.BORDER);
+			GridDataFactory.fillDefaults().hint(_spinnerWidth, SWT.DEFAULT).applyTo(_spinnerBreak_MinSliceSpeed);
+			_spinnerBreak_MinSliceSpeed.setMinimum(0); // 0.0 km/h
+			_spinnerBreak_MinSliceSpeed.setMaximum(PrefPageComputedValues.BREAK_MAX_SPEED_KM_H); // 10.0 km/h
+			_spinnerBreak_MinSliceSpeed.setDigits(1);
+			_spinnerBreak_MinSliceSpeed.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					onSelect_BreakTime();
 				}
 			});
-			_spinnerBreakMinSliceSpeed.addMouseWheelListener(new MouseWheelListener() {
+			_spinnerBreak_MinSliceSpeed.addMouseWheelListener(new MouseWheelListener() {
 				@Override
 				public void mouseScrolled(final MouseEvent event) {
 					UI.adjustSpinnerValueOnMouseScroll(event);
@@ -1862,17 +1930,17 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				_firstColBreakTime.add(label);
 
 				// spinner: break minimum time
-				_spinnerBreakShortestTime = new Spinner(container, SWT.BORDER);
-				GridDataFactory.fillDefaults().hint(_spinnerWidth, SWT.DEFAULT).applyTo(_spinnerBreakShortestTime);
-				_spinnerBreakShortestTime.setMinimum(1);
-				_spinnerBreakShortestTime.setMaximum(120); // 120 seconds
-				_spinnerBreakShortestTime.addSelectionListener(new SelectionAdapter() {
+				_spinnerBreak_ShortestTime = new Spinner(container, SWT.BORDER);
+				GridDataFactory.fillDefaults().hint(_spinnerWidth, SWT.DEFAULT).applyTo(_spinnerBreak_ShortestTime);
+				_spinnerBreak_ShortestTime.setMinimum(1);
+				_spinnerBreak_ShortestTime.setMaximum(120); // 120 seconds
+				_spinnerBreak_ShortestTime.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
 						onSelect_BreakTime();
 					}
 				});
-				_spinnerBreakShortestTime.addMouseWheelListener(new MouseWheelListener() {
+				_spinnerBreak_ShortestTime.addMouseWheelListener(new MouseWheelListener() {
 					@Override
 					public void mouseScrolled(final MouseEvent event) {
 						UI.adjustSpinnerValueOnMouseScroll(event);
@@ -1895,17 +1963,17 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				_firstColBreakTime.add(label);
 
 				// spinner: break minimum time
-				_spinnerBreakMaxDistance = new Spinner(container, SWT.BORDER);
-				GridDataFactory.fillDefaults().hint(_spinnerWidth, SWT.DEFAULT).applyTo(_spinnerBreakMaxDistance);
-				_spinnerBreakMaxDistance.setMinimum(1);
-				_spinnerBreakMaxDistance.setMaximum(1000); // 1000 m/yards
-				_spinnerBreakMaxDistance.addSelectionListener(new SelectionAdapter() {
+				_spinnerBreak_MaxDistance = new Spinner(container, SWT.BORDER);
+				GridDataFactory.fillDefaults().hint(_spinnerWidth, SWT.DEFAULT).applyTo(_spinnerBreak_MaxDistance);
+				_spinnerBreak_MaxDistance.setMinimum(1);
+				_spinnerBreak_MaxDistance.setMaximum(1000); // 1000 m/yards
+				_spinnerBreak_MaxDistance.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
 						onSelect_BreakTime();
 					}
 				});
-				_spinnerBreakMaxDistance.addMouseWheelListener(new MouseWheelListener() {
+				_spinnerBreak_MaxDistance.addMouseWheelListener(new MouseWheelListener() {
 					@Override
 					public void mouseScrolled(final MouseEvent event) {
 						UI.adjustSpinnerValueOnMouseScroll(event);
@@ -1933,17 +2001,17 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				_firstColBreakTime.add(label);
 
 				// spinner: slice diff break time
-				_spinnerBreakSliceDiff = new Spinner(container, SWT.BORDER);
-				GridDataFactory.fillDefaults().hint(_spinnerWidth, SWT.DEFAULT).applyTo(_spinnerBreakSliceDiff);
-				_spinnerBreakSliceDiff.setMinimum(0);
-				_spinnerBreakSliceDiff.setMaximum(60); // minutes
-				_spinnerBreakSliceDiff.addSelectionListener(new SelectionAdapter() {
+				_spinnerBreak_SliceDiff = new Spinner(container, SWT.BORDER);
+				GridDataFactory.fillDefaults().hint(_spinnerWidth, SWT.DEFAULT).applyTo(_spinnerBreak_SliceDiff);
+				_spinnerBreak_SliceDiff.setMinimum(0);
+				_spinnerBreak_SliceDiff.setMaximum(60); // minutes
+				_spinnerBreak_SliceDiff.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
 						onSelect_BreakTime();
 					}
 				});
-				_spinnerBreakSliceDiff.addMouseWheelListener(new MouseWheelListener() {
+				_spinnerBreak_SliceDiff.addMouseWheelListener(new MouseWheelListener() {
 					@Override
 					public void mouseScrolled(final MouseEvent event) {
 						UI.adjustSpinnerValueOnMouseScroll(event);
@@ -3034,22 +3102,22 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		if (selectedBreakMethod.methodId.equals(BreakTimeTool.BREAK_TIME_METHOD_BY_AVG_SPEED)) {
 
-			_pageBookBreakTime.showPage(_pageBreakByAvgSpeed);
+			_pageBookBreakTime.showPage(_pageBreakBy_AvgSpeed);
 			_comboBreakMethod.setToolTipText(Messages.Compute_BreakTime_Label_Description_ComputeByAvgSpeed);
 
 		} else if (selectedBreakMethod.methodId.equals(BreakTimeTool.BREAK_TIME_METHOD_BY_SLICE_SPEED)) {
 
-			_pageBookBreakTime.showPage(_pageBreakBySliceSpeed);
+			_pageBookBreakTime.showPage(_pageBreakBy_SliceSpeed);
 			_comboBreakMethod.setToolTipText(Messages.Compute_BreakTime_Label_Description_ComputeBySliceSpeed);
 
 		} else if (selectedBreakMethod.methodId.equals(BreakTimeTool.BREAK_TIME_METHOD_BY_AVG_SLICE_SPEED)) {
 
-			_pageBookBreakTime.showPage(_pageBreakByAvgSliceSpeed);
+			_pageBookBreakTime.showPage(_pageBreakBy_AvgSliceSpeed);
 			_comboBreakMethod.setToolTipText(Messages.Compute_BreakTime_Label_Description_ComputeByAvgSliceSpeed);
 
 		} else if (selectedBreakMethod.methodId.equals(BreakTimeTool.BREAK_TIME_METHOD_BY_TIME_DISTANCE)) {
 
-			_pageBookBreakTime.showPage(_pageBreakByTimeDistance);
+			_pageBookBreakTime.showPage(_pageBreakBy_TimeDistance);
 			_comboBreakMethod.setToolTipText(Messages.Compute_BreakTime_Label_Description_ComputeByTime);
 		}
 
@@ -3135,27 +3203,31 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		if (selectedSegmenterType == SegmenterType.ByAltitudeWithDP
 				|| selectedSegmenterType == SegmenterType.ByAltitudeWithDPMerged) {
 
-			_pageBookSegmenter.showPage(_pageSegTypeDPAltitude);
+			_pageBookSegmenter.showPage(_pageSegType_DPAltitude);
+
+		} else if (selectedSegmenterType == SegmenterType.ByPowerWithDP) {
+
+			_pageBookSegmenter.showPage(_pageSegType_DPPower);
 
 		} else if (selectedSegmenterType == SegmenterType.ByPulseWithDP) {
 
-			_pageBookSegmenter.showPage(_pageSegTypeDPPulse);
+			_pageBookSegmenter.showPage(_pageSegType_DPPulse);
 
 		} else if (selectedSegmenterType == SegmenterType.ByMarker) {
 
-			_pageBookSegmenter.showPage(_pageSegTypeByMarker);
+			_pageBookSegmenter.showPage(_pageSegType_ByMarker);
 
 		} else if (selectedSegmenterType == SegmenterType.ByDistance) {
 
-			_pageBookSegmenter.showPage(_pageSegTypeByDistance);
+			_pageBookSegmenter.showPage(_pageSegType_ByDistance);
 
 		} else if (selectedSegmenterType == SegmenterType.ByComputedAltiUpDown) {
 
-			_pageBookSegmenter.showPage(_pageSegTypeByAltiUpDown);
+			_pageBookSegmenter.showPage(_pageSegType_ByAltiUpDown);
 
 		} else if (selectedSegmenterType == SegmenterType.ByBreakTime) {
 
-			_pageBookSegmenter.showPage(_pageSegTypeByBreakTime);
+			_pageBookSegmenter.showPage(_pageSegType_ByBreakTime);
 
 			// update ui + layout
 			onSelect_BreakTimeMethod();
@@ -3168,15 +3240,20 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 	private void onSelect_Tolerance() {
 
-		final float dpToleranceAlti = (float) (_spinnerDPToleranceAltitude.getSelection() / 10.0);
-		final float dpTolerancePulse = (float) (_spinnerDPTolerancePulse.getSelection() / 10.0);
+		final float dpToleranceAlti = (float) (_spinnerDPTolerance_Altitude.getSelection() / 10.0);
+		final float dpTolerancePower = (float) (_spinnerDPTolerance_Power.getSelection() / 10.0);
+		final float dpTolerancePulse = (float) (_spinnerDPTolerance_Pulse.getSelection() / 10.0);
 
 		// check if tolerance has changed
-		if (_tourData == null || (_dpToleranceAltitude == dpToleranceAlti && _dpTolerancePulse == dpTolerancePulse)) {
+		if (_tourData == null || //
+				(_dpToleranceAltitude == dpToleranceAlti //
+						&& _dpTolerancePower == dpTolerancePower //
+				&& _dpTolerancePulse == dpTolerancePulse)) {
 			return;
 		}
 
 		_dpToleranceAltitude = dpToleranceAlti;
+		_dpTolerancePower = dpTolerancePower;
 		_dpTolerancePulse = dpTolerancePulse;
 
 		if (_tourData.isMultipleTours) {
@@ -3383,28 +3460,28 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		 * break by avg + slice speed
 		 */
 		//
-		_spinnerBreakMinAvgSpeedAS.setSelection(//
+		_spinnerBreak_MinAvgSpeedAS.setSelection(//
 				(int) (btConfig.breakMinAvgSpeedAS * SPEED_DIGIT_VALUE * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
-		_spinnerBreakMinSliceSpeedAS.setSelection(//
+		_spinnerBreak_MinSliceSpeedAS.setSelection(//
 				(int) (btConfig.breakMinSliceSpeedAS * SPEED_DIGIT_VALUE * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
-		_spinnerBreakMinSliceTimeAS.setSelection(btConfig.breakMinSliceTimeAS);
+		_spinnerBreak_MinSliceTimeAS.setSelection(btConfig.breakMinSliceTimeAS);
 
 		/*
 		 * break time by time/distance
 		 */
-		_spinnerBreakShortestTime.setSelection(btConfig.breakShortestTime);
+		_spinnerBreak_ShortestTime.setSelection(btConfig.breakShortestTime);
 
 		final float prefBreakDistance = btConfig.breakMaxDistance / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_SMALL;
-		_spinnerBreakMaxDistance.setSelection((int) (prefBreakDistance + 0.5));
+		_spinnerBreak_MaxDistance.setSelection((int) (prefBreakDistance + 0.5));
 
-		_spinnerBreakSliceDiff.setSelection(btConfig.breakSliceDiff);
+		_spinnerBreak_SliceDiff.setSelection(btConfig.breakSliceDiff);
 
 		/*
 		 * break time by speed
 		 */
-		_spinnerBreakMinSliceSpeed.setSelection(//
+		_spinnerBreak_MinSliceSpeed.setSelection(//
 				(int) (btConfig.breakMinSliceSpeed * SPEED_DIGIT_VALUE * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
-		_spinnerBreakMinAvgSpeed.setSelection(//
+		_spinnerBreak_MinAvgSpeed.setSelection(//
 				(int) (btConfig.breakMinAvgSpeed * SPEED_DIGIT_VALUE * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
 
 		onSelect_BreakTimeMethod();
@@ -3415,7 +3492,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		_dpToleranceAltitudeMultipleTours = (float) (STATE_DP_TOLERANCE_ALTITUDE_MULTIPLE_TOURS_DEFAULT / 10.0);
 
 		if (_tourData != null && _tourData.isMultipleTours) {
-			_spinnerDPToleranceAltitude.setSelection(STATE_DP_TOLERANCE_ALTITUDE_MULTIPLE_TOURS_DEFAULT);
+			_spinnerDPTolerance_Altitude.setSelection(STATE_DP_TOLERANCE_ALTITUDE_MULTIPLE_TOURS_DEFAULT);
 		}
 	}
 
@@ -3454,7 +3531,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		 */
 		final int stateDPTolerancePulse = Util.getStateInt(_state, STATE_DP_TOLERANCE_PULSE, 50);
 		_dpTolerancePulse = stateDPTolerancePulse / 10.0f;
-		_spinnerDPTolerancePulse.setSelection(stateDPTolerancePulse);
+		_spinnerDPTolerance_Pulse.setSelection(stateDPTolerancePulse);
 
 		final int stateDPToleranceMultipleTours = Util.getStateInt(
 				_state,
@@ -3488,11 +3565,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				STATE_BREAK_TIME_MIN_SLICE_TIME_AS,
 				btConfig.breakMinSliceTimeAS);
 
-		_spinnerBreakMinAvgSpeedAS.setSelection(//
+		_spinnerBreak_MinAvgSpeedAS.setSelection(//
 				(int) (stateAvgSpeedAS * SPEED_DIGIT_VALUE * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
-		_spinnerBreakMinSliceSpeedAS.setSelection(//
+		_spinnerBreak_MinSliceSpeedAS.setSelection(//
 				(int) (stateSliceSpeedAS * SPEED_DIGIT_VALUE * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
-		_spinnerBreakMinSliceTimeAS.setSelection(stateSliceTimeAS);
+		_spinnerBreak_MinSliceTimeAS.setSelection(stateSliceTimeAS);
 
 		/*
 		 * break by slice speed
@@ -3502,7 +3579,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				STATE_BREAK_TIME_MIN_SLICE_SPEED,
 				btConfig.breakMinSliceSpeed);
 
-		_spinnerBreakMinSliceSpeed
+		_spinnerBreak_MinSliceSpeed
 				.setSelection((int) (stateSliceSpeed * SPEED_DIGIT_VALUE * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
 
 		/*
@@ -3513,13 +3590,13 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				STATE_BREAK_TIME_MIN_AVG_SPEED,
 				btConfig.breakMinAvgSpeed);
 
-		_spinnerBreakMinAvgSpeed
+		_spinnerBreak_MinAvgSpeed
 				.setSelection((int) (stateAvgSpeed * SPEED_DIGIT_VALUE * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
 
 		/*
 		 * break time by time/distance
 		 */
-		_spinnerBreakShortestTime.setSelection(Util.getStateInt(
+		_spinnerBreak_ShortestTime.setSelection(Util.getStateInt(
 				_state,
 				STATE_BREAK_TIME_MIN_TIME_VALUE,
 				btConfig.breakShortestTime));
@@ -3528,9 +3605,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				_state,
 				STATE_BREAK_TIME_MIN_DISTANCE_VALUE,
 				btConfig.breakMaxDistance) / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_SMALL;
-		_spinnerBreakMaxDistance.setSelection((int) (breakDistance + 0.5));
+		_spinnerBreak_MaxDistance.setSelection((int) (breakDistance + 0.5));
 
-		_spinnerBreakSliceDiff.setSelection(Util.getStateInt(
+		_spinnerBreak_SliceDiff.setSelection(Util.getStateInt(
 				_state,
 				STATE_BREAK_TIME_SLICE_DIFF,
 				btConfig.breakSliceDiff));
@@ -3545,35 +3622,35 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		_prefStore.setValue(ITourbookPreferences.BREAK_TIME_METHOD2, getSelectedBreakMethod().methodId);
 
 		// break by avg+slice speed
-		final float breakMinAvgSpeedAS = _spinnerBreakMinAvgSpeedAS.getSelection()
+		final float breakMinAvgSpeedAS = _spinnerBreak_MinAvgSpeedAS.getSelection()
 				/ SPEED_DIGIT_VALUE
 				/ net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
-		final float breakMinSliceSpeedAS = _spinnerBreakMinSliceSpeedAS.getSelection()
+		final float breakMinSliceSpeedAS = _spinnerBreak_MinSliceSpeedAS.getSelection()
 				/ SPEED_DIGIT_VALUE
 				/ net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
-		final int breakMinSliceTimeAS = _spinnerBreakMinSliceTimeAS.getSelection();
+		final int breakMinSliceTimeAS = _spinnerBreak_MinSliceTimeAS.getSelection();
 		_prefStore.setValue(ITourbookPreferences.BREAK_TIME_MIN_AVG_SPEED_AS, breakMinAvgSpeedAS);
 		_prefStore.setValue(ITourbookPreferences.BREAK_TIME_MIN_SLICE_SPEED_AS, breakMinSliceSpeedAS);
 		_prefStore.setValue(ITourbookPreferences.BREAK_TIME_MIN_SLICE_TIME_AS, breakMinSliceTimeAS);
 
 		// break by slice speed
-		final float breakMinSliceSpeed = _spinnerBreakMinSliceSpeed.getSelection()
+		final float breakMinSliceSpeed = _spinnerBreak_MinSliceSpeed.getSelection()
 				/ SPEED_DIGIT_VALUE
 				/ net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 		_prefStore.setValue(ITourbookPreferences.BREAK_TIME_MIN_SLICE_SPEED, breakMinSliceSpeed);
 
 		// break by avg speed
-		final float breakMinAvgSpeed = _spinnerBreakMinAvgSpeed.getSelection()
+		final float breakMinAvgSpeed = _spinnerBreak_MinAvgSpeed.getSelection()
 				/ SPEED_DIGIT_VALUE
 				/ net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 		_prefStore.setValue(ITourbookPreferences.BREAK_TIME_MIN_AVG_SPEED, breakMinAvgSpeed);
 
 		// break by time/distance
-		_prefStore.setValue(ITourbookPreferences.BREAK_TIME_SHORTEST_TIME, _spinnerBreakShortestTime.getSelection());
-		final float breakDistance = _spinnerBreakMaxDistance.getSelection()
+		_prefStore.setValue(ITourbookPreferences.BREAK_TIME_SHORTEST_TIME, _spinnerBreak_ShortestTime.getSelection());
+		final float breakDistance = _spinnerBreak_MaxDistance.getSelection()
 				* net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_SMALL;
 		_prefStore.setValue(ITourbookPreferences.BREAK_TIME_MAX_DISTANCE, breakDistance);
-		_prefStore.setValue(ITourbookPreferences.BREAK_TIME_SLICE_DIFF, _spinnerBreakSliceDiff.getSelection());
+		_prefStore.setValue(ITourbookPreferences.BREAK_TIME_SLICE_DIFF, _spinnerBreak_SliceDiff.getSelection());
 	}
 
 	/**
@@ -3585,36 +3662,36 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		_state.put(STATE_SELECTED_BREAK_METHOD2, getSelectedBreakMethod().methodId);
 
 		// break by avg+slice speed
-		final float breakMinAvgSpeedAS = _spinnerBreakMinAvgSpeedAS.getSelection()
+		final float breakMinAvgSpeedAS = _spinnerBreak_MinAvgSpeedAS.getSelection()
 				/ SPEED_DIGIT_VALUE
 				/ net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
-		final float breakMinSliceSpeedAS = _spinnerBreakMinSliceSpeedAS.getSelection()
+		final float breakMinSliceSpeedAS = _spinnerBreak_MinSliceSpeedAS.getSelection()
 				/ SPEED_DIGIT_VALUE
 				/ net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
-		final int breakMinSliceTimeAS = _spinnerBreakMinSliceTimeAS.getSelection();
+		final int breakMinSliceTimeAS = _spinnerBreak_MinSliceTimeAS.getSelection();
 
 		_state.put(STATE_BREAK_TIME_MIN_AVG_SPEED_AS, breakMinAvgSpeedAS);
 		_state.put(STATE_BREAK_TIME_MIN_SLICE_SPEED_AS, breakMinSliceSpeedAS);
 		_state.put(STATE_BREAK_TIME_MIN_SLICE_TIME_AS, breakMinSliceTimeAS);
 
 		// break by slice speed
-		final float breakMinSliceSpeed = _spinnerBreakMinSliceSpeed.getSelection()
+		final float breakMinSliceSpeed = _spinnerBreak_MinSliceSpeed.getSelection()
 				/ SPEED_DIGIT_VALUE
 				/ net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 		_state.put(STATE_BREAK_TIME_MIN_SLICE_SPEED, breakMinSliceSpeed);
 
 		// break by avg speed
-		final float breakMinAvgSpeed = _spinnerBreakMinAvgSpeed.getSelection()
+		final float breakMinAvgSpeed = _spinnerBreak_MinAvgSpeed.getSelection()
 				/ SPEED_DIGIT_VALUE
 				/ net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 		_state.put(STATE_BREAK_TIME_MIN_AVG_SPEED, breakMinAvgSpeed);
 
 		// break by time/distance
-		final float breakDistance = _spinnerBreakMaxDistance.getSelection()
+		final float breakDistance = _spinnerBreak_MaxDistance.getSelection()
 				* net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_SMALL;
 		_state.put(STATE_BREAK_TIME_MIN_DISTANCE_VALUE, breakDistance);
-		_state.put(STATE_BREAK_TIME_MIN_TIME_VALUE, _spinnerBreakShortestTime.getSelection());
-		_state.put(STATE_BREAK_TIME_SLICE_DIFF, _spinnerBreakSliceDiff.getSelection());
+		_state.put(STATE_BREAK_TIME_MIN_TIME_VALUE, _spinnerBreak_ShortestTime.getSelection());
+		_state.put(STATE_BREAK_TIME_SLICE_DIFF, _spinnerBreak_SliceDiff.getSelection());
 	}
 
 	private void saveState() {
@@ -3624,7 +3701,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		_state.put(STATE_SELECTED_SEGMENTER_BY_USER, _userSelectedSegmenterType.name());
 		_state.put(STATE_SELECTED_DISTANCE, _spinnerDistance.getSelection());
 		_state.put(STATE_MINIMUM_ALTITUDE, _spinnerMinAltitude.getSelection());
-		_state.put(STATE_DP_TOLERANCE_PULSE, _spinnerDPTolerancePulse.getSelection());
+		_state.put(STATE_DP_TOLERANCE_PULSE, _spinnerDPTolerance_Pulse.getSelection());
 
 		_state.put(STATE_DP_TOLERANCE_ALTITUDE_MULTIPLE_TOURS, (int) (_dpToleranceAltitudeMultipleTours * 10));
 
@@ -3784,7 +3861,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			_savedDpToleranceAltitude = _dpToleranceAltitude = getDPTolerance_FromTour();
 
 			// segmenter value
-			_spinnerDPToleranceAltitude.setSelection((int) (getDPTolerance_FromTour() * 10));
+			_spinnerDPTolerance_Altitude.setSelection((int) (getDPTolerance_FromTour() * 10));
 
 			final boolean canSaveTour = _tourData.getTourPerson() != null;
 			_btnSaveTourDP.setEnabled(canSaveTour);

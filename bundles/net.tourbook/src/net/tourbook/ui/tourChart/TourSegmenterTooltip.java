@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -106,6 +106,8 @@ public class TourSegmenterTooltip extends AnimatedToolTipShell implements ITourP
 	private Label						_lblAvg_CadenceUnit;
 	private Label						_lblAvg_Pace;
 	private Label						_lblAvg_PaceUnit;
+	private Label						_lblAvg_Power;
+	private Label						_lblAvg_PowerUnit;
 	private Label						_lblAvg_Pulse;
 	private Label						_lblAvg_PulseUnit;
 	private Label						_lblAvg_Speed;
@@ -413,11 +415,21 @@ public class TourSegmenterTooltip extends AnimatedToolTipShell implements ITourP
 		_secondColumnControls.add(_lblAvg_Cadence);
 
 		_lblAvg_CadenceUnit = createUI_LabelValue(parent, SWT.LEAD);
+
+		/*
+		 * avg power
+		 */
+		label = createUI_Label(parent, Messages.Tour_Tooltip_Label_AvgPower);
+		_firstColumnControls.add(label);
+
+		_lblAvg_Power = createUI_LabelValue(parent, SWT.TRAIL);
+		_secondColumnControls.add(_lblAvg_Power);
+
+		_lblAvg_PowerUnit = createUI_LabelValue(parent, SWT.LEAD);
 	}
 
 	private void createUI_44_Altimeter(final Composite container) {
 
-		createUI_Spacer(container);
 		createUI_Spacer(container);
 
 		/*
@@ -749,6 +761,10 @@ public class TourSegmenterTooltip extends AnimatedToolTipShell implements ITourP
 		// avg cadence
 		_lblAvg_Cadence.setText(_nf_1_1.format(tourSegment.cadence));
 		_lblAvg_CadenceUnit.setText(Messages.Value_Unit_Cadence);
+
+		// avg power
+		_lblAvg_Power.setText(Integer.toString((int) tourSegment.power));
+		_lblAvg_PowerUnit.setText(UI.UNIT_POWER);
 
 		/*
 		 * Time

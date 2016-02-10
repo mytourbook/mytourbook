@@ -366,6 +366,7 @@ public class Messages extends NLS {
 	public static String		Tour_Tooltip_Label_AltitudeUp;
 	public static String		Tour_Tooltip_Label_AvgCadence;
 	public static String		Tour_Tooltip_Label_AvgPace;
+	public static String		Tour_Tooltip_Label_AvgPower;
 	public static String		Tour_Tooltip_Label_AvgPulse;
 	public static String		Tour_Tooltip_Label_AvgSpeed;
 	public static String		Tour_Tooltip_Label_BreakTime;

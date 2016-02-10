@@ -453,7 +453,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	private float												power_AvgLeftPedalSmoothness;
 	private float												power_AvgRightPedalSmoothness;
 
-
 	// ############################################# OTHER TOUR/DEVICE DATA #############################################
 
 	@XmlElement
@@ -3797,8 +3796,9 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 						: (altitudeUpH + altitudeDownH) / segmentDrivingTime * 3600 / UI.UNIT_VALUE_ALTITUDE;
 
 				final int segmentIndexDiff = segmentEndIndex - segmentStartIndex;
-				segmentSeriePower[segmentIndex] = segment.power = segmentIndexDiff == 0 ? 0 : powerSum
-						/ segmentIndexDiff;
+				segmentSeriePower[segmentIndex] = segment.power = segmentIndexDiff == 0 //
+						? 0
+						: powerSum / segmentIndexDiff;
 
 				// end point of current segment is the start of the next segment
 				altitudeStart = altitudeEnd;
@@ -5356,6 +5356,13 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		return power_AvgRightTorqueEffectiveness;
 	}
 
+	/**
+	 * @return Returns Functional Threshold Power (FTP)
+	 */
+	public int getPower_FTP() {
+		return power_FTP;
+	}
+
 	public float getPower_IntensityFactor() {
 		return power_IntensityFactor;
 	}
@@ -5372,10 +5379,6 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		return power_PedalLeftRightBalance;
 	}
 
-	public int getPower_Power() {
-		return power_FTP;
-	}
-
 	public long getPower_TotalWork() {
 		return power_TotalWork;
 	}
@@ -5386,7 +5389,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 
 	public float[] getPowerSerie() {
 
-		if ((powerSerie != null) || isPowerSerieFromDevice) {
+		if (powerSerie != null || isPowerSerieFromDevice) {
 			return powerSerie;
 		}
 
@@ -6688,6 +6691,11 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		this.power_AvgRightTorqueEffectiveness = avgRightTorqueEffectiveness;
 	}
 
+	/**
+	 * Sets Functional Threshold Power (FTP)
+	 * 
+	 * @param ftp
+	 */
 	public void setPower_FTP(final int ftp) {
 		this.power_FTP = ftp;
 	}

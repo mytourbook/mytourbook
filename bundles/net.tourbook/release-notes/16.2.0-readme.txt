@@ -1,0 +1,29 @@
+Version 16.?                                            18. January 2016
+
+--------------------------------------------------------------------------
+IDEAS
+--------------------------------------------------------------------------
+
+* bug with body weight in reimport
+* smooth power data
+
+
+
+
+
+--------------------------------------------------------------------------
+
+New
+===	
+
+* Column Profiles
+
+* Power
+  - Show power value in chart segment tooltip
+  - Reimport device power values
+ 
+
+Bugfix
+======	
+
+
