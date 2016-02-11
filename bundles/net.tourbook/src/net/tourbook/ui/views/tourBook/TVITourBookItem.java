@@ -152,6 +152,9 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
 	float							colPower_PowerToWeight;
 
+	String							col_ImportFileName;
+	String							col_ImportFilePath;
+
 	TVITourBookItem(final TourBookView view) {
 
 		tourBookView = view;

@@ -126,7 +126,10 @@ public class TVITourBookYearSub extends TVITourBookItem {
 				+ "power_AvgLeftPedalSmoothness, " //				47	//$NON-NLS-1$
 				+ "power_AvgRightPedalSmoothness, " //				48	//$NON-NLS-1$
 
-				+ "bikerWeight " //									49	//$NON-NLS-1$
+				+ "bikerWeight, " //								49	//$NON-NLS-1$
+
+				+ "tourImportFileName, " //							50	//$NON-NLS-1$
+				+ "tourImportFilePath " //							51	//$NON-NLS-1$
 
 				+ UI.NEW_LINE
 
@@ -264,6 +267,9 @@ public class TVITourBookYearSub extends TVITourBookItem {
 					tourItem.colPower_AvgRightPedalSmoothness = result.getFloat(48);
 
 					tourItem.colPower_PowerToWeight = dbAvgPower / dbBodyWeight;
+
+					tourItem.col_ImportFileName = result.getString(50);
+					tourItem.col_ImportFilePath = result.getString(51);
 
 					// -----------------------------------------------
 

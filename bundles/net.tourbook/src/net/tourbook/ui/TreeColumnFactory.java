@@ -42,6 +42,8 @@ public abstract class TreeColumnFactory {
 	public static final TreeColumnFactory	DRIVING_TIME;
 	public static final TreeColumnFactory	GEAR_FRONT_SHIFT_COUNT;
 	public static final TreeColumnFactory	GEAR_REAR_SHIFT_COUNT;
+	public static final TreeColumnFactory	IMPORT_FILE_NAME;
+	public static final TreeColumnFactory	IMPORT_FILE_PATH;
 	public static final TreeColumnFactory	MAX_ALTITUDE;
 	public static final TreeColumnFactory	MAX_PULSE;
 	public static final TreeColumnFactory	MAX_SPEED;
@@ -395,6 +397,38 @@ public abstract class TreeColumnFactory {
 				colDef.setColumnHeaderText(Messages.ColumnFactory_GearRearShiftCount_Header);
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_GearRearShiftCount_Tooltip);
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+
+				return colDef;
+			};
+		};
+
+		IMPORT_FILE_NAME = new TreeColumnFactory() {
+			@Override
+			public TreeColumnDefinition createColumn(	final ColumnManager columnManager,
+														final PixelConverter pixelConverter) {
+
+				final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "ImportFileName", SWT.LEAD); //$NON-NLS-1$
+
+				colDef.setColumnLabel(Messages.ColumnFactory_import_filename_label);
+				colDef.setColumnHeaderText(Messages.ColumnFactory_import_filename);
+				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_import_filename_tooltip);
+				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
+
+				return colDef;
+			};
+		};
+
+		IMPORT_FILE_PATH = new TreeColumnFactory() {
+			@Override
+			public TreeColumnDefinition createColumn(	final ColumnManager columnManager,
+														final PixelConverter pixelConverter) {
+
+				final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "ImportFilePath", SWT.LEAD); //$NON-NLS-1$
+
+				colDef.setColumnLabel(Messages.ColumnFactory_import_filepath);
+				colDef.setColumnHeaderText(Messages.ColumnFactory_import_filepath);
+				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_import_filepath_tooltip);
+				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
 
 				return colDef;
 			};

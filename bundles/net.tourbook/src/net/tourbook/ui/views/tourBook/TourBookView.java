@@ -862,6 +862,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		defineColumn_Power_TrainingStressScore();
 
 		defineColumn_Person();
+
+		defineColumn_ImportFilePath();
+		defineColumn_ImportFileName();
 	}
 
 	/**
@@ -1251,6 +1254,42 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				}
 
 				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
+	 * Column: Import filename
+	 */
+	private void defineColumn_ImportFileName() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.IMPORT_FILE_NAME.createColumn(_columnManager, _pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final Object element = cell.getElement();
+				if (element instanceof TVITourBookTour) {
+					cell.setText(((TVITourBookTour) element).col_ImportFileName);
+					setCellColor(cell, element);
+				}
+			}
+		});
+	}
+
+	/**
+	 * Column: Import filepath
+	 */
+	private void defineColumn_ImportFilePath() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.IMPORT_FILE_PATH.createColumn(_columnManager, _pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final Object element = cell.getElement();
+				if (element instanceof TVITourBookTour) {
+					cell.setText(((TVITourBookTour) element).col_ImportFilePath);
+					setCellColor(cell, element);
+				}
 			}
 		});
 	}
