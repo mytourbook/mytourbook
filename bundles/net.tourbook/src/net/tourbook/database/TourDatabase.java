@@ -2571,7 +2571,7 @@ public class TourDatabase {
 
 				// version 30 start  -  16.x
 				//
-				+ "	power_Avg								INTEGER DEFAULT 0,								\n" //$NON-NLS-1$
+				+ "	power_Avg								FLOAT DEFAULT 0,								\n" //$NON-NLS-1$
 				+ "	power_Max								INTEGER DEFAULT 0,								\n" //$NON-NLS-1$
 				+ "	power_Normalized						INTEGER DEFAULT 0,								\n" //$NON-NLS-1$
 				+ "	power_FTP								INTEGER DEFAULT 0,								\n" //$NON-NLS-1$
@@ -5896,7 +5896,7 @@ public class TourDatabase {
 			if (isColumnAvailable(conn, TABLE_TOUR_DATA, "power_Avg") == false) { //$NON-NLS-1$
 
 				// Add new columns
-				SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "power_Avg", DEFAULT_0); //$NON-NLS-1$
+				SQL.AddCol_Float(stmt, TABLE_TOUR_DATA, "power_Avg", DEFAULT_0); //$NON-NLS-1$
 				SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "power_Max", DEFAULT_0); //$NON-NLS-1$
 				SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "power_Normalized", DEFAULT_0); //$NON-NLS-1$
 				SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "power_FTP", DEFAULT_0); //$NON-NLS-1$

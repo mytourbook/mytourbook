@@ -141,7 +141,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 	float							colPower_AvgRightPedalSmoothness;
 	int								colPower_PedalLeftRightBalance;
 
-	int								colPower_Avg;
+	float							colPower_Avg;
 	int								colPower_Max;
 	int								colPower_Normalized;
 	long							colPower_TotalWork;

@@ -1122,12 +1122,12 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			public void update(final ViewerCell cell) {
 
 				final Object element = cell.getElement();
-				final long caloriesSum = ((TVITourBookItem) element).colCalories;
+				final long calories = ((TVITourBookItem) element).colCalories;
 
-				if (caloriesSum == 0) {
+				if (calories == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(Long.toString(caloriesSum));
+					cell.setText(_nf1.format((double) calories / 1000));
 				}
 
 				setCellColor(cell, element);
@@ -1454,12 +1454,12 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			public void update(final ViewerCell cell) {
 
 				final Object element = cell.getElement();
-				final int dbValue = ((TVITourBookItem) element).colPower_Avg;
+				final float dbValue = ((TVITourBookItem) element).colPower_Avg;
 
 				if (dbValue == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(Integer.toString(dbValue));
+					cell.setText(_nf1.format(dbValue));
 				}
 
 				setCellColor(cell, element);

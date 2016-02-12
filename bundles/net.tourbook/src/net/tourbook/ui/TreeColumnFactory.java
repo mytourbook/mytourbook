@@ -225,8 +225,8 @@ public abstract class TreeColumnFactory {
 				final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "calories", SWT.TRAIL); //$NON-NLS-1$
 
 				colDef.setColumnLabel(Messages.ColumnFactory_calories_label);
-				colDef.setColumnHeaderText(Messages.ColumnFactory_calories);
-				colDef.setColumnUnit(Messages.ColumnFactory_calories);
+				colDef.setColumnHeaderText(Messages.ColumnFactory_kcal);
+				colDef.setColumnUnit(Messages.ColumnFactory_kcal);
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_calories_tooltip);
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
 

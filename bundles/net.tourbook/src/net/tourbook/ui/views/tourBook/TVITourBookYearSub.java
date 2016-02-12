@@ -248,8 +248,7 @@ public class TVITourBookYearSub extends TVITourBookItem {
 
 					// ----------------- POWER ------------------
 
-					final int dbAvgPower = result.getInt(37);
-					final float dbBodyWeight = result.getFloat(49);
+					final float dbAvgPower = result.getFloat(37);
 
 					tourItem.colPower_Avg = dbAvgPower;
 					tourItem.colPower_Max = result.getInt(38);
@@ -266,7 +265,8 @@ public class TVITourBookYearSub extends TVITourBookItem {
 					tourItem.colPower_AvgLeftPedalSmoothness = result.getFloat(47);
 					tourItem.colPower_AvgRightPedalSmoothness = result.getFloat(48);
 
-					tourItem.colPower_PowerToWeight = dbAvgPower / dbBodyWeight;
+					final float dbBodyWeight = result.getFloat(49);
+					tourItem.colPower_PowerToWeight = dbBodyWeight == 0 ? 0 : dbAvgPower / dbBodyWeight;
 
 					tourItem.col_ImportFileName = result.getString(50);
 					tourItem.col_ImportFilePath = result.getString(51);

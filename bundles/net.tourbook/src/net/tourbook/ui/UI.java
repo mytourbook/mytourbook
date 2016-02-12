@@ -163,6 +163,22 @@ public class UI {
 	public static final String								SYMBOL_EXCLAMATION_POINT		= "!";											//$NON-NLS-1$
 
 	/**
+	 * Convert Joule in Calorie
+	 * <p>
+	 * 1 cal = 4.1868 J<br>
+	 * 1 J = 0.238846 cal
+	 */
+	public static final float								UNIT_CALORIE_2_JOULE			= 4.1868f;
+
+	/**
+	 * Convert Calorie to Joule
+	 * <p>
+	 * 1 cal = 4.1868 J<br>
+	 * 1 J = 0.238846 cal
+	 */
+	public static final float								UNIT_JOULE_2_CALORY				= 1.0f / 4.1868f;
+
+	/**
 	 * Imperial system for distance
 	 */
 	public static final float								UNIT_MILE						= 1.609344f;

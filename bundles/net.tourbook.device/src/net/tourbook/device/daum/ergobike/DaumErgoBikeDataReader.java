@@ -34,6 +34,7 @@ import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.ui.UI;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 
@@ -203,10 +204,14 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 			float cadence;
 			int pulse;
 			int power;
+			float energy = 0;
 			float speed;
 			boolean isFirstTime = true;
 
 			String tokenLine;
+
+			int sumPowerTime = 0;
+			float sumPower = 0;
 
 			// read all data points
 			while ((tokenLine = fileReader.readLine()) != null) {
@@ -215,11 +220,11 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 
 				time = (short) Integer.parseInt(tokenizer.nextToken()); // 				1  Elapsed Time (s)
 				distance = (int) (parseFloat(tokenizer.nextToken()) * 1000); // 		2  Distance (m)
-				tokenizer.nextToken(); // 												3  Phys. kJoule
+				energy = parseFloat(tokenizer.nextToken()); // 							3  Phys. kJoule
 				tokenizer.nextToken(); // 												4  Slope (%)
 				tokenizer.nextToken(); // 												5  NM
-				cadence = parseFloat(tokenizer.nextToken()); // 					6  RPM
-				speed = parseFloat(tokenizer.nextToken()); // 					7  Speed (km/h)
+				cadence = parseFloat(tokenizer.nextToken()); // 						6  RPM
+				speed = parseFloat(tokenizer.nextToken()); // 							7  Speed (km/h)
 				power = Integer.parseInt(tokenizer.nextToken()); //						8  Watt
 				tokenizer.nextToken(); // 												9  Gear
 				tokenizer.nextToken(); // 												10 Device Active
@@ -227,17 +232,26 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 
 				timeDataList.add(timeData = new TimeData());
 
+				final int timeDiff = time - previousTime;
+
 				if (isFirstTime) {
 					isFirstTime = false;
 					timeData.time = 0;
 				} else {
-					timeData.time = time - previousTime;
+					timeData.time = timeDiff;
 				}
 				timeData.distance = distance - previousDistance;
 				timeData.cadence = cadence;
 				timeData.pulse = pulse;
 				timeData.power = power;
 				timeData.speed = speed;
+
+				// ignore small cadence values
+				if (cadence > 10) {
+
+					sumPower += power;
+					sumPowerTime += timeDiff;
+				}
 
 				// prepare next data point
 				previousTime = time;
@@ -252,6 +266,13 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 				 */
 				return true;
 			}
+
+			final float joule = energy * 1000;
+			final float calories = joule * UI.UNIT_JOULE_2_CALORY;
+
+			tourData.setCalories((int) calories);
+			tourData.setPower_TotalWork((long) joule);
+			tourData.setPower_Avg(sumPowerTime == 0 ? 0 : sumPower / sumPowerTime);
 
 			tourData.setDeviceId(deviceId);
 			tourData.setDeviceName(visibleName);

@@ -198,6 +198,8 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_ImportStatus_Tooltip;
 	public static String		ColumnFactory_InetAddress_Label;
 	public static String		ColumnFactory_InetAddress_Url;
+
+	public static String	ColumnFactory_kcal;
 	public static String		ColumnFactory_NumberOfGPSPhotos_Header;
 	public static String		ColumnFactory_NumberOfGPSPhotos_Label;
 	public static String		ColumnFactory_NumberOfGPSPhotos_Tooltip;

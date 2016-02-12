@@ -902,8 +902,9 @@ public class RawDataManager {
 
 		if (reimportId == ReImport.AllTimeSlices || reimportId == ReImport.OnlyPowerAndSpeedValues) {
 
-			// reimport power and speed only when it's from the device
+			oldTourData.setCalories(reimportedTourData.getCalories());
 
+			// reimport power and speed only when it's from the device
 			final boolean isDevicePower = reimportedTourData.isPowerSerieFromDevice();
 			if (isDevicePower) {
 
@@ -960,8 +961,6 @@ public class RawDataManager {
 			oldTourData.longitudeSerie = reimportedTourData.longitudeSerie;
 			oldTourData.pulseSerie = reimportedTourData.pulseSerie;
 			oldTourData.timeSerie = reimportedTourData.timeSerie;
-
-			oldTourData.setCalories(reimportedTourData.getCalories());
 		}
 	}
 

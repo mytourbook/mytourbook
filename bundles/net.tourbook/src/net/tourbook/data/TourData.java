@@ -436,7 +436,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	// ############################################# POWER #############################################
 
-	private int													power_Avg;
+	private float												power_Avg;
 	private int													power_Max;
 	private int													power_Normalized;
 
@@ -5336,7 +5336,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		return photoTimeAdjustment;
 	}
 
-	public int getPower_Avg() {
+	public float getPower_Avg() {
 		return power_Avg;
 	}
 
@@ -6671,7 +6671,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		this.mergeTargetTourId = mergeTargetTourId;
 	}
 
-	public void setPower_Avg(final int avgPower) {
+	public void setPower_Avg(final float avgPower) {
 		this.power_Avg = avgPower;
 	}
 
