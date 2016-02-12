@@ -2876,7 +2876,7 @@ public class TourManager {
 		}
 
 		/*
-		 * cadence
+		 * Cadence
 		 */
 		final float[] cadenceSerie = tourData.cadenceSerie;
 		ChartDataYSerie yDataCadence = null;
@@ -2887,6 +2887,7 @@ public class TourManager {
 			yDataCadence.setYTitle(GRAPH_LABEL_CADENCE);
 			yDataCadence.setUnitLabel(GRAPH_LABEL_CADENCE_UNIT);
 			yDataCadence.setShowYSlider(true);
+			yDataCadence.setDisplayedFractionalDigits(1);
 			yDataCadence.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_CADENCE);
 			yDataCadence.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, _computeAvg_Cadence));
 			yDataCadence.setSliderLabelProvider(new SliderLabelProvider_Cadence(cadenceSerie));

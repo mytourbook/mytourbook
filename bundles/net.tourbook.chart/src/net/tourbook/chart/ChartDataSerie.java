@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -241,8 +241,8 @@ public abstract class ChartDataSerie {
 		_defaultRGB = color;
 	}
 
-	public void setDisplayedFractionalDigits(final int _displayedFractionalDigits) {
-		this._displayedFractionalDigits = _displayedFractionalDigits;
+	public void setDisplayedFractionalDigits(final int displayedFractionalDigits) {
+		_displayedFractionalDigits = displayedFractionalDigits;
 	}
 
 	public void setLabel(final String label) {

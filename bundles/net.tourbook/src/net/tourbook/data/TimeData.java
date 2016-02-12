@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -140,10 +140,10 @@ public class TimeData implements Serializable {
 //				+ (", relativeTime=" + relativeTime) //$NON-NLS-1$
 //				+ (", pulse=" + pulse) //$NON-NLS-1$
 //				+ (", temperature=" + temperature)
-//				+ (", cadence=" + cadence)
+				+ (", cadence=" + cadence)
 //				+ (", altitude=" + altitude) //$NON-NLS-1$
-				+ (", absoluteAltitude=" + absoluteAltitude) //$NON-NLS-1$
-				+ (", distance=" + distance) //$NON-NLS-1$
+//				+ (", absoluteAltitude=" + absoluteAltitude) //$NON-NLS-1$
+//				+ (", distance=" + distance) //$NON-NLS-1$
 //				+ (", gpxDistance=" + gpxDistance)
 //				+ (", absoluteDistance=" + absoluteDistance)
 //				+ (", power=" + power)

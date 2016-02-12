@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -200,7 +200,7 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 			int distance = 0;
 			int previousDistance = 0;
 
-			int cadence;
+			float cadence;
 			int pulse;
 			int power;
 			float speed;
@@ -218,7 +218,7 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 				tokenizer.nextToken(); // 												3  Phys. kJoule
 				tokenizer.nextToken(); // 												4  Slope (%)
 				tokenizer.nextToken(); // 												5  NM
-				cadence = (int) parseFloat(tokenizer.nextToken()); // 					6  RPM
+				cadence = parseFloat(tokenizer.nextToken()); // 					6  RPM
 				speed = parseFloat(tokenizer.nextToken()); // 					7  Speed (km/h)
 				power = Integer.parseInt(tokenizer.nextToken()); //						8  Watt
 				tokenizer.nextToken(); // 												9  Gear
