@@ -104,7 +104,7 @@ public class WEB {
 	private static final String				URL_SPACE								= " ";											//$NON-NLS-1$
 	private static final String				URL_SPACE_REPLACEMENT					= "%20";										//$NON-NLS-1$
 
-	public static final String				HTML_ELEMENT_BR							= "<br>"; //$NON-NLS-1$
+	public static final String				HTML_ELEMENT_BR							= "<br>";										//$NON-NLS-1$
 
 	public static final String				RESPONSE_HEADER_ACCEPT_LANGUAGE			= "Accept-Language";							//$NON-NLS-1$
 	private static final String				RESPONSE_HEADER_CONTENT_ENCODING		= "Content-Encoding";							//$NON-NLS-1$
@@ -148,11 +148,23 @@ public class WEB {
 	private static final IDialogSettings	_state									= Activator.getState(WEB.class
 																							.getCanonicalName());
 
+	/**
+	 * Converts Java newline into HTML newline.
+	 * 
+	 * @param text
+	 * @return
+	 */
 	public static String convertHTML_LineBreaks(final String text) {
 
 		return text.replaceAll("\\r\\n|\\r|\\n", HTML_ELEMENT_BR); //$NON-NLS-1$
 	}
 
+	/**
+	 * Convert Java newline into JS newline.
+	 * 
+	 * @param text
+	 * @return
+	 */
 	public static String convertJS_LineBreaks(final String text) {
 
 		return text.replaceAll("\\r\\n|\\r|\\n", "\\\\n"); //$NON-NLS-1$ //$NON-NLS-2$

@@ -3950,7 +3950,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		final long start = System.currentTimeMillis();
 
 		if (RawDataManager.isAutoOpenImportLog()) {
-			TourLogManager.openLogView();
+			TourLogManager.showLogView();
 		}
 
 		try {
@@ -4079,7 +4079,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		// show error log
 		if (notImportedFiles.size() > 0) {
-			TourLogManager.openLogView();
+			TourLogManager.showLogView();
 		}
 	}
 
@@ -4237,7 +4237,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		ImportDeviceState importState = null;
 
 		if (RawDataManager.isAutoOpenImportLog()) {
-			TourLogManager.openLogView();
+			TourLogManager.showLogView();
 		}
 
 		try {
@@ -4456,7 +4456,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 												final boolean isEasyImport) {
 
 		// open log view always then tour files are deleted
-		TourLogManager.openLogView();
+		TourLogManager.showLogView();
 
 		final String css = isEasyImport //
 				? UI.EMPTY_STRING

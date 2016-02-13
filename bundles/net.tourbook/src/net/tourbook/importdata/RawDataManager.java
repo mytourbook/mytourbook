@@ -308,7 +308,7 @@ public class RawDataManager {
 		}
 
 		if (_importState_IsAutoOpenImportLog) {
-			TourLogManager.openLogView();
+			TourLogManager.showLogView();
 		}
 
 		runImport(osFiles, false, null);
@@ -764,8 +764,12 @@ public class RawDataManager {
 											final File reimportedFile,
 											final TourData oldTourData) {
 
-		boolean isWrongLength = false;
+		final String oldTourDateTimeShort = TourManager.getTourDateTimeShort(oldTourData);
+
 		boolean isWrongTourId = false;
+
+		int oldLength = 0;
+		int reimportedLength = 0;
 
 		for (final TourData reimportedTourData : _newlyImportedTours.values()) {
 
@@ -775,8 +779,21 @@ public class RawDataManager {
 				 * data series must have the same number of time slices, otherwise the markers can
 				 * be off the array bounds, this problem could be solved but takes time to do it.
 				 */
-				if (oldTourData.timeSerie.length != reimportedTourData.timeSerie.length) {
-					isWrongLength = true;
+				oldLength = oldTourData.timeSerie.length;
+				reimportedLength = reimportedTourData.timeSerie.length;
+
+				if (oldLength != reimportedLength) {
+
+					// log error
+					final String message = NLS
+							.bind(Messages.Import_Data_Log_ReimportIsInvalid_WrongSliceNumbers, new Object[] {
+									oldTourDateTimeShort,
+									reimportedFile.toString(),
+									oldLength,
+									reimportedLength });
+
+					TourLogManager.logSubError(message);
+
 					continue;
 				}
 			}
@@ -842,28 +859,18 @@ public class RawDataManager {
 		/*
 		 * reimport failed, display an error message
 		 */
-		final String oldTourDateTimeShort = TourManager.getTourDateTimeShort(oldTourData);
+
+		String message = null;
 
 		if (_newlyImportedTours.size() == 1) {
 
 			// file contains only one tour
 
-			if (isWrongLength) {
+			if (isWrongTourId) {
 
-				MessageDialog.openInformation(
-						Display.getCurrent().getActiveShell(),
-						Messages.import_data_dlg_reimport_title,
-						NLS.bind(Messages.Import_Data_Dialog_ReimportIsInvalid_WrongSliceNumbers_Message, //
-								oldTourDateTimeShort,
-								reimportedFile.toString()));
-
-			} else if (isWrongTourId) {
-				MessageDialog.openInformation(
-						Display.getCurrent().getActiveShell(),
-						Messages.import_data_dlg_reimport_title,
-						NLS.bind(Messages.Import_Data_Dialog_ReimportIsInvalid_DifferentTourId_Message, //
-								oldTourDateTimeShort,
-								reimportedFile.toString()));
+				message = NLS.bind(Messages.Import_Data_Dialog_ReimportIsInvalid_DifferentTourId_Message, //
+						oldTourDateTimeShort,
+						reimportedFile.toString());
 			}
 
 		} else {
@@ -871,12 +878,15 @@ public class RawDataManager {
 			// file contains multiple tours
 
 			// show common error message
-			MessageDialog.openInformation(
-					Display.getCurrent().getActiveShell(),
-					Messages.import_data_dlg_reimport_title,
-					NLS.bind(Messages.Import_Data_Dialog_ReimportIsInvalid_CommonError_Message, //
-							oldTourDateTimeShort,
-							reimportedFile.toString()));
+			message = NLS.bind(Messages.Import_Data_Dialog_ReimportIsInvalid_CommonError_Message, //
+					oldTourDateTimeShort,
+					reimportedFile.toString());
+		}
+
+		if (message != null) {
+
+			TourLogManager.showLogView();
+			TourLogManager.logSubInfo(message);
 		}
 
 		return null;

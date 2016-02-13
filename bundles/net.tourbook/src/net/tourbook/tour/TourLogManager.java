@@ -118,10 +118,10 @@ public class TourLogManager {
 
 		addLog(tourLog);
 
-		Display.getDefault().asyncExec(new Runnable() {
+		Display.getDefault().syncExec(new Runnable() {
 			@Override
 			public void run() {
-				openLogView();
+				showLogView();
 			}
 		});
 
@@ -131,16 +131,32 @@ public class TourLogManager {
 
 	public static void logInfo(final String message) {
 
-		final TourLog tourLog = new TourLog(TourLogState.IMPORT_INFO, message);
+		final String logMessage = WEB.convertHTML_LineBreaks(message);
+
+		final TourLog tourLog = new TourLog(TourLogState.IMPORT_INFO, logMessage);
 
 		tourLog.css = TourLogView.CSS_LOG_INFO;
 
 		addLog(tourLog);
 	}
 
+	public static void logSubError(final String message) {
+		
+		final String logMessage = WEB.convertHTML_LineBreaks(message);
+		
+		final TourLog tourLog = new TourLog(TourLogState.IMPORT_ERROR, logMessage);
+		
+		tourLog.css = TourLogView.CSS_LOG_INFO;
+		tourLog.isSubLogItem = true;
+		
+		addLog(tourLog);
+	}
+
 	public static void logSubInfo(final String message) {
 
-		final TourLog tourLog = new TourLog(TourLogState.IMPORT_INFO, message);
+		final String logMessage = WEB.convertHTML_LineBreaks(message);
+
+		final TourLog tourLog = new TourLog(TourLogState.IMPORT_INFO, logMessage);
 
 		tourLog.css = TourLogView.CSS_LOG_INFO;
 		tourLog.isSubLogItem = true;
@@ -148,16 +164,13 @@ public class TourLogManager {
 		addLog(tourLog);
 	}
 
-	public static void openLogView() {
-
-		if (_logView == null || _logView.isDisposed()) {
-
-			_logView = (TourLogView) Util.showView(TourLogView.ID, true);
-		}
-	}
-
 	public static void setLogView(final TourLogView tourLogView) {
 
 		_logView = tourLogView;
+	}
+
+	public static void showLogView() {
+
+		_logView = (TourLogView) Util.showView(TourLogView.ID, true);
 	}
 }

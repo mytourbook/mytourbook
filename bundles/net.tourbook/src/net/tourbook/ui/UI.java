@@ -153,8 +153,10 @@ public class UI {
 	public static final String								SYMBOL_SUM_WITH_SPACE			= "\u2211 ";									//$NON-NLS-1$
 	public static final String								SYMBOL_TAU						= "\u03c4";									//$NON-NLS-1$
 
-	public static final String								SYMBOL_DOT						= ".";											//$NON-NLS-1$
+	public static final String								SYMBOL_BRACKET_LEFT				= "(";											//$NON-NLS-1$
+	public static final String								SYMBOL_BRACKET_RIGHT			= ")";											//$NON-NLS-1$
 	public static final String								SYMBOL_COLON					= ":";											//$NON-NLS-1$
+	public static final String								SYMBOL_DOT						= ".";											//$NON-NLS-1$
 	public static final String								SYMBOL_EQUAL					= "=";											//$NON-NLS-1$
 	public static final String								SYMBOL_GREATER_THAN				= ">";											//$NON-NLS-1$
 	public static final String								SYMBOL_LESS_THAN				= "<";											//$NON-NLS-1$

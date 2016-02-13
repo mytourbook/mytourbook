@@ -127,9 +127,13 @@ public class TVITourBookYearSub extends TVITourBookItem {
 				+ "power_AvgRightPedalSmoothness, " //				48	//$NON-NLS-1$
 
 				+ "bikerWeight, " //								49	//$NON-NLS-1$
-
+				//
+				// ---------- IMPORT -------------
+				//
 				+ "tourImportFileName, " //							50	//$NON-NLS-1$
-				+ "tourImportFilePath " //							51	//$NON-NLS-1$
+				+ "tourImportFilePath, " //							51	//$NON-NLS-1$
+				+ "devicePluginName, " //							52	//$NON-NLS-1$
+				+ "deviceFirmwareVersion " //						53	//$NON-NLS-1$
 
 				+ UI.NEW_LINE
 
@@ -268,10 +272,28 @@ public class TVITourBookYearSub extends TVITourBookItem {
 					final float dbBodyWeight = result.getFloat(49);
 					tourItem.colPower_PowerToWeight = dbBodyWeight == 0 ? 0 : dbAvgPower / dbBodyWeight;
 
+					// --------------------- IMPORT ------------------
+
 					tourItem.col_ImportFileName = result.getString(50);
 					tourItem.col_ImportFilePath = result.getString(51);
 
+					String dbDeviceName = result.getString(52);
+					String dbFirmwareVersion = result.getString(53);
+
 					// -----------------------------------------------
+
+					dbDeviceName = dbDeviceName == null ? UI.EMPTY_STRING : dbDeviceName;
+					dbFirmwareVersion = dbFirmwareVersion == null ? UI.EMPTY_STRING : dbFirmwareVersion;
+
+					final String deviceName = dbFirmwareVersion.length() == 0//
+							? dbDeviceName
+							: dbDeviceName
+									+ UI.SPACE
+									+ UI.SYMBOL_BRACKET_LEFT
+									+ dbFirmwareVersion
+									+ UI.SYMBOL_BRACKET_RIGHT;
+
+					tourItem.col_DeviceName = deviceName;
 
 					calendar.set(dbYear, dbMonth - 1, dbDay, dbHour, dbMinute);
 					tourItem.colTourDate = calendar.getTimeInMillis();

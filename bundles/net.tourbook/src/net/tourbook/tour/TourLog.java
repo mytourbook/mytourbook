@@ -29,6 +29,7 @@ class TourLog {
 // TOO MUCH DETAIL
 //																.appendLiteral(',')
 //																.appendFractionOfSecond(3, 3)
+
 																.toFormatter();
 
 	public String					time;

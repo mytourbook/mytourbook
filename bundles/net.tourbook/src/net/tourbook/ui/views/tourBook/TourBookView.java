@@ -863,6 +863,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 		defineColumn_Person();
 
+		defineColumn_DeviceName();
 		defineColumn_ImportFilePath();
 		defineColumn_ImportFileName();
 	}
@@ -1157,6 +1158,31 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 					setCellColor(cell, element);
 				}
+			}
+		});
+	}
+
+	/**
+	 * Column: Device name
+	 */
+	private void defineColumn_DeviceName() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.DEVICE_NAME.createColumn(_columnManager, _pc);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final String dbValue = ((TVITourBookItem) element).col_DeviceName;
+
+				if (dbValue == null) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(dbValue);
+				}
+
+				setCellColor(cell, element);
 			}
 		});
 	}
@@ -1696,21 +1722,21 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	}
 
 	private void defineColumn_Power_PowerToWeightRatio() {
-		
+
 		final TreeColumnDefinition colDef = TreeColumnFactory.POWER_POWER_TO_WEIGHT.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
-				
+
 				final Object element = cell.getElement();
 				final float dbValue = ((TVITourBookItem) element).colPower_PowerToWeight;
-				
+
 				if (dbValue == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
 					cell.setText(_nf3.format(dbValue));
 				}
-				
+
 				setCellColor(cell, element);
 			}
 		});

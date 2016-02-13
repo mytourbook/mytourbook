@@ -210,7 +210,7 @@ public class ActionDeleteTour extends Action {
 		}
 
 		// log deletions
-		TourLogManager.openLogView();
+		TourLogManager.showLogView();
 
 		final SelectionDeletedTours selectionRemovedTours = new SelectionDeletedTours();
 
