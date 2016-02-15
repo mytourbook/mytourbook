@@ -700,7 +700,11 @@ public class RawDataManager {
 			 */
 			TourData newTourData = actionReimportTour_40(reimportId, reimportedFile, oldTourData);
 
-			if (newTourData != null) {
+			if (newTourData == null) {
+
+				// error is already logged
+
+			} else {
 
 				isTourReImported = true;
 
@@ -733,10 +737,6 @@ public class RawDataManager {
 
 					_toursInImportView.put(newTourData.getTourId(), newTourData);
 				}
-
-			} else {
-
-				TourLogManager.addSubLog(TourLogState.IMPORT_ERROR, reimportFileNamePath);
 			}
 
 		} else {
@@ -758,20 +758,29 @@ public class RawDataManager {
 	 * @param reimportId
 	 * @param reimportedFile
 	 * @param oldTourData
-	 * @return Returns {@link TourData} with the reimported time slices.
+	 * @return Returns {@link TourData} with the reimported time slices or <code>null</code> when an
+	 *         error occured.
 	 */
 	private TourData actionReimportTour_40(	final ReImport reimportId,
 											final File reimportedFile,
 											final TourData oldTourData) {
 
 		final String oldTourDateTimeShort = TourManager.getTourDateTimeShort(oldTourData);
-
-		boolean isWrongTourId = false;
-
-		int oldLength = 0;
-		int reimportedLength = 0;
+		String message = null;
 
 		for (final TourData reimportedTourData : _newlyImportedTours.values()) {
+
+			// skip tours which have a different tour start time
+			final long reimportTourStartTime = reimportedTourData.getTourStartTimeMS();
+			final long oldTourStartTime = oldTourData.getTourStartTimeMS();
+			final long timeDiff = reimportTourStartTime > oldTourStartTime
+					? reimportTourStartTime - oldTourStartTime
+					: oldTourStartTime - reimportTourStartTime;
+
+			if (timeDiff > 20000) {
+// disabled because .fit files can have different tour start times (of some seconds)
+//				continue;
+			}
 
 			if (oldTourData.timeSerie != null && reimportedTourData.timeSerie != null) {
 
@@ -779,31 +788,37 @@ public class RawDataManager {
 				 * data series must have the same number of time slices, otherwise the markers can
 				 * be off the array bounds, this problem could be solved but takes time to do it.
 				 */
-				oldLength = oldTourData.timeSerie.length;
-				reimportedLength = reimportedTourData.timeSerie.length;
+				final int oldLength = oldTourData.timeSerie.length;
+				final int reimportedLength = reimportedTourData.timeSerie.length;
 
 				if (oldLength != reimportedLength) {
 
 					// log error
-					final String message = NLS
-							.bind(Messages.Import_Data_Log_ReimportIsInvalid_WrongSliceNumbers, new Object[] {
-									oldTourDateTimeShort,
-									reimportedFile.toString(),
-									oldLength,
-									reimportedLength });
+					message = NLS.bind(Messages.Import_Data_Log_ReimportIsInvalid_WrongSliceNumbers, new Object[] {
+							oldTourDateTimeShort,
+							reimportedFile.toString(),
+							oldLength,
+							reimportedLength });
 
-					TourLogManager.logSubError(message);
-
-					continue;
+					break;
 				}
 			}
 
 			/*
 			 * ensure that the reimported tour has the same tour id
 			 */
-			if (oldTourData.getTourId().longValue() != reimportedTourData.getTourId().longValue()) {
-				isWrongTourId = true;
-				continue;
+			final long oldTourId = oldTourData.getTourId().longValue();
+			final long reimportTourId = reimportedTourData.getTourId().longValue();
+
+			if (oldTourId != reimportTourId) {
+
+				message = NLS.bind(Messages.Import_Data_Log_ReimportIsInvalid_DifferentTourId_Message, new Object[] {
+						oldTourDateTimeShort,
+						reimportedFile.toString(),
+						oldTourId,
+						reimportTourId });
+
+				break;
 			}
 
 			TourData newTourData = null;
@@ -820,9 +835,7 @@ public class RawDataManager {
 					|| reimportId == ReImport.OnlyAltitudeValues
 					|| reimportId == ReImport.OnlyGearValues
 					|| reimportId == ReImport.OnlyPowerAndSpeedValues
-					|| reimportId == ReImport.OnlyTemperatureValues
-			//
-			) {
+					|| reimportId == ReImport.OnlyTemperatureValues) {
 
 				// replace part of the tour
 
@@ -833,6 +846,7 @@ public class RawDataManager {
 			} else if (reimportId == ReImport.OnlyTourMarker) {
 
 				// reimport only tour markers
+
 				oldTourData.setTourMarkers(reimportedTourData.getTourMarkers());
 
 				newTourData = oldTourData;
@@ -857,37 +871,18 @@ public class RawDataManager {
 		}
 
 		/*
-		 * reimport failed, display an error message
+		 * A reimport failed, display an error message
 		 */
+		if (message == null) {
 
-		String message = null;
-
-		if (_newlyImportedTours.size() == 1) {
-
-			// file contains only one tour
-
-			if (isWrongTourId) {
-
-				message = NLS.bind(Messages.Import_Data_Dialog_ReimportIsInvalid_DifferentTourId_Message, //
-						oldTourDateTimeShort,
-						reimportedFile.toString());
-			}
+			// undefined error
+			TourLogManager.logSubError(reimportedFile.toString());
 
 		} else {
-
-			// file contains multiple tours
-
-			// show common error message
-			message = NLS.bind(Messages.Import_Data_Dialog_ReimportIsInvalid_CommonError_Message, //
-					oldTourDateTimeShort,
-					reimportedFile.toString());
+			TourLogManager.logSubError(message);
 		}
 
-		if (message != null) {
-
-			TourLogManager.showLogView();
-			TourLogManager.logSubInfo(message);
-		}
+		TourLogManager.showLogView();
 
 		return null;
 	}
@@ -1295,6 +1290,7 @@ public class RawDataManager {
 						_deviceData,
 						_toursInImportView,
 						_newlyImportedTours);
+
 			} catch (final Exception e) {
 				TourLogManager.logEx(e);
 			}

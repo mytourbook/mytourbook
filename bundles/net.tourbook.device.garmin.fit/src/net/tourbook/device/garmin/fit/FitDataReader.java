@@ -17,6 +17,7 @@ package net.tourbook.device.garmin.fit;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashMap;
 
 import net.tourbook.data.TourData;
@@ -103,10 +104,10 @@ public class FitDataReader extends TourbookDevice {
 							|| fieldName.equals("compressed_speed_distance") //$NON-NLS-1$
 							|| fieldName.equals("temperature") //$NON-NLS-1$
 
-//							|| fieldName.equals("front_gear") //$NON-NLS-1$
-//							|| fieldName.equals("front_gear_num") //$NON-NLS-1$
-//							|| fieldName.equals("rear_gear") //$NON-NLS-1$
-//							|| fieldName.equals("rear_gear_num") //$NON-NLS-1$
+							|| fieldName.equals("front_gear") //$NON-NLS-1$
+							|| fieldName.equals("front_gear_num") //$NON-NLS-1$
+							|| fieldName.equals("rear_gear") //$NON-NLS-1$
+							|| fieldName.equals("rear_gear_num") //$NON-NLS-1$
 
 							|| fieldName.equals("enhanced_altitude") //$NON-NLS-1$
 							|| fieldName.equals("enhanced_speed") //$NON-NLS-1$
@@ -125,8 +126,6 @@ public class FitDataReader extends TourbookDevice {
 							|| fieldName.equals("avg_heart_rate") //$NON-NLS-1$
 							|| fieldName.equals("avg_speed") //$NON-NLS-1$
 							|| fieldName.equals("data") //$NON-NLS-1$
-							|| fieldName.equals("device_index") //$NON-NLS-1$
-							|| fieldName.equals("device_type") //$NON-NLS-1$
 							|| fieldName.equals("event_group") //$NON-NLS-1$
 							|| fieldName.equals("end_position_lat") //$NON-NLS-1$
 							|| fieldName.equals("end_position_long") //$NON-NLS-1$
@@ -162,18 +161,63 @@ public class FitDataReader extends TourbookDevice {
 							|| fieldName.equals("left_pedal_smoothness") //$NON-NLS-1$
 							|| fieldName.equals("right_pedal_smoothness") //$NON-NLS-1$
 
+							|| fieldName.equals("functional_threshold_power") //$NON-NLS-1$
+							|| fieldName.equals("power_setting") //$NON-NLS-1$
+							|| fieldName.equals("pwr_calc_type") //$NON-NLS-1$
+
 							// device
 							|| fieldName.equals("manufacturer") //$NON-NLS-1$
-//							|| fieldName.equals("product") //$NON-NLS-1$
+							|| fieldName.equals("serial_number") //$NON-NLS-1$
+							|| fieldName.equals("product") //$NON-NLS-1$
+							|| fieldName.equals("friendly_name") //$NON-NLS-1$
+							|| fieldName.equals("device_index") //$NON-NLS-1$
+							|| fieldName.equals("device_type") //$NON-NLS-1$
 							|| fieldName.equals("software_version") //$NON-NLS-1$
 							|| fieldName.equals("hardware_version") //$NON-NLS-1$
-//							|| fieldName.equals("battery_voltage") //$NON-NLS-1$
-//							|| fieldName.equals("battery_status") //$NON-NLS-1$
+							|| fieldName.equals("battery_voltage") //$NON-NLS-1$
+							|| fieldName.equals("battery_status") //$NON-NLS-1$
 							|| fieldName.equals("ant_network") //$NON-NLS-1$
 							|| fieldName.equals("source_type") //$NON-NLS-1$
-//							|| fieldName.equals("serial_number") //$NON-NLS-1$
 							|| fieldName.equals("cum_operating_time") //$NON-NLS-1$
 
+							|| fieldName.equals("trigger") //$NON-NLS-1$
+							|| fieldName.equals("type") //$NON-NLS-1$
+							|| fieldName.equals("num_laps") //$NON-NLS-1$
+							|| fieldName.equals("num_sessions") //$NON-NLS-1$
+							|| fieldName.equals("sport_index") //$NON-NLS-1$
+							|| fieldName.equals("sub_sport") //$NON-NLS-1$
+
+							|| fieldName.equals("activity_class") //$NON-NLS-1$
+							|| fieldName.equals("default_max_biking_heart_rate") //$NON-NLS-1$
+							|| fieldName.equals("default_max_heart_rate") //$NON-NLS-1$
+							|| fieldName.equals("first_lap_index") //$NON-NLS-1$
+							|| fieldName.equals("hr_calc_type") //$NON-NLS-1$
+							|| fieldName.equals("hr_setting") //$NON-NLS-1$
+
+							|| fieldName.equals("nec_lat") //$NON-NLS-1$
+							|| fieldName.equals("nec_long") //$NON-NLS-1$
+							|| fieldName.equals("swc_lat") //$NON-NLS-1$
+							|| fieldName.equals("swc_long") //$NON-NLS-1$
+
+							|| fieldName.equals("active_time_zone") //$NON-NLS-1$
+							|| fieldName.equals("local_timestamp") //$NON-NLS-1$
+							|| fieldName.equals("time_created") //$NON-NLS-1$
+							|| fieldName.equals("time_offset") //$NON-NLS-1$
+							|| fieldName.equals("time_zone_offset") //$NON-NLS-1$
+							|| fieldName.equals("utc_offset") //$NON-NLS-1$
+
+							|| fieldName.equals("age") //$NON-NLS-1$
+							|| fieldName.equals("gender") //$NON-NLS-1$
+							|| fieldName.equals("height") //$NON-NLS-1$
+							|| fieldName.equals("weight") //$NON-NLS-1$
+							|| fieldName.equals("language") //$NON-NLS-1$
+
+							|| fieldName.equals("dist_setting") //$NON-NLS-1$
+							|| fieldName.equals("elev_setting") //$NON-NLS-1$
+							|| fieldName.equals("position_setting") //$NON-NLS-1$
+							|| fieldName.equals("speed_setting") //$NON-NLS-1$
+							|| fieldName.equals("temperature_setting") //$NON-NLS-1$
+							|| fieldName.equals("weight_setting") //$NON-NLS-1$
 
 							//
 							|| fieldName.equals("unknown") //$NON-NLS-1$
@@ -235,11 +279,7 @@ public class FitDataReader extends TourbookDevice {
 
 		boolean returnValue = false;
 
-		FileInputStream fis = null;
-
-		try {
-
-			fis = new FileInputStream(importFilePath);
+		try (FileInputStream fis = new FileInputStream(importFilePath)) {
 
 			final MesgBroadcaster broadcaster = new MesgBroadcaster(new Decode());
 
@@ -290,10 +330,8 @@ public class FitDataReader extends TourbookDevice {
 
 			returnValue = true;
 
-		} catch (final FileNotFoundException e) {
+		} catch (final IOException e) {
 			TourLogManager.logEx(String.format("Could not read data file '%s'", importFilePath), e); //$NON-NLS-1$
-		} finally {
-			IOUtils.closeQuietly(fis);
 		}
 
 		return returnValue;

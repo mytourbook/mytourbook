@@ -947,6 +947,8 @@ public class Messages extends NLS {
 	public static String		Import_Data_HTML_WatchingOff;
 	public static String		Import_Data_HTML_WatchingOn;
 	public static String		Import_Data_Dialog_EasyImport_NoImportFiles_Message;
+	public static String		Import_Data_Log_ReimportIsInvalid_CommonError_Message;
+	public static String		Import_Data_Log_ReimportIsInvalid_DifferentTourId_Message;
 	public static String		Import_Data_Log_ReimportIsInvalid_WrongSliceNumbers;
 	public static String		Import_Data_Monitor_Backup;
 	public static String		Import_Data_Monitor_Backup_SubTask;

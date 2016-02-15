@@ -1100,9 +1100,8 @@ public class TourManager {
 	}
 
 	public static String getTourDateTimeFull(final Date dt) {
-		return UI.DateFormatterFull.format(dt) + UI.DASH_WITH_SPACE
 
-		;
+		return UI.DateFormatterFull.format(dt) + UI.DASH_WITH_SPACE;
 	}
 
 	/**
@@ -1116,10 +1115,12 @@ public class TourManager {
 	}
 
 	public static String getTourDateTimeShort(final TourData tourData) {
+
 		return UI.DTFormatterShort.print(tourData.getTourStartTime());
 	}
 
 	private static String getTourTimeShort(final Date date) {
+
 		return UI.TimeFormatterShort.format(date.getTime());
 	}
 
@@ -1127,6 +1128,7 @@ public class TourManager {
 	 * @return returns the date of this tour
 	 */
 	public static String getTourTimeShort(final TourData tourData) {
+
 		return UI.TimeFormatterShort.format(tourData.getTourStartTimeMS());
 	}
 

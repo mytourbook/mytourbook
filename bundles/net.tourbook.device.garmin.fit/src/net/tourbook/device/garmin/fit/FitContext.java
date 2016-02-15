@@ -18,6 +18,8 @@ import net.tourbook.tour.TourLogManager;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import com.garmin.fit.EventMesg;
 
@@ -29,7 +31,7 @@ import com.garmin.fit.EventMesg;
  */
 public class FitContext {
 
-	private IPreferenceStore		_prefStore	= Activator.getDefault().getPreferenceStore();
+	private IPreferenceStore		_prefStore		= Activator.getDefault().getPreferenceStore();
 
 	private TourbookDevice			_device;
 	private final String			_importFilePathName;
@@ -58,6 +60,8 @@ public class FitContext {
 	private boolean					_isIgnoreLastMarker;
 	private boolean					_isSetLastMarker;
 	private int						_lastMarkerTimeSlices;
+
+	private final DateTimeFormatter	_dtFormatter	= DateTimeFormat.forStyle("MM");				//$NON-NLS-1$
 
 	public FitContext(	final TourbookDevice device,
 						final String importFilePath,
@@ -109,12 +113,12 @@ public class FitContext {
 				if (recordStartTime != sessionStartTime) {
 
 					final String message = "Import file %s has other session start time, sessionStartTime=%s recordStartTime=%s, Difference=%d sec";//$NON-NLS-1$
-					
+
 					TourLogManager.logSubInfo(String.format(
 							message,
 							_importFilePathName,
-							new DateTime(sessionStartTime),
-							new DateTime(recordStartTime),
+							_dtFormatter.print(sessionStartTime),
+							_dtFormatter.print(recordStartTime),
 							(recordStartTime - sessionStartTime) / 1000));
 				}
 

@@ -2,11 +2,16 @@ package net.tourbook.device.garmin.fit.listeners;
 
 import net.tourbook.device.garmin.fit.FitContext;
 
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
 import com.garmin.fit.AntplusDeviceType;
 import com.garmin.fit.DeviceInfoMesg;
 import com.garmin.fit.DeviceInfoMesgListener;
 
 public class DeviceInfoMesgListenerImpl extends AbstractMesgListener implements DeviceInfoMesgListener {
+
+	private final DateTimeFormatter	_dtFormatter	= DateTimeFormat.forStyle("MM");	//$NON-NLS-1$
 
 	public DeviceInfoMesgListenerImpl(final FitContext context) {
 		super(context);
@@ -33,6 +38,52 @@ public class DeviceInfoMesgListenerImpl extends AbstractMesgListener implements 
 		final Short deviceType = mesg.getDeviceType();
 		final Short antDeviceType = mesg.getAntDeviceType();
 		final Short antplusDeviceType = mesg.getAntplusDeviceType();
+
+//		final AntNetwork antNetwork = mesg.getAntNetwork();
+//		final BodyLocation sensorPosition = mesg.getSensorPosition();
+//		final DateTime timestamp = mesg.getTimestamp();
+//		final Float softwareVersion = mesg.getSoftwareVersion();
+//		final Integer antDeviceNumber = mesg.getAntDeviceNumber();
+//		final Integer garminProduct = mesg.getGarminProduct();
+//		final Integer manufacturer = mesg.getManufacturer();
+//		final Integer product = mesg.getProduct();
+//		final Long cumOperatingTime = mesg.getCumOperatingTime();
+//		final Long serialNumber = mesg.getSerialNumber();
+//		final Short antTransmissionType = mesg.getAntTransmissionType();
+//
+//		final Short antDeviceType = mesg.getAntDeviceType();
+//		final Short antplusDeviceType = mesg.getAntplusDeviceType();
+//		final Short deviceType = mesg.getDeviceType();
+//		final Short deviceIndex = mesg.getDeviceIndex();
+//
+//		final Float batteryVoltage = mesg.getBatteryVoltage();
+//		final Short batteryStatus = mesg.getBatteryStatus();
+//		final Short hardwareVersion = mesg.getHardwareVersion();
+//		final SourceType sourceType = mesg.getSourceType();
+//		final String descriptor = mesg.getDescriptor();
+//		final String productName = mesg.getProductName();
+//
+//		if (serialNumber != null && batteryVoltage != null) {
+//
+//			final long javaTime = (timestamp.getTimestamp() * 1000) + com.garmin.fit.DateTime.OFFSET;
+//
+////			System.out.println();
+////			System.out.println(String.format("manufacturer:   %s", manufacturer == null ? "" : manufacturer));
+////			System.out.println(String.format("product:        %s", product == null ? "" : product));
+////			System.out.println(String.format("productName:    %s", productName == null ? "" : productName));
+////			System.out.println(String.format("deviceType:     %s", deviceType == null ? "" : deviceType));
+////			System.out.println(String.format("serialNumber:   %s", serialNumber == null ? "" : serialNumber));
+////			System.out.println(String.format("batteryVoltage: %s", batteryVoltage == null ? "" : batteryVoltage));
+//
+//			System.out.println(String.format("%s,%s,%s", //
+//
+//					_dtFormatter.print(javaTime),
+//					serialNumber,
+//					batteryVoltage
+//			//
+//					));
+//			// TODO remove SYSTEM.OUT.PRINTLN
+//		}
 
 		if (deviceType != null) {
 

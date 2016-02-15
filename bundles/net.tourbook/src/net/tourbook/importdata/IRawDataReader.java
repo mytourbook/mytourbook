@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -45,7 +45,7 @@ public interface IRawDataReader {
 	 *            This map can be used to check if a tour is already imported and displayed in the
 	 *            import view.
 	 * @param newlyImportedTours
-	 *            Contains all tours which are imported in this method.
+	 *            Contains all tours which are imported by this method.
 	 * @return Returns <code>true</code> when the import was successfull, the parameters
 	 *         <code>deviceData</code> and <code>tourData</code> are set from the imported file.
 	 */

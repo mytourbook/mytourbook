@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,6 +24,7 @@ import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeItem;
 
 public class ActionCollapseAll extends Action {
 
@@ -56,13 +57,38 @@ public class ActionCollapseAll extends Action {
 				// disable redraw that the UI in not flickering
 				tree.setRedraw(false);
 				{
-					treeViewer.collapseAll();
+					try {
+						treeViewer.collapseAll();
+					} catch (final Exception e) {
+						// this occured
+					}
 				}
 				tree.setRedraw(true);
 
-				final Object firstElement = ((StructuredSelection) treeViewer.getSelection()).getFirstElement();
-				if (firstElement != null) {
-					treeViewer.reveal(firstElement);
+				try {
+
+					final StructuredSelection selection = (StructuredSelection) treeViewer.getSelection();
+					if (selection != null) {
+						final Object firstElement = selection.getFirstElement();
+						if (firstElement != null) {
+							treeViewer.reveal(firstElement);
+						}
+					}
+
+				} catch (final Exception e) {
+
+					// this occured, ensure something is selected otherwise further NPEs occure
+
+					final TreeItem[] selection = tree.getSelection();
+
+					for (final TreeItem treeItem : selection) {
+
+						final Object itemData = treeItem.getData();
+
+						_tourViewer.getViewer().setSelection(new StructuredSelection(itemData), true);
+
+						break;
+					}
 				}
 			}
 		}

@@ -49,4 +49,17 @@ class TourLog {
 		this.message = message;
 	}
 
+	@Override
+	public String toString() {
+		return "TourLog ["
+
+//				+ ("time=" + time + ", ")
+//				+ ("state=" + state + ", ")
+				+ ("message=" + message + ", ")
+//				+ ("isSubLogItem=" + isSubLogItem + ", ")
+//				+ ("css=" + css)
+
+				+ "]";
+	}
+
 }
