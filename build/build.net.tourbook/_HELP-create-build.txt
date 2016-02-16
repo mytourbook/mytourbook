@@ -28,7 +28,7 @@ Build with POM (since 16.2)
 		- Set version number in "INSTALL-UPDATES\installer-net.tourbook\win-Inno.Setup\mytourbook-include-app.iss"
 	
 	pom.xml
-		- Replace text "16.1.0-SNAPSHOT" to "16.2.0-SNAPSHOT" in all "pom*.xml" files
+		- Replace text (Ctrl-H) "16.1.0-SNAPSHOT" to "16.2.0-SNAPSHOT" in all "pom*.xml" files
 		
 	
 	Run script "CREATE_MT_BuildFiles.xml" in project "build.net.tourbook"

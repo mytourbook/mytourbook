@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<site>
-   <feature url="features/patch.net.tourbook.app.10.11.0.patch1_10.11.0.201012030709.jar" id="patch.net.tourbook.app.10.11.0.patch1" version="10.11.0.201012030709" patch="true">
-      <category name="MyTourbook 10.11"/>
-   </feature>
-   <category-def name="MyTourbook 10.11" label="MyTourbook 10.11"/>
-</site>
