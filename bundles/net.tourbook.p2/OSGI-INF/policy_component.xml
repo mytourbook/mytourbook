@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.eclipse.equinox.p2.ui.sdk">
+   <implementation class="org.eclipse.equinox.internal.p2.ui.sdk.SDKPolicy"/>
+   <service>
+      <provide interface="org.eclipse.equinox.p2.ui.Policy"/>
+   </service>
+</scr:component>
