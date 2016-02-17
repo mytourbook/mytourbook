@@ -27,6 +27,7 @@
 		<module>net.tourbook.device.garmin.fit</module>
 		<module>net.tourbook.device.nmea</module>
 		<module>net.tourbook.export</module>
+		<module>net.tourbook.p2</module>
 		<module>net.tourbook.photo</module>
 		<module>net.tourbook.printing</module>
 		<module>net.tourbook.statistics</module>

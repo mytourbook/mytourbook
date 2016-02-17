@@ -94,9 +94,9 @@
    </extension>
 
 
+		<!-- Software Updates
 	<extension	point="org.eclipse.ui.actionSets">
    
-		<!-- Software Updates -->
 		<actionSet
 			id="net.tourbook.update.actionSet"
 			label="Update Management"
@@ -112,6 +112,7 @@
 			
 		</actionSet>
 	</extension>
+		 -->
    
    <extension
          point="org.eclipse.ui.editors">

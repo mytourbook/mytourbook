@@ -1,124 +1,135 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.2"?>
 <plugin>
-   	<extension 
-   		id="preferences" point="org.eclipse.core.runtime.preferences" name="%preferences">
-		<initializer class="org.eclipse.equinox.internal.p2.ui.sdk.prefs.PreferenceInitializer"/>
-	</extension>
-    <extension
-         point="org.eclipse.ui.preferencePages">
-              <page
-            name="%provisioningPrefPage"
-            class="org.eclipse.equinox.internal.p2.ui.sdk.prefs.ProvisioningPreferencePage"
-            id="org.eclipse.equinox.internal.p2.ui.sdk.ProvisioningPreferencePage">
-            <keywordReference id="org.eclipse.equinox.p2.ui.sdk.updates.general"/>
-      </page>
-      
-       <page
-            name="%sitesPrefPage"
-            category="org.eclipse.equinox.internal.p2.ui.sdk.ProvisioningPreferencePage"
-            class="org.eclipse.equinox.p2.ui.RepositoryManipulationPage"
-            id="org.eclipse.equinox.internal.p2.ui.sdk.SitesPreferencePage">
-            <keywordReference id="org.eclipse.equinox.p2.ui.sdk.updates.general"/>
-      </page>
- 
-   </extension>
 
-      <extension
-   		point="org.eclipse.ui.keywords">
-      <keyword
-            label="%preferenceKeywords.general"
-            id="org.eclipse.equinox.p2.ui.sdk.updates.general"/>
-      </extension>
-      
-      
-   <extension
-         point="org.eclipse.ui.commands">
-      <command
-            name="%Update.command"
-            id="org.eclipse.equinox.p2.ui.sdk.update">
-      </command>
-      <command
-            name="%Install.command"
-            id="org.eclipse.equinox.p2.ui.sdk.install">
-      </command>
-   </extension>
-   <extension
-         point="org.eclipse.ui.handlers">
-      <handler
-            commandId="org.eclipse.equinox.p2.ui.sdk.update"
-            class="org.eclipse.equinox.internal.p2.ui.sdk.UpdateHandler">
-      </handler>
-      <handler
-            commandId="org.eclipse.equinox.p2.ui.sdk.install"
-            class="org.eclipse.equinox.internal.p2.ui.sdk.InstallNewSoftwareHandler">
-      </handler>
-   </extension>
-   <extension
-         point="org.eclipse.ui.menus">
-      <menuContribution
-            locationURI="menu:help?after=additions">
-            <command
-                  commandId="org.eclipse.equinox.p2.ui.sdk.update"
-            	  mnemonic="%Update.command.mnemonic"
-                  id="org.eclipse.equinox.p2.ui.sdk.update">
-            </command>
-                        
-      </menuContribution>
-      <menuContribution
-            locationURI="menu:help?after=org.eclipse.equinox.p2.ui.sdk.update">
-            <command
-                  commandId="org.eclipse.equinox.p2.ui.sdk.install"
-            	  mnemonic="%Install.command.mnemonic"
-                  id="org.eclipse.equinox.p2.ui.sdk.install">
-            </command>
-                        
-      </menuContribution>
-   </extension>
-   <extension
-         point="org.eclipse.ui.activities">
-      <activity
-            description="%classicCategoryDesc"
-            id="org.eclipse.equinox.p2.ui.sdk.classicUpdate"
-            name="%classicCategoryName">
-      </activity>
-      <activityPatternBinding
-            activityId="org.eclipse.equinox.p2.ui.sdk.classicUpdate"
-            isEqualityPattern="false"
-            pattern=".*org\.eclipse\.update\.internal.*">
-      </activityPatternBinding>
-      <activityPatternBinding
-            activityId="org.eclipse.equinox.p2.ui.sdk.classicUpdate"
-            isEqualityPattern="false"
-            pattern=".*org\.eclipse\.ui\.update.*">
-      </activityPatternBinding>
-      <category
-            description="%classicCategoryDesc"
-            id="org.eclipse.equinox.p2.ui.sdk.category.classicUpdate"
-            name="%classicCategoryName">
-      </category>
-      <categoryActivityBinding
-            activityId="org.eclipse.equinox.p2.ui.sdk.classicUpdate"
-            categoryId="org.eclipse.equinox.p2.ui.sdk.category.classicUpdate">
-      </categoryActivityBinding>
-   </extension>
-      	<extension 
-   		id="preferences" point="org.eclipse.core.runtime.preferences" name="%preferences">
+	<extension		point="org.eclipse.core.runtime.preferences"
+
+		id			="preferences" 
+		name		="%preferences"
+	>
 		<initializer class="org.eclipse.equinox.internal.p2.ui.sdk.prefs.PreferenceInitializer"/>
 	</extension>
-      <extension
-         point="org.eclipse.ui.installationPages">
-          <page
-            name="%installedSoftwarePage"
-            class="org.eclipse.equinox.p2.ui.InstalledSoftwarePage"
-            id="10.org.eclipse.equinox.internal.p2.ui.sdk.InstalledSoftwarePage">
-          </page>
-          <page
-            name="%installHistoryPage"
-            class="org.eclipse.equinox.internal.p2.ui.sdk.RevertProfilePageExtensionFactory"
-            id="11.org.eclipse.equinox.internal.p2.ui.sdk.RevertProfilePage">
-          </page>
-          
-      </extension>
+
+	<extension		point="org.eclipse.ui.preferencePages">
+
+		<page
+			name	="%provisioningPrefPage"
+			class	="org.eclipse.equinox.internal.p2.ui.sdk.prefs.ProvisioningPreferencePage"
+			id		="org.eclipse.equinox.internal.p2.ui.sdk.ProvisioningPreferencePage"
+		>
+			<keywordReference id="org.eclipse.equinox.p2.ui.sdk.updates.general"/>
+		</page>
+		
+		<page
+			name	="%sitesPrefPage"
+			class	="org.eclipse.equinox.p2.ui.RepositoryManipulationPage"
+			id		="org.eclipse.equinox.internal.p2.ui.sdk.SitesPreferencePage"
+			category="org.eclipse.equinox.internal.p2.ui.sdk.ProvisioningPreferencePage"
+		>
+			<keywordReference id="org.eclipse.equinox.p2.ui.sdk.updates.general"/>
+		</page>
+
+	</extension>
+
+
+	<extension		point="org.eclipse.ui.keywords">
+		<keyword
+			label	="%preferenceKeywords.general"
+			id		="org.eclipse.equinox.p2.ui.sdk.updates.general"
+		/>
+	</extension>
+
+
+	<extension		point="org.eclipse.ui.installationPages">
+		<page
+			name	="%installedSoftwarePage"
+			id		="10.org.eclipse.equinox.internal.p2.ui.sdk.InstalledSoftwarePage"
+			class	="org.eclipse.equinox.p2.ui.InstalledSoftwarePage"
+		/>
+		<page
+			name	="%installHistoryPage"
+			id		="11.org.eclipse.equinox.internal.p2.ui.sdk.RevertProfilePage"
+			class	="org.eclipse.equinox.internal.p2.ui.sdk.RevertProfilePageExtensionFactory"
+		/>
+	</extension>
+
+
+	<extension		point="org.eclipse.ui.commands">
+		<command
+			name	="%Update.command"
+			id		="org.eclipse.equinox.p2.ui.sdk.update"
+		/>
+		<command
+			name	="%Install.command"
+			id		="org.eclipse.equinox.p2.ui.sdk.install"
+		/>
+	</extension>
+
+	<extension	point="org.eclipse.ui.handlers">
+		<handler
+			commandId	="org.eclipse.equinox.p2.ui.sdk.update"
+			class		="org.eclipse.equinox.internal.p2.ui.sdk.UpdateHandler"
+		/>
+		
+		<handler
+			commandId	="org.eclipse.equinox.p2.ui.sdk.install"
+			class		="org.eclipse.equinox.internal.p2.ui.sdk.InstallNewSoftwareHandler"
+		/>
+	</extension>
+
+
+	<extension		point="org.eclipse.ui.menus">
+	
+		<menuContribution	locationURI="menu:m_Help?after=g_SoftwareUpdate">
+			<command
+				id			="org.eclipse.equinox.p2.ui.sdk.update"
+				commandId	="org.eclipse.equinox.p2.ui.sdk.update"
+				mnemonic	="%Update.command.mnemonic"
+			/>
+		</menuContribution>
+		
+		<menuContribution	locationURI="menu:m_Help?after=org.eclipse.equinox.p2.ui.sdk.update">
+			<command
+				id			="org.eclipse.equinox.p2.ui.sdk.install"
+				commandId	="org.eclipse.equinox.p2.ui.sdk.install"
+				mnemonic	="%Install.command.mnemonic"
+			/>
+		</menuContribution>
+
+	</extension>
+
+
+	<extension		point="org.eclipse.ui.activities">
+
+		<activity
+			id				="org.eclipse.equinox.p2.ui.sdk.classicUpdate"
+			name			="%classicCategoryName"
+			description		="%classicCategoryDesc"
+		/>
+
+		<activityPatternBinding
+			activityId		="org.eclipse.equinox.p2.ui.sdk.classicUpdate"
+			pattern			=".*org\.eclipse\.update\.internal.*"
+			isEqualityPattern="false"
+		/>
+
+		<activityPatternBinding
+			activityId		="org.eclipse.equinox.p2.ui.sdk.classicUpdate"
+			pattern			=".*org\.eclipse\.ui\.update.*"
+			isEqualityPattern="false"
+		/>
+
+		<category
+			id				="org.eclipse.equinox.p2.ui.sdk.category.classicUpdate"
+			name			="%classicCategoryName"
+			description		="%classicCategoryDesc"
+		/>
+
+		<categoryActivityBinding
+			activityId="org.eclipse.equinox.p2.ui.sdk.classicUpdate"
+			categoryId="org.eclipse.equinox.p2.ui.sdk.category.classicUpdate"
+		/>
+
+	</extension>
 
 </plugin>
