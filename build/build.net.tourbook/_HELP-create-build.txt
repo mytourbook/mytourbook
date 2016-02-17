@@ -35,9 +35,13 @@ Build with POM (since 16.2)
 	
 	Open cmd
 		- Select folder "C:\DAT\MT\mytourbook"
-		- Run "mvn verify"
+		- Run "mvn verify -P build-release"
 
 
+* Update site
+
+	Open cmd
+		- Run "mvn verify -P build-update-site"
 
 
 vvvv --- BUILD COMMANDS UNTIL 16.1 --- vvvv

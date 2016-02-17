@@ -18,17 +18,35 @@
 	</properties>
 
 	<modules>
-	
 		<!-- artifact.bundles -->
 		<module>../../mytourbook-BUILD-autocreated/core</module>
 		
 		<!-- artifact.mytourbook.plugins.i18 -->
 		<module>../../mytourbook-BUILD-autocreated/translation</module>
-		
-		<module>features</module>
-		<module>build</module>
-
 	</modules>
+	
+
+	<profiles>
+	
+		<profile>
+			<id>build-release</id>
+			<modules>
+				<module>features</module>
+				<module>build</module>
+			</modules>
+		
+		</profile>
+
+		<profile>
+			<id>build-update-site</id>
+			<modules>
+				<module>features</module>
+				<module>update-site/update-site.test</module>
+			</modules>
+		</profile>
+	
+	</profiles>
+
 
 	<repositories>
 	
