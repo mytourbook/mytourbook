@@ -218,7 +218,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private final DateTimeFormatter						_dtFormatter;
 	private final DateTimeFormatter						_isoFormatter;
 	private final NumberFormat							_nf1;
-	private final NumberFormat							_nf3;
+	private final NumberFormat							_nf2;
 	private final NumberFormat							_nf1_NoGroup;
 
 	private final Calendar								_calendar;
@@ -229,9 +229,9 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
 
-		_nf3 = NumberFormat.getNumberInstance();
-		_nf3.setMinimumFractionDigits(3);
-		_nf3.setMaximumFractionDigits(3);
+		_nf2 = NumberFormat.getNumberInstance();
+		_nf2.setMinimumFractionDigits(2);
+		_nf2.setMaximumFractionDigits(2);
 
 		_nf1_NoGroup = NumberFormat.getNumberInstance();
 		_nf1_NoGroup.setMinimumFractionDigits(1);
@@ -1638,7 +1638,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				if (dbValue == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(_nf3.format(dbValue));
+					cell.setText(_nf2.format(dbValue));
 				}
 
 				setCellColor(cell, element);
@@ -1734,7 +1734,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				if (dbValue == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(_nf3.format(dbValue));
+					cell.setText(_nf2.format(dbValue));
 				}
 
 				setCellColor(cell, element);
@@ -1759,7 +1759,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				if (dbValue == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(_nf3.format((double) dbValue / 1000000));
+					cell.setText(_nf2.format((double) dbValue / 1000000));
 				}
 
 				setCellColor(cell, element);
