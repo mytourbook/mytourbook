@@ -1,13 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="MyTourbook" 
-	uid					="net.tourbook.product" 
-	id					="net.tourbook.product" 
-	application=		"net.tourbook.application" 
-	version				="16.2.0.qualifier" 
-	useFeatures			="true" 
-	includeLaunchers	="true">
+<product name="MyTourbook" uid="net.tourbook.product" id="net.tourbook.product" application="net.tourbook.application" version="16.2.0.qualifier" useFeatures="true" includeLaunchers="true">
 
    <aboutInfo>
       <image path="../../bundles/net.tourbook/icons/application/tourbook-about.png"/>
@@ -17,10 +11,10 @@
    </aboutInfo>
 
    <configIni use="default">
-      <linux>../../bundles/net.tourbook/install-settings/config-linux.ini</linux>
-      <macosx>../../bundles/net.tourbook/install-settings/config-osx.ini</macosx>
-      <solaris>../../bundles/net.tourbook/install-settings/config-linux.ini</solaris>
-      <win32>../../bundles/net.tourbook/install-settings/config-win.ini</win32>
+      <linux>config-linux.ini</linux>
+      <macosx>config-osx.ini</macosx>
+      <solaris>config-linux.ini</solaris>
+      <win32>config-win-DEBUG.ini</win32>
    </configIni>
 
    <launcherArgs>
@@ -35,12 +29,7 @@
       </vmArgsLin>
    </launcherArgs>
 
-   <windowImages 
-	i16		="../../bundles/net.tourbook/icons/application/tourbook16.png" 
-	i32		="../../bundles/net.tourbook/icons/application/tourbook32.png" 
-	i48		="../../bundles/net.tourbook/icons/application/tourbook48.png" 
-	i64		="../../bundles/net.tourbook/icons/application/tourbook64.png" 
-	i128	="../../bundles/net.tourbook/icons/application/tourbook128.png"/>
+   <windowImages i16="../../bundles/net.tourbook/icons/application/tourbook16.png" i32="../../bundles/net.tourbook/icons/application/tourbook32.png" i48="../../bundles/net.tourbook/icons/application/tourbook48.png" i64="../../bundles/net.tourbook/icons/application/tourbook64.png" i128="../../bundles/net.tourbook/icons/application/tourbook128.png"/>
 
    <splash
       location="net.tourbook"
@@ -58,7 +47,6 @@
             winLargeHigh="../../bundles/net.tourbook/icons/application/win/tourbook48-32.bmp"/>
       </win>
    </launcher>
-
 
    <vm>
    </vm>
@@ -356,5 +344,12 @@ END OF TERMS AND CONDITIONS
       <feature id="build.net.tourbook.feature"/>
    </features>
 
+   <configurations>
+      <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="4" />
+      <plugin id="org.eclipse.equinox.common" autoStart="true" startLevel="2" />
+      <plugin id="org.eclipse.equinox.ds" autoStart="true" startLevel="2" />
+      <plugin id="org.eclipse.equinox.simpleconfigurator" autoStart="true" startLevel="1" />
+      <plugin id="org.eclipse.update.configurator" autoStart="true" startLevel="4" />
+   </configurations>
 
 </product>
