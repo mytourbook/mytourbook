@@ -16,7 +16,9 @@
 	</parent>
 	
 	<modules>
+<!--
 		<module>build.net.tourbook.feature</module>
+-->
 		<module>build.net.tourbook.product</module>
 	</modules>
 
