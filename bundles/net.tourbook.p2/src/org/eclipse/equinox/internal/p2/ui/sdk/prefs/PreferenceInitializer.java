@@ -30,7 +30,9 @@ import org.osgi.service.prefs.Preferences;
 public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
 	public static void migratePreferences() {
+
 		Preferences pref = new ProfileScope(getDefaultAgentLocation(), IProfileRegistry.SELF).getNode(ProvSDKUIActivator.PLUGIN_ID);
+
 		try {
 			if (pref.keys().length == 0) {
 				// migrate preferences from instance scope to profile scope

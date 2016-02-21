@@ -11,9 +11,7 @@
 package org.eclipse.equinox.internal.p2.ui.sdk;
 
 import org.eclipse.core.runtime.IExecutableExtensionFactory;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.p2.ui.RevertProfilePage;
-import org.osgi.framework.Bundle;
 
 public class RevertProfilePageExtensionFactory implements IExecutableExtensionFactory {
 
@@ -22,10 +20,6 @@ public class RevertProfilePageExtensionFactory implements IExecutableExtensionFa
 	 * @see org.eclipse.core.runtime.IExecutableExtensionFactory#create()
 	 */
 	public Object create() {
-		Bundle bundle = Platform.getBundle("org.eclipse.compare"); //$NON-NLS-1$
-		if (bundle == null) {
-			return new RevertProfilePage();
-		}
-		return new RevertProfilePageWithCompare();
+		return new RevertProfilePage();
 	}
 }

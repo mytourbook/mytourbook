@@ -25,16 +25,12 @@
       <import plugin="org.eclipse.core.jobs"/>
       <import plugin="org.eclipse.core.net"/>
       <import plugin="org.eclipse.core.runtime.compatibility.auth"/>
-      <import plugin="org.eclipse.core.runtime"/>
       <import plugin="org.eclipse.help"/>
       <import plugin="org.eclipse.jface.databinding"/>
       <import plugin="org.eclipse.jface"/>
       <import plugin="org.eclipse.swt"/>
       <import plugin="org.eclipse.ui.forms"/>
       <import plugin="org.eclipse.ui.workbench"/>
-      <import plugin="org.eclipse.update.configurator"/>
-      <import plugin="org.eclipse.update.core"/>
-      <import plugin="org.eclipse.update.ui"/>
       <import plugin="org.eclipse.ui"/>
       <import plugin="org.eclipse.equinox.app"/>
       <import plugin="org.eclipse.equinox.common"/>
@@ -45,6 +41,8 @@
       <import plugin="org.eclipse.equinox.security"/>
       <import plugin="org.eclipse.equinox.util"/>
       <import plugin="org.eclipse.ui.views.log"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.equinox.p2.ui"/>
    </requires>
 
    <plugin
@@ -145,30 +143,6 @@
 
    <plugin
          id="org.eclipse.ui.workbench.nl_de"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.update.configurator.nl_de"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.update.core.nl_de"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.update.ui.nl_de"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -353,30 +327,6 @@
 
    <plugin
          id="org.eclipse.ui.workbench.nl_fr"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.update.configurator.nl_fr"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.update.core.nl_fr"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.update.ui.nl_fr"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -576,30 +526,6 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.update.configurator.nl_nl"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.update.core.nl_nl"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.update.ui.nl_nl"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
          id="org.eclipse.ui.nl_nl"
          download-size="0"
          install-size="0"
@@ -792,30 +718,6 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.update.configurator.nl_it"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.update.core.nl_it"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.update.ui.nl_it"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
          id="org.eclipse.ui.nl_it"
          download-size="0"
          install-size="0"
@@ -910,9 +812,6 @@
          version="0.0.0"
          fragment="true"
          unpack="false"/>
-
-
-   <!-- SPAIN -->	
 
    <plugin
          id="org.eclipse.core.commands.nl_es"
@@ -1107,33 +1006,6 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.update.configurator.nl_es"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.update.core.nl_es"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.update.ui.nl_es"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-
-   <!-- CZECH -->	
-
-   <plugin
          id="org.eclipse.core.commands.nl_cs"
          download-size="0"
          install-size="0"
@@ -1326,7 +1198,7 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.update.configurator.nl_cs"
+         id="org.eclipse.equinox.p2.ui.nl_cs"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -1334,7 +1206,7 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.update.core.nl_cs"
+         id="org.eclipse.equinox.p2.ui.nl_de"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -1342,7 +1214,31 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.update.ui.nl_cs"
+         id="org.eclipse.equinox.p2.ui.nl_es"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.equinox.p2.ui.nl_fr"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.equinox.p2.ui.nl_it"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.equinox.p2.ui.nl_nl"
          download-size="0"
          install-size="0"
          version="0.0.0"

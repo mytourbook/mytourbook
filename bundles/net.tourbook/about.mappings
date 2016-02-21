@@ -2,3 +2,6 @@
 # version is also set in net.tourbook.application.ApplicationVersion 
 0=16.2.0
 1=2016
+
+#this do not work but it can when ALL is correctly configured
+#0=${unqualifiedVersion}-${version-suffix}

@@ -10,10 +10,14 @@
  *******************************************************************************/
 package org.eclipse.equinox.internal.p2.ui.sdk;
 
-import org.eclipse.core.runtime.*;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.equinox.p2.operations.RepositoryTracker;
 import org.eclipse.equinox.p2.operations.UpdateOperation;
 import org.eclipse.equinox.p2.ui.LoadMetadataRepositoryJob;
+import org.eclipse.equinox.p2.ui.Policy;
+import org.eclipse.equinox.p2.ui.ProvisioningUI;
 import org.eclipse.jface.dialogs.MessageDialog;
 
 /**
@@ -23,46 +27,63 @@ import org.eclipse.jface.dialogs.MessageDialog;
  */
 public class UpdateHandler extends PreloadingRepositoryHandler {
 
-	boolean hasNoRepos = false;
-	UpdateOperation operation;
+	boolean			hasNoRepos	= false;
 
-	protected void doExecute(LoadMetadataRepositoryJob job) {
+	UpdateOperation	operation;
+
+	@Override
+	protected void doExecute(final LoadMetadataRepositoryJob job) {
+
+		final ProvisioningUI provisioningUI = getProvisioningUI();
+		final Policy policy = provisioningUI.getPolicy();
+
 		if (hasNoRepos) {
-			if (getProvisioningUI().getPolicy().getRepositoriesVisible()) {
-				boolean goToSites = MessageDialog.openQuestion(getShell(), ProvSDKMessages.UpdateHandler_NoSitesTitle, ProvSDKMessages.UpdateHandler_NoSitesMessage);
+			if (policy.getRepositoriesVisible()) {
+
+				final boolean goToSites = MessageDialog.openQuestion(
+						getShell(),
+						ProvSDKMessages.UpdateHandler_NoSitesTitle,
+						ProvSDKMessages.UpdateHandler_NoSitesMessage);
+
 				if (goToSites) {
-					getProvisioningUI().manipulateRepositories(getShell());
+					provisioningUI.manipulateRepositories(getShell());
 				}
 			}
 			return;
 		}
 		// Report any missing repositories.
 		job.reportAccumulatedStatus();
-		if (getProvisioningUI().getPolicy().continueWorkingWithOperation(operation, getShell())) {
-			getProvisioningUI().openUpdateWizard(false, operation, job);
+		if (policy.continueWorkingWithOperation(operation, getShell())) {
+			provisioningUI.openUpdateWizard(false, operation, job);
 		}
 	}
 
-	protected void doPostLoadBackgroundWork(IProgressMonitor monitor) throws OperationCanceledException {
+	@Override
+	protected void doPostLoadBackgroundWork(final IProgressMonitor monitor) throws OperationCanceledException {
 		operation = getProvisioningUI().getUpdateOperation(null, null);
 		// check for updates
-		IStatus resolveStatus = operation.resolveModal(monitor);
-		if (resolveStatus.getSeverity() == IStatus.CANCEL)
+		final IStatus resolveStatus = operation.resolveModal(monitor);
+		if (resolveStatus.getSeverity() == IStatus.CANCEL) {
 			throw new OperationCanceledException();
-	}
-
-	protected boolean preloadRepositories() {
-		hasNoRepos = false;
-		RepositoryTracker repoMan = getProvisioningUI().getRepositoryTracker();
-		if (repoMan.getKnownRepositories(getProvisioningUI().getSession()).length == 0) {
-			hasNoRepos = true;
-			return false;
 		}
-		return super.preloadRepositories();
 	}
 
 	@Override
 	protected String getProgressTaskName() {
 		return ProvSDKMessages.UpdateHandler_ProgressTaskName;
+	}
+
+	@Override
+	protected boolean preloadRepositories() {
+
+		hasNoRepos = false;
+		final RepositoryTracker repoMan = getProvisioningUI().getRepositoryTracker();
+
+		if (repoMan.getKnownRepositories(getProvisioningUI().getSession()).length == 0) {
+			hasNoRepos = true;
+			return false;
+		}
+
+		return super.preloadRepositories();
 	}
 }

@@ -27,21 +27,22 @@
       <import plugin="org.eclipse.core.runtime"/>
       <import plugin="org.eclipse.core.expressions"/>
       <import plugin="net.tourbook.ext.jars"/>
+      <import plugin="net.tourbook.ext.velocity"/>
       <import plugin="net.tourbook.ext.jars.printing"/>
+      <import plugin="net.tourbook.ext.rxtx_2.2"/>
       <import plugin="org.eclipse.ui.forms"/>
+      <import plugin="net.tourbook.ext.worldwind_2.0"/>
       <import plugin="org.eclipse.core.databinding"/>
-      <import plugin="org.eclipse.update.ui"/>
+      <import plugin="org.apache.derby"/>
       <import plugin="net.tourbook.ext.ejb3"/>
       <import plugin="de.byteholder.geoclipse.ext.geotools"/>
-      <import plugin="net.tourbook.common"/>
-      <import plugin="net.tourbook"/>
-      <import plugin="net.tourbook.ext.velocity"/>
-      <import plugin="net.tourbook.chart"/>
-      <import plugin="net.tourbook.device"/>
-      <import plugin="net.tourbook.photo"/>
-      <import plugin="net.tourbook.ext.rxtx_2.2"/>
-      <import plugin="net.tourbook.ext.worldwind_2.0"/>
-      <import plugin="org.apache.derby"/>
+      <import plugin="org.eclipse.ui" version="3.6.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.equinox.p2.ui"/>
+      <import plugin="org.eclipse.osgi"/>
+      <import plugin="org.eclipse.equinox.p2.core"/>
+      <import plugin="org.eclipse.equinox.p2.engine"/>
+      <import plugin="org.eclipse.equinox.p2.metadata"/>
+      <import plugin="org.eclipse.equinox.p2.operations"/>
    </requires>
 
    <plugin

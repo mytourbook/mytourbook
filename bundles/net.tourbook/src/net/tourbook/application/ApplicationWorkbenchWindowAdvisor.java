@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -46,6 +46,7 @@ import net.tourbook.web.WebContentServer;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.equinox.internal.p2.ui.sdk.ProvSDKUIActivator;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ISelection;
@@ -82,6 +83,7 @@ import org.eclipse.ui.internal.WorkbenchPlugin;
 @SuppressWarnings("restriction")
 public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
+
 	private ApplicationActionBarAdvisor			_applicationActionBarAdvisor;
 
 	private IPerspectiveDescriptor				_lastPerspective;
@@ -107,6 +109,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 				+ ApplicationVersion.getVersionSimple()
 				+ ApplicationVersion.getDevelopmentId();
 	}
+
 
 	public static void setupProxy() {
 
@@ -445,7 +448,6 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 //		System.out.println("postWindowOpen()\t");
 //		// TODO remove SYSTEM.OUT.PRINTLN
 
-
 		Display.getDefault().asyncExec(new Runnable() {
 			@Override
 			public void run() {
@@ -457,6 +459,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 				setupAppSelectionListener();
 
 				setupProxy();
+				ProvSDKUIActivator.setUpdateSites();
 			}
 		});
 	}
