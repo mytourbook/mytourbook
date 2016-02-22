@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="build.net.tourbook.feature"
+      label="MyTourbook Product Features"
+      version="16.2.0.qualifier"
+      provider-name="MyTourbook">
+
+   <description>
+      MyTourbook Application.
+   </description>
+
+   <copyright>
+      %copyright
+   </copyright>
+
+   <license url="http://www.gnu.org/copyleft/gpl.html">
+      %license
+   </license>
+
+   <url>
+      <update label="%updateSiteName" url="http://mytourbook.sourceforge.net/updates/"/>
+   </url>
+
+   <includes
+         id="org.eclipse.rcp"
+         version="0.0.0"/>
+
+   <includes
+         id="feature.net.tourbook.ext.eclipse"
+         version="0.0.0"/>
+
+   <includes
+         id="feature.net.tourbook.ext.eclipse.nl"
+         version="0.0.0"/>
+
+   <includes
+         id="feature.net.tourbook.app"
+         version="0.0.0"/>
+
+   <includes
+         id="feature.net.tourbook.app.nl"
+         version="0.0.0"/>
+
+   <includes
+         id="feature.net.tourbook.ext.derby"
+         version="0.0.0"/>
+
+   <includes
+         id="feature.net.tourbook.ext.ejb3"
+         version="0.0.0"/>
+
+   <includes
+         id="feature.net.tourbook.ext.jars"
+         version="0.0.0"/>
+
+   <includes
+         id="feature.net.tourbook.ext.rxtx"
+         version="0.0.0"/>
+
+   <includes
+         id="feature.net.tourbook.ext.worldwind"
+         version="0.0.0"/>
+
+</feature>

@@ -341,14 +341,7 @@ END OF TERMS AND CONDITIONS
    </plugins>
 
    <features>
-      <feature id="org.eclipse.rcp"/>
-      <feature id="feature.net.tourbook.ext.eclipse"/>
-      <feature id="feature.net.tourbook.ext.derby"/>
-      <feature id="feature.net.tourbook.ext.ejb3"/>
-      <feature id="feature.net.tourbook.ext.jars"/>
-      <feature id="feature.net.tourbook.ext.rxtx"/>
-      <feature id="feature.net.tourbook.app"/>
-      <feature id="feature.net.tourbook.ext.worldwind"/>
+      <feature id="build.net.tourbook.feature" version="16.2.0.qualifier"/>
    </features>
 
    <configurations>
