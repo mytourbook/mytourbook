@@ -5,40 +5,43 @@ Build with POM (since 16.2)
 
 ###########################
 
-- Switch to workspace "C:\DAT\ws_MT-e38"
+Switch to workspace "C:\DAT\ws_MT-e38"
 
+Set version number / year in
+	- "about.mappings"
+	- "net.tourbook.application.ApplicationVersion"
+	- Replace text (Ctrl-H) "16.1.0-SNAPSHOT" to "16.2.0-SNAPSHOT" in all "pom*.xml"
+	- Replace text (Ctrl-H) "16.1.0.qualifier" to "16.2.0.qualifier" in all other files
 
-
-- Switch to workspace "C:\DAT\ws_MT-e38
-
-	Set version number / year in
-		- about.mappings
-		- net.tourbook.application.ApplicationVersion
-
-	"feature.net.tourbook.app"
-		- Set version number in "feature.xml"
-		- Force feature version number into net.tourbook.* plugins
-		- Set synch option back to "synch versions on build (recommended)"
-
-	"build.net.tourbook.product"
-		- Set version number in "net.tourbook.product" 
-		
-	Win-Installer
-		- Set version number in "INSTALL-UPDATES\installer-net.tourbook\win-Inno.Setup\mytourbook-include-app.iss"
 	
-	pom.xml
-		- Replace text (Ctrl-H) "16.1.0-SNAPSHOT" to "16.2.0-SNAPSHOT" in all "pom*.xml" files
-		
+Win-Installer
+	- Set version number in "INSTALL-UPDATES\installer-net.tourbook\win-Inno.Setup\mytourbook-include-app.iss"
+
 	
-	Run script "CREATE_MT_BuildFiles.xml" in project "build.net.tourbook"
+Remove debug code
+
+	- "config.ini" in "net.tourbook.product"
 	
-	Open cmd
-		- Select folder "C:\DAT\MT\mytourbook"
-		- Run "mvn verify -P build-release"
-		- Run "mvn verify -P build-release -X --log-file log.txt"
+	  Disable	"<win32>config-win-DEBUG.ini</win32>"
+	  Enable	"<win32>config-win.ini</win32>"
+	
+	  
+	- Update site in "org.eclipse.equinox.internal.p2.ui.sdk.P2_Activator"
+	
+	  Disable	"file:/C:/DAT/MT/mytourbook/build/build.update-site.test/target/repository"
+	  Enable	"http://mytourbook.sourceforge.net/updates"
 
 
-* Update site
+Run ant script "CREATE_MT_BuildFiles.xml" in project "build.net.tourbook"
+
+
+Open cmd
+	- Select folder "C:\DAT\MT\mytourbook"
+	- Run "mvn verify -P build-release"
+	- Run "mvn verify -P build-release -X --log-file log.txt"
+
+
+Create Update site
 
 	Open cmd
 		- Run "mvn verify -P build-update-site"

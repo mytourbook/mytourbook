@@ -14,7 +14,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.*;
 import org.eclipse.equinox.internal.p2.ui.sdk.ProvSDKMessages;
-import org.eclipse.equinox.internal.p2.ui.sdk.ProvSDKUIActivator;
+import org.eclipse.equinox.internal.p2.ui.sdk.P2_Activator;
 import org.eclipse.equinox.p2.core.IAgentLocation;
 import org.eclipse.equinox.p2.engine.IProfileRegistry;
 import org.eclipse.equinox.p2.engine.ProfileScope;
@@ -31,12 +31,12 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
 	public static void migratePreferences() {
 
-		Preferences pref = new ProfileScope(getDefaultAgentLocation(), IProfileRegistry.SELF).getNode(ProvSDKUIActivator.PLUGIN_ID);
+		Preferences pref = new ProfileScope(getDefaultAgentLocation(), IProfileRegistry.SELF).getNode(P2_Activator.PLUGIN_ID);
 
 		try {
 			if (pref.keys().length == 0) {
 				// migrate preferences from instance scope to profile scope
-				Preferences oldPref = new InstanceScope().getNode(ProvSDKUIActivator.PLUGIN_ID);
+				Preferences oldPref = new InstanceScope().getNode(P2_Activator.PLUGIN_ID);
 				// don't migrate everything.  Some of the preferences moved to
 				// another bundle.
 				pref.put(PreferenceConstants.PREF_OPEN_WIZARD_ON_ERROR_PLAN, oldPref.get(PreferenceConstants.PREF_OPEN_WIZARD_ON_ERROR_PLAN, MessageDialogWithToggle.PROMPT));
@@ -44,7 +44,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 				pref.flush();
 			}
 		} catch (BackingStoreException e) {
-			StatusManager.getManager().handle(new Status(IStatus.ERROR, ProvSDKUIActivator.PLUGIN_ID, 0, ProvSDKMessages.PreferenceInitializer_Error, e), StatusManager.LOG);
+			StatusManager.getManager().handle(new Status(IStatus.ERROR, P2_Activator.PLUGIN_ID, 0, ProvSDKMessages.PreferenceInitializer_Error, e), StatusManager.LOG);
 		}
 	}
 
@@ -59,11 +59,11 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 	}
 
 	private static IAgentLocation getDefaultAgentLocation() {
-		ServiceReference<?> reference = ProvSDKUIActivator.getContext().getServiceReference(IAgentLocation.SERVICE_NAME);
+		ServiceReference<?> reference = P2_Activator.getContext().getServiceReference(IAgentLocation.SERVICE_NAME);
 		if (reference == null)
 			return null;
-		IAgentLocation result = (IAgentLocation) ProvSDKUIActivator.getContext().getService(reference);
-		ProvSDKUIActivator.getContext().ungetService(reference);
+		IAgentLocation result = (IAgentLocation) P2_Activator.getContext().getService(reference);
+		P2_Activator.getContext().ungetService(reference);
 		return result;
 	}
 }

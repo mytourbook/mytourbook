@@ -42,21 +42,23 @@ import org.osgi.framework.ServiceReference;
  * Activator class for the p2 UI.
  */
 @SuppressWarnings("restriction")
-public class ProvSDKUIActivator extends AbstractUIPlugin {
+public class P2_Activator extends AbstractUIPlugin {
 
 	public static final String			PLUGIN_ID			= "org.eclipse.equinox.p2.ui.sdk";												//$NON-NLS-1$
 
 	private static final String			UPDATE_SITE_NAME	= "MyTourbook Update Site";													//$NON-NLS-1$
-//	private static String				UPDATE_SITE			= "http://mytourbook.sourceforge.net/updates";									//$NON-NLS-1$
-	private static String				UPDATE_SITE			= "file:/C:/DAT/MT/mytourbook/build/build.update-site.test/target/repository";	//$NON-NLS-1$
 
-	private static ProvSDKUIActivator	plugin;
+//	private static String				UPDATE_SITE			= "http://mytourbook.sourceforge.net/updates";	//$NON-NLS-1$
+	private static String				UPDATE_SITE			= "http://mytourbook.sourceforge.net/TEST-updates"; //$NON-NLS-1$
+//	private static String				UPDATE_SITE			= "file:/C:/DAT/MT/mytourbook/build/build.update-site.test/target/repository";	//$NON-NLS-1$
+
+	private static P2_Activator	plugin;
 	private static BundleContext		context;
 
 	private ScopedPreferenceStore		preferenceStore;
 	private IPropertyChangeListener		preferenceListener;
 
-	public ProvSDKUIActivator() {
+	public P2_Activator() {
 		// constructor
 	}
 
@@ -69,7 +71,7 @@ public class ProvSDKUIActivator extends AbstractUIPlugin {
 	 * 
 	 * @return the instance
 	 */
-	public static ProvSDKUIActivator getDefault() {
+	public static P2_Activator getDefault() {
 		return plugin;
 	}
 
@@ -194,7 +196,7 @@ public class ProvSDKUIActivator extends AbstractUIPlugin {
 	public void start(final BundleContext bundleContext) throws Exception {
 		super.start(bundleContext);
 		plugin = this;
-		ProvSDKUIActivator.context = bundleContext;
+		P2_Activator.context = bundleContext;
 		PreferenceInitializer.migratePreferences();
 		getPreferenceStore().addPropertyChangeListener(getPreferenceListener());
 	}

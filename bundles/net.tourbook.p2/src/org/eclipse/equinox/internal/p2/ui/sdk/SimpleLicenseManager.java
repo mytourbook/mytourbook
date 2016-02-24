@@ -50,11 +50,11 @@ public class SimpleLicenseManager extends LicenseManager {
 	}
 
 	private Preferences getPreferences() {
-		final IAgentLocation location = (IAgentLocation) ProvSDKUIActivator
+		final IAgentLocation location = (IAgentLocation) P2_Activator
 				.getDefault()
 				.getProvisioningAgent()
 				.getService(IAgentLocation.SERVICE_NAME);
-		return new ProfileScope(location, profileId).getNode(ProvSDKUIActivator.PLUGIN_ID);
+		return new ProfileScope(location, profileId).getNode(P2_Activator.PLUGIN_ID);
 	}
 
 	@Override

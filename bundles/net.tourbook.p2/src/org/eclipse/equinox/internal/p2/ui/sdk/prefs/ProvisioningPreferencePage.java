@@ -14,7 +14,7 @@ import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.equinox.internal.p2.ui.ProvUI;
 import org.eclipse.equinox.internal.p2.ui.sdk.IProvSDKHelpContextIds;
 import org.eclipse.equinox.internal.p2.ui.sdk.ProvSDKMessages;
-import org.eclipse.equinox.internal.p2.ui.sdk.ProvSDKUIActivator;
+import org.eclipse.equinox.internal.p2.ui.sdk.P2_Activator;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -133,7 +133,7 @@ public class ProvisioningPreferencePage extends PreferencePage implements IWorkb
 
 	private void initialize() {
 
-		final IPreferenceStore pref = ProvSDKUIActivator.getDefault().getPreferenceStore();
+		final IPreferenceStore pref = P2_Activator.getDefault().getPreferenceStore();
 
 		showLatestRadio.setSelection(pref.getBoolean(PreferenceConstants.PREF_SHOW_LATEST_VERSION));
 		showAllRadio.setSelection(!pref.getBoolean(PreferenceConstants.PREF_SHOW_LATEST_VERSION));
@@ -148,7 +148,7 @@ public class ProvisioningPreferencePage extends PreferencePage implements IWorkb
 	protected void performDefaults() {
 
 		super.performDefaults();
-		final Preferences pref = new DefaultScope().getNode(ProvSDKUIActivator.PLUGIN_ID);
+		final Preferences pref = new DefaultScope().getNode(P2_Activator.PLUGIN_ID);
 
 		showLatestRadio.setSelection(pref.getBoolean(PreferenceConstants.PREF_SHOW_LATEST_VERSION, false));
 		showAllRadio.setSelection(!pref.getBoolean(PreferenceConstants.PREF_SHOW_LATEST_VERSION, false));
@@ -162,7 +162,7 @@ public class ProvisioningPreferencePage extends PreferencePage implements IWorkb
 	@Override
 	public boolean performOk() {
 
-		final IPreferenceStore pref = ProvSDKUIActivator.getDefault().getPreferenceStore();
+		final IPreferenceStore pref = P2_Activator.getDefault().getPreferenceStore();
 
 		pref.setValue(PreferenceConstants.PREF_SHOW_LATEST_VERSION, showLatestRadio.getSelection());
 
@@ -174,7 +174,7 @@ public class ProvisioningPreferencePage extends PreferencePage implements IWorkb
 			pref.setValue(PreferenceConstants.PREF_OPEN_WIZARD_ON_ERROR_PLAN, MessageDialogWithToggle.PROMPT);
 		}
 
-		ProvSDKUIActivator.getDefault().savePreferences();
+		P2_Activator.getDefault().savePreferences();
 
 		return true;
 	}

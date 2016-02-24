@@ -41,7 +41,7 @@ public class SDKPolicy extends Policy {
 		setRepositoryPreferencePageId("org.eclipse.equinox.internal.p2.ui.sdk.SitesPreferencePage"); //$NON-NLS-1$
 		setRepositoryPreferencePageName(ProvSDKMessages.SDKPolicy_PrefPageName);
 
-		ProvSDKUIActivator.getDefault().updateWithPreferences(this);
+		P2_Activator.getDefault().updateWithPreferences(this);
 
 //		final IPreferenceStore prefs = Activator.getDefault().getPreferenceStore();
 //		setRepositoriesVisible(prefs.getBoolean(PreferenceConstants.REPOSITORIES_VISIBLE));
@@ -82,7 +82,7 @@ public class SDKPolicy extends Policy {
 		}
 
 		// Check the preference to see whether to continue.
-		final IPreferenceStore prefs = ProvSDKUIActivator.getDefault().getPreferenceStore();
+		final IPreferenceStore prefs = P2_Activator.getDefault().getPreferenceStore();
 		final String openPlan = prefs.getString(PreferenceConstants.PREF_OPEN_WIZARD_ON_ERROR_PLAN);
 
 		if (MessageDialogWithToggle.ALWAYS.equals(openPlan)) {
@@ -113,6 +113,6 @@ public class SDKPolicy extends Policy {
 
 	@Override
 	public IStatus getNoProfileChosenStatus() {
-		return ProvSDKUIActivator.getNoSelfProfileStatus();
+		return P2_Activator.getNoSelfProfileStatus();
 	}
 }

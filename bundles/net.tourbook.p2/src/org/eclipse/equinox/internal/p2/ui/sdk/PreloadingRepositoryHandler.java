@@ -61,7 +61,7 @@ abstract class PreloadingRepositoryHandler extends AbstractHandler {
 			// Inform the user nicely
 			MessageDialog.openInformation(null, ProvSDKMessages.Handler_SDKUpdateUIMessageTitle, ProvSDKMessages.Handler_CannotLaunchUI);
 			// Log the detailed message
-			StatusManager.getManager().handle(ProvSDKUIActivator.getNoSelfProfileStatus());
+			StatusManager.getManager().handle(P2_Activator.getNoSelfProfileStatus());
 		} else {
 			BusyIndicator.showWhile(getShell().getDisplay(), new Runnable() {
 				public void run() {

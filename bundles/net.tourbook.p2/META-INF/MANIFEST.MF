@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %bundleName
 Bundle-SymbolicName: net.tourbook.p2;singleton:=true
 Bundle-Version: 16.2.0.qualifier
-Bundle-Activator: org.eclipse.equinox.internal.p2.ui.sdk.ProvSDKUIActivator
+Bundle-Activator: org.eclipse.equinox.internal.p2.ui.sdk.P2_Activator
 Bundle-Vendor: %providerName
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui;bundle-version="3.6.0",
@@ -19,6 +19,7 @@ Require-Bundle: org.eclipse.ui;bundle-version="3.6.0",
  org.eclipse.equinox.p2.operations,
  org.eclipse.equinox.p2.repository,
  org.eclipse.equinox.p2.touchpoint.eclipse,
+ org.eclipse.equinox.p2.transport.ecf,
  org.eclipse.equinox.p2.ui
 Service-Component: OSGI-INF/policy_component.xml, OSGI-INF/licenseManager_component.xml
 Bundle-ActivationPolicy: lazy
