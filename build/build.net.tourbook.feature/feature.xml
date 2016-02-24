@@ -6,7 +6,7 @@
       provider-name="MyTourbook">
 
    <description>
-      MyTourbook Application.
+      MyTourbook App
    </description>
 
    <copyright>
@@ -35,7 +35,7 @@
 
    <includes
          id="feature.net.tourbook.app"
-         version="0.0.0"/>
+         version="16.2.0.qualifier"/>
 
    <includes
          id="feature.net.tourbook.app.nl"

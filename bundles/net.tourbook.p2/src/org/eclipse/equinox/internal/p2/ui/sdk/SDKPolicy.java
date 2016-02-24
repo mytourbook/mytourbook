@@ -40,7 +40,32 @@ public class SDKPolicy extends Policy {
 		setVisibleInstalledIUQuery(new UserVisibleRootQuery());
 		setRepositoryPreferencePageId("org.eclipse.equinox.internal.p2.ui.sdk.SitesPreferencePage"); //$NON-NLS-1$
 		setRepositoryPreferencePageName(ProvSDKMessages.SDKPolicy_PrefPageName);
+
 		ProvSDKUIActivator.getDefault().updateWithPreferences(this);
+
+//		final IPreferenceStore prefs = Activator.getDefault().getPreferenceStore();
+//		setRepositoriesVisible(prefs.getBoolean(PreferenceConstants.REPOSITORIES_VISIBLE));
+//		setRestartPolicy(prefs.getInt(PreferenceConstants.RESTART_POLICY));
+//		setShowLatestVersionsOnly(prefs.getBoolean(PreferenceConstants.SHOW_LATEST_VERSION_ONLY));
+//		setGroupByCategory(prefs.getBoolean(PreferenceConstants.AVAILABLE_GROUP_BY_CATEGORY));
+//		setShowDrilldownRequirements(prefs.getBoolean(PreferenceConstants.SHOW_DRILLDOWN_REQUIREMENTS));
+//		setFilterOnEnv(prefs.getBoolean(PreferenceConstants.FILTER_ON_ENV));
+//		setUpdateWizardStyle(prefs.getInt(PreferenceConstants.UPDATE_WIZARD_STYLE));
+//
+//		final int preferredWidth = prefs.getInt(PreferenceConstants.UPDATE_DETAILS_WIDTH);
+//		final int preferredHeight = prefs.getInt(PreferenceConstants.UPDATE_DETAILS_HEIGHT);
+//		setUpdateDetailsPreferredSize(new Point(preferredWidth, preferredHeight));
+//
+//		if (prefs.getBoolean(PreferenceConstants.AVAILABLE_SHOW_ALL_BUNDLES)) {
+//			setVisibleAvailableIUQuery(QueryUtil.ALL_UNITS);
+//		} else {
+//			setVisibleAvailableIUQuery(QueryUtil.createIUGroupQuery());
+//		}
+//		if (prefs.getBoolean(PreferenceConstants.INSTALLED_SHOW_ALL_BUNDLES)) {
+//			setVisibleAvailableIUQuery(QueryUtil.ALL_UNITS);
+//		} else {
+//			setVisibleAvailableIUQuery(new UserVisibleRootQuery());
+//		}
 	}
 
 	public boolean continueWorkingOperation(final ProfileChangeOperation operation, final Shell shell) {

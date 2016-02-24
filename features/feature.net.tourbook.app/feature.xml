@@ -36,13 +36,19 @@
       <import plugin="org.apache.derby"/>
       <import plugin="net.tourbook.ext.ejb3"/>
       <import plugin="de.byteholder.geoclipse.ext.geotools"/>
-      <import plugin="org.eclipse.ui" version="3.6.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.equinox.p2.ui"/>
-      <import plugin="org.eclipse.osgi"/>
+      <import plugin="org.eclipse.equinox.p2.artifact.repository"/>
       <import plugin="org.eclipse.equinox.p2.core"/>
+      <import plugin="org.eclipse.equinox.p2.director"/>
       <import plugin="org.eclipse.equinox.p2.engine"/>
+      <import plugin="org.eclipse.equinox.p2.garbagecollector"/>
+      <import plugin="org.eclipse.equinox.p2.jarprocessor"/>
       <import plugin="org.eclipse.equinox.p2.metadata"/>
+      <import plugin="org.eclipse.equinox.p2.metadata.repository"/>
       <import plugin="org.eclipse.equinox.p2.operations"/>
+      <import plugin="org.eclipse.equinox.p2.repository"/>
+      <import plugin="org.eclipse.equinox.p2.touchpoint.eclipse"/>
+      <import plugin="org.eclipse.equinox.p2.ui"/>
+      <import plugin="org.eclipse.ui" version="3.6.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin

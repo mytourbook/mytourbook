@@ -1,0 +1,10 @@
+#
+# Remove default eclipse files which are not needed
+#
+instructions.configure = \
+    org.eclipse.equinox.p2.touchpoint.natives.remove(path:${installFolder}/eclipsec.exe);\
+    org.eclipse.equinox.p2.touchpoint.natives.remove(path:${installFolder}/readme);\
+    org.eclipse.equinox.p2.touchpoint.natives.remove(path:${installFolder}/notice.html);\
+    org.eclipse.equinox.p2.touchpoint.natives.remove(path:${installFolder}/epl-v10.html);\
+    org.eclipse.equinox.p2.touchpoint.natives.remove(path:${installFolder}/.eclipseproduct);
+#
