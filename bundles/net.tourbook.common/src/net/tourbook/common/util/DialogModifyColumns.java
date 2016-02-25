@@ -482,7 +482,23 @@ public class DialogModifyColumns extends TrayDialog {
 			@Override
 			public void update(final ViewerCell cell) {
 				final ColumnDefinition colDef = (ColumnDefinition) cell.getElement();
-				cell.setText(colDef.getColumnLabel());
+
+				final String category = colDef.getColumnCategory();
+				final String label = colDef.getColumnLabel();
+
+				final StringBuilder sb = new StringBuilder();
+				if (category != null) {
+					sb.append(category);
+				}
+
+				if (label != null) {
+					if (sb.length() > 0) {
+						sb.append(ColumnManager.COLUMN_CATEGORY_SEPARATOR);
+					}
+					sb.append(label);
+				}
+
+				cell.setText(sb.toString());
 
 				// paint columns in a different color which can't be hidden
 				if (colDef.canModifyVisibility() == false) {

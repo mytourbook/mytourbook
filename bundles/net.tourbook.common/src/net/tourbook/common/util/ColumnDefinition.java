@@ -50,6 +50,7 @@ public class ColumnDefinition implements Cloneable {
 	private CellLabelProvider	_cellLabelProvider;
 	private ControlListener		_columnControlListener;
 
+	private String				_columnCategory;
 	private String				_columnText;
 	private String				_columnToolTipText;
 	private int					_columnWidth;
@@ -99,6 +100,7 @@ public class ColumnDefinition implements Cloneable {
 		clone._style = _style;
 
 		clone._cellLabelProvider = _cellLabelProvider;
+		clone._columnCategory = _columnCategory;
 		clone._columnText = _columnText;
 		clone._columnToolTipText = _columnToolTipText;
 		clone._columnWidth = _columnWidth;
@@ -137,6 +139,10 @@ public class ColumnDefinition implements Cloneable {
 
 	public CellLabelProvider getCellLabelProvider() {
 		return _cellLabelProvider;
+	}
+
+	public String getColumnCategory() {
+		return _columnCategory;
 	}
 
 	public ControlListener getColumnControlListener() {
@@ -239,6 +245,10 @@ public class ColumnDefinition implements Cloneable {
 	 */
 	public void setCanModifyVisibility(final boolean canModifyVisibility) {
 		_canModifyVisibility = canModifyVisibility;
+	}
+
+	public void setColumnCategory(final String category) {
+		_columnCategory = category;
 	}
 
 	/**
@@ -389,4 +399,5 @@ public class ColumnDefinition implements Cloneable {
 //				+ ("_defaultColumnWidth=" + _defaultColumnWidth) //$NON-NLS-1$
 				+ "]\n"; //$NON-NLS-1$
 	}
+
 }

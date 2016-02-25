@@ -684,7 +684,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	 */
 	private void defineColumn_Distance() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.DISTANCE.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_DISTANCE.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -818,7 +818,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	 */
 	private void defineColumn_TimeInterval() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.TIME_INTERVAL.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.DEVICE_TIME_INTERVAL.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -837,7 +837,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	 */
 	private void defineColumn_Title() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.TITLE.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TITLE.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {

@@ -809,7 +809,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	 */
 	private void defineColumnAltitudeDown() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.ALTITUDE_DOWN.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_ALTITUDE_DOWN.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -834,7 +834,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	 */
 	private void defineColumnAltitudeUp() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.ALTITUDE_UP.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_ALTITUDE_UP.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -859,7 +859,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	 */
 	private void defineColumnAvgCadence() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.AVG_CADENCE.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.POWERTRAIN_AVG_CADENCE.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -884,7 +884,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	 */
 	private void defineColumnAvgPace() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.AVG_PACE.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_AVG_PACE.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -908,7 +908,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	 */
 	private void defineColumnAvgPulse() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.AVG_PULSE.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.BODY_PULSE_AVG.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -933,7 +933,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	 */
 	private void defineColumnAvgSpeed() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.AVG_SPEED.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_SPEED_AVG.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -955,7 +955,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	 */
 	private void defineColumnAvgTemperature() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.AVG_TEMPERATURE.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.WEATHER_AVG_TEMPERATURE.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 
 			@Override
@@ -986,7 +986,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	 */
 	private void defineColumnDistance() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.DISTANCE.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_DISTANCE.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -1013,7 +1013,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	 */
 	private void defineColumnMaxAltitude() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.MAX_ALTITUDE.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_MAX_ALTITUDE.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -1038,7 +1038,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	 */
 	private void defineColumnMaxPulse() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.MAX_PULSE.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.BODY_PULSE_MAX.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -1063,7 +1063,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	 */
 	private void defineColumnMaxSpeed() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.MAX_SPEED.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_SPEED_MAX.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -1128,7 +1128,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	 */
 	private void defineColumnTimeBreak() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.PAUSED_TIME.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.TIME_PAUSED_TIME.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -1164,7 +1164,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	 */
 	private void defineColumnTimeDriving() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.DRIVING_TIME.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.TIME_DRIVING_TIME.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -1196,7 +1196,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	 */
 	private void defineColumnTimeRecording() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.RECORDING_TIME.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.TIME_RECORDING_TIME.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -1229,7 +1229,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	 */
 	private void defineColumnTitle() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.TITLE.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TITLE.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new TourInfoToolTipCellLabelProvider() {
 

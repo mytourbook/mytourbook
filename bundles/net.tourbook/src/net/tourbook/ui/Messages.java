@@ -171,6 +171,16 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_clouds_label;
 	public static String		ColumnFactory_clouds;
 	public static String		ColumnFactory_clouds_tooltip;
+
+	public static String		ColumnFactory_Category_Body;
+	public static String		ColumnFactory_Category_Device;
+	public static String		ColumnFactory_Category_Power;
+	public static String		ColumnFactory_Category_Powertrain;
+	public static String		ColumnFactory_Category_Time;
+	public static String		ColumnFactory_Category_Tour;
+	public static String		ColumnFactory_Category_Training;
+	public static String		ColumnFactory_Category_Weather;
+
 	public static String		ColumnFactory_CollateEvent_Label;
 	public static String		ColumnFactory_CollateEvent_Tooltip;
 	public static String		ColumnFactory_Diff_Header;
@@ -199,7 +209,7 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_InetAddress_Label;
 	public static String		ColumnFactory_InetAddress_Url;
 
-	public static String	ColumnFactory_kcal;
+	public static String		ColumnFactory_kcal;
 	public static String		ColumnFactory_NumberOfGPSPhotos_Header;
 	public static String		ColumnFactory_NumberOfGPSPhotos_Label;
 	public static String		ColumnFactory_NumberOfGPSPhotos_Tooltip;

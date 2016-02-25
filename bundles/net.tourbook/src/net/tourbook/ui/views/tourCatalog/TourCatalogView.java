@@ -715,7 +715,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	 */
 	private void defineColumn_AvgPulse() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.AVG_PULSE.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.BODY_PULSE_AVG.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -816,7 +816,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	 */
 	private void defineColumn_Title() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.TITLE.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TITLE.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new TourInfoToolTipCellLabelProvider() {
 

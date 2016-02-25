@@ -77,7 +77,8 @@ public class ColumnManager {
 	private static final String					ATTR_VISIBLE_COLUMN_IDS				= "visibleColumnIds";					//$NON-NLS-1$
 	private static final String					ATTR_VISIBLE_COLUMN_IDS_AND_WIDTH	= "visibleColumnIdsAndWidth";			//$NON-NLS-1$
 	//
-	private static final String					LABEL_UNIT_SEPARATOR				= "   \u00B7   ";						//$NON-NLS-1$
+	static final String							COLUMN_CATEGORY_SEPARATOR			= "   \u00bb   ";						//$NON-NLS-1$
+	static final String							COLUMN_TEXT_SEPARATOR				= "   \u00B7   ";						//$NON-NLS-1$
 
 	/**
 	 * Minimum column width, when the column width is 0, there was a bug that this happened.
@@ -381,7 +382,7 @@ public class ColumnManager {
 			final boolean isChecked = columnProfile == _activeProfile;
 
 			final String menuText = columnProfile.name
-					+ LABEL_UNIT_SEPARATOR
+					+ COLUMN_TEXT_SEPARATOR
 					+ Integer.toString(columnProfile.visibleColumnIds.length);
 
 			final MenuItem menuItem = new MenuItem(contextMenu, SWT.CHECK);
@@ -413,17 +414,35 @@ public class ColumnManager {
 
 			final MenuItem colMenuItem = new MenuItem(contextMenu, SWT.CHECK);
 
+			/*
+			 * Create column text
+			 */
+			final String category = colDef.getColumnCategory();
 			final String label = colDef.getColumnLabel();
 			final String unit = colDef.getColumnUnit();
 
-			String menuText = UI.EMPTY_STRING;
-			if (label != null) {
-				menuText = unit == null //
-						? label
-						: label + LABEL_UNIT_SEPARATOR + unit;
+			final StringBuilder sb = new StringBuilder();
+			if (category != null) {
+				sb.append(category);
 			}
 
-			colMenuItem.setText(menuText);
+			if (label != null) {
+				if (sb.length() > 0) {
+					sb.append(COLUMN_CATEGORY_SEPARATOR);
+				}
+				sb.append(label);
+			}
+
+			if (unit != null) {
+
+				if (sb.length() > 0) {
+					sb.append(COLUMN_TEXT_SEPARATOR);
+				}
+
+				sb.append(unit);
+			}
+
+			colMenuItem.setText(sb.toString());
 			colMenuItem.setEnabled(colDef.canModifyVisibility());
 			colMenuItem.setSelection(colDef.isCheckedInDialog());
 

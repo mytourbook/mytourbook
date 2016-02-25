@@ -763,7 +763,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	 */
 	private void defineColumn_AltitudeDown() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.ALTITUDE_DOWN.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_ALTITUDE_DOWN.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -787,7 +787,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	 */
 	private void defineColumn_AltitudeUp() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.ALTITUDE_UP.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_ALTITUDE_UP.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -812,7 +812,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	 */
 	private void defineColumn_AvgCadence() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.AVG_CADENCE.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.POWERTRAIN_AVG_CADENCE.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -836,7 +836,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	 */
 	private void defineColumn_AvgPace() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.AVG_PACE.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_AVG_PACE.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -860,7 +860,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	 */
 	private void defineColumn_AvgPulse() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.AVG_PULSE.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.BODY_PULSE_AVG.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -884,7 +884,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	 */
 	private void defineColumn_AvgSpeed() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.AVG_SPEED.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_SPEED_AVG.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -908,7 +908,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	 */
 	private void defineColumn_AvgTemperature() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.AVG_TEMPERATURE.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.WEATHER_AVG_TEMPERATURE.createColumn(_columnManager, _pc);
 
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -940,7 +940,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	 */
 	private void defineColumn_Calories() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.CALORIES.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.BODY_CALORIES.createColumn(_columnManager, _pc);
 		//colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -991,7 +991,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	 */
 	private void defineColumn_Distance() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.DISTANCE.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_DISTANCE.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -1016,7 +1016,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	 */
 	private void defineColumn_DPTolerance() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.DP_TOLERANCE.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_DP_TOLERANCE.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -1040,7 +1040,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	 */
 	private void defineColumn_Gear_FrontShiftCount() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.GEAR_FRONT_SHIFT_COUNT.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.POWERTRAIN_GEAR_FRONT_SHIFT_COUNT.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -1064,7 +1064,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	 */
 	private void defineColumn_Gear_RearShiftCount() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.GEAR_REAR_SHIFT_COUNT.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.POWERTRAIN_GEAR_REAR_SHIFT_COUNT.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -1115,7 +1115,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	 */
 	private void defineColumn_MaxAltitude() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.MAX_ALTITUDE.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_MAX_ALTITUDE.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -1139,7 +1139,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	 */
 	private void defineColumn_MaxPulse() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.MAX_PULSE.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.BODY_PULSE_MAX.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -1162,7 +1162,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	 */
 	private void defineColumn_MaxSpeed() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.MAX_SPEED.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_SPEED_MAX.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -1186,7 +1186,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	 */
 	private void defineColumn_Person() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.PERSON.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.BODY_PERSON.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -1233,7 +1233,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	 */
 	private void defineColumn_RestPulse() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.RESTPULSE.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.BODY_RESTPULSE.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 
 			@Override
@@ -1300,7 +1300,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	 */
 	private void defineColumn_Time() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_START_TIME //
+		final TreeColumnDefinition colDef = TreeColumnFactory.TIME_TOUR_START_TIME //
 				.createColumn(_columnManager, _pc);
 
 		colDef.setIsDefaultColumn();
@@ -1335,7 +1335,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	 */
 	private void defineColumn_TimeBreak() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.PAUSED_TIME.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.TIME_PAUSED_TIME.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -1369,7 +1369,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	 */
 	private void defineColumn_TimeBreakRelative() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.PAUSED_TIME_RELATIVE.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.TIME_PAUSED_TIME_RELATIVE.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -1400,7 +1400,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	 */
 	private void defineColumn_TimeDriving() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.DRIVING_TIME.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.TIME_DRIVING_TIME.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -1437,7 +1437,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
 	private void defineColumn_TimeInterval() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.TIME_INTERVAL.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.DEVICE_TIME_INTERVAL.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -1462,7 +1462,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	 */
 	private void defineColumn_TimeRecording() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.RECORDING_TIME.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.TIME_RECORDING_TIME.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -1497,7 +1497,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	 */
 	private void defineColumn_TimeSlices() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.TIME_SLICES.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TIME_SLICES.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -1521,7 +1521,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	 */
 	private void defineColumn_Title() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.TITLE.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TITLE.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new TourInfoToolTipCellLabelProvider() {
 
@@ -1603,7 +1603,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	 */
 	private void defineColumn_WeatherClouds() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.CLOUDS.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.WEATHER_CLOUDS.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 
@@ -1635,7 +1635,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	 */
 	private void defineColumn_WeatherWindDirection() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.WIND_DIR.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.WEATHER_WIND_DIR.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 
 			@Override
@@ -1660,7 +1660,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	 */
 	private void defineColumn_WeatherWindSpeed() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.WIND_SPEED.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.WEATHER_WIND_SPEED.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 
 			@Override
@@ -1685,7 +1685,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	 */
 	private void defineColumn_WeekDay() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.WEEK_DAY.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.TIME_WEEK_DAY.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new TourInfoToolTipCellLabelProvider() {
 
@@ -1718,7 +1718,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	 */
 	private void defineColumn_WeekNo() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.WEEK_NO.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.TIME_WEEK_NO.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 
 			@Override
@@ -1743,7 +1743,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	 */
 	private void defineColumn_WeekYear() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.WEEKYEAR.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.TIME_WEEKYEAR.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 
 			@Override
