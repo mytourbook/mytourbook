@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -117,11 +117,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 //	private static final String				STATE_IS_SRTM_SELECT_WHOLE_TOUR		= "State_IsSRTMSelectWholeTour";			//$NON-NLS-1$
 //	private static final String				STATE_IS_SRTM_SELECT_SYNC_START_END	= "State_IsSRTMSyncStartEnd";				//$NON-NLS-1$
 
-	private final IPreferenceStore			_prefStore							= TourbookPlugin.getDefault() //
-																						.getPreferenceStore();
-//	private final IDialogSettings			_state								= TourbookPlugin.getDefault().//
-//																						getDialogSettingsSection(
-//																								"Dialog_AdjustAltitude");	//$NON-NLS-1$
+	private final IPreferenceStore			_prefStore							= TourbookPlugin.getPrefStore();
 
 	/*
 	 * data
@@ -176,10 +172,10 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 	private PageBook						_pageBookOptions;
 	private Label							_pageEmpty;
-	private Composite						_pageOptionSRTMSpline;
-	private Composite						_pageOptionNoSRTM;
-	private Composite						_pageOptionSRTM;
-	private Composite						_pageOptionGeoPosition;
+	private Composite						_pageOption_SRTMSpline;
+	private Composite						_pageOption_NoSRTM;
+	private Composite						_pageOption_SRTM;
+	private Composite						_pageOption_GeoPosition;
 
 	private Combo							_comboAdjustmentType;
 
@@ -1048,13 +1044,13 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(_dlgContainer);
 		GridLayoutFactory.fillDefaults().margins(9, 0).applyTo(_dlgContainer);
 		{
-			createUI10AdjustmentType(_dlgContainer);
-			createUI20TourChart(_dlgContainer);
-			createUI30Options(_dlgContainer);
+			createUI_10_AdjustmentType(_dlgContainer);
+			createUI_20_TourChart(_dlgContainer);
+			createUI_30_Options(_dlgContainer);
 		}
 	}
 
-	private void createUI10AdjustmentType(final Composite parent) {
+	private void createUI_10_AdjustmentType(final Composite parent) {
 
 		final Composite typeContainer = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().applyTo(typeContainer);
@@ -1094,7 +1090,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		}
 	}
 
-	private void createUI20TourChart(final Composite parent) {
+	private void createUI_20_TourChart(final Composite parent) {
 
 		_tourChart = new TourChart(parent, SWT.BORDER, null);
 		GridDataFactory.fillDefaults().grab(true, true).indent(0, 0).minSize(300, 200).applyTo(_tourChart);
@@ -1171,20 +1167,21 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 	/**
 	 * create options for each adjustment type in a pagebook
 	 */
-	private void createUI30Options(final Composite parent) {
+	private void createUI_30_Options(final Composite parent) {
+
 		_pageBookOptions = new PageBook(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(_pageBookOptions);
 		{
 			_pageEmpty = new Label(_pageBookOptions, SWT.NONE);
 
-			_pageOptionSRTM = createUI40OptionWithSRTM(_pageBookOptions);
-			_pageOptionSRTMSpline = createUI50OptionWithSRTMSpline(_pageBookOptions);
-			_pageOptionNoSRTM = createUI60OptionWithoutSRTM(_pageBookOptions);
-			_pageOptionGeoPosition = createUI70OptionGeoPosition(_pageBookOptions);
+			_pageOption_SRTM = createUI_40_Option_WithSRTM(_pageBookOptions);
+			_pageOption_SRTMSpline = createUI_50_Option_WithSRTMSpline(_pageBookOptions);
+			_pageOption_NoSRTM = createUI_60_Option_WithoutSRTM(_pageBookOptions);
+			_pageOption_GeoPosition = createUI_70_Option_GeoPosition(_pageBookOptions);
 		}
 	}
 
-	private Composite createUI40OptionWithSRTM(final Composite parent) {
+	private Composite createUI_40_Option_WithSRTM(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().applyTo(container);
@@ -1222,20 +1219,20 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		return container;
 	}
 
-	private Composite createUI50OptionWithSRTMSpline(final Composite parent) {
+	private Composite createUI_50_Option_WithSRTMSpline(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 		{
-			createUI52SRTMOptions(container);
-			createUI54SRTMActions(container);
+			createUI_52_SRTMOptions(container);
+			createUI_54_SRTMActions(container);
 		}
 
 		return container;
 	}
 
-	private void createUI52SRTMOptions(final Composite parent) {
+	private void createUI_52_SRTMOptions(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -1269,7 +1266,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		}
 	}
 
-	private Composite createUI54SRTMActions(final Composite parent) {
+	private Composite createUI_54_SRTMActions(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridLayoutFactory.fillDefaults().numColumns(3).equalWidth(false).applyTo(container);
@@ -1326,21 +1323,21 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		return container;
 	}
 
-	private Composite createUI60OptionWithoutSRTM(final Composite parent) {
+	private Composite createUI_60_Option_WithoutSRTM(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
 		{
-			createUI61StartEnd(container);
-			createUI62Max(container);
-			createUI63Actions(container);
+			createUI_61_StartEnd(container);
+			createUI_62_Max(container);
+			createUI_63_Actions(container);
 		}
 
 		return container;
 	}
 
-	private void createUI61StartEnd(final Composite parent) {
+	private void createUI_61_StartEnd(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(container);
@@ -1377,7 +1374,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 	}
 
-	private void createUI62Max(final Composite parent) {
+	private void createUI_62_Max(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
@@ -1433,7 +1430,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 	}
 
-	private void createUI63Actions(final Composite parent) {
+	private void createUI_63_Actions(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().indent(20, 0).applyTo(container);
@@ -1469,7 +1466,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		}
 	}
 
-	private Composite createUI70OptionGeoPosition(final PageBook parent) {
+	private Composite createUI_70_Option_GeoPosition(final PageBook parent) {
 
 		final PixelConverter pc = new PixelConverter(parent);
 		final int valueWidth = pc.convertWidthInCharsToPixels(4);
@@ -1511,6 +1508,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 				}
 			});
 			_scaleSlicePos.addListener(SWT.MouseDoubleClick, new Listener() {
+				@Override
 				public void handleEvent(final Event event) {
 					onDoubleClickGeoPos(event.widget);
 				}
@@ -1789,6 +1787,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		}
 
 		_tourChart.getDisplay().timerExec(100, new Runnable() {
+			@Override
 			public void run() {
 				updateTourChart();
 			}
@@ -1976,7 +1975,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		switch (adjustmentType) {
 		case ADJUST_TYPE_SRTM:
 
-			_pageBookOptions.showPage(_pageOptionSRTM);
+			_pageBookOptions.showPage(_pageOption_SRTM);
 
 			computeAltitudeSRTM();
 
@@ -1984,7 +1983,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 		case ADJUST_TYPE_HORIZONTAL_GEO_POSITION:
 
-			_pageBookOptions.showPage(_pageOptionGeoPosition);
+			_pageBookOptions.showPage(_pageOption_GeoPosition);
 
 			onSelectSlicePosition();
 
@@ -1992,7 +1991,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 
 		case ADJUST_TYPE_SRTM_SPLINE:
 
-			_pageBookOptions.showPage(_pageOptionSRTMSpline);
+			_pageBookOptions.showPage(_pageOption_SRTMSpline);
 
 			// display splines
 			_tourData.splineDataPoints = _splineData;
@@ -2005,7 +2004,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		case ADJUST_TYPE_END:
 		case ADJUST_TYPE_MAX_HEIGHT:
 
-			_pageBookOptions.showPage(_pageOptionNoSRTM);
+			_pageBookOptions.showPage(_pageOption_NoSRTM);
 			onResetAltitude();
 
 			break;
@@ -2132,6 +2131,12 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 			typeIndex++;
 		}
 		_comboAdjustmentType.select(comboIndex);
+		
+		/*
+		 * A selection event is not fired, this is necessary that the layout of the dialog is run,
+		 * otherwise the options can be hidden
+		 */
+		onSelectAdjustmentType();
 
 		// get max options
 		boolean isKeepStart;
@@ -2170,6 +2175,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
 		if (isAdjustmentTypeSRTMSPline()) {
 
 			Display.getCurrent().asyncExec(new Runnable() {
+				@Override
 				public void run() {
 					onModifySRTMSelection();
 				}
