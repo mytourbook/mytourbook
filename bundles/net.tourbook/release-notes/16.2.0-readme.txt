@@ -20,7 +20,7 @@ New
 
 * Power
   - Show power value in chart segment tooltip
-  - Reimport device power values
+  - Reimport power values
  
 
 Bugfix

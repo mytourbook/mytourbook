@@ -112,6 +112,7 @@ public class DialogModifyColumns extends TrayDialog {
 	private Button						_btnProfile_New;
 	private Button						_btnProfile_Remove;
 	private Button						_btnProfile_Rename;
+	private Button						_btnColumn_Sort;
 	//
 	private CheckboxTableViewer			_columnViewer;
 	private CheckboxTableViewer			_profileViewer;
@@ -252,8 +253,8 @@ public class DialogModifyColumns extends TrayDialog {
 
 		// set default width
 		final GridData gd = (GridData) dlgContainer.getLayoutData();
-		gd.heightHint = 400;
-		gd.widthHint = 400;
+		gd.widthHint = 600;
+		gd.heightHint = 800;
 
 		createUI(dlgContainer);
 
@@ -468,81 +469,7 @@ public class DialogModifyColumns extends TrayDialog {
 
 		_columnViewer = new CheckboxTableViewer(table);
 
-		/*
-		 * create columns
-		 */
-		TableViewerColumn tvc;
-		TableColumn tc;
-
-		// column: label
-		tvc = new TableViewerColumn(_columnViewer, SWT.LEAD);
-		tc = tvc.getColumn();
-		tc.setText(Messages.ColumnModifyDialog_column_column);
-		tvc.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final ColumnDefinition colDef = (ColumnDefinition) cell.getElement();
-
-				final String category = colDef.getColumnCategory();
-				final String label = colDef.getColumnLabel();
-
-				final StringBuilder sb = new StringBuilder();
-				if (category != null) {
-					sb.append(category);
-				}
-
-				if (label != null) {
-					if (sb.length() > 0) {
-						sb.append(ColumnManager.COLUMN_CATEGORY_SEPARATOR);
-					}
-					sb.append(label);
-				}
-
-				cell.setText(sb.toString());
-
-				// paint columns in a different color which can't be hidden
-				if (colDef.canModifyVisibility() == false) {
-					cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-				}
-			}
-		});
-		tableLayout.setColumnData(tc, new ColumnWeightData(1, true));
-
-		// column: unit
-		tvc = new TableViewerColumn(_columnViewer, SWT.LEAD);
-		tc = tvc.getColumn();
-		tc.setText(Messages.ColumnModifyDialog_column_unit);
-		tvc.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final ColumnDefinition colDef = (ColumnDefinition) cell.getElement();
-				cell.setText(colDef.getColumnUnit());
-
-				// paint columns in a different color which can't be hidden
-				if (colDef.canModifyVisibility() == false) {
-					cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-				}
-			}
-		});
-		tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(13), true));
-
-		// column: width
-		tvc = new TableViewerColumn(_columnViewer, SWT.LEAD);
-		tc = tvc.getColumn();
-		tc.setText(Messages.ColumnModifyDialog_column_width);
-		tvc.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final ColumnDefinition colDef = (ColumnDefinition) cell.getElement();
-				cell.setText(Integer.toString(colDef.getColumnWidth()));
-
-				// paint columns in a different color which can't be hidden
-				if (colDef.canModifyVisibility() == false) {
-					cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-				}
-			}
-		});
-		tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(10), true));
+		defineAllColumns(tableLayout);
 
 		_columnViewer.setContentProvider(new IStructuredContentProvider() {
 
@@ -763,92 +690,141 @@ public class DialogModifyColumns extends TrayDialog {
 		GridDataFactory.fillDefaults().applyTo(container);
 		GridLayoutFactory.fillDefaults().extendedMargins(5, 0, 0, 0).applyTo(container);
 		{
-			_btnColumn_MoveUp = new Button(container, SWT.NONE);
-			_btnColumn_MoveUp.setText(Messages.ColumnModifyDialog_Button_move_up);
-			_btnColumn_MoveUp.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					moveSelectionUp();
-					enableUpDownActions();
-				}
-			});
-			setButtonLayoutData(_btnColumn_MoveUp);
+			/*
+			 * Button: Move Up
+			 */
+			{
+				_btnColumn_MoveUp = new Button(container, SWT.NONE);
+				_btnColumn_MoveUp.setText(Messages.ColumnModifyDialog_Button_move_up);
+				_btnColumn_MoveUp.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						moveSelectionUp();
+						enableUpDownActions();
+					}
+				});
+				setButtonLayoutData(_btnColumn_MoveUp);
+			}
 
-			_btnColumn_MoveDown = new Button(container, SWT.NONE);
-			_btnColumn_MoveDown.setText(Messages.ColumnModifyDialog_Button_move_down);
-			_btnColumn_MoveDown.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					moveSelectionDown();
-					enableUpDownActions();
-				}
-			});
-			setButtonLayoutData(_btnColumn_MoveDown);
+			/*
+			 * Button: Move Down
+			 */
+			{
+				_btnColumn_MoveDown = new Button(container, SWT.NONE);
+				_btnColumn_MoveDown.setText(Messages.ColumnModifyDialog_Button_move_down);
+				_btnColumn_MoveDown.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						moveSelectionDown();
+						enableUpDownActions();
+					}
+				});
+				setButtonLayoutData(_btnColumn_MoveDown);
+			}
 
 			// spacer
 			new Label(container, SWT.NONE);
 
-			_btnColumn_SelectAll = new Button(container, SWT.NONE);
-			_btnColumn_SelectAll.setText(Messages.ColumnModifyDialog_Button_select_all);
-			_btnColumn_SelectAll.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
+			/*
+			 * Button: Select All
+			 */
+			{
+				_btnColumn_SelectAll = new Button(container, SWT.NONE);
+				_btnColumn_SelectAll.setText(Messages.ColumnModifyDialog_Button_select_all);
+				_btnColumn_SelectAll.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
 
-					// update model
-					for (final ColumnDefinition colDef : _columnViewerModel) {
-						colDef.setIsCheckedInDialog(true);
-					}
-
-					// update viewer
-					_columnViewer.setAllChecked(true);
-				}
-			});
-			setButtonLayoutData(_btnColumn_SelectAll);
-
-			_btnColumn_DeselectAll = new Button(container, SWT.NONE);
-			_btnColumn_DeselectAll.setText(Messages.ColumnModifyDialog_Button_deselect_all);
-			_btnColumn_DeselectAll.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-
-					// list with all columns which must be checked
-					final ArrayList<ColumnDefinition> checkedElements = new ArrayList<ColumnDefinition>();
-
-					// update model
-					for (final ColumnDefinition colDef : _columnViewerModel) {
-						if (colDef.canModifyVisibility() == false) {
-							checkedElements.add(colDef);
+						// update model
+						for (final ColumnDefinition colDef : _columnViewerModel) {
 							colDef.setIsCheckedInDialog(true);
-						} else {
-							colDef.setIsCheckedInDialog(false);
 						}
-					}
 
-					// update viewer
-					_columnViewer.setCheckedElements(checkedElements.toArray());
-				}
-			});
-			setButtonLayoutData(_btnColumn_DeselectAll);
+						// update viewer
+						_columnViewer.setAllChecked(true);
+					}
+				});
+				setButtonLayoutData(_btnColumn_SelectAll);
+			}
+
+			/*
+			 * Button: Deselect All
+			 */
+			{
+				_btnColumn_DeselectAll = new Button(container, SWT.NONE);
+				_btnColumn_DeselectAll.setText(Messages.ColumnModifyDialog_Button_deselect_all);
+				_btnColumn_DeselectAll.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+
+						// list with all columns which must be checked
+						final ArrayList<ColumnDefinition> checkedElements = new ArrayList<ColumnDefinition>();
+
+						// update model
+						for (final ColumnDefinition colDef : _columnViewerModel) {
+							if (colDef.canModifyVisibility() == false) {
+								checkedElements.add(colDef);
+								colDef.setIsCheckedInDialog(true);
+							} else {
+								colDef.setIsCheckedInDialog(false);
+							}
+						}
+
+						// update viewer
+						_columnViewer.setCheckedElements(checkedElements.toArray());
+					}
+				});
+				setButtonLayoutData(_btnColumn_DeselectAll);
+			}
 
 			// spacer
 			new Label(container, SWT.NONE);
 
-			_btnColumn_Default = new Button(container, SWT.NONE);
-			_btnColumn_Default.setText(Messages.ColumnModifyDialog_Button_default);
-			_btnColumn_Default.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent event) {
+			/*
+			 * Button: Default
+			 */
+			{
+				_btnColumn_Default = new Button(container, SWT.NONE);
+				_btnColumn_Default.setText(Messages.ColumnModifyDialog_Button_default);
+				_btnColumn_Default.setToolTipText(Messages.ColumnModifyDialog_Button_Default_Tooltip);
+				_btnColumn_Default.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent event) {
 
-					/*
-					 * copy all defined columns into the dialog columns
-					 */
+						/*
+						 * copy all defined columns into the dialog columns
+						 */
 
-					_columnViewerModel = getDefaultColumns();
+						_columnViewerModel = getDefaultColumns(true);
 
-					setupColumnsInViewer();
-				}
-			});
-			setButtonLayoutData(_btnColumn_Default);
+						setupColumnsInViewer();
+					}
+				});
+				setButtonLayoutData(_btnColumn_Default);
+			}
+
+			/*
+			 * Button: Sort
+			 */
+			{
+				_btnColumn_Sort = new Button(container, SWT.NONE);
+				_btnColumn_Sort.setText(Messages.ColumnModifyDialog_Button_Sort);
+				_btnColumn_Sort.setToolTipText(Messages.ColumnModifyDialog_Button_Sort_Tooltip);
+				_btnColumn_Sort.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent event) {
+
+						/*
+						 * copy all defined columns into the dialog columns
+						 */
+
+						_columnViewerModel = getDefaultColumns(false);
+
+						setupColumnsInViewer();
+					}
+				});
+				setButtonLayoutData(_btnColumn_Sort);
+			}
 		}
 	}
 
@@ -871,6 +847,96 @@ public class DialogModifyColumns extends TrayDialog {
 				.grab(true, false)
 				.span(2, 1)
 				.applyTo(styledText);
+	}
+
+	private void defineAllColumns(final TableColumnLayout tableLayout) {
+
+		TableViewerColumn tvc;
+		TableColumn tc;
+
+		/*
+		 * Column: Category
+		 */
+		tvc = new TableViewerColumn(_columnViewer, SWT.LEAD);
+		tc = tvc.getColumn();
+		tc.setText(Messages.ColumnModifyDialog_Column_Category);
+		tvc.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final ColumnDefinition colDef = (ColumnDefinition) cell.getElement();
+				cell.setText(colDef.getColumnCategory());
+
+				// paint columns in a different color which can't be hidden
+				if (colDef.canModifyVisibility() == false) {
+					cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+				}
+			}
+		});
+		tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(20), true));
+
+		/*
+		 * Column: Label
+		 */
+		tvc = new TableViewerColumn(_columnViewer, SWT.LEAD);
+		tc = tvc.getColumn();
+		tc.setText(Messages.ColumnModifyDialog_column_column);
+		tvc.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final ColumnDefinition colDef = (ColumnDefinition) cell.getElement();
+				cell.setText(colDef.getColumnLabel());
+
+				// paint columns in a different color which can't be hidden
+				if (colDef.canModifyVisibility() == false) {
+					cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+				}
+			}
+		});
+		tableLayout.setColumnData(tc, new ColumnWeightData(30, true));
+
+		/*
+		 * Column: unit
+		 */
+		tvc = new TableViewerColumn(_columnViewer, SWT.LEAD);
+		tc = tvc.getColumn();
+		tc.setText(Messages.ColumnModifyDialog_column_unit);
+		tvc.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final ColumnDefinition colDef = (ColumnDefinition) cell.getElement();
+				cell.setText(colDef.getColumnUnit());
+
+				// paint columns in a different color which can't be hidden
+				if (colDef.canModifyVisibility() == false) {
+					cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+				}
+			}
+		});
+		tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(13), true));
+
+		/*
+		 * Column: width
+		 */
+		tvc = new TableViewerColumn(_columnViewer, SWT.LEAD);
+		tc = tvc.getColumn();
+		tc.setText(Messages.ColumnModifyDialog_column_width);
+		tvc.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final ColumnDefinition colDef = (ColumnDefinition) cell.getElement();
+				cell.setText(Integer.toString(colDef.getColumnWidth()));
+
+				// paint columns in a different color which can't be hidden
+				if (colDef.canModifyVisibility() == false) {
+					cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+				}
+			}
+		});
+		tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(10), true));
 	}
 
 	private void enableProfileActions() {
@@ -919,42 +985,49 @@ public class DialogModifyColumns extends TrayDialog {
 	}
 
 	/**
-	 * @param columnId
-	 *            column id
-	 * @return Returns the column definition for the column id, or <code>null</code> when the column
-	 *         for the column id is not available
-	 */
-	private ColumnDefinition getColDef_ByColumnId(final String columnId) {
-
-		for (final ColumnDefinition colDef : _allDefinedColumns) {
-			if (colDef.getColumnId().compareTo(columnId) == 0) {
-				return colDef;
-			}
-		}
-
-		return null;
-	}
-
-	/**
 	 * Create all columns in default order and selection.
 	 * 
+	 * @param isSetDefaultProperties
 	 * @return Returns all {@link ColumnDefinition}s in default order/selection.
 	 */
-	private ArrayList<ColumnDefinition> getDefaultColumns() {
+	private ArrayList<ColumnDefinition> getDefaultColumns(final boolean isSetDefaultProperties) {
 
 		final ArrayList<ColumnDefinition> allDialogColumns = new ArrayList<ColumnDefinition>();
 
 		for (final ColumnDefinition definedColDef : _allDefinedColumns) {
 			try {
 
-				final ColumnDefinition columnDefinitionClone = (ColumnDefinition) definedColDef.clone();
+				// clone column
+				final ColumnDefinition colDefClone = (ColumnDefinition) definedColDef.clone();
 
-				// visible columns in the viewer will be checked
-				final boolean isDefaultColumn = definedColDef.isDefaultColumn();
-				columnDefinitionClone.setIsCheckedInDialog(isDefaultColumn);
-				columnDefinitionClone.setColumnWidth(definedColDef.getDefaultColumnWidth());
+				if (isSetDefaultProperties) {
 
-				allDialogColumns.add(columnDefinitionClone);
+					// visible columns in the viewer will be checked
+
+					final boolean isDefaultColumn = definedColDef.isDefaultColumn();
+
+					colDefClone.setIsCheckedInDialog(isDefaultColumn);
+					colDefClone.setColumnWidth(definedColDef.getDefaultColumnWidth());
+
+				} else {
+
+					// set properties from the current settings
+
+					final String definedColumnId = definedColDef.getColumnId();
+
+					for (final ColumnDefinition currentColDef : _columnViewerModel) {
+
+						if (currentColDef.getColumnId().equals(definedColumnId)) {
+
+							colDefClone.setIsCheckedInDialog(currentColDef.isCheckedInDialog());
+							colDefClone.setColumnWidth(currentColDef.getColumnWidth());
+
+							break;
+						}
+					}
+				}
+
+				allDialogColumns.add(colDefClone);
 
 			} catch (final CloneNotSupportedException e) {
 				StatusUtil.log(e);
@@ -966,7 +1039,11 @@ public class DialogModifyColumns extends TrayDialog {
 
 	@Override
 	protected IDialogSettings getDialogBoundsSettings() {
-		return CommonActivator.getState(getClass().getName() + "_DialogBounds"); //$NON-NLS-1$
+
+		final IDialogSettings state = CommonActivator.getState(getClass().getName() + "_DialogBounds");//$NON-NLS-1$
+//		final IDialogSettings state = null;
+
+		return state;
 	}
 
 	private ColumnProfile getSelectedProfile() {
@@ -1071,7 +1148,7 @@ public class DialogModifyColumns extends TrayDialog {
 		 */
 
 		// create default columns for a new profile
-		_columnViewerModel = getDefaultColumns();
+		_columnViewerModel = getDefaultColumns(true);
 
 		final ColumnProfile newProfile = new ColumnProfile();
 

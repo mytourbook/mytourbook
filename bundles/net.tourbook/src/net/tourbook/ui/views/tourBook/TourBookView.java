@@ -217,6 +217,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	//
 	private final DateTimeFormatter						_dtFormatter;
 	private final DateTimeFormatter						_isoFormatter;
+	private final NumberFormat							_nf0;
 	private final NumberFormat							_nf1;
 	private final NumberFormat							_nf2;
 	private final NumberFormat							_nf1_NoGroup;
@@ -225,6 +226,10 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private final DateFormat							_timeFormatter;
 	private static final String[]						_weekDays;
 	{
+		_nf0 = NumberFormat.getNumberInstance();
+		_nf0.setMinimumFractionDigits(0);
+		_nf0.setMaximumFractionDigits(0);
+
 		_nf1 = NumberFormat.getNumberInstance();
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
@@ -838,6 +843,12 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		defineColumn_Body_AvgPulse();
 		defineColumn_Body_Person();
 
+		// Leistung
+		defineColumn_Power_Avg();
+		defineColumn_Power_Max();
+		defineColumn_Power_Normalized();
+		defineColumn_Power_TotalWork();
+
 		// Antrieb/Pedal - Powertrain
 		defineColumn_Powertrain_AvgCadence();
 		defineColumn_Powertrain_Gear_FrontShiftCount();
@@ -847,12 +858,6 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		defineColumn_Powertrain_AvgRightPedalSmoothness();
 		defineColumn_Powertrain_AvgRightTorqueEffectiveness();
 		defineColumn_Powertrain_PedalLeftRightBalance();
-
-		// Leistung
-		defineColumn_Power_Avg();
-		defineColumn_Power_Max();
-		defineColumn_Power_Normalized();
-		defineColumn_Power_TotalWork();
 
 		// Trainingsanalyse
 		defineColumn_Training_FTP();
@@ -1119,7 +1124,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				if (dbValue == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(_nf1.format(dbValue));
+					cell.setText(_nf0.format(dbValue));
 				}
 
 				setCellColor(cell, element);

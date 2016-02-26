@@ -763,7 +763,7 @@ public class TourSegmenterTooltip extends AnimatedToolTipShell implements ITourP
 		_lblAvg_CadenceUnit.setText(Messages.Value_Unit_Cadence);
 
 		// avg power
-		_lblAvg_Power.setText(Integer.toString((int) tourSegment.power));
+		_lblAvg_Power.setText(_nf_0_0.format(tourSegment.power));
 		_lblAvg_PowerUnit.setText(UI.UNIT_POWER);
 
 		/*
