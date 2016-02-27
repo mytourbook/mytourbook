@@ -36,19 +36,19 @@ public class Messages extends NLS {
 
 	public static String		Advanced_Menu_AnimationSymbol;
 
+	public static String		Column_Profile_Dialog_ShowAllColumns_Message;
+	public static String		Column_Profile_Dialog_ShowDefaultColumns_Message;
+	public static String		Column_Profile_Dialog_Title;
 	public static String		Column_Profile_Name_Default;
 
 	public static String		ColumnModifyDialog_Button_default;
-
-	public static String	ColumnModifyDialog_Button_Default_Tooltip;
+	public static String		ColumnModifyDialog_Button_Default_Tooltip;
 	public static String		ColumnModifyDialog_Button_deselect_all;
 	public static String		ColumnModifyDialog_Button_move_down;
 	public static String		ColumnModifyDialog_Button_move_up;
 	public static String		ColumnModifyDialog_Button_select_all;
-
-	public static String	ColumnModifyDialog_Button_Sort;
-
-	public static String	ColumnModifyDialog_Button_Sort_Tooltip;
+	public static String		ColumnModifyDialog_Button_Sort;
+	public static String		ColumnModifyDialog_Button_Sort_Tooltip;
 	public static String		ColumnModifyDialog_Column_Category;
 	public static String		ColumnModifyDialog_column_column;
 	public static String		ColumnModifyDialog_column_unit;

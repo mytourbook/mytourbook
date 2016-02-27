@@ -28,6 +28,7 @@ import net.tourbook.common.Messages;
 import net.tourbook.common.UI;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.AbstractColumnLayout;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnLayoutData;
@@ -38,6 +39,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.ControlListener;
@@ -201,16 +203,28 @@ public class ColumnManager {
 
 	private void actionShowAllColumns() {
 
-		setVisibleColumnIds_All();
+		if (MessageDialog.openConfirm(
+				Display.getCurrent().getActiveShell(),
+				Messages.Column_Profile_Dialog_Title,
+				NLS.bind(Messages.Column_Profile_Dialog_ShowAllColumns_Message, _activeProfile.name))) {
 
-		_columnViewer = _tourViewer.recreateViewer(_columnViewer);
+			setVisibleColumnIds_All();
+
+			_columnViewer = _tourViewer.recreateViewer(_columnViewer);
+		}
 	}
 
 	private void actionShowDefaultColumns() {
 
-		setVisibleColumnIds_Default();
+		if (MessageDialog.openConfirm(
+				Display.getCurrent().getActiveShell(),
+				Messages.Column_Profile_Dialog_Title,
+				NLS.bind(Messages.Column_Profile_Dialog_ShowDefaultColumns_Message, _activeProfile.name))) {
 
-		_columnViewer = _tourViewer.recreateViewer(_columnViewer);
+			setVisibleColumnIds_Default();
+
+			_columnViewer = _tourViewer.recreateViewer(_columnViewer);
+		}
 	}
 
 	public void addColumn(final ColumnDefinition colDef) {
@@ -288,7 +302,7 @@ public class ColumnManager {
 
 		setVisibleColumnIds_FromViewer();
 
-		createHCM_10_Various(contextMenu);
+		createHCM_10_Other(contextMenu);
 
 		// separator
 		new MenuItem(contextMenu, SWT.SEPARATOR);
@@ -301,7 +315,7 @@ public class ColumnManager {
 		createHCM_30_Columns(contextMenu);
 	}
 
-	private void createHCM_10_Various(final Menu contextMenu) {
+	private void createHCM_10_Other(final Menu contextMenu) {
 
 		/*
 		 * Action: Size All Columns to Fit
