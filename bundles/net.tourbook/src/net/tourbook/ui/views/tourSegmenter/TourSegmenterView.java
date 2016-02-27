@@ -2186,47 +2186,47 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		final SelectionAdapter defaultListener = new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
+
+				// sort columns
 				((ViewSorter) _segmentViewer.getSorter()).setSortColumn(COLUMN_DEFAULT);
+
 				_segmentViewer.refresh();
 			}
 		};
 
-		defineColumn_RecordingTimeTotal(defaultListener);
+		defineColumn_Time_RecordingTimeTotal(defaultListener);
+		defineColumn_Time_Recording(defaultListener);
+		defineColumn_Time_Driving(defaultListener);
+		defineColumn_Time_Paused(defaultListener);
 
-		defineColumn_DistanceTotal(defaultListener);
-		defineColumn_Distance(defaultListener);
+		defineColumn_Motion_DistanceTotal(defaultListener);
+		defineColumn_Motion_Distance(defaultListener);
+		defineColumn_Motion_AvgSpeed();
+		defineColumn_Motion_AvgPace();
+		defineColumn_Motion_AvgPace_Difference();
 
-		defineColumn_RecordingTime(defaultListener);
-		defineColumn_DrivingTime(defaultListener);
-		defineColumn_PausedTime(defaultListener);
+		defineColumn_Altitude_Gradient();
+		defineColumn_Altitude_Hour_Up(defaultListener);
+		defineColumn_Altitude_Hour_Down(defaultListener);
+		defineColumn_Altitude_Diff_SegmentBorder(defaultListener);
+		defineColumn_Altitude_Diff_SegmentComputed(defaultListener);
+		defineColumn_Altitude_Up_SummarizedComputed(defaultListener);
+		defineColumn_Altitude_Down_SummarizedComputed(defaultListener);
+		defineColumn_Altitude_Up_SummarizedBorder(defaultListener);
+		defineColumn_Altitude_Down_SummarizedBorder(defaultListener);
 
-		defineColumn_AltitudeDiff_SegmentBorder(defaultListener);
-		defineColumn_AltitudeDiff_SegmentComputed(defaultListener);
-		defineColumn_AltitudeUp_SummarizedComputed(defaultListener);
-		defineColumn_AltitudeDown_SummarizedComputed(defaultListener);
+		defineColumn_Body_AvgPulse();
+		defineColumn_Body_AvgPulse_Difference();
 
-		defineColumn_Gradient();
+		defineColumn_Powertrain_AvgCadence();
 
-		defineColumn_AltitudeUp_Hour(defaultListener);
-		defineColumn_AltitudeDown_Hour(defaultListener);
-
-		defineColumn_AvgSpeed();
-		defineColumn_AvgPace();
-		defineColumn_AvgPace_Difference();
-		defineColumn_AvgPulse();
-		defineColumn_AvgPulse_Difference();
-		defineColumn_AvgCadence();
-
-		defineColumn_AltitudeUp_SummarizedBorder(defaultListener);
-		defineColumn_AltitudeDown_SummarizedBorder(defaultListener);
-
-		defineColumn_SerieStartEndIndex();
+		defineColumn_Data_SerieStartEndIndex();
 	}
 
 	/**
 	 * column: altitude diff segment border (m/ft)
 	 */
-	private void defineColumn_AltitudeDiff_SegmentBorder(final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumn_Altitude_Diff_SegmentBorder(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
@@ -2253,7 +2253,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: computed altitude diff (m/ft)
 	 */
-	private void defineColumn_AltitudeDiff_SegmentComputed(final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumn_Altitude_Diff_SegmentComputed(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
@@ -2278,9 +2278,92 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	}
 
 	/**
+	 * column: total altitude down (m/ft)
+	 */
+	private void defineColumn_Altitude_Down_SummarizedBorder(final SelectionAdapter defaultColumnSelectionListener) {
+
+		final ColumnDefinition colDef;
+
+		colDef = TableColumnFactory.ALTITUDE_DOWN_SUMMARIZED_BORDER.createColumn(_columnManager, _pc);
+		colDef.setIsDefaultColumn();
+		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourSegment segment = (TourSegment) cell.getElement();
+				final float altitude = segment.altitudeDownSummarizedBorder / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+
+				if (altitude == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(_nf_0_0.format(altitude));
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: total altitude down (m/ft)
+	 */
+	private void defineColumn_Altitude_Down_SummarizedComputed(final SelectionAdapter defaultColumnSelectionListener) {
+
+		final ColumnDefinition colDef;
+
+		colDef = TableColumnFactory.ALTITUDE_DOWN_SUMMARIZED_COMPUTED.createColumn(_columnManager, _pc);
+		colDef.setIsDefaultColumn();
+		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourSegment segment = (TourSegment) cell.getElement();
+				final float altitude = segment.altitudeDownSummarizedComputed / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+				if (altitude == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(_nf_0_0.format(altitude));
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: gradient
+	 */
+	private void defineColumn_Altitude_Gradient() {
+
+		final ColumnDefinition colDef;
+
+		colDef = TableColumnFactory.ALTITUDE_GRADIENT.createColumn(_columnManager, _pc);
+		colDef.setIsDefaultColumn();
+		colDef.setColumnSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent event) {
+				((ViewSorter) _segmentViewer.getSorter()).setSortColumn(COLUMN_GRADIENT);
+				_segmentViewer.refresh();
+			}
+		});
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourSegment segment = (TourSegment) cell.getElement();
+				final float gradient = segment.gradient;
+
+				if (gradient == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(_nf_1_1.format(gradient));
+				}
+			}
+		});
+	}
+
+	/**
 	 * column: altitude down m/h
 	 */
-	private void defineColumn_AltitudeDown_Hour(final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumn_Altitude_Hour_Down(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
@@ -2309,60 +2392,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	}
 
 	/**
-	 * column: total altitude down (m/ft)
-	 */
-	private void defineColumn_AltitudeDown_SummarizedBorder(final SelectionAdapter defaultColumnSelectionListener) {
-
-		final ColumnDefinition colDef;
-
-		colDef = TableColumnFactory.ALTITUDE_DOWN_SUMMARIZED_BORDER.createColumn(_columnManager, _pc);
-		colDef.setIsDefaultColumn();
-		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final TourSegment segment = (TourSegment) cell.getElement();
-				final float altitude = segment.altitudeDownSummarizedBorder / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
-
-				if (altitude == 0) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					cell.setText(_nf_0_0.format(altitude));
-				}
-			}
-		});
-	}
-
-	/**
-	 * column: total altitude down (m/ft)
-	 */
-	private void defineColumn_AltitudeDown_SummarizedComputed(final SelectionAdapter defaultColumnSelectionListener) {
-
-		final ColumnDefinition colDef;
-
-		colDef = TableColumnFactory.ALTITUDE_DOWN_SUMMARIZED_COMPUTED.createColumn(_columnManager, _pc);
-		colDef.setIsDefaultColumn();
-		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final TourSegment segment = (TourSegment) cell.getElement();
-				final float altitude = segment.altitudeDownSummarizedComputed / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
-				if (altitude == 0) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					cell.setText(_nf_0_0.format(altitude));
-				}
-			}
-		});
-	}
-
-	/**
 	 * column: altitude up m/h
 	 */
-	private void defineColumn_AltitudeUp_Hour(final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumn_Altitude_Hour_Up(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
@@ -2393,7 +2425,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: total altitude up (m/ft)
 	 */
-	private void defineColumn_AltitudeUp_SummarizedBorder(final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumn_Altitude_Up_SummarizedBorder(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
@@ -2418,7 +2450,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: total altitude up (m/ft)
 	 */
-	private void defineColumn_AltitudeUp_SummarizedComputed(final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumn_Altitude_Up_SummarizedComputed(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
@@ -2441,18 +2473,18 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	}
 
 	/**
-	 * column: Average cadence
+	 * column: average pulse
 	 */
-	private void defineColumn_AvgCadence() {
+	private void defineColumn_Body_AvgPulse() {
 
 		final ColumnDefinition colDef;
 
-		colDef = TableColumnFactory.AVG_CADENCE.createColumn(_columnManager, _pc);
+		colDef = TableColumnFactory.BODY_AVG_PULSE.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setColumnSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
-				((ViewSorter) _segmentViewer.getSorter()).setSortColumn(COLUMN_CADENCE);
+				((ViewSorter) _segmentViewer.getSorter()).setSortColumn(COLUMN_PULSE);
 				_segmentViewer.refresh();
 			}
 		});
@@ -2460,13 +2492,67 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			@Override
 			public void update(final ViewerCell cell) {
 
-				final float cadence = ((TourSegment) cell.getElement()).cadence;
+				final float pulse = ((TourSegment) cell.getElement()).pulse;
 
-				if (cadence == 0) {
+				if (pulse == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(_nf_1_1.format(cadence));
+					cell.setText(_nf_1_1.format(pulse));
 				}
+			}
+		});
+	}
+
+	/**
+	 * column: pulse difference
+	 */
+	private void defineColumn_Body_AvgPulse_Difference() {
+
+		final ColumnDefinition colDef;
+
+		colDef = TableColumnFactory.BODY_AVG_PULSE_DIFFERENCE.createColumn(_columnManager, _pc);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final float pulseDiff = ((TourSegment) cell.getElement()).pulseDiff;
+
+				if (pulseDiff == Integer.MIN_VALUE) {
+					cell.setText(UI.EMPTY_STRING);
+				} else if (pulseDiff == 0) {
+					cell.setText(UI.DASH);
+				} else {
+					cell.setText(Integer.toString((int) pulseDiff));
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: data serie start/end index
+	 */
+	private void defineColumn_Data_SerieStartEndIndex() {
+
+		final ColumnDefinition colDef;
+
+		colDef = TableColumnFactory.DATA_SERIE_START_END_INDEX.createColumn(_columnManager, _pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourSegment segment = (TourSegment) cell.getElement();
+
+				int startIndex = segment.serieIndexStart;
+				final int endIndex = segment.serieIndexEnd;
+
+				if (startIndex > 0) {
+					startIndex++;
+				}
+
+				cell.setText(startIndex == endIndex ? //
+						Integer.toString(startIndex)
+						: startIndex + UI.DASH_WITH_SPACE + endIndex);
 			}
 		});
 	}
@@ -2474,11 +2560,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: average pace
 	 */
-	private void defineColumn_AvgPace() {
+	private void defineColumn_Motion_AvgPace() {
 
 		final ColumnDefinition colDef;
 
-		colDef = TableColumnFactory.AVG_PACE.createColumn(_columnManager, _pc);
+		colDef = TableColumnFactory.MOTION_AVG_PACE.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setColumnSelectionListener(new SelectionAdapter() {
 			@Override
@@ -2506,11 +2592,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: pace difference
 	 */
-	private void defineColumn_AvgPace_Difference() {
+	private void defineColumn_Motion_AvgPace_Difference() {
 
 		final ColumnDefinition colDef;
 
-		colDef = TableColumnFactory.AVG_PACE_DIFFERENCE.createColumn(_columnManager, _pc);
+		colDef = TableColumnFactory.MOTION_AVG_PACE_DIFFERENCE.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -2528,70 +2614,13 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	}
 
 	/**
-	 * column: average pulse
-	 */
-	private void defineColumn_AvgPulse() {
-
-		final ColumnDefinition colDef;
-
-		colDef = TableColumnFactory.AVG_PULSE.createColumn(_columnManager, _pc);
-		colDef.setIsDefaultColumn();
-		colDef.setColumnSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent event) {
-				((ViewSorter) _segmentViewer.getSorter()).setSortColumn(COLUMN_PULSE);
-				_segmentViewer.refresh();
-			}
-		});
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final float pulse = ((TourSegment) cell.getElement()).pulse;
-
-				if (pulse == 0) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					cell.setText(_nf_1_1.format(pulse));
-				}
-			}
-		});
-	}
-
-	/**
-	 * column: pulse difference
-	 */
-	private void defineColumn_AvgPulse_Difference() {
-
-		final ColumnDefinition colDef;
-
-		colDef = TableColumnFactory.AVG_PULSE_DIFFERENCE.createColumn(_columnManager, _pc);
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final float pulseDiff = ((TourSegment) cell.getElement()).pulseDiff;
-
-				if (pulseDiff == Integer.MIN_VALUE) {
-					cell.setText(UI.EMPTY_STRING);
-				} else if (pulseDiff == 0) {
-					cell.setText(UI.DASH);
-				} else {
-					cell.setText(Integer.toString((int) pulseDiff));
-				}
-			}
-		});
-	}
-
-	/**
 	 * column: average speed
 	 */
-	private void defineColumn_AvgSpeed() {
+	private void defineColumn_Motion_AvgSpeed() {
 
 		final ColumnDefinition colDef;
 
-		colDef = TableColumnFactory.AVG_SPEED.createColumn(_columnManager, _pc);
+		colDef = TableColumnFactory.MOTION_AVG_SPEED.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setColumnSelectionListener(new SelectionAdapter() {
 			@Override
@@ -2618,11 +2647,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: distance (km/mile)
 	 */
-	private void defineColumn_Distance(final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumn_Motion_Distance(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
-		colDef = TableColumnFactory.DISTANCE.createColumn(_columnManager, _pc);
+		colDef = TableColumnFactory.MOTION_DISTANCE.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -2643,11 +2672,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: TOTAL distance (km/mile)
 	 */
-	private void defineColumn_DistanceTotal(final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumn_Motion_DistanceTotal(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
-		colDef = TableColumnFactory.DISTANCE_TOTAL.createColumn(_columnManager, _pc);
+		colDef = TableColumnFactory.MOTION_DISTANCE_TOTAL.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -2666,13 +2695,44 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	}
 
 	/**
-	 * column: driving time
+	 * column: Average cadence
 	 */
-	private void defineColumn_DrivingTime(final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumn_Powertrain_AvgCadence() {
 
 		final ColumnDefinition colDef;
 
-		colDef = TableColumnFactory.DRIVING_TIME.createColumn(_columnManager, _pc);
+		colDef = TableColumnFactory.POWERTRAIN_AVG_CADENCE.createColumn(_columnManager, _pc);
+		colDef.setIsDefaultColumn();
+		colDef.setColumnSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent event) {
+				((ViewSorter) _segmentViewer.getSorter()).setSortColumn(COLUMN_CADENCE);
+				_segmentViewer.refresh();
+			}
+		});
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final float cadence = ((TourSegment) cell.getElement()).cadence;
+
+				if (cadence == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(_nf_1_1.format(cadence));
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: driving time
+	 */
+	private void defineColumn_Time_Driving(final SelectionAdapter defaultColumnSelectionListener) {
+
+		final ColumnDefinition colDef;
+
+		colDef = TableColumnFactory.TIME_DRIVING.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -2690,45 +2750,13 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	}
 
 	/**
-	 * column: gradient
-	 */
-	private void defineColumn_Gradient() {
-
-		final ColumnDefinition colDef;
-
-		colDef = TableColumnFactory.GRADIENT.createColumn(_columnManager, _pc);
-		colDef.setIsDefaultColumn();
-		colDef.setColumnSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent event) {
-				((ViewSorter) _segmentViewer.getSorter()).setSortColumn(COLUMN_GRADIENT);
-				_segmentViewer.refresh();
-			}
-		});
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final TourSegment segment = (TourSegment) cell.getElement();
-				final float gradient = segment.gradient;
-
-				if (gradient == 0) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					cell.setText(_nf_1_1.format(gradient));
-				}
-			}
-		});
-	}
-
-	/**
 	 * column: break time
 	 */
-	private void defineColumn_PausedTime(final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumn_Time_Paused(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
-		colDef = TableColumnFactory.PAUSED_TIME.createColumn(_columnManager, _pc);
+		colDef = TableColumnFactory.TIME_PAUSED.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -2748,11 +2776,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: recording time
 	 */
-	private void defineColumn_RecordingTime(final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumn_Time_Recording(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
-		colDef = TableColumnFactory.RECORDING_TIME.createColumn(_columnManager, _pc);
+		colDef = TableColumnFactory.TIME_RECORDING.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -2767,11 +2795,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * column: TOTAL recording time
 	 */
-	private void defineColumn_RecordingTimeTotal(final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumn_Time_RecordingTimeTotal(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
-		colDef = TableColumnFactory.RECORDING_TIME_TOTAL.createColumn(_columnManager, _pc);
+		colDef = TableColumnFactory.TIME_RECORDING_TIME_TOTAL.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -2779,34 +2807,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			public void update(final ViewerCell cell) {
 				final TourSegment segment = (TourSegment) cell.getElement();
 				cell.setText(net.tourbook.ui.UI.format_hh_mm_ss(segment.timeTotal));
-			}
-		});
-	}
-
-	/**
-	 * column: data serie start/end index
-	 */
-	private void defineColumn_SerieStartEndIndex() {
-
-		final ColumnDefinition colDef;
-
-		colDef = TableColumnFactory.SERIE_START_END_INDEX.createColumn(_columnManager, _pc);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final TourSegment segment = (TourSegment) cell.getElement();
-
-				int startIndex = segment.serieIndexStart;
-				final int endIndex = segment.serieIndexEnd;
-
-				if (startIndex > 0) {
-					startIndex++;
-				}
-
-				cell.setText(startIndex == endIndex ? //
-						Integer.toString(startIndex)
-						: startIndex + UI.DASH_WITH_SPACE + endIndex);
 			}
 		});
 	}

@@ -738,7 +738,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	 */
 	private void defineColumn_Count() {
 		
-		final TreeColumnDefinition colDef = TreeColumnFactory.NUMBER_OF_TOURS.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.NUM_TOURS.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override

@@ -172,8 +172,11 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_clouds;
 	public static String		ColumnFactory_clouds_tooltip;
 
+	public static String		ColumnFactory_Category_Altitude;
 	public static String		ColumnFactory_Category_Body;
+	public static String		ColumnFactory_Category_Data;
 	public static String		ColumnFactory_Category_Device;
+	public static String		ColumnFactory_Category_Motion;
 	public static String		ColumnFactory_Category_Power;
 	public static String		ColumnFactory_Category_Powertrain;
 	public static String		ColumnFactory_Category_Time;

@@ -3488,7 +3488,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 */
 	private void defineColumn_Distance() {
 
-		final ColumnDefinition colDef = TableColumnFactory.DISTANCE.createColumn(_sliceColumnManager, _pc);
+		final ColumnDefinition colDef = TableColumnFactory.MOTION_DISTANCE.createColumn(_sliceColumnManager, _pc);
 
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -3611,7 +3611,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 */
 	private void defineColumn_Gradient() {
 
-		final ColumnDefinition colDef = TableColumnFactory.GRADIENT.createColumn(_sliceColumnManager, _pc);
+		final ColumnDefinition colDef = TableColumnFactory.ALTITUDE_GRADIENT.createColumn(_sliceColumnManager, _pc);
 
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {

@@ -531,7 +531,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 	 */
 	private void defineColumn_Distance() {
 
-		final ColumnDefinition colDef = TableColumnFactory.DISTANCE.createColumn(_columnManager, _pc);
+		final ColumnDefinition colDef = TableColumnFactory.MOTION_DISTANCE.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 
 		colDef.setLabelProvider(new CellLabelProvider() {
