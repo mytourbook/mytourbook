@@ -23,6 +23,8 @@ import net.tourbook.common.CommonActivator;
 import net.tourbook.common.Messages;
 import net.tourbook.common.UI;
 
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.TrayDialog;
@@ -75,16 +77,20 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.Widget;
 
 public class DialogModifyColumns extends TrayDialog {
 
 	private static final String[]		IS_SORTER_PROPERTY	= new String[] { "DummyProperty" }; //$NON-NLS-1$
 
+	private Action						_actionShowHideCategory;
+
 	private ColumnManager				_columnManager;
 
 	/** Model for the column viewer */
 	private ArrayList<ColumnDefinition>	_columnViewerModel;
+
 	private ArrayList<ColumnDefinition>	_allDefinedColumns;
 	//
 	private PixelConverter				_pc;
@@ -93,18 +99,21 @@ public class DialogModifyColumns extends TrayDialog {
 	private Object[]					_dndCheckedElements;
 	//
 	private ColumnProfile				_selectedProfile;
-
 	private ArrayList<ColumnProfile>	_columnMgr_Profiles;
+
 	private ArrayList<ColumnProfile>	_dialog_Profiles;
 	//
 	private boolean						_isInUpdate;
 	//
+	private boolean						_isShowCategory;
+	private int							_categoryColumnWidth;
+	//
 	private ViewerComparator			_profileComparator	= new ProfileComparator();
-
 	/*
 	 * UI controls
 	 */
 	private Button						_btnColumn_MoveUp;
+
 	private Button						_btnColumn_MoveDown;
 	private Button						_btnColumn_SelectAll;
 	private Button						_btnColumn_DeselectAll;
@@ -116,8 +125,25 @@ public class DialogModifyColumns extends TrayDialog {
 	//
 	private CheckboxTableViewer			_columnViewer;
 	private CheckboxTableViewer			_profileViewer;
-
 	private Composite					_uiContainer;
+
+	private TableColumn					_categoryColumn;
+
+	public class ActionCategoryColumn extends Action {
+
+		public ActionCategoryColumn() {
+
+			super(null, AS_CHECK_BOX);
+
+			setImageDescriptor(CommonActivator.getImageDescriptor(Messages.Image__ColumnCategory));
+			setToolTipText(Messages.ColumnModifyDialog_Button_ShowCategoryColumn_Tooltip);
+		}
+
+		@Override
+		public void run() {
+			action_ShowHideCategory();
+		}
+	}
 
 	public class ProfileComparator extends ViewerComparator {
 
@@ -175,10 +201,23 @@ public class DialogModifyColumns extends TrayDialog {
 		setShellStyle(getShellStyle() | SWT.RESIZE);
 	}
 
+	private void action_ShowHideCategory() {
+
+		// toggle column
+		_isShowCategory = !_isShowCategory;
+
+		_categoryColumn.setWidth(_isShowCategory ? _categoryColumnWidth : 0);
+	}
+
 	@Override
 	protected void configureShell(final Shell newShell) {
 		super.configureShell(newShell);
 		newShell.setText(Messages.ColumnModifyDialog_Dialog_title);
+	}
+
+	private void createActions() {
+
+		_actionShowHideCategory = new ActionCategoryColumn();
 	}
 
 	/**
@@ -256,6 +295,7 @@ public class DialogModifyColumns extends TrayDialog {
 		gd.widthHint = 600;
 		gd.heightHint = 800;
 
+		createActions();
 		createUI(dlgContainer);
 
 		setupColumnsInViewer();
@@ -440,15 +480,47 @@ public class DialogModifyColumns extends TrayDialog {
 		}
 	}
 
-	private void createUI_70_ColumnsHeader(final Composite container) {
+	private void createUI_70_ColumnsHeader(final Composite parent) {
 
-		final Label label = new Label(container, SWT.WRAP);
-		label.setText(Messages.ColumnModifyDialog_Label_Column);
+		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
 				.grab(true, false)
-				.span(2, 1)
 				.indent(0, 20)
-				.applyTo(label);
+				.applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+		{
+			/*
+			 * Label: Column
+			 */
+			{
+				final Label label = new Label(container, SWT.WRAP);
+				label.setText(Messages.ColumnModifyDialog_Label_Column);
+				GridDataFactory.fillDefaults()//
+						.align(SWT.FILL, SWT.END)
+						.applyTo(label);
+			}
+
+			/*
+			 * Action: Show/hide category
+			 */
+			{
+				final ToolBar toolbar = new ToolBar(container, SWT.FLAT);
+				GridDataFactory.fillDefaults()//
+						.grab(true, false)
+						.align(SWT.END, SWT.FILL)
+						.applyTo(toolbar);
+
+				final ToolBarManager tbm = new ToolBarManager(toolbar);
+
+				tbm.add(_actionShowHideCategory);
+
+				tbm.update(true);
+			}
+		}
+
+		// 2nd column
+		new Label(parent, SWT.NONE);
 	}
 
 	private void createUI_72_ColumnsViewer(final Composite parent) {
@@ -855,27 +927,6 @@ public class DialogModifyColumns extends TrayDialog {
 		TableColumn tc;
 
 		/*
-		 * Column: Category
-		 */
-		tvc = new TableViewerColumn(_columnViewer, SWT.LEAD);
-		tc = tvc.getColumn();
-		tc.setText(Messages.ColumnModifyDialog_Column_Category);
-		tvc.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final ColumnDefinition colDef = (ColumnDefinition) cell.getElement();
-				cell.setText(colDef.getColumnCategory());
-
-				// paint columns in a different color which can't be hidden
-				if (colDef.canModifyVisibility() == false) {
-					cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-				}
-			}
-		});
-		tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(20), true));
-
-		/*
 		 * Column: Label
 		 */
 		tvc = new TableViewerColumn(_columnViewer, SWT.LEAD);
@@ -937,6 +988,39 @@ public class DialogModifyColumns extends TrayDialog {
 			}
 		});
 		tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(10), true));
+
+		/*
+		 * Column: Category, this column CANNOT be the first column because it would contain the
+		 * checkbox
+		 */
+		tvc = new TableViewerColumn(_columnViewer, SWT.LEAD);
+		tc = tvc.getColumn();
+		tc.setText(Messages.ColumnModifyDialog_Column_Category);
+		tvc.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final ColumnDefinition colDef = (ColumnDefinition) cell.getElement();
+				cell.setText(colDef.getColumnCategory());
+
+				// paint columns in a different color which can't be hidden
+				if (colDef.canModifyVisibility() == false) {
+					cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+				}
+			}
+		});
+		_categoryColumn = tc;
+
+		_categoryColumnWidth = _pc.convertWidthInCharsToPixels(20);
+		int categoryColumnWidth;
+		if (_columnManager.isShowCategory()) {
+			categoryColumnWidth = _categoryColumnWidth;
+		} else {
+			// hide column
+			categoryColumnWidth = 0;
+		}
+
+		tableLayout.setColumnData(tc, new ColumnPixelData(categoryColumnWidth, true));
 	}
 
 	private void enableProfileActions() {
@@ -1322,6 +1406,12 @@ public class DialogModifyColumns extends TrayDialog {
 
 	private void restoreState() {
 
+		/*
+		 * Show/hide category
+		 */
+		_isShowCategory = _columnManager.isShowCategory();
+		_actionShowHideCategory.setChecked(_isShowCategory);
+
 		// load viewer
 		_profileViewer.setInput(new Object());
 
@@ -1339,6 +1429,8 @@ public class DialogModifyColumns extends TrayDialog {
 		// replace column mgr profiles
 		_columnMgr_Profiles.clear();
 		_columnMgr_Profiles.addAll(_dialog_Profiles);
+
+		_columnManager.setIsShowCategory(_isShowCategory);
 
 		_columnManager.updateColumns(//
 				_selectedProfile,

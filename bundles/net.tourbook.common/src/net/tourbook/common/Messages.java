@@ -47,6 +47,7 @@ public class Messages extends NLS {
 	public static String		ColumnModifyDialog_Button_move_down;
 	public static String		ColumnModifyDialog_Button_move_up;
 	public static String		ColumnModifyDialog_Button_select_all;
+	public static String		ColumnModifyDialog_Button_ShowCategoryColumn_Tooltip;
 	public static String		ColumnModifyDialog_Button_Sort;
 	public static String		ColumnModifyDialog_Button_Sort_Tooltip;
 	public static String		ColumnModifyDialog_Column_Category;
@@ -121,6 +122,7 @@ public class Messages extends NLS {
 	public static String		Graph_Pref_ColorText;
 
 	public static String		Image___Empty16;
+	public static String		Image__ColumnCategory;
 	public static String		Image__CustomizeProfilesColumns;
 	public static String		Image__options;
 	public static String		Image__weather_sunny;

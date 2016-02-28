@@ -75,6 +75,7 @@ public class ColumnManager {
 	private static final String					TAG_PROFILE							= "Profile";							//$NON-NLS-1$
 	//
 	private static final String					ATTR_IS_ACTIVE_PROFILE				= "isActiveProfile";					//$NON-NLS-1$
+	private static final String					ATTR_IS_SHOW_CATEGORY				= "isShowCategory";					//$NON-NLS-1$
 	private static final String					ATTR_NAME							= "name";								//$NON-NLS-1$
 	private static final String					ATTR_VISIBLE_COLUMN_IDS				= "visibleColumnIds";					//$NON-NLS-1$
 	private static final String					ATTR_VISIBLE_COLUMN_IDS_AND_WIDTH	= "visibleColumnIdsAndWidth";			//$NON-NLS-1$
@@ -99,6 +100,8 @@ public class ColumnManager {
 
 	/** Active column profile */
 	private ColumnProfile						_activeProfile;
+
+	private boolean								_isShowCategory						= true;
 
 	private Comparator<ColumnProfile>			_profileSorter;
 
@@ -436,7 +439,7 @@ public class ColumnManager {
 			final String unit = colDef.getColumnUnit();
 
 			final StringBuilder sb = new StringBuilder();
-			if (category != null) {
+			if (_isShowCategory && category != null) {
 				sb.append(category);
 			}
 
@@ -969,6 +972,10 @@ public class ColumnManager {
 		return allRearrangedColumns;
 	}
 
+	public boolean isShowCategory() {
+		return _isShowCategory;
+	}
+
 	private void onSelectColumnItem(final Event event) {
 
 		if (event.widget instanceof MenuItem) {
@@ -1023,6 +1030,13 @@ public class ColumnManager {
 				final Reader reader = new StringReader(stateValue);
 				final XMLMemento xmlMemento = XMLMemento.createReadRoot(reader);
 
+				// get category column state
+				final Boolean xmlIsShowCategory = xmlMemento.getBoolean(ATTR_IS_SHOW_CATEGORY);
+				if (xmlIsShowCategory != null) {
+					_isShowCategory = xmlIsShowCategory;
+				}
+
+				// get profiles
 				for (final IMemento memento : xmlMemento.getChildren()) {
 
 					final XMLMemento xmlProfile = (XMLMemento) memento;
@@ -1110,12 +1124,13 @@ public class ColumnManager {
 			_activeProfile.visibleColumnIdsAndWidth = visibleColumnIdsAndWidth;
 		}
 
-		/*
-		 * Save profiles
-		 */
 		// Build the XML block for writing the bindings and active scheme.
 		final XMLMemento xmlMemento = XMLMemento.createWriteRoot(TAG_ROOT);
 
+		// save category column state
+		xmlMemento.putBoolean(ATTR_IS_SHOW_CATEGORY, _isShowCategory);
+
+		// save profiles
 		saveState_Profiles(xmlMemento);
 
 		// Write the XML block to the state store.
@@ -1195,6 +1210,10 @@ public class ColumnManager {
 	 */
 	public void setColumnLayout(final AbstractColumnLayout columnLayout) {
 		_columnLayout = columnLayout;
+	}
+
+	public void setIsShowCategory(final boolean isShowCategory) {
+		_isShowCategory = isShowCategory;
 	}
 
 	/**
