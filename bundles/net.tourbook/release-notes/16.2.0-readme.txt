@@ -16,7 +16,9 @@ IDEAS
 New
 ===	
 
-* Column Profiles
+* Table/Tree Columns
+  - Organize column sets with profiles
+  - Column categorization
 
 * Power
   - Show power value in chart segment tooltip
@@ -24,6 +26,7 @@ New
  
 
 Bugfix
-======	
+======
 
+* Allways
 

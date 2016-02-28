@@ -659,7 +659,7 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 	 */
 	private void defineColumn_Latitude() {
 
-		final ColumnDefinition colDef = TableColumnFactory.LATITUDE.createColumn(_columnManager, _pc);
+		final ColumnDefinition colDef = TableColumnFactory.MOTION_LATITUDE.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -676,7 +676,7 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 	 */
 	private void defineColumn_Longitude() {
 
-		final ColumnDefinition colDef = TableColumnFactory.LONGITUDE.createColumn(_columnManager, _pc);
+		final ColumnDefinition colDef = TableColumnFactory.MOTION_LONGITUDE.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setCanModifyVisibility(true);
 		colDef.setLabelProvider(new CellLabelProvider() {

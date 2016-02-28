@@ -1111,7 +1111,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 	 */
 	private void defineColumn_TourStartTime() {
 
-		final ColumnDefinition colDef = TableColumnFactory.TOUR_START_TIME.createColumn(_columnManager, _pc);
+		final ColumnDefinition colDef = TableColumnFactory.TIME_TOUR_START_TIME.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {

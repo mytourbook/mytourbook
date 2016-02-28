@@ -760,7 +760,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 	 */
 	private void defineColumn_Altitude() {
 
-		final ColumnDefinition colDef = TableColumnFactory.ALTITUDE.createColumn(_columnManager, _pc);
+		final ColumnDefinition colDef = TableColumnFactory.ALTITUDE_ALTITUDE.createColumn(_columnManager, _pc);
 
 		// overwrite column id to identify the column when table is sorted
 		colDef.setColumnId(COLUMN_ALTITUDE);

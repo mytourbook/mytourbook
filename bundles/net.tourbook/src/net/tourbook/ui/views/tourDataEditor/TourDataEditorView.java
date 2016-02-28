@@ -3371,56 +3371,47 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private void defineAllColumns(final Composite parent) {
 
-		defineColumn_1_First();
-		defineColumn_Sequence();
-		defineColumn_TimeInHHMMSSRelative();
-		defineColumn_TimeOfDay();
-		defineColumn_TimeInSeconds();
-		defineColumn_Distance();
-		defineColumn_Altitude();
-		defineColumn_Gradient();
-		defineColumn_Pulse();
-		defineColumn_Marker();
-		defineColumn_Temperature();
-		defineColumn_Cadence();
-		defineColumn_GearRatio();
-		defineColumn_GearTeeth();
-		defineColumn_Speed();
-		defineColumn_Pace();
+		defineColumn_Data_1_First();
+		defineColumn_Data_Sequence();
+
+		defineColumn_Time_TimeInHHMMSSRelative();
+		defineColumn_Time_TimeOfDay();
+		defineColumn_Time_TimeInSeconds();
+		defineColumn_Time_TimeDiff();
+		defineColumn_Time_BreakTime();
+
+		defineColumn_Motion_Distance();
+		defineColumn_Motion_Speed();
+		defineColumn_Motion_Pace();
+		defineColumn_Motion_Latitude();
+		defineColumn_Motion_Longitude();
+		defineColumn_Motion_DistanceDiff();
+		defineColumn_Motion_SpeedDiff();
+
+		defineColumn_Altitude_Altitude();
+		defineColumn_Altitude_Gradient();
+
+		defineColumn_Body_Pulse();
+
+		defineColumn_Tour_Marker();
+
+		defineColumn_Weather_Temperature();
+
+		defineColumn_Powertrain_Cadence();
+		defineColumn_Powertrain_GearRatio();
+		defineColumn_Powertrain_GearTeeth();
+
 		defineColumn_Power();
-		defineColumn_Latitude();
-		defineColumn_Longitude();
-		defineColumn_TimeDiff();
-		defineColumn_DistanceDiff();
-		defineColumn_BreakTime();
-		defineColumn_SpeedDiff();
-	}
-
-	/**
-	 * 1. column will be hidden because the alignment for the first column is always to the left
-	 */
-	private void defineColumn_1_First() {
-
-		final ColumnDefinition colDef = TableColumnFactory.FIRST_COLUMN.createColumn(_sliceColumnManager, _pc);
-
-		colDef.setIsDefaultColumn();
-		colDef.setCanModifyVisibility(false);
-		colDef.setIsColumnMoveable(false);
-		colDef.setHideColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {}
-		});
 	}
 
 	/**
 	 * column: altitude
 	 */
-	private void defineColumn_Altitude() {
+	private void defineColumn_Altitude_Altitude() {
 
 		ColumnDefinition colDef;
 
-		_colDefAltitude = colDef = TableColumnFactory.ALTITUDE.createColumn(_sliceColumnManager, _pc);
+		_colDefAltitude = colDef = TableColumnFactory.ALTITUDE_ALTITUDE.createColumn(_sliceColumnManager, _pc);
 
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -3438,22 +3429,21 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	}
 
 	/**
-	 * column: cadence
+	 * column: gradient
 	 */
-	private void defineColumn_BreakTime() {
+	private void defineColumn_Altitude_Gradient() {
 
-		ColumnDefinition colDef;
+		final ColumnDefinition colDef = TableColumnFactory.ALTITUDE_GRADIENT.createColumn(_sliceColumnManager, _pc);
 
-		_colDefCadence = colDef = TableColumnFactory.BREAK_TIME.createColumn(_sliceColumnManager, _pc);
-
+		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
-				if (_serieBreakTime != null) {
+
+				if (_serieGradient != null) {
 					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-					cell.setText(_serieBreakTime[timeSlice.serieIndex]
-							? net.tourbook.ui.UI.BREAK_TIME_MARKER
-							: UI.EMPTY_STRING);
+
+					cell.setText(_nf1.format(_serieGradient[timeSlice.serieIndex]));
 				} else {
 					cell.setText(UI.EMPTY_STRING);
 				}
@@ -3462,22 +3452,78 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	}
 
 	/**
-	 * column: cadence
+	 * column: pulse
 	 */
-	private void defineColumn_Cadence() {
+	private void defineColumn_Body_Pulse() {
 
 		ColumnDefinition colDef;
-
-		_colDefCadence = colDef = TableColumnFactory.CADENCE.createColumn(_sliceColumnManager, _pc);
+		_colDefPulse = colDef = TableColumnFactory.BODY_PULSE.createColumn(_sliceColumnManager, _pc);
 
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
-				if (_serieCadence != null) {
+				if (_seriePulse != null) {
 					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-					cell.setText(_nf1.format(_serieCadence[timeSlice.serieIndex]));
+					cell.setText(Integer.toString((int) _seriePulse[timeSlice.serieIndex]));
 				} else {
 					cell.setText(UI.EMPTY_STRING);
+				}
+			}
+		});
+	}
+
+	/**
+	 * 1. column will be hidden because the alignment for the first column is always to the left
+	 */
+	private void defineColumn_Data_1_First() {
+
+		final ColumnDefinition colDef = TableColumnFactory.DATA_FIRST_COLUMN.createColumn(_sliceColumnManager, _pc);
+
+		colDef.setIsDefaultColumn();
+		colDef.setCanModifyVisibility(false);
+		colDef.setIsColumnMoveable(false);
+		colDef.setHideColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {}
+		});
+	}
+
+	/**
+	 * column: #
+	 */
+	private void defineColumn_Data_Sequence() {
+
+		final ColumnDefinition colDef = TableColumnFactory.DATA_SEQUENCE.createColumn(_sliceColumnManager, _pc);
+
+		colDef.setIsDefaultColumn();
+		colDef.setCanModifyVisibility(false);
+		colDef.setIsColumnMoveable(false);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final int serieIndex = ((TimeSlice) cell.getElement()).serieIndex;
+				final int logIndex = ((TimeSlice) cell.getElement()).uniqueCreateIndex;
+
+				// the UI shows the time slice number starting with 1 and not with 0
+				cell.setText(Integer.toString(logIndex + 0));
+
+				// mark reference tour with a different background color
+				boolean isBgSet = false;
+
+				if (_refTourRange != null) {
+					for (final int[] oneRange : _refTourRange) {
+						if ((serieIndex >= oneRange[0]) && (serieIndex <= oneRange[1])) {
+							cell.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+							isBgSet = true;
+							break;
+						}
+					}
+				}
+
+				if (isBgSet == false) {
+					cell.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 				}
 			}
 		});
@@ -3486,7 +3532,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * column: distance
 	 */
-	private void defineColumn_Distance() {
+	private void defineColumn_Motion_Distance() {
 
 		final ColumnDefinition colDef = TableColumnFactory.MOTION_DISTANCE.createColumn(_sliceColumnManager, _pc);
 
@@ -3514,9 +3560,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * column: distance difference in seconds to previous slice
 	 */
-	private void defineColumn_DistanceDiff() {
+	private void defineColumn_Motion_DistanceDiff() {
 
-		final ColumnDefinition colDef = TableColumnFactory.DISTANCE_DIFF.createColumn(_sliceColumnManager, _pc);
+		final ColumnDefinition colDef = TableColumnFactory.MOTION_DISTANCE_DIFF.createColumn(_sliceColumnManager, _pc);
 
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -3553,90 +3599,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	}
 
 	/**
-	 * Column: Gear ratio
-	 */
-	private void defineColumn_GearRatio() {
-
-		final ColumnDefinition colDef = TableColumnFactory.GEAR_RATIO.createColumn(_sliceColumnManager, _pc);
-
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				if (_serieGears == null) {
-
-					cell.setText(UI.EMPTY_STRING);
-
-				} else {
-
-					final int serieIndex = ((TimeSlice) cell.getElement()).serieIndex;
-					final float gearRatio = _serieGears[0][serieIndex];
-
-					cell.setText(_nf2.format(gearRatio));
-				}
-			}
-		});
-	}
-
-	/**
-	 * Column: Gear teeth
-	 */
-	private void defineColumn_GearTeeth() {
-
-		final ColumnDefinition colDef = TableColumnFactory.GEAR_TEETH.createColumn(_sliceColumnManager, _pc);
-
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				if (_serieGears == null) {
-
-					cell.setText(UI.EMPTY_STRING);
-
-				} else {
-
-					final int serieIndex = ((TimeSlice) cell.getElement()).serieIndex;
-
-					final long frontTeeth = (long) _serieGears[1][serieIndex];
-					final long rearTeeth = (long) _serieGears[2][serieIndex];
-
-					cell.setText(String.format(TourManager.GEAR_TEETH_FORMAT, frontTeeth, rearTeeth));
-				}
-			}
-		});
-	}
-
-	/**
-	 * column: gradient
-	 */
-	private void defineColumn_Gradient() {
-
-		final ColumnDefinition colDef = TableColumnFactory.ALTITUDE_GRADIENT.createColumn(_sliceColumnManager, _pc);
-
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				if (_serieGradient != null) {
-					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-
-					cell.setText(_nf1.format(_serieGradient[timeSlice.serieIndex]));
-				} else {
-					cell.setText(UI.EMPTY_STRING);
-				}
-			}
-		});
-	}
-
-	/**
 	 * column: latitude
 	 */
-	private void defineColumn_Latitude() {
+	private void defineColumn_Motion_Latitude() {
 
 		ColumnDefinition colDef;
 
-		_colDefLatitude = colDef = TableColumnFactory.LATITUDE.createColumn(_sliceColumnManager, _pc);
+		_colDefLatitude = colDef = TableColumnFactory.MOTION_LATITUDE.createColumn(_sliceColumnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -3660,10 +3629,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * column: longitude
 	 */
-	private void defineColumn_Longitude() {
+	private void defineColumn_Motion_Longitude() {
 
 		ColumnDefinition colDef;
-		_colDefLongitude = colDef = TableColumnFactory.LONGITUDE.createColumn(_sliceColumnManager, _pc);
+		_colDefLongitude = colDef = TableColumnFactory.MOTION_LONGITUDE.createColumn(_sliceColumnManager, _pc);
 
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -3686,42 +3655,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	}
 
 	/**
-	 * column: marker
-	 */
-	private void defineColumn_Marker() {
-
-		ColumnDefinition colDef;
-		colDef = TableColumnFactory.MARKER.createColumn(_sliceColumnManager, _pc);
-
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-
-				final TourMarker tourMarker = _markerMap.get(timeSlice.serieIndex);
-				if (tourMarker != null) {
-
-					cell.setText(tourMarker.getLabel());
-
-					if (tourMarker.getType() == ChartLabel.MARKER_TYPE_DEVICE) {
-						cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-					}
-
-				} else {
-					cell.setText(UI.EMPTY_STRING);
-				}
-			}
-		});
-	}
-
-	/**
 	 * column: pace
 	 */
-	private void defineColumn_Pace() {
+	private void defineColumn_Motion_Pace() {
 
-		final ColumnDefinition colDef = TableColumnFactory.PACE.createColumn(_sliceColumnManager, _pc);
+		final ColumnDefinition colDef = TableColumnFactory.MOTION_PACE.createColumn(_sliceColumnManager, _pc);
 
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -3739,93 +3677,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	}
 
 	/**
-	 * column: power
-	 */
-	private void defineColumn_Power() {
-
-		final ColumnDefinition colDef = TableColumnFactory.POWER.createColumn(_sliceColumnManager, _pc);
-
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				if (_seriePower != null) {
-					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-					cell.setText(Integer.toString((int) _seriePower[timeSlice.serieIndex]));
-
-				} else {
-					cell.setText(UI.EMPTY_STRING);
-				}
-			}
-		});
-	}
-
-	/**
-	 * column: pulse
-	 */
-	private void defineColumn_Pulse() {
-
-		ColumnDefinition colDef;
-		_colDefPulse = colDef = TableColumnFactory.PULSE.createColumn(_sliceColumnManager, _pc);
-
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				if (_seriePulse != null) {
-					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-					cell.setText(Integer.toString((int) _seriePulse[timeSlice.serieIndex]));
-				} else {
-					cell.setText(UI.EMPTY_STRING);
-				}
-			}
-		});
-	}
-
-	/**
-	 * column: #
-	 */
-	private void defineColumn_Sequence() {
-
-		final ColumnDefinition colDef = TableColumnFactory.SEQUENCE.createColumn(_sliceColumnManager, _pc);
-
-		colDef.setIsDefaultColumn();
-		colDef.setCanModifyVisibility(false);
-		colDef.setIsColumnMoveable(false);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final int serieIndex = ((TimeSlice) cell.getElement()).serieIndex;
-				final int logIndex = ((TimeSlice) cell.getElement()).uniqueCreateIndex;
-
-				// the UI shows the time slice number starting with 1 and not with 0
-				cell.setText(Integer.toString(logIndex + 0));
-
-				// mark reference tour with a different background color
-				boolean isBgSet = false;
-
-				if (_refTourRange != null) {
-					for (final int[] oneRange : _refTourRange) {
-						if ((serieIndex >= oneRange[0]) && (serieIndex <= oneRange[1])) {
-							cell.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
-							isBgSet = true;
-							break;
-						}
-					}
-				}
-
-				if (isBgSet == false) {
-					cell.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
-				}
-			}
-		});
-	}
-
-	/**
 	 * column: speed
 	 */
-	private void defineColumn_Speed() {
+	private void defineColumn_Motion_Speed() {
 
-		final ColumnDefinition colDef = TableColumnFactory.SPEED.createColumn(_sliceColumnManager, _pc);
+		final ColumnDefinition colDef = TableColumnFactory.MOTION_SPEED.createColumn(_sliceColumnManager, _pc);
 
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -3847,9 +3703,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * column: speed diff
 	 */
-	private void defineColumn_SpeedDiff() {
+	private void defineColumn_Motion_SpeedDiff() {
 
-		final ColumnDefinition colDef = TableColumnFactory.SPEED_DIFF.createColumn(_sliceColumnManager, _pc);
+		final ColumnDefinition colDef = TableColumnFactory.MOTION_SPEED_DIFF.createColumn(_sliceColumnManager, _pc);
 
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -3883,12 +3739,258 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	}
 
 	/**
-	 * column: temperature
+	 * column: power
 	 */
-	private void defineColumn_Temperature() {
+	private void defineColumn_Power() {
+
+		final ColumnDefinition colDef = TableColumnFactory.POWER.createColumn(_sliceColumnManager, _pc);
+
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				if (_seriePower != null) {
+					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
+					cell.setText(Integer.toString((int) _seriePower[timeSlice.serieIndex]));
+
+				} else {
+					cell.setText(UI.EMPTY_STRING);
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: cadence
+	 */
+	private void defineColumn_Powertrain_Cadence() {
 
 		ColumnDefinition colDef;
-		_colDefTemperature = colDef = TableColumnFactory.TEMPERATURE.createColumn(_sliceColumnManager, _pc);
+
+		_colDefCadence = colDef = TableColumnFactory.POWERTRAIN_CADENCE.createColumn(_sliceColumnManager, _pc);
+
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				if (_serieCadence != null) {
+					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
+					cell.setText(_nf1.format(_serieCadence[timeSlice.serieIndex]));
+				} else {
+					cell.setText(UI.EMPTY_STRING);
+				}
+			}
+		});
+	}
+
+	/**
+	 * Column: Gear ratio
+	 */
+	private void defineColumn_Powertrain_GearRatio() {
+
+		final ColumnDefinition colDef = TableColumnFactory.POWERTRAIN_GEAR_RATIO.createColumn(_sliceColumnManager, _pc);
+
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				if (_serieGears == null) {
+
+					cell.setText(UI.EMPTY_STRING);
+
+				} else {
+
+					final int serieIndex = ((TimeSlice) cell.getElement()).serieIndex;
+					final float gearRatio = _serieGears[0][serieIndex];
+
+					cell.setText(_nf2.format(gearRatio));
+				}
+			}
+		});
+	}
+
+	/**
+	 * Column: Gear teeth
+	 */
+	private void defineColumn_Powertrain_GearTeeth() {
+
+		final ColumnDefinition colDef = TableColumnFactory.POWERTRAIN_GEAR_TEETH.createColumn(_sliceColumnManager, _pc);
+
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				if (_serieGears == null) {
+
+					cell.setText(UI.EMPTY_STRING);
+
+				} else {
+
+					final int serieIndex = ((TimeSlice) cell.getElement()).serieIndex;
+
+					final long frontTeeth = (long) _serieGears[1][serieIndex];
+					final long rearTeeth = (long) _serieGears[2][serieIndex];
+
+					cell.setText(String.format(TourManager.GEAR_TEETH_FORMAT, frontTeeth, rearTeeth));
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: cadence
+	 */
+	private void defineColumn_Time_BreakTime() {
+
+		ColumnDefinition colDef;
+
+		_colDefCadence = colDef = TableColumnFactory.TIME_BREAK_TIME.createColumn(_sliceColumnManager, _pc);
+
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				if (_serieBreakTime != null) {
+					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
+					cell.setText(_serieBreakTime[timeSlice.serieIndex]
+							? net.tourbook.ui.UI.BREAK_TIME_MARKER
+							: UI.EMPTY_STRING);
+				} else {
+					cell.setText(UI.EMPTY_STRING);
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: time difference in seconds to previous slice
+	 */
+	private void defineColumn_Time_TimeDiff() {
+
+		final ColumnDefinition colDef = TableColumnFactory.TIME_TOUR_TIME_DIFF.createColumn(_sliceColumnManager, _pc);
+
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				if (_serieTime != null) {
+					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
+					final int serieIndex = timeSlice.serieIndex;
+					if (serieIndex == 0) {
+						cell.setText(Integer.toString(0));
+					} else {
+						cell.setText(Integer.toString(_serieTime[serieIndex] - _serieTime[serieIndex - 1]));
+					}
+				} else {
+					cell.setText(UI.EMPTY_STRING);
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: time hh:mm:ss relative to tour start
+	 */
+	private void defineColumn_Time_TimeInHHMMSSRelative() {
+
+		final ColumnDefinition colDef = TableColumnFactory.TIME_TOUR_TIME_HH_MM_SS.createColumn(_sliceColumnManager, _pc);
+
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final int serieIndex = ((TimeSlice) cell.getElement()).serieIndex;
+				if (_serieTime != null) {
+					cell.setText(net.tourbook.ui.UI.format_hh_mm_ss(_serieTime[serieIndex]));
+				} else {
+					cell.setText(UI.EMPTY_STRING);
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: time in seconds
+	 */
+	private void defineColumn_Time_TimeInSeconds() {
+
+		final ColumnDefinition colDef = TableColumnFactory.TIME_TOUR_TIME.createColumn(_sliceColumnManager, _pc);
+
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				if (_serieTime != null) {
+					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
+					final int serieIndex = timeSlice.serieIndex;
+					cell.setText(Integer.toString(_serieTime[serieIndex]));
+				} else {
+					cell.setText(UI.EMPTY_STRING);
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: time of day in hh:mm:ss
+	 */
+	private void defineColumn_Time_TimeOfDay() {
+
+		final ColumnDefinition colDef = TableColumnFactory.TIME_TOUR_TIME_OF_DAY_HH_MM_SS.createColumn(
+				_sliceColumnManager,
+				_pc);
+
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				if (_serieTime == null) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+
+					final int serieIndex = ((TimeSlice) cell.getElement()).serieIndex;
+
+					cell.setText(net.tourbook.ui.UI.format_hh_mm_ss(_tourStartDayTime + _serieTime[serieIndex]));
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: marker
+	 */
+	private void defineColumn_Tour_Marker() {
+
+		ColumnDefinition colDef;
+		colDef = TableColumnFactory.TOUR_MARKER.createColumn(_sliceColumnManager, _pc);
+
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TimeSlice timeSlice = (TimeSlice) cell.getElement();
+
+				final TourMarker tourMarker = _markerMap.get(timeSlice.serieIndex);
+				if (tourMarker != null) {
+
+					cell.setText(tourMarker.getLabel());
+
+					if (tourMarker.getType() == ChartLabel.MARKER_TYPE_DEVICE) {
+						cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+					}
+
+				} else {
+					cell.setText(UI.EMPTY_STRING);
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: temperature
+	 */
+	private void defineColumn_Weather_Temperature() {
+
+		ColumnDefinition colDef;
+		_colDefTemperature = colDef = TableColumnFactory.WEATHER_TEMPERATURE.createColumn(_sliceColumnManager, _pc);
 
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -3916,100 +4018,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 				} else {
 					cell.setText(UI.EMPTY_STRING);
-				}
-			}
-		});
-	}
-
-	/**
-	 * column: time difference in seconds to previous slice
-	 */
-	private void defineColumn_TimeDiff() {
-
-		final ColumnDefinition colDef = TableColumnFactory.TOUR_TIME_DIFF.createColumn(_sliceColumnManager, _pc);
-
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				if (_serieTime != null) {
-					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-					final int serieIndex = timeSlice.serieIndex;
-					if (serieIndex == 0) {
-						cell.setText(Integer.toString(0));
-					} else {
-						cell.setText(Integer.toString(_serieTime[serieIndex] - _serieTime[serieIndex - 1]));
-					}
-				} else {
-					cell.setText(UI.EMPTY_STRING);
-				}
-			}
-		});
-	}
-
-	/**
-	 * column: time hh:mm:ss relative to tour start
-	 */
-	private void defineColumn_TimeInHHMMSSRelative() {
-
-		final ColumnDefinition colDef = TableColumnFactory.TOUR_TIME_HH_MM_SS.createColumn(_sliceColumnManager, _pc);
-
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final int serieIndex = ((TimeSlice) cell.getElement()).serieIndex;
-				if (_serieTime != null) {
-					cell.setText(net.tourbook.ui.UI.format_hh_mm_ss(_serieTime[serieIndex]));
-				} else {
-					cell.setText(UI.EMPTY_STRING);
-				}
-			}
-		});
-	}
-
-	/**
-	 * column: time in seconds
-	 */
-	private void defineColumn_TimeInSeconds() {
-
-		final ColumnDefinition colDef = TableColumnFactory.TOUR_TIME.createColumn(_sliceColumnManager, _pc);
-
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				if (_serieTime != null) {
-					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-					final int serieIndex = timeSlice.serieIndex;
-					cell.setText(Integer.toString(_serieTime[serieIndex]));
-				} else {
-					cell.setText(UI.EMPTY_STRING);
-				}
-			}
-		});
-	}
-
-	/**
-	 * column: time of day in hh:mm:ss
-	 */
-	private void defineColumn_TimeOfDay() {
-
-		final ColumnDefinition colDef = TableColumnFactory.TOUR_TIME_OF_DAY_HH_MM_SS.createColumn(
-				_sliceColumnManager,
-				_pc);
-
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				if (_serieTime == null) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-
-					final int serieIndex = ((TimeSlice) cell.getElement()).serieIndex;
-
-					cell.setText(net.tourbook.ui.UI.format_hh_mm_ss(_tourStartDayTime + _serieTime[serieIndex]));
 				}
 			}
 		});

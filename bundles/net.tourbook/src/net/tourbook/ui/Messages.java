@@ -66,6 +66,8 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_date;
 	public static String		ColumnFactory_date_label;
 	public static String		ColumnFactory_date_tooltip;
+	public static String	ColumnFactory_db_status_Header;
+
 	public static String		ColumnFactory_db_status_label;
 	public static String		ColumnFactory_db_status_tooltip;
 	public static String		ColumnFactory_device;
@@ -179,9 +181,11 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_Category_Motion;
 	public static String		ColumnFactory_Category_Power;
 	public static String		ColumnFactory_Category_Powertrain;
+	public static String		ColumnFactory_Category_State;
 	public static String		ColumnFactory_Category_Time;
 	public static String		ColumnFactory_Category_Tour;
 	public static String		ColumnFactory_Category_Training;
+	public static String		ColumnFactory_Category_Waypoint;
 	public static String		ColumnFactory_Category_Weather;
 
 	public static String		ColumnFactory_CollateEvent_Label;

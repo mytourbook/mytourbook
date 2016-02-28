@@ -2732,7 +2732,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		final ColumnDefinition colDef;
 
-		colDef = TableColumnFactory.TIME_DRIVING.createColumn(_columnManager, _pc);
+		colDef = TableColumnFactory.TIME_DRIVING_TIME.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -2756,7 +2756,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		final ColumnDefinition colDef;
 
-		colDef = TableColumnFactory.TIME_PAUSED.createColumn(_columnManager, _pc);
+		colDef = TableColumnFactory.TIME_PAUSED_TIME.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -2780,7 +2780,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		final ColumnDefinition colDef;
 
-		colDef = TableColumnFactory.TIME_RECORDING.createColumn(_columnManager, _pc);
+		colDef = TableColumnFactory.TIME_RECORDING_TIME.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {

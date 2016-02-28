@@ -559,7 +559,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 	 */
 	private void defineColumn_DistanceDelta() {
 
-		final ColumnDefinition colDef = TableColumnFactory.DISTANCE_DELTA.createColumn(_columnManager, _pc);
+		final ColumnDefinition colDef = TableColumnFactory.MOTION_DISTANCE_DELTA.createColumn(_columnManager, _pc);
 //		colDef.setIsDefaultColumn();
 
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -655,7 +655,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 	 */
 	private void defineColumn_Time() {
 
-		final ColumnDefinition colDef = TableColumnFactory.TOUR_TIME_HH_MM_SS.createColumn(_columnManager, _pc);
+		final ColumnDefinition colDef = TableColumnFactory.TIME_TOUR_TIME_HH_MM_SS.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 
 		// hide wrong tooltip
