@@ -179,6 +179,7 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_Category_Data;
 	public static String		ColumnFactory_Category_Device;
 	public static String		ColumnFactory_Category_Motion;
+	public static String		ColumnFactory_Category_Photo;
 	public static String		ColumnFactory_Category_Power;
 	public static String		ColumnFactory_Category_Powertrain;
 	public static String		ColumnFactory_Category_State;

@@ -92,6 +92,9 @@ public abstract class TreeColumnFactory {
 	public static final TreeColumnFactory	WEATHER_WIND_DIR;
 	public static final TreeColumnFactory	WEATHER_WIND_SPEED;
 
+	/*
+	 * Not yet categorized
+	 */
 	public static final TreeColumnFactory	NUM_TOURS;
 	public static final TreeColumnFactory	REF_TOUR;
 	public static final TreeColumnFactory	SPEED;

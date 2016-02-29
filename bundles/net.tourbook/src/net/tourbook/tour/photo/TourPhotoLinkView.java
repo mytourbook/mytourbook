@@ -881,26 +881,140 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 	private void defineAllColumns(final Composite parent) {
 
-		defineColumn_TourTypeImage();
-		defineColumn_NumberOfTourPhotos();
-		defineColumn_PhotoTimeAdjustment();
-		defineColumn_NumberOfGPSPhotos();
-		defineColumn_NumberOfNoGPSPhotos();
-		defineColumn_TourStartDate();
-		defineColumn_DurationTime();
-		defineColumn_TourCameras();
-		defineColumn_TourStartTime();
-		defineColumn_TourEndDate();
-		defineColumn_TourEndTime();
-		defineColumn_TourTypeText();
+		defineColumn_Tour_TypeImage();
+		defineColumn_Photo_NumberOfTourPhotos();
+		defineColumn_Photo_TimeAdjustment();
+		defineColumn_Photo_NumberOfGPSPhotos();
+		defineColumn_Photo_NumberOfNoGPSPhotos();
+
+		defineColumn_Time_TourStartDate();
+		defineColumn_Time_TourDurationTime();
+
+		defineColumn_Photo_TourCameras();
+
+		defineColumn_Time_TourStartTime();
+		defineColumn_Time_TourEndDate();
+		defineColumn_Time_TourEndTime();
+
+		defineColumn_Tour_TypeText();
+	}
+
+	/**
+	 * column: number of photos which contain gps data
+	 */
+	private void defineColumn_Photo_NumberOfGPSPhotos() {
+
+		final ColumnDefinition colDef = TableColumnFactory.PHOTO_NUMBER_OF_GPS_PHOTOS.createColumn(_columnManager, _pc);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourPhotoLink link = (TourPhotoLink) cell.getElement();
+				final int numberOfGPSPhotos = link.numberOfGPSPhotos;
+
+				cell.setText(numberOfGPSPhotos == 0 ? UI.EMPTY_STRING : Long.toString(numberOfGPSPhotos));
+
+				setBgColor(cell, link);
+			}
+		});
+	}
+
+	/**
+	 * column: number of photos which contain gps data
+	 */
+	private void defineColumn_Photo_NumberOfNoGPSPhotos() {
+
+		final ColumnDefinition colDef = TableColumnFactory.PHOTO_NUMBER_OF_NO_GPS_PHOTOS.createColumn(_columnManager, _pc);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourPhotoLink link = (TourPhotoLink) cell.getElement();
+				final int numberOfNoGPSPhotos = link.numberOfNoGPSPhotos;
+
+				cell.setText(numberOfNoGPSPhotos == 0 ? UI.EMPTY_STRING : Long.toString(numberOfNoGPSPhotos));
+
+				setBgColor(cell, link);
+			}
+		});
+	}
+
+	/**
+	 * column: number of photos which are saved in the tour
+	 */
+	private void defineColumn_Photo_NumberOfTourPhotos() {
+
+		final ColumnDefinition colDef = TableColumnFactory.PHOTO_NUMBER_OF_PHOTOS.createColumn(_columnManager, _pc);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourPhotoLink link = (TourPhotoLink) cell.getElement();
+				final int numberOfPhotos = link.numberOfTourPhotos;
+
+				cell.setText(numberOfPhotos == 0 ? UI.EMPTY_STRING : Integer.toString(numberOfPhotos));
+
+				setBgColor(cell, link);
+			}
+		});
+	}
+
+	/**
+	 * column: number of photos which are saved in the tour
+	 */
+	private void defineColumn_Photo_TimeAdjustment() {
+
+		final ColumnDefinition colDef = TableColumnFactory.PHOTO_TIME_ADJUSTMENT.createColumn(_columnManager, _pc);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourPhotoLink link = (TourPhotoLink) cell.getElement();
+				final int numberOfTourPhotos = link.numberOfTourPhotos;
+				final int timeAdjustment = link.photoTimeAdjustment;
+
+				cell.setText(numberOfTourPhotos == 0 //
+						? UI.EMPTY_STRING
+						: net.tourbook.ui.UI.formatHhMmSs(timeAdjustment));
+
+				setBgColor(cell, link);
+			}
+		});
+	}
+
+	/**
+	 * column: tour type text
+	 */
+	private void defineColumn_Photo_TourCameras() {
+
+		final ColumnDefinition colDef = TableColumnFactory.PHOTO_TOUR_CAMERA.createColumn(_columnManager, _pc);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final Object element = cell.getElement();
+				if (element instanceof TourPhotoLink) {
+
+					final TourPhotoLink link = (TourPhotoLink) element;
+
+					cell.setText(link.tourCameras);
+
+					setBgColor(cell, link);
+				}
+			}
+		});
 	}
 
 	/**
 	 * column: duration time
 	 */
-	private void defineColumn_DurationTime() {
+	private void defineColumn_Time_TourDurationTime() {
 
-		final ColumnDefinition colDef = TableColumnFactory.TOUR_DURATION_TIME.createColumn(_columnManager, _pc);
+		final ColumnDefinition colDef = TableColumnFactory.TIME_TOUR_DURATION_TIME.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 
@@ -930,121 +1044,11 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 	}
 
 	/**
-	 * column: number of photos which contain gps data
-	 */
-	private void defineColumn_NumberOfGPSPhotos() {
-
-		final ColumnDefinition colDef = TableColumnFactory.NUMBER_OF_GPS_PHOTOS.createColumn(_columnManager, _pc);
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final TourPhotoLink link = (TourPhotoLink) cell.getElement();
-				final int numberOfGPSPhotos = link.numberOfGPSPhotos;
-
-				cell.setText(numberOfGPSPhotos == 0 ? UI.EMPTY_STRING : Long.toString(numberOfGPSPhotos));
-
-				setBgColor(cell, link);
-			}
-		});
-	}
-
-	/**
-	 * column: number of photos which contain gps data
-	 */
-	private void defineColumn_NumberOfNoGPSPhotos() {
-
-		final ColumnDefinition colDef = TableColumnFactory.NUMBER_OF_NO_GPS_PHOTOS.createColumn(_columnManager, _pc);
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final TourPhotoLink link = (TourPhotoLink) cell.getElement();
-				final int numberOfNoGPSPhotos = link.numberOfNoGPSPhotos;
-
-				cell.setText(numberOfNoGPSPhotos == 0 ? UI.EMPTY_STRING : Long.toString(numberOfNoGPSPhotos));
-
-				setBgColor(cell, link);
-			}
-		});
-	}
-
-	/**
-	 * column: number of photos which are saved in the tour
-	 */
-	private void defineColumn_NumberOfTourPhotos() {
-
-		final ColumnDefinition colDef = TableColumnFactory.NUMBER_OF_PHOTOS.createColumn(_columnManager, _pc);
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final TourPhotoLink link = (TourPhotoLink) cell.getElement();
-				final int numberOfPhotos = link.numberOfTourPhotos;
-
-				cell.setText(numberOfPhotos == 0 ? UI.EMPTY_STRING : Integer.toString(numberOfPhotos));
-
-				setBgColor(cell, link);
-			}
-		});
-	}
-
-	/**
-	 * column: number of photos which are saved in the tour
-	 */
-	private void defineColumn_PhotoTimeAdjustment() {
-
-		final ColumnDefinition colDef = TableColumnFactory.PHOTO_TIME_ADJUSTMENT.createColumn(_columnManager, _pc);
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final TourPhotoLink link = (TourPhotoLink) cell.getElement();
-				final int numberOfTourPhotos = link.numberOfTourPhotos;
-				final int timeAdjustment = link.photoTimeAdjustment;
-
-				cell.setText(numberOfTourPhotos == 0 //
-						? UI.EMPTY_STRING
-						: net.tourbook.ui.UI.formatHhMmSs(timeAdjustment));
-
-				setBgColor(cell, link);
-			}
-		});
-	}
-
-	/**
-	 * column: tour type text
-	 */
-	private void defineColumn_TourCameras() {
-
-		final ColumnDefinition colDef = TableColumnFactory.TOUR_CAMERA.createColumn(_columnManager, _pc);
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final Object element = cell.getElement();
-				if (element instanceof TourPhotoLink) {
-
-					final TourPhotoLink link = (TourPhotoLink) element;
-
-					cell.setText(link.tourCameras);
-
-					setBgColor(cell, link);
-				}
-			}
-		});
-	}
-
-	/**
 	 * column: tour end date
 	 */
-	private void defineColumn_TourEndDate() {
+	private void defineColumn_Time_TourEndDate() {
 
-		final ColumnDefinition colDef = TableColumnFactory.TOUR_END_DATE.createColumn(_columnManager, _pc);
+		final ColumnDefinition colDef = TableColumnFactory.TIME_TOUR_END_DATE.createColumn(_columnManager, _pc);
 //		colDef.setCanModifyVisibility(false);
 //		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -1065,9 +1069,9 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 	/**
 	 * column: tour end time
 	 */
-	private void defineColumn_TourEndTime() {
+	private void defineColumn_Time_TourEndTime() {
 
-		final ColumnDefinition colDef = TableColumnFactory.TOUR_END_TIME.createColumn(_columnManager, _pc);
+		final ColumnDefinition colDef = TableColumnFactory.TIME_TOUR_END_TIME.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -1086,9 +1090,9 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 	/**
 	 * column: tour start date
 	 */
-	private void defineColumn_TourStartDate() {
+	private void defineColumn_Time_TourStartDate() {
 
-		final ColumnDefinition colDef = TableColumnFactory.TOUR_START_DATE.createColumn(_columnManager, _pc);
+		final ColumnDefinition colDef = TableColumnFactory.TIME_TOUR_START_DATE.createColumn(_columnManager, _pc);
 //		colDef.setCanModifyVisibility(false);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -1109,7 +1113,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 	/**
 	 * column: tour start time
 	 */
-	private void defineColumn_TourStartTime() {
+	private void defineColumn_Time_TourStartTime() {
 
 		final ColumnDefinition colDef = TableColumnFactory.TIME_TOUR_START_TIME.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -1130,7 +1134,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 	/**
 	 * column: tour type image
 	 */
-	private void defineColumn_TourTypeImage() {
+	private void defineColumn_Tour_TypeImage() {
 
 		final ColumnDefinition colDef = TableColumnFactory.TOUR_TYPE.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
@@ -1174,7 +1178,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 	/**
 	 * column: tour type text
 	 */
-	private void defineColumn_TourTypeText() {
+	private void defineColumn_Tour_TypeText() {
 
 		final ColumnDefinition colDef = TableColumnFactory.TOUR_TYPE_TEXT.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {

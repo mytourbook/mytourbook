@@ -637,7 +637,7 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 	 */
 	private void defineColumn_Id() {
 
-		final ColumnDefinition colDef = TableColumnFactory.ID.createColumn(_columnManager, _pc);
+		final ColumnDefinition colDef = TableColumnFactory.WAYPOINT_ID.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
