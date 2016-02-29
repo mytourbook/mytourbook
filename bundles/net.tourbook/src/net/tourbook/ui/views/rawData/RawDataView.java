@@ -1885,6 +1885,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		// define all columns
 		_columnManager = new ColumnManager(this, _state);
+		_columnManager.setIsCategoryAvailable(true);
 		defineAllColumns();
 
 		createUI(parent);

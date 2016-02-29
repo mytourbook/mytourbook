@@ -850,6 +850,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		// define all columns
 		_columnManager = new ColumnManager(this, _state);
+		_columnManager.setIsCategoryAvailable(true);
 		defineAllColumns(parent);
 
 		createUI(parent);

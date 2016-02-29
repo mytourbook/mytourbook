@@ -540,6 +540,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 		// define all columns
 		_columnManager = new ColumnManager(this, _state);
+		_columnManager.setIsCategoryAvailable(true);
 		defineAllColumns();
 
 		createActions();
@@ -710,31 +711,38 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	 */
 	private void defineAllColumns() {
 
-		defineColumn1stColumn();
-		defineColumnTitle();
-		defineColumnTags();
-		defineColumnTimeRecording();
-		defineColumnTimeDriving();
-		defineColumnTimeBreak();
-		defineColumnDistance();
-		defineColumnAltitudeUp();
-		defineColumnAltitudeDown();
-		defineColumnMaxAltitude();
-		defineColumnMaxSpeed();
-		defineColumnMaxPulse();
-		defineColumnAvgSpeed();
-		defineColumnAvgPace();
-		defineColumnAvgPulse();
-		defineColumnAvgCadence();
-		defineColumnAvgTemperature();
+		defineColumn_1stColumn();
+
+		defineColumn_Time_RecordingTime();
+		defineColumn_Time_DrivingTime();
+		defineColumn_Time_PausedTime();
+
+		defineColumn_Tour_Title();
+		defineColumn_Tour_Tags();
+
+		defineColumn_Motion_Distance();
+		defineColumn_Motion_MaxSpeed();
+		defineColumn_Motion_AvgSpeed();
+		defineColumn_Motion_AvgPace();
+
+		defineColumn_Altitude_Up();
+		defineColumn_Altitude_Down();
+		defineColumn_Altitude_Max();
+
+		defineColumn_Body_MaxPulse();
+		defineColumn_Body_AvgPulse();
+
+		defineColumn_Weather_AvgTemperature();
+
+		defineColumn_Powertrain_AvgCadence();
 	}
 
 	/**
 	 * tree column: category/tag/year/month/tour
 	 */
-	private void defineColumn1stColumn() {
+	private void defineColumn_1stColumn() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.TAG.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TAG_AND_TAGS.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setCanModifyVisibility(false);
 		colDef.setLabelProvider(new TourInfoToolTipStyledCellLabelProvider() {
@@ -807,7 +815,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	/**
 	 * column: altitude down (m)
 	 */
-	private void defineColumnAltitudeDown() {
+	private void defineColumn_Altitude_Down() {
 
 		final TreeColumnDefinition colDef = TreeColumnFactory.ALTITUDE_DOWN.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -830,9 +838,34 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	}
 
 	/**
+	 * column: max altitude
+	 */
+	private void defineColumn_Altitude_Max() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.ALTITUDE_MAX.createColumn(_columnManager, _pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				if (element instanceof TVITagViewTagCategory) {
+					return;
+				}
+
+				final long colMaxAltitude = ((TVITagViewItem) element).colMaxAltitude;
+				if (colMaxAltitude != 0) {
+
+					cell.setText(Long.toString(colMaxAltitude));
+					setCellColor(cell, element);
+				}
+			}
+		});
+	}
+
+	/**
 	 * column: altitude up (m)
 	 */
-	private void defineColumnAltitudeUp() {
+	private void defineColumn_Altitude_Up() {
 
 		final TreeColumnDefinition colDef = TreeColumnFactory.ALTITUDE_UP.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -855,58 +888,9 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	}
 
 	/**
-	 * column: avg cadence
-	 */
-	private void defineColumnAvgCadence() {
-
-		final TreeColumnDefinition colDef = TreeColumnFactory.POWERTRAIN_AVG_CADENCE.createColumn(_columnManager, _pc);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Object element = cell.getElement();
-				if (element instanceof TVITagViewTagCategory) {
-					return;
-				}
-
-				final float colAvgCadence = ((TVITagViewItem) element).colAvgCadence;
-				if (colAvgCadence != 0) {
-
-					cell.setText(_nf1.format(colAvgCadence));
-					setCellColor(cell, element);
-				}
-			}
-		});
-	}
-
-	/**
-	 * column: avg pace min/km - min/mi
-	 */
-	private void defineColumnAvgPace() {
-
-		final TreeColumnDefinition colDef = TreeColumnFactory.MOTION_AVG_PACE.createColumn(_columnManager, _pc);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Object element = cell.getElement();
-				final float pace = ((TVITagViewItem) element).colAvgPace * UI.UNIT_VALUE_DISTANCE;
-
-				if (pace == 0.0) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					cell.setText(UI.format_mm_ss((long) pace));
-				}
-
-				setCellColor(cell, element);
-			}
-		});
-	}
-
-	/**
 	 * column: avg pulse
 	 */
-	private void defineColumnAvgPulse() {
+	private void defineColumn_Body_AvgPulse() {
 
 		final TreeColumnDefinition colDef = TreeColumnFactory.BODY_PULSE_AVG.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -929,9 +913,58 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	}
 
 	/**
+	 * column: max pulse
+	 */
+	private void defineColumn_Body_MaxPulse() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.BODY_PULSE_MAX.createColumn(_columnManager, _pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				if (element instanceof TVITagViewTagCategory) {
+					return;
+				}
+
+				final long colMaxPulse = ((TVITagViewItem) element).colMaxPulse;
+				if (colMaxPulse != 0) {
+
+					cell.setText(Long.toString(colMaxPulse));
+					setCellColor(cell, element);
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: avg pace min/km - min/mi
+	 */
+	private void defineColumn_Motion_AvgPace() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.MOTION_AVG_PACE.createColumn(_columnManager, _pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final float pace = ((TVITagViewItem) element).colAvgPace * UI.UNIT_VALUE_DISTANCE;
+
+				if (pace == 0.0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(UI.format_mm_ss((long) pace));
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
 	 * column: avg speed km/h - mph
 	 */
-	private void defineColumnAvgSpeed() {
+	private void defineColumn_Motion_AvgSpeed() {
 
 		final TreeColumnDefinition colDef = TreeColumnFactory.MOTION_AVG_SPEED.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -951,40 +984,9 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	}
 
 	/**
-	 * column: avg temperature
-	 */
-	private void defineColumnAvgTemperature() {
-
-		final TreeColumnDefinition colDef = TreeColumnFactory.WEATHER_AVG_TEMPERATURE.createColumn(_columnManager, _pc);
-		colDef.setLabelProvider(new CellLabelProvider() {
-
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Object element = cell.getElement();
-				if (element instanceof TVITagViewTagCategory) {
-					return;
-				}
-
-				final TVITagViewItem tviTagViewItem = (TVITagViewItem) element;
-				float temperature = tviTagViewItem.colAvgTemperature;
-				if (temperature != 0) {
-
-					if (UI.UNIT_VALUE_TEMPERATURE != 1) {
-						temperature = temperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD;
-					}
-
-					cell.setText(_nf1.format(temperature));
-					setCellColor(cell, element);
-				}
-			}
-		});
-	}
-
-	/**
 	 * column: distance (km/miles)
 	 */
-	private void defineColumnDistance() {
+	private void defineColumn_Motion_Distance() {
 
 		final TreeColumnDefinition colDef = TreeColumnFactory.MOTION_DISTANCE.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -1009,59 +1011,9 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	}
 
 	/**
-	 * column: max altitude
-	 */
-	private void defineColumnMaxAltitude() {
-
-		final TreeColumnDefinition colDef = TreeColumnFactory.ALTITUDE_MAX.createColumn(_columnManager, _pc);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Object element = cell.getElement();
-				if (element instanceof TVITagViewTagCategory) {
-					return;
-				}
-
-				final long colMaxAltitude = ((TVITagViewItem) element).colMaxAltitude;
-				if (colMaxAltitude != 0) {
-
-					cell.setText(Long.toString(colMaxAltitude));
-					setCellColor(cell, element);
-				}
-			}
-		});
-	}
-
-	/**
-	 * column: max pulse
-	 */
-	private void defineColumnMaxPulse() {
-
-		final TreeColumnDefinition colDef = TreeColumnFactory.BODY_PULSE_MAX.createColumn(_columnManager, _pc);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Object element = cell.getElement();
-				if (element instanceof TVITagViewTagCategory) {
-					return;
-				}
-
-				final long colMaxPulse = ((TVITagViewItem) element).colMaxPulse;
-				if (colMaxPulse != 0) {
-
-					cell.setText(Long.toString(colMaxPulse));
-					setCellColor(cell, element);
-				}
-			}
-		});
-	}
-
-	/**
 	 * column: max speed
 	 */
-	private void defineColumnMaxSpeed() {
+	private void defineColumn_Motion_MaxSpeed() {
 
 		final TreeColumnDefinition colDef = TreeColumnFactory.MOTION_MAX_SPEED.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -1084,9 +1036,135 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	}
 
 	/**
+	 * column: avg cadence
+	 */
+	private void defineColumn_Powertrain_AvgCadence() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.POWERTRAIN_AVG_CADENCE.createColumn(_columnManager, _pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				if (element instanceof TVITagViewTagCategory) {
+					return;
+				}
+
+				final float colAvgCadence = ((TVITagViewItem) element).colAvgCadence;
+				if (colAvgCadence != 0) {
+
+					cell.setText(_nf1.format(colAvgCadence));
+					setCellColor(cell, element);
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: driving time (h)
+	 */
+	private void defineColumn_Time_DrivingTime() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.TIME_DRIVING_TIME.createColumn(_columnManager, _pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				if (element instanceof TVITagViewTagCategory) {
+					return;
+				}
+
+				final long drivingTime = ((TVITagViewItem) element).colDrivingTime;
+
+				if (element instanceof TVITagViewTour) {
+					if (_isDriveTimeFormat_hhmmss) {
+						cell.setText(UI.format_hh_mm_ss(drivingTime).toString());
+					} else {
+						cell.setText(UI.format_hh_mm(drivingTime + 30).toString());
+					}
+				} else {
+					cell.setText(UI.format_hh_mm(drivingTime + 30).toString());
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
+	 * column: paused time (h)
+	 */
+	private void defineColumn_Time_PausedTime() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.TIME_PAUSED_TIME.createColumn(_columnManager, _pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				if (element instanceof TVITagViewTagCategory) {
+					return;
+				}
+
+				/*
+				 * display paused time relative to the recording time
+				 */
+
+				final TVITagViewItem item = (TVITagViewItem) element;
+
+				final long dbPausedTime = item.colPausedTime;
+				final long dbRecordingTime = item.colRecordingTime;
+
+				final float relativePausedTime = dbRecordingTime == 0 ? 0 : (float) dbPausedTime
+						/ dbRecordingTime
+						* 100;
+
+				cell.setText(_nf1.format(relativePausedTime));
+
+				setCellColor(cell, element);
+
+			}
+		});
+	}
+
+	/**
+	 * column: recording time (h)
+	 */
+	private void defineColumn_Time_RecordingTime() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.TIME_RECORDING_TIME.createColumn(_columnManager, _pc);
+		colDef.setIsDefaultColumn();
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				if (element instanceof TVITagViewTagCategory) {
+					return;
+				}
+
+				final long recordingTime = ((TVITagViewItem) element).colRecordingTime;
+
+				if (element instanceof TVITagViewTour) {
+					if (_isRecTimeFormat_hhmmss) {
+						cell.setText(UI.format_hh_mm_ss(recordingTime).toString());
+					} else {
+						cell.setText(UI.format_hh_mm(recordingTime + 30).toString());
+					}
+				} else {
+					cell.setText(UI.format_hh_mm(recordingTime + 30).toString());
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
 	 * column: tags
 	 */
-	private void defineColumnTags() {
+	private void defineColumn_Tour_Tags() {
 
 		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TAGS.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
@@ -1124,110 +1202,9 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	}
 
 	/**
-	 * column: paused time (h)
-	 */
-	private void defineColumnTimeBreak() {
-
-		final TreeColumnDefinition colDef = TreeColumnFactory.TIME_PAUSED_TIME.createColumn(_columnManager, _pc);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Object element = cell.getElement();
-				if (element instanceof TVITagViewTagCategory) {
-					return;
-				}
-
-				/*
-				 * display paused time relative to the recording time
-				 */
-
-				final TVITagViewItem item = (TVITagViewItem) element;
-
-				final long dbPausedTime = item.colPausedTime;
-				final long dbRecordingTime = item.colRecordingTime;
-
-				final float relativePausedTime = dbRecordingTime == 0 ? 0 : (float) dbPausedTime
-						/ dbRecordingTime
-						* 100;
-
-				cell.setText(_nf1.format(relativePausedTime));
-
-				setCellColor(cell, element);
-
-			}
-		});
-	}
-
-	/**
-	 * column: driving time (h)
-	 */
-	private void defineColumnTimeDriving() {
-
-		final TreeColumnDefinition colDef = TreeColumnFactory.TIME_DRIVING_TIME.createColumn(_columnManager, _pc);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Object element = cell.getElement();
-				if (element instanceof TVITagViewTagCategory) {
-					return;
-				}
-
-				final long drivingTime = ((TVITagViewItem) element).colDrivingTime;
-
-				if (element instanceof TVITagViewTour) {
-					if (_isDriveTimeFormat_hhmmss) {
-						cell.setText(UI.format_hh_mm_ss(drivingTime).toString());
-					} else {
-						cell.setText(UI.format_hh_mm(drivingTime + 30).toString());
-					}
-				} else {
-					cell.setText(UI.format_hh_mm(drivingTime + 30).toString());
-				}
-
-				setCellColor(cell, element);
-			}
-		});
-	}
-
-	/**
-	 * column: recording time (h)
-	 */
-	private void defineColumnTimeRecording() {
-
-		final TreeColumnDefinition colDef = TreeColumnFactory.TIME_RECORDING_TIME.createColumn(_columnManager, _pc);
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Object element = cell.getElement();
-				if (element instanceof TVITagViewTagCategory) {
-					return;
-				}
-
-				final long recordingTime = ((TVITagViewItem) element).colRecordingTime;
-
-				if (element instanceof TVITagViewTour) {
-					if (_isRecTimeFormat_hhmmss) {
-						cell.setText(UI.format_hh_mm_ss(recordingTime).toString());
-					} else {
-						cell.setText(UI.format_hh_mm(recordingTime + 30).toString());
-					}
-				} else {
-					cell.setText(UI.format_hh_mm(recordingTime + 30).toString());
-				}
-
-				setCellColor(cell, element);
-			}
-		});
-	}
-
-	/**
 	 * column: title
 	 */
-	private void defineColumnTitle() {
+	private void defineColumn_Tour_Title() {
 
 		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TITLE.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
@@ -1258,6 +1235,37 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 					setCellColor(cell, element);
 				} else {
 					cell.setText(UI.EMPTY_STRING);
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: avg temperature
+	 */
+	private void defineColumn_Weather_AvgTemperature() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.WEATHER_AVG_TEMPERATURE.createColumn(_columnManager, _pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				if (element instanceof TVITagViewTagCategory) {
+					return;
+				}
+
+				final TVITagViewItem tviTagViewItem = (TVITagViewItem) element;
+				float temperature = tviTagViewItem.colAvgTemperature;
+				if (temperature != 0) {
+
+					if (UI.UNIT_VALUE_TEMPERATURE != 1) {
+						temperature = temperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD;
+					}
+
+					cell.setText(_nf1.format(temperature));
+					setCellColor(cell, element);
 				}
 			}
 		});

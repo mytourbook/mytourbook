@@ -643,6 +643,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 		// define all columns for the viewer
 		_columnManager = new ColumnManager(this, _state);
+		_columnManager.setIsCategoryAvailable(true);
 		defineAllColumns(parent);
 
 		createUI(parent);
@@ -872,7 +873,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		defineColumn_Data_ImportFilePath();
 		defineColumn_Data_ImportFileName();
 		defineColumn_Data_TimeInterval();
-		defineColumn_Data_TimeSlices();
+		defineColumn_Data_NumTimeSlices();
 	}
 
 	/**
@@ -1129,6 +1130,30 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	}
 
 	/**
+	 * column: number of time slices
+	 */
+	private void defineColumn_Data_NumTimeSlices() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.DATA_NUM_TIME_SLICES.createColumn(_columnManager, _pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final int numberOfTimeSlices = ((TVITourBookItem) element).colNumberOfTimeSlices;
+
+				if (numberOfTimeSlices == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(Integer.toString(numberOfTimeSlices));
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
 	 * column: timeinterval
 	 */
 
@@ -1150,30 +1175,6 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 					setCellColor(cell, element);
 				}
-			}
-		});
-	}
-
-	/**
-	 * column: number of time slices
-	 */
-	private void defineColumn_Data_TimeSlices() {
-
-		final TreeColumnDefinition colDef = TreeColumnFactory.DATA_NUM_SLICES.createColumn(_columnManager, _pc);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Object element = cell.getElement();
-				final int numberOfTimeSlices = ((TVITourBookItem) element).colNumberOfTimeSlices;
-
-				if (numberOfTimeSlices == 0) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					cell.setText(Integer.toString(numberOfTimeSlices));
-				}
-
-				setCellColor(cell, element);
 			}
 		});
 	}

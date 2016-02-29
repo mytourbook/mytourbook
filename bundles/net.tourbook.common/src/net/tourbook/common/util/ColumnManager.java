@@ -101,6 +101,19 @@ public class ColumnManager {
 	/** Active column profile */
 	private ColumnProfile						_activeProfile;
 
+	/**
+	 * When <code>true</code>, columns can be categorized which is displayed in the UI but it has no
+	 * other functions, default is <code>false</code>.
+	 * <p>
+	 * When only a view columns are contained in a view then it does not make sense to categorize
+	 * these columns.
+	 */
+	private boolean								_isCategoryAvailable				= false;
+
+	/**
+	 * Flag which the user can set to show/hide column category in the column viewer and table/tree
+	 * header context menu.
+	 */
 	private boolean								_isShowCategory						= true;
 
 	private Comparator<ColumnProfile>			_profileSorter;
@@ -439,10 +452,13 @@ public class ColumnManager {
 			final String unit = colDef.getColumnUnit();
 
 			final StringBuilder sb = new StringBuilder();
-			if (_isShowCategory && category != null) {
+
+			// add category
+			if (_isCategoryAvailable && _isShowCategory && category != null) {
 				sb.append(category);
 			}
 
+			// add label
 			if (label != null) {
 				if (sb.length() > 0) {
 					sb.append(COLUMN_CATEGORY_SEPARATOR);
@@ -450,6 +466,7 @@ public class ColumnManager {
 				sb.append(label);
 			}
 
+			// add unit
 			if (unit != null) {
 
 				if (sb.length() > 0) {
@@ -972,6 +989,10 @@ public class ColumnManager {
 		return allRearrangedColumns;
 	}
 
+	public boolean isCategoryAvailable() {
+		return _isCategoryAvailable;
+	}
+
 	public boolean isShowCategory() {
 		return _isShowCategory;
 	}
@@ -1210,6 +1231,10 @@ public class ColumnManager {
 	 */
 	public void setColumnLayout(final AbstractColumnLayout columnLayout) {
 		_columnLayout = columnLayout;
+	}
+
+	public void setIsCategoryAvailable(final boolean isCategoryAvailable) {
+		_isCategoryAvailable = isCategoryAvailable;
 	}
 
 	public void setIsShowCategory(final boolean isShowCategory) {

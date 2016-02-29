@@ -2086,6 +2086,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		// define columns for the viewers
 		_sliceColumnManager = new ColumnManager(this, _stateSlice);
+		_sliceColumnManager.setIsCategoryAvailable(true);
 		defineAllColumns(parent);
 
 		restoreStateBeforeUI();
