@@ -840,6 +840,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		defineColumn_Body_RestPulse();
 		defineColumn_Body_MaxPulse();
 		defineColumn_Body_AvgPulse();
+		defineColumn_Body_Weight();
 		defineColumn_Body_Person();
 
 		// Power - Leistung
@@ -998,6 +999,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		});
 	}
 
+
 	/**
 	 * column: max pulse
 	 */
@@ -1062,6 +1064,30 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 					cell.setText(UI.EMPTY_STRING);
 				} else {
 					cell.setText(Integer.toString(restPulse));
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
+	 * column: Body weight
+	 */
+	private void defineColumn_Body_Weight() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.BODY_WEIGHT.createColumn(_columnManager, _pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final float weight = ((TVITourBookItem) element).colBodyWeight;
+
+				if (weight == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(_nf1.format(weight));
 				}
 
 				setCellColor(cell, element);
@@ -1970,7 +1996,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	 */
 	private void defineColumn_Tour_Marker() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_MARKERS.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_NUM_MARKERS.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -1997,7 +2023,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	 */
 	private void defineColumn_Tour_Photos() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_PHOTOS.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_NUM_PHOTOS.createColumn(_columnManager, _pc);
 
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {

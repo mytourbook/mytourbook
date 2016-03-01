@@ -270,7 +270,6 @@ public class TVITourBookYearSub extends TVITourBookItem {
 					tourItem.colPower_AvgRightPedalSmoothness = result.getFloat(48);
 
 					final float dbBodyWeight = result.getFloat(49);
-					tourItem.colPower_PowerToWeight = dbBodyWeight == 0 ? 0 : dbAvgPower / dbBodyWeight;
 
 					// --------------------- IMPORT ------------------
 
@@ -279,6 +278,11 @@ public class TVITourBookYearSub extends TVITourBookItem {
 
 					String dbDeviceName = result.getString(52);
 					String dbFirmwareVersion = result.getString(53);
+
+					// -----------------------------------------------
+
+					tourItem.colBodyWeight = dbBodyWeight;
+					tourItem.colPower_PowerToWeight = dbBodyWeight == 0 ? 0 : dbAvgPower / dbBodyWeight;
 
 					// -----------------------------------------------
 
@@ -294,6 +298,8 @@ public class TVITourBookYearSub extends TVITourBookItem {
 									+ UI.SYMBOL_BRACKET_RIGHT;
 
 					tourItem.col_DeviceName = deviceName;
+
+					// -----------------------------------------------
 
 					calendar.set(dbYear, dbMonth - 1, dbDay, dbHour, dbMinute);
 					tourItem.colTourDate = calendar.getTimeInMillis();

@@ -98,6 +98,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 	long							colCounter;
 	long							colCalories;
 	long							colDistance;
+	float							colBodyWeight;
 
 	long							colRecordingTime;
 	long							colDrivingTime;

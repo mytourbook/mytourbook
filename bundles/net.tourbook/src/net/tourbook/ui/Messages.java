@@ -54,6 +54,10 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_avg_speed_tooltip;
 	public static String		ColumnFactory_avg_temperature_label;
 	public static String		ColumnFactory_avg_temperature_tooltip;
+	
+	public static String		ColumnFactory_BodyWeight_Label;
+	public static String		ColumnFactory_BodyWeight_Tooltip;
+
 	public static String		ColumnFactory_BreakTime_Header;
 	public static String		ColumnFactory_BreakTime_Label;
 	public static String		ColumnFactory_BreakTime_Tooltip;
@@ -66,8 +70,8 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_date;
 	public static String		ColumnFactory_date_label;
 	public static String		ColumnFactory_date_tooltip;
-	public static String	ColumnFactory_db_status_Header;
 
+	public static String		ColumnFactory_db_status_Header;
 	public static String		ColumnFactory_db_status_label;
 	public static String		ColumnFactory_db_status_tooltip;
 	public static String		ColumnFactory_device;

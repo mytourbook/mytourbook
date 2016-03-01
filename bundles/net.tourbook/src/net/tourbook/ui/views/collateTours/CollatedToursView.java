@@ -1481,7 +1481,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	 */
 	private void defineColumn_Tour_Marker() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_MARKERS.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_NUM_MARKERS.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -1508,7 +1508,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	 */
 	private void defineColumn_Tour_Photos() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_PHOTOS.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_NUM_PHOTOS.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
