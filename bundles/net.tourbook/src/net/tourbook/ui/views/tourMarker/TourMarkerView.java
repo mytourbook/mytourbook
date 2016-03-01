@@ -600,7 +600,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 	 */
 	private void defineColumn_IsVisible() {
 
-		_colDefVisibility = TableColumnFactory.MAP_MARKER_VISIBLE.createColumn(_columnManager, _pc);
+		_colDefVisibility = TableColumnFactory.MARKER_MAP_VISIBLE.createColumn(_columnManager, _pc);
 		_colDefVisibility.setIsDefaultColumn();
 
 		_colDefVisibility.setLabelProvider(new CellLabelProvider() {
@@ -638,7 +638,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 	 */
 	private void defineColumn_SerieIndex() {
 
-		_colDefName = TableColumnFactory.SERIE_INDEX.createColumn(_columnManager, _pc);
+		_colDefName = TableColumnFactory.MARKER_SERIE_INDEX.createColumn(_columnManager, _pc);
 
 		_colDefName.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -678,7 +678,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 	 */
 	private void defineColumn_TimeDelta() {
 
-		final ColumnDefinition colDef = TableColumnFactory.TIME_DELTA.createColumn(_columnManager, _pc);
+		final ColumnDefinition colDef = TableColumnFactory.MARKER_TIME_DELTA.createColumn(_columnManager, _pc);
 
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -720,7 +720,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 	 */
 	private void defineColumn_Url() {
 
-		final ColumnDefinition colDef = TableColumnFactory.URL.createColumn(_columnManager, _pc);
+		final ColumnDefinition colDef = TableColumnFactory.MARKER_URL.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override

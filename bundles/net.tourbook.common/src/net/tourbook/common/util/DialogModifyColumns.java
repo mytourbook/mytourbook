@@ -546,6 +546,7 @@ public class DialogModifyColumns extends TrayDialog {
 		_columnViewer = new CheckboxTableViewer(table);
 
 		defineAllColumns(tableLayout);
+		reorderColumns(table);
 
 		_columnViewer.setContentProvider(new IStructuredContentProvider() {
 
@@ -927,88 +928,30 @@ public class DialogModifyColumns extends TrayDialog {
 
 	private void defineAllColumns(final TableColumnLayout tableLayout) {
 
-		TableColumn tc;
-		TableViewerColumn tvc;
-
-		/*
-		 * Column: Label
-		 */
-		{
-			tvc = new TableViewerColumn(_columnViewer, SWT.LEAD);
-			tc = tvc.getColumn();
-			tc.setText(Messages.ColumnModifyDialog_column_column);
-			tvc.setLabelProvider(new CellLabelProvider() {
-				@Override
-				public void update(final ViewerCell cell) {
-
-					final ColumnDefinition colDef = (ColumnDefinition) cell.getElement();
-					cell.setText(colDef.getColumnLabel());
-
-					// paint columns in a different color which can't be hidden
-					if (colDef.canModifyVisibility() == false) {
-						cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-					}
-				}
-			});
-			tableLayout.setColumnData(tc, new ColumnWeightData(30, true));
-		}
-
-		/*
-		 * Column: unit
-		 */
-		{
-			tvc = new TableViewerColumn(_columnViewer, SWT.LEAD);
-			tc = tvc.getColumn();
-			tc.setText(Messages.ColumnModifyDialog_column_unit);
-			tvc.setLabelProvider(new CellLabelProvider() {
-				@Override
-				public void update(final ViewerCell cell) {
-
-					final ColumnDefinition colDef = (ColumnDefinition) cell.getElement();
-					cell.setText(colDef.getColumnUnit());
-
-					// paint columns in a different color which can't be hidden
-					if (colDef.canModifyVisibility() == false) {
-						cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-					}
-				}
-			});
-			tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(13), true));
-		}
-
-		/*
-		 * Column: width
-		 */
-		{
-			tvc = new TableViewerColumn(_columnViewer, SWT.LEAD);
-			tc = tvc.getColumn();
-			tc.setText(Messages.ColumnModifyDialog_column_width);
-			tvc.setLabelProvider(new CellLabelProvider() {
-				@Override
-				public void update(final ViewerCell cell) {
-
-					final ColumnDefinition colDef = (ColumnDefinition) cell.getElement();
-					cell.setText(Integer.toString(colDef.getColumnWidth()));
-
-					// paint columns in a different color which can't be hidden
-					if (colDef.canModifyVisibility() == false) {
-						cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-					}
-				}
-			});
-			tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(10), true));
-		}
+		defineColumn_ColumnName(tableLayout);
+		defineColumn_Unit(tableLayout);
+		defineColumn_Width(tableLayout);
 
 		/**
-		 * Column: Category
-		 * <p>
-		 * This column CANNOT be the first column because it would contain the checkbox
+		 * This column CANNOT be the first column because it would contain the checkbox, but with
+		 * the reorder feature this column is set as first column :-)
 		 */
+		defineColumn_Category(tableLayout);
+	}
+
+	/**
+	 * Column: Category
+	 */
+	private void defineColumn_Category(final TableColumnLayout tableLayout) {
+
 		if (_isCategoryAvailable) {
 
-			tvc = new TableViewerColumn(_columnViewer, SWT.LEAD);
-			tc = tvc.getColumn();
+			final TableViewerColumn tvc = new TableViewerColumn(_columnViewer, SWT.LEAD);
+
+			final TableColumn tc = tvc.getColumn();
+			tc.setMoveable(true);
 			tc.setText(Messages.ColumnModifyDialog_Column_Category);
+
 			tvc.setLabelProvider(new CellLabelProvider() {
 				@Override
 				public void update(final ViewerCell cell) {
@@ -1035,6 +978,87 @@ public class DialogModifyColumns extends TrayDialog {
 
 			tableLayout.setColumnData(tc, new ColumnPixelData(categoryColumnWidth, true));
 		}
+	}
+
+	/**
+	 * Column: Label
+	 */
+	private void defineColumn_ColumnName(final TableColumnLayout tableLayout) {
+
+		final TableViewerColumn tvc = new TableViewerColumn(_columnViewer, SWT.LEAD);
+
+		final TableColumn tc = tvc.getColumn();
+		tc.setMoveable(true);
+		tc.setText(Messages.ColumnModifyDialog_column_column);
+
+		tvc.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final ColumnDefinition colDef = (ColumnDefinition) cell.getElement();
+				cell.setText(colDef.getColumnLabel());
+
+				// paint columns in a different color which can't be hidden
+				if (colDef.canModifyVisibility() == false) {
+					cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+				}
+			}
+		});
+		tableLayout.setColumnData(tc, new ColumnWeightData(30, true));
+	}
+
+	/**
+	 * Column: Unit
+	 */
+	private void defineColumn_Unit(final TableColumnLayout tableLayout) {
+
+		final TableViewerColumn tvc = new TableViewerColumn(_columnViewer, SWT.LEAD);
+
+		final TableColumn tc = tvc.getColumn();
+		tc.setText(Messages.ColumnModifyDialog_column_unit);
+		tc.setMoveable(true);
+
+		tvc.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final ColumnDefinition colDef = (ColumnDefinition) cell.getElement();
+				cell.setText(colDef.getColumnUnit());
+
+				// paint columns in a different color which can't be hidden
+				if (colDef.canModifyVisibility() == false) {
+					cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+				}
+			}
+		});
+		tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(13), true));
+	}
+
+	/**
+	 * Column: Width
+	 */
+	private void defineColumn_Width(final TableColumnLayout tableLayout) {
+
+		final TableViewerColumn tvc = new TableViewerColumn(_columnViewer, SWT.LEAD);
+
+		final TableColumn tc = tvc.getColumn();
+		tc.setMoveable(true);
+		tc.setText(Messages.ColumnModifyDialog_column_width);
+
+		tvc.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final ColumnDefinition colDef = (ColumnDefinition) cell.getElement();
+				cell.setText(Integer.toString(colDef.getColumnWidth()));
+
+				// paint columns in a different color which can't be hidden
+				if (colDef.canModifyVisibility() == false) {
+					cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+				}
+			}
+		});
+		tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(10), true));
 	}
 
 	private void enableProfileActions() {
@@ -1416,6 +1440,29 @@ public class DialogModifyColumns extends TrayDialog {
 		setupColumnsInViewer();
 
 		enableProfileActions();
+	}
+
+	/**
+	 * Reorder columns, set category column to the first but the checkbox keeps with the column name
+	 * column.
+	 */
+	private void reorderColumns(final Table table) {
+
+		if (_isCategoryAvailable) {
+
+			final int[] oldColumnOrder = table.getColumnOrder();
+			final int numColumns = oldColumnOrder.length;
+			final int[] newColumnOrder = new int[numColumns];
+
+			// set last column to the first
+			newColumnOrder[0] = oldColumnOrder[numColumns - 1];
+
+			for (int columnIndex = 1; columnIndex < numColumns; columnIndex++) {
+				newColumnOrder[columnIndex] = oldColumnOrder[columnIndex - 1];
+			}
+
+			table.setColumnOrder(newColumnOrder);
+		}
 	}
 
 	private void restoreState() {

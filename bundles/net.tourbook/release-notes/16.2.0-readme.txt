@@ -7,18 +7,19 @@ IDEAS
 * bug with body weight in reimport
 * smooth power data
 
-
-
-
-
 --------------------------------------------------------------------------
+
+
+
+
 
 New
 ===	
 
 * Table/Tree Columns
   - Organize column sets with profiles
-  - Column categorization
+  - Columns are categorized (when a view has ~ > 10 columns)
+    !!! PREVIOUS COLUM ORDER HAS BEEN RESET !!! - this was necessary to have consistent data internally
 
 * Power
   - Show power value in chart segment tooltip

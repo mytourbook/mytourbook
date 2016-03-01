@@ -638,7 +638,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	 */
 	private void defineColumn_1stColumn() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.REF_TOUR.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.REFTOUR_TOUR.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setCanModifyVisibility(false);
 		colDef.setLabelProvider(new TourInfoToolTipStyledCellLabelProvider() {
@@ -738,7 +738,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	 */
 	private void defineColumn_Count() {
 		
-		final TreeColumnDefinition colDef = TreeColumnFactory.NUM_TOURS.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.DATA_NUM_TOURS.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -760,7 +760,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	 */
 	private void defineColumn_Speed() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.SPEED.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.MOTION_SPEED.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override

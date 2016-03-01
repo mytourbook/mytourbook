@@ -747,7 +747,7 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 	 */
 	private void defineColumn_Url() {
 
-		final ColumnDefinition colDef = TableColumnFactory.URL.createColumn(_columnManager, _pc);
+		final ColumnDefinition colDef = TableColumnFactory.MARKER_URL.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
