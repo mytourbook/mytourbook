@@ -966,7 +966,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				if (dbAvgPulse == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(_nf1.format(dbAvgPulse));
+					cell.setText(_nf0.format(dbAvgPulse));
 				}
 
 				setCellColor(cell, element);
@@ -1466,7 +1466,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 				if (dbAvgCadence == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(_nf1.format(dbAvgCadence));
+					cell.setText(_nf0.format(dbAvgCadence));
 				}
 
 				setCellColor(cell, element);
