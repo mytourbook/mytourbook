@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -216,12 +216,15 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 		public ClientsContentProvider() {}
 
+		@Override
 		public void dispose() {}
 
+		@Override
 		public Object[] getElements(final Object parent) {
 			return _people.toArray(new TourPerson[_people.size()]);
 		}
 
+		@Override
 		public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {
 
 		}
@@ -230,6 +233,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	private void addPrefListener() {
 
 		_prefChangeListener = new IPropertyChangeListener() {
+			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
@@ -313,6 +317,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 					_tabFolderPerson.setSelection(1);
 				} else {
 					Display.getDefault().asyncExec(new Runnable() {
+						@Override
 						public void run() {
 							_tabFolderPerson.setSelection(1);
 						}
@@ -383,6 +388,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 				return false;
 			}
 
+			@Override
 			public String getResultText() {
 
 				return NLS.bind(Messages.Compute_HrZones_Job_ComputeAllTours_Result, //
@@ -434,7 +440,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 			_isNoUI = true;
 
-			return createUI01NoUI(parent);
+			return createUI_01_NoUI(parent);
 		}
 
 		initUI(parent);
@@ -503,10 +509,10 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 					.applyTo(innerContainer);
 			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(innerContainer);
 			{
-				createUI10PeopleViewer(innerContainer);
-				createUI20PeopleActions(innerContainer);
+				createUI_10_People_Viewer(innerContainer);
+				createUI_20_People_Actions(innerContainer);
 
-				createUI30PersonFolder(innerContainer);
+				createUI_30_Person_Folder(innerContainer);
 			}
 
 			// placeholder
@@ -516,7 +522,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		return _prefPageContainer;
 	}
 
-	private Control createUI01NoUI(final Composite parent) {
+	private Control createUI_01_NoUI(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -530,7 +536,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		return container;
 	}
 
-	private void createUI10PeopleViewer(final Composite parent) {
+	private void createUI_10_People_Viewer(final Composite parent) {
 
 		final TableColumnLayout tableLayout = new TableColumnLayout();
 
@@ -577,12 +583,14 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		});
 
 		_peopleViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
 			public void selectionChanged(final SelectionChangedEvent event) {
 				onSelectPerson();
 			}
 		});
 
 		_peopleViewer.addDoubleClickListener(new IDoubleClickListener() {
+			@Override
 			public void doubleClick(final DoubleClickEvent event) {
 				_tabFolderPerson.setSelection(0);
 				_txtFirstName.setFocus();
@@ -592,7 +600,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 	}
 
-	private void createUI20PeopleActions(final Composite parent) {
+	private void createUI_20_People_Actions(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
@@ -645,7 +653,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		}
 	}
 
-	private void createUI30PersonFolder(final Composite parent) {
+	private void createUI_30_Person_Folder(final Composite parent) {
 
 		_tabFolderPerson = new TabFolder(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
@@ -656,21 +664,21 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			// tab: person
 			final TabItem tabItemDetails = new TabItem(_tabFolderPerson, SWT.NONE);
 			tabItemDetails.setText(Messages.Pref_People_Tab_Person);
-			tabItemDetails.setControl(createUI50TabPerson(_tabFolderPerson));
+			tabItemDetails.setControl(createUI_50_Tab_Person(_tabFolderPerson));
 
 			// tab: hr zone
 			final TabItem tabItemHRZone = new TabItem(_tabFolderPerson, SWT.NONE);
 			tabItemHRZone.setText(Messages.Pref_People_Tab_HRZone);
-			tabItemHRZone.setControl(createUI60TabHRZone(_tabFolderPerson));
+			tabItemHRZone.setControl(createUI_60_Tab_HRZone(_tabFolderPerson));
 
 			// tab: data transfer
 			final TabItem tabItemDataTransfer = new TabItem(_tabFolderPerson, SWT.NONE);
 			tabItemDataTransfer.setText(Messages.Pref_People_Tab_DataTransfer);
-			tabItemDataTransfer.setControl(createUI90TabDataTransfer(_tabFolderPerson));
+			tabItemDataTransfer.setControl(createUI_90_Tab_DataTransfer(_tabFolderPerson));
 		}
 	}
 
-	private Control createUI50TabPerson(final Composite parent) {
+	private Control createUI_50_Tab_Person(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
@@ -678,13 +686,13 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 				.applyTo(container);
 		GridLayoutFactory.swtDefaults().numColumns(3).extendedMargins(0, 0, 7, 0).applyTo(container);
 		{
-			createUI51FieldFirstName(container);
-			createUI52FieldLastName(container);
+			createUI_51_Field_FirstName(container);
+			createUI_52_Field_LastName(container);
 
-			createUI53FieldBirthday(container);
-			createUI54FieldGender(container);
-			createUI55FieldWeight(container);
-			createUI56FieldHeight(container);
+			createUI_53_Field_Birthday(container);
+			createUI_54_Field_Gender(container);
+			createUI_55_Field_Weight(container);
+			createUI_56_Field_Height(container);
 		}
 		container.layout(true, true);
 
@@ -694,7 +702,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	/**
 	 * field: first name
 	 */
-	private void createUI51FieldFirstName(final Composite parent) {
+	private void createUI_51_Field_FirstName(final Composite parent) {
 
 		final Label label = new Label(parent, SWT.NONE);
 		label.setText(Messages.Pref_People_Label_first_name);
@@ -710,7 +718,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	/**
 	 * field: last name
 	 */
-	private void createUI52FieldLastName(final Composite parent) {
+	private void createUI_52_Field_LastName(final Composite parent) {
 
 		final Label label = new Label(parent, SWT.NONE);
 		label.setText(Messages.Pref_People_Label_last_name);
@@ -726,7 +734,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	/**
 	 * field: birthday
 	 */
-	private void createUI53FieldBirthday(final Composite parent) {
+	private void createUI_53_Field_Birthday(final Composite parent) {
 
 		/*
 		 * date-time: birthday
@@ -779,7 +787,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	/**
 	 * field: gender
 	 */
-	private void createUI54FieldGender(final Composite parent) {
+	private void createUI_54_Field_Gender(final Composite parent) {
 
 		// label
 		final Label label = new Label(parent, SWT.NONE);
@@ -805,7 +813,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	/**
 	 * field: weight
 	 */
-	private void createUI55FieldWeight(final Composite parent) {
+	private void createUI_55_Field_Weight(final Composite parent) {
 
 		Label label = new Label(parent, SWT.NONE);
 		label.setText(Messages.Pref_People_Label_weight);
@@ -826,6 +834,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			_spinnerWeight.setMaximum(3000); // 300.0 kg
 			_spinnerWeight.addSelectionListener(_defaultSelectionListener);
 			_spinnerWeight.addMouseWheelListener(new MouseWheelListener() {
+				@Override
 				public void mouseScrolled(final MouseEvent event) {
 					UI.adjustSpinnerValueOnMouseScroll(event);
 					onModifyPerson();
@@ -844,7 +853,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	/**
 	 * field: height
 	 */
-	private void createUI56FieldHeight(final Composite parent) {
+	private void createUI_56_Field_Height(final Composite parent) {
 
 		Label label = new Label(parent, SWT.NONE);
 		label.setText(Messages.Pref_People_Label_height);
@@ -865,6 +874,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			_spinnerHeight.setMaximum(300); // 3.00 m
 			_spinnerHeight.addSelectionListener(_defaultSelectionListener);
 			_spinnerHeight.addMouseWheelListener(new MouseWheelListener() {
+				@Override
 				public void mouseScrolled(final MouseEvent event) {
 					UI.adjustSpinnerValueOnMouseScroll(event);
 					onModifyPerson();
@@ -880,7 +890,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		new Label(parent, SWT.NONE);
 	}
 
-	private Control createUI60TabHRZone(final Composite parent) {
+	private Control createUI_60_Tab_HRZone(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridLayoutFactory.swtDefaults()//
@@ -893,8 +903,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			GridLayoutFactory.fillDefaults().numColumns(3).applyTo(containerHr);
 			{
 //				createUI53FieldBirthday(containerHr);
-				createUI62RestingHR(containerHr);
-				createUI64MaxHR(containerHr);
+				createUI_62_RestingHR(containerHr);
+				createUI_64_MaxHR(containerHr);
 			}
 
 			final Group group = new Group(container, SWT.NONE);
@@ -902,8 +912,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			GridLayoutFactory.swtDefaults().extendedMargins(0, 0, -5, 0).applyTo(group);
 //			group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 			{
-				createUI70HrZone(group);
-				createUI72HrZoneActions(group);
+				createUI_70_HrZone(group);
+				createUI_72_HrZone_Actions(group);
 			}
 		}
 
@@ -913,7 +923,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	/**
 	 * field: resting hr
 	 */
-	private void createUI62RestingHR(final Composite parent) {
+	private void createUI_62_RestingHR(final Composite parent) {
 
 		Label label = new Label(parent, SWT.NONE);
 		label.setText(Messages.Pref_People_Label_RestingHR);
@@ -934,6 +944,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			_spinnerRestingHR.setMaximum(200);
 			_spinnerRestingHR.addSelectionListener(_defaultSelectionListener);
 			_spinnerRestingHR.addMouseWheelListener(new MouseWheelListener() {
+				@Override
 				public void mouseScrolled(final MouseEvent event) {
 					UI.adjustSpinnerValueOnMouseScroll(event);
 					onModifyPerson();
@@ -978,7 +989,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	/**
 	 * field: max hr
 	 */
-	private void createUI64MaxHR(final Composite parent) {
+	private void createUI_64_MaxHR(final Composite parent) {
 
 		Label label = new Label(parent, SWT.NONE);
 		label.setText(Messages.Pref_People_Label_MaxHR);
@@ -1007,6 +1018,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 				}
 			});
 			_spinnerMaxHR.addMouseWheelListener(new MouseWheelListener() {
+				@Override
 				public void mouseScrolled(final MouseEvent event) {
 					UI.adjustSpinnerValueOnMouseScroll(event);
 					updateUIOnModifiedHrZones();
@@ -1044,7 +1056,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		}
 	}
 
-	private void createUI70HrZone(final Composite parent) {
+	private void createUI_70_HrZone(final Composite parent) {
 
 		final Composite hrZoneContainer = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
@@ -1083,7 +1095,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		}
 	}
 
-	private void createUI72HrZoneActions(final Composite parent) {
+	private void createUI_72_HrZone_Actions(final Composite parent) {
 
 		// compute size for the first combo item
 		final Label label = new Label(parent, SWT.NONE);
@@ -1163,7 +1175,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		}
 	}
 
-	private void createUI80HrZoneInnerContainer(final int hrMaxFormulaKey,
+	private void createUI_80_HrZone_InnerContainer(final int hrMaxFormulaKey,
 												final int hrMaxPulse,
 												final org.joda.time.DateTime birthDay) {
 
@@ -1190,10 +1202,10 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 			if (hrZones.size() == 0) {
 				// hr zones are not available, show info
-				createUI81HrZoneInfo(innerContainer);
+				createUI_81_HrZone_Info(innerContainer);
 			} else {
-				createUI82HrZoneHeader(innerContainer);
-				createUI84HrZoneFields(innerContainer, hrMaxFormulaKey, hrMaxPulse, birthDay);
+				createUI_82_HrZone_Header(innerContainer);
+				createUI_84_HrZone_Fields(innerContainer, hrMaxFormulaKey, hrMaxPulse, birthDay);
 			}
 		}
 
@@ -1208,14 +1220,14 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		}
 	}
 
-	private void createUI81HrZoneInfo(final Composite parent) {
+	private void createUI_81_HrZone_Info(final Composite parent) {
 
 		final Label label = new Label(parent, SWT.WRAP);
 		GridDataFactory.fillDefaults().applyTo(label);
 		label.setText(Messages.Pref_People_Label_HrZoneInfo);
 	}
 
-	private void createUI82HrZoneHeader(final Composite parent) {
+	private void createUI_82_HrZone_Header(final Composite parent) {
 
 		/*
 		 * label: color
@@ -1255,7 +1267,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 //		label.addMouseListener(_hrZoneMouseListener);
 	}
 
-	private void createUI84HrZoneFields(final Composite parent,
+	private void createUI_84_HrZone_Fields(final Composite parent,
 										final int hrMaxFormulaKey,
 										final int hrMaxPulse,
 										final org.joda.time.DateTime birthDay) {
@@ -1388,7 +1400,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		}
 	}
 
-	private Control createUI90TabDataTransfer(final Composite parent) {
+	private Control createUI_90_Tab_DataTransfer(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
@@ -1406,8 +1418,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 					.applyTo(label);
 			label.setText(Messages.Pref_People_Label_DataTransfer);
 
-			createUI92FieldSportComputer(container);
-			createUI94FieldRawDataPath(container);
+			createUI_92_Field_SportComputer(container);
+			createUI_94_Field_RawDataPath(container);
 		}
 
 		// set layout after the fields are created
@@ -1426,7 +1438,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	/**
 	 * field: sport computer
 	 */
-	private void createUI92FieldSportComputer(final Composite parent) {
+	private void createUI_92_Field_SportComputer(final Composite parent) {
 
 		// label
 		final Label label = new Label(parent, SWT.NONE);
@@ -1446,7 +1458,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	/**
 	 * field: path to save raw tour data
 	 */
-	private void createUI94FieldRawDataPath(final Composite parent) {
+	private void createUI_94_Field_RawDataPath(final Composite parent) {
 
 		/*
 		 * editor: raw data path
@@ -1680,6 +1692,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		return TrainingManager.HRMaxFormulaKeys[selectedIndex];
 	}
 
+	@Override
 	public void init(final IWorkbench workbench) {
 		setPreferenceStore(_prefStore);
 		noDefaultAndApplyButton();
@@ -1871,7 +1884,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		final int hrMaxFormulaKey = person.getHrMaxFormula();
 		final int maxPulse = person.getMaxPulse();
 
-		createUI80HrZoneInnerContainer(hrMaxFormulaKey, maxPulse, getBirthdayFromUI());
+		createUI_80_HrZone_InnerContainer(hrMaxFormulaKey, maxPulse, getBirthdayFromUI());
 		onModifyPerson();
 	}
 
@@ -2215,7 +2228,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 			updateUIHrMax(hrMaxFormulaKey, maxPulse);
 			updateUISportComputer(person);
 
-			createUI80HrZoneInnerContainer(hrMaxFormulaKey, maxPulse, dtBirthday);
+			createUI_80_HrZone_InnerContainer(hrMaxFormulaKey, maxPulse, dtBirthday);
 		}
 		_isUpdateUI = false;
 	}
@@ -2272,7 +2285,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		_isHrZoneModified = true;
 
 		// update modified bpm in hr zones
-		createUI80HrZoneInnerContainer(selectedHrMaxFormulaKey, maxPulse, getBirthdayFromUI());
+		createUI_80_HrZone_InnerContainer(selectedHrMaxFormulaKey, maxPulse, getBirthdayFromUI());
 
 		onModifyPerson();
 	}

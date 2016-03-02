@@ -509,44 +509,45 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 */
 	private Combo								_comboTitle;
 
-	private Text								_txtDescription;
-	private Combo								_comboStartLocation;
-	private Combo								_comboEndLocation;
-	private Spinner								_spinRestPuls;
-
-	private Spinner								_spinTourCalories;
-	private Spinner								_spinTemperature;
-
-	private Text								_txtWeather;
-	private Label								_lblTemperatureUnit;
-	private Spinner								_spinWindDirectionValue;
-	private Spinner								_spinWindSpeedValue;
-	private Combo								_comboWindDirectionText;
-	private Combo								_comboWindSpeedText;
 	private CLabel								_lblCloudIcon;
-	private Combo								_comboClouds;
-
-	private Text								_txtTourDistance;
-	private Label								_lblTourDistanceUnit;
-	private Text								_txtAltitudeUp;
-	private Text								_txtAltitudeDown;
-	private Label								_lblAltitudeUpUnit;
-	private Label								_lblAltitudeDownUnit;
-
-	private Label								_lblSpeedUnit;
-
-	private Link								_linkTag;
-	private Label								_lblTourTags;
-
-	private Link								_linkTourType;
 	private CLabel								_lblTourType;
 
-	private DateTime							_dtTourDate;
-	private DateTime							_dtStartTime;
+	private Combo								_comboEndLocation;
+	private Combo								_comboStartLocation;
 
-	private TimeDuration						_timeRecording;
-	private TimeDuration						_timePaused;
+	private Combo								_comboClouds;
+	private Combo								_comboWindDirectionText;
+	private Combo								_comboWindSpeedText;
+
+	private DateTime							_dtStartTime;
+	private DateTime							_dtTourDate;
+
+	private Label								_lblAltitudeUpUnit;
+	private Label								_lblAltitudeDownUnit;
+	private Label								_lblSpeedUnit;
+	private Label								_lblTemperatureUnit;
+	private Label								_lblTourDistanceUnit;
+	private Label								_lblTourTags;
+
+	private Link								_linkTag;
+	private Link								_linkTourType;
+
+	private Spinner								_spinBodyWeight;
+	private Spinner								_spinRestPuls;
+	private Spinner								_spinTemperature;
+	private Spinner								_spinTourCalories;
+	private Spinner								_spinWindDirectionValue;
+	private Spinner								_spinWindSpeedValue;
+
+	private Text								_txtAltitudeDown;
+	private Text								_txtAltitudeUp;
+	private Text								_txtDescription;
+	private Text								_txtTourDistance;
+	private Text								_txtWeather;
+
 	private TimeDuration						_timeDriving;
+	private TimeDuration						_timePaused;
+	private TimeDuration						_timeRecording;
 
 	/*
 	 * tab: info
@@ -2620,30 +2621,53 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
 		_firstColumnContainerControls.add(container);
 		{
-			/*
-			 * rest pulse
-			 */
 
-			// label: Rest pulse
-			final Label label = _tk.createLabel(container, Messages.tour_editor_label_rest_pulse);
-			label.setToolTipText(Messages.tour_editor_label_rest_pulse_Tooltip);
-			_firstColumnControls.add(label);
+			{
+				/*
+				 * calories
+				 */
 
-			// spinner
-			_spinRestPuls = new Spinner(container, SWT.BORDER);
-			GridDataFactory.fillDefaults()//
-					.hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
-					.align(SWT.BEGINNING, SWT.CENTER)
-					.applyTo(_spinRestPuls);
-			_spinRestPuls.setMinimum(0);
-			_spinRestPuls.setMaximum(200);
-			_spinRestPuls.setToolTipText(Messages.tour_editor_label_rest_pulse_Tooltip);
+				// label
+				final Label label = _tk.createLabel(container, Messages.tour_editor_label_tour_calories);
+				_firstColumnControls.add(label);
 
-			_spinRestPuls.addMouseWheelListener(_mouseWheelListener);
-			_spinRestPuls.addSelectionListener(_selectionListener);
+				// spinner
+				_spinTourCalories = new Spinner(container, SWT.BORDER);
+				GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_spinTourCalories);
+				_spinTourCalories.setMinimum(0);
+				_spinTourCalories.setMaximum(1000000);
 
-			// label: bpm
-			_tk.createLabel(container, GRAPH_LABEL_HEARTBEAT_UNIT);
+				_spinTourCalories.addMouseWheelListener(_mouseWheelListener);
+				_spinTourCalories.addSelectionListener(_selectionListener);
+
+				// label: cal
+				_tk.createLabel(container, Messages.tour_editor_label_tour_calories_unit);
+			}
+			{
+				/*
+				 * rest pulse
+				 */
+				// label: Rest pulse
+				final Label label = _tk.createLabel(container, Messages.tour_editor_label_rest_pulse);
+				label.setToolTipText(Messages.tour_editor_label_rest_pulse_Tooltip);
+				_firstColumnControls.add(label);
+
+				// spinner
+				_spinRestPuls = new Spinner(container, SWT.BORDER);
+				GridDataFactory.fillDefaults()//
+						.hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+						.align(SWT.BEGINNING, SWT.CENTER)
+						.applyTo(_spinRestPuls);
+				_spinRestPuls.setMinimum(0);
+				_spinRestPuls.setMaximum(200);
+				_spinRestPuls.setToolTipText(Messages.tour_editor_label_rest_pulse_Tooltip);
+
+				_spinRestPuls.addMouseWheelListener(_mouseWheelListener);
+				_spinRestPuls.addSelectionListener(_selectionListener);
+
+				// label: bpm
+				_tk.createLabel(container, GRAPH_LABEL_HEARTBEAT_UNIT);
+			}
 		}
 	}
 
@@ -2656,25 +2680,31 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		GridDataFactory.fillDefaults().applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
 		{
-			/*
-			 * calories
-			 */
+			{
+				/*
+				 * Body weight
+				 */
+				// label: Weight
+				final Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_BodyWeight);
+				label.setToolTipText(Messages.Tour_Editor_Label_BodyWeight_Tooltip);
+				_secondColumnControls.add(label);
 
-			// label
-			final Label label = _tk.createLabel(container, Messages.tour_editor_label_tour_calories);
-			_secondColumnControls.add(label);
+				// spinner: weight
+				_spinBodyWeight = new Spinner(container, SWT.BORDER);
+				GridDataFactory.fillDefaults()//
+						.hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+						.align(SWT.BEGINNING, SWT.CENTER)
+						.applyTo(_spinBodyWeight);
+				_spinBodyWeight.setDigits(1);
+				_spinBodyWeight.setMinimum(0);
+				_spinBodyWeight.setMaximum(3000); // 300.0 kg
 
-			// spinner
-			_spinTourCalories = new Spinner(container, SWT.BORDER);
-			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_spinTourCalories);
-			_spinTourCalories.setMinimum(0);
-			_spinTourCalories.setMaximum(1000000);
+				_spinBodyWeight.addMouseWheelListener(_mouseWheelListener);
+				_spinBodyWeight.addSelectionListener(_selectionListener);
 
-			_spinTourCalories.addMouseWheelListener(_mouseWheelListener);
-			_spinTourCalories.addSelectionListener(_selectionListener);
-
-			// label: cal
-			_tk.createLabel(container, Messages.tour_editor_label_tour_calories_unit);
+				// label: unit
+				_tk.createLabel(container, UI.UNIT_WEIGHT_KG);
+			}
 		}
 	}
 
@@ -3891,7 +3921,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 */
 	private void defineColumn_Time_TimeInHHMMSSRelative() {
 
-		final ColumnDefinition colDef = TableColumnFactory.TIME_TOUR_TIME_HH_MM_SS.createColumn(_sliceColumnManager, _pc);
+		final ColumnDefinition colDef = TableColumnFactory.TIME_TOUR_TIME_HH_MM_SS.createColumn(
+				_sliceColumnManager,
+				_pc);
 
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -4287,8 +4319,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_txtAltitudeUp.setEnabled(isManualAndEdit);
 		_txtAltitudeDown.setEnabled(isManualAndEdit);
 
-		_spinTourCalories.setEnabled(canEdit);
+		// Personal
+		_spinBodyWeight.setEnabled(canEdit);
 		_spinRestPuls.setEnabled(canEdit);
+		_spinTourCalories.setEnabled(canEdit);
 
 		_linkTag.setEnabled(canEdit);
 		_linkTourType.setEnabled(canEdit);
@@ -6081,6 +6115,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_tourData.setTourEndPlace(_comboEndLocation.getText());
 
 			_tourData.setRestPulse(_spinRestPuls.getSelection());
+			_tourData.setBodyWeight((float) (_spinBodyWeight.getSelection() / 10.0));
 			_tourData.setCalories(_spinTourCalories.getSelection());
 
 			_tourData.setWeather(_txtWeather.getText().trim());
@@ -6452,6 +6487,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		 */
 		_spinRestPuls.setSelection(_tourData.getRestPulse());
 		_spinTourCalories.setSelection(_tourData.getCalories());
+		_spinBodyWeight.setSelection(Math.round(_tourData.getBodyWeight() * 10));
 
 		/*
 		 * wind properties

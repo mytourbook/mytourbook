@@ -1592,6 +1592,8 @@ public class Messages extends NLS {
 
 	public static String		Tour_Editor_Label_AltitudeDown;
 	public static String		Tour_Editor_Label_AltitudeUp;
+	public static String		Tour_Editor_Label_BodyWeight;
+	public static String		Tour_Editor_Label_BodyWeight_Tooltip;
 	public static String		Tour_Editor_Label_DateTimeCreated;
 	public static String		Tour_Editor_Label_DateTimeModified;
 	public static String		Tour_Editor_Label_DeviceFirmwareVersion;

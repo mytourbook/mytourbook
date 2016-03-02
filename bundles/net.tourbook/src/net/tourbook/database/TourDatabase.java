@@ -4257,7 +4257,7 @@ public class TourDatabase {
 
 			final TourPerson person = tourData.getTourPerson();
 			tourData.setTourBike(person.getTourBike());
-			tourData.setBikerWeight(person.getWeight());
+			tourData.setBodyWeight(person.getWeight());
 
 			saveTour(tourData, false);
 		}

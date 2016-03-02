@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -75,21 +75,6 @@ public class DialogQuickEdit extends TitleAreaDialog {
 	private final IDialogSettings		_state;
 	private PixelConverter				_pc;
 
-	private FormToolkit					_tk;
-	private Form						_formContainer;
-
-	private Combo						_comboTitle;
-	private Text						_txtDescription;
-
-	private Text						_txtWeather;
-	private Spinner						_spinWindSpeedValue;
-	private Combo						_comboWindSpeedText;
-	private Combo						_comboWindDirectionText;
-	private Spinner						_spinWindDirectionValue;
-	private Spinner						_spinTemperature;
-	private CLabel						_lblCloudIcon;
-	private Combo						_comboClouds;
-
 	/**
 	 * contains the controls which are displayed in the first column, these controls are used to get
 	 * the maximum width and set the first column within the different section to the same width
@@ -106,8 +91,29 @@ public class DialogQuickEdit extends TitleAreaDialog {
 	private int[]						_unitValueWindSpeed;
 	private float						_unitValueDistance;
 	private float						_unitValueTemperature;
+
+	/*
+	 * UI controls
+	 */
+	private FormToolkit					_tk;
+	private Form						_formContainer;
+
+	private CLabel						_lblCloudIcon;
+
+	private Combo						_comboClouds;
+	private Combo						_comboTitle;
+	private Combo						_comboWindDirectionText;
+	private Combo						_comboWindSpeedText;
+
+	private Spinner						_spinBodyWeight;
 	private Spinner						_spinRestPuls;
+	private Spinner						_spinTemperature;
 	private Spinner						_spinTourCalories;
+	private Spinner						_spinWindSpeedValue;
+	private Spinner						_spinWindDirectionValue;
+
+	private Text						_txtDescription;
+	private Text						_txtWeather;
 
 	/**
 	 * When <code>true</code> the tour is created with the tour editor
@@ -250,13 +256,13 @@ public class DialogQuickEdit extends TitleAreaDialog {
 		final Composite tourContainer = _formContainer.getBody();
 		GridLayoutFactory.swtDefaults().applyTo(tourContainer);
 		{
-			createUISection110Title(tourContainer);
-			createUISectionSeparator(tourContainer);
+			createUI_110_Title(tourContainer);
+			createUI_SectionSeparator(tourContainer);
 
-			createUISection130Personal(tourContainer);
-			createUISectionSeparator(tourContainer);
+			createUI_130_Personal(tourContainer);
+			createUI_SectionSeparator(tourContainer);
 
-			createUISection140Weather(tourContainer);
+			createUI_140_Weather(tourContainer);
 		}
 
 		final Label label = new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL);
@@ -271,7 +277,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 		UI.setEqualizeColumWidths(_firstColumnContainerControls);
 	}
 
-	private void createUISection110Title(final Composite parent) {
+	private void createUI_110_Title(final Composite parent) {
 
 		Label label;
 		final int defaultTextWidth = _pc.convertWidthInCharsToPixels(40);
@@ -332,7 +338,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 		}
 	}
 
-	private void createUISection130Personal(final Composite parent) {
+	private void createUI_130_Personal(final Composite parent) {
 
 		final Composite section = createSection(parent, Messages.tour_editor_section_personal, false);
 		GridLayoutFactory.fillDefaults()//
@@ -340,79 +346,107 @@ public class DialogQuickEdit extends TitleAreaDialog {
 				.spacing(20, 5)
 				.applyTo(section);
 		{
-			createUISection132PersonalCol1(section);
-			createUISection134PersonalCol2(section);
+			createUI_132_Personal_Col1(section);
+			createUI_134_Personal_Col2(section);
 		}
 	}
 
 	/**
 	 * 1. column
 	 */
-	private void createUISection132PersonalCol1(final Composite section) {
+	private void createUI_132_Personal_Col1(final Composite section) {
 
 		final Composite container = _tk.createComposite(section);
 		GridDataFactory.fillDefaults().applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
 		_firstColumnContainerControls.add(container);
 		{
-			/*
-			 * rest pulse
-			 */
+			{
+				/*
+				 * calories
+				 */
 
-			// label: Rest pulse
-			final Label label = _tk.createLabel(container, Messages.tour_editor_label_rest_pulse);
-			label.setToolTipText(Messages.tour_editor_label_rest_pulse_Tooltip);
-			_firstColumnControls.add(label);
+				// label
+				final Label label = _tk.createLabel(container, Messages.tour_editor_label_tour_calories);
+				_firstColumnControls.add(label);
 
-			// spinner
-			_spinRestPuls = new Spinner(container, SWT.BORDER);
-			GridDataFactory.fillDefaults()//
-					.hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
-					.align(SWT.BEGINNING, SWT.CENTER)
-					.applyTo(_spinRestPuls);
-			_spinRestPuls.setMinimum(0);
-			_spinRestPuls.setMaximum(200);
-			_spinRestPuls.setToolTipText(Messages.tour_editor_label_rest_pulse_Tooltip);
+				// spinner
+				_spinTourCalories = new Spinner(container, SWT.BORDER);
+				GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_spinTourCalories);
+				_spinTourCalories.setMinimum(0);
+				_spinTourCalories.setMaximum(1000000);
+//			_spinTourCalories.setToolTipText();
 
-			_spinRestPuls.addMouseWheelListener(_mouseWheelListener);
+				_spinTourCalories.addMouseWheelListener(_mouseWheelListener);
 
-			// label: bpm
-			_tk.createLabel(container, net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit);
+				// label: cal
+				_tk.createLabel(container, Messages.tour_editor_label_tour_calories_unit);
+			}
+			{
+				/*
+				 * rest pulse
+				 */
+
+				// label: Rest pulse
+				final Label label = _tk.createLabel(container, Messages.tour_editor_label_rest_pulse);
+				label.setToolTipText(Messages.tour_editor_label_rest_pulse_Tooltip);
+				_firstColumnControls.add(label);
+
+				// spinner
+				_spinRestPuls = new Spinner(container, SWT.BORDER);
+				GridDataFactory.fillDefaults()//
+						.hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+						.align(SWT.BEGINNING, SWT.CENTER)
+						.applyTo(_spinRestPuls);
+				_spinRestPuls.setMinimum(0);
+				_spinRestPuls.setMaximum(200);
+				_spinRestPuls.setToolTipText(Messages.tour_editor_label_rest_pulse_Tooltip);
+
+				_spinRestPuls.addMouseWheelListener(_mouseWheelListener);
+
+				// label: bpm
+				_tk.createLabel(container, net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit);
+			}
 		}
 	}
 
 	/**
 	 * 2. column
 	 */
-	private void createUISection134PersonalCol2(final Composite section) {
+	private void createUI_134_Personal_Col2(final Composite section) {
 
 		final Composite container = _tk.createComposite(section);
 		GridDataFactory.fillDefaults().applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
 		{
-			/*
-			 * calories
-			 */
+			{
+				/*
+				 * Body weight
+				 */
+				// label: Weight
+				final Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_BodyWeight);
+				label.setToolTipText(Messages.Tour_Editor_Label_BodyWeight_Tooltip);
+				_secondColumnControls.add(label);
 
-			// label
-			final Label label = _tk.createLabel(container, Messages.tour_editor_label_tour_calories);
-			_secondColumnControls.add(label);
+				// spinner: weight
+				_spinBodyWeight = new Spinner(container, SWT.BORDER);
+				GridDataFactory.fillDefaults()//
+						.hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+						.align(SWT.BEGINNING, SWT.CENTER)
+						.applyTo(_spinBodyWeight);
+				_spinBodyWeight.setDigits(1);
+				_spinBodyWeight.setMinimum(0);
+				_spinBodyWeight.setMaximum(3000); // 300.0 kg
 
-			// spinner
-			_spinTourCalories = new Spinner(container, SWT.BORDER);
-			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_spinTourCalories);
-			_spinTourCalories.setMinimum(0);
-			_spinTourCalories.setMaximum(1000000);
-//			_spinTourCalories.setToolTipText();
+				_spinBodyWeight.addMouseWheelListener(_mouseWheelListener);
 
-			_spinTourCalories.addMouseWheelListener(_mouseWheelListener);
-
-			// label: cal
-			_tk.createLabel(container, Messages.tour_editor_label_tour_calories_unit);
+				// label: unit
+				_tk.createLabel(container, UI.UNIT_WEIGHT_KG);
+			}
 		}
 	}
 
-	private void createUISection140Weather(final Composite parent) {
+	private void createUI_140_Weather(final Composite parent) {
 
 		final Composite section = createSection(parent, Messages.tour_editor_section_weather, false);
 		GridLayoutFactory.fillDefaults()//
@@ -420,13 +454,13 @@ public class DialogQuickEdit extends TitleAreaDialog {
 				.spacing(20, 5)
 				.applyTo(section);
 		{
-			createUISection141Weather(section);
-			createUISection142Weather(section);
-			createUISection144WeatherCol1(section);
+			createUI_141_Weather(section);
+			createUI_142_Weather(section);
+			createUI_144_Weather_Col1(section);
 		}
 	}
 
-	private void createUISection141Weather(final Composite parent) {
+	private void createUI_141_Weather(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(container);
@@ -454,7 +488,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 		}
 	}
 
-	private void createUISection142Weather(final Composite parent) {
+	private void createUI_142_Weather(final Composite parent) {
 
 		final Composite container = _tk.createComposite(parent);
 		GridDataFactory.fillDefaults().span(2, 1).applyTo(container);
@@ -624,7 +658,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 	/**
 	 * weather: 1. column
 	 */
-	private void createUISection144WeatherCol1(final Composite parent) {
+	private void createUI_144_Weather_Col1(final Composite parent) {
 
 		final Composite container = _tk.createComposite(parent);
 		GridDataFactory.fillDefaults().applyTo(container);
@@ -732,7 +766,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 		}
 	}
 
-	private void createUISectionSeparator(final Composite parent) {
+	private void createUI_SectionSeparator(final Composite parent) {
 		final Composite sep = _tk.createComposite(parent);
 		GridDataFactory.fillDefaults().hint(SWT.DEFAULT, 5).applyTo(sep);
 	}
@@ -869,6 +903,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 		_tourData.setTourTitle(_comboTitle.getText().trim());
 		_tourData.setTourDescription(_txtDescription.getText().trim());
 
+		_tourData.setBodyWeight((float) (_spinBodyWeight.getSelection() / 10.0));
 		_tourData.setRestPulse(_spinRestPuls.getSelection());
 		_tourData.setCalories(_spinTourCalories.getSelection());
 
@@ -915,6 +950,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 			/*
 			 * personal details
 			 */
+			_spinBodyWeight.setSelection(Math.round(_tourData.getBodyWeight() * 10));
 			_spinRestPuls.setSelection(_tourData.getRestPulse());
 			_spinTourCalories.setSelection(_tourData.getCalories());
 

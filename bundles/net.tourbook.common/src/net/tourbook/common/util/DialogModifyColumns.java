@@ -494,6 +494,20 @@ public class DialogModifyColumns extends TrayDialog {
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 		{
 			/*
+			 * Action: Show/hide category
+			 */
+			if (_isCategoryAvailable) {
+
+				final ToolBar toolbar = new ToolBar(container, SWT.FLAT);
+
+				final ToolBarManager tbm = new ToolBarManager(toolbar);
+
+				tbm.add(_actionShowHideCategory);
+
+				tbm.update(true);
+			}
+
+			/*
 			 * Label: Column
 			 */
 			{
@@ -502,24 +516,6 @@ public class DialogModifyColumns extends TrayDialog {
 				GridDataFactory.fillDefaults()//
 						.align(SWT.FILL, SWT.END)
 						.applyTo(label);
-			}
-
-			/*
-			 * Action: Show/hide category
-			 */
-			if (_isCategoryAvailable) {
-
-				final ToolBar toolbar = new ToolBar(container, SWT.FLAT);
-				GridDataFactory.fillDefaults()//
-						.grab(true, false)
-						.align(SWT.END, SWT.FILL)
-						.applyTo(toolbar);
-
-				final ToolBarManager tbm = new ToolBarManager(toolbar);
-
-				tbm.add(_actionShowHideCategory);
-
-				tbm.update(true);
 			}
 		}
 

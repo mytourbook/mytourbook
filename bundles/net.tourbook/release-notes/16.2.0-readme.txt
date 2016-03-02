@@ -1,8 +1,14 @@
-Version 16.?                                            18. January 2016
+Version 16.?                                            ?. March 2016
+
+--------------------------------------------------------------------------
+TEST
+
+!!! select body weight spinner with UBUNTU, temperature has a special UBUNTU flag !!!
+
+
 
 --------------------------------------------------------------------------
 IDEAS
---------------------------------------------------------------------------
 
 * bug with body weight in reimport
 * smooth power data
@@ -16,18 +22,27 @@ IDEAS
 New
 ===	
 
+* P2 + Tycho
+  These are internal processes but there are no changes in the app, except that the software update procedure is different.
+  P2 is writing in the app folder to keep internal data, before, these data were located in the user folder.
+  The folders ... in the user folder can now be removed because they are not needed any more, there is no automatic cleanup.
+
 * Table/Tree Columns
   - Organize column sets with profiles
   - Columns are categorized (when a view has ~ > 10 columns)
     !!! PREVIOUS COLUM ORDER HAS BEEN RESET !!! - this was necessary to have consistent data internally
 
 * Power
+  - Show power/powertrain/training values in the tourbook view (imported from .fit files)
   - Show power value in chart segment tooltip
   - Reimport power values
+  
+* Tour/Quick Editor
+  - Edit body weight
  
 
 Bugfix
 ======
 
-* Allways
+* Ongoing
 

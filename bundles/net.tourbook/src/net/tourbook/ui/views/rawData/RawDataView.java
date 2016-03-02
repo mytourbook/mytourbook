@@ -3165,15 +3165,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	 */
 	private void doSaveTour_OneTour(final TourData tourData,
 									final TourPerson person,
-									final ArrayList<TourData> savedTours,
-									final boolean isForceSave) {
+									final ArrayList<TourData> savedTours) {
 
 		// workaround for hibernate problems
 		if (tourData.isTourDeleted) {
 			return;
 		}
 
-		if ((tourData.getTourPerson() != null) && (isForceSave == false)) {
+		if (tourData.getTourPerson() != null) {
+
 			/*
 			 * tour is already saved, resaving cannot be done in the import view it can be done in
 			 * the tour editor
@@ -3181,8 +3181,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			return;
 		}
 
+		// a saved tour needs a person
 		tourData.setTourPerson(person);
-		tourData.setBikerWeight(person.getWeight());
+
+		// set weight from person
+		tourData.setBodyWeight(person.getWeight());
+
 		tourData.setTourBike(person.getTourBike());
 
 		final TourData savedTour = TourDatabase.saveTour(tourData, true);
@@ -4484,7 +4488,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 					monitor.subTask(NLS.bind(Messages.Tour_Data_SaveTour_MonitorSubtask, ++saveCounter, selectionSize));
 
-					doSaveTour_OneTour(tourData, person, savedTours, false);
+					doSaveTour_OneTour(tourData, person, savedTours);
 
 					TourLogManager.addSubLog(
 							TourLogState.TOUR_SAVED,

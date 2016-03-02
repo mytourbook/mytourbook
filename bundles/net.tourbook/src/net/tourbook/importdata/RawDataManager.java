@@ -831,6 +831,9 @@ public class RawDataManager {
 
 				newTourData = reimportedTourData;
 
+				// keep body weight from old tour
+				newTourData.setBodyWeight(oldTourData.getBodyWeight());
+
 			} else if (reimportId == ReImport.AllTimeSlices
 					|| reimportId == ReImport.OnlyAltitudeValues
 					|| reimportId == ReImport.OnlyGearValues

@@ -72,9 +72,12 @@ public class TourInfoUI {
 	private final DateTimeFormatter		_dtHistoryFormatter		= DateTimeFormat.forStyle("FM");		//$NON-NLS-1$
 //	private final DateTimeFormatter		_dtWeekday				= DateTimeFormat.forPattern("E");	//$NON-NLS-1$
 
+	private final NumberFormat			_nf0					= NumberFormat.getNumberInstance();
 	private final NumberFormat			_nf1					= NumberFormat.getInstance();
 	private final NumberFormat			_nf3					= NumberFormat.getInstance();
 	{
+		_nf0.setMinimumFractionDigits(0);
+		_nf0.setMaximumFractionDigits(0);
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
 		_nf3.setMinimumFractionDigits(3);
@@ -138,6 +141,9 @@ public class TourInfoUI {
 	private Label						_lblAvgPulseUnit;
 	private Label						_lblAvgCadence;
 	private Label						_lblAvgCadenceUnit;
+	private Label						_lblAvg_Power;
+	private Label						_lblAvg_PowerUnit;
+	private Label						_lblBodyWeight;
 	private Label						_lblBreakTime;
 	private Label						_lblBreakTimeHour;
 	private Label						_lblCalories;
@@ -451,26 +457,42 @@ public class TourInfoUI {
 
 	private void createUI_36_Misc(final Composite container) {
 
-		/*
-		 * calories
-		 */
-		Label label = createUI_Label(container, Messages.Tour_Tooltip_Label_Calories);
-		_firstColumnControls.add(label);
+		{
+			/*
+			 * calories
+			 */
+			final Label label = createUI_Label(container, Messages.Tour_Tooltip_Label_Calories);
+			_firstColumnControls.add(label);
 
-		_lblCalories = createUI_LabelValue(container, SWT.TRAIL);
-		_secondColumnControls.add(_lblCalories);
-		createUI_Label(container, Messages.Value_Unit_Calories);
+			_lblCalories = createUI_LabelValue(container, SWT.TRAIL);
+			_secondColumnControls.add(_lblCalories);
+			createUI_Label(container, Messages.Value_Unit_Calories);
+		}
 
-		/*
-		 * rest pulse
-		 */
-		label = createUI_Label(container, Messages.Tour_Tooltip_Label_RestPulse);
-		_firstColumnControls.add(label);
+		{
+			/*
+			 * rest pulse
+			 */
+			final Label label = createUI_Label(container, Messages.Tour_Tooltip_Label_RestPulse);
+			_firstColumnControls.add(label);
 
-		_lblRestPulse = createUI_LabelValue(container, SWT.TRAIL);
-		_secondColumnControls.add(_lblRestPulse);
+			_lblRestPulse = createUI_LabelValue(container, SWT.TRAIL);
+			_secondColumnControls.add(_lblRestPulse);
 
-		createUI_Label(container, Messages.Value_Unit_Pulse);
+			createUI_Label(container, Messages.Value_Unit_Pulse);
+		}
+		{
+			/*
+			 * Body weight
+			 */
+			final Label label = createUI_Label(container, Messages.Tour_Tooltip_Label_BodyWeight);
+			_firstColumnControls.add(label);
+
+			_lblBodyWeight = createUI_LabelValue(container, SWT.TRAIL);
+			_secondColumnControls.add(_lblBodyWeight);
+
+			createUI_Label(container, UI.UNIT_WEIGHT_KG);
+		}
 	}
 
 	private void createUI_40_RightColumn(final Composite parent) {
@@ -539,6 +561,17 @@ public class TourInfoUI {
 		_secondColumnControls.add(_lblAvgCadence);
 
 		_lblAvgCadenceUnit = createUI_LabelValue(parent, SWT.LEAD);
+
+		/*
+		 * avg power
+		 */
+		label = createUI_Label(parent, Messages.Tour_Tooltip_Label_AvgPower);
+		_firstColumnControls.add(label);
+
+		_lblAvg_Power = createUI_LabelValue(parent, SWT.TRAIL);
+		_secondColumnControls.add(_lblAvg_Power);
+
+		_lblAvg_PowerUnit = createUI_LabelValue(parent, SWT.LEAD);
 	}
 
 	private void createUI_43_Max(final Composite container) {
@@ -1110,8 +1143,14 @@ public class TourInfoUI {
 		_lblAvgCadence.setText(_nf1.format(_tourData.getAvgCadence()));
 		_lblAvgCadenceUnit.setText(Messages.Value_Unit_Cadence);
 
+		// avg power
+		_lblAvg_Power.setText(_nf0.format(_tourData.getPower_Avg()));
+		_lblAvg_PowerUnit.setText(UI.UNIT_POWER);
+
+		// misc
 		_lblCalories.setText(Integer.toString(_tourData.getCalories()));
 		_lblRestPulse.setText(Integer.toString(_tourData.getRestPulse()));
+		_lblBodyWeight.setText(_nf1.format(_tourData.getBodyWeight()));
 
 		/*
 		 * Max values

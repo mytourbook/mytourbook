@@ -4734,9 +4734,9 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	}
 
 	/**
-	 * @return the bikerWeight
+	 * @return Returns the body weight.
 	 */
-	public float getBikerWeight() {
+	public float getBodyWeight() {
 		return bikerWeight;
 	}
 
@@ -6381,9 +6381,9 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 
 	/**
 	 * @param bikerWeight
-	 *            the bikerWeight to set
+	 *            Sets the body weight.
 	 */
-	public void setBikerWeight(final float bikerWeight) {
+	public void setBodyWeight(final float bikerWeight) {
 		this.bikerWeight = bikerWeight;
 	}
 

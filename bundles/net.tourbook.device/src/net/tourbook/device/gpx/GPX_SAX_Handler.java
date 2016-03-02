@@ -590,7 +590,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 		} else if (name.equals(TAG_MT_TOUR_BIKER_WEIGHT)) {
 
-			_tourData.setBikerWeight(getFloatValue(charData));
+			_tourData.setBodyWeight(getFloatValue(charData));
 			_isInMT_Tour = false;
 
 		} else if (name.equals(TAG_MT_TOUR_CONCONI_DEFLECTION)) {
