@@ -6,21 +6,25 @@ Build with POM (since 16.2)
 ###########################
 
 Switch to workspace "C:\DAT\ws_MT-e38"
+--------------------------------------
 
-Set version number / year in
+Set version number / year
+-------------------------
+
 	- "about.mappings"
 	- "net.tourbook.application.ApplicationVersion"
-	- Replace text (Ctrl-H) "16.1.0-SNAPSHOT" to "16.2.0-SNAPSHOT" in all "pom*.xml"
-	- Replace text (Ctrl-H) "16.1.0.qualifier" to "16.2.0.qualifier" in all other files
+	- Replace text (Ctrl-H) "x.y.0-SNAPSHOT" to "a.b.0-SNAPSHOT" in all "pom*.xml"
+	- Replace text (Ctrl-H) "x.y.0.qualifier" to "a.b.0.qualifier" in all other files
 
 	
-Win-Installer
-	- Set version number in "INSTALL-UPDATES\installer-net.tourbook\win-Inno.Setup\mytourbook-include-app.iss"
+	Win-Installer
+		- Set version number in "INSTALL-UPDATES\installer-net.tourbook\win-Inno.Setup\mytourbook-include-app.iss"
 
 	
 Remove debug code
+-----------------
 
-	- "config.ini" in "net.tourbook.product"
+	- "configIni" in "net.tourbook.product"
 	
 	  Disable	"<win32>config-win-DEBUG.ini</win32>"
 	  Enable	"<win32>config-win.ini</win32>"
@@ -32,18 +36,23 @@ Remove debug code
 	  Enable	"http://mytourbook.sourceforge.net/updates"
 
 
-Run ant script "CREATE_MT_BuildFiles.xml" in project "build.net.tourbook"
+Copy/Merge app files to build folder
+--------------------------
+	Run ant script "CREATE_MT_BuildFiles.xml" in project "build.net.tourbook"
 
 
-Open cmd
-	- Select folder "C:\DAT\MT\mytourbook"
-	- Run "mvn verify -P build-release"
-	- Run "mvn verify -P build-release -X --log-file log.txt"
+Create Version
+--------------
+	Open cmd
+		- Select folder "C:\DAT\MT\mytourbook"
+		- Run "mvn verify -P build-release"
+		- Run "mvn verify -P build-release -X --log-file log.txt"
 
 
 Create Update site
-
+------------------
 	Open cmd
+		- Select folder "C:\DAT\MT\mytourbook"
 		- Run "mvn verify -P build-update-site"
 
 
