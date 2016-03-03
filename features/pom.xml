@@ -15,6 +15,7 @@
 	<modules>
 		<module>feature.net.tourbook.app</module>
 		<module>feature.net.tourbook.app.nl</module>
+		<module>feature.net.tourbook.app.version</module>
 		
 		<module>feature.net.tourbook.ext.derby</module>
 		<module>feature.net.tourbook.ext.eclipse</module>

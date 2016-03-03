@@ -16,10 +16,14 @@ Set version number / year
 	- Replace text (Ctrl-H) "x.y.0-SNAPSHOT" to "a.b.0-SNAPSHOT" in all "pom*.xml"
 	- Replace text (Ctrl-H) "x.y.0.qualifier" to "a.b.0.qualifier" in all other files
 
+	feature.net.tourbook.app
+		This version ensures that a software update is done ONLY for the current version
+		- <import feature="feature.net.tourbook.app.version" version="16.2.0" match="equivalent"/>
+
 	
 	Win-Installer
 		- Set version number in "INSTALL-UPDATES\installer-net.tourbook\win-Inno.Setup\mytourbook-include-app.iss"
-
+	
 	
 Remove debug code
 -----------------

@@ -36,6 +36,7 @@
       <import plugin="org.apache.derby"/>
       <import plugin="net.tourbook.ext.ejb3"/>
       <import plugin="de.byteholder.geoclipse.ext.geotools"/>
+      <import plugin="org.eclipse.ui" version="3.6.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.equinox.p2.artifact.repository"/>
       <import plugin="org.eclipse.equinox.p2.core"/>
       <import plugin="org.eclipse.equinox.p2.director"/>
@@ -47,16 +48,10 @@
       <import plugin="org.eclipse.equinox.p2.operations"/>
       <import plugin="org.eclipse.equinox.p2.repository"/>
       <import plugin="org.eclipse.equinox.p2.touchpoint.eclipse"/>
+      <import plugin="org.eclipse.equinox.p2.transport.ecf"/>
       <import plugin="org.eclipse.equinox.p2.ui"/>
-      <import plugin="org.eclipse.ui" version="3.6.0" match="greaterOrEqual"/>
+      <import feature="feature.net.tourbook.app.version" version="16.2.0" match="equivalent"/>
    </requires>
-
-   <plugin
-         id="net.tourbook.branding"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
 
    <plugin
          id="net.tourbook.chart"
@@ -148,5 +143,11 @@
          install-size="0"
          version="0.0.0"
          unpack="false"/>
+
+   <plugin
+         id="net.tourbook.branding"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
 
 </feature>

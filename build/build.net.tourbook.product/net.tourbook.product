@@ -83,6 +83,7 @@
       
       <feature id="feature.net.tourbook.app"				installMode="root"/>
       <feature id="feature.net.tourbook.app.nl"				installMode="root"/>
+      <feature id="feature.net.tourbook.app.version"/>
    </features>
 
    <configurations>

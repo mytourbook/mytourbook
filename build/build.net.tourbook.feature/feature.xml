@@ -35,10 +35,14 @@
 
    <includes
          id="feature.net.tourbook.app"
-         version="16.2.0.qualifier"/>
+         version="0.0.0"/>
 
    <includes
          id="feature.net.tourbook.app.nl"
+         version="0.0.0"/>
+
+   <includes
+         id="feature.net.tourbook.app.version"
          version="0.0.0"/>
 
    <includes
