@@ -22,7 +22,6 @@ public class Messages extends NLS {
 	private static final String	BUNDLE_NAME	= "net.tourbook.common.messages";				//$NON-NLS-1$
 
 	public static String		App_Action_New_WithConfirm;
-	public static String		App_Action_Remove;
 	public static String		App_Action_Remove_NoConfirm;
 	public static String		App_Action_Rename_WithConfirm;
 
@@ -60,7 +59,6 @@ public class Messages extends NLS {
 	public static String		ColumnModifyDialog_Dialog_title;
 	public static String		ColumnModifyDialog_Label_Column;
 	public static String		ColumnModifyDialog_Label_Hints;
-	public static String		ColumnModifyDialog_Label_info;
 	public static String		ColumnModifyDialog_Label_Profile;
 
 	public static String		color_chooser_hexagon;

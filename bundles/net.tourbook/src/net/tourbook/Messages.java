@@ -900,9 +900,6 @@ public class Messages extends NLS {
 	public static String		Import_Data_Dialog_Reimport_SubTask;
 	public static String		Import_Data_Dialog_Reimport_Task;
 	public static String		Import_Data_Dialog_Reimport_Title;
-	public static String		Import_Data_Dialog_ReimportIsInvalid_CommonError_Message;
-	public static String		Import_Data_Dialog_ReimportIsInvalid_DifferentTourId_Message;
-	public static String		Import_Data_Dialog_ReimportIsInvalid_WrongSliceNumbers_Message;
 	public static String		Import_Data_Error_CreatingFileName_Message;
 	public static String		Import_Data_Error_CreatingFileName_Title;
 	public static String		Import_Data_Dialog_EasyImport_InvalidBackupFolder_Message;
@@ -947,7 +944,6 @@ public class Messages extends NLS {
 	public static String		Import_Data_HTML_WatchingOff;
 	public static String		Import_Data_HTML_WatchingOn;
 	public static String		Import_Data_Dialog_EasyImport_NoImportFiles_Message;
-	public static String		Import_Data_Log_ReimportIsInvalid_CommonError_Message;
 	public static String		Import_Data_Log_ReimportIsInvalid_DifferentTourId_Message;
 	public static String		Import_Data_Log_ReimportIsInvalid_WrongSliceNumbers;
 	public static String		Import_Data_Monitor_Backup;

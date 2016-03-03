@@ -274,10 +274,7 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_Power_Normalized_Label;
 	public static String		ColumnFactory_Power_Normalized_Tooltip;
 	public static String		ColumnFactory_Power_PowerToWeight_Header;
-	public static String		ColumnFactory_Power_PowerToWeight_Label;
 	public static String		ColumnFactory_Power_PowerToWeight_Tooltip;
-	public static String		ColumnFactory_Power_TotalWork_Header;
-	public static String		ColumnFactory_Power_TotalWork_Label;
 	public static String		ColumnFactory_Power_TotalWork_Tooltip;
 	public static String		ColumnFactory_Power_TrainingStressScore_Header;
 	public static String		ColumnFactory_Power_TrainingStressScore_Label;
