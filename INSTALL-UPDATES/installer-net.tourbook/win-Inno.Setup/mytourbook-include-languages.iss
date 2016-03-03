@@ -1,10 +1,10 @@
 
 [Languages]
-Name: en; MessagesFile: compiler:Default.isl;           LicenseFile: {#AppRoot}\mytourbook\net.tourbook\gpl-2.0.txt
-Name: de; MessagesFile: compiler:Languages\German.isl;  LicenseFile: {#AppRoot}\mytourbook\net.tourbook\gpl-de-2.0.rtf
-Name: fr; MessagesFile: compiler:Languages\French.isl;  LicenseFile: {#AppRoot}\mytourbook\net.tourbook\gpl-fr-2.0.txt
-Name: it; MessagesFile: compiler:Languages\Italian.isl;	LicenseFile: {#AppRoot}\mytourbook\net.tourbook\gpl-it-2.0.txt
-Name: es; MessagesFile: compiler:Languages\Spanish.isl;	LicenseFile: {#AppRoot}\mytourbook\net.tourbook\gpl-es-2.0.rtf
+Name: en; MessagesFile: compiler:Default.isl;            LicenseFile: {#AppRoot}\mytourbook\bundles\net.tourbook\gpl-2.0.txt
+Name: de; MessagesFile: compiler:Languages\German.isl;   LicenseFile: {#AppRoot}\mytourbook\bundles\net.tourbook\gpl-de-2.0.rtf
+Name: fr; MessagesFile: compiler:Languages\French.isl;   LicenseFile: {#AppRoot}\mytourbook\bundles\net.tourbook\gpl-fr-2.0.txt
+Name: it; MessagesFile: compiler:Languages\Italian.isl;	LicenseFile: {#AppRoot}\mytourbook\bundles\net.tourbook\gpl-it-2.0.txt
+Name: es; MessagesFile: compiler:Languages\Spanish.isl;	LicenseFile: {#AppRoot}\mytourbook\bundles\net.tourbook\gpl-es-2.0.rtf
 
 [CustomMessages]
 en.GroupCreateIcons=Create icons:

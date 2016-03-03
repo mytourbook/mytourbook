@@ -5,6 +5,14 @@ Build with POM (since 16.2)
 
 ###########################
 
+
+Switch to workspace "C:\DAT\ws_mt-NL-projects" 
+----------------------------------------------
+
+	- refresh all projects with F5
+	- Replace text (Ctrl-H) "x.y.0.qualifier" to "a.b.0.qualifier" in all NL projects
+
+	
 Switch to workspace "C:\DAT\ws_MT-e38"
 --------------------------------------
 
@@ -19,11 +27,9 @@ Set version number / year
 	feature.net.tourbook.app
 		This version ensures that a software update is done ONLY for the current version
 		- <import feature="feature.net.tourbook.app.version" version="16.2.0" match="equivalent"/>
-
 	
 	Win-Installer
 		- Set version number in "INSTALL-UPDATES\installer-net.tourbook\win-Inno.Setup\mytourbook-include-app.iss"
-	
 	
 Remove debug code
 -----------------

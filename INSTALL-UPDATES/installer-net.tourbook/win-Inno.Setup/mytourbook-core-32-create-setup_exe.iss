@@ -9,7 +9,7 @@ AppCopyright=MyTourbook Contributors 2005, {#AppYear}
 AppID={{37852811-BC7D-411C-8122-E69CCA892582}
 
 OutputDir={#ProductRoot}{#AppVersion}
-OutputBaseFilename=mytourbook_{#AppVersion}{#AppSubVersion}.win32.win32.x86.setup
+OutputBaseFilename=mytourbook-{#AppVersion}{#AppSubVersion}-win-32-setup
 
 DefaultGroupName=MyTourbook
 DefaultDirName={pf}\MyTourbook
@@ -18,10 +18,10 @@ VersionInfoVersion={#AppVersion}
 VersionInfoCompany=MyTourbook
 
 WizardImageBackColor=clWhite
-WizardSmallImageFile={#AppRoot}\mytourbook\net.tourbook\icons\application\win\tourbook55-32-installer.bmp
+WizardSmallImageFile={#AppRoot}\mytourbook\bundles\net.tourbook\icons\application\win\tourbook55-32-installer.bmp
 
 LanguageDetectionMethod=locale
-UninstallDisplayIcon={#AppRoot}\mytourbook\net.tourbook\icons\application\win\tourbook16.ico
+UninstallDisplayIcon={#AppRoot}\mytourbook\bundles\net.tourbook\icons\application\win\tourbook16.ico
 
 
 
@@ -32,7 +32,7 @@ UninstallDisplayIcon={#AppRoot}\mytourbook\net.tourbook\icons\application\win\to
 
 
 [Files]
-Source: {#ProductRoot}{#AppVersion}\mytourbook_{#AppVersion}{#AppSubVersion}.win32.win32.x86\mytourbook\*; DestDir: {app}; Flags: recursesubdirs; Tasks: ; Languages:
+Source: {#ProductRoot}{#AppVersion}\mytourbook-{#AppVersion}{#AppSubVersion}-win32.win32.x86\mytourbook\*; DestDir: {app}; Flags: recursesubdirs; Tasks: ; Languages:
 
 [InstallDelete]
 Name: {app}\*; Type: files

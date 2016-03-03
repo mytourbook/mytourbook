@@ -9,7 +9,7 @@ AppCopyright=MyTourbook Contributors 2005, {#AppYear}
 AppID={{A20227AD-322E-4B3D-B67A-9C1FECF7B4A6}
 
 OutputDir={#ProductRoot}{#AppVersion}
-OutputBaseFilename=mytourbook_{#AppVersion}{#AppSubVersion}.win32.win32.x86_64.setup
+OutputBaseFilename=mytourbook-{#AppVersion}{#AppSubVersion}-win-64-setup
 
 DefaultGroupName=MyTourbook
 DefaultDirName={pf}\MyTourbook
@@ -18,10 +18,10 @@ VersionInfoVersion={#AppVersion}
 VersionInfoCompany=MyTourbook
 
 WizardImageBackColor=clWhite
-WizardSmallImageFile={#AppRoot}\mytourbook\net.tourbook\icons\application\win\tourbook55-32-installer.bmp
+WizardSmallImageFile={#AppRoot}\mytourbook\bundles\net.tourbook\icons\application\win\tourbook55-32-installer.bmp
 
 LanguageDetectionMethod=locale
-UninstallDisplayIcon={#AppRoot}\mytourbook\net.tourbook\icons\application\win\tourbook16.ico
+UninstallDisplayIcon={#AppRoot}\mytourbook\bundles\net.tourbook\icons\application\win\tourbook16.ico
 
 ; "ArchitecturesAllowed=x64" specifies that Setup cannot run on
 ; anything but x64.
@@ -32,7 +32,7 @@ ArchitecturesAllowed=x64
 ArchitecturesInstallIn64BitMode=x64
 
 [Files]
-Source: {#ProductRoot}{#AppVersion}\mytourbook_{#AppVersion}{#AppSubVersion}.win32.win32.x86_64\mytourbook\*; DestDir: {app}; Flags: recursesubdirs; Tasks: ; Languages:
+Source: {#ProductRoot}{#AppVersion}\mytourbook-{#AppVersion}{#AppSubVersion}-win32.win32.x86_64\mytourbook\*; DestDir: {app}; Flags: recursesubdirs; Tasks: ; Languages:
 
 [InstallDelete]
 Name: {app}\*; Type: files
