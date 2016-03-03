@@ -101,7 +101,7 @@ public class ColumnProfile implements Cloneable {
 		return "ColumnProfile [" // //$NON-NLS-1$
 
 				+ ("name=" + name + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("_id=" + _id + ", ") //$NON-NLS-1$
+				+ ("_id=" + _id + ", ") //$NON-NLS-1$ //$NON-NLS-2$
 
 				+ "]"; //$NON-NLS-1$
 	}

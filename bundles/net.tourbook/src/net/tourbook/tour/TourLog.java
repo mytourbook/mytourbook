@@ -51,15 +51,15 @@ class TourLog {
 
 	@Override
 	public String toString() {
-		return "TourLog ["
+		return "TourLog [" //$NON-NLS-1$
 
 //				+ ("time=" + time + ", ")
 //				+ ("state=" + state + ", ")
-				+ ("message=" + message + ", ")
+				+ ("message=" + message + ", ") //$NON-NLS-1$ //$NON-NLS-2$
 //				+ ("isSubLogItem=" + isSubLogItem + ", ")
 //				+ ("css=" + css)
 
-				+ "]";
+				+ "]"; //$NON-NLS-1$
 	}
 
 }

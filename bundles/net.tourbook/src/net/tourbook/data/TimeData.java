@@ -140,7 +140,7 @@ public class TimeData implements Serializable {
 //				+ (", relativeTime=" + relativeTime) //$NON-NLS-1$
 //				+ (", pulse=" + pulse) //$NON-NLS-1$
 //				+ (", temperature=" + temperature)
-				+ (", cadence=" + cadence)
+				+ (", cadence=" + cadence) //$NON-NLS-1$
 //				+ (", altitude=" + altitude) //$NON-NLS-1$
 //				+ (", absoluteAltitude=" + absoluteAltitude) //$NON-NLS-1$
 //				+ (", distance=" + distance) //$NON-NLS-1$

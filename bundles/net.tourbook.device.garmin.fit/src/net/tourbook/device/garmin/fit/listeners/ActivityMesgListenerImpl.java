@@ -19,8 +19,10 @@ public class ActivityMesgListenerImpl extends AbstractMesgListener implements Ac
 
 		if (numSessions == null || numSessions < 1) {
 
+			final String message = "%s - Invalid number of sessions: %d, expected at least one session."; //$NON-NLS-1$
+
 			TourLogManager.logSubInfo(String.format(
-					"%s - Invalid number of sessions: %d, expected at least one session.",
+					message,
 					context.getTourTitle(),
 					numSessions));
 
