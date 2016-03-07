@@ -1,4 +1,5 @@
 bin
 target
+.apt_generated
 *.js.map
 *.js.uncompressed.js
