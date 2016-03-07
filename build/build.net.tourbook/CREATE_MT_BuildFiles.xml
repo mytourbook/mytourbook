@@ -59,12 +59,32 @@
 				<include name="de.byteholder*/**/*" />
 				<include name="org.apache.derby*/**" />
 				
+				
 				<exclude name="**/plugin_*.properties" />
 				<exclude name="**/feature_*.properties" />
 				<exclude name="**/messages_*.properties" />
 
 				<exclude name="**/bin/**" />
 				<exclude name="**/classes/**" />
+
+				<!-- ignore empty files -->
+				<size value="0" when="more" />
+
+			</fileset>
+
+		</copy>
+
+		<!-- 
+		 
+		 Copy only P2 language files, it would be much more complicated when using features/plugins 
+		
+		-->
+		<copy todir="${path-build-core}" preservelastmodified="true" includeemptydirs="false">
+
+			<fileset dir="${path-mt-bundles}">
+
+				<include name="**/net.tourbook.p2/**/plugin_*.properties" />
+				<include name="**/net.tourbook.p2/**/messages_*.properties" />
 
 				<!-- ignore empty files -->
 				<size value="0" when="more" />
