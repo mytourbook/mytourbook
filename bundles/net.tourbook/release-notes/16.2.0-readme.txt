@@ -39,7 +39,11 @@ New
   
 * Tour/Quick Editor
   - Edit body weight
- 
+
+* Import
+  - .fit import is faster
+    FIT SDK 16.60: -Changed Java File Encoder to use Checked Output Stream for added performance.
+  
 
 Bugfix
 ======
