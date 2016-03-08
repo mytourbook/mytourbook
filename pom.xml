@@ -41,7 +41,7 @@
 			<id>build-update-site</id>
 			<modules>
 				<module>features</module>
-				<module>build/build.update-site.test</module>
+				<module>build/build.update-site</module>
 			</modules>
 		</profile>
 	
