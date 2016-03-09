@@ -63,8 +63,10 @@ import org.joda.time.DateTime;
 
 public class DialogQuickEdit extends TitleAreaDialog {
 
+	private static final String			GRAPH_LABEL_HEARTBEAT_UNIT		= net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
+
 	private final boolean				_isOSX							= net.tourbook.common.UI.IS_OSX;
-	private final boolean				_isLinux						= net.tourbook.common.UI.IS_LINUX;				;
+	private final boolean				_isLinux						= net.tourbook.common.UI.IS_LINUX;
 
 	private static final Calendar		_calendar						= GregorianCalendar.getInstance();
 	private static final DateFormat		_dateFormatter					= DateFormat.getDateInstance(DateFormat.FULL);
@@ -106,6 +108,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 	private Combo						_comboWindSpeedText;
 
 	private Spinner						_spinBodyWeight;
+	private Spinner						_spinFTP;
 	private Spinner						_spinRestPuls;
 	private Spinner						_spinTemperature;
 	private Spinner						_spinTourCalories;
@@ -375,7 +378,6 @@ public class DialogQuickEdit extends TitleAreaDialog {
 				GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_spinTourCalories);
 				_spinTourCalories.setMinimum(0);
 				_spinTourCalories.setMaximum(1000000);
-//			_spinTourCalories.setToolTipText();
 
 				_spinTourCalories.addMouseWheelListener(_mouseWheelListener);
 
@@ -405,7 +407,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 				_spinRestPuls.addMouseWheelListener(_mouseWheelListener);
 
 				// label: bpm
-				_tk.createLabel(container, net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit);
+				_tk.createLabel(container, GRAPH_LABEL_HEARTBEAT_UNIT);
 			}
 		}
 	}
@@ -420,28 +422,54 @@ public class DialogQuickEdit extends TitleAreaDialog {
 		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
 		{
 			{
-				/*
-				 * Body weight
-				 */
-				// label: Weight
-				final Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_BodyWeight);
-				label.setToolTipText(Messages.Tour_Editor_Label_BodyWeight_Tooltip);
-				_secondColumnControls.add(label);
+				{
+					/*
+					 * Body weight
+					 */
+					// label: Weight
+					final Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_BodyWeight);
+					label.setToolTipText(Messages.Tour_Editor_Label_BodyWeight_Tooltip);
+					_secondColumnControls.add(label);
 
-				// spinner: weight
-				_spinBodyWeight = new Spinner(container, SWT.BORDER);
-				GridDataFactory.fillDefaults()//
-						.hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
-						.align(SWT.BEGINNING, SWT.CENTER)
-						.applyTo(_spinBodyWeight);
-				_spinBodyWeight.setDigits(1);
-				_spinBodyWeight.setMinimum(0);
-				_spinBodyWeight.setMaximum(3000); // 300.0 kg
+					// spinner: weight
+					_spinBodyWeight = new Spinner(container, SWT.BORDER);
+					GridDataFactory.fillDefaults()//
+							.hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+							.align(SWT.BEGINNING, SWT.CENTER)
+							.applyTo(_spinBodyWeight);
+					_spinBodyWeight.setDigits(1);
+					_spinBodyWeight.setMinimum(0);
+					_spinBodyWeight.setMaximum(3000); // 300.0 kg
 
-				_spinBodyWeight.addMouseWheelListener(_mouseWheelListener);
+					_spinBodyWeight.addMouseWheelListener(_mouseWheelListener);
 
-				// label: unit
-				_tk.createLabel(container, UI.UNIT_WEIGHT_KG);
+					// label: unit
+					_tk.createLabel(container, UI.UNIT_WEIGHT_KG);
+				}
+
+				{
+					/*
+					 * FTP - Functional Threshold Power
+					 */
+					// label: FTP
+					final Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_FTP);
+					label.setToolTipText(Messages.Tour_Editor_Label_FTP_Tooltip);
+					_secondColumnControls.add(label);
+
+					// spinner: FTP
+					_spinFTP = new Spinner(container, SWT.BORDER);
+					GridDataFactory.fillDefaults()//
+							.hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+							.align(SWT.BEGINNING, SWT.CENTER)
+							.applyTo(_spinFTP);
+					_spinFTP.setMinimum(0);
+					_spinFTP.setMaximum(10000);
+
+					_spinFTP.addMouseWheelListener(_mouseWheelListener);
+
+					// spacer
+					_tk.createLabel(container, UI.EMPTY_STRING);
+				}
 			}
 		}
 	}
@@ -904,6 +932,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 		_tourData.setTourDescription(_txtDescription.getText().trim());
 
 		_tourData.setBodyWeight((float) (_spinBodyWeight.getSelection() / 10.0));
+		_tourData.setPower_FTP(_spinFTP.getSelection());
 		_tourData.setRestPulse(_spinRestPuls.getSelection());
 		_tourData.setCalories(_spinTourCalories.getSelection());
 
@@ -951,6 +980,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 			 * personal details
 			 */
 			_spinBodyWeight.setSelection(Math.round(_tourData.getBodyWeight() * 10));
+			_spinFTP.setSelection(_tourData.getPower_FTP());
 			_spinRestPuls.setSelection(_tourData.getRestPulse());
 			_spinTourCalories.setSelection(_tourData.getCalories());
 

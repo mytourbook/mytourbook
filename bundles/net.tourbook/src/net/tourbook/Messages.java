@@ -1595,6 +1595,8 @@ public class Messages extends NLS {
 	public static String		Tour_Editor_Label_DeviceFirmwareVersion;
 	public static String		Tour_Editor_Label_DeviceSensor_Tooltip;
 	public static String		Tour_Editor_Label_DistanceSensor;
+	public static String		Tour_Editor_Label_FTP;
+	public static String		Tour_Editor_Label_FTP_Tooltip;
 	public static String		Tour_Editor_Label_Hours_Tooltip;
 	public static String		Tour_Editor_Label_Minutes_Tooltip;
 	public static String		Tour_Editor_Label_PowerSensor;

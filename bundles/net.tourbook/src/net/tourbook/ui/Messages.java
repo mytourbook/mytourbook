@@ -54,10 +54,8 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_avg_speed_tooltip;
 	public static String		ColumnFactory_avg_temperature_label;
 	public static String		ColumnFactory_avg_temperature_tooltip;
-	
 	public static String		ColumnFactory_BodyWeight_Label;
 	public static String		ColumnFactory_BodyWeight_Tooltip;
-
 	public static String		ColumnFactory_BreakTime_Header;
 	public static String		ColumnFactory_BreakTime_Label;
 	public static String		ColumnFactory_BreakTime_Tooltip;
@@ -70,7 +68,6 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_date;
 	public static String		ColumnFactory_date_label;
 	public static String		ColumnFactory_date_tooltip;
-
 	public static String		ColumnFactory_db_status_Header;
 	public static String		ColumnFactory_db_status_label;
 	public static String		ColumnFactory_db_status_tooltip;
@@ -177,7 +174,6 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_clouds_label;
 	public static String		ColumnFactory_clouds;
 	public static String		ColumnFactory_clouds_tooltip;
-
 	public static String		ColumnFactory_Category_Altitude;
 	public static String		ColumnFactory_Category_Body;
 	public static String		ColumnFactory_Category_Data;
@@ -192,7 +188,6 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_Category_Training;
 	public static String		ColumnFactory_Category_Waypoint;
 	public static String		ColumnFactory_Category_Weather;
-
 	public static String		ColumnFactory_CollateEvent_Label;
 	public static String		ColumnFactory_CollateEvent_Tooltip;
 	public static String		ColumnFactory_Diff_Header;
@@ -220,7 +215,6 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_ImportStatus_Tooltip;
 	public static String		ColumnFactory_InetAddress_Label;
 	public static String		ColumnFactory_InetAddress_Url;
-
 	public static String		ColumnFactory_kcal;
 	public static String		ColumnFactory_NumberOfGPSPhotos_Header;
 	public static String		ColumnFactory_NumberOfGPSPhotos_Label;

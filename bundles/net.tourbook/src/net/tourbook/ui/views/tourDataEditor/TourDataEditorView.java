@@ -533,6 +533,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private Link								_linkTourType;
 
 	private Spinner								_spinBodyWeight;
+	private Spinner								_spinFTP;
 	private Spinner								_spinRestPuls;
 	private Spinner								_spinTemperature;
 	private Spinner								_spinTourCalories;
@@ -2684,6 +2685,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				/*
 				 * Body weight
 				 */
+
 				// label: Weight
 				final Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_BodyWeight);
 				label.setToolTipText(Messages.Tour_Editor_Label_BodyWeight_Tooltip);
@@ -2704,6 +2706,30 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 				// label: unit
 				_tk.createLabel(container, UI.UNIT_WEIGHT_KG);
+			}
+			{
+				/*
+				 * FTP - Functional Threshold Power
+				 */
+
+				// label: FTP
+				final Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_FTP);
+				label.setToolTipText(Messages.Tour_Editor_Label_FTP_Tooltip);
+				_secondColumnControls.add(label);
+
+				// spinner: FTP
+				_spinFTP = new Spinner(container, SWT.BORDER);
+				GridDataFactory.fillDefaults()//
+						.hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+						.align(SWT.BEGINNING, SWT.CENTER)
+						.applyTo(_spinFTP);
+				_spinFTP.setMinimum(0);
+				_spinFTP.setMaximum(10000);
+
+				_spinFTP.addMouseWheelListener(_mouseWheelListener);
+
+				// spacer
+				_tk.createLabel(container, UI.EMPTY_STRING);
 			}
 		}
 	}
@@ -4321,6 +4347,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		// Personal
 		_spinBodyWeight.setEnabled(canEdit);
+		_spinFTP.setEnabled(canEdit);
 		_spinRestPuls.setEnabled(canEdit);
 		_spinTourCalories.setEnabled(canEdit);
 
@@ -6114,9 +6141,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_tourData.setTourStartPlace(_comboStartLocation.getText());
 			_tourData.setTourEndPlace(_comboEndLocation.getText());
 
-			_tourData.setRestPulse(_spinRestPuls.getSelection());
 			_tourData.setBodyWeight((float) (_spinBodyWeight.getSelection() / 10.0));
+			_tourData.setPower_FTP(_spinFTP.getSelection());
 			_tourData.setCalories(_spinTourCalories.getSelection());
+			_tourData.setRestPulse(_spinRestPuls.getSelection());
 
 			_tourData.setWeather(_txtWeather.getText().trim());
 			_tourData.setWeatherWindDir(_spinWindDirectionValue.getSelection());
@@ -6485,9 +6513,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		/*
 		 * personal details
 		 */
+		_spinBodyWeight.setSelection(Math.round(_tourData.getBodyWeight() * 10));
+		_spinFTP.setSelection(_tourData.getPower_FTP());
 		_spinRestPuls.setSelection(_tourData.getRestPulse());
 		_spinTourCalories.setSelection(_tourData.getCalories());
-		_spinBodyWeight.setSelection(Math.round(_tourData.getBodyWeight() * 10));
 
 		/*
 		 * wind properties
