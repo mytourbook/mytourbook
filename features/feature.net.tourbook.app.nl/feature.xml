@@ -23,6 +23,7 @@
    </url>
 
    <requires>
+      <import feature="feature.net.tourbook.app.version" version="16.3.0" match="equivalent"/>
       <import plugin="net.tourbook.chart"/>
       <import plugin="net.tourbook.common"/>
       <import plugin="net.tourbook.device"/>

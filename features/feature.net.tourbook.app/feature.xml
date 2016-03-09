@@ -36,7 +36,6 @@
       <import plugin="org.apache.derby"/>
       <import plugin="net.tourbook.ext.ejb3"/>
       <import plugin="de.byteholder.geoclipse.ext.geotools"/>
-      <import plugin="org.eclipse.ui" version="3.6.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.equinox.p2.artifact.repository"/>
       <import plugin="org.eclipse.equinox.p2.core"/>
       <import plugin="org.eclipse.equinox.p2.director"/>
