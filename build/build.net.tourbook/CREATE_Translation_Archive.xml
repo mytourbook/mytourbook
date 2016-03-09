@@ -76,7 +76,19 @@
 		<echo message="Copy language fragments into ${path-build-translation}" />
 
 		<copy todir="${path-mt-translations-temp}" preservelastmodified="true" includeemptydirs="true">
-			<fileset dir="${path-mt-nl}" />
+
+			<fileset dir="${path-mt-nl}" >
+				
+				<!-- exclude update site content-->
+				<exclude name="**/features/" />
+				<exclude name="**/plugins/" />
+				<exclude name="**/target/" />
+
+				<exclude name="**/pom.xml" />
+				<exclude name="**/*.jar" />
+				
+			</fileset>
+			
 		</copy>
 
 	</target>
@@ -120,6 +132,8 @@
 	<target name="create-language-archive-file">
 
 		<echo message="Create language archive ${file-translation-archive}" />
+		
+		<delete file="${file-translation-archive}" failonerror="false"></delete>
 
 		<zip destfile="${file-translation-archive}">
 			<fileset dir="${path-mt-translations-temp}" />

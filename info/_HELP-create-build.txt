@@ -24,9 +24,14 @@ Set version number / year
 	- Replace text (Ctrl-H) "x.y.0-SNAPSHOT" to "a.b.0-SNAPSHOT" in all "pom*.xml"
 	- Replace text (Ctrl-H) "x.y.0.qualifier" to "a.b.0.qualifier" in all other files
 
-	"feature.xml" in "feature.net.tourbook.app" project
-		This version ensures that a software update is done ONLY for the current version, VERY TRICKY
-		- <import feature="feature.net.tourbook.app.version" version="16.2.0" match="equivalent"/>
+	"feature.xml" in "feature.net.tourbook.app" AND
+	"feature.xml" in "feature.net.tourbook.app.nl" 
+
+		- Replace text (Ctrl-H) "x.y.z" to "a.b.c" in these files
+	
+		  This version ensures that a software update is done ONLY for the current version, VERY TRICKY
+		  <import feature="feature.net.tourbook.app.version" version="16.2.0" match="equivalent"/>
+	
 	
 	Win-Installer
 		- Set version number in "INSTALL-UPDATES\installer-net.tourbook\win-Inno.Setup\mytourbook-include-app.iss"
@@ -66,9 +71,6 @@ Create Update site
 		- Run "mvn verify -P build-update-site"
 
 
-
-
---- BUILD COMMANDS UNTIL 16.1 ---
 
 
 ##########################
@@ -114,7 +116,8 @@ Create Translation Archive
 	- run script "Create_Translation_Archive"
 
 
-- test translations
+* Test translations
+-------------------
 	
 	- select favorite mt-TRANSLATION-TEST in Q-Dir
 	- select folder "C:\DAT\ws_mt-Translation-TEST"
@@ -124,6 +127,20 @@ Create Translation Archive
 	- switch to workspace "C:\DAT\ws_mt-Translation-TEST"
 		- refresh all projects with F5
 		- run Project/clean... for all projects
+
+
+
+
+
+######################################
+######################################
+
+ BUILD COMMANDS BEFORE TYCHO (<= 16.1)
+
+######################################
+######################################
+
+
 
 
 ############
