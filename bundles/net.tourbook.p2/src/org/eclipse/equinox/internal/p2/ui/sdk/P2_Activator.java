@@ -10,6 +10,10 @@
  *******************************************************************************/
 package org.eclipse.equinox.internal.p2.ui.sdk;
 
+/*
+ * Modified for MyTourbook
+ */
+
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
@@ -17,6 +21,7 @@ import java.net.URISyntaxException;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.equinox.internal.p2.ui.ProvUI;
 import org.eclipse.equinox.internal.p2.ui.model.ElementUtils;
 import org.eclipse.equinox.internal.p2.ui.model.MetadataRepositoryElement;
 import org.eclipse.equinox.internal.p2.ui.sdk.prefs.PreferenceConstants;
@@ -25,12 +30,17 @@ import org.eclipse.equinox.p2.core.IAgentLocation;
 import org.eclipse.equinox.p2.core.IProvisioningAgent;
 import org.eclipse.equinox.p2.engine.IProfileRegistry;
 import org.eclipse.equinox.p2.engine.ProfileScope;
+import org.eclipse.equinox.p2.repository.IRepository;
+import org.eclipse.equinox.p2.repository.IRepositoryManager;
+import org.eclipse.equinox.p2.repository.artifact.IArtifactRepositoryManager;
+import org.eclipse.equinox.p2.repository.metadata.IMetadataRepositoryManager;
 import org.eclipse.equinox.p2.ui.Policy;
 import org.eclipse.equinox.p2.ui.ProvisioningUI;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.internal.misc.StatusUtil;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
@@ -44,22 +54,84 @@ import org.osgi.framework.ServiceReference;
 @SuppressWarnings("restriction")
 public class P2_Activator extends AbstractUIPlugin {
 
-	public static final String			PLUGIN_ID			= "org.eclipse.equinox.p2.ui.sdk";												//$NON-NLS-1$
+	public static final String					PLUGIN_ID				= "org.eclipse.equinox.p2.ui.sdk";											//$NON-NLS-1$
 
-	private static final String			UPDATE_SITE_NAME	= "MyTourbook Update Site";													//$NON-NLS-1$
+	private static final String					UPDATE_SITE_NAME		= "MyTourbook Update Site";												//$NON-NLS-1$
 
-//	private static String				UPDATE_SITE			= "http://mytourbook.sourceforge.net/updates";	//$NON-NLS-1$
-	private static String				UPDATE_SITE			= "http://mytourbook.sourceforge.net/TEST-updates"; //$NON-NLS-1$
-//	private static String				UPDATE_SITE			= "file:/C:/DAT/MT/mytourbook/build/build.update-site.test/target/repository";	//$NON-NLS-1$
+	private static String						UPDATE_SITE_URL			= "http://mytourbook.sourceforge.net/updates";								//$NON-NLS-1$
+	private static String						UPDATE_SITE_TEST		= "http://mytourbook.sourceforge.net/TEST-updates";						//$NON-NLS-1$
+	private static String						UPDATE_SITE_TEST_LOCAL	= "file:/C:/DAT/MT/mytourbook/build/build.update-site/target/repository";	//$NON-NLS-1$
 
-	private static P2_Activator	plugin;
-	private static BundleContext		context;
+	private static MetadataRepositoryElement[]	DEFAULT_UPDATE_SITES;																				;
 
-	private ScopedPreferenceStore		preferenceStore;
-	private IPropertyChangeListener		preferenceListener;
+	static {
+
+		try {
+
+			/*
+			 * http://mytourbook.sourceforge.net/updates
+			 */
+			final MetadataRepositoryElement repo_PRODUCTION = new MetadataRepositoryElement(null, //
+					new URI(UPDATE_SITE_URL),
+					true);
+
+			repo_PRODUCTION.setNickname(UPDATE_SITE_NAME);
+
+			/*
+			 * http://mytourbook.sourceforge.net/TEST-updates
+			 */
+			final MetadataRepositoryElement repo_TEST_Web = new MetadataRepositoryElement(null,//
+					new URI(UPDATE_SITE_TEST),
+					true);
+
+			repo_TEST_Web.setNickname(UPDATE_SITE_TEST);
+
+			/*
+			 * file:/C:/DAT/MT/mytourbook/build/build.update-site/target/repository
+			 */
+			final MetadataRepositoryElement repo_TEST_Local = new MetadataRepositoryElement(null, //
+					new URI(UPDATE_SITE_TEST_LOCAL),
+					true);
+
+			repo_TEST_Local.setNickname(UPDATE_SITE_TEST_LOCAL);
+
+			DEFAULT_UPDATE_SITES = new MetadataRepositoryElement[] {
+			//
+
+//			repo_PRODUCTION,
+
+			//
+			// TEST - sites
+			//
+
+			repo_TEST_Web,
+//			repo_TEST_Local
+
+			//
+			};
+
+		} catch (final URISyntaxException e) {
+			StatusUtil.handleStatus(e, 0);
+		}
+	}
+
+	private static P2_Activator					plugin;
+	private static BundleContext				context;
+
+	private ScopedPreferenceStore				preferenceStore;
+	private IPropertyChangeListener				preferenceListener;
 
 	public P2_Activator() {
 		// constructor
+	}
+
+	static boolean containsURI(final URI[] locations, final URI url) {
+		for (final URI location : locations) {
+			if (location.equals(url)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public static BundleContext getContext() {
@@ -90,6 +162,13 @@ public class P2_Activator extends AbstractUIPlugin {
 		return new Status(IStatus.WARNING, PLUGIN_ID, ProvSDKMessages.ProvSDKUIActivator_NoSelfProfile);
 	}
 
+	private static void setColocatedRepositoryEnablement(	final ProvisioningUI ui,
+															final URI location,
+															final boolean enable) {
+		ProvUI.getArtifactRepositoryManager(ui.getSession()).setEnabled(location, enable);
+		ProvUI.getMetadataRepositoryManager(ui.getSession()).setEnabled(location, enable);
+	}
+
 	/**
 	 * After trying to set addRepository with p2.inf for 2 full days, I ended up to set it
 	 * programmatically like others also did, found a solution here: <a href=
@@ -101,18 +180,102 @@ public class P2_Activator extends AbstractUIPlugin {
 	 */
 	public static void setUpdateSites() {
 
+// Original
+//		ElementUtils.updateRepositoryUsingElements(ui, DEFAULT_UPDATE_SITES, null);
+
+		updateRepositoryUsingElements(ProvisioningUI.getDefaultUI(), DEFAULT_UPDATE_SITES, null);
+	}
+
+	/**
+	 * Copied from {@link ElementUtils} and disabled the part which removes previous repositories.
+	 * 
+	 * @param ui
+	 * @param newRepos
+	 * @param shell
+	 */
+	private static void updateRepositoryUsingElements(	final ProvisioningUI ui,
+														final MetadataRepositoryElement[] newRepos,
+														final Shell shell) {
+		ui.signalRepositoryOperationStart();
+
+		final IMetadataRepositoryManager metaManager = ProvUI.getMetadataRepositoryManager(ui.getSession());
+		final IArtifactRepositoryManager artManager = ProvUI.getArtifactRepositoryManager(ui.getSession());
+
 		try {
 
-			final MetadataRepositoryElement repo = new MetadataRepositoryElement(null, new URI(UPDATE_SITE), true);
-			repo.setNickname(UPDATE_SITE_NAME);
+			final int visibilityFlags = ui.getRepositoryTracker().getMetadataRepositoryFlags();
 
-			ElementUtils.updateRepositoryUsingElements(
-					ProvisioningUI.getDefaultUI(),
-					new MetadataRepositoryElement[] { repo },
-					null);
+			final URI[] currentlyEnabled = metaManager.getKnownRepositories(visibilityFlags);
+			final URI[] currentlyDisabled = metaManager.getKnownRepositories(IRepositoryManager.REPOSITORIES_DISABLED
+					| visibilityFlags);
 
-		} catch (final URISyntaxException e) {
-			StatusUtil.handleStatus(e, 0);
+			for (final MetadataRepositoryElement newRepo : newRepos) {
+
+				final URI location = newRepo.getLocation();
+
+				if (newRepo.isEnabled()) {
+
+					if (containsURI(currentlyDisabled, location)) {
+
+						// It should be enabled and is not currently
+
+// disabled this code, that existing disabled repos are not enabled if the user do not want it
+//
+//						setColocatedRepositoryEnablement(ui, location, true);
+
+					} else if (!containsURI(currentlyEnabled, location)) {
+
+						// It is not known as enabled or disabled.  Add it.
+						metaManager.addRepository(location);
+						artManager.addRepository(location);
+					}
+
+				} else {
+
+					if (containsURI(currentlyEnabled, location)) {
+
+						// It should be disabled, and is currently enabled
+						setColocatedRepositoryEnablement(ui, location, false);
+
+					} else if (!containsURI(currentlyDisabled, location)) {
+
+						// It is not known as enabled or disabled.  Add it and then disable it.
+						metaManager.addRepository(location);
+						artManager.addRepository(location);
+						setColocatedRepositoryEnablement(ui, location, false);
+					}
+				}
+
+				// set repo name
+
+				final String name = newRepo.getName();
+				if (name != null && name.length() > 0) {
+					metaManager.setRepositoryProperty(location, IRepository.PROP_NICKNAME, name);
+					artManager.setRepositoryProperty(location, IRepository.PROP_NICKNAME, name);
+				}
+			}
+
+//			// Are there any elements that need to be deleted?  Go over the original state
+//			// and remove any elements that weren't in the elements we were given
+//			final Set<String> nowKnown = new HashSet<String>();
+//			for (final MetadataRepositoryElement element : elements) {
+//				nowKnown.add(URIUtil.toUnencodedString(element.getLocation()));
+//			}
+//			for (int i = 0; i < currentlyEnabled.length; i++) {
+//				if (!nowKnown.contains(URIUtil.toUnencodedString(currentlyEnabled[i]))) {
+//					metaManager.removeRepository(currentlyEnabled[i]);
+//					artManager.removeRepository(currentlyEnabled[i]);
+//				}
+//			}
+//			for (int i = 0; i < currentlyDisabled.length; i++) {
+//				if (!nowKnown.contains(URIUtil.toUnencodedString(currentlyDisabled[i]))) {
+//					metaManager.removeRepository(currentlyDisabled[i]);
+//					artManager.removeRepository(currentlyDisabled[i]);
+//				}
+//			}
+
+		} finally {
+			ui.signalRepositoryOperationComplete(null, true);
 		}
 	}
 
