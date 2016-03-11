@@ -115,12 +115,29 @@ public class MyTourbookSplashHandler extends BasicSplashHandler {
 		final String qualifier = ApplicationVersion.getVersionQualifier();
 		final Point qualifierExtent = gc.textExtent(qualifier);
 
-		gc.drawText(
-				version,
+		final String dataLocation = Platform.getInstanceLocation().getURL().getPath();
+		final Point dataLocationExtent = gc.textExtent(dataLocation);
+
+		gc.drawText(version,//
 				borderRight - versionExtent.x,
 				borderBottom - versionExtent.y - 2 - qualifierExtent.y,
 				true);
-		gc.drawText(qualifier, borderRight - qualifierExtent.x, borderBottom - versionExtent.y, true);
+
+		// show location when location is in debug mode
+		if (dataLocation.contains("DEBUG")) {
+
+			gc.drawText(dataLocation, //
+					borderRight - dataLocationExtent.x,
+					borderBottom - versionExtent.y,
+					true);
+
+		} else {
+
+			gc.drawText(qualifier, //
+					borderRight - qualifierExtent.x,
+					borderBottom - versionExtent.y,
+					true);
+		}
 
 		gc.drawText(copyRight, 5, 162 - textHeight, true);
 	}
