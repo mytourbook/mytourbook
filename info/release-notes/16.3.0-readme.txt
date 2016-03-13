@@ -3,8 +3,10 @@ Version 16.?                                            ?. March 2016
 --------------------------------------------------------------------------
 TEST
 
-!!! select body weight spinner with UBUNTU, temperature has a special UBUNTU flag !!!
+* !!! select body weight spinner with UBUNTU, temperature has a special UBUNTU flag !!!
 
+* UBUNTU: Remove obsolete folders from .mytourbook
+  These folders are now in the install location, otherwise it did not work with P2 :-(
 
 
 --------------------------------------------------------------------------

@@ -40,6 +40,7 @@ Name: {app}\configuration; Type: filesandordirs
 Name: {app}\features; Type: filesandordirs
 Name: {app}\plugins; Type: filesandordirs
 Name: {app}\workspace; Type: filesandordirs
+Name: {app}\p2; Type: filesandordirs
 Name: {app}; Type: dirifempty
 
 [Icons]
