@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="Set Executable Flag 755" default="set-executable-flag">
+
+	<target name="set-executable-flag">
+		
+		<echo message="tycho-path:     '${tycho-path}'"/>
+		<echo message="tycho-version:  '${tycho-version}'"/>
+
+		<antcall target="set-755-in-zip-file">
+			<param name="zip-file" value="${tycho-path}\products\mytourbook-${tycho-version}-linux.gtk.x86.zip"/>
+		</antcall>
+	
+		<antcall target="set-755-in-zip-file">
+			<param name="zip-file" value="${tycho-path}\products\mytourbook-${tycho-version}-linux.gtk.x86_64.zip"/>
+		</antcall>
+		
+	</target>
+
+	
+    <target name="set-755-in-zip-file">
+
+    	<property name="param-zip-file"				value="${zip-file}"/>
+    	
+    	<property name="launcher-filepath"			value="mytourbook/mytourbook"/>
+
+    	<property name="temp-expanded-zip-dir"		value="./temp"/>
+    	<property name="temp-new-zip-file"			value="temp-new-zip-file"/>
+
+    	<echo message="Setting executable flag 755 in ${param-zip-file}" />
+
+    	<antcall target="clear-temp-dir"/>
+    	
+    	<!-- extract app launcher -->
+    	<unzip src="${param-zip-file}" dest="${temp-expanded-zip-dir}" >
+    		<patternset>
+    			<include name="${launcher-filepath}" />
+    		</patternset>
+    	</unzip>
+
+    	<!-- create temp zip without launcher-->
+    	<zip destfile="${temp-new-zip-file}">
+    	    <zipfileset src="${param-zip-file}" excludes="${launcher-filepath}"/>
+    	</zip>
+
+    	<!-- 
+    		
+    		Copy launcher and set executable bit 755.
+    		 
+    		This is the trick to get the app executable on Linux, 
+    		it took me a day to find a working solution :-( 
+    		
+    		Setting this bit is currently not supported by tycho 
+    		https://bugs.eclipse.org/bugs/show_bug.cgi?id=355370
+    		
+    	-->
+    	<zip destfile="${temp-new-zip-file}"		update="true">
+    		
+    		<zipfileset 
+    			file		="${temp-expanded-zip-dir}/${launcher-filepath}"
+    			fullpath	="${launcher-filepath}"
+    			filemode	="755"
+    		/>
+    		
+    	</zip>
+    	
+    	<!-- replace original zip with modified zip -->
+    	<delete file="${param-zip-file}"/>
+    	<move file="${temp-new-zip-file}" tofile="${param-zip-file}"/>
+
+    	<antcall target="clear-temp-dir"/>
+    	
+    	<echo message="Executable flag 755 is set in ${param-zip-file}" />
+
+    </target>
+	
+
+	<target name="clear-temp-dir">
+    	<delete file	="${temp-new-zip-file}"			failonerror="false"/>
+    	<delete dir		="${temp-expanded-zip-dir}"		failonerror="false"/>
+    </target>
+
+	
+</project>

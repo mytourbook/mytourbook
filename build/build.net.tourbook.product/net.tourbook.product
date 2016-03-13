@@ -13,23 +13,44 @@
 	includeLaunchers	="true"
 >
 
-   <aboutInfo>
-      <image path="../../bundles/net.tourbook/icons/application/tourbook-about.png"/>
-      <text>%Product_about</text>
-   </aboutInfo>
+	<aboutInfo>
+		<image path="../../bundles/net.tourbook/icons/application/tourbook-about.png"/>
+		<text>%Product_about</text>
+	</aboutInfo>
 
-   <configIni use="default">
+	<configIni use="default">
 
-      <linux>config-linux.ini</linux>
-      <macosx>config-osx.ini</macosx>
-      <solaris>config-linux.ini</solaris>
-      
-<!--      
-      <win32>config-win.ini</win32>
+		<linux>config-linux.ini</linux>
+		<macosx>config-osx.ini</macosx>
+		<solaris>config-linux.ini</solaris>
+
+<!--	
+		PRODUCTION	PRODUCTION	PRODUCTION	PRODUCTION	PRODUCTION	
+
+		osgi.instance.area.default=@user.home/mytourbook
+
+		PRODUCTION	PRODUCTION	PRODUCTION	PRODUCTION	PRODUCTION	
 -->
-      <win32>config-win-DEBUG.ini</win32>
       
-   </configIni>
+		<win32>config-win.ini</win32>
+
+
+
+<!--	
+		DEBUG	DEBUG	DEBUG	DEBUG	DEBUG	DEBUG	DEBUG	
+
+		osgi.instance.area.default=@user.home/mytourbook-DEBUG
+
+		When the location contains 'DEBUG' then the location is displayed in the splashscreen
+		(MyTourbookSplashHandler), otherwise the qualifier is displayed
+		
+		DEBUG	DEBUG	DEBUG	DEBUG	DEBUG	DEBUG	DEBUG	DEBUG	
+
+		<win32>config-win-DEBUG.ini</win32>
+-->
+
+
+	</configIni>
 
    <launcherArgs>
       <vmArgs>-Xmx1024m</vmArgs>

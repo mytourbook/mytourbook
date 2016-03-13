@@ -7,11 +7,13 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
-	<artifactId>mytourbook-product</artifactId>		<groupId>net.tourbook</groupId><version>16.3.0-SNAPSHOT</version>
+	<artifactId>mytourbook-product</artifactId>			<groupId>net.tourbook</groupId>
+														<version>16.3.0-SNAPSHOT</version>
 	<packaging>eclipse-repository</packaging>
 
 	<parent>
-		<artifactId>mytourbook-build</artifactId>	<groupId>net.tourbook</groupId><version>16.3.0-SNAPSHOT</version>
+		<artifactId>mytourbook-build</artifactId>		<groupId>net.tourbook</groupId>
+														<version>16.3.0-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 
@@ -23,8 +25,8 @@
 
 			<plugin>
 			
-				<artifactId>tycho-p2-director-plugin</artifactId>			<groupId>org.eclipse.tycho</groupId><version>${tycho.version}</version>
-			
+				<artifactId>tycho-p2-director-plugin</artifactId>	<groupId>org.eclipse.tycho</groupId>
+																	<version>${tycho.version}</version>
 				<executions>
 					<execution>
 						<id>create-distributions</id>
@@ -58,21 +60,58 @@
 						</product>
 					</products>
 				</configuration>
+				
   			</plugin>
 
 			<plugin>
 				<artifactId>maven-antrun-plugin</artifactId>	<version>1.8</version>
 				<executions>
+				
+					<execution>
+						<id>set-unix-executable-flag-755</id>
+						<phase>package</phase>
+						<goals><goal>run</goal></goals>
+						
+						<configuration>
+							<target name="set-executable-flag">
+							
+								<ant antfile="SET_EXECUTABLE_FLAG_755.xml" target="set-executable-flag">
+									<property name="tycho-path"		value="${project.build.directory}"/>
+									<property name="tycho-version"	value="${unqualifiedVersion}"/>
+								</ant>
+								
+							</target>
+						</configuration>
+						
+					</execution>
+				
+<!-- 
 					<execution>
 						<id>create-win-installer</id>
 						<phase>package</phase>
 						<goals><goal>run</goal></goals>
+						
 						<configuration>
 							<target>
 
 								<echo message="Hello from ant in between materialize-products and archive-products" />
 
+
+								<chmod file="${dist}/start.sh" perm="700"/>
+
+								<echo message="Setting executable bit" />
+						        
+						        <chmod file="${project.build.directory}/repository/mytourbook" perm="755"/>
+						        
+						        
+								<chmod perm="755" type="file">
+									<fileset dir="/web">
+										<include name="**/*.cgi"/>
+									</fileset>
+								</chmod>
+						        
 							</target>
+ -->
 <!-- 
 							<target>
 							
@@ -104,10 +143,12 @@
 									<arg line="arg1 arg2 arg3 arg4" />
 								</exec>
 							</tasks>
- -->							
  
 						</configuration>
+ 
 					</execution>
+ -->							
+ 
 				</executions>
 			</plugin>
 		</plugins>

@@ -58,7 +58,7 @@ public class P2_Activator extends AbstractUIPlugin {
 
 	private static final String					UPDATE_SITE_NAME		= "MyTourbook Update Site";												//$NON-NLS-1$
 
-	private static String						UPDATE_SITE_URL			= "http://mytourbook.sourceforge.net/updates";								//$NON-NLS-1$
+	private static String						UPDATE_SITE_PRODUCTION	= "http://mytourbook.sourceforge.net/updates";								//$NON-NLS-1$
 	private static String						UPDATE_SITE_TEST		= "http://mytourbook.sourceforge.net/TEST-updates";						//$NON-NLS-1$
 	private static String						UPDATE_SITE_TEST_LOCAL	= "file:/C:/DAT/MT/mytourbook/build/build.update-site/target/repository";	//$NON-NLS-1$
 
@@ -72,7 +72,7 @@ public class P2_Activator extends AbstractUIPlugin {
 			 * http://mytourbook.sourceforge.net/updates
 			 */
 			final MetadataRepositoryElement repo_PRODUCTION = new MetadataRepositoryElement(null, //
-					new URI(UPDATE_SITE_URL),
+					new URI(UPDATE_SITE_PRODUCTION),
 					true);
 
 			repo_PRODUCTION.setNickname(UPDATE_SITE_NAME);
@@ -96,15 +96,16 @@ public class P2_Activator extends AbstractUIPlugin {
 			repo_TEST_Local.setNickname(UPDATE_SITE_TEST_LOCAL);
 
 			DEFAULT_UPDATE_SITES = new MetadataRepositoryElement[] {
+
+			//	PRODUCTION	PRODUCTION	PRODUCTION	PRODUCTION
+
+			repo_PRODUCTION,
+
+			//
+			// DEBUG	DEBUG	DEBUG	DEBUG	DEBUG	DEBUG
 			//
 
-//			repo_PRODUCTION,
-
-			//
-			// TEST - sites
-			//
-
-			repo_TEST_Web,
+//			repo_TEST_Web,
 //			repo_TEST_Local
 
 			//

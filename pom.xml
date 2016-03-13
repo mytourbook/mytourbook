@@ -9,7 +9,8 @@
 	
 	<name>MyTourbook App</name>
 
-	<artifactId>mytourbook-app</artifactId>		<groupId>net.tourbook</groupId><version>16.3.0-SNAPSHOT</version>
+	<artifactId>mytourbook-app</artifactId>		<groupId>net.tourbook</groupId>
+												<version>16.3.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	
 	<properties>
@@ -71,12 +72,14 @@
 		<plugins>
         			
 			<plugin>
-				<artifactId>tycho-maven-plugin</artifactId>					<groupId>org.eclipse.tycho</groupId><version>${tycho.version}</version>
+				<artifactId>tycho-maven-plugin</artifactId>					<groupId>org.eclipse.tycho</groupId>
+																			<version>${tycho.version}</version>
 				<extensions>true</extensions>
 			</plugin>
 
 			<plugin>
-				<artifactId>tycho-compiler-plugin</artifactId>				<groupId>org.eclipse.tycho</groupId><version>${tycho.version}</version>
+				<artifactId>tycho-compiler-plugin</artifactId>				<groupId>org.eclipse.tycho</groupId>
+																			<version>${tycho.version}</version>
 				<configuration>
 
 
@@ -92,7 +95,8 @@
 			</plugin>
 			
 			<plugin>
-				<artifactId>tycho-packaging-plugin</artifactId>				<groupId>org.eclipse.tycho</groupId><version>${tycho.version}</version>
+				<artifactId>tycho-packaging-plugin</artifactId>				<groupId>org.eclipse.tycho</groupId>
+																			<version>${tycho.version}</version>
 				<configuration>
 				
 					<!-- !!! Hide default user name in manifest files and set a new name !!! -->
@@ -110,7 +114,8 @@
 			</plugin>			
 			
 			<plugin>
-				<artifactId>target-platform-configuration</artifactId>		<groupId>org.eclipse.tycho</groupId><version>${tycho.version}</version>
+				<artifactId>target-platform-configuration</artifactId>		<groupId>org.eclipse.tycho</groupId>
+																			<version>${tycho.version}</version>
 				<configuration>
 					<resolver>p2</resolver>
 					<environments>
