@@ -1863,7 +1863,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	}
 
 	private String createHTML_BgImage(final String imageUrl) {
-		return "background-image: url(" + imageUrl + ");"; //$NON-NLS-1$ //$NON-NLS-2$
+
+		final String encodedImageUrl = WEB.encodeSpace(imageUrl);
+
+		return "background-image: url(" + encodedImageUrl + ");"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	private String createHTML_BgImageStyle(final String imageUrl) {

@@ -224,10 +224,11 @@ public class WEB {
 		}
 
 		final URL fileUrl = FileLocator.toFileURL(bundleUrl);
-		final File file = new File(fileUrl.toURI());
+		final String encodedFileUrl = encodeSpace(fileUrl.toExternalForm());
+		final URI uri = new URI(encodedFileUrl);
+		final File file = new File(uri);
 
 		return file;
-
 	}
 
 	/**
