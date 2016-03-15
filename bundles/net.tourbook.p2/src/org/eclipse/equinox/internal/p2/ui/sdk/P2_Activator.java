@@ -18,6 +18,8 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -41,6 +43,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IMemento;
 import org.eclipse.ui.internal.misc.StatusUtil;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
@@ -54,15 +57,22 @@ import org.osgi.framework.ServiceReference;
 @SuppressWarnings("restriction")
 public class P2_Activator extends AbstractUIPlugin {
 
-	public static final String					PLUGIN_ID				= "org.eclipse.equinox.p2.ui.sdk";											//$NON-NLS-1$
+	public static final String					PLUGIN_ID				= "org.eclipse.equinox.p2.ui.sdk";				//$NON-NLS-1$
 
-	private static final String					UPDATE_SITE_NAME		= "MyTourbook Update Site";												//$NON-NLS-1$
+	private static final String					UPDATE_SITE_NAME		= "MyTourbook Update Site";					//$NON-NLS-1$
 
-	private static String						UPDATE_SITE_PRODUCTION	= "http://mytourbook.sourceforge.net/updates";								//$NON-NLS-1$
-	private static String						UPDATE_SITE_TEST		= "http://mytourbook.sourceforge.net/TEST-updates";						//$NON-NLS-1$
-	private static String						UPDATE_SITE_TEST_LOCAL	= "file:/C:/DAT/MT/mytourbook/build/build.update-site/target/repository";	//$NON-NLS-1$
+	private static final String					TAG_REPOSITORIES		= "Repositories";
+	private static final String					TAG_REPOSITORY			= "Repository";
 
-	private static MetadataRepositoryElement[]	DEFAULT_UPDATE_SITES;																				;
+	private static final String					ATTR_IS_ENABLED			= "isEnabled";
+	private static final String					ATTR_NICK_NAME			= "nickName";
+	private static final String					ATTR_URI				= "uri";
+
+	private static String						UPDATE_SITE_PRODUCTION	= "http://mytourbook.sourceforge.net/updates";	//$NON-NLS-1$
+//	private static String						UPDATE_SITE_TEST		= "http://mytourbook.sourceforge.net/TEST-updates";						//$NON-NLS-1$
+//	private static String						UPDATE_SITE_TEST_LOCAL	= "file:/C:/DAT/MT/mytourbook/build/build.update-site/target/repository";	//$NON-NLS-1$
+
+	private static MetadataRepositoryElement[]	DEFAULT_UPDATE_SITES;													;
 
 	static {
 
@@ -77,23 +87,23 @@ public class P2_Activator extends AbstractUIPlugin {
 
 			repo_PRODUCTION.setNickname(UPDATE_SITE_NAME);
 
-			/*
-			 * http://mytourbook.sourceforge.net/TEST-updates
-			 */
-			final MetadataRepositoryElement repo_TEST_Web = new MetadataRepositoryElement(null,//
-					new URI(UPDATE_SITE_TEST),
-					true);
-
-			repo_TEST_Web.setNickname(UPDATE_SITE_TEST);
-
-			/*
-			 * file:/C:/DAT/MT/mytourbook/build/build.update-site/target/repository
-			 */
-			final MetadataRepositoryElement repo_TEST_Local = new MetadataRepositoryElement(null, //
-					new URI(UPDATE_SITE_TEST_LOCAL),
-					true);
-
-			repo_TEST_Local.setNickname(UPDATE_SITE_TEST_LOCAL);
+//			/*
+//			 * http://mytourbook.sourceforge.net/TEST-updates
+//			 */
+//			final MetadataRepositoryElement repo_TEST_Web = new MetadataRepositoryElement(null,//
+//					new URI(UPDATE_SITE_TEST),
+//					true);
+//
+//			repo_TEST_Web.setNickname(UPDATE_SITE_TEST);
+//
+//			/*
+//			 * file:/C:/DAT/MT/mytourbook/build/build.update-site/target/repository
+//			 */
+//			final MetadataRepositoryElement repo_TEST_Local = new MetadataRepositoryElement(null, //
+//					new URI(UPDATE_SITE_TEST_LOCAL),
+//					true);
+//
+//			repo_TEST_Local.setNickname(UPDATE_SITE_TEST_LOCAL);
 
 			DEFAULT_UPDATE_SITES = new MetadataRepositoryElement[] {
 
@@ -163,6 +173,120 @@ public class P2_Activator extends AbstractUIPlugin {
 		return new Status(IStatus.WARNING, PLUGIN_ID, ProvSDKMessages.ProvSDKUIActivator_NoSelfProfile);
 	}
 
+	private static ArrayList<MetadataRepositoryElement> getOldRepos(final IMemento memento) {
+
+		final ArrayList<MetadataRepositoryElement> oldRepos = new ArrayList<MetadataRepositoryElement>();
+
+		try {
+
+			final IMemento xmlRepos = memento.getChild(TAG_REPOSITORIES);
+			for (final IMemento xmlRepo : xmlRepos.getChildren(TAG_REPOSITORY)) {
+
+				final String uriName = xmlRepo.getString(ATTR_URI);
+				final String nickName = xmlRepo.getString(ATTR_NICK_NAME);
+				final Boolean isEnabled = xmlRepo.getBoolean(ATTR_IS_ENABLED);
+
+				if (uriName != null && isEnabled != null) {
+
+					final MetadataRepositoryElement oldRepo = new MetadataRepositoryElement(null, //
+							new URI(uriName),
+							isEnabled);
+
+					if (nickName != null) {
+						oldRepo.setNickname(nickName);
+					}
+
+					oldRepos.add(oldRepo);
+
+				} else {
+					StatusUtil.handleStatus("Repository data are invalid", 0);
+				}
+			}
+		} catch (final Exception e) {
+			StatusUtil.handleStatus(e, 0);
+		}
+
+		return oldRepos;
+	}
+
+	private static MetadataRepositoryElement[] mergeRepositories(final IMemento memento) {
+
+		final ArrayList<MetadataRepositoryElement> oldRepos = getOldRepos(memento);
+		final Collection<MetadataRepositoryElement> newRepos = new ArrayList<MetadataRepositoryElement>();
+
+		// add default repos when they are not contained in the old repos
+		for (final MetadataRepositoryElement defaultRepo : DEFAULT_UPDATE_SITES) {
+
+			final String defaultRepoLocation = defaultRepo.getLocation().toASCIIString();
+			boolean isInOldRepo = false;
+
+			for (final MetadataRepositoryElement oldRepo : oldRepos) {
+
+				if (oldRepo.getLocation().toASCIIString().equals(defaultRepoLocation)) {
+					isInOldRepo = true;
+					break;
+				}
+			}
+
+			if (isInOldRepo == false) {
+
+				// add default repo before the old repos
+				newRepos.add(defaultRepo);
+			}
+		}
+
+		newRepos.addAll(oldRepos);
+
+		return newRepos.toArray(new MetadataRepositoryElement[newRepos.size()]);
+	}
+
+	public static void saveState(final IMemento memento) {
+
+		/*
+		 * Save update sites in a memento because when a new app is installed then the configuration
+		 * is cleaned up.
+		 */
+
+		final ProvisioningUI ui = ProvisioningUI.getDefaultUI();
+		ui.signalRepositoryOperationStart();
+
+		final IMetadataRepositoryManager metaManager = ProvUI.getMetadataRepositoryManager(ui.getSession());
+
+		try {
+
+			final int visibilityFlags = ui.getRepositoryTracker().getMetadataRepositoryFlags();
+
+			final URI[] currentlyEnabledURIs = metaManager.getKnownRepositories(IRepositoryManager.REPOSITORIES_ALL);
+			final URI[] currentlyDisabledURIs = metaManager
+					.getKnownRepositories(IRepositoryManager.REPOSITORIES_DISABLED | visibilityFlags);
+
+			final IMemento xmlRepositories = memento.createChild(TAG_REPOSITORIES);
+
+			saveState_URI(currentlyEnabledURIs, metaManager, xmlRepositories, true);
+			saveState_URI(currentlyDisabledURIs, metaManager, xmlRepositories, false);
+
+		} finally {
+			ui.signalRepositoryOperationComplete(null, true);
+		}
+	}
+
+	private static void saveState_URI(	final URI[] location,
+										final IMetadataRepositoryManager metaManager,
+										final IMemento xmlRepositories,
+										final boolean isEnabled) {
+
+		for (final URI uri : location) {
+
+			final IMemento xmlRepo = xmlRepositories.createChild(TAG_REPOSITORY);
+
+			final String nickName = metaManager.getRepositoryProperty(uri, IRepository.PROP_NICKNAME);
+
+			xmlRepo.putString(ATTR_URI, uri.toASCIIString());
+			xmlRepo.putString(ATTR_NICK_NAME, nickName);
+			xmlRepo.putBoolean(ATTR_IS_ENABLED, isEnabled);
+		}
+	}
+
 	private static void setColocatedRepositoryEnablement(	final ProvisioningUI ui,
 															final URI location,
 															final boolean enable) {
@@ -177,14 +301,20 @@ public class P2_Activator extends AbstractUIPlugin {
 	 * >http://coopology.com/2012/08/eclipse-rcp-setting-p2-repositories-update-sites-
 	 * programmatically-for-when-p2-inf-fails/</a>
 	 * 
+	 * @param memento
 	 * @throws InvocationTargetException
 	 */
-	public static void setUpdateSites() {
+	public static void setUpdateSites(final IMemento memento) {
 
+//
 // Original
+//
 //		ElementUtils.updateRepositoryUsingElements(ui, DEFAULT_UPDATE_SITES, null);
+//
 
-		updateRepositoryUsingElements(ProvisioningUI.getDefaultUI(), DEFAULT_UPDATE_SITES, null);
+		final MetadataRepositoryElement[] mergedRepos = mergeRepositories(memento);
+
+		updateRepositoryUsingElements(ProvisioningUI.getDefaultUI(), mergedRepos, null);
 	}
 
 	/**

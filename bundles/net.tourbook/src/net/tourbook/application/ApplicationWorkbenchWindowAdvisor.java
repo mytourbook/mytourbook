@@ -459,7 +459,6 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 				setupAppSelectionListener();
 
 				setupProxy();
-				P2_Activator.setUpdateSites();
 			}
 		});
 	}
@@ -539,8 +538,17 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		// this is the first entry point - setup unit values otherwise views show "null"
 
 		UI.updateUnits();
+		P2_Activator.setUpdateSites(memento);
 
 		return super.restoreState(memento);
+	}
+
+	@Override
+	public IStatus saveState(final IMemento memento) {
+
+		P2_Activator.saveState(memento);
+
+		return super.saveState(memento);
 	}
 
 	private void setupAppSelectionListener() {
