@@ -2211,10 +2211,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		defineColumn_Altitude_Hour_Down(defaultListener);
 		defineColumn_Altitude_Diff_SegmentBorder(defaultListener);
 		defineColumn_Altitude_Diff_SegmentComputed(defaultListener);
-		defineColumn_Altitude_Up_SummarizedComputed(defaultListener);
-		defineColumn_Altitude_Down_SummarizedComputed(defaultListener);
-		defineColumn_Altitude_Up_SummarizedBorder(defaultListener);
-		defineColumn_Altitude_Down_SummarizedBorder(defaultListener);
+		defineColumn_Altitude_SummarizedBorder_Up(defaultListener);
+		defineColumn_Altitude_SummarizedBorder_Down(defaultListener);
+		defineColumn_Altitude_SummarizedComputed_Up(defaultListener);
+		defineColumn_Altitude_SummarizedComputed_Down(defaultListener);
 
 		defineColumn_Body_AvgPulse();
 		defineColumn_Body_AvgPulse_Difference();
@@ -2279,57 +2279,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	}
 
 	/**
-	 * column: total altitude down (m/ft)
-	 */
-	private void defineColumn_Altitude_Down_SummarizedBorder(final SelectionAdapter defaultColumnSelectionListener) {
-
-		final ColumnDefinition colDef;
-
-		colDef = TableColumnFactory.ALTITUDE_DOWN_SUMMARIZED_BORDER.createColumn(_columnManager, _pc);
-		colDef.setIsDefaultColumn();
-		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final TourSegment segment = (TourSegment) cell.getElement();
-				final float altitude = segment.altitudeDownSummarizedBorder / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
-
-				if (altitude == 0) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					cell.setText(_nf_0_0.format(altitude));
-				}
-			}
-		});
-	}
-
-	/**
-	 * column: total altitude down (m/ft)
-	 */
-	private void defineColumn_Altitude_Down_SummarizedComputed(final SelectionAdapter defaultColumnSelectionListener) {
-
-		final ColumnDefinition colDef;
-
-		colDef = TableColumnFactory.ALTITUDE_DOWN_SUMMARIZED_COMPUTED.createColumn(_columnManager, _pc);
-		colDef.setIsDefaultColumn();
-		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final TourSegment segment = (TourSegment) cell.getElement();
-				final float altitude = segment.altitudeDownSummarizedComputed / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
-				if (altitude == 0) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					cell.setText(_nf_0_0.format(altitude));
-				}
-			}
-		});
-	}
-
-	/**
 	 * column: gradient
 	 */
 	private void defineColumn_Altitude_Gradient() {
@@ -2368,7 +2317,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		final ColumnDefinition colDef;
 
-		colDef = TableColumnFactory.ALTITUDE_DOWN_H.createColumn(_columnManager, _pc);
+		colDef = TableColumnFactory.ALTITUDE_ELEVATION_DOWN.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -2399,7 +2348,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		final ColumnDefinition colDef;
 
-		colDef = TableColumnFactory.ALTITUDE_UP_H.createColumn(_columnManager, _pc);
+		colDef = TableColumnFactory.ALTITUDE_ELEVATION_UP.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -2424,13 +2373,39 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	}
 
 	/**
-	 * column: total altitude up (m/ft)
+	 * column: total altitude down (m/ft)
 	 */
-	private void defineColumn_Altitude_Up_SummarizedBorder(final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumn_Altitude_SummarizedBorder_Down(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
-		colDef = TableColumnFactory.ALTITUDE_UP_SUMMARIZED_BORDER.createColumn(_columnManager, _pc);
+		colDef = TableColumnFactory.ALTITUDE_SUMMARIZED_BORDER_DOWN.createColumn(_columnManager, _pc);
+		colDef.setIsDefaultColumn();
+		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourSegment segment = (TourSegment) cell.getElement();
+				final float altitude = segment.altitudeDownSummarizedBorder / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+
+				if (altitude == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(_nf_0_0.format(altitude));
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: total altitude up (m/ft)
+	 */
+	private void defineColumn_Altitude_SummarizedBorder_Up(final SelectionAdapter defaultColumnSelectionListener) {
+
+		final ColumnDefinition colDef;
+
+		colDef = TableColumnFactory.ALTITUDE_SUMMARIZED_BORDER_UP.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -2449,13 +2424,38 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	}
 
 	/**
-	 * column: total altitude up (m/ft)
+	 * column: total altitude down (m/ft)
 	 */
-	private void defineColumn_Altitude_Up_SummarizedComputed(final SelectionAdapter defaultColumnSelectionListener) {
+	private void defineColumn_Altitude_SummarizedComputed_Down(final SelectionAdapter defaultColumnSelectionListener) {
 
 		final ColumnDefinition colDef;
 
-		colDef = TableColumnFactory.ALTITUDE_UP_SUMMARIZED_COMPUTED.createColumn(_columnManager, _pc);
+		colDef = TableColumnFactory.ALTITUDE_SUMMARIZED_COMPUTED_DOWN.createColumn(_columnManager, _pc);
+		colDef.setIsDefaultColumn();
+		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourSegment segment = (TourSegment) cell.getElement();
+				final float altitude = segment.altitudeDownSummarizedComputed / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+				if (altitude == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(_nf_0_0.format(altitude));
+				}
+			}
+		});
+	}
+
+	/**
+	 * column: total altitude up (m/ft)
+	 */
+	private void defineColumn_Altitude_SummarizedComputed_Up(final SelectionAdapter defaultColumnSelectionListener) {
+
+		final ColumnDefinition colDef;
+
+		colDef = TableColumnFactory.ALTITUDE_SUMMARIZED_COMPUTED_UP.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
 		colDef.setLabelProvider(new CellLabelProvider() {

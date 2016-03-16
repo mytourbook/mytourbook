@@ -124,7 +124,7 @@ public class UI {
 	public static final String				SYMBOL_DIFFERENCE						= "\u0394";																//$NON-NLS-1$
 	public static final String				SYMBOL_DIFFERENCE_WITH_SPACE			= "\u0394 ";																//$NON-NLS-1$
 	public static final String				SYMBOL_DOUBLE_HORIZONTAL				= "\u2550";																//$NON-NLS-1$
-	public static final String				SYMBOL_DOUBLE_VERTICAL					= "\u2551";																//$NON-NLS-1$
+	public static final String				SYMBOL_DOUBLE_VERTICAL					= "||";																	// this looks ugly "\u2551"; //$NON-NLS-1$
 	public static final String				SYMBOL_ELLIPSIS							= "\u2026";																//$NON-NLS-1$
 	public static final String				SYMBOL_FIGURE_DASH						= "\u2012";																//$NON-NLS-1$
 	public static final String				SYMBOL_FOOT_NOTE						= "\u20F0";																//$NON-NLS-1$

@@ -2459,7 +2459,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	 */
 	private void defineColumn_Altitude_Down() {
 
-		final ColumnDefinition colDef = TableColumnFactory.ALTITUDE_DOWN_SUMMARIZED_BORDER.createColumn(
+		final ColumnDefinition colDef = TableColumnFactory.ALTITUDE_SUMMARIZED_BORDER_DOWN.createColumn(
 				_columnManager,
 				_pc);
 
@@ -2479,7 +2479,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	 */
 	private void defineColumn_Altitude_Up() {
 
-		final ColumnDefinition colDef = TableColumnFactory.ALTITUDE_UP_SUMMARIZED_BORDER.createColumn(
+		final ColumnDefinition colDef = TableColumnFactory.ALTITUDE_SUMMARIZED_BORDER_UP.createColumn(
 				_columnManager,
 				_pc);
 
