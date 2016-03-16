@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project default="plugin_export" name="build">
-	<target name="plugin_export">
-		<pde.exportPlugins destination="C:\Program Files (x86)\MyTourbook" exportSource="false" exportType="directory" plugins="net.tourbook.chart.nl,net.tourbook.device.garmin.nl,net.tourbook.device.nl,net.tourbook.device.nmea.nl,net.tourbook.nl,net.tourbook.printing.nl,net.tourbook.statistics.nl,net.tourbook.util.nl" useJARFormat="true"/>
-	</target>
-</project>
