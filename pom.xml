@@ -51,15 +51,16 @@
 
 	<repositories>
 	
-<!-- Web repository
+		<!--  Eclipse web repository	
 
 		<repository>
 			<id>juno</id>													<layout>p2</layout>
 			<url>http://download.eclipse.org/eclipse/updates/3.8</url>
 		</repository>
--->
+		-->
 
-<!-- Local repository -->	
+		<!-- Eclipse local repositories -->
+	
 		<repository>
 			<id>eclipse.platform.3.8.2</id>									<layout>p2</layout>
 			<url>jar:file:repositories/org.eclipse.platform-3.8.2.zip!/</url>

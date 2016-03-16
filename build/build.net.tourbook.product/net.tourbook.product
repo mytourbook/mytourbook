@@ -25,11 +25,9 @@
 		<solaris>config-linux.ini</solaris>
 
 <!--	
-		PRODUCTION	PRODUCTION	PRODUCTION	PRODUCTION	PRODUCTION	
+		PRODUCTION	
 
 		osgi.instance.area.default=@user.home/mytourbook
-
-		PRODUCTION	PRODUCTION	PRODUCTION	PRODUCTION	PRODUCTION	
 -->
       
 		<win32>config-win.ini</win32>
@@ -37,14 +35,12 @@
 
 
 <!--	
-		DEBUG	DEBUG	DEBUG	DEBUG	DEBUG	DEBUG	DEBUG	
+		DEBUG		
 
 		osgi.instance.area.default=@user.home/mytourbook-DEBUG
 
 		When the location contains 'DEBUG' then the location is displayed in the splashscreen
 		(MyTourbookSplashHandler), otherwise the qualifier is displayed
-		
-		DEBUG	DEBUG	DEBUG	DEBUG	DEBUG	DEBUG	DEBUG	DEBUG	
 
 		<win32>config-win-DEBUG.ini</win32>
 -->
