@@ -240,33 +240,43 @@ public class P2_Activator extends AbstractUIPlugin {
 		return newRepos.toArray(new MetadataRepositoryElement[newRepos.size()]);
 	}
 
+	/**
+	 * Save update sites in a memento because when a new app is installed then the configuration is
+	 * cleaned up.
+	 */
 	public static void saveState(final IMemento memento) {
-
-		/*
-		 * Save update sites in a memento because when a new app is installed then the configuration
-		 * is cleaned up.
-		 */
-
-		final ProvisioningUI ui = ProvisioningUI.getDefaultUI();
-		ui.signalRepositoryOperationStart();
-
-		final IMetadataRepositoryManager metaManager = ProvUI.getMetadataRepositoryManager(ui.getSession());
 
 		try {
 
-			final int visibilityFlags = ui.getRepositoryTracker().getMetadataRepositoryFlags();
+			final ProvisioningUI ui = ProvisioningUI.getDefaultUI();
 
-			final URI[] currentlyEnabledURIs = metaManager.getKnownRepositories(IRepositoryManager.REPOSITORIES_ALL);
-			final URI[] currentlyDisabledURIs = metaManager
-					.getKnownRepositories(IRepositoryManager.REPOSITORIES_DISABLED | visibilityFlags);
+			ui.signalRepositoryOperationStart();
 
-			final IMemento xmlRepositories = memento.createChild(TAG_REPOSITORIES);
+			final IMetadataRepositoryManager metaManager = ProvUI.getMetadataRepositoryManager(ui.getSession());
 
-			saveState_URI(currentlyEnabledURIs, metaManager, xmlRepositories, true);
-			saveState_URI(currentlyDisabledURIs, metaManager, xmlRepositories, false);
+			try {
 
-		} finally {
-			ui.signalRepositoryOperationComplete(null, true);
+				final int visibilityFlags = ui.getRepositoryTracker().getMetadataRepositoryFlags();
+
+				final URI[] currentlyEnabledURIs = metaManager.getKnownRepositories(//
+						IRepositoryManager.REPOSITORIES_ALL);
+
+				final URI[] currentlyDisabledURIs = metaManager.getKnownRepositories(//
+						IRepositoryManager.REPOSITORIES_DISABLED | visibilityFlags);
+
+				final IMemento xmlRepositories = memento.createChild(TAG_REPOSITORIES);
+
+				saveState_URI(currentlyEnabledURIs, metaManager, xmlRepositories, true);
+				saveState_URI(currentlyDisabledURIs, metaManager, xmlRepositories, false);
+
+			} finally {
+				ui.signalRepositoryOperationComplete(null, true);
+			}
+
+		} catch (final Exception e) {
+
+			// this can occure when running in the IDE
+			StatusUtil.handleStatus(e, 0);
 		}
 	}
 
@@ -314,7 +324,15 @@ public class P2_Activator extends AbstractUIPlugin {
 
 		final MetadataRepositoryElement[] mergedRepos = mergeRepositories(memento);
 
-		updateRepositoryUsingElements(ProvisioningUI.getDefaultUI(), mergedRepos, null);
+		try {
+
+			updateRepositoryUsingElements(ProvisioningUI.getDefaultUI(), mergedRepos, null);
+
+		} catch (final Exception e) {
+
+			// this can occure when running in the IDE
+			StatusUtil.handleStatus(e, 0);
+		}
 	}
 
 	/**
