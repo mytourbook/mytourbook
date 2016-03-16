@@ -43,6 +43,7 @@ import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.photo.TourPhotoLinkView;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
+import net.tourbook.web.WEB;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -984,11 +985,11 @@ public class UI {
 		try {
 
 			final URL bundleUrl = TourbookPlugin.getDefault().getBundle().getEntry(ICONS_PATH + imageName);
-
 			final URL fileUrl = FileLocator.toFileURL(bundleUrl);
-			final String iconUrl = fileUrl.toExternalForm();
 
-			return iconUrl;
+			final String encodedFileUrl = WEB.encodeSpace(fileUrl.toExternalForm());
+
+			return encodedFileUrl;
 
 		} catch (final IOException e) {
 			StatusUtil.log(e);

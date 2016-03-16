@@ -206,6 +206,27 @@ public class WEB {
 		return lastSegment.substring(index + 1, endIndex);
 	}
 
+	public static File getEscapedBundleFile(final URL bundleUrl) {
+
+		File file = null;
+
+		try {
+
+			final URL fileUrl = FileLocator.toFileURL(bundleUrl);
+			final String encodedFileUrl = WEB.encodeSpace(fileUrl.toExternalForm());
+
+			final URI uri = new URI(encodedFileUrl);
+			file = new File(uri);
+
+		} catch (final Exception e) {
+
+			// this should not happen otherwise the resource is not available
+			StatusUtil.showStatus(e);
+		}
+
+		return file;
+	}
+
 	/**
 	 * @param filePathName
 	 * @return Returns a file from the WebContent folder, this folder is the root for path names.
@@ -223,10 +244,7 @@ public class WEB {
 			return null;
 		}
 
-		final URL fileUrl = FileLocator.toFileURL(bundleUrl);
-		final String encodedFileUrl = encodeSpace(fileUrl.toExternalForm());
-		final URI uri = new URI(encodedFileUrl);
-		final File file = new File(uri);
+		final File file = getEscapedBundleFile(bundleUrl);
 
 		return file;
 	}
@@ -296,29 +314,9 @@ public class WEB {
 			return null;
 		}
 
-		final URL fileUrl = FileLocator.toFileURL(bundleUrl);
-		final String encodedFileUrl = encodeSpace(fileUrl.toExternalForm());
-		final URI uri = new URI(encodedFileUrl);
-		final File file = new File(uri);
+		final File file = getEscapedBundleFile(bundleUrl);
 
 		return file;
-	}
-
-	/**
-	 * @param filePathName
-	 * @return Returns the root of the WebContent folder.
-	 * @throws IOException
-	 * @throws URISyntaxException
-	 */
-	public static URI getRoot() throws IOException, URISyntaxException {
-
-		final URL bundleUrl = Activator.getDefault().getBundle().getEntry(WEB_CONTENT_FOLDER);
-
-		final URL fileUrl = FileLocator.toFileURL(bundleUrl);
-		final URI fileUri = fileUrl.toURI();
-
-		return fileUri;
-
 	}
 
 	public static IDialogSettings getState() {

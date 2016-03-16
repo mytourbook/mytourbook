@@ -27,8 +27,6 @@ import net.tourbook.common.util.Util;
 import net.tourbook.web.IconRequestHandler;
 import net.tourbook.web.WEB;
 
-import org.eclipse.core.runtime.FileLocator;
-
 import com.sun.net.httpserver.HttpExchange;
 
 /**
@@ -36,7 +34,7 @@ import com.sun.net.httpserver.HttpExchange;
  */
 public class IconRequestMgr implements IconRequestHandler {
 
-	private static final String			ICON_FOLDER	= "/icons/";	//$NON-NLS-1$
+	private static final String		ICON_FOLDER	= "/icons/";	//$NON-NLS-1$
 
 	private static IconRequestMgr	_instance;
 
@@ -48,7 +46,6 @@ public class IconRequestMgr implements IconRequestHandler {
 
 		return _instance;
 	}
-
 
 	/**
 	 * @param filePathName
@@ -67,17 +64,14 @@ public class IconRequestMgr implements IconRequestHandler {
 			return null;
 		}
 
-		final URL fileUrl = FileLocator.toFileURL(bundleUrl);
-		final File file = new File(fileUrl.toURI());
+		final File file = WEB.getEscapedBundleFile(bundleUrl);
 
 		return file;
-
 	}
 
 	@Override
 	public void handleIconRequest(final HttpExchange httpExchange, final String iconFileName, final StringBuilder log)
 			throws IOException {
-
 
 		FileInputStream fs = null;
 		OutputStream os = null;
