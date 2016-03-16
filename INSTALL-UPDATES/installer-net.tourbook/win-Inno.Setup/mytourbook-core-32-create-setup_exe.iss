@@ -32,7 +32,7 @@ UninstallDisplayIcon={#AppRoot}\mytourbook\bundles\net.tourbook\icons\applicatio
 
 
 [Files]
-Source: {#ProductRoot}{#AppVersion}\mytourbook-{#AppVersion}{#AppSubVersion}-win32.win32.x86\mytourbook\*; DestDir: {app}; Flags: recursesubdirs; Tasks: ; Languages:
+Source: {#ProductRoot}{#AppVersion}\mytourbook-{#AppVersion}{#AppSubVersion}-win-32\mytourbook\*; DestDir: {app}; Flags: recursesubdirs; Tasks: ; Languages:
 
 [InstallDelete]
 Name: {app}\*; Type: files

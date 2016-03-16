@@ -43,12 +43,6 @@ Remove debug code
 	
 	  Disable	"<win32>config-win-DEBUG.ini</win32>"
 	  Enable	"<win32>config-win.ini</win32>"
-	
-	  
-	* Update site in "org.eclipse.equinox.internal.p2.ui.sdk.P2_Activator"
-	
-	  Disable	"file:/C:/DAT/MT/mytourbook/build/build.update-site.test/target/repository"
-	  Enable	"http://mytourbook.sourceforge.net/updates"
 
 
 Copy/Merge app files to build folder

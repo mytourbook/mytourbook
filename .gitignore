@@ -1,4 +1,5 @@
 bin
+/repositories
 target
 .apt_generated
 *.js.map

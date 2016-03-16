@@ -32,7 +32,7 @@ ArchitecturesAllowed=x64
 ArchitecturesInstallIn64BitMode=x64
 
 [Files]
-Source: {#ProductRoot}{#AppVersion}\mytourbook-{#AppVersion}{#AppSubVersion}-win32.win32.x86_64\mytourbook\*; DestDir: {app}; Flags: recursesubdirs; Tasks: ; Languages:
+Source: {#ProductRoot}{#AppVersion}\mytourbook-{#AppVersion}{#AppSubVersion}-win-64\mytourbook\*; DestDir: {app}; Flags: recursesubdirs; Tasks: ; Languages:
 
 [InstallDelete]
 Name: {app}\*; Type: files

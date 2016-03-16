@@ -199,7 +199,11 @@ public class P2_Activator extends AbstractUIPlugin {
 					oldRepos.add(oldRepo);
 
 				} else {
-					StatusUtil.handleStatus("Repository data are invalid", 0);
+					StatusUtil.handleStatus(String.format(
+							"Repository data is invalid - Nickname:%s - URI:%s - Enabled:%s",
+							nickName,
+							uriName,
+							isEnabled), 0);
 				}
 			}
 		} catch (final Exception e) {

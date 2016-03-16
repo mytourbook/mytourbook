@@ -5,7 +5,7 @@ TEST
 
 * !!! select body weight spinner with UBUNTU, temperature has a special UBUNTU flag !!!
 
-* UBUNTU: Remove obsolete folders from .mytourbook
+* Win/UBUNTU: Remove obsolete folders from .mytourbook
   These folders are now in the install location, otherwise it did not work with P2 :-(
 
 
@@ -24,10 +24,13 @@ IDEAS
 New
 ===	
 
-* P2 + Tycho
+* Tycho + P2
   These are internal processes but there are no changes in the app, except that the software update procedure is different.
   P2 is writing in the app folder to keep internal data, before, these data were located in the user folder.
   The folders ... in the user folder can now be removed because they are not needed any more, there is no automatic cleanup.
+  
+  Possible Problems
+  Image urls can contain spaces which do not show the image, this is fixed but propably not everywere 
 
 * Table/Tree Columns
   - Organize column sets with profiles
@@ -36,15 +39,15 @@ New
 
 * Power
   - Show power/powertrain/training values in the tourbook view (imported from .fit files)
-  - Show power value in chart segment tooltip
+  - Show power value in tooltips
   - Reimport power values
   
 * Tour/Quick Editor
-  - Edit body weight
+  - Edit body weight, FTP
 
 * Import
-  - .fit import is faster
-    FIT SDK 16.60: -Changed Java File Encoder to use Checked Output Stream for added performance.
+  - .fit import is much faster
+    FIT SDK 16.60: Changed Java File Encoder to use Checked Output Stream for added performance.
   
 
 Bugfix
