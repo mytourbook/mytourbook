@@ -1,0 +1,69 @@
+Version 16.4                                            ?. April 2016
+
+--------------------------------------------------------------------------
+TEST
+
+* !!! select body weight spinner with UBUNTU, temperature has a special UBUNTU flag !!!
+
+* Win/UBUNTU: Remove obsolete folders from .mytourbook
+  These folders are now in the install location, otherwise it did not work with P2 :-(
+
+
+--------------------------------------------------------------------------
+IDEAS
+
+* bug with body weight in reimport
+* smooth power data
+
+--------------------------------------------------------------------------
+
+
+Cleanup
+=======
+
+Since this version, some internal data (configuration) has been moved to the folder where the app is installed.
+The old data are not removed automatically, it has to be done manually this way:
+Delete in your user directory the folders org.eclipse.* within the folder mytourbook in Windows or .mytourbook in Linux, 
+DO NOT DELETE OTHER FOLDERS because they contain your tours !!! 
+
+
+New
+===	
+
+* Table/Tree Columns
+  - Manage columns with profiles
+  - Columns are categorized (when a view has ~ > 10 columns)
+    !!! PREVIOUS COLUM ORDER HAS BEEN RESET !!! - this was necessary to have internally consistent data
+
+* Power
+  - Show power/powertrain/training values in the tourbook view (imported from .fit files)
+  - Show power value in tooltips
+  - Reimport power values
+  
+* Tour/Quick Editor
+  - Edit body weight, FTP
+
+* Import
+  - .fit import is now much faster
+    FIT SDK 16.60: "Changed Java File Encoder to use Checked Output Stream for added performance."
+
+
+System
+======
+
+* P2
+  This is the new software update tool
+
+* Tycho
+  This is a maven driven tool to build the application
+ 
+* Eclipse internal data  
+  These data are now written in the app folder, in the previous versions these data were saved in the user folder.
+  The folders ... in the user folder can now be removed because they are not needed any more, there is no automatic cleanup.
+  
+
+Bugfix
+======
+
+* Ongoing
+

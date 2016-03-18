@@ -16,6 +16,7 @@ Switch to workspace "C:\DAT\ws_mt-NL-projects"
 Switch to workspace "C:\DAT\ws_MT-e38"
 --------------------------------------
 
+
 Set version number / year
 -------------------------
 
@@ -23,19 +24,19 @@ Set version number / year
 	- "net.tourbook.application.ApplicationVersion"
 	- Replace text (Ctrl-H) "x.y.0-SNAPSHOT" to "a.b.0-SNAPSHOT" in all "pom*.xml"
 	- Replace text (Ctrl-H) "x.y.0.qualifier" to "a.b.0.qualifier" in all other files
+	- Replace text (Ctrl-H) "x.y.z" to "a.b.c" in these files
 
-	"feature.xml" in "feature.net.tourbook.app" AND
-	"feature.xml" in "feature.net.tourbook.app.nl" 
+		"feature.xml" in "feature.net.tourbook.app"
+		"feature.xml" in "feature.net.tourbook.app.nl" 
 
-		- Replace text (Ctrl-H) "x.y.z" to "a.b.c" in these files
-	
-		  This version ensures that a software update is done ONLY for the current version, VERY TRICKY
-		  <import feature="feature.net.tourbook.app.version" version="16.2.0" match="equivalent"/>
+		This version ensures that a software update is done ONLY for the current version, VERY TRICKY
+		<import feature="feature.net.tourbook.app.version" version="16.2.0" match="equivalent"/>
 	
 	
 	Win-Installer
 		- Set version number in "INSTALL-UPDATES\installer-net.tourbook\win-Inno.Setup\mytourbook-include-app.iss"
-	
+
+
 Remove debug code
 -----------------
 
@@ -43,6 +44,14 @@ Remove debug code
 	
 	  Disable	"<win32>config-win-DEBUG.ini</win32>"
 	  Enable	"<win32>config-win.ini</win32>"
+
+
+Create Dojo files, when net.tourbook.web is modified
+----------------------------------------------------
+
+	- Set "IS_DEBUG = false" in net.tourbook.web.WEB 
+	- 1. run script /net.tourbook.ant/build-files/Convert-i18-To-Dojo.xml
+	- 2. run script /net.tourbook.web/build-files/Create-Dojo-Bundle.xml
 
 
 Copy/Merge app files to build folder
@@ -67,16 +76,20 @@ Create Update site
 
 
 
-##########################
 
-Create Dojo files, when net.tourbook.web is modified
 
-##########################
 
-	- Set "IS_DEBUG = false" in net.tourbook.web.WEB 
-	- 1. run script /net.tourbook.ant/build-files/Convert-i18-To-Dojo.xml
-	- 2. run script /net.tourbook.web/build-files/Create-Dojo-Bundle.xml
 
+
+
+
+######################################
+######################################
+
+ BUILD COMMANDS BEFORE TYCHO (<= 16.1)
+
+######################################
+######################################
 
 
 ##########################
@@ -121,19 +134,6 @@ Create Translation Archive
 	- switch to workspace "C:\DAT\ws_mt-Translation-TEST"
 		- refresh all projects with F5
 		- run Project/clean... for all projects
-
-
-
-
-
-######################################
-######################################
-
- BUILD COMMANDS BEFORE TYCHO (<= 16.1)
-
-######################################
-######################################
-
 
 
 
