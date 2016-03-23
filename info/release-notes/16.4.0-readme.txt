@@ -1,4 +1,4 @@
-Version 16.4                                            ?. April 2016
+Version 16.4                                            4. April 2016
 
 --------------------------------------------------------------------------
 TEST
@@ -15,6 +15,12 @@ IDEAS
 * bug with body weight in reimport
 * smooth power data
 
+--------------------------------------------------------------------------
+
+Next ?
+
+* Tour Segmenter
+  - Support multiple tours for the segmenter by marker
 --------------------------------------------------------------------------
 
 

@@ -19,9 +19,9 @@ import gnu.trove.list.array.TIntArrayList;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.algorithm.DPPoint;
@@ -428,8 +428,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 				final Object[] tourSegments = createSegmenterContent();
 
-				updateUIAltitude();
-				updateUIBreakTime();
+				updateUI_Altitude();
+				updateUI_BreakTime();
 
 				return tourSegments;
 			}
@@ -595,7 +595,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 					setMaxDistanceSpinner();
 					_spinnerDistance.setMaximum(_maxDistanceSpinner);
 					_spinnerDistance.setPageIncrement(_spinnerDistancePage);
-					updateUIDistance();
+					updateUI_Distance();
 
 					/*
 					 * update min altitude
@@ -789,7 +789,12 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		final float[] metricDistanceSerie = tourData.getMetricDistanceSerie();
 		final float[] pulseSerie = tourData.pulseSerie;
 
-		final Set<TourMarker> markerSerie = tourData.getTourMarkers();
+		final Object[] markerSerie;
+		if (tourData.isMultipleTours) {
+			markerSerie = tourData.multiTourMarkers.toArray();
+		} else {
+			markerSerie = tourData.getTourMarkers().toArray();
+		}
 
 		int checkedSegmenterData = 0;
 
@@ -809,7 +814,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				SEGMENTER_REQUIRES_PULSE
 				: 0;
 
-		checkedSegmenterData |= markerSerie != null && markerSerie.size() > 0 ? //
+		checkedSegmenterData |= markerSerie != null && markerSerie.length > 0 ? //
 				SEGMENTER_REQUIRES_MARKER
 				: 0;
 
@@ -1299,7 +1304,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private void createSegmentsBy_Marker() {
 
 		final int[] timeSerie = _tourData.timeSerie;
-		final Set<TourMarker> tourMarkers = _tourData.getTourMarkers();
+
+		final Collection<TourMarker> tourMarkers = _tourData.isMultipleTours //
+				? _tourData.multiTourMarkers
+				: _tourData.getTourMarkers();
 
 		// sort markers by time - they can be unsorted
 		final ArrayList<TourMarker> markerList = new ArrayList<TourMarker>(tourMarkers);
@@ -1336,7 +1344,51 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			segmentSerieIndex.add(lastIndex);
 		}
 
-		_tourData.segmentSerieIndex = ArrayListToArray.toInt(segmentSerieIndex);
+		final int[] outerSegmentIndex = _tourData.segmentSerieIndex = ArrayListToArray.toInt(segmentSerieIndex);
+
+		/*
+		 * Create the inner data serie index
+		 */
+		final float[] distanceSerie = _tourData.getMetricDistanceSerie();
+		final float[] altitudeSerie = _tourData.getAltitudeSmoothedSerie(false);
+
+		// ensure required data are available
+//		if (altitudeSerie != null //
+//				&& altitudeSerie.length > 1
+//				&& distanceSerie != null
+//				&& distanceSerie.length > 1) {
+//
+//			for (int outerIndex = 0; outerIndex < outerSegmentIndex.length; outerIndex++) {
+//
+//				final int element = outerSegmentIndex[outerIndex];
+//
+//				// convert data series into dp points
+//				final DPPoint graphPoints[] = new DPPoint[distanceSerie.length];
+//				for (int serieIndex = 0; serieIndex < graphPoints.length; serieIndex++) {
+//					graphPoints[serieIndex] = new DPPoint(
+//							distanceSerie[serieIndex],
+//							altitudeSerie[serieIndex],
+//							serieIndex);
+//				}
+//
+//				final Object[] dpPoints = new DouglasPeuckerSimplifier(//
+//						_dpToleranceAltitude,
+//						graphPoints,
+//						getForcedIndices()).simplify();
+//
+//				/*
+//				 * copie the data index for the simplified points into the tour data
+//				 */
+//
+//				final int[] segmentSerieIndex = _tourData.segmentSerieIndex = new int[dpPoints.length];
+//
+//				for (int iPoint = 0; iPoint < dpPoints.length; iPoint++) {
+//					final DPPoint point = (DPPoint) dpPoints[iPoint];
+//					segmentSerieIndex[iPoint] = point.serieIndex;
+//				}
+//			}
+//		}
+
 	}
 
 	/**
@@ -3089,7 +3141,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 		// create segments with newly saved tour that it can be displayed in the tour chart
 		createSegments(false);
-		updateUIAltitude();
+		updateUI_Altitude();
 	}
 
 	private void onSelect_BreakTime() {
@@ -3130,7 +3182,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 	private void onSelect_Distance() {
 
-		updateUIDistance();
+		updateUI_Distance();
 
 		createSegments(true);
 	}
@@ -3523,7 +3575,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		final int stateDistance = Util.getStateInt(_state, STATE_SELECTED_DISTANCE, 10);
 		_spinnerDistance.setSelection(stateDistance);
 
-		updateUIDistance();
+		updateUI_Distance();
 
 		_spinnerMinAltitude.setSelection(Util.getStateInt(_state, STATE_MINIMUM_ALTITUDE, 50));
 
@@ -3870,7 +3922,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		}
 		_isDirtyDisabled = false;
 
-		updateUISegmenterSelector();
+		updateUI_SegmenterSelector();
 		onSelect_SegmenterType(false);
 	}
 
@@ -3911,7 +3963,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/**
 	 * update ascending altitude computed value
 	 */
-	private void updateUIAltitude() {
+	private void updateUI_Altitude() {
 
 		final TourSegmenter selectedSegmenter = getSelectedSegmenter();
 		if (selectedSegmenter == null) {
@@ -3994,7 +4046,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				}));
 	}
 
-	private void updateUIBreakTime() {
+	private void updateUI_BreakTime() {
 
 		_lblTourBreakTime.setText(Long.toString(_tourBreakTime)
 				+ UI.SPACE
@@ -4005,7 +4057,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		_containerBreakTime.layout();
 	}
 
-	private void updateUIDistance() {
+	private void updateUI_Distance() {
 
 		float spinnerDistance = getDistance() / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
@@ -4063,7 +4115,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		}
 	}
 
-	private void updateUISegmenterSelector() {
+	private void updateUI_SegmenterSelector() {
 
 		final TourSegmenter currentSegmenter = getSelectedSegmenter();
 		final int availableSegmenterData = checkSegmenterData(_tourData);

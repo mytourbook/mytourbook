@@ -926,6 +926,16 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	public int[]												segmentSerieIndex;
 
 	/**
+	 * 2nd Index of the segmented data in the data series, {@link #segmentSerieIndex} contains the
+	 * outer index, this contains the inner index.
+	 * <p>
+	 * This is used to first creates the sements by the outer attribute, e.g. tour marker and then
+	 * create the inner segments, e.g. altitude with DP.
+	 */
+	@Transient
+	public int[]												segmentSerieIndex2nd;
+
+	/**
 	 * oooo (o) DD-record // offset
 	 */
 	@Transient
@@ -3773,7 +3783,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 
 				float altitude1 = segmenterAltitudeSerie[segmentStartIndex];
 
-				// get computed values: altitude up/down, pulse and power for a segment
+				// get computed values: altitude up/down and power for a segment
 				for (int serieIndex = segmentStartIndex + 1; serieIndex <= segmentEndIndex; serieIndex++) {
 
 					final float altitude2 = segmenterAltitudeSerie[serieIndex];
