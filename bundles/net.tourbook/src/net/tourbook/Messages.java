@@ -1440,12 +1440,9 @@ public class Messages extends NLS {
 	public static String		Slideout_SegmenterChartOptions_Label_ValueFont_Example;
 	
 	public static String		Slideout_SegmenterOptions_Label_AltitudeDown;
-	public static String		Slideout_SegmenterOptions_Label_AltitudeDown_Tooltip;
 	public static String		Slideout_SegmenterOptions_Label_AltitudeUp;
-	public static String		Slideout_SegmenterOptions_Label_AltitudeUp_Tooltip;
 	public static String		Slideout_SegmenterOptions_Label_Title;
 	public static String		Slideout_SegmenterOptions_Label_Totals;
-	public static String		Slideout_SegmenterOptions_Label_Totals_Tooltip;
 
 	public static String		Slideout_TourEditor_Label_LatLonDigits;
 	public static String		Slideout_TourEditor_Label_LatLonDigits_Tooltip;

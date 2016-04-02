@@ -521,7 +521,6 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell i
 							.align(SWT.BEGINNING, SWT.CENTER)
 							.applyTo(label);
 					label.setText(Messages.Slideout_SegmenterOptions_Label_AltitudeUp);
-					label.setToolTipText(Messages.Slideout_SegmenterOptions_Label_AltitudeUp_Tooltip);
 
 					// Color
 					_colorSegmenterAltitudeUp = new ColorSelectorExtended(containerLeft);
@@ -538,7 +537,6 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell i
 							.align(SWT.BEGINNING, SWT.CENTER)
 							.applyTo(label);
 					label.setText(Messages.Slideout_SegmenterOptions_Label_AltitudeDown);
-					label.setToolTipText(Messages.Slideout_SegmenterOptions_Label_AltitudeDown_Tooltip);
 
 					// Color
 					_colorSegmenterAltitudeDown = new ColorSelectorExtended(containerLeft);
@@ -561,7 +559,6 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell i
 							.align(SWT.BEGINNING, SWT.CENTER)
 							.applyTo(label);
 					label.setText(Messages.Slideout_SegmenterOptions_Label_Totals);
-					label.setToolTipText(Messages.Slideout_SegmenterOptions_Label_Totals_Tooltip);
 
 					// Color: Segmenter totals
 					_colorSegmenterTotals = new ColorSelectorExtended(containerRight);
