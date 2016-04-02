@@ -276,6 +276,10 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_restpulse_label;
 	public static String		ColumnFactory_restpulse;
 	public static String		ColumnFactory_restpulse_tooltip;
+	public static String		ColumnFactory_Segment_Ascent_Label;
+	public static String		ColumnFactory_Segment_Ascent_Tooltip;
+	public static String		ColumnFactory_Segment_Descent_Label;
+	public static String		ColumnFactory_Segment_Descent_Tooltip;
 	public static String		ColumnFactory_SerieIndex;
 	public static String		ColumnFactory_SerieIndex_Label;
 	public static String		ColumnFactory_SerieIndex_Tooltip;

@@ -299,23 +299,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 				new RGB(0x00, 0x00, 0x00));
 
 		PreferenceConverter.setDefault(store, //
-				ITourbookPreferences.VIEW_LAYOUT_COLOR_BG_SEGMENTER_UP,
-				new RGB(0xFF, 0x5E, 0x62));
-
-		PreferenceConverter.setDefault(store, //
-				ITourbookPreferences.VIEW_LAYOUT_COLOR_BG_SEGMENTER_DOWN,
-				new RGB(0x3B, 0xFF, 0x36));
-
-		PreferenceConverter.setDefault(store, //
 				ITourbookPreferences.VIEW_LAYOUT_COLOR_BG_HISTORY_TOUR,
 				new RGB(0xFC, 0xFF, 0xE3));
-//		new RGB(0xFF, 0xF5, 0xE3));
-//		new RGB(0xED, 0xE5, 0xD3));
-//		new RGB(0xF0, 0xF2, 0xE3));
-//		new RGB(0xF0, 0xE3, 0xED));
-//				new RGB(0xE0, 0xE5, 0xF0));
-//				new RGB(0xF0, 0xF0, 0xF0));
-//				new RGB(0xD8, 0xD8, 0xD8));
 
 		/*
 		 * view formats

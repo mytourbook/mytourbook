@@ -4200,49 +4200,50 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			final IValueLabelProvider labelProviderMMSS = TourManager.getLabelProviderMMSS();
 
 			cfgAltitude = new ConfigGraphSegment(GraphColorManager.PREF_GRAPH_ALTITUDE);
-			cfgAltitude.segmentDataSerie = _tourData.segmentSerieAltitudeDiff;
+			cfgAltitude.segmentDataSerie = _tourData.segmentSerie_Altitude_Diff;
 			cfgAltitude.labelProvider = labelProviderInt;
 			cfgAltitude.canHaveNegativeValues = true;
 			cfgAltitude.minValueAdjustment = 0.1;
 
 			cfgPulse = new ConfigGraphSegment(GraphColorManager.PREF_GRAPH_HEARTBEAT);
-			cfgPulse.segmentDataSerie = _tourData.segmentSeriePulse;
+			cfgPulse.segmentDataSerie = _tourData.segmentSerie_Pulse;
 			cfgPulse.labelProvider = null;
 			cfgPulse.canHaveNegativeValues = false;
 			cfgPulse.minValueAdjustment = Double.MIN_VALUE;
 
 			cfgSpeed = new ConfigGraphSegment(GraphColorManager.PREF_GRAPH_SPEED);
-			cfgSpeed.segmentDataSerie = _tourData.segmentSerieSpeed;
+			cfgSpeed.segmentDataSerie = _tourData.segmentSerie_Speed;
 			cfgSpeed.labelProvider = null;
 			cfgSpeed.canHaveNegativeValues = false;
 			cfgSpeed.minValueAdjustment = Double.MIN_VALUE;
 
 			cfgPace = new ConfigGraphSegment(GraphColorManager.PREF_GRAPH_PACE);
-			cfgPace.segmentDataSerie = _tourData.segmentSeriePace;
+			cfgPace.segmentDataSerie = _tourData.segmentSerie_Pace;
 			cfgPace.labelProvider = labelProviderMMSS;
 			cfgPace.canHaveNegativeValues = false;
 			cfgPace.minValueAdjustment = Double.MIN_VALUE;
 
 			cfgPower = new ConfigGraphSegment(GraphColorManager.PREF_GRAPH_POWER);
-			cfgPower.segmentDataSerie = _tourData.segmentSeriePower;
+			cfgPower.segmentDataSerie = _tourData.segmentSerie_Power;
 			cfgPower.labelProvider = labelProviderInt;
 			cfgPower.canHaveNegativeValues = false;
 			cfgPower.minValueAdjustment = 1.0;
 
 			cfgGradient = new ConfigGraphSegment(GraphColorManager.PREF_GRAPH_GRADIENT);
-			cfgGradient.segmentDataSerie = _tourData.segmentSerieGradient;
+			cfgGradient.segmentDataSerie = _tourData.segmentSerie_Gradient;
 			cfgGradient.labelProvider = null;
 			cfgGradient.canHaveNegativeValues = true;
 			cfgGradient.minValueAdjustment = 1.6;
 
 			cfgAltimeter = new ConfigGraphSegment(GraphColorManager.PREF_GRAPH_ALTIMETER);
-			cfgAltimeter.segmentDataSerie = _tourData.segmentSerieAltitudeUpH;
+			// set dummy which is not used
+			cfgAltimeter.segmentDataSerie = new float[] {};
 			cfgAltimeter.labelProvider = labelProviderInt;
 			cfgAltimeter.canHaveNegativeValues = true;
 			cfgAltimeter.minValueAdjustment = 1.0;
 
 			cfgCadence = new ConfigGraphSegment(GraphColorManager.PREF_GRAPH_CADENCE);
-			cfgCadence.segmentDataSerie = _tourData.segmentSerieCadence;
+			cfgCadence.segmentDataSerie = _tourData.segmentSerie_Cadence;
 			cfgCadence.labelProvider = null;
 			cfgCadence.canHaveNegativeValues = false;
 			cfgCadence.minValueAdjustment = Double.MIN_VALUE;
@@ -4901,6 +4902,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	}
 
 	void updateUI_MarkerLayer() {
+
+		// hide hovered segment
+// this is NOT  working
+// 		onSegmenterSegment_MouseExit();
+
 		updateUI_MarkerLayer(true);
 	}
 

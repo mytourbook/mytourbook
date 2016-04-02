@@ -1,5 +1,15 @@
 Version 16.4                                            4. April 2016
 
+
+
+--------------------------------------------------------------------------
+NEW NEW NEW
+
+
+* Set segmenter colors in the segmenter slideout
+* Hidden marker are not segmented
+
+
 --------------------------------------------------------------------------
 TEST
 

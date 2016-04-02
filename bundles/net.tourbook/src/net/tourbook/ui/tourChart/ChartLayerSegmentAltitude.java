@@ -146,8 +146,8 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 		int devXPrev = Integer.MIN_VALUE;
 		int devYPrev = Integer.MIN_VALUE;
 
-		final float[] segmentSerieAltitudeDiff = _tourData.segmentSerieAltitudeDiff;
-		final float[] segmentSerieComputedAltitudeDiff = _tourData.segmentSerieComputedAltitudeDiff;
+		final float[] segmentSerieAltitudeDiff = _tourData.segmentSerie_Altitude_Diff;
+		final float[] segmentSerieComputedAltitudeDiff = _tourData.segmentSerie_Altitude_Diff_Computed;
 
 		final LineAttributes defaultLineAttributes = gc.getLineAttributes();
 		final LineAttributes markerLineAttribute = new LineAttributes(5);

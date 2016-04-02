@@ -32,6 +32,8 @@ public abstract class TableColumnFactory {
 	public static final TableColumnFactory	ALTITUDE_DIFF_SEGMENT_BORDER;
 	public static final TableColumnFactory	ALTITUDE_ELEVATION_DOWN;
 	public static final TableColumnFactory	ALTITUDE_ELEVATION_UP;
+	public static final TableColumnFactory	ALTITUDE_ELEVATION_SEGMENT_DOWN;
+	public static final TableColumnFactory	ALTITUDE_ELEVATION_SEGMENT_UP;
 	public static final TableColumnFactory	ALTITUDE_GRADIENT;
 	public static final TableColumnFactory	ALTITUDE_SUMMARIZED_BORDER_DOWN;
 	public static final TableColumnFactory	ALTITUDE_SUMMARIZED_BORDER_UP;
@@ -230,6 +232,7 @@ public abstract class TableColumnFactory {
 				final ColumnDefinition colDef = new TableColumnDefinition(columnManager, //
 						"ALTITUDE_ELEVATION_UP", //$NON-NLS-1$
 						SWT.TRAIL);
+
 				final String unitLabel = UI.UNIT_LABEL_ALTITUDE
 						+ Messages.ColumnFactory_hour
 						+ UI.SPACE
@@ -240,6 +243,50 @@ public abstract class TableColumnFactory {
 				colDef.setColumnHeaderText(unitLabel);
 				colDef.setColumnUnit(unitLabel);
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_altitude_up_h_tooltip);
+				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+
+				return colDef;
+			};
+		};
+
+		ALTITUDE_ELEVATION_SEGMENT_DOWN = new TableColumnFactory() {
+
+			@Override
+			public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+
+				final ColumnDefinition colDef = new TableColumnDefinition(columnManager, //
+						"ALTITUDE_ELEVATION_SEGMENT_DOWN", //$NON-NLS-1$
+						SWT.TRAIL);
+
+				final String unitLabel = UI.UNIT_LABEL_ALTITUDE + UI.SPACE + UI.SYMBOL_ARROW_DOWN;
+
+				colDef.setColumnCategory(Messages.ColumnFactory_Category_Altitude);
+				colDef.setColumnLabel(Messages.ColumnFactory_Segment_Descent_Label);
+				colDef.setColumnHeaderText(unitLabel);
+				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Segment_Descent_Tooltip);
+				colDef.setColumnUnit(unitLabel);
+				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+
+				return colDef;
+			};
+		};
+
+		ALTITUDE_ELEVATION_SEGMENT_UP = new TableColumnFactory() {
+
+			@Override
+			public ColumnDefinition createColumn(final ColumnManager columnManager, final PixelConverter pixelConverter) {
+
+				final ColumnDefinition colDef = new TableColumnDefinition(columnManager, //
+						"ALTITUDE_ELEVATION_SEGMENT_UP", //$NON-NLS-1$
+						SWT.TRAIL);
+
+				final String unitLabel = UI.UNIT_LABEL_ALTITUDE + UI.SPACE + UI.SYMBOL_ARROW_UP;
+
+				colDef.setColumnCategory(Messages.ColumnFactory_Category_Altitude);
+				colDef.setColumnLabel(Messages.ColumnFactory_Segment_Ascent_Label);
+				colDef.setColumnHeaderText(unitLabel);
+				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Segment_Ascent_Tooltip);
+				colDef.setColumnUnit(unitLabel);
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
 				return colDef;

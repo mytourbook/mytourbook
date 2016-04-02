@@ -926,10 +926,11 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	public int[]												segmentSerieIndex;
 
 	/**
-	 * 2nd Index of the segmented data in the data series, {@link #segmentSerieIndex} contains the
-	 * outer index, this contains the inner index.
+	 * 2nd Index of the segmented data in the data series.
 	 * <p>
-	 * This is used to first creates the sements by the outer attribute, e.g. tour marker and then
+	 * {@link #segmentSerieIndex} contains the outer index, this contains the inner index.
+	 * <p>
+	 * This is used, first to create the sements by the outer attribute, e.g. tour marker and then
 	 * create the inner segments, e.g. altitude with DP.
 	 */
 	@Transient
@@ -945,43 +946,42 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	 * data for the tour segments
 	 */
 	@Transient
-	public int[]												segmentSerieTimeTotal;
+	private int[]												segmentSerie_Time_Total;
+	@Transient
+	private int[]												segmentSerie_Time_Recording;
+	@Transient
+	public int[]												segmentSerie_Time_Driving;
+	@Transient
+	private int[]												segmentSerie_Time_Break;
 
 	@Transient
-	public int[]												segmentSerieRecordingTime;
+	private float[]												segmentSerie_Distance_Diff;
+	@Transient
+	private float[]												segmentSerie_Distance_Total;
 
 	@Transient
-	public int[]												segmentSerieDrivingTime;
+	public float[]												segmentSerie_Altitude_Diff;
 	@Transient
-	public int[]												segmentSerieBreakTime;
+	public float[]												segmentSerie_Altitude_Diff_Computed;
 	@Transient
-	public float[]												segmentSerieDistanceDiff;
+	public float												segmentSerieTotal_Altitude_Down;
+	@Transient
+	public float												segmentSerieTotal_Altitude_Up;
 
 	@Transient
-	public float[]												segmentSerieDistanceTotal;
+	public float[]												segmentSerie_Speed;
 	@Transient
-	public float[]												segmentSerieAltitudeDiff;
+	public float[]												segmentSerie_Cadence;
 	@Transient
-	public float[]												segmentSerieComputedAltitudeDiff;
+	public float[]												segmentSerie_Pace;
 	@Transient
-	public float[]												segmentSerieAltitudeUpH;
+	public float[]												segmentSerie_Pace_Diff;
 	@Transient
-	public float[]												segmentSerieAltitudeDownH;
+	public float[]												segmentSerie_Power;
 	@Transient
-	public float[]												segmentSerieSpeed;
-
+	public float[]												segmentSerie_Gradient;
 	@Transient
-	public float[]												segmentSerieCadence;
-	@Transient
-	public float[]												segmentSeriePace;
-	@Transient
-	public float[]												segmentSeriePaceDiff;
-	@Transient
-	public float[]												segmentSeriePower;
-	@Transient
-	public float[]												segmentSerieGradient;
-	@Transient
-	public float[]												segmentSeriePulse;
+	public float[]												segmentSerie_Pulse;
 
 	/**
 	 * Keep original import file path, this is used when the tour file should be deleted.
@@ -3661,27 +3661,34 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 				0
 				: tourDrivingTime * 1000 / (tourDistance * UI.UNIT_VALUE_DISTANCE);
 
-		segmentSerieRecordingTime = new int[segmentSerieLength];
-		segmentSerieDrivingTime = new int[segmentSerieLength];
-		segmentSerieBreakTime = new int[segmentSerieLength];
-		segmentSerieTimeTotal = new int[segmentSerieLength];
+		segmentSerie_Time_Recording = new int[segmentSerieLength];
+		segmentSerie_Time_Driving = new int[segmentSerieLength];
+		segmentSerie_Time_Break = new int[segmentSerieLength];
+		segmentSerie_Time_Total = new int[segmentSerieLength];
 
-		segmentSerieDistanceDiff = new float[segmentSerieLength];
-		segmentSerieDistanceTotal = new float[segmentSerieLength];
+		segmentSerie_Distance_Diff = new float[segmentSerieLength];
+		segmentSerie_Distance_Total = new float[segmentSerieLength];
 
-		segmentSerieAltitudeDiff = new float[segmentSerieLength];
-		segmentSerieAltitudeUpH = new float[segmentSerieLength];
-		segmentSerieAltitudeDownH = new float[segmentSerieLength];
+		segmentSerie_Altitude_Diff = new float[segmentSerieLength];
 
-		segmentSerieSpeed = new float[segmentSerieLength];
-		segmentSeriePace = new float[segmentSerieLength];
+		segmentSerie_Speed = new float[segmentSerieLength];
+		segmentSerie_Pace = new float[segmentSerieLength];
 
-		segmentSerieCadence = new float[segmentSerieLength];
-		segmentSerieGradient = new float[segmentSerieLength];
-		segmentSeriePower = new float[segmentSerieLength];
-		segmentSeriePulse = new float[segmentSerieLength];
+		segmentSerie_Cadence = new float[segmentSerieLength];
+		segmentSerie_Gradient = new float[segmentSerieLength];
+		segmentSerie_Power = new float[segmentSerieLength];
+		segmentSerie_Pulse = new float[segmentSerieLength];
 
-		// compute values between start and end
+		int segmentIndex2nd = 0;
+
+		int totalTime_Recording = 0;
+		int totalTime_Driving = 0;
+		int totalTime_Break = 0;
+		float totalDistance = 0;
+		float totalAltitude_Up = 0;
+		float totalAltitude_Down = 0;
+
+		// compute segment values between tour start and tour end
 		for (int segmentIndex = 1; segmentIndex < segmentSerieLength; segmentIndex++) {
 
 			final int segmentStartIndex = segmentSerieIndex[segmentIndex - 1];
@@ -3690,8 +3697,8 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 			final TourSegment segment = new TourSegment();
 			tourSegments.add(segment);
 
-			segment.serieIndexStart = segmentStartIndex;
-			segment.serieIndexEnd = segmentEndIndex;
+			segment.serieIndex_Start = segmentStartIndex;
+			segment.serieIndex_End = segmentEndIndex;
 
 			/*
 			 * time
@@ -3702,10 +3709,14 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 
 			final float segmentDrivingTime = segmentRecordingTime - segmentBreakTime;
 
-			segmentSerieRecordingTime[segmentIndex] = segment.recordingTime = segmentRecordingTime;
-			segmentSerieDrivingTime[segmentIndex] = segment.drivingTime = (int) segmentDrivingTime;
-			segmentSerieBreakTime[segmentIndex] = segment.breakTime = segmentBreakTime;
-			segmentSerieTimeTotal[segmentIndex] = segment.timeTotal = timeTotal += segmentRecordingTime;
+			segmentSerie_Time_Recording[segmentIndex] = segment.time_Recording = segmentRecordingTime;
+			segmentSerie_Time_Driving[segmentIndex] = segment.time_Driving = (int) segmentDrivingTime;
+			segmentSerie_Time_Break[segmentIndex] = segment.time_Break = segmentBreakTime;
+			segmentSerie_Time_Total[segmentIndex] = segment.time_Total = timeTotal += segmentRecordingTime;
+
+			totalTime_Recording += segmentRecordingTime;
+			totalTime_Driving += segmentDrivingTime;
+			totalTime_Break += segmentBreakTime;
 
 			float segmentDistance = 0.0f;
 
@@ -3717,25 +3728,27 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 				final float distanceEnd = distanceSerie[segmentEndIndex];
 				final float distanceDiff = distanceEnd - distanceStart;
 
-				segmentSerieDistanceDiff[segmentIndex] = segment.distanceDiff = distanceDiff;
-				segmentSerieDistanceTotal[segmentIndex] = segment.distanceTotal = distanceTotal += distanceDiff;
+				segmentSerie_Distance_Diff[segmentIndex] = segment.distance_Diff = distanceDiff;
+				segmentSerie_Distance_Total[segmentIndex] = segment.distance_Total = distanceTotal += distanceDiff;
 
 				// end point of current segment is the start of the next segment
 				distanceStart = distanceEnd;
 
-				segmentDistance = segment.distanceDiff;
+				segmentDistance = segment.distance_Diff;
 				if (segmentDistance != 0.0) {
 
 					// speed
-					segmentSerieSpeed[segmentIndex] = segment.speed = segmentDrivingTime == 0.0f ? //
+					segmentSerie_Speed[segmentIndex] = segment.speed = segmentDrivingTime == 0.0f ? //
 							0.0f
 							: segmentDistance / segmentDrivingTime * 3.6f / UI.UNIT_VALUE_DISTANCE;
 
 					// pace
 					final float segmentPace = segmentDrivingTime * 1000 / (segmentDistance / UI.UNIT_VALUE_DISTANCE);
 					segment.pace = segmentPace;
-					segment.paceDiff = segment.pace - tourPace;
-					segmentSeriePace[segmentIndex] = segmentPace;
+					segment.pace_Diff = segment.pace - tourPace;
+					segmentSerie_Pace[segmentIndex] = segmentPace;
+
+					totalDistance += segmentDistance;
 				}
 			}
 
@@ -3747,98 +3760,143 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 				final float altitudeEnd = segmenterAltitudeSerie[segmentEndIndex];
 				final float altitudeDiff = altitudeEnd - altitudeStart;
 
-				segmentSerieAltitudeDiff[segmentIndex] = segment.altitudeDiffSegmentBorder = altitudeDiff;
+				segmentSerie_Altitude_Diff[segmentIndex] = segment.altitude_Segment_Border_Diff = altitudeDiff;
 
 				if (altitudeDiff > 0) {
-					segment.altitudeUpSummarizedBorder = altitudeUpSummarizedBorder += altitudeDiff;
-					segment.altitudeDownSummarizedBorder = altitudeDownSummarizedBorder;
+					segment.altitude_Summarized_Border_Up = altitudeUpSummarizedBorder += altitudeDiff;
+					segment.altitude_Summarized_Border_Down = altitudeDownSummarizedBorder;
 
 				} else {
-					segment.altitudeUpSummarizedBorder = altitudeUpSummarizedBorder;
-					segment.altitudeDownSummarizedBorder = altitudeDownSummarizedBorder += altitudeDiff;
+					segment.altitude_Summarized_Border_Up = altitudeUpSummarizedBorder;
+					segment.altitude_Summarized_Border_Down = altitudeDownSummarizedBorder += altitudeDiff;
 				}
 
-				if ((segmentSerieComputedAltitudeDiff != null)
-						&& (segmentIndex < segmentSerieComputedAltitudeDiff.length)) {
+				if ((segmentSerie_Altitude_Diff_Computed != null)
+						&& (segmentIndex < segmentSerie_Altitude_Diff_Computed.length)) {
 
-					final float segmentDiff = segmentSerieComputedAltitudeDiff[segmentIndex];
+					final float segmentDiff = segmentSerie_Altitude_Diff_Computed[segmentIndex];
 
-					segment.altitudeDiffSegmentComputed = segmentDiff;
+					segment.altitude_Segment_Computed_Diff = segmentDiff;
 
 					if (segmentDiff > 0) {
 
-						segment.altitudeUpSummarizedComputed = altitudeUpSummarizedComputed += segmentDiff;
-						segment.altitudeDownSummarizedComputed = altitudeDownSummarizedComputed;
+						segment.altitude_Summarized_Computed_Up = altitudeUpSummarizedComputed += segmentDiff;
+						segment.altitude_Summarized_Computed_Down = altitudeDownSummarizedComputed;
 
 					} else {
 
-						segment.altitudeUpSummarizedComputed = altitudeUpSummarizedComputed;
-						segment.altitudeDownSummarizedComputed = altitudeDownSummarizedComputed += segmentDiff;
+						segment.altitude_Summarized_Computed_Up = altitudeUpSummarizedComputed;
+						segment.altitude_Summarized_Computed_Down = altitudeDownSummarizedComputed += segmentDiff;
 					}
 				}
 
-				float altitudeUpH = 0;
-				float altitudeDownH = 0;
-				float powerSum = 0;
+				// get computed values: altitude up/down from the 2nd index
+				if (segmentSerieIndex2nd != null) {
 
-				float altitude1 = segmenterAltitudeSerie[segmentStartIndex];
+					float sumSegmentAltitude_Up = 0;
+					float sumSegmentAltitude_Down = 0;
 
-				// get computed values: altitude up/down and power for a segment
+					// get initial altitude
+					float altitude1 = segmenterAltitudeSerie[segmentStartIndex];
+
+					for (; segmentIndex2nd < segmentSerieIndex2nd.length; segmentIndex2nd++) {
+
+						final int serieIndex2nd = segmentSerieIndex2nd[segmentIndex2nd];
+
+						if (serieIndex2nd > segmentEndIndex) {
+							break;
+						}
+
+						final float altitude2 = segmenterAltitudeSerie[serieIndex2nd];
+						final float altitude2Diff = altitude2 - altitude1;
+
+						altitude1 = altitude2;
+
+						sumSegmentAltitude_Up += altitude2Diff > 0 ? altitude2Diff : 0;
+						sumSegmentAltitude_Down += altitude2Diff < 0 ? altitude2Diff : 0;
+					}
+
+					segment.altitude_Segment_Up = sumSegmentAltitude_Up;
+					segment.altitude_Segment_Down = sumSegmentAltitude_Down;
+
+					totalAltitude_Up += sumSegmentAltitude_Up;
+					totalAltitude_Down += sumSegmentAltitude_Down;
+				}
+
+				// get computed values: power for a segment
+				float sumPower = 0;
 				for (int serieIndex = segmentStartIndex + 1; serieIndex <= segmentEndIndex; serieIndex++) {
 
-					final float altitude2 = segmenterAltitudeSerie[serieIndex];
-					final float altitude2Diff = altitude2 - altitude1;
-					altitude1 = altitude2;
-
-					altitudeUpH += altitude2Diff > 0 ? altitude2Diff : 0;
-					altitudeDownH += altitude2Diff < 0 ? altitude2Diff : 0;
-
 					if (isPowerSerie) {
-						powerSum += localPowerSerie[serieIndex];
+						sumPower += localPowerSerie[serieIndex];
 					}
 				}
-
-				segment.altitudeUpHour = altitudeUpH;
-
-				segmentSerieAltitudeDownH[segmentIndex] = segment.altitudeDownHour = altitudeDownH;
-				segmentSerieAltitudeUpH[segmentIndex] = segmentDrivingTime == 0 ? //
-						0
-						: (altitudeUpH + altitudeDownH) / segmentDrivingTime * 3600 / UI.UNIT_VALUE_ALTITUDE;
-
 				final int segmentIndexDiff = segmentEndIndex - segmentStartIndex;
-				segmentSeriePower[segmentIndex] = segment.power = segmentIndexDiff == 0 //
+				segmentSerie_Power[segmentIndex] = segment.power = segmentIndexDiff == 0 //
 						? 0
-						: powerSum / segmentIndexDiff;
+						: sumPower / segmentIndexDiff;
 
-				// end point of current segment is the start of the next segment
+				// end point of the current segment is the start of the next segment
 				altitudeStart = altitudeEnd;
 			}
 
 			if (isDistanceSerie && isAltitudeSerie && (segmentDistance != 0.0)) {
 
 				// gradient
-				segmentSerieGradient[segmentIndex] = segment.gradient = //
-				segment.altitudeDiffSegmentBorder * 100 / segmentDistance;
+				segmentSerie_Gradient[segmentIndex] = segment.gradient = //
+				segment.altitude_Segment_Border_Diff * 100 / segmentDistance;
 			}
 
 			if (isPulseSerie) {
 				final float segmentAvgPulse = computeAvg_PulseSegment(segmentStartIndex, segmentEndIndex);
-				segmentSeriePulse[segmentIndex] = segment.pulse = segmentAvgPulse;
-				segment.pulseDiff = segmentAvgPulse - avgPulse;
+				segmentSerie_Pulse[segmentIndex] = segment.pulse = segmentAvgPulse;
+				segment.pulse_Diff = segmentAvgPulse - avgPulse;
 			} else {
 				// hide pulse in the view
-				segment.pulseDiff = Float.MIN_VALUE;
+				segment.pulse_Diff = Float.MIN_VALUE;
 			}
 
 			if (isCadenceSerie) {
 
 				final float segmentAvgCadence = computeAvg_CadenceSegment(segmentStartIndex, segmentEndIndex);
-				segmentSerieCadence[segmentIndex] = segment.cadence = segmentAvgCadence;
+				segmentSerie_Cadence[segmentIndex] = segment.cadence = segmentAvgCadence;
 			}
 
 			// end point of current segment is the start of the next segment
 			timeStart = segmentEndTime;
 		}
+
+		/*
+		 * Add total segment
+		 */
+		final float totalSpeed = totalTime_Driving == 0.0f ? //
+				0.0f
+				: totalDistance / totalTime_Driving * 3.6f / UI.UNIT_VALUE_DISTANCE;
+		// pace
+		final float totalPace = totalTime_Driving * 1000 / (totalDistance / UI.UNIT_VALUE_DISTANCE);
+
+		final TourSegment totalSegment = new TourSegment();
+
+		totalSegment.isTotal = true;
+
+		totalSegment.time_Recording = totalTime_Recording;
+		totalSegment.time_Driving = totalTime_Driving;
+		totalSegment.time_Break = totalTime_Break;
+
+		totalSegment.distance_Diff = totalDistance;
+		totalSegment.pace = totalPace;
+		totalSegment.speed = totalSpeed;
+
+		totalSegment.cadence = avgCadence;
+		totalSegment.pulse = avgPulse;
+
+		totalSegment.altitude_Segment_Down = totalAltitude_Down;
+		totalSegment.altitude_Segment_Up = totalAltitude_Up;
+
+		tourSegments.add(totalSegment);
+
+		segmentSerieTotal_Altitude_Up = totalAltitude_Up;
+		segmentSerieTotal_Altitude_Down = totalAltitude_Down;
 
 		return tourSegments;
 	}

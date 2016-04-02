@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,27 +17,29 @@ package net.tourbook.data;
 
 public class TourSegment {
 
-	public int		serieIndexStart;
-	public int		serieIndexEnd;
+	/** Is <code>true</code> when this segment is the totals segment. */
+	public boolean	isTotal;
 
-	public int		recordingTime;
-	public int		drivingTime;
-	public int		breakTime;
-	public int		timeTotal;
+	public int		serieIndex_Start;
+	public int		serieIndex_End;
 
-	public float	distanceDiff;
-	public float	distanceTotal;
+	public int		time_Recording;
+	public int		time_Driving;
+	public int		time_Break;
+	public int		time_Total;
 
-	public float	altitudeUpHour;
-	public float	altitudeUpSummarizedBorder;
-	public float	altitudeUpSummarizedComputed;
+	public float	distance_Diff;
+	public float	distance_Total;
 
-	public float	altitudeDownHour;
-	public float	altitudeDownSummarizedBorder;
-	public float	altitudeDownSummarizedComputed;
+	public float	altitude_Segment_Up;
+	public float	altitude_Segment_Down;
+	public float	altitude_Segment_Border_Diff;
+	public float	altitude_Segment_Computed_Diff;
 
-	public float	altitudeDiffSegmentBorder;
-	public float	altitudeDiffSegmentComputed;
+	public float	altitude_Summarized_Border_Up;
+	public float	altitude_Summarized_Border_Down;
+	public float	altitude_Summarized_Computed_Up;
+	public float	altitude_Summarized_Computed_Down;
 
 	public float	cadence;
 	public float	gradient;
@@ -45,7 +47,7 @@ public class TourSegment {
 	public float	speed;
 
 	public float	pace;
-	public float	paceDiff;
+	public float	pace_Diff;
 	public float	pulse;
-	public float	pulseDiff;
+	public float	pulse_Diff;
 }

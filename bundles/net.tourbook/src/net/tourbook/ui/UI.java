@@ -140,8 +140,6 @@ public class UI {
 	public static final String								VIEW_COLOR_SUB					= "view.color.sub";							//$NON-NLS-1$
 	public static final String								VIEW_COLOR_SUB_SUB				= "view.color.sub-sub";						//$NON-NLS-1$
 	public static final String								VIEW_COLOR_TOUR					= "view.color.tour";							//$NON-NLS-1$
-	public static final String								VIEW_COLOR_BG_SEGMENTER_UP		= "view.colorBG.segmenterUp";					//$NON-NLS-1$
-	public static final String								VIEW_COLOR_BG_SEGMENTER_DOWN	= "view.colorBG.segmenterDown";				//$NON-NLS-1$
 	public static final String								VIEW_COLOR_BG_HISTORY_TOUR		= "VIEW_COLOR_BG_HISTORY_TOUR";				//$NON-NLS-1$
 
 	public static final String								SYMBOL_AVERAGE					= "\u00f8";									//$NON-NLS-1$
@@ -1182,11 +1180,6 @@ public class UI {
 
 		colorRegistry.put(VIEW_COLOR_TOUR, //
 				PreferenceConverter.getColor(prefStore, ITourbookPreferences.VIEW_LAYOUT_COLOR_TOUR));
-
-		colorRegistry.put(VIEW_COLOR_BG_SEGMENTER_UP, //
-				PreferenceConverter.getColor(prefStore, ITourbookPreferences.VIEW_LAYOUT_COLOR_BG_SEGMENTER_UP));
-		colorRegistry.put(VIEW_COLOR_BG_SEGMENTER_DOWN, //
-				PreferenceConverter.getColor(prefStore, ITourbookPreferences.VIEW_LAYOUT_COLOR_BG_SEGMENTER_DOWN));
 
 		colorRegistry.put(VIEW_COLOR_BG_HISTORY_TOUR, //
 				PreferenceConverter.getColor(prefStore, ITourbookPreferences.VIEW_LAYOUT_COLOR_BG_HISTORY_TOUR));

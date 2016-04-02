@@ -1470,6 +1470,7 @@ public class TourManager {
 
 		// segments must be recomputed
 		tourData.segmentSerieIndex = null;
+		tourData.segmentSerieIndex2nd = null;
 
 		removeTourMarkers(tourData, firstIndex, lastIndex, isRemoveTime);
 	}

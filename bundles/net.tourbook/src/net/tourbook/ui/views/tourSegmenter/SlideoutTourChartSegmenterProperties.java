@@ -17,7 +17,10 @@ package net.tourbook.ui.views.tourSegmenter;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.chart.ColorCache;
 import net.tourbook.common.UI;
+import net.tourbook.common.color.ColorSelectorExtended;
+import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.font.FontFieldEditorExtended;
 import net.tourbook.common.font.IFontDialogListener;
 import net.tourbook.common.tooltip.AnimatedToolTipShell;
@@ -41,6 +44,7 @@ import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -54,7 +58,8 @@ import org.eclipse.swt.widgets.ToolBar;
 /**
  * Tour chart marker properties slideout.
  */
-public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell implements IFontDialogListener {
+public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell implements IFontDialogListener,
+		IColorSelectorListener {
 
 	private static final IPreferenceStore	_prefStore			= TourbookPlugin.getPrefStore();
 	private static final IDialogSettings	_segmenterState		= TourSegmenterView.getState();
@@ -67,7 +72,8 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell i
 	private boolean							_isWaitTimerStarted;
 	private boolean							_canOpenToolTip;
 
-	private IPropertyChangeListener			_defaultChangePropertyListener;
+	private IPropertyChangeListener			_segmenterChangePropertyListener;
+	private IPropertyChangeListener			_fontChangePropertyListener;
 	private SelectionAdapter				_defaultSelectionAdapter;
 	private MouseWheelListener				_defaultMouseWheelListener;
 
@@ -87,7 +93,14 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell i
 			}
 		};
 
-		_defaultChangePropertyListener = new IPropertyChangeListener() {
+		_segmenterChangePropertyListener = new IPropertyChangeListener() {
+			@Override
+			public void propertyChange(final PropertyChangeEvent event) {
+				onChangeUI_Segmenter();
+			}
+		};
+
+		_fontChangePropertyListener = new IPropertyChangeListener() {
 			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 				onChangeFontInEditor();
@@ -117,6 +130,10 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell i
 	private Button							_chkShowSegmentValue;
 
 	private FontFieldEditorExtended			_valueFontEditor;
+
+	private ColorSelectorExtended			_colorSegmenterAltitudeUp;
+	private ColorSelectorExtended			_colorSegmenterAltitudeDown;
+	private ColorSelectorExtended			_colorSegmenterTotals;
 
 	private Label							_lblGraphOpacity;
 	private Label							_lblHideSmallValuesUnit;
@@ -189,6 +206,12 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell i
 		return true;
 	}
 
+	@Override
+	public void colorDialogOpened(final boolean isDialogOpened) {
+
+		_isAnotherDialogOpened = isDialogOpened;
+	}
+
 	private void createActions() {
 
 		/*
@@ -238,6 +261,9 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell i
 				createUI_12_Actions(container);
 				createUI_20_Options(container);
 				createUI_30_SegmentValues(container);
+
+				createUI_50_SegmenterTitle(container);
+				createUI_60_SegmenterColors(container);
 			}
 		}
 
@@ -450,9 +476,98 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell i
 						Messages.Slideout_SegmenterChartOptions_Label_ValueFont_Example,
 						_fontContainer);
 
-				_valueFontEditor.setPropertyChangeListener(_defaultChangePropertyListener);
+				_valueFontEditor.setPropertyChangeListener(_fontChangePropertyListener);
 				_valueFontEditor.addOpenListener(this);
 				_valueFontEditor.setFirstColumnIndent(_firstColumnIndent, 0);
+			}
+		}
+	}
+
+	private void createUI_50_SegmenterTitle(final Composite parent) {
+
+		{
+			/*
+			 * Label: Segmenter title
+			 */
+			final Label label = new Label(parent, SWT.NONE);
+			GridDataFactory.fillDefaults()//
+					.span(4, 1)
+					.applyTo(label);
+			label.setText(Messages.Slideout_SegmenterOptions_Label_Title);
+			label.setFont(JFaceResources.getBannerFont());
+		}
+	}
+
+	private void createUI_60_SegmenterColors(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+				.grab(true, false)
+				.span(4, 1)
+				.applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		{
+			final Composite containerLeft = new Composite(container, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(containerLeft);
+			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerLeft);
+			{
+				{
+					/*
+					 * Segmenter altitude up
+					 */
+					// Label
+					final Label label = new Label(containerLeft, SWT.NONE);
+					GridDataFactory.fillDefaults()//
+							.align(SWT.BEGINNING, SWT.CENTER)
+							.applyTo(label);
+					label.setText(Messages.Slideout_SegmenterOptions_Label_AltitudeUp);
+					label.setToolTipText(Messages.Slideout_SegmenterOptions_Label_AltitudeUp_Tooltip);
+
+					// Color
+					_colorSegmenterAltitudeUp = new ColorSelectorExtended(containerLeft);
+					_colorSegmenterAltitudeUp.addListener(_segmenterChangePropertyListener);
+					_colorSegmenterAltitudeUp.addOpenListener(this);
+				}
+				{
+					/*
+					 * Segmenter altitude down
+					 */
+					// Label
+					final Label label = new Label(containerLeft, SWT.NONE);
+					GridDataFactory.fillDefaults()//
+							.align(SWT.BEGINNING, SWT.CENTER)
+							.applyTo(label);
+					label.setText(Messages.Slideout_SegmenterOptions_Label_AltitudeDown);
+					label.setToolTipText(Messages.Slideout_SegmenterOptions_Label_AltitudeDown_Tooltip);
+
+					// Color
+					_colorSegmenterAltitudeDown = new ColorSelectorExtended(containerLeft);
+					_colorSegmenterAltitudeDown.addListener(_segmenterChangePropertyListener);
+					_colorSegmenterAltitudeDown.addOpenListener(this);
+				}
+			}
+
+			final Composite containerRight = new Composite(container, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(containerRight);
+			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerRight);
+			{
+				{
+					/*
+					 * Segmenter totals
+					 */
+					// Label
+					final Label label = new Label(containerRight, SWT.NONE);
+					GridDataFactory.fillDefaults()//
+							.align(SWT.BEGINNING, SWT.CENTER)
+							.applyTo(label);
+					label.setText(Messages.Slideout_SegmenterOptions_Label_Totals);
+					label.setToolTipText(Messages.Slideout_SegmenterOptions_Label_Totals_Tooltip);
+
+					// Color: Segmenter totals
+					_colorSegmenterTotals = new ColorSelectorExtended(containerRight);
+					_colorSegmenterTotals.addListener(_segmenterChangePropertyListener);
+					_colorSegmenterTotals.addOpenListener(this);
+				}
 			}
 		}
 	}
@@ -543,6 +658,13 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell i
 		 * Update UI
 		 */
 		_tourSegmenterView.fireSegmentLayerChanged();
+	}
+
+	private void onChangeUI_Segmenter() {
+
+		saveState_Segmenter();
+
+		_tourSegmenterView.reloadViewer();
 	}
 
 	/**
@@ -638,6 +760,8 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell i
 				TourSegmenterView.STATE_STACKED_VISIBLE_VALUES,
 				TourSegmenterView.STATE_STACKED_VISIBLE_VALUES_DEFAULT);
 
+		resetToDefaults_Segmenter();
+
 		// update UI with the default values from the state/pref store
 		restoreState();
 
@@ -647,6 +771,27 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell i
 		 * Update UI
 		 */
 		_tourSegmenterView.fireSegmentLayerChanged();
+		_tourSegmenterView.reloadViewer();
+	}
+
+	private void resetToDefaults_Segmenter() {
+
+		/*
+		 * Colors
+		 */
+		final RGB rgbAltitudeDownDefault = TourSegmenterView.STATE_COLOR_ALTITUDE_DOWN_DEFAULT;
+		final RGB rgbAltitudeUpDefault = TourSegmenterView.STATE_COLOR_ALTITUDE_UP_DEFAULT;
+		final RGB rgbTotalsDefault = TourSegmenterView.STATE_COLOR_TOTALS_DEFAULT;
+
+		Util.setState(_segmenterState, TourSegmenterView.STATE_COLOR_ALTITUDE_DOWN, rgbAltitudeDownDefault);
+		Util.setState(_segmenterState, TourSegmenterView.STATE_COLOR_ALTITUDE_UP, rgbAltitudeUpDefault);
+		Util.setState(_segmenterState, TourSegmenterView.STATE_COLOR_TOTALS, rgbTotalsDefault);
+
+		final ColorCache colorCache = _tourSegmenterView.getColorCache();
+
+		colorCache.replaceColor(TourSegmenterView.STATE_COLOR_ALTITUDE_DOWN, rgbAltitudeDownDefault);
+		colorCache.replaceColor(TourSegmenterView.STATE_COLOR_ALTITUDE_UP, rgbAltitudeUpDefault);
+		colorCache.replaceColor(TourSegmenterView.STATE_COLOR_TOTALS, rgbTotalsDefault);
 	}
 
 	private void restoreState() {
@@ -702,12 +847,34 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell i
 				TourSegmenterView.STATE_STACKED_VISIBLE_VALUES_DEFAULT));
 
 		restoreState_Font();
+		restoreState_Segmenter();
 	}
 
 	private void restoreState_Font() {
 
 		_valueFontEditor.setPreferenceStore(_prefStore);
 		_valueFontEditor.load();
+	}
+
+	private void restoreState_Segmenter() {
+
+		/*
+		 * Colors
+		 */
+		_colorSegmenterAltitudeDown.setColorValue(Util.getStateRGB(
+				_segmenterState,
+				TourSegmenterView.STATE_COLOR_ALTITUDE_DOWN,
+				TourSegmenterView.STATE_COLOR_ALTITUDE_DOWN_DEFAULT));
+
+		_colorSegmenterAltitudeUp.setColorValue(Util.getStateRGB(
+				_segmenterState,
+				TourSegmenterView.STATE_COLOR_ALTITUDE_UP,
+				TourSegmenterView.STATE_COLOR_ALTITUDE_UP_DEFAULT));
+
+		_colorSegmenterTotals.setColorValue(Util.getStateRGB(
+				_segmenterState,
+				TourSegmenterView.STATE_COLOR_TOTALS,
+				TourSegmenterView.STATE_COLOR_TOTALS_DEFAULT));
 	}
 
 	private void saveState() {
@@ -739,6 +906,27 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell i
 				_spinGraphOpacity.getSelection());
 		_segmenterState.put(TourSegmenterView.STATE_STACKED_VISIBLE_VALUES, //
 				_spinVisibleValuesStacked.getSelection());
+	}
+
+	private void saveState_Segmenter() {
+
+		/*
+		 * Color values
+		 */
+
+		final RGB rgbAltitudeDown = _colorSegmenterAltitudeDown.getColorValue();
+		final RGB rgbAltitudeUp = _colorSegmenterAltitudeUp.getColorValue();
+		final RGB rgbTotals = _colorSegmenterTotals.getColorValue();
+
+		Util.setState(_segmenterState, TourSegmenterView.STATE_COLOR_ALTITUDE_DOWN, rgbAltitudeDown);
+		Util.setState(_segmenterState, TourSegmenterView.STATE_COLOR_ALTITUDE_UP, rgbAltitudeUp);
+		Util.setState(_segmenterState, TourSegmenterView.STATE_COLOR_TOTALS, rgbTotals);
+
+		final ColorCache colorCache = _tourSegmenterView.getColorCache();
+
+		colorCache.replaceColor(TourSegmenterView.STATE_COLOR_ALTITUDE_DOWN, rgbAltitudeDown);
+		colorCache.replaceColor(TourSegmenterView.STATE_COLOR_ALTITUDE_UP, rgbAltitudeUp);
+		colorCache.replaceColor(TourSegmenterView.STATE_COLOR_TOTALS, rgbTotals);
 	}
 
 }

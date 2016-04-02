@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -91,6 +91,46 @@ public class ColorCache {
 		_colors.put(colorKey, color);
 
 		return color;
+	}
+
+	/**
+	 * Replace a color in the color cache.
+	 * 
+	 * @param colorKey
+	 * @param rgb
+	 * @return Returns the created color
+	 */
+	public Color replaceColor(final String colorKey, final RGB rgb) {
+
+		// check if key already exists
+		final Color oldColor = _colors.get(colorKey);
+		if (oldColor != null) {
+			oldColor.dispose();
+		}
+
+		final Color color = new Color(_display, rgb);
+
+		_colors.put(colorKey, color);
+		
+		return color;
+	}
+
+	/**
+	 * Creates a color in the color cache when the color is not yet created.
+	 * 
+	 * @param colorKey
+	 * @param rgb
+	 */
+	public void setColor(final String colorKey, final RGB rgb) {
+
+		// check if key already exists
+		if (_colors.containsKey(colorKey)) {
+			return;
+		}
+
+		final Color color = new Color(_display, rgb);
+
+		_colors.put(colorKey, color);
 	}
 
 }

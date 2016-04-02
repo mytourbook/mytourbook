@@ -174,9 +174,9 @@ public class StatisticWeekHrZone extends YearStatistic {
 //		date.setTime(calendar.getTimeInMillis());
 //		fDateFormatter.format(date, monthStringBuffer, monthPosition);
 //
-//		final Integer recordingTime = fTourMonthData.fRecordingTime[serieIndex][valueIndex];
-//		final Integer drivingTime = fTourMonthData.fDrivingTime[serieIndex][valueIndex];
-//		final int breakTime = recordingTime - drivingTime;
+//		final Integer time_Recording = fTourMonthData.fRecordingTime[serieIndex][valueIndex];
+//		final Integer time_Driving = fTourMonthData.fDrivingTime[serieIndex][valueIndex];
+//		final int time_Break = time_Recording - time_Driving;
 //
 //		/*
 //		 * tool tip: title
@@ -219,14 +219,14 @@ public class StatisticWeekHrZone extends YearStatistic {
 //				fTourMonthData.fAltitudeHigh[serieIndex][valueIndex],
 //				UI.UNIT_LABEL_ALTITUDE,
 //				//
-//				recordingTime / 3600,
-//				(recordingTime % 3600) / 60,
+//				time_Recording / 3600,
+//				(time_Recording % 3600) / 60,
 //				//
-//				drivingTime / 3600,
-//				(drivingTime % 3600) / 60,
+//				time_Driving / 3600,
+//				(time_Driving % 3600) / 60,
 //				//
-//				breakTime / 3600,
-//				(breakTime % 3600) / 60
+//				time_Break / 3600,
+//				(time_Break % 3600) / 60
 //		//
 //		)
 //				.toString();

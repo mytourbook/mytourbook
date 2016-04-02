@@ -717,17 +717,17 @@ public class TourSegmenterTooltip extends AnimatedToolTipShell implements ITourP
 		/*
 		 * Altitude
 		 */
-		_lblAltitude_Diff.setText(_nf_1_1.format(tourSegment.altitudeDiffSegmentBorder));
+		_lblAltitude_Diff.setText(_nf_1_1.format(tourSegment.altitude_Segment_Border_Diff));
 		_lblAltitude_Diff_Unit.setText(UI.UNIT_LABEL_ALTITUDE);
 
-		final float altiDown = (tourSegment.altitudeDownHour / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)
-				/ tourSegment.drivingTime
+		final float altiDown = (tourSegment.altitude_Segment_Down / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)
+				/ tourSegment.time_Driving
 				* 3600;
 		_lblAltitude_DownHour.setText(_nf_1_0.format(altiDown));
 		_lblAltitude_DownHour_Unit.setText(UI.UNIT_LABEL_ALTITUDE + Messages.ColumnFactory_hour);
 
-		final float altiUp = (tourSegment.altitudeUpHour / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)
-				/ tourSegment.drivingTime
+		final float altiUp = (tourSegment.altitude_Segment_Up / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)
+				/ tourSegment.time_Driving
 				* 3600;
 		_lblAltitude_UpHour.setText(_nf_1_0.format(altiUp));
 		_lblAltitude_UpHour_Unit.setText(UI.UNIT_LABEL_ALTITUDE + Messages.ColumnFactory_hour);
@@ -735,7 +735,7 @@ public class TourSegmenterTooltip extends AnimatedToolTipShell implements ITourP
 		_lblGradient.setText(_nf_1_1.format(tourSegment.gradient));
 
 		// distance
-		_lblDistance.setText(_nf_3_3.format(tourSegment.distanceDiff / 1000));
+		_lblDistance.setText(_nf_3_3.format(tourSegment.distance_Diff / 1000));
 		_lblDistance_Unit.setText(UI.UNIT_LABEL_DISTANCE);
 
 		/*
@@ -769,9 +769,9 @@ public class TourSegmenterTooltip extends AnimatedToolTipShell implements ITourP
 		/*
 		 * Time
 		 */
-		final int breakTime = tourSegment.breakTime;
-		final int movingTime = tourSegment.drivingTime;
-		final int recordingTime = tourSegment.recordingTime;
+		final int breakTime = tourSegment.time_Break;
+		final int movingTime = tourSegment.time_Driving;
+		final int recordingTime = tourSegment.time_Recording;
 
 		_lblTime_Break.setText(String.format(
 				Messages.Tour_Tooltip_Format_Date,
