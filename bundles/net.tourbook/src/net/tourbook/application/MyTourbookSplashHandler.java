@@ -123,8 +123,8 @@ public class MyTourbookSplashHandler extends BasicSplashHandler {
 				borderBottom - versionExtent.y - 2 - qualifierExtent.y,
 				true);
 
-		// show location when location is in debug mode
-		if (dataLocation.contains("DEBUG")) {
+		// show location when data location is in debug mode
+		if (dataLocation.contains("DEBUG")) { //$NON-NLS-1$
 
 			gc.drawText(dataLocation, //
 					borderRight - dataLocationExtent.x,

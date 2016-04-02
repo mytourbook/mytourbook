@@ -1273,8 +1273,11 @@ public class Messages extends NLS {
 	public static String		pref_view_layout_label_format_hh_mm;
 	public static String		pref_view_layout_label_format_hh_mm_ss;
 	public static String		pref_view_layout_label_recording_time_format;
+
+	// will be removed after 16.4
 	public static String		pref_view_layout_label_segmenter_down;
 	public static String		pref_view_layout_label_segmenter_up;
+
 	public static String		pref_view_layout_label_sub;
 	public static String		pref_view_layout_label_sub_sub;
 	public static String		pref_view_layout_label_title;

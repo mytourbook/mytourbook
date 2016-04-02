@@ -61,12 +61,12 @@ public class P2_Activator extends AbstractUIPlugin {
 
 	private static final String					UPDATE_SITE_NAME		= "MyTourbook Update Site";					//$NON-NLS-1$
 
-	private static final String					TAG_REPOSITORIES		= "Repositories";
-	private static final String					TAG_REPOSITORY			= "Repository";
+	private static final String					TAG_REPOSITORIES		= "Repositories"; //$NON-NLS-1$
+	private static final String					TAG_REPOSITORY			= "Repository"; //$NON-NLS-1$
 
-	private static final String					ATTR_IS_ENABLED			= "isEnabled";
-	private static final String					ATTR_NICK_NAME			= "nickName";
-	private static final String					ATTR_URI				= "uri";
+	private static final String					ATTR_IS_ENABLED			= "isEnabled"; //$NON-NLS-1$
+	private static final String					ATTR_NICK_NAME			= "nickName"; //$NON-NLS-1$
+	private static final String					ATTR_URI				= "uri"; //$NON-NLS-1$
 
 	private static String						UPDATE_SITE_PRODUCTION	= "http://mytourbook.sourceforge.net/updates";	//$NON-NLS-1$
 //	private static String						UPDATE_SITE_TEST		= "http://mytourbook.sourceforge.net/TEST-updates";						//$NON-NLS-1$
@@ -200,7 +200,7 @@ public class P2_Activator extends AbstractUIPlugin {
 
 				} else {
 					StatusUtil.handleStatus(String.format(
-							"Repository data is invalid - Nickname:%s - URI:%s - Enabled:%s",
+							"Repository data is invalid - Nickname:%s - URI:%s - Enabled:%s", //$NON-NLS-1$
 							nickName,
 							uriName,
 							isEnabled), 0);
