@@ -1,85 +1,98 @@
-Version 16.4                                            4. April 2016
+Version 16.4                                               4. April 2016
 
+Last Minute Feature
+===================
 
+*Tour Segmenter
 
---------------------------------------------------------------------------
-NEW NEW NEW
-
-
-* Set segmenter colors in the segmenter slideout
-* Hidden marker are not segmented
-
-
---------------------------------------------------------------------------
-TEST
-
-* !!! select body weight spinner with UBUNTU, temperature has a special UBUNTU flag !!!
-
-* Win/UBUNTU: Remove obsolete folders from .mytourbook
-  These folders are now in the install location, otherwise it did not work with P2 :-(
-
-
---------------------------------------------------------------------------
-IDEAS
-
-* bug with body weight in reimport
-* smooth power data
-
---------------------------------------------------------------------------
-
-Next ?
-
-* Tour Segmenter
-  - Support multiple tours for the segmenter by marker
---------------------------------------------------------------------------
-
-
-Cleanup
-=======
-
-Since this version, some internal data (configuration) has been moved to the folder where the app is installed.
-The old data are not removed automatically, it has to be done manually this way:
-Delete in your user directory the folders org.eclipse.* within the folder mytourbook in Windows or .mytourbook in Linux, 
-DO NOT DELETE OTHER FOLDERS because they contain your tours !!! 
+  - New segmenter: By Altitude (with DP) and Marker
+  - Last row contains the total values for all segments
+  - Segmenter colors can now be set in the segmenter slideout, this has 
+    been moved from the preferences dialog to this location for easier 
+    access
+  - Fixed m/h values, in any previous versions these values were wrong 
+    for smaller segments, larger segments were almost correct
 
 
 New
 ===	
 
 * Table/Tree Columns
+
   - Manage columns with profiles
   - Columns are categorized (when a view has ~ > 10 columns)
-    !!! PREVIOUS COLUM ORDER HAS BEEN RESET !!! - this was necessary to have internally consistent data
+  - PREVIOUS COLUM ORDER HAS BEEN RESET - this was necessary to have 
+    internally consistent data
+
 
 * Power
-  - Show power/powertrain/training values in the tourbook view (imported from .fit files)
+
+  - Show power/powertrain/training values in the tourbook view, imported
+    from .fit files
   - Show power value in tooltips
   - Reimport power values
-  
+
+
 * Tour/Quick Editor
+
   - Edit body weight, FTP
 
+
 * Import
-  - .fit import is now much faster
-    FIT SDK 16.60: "Changed Java File Encoder to use Checked Output Stream for added performance."
+
+  - .fit import is much faster (with FIT SDK 16.60)
+
+
+
+Cleanup Internal Data
+=====================
+
+The internal Eclipse data are located now (since this version) in the 
+app installation folder, the old data are not used any more at the old 
+location. They are not removed automatically, this has to be done 
+manually.
+
+In this location
+Linux 	<User>/.mytourbook
+Windows 	<User>\mytourbook
+
+delete the folders org.eclipse.* but DO NOT DELETE OTHER FOLDERS, 
+they contain the tour data.
+
 
 
 System
 ======
 
 * P2
-  This is the new software update tool
+
+P2 is used as the new software update tool
+
+
 
 * Tycho
-  This is a maven driven tool to build the application
- 
-* Eclipse internal data  
-  These data are now written in the app folder, in the previous versions these data were saved in the user folder.
-  The folders ... in the user folder can now be removed because they are not needed any more, there is no automatic cleanup.
-  
 
-Bugfix
-======
+This is a maven driven tool to build the application
 
-* Ongoing
+It took me some weeks to use/implement Tycho and P2 so that the app was
+running and installed as before. I fixed many problems and hope that all
+is fixed, after some weeks of testing and using, it looks very good.
+
+The benefit is now, that the creation of the app is faster/easier and 
+the app is prepared for E4, but moving to E4 is (sometime) another big
+task.
+
+These are the new tycho files to build the product
+
+    /pom.xml
+    /build/pom.xml
+    /bundles/pom.xml
+    /features/pom.xml
+    /build/build.net.tourbook.product/p2.inf
+    /build/build.net.tourbook.product/pom.xml
+    /build/build.net.tourbook.product/build-SetExecutableFlag755.xml
+    /build/build.net.tourbook.product/build-RenameProductArchives.xml
+    /build/build.update-site/pom.xml
+    /.mvn/extensions.xml
+    /LANGUAGE-FRAGMENTS/pom.xml
 
