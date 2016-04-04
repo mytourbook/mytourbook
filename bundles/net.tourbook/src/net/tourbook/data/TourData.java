@@ -3869,11 +3869,13 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		/*
 		 * Add total segment
 		 */
-		final float totalSpeed = totalTime_Driving == 0.0f ? //
-				0.0f
+		final float totalSpeed = totalTime_Driving == 0 ? //
+				0
 				: totalDistance / totalTime_Driving * 3.6f / UI.UNIT_VALUE_DISTANCE;
-		// pace
-		final float totalPace = totalTime_Driving * 1000 / (totalDistance / UI.UNIT_VALUE_DISTANCE);
+
+		final float totalPace = totalDistance == 0 //
+				? 0
+				: totalTime_Driving * 1000 / (totalDistance / UI.UNIT_VALUE_DISTANCE);
 
 		final TourSegment totalSegment = new TourSegment();
 
