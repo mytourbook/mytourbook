@@ -1,0 +1,22 @@
+Version 16.4.next                                               ?. ? 2016
+
+
+- Units cal/kcal
+- Cadence 
+  - Factor 2x
+  - Num Decimals 0 || 1
+  
+- Remove temperature graph start error
+
+New
+===	
+
+* Tour Chart
+
+  - Replaced chart options drop-down menu with a slideout
+
+
+
+
+System
+======

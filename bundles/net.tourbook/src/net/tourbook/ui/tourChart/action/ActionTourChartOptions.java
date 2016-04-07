@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,115 +15,191 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart.action;
 
-import java.util.Map;
-
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.tooltip.IOpeningDialog;
+import net.tourbook.ui.tourChart.SlideoutTourChartOptions;
 import net.tourbook.ui.tourChart.TourChart;
 
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.ActionContributionItem;
-import org.eclipse.jface.action.IMenuCreator;
-import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.action.ContributionItem;
+import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseMoveListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
-import org.eclipse.swt.widgets.Widget;
 
-public class ActionTourChartOptions extends Action implements IMenuCreator {
+public class ActionTourChartOptions extends ContributionItem implements IOpeningDialog {
 
-	private Menu		_menu	= null;
+	private static final String			ID			= "net.tourbook.ui.tourChart.action.ActionTourChartOptions";	//$NON-NLS-1$
 
-	private TourChart	_tourChart;
+	private IDialogSettings				_state		= TourbookPlugin.getState(ID);
+	private String						_dialogId	= getClass().getCanonicalName();
 
-	public ActionTourChartOptions(final TourChart tourChart) {
+	private TourChart					_tourChart;
 
-		super(null, Action.AS_DROP_DOWN_MENU);
+	private ToolBar						_toolBar;
+	private ToolItem					_actionToolItem;
+
+	private SlideoutTourChartOptions	_slideoutChartOptions;
+
+	/*
+	 * UI controls
+	 */
+	private Control						_parent;
+
+	private Image						_imageEnabled;
+	private Image						_imageDisabled;
+
+	public ActionTourChartOptions(final TourChart tourChart, final Control parent) {
 
 		_tourChart = tourChart;
+		_parent = parent;
 
-		setToolTipText(Messages.Tour_Action_chart_options_tooltip);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__tour_options));
-
-		setMenuCreator(this);
-	}
-
-	private void addItem(final Action action) {
-		final ActionContributionItem item = new ActionContributionItem(action);
-		item.fill(_menu, -1);
+		_imageEnabled = TourbookPlugin.getImageDescriptor(Messages.Image__tour_options).createImage();
+		_imageDisabled = TourbookPlugin.getImageDescriptor(Messages.Image__tour_options_disabled).createImage();
 	}
 
 	@Override
-	public void dispose() {
-		if (_menu != null) {
-			_menu.dispose();
-			_menu = null;
-		}
-	}
+	public void fill(final ToolBar toolbar, final int index) {
 
-	@Override
-	public Menu getMenu(final Control parent) {
+		if (_actionToolItem == null && toolbar != null) {
 
-		// recreate menu each time
-		if (_menu != null) {
-			_menu.dispose();
-		}
-
-		_menu = new Menu(parent);
-
-		final Map<String, Action> tourChartActions = _tourChart.getTourChartActions();
-
-		addItem(tourChartActions.get(TourChart.ACTION_ID_IS_SHOW_BREAKTIME_VALUES));
-		addItem(tourChartActions.get(TourChart.ACTION_ID_IS_SHOW_START_TIME));
-		addItem(tourChartActions.get(TourChart.ACTION_ID_IS_SHOW_SRTM_DATA));
-		addItem(tourChartActions.get(TourChart.ACTION_ID_IS_SHOW_VALUEPOINT_TOOLTIP));
-
-		(new Separator()).fill(_menu, -1);
-		addItem(tourChartActions.get(TourChart.ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER));
-		addItem(tourChartActions.get(TourChart.ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED));
-
-		(new Separator()).fill(_menu, -1);
-		addItem(tourChartActions.get(TourChart.ACTION_ID_EDIT_CHART_PREFERENCES));
-
-		return _menu;
-	}
-
-	@Override
-	public Menu getMenu(final Menu parent) {
-		return null;
-	}
-
-	@Override
-	public void runWithEvent(final Event event) {
-
-		// open and position drop down menu below the action button
-		final Widget item = event.widget;
-		if (item instanceof ToolItem) {
-
-			final ToolItem toolItem = (ToolItem) item;
-
-			final IMenuCreator mc = getMenuCreator();
-			if (mc != null) {
-
-				final ToolBar toolBar = toolItem.getParent();
-
-				final Menu menu = mc.getMenu(toolBar);
-				if (menu != null) {
-
-					final Rectangle toolItemBounds = toolItem.getBounds();
-					Point topLeft = new Point(toolItemBounds.x, toolItemBounds.y + toolItemBounds.height);
-					topLeft = toolBar.toDisplay(topLeft);
-
-					menu.setLocation(topLeft.x, topLeft.y);
-					menu.setVisible(true);
+			toolbar.addDisposeListener(new DisposeListener() {
+				@Override
+				public void widgetDisposed(final DisposeEvent e) {
+					onDispose();
 				}
-			}
+			});
+
+			_toolBar = toolbar;
+
+			_actionToolItem = new ToolItem(toolbar, SWT.PUSH);
+			_actionToolItem.setImage(_imageEnabled);
+			_actionToolItem.setDisabledImage(_imageDisabled);
+			_actionToolItem.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onSelect();
+				}
+			});
+
+			toolbar.addMouseMoveListener(new MouseMoveListener() {
+				@Override
+				public void mouseMove(final MouseEvent e) {
+
+					final Point mousePosition = new Point(e.x, e.y);
+					final ToolItem hoveredItem = toolbar.getItem(mousePosition);
+
+					onMouseMove(hoveredItem, e);
+				}
+			});
+
+			_slideoutChartOptions = new SlideoutTourChartOptions(_parent, _toolBar, _state, _tourChart);
+		}
+	}
+
+	@Override
+	public String getDialogId() {
+		return _dialogId;
+	}
+
+	@Override
+	public void hideDialog() {
+		_slideoutChartOptions.hideNow();
+	}
+
+	private void onDispose() {
+
+		_actionToolItem.dispose();
+		_actionToolItem = null;
+	}
+
+	private void onMouseMove(final ToolItem hoveredItem, final MouseEvent mouseEvent) {
+
+		// ignore other items in the toolbar
+		if (hoveredItem != _actionToolItem) {
+			return;
 		}
 
+		if (_actionToolItem.isEnabled() == false) {
+
+			// a graph is not displayed
+
+			return;
+		}
+
+		final boolean isToolItemHovered = hoveredItem == _actionToolItem;
+
+		Rectangle itemBounds = null;
+
+		if (isToolItemHovered) {
+
+			itemBounds = hoveredItem.getBounds();
+
+			final Point itemDisplayPosition = _toolBar.toDisplay(itemBounds.x, itemBounds.y);
+
+			itemBounds.x = itemDisplayPosition.x;
+			itemBounds.y = itemDisplayPosition.y;
+
+			openSlideout(itemBounds, true);
+		}
+	}
+
+	private void onSelect() {
+
+		if (_slideoutChartOptions.isToolTipVisible() == false) {
+
+			final Rectangle itemBounds = _actionToolItem.getBounds();
+
+			final Point itemDisplayPosition = _toolBar.toDisplay(itemBounds.x, itemBounds.y);
+
+			itemBounds.x = itemDisplayPosition.x;
+			itemBounds.y = itemDisplayPosition.y;
+
+			openSlideout(itemBounds, false);
+
+		} else {
+
+			_slideoutChartOptions.close();
+		}
+	}
+
+	private void openSlideout(final Rectangle itemBounds, final boolean isOpenDelayed) {
+
+		// ensure other dialogs are closed
+		_tourChart.closeOpenedDialogs(this);
+
+		_slideoutChartOptions.open(itemBounds, isOpenDelayed);
+	}
+
+	public void setEnabled(final boolean isEnabled) {
+
+		_actionToolItem.setEnabled(isEnabled);
+
+		if (isEnabled && _actionToolItem.getSelection() == false) {
+
+			// show default icon
+			_actionToolItem.setImage(_imageEnabled);
+		}
+	}
+
+	public void setSelected(final boolean isSelected) {
+
+		if (_actionToolItem == null) {
+			// this happened
+			return;
+		}
+
+		_actionToolItem.setSelection(isSelected);
 	}
 
 }

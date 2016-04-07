@@ -79,10 +79,6 @@ import net.tourbook.ui.tourChart.action.ActionGraph;
 import net.tourbook.ui.tourChart.action.ActionGraphOverlapped;
 import net.tourbook.ui.tourChart.action.ActionHrZoneDropDownMenu;
 import net.tourbook.ui.tourChart.action.ActionHrZoneGraphType;
-import net.tourbook.ui.tourChart.action.ActionShowBreaktimeValues;
-import net.tourbook.ui.tourChart.action.ActionShowSRTMData;
-import net.tourbook.ui.tourChart.action.ActionShowStartTime;
-import net.tourbook.ui.tourChart.action.ActionShowValuePointToolTip;
 import net.tourbook.ui.tourChart.action.ActionTourChartInfo;
 import net.tourbook.ui.tourChart.action.ActionTourChartMarker;
 import net.tourbook.ui.tourChart.action.ActionTourChartOptions;
@@ -131,11 +127,10 @@ import org.eclipse.ui.IWorkbenchPart;
 public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdater, ILineSelectionPainter {
 
 	private static final String				ID										= "net.tourbook.ui.tourChart";								//$NON-NLS-1$
-
+	//
 	private static final int				PAGE_NAVIGATION_SEGMENTS				= 10;
-
+	//
 	private static final String				GRAPH_LABEL_ALTIMETER					= net.tourbook.common.Messages.Graph_Label_Altimeter;
-
 	private static final String				GRAPH_LABEL_ALTITUDE					= net.tourbook.common.Messages.Graph_Label_Altitude;
 	private static final String				GRAPH_LABEL_CADENCE						= net.tourbook.common.Messages.Graph_Label_Cadence;
 	private static final String				GRAPH_LABEL_GEARS						= net.tourbook.common.Messages.Graph_Label_Gears;
@@ -146,16 +141,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	private static final String				GRAPH_LABEL_SPEED						= net.tourbook.common.Messages.Graph_Label_Speed;
 	private static final String				GRAPH_LABEL_TEMPERATURE					= net.tourbook.common.Messages.Graph_Label_Temperature;
 	private static final String				GRAPH_LABEL_TOUR_COMPARE				= net.tourbook.common.Messages.Graph_Label_Tour_Compare;
+	//
 	public static final String				ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER		= "ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER";						//$NON-NLS-1$
-
 	public static final String				ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED	= "ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED";				//$NON-NLS-1$
 	public static final String				ACTION_ID_EDIT_CHART_PREFERENCES		= "ACTION_ID_EDIT_CHART_PREFERENCES";						//$NON-NLS-1$
 	private static final String				ACTION_ID_IS_GRAPH_OVERLAPPED			= "ACTION_ID_IS_GRAPH_OVERLAPPED";							//$NON-NLS-1$
-	public static final String				ACTION_ID_IS_SHOW_BREAKTIME_VALUES		= "ACTION_ID_IS_SHOW_BREAKTIME_VALUES";					//$NON-NLS-1$
-	public static final String				ACTION_ID_IS_SHOW_SRTM_DATA				= "ACTION_ID_IS_SHOW_SRTM_DATA";							//$NON-NLS-1$
-	public static final String				ACTION_ID_IS_SHOW_START_TIME			= "ACTION_ID_IS_SHOW_START_TIME";							//$NON-NLS-1$
 	public static final String				ACTION_ID_IS_SHOW_TOUR_PHOTOS			= "ACTION_ID_IS_SHOW_TOUR_PHOTOS";							//$NON-NLS-1$
-	public static final String				ACTION_ID_IS_SHOW_VALUEPOINT_TOOLTIP	= "ACTION_ID_IS_SHOW_VALUEPOINT_TOOLTIP";					//$NON-NLS-1$
 	public static final String				ACTION_ID_HR_ZONE_DROPDOWN_MENU			= "ACTION_ID_HR_ZONE_DROPDOWN_MENU";						//$NON-NLS-1$
 	public static final String				ACTION_ID_HR_ZONE_STYLE_GRAPH_TOP		= "ACTION_ID_HR_ZONE_STYLE_GRAPH_TOP";						//$NON-NLS-1$
 	public static final String				ACTION_ID_HR_ZONE_STYLE_NO_GRADIENT		= "ACTION_ID_HR_ZONE_STYLE_NO_GRADIENT";					//$NON-NLS-1$
@@ -187,7 +178,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	private ActionOpenMarkerDialog			_actionOpenMarkerDialog;
 	private ActionTourChartInfo				_actionTourInfo;
 	private ActionTourChartMarker			_actionTourMarker;
-	private ActionTourChartOptions			_actionTourOptions;
+	private ActionTourChartOptions			_actionTourChartOptions;
 	//
 	/**
 	 * datamodel listener is called when the chart data is created
@@ -201,8 +192,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	private final ListenerList				_xAxisSelectionListener					= new ListenerList();
 	//
 	private boolean							_is2ndAltiLayerVisible;
-	private boolean							_isMouseModeSet;
 	private boolean							_isDisplayedInDialog;
+	private boolean							_isMouseModeSet;
+	private boolean							_isTourChartToolbarCreated;
 	private TourMarker						_firedTourMarker;
 
 	/**
@@ -681,16 +673,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		setActionChecked(ACTION_ID_IS_GRAPH_OVERLAPPED, isItemChecked);
 	}
 
-	public void actionShowBreaktimeValues(final boolean isItemChecked) {
-
-		_prefStore.setValue(ITourbookPreferences.GRAPH_IS_BREAKTIME_VALUES_VISIBLE, isItemChecked);
-		_tcc.isShowBreaktimeValues = isItemChecked;
-
-		updateTourChart();
-
-		setActionChecked(ACTION_ID_IS_SHOW_BREAKTIME_VALUES, isItemChecked);
-	}
-
 	/**
 	 * Toggle HR zone background
 	 */
@@ -735,24 +717,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		} else {
 			updateTourChart();
 		}
-	}
-
-	public void actionShowSRTMData(final boolean isItemChecked) {
-
-		_prefStore.setValue(ITourbookPreferences.GRAPH_IS_SRTM_VISIBLE, isItemChecked);
-
-		_tcc.isSRTMDataVisible = isItemChecked;
-		updateTourChart();
-
-		setActionChecked(ACTION_ID_IS_SHOW_SRTM_DATA, isItemChecked);
-	}
-
-	public void actionShowStartTime(final Boolean isItemChecked) {
-
-		_tcc.xAxisTime = isItemChecked ? X_AXIS_START_TIME.TOUR_START_TIME : X_AXIS_START_TIME.START_WITH_0;
-		updateTourChart();
-
-		setActionChecked(ACTION_ID_IS_SHOW_START_TIME, isItemChecked);
 	}
 
 	public void actionShowTourInfo(final boolean isTourInfoVisible) {
@@ -801,19 +765,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		updatePhotoAction();
 
 		updateTourChart();
-	}
-
-	public void actionShowValuePointToolTip(final Boolean isItemChecked) {
-
-		// set in pref store, tooltip is listening pref store modifications
-		_prefStore.setValue(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE, isItemChecked);
-
-//		_valuePointToolTip.setVisible(isItemChecked);
-
-		setActionChecked(ACTION_ID_IS_SHOW_VALUEPOINT_TOOLTIP, isItemChecked);
-
-		// chart needs not to be updated but update the actions
-		updateTourActions();
 	}
 
 	/**
@@ -886,8 +837,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			 * x-axis units
 			 */
 			updateTourChart(false);
-
-			setActionChecked(ACTION_ID_IS_SHOW_START_TIME, _tcc.xAxisTime != X_AXIS_START_TIME.START_WITH_0);
 
 			return;
 		}
@@ -990,15 +939,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 					setupChartConfig();
 
 					isChartModified = true;
-
-				} else if (property.equals(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE)) {
-
-					final Boolean isVisible = (Boolean) event.getNewValue();
-
-					setActionChecked(ACTION_ID_IS_SHOW_VALUEPOINT_TOOLTIP, isVisible);
-
-					// chart needs not to be updated but update the actions
-//					enableTourActions();
 
 				} else if (property.equals(ITourbookPreferences.TOUR_SEGMENTER_CHART_VALUE_FONT)) {
 
@@ -1281,17 +1221,14 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		 * other actions
 		 */
 		_actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
+		_actionTourChartOptions = new ActionTourChartOptions(this, _parent);
 		_actionTourInfo = new ActionTourChartInfo(this, _parent);
 		_actionTourMarker = new ActionTourChartMarker(this, _parent);
 
 		_allTourChartActions.put(ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER, new ActionCanAutoZoomToSlider(this));
 		_allTourChartActions.put(ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED, new ActionCanMoveSlidersWhenZoomed(this));
-		_allTourChartActions.put(ACTION_ID_IS_SHOW_BREAKTIME_VALUES, new ActionShowBreaktimeValues(this));
-		_allTourChartActions.put(ACTION_ID_IS_SHOW_SRTM_DATA, new ActionShowSRTMData(this));
-		_allTourChartActions.put(ACTION_ID_IS_SHOW_START_TIME, new ActionShowStartTime(this));
 		_allTourChartActions.put(ACTION_ID_IS_SHOW_TOUR_PHOTOS, new ActionTourPhotos(this));
 		_allTourChartActions.put(ACTION_ID_IS_GRAPH_OVERLAPPED, new ActionGraphOverlapped(this));
-		_allTourChartActions.put(ACTION_ID_IS_SHOW_VALUEPOINT_TOOLTIP, new ActionShowValuePointToolTip(this));
 		_allTourChartActions.put(ACTION_ID_X_AXIS_DISTANCE, new ActionXAxisDistance(this));
 		_allTourChartActions.put(ACTION_ID_X_AXIS_TIME, new ActionXAxisTime(this));
 
@@ -2434,16 +2371,16 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	private void fillToolbar() {
 
 		// check if toolbar is created
-		if (_actionTourOptions != null) {
+		if (_isTourChartToolbarCreated) {
 			return;
 		}
 
+		_isTourChartToolbarCreated = true;
+
 		final IToolBarManager tbm = getToolBarManager();
 
-		_actionTourOptions = new ActionTourChartOptions(this);
-
 		/*
-		 * add the actions to the toolbar
+		 * add actions to the toolbar
 		 */
 		if (_tcc.canShowTourCompareGraph) {
 			tbm.add(_allTourChartActions.get(getGraphActionId(TourManager.GRAPH_TOUR_COMPARE)));
@@ -2464,15 +2401,14 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		tbm.add(new Separator());
 		tbm.add(_allTourChartActions.get(ACTION_ID_IS_GRAPH_OVERLAPPED));
 		tbm.add(_allTourChartActions.get(ACTION_ID_HR_ZONE_DROPDOWN_MENU));
-		tbm.add(_allTourChartActions.get(ACTION_ID_IS_SHOW_TOUR_PHOTOS));
-		tbm.add(_actionTourMarker);
-		tbm.add(_actionTourInfo);
-
-		tbm.add(new Separator());
 		tbm.add(_allTourChartActions.get(ACTION_ID_X_AXIS_TIME));
 		tbm.add(_allTourChartActions.get(ACTION_ID_X_AXIS_DISTANCE));
 
-		tbm.add(_actionTourOptions);
+		tbm.add(new Separator());
+		tbm.add(_allTourChartActions.get(ACTION_ID_IS_SHOW_TOUR_PHOTOS));
+		tbm.add(_actionTourMarker);
+		tbm.add(_actionTourInfo);
+		tbm.add(_actionTourChartOptions);
 
 		tbm.update(true);
 	}
@@ -4645,29 +4581,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		updatePhotoAction();
 
 		/*
-		 * Breaktime values
-		 */
-		tourAction = _allTourChartActions.get(ACTION_ID_IS_SHOW_BREAKTIME_VALUES);
-		tourAction.setEnabled(true);
-		tourAction.setChecked(_tcc.isShowBreaktimeValues);
-
-		/*
-		 * Value point tool tip
-		 */
-		tourAction = _allTourChartActions.get(ACTION_ID_IS_SHOW_VALUEPOINT_TOOLTIP);
-		tourAction.setEnabled(true);
-		final boolean isVisible = _valuePointTooltip.isVisible();
-		tourAction.setChecked(isVisible);
-
-		/*
-		 * SRTM data
-		 */
-		tourAction = _allTourChartActions.get(ACTION_ID_IS_SHOW_SRTM_DATA);
-		final boolean canShowSRTMData = _tcc.canShowSRTMData;
-		tourAction.setEnabled(canShowSRTMData);
-		tourAction.setChecked(canShowSRTMData ? _tcc.isSRTMDataVisible : false);
-
-		/*
 		 * Overlapped graphs
 		 */
 		tourAction = _allTourChartActions.get(ACTION_ID_IS_GRAPH_OVERLAPPED);
@@ -4679,9 +4592,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		 */
 		final boolean isShowTimeOnXAxis = _tcc.isShowTimeOnXAxis;
 
-		tourAction = _allTourChartActions.get(ACTION_ID_IS_SHOW_START_TIME);
-		tourAction.setEnabled(isShowTimeOnXAxis);
-		tourAction.setChecked(_tcc.xAxisTime != X_AXIS_START_TIME.START_WITH_0);
 
 		tourAction = _allTourChartActions.get(ACTION_ID_X_AXIS_TIME);
 		tourAction.setEnabled(true); // time data are always available

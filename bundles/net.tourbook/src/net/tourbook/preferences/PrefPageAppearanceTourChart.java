@@ -26,7 +26,6 @@ import net.tourbook.common.util.StringToArrayConverter;
 import net.tourbook.common.util.Util;
 import net.tourbook.tour.TourManager;
 
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
@@ -57,6 +56,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
@@ -115,10 +115,9 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 	private MouseWheelListener		_defaultMouseWheelListener;
 	private SelectionAdapter		_defaultSelectionListener;
 
-	private boolean					_isGridLineWarningDisplayed					= false;
-
 	private PixelConverter			_pc;
 	private int						_columnSpacing;
+	private boolean					_isGridWarningDisplayed;
 
 	/*
 	 * UI controls
@@ -163,6 +162,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 	private Button					_chkShowVerticalGridLines;
 	private Button					_chkZoomToSlider;
 
+	private Label					_lblGridWarning;
 	private Label					_lblMaxValue;
 	private Label					_lblMinValue;
 	private Label					_lblMinMax_Altimeter;
@@ -820,6 +820,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		group.setText(Messages.Pref_Graphs_Group_Grid);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
 		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
+//		group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 		{
 			/*
 			 * label: grid distance
@@ -875,25 +876,36 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 				_spinnerGridVerticalDistance.addSelectionListener(_defaultSelectionListener);
 			}
 
-			/*
-			 * checkbox: show horizontal grid
-			 */
-			_chkShowHorizontalGridLines = new Button(group, SWT.CHECK);
-			GridDataFactory.fillDefaults()//
-					.indent(0, 15)
-					.span(2, 1)
-					.applyTo(_chkShowHorizontalGridLines);
-			_chkShowHorizontalGridLines.setText(Messages.Pref_Graphs_Checkbox_ShowHorizontalGrid);
-			_chkShowHorizontalGridLines.addSelectionListener(gridLineListener);
+			{
+				/*
+				 * checkbox: show horizontal grid
+				 */
+				_chkShowHorizontalGridLines = new Button(group, SWT.CHECK);
+				GridDataFactory.fillDefaults()//
+						.indent(0, 15)
+						.span(2, 1)
+						.applyTo(_chkShowHorizontalGridLines);
+				_chkShowHorizontalGridLines.setText(Messages.Pref_Graphs_Checkbox_ShowHorizontalGrid);
+				_chkShowHorizontalGridLines.addSelectionListener(gridLineListener);
 
-			/*
-			 * checkbox: show vertical grid
-			 */
-			_chkShowVerticalGridLines = new Button(group, SWT.CHECK);
-			GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkShowVerticalGridLines);
-			_chkShowVerticalGridLines.setText(Messages.Pref_Graphs_Checkbox_ShowVerticalGrid);
-			_chkShowVerticalGridLines.addSelectionListener(gridLineListener);
+				/*
+				 * checkbox: show vertical grid
+				 */
+				_chkShowVerticalGridLines = new Button(group, SWT.CHECK);
+				GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkShowVerticalGridLines);
+				_chkShowVerticalGridLines.setText(Messages.Pref_Graphs_Checkbox_ShowVerticalGrid);
+				_chkShowVerticalGridLines.addSelectionListener(gridLineListener);
 
+				/*
+				 * label: grid warning
+				 */
+				_lblGridWarning = new Label(group, SWT.WRAP);
+				GridDataFactory.fillDefaults()//
+						.span(2, 1)
+						.grab(true, false)
+//						.align(SWT.FILL, SWT.CENTER)
+						.applyTo(_lblGridWarning);
+			}
 		}
 	}
 
@@ -1324,19 +1336,15 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 	private void onSelectGridLine() {
 
 		// show performance warning
+		if (_isGridWarningDisplayed == false
+				&& (_chkShowHorizontalGridLines.getSelection() || _chkShowVerticalGridLines.getSelection())) {
 
-		if (_isGridLineWarningDisplayed == false) {
+			_isGridWarningDisplayed = true;
 
-			// don't show warning when both are hidden
-			if (_chkShowHorizontalGridLines.getSelection() || _chkShowVerticalGridLines.getSelection()) {
+			_lblGridWarning.setText(Messages.Pref_Graphs_Dialog_GridLine_Warning_Message);
+			_lblGridWarning.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
 
-				_isGridLineWarningDisplayed = true;
-
-				MessageDialog.openWarning(
-						getShell(),
-						Messages.Pref_Graphs_Dialog_GridLine_Warning_Title,
-						Messages.Pref_Graphs_Dialog_GridLine_Warning_Message);
-			}
+			_tabFolder.layout(true, true);
 		}
 
 		doLiveUpdate();
