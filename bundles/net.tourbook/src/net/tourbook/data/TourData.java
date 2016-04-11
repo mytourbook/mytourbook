@@ -964,6 +964,8 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	@Transient
 	public float[]												segmentSerie_Altitude_Diff_Computed;
 	@Transient
+	public float[]												segmentSerie_Altitude_UpDown_Hour;
+	@Transient
 	public float												segmentSerieTotal_Altitude_Down;
 	@Transient
 	public float												segmentSerieTotal_Altitude_Up;
@@ -3670,6 +3672,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		segmentSerie_Distance_Total = new float[segmentSerieLength];
 
 		segmentSerie_Altitude_Diff = new float[segmentSerieLength];
+		segmentSerie_Altitude_UpDown_Hour = new float[segmentSerieLength];
 
 		segmentSerie_Speed = new float[segmentSerieLength];
 		segmentSerie_Pace = new float[segmentSerieLength];
@@ -3760,15 +3763,22 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 				final float altitudeEnd = segmenterAltitudeSerie[segmentEndIndex];
 				final float altitudeDiff = altitudeEnd - altitudeStart;
 
+				final float altiUpDownHour = segmentDrivingTime == 0 //
+						? 0
+						: (altitudeDiff / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE) / segmentDrivingTime * 3600;
+
 				segmentSerie_Altitude_Diff[segmentIndex] = segment.altitude_Segment_Border_Diff = altitudeDiff;
+				segmentSerie_Altitude_UpDown_Hour[segmentIndex] = altiUpDownHour;
 
 				if (altitudeDiff > 0) {
 					segment.altitude_Summarized_Border_Up = altitudeUpSummarizedBorder += altitudeDiff;
 					segment.altitude_Summarized_Border_Down = altitudeDownSummarizedBorder;
+					segment.altitude_Segment_Up = altitudeDiff;
 
 				} else {
 					segment.altitude_Summarized_Border_Up = altitudeUpSummarizedBorder;
 					segment.altitude_Summarized_Border_Down = altitudeDownSummarizedBorder += altitudeDiff;
+					segment.altitude_Segment_Down = altitudeDiff;
 				}
 
 				if ((segmentSerie_Altitude_Diff_Computed != null)

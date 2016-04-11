@@ -4236,8 +4236,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			cfgGradient.minValueAdjustment = 1.6;
 
 			cfgAltimeter = new ConfigGraphSegment(GraphColorManager.PREF_GRAPH_ALTIMETER);
-			// set dummy which is not used
-			cfgAltimeter.segmentDataSerie = new float[] {};
+			cfgAltimeter.segmentDataSerie = _tourData.segmentSerie_Altitude_UpDown_Hour;
 			cfgAltimeter.labelProvider = labelProviderInt;
 			cfgAltimeter.canHaveNegativeValues = true;
 			cfgAltimeter.minValueAdjustment = 1.0;
