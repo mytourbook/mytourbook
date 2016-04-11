@@ -453,5 +453,11 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		 * Tour import
 		 */
 		store.setDefault(ITourbookPreferences.IMPORT_IS_NEW_UI, false);
+
+		/*
+		 * Adjust temperature
+		 */
+		store.setDefault(ITourbookPreferences.ADJUST_TEMPERATURE_AVG_TEMPERATURE, 15); // 15 °C
+		store.setDefault(ITourbookPreferences.ADJUST_TEMPERATURE_DURATION_TIME, 10 * 60); // 10 minutes
 	}
 }

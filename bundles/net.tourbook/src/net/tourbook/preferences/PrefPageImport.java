@@ -32,7 +32,10 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.DateTime;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
@@ -45,14 +48,25 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
 	private RawDataManager			_rawDataMgr	= RawDataManager.getInstance();
 
 	private PixelConverter			_pc;
+	private SelectionAdapter		_defaultSelectionListener;
+	private int						_checkboxIndent;
 
 	/*
 	 * UI controls
 	 */
-	private Button					_chkCreateTourIdWithTime;
+	private Button					_chkAdjustTemperature;
 	private Button					_chkAutoOpenImportLog;
+	private Button					_chkCreateTourIdWithTime;
 
-	private Label					_txtIdInfo;
+	private DateTime				_dtTemperatureAdjustmentDuration;
+
+	private Label					_lblAvgTemperature;
+	private Label					_lblIdInfo;
+	private Label					_lblTemperatureAdjustmentDuration;
+	private Label					_lblTemperatureAdjustmentInfo;
+	private Label					_lblTemperatureUnit;
+
+	private Spinner					_spinnerAvgTemperature;
 
 	@Override
 	protected Control createContents(final Composite parent) {
@@ -73,6 +87,19 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
 		{
+			createUI_10_General(container);
+			createUI_30_TemperatureAdjustment(container);
+		}
+
+		return container;
+	}
+
+	private void createUI_10_General(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+		{
 			{
 				/*
 				 * Label: common info
@@ -88,12 +115,7 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
 				 */
 				_chkAutoOpenImportLog = new Button(container, SWT.CHECK);
 				_chkAutoOpenImportLog.setText(Messages.PrefPage_Import_Checkbox_AutoOpenTourLogView);
-				_chkAutoOpenImportLog.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(final SelectionEvent e) {
-						enableControls();
-					}
-				});
+				_chkAutoOpenImportLog.addSelectionListener(_defaultSelectionListener);
 				GridDataFactory.fillDefaults()//
 						.indent(0, _pc.convertVerticalDLUsToPixels(4))
 						.applyTo(_chkAutoOpenImportLog);
@@ -105,12 +127,7 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
 				 */
 				_chkCreateTourIdWithTime = new Button(container, SWT.CHECK);
 				_chkCreateTourIdWithTime.setText(Messages.PrefPage_Import_Checkbox_CreateTourIdWithTime);
-				_chkCreateTourIdWithTime.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(final SelectionEvent e) {
-						enableControls();
-					}
-				});
+				_chkCreateTourIdWithTime.addSelectionListener(_defaultSelectionListener);
 				GridDataFactory.fillDefaults()//
 //						.indent(0, _pc.convertVerticalDLUsToPixels(4))
 						.applyTo(_chkCreateTourIdWithTime);
@@ -118,26 +135,55 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
 
 			{
 				/*
-				 * Text: id info
+				 * Label: id info
 				 */
-				_txtIdInfo = new Label(container, SWT.WRAP | SWT.READ_ONLY);
-				_txtIdInfo.setText(Messages.PrefPage_Import_Checkbox_CreateTourIdWithTime_Tooltip);
+				_lblIdInfo = new Label(container, SWT.WRAP | SWT.READ_ONLY);
+				_lblIdInfo.setText(Messages.PrefPage_Import_Checkbox_CreateTourIdWithTime_Tooltip);
 				GridDataFactory.fillDefaults()//
 						.grab(true, false)
-						.indent(_pc.convertHorizontalDLUsToPixels(10), 0)
+						.indent(_checkboxIndent, 0)
 						.hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
-						.applyTo(_txtIdInfo);
+						.applyTo(_lblIdInfo);
 			}
 		}
+	}
 
-		return container;
+	private void createUI_30_TemperatureAdjustment(final Composite parent) {
+
+		final Group group = new Group(parent, SWT.NONE);
+		group.setText(Messages.PrefPage_Import_Group_TemperatureAdjustment);
+		GridDataFactory.fillDefaults()//
+				.grab(true, false)
+				.indent(0, _pc.convertVerticalDLUsToPixels(4))
+				.applyTo(group);
+		GridLayoutFactory.swtDefaults().applyTo(group);
+		{
+			{
+				/*
+				 * Checkbox: Adjust temperature
+				 */
+				_chkAdjustTemperature = new Button(group, SWT.CHECK);
+				_chkAdjustTemperature.setText(Messages.PrefPage_Import_Checkbox_AdjustTemperature);
+				_chkAdjustTemperature.addSelectionListener(_defaultSelectionListener);
+				GridDataFactory.fillDefaults()//
+						.applyTo(_chkAdjustTemperature);
+			}
+		}
 	}
 
 	private void enableControls() {
 
 		final boolean isTourIdWithTime = _chkCreateTourIdWithTime.getSelection();
+		final boolean isAdjustTemperature = _chkAdjustTemperature.getSelection();
 
-		_txtIdInfo.setEnabled(isTourIdWithTime);
+		_lblIdInfo.setEnabled(isTourIdWithTime);
+
+		_dtTemperatureAdjustmentDuration.setEnabled(isAdjustTemperature);
+		_lblAvgTemperature.setEnabled(isAdjustTemperature);
+		_lblTemperatureAdjustmentInfo.setEnabled(isAdjustTemperature);
+		_lblTemperatureAdjustmentDuration.setEnabled(isAdjustTemperature);
+		_lblTemperatureUnit.setEnabled(isAdjustTemperature);
+		_spinnerAvgTemperature.setEnabled(isAdjustTemperature);
 	}
 
 	@Override
@@ -148,6 +194,15 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
 	private void initUI(final Composite parent) {
 
 		_pc = new PixelConverter(parent);
+
+		_checkboxIndent = _pc.convertHorizontalDLUsToPixels(10);
+
+		_defaultSelectionListener = new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				enableControls();
+			}
+		};
 	}
 
 	@Override

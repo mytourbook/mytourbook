@@ -112,6 +112,16 @@ public class Messages extends NLS {
 	public static String		dialog_export_shell_text;
 	public static String		dialog_export_txt_filePath_tooltip;
 
+	public static String		Dialog_AdjustTemperature_Button_AdjustTemperature;
+	public static String		Dialog_AdjustTemperature_Dialog_Message;
+	public static String		Dialog_AdjustTemperature_Dialog_Title;
+	public static String		Dialog_AdjustTemperature_Info_TemperatureAdjustment;
+	public static String		Dialog_AdjustTemperature_Label_AvgTemperature;
+	public static String		Dialog_AdjustTemperature_Label_Progress;
+	public static String		Dialog_AdjustTemperature_Label_Progress_SubTask;
+	public static String		Dialog_AdjustTemperature_Label_Progress_Task;
+	public static String		Dialog_AdjustTemperature_Label_TemperatureAdjustmentDuration;
+
 	public static String		Dialog_ImportConfig_Action_AddSpeed_Tooltip;
 	public static String		Dialog_ImportConfig_Action_NewOneTourType;
 	public static String		Dialog_ImportConfig_Action_NewOneTourType_Tooltip;
@@ -1343,9 +1353,13 @@ public class Messages extends NLS {
 	public static String		Pref_TourTypes_root_title;
 	public static String		Pref_TourTypes_Title;
 
+	public static String		PrefPage_Import_Checkbox_AdjustTemperature;
 	public static String		PrefPage_Import_Checkbox_AutoOpenTourLogView;
 	public static String		PrefPage_Import_Checkbox_CreateTourIdWithTime;
 	public static String		PrefPage_Import_Checkbox_CreateTourIdWithTime_Tooltip;
+
+	public static String		PrefPage_Import_Group_TemperatureAdjustment;
+
 	public static String		PrefPage_Import_Label_Info;
 
 	public static String		PrefPage_ViewActions_Group;
@@ -1500,6 +1514,8 @@ public class Messages extends NLS {
 	public static String		Tooltip_ValuePoint_Label_NoData_Tooltip;
 	public static String		Tooltip_ValuePoint_Label_SlicesCurrent_Tooltip;
 	public static String		Tooltip_ValuePoint_Label_SlicesMax_Tooltip;
+
+	public static String		Tour_Action_AdjustTemperature;
 
 	public static String		Tour_Action_auto_move_sliders_when_zoomed;
 	public static String		Tour_Action_auto_zoom_to_slider_position;

@@ -440,4 +440,10 @@ public interface ITourbookPreferences {
 	 */
 	public static final String	IMPORT_IS_NEW_UI								= "IMPORT_IS_NEW_UI";										//$NON-NLS-1$
 
+	/*
+	 * Adjust temperature
+	 */
+	public static final String	ADJUST_TEMPERATURE_AVG_TEMPERATURE				= "ADJUST_TEMPERATURE_AVG_TEMPERATURE";					//$NON-NLS-1$
+	public static final String	ADJUST_TEMPERATURE_DURATION_TIME				= "ADJUST_TEMPERATURE_DURATION_TIME";						//$NON-NLS-1$
+
 }

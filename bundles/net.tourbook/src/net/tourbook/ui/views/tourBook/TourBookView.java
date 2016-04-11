@@ -65,6 +65,7 @@ import net.tourbook.tour.printing.ActionPrint;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourProviderByID;
 import net.tourbook.ui.TreeColumnFactory;
+import net.tourbook.ui.action.ActionAdjustTemperature;
 import net.tourbook.ui.action.ActionCollapseAll;
 import net.tourbook.ui.action.ActionCollapseOthers;
 import net.tourbook.ui.action.ActionComputeDistanceValuesFromGeoposition;
@@ -274,6 +275,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	private TagMenuManager								_tagMenuMgr;
 	private TreeViewerTourInfoToolTip					_tourInfoToolTip;
 
+	private ActionAdjustTemperature						_actionAdjustTemperature;
 	private ActionCollapseAll							_actionCollapseAll;
 	private ActionCollapseOthers						_actionCollapseOthers;
 	private ActionComputeDistanceValuesFromGeoposition	_actionComputeDistanceValuesFromGeoposition;
@@ -606,6 +608,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 
 	private void createActions() {
 
+		_actionAdjustTemperature = new ActionAdjustTemperature(this);
 		_actionCollapseAll = new ActionCollapseAll(this);
 		_actionCollapseOthers = new ActionCollapseOthers(this);
 		_actionComputeDistanceValuesFromGeoposition = new ActionComputeDistanceValuesFromGeoposition(this);
@@ -998,7 +1001,6 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 			}
 		});
 	}
-
 
 	/**
 	 * column: max pulse
@@ -3084,11 +3086,6 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		menuMgr.add(_actionMergeTour);
 		menuMgr.add(_actionJoinTours);
 
-		menuMgr.add(new Separator());
-		menuMgr.add(_actionComputeElevationGain);
-		menuMgr.add(_actionComputeDistanceValuesFromGeoposition);
-		menuMgr.add(_actionSetAltitudeFromSRTM);
-
 		_tagMenuMgr.fillTagMenu(menuMgr);
 
 		// tour type actions
@@ -3104,10 +3101,16 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionExportTour);
 		menuMgr.add(_actionExportViewCSV);
-		menuMgr.add(_actionReimportSubMenu);
 		menuMgr.add(_actionPrintTour);
 
 		menuMgr.add(new Separator());
+		menuMgr.add(_actionAdjustTemperature);
+		menuMgr.add(_actionComputeElevationGain);
+		menuMgr.add(_actionComputeDistanceValuesFromGeoposition);
+		menuMgr.add(_actionSetAltitudeFromSRTM);
+
+		menuMgr.add(new Separator());
+		menuMgr.add(_actionReimportSubMenu);
 		menuMgr.add(_actionSetOtherPerson);
 		menuMgr.add(_actionDeleteTour);
 

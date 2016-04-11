@@ -124,10 +124,6 @@ public class UI {
 	public static final String				SYMBOL_DIFFERENCE						= "\u0394";																//$NON-NLS-1$
 	public static final String				SYMBOL_DIFFERENCE_WITH_SPACE			= "\u0394 ";																//$NON-NLS-1$
 	public static final String				SYMBOL_DOUBLE_HORIZONTAL				= "\u2550";																//$NON-NLS-1$
-
-	// this looks ugly "\u2551";
-	public static final String				SYMBOL_DOUBLE_VERTICAL					= "||";																	//$NON-NLS-1$
-
 	public static final String				SYMBOL_ELLIPSIS							= "\u2026";																//$NON-NLS-1$
 	public static final String				SYMBOL_FIGURE_DASH						= "\u2012";																//$NON-NLS-1$
 	public static final String				SYMBOL_FOOT_NOTE						= "\u20F0";																//$NON-NLS-1$
@@ -135,9 +131,7 @@ public class UI {
 	public static final String				SYMBOL_IDENTICAL_TO						= "\u2261";																//$NON-NLS-1$
 	public static final String				SYMBOL_INFINITY_MAX						= "\u221E";																//$NON-NLS-1$
 	public static final String				SYMBOL_INFINITY_MIN						= "-\u221E";																//$NON-NLS-1$
-	public static final char				SYMBOL_NUMBER_SIGN						= '#';
 	public static final String				SYMBOL_PLUS_MINUS						= "\u00B1";																//$NON-NLS-1$
-	public static final char				SYMBOL_SEMICOLON						= ';';
 	public static final String				SYMBOL_SUM_WITH_SPACE					= "\u2211 ";																//$NON-NLS-1$
 	public static final String				SYMBOL_SUN								= "\u263C";																//$NON-NLS-1$
 	public static final String				SYMBOL_TAU								= "\u03c4";																//$NON-NLS-1$
@@ -145,13 +139,18 @@ public class UI {
 	public static final CharSequence		SYMBOL_BACKSLASH						= "\\";																	//$NON-NLS-1$
 	public static final String				SYMBOL_COLON							= ":";																		//$NON-NLS-1$
 	public static final String				SYMBOL_DOT								= ".";																		//$NON-NLS-1$
+	// this looks ugly "\u2551";
+	public static final String				SYMBOL_DOUBLE_VERTICAL					= "||";																	//$NON-NLS-1$
 	public static final String				SYMBOL_EQUAL							= "=";																		//$NON-NLS-1$
 	public static final String				SYMBOL_EXCLAMATION_POINT				= "!";																		//$NON-NLS-1$
 	public static final String				SYMBOL_GREATER_THAN						= ">";																		//$NON-NLS-1$
 	public static final String				SYMBOL_LESS_THAN						= "<";																		//$NON-NLS-1$
+	public static final char				SYMBOL_NUMBER_SIGN						= '#';
 	public static final String				SYMBOL_PERCENTAGE						= "%";																		//$NON-NLS-1$
 	public static final String				SYMBOL_QUESTION_MARK					= "?";																		//$NON-NLS-1$
+	public static final char				SYMBOL_SEMICOLON						= ';';
 	public static final String				SYMBOL_STAR								= "*";																		//$NON-NLS-1$
+	public static final String				SYMBOL_TEMPERATURE						= "°C";																	//$NON-NLS-1$
 	public static final String				SYMBOL_UNDERSCORE						= "_";																		//$NON-NLS-1$
 	public static final String				SYMBOL_WIND_WITH_SPACE					= "W ";																	//$NON-NLS-1$
 
