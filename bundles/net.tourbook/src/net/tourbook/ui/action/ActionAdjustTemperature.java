@@ -21,7 +21,8 @@ import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.DialogAdjustTemperature;
 import net.tourbook.tour.DialogAdjustTemperature_Wizard;
-import net.tourbook.ui.ITourProvider;
+import net.tourbook.tour.TourManager;
+import net.tourbook.ui.ITourProvider2;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -30,10 +31,9 @@ import org.eclipse.swt.widgets.Shell;
 
 public class ActionAdjustTemperature extends Action {
 
+	private final ITourProvider2	_tourProvider;
 
-	private final ITourProvider	_tourProvider;
-
-	public ActionAdjustTemperature(final ITourProvider tourProvider) {
+	public ActionAdjustTemperature(final ITourProvider2 tourProvider) {
 
 		super(null, AS_PUSH_BUTTON);
 
@@ -44,6 +44,11 @@ public class ActionAdjustTemperature extends Action {
 
 	@Override
 	public void run() {
+
+		// check if the tour editor contains a modified tour
+		if (TourManager.isTourEditorModified()) {
+			return;
+		}
 
 		final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
 
@@ -60,7 +65,7 @@ public class ActionAdjustTemperature extends Action {
 			return;
 		}
 
-		final DialogAdjustTemperature_Wizard wizard = new DialogAdjustTemperature_Wizard(selectedTours);
+		final DialogAdjustTemperature_Wizard wizard = new DialogAdjustTemperature_Wizard(selectedTours, _tourProvider);
 		final DialogAdjustTemperature dialog = new DialogAdjustTemperature(shell, wizard);
 
 		dialog.open();

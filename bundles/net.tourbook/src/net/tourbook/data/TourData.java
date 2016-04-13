@@ -2328,7 +2328,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		return (float) (timeSquare == 0 ? 0 : pulseSquare / timeSquare);
 	}
 
-	private void computeAvg_Temperature() {
+	public void computeAvg_Temperature() {
 
 		if (temperatureSerie == null) {
 			return;

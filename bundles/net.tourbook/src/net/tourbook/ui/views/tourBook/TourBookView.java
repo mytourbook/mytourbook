@@ -62,7 +62,7 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourTypeMenuManager;
 import net.tourbook.tour.printing.ActionPrint;
-import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.ITourProvider2;
 import net.tourbook.ui.ITourProviderByID;
 import net.tourbook.ui.TreeColumnFactory;
 import net.tourbook.ui.action.ActionAdjustTemperature;
@@ -139,7 +139,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
-public class TourBookView extends ViewPart implements ITourProvider, ITourViewer3, ITourProviderByID {
+public class TourBookView extends ViewPart implements ITourProvider2, ITourViewer3, ITourProviderByID {
 
 	static public final String							ID									= "net.tourbook.views.tourListView";						//$NON-NLS-1$
 
@@ -432,6 +432,7 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	void actionSelectYearMonthTours() {
 
 		if (_actionSelectAllTours.isChecked()) {
+
 			// reselect selection
 			_tourViewer.setSelection(_tourViewer.getSelection());
 		}
@@ -3645,6 +3646,14 @@ public class TourBookView extends ViewPart implements ITourProvider, ITourViewer
 	@Override
 	public void setFocus() {
 		_tourViewer.getControl().setFocus();
+	}
+
+	@Override
+	public void toursAreModified(final ArrayList<TourData> modifiedTours) {
+
+		// do a reselection of the selected tours to fire the multi tour data selection
+
+		actionSelectYearMonthTours();
 	}
 
 	private void updateToolTipState() {

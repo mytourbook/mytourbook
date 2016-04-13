@@ -56,6 +56,7 @@ public class DialogAdjustTemperature extends WizardDialog {
 	protected IDialogSettings getDialogBoundsSettings() {
 
 		return _state;
+//		return null;
 	}
 
 }

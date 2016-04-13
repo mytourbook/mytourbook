@@ -309,6 +309,20 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 								return;
 							}
 						}
+
+						// ensure that wrong data are not displayed
+						clearView();
+					}
+
+				} else if (eventId == TourEventId.TOUR_CHANGED) {
+
+					if (_tourData == null) {
+						return;
+					}
+
+					if (_tourData.isMultipleTours) {
+
+						clearView();
 					}
 
 				} else if ((eventId == TourEventId.TOUR_SELECTION //

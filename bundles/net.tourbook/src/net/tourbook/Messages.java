@@ -117,7 +117,6 @@ public class Messages extends NLS {
 	public static String		Dialog_AdjustTemperature_Dialog_Title;
 	public static String		Dialog_AdjustTemperature_Info_TemperatureAdjustment;
 	public static String		Dialog_AdjustTemperature_Label_AvgTemperature;
-	public static String		Dialog_AdjustTemperature_Label_Progress;
 	public static String		Dialog_AdjustTemperature_Label_Progress_SubTask;
 	public static String		Dialog_AdjustTemperature_Label_Progress_Task;
 	public static String		Dialog_AdjustTemperature_Label_TemperatureAdjustmentDuration;
@@ -1018,6 +1017,14 @@ public class Messages extends NLS {
 	public static String		Log_Reimport_PreviousFiles;
 	public static String		Log_Reimport_PreviousFiles_End;
 	public static String		Log_Reimport_Tour;
+
+	public static String		Log_TemperatureAdjustment_001_Start;
+	public static String		Log_TemperatureAdjustment_002_End;
+	public static String		Log_TemperatureAdjustment_003_TourChanges;
+	public static String		Log_TemperatureAdjustment_005_TourIsTooShort;
+	public static String		Log_TemperatureAdjustment_006_IsAboveTemperature;
+	public static String		Log_TemperatureAdjustment_010_NoTemperatureDataSeries;
+	public static String		Log_TemperatureAdjustment_011_NoTimeDataSeries;
 
 	public static String		Log_Tour_DeleteTours;
 	public static String		Log_Tour_SaveTours;

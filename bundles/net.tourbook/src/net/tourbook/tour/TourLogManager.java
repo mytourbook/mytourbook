@@ -89,6 +89,15 @@ public class TourLogManager {
 		return isLogViewOpen;
 	}
 
+	public static void logDefault(final String message) {
+
+		final String logMessage = WEB.convertHTML_LineBreaks(message);
+
+		final TourLog tourLog = new TourLog(TourLogState.DEFAULT, logMessage);
+
+		addLog(tourLog);
+	}
+
 	public static void logError(final String message) {
 
 		final TourLog tourLog = new TourLog(TourLogState.IMPORT_ERROR, message);
@@ -141,14 +150,14 @@ public class TourLogManager {
 	}
 
 	public static void logSubError(final String message) {
-		
+
 		final String logMessage = WEB.convertHTML_LineBreaks(message);
-		
+
 		final TourLog tourLog = new TourLog(TourLogState.IMPORT_ERROR, logMessage);
-		
+
 		tourLog.css = TourLogView.CSS_LOG_INFO;
 		tourLog.isSubLogItem = true;
-		
+
 		addLog(tourLog);
 	}
 
@@ -160,6 +169,17 @@ public class TourLogManager {
 
 		tourLog.css = TourLogView.CSS_LOG_INFO;
 		tourLog.isSubLogItem = true;
+
+		addLog(tourLog);
+	}
+
+	public static void logTitle(final String message) {
+
+		final String logMessage = WEB.convertHTML_LineBreaks(message);
+
+		final TourLog tourLog = new TourLog(TourLogState.DEFAULT, logMessage);
+
+		tourLog.css = TourLogView.CSS_LOG_TITLE;
 
 		addLog(tourLog);
 	}

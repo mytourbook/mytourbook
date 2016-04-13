@@ -1833,9 +1833,11 @@ public class TourManager {
 		FTSearchManager.updateIndex(savedTours);
 
 		if (canFireNotification && doFireChangeEvent[0]) {
-			final TourEvent propertyData = new TourEvent(savedTours);
-			propertyData.tourDataEditorSavedTour = tourDataEditorSavedTour[0];
-			fireEvent(TourEventId.TOUR_CHANGED, propertyData);
+
+			final TourEvent tourEvent = new TourEvent(savedTours);
+			tourEvent.tourDataEditorSavedTour = tourDataEditorSavedTour[0];
+
+			fireEvent(TourEventId.TOUR_CHANGED, tourEvent);
 		}
 
 		return savedTours;

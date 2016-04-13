@@ -31,7 +31,6 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DateTime;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 
@@ -45,11 +44,6 @@ class DialogAdjustTemperature_WizardPage extends WizardPage {
 	 * UI controls
 	 */
 	private DateTime				_dtTemperatureAdjustmentDuration;
-
-	private Label					_lblAvgTemperature;
-	private Label					_lblTemperatureAdjustmentInfo;
-	private Label					_lblTemperatureAdjustmentDuration;
-	private Label					_lblTemperatureUnit;
 
 	private Spinner					_spinnerAvgTemperature;
 
@@ -77,11 +71,11 @@ class DialogAdjustTemperature_WizardPage extends WizardPage {
 	private Composite createUI(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 		GridDataFactory.fillDefaults()//
 				.grab(true, false)
 				.applyTo(container);
 		GridLayoutFactory.fillDefaults().applyTo(container);
-		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 		{
 			createUI_10_Controls(container);
 		}
@@ -101,29 +95,30 @@ class DialogAdjustTemperature_WizardPage extends WizardPage {
 				/*
 				 * Label: Temperature adjustment info
 				 */
-				_lblTemperatureAdjustmentInfo = new Label(container, SWT.WRAP | SWT.READ_ONLY);
-				_lblTemperatureAdjustmentInfo.setText(Messages.Dialog_AdjustTemperature_Info_TemperatureAdjustment);
+				final Label label = new Label(container, SWT.WRAP | SWT.READ_ONLY);
+				label.setText(Messages.Dialog_AdjustTemperature_Info_TemperatureAdjustment);
 				GridDataFactory.fillDefaults()//
 						.hint(_pc.convertWidthInCharsToPixels(60), SWT.DEFAULT)
 						.grab(true, false)
-						.applyTo(_lblTemperatureAdjustmentInfo);
+						.applyTo(label);
 			}
 
 			final Composite innerContainer = new Composite(container, SWT.NONE);
+//			innerContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 			GridLayoutFactory.fillDefaults().numColumns(3).applyTo(innerContainer);
-//			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 			{
 				{
+					final int verticalIndent = _pc.convertVerticalDLUsToPixels(4);
+
 					/*
 					 * Label: Adjustment duration
 					 */
-					_lblTemperatureAdjustmentDuration = new Label(innerContainer, SWT.NONE);
-					_lblTemperatureAdjustmentDuration
-							.setText(Messages.Dialog_AdjustTemperature_Label_TemperatureAdjustmentDuration);
+					final Label label = new Label(innerContainer, SWT.NONE);
+					label.setText(Messages.Dialog_AdjustTemperature_Label_TemperatureAdjustmentDuration);
 					GridDataFactory.fillDefaults()//
 							.align(SWT.FILL, SWT.CENTER)
-							.indent(0, _pc.convertVerticalDLUsToPixels(4))
-							.applyTo(_lblTemperatureAdjustmentDuration);
+							.indent(0, verticalIndent)
+							.applyTo(label);
 
 					/*
 					 * DateTime: Duration
@@ -131,11 +126,16 @@ class DialogAdjustTemperature_WizardPage extends WizardPage {
 					_dtTemperatureAdjustmentDuration = new DateTime(innerContainer, SWT.TIME | SWT.MEDIUM | SWT.BORDER);
 					GridDataFactory.fillDefaults()//
 							.align(SWT.BEGINNING, SWT.FILL)
-							.indent(_pc.convertWidthInCharsToPixels(2), _pc.convertVerticalDLUsToPixels(4))
+							.indent(0, verticalIndent)
 							.applyTo(_dtTemperatureAdjustmentDuration);
 
-					// spacer
-					new Label(innerContainer, SWT.NONE);
+					// label: h
+					final Label unitLabel = new Label(innerContainer, SWT.NONE);
+					unitLabel.setText(UI.UNIT_LABEL_TIME);
+					GridDataFactory.fillDefaults()//
+							.align(SWT.FILL, SWT.CENTER)
+							.indent(0, verticalIndent)
+							.applyTo(unitLabel);
 				}
 
 				{
@@ -143,11 +143,11 @@ class DialogAdjustTemperature_WizardPage extends WizardPage {
 					 * Avg temperature
 					 */
 					// label
-					_lblAvgTemperature = new Label(innerContainer, SWT.NONE);
-					_lblAvgTemperature.setText(Messages.Dialog_AdjustTemperature_Label_AvgTemperature);
+					final Label label = new Label(innerContainer, SWT.NONE);
+					label.setText(Messages.Dialog_AdjustTemperature_Label_AvgTemperature);
 					GridDataFactory.fillDefaults()//
 							.align(SWT.FILL, SWT.CENTER)
-							.applyTo(_lblAvgTemperature);
+							.applyTo(label);
 
 					// spinner
 					_spinnerAvgTemperature = new Spinner(innerContainer, SWT.BORDER);
@@ -165,11 +165,11 @@ class DialogAdjustTemperature_WizardPage extends WizardPage {
 							.applyTo(_spinnerAvgTemperature);
 
 					// label: °C
-					_lblTemperatureUnit = new Label(innerContainer, SWT.NONE);
-					_lblTemperatureUnit.setText(UI.SYMBOL_TEMPERATURE);
+					final Label unitLabel = new Label(innerContainer, SWT.NONE);
+					unitLabel.setText(UI.SYMBOL_TEMPERATURE);
 					GridDataFactory.fillDefaults()//
 							.align(SWT.FILL, SWT.CENTER)
-							.applyTo(_lblTemperatureUnit);
+							.applyTo(unitLabel);
 				}
 			}
 		}
