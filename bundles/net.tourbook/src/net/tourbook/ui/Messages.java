@@ -174,6 +174,12 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_clouds_label;
 	public static String		ColumnFactory_clouds;
 	public static String		ColumnFactory_clouds_tooltip;
+
+	public static String		ColumnFactory_CadenceMultiplier_Header;
+	public static String		ColumnFactory_CadenceMultiplier_Label;
+	public static String		ColumnFactory_CadenceMultiplier_Tooltip;
+	public static String		ColumnFactory_CadenceMultiplier_Unit;
+
 	public static String		ColumnFactory_Category_Altitude;
 	public static String		ColumnFactory_Category_Body;
 	public static String		ColumnFactory_Category_Data;
@@ -414,6 +420,7 @@ public class Messages extends NLS {
 	public static String		Tour_Tooltip_Label_WindSpeed;
 
 	public static String		Value_Unit_Cadence;
+	public static String		Value_Unit_Cadence_Spm;
 	public static String		Value_Unit_Calories;
 	public static String		Value_Unit_Pulse;
 

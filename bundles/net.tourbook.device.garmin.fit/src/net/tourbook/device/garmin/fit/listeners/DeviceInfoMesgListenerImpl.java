@@ -32,13 +32,18 @@ public class DeviceInfoMesgListenerImpl extends AbstractMesgListener implements 
 				|| deviceType.equals(AntplusDeviceType.STRIDE_SPEED_DISTANCE);
 	}
 
+	private boolean hasStrideSensor(final Short deviceType) {
+
+		return deviceType.equals(AntplusDeviceType.STRIDE_SPEED_DISTANCE);
+	}
+
 	@Override
 	public void onMesg(final DeviceInfoMesg mesg) {
 
 		final Short deviceType = mesg.getDeviceType();
-		final Short antDeviceType = mesg.getAntDeviceType();
-		final Short antplusDeviceType = mesg.getAntplusDeviceType();
-
+//		final Short antDeviceType = mesg.getAntDeviceType();
+//		final Short antplusDeviceType = mesg.getAntplusDeviceType();
+//
 //		final AntNetwork antNetwork = mesg.getAntNetwork();
 //		final BodyLocation sensorPosition = mesg.getSensorPosition();
 //		final DateTime timestamp = mesg.getTimestamp();
@@ -51,9 +56,6 @@ public class DeviceInfoMesgListenerImpl extends AbstractMesgListener implements 
 //		final Long serialNumber = mesg.getSerialNumber();
 //		final Short antTransmissionType = mesg.getAntTransmissionType();
 //
-//		final Short antDeviceType = mesg.getAntDeviceType();
-//		final Short antplusDeviceType = mesg.getAntplusDeviceType();
-//		final Short deviceType = mesg.getDeviceType();
 //		final Short deviceIndex = mesg.getDeviceIndex();
 //
 //		final Float batteryVoltage = mesg.getBatteryVoltage();
@@ -63,33 +65,28 @@ public class DeviceInfoMesgListenerImpl extends AbstractMesgListener implements 
 //		final String descriptor = mesg.getDescriptor();
 //		final String productName = mesg.getProductName();
 //
-//		if (serialNumber != null && batteryVoltage != null) {
+////		if (serialNumber != null && batteryVoltage != null) {
 //
-//			final long javaTime = (timestamp.getTimestamp() * 1000) + com.garmin.fit.DateTime.OFFSET;
+//		final long javaTime = (timestamp.getTimestamp() * 1000) + com.garmin.fit.DateTime.OFFSET;
 //
-////			System.out.println();
-////			System.out.println(String.format("manufacturer:   %s", manufacturer == null ? "" : manufacturer));
-////			System.out.println(String.format("product:        %s", product == null ? "" : product));
-////			System.out.println(String.format("productName:    %s", productName == null ? "" : productName));
-////			System.out.println(String.format("deviceType:     %s", deviceType == null ? "" : deviceType));
-////			System.out.println(String.format("serialNumber:   %s", serialNumber == null ? "" : serialNumber));
-////			System.out.println(String.format("batteryVoltage: %s", batteryVoltage == null ? "" : batteryVoltage));
+//		System.out.println(String.format("%s %10s %10s", //
 //
-//			System.out.println(String.format("%s,%s,%s", //
+//				_dtFormatter.print(javaTime),
 //
-//					_dtFormatter.print(javaTime),
-//					serialNumber,
-//					batteryVoltage
-//			//
-//					));
-//			// TODO remove SYSTEM.OUT.PRINTLN
-//		}
+//				deviceType,
+////				antDeviceType,
+//				antplusDeviceType
+//				//
+//				));
+//		// TODO remove SYSTEM.OUT.PRINTLN
+////		}
 
 		if (deviceType != null) {
 
 			final boolean hasSpeedSensor = hasSpeedSensor(deviceType);
 			final boolean hasHeartRateSensor = hasHeartRateSensor(deviceType);
 			final boolean hasPowerSensor = hasPowerSensor(deviceType);
+			final boolean hasStrideSensor = hasStrideSensor(deviceType);
 
 			/*
 			 * This event occures several times and can set a true to false, therefore only true is
@@ -107,10 +104,14 @@ public class DeviceInfoMesgListenerImpl extends AbstractMesgListener implements 
 			if (hasPowerSensor) {
 				context.setPowerSensorPresent(hasPowerSensor);
 			}
+
+			if (hasStrideSensor) {
+				context.setStrideSensorPresent(hasStrideSensor);
+			}
 		}
 
-		if (deviceType != null || antDeviceType != null || antplusDeviceType != null) {
-
+//		if (deviceType != null || antDeviceType != null || antplusDeviceType != null) {
+//
 //			System.out.println(String.format("\n"//
 //					+ "DeviceInfoMesg" //
 //					+ "\tdev %d" //
@@ -124,7 +125,7 @@ public class DeviceInfoMesgListenerImpl extends AbstractMesgListener implements 
 //			//
 //					));
 //			// TODO remove SYSTEM.OUT.PRINTLN
-		}
+//		}
 	}
 
 }

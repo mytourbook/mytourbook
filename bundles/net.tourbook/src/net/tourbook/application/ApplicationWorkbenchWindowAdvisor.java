@@ -40,6 +40,7 @@ import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.TourTypeFilterManager;
 import net.tourbook.tour.TourTypeMenuManager;
 import net.tourbook.tour.photo.TourPhotoManager;
+import net.tourbook.ui.FormatManager;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.views.rawData.RawDataView;
 import net.tourbook.web.WebContentServer;
@@ -499,6 +500,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 		// must be initialized early to set photoServiceProvider in the Photo
 		TourPhotoManager.restoreState();
+
+		FormatManager.updateDisplayFormats();
 	}
 
 	@Override
@@ -524,9 +527,11 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 	}
 
 	private void recomputeTitle() {
+
 		final IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
 		final String oldTitle = configurer.getTitle();
 		final String newTitle = computeTitle();
+
 		if (!newTitle.equals(oldTitle)) {
 			configurer.setTitle(newTitle);
 		}

@@ -38,9 +38,10 @@ public class FitContext {
 
 	private FitContextData			_contextData;
 
-	private boolean					_isSpeedSensorPresent;
 	private boolean					_isHeartRateSensorPresent;
 	private boolean					_isPowerSensorPresent;
+	private boolean					_isSpeedSensorPresent;
+	private boolean					_isStrideSensorPresent;
 
 	private String					_deviceId;
 	private String					_manufacturer;
@@ -103,9 +104,10 @@ public class FitContext {
 				tourData.setDeviceFirmwareVersion(_softwareVersion);
 				tourData.setDeviceTimeInterval((short) -1);
 
-				tourData.setIsDistanceFromSensor(_isSpeedSensorPresent);
 				tourData.setIsPulseSensorPresent(_isHeartRateSensorPresent);
 				tourData.setIsPowerSensorPresent(_isPowerSensorPresent);
+				tourData.setIsDistanceFromSensor(_isSpeedSensorPresent);
+				tourData.setIsStrideSensorPresent(_isStrideSensorPresent);
 
 				final long recordStartTime = timeDataList.get(0).absoluteTime;
 				final long sessionStartTime = _sessionTime.getMillis();
@@ -444,6 +446,10 @@ public class FitContext {
 
 	public void setSpeedSensorPresent(final boolean speedSensorPresent) {
 		_isSpeedSensorPresent = speedSensorPresent;
+	}
+
+	public void setStrideSensorPresent(final boolean hasStrideSensor) {
+		_isStrideSensorPresent = hasStrideSensor;
 	}
 
 }

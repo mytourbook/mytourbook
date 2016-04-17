@@ -27,6 +27,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.ui.FormatManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.Messages;
 import net.tourbook.ui.action.ActionTourToolTipEditQuick;
@@ -74,12 +75,15 @@ public class TourInfoUI {
 
 	private final NumberFormat			_nf0					= NumberFormat.getNumberInstance();
 	private final NumberFormat			_nf1					= NumberFormat.getInstance();
+	private final NumberFormat			_nf2					= NumberFormat.getInstance();
 	private final NumberFormat			_nf3					= NumberFormat.getInstance();
 	{
 		_nf0.setMinimumFractionDigits(0);
 		_nf0.setMaximumFractionDigits(0);
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
+		_nf2.setMinimumFractionDigits(2);
+		_nf2.setMaximumFractionDigits(2);
 		_nf3.setMinimumFractionDigits(3);
 		_nf3.setMaximumFractionDigits(3);
 	}
@@ -1140,8 +1144,16 @@ public class TourInfoUI {
 		_lblAvgPulseUnit.setText(Messages.Value_Unit_Pulse);
 
 		// avg cadence
-		_lblAvgCadence.setText(_nf1.format(_tourData.getAvgCadence()));
-		_lblAvgCadenceUnit.setText(Messages.Value_Unit_Cadence);
+		final float avgCadence = _tourData.getAvgCadence() * _tourData.getCadenceMultiplier();
+		_lblAvgCadence.setText(FormatManager.isAvgCadence_1_2 //
+				? _nf2.format(avgCadence)
+				: FormatManager.isAvgCadence_1_1 //
+						? _nf1.format(avgCadence)
+						: _nf0.format(avgCadence));
+
+		_lblAvgCadenceUnit.setText(_tourData.isCadenceSpm()
+				? Messages.Value_Unit_Cadence_Spm
+				: Messages.Value_Unit_Cadence);
 
 		// avg power
 		_lblAvg_Power.setText(_nf0.format(_tourData.getPower_Avg()));

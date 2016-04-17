@@ -39,7 +39,7 @@ import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.preferences.PrefPageViewColors;
+import net.tourbook.preferences.PrefPageAppearanceDisplayFormat;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
 import net.tourbook.tour.ActionOpenMarkerDialog;
@@ -2116,11 +2116,11 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
 	private void readDisplayFormats() {
 
-		_isRecTimeFormat_hhmmss = _prefStore.getString(ITourbookPreferences.VIEW_LAYOUT_RECORDING_TIME_FORMAT).equals(
-				PrefPageViewColors.VIEW_TIME_LAYOUT_HH_MM_SS);
+		_isRecTimeFormat_hhmmss = _prefStore.getString(ITourbookPreferences.DISPLAY_FORMAT_RECORDING_TIME).equals(
+				PrefPageAppearanceDisplayFormat.DISPLAY_FORMAT_HH_MM_SS);
 
-		_isDriveTimeFormat_hhmmss = _prefStore.getString(ITourbookPreferences.VIEW_LAYOUT_DRIVING_TIME_FORMAT).equals(
-				PrefPageViewColors.VIEW_TIME_LAYOUT_HH_MM_SS);
+		_isDriveTimeFormat_hhmmss = _prefStore.getString(ITourbookPreferences.DISPLAY_FORMAT_DRIVING_TIME).equals(
+				PrefPageAppearanceDisplayFormat.DISPLAY_FORMAT_HH_MM_SS);
 	}
 
 	@Override

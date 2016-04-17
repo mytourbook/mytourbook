@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -97,9 +97,10 @@ public class TourDatabase {
 	/**
 	 * version for the database which is required that the tourbook application works successfully
 	 */
-	private static final int						TOURBOOK_DB_VERSION							= 30;
+	private static final int						TOURBOOK_DB_VERSION							= 31;
 
-//	private static final int						TOURBOOK_DB_VERSION							= 30;	// 16.?
+//	private static final int						TOURBOOK_DB_VERSION							= 31;	// 16.5?
+//	private static final int						TOURBOOK_DB_VERSION							= 30;	// 16.1
 //	private static final int						TOURBOOK_DB_VERSION							= 29;	// 15.12
 //	private static final int						TOURBOOK_DB_VERSION							= 28;	// 15.6
 //	private static final int						TOURBOOK_DB_VERSION							= 27;	// 15.3.1
@@ -221,6 +222,7 @@ public class TourDatabase {
 																										+ "_" + ENTITY_ID_TYPE;			//$NON-NLS-1$
 	//
 	private static final String						DEFAULT_0									= "0";										//$NON-NLS-1$
+	private static final String						DEFAULT_1_0									= "1.0";									//$NON-NLS-1$
 	//
 	private static volatile TourDatabase			_instance;
 
@@ -1911,6 +1913,11 @@ public class TourDatabase {
 			return null;
 		}
 
+		/*
+		 * Removed cached data
+		 */
+		TourManager.clearMultipleTourData();
+
 		/**
 		 * ensure HR zones are computed, it requires that a person is set which is not the case when
 		 * a device importer calls the method {@link TourData#computeComputedValues()}
@@ -2569,7 +2576,7 @@ public class TourDatabase {
 				//
 				// version 29 end ---------
 
-				// version 30 start  -  16.x
+				// version 30 start  -  16.1
 				//
 				+ "	power_Avg								FLOAT DEFAULT 0,								\n" //$NON-NLS-1$
 				+ "	power_Max								INTEGER DEFAULT 0,								\n" //$NON-NLS-1$
@@ -2587,6 +2594,13 @@ public class TourDatabase {
 				+ " power_AvgRightPedalSmoothness			FLOAT DEFAULT 0,								\n" //$NON-NLS-1$
 				//
 				// version 30 end ---------
+
+				// version 31 start  -  16.5?
+				//
+				+ "	CadenceMultiplier						FLOAT DEFAULT 1.0,								\n" //$NON-NLS-1$
+				+ " IsStrideSensorPresent					INTEGER DEFAULT 0,								\n" //$NON-NLS-1$
+				//
+				// version 31 end ---------
 
 				+ "	serieData				BLOB 															\n" //$NON-NLS-1$
 
@@ -4066,6 +4080,13 @@ public class TourDatabase {
 			 */
 			if (currentDbVersion == 29) {
 				currentDbVersion = newVersion = updateDbDesign_029_to_030(conn, monitor);
+			}
+
+			/*
+			 * 30 -> 31
+			 */
+			if (currentDbVersion == 30) {
+				currentDbVersion = newVersion = updateDbDesign_030_to_031(conn, monitor);
 			}
 
 			/*
@@ -5910,6 +5931,30 @@ public class TourDatabase {
 				SQL.AddCol_Float(stmt, TABLE_TOUR_DATA, "power_AvgRightTorqueEffectiveness", DEFAULT_0); //$NON-NLS-1$
 				SQL.AddCol_Float(stmt, TABLE_TOUR_DATA, "power_AvgLeftPedalSmoothness", DEFAULT_0); //$NON-NLS-1$
 				SQL.AddCol_Float(stmt, TABLE_TOUR_DATA, "power_AvgRightPedalSmoothness", DEFAULT_0); //$NON-NLS-1$
+			}
+		}
+		stmt.close();
+
+		logDb_UpdateEnd(newDbVersion);
+
+		return newDbVersion;
+	}
+
+	private int updateDbDesign_030_to_031(final Connection conn, final IProgressMonitor monitor) throws SQLException {
+
+		final int newDbVersion = 31;
+
+		logDb_UpdateStart(newDbVersion);
+		updateMonitor(monitor, newDbVersion);
+
+		final Statement stmt = conn.createStatement();
+		{
+			// check if db is updated to version 31
+			if (isColumnAvailable(conn, TABLE_TOUR_DATA, "CadenceMultiplier") == false) { //$NON-NLS-1$
+
+				// Add new columns
+				SQL.AddCol_Float(stmt, TABLE_TOUR_DATA, "CadenceMultiplier", DEFAULT_1_0); //$NON-NLS-1$
+				SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "IsStrideSensorPresent", DEFAULT_0); //$NON-NLS-1$
 			}
 		}
 		stmt.close();

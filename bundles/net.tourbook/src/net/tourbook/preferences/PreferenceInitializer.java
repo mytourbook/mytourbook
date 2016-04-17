@@ -303,14 +303,33 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 				new RGB(0xFC, 0xFF, 0xE3));
 
 		/*
-		 * view formats
+		 * display formats
 		 */
+		store.setDefault(ITourbookPreferences.DISPLAY_FORMAT_IS_LIVE_UPDATE, true);
+
+		store.setDefault(//
+				ITourbookPreferences.DISPLAY_FORMAT_AVG_CADENCE,
+				PrefPageAppearanceDisplayFormat.DISPLAY_FORMAT_1);
+
+		store.setDefault(//
+				ITourbookPreferences.DISPLAY_FORMAT_AVG_POWER,
+				PrefPageAppearanceDisplayFormat.DISPLAY_FORMAT_1);
+
+		store.setDefault(//
+				ITourbookPreferences.DISPLAY_FORMAT_AVG_PULSE,
+				PrefPageAppearanceDisplayFormat.DISPLAY_FORMAT_1);
+
 		store.setDefault(
-				ITourbookPreferences.VIEW_LAYOUT_RECORDING_TIME_FORMAT,
-				PrefPageViewColors.VIEW_TIME_LAYOUT_HH_MM);
+				ITourbookPreferences.DISPLAY_FORMAT_CALORIES,
+				PrefPageAppearanceDisplayFormat.DISPLAY_FORMAT_KCAL);
+
 		store.setDefault(
-				ITourbookPreferences.VIEW_LAYOUT_DRIVING_TIME_FORMAT,
-				PrefPageViewColors.VIEW_TIME_LAYOUT_HH_MM);
+				ITourbookPreferences.DISPLAY_FORMAT_RECORDING_TIME,
+				PrefPageAppearanceDisplayFormat.DISPLAY_FORMAT_HH_MM);
+
+		store.setDefault(
+				ITourbookPreferences.DISPLAY_FORMAT_DRIVING_TIME,
+				PrefPageAppearanceDisplayFormat.DISPLAY_FORMAT_HH_MM);
 
 		store.setDefault(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES, false);
 

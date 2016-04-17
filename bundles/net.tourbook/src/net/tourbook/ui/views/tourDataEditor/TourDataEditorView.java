@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -149,6 +149,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -509,6 +510,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 */
 	private Combo								_comboTitle;
 
+	private Button								_rdoCadence_Rpm;
+	private Button								_rdoCadence_Spm;
+
 	private CLabel								_lblCloudIcon;
 	private CLabel								_lblTourType;
 
@@ -565,6 +569,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private Text								_txtPowerSensor;
 	private Text								_txtPerson;
 	private Text								_txtRefTour;
+	private Text								_txtStrideSensor;
 	private Text								_txtTimeSlicesCount;
 	private Text								_txtTourId;
 
@@ -3128,55 +3133,85 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 		{
-			/*
-			 * tags
-			 */
-			_linkTag = new Link(container, SWT.NONE);
-			_linkTag.setText(Messages.tour_editor_label_tour_tag);
-			GridDataFactory.fillDefaults()//
-					.align(SWT.BEGINNING, SWT.BEGINNING)
-					.applyTo(_linkTag);
-			_linkTag.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					net.tourbook.common.UI.openControlMenu(_linkTag);
+			{
+				/*
+				 * tags
+				 */
+				_linkTag = new Link(container, SWT.NONE);
+				_linkTag.setText(Messages.tour_editor_label_tour_tag);
+				GridDataFactory.fillDefaults()//
+						.align(SWT.BEGINNING, SWT.BEGINNING)
+						.applyTo(_linkTag);
+				_linkTag.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						net.tourbook.common.UI.openControlMenu(_linkTag);
+					}
+				});
+				_tk.adapt(_linkTag, true, true);
+				_firstColumnControls.add(_linkTag);
+
+				_lblTourTags = _tk.createLabel(container, UI.EMPTY_STRING, SWT.WRAP);
+				GridDataFactory.fillDefaults()//
+						.grab(true, true)
+						/*
+						 * hint is necessary that the width is not expanded when the text is long
+						 */
+						.hint(2 * _hintTextColumnWidth, SWT.DEFAULT)
+						.span(3, 1)
+						.applyTo(_lblTourTags);
+			}
+
+			{
+				/*
+				 * tour type
+				 */
+				_linkTourType = new Link(container, SWT.NONE);
+				_linkTourType.setText(Messages.tour_editor_label_tour_type);
+				_linkTourType.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						net.tourbook.common.UI.openControlMenu(_linkTourType);
+					}
+				});
+				_tk.adapt(_linkTourType, true, true);
+				_firstColumnControls.add(_linkTourType);
+
+				_lblTourType = new CLabel(container, SWT.NONE);
+				GridDataFactory.swtDefaults()//
+						.grab(true, false)
+						.span(3, 1)
+						.applyTo(_lblTourType);
+			}
+
+			{
+				/*
+				 * Cadence: rpm/spm
+				 */
+
+				// label
+				final Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_Cadence);
+				label.setToolTipText(Messages.Tour_Editor_Label_Cadence_Tooltip);
+				_firstColumnControls.add(label);
+
+				final Composite radioContainer = new Composite(container, SWT.NONE);
+				GridLayoutFactory.fillDefaults().numColumns(2).applyTo(radioContainer);
+				{
+					// ratio: rpm
+					_rdoCadence_Rpm = _tk.createButton(
+							radioContainer,
+							Messages.Tour_Editor_Radio_Cadence_Rpm,
+							SWT.RADIO);
+					_rdoCadence_Rpm.addSelectionListener(_selectionListener);
+
+					// radio: spm
+					_rdoCadence_Spm = _tk.createButton(
+							radioContainer,
+							Messages.Tour_Editor_Radio_Cadence_Spm,
+							SWT.RADIO);
+					_rdoCadence_Spm.addSelectionListener(_selectionListener);
 				}
-			});
-			_tk.adapt(_linkTag, true, true);
-			_firstColumnControls.add(_linkTag);
-//			_linkTag.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-
-			_lblTourTags = _tk.createLabel(container, UI.EMPTY_STRING, SWT.WRAP);
-			GridDataFactory.fillDefaults()//
-					.grab(true, true)
-					/*
-					 * hint is necessary that the width is not expanded when the text is long
-					 */
-					.hint(2 * _hintTextColumnWidth, SWT.DEFAULT)
-					.span(3, 1)
-					.applyTo(_lblTourTags);
-//			_lblTourTags.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-
-			/*
-			 * tour type
-			 */
-			_linkTourType = new Link(container, SWT.NONE);
-			_linkTourType.setText(Messages.tour_editor_label_tour_type);
-			_linkTourType.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					net.tourbook.common.UI.openControlMenu(_linkTourType);
-				}
-			});
-			_tk.adapt(_linkTourType, true, true);
-			_firstColumnControls.add(_linkTourType);
-
-			_lblTourType = new CLabel(container, SWT.NONE);
-			GridDataFactory.swtDefaults()//
-					.grab(true, false)
-					.span(3, 1)
-					.applyTo(_lblTourType);
-//			_lblTourType.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+			}
 		}
 	}
 
@@ -3240,6 +3275,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			_txtDistanceSensor = createUI_FieldText(container);
 			_txtDistanceSensor.setToolTipText(Messages.Tour_Editor_Label_DeviceSensor_Tooltip);
+
+			/*
+			 * stride sensor
+			 */
+			_tk.createLabel(container, Messages.Tour_Editor_Label_StrideSensor);
+
+			_txtStrideSensor = createUI_FieldText(container);
+			_txtStrideSensor.setToolTipText(Messages.Tour_Editor_Label_DeviceSensor_Tooltip);
 
 			/*
 			 * pulse sensor
@@ -4333,6 +4376,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_spinWindSpeedValue.setEnabled(canEdit);
 		_comboWindDirectionText.setEnabled(canEdit);
 		_comboWindSpeedText.setEnabled(canEdit);
+
+		_rdoCadence_Rpm.setEnabled(canEdit);
+		_rdoCadence_Spm.setEnabled(canEdit);
 
 		_dtTourDate.setEnabled(canEdit);
 		_dtStartTime.setEnabled(canEdit);
@@ -6146,6 +6192,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_tourData.setCalories(_spinTourCalories.getSelection());
 			_tourData.setRestPulse(_spinRestPuls.getSelection());
 
+			_tourData.setCadenceMultiplier(_rdoCadence_Rpm.getSelection() ? 1.0f : 2.0f);
+
 			_tourData.setWeather(_txtWeather.getText().trim());
 			_tourData.setWeatherWindDir(_spinWindDirectionValue.getSelection());
 			if (_isWindSpeedManuallyModified) {
@@ -6601,6 +6649,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_lblTemperatureUnit.setText(UI.UNIT_LABEL_TEMPERATURE);
 		_lblSpeedUnit.setText(UI.UNIT_LABEL_SPEED);
 
+		// cadence rpm/spm
+		final float cadence = _tourData.getCadenceMultiplier();
+		final boolean isSpm = cadence == 2.0f;
+		_rdoCadence_Rpm.setSelection(!isSpm);
+		_rdoCadence_Spm.setSelection(isSpm);
+
 		/*
 		 * layout container to resize labels
 		 */
@@ -6654,6 +6708,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		// distance sensor
 		_txtDistanceSensor.setText(_tourData.isDistanceSensorPresent()
+				? Messages.Tour_Editor_Label_Sensor_Yes
+				: Messages.Tour_Editor_Label_Sensor_No);
+
+		// stride sensor
+		_txtStrideSensor.setText(_tourData.isStrideSensorPresent()
 				? Messages.Tour_Editor_Label_Sensor_Yes
 				: Messages.Tour_Editor_Label_Sensor_No);
 

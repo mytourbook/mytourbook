@@ -284,15 +284,22 @@ public interface ITourbookPreferences {
 	public static final String	VIEW_LAYOUT_CHANGED								= "view.layout.changed";									//$NON-NLS-1$
 	public static final String	VIEW_LAYOUT_DISPLAY_LINES						= "view.layout.display.lines";								//$NON-NLS-1$
 
+	public static final String	VIEW_LAYOUT_COLOR_BG_HISTORY_TOUR				= "VIEW_LAYOUT_COLOR_BG_HISTORY_TOUR";						//$NON-NLS-1$
 	public static final String	VIEW_LAYOUT_COLOR_CATEGORY						= "view.layout.color.category";							//$NON-NLS-1$
-	public static final String	VIEW_LAYOUT_COLOR_TITLE							= "view.layout.color.title";								//$NON-NLS-1$
 	public static final String	VIEW_LAYOUT_COLOR_SUB							= "view.layout.color.sub";									//$NON-NLS-1$
 	public static final String	VIEW_LAYOUT_COLOR_SUB_SUB						= "view.layout.color.sub-sub";								//$NON-NLS-1$
+	public static final String	VIEW_LAYOUT_COLOR_TITLE							= "view.layout.color.title";								//$NON-NLS-1$
 	public static final String	VIEW_LAYOUT_COLOR_TOUR							= "view.layout.color.tour";								//$NON-NLS-1$
-	public static final String	VIEW_LAYOUT_COLOR_BG_HISTORY_TOUR				= "VIEW_LAYOUT_COLOR_BG_HISTORY_TOUR";						//$NON-NLS-1$
 
-	public static final String	VIEW_LAYOUT_RECORDING_TIME_FORMAT				= "view.layout.recording-time-format";						//$NON-NLS-1$
-	public static final String	VIEW_LAYOUT_DRIVING_TIME_FORMAT					= "view.layout.driving-time-format";						//$NON-NLS-1$
+	public static final String	DISPLAY_FORMAT_AVG_CADENCE						= "DISPLAY_FORMAT_AVG_CADENCE";							//$NON-NLS-1$
+	public static final String	DISPLAY_FORMAT_AVG_POWER						= "DISPLAY_FORMAT_AVG_POWER";								//$NON-NLS-1$
+	public static final String	DISPLAY_FORMAT_AVG_PULSE						= "DISPLAY_FORMAT_AVG_PULSE";								//$NON-NLS-1$
+	public static final String	DISPLAY_FORMAT_CALORIES							= "DISPLAY_FORMAT_CALORIES";								//$NON-NLS-1$
+
+	public static final String	DISPLAY_FORMAT_DRIVING_TIME						= "view.layout.driving-time-format";						//$NON-NLS-1$
+	public static final String	DISPLAY_FORMAT_RECORDING_TIME					= "view.layout.recording-time-format";						//$NON-NLS-1$
+
+	public static final String	DISPLAY_FORMAT_IS_LIVE_UPDATE					= "DISPLAY_FORMAT_IS_LIVE_UPDATE";							//$NON-NLS-1$
 
 	/*
 	 * layout for maps

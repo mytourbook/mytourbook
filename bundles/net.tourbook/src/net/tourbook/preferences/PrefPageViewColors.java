@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,7 +26,6 @@ import org.eclipse.jface.layout.LayoutConstants;
 import org.eclipse.jface.preference.ColorFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.preference.RadioGroupFieldEditor;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
@@ -38,10 +37,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageViewColors extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-	public static final String		VIEW_TIME_LAYOUT_HH_MM		= "hh_mm";											//$NON-NLS-1$
-	public static final String		VIEW_TIME_LAYOUT_HH_MM_SS	= "hh_mm_ss";										//$NON-NLS-1$
-
-	private final IPreferenceStore	_prefStore					= TourbookPlugin.getDefault().getPreferenceStore();
+	private final IPreferenceStore	_prefStore	= TourbookPlugin.getPrefStore();
 
 	private boolean					_isOtherModified;
 
@@ -59,7 +55,6 @@ public class PrefPageViewColors extends FieldEditorPreferencePage implements IWo
 			GridLayoutFactory.fillDefaults().applyTo(parent);
 
 			createUI10Colors(parent);
-			createUI20TimeFormat(parent);
 		}
 	}
 
@@ -135,49 +130,6 @@ public class PrefPageViewColors extends FieldEditorPreferencePage implements IWo
 				editorLinesControl.setToolTipText(Messages.pref_view_layout_display_lines_Tooltip);
 			}
 		}
-	}
-
-	private void createUI20TimeFormat(final Composite parent) {
-
-		/*
-		 * group: column time format
-		 */
-		final Group formatGroup = new Group(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().applyTo(formatGroup);
-		formatGroup.setText(Messages.pref_view_layout_group_display_format);
-		{
-			/*
-			 * recording time format: hh:mm
-			 */
-			addField(new RadioGroupFieldEditor(
-					ITourbookPreferences.VIEW_LAYOUT_RECORDING_TIME_FORMAT,
-					Messages.pref_view_layout_label_recording_time_format,
-					2,
-					new String[][] {
-							{ Messages.pref_view_layout_label_format_hh_mm, VIEW_TIME_LAYOUT_HH_MM },
-							{ Messages.pref_view_layout_label_format_hh_mm_ss, VIEW_TIME_LAYOUT_HH_MM_SS } },
-					formatGroup,
-					false));
-
-			/*
-			 * driving time format: hh:mm
-			 */
-			addField(new RadioGroupFieldEditor(
-					ITourbookPreferences.VIEW_LAYOUT_DRIVING_TIME_FORMAT,
-					Messages.pref_view_layout_label_driving_time_format,
-					2,
-					new String[][] {
-							{ Messages.pref_view_layout_label_format_hh_mm, VIEW_TIME_LAYOUT_HH_MM },
-							{ Messages.pref_view_layout_label_format_hh_mm_ss, VIEW_TIME_LAYOUT_HH_MM_SS } },
-					formatGroup,
-					false));
-		}
-
-		// set group margin after the fields are created
-		final GridLayout gl = (GridLayout) formatGroup.getLayout();
-		gl.marginHeight = 5;
-		gl.marginWidth = 5;
-		gl.numColumns = 2;
 	}
 
 	private void fireModifyEvent() {

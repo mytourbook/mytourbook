@@ -49,7 +49,6 @@ import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.preferences.PrefPageViewColors;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
 import net.tourbook.tour.ActionOpenMarkerDialog;
@@ -62,10 +61,12 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourTypeMenuManager;
 import net.tourbook.tour.printing.ActionPrint;
+import net.tourbook.ui.FormatManager;
 import net.tourbook.ui.ITourProvider2;
 import net.tourbook.ui.ITourProviderByID;
 import net.tourbook.ui.TreeColumnFactory;
 import net.tourbook.ui.action.ActionAdjustTemperature;
+import net.tourbook.ui.action.ActionCadenceSubMenu;
 import net.tourbook.ui.action.ActionCollapseAll;
 import net.tourbook.ui.action.ActionCollapseOthers;
 import net.tourbook.ui.action.ActionComputeDistanceValuesFromGeoposition;
@@ -143,6 +144,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
 	static public final String							ID									= "net.tourbook.views.tourListView";						//$NON-NLS-1$
 
+	private static final String							COLUMN_FACTORY_CALORIES				= net.tourbook.ui.Messages.ColumnFactory_calories;
+	private static final String							COLUMN_FACTORY_KCAL					= net.tourbook.ui.Messages.ColumnFactory_kcal;
 	private static final String							GRAPH_LABEL_HEARTBEAT_UNIT			= net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
 
 	private static final String							STATE_CSV_EXPORT_PATH				= "STATE_CSV_EXPORT_PATH";									//$NON-NLS-1$
@@ -262,8 +265,13 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
 	private boolean										_isInStartup;
 	private boolean										_isInReload;
-	private boolean										_isRecTimeFormat_hhmmss;
-	private boolean										_isDriveTimeFormat_hhmmss;
+
+	// display formats
+//	private boolean										_isCadenceFormat_1_1;
+//	private boolean										_isCadenceFormat_1_2;
+//	private boolean										_isCaloriesFormat_cal;
+//	private boolean										_isDriveTimeFormat_hhmmss;
+//	private boolean										_isRecTimeFormat_hhmmss;
 
 	private boolean										_isToolTipInDate;
 	private boolean										_isToolTipInTags;
@@ -297,9 +305,12 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 	private ActionReimportSubMenu						_actionReimportSubMenu;
 	private ActionSelectAllTours						_actionSelectAllTours;
 	private ActionSetAltitudeValuesFromSRTM				_actionSetAltitudeFromSRTM;
+	private ActionCadenceSubMenu						_actionSetCadenceSubMenu;
 	private ActionSetTourTypeMenu						_actionSetTourType;
 	private ActionSetPerson								_actionSetOtherPerson;
 	private ActionToggleMonthWeek						_actionToggleMonthWeek;
+
+	private TreeColumnDefinition						_colDef_BodyCalories;
 
 	/*
 	 * UI controls
@@ -527,8 +538,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
 					// measurement system has changed
 
-//					UI.updateUnits();
-
 					_columnManager.saveState(_state);
 					_columnManager.clearColumns();
 					defineAllColumns(_viewerContainer);
@@ -537,7 +546,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
 				} else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
-					readDisplayFormats();
+					updateDisplayFormats();
 
 					_tourViewer.getTree().setLinesVisible(
 							_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
@@ -630,6 +639,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 		_actionRefreshView = new ActionRefreshView(this);
 		_actionReimportSubMenu = new ActionReimportSubMenu(this);
 		_actionSetAltitudeFromSRTM = new ActionSetAltitudeValuesFromSRTM(this);
+		_actionSetCadenceSubMenu = new ActionCadenceSubMenu(this);
 		_actionSetOtherPerson = new ActionSetPerson(this);
 		_actionSetTourType = new ActionSetTourTypeMenu(this);
 		_actionSelectAllTours = new ActionSelectAllTours(this);
@@ -661,7 +671,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 		// set selection provider
 		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
 
-		readDisplayFormats();
+		updateDisplayFormats();
 		restoreState();
 
 		enableActions();
@@ -855,6 +865,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
 		// Powertrain - Antrieb/Pedal
 		defineColumn_Powertrain_AvgCadence();
+		defineColumn_Powertrain_CadenceMultiplier();
 		defineColumn_Powertrain_Gear_FrontShiftCount();
 		defineColumn_Powertrain_Gear_RearShiftCount();
 		defineColumn_Powertrain_AvgLeftPedalSmoothness();
@@ -970,7 +981,12 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				if (dbAvgPulse == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(_nf0.format(dbAvgPulse));
+
+					if (FormatManager.isAvgPulse_1_1) {
+						cell.setText(_nf1.format(dbAvgPulse));
+					} else {
+						cell.setText(_nf0.format(dbAvgPulse));
+					}
 				}
 
 				setCellColor(cell, element);
@@ -983,9 +999,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 	 */
 	private void defineColumn_Body_Calories() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.BODY_CALORIES.createColumn(_columnManager, _pc);
-		//colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
+		_colDef_BodyCalories = TreeColumnFactory.BODY_CALORIES.createColumn(_columnManager, _pc);
+		_colDef_BodyCalories.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
 
@@ -995,7 +1010,11 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				if (calories == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(_nf1.format((double) calories / 1000));
+					if (FormatManager.isCalories_cal) {
+						cell.setText(Long.toString(calories));
+					} else {
+						cell.setText(_nf1.format((double) calories / 1000));
+					}
 				}
 
 				setCellColor(cell, element);
@@ -1372,7 +1391,12 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				if (dbValue == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(_nf0.format(dbValue));
+
+					if (FormatManager.isAvgPower_1_1) {
+						cell.setText(_nf1.format(dbValue));
+					} else {
+						cell.setText(_nf0.format(dbValue));
+					}
 				}
 
 				setCellColor(cell, element);
@@ -1464,12 +1488,20 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 			public void update(final ViewerCell cell) {
 
 				final Object element = cell.getElement();
+
 				final float dbAvgCadence = ((TVITourBookItem) element).colAvgCadence;
 
 				if (dbAvgCadence == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(_nf0.format(dbAvgCadence));
+
+					if (FormatManager.isAvgCadence_1_2) {
+						cell.setText(_nf2.format(dbAvgCadence));
+					} else if (FormatManager.isAvgCadence_1_1) {
+						cell.setText(_nf1.format(dbAvgCadence));
+					} else {
+						cell.setText(_nf0.format(dbAvgCadence));
+					}
 				}
 
 				setCellColor(cell, element);
@@ -1575,6 +1607,32 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 					cell.setText(UI.EMPTY_STRING);
 				} else {
 					cell.setText(_nf1.format(dbValue));
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
+	 * column: Cadence multiplier
+	 */
+	private void defineColumn_Powertrain_CadenceMultiplier() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.POWERTRAIN_CADENCE_MULTIPLIER.createColumn(
+				_columnManager,
+				_pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final float dbCadenceMultiplier = ((TVITourBookItem) element).colCadenceMultiplier;
+
+				if (dbCadenceMultiplier == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(_nf1.format(dbCadenceMultiplier));
 				}
 
 				setCellColor(cell, element);
@@ -1749,7 +1807,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				if (dbPausedTime == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					if (_isDriveTimeFormat_hhmmss) {
+					if (FormatManager.isDrivingTime_hhmmss) {
 						cell.setText(net.tourbook.ui.UI.format_hh_mm_ss(dbPausedTime).toString());
 					} else {
 						cell.setText(net.tourbook.ui.UI.format_hh_mm(dbPausedTime + 30).toString());
@@ -1815,7 +1873,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				} else {
 
 					if (element instanceof TVITourBookTour) {
-						if (_isDriveTimeFormat_hhmmss) {
+						if (FormatManager.isDrivingTime_hhmmss) {
 							cell.setText(net.tourbook.ui.UI.format_hh_mm_ss(drivingTime).toString());
 						} else {
 							cell.setText(net.tourbook.ui.UI.format_hh_mm(drivingTime + 30).toString());
@@ -1850,7 +1908,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				} else {
 
 					if (element instanceof TVITourBookTour) {
-						if (_isRecTimeFormat_hhmmss) {
+						if (FormatManager.isRecordingTime_hhmmss) {
 							cell.setText(net.tourbook.ui.UI.format_hh_mm_ss(recordingTime).toString());
 						} else {
 							cell.setText(net.tourbook.ui.UI.format_hh_mm(recordingTime + 30).toString());
@@ -3109,6 +3167,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 		menuMgr.add(_actionComputeElevationGain);
 		menuMgr.add(_actionComputeDistanceValuesFromGeoposition);
 		menuMgr.add(_actionSetAltitudeFromSRTM);
+		menuMgr.add(_actionSetCadenceSubMenu);
 
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionReimportSubMenu);
@@ -3386,15 +3445,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 		enableActions();
 	}
 
-	private void readDisplayFormats() {
-
-		_isRecTimeFormat_hhmmss = _prefStore.getString(ITourbookPreferences.VIEW_LAYOUT_RECORDING_TIME_FORMAT).equals(
-				PrefPageViewColors.VIEW_TIME_LAYOUT_HH_MM_SS);
-
-		_isDriveTimeFormat_hhmmss = _prefStore.getString(ITourbookPreferences.VIEW_LAYOUT_DRIVING_TIME_FORMAT).equals(
-				PrefPageViewColors.VIEW_TIME_LAYOUT_HH_MM_SS);
-	}
-
 	@Override
 	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
 
@@ -3654,6 +3704,15 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 		// do a reselection of the selected tours to fire the multi tour data selection
 
 		actionSelectYearMonthTours();
+	}
+
+	private void updateDisplayFormats() {
+
+		// update table header
+		final String headerText = FormatManager.isCalories_cal ? COLUMN_FACTORY_CALORIES : COLUMN_FACTORY_KCAL;
+
+		_colDef_BodyCalories.setColumnHeaderText(headerText);
+		_colDef_BodyCalories.getTreeColumn().setText(headerText);
 	}
 
 	private void updateToolTipState() {

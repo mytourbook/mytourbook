@@ -306,6 +306,13 @@
 				class="net.tourbook.preferences.PrefPageAppearanceColors"
 				category="net.tourbook.preferences.PrefPageAppearance"
 			/>
+			
+			<page
+				name="%Pref_Page_Display_Format"
+				id="net.tourbook.preferences.PrefPageAppearanceDisplayFormat"
+				class="net.tourbook.preferences.PrefPageAppearanceDisplayFormat"
+				category="net.tourbook.preferences.PrefPageAppearance"
+			/>
 
 
 		<!--

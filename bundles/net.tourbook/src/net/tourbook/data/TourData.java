@@ -515,12 +515,28 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	private String												deviceFirmwareVersion;																		// db-version 12
 
 	/**
+	 * This value is multiplied with the cadence data serie when displayed, cadence data serie is
+	 * always saved with rpm.
+	 * <p>
+	 * 1.0f = Revolutions per minute (RPM) <br>
+	 * 2.0f = Steps per minute (SPM)
+	 */
+	private float												cadenceMultiplier					= 1.0f;
+
+	/**
+	 * When <code>1</code> then a stride sensor is available.
+	 * <p>
+	 * 0 == false, 1 == true
+	 */
+	private short												isStrideSensorPresent				= 0;
+
+	// ############################################# MERGED DATA #############################################
+
+	/**
 	 * when a tour is merged with another tour, {@link #mergeSourceTourId} contains the tour id of
 	 * the tour which is merged into this tour
 	 */
 	private Long												mergeSourceTourId;																			// db-version 7
-
-	// ############################################# MERGED DATA #############################################
 
 	/**
 	 * when a tour is merged into another tour, {@link #mergeTargetTourId} contains the tour id of
@@ -1189,11 +1205,23 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	@Transient
 	public ArrayList<TourMarker>								multiTourMarkers;
 
+	@Transient
+	public boolean												multipleTour_IsCadenceRpm;
+
+	@Transient
+	public boolean												multipleTour_IsCadenceSpm;
+
 	/**
 	 * A value is <code>true</code> when cadence is 0.
 	 */
 	@Transient
 	private boolean[]											_cadenceGaps;
+
+	/**
+	 * Contains the cadence data serie when the {@link #cadenceMultiplier} != 1.0;
+	 */
+	@Transient
+	private float[]												cadenceSerieWithMultiplier;
 
 	/**
 	 * Is <code>true</code> when the tour is imported and contained MT specific fields, e.g. tour
@@ -1425,6 +1453,8 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		altitudeSerieSmoothed = null;
 		altitudeSerieImperial = null;
 		altitudeSerieImperialSmoothed = null;
+
+		cadenceSerieWithMultiplier = null;
 
 		srtmSerie = null;
 		srtmSerieImperial = null;
@@ -4901,6 +4931,34 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		return _cadenceGaps;
 	}
 
+	public float getCadenceMultiplier() {
+		return cadenceMultiplier;
+	}
+
+	/**
+	 * @return Returns cadence data serie which is multiplied with the {@link #cadenceMultiplier}
+	 */
+	public float[] getCadenceSerie() {
+
+		if (cadenceMultiplier != 1.0 && cadenceSerie != null) {
+
+			if (cadenceSerieWithMultiplier == null) {
+
+				// create cadence with multiplier
+
+				cadenceSerieWithMultiplier = new float[cadenceSerie.length];
+
+				for (int serieIndex = 0; serieIndex < cadenceSerie.length; serieIndex++) {
+					cadenceSerieWithMultiplier[serieIndex] = cadenceSerie[serieIndex] * cadenceMultiplier;
+				}
+			}
+
+			return cadenceSerieWithMultiplier;
+		}
+
+		return cadenceSerie;
+	}
+
 	/**
 	 * @return Returns the calories or <code>0</code> when calories are not available.
 	 */
@@ -6083,6 +6141,14 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	}
 
 	/**
+	 * @return Returns <code>true</code> when cadence of the tour is spm, otherwise it is rpm.
+	 */
+	public boolean isCadenceSpm() {
+
+		return cadenceMultiplier != 1.0;
+	}
+
+	/**
 	 * @return Returns <code>true</code> when {@link TourData} contains refreence tours, otherwise
 	 *         <code>false</code>
 	 */
@@ -6172,6 +6238,10 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		} else {
 			return true;
 		}
+	}
+
+	public boolean isStrideSensorPresent() {
+		return isStrideSensorPresent == 1;
 	}
 
 	public boolean isTimeSerieWithTimeZoneAdjustment() {
@@ -6461,6 +6531,10 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		this.breakTimeSerie = breakTimeSerie;
 	}
 
+	public void setCadenceMultiplier(final float cadenceMultiplier) {
+		this.cadenceMultiplier = cadenceMultiplier;
+	}
+
 	/**
 	 * @param calories
 	 *            the calories to set
@@ -6715,6 +6789,15 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 
 	public void setIsPulseSensorPresent(final boolean isFromSensor) {
 		this.isPulseSensorPresent = (short) (isFromSensor ? 1 : 0);
+	}
+
+	public void setIsStrideSensorPresent(final boolean isFromSensor) {
+
+		this.isStrideSensorPresent = (short) (isFromSensor ? 1 : 0);
+
+		if (isFromSensor) {
+			cadenceMultiplier = 2.0f;
+		}
 	}
 
 	public void setMaxPulse(final float maxPulse) {

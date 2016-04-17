@@ -133,7 +133,9 @@ public class TVITourBookYearSub extends TVITourBookItem {
 				+ "tourImportFileName, " //							50	//$NON-NLS-1$
 				+ "tourImportFilePath, " //							51	//$NON-NLS-1$
 				+ "devicePluginName, " //							52	//$NON-NLS-1$
-				+ "deviceFirmwareVersion " //						53	//$NON-NLS-1$
+				+ "deviceFirmwareVersion, " //						53	//$NON-NLS-1$
+
+				+ "cadenceMultiplier " //							54	//$NON-NLS-1$
 
 				+ UI.NEW_LINE
 
@@ -226,7 +228,7 @@ public class TVITourBookYearSub extends TVITourBookItem {
 					tourItem.colMaxAltitude = result.getLong(15);
 					tourItem.colMaxPulse = result.getLong(16);
 					tourItem.colAvgPulse = result.getFloat(17);
-					tourItem.colAvgCadence = result.getFloat(18);
+					final float dbAvgCadence = result.getFloat(18);
 					tourItem.colAvgTemperature = result.getFloat(19);
 
 					final int dbHour = result.getInt(22);
@@ -281,8 +283,15 @@ public class TVITourBookYearSub extends TVITourBookItem {
 
 					// -----------------------------------------------
 
+					final float dbCadenceMultiplier = result.getFloat(54);
+
+					// -----------------------------------------------
+
 					tourItem.colBodyWeight = dbBodyWeight;
 					tourItem.colPower_PowerToWeight = dbBodyWeight == 0 ? 0 : dbAvgPower / dbBodyWeight;
+
+					tourItem.colAvgCadence = dbAvgCadence * dbCadenceMultiplier;
+					tourItem.colCadenceMultiplier = dbCadenceMultiplier;
 
 					// -----------------------------------------------
 

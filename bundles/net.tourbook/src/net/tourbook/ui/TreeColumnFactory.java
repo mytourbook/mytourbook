@@ -57,6 +57,7 @@ public abstract class TreeColumnFactory {
 	public static final TreeColumnFactory	POWERTRAIN_AVG_RIGHT_PEDAL_SMOOTHNESS;
 	public static final TreeColumnFactory	POWERTRAIN_AVG_LEFT_TORQUE_EFFECTIVENESS;
 	public static final TreeColumnFactory	POWERTRAIN_AVG_RIGHT_TORQUE_EFFECTIVENESS;
+	public static final TreeColumnFactory	POWERTRAIN_CADENCE_MULTIPLIER;
 	public static final TreeColumnFactory	POWERTRAIN_GEAR_FRONT_SHIFT_COUNT;
 	public static final TreeColumnFactory	POWERTRAIN_GEAR_REAR_SHIFT_COUNT;
 	public static final TreeColumnFactory	POWERTRAIN_PEDAL_LEFT_RIGHT_BALANCE;
@@ -737,6 +738,27 @@ public abstract class TreeColumnFactory {
 				colDef.setColumnUnit(UI.SYMBOL_PERCENTAGE);
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Power_AvgRightTorqueEffectiveness_Tooltip);
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(6));
+
+				return colDef;
+			};
+		};
+
+		POWERTRAIN_CADENCE_MULTIPLIER = new TreeColumnFactory() {
+			@Override
+			public TreeColumnDefinition createColumn(	final ColumnManager columnManager,
+														final PixelConverter pixelConverter) {
+
+				final TreeColumnDefinition colDef = new TreeColumnDefinition(
+						columnManager,
+						"POWERTRAIN_CADENCE_MULTIPLIER", //$NON-NLS-1$
+						SWT.TRAIL);
+
+				colDef.setColumnCategory(Messages.ColumnFactory_Category_Powertrain);
+				colDef.setColumnLabel(Messages.ColumnFactory_CadenceMultiplier_Label);
+				colDef.setColumnHeaderText(Messages.ColumnFactory_CadenceMultiplier_Header);
+				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_CadenceMultiplier_Tooltip);
+				colDef.setColumnUnit(Messages.ColumnFactory_CadenceMultiplier_Unit);
+				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(4));
 
 				return colDef;
 			};

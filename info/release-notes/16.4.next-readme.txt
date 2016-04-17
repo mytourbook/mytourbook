@@ -6,7 +6,6 @@ Version 16.4.next                                               ?. ? 2016
   - Factor 2x
   - Num Decimals 0 || 1
   
-- Remove temperature graph start error
 
 New
 ===	
@@ -14,8 +13,21 @@ New
 * Tour Chart
 
   - Replaced chart options drop-down menu with a slideout
+  - Adjust tour start temperature values
 
 
+* All Views
+
+  - Customize display formats
+  - Show calories by cal/kcal
+  
+  
+* Tour Book View  
+
+  - Set Cadence to rpm/spm
+
+	 * 1.0f = Revolutions per minute (RPM) <br>
+	 * 2.0f = Steps per minute (SPM)
 
 
 System

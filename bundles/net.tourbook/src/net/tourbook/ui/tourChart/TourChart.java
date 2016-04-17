@@ -948,13 +948,10 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 					// measurement system has changed
 
-//					UI.updateUnits();
-
 					isChartModified = true;
 					keepMinMax = false;
 
 					_valuePointTooltip.reopen();
-
 				}
 
 				final boolean isMinMaxEnabled = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_MIN_MAX_ENABLED);

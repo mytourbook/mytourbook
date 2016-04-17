@@ -21,6 +21,10 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.messages";										//$NON-NLS-1$
 
+	public static String		Action_Cadence_Set;
+	public static String		Action_Cadence_Set_Rpm;
+	public static String		Action_Cadence_Set_Spm;
+
 	public static String		Action_Compute_ElevationGain;
 
 	public static String		Action_MarkerFilter_WithGPS_Tooltip;
@@ -1099,6 +1103,7 @@ public class Messages extends NLS {
 	public static String		Pref_Appearance_Dialog_ResetAllToggleDialogs_Message;
 	public static String		Pref_Appearance_Dialog_ResetAllToggleDialogs_Title;
 	public static String		Pref_Appearance_Group_Tagging;
+
 	public static String		Pref_Appearance_Label_AutoOpenTagging_Tooltip;
 	public static String		Pref_Appearance_Label_AutoOpenTaggingDelay;
 	public static String		Pref_Appearance_NumberOfRecent_TourTypes;
@@ -1112,6 +1117,16 @@ public class Messages extends NLS {
 	public static String		Pref_ChartColors_unit_max;
 	public static String		Pref_ChartColors_unit_mid;
 	public static String		Pref_ChartColors_unit_min;
+
+	public static String		Pref_DisplayFormat_Group_Format;
+	public static String		Pref_DisplayFormat_Label_Cadence;
+	public static String		Pref_DisplayFormat_Label_Calories;
+	public static String		Pref_DisplayFormat_Label_Pulse;
+	public static String		Pref_DisplayFormat_Radio_Calories_Format_Cal;
+	public static String		Pref_DisplayFormat_Radio_Calories_Format_Kcal;
+	public static String		Pref_DisplayFormat_Radio_Format_1;
+	public static String		Pref_DisplayFormat_Radio_Format_1_1;
+	public static String		Pref_DisplayFormat_Radio_Format_1_2;
 
 	public static String		Pref_general_imperial_unit_fahrenheit;
 	public static String		Pref_general_imperial_unit_feet;
@@ -1623,6 +1638,8 @@ public class Messages extends NLS {
 	public static String		Tour_Editor_Label_AltitudeUp;
 	public static String		Tour_Editor_Label_BodyWeight;
 	public static String		Tour_Editor_Label_BodyWeight_Tooltip;
+	public static String		Tour_Editor_Label_Cadence;
+	public static String		Tour_Editor_Label_Cadence_Tooltip;
 	public static String		Tour_Editor_Label_DateTimeCreated;
 	public static String		Tour_Editor_Label_DateTimeModified;
 	public static String		Tour_Editor_Label_DeviceFirmwareVersion;
@@ -1637,8 +1654,11 @@ public class Messages extends NLS {
 	public static String		Tour_Editor_Label_Seconds_Tooltip;
 	public static String		Tour_Editor_Label_Sensor_No;
 	public static String		Tour_Editor_Label_Sensor_Yes;
+	public static String		Tour_Editor_Label_StrideSensor;
 	public static String		Tour_Editor_Label_Weather;
 	public static String		Tour_Editor_Label_WindDirection_Unit;
+	public static String		Tour_Editor_Radio_Cadence_Rpm;
+	public static String		Tour_Editor_Radio_Cadence_Spm;
 
 	public static String		Tour_Log_Action_Clear_Tooltip;
 

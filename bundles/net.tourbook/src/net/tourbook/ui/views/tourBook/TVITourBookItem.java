@@ -60,7 +60,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 				+ "MAX(MAXPULSE)," //									10	//$NON-NLS-1$
 				//
 				+ "AVG( CASE WHEN AVGPULSE = 0			THEN NULL ELSE AVGPULSE END)," //			11	//$NON-NLS-1$
-				+ "AVG( CASE WHEN AVGCADENCE = 0		THEN NULL ELSE AVGCADENCE END )," //		12	//$NON-NLS-1$
+				+ "AVG( CASE WHEN AVGCADENCE = 0		THEN NULL ELSE DOUBLE(AvgCadence) * CadenceMultiplier END )," //	12	//$NON-NLS-1$
 				+ "AVG( CASE WHEN AvgTemperature = 0	THEN NULL ELSE DOUBLE(AvgTemperature) / TemperatureScale END )," //	13	//$NON-NLS-1$
 				+ "AVG( CASE WHEN WEATHERWINDDIR = 0	THEN NULL ELSE WEATHERWINDDIR END )," //	14	//$NON-NLS-1$
 				+ "AVG( CASE WHEN WEATHERWINDSPD = 0	THEN NULL ELSE WEATHERWINDSPD END )," //	15	//$NON-NLS-1$
@@ -133,6 +133,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
 	int								colFrontShiftCount;
 	int								colRearShiftCount;
+
+	float							colCadenceMultiplier;
 
 	// ----------- POWER ---------
 

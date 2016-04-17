@@ -94,6 +94,8 @@ public class TourManager {
 	private static final String				GRAPH_LABEL_ALTITUDE					= net.tourbook.common.Messages.Graph_Label_Altitude;
 	private static final String				GRAPH_LABEL_CADENCE						= net.tourbook.common.Messages.Graph_Label_Cadence;
 	private static final String				GRAPH_LABEL_CADENCE_UNIT				= net.tourbook.common.Messages.Graph_Label_Cadence_Unit;
+	private static final String				GRAPH_LABEL_CADENCE_UNIT_SPM			= net.tourbook.common.Messages.Graph_Label_Cadence_Unit_Spm;
+	private static final String				GRAPH_LABEL_CADENCE_UNIT_RPM_SPM		= net.tourbook.common.Messages.Graph_Label_Cadence_Unit_RpmSpm;
 	private static final String				GRAPH_LABEL_GEARS						= net.tourbook.common.Messages.Graph_Label_Gears;
 	private static final String				GRAPH_LABEL_GRADIENT					= net.tourbook.common.Messages.Graph_Label_Gradient;
 	private static final String				GRAPH_LABEL_GRADIENT_UNIT				= net.tourbook.common.Messages.Graph_Label_Gradient_Unit;
@@ -330,6 +332,11 @@ public class TourManager {
 		}
 
 		return true;
+	}
+
+	public static void clearMultipleTourData() {
+
+		_multipleTourData = null;
 	}
 
 	/**
@@ -575,6 +582,9 @@ public class TourManager {
 
 		boolean isFirstTour = true;
 
+		boolean isCadenceRpm = false;
+		boolean isCadenceSpm = false;
+
 		for (int tourIndex = 0; tourIndex < numTours; tourIndex++) {
 
 			final TourData fromTourData = validatedMultipleTours.get(tourIndex);
@@ -582,7 +592,7 @@ public class TourManager {
 			final int[] fromTimeSerie = fromTourData.timeSerie;
 
 			final float[] fromAltitudeSerie = fromTourData.altitudeSerie;
-			final float[] fromCadenceSerie = fromTourData.cadenceSerie;
+			final float[] fromCadenceSerie = fromTourData.getCadenceSerie();
 			final float[] fromDistanceSerie = fromTourData.distanceSerie;
 			final long[] fromGearSerie = fromTourData.gearSerie;
 			final double[] fromLatitudeSerie = fromTourData.latitudeSerie;
@@ -636,6 +646,9 @@ public class TourManager {
 			if (fromCadenceSerie != null) {
 				isCadenceSerie = true;
 				System.arraycopy(fromCadenceSerie, 0, toCadenceSerie, toStartIndex, fromSerieLength);
+
+				isCadenceRpm |= !fromTourData.isCadenceSpm();
+				isCadenceSpm |= fromTourData.isCadenceSpm();
 			}
 			if (fromGearSerie != null) {
 				isGearSerie = true;
@@ -748,6 +761,9 @@ public class TourManager {
 
 		multiTourData.computeTourDrivingTime();
 		multiTourData.computeComputedValues();
+
+		multiTourData.multipleTour_IsCadenceRpm = isCadenceRpm;
+		multiTourData.multipleTour_IsCadenceSpm = isCadenceSpm;
 
 		_multipleTourData = multiTourData;
 		_multipleTourDataHash = tourIds.hashCode();
@@ -2883,14 +2899,33 @@ public class TourManager {
 		/*
 		 * Cadence
 		 */
-		final float[] cadenceSerie = tourData.cadenceSerie;
+		final float[] cadenceSerie = tourData.getCadenceSerie();
 		ChartDataYSerie yDataCadence = null;
 		if (cadenceSerie != null) {
+
+			final String cadenceUnit;
+
+			if (tourData.isMultipleTours) {
+
+				final boolean isRpm = tourData.multipleTour_IsCadenceRpm;
+				final boolean isSpm = tourData.multipleTour_IsCadenceSpm;
+
+				cadenceUnit = isRpm && isSpm ? GRAPH_LABEL_CADENCE_UNIT_RPM_SPM //
+						: isSpm //
+								? GRAPH_LABEL_CADENCE_UNIT_SPM
+								: GRAPH_LABEL_CADENCE_UNIT;
+
+			} else {
+
+				cadenceUnit = tourData.isCadenceSpm() //
+						? GRAPH_LABEL_CADENCE_UNIT_SPM
+						: GRAPH_LABEL_CADENCE_UNIT;
+			}
 
 			yDataCadence = createChartDataSerieNoZero(cadenceSerie, chartType);
 
 			yDataCadence.setYTitle(GRAPH_LABEL_CADENCE);
-			yDataCadence.setUnitLabel(GRAPH_LABEL_CADENCE_UNIT);
+			yDataCadence.setUnitLabel(cadenceUnit);
 			yDataCadence.setShowYSlider(true);
 			yDataCadence.setDisplayedFractionalDigits(1);
 			yDataCadence.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_CADENCE);
