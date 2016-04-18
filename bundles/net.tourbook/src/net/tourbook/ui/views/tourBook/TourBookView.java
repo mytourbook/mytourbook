@@ -144,8 +144,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
 	static public final String							ID									= "net.tourbook.views.tourListView";						//$NON-NLS-1$
 
-	private static final String							COLUMN_FACTORY_CALORIES				= net.tourbook.ui.Messages.ColumnFactory_calories;
-	private static final String							COLUMN_FACTORY_KCAL					= net.tourbook.ui.Messages.ColumnFactory_kcal;
 	private static final String							GRAPH_LABEL_HEARTBEAT_UNIT			= net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
 
 	private static final String							STATE_CSV_EXPORT_PATH				= "STATE_CSV_EXPORT_PATH";									//$NON-NLS-1$
@@ -976,17 +974,12 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 			public void update(final ViewerCell cell) {
 
 				final Object element = cell.getElement();
-				final float dbAvgPulse = ((TVITourBookItem) element).colAvgPulse;
+				final float avgPulse = ((TVITourBookItem) element).colAvgPulse;
 
-				if (dbAvgPulse == 0) {
+				if (avgPulse == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-
-					if (FormatManager.isAvgPulse_1_1) {
-						cell.setText(_nf1.format(dbAvgPulse));
-					} else {
-						cell.setText(_nf0.format(dbAvgPulse));
-					}
+					cell.setText(FormatManager.getAvgPulse(avgPulse));
 				}
 
 				setCellColor(cell, element);
@@ -1010,11 +1003,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				if (calories == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					if (FormatManager.isCalories_cal) {
-						cell.setText(Long.toString(calories));
-					} else {
-						cell.setText(_nf1.format((double) calories / 1000));
-					}
+					cell.setText(FormatManager.getCalories(calories));
 				}
 
 				setCellColor(cell, element);
@@ -1391,12 +1380,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				if (dbValue == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-
-					if (FormatManager.isAvgPower_1_1) {
-						cell.setText(_nf1.format(dbValue));
-					} else {
-						cell.setText(_nf0.format(dbValue));
-					}
+					cell.setText(FormatManager.getAvgPower(dbValue));
 				}
 
 				setCellColor(cell, element);
@@ -1494,14 +1478,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				if (dbAvgCadence == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-
-					if (FormatManager.isAvgCadence_1_2) {
-						cell.setText(_nf2.format(dbAvgCadence));
-					} else if (FormatManager.isAvgCadence_1_1) {
-						cell.setText(_nf1.format(dbAvgCadence));
-					} else {
-						cell.setText(_nf0.format(dbAvgCadence));
-					}
+					cell.setText(FormatManager.getAvgCadence(dbAvgCadence));
 				}
 
 				setCellColor(cell, element);
@@ -1807,11 +1784,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				if (dbPausedTime == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					if (FormatManager.isDrivingTime_hhmmss) {
-						cell.setText(net.tourbook.ui.UI.format_hh_mm_ss(dbPausedTime).toString());
-					} else {
-						cell.setText(net.tourbook.ui.UI.format_hh_mm(dbPausedTime + 30).toString());
-					}
+					cell.setText(FormatManager.getPauseTime(dbPausedTime));
 				}
 
 				setCellColor(cell, element);
@@ -1873,11 +1846,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				} else {
 
 					if (element instanceof TVITourBookTour) {
-						if (FormatManager.isDrivingTime_hhmmss) {
-							cell.setText(net.tourbook.ui.UI.format_hh_mm_ss(drivingTime).toString());
-						} else {
-							cell.setText(net.tourbook.ui.UI.format_hh_mm(drivingTime + 30).toString());
-						}
+						cell.setText(FormatManager.getDrivingTime(drivingTime));
 					} else {
 						cell.setText(net.tourbook.ui.UI.format_hh_mm(drivingTime + 30).toString());
 					}
@@ -1908,11 +1877,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				} else {
 
 					if (element instanceof TVITourBookTour) {
-						if (FormatManager.isRecordingTime_hhmmss) {
-							cell.setText(net.tourbook.ui.UI.format_hh_mm_ss(recordingTime).toString());
-						} else {
-							cell.setText(net.tourbook.ui.UI.format_hh_mm(recordingTime + 30).toString());
-						}
+						cell.setText(FormatManager.getRecordingTime(recordingTime));
 					} else {
 						cell.setText(net.tourbook.ui.UI.format_hh_mm(recordingTime + 30).toString());
 					}
@@ -3708,8 +3673,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
 	private void updateDisplayFormats() {
 
-		// update table header
-		final String headerText = FormatManager.isCalories_cal ? COLUMN_FACTORY_CALORIES : COLUMN_FACTORY_KCAL;
+		// update table header texts
+		final String headerText = FormatManager.getCaloriesUnit();
 
 		_colDef_BodyCalories.setColumnHeaderText(headerText);
 		_colDef_BodyCalories.getTreeColumn().setText(headerText);

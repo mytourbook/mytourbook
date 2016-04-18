@@ -609,11 +609,11 @@ public class UI {
 		}
 	}
 
-	public static Formatter format_hh_mm(final long time) {
+	public static String format_hh_mm(final long time) {
 
 		_formatterSB.setLength(0);
 
-		return _formatter.format(Messages.Format_hhmm, (time / 3600), ((time % 3600) / 60));
+		return _formatter.format(Messages.Format_hhmm, (time / 3600), ((time % 3600) / 60)).toString();
 	}
 
 	/**

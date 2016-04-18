@@ -175,8 +175,8 @@ public abstract class TreeColumnFactory {
 
 				colDef.setColumnCategory(Messages.ColumnFactory_Category_Body);
 				colDef.setColumnLabel(Messages.ColumnFactory_calories_label);
-				colDef.setColumnHeaderText(Messages.ColumnFactory_kcal);
-				colDef.setColumnUnit(Messages.ColumnFactory_kcal);
+				colDef.setColumnHeaderText(Messages.Value_Unit_KCalories);
+				colDef.setColumnUnit(Messages.Value_Unit_KCalories);
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_calories_tooltip);
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
 
@@ -282,9 +282,7 @@ public abstract class TreeColumnFactory {
 			public TreeColumnDefinition createColumn(	final ColumnManager columnManager,
 														final PixelConverter pixelConverter) {
 
-				final TreeColumnDefinition colDef = new TreeColumnDefinition(
-						columnManager,
-						"DATA_DP_TOLERANCE", //$NON-NLS-1$
+				final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "DATA_DP_TOLERANCE", //$NON-NLS-1$
 						SWT.TRAIL);
 
 				colDef.setColumnCategory(Messages.ColumnFactory_Category_Data);
@@ -302,9 +300,7 @@ public abstract class TreeColumnFactory {
 			public TreeColumnDefinition createColumn(	final ColumnManager columnManager,
 														final PixelConverter pixelConverter) {
 
-				final TreeColumnDefinition colDef = new TreeColumnDefinition(
-						columnManager,
-						"DATA_IMPORT_FILE_NAME", //$NON-NLS-1$
+				final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "DATA_IMPORT_FILE_NAME", //$NON-NLS-1$
 						SWT.LEAD);
 
 				colDef.setColumnCategory(Messages.ColumnFactory_Category_Data);
@@ -322,9 +318,7 @@ public abstract class TreeColumnFactory {
 			public TreeColumnDefinition createColumn(	final ColumnManager columnManager,
 														final PixelConverter pixelConverter) {
 
-				final TreeColumnDefinition colDef = new TreeColumnDefinition(
-						columnManager,
-						"DATA_IMPORT_FILE_PATH", //$NON-NLS-1$
+				final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "DATA_IMPORT_FILE_PATH", //$NON-NLS-1$
 						SWT.LEAD);
 
 				colDef.setColumnCategory(Messages.ColumnFactory_Category_Data);
@@ -342,9 +336,7 @@ public abstract class TreeColumnFactory {
 			public TreeColumnDefinition createColumn(	final ColumnManager columnManager,
 														final PixelConverter pixelConverter) {
 
-				final TreeColumnDefinition colDef = new TreeColumnDefinition(
-						columnManager,
-						"DATA_NUM_TIME_SLICES", //$NON-NLS-1$
+				final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "DATA_NUM_TIME_SLICES", //$NON-NLS-1$
 						SWT.TRAIL);
 
 				colDef.setColumnCategory(Messages.ColumnFactory_Category_Data);
@@ -378,9 +370,7 @@ public abstract class TreeColumnFactory {
 			public TreeColumnDefinition createColumn(	final ColumnManager columnManager,
 														final PixelConverter pixelConverter) {
 
-				final TreeColumnDefinition colDef = new TreeColumnDefinition(
-						columnManager,
-						"DATA_TIME_INTERVAL", //$NON-NLS-1$
+				final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "DATA_TIME_INTERVAL", //$NON-NLS-1$
 						SWT.TRAIL);
 
 				colDef.setColumnCategory(Messages.ColumnFactory_Category_Data);
@@ -403,9 +393,7 @@ public abstract class TreeColumnFactory {
 			public TreeColumnDefinition createColumn(	final ColumnManager columnManager,
 														final PixelConverter pixelConverter) {
 
-				final TreeColumnDefinition colDef = new TreeColumnDefinition(
-						columnManager,
-						"DEVICE_DISTANCE", //$NON-NLS-1$
+				final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "DEVICE_DISTANCE", //$NON-NLS-1$
 						SWT.TRAIL);
 
 				final String unit = UI.UNIT_LABEL_DISTANCE + " * 1000"; //$NON-NLS-1$
@@ -447,9 +435,7 @@ public abstract class TreeColumnFactory {
 			public TreeColumnDefinition createColumn(	final ColumnManager columnManager,
 														final PixelConverter pixelConverter) {
 
-				final TreeColumnDefinition colDef = new TreeColumnDefinition(
-						columnManager,
-						"MOTION_AVG_PACE", //$NON-NLS-1$
+				final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "MOTION_AVG_PACE", //$NON-NLS-1$
 						SWT.TRAIL);
 				final String unitLabel = UI.SYMBOL_AVERAGE_WITH_SPACE + UI.UNIT_LABEL_PACE;
 
@@ -469,9 +455,7 @@ public abstract class TreeColumnFactory {
 			public TreeColumnDefinition createColumn(	final ColumnManager columnManager,
 														final PixelConverter pixelConverter) {
 
-				final TreeColumnDefinition colDef = new TreeColumnDefinition(
-						columnManager,
-						"MOTION_AVG_SPEED", //$NON-NLS-1$
+				final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "MOTION_AVG_SPEED", //$NON-NLS-1$
 						SWT.TRAIL);
 				final String unitLabel = UI.SYMBOL_AVERAGE_WITH_SPACE + UI.UNIT_LABEL_SPEED;
 
@@ -491,9 +475,7 @@ public abstract class TreeColumnFactory {
 			public TreeColumnDefinition createColumn(	final ColumnManager columnManager,
 														final PixelConverter pixelConverter) {
 
-				final TreeColumnDefinition colDef = new TreeColumnDefinition(
-						columnManager,
-						"MOTION_DISTANCE", //$NON-NLS-1$
+				final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "MOTION_DISTANCE", //$NON-NLS-1$
 						SWT.TRAIL);
 
 				colDef.setColumnCategory(Messages.ColumnFactory_Category_Motion);
@@ -513,9 +495,7 @@ public abstract class TreeColumnFactory {
 			public TreeColumnDefinition createColumn(	final ColumnManager columnManager,
 														final PixelConverter pixelConverter) {
 
-				final TreeColumnDefinition colDef = new TreeColumnDefinition(
-						columnManager,
-						"MOTION_MAX_SPEED", //$NON-NLS-1$
+				final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "MOTION_MAX_SPEED", //$NON-NLS-1$
 						SWT.TRAIL);
 				final String unitLabel = "^" + UI.UNIT_LABEL_SPEED; //$NON-NLS-1$
 
@@ -643,9 +623,7 @@ public abstract class TreeColumnFactory {
 			public TreeColumnDefinition createColumn(	final ColumnManager columnManager,
 														final PixelConverter pixelConverter) {
 
-				final TreeColumnDefinition colDef = new TreeColumnDefinition(
-						columnManager,
-						"POWERTRAIN_AVG_CADENCE", //$NON-NLS-1$
+				final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "POWERTRAIN_AVG_CADENCE", //$NON-NLS-1$
 						SWT.TRAIL);
 
 				colDef.setColumnCategory(Messages.ColumnFactory_Category_Powertrain);
@@ -869,9 +847,7 @@ public abstract class TreeColumnFactory {
 			public TreeColumnDefinition createColumn(	final ColumnManager columnManager,
 														final PixelConverter pixelConverter) {
 
-				final TreeColumnDefinition colDef = new TreeColumnDefinition(
-						columnManager,
-						"TIME_DRIVING_TIME", //$NON-NLS-1$
+				final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TIME_DRIVING_TIME", //$NON-NLS-1$
 						SWT.TRAIL);
 
 				colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
@@ -890,9 +866,7 @@ public abstract class TreeColumnFactory {
 			public TreeColumnDefinition createColumn(	final ColumnManager columnManager,
 														final PixelConverter pixelConverter) {
 
-				final TreeColumnDefinition colDef = new TreeColumnDefinition(
-						columnManager,
-						"TIME_PAUSED_TIME", //$NON-NLS-1$
+				final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TIME_PAUSED_TIME", //$NON-NLS-1$
 						SWT.TRAIL);
 
 				colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
@@ -932,9 +906,7 @@ public abstract class TreeColumnFactory {
 			public TreeColumnDefinition createColumn(	final ColumnManager columnManager,
 														final PixelConverter pixelConverter) {
 
-				final TreeColumnDefinition colDef = new TreeColumnDefinition(
-						columnManager,
-						"TIME_RECORDING_TIME", //$NON-NLS-1$
+				final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TIME_RECORDING_TIME", //$NON-NLS-1$
 						SWT.TRAIL);
 
 				colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
@@ -954,9 +926,7 @@ public abstract class TreeColumnFactory {
 			public TreeColumnDefinition createColumn(	final ColumnManager columnManager,
 														final PixelConverter pixelConverter) {
 
-				final TreeColumnDefinition colDef = new TreeColumnDefinition(
-						columnManager,
-						"TIME_TOUR_START_TIME", //$NON-NLS-1$
+				final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TIME_TOUR_START_TIME", //$NON-NLS-1$
 						SWT.TRAIL);
 
 				colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
@@ -1029,9 +999,7 @@ public abstract class TreeColumnFactory {
 			public TreeColumnDefinition createColumn(	final ColumnManager columnManager,
 														final PixelConverter pixelConverter) {
 
-				final TreeColumnDefinition colDef = new TreeColumnDefinition(
-						columnManager,
-						"TOUR_COLLATE_EVENT", //$NON-NLS-1$
+				final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TOUR_COLLATE_EVENT", //$NON-NLS-1$
 						SWT.LEAD);
 
 				colDef.setColumnCategory(Messages.ColumnFactory_Category_Tour);
@@ -1066,9 +1034,7 @@ public abstract class TreeColumnFactory {
 			public TreeColumnDefinition createColumn(	final ColumnManager columnManager,
 														final PixelConverter pixelConverter) {
 
-				final TreeColumnDefinition colDef = new TreeColumnDefinition(
-						columnManager,
-						"TOUR_NUM_MARKERS", //$NON-NLS-1$
+				final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TOUR_NUM_MARKERS", //$NON-NLS-1$
 						SWT.TRAIL);
 
 				colDef.setColumnCategory(Messages.ColumnFactory_Category_Tour);
@@ -1086,9 +1052,7 @@ public abstract class TreeColumnFactory {
 			public TreeColumnDefinition createColumn(	final ColumnManager columnManager,
 														final PixelConverter pixelConverter) {
 
-				final TreeColumnDefinition colDef = new TreeColumnDefinition(
-						columnManager,
-						"TOUR_NUM_PHOTOS", //$NON-NLS-1$
+				final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TOUR_NUM_PHOTOS", //$NON-NLS-1$
 						SWT.TRAIL);
 
 				colDef.setColumnCategory(Messages.ColumnFactory_Category_Tour);
@@ -1106,9 +1070,7 @@ public abstract class TreeColumnFactory {
 			public TreeColumnDefinition createColumn(	final ColumnManager columnManager,
 														final PixelConverter pixelConverter) {
 
-				final TreeColumnDefinition colDef = new TreeColumnDefinition(
-						columnManager,
-						"TOUR_TAG_AND_TAGS", //$NON-NLS-1$
+				final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TOUR_TAG_AND_TAGS", //$NON-NLS-1$
 						SWT.LEAD);
 
 				colDef.setColumnCategory(Messages.ColumnFactory_Category_Tour);
@@ -1282,9 +1244,7 @@ public abstract class TreeColumnFactory {
 			public TreeColumnDefinition createColumn(	final ColumnManager columnManager,
 														final PixelConverter pixelConverter) {
 
-				final TreeColumnDefinition colDef = new TreeColumnDefinition(
-						columnManager,
-						"WEATHER_AVG_TEMPERATURE", //$NON-NLS-1$
+				final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "WEATHER_AVG_TEMPERATURE", //$NON-NLS-1$
 						SWT.TRAIL);
 
 				final String unitLabel = UI.SYMBOL_AVERAGE_WITH_SPACE + UI.UNIT_LABEL_TEMPERATURE;
@@ -1322,9 +1282,7 @@ public abstract class TreeColumnFactory {
 			public TreeColumnDefinition createColumn(	final ColumnManager columnManager,
 														final PixelConverter pixelConverter) {
 
-				final TreeColumnDefinition colDef = new TreeColumnDefinition(
-						columnManager,
-						"WEATHER_WIND_DIR", //$NON-NLS-1$
+				final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "WEATHER_WIND_DIR", //$NON-NLS-1$
 						SWT.TRAIL);
 
 				final String unitLabel = UI.UNIT_LABEL_DIRECTION;
@@ -1345,9 +1303,7 @@ public abstract class TreeColumnFactory {
 			public TreeColumnDefinition createColumn(	final ColumnManager columnManager,
 														final PixelConverter pixelConverter) {
 
-				final TreeColumnDefinition colDef = new TreeColumnDefinition(
-						columnManager,
-						"WEATHER_WIND_SPEED", //$NON-NLS-1$
+				final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "WEATHER_WIND_SPEED", //$NON-NLS-1$
 						SWT.TRAIL);
 
 				colDef.setColumnCategory(Messages.ColumnFactory_Category_Weather);

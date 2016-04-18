@@ -45,7 +45,8 @@ public class ActionCadenceSubMenu extends Action implements IMenuCreator {
 	private class ActionSetRpm extends Action {
 
 		public ActionSetRpm() {
-			setText(Messages.Action_Cadence_Set_Rpm);
+
+			super(Messages.Action_Cadence_Set_Rpm, AS_CHECK_BOX);
 		}
 
 		@Override
@@ -57,7 +58,7 @@ public class ActionCadenceSubMenu extends Action implements IMenuCreator {
 	private class ActionSetSpm extends Action {
 
 		public ActionSetSpm() {
-			setText(Messages.Action_Cadence_Set_Spm);
+			super(Messages.Action_Cadence_Set_Spm, AS_CHECK_BOX);
 		}
 
 		@Override
@@ -84,6 +85,34 @@ public class ActionCadenceSubMenu extends Action implements IMenuCreator {
 		if (_menu != null) {
 			_menu.dispose();
 			_menu = null;
+		}
+	}
+
+	private void enableActions() {
+
+		final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
+
+		int numSpm = 0;
+		int numRpm = 0;
+
+		for (final TourData tourData : selectedTours) {
+
+			if (tourData.isCadenceSpm()) {
+				numSpm++;
+			} else {
+				numRpm++;
+			}
+		}
+
+		if (numSpm > 0 && numRpm > 0) {
+			_actionSetRpm.setChecked(false);
+			_actionSetSpm.setChecked(false);
+		} else if (numRpm > 0) {
+			_actionSetRpm.setChecked(true);
+			_actionSetSpm.setChecked(false);
+		} else if (numSpm > 0) {
+			_actionSetRpm.setChecked(false);
+			_actionSetSpm.setChecked(true);
 		}
 	}
 
@@ -116,6 +145,8 @@ public class ActionCadenceSubMenu extends Action implements IMenuCreator {
 				}
 
 				fillMenu(_menu);
+
+				enableActions();
 			}
 		});
 

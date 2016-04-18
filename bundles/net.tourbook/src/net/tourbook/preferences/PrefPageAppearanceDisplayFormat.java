@@ -21,7 +21,6 @@ import net.tourbook.ui.FormatManager;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
@@ -52,7 +51,6 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
 	/*
 	 * UI tools
 	 */
-	private PixelConverter			_pc;
 	private SelectionAdapter		_defaultSelectionListener;
 
 	private Button					_chkLiveUpdate;
@@ -67,6 +65,8 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
 
 	private Button					_rdoTime_Driving_hh_mm;
 	private Button					_rdoTime_Driving_hh_mm_ss;
+	private Button					_rdoTime_Paused_hh_mm;
+	private Button					_rdoTime_Paused_hh_mm_ss;
 	private Button					_rdoTime_Recording_hh_mm;
 	private Button					_rdoTime_Recording_hh_mm_ss;
 
@@ -144,7 +144,7 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
 				 * Power: W
 				 */
 				final Label label = new Label(group, SWT.NONE);
-				label.setText(Messages.Pref_DisplayFormat_Label_Pulse);
+				label.setText(Messages.Pref_DisplayFormat_Label_Power);
 
 				final Composite container = new Composite(group, SWT.NONE);
 				GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
@@ -247,6 +247,27 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
 					_rdoTime_Driving_hh_mm_ss.addSelectionListener(_defaultSelectionListener);
 				}
 			}
+
+			{
+				/*
+				 * Paused time format: hh:mm
+				 */
+
+				final Label label = new Label(group, SWT.NONE);
+				label.setText(Messages.Pref_DisplayFormat_Label_PausedTime);
+
+				final Composite container = new Composite(group, SWT.NONE);
+				GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+				{
+					_rdoTime_Paused_hh_mm = new Button(container, SWT.RADIO);
+					_rdoTime_Paused_hh_mm.setText(Messages.pref_view_layout_label_format_hh_mm);
+					_rdoTime_Paused_hh_mm.addSelectionListener(_defaultSelectionListener);
+
+					_rdoTime_Paused_hh_mm_ss = new Button(container, SWT.RADIO);
+					_rdoTime_Paused_hh_mm_ss.setText(Messages.pref_view_layout_label_format_hh_mm_ss);
+					_rdoTime_Paused_hh_mm_ss.addSelectionListener(_defaultSelectionListener);
+				}
+			}
 		}
 	}
 
@@ -278,8 +299,6 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
 	}
 
 	private void initUITools(final Composite parent) {
-
-		_pc = new PixelConverter(parent);
 
 		_defaultSelectionListener = new SelectionAdapter() {
 			@Override
@@ -314,6 +333,7 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
 		final String defaultPulse = _prefStore.getDefaultString(ITourbookPreferences.DISPLAY_FORMAT_AVG_PULSE);
 
 		final String defaultDrivingTime = _prefStore.getDefaultString(ITourbookPreferences.DISPLAY_FORMAT_DRIVING_TIME);
+		final String defaultPausedTime = _prefStore.getDefaultString(ITourbookPreferences.DISPLAY_FORMAT_PAUSED_TIME);
 		final String defaultRecordingTime = _prefStore.getDefaultString(//
 				ITourbookPreferences.DISPLAY_FORMAT_RECORDING_TIME);
 
@@ -322,6 +342,7 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
 		final boolean isCadence_1_2 = DISPLAY_FORMAT_1_2.equals(defaultCadence);
 		final boolean isCalories_Kcal = DISPLAY_FORMAT_KCAL.equals(defaultCalories);
 		final boolean isDriving_hh_mm = DISPLAY_FORMAT_HH_MM.equals(defaultDrivingTime);
+		final boolean isPaused_hh_mm = DISPLAY_FORMAT_HH_MM.equals(defaultPausedTime);
 		final boolean isRecording_hh_mm = DISPLAY_FORMAT_HH_MM.equals(defaultRecordingTime);
 		final boolean isPower_1 = DISPLAY_FORMAT_1.equals(defaultPower);
 		final boolean isPulse_1 = DISPLAY_FORMAT_1.equals(defaultPulse);
@@ -341,6 +362,9 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
 
 		_rdoTime_Driving_hh_mm.setSelection(isDriving_hh_mm);
 		_rdoTime_Driving_hh_mm_ss.setSelection(!isDriving_hh_mm);
+
+		_rdoTime_Paused_hh_mm.setSelection(isPaused_hh_mm);
+		_rdoTime_Paused_hh_mm_ss.setSelection(!isPaused_hh_mm);
 
 		_rdoTime_Recording_hh_mm.setSelection(isRecording_hh_mm);
 		_rdoTime_Recording_hh_mm_ss.setSelection(!isRecording_hh_mm);
@@ -370,6 +394,7 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
 		final String pulse = _prefStore.getString(ITourbookPreferences.DISPLAY_FORMAT_AVG_PULSE);
 
 		final String drivingTime = _prefStore.getString(ITourbookPreferences.DISPLAY_FORMAT_DRIVING_TIME);
+		final String pausedTime = _prefStore.getString(ITourbookPreferences.DISPLAY_FORMAT_PAUSED_TIME);
 		final String recordingTime = _prefStore.getString(ITourbookPreferences.DISPLAY_FORMAT_RECORDING_TIME);
 
 		final boolean isCadence_1 = DISPLAY_FORMAT_1.equals(cadence);
@@ -380,6 +405,7 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
 
 		final boolean isCalories_Kcal = DISPLAY_FORMAT_KCAL.equals(calories);
 		final boolean isDriving_hh_mm = DISPLAY_FORMAT_HH_MM.equals(drivingTime);
+		final boolean isPaused_hh_mm = DISPLAY_FORMAT_HH_MM.equals(pausedTime);
 		final boolean isRecording_hh_mm = DISPLAY_FORMAT_HH_MM.equals(recordingTime);
 
 		_rdoAvg_Cadence_1.setSelection(isCadence_1);
@@ -397,6 +423,9 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
 
 		_rdoTime_Driving_hh_mm.setSelection(isDriving_hh_mm);
 		_rdoTime_Driving_hh_mm_ss.setSelection(!isDriving_hh_mm);
+
+		_rdoTime_Paused_hh_mm.setSelection(isPaused_hh_mm);
+		_rdoTime_Paused_hh_mm_ss.setSelection(!isPaused_hh_mm);
 
 		_rdoTime_Recording_hh_mm.setSelection(isRecording_hh_mm);
 		_rdoTime_Recording_hh_mm_ss.setSelection(!isRecording_hh_mm);
@@ -430,6 +459,11 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
 
 		_prefStore.setValue(ITourbookPreferences.DISPLAY_FORMAT_DRIVING_TIME,//
 				_rdoTime_Driving_hh_mm.getSelection() //
+						? DISPLAY_FORMAT_HH_MM
+						: DISPLAY_FORMAT_HH_MM_SS);
+
+		_prefStore.setValue(ITourbookPreferences.DISPLAY_FORMAT_PAUSED_TIME,//
+				_rdoTime_Paused_hh_mm.getSelection() //
 						? DISPLAY_FORMAT_HH_MM
 						: DISPLAY_FORMAT_HH_MM_SS);
 

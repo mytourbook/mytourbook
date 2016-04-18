@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -39,7 +39,6 @@ import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.extension.export.ActionExport;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.preferences.PrefPageAppearanceDisplayFormat;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
 import net.tourbook.tour.ActionOpenMarkerDialog;
@@ -52,6 +51,7 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourTypeMenuManager;
 import net.tourbook.tour.printing.ActionPrint;
+import net.tourbook.ui.FormatManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourProviderByID;
 import net.tourbook.ui.TourTypeFilter;
@@ -132,7 +132,6 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	static {
 
 		WEEK_DAYS = DateFormatSymbols.getInstance().getShortWeekdays();
-
 		DATE_STYLER = StyledString.createColorRegistryStyler(net.tourbook.ui.UI.VIEW_COLOR_SUB, null);
 	}
 
@@ -174,20 +173,18 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
 	private boolean										_isInStartup;
 	private boolean										_isInReload;
-	private boolean										_isRecTimeFormat_hhmmss;
-	private boolean										_isDriveTimeFormat_hhmmss;
 	private boolean										_isInUIUpdate;
-
+	//
 	private boolean										_isToolTipInCollation;
 	private boolean										_isToolTipInTags;
 	private boolean										_isToolTipInTime;
 	private boolean										_isToolTipInTitle;
 	private boolean										_isToolTipInWeekDay;
-
+	//
 	private final TourDoubleClickState					_tourDoubleClickState	= new TourDoubleClickState();
 	private TagMenuManager								_tagMenuMgr;
 	private TreeViewerTourInfoToolTip					_tourInfoToolTip;
-
+	//
 	private ActionCollapseAll							_actionCollapseAll;
 	private ActionCollapseOthers						_actionCollapseOthers;
 	private ActionComputeDistanceValuesFromGeoposition	_actionComputeDistanceValuesFromGeoposition;
@@ -211,14 +208,14 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
 	private CollateTourContributionItem					_contribItem_CollatedTours;
 
+	private TreeColumnDefinition						_colDef_BodyCalories;
+	private TreeViewer									_tourViewer;
+	private PixelConverter								_pc;
+
 	/*
 	 * UI controls
 	 */
 	private Composite									_viewerContainer;
-
-	private TreeViewer									_tourViewer;
-
-	private PixelConverter								_pc;
 
 	private static class ItemComparer implements IElementComparer {
 
@@ -363,7 +360,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
 				} else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
-					readDisplayFormats();
+					updateDisplayFormats();
 
 					_tourViewer.getTree().setLinesVisible(
 							_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
@@ -483,7 +480,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 		// set selection provider
 		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
 
-		readDisplayFormats();
+		updateDisplayFormats();
 		restoreState();
 
 		enableActions();
@@ -857,9 +854,8 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	 */
 	private void defineColumn_Body_Calories() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.BODY_CALORIES.createColumn(_columnManager, _pc);
-		//colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
+		_colDef_BodyCalories = TreeColumnFactory.BODY_CALORIES.createColumn(_columnManager, _pc);
+		_colDef_BodyCalories.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
 
@@ -869,7 +865,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 				if (caloriesSum == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(Long.toString(caloriesSum));
+					cell.setText(FormatManager.getCalories(caloriesSum));
 				}
 
 				setCellColor(cell, element);
@@ -1241,11 +1237,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 				} else {
 
 					if (element instanceof TVICollatedTour_Tour) {
-						if (_isDriveTimeFormat_hhmmss) {
-							cell.setText(net.tourbook.ui.UI.format_hh_mm_ss(drivingTime).toString());
-						} else {
-							cell.setText(net.tourbook.ui.UI.format_hh_mm(drivingTime + 30).toString());
-						}
+						cell.setText(FormatManager.getDrivingTime(drivingTime));
 					} else {
 						cell.setText(net.tourbook.ui.UI.format_hh_mm(drivingTime + 30).toString());
 					}
@@ -1278,11 +1270,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 				if (dbPausedTime == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					if (_isDriveTimeFormat_hhmmss) {
-						cell.setText(net.tourbook.ui.UI.format_hh_mm_ss(dbPausedTime).toString());
-					} else {
-						cell.setText(net.tourbook.ui.UI.format_hh_mm(dbPausedTime + 30).toString());
-					}
+					cell.setText(FormatManager.getPauseTime(dbPausedTime));
 				}
 
 				setCellColor(cell, element);
@@ -1343,11 +1331,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 				} else {
 
 					if (element instanceof TVICollatedTour_Tour) {
-						if (_isRecTimeFormat_hhmmss) {
-							cell.setText(net.tourbook.ui.UI.format_hh_mm_ss(recordingTime).toString());
-						} else {
-							cell.setText(net.tourbook.ui.UI.format_hh_mm(recordingTime + 30).toString());
-						}
+						cell.setText(FormatManager.getRecordingTime(recordingTime));
 					} else {
 						cell.setText(net.tourbook.ui.UI.format_hh_mm(recordingTime + 30).toString());
 					}
@@ -2114,15 +2098,6 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 		enableActions();
 	}
 
-	private void readDisplayFormats() {
-
-		_isRecTimeFormat_hhmmss = _prefStore.getString(ITourbookPreferences.DISPLAY_FORMAT_RECORDING_TIME).equals(
-				PrefPageAppearanceDisplayFormat.DISPLAY_FORMAT_HH_MM_SS);
-
-		_isDriveTimeFormat_hhmmss = _prefStore.getString(ITourbookPreferences.DISPLAY_FORMAT_DRIVING_TIME).equals(
-				PrefPageAppearanceDisplayFormat.DISPLAY_FORMAT_HH_MM_SS);
-	}
-
 	@Override
 	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
 
@@ -2205,6 +2180,15 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
 	void setIsInUIUpdate(final boolean isInUpdate) {
 		_isInUIUpdate = isInUpdate;
+	}
+
+	private void updateDisplayFormats() {
+
+		// update table header texts
+		final String headerText = FormatManager.getCaloriesUnit();
+
+		_colDef_BodyCalories.setColumnHeaderText(headerText);
+		_colDef_BodyCalories.getTreeColumn().setText(headerText);
 	}
 
 	private void updateToolTipState() {

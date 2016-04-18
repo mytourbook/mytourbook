@@ -80,10 +80,13 @@ public class TourInfoUI {
 	{
 		_nf0.setMinimumFractionDigits(0);
 		_nf0.setMaximumFractionDigits(0);
+
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
+
 		_nf2.setMinimumFractionDigits(2);
 		_nf2.setMaximumFractionDigits(2);
+
 		_nf3.setMinimumFractionDigits(3);
 		_nf3.setMaximumFractionDigits(3);
 	}
@@ -470,7 +473,8 @@ public class TourInfoUI {
 
 			_lblCalories = createUI_LabelValue(container, SWT.TRAIL);
 			_secondColumnControls.add(_lblCalories);
-			createUI_Label(container, Messages.Value_Unit_Calories);
+
+			createUI_Label(container, FormatManager.getCaloriesUnit());
 		}
 
 		{
@@ -1140,27 +1144,27 @@ public class TourInfoUI {
 		_lblAvgPaceUnit.setText(UI.UNIT_LABEL_PACE);
 
 		// avg pulse
-		_lblAvgPulse.setText(_nf1.format(_tourData.getAvgPulse()));
+		final float avgPulse = _tourData.getAvgPulse();
+		_lblAvgPulse.setText(FormatManager.getAvgPulse(avgPulse));
 		_lblAvgPulseUnit.setText(Messages.Value_Unit_Pulse);
 
 		// avg cadence
 		final float avgCadence = _tourData.getAvgCadence() * _tourData.getCadenceMultiplier();
-		_lblAvgCadence.setText(FormatManager.isAvgCadence_1_2 //
-				? _nf2.format(avgCadence)
-				: FormatManager.isAvgCadence_1_1 //
-						? _nf1.format(avgCadence)
-						: _nf0.format(avgCadence));
-
+		_lblAvgCadence.setText(FormatManager.getAvgCadence(avgCadence));
 		_lblAvgCadenceUnit.setText(_tourData.isCadenceSpm()
 				? Messages.Value_Unit_Cadence_Spm
 				: Messages.Value_Unit_Cadence);
 
 		// avg power
-		_lblAvg_Power.setText(_nf0.format(_tourData.getPower_Avg()));
+		final float avgPower = _tourData.getPower_Avg();
+		_lblAvg_Power.setText(FormatManager.getAvgPower(avgPower));
 		_lblAvg_PowerUnit.setText(UI.UNIT_POWER);
 
-		// misc
-		_lblCalories.setText(Integer.toString(_tourData.getCalories()));
+		// calories
+		final int calories = _tourData.getCalories();
+		_lblCalories.setText(FormatManager.getCalories(calories));
+
+		// body
 		_lblRestPulse.setText(Integer.toString(_tourData.getRestPulse()));
 		_lblBodyWeight.setText(_nf1.format(_tourData.getBodyWeight()));
 

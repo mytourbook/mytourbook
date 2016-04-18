@@ -297,6 +297,7 @@ public interface ITourbookPreferences {
 	public static final String	DISPLAY_FORMAT_CALORIES							= "DISPLAY_FORMAT_CALORIES";								//$NON-NLS-1$
 
 	public static final String	DISPLAY_FORMAT_DRIVING_TIME						= "view.layout.driving-time-format";						//$NON-NLS-1$
+	public static final String	DISPLAY_FORMAT_PAUSED_TIME						= "DISPLAY_FORMAT_PAUSED_TIME";							//$NON-NLS-1$
 	public static final String	DISPLAY_FORMAT_RECORDING_TIME					= "view.layout.recording-time-format";						//$NON-NLS-1$
 
 	public static final String	DISPLAY_FORMAT_IS_LIVE_UPDATE					= "DISPLAY_FORMAT_IS_LIVE_UPDATE";							//$NON-NLS-1$

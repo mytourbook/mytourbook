@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -37,7 +37,6 @@ import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.preferences.PrefPageAppearanceDisplayFormat;
 import net.tourbook.preferences.PrefPageTags;
 import net.tourbook.tag.ActionMenuSetAllTagStructures;
 import net.tourbook.tag.ActionMenuSetTagStructure;
@@ -54,6 +53,7 @@ import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourTypeMenuManager;
+import net.tourbook.ui.FormatManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.TreeColumnFactory;
 import net.tourbook.ui.UI;
@@ -153,9 +153,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	private final IDialogSettings			_state							= TourbookPlugin.getState(ID);
 	private int								_tagViewLayout					= TAG_VIEW_LAYOUT_HIERARCHICAL;
 
-	private boolean							_isRecTimeFormat_hhmmss;
 
-	private boolean							_isDriveTimeFormat_hhmmss;
 	private TreeViewerTourInfoToolTip		_tourInfoToolTip;
 
 	private boolean							_isToolTipInTag;
@@ -164,12 +162,12 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	private TagMenuManager					_tagMenuMgr;
 
 	private TourDoubleClickState			_tourDoubleClickState			= new TourDoubleClickState();
+	//
 	/*
 	 * resources
 	 */
 	private final Image						_imgTagCategory					= TourbookPlugin
 																					.getImage(Messages.Image__tag_category);
-
 	private final Image						_imgTag							= TourbookPlugin
 																					.getImage(Messages.Image__tag);
 	private final Image						_imgTagRoot						= TourbookPlugin
@@ -192,8 +190,8 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	private ISelectionListener				_postSelectionListener;
 	private IPropertyChangeListener			_prefChangeListener;
 	private IPartListener2					_partListener;
+	//
 	private ActionCollapseAll				_actionCollapseAll;
-
 	private ActionCollapseOthers			_actionCollapseOthers;
 	private ActionEditQuick					_actionEditQuick;
 	private ActionEditTour					_actionEditTour;
@@ -424,7 +422,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 				} else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
-					readDisplayFormats();
 
 					_tagViewer.getTree().setLinesVisible(
 							_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
@@ -560,7 +557,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		enableActions();
 
 		restoreState();
-		readDisplayFormats();
 
 		reloadViewer();
 
@@ -1078,11 +1074,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 				final long drivingTime = ((TVITagViewItem) element).colDrivingTime;
 
 				if (element instanceof TVITagViewTour) {
-					if (_isDriveTimeFormat_hhmmss) {
-						cell.setText(UI.format_hh_mm_ss(drivingTime).toString());
-					} else {
-						cell.setText(UI.format_hh_mm(drivingTime + 30).toString());
-					}
+					cell.setText(FormatManager.getDrivingTime(drivingTime));
 				} else {
 					cell.setText(UI.format_hh_mm(drivingTime + 30).toString());
 				}
@@ -1147,11 +1139,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 				final long recordingTime = ((TVITagViewItem) element).colRecordingTime;
 
 				if (element instanceof TVITagViewTour) {
-					if (_isRecTimeFormat_hhmmss) {
-						cell.setText(UI.format_hh_mm_ss(recordingTime).toString());
-					} else {
-						cell.setText(UI.format_hh_mm(recordingTime + 30).toString());
-					}
+					cell.setText(FormatManager.getRecordingTime(recordingTime));
 				} else {
 					cell.setText(UI.format_hh_mm(recordingTime + 30).toString());
 				}
@@ -1484,14 +1472,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 		return _tagViewer;
 	}
 
-	private void readDisplayFormats() {
-
-		_isRecTimeFormat_hhmmss = _prefStore.getString(ITourbookPreferences.DISPLAY_FORMAT_RECORDING_TIME).equals(
-				PrefPageAppearanceDisplayFormat.DISPLAY_FORMAT_HH_MM_SS);
-
-		_isDriveTimeFormat_hhmmss = _prefStore.getString(ITourbookPreferences.DISPLAY_FORMAT_DRIVING_TIME).equals(
-				PrefPageAppearanceDisplayFormat.DISPLAY_FORMAT_HH_MM_SS);
-	}
 
 	@Override
 	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {

@@ -567,10 +567,12 @@ public class ColumnManager {
 
 				final Decorations shell = tree.getShell();
 				final Display display = shell.getDisplay();
+
 				final Point pt = display.map(null, tree, new Point(event.x, event.y));
 				final Rectangle clientArea = tree.getClientArea();
+				final int headerHeight = tree.getHeaderHeight();
 
-				final boolean isTreeHeaderHit = clientArea.y <= pt.y && pt.y < (clientArea.y + tree.getHeaderHeight());
+				final boolean isTreeHeaderHit = clientArea.y <= pt.y && pt.y < (clientArea.y + headerHeight);
 
 				tree.setMenu(getContextMenu(isTreeHeaderHit, headerContextMenu, defaultContextMenu));
 			}
@@ -891,6 +893,7 @@ public class ColumnManager {
 	private Menu getContextMenu(final boolean isHeaderHit, final Menu headerContextMenu, final Menu defaultContextMenu) {
 
 		Menu contextMenu;
+
 		if (isHeaderHit) {
 
 			contextMenu = headerContextMenu;

@@ -221,7 +221,6 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_ImportStatus_Tooltip;
 	public static String		ColumnFactory_InetAddress_Label;
 	public static String		ColumnFactory_InetAddress_Url;
-	public static String		ColumnFactory_kcal;
 	public static String		ColumnFactory_NumberOfGPSPhotos_Header;
 	public static String		ColumnFactory_NumberOfGPSPhotos_Label;
 	public static String		ColumnFactory_NumberOfGPSPhotos_Tooltip;
@@ -422,6 +421,8 @@ public class Messages extends NLS {
 	public static String		Value_Unit_Cadence;
 	public static String		Value_Unit_Cadence_Spm;
 	public static String		Value_Unit_Calories;
+
+	public static String	Value_Unit_KCalories;
 	public static String		Value_Unit_Pulse;
 
 	static {
