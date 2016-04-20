@@ -70,6 +70,7 @@ import org.eclipse.ui.XMLMemento;
 public class ColumnManager {
 
 	private static final String					XML_STATE_COLUMN_MANAGER			= "XML_STATE_COLUMN_MANAGER";			//$NON-NLS-1$
+
 	//
 	private static final String					TAG_ROOT							= "ColumnProfiles";					//$NON-NLS-1$
 	private static final String					TAG_PROFILE							= "Profile";							//$NON-NLS-1$
@@ -82,7 +83,6 @@ public class ColumnManager {
 	//
 	static final String							COLUMN_CATEGORY_SEPARATOR			= "   \u00bb   ";						//$NON-NLS-1$
 	static final String							COLUMN_TEXT_SEPARATOR				= "   \u00B7   ";						//$NON-NLS-1$
-
 	/**
 	 * Minimum column width, when the column width is 0, there was a bug that this happened.
 	 */
@@ -119,8 +119,8 @@ public class ColumnManager {
 	private Comparator<ColumnProfile>			_profileSorter;
 
 	private final ITourViewer					_tourViewer;
-	private AbstractColumnLayout				_columnLayout;
 
+	private AbstractColumnLayout				_columnLayout;
 	/**
 	 * Viewer which is managed by this {@link ColumnManager}.
 	 */
@@ -130,9 +130,10 @@ public class ColumnManager {
 	 * Context menu listener.
 	 */
 	private Listener							_tableMenuDetectListener;
-	private Listener							_treeMenuDetectListener;
 
+	private Listener							_treeMenuDetectListener;
 	private final Listener						_colItemListener;
+
 	{
 		_colItemListener = new Listener() {
 			@Override
@@ -147,6 +148,18 @@ public class ColumnManager {
 				return colProfile1.name.compareTo(colProfile2.name);
 			}
 		};
+	}
+
+	/**
+	 * A column wrapper which contains a {@link TableColumn} or a {@link TreeColumn}.
+	 */
+	public class ColumnWrapper {
+
+		Object	tableOrTreeColumn;
+
+		public ColumnWrapper(final Object column) {
+			this.tableOrTreeColumn = column;
+		}
 	}
 
 	public ColumnManager(final ITourViewer tourViewer, final IDialogSettings viewState) {
@@ -314,11 +327,13 @@ public class ColumnManager {
 		return headerContextMenu;
 	}
 
-	private void createHCM_0_MenuItems(final Menu contextMenu) {
+	private void createHCM_0_MenuItems(final Menu contextMenu, final ColumnWrapper headerHitColumn) {
 
 		setVisibleColumnIds_FromViewer();
 
-		createHCM_10_Other(contextMenu);
+		createHCM_10_ColumnActions(contextMenu, headerHitColumn);
+
+		createHCM_15_Other(contextMenu);
 
 		// separator
 		new MenuItem(contextMenu, SWT.SEPARATOR);
@@ -331,7 +346,12 @@ public class ColumnManager {
 		createHCM_30_Columns(contextMenu);
 	}
 
-	private void createHCM_10_Other(final Menu contextMenu) {
+	private void createHCM_10_ColumnActions(final Menu contextMenu, final ColumnWrapper headerHitColumn) {
+		// TODO Auto-generated method stub
+
+	}
+
+	private void createHCM_15_Other(final Menu contextMenu) {
 
 		/*
 		 * Action: Size All Columns to Fit
@@ -507,37 +527,23 @@ public class ColumnManager {
 			public void handleEvent(final Event event) {
 
 				final Display display = table.getShell().getDisplay();
-				final Point pt = display.map(null, table, new Point(event.x, event.y));
+				final Point mousePosition = display.map(null, table, new Point(event.x, event.y));
 
 				final Rectangle tblClientArea = table.getClientArea();
 				final int headerHeight = table.getHeaderHeight();
 
-				final boolean isTableHeaderHit = tblClientArea.y <= pt.y && pt.y < (tblClientArea.y + headerHeight);
+				final boolean isTableHeaderHit = tblClientArea.y <= mousePosition.y
+						&& mousePosition.y < (tblClientArea.y + headerHeight);
 
-//				System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//						+ ("\tisTableHeaderHit: " + isTableHeaderHit)
-//						+ ("\tclientArea: " + tblClientArea)
-//						+ ("\theaderHeight: " + headerHeight)
-//						+ ("\tpt: " + pt));
-//				// TODO remove SYSTEM.OUT.PRINTLN
-//
-//
-				/**
-				 * When the context menu is opened with the keyboard, the context menu from the
-				 * tree/table is displayed and not from the header when the mouse is hovering the
-				 * header. "detail" contains the info which input devices requested the context
-				 * menu.
-				 * <p>
-				 * Currently the context menu for the header with the keyboard is not supported.
-				 */
-//
-//				if (lParam != -1) {
-//					detail = SWT.MENU_MOUSE;
-//				} else {
-//					detail = SWT.MENU_KEYBOARD;
-//				}
+				final ColumnWrapper headerColumn = getHeaderColumn(table, mousePosition, isTableHeaderHit);
 
-				table.setMenu(getContextMenu(isTableHeaderHit, headerContextMenu, defaultContextMenu));
+				final Menu contextMenu = getContextMenu(
+						isTableHeaderHit,
+						headerColumn,
+						headerContextMenu,
+						defaultContextMenu);
+
+				table.setMenu(contextMenu);
 			}
 		};
 
@@ -568,13 +574,22 @@ public class ColumnManager {
 				final Decorations shell = tree.getShell();
 				final Display display = shell.getDisplay();
 
-				final Point pt = display.map(null, tree, new Point(event.x, event.y));
+				final Point mousePosition = display.map(null, tree, new Point(event.x, event.y));
 				final Rectangle clientArea = tree.getClientArea();
 				final int headerHeight = tree.getHeaderHeight();
 
-				final boolean isTreeHeaderHit = clientArea.y <= pt.y && pt.y < (clientArea.y + headerHeight);
+				final boolean isTreeHeaderHit = clientArea.y <= mousePosition.y
+						&& mousePosition.y < (clientArea.y + headerHeight);
 
-				tree.setMenu(getContextMenu(isTreeHeaderHit, headerContextMenu, defaultContextMenu));
+				final ColumnWrapper headerColumn = getHeaderColumn(tree, mousePosition, isTreeHeaderHit);
+
+				final Menu contextMenu = getContextMenu(
+						isTreeHeaderHit,
+						headerColumn,
+						headerContextMenu,
+						defaultContextMenu);
+
+				tree.setMenu(contextMenu);
 			}
 		};
 		tree.addListener(SWT.MenuDetect, _treeMenuDetectListener);
@@ -655,10 +670,6 @@ public class ColumnManager {
 
 		// keep tc ref
 		colDef.setTableColumn(tc);
-
-		// keep create index
-		final int tcIndex = tableViewer.getTable().getColumnCount();
-		colDef.setTableColumnIndex(tcIndex);
 
 		// add selection listener
 		final SelectionAdapter columnSelectionListener = colDef.getColumnSelectionListener();
@@ -890,7 +901,18 @@ public class ColumnManager {
 		return columnWidth;
 	}
 
-	private Menu getContextMenu(final boolean isHeaderHit, final Menu headerContextMenu, final Menu defaultContextMenu) {
+	/**
+	 * @param isHeaderHit
+	 * @param headerHitColumn
+	 *            Contains the column when the header is hit.
+	 * @param headerContextMenu
+	 * @param defaultContextMenu
+	 * @return
+	 */
+	private Menu getContextMenu(final boolean isHeaderHit,
+								final ColumnWrapper headerHitColumn,
+								final Menu headerContextMenu,
+								final Menu defaultContextMenu) {
 
 		Menu contextMenu;
 
@@ -903,7 +925,7 @@ public class ColumnManager {
 				menuItem.dispose();
 			}
 
-			createHCM_0_MenuItems(headerContextMenu);
+			createHCM_0_MenuItems(headerContextMenu, headerHitColumn);
 
 		} else {
 
@@ -911,6 +933,58 @@ public class ColumnManager {
 		}
 
 		return contextMenu;
+	}
+
+	private ColumnWrapper getHeaderColumn(final Table table, final Point mousePosition, final boolean isTableHeaderHit) {
+
+		if (isTableHeaderHit) {
+
+			int columnWidths = 0;
+
+			final TableColumn[] columns = table.getColumns();
+			final int[] columnOrder = table.getColumnOrder();
+
+			for (final int creationIndex : columnOrder) {
+
+				final TableColumn tc = columns[creationIndex];
+
+				if (columnWidths < mousePosition.x && mousePosition.x < columnWidths + tc.getWidth()) {
+
+					// column found
+					return new ColumnWrapper(tc);
+				}
+
+				columnWidths += tc.getWidth();
+			}
+		}
+
+		return null;
+	}
+
+	private ColumnWrapper getHeaderColumn(final Tree tree, final Point mousePosition, final boolean isTreeHeaderHit) {
+
+		if (isTreeHeaderHit) {
+
+			int columnWidths = 0;
+
+			final TreeColumn[] columns = tree.getColumns();
+			final int[] columnOrder = tree.getColumnOrder();
+
+			for (final int creationIndex : columnOrder) {
+
+				final TreeColumn tc = columns[creationIndex];
+
+				if (columnWidths < mousePosition.x && mousePosition.x < columnWidths + tc.getWidth()) {
+
+					// column found
+					return new ColumnWrapper(tc);
+				}
+
+				columnWidths += tc.getWidth();
+			}
+		}
+
+		return null;
 	}
 
 	/**
