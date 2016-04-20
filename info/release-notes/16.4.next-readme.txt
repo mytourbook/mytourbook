@@ -18,6 +18,8 @@ New
 
 * All Views
 
+  - Hide hovered column
+
   - Customize display formats
   - Show calories by cal/kcal
   

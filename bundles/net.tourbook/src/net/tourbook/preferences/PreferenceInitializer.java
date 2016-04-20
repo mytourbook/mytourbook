@@ -24,6 +24,7 @@ import net.tourbook.data.TourMarker;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.BreakTimeTool;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.FormatManager;
 import net.tourbook.ui.tourChart.ChartMarkerToolTip;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.ISmoothingAlgorithm;
@@ -309,27 +310,27 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
 		store.setDefault(//
 				ITourbookPreferences.DISPLAY_FORMAT_AVG_CADENCE,
-				PrefPageAppearanceDisplayFormat.DISPLAY_FORMAT_1);
+				FormatManager.DISPLAY_FORMAT_1);
 		store.setDefault(//
 				ITourbookPreferences.DISPLAY_FORMAT_AVG_POWER,
-				PrefPageAppearanceDisplayFormat.DISPLAY_FORMAT_1);
+				FormatManager.DISPLAY_FORMAT_1);
 		store.setDefault(//
 				ITourbookPreferences.DISPLAY_FORMAT_AVG_PULSE,
-				PrefPageAppearanceDisplayFormat.DISPLAY_FORMAT_1);
+				FormatManager.DISPLAY_FORMAT_1);
 
 		store.setDefault(
 				ITourbookPreferences.DISPLAY_FORMAT_CALORIES,
-				PrefPageAppearanceDisplayFormat.DISPLAY_FORMAT_KCAL);
+				FormatManager.DISPLAY_FORMAT_KCAL);
 
 		store.setDefault(
 				ITourbookPreferences.DISPLAY_FORMAT_DRIVING_TIME,
-				PrefPageAppearanceDisplayFormat.DISPLAY_FORMAT_HH_MM);
+				FormatManager.DISPLAY_FORMAT_HH_MM);
 		store.setDefault(
 				ITourbookPreferences.DISPLAY_FORMAT_PAUSED_TIME,
-				PrefPageAppearanceDisplayFormat.DISPLAY_FORMAT_HH_MM);
+				FormatManager.DISPLAY_FORMAT_HH_MM);
 		store.setDefault(
 				ITourbookPreferences.DISPLAY_FORMAT_RECORDING_TIME,
-				PrefPageAppearanceDisplayFormat.DISPLAY_FORMAT_HH_MM);
+				FormatManager.DISPLAY_FORMAT_HH_MM);
 
 
 		store.setDefault(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES, false);

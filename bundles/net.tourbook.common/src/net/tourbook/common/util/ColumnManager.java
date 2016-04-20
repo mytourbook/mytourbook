@@ -121,10 +121,12 @@ public class ColumnManager {
 	private final ITourViewer					_tourViewer;
 
 	private AbstractColumnLayout				_columnLayout;
+
 	/**
 	 * Viewer which is managed by this {@link ColumnManager}.
 	 */
 	private ColumnViewer						_columnViewer;
+	private ColumnWrapper						_headerColumn;
 
 	/**
 	 * Context menu listener.
@@ -169,7 +171,7 @@ public class ColumnManager {
 		restoreState(viewState);
 	}
 
-	private void actionFitAllColumnSize() {
+	private void action_FitAllColumnSize() {
 
 		// larger tables/trees needs more time to resize
 
@@ -230,7 +232,38 @@ public class ColumnManager {
 		});
 	}
 
-	private void actionShowAllColumns() {
+	private void action_HideCurrentColumn(final ColumnDefinition headerHitColDef) {
+
+		final String headerHitColId = headerHitColDef.getColumnId();
+		final String[] visibleIds = _activeProfile.visibleColumnIds;
+
+		final ArrayList<String> visibleColumnIds = new ArrayList<String>();
+		final ArrayList<String> visibleIdsAndWidth = new ArrayList<String>();
+
+		for (final String columnId : visibleIds) {
+
+			if (columnId.equals(headerHitColId)) {
+				// skip it to hide it
+				continue;
+			}
+
+			final ColumnDefinition colDef = getColDef_ByColumnId(columnId);
+
+			// set visible columns
+			visibleColumnIds.add(colDef.getColumnId());
+
+			// set column id and width
+			visibleIdsAndWidth.add(colDef.getColumnId());
+			visibleIdsAndWidth.add(Integer.toString(colDef.getColumnWidth()));
+		}
+
+		_activeProfile.visibleColumnIds = visibleColumnIds.toArray(new String[visibleColumnIds.size()]);
+		_activeProfile.visibleColumnIdsAndWidth = visibleIdsAndWidth.toArray(new String[visibleIdsAndWidth.size()]);
+
+		_columnViewer = _tourViewer.recreateViewer(_columnViewer);
+	}
+
+	private void action_ShowAllColumns() {
 
 		if (MessageDialog.openConfirm(
 				Display.getCurrent().getActiveShell(),
@@ -243,7 +276,7 @@ public class ColumnManager {
 		}
 	}
 
-	private void actionShowDefaultColumns() {
+	private void action_ShowDefaultColumns() {
 
 		if (MessageDialog.openConfirm(
 				Display.getCurrent().getActiveShell(),
@@ -327,12 +360,11 @@ public class ColumnManager {
 		return headerContextMenu;
 	}
 
-	private void createHCM_0_MenuItems(final Menu contextMenu, final ColumnWrapper headerHitColumn) {
+	private void createHCM_0_MenuItems(final Menu contextMenu) {
 
 		setVisibleColumnIds_FromViewer();
 
-		createHCM_10_ColumnActions(contextMenu, headerHitColumn);
-
+		createHCM_10_ColumnActions(contextMenu);
 		createHCM_15_Other(contextMenu);
 
 		// separator
@@ -346,59 +378,106 @@ public class ColumnManager {
 		createHCM_30_Columns(contextMenu);
 	}
 
-	private void createHCM_10_ColumnActions(final Menu contextMenu, final ColumnWrapper headerHitColumn) {
-		// TODO Auto-generated method stub
+	private void createHCM_10_ColumnActions(final Menu contextMenu) {
 
+		if (_headerColumn == null) {
+			// this is required
+			return;
+		}
+
+		final ColumnDefinition colDef = getColDef_FromHeaderColumn();
+		if (colDef == null) {
+			// this should not occure
+			return;
+		}
+
+		boolean isShowSeparator = false;
+
+		{
+			/*
+			 * Action: Hide current column
+			 */
+			final String[] visibleIds = _activeProfile.visibleColumnIds;
+			if (visibleIds.length > 1) {
+
+				isShowSeparator = true;
+
+				// create menu item text
+				final String headerText = colDef.getColumnHeaderText();
+				final String headerLabel = colDef.getColumnLabel();
+				final String menuItemText = headerText == null //
+
+						? NLS.bind(Messages.Action_ColumnManager_HideCurrentColumn, headerLabel)
+						: headerText.equals(headerLabel) //
+
+								? NLS.bind(Messages.Action_ColumnManager_HideCurrentColumn, headerText)
+								: NLS.bind(Messages.Action_ColumnManager_HideCurrentColumn_2, headerText, headerLabel);
+
+				final MenuItem menuItem = new MenuItem(contextMenu, SWT.PUSH);
+				menuItem.setText(menuItemText);
+				menuItem.addListener(SWT.Selection, new Listener() {
+					@Override
+					public void handleEvent(final Event event) {
+						action_HideCurrentColumn(colDef);
+					}
+				});
+			}
+		}
+
+		// separator
+		if (isShowSeparator) {
+			new MenuItem(contextMenu, SWT.SEPARATOR);
+		}
 	}
 
 	private void createHCM_15_Other(final Menu contextMenu) {
 
-		/*
-		 * Action: Size All Columns to Fit
-		 */
 		{
+			/*
+			 * Action: Size All Columns to Fit
+			 */
 			final MenuItem fitMenuItem = new MenuItem(contextMenu, SWT.PUSH);
 			fitMenuItem.setText(Messages.Action_App_SizeAllColumnsToFit);
 			fitMenuItem.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(final Event event) {
-					actionFitAllColumnSize();
+					action_FitAllColumnSize();
 				}
 			});
 		}
 
-		/*
-		 * Action: Show all columns
-		 */
 		{
+			/*
+			 * Action: Show all columns
+			 */
 			final MenuItem allColumnsMenuItem = new MenuItem(contextMenu, SWT.PUSH);
 			allColumnsMenuItem.setText(Messages.Action_ColumnManager_ShowAllColumns);
 			allColumnsMenuItem.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(final Event event) {
-					actionShowAllColumns();
+					action_ShowAllColumns();
 				}
 			});
 		}
 
-		/*
-		 * Action: Show default columns
-		 */
 		{
+			/*
+			 * Action: Show default columns
+			 */
 			final MenuItem defaultColumnsMenuItem = new MenuItem(contextMenu, SWT.PUSH);
 			defaultColumnsMenuItem.setText(Messages.Action_ColumnManager_ShowDefaultColumns);
 			defaultColumnsMenuItem.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(final Event event) {
-					actionShowDefaultColumns();
+					action_ShowDefaultColumns();
 				}
 			});
 		}
 
-		/*
-		 * Action: &Customize Profiles/Columns...
-		 */
 		{
+			/*
+			 * Action: &Customize Profiles/Columns...
+			 */
 			final MenuItem configMenuItem = new MenuItem(contextMenu, SWT.PUSH);
 			configMenuItem.setText(Messages.Action_App_CustomizeColumnsAndProfiles);
 			configMenuItem.setImage(UI.IMAGE_REGISTRY.get(UI.IMAGE_CONFIGURE_COLUMNS));
@@ -535,13 +614,9 @@ public class ColumnManager {
 				final boolean isTableHeaderHit = tblClientArea.y <= mousePosition.y
 						&& mousePosition.y < (tblClientArea.y + headerHeight);
 
-				final ColumnWrapper headerColumn = getHeaderColumn(table, mousePosition, isTableHeaderHit);
+				_headerColumn = getHeaderColumn(table, mousePosition, isTableHeaderHit);
 
-				final Menu contextMenu = getContextMenu(
-						isTableHeaderHit,
-						headerColumn,
-						headerContextMenu,
-						defaultContextMenu);
+				final Menu contextMenu = getContextMenu(isTableHeaderHit, headerContextMenu, defaultContextMenu);
 
 				table.setMenu(contextMenu);
 			}
@@ -581,17 +656,14 @@ public class ColumnManager {
 				final boolean isTreeHeaderHit = clientArea.y <= mousePosition.y
 						&& mousePosition.y < (clientArea.y + headerHeight);
 
-				final ColumnWrapper headerColumn = getHeaderColumn(tree, mousePosition, isTreeHeaderHit);
+				_headerColumn = getHeaderColumn(tree, mousePosition, isTreeHeaderHit);
 
-				final Menu contextMenu = getContextMenu(
-						isTreeHeaderHit,
-						headerColumn,
-						headerContextMenu,
-						defaultContextMenu);
+				final Menu contextMenu = getContextMenu(isTreeHeaderHit, headerContextMenu, defaultContextMenu);
 
 				tree.setMenu(contextMenu);
 			}
 		};
+
 		tree.addListener(SWT.MenuDetect, _treeMenuDetectListener);
 	}
 
@@ -779,6 +851,28 @@ public class ColumnManager {
 		return null;
 	}
 
+	private ColumnDefinition getColDef_FromHeaderColumn() {
+
+		ColumnDefinition colDef = null;
+
+		final Object column = _headerColumn.tableOrTreeColumn;
+
+		if (column instanceof TableColumn) {
+
+			final TableColumn tableColumn = (TableColumn) column;
+
+			colDef = (ColumnDefinition) tableColumn.getData();
+
+		} else if (column instanceof TreeColumn) {
+
+			final TreeColumn treeColumn = (TreeColumn) column;
+
+			colDef = (ColumnDefinition) treeColumn.getData();
+		}
+
+		return colDef;
+	}
+
 	/**
 	 * @return Returns the columns in the format: id/width ...
 	 */
@@ -903,16 +997,11 @@ public class ColumnManager {
 
 	/**
 	 * @param isHeaderHit
-	 * @param headerHitColumn
-	 *            Contains the column when the header is hit.
 	 * @param headerContextMenu
 	 * @param defaultContextMenu
 	 * @return
 	 */
-	private Menu getContextMenu(final boolean isHeaderHit,
-								final ColumnWrapper headerHitColumn,
-								final Menu headerContextMenu,
-								final Menu defaultContextMenu) {
+	private Menu getContextMenu(final boolean isHeaderHit, final Menu headerContextMenu, final Menu defaultContextMenu) {
 
 		Menu contextMenu;
 
@@ -925,7 +1014,7 @@ public class ColumnManager {
 				menuItem.dispose();
 			}
 
-			createHCM_0_MenuItems(headerContextMenu, headerHitColumn);
+			createHCM_0_MenuItems(headerContextMenu);
 
 		} else {
 
@@ -1275,6 +1364,7 @@ public class ColumnManager {
 	private void setColumnIdAndWidth(final ArrayList<String> columnIdsAndWidth, final String columnId, int columnWidth) {
 
 		final ColumnDefinition colDef = getColDef_ByColumnId(columnId);
+
 		if (colDef.isColumnHidden()) {
 
 			// column is hidden
