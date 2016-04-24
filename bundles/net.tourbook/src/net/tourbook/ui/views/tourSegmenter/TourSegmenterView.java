@@ -2860,7 +2860,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				if (pace == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(net.tourbook.ui.UI.format_mm_ss((long) pace));
+					cell.setText(net.tourbook.common.UI.format_mm_ss((long) pace));
 				}
 
 				if (segment.isTotal) {
@@ -2889,7 +2889,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				if (paceDiff == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(net.tourbook.ui.UI.format_mm_ss((long) paceDiff));
+					cell.setText(net.tourbook.common.UI.format_mm_ss((long) paceDiff));
 				}
 			}
 		});
@@ -3042,7 +3042,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				if (drivingTime == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(net.tourbook.ui.UI.format_hh_mm_ss(drivingTime));
+					cell.setText(net.tourbook.common.UI.format_hh_mm_ss(drivingTime));
 				}
 
 				if (segment.isTotal) {
@@ -3072,7 +3072,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				if (breakTime == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(net.tourbook.ui.UI.format_hh_mm_ss(breakTime));
+					cell.setText(net.tourbook.common.UI.format_hh_mm_ss(breakTime));
 				}
 
 				if (segment.isTotal) {
@@ -3098,7 +3098,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 				final TourSegment segment = (TourSegment) cell.getElement();
 
-				cell.setText(net.tourbook.ui.UI.format_hh_mm_ss(segment.time_Recording));
+				cell.setText(net.tourbook.common.UI.format_hh_mm_ss(segment.time_Recording));
 
 				if (segment.isTotal) {
 					setTotalStyle(cell);
@@ -3127,7 +3127,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				if (segment.isTotal) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(net.tourbook.ui.UI.format_hh_mm_ss(segment.time_Total));
+					cell.setText(net.tourbook.common.UI.format_hh_mm_ss(segment.time_Total));
 				}
 			}
 		});
@@ -4488,7 +4488,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				+ UI.SPACE
 				+ Messages.App_Unit_Seconds_Small
 				+ UI.SPACE4
-				+ net.tourbook.ui.UI.format_hh_mm_ss(_tourBreakTime));
+				+ net.tourbook.common.UI.format_hh_mm_ss(_tourBreakTime));
 
 		_containerBreakTime.layout();
 	}

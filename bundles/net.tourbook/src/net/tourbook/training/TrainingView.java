@@ -1467,7 +1467,7 @@ public class TrainingView extends ViewPart {
 			_lblTourMinMaxValue[tourZoneIndex].setText(((int) zoneMinBpm) + UI.DASH + zoneMaxBpmText);
 			_lblTourMinMaxValue[tourZoneIndex].setToolTipText(hrZoneTooltip);
 
-			_lblTourMinMaxHours[tourZoneIndex].setText(UI.format_hh_mm((long) (zoneTime + 30)).toString());
+			_lblTourMinMaxHours[tourZoneIndex].setText(net.tourbook.common.UI.format_hh_mm((long) (zoneTime + 30)).toString());
 			_lblTourMinMaxHours[tourZoneIndex].setToolTipText(hrZoneTooltip);
 
 			_lblHRZoneName[tourZoneIndex].setToolTipText(hrZoneTooltip);

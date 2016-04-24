@@ -265,8 +265,9 @@ public class DialogModifyColumns extends TrayDialog {
 
 				colDef.setIsCheckedInDialog(false);
 
-				// set column width from default width
+				// set default values
 				colDef.setColumnWidth(colDef.getDefaultColumnWidth());
+				colDef.setColumnFormat(colDef.getDefaultValueFormat());
 
 				modelColumns.add(colDef);
 			}
@@ -1122,10 +1123,10 @@ public class DialogModifyColumns extends TrayDialog {
 
 					// visible columns in the viewer will be checked
 
-					final boolean isDefaultColumn = definedColDef.isDefaultColumn();
+					colDefClone.setIsCheckedInDialog(definedColDef.isDefaultColumn());
 
-					colDefClone.setIsCheckedInDialog(isDefaultColumn);
 					colDefClone.setColumnWidth(definedColDef.getDefaultColumnWidth());
+					colDefClone.setColumnFormat(definedColDef.getDefaultValueFormat());
 
 				} else {
 
@@ -1138,7 +1139,9 @@ public class DialogModifyColumns extends TrayDialog {
 						if (currentColDef.getColumnId().equals(definedColumnId)) {
 
 							colDefClone.setIsCheckedInDialog(currentColDef.isCheckedInDialog());
+
 							colDefClone.setColumnWidth(currentColDef.getColumnWidth());
+							colDefClone.setColumnFormat(currentColDef.getColumnFormat());
 
 							break;
 						}

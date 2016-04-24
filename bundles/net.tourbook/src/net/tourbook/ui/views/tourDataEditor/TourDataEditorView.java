@@ -1093,7 +1093,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 				// time hh:mm:ss
 				if (_serieTime != null) {
-					sb.append(net.tourbook.ui.UI.format_hh_mm_ss(_serieTime[serieIndex]));
+					sb.append(net.tourbook.common.UI.format_hh_mm_ss(_serieTime[serieIndex]));
 				}
 				sb.append(UI.TAB);
 
@@ -1166,7 +1166,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 				// pace
 				if (_seriePace != null) {
-					sb.append(net.tourbook.ui.UI.format_hhh_mm_ss((long) _seriePace[serieIndex]));
+					sb.append(net.tourbook.common.UI.format_hhh_mm_ss((long) _seriePace[serieIndex]));
 				}
 				sb.append(UI.TAB);
 
@@ -3770,7 +3770,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
 					final long pace = (long) _seriePace[timeSlice.serieIndex];
 
-					cell.setText(net.tourbook.ui.UI.format_mm_ss(pace));
+					cell.setText(net.tourbook.common.UI.format_mm_ss(pace));
 				}
 			}
 		});
@@ -4000,7 +4000,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			public void update(final ViewerCell cell) {
 				final int serieIndex = ((TimeSlice) cell.getElement()).serieIndex;
 				if (_serieTime != null) {
-					cell.setText(net.tourbook.ui.UI.format_hh_mm_ss(_serieTime[serieIndex]));
+					cell.setText(net.tourbook.common.UI.format_hh_mm_ss(_serieTime[serieIndex]));
 				} else {
 					cell.setText(UI.EMPTY_STRING);
 				}
@@ -4049,7 +4049,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 					final int serieIndex = ((TimeSlice) cell.getElement()).serieIndex;
 
-					cell.setText(net.tourbook.ui.UI.format_hh_mm_ss(_tourStartDayTime + _serieTime[serieIndex]));
+					cell.setText(net.tourbook.common.UI.format_hh_mm_ss(_tourStartDayTime + _serieTime[serieIndex]));
 				}
 			}
 		});

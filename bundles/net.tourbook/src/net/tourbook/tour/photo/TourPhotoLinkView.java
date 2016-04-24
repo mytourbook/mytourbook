@@ -979,7 +979,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 				cell.setText(numberOfTourPhotos == 0 //
 						? UI.EMPTY_STRING
-						: net.tourbook.ui.UI.formatHhMmSs(timeAdjustment));
+						: UI.formatHhMmSs(timeAdjustment));
 
 				setBgColor(cell, link);
 			}

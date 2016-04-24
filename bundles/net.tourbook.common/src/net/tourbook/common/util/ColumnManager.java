@@ -26,6 +26,14 @@ import java.util.Comparator;
 
 import net.tourbook.common.Messages;
 import net.tourbook.common.UI;
+import net.tourbook.common.formatter.IValueFormatter;
+import net.tourbook.common.formatter.ValueFormat;
+import net.tourbook.common.formatter.ValueFormatter_Calories_Cal;
+import net.tourbook.common.formatter.ValueFormatter_Calories_Kcal;
+import net.tourbook.common.formatter.ValueFormatter_Default;
+import net.tourbook.common.formatter.ValueFormatter_Time_HH;
+import net.tourbook.common.formatter.ValueFormatter_Time_HHMM;
+import net.tourbook.common.formatter.ValueFormatter_Time_HHMMSS;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -73,11 +81,17 @@ public class ColumnManager {
 
 	//
 	private static final String					TAG_ROOT							= "ColumnProfiles";					//$NON-NLS-1$
+	//
+	private static final String					TAG_COLUMN							= "Column";							//$NON-NLS-1$
 	private static final String					TAG_PROFILE							= "Profile";							//$NON-NLS-1$
 	//
 	private static final String					ATTR_IS_ACTIVE_PROFILE				= "isActiveProfile";					//$NON-NLS-1$
 	private static final String					ATTR_IS_SHOW_CATEGORY				= "isShowCategory";					//$NON-NLS-1$
+	//
+	private static final String					ATTR_COLUMN_ID						= "columnId";							//$NON-NLS-1$
+	private static final String					ATTR_COLUMN_FORMAT					= "format";							//$NON-NLS-1$
 	private static final String					ATTR_NAME							= "name";								//$NON-NLS-1$
+
 	private static final String					ATTR_VISIBLE_COLUMN_IDS				= "visibleColumnIds";					//$NON-NLS-1$
 	private static final String					ATTR_VISIBLE_COLUMN_IDS_AND_WIDTH	= "visibleColumnIdsAndWidth";			//$NON-NLS-1$
 	//
@@ -136,6 +150,17 @@ public class ColumnManager {
 	private Listener							_treeMenuDetectListener;
 	private final Listener						_colItemListener;
 
+	/*
+	 * Value formatter
+	 */
+	private static IValueFormatter				_defaultDefaultValueFormatter		= new ValueFormatter_Default();
+
+	private IValueFormatter						_valueFormatter_Calories_Cal		= new ValueFormatter_Calories_Cal();
+	private IValueFormatter						_valueFormatter_Calories_Kcal		= new ValueFormatter_Calories_Kcal();
+	private IValueFormatter						_valueFormatter_Time_HH				= new ValueFormatter_Time_HH();
+	private IValueFormatter						_valueFormatter_Time_HHMM			= new ValueFormatter_Time_HHMM();
+	private IValueFormatter						_valueFormatter_Time_HHMMSS			= new ValueFormatter_Time_HHMMSS();
+
 	{
 		_colItemListener = new Listener() {
 			@Override
@@ -169,6 +194,10 @@ public class ColumnManager {
 		_tourViewer = tourViewer;
 
 		restoreState(viewState);
+	}
+
+	public static IValueFormatter getDefaultValueFormatter() {
+		return _defaultDefaultValueFormatter;
 	}
 
 	private void action_FitAllColumnSize() {
@@ -232,35 +261,9 @@ public class ColumnManager {
 		});
 	}
 
-	private void action_HideCurrentColumn(final ColumnDefinition headerHitColDef) {
+	private void action_SetValueFormatter(final ColumnDefinition colDef, final ValueFormat valueFormat) {
+		// TODO Auto-generated method stub
 
-		final String headerHitColId = headerHitColDef.getColumnId();
-		final String[] visibleIds = _activeProfile.visibleColumnIds;
-
-		final ArrayList<String> visibleColumnIds = new ArrayList<String>();
-		final ArrayList<String> visibleIdsAndWidth = new ArrayList<String>();
-
-		for (final String columnId : visibleIds) {
-
-			if (columnId.equals(headerHitColId)) {
-				// skip it to hide it
-				continue;
-			}
-
-			final ColumnDefinition colDef = getColDef_ByColumnId(columnId);
-
-			// set visible columns
-			visibleColumnIds.add(colDef.getColumnId());
-
-			// set column id and width
-			visibleIdsAndWidth.add(colDef.getColumnId());
-			visibleIdsAndWidth.add(Integer.toString(colDef.getColumnWidth()));
-		}
-
-		_activeProfile.visibleColumnIds = visibleColumnIds.toArray(new String[visibleColumnIds.size()]);
-		_activeProfile.visibleColumnIdsAndWidth = visibleIdsAndWidth.toArray(new String[visibleIdsAndWidth.size()]);
-
-		_columnViewer = _tourViewer.recreateViewer(_columnViewer);
 	}
 
 	private void action_ShowAllColumns() {
@@ -316,7 +319,7 @@ public class ColumnManager {
 			// create all columns in the table
 
 			for (final ColumnDefinition colDef : _activeProfile.visibleColumnDefinitions) {
-				createTableColumn((TableColumnDefinition) colDef, (TableViewer) columnViewer);
+				createColumns_Table((TableColumnDefinition) colDef, (TableViewer) columnViewer);
 			}
 
 		} else if (columnViewer instanceof TreeViewer) {
@@ -324,8 +327,162 @@ public class ColumnManager {
 			// create all columns in the tree
 
 			for (final ColumnDefinition colDef : _activeProfile.visibleColumnDefinitions) {
-				createTreeColumn((TreeColumnDefinition) colDef, (TreeViewer) columnViewer);
+				createColumns_Tree((TreeColumnDefinition) colDef, (TreeViewer) columnViewer);
 			}
+		}
+
+		setupValueFormatter(_activeProfile);
+	}
+
+	/**
+	 * Creates a column in a table viewer
+	 * 
+	 * @param colDef
+	 * @param tableViewer
+	 */
+	private void createColumns_Table(final TableColumnDefinition colDef, final TableViewer tableViewer) {
+
+		TableViewerColumn tvc;
+		TableColumn tc;
+
+		tvc = new TableViewerColumn(tableViewer, colDef.getColumnStyle());
+
+		final CellLabelProvider cellLabelProvider = colDef.getCellLabelProvider();
+		if (cellLabelProvider != null) {
+			tvc.setLabelProvider(cellLabelProvider);
+		}
+
+		tvc.setEditingSupport(colDef.getEditingSupport());
+
+		// get column widget
+		tc = tvc.getColumn();
+
+		final String columnText = colDef.getColumnHeaderText();
+		if (columnText != null) {
+			tc.setText(columnText);
+		}
+
+		final String columnToolTipText = colDef.getColumnHeaderToolTipText();
+		if (columnToolTipText != null) {
+			tc.setToolTipText(columnToolTipText);
+		}
+
+		/*
+		 * set column width
+		 */
+		if (_columnLayout == null) {
+
+			// set the column width with pixels
+
+			tc.setWidth(getColumnWidth(colDef));
+
+		} else {
+
+			// use the column layout to set the width of the columns
+
+			final ColumnLayoutData columnLayoutData = colDef.getColumnWeightData();
+
+			if (columnLayoutData == null) {
+				try {
+					throw new Exception("ColumnWeightData is not set for the column: " + colDef); //$NON-NLS-1$
+				} catch (final Exception e) {
+					e.printStackTrace();
+				}
+			}
+
+			if (columnLayoutData instanceof ColumnPixelData) {
+				final ColumnPixelData columnPixelData = (ColumnPixelData) columnLayoutData;
+
+				// overwrite the width
+				columnPixelData.width = getColumnWidth(colDef);
+				_columnLayout.setColumnData(tc, columnPixelData);
+			} else {
+				_columnLayout.setColumnData(tc, columnLayoutData);
+			}
+		}
+
+		tc.setResizable(colDef.isColumnResizable());
+		tc.setMoveable(colDef.isColumnMoveable());
+
+		// keep reference to the column definition
+		tc.setData(colDef);
+
+		// keep tc ref
+		colDef.setTableColumn(tc);
+
+		// add selection listener
+		final SelectionAdapter columnSelectionListener = colDef.getColumnSelectionListener();
+		if (columnSelectionListener != null) {
+			tc.addSelectionListener(columnSelectionListener);
+		}
+
+		// add resize/move listener
+		final ControlListener columnControlListener = colDef.getColumnControlListener();
+		if (columnControlListener != null) {
+			tc.addControlListener(columnControlListener);
+		}
+	}
+
+	/**
+	 * Creates a column in a tree viewer
+	 * 
+	 * @param colDef
+	 * @param treeViewer
+	 */
+	private void createColumns_Tree(final TreeColumnDefinition colDef, final TreeViewer treeViewer) {
+
+		TreeViewerColumn tvc;
+		TreeColumn tc;
+
+		tvc = new TreeViewerColumn(treeViewer, colDef.getColumnStyle());
+
+		final CellLabelProvider cellLabelProvider = colDef.getCellLabelProvider();
+		if (cellLabelProvider != null) {
+			tvc.setLabelProvider(cellLabelProvider);
+		}
+
+		tc = tvc.getColumn();
+
+		final String columnText = colDef.getColumnHeaderText();
+		if (columnText != null) {
+			tc.setText(columnText);
+		}
+
+		final String columnToolTipText = colDef.getColumnHeaderToolTipText();
+		if (columnToolTipText != null) {
+			tc.setToolTipText(columnToolTipText);
+		}
+
+		/*
+		 * set column width
+		 */
+		int columnWidth = colDef.getColumnWidth();
+		if (colDef.isColumnHidden()) {
+			columnWidth = 0;
+		} else {
+			columnWidth = columnWidth < MINIMUM_COLUMN_WIDTH //
+					? colDef.getDefaultColumnWidth()
+					: columnWidth;
+		}
+		tc.setWidth(columnWidth);
+
+		tc.setResizable(colDef.isColumnResizable());
+		tc.setMoveable(colDef.isColumnMoveable());
+
+		// keep reference to the column definition
+		tc.setData(colDef);
+		colDef.setTreeColumn(tc);
+
+		// add selection listener
+		final SelectionAdapter columnSelectionListener = colDef.getColumnSelectionListener();
+		if (columnSelectionListener != null) {
+			tc.addSelectionListener(columnSelectionListener);
+		}
+
+		// add resize/move listener
+		final ControlListener columnControlListener = colDef.getColumnControlListener();
+		if (columnControlListener != null) {
+			tc.addControlListener(columnControlListener);
 		}
 	}
 
@@ -364,73 +521,16 @@ public class ColumnManager {
 
 		setVisibleColumnIds_FromViewer();
 
-		createHCM_10_ColumnActions(contextMenu);
-		createHCM_15_Other(contextMenu);
+		createHCM_10_ShowHideColumns(contextMenu);
 
-		// separator
-		new MenuItem(contextMenu, SWT.SEPARATOR);
+		createHCM_40_CurrentColumnFormats(contextMenu);
 
-		createHCM_20_Profiles(contextMenu);
+		createHCM_50_Profiles(contextMenu);
 
-		// separator
-		new MenuItem(contextMenu, SWT.SEPARATOR);
-
-		createHCM_30_Columns(contextMenu);
+		createHCM_70_Columns(contextMenu);
 	}
 
-	private void createHCM_10_ColumnActions(final Menu contextMenu) {
-
-		if (_headerColumn == null) {
-			// this is required
-			return;
-		}
-
-		final ColumnDefinition colDef = getColDef_FromHeaderColumn();
-		if (colDef == null) {
-			// this should not occure
-			return;
-		}
-
-		boolean isShowSeparator = false;
-
-		{
-			/*
-			 * Action: Hide current column
-			 */
-			final String[] visibleIds = _activeProfile.visibleColumnIds;
-			if (visibleIds.length > 1) {
-
-				isShowSeparator = true;
-
-				// create menu item text
-				final String headerText = colDef.getColumnHeaderText();
-				final String headerLabel = colDef.getColumnLabel();
-				final String menuItemText = headerText == null //
-
-						? NLS.bind(Messages.Action_ColumnManager_HideCurrentColumn, headerLabel)
-						: headerText.equals(headerLabel) //
-
-								? NLS.bind(Messages.Action_ColumnManager_HideCurrentColumn, headerText)
-								: NLS.bind(Messages.Action_ColumnManager_HideCurrentColumn_2, headerText, headerLabel);
-
-				final MenuItem menuItem = new MenuItem(contextMenu, SWT.PUSH);
-				menuItem.setText(menuItemText);
-				menuItem.addListener(SWT.Selection, new Listener() {
-					@Override
-					public void handleEvent(final Event event) {
-						action_HideCurrentColumn(colDef);
-					}
-				});
-			}
-		}
-
-		// separator
-		if (isShowSeparator) {
-			new MenuItem(contextMenu, SWT.SEPARATOR);
-		}
-	}
-
-	private void createHCM_15_Other(final Menu contextMenu) {
+	private void createHCM_10_ShowHideColumns(final Menu contextMenu) {
 
 		{
 			/*
@@ -445,6 +545,8 @@ public class ColumnManager {
 				}
 			});
 		}
+
+		createHCM_12_HideCurrentColumn(contextMenu);
 
 		{
 			/*
@@ -488,12 +590,158 @@ public class ColumnManager {
 				}
 			});
 		}
+
+		createMenuSeparator(contextMenu);
+	}
+
+	private void createHCM_12_HideCurrentColumn(final Menu contextMenu) {
+
+		if (_headerColumn == null) {
+			// this field is required
+			return;
+		}
+
+		final ColumnDefinition colDef = getColDef_FromHeaderColumn();
+
+		if (colDef == null) {
+			// this should not occure
+			return;
+		}
+
+
+		final String[] visibleIds = _activeProfile.visibleColumnIds;
+		if (visibleIds.length > 1) {
+
+			/*
+			 * Action: Hide current column
+			 */
+			{
+				// create menu item text
+				final String headerText = colDef.getColumnHeaderText();
+				final String headerLabel = colDef.getColumnLabel();
+				final String menuItemText = headerText == null //
+
+						? NLS.bind(Messages.Action_ColumnManager_HideCurrentColumn, headerLabel)
+						: headerText.equals(headerLabel) //
+
+								? NLS.bind(Messages.Action_ColumnManager_HideCurrentColumn, headerText)
+								: NLS.bind(Messages.Action_ColumnManager_HideCurrentColumn_2, headerText, headerLabel);
+
+				final MenuItem menuItem = new MenuItem(contextMenu, SWT.PUSH);
+				menuItem.setText(menuItemText);
+				menuItem.addListener(SWT.Selection, new Listener() {
+					@Override
+					public void handleEvent(final Event event) {
+						setVisibleColumnIds_HideCurrentColumn(colDef);
+					}
+				});
+
+				if (colDef.canModifyVisibility() == false) {
+					// column cannot be hidden, disable it
+					menuItem.setEnabled(false);
+				}
+			}
+		}
+	}
+
+	private void createHCM_40_CurrentColumnFormats(final Menu contextMenu) {
+
+		if (_headerColumn == null) {
+			// this is required
+			return;
+		}
+
+		final ColumnDefinition colDef = getColDef_FromHeaderColumn();
+
+		if (colDef == null) {
+			// this should not occure
+			return;
+		}
+
+		/*
+		 * Action: Value Formatter
+		 */
+
+		final ValueFormat[] availableFormatter = colDef.getAvailableFormatter();
+		if (availableFormatter != null && availableFormatter.length > 0) {
+
+			/*
+			 * Menu items header
+			 */
+			{
+				final MenuItem menuItem = new MenuItem(contextMenu, SWT.PUSH);
+				menuItem.setText(Messages.Action_ColumnManager_ValueFormatter_Info);
+				menuItem.setEnabled(false);
+			}
+
+			/*
+			 * Formatter menu items
+			 */
+			final ValueFormat currentValueFormat = colDef.getValueFormat();
+
+			for (final ValueFormat formatter : availableFormatter) {
+
+				String menuItemText = null;
+				ValueFormat menuItemData = null;
+
+				switch (formatter) {
+
+				case Calories_Cal:
+					menuItemText = Messages.Value_Formatter_Calories_Cal;
+					menuItemData = ValueFormat.Calories_Cal;
+					break;
+
+				case Calories_Kcal:
+					menuItemText = Messages.Value_Formatter_Calories_Kcal;
+					menuItemData = ValueFormat.Calories_Kcal;
+					break;
+
+				case Time_HH:
+					menuItemText = Messages.Value_Formatter_Time_HH;
+					menuItemData = ValueFormat.Time_HH;
+					break;
+
+				case Time_HH_MM:
+					menuItemText = Messages.Value_Formatter_Time_HH_MM;
+					menuItemData = ValueFormat.Time_HH_MM;
+					break;
+
+				case Time_HH_MM_SS:
+					menuItemText = Messages.Value_Formatter_Time_HH_MM_SS;
+					menuItemData = ValueFormat.Time_HH_MM_SS;
+					break;
+				default:
+					break;
+				}
+
+				final MenuItem menuItem = new MenuItem(contextMenu, SWT.CHECK);
+
+				menuItem.setText(menuItemText);
+				menuItem.setData(menuItemData);
+				menuItem.addListener(SWT.Selection, new Listener() {
+					@Override
+					public void handleEvent(final Event event) {
+						action_SetValueFormatter(colDef, (ValueFormat) event.data);
+					}
+				});
+
+				final boolean isCurrentFormat = currentValueFormat == menuItemData;
+
+				// check current format
+				menuItem.setSelection(isCurrentFormat);
+
+				// disable current format
+				menuItem.setEnabled(isCurrentFormat == false);
+			}
+
+			createMenuSeparator(contextMenu);
+		}
 	}
 
 	/**
 	 * Action: Profiles
 	 */
-	private void createHCM_20_Profiles(final Menu contextMenu) {
+	private void createHCM_50_Profiles(final Menu contextMenu) {
 
 		{
 			final MenuItem menuItem = new MenuItem(contextMenu, SWT.PUSH);
@@ -523,12 +771,14 @@ public class ColumnManager {
 			menuItem.setData(columnProfile);
 			menuItem.addListener(SWT.Selection, _colItemListener);
 		}
+
+		createMenuSeparator(contextMenu);
 	}
 
 	/**
 	 * Action: Columns
 	 */
-	private void createHCM_30_Columns(final Menu contextMenu) {
+	private void createHCM_70_Columns(final Menu contextMenu) {
 
 		{
 			final MenuItem menuItem = new MenuItem(contextMenu, SWT.PUSH);
@@ -667,154 +917,13 @@ public class ColumnManager {
 		tree.addListener(SWT.MenuDetect, _treeMenuDetectListener);
 	}
 
-	/**
-	 * Creates a column in a table viewer
-	 * 
-	 * @param colDef
-	 * @param tableViewer
-	 */
-	private void createTableColumn(final TableColumnDefinition colDef, final TableViewer tableViewer) {
+	private void createMenuSeparator(final Menu contextMenu) {
 
-		TableViewerColumn tvc;
-		TableColumn tc;
-
-		tvc = new TableViewerColumn(tableViewer, colDef.getColumnStyle());
-
-		final CellLabelProvider cellLabelProvider = colDef.getCellLabelProvider();
-		if (cellLabelProvider != null) {
-			tvc.setLabelProvider(cellLabelProvider);
-		}
-
-		tvc.setEditingSupport(colDef.getEditingSupport());
-
-		// get column widget
-		tc = tvc.getColumn();
-
-		final String columnText = colDef.getColumnHeaderText();
-		if (columnText != null) {
-			tc.setText(columnText);
-		}
-
-		final String columnToolTipText = colDef.getColumnHeaderToolTipText();
-		if (columnToolTipText != null) {
-			tc.setToolTipText(columnToolTipText);
-		}
-
-		/*
-		 * set column width
-		 */
-		if (_columnLayout == null) {
-
-			// set the column width with pixels
-
-			tc.setWidth(getColumnWidth(colDef));
-
-		} else {
-
-			// use the column layout to set the width of the columns
-
-			final ColumnLayoutData columnLayoutData = colDef.getColumnWeightData();
-
-			if (columnLayoutData == null) {
-				try {
-					throw new Exception("ColumnWeightData is not set for the column: " + colDef); //$NON-NLS-1$
-				} catch (final Exception e) {
-					e.printStackTrace();
-				}
-			}
-
-			if (columnLayoutData instanceof ColumnPixelData) {
-				final ColumnPixelData columnPixelData = (ColumnPixelData) columnLayoutData;
-
-				// overwrite the width
-				columnPixelData.width = getColumnWidth(colDef);
-				_columnLayout.setColumnData(tc, columnPixelData);
-			} else {
-				_columnLayout.setColumnData(tc, columnLayoutData);
-			}
-		}
-
-		tc.setResizable(colDef.isColumnResizable());
-		tc.setMoveable(colDef.isColumnMoveable());
-
-		// keep reference to the column definition
-		tc.setData(colDef);
-
-		// keep tc ref
-		colDef.setTableColumn(tc);
-
-		// add selection listener
-		final SelectionAdapter columnSelectionListener = colDef.getColumnSelectionListener();
-		if (columnSelectionListener != null) {
-			tc.addSelectionListener(columnSelectionListener);
-		}
-
-		// add resize/move listener
-		final ControlListener columnControlListener = colDef.getColumnControlListener();
-		if (columnControlListener != null) {
-			tc.addControlListener(columnControlListener);
-		}
+		new MenuItem(contextMenu, SWT.SEPARATOR);
 	}
 
-	/**
-	 * Creates a column in a tree viewer
-	 * 
-	 * @param colDef
-	 * @param treeViewer
-	 */
-	private void createTreeColumn(final TreeColumnDefinition colDef, final TreeViewer treeViewer) {
-
-		TreeViewerColumn tvc;
-		TreeColumn tc;
-
-		tvc = new TreeViewerColumn(treeViewer, colDef.getColumnStyle());
-
-		final CellLabelProvider cellLabelProvider = colDef.getCellLabelProvider();
-		if (cellLabelProvider != null) {
-			tvc.setLabelProvider(cellLabelProvider);
-		}
-
-		tc = tvc.getColumn();
-
-		final String columnText = colDef.getColumnHeaderText();
-		if (columnText != null) {
-			tc.setText(columnText);
-		}
-
-		final String columnToolTipText = colDef.getColumnHeaderToolTipText();
-		if (columnToolTipText != null) {
-			tc.setToolTipText(columnToolTipText);
-		}
-
-		/*
-		 * set column width
-		 */
-		int columnWidth = colDef.getColumnWidth();
-		if (colDef.isColumnHidden()) {
-			columnWidth = 0;
-		} else {
-			columnWidth = columnWidth < MINIMUM_COLUMN_WIDTH ? colDef.getDefaultColumnWidth() : columnWidth;
-		}
-		tc.setWidth(columnWidth);
-
-		tc.setResizable(colDef.isColumnResizable());
-		tc.setMoveable(colDef.isColumnMoveable());
-
-		// keep reference to the column definition
-		tc.setData(colDef);
-		colDef.setTreeColumn(tc);
-
-		// add selection listener
-		final SelectionAdapter columnSelectionListener = colDef.getColumnSelectionListener();
-		if (columnSelectionListener != null) {
-			tc.addSelectionListener(columnSelectionListener);
-		}
-
-		// add resize/move listener
-		final ControlListener columnControlListener = colDef.getColumnControlListener();
-		if (columnControlListener != null) {
-			tc.addControlListener(columnControlListener);
-		}
+	public ColumnProfile getActiveProfile() {
+		return _activeProfile;
 	}
 
 	/**
@@ -826,6 +935,7 @@ public class ColumnManager {
 	private ColumnDefinition getColDef_ByColumnId(final String columnId) {
 
 		for (final ColumnDefinition colDef : _allDefinedColumnDefinitions) {
+
 			if (colDef.getColumnId().compareTo(columnId) == 0) {
 				return colDef;
 			}
@@ -989,7 +1099,9 @@ public class ColumnManager {
 		if (colDef.isColumnHidden()) {
 			columnWidth = 0;
 		} else {
-			columnWidth = columnWidth < MINIMUM_COLUMN_WIDTH ? colDef.getDefaultColumnWidth() : columnWidth;
+			columnWidth = columnWidth < MINIMUM_COLUMN_WIDTH //
+					? colDef.getDefaultColumnWidth()
+					: columnWidth;
 		}
 
 		return columnWidth;
@@ -1123,6 +1235,7 @@ public class ColumnManager {
 		for (final int createIndex : columnOrder) {
 
 			final ColumnDefinition colDef = getColDef_ByCreateIndex(createIndex);
+
 			if (colDef != null) {
 
 				// check all visible columns in the dialog
@@ -1153,6 +1266,44 @@ public class ColumnManager {
 		}
 
 		return allRearrangedColumns;
+	}
+
+	/**
+	 * Get a value formatter for a value format.
+	 * 
+	 * @param valueFormat
+	 * @return Returns the {@link IValueFormatter} or <code>null</code> when not available.
+	 */
+	private IValueFormatter getValueFormatter_From_ValueFormat(final ValueFormat valueFormat) {
+
+		IValueFormatter valueFormatter = null;
+
+		switch (valueFormat) {
+		case Calories_Cal:
+			valueFormatter = _valueFormatter_Calories_Cal;
+			break;
+
+		case Calories_Kcal:
+			valueFormatter = _valueFormatter_Calories_Kcal;
+			break;
+
+		case Time_HH:
+			valueFormatter = _valueFormatter_Time_HH;
+			break;
+
+		case Time_HH_MM:
+			valueFormatter = _valueFormatter_Time_HHMM;
+			break;
+
+		case Time_HH_MM_SS:
+			valueFormatter = _valueFormatter_Time_HHMMSS;
+			break;
+
+		default:
+			break;
+		}
+
+		return valueFormatter;
 	}
 
 	public boolean isCategoryAvailable() {
@@ -1259,6 +1410,36 @@ public class ColumnManager {
 									.convertStringToArray(xmlColumnIdsAndWidth);
 						}
 
+						/*
+						 * Column properties
+						 */
+
+						final ArrayList<ColumnProperties> columnPropertiesList = new ArrayList<>();
+						currentProfile.columnProperties = columnPropertiesList;
+
+						for (final IMemento memento2 : xmlProfile.getChildren()) {
+
+							final XMLMemento xmlColumn = (XMLMemento) memento2;
+
+							if (TAG_COLUMN.equals(xmlColumn.getType())) {
+
+								final String columnId = xmlColumn.getString(ATTR_COLUMN_ID);
+								final Enum<ValueFormat> valueFormat = Util.getXmlEnum(
+										xmlColumn,
+										ATTR_COLUMN_FORMAT,
+										null);
+
+								if (columnId != null && valueFormat != null) {
+
+									final ColumnProperties columnProperties = new ColumnProperties();
+									columnProperties.columnId = columnId;
+									columnProperties.valueFormat = (ValueFormat) valueFormat;
+
+									columnPropertiesList.add(columnProperties);
+								}
+							}
+						}
+
 						allProfiles.add(currentProfile);
 					}
 				}
@@ -1343,6 +1524,9 @@ public class ColumnManager {
 				xmlProfile.putBoolean(ATTR_IS_ACTIVE_PROFILE, true);
 			}
 
+			/*
+			 * visibleColumnIds
+			 */
 			final String[] visibleColumnIds = profile.visibleColumnIds;
 			if (visibleColumnIds != null) {
 
@@ -1351,12 +1535,30 @@ public class ColumnManager {
 						StringToArrayConverter.convertArrayToString(visibleColumnIds));
 			}
 
+			/*
+			 * visibleColumnIdsAndWidth
+			 */
 			final String[] visibleColumnIdsAndWidth = profile.visibleColumnIdsAndWidth;
 			if (visibleColumnIdsAndWidth != null) {
 
 				xmlProfile.putString(
 						ATTR_VISIBLE_COLUMN_IDS_AND_WIDTH,
 						StringToArrayConverter.convertArrayToString(visibleColumnIdsAndWidth));
+			}
+
+			/*
+			 * Column properties
+			 */
+			for (final ColumnProperties columnProperty : profile.columnProperties) {
+
+				final IMemento xmlColumn = xmlMemento.createChild(TAG_COLUMN);
+
+				xmlColumn.putString(ATTR_COLUMN_ID, columnProperty.columnId);
+
+				final Enum<ValueFormat> columnFormat = columnProperty.valueFormat;
+				if (columnFormat != null) {
+					xmlColumn.putString(ATTR_COLUMN_FORMAT, columnFormat.name());
+				}
 			}
 		}
 	}
@@ -1406,6 +1608,46 @@ public class ColumnManager {
 
 	public void setIsShowCategory(final boolean isShowCategory) {
 		_isShowCategory = isShowCategory;
+	}
+
+	private void setupValueFormatter(final ColumnProfile activeProfile) {
+
+		for (final ColumnDefinition colDef : activeProfile.visibleColumnDefinitions) {
+
+			final String columnId = colDef._columnId;
+
+			ValueFormat valueFormat = null;
+			IValueFormatter valueFormatter = null;
+
+			for (final ColumnProperties columnProperties : activeProfile.columnProperties) {
+
+				if (columnId.equals(columnProperties.columnId)) {
+
+					valueFormat = columnProperties.valueFormat;
+					valueFormatter = getValueFormatter_From_ValueFormat(valueFormat);
+
+					break;
+				}
+			}
+
+			if (valueFormatter == null) {
+
+				final ValueFormat defaultFormat = colDef.getDefaultValueFormat();
+
+				if (defaultFormat != null) {
+					valueFormat = defaultFormat;
+					valueFormatter = getValueFormatter_From_ValueFormat(valueFormat);
+				}
+
+				if (valueFormatter == null) {
+					valueFormat = ValueFormat.DEFAULT;
+					valueFormatter = _defaultDefaultValueFormatter;
+				}
+
+			}
+
+			colDef.setValueFormatter(valueFormat, valueFormatter);
+		}
 	}
 
 	/**
@@ -1645,6 +1887,38 @@ public class ColumnManager {
 		// get the sorting order and column width from the viewer
 		_activeProfile.visibleColumnIds = getColumns_FromViewer_Ids();
 		_activeProfile.visibleColumnIdsAndWidth = getColumns_FromViewer_IdAndWidth();
+
+	}
+
+	private void setVisibleColumnIds_HideCurrentColumn(final ColumnDefinition headerHitColDef) {
+
+		final String headerHitColId = headerHitColDef.getColumnId();
+		final String[] visibleIds = _activeProfile.visibleColumnIds;
+
+		final ArrayList<String> visibleColumnIds = new ArrayList<String>();
+		final ArrayList<String> visibleIdsAndWidth = new ArrayList<String>();
+
+		for (final String columnId : visibleIds) {
+
+			if (columnId.equals(headerHitColId)) {
+				// skip it to hide it
+				continue;
+			}
+
+			final ColumnDefinition colDef = getColDef_ByColumnId(columnId);
+
+			// set visible columns
+			visibleColumnIds.add(colDef.getColumnId());
+
+			// set column id and width
+			visibleIdsAndWidth.add(colDef.getColumnId());
+			visibleIdsAndWidth.add(Integer.toString(colDef.getColumnWidth()));
+		}
+
+		_activeProfile.visibleColumnIds = visibleColumnIds.toArray(new String[visibleColumnIds.size()]);
+		_activeProfile.visibleColumnIdsAndWidth = visibleIdsAndWidth.toArray(new String[visibleIdsAndWidth.size()]);
+
+		_columnViewer = _tourViewer.recreateViewer(_columnViewer);
 	}
 
 	private void updateColumns(final ColumnProfile profile) {

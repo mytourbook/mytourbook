@@ -19,9 +19,7 @@ New
 * All Views
 
   - Hide hovered column
-
-  - Customize display formats
-  - Show calories by cal/kcal
+  - Set value format for the hovered column, e.g. hh or hh:mm or hh:mm:ss, cal or kcal
   
   
 * Tour Book View  

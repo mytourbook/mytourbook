@@ -34,6 +34,7 @@ public class Messages extends NLS {
 	public static String		Action_ColumnManager_Profile_Info;
 	public static String		Action_ColumnManager_ShowAllColumns;
 	public static String		Action_ColumnManager_ShowDefaultColumns;
+	public static String		Action_ColumnManager_ValueFormatter_Info;
 
 	public static String		Advanced_Menu_AnimationSymbol;
 
@@ -87,6 +88,11 @@ public class Messages extends NLS {
 	public static String		Color_Chooser_SelectedColor_Tooltip;
 
 	public static String		Font_Editor_Label_FontSize;
+
+	public static String		Format_hh;
+	public static String		Format_hhmm;
+	public static String		Format_hhmmss;
+	public static String		Format_yyyymmdd_hhmmss;
 
 	public static String		Graph_Label_Altimeter;
 	public static String		Graph_Label_Altitude;
@@ -229,6 +235,12 @@ public class Messages extends NLS {
 	public static String		legend_color_lighten_color;
 
 	public static String		rgv_vertex_class_cast_exception;
+
+	public static String		Value_Formatter_Calories_Cal;
+	public static String		Value_Formatter_Calories_Kcal;
+	public static String		Value_Formatter_Time_HH;
+	public static String		Value_Formatter_Time_HH_MM;
+	public static String		Value_Formatter_Time_HH_MM_SS;
 
 	static {
 		// initialize resource bundle

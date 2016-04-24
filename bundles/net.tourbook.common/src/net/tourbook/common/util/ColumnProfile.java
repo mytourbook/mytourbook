@@ -21,27 +21,34 @@ import net.tourbook.common.UI;
 
 public class ColumnProfile implements Cloneable {
 
-	String						name						= UI.EMPTY_STRING;
+	String								name						= UI.EMPTY_STRING;
 
 	/**
 	 * Contains column definitions which are visible in the table/tree in the sort order of the
 	 * table/tree.
 	 */
-	ArrayList<ColumnDefinition>	visibleColumnDefinitions	= new ArrayList<ColumnDefinition>();
+	ArrayList<ColumnDefinition>			visibleColumnDefinitions	= new ArrayList<ColumnDefinition>();
 
 	/**
 	 * Contains the column ids which are visible in the viewer.
 	 */
-	String[]					visibleColumnIds;
+	String[]							visibleColumnIds;
 
 	/**
 	 * Contains a pair with column id/column width for visible columns.
 	 */
-	String[]					visibleColumnIdsAndWidth;
+	String[]							visibleColumnIdsAndWidth;
 
-	private long				_id;
+	/**
+	 * Contains a pair with column id/column format for all columns.
+	 * 
+	 * @since 16.5
+	 */
+	public ArrayList<ColumnProperties>	columnProperties;
 
-	private static long			_idCreator;
+	private long						_id;
+
+	private static long					_idCreator;
 
 	public ColumnProfile() {
 		_id = ++_idCreator;

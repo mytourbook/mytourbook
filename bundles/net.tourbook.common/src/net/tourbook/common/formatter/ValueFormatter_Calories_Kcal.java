@@ -1,51 +1,36 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.common.util;
+package net.tourbook.common.formatter;
 
-import org.eclipse.swt.widgets.TreeColumn;
+import java.text.NumberFormat;
 
-/**
- * A ColumnDefinition contains the data for creating a column in a TableViewer
- */
-public class TreeColumnDefinition extends ColumnDefinition {
+public class ValueFormatter_Calories_Kcal implements IValueFormatter {
 
-	private TreeColumn	_treeColumn;
+	private final static NumberFormat	_nf1	= NumberFormat.getNumberInstance();
 
-	/**
-	 * @param columnManager
-	 *            Manager which managed the columns.
-	 * @param columnId
-	 *            Column id which must be unique within the table.
-	 * @param style
-	 *            UI style.
-	 */
-	public TreeColumnDefinition(final ColumnManager columnManager, final String columnId, final int style) {
+	static {
 
-		_columnId = columnId;
-		_style = style;
-
-		columnManager.addColumn(this);
+		_nf1.setMinimumFractionDigits(1);
+		_nf1.setMaximumFractionDigits(1);
 	}
 
-	public TreeColumn getTreeColumn() {
-		return _treeColumn;
-	}
+	@Override
+	public String formatValue(final Object value) {
 
-	public void setTreeColumn(final TreeColumn tableColumn) {
-		_treeColumn = tableColumn;
+		return _nf1.format((double) value / 1000);
 	}
 
 }

@@ -2650,7 +2650,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 						0
 						: drivingTime * 1000 / tourDistance * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
-				cell.setText(net.tourbook.ui.UI.format_mm_ss((long) pace));
+				cell.setText(UI.format_mm_ss((long) pace));
 			}
 		});
 	}

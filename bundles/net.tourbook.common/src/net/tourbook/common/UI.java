@@ -20,6 +20,7 @@ import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Formatter;
 
 import net.tourbook.common.weather.IWeather;
 
@@ -250,6 +251,9 @@ public class UI {
 
 	public static final PeriodFormatter		DEFAULT_DURATION_FORMATTER;
 	public static final PeriodFormatter		DEFAULT_DURATION_FORMATTER_SHORT;
+
+	private static StringBuilder			_formatterSB							= new StringBuilder();
+	private static Formatter				_formatter								= new Formatter(_formatterSB);
 
 	/*
 	 * SET_FORMATTING_OFF
@@ -737,6 +741,105 @@ public class UI {
 		}
 	}
 
+	public static String format_hh(final long time) {
+		
+		_formatterSB.setLength(0);
+		
+		return _formatter.format(Messages.Format_hh, (time / 3600)).toString();
+	}
+
+	public static String format_hh_mm(final long time) {
+
+		_formatterSB.setLength(0);
+
+		return _formatter.format(Messages.Format_hhmm, (time / 3600), ((time % 3600) / 60)).toString();
+	}
+
+	/**
+	 * Hours are ignored when they are 0. An empty string is returned when time = <code>-1</code>
+	 * 
+	 * @param time
+	 * @return
+	 */
+	public static String format_hh_mm_ss(final long time) {
+
+		if (time == -1) {
+			return UI.EMPTY_STRING;
+		}
+
+		UI._formatterSB.setLength(0);
+
+		if (time >= 3600) {
+
+			// display hours
+
+			return UI._formatter.format(//
+					Messages.Format_hhmmss,
+					(time / 3600),
+					((time % 3600) / 60),
+					((time % 3600) % 60)).toString();
+
+		} else {
+
+			// ignore hours
+
+			return UI._formatter.format(//
+					Messages.Format_hhmm,
+					((time % 3600) / 60),
+					((time % 3600) % 60)).toString();
+		}
+	}
+
+	/**
+	 * force hours to be displayed
+	 * 
+	 * @param time
+	 * @return
+	 */
+	public static String format_hhh_mm_ss(final long time) {
+
+		_formatterSB.setLength(0);
+
+		return _formatter.format(//
+				Messages.Format_hhmmss,
+				(time / 3600),
+				((time % 3600) / 60),
+				((time % 3600) % 60)).toString();
+	}
+
+	public static String format_mm_ss(final long time) {
+
+		_formatterSB.setLength(0);
+
+		if (time < 0) {
+			_formatterSB.append(UI.DASH);
+		}
+
+		final long timeAbs = time < 0 ? 0 - time : time;
+
+		return _formatter.format(Messages.Format_hhmm, (timeAbs / 60), (timeAbs % 60)).toString();
+	}
+
+	public static String format_yyyymmdd_hhmmss(final int year,
+												final int month,
+												final int day,
+												final int hour,
+												final int minute,
+												final int second) {
+
+		_formatterSB.setLength(0);
+
+		return _formatter.format(//
+				Messages.Format_yyyymmdd_hhmmss,
+				year,
+				month,
+				day,
+				hour,
+				minute,
+				second)//
+				.toString();
+	}
+
 	public static String FormatDoubleMinMax(final double value) {
 
 		if (value == -Double.MAX_VALUE) {
@@ -757,6 +860,53 @@ public class UI {
 		}
 
 		return Long.toString((long) (value / 1000)) + UI.SPACE + UI.UNIT_DISTANCE_KM;
+	}
+
+	/**
+	 * Hours are ignored when they are 0. An empty string is returned when time = <code>0</code>.
+	 * 
+	 * @param time
+	 *            Time in seconds.
+	 * @return
+	 */
+	public static String formatHhMmSs(long time) {
+
+		if (time == 0) {
+			return UI.EMPTY_STRING;
+		}
+
+		boolean isNegative = false;
+
+		if (time < 0) {
+			isNegative = true;
+			time = -time;
+		}
+
+		_formatterSB.setLength(0);
+
+		String timeText;
+		if (time >= 3600) {
+
+			// display hours
+
+			timeText = _formatter.format(//
+					Messages.Format_hhmmss,
+					(time / 3600),
+					((time % 3600) / 60),
+					((time % 3600) % 60)).toString();
+
+		} else {
+
+			// ignore hours
+
+			timeText = _formatter.format(//
+					Messages.Format_hhmm,
+					((time % 3600) / 60),
+					((time % 3600) % 60)).toString();
+
+		}
+
+		return isNegative ? UI.SYMBOL_DASH + timeText : timeText;
 	}
 
 	/**

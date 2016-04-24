@@ -461,7 +461,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 
 				if (timeValue != Integer.MIN_VALUE) {
 
-					final String valueText = net.tourbook.ui.UI.format_hhh_mm_ss(timeValue);
+					final String valueText = UI.format_hhh_mm_ss(timeValue);
 
 					createUI_72_ValueField(container, GRAPH_LABEL_TIME, UI.UNIT_LABEL_TIME, valueText);
 				}

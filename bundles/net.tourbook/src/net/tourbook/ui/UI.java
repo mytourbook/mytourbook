@@ -239,12 +239,12 @@ public class UI {
 
 	private static UI										instance;
 
-	private static DateFormat								_dateFormatterShort;
-	private static DateFormat								_timeFormatterShort;
-
 	private static StringBuilder							_formatterSB					= new StringBuilder();
 	private static Formatter								_formatter						= new Formatter(
 																									_formatterSB);
+
+	private static DateFormat								_dateFormatterShort;
+	private static DateFormat								_timeFormatterShort;
 
 	public static Styler									TAG_STYLER;
 	public static Styler									TAG_CATEGORY_STYLER;
@@ -609,98 +609,6 @@ public class UI {
 		}
 	}
 
-	public static String format_hh_mm(final long time) {
-
-		_formatterSB.setLength(0);
-
-		return _formatter.format(Messages.Format_hhmm, (time / 3600), ((time % 3600) / 60)).toString();
-	}
-
-	/**
-	 * Hours are ignored when they are 0. An empty string is returned when time = <code>-1</code>
-	 * 
-	 * @param time
-	 * @return
-	 */
-	public static String format_hh_mm_ss(final long time) {
-
-		if (time == -1) {
-			return UI.EMPTY_STRING;
-		}
-
-		_formatterSB.setLength(0);
-
-		if (time >= 3600) {
-
-			// display hours
-
-			return _formatter.format(//
-					Messages.Format_hhmmss,
-					(time / 3600),
-					((time % 3600) / 60),
-					((time % 3600) % 60)).toString();
-
-		} else {
-
-			// ignore hours
-
-			return _formatter.format(//
-					Messages.Format_hhmm,
-					((time % 3600) / 60),
-					((time % 3600) % 60)).toString();
-		}
-	}
-
-	/**
-	 * force hours to be displayed
-	 * 
-	 * @param time
-	 * @return
-	 */
-	public static String format_hhh_mm_ss(final long time) {
-
-		_formatterSB.setLength(0);
-
-		return _formatter.format(//
-				Messages.Format_hhmmss,
-				(time / 3600),
-				((time % 3600) / 60),
-				((time % 3600) % 60)).toString();
-	}
-
-	public static String format_mm_ss(final long time) {
-
-		_formatterSB.setLength(0);
-
-		if (time < 0) {
-			_formatterSB.append(UI.DASH);
-		}
-
-		final long timeAbs = time < 0 ? 0 - time : time;
-
-		return _formatter.format(Messages.Format_hhmm, (timeAbs / 60), (timeAbs % 60)).toString();
-	}
-
-	public static String format_yyyymmdd_hhmmss(final int year,
-												final int month,
-												final int day,
-												final int hour,
-												final int minute,
-												final int second) {
-
-		_formatterSB.setLength(0);
-
-		return _formatter.format(//
-				Messages.Format_yyyymmdd_hhmmss,
-				year,
-				month,
-				day,
-				hour,
-				minute,
-				second)//
-				.toString();
-	}
-
 	public static String format_yyyymmdd_hhmmss(final TourData tourData) {
 
 		if (tourData == null) {
@@ -720,53 +628,6 @@ public class UI {
 				dt.getMinuteOfHour(),
 				dt.getSecondOfMinute())//
 				.toString();
-	}
-
-	/**
-	 * Hours are ignored when they are 0. An empty string is returned when time = <code>0</code>.
-	 * 
-	 * @param time
-	 *            Time in seconds.
-	 * @return
-	 */
-	public static String formatHhMmSs(long time) {
-
-		if (time == 0) {
-			return UI.EMPTY_STRING;
-		}
-
-		boolean isNegative = false;
-
-		if (time < 0) {
-			isNegative = true;
-			time = -time;
-		}
-
-		_formatterSB.setLength(0);
-
-		String timeText;
-		if (time >= 3600) {
-
-			// display hours
-
-			timeText = _formatter.format(//
-					Messages.Format_hhmmss,
-					(time / 3600),
-					((time % 3600) / 60),
-					((time % 3600) % 60)).toString();
-
-		} else {
-
-			// ignore hours
-
-			timeText = _formatter.format(//
-					Messages.Format_hhmm,
-					((time % 3600) / 60),
-					((time % 3600) % 60)).toString();
-
-		}
-
-		return isNegative ? UI.SYMBOL_DASH + timeText : timeText;
 	}
 
 	public static ColumnPixelData getColumnPixelWidth(final PixelConverter pixelConverter, final int width) {

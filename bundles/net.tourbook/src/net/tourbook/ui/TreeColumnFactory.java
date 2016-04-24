@@ -16,6 +16,8 @@
 package net.tourbook.ui;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.formatter.ValueFormat;
+import net.tourbook.common.formatter.ValueFormatSet;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.TreeColumnDefinition;
 
@@ -178,6 +180,10 @@ public abstract class TreeColumnFactory {
 				colDef.setColumnHeaderText(Messages.Value_Unit_KCalories);
 				colDef.setColumnUnit(Messages.Value_Unit_KCalories);
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_calories_tooltip);
+
+				colDef.setAvailableValueFormats(ValueFormatSet.Calories);
+				colDef.setDefaultValueFormat(ValueFormat.Calories_Kcal);
+
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
 
 				return colDef;
@@ -855,6 +861,10 @@ public abstract class TreeColumnFactory {
 				colDef.setColumnHeaderText(Messages.ColumnFactory_driving_time);
 				colDef.setColumnUnit(Messages.ColumnFactory_driving_time);
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_driving_time_tooltip);
+
+				colDef.setAvailableValueFormats(ValueFormatSet.Time);
+				colDef.setDefaultValueFormat(ValueFormat.Time_HH_MM);
+
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
 				return colDef;
@@ -874,6 +884,10 @@ public abstract class TreeColumnFactory {
 				colDef.setColumnHeaderText(Messages.ColumnFactory_paused_time);
 				colDef.setColumnUnit(Messages.ColumnFactory_paused_time);
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_paused_time_tooltip);
+
+				colDef.setAvailableValueFormats(ValueFormatSet.Time);
+				colDef.setDefaultValueFormat(ValueFormat.Time_HH_MM);
+
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
 				return colDef;
@@ -914,6 +928,10 @@ public abstract class TreeColumnFactory {
 				colDef.setColumnHeaderText(Messages.ColumnFactory_recording_time);
 				colDef.setColumnUnit(Messages.ColumnFactory_recording_time);
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_recording_time_tooltip);
+
+				colDef.setAvailableValueFormats(ValueFormatSet.Time);
+				colDef.setDefaultValueFormat(ValueFormat.Time_HH_MM);
+
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
 				return colDef;

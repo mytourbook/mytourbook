@@ -130,27 +130,27 @@ public class FormatManager {
 	public static String getDrivingTime(final long time) {
 
 		if (_isDrivingTime_hhmmss) {
-			return UI.format_hh_mm_ss(time);
+			return net.tourbook.common.UI.format_hh_mm_ss(time);
 		} else {
-			return UI.format_hh_mm(time + 30);
+			return net.tourbook.common.UI.format_hh_mm(time + 30);
 		}
 	}
 
 	public static String getPauseTime(final long time) {
 
 		if (_isPausedTime_hhmmss) {
-			return UI.format_hh_mm_ss(time);
+			return net.tourbook.common.UI.format_hh_mm_ss(time);
 		} else {
-			return UI.format_hh_mm(time + 30);
+			return net.tourbook.common.UI.format_hh_mm(time + 30);
 		}
 	}
 
 	public static String getRecordingTime(final long time) {
 
 		if (_isRecordingTime_hhmmss) {
-			return UI.format_hh_mm_ss(time);
+			return net.tourbook.common.UI.format_hh_mm_ss(time);
 		} else {
-			return UI.format_hh_mm(time + 30);
+			return net.tourbook.common.UI.format_hh_mm(time + 30);
 		}
 	}
 

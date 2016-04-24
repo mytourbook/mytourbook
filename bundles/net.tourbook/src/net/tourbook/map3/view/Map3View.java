@@ -971,7 +971,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 				final float pace = paceSerie[positionIndex];
 				graphValueText = String.format(
 						SLIDER_TEXT_PACE,
-						net.tourbook.ui.UI.format_mm_ss((long) pace),
+						UI.format_mm_ss((long) pace),
 						UI.UNIT_LABEL_PACE);
 			}
 			break;

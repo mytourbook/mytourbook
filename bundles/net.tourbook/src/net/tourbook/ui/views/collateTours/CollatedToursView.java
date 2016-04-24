@@ -26,6 +26,7 @@ import java.util.Set;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.formatter.IValueFormatter;
 import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.tooltip.OpenDialogManager;
 import net.tourbook.common.util.ColumnManager;
@@ -1059,7 +1060,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 				if (pace == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(net.tourbook.ui.UI.format_mm_ss((long) pace));
+					cell.setText(UI.format_mm_ss((long) pace));
 				}
 
 				setCellColor(cell, element);
@@ -1223,6 +1224,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
 		final TreeColumnDefinition colDef = TreeColumnFactory.TIME_DRIVING_TIME.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -1237,9 +1239,14 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 				} else {
 
 					if (element instanceof TVICollatedTour_Tour) {
-						cell.setText(FormatManager.getDrivingTime(drivingTime));
+
+						final IValueFormatter valueFormatter = colDef.getValueFormatter();
+						final String formatedValue = valueFormatter.formatValue(drivingTime);
+
+						cell.setText(formatedValue);
+
 					} else {
-						cell.setText(net.tourbook.ui.UI.format_hh_mm(drivingTime + 30).toString());
+						cell.setText(UI.format_hh_mm(drivingTime + 30).toString());
 					}
 				}
 
@@ -1333,7 +1340,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 					if (element instanceof TVICollatedTour_Tour) {
 						cell.setText(FormatManager.getRecordingTime(recordingTime));
 					} else {
-						cell.setText(net.tourbook.ui.UI.format_hh_mm(recordingTime + 30).toString());
+						cell.setText(UI.format_hh_mm(recordingTime + 30).toString());
 					}
 				}
 
@@ -1687,7 +1694,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 					cell.setText(UI.EMPTY_STRING);
 				} else {
 					//cell.setText(windClouds);
-					final Image img = net.tourbook.common.UI.IMAGE_REGISTRY.get(windClouds);
+					final Image img = UI.IMAGE_REGISTRY.get(windClouds);
 					if (img != null) {
 						cell.setImage(img);
 					} else {

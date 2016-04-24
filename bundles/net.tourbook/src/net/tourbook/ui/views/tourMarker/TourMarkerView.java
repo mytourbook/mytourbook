@@ -668,7 +668,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 				final TourMarker marker = (TourMarker) cell.getElement();
 				final long time = marker.getTime();
 
-				cell.setText(net.tourbook.ui.UI.format_hh_mm_ss(time));
+				cell.setText(net.tourbook.common.UI.format_hh_mm_ss(time));
 			}
 		});
 	}
@@ -693,7 +693,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 					}
 				}
 
-				cell.setText(net.tourbook.ui.UI.format_hh_mm_ss(((TourMarker) cell.getElement()).getTime() - lastTime));
+				cell.setText(net.tourbook.common.UI.format_hh_mm_ss(((TourMarker) cell.getElement()).getTime() - lastTime));
 
 				final String text = ((TourMarker) cell.getElement()).getLabel();
 

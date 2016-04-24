@@ -1307,7 +1307,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				if (pace == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(net.tourbook.ui.UI.format_mm_ss((long) pace));
+					cell.setText(UI.format_mm_ss((long) pace));
 				}
 
 				setCellColor(cell, element);
@@ -1848,7 +1848,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 					if (element instanceof TVITourBookTour) {
 						cell.setText(FormatManager.getDrivingTime(drivingTime));
 					} else {
-						cell.setText(net.tourbook.ui.UI.format_hh_mm(drivingTime + 30).toString());
+						cell.setText(UI.format_hh_mm(drivingTime + 30).toString());
 					}
 				}
 
@@ -1879,7 +1879,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 					if (element instanceof TVITourBookTour) {
 						cell.setText(FormatManager.getRecordingTime(recordingTime));
 					} else {
-						cell.setText(net.tourbook.ui.UI.format_hh_mm(recordingTime + 30).toString());
+						cell.setText(net.tourbook.common.UI.format_hh_mm(recordingTime + 30).toString());
 					}
 				}
 
@@ -2801,7 +2801,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 		{
 			final long colRecordingTime = (tviItem).colRecordingTime;
 			if (colRecordingTime != 0) {
-				sb.append(net.tourbook.ui.UI.format_hh_mm_ss(colRecordingTime));
+				sb.append(net.tourbook.common.UI.format_hh_mm_ss(colRecordingTime));
 			}
 			sb.append(UI.TAB);
 		}
@@ -2810,7 +2810,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 		{
 			final long colDrivingTime = tviItem.colDrivingTime;
 			if (colDrivingTime != 0) {
-				sb.append(net.tourbook.ui.UI.format_hh_mm_ss(colDrivingTime));
+				sb.append(net.tourbook.common.UI.format_hh_mm_ss(colDrivingTime));
 			}
 			sb.append(UI.TAB);
 		}
@@ -2819,7 +2819,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 		{
 			final long colPausedTime = tviItem.colPausedTime;
 			if (colPausedTime != 0) {
-				sb.append(net.tourbook.ui.UI.format_hh_mm_ss(colPausedTime));
+				sb.append(net.tourbook.common.UI.format_hh_mm_ss(colPausedTime));
 			}
 			sb.append(UI.TAB);
 		}
@@ -2956,7 +2956,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 		{
 			final float pace = tviItem.colAvgPace * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 			if (pace != 0) {
-				sb.append(net.tourbook.ui.UI.format_mm_ss((long) pace));
+				sb.append(net.tourbook.common.UI.format_mm_ss((long) pace));
 			}
 			sb.append(UI.TAB);
 		}

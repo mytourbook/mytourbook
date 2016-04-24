@@ -949,7 +949,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 				if (pace == 0.0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(UI.format_mm_ss((long) pace));
+					cell.setText(net.tourbook.common.UI.format_mm_ss((long) pace));
 				}
 
 				setCellColor(cell, element);
@@ -1076,7 +1076,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 				if (element instanceof TVITagViewTour) {
 					cell.setText(FormatManager.getDrivingTime(drivingTime));
 				} else {
-					cell.setText(UI.format_hh_mm(drivingTime + 30).toString());
+					cell.setText(net.tourbook.common.UI.format_hh_mm(drivingTime + 30).toString());
 				}
 
 				setCellColor(cell, element);
@@ -1141,7 +1141,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 				if (element instanceof TVITagViewTour) {
 					cell.setText(FormatManager.getRecordingTime(recordingTime));
 				} else {
-					cell.setText(UI.format_hh_mm(recordingTime + 30).toString());
+					cell.setText(net.tourbook.common.UI.format_hh_mm(recordingTime + 30).toString());
 				}
 
 				setCellColor(cell, element);

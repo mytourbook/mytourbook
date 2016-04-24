@@ -864,7 +864,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			public String getResultText() {
 
 				return NLS.bind(Messages.Compute_BreakTime_ForAllTour_Job_Result, //
-						new Object[] { UI.format_hh_mm_ss(oldBreakTime[0]), UI.format_hh_mm_ss(newBreakTime[0]), });
+						new Object[] { net.tourbook.common.UI.format_hh_mm_ss(oldBreakTime[0]), net.tourbook.common.UI.format_hh_mm_ss(newBreakTime[0]), });
 			}
 
 			@Override
@@ -882,7 +882,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 					newBreakTime[0] += tourRecordingTime - tourDrivingTime;
 
 					subTaskText = NLS.bind(Messages.Compute_BreakTime_ForAllTour_Job_SubTask,//
-							new Object[] { UI.format_hh_mm_ss(oldBreakTime[0]), UI.format_hh_mm_ss(newBreakTime[0]), });
+							new Object[] { net.tourbook.common.UI.format_hh_mm_ss(oldBreakTime[0]), net.tourbook.common.UI.format_hh_mm_ss(newBreakTime[0]), });
 				}
 
 				return subTaskText;

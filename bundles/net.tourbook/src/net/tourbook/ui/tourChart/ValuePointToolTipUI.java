@@ -1396,11 +1396,11 @@ public class ValuePointToolTipUI extends ValuePointToolTipShell implements IValu
 		}
 
 		if (_isVisibleAndAvailable_TimeDuration) {
-			_lblTimeDuration.setText(net.tourbook.ui.UI.format_hhh_mm_ss(timeSerie[valueIndex]));
+			_lblTimeDuration.setText(UI.format_hhh_mm_ss(timeSerie[valueIndex]));
 		}
 
 		if (_isVisibleAndAvailable_TimeOfDay) {
-			_lblTimeOfDay.setText(net.tourbook.ui.UI.format_hhh_mm_ss(_tourData.getStartTimeOfDay()
+			_lblTimeOfDay.setText(UI.format_hhh_mm_ss(_tourData.getStartTimeOfDay()
 					+ timeSerie[valueIndex]));
 		}
 

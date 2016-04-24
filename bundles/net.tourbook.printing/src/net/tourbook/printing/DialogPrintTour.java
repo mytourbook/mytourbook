@@ -809,7 +809,7 @@ public class DialogPrintTour extends TitleAreaDialog {
 			final int startTime = minTourData.timeSerie[_tourStartIndex];
 			final DateTime tourTime = dtTour.plusSeconds(startTime);
 
-			_comboFile.setText(net.tourbook.ui.UI.format_yyyymmdd_hhmmss(
+			_comboFile.setText(UI.format_yyyymmdd_hhmmss(
 					tourTime.getYear(),
 					tourTime.getMonthOfYear(),
 					tourTime.getDayOfMonth(),

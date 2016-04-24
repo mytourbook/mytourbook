@@ -13,39 +13,10 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.common.util;
+package net.tourbook.common.formatter;
 
-import org.eclipse.swt.widgets.TreeColumn;
+public interface IValueFormatter {
 
-/**
- * A ColumnDefinition contains the data for creating a column in a TableViewer
- */
-public class TreeColumnDefinition extends ColumnDefinition {
-
-	private TreeColumn	_treeColumn;
-
-	/**
-	 * @param columnManager
-	 *            Manager which managed the columns.
-	 * @param columnId
-	 *            Column id which must be unique within the table.
-	 * @param style
-	 *            UI style.
-	 */
-	public TreeColumnDefinition(final ColumnManager columnManager, final String columnId, final int style) {
-
-		_columnId = columnId;
-		_style = style;
-
-		columnManager.addColumn(this);
-	}
-
-	public TreeColumn getTreeColumn() {
-		return _treeColumn;
-	}
-
-	public void setTreeColumn(final TreeColumn tableColumn) {
-		_treeColumn = tableColumn;
-	}
+	String formatValue(Object value);
 
 }

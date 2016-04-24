@@ -15,6 +15,9 @@
  *******************************************************************************/
 package net.tourbook.common.util;
 
+import net.tourbook.common.formatter.IValueFormatter;
+import net.tourbook.common.formatter.ValueFormat;
+
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnLayoutData;
 import org.eclipse.jface.viewers.ColumnPixelData;
@@ -55,6 +58,7 @@ public class ColumnDefinition implements Cloneable {
 	private String				_columnToolTipText;
 	private int					_columnWidth;
 	private String				_columnUnit;
+	private ValueFormat			_columnFormat;
 
 	private boolean				_isColumnResizable		= true;
 	private boolean				_isColumnMoveable		= true;
@@ -79,6 +83,22 @@ public class ColumnDefinition implements Cloneable {
 	private EditingSupport		_editingSupport;
 
 	private ColumnLayoutData	_columnLayoutData;
+
+	/*
+	 * Value formatter
+	 */
+
+	/** Default value format */
+	private ValueFormat			_defaultValueFormat;
+
+	/** Available value formats */
+	private ValueFormat[]		_availableFormats;
+
+	/** Current value format */
+	private ValueFormat			_valueFormat;
+
+	/** Current value formatter */
+	private IValueFormatter		_valueFormatter;
 
 	/**
 	 * @return Returns <code>true</code> when the visibility of this column can be modified
@@ -110,6 +130,11 @@ public class ColumnDefinition implements Cloneable {
 		clone._isColumnMoveable = _isColumnMoveable;
 		clone._columnSelectionListener = _columnSelectionListener;
 
+		clone._defaultValueFormat = _defaultValueFormat;
+		clone._availableFormats = _availableFormats;
+		clone._valueFormat = _valueFormat;
+		clone._valueFormatter = _valueFormatter;
+
 		clone._createIndex = _createIndex;
 
 		return clone;
@@ -137,6 +162,10 @@ public class ColumnDefinition implements Cloneable {
 		return true;
 	}
 
+	ValueFormat[] getAvailableFormatter() {
+		return _availableFormats;
+	}
+
 	public CellLabelProvider getCellLabelProvider() {
 		return _cellLabelProvider;
 	}
@@ -147,6 +176,10 @@ public class ColumnDefinition implements Cloneable {
 
 	public ControlListener getColumnControlListener() {
 		return _columnControlListener;
+	}
+
+	public ValueFormat getColumnFormat() {
+		return _columnFormat;
 	}
 
 	/**
@@ -199,8 +232,25 @@ public class ColumnDefinition implements Cloneable {
 		return _defaultColumnWidth;
 	}
 
+	public ValueFormat getDefaultValueFormat() {
+		return _defaultValueFormat;
+	}
+
 	public EditingSupport getEditingSupport() {
 		return _editingSupport;
+	}
+
+	public ValueFormat getValueFormat() {
+		return _valueFormat;
+	}
+
+	public IValueFormatter getValueFormatter() {
+
+		if (_valueFormatter == null) {
+			return ColumnManager.getDefaultValueFormatter();
+		}
+
+		return _valueFormatter;
 	}
 
 	@Override
@@ -237,6 +287,10 @@ public class ColumnDefinition implements Cloneable {
 		return _isDefaultColumn;
 	}
 
+	public void setAvailableValueFormats(final ValueFormat[] availableFormatter) {
+		_availableFormats = availableFormatter;
+	}
+
 	/**
 	 * Set status, if the visibility can be changed, when set to <code>false</code> the column is
 	 * always visible and can't be hidden, default is <code>true</code>
@@ -249,6 +303,10 @@ public class ColumnDefinition implements Cloneable {
 
 	public void setColumnCategory(final String category) {
 		_columnCategory = category;
+	}
+
+	public void setColumnFormat(final ValueFormat columnFormat) {
+		_columnFormat = columnFormat;
 	}
 
 	/**
@@ -358,6 +416,10 @@ public class ColumnDefinition implements Cloneable {
 		_defaultColumnWidth = defaultColumnWidth;
 	}
 
+	public void setDefaultValueFormat(final ValueFormat valueFormat) {
+		_defaultValueFormat = valueFormat;
+	}
+
 	public void setEditingSupport(final EditingSupport editingSupport) {
 		_editingSupport = editingSupport;
 	}
@@ -387,6 +449,12 @@ public class ColumnDefinition implements Cloneable {
 
 	public void setLabelProvider(final CellLabelProvider cellLabelProvider) {
 		_cellLabelProvider = cellLabelProvider;
+	}
+
+	void setValueFormatter(final ValueFormat valueFormat, final IValueFormatter valueFormatter) {
+
+		_valueFormat = valueFormat;
+		_valueFormatter = valueFormatter;
 	}
 
 	@Override
