@@ -36,6 +36,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.RGBVertex;
+import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.TableColumnDefinition;
@@ -160,12 +161,15 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 	private class ProfileContentProvider implements IStructuredContentProvider {
 
+		@Override
 		public void dispose() {}
 
+		@Override
 		public Object[] getElements(final Object inputElement) {
 			return _profileList.toArray(new SRTMProfile[_profileList.size()]);
 		}
 
+		@Override
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 
 	}
@@ -688,6 +692,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		 * critical for performance that these methods be as efficient as possible.
 		 */
 		final Listener paintListener = new Listener() {
+			@Override
 			public void handleEvent(final Event event) {
 
 				if (event.index == _profileImageColumn) {
@@ -712,6 +717,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		_profileViewer.setSorter(new ProfileSorter());
 
 		_profileViewer.addCheckStateListener(new ICheckStateListener() {
+			@Override
 			public void checkStateChanged(final CheckStateChangedEvent event) {
 
 				final SRTMProfile checkedProfile = (SRTMProfile) event.getElement();
@@ -731,6 +737,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		});
 
 		_profileViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
 			public void selectionChanged(final SelectionChangedEvent event) {
 
 				final Object firstElement = ((StructuredSelection) event.getSelection()).getFirstElement();
@@ -741,6 +748,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		});
 
 		_profileViewer.addDoubleClickListener(new IDoubleClickListener() {
+			@Override
 			public void doubleClick(final DoubleClickEvent event) {
 				onEditProfile();
 			}
@@ -835,6 +843,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		_booleanEditorApplyOption.setPreferenceStore(_prefStore);
 		_booleanEditorApplyOption.setPage(this);
 		_booleanEditorApplyOption.setPropertyChangeListener(new IPropertyChangeListener() {
+			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 				if (((Boolean) event.getNewValue())) {
 					// apply profile
@@ -1182,6 +1191,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		_btnRemoveProfile.setEnabled(selection.size() == 1 && _profileList.size() > 1);
 	}
 
+	@Override
 	public ColumnManager getColumnManager() {
 		return _columnManager;
 	}
@@ -1237,10 +1247,12 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		return UI.EMPTY_STRING;
 	}
 
+	@Override
 	public ColumnViewer getViewer() {
 		return _profileViewer;
 	}
 
+	@Override
 	public void init(final IWorkbench workbench) {}
 
 	@Override
@@ -1453,6 +1465,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		return super.performOk();
 	}
 
+	@Override
 	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
 
 		_viewerContainer.setRedraw(false);
@@ -1470,6 +1483,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		return _profileViewer;
 	}
 
+	@Override
 	public void reloadViewer() {
 		_profileViewer.setInput(new Object[0]);
 	}
@@ -1656,5 +1670,11 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 		_profileViewer.getTable().setFocus();
 
 		_profileViewer.setSelection(new StructuredSelection(profile), true);
+	}
+
+	@Override
+	public void updateColumnHeader(final ColumnDefinition colDef) {
+		// TODO Auto-generated method stub
+
 	}
 }

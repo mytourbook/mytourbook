@@ -1742,6 +1742,12 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 		}
 	}
 
+	@Override
+	public void updateColumnHeader(final ColumnDefinition colDef) {
+		// TODO Auto-generated method stub
+		
+	}
+
 	private void updateUI(	final ArrayList<TourPhotoLink> tourPhotoLinksWhichShouldBeSelected,
 							final ArrayList<TourPhotoLink> allLinksWhichShouldBeSelected) {
 

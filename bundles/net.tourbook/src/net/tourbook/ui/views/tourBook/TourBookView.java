@@ -36,6 +36,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.tooltip.OpenDialogManager;
+import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer3;
 import net.tourbook.common.util.PostSelectionProvider;
@@ -3669,6 +3670,12 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 		// do a reselection of the selected tours to fire the multi tour data selection
 
 		actionSelectYearMonthTours();
+	}
+
+	@Override
+	public void updateColumnHeader(final ColumnDefinition colDef) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	private void updateDisplayFormats() {

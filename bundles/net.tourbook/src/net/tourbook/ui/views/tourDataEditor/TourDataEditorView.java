@@ -6145,6 +6145,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 	}
 
+	@Override
+	public void updateColumnHeader(final ColumnDefinition colDef) {
+		// TODO Auto-generated method stub
+		
+	}
+
 	private void updateInternalUnitValues() {
 
 		_unitValueDistance = net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;

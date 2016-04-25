@@ -19,13 +19,20 @@ public class ValueFormatSet {
 
 	public static ValueFormat[]	Calories	= new ValueFormat[] {
 											//
-			ValueFormat.Calories_Cal,
-			ValueFormat.Calories_Kcal		};
+			ValueFormat.CALORIES_CAL,
+			ValueFormat.CALORIES_KCAL		};
 
 	public static ValueFormat[]	Time		= new ValueFormat[] {
 											//
-			ValueFormat.Time_HH,
-			ValueFormat.Time_HH_MM,
-			ValueFormat.Time_HH_MM_SS		};
+			ValueFormat.TIME_HH,
+			ValueFormat.TIME_HH_MM,
+			ValueFormat.TIME_HH_MM_SS		};
+
+	public static ValueFormat[]	Number		= new ValueFormat[] {
+											//
+			ValueFormat.NUMBER_1_0,
+			ValueFormat.NUMBER_1_1,
+			ValueFormat.NUMBER_1_2,
+			ValueFormat.NUMBER_1_3			};
 
 }

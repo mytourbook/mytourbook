@@ -61,4 +61,12 @@ public class ColumnProperties {
 
 		return result;
 	}
+
+	@Override
+	public String toString() {
+		return "ColumnProperties [" //
+				+ ("columnId=" + columnId + ", ")
+				+ ("valueFormat=" + valueFormat)
+				+ "]";
+	}
 }

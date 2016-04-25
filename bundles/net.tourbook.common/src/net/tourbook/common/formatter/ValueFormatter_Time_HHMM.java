@@ -15,14 +15,19 @@
  *******************************************************************************/
 package net.tourbook.common.formatter;
 
+import net.tourbook.common.Messages;
 import net.tourbook.common.UI;
 
 public class ValueFormatter_Time_HHMM implements IValueFormatter {
 
 	@Override
-	public String formatValue(final Object value) {
+	public String printDouble(final double value) {
+		return Messages.App_Error_NotSupportedValueFormatter;
+	}
 
-		return UI.format_hh_mm((long) value + 30);
+	@Override
+	public String printLong(final long value) {
+		return UI.format_hh_mm(value + 30);
 	}
 
 }

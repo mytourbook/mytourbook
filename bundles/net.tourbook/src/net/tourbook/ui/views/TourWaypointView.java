@@ -999,6 +999,12 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 		});
 	}
 
+	@Override
+	public void updateColumnHeader(final ColumnDefinition colDef) {
+		// TODO Auto-generated method stub
+		
+	}
+
 	private void updateInternalUnitValues() {
 
 		_unitValueAltitude = UI.UNIT_VALUE_ALTITUDE;

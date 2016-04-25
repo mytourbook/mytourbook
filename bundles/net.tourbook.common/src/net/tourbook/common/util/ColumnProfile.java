@@ -44,7 +44,7 @@ public class ColumnProfile implements Cloneable {
 	 * 
 	 * @since 16.5
 	 */
-	public ArrayList<ColumnProperties>	columnProperties;
+	public ArrayList<ColumnProperties>	columnProperties			= new ArrayList<>();
 
 	private long						_id;
 

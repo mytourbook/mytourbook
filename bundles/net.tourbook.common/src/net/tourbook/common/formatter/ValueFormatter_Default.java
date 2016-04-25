@@ -15,14 +15,16 @@
  *******************************************************************************/
 package net.tourbook.common.formatter;
 
-
-
 public class ValueFormatter_Default implements IValueFormatter {
 
 	@Override
-	public String formatValue(final Object value) {
+	public String printDouble(final double value) {
+		return Double.toString(value);
+	}
 
-		return value.toString();
+	@Override
+	public String printLong(final long value) {
+		return Long.toString(value);
 	}
 
 }

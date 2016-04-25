@@ -31,6 +31,10 @@ import net.tourbook.common.formatter.ValueFormat;
 import net.tourbook.common.formatter.ValueFormatter_Calories_Cal;
 import net.tourbook.common.formatter.ValueFormatter_Calories_Kcal;
 import net.tourbook.common.formatter.ValueFormatter_Default;
+import net.tourbook.common.formatter.ValueFormatter_Number_1_0;
+import net.tourbook.common.formatter.ValueFormatter_Number_1_1;
+import net.tourbook.common.formatter.ValueFormatter_Number_1_2;
+import net.tourbook.common.formatter.ValueFormatter_Number_1_3;
 import net.tourbook.common.formatter.ValueFormatter_Time_HH;
 import net.tourbook.common.formatter.ValueFormatter_Time_HHMM;
 import net.tourbook.common.formatter.ValueFormatter_Time_HHMMSS;
@@ -157,6 +161,10 @@ public class ColumnManager {
 
 	private IValueFormatter						_valueFormatter_Calories_Cal		= new ValueFormatter_Calories_Cal();
 	private IValueFormatter						_valueFormatter_Calories_Kcal		= new ValueFormatter_Calories_Kcal();
+	private IValueFormatter						_valueFormatter_Number_1_0			= new ValueFormatter_Number_1_0();
+	private IValueFormatter						_valueFormatter_Number_1_1			= new ValueFormatter_Number_1_1();
+	private IValueFormatter						_valueFormatter_Number_1_2			= new ValueFormatter_Number_1_2();
+	private IValueFormatter						_valueFormatter_Number_1_3			= new ValueFormatter_Number_1_3();
 	private IValueFormatter						_valueFormatter_Time_HH				= new ValueFormatter_Time_HH();
 	private IValueFormatter						_valueFormatter_Time_HHMM			= new ValueFormatter_Time_HHMM();
 	private IValueFormatter						_valueFormatter_Time_HHMMSS			= new ValueFormatter_Time_HHMMSS();
@@ -196,8 +204,46 @@ public class ColumnManager {
 		restoreState(viewState);
 	}
 
-	public static IValueFormatter getDefaultValueFormatter() {
+	public static IValueFormatter getDefaultDefaultValueFormatter() {
 		return _defaultDefaultValueFormatter;
+	}
+
+	public static String getValueFormatterName(final ValueFormat valueFormat) {
+
+		switch (valueFormat) {
+
+		case CALORIES_CAL:
+			return Messages.Value_Formatter_Calories_Cal;
+
+		case CALORIES_KCAL:
+			return Messages.Value_Formatter_Calories_Kcal;
+
+		case NUMBER_1_0:
+			return Messages.Value_Formatter_Number_1_0;
+
+		case NUMBER_1_1:
+			return Messages.Value_Formatter_Number_1_1;
+
+		case NUMBER_1_2:
+			return Messages.Value_Formatter_Number_1_2;
+
+		case NUMBER_1_3:
+			return Messages.Value_Formatter_Number_1_3;
+
+		case TIME_HH:
+			return Messages.Value_Formatter_Time_HH;
+
+		case TIME_HH_MM:
+			return Messages.Value_Formatter_Time_HH_MM;
+
+		case TIME_HH_MM_SS:
+			return Messages.Value_Formatter_Time_HH_MM_SS;
+
+		default:
+			break;
+		}
+
+		return UI.EMPTY_STRING;
 	}
 
 	private void action_FitAllColumnSize() {
@@ -262,8 +308,33 @@ public class ColumnManager {
 	}
 
 	private void action_SetValueFormatter(final ColumnDefinition colDef, final ValueFormat valueFormat) {
-		// TODO Auto-generated method stub
 
+		/*
+		 * Update model
+		 */
+
+		final String columnId = colDef.getColumnId();
+		for (final ColumnProperties columnProperties : _activeProfile.columnProperties) {
+
+			if (columnId.equals(columnProperties.columnId)) {
+
+				columnProperties.valueFormat = valueFormat;
+
+				break;
+			}
+		}
+
+		final IValueFormatter valueFormatter = getValueFormatter_From_ValueFormat(valueFormat);
+		colDef.setValueFormatter(valueFormat, valueFormatter);
+
+		/*
+		 * Update UI
+		 */
+
+		// allow the viewer to update the header
+		_tourViewer.updateColumnHeader(colDef);
+
+		_tourViewer.getViewer().refresh();
 	}
 
 	private void action_ShowAllColumns() {
@@ -608,7 +679,6 @@ public class ColumnManager {
 			return;
 		}
 
-
 		final String[] visibleIds = _activeProfile.visibleColumnIds;
 		if (visibleIds.length > 1) {
 
@@ -679,53 +749,24 @@ public class ColumnManager {
 			 */
 			final ValueFormat currentValueFormat = colDef.getValueFormat();
 
-			for (final ValueFormat formatter : availableFormatter) {
-
-				String menuItemText = null;
-				ValueFormat menuItemData = null;
-
-				switch (formatter) {
-
-				case Calories_Cal:
-					menuItemText = Messages.Value_Formatter_Calories_Cal;
-					menuItemData = ValueFormat.Calories_Cal;
-					break;
-
-				case Calories_Kcal:
-					menuItemText = Messages.Value_Formatter_Calories_Kcal;
-					menuItemData = ValueFormat.Calories_Kcal;
-					break;
-
-				case Time_HH:
-					menuItemText = Messages.Value_Formatter_Time_HH;
-					menuItemData = ValueFormat.Time_HH;
-					break;
-
-				case Time_HH_MM:
-					menuItemText = Messages.Value_Formatter_Time_HH_MM;
-					menuItemData = ValueFormat.Time_HH_MM;
-					break;
-
-				case Time_HH_MM_SS:
-					menuItemText = Messages.Value_Formatter_Time_HH_MM_SS;
-					menuItemData = ValueFormat.Time_HH_MM_SS;
-					break;
-				default:
-					break;
-				}
+			for (final ValueFormat valueFormat : availableFormatter) {
 
 				final MenuItem menuItem = new MenuItem(contextMenu, SWT.CHECK);
 
-				menuItem.setText(menuItemText);
-				menuItem.setData(menuItemData);
+				menuItem.setText(getValueFormatterName(valueFormat));
+				menuItem.setData(valueFormat);
+
 				menuItem.addListener(SWT.Selection, new Listener() {
 					@Override
 					public void handleEvent(final Event event) {
-						action_SetValueFormatter(colDef, (ValueFormat) event.data);
+
+						final ValueFormat valueFormat = (ValueFormat) menuItem.getData();
+
+						action_SetValueFormatter(colDef, valueFormat);
 					}
 				});
 
-				final boolean isCurrentFormat = currentValueFormat == menuItemData;
+				final boolean isCurrentFormat = currentValueFormat == valueFormat;
 
 				// check current format
 				menuItem.setSelection(isCurrentFormat);
@@ -1279,23 +1320,39 @@ public class ColumnManager {
 		IValueFormatter valueFormatter = null;
 
 		switch (valueFormat) {
-		case Calories_Cal:
+		case CALORIES_CAL:
 			valueFormatter = _valueFormatter_Calories_Cal;
 			break;
 
-		case Calories_Kcal:
+		case CALORIES_KCAL:
 			valueFormatter = _valueFormatter_Calories_Kcal;
 			break;
 
-		case Time_HH:
+		case TIME_HH:
 			valueFormatter = _valueFormatter_Time_HH;
 			break;
 
-		case Time_HH_MM:
+		case NUMBER_1_0:
+			valueFormatter = _valueFormatter_Number_1_0;
+			break;
+
+		case NUMBER_1_1:
+			valueFormatter = _valueFormatter_Number_1_1;
+			break;
+
+		case NUMBER_1_2:
+			valueFormatter = _valueFormatter_Number_1_2;
+			break;
+
+		case NUMBER_1_3:
+			valueFormatter = _valueFormatter_Number_1_3;
+			break;
+
+		case TIME_HH_MM:
 			valueFormatter = _valueFormatter_Time_HHMM;
 			break;
 
-		case Time_HH_MM_SS:
+		case TIME_HH_MM_SS:
 			valueFormatter = _valueFormatter_Time_HHMMSS;
 			break;
 
@@ -1414,8 +1471,8 @@ public class ColumnManager {
 						 * Column properties
 						 */
 
-						final ArrayList<ColumnProperties> columnPropertiesList = new ArrayList<>();
-						currentProfile.columnProperties = columnPropertiesList;
+						final ArrayList<ColumnProperties> allColumnProperties = new ArrayList<>();
+						currentProfile.columnProperties = allColumnProperties;
 
 						for (final IMemento memento2 : xmlProfile.getChildren()) {
 
@@ -1424,18 +1481,20 @@ public class ColumnManager {
 							if (TAG_COLUMN.equals(xmlColumn.getType())) {
 
 								final String columnId = xmlColumn.getString(ATTR_COLUMN_ID);
+
 								final Enum<ValueFormat> valueFormat = Util.getXmlEnum(
 										xmlColumn,
 										ATTR_COLUMN_FORMAT,
-										null);
+										ValueFormat.DUMMY_VALUE);
 
-								if (columnId != null && valueFormat != null) {
+								if (columnId != null && valueFormat != ValueFormat.DUMMY_VALUE) {
 
 									final ColumnProperties columnProperties = new ColumnProperties();
+
 									columnProperties.columnId = columnId;
 									columnProperties.valueFormat = (ValueFormat) valueFormat;
 
-									columnPropertiesList.add(columnProperties);
+									allColumnProperties.add(columnProperties);
 								}
 							}
 						}
@@ -1551,7 +1610,7 @@ public class ColumnManager {
 			 */
 			for (final ColumnProperties columnProperty : profile.columnProperties) {
 
-				final IMemento xmlColumn = xmlMemento.createChild(TAG_COLUMN);
+				final IMemento xmlColumn = xmlProfile.createChild(TAG_COLUMN);
 
 				xmlColumn.putString(ATTR_COLUMN_ID, columnProperty.columnId);
 
@@ -1612,6 +1671,8 @@ public class ColumnManager {
 
 	private void setupValueFormatter(final ColumnProfile activeProfile) {
 
+		final ArrayList<ColumnProperties> allColumnProperties = new ArrayList<>();
+
 		for (final ColumnDefinition colDef : activeProfile.visibleColumnDefinitions) {
 
 			final String columnId = colDef._columnId;
@@ -1619,9 +1680,13 @@ public class ColumnManager {
 			ValueFormat valueFormat = null;
 			IValueFormatter valueFormatter = null;
 
+			ColumnProperties currentColumnProperties = null;
+
 			for (final ColumnProperties columnProperties : activeProfile.columnProperties) {
 
 				if (columnId.equals(columnProperties.columnId)) {
+
+					currentColumnProperties = columnProperties;
 
 					valueFormat = columnProperties.valueFormat;
 					valueFormatter = getValueFormatter_From_ValueFormat(valueFormat);
@@ -1647,7 +1712,27 @@ public class ColumnManager {
 			}
 
 			colDef.setValueFormatter(valueFormat, valueFormatter);
+
+			// ensure all column properties are created
+			if (currentColumnProperties == null) {
+
+				// column properties are not defined
+
+				final ColumnProperties columnProperties = new ColumnProperties();
+
+				columnProperties.columnId = columnId;
+				columnProperties.valueFormat = valueFormat;
+
+				allColumnProperties.add(columnProperties);
+
+			} else {
+				allColumnProperties.add(currentColumnProperties);
+			}
 		}
+
+		// update model
+		activeProfile.columnProperties.clear();
+		activeProfile.columnProperties.addAll(allColumnProperties);
 	}
 
 	/**

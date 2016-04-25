@@ -313,12 +313,15 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
 	private class MarkerContentProvider implements IStructuredContentProvider {
 
+		@Override
 		public void dispose() {}
 
+		@Override
 		public Object[] getElements(final Object inputElement) {
 			return _allMarkerItems.toArray();
 		}
 
+		@Override
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 	}
 
@@ -498,24 +501,32 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
 		_partListener = new IPartListener2() {
 
+			@Override
 			public void partActivated(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == TourMarkerAllView.this) {
 					saveState();
 				}
 			}
 
+			@Override
 			public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partHidden(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partOpened(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partVisible(final IWorkbenchPartReference partRef) {}
 		};
 
@@ -525,6 +536,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 	private void addPrefListener() {
 
 		_prefChangeListener = new IPropertyChangeListener() {
+			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
@@ -562,6 +574,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 	private void addTourEventListener() {
 
 		_tourEventListener = new ITourEventListener() {
+			@Override
 			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
 				if (part == TourMarkerAllView.this) {
@@ -640,6 +653,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 //			}
 //		});
 		BusyIndicator.showWhile(parent.getDisplay(), new Runnable() {
+			@Override
 			public void run() {
 
 				loadAllMarker();
@@ -725,6 +739,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 		final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
+			@Override
 			public void menuAboutToShow(final IMenuManager manager) {
 				fillContextMenu(manager);
 			}
@@ -1228,6 +1243,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 		return null;
 	}
 
+	@Override
 	public ArrayList<TourData> getSelectedTours() {
 
 		final ArrayList<TourData> selectedTours = new ArrayList<TourData>();
@@ -1609,6 +1625,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 	private void refilterViewer() {
 
 		BusyIndicator.showWhile(_viewerContainer.getDisplay(), new Runnable() {
+			@Override
 			public void run() {
 
 				_viewerContainer.setRedraw(false);
@@ -1737,6 +1754,12 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
 		_nfLatLon.setMinimumFractionDigits(_latLonDigits);
 		_nfLatLon.setMaximumFractionDigits(_latLonDigits);
+	}
+
+	@Override
+	public void updateColumnHeader(final ColumnDefinition colDef) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	void updateUI_GeoFilter() {

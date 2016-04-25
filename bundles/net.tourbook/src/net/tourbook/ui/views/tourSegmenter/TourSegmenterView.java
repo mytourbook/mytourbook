@@ -4382,6 +4382,12 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		}
 	}
 
+	@Override
+	public void updateColumnHeader(final ColumnDefinition colDef) {
+		// TODO Auto-generated method stub
+		
+	}
+
 	/**
 	 * update ascending altitude computed value
 	 */

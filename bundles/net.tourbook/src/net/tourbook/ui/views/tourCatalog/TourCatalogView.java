@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.PostSelectionProvider;
@@ -1298,6 +1299,12 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	@Override
 	public void setFocus() {
 //		fTourViewer.getTree().setFocus();
+	}
+
+	@Override
+	public void updateColumnHeader(final ColumnDefinition colDef) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	private void updateToolTipState() {

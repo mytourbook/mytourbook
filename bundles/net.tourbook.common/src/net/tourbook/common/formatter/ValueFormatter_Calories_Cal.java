@@ -17,6 +17,8 @@ package net.tourbook.common.formatter;
 
 import java.text.NumberFormat;
 
+import net.tourbook.common.Messages;
+
 public class ValueFormatter_Calories_Cal implements IValueFormatter {
 
 	private final static NumberFormat	_nf0	= NumberFormat.getNumberInstance();
@@ -28,8 +30,12 @@ public class ValueFormatter_Calories_Cal implements IValueFormatter {
 	}
 
 	@Override
-	public String formatValue(final Object value) {
+	public String printDouble(final double value) {
+		return Messages.App_Error_NotSupportedValueFormatter;
+	}
 
+	@Override
+	public String printLong(final long value) {
 		return _nf0.format(value);
 	}
 

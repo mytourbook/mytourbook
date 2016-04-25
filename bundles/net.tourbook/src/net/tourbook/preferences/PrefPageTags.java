@@ -23,6 +23,7 @@ import javax.persistence.EntityManager;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.TreeViewerItem;
@@ -181,16 +182,20 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 	private final class TagViewerContentProvicer implements ITreeContentProvider {
 
+		@Override
 		public void dispose() {}
 
+		@Override
 		public Object[] getChildren(final Object parentElement) {
 			return ((TreeViewerItem) parentElement).getFetchedChildrenAsArray();
 		}
 
+		@Override
 		public Object[] getElements(final Object inputElement) {
 			return _rootItem.getFetchedChildrenAsArray();
 		}
 
+		@Override
 		public Object getParent(final Object element) {
 			return ((TreeViewerItem) element).getParentItem();
 		}
@@ -199,10 +204,12 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 //			return _rootItem;
 //		}
 
+		@Override
 		public boolean hasChildren(final Object element) {
 			return ((TreeViewerItem) element).hasChildren();
 		}
 
+		@Override
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 	}
 
@@ -339,6 +346,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		_tagViewer.setUseHashlookup(true);
 
 		_tagViewer.addDoubleClickListener(new IDoubleClickListener() {
+			@Override
 			public void doubleClick(final DoubleClickEvent event) {
 
 				final Object selection = ((IStructuredSelection) _tagViewer.getSelection()).getFirstElement();
@@ -365,6 +373,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		});
 
 		_tagViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
 			public void selectionChanged(final SelectionChangedEvent event) {
 				enableButtons();
 			}
@@ -375,6 +384,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 				new Transfer[] { LocalSelectionTransfer.getTransfer() },
 				new DragSourceListener() {
 
+					@Override
 					public void dragFinished(final DragSourceEvent event) {
 
 						final LocalSelectionTransfer transfer = LocalSelectionTransfer.getTransfer();
@@ -387,10 +397,12 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 						transfer.setSelectionSetTime(0);
 					}
 
+					@Override
 					public void dragSetData(final DragSourceEvent event) {
 						// data are set in LocalSelectionTransfer
 					}
 
+					@Override
 					public void dragStart(final DragSourceEvent event) {
 
 						final LocalSelectionTransfer transfer = LocalSelectionTransfer.getTransfer();
@@ -617,6 +629,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		}
 	}
 
+	@Override
 	public ColumnManager getColumnManager() {
 		return null;
 	}
@@ -629,10 +642,12 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		return _rootItem;
 	}
 
+	@Override
 	public ColumnViewer getViewer() {
 		return _tagViewer;
 	}
 
+	@Override
 	public void init(final IWorkbench workbench) {
 		setPreferenceStore(TourbookPlugin.getDefault().getPreferenceStore());
 	}
@@ -1083,10 +1098,12 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 		return true;
 	}
 
+	@Override
 	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
 		return null;
 	}
 
+	@Override
 	public void reloadViewer() {}
 
 	private void setFocusToViewer() {
@@ -1097,6 +1114,12 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
 	public void setIsModified() {
 		_isModified = true;
+	}
+
+	@Override
+	public void updateColumnHeader(final ColumnDefinition colDef) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	private void updateTagViewer() {

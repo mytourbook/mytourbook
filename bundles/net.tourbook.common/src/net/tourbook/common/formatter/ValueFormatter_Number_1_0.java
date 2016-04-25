@@ -15,19 +15,28 @@
  *******************************************************************************/
 package net.tourbook.common.formatter;
 
-import net.tourbook.common.Messages;
-import net.tourbook.common.UI;
+import java.text.NumberFormat;
 
-public class ValueFormatter_Time_HH implements IValueFormatter {
+import net.tourbook.common.Messages;
+
+public class ValueFormatter_Number_1_0 implements IValueFormatter {
+
+	private final static NumberFormat	_nf0	= NumberFormat.getNumberInstance();
+
+	static {
+
+		_nf0.setMinimumFractionDigits(0);
+		_nf0.setMaximumFractionDigits(0);
+	}
 
 	@Override
 	public String printDouble(final double value) {
-		return Messages.App_Error_NotSupportedValueFormatter;
+		return _nf0.format(value);
 	}
 
 	@Override
 	public String printLong(final long value) {
-		return UI.format_hh(value + 1800);
+		return Messages.App_Error_NotSupportedValueFormatter;
 	}
 
 }

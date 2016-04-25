@@ -18,12 +18,18 @@ package net.tourbook.common.formatter;
 public enum ValueFormat {
 
 	DEFAULT, //
+	DUMMY_VALUE, //
 
-	Calories_Cal, //
-	Calories_Kcal, //
+	CALORIES_CAL, //
+	CALORIES_KCAL, //
 
-	Time_HH, //
-	Time_HH_MM, //
-	Time_HH_MM_SS,
+	NUMBER_1_0, //
+	NUMBER_1_1, //
+	NUMBER_1_2, //
+	NUMBER_1_3, //
+
+	TIME_HH, //
+	TIME_HH_MM, //
+	TIME_HH_MM_SS, //
 
 }

@@ -5135,6 +5135,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_watchingStoresThread.start();
 	}
 
+	@Override
+	public void updateColumnHeader(final ColumnDefinition colDef) {
+		// TODO Auto-generated method stub
+		
+	}
+
 	private void updateDisplayFormats() {
 
 		// update table header

@@ -24,6 +24,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.TableColumnDefinition;
@@ -467,6 +468,12 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 			_icViewer.setInput(this);
 		}
 
+		@Override
+		public void updateColumnHeader(final ColumnDefinition colDef) {
+			// TODO Auto-generated method stub
+
+		}
+
 	}
 
 	private class ICContentProvider implements IStructuredContentProvider {
@@ -526,6 +533,12 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 		public void reloadViewer() {
 
 			_ilViewer.setInput(this);
+		}
+
+		@Override
+		public void updateColumnHeader(final ColumnDefinition colDef) {
+			// TODO Auto-generated method stub
+
 		}
 
 	}

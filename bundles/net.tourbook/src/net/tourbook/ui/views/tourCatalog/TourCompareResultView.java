@@ -26,6 +26,7 @@ import javax.persistence.EntityTransaction;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.PostSelectionProvider;
@@ -1519,6 +1520,12 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	public void setFocus() {
 
 		_tourViewer.getTree().setFocus();
+	}
+
+	@Override
+	public void updateColumnHeader(final ColumnDefinition colDef) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	/**

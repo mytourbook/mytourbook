@@ -22,6 +22,7 @@ import java.util.Comparator;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.Messages;
 import net.tourbook.common.UI;
+import net.tourbook.common.formatter.ValueFormat;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
@@ -251,7 +252,11 @@ public class DialogModifyColumns extends TrayDialog {
 			for (final ColumnDefinition colDef : columnProfile.visibleColumnDefinitions) {
 
 				final ColumnDefinition modelColDef = (ColumnDefinition) colDef.clone();
+
 				modelColDef.setIsCheckedInDialog(true);
+
+				modelColDef.setColumnFormat(colDef.getValueFormat());
+				modelColDef.setColumnWidth(colDef.getColumnWidth());
 
 				modelColumns.add(modelColDef);
 
@@ -927,6 +932,7 @@ public class DialogModifyColumns extends TrayDialog {
 
 		defineColumn_ColumnName(tableLayout);
 		defineColumn_Unit(tableLayout);
+		defineColumn_Format(tableLayout);
 		defineColumn_Width(tableLayout);
 
 		/**
@@ -1005,6 +1011,42 @@ public class DialogModifyColumns extends TrayDialog {
 	}
 
 	/**
+	 * Column: Format
+	 */
+	private void defineColumn_Format(final TableColumnLayout tableLayout) {
+		
+		final TableViewerColumn tvc = new TableViewerColumn(_columnViewer, SWT.LEAD);
+		
+		final TableColumn tc = tvc.getColumn();
+		tc.setMoveable(true);
+		tc.setText(Messages.ColumnModifyDialog_Column_Format);
+		
+		tvc.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				
+				final ColumnDefinition colDef = (ColumnDefinition) cell.getElement();
+				final ValueFormat valueFormat = colDef.getValueFormat();
+				
+				if (valueFormat == null) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+
+					final String valueFormatterText = ColumnManager.getValueFormatterName(valueFormat);
+
+					cell.setText(valueFormatterText);
+				}
+
+				// paint columns in a different color which can't be hidden
+				if (colDef.canModifyVisibility() == false) {
+					cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+				}
+			}
+		});
+		tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(14), true));
+	}
+
+	/**
 	 * Column: Unit
 	 */
 	private void defineColumn_Unit(final TableColumnLayout tableLayout) {
@@ -1028,7 +1070,7 @@ public class DialogModifyColumns extends TrayDialog {
 				}
 			}
 		});
-		tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(13), true));
+		tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(14), true));
 	}
 
 	/**
@@ -1036,7 +1078,7 @@ public class DialogModifyColumns extends TrayDialog {
 	 */
 	private void defineColumn_Width(final TableColumnLayout tableLayout) {
 
-		final TableViewerColumn tvc = new TableViewerColumn(_columnViewer, SWT.LEAD);
+		final TableViewerColumn tvc = new TableViewerColumn(_columnViewer, SWT.TRAIL);
 
 		final TableColumn tc = tvc.getColumn();
 		tc.setMoveable(true);

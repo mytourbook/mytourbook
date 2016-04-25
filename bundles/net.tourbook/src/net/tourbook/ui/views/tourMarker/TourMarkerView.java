@@ -1039,6 +1039,12 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 		});
 	}
 
+	@Override
+	public void updateColumnHeader(final ColumnDefinition colDef) {
+		// TODO Auto-generated method stub
+		
+	}
+
 	private void updateUI_MarkerViewer() {
 
 		if (_tourData == null) {

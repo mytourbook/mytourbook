@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
+import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.Util;
 import net.tourbook.photo.internal.ActionPhotoFilterGPS;
 import net.tourbook.photo.internal.ActionPhotoFilterNoGPS;
@@ -482,6 +483,12 @@ public class PhotoGallery extends ImageGallery {
 		_state.put(STATE_RATING_STAR_BEHAVIOUR, _ratingStarBehaviour.name());
 
 		super.saveState();
+	}
+
+	@Override
+	public void updateColumnHeader(final ColumnDefinition colDef) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	private void updateUI_GalleryType(final GalleryType galleryType) {

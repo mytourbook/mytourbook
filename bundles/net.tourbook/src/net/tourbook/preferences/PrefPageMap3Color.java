@@ -28,6 +28,7 @@ import net.tourbook.common.color.Map3ProfileComparator;
 import net.tourbook.common.color.MapGraphId;
 import net.tourbook.common.color.ProfileImage;
 import net.tourbook.common.color.RGBVertex;
+import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.TreeColumnDefinition;
@@ -176,6 +177,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 
 	{
 		_defaultMouseWheelListener = new MouseWheelListener() {
+			@Override
 			public void mouseScrolled(final MouseEvent event) {
 				net.tourbook.common.UI.adjustSpinnerValueOnMouseScroll(event);
 			}
@@ -203,8 +205,10 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 	 */
 	private static class ContentProvider implements ITreeContentProvider {
 
+		@Override
 		public void dispose() {}
 
+		@Override
 		public Object[] getChildren(final Object parentElement) {
 			if (parentElement instanceof Map3ColorDefinition) {
 
@@ -218,6 +222,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 			return null;
 		}
 
+		@Override
 		public Object[] getElements(final Object inputElement) {
 
 			if (inputElement instanceof PrefPageMap3Color) {
@@ -227,10 +232,12 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 			return null;
 		}
 
+		@Override
 		public Object getParent(final Object element) {
 			return null;
 		}
 
+		@Override
 		public boolean hasChildren(final Object element) {
 
 			if (element instanceof Map3ColorDefinition) {
@@ -240,6 +247,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 			return false;
 		}
 
+		@Override
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 	}
 
@@ -458,6 +466,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 		menuMgr.setRemoveAllWhenShown(true);
 
 		menuMgr.addMenuListener(new IMenuListener() {
+			@Override
 			public void menuAboutToShow(final IMenuManager menuMgr2) {
 //				fillContextMenu(menuMgr2);
 			}
@@ -554,6 +563,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 		 * critical for performance that these methods be as efficient as possible.
 		 */
 		final Listener paintListener = new Listener() {
+			@Override
 			public void handleEvent(final Event event) {
 
 				if (event.type == SWT.MeasureItem || event.type == SWT.PaintItem) {
@@ -583,12 +593,14 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 		_colorProfileViewer.setUseHashlookup(true);
 
 		_colorProfileViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
 			public void selectionChanged(final SelectionChangedEvent event) {
 				onViewerSelectColor();
 			}
 		});
 
 		_colorProfileViewer.addDoubleClickListener(new IDoubleClickListener() {
+			@Override
 			public void doubleClick(final DoubleClickEvent event) {
 				onViewerDoubleClick();
 			}
@@ -1199,6 +1211,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 		return _colorProfileViewer;
 	}
 
+	@Override
 	public void init(final IWorkbench workbench) {}
 
 	/**
@@ -1613,6 +1626,12 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 		}
 
 		return false;
+	}
+
+	@Override
+	public void updateColumnHeader(final ColumnDefinition colDef) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	private void updateUI_SelectColorProvider(final Map3GradientColorProvider selectedColorProvider) {

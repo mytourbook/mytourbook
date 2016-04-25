@@ -26,9 +26,10 @@ import java.util.Set;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
-import net.tourbook.common.formatter.IValueFormatter;
+import net.tourbook.common.formatter.ValueFormat;
 import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.tooltip.OpenDialogManager;
+import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer3;
 import net.tourbook.common.util.PostSelectionProvider;
@@ -52,7 +53,6 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourTypeMenuManager;
 import net.tourbook.tour.printing.ActionPrint;
-import net.tourbook.ui.FormatManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourProviderByID;
 import net.tourbook.ui.TourTypeFilter;
@@ -150,6 +150,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	//
 	private TVICollatedTour_Root						_rootItem;
 	//
+	private final NumberFormat							_nf0;
 	private final NumberFormat							_nf1;
 	private final NumberFormat							_nf1_NoGroup;
 
@@ -157,6 +158,10 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	private final DateFormat							_timeFormatter;
 
 	{
+		_nf0 = NumberFormat.getNumberInstance();
+		_nf0.setMinimumFractionDigits(0);
+		_nf0.setMaximumFractionDigits(0);
+
 		_nf1 = NumberFormat.getNumberInstance();
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
@@ -209,8 +214,9 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
 	private CollateTourContributionItem					_contribItem_CollatedTours;
 
-	private TreeColumnDefinition						_colDef_BodyCalories;
 	private TreeViewer									_tourViewer;
+	private TreeColumnDefinition						_colDef_BodyCalories;
+
 	private PixelConverter								_pc;
 
 	/*
@@ -361,7 +367,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
 				} else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
-					updateDisplayFormats();
+//					updateDisplayFormats();
 
 					_tourViewer.getTree().setLinesVisible(
 							_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
@@ -481,7 +487,9 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 		// set selection provider
 		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
 
-		updateDisplayFormats();
+		// set column header according to the displayed values
+		updateColumnHeader(null);
+
 		restoreState();
 
 		enableActions();
@@ -742,7 +750,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 					 * Number of tours for each event
 					 */
 					styledString.append(UI.SPACE3);
-					styledString.append(Long.toString(tourItem.colCounter), StyledString.QUALIFIER_STYLER);
+					styledString.append(_nf0.format(tourItem.colCounter), StyledString.QUALIFIER_STYLER);
 
 					cell.setText(styledString.getString());
 					cell.setStyleRanges(styledString.getStyleRanges());
@@ -769,7 +777,8 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 				if (dbAltitudeDown == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(Long.toString((long) (-dbAltitudeDown / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
+					final float value = -dbAltitudeDown / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+					cell.setText(_nf0.format(value));
 				}
 
 				setCellColor(cell, element);
@@ -793,7 +802,8 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 				if (dbMaxAltitude == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(Long.toString((long) (dbMaxAltitude / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
+					final float value = dbMaxAltitude / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+					cell.setText(_nf0.format(value));
 				}
 
 				setCellColor(cell, element);
@@ -818,7 +828,8 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 				if (dbAltitudeUp == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(Long.toString((long) (dbAltitudeUp / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
+					final float value = dbAltitudeUp / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+					cell.setText(_nf0.format(value));
 				}
 
 				setCellColor(cell, element);
@@ -842,7 +853,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 				if (dbAvgPulse == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(_nf1.format(dbAvgPulse));
+					cell.setText(colDef.getValueFormatter().printDouble(dbAvgPulse));
 				}
 
 				setCellColor(cell, element);
@@ -861,12 +872,12 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 			public void update(final ViewerCell cell) {
 
 				final Object element = cell.getElement();
-				final long caloriesSum = ((TVICollatedTour) element).colCalories;
+				final long calories = ((TVICollatedTour) element).colCalories;
 
-				if (caloriesSum == 0) {
+				if (calories == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(FormatManager.getCalories(caloriesSum));
+					cell.setText(_colDef_BodyCalories.getValueFormatter().printLong(calories));
 				}
 
 				setCellColor(cell, element);
@@ -890,7 +901,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 				if (dbMaxPulse == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(Long.toString(dbMaxPulse));
+					cell.setText(_nf0.format(dbMaxPulse));
 				}
 				setCellColor(cell, element);
 			}
@@ -984,7 +995,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 				if (numberOfTimeSlices == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(Integer.toString(numberOfTimeSlices));
+					cell.setText(_nf0.format(numberOfTimeSlices));
 				}
 
 				setCellColor(cell, element);
@@ -1035,7 +1046,8 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 					if (dbStartDistance == 0) {
 						cell.setText(UI.EMPTY_STRING);
 					} else {
-						cell.setText(Long.toString((long) (dbStartDistance / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE)));
+						final float value = dbStartDistance / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+						cell.setText(_nf0.format(value));
 					}
 
 					setCellColor(cell, element);
@@ -1081,10 +1093,11 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 				final Object element = cell.getElement();
 
 				final float speed = ((TVICollatedTour) element).colAvgSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+
 				if (speed == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(_nf1.format(speed));
+					cell.setText(colDef.getValueFormatter().printDouble(speed));
 				}
 
 				setCellColor(cell, element);
@@ -1109,7 +1122,10 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 				if (dbDistance == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(_nf1.format(dbDistance / 1000 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
+
+					final double value = dbDistance / 1000 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+
+					cell.setText(colDef.getValueFormatter().printDouble(value));
 				}
 
 				setCellColor(cell, element);
@@ -1133,7 +1149,8 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 				if (dbMaxSpeed == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(_nf1.format(dbMaxSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
+					final float value = dbMaxSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+					cell.setText(colDef.getValueFormatter().printDouble(value));
 				}
 
 				setCellColor(cell, element);
@@ -1157,7 +1174,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 				if (dbAvgCadence == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(_nf1.format(dbAvgCadence));
+					cell.setText(colDef.getValueFormatter().printDouble(dbAvgCadence));
 				}
 
 				setCellColor(cell, element);
@@ -1183,7 +1200,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 				if (numberOfShifts == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(Integer.toString(numberOfShifts));
+					cell.setText(_nf0.format(numberOfShifts));
 				}
 
 				setCellColor(cell, element);
@@ -1209,7 +1226,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 				if (numberOfShifts == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(Integer.toString(numberOfShifts));
+					cell.setText(_nf0.format(numberOfShifts));
 				}
 
 				setCellColor(cell, element);
@@ -1233,21 +1250,9 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 				final long drivingTime = ((TVICollatedTour) element).colDrivingTime;
 
 				if (drivingTime == 0) {
-
 					cell.setText(UI.EMPTY_STRING);
-
 				} else {
-
-					if (element instanceof TVICollatedTour_Tour) {
-
-						final IValueFormatter valueFormatter = colDef.getValueFormatter();
-						final String formatedValue = valueFormatter.formatValue(drivingTime);
-
-						cell.setText(formatedValue);
-
-					} else {
-						cell.setText(UI.format_hh_mm(drivingTime + 30).toString());
-					}
+					cell.setText(colDef.getValueFormatter().printLong(drivingTime));
 				}
 
 				setCellColor(cell, element);
@@ -1277,7 +1282,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 				if (dbPausedTime == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(FormatManager.getPauseTime(dbPausedTime));
+					cell.setText(colDef.getValueFormatter().printLong(dbPausedTime));
 				}
 
 				setCellColor(cell, element);
@@ -1332,16 +1337,9 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 				final long recordingTime = ((TVICollatedTour) element).colRecordingTime;
 
 				if (recordingTime == 0) {
-
 					cell.setText(UI.EMPTY_STRING);
-
 				} else {
-
-					if (element instanceof TVICollatedTour_Tour) {
-						cell.setText(FormatManager.getRecordingTime(recordingTime));
-					} else {
-						cell.setText(UI.format_hh_mm(recordingTime + 30).toString());
-					}
+					cell.setText(colDef.getValueFormatter().printLong(recordingTime));
 				}
 
 				setCellColor(cell, element);
@@ -1485,7 +1483,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 					if (markerIds == null) {
 						cell.setText(UI.EMPTY_STRING);
 					} else {
-						cell.setText(Integer.toString(markerIds.size()));
+						cell.setText(_nf0.format(markerIds.size()));
 					}
 
 					setCellColor(cell, element);
@@ -1511,7 +1509,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 				if (numberOfPhotos == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(Integer.toString(numberOfPhotos));
+					cell.setText(_nf0.format(numberOfPhotos));
 				}
 
 				setCellColor(cell, element);
@@ -1667,7 +1665,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 								+ net.tourbook.ui.UI.UNIT_FAHRENHEIT_ADD;
 					}
 
-					cell.setText(_nf1.format(temperature));
+					cell.setText(colDef.getValueFormatter().printDouble(temperature));
 				}
 
 				setCellColor(cell, element);
@@ -2189,10 +2187,14 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 		_isInUIUpdate = isInUpdate;
 	}
 
-	private void updateDisplayFormats() {
+	@Override
+	public void updateColumnHeader(final ColumnDefinition colDef) {
 
-		// update table header texts
-		final String headerText = FormatManager.getCaloriesUnit();
+		// update viewer header texts
+
+		final String headerText = ValueFormat.CALORIES_CAL.equals(_colDef_BodyCalories.getValueFormat())
+				? net.tourbook.ui.Messages.Value_Unit_Calories
+				: net.tourbook.ui.Messages.Value_Unit_KCalories;
 
 		_colDef_BodyCalories.setColumnHeaderText(headerText);
 		_colDef_BodyCalories.getTreeColumn().setText(headerText);

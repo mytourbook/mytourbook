@@ -247,7 +247,7 @@ public class ColumnDefinition implements Cloneable {
 	public IValueFormatter getValueFormatter() {
 
 		if (_valueFormatter == null) {
-			return ColumnManager.getDefaultValueFormatter();
+			return ColumnManager.getDefaultDefaultValueFormatter();
 		}
 
 		return _valueFormatter;
@@ -285,10 +285,6 @@ public class ColumnDefinition implements Cloneable {
 	 */
 	public boolean isDefaultColumn() {
 		return _isDefaultColumn;
-	}
-
-	public void setAvailableValueFormats(final ValueFormat[] availableFormatter) {
-		_availableFormats = availableFormatter;
 	}
 
 	/**
@@ -416,10 +412,6 @@ public class ColumnDefinition implements Cloneable {
 		_defaultColumnWidth = defaultColumnWidth;
 	}
 
-	public void setDefaultValueFormat(final ValueFormat valueFormat) {
-		_defaultValueFormat = valueFormat;
-	}
-
 	public void setEditingSupport(final EditingSupport editingSupport) {
 		_editingSupport = editingSupport;
 	}
@@ -449,6 +441,18 @@ public class ColumnDefinition implements Cloneable {
 
 	public void setLabelProvider(final CellLabelProvider cellLabelProvider) {
 		_cellLabelProvider = cellLabelProvider;
+	}
+
+	/**
+	 * Set formats which are used to render the column.
+	 * 
+	 * @param availableFormats
+	 * @param defaultFormat
+	 */
+	public void setValueFormats(final ValueFormat[] availableFormats, final ValueFormat defaultFormat) {
+
+		_availableFormats = availableFormats;
+		_defaultValueFormat = defaultFormat;
 	}
 
 	void setValueFormatter(final ValueFormat valueFormat, final IValueFormatter valueFormatter) {

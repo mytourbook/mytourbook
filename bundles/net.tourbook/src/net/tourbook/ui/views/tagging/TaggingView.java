@@ -26,6 +26,7 @@ import java.util.Set;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.PostSelectionProvider;
@@ -1836,6 +1837,12 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	public void setViewLayout(final int tagViewStructure) {
 		_tagViewLayout = tagViewStructure;
 		reloadViewer();
+	}
+
+	@Override
+	public void updateColumnHeader(final ColumnDefinition colDef) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	private void updateToolTipState() {

@@ -25,6 +25,8 @@ public class Messages extends NLS {
 	public static String		App_Action_Remove_NoConfirm;
 	public static String		App_Action_Rename_WithConfirm;
 
+	public static String		App_Error_NotSupportedValueFormatter;
+
 	public static String		Action_App_CustomizeColumnsAndProfiles;
 	public static String		Action_App_SizeAllColumnsToFit;
 
@@ -53,6 +55,7 @@ public class Messages extends NLS {
 	public static String		ColumnModifyDialog_Button_Sort;
 	public static String		ColumnModifyDialog_Button_Sort_Tooltip;
 	public static String		ColumnModifyDialog_Column_Category;
+	public static String		ColumnModifyDialog_Column_Format;
 	public static String		ColumnModifyDialog_column_column;
 	public static String		ColumnModifyDialog_column_unit;
 	public static String		ColumnModifyDialog_column_width;
@@ -238,6 +241,10 @@ public class Messages extends NLS {
 
 	public static String		Value_Formatter_Calories_Cal;
 	public static String		Value_Formatter_Calories_Kcal;
+	public static String		Value_Formatter_Number_1_0;
+	public static String		Value_Formatter_Number_1_1;
+	public static String		Value_Formatter_Number_1_2;
+	public static String		Value_Formatter_Number_1_3;
 	public static String		Value_Formatter_Time_HH;
 	public static String		Value_Formatter_Time_HH_MM;
 	public static String		Value_Formatter_Time_HH_MM_SS;

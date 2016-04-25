@@ -17,6 +17,8 @@ package net.tourbook.common.formatter;
 
 public interface IValueFormatter {
 
-	String formatValue(Object value);
+	String printDouble(double value);
+
+	String printLong(long value);
 
 }
