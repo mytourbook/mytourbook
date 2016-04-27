@@ -128,8 +128,6 @@ public abstract class ColumnViewerTourInfoToolTip extends ToolTip implements ITo
 
 		if (cell != null) {
 
-			final Rectangle displayBounds = _ttControl.getDisplay().getBounds();
-
 			final Rectangle cellBounds = cell.getBounds();
 			final int cellWidth2 = cellBounds.width / 2;
 			final int cellHeight = cellBounds.height;
@@ -149,6 +147,8 @@ public abstract class ColumnViewerTourInfoToolTip extends ToolTip implements ITo
 				devX = treeBounds.width - 40;
 				isDevXAdjusted = true;
 			}
+
+			final Rectangle displayBounds = _ttControl.getDisplay().getBounds();
 
 			Point ttDisplayLocation = _ttControl.toDisplay(devX, devY);
 			final int tipSizeWidth = tipSize.x;

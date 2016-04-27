@@ -38,6 +38,8 @@ public class Messages extends NLS {
 	public static String		Action_ColumnManager_ShowDefaultColumns;
 	public static String		Action_ColumnManager_ValueFormatter_Info;
 
+	public static String	Action_ColumnManager_ValueFormatterDetail_Info;
+
 	public static String		Advanced_Menu_AnimationSymbol;
 
 	public static String		Column_Profile_Dialog_ShowAllColumns_Message;
@@ -55,6 +57,8 @@ public class Messages extends NLS {
 	public static String		ColumnModifyDialog_Button_Sort;
 	public static String		ColumnModifyDialog_Button_Sort_Tooltip;
 	public static String		ColumnModifyDialog_Column_Category;
+
+	public static String	ColumnModifyDialog_Column_DetailFormat;
 	public static String		ColumnModifyDialog_Column_Format;
 	public static String		ColumnModifyDialog_column_column;
 	public static String		ColumnModifyDialog_column_unit;
@@ -240,7 +244,13 @@ public class Messages extends NLS {
 	public static String		rgv_vertex_class_cast_exception;
 
 	public static String		Value_Formatter_Calories_Cal;
-	public static String		Value_Formatter_Calories_Kcal;
+	public static String	Value_Formatter_Calories_Kcal_1_0;
+
+	public static String	Value_Formatter_Calories_Kcal_1_1;
+
+	public static String	Value_Formatter_Calories_Kcal_1_2;
+
+	public static String	Value_Formatter_Calories_Kcal_1_3;
 	public static String		Value_Formatter_Number_1_0;
 	public static String		Value_Formatter_Number_1_1;
 	public static String		Value_Formatter_Number_1_2;

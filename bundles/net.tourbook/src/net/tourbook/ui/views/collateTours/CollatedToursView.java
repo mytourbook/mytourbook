@@ -116,6 +116,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
@@ -126,6 +127,9 @@ import org.joda.time.DateTime;
 public class CollatedToursView extends ViewPart implements ITourProvider, ITourViewer3, ITourProviderByID {
 
 	static public final String							ID						= "net.tourbook.ui.views.collateTours.CollatedToursView";	//$NON-NLS-1$
+
+	private static final String							VALUE_UNIT_CALORIES		= net.tourbook.ui.Messages.Value_Unit_Calories;
+	private static final String							VALUE_UNIT_K_CALORIES	= net.tourbook.ui.Messages.Value_Unit_KCalories;
 
 	private static Styler								DATE_STYLER;
 	private static final String[]						WEEK_DAYS;
@@ -1122,9 +1126,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 				if (dbDistance == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-
 					final double value = dbDistance / 1000 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
-
 					cell.setText(colDef.getValueFormatter().printDouble(value));
 				}
 
@@ -2190,14 +2192,17 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	@Override
 	public void updateColumnHeader(final ColumnDefinition colDef) {
 
-		// update viewer header texts
+		final TreeColumn caloriesColumn = _colDef_BodyCalories.getTreeColumn();
 
-		final String headerText = ValueFormat.CALORIES_CAL.equals(_colDef_BodyCalories.getValueFormat())
-				? net.tourbook.ui.Messages.Value_Unit_Calories
-				: net.tourbook.ui.Messages.Value_Unit_KCalories;
+		if (caloriesColumn.isDisposed() == false) {
 
-		_colDef_BodyCalories.setColumnHeaderText(headerText);
-		_colDef_BodyCalories.getTreeColumn().setText(headerText);
+			final String headerText = ValueFormat.CALORIES_CAL.equals(_colDef_BodyCalories.getValueFormat())
+					? VALUE_UNIT_CALORIES
+					: VALUE_UNIT_K_CALORIES;
+
+			_colDef_BodyCalories.setColumnHeaderText(headerText);
+			caloriesColumn.setText(headerText);
+		}
 	}
 
 	private void updateToolTipState() {

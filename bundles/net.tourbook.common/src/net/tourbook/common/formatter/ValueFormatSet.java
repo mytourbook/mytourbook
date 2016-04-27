@@ -20,7 +20,10 @@ public class ValueFormatSet {
 	public static ValueFormat[]	Calories	= new ValueFormat[] {
 											//
 			ValueFormat.CALORIES_CAL,
-			ValueFormat.CALORIES_KCAL		};
+			ValueFormat.CALORIES_KCAL_1_0,
+			ValueFormat.CALORIES_KCAL_1_1,
+			ValueFormat.CALORIES_KCAL_1_2,
+			ValueFormat.CALORIES_KCAL_1_3,	};
 
 	public static ValueFormat[]	Time		= new ValueFormat[] {
 											//

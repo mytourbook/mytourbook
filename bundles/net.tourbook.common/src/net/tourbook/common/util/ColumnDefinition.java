@@ -35,7 +35,7 @@ public class ColumnDefinition implements Cloneable {
 	/**
 	 * every column in a table must have a unique id
 	 */
-	protected String			_columnId;
+	private String				_columnId;
 
 	/**
 	 * visibility status used in the modify dialog, this is used if the dialog is canceled to not
@@ -58,7 +58,6 @@ public class ColumnDefinition implements Cloneable {
 	private String				_columnToolTipText;
 	private int					_columnWidth;
 	private String				_columnUnit;
-	private ValueFormat			_columnFormat;
 
 	private boolean				_isColumnResizable		= true;
 	private boolean				_isColumnMoveable		= true;
@@ -88,17 +87,32 @@ public class ColumnDefinition implements Cloneable {
 	 * Value formatter
 	 */
 
+	/** Available value formats */
+	private ValueFormat[]		_availableFormats;
+
 	/** Default value format */
 	private ValueFormat			_defaultValueFormat;
 
-	/** Available value formats */
-	private ValueFormat[]		_availableFormats;
+	/** Default detail value format */
+	private ValueFormat			_defaultValueFormat_Detail;
 
 	/** Current value format */
 	private ValueFormat			_valueFormat;
 
 	/** Current value formatter */
 	private IValueFormatter		_valueFormatter;
+
+	/** Current value format */
+	private ValueFormat			_valueFormat_Detail;
+
+	/** Current value formatter */
+	private IValueFormatter		_valueFormatter_Detail;
+
+	ColumnDefinition(final String columnId, final int style) {
+
+		_columnId = columnId;
+		_style = style;
+	}
 
 	/**
 	 * @return Returns <code>true</code> when the visibility of this column can be modified
@@ -178,10 +192,6 @@ public class ColumnDefinition implements Cloneable {
 		return _columnControlListener;
 	}
 
-	public ValueFormat getColumnFormat() {
-		return _columnFormat;
-	}
-
 	/**
 	 * @return Returns the text which is displayed in the column header.
 	 */
@@ -236,12 +246,20 @@ public class ColumnDefinition implements Cloneable {
 		return _defaultValueFormat;
 	}
 
+	public ValueFormat getDefaultValueFormat_Detail() {
+		return _defaultValueFormat_Detail;
+	}
+
 	public EditingSupport getEditingSupport() {
 		return _editingSupport;
 	}
 
 	public ValueFormat getValueFormat() {
 		return _valueFormat;
+	}
+
+	public ValueFormat getValueFormat_Detail() {
+		return _valueFormat_Detail;
 	}
 
 	public IValueFormatter getValueFormatter() {
@@ -251,6 +269,15 @@ public class ColumnDefinition implements Cloneable {
 		}
 
 		return _valueFormatter;
+	}
+
+	public IValueFormatter getValueFormatter_Detail() {
+
+		if (_valueFormatter_Detail == null) {
+			return ColumnManager.getDefaultDefaultValueFormatter();
+		}
+
+		return _valueFormatter_Detail;
 	}
 
 	@Override
@@ -299,10 +326,6 @@ public class ColumnDefinition implements Cloneable {
 
 	public void setColumnCategory(final String category) {
 		_columnCategory = category;
-	}
-
-	public void setColumnFormat(final ValueFormat columnFormat) {
-		_columnFormat = columnFormat;
 	}
 
 	/**
@@ -436,7 +459,7 @@ public class ColumnDefinition implements Cloneable {
 	 * default button is selected, default is <code>false</code>
 	 */
 	public void setIsDefaultColumn() {
-		this._isDefaultColumn = true;
+		_isDefaultColumn = true;
 	}
 
 	public void setLabelProvider(final CellLabelProvider cellLabelProvider) {
@@ -448,11 +471,17 @@ public class ColumnDefinition implements Cloneable {
 	 * 
 	 * @param availableFormats
 	 * @param defaultFormat
+	 * @param defaultDetailFormat
+	 *            When <code>null</code> this format cannot be selected.
 	 */
-	public void setValueFormats(final ValueFormat[] availableFormats, final ValueFormat defaultFormat) {
+	public void setValueFormats(final ValueFormat[] availableFormats,
+								final ValueFormat defaultFormat,
+								final ValueFormat defaultDetailFormat) {
 
 		_availableFormats = availableFormats;
+
 		_defaultValueFormat = defaultFormat;
+		_defaultValueFormat_Detail = defaultDetailFormat;
 	}
 
 	void setValueFormatter(final ValueFormat valueFormat, final IValueFormatter valueFormatter) {
@@ -461,12 +490,20 @@ public class ColumnDefinition implements Cloneable {
 		_valueFormatter = valueFormatter;
 	}
 
+	void setValueFormatter_Detail(final ValueFormat valueFormat, final IValueFormatter valueFormatter) {
+
+		_valueFormat_Detail = valueFormat;
+		_valueFormatter_Detail = valueFormatter;
+	}
+
 	@Override
 	public String toString() {
 		return "ColumnDefinition [" //$NON-NLS-1$
 //				+ ("_label=" + _label + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("_isCheckedInDialog=" + _isCheckedInDialog + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+//				+ ("_isCheckedInDialog=" + _isCheckedInDialog + ", ") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("_columnId=" + _columnId + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("_valueFormat=" + _valueFormat + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("_valueFormat_Detail=" + _valueFormat_Detail + ", ") //$NON-NLS-1$ //$NON-NLS-2$
 //				+ ("_columnWidth=" + _columnWidth + ", ") //$NON-NLS-1$ //$NON-NLS-2$
 //				+ ("_defaultColumnWidth=" + _defaultColumnWidth) //$NON-NLS-1$
 				+ "]\n"; //$NON-NLS-1$

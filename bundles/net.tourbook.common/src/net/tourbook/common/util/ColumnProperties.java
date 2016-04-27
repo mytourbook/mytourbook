@@ -28,6 +28,7 @@ public class ColumnProperties {
 	String		columnId;
 
 	ValueFormat	valueFormat;
+	ValueFormat	valueFormat_Detail;
 
 	@Override
 	public boolean equals(final Object obj) {
@@ -66,7 +67,8 @@ public class ColumnProperties {
 	public String toString() {
 		return "ColumnProperties [" //
 				+ ("columnId=" + columnId + ", ")
-				+ ("valueFormat=" + valueFormat)
+				+ ("valueFormat=" + valueFormat + ", ")
+				+ ("valueFormat_Detail=" + valueFormat_Detail + ", ")
 				+ "]";
 	}
 }

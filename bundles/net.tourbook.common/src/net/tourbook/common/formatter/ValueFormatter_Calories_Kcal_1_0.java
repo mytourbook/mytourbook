@@ -19,14 +19,14 @@ import java.text.NumberFormat;
 
 import net.tourbook.common.Messages;
 
-public class ValueFormatter_Calories_Kcal implements IValueFormatter {
+public class ValueFormatter_Calories_Kcal_1_0 implements IValueFormatter {
 
-	private final static NumberFormat	_nf1	= NumberFormat.getNumberInstance();
+	private final static NumberFormat	_nf0	= NumberFormat.getNumberInstance();
 
 	static {
 
-		_nf1.setMinimumFractionDigits(1);
-		_nf1.setMaximumFractionDigits(1);
+		_nf0.setMinimumFractionDigits(0);
+		_nf0.setMaximumFractionDigits(0);
 	}
 
 	@Override
@@ -36,7 +36,7 @@ public class ValueFormatter_Calories_Kcal implements IValueFormatter {
 
 	@Override
 	public String printLong(final long value) {
-		return _nf1.format((double) value / 1000);
+		return _nf0.format((double) value / 1000);
 	}
 
 }

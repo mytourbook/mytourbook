@@ -29,7 +29,10 @@ import net.tourbook.common.UI;
 import net.tourbook.common.formatter.IValueFormatter;
 import net.tourbook.common.formatter.ValueFormat;
 import net.tourbook.common.formatter.ValueFormatter_Calories_Cal;
-import net.tourbook.common.formatter.ValueFormatter_Calories_Kcal;
+import net.tourbook.common.formatter.ValueFormatter_Calories_Kcal_1_0;
+import net.tourbook.common.formatter.ValueFormatter_Calories_Kcal_1_1;
+import net.tourbook.common.formatter.ValueFormatter_Calories_Kcal_1_2;
+import net.tourbook.common.formatter.ValueFormatter_Calories_Kcal_1_3;
 import net.tourbook.common.formatter.ValueFormatter_Default;
 import net.tourbook.common.formatter.ValueFormatter_Number_1_0;
 import net.tourbook.common.formatter.ValueFormatter_Number_1_1;
@@ -81,26 +84,28 @@ import org.eclipse.ui.XMLMemento;
  */
 public class ColumnManager {
 
-	private static final String					XML_STATE_COLUMN_MANAGER			= "XML_STATE_COLUMN_MANAGER";			//$NON-NLS-1$
+	private static final String					XML_STATE_COLUMN_MANAGER			= "XML_STATE_COLUMN_MANAGER";				//$NON-NLS-1$
 
 	//
-	private static final String					TAG_ROOT							= "ColumnProfiles";					//$NON-NLS-1$
+	private static final String					TAG_ROOT							= "ColumnProfiles";						//$NON-NLS-1$
 	//
-	private static final String					TAG_COLUMN							= "Column";							//$NON-NLS-1$
-	private static final String					TAG_PROFILE							= "Profile";							//$NON-NLS-1$
+	private static final String					TAG_COLUMN							= "Column";								//$NON-NLS-1$
+	private static final String					TAG_PROFILE							= "Profile";								//$NON-NLS-1$
 	//
-	private static final String					ATTR_IS_ACTIVE_PROFILE				= "isActiveProfile";					//$NON-NLS-1$
-	private static final String					ATTR_IS_SHOW_CATEGORY				= "isShowCategory";					//$NON-NLS-1$
+	private static final String					ATTR_IS_ACTIVE_PROFILE				= "isActiveProfile";						//$NON-NLS-1$
+	private static final String					ATTR_IS_SHOW_CATEGORY				= "isShowCategory";						//$NON-NLS-1$
 	//
-	private static final String					ATTR_COLUMN_ID						= "columnId";							//$NON-NLS-1$
-	private static final String					ATTR_COLUMN_FORMAT					= "format";							//$NON-NLS-1$
-	private static final String					ATTR_NAME							= "name";								//$NON-NLS-1$
+	private static final String					ATTR_COLUMN_ID						= "columnId";								//$NON-NLS-1$
+	private static final String					ATTR_COLUMN_FORMAT					= "format";								//$NON-NLS-1$
+	private static final String					ATTR_COLUMN_FORMAT_DETAIL			= "detailFormat";							//$NON-NLS-1$
+	private static final String					ATTR_NAME							= "name";									//$NON-NLS-1$
 
-	private static final String					ATTR_VISIBLE_COLUMN_IDS				= "visibleColumnIds";					//$NON-NLS-1$
-	private static final String					ATTR_VISIBLE_COLUMN_IDS_AND_WIDTH	= "visibleColumnIdsAndWidth";			//$NON-NLS-1$
+	private static final String					ATTR_VISIBLE_COLUMN_IDS				= "visibleColumnIds";						//$NON-NLS-1$
+	private static final String					ATTR_VISIBLE_COLUMN_IDS_AND_WIDTH	= "visibleColumnIdsAndWidth";				//$NON-NLS-1$
 	//
-	static final String							COLUMN_CATEGORY_SEPARATOR			= "   \u00bb   ";						//$NON-NLS-1$
-	static final String							COLUMN_TEXT_SEPARATOR				= "   \u00B7   ";						//$NON-NLS-1$
+	static final String							COLUMN_CATEGORY_SEPARATOR			= "   \u00bb   ";							//$NON-NLS-1$
+	static final String							COLUMN_TEXT_SEPARATOR				= "   \u00B7   ";							//$NON-NLS-1$
+
 	/**
 	 * Minimum column width, when the column width is 0, there was a bug that this happened.
 	 */
@@ -160,7 +165,10 @@ public class ColumnManager {
 	private static IValueFormatter				_defaultDefaultValueFormatter		= new ValueFormatter_Default();
 
 	private IValueFormatter						_valueFormatter_Calories_Cal		= new ValueFormatter_Calories_Cal();
-	private IValueFormatter						_valueFormatter_Calories_Kcal		= new ValueFormatter_Calories_Kcal();
+	private IValueFormatter						_valueFormatter_Calories_Kcal_1_0	= new ValueFormatter_Calories_Kcal_1_0();
+	private IValueFormatter						_valueFormatter_Calories_Kcal_1_1	= new ValueFormatter_Calories_Kcal_1_1();
+	private IValueFormatter						_valueFormatter_Calories_Kcal_1_2	= new ValueFormatter_Calories_Kcal_1_2();
+	private IValueFormatter						_valueFormatter_Calories_Kcal_1_3	= new ValueFormatter_Calories_Kcal_1_3();
 	private IValueFormatter						_valueFormatter_Number_1_0			= new ValueFormatter_Number_1_0();
 	private IValueFormatter						_valueFormatter_Number_1_1			= new ValueFormatter_Number_1_1();
 	private IValueFormatter						_valueFormatter_Number_1_2			= new ValueFormatter_Number_1_2();
@@ -192,8 +200,15 @@ public class ColumnManager {
 
 		Object	tableOrTreeColumn;
 
-		public ColumnWrapper(final Object column) {
-			this.tableOrTreeColumn = column;
+		int		columnLeftBorder;
+		int		columnRightBorder;
+
+		public ColumnWrapper(final Object tableOrTreeColumn, final int columnLeftBorder, final int columnRightBorder) {
+
+			this.tableOrTreeColumn = tableOrTreeColumn;
+
+			this.columnLeftBorder = columnLeftBorder;
+			this.columnRightBorder = columnRightBorder;
 		}
 	}
 
@@ -215,8 +230,17 @@ public class ColumnManager {
 		case CALORIES_CAL:
 			return Messages.Value_Formatter_Calories_Cal;
 
-		case CALORIES_KCAL:
-			return Messages.Value_Formatter_Calories_Kcal;
+		case CALORIES_KCAL_1_0:
+			return Messages.Value_Formatter_Calories_Kcal_1_0;
+
+		case CALORIES_KCAL_1_1:
+			return Messages.Value_Formatter_Calories_Kcal_1_1;
+
+		case CALORIES_KCAL_1_2:
+			return Messages.Value_Formatter_Calories_Kcal_1_2;
+
+		case CALORIES_KCAL_1_3:
+			return Messages.Value_Formatter_Calories_Kcal_1_3;
 
 		case NUMBER_1_0:
 			return Messages.Value_Formatter_Number_1_0;
@@ -307,7 +331,9 @@ public class ColumnManager {
 		});
 	}
 
-	private void action_SetValueFormatter(final ColumnDefinition colDef, final ValueFormat valueFormat) {
+	private void action_SetValueFormatter(	final ColumnDefinition colDef,
+											final ValueFormat valueFormat,
+											final boolean isDetailFormat) {
 
 		/*
 		 * Update model
@@ -318,14 +344,23 @@ public class ColumnManager {
 
 			if (columnId.equals(columnProperties.columnId)) {
 
-				columnProperties.valueFormat = valueFormat;
+				if (isDetailFormat) {
+					columnProperties.valueFormat_Detail = valueFormat;
+				} else {
+					columnProperties.valueFormat = valueFormat;
+				}
 
 				break;
 			}
 		}
 
-		final IValueFormatter valueFormatter = getValueFormatter_From_ValueFormat(valueFormat);
-		colDef.setValueFormatter(valueFormat, valueFormatter);
+		final IValueFormatter valueFormatter = getValueFormatter(valueFormat);
+
+		if (isDetailFormat) {
+			colDef.setValueFormatter_Detail(valueFormat, valueFormatter);
+		} else {
+			colDef.setValueFormatter(valueFormat, valueFormatter);
+		}
 
 		/*
 		 * Update UI
@@ -762,7 +797,7 @@ public class ColumnManager {
 
 						final ValueFormat valueFormat = (ValueFormat) menuItem.getData();
 
-						action_SetValueFormatter(colDef, valueFormat);
+						action_SetValueFormatter(colDef, valueFormat, false);
 					}
 				});
 
@@ -776,6 +811,54 @@ public class ColumnManager {
 			}
 
 			createMenuSeparator(contextMenu);
+
+			/*
+			 * Detail formatter
+			 */
+			final ValueFormat currentDetailFormat = colDef.getValueFormat_Detail();
+			if (currentDetailFormat != null) {
+
+				/*
+				 * Menu items header
+				 */
+				{
+					final MenuItem menuItem = new MenuItem(contextMenu, SWT.PUSH);
+					menuItem.setText(Messages.Action_ColumnManager_ValueFormatterDetail_Info);
+					menuItem.setEnabled(false);
+				}
+
+				/*
+				 * Formatter menu items
+				 */
+
+				for (final ValueFormat valueFormat : availableFormatter) {
+
+					final MenuItem menuItem = new MenuItem(contextMenu, SWT.CHECK);
+
+					menuItem.setText(getValueFormatterName(valueFormat));
+					menuItem.setData(valueFormat);
+
+					menuItem.addListener(SWT.Selection, new Listener() {
+						@Override
+						public void handleEvent(final Event event) {
+
+							final ValueFormat valueFormat = (ValueFormat) menuItem.getData();
+
+							action_SetValueFormatter(colDef, valueFormat, true);
+						}
+					});
+
+					final boolean isCurrentFormat = currentDetailFormat == valueFormat;
+
+					// check current format
+					menuItem.setSelection(isCurrentFormat);
+
+					// disable current format
+					menuItem.setEnabled(isCurrentFormat == false);
+				}
+
+				createMenuSeparator(contextMenu);
+			}
 		}
 	}
 
@@ -941,6 +1024,7 @@ public class ColumnManager {
 				final Display display = shell.getDisplay();
 
 				final Point mousePosition = display.map(null, tree, new Point(event.x, event.y));
+
 				final Rectangle clientArea = tree.getClientArea();
 				final int headerHeight = tree.getHeaderHeight();
 
@@ -952,6 +1036,15 @@ public class ColumnManager {
 				final Menu contextMenu = getContextMenu(isTreeHeaderHit, headerContextMenu, defaultContextMenu);
 
 				tree.setMenu(contextMenu);
+
+				/*
+				 * Set context menu position to the right border of the column
+				 */
+				if (_headerColumn != null) {
+
+					final Point displayPosition = tree.toDisplay(_headerColumn.columnRightBorder, event.y);
+					event.x = displayPosition.x + 0;
+				}
 			}
 		};
 
@@ -1190,13 +1283,18 @@ public class ColumnManager {
 
 				final TableColumn tc = columns[creationIndex];
 
-				if (columnWidths < mousePosition.x && mousePosition.x < columnWidths + tc.getWidth()) {
+				final int columnWidth = tc.getWidth();
+
+				if (columnWidths < mousePosition.x && mousePosition.x < columnWidths + columnWidth) {
+
+					final int columnLeftBorder = columnWidths;
+					final int columnRightBorder = columnWidths + columnWidth;
 
 					// column found
-					return new ColumnWrapper(tc);
+					return new ColumnWrapper(tc, columnLeftBorder, columnRightBorder);
 				}
 
-				columnWidths += tc.getWidth();
+				columnWidths += columnWidth;
 			}
 		}
 
@@ -1216,13 +1314,18 @@ public class ColumnManager {
 
 				final TreeColumn tc = columns[creationIndex];
 
-				if (columnWidths < mousePosition.x && mousePosition.x < columnWidths + tc.getWidth()) {
+				final int columnWidth = tc.getWidth();
+
+				if (columnWidths < mousePosition.x && mousePosition.x < columnWidths + columnWidth) {
+
+					final int columnLeftBorder = columnWidths;
+					final int columnRightBorder = columnWidths + columnWidth;
 
 					// column found
-					return new ColumnWrapper(tc);
+					return new ColumnWrapper(tc, columnLeftBorder, columnRightBorder);
 				}
 
-				columnWidths += tc.getWidth();
+				columnWidths += columnWidth;
 			}
 		}
 
@@ -1283,7 +1386,7 @@ public class ColumnManager {
 				colDef.setIsCheckedInDialog(true);
 
 				// set column width
-				colDef.setColumnWidth(getColumnWidth(colDef._columnId));
+				colDef.setColumnWidth(getColumnWidth(colDef.getColumnId()));
 
 				// keep the column
 				allRearrangedColumns.add(colDef);
@@ -1310,57 +1413,57 @@ public class ColumnManager {
 	}
 
 	/**
-	 * Get a value formatter for a value format.
+	 * Get a value formatter for a {@link ValueFormat}.
 	 * 
 	 * @param valueFormat
 	 * @return Returns the {@link IValueFormatter} or <code>null</code> when not available.
 	 */
-	private IValueFormatter getValueFormatter_From_ValueFormat(final ValueFormat valueFormat) {
+	IValueFormatter getValueFormatter(final ValueFormat valueFormat) {
 
-		IValueFormatter valueFormatter = null;
+		if (valueFormat == null) {
+			return null;
+		}
 
 		switch (valueFormat) {
 		case CALORIES_CAL:
-			valueFormatter = _valueFormatter_Calories_Cal;
-			break;
+			return _valueFormatter_Calories_Cal;
 
-		case CALORIES_KCAL:
-			valueFormatter = _valueFormatter_Calories_Kcal;
-			break;
+		case CALORIES_KCAL_1_0:
+			return _valueFormatter_Calories_Kcal_1_0;
+
+		case CALORIES_KCAL_1_1:
+			return _valueFormatter_Calories_Kcal_1_1;
+
+		case CALORIES_KCAL_1_2:
+			return _valueFormatter_Calories_Kcal_1_2;
+
+		case CALORIES_KCAL_1_3:
+			return _valueFormatter_Calories_Kcal_1_3;
 
 		case TIME_HH:
-			valueFormatter = _valueFormatter_Time_HH;
-			break;
+			return _valueFormatter_Time_HH;
 
 		case NUMBER_1_0:
-			valueFormatter = _valueFormatter_Number_1_0;
-			break;
+			return _valueFormatter_Number_1_0;
 
 		case NUMBER_1_1:
-			valueFormatter = _valueFormatter_Number_1_1;
-			break;
+			return _valueFormatter_Number_1_1;
 
 		case NUMBER_1_2:
-			valueFormatter = _valueFormatter_Number_1_2;
-			break;
+			return _valueFormatter_Number_1_2;
 
 		case NUMBER_1_3:
-			valueFormatter = _valueFormatter_Number_1_3;
-			break;
+			return _valueFormatter_Number_1_3;
 
 		case TIME_HH_MM:
-			valueFormatter = _valueFormatter_Time_HHMM;
-			break;
+			return _valueFormatter_Time_HHMM;
 
 		case TIME_HH_MM_SS:
-			valueFormatter = _valueFormatter_Time_HHMMSS;
-			break;
+			return _valueFormatter_Time_HHMMSS;
 
 		default:
-			break;
+			return null;
 		}
-
-		return valueFormatter;
 	}
 
 	public boolean isCategoryAvailable() {
@@ -1470,7 +1573,6 @@ public class ColumnManager {
 						/*
 						 * Column properties
 						 */
-
 						final ArrayList<ColumnProperties> allColumnProperties = new ArrayList<>();
 						currentProfile.columnProperties = allColumnProperties;
 
@@ -1487,12 +1589,21 @@ public class ColumnManager {
 										ATTR_COLUMN_FORMAT,
 										ValueFormat.DUMMY_VALUE);
 
+								final Enum<ValueFormat> valueFormat_Detail = Util.getXmlEnum(
+										xmlColumn,
+										ATTR_COLUMN_FORMAT_DETAIL,
+										ValueFormat.DUMMY_VALUE);
+
 								if (columnId != null && valueFormat != ValueFormat.DUMMY_VALUE) {
 
 									final ColumnProperties columnProperties = new ColumnProperties();
 
 									columnProperties.columnId = columnId;
 									columnProperties.valueFormat = (ValueFormat) valueFormat;
+
+									if (valueFormat_Detail != ValueFormat.DUMMY_VALUE) {
+										columnProperties.valueFormat_Detail = (ValueFormat) valueFormat_Detail;
+									}
 
 									allColumnProperties.add(columnProperties);
 								}
@@ -1618,6 +1729,11 @@ public class ColumnManager {
 				if (columnFormat != null) {
 					xmlColumn.putString(ATTR_COLUMN_FORMAT, columnFormat.name());
 				}
+
+				final Enum<ValueFormat> columnFormat_Detail = columnProperty.valueFormat_Detail;
+				if (columnFormat_Detail != null) {
+					xmlColumn.putString(ATTR_COLUMN_FORMAT, columnFormat_Detail.name());
+				}
 			}
 		}
 	}
@@ -1671,14 +1787,16 @@ public class ColumnManager {
 
 	private void setupValueFormatter(final ColumnProfile activeProfile) {
 
-		final ArrayList<ColumnProperties> allColumnProperties = new ArrayList<>();
+		final ArrayList<ColumnProperties> profileColumnProperties = new ArrayList<>();
 
 		for (final ColumnDefinition colDef : activeProfile.visibleColumnDefinitions) {
 
-			final String columnId = colDef._columnId;
+			final String columnId = colDef.getColumnId();
 
 			ValueFormat valueFormat = null;
+			ValueFormat valueFormat_Detail = null;
 			IValueFormatter valueFormatter = null;
+			IValueFormatter valueFormatter_Detail = null;
 
 			ColumnProperties currentColumnProperties = null;
 
@@ -1689,7 +1807,10 @@ public class ColumnManager {
 					currentColumnProperties = columnProperties;
 
 					valueFormat = columnProperties.valueFormat;
-					valueFormatter = getValueFormatter_From_ValueFormat(valueFormat);
+					valueFormatter = getValueFormatter(valueFormat);
+
+					valueFormat_Detail = columnProperties.valueFormat_Detail;
+					valueFormatter_Detail = getValueFormatter(valueFormat_Detail);
 
 					break;
 				}
@@ -1701,7 +1822,7 @@ public class ColumnManager {
 
 				if (defaultFormat != null) {
 					valueFormat = defaultFormat;
-					valueFormatter = getValueFormatter_From_ValueFormat(valueFormat);
+					valueFormatter = getValueFormatter(valueFormat);
 				}
 
 				if (valueFormatter == null) {
@@ -1711,7 +1832,18 @@ public class ColumnManager {
 
 			}
 
+			if (valueFormatter_Detail == null) {
+
+				final ValueFormat defaultFormat = colDef.getDefaultValueFormat_Detail();
+
+				if (defaultFormat != null) {
+					valueFormat_Detail = defaultFormat;
+					valueFormatter_Detail = getValueFormatter(valueFormat_Detail);
+				}
+			}
+
 			colDef.setValueFormatter(valueFormat, valueFormatter);
+			colDef.setValueFormatter_Detail(valueFormat_Detail, valueFormatter_Detail);
 
 			// ensure all column properties are created
 			if (currentColumnProperties == null) {
@@ -1723,16 +1855,16 @@ public class ColumnManager {
 				columnProperties.columnId = columnId;
 				columnProperties.valueFormat = valueFormat;
 
-				allColumnProperties.add(columnProperties);
+				profileColumnProperties.add(columnProperties);
 
 			} else {
-				allColumnProperties.add(currentColumnProperties);
+				profileColumnProperties.add(currentColumnProperties);
 			}
 		}
 
 		// update model
 		activeProfile.columnProperties.clear();
-		activeProfile.columnProperties.addAll(allColumnProperties);
+		activeProfile.columnProperties.addAll(profileColumnProperties);
 	}
 
 	/**
@@ -1851,7 +1983,7 @@ public class ColumnManager {
 			final ArrayList<String> columnIds = new ArrayList<String>();
 
 			for (final ColumnDefinition colDef : visibleColDefs) {
-				columnIds.add(colDef._columnId);
+				columnIds.add(colDef.getColumnId());
 			}
 
 			columnProfile.visibleColumnIds = columnIds.toArray(new String[columnIds.size()]);

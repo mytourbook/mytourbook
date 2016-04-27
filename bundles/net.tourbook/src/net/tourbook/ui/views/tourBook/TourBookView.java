@@ -34,6 +34,7 @@ import java.util.Set;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.formatter.ValueFormat;
 import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.tooltip.OpenDialogManager;
 import net.tourbook.common.util.ColumnDefinition;
@@ -62,7 +63,6 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourTypeMenuManager;
 import net.tourbook.tour.printing.ActionPrint;
-import net.tourbook.ui.FormatManager;
 import net.tourbook.ui.ITourProvider2;
 import net.tourbook.ui.ITourProviderByID;
 import net.tourbook.ui.TreeColumnFactory;
@@ -131,6 +131,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
@@ -146,6 +147,10 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 	static public final String							ID									= "net.tourbook.views.tourListView";						//$NON-NLS-1$
 
 	private static final String							GRAPH_LABEL_HEARTBEAT_UNIT			= net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
+	private static final String							VALUE_UNIT_CALORIES					= net.tourbook.ui.Messages.Value_Unit_Calories;
+	private static final String							VALUE_UNIT_K_CALORIES				= net.tourbook.ui.Messages.Value_Unit_KCalories;
+
+	private static final float							UNIT_VALUE_DISTANCE					= net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
 	private static final String							STATE_CSV_EXPORT_PATH				= "STATE_CSV_EXPORT_PATH";									//$NON-NLS-1$
 	private static final String							STATE_IS_SELECT_YEAR_MONTH_TOURS	= "IsSelectYearMonthTours";								//$NON-NLS-1$
@@ -264,13 +269,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
 	private boolean										_isInStartup;
 	private boolean										_isInReload;
-
-	// display formats
-//	private boolean										_isCadenceFormat_1_1;
-//	private boolean										_isCadenceFormat_1_2;
-//	private boolean										_isCaloriesFormat_cal;
-//	private boolean										_isDriveTimeFormat_hhmmss;
-//	private boolean										_isRecTimeFormat_hhmmss;
 
 	private boolean										_isToolTipInDate;
 	private boolean										_isToolTipInTags;
@@ -545,8 +543,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
 				} else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
-					updateDisplayFormats();
-
 					_tourViewer.getTree().setLinesVisible(
 							_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
@@ -670,7 +666,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 		// set selection provider
 		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
 
-		updateDisplayFormats();
 		restoreState();
 
 		enableActions();
@@ -833,9 +828,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
 		// Motion / Bewegung
 		defineColumn_Motion_Distance();
-		defineColumn_Motion_SpeedMax();
-		defineColumn_Motion_SpeedAvg();
-		defineColumn_Motion_PaceAvg();
+		defineColumn_Motion_MaxSpeed();
+		defineColumn_Motion_AvgSpeed();
+		defineColumn_Motion_AvgPace();
 
 		// Altitude
 		defineColumn_Altitude_Up();
@@ -907,7 +902,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				if (dbAltitudeDown == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(Long.toString((long) (-dbAltitudeDown / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
+					final float value = -dbAltitudeDown / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+					cell.setText(_nf0.format(value));
 				}
 
 				setCellColor(cell, element);
@@ -931,7 +927,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				if (dbMaxAltitude == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(Long.toString((long) (dbMaxAltitude / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
+					final float value = dbMaxAltitude / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+					cell.setText(_nf0.format(value));
 				}
 
 				setCellColor(cell, element);
@@ -956,7 +953,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				if (dbAltitudeUp == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(Long.toString((long) (dbAltitudeUp / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
+					final float value = dbAltitudeUp / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+					cell.setText(_nf0.format(value));
 				}
 
 				setCellColor(cell, element);
@@ -980,7 +978,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				if (avgPulse == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(FormatManager.getAvgPulse(avgPulse));
+					cell.setText(colDef.getValueFormatter().printDouble(avgPulse));
 				}
 
 				setCellColor(cell, element);
@@ -1004,7 +1002,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				if (calories == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(FormatManager.getCalories(calories));
+					cell.setText(_colDef_BodyCalories.getValueFormatter().printLong(calories));
 				}
 
 				setCellColor(cell, element);
@@ -1028,8 +1026,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				if (dbMaxPulse == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(Long.toString(dbMaxPulse));
+					cell.setText(_nf0.format(dbMaxPulse));
 				}
+
 				setCellColor(cell, element);
 			}
 		});
@@ -1183,7 +1182,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				if (numberOfTimeSlices == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(Integer.toString(numberOfTimeSlices));
+					cell.setText(_nf0.format(numberOfTimeSlices));
 				}
 
 				setCellColor(cell, element);
@@ -1234,7 +1233,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 					if (dbStartDistance == 0) {
 						cell.setText(UI.EMPTY_STRING);
 					} else {
-						cell.setText(Long.toString((long) (dbStartDistance / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE)));
+						final float value = dbStartDistance / UNIT_VALUE_DISTANCE;
+						cell.setText(_nf0.format(value));
 					}
 
 					setCellColor(cell, element);
@@ -1268,6 +1268,54 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 	}
 
 	/**
+	 * column: avg pace min/km - min/mi
+	 */
+	private void defineColumn_Motion_AvgPace() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.MOTION_AVG_PACE.createColumn(_columnManager, _pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				final float pace = ((TVITourBookItem) element).colAvgPace * UNIT_VALUE_DISTANCE;
+
+				if (pace == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(UI.format_mm_ss((long) pace));
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
+	 * column: avg speed km/h - mph
+	 */
+	private void defineColumn_Motion_AvgSpeed() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.MOTION_AVG_SPEED.createColumn(_columnManager, _pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+
+				final float speed = ((TVITourBookItem) element).colAvgSpeed / UNIT_VALUE_DISTANCE;
+				if (speed == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(colDef.getValueFormatter().printDouble(speed));
+				}
+
+				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
 	 * column: distance (km/miles)
 	 */
 	private void defineColumn_Motion_Distance() {
@@ -1284,55 +1332,14 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				if (dbDistance == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(_nf1.format(dbDistance / 1000 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
-				}
 
-				setCellColor(cell, element);
-			}
-		});
-	}
+					final double value = dbDistance / 1000 / UNIT_VALUE_DISTANCE;
 
-	/**
-	 * column: avg pace min/km - min/mi
-	 */
-	private void defineColumn_Motion_PaceAvg() {
-
-		final TreeColumnDefinition colDef = TreeColumnFactory.MOTION_AVG_PACE.createColumn(_columnManager, _pc);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Object element = cell.getElement();
-				final float pace = ((TVITourBookItem) element).colAvgPace * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
-
-				if (pace == 0) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					cell.setText(UI.format_mm_ss((long) pace));
-				}
-
-				setCellColor(cell, element);
-			}
-		});
-	}
-
-	/**
-	 * column: avg speed km/h - mph
-	 */
-	private void defineColumn_Motion_SpeedAvg() {
-
-		final TreeColumnDefinition colDef = TreeColumnFactory.MOTION_AVG_SPEED.createColumn(_columnManager, _pc);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Object element = cell.getElement();
-
-				final float speed = ((TVITourBookItem) element).colAvgSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
-				if (speed == 0) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					cell.setText(_nf1.format(speed));
+					if (element instanceof TVITourBookTour) {
+						cell.setText(colDef.getValueFormatter_Detail().printDouble(value));
+					} else {
+						cell.setText(colDef.getValueFormatter().printDouble(value));
+					}
 				}
 
 				setCellColor(cell, element);
@@ -1343,7 +1350,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 	/**
 	 * column: max speed
 	 */
-	private void defineColumn_Motion_SpeedMax() {
+	private void defineColumn_Motion_MaxSpeed() {
 
 		final TreeColumnDefinition colDef = TreeColumnFactory.MOTION_MAX_SPEED.createColumn(_columnManager, _pc);
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -1356,7 +1363,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				if (dbMaxSpeed == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(_nf1.format(dbMaxSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
+					final float value = dbMaxSpeed / UNIT_VALUE_DISTANCE;
+					cell.setText(colDef.getValueFormatter().printDouble(value));
 				}
 
 				setCellColor(cell, element);
@@ -1376,12 +1384,12 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 			public void update(final ViewerCell cell) {
 
 				final Object element = cell.getElement();
-				final float dbValue = ((TVITourBookItem) element).colPower_Avg;
+				final float value = ((TVITourBookItem) element).colPower_Avg;
 
-				if (dbValue == 0) {
+				if (value == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(FormatManager.getAvgPower(dbValue));
+					cell.setText(colDef.getValueFormatter().printDouble(value));
 				}
 
 				setCellColor(cell, element);
@@ -1400,12 +1408,12 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 			public void update(final ViewerCell cell) {
 
 				final Object element = cell.getElement();
-				final int dbValue = ((TVITourBookItem) element).colPower_Max;
+				final int value = ((TVITourBookItem) element).colPower_Max;
 
-				if (dbValue == 0) {
+				if (value == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(Integer.toString(dbValue));
+					cell.setText(colDef.getValueFormatter().printDouble(value));
 				}
 
 				setCellColor(cell, element);
@@ -1424,12 +1432,12 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 			public void update(final ViewerCell cell) {
 
 				final Object element = cell.getElement();
-				final int dbValue = ((TVITourBookItem) element).colPower_Normalized;
+				final int value = ((TVITourBookItem) element).colPower_Normalized;
 
-				if (dbValue == 0) {
+				if (value == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(Integer.toString(dbValue));
+					cell.setText(_nf0.format(value));
 				}
 
 				setCellColor(cell, element);
@@ -1454,7 +1462,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				if (dbValue == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(_nf2.format((double) dbValue / 1000000));
+					final double value = (double) dbValue / 1000000;
+					cell.setText(colDef.getValueFormatter().printDouble(value));
 				}
 
 				setCellColor(cell, element);
@@ -1474,12 +1483,12 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
 				final Object element = cell.getElement();
 
-				final float dbAvgCadence = ((TVITourBookItem) element).colAvgCadence;
+				final float avgCadence = ((TVITourBookItem) element).colAvgCadence;
 
-				if (dbAvgCadence == 0) {
+				if (avgCadence == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(FormatManager.getAvgCadence(dbAvgCadence));
+					cell.setText(colDef.getValueFormatter().printDouble(avgCadence));
 				}
 
 				setCellColor(cell, element);
@@ -1501,12 +1510,12 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 			public void update(final ViewerCell cell) {
 
 				final Object element = cell.getElement();
-				final float dbValue = ((TVITourBookItem) element).colPower_AvgLeftPedalSmoothness;
+				final float value = ((TVITourBookItem) element).colPower_AvgLeftPedalSmoothness;
 
-				if (dbValue == 0) {
+				if (value == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(_nf1.format(dbValue));
+					cell.setText(colDef.getValueFormatter().printDouble(value));
 				}
 
 				setCellColor(cell, element);
@@ -1527,12 +1536,12 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 			public void update(final ViewerCell cell) {
 
 				final Object element = cell.getElement();
-				final float dbValue = ((TVITourBookItem) element).colPower_AvgLeftTorqueEffectiveness;
+				final float value = ((TVITourBookItem) element).colPower_AvgLeftTorqueEffectiveness;
 
-				if (dbValue == 0) {
+				if (value == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(_nf1.format(dbValue));
+					cell.setText(colDef.getValueFormatter().printDouble(value));
 				}
 
 				setCellColor(cell, element);
@@ -1553,12 +1562,12 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 			public void update(final ViewerCell cell) {
 
 				final Object element = cell.getElement();
-				final float dbValue = ((TVITourBookItem) element).colPower_AvgRightPedalSmoothness;
+				final float value = ((TVITourBookItem) element).colPower_AvgRightPedalSmoothness;
 
-				if (dbValue == 0) {
+				if (value == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(_nf1.format(dbValue));
+					cell.setText(colDef.getValueFormatter().printDouble(value));
 				}
 
 				setCellColor(cell, element);
@@ -1579,12 +1588,12 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 			public void update(final ViewerCell cell) {
 
 				final Object element = cell.getElement();
-				final float dbValue = ((TVITourBookItem) element).colPower_AvgRightTorqueEffectiveness;
+				final float value = ((TVITourBookItem) element).colPower_AvgRightTorqueEffectiveness;
 
-				if (dbValue == 0) {
+				if (value == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(_nf1.format(dbValue));
+					cell.setText(colDef.getValueFormatter().printDouble(value));
 				}
 
 				setCellColor(cell, element);
@@ -1636,7 +1645,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				if (numberOfShifts == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(Integer.toString(numberOfShifts));
+					cell.setText(_nf0.format(numberOfShifts));
 				}
 
 				setCellColor(cell, element);
@@ -1662,7 +1671,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				if (numberOfShifts == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(Integer.toString(numberOfShifts));
+					cell.setText(_nf0.format(numberOfShifts));
 				}
 
 				setCellColor(cell, element);
@@ -1689,7 +1698,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				if (dbValue == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(Integer.toString(dbValue));
+					cell.setText(_nf0.format(dbValue));
 				}
 
 				setCellColor(cell, element);
@@ -1785,7 +1794,13 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				if (dbPausedTime == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(FormatManager.getPauseTime(dbPausedTime));
+
+					if (element instanceof TVITourBookTour) {
+						cell.setText(colDef.getValueFormatter_Detail().printLong(dbPausedTime));
+					} else {
+						cell.setText(colDef.getValueFormatter().printLong(dbPausedTime));
+					}
+
 				}
 
 				setCellColor(cell, element);
@@ -1847,9 +1862,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				} else {
 
 					if (element instanceof TVITourBookTour) {
-						cell.setText(FormatManager.getDrivingTime(drivingTime));
+						cell.setText(colDef.getValueFormatter_Detail().printLong(drivingTime));
 					} else {
-						cell.setText(UI.format_hh_mm(drivingTime + 30).toString());
+						cell.setText(colDef.getValueFormatter().printLong(drivingTime));
 					}
 				}
 
@@ -1878,9 +1893,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				} else {
 
 					if (element instanceof TVITourBookTour) {
-						cell.setText(FormatManager.getRecordingTime(recordingTime));
+						cell.setText(colDef.getValueFormatter_Detail().printLong(recordingTime));
 					} else {
-						cell.setText(net.tourbook.common.UI.format_hh_mm(recordingTime + 30).toString());
+						cell.setText(colDef.getValueFormatter().printLong(recordingTime));
 					}
 				}
 
@@ -2387,7 +2402,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 			public void update(final ViewerCell cell) {
 
 				final Object element = cell.getElement();
-				final int windSpeed = (int) (((TVITourBookItem) element).colWindSpd / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
+				final int windSpeed = (int) (((TVITourBookItem) element).colWindSpd / UNIT_VALUE_DISTANCE);
 
 				if (windSpeed == 0) {
 					cell.setText(UI.EMPTY_STRING);
@@ -2734,7 +2749,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 		{
 			final float dbDistance = tviItem.colDistance;
 			if (dbDistance != 0) {
-				sb.append(_nf1_NoGroup.format(dbDistance / 1000 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
+				sb.append(_nf1_NoGroup.format(dbDistance / 1000 / UNIT_VALUE_DISTANCE));
 			}
 			sb.append(UI.TAB);
 		}
@@ -2860,7 +2875,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
 		// CSV_HEADER_WIND_SPEED
 		{
-			final int windSpeed = (int) (tviItem.colWindSpd / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
+			final int windSpeed = (int) (tviItem.colWindSpd / UNIT_VALUE_DISTANCE);
 			if (windSpeed != 0) {
 				sb.append(Integer.toString(windSpeed));
 			}
@@ -2928,7 +2943,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 		{
 			final float dbMaxSpeed = tviItem.colMaxSpeed;
 			if (dbMaxSpeed != 0) {
-				sb.append(_nf1_NoGroup.format(dbMaxSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
+				sb.append(_nf1_NoGroup.format(dbMaxSpeed / UNIT_VALUE_DISTANCE));
 			}
 			sb.append(UI.TAB);
 		}
@@ -2946,7 +2961,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
 		// CSV_HEADER_AVERAGE_SPEED
 		{
-			final float speed = tviItem.colAvgSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+			final float speed = tviItem.colAvgSpeed / UNIT_VALUE_DISTANCE;
 			if (speed != 0) {
 				sb.append(_nf1_NoGroup.format(speed));
 			}
@@ -2955,7 +2970,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
 		// CSV_HEADER_AVERAGE_PACE
 		{
-			final float pace = tviItem.colAvgPace * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+			final float pace = tviItem.colAvgPace * UNIT_VALUE_DISTANCE;
 			if (pace != 0) {
 				sb.append(net.tourbook.common.UI.format_mm_ss((long) pace));
 			}
@@ -3031,7 +3046,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 			if (isTour) {
 				final long dbStartDistance = tviTour.getColumnStartDistance();
 				if (dbStartDistance != 0) {
-					sb.append(Long.toString((long) (dbStartDistance / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE)));
+					sb.append(Long.toString((long) (dbStartDistance / UNIT_VALUE_DISTANCE)));
 				}
 			}
 			sb.append(UI.TAB);
@@ -3674,17 +3689,18 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
 	@Override
 	public void updateColumnHeader(final ColumnDefinition colDef) {
-		// TODO Auto-generated method stub
-		
-	}
 
-	private void updateDisplayFormats() {
+		final TreeColumn caloriesColumn = _colDef_BodyCalories.getTreeColumn();
 
-		// update table header texts
-		final String headerText = FormatManager.getCaloriesUnit();
+		if (caloriesColumn != null && caloriesColumn.isDisposed() == false) {
 
-		_colDef_BodyCalories.setColumnHeaderText(headerText);
-		_colDef_BodyCalories.getTreeColumn().setText(headerText);
+			final String headerText = ValueFormat.CALORIES_CAL.equals(_colDef_BodyCalories.getValueFormat())
+					? VALUE_UNIT_CALORIES
+					: VALUE_UNIT_K_CALORIES;
+
+			_colDef_BodyCalories.setColumnHeaderText(headerText);
+			caloriesColumn.setText(headerText);
+		}
 	}
 
 	private void updateToolTipState() {

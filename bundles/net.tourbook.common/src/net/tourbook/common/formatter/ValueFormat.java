@@ -21,7 +21,10 @@ public enum ValueFormat {
 	DUMMY_VALUE, //
 
 	CALORIES_CAL, //
-	CALORIES_KCAL, //
+	CALORIES_KCAL_1_0, //
+	CALORIES_KCAL_1_1, //
+	CALORIES_KCAL_1_2, //
+	CALORIES_KCAL_1_3, //
 
 	NUMBER_1_0, //
 	NUMBER_1_1, //

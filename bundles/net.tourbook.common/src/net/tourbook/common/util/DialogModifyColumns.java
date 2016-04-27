@@ -22,6 +22,7 @@ import java.util.Comparator;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.Messages;
 import net.tourbook.common.UI;
+import net.tourbook.common.formatter.IValueFormatter;
 import net.tourbook.common.formatter.ValueFormat;
 
 import org.eclipse.jface.action.Action;
@@ -252,11 +253,32 @@ public class DialogModifyColumns extends TrayDialog {
 			for (final ColumnDefinition colDef : columnProfile.visibleColumnDefinitions) {
 
 				final ColumnDefinition modelColDef = (ColumnDefinition) colDef.clone();
+				final String columnId = modelColDef.getColumnId();
+
+				// get value format
+				ValueFormat valueFormat = null;
+				ValueFormat valueFormat_Detail = null;
+				IValueFormatter valueFormatter = null;
+				IValueFormatter valueFormatter_Detail = null;
+
+				for (final ColumnProperties columnProperties : columnProfile.columnProperties) {
+					if (columnId.equals(columnProperties.columnId)) {
+
+						valueFormat = columnProperties.valueFormat;
+						valueFormatter = _columnManager.getValueFormatter(valueFormat);
+
+						valueFormat_Detail = columnProperties.valueFormat_Detail;
+						valueFormatter_Detail = _columnManager.getValueFormatter(valueFormat_Detail);
+
+						break;
+					}
+				}
 
 				modelColDef.setIsCheckedInDialog(true);
 
-				modelColDef.setColumnFormat(colDef.getValueFormat());
 				modelColDef.setColumnWidth(colDef.getColumnWidth());
+				modelColDef.setValueFormatter(valueFormat, valueFormatter);
+				modelColDef.setValueFormatter_Detail(valueFormat_Detail, valueFormatter_Detail);
 
 				modelColumns.add(modelColDef);
 
@@ -268,11 +290,17 @@ public class DialogModifyColumns extends TrayDialog {
 			 */
 			for (final ColumnDefinition colDef : allClonedColDef) {
 
-				colDef.setIsCheckedInDialog(false);
+				final ValueFormat valueFormat = colDef.getDefaultValueFormat();
+				final ValueFormat valueFormat_Detail = colDef.getDefaultValueFormat_Detail();
+				final IValueFormatter valueFormatter = _columnManager.getValueFormatter(valueFormat);
+				final IValueFormatter valueFormatter_Detail = _columnManager.getValueFormatter(valueFormat_Detail);
 
 				// set default values
+				colDef.setIsCheckedInDialog(false);
+
 				colDef.setColumnWidth(colDef.getDefaultColumnWidth());
-				colDef.setColumnFormat(colDef.getDefaultValueFormat());
+				colDef.setValueFormatter(valueFormat, valueFormatter);
+				colDef.setValueFormatter_Detail(valueFormat_Detail, valueFormatter_Detail);
 
 				modelColumns.add(colDef);
 			}
@@ -933,6 +961,7 @@ public class DialogModifyColumns extends TrayDialog {
 		defineColumn_ColumnName(tableLayout);
 		defineColumn_Unit(tableLayout);
 		defineColumn_Format(tableLayout);
+		defineColumn_Format_Detail(tableLayout);
 		defineColumn_Width(tableLayout);
 
 		/**
@@ -962,10 +991,7 @@ public class DialogModifyColumns extends TrayDialog {
 					final ColumnDefinition colDef = (ColumnDefinition) cell.getElement();
 					cell.setText(colDef.getColumnCategory());
 
-					// paint columns in a different color which can't be hidden
-					if (colDef.canModifyVisibility() == false) {
-						cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-					}
+					setColor(cell, colDef);
 				}
 			});
 			_categoryColumn = tc;
@@ -1001,10 +1027,7 @@ public class DialogModifyColumns extends TrayDialog {
 				final ColumnDefinition colDef = (ColumnDefinition) cell.getElement();
 				cell.setText(colDef.getColumnLabel());
 
-				// paint columns in a different color which can't be hidden
-				if (colDef.canModifyVisibility() == false) {
-					cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-				}
+				setColor(cell, colDef);
 			}
 		});
 		tableLayout.setColumnData(tc, new ColumnWeightData(30, true));
@@ -1014,33 +1037,63 @@ public class DialogModifyColumns extends TrayDialog {
 	 * Column: Format
 	 */
 	private void defineColumn_Format(final TableColumnLayout tableLayout) {
-		
+
 		final TableViewerColumn tvc = new TableViewerColumn(_columnViewer, SWT.LEAD);
-		
+
 		final TableColumn tc = tvc.getColumn();
 		tc.setMoveable(true);
 		tc.setText(Messages.ColumnModifyDialog_Column_Format);
-		
+
 		tvc.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
-				
+
 				final ColumnDefinition colDef = (ColumnDefinition) cell.getElement();
 				final ValueFormat valueFormat = colDef.getValueFormat();
-				
+
 				if (valueFormat == null) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
 
-					final String valueFormatterText = ColumnManager.getValueFormatterName(valueFormat);
+					final String valueFormatterName = ColumnManager.getValueFormatterName(valueFormat);
 
-					cell.setText(valueFormatterText);
+					cell.setText(valueFormatterName);
 				}
 
-				// paint columns in a different color which can't be hidden
-				if (colDef.canModifyVisibility() == false) {
-					cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+				setColor(cell, colDef);
+			}
+		});
+		tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(14), true));
+	}
+
+	/**
+	 * Column: Detail format
+	 */
+	private void defineColumn_Format_Detail(final TableColumnLayout tableLayout) {
+
+		final TableViewerColumn tvc = new TableViewerColumn(_columnViewer, SWT.LEAD);
+
+		final TableColumn tc = tvc.getColumn();
+		tc.setMoveable(true);
+		tc.setText(Messages.ColumnModifyDialog_Column_DetailFormat);
+
+		tvc.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final ColumnDefinition colDef = (ColumnDefinition) cell.getElement();
+				final ValueFormat valueFormat = colDef.getValueFormat_Detail();
+
+				if (valueFormat == null) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+
+					final String valueFormatterName = ColumnManager.getValueFormatterName(valueFormat);
+
+					cell.setText(valueFormatterName);
 				}
+
+				setColor(cell, colDef);
 			}
 		});
 		tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(14), true));
@@ -1064,10 +1117,7 @@ public class DialogModifyColumns extends TrayDialog {
 				final ColumnDefinition colDef = (ColumnDefinition) cell.getElement();
 				cell.setText(colDef.getColumnUnit());
 
-				// paint columns in a different color which can't be hidden
-				if (colDef.canModifyVisibility() == false) {
-					cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-				}
+				setColor(cell, colDef);
 			}
 		});
 		tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(14), true));
@@ -1091,10 +1141,7 @@ public class DialogModifyColumns extends TrayDialog {
 				final ColumnDefinition colDef = (ColumnDefinition) cell.getElement();
 				cell.setText(Integer.toString(colDef.getColumnWidth()));
 
-				// paint columns in a different color which can't be hidden
-				if (colDef.canModifyVisibility() == false) {
-					cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
-				}
+				setColor(cell, colDef);
 			}
 		});
 		tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(10), true));
@@ -1163,12 +1210,17 @@ public class DialogModifyColumns extends TrayDialog {
 
 				if (isSetDefaultProperties) {
 
-					// visible columns in the viewer will be checked
+					final ValueFormat valueFormat = definedColDef.getDefaultValueFormat();
+					final ValueFormat valueFormat_Detail = definedColDef.getDefaultValueFormat_Detail();
+					final IValueFormatter valueFormatter = _columnManager.getValueFormatter(valueFormat);
+					final IValueFormatter valueFormatter_Detail = _columnManager.getValueFormatter(valueFormat_Detail);
 
+					// visible columns in the viewer will be checked
 					colDefClone.setIsCheckedInDialog(definedColDef.isDefaultColumn());
 
 					colDefClone.setColumnWidth(definedColDef.getDefaultColumnWidth());
-					colDefClone.setColumnFormat(definedColDef.getDefaultValueFormat());
+					colDefClone.setValueFormatter(valueFormat, valueFormatter);
+					colDefClone.setValueFormatter_Detail(valueFormat_Detail, valueFormatter_Detail);
 
 				} else {
 
@@ -1180,10 +1232,17 @@ public class DialogModifyColumns extends TrayDialog {
 
 						if (currentColDef.getColumnId().equals(definedColumnId)) {
 
+							final ValueFormat valueFormat = definedColDef.getValueFormat();
+							final ValueFormat valueFormat_Detail = definedColDef.getValueFormat_Detail();
+							final IValueFormatter valueFormatter = _columnManager.getValueFormatter(valueFormat);
+							final IValueFormatter valueFormatter_Detail = _columnManager
+									.getValueFormatter(valueFormat_Detail);
+
 							colDefClone.setIsCheckedInDialog(currentColDef.isCheckedInDialog());
 
 							colDefClone.setColumnWidth(currentColDef.getColumnWidth());
-							colDefClone.setColumnFormat(currentColDef.getColumnFormat());
+							colDefClone.setValueFormatter(valueFormat, valueFormatter);
+							colDefClone.setValueFormatter_Detail(valueFormat_Detail, valueFormatter_Detail);
 
 							break;
 						}
@@ -1553,6 +1612,14 @@ public class DialogModifyColumns extends TrayDialog {
 		_columnManager.setVisibleColumnIds_FromModifyDialog(//
 				_selectedProfile,
 				_columnViewer.getTable().getItems());
+	}
+
+	private void setColor(final ViewerCell cell, final ColumnDefinition colDef) {
+		
+		// paint columns in a different color which can't be hidden
+		if (colDef.canModifyVisibility() == false) {
+			cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+		}
 	}
 
 	private void setupColumnsInViewer() {
