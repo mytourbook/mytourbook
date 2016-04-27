@@ -274,7 +274,7 @@ public class DialogModifyColumns extends TrayDialog {
 					}
 				}
 
-				modelColDef.setIsCheckedInDialog(true);
+				modelColDef.setIsColumnDisplayed(true);
 
 				modelColDef.setColumnWidth(colDef.getColumnWidth());
 				modelColDef.setValueFormatter(valueFormat, valueFormatter);
@@ -296,7 +296,7 @@ public class DialogModifyColumns extends TrayDialog {
 				final IValueFormatter valueFormatter_Detail = _columnManager.getValueFormatter(valueFormat_Detail);
 
 				// set default values
-				colDef.setIsCheckedInDialog(false);
+				colDef.setIsColumnDisplayed(false);
 
 				colDef.setColumnWidth(colDef.getDefaultColumnWidth());
 				colDef.setValueFormatter(valueFormat, valueFormatter);
@@ -615,7 +615,7 @@ public class DialogModifyColumns extends TrayDialog {
 				if (colDef.canModifyVisibility()) {
 
 					// keep the checked status
-					colDef.setIsCheckedInDialog(event.getChecked());
+					colDef.setIsColumnDisplayed(event.getChecked());
 
 					// select the checked item
 					_columnViewer.setSelection(new StructuredSelection(colDef));
@@ -844,7 +844,7 @@ public class DialogModifyColumns extends TrayDialog {
 
 						// update model
 						for (final ColumnDefinition colDef : _columnViewerModel) {
-							colDef.setIsCheckedInDialog(true);
+							colDef.setIsColumnDisplayed(true);
 						}
 
 						// update viewer
@@ -871,9 +871,9 @@ public class DialogModifyColumns extends TrayDialog {
 						for (final ColumnDefinition colDef : _columnViewerModel) {
 							if (colDef.canModifyVisibility() == false) {
 								checkedElements.add(colDef);
-								colDef.setIsCheckedInDialog(true);
+								colDef.setIsColumnDisplayed(true);
 							} else {
-								colDef.setIsCheckedInDialog(false);
+								colDef.setIsColumnDisplayed(false);
 							}
 						}
 
@@ -1049,15 +1049,17 @@ public class DialogModifyColumns extends TrayDialog {
 			public void update(final ViewerCell cell) {
 
 				final ColumnDefinition colDef = (ColumnDefinition) cell.getElement();
-				final ValueFormat valueFormat = colDef.getValueFormat();
+
+				ValueFormat valueFormat = colDef.getValueFormat();
+
+				if (valueFormat == null) {
+					valueFormat = colDef.getDefaultValueFormat();
+				}
 
 				if (valueFormat == null) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-
-					final String valueFormatterName = ColumnManager.getValueFormatterName(valueFormat);
-
-					cell.setText(valueFormatterName);
+					cell.setText(ColumnManager.getValueFormatterName(valueFormat));
 				}
 
 				setColor(cell, colDef);
@@ -1082,15 +1084,17 @@ public class DialogModifyColumns extends TrayDialog {
 			public void update(final ViewerCell cell) {
 
 				final ColumnDefinition colDef = (ColumnDefinition) cell.getElement();
-				final ValueFormat valueFormat = colDef.getValueFormat_Detail();
+
+				ValueFormat valueFormat = colDef.getValueFormat_Detail();
+
+				if (valueFormat == null) {
+					valueFormat = colDef.getDefaultValueFormat_Detail();
+				}
 
 				if (valueFormat == null) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-
-					final String valueFormatterName = ColumnManager.getValueFormatterName(valueFormat);
-
-					cell.setText(valueFormatterName);
+					cell.setText(ColumnManager.getValueFormatterName(valueFormat));
 				}
 
 				setColor(cell, colDef);
@@ -1212,11 +1216,12 @@ public class DialogModifyColumns extends TrayDialog {
 
 					final ValueFormat valueFormat = definedColDef.getDefaultValueFormat();
 					final ValueFormat valueFormat_Detail = definedColDef.getDefaultValueFormat_Detail();
+
 					final IValueFormatter valueFormatter = _columnManager.getValueFormatter(valueFormat);
 					final IValueFormatter valueFormatter_Detail = _columnManager.getValueFormatter(valueFormat_Detail);
 
 					// visible columns in the viewer will be checked
-					colDefClone.setIsCheckedInDialog(definedColDef.isDefaultColumn());
+					colDefClone.setIsColumnDisplayed(definedColDef.isDefaultColumn());
 
 					colDefClone.setColumnWidth(definedColDef.getDefaultColumnWidth());
 					colDefClone.setValueFormatter(valueFormat, valueFormatter);
@@ -1232,13 +1237,22 @@ public class DialogModifyColumns extends TrayDialog {
 
 						if (currentColDef.getColumnId().equals(definedColumnId)) {
 
-							final ValueFormat valueFormat = definedColDef.getValueFormat();
-							final ValueFormat valueFormat_Detail = definedColDef.getValueFormat_Detail();
+							ValueFormat valueFormat = definedColDef.getValueFormat();
+							ValueFormat valueFormat_Detail = definedColDef.getValueFormat_Detail();
+
+							if (valueFormat == null) {
+								valueFormat = definedColDef.getDefaultValueFormat();
+							}
+
+							if (valueFormat_Detail == null) {
+								valueFormat_Detail = definedColDef.getDefaultValueFormat_Detail();
+							}
+
 							final IValueFormatter valueFormatter = _columnManager.getValueFormatter(valueFormat);
 							final IValueFormatter valueFormatter_Detail = _columnManager
 									.getValueFormatter(valueFormat_Detail);
 
-							colDefClone.setIsCheckedInDialog(currentColDef.isCheckedInDialog());
+							colDefClone.setIsColumnDisplayed(currentColDef.isColumnDisplayed());
 
 							colDefClone.setColumnWidth(currentColDef.getColumnWidth());
 							colDefClone.setValueFormatter(valueFormat, valueFormatter);
@@ -1289,7 +1303,7 @@ public class DialogModifyColumns extends TrayDialog {
 
 		// create new item
 		_columnViewer.insert(colDef, index);
-		_columnViewer.setChecked(colDef, colDef.isCheckedInDialog());
+		_columnViewer.setChecked(colDef, colDef.isColumnDisplayed());
 	}
 
 	/**
@@ -1615,7 +1629,7 @@ public class DialogModifyColumns extends TrayDialog {
 	}
 
 	private void setColor(final ViewerCell cell, final ColumnDefinition colDef) {
-		
+
 		// paint columns in a different color which can't be hidden
 		if (colDef.canModifyVisibility() == false) {
 			cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
@@ -1631,7 +1645,7 @@ public class DialogModifyColumns extends TrayDialog {
 		final ArrayList<ColumnDefinition> checkedColumns = new ArrayList<ColumnDefinition>();
 
 		for (final ColumnDefinition colDef : _columnViewerModel) {
-			if (colDef.isCheckedInDialog()) {
+			if (colDef.isColumnDisplayed()) {
 				checkedColumns.add(colDef);
 			}
 		}

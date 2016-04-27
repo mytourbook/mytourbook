@@ -41,7 +41,7 @@ public class ColumnDefinition implements Cloneable {
 	 * visibility status used in the modify dialog, this is used if the dialog is canceled to not
 	 * touch the visible status
 	 */
-	private boolean				_isCheckedInDialog;
+	private boolean				_isColumnDisplayed;
 
 	/**
 	 * when <code>true</code> the visibility for this column can be changed
@@ -128,7 +128,7 @@ public class ColumnDefinition implements Cloneable {
 
 		clone._label = _label;
 		clone._columnId = _columnId;
-		clone._isCheckedInDialog = _isCheckedInDialog;
+		clone._isColumnDisplayed = _isColumnDisplayed;
 		clone._canModifyVisibility = _canModifyVisibility;
 
 		clone._style = _style;
@@ -288,8 +288,12 @@ public class ColumnDefinition implements Cloneable {
 		return result;
 	}
 
-	public boolean isCheckedInDialog() {
-		return _isCheckedInDialog;
+	/**
+	 * @return Returns <code>true</code> when the column is displayed in the UI, otherwise
+	 *         <code>false</code>.
+	 */
+	public boolean isColumnDisplayed() {
+		return _isColumnDisplayed;
 	}
 
 	public boolean isColumnHidden() {
@@ -446,8 +450,8 @@ public class ColumnDefinition implements Cloneable {
 		_isColumnHidden = true;
 	}
 
-	public void setIsCheckedInDialog(final boolean isCheckedInDialog) {
-		_isCheckedInDialog = isCheckedInDialog;
+	public void setIsColumnDisplayed(final boolean isDisplayed) {
+		_isColumnDisplayed = isDisplayed;
 	}
 
 	public void setIsColumnMoveable(final boolean isColumnMovablee) {

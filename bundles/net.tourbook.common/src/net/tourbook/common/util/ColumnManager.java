@@ -23,12 +23,12 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 
 import net.tourbook.common.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.formatter.IValueFormatter;
 import net.tourbook.common.formatter.ValueFormat;
-import net.tourbook.common.formatter.ValueFormatter_Calories_Cal;
 import net.tourbook.common.formatter.ValueFormatter_Calories_Kcal_1_0;
 import net.tourbook.common.formatter.ValueFormatter_Calories_Kcal_1_1;
 import net.tourbook.common.formatter.ValueFormatter_Calories_Kcal_1_2;
@@ -68,6 +68,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -164,7 +165,6 @@ public class ColumnManager {
 	 */
 	private static IValueFormatter				_defaultDefaultValueFormatter		= new ValueFormatter_Default();
 
-	private IValueFormatter						_valueFormatter_Calories_Cal		= new ValueFormatter_Calories_Cal();
 	private IValueFormatter						_valueFormatter_Calories_Kcal_1_0	= new ValueFormatter_Calories_Kcal_1_0();
 	private IValueFormatter						_valueFormatter_Calories_Kcal_1_1	= new ValueFormatter_Calories_Kcal_1_1();
 	private IValueFormatter						_valueFormatter_Calories_Kcal_1_2	= new ValueFormatter_Calories_Kcal_1_2();
@@ -227,9 +227,6 @@ public class ColumnManager {
 
 		switch (valueFormat) {
 
-		case CALORIES_CAL:
-			return Messages.Value_Formatter_Calories_Cal;
-
 		case CALORIES_KCAL_1_0:
 			return Messages.Value_Formatter_Calories_Kcal_1_0;
 
@@ -268,6 +265,11 @@ public class ColumnManager {
 		}
 
 		return UI.EMPTY_STRING;
+	}
+
+	void action_AddColumn(final ColumnDefinition colDef) {
+
+		setVisibleColumnIds_AddColumn(colDef);
 	}
 
 	private void action_FitAllColumnSize() {
@@ -913,7 +915,29 @@ public class ColumnManager {
 		/*
 		 * Actions: All columns
 		 */
-		for (final ColumnDefinition colDef : getRearrangedColumns()) {
+		final ArrayList<ColumnDefinition> allColumns = getRearrangedColumns();
+
+		final ArrayList<ColumnDefinition> displayedColumns = new ArrayList<>();
+		final ArrayList<ColumnDefinition> categorizedColumns = new ArrayList<>();
+		final HashSet<String> categorizedNames = new HashSet<String>();
+
+		for (final ColumnDefinition colDef : allColumns) {
+
+			if (colDef.isColumnDisplayed()) {
+
+				displayedColumns.add(colDef);
+
+			} else {
+
+				categorizedColumns.add(colDef);
+				categorizedNames.add(colDef.getColumnCategory());
+			}
+		}
+
+		/*
+		 * Create menu items for each visible column
+		 */
+		for (final ColumnDefinition colDef : displayedColumns) {
 
 			final MenuItem colMenuItem = new MenuItem(contextMenu, SWT.CHECK);
 
@@ -951,11 +975,21 @@ public class ColumnManager {
 
 			colMenuItem.setText(sb.toString());
 			colMenuItem.setEnabled(colDef.canModifyVisibility());
-			colMenuItem.setSelection(colDef.isCheckedInDialog());
+			colMenuItem.setSelection(colDef.isColumnDisplayed());
 
 			colMenuItem.setData(colDef);
 			colMenuItem.addListener(SWT.Selection, _colItemListener);
 		}
+
+		/*
+		 * Create submenus for each category
+		 */
+
+		// sort by name
+		final ArrayList<String> categories = new ArrayList<>(categorizedNames);
+		Collections.sort(categories);
+
+		new ColumnContextMenu(contextMenu, categories, categorizedColumns, this);
 	}
 
 	/**
@@ -1028,8 +1062,9 @@ public class ColumnManager {
 				final Rectangle clientArea = tree.getClientArea();
 				final int headerHeight = tree.getHeaderHeight();
 
-				final boolean isTreeHeaderHit = clientArea.y <= mousePosition.y
-						&& mousePosition.y < (clientArea.y + headerHeight);
+				final int headerBottom = clientArea.y + headerHeight;
+
+				final boolean isTreeHeaderHit = clientArea.y <= mousePosition.y && mousePosition.y < headerBottom;
 
 				_headerColumn = getHeaderColumn(tree, mousePosition, isTreeHeaderHit);
 
@@ -1042,8 +1077,27 @@ public class ColumnManager {
 				 */
 				if (_headerColumn != null) {
 
-					final Point displayPosition = tree.toDisplay(_headerColumn.columnRightBorder, event.y);
-					event.x = displayPosition.x + 0;
+					int posX = _headerColumn.columnRightBorder;
+					int xOffset = 0;
+
+					final ScrollBar hBar = tree.getHorizontalBar();
+
+					if (hBar != null) {
+						xOffset = hBar.getSelection();
+					}
+
+					/*
+					 * It is possible that the context menu is outside of the tree, this occures
+					 * when the column is very wide and horizonal scrolled.
+					 */
+					if (posX - xOffset > clientArea.width) {
+						posX = xOffset + clientArea.width;
+					}
+
+					final Point displayPosition = tree.toDisplay(posX, headerBottom);
+
+					event.x = displayPosition.x - 1;
+					event.y = displayPosition.y - 2;
 				}
 			}
 		};
@@ -1383,7 +1437,7 @@ public class ColumnManager {
 			if (colDef != null) {
 
 				// check all visible columns in the dialog
-				colDef.setIsCheckedInDialog(true);
+				colDef.setIsColumnDisplayed(true);
 
 				// set column width
 				colDef.setColumnWidth(getColumnWidth(colDef.getColumnId()));
@@ -1401,7 +1455,7 @@ public class ColumnManager {
 		for (final ColumnDefinition colDef : allColDefClone) {
 
 			// uncheck hidden columns
-			colDef.setIsCheckedInDialog(false);
+			colDef.setIsColumnDisplayed(false);
 
 			// set column default width
 			colDef.setColumnWidth(colDef.getDefaultColumnWidth());
@@ -1425,8 +1479,6 @@ public class ColumnManager {
 		}
 
 		switch (valueFormat) {
-		case CALORIES_CAL:
-			return _valueFormatter_Calories_Cal;
 
 		case CALORIES_KCAL_1_0:
 			return _valueFormatter_Calories_Kcal_1_0;
@@ -1988,6 +2040,46 @@ public class ColumnManager {
 
 			columnProfile.visibleColumnIds = columnIds.toArray(new String[columnIds.size()]);
 		}
+	}
+
+	private void setVisibleColumnIds_AddColumn(final ColumnDefinition newColDef) {
+
+		final ArrayList<String> visibleColumnIds = new ArrayList<String>();
+		final ArrayList<String> visibleIdsAndWidth = new ArrayList<String>();
+
+		for (final String columnId : _activeProfile.visibleColumnIds) {
+
+			final ColumnDefinition colDef = getColDef_ByColumnId(columnId);
+
+			// set visible columns
+			visibleColumnIds.add(columnId);
+
+			// set column id and width
+			visibleIdsAndWidth.add(columnId);
+			visibleIdsAndWidth.add(Integer.toString(colDef.getColumnWidth()));
+		}
+
+		/*
+		 * Append new column
+		 */
+
+		// set visible columns
+		visibleColumnIds.add(newColDef.getColumnId());
+
+		// set column id and width
+		visibleIdsAndWidth.add(newColDef.getColumnId());
+		visibleIdsAndWidth.add(Integer.toString(newColDef.getColumnWidth()));
+
+		/*
+		 * Update model
+		 */
+		_activeProfile.visibleColumnIds = visibleColumnIds.toArray(new String[visibleColumnIds.size()]);
+		_activeProfile.visibleColumnIdsAndWidth = visibleIdsAndWidth.toArray(new String[visibleIdsAndWidth.size()]);
+
+		/*
+		 * Update UI
+		 */
+		_columnViewer = _tourViewer.recreateViewer(_columnViewer);
 	}
 
 	private void setVisibleColumnIds_All() {

@@ -34,7 +34,6 @@ import java.util.Set;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
-import net.tourbook.common.formatter.ValueFormat;
 import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.tooltip.OpenDialogManager;
 import net.tourbook.common.util.ColumnDefinition;
@@ -131,7 +130,6 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
-import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
@@ -147,8 +145,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 	static public final String							ID									= "net.tourbook.views.tourListView";						//$NON-NLS-1$
 
 	private static final String							GRAPH_LABEL_HEARTBEAT_UNIT			= net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
-	private static final String							VALUE_UNIT_CALORIES					= net.tourbook.ui.Messages.Value_Unit_Calories;
-	private static final String							VALUE_UNIT_K_CALORIES				= net.tourbook.ui.Messages.Value_Unit_KCalories;
 
 	private static final float							UNIT_VALUE_DISTANCE					= net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
@@ -307,7 +303,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 	private ActionSetPerson								_actionSetOtherPerson;
 	private ActionToggleMonthWeek						_actionToggleMonthWeek;
 
-	private TreeColumnDefinition						_colDef_BodyCalories;
 
 	/*
 	 * UI controls
@@ -991,8 +986,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 	 */
 	private void defineColumn_Body_Calories() {
 
-		_colDef_BodyCalories = TreeColumnFactory.BODY_CALORIES.createColumn(_columnManager, _pc);
-		_colDef_BodyCalories.setLabelProvider(new CellLabelProvider() {
+		final TreeColumnDefinition colDef = TreeColumnFactory.BODY_CALORIES.createColumn(_columnManager, _pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
 
@@ -1002,7 +997,12 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				if (calories == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(_colDef_BodyCalories.getValueFormatter().printLong(calories));
+
+					if (element instanceof TVITourBookTour) {
+						cell.setText(colDef.getValueFormatter_Detail().printLong(calories));
+					} else {
+						cell.setText(colDef.getValueFormatter().printLong(calories));
+					}
 				}
 
 				setCellColor(cell, element);
@@ -1462,8 +1462,14 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				if (dbValue == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
+
 					final double value = (double) dbValue / 1000000;
-					cell.setText(colDef.getValueFormatter().printDouble(value));
+
+					if (element instanceof TVITourBookTour) {
+						cell.setText(colDef.getValueFormatter_Detail().printDouble(value));
+					} else {
+						cell.setText(colDef.getValueFormatter().printDouble(value));
+					}
 				}
 
 				setCellColor(cell, element);
@@ -3690,17 +3696,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 	@Override
 	public void updateColumnHeader(final ColumnDefinition colDef) {
 
-		final TreeColumn caloriesColumn = _colDef_BodyCalories.getTreeColumn();
-
-		if (caloriesColumn != null && caloriesColumn.isDisposed() == false) {
-
-			final String headerText = ValueFormat.CALORIES_CAL.equals(_colDef_BodyCalories.getValueFormat())
-					? VALUE_UNIT_CALORIES
-					: VALUE_UNIT_K_CALORIES;
-
-			_colDef_BodyCalories.setColumnHeaderText(headerText);
-			caloriesColumn.setText(headerText);
-		}
 	}
 
 	private void updateToolTipState() {

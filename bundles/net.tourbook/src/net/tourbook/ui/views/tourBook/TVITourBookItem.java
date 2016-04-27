@@ -67,11 +67,13 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 				+ "AVG( CASE WHEN RESTPULSE = 0			THEN NULL ELSE RESTPULSE END )," //			16	//$NON-NLS-1$
 				//
 				+ "SUM(CALORIES)," //									17	//$NON-NLS-1$
-				+ "SUM(numberOfTimeSlices)," //							18	//$NON-NLS-1$
-				+ "SUM(numberOfPhotos)," //								19	//$NON-NLS-1$
+				+ "SUM(power_TotalWork)," //							18	//$NON-NLS-1$
+
+				+ "SUM(numberOfTimeSlices)," //							19	//$NON-NLS-1$
+				+ "SUM(numberOfPhotos)," //								20	//$NON-NLS-1$
 				//
-				+ "SUM(frontShiftCount)," //							20	//$NON-NLS-1$
-				+ "SUM(rearShiftCount)"; //								21	//$NON-NLS-1$
+				+ "SUM(frontShiftCount)," //							21	//$NON-NLS-1$
+				+ "SUM(rearShiftCount)"; //								22	//$NON-NLS-1$
 	}
 
 	TourBookView					tourBookView;
@@ -202,12 +204,13 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 		colRestPulse = result.getInt(startIndex + 16);
 
 		colCalories = result.getLong(startIndex + 17);
+		colPower_TotalWork = result.getLong(startIndex + 18);
 
-		colNumberOfTimeSlices = result.getInt(startIndex + 18);
-		colNumberOfPhotos = result.getInt(startIndex + 19);
+		colNumberOfTimeSlices = result.getInt(startIndex + 19);
+		colNumberOfPhotos = result.getInt(startIndex + 20);
 
-		colFrontShiftCount = result.getInt(startIndex + 20);
-		colRearShiftCount = result.getInt(startIndex + 21);
+		colFrontShiftCount = result.getInt(startIndex + 21);
+		colRearShiftCount = result.getInt(startIndex + 22);
 
 		colPausedTime = colRecordingTime - colDrivingTime;
 	}

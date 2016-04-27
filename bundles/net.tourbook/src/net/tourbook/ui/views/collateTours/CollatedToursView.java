@@ -26,7 +26,6 @@ import java.util.Set;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
-import net.tourbook.common.formatter.ValueFormat;
 import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.tooltip.OpenDialogManager;
 import net.tourbook.common.util.ColumnDefinition;
@@ -116,7 +115,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
-import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
@@ -128,8 +126,6 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
 	static public final String							ID						= "net.tourbook.ui.views.collateTours.CollatedToursView";	//$NON-NLS-1$
 
-	private static final String							VALUE_UNIT_CALORIES		= net.tourbook.ui.Messages.Value_Unit_Calories;
-	private static final String							VALUE_UNIT_K_CALORIES	= net.tourbook.ui.Messages.Value_Unit_KCalories;
 
 	private static Styler								DATE_STYLER;
 	private static final String[]						WEEK_DAYS;
@@ -219,7 +215,6 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	private CollateTourContributionItem					_contribItem_CollatedTours;
 
 	private TreeViewer									_tourViewer;
-	private TreeColumnDefinition						_colDef_BodyCalories;
 
 	private PixelConverter								_pc;
 
@@ -870,8 +865,8 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	 */
 	private void defineColumn_Body_Calories() {
 
-		_colDef_BodyCalories = TreeColumnFactory.BODY_CALORIES.createColumn(_columnManager, _pc);
-		_colDef_BodyCalories.setLabelProvider(new CellLabelProvider() {
+		final TreeColumnDefinition colDef = TreeColumnFactory.BODY_CALORIES.createColumn(_columnManager, _pc);
+		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
 
@@ -881,7 +876,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 				if (calories == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(_colDef_BodyCalories.getValueFormatter().printLong(calories));
+					cell.setText(colDef.getValueFormatter().printLong(calories));
 				}
 
 				setCellColor(cell, element);
@@ -2192,17 +2187,6 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	@Override
 	public void updateColumnHeader(final ColumnDefinition colDef) {
 
-		final TreeColumn caloriesColumn = _colDef_BodyCalories.getTreeColumn();
-
-		if (caloriesColumn.isDisposed() == false) {
-
-			final String headerText = ValueFormat.CALORIES_CAL.equals(_colDef_BodyCalories.getValueFormat())
-					? VALUE_UNIT_CALORIES
-					: VALUE_UNIT_K_CALORIES;
-
-			_colDef_BodyCalories.setColumnHeaderText(headerText);
-			caloriesColumn.setText(headerText);
-		}
 	}
 
 	private void updateToolTipState() {
