@@ -21,6 +21,9 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.ui.messages";					//$NON-NLS-1$
 
+	public static String		App_Annotation_1;
+	public static String		App_Annotation_2;
+
 	public static String		ColumnFactory_altitude_computed_difference_tooltip;
 	public static String		ColumnFactory_altitude_difference_label;
 	public static String		ColumnFactory_altitude_difference_tooltip;
@@ -421,8 +424,7 @@ public class Messages extends NLS {
 	public static String		Value_Unit_Cadence;
 	public static String		Value_Unit_Cadence_Spm;
 	public static String		Value_Unit_Calories;
-
-	public static String	Value_Unit_KCalories;
+	public static String		Value_Unit_KCalories;
 	public static String		Value_Unit_Pulse;
 
 	static {

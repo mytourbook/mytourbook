@@ -188,7 +188,8 @@ public abstract class TreeColumnFactory {
 				colDef.setValueFormats(
 						ValueFormatSet.Calories,
 						ValueFormat.CALORIES_KCAL_1_0,
-						ValueFormat.CALORIES_KCAL_1_3);
+						ValueFormat.CALORIES_KCAL_1_3,
+						columnManager);
 
 				return colDef;
 			};
@@ -226,7 +227,7 @@ public abstract class TreeColumnFactory {
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_avg_pulse_tooltip);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
-				colDef.setValueFormats(ValueFormatSet.Number, ValueFormat.NUMBER_1_1, null);
+				colDef.setValueFormats(ValueFormatSet.Number, ValueFormat.NUMBER_1_1, null, columnManager);
 
 				return colDef;
 			};
@@ -246,7 +247,7 @@ public abstract class TreeColumnFactory {
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_max_pulse_tooltip);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
-				colDef.setValueFormats(ValueFormatSet.Number, ValueFormat.NUMBER_1_1, null);
+				colDef.setValueFormats(ValueFormatSet.Number, ValueFormat.NUMBER_1_1, null, columnManager);
 
 				return colDef;
 			};
@@ -492,7 +493,7 @@ public abstract class TreeColumnFactory {
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_avg_speed_tooltip);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
-				colDef.setValueFormats(ValueFormatSet.Number, ValueFormat.NUMBER_1_1, null);
+				colDef.setValueFormats(ValueFormatSet.Number, ValueFormat.NUMBER_1_1, null, columnManager);
 
 				return colDef;
 			};
@@ -513,7 +514,11 @@ public abstract class TreeColumnFactory {
 				colDef.setColumnUnit(UI.UNIT_LABEL_DISTANCE);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
-				colDef.setValueFormats(ValueFormatSet.Number, ValueFormat.NUMBER_1_0, ValueFormat.NUMBER_1_3);
+				colDef.setValueFormats(
+						ValueFormatSet.Number,
+						ValueFormat.NUMBER_1_0,
+						ValueFormat.NUMBER_1_3,
+						columnManager);
 
 				return colDef;
 			};
@@ -536,7 +541,7 @@ public abstract class TreeColumnFactory {
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_max_speed_tooltip);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
-				colDef.setValueFormats(ValueFormatSet.Number, ValueFormat.NUMBER_1_1, null);
+				colDef.setValueFormats(ValueFormatSet.Number, ValueFormat.NUMBER_1_1, null, columnManager);
 
 				return colDef;
 			};
@@ -555,7 +560,7 @@ public abstract class TreeColumnFactory {
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_speed_tooltip);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
-				colDef.setValueFormats(ValueFormatSet.Number, ValueFormat.NUMBER_1_1, null);
+				colDef.setValueFormats(ValueFormatSet.Number, ValueFormat.NUMBER_1_1, null, columnManager);
 
 				return colDef;
 			};
@@ -581,7 +586,7 @@ public abstract class TreeColumnFactory {
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Power_Avg_Tooltip);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
-				colDef.setValueFormats(ValueFormatSet.Number, ValueFormat.NUMBER_1_0, null);
+				colDef.setValueFormats(ValueFormatSet.Number, ValueFormat.NUMBER_1_0, null, columnManager);
 
 				return colDef;
 			};
@@ -604,7 +609,7 @@ public abstract class TreeColumnFactory {
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Power_Max_Tooltip);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
-				colDef.setValueFormats(ValueFormatSet.Number, ValueFormat.NUMBER_1_0, null);
+				colDef.setValueFormats(ValueFormatSet.Number, ValueFormat.NUMBER_1_0, null, columnManager);
 
 				return colDef;
 			};
@@ -649,7 +654,11 @@ public abstract class TreeColumnFactory {
 				colDef.setColumnUnit(UI.UNIT_JOULE_MEGA);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
-				colDef.setValueFormats(ValueFormatSet.Number, ValueFormat.NUMBER_1_2, ValueFormat.NUMBER_1_3);
+				colDef.setValueFormats(
+						ValueFormatSet.Number,
+						ValueFormat.NUMBER_1_2,
+						ValueFormat.NUMBER_1_3,
+						columnManager);
 
 				return colDef;
 			};
@@ -674,7 +683,7 @@ public abstract class TreeColumnFactory {
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_avg_cadence_tooltip);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
-				colDef.setValueFormats(ValueFormatSet.Number, ValueFormat.NUMBER_1_1, null);
+				colDef.setValueFormats(ValueFormatSet.Number, ValueFormat.NUMBER_1_1, null, columnManager);
 
 				return colDef;
 			};
@@ -697,7 +706,7 @@ public abstract class TreeColumnFactory {
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Power_AvgLeftPedalSmoothness_Tooltip);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(6));
-				colDef.setValueFormats(ValueFormatSet.Number, ValueFormat.NUMBER_1_1, null);
+				colDef.setValueFormats(ValueFormatSet.Number, ValueFormat.NUMBER_1_1, null, columnManager);
 
 				return colDef;
 			};
@@ -720,7 +729,7 @@ public abstract class TreeColumnFactory {
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Power_AvgRightPedalSmoothness_Tooltip);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(6));
-				colDef.setValueFormats(ValueFormatSet.Number, ValueFormat.NUMBER_1_1, null);
+				colDef.setValueFormats(ValueFormatSet.Number, ValueFormat.NUMBER_1_1, null, columnManager);
 
 				return colDef;
 			};
@@ -743,7 +752,7 @@ public abstract class TreeColumnFactory {
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Power_AvgLeftTorqueEffectiveness_Tooltip);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(6));
-				colDef.setValueFormats(ValueFormatSet.Number, ValueFormat.NUMBER_1_1, null);
+				colDef.setValueFormats(ValueFormatSet.Number, ValueFormat.NUMBER_1_1, null, columnManager);
 
 				return colDef;
 			};
@@ -766,7 +775,7 @@ public abstract class TreeColumnFactory {
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Power_AvgRightTorqueEffectiveness_Tooltip);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(6));
-				colDef.setValueFormats(ValueFormatSet.Number, ValueFormat.NUMBER_1_1, null);
+				colDef.setValueFormats(ValueFormatSet.Number, ValueFormat.NUMBER_1_1, null, columnManager);
 
 				return colDef;
 			};
@@ -914,7 +923,7 @@ public abstract class TreeColumnFactory {
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_driving_time_tooltip);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
-				colDef.setValueFormats(ValueFormatSet.Time, ValueFormat.TIME_HH, ValueFormat.TIME_HH_MM);
+				colDef.setValueFormats(ValueFormatSet.Time, ValueFormat.TIME_HH, ValueFormat.TIME_HH_MM, columnManager);
 
 				return colDef;
 			};
@@ -935,7 +944,7 @@ public abstract class TreeColumnFactory {
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_paused_time_tooltip);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
-				colDef.setValueFormats(ValueFormatSet.Time, ValueFormat.TIME_HH, ValueFormat.TIME_HH_MM);
+				colDef.setValueFormats(ValueFormatSet.Time, ValueFormat.TIME_HH, ValueFormat.TIME_HH_MM, columnManager);
 
 				return colDef;
 			};
@@ -978,7 +987,7 @@ public abstract class TreeColumnFactory {
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_recording_time_tooltip);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
-				colDef.setValueFormats(ValueFormatSet.Time, ValueFormat.TIME_HH, ValueFormat.TIME_HH_MM);
+				colDef.setValueFormats(ValueFormatSet.Time, ValueFormat.TIME_HH, ValueFormat.TIME_HH_MM, columnManager);
 
 				return colDef;
 			};
@@ -1268,7 +1277,7 @@ public abstract class TreeColumnFactory {
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Power_IntensityFactor_Tooltip);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
-				colDef.setValueFormats(ValueFormatSet.Number, ValueFormat.NUMBER_1_2, null);
+				colDef.setValueFormats(ValueFormatSet.Number, ValueFormat.NUMBER_1_2, null, columnManager);
 
 				return colDef;
 			};
@@ -1291,7 +1300,7 @@ public abstract class TreeColumnFactory {
 				colDef.setColumnUnit(UI.UNIT_POWER_TO_WEIGHT_RATIO);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
-				colDef.setValueFormats(ValueFormatSet.Number, ValueFormat.NUMBER_1_2, null);
+				colDef.setValueFormats(ValueFormatSet.Number, ValueFormat.NUMBER_1_2, null, columnManager);
 
 				return colDef;
 			};
@@ -1313,7 +1322,7 @@ public abstract class TreeColumnFactory {
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Power_TrainingStressScore_Tooltip);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
-				colDef.setValueFormats(ValueFormatSet.Number, ValueFormat.NUMBER_1_1, null);
+				colDef.setValueFormats(ValueFormatSet.Number, ValueFormat.NUMBER_1_1, null, columnManager);
 
 				return colDef;
 			};
@@ -1340,7 +1349,7 @@ public abstract class TreeColumnFactory {
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_avg_temperature_tooltip);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
-				colDef.setValueFormats(ValueFormatSet.Number, ValueFormat.NUMBER_1_1, null);
+				colDef.setValueFormats(ValueFormatSet.Number, ValueFormat.NUMBER_1_1, null, columnManager);
 
 				return colDef;
 			};

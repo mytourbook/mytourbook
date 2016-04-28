@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.common.util;
 
+import net.tourbook.common.Messages;
+import net.tourbook.common.UI;
 import net.tourbook.common.formatter.IValueFormatter;
 import net.tourbook.common.formatter.ValueFormat;
 
@@ -472,20 +474,43 @@ public class ColumnDefinition implements Cloneable {
 
 	/**
 	 * Set formats which are used to render the column.
+	 * <p>
+	 * <b>This must be called after {@link #setColumnHeaderText(String)} that annotations can be
+	 * added to the column header text. </b>
 	 * 
 	 * @param availableFormats
 	 * @param defaultFormat
 	 * @param defaultDetailFormat
 	 *            When <code>null</code> this format cannot be selected.
+	 * @param columnManager
 	 */
 	public void setValueFormats(final ValueFormat[] availableFormats,
 								final ValueFormat defaultFormat,
-								final ValueFormat defaultDetailFormat) {
+								final ValueFormat defaultDetailFormat,
+								final ColumnManager columnManager) {
 
 		_availableFormats = availableFormats;
 
 		_defaultValueFormat = defaultFormat;
 		_defaultValueFormat_Detail = defaultDetailFormat;
+
+		/*
+		 * Add annotations to the column header text
+		 */
+		if (columnManager.isShowColumnAnnotations()) {
+
+			if (_columnText == null) {
+				_columnText = UI.EMPTY_STRING;
+			}
+
+			if (defaultFormat != null) {
+				_columnText += UI.SPACE1 + Messages.App_Annotation_1;
+			}
+
+			if (defaultDetailFormat != null) {
+				_columnText += Messages.App_Annotation_2;
+			}
+		}
 	}
 
 	void setValueFormatter(final ValueFormat valueFormat, final IValueFormatter valueFormatter) {

@@ -95,6 +95,7 @@ public class ColumnManager {
 	//
 	private static final String					ATTR_IS_ACTIVE_PROFILE				= "isActiveProfile";						//$NON-NLS-1$
 	private static final String					ATTR_IS_SHOW_CATEGORY				= "isShowCategory";						//$NON-NLS-1$
+	private static final String					ATTR_IS_SHOW_COLUMN_ANNOTATIONS		= "isShowColumnAnnotations";				//$NON-NLS-1$
 	//
 	private static final String					ATTR_COLUMN_ID						= "columnId";								//$NON-NLS-1$
 	private static final String					ATTR_COLUMN_FORMAT					= "format";								//$NON-NLS-1$
@@ -139,6 +140,8 @@ public class ColumnManager {
 	 * header context menu.
 	 */
 	private boolean								_isShowCategory						= true;
+
+	private boolean								_isShowColumnAnnotations;
 
 	private Comparator<ColumnProfile>			_profileSorter;
 
@@ -1526,6 +1529,10 @@ public class ColumnManager {
 		return _isShowCategory;
 	}
 
+	public boolean isShowColumnAnnotations() {
+		return _isShowColumnAnnotations;
+	}
+
 	private void onSelectColumnItem(final Event event) {
 
 		if (event.widget instanceof MenuItem) {
@@ -1584,6 +1591,12 @@ public class ColumnManager {
 				final Boolean xmlIsShowCategory = xmlMemento.getBoolean(ATTR_IS_SHOW_CATEGORY);
 				if (xmlIsShowCategory != null) {
 					_isShowCategory = xmlIsShowCategory;
+				}
+
+				// get category column state
+				final Boolean xmlIsShowAnnotations = xmlMemento.getBoolean(ATTR_IS_SHOW_COLUMN_ANNOTATIONS);
+				if (xmlIsShowAnnotations != null) {
+					_isShowColumnAnnotations = xmlIsShowAnnotations;
 				}
 
 				// get profiles
@@ -1717,8 +1730,9 @@ public class ColumnManager {
 		// Build the XML block for writing the bindings and active scheme.
 		final XMLMemento xmlMemento = XMLMemento.createWriteRoot(TAG_ROOT);
 
-		// save category column state
+		// save other states
 		xmlMemento.putBoolean(ATTR_IS_SHOW_CATEGORY, _isShowCategory);
+		xmlMemento.putBoolean(ATTR_IS_SHOW_COLUMN_ANNOTATIONS, _isShowColumnAnnotations);
 
 		// save profiles
 		saveState_Profiles(xmlMemento);
@@ -1835,6 +1849,10 @@ public class ColumnManager {
 
 	public void setIsShowCategory(final boolean isShowCategory) {
 		_isShowCategory = isShowCategory;
+	}
+
+	void setIsShowColumnAnnotations(final boolean isShowColumnAnnotations) {
+		_isShowColumnAnnotations = isShowColumnAnnotations;
 	}
 
 	private void setupValueFormatter(final ColumnProfile activeProfile) {

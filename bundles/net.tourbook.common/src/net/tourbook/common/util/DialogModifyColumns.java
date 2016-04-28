@@ -106,6 +106,7 @@ public class DialogModifyColumns extends TrayDialog {
 	private ArrayList<ColumnProfile>	_dialog_Profiles;
 	//
 	private boolean						_isInUpdate;
+	private boolean						_isShowColumnAnnotations;
 	//
 	private boolean						_isShowCategory;
 	private boolean						_isCategoryAvailable;
@@ -125,6 +126,8 @@ public class DialogModifyColumns extends TrayDialog {
 	private Button						_btnProfile_Remove;
 	private Button						_btnProfile_Rename;
 	private Button						_btnColumn_Sort;
+	//
+	private Button						_chkShowFormatAnnotations;
 	//
 	private CheckboxTableViewer			_columnViewer;
 	private CheckboxTableViewer			_profileViewer;
@@ -358,6 +361,8 @@ public class DialogModifyColumns extends TrayDialog {
 			createUI_72_ColumnsViewer(_uiContainer);
 			createUI_74_ColumnActions(_uiContainer);
 			createUI_76_Hints(_uiContainer);
+
+			createUI_80_ColumnAnnotations(_uiContainer);
 		}
 	}
 
@@ -956,6 +961,22 @@ public class DialogModifyColumns extends TrayDialog {
 				.applyTo(styledText);
 	}
 
+	private void createUI_80_ColumnAnnotations(final Composite parent) {
+
+		_chkShowFormatAnnotations = new Button(parent, SWT.CHECK);
+		_chkShowFormatAnnotations.setText(Messages.ColumnModifyDialog_Checkbox_ShowFormatAnnotations);
+		_chkShowFormatAnnotations.setToolTipText(Messages.ColumnModifyDialog_Checkbox_ShowFormatAnnotations_Tooltip);
+
+		GridDataFactory.fillDefaults().indent(0, 20).applyTo(_chkShowFormatAnnotations);
+
+		_chkShowFormatAnnotations.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				_isShowColumnAnnotations = _chkShowFormatAnnotations.getSelection();
+			}
+		});
+	}
+
 	private void defineAllColumns(final TableColumnLayout tableLayout) {
 
 		defineColumn_ColumnName(tableLayout);
@@ -1100,7 +1121,7 @@ public class DialogModifyColumns extends TrayDialog {
 				setColor(cell, colDef);
 			}
 		});
-		tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(14), true));
+		tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(18), true));
 	}
 
 	/**
@@ -1581,11 +1602,13 @@ public class DialogModifyColumns extends TrayDialog {
 
 	private void restoreState() {
 
-		/*
-		 * Show/hide category
-		 */
+		// show/hide category
 		_isShowCategory = _columnManager.isShowCategory();
 		_actionShowHideCategory.setChecked(_isShowCategory);
+
+		// show/hide column annotations
+		_isShowColumnAnnotations = _columnManager.isShowColumnAnnotations();
+		_chkShowFormatAnnotations.setSelection(_isShowColumnAnnotations);
 
 		// load viewer
 		_profileViewer.setInput(new Object());
@@ -1611,6 +1634,7 @@ public class DialogModifyColumns extends TrayDialog {
 		_columnMgr_Profiles.addAll(_dialog_Profiles);
 
 		_columnManager.setIsShowCategory(_isShowCategory);
+		_columnManager.setIsShowColumnAnnotations(_isShowColumnAnnotations);
 
 		_columnManager.updateColumns(//
 				_selectedProfile,

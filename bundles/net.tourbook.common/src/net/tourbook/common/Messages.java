@@ -25,6 +25,10 @@ public class Messages extends NLS {
 	public static String		App_Action_Remove_NoConfirm;
 	public static String		App_Action_Rename_WithConfirm;
 
+	public static String	App_Annotation_1;
+
+	public static String	App_Annotation_2;
+
 	public static String		App_Error_NotSupportedValueFormatter;
 
 	public static String		Action_App_CustomizeColumnsAndProfiles;
@@ -56,6 +60,10 @@ public class Messages extends NLS {
 	public static String		ColumnModifyDialog_Button_ShowCategoryColumn_Tooltip;
 	public static String		ColumnModifyDialog_Button_Sort;
 	public static String		ColumnModifyDialog_Button_Sort_Tooltip;
+	public static String	ColumnModifyDialog_Checkbox_ShowFormatAnnotations;
+
+	public static String	ColumnModifyDialog_Checkbox_ShowFormatAnnotations_Tooltip;
+
 	public static String		ColumnModifyDialog_Column_Category;
 
 	public static String	ColumnModifyDialog_Column_DetailFormat;
