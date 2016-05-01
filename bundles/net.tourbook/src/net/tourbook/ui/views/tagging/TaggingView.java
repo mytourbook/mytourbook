@@ -54,7 +54,6 @@ import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourTypeMenuManager;
-import net.tourbook.ui.FormatManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.TreeColumnFactory;
 import net.tourbook.ui.UI;
@@ -142,9 +141,14 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 	static final int						TAG_VIEW_LAYOUT_FLAT			= 0;
 	static final int						TAG_VIEW_LAYOUT_HIERARCHICAL	= 10;
+	//
+	private static final NumberFormat		_nf0							= NumberFormat.getNumberInstance();
 	private static final NumberFormat		_nf1							= NumberFormat.getNumberInstance();
 
 	{
+		_nf0.setMinimumFractionDigits(0);
+		_nf0.setMaximumFractionDigits(0);
+
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
 	}
@@ -153,7 +157,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 	private final IDialogSettings			_state							= TourbookPlugin.getState(ID);
 	private int								_tagViewLayout					= TAG_VIEW_LAYOUT_HIERARCHICAL;
-
 
 	private TreeViewerTourInfoToolTip		_tourInfoToolTip;
 
@@ -422,7 +425,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 					_tagViewer = (TreeViewer) recreateViewer(_tagViewer);
 
 				} else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
-
 
 					_tagViewer.getTree().setLinesVisible(
 							_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
@@ -824,12 +826,12 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 					return;
 				}
 
-				final long colAltitudeDown = ((TVITagViewItem) element).colAltitudeDown;
-				if (colAltitudeDown != 0) {
+				final double dbAltitudeDown = ((TVITagViewItem) element).colAltitudeDown;
+				final double value = -dbAltitudeDown / UI.UNIT_VALUE_ALTITUDE;
 
-					cell.setText(Long.toString((long) (colAltitudeDown / UI.UNIT_VALUE_ALTITUDE)));
-					setCellColor(cell, element);
-				}
+				colDef.printValue_0(cell, value);
+
+				setCellColor(cell, element);
 			}
 		});
 	}
@@ -849,12 +851,12 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 					return;
 				}
 
-				final long colMaxAltitude = ((TVITagViewItem) element).colMaxAltitude;
-				if (colMaxAltitude != 0) {
+				final long dbMaxAltitude = ((TVITagViewItem) element).colMaxAltitude;
+				final double value = dbMaxAltitude / UI.UNIT_VALUE_ALTITUDE;
 
-					cell.setText(Long.toString(colMaxAltitude));
-					setCellColor(cell, element);
-				}
+				colDef.printValue_0(cell, value);
+
+				setCellColor(cell, element);
 			}
 		});
 	}
@@ -874,12 +876,12 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 					return;
 				}
 
-				final long colAltitudeUp = ((TVITagViewItem) element).colAltitudeUp;
-				if (colAltitudeUp != 0) {
+				final long dbAltitudeUp = ((TVITagViewItem) element).colAltitudeUp;
+				final double value = dbAltitudeUp / UI.UNIT_VALUE_ALTITUDE;
 
-					cell.setText(Long.toString((long) (colAltitudeUp / UI.UNIT_VALUE_ALTITUDE)));
-					setCellColor(cell, element);
-				}
+				colDef.printValue_0(cell, value);
+
+				setCellColor(cell, element);
 			}
 		});
 	}
@@ -899,12 +901,11 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 					return;
 				}
 
-				final float colAvgPulse = ((TVITagViewItem) element).colAvgPulse;
-				if (colAvgPulse != 0) {
+				final double value = ((TVITagViewItem) element).colAvgPulse;
 
-					cell.setText(_nf1.format(colAvgPulse));
-					setCellColor(cell, element);
-				}
+				colDef.printValue(cell, value, element instanceof TVITagViewTour);
+
+				setCellColor(cell, element);
 			}
 		});
 	}
@@ -924,12 +925,11 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 					return;
 				}
 
-				final long colMaxPulse = ((TVITagViewItem) element).colMaxPulse;
-				if (colMaxPulse != 0) {
+				final long value = ((TVITagViewItem) element).colMaxPulse;
 
-					cell.setText(Long.toString(colMaxPulse));
-					setCellColor(cell, element);
-				}
+				colDef.printValue_0(cell, value);
+
+				setCellColor(cell, element);
 			}
 		});
 	}
@@ -969,13 +969,11 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 			public void update(final ViewerCell cell) {
 
 				final Object element = cell.getElement();
+				final float value = ((TVITagViewItem) element).colAvgSpeed / UI.UNIT_VALUE_DISTANCE;
 
-				final float colAvgSpeed = ((TVITagViewItem) element).colAvgSpeed / UI.UNIT_VALUE_DISTANCE;
-				if (colAvgSpeed != 0) {
+				colDef.printValue(cell, value, element instanceof TVITagViewTour);
 
-					cell.setText(_nf1.format(colAvgSpeed));
-					setCellColor(cell, element);
-				}
+				setCellColor(cell, element);
 			}
 		});
 	}
@@ -995,14 +993,23 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 					return;
 				}
 
-				final long colDistance = ((TVITagViewItem) element).colDistance;
+				final float colDistance = ((TVITagViewItem) element).colDistance;
+
 				if (colDistance != 0) {
 
-					final String distance = _nf1.format(((float) colDistance) / 1000 / UI.UNIT_VALUE_DISTANCE);
+					colDef.printValue(
+							cell,
+							colDistance / 1000 / UI.UNIT_VALUE_DISTANCE,
+							element instanceof TVITagViewTour);
 
-					cell.setText(distance);
 					setCellColor(cell, element);
 				}
+
+				final double value = ((TVITagViewItem) element).colDistance / 1000.0 / UI.UNIT_VALUE_DISTANCE;
+
+				colDef.printValue(cell, value, element instanceof TVITagViewTour);
+
+				setCellColor(cell, element);
 			}
 		});
 	}
@@ -1022,12 +1029,11 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 					return;
 				}
 
-				final float colMaxSpeed = ((TVITagViewItem) element).colMaxSpeed;
-				if (colMaxSpeed != 0) {
+				final double value = ((TVITagViewItem) element).colMaxSpeed / UI.UNIT_VALUE_DISTANCE;
 
-					cell.setText(_nf1.format(colMaxSpeed / UI.UNIT_VALUE_DISTANCE));
-					setCellColor(cell, element);
-				}
+				colDef.printValue(cell, value, element instanceof TVITagViewTour);
+
+				setCellColor(cell, element);
 			}
 		});
 	}
@@ -1047,12 +1053,11 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 					return;
 				}
 
-				final float colAvgCadence = ((TVITagViewItem) element).colAvgCadence;
-				if (colAvgCadence != 0) {
+				final float value = ((TVITagViewItem) element).colAvgCadence;
 
-					cell.setText(_nf1.format(colAvgCadence));
-					setCellColor(cell, element);
-				}
+				colDef.printValue(cell, value, element instanceof TVITagViewTour);
+
+				setCellColor(cell, element);
 			}
 		});
 	}
@@ -1072,13 +1077,9 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 					return;
 				}
 
-				final long drivingTime = ((TVITagViewItem) element).colDrivingTime;
+				final long value = ((TVITagViewItem) element).colDrivingTime;
 
-				if (element instanceof TVITagViewTour) {
-					cell.setText(FormatManager.getDrivingTime(drivingTime));
-				} else {
-					cell.setText(net.tourbook.common.UI.format_hh_mm(drivingTime + 30).toString());
-				}
+				colDef.printValue_0(cell, value);
 
 				setCellColor(cell, element);
 			}
@@ -1100,23 +1101,11 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 					return;
 				}
 
-				/*
-				 * display paused time relative to the recording time
-				 */
+				final long value = ((TVITagViewItem) element).colPausedTime;
 
-				final TVITagViewItem item = (TVITagViewItem) element;
-
-				final long dbPausedTime = item.colPausedTime;
-				final long dbRecordingTime = item.colRecordingTime;
-
-				final float relativePausedTime = dbRecordingTime == 0 ? 0 : (float) dbPausedTime
-						/ dbRecordingTime
-						* 100;
-
-				cell.setText(_nf1.format(relativePausedTime));
+				colDef.printValue_0(cell, value);
 
 				setCellColor(cell, element);
-
 			}
 		});
 	}
@@ -1137,13 +1126,9 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 					return;
 				}
 
-				final long recordingTime = ((TVITagViewItem) element).colRecordingTime;
+				final long value = ((TVITagViewItem) element).colRecordingTime;
 
-				if (element instanceof TVITagViewTour) {
-					cell.setText(FormatManager.getRecordingTime(recordingTime));
-				} else {
-					cell.setText(net.tourbook.common.UI.format_hh_mm(recordingTime + 30).toString());
-				}
+				colDef.printValue_0(cell, value);
 
 				setCellColor(cell, element);
 			}
@@ -1245,17 +1230,18 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 					return;
 				}
 
-				final TVITagViewItem tviTagViewItem = (TVITagViewItem) element;
-				float temperature = tviTagViewItem.colAvgTemperature;
-				if (temperature != 0) {
+				double temperature = ((TVITagViewItem) element).colAvgTemperature;
 
-					if (UI.UNIT_VALUE_TEMPERATURE != 1) {
-						temperature = temperature * UI.UNIT_FAHRENHEIT_MULTI + UI.UNIT_FAHRENHEIT_ADD;
-					}
+				if (net.tourbook.ui.UI.UNIT_VALUE_TEMPERATURE != 1) {
 
-					cell.setText(_nf1.format(temperature));
-					setCellColor(cell, element);
+					temperature = temperature
+							* net.tourbook.ui.UI.UNIT_FAHRENHEIT_MULTI
+							+ net.tourbook.ui.UI.UNIT_FAHRENHEIT_ADD;
 				}
+
+				colDef.printValue(cell, temperature, element instanceof TVITagViewTour);
+
+				setCellColor(cell, element);
 			}
 		});
 	}
@@ -1472,7 +1458,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	public ColumnViewer getViewer() {
 		return _tagViewer;
 	}
-
 
 	@Override
 	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
@@ -1842,7 +1827,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 	@Override
 	public void updateColumnHeader(final ColumnDefinition colDef) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	private void updateToolTipState() {

@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.common.util;
 
+import java.text.NumberFormat;
+
 import net.tourbook.common.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.formatter.IValueFormatter;
@@ -24,6 +26,7 @@ import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnLayoutData;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.EditingSupport;
+import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.SelectionAdapter;
 
@@ -32,83 +35,102 @@ public class ColumnDefinition implements Cloneable {
 	/**
 	 * Visible name in the modify dialog.
 	 */
-	private String				_label;
+	private String						_label;
 
 	/**
 	 * every column in a table must have a unique id
 	 */
-	private String				_columnId;
+	private String						_columnId;
 
 	/**
 	 * visibility status used in the modify dialog, this is used if the dialog is canceled to not
 	 * touch the visible status
 	 */
-	private boolean				_isColumnDisplayed;
+	private boolean						_isColumnDisplayed;
 
 	/**
 	 * when <code>true</code> the visibility for this column can be changed
 	 */
-	private boolean				_canModifyVisibility	= true;
+	private boolean						_canModifyVisibility	= true;
 
-	protected int				_style;
+	protected int						_style;
 
-	private CellLabelProvider	_cellLabelProvider;
-	private ControlListener		_columnControlListener;
+	private CellLabelProvider			_cellLabelProvider;
+	private ControlListener				_columnControlListener;
 
-	private String				_columnCategory;
-	private String				_columnText;
-	private String				_columnToolTipText;
-	private int					_columnWidth;
-	private String				_columnUnit;
+	private String						_columnCategory;
+	private String						_columnText;
+	private String						_columnToolTipText;
+	private int							_columnWidth;
+	private String						_columnUnit;
 
-	private boolean				_isColumnResizable		= true;
-	private boolean				_isColumnMoveable		= true;
+	private boolean						_isColumnResizable		= true;
+	private boolean						_isColumnMoveable		= true;
 
-	private SelectionAdapter	_columnSelectionListener;
-	private int					_createIndex;
+	private SelectionAdapter			_columnSelectionListener;
+	private int							_createIndex;
 
 	/**
 	 * when <code>true</code> this column will be checked in the modify dialog when the default
 	 * button is selected
 	 */
-	private boolean				_isDefaultColumn		= false;
+	private boolean						_isDefaultColumn		= false;
 
-	private int					_defaultColumnWidth;
+	private int							_defaultColumnWidth;
 
 	/**
 	 * column will have the width 0 to be hidden, this is necessary that the first visible column
 	 * can be right aligned
 	 */
-	private boolean				_isColumnHidden			= false;
+	private boolean						_isColumnHidden			= false;
 
-	private EditingSupport		_editingSupport;
+	private EditingSupport				_editingSupport;
 
-	private ColumnLayoutData	_columnLayoutData;
+	private ColumnLayoutData			_columnLayoutData;
 
 	/*
 	 * Value formatter
 	 */
 
 	/** Available value formats */
-	private ValueFormat[]		_availableFormats;
+	private ValueFormat[]				_availableFormats;
 
 	/** Default value format */
-	private ValueFormat			_defaultValueFormat;
+	private ValueFormat					_defaultValueFormat;
 
 	/** Default detail value format */
-	private ValueFormat			_defaultValueFormat_Detail;
+	private ValueFormat					_defaultValueFormat_Detail;
 
 	/** Current value format */
-	private ValueFormat			_valueFormat;
+	private ValueFormat					_valueFormat;
 
 	/** Current value formatter */
-	private IValueFormatter		_valueFormatter;
+	private IValueFormatter				_valueFormatter;
 
 	/** Current value format */
-	private ValueFormat			_valueFormat_Detail;
+	private ValueFormat					_valueFormat_Detail;
 
 	/** Current value formatter */
-	private IValueFormatter		_valueFormatter_Detail;
+	private IValueFormatter				_valueFormatter_Detail;
+
+	private final static NumberFormat	_nf0;
+	private final static NumberFormat	_nf1;
+	private final static NumberFormat	_nf2;
+
+	static {
+
+		_nf0 = NumberFormat.getNumberInstance();
+		_nf0.setMinimumFractionDigits(0);
+		_nf0.setMaximumFractionDigits(0);
+
+		_nf1 = NumberFormat.getNumberInstance();
+		_nf1.setMinimumFractionDigits(1);
+		_nf1.setMaximumFractionDigits(1);
+
+		_nf2 = NumberFormat.getNumberInstance();
+		_nf2.setMinimumFractionDigits(2);
+		_nf2.setMaximumFractionDigits(2);
+	}
 
 	ColumnDefinition(final String columnId, final int style) {
 
@@ -321,6 +343,67 @@ public class ColumnDefinition implements Cloneable {
 	}
 
 	/**
+	 * Format value for a viewer cell.
+	 * 
+	 * @param cell
+	 * @param value
+	 * @param isDetail
+	 */
+	public void printValue(final ViewerCell cell, final double value, final boolean isDetail) {
+
+		if (value == 0) {
+
+			cell.setText(UI.EMPTY_STRING);
+
+		} else if (isDetail) {
+
+			cell.setText(getValueFormatter_Detail().printDouble(value));
+
+		} else {
+
+			cell.setText(getValueFormatter().printDouble(value));
+		}
+	}
+
+	/**
+	 * Formats value for a viewer cell.
+	 * 
+	 * @param cell
+	 * @param value
+	 * @param isDetail
+	 */
+	public void printValue(final ViewerCell cell, final long value, final boolean isDetail) {
+
+		if (value == 0) {
+
+			cell.setText(UI.EMPTY_STRING);
+
+		} else if (isDetail) {
+
+			cell.setText(getValueFormatter_Detail().printLong(value));
+
+		} else {
+
+			cell.setText(getValueFormatter().printLong(value));
+		}
+	}
+
+	/**
+	 * Format value with 0 fraction digits.
+	 * 
+	 * @param cell
+	 * @param value
+	 */
+	public void printValue_0(final ViewerCell cell, final double value) {
+
+		if (value == 0) {
+			cell.setText(UI.EMPTY_STRING);
+		} else {
+			cell.setText(_nf0.format(value));
+		}
+	}
+
+	/**
 	 * Set status, if the visibility can be changed, when set to <code>false</code> the column is
 	 * always visible and can't be hidden, default is <code>true</code>
 	 * 
@@ -505,10 +588,6 @@ public class ColumnDefinition implements Cloneable {
 
 			if (defaultFormat != null) {
 				_columnText += UI.SPACE1 + Messages.App_Annotation_1;
-			}
-
-			if (defaultDetailFormat != null) {
-				_columnText += Messages.App_Annotation_2;
 			}
 		}
 	}

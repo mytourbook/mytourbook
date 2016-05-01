@@ -1,0 +1,36 @@
+Version 16.5                                               ?. May 2016
+
+  
+
+New
+===	
+
+* Tour Chart
+
+  - Replaced chart options drop-down menu with a slideout
+
+
+* All Table/Tree
+
+  - Hide hovered column
+  - Set value format for the hovered column, e.g. hh or hh:mm or hh:mm:ss, cal or kcal
+  - Position the header context menu to the right border of the column (to see the content of the column)
+  
+  
+* Tour Book View / Tour Editor
+
+  - Set Cadence format to rpm/spm
+
+	 * 1.0f = Revolutions per minute (RPM)
+	 * 2.0f = Steps per minute (SPM)
+
+* Tour Book View
+
+  New context menu actions for the selected tours
+   
+  - Adjust tour start temperature values
+  - Set cadence format for selected tours
+
+
+System
+======

@@ -27,6 +27,11 @@ public class ValueFormatter_Time_HH implements IValueFormatter {
 
 	@Override
 	public String printLong(final long value) {
+
+		if (value == 0) {
+			return UI.EMPTY_STRING;
+		}
+
 		return UI.format_hh(value + 1800);
 	}
 

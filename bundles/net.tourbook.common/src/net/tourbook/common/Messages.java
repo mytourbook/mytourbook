@@ -35,14 +35,17 @@ public class Messages extends NLS {
 	public static String		Action_App_SizeAllColumnsToFit;
 
 	public static String		Action_ColumnManager_Column_Info;
+
+	public static String	Action_ColumnManager_ColumnActions_Info;
+
+	public static String	Action_ColumnManager_ColumnActions_Info_2;
 	public static String		Action_ColumnManager_HideCurrentColumn;
-	public static String		Action_ColumnManager_HideCurrentColumn_2;
 	public static String		Action_ColumnManager_Profile_Info;
 	public static String		Action_ColumnManager_ShowAllColumns;
 	public static String		Action_ColumnManager_ShowDefaultColumns;
-	public static String		Action_ColumnManager_ValueFormatter_Info;
+	public static String	Action_ColumnManager_ValueFormatter;
 
-	public static String	Action_ColumnManager_ValueFormatterDetail_Info;
+	public static String	Action_ColumnManager_ValueFormatterDetail;
 
 	public static String		Advanced_Menu_AnimationSymbol;
 

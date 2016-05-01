@@ -721,14 +721,13 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
+
 				final Object element = cell.getElement();
 				if (element instanceof TVICatalogComparedTour) {
 
-					final float avgPulse = ((TVICatalogComparedTour) element).getAvgPulse();
+					final float value = ((TVICatalogComparedTour) element).getAvgPulse();
 
-					if (avgPulse > 0) {
-						cell.setText(_nf1.format(avgPulse));
-					}
+					colDef.printValue(cell, value, element instanceof TVICatalogComparedTour);
 				}
 			}
 		});
@@ -738,15 +737,16 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	 * column: Count
 	 */
 	private void defineColumn_Count() {
-		
+
 		final TreeColumnDefinition colDef = TreeColumnFactory.DATA_NUM_TOURS.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
+
 				final Object element = cell.getElement();
 				if (element instanceof TVICatalogRefTourItem) {
-					
+
 					final int numberOfTours = ((TVICatalogRefTourItem) element).tourCounter;
 					if (numberOfTours > 0) {
 						cell.setText(Integer.toString(numberOfTours));
@@ -761,18 +761,18 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	 */
 	private void defineColumn_Speed() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.MOTION_SPEED.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.MOTION_AVG_SPEED.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
+
 				final Object element = cell.getElement();
 				if (element instanceof TVICatalogComparedTour) {
 
-					final float speed = ((TVICatalogComparedTour) element).getTourSpeed();
-					if (speed > 0) {
-						cell.setText(_nf1.format(speed / UI.UNIT_VALUE_DISTANCE));
-					}
+					final double value = ((TVICatalogComparedTour) element).tourSpeed / UI.UNIT_VALUE_DISTANCE;
+
+					colDef.printValue(cell, value, element instanceof TVICatalogComparedTour);
 				}
 			}
 		});
@@ -1304,7 +1304,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	@Override
 	public void updateColumnHeader(final ColumnDefinition colDef) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	private void updateToolTipState() {

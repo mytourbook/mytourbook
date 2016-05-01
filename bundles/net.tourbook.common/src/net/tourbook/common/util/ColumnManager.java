@@ -336,9 +336,9 @@ public class ColumnManager {
 		});
 	}
 
-	private void action_SetValueFormatter(	final ColumnDefinition colDef,
-											final ValueFormat valueFormat,
-											final boolean isDetailFormat) {
+	void action_SetValueFormatter(	final ColumnDefinition colDef,
+									final ValueFormat valueFormat,
+									final boolean isDetailFormat) {
 
 		/*
 		 * Update model
@@ -632,16 +632,13 @@ public class ColumnManager {
 
 		setVisibleColumnIds_FromViewer();
 
-		createHCM_10_ShowHideColumns(contextMenu);
-
-		createHCM_40_CurrentColumnFormats(contextMenu);
-
+		createHCM_10_AllColumns(contextMenu);
 		createHCM_50_Profiles(contextMenu);
-
+		createHCM_40_CurrentColumn(contextMenu);
 		createHCM_70_Columns(contextMenu);
 	}
 
-	private void createHCM_10_ShowHideColumns(final Menu contextMenu) {
+	private void createHCM_10_AllColumns(final Menu contextMenu) {
 
 		{
 			/*
@@ -656,8 +653,6 @@ public class ColumnManager {
 				}
 			});
 		}
-
-		createHCM_12_HideCurrentColumn(contextMenu);
 
 		{
 			/*
@@ -705,56 +700,7 @@ public class ColumnManager {
 		createMenuSeparator(contextMenu);
 	}
 
-	private void createHCM_12_HideCurrentColumn(final Menu contextMenu) {
-
-		if (_headerColumn == null) {
-			// this field is required
-			return;
-		}
-
-		final ColumnDefinition colDef = getColDef_FromHeaderColumn();
-
-		if (colDef == null) {
-			// this should not occure
-			return;
-		}
-
-		final String[] visibleIds = _activeProfile.visibleColumnIds;
-		if (visibleIds.length > 1) {
-
-			/*
-			 * Action: Hide current column
-			 */
-			{
-				// create menu item text
-				final String headerText = colDef.getColumnHeaderText();
-				final String headerLabel = colDef.getColumnLabel();
-				final String menuItemText = headerText == null //
-
-						? NLS.bind(Messages.Action_ColumnManager_HideCurrentColumn, headerLabel)
-						: headerText.equals(headerLabel) //
-
-								? NLS.bind(Messages.Action_ColumnManager_HideCurrentColumn, headerText)
-								: NLS.bind(Messages.Action_ColumnManager_HideCurrentColumn_2, headerText, headerLabel);
-
-				final MenuItem menuItem = new MenuItem(contextMenu, SWT.PUSH);
-				menuItem.setText(menuItemText);
-				menuItem.addListener(SWT.Selection, new Listener() {
-					@Override
-					public void handleEvent(final Event event) {
-						setVisibleColumnIds_HideCurrentColumn(colDef);
-					}
-				});
-
-				if (colDef.canModifyVisibility() == false) {
-					// column cannot be hidden, disable it
-					menuItem.setEnabled(false);
-				}
-			}
-		}
-	}
-
-	private void createHCM_40_CurrentColumnFormats(final Menu contextMenu) {
+	private void createHCM_40_CurrentColumn(final Menu contextMenu) {
 
 		if (_headerColumn == null) {
 			// this is required
@@ -768,103 +714,67 @@ public class ColumnManager {
 			return;
 		}
 
-		/*
-		 * Action: Value Formatter
-		 */
+		final String[] visibleIds = _activeProfile.visibleColumnIds;
+		final boolean isHideColumn = visibleIds.length > 1;
 
 		final ValueFormat[] availableFormatter = colDef.getAvailableFormatter();
-		if (availableFormatter != null && availableFormatter.length > 0) {
+		final boolean isValueFormatter = availableFormatter != null && availableFormatter.length > 0;
 
+		if (!isValueFormatter && !isHideColumn) {
+			// nothing can be done
+			return;
+		}
+
+		{
 			/*
-			 * Menu items header
+			 * Menu title
 			 */
-			{
-				final MenuItem menuItem = new MenuItem(contextMenu, SWT.PUSH);
-				menuItem.setText(Messages.Action_ColumnManager_ValueFormatter_Info);
+
+			// create menu item text
+			final String headerText = colDef.getColumnHeaderText();
+			final String headerLabel = colDef.getColumnLabel();
+			final String menuItemText = headerText == null //
+
+					? NLS.bind(Messages.Action_ColumnManager_ColumnActions_Info, headerLabel)
+					: headerText.equals(headerLabel) //
+
+							? NLS.bind(Messages.Action_ColumnManager_ColumnActions_Info, headerText)
+							: NLS.bind(Messages.Action_ColumnManager_ColumnActions_Info_2, headerText, headerLabel);
+
+			final MenuItem menuItem = new MenuItem(contextMenu, SWT.PUSH);
+			menuItem.setText(menuItemText);
+			menuItem.setEnabled(false);
+		}
+
+		/*
+		 * Actions: Value Formatter
+		 */
+		if (isValueFormatter) {
+
+			new ColumnFormatSubMenu(contextMenu, colDef, this);
+		}
+
+		/*
+		 * Action: Hide current column
+		 */
+		if (isHideColumn) {
+
+			final MenuItem menuItem = new MenuItem(contextMenu, SWT.PUSH);
+			menuItem.setText(Messages.Action_ColumnManager_HideCurrentColumn);
+			menuItem.addListener(SWT.Selection, new Listener() {
+				@Override
+				public void handleEvent(final Event event) {
+					setVisibleColumnIds_HideCurrentColumn(colDef);
+				}
+			});
+
+			if (colDef.canModifyVisibility() == false) {
+				// column cannot be hidden, disable it
 				menuItem.setEnabled(false);
 			}
-
-			/*
-			 * Formatter menu items
-			 */
-			final ValueFormat currentValueFormat = colDef.getValueFormat();
-
-			for (final ValueFormat valueFormat : availableFormatter) {
-
-				final MenuItem menuItem = new MenuItem(contextMenu, SWT.CHECK);
-
-				menuItem.setText(getValueFormatterName(valueFormat));
-				menuItem.setData(valueFormat);
-
-				menuItem.addListener(SWT.Selection, new Listener() {
-					@Override
-					public void handleEvent(final Event event) {
-
-						final ValueFormat valueFormat = (ValueFormat) menuItem.getData();
-
-						action_SetValueFormatter(colDef, valueFormat, false);
-					}
-				});
-
-				final boolean isCurrentFormat = currentValueFormat == valueFormat;
-
-				// check current format
-				menuItem.setSelection(isCurrentFormat);
-
-				// disable current format
-				menuItem.setEnabled(isCurrentFormat == false);
-			}
-
-			createMenuSeparator(contextMenu);
-
-			/*
-			 * Detail formatter
-			 */
-			final ValueFormat currentDetailFormat = colDef.getValueFormat_Detail();
-			if (currentDetailFormat != null) {
-
-				/*
-				 * Menu items header
-				 */
-				{
-					final MenuItem menuItem = new MenuItem(contextMenu, SWT.PUSH);
-					menuItem.setText(Messages.Action_ColumnManager_ValueFormatterDetail_Info);
-					menuItem.setEnabled(false);
-				}
-
-				/*
-				 * Formatter menu items
-				 */
-
-				for (final ValueFormat valueFormat : availableFormatter) {
-
-					final MenuItem menuItem = new MenuItem(contextMenu, SWT.CHECK);
-
-					menuItem.setText(getValueFormatterName(valueFormat));
-					menuItem.setData(valueFormat);
-
-					menuItem.addListener(SWT.Selection, new Listener() {
-						@Override
-						public void handleEvent(final Event event) {
-
-							final ValueFormat valueFormat = (ValueFormat) menuItem.getData();
-
-							action_SetValueFormatter(colDef, valueFormat, true);
-						}
-					});
-
-					final boolean isCurrentFormat = currentDetailFormat == valueFormat;
-
-					// check current format
-					menuItem.setSelection(isCurrentFormat);
-
-					// disable current format
-					menuItem.setEnabled(isCurrentFormat == false);
-				}
-
-				createMenuSeparator(contextMenu);
-			}
 		}
+
+		createMenuSeparator(contextMenu);
 	}
 
 	/**
@@ -873,6 +783,7 @@ public class ColumnManager {
 	private void createHCM_50_Profiles(final Menu contextMenu) {
 
 		{
+			// menu title
 			final MenuItem menuItem = new MenuItem(contextMenu, SWT.PUSH);
 			menuItem.setText(Messages.Action_ColumnManager_Profile_Info);
 			menuItem.setEnabled(false);
@@ -1798,7 +1709,7 @@ public class ColumnManager {
 
 				final Enum<ValueFormat> columnFormat_Detail = columnProperty.valueFormat_Detail;
 				if (columnFormat_Detail != null) {
-					xmlColumn.putString(ATTR_COLUMN_FORMAT, columnFormat_Detail.name());
+					xmlColumn.putString(ATTR_COLUMN_FORMAT_DETAIL, columnFormat_Detail.name());
 				}
 			}
 		}
