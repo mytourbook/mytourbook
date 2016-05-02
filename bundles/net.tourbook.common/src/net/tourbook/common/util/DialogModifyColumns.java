@@ -267,7 +267,7 @@ public class DialogModifyColumns extends TrayDialog {
 				for (final ColumnProperties columnProperties : columnProfile.columnProperties) {
 					if (columnId.equals(columnProperties.columnId)) {
 
-						valueFormat = columnProperties.valueFormat;
+						valueFormat = columnProperties.valueFormat_Category;
 						valueFormatter = _columnManager.getValueFormatter(valueFormat);
 
 						valueFormat_Detail = columnProperties.valueFormat_Detail;
@@ -280,7 +280,7 @@ public class DialogModifyColumns extends TrayDialog {
 				modelColDef.setIsColumnDisplayed(true);
 
 				modelColDef.setColumnWidth(colDef.getColumnWidth());
-				modelColDef.setValueFormatter(valueFormat, valueFormatter);
+				modelColDef.setValueFormatter_Category(valueFormat, valueFormatter);
 				modelColDef.setValueFormatter_Detail(valueFormat_Detail, valueFormatter_Detail);
 
 				modelColumns.add(modelColDef);
@@ -302,7 +302,7 @@ public class DialogModifyColumns extends TrayDialog {
 				colDef.setIsColumnDisplayed(false);
 
 				colDef.setColumnWidth(colDef.getDefaultColumnWidth());
-				colDef.setValueFormatter(valueFormat, valueFormatter);
+				colDef.setValueFormatter_Category(valueFormat, valueFormatter);
 				colDef.setValueFormatter_Detail(valueFormat_Detail, valueFormatter_Detail);
 
 				modelColumns.add(colDef);
@@ -1071,7 +1071,7 @@ public class DialogModifyColumns extends TrayDialog {
 
 				final ColumnDefinition colDef = (ColumnDefinition) cell.getElement();
 
-				ValueFormat valueFormat = colDef.getValueFormat();
+				ValueFormat valueFormat = colDef.getValueFormat_Category();
 
 				if (valueFormat == null) {
 					valueFormat = colDef.getDefaultValueFormat();
@@ -1245,7 +1245,7 @@ public class DialogModifyColumns extends TrayDialog {
 					colDefClone.setIsColumnDisplayed(definedColDef.isDefaultColumn());
 
 					colDefClone.setColumnWidth(definedColDef.getDefaultColumnWidth());
-					colDefClone.setValueFormatter(valueFormat, valueFormatter);
+					colDefClone.setValueFormatter_Category(valueFormat, valueFormatter);
 					colDefClone.setValueFormatter_Detail(valueFormat_Detail, valueFormatter_Detail);
 
 				} else {
@@ -1258,7 +1258,7 @@ public class DialogModifyColumns extends TrayDialog {
 
 						if (currentColDef.getColumnId().equals(definedColumnId)) {
 
-							ValueFormat valueFormat = definedColDef.getValueFormat();
+							ValueFormat valueFormat = definedColDef.getValueFormat_Category();
 							ValueFormat valueFormat_Detail = definedColDef.getValueFormat_Detail();
 
 							if (valueFormat == null) {
@@ -1276,7 +1276,7 @@ public class DialogModifyColumns extends TrayDialog {
 							colDefClone.setIsColumnDisplayed(currentColDef.isColumnDisplayed());
 
 							colDefClone.setColumnWidth(currentColDef.getColumnWidth());
-							colDefClone.setValueFormatter(valueFormat, valueFormatter);
+							colDefClone.setValueFormatter_Category(valueFormat, valueFormatter);
 							colDefClone.setValueFormatter_Detail(valueFormat_Detail, valueFormatter_Detail);
 
 							break;

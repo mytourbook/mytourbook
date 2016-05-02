@@ -461,9 +461,9 @@ public abstract class TableColumnFactory {
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_avg_pulse_tooltip);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
-				colDef.setValueFormats(
+				colDef.setValueFormats(//
 						ValueFormatSet.Number,
-						ValueFormat.NUMBER_1_1,
+						null,
 						ValueFormat.NUMBER_1_1,
 						columnManager);
 
@@ -511,9 +511,9 @@ public abstract class TableColumnFactory {
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_calories_tooltip);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
-				colDef.setValueFormats(
+				colDef.setValueFormats(//
 						ValueFormatSet.Calories,
-						ValueFormat.CALORIES_KCAL_1_0,
+						null,
 						ValueFormat.CALORIES_KCAL_1_3,
 						columnManager);
 
@@ -536,6 +536,11 @@ public abstract class TableColumnFactory {
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_pulse_tooltip);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
+				colDef.setValueFormats(//
+						ValueFormatSet.Number,
+						null,
+						ValueFormat.NUMBER_1_1,
+						columnManager);
 
 				return colDef;
 			};
@@ -842,6 +847,32 @@ public abstract class TableColumnFactory {
 			};
 		};
 
+		MOTION_AVG_SPEED = new TableColumnFactory() {
+			@Override
+			public TableColumnDefinition createColumn(	final ColumnManager columnManager,
+														final PixelConverter pixelConverter) {
+
+				final TableColumnDefinition colDef = new TableColumnDefinition(
+						columnManager,
+						"MOTION_AVG_SPEED", SWT.TRAIL); //$NON-NLS-1$
+
+				colDef.setColumnCategory(Messages.ColumnFactory_Category_Motion);
+				colDef.setColumnLabel(Messages.ColumnFactory_avg_speed_label);
+				colDef.setColumnHeaderText(UI.SYMBOL_AVERAGE_WITH_SPACE + UI.UNIT_LABEL_SPEED);
+				colDef.setColumnUnit(UI.SYMBOL_AVERAGE_WITH_SPACE + UI.UNIT_LABEL_SPEED);
+				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_avg_speed_tooltip);
+
+				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+				colDef.setValueFormats(//
+						ValueFormatSet.Number,
+						null,
+						ValueFormat.NUMBER_1_1,
+						columnManager);
+
+				return colDef;
+			};
+		};
+
 		MOTION_DISTANCE = new TableColumnFactory() {
 
 			@Override
@@ -861,6 +892,11 @@ public abstract class TableColumnFactory {
 
 				colDef.setDefaultColumnWidth(pixelWidth);
 				colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
+				colDef.setValueFormats(//
+						ValueFormatSet.Number,
+						null,
+						ValueFormat.NUMBER_1_3,
+						columnManager);
 
 				return colDef;
 			};
@@ -932,27 +968,6 @@ public abstract class TableColumnFactory {
 
 				colDef.setDefaultColumnWidth(pixelWidth);
 				colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
-
-				return colDef;
-			};
-		};
-
-		MOTION_AVG_SPEED = new TableColumnFactory() {
-			@Override
-			public TableColumnDefinition createColumn(	final ColumnManager columnManager,
-														final PixelConverter pixelConverter) {
-
-				final TableColumnDefinition colDef = new TableColumnDefinition(
-						columnManager,
-						"MOTION_AVG_SPEED", SWT.TRAIL); //$NON-NLS-1$
-
-				colDef.setColumnCategory(Messages.ColumnFactory_Category_Motion);
-				colDef.setColumnLabel(Messages.ColumnFactory_avg_speed_label);
-				colDef.setColumnHeaderText(UI.SYMBOL_AVERAGE_WITH_SPACE + UI.UNIT_LABEL_SPEED);
-				colDef.setColumnUnit(UI.SYMBOL_AVERAGE_WITH_SPACE + UI.UNIT_LABEL_SPEED);
-				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_avg_speed_tooltip);
-
-				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
 				return colDef;
 			};

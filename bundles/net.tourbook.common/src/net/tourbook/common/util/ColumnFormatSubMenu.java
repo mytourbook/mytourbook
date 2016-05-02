@@ -131,16 +131,39 @@ public class ColumnFormatSubMenu extends Action implements IMenuCreator {
 
 		_colDef = colDef;
 
-		final String actionText = NLS.bind(
-				Messages.Action_ColumnManager_ValueFormatter,
-				ColumnManager.getValueFormatterName(colDef.getValueFormat()));
+		final ValueFormat valueFormat_Category = colDef.getValueFormat_Category();
+		final ValueFormat valueFormat_Detail = colDef.getValueFormat_Detail();
 
-		final String actionDetailText = NLS.bind(
-				Messages.Action_ColumnManager_ValueFormatterDetail,
-				ColumnManager.getValueFormatterName(colDef.getValueFormat_Detail()));
+		if (valueFormat_Category == null && valueFormat_Detail != null) {
 
-		addActionToMenu(_menu, new ActionAvailableFormats(actionText, false));
-		addActionToMenu(_menu, new ActionAvailableFormats(actionDetailText, true));
+			// only the detail (tour) can be formatted
+
+			final String actionDetailText = NLS.bind(
+					Messages.Action_ColumnManager_ValueFormatter_Tour,
+					ColumnManager.getValueFormatterName(valueFormat_Detail));
+
+			addActionToMenu(_menu, new ActionAvailableFormats(actionDetailText, true));
+
+		} else {
+
+			if (valueFormat_Category != null) {
+
+				final String actionCategoryText = NLS.bind(
+						Messages.Action_ColumnManager_ValueFormatter_Category,
+						ColumnManager.getValueFormatterName(valueFormat_Category));
+
+				addActionToMenu(_menu, new ActionAvailableFormats(actionCategoryText, false));
+			}
+
+			if (valueFormat_Detail != null) {
+
+				final String actionDetailText = NLS.bind(
+						Messages.Action_ColumnManager_ValueFormatter_Detail,
+						ColumnManager.getValueFormatterName(valueFormat_Detail));
+
+				addActionToMenu(_menu, new ActionAvailableFormats(actionDetailText, true));
+			}
+		}
 	}
 
 	private void addActionToMenu(final Menu menu, final Action action) {
@@ -160,7 +183,7 @@ public class ColumnFormatSubMenu extends Action implements IMenuCreator {
 
 			final ValueFormat currentFormat = isDetailFormat //
 					? _colDef.getValueFormat_Detail()
-					: _colDef.getValueFormat();
+					: _colDef.getValueFormat_Category();
 
 			final boolean isCurrentFormat = currentFormat == valueFormat;
 

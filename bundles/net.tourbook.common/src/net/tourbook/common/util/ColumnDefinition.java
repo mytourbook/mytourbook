@@ -96,16 +96,16 @@ public class ColumnDefinition implements Cloneable {
 	private ValueFormat[]				_availableFormats;
 
 	/** Default value format */
-	private ValueFormat					_defaultValueFormat;
+	private ValueFormat					_defaultValueFormat_Category;
 
 	/** Default detail value format */
 	private ValueFormat					_defaultValueFormat_Detail;
 
 	/** Current value format */
-	private ValueFormat					_valueFormat;
+	private ValueFormat					_valueFormat_Category;
 
 	/** Current value formatter */
-	private IValueFormatter				_valueFormatter;
+	private IValueFormatter				_valueFormatter_Category;
 
 	/** Current value format */
 	private ValueFormat					_valueFormat_Detail;
@@ -168,10 +168,10 @@ public class ColumnDefinition implements Cloneable {
 		clone._isColumnMoveable = _isColumnMoveable;
 		clone._columnSelectionListener = _columnSelectionListener;
 
-		clone._defaultValueFormat = _defaultValueFormat;
+		clone._defaultValueFormat_Category = _defaultValueFormat_Category;
 		clone._availableFormats = _availableFormats;
-		clone._valueFormat = _valueFormat;
-		clone._valueFormatter = _valueFormatter;
+		clone._valueFormat_Category = _valueFormat_Category;
+		clone._valueFormatter_Category = _valueFormatter_Category;
 
 		clone._createIndex = _createIndex;
 
@@ -267,7 +267,7 @@ public class ColumnDefinition implements Cloneable {
 	}
 
 	public ValueFormat getDefaultValueFormat() {
-		return _defaultValueFormat;
+		return _defaultValueFormat_Category;
 	}
 
 	public ValueFormat getDefaultValueFormat_Detail() {
@@ -278,8 +278,8 @@ public class ColumnDefinition implements Cloneable {
 		return _editingSupport;
 	}
 
-	public ValueFormat getValueFormat() {
-		return _valueFormat;
+	public ValueFormat getValueFormat_Category() {
+		return _valueFormat_Category;
 	}
 
 	public ValueFormat getValueFormat_Detail() {
@@ -288,11 +288,11 @@ public class ColumnDefinition implements Cloneable {
 
 	public IValueFormatter getValueFormatter() {
 
-		if (_valueFormatter == null) {
+		if (_valueFormatter_Category == null) {
 			return ColumnManager.getDefaultDefaultValueFormatter();
 		}
 
-		return _valueFormatter;
+		return _valueFormatter_Category;
 	}
 
 	public IValueFormatter getValueFormatter_Detail() {
@@ -343,7 +343,44 @@ public class ColumnDefinition implements Cloneable {
 	}
 
 	/**
-	 * Format value for a viewer cell.
+	 * Print double value with the detail value formatter.
+	 * 
+	 * @param cell
+	 * @param value
+	 */
+	public void printDetailValue(final ViewerCell cell, final double value) {
+
+		if (value == 0) {
+
+			cell.setText(UI.EMPTY_STRING);
+
+		} else {
+
+			cell.setText(getValueFormatter_Detail().printDouble(value));
+		}
+	}
+
+	/**
+	 * Print long value with the detail value formatter.
+	 * 
+	 * @param cell
+	 * @param value
+	 * @param isDetail
+	 */
+	public void printDetailValue(final ViewerCell cell, final long value) {
+
+		if (value == 0) {
+
+			cell.setText(UI.EMPTY_STRING);
+
+		} else {
+
+			cell.setText(getValueFormatter_Detail().printLong(value));
+		}
+	}
+
+	/**
+	 * Print double value with a value formatter.
 	 * 
 	 * @param cell
 	 * @param value
@@ -366,7 +403,7 @@ public class ColumnDefinition implements Cloneable {
 	}
 
 	/**
-	 * Formats value for a viewer cell.
+	 * Print long value with a value formatter.
 	 * 
 	 * @param cell
 	 * @param value
@@ -389,7 +426,7 @@ public class ColumnDefinition implements Cloneable {
 	}
 
 	/**
-	 * Format value with 0 fraction digits.
+	 * Print double value without fraction digits.
 	 * 
 	 * @param cell
 	 * @param value
@@ -562,19 +599,20 @@ public class ColumnDefinition implements Cloneable {
 	 * added to the column header text. </b>
 	 * 
 	 * @param availableFormats
-	 * @param defaultFormat
+	 * @param defaultCategoryFormat
+	 *            When <code>null</code> this format cannot be selected.
 	 * @param defaultDetailFormat
 	 *            When <code>null</code> this format cannot be selected.
 	 * @param columnManager
 	 */
 	public void setValueFormats(final ValueFormat[] availableFormats,
-								final ValueFormat defaultFormat,
+								final ValueFormat defaultCategoryFormat,
 								final ValueFormat defaultDetailFormat,
 								final ColumnManager columnManager) {
 
 		_availableFormats = availableFormats;
 
-		_defaultValueFormat = defaultFormat;
+		_defaultValueFormat_Category = defaultCategoryFormat;
 		_defaultValueFormat_Detail = defaultDetailFormat;
 
 		/*
@@ -586,16 +624,16 @@ public class ColumnDefinition implements Cloneable {
 				_columnText = UI.EMPTY_STRING;
 			}
 
-			if (defaultFormat != null) {
+			if (defaultCategoryFormat != null || defaultDetailFormat != null) {
 				_columnText += UI.SPACE1 + Messages.App_Annotation_1;
 			}
 		}
 	}
 
-	void setValueFormatter(final ValueFormat valueFormat, final IValueFormatter valueFormatter) {
+	void setValueFormatter_Category(final ValueFormat valueFormat, final IValueFormatter valueFormatter) {
 
-		_valueFormat = valueFormat;
-		_valueFormatter = valueFormatter;
+		_valueFormat_Category = valueFormat;
+		_valueFormatter_Category = valueFormatter;
 	}
 
 	void setValueFormatter_Detail(final ValueFormat valueFormat, final IValueFormatter valueFormatter) {
@@ -610,7 +648,7 @@ public class ColumnDefinition implements Cloneable {
 //				+ ("_label=" + _label + ", ") //$NON-NLS-1$ //$NON-NLS-2$
 //				+ ("_isCheckedInDialog=" + _isCheckedInDialog + ", ") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("_columnId=" + _columnId + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("_valueFormat=" + _valueFormat + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("_valueFormat=" + _valueFormat_Category + ", ") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("_valueFormat_Detail=" + _valueFormat_Detail + ", ") //$NON-NLS-1$ //$NON-NLS-2$
 //				+ ("_columnWidth=" + _columnWidth + ", ") //$NON-NLS-1$ //$NON-NLS-2$
 //				+ ("_defaultColumnWidth=" + _defaultColumnWidth) //$NON-NLS-1$

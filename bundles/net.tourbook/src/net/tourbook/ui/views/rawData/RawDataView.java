@@ -2472,10 +2472,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
-				final int tourAltUp = ((TourData) cell.getElement()).getTourAltUp();
-				if (tourAltUp != 0) {
-					cell.setText(Long.toString((long) (tourAltUp / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
-				}
+
+				final double dbValue = ((TourData) cell.getElement()).getTourAltUp();
+				final double value = dbValue / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+
+				colDef.printValue_0(cell, value);
 			}
 		});
 	}
@@ -2491,13 +2492,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			@Override
 			public void update(final ViewerCell cell) {
 
-				final int calories = ((TourData) cell.getElement()).getCalories();
+				final TourData element = (TourData) cell.getElement();
+				final long value = element.getCalories();
 
-				if (calories == 0) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					cell.setText(FormatManager.getCalories(calories));
-				}
+				colDef.printDetailValue(cell, value);
 			}
 		});
 	}
@@ -2636,7 +2634,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 						0
 						: drivingTime * 1000 / tourDistance * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
-				cell.setText(UI.format_mm_ss((long) pace));
+				if (pace == 0) {
+					cell.setText(UI.EMPTY_STRING);
+				} else {
+					cell.setText(UI.format_mm_ss((long) pace));
+				}
 			}
 		});
 	}
@@ -2658,13 +2660,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				final float tourDistance = tourData.getTourDistance();
 				final long drivingTime = tourData.getTourDrivingTime();
 
-				double speed = 0;
+				double value = 0;
 
 				if (drivingTime != 0) {
-					speed = tourDistance / drivingTime * 3.6 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+					value = tourDistance / drivingTime * 3.6 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 				}
 
-				cell.setText(speed == 0.0 ? UI.EMPTY_STRING : _nf1.format(speed));
+				colDef.printDetailValue(cell, value);
 			}
 		});
 	}
@@ -2680,12 +2682,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
-				final float tourDistance = ((TourData) cell.getElement()).getTourDistance();
-				if (tourDistance == 0) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					cell.setText(_nf3.format(tourDistance / 1000 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
-				}
+
+				final double tourDistance = ((TourData) cell.getElement()).getTourDistance();
+				final double value = tourDistance / 1000 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+
+				colDef.printDetailValue(cell, value);
 			}
 		});
 	}

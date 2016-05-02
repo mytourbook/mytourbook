@@ -27,7 +27,7 @@ public class ColumnProperties {
 
 	String		columnId;
 
-	ValueFormat	valueFormat;
+	ValueFormat	valueFormat_Category;
 	ValueFormat	valueFormat_Detail;
 
 	@Override
@@ -67,7 +67,7 @@ public class ColumnProperties {
 	public String toString() {
 		return "ColumnProperties [" //
 				+ ("columnId=" + columnId + ", ")
-				+ ("valueFormat=" + valueFormat + ", ")
+				+ ("valueFormat_Category=" + valueFormat_Category + ", ")
 				+ ("valueFormat_Detail=" + valueFormat_Detail + ", ")
 				+ "]";
 	}

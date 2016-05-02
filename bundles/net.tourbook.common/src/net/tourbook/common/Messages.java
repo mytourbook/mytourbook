@@ -43,9 +43,11 @@ public class Messages extends NLS {
 	public static String		Action_ColumnManager_Profile_Info;
 	public static String		Action_ColumnManager_ShowAllColumns;
 	public static String		Action_ColumnManager_ShowDefaultColumns;
-	public static String	Action_ColumnManager_ValueFormatter;
+	public static String	Action_ColumnManager_ValueFormatter_Category;
 
-	public static String	Action_ColumnManager_ValueFormatterDetail;
+	public static String	Action_ColumnManager_ValueFormatter_Detail;
+
+	public static String	Action_ColumnManager_ValueFormatter_Tour;
 
 	public static String		Advanced_Menu_AnimationSymbol;
 

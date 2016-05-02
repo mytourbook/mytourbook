@@ -98,7 +98,7 @@ public class ColumnManager {
 	private static final String					ATTR_IS_SHOW_COLUMN_ANNOTATIONS		= "isShowColumnAnnotations";				//$NON-NLS-1$
 	//
 	private static final String					ATTR_COLUMN_ID						= "columnId";								//$NON-NLS-1$
-	private static final String					ATTR_COLUMN_FORMAT					= "format";								//$NON-NLS-1$
+	private static final String					ATTR_COLUMN_FORMAT_CATEGORY			= "categoryFormat";						//$NON-NLS-1$
 	private static final String					ATTR_COLUMN_FORMAT_DETAIL			= "detailFormat";							//$NON-NLS-1$
 	private static final String					ATTR_NAME							= "name";									//$NON-NLS-1$
 
@@ -352,7 +352,7 @@ public class ColumnManager {
 				if (isDetailFormat) {
 					columnProperties.valueFormat_Detail = valueFormat;
 				} else {
-					columnProperties.valueFormat = valueFormat;
+					columnProperties.valueFormat_Category = valueFormat;
 				}
 
 				break;
@@ -364,7 +364,7 @@ public class ColumnManager {
 		if (isDetailFormat) {
 			colDef.setValueFormatter_Detail(valueFormat, valueFormatter);
 		} else {
-			colDef.setValueFormatter(valueFormat, valueFormatter);
+			colDef.setValueFormatter_Category(valueFormat, valueFormatter);
 		}
 
 		/*
@@ -1383,7 +1383,7 @@ public class ColumnManager {
 	/**
 	 * Get a value formatter for a {@link ValueFormat}.
 	 * 
-	 * @param valueFormat
+	 * @param valueFormat_Category
 	 * @return Returns the {@link IValueFormatter} or <code>null</code> when not available.
 	 */
 	IValueFormatter getValueFormatter(final ValueFormat valueFormat) {
@@ -1560,9 +1560,9 @@ public class ColumnManager {
 
 								final String columnId = xmlColumn.getString(ATTR_COLUMN_ID);
 
-								final Enum<ValueFormat> valueFormat = Util.getXmlEnum(
+								final Enum<ValueFormat> valueFormat_Category = Util.getXmlEnum(
 										xmlColumn,
-										ATTR_COLUMN_FORMAT,
+										ATTR_COLUMN_FORMAT_CATEGORY,
 										ValueFormat.DUMMY_VALUE);
 
 								final Enum<ValueFormat> valueFormat_Detail = Util.getXmlEnum(
@@ -1570,12 +1570,17 @@ public class ColumnManager {
 										ATTR_COLUMN_FORMAT_DETAIL,
 										ValueFormat.DUMMY_VALUE);
 
-								if (columnId != null && valueFormat != ValueFormat.DUMMY_VALUE) {
+								if (columnId != null //
+										&& (valueFormat_Category != ValueFormat.DUMMY_VALUE //
+										|| valueFormat_Detail != ValueFormat.DUMMY_VALUE)) {
 
 									final ColumnProperties columnProperties = new ColumnProperties();
 
 									columnProperties.columnId = columnId;
-									columnProperties.valueFormat = (ValueFormat) valueFormat;
+
+									if (valueFormat_Category != ValueFormat.DUMMY_VALUE) {
+										columnProperties.valueFormat_Category = (ValueFormat) valueFormat_Category;
+									}
 
 									if (valueFormat_Detail != ValueFormat.DUMMY_VALUE) {
 										columnProperties.valueFormat_Detail = (ValueFormat) valueFormat_Detail;
@@ -1702,9 +1707,9 @@ public class ColumnManager {
 
 				xmlColumn.putString(ATTR_COLUMN_ID, columnProperty.columnId);
 
-				final Enum<ValueFormat> columnFormat = columnProperty.valueFormat;
+				final Enum<ValueFormat> columnFormat = columnProperty.valueFormat_Category;
 				if (columnFormat != null) {
-					xmlColumn.putString(ATTR_COLUMN_FORMAT, columnFormat.name());
+					xmlColumn.putString(ATTR_COLUMN_FORMAT_CATEGORY, columnFormat.name());
 				}
 
 				final Enum<ValueFormat> columnFormat_Detail = columnProperty.valueFormat_Detail;
@@ -1774,9 +1779,9 @@ public class ColumnManager {
 
 			final String columnId = colDef.getColumnId();
 
-			ValueFormat valueFormat = null;
+			ValueFormat valueFormat_Category = null;
 			ValueFormat valueFormat_Detail = null;
-			IValueFormatter valueFormatter = null;
+			IValueFormatter valueFormatter_Category = null;
 			IValueFormatter valueFormatter_Detail = null;
 
 			ColumnProperties currentColumnProperties = null;
@@ -1787,8 +1792,8 @@ public class ColumnManager {
 
 					currentColumnProperties = columnProperties;
 
-					valueFormat = columnProperties.valueFormat;
-					valueFormatter = getValueFormatter(valueFormat);
+					valueFormat_Category = columnProperties.valueFormat_Category;
+					valueFormatter_Category = getValueFormatter(valueFormat_Category);
 
 					valueFormat_Detail = columnProperties.valueFormat_Detail;
 					valueFormatter_Detail = getValueFormatter(valueFormat_Detail);
@@ -1797,20 +1802,14 @@ public class ColumnManager {
 				}
 			}
 
-			if (valueFormatter == null) {
+			if (valueFormatter_Category == null) {
 
 				final ValueFormat defaultFormat = colDef.getDefaultValueFormat();
 
 				if (defaultFormat != null) {
-					valueFormat = defaultFormat;
-					valueFormatter = getValueFormatter(valueFormat);
+					valueFormat_Category = defaultFormat;
+					valueFormatter_Category = getValueFormatter(valueFormat_Category);
 				}
-
-				if (valueFormatter == null) {
-					valueFormat = ValueFormat.DEFAULT;
-					valueFormatter = _defaultDefaultValueFormatter;
-				}
-
 			}
 
 			if (valueFormatter_Detail == null) {
@@ -1823,7 +1822,7 @@ public class ColumnManager {
 				}
 			}
 
-			colDef.setValueFormatter(valueFormat, valueFormatter);
+			colDef.setValueFormatter_Category(valueFormat_Category, valueFormatter_Category);
 			colDef.setValueFormatter_Detail(valueFormat_Detail, valueFormatter_Detail);
 
 			// ensure all column properties are created
@@ -1834,7 +1833,8 @@ public class ColumnManager {
 				final ColumnProperties columnProperties = new ColumnProperties();
 
 				columnProperties.columnId = columnId;
-				columnProperties.valueFormat = valueFormat;
+				columnProperties.valueFormat_Category = valueFormat_Category;
+				columnProperties.valueFormat_Detail = valueFormat_Detail;
 
 				profileColumnProperties.add(columnProperties);
 
