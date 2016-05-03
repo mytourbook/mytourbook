@@ -187,6 +187,7 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_Category_Body;
 	public static String		ColumnFactory_Category_Data;
 	public static String		ColumnFactory_Category_Device;
+	public static String		ColumnFactory_Category_Marker;
 	public static String		ColumnFactory_Category_Motion;
 	public static String		ColumnFactory_Category_Photo;
 	public static String		ColumnFactory_Category_Power;
@@ -346,7 +347,6 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_Waypoint_Comment;
 	public static String		ColumnFactory_Waypoint_Date;
 	public static String		ColumnFactory_Waypoint_Date_Tooltip;
-	public static String		ColumnFactory_Waypoint_Date_Unit;
 	public static String		ColumnFactory_Waypoint_Description;
 	public static String		ColumnFactory_Waypoint_Name;
 	public static String		ColumnFactory_Waypoint_Symbol;
