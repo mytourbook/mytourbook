@@ -3557,7 +3557,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private void defineColumn_Body_Pulse() {
 
 		ColumnDefinition colDef;
+
 		_colDefPulse = colDef = TableColumnFactory.BODY_PULSE.createColumn(_sliceColumnManager, _pc);
+
+		colDef.disableValueFormatter();
 
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -3637,6 +3640,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		final ColumnDefinition colDef = TableColumnFactory.MOTION_DISTANCE.createColumn(_sliceColumnManager, _pc);
 
 		colDef.setIsDefaultColumn();
+		colDef.disableValueFormatter();
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {

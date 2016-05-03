@@ -29,8 +29,8 @@ import org.eclipse.swt.SWT;
 public abstract class TableColumnFactory {
 
 	public static final TableColumnFactory	ALTITUDE_ALTITUDE;
-	public static final TableColumnFactory	ALTITUDE_DIFF_SEGMENT_COMPUTED;
 	public static final TableColumnFactory	ALTITUDE_DIFF_SEGMENT_BORDER;
+	public static final TableColumnFactory	ALTITUDE_DIFF_SEGMENT_COMPUTED;
 	public static final TableColumnFactory	ALTITUDE_ELEVATION_DOWN;
 	public static final TableColumnFactory	ALTITUDE_ELEVATION_UP;
 	public static final TableColumnFactory	ALTITUDE_ELEVATION_SEGMENT_DOWN;
@@ -154,32 +154,6 @@ public abstract class TableColumnFactory {
 			};
 		};
 
-		ALTITUDE_DIFF_SEGMENT_COMPUTED = new TableColumnFactory() {
-
-			@Override
-			public TableColumnDefinition createColumn(	final ColumnManager columnManager,
-														final PixelConverter pixelConverter) {
-
-				final String unitLabel = UI.SYMBOL_DIFFERENCE_WITH_SPACE
-						+ UI.UNIT_LABEL_ALTITUDE
-						+ UI.SYMBOL_DOUBLE_HORIZONTAL;
-
-				final TableColumnDefinition colDef = new TableColumnDefinition(columnManager,//
-						"ALTITUDE_DIFF_SEGMENT_COMPUTED", //$NON-NLS-1$
-						SWT.TRAIL);
-
-				colDef.setColumnCategory(Messages.ColumnFactory_Category_Altitude);
-				colDef.setColumnLabel(Messages.ColumnFactory_altitude_difference_label);
-				colDef.setColumnHeaderText(unitLabel);
-				colDef.setColumnUnit(unitLabel);
-				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_altitude_computed_difference_tooltip);
-
-				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
-
-				return colDef;
-			};
-		};
-
 		ALTITUDE_DIFF_SEGMENT_BORDER = new TableColumnFactory() {
 
 			@Override
@@ -201,6 +175,40 @@ public abstract class TableColumnFactory {
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_altitude_difference_tooltip);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
+				colDef.setValueFormats(//
+						ValueFormatSet.Number,
+						ValueFormat.NUMBER_1_0,
+						columnManager);
+
+				return colDef;
+			};
+		};
+
+		ALTITUDE_DIFF_SEGMENT_COMPUTED = new TableColumnFactory() {
+
+			@Override
+			public TableColumnDefinition createColumn(	final ColumnManager columnManager,
+														final PixelConverter pixelConverter) {
+
+				final String unitLabel = UI.SYMBOL_DIFFERENCE_WITH_SPACE
+						+ UI.UNIT_LABEL_ALTITUDE
+						+ UI.SYMBOL_DOUBLE_HORIZONTAL;
+
+				final TableColumnDefinition colDef = new TableColumnDefinition(columnManager,//
+						"ALTITUDE_DIFF_SEGMENT_COMPUTED", //$NON-NLS-1$
+						SWT.TRAIL);
+
+				colDef.setColumnCategory(Messages.ColumnFactory_Category_Altitude);
+				colDef.setColumnLabel(Messages.ColumnFactory_altitude_difference_label);
+				colDef.setColumnHeaderText(unitLabel);
+				colDef.setColumnUnit(unitLabel);
+				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_altitude_computed_difference_tooltip);
+
+				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
+				colDef.setValueFormats(//
+						ValueFormatSet.Number,
+						ValueFormat.NUMBER_1_0,
+						columnManager);
 
 				return colDef;
 			};
@@ -325,6 +333,10 @@ public abstract class TableColumnFactory {
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_gradient_tooltip);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+				colDef.setValueFormats(//
+						ValueFormatSet.Number,
+						ValueFormat.NUMBER_1_1,
+						columnManager);
 
 				return colDef;
 			};
@@ -463,7 +475,6 @@ public abstract class TableColumnFactory {
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 				colDef.setValueFormats(//
 						ValueFormatSet.Number,
-						null,
 						ValueFormat.NUMBER_1_1,
 						columnManager);
 
@@ -513,7 +524,6 @@ public abstract class TableColumnFactory {
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
 				colDef.setValueFormats(//
 						ValueFormatSet.Calories,
-						null,
 						ValueFormat.CALORIES_KCAL_1_3,
 						columnManager);
 
@@ -538,7 +548,6 @@ public abstract class TableColumnFactory {
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
 				colDef.setValueFormats(//
 						ValueFormatSet.Number,
-						null,
 						ValueFormat.NUMBER_1_1,
 						columnManager);
 
@@ -730,6 +739,7 @@ public abstract class TableColumnFactory {
 				final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "MARKER_MAP_VISIBLE", //$NON-NLS-1$
 						SWT.CENTER);
 
+				colDef.setColumnCategory(Messages.ColumnFactory_Category_Marker);
 				colDef.setColumnLabel(Messages.Tour_Marker_Column_IsVisible);
 				colDef.setColumnHeaderText(Messages.Tour_Marker_Column_IsVisible);
 				colDef.setColumnHeaderToolTipText(Messages.Tour_Marker_Column_IsVisibleNoEdit_Tooltip);
@@ -751,6 +761,7 @@ public abstract class TableColumnFactory {
 						columnManager,
 						"MARKER_SERIE_INDEX", SWT.TRAIL); //$NON-NLS-1$
 
+				colDef.setColumnCategory(Messages.ColumnFactory_Category_Data);
 				colDef.setColumnLabel(Messages.ColumnFactory_SerieIndex_Label);
 				colDef.setColumnHeaderText(Messages.ColumnFactory_SerieIndex);
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_SerieIndex_Tooltip);
@@ -771,6 +782,7 @@ public abstract class TableColumnFactory {
 						columnManager,
 						"MARKER_TIME_DELTA", SWT.TRAIL); //$NON-NLS-1$
 
+				colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
 				colDef.setColumnLabel(Messages.ColumnFactory_TimeDelta_Label);
 				colDef.setColumnHeaderText(Messages.ColumnFactory_TimeDelta_Header);
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_TimeDelta_Tooltip);
@@ -790,6 +802,7 @@ public abstract class TableColumnFactory {
 
 				final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "MARKER_URL", SWT.LEAD); //$NON-NLS-1$
 
+				colDef.setColumnCategory(Messages.ColumnFactory_Category_Marker);
 				colDef.setColumnLabel(Messages.ColumnFactory_Url_Label);
 				colDef.setColumnHeaderText(Messages.ColumnFactory_Url_Header);
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Url_Tooltip);
@@ -865,7 +878,6 @@ public abstract class TableColumnFactory {
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 				colDef.setValueFormats(//
 						ValueFormatSet.Number,
-						null,
 						ValueFormat.NUMBER_1_1,
 						columnManager);
 
@@ -894,7 +906,6 @@ public abstract class TableColumnFactory {
 				colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
 				colDef.setValueFormats(//
 						ValueFormatSet.Number,
-						null,
 						ValueFormat.NUMBER_1_3,
 						columnManager);
 
@@ -1475,6 +1486,10 @@ public abstract class TableColumnFactory {
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_driving_time_tooltip);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+				colDef.setValueFormats(//
+						ValueFormatSet.Time,
+						ValueFormat.TIME_HH_MM,
+						columnManager);
 
 				return colDef;
 			};
@@ -1496,6 +1511,10 @@ public abstract class TableColumnFactory {
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_recording_time_tooltip);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+				colDef.setValueFormats(//
+						ValueFormatSet.Time,
+						ValueFormat.TIME_HH_MM,
+						columnManager);
 
 				return colDef;
 			};
@@ -1518,6 +1537,10 @@ public abstract class TableColumnFactory {
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_paused_time_tooltip);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+				colDef.setValueFormats(//
+						ValueFormatSet.Time,
+						ValueFormat.TIME_HH_MM,
+						columnManager);
 
 				return colDef;
 			};
@@ -1869,7 +1892,6 @@ public abstract class TableColumnFactory {
 				colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
 				colDef.setColumnLabel(Messages.ColumnFactory_Waypoint_Date);
 				colDef.setColumnHeaderText(Messages.ColumnFactory_Waypoint_Date);
-				colDef.setColumnUnit(Messages.ColumnFactory_Waypoint_Date_Unit);
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Waypoint_Date_Tooltip);
 
 				colDef.setDefaultColumnWidth(pixelWidth);

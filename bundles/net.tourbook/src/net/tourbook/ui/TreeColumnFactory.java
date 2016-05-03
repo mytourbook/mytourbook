@@ -77,7 +77,7 @@ public abstract class TreeColumnFactory {
 	public static final TreeColumnFactory	MOTION_DISTANCE;
 	public static final TreeColumnFactory	MOTION_MAX_SPEED;
 
-	public static final TreeColumnFactory	REFTOUR_TOUR;
+	public static final TreeColumnFactory	TOUR_REFTOUR_TOUR;
 
 	public static final TreeColumnFactory	TOUR_COLLATE_EVENT;
 	public static final TreeColumnFactory	TOUR_COUNTER;
@@ -379,6 +379,7 @@ public abstract class TreeColumnFactory {
 
 				final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "DATA_NUM_TOURS", SWT.TRAIL); //$NON-NLS-1$
 
+				colDef.setColumnCategory(Messages.ColumnFactory_Category_Data);
 				colDef.setColumnLabel(Messages.ColumnFactory_NumberOfTours_Label);
 				colDef.setColumnHeaderText(Messages.ColumnFactory_NumberOfTours_Header);
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_NumberOfTours_Tooltip);
@@ -884,25 +885,6 @@ public abstract class TreeColumnFactory {
 			};
 		};
 
-		/*
-		 * Reference tour
-		 */
-
-		REFTOUR_TOUR = new TreeColumnFactory() {
-			@Override
-			public TreeColumnDefinition createColumn(	final ColumnManager columnManager,
-														final PixelConverter pixelConverter) {
-
-				final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "REFTOUR_TOUR", SWT.LEAD); //$NON-NLS-1$
-
-				colDef.setColumnLabel(Messages.ColumnFactory_reference_tour);
-				colDef.setColumnHeaderText(Messages.ColumnFactory_reference_tour);
-
-				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
-
-				return colDef;
-			};
-		};
 
 		/*
 		 * Time
@@ -941,7 +923,11 @@ public abstract class TreeColumnFactory {
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_driving_time_tooltip);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
-				colDef.setValueFormats(ValueFormatSet.Time, ValueFormat.TIME_HH, ValueFormat.TIME_HH_MM, columnManager);
+				colDef.setValueFormats(//
+						ValueFormatSet.Time,
+						ValueFormat.TIME_HH,
+						ValueFormat.TIME_HH_MM,
+						columnManager);
 
 				return colDef;
 			};
@@ -962,7 +948,11 @@ public abstract class TreeColumnFactory {
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_paused_time_tooltip);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
-				colDef.setValueFormats(ValueFormatSet.Time, ValueFormat.TIME_HH, ValueFormat.TIME_HH_MM, columnManager);
+				colDef.setValueFormats(//
+						ValueFormatSet.Time,
+						ValueFormat.TIME_HH,
+						ValueFormat.TIME_HH_MM,
+						columnManager);
 
 				return colDef;
 			};
@@ -1005,7 +995,11 @@ public abstract class TreeColumnFactory {
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_recording_time_tooltip);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
-				colDef.setValueFormats(ValueFormatSet.Time, ValueFormat.TIME_HH, ValueFormat.TIME_HH_MM, columnManager);
+				colDef.setValueFormats(//
+						ValueFormatSet.Time,
+						ValueFormat.TIME_HH,
+						ValueFormat.TIME_HH_MM,
+						columnManager);
 
 				return colDef;
 			};
@@ -1159,6 +1153,25 @@ public abstract class TreeColumnFactory {
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_NumberOfPhotos_Tooltip);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+
+				return colDef;
+			};
+		};
+
+		TOUR_REFTOUR_TOUR = new TreeColumnFactory() {
+			@Override
+			public TreeColumnDefinition createColumn(	final ColumnManager columnManager,
+														final PixelConverter pixelConverter) {
+
+				final TreeColumnDefinition colDef = new TreeColumnDefinition(
+						columnManager,
+						"TOUR_REFTOUR_TOUR", SWT.LEAD); //$NON-NLS-1$
+
+				colDef.setColumnCategory(Messages.ColumnFactory_Category_Tour);
+				colDef.setColumnLabel(Messages.ColumnFactory_reference_tour);
+				colDef.setColumnHeaderText(Messages.ColumnFactory_reference_tour);
+
+				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
 
 				return colDef;
 			};

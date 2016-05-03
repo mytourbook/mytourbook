@@ -59,10 +59,10 @@ public class ColumnDefinition implements Cloneable {
 	private ControlListener				_columnControlListener;
 
 	private String						_columnCategory;
-	private String						_columnText;
+	private String						_columnHeaderText;
 	private String						_columnToolTipText;
-	private int							_columnWidth;
 	private String						_columnUnit;
+	private int							_columnWidth;
 
 	private boolean						_isColumnResizable		= true;
 	private boolean						_isColumnMoveable		= true;
@@ -159,7 +159,7 @@ public class ColumnDefinition implements Cloneable {
 
 		clone._cellLabelProvider = _cellLabelProvider;
 		clone._columnCategory = _columnCategory;
-		clone._columnText = _columnText;
+		clone._columnHeaderText = _columnHeaderText;
 		clone._columnToolTipText = _columnToolTipText;
 		clone._columnWidth = _columnWidth;
 		clone._defaultColumnWidth = _defaultColumnWidth;
@@ -176,6 +176,27 @@ public class ColumnDefinition implements Cloneable {
 		clone._createIndex = _createIndex;
 
 		return clone;
+	}
+
+	/**
+	 * Do not use the value formatter, this prevents that the column header context menu is
+	 * displayed with the column formatter.
+	 * <p>
+	 * The formatter is set in the column factory but it do not always make sense to have it, e.g.
+	 * tour data editor time slice columns.
+	 */
+	public void disableValueFormatter() {
+
+		_availableFormats = null;
+
+		_defaultValueFormat_Category = null;
+		_defaultValueFormat_Detail = null;
+
+		_valueFormat_Category = null;
+		_valueFormat_Detail = null;
+
+		_valueFormatter_Category = null;
+		_valueFormatter_Detail = null;
 	}
 
 	@Override
@@ -219,8 +240,24 @@ public class ColumnDefinition implements Cloneable {
 	/**
 	 * @return Returns the text which is displayed in the column header.
 	 */
-	public String getColumnHeaderText() {
-		return _columnText;
+	public String getColumnHeaderText(final ColumnManager columnManager) {
+
+		String columnHeaderText = _columnHeaderText;
+
+		// add annotations to this text
+		if (columnManager.isShowColumnAnnotations() //
+				&& (_defaultValueFormat_Category != null || _defaultValueFormat_Detail != null)) {
+
+			if (_columnHeaderText == null) {
+				columnHeaderText = UI.EMPTY_STRING;
+			}
+
+			if (_defaultValueFormat_Category != null || _defaultValueFormat_Detail != null) {
+				columnHeaderText += UI.SPACE1 + Messages.App_Annotation_1;
+			}
+		}
+
+		return columnHeaderText;
 	}
 
 	public String getColumnHeaderToolTipText() {
@@ -266,7 +303,7 @@ public class ColumnDefinition implements Cloneable {
 		return _defaultColumnWidth;
 	}
 
-	public ValueFormat getDefaultValueFormat() {
+	public ValueFormat getDefaultValueFormat_Category() {
 		return _defaultValueFormat_Category;
 	}
 
@@ -460,7 +497,7 @@ public class ColumnDefinition implements Cloneable {
 	 * @param text
 	 */
 	public void setColumnHeaderText(final String text) {
-		_columnText = text;
+		_columnHeaderText = text;
 	}
 
 	/**
@@ -499,7 +536,7 @@ public class ColumnDefinition implements Cloneable {
 	public void setColumnName(final String text) {
 
 		_label = text;
-		_columnText = text;
+		_columnHeaderText = text;
 	}
 
 	/**
@@ -599,6 +636,24 @@ public class ColumnDefinition implements Cloneable {
 	 * added to the column header text. </b>
 	 * 
 	 * @param availableFormats
+	 * @param defaultDetailFormat
+	 *            When <code>null</code> this format cannot be selected.
+	 * @param columnManager
+	 */
+	public void setValueFormats(final ValueFormat[] availableFormats,
+								final ValueFormat defaultDetailFormat,
+								final ColumnManager columnManager) {
+
+		setValueFormats(availableFormats, null, defaultDetailFormat, columnManager);
+	}
+
+	/**
+	 * Set formats which are used to render the column.
+	 * <p>
+	 * <b>This must be called after {@link #setColumnHeaderText(String)} that annotations can be
+	 * added to the column header text. </b>
+	 * 
+	 * @param availableFormats
 	 * @param defaultCategoryFormat
 	 *            When <code>null</code> this format cannot be selected.
 	 * @param defaultDetailFormat
@@ -614,20 +669,6 @@ public class ColumnDefinition implements Cloneable {
 
 		_defaultValueFormat_Category = defaultCategoryFormat;
 		_defaultValueFormat_Detail = defaultDetailFormat;
-
-		/*
-		 * Add annotations to the column header text
-		 */
-		if (columnManager.isShowColumnAnnotations()) {
-
-			if (_columnText == null) {
-				_columnText = UI.EMPTY_STRING;
-			}
-
-			if (defaultCategoryFormat != null || defaultDetailFormat != null) {
-				_columnText += UI.SPACE1 + Messages.App_Annotation_1;
-			}
-		}
 	}
 
 	void setValueFormatter_Category(final ValueFormat valueFormat, final IValueFormatter valueFormatter) {

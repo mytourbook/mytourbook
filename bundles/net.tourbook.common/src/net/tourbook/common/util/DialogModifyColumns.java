@@ -293,7 +293,7 @@ public class DialogModifyColumns extends TrayDialog {
 			 */
 			for (final ColumnDefinition colDef : allClonedColDef) {
 
-				final ValueFormat valueFormat = colDef.getDefaultValueFormat();
+				final ValueFormat valueFormat = colDef.getDefaultValueFormat_Category();
 				final ValueFormat valueFormat_Detail = colDef.getDefaultValueFormat_Detail();
 				final IValueFormatter valueFormatter = _columnManager.getValueFormatter(valueFormat);
 				final IValueFormatter valueFormatter_Detail = _columnManager.getValueFormatter(valueFormat_Detail);
@@ -965,7 +965,6 @@ public class DialogModifyColumns extends TrayDialog {
 
 		_chkShowFormatAnnotations = new Button(parent, SWT.CHECK);
 		_chkShowFormatAnnotations.setText(Messages.ColumnModifyDialog_Checkbox_ShowFormatAnnotations);
-		_chkShowFormatAnnotations.setToolTipText(Messages.ColumnModifyDialog_Checkbox_ShowFormatAnnotations_Tooltip);
 
 		GridDataFactory.fillDefaults().indent(0, 20).applyTo(_chkShowFormatAnnotations);
 
@@ -1074,7 +1073,7 @@ public class DialogModifyColumns extends TrayDialog {
 				ValueFormat valueFormat = colDef.getValueFormat_Category();
 
 				if (valueFormat == null) {
-					valueFormat = colDef.getDefaultValueFormat();
+					valueFormat = colDef.getDefaultValueFormat_Category();
 				}
 
 				if (valueFormat == null) {
@@ -1235,7 +1234,7 @@ public class DialogModifyColumns extends TrayDialog {
 
 				if (isSetDefaultProperties) {
 
-					final ValueFormat valueFormat = definedColDef.getDefaultValueFormat();
+					final ValueFormat valueFormat = definedColDef.getDefaultValueFormat_Category();
 					final ValueFormat valueFormat_Detail = definedColDef.getDefaultValueFormat_Detail();
 
 					final IValueFormatter valueFormatter = _columnManager.getValueFormatter(valueFormat);
@@ -1262,7 +1261,7 @@ public class DialogModifyColumns extends TrayDialog {
 							ValueFormat valueFormat_Detail = definedColDef.getValueFormat_Detail();
 
 							if (valueFormat == null) {
-								valueFormat = definedColDef.getDefaultValueFormat();
+								valueFormat = definedColDef.getDefaultValueFormat_Category();
 							}
 
 							if (valueFormat_Detail == null) {

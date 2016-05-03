@@ -2416,21 +2416,22 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		final ColumnDefinition colDef;
 
 		colDef = TableColumnFactory.ALTITUDE_DIFF_SEGMENT_BORDER.createColumn(_columnManager, _pc);
+
 		colDef.setIsDefaultColumn();
 		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
 
 				final TourSegment segment = (TourSegment) cell.getElement();
 
-				final float altitudeDiff = segment.altitude_Segment_Border_Diff;
-				if (altitudeDiff == 0) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					cell.setText(_nf_1_1.format(altitudeDiff / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE));
-					setCellColor(cell, altitudeDiff);
-				}
+				final double altitudeDiff = segment.altitude_Segment_Border_Diff;
+				final double value = altitudeDiff / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+
+				colDef.printDetailValue(cell, value);
+
+				setCellColor(cell, altitudeDiff);
 			}
 		});
 	}
@@ -2443,21 +2444,22 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		final ColumnDefinition colDef;
 
 		colDef = TableColumnFactory.ALTITUDE_DIFF_SEGMENT_COMPUTED.createColumn(_columnManager, _pc);
+
 		colDef.setIsDefaultColumn();
 		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
 
 				final TourSegment segment = (TourSegment) cell.getElement();
 
-				final float altitudeDiff = segment.altitude_Segment_Computed_Diff;
-				if (altitudeDiff == 0) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					cell.setText(_nf_1_1.format(altitudeDiff / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE));
-					setCellColor(cell, altitudeDiff);
-				}
+				final double altitudeDiff = segment.altitude_Segment_Computed_Diff;
+				final double value = altitudeDiff / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+
+				colDef.printDetailValue(cell, value);
+
+				setCellColor(cell, altitudeDiff);
 			}
 		});
 	}
@@ -2470,7 +2472,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		final ColumnDefinition colDef;
 
 		colDef = TableColumnFactory.ALTITUDE_GRADIENT.createColumn(_columnManager, _pc);
+
 		colDef.setIsDefaultColumn();
+
 		colDef.setColumnSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
@@ -2478,18 +2482,15 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				_segmentViewer.refresh();
 			}
 		});
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
 
 				final TourSegment segment = (TourSegment) cell.getElement();
-				final float gradient = segment.gradient;
+				final double value = segment.gradient;
 
-				if (gradient == 0) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					cell.setText(_nf_1_1.format(gradient));
-				}
+				colDef.printDetailValue(cell, value);
 			}
 		});
 	}
@@ -2502,8 +2503,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		final ColumnDefinition colDef;
 
 		colDef = TableColumnFactory.ALTITUDE_ELEVATION_DOWN.createColumn(_columnManager, _pc);
+
 		colDef.setIsDefaultColumn();
 		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -2516,17 +2519,12 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
 
-					final float altitudeDiff = segment.altitude_Segment_Border_Diff;
-
-					final float result = altitudeDiff > 0 //
+					final double altitudeDiff = segment.altitude_Segment_Border_Diff;
+					final double value = altitudeDiff > 0 //
 							? 0
 							: (altitudeDiff / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE) / drivingTime * 3600;
 
-					if (result == 0) {
-						cell.setText(UI.EMPTY_STRING);
-					} else {
-						cell.setText(_nf_1_0.format(result));
-					}
+					colDef.printValue_0(cell, value);
 				}
 			}
 		});
@@ -2540,8 +2538,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		final ColumnDefinition colDef;
 
 		colDef = TableColumnFactory.ALTITUDE_ELEVATION_UP.createColumn(_columnManager, _pc);
+
 		colDef.setIsDefaultColumn();
 		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -2554,17 +2554,12 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
 
-					final float altitudeDiff = segment.altitude_Segment_Border_Diff;
-
-					final float result = altitudeDiff < 0 //
+					final double altitudeDiff = segment.altitude_Segment_Border_Diff;
+					final double value = altitudeDiff < 0 //
 							? 0
 							: (altitudeDiff / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE) / drivingTime * 3600;
 
-					if (result == 0) {
-						cell.setText(UI.EMPTY_STRING);
-					} else {
-						cell.setText(_nf_1_0.format(result));
-					}
+					colDef.printValue_0(cell, value);
 				}
 			}
 		});
@@ -2578,24 +2573,22 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		final ColumnDefinition colDef;
 
 		colDef = TableColumnFactory.ALTITUDE_ELEVATION_SEGMENT_DOWN.createColumn(_columnManager, _pc);
+
 		colDef.setIsDefaultColumn();
 		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
 
 				final TourSegment segment = (TourSegment) cell.getElement();
 
-				final float result = segment.altitude_Segment_Down;
-				if (result == 0) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
+				final double value = segment.altitude_Segment_Down;
 
-					cell.setText(_nf_1_0.format(result));
+				colDef.printValue_0(cell, value);
 
-					if (segment.isTotal) {
-						setTotalStyle(cell);
-					}
+				if (segment.isTotal) {
+					setTotalStyle(cell);
 				}
 			}
 		});
@@ -2609,24 +2602,22 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		final ColumnDefinition colDef;
 
 		colDef = TableColumnFactory.ALTITUDE_ELEVATION_SEGMENT_UP.createColumn(_columnManager, _pc);
+
 		colDef.setIsDefaultColumn();
 		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
 
 				final TourSegment segment = (TourSegment) cell.getElement();
 
-				final float result = segment.altitude_Segment_Up;
-				if (result == 0) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
+				final double value = segment.altitude_Segment_Up;
 
-					cell.setText(_nf_1_0.format(result));
+				colDef.printValue_0(cell, value);
 
-					if (segment.isTotal) {
-						setTotalStyle(cell);
-					}
+				if (segment.isTotal) {
+					setTotalStyle(cell);
 				}
 			}
 		});
@@ -2640,21 +2631,18 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		final ColumnDefinition colDef;
 
 		colDef = TableColumnFactory.ALTITUDE_SUMMARIZED_BORDER_DOWN.createColumn(_columnManager, _pc);
+
 		colDef.setIsDefaultColumn();
 		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
 
 				final TourSegment segment = (TourSegment) cell.getElement();
-				final float altitude = segment.altitude_Summarized_Border_Down / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+				final double value = segment.altitude_Summarized_Border_Down / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
 
-				if (altitude == 0) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-
-					cell.setText(_nf_0_0.format(altitude));
-				}
+				colDef.printValue_0(cell, value);
 			}
 		});
 	}
@@ -2667,19 +2655,18 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		final ColumnDefinition colDef;
 
 		colDef = TableColumnFactory.ALTITUDE_SUMMARIZED_BORDER_UP.createColumn(_columnManager, _pc);
+
 		colDef.setIsDefaultColumn();
 		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
 
 				final TourSegment segment = (TourSegment) cell.getElement();
-				final float altitude = segment.altitude_Summarized_Border_Up / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
-				if (altitude == 0) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					cell.setText(_nf_0_0.format(altitude));
-				}
+				final double value = segment.altitude_Summarized_Border_Up / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+
+				colDef.printValue_0(cell, value);
 			}
 		});
 	}
@@ -2692,20 +2679,18 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		final ColumnDefinition colDef;
 
 		colDef = TableColumnFactory.ALTITUDE_SUMMARIZED_COMPUTED_DOWN.createColumn(_columnManager, _pc);
+
 		colDef.setIsDefaultColumn();
 		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
 
 				final TourSegment segment = (TourSegment) cell.getElement();
-				final float altitude = segment.altitude_Summarized_Computed_Down
-						/ net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
-				if (altitude == 0) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					cell.setText(_nf_0_0.format(altitude));
-				}
+				final double value = segment.altitude_Summarized_Computed_Down / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+
+				colDef.printValue_0(cell, value);
 			}
 		});
 	}
@@ -2718,19 +2703,18 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		final ColumnDefinition colDef;
 
 		colDef = TableColumnFactory.ALTITUDE_SUMMARIZED_COMPUTED_UP.createColumn(_columnManager, _pc);
+
 		colDef.setIsDefaultColumn();
 		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
 
 				final TourSegment segment = (TourSegment) cell.getElement();
-				final float altitude = segment.altitude_Summarized_Computed_Up / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
-				if (altitude == 0) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					cell.setText(_nf_0_0.format(altitude));
-				}
+				final double value = segment.altitude_Summarized_Computed_Up / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+
+				colDef.printValue_0(cell, value);
 			}
 		});
 	}
@@ -2743,7 +2727,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		final ColumnDefinition colDef;
 
 		colDef = TableColumnFactory.BODY_AVG_PULSE.createColumn(_columnManager, _pc);
+
 		colDef.setIsDefaultColumn();
+
 		colDef.setColumnSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
@@ -2751,18 +2737,15 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				_segmentViewer.refresh();
 			}
 		});
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
 
 				final TourSegment segment = (TourSegment) cell.getElement();
-				final float pulse = segment.pulse;
+				final double value = segment.pulse;
 
-				if (pulse == 0) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					cell.setText(_nf_1_1.format(pulse));
-				}
+				colDef.printDetailValue(cell, value);
 
 				if (segment.isTotal) {
 					setTotalStyle(cell);
@@ -2779,7 +2762,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		final ColumnDefinition colDef;
 
 		colDef = TableColumnFactory.BODY_AVG_PULSE_DIFFERENCE.createColumn(_columnManager, _pc);
+
 		colDef.setIsDefaultColumn();
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -2809,6 +2794,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		final ColumnDefinition colDef;
 
 		colDef = TableColumnFactory.DATA_SERIE_START_END_INDEX.createColumn(_columnManager, _pc);
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -2842,7 +2828,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		final ColumnDefinition colDef;
 
 		colDef = TableColumnFactory.MOTION_AVG_PACE.createColumn(_columnManager, _pc);
+
 		colDef.setIsDefaultColumn();
+
 		colDef.setColumnSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
@@ -2850,6 +2838,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				_segmentViewer.refresh();
 			}
 		});
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -2878,7 +2867,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		final ColumnDefinition colDef;
 
 		colDef = TableColumnFactory.MOTION_AVG_PACE_DIFFERENCE.createColumn(_columnManager, _pc);
+
 		colDef.setIsDefaultColumn();
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -2903,7 +2894,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		final ColumnDefinition colDef;
 
 		colDef = TableColumnFactory.MOTION_AVG_SPEED.createColumn(_columnManager, _pc);
+
 		colDef.setIsDefaultColumn();
+
 		colDef.setColumnSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
@@ -2911,18 +2904,15 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				_segmentViewer.refresh();
 			}
 		});
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
 
 				final TourSegment segment = (TourSegment) cell.getElement();
-				final float speed = segment.speed;
+				final double value = segment.speed;
 
-				if (speed == 0) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					cell.setText(_nf_1_1.format(speed));
-				}
+				colDef.printDetailValue(cell, value);
 
 				if (segment.isTotal) {
 					setTotalStyle(cell);
@@ -2939,19 +2929,18 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		final ColumnDefinition colDef;
 
 		colDef = TableColumnFactory.MOTION_DISTANCE.createColumn(_columnManager, _pc);
+
 		colDef.setIsDefaultColumn();
 		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
 
 				final TourSegment segment = (TourSegment) cell.getElement();
-				final float distance = (segment.distance_Diff) / (1000 * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
-				if (distance == 0) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					cell.setText(_nf_3_3.format(distance));
-				}
+				final double value = (segment.distance_Diff) / (1000 * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
+
+				colDef.printDetailValue(cell, value);
 
 				if (segment.isTotal) {
 					setTotalStyle(cell);
@@ -2968,8 +2957,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		final ColumnDefinition colDef;
 
 		colDef = TableColumnFactory.MOTION_DISTANCE_TOTAL.createColumn(_columnManager, _pc);
+
 		colDef.setIsDefaultColumn();
 		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -2994,7 +2985,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		final ColumnDefinition colDef;
 
 		colDef = TableColumnFactory.POWERTRAIN_AVG_CADENCE.createColumn(_columnManager, _pc);
+
 		colDef.setIsDefaultColumn();
+
 		colDef.setColumnSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
@@ -3002,6 +2995,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				_segmentViewer.refresh();
 			}
 		});
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -3030,8 +3024,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		final ColumnDefinition colDef;
 
 		colDef = TableColumnFactory.TIME_DRIVING_TIME.createColumn(_columnManager, _pc);
+
 		colDef.setIsDefaultColumn();
 		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -3060,8 +3056,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		final ColumnDefinition colDef;
 
 		colDef = TableColumnFactory.TIME_PAUSED_TIME.createColumn(_columnManager, _pc);
+
 		colDef.setIsDefaultColumn();
 		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -3090,8 +3088,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		final ColumnDefinition colDef;
 
 		colDef = TableColumnFactory.TIME_RECORDING_TIME.createColumn(_columnManager, _pc);
+
 		colDef.setIsDefaultColumn();
 		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -3116,8 +3116,10 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		final ColumnDefinition colDef;
 
 		colDef = TableColumnFactory.TIME_RECORDING_TIME_TOTAL.createColumn(_columnManager, _pc);
+
 		colDef.setIsDefaultColumn();
 		colDef.setColumnSelectionListener(defaultColumnSelectionListener);
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -4265,17 +4267,17 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		}
 	}
 
-	private void setCellColor(final ViewerCell cell, final float altiDiff) {
+	private void setCellColor(final ViewerCell cell, final double value) {
 
-		if (altiDiff == 0) {
+		if (value == 0) {
 
 			cell.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
-		} else if (altiDiff > 0) {
+		} else if (value > 0) {
 
 			cell.setBackground(_colorCache.get(STATE_COLOR_ALTITUDE_UP));
 
-		} else if (altiDiff < 0) {
+		} else if (value < 0) {
 
 			cell.setBackground(_colorCache.get(STATE_COLOR_ALTITUDE_DOWN));
 		}
@@ -4385,7 +4387,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	@Override
 	public void updateColumnHeader(final ColumnDefinition colDef) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	/**

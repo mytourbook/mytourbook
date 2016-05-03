@@ -376,6 +376,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
 		// define all columns for the viewer
 		_columnManager = new ColumnManager(this, _state);
+		_columnManager.setIsCategoryAvailable(true);
 		defineAllColumns();
 
 		createUI(parent);
@@ -494,34 +495,100 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
 	private void defineAllColumns() {
 
-		defineColumn_IsVisible();
+		defineColumn_Marker_IsVisible();
 
-		defineColumn_Time();
-		defineColumn_Distance();
+		defineColumn_Time_Time();
+		defineColumn_Time_TimeDelta();
 
-		defineColumn_TimeDelta();
-		defineColumn_DistanceDelta();
+		defineColumn_Motion_Distance();
+		defineColumn_Motion_DistanceDelta();
 
-		defineColumn_Name();
-		defineColumn_Description();
-		defineColumn_Url();
+		defineColumn_Waypoint_Name();
+		defineColumn_Waypoint_Description();
+		defineColumn_Marker_Url();
 
-		defineColumn_SerieIndex();
+		defineColumn_Data_SerieIndex();
 	}
 
 	/**
-	 * Column: Description
+	 * Column: Serie index
 	 */
-	private void defineColumn_Description() {
+	private void defineColumn_Data_SerieIndex() {
 
-		final ColumnDefinition colDef = TableColumnFactory.WAYPOINT_DESCRIPTION.createColumn(_columnManager, _pc);
+		_colDefName = TableColumnFactory.MARKER_SERIE_INDEX.createColumn(_columnManager, _pc);
+
+		_colDefName.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourMarker marker = (TourMarker) cell.getElement();
+
+				cell.setText(Integer.toString(marker.getSerieIndex()));
+			}
+		});
+	}
+
+	/**
+	 * Column: Is visible
+	 */
+	private void defineColumn_Marker_IsVisible() {
+
+		_colDefVisibility = TableColumnFactory.MARKER_MAP_VISIBLE.createColumn(_columnManager, _pc);
+
+		_colDefVisibility.setIsDefaultColumn();
+
+		_colDefVisibility.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final TourMarker tourMarker = (TourMarker) cell.getElement();
+				cell.setText(tourMarker.isMarkerVisible()
+						? Messages.App_Label_BooleanYes
+						: Messages.App_Label_BooleanNo);
+			}
+		});
+	}
+
+	/**
+	 * Column: Url
+	 */
+	private void defineColumn_Marker_Url() {
+
+		final ColumnDefinition colDef = TableColumnFactory.MARKER_URL.createColumn(_columnManager, _pc);
+
 		colDef.setIsDefaultColumn();
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
 
 				final TourMarker marker = (TourMarker) cell.getElement();
-				cell.setText(marker.getDescription());
+
+				String columnText = UI.EMPTY_STRING;
+
+				/*
+				 * Url
+				 */
+				final String urlText = marker.getUrlText();
+				final String urlAddress = marker.getUrlAddress();
+				final boolean isText = urlText.length() > 0;
+				final boolean isAddress = urlAddress.length() > 0;
+
+				if (isText || isAddress) {
+
+					if (isAddress == false) {
+
+						// only text is in the link -> this is not a internet address but create a link of it
+
+						columnText = urlText;
+
+					} else {
+
+						columnText = urlAddress;
+					}
+				}
+
+				cell.setText(columnText);
 			}
 		});
 	}
@@ -529,10 +596,12 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 	/**
 	 * Column: Distance km/mi
 	 */
-	private void defineColumn_Distance() {
+	private void defineColumn_Motion_Distance() {
 
 		final ColumnDefinition colDef = TableColumnFactory.MOTION_DISTANCE.createColumn(_columnManager, _pc);
+
 		colDef.setIsDefaultColumn();
+		colDef.disableValueFormatter();
 
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -557,10 +626,9 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 	/**
 	 * Column: Distance delta km/mi
 	 */
-	private void defineColumn_DistanceDelta() {
+	private void defineColumn_Motion_DistanceDelta() {
 
 		final ColumnDefinition colDef = TableColumnFactory.MOTION_DISTANCE_DELTA.createColumn(_columnManager, _pc);
-//		colDef.setIsDefaultColumn();
 
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -596,66 +664,12 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 	}
 
 	/**
-	 * Column: Is visible
-	 */
-	private void defineColumn_IsVisible() {
-
-		_colDefVisibility = TableColumnFactory.MARKER_MAP_VISIBLE.createColumn(_columnManager, _pc);
-		_colDefVisibility.setIsDefaultColumn();
-
-		_colDefVisibility.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final TourMarker tourMarker = (TourMarker) cell.getElement();
-				cell.setText(tourMarker.isMarkerVisible()
-						? Messages.App_Label_BooleanYes
-						: Messages.App_Label_BooleanNo);
-			}
-		});
-	}
-
-	/**
-	 * Column: Name
-	 */
-	private void defineColumn_Name() {
-
-		_colDefName = TableColumnFactory.WAYPOINT_NAME.createColumn(_columnManager, _pc);
-		_colDefName.setIsDefaultColumn();
-
-		_colDefName.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final TourMarker marker = (TourMarker) cell.getElement();
-				cell.setText(marker.getLabel());
-			}
-		});
-	}
-
-	/**
-	 * Column: Serie index
-	 */
-	private void defineColumn_SerieIndex() {
-
-		_colDefName = TableColumnFactory.MARKER_SERIE_INDEX.createColumn(_columnManager, _pc);
-
-		_colDefName.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final TourMarker marker = (TourMarker) cell.getElement();
-				cell.setText(Integer.toString(marker.getSerieIndex()));
-			}
-		});
-	}
-
-	/**
 	 * Column: Time
 	 */
-	private void defineColumn_Time() {
+	private void defineColumn_Time_Time() {
 
 		final ColumnDefinition colDef = TableColumnFactory.TIME_TOUR_TIME_HH_MM_SS.createColumn(_columnManager, _pc);
+
 		colDef.setIsDefaultColumn();
 
 		// hide wrong tooltip
@@ -676,7 +690,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 	/**
 	 * Column: Time
 	 */
-	private void defineColumn_TimeDelta() {
+	private void defineColumn_Time_TimeDelta() {
 
 		final ColumnDefinition colDef = TableColumnFactory.MARKER_TIME_DELTA.createColumn(_columnManager, _pc);
 
@@ -716,43 +730,40 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 	}
 
 	/**
-	 * Column: Url
+	 * Column: Description
 	 */
-	private void defineColumn_Url() {
+	private void defineColumn_Waypoint_Description() {
 
-		final ColumnDefinition colDef = TableColumnFactory.MARKER_URL.createColumn(_columnManager, _pc);
+		final ColumnDefinition colDef = TableColumnFactory.WAYPOINT_DESCRIPTION.createColumn(_columnManager, _pc);
+
 		colDef.setIsDefaultColumn();
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
 
 				final TourMarker marker = (TourMarker) cell.getElement();
+				cell.setText(marker.getDescription());
+			}
+		});
+	}
 
-				String columnText = UI.EMPTY_STRING;
+	/**
+	 * Column: Name
+	 */
+	private void defineColumn_Waypoint_Name() {
 
-				/*
-				 * Url
-				 */
-				final String urlText = marker.getUrlText();
-				final String urlAddress = marker.getUrlAddress();
-				final boolean isText = urlText.length() > 0;
-				final boolean isAddress = urlAddress.length() > 0;
+		_colDefName = TableColumnFactory.WAYPOINT_NAME.createColumn(_columnManager, _pc);
 
-				if (isText || isAddress) {
+		_colDefName.setIsDefaultColumn();
 
-					if (isAddress == false) {
+		_colDefName.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
 
-						// only text is in the link -> this is not a internet address but create a link of it
+				final TourMarker marker = (TourMarker) cell.getElement();
 
-						columnText = urlText;
-
-					} else {
-
-						columnText = urlAddress;
-					}
-				}
-
-				cell.setText(columnText);
+				cell.setText(marker.getLabel());
 			}
 		});
 	}

@@ -414,6 +414,40 @@ public class ColumnManager {
 		_allDefinedColumnDefinitions.clear();
 	}
 
+	private String createColumnLabel(final ColumnDefinition colDef, final boolean isWithCategory) {
+
+		final String category = colDef.getColumnCategory();
+		final String label = colDef.getColumnLabel();
+		final String unit = colDef.getColumnUnit();
+
+		final StringBuilder sb = new StringBuilder();
+
+		// add category
+		if (isWithCategory && _isCategoryAvailable && _isShowCategory && category != null) {
+			sb.append(category);
+		}
+
+		// add label
+		if (label != null) {
+			if (isWithCategory && sb.length() > 0) {
+				sb.append(COLUMN_CATEGORY_SEPARATOR);
+			}
+			sb.append(label);
+		}
+
+		// add unit
+		if (unit != null) {
+
+			if (sb.length() > 0) {
+				sb.append(COLUMN_TEXT_SEPARATOR);
+			}
+
+			sb.append(unit);
+		}
+
+		return sb.toString();
+	}
+
 	/**
 	 * Creates the columns in the tree/table for all visible columns.
 	 * 
@@ -468,7 +502,7 @@ public class ColumnManager {
 		// get column widget
 		tc = tvc.getColumn();
 
-		final String columnText = colDef.getColumnHeaderText();
+		final String columnText = colDef.getColumnHeaderText(this);
 		if (columnText != null) {
 			tc.setText(columnText);
 		}
@@ -554,7 +588,7 @@ public class ColumnManager {
 
 		tc = tvc.getColumn();
 
-		final String columnText = colDef.getColumnHeaderText();
+		final String columnText = colDef.getColumnHeaderText(this);
 		if (columnText != null) {
 			tc.setText(columnText);
 		}
@@ -726,20 +760,24 @@ public class ColumnManager {
 		}
 
 		{
-			/*
-			 * Menu title
-			 */
+//			/*
+//			 * Menu title
+//			 */
+//
+//			// create menu item text
+//			final String headerText = colDef.getColumnHeaderText(this);
+//			final String headerLabel = colDef.getColumnLabel();
+//			String menuItemText = headerText == null //
+//
+//					? NLS.bind(Messages.Action_ColumnManager_ColumnActions_Info, headerLabel)
+//					: headerText.equals(headerLabel) //
+//
+//							? NLS.bind(Messages.Action_ColumnManager_ColumnActions_Info, headerText)
+//							: NLS.bind(Messages.Action_ColumnManager_ColumnActions_Info_2, headerText, headerLabel);
 
-			// create menu item text
-			final String headerText = colDef.getColumnHeaderText();
-			final String headerLabel = colDef.getColumnLabel();
-			final String menuItemText = headerText == null //
-
-					? NLS.bind(Messages.Action_ColumnManager_ColumnActions_Info, headerLabel)
-					: headerText.equals(headerLabel) //
-
-							? NLS.bind(Messages.Action_ColumnManager_ColumnActions_Info, headerText)
-							: NLS.bind(Messages.Action_ColumnManager_ColumnActions_Info_2, headerText, headerLabel);
+			final String menuItemText = NLS.bind(
+					Messages.Action_ColumnManager_ColumnActions_Info,
+					createColumnLabel(colDef, false));
 
 			final MenuItem menuItem = new MenuItem(contextMenu, SWT.PUSH);
 			menuItem.setText(menuItemText);
@@ -844,7 +882,8 @@ public class ColumnManager {
 			} else {
 
 				categorizedColumns.add(colDef);
-				categorizedNames.add(colDef.getColumnCategory());
+				final String columnCategory = colDef.getColumnCategory();
+				categorizedNames.add(columnCategory);
 			}
 		}
 
@@ -855,39 +894,9 @@ public class ColumnManager {
 
 			final MenuItem colMenuItem = new MenuItem(contextMenu, SWT.CHECK);
 
-			/*
-			 * Create column text
-			 */
-			final String category = colDef.getColumnCategory();
-			final String label = colDef.getColumnLabel();
-			final String unit = colDef.getColumnUnit();
+			final String columnLabel = createColumnLabel(colDef, true);
 
-			final StringBuilder sb = new StringBuilder();
-
-			// add category
-			if (_isCategoryAvailable && _isShowCategory && category != null) {
-				sb.append(category);
-			}
-
-			// add label
-			if (label != null) {
-				if (sb.length() > 0) {
-					sb.append(COLUMN_CATEGORY_SEPARATOR);
-				}
-				sb.append(label);
-			}
-
-			// add unit
-			if (unit != null) {
-
-				if (sb.length() > 0) {
-					sb.append(COLUMN_TEXT_SEPARATOR);
-				}
-
-				sb.append(unit);
-			}
-
-			colMenuItem.setText(sb.toString());
+			colMenuItem.setText(columnLabel);
 			colMenuItem.setEnabled(colDef.canModifyVisibility());
 			colMenuItem.setSelection(colDef.isColumnDisplayed());
 
@@ -1779,6 +1788,9 @@ public class ColumnManager {
 
 			final String columnId = colDef.getColumnId();
 
+			final ValueFormat defaultFormat_Category = colDef.getDefaultValueFormat_Category();
+			final ValueFormat defaultFormat_Detail = colDef.getDefaultValueFormat_Detail();
+
 			ValueFormat valueFormat_Category = null;
 			ValueFormat valueFormat_Detail = null;
 			IValueFormatter valueFormatter_Category = null;
@@ -1792,34 +1804,37 @@ public class ColumnManager {
 
 					currentColumnProperties = columnProperties;
 
-					valueFormat_Category = columnProperties.valueFormat_Category;
-					valueFormatter_Category = getValueFormatter(valueFormat_Category);
+					/*
+					 * Set format ONLY when default is set, this prevents that old saved settings
+					 * are still used.
+					 */
 
-					valueFormat_Detail = columnProperties.valueFormat_Detail;
-					valueFormatter_Detail = getValueFormatter(valueFormat_Detail);
+					if (defaultFormat_Category != null) {
+
+						valueFormat_Category = columnProperties.valueFormat_Category;
+						valueFormatter_Category = getValueFormatter(valueFormat_Category);
+					}
+
+					if (defaultFormat_Detail != null) {
+
+						valueFormat_Detail = columnProperties.valueFormat_Detail;
+						valueFormatter_Detail = getValueFormatter(valueFormat_Detail);
+					}
 
 					break;
 				}
 			}
 
-			if (valueFormatter_Category == null) {
+			if (valueFormatter_Category == null && defaultFormat_Category != null) {
 
-				final ValueFormat defaultFormat = colDef.getDefaultValueFormat();
-
-				if (defaultFormat != null) {
-					valueFormat_Category = defaultFormat;
-					valueFormatter_Category = getValueFormatter(valueFormat_Category);
-				}
+				valueFormat_Category = defaultFormat_Category;
+				valueFormatter_Category = getValueFormatter(defaultFormat_Category);
 			}
 
-			if (valueFormatter_Detail == null) {
+			if (valueFormatter_Detail == null && defaultFormat_Detail != null) {
 
-				final ValueFormat defaultFormat = colDef.getDefaultValueFormat_Detail();
-
-				if (defaultFormat != null) {
-					valueFormat_Detail = defaultFormat;
-					valueFormatter_Detail = getValueFormatter(valueFormat_Detail);
-				}
+				valueFormat_Detail = defaultFormat_Detail;
+				valueFormatter_Detail = getValueFormatter(defaultFormat_Detail);
 			}
 
 			colDef.setValueFormatter_Category(valueFormat_Category, valueFormatter_Category);

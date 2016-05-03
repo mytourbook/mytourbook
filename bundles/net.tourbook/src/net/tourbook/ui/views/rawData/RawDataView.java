@@ -93,7 +93,6 @@ import net.tourbook.tour.TourLogState;
 import net.tourbook.tour.TourLogView;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourTypeMenuManager;
-import net.tourbook.ui.FormatManager;
 import net.tourbook.ui.ITourProviderAll;
 import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.action.ActionEditQuick;
@@ -2745,11 +2744,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			@Override
 			public void update(final ViewerCell cell) {
 
-				final long drivingTime = ((TourData) cell.getElement()).getTourDrivingTime();
+				final long value = ((TourData) cell.getElement()).getTourDrivingTime();
 
-				if (drivingTime != 0) {
-					cell.setText(FormatManager.getDrivingTime(drivingTime));
-				}
+				colDef.printDetailValue(cell, value);
 			}
 		});
 	}
@@ -2766,11 +2763,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			@Override
 			public void update(final ViewerCell cell) {
 
-				final long recordingTime = ((TourData) cell.getElement()).getTourRecordingTime();
+				final long value = ((TourData) cell.getElement()).getTourRecordingTime();
 
-				if (recordingTime != 0) {
-					cell.setText(FormatManager.getRecordingTime(recordingTime));
-				}
+				colDef.printDetailValue(cell, value);
 			}
 		});
 	}

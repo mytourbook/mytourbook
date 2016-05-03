@@ -639,7 +639,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 	 */
 	private void defineColumn_1stColumn() {
 
-		final TreeColumnDefinition colDef = TreeColumnFactory.REFTOUR_TOUR.createColumn(_columnManager, _pc);
+		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_REFTOUR_TOUR.createColumn(_columnManager, _pc);
 		colDef.setIsDefaultColumn();
 		colDef.setCanModifyVisibility(false);
 		colDef.setLabelProvider(new TourInfoToolTipStyledCellLabelProvider() {
