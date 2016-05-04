@@ -498,6 +498,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 		// define all columns for the viewer
 		_columnManager = new ColumnManager(this, _state);
+		_columnManager.setIsCategoryAvailable(true);
 		defineAllColumns(parent);
 
 		createUI(parent);

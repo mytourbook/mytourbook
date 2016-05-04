@@ -448,6 +448,23 @@ public class ColumnManager {
 		return sb.toString();
 	}
 
+	private void createColumnMenuItems(final Menu contextMenu, final ArrayList<ColumnDefinition> allColDef) {
+
+		for (final ColumnDefinition colDef : allColDef) {
+
+			final MenuItem colMenuItem = new MenuItem(contextMenu, SWT.CHECK);
+
+			final String columnLabel = createColumnLabel(colDef, true);
+
+			colMenuItem.setText(columnLabel);
+			colMenuItem.setEnabled(colDef.canModifyVisibility());
+			colMenuItem.setSelection(colDef.isColumnDisplayed());
+
+			colMenuItem.setData(colDef);
+			colMenuItem.addListener(SWT.Selection, _colItemListener);
+		}
+	}
+
 	/**
 	 * Creates the columns in the tree/table for all visible columns.
 	 * 
@@ -870,7 +887,7 @@ public class ColumnManager {
 		final ArrayList<ColumnDefinition> allColumns = getRearrangedColumns();
 
 		final ArrayList<ColumnDefinition> displayedColumns = new ArrayList<>();
-		final ArrayList<ColumnDefinition> categorizedColumns = new ArrayList<>();
+		final ArrayList<ColumnDefinition> notDisplyedColumns = new ArrayList<>();
 		final HashSet<String> categorizedNames = new HashSet<String>();
 
 		for (final ColumnDefinition colDef : allColumns) {
@@ -881,38 +898,34 @@ public class ColumnManager {
 
 			} else {
 
-				categorizedColumns.add(colDef);
+				notDisplyedColumns.add(colDef);
+
 				final String columnCategory = colDef.getColumnCategory();
-				categorizedNames.add(columnCategory);
+
+				if (columnCategory != null) {
+					categorizedNames.add(columnCategory);
+				}
 			}
 		}
 
-		/*
-		 * Create menu items for each visible column
-		 */
-		for (final ColumnDefinition colDef : displayedColumns) {
+		// create menu items for each visible column
+		createColumnMenuItems(contextMenu, displayedColumns);
 
-			final MenuItem colMenuItem = new MenuItem(contextMenu, SWT.CHECK);
+		if (_isCategoryAvailable) {
 
-			final String columnLabel = createColumnLabel(colDef, true);
+			// create submenus for each category
 
-			colMenuItem.setText(columnLabel);
-			colMenuItem.setEnabled(colDef.canModifyVisibility());
-			colMenuItem.setSelection(colDef.isColumnDisplayed());
+			// sort by category name
+			final ArrayList<String> categories = new ArrayList<>(categorizedNames);
+			Collections.sort(categories);
 
-			colMenuItem.setData(colDef);
-			colMenuItem.addListener(SWT.Selection, _colItemListener);
+			new ColumnContextMenu(contextMenu, categories, notDisplyedColumns, this);
+
+		} else {
+
+			// create not categorized menu items
+			createColumnMenuItems(contextMenu, notDisplyedColumns);
 		}
-
-		/*
-		 * Create submenus for each category
-		 */
-
-		// sort by name
-		final ArrayList<String> categories = new ArrayList<>(categorizedNames);
-		Collections.sort(categories);
-
-		new ColumnContextMenu(contextMenu, categories, categorizedColumns, this);
 	}
 
 	/**
@@ -939,17 +952,47 @@ public class ColumnManager {
 				final Display display = table.getShell().getDisplay();
 				final Point mousePosition = display.map(null, table, new Point(event.x, event.y));
 
-				final Rectangle tblClientArea = table.getClientArea();
-				final int headerHeight = table.getHeaderHeight();
+				final Rectangle clientArea = table.getClientArea();
 
-				final boolean isTableHeaderHit = tblClientArea.y <= mousePosition.y
-						&& mousePosition.y < (tblClientArea.y + headerHeight);
+				final int headerHeight = table.getHeaderHeight();
+				final int headerBottom = clientArea.y + headerHeight;
+
+				final boolean isTableHeaderHit = clientArea.y <= mousePosition.y
+						&& mousePosition.y < (clientArea.y + headerHeight);
 
 				_headerColumn = getHeaderColumn(table, mousePosition, isTableHeaderHit);
 
 				final Menu contextMenu = getContextMenu(isTableHeaderHit, headerContextMenu, defaultContextMenu);
 
 				table.setMenu(contextMenu);
+
+				/*
+				 * Set context menu position to the right border of the column
+				 */
+				if (_headerColumn != null) {
+
+					int posX = _headerColumn.columnRightBorder;
+					int xOffset = 0;
+
+					final ScrollBar hBar = table.getHorizontalBar();
+
+					if (hBar != null) {
+						xOffset = hBar.getSelection();
+					}
+
+					/*
+					 * It is possible that the context menu is outside of the tree, this occures
+					 * when the column is very wide and horizonal scrolled.
+					 */
+					if (posX - xOffset > clientArea.width) {
+						posX = xOffset + clientArea.width;
+					}
+
+					final Point displayPosition = table.toDisplay(posX, headerBottom);
+
+					event.x = displayPosition.x - 1;
+					event.y = displayPosition.y - 2;
+				}
 			}
 		};
 
@@ -983,8 +1026,8 @@ public class ColumnManager {
 				final Point mousePosition = display.map(null, tree, new Point(event.x, event.y));
 
 				final Rectangle clientArea = tree.getClientArea();
-				final int headerHeight = tree.getHeaderHeight();
 
+				final int headerHeight = tree.getHeaderHeight();
 				final int headerBottom = clientArea.y + headerHeight;
 
 				final boolean isTreeHeaderHit = clientArea.y <= mousePosition.y && mousePosition.y < headerBottom;

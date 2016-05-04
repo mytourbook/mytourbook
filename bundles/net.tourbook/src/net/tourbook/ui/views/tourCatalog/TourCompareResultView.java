@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourCatalog;
 
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Set;
@@ -26,6 +25,8 @@ import javax.persistence.EntityTransaction;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.formatter.ValueFormat;
+import net.tourbook.common.formatter.ValueFormatSet;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
@@ -126,16 +127,6 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	private TagMenuManager						_tagMenuMgr;
 
 	private SelectionRemovedComparedTours		_oldRemoveSelection	= null;
-
-	private final NumberFormat					_nf1				= NumberFormat.getNumberInstance();
-	private final NumberFormat					_nf2				= NumberFormat.getNumberInstance();
-	{
-		_nf1.setMinimumFractionDigits(1);
-		_nf1.setMaximumFractionDigits(1);
-
-		_nf2.setMinimumFractionDigits(2);
-		_nf2.setMaximumFractionDigits(2);
-	}
 
 	/*
 	 * resources
@@ -433,6 +424,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 		// define all columns for the viewer
 		_columnManager = new ColumnManager(this, _state);
+//		_columnManager.setIsCategoryAvailable(true);
 		defineAllColumns(parent);
 
 		createUI(parent);
@@ -580,22 +572,25 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 	private void defineAllColumns(final Composite parent) {
 
-		defineColumn_ComparedTour();
-		defineColumn_Diff();
-		defineColumn_SpeedComputed();
-		defineColumn_SpeedSaved();
-		defineColumn_SpeedMoved();
-		defineColumn_Distance();
-		defineColumn_TimeInterval();
-		defineColumn_TourType();
-		defineColumn_Title();
-		defineColumn_Tags();
+		defineColumn_1st_ComparedTour();
+		defineColumn_Data_Diff();
+
+		defineColumn_Motion_SpeedComputed();
+		defineColumn_Motion_SpeedSaved();
+		defineColumn_Motion_SpeedMoved();
+		defineColumn_Motion_Distance();
+
+		defineColumn_Data_TimeInterval();
+
+		defineColumn_Tour_Type();
+		defineColumn_Tour_Title();
+		defineColumn_Tour_Tags();
 	}
 
 	/**
 	 * tree column: reference tour/date
 	 */
-	private void defineColumn_ComparedTour() {
+	private void defineColumn_1st_ComparedTour() {
 
 		final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "comparedTour", SWT.LEAD); //$NON-NLS-1$
 
@@ -652,7 +647,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	/**
 	 * column: altitude difference
 	 */
-	private void defineColumn_Diff() {
+	private void defineColumn_Data_Diff() {
 
 		final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "diff", SWT.TRAIL); //$NON-NLS-1$
 
@@ -681,11 +676,32 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	}
 
 	/**
+	 * column: time interval
+	 */
+	private void defineColumn_Data_TimeInterval() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.DATA_TIME_INTERVAL.createColumn(_columnManager, _pc);
+
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+				final Object element = cell.getElement();
+				if (element instanceof TVICompareResultComparedTour) {
+
+					cell.setText(Integer.toString(((TVICompareResultComparedTour) element).timeIntervall));
+					setCellColor(cell, element);
+				}
+			}
+		});
+	}
+
+	/**
 	 * column: distance
 	 */
-	private void defineColumn_Distance() {
+	private void defineColumn_Motion_Distance() {
 
 		final TreeColumnDefinition colDef = TreeColumnFactory.MOTION_DISTANCE.createColumn(_columnManager, _pc);
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -694,8 +710,9 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 					final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) element;
 
-					cell.setText(_nf2.format(compareItem.compareDistance
-							/ (1000 * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE)));
+					final float value = compareItem.compareDistance / (1000 * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
+
+					colDef.printDetailValue(cell, value);
 					setCellColor(cell, element);
 				}
 			}
@@ -705,7 +722,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	/**
 	 * column: speed computed
 	 */
-	private void defineColumn_SpeedComputed() {
+	private void defineColumn_Motion_SpeedComputed() {
 
 		final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "speedComputed", SWT.TRAIL); //$NON-NLS-1$
 
@@ -714,7 +731,13 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		colDef.setColumnUnit(UI.UNIT_LABEL_SPEED);
 		colDef.setColumnHeaderToolTipText(Messages.Compare_Result_Column_kmh_tooltip);
 		colDef.setColumnLabel(Messages.Compare_Result_Column_kmh_label);
+
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
+		colDef.setValueFormats(//
+				ValueFormatSet.Number,
+				ValueFormat.NUMBER_1_1,
+				_columnManager);
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -722,8 +745,10 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 				if (element instanceof TVICompareResultComparedTour) {
 
 					final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) element;
+					final double value = compareItem.compareSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
-					cell.setText(_nf2.format(compareItem.compareSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
+					colDef.printDetailValue(cell, value);
+
 					setCellColor(cell, element);
 				}
 			}
@@ -733,7 +758,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	/**
 	 * column: speed moved
 	 */
-	private void defineColumn_SpeedMoved() {
+	private void defineColumn_Motion_SpeedMoved() {
 
 		final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "speedMoved", SWT.TRAIL); //$NON-NLS-1$
 
@@ -741,7 +766,13 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		colDef.setColumnUnit(UI.UNIT_LABEL_SPEED);
 		colDef.setColumnHeaderToolTipText(Messages.Compare_Result_Column_kmh_moved_tooltip);
 		colDef.setColumnLabel(Messages.Compare_Result_Column_kmh_moved_label);
+
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
+		colDef.setValueFormats(//
+				ValueFormatSet.Number,
+				ValueFormat.NUMBER_1_1,
+				_columnManager);
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -750,7 +781,10 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 					final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) element;
 
-					cell.setText(_nf2.format(compareItem.movedSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
+					final double value = compareItem.movedSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+
+					colDef.printDetailValue(cell, value);
+
 					setCellColor(cell, element);
 				}
 			}
@@ -760,7 +794,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	/**
 	 * column: speed saved
 	 */
-	private void defineColumn_SpeedSaved() {
+	private void defineColumn_Motion_SpeedSaved() {
 
 		final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "speedSaved", SWT.TRAIL); //$NON-NLS-1$
 
@@ -768,7 +802,13 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 		colDef.setColumnUnit(UI.UNIT_LABEL_SPEED);
 		colDef.setColumnHeaderToolTipText(Messages.Compare_Result_Column_kmh_db_tooltip);
 		colDef.setColumnLabel(Messages.Compare_Result_Column_kmh_db_label);
+
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
+		colDef.setValueFormats(//
+				ValueFormatSet.Number,
+				ValueFormat.NUMBER_1_1,
+				_columnManager);
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -777,7 +817,10 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 					final TVICompareResultComparedTour compareItem = (TVICompareResultComparedTour) element;
 
-					cell.setText(_nf2.format(compareItem.dbSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
+					final double value = compareItem.dbSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+
+					colDef.printDetailValue(cell, value);
+
 					setCellColor(cell, element);
 				}
 			}
@@ -787,9 +830,10 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	/**
 	 * column: tags
 	 */
-	private void defineColumn_Tags() {
+	private void defineColumn_Tour_Tags() {
 
 		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TAGS.createColumn(_columnManager, _pc);
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -815,30 +859,12 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	}
 
 	/**
-	 * column: time interval
-	 */
-	private void defineColumn_TimeInterval() {
-
-		final TreeColumnDefinition colDef = TreeColumnFactory.DATA_TIME_INTERVAL.createColumn(_columnManager, _pc);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final Object element = cell.getElement();
-				if (element instanceof TVICompareResultComparedTour) {
-
-					cell.setText(Integer.toString(((TVICompareResultComparedTour) element).timeIntervall));
-					setCellColor(cell, element);
-				}
-			}
-		});
-	}
-
-	/**
 	 * column: title
 	 */
-	private void defineColumn_Title() {
+	private void defineColumn_Tour_Title() {
 
 		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TITLE.createColumn(_columnManager, _pc);
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -854,9 +880,10 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	/**
 	 * column: tour type
 	 */
-	private void defineColumn_TourType() {
+	private void defineColumn_Tour_Type() {
 
 		final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TYPE.createColumn(_columnManager, _pc);
+
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -1525,7 +1552,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 	@Override
 	public void updateColumnHeader(final ColumnDefinition colDef) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	/**

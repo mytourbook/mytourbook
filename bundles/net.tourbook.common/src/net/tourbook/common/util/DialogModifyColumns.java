@@ -50,6 +50,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableLayout;
+import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
@@ -130,7 +131,7 @@ public class DialogModifyColumns extends TrayDialog {
 	private Button						_chkShowFormatAnnotations;
 	//
 	private CheckboxTableViewer			_columnViewer;
-	private CheckboxTableViewer			_profileViewer;
+	private TableViewer					_profileViewer;
 	private Composite					_uiContainer;
 
 	private TableColumn					_categoryColumn;
@@ -328,10 +329,10 @@ public class DialogModifyColumns extends TrayDialog {
 
 		final Composite dlgContainer = (Composite) super.createDialogArea(parent);
 
-		// set default width
+		// set default size
 		final GridData gd = (GridData) dlgContainer.getLayoutData();
-		gd.widthHint = 600;
-		gd.heightHint = 800;
+		gd.widthHint = 800;
+		gd.heightHint = 900;
 
 		restoreState_BeforeUI();
 
@@ -394,8 +395,7 @@ public class DialogModifyColumns extends TrayDialog {
 		layoutContainer.setLayout(tableLayout);
 
 		final Table table = new Table(layoutContainer, //
-				SWT.CHECK //
-						| SWT.SINGLE
+				SWT.SINGLE
 //						| SWT.H_SCROLL
 //						| SWT.V_SCROLL
 						| SWT.BORDER
@@ -421,13 +421,6 @@ public class DialogModifyColumns extends TrayDialog {
 
 			@Override
 			public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
-		});
-
-		_profileViewer.addCheckStateListener(new ICheckStateListener() {
-			@Override
-			public void checkStateChanged(final CheckStateChangedEvent event) {
-				onProfileViewer_CheckStateChanged(event);
-			}
 		});
 
 		_profileViewer.addSelectionChangedListener(new ISelectionChangedListener() {
@@ -1227,6 +1220,7 @@ public class DialogModifyColumns extends TrayDialog {
 		final ArrayList<ColumnDefinition> allDialogColumns = new ArrayList<ColumnDefinition>();
 
 		for (final ColumnDefinition definedColDef : _allDefinedColumns) {
+
 			try {
 
 				// clone column
@@ -1234,17 +1228,18 @@ public class DialogModifyColumns extends TrayDialog {
 
 				if (isSetDefaultProperties) {
 
-					final ValueFormat valueFormat = definedColDef.getDefaultValueFormat_Category();
+					final ValueFormat valueFormat_Category = definedColDef.getDefaultValueFormat_Category();
 					final ValueFormat valueFormat_Detail = definedColDef.getDefaultValueFormat_Detail();
 
-					final IValueFormatter valueFormatter = _columnManager.getValueFormatter(valueFormat);
+					final IValueFormatter valueFormatter_Category = _columnManager
+							.getValueFormatter(valueFormat_Category);
 					final IValueFormatter valueFormatter_Detail = _columnManager.getValueFormatter(valueFormat_Detail);
 
 					// visible columns in the viewer will be checked
 					colDefClone.setIsColumnDisplayed(definedColDef.isDefaultColumn());
 
 					colDefClone.setColumnWidth(definedColDef.getDefaultColumnWidth());
-					colDefClone.setValueFormatter_Category(valueFormat, valueFormatter);
+					colDefClone.setValueFormatter_Category(valueFormat_Category, valueFormatter_Category);
 					colDefClone.setValueFormatter_Detail(valueFormat_Detail, valueFormatter_Detail);
 
 				} else {
@@ -1418,7 +1413,6 @@ public class DialogModifyColumns extends TrayDialog {
 		// update UI
 		_profileViewer.add(newProfile);
 
-		_profileViewer.setCheckedElements(new ColumnProfile[] { newProfile });
 		_profileViewer.setSelection(new StructuredSelection(newProfile), true);
 
 		// force that horizontal scrollbar is NOT visible
@@ -1470,7 +1464,6 @@ public class DialogModifyColumns extends TrayDialog {
 		_selectedProfile = _dialog_Profiles.get(nextIndex);
 
 		// update UI
-		_profileViewer.setCheckedElements(new ColumnProfile[] { _selectedProfile });
 		_profileViewer.setSelection(new StructuredSelection(_selectedProfile), true);
 
 		enableProfileActions();
@@ -1524,27 +1517,6 @@ public class DialogModifyColumns extends TrayDialog {
 		_profileViewer.getTable().setFocus();
 	}
 
-	private void onProfileViewer_CheckStateChanged(final CheckStateChangedEvent event) {
-
-		final boolean isChecked = event.getChecked();
-		final ColumnProfile checkedProfile = (ColumnProfile) event.getElement();
-
-		if (isChecked) {
-
-			// uncheck others
-
-			_profileViewer.setCheckedElements(new ColumnProfile[] { checkedProfile });
-
-		} else {
-
-			// ensure one is checked
-
-			_profileViewer.setCheckedElements(new ColumnProfile[] { checkedProfile });
-		}
-
-		_profileViewer.setSelection(new StructuredSelection(checkedProfile));
-	}
-
 	private void onProfileViewer_Select(final SelectionChangedEvent event) {
 
 		if (_isInUpdate) {
@@ -1562,9 +1534,6 @@ public class DialogModifyColumns extends TrayDialog {
 		saveState_CurrentProfileColumns();
 
 		_selectedProfile = selectedProfile;
-
-		// check the selected profile
-		_profileViewer.setCheckedElements(new ColumnProfile[] { selectedProfile });
 
 		/*
 		 * Update column viewer from the selected profile
@@ -1614,7 +1583,6 @@ public class DialogModifyColumns extends TrayDialog {
 
 		// select active profile
 		_profileViewer.setSelection(new StructuredSelection(_selectedProfile), true);
-		_profileViewer.setCheckedElements(new ColumnProfile[] { _selectedProfile });
 
 		enableProfileActions();
 	}
@@ -1649,6 +1617,26 @@ public class DialogModifyColumns extends TrayDialog {
 		_columnManager.setVisibleColumnIds_FromModifyDialog(//
 				_selectedProfile,
 				_columnViewer.getTable().getItems());
+
+		/*
+		 * Update column proprerties (value formats) from the model
+		 */
+		for (final ColumnDefinition colDef : _columnViewerModel) {
+
+			final String columnId = colDef.getColumnId();
+
+			for (final ColumnProperties columnProperties : _selectedProfile.columnProperties) {
+
+				if (columnId.equals(columnProperties.columnId)) {
+
+					columnProperties.valueFormat_Category = colDef.getValueFormat_Category();
+					columnProperties.valueFormat_Detail = colDef.getValueFormat_Detail();
+
+					break;
+				}
+			}
+		}
+
 	}
 
 	private void setColor(final ViewerCell cell, final ColumnDefinition colDef) {

@@ -979,6 +979,10 @@ public abstract class TableColumnFactory {
 
 				colDef.setDefaultColumnWidth(pixelWidth);
 				colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
+				colDef.setValueFormats(//
+						ValueFormatSet.Number,
+						ValueFormat.NUMBER_1_3,
+						columnManager);
 
 				return colDef;
 			};
@@ -1240,6 +1244,10 @@ public abstract class TableColumnFactory {
 				colDef.setColumnUnit(Messages.ColumnFactory_avg_cadence);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
+				colDef.setValueFormats(//
+						ValueFormatSet.Number,
+						ValueFormat.NUMBER_1_1,
+						columnManager);
 
 				return colDef;
 			};
@@ -1495,31 +1503,6 @@ public abstract class TableColumnFactory {
 			};
 		};
 
-		TIME_RECORDING_TIME = new TableColumnFactory() {
-
-			@Override
-			public TableColumnDefinition createColumn(	final ColumnManager columnManager,
-														final PixelConverter pixelConverter) {
-
-				final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "TIME_RECORDING_TIME", //$NON-NLS-1$
-						SWT.TRAIL);
-
-				colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
-				colDef.setColumnLabel(Messages.ColumnFactory_recording_time_label);
-				colDef.setColumnHeaderText(Messages.ColumnFactory_recording_time);
-				colDef.setColumnUnit(Messages.ColumnFactory_recording_time);
-				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_recording_time_tooltip);
-
-				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
-				colDef.setValueFormats(//
-						ValueFormatSet.Time,
-						ValueFormat.TIME_HH_MM,
-						columnManager);
-
-				return colDef;
-			};
-		};
-
 		TIME_PAUSED_TIME = new TableColumnFactory() {
 
 			@Override
@@ -1535,6 +1518,31 @@ public abstract class TableColumnFactory {
 				colDef.setColumnHeaderText(Messages.ColumnFactory_paused_time);
 				colDef.setColumnUnit(Messages.ColumnFactory_paused_time);
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_paused_time_tooltip);
+
+				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+				colDef.setValueFormats(//
+						ValueFormatSet.Time,
+						ValueFormat.TIME_HH_MM,
+						columnManager);
+
+				return colDef;
+			};
+		};
+
+		TIME_RECORDING_TIME = new TableColumnFactory() {
+
+			@Override
+			public TableColumnDefinition createColumn(	final ColumnManager columnManager,
+														final PixelConverter pixelConverter) {
+
+				final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "TIME_RECORDING_TIME", //$NON-NLS-1$
+						SWT.TRAIL);
+
+				colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
+				colDef.setColumnLabel(Messages.ColumnFactory_recording_time_label);
+				colDef.setColumnHeaderText(Messages.ColumnFactory_recording_time);
+				colDef.setColumnUnit(Messages.ColumnFactory_recording_time);
+				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_recording_time_tooltip);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 				colDef.setValueFormats(//
@@ -1566,6 +1574,10 @@ public abstract class TableColumnFactory {
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_recording_timeTotal_tooltip);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+				colDef.setValueFormats(//
+						ValueFormatSet.Time,
+						ValueFormat.TIME_HH_MM,
+						columnManager);
 
 				return colDef;
 			};

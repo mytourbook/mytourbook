@@ -2966,13 +2966,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			public void update(final ViewerCell cell) {
 
 				final TourSegment segment = (TourSegment) cell.getElement();
-				final float distance = (segment.distance_Total) / (1000 * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
+				final float value = (segment.distance_Total) / (1000 * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
 
-				if (distance == 0) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					cell.setText(_nf_3_3.format(distance));
-				}
+				colDef.printDetailValue(cell, value);
 			}
 		});
 	}
@@ -3001,13 +2997,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			public void update(final ViewerCell cell) {
 
 				final TourSegment segment = (TourSegment) cell.getElement();
-				final float cadence = segment.cadence;
+				final float value = segment.cadence;
 
-				if (cadence == 0) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					cell.setText(_nf_1_1.format(cadence));
-				}
+				colDef.printDetailValue(cell, value);
 
 				if (segment.isTotal) {
 					setTotalStyle(cell);
@@ -3033,13 +3025,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			public void update(final ViewerCell cell) {
 
 				final TourSegment segment = (TourSegment) cell.getElement();
-				final int drivingTime = segment.time_Driving;
+				final int value = segment.time_Driving;
 
-				if (drivingTime == 0) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					cell.setText(net.tourbook.common.UI.format_hh_mm_ss(drivingTime));
-				}
+				colDef.printDetailValue(cell, value);
 
 				if (segment.isTotal) {
 					setTotalStyle(cell);
@@ -3065,13 +3053,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			public void update(final ViewerCell cell) {
 
 				final TourSegment segment = (TourSegment) cell.getElement();
-				final int breakTime = segment.time_Break;
+				final int value = segment.time_Break;
 
-				if (breakTime == 0) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					cell.setText(net.tourbook.common.UI.format_hh_mm_ss(breakTime));
-				}
+				colDef.printDetailValue(cell, value);
 
 				if (segment.isTotal) {
 					setTotalStyle(cell);
@@ -3097,14 +3081,14 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 			public void update(final ViewerCell cell) {
 
 				final TourSegment segment = (TourSegment) cell.getElement();
+				final int value = segment.time_Recording;
 
-				cell.setText(net.tourbook.common.UI.format_hh_mm_ss(segment.time_Recording));
+				colDef.printDetailValue(cell, value);
 
 				if (segment.isTotal) {
 					setTotalStyle(cell);
 				}
 			}
-
 		});
 	}
 
@@ -3129,7 +3113,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				if (segment.isTotal) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(net.tourbook.common.UI.format_hh_mm_ss(segment.time_Total));
+					final int value = segment.time_Total;
+					colDef.printDetailValue(cell, value);
 				}
 			}
 		});
