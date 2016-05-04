@@ -65,10 +65,10 @@ public class ColumnProperties {
 
 	@Override
 	public String toString() {
-		return "ColumnProperties [" //
-				+ ("columnId=" + columnId + ", ")
-				+ ("valueFormat_Category=" + valueFormat_Category + ", ")
-				+ ("valueFormat_Detail=" + valueFormat_Detail + ", ")
-				+ "]";
+		return "ColumnProperties [" // //$NON-NLS-1$
+				+ ("columnId=" + columnId + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("valueFormat_Category=" + valueFormat_Category + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("valueFormat_Detail=" + valueFormat_Detail + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ "]"; //$NON-NLS-1$
 	}
 }

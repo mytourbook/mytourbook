@@ -25,6 +25,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
+import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.PersonManager;
@@ -40,7 +41,6 @@ import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.TourTypeFilterManager;
 import net.tourbook.tour.TourTypeMenuManager;
 import net.tourbook.tour.photo.TourPhotoManager;
-import net.tourbook.ui.FormatManager;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.views.rawData.RawDataView;
 import net.tourbook.web.WebContentServer;

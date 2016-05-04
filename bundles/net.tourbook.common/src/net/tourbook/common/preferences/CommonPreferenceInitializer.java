@@ -18,6 +18,7 @@ package net.tourbook.common.preferences;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.color.ColorDefinition;
 import net.tourbook.common.color.GraphColorManager;
+import net.tourbook.common.formatter.FormatManager;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -31,7 +32,7 @@ public class CommonPreferenceInitializer extends AbstractPreferenceInitializer {
 	@Override
 	public void initializeDefaultPreferences() {
 
-		final IPreferenceStore commonPrefStore = CommonActivator.getPrefStore();
+		final IPreferenceStore store = CommonActivator.getPrefStore();
 
 		/*
 		 * graph color preferences
@@ -39,19 +40,35 @@ public class CommonPreferenceInitializer extends AbstractPreferenceInitializer {
 		for (final ColorDefinition colorDefinition : GraphColorManager.getInstance().getGraphColorDefinitions()) {
 
 			PreferenceConverter.setDefault(
-					commonPrefStore,
+					store,
 					colorDefinition.getGraphPrefName(GraphColorManager.PREF_COLOR_BRIGHT),
 					colorDefinition.getGradientBright_Default());
 
 			PreferenceConverter.setDefault(
-					commonPrefStore,
+					store,
 					colorDefinition.getGraphPrefName(GraphColorManager.PREF_COLOR_DARK),
 					colorDefinition.getGradientDark_Default());
 
 			PreferenceConverter.setDefault(
-					commonPrefStore,
+					store,
 					colorDefinition.getGraphPrefName(GraphColorManager.PREF_COLOR_LINE),
 					colorDefinition.getLineColor_Default());
 		}
+
+		/*
+		 * Display formats
+		 */
+		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_IS_LIVE_UPDATE, true);
+
+		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_AVG_CADENCE, FormatManager.DISPLAY_FORMAT_1);
+		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_AVG_POWER, FormatManager.DISPLAY_FORMAT_1);
+		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_AVG_PULSE, FormatManager.DISPLAY_FORMAT_1);
+
+		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_CALORIES, FormatManager.DISPLAY_FORMAT_KCAL);
+
+		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_DRIVING_TIME, FormatManager.DISPLAY_FORMAT_HH_MM);
+		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_PAUSED_TIME, FormatManager.DISPLAY_FORMAT_HH_MM);
+		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_RECORDING_TIME, FormatManager.DISPLAY_FORMAT_HH_MM);
+
 	}
 }

@@ -184,9 +184,9 @@ public abstract class TreeColumnFactory {
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
 				colDef.setValueFormats(
-						ValueFormatSet.Calories,
-						ValueFormat.CALORIES_KCAL_1_0,
-						ValueFormat.CALORIES_KCAL_1_3,
+						ValueFormatSet.Number,
+						ValueFormat.NUMBER_1_0,
+						ValueFormat.NUMBER_1_3,
 						columnManager);
 
 				return colDef;

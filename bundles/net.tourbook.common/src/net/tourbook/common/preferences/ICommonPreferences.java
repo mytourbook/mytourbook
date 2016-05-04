@@ -20,7 +20,17 @@ public interface ICommonPreferences {
 	/*
 	 * colors
 	 */
-	public static final String	GRAPH_COLORS				= "graph.colors.";				//$NON-NLS-1$
+	public static final String	GRAPH_COLORS					= "graph.colors.";					//$NON-NLS-1$
 
+	public static final String	DISPLAY_FORMAT_AVG_CADENCE		= "DISPLAY_FORMAT_AVG_CADENCE";	//$NON-NLS-1$
+	public static final String	DISPLAY_FORMAT_AVG_POWER		= "DISPLAY_FORMAT_AVG_POWER";		//$NON-NLS-1$
+	public static final String	DISPLAY_FORMAT_AVG_PULSE		= "DISPLAY_FORMAT_AVG_PULSE";		//$NON-NLS-1$
+	public static final String	DISPLAY_FORMAT_CALORIES			= "DISPLAY_FORMAT_CALORIES";		//$NON-NLS-1$
+
+	public static final String	DISPLAY_FORMAT_DRIVING_TIME		= "DISPLAY_FORMAT_DRIVING_TIME";	//$NON-NLS-1$
+	public static final String	DISPLAY_FORMAT_PAUSED_TIME		= "DISPLAY_FORMAT_PAUSED_TIME";	//$NON-NLS-1$
+	public static final String	DISPLAY_FORMAT_RECORDING_TIME	= "DISPLAY_FORMAT_RECORDING_TIME";	//$NON-NLS-1$
+
+	public static final String	DISPLAY_FORMAT_IS_LIVE_UPDATE	= "DISPLAY_FORMAT_IS_LIVE_UPDATE";	//$NON-NLS-1$
 
 }

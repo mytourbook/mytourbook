@@ -523,8 +523,8 @@ public abstract class TableColumnFactory {
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
 				colDef.setValueFormats(//
-						ValueFormatSet.Calories,
-						ValueFormat.CALORIES_KCAL_1_3,
+						ValueFormatSet.Number,
+						ValueFormat.NUMBER_1_3,
 						columnManager);
 
 				return colDef;

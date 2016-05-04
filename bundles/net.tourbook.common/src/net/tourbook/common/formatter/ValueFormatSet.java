@@ -17,24 +17,17 @@ package net.tourbook.common.formatter;
 
 public class ValueFormatSet {
 
-	public static ValueFormat[]	Calories	= new ValueFormat[] {
-											//
-			ValueFormat.CALORIES_KCAL_1_0,
-			ValueFormat.CALORIES_KCAL_1_1,
-			ValueFormat.CALORIES_KCAL_1_2,
-			ValueFormat.CALORIES_KCAL_1_3,	};
-
-	public static ValueFormat[]	Time		= new ValueFormat[] {
-											//
-			ValueFormat.TIME_HH,
-			ValueFormat.TIME_HH_MM,
-			ValueFormat.TIME_HH_MM_SS		};
-
-	public static ValueFormat[]	Number		= new ValueFormat[] {
-											//
+	public static ValueFormat[]	Number	= new ValueFormat[] {
+										//
 			ValueFormat.NUMBER_1_0,
 			ValueFormat.NUMBER_1_1,
 			ValueFormat.NUMBER_1_2,
-			ValueFormat.NUMBER_1_3			};
+			ValueFormat.NUMBER_1_3		};
+
+	public static ValueFormat[]	Time	= new ValueFormat[] {
+										//
+			ValueFormat.TIME_HH,
+			ValueFormat.TIME_HH_MM,
+			ValueFormat.TIME_HH_MM_SS	};
 
 }

@@ -29,10 +29,6 @@ import net.tourbook.common.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.formatter.IValueFormatter;
 import net.tourbook.common.formatter.ValueFormat;
-import net.tourbook.common.formatter.ValueFormatter_Calories_Kcal_1_0;
-import net.tourbook.common.formatter.ValueFormatter_Calories_Kcal_1_1;
-import net.tourbook.common.formatter.ValueFormatter_Calories_Kcal_1_2;
-import net.tourbook.common.formatter.ValueFormatter_Calories_Kcal_1_3;
 import net.tourbook.common.formatter.ValueFormatter_Default;
 import net.tourbook.common.formatter.ValueFormatter_Number_1_0;
 import net.tourbook.common.formatter.ValueFormatter_Number_1_1;
@@ -85,28 +81,28 @@ import org.eclipse.ui.XMLMemento;
  */
 public class ColumnManager {
 
-	private static final String					XML_STATE_COLUMN_MANAGER			= "XML_STATE_COLUMN_MANAGER";				//$NON-NLS-1$
+	private static final String					XML_STATE_COLUMN_MANAGER			= "XML_STATE_COLUMN_MANAGER";			//$NON-NLS-1$
 
 	//
-	private static final String					TAG_ROOT							= "ColumnProfiles";						//$NON-NLS-1$
+	private static final String					TAG_ROOT							= "ColumnProfiles";					//$NON-NLS-1$
 	//
-	private static final String					TAG_COLUMN							= "Column";								//$NON-NLS-1$
-	private static final String					TAG_PROFILE							= "Profile";								//$NON-NLS-1$
+	private static final String					TAG_COLUMN							= "Column";							//$NON-NLS-1$
+	private static final String					TAG_PROFILE							= "Profile";							//$NON-NLS-1$
 	//
-	private static final String					ATTR_IS_ACTIVE_PROFILE				= "isActiveProfile";						//$NON-NLS-1$
-	private static final String					ATTR_IS_SHOW_CATEGORY				= "isShowCategory";						//$NON-NLS-1$
-	private static final String					ATTR_IS_SHOW_COLUMN_ANNOTATIONS		= "isShowColumnAnnotations";				//$NON-NLS-1$
+	private static final String					ATTR_IS_ACTIVE_PROFILE				= "isActiveProfile";					//$NON-NLS-1$
+	private static final String					ATTR_IS_SHOW_CATEGORY				= "isShowCategory";					//$NON-NLS-1$
+	private static final String					ATTR_IS_SHOW_COLUMN_ANNOTATIONS		= "isShowColumnAnnotations";			//$NON-NLS-1$
 	//
-	private static final String					ATTR_COLUMN_ID						= "columnId";								//$NON-NLS-1$
-	private static final String					ATTR_COLUMN_FORMAT_CATEGORY			= "categoryFormat";						//$NON-NLS-1$
-	private static final String					ATTR_COLUMN_FORMAT_DETAIL			= "detailFormat";							//$NON-NLS-1$
-	private static final String					ATTR_NAME							= "name";									//$NON-NLS-1$
+	private static final String					ATTR_COLUMN_ID						= "columnId";							//$NON-NLS-1$
+	private static final String					ATTR_COLUMN_FORMAT_CATEGORY			= "categoryFormat";					//$NON-NLS-1$
+	private static final String					ATTR_COLUMN_FORMAT_DETAIL			= "detailFormat";						//$NON-NLS-1$
+	private static final String					ATTR_NAME							= "name";								//$NON-NLS-1$
 
-	private static final String					ATTR_VISIBLE_COLUMN_IDS				= "visibleColumnIds";						//$NON-NLS-1$
-	private static final String					ATTR_VISIBLE_COLUMN_IDS_AND_WIDTH	= "visibleColumnIdsAndWidth";				//$NON-NLS-1$
+	private static final String					ATTR_VISIBLE_COLUMN_IDS				= "visibleColumnIds";					//$NON-NLS-1$
+	private static final String					ATTR_VISIBLE_COLUMN_IDS_AND_WIDTH	= "visibleColumnIdsAndWidth";			//$NON-NLS-1$
 	//
-	static final String							COLUMN_CATEGORY_SEPARATOR			= "   \u00bb   ";							//$NON-NLS-1$
-	static final String							COLUMN_TEXT_SEPARATOR				= "   \u00B7   ";							//$NON-NLS-1$
+	static final String							COLUMN_CATEGORY_SEPARATOR			= "   \u00bb   ";						//$NON-NLS-1$
+	static final String							COLUMN_TEXT_SEPARATOR				= "   \u00B7   ";						//$NON-NLS-1$
 
 	/**
 	 * Minimum column width, when the column width is 0, there was a bug that this happened.
@@ -168,10 +164,6 @@ public class ColumnManager {
 	 */
 	private static IValueFormatter				_defaultDefaultValueFormatter		= new ValueFormatter_Default();
 
-	private IValueFormatter						_valueFormatter_Calories_Kcal_1_0	= new ValueFormatter_Calories_Kcal_1_0();
-	private IValueFormatter						_valueFormatter_Calories_Kcal_1_1	= new ValueFormatter_Calories_Kcal_1_1();
-	private IValueFormatter						_valueFormatter_Calories_Kcal_1_2	= new ValueFormatter_Calories_Kcal_1_2();
-	private IValueFormatter						_valueFormatter_Calories_Kcal_1_3	= new ValueFormatter_Calories_Kcal_1_3();
 	private IValueFormatter						_valueFormatter_Number_1_0			= new ValueFormatter_Number_1_0();
 	private IValueFormatter						_valueFormatter_Number_1_1			= new ValueFormatter_Number_1_1();
 	private IValueFormatter						_valueFormatter_Number_1_2			= new ValueFormatter_Number_1_2();
@@ -229,18 +221,6 @@ public class ColumnManager {
 	public static String getValueFormatterName(final ValueFormat valueFormat) {
 
 		switch (valueFormat) {
-
-		case CALORIES_KCAL_1_0:
-			return Messages.Value_Formatter_Calories_Kcal_1_0;
-
-		case CALORIES_KCAL_1_1:
-			return Messages.Value_Formatter_Calories_Kcal_1_1;
-
-		case CALORIES_KCAL_1_2:
-			return Messages.Value_Formatter_Calories_Kcal_1_2;
-
-		case CALORIES_KCAL_1_3:
-			return Messages.Value_Formatter_Calories_Kcal_1_3;
 
 		case NUMBER_1_0:
 			return Messages.Value_Formatter_Number_1_0;
@@ -777,21 +757,11 @@ public class ColumnManager {
 		}
 
 		{
-//			/*
-//			 * Menu title
-//			 */
-//
-//			// create menu item text
-//			final String headerText = colDef.getColumnHeaderText(this);
-//			final String headerLabel = colDef.getColumnLabel();
-//			String menuItemText = headerText == null //
-//
-//					? NLS.bind(Messages.Action_ColumnManager_ColumnActions_Info, headerLabel)
-//					: headerText.equals(headerLabel) //
-//
-//							? NLS.bind(Messages.Action_ColumnManager_ColumnActions_Info, headerText)
-//							: NLS.bind(Messages.Action_ColumnManager_ColumnActions_Info_2, headerText, headerLabel);
+			/*
+			 * Menu title
+			 */
 
+			// create menu item text
 			final String menuItemText = NLS.bind(
 					Messages.Action_ColumnManager_ColumnActions_Info,
 					createColumnLabel(colDef, false));
@@ -1445,18 +1415,6 @@ public class ColumnManager {
 		}
 
 		switch (valueFormat) {
-
-		case CALORIES_KCAL_1_0:
-			return _valueFormatter_Calories_Kcal_1_0;
-
-		case CALORIES_KCAL_1_1:
-			return _valueFormatter_Calories_Kcal_1_1;
-
-		case CALORIES_KCAL_1_2:
-			return _valueFormatter_Calories_Kcal_1_2;
-
-		case CALORIES_KCAL_1_3:
-			return _valueFormatter_Calories_Kcal_1_3;
 
 		case TIME_HH:
 			return _valueFormatter_Time_HH;

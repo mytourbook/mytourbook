@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Set;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.util.IToolTipProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
@@ -27,7 +28,6 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.ui.FormatManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.Messages;
 import net.tourbook.ui.action.ActionTourToolTipEditQuick;
@@ -474,7 +474,7 @@ public class TourInfoUI {
 			_lblCalories = createUI_LabelValue(container, SWT.TRAIL);
 			_secondColumnControls.add(_lblCalories);
 
-			createUI_Label(container, FormatManager.getCaloriesUnit());
+			createUI_Label(container, Messages.Value_Unit_KCalories);
 		}
 
 		{

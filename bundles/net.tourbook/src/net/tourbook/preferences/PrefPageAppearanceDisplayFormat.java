@@ -17,7 +17,8 @@ package net.tourbook.preferences;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.ui.FormatManager;
+import net.tourbook.common.formatter.FormatManager;
+import net.tourbook.common.preferences.ICommonPreferences;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -317,17 +318,17 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
 	protected void performDefaults() {
 
 		final boolean isDefaultLiveUpdate = _prefStore.getDefaultBoolean(//
-				ITourbookPreferences.DISPLAY_FORMAT_IS_LIVE_UPDATE);
+				ICommonPreferences.DISPLAY_FORMAT_IS_LIVE_UPDATE);
 
-		final String defaultCadence = _prefStore.getDefaultString(ITourbookPreferences.DISPLAY_FORMAT_AVG_CADENCE);
-		final String defaultCalories = _prefStore.getDefaultString(ITourbookPreferences.DISPLAY_FORMAT_CALORIES);
-		final String defaultPower = _prefStore.getDefaultString(ITourbookPreferences.DISPLAY_FORMAT_AVG_POWER);
-		final String defaultPulse = _prefStore.getDefaultString(ITourbookPreferences.DISPLAY_FORMAT_AVG_PULSE);
+		final String defaultCadence = _prefStore.getDefaultString(ICommonPreferences.DISPLAY_FORMAT_AVG_CADENCE);
+		final String defaultCalories = _prefStore.getDefaultString(ICommonPreferences.DISPLAY_FORMAT_CALORIES);
+		final String defaultPower = _prefStore.getDefaultString(ICommonPreferences.DISPLAY_FORMAT_AVG_POWER);
+		final String defaultPulse = _prefStore.getDefaultString(ICommonPreferences.DISPLAY_FORMAT_AVG_PULSE);
 
-		final String defaultDrivingTime = _prefStore.getDefaultString(ITourbookPreferences.DISPLAY_FORMAT_DRIVING_TIME);
-		final String defaultPausedTime = _prefStore.getDefaultString(ITourbookPreferences.DISPLAY_FORMAT_PAUSED_TIME);
+		final String defaultDrivingTime = _prefStore.getDefaultString(ICommonPreferences.DISPLAY_FORMAT_DRIVING_TIME);
+		final String defaultPausedTime = _prefStore.getDefaultString(ICommonPreferences.DISPLAY_FORMAT_PAUSED_TIME);
 		final String defaultRecordingTime = _prefStore.getDefaultString(//
-				ITourbookPreferences.DISPLAY_FORMAT_RECORDING_TIME);
+				ICommonPreferences.DISPLAY_FORMAT_RECORDING_TIME);
 
 		final boolean isCadence_1 = FormatManager.DISPLAY_FORMAT_1.equals(defaultCadence);
 		final boolean isCadence_1_1 = FormatManager.DISPLAY_FORMAT_1_1.equals(defaultCadence);
@@ -378,16 +379,16 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
 
 	private void restoreState() {
 
-		final boolean isLiveUpdate = _prefStore.getBoolean(ITourbookPreferences.DISPLAY_FORMAT_IS_LIVE_UPDATE);
+		final boolean isLiveUpdate = _prefStore.getBoolean(ICommonPreferences.DISPLAY_FORMAT_IS_LIVE_UPDATE);
 
-		final String cadence = _prefStore.getString(ITourbookPreferences.DISPLAY_FORMAT_AVG_CADENCE);
-		final String calories = _prefStore.getString(ITourbookPreferences.DISPLAY_FORMAT_CALORIES);
-		final String power = _prefStore.getString(ITourbookPreferences.DISPLAY_FORMAT_AVG_POWER);
-		final String pulse = _prefStore.getString(ITourbookPreferences.DISPLAY_FORMAT_AVG_PULSE);
+		final String cadence = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_AVG_CADENCE);
+		final String calories = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_CALORIES);
+		final String power = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_AVG_POWER);
+		final String pulse = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_AVG_PULSE);
 
-		final String drivingTime = _prefStore.getString(ITourbookPreferences.DISPLAY_FORMAT_DRIVING_TIME);
-		final String pausedTime = _prefStore.getString(ITourbookPreferences.DISPLAY_FORMAT_PAUSED_TIME);
-		final String recordingTime = _prefStore.getString(ITourbookPreferences.DISPLAY_FORMAT_RECORDING_TIME);
+		final String drivingTime = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_DRIVING_TIME);
+		final String pausedTime = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_PAUSED_TIME);
+		final String recordingTime = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_RECORDING_TIME);
 
 		final boolean isCadence_1 = FormatManager.DISPLAY_FORMAT_1.equals(cadence);
 		final boolean isCadence_1_1 = FormatManager.DISPLAY_FORMAT_1_1.equals(cadence);
@@ -427,45 +428,45 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
 
 	private void saveState() {
 
-		_prefStore.setValue(ITourbookPreferences.DISPLAY_FORMAT_AVG_POWER,//
+		_prefStore.setValue(ICommonPreferences.DISPLAY_FORMAT_AVG_POWER,//
 				_rdoAvg_Power_1.getSelection() //
 						? FormatManager.DISPLAY_FORMAT_1
 						: FormatManager.DISPLAY_FORMAT_1_1);
 
-		_prefStore.setValue(ITourbookPreferences.DISPLAY_FORMAT_AVG_PULSE,//
+		_prefStore.setValue(ICommonPreferences.DISPLAY_FORMAT_AVG_PULSE,//
 				_rdoAvg_Pulse_1.getSelection() //
 						? FormatManager.DISPLAY_FORMAT_1
 						: FormatManager.DISPLAY_FORMAT_1_1);
 
-		_prefStore.setValue(ITourbookPreferences.DISPLAY_FORMAT_AVG_CADENCE,//
+		_prefStore.setValue(ICommonPreferences.DISPLAY_FORMAT_AVG_CADENCE,//
 				_rdoAvg_Cadence_1.getSelection() //
 						? FormatManager.DISPLAY_FORMAT_1
 						: _rdoAvg_Cadence_1_1.getSelection() //
 								? FormatManager.DISPLAY_FORMAT_1_1
 								: FormatManager.DISPLAY_FORMAT_1_2);
 
-		_prefStore.setValue(ITourbookPreferences.DISPLAY_FORMAT_CALORIES,//
+		_prefStore.setValue(ICommonPreferences.DISPLAY_FORMAT_CALORIES,//
 				_rdoValue_Calories_Kcal.getSelection() //
 						? FormatManager.DISPLAY_FORMAT_KCAL
 						: FormatManager.DISPLAY_FORMAT_CAL);
 
-		_prefStore.setValue(ITourbookPreferences.DISPLAY_FORMAT_DRIVING_TIME,//
+		_prefStore.setValue(ICommonPreferences.DISPLAY_FORMAT_DRIVING_TIME,//
 				_rdoTime_Driving_hh_mm.getSelection() //
 						? FormatManager.DISPLAY_FORMAT_HH_MM
 						: FormatManager.DISPLAY_FORMAT_HH_MM_SS);
 
-		_prefStore.setValue(ITourbookPreferences.DISPLAY_FORMAT_PAUSED_TIME,//
+		_prefStore.setValue(ICommonPreferences.DISPLAY_FORMAT_PAUSED_TIME,//
 				_rdoTime_Paused_hh_mm.getSelection() //
 						? FormatManager.DISPLAY_FORMAT_HH_MM
 						: FormatManager.DISPLAY_FORMAT_HH_MM_SS);
 
-		_prefStore.setValue(ITourbookPreferences.DISPLAY_FORMAT_RECORDING_TIME,//
+		_prefStore.setValue(ICommonPreferences.DISPLAY_FORMAT_RECORDING_TIME,//
 				_rdoTime_Recording_hh_mm.getSelection() //
 						? FormatManager.DISPLAY_FORMAT_HH_MM
 						: FormatManager.DISPLAY_FORMAT_HH_MM_SS);
 
 		// live update
-		_prefStore.setValue(ITourbookPreferences.DISPLAY_FORMAT_IS_LIVE_UPDATE,//
+		_prefStore.setValue(ICommonPreferences.DISPLAY_FORMAT_IS_LIVE_UPDATE,//
 				_chkLiveUpdate.getSelection());
 
 		/*

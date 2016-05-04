@@ -13,12 +13,12 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui;
+package net.tourbook.common.formatter;
 
 import java.text.NumberFormat;
 
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.preferences.ICommonPreferences;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 
@@ -27,15 +27,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
  */
 public class FormatManager {
 
-	public static final String				DISPLAY_FORMAT_1		= "1";								//$NON-NLS-1$
-	public static final String				DISPLAY_FORMAT_1_1		= "1.1";							//$NON-NLS-1$
-	public static final String				DISPLAY_FORMAT_1_2		= "1.2";							//$NON-NLS-1$
-	public static final String				DISPLAY_FORMAT_CAL		= "cal";							//$NON-NLS-1$
-	public static final String				DISPLAY_FORMAT_KCAL		= "kcal";							//$NON-NLS-1$
-	public static final String				DISPLAY_FORMAT_HH_MM	= "hh_mm";							//$NON-NLS-1$
-	public static final String				DISPLAY_FORMAT_HH_MM_SS	= "hh_mm_ss";						//$NON-NLS-1$
-
-	private final static IPreferenceStore	_prefStore				= TourbookPlugin.getPrefStore();
+	private final static IPreferenceStore	_prefStore	= CommonActivator.getPrefStore();
 
 	/** When <code>true</code> then avg cadence format is #.#, default is # */
 	private static boolean					_isAvgCadence_1_1;
@@ -49,9 +41,6 @@ public class FormatManager {
 	/** When <code>true</code> then avg pulse format is #.#, default is # */
 	private static boolean					_isAvgPulse_1_1;
 
-	/** When <code>true</code> then calories is <i>cal</i>, default is <i>kcal</i>. */
-	private static boolean					_isCalories_cal;
-
 	/** When <code>true</code> then driving time format is <i>hh:mm:ss</i>, default is <i>hh:mm</i>. */
 	private static boolean					_isDrivingTime_hhmmss;
 
@@ -64,10 +53,10 @@ public class FormatManager {
 	 */
 	private static boolean					_isRecordingTime_hhmmss;
 
-	private final static NumberFormat		_nf0					= NumberFormat.getNumberInstance();
-	private final static NumberFormat		_nf1					= NumberFormat.getNumberInstance();
-	private final static NumberFormat		_nf2					= NumberFormat.getNumberInstance();
-	private final static NumberFormat		_nf3					= NumberFormat.getNumberInstance();
+	private final static NumberFormat		_nf0		= NumberFormat.getNumberInstance();
+	private final static NumberFormat		_nf1		= NumberFormat.getNumberInstance();
+	private final static NumberFormat		_nf2		= NumberFormat.getNumberInstance();
+	private final static NumberFormat		_nf3		= NumberFormat.getNumberInstance();
 
 	static {
 
@@ -121,12 +110,6 @@ public class FormatManager {
 				: _nf1.format((double) calories / 1000);
 	}
 
-	public static String getCaloriesUnit() {
-
-		return _isCalories_cal ? Messages.Value_Unit_Calories : Messages.Value_Unit_KCalories;
-
-	}
-
 	public static String getDrivingTime(final long time) {
 
 		if (_isDrivingTime_hhmmss) {
@@ -159,38 +142,38 @@ public class FormatManager {
 		/*
 		 * Cadence
 		 */
-		final String cadence = _prefStore.getString(ITourbookPreferences.DISPLAY_FORMAT_AVG_CADENCE);
+		final String cadence = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_AVG_CADENCE);
 		_isAvgCadence_1_1 = DISPLAY_FORMAT_1_1.equals(cadence);
 		_isAvgCadence_1_2 = DISPLAY_FORMAT_1_2.equals(cadence);
 
 		/*
 		 * Power
 		 */
-		final String power = _prefStore.getString(ITourbookPreferences.DISPLAY_FORMAT_AVG_POWER);
+		final String power = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_AVG_POWER);
 		_isAvgPower_1_1 = DISPLAY_FORMAT_1_1.equals(power);
 
 		/*
 		 * Pulse
 		 */
-		final String pulse = _prefStore.getString(ITourbookPreferences.DISPLAY_FORMAT_AVG_PULSE);
+		final String pulse = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_AVG_PULSE);
 		_isAvgPulse_1_1 = DISPLAY_FORMAT_1_1.equals(pulse);
 
 		/*
 		 * Calories
 		 */
 		_isCalories_cal = DISPLAY_FORMAT_CAL.equals(//
-				_prefStore.getString(ITourbookPreferences.DISPLAY_FORMAT_CALORIES));
+				_prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_CALORIES));
 
 		/*
 		 * Time formats
 		 */
 		_isDrivingTime_hhmmss = DISPLAY_FORMAT_HH_MM_SS.equals(//
-				_prefStore.getString(ITourbookPreferences.DISPLAY_FORMAT_DRIVING_TIME));
+				_prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_DRIVING_TIME));
 
 		_isPausedTime_hhmmss = DISPLAY_FORMAT_HH_MM_SS.equals(//
-				_prefStore.getString(ITourbookPreferences.DISPLAY_FORMAT_PAUSED_TIME));
+				_prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_PAUSED_TIME));
 
 		_isRecordingTime_hhmmss = DISPLAY_FORMAT_HH_MM_SS.equals(//
-				_prefStore.getString(ITourbookPreferences.DISPLAY_FORMAT_RECORDING_TIME));
+				_prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_RECORDING_TIME));
 	}
 }

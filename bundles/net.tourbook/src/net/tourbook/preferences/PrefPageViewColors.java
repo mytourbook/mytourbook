@@ -99,22 +99,6 @@ public class PrefPageViewColors extends FieldEditorPreferencePage implements IWo
 			GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(containerSegmenter);
 			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerSegmenter);
 			{
-//
-//
-// This was a last minute changes, language texts are not yet removed
-//
-//				// color: up
-//				addField(new ColorFieldEditor(
-//						ITourbookPreferences.VIEW_LAYOUT_COLOR_BG_SEGMENTER_UP,
-//						Messages.pref_view_layout_label_segmenter_up,
-//						containerSegmenter));
-//
-//				// color: down
-//				addField(new ColorFieldEditor(
-//						ITourbookPreferences.VIEW_LAYOUT_COLOR_BG_SEGMENTER_DOWN,
-//						Messages.pref_view_layout_label_segmenter_down,
-//						containerSegmenter));
-
 				// show lines
 				final BooleanFieldEditor2 editorLines = new BooleanFieldEditor2(
 						ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES,
