@@ -21,9 +21,6 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.ui.messages";					//$NON-NLS-1$
 
-	public static String		App_Annotation_1;
-	public static String		App_Annotation_2;
-
 	public static String		ColumnFactory_altitude_computed_difference_tooltip;
 	public static String		ColumnFactory_altitude_difference_label;
 	public static String		ColumnFactory_altitude_difference_tooltip;
@@ -65,7 +62,6 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_cadence;
 	public static String		ColumnFactory_cadence_label;
 	public static String		ColumnFactory_cadence_tooltip;
-	public static String		ColumnFactory_calories;
 	public static String		ColumnFactory_calories_label;
 	public static String		ColumnFactory_calories_tooltip;
 	public static String		ColumnFactory_date;
@@ -174,6 +170,7 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_wind_dir_label;
 	public static String		ColumnFactory_wind_dir;
 	public static String		ColumnFactory_wind_dir_tooltip;
+
 	public static String		ColumnFactory_clouds_label;
 	public static String		ColumnFactory_clouds;
 	public static String		ColumnFactory_clouds_tooltip;
@@ -198,6 +195,7 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_Category_Training;
 	public static String		ColumnFactory_Category_Waypoint;
 	public static String		ColumnFactory_Category_Weather;
+
 	public static String		ColumnFactory_CollateEvent_Label;
 	public static String		ColumnFactory_CollateEvent_Tooltip;
 	public static String		ColumnFactory_Diff_Header;

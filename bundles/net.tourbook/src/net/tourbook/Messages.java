@@ -669,7 +669,6 @@ public class Messages extends NLS {
 	public static String		External_Link_MyTourbook_TourChartSmoothing;
 
 	public static String		Format_hhmm;
-	public static String		Format_hhmmss;
 	public static String		Format_rawdata_file_yyyy_mm_dd;
 	public static String		Format_yyyymmdd_hhmmss;
 
@@ -1174,7 +1173,6 @@ public class Messages extends NLS {
 	public static String		Pref_Graphs_Checkbox_ShowHorizontalGrid;
 	public static String		Pref_Graphs_Checkbox_ShowVerticalGrid;
 	public static String		Pref_Graphs_Dialog_GridLine_Warning_Message;
-	public static String		Pref_Graphs_Dialog_GridLine_Warning_Title;
 	public static String		Pref_Graphs_Error_one_graph_must_be_selected;
 	public static String		Pref_Graphs_force_minimum_value;
 	public static String		Pref_Graphs_grid_distance;
@@ -1300,18 +1298,12 @@ public class Messages extends NLS {
 
 	public static String		pref_view_layout_display_lines;
 	public static String		pref_view_layout_display_lines_Tooltip;
-	public static String		pref_view_layout_group_display_format;
 	public static String		pref_view_layout_label_category;
 	public static String		pref_view_layout_label_color_group;
 	public static String		pref_view_layout_label_driving_time_format;
 	public static String		pref_view_layout_label_format_hh_mm;
 	public static String		pref_view_layout_label_format_hh_mm_ss;
 	public static String		pref_view_layout_label_recording_time_format;
-
-	// will be removed after 16.4
-	public static String		pref_view_layout_label_segmenter_down;
-	public static String		pref_view_layout_label_segmenter_up;
-
 	public static String		pref_view_layout_label_sub;
 	public static String		pref_view_layout_label_sub_sub;
 	public static String		pref_view_layout_label_title;
@@ -1543,7 +1535,6 @@ public class Messages extends NLS {
 
 	public static String		Tour_Action_auto_move_sliders_when_zoomed;
 	public static String		Tour_Action_auto_zoom_to_slider_position;
-	public static String		Tour_Action_chart_options_tooltip;
 	public static String		Tour_Action_EditChartPreferences;
 	public static String		Tour_Action_graph_altimeter_tooltip;
 	public static String		Tour_Action_graph_altitude_tooltip;

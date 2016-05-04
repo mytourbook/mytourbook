@@ -25,9 +25,7 @@ public class Messages extends NLS {
 	public static String		App_Action_Remove_NoConfirm;
 	public static String		App_Action_Rename_WithConfirm;
 
-	public static String	App_Annotation_1;
-
-	public static String	App_Annotation_2;
+	public static String		App_Annotation_1;
 
 	public static String		App_Error_NotSupportedValueFormatter;
 
@@ -35,19 +33,14 @@ public class Messages extends NLS {
 	public static String		Action_App_SizeAllColumnsToFit;
 
 	public static String		Action_ColumnManager_Column_Info;
-
-	public static String	Action_ColumnManager_ColumnActions_Info;
-
-	public static String	Action_ColumnManager_ColumnActions_Info_2;
+	public static String		Action_ColumnManager_ColumnActions_Info;
 	public static String		Action_ColumnManager_HideCurrentColumn;
 	public static String		Action_ColumnManager_Profile_Info;
 	public static String		Action_ColumnManager_ShowAllColumns;
 	public static String		Action_ColumnManager_ShowDefaultColumns;
-	public static String	Action_ColumnManager_ValueFormatter_Category;
-
-	public static String	Action_ColumnManager_ValueFormatter_Detail;
-
-	public static String	Action_ColumnManager_ValueFormatter_Tour;
+	public static String		Action_ColumnManager_ValueFormatter_Category;
+	public static String		Action_ColumnManager_ValueFormatter_Detail;
+	public static String		Action_ColumnManager_ValueFormatter_Tour;
 
 	public static String		Advanced_Menu_AnimationSymbol;
 
@@ -65,13 +58,9 @@ public class Messages extends NLS {
 	public static String		ColumnModifyDialog_Button_ShowCategoryColumn_Tooltip;
 	public static String		ColumnModifyDialog_Button_Sort;
 	public static String		ColumnModifyDialog_Button_Sort_Tooltip;
-	public static String	ColumnModifyDialog_Checkbox_ShowFormatAnnotations;
-
-	public static String	ColumnModifyDialog_Checkbox_ShowFormatAnnotations_Tooltip;
-
+	public static String		ColumnModifyDialog_Checkbox_ShowFormatAnnotations;
 	public static String		ColumnModifyDialog_Column_Category;
-
-	public static String	ColumnModifyDialog_Column_DetailFormat;
+	public static String		ColumnModifyDialog_Column_DetailFormat;
 	public static String		ColumnModifyDialog_Column_Format;
 	public static String		ColumnModifyDialog_column_column;
 	public static String		ColumnModifyDialog_column_unit;
@@ -256,14 +245,6 @@ public class Messages extends NLS {
 
 	public static String		rgv_vertex_class_cast_exception;
 
-	public static String		Value_Formatter_Calories_Cal;
-	public static String	Value_Formatter_Calories_Kcal_1_0;
-
-	public static String	Value_Formatter_Calories_Kcal_1_1;
-
-	public static String	Value_Formatter_Calories_Kcal_1_2;
-
-	public static String	Value_Formatter_Calories_Kcal_1_3;
 	public static String		Value_Formatter_Number_1_0;
 	public static String		Value_Formatter_Number_1_1;
 	public static String		Value_Formatter_Number_1_2;
