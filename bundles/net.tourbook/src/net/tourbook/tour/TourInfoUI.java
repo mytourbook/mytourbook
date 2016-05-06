@@ -1020,9 +1020,9 @@ public class TourInfoUI {
 		final DateTime dtTourStart = _tourData.getTourStartTime();
 		final DateTime dtTourEnd = dtTourStart.plus(recordingTime * 1000);
 
-		final boolean isShorDuration = recordingTime < net.tourbook.common.UI.DAY_IN_SECONDS;
+		final boolean isShortDuration = recordingTime < net.tourbook.common.UI.DAY_IN_SECONDS;
 
-		if (isShorDuration) {
+		if (isShortDuration) {
 
 			// < 1 day
 
@@ -1144,25 +1144,25 @@ public class TourInfoUI {
 		_lblAvgPaceUnit.setText(UI.UNIT_LABEL_PACE);
 
 		// avg pulse
-		final float avgPulse = _tourData.getAvgPulse();
-		_lblAvgPulse.setText(FormatManager.getAvgPulse(avgPulse));
+		final double avgPulse = _tourData.getAvgPulse();
+		_lblAvgPulse.setText(FormatManager.formatPulse(avgPulse));
 		_lblAvgPulseUnit.setText(Messages.Value_Unit_Pulse);
 
 		// avg cadence
-		final float avgCadence = _tourData.getAvgCadence() * _tourData.getCadenceMultiplier();
-		_lblAvgCadence.setText(FormatManager.getAvgCadence(avgCadence));
+		final double avgCadence = _tourData.getAvgCadence() * _tourData.getCadenceMultiplier();
+		_lblAvgCadence.setText(FormatManager.formatCadence(avgCadence));
 		_lblAvgCadenceUnit.setText(_tourData.isCadenceSpm()
 				? Messages.Value_Unit_Cadence_Spm
 				: Messages.Value_Unit_Cadence);
 
 		// avg power
-		final float avgPower = _tourData.getPower_Avg();
-		_lblAvg_Power.setText(FormatManager.getAvgPower(avgPower));
+		final double avgPower = _tourData.getPower_Avg();
+		_lblAvg_Power.setText(FormatManager.formatPower(avgPower));
 		_lblAvg_PowerUnit.setText(UI.UNIT_POWER);
 
 		// calories
-		final int calories = _tourData.getCalories();
-		_lblCalories.setText(FormatManager.getCalories(calories));
+		final double calories = _tourData.getCalories() / 1000.0;
+		_lblCalories.setText(FormatManager.formatCalories(calories));
 
 		// body
 		_lblRestPulse.setText(Integer.toString(_tourData.getRestPulse()));

@@ -1416,9 +1416,6 @@ public class ColumnManager {
 
 		switch (valueFormat) {
 
-		case TIME_HH:
-			return _valueFormatter_Time_HH;
-
 		case NUMBER_1_0:
 			return _valueFormatter_Number_1_0;
 
@@ -1430,6 +1427,9 @@ public class ColumnManager {
 
 		case NUMBER_1_3:
 			return _valueFormatter_Number_1_3;
+
+		case TIME_HH:
+			return _valueFormatter_Time_HH;
 
 		case TIME_HH_MM:
 			return _valueFormatter_Time_HHMM;

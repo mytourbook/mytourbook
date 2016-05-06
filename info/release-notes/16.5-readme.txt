@@ -44,5 +44,10 @@ New
     * Set cadence format for selected tours
 
 
+* Tour Tooltip
+
+  - Use value format from the preferences
+
+
 System
 ======

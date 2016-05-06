@@ -514,6 +514,29 @@ public class Util {
 		return is;
 	}
 
+	/**
+	 * @param state
+	 * @param enumName
+	 * @param defaultValue
+	 * @return Returns a enum value from a string or the default value when the enum value is
+	 *         invalid.
+	 */
+	public static <E extends Enum<E>> Enum<E> getEnumValue(final String enumName, final Enum<E> defaultValue) {
+
+		if (enumName == null) {
+			return defaultValue;
+		}
+
+		try {
+
+			return Enum.valueOf(defaultValue.getDeclaringClass(), enumName);
+
+		} catch (final IllegalArgumentException ex) {
+
+			return defaultValue;
+		}
+	}
+
 	private static int getKeyAccelerator(final MouseEvent event) {
 
 		boolean isCtrlKey;

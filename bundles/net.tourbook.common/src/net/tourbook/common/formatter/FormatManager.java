@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.common.formatter;
 
-import java.text.NumberFormat;
-
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.preferences.ICommonPreferences;
 
@@ -27,153 +25,115 @@ import org.eclipse.jface.preference.IPreferenceStore;
  */
 public class FormatManager {
 
-	private final static IPreferenceStore	_prefStore	= CommonActivator.getPrefStore();
+	private final static IPreferenceStore	_prefStore					= CommonActivator.getPrefStore();
 
-	/** When <code>true</code> then avg cadence format is #.#, default is # */
-	private static boolean					_isAvgCadence_1_1;
+	private static IValueFormatter			_valueFormatter_Number_1_0	= new ValueFormatter_Number_1_0();
+	private static IValueFormatter			_valueFormatter_Number_1_1	= new ValueFormatter_Number_1_1();
+	private static IValueFormatter			_valueFormatter_Number_1_2	= new ValueFormatter_Number_1_2();
+	private static IValueFormatter			_valueFormatter_Number_1_3	= new ValueFormatter_Number_1_3();
+	private static IValueFormatter			_valueFormatter_Time_HH		= new ValueFormatter_Time_HH();
+	private static IValueFormatter			_valueFormatter_Time_HHMM	= new ValueFormatter_Time_HHMM();
+	private static IValueFormatter			_valueFormatter_Time_HHMMSS	= new ValueFormatter_Time_HHMMSS();
 
-	/** When <code>true</code> then avg cadence format is #.##, default is # */
-	private static boolean					_isAvgCadence_1_2;
+	private static IValueFormatter			_cadenceFormatter;
+	private static IValueFormatter			_caloriesFormatter;
+	private static IValueFormatter			_powerFormatter;
+	private static IValueFormatter			_pulseFormatter;
 
-	/** When <code>true</code> then avg power format is #.#, default is # */
-	private static boolean					_isAvgPower_1_1;
+	private static IValueFormatter			_drivingTimeFormatter;
+	private static IValueFormatter			_pausedTimeFormatter;
+	private static IValueFormatter			_recordingTimeFormatter;
 
-	/** When <code>true</code> then avg pulse format is #.#, default is # */
-	private static boolean					_isAvgPulse_1_1;
-
-	/** When <code>true</code> then driving time format is <i>hh:mm:ss</i>, default is <i>hh:mm</i>. */
-	private static boolean					_isDrivingTime_hhmmss;
-
-	/** When <code>true</code> then paused time format is <i>hh:mm:ss</i>, default is <i>hh:mm</i>. */
-	private static boolean					_isPausedTime_hhmmss;
-
-	/**
-	 * When <code>true</code> then recording time format is <i>hh:mm:ss</i>, default is
-	 * <i>hh:mm</i>.
-	 */
-	private static boolean					_isRecordingTime_hhmmss;
-
-	private final static NumberFormat		_nf0		= NumberFormat.getNumberInstance();
-	private final static NumberFormat		_nf1		= NumberFormat.getNumberInstance();
-	private final static NumberFormat		_nf2		= NumberFormat.getNumberInstance();
-	private final static NumberFormat		_nf3		= NumberFormat.getNumberInstance();
-
-	static {
-
-		_nf0.setMinimumFractionDigits(0);
-		_nf0.setMaximumFractionDigits(0);
-
-		_nf1.setMinimumFractionDigits(1);
-		_nf1.setMaximumFractionDigits(1);
-
-		_nf2.setMinimumFractionDigits(2);
-		_nf2.setMaximumFractionDigits(2);
-
-		_nf3.setMinimumFractionDigits(3);
-		_nf3.setMaximumFractionDigits(3);
+	public static String formatCadence(final double value) {
+		return _cadenceFormatter.printDouble(value);
 	}
 
-	public static String getAvgCadence(final float avgCadence) {
-
-		return _isAvgCadence_1_2 //
-
-				? _nf2.format(avgCadence)
-				: _isAvgCadence_1_1 //
-
-						? _nf1.format(avgCadence)
-						: _nf0.format(avgCadence);
+	public static String formatCalories(final double value) {
+		return _caloriesFormatter.printDouble(value);
 	}
 
-	public static String getAvgPower(final float avgPower) {
-
-		return _isAvgPower_1_1 //
-
-				? _nf1.format(avgPower)
-				: _nf0.format(avgPower);
-
+	public static String formatPauseTime(final long value) {
+		return _pausedTimeFormatter.printLong(value);
 	}
 
-	public static String getAvgPulse(final float avgPulse) {
-
-		return _isAvgPulse_1_1//
-
-				? _nf1.format(avgPulse)
-				: _nf0.format(avgPulse);
-
+	public static String formatPower(final double value) {
+		return _powerFormatter.printDouble(value);
 	}
 
-	public static String getCalories(final long calories) {
-
-		return _isCalories_cal//
-
-				? _nf0.format(calories)
-				: _nf1.format((double) calories / 1000);
+	public static String formatPulse(final double value) {
+		return _pulseFormatter.printDouble(value);
 	}
 
-	public static String getDrivingTime(final long time) {
+	public static String formatRecordingTime(final long value) {
+		return _recordingTimeFormatter.printLong(value);
+	}
 
-		if (_isDrivingTime_hhmmss) {
-			return net.tourbook.common.UI.format_hh_mm_ss(time);
+	public static String getDrivingTime(final long value) {
+		return _drivingTimeFormatter.printLong(value);
+	}
+
+	private static IValueFormatter getNumberFormatter(final String formatName) {
+
+		if (formatName.equals(ValueFormat.NUMBER_1_0.name())) {
+
+			return _valueFormatter_Number_1_0;
+
+		} else if (formatName.equals(ValueFormat.NUMBER_1_1.name())) {
+
+			return _valueFormatter_Number_1_1;
+
+		} else if (formatName.equals(ValueFormat.NUMBER_1_2.name())) {
+
+			return _valueFormatter_Number_1_2;
+
+		} else if (formatName.equals(ValueFormat.NUMBER_1_3.name())) {
+
+			return _valueFormatter_Number_1_3;
+
 		} else {
-			return net.tourbook.common.UI.format_hh_mm(time + 30);
+
+			return _valueFormatter_Number_1_0;
 		}
 	}
 
-	public static String getPauseTime(final long time) {
+	private static IValueFormatter getTimeFormatter(final String formatName) {
 
-		if (_isPausedTime_hhmmss) {
-			return net.tourbook.common.UI.format_hh_mm_ss(time);
+		if (formatName.equals(ValueFormat.TIME_HH.name())) {
+
+			return _valueFormatter_Time_HH;
+
+		} else if (formatName.equals(ValueFormat.TIME_HH_MM.name())) {
+
+			return _valueFormatter_Time_HHMM;
+
+		} else if (formatName.equals(ValueFormat.TIME_HH_MM_SS.name())) {
+
+			return _valueFormatter_Time_HHMMSS;
+
 		} else {
-			return net.tourbook.common.UI.format_hh_mm(time + 30);
-		}
-	}
 
-	public static String getRecordingTime(final long time) {
-
-		if (_isRecordingTime_hhmmss) {
-			return net.tourbook.common.UI.format_hh_mm_ss(time);
-		} else {
-			return net.tourbook.common.UI.format_hh_mm(time + 30);
+			return _valueFormatter_Time_HHMMSS;
 		}
 	}
 
 	public static void updateDisplayFormats() {
 
-		/*
-		 * Cadence
-		 */
 		final String cadence = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_AVG_CADENCE);
-		_isAvgCadence_1_1 = DISPLAY_FORMAT_1_1.equals(cadence);
-		_isAvgCadence_1_2 = DISPLAY_FORMAT_1_2.equals(cadence);
-
-		/*
-		 * Power
-		 */
+		final String calories = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_CALORIES);
 		final String power = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_AVG_POWER);
-		_isAvgPower_1_1 = DISPLAY_FORMAT_1_1.equals(power);
-
-		/*
-		 * Pulse
-		 */
 		final String pulse = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_AVG_PULSE);
-		_isAvgPulse_1_1 = DISPLAY_FORMAT_1_1.equals(pulse);
 
-		/*
-		 * Calories
-		 */
-		_isCalories_cal = DISPLAY_FORMAT_CAL.equals(//
-				_prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_CALORIES));
+		final String drivingTime = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_DRIVING_TIME);
+		final String pausedTime = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_PAUSED_TIME);
+		final String recordingTime = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_RECORDING_TIME);
 
-		/*
-		 * Time formats
-		 */
-		_isDrivingTime_hhmmss = DISPLAY_FORMAT_HH_MM_SS.equals(//
-				_prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_DRIVING_TIME));
+		_cadenceFormatter = getNumberFormatter(cadence);
+		_caloriesFormatter = getNumberFormatter(calories);
+		_powerFormatter = getNumberFormatter(power);
+		_pulseFormatter = getNumberFormatter(pulse);
 
-		_isPausedTime_hhmmss = DISPLAY_FORMAT_HH_MM_SS.equals(//
-				_prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_PAUSED_TIME));
-
-		_isRecordingTime_hhmmss = DISPLAY_FORMAT_HH_MM_SS.equals(//
-				_prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_RECORDING_TIME));
+		_drivingTimeFormatter = getTimeFormatter(drivingTime);
+		_pausedTimeFormatter = getTimeFormatter(pausedTime);
+		_recordingTimeFormatter = getTimeFormatter(recordingTime);
 	}
 }

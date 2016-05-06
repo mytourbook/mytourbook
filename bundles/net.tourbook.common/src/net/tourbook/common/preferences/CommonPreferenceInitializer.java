@@ -18,7 +18,7 @@ package net.tourbook.common.preferences;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.color.ColorDefinition;
 import net.tourbook.common.color.GraphColorManager;
-import net.tourbook.common.formatter.FormatManager;
+import net.tourbook.common.formatter.ValueFormat;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -60,15 +60,15 @@ public class CommonPreferenceInitializer extends AbstractPreferenceInitializer {
 		 */
 		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_IS_LIVE_UPDATE, true);
 
-		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_AVG_CADENCE, FormatManager.DISPLAY_FORMAT_1);
-		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_AVG_POWER, FormatManager.DISPLAY_FORMAT_1);
-		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_AVG_PULSE, FormatManager.DISPLAY_FORMAT_1);
+		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_AVG_CADENCE, ValueFormat.NUMBER_1_0.name());
+		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_AVG_POWER, ValueFormat.NUMBER_1_0.name());
+		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_AVG_PULSE, ValueFormat.NUMBER_1_0.name());
 
-		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_CALORIES, FormatManager.DISPLAY_FORMAT_KCAL);
+		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_CALORIES, ValueFormat.NUMBER_1_3.name());
 
-		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_DRIVING_TIME, FormatManager.DISPLAY_FORMAT_HH_MM);
-		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_PAUSED_TIME, FormatManager.DISPLAY_FORMAT_HH_MM);
-		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_RECORDING_TIME, FormatManager.DISPLAY_FORMAT_HH_MM);
+		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_DRIVING_TIME, ValueFormat.TIME_HH_MM.name());
+		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_PAUSED_TIME, ValueFormat.TIME_HH_MM.name());
+		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_RECORDING_TIME, ValueFormat.TIME_HH_MM.name());
 
 	}
 }
