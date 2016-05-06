@@ -27,4 +27,12 @@ public class ValueFormatter_Default implements IValueFormatter {
 		return Long.toString(value);
 	}
 
+	@Override
+	public String toString() {
+		return "ValueFormatter_Default [" //
+				+ "printDouble()"
+				+ "+ printLong()"
+				+ "]";
+	}
+
 }

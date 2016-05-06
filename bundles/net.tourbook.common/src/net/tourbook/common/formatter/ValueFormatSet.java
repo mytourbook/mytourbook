@@ -22,12 +22,16 @@ public class ValueFormatSet {
 			ValueFormat.NUMBER_1_0,
 			ValueFormat.NUMBER_1_1,
 			ValueFormat.NUMBER_1_2,
-			ValueFormat.NUMBER_1_3		};
+			ValueFormat.NUMBER_1_3
+
+										};
 
 	public static ValueFormat[]	Time	= new ValueFormat[] {
 										//
 			ValueFormat.TIME_HH,
 			ValueFormat.TIME_HH_MM,
-			ValueFormat.TIME_HH_MM_SS	};
+			ValueFormat.TIME_HH_MM_SS
+
+										};
 
 }

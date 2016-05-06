@@ -18,11 +18,11 @@ package net.tourbook.ui.action;
 import net.tourbook.common.util.IToolTipProvider;
 import net.tourbook.ui.ITourProvider;
 
-public class ActionTourToolTipEditQuick extends ActionEditQuick {
+public class ActionTourToolTip_EditQuick extends ActionEditQuick {
 
 	private final IToolTipProvider	_tourInfo;
 
-	public ActionTourToolTipEditQuick(	final IToolTipProvider tourInfoToolTipProvider,
+	public ActionTourToolTip_EditQuick(	final IToolTipProvider tourInfoToolTipProvider,
 										final ITourProvider tourProvider) {
 
 		super(tourProvider);

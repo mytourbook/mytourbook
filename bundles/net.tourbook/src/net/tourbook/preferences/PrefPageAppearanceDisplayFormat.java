@@ -59,20 +59,27 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
 	private Button					_rdoCalories_1_1;
 	private Button					_rdoCalories_1_2;
 	private Button					_rdoCalories_1_3;
+	private Button					_rdoDistance_1_0;
+	private Button					_rdoDistance_1_1;
+	private Button					_rdoDistance_1_2;
+	private Button					_rdoDistance_1_3;
 	private Button					_rdoPower_1_0;
 	private Button					_rdoPower_1_1;
 	private Button					_rdoPulse_1_0;
 	private Button					_rdoPulse_1_1;
+	private Button					_rdoSpeed_1_0;
+	private Button					_rdoSpeed_1_1;
+	private Button					_rdoSpeed_1_2;
 
-//	private Button					_rdoTime_Driving_HH;
-//	private Button					_rdoTime_Driving_HH_MM;
-//	private Button					_rdoTime_Driving_HH_MM_SS;
-//	private Button					_rdoTime_Paused_HH;
-//	private Button					_rdoTime_Paused_HH_MM;
-//	private Button					_rdoTime_Paused_HH_MM_SS;
-//	private Button					_rdoTime_Recording_HH;
-//	private Button					_rdoTime_Recording_HH_MM;
-//	private Button					_rdoTime_Recording_HH_MM_SS;
+	private Button					_rdoTime_Driving_HH;
+	private Button					_rdoTime_Driving_HH_MM;
+	private Button					_rdoTime_Driving_HH_MM_SS;
+	private Button					_rdoTime_Paused_HH;
+	private Button					_rdoTime_Paused_HH_MM;
+	private Button					_rdoTime_Paused_HH_MM_SS;
+	private Button					_rdoTime_Recording_HH;
+	private Button					_rdoTime_Recording_HH_MM;
+	private Button					_rdoTime_Recording_HH_MM_SS;
 
 	/*
 	 * UI controls
@@ -130,11 +137,89 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
 				.applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 		{
-
-// this is currently not used
-//			createUI_26_Time(container);
-
+			createUI_22_Time(container);
 			createUI_24_Other(container);
+		}
+	}
+
+	private void createUI_22_Time(final Composite parent) {
+
+		final String formatName_HH = ColumnManager.getValueFormatterName(ValueFormat.TIME_HH);
+		final String formatName_HH_MM = ColumnManager.getValueFormatterName(ValueFormat.TIME_HH_MM);
+		final String formatName_HH_MM_SS = ColumnManager.getValueFormatterName(ValueFormat.TIME_HH_MM_SS);
+		{
+			/*
+			 * Recording time format: hh ... hh:mm:ss
+			 */
+
+			final Label label = new Label(parent, SWT.NONE);
+			label.setText(Messages.pref_view_layout_label_recording_time_format);
+
+			final Composite container = new Composite(parent, SWT.NONE);
+			GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+			{
+				_rdoTime_Recording_HH = new Button(container, SWT.RADIO);
+				_rdoTime_Recording_HH.setText(formatName_HH);
+				_rdoTime_Recording_HH.addSelectionListener(_defaultSelectionListener);
+
+				_rdoTime_Recording_HH_MM = new Button(container, SWT.RADIO);
+				_rdoTime_Recording_HH_MM.setText(formatName_HH_MM);
+				_rdoTime_Recording_HH_MM.addSelectionListener(_defaultSelectionListener);
+
+				_rdoTime_Recording_HH_MM_SS = new Button(container, SWT.RADIO);
+				_rdoTime_Recording_HH_MM_SS.setText(formatName_HH_MM_SS);
+				_rdoTime_Recording_HH_MM_SS.addSelectionListener(_defaultSelectionListener);
+			}
+		}
+
+		{
+			/*
+			 * Driving time format: hh ... hh:mm:ss
+			 */
+
+			final Label label = new Label(parent, SWT.NONE);
+			label.setText(Messages.pref_view_layout_label_driving_time_format);
+
+			final Composite container = new Composite(parent, SWT.NONE);
+			GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+			{
+				_rdoTime_Driving_HH = new Button(container, SWT.RADIO);
+				_rdoTime_Driving_HH.setText(formatName_HH);
+				_rdoTime_Driving_HH.addSelectionListener(_defaultSelectionListener);
+
+				_rdoTime_Driving_HH_MM = new Button(container, SWT.RADIO);
+				_rdoTime_Driving_HH_MM.setText(formatName_HH_MM);
+				_rdoTime_Driving_HH_MM.addSelectionListener(_defaultSelectionListener);
+
+				_rdoTime_Driving_HH_MM_SS = new Button(container, SWT.RADIO);
+				_rdoTime_Driving_HH_MM_SS.setText(formatName_HH_MM_SS);
+				_rdoTime_Driving_HH_MM_SS.addSelectionListener(_defaultSelectionListener);
+			}
+		}
+
+		{
+			/*
+			 * Paused time format: hh ... hh:mm:ss
+			 */
+
+			final Label label = new Label(parent, SWT.NONE);
+			label.setText(Messages.Pref_DisplayFormat_Label_PausedTime);
+
+			final Composite container = new Composite(parent, SWT.NONE);
+			GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+			{
+				_rdoTime_Paused_HH = new Button(container, SWT.RADIO);
+				_rdoTime_Paused_HH.setText(formatName_HH);
+				_rdoTime_Paused_HH.addSelectionListener(_defaultSelectionListener);
+
+				_rdoTime_Paused_HH_MM = new Button(container, SWT.RADIO);
+				_rdoTime_Paused_HH_MM.setText(formatName_HH_MM);
+				_rdoTime_Paused_HH_MM.addSelectionListener(_defaultSelectionListener);
+
+				_rdoTime_Paused_HH_MM_SS = new Button(container, SWT.RADIO);
+				_rdoTime_Paused_HH_MM_SS.setText(formatName_HH_MM_SS);
+				_rdoTime_Paused_HH_MM_SS.addSelectionListener(_defaultSelectionListener);
+			}
 		}
 	}
 
@@ -216,6 +301,61 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
 
 		{
 			/*
+			 * Speed: km/h
+			 */
+			final Label label = new Label(parent, SWT.NONE);
+			label.setText(Messages.Pref_DisplayFormat_Label_Speed);
+
+			final Composite container = new Composite(parent, SWT.NONE);
+			GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+			{
+				_rdoSpeed_1_0 = new Button(container, SWT.RADIO);
+				_rdoSpeed_1_0.setText(formatName_1_0);
+				_rdoSpeed_1_0.addSelectionListener(_defaultSelectionListener);
+
+				_rdoSpeed_1_1 = new Button(container, SWT.RADIO);
+				_rdoSpeed_1_1.setText(formatName_1_1);
+				_rdoSpeed_1_1.addSelectionListener(_defaultSelectionListener);
+
+				_rdoSpeed_1_2 = new Button(container, SWT.RADIO);
+				_rdoSpeed_1_2.setText(formatName_1_2);
+				_rdoSpeed_1_2.addSelectionListener(_defaultSelectionListener);
+			}
+		}
+
+		{
+			/*
+			 * Distance: # ... #.###
+			 */
+
+			final Label label = new Label(parent, SWT.NONE);
+			label.setText(Messages.Pref_DisplayFormat_Label_Distance);
+//			GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
+
+			final Composite container = new Composite(parent, SWT.NONE);
+			GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
+//			GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+			{
+				_rdoDistance_1_0 = new Button(container, SWT.RADIO);
+				_rdoDistance_1_0.setText(formatName_1_0);
+				_rdoDistance_1_0.addSelectionListener(_defaultSelectionListener);
+
+				_rdoDistance_1_1 = new Button(container, SWT.RADIO);
+				_rdoDistance_1_1.setText(formatName_1_1);
+				_rdoDistance_1_1.addSelectionListener(_defaultSelectionListener);
+
+				_rdoDistance_1_2 = new Button(container, SWT.RADIO);
+				_rdoDistance_1_2.setText(formatName_1_2);
+				_rdoDistance_1_2.addSelectionListener(_defaultSelectionListener);
+
+				_rdoDistance_1_3 = new Button(container, SWT.RADIO);
+				_rdoDistance_1_3.setText(formatName_1_3);
+				_rdoDistance_1_3.addSelectionListener(_defaultSelectionListener);
+			}
+		}
+
+		{
+			/*
 			 * Calories: # ... #.###
 			 */
 
@@ -244,87 +384,6 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
 				_rdoCalories_1_3.addSelectionListener(_defaultSelectionListener);
 			}
 		}
-	}
-
-	private void createUI_26_Time(final Composite parent) {
-
-//		final String formatName_HH = ColumnManager.getValueFormatterName(ValueFormat.TIME_HH);
-//		final String formatName_HH_MM = ColumnManager.getValueFormatterName(ValueFormat.TIME_HH_MM);
-//		final String formatName_HH_MM_SS = ColumnManager.getValueFormatterName(ValueFormat.TIME_HH_MM_SS);
-//		{
-//			/*
-//			 * Recording time format: hh ... hh:mm:ss
-//			 */
-//
-//			final Label label = new Label(parent, SWT.NONE);
-//			label.setText(Messages.pref_view_layout_label_recording_time_format);
-//
-//			final Composite container = new Composite(parent, SWT.NONE);
-//			GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
-//			{
-//				_rdoTime_Recording_HH = new Button(container, SWT.RADIO);
-//				_rdoTime_Recording_HH.setText(formatName_HH);
-//				_rdoTime_Recording_HH.addSelectionListener(_defaultSelectionListener);
-//
-//				_rdoTime_Recording_HH_MM = new Button(container, SWT.RADIO);
-//				_rdoTime_Recording_HH_MM.setText(formatName_HH_MM);
-//				_rdoTime_Recording_HH_MM.addSelectionListener(_defaultSelectionListener);
-//
-//				_rdoTime_Recording_HH_MM_SS = new Button(container, SWT.RADIO);
-//				_rdoTime_Recording_HH_MM_SS.setText(formatName_HH_MM_SS);
-//				_rdoTime_Recording_HH_MM_SS.addSelectionListener(_defaultSelectionListener);
-//			}
-//		}
-//
-//		{
-//			/*
-//			 * Driving time format: hh ... hh:mm:ss
-//			 */
-//
-//			final Label label = new Label(parent, SWT.NONE);
-//			label.setText(Messages.pref_view_layout_label_driving_time_format);
-//
-//			final Composite container = new Composite(parent, SWT.NONE);
-//			GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
-//			{
-//				_rdoTime_Driving_HH = new Button(container, SWT.RADIO);
-//				_rdoTime_Driving_HH.setText(formatName_HH);
-//				_rdoTime_Driving_HH.addSelectionListener(_defaultSelectionListener);
-//
-//				_rdoTime_Driving_HH_MM = new Button(container, SWT.RADIO);
-//				_rdoTime_Driving_HH_MM.setText(formatName_HH_MM);
-//				_rdoTime_Driving_HH_MM.addSelectionListener(_defaultSelectionListener);
-//
-//				_rdoTime_Driving_HH_MM_SS = new Button(container, SWT.RADIO);
-//				_rdoTime_Driving_HH_MM_SS.setText(formatName_HH_MM_SS);
-//				_rdoTime_Driving_HH_MM_SS.addSelectionListener(_defaultSelectionListener);
-//			}
-//		}
-//
-//		{
-//			/*
-//			 * Paused time format: hh ... hh:mm:ss
-//			 */
-//
-//			final Label label = new Label(parent, SWT.NONE);
-//			label.setText(Messages.Pref_DisplayFormat_Label_PausedTime);
-//
-//			final Composite container = new Composite(parent, SWT.NONE);
-//			GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
-//			{
-//				_rdoTime_Paused_HH = new Button(container, SWT.RADIO);
-//				_rdoTime_Paused_HH.setText(formatName_HH);
-//				_rdoTime_Paused_HH.addSelectionListener(_defaultSelectionListener);
-//
-//				_rdoTime_Paused_HH_MM = new Button(container, SWT.RADIO);
-//				_rdoTime_Paused_HH_MM.setText(formatName_HH_MM);
-//				_rdoTime_Paused_HH_MM.addSelectionListener(_defaultSelectionListener);
-//
-//				_rdoTime_Paused_HH_MM_SS = new Button(container, SWT.RADIO);
-//				_rdoTime_Paused_HH_MM_SS.setText(formatName_HH_MM_SS);
-//				_rdoTime_Paused_HH_MM_SS.addSelectionListener(_defaultSelectionListener);
-//			}
-//		}
 	}
 
 	private void createUI_99_LiveUpdate(final Composite parent) {
@@ -387,10 +446,12 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
 
 		final boolean isLiveUpdate = _prefStore.getDefaultBoolean(ICommonPreferences.DISPLAY_FORMAT_IS_LIVE_UPDATE);
 
-		final String cadence = _prefStore.getDefaultString(ICommonPreferences.DISPLAY_FORMAT_AVG_CADENCE);
+		final String cadence = _prefStore.getDefaultString(ICommonPreferences.DISPLAY_FORMAT_CADENCE);
 		final String calories = _prefStore.getDefaultString(ICommonPreferences.DISPLAY_FORMAT_CALORIES);
-		final String power = _prefStore.getDefaultString(ICommonPreferences.DISPLAY_FORMAT_AVG_POWER);
-		final String pulse = _prefStore.getDefaultString(ICommonPreferences.DISPLAY_FORMAT_AVG_PULSE);
+		final String distance = _prefStore.getDefaultString(ICommonPreferences.DISPLAY_FORMAT_DISTANCE);
+		final String power = _prefStore.getDefaultString(ICommonPreferences.DISPLAY_FORMAT_POWER);
+		final String pulse = _prefStore.getDefaultString(ICommonPreferences.DISPLAY_FORMAT_PULSE);
+		final String speed = _prefStore.getDefaultString(ICommonPreferences.DISPLAY_FORMAT_SPEED);
 
 		final String drivingTime = _prefStore.getDefaultString(ICommonPreferences.DISPLAY_FORMAT_DRIVING_TIME);
 		final String pausedTime = _prefStore.getDefaultString(ICommonPreferences.DISPLAY_FORMAT_PAUSED_TIME);
@@ -405,8 +466,17 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
 		final boolean isCalories_1_2 = ValueFormat.NUMBER_1_2.name().equals(calories);
 		final boolean isCalories_1_3 = ValueFormat.NUMBER_1_3.name().equals(calories);
 
+		final boolean isDistance_1_0 = ValueFormat.NUMBER_1_0.name().equals(distance);
+		final boolean isDistance_1_1 = ValueFormat.NUMBER_1_1.name().equals(distance);
+		final boolean isDistance_1_2 = ValueFormat.NUMBER_1_2.name().equals(distance);
+		final boolean isDistance_1_3 = ValueFormat.NUMBER_1_3.name().equals(distance);
+
 		final boolean isPower_1_0 = ValueFormat.NUMBER_1_0.name().equals(power);
 		final boolean isPulse_1_0 = ValueFormat.NUMBER_1_0.name().equals(pulse);
+
+		final boolean isSpeed_1_0 = ValueFormat.NUMBER_1_0.name().equals(speed);
+		final boolean isSpeed_1_1 = ValueFormat.NUMBER_1_1.name().equals(speed);
+		final boolean isSpeed_1_2 = ValueFormat.NUMBER_1_2.name().equals(speed);
 
 		final boolean isDriving_HH = ValueFormat.TIME_HH.name().equals(drivingTime);
 		final boolean isDriving_HH_MM = ValueFormat.TIME_HH_MM.name().equals(drivingTime);
@@ -429,23 +499,32 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
 		_rdoCalories_1_2.setSelection(isCalories_1_2);
 		_rdoCalories_1_3.setSelection(isCalories_1_3);
 
+		_rdoDistance_1_0.setSelection(isDistance_1_0);
+		_rdoDistance_1_1.setSelection(isDistance_1_1);
+		_rdoDistance_1_2.setSelection(isDistance_1_2);
+		_rdoDistance_1_3.setSelection(isDistance_1_3);
+
 		_rdoPower_1_0.setSelection(isPower_1_0);
 		_rdoPower_1_1.setSelection(!isPower_1_0);
 
 		_rdoPulse_1_0.setSelection(isPulse_1_0);
 		_rdoPulse_1_1.setSelection(!isPulse_1_0);
 
-//		_rdoTime_Driving_HH.setSelection(isDriving_HH);
-//		_rdoTime_Driving_HH_MM.setSelection(isDriving_HH_MM);
-//		_rdoTime_Driving_HH_MM_SS.setSelection(isDriving_HH_MM_SS);
-//
-//		_rdoTime_Paused_HH.setSelection(isPaused_HH);
-//		_rdoTime_Paused_HH_MM.setSelection(isPaused_HH_MM);
-//		_rdoTime_Paused_HH_MM_SS.setSelection(isPaused_HH_MM_SS);
-//
-//		_rdoTime_Recording_HH.setSelection(isRecording_HH);
-//		_rdoTime_Recording_HH_MM.setSelection(isRecording_HH_MM);
-//		_rdoTime_Recording_HH_MM_SS.setSelection(isRecording_HH_MM_SS);
+		_rdoSpeed_1_0.setSelection(isSpeed_1_0);
+		_rdoSpeed_1_1.setSelection(isSpeed_1_1);
+		_rdoSpeed_1_2.setSelection(isSpeed_1_2);
+
+		_rdoTime_Driving_HH.setSelection(isDriving_HH);
+		_rdoTime_Driving_HH_MM.setSelection(isDriving_HH_MM);
+		_rdoTime_Driving_HH_MM_SS.setSelection(isDriving_HH_MM_SS);
+
+		_rdoTime_Paused_HH.setSelection(isPaused_HH);
+		_rdoTime_Paused_HH_MM.setSelection(isPaused_HH_MM);
+		_rdoTime_Paused_HH_MM_SS.setSelection(isPaused_HH_MM_SS);
+
+		_rdoTime_Recording_HH.setSelection(isRecording_HH);
+		_rdoTime_Recording_HH_MM.setSelection(isRecording_HH_MM);
+		_rdoTime_Recording_HH_MM_SS.setSelection(isRecording_HH_MM_SS);
 
 		_chkLiveUpdate.setSelection(isLiveUpdate);
 
@@ -466,10 +545,12 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
 
 		final boolean isLiveUpdate = _prefStore.getBoolean(ICommonPreferences.DISPLAY_FORMAT_IS_LIVE_UPDATE);
 
-		final String cadence = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_AVG_CADENCE);
+		final String cadence = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_CADENCE);
 		final String calories = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_CALORIES);
-		final String power = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_AVG_POWER);
-		final String pulse = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_AVG_PULSE);
+		final String distance = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_DISTANCE);
+		final String power = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_POWER);
+		final String pulse = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_PULSE);
+		final String speed = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_SPEED);
 
 		final String drivingTime = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_DRIVING_TIME);
 		final String pausedTime = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_PAUSED_TIME);
@@ -484,8 +565,17 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
 		final boolean isCalories_1_2 = ValueFormat.NUMBER_1_2.name().equals(calories);
 		final boolean isCalories_1_3 = ValueFormat.NUMBER_1_3.name().equals(calories);
 
+		final boolean isDistance_1_0 = ValueFormat.NUMBER_1_0.name().equals(distance);
+		final boolean isDistance_1_1 = ValueFormat.NUMBER_1_1.name().equals(distance);
+		final boolean isDistance_1_2 = ValueFormat.NUMBER_1_2.name().equals(distance);
+		final boolean isDistance_1_3 = ValueFormat.NUMBER_1_3.name().equals(distance);
+
 		final boolean isPower_1_0 = ValueFormat.NUMBER_1_0.name().equals(power);
 		final boolean isPulse_1_0 = ValueFormat.NUMBER_1_0.name().equals(pulse);
+
+		final boolean isSpeed_1_0 = ValueFormat.NUMBER_1_0.name().equals(speed);
+		final boolean isSpeed_1_1 = ValueFormat.NUMBER_1_1.name().equals(speed);
+		final boolean isSpeed_1_2 = ValueFormat.NUMBER_1_2.name().equals(speed);
 
 		final boolean isDriving_HH = ValueFormat.TIME_HH.name().equals(drivingTime);
 		final boolean isDriving_HH_MM = ValueFormat.TIME_HH_MM.name().equals(drivingTime);
@@ -508,23 +598,32 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
 		_rdoCalories_1_2.setSelection(isCalories_1_2);
 		_rdoCalories_1_3.setSelection(isCalories_1_3);
 
+		_rdoDistance_1_0.setSelection(isDistance_1_0);
+		_rdoDistance_1_1.setSelection(isDistance_1_1);
+		_rdoDistance_1_2.setSelection(isDistance_1_2);
+		_rdoDistance_1_3.setSelection(isDistance_1_3);
+
 		_rdoPower_1_0.setSelection(isPower_1_0);
 		_rdoPower_1_1.setSelection(!isPower_1_0);
 
 		_rdoPulse_1_0.setSelection(isPulse_1_0);
 		_rdoPulse_1_1.setSelection(!isPulse_1_0);
 
-//		_rdoTime_Driving_HH.setSelection(isDriving_HH);
-//		_rdoTime_Driving_HH_MM.setSelection(isDriving_HH_MM);
-//		_rdoTime_Driving_HH_MM_SS.setSelection(isDriving_HH_MM_SS);
-//
-//		_rdoTime_Paused_HH.setSelection(isPaused_HH);
-//		_rdoTime_Paused_HH_MM.setSelection(isPaused_HH_MM);
-//		_rdoTime_Paused_HH_MM_SS.setSelection(isPaused_HH_MM_SS);
-//
-//		_rdoTime_Recording_HH.setSelection(isRecording_HH);
-//		_rdoTime_Recording_HH_MM.setSelection(isRecording_HH_MM);
-//		_rdoTime_Recording_HH_MM_SS.setSelection(isRecording_HH_MM_SS);
+		_rdoSpeed_1_0.setSelection(isSpeed_1_0);
+		_rdoSpeed_1_1.setSelection(isSpeed_1_1);
+		_rdoSpeed_1_2.setSelection(isSpeed_1_2);
+
+		_rdoTime_Driving_HH.setSelection(isDriving_HH);
+		_rdoTime_Driving_HH_MM.setSelection(isDriving_HH_MM);
+		_rdoTime_Driving_HH_MM_SS.setSelection(isDriving_HH_MM_SS);
+
+		_rdoTime_Paused_HH.setSelection(isPaused_HH);
+		_rdoTime_Paused_HH_MM.setSelection(isPaused_HH_MM);
+		_rdoTime_Paused_HH_MM_SS.setSelection(isPaused_HH_MM_SS);
+
+		_rdoTime_Recording_HH.setSelection(isRecording_HH);
+		_rdoTime_Recording_HH_MM.setSelection(isRecording_HH_MM);
+		_rdoTime_Recording_HH_MM_SS.setSelection(isRecording_HH_MM_SS);
 
 		_chkLiveUpdate.setSelection(isLiveUpdate);
 	}
@@ -545,6 +644,14 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
 								? ValueFormat.NUMBER_1_2.name()
 								: ValueFormat.NUMBER_1_3.name();
 
+		final String distanceFormat = _rdoDistance_1_0.getSelection() //
+				? ValueFormat.NUMBER_1_0.name()
+				: _rdoDistance_1_1.getSelection()//
+						? ValueFormat.NUMBER_1_1.name()
+						: _rdoDistance_1_2.getSelection() //
+								? ValueFormat.NUMBER_1_2.name()
+								: ValueFormat.NUMBER_1_3.name();
+
 		final String powerFormat = _rdoPower_1_0.getSelection() //
 				? ValueFormat.NUMBER_1_0.name()
 				: ValueFormat.NUMBER_1_1.name();
@@ -553,32 +660,40 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
 				? ValueFormat.NUMBER_1_0.name()
 				: ValueFormat.NUMBER_1_1.name();
 
-//		final String drivingFormat = _rdoTime_Driving_HH.getSelection() //
-//				? ValueFormat.TIME_HH.name()
-//				: _rdoTime_Driving_HH_MM.getSelection() //
-//						? ValueFormat.TIME_HH_MM.name()
-//						: ValueFormat.TIME_HH_MM_SS.name();
-//
-//		final String pausedFormat = _rdoTime_Paused_HH.getSelection() //
-//				? ValueFormat.TIME_HH.name()
-//				: _rdoTime_Paused_HH_MM.getSelection() //
-//						? ValueFormat.TIME_HH_MM.name()
-//						: ValueFormat.TIME_HH_MM_SS.name();
-//
-//		final String recordingFormat = _rdoTime_Recording_HH.getSelection() //
-//				? ValueFormat.TIME_HH.name()
-//				: _rdoTime_Recording_HH_MM.getSelection() //
-//						? ValueFormat.TIME_HH_MM.name()
-//						: ValueFormat.TIME_HH_MM_SS.name();
+		final String speedFormat = _rdoSpeed_1_0.getSelection() //
+				? ValueFormat.NUMBER_1_0.name()
+				: _rdoSpeed_1_1.getSelection() //
+						? ValueFormat.NUMBER_1_1.name()
+						: ValueFormat.NUMBER_1_2.name();
 
-		_prefStore.setValue(ICommonPreferences.DISPLAY_FORMAT_AVG_CADENCE, cadenceFormat);
+		final String drivingFormat = _rdoTime_Driving_HH.getSelection() //
+				? ValueFormat.TIME_HH.name()
+				: _rdoTime_Driving_HH_MM.getSelection() //
+						? ValueFormat.TIME_HH_MM.name()
+						: ValueFormat.TIME_HH_MM_SS.name();
+
+		final String pausedFormat = _rdoTime_Paused_HH.getSelection() //
+				? ValueFormat.TIME_HH.name()
+				: _rdoTime_Paused_HH_MM.getSelection() //
+						? ValueFormat.TIME_HH_MM.name()
+						: ValueFormat.TIME_HH_MM_SS.name();
+
+		final String recordingFormat = _rdoTime_Recording_HH.getSelection() //
+				? ValueFormat.TIME_HH.name()
+				: _rdoTime_Recording_HH_MM.getSelection() //
+						? ValueFormat.TIME_HH_MM.name()
+						: ValueFormat.TIME_HH_MM_SS.name();
+
+		_prefStore.setValue(ICommonPreferences.DISPLAY_FORMAT_CADENCE, cadenceFormat);
 		_prefStore.setValue(ICommonPreferences.DISPLAY_FORMAT_CALORIES, caloriesFormat);
-		_prefStore.setValue(ICommonPreferences.DISPLAY_FORMAT_AVG_POWER, powerFormat);
-		_prefStore.setValue(ICommonPreferences.DISPLAY_FORMAT_AVG_PULSE, pulseFormat);
+		_prefStore.setValue(ICommonPreferences.DISPLAY_FORMAT_DISTANCE, distanceFormat);
+		_prefStore.setValue(ICommonPreferences.DISPLAY_FORMAT_POWER, powerFormat);
+		_prefStore.setValue(ICommonPreferences.DISPLAY_FORMAT_PULSE, pulseFormat);
+		_prefStore.setValue(ICommonPreferences.DISPLAY_FORMAT_SPEED, speedFormat);
 
-//		_prefStore.setValue(ICommonPreferences.DISPLAY_FORMAT_DRIVING_TIME, drivingFormat);
-//		_prefStore.setValue(ICommonPreferences.DISPLAY_FORMAT_PAUSED_TIME, pausedFormat);
-//		_prefStore.setValue(ICommonPreferences.DISPLAY_FORMAT_RECORDING_TIME, recordingFormat);
+		_prefStore.setValue(ICommonPreferences.DISPLAY_FORMAT_DRIVING_TIME, drivingFormat);
+		_prefStore.setValue(ICommonPreferences.DISPLAY_FORMAT_PAUSED_TIME, pausedFormat);
+		_prefStore.setValue(ICommonPreferences.DISPLAY_FORMAT_RECORDING_TIME, recordingFormat);
 
 		// live update
 		_prefStore.setValue(ICommonPreferences.DISPLAY_FORMAT_IS_LIVE_UPDATE, _chkLiveUpdate.getSelection());

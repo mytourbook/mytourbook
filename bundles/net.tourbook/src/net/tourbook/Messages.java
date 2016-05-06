@@ -1120,10 +1120,12 @@ public class Messages extends NLS {
 	public static String		Pref_DisplayFormat_Group_Format;
 	public static String		Pref_DisplayFormat_Label_Cadence;
 	public static String		Pref_DisplayFormat_Label_Calories;
+	public static String		Pref_DisplayFormat_Label_Distance;
 	public static String		Pref_DisplayFormat_Label_Info;
 	public static String		Pref_DisplayFormat_Label_PausedTime;
 	public static String		Pref_DisplayFormat_Label_Power;
 	public static String		Pref_DisplayFormat_Label_Pulse;
+	public static String		Pref_DisplayFormat_Label_Speed;
 	public static String		Pref_DisplayFormat_Radio_Format_1;
 	public static String		Pref_DisplayFormat_Radio_Format_1_1;
 	public static String		Pref_DisplayFormat_Radio_Format_1_2;

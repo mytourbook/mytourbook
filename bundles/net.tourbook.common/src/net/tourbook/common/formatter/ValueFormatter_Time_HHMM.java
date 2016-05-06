@@ -35,4 +35,10 @@ public class ValueFormatter_Time_HHMM implements IValueFormatter {
 		return UI.format_hh_mm(value + 30);
 	}
 
+	@Override
+	public String toString() {
+		return "ValueFormatter_Time_HHMM [" //
+				+ "printLong()"
+				+ "]";
+	}
 }

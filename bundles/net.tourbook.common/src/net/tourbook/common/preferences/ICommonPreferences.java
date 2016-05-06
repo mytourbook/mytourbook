@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,10 +22,12 @@ public interface ICommonPreferences {
 	 */
 	public static final String	GRAPH_COLORS					= "graph.colors.";					//$NON-NLS-1$
 
-	public static final String	DISPLAY_FORMAT_AVG_CADENCE		= "DISPLAY_FORMAT_AVG_CADENCE";	//$NON-NLS-1$
-	public static final String	DISPLAY_FORMAT_AVG_POWER		= "DISPLAY_FORMAT_AVG_POWER";		//$NON-NLS-1$
-	public static final String	DISPLAY_FORMAT_AVG_PULSE		= "DISPLAY_FORMAT_AVG_PULSE";		//$NON-NLS-1$
+	public static final String	DISPLAY_FORMAT_CADENCE			= "DISPLAY_FORMAT_CADENCE";		//$NON-NLS-1$
 	public static final String	DISPLAY_FORMAT_CALORIES			= "DISPLAY_FORMAT_CALORIES";		//$NON-NLS-1$
+	public static final String	DISPLAY_FORMAT_DISTANCE			= "DISPLAY_FORMAT_DISTANCE";		//$NON-NLS-1$
+	public static final String	DISPLAY_FORMAT_POWER			= "DISPLAY_FORMAT_POWER";			//$NON-NLS-1$
+	public static final String	DISPLAY_FORMAT_PULSE			= "DISPLAY_FORMAT_PULSE";			//$NON-NLS-1$
+	public static final String	DISPLAY_FORMAT_SPEED			= "DISPLAY_FORMAT_SPEED";			//$NON-NLS-1$
 
 	public static final String	DISPLAY_FORMAT_DRIVING_TIME		= "DISPLAY_FORMAT_DRIVING_TIME";	//$NON-NLS-1$
 	public static final String	DISPLAY_FORMAT_PAUSED_TIME		= "DISPLAY_FORMAT_PAUSED_TIME";	//$NON-NLS-1$

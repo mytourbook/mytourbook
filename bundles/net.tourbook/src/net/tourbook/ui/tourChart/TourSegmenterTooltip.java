@@ -20,6 +20,7 @@ import java.util.ArrayList;
 
 import net.tourbook.chart.ChartComponentGraph;
 import net.tourbook.common.UI;
+import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.tooltip.AnimatedToolTipShell;
 import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.util.IToolTipProvider;
@@ -735,14 +736,15 @@ public class TourSegmenterTooltip extends AnimatedToolTipShell implements ITourP
 		_lblGradient.setText(_nf_1_1.format(tourSegment.gradient));
 
 		// distance
-		_lblDistance.setText(_nf_3_3.format(tourSegment.distance_Diff / 1000));
+		final double distance = tourSegment.distance_Diff / 1000.0;
+		_lblDistance.setText(FormatManager.formatDistance(distance));
 		_lblDistance_Unit.setText(UI.UNIT_LABEL_DISTANCE);
 
 		/*
 		 * Avg
 		 */
 		// avg speed
-		_lblAvg_Speed.setText(_nf_1_1.format(tourSegment.speed));
+		_lblAvg_Speed.setText(FormatManager.formatSpeed(tourSegment.speed));
 		_lblAvg_SpeedUnit.setText(UI.UNIT_LABEL_SPEED);
 
 		// avg pace
@@ -755,41 +757,22 @@ public class TourSegmenterTooltip extends AnimatedToolTipShell implements ITourP
 		_lblAvg_PaceUnit.setText(UI.UNIT_LABEL_PACE);
 
 		// avg pulse
-		_lblAvg_Pulse.setText(_nf_1_1.format(tourSegment.pulse));
+		_lblAvg_Pulse.setText(FormatManager.formatPulse(tourSegment.pulse));
 		_lblAvg_PulseUnit.setText(Messages.Value_Unit_Pulse);
 
 		// avg cadence
-		_lblAvg_Cadence.setText(_nf_1_1.format(tourSegment.cadence));
+		_lblAvg_Cadence.setText(FormatManager.formatCadence(tourSegment.cadence));
 		_lblAvg_CadenceUnit.setText(Messages.Value_Unit_Cadence);
 
 		// avg power
-		_lblAvg_Power.setText(_nf_0_0.format(tourSegment.power));
+		_lblAvg_Power.setText(FormatManager.formatPower(tourSegment.power));
 		_lblAvg_PowerUnit.setText(UI.UNIT_POWER);
 
 		/*
 		 * Time
 		 */
-		final int breakTime = tourSegment.time_Break;
-		final int movingTime = tourSegment.time_Driving;
-		final int recordingTime = tourSegment.time_Recording;
-
-		_lblTime_Break.setText(String.format(
-				Messages.Tour_Tooltip_Format_Date,
-				breakTime / 3600,
-				(breakTime % 3600) / 60,
-				(breakTime % 3600) % 60)//
-				);
-		_lblTime_Moving.setText(String.format(
-				Messages.Tour_Tooltip_Format_Date,
-				movingTime / 3600,
-				(movingTime % 3600) / 60,
-				(movingTime % 3600) % 60)//
-				);
-		_lblTime_Recording.setText(String.format(
-				Messages.Tour_Tooltip_Format_Date,
-				recordingTime / 3600,
-				(recordingTime % 3600) / 60,
-				(recordingTime % 3600) % 60)//
-				);
+		_lblTime_Recording.setText(FormatManager.formatRecordingTime(tourSegment.time_Recording));
+		_lblTime_Moving.setText(FormatManager.formatDrivingTime(tourSegment.time_Driving));
+		_lblTime_Break.setText(FormatManager.formatPausedTime(tourSegment.time_Break));
 	}
 }

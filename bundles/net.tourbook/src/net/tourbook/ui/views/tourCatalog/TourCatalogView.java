@@ -728,7 +728,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 					final float value = ((TVICatalogComparedTour) element).getAvgPulse();
 
-					colDef.printValue(cell, value, element instanceof TVICatalogComparedTour);
+					colDef.printDoubleValue(cell, value, element instanceof TVICatalogComparedTour);
 				}
 			}
 		});
@@ -773,7 +773,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 					final double value = ((TVICatalogComparedTour) element).tourSpeed / UI.UNIT_VALUE_DISTANCE;
 
-					colDef.printValue(cell, value, element instanceof TVICatalogComparedTour);
+					colDef.printDoubleValue(cell, value, element instanceof TVICatalogComparedTour);
 				}
 			}
 		});

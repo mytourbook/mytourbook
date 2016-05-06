@@ -846,7 +846,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 				final Object element = cell.getElement();
 				final float value = ((TVICollatedTour) element).colAvgPulse;
 
-				colDef.printValue(cell, value, element instanceof TVICollatedTour_Tour);
+				colDef.printDoubleValue(cell, value, element instanceof TVICollatedTour_Tour);
 
 				setCellColor(cell, element);
 			}
@@ -867,7 +867,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 				final Object element = cell.getElement();
 				final long value = ((TVICollatedTour) element).colCalories;
 
-				colDef.printValue(cell, value, element instanceof TVICollatedTour_Tour);
+				colDef.printDoubleValue(cell, value, element instanceof TVICollatedTour_Tour);
 
 				setCellColor(cell, element);
 			}
@@ -1080,7 +1080,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 				final Object element = cell.getElement();
 				final float value = ((TVICollatedTour) element).colAvgSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
-				colDef.printValue(cell, value, element instanceof TVICollatedTour_Tour);
+				colDef.printDoubleValue(cell, value, element instanceof TVICollatedTour_Tour);
 
 				setCellColor(cell, element);
 			}
@@ -1104,7 +1104,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 						/ 1000.0
 						/ net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
-				colDef.printValue(cell, value, element instanceof TVICollatedTour_Tour);
+				colDef.printDoubleValue(cell, value, element instanceof TVICollatedTour_Tour);
 
 				setCellColor(cell, element);
 			}
@@ -1125,7 +1125,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 				final Object element = cell.getElement();
 				final double value = ((TVICollatedTour) element).colMaxSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
-				colDef.printValue(cell, value, element instanceof TVICollatedTour_Tour);
+				colDef.printDoubleValue(cell, value, element instanceof TVICollatedTour_Tour);
 
 				setCellColor(cell, element);
 			}
@@ -1146,7 +1146,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 				final Object element = cell.getElement();
 				final float value = ((TVICollatedTour) element).colAvgCadence;
 
-				colDef.printValue(cell, value, element instanceof TVICollatedTour_Tour);
+				colDef.printDoubleValue(cell, value, element instanceof TVICollatedTour_Tour);
 
 				setCellColor(cell, element);
 			}
@@ -1214,7 +1214,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 				final Object element = cell.getElement();
 				final long value = ((TVICollatedTour) element).colDrivingTime;
 
-				colDef.printValue(cell, value, element instanceof TVICollatedTour_Tour);
+				colDef.printLongValue(cell, value, element instanceof TVICollatedTour_Tour);
 
 				setCellColor(cell, element);
 			}
@@ -1241,7 +1241,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
 				final long value = item.colPausedTime;
 
-				colDef.printValue(cell, value, element instanceof TVICollatedTour_Tour);
+				colDef.printLongValue(cell, value, element instanceof TVICollatedTour_Tour);
 
 				setCellColor(cell, element);
 			}
@@ -1296,7 +1296,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 				final Object element = cell.getElement();
 				final long value = ((TVICollatedTour) element).colRecordingTime;
 
-				colDef.printValue(cell, value, element instanceof TVICollatedTour_Tour);
+				colDef.printLongValue(cell, value, element instanceof TVICollatedTour_Tour);
 
 				setCellColor(cell, element);
 			}
@@ -1614,7 +1614,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 							+ net.tourbook.ui.UI.UNIT_FAHRENHEIT_ADD;
 				}
 
-				colDef.printValue(cell, value, element instanceof TVITourBookTour);
+				colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
 				setCellColor(cell, element);
 			}

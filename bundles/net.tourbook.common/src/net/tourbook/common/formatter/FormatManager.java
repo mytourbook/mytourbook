@@ -37,8 +37,11 @@ public class FormatManager {
 
 	private static IValueFormatter			_cadenceFormatter;
 	private static IValueFormatter			_caloriesFormatter;
+	private static IValueFormatter			_distanceFormatter;
 	private static IValueFormatter			_powerFormatter;
 	private static IValueFormatter			_pulseFormatter;
+	private static IValueFormatter			_speedFormatter;
+
 
 	private static IValueFormatter			_drivingTimeFormatter;
 	private static IValueFormatter			_pausedTimeFormatter;
@@ -52,7 +55,15 @@ public class FormatManager {
 		return _caloriesFormatter.printDouble(value);
 	}
 
-	public static String formatPauseTime(final long value) {
+	public static String formatDistance(final double value) {
+		return _distanceFormatter.printDouble(value);
+	}
+
+	public static String formatDrivingTime(final long value) {
+		return _drivingTimeFormatter.printLong(value);
+	}
+
+	public static String formatPausedTime(final long value) {
 		return _pausedTimeFormatter.printLong(value);
 	}
 
@@ -68,8 +79,8 @@ public class FormatManager {
 		return _recordingTimeFormatter.printLong(value);
 	}
 
-	public static String getDrivingTime(final long value) {
-		return _drivingTimeFormatter.printLong(value);
+	public static String formatSpeed(final double value) {
+		return _speedFormatter.printDouble(value);
 	}
 
 	private static IValueFormatter getNumberFormatter(final String formatName) {
@@ -118,10 +129,12 @@ public class FormatManager {
 
 	public static void updateDisplayFormats() {
 
-		final String cadence = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_AVG_CADENCE);
+		final String cadence = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_CADENCE);
 		final String calories = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_CALORIES);
-		final String power = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_AVG_POWER);
-		final String pulse = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_AVG_PULSE);
+		final String distance = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_DISTANCE);
+		final String power = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_POWER);
+		final String pulse = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_PULSE);
+		final String speed = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_SPEED);
 
 		final String drivingTime = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_DRIVING_TIME);
 		final String pausedTime = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_PAUSED_TIME);
@@ -129,8 +142,10 @@ public class FormatManager {
 
 		_cadenceFormatter = getNumberFormatter(cadence);
 		_caloriesFormatter = getNumberFormatter(calories);
+		_distanceFormatter = getNumberFormatter(distance);
 		_powerFormatter = getNumberFormatter(power);
 		_pulseFormatter = getNumberFormatter(pulse);
+		_speedFormatter = getNumberFormatter(speed);
 
 		_drivingTimeFormatter = getTimeFormatter(drivingTime);
 		_pausedTimeFormatter = getTimeFormatter(pausedTime);

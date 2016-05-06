@@ -39,4 +39,11 @@ public class ValueFormatter_Number_1_2 implements IValueFormatter {
 		return Messages.App_Error_NotSupportedValueFormatter;
 	}
 
+	@Override
+	public String toString() {
+		return "ValueFormatter_Number_1_2 [" //
+				+ "printDouble()"
+				+ "]";
+	}
+
 }

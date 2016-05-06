@@ -903,7 +903,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 				final double value = ((TVITagViewItem) element).colAvgPulse;
 
-				colDef.printValue(cell, value, element instanceof TVITagViewTour);
+				colDef.printDoubleValue(cell, value, element instanceof TVITagViewTour);
 
 				setCellColor(cell, element);
 			}
@@ -971,7 +971,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 				final Object element = cell.getElement();
 				final float value = ((TVITagViewItem) element).colAvgSpeed / UI.UNIT_VALUE_DISTANCE;
 
-				colDef.printValue(cell, value, element instanceof TVITagViewTour);
+				colDef.printDoubleValue(cell, value, element instanceof TVITagViewTour);
 
 				setCellColor(cell, element);
 			}
@@ -993,21 +993,9 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 					return;
 				}
 
-				final float colDistance = ((TVITagViewItem) element).colDistance;
-
-				if (colDistance != 0) {
-
-					colDef.printValue(
-							cell,
-							colDistance / 1000 / UI.UNIT_VALUE_DISTANCE,
-							element instanceof TVITagViewTour);
-
-					setCellColor(cell, element);
-				}
-
 				final double value = ((TVITagViewItem) element).colDistance / 1000.0 / UI.UNIT_VALUE_DISTANCE;
 
-				colDef.printValue(cell, value, element instanceof TVITagViewTour);
+				colDef.printDoubleValue(cell, value, element instanceof TVITagViewTour);
 
 				setCellColor(cell, element);
 			}
@@ -1031,7 +1019,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 				final double value = ((TVITagViewItem) element).colMaxSpeed / UI.UNIT_VALUE_DISTANCE;
 
-				colDef.printValue(cell, value, element instanceof TVITagViewTour);
+				colDef.printDoubleValue(cell, value, element instanceof TVITagViewTour);
 
 				setCellColor(cell, element);
 			}
@@ -1055,7 +1043,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 				final float value = ((TVITagViewItem) element).colAvgCadence;
 
-				colDef.printValue(cell, value, element instanceof TVITagViewTour);
+				colDef.printDoubleValue(cell, value, element instanceof TVITagViewTour);
 
 				setCellColor(cell, element);
 			}
@@ -1239,7 +1227,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 							+ net.tourbook.ui.UI.UNIT_FAHRENHEIT_ADD;
 				}
 
-				colDef.printValue(cell, temperature, element instanceof TVITagViewTour);
+				colDef.printDoubleValue(cell, temperature, element instanceof TVITagViewTour);
 
 				setCellColor(cell, element);
 			}

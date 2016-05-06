@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,10 +28,12 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.preferences.PrefPageAppearanceDisplayFormat;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.Messages;
-import net.tourbook.ui.action.ActionTourToolTipEditQuick;
-import net.tourbook.ui.action.ActionTourToolTipEditTour;
+import net.tourbook.ui.action.ActionTourToolTip_EditPreferences;
+import net.tourbook.ui.action.ActionTourToolTip_EditQuick;
+import net.tourbook.ui.action.ActionTourToolTip_EditTour;
 
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -57,26 +59,26 @@ import org.joda.time.format.DateTimeFormatter;
 
 public class TourInfoUI {
 
-	private static final int			SHELL_MARGIN			= 5;
-	private static final int			MAX_DATA_WIDTH			= 300;
+	private static final int					SHELL_MARGIN			= 5;
+	private static final int					MAX_DATA_WIDTH			= 300;
 
-	private static final String			REAR_SHIFT_FORMAT		= "/  ";								//$NON-NLS-1$
+	private static final String					REAR_SHIFT_FORMAT		= "/  ";								//$NON-NLS-1$
 
-	private Color						_bgColor;
-	private Color						_fgColor;
-	private Font						_boldFont;
+	private Color								_bgColor;
+	private Color								_fgColor;
+	private Font								_boldFont;
 
-	private final DateTimeFormatter		_dateFormatter			= DateTimeFormat.fullDate();
-	private final DateTimeFormatter		_timeFormatter			= DateTimeFormat.mediumTime();
-	private final DateTimeFormatter		_dtFormatterCreated		= DateTimeFormat.mediumDateTime();
+	private final DateTimeFormatter				_dateFormatter			= DateTimeFormat.fullDate();
+	private final DateTimeFormatter				_timeFormatter			= DateTimeFormat.mediumTime();
+	private final DateTimeFormatter				_dtFormatterCreated		= DateTimeFormat.mediumDateTime();
 
-	private final DateTimeFormatter		_dtHistoryFormatter		= DateTimeFormat.forStyle("FM");		//$NON-NLS-1$
+	private final DateTimeFormatter				_dtHistoryFormatter		= DateTimeFormat.forStyle("FM");		//$NON-NLS-1$
 //	private final DateTimeFormatter		_dtWeekday				= DateTimeFormat.forPattern("E");	//$NON-NLS-1$
 
-	private final NumberFormat			_nf0					= NumberFormat.getNumberInstance();
-	private final NumberFormat			_nf1					= NumberFormat.getInstance();
-	private final NumberFormat			_nf2					= NumberFormat.getInstance();
-	private final NumberFormat			_nf3					= NumberFormat.getInstance();
+	private final NumberFormat					_nf0					= NumberFormat.getNumberInstance();
+	private final NumberFormat					_nf1					= NumberFormat.getInstance();
+	private final NumberFormat					_nf2					= NumberFormat.getInstance();
+	private final NumberFormat					_nf3					= NumberFormat.getInstance();
 	{
 		_nf0.setMinimumFractionDigits(0);
 		_nf0.setMaximumFractionDigits(0);
@@ -91,107 +93,108 @@ public class TourInfoUI {
 		_nf3.setMaximumFractionDigits(3);
 	}
 
-	private static PeriodType			_tourPeriodTemplate		= PeriodType.yearMonthDayTime()
-																// hide these components
+	private static PeriodType					_tourPeriodTemplate		= PeriodType.yearMonthDayTime()
+																		// hide these components
 //																		.withMinutesRemoved()
-																		.withSecondsRemoved()
-																		.withMillisRemoved();
+																				.withSecondsRemoved()
+																				.withMillisRemoved();
 
-	private boolean						_hasDescription;
-	private boolean						_hasGears;
-	private boolean						_hasTags;
-	private boolean						_hasTourType;
-	private boolean						_hasWeather;
+	private boolean								_hasDescription;
+	private boolean								_hasGears;
+	private boolean								_hasTags;
+	private boolean								_hasTourType;
+	private boolean								_hasWeather;
 
 	/*
 	 * actions
 	 */
-	private ActionTourToolTipEditTour	_actionEditTour;
-	private ActionTourToolTipEditQuick	_actionEditQuick;
+	private ActionTourToolTip_EditTour			_actionEditTour;
+	private ActionTourToolTip_EditQuick			_actionEditQuick;
+	private ActionTourToolTip_EditPreferences	_actionPrefDialog;
 
-	private boolean						_isActionsVisible		= false;
+	private boolean								_isActionsVisible		= false;
 
 	/**
 	 * Tour which is displayed in the tool tip
 	 */
-	private TourData					_tourData;
+	private TourData							_tourData;
 
-	private String						_noTourTooltip			= Messages.Tour_Tooltip_Label_NoTour;
+	private String								_noTourTooltip			= Messages.Tour_Tooltip_Label_NoTour;
 
 	/**
 	 * contains the controls which are displayed in the first column, these controls are used to get
 	 * the maximum width and set the first column within the differenct section to the same width
 	 */
-	private final ArrayList<Control>	_firstColumnControls	= new ArrayList<Control>();
-	private final ArrayList<Control>	_secondColumnControls	= new ArrayList<Control>();
+	private final ArrayList<Control>			_firstColumnControls	= new ArrayList<Control>();
+	private final ArrayList<Control>			_secondColumnControls	= new ArrayList<Control>();
 
 	/*
 	 * UI controls
 	 */
-	private Composite					_ttContainer;
+	private Composite							_ttContainer;
 
-	private Text						_txtDescription;
-	private Text						_txtWeather;
+	private Text								_txtDescription;
+	private Text								_txtWeather;
 
-	private CLabel						_lblClouds;
-	private CLabel						_lblTourType;
+	private CLabel								_lblClouds;
+	private CLabel								_lblTourType;
 
-	private Label						_lblAltitudeUp;
-	private Label						_lblAltitudeUpUnit;
-	private Label						_lblAltitudeDown;
-	private Label						_lblAltitudeDownUnit;
-	private Label						_lblAvgSpeed;
-	private Label						_lblAvgSpeedUnit;
-	private Label						_lblAvgPace;
-	private Label						_lblAvgPaceUnit;
-	private Label						_lblAvgPulse;
-	private Label						_lblAvgPulseUnit;
-	private Label						_lblAvgCadence;
-	private Label						_lblAvgCadenceUnit;
-	private Label						_lblAvg_Power;
-	private Label						_lblAvg_PowerUnit;
-	private Label						_lblBodyWeight;
-	private Label						_lblBreakTime;
-	private Label						_lblBreakTimeHour;
-	private Label						_lblCalories;
-	private Label						_lblCloudsUnit;
-	private Label						_lblDate;
-	private Label						_lblDateTimeCreatedValue;
-	private Label						_lblDateTimeModifiedValue;
-	private Label						_lblDateTimeModified;
-	private Label						_lblDistance;
-	private Label						_lblDistanceUnit;
-	private Label						_lblGearFrontShifts;
-	private Label						_lblGearRearShifts;
-	private Label						_lblMaxAltitude;
-	private Label						_lblMaxAltitudeUnit;
-	private Label						_lblMaxPulse;
-	private Label						_lblMaxPulseUnit;
-	private Label						_lblMaxSpeed;
-	private Label						_lblMaxSpeedUnit;
-	private Label						_lblMovingTime;
-	private Label						_lblMovingTimeHour;
-	private Label						_lblRecordingTime;
-	private Label						_lblRecordingTimeHour;
-	private Label						_lblRestPulse;
-	private Label						_lblTemperature;
-	private Label						_lblTitle;
-	private Label						_lblTourTags;
-	private Label						_lblTourTypeText;
-	private Label						_lblWindSpeed;
-	private Label						_lblWindSpeedUnit;
-	private Label						_lblWindDirection;
-	private Label						_lblWindDirectionUnit;
+	private Label								_lblAltitudeUp;
+	private Label								_lblAltitudeUpUnit;
+	private Label								_lblAltitudeDown;
+	private Label								_lblAltitudeDownUnit;
+	private Label								_lblAvgSpeed;
+	private Label								_lblAvgSpeedUnit;
+	private Label								_lblAvgPace;
+	private Label								_lblAvgPaceUnit;
+	private Label								_lblAvgPulse;
+	private Label								_lblAvgPulseUnit;
+	private Label								_lblAvgCadence;
+	private Label								_lblAvgCadenceUnit;
+	private Label								_lblAvg_Power;
+	private Label								_lblAvg_PowerUnit;
+	private Label								_lblBodyWeight;
+	private Label								_lblBreakTime;
+	private Label								_lblBreakTimeHour;
+	private Label								_lblCalories;
+	private Label								_lblCloudsUnit;
+	private Label								_lblDate;
+	private Label								_lblDateTimeCreatedValue;
+	private Label								_lblDateTimeModifiedValue;
+	private Label								_lblDateTimeModified;
+	private Label								_lblDistance;
+	private Label								_lblDistanceUnit;
+	private Label								_lblGearFrontShifts;
+	private Label								_lblGearRearShifts;
+	private Label								_lblMaxAltitude;
+	private Label								_lblMaxAltitudeUnit;
+	private Label								_lblMaxPulse;
+	private Label								_lblMaxPulseUnit;
+	private Label								_lblMaxSpeed;
+	private Label								_lblMaxSpeedUnit;
+	private Label								_lblMovingTime;
+	private Label								_lblMovingTimeHour;
+	private Label								_lblRecordingTime;
+	private Label								_lblRecordingTimeHour;
+	private Label								_lblRestPulse;
+	private Label								_lblTemperature;
+	private Label								_lblTitle;
+	private Label								_lblTourTags;
+	private Label								_lblTourTypeText;
+	private Label								_lblWindSpeed;
+	private Label								_lblWindSpeedUnit;
+	private Label								_lblWindDirection;
+	private Label								_lblWindDirectionUnit;
 
 	/*
 	 * fields which are optionally displayed when they are not null
 	 */
-	private DateTime					_uiDtCreated;
-	private DateTime					_uiDtModified;
-	private String						_uiTourTypeName;
+	private DateTime							_uiDtCreated;
+	private DateTime							_uiDtModified;
+	private String								_uiTourTypeName;
 
-	private IToolTipProvider			_tourToolTipProvider;
-	private ITourProvider				_tourProvider;
+	private IToolTipProvider					_tourToolTipProvider;
+	private ITourProvider						_tourProvider;
 
 	/**
 	 * Run tour action quick edit.
@@ -345,8 +348,12 @@ public class TourInfoUI {
 		/*
 		 * create actions
 		 */
-		_actionEditTour = new ActionTourToolTipEditTour(_tourToolTipProvider, _tourProvider);
-		_actionEditQuick = new ActionTourToolTipEditQuick(_tourToolTipProvider, _tourProvider);
+		_actionEditTour = new ActionTourToolTip_EditTour(_tourToolTipProvider, _tourProvider);
+		_actionEditQuick = new ActionTourToolTip_EditQuick(_tourToolTipProvider, _tourProvider);
+		_actionPrefDialog = new ActionTourToolTip_EditPreferences(
+				_tourToolTipProvider,
+				Messages.Tour_Tooltip_Action_EditFormatPreferences,
+				PrefPageAppearanceDisplayFormat.ID);
 
 		/*
 		 * create toolbar
@@ -360,6 +367,7 @@ public class TourInfoUI {
 
 		tbm.add(_actionEditTour);
 		tbm.add(_actionEditQuick);
+		tbm.add(_actionPrefDialog);
 
 		tbm.update(true);
 	}
@@ -1037,26 +1045,9 @@ public class TourInfoUI {
 			_lblMovingTimeHour.setVisible(true);
 			_lblBreakTimeHour.setVisible(true);
 
-			_lblRecordingTime.setText(String.format(
-					Messages.Tour_Tooltip_Format_Date,
-					recordingTime / 3600,
-					(recordingTime % 3600) / 60,
-					(recordingTime % 3600) % 60)//
-					);
-
-			_lblMovingTime.setText(String.format(
-					Messages.Tour_Tooltip_Format_Date,
-					movingTime / 3600,
-					(movingTime % 3600) / 60,
-					(movingTime % 3600) % 60)//
-					);
-
-			_lblBreakTime.setText(String.format(
-					Messages.Tour_Tooltip_Format_Date,
-					breakTime / 3600,
-					(breakTime % 3600) / 60,
-					(breakTime % 3600) % 60)//
-					);
+			_lblRecordingTime.setText(FormatManager.formatRecordingTime(recordingTime));
+			_lblMovingTime.setText(FormatManager.formatDrivingTime(movingTime));
+			_lblBreakTime.setText(FormatManager.formatPausedTime(breakTime));
 
 		} else {
 
@@ -1121,7 +1112,7 @@ public class TourInfoUI {
 		 */
 		final float distance = _tourData.getTourDistance() / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
-		_lblDistance.setText(_nf3.format(distance / 1000));
+		_lblDistance.setText(FormatManager.formatDistance(distance / 1000.0));
 		_lblDistanceUnit.setText(UI.UNIT_LABEL_DISTANCE);
 
 		_lblAltitudeUp.setText(Integer.toString(//
@@ -1132,7 +1123,8 @@ public class TourInfoUI {
 				(int) (_tourData.getTourAltDown() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
 		_lblAltitudeDownUnit.setText(UI.UNIT_LABEL_ALTITUDE);
 
-		_lblAvgSpeed.setText(_nf1.format(movingTime == 0 ? 0 : distance / (movingTime / 3.6f)));
+		final float avgSpeed = movingTime == 0 ? 0 : distance / (movingTime / 3.6f);
+		_lblAvgSpeed.setText(FormatManager.formatSpeed(avgSpeed));
 		_lblAvgSpeedUnit.setText(UI.UNIT_LABEL_SPEED);
 
 		final int pace = (int) (distance == 0 ? 0 : (movingTime * 1000 / distance));
@@ -1175,10 +1167,10 @@ public class TourInfoUI {
 				(int) (_tourData.getMaxAltitude() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
 		_lblMaxAltitudeUnit.setText(UI.UNIT_LABEL_ALTITUDE);
 
-		_lblMaxPulse.setText(Integer.toString((int) _tourData.getMaxPulse()));
+		_lblMaxPulse.setText(FormatManager.formatPulse(_tourData.getMaxPulse()));
 		_lblMaxPulseUnit.setText(Messages.Value_Unit_Pulse);
 
-		_lblMaxSpeed.setText(_nf1.format(_tourData.getMaxSpeed()));
+		_lblMaxSpeed.setText(FormatManager.formatSpeed(_tourData.getMaxSpeed()));
 		_lblMaxSpeedUnit.setText(UI.UNIT_LABEL_SPEED);
 
 		// gears

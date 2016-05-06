@@ -32,7 +32,14 @@ public class ValueFormatter_Time_HHMMSS implements IValueFormatter {
 			return UI.EMPTY_STRING;
 		}
 
-		return UI.format_hh_mm_ss(value);
+		return UI.format_hhh_mm_ss(value);
+	}
+
+	@Override
+	public String toString() {
+		return "ValueFormatter_Time_HHMMSS [" //
+				+ "printLong()"
+				+ "]";
 	}
 
 }

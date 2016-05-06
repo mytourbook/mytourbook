@@ -423,7 +423,7 @@ public class ColumnDefinition implements Cloneable {
 	 * @param value
 	 * @param isDetail
 	 */
-	public void printValue(final ViewerCell cell, final double value, final boolean isDetail) {
+	public void printDoubleValue(final ViewerCell cell, final double value, final boolean isDetail) {
 
 		if (value == 0) {
 
@@ -446,7 +446,7 @@ public class ColumnDefinition implements Cloneable {
 	 * @param value
 	 * @param isDetail
 	 */
-	public void printValue(final ViewerCell cell, final long value, final boolean isDetail) {
+	public void printLongValue(final ViewerCell cell, final long value, final boolean isDetail) {
 
 		if (value == 0) {
 

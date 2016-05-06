@@ -1031,7 +1031,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				final Object element = cell.getElement();
 				final double value = ((TVITourBookItem) element).colAvgPulse;
 
-				colDef.printValue(cell, value, element instanceof TVITourBookTour);
+				colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
 				setCellColor(cell, element);
 			}
@@ -1050,9 +1050,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 			public void update(final ViewerCell cell) {
 
 				final Object element = cell.getElement();
-				final long value = ((TVITourBookItem) element).colCalories;
+				final double value = ((TVITourBookItem) element).colCalories / 1000.0;
 
-				colDef.printValue(cell, value, element instanceof TVITourBookTour);
+				colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
 				setCellColor(cell, element);
 			}
@@ -1358,7 +1358,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				final Object element = cell.getElement();
 				final double value = ((TVITourBookItem) element).colAvgSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
-				colDef.printValue(cell, value, element instanceof TVITourBookTour);
+				colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
 				setCellColor(cell, element);
 			}
@@ -1383,7 +1383,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 						/ 1000.0
 						/ net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
-				colDef.printValue(cell, value, element instanceof TVITourBookTour);
+				colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
 				setCellColor(cell, element);
 			}
@@ -1404,7 +1404,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				final Object element = cell.getElement();
 				final double value = ((TVITourBookItem) element).colMaxSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
-				colDef.printValue(cell, value, element instanceof TVITourBookTour);
+				colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
 				setCellColor(cell, element);
 			}
@@ -1425,7 +1425,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				final Object element = cell.getElement();
 				final double value = ((TVITourBookItem) element).colPower_Avg;
 
-				colDef.printValue(cell, value, element instanceof TVITourBookTour);
+				colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
 				setCellColor(cell, element);
 			}
@@ -1446,7 +1446,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				final Object element = cell.getElement();
 				final int value = ((TVITourBookItem) element).colPower_Max;
 
-				colDef.printValue(cell, value, element instanceof TVITourBookTour);
+				colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
 				setCellColor(cell, element);
 			}
@@ -1488,7 +1488,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				final Object element = cell.getElement();
 				final double value = ((TVITourBookItem) element).colPower_TotalWork / 1000000.0;
 
-				colDef.printValue(cell, value, element instanceof TVITourBookTour);
+				colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
 				setCellColor(cell, element);
 			}
@@ -1508,7 +1508,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				final Object element = cell.getElement();
 				final double value = ((TVITourBookItem) element).colAvgCadence;
 
-				colDef.printValue(cell, value, element instanceof TVITourBookTour);
+				colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
 				setCellColor(cell, element);
 			}
@@ -1531,7 +1531,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				final Object element = cell.getElement();
 				final double value = ((TVITourBookItem) element).colPower_AvgLeftPedalSmoothness;
 
-				colDef.printValue(cell, value, element instanceof TVITourBookTour);
+				colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
 				setCellColor(cell, element);
 			}
@@ -1554,7 +1554,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				final Object element = cell.getElement();
 				final double value = ((TVITourBookItem) element).colPower_AvgLeftTorqueEffectiveness;
 
-				colDef.printValue(cell, value, element instanceof TVITourBookTour);
+				colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
 				setCellColor(cell, element);
 			}
@@ -1577,7 +1577,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				final Object element = cell.getElement();
 				final double value = ((TVITourBookItem) element).colPower_AvgRightPedalSmoothness;
 
-				colDef.printValue(cell, value, element instanceof TVITourBookTour);
+				colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
 				setCellColor(cell, element);
 			}
@@ -1600,7 +1600,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				final Object element = cell.getElement();
 				final double value = ((TVITourBookItem) element).colPower_AvgRightTorqueEffectiveness;
 
-				colDef.printValue(cell, value, element instanceof TVITourBookTour);
+				colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
 				setCellColor(cell, element);
 			}
@@ -1719,7 +1719,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				final Object element = cell.getElement();
 				final long value = ((TVITourBookItem) element).colDrivingTime;
 
-				colDef.printValue(cell, value, element instanceof TVITourBookTour);
+				colDef.printLongValue(cell, value, element instanceof TVITourBookTour);
 
 				setCellColor(cell, element);
 			}
@@ -1742,7 +1742,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
 				final long value = item.colPausedTime;
 
-				colDef.printValue(cell, value, element instanceof TVITourBookTour);
+				colDef.printLongValue(cell, value, element instanceof TVITourBookTour);
 
 				setCellColor(cell, element);
 			}
@@ -1797,7 +1797,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				final Object element = cell.getElement();
 				final long value = ((TVITourBookItem) element).colRecordingTime;
 
-				colDef.printValue(cell, value, element instanceof TVITourBookTour);
+				colDef.printLongValue(cell, value, element instanceof TVITourBookTour);
 
 				setCellColor(cell, element);
 			}
@@ -2156,7 +2156,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				final Object element = cell.getElement();
 				final double value = ((TVITourBookItem) element).colPower_IntensityFactor;
 
-				colDef.printValue(cell, value, element instanceof TVITourBookTour);
+				colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
 				setCellColor(cell, element);
 			}
@@ -2175,7 +2175,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				final Object element = cell.getElement();
 				final double value = ((TVITourBookItem) element).colPower_PowerToWeight;
 
-				colDef.printValue(cell, value, element instanceof TVITourBookTour);
+				colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
 				setCellColor(cell, element);
 			}
@@ -2196,7 +2196,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				final Object element = cell.getElement();
 				final double value = ((TVITourBookItem) element).colPower_TrainingStressScore;
 
-				colDef.printValue(cell, value, element instanceof TVITourBookTour);
+				colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
 				setCellColor(cell, element);
 			}
@@ -2224,7 +2224,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 							+ net.tourbook.ui.UI.UNIT_FAHRENHEIT_ADD;
 				}
 
-				colDef.printValue(cell, value, element instanceof TVITourBookTour);
+				colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
 				setCellColor(cell, element);
 			}

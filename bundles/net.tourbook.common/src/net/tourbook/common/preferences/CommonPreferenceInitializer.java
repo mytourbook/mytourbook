@@ -60,11 +60,12 @@ public class CommonPreferenceInitializer extends AbstractPreferenceInitializer {
 		 */
 		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_IS_LIVE_UPDATE, true);
 
-		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_AVG_CADENCE, ValueFormat.NUMBER_1_0.name());
-		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_AVG_POWER, ValueFormat.NUMBER_1_0.name());
-		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_AVG_PULSE, ValueFormat.NUMBER_1_0.name());
-
+		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_CADENCE, ValueFormat.NUMBER_1_0.name());
 		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_CALORIES, ValueFormat.NUMBER_1_3.name());
+		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_DISTANCE, ValueFormat.NUMBER_1_3.name());
+		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_POWER, ValueFormat.NUMBER_1_0.name());
+		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_PULSE, ValueFormat.NUMBER_1_0.name());
+		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_SPEED, ValueFormat.NUMBER_1_0.name());
 
 		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_DRIVING_TIME, ValueFormat.TIME_HH_MM.name());
 		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_PAUSED_TIME, ValueFormat.TIME_HH_MM.name());

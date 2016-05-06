@@ -15,18 +15,20 @@
  *******************************************************************************/
 package net.tourbook.ui.action;
 
+import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.util.IToolTipProvider;
-import net.tourbook.ui.ITourProvider;
 
-public class ActionTourToolTipEditTour extends ActionEditTour {
+public class ActionTourToolTip_EditPreferences extends ActionOpenPrefDialog {
 
 	private final IToolTipProvider	_ttProvider;
 
-	public ActionTourToolTipEditTour(final IToolTipProvider _toolTipProvider, final ITourProvider _tourProvider) {
+	public ActionTourToolTip_EditPreferences(	final IToolTipProvider tourToolTipProvider,
+												final String text,
+												final String prefPageId) {
 
-		super(_tourProvider);
+		super(text, prefPageId);
 
-		_ttProvider = _toolTipProvider;
+		_ttProvider = tourToolTipProvider;
 	}
 
 	@Override

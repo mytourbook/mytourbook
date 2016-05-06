@@ -493,7 +493,7 @@ public class UI {
 		boolean isCtrlKey;
 		boolean isShiftKey;
 
-		if (UI.IS_OSX) {
+		if (IS_OSX) {
 			isCtrlKey = (event.stateMask & SWT.MOD1) > 0;
 			isShiftKey = (event.stateMask & SWT.MOD3) > 0;
 			//			isAltKey = (event.stateMask & SWT.MOD3) > 0;
@@ -520,7 +520,7 @@ public class UI {
 		boolean isCtrlKey;
 		boolean isShiftKey;
 
-		if (UI.IS_OSX) {
+		if (IS_OSX) {
 			isCtrlKey = (event.stateMask & SWT.MOD1) > 0;
 			isShiftKey = (event.stateMask & SWT.MOD3) > 0;
 			//			isAltKey = (event.stateMask & SWT.MOD3) > 0;
@@ -764,16 +764,16 @@ public class UI {
 	public static String format_hh_mm_ss(final long time) {
 
 		if (time == -1) {
-			return UI.EMPTY_STRING;
+			return EMPTY_STRING;
 		}
 
-		UI._formatterSB.setLength(0);
+		_formatterSB.setLength(0);
 
 		if (time >= 3600) {
 
 			// display hours
 
-			return UI._formatter.format(//
+			return _formatter.format(//
 					Messages.Format_hhmmss,
 					(time / 3600),
 					((time % 3600) / 60),
@@ -783,7 +783,7 @@ public class UI {
 
 			// ignore hours
 
-			return UI._formatter.format(//
+			return _formatter.format(//
 					Messages.Format_hhmm,
 					((time % 3600) / 60),
 					((time % 3600) % 60)).toString();
@@ -812,7 +812,7 @@ public class UI {
 		_formatterSB.setLength(0);
 
 		if (time < 0) {
-			_formatterSB.append(UI.DASH);
+			_formatterSB.append(DASH);
 		}
 
 		final long timeAbs = time < 0 ? 0 - time : time;
@@ -859,7 +859,7 @@ public class UI {
 			return SYMBOL_INFINITY_MAX;
 		}
 
-		return Long.toString((long) (value / 1000)) + UI.SPACE + UI.UNIT_DISTANCE_KM;
+		return Long.toString((long) (value / 1000)) + SPACE + UNIT_DISTANCE_KM;
 	}
 
 	/**
@@ -872,7 +872,7 @@ public class UI {
 	public static String formatHhMmSs(long time) {
 
 		if (time == 0) {
-			return UI.EMPTY_STRING;
+			return EMPTY_STRING;
 		}
 
 		boolean isNegative = false;
@@ -906,7 +906,7 @@ public class UI {
 
 		}
 
-		return isNegative ? UI.SYMBOL_DASH + timeText : timeText;
+		return isNegative ? SYMBOL_DASH + timeText : timeText;
 	}
 
 	/**
@@ -1047,7 +1047,7 @@ public class UI {
 
 		boolean isCtrlKey;
 
-		if (UI.IS_OSX) {
+		if (IS_OSX) {
 			isCtrlKey = (event.stateMask & SWT.MOD1) > 0;
 		} else {
 			isCtrlKey = (event.stateMask & SWT.MOD1) > 0;
@@ -1060,7 +1060,7 @@ public class UI {
 
 		boolean isShiftKey;
 
-		if (UI.IS_OSX) {
+		if (IS_OSX) {
 			isShiftKey = (event.stateMask & SWT.MOD3) > 0;
 		} else {
 			isShiftKey = (event.stateMask & SWT.MOD2) > 0;
@@ -1092,8 +1092,8 @@ public class UI {
 	public static String replaceHTML_BackSlash(final String filePath) {
 
 		return filePath.replace(//
-				UI.SYMBOL_BACKSLASH,
-				UI.SYMBOL_HTML_BACKSLASH);
+				SYMBOL_BACKSLASH,
+				SYMBOL_HTML_BACKSLASH);
 	}
 
 	public static String replaceHTML_NewLine(final String text) {
@@ -1109,7 +1109,7 @@ public class UI {
 	public static String replaceJS_BackSlash(final String filePath) {
 
 		return filePath.replace(//
-				UI.SYMBOL_BACKSLASH,
+				SYMBOL_BACKSLASH,
 				JS_BACKSLASH_REPLACEMENT);
 	}
 
@@ -1424,7 +1424,7 @@ public class UI {
 	 * set width for all controls in one column to the max width value
 	 */
 	public static void setEqualizeColumWidths(final ArrayList<Control> columnControls) {
-		UI.setEqualizeColumWidths(columnControls, 0);
+		setEqualizeColumWidths(columnControls, 0);
 	}
 
 	public static void setEqualizeColumWidths(final ArrayList<Control> columnControls, final int additionalSpace) {
@@ -1515,7 +1515,7 @@ public class UI {
 	public static String shortenText(final GC gc, final String text, final int width, final boolean isUseEllipses) {
 		return isUseEllipses ? //
 				shortenText(gc, text, width, ELLIPSIS)
-				: shortenText(gc, text, width, UI.EMPTY_STRING);
+				: shortenText(gc, text, width, EMPTY_STRING);
 	}
 
 	public static String shortenText(final GC gc, String text, final int width, final String ellipses) {
@@ -1630,9 +1630,9 @@ public class UI {
 		if (textLength > textWidth) {
 
 			if (isShowBegin) {
-				shortedText = shortedText + UI.ELLIPSIS;
+				shortedText = shortedText + ELLIPSIS;
 			} else {
-				shortedText = UI.ELLIPSIS + shortedText;
+				shortedText = ELLIPSIS + shortedText;
 			}
 		}
 
@@ -1772,7 +1772,7 @@ public class UI {
 		return new VerifyListener() {
 			@Override
 			public void verifyText(final VerifyEvent e) {
-				if (e.text.equals(UI.EMPTY_STRING)) {
+				if (e.text.equals(EMPTY_STRING)) {
 					return;
 				}
 				try {
