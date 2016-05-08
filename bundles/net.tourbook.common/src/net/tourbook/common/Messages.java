@@ -50,7 +50,7 @@ public class Messages extends NLS {
 	public static String		Column_Profile_Name_Default;
 
 	public static String		ColumnModifyDialog_Button_default;
-	public static String		ColumnModifyDialog_Button_Default_Tooltip;
+	public static String		ColumnModifyDialog_Button_Default2_Tooltip;
 	public static String		ColumnModifyDialog_Button_deselect_all;
 	public static String		ColumnModifyDialog_Button_move_down;
 	public static String		ColumnModifyDialog_Button_move_up;

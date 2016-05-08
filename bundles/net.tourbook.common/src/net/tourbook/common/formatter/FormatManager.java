@@ -16,6 +16,7 @@
 package net.tourbook.common.formatter;
 
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.UI;
 import net.tourbook.common.preferences.ICommonPreferences;
 
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -63,6 +64,11 @@ public class FormatManager {
 	}
 
 	public static String formatNumber_0(final double value) {
+
+		if (value == 0) {
+			return UI.EMPTY_STRING;
+		}
+
 		return _valueFormatter_Number_1_0.printDouble(value);
 	}
 

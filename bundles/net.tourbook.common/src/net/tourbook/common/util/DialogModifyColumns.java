@@ -891,7 +891,7 @@ public class DialogModifyColumns extends TrayDialog {
 			{
 				_btnColumn_Default = new Button(container, SWT.NONE);
 				_btnColumn_Default.setText(Messages.ColumnModifyDialog_Button_default);
-				_btnColumn_Default.setToolTipText(Messages.ColumnModifyDialog_Button_Default_Tooltip);
+				_btnColumn_Default.setToolTipText(Messages.ColumnModifyDialog_Button_Default2_Tooltip);
 				_btnColumn_Default.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(final SelectionEvent event) {

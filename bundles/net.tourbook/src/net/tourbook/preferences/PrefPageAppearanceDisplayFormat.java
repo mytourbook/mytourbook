@@ -203,7 +203,7 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
 			 */
 
 			final Label label = new Label(parent, SWT.NONE);
-			label.setText(Messages.Pref_DisplayFormat_Label_PausedTime);
+			label.setText(Messages.Pref_DisplayFormat_Label_BreakTime);
 
 			final Composite container = new Composite(parent, SWT.NONE);
 			GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
