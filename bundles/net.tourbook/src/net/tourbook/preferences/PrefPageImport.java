@@ -178,12 +178,12 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
 
 		_lblIdInfo.setEnabled(isTourIdWithTime);
 
-		_dtTemperatureAdjustmentDuration.setEnabled(isAdjustTemperature);
-		_lblAvgTemperature.setEnabled(isAdjustTemperature);
-		_lblTemperatureAdjustmentInfo.setEnabled(isAdjustTemperature);
-		_lblTemperatureAdjustmentDuration.setEnabled(isAdjustTemperature);
-		_lblTemperatureUnit.setEnabled(isAdjustTemperature);
-		_spinnerAvgTemperature.setEnabled(isAdjustTemperature);
+//		_dtTemperatureAdjustmentDuration.setEnabled(isAdjustTemperature);
+//		_lblAvgTemperature.setEnabled(isAdjustTemperature);
+//		_lblTemperatureAdjustmentInfo.setEnabled(isAdjustTemperature);
+//		_lblTemperatureAdjustmentDuration.setEnabled(isAdjustTemperature);
+//		_lblTemperatureUnit.setEnabled(isAdjustTemperature);
+//		_spinnerAvgTemperature.setEnabled(isAdjustTemperature);
 	}
 
 	@Override

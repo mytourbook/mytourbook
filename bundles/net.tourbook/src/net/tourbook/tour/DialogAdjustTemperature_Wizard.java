@@ -81,6 +81,8 @@ public class DialogAdjustTemperature_Wizard extends Wizard {
 
 		final long start = System.currentTimeMillis();
 
+		TourLogManager.showLogView();
+
 		TourLogManager.logTitle(LOG_TEMP_ADJUST_001_START);
 
 		try {
@@ -102,8 +104,8 @@ public class DialogAdjustTemperature_Wizard extends Wizard {
 
 		_wizardPage.saveState();
 
-		final float avgMinimumTemperature = _prefStore
-				.getFloat(ITourbookPreferences.ADJUST_TEMPERATURE_AVG_TEMPERATURE);
+		final float avgMinimumTemperature = _prefStore.getFloat(//
+				ITourbookPreferences.ADJUST_TEMPERATURE_AVG_TEMPERATURE);
 		final int durationTime = _prefStore.getInt(ITourbookPreferences.ADJUST_TEMPERATURE_DURATION_TIME);
 
 		final IRunnableWithProgress runnable = new IRunnableWithProgress() {
@@ -137,7 +139,7 @@ public class DialogAdjustTemperature_Wizard extends Wizard {
 					// skip tours which avg temperature is above the minimum avg temperature
 					if (oldTourAvgTemperature > avgMinimumTemperature) {
 
-						TourLogManager.logSubError(String.format(
+						TourLogManager.logSubInfo(String.format(
 								LOG_TEMP_ADJUST_006_IS_ABOVE_TEMPERATURE,
 								TourManager.getTourDateTimeShort(tourData),
 								oldTourAvgTemperature,

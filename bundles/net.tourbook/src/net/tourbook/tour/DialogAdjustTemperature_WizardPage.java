@@ -85,6 +85,8 @@ class DialogAdjustTemperature_WizardPage extends WizardPage {
 
 	private void createUI_10_Controls(final Composite parent) {
 
+		final int infoWidth = _pc.convertWidthInCharsToPixels(60);
+
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
 				.grab(true, false)
@@ -98,7 +100,7 @@ class DialogAdjustTemperature_WizardPage extends WizardPage {
 				final Label label = new Label(container, SWT.WRAP | SWT.READ_ONLY);
 				label.setText(Messages.Dialog_AdjustTemperature_Info_TemperatureAdjustment);
 				GridDataFactory.fillDefaults()//
-						.hint(_pc.convertWidthInCharsToPixels(60), SWT.DEFAULT)
+						.hint(infoWidth, SWT.DEFAULT)
 						.grab(true, false)
 						.applyTo(label);
 			}
@@ -171,6 +173,19 @@ class DialogAdjustTemperature_WizardPage extends WizardPage {
 							.align(SWT.FILL, SWT.CENTER)
 							.applyTo(unitLabel);
 				}
+			}
+
+			{
+				/*
+				 * Label: Hint
+				 */
+				final Label label = new Label(container, SWT.WRAP | SWT.READ_ONLY);
+				label.setText(Messages.Dialog_AdjustTemperature_Info_Hint);
+				GridDataFactory.fillDefaults()//
+						.hint(infoWidth, SWT.DEFAULT)
+						.indent(0, _pc.convertVerticalDLUsToPixels(8))
+						.grab(true, false)
+						.applyTo(label);
 			}
 		}
 	}

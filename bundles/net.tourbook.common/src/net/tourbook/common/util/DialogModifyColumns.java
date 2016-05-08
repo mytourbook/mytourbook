@@ -1055,7 +1055,7 @@ public class DialogModifyColumns extends TrayDialog {
 
 		final TableColumn tc = tvc.getColumn();
 		tc.setMoveable(true);
-		tc.setText(Messages.ColumnModifyDialog_Column_Format);
+		tc.setText(Messages.ColumnModifyDialog_Column_FormatCategory);
 
 		tvc.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -1090,7 +1090,7 @@ public class DialogModifyColumns extends TrayDialog {
 
 		final TableColumn tc = tvc.getColumn();
 		tc.setMoveable(true);
-		tc.setText(Messages.ColumnModifyDialog_Column_DetailFormat);
+		tc.setText(Messages.ColumnModifyDialog_Column_FormatTour);
 
 		tvc.setLabelProvider(new CellLabelProvider() {
 			@Override

@@ -60,8 +60,8 @@ public class Messages extends NLS {
 	public static String		ColumnModifyDialog_Button_Sort_Tooltip;
 	public static String		ColumnModifyDialog_Checkbox_ShowFormatAnnotations;
 	public static String		ColumnModifyDialog_Column_Category;
-	public static String		ColumnModifyDialog_Column_DetailFormat;
-	public static String		ColumnModifyDialog_Column_Format;
+	public static String		ColumnModifyDialog_Column_FormatCategory;
+	public static String		ColumnModifyDialog_Column_FormatTour;
 	public static String		ColumnModifyDialog_column_column;
 	public static String		ColumnModifyDialog_column_unit;
 	public static String		ColumnModifyDialog_column_width;

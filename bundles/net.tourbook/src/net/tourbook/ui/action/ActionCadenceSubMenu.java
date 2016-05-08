@@ -118,8 +118,8 @@ public class ActionCadenceSubMenu extends Action implements IMenuCreator {
 
 	private void fillMenu(final Menu menu) {
 
-		new ActionContributionItem(_actionSetSpm).fill(menu, -1);
 		new ActionContributionItem(_actionSetRpm).fill(menu, -1);
+		new ActionContributionItem(_actionSetSpm).fill(menu, -1);
 	}
 
 	@Override

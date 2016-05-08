@@ -710,14 +710,6 @@ public class ColumnManager {
 		}
 
 		/*
-		 * Actions: Value Formatter
-		 */
-		if (isValueFormatter) {
-
-			new ColumnFormatSubMenu(contextMenu, colDef, this);
-		}
-
-		/*
 		 * Action: Hide current column
 		 */
 		if (isHideColumn) {
@@ -735,6 +727,14 @@ public class ColumnManager {
 				// column cannot be hidden, disable it
 				menuItem.setEnabled(false);
 			}
+		}
+
+		/*
+		 * Actions: Value Formatter
+		 */
+		if (isValueFormatter) {
+
+			new ColumnFormatSubMenu(contextMenu, colDef, this);
 		}
 
 		createMenuSeparator(contextMenu);

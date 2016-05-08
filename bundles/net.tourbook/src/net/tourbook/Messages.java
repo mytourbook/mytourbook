@@ -119,6 +119,7 @@ public class Messages extends NLS {
 	public static String		Dialog_AdjustTemperature_Button_AdjustTemperature;
 	public static String		Dialog_AdjustTemperature_Dialog_Message;
 	public static String		Dialog_AdjustTemperature_Dialog_Title;
+	public static String		Dialog_AdjustTemperature_Info_Hint;
 	public static String		Dialog_AdjustTemperature_Info_TemperatureAdjustment;
 	public static String		Dialog_AdjustTemperature_Label_AvgTemperature;
 	public static String		Dialog_AdjustTemperature_Label_Progress_SubTask;
@@ -1122,7 +1123,6 @@ public class Messages extends NLS {
 	public static String		Pref_DisplayFormat_Label_Altitude;
 	public static String		Pref_DisplayFormat_Label_BreakTime;
 	public static String		Pref_DisplayFormat_Label_Cadence;
-	public static String		Pref_DisplayFormat_Label_Calories;
 	public static String		Pref_DisplayFormat_Label_Distance;
 	public static String		Pref_DisplayFormat_Label_Info;
 	public static String		Pref_DisplayFormat_Label_Power;
