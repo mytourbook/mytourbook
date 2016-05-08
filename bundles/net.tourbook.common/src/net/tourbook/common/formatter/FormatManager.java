@@ -42,7 +42,6 @@ public class FormatManager {
 	private static IValueFormatter			_pulseFormatter;
 	private static IValueFormatter			_speedFormatter;
 
-
 	private static IValueFormatter			_drivingTimeFormatter;
 	private static IValueFormatter			_pausedTimeFormatter;
 	private static IValueFormatter			_recordingTimeFormatter;
@@ -63,6 +62,14 @@ public class FormatManager {
 		return _drivingTimeFormatter.printLong(value);
 	}
 
+	public static String formatNumber_0(final double value) {
+		return _valueFormatter_Number_1_0.printDouble(value);
+	}
+
+	/**
+	 * @param value
+	 * @return Format a number with 0 digits but with thousender markers.
+	 */
 	public static String formatPausedTime(final long value) {
 		return _pausedTimeFormatter.printLong(value);
 	}

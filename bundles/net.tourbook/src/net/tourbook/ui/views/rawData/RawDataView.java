@@ -48,6 +48,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer3;
@@ -2494,7 +2495,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				final TourData element = (TourData) cell.getElement();
 				final long value = element.getCalories();
 
-				colDef.printDetailValue(cell, value);
+				cell.setText(FormatManager.formatNumber_0(value));
 			}
 		});
 	}

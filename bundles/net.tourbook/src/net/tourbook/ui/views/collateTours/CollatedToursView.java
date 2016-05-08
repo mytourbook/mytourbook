@@ -26,6 +26,7 @@ import java.util.Set;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.tooltip.OpenDialogManager;
 import net.tourbook.common.util.ColumnDefinition;
@@ -867,7 +868,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 				final Object element = cell.getElement();
 				final long value = ((TVICollatedTour) element).colCalories;
 
-				colDef.printDoubleValue(cell, value, element instanceof TVICollatedTour_Tour);
+				cell.setText(FormatManager.formatNumber_0(value));
 
 				setCellColor(cell, element);
 			}

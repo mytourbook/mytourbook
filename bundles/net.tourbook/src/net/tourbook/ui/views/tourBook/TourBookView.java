@@ -34,6 +34,7 @@ import java.util.Set;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.tooltip.OpenDialogManager;
 import net.tourbook.common.util.ColumnDefinition;
@@ -1050,9 +1051,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 			public void update(final ViewerCell cell) {
 
 				final Object element = cell.getElement();
-				final double value = ((TVITourBookItem) element).colCalories / 1000.0;
+				final double value = ((TVITourBookItem) element).colCalories;
 
-				colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
+				cell.setText(FormatManager.formatNumber_0(value));
 
 				setCellColor(cell, element);
 			}

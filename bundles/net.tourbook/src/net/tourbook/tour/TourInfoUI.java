@@ -1153,8 +1153,8 @@ public class TourInfoUI {
 		_lblAvg_PowerUnit.setText(UI.UNIT_POWER);
 
 		// calories
-		final double calories = _tourData.getCalories() / 1000.0;
-		_lblCalories.setText(FormatManager.formatCalories(calories));
+		final double calories = _tourData.getCalories();
+		_lblCalories.setText(FormatManager.formatNumber_0(calories));
 
 		// body
 		_lblRestPulse.setText(Integer.toString(_tourData.getRestPulse()));

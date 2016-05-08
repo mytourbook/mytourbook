@@ -193,6 +193,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	public static final String					ID								= "net.tourbook.views.TourDataEditorView";					//$NON-NLS-1$
 
 	private static final String					GRAPH_LABEL_HEARTBEAT_UNIT		= net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
+	private static final String					VALUE_UNIT_K_CALORIES			= net.tourbook.ui.Messages.Value_Unit_KCalories;
 
 	private static final int					COLUMN_SPACING					= 20;
 
@@ -2627,7 +2628,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
 		_firstColumnContainerControls.add(container);
 		{
-
 			{
 				/*
 				 * calories
@@ -2646,9 +2646,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				_spinTourCalories.addMouseWheelListener(_mouseWheelListener);
 				_spinTourCalories.addSelectionListener(_selectionListener);
 
-				// label: cal
-				_tk.createLabel(container, Messages.tour_editor_label_tour_calories_unit);
+				// label: kcal
+				_tk.createLabel(container, VALUE_UNIT_K_CALORIES);
 			}
+
 			{
 				/*
 				 * rest pulse
@@ -6153,7 +6154,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	@Override
 	public void updateColumnHeader(final ColumnDefinition colDef) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	private void updateInternalUnitValues() {
