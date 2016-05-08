@@ -45,6 +45,14 @@
 				<module>build/build.update-site</module>
 			</modules>
 		</profile>
+
+		<profile>
+			<id>build-update-site-no-nl</id>
+			<modules>
+				<module>features</module>
+				<module>build/build.update-site-no-NL</module>
+			</modules>
+		</profile>
 	
 	</profiles>
 

@@ -74,12 +74,21 @@ Create Update site
 		- Run "mvn verify -P build-update-site"
 
 
+	* without NL
+
+	Open cmd
+		- Select folder "C:\DAT\MT\mytourbook"
+		- Run "mvn verify -P build-update-site-no-nl"
 
 
 
+3.8.2 Archives
+--------------
 
-
-
+http://archive.eclipse.org/eclipse/downloads/drops/R-3.8.2-201301310800/org.eclipse.pde-3.8.2.zip
+http://archive.eclipse.org/eclipse/downloads/drops/R-3.8.2-201301310800/org.eclipse.jdt-3.8.2.zip
+http://archive.eclipse.org/eclipse/downloads/drops/R-3.8.2-201301310800/org.eclipse.rcp-3.8.2.zip
+http://archive.eclipse.org/eclipse/downloads/drops/R-3.8.2-201301310800/org.eclipse.platform-3.8.2.zip
 
 
 
