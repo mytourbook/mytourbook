@@ -52,13 +52,11 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
 
 	private Button					_chkLiveUpdate;
 
+	private Button					_rdoAltitude_1_0;
+	private Button					_rdoAltitude_1_1;
 	private Button					_rdoCadence_1_0;
 	private Button					_rdoCadence_1_1;
 	private Button					_rdoCadence_1_2;
-	private Button					_rdoCalories_1_0;
-	private Button					_rdoCalories_1_1;
-	private Button					_rdoCalories_1_2;
-	private Button					_rdoCalories_1_3;
 	private Button					_rdoDistance_1_0;
 	private Button					_rdoDistance_1_1;
 	private Button					_rdoDistance_1_2;
@@ -232,6 +230,30 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
 
 		{
 			/*
+			 * Pulse: m / ft
+			 */
+			final Label label = new Label(parent, SWT.NONE);
+			label.setText(Messages.Pref_DisplayFormat_Label_Altitude);
+
+			final Composite container = new Composite(parent, SWT.NONE);
+			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+			{
+				_rdoAltitude_1_0 = new Button(container, SWT.RADIO);
+				_rdoAltitude_1_0.setText(formatName_1_0);
+				_rdoAltitude_1_0.addSelectionListener(_defaultSelectionListener);
+
+				_rdoAltitude_1_1 = new Button(container, SWT.RADIO);
+				_rdoAltitude_1_1.setText(formatName_1_1);
+				_rdoAltitude_1_1.addSelectionListener(_defaultSelectionListener);
+			}
+
+			// vertical indent
+			final int vIndent = _pc.convertVerticalDLUsToPixels(4);
+			GridDataFactory.fillDefaults().indent(0, vIndent).applyTo(label);
+			GridDataFactory.fillDefaults().indent(0, vIndent).applyTo(container);
+		}
+		{
+			/*
 			 * Pulse: bpm
 			 */
 			final Label label = new Label(parent, SWT.NONE);
@@ -248,11 +270,6 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
 				_rdoPulse_1_1.setText(formatName_1_1);
 				_rdoPulse_1_1.addSelectionListener(_defaultSelectionListener);
 			}
-
-			// vertical indent
-			final int vIndent = _pc.convertVerticalDLUsToPixels(4);
-			GridDataFactory.fillDefaults().indent(0, vIndent).applyTo(label);
-			GridDataFactory.fillDefaults().indent(0, vIndent).applyTo(container);
 		}
 
 		{
@@ -353,37 +370,6 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
 				_rdoDistance_1_3.addSelectionListener(_defaultSelectionListener);
 			}
 		}
-
-		{
-			/*
-			 * Calories: # ... #.###
-			 */
-
-			final Label label = new Label(parent, SWT.NONE);
-			label.setText(Messages.Pref_DisplayFormat_Label_Calories);
-//			GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
-
-			final Composite container = new Composite(parent, SWT.NONE);
-			GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
-//			GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-			{
-				_rdoCalories_1_0 = new Button(container, SWT.RADIO);
-				_rdoCalories_1_0.setText(formatName_1_0);
-				_rdoCalories_1_0.addSelectionListener(_defaultSelectionListener);
-
-				_rdoCalories_1_1 = new Button(container, SWT.RADIO);
-				_rdoCalories_1_1.setText(formatName_1_1);
-				_rdoCalories_1_1.addSelectionListener(_defaultSelectionListener);
-
-				_rdoCalories_1_2 = new Button(container, SWT.RADIO);
-				_rdoCalories_1_2.setText(formatName_1_2);
-				_rdoCalories_1_2.addSelectionListener(_defaultSelectionListener);
-
-				_rdoCalories_1_3 = new Button(container, SWT.RADIO);
-				_rdoCalories_1_3.setText(formatName_1_3);
-				_rdoCalories_1_3.addSelectionListener(_defaultSelectionListener);
-			}
-		}
 	}
 
 	private void createUI_99_LiveUpdate(final Composite parent) {
@@ -446,8 +432,8 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
 
 		final boolean isLiveUpdate = _prefStore.getDefaultBoolean(ICommonPreferences.DISPLAY_FORMAT_IS_LIVE_UPDATE);
 
+		final String altitude = _prefStore.getDefaultString(ICommonPreferences.DISPLAY_FORMAT_ALTITUDE);
 		final String cadence = _prefStore.getDefaultString(ICommonPreferences.DISPLAY_FORMAT_CADENCE);
-		final String calories = _prefStore.getDefaultString(ICommonPreferences.DISPLAY_FORMAT_CALORIES);
 		final String distance = _prefStore.getDefaultString(ICommonPreferences.DISPLAY_FORMAT_DISTANCE);
 		final String power = _prefStore.getDefaultString(ICommonPreferences.DISPLAY_FORMAT_POWER);
 		final String pulse = _prefStore.getDefaultString(ICommonPreferences.DISPLAY_FORMAT_PULSE);
@@ -457,14 +443,11 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
 		final String pausedTime = _prefStore.getDefaultString(ICommonPreferences.DISPLAY_FORMAT_PAUSED_TIME);
 		final String recordingTime = _prefStore.getDefaultString(ICommonPreferences.DISPLAY_FORMAT_RECORDING_TIME);
 
+		final boolean isAltitude_1_0 = ValueFormat.NUMBER_1_0.name().equals(altitude);
+
 		final boolean isCadence_1_0 = ValueFormat.NUMBER_1_0.name().equals(cadence);
 		final boolean isCadence_1_1 = ValueFormat.NUMBER_1_1.name().equals(cadence);
 		final boolean isCadence_1_2 = ValueFormat.NUMBER_1_2.name().equals(cadence);
-
-		final boolean isCalories_1_0 = ValueFormat.NUMBER_1_0.name().equals(calories);
-		final boolean isCalories_1_1 = ValueFormat.NUMBER_1_1.name().equals(calories);
-		final boolean isCalories_1_2 = ValueFormat.NUMBER_1_2.name().equals(calories);
-		final boolean isCalories_1_3 = ValueFormat.NUMBER_1_3.name().equals(calories);
 
 		final boolean isDistance_1_0 = ValueFormat.NUMBER_1_0.name().equals(distance);
 		final boolean isDistance_1_1 = ValueFormat.NUMBER_1_1.name().equals(distance);
@@ -490,14 +473,12 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
 		final boolean isRecording_HH_MM = ValueFormat.TIME_HH_MM.name().equals(recordingTime);
 		final boolean isRecording_HH_MM_SS = ValueFormat.TIME_HH_MM_SS.name().equals(recordingTime);
 
+		_rdoAltitude_1_0.setSelection(isAltitude_1_0);
+		_rdoAltitude_1_1.setSelection(!isAltitude_1_0);
+
 		_rdoCadence_1_0.setSelection(isCadence_1_0);
 		_rdoCadence_1_1.setSelection(isCadence_1_1);
 		_rdoCadence_1_2.setSelection(isCadence_1_2);
-
-		_rdoCalories_1_0.setSelection(isCalories_1_0);
-		_rdoCalories_1_1.setSelection(isCalories_1_1);
-		_rdoCalories_1_2.setSelection(isCalories_1_2);
-		_rdoCalories_1_3.setSelection(isCalories_1_3);
 
 		_rdoDistance_1_0.setSelection(isDistance_1_0);
 		_rdoDistance_1_1.setSelection(isDistance_1_1);
@@ -545,8 +526,8 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
 
 		final boolean isLiveUpdate = _prefStore.getBoolean(ICommonPreferences.DISPLAY_FORMAT_IS_LIVE_UPDATE);
 
+		final String altitude = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_ALTITUDE);
 		final String cadence = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_CADENCE);
-		final String calories = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_CALORIES);
 		final String distance = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_DISTANCE);
 		final String power = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_POWER);
 		final String pulse = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_PULSE);
@@ -556,14 +537,10 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
 		final String pausedTime = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_PAUSED_TIME);
 		final String recordingTime = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_RECORDING_TIME);
 
+		final boolean isAltitude_1_0 = ValueFormat.NUMBER_1_0.name().equals(altitude);
 		final boolean isCadence_1_0 = ValueFormat.NUMBER_1_0.name().equals(cadence);
 		final boolean isCadence_1_1 = ValueFormat.NUMBER_1_1.name().equals(cadence);
 		final boolean isCadence_1_2 = ValueFormat.NUMBER_1_2.name().equals(cadence);
-
-		final boolean isCalories_1_0 = ValueFormat.NUMBER_1_0.name().equals(calories);
-		final boolean isCalories_1_1 = ValueFormat.NUMBER_1_1.name().equals(calories);
-		final boolean isCalories_1_2 = ValueFormat.NUMBER_1_2.name().equals(calories);
-		final boolean isCalories_1_3 = ValueFormat.NUMBER_1_3.name().equals(calories);
 
 		final boolean isDistance_1_0 = ValueFormat.NUMBER_1_0.name().equals(distance);
 		final boolean isDistance_1_1 = ValueFormat.NUMBER_1_1.name().equals(distance);
@@ -589,14 +566,12 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
 		final boolean isRecording_HH_MM = ValueFormat.TIME_HH_MM.name().equals(recordingTime);
 		final boolean isRecording_HH_MM_SS = ValueFormat.TIME_HH_MM_SS.name().equals(recordingTime);
 
+		_rdoAltitude_1_0.setSelection(isAltitude_1_0);
+		_rdoAltitude_1_1.setSelection(!isAltitude_1_0);
+
 		_rdoCadence_1_0.setSelection(isCadence_1_0);
 		_rdoCadence_1_1.setSelection(isCadence_1_1);
 		_rdoCadence_1_2.setSelection(isCadence_1_2);
-
-		_rdoCalories_1_0.setSelection(isCalories_1_0);
-		_rdoCalories_1_1.setSelection(isCalories_1_1);
-		_rdoCalories_1_2.setSelection(isCalories_1_2);
-		_rdoCalories_1_3.setSelection(isCalories_1_3);
 
 		_rdoDistance_1_0.setSelection(isDistance_1_0);
 		_rdoDistance_1_1.setSelection(isDistance_1_1);
@@ -630,19 +605,15 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
 
 	private void saveState() {
 
+		final String altitudeFormat = _rdoAltitude_1_0.getSelection() //
+				? ValueFormat.NUMBER_1_0.name()
+				: ValueFormat.NUMBER_1_1.name();
+
 		final String cadenceFormat = _rdoCadence_1_0.getSelection() //
 				? ValueFormat.NUMBER_1_0.name()
 				: _rdoCadence_1_1.getSelection() //
 						? ValueFormat.NUMBER_1_1.name()
 						: ValueFormat.NUMBER_1_2.name();
-
-		final String caloriesFormat = _rdoCalories_1_0.getSelection() //
-				? ValueFormat.NUMBER_1_0.name()
-				: _rdoCalories_1_1.getSelection()//
-						? ValueFormat.NUMBER_1_1.name()
-						: _rdoCalories_1_2.getSelection() //
-								? ValueFormat.NUMBER_1_2.name()
-								: ValueFormat.NUMBER_1_3.name();
 
 		final String distanceFormat = _rdoDistance_1_0.getSelection() //
 				? ValueFormat.NUMBER_1_0.name()
@@ -684,8 +655,8 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
 						? ValueFormat.TIME_HH_MM.name()
 						: ValueFormat.TIME_HH_MM_SS.name();
 
+		_prefStore.setValue(ICommonPreferences.DISPLAY_FORMAT_ALTITUDE, altitudeFormat);
 		_prefStore.setValue(ICommonPreferences.DISPLAY_FORMAT_CADENCE, cadenceFormat);
-		_prefStore.setValue(ICommonPreferences.DISPLAY_FORMAT_CALORIES, caloriesFormat);
 		_prefStore.setValue(ICommonPreferences.DISPLAY_FORMAT_DISTANCE, distanceFormat);
 		_prefStore.setValue(ICommonPreferences.DISPLAY_FORMAT_POWER, powerFormat);
 		_prefStore.setValue(ICommonPreferences.DISPLAY_FORMAT_PULSE, pulseFormat);

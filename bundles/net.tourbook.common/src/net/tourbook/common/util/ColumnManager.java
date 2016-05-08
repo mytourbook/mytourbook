@@ -663,75 +663,13 @@ public class ColumnManager {
 
 		setVisibleColumnIds_FromViewer();
 
-		createHCM_10_AllColumns(contextMenu);
-		createHCM_50_Profiles(contextMenu);
-		createHCM_40_CurrentColumn(contextMenu);
-		createHCM_70_Columns(contextMenu);
+		createHCM_10_CurrentColumn(contextMenu);
+		createHCM_20_AllColumns(contextMenu);
+		createHCM_30_Profiles(contextMenu);
+		createHCM_40_Columns(contextMenu);
 	}
 
-	private void createHCM_10_AllColumns(final Menu contextMenu) {
-
-		{
-			/*
-			 * Action: Size All Columns to Fit
-			 */
-			final MenuItem fitMenuItem = new MenuItem(contextMenu, SWT.PUSH);
-			fitMenuItem.setText(Messages.Action_App_SizeAllColumnsToFit);
-			fitMenuItem.addListener(SWT.Selection, new Listener() {
-				@Override
-				public void handleEvent(final Event event) {
-					action_FitAllColumnSize();
-				}
-			});
-		}
-
-		{
-			/*
-			 * Action: Show all columns
-			 */
-			final MenuItem allColumnsMenuItem = new MenuItem(contextMenu, SWT.PUSH);
-			allColumnsMenuItem.setText(Messages.Action_ColumnManager_ShowAllColumns);
-			allColumnsMenuItem.addListener(SWT.Selection, new Listener() {
-				@Override
-				public void handleEvent(final Event event) {
-					action_ShowAllColumns();
-				}
-			});
-		}
-
-		{
-			/*
-			 * Action: Show default columns
-			 */
-			final MenuItem defaultColumnsMenuItem = new MenuItem(contextMenu, SWT.PUSH);
-			defaultColumnsMenuItem.setText(Messages.Action_ColumnManager_ShowDefaultColumns);
-			defaultColumnsMenuItem.addListener(SWT.Selection, new Listener() {
-				@Override
-				public void handleEvent(final Event event) {
-					action_ShowDefaultColumns();
-				}
-			});
-		}
-
-		{
-			/*
-			 * Action: &Customize Profiles/Columns...
-			 */
-			final MenuItem configMenuItem = new MenuItem(contextMenu, SWT.PUSH);
-			configMenuItem.setText(Messages.Action_App_CustomizeColumnsAndProfiles);
-			configMenuItem.setImage(UI.IMAGE_REGISTRY.get(UI.IMAGE_CONFIGURE_COLUMNS));
-			configMenuItem.addListener(SWT.Selection, new Listener() {
-				@Override
-				public void handleEvent(final Event event) {
-					openColumnDialog();
-				}
-			});
-		}
-
-		createMenuSeparator(contextMenu);
-	}
-
-	private void createHCM_40_CurrentColumn(final Menu contextMenu) {
+	private void createHCM_10_CurrentColumn(final Menu contextMenu) {
 
 		if (_headerColumn == null) {
 			// this is required
@@ -802,10 +740,72 @@ public class ColumnManager {
 		createMenuSeparator(contextMenu);
 	}
 
+	private void createHCM_20_AllColumns(final Menu contextMenu) {
+
+		{
+			/*
+			 * Action: Size All Columns to Fit
+			 */
+			final MenuItem fitMenuItem = new MenuItem(contextMenu, SWT.PUSH);
+			fitMenuItem.setText(Messages.Action_App_SizeAllColumnsToFit);
+			fitMenuItem.addListener(SWT.Selection, new Listener() {
+				@Override
+				public void handleEvent(final Event event) {
+					action_FitAllColumnSize();
+				}
+			});
+		}
+
+		{
+			/*
+			 * Action: Show all columns
+			 */
+			final MenuItem allColumnsMenuItem = new MenuItem(contextMenu, SWT.PUSH);
+			allColumnsMenuItem.setText(Messages.Action_ColumnManager_ShowAllColumns);
+			allColumnsMenuItem.addListener(SWT.Selection, new Listener() {
+				@Override
+				public void handleEvent(final Event event) {
+					action_ShowAllColumns();
+				}
+			});
+		}
+
+		{
+			/*
+			 * Action: Show default columns
+			 */
+			final MenuItem defaultColumnsMenuItem = new MenuItem(contextMenu, SWT.PUSH);
+			defaultColumnsMenuItem.setText(Messages.Action_ColumnManager_ShowDefaultColumns);
+			defaultColumnsMenuItem.addListener(SWT.Selection, new Listener() {
+				@Override
+				public void handleEvent(final Event event) {
+					action_ShowDefaultColumns();
+				}
+			});
+		}
+
+		{
+			/*
+			 * Action: &Customize Profiles/Columns...
+			 */
+			final MenuItem configMenuItem = new MenuItem(contextMenu, SWT.PUSH);
+			configMenuItem.setText(Messages.Action_App_CustomizeColumnsAndProfiles);
+			configMenuItem.setImage(UI.IMAGE_REGISTRY.get(UI.IMAGE_CONFIGURE_COLUMNS));
+			configMenuItem.addListener(SWT.Selection, new Listener() {
+				@Override
+				public void handleEvent(final Event event) {
+					openColumnDialog();
+				}
+			});
+		}
+
+		createMenuSeparator(contextMenu);
+	}
+
 	/**
 	 * Action: Profiles
 	 */
-	private void createHCM_50_Profiles(final Menu contextMenu) {
+	private void createHCM_30_Profiles(final Menu contextMenu) {
 
 		{
 			// menu title
@@ -843,7 +843,7 @@ public class ColumnManager {
 	/**
 	 * Action: Columns
 	 */
-	private void createHCM_70_Columns(final Menu contextMenu) {
+	private void createHCM_40_Columns(final Menu contextMenu) {
 
 		{
 			final MenuItem menuItem = new MenuItem(contextMenu, SWT.PUSH);

@@ -1119,6 +1119,7 @@ public class Messages extends NLS {
 	public static String		Pref_ChartColors_unit_mid;
 	public static String		Pref_ChartColors_unit_min;
 
+	public static String		Pref_DisplayFormat_Label_Altitude;
 	public static String		Pref_DisplayFormat_Label_BreakTime;
 	public static String		Pref_DisplayFormat_Label_Cadence;
 	public static String		Pref_DisplayFormat_Label_Calories;

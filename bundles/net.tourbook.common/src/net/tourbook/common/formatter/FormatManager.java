@@ -36,8 +36,8 @@ public class FormatManager {
 	private static IValueFormatter			_valueFormatter_Time_HHMM	= new ValueFormatter_Time_HHMM();
 	private static IValueFormatter			_valueFormatter_Time_HHMMSS	= new ValueFormatter_Time_HHMMSS();
 
+	private static IValueFormatter			_altitudeFormatter;
 	private static IValueFormatter			_cadenceFormatter;
-	private static IValueFormatter			_caloriesFormatter;
 	private static IValueFormatter			_distanceFormatter;
 	private static IValueFormatter			_powerFormatter;
 	private static IValueFormatter			_pulseFormatter;
@@ -47,12 +47,12 @@ public class FormatManager {
 	private static IValueFormatter			_pausedTimeFormatter;
 	private static IValueFormatter			_recordingTimeFormatter;
 
-	public static String formatCadence(final double value) {
-		return _cadenceFormatter.printDouble(value);
+	public static String formatAltitude(final float value) {
+		return _altitudeFormatter.printDouble(value);
 	}
 
-	public static String formatCalories(final double value) {
-		return _caloriesFormatter.printDouble(value);
+	public static String formatCadence(final double value) {
+		return _cadenceFormatter.printDouble(value);
 	}
 
 	public static String formatDistance(final double value) {
@@ -142,8 +142,8 @@ public class FormatManager {
 
 	public static void updateDisplayFormats() {
 
+		final String altitude = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_ALTITUDE);
 		final String cadence = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_CADENCE);
-		final String calories = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_CALORIES);
 		final String distance = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_DISTANCE);
 		final String power = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_POWER);
 		final String pulse = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_PULSE);
@@ -153,8 +153,8 @@ public class FormatManager {
 		final String pausedTime = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_PAUSED_TIME);
 		final String recordingTime = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_RECORDING_TIME);
 
+		_altitudeFormatter = getNumberFormatter(altitude);
 		_cadenceFormatter = getNumberFormatter(cadence);
-		_caloriesFormatter = getNumberFormatter(calories);
 		_distanceFormatter = getNumberFormatter(distance);
 		_powerFormatter = getNumberFormatter(power);
 		_pulseFormatter = getNumberFormatter(pulse);

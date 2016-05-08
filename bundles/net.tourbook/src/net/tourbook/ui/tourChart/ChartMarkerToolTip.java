@@ -15,13 +15,13 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart;
 
-import java.text.NumberFormat;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.chart.ChartComponentGraph;
 import net.tourbook.chart.ColorCache;
 import net.tourbook.common.UI;
+import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.tooltip.AnimatedToolTipShell;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -123,17 +123,17 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 
 	private ActionOpenMarkerDialogInTooltip	_actionOpenMarkerDialog;
 
-	private final NumberFormat				_nf1NoGroup						= NumberFormat.getNumberInstance();
-	private final NumberFormat				_nf3NoGroup						= NumberFormat.getNumberInstance();
-	{
-		_nf1NoGroup.setMinimumFractionDigits(1);
-		_nf1NoGroup.setMaximumFractionDigits(1);
-		_nf1NoGroup.setGroupingUsed(false);
-
-		_nf3NoGroup.setMinimumFractionDigits(3);
-		_nf3NoGroup.setMaximumFractionDigits(3);
-		_nf3NoGroup.setGroupingUsed(false);
-	}
+//	private final NumberFormat				_nf1NoGroup						= NumberFormat.getNumberInstance();
+//	private final NumberFormat				_nf3NoGroup						= NumberFormat.getNumberInstance();
+//	{
+//		_nf1NoGroup.setMinimumFractionDigits(1);
+//		_nf1NoGroup.setMaximumFractionDigits(1);
+//		_nf1NoGroup.setGroupingUsed(false);
+//
+//		_nf3NoGroup.setMinimumFractionDigits(3);
+//		_nf3NoGroup.setMaximumFractionDigits(3);
+//		_nf3NoGroup.setGroupingUsed(false);
+//	}
 
 	/*
 	 * UI resources
@@ -396,9 +396,13 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 				final boolean isAvailableAltitude = _tourData.getAltitudeSerie() != null;
 				if (isAvailableAltitude) {
 
-					final String valueText = _nf1NoGroup.format(_tourData.getAltitudeSmoothedSerie(false)[valueIndex]);
+					final float value = _tourData.getAltitudeSmoothedSerie(false)[valueIndex];
 
-					createUI_72_ValueField(container, GRAPH_LABEL_ALTITUDE, UI.UNIT_LABEL_ALTITUDE, valueText);
+					createUI_72_ValueField(
+							container,
+							GRAPH_LABEL_ALTITUDE,
+							UI.UNIT_LABEL_ALTITUDE,
+							FormatManager.formatAltitude(value));
 				}
 			}
 
@@ -428,13 +432,15 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 
 				if (distance != Float.MIN_VALUE) {
 
-					distance = distance //
+					final double value = distance //
 							/ 1000
 							/ net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
-					final String valueText = _nf3NoGroup.format(distance);
-
-					createUI_72_ValueField(container, GRAPH_LABEL_DISTANCE, UI.UNIT_LABEL_DISTANCE, valueText);
+					createUI_72_ValueField(
+							container,
+							GRAPH_LABEL_DISTANCE,
+							UI.UNIT_LABEL_DISTANCE,
+							FormatManager.formatDistance(value));
 				}
 			}
 
@@ -461,9 +467,11 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 
 				if (timeValue != Integer.MIN_VALUE) {
 
-					final String valueText = UI.format_hhh_mm_ss(timeValue);
-
-					createUI_72_ValueField(container, GRAPH_LABEL_TIME, UI.UNIT_LABEL_TIME, valueText);
+					createUI_72_ValueField(
+							container,
+							GRAPH_LABEL_TIME,
+							UI.UNIT_LABEL_TIME,
+							FormatManager.formatRecordingTime(timeValue));
 				}
 			}
 		}

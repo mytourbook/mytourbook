@@ -22,8 +22,8 @@ public interface ICommonPreferences {
 	 */
 	public static final String	GRAPH_COLORS					= "graph.colors.";					//$NON-NLS-1$
 
+	public static final String	DISPLAY_FORMAT_ALTITUDE			= "DISPLAY_FORMAT_ALTITUDE";		//$NON-NLS-1$
 	public static final String	DISPLAY_FORMAT_CADENCE			= "DISPLAY_FORMAT_CADENCE";		//$NON-NLS-1$
-	public static final String	DISPLAY_FORMAT_CALORIES			= "DISPLAY_FORMAT_CALORIES";		//$NON-NLS-1$
 	public static final String	DISPLAY_FORMAT_DISTANCE			= "DISPLAY_FORMAT_DISTANCE";		//$NON-NLS-1$
 	public static final String	DISPLAY_FORMAT_POWER			= "DISPLAY_FORMAT_POWER";			//$NON-NLS-1$
 	public static final String	DISPLAY_FORMAT_PULSE			= "DISPLAY_FORMAT_PULSE";			//$NON-NLS-1$

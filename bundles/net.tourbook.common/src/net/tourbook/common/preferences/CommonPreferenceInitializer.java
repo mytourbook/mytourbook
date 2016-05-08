@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -60,9 +60,9 @@ public class CommonPreferenceInitializer extends AbstractPreferenceInitializer {
 		 */
 		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_IS_LIVE_UPDATE, true);
 
+		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_ALTITUDE, ValueFormat.NUMBER_1_0.name());
 		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_CADENCE, ValueFormat.NUMBER_1_0.name());
-		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_CALORIES, ValueFormat.NUMBER_1_3.name());
-		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_DISTANCE, ValueFormat.NUMBER_1_3.name());
+		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_DISTANCE, ValueFormat.NUMBER_1_0.name());
 		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_POWER, ValueFormat.NUMBER_1_0.name());
 		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_PULSE, ValueFormat.NUMBER_1_0.name());
 		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_SPEED, ValueFormat.NUMBER_1_0.name());
