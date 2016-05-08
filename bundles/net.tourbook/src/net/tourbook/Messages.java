@@ -1119,7 +1119,6 @@ public class Messages extends NLS {
 	public static String		Pref_ChartColors_unit_mid;
 	public static String		Pref_ChartColors_unit_min;
 
-	public static String		Pref_DisplayFormat_Group_Format;
 	public static String		Pref_DisplayFormat_Label_BreakTime;
 	public static String		Pref_DisplayFormat_Label_Cadence;
 	public static String		Pref_DisplayFormat_Label_Calories;
@@ -1128,9 +1127,6 @@ public class Messages extends NLS {
 	public static String		Pref_DisplayFormat_Label_Power;
 	public static String		Pref_DisplayFormat_Label_Pulse;
 	public static String		Pref_DisplayFormat_Label_Speed;
-	public static String		Pref_DisplayFormat_Radio_Format_1;
-	public static String		Pref_DisplayFormat_Radio_Format_1_1;
-	public static String		Pref_DisplayFormat_Radio_Format_1_2;
 
 	public static String		Pref_general_imperial_unit_fahrenheit;
 	public static String		Pref_general_imperial_unit_feet;
@@ -1304,8 +1300,6 @@ public class Messages extends NLS {
 	public static String		pref_view_layout_label_category;
 	public static String		pref_view_layout_label_color_group;
 	public static String		pref_view_layout_label_driving_time_format;
-	public static String		pref_view_layout_label_format_hh_mm;
-	public static String		pref_view_layout_label_format_hh_mm_ss;
 	public static String		pref_view_layout_label_recording_time_format;
 	public static String		pref_view_layout_label_sub;
 	public static String		pref_view_layout_label_sub_sub;
