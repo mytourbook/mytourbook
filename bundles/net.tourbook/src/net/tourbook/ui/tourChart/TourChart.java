@@ -4014,7 +4014,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		}
 	}
 
-	private void setupChartConfig() {
+	void setupChartConfig() {
 
 		graphAntialiasing = _prefStore.getBoolean(//
 				ITourbookPreferences.GRAPH_ANTIALIASING) ? SWT.ON : SWT.OFF;

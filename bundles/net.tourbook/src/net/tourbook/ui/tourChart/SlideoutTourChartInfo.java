@@ -70,11 +70,11 @@ public class SlideoutTourChartInfo extends AnimatedToolTipShell implements IColo
 	private boolean					_isAnotherDialogOpened;
 
 	private IPropertyChangeListener	_defaultChangePropertyListener;
-	private SelectionAdapter		_defaultSelectionAdapter;
+	private SelectionAdapter		_defaultSelectionListener;
 	private MouseWheelListener		_defaultMouseWheelListener;
 
 	{
-		_defaultSelectionAdapter = new SelectionAdapter() {
+		_defaultSelectionListener = new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				onChangeUI();
@@ -115,7 +115,7 @@ public class SlideoutTourChartInfo extends AnimatedToolTipShell implements IColo
 
 	private Label					_lblTooltipDelay;
 
-	private Spinner					_spinTooltipDelay;
+	private Spinner					_spinnerTooltipDelay;
 
 	private ColorSelectorExtended	_colorSegmentAlternateColor;
 
@@ -305,7 +305,7 @@ public class SlideoutTourChartInfo extends AnimatedToolTipShell implements IColo
 						.applyTo(_chkShowInfoTitle);
 				_chkShowInfoTitle.setText(//
 						Messages.Slideout_TourInfoOptions_Checkbox_IsShowTourTitle);
-				_chkShowInfoTitle.addSelectionListener(_defaultSelectionAdapter);
+				_chkShowInfoTitle.addSelectionListener(_defaultSelectionListener);
 			}
 			{
 				/*
@@ -319,7 +319,7 @@ public class SlideoutTourChartInfo extends AnimatedToolTipShell implements IColo
 						Messages.Slideout_TourInfoOptions_Checkbox_IsShowTourSeparator);
 				_chkShowInfoTourSeparator.setToolTipText(//
 						Messages.Slideout_TourInfoOptions_Checkbox_IsShowTourSeparator_Tooltip);
-				_chkShowInfoTourSeparator.addSelectionListener(_defaultSelectionAdapter);
+				_chkShowInfoTourSeparator.addSelectionListener(_defaultSelectionListener);
 			}
 			{
 				/*
@@ -328,7 +328,7 @@ public class SlideoutTourChartInfo extends AnimatedToolTipShell implements IColo
 				_chkSegmentAlternateColor = new Button(ttContainer, SWT.CHECK);
 				_chkSegmentAlternateColor.setText(Messages.Pref_Graphs_Checkbox_SegmentAlternateColor);
 				_chkSegmentAlternateColor.setToolTipText(Messages.Pref_Graphs_Checkbox_SegmentAlternateColor_Tooltip);
-				_chkSegmentAlternateColor.addSelectionListener(_defaultSelectionAdapter);
+				_chkSegmentAlternateColor.addSelectionListener(_defaultSelectionListener);
 
 				// Color: Segment alternate color
 				_colorSegmentAlternateColor = new ColorSelectorExtended(ttContainer);
@@ -345,7 +345,7 @@ public class SlideoutTourChartInfo extends AnimatedToolTipShell implements IColo
 						.applyTo(_chkShowInfoTooltip);
 				_chkShowInfoTooltip.setText(//
 						Messages.Slideout_TourInfoOptions_Checkbox_IsShowInfoTooltip);
-				_chkShowInfoTooltip.addSelectionListener(_defaultSelectionAdapter);
+				_chkShowInfoTooltip.addSelectionListener(_defaultSelectionListener);
 			}
 			{
 				/*
@@ -361,12 +361,12 @@ public class SlideoutTourChartInfo extends AnimatedToolTipShell implements IColo
 				_lblTooltipDelay.setToolTipText(Messages.Slideout_TourInfoOptions_Label_TooltipDelay_Tooltip);
 
 				// Spinner
-				_spinTooltipDelay = new Spinner(ttContainer, SWT.BORDER);
-				_spinTooltipDelay.setMinimum(0);
-				_spinTooltipDelay.setMaximum(1000);
-				_spinTooltipDelay.setPageIncrement(50);
-				_spinTooltipDelay.addSelectionListener(_defaultSelectionAdapter);
-				_spinTooltipDelay.addMouseWheelListener(_defaultMouseWheelListener);
+				_spinnerTooltipDelay = new Spinner(ttContainer, SWT.BORDER);
+				_spinnerTooltipDelay.setMinimum(0);
+				_spinnerTooltipDelay.setMaximum(1000);
+				_spinnerTooltipDelay.setPageIncrement(50);
+				_spinnerTooltipDelay.addSelectionListener(_defaultSelectionListener);
+				_spinnerTooltipDelay.addMouseWheelListener(_defaultMouseWheelListener);
 			}
 		}
 	}
@@ -376,7 +376,7 @@ public class SlideoutTourChartInfo extends AnimatedToolTipShell implements IColo
 		final boolean isShowInfoTooltip = _chkShowInfoTooltip.getSelection();
 
 		_lblTooltipDelay.setEnabled(isShowInfoTooltip);
-		_spinTooltipDelay.setEnabled(isShowInfoTooltip);
+		_spinnerTooltipDelay.setEnabled(isShowInfoTooltip);
 	}
 
 	public Shell getShell() {
@@ -427,7 +427,7 @@ public class SlideoutTourChartInfo extends AnimatedToolTipShell implements IColo
 		final boolean isShowInfoTitle = _chkShowInfoTitle.getSelection();
 		final boolean isShowInfoTooltip = _chkShowInfoTooltip.getSelection();
 		final boolean isShowInfoTourSeparator = _chkShowInfoTourSeparator.getSelection();
-		final int tooltipDelay = _spinTooltipDelay.getSelection();
+		final int tooltipDelay = _spinnerTooltipDelay.getSelection();
 
 		/*
 		 * Update pref store
@@ -520,7 +520,7 @@ public class SlideoutTourChartInfo extends AnimatedToolTipShell implements IColo
 		_chkShowInfoTourSeparator.setSelection(//
 				_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_TOUR_INFO_IS_TOUR_SEPARATOR_VISIBLE));
 
-		_spinTooltipDelay.setSelection(//
+		_spinnerTooltipDelay.setSelection(//
 				_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_TOUR_INFO_TOOLTIP_DELAY));
 
 		// segment alternate color
@@ -540,7 +540,7 @@ public class SlideoutTourChartInfo extends AnimatedToolTipShell implements IColo
 		_chkShowInfoTooltip.setSelection(tcc.isShowInfoTooltip);
 		_chkShowInfoTourSeparator.setSelection(tcc.isShowInfoTourSeparator);
 
-		_spinTooltipDelay.setSelection(tcc.tourInfoTooltipDelay);
+		_spinnerTooltipDelay.setSelection(tcc.tourInfoTooltipDelay);
 
 		// segment alternate color
 		_chkSegmentAlternateColor.setSelection(//

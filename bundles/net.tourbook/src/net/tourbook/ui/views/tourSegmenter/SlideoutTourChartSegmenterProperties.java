@@ -631,6 +631,7 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell i
 
 		enableControls();
 
+		// resize slideout
 		final Shell shell = _shellContainer.getShell();
 		shell.pack(true);
 
