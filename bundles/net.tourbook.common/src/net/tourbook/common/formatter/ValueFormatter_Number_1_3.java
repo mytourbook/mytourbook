@@ -41,9 +41,9 @@ public class ValueFormatter_Number_1_3 implements IValueFormatter {
 
 	@Override
 	public String toString() {
-		return "ValueFormatter_Number_1_3 [" //
-				+ "printDouble()"
-				+ "]";
+		return "ValueFormatter_Number_1_3 [" // //$NON-NLS-1$
+				+ "printDouble()" //$NON-NLS-1$
+				+ "]"; //$NON-NLS-1$
 	}
 
 }

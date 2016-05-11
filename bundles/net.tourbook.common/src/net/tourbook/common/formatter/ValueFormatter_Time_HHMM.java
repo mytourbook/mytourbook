@@ -37,8 +37,8 @@ public class ValueFormatter_Time_HHMM implements IValueFormatter {
 
 	@Override
 	public String toString() {
-		return "ValueFormatter_Time_HHMM [" //
-				+ "printLong()"
-				+ "]";
+		return "ValueFormatter_Time_HHMM [" // //$NON-NLS-1$
+				+ "printLong()" //$NON-NLS-1$
+				+ "]"; //$NON-NLS-1$
 	}
 }

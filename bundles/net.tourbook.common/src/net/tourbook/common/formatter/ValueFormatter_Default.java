@@ -29,10 +29,10 @@ public class ValueFormatter_Default implements IValueFormatter {
 
 	@Override
 	public String toString() {
-		return "ValueFormatter_Default [" //
-				+ "printDouble()"
-				+ "+ printLong()"
-				+ "]";
+		return "ValueFormatter_Default [" // //$NON-NLS-1$
+				+ "printDouble()" //$NON-NLS-1$
+				+ "+ printLong()" //$NON-NLS-1$
+				+ "]"; //$NON-NLS-1$
 	}
 
 }

@@ -34,7 +34,7 @@ public class SelectionDeletedTours implements ISelection {
 
 	@Override
 	public String toString() {
-		return "SelectionDeletedTours [removedTours=" + removedTours + "]";
+		return "SelectionDeletedTours [removedTours=" + removedTours + "]"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 }

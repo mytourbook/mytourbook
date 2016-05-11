@@ -1377,13 +1377,9 @@ public class Messages extends NLS {
 	public static String		Pref_TourTypes_root_title;
 	public static String		Pref_TourTypes_Title;
 
-	public static String		PrefPage_Import_Checkbox_AdjustTemperature;
 	public static String		PrefPage_Import_Checkbox_AutoOpenTourLogView;
 	public static String		PrefPage_Import_Checkbox_CreateTourIdWithTime;
 	public static String		PrefPage_Import_Checkbox_CreateTourIdWithTime_Tooltip;
-
-	public static String		PrefPage_Import_Group_TemperatureAdjustment;
-
 	public static String		PrefPage_Import_Label_Info;
 
 	public static String		PrefPage_ViewActions_Group;
