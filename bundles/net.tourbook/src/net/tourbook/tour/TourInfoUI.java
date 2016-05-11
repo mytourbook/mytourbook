@@ -658,6 +658,7 @@ public class TourInfoUI {
 		_secondColumnControls.add(_lblTemperature);
 
 		createUI_Label(parent, UI.UNIT_LABEL_TEMPERATURE);
+
 		/*
 		 * wind speed
 		 */

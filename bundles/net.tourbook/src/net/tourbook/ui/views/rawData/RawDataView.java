@@ -383,6 +383,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private String							_imageUrl_ImportFromFile;
 	private String							_imageUrl_SerialPort_Configured;
 	private String							_imageUrl_SerialPort_Directly;
+	private String							_imageUrl_State_AdjustTemperature;
 	private String							_imageUrl_State_Error;
 	private String							_imageUrl_State_OK;
 	private String							_imageUrl_State_MovedFiles;
@@ -552,7 +553,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		final ArrayList<TourData> selectedTours = getAnySelectedTours();
 
-		runImport_100_DeleteTourFiles(true, selectedTours, false);
+		runEasyImport_100_DeleteTourFiles(true, selectedTours, false);
 	}
 
 	void actionMergeTours(final TourData mergeFromTour, final TourData mergeIntoTour) {
@@ -1709,6 +1710,28 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 					: Messages.Import_Data_HTML_LastMarker_No);
 		}
 
+		// adjust temperature
+		{
+			sb.append(UI.NEW_LINE);
+
+			if (importLauncher.isAdjustTemperature) {
+
+				final float temperature = UI.getTemperatureFromMetric(importLauncher.tourAvgTemperature);
+
+				final String temperatureText = NLS.bind(Messages.Import_Data_HTML_AdjustTemperature_Yes, //
+						new Object[] {
+								UI.format_hhh_mm_ss(importLauncher.temperatureAdjustmentDuration),
+								_nf1.format(temperature),
+								UI.UNIT_LABEL_TEMPERATURE });
+
+				sb.append(temperatureText);
+
+			} else {
+
+				sb.append(Messages.Import_Data_HTML_AdjustTemperature_No);
+			}
+		}
+
 		// save tour
 		{
 			sb.append(UI.NEW_LINE);
@@ -1744,6 +1767,17 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 
 		/*
+		 * AdjustTemperature
+		 */
+		String htmlAdjustTemperature = UI.EMPTY_STRING;
+		if (importTile.isAdjustTemperature) {
+
+			final String stateImage = createHTML_BgImage(_imageUrl_State_AdjustTemperature);
+
+			htmlAdjustTemperature = createHTML_TileAnnotation(stateImage);
+		}
+
+		/*
 		 * Marker
 		 */
 		String htmlLastMarker = UI.EMPTY_STRING;
@@ -1770,6 +1804,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		// order is reverted that it looks in the correct order
 		sb.append(htmlDeleteFiles);
 		sb.append(htmlSaveTour);
+		sb.append(htmlAdjustTemperature);
 		sb.append(htmlLastMarker);
 
 		sb.append("<div style='float:left;'>" + importTile.name + "</div>"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -1996,6 +2031,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			_imageUrl_SerialPort_Configured = getIconUrl(Messages.Image__RawData_Transfer);
 			_imageUrl_SerialPort_Directly = getIconUrl(Messages.Image__RawData_TransferDirect);
 
+			_imageUrl_State_AdjustTemperature = getIconUrl(Messages.Image__State_AdjustTemperature);
 			_imageUrl_State_Error = getIconUrl(Messages.Image__State_Error);
 			_imageUrl_State_OK = getIconUrl(Messages.Image__State_OK);
 			_imageUrl_State_MovedFiles = getIconUrl(Messages.Image__State_MovedTour);
@@ -3130,7 +3166,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		final ArrayList<TourData> selectedTours = getAnySelectedTours();
 
-		runImport_099_SaveTour(person, selectedTours, false);
+		runEasyImport_099_SaveTour(person, selectedTours, false);
 	}
 
 	/**
@@ -3862,7 +3898,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			final long tileId = Long.parseLong(locationParts[2]);
 
-			runImport(tileId);
+			runEasyImport(tileId);
 
 		} else if (ACTION_SETUP_EASY_IMPORT.equals(hrefAction)) {
 
@@ -4220,7 +4256,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		});
 	}
 
-	private void runImport(final long tileId) {
+	private void runEasyImport(final long tileId) {
 
 		final long start = System.currentTimeMillis();
 
@@ -4307,82 +4343,96 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		final Collection<TourData> importedToursCollection = RawDataManager.getInstance().getImportedTours().values();
 		final ArrayList<TourData> importedTours = new ArrayList<>(importedToursCollection);
 
-		if (importState.isUpdateImportViewer) {
-			_tourViewer.update(importedToursCollection.toArray(), null);
+		try {
+
+			// stop all other actions when canceled
+			if (importState.isImportCanceled) {
+				return;
+			}
+
+			// open import config dialog to solve problems
+			if (importState.isOpenSetup) {
+
+				_parent.getDisplay().asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						action_Easy_SetupImport(0);
+					}
+				});
+
+				return;
+			}
+
+			/*
+			 * 4. Set last marker text
+			 */
+			if (importLauncher.isSetLastMarker) {
+				runEasyImport_004_SetLastMarker(importLauncher, importedTours);
+			}
+
+			/*
+			 * 5. Adjust temperature
+			 */
+			if (importLauncher.isAdjustTemperature) {
+				runEasyImport_005_AdjustTemperature(importLauncher, importedTours);
+			}
+
+			ArrayList<TourData> importedAndSavedTours;
+
+			/*
+			 * 99. Save imported tours
+			 */
+			if (importLauncher.isSaveTour) {
+
+				importedAndSavedTours = runEasyImport_099_SaveTour(person, importedTours, true);
+
+			} else {
+
+				importedAndSavedTours = _rawDataMgr.getImportedTourList();
+			}
+
+			/*
+			 * 100. Delete device files
+			 */
+			if (importConfig.isDeleteDeviceFiles) {
+
+				// use newly saved/not saved tours
+
+				runEasyImport_100_DeleteTourFiles(false, importedAndSavedTours, true);
+			}
+
+			/*
+			 * 101. Turn watching off
+			 */
+			if (importConfig.isTurnOffWatching) {
+
+				TourLogManager.addLog(TourLogState.DEFAULT, EasyImportManager.LOG_EASY_IMPORT_101_TURN_WATCHING_OFF);
+
+				setWatcher_Off();
+			}
+
+			/*
+			 * Log import end
+			 */
+			final double time = (System.currentTimeMillis() - start) / 1000.0;
+			TourLogManager.addLog(
+					TourLogState.DEFAULT,
+					String.format(EasyImportManager.LOG_EASY_IMPORT_999_IMPORT_END, time));
+
+		} finally {
+
+			// update viewer when required
+
+			if (importState.isUpdateImportViewer) {
+
+				_tourViewer.update(importedToursCollection.toArray(), null);
+
+				selectFirstTour();
+			}
 		}
-
-		// stop all other actions when canceled
-		if (importState.isImportCanceled) {
-			return;
-		}
-
-		// open import config dialog to solve problems
-		if (importState.isOpenSetup) {
-
-			_parent.getDisplay().asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					action_Easy_SetupImport(0);
-				}
-			});
-
-			return;
-		}
-
-		/*
-		 * 4. Set last marker text
-		 */
-		if (importLauncher.isSetLastMarker) {
-			runImport_004_SetLastMarker(importLauncher, importedTours);
-		}
-
-		ArrayList<TourData> importedAndSavedTours;
-
-		/*
-		 * 99. Save imported tours
-		 */
-		if (importLauncher.isSaveTour) {
-
-			importedAndSavedTours = runImport_099_SaveTour(person, importedTours, true);
-
-		} else {
-
-			importedAndSavedTours = _rawDataMgr.getImportedTourList();
-		}
-
-		/*
-		 * 100. Delete device files
-		 */
-		if (importConfig.isDeleteDeviceFiles) {
-
-			// use newly saved/not saved tours
-
-			runImport_100_DeleteTourFiles(false, importedAndSavedTours, true);
-		}
-
-		/*
-		 * 101. Turn watching off
-		 */
-		if (importConfig.isTurnOffWatching) {
-
-			TourLogManager.addLog(TourLogState.DEFAULT, EasyImportManager.LOG_EASY_IMPORT_101_TURN_WATCHING_OFF);
-
-			setWatcher_Off();
-		}
-
-//		thread_FolderWatcher_Activate();
-//		updateUI_DeviceState();
-
-		/*
-		 * Log import end
-		 */
-		final double time = (System.currentTimeMillis() - start) / 1000.0;
-		TourLogManager.addLog(
-				TourLogState.DEFAULT,
-				String.format(EasyImportManager.LOG_EASY_IMPORT_999_IMPORT_END, time));
 	}
 
-	private void runImport_004_SetLastMarker(	final ImportLauncher importLauncher,
+	private void runEasyImport_004_SetLastMarker(	final ImportLauncher importLauncher,
 												final ArrayList<TourData> importedTours) {
 
 		final String lastMarkerText = importLauncher.lastMarkerText;
@@ -4431,13 +4481,41 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		}
 	}
 
+	private void runEasyImport_005_AdjustTemperature(	final ImportLauncher importLauncher,
+													final ArrayList<TourData> importedTours) {
+
+		TourLogManager.addLog(TourLogState.DEFAULT, EasyImportManager.LOG_EASY_IMPORT_005_ADJUST_TEMPERATURE);
+
+		final float avgMinimumTemperature = importLauncher.tourAvgTemperature;
+		final int durationTime = importLauncher.temperatureAdjustmentDuration;
+
+		for (final TourData tourData : importedTours) {
+
+			final float oldTourAvgTemperature = tourData.getAvgTemperature();
+
+			// skip tours which avg temperature is above the minimum avg temperature
+			if (oldTourAvgTemperature > avgMinimumTemperature) {
+
+				TourLogManager.logSubInfo(String.format(
+						EasyImportManager.LOG_TEMP_ADJUST_006_IS_ABOVE_TEMPERATURE,
+						TourManager.getTourDateTimeShort(tourData),
+						oldTourAvgTemperature,
+						avgMinimumTemperature));
+
+				continue;
+			}
+
+			EasyImportManager.adjustTemperature(tourData, durationTime);
+		}
+	}
+
 	/**
 	 * @param person
 	 * @param selectedTours
 	 * @param isEasyImport
 	 * @return Returns list with saved tours.
 	 */
-	private ArrayList<TourData> runImport_099_SaveTour(	final TourPerson person,
+	private ArrayList<TourData> runEasyImport_099_SaveTour(	final TourPerson person,
 														final ArrayList<TourData> selectedTours,
 														final boolean isEasyImport) {
 
@@ -4500,7 +4578,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	 *            backup files are not touched, this feature is used to move device files to the
 	 *            backup folder.
 	 */
-	private void runImport_100_DeleteTourFiles(	final boolean isDeleteAllFiles,
+	private void runEasyImport_100_DeleteTourFiles(	final boolean isDeleteAllFiles,
 												final ArrayList<TourData> allTourData,
 												final boolean isEasyImport) {
 
@@ -4652,7 +4730,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	}
 
 	/**
-	 * select first tour in the viewer
+	 * Select first tour in the import view.
 	 */
 	public void selectFirstTour() {
 

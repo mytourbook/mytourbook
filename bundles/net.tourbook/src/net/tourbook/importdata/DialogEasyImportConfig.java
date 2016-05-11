@@ -97,6 +97,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.DateTime;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
@@ -143,6 +144,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 	//
 	private IPropertyChangeListener			_prefChangeListener;
 	//
+	private SelectionAdapter				_defaultModify_Listener;
+	private MouseWheelListener				_defaultModify_MouseWheelListener;
 	private MouseWheelListener				_defaultMouseWheelListener;
 	private SelectionAdapter				_icSelectionListener;
 	private FocusListener					_ic_FolderFocusListener;
@@ -225,6 +228,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 	private Button							_chkIC_DeleteDeviceFiles;
 	private Button							_chkIC_ImportFiles;
 	private Button							_chkIC_TurnOffWatching;
+	private Button							_chkIL_AdjustTemperature;
 	private Button							_chkIL_SaveTour;
 	private Button							_chkIL_ShowInDashboard;
 	private Button							_chkIL_SetLastMarker;
@@ -244,18 +248,24 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 	private Combo							_comboIC_DeviceFolder;
 	private Combo							_comboIL_TourType;
 	//
+	private DateTime						_dtIL_TemperatureAdjustmentDuration;
+	//
 	private Label							_lblIC_ConfigName;
 	private Label							_lblIC_BackupFolder;
 	private Label							_lblIC_LocalFolderPath;
 	private Label							_lblIC_DeleteFilesInfo;
 	private Label							_lblIC_DeviceFolder;
 	private Label							_lblIC_DeviceFolderPath;
+	private Label							_lblIL_AvgTemperature;
+	private Label							_lblIL_AvgTemperature_Unit;
 	private Label							_lblIL_ConfigDescription;
 	private Label							_lblIL_ConfigName;
 	private Label							_lblIL_LastMarker;
 	private Label							_lblIL_LastMarkerDistanceUnit;
 	private Label							_lblIL_LastMarkerText;
 	private Label							_lblIL_One_TourTypeIcon;
+	private Label							_lblIL_TemperatureAdjustmentDuration;
+	private Label							_lblIL_TemperatureAdjustmentDuration_Unit;
 	private Label[]							_lblTT_Speed_SpeedUnit;
 	private Label[]							_lblTT_Speed_TourTypeIcon;
 	//
@@ -269,6 +279,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 	private Spinner							_spinnerDash_NumHTiles;
 	private Spinner							_spinnerDash_StateTooltipWidth;
 	private Spinner							_spinnerDash_TileSize;
+	private Spinner							_spinnerIL_AvgTemperature;
 	private Spinner							_spinnerIL_LastMarkerDistance;
 	private Spinner[]						_spinnerTT_Speed_AvgSpeed;
 	//
@@ -1471,7 +1482,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 			createUI_530_IL_Actions(container);
 			createUI_540_IL_Detail(container);
 
-			createUI_590_IL_DragDropHint(container);
+			createUI_570_IL_DragDropHint(container);
 		}
 
 		return container;
@@ -1817,7 +1828,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 		{
 			createUI_542_IL_Name(group);
 			createUI_550_IL_TourType(group);
-			createUI_590_IL_LastMarker(group);
+			createUI_580_IL_LastMarker(group);
+			createUI_590_IL_AdjustTemperature(group);
 			createUI_599_IL_Save(group);
 		}
 	}
@@ -2161,7 +2173,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 		return speedTTContainer;
 	}
 
-	private void createUI_590_IL_DragDropHint(final Composite parent) {
+	private void createUI_570_IL_DragDropHint(final Composite parent) {
 
 		final Label label = new Label(parent, SWT.WRAP);
 		label.setText(Messages.Dialog_ImportConfig_Info_ConfigDragDrop);
@@ -2170,27 +2182,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 				.applyTo(label);
 	}
 
-	private void createUI_590_IL_LastMarker(final Composite parent) {
-
-		final SelectionAdapter lastMarkerSelectionListener = new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-
-				onIL_Modified();
-				enable_IL_Controls();
-			}
-		};
-
-		final MouseWheelListener lastMarkerMouseWheelListener = new MouseWheelListener() {
-
-			@Override
-			public void mouseScrolled(final MouseEvent e) {
-				UI.adjustSpinnerValueOnMouseScroll(e);
-
-				onIL_Modified();
-				enable_IL_Controls();
-			}
-		};
+	private void createUI_580_IL_LastMarker(final Composite parent) {
 
 		{
 			/*
@@ -2199,7 +2191,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 			_chkIL_SetLastMarker = new Button(parent, SWT.CHECK);
 			_chkIL_SetLastMarker.setText(Messages.Dialog_ImportConfig_Checkbox_LastMarker);
 			_chkIL_SetLastMarker.setToolTipText(Messages.Dialog_ImportConfig_Checkbox_LastMarker_Tooltip);
-			_chkIL_SetLastMarker.addSelectionListener(lastMarkerSelectionListener);
+			_chkIL_SetLastMarker.addSelectionListener(_defaultModify_Listener);
 			GridDataFactory.fillDefaults()//
 					.span(2, 1)
 					.indent(0, 5)
@@ -2228,8 +2220,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 				_spinnerIL_LastMarkerDistance.setMaximum(EasyConfig.LAST_MARKER_DISTANCE_MAX / 100);
 				_spinnerIL_LastMarkerDistance.setMinimum(EasyConfig.LAST_MARKER_DISTANCE_MIN);
 				_spinnerIL_LastMarkerDistance.setDigits(1);
-				_spinnerIL_LastMarkerDistance.addMouseWheelListener(lastMarkerMouseWheelListener);
-				_spinnerIL_LastMarkerDistance.addSelectionListener(lastMarkerSelectionListener);
+				_spinnerIL_LastMarkerDistance.addMouseWheelListener(_defaultModify_MouseWheelListener);
+				_spinnerIL_LastMarkerDistance.addSelectionListener(_defaultModify_Listener);
 				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_spinnerIL_LastMarkerDistance);
 
 				// label: unit
@@ -2257,6 +2249,91 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 			GridDataFactory.fillDefaults()//
 					.grab(true, false)
 					.applyTo(_txtIL_LastMarker);
+		}
+	}
+
+	private void createUI_590_IL_AdjustTemperature(final Composite parent) {
+
+		{
+			/*
+			 * Checkbox: Adjust temperature
+			 */
+			_chkIL_AdjustTemperature = new Button(parent, SWT.CHECK);
+			_chkIL_AdjustTemperature.setText(Messages.Dialog_ImportConfig_Checkbox_AdjustTemperature);
+			_chkIL_AdjustTemperature.setToolTipText(Messages.Dialog_AdjustTemperature_Info_TemperatureAdjustment);
+			_chkIL_AdjustTemperature.addSelectionListener(_defaultModify_Listener);
+			GridDataFactory.fillDefaults()//
+					.span(2, 1)
+					.indent(0, 5)
+					.applyTo(_chkIL_AdjustTemperature);
+		}
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+				.span(2, 1)
+				.applyTo(container);
+		GridLayoutFactory.fillDefaults()//
+				.numColumns(3)
+				.applyTo(container);
+//		innerContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+		{
+			{
+				/*
+				 * Label: Adjustment duration
+				 */
+				_lblIL_TemperatureAdjustmentDuration = new Label(container, SWT.NONE);
+				_lblIL_TemperatureAdjustmentDuration
+						.setText(Messages.Dialog_AdjustTemperature_Label_TemperatureAdjustmentDuration);
+				GridDataFactory.fillDefaults()//
+						.align(SWT.FILL, SWT.CENTER)
+						.indent(_leftPadding, 0)
+						.applyTo(_lblIL_TemperatureAdjustmentDuration);
+				/*
+				 * DateTime: Duration
+				 */
+				_dtIL_TemperatureAdjustmentDuration = new DateTime(container, SWT.TIME | SWT.MEDIUM | SWT.BORDER);
+				GridDataFactory.fillDefaults()//
+						.align(SWT.BEGINNING, SWT.FILL)
+						.applyTo(_dtIL_TemperatureAdjustmentDuration);
+
+				// label: h
+				_lblIL_TemperatureAdjustmentDuration_Unit = new Label(container, SWT.NONE);
+				_lblIL_TemperatureAdjustmentDuration_Unit.setText(UI.UNIT_LABEL_TIME);
+				GridDataFactory.fillDefaults()//
+						.align(SWT.FILL, SWT.CENTER)
+						.applyTo(_lblIL_TemperatureAdjustmentDuration_Unit);
+			}
+
+			{
+				/*
+				 * Avg temperature
+				 */
+				// label
+				_lblIL_AvgTemperature = new Label(container, SWT.NONE);
+				_lblIL_AvgTemperature.setText(Messages.Dialog_AdjustTemperature_Label_AvgTemperature);
+				GridDataFactory.fillDefaults()//
+						.align(SWT.FILL, SWT.CENTER)
+						.indent(_leftPadding, 0)
+						.applyTo(_lblIL_AvgTemperature);
+
+				// spinner
+				_spinnerIL_AvgTemperature = new Spinner(container, SWT.BORDER);
+				_spinnerIL_AvgTemperature.setPageIncrement(5);
+				_spinnerIL_AvgTemperature.setMinimum(EasyConfig.TEMPERATURE_AVG_TEMPERATURE_MIN);
+				_spinnerIL_AvgTemperature.setMaximum(EasyConfig.TEMPERATURE_AVG_TEMPERATURE_MAX);
+				_spinnerIL_AvgTemperature.addMouseWheelListener(_defaultModify_MouseWheelListener);
+				_spinnerIL_AvgTemperature.addSelectionListener(_defaultModify_Listener);
+				GridDataFactory.fillDefaults() //
+						.align(SWT.END, SWT.FILL)
+						.applyTo(_spinnerIL_AvgTemperature);
+
+				// label: °C / °F
+				_lblIL_AvgTemperature_Unit = new Label(container, SWT.NONE);
+				_lblIL_AvgTemperature_Unit.setText(UI.UNIT_LABEL_TEMPERATURE);
+				GridDataFactory.fillDefaults()//
+						.align(SWT.FILL, SWT.CENTER)
+						.applyTo(_lblIL_AvgTemperature_Unit);
+			}
 		}
 	}
 
@@ -2538,10 +2615,11 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
 		defineColumnIL_10_LauncherName();
 		defineColumnIL_20_ColorImage();
-		defineColumnIL_30_IsSaveTour();
-		defineColumnIL_40_LastMarkerDistance();
-		defineColumnIL_50_ShowInDashboard();
-		defineColumnIL_60_Description();
+		defineColumnIL_30_LastMarkerDistance();
+		defineColumnIL_40_AdjustTemperature();
+		defineColumnIL_88_IsSaveTour();
+		defineColumnIL_90_ShowInDashboard();
+		defineColumnIL_99_Description();
 	}
 
 	/**
@@ -2673,7 +2751,10 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
 				if (importConfig.isCreateBackup) {
 
-					cell.setText(isDeleteDeviceFiles ? Messages.App_Label_BooleanYes : Messages.App_Label_BooleanNo);
+					cell.setText(isDeleteDeviceFiles //
+							? Messages.App_Label_BooleanYes
+							: Messages.App_Label_BooleanNo);
+
 					cell.setForeground(isDeleteDeviceFiles //
 							? COLOR_RED
 							: COLOR_FOREGROUND);
@@ -2764,37 +2845,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 	}
 
 	/**
-	 * Column: Is save tour
-	 */
-	private void defineColumnIL_30_IsSaveTour() {
-
-		final TableColumnDefinition colDef = new TableColumnDefinition(_ilColumnManager, "isSaveTour", SWT.LEAD); //$NON-NLS-1$
-
-		colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_Save_Label);
-		colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_Save_Header);
-		colDef.setColumnHeaderToolTipText(Messages.Dialog_ImportConfig_Checkbox_SaveTour_Tooltip);
-
-		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(7));
-		colDef.setColumnWeightData(new ColumnWeightData(7));
-
-		colDef.setIsDefaultColumn();
-
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final ImportLauncher importLauncher = (ImportLauncher) cell.getElement();
-				cell.setText(importLauncher.isSaveTour //
-						? Messages.App_Label_BooleanYes
-						: UI.EMPTY_STRING);
-			}
-		});
-	}
-
-	/**
 	 * Column: Set last marker
 	 */
-	private void defineColumnIL_40_LastMarkerDistance() {
+	private void defineColumnIL_30_LastMarkerDistance() {
 
 		final TableColumnDefinition colDef = new TableColumnDefinition(_ilColumnManager, "isSetLastMarker", SWT.TRAIL); //$NON-NLS-1$
 
@@ -2828,11 +2881,70 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 	}
 
 	/**
+	 * Column: Adjust temperature
+	 */
+	private void defineColumnIL_40_AdjustTemperature() {
+
+		final TableColumnDefinition colDef = new TableColumnDefinition(_ilColumnManager, //
+				"isAdjustTemperature", //$NON-NLS-1$
+				SWT.CENTER);
+
+		colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_AdjustTemperature_Label);
+		colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_AdjustTemperature_Header);
+		colDef.setColumnHeaderToolTipText(Messages.Dialog_ImportConfig_Column_AdjustTemperature_Tooltip);
+
+		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(7));
+		colDef.setColumnWeightData(new ColumnWeightData(7));
+
+		colDef.setIsDefaultColumn();
+
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final ImportLauncher importLauncher = (ImportLauncher) cell.getElement();
+
+				cell.setText(importLauncher.isAdjustTemperature //
+						? Messages.App_Label_BooleanYes
+						: UI.EMPTY_STRING);
+			}
+		});
+	}
+
+	/**
+	 * Column: Is save tour
+	 */
+	private void defineColumnIL_88_IsSaveTour() {
+
+		final TableColumnDefinition colDef = new TableColumnDefinition(_ilColumnManager, "isSaveTour", SWT.CENTER); //$NON-NLS-1$
+
+		colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_Save_Label);
+		colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_Save_Header);
+		colDef.setColumnHeaderToolTipText(Messages.Dialog_ImportConfig_Checkbox_SaveTour_Tooltip);
+
+		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(7));
+		colDef.setColumnWeightData(new ColumnWeightData(7));
+
+		colDef.setIsDefaultColumn();
+
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final ImportLauncher importLauncher = (ImportLauncher) cell.getElement();
+				cell.setText(importLauncher.isSaveTour //
+						? Messages.App_Label_BooleanYes
+						: UI.EMPTY_STRING);
+			}
+		});
+	}
+
+	/**
 	 * Column: Show in dashboard
 	 */
-	private void defineColumnIL_50_ShowInDashboard() {
+	private void defineColumnIL_90_ShowInDashboard() {
 
-		final TableColumnDefinition colDef = new TableColumnDefinition(_ilColumnManager, "showInDash", SWT.LEAD); //$NON-NLS-1$
+		final TableColumnDefinition colDef = new TableColumnDefinition(_ilColumnManager, "showInDash", SWT.CENTER); //$NON-NLS-1$
 
 		colDef.setColumnLabel(Messages.Dialog_ImportConfig_Column_ShowInDash_Label);
 		colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_ShowInDash_Header);
@@ -2855,7 +2967,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 	/**
 	 * Column: Item description
 	 */
-	private void defineColumnIL_60_Description() {
+	private void defineColumnIL_99_Description() {
 
 		final TableColumnDefinition colDef = new TableColumnDefinition(_ilColumnManager, "configDescription", SWT.LEAD); //$NON-NLS-1$
 
@@ -2931,8 +3043,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 		final boolean isLauncherAvailable = numLaunchers > 0;
 
 		final boolean isILSelected = _selectedIL != null;
-
 		final boolean isLastMarkerSelected = isILSelected && _chkIL_SetLastMarker.getSelection();
+		final boolean isAdjustTemperature = isILSelected && _chkIL_AdjustTemperature.getSelection();
+
 		boolean isSetTourType = false;
 
 		if (isILSelected) {
@@ -3012,15 +3125,24 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
 		_lblIL_ConfigName.setEnabled(isILSelected);
 		_lblIL_ConfigDescription.setEnabled(isILSelected);
-		_lblIL_LastMarker.setEnabled(isLastMarkerSelected);
-		_lblIL_LastMarkerDistanceUnit.setEnabled(isLastMarkerSelected);
-		_lblIL_LastMarkerText.setEnabled(isLastMarkerSelected);
-
-		_spinnerIL_LastMarkerDistance.setEnabled(isLastMarkerSelected);
 
 		_txtIL_ConfigName.setEnabled(isILSelected);
 		_txtIL_ConfigDescription.setEnabled(isILSelected);
+
+		// last marker
+		_lblIL_LastMarker.setEnabled(isLastMarkerSelected);
+		_lblIL_LastMarkerDistanceUnit.setEnabled(isLastMarkerSelected);
+		_lblIL_LastMarkerText.setEnabled(isLastMarkerSelected);
+		_spinnerIL_LastMarkerDistance.setEnabled(isLastMarkerSelected);
 		_txtIL_LastMarker.setEnabled(isLastMarkerSelected);
+
+		// adjust temperature
+		_dtIL_TemperatureAdjustmentDuration.setEnabled(isAdjustTemperature);
+		_lblIL_AvgTemperature.setEnabled(isAdjustTemperature);
+		_lblIL_AvgTemperature_Unit.setEnabled(isAdjustTemperature);
+		_lblIL_TemperatureAdjustmentDuration.setEnabled(isAdjustTemperature);
+		_lblIL_TemperatureAdjustmentDuration_Unit.setEnabled(isAdjustTemperature);
+		_spinnerIL_AvgTemperature.setEnabled(isAdjustTemperature);
 
 		_ilViewer.getTable().setEnabled(isLauncherAvailable);
 
@@ -3286,6 +3408,31 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 				UI.openControlMenu((Link) event.widget);
 			}
 		};
+
+		/*
+		 * Default modify listener
+		 */
+		_defaultModify_Listener = new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+
+				onIL_Modified();
+				enable_IL_Controls();
+			}
+		};
+
+		_defaultModify_MouseWheelListener = new MouseWheelListener() {
+
+			@Override
+			public void mouseScrolled(final MouseEvent e) {
+
+				UI.adjustSpinnerValueOnMouseScroll(e);
+
+				onIL_Modified();
+				enable_IL_Controls();
+			}
+		};
+
 	}
 
 	@Override
@@ -3580,6 +3727,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
 		_selectedIL.isSetLastMarker = _chkIL_SetLastMarker.getSelection();
 		_selectedIL.lastMarkerDistance = getSelectedLastMarkerDistance();
+
+		_selectedIL.isAdjustTemperature = _chkIL_AdjustTemperature.getSelection();
 
 		_selectedIL.isSaveTour = _chkIL_SaveTour.getSelection();
 		_selectedIL.isShowInDashboard = _chkIL_ShowInDashboard.getSelection();
@@ -4007,6 +4156,17 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 		_selectedIL.lastMarkerDistance = getSelectedLastMarkerDistance();
 		_selectedIL.lastMarkerText = _txtIL_LastMarker.getText();
 
+		// adjust temperature
+		final int hours = _dtIL_TemperatureAdjustmentDuration.getHours();
+		final int minutes = _dtIL_TemperatureAdjustmentDuration.getMinutes();
+		final int seconds = _dtIL_TemperatureAdjustmentDuration.getSeconds();
+
+		final float temperature = UI.getTemperatureToMetric(_spinnerIL_AvgTemperature.getSelection());
+
+		_selectedIL.isAdjustTemperature = _chkIL_AdjustTemperature.getSelection();
+		_selectedIL.tourAvgTemperature = temperature;
+		_selectedIL.temperatureAdjustmentDuration = hours * 3600 + minutes * 60 + seconds;
+
 		final Enum<TourTypeConfig> selectedTourTypeConfig = getSelectedTourTypeConfig();
 
 		_selectedIL.tourTypeConfig = selectedTourTypeConfig;
@@ -4164,6 +4324,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 			final int distanceValue = (int) (distance10 + 0.5);
 			final String lastMarkerText = _selectedIL.lastMarkerText;
 
+			final int durationTime = _selectedIL.temperatureAdjustmentDuration;
 			_txtIL_ConfigName.setText(_selectedIL.name);
 			_txtIL_ConfigDescription.setText(_selectedIL.description);
 			_chkIL_SaveTour.setSelection(_selectedIL.isSaveTour);
@@ -4174,8 +4335,16 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 			_spinnerIL_LastMarkerDistance.setSelection(distanceValue);
 			_txtIL_LastMarker.setText(lastMarkerText == null ? UI.EMPTY_STRING : lastMarkerText);
 
-			_chkIL_SetTourType.setSelection(isSetTourType);
+			// adjust temperature
+			_chkIL_AdjustTemperature.setSelection(_selectedIL.isAdjustTemperature);
+			_spinnerIL_AvgTemperature.setSelection(//
+					(int) (UI.getTemperatureFromMetric(_selectedIL.tourAvgTemperature) + 0.5));
+			_dtIL_TemperatureAdjustmentDuration.setTime(
+					durationTime / 3600,
+					(durationTime % 3600) / 60,
+					(durationTime % 3600) % 60);
 
+			_chkIL_SetTourType.setSelection(isSetTourType);
 			if (isSetTourType) {
 				_comboIL_TourType.select(getTourTypeConfigIndex(tourTypeConfig));
 			}

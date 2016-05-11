@@ -32,10 +32,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.DateTime;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
@@ -54,19 +51,10 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
 	/*
 	 * UI controls
 	 */
-	private Button					_chkAdjustTemperature;
 	private Button					_chkAutoOpenImportLog;
 	private Button					_chkCreateTourIdWithTime;
 
-	private DateTime				_dtTemperatureAdjustmentDuration;
-
-	private Label					_lblAvgTemperature;
 	private Label					_lblIdInfo;
-	private Label					_lblTemperatureAdjustmentDuration;
-	private Label					_lblTemperatureAdjustmentInfo;
-	private Label					_lblTemperatureUnit;
-
-	private Spinner					_spinnerAvgTemperature;
 
 	@Override
 	protected Control createContents(final Composite parent) {
@@ -88,7 +76,6 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
 		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
 		{
 			createUI_10_General(container);
-			createUI_30_TemperatureAdjustment(container);
 		}
 
 		return container;
@@ -148,42 +135,11 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
 		}
 	}
 
-	private void createUI_30_TemperatureAdjustment(final Composite parent) {
-
-		final Group group = new Group(parent, SWT.NONE);
-		group.setText(Messages.PrefPage_Import_Group_TemperatureAdjustment);
-		GridDataFactory.fillDefaults()//
-				.grab(true, false)
-				.indent(0, _pc.convertVerticalDLUsToPixels(4))
-				.applyTo(group);
-		GridLayoutFactory.swtDefaults().applyTo(group);
-		{
-			{
-				/*
-				 * Checkbox: Adjust temperature
-				 */
-				_chkAdjustTemperature = new Button(group, SWT.CHECK);
-				_chkAdjustTemperature.setText(Messages.PrefPage_Import_Checkbox_AdjustTemperature);
-				_chkAdjustTemperature.addSelectionListener(_defaultSelectionListener);
-				GridDataFactory.fillDefaults()//
-						.applyTo(_chkAdjustTemperature);
-			}
-		}
-	}
-
 	private void enableControls() {
 
 		final boolean isTourIdWithTime = _chkCreateTourIdWithTime.getSelection();
-		final boolean isAdjustTemperature = _chkAdjustTemperature.getSelection();
 
 		_lblIdInfo.setEnabled(isTourIdWithTime);
-
-//		_dtTemperatureAdjustmentDuration.setEnabled(isAdjustTemperature);
-//		_lblAvgTemperature.setEnabled(isAdjustTemperature);
-//		_lblTemperatureAdjustmentInfo.setEnabled(isAdjustTemperature);
-//		_lblTemperatureAdjustmentDuration.setEnabled(isAdjustTemperature);
-//		_lblTemperatureUnit.setEnabled(isAdjustTemperature);
-//		_spinnerAvgTemperature.setEnabled(isAdjustTemperature);
 	}
 
 	@Override

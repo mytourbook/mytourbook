@@ -236,8 +236,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 * Tour start daytime in seconds
 	 */
 	private int									_tourStartDayTime;
+
 	/*
-	 * data series which are displayed in the viewer
+	 * Data series which are displayed in the viewer, all are metric system
 	 */
 	private int[]								_serieTime;
 	private float[]								_serieDistance;
@@ -415,9 +416,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/*
 	 * measurement unit values
 	 */
-	private float								_unitValueDistance;
 	private float								_unitValueAltitude;
-	private float								_unitValueTemperature;
+	private float								_unitValueDistance;
 	private int[]								_unitValueWindSpeed;
 
 	// pages
@@ -688,17 +688,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			} else if (__dataSerie == _serieTemperature) {
 
-				if (_unitValueTemperature != 1) {
-
-					// none metric measurement systemm
-
-					displayedValue = metricValue
-							* net.tourbook.ui.UI.UNIT_FAHRENHEIT_MULTI
-							+ net.tourbook.ui.UI.UNIT_FAHRENHEIT_ADD;
-				}
+				displayedValue = UI.getTemperatureFromMetric(metricValue);
 			}
 
-			return new Float(displayedValue).toString();
+			return Float.toString(displayedValue);
 		}
 
 		public void setDataSerie(final float[] dataSerie) {
@@ -717,6 +710,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					 */
 					final float enteredValue = Float.parseFloat((String) value);
 					float metricValue = enteredValue;
+
 					if (__dataSerie == _serieAltitude) {
 
 						if (_unitValueAltitude != 1) {
@@ -732,14 +726,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					final boolean isTemperatureSerie = __dataSerie == _serieTemperature;
 
 					if (isTemperatureSerie) {
-
-						if (_unitValueTemperature != 1) {
-
-							// none metric measurement systemm, convert entered value into metric value
-
-							metricValue = ((enteredValue - net.tourbook.ui.UI.UNIT_FAHRENHEIT_ADD))
-									/ net.tourbook.ui.UI.UNIT_FAHRENHEIT_MULTI;
-						}
+						metricValue = UI.getTemperatureToMetric(enteredValue);
 					}
 
 					final int serieIndex = ((TimeSlice) element).serieIndex;
@@ -1138,18 +1125,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				// temperature
 				if (_serieTemperature != null) {
 
-					final float metricTemperature = _serieTemperature[serieIndex];
+					final float temperature = UI.getTemperatureFromMetric(_serieTemperature[serieIndex]);
 
-					if (_unitValueTemperature != 1) {
-						// use imperial system
-						final float imperialTemp = metricTemperature
-								* net.tourbook.ui.UI.UNIT_FAHRENHEIT_MULTI
-								+ net.tourbook.ui.UI.UNIT_FAHRENHEIT_ADD;
-						sb.append(_nf3.format(imperialTemp));
-					} else {
-						// use metric system
-						sb.append(_nf3.format(metricTemperature));
-					}
+					sb.append(_nf3.format(temperature));
 				}
 				sb.append(UI.TAB);
 
@@ -3542,9 +3520,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			public void update(final ViewerCell cell) {
 
 				if (_serieGradient != null) {
-					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
 
-					cell.setText(_nf1.format(_serieGradient[timeSlice.serieIndex]));
+					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
+					final float value = _serieGradient[timeSlice.serieIndex];
+
+					colDef.printDetailValue(cell, value);
+
 				} else {
 					cell.setText(UI.EMPTY_STRING);
 				}
@@ -4097,7 +4078,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 */
 	private void defineColumn_Weather_Temperature() {
 
-		ColumnDefinition colDef;
+		final ColumnDefinition colDef;
 		_colDefTemperature = colDef = TableColumnFactory.WEATHER_TEMPERATURE.createColumn(_sliceColumnManager, _pc);
 
 		colDef.setLabelProvider(new CellLabelProvider() {
@@ -4106,23 +4087,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				if (_serieTemperature != null) {
 
 					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
-					final double metricTemperature = _serieTemperature[timeSlice.serieIndex];
 
-					if (_unitValueTemperature != 1) {
+					final float value = UI.getTemperatureFromMetric(_serieTemperature[timeSlice.serieIndex]);
 
-						// use imperial system
-
-						final double imperialTemp = metricTemperature
-								* net.tourbook.ui.UI.UNIT_FAHRENHEIT_MULTI
-								+ net.tourbook.ui.UI.UNIT_FAHRENHEIT_ADD;
-
-						cell.setText(_nf1.format(imperialTemp));
-
-					} else {
-
-						// use metric system
-						cell.setText(_nf1.format(metricTemperature));
-					}
+					colDef.printDetailValue(cell, value);
 
 				} else {
 					cell.setText(UI.EMPTY_STRING);
@@ -6161,7 +6129,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		_unitValueDistance = net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 		_unitValueAltitude = net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
-		_unitValueTemperature = net.tourbook.ui.UI.UNIT_VALUE_TEMPERATURE;
 
 		_unitValueWindSpeed = net.tourbook.ui.UI.UNIT_VALUE_DISTANCE == 1
 				? IWeather.windSpeedKmh
@@ -6227,13 +6194,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			if (_isTemperatureManuallyModified) {
 
-				float temperature = (float) _spinTemperature.getSelection() / 10;
+				final float temperature = (float) _spinTemperature.getSelection() / 10;
 
-				if (_unitValueTemperature != 1) {
-					temperature = (temperature - net.tourbook.ui.UI.UNIT_FAHRENHEIT_ADD)
-							/ net.tourbook.ui.UI.UNIT_FAHRENHEIT_MULTI;
-				}
-				_tourData.setAvgTemperature(temperature);
+				_tourData.setAvgTemperature(UI.getTemperatureToMetric(temperature));
 			}
 
 			_tourData.setTourStartTime(
@@ -6603,14 +6566,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		/*
 		 * avg temperature
 		 */
-		float avgTemperature = _tourData.getAvgTemperature();
-
-		if (_unitValueTemperature != 1) {
-			final float imperialTemperature = avgTemperature;
-			avgTemperature = imperialTemperature
-					* net.tourbook.ui.UI.UNIT_FAHRENHEIT_MULTI
-					+ net.tourbook.ui.UI.UNIT_FAHRENHEIT_ADD;
-		}
+		final float avgTemperature = UI.getTemperatureFromMetric(_tourData.getAvgTemperature());
 
 		/*
 		 * on Linux .setDigit() fires an asynch selection event that the flag _isSetField is not
@@ -6618,7 +6574,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		 */
 		_isSetDigits = true;
 		_spinTemperature.setDigits(1);
-		_spinTemperature.setSelection(Math.round(avgTemperature * 10));
+		_spinTemperature.setSelection((int) ((avgTemperature * 10) + 0.5));
 
 		// set start date/time
 		final org.joda.time.DateTime start = _tourData.getTourStartTime();

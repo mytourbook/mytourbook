@@ -47,6 +47,11 @@ New
 * Tour Tooltip
 
   - Use value format from the preferences
+  
+  
+* Easy Import
+
+  - Run Action "Show default columns" in the launcher table header context menu to see the new temperature adjustment column
 
 
 System

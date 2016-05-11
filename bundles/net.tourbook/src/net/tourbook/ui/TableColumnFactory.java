@@ -2055,6 +2055,10 @@ public abstract class TableColumnFactory {
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_temperature_tooltip);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
+				colDef.setValueFormats(
+						ValueFormatSet.Number,
+						ValueFormat.NUMBER_1_1,
+						columnManager);
 
 				return colDef;
 			};

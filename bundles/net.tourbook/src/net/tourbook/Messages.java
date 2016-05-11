@@ -131,6 +131,8 @@ public class Messages extends NLS {
 	public static String		Dialog_ImportConfig_Action_NewOneTourType_Tooltip;
 	public static String		Dialog_ImportConfig_Action_RemoveSpeed_Tooltip;
 	public static String		Dialog_ImportConfig_Action_SortBySpeed_Tooltip;
+
+	public static String		Dialog_ImportConfig_Checkbox_AdjustTemperature;
 	public static String		Dialog_ImportConfig_Checkbox_CreateBackup;
 	public static String		Dialog_ImportConfig_Checkbox_CreateBackup_Tooltip;
 	public static String		Dialog_ImportConfig_Checkbox_DeleteDeviceFiles;
@@ -147,6 +149,10 @@ public class Messages extends NLS {
 	public static String		Dialog_ImportConfig_Checkbox_ShowInDashboard_Tooltip;
 	public static String		Dialog_ImportConfig_Checkbox_TourType;
 	public static String		Dialog_ImportConfig_Checkbox_TourType_Tooltip;
+
+	public static String		Dialog_ImportConfig_Column_AdjustTemperature_Header;
+	public static String		Dialog_ImportConfig_Column_AdjustTemperature_Label;
+	public static String		Dialog_ImportConfig_Column_AdjustTemperature_Tooltip;
 	public static String		Dialog_ImportConfig_Column_Backup;
 	public static String		Dialog_ImportConfig_Column_DeleteFiles_Header;
 	public static String		Dialog_ImportConfig_Column_DeleteFiles_Label;
@@ -441,7 +447,7 @@ public class Messages extends NLS {
 
 	public static String		App_Unit_Minute;
 
-	public static String	App_Unit_Px;
+	public static String		App_Unit_Px;
 	public static String		App_Unit_Seconds_Small;
 
 	public static String		App_Window_Title;
@@ -821,6 +827,7 @@ public class Messages extends NLS {
 	public static String		Image__synch_statistics_Disabled;
 	public static String		Image__SearchExternal;
 	public static String		Image__SearchExternal_Disabled;
+	public static String		Image__State_AdjustTemperature;
 	public static String		Image__State_Copy;
 	public static String		Image__State_Deleted_Backup;
 	public static String		Image__State_Deleted_Device;
@@ -924,6 +931,8 @@ public class Messages extends NLS {
 	public static String		Import_Data_HTML_AcquireDeviceInfo;
 	public static String		Import_Data_HTML_Action_OldUI;
 	public static String		Import_Data_HTML_Action_OldUI_Tooltip;
+	public static String		Import_Data_HTML_AdjustTemperature_No;
+	public static String		Import_Data_HTML_AdjustTemperature_Yes;
 	public static String		Import_Data_HTML_AllFilesAreBackedUp;
 	public static String		Import_Data_HTML_AllFilesAreImported;
 	public static String		Import_Data_HTML_DeleteDeviceFiles_No;
@@ -1003,6 +1012,7 @@ public class Messages extends NLS {
 	public static String		Log_EasyImport_003_TourType;
 	public static String		Log_EasyImport_003_TourType_Item;
 	public static String		Log_EasyImport_004_SetLastMarker;
+	public static String		Log_EasyImport_005_AdjustTemperatureValues;
 	public static String		Log_EasyImport_099_SaveTour;
 	public static String		Log_EasyImport_100_DeleteTourFiles;
 	public static String		Log_EasyImport_101_TurnWatchingOff;

@@ -19,6 +19,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
+import net.tourbook.importdata.EasyConfig;
 import net.tourbook.preferences.ITourbookPreferences;
 
 import org.eclipse.jface.layout.GridDataFactory;
@@ -154,8 +155,8 @@ class DialogAdjustTemperature_WizardPage extends WizardPage {
 					// spinner
 					_spinnerAvgTemperature = new Spinner(innerContainer, SWT.BORDER);
 					_spinnerAvgTemperature.setPageIncrement(5);
-					_spinnerAvgTemperature.setMinimum(0);
-					_spinnerAvgTemperature.setMaximum(30);
+					_spinnerAvgTemperature.setMinimum(EasyConfig.TEMPERATURE_AVG_TEMPERATURE_MIN);
+					_spinnerAvgTemperature.setMaximum(EasyConfig.TEMPERATURE_AVG_TEMPERATURE_MAX);
 					_spinnerAvgTemperature.addMouseWheelListener(new MouseWheelListener() {
 						@Override
 						public void mouseScrolled(final MouseEvent event) {
@@ -166,9 +167,9 @@ class DialogAdjustTemperature_WizardPage extends WizardPage {
 							.align(SWT.END, SWT.FILL)
 							.applyTo(_spinnerAvgTemperature);
 
-					// label: °C
+					// label: °C / °F
 					final Label unitLabel = new Label(innerContainer, SWT.NONE);
-					unitLabel.setText(UI.SYMBOL_TEMPERATURE);
+					unitLabel.setText(UI.UNIT_LABEL_TEMPERATURE);
 					GridDataFactory.fillDefaults()//
 							.align(SWT.FILL, SWT.CENTER)
 							.applyTo(unitLabel);
@@ -195,7 +196,7 @@ class DialogAdjustTemperature_WizardPage extends WizardPage {
 		final float avgTemperature = _prefStore.getFloat(ITourbookPreferences.ADJUST_TEMPERATURE_AVG_TEMPERATURE);
 		final int durationTime = _prefStore.getInt(ITourbookPreferences.ADJUST_TEMPERATURE_DURATION_TIME);
 
-		_spinnerAvgTemperature.setSelection((int) avgTemperature);
+		_spinnerAvgTemperature.setSelection((int) (UI.getTemperatureFromMetric(avgTemperature) + 0.5));
 		_dtTemperatureAdjustmentDuration.setTime(
 				durationTime / 3600,
 				(durationTime % 3600) / 60,
@@ -204,7 +205,7 @@ class DialogAdjustTemperature_WizardPage extends WizardPage {
 
 	void saveState() {
 
-		final float avgTemperature = _spinnerAvgTemperature.getSelection();
+		final float avgTemperature = UI.getTemperatureToMetric(_spinnerAvgTemperature.getSelection());
 
 		final int hours = _dtTemperatureAdjustmentDuration.getHours();
 		final int minutes = _dtTemperatureAdjustmentDuration.getMinutes();

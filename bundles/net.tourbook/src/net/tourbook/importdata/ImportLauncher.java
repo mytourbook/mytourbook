@@ -23,8 +23,8 @@ import net.tourbook.data.TourType;
 
 public class ImportLauncher implements Cloneable {
 
-	public String					description			= UI.EMPTY_STRING;
-	public String					name				= UI.EMPTY_STRING;
+	public String					description						= UI.EMPTY_STRING;
+	public String					name							= UI.EMPTY_STRING;
 
 	/**
 	 * When <code>null</code> then the tour type is not set.
@@ -33,36 +33,52 @@ public class ImportLauncher implements Cloneable {
 
 	public TourType					oneTourType;
 
-	public ArrayList<SpeedTourType>	speedTourTypes		= new ArrayList<>();
+	public ArrayList<SpeedTourType>	speedTourTypes					= new ArrayList<>();
 
 	/** Contains the image hash or 0 when an image is not displayed. */
 	public int						imageHash;
 
 	public int						imageWidth;
 
-
 	/**
 	 * Show/hide this launcher in the dashboard.
 	 */
-	public boolean					isShowInDashboard	= true;
+	public boolean					isShowInDashboard				= true;
 
 	/**
 	 * When <code>true</code> save the tour for the active person.
 	 */
-	public boolean					isSaveTour;
+	public boolean					isSaveTour						= false;
 
 	/**
 	 * When <code>true</code> then the text of the last marker is set.
 	 */
-	public boolean					isSetLastMarker;
+	public boolean					isSetLastMarker					= false;
 
 	/**
 	 * Last marker distance in meters.
 	 */
-	public int						lastMarkerDistance;
-	public String					lastMarkerText		= UI.EMPTY_STRING;
+	public int						lastMarkerDistance				= 0;
+	public String					lastMarkerText					= UI.EMPTY_STRING;
+
+	/**
+	 * When <code>true</code> then the tour start temperature is adjusted.
+	 */
+	public boolean					isAdjustTemperature				= false;
+
+	/**
+	 * Duration in seconds during which the temperature is adjusted.
+	 */
+	public int						temperatureAdjustmentDuration	= EasyConfig.TEMPERATURE_ADJUSTMENT_DURATION_DEFAULT;
+
+	/**
+	 * Temperature adjustment will be performed when the tour average temperature is below this
+	 * value.
+	 */
+	public float					tourAvgTemperature				= EasyConfig.TEMPERATURE_AVG_TEMPERATURE_DEFAULT;
 
 	private long					_id;
+
 	private static long				_idCreator;
 
 	public ImportLauncher() {

@@ -120,6 +120,7 @@ public class UI {
 	public static final String				SYMBOL_ARROW_DOWN						= "\u2193";																//$NON-NLS-1$
 	public static final String				SYMBOL_AVERAGE							= "\u00f8";																//$NON-NLS-1$
 	public static final String				SYMBOL_AVERAGE_WITH_SPACE				= "\u00f8 ";																//$NON-NLS-1$
+	public static final String				SYMBOL_BOX								= "\u25a0";																//$NON-NLS-1$
 	public static final String				SYMBOL_DASH								= "\u2212";																//$NON-NLS-1$
 	public static final String				SYMBOL_DEGREE							= "\u00B0";																//$NON-NLS-1$
 	public static final String				SYMBOL_DIFFERENCE						= "\u0394";																//$NON-NLS-1$
@@ -151,7 +152,8 @@ public class UI {
 	public static final String				SYMBOL_QUESTION_MARK					= "?";																		//$NON-NLS-1$
 	public static final char				SYMBOL_SEMICOLON						= ';';
 	public static final String				SYMBOL_STAR								= "*";																		//$NON-NLS-1$
-	public static final String				SYMBOL_TEMPERATURE						= "°C";																	//$NON-NLS-1$
+	public static final String				SYMBOL_TEMPERATURE_CELCIUS				= "°C";																	//$NON-NLS-1$
+	public static final String				SYMBOL_TEMPERATURE_FAHRENHEIT			= "°F";																	//$NON-NLS-1$
 	public static final String				SYMBOL_UNDERSCORE						= "_";																		//$NON-NLS-1$
 	public static final String				SYMBOL_WIND_WITH_SPACE					= "W ";																	//$NON-NLS-1$
 
@@ -221,6 +223,12 @@ public class UI {
 
 	public static final String				UNIT_LABEL_TIME							= "h";																		//$NON-NLS-1$
 	public static final String				UNIT_LABEL_DIRECTION					= "\u00B0";																//$NON-NLS-1$
+
+	public static float						UNIT_VALUE_TEMPERATURE;
+
+	// (Celcius * 9/5) + 32 = Fahrenheit
+	public static final float				UNIT_FAHRENHEIT_MULTI					= 1.8f;
+	public static final float				UNIT_FAHRENHEIT_ADD						= 32;
 
 	/*
 	 * Labels for the different measurement systems
@@ -597,114 +605,6 @@ public class UI {
 		return null;
 	}
 
-// this conversion is not working for all png images, found SWT2Dutil.java
-//
-//	/**
-//	 * Converts a Swing BufferedImage into a lightweight ImageData object for SWT
-//	 *
-//	 * @param bufferedImage
-//	 *            the image to be converted
-//	 * @param originalImagePathName
-//	 * @return An ImageData that represents the same image as bufferedImage
-//	 */
-//	public static ImageData convertAWTimageIntoSWTimage(final BufferedImage bufferedImage, final String imagePathName) {
-//
-//		try {
-//
-//			if (bufferedImage.getColorModel() instanceof DirectColorModel) {
-//				final DirectColorModel colorModel = (DirectColorModel) bufferedImage.getColorModel();
-//				final PaletteData palette = new PaletteData(
-//						colorModel.getRedMask(),
-//						colorModel.getGreenMask(),
-//						colorModel.getBlueMask());
-//				final ImageData data = new ImageData(
-//						bufferedImage.getWidth(),
-//						bufferedImage.getHeight(),
-//						colorModel.getPixelSize(),
-//						palette);
-//				final WritableRaster raster = bufferedImage.getRaster();
-//				final int[] pixelArray = new int[3];
-//				for (int y = 0; y < data.height; y++) {
-//					for (int x = 0; x < data.width; x++) {
-//						raster.getPixel(x, y, pixelArray);
-//						final int pixel = palette.getPixel(new RGB(pixelArray[0], pixelArray[1], pixelArray[2]));
-//						data.setPixel(x, y, pixel);
-//					}
-//				}
-//				return data;
-//
-//			} else if (bufferedImage.getColorModel() instanceof IndexColorModel) {
-//
-//				final IndexColorModel colorModel = (IndexColorModel) bufferedImage.getColorModel();
-//				final int size = colorModel.getMapSize();
-//				final byte[] reds = new byte[size];
-//				final byte[] greens = new byte[size];
-//				final byte[] blues = new byte[size];
-//				colorModel.getReds(reds);
-//				colorModel.getGreens(greens);
-//				colorModel.getBlues(blues);
-//				final RGB[] rgbs = new RGB[size];
-//				for (int i = 0; i < rgbs.length; i++) {
-//					rgbs[i] = new RGB(reds[i] & 0xFF, greens[i] & 0xFF, blues[i] & 0xFF);
-//				}
-//				final PaletteData palette = new PaletteData(rgbs);
-//				final ImageData data = new ImageData(
-//						bufferedImage.getWidth(),
-//						bufferedImage.getHeight(),
-//						colorModel.getPixelSize(),
-//						palette);
-//				data.transparentPixel = colorModel.getTransparentPixel();
-//				final WritableRaster raster = bufferedImage.getRaster();
-//				final int[] pixelArray = new int[1];
-//				for (int y = 0; y < data.height; y++) {
-//					for (int x = 0; x < data.width; x++) {
-//						raster.getPixel(x, y, pixelArray);
-//						data.setPixel(x, y, pixelArray[0]);
-//					}
-//				}
-//				return data;
-//
-//			} else if (bufferedImage.getColorModel() instanceof ComponentColorModel) {
-//
-//				final ComponentColorModel colorModel = (ComponentColorModel) bufferedImage.getColorModel();
-//
-//				//ASSUMES: 3 BYTE BGR IMAGE TYPE
-//
-//				final PaletteData palette = new PaletteData(0x0000FF, 0x00FF00, 0xFF0000);
-//				final ImageData data = new ImageData(
-//						bufferedImage.getWidth(),
-//						bufferedImage.getHeight(),
-//						colorModel.getPixelSize(),
-//						palette);
-//
-//				//This is valid because we are using a 3-byte Data model with no transparent pixels
-//				data.transparentPixel = -1;
-//
-//				final WritableRaster raster = bufferedImage.getRaster();
-//
-////				final int[] pixelArray = new int[3];
-//				final int[] pixelArray = colorModel.getComponentSize();
-//
-//				for (int y = 0; y < data.height; y++) {
-//					for (int x = 0; x < data.width; x++) {
-//						raster.getPixel(x, y, pixelArray);
-//						final int pixel = palette.getPixel(new RGB(pixelArray[0], pixelArray[1], pixelArray[2]));
-//						data.setPixel(x, y, pixel);
-//					}
-//				}
-//				return data;
-//			}
-//
-//		} catch (final Exception e) {
-//
-//			System.out.println(NLS.bind(//
-//					UI.timeStamp() + "Cannot convert AWT image into SWT image: {0}",
-//					imagePathName));
-//		}
-//
-//		return null;
-//	}
-
 	public static Cursor disposeResource(final Cursor resource) {
 		if ((resource != null) && !resource.isDisposed()) {
 			resource.dispose();
@@ -742,9 +642,9 @@ public class UI {
 	}
 
 	public static String format_hh(final long time) {
-		
+
 		_formatterSB.setLength(0);
-		
+
 		return _formatter.format(Messages.Format_hh, (time / 3600)).toString();
 	}
 
@@ -1041,6 +941,33 @@ public class UI {
 		// No attempt is made to constrain the bounds. The default
 		// constraining behavior in Window will be used.
 		return result;
+	}
+
+	/**
+	 * @param temperature
+	 * @return Returns the temperatur in the current measurement system.
+	 */
+	public static float getTemperatureFromMetric(final float temperature) {
+
+		if (UNIT_VALUE_TEMPERATURE == 1) {
+			return temperature;
+		}
+
+		return temperature * UNIT_FAHRENHEIT_MULTI + UNIT_FAHRENHEIT_ADD;
+	}
+
+	/**
+	 * @param temperature
+	 * @return Returns the temperature from the current measurement system converted into metric
+	 *         system.
+	 */
+	public static float getTemperatureToMetric(final float temperature) {
+
+		if (UNIT_VALUE_TEMPERATURE == 1) {
+			return temperature;
+		}
+
+		return (temperature - UNIT_FAHRENHEIT_ADD) / UNIT_FAHRENHEIT_MULTI;
 	}
 
 	public static boolean isCtrlKey(final MouseEvent event) {
@@ -1784,3 +1711,111 @@ public class UI {
 		};
 	}
 }
+
+//this conversion is not working for all png images, found SWT2Dutil.java
+//
+//	/**
+//	 * Converts a Swing BufferedImage into a lightweight ImageData object for SWT
+//	 *
+//	 * @param bufferedImage
+//	 *            the image to be converted
+//	 * @param originalImagePathName
+//	 * @return An ImageData that represents the same image as bufferedImage
+//	 */
+//	public static ImageData convertAWTimageIntoSWTimage(final BufferedImage bufferedImage, final String imagePathName) {
+//
+//		try {
+//
+//			if (bufferedImage.getColorModel() instanceof DirectColorModel) {
+//				final DirectColorModel colorModel = (DirectColorModel) bufferedImage.getColorModel();
+//				final PaletteData palette = new PaletteData(
+//						colorModel.getRedMask(),
+//						colorModel.getGreenMask(),
+//						colorModel.getBlueMask());
+//				final ImageData data = new ImageData(
+//						bufferedImage.getWidth(),
+//						bufferedImage.getHeight(),
+//						colorModel.getPixelSize(),
+//						palette);
+//				final WritableRaster raster = bufferedImage.getRaster();
+//				final int[] pixelArray = new int[3];
+//				for (int y = 0; y < data.height; y++) {
+//					for (int x = 0; x < data.width; x++) {
+//						raster.getPixel(x, y, pixelArray);
+//						final int pixel = palette.getPixel(new RGB(pixelArray[0], pixelArray[1], pixelArray[2]));
+//						data.setPixel(x, y, pixel);
+//					}
+//				}
+//				return data;
+//
+//			} else if (bufferedImage.getColorModel() instanceof IndexColorModel) {
+//
+//				final IndexColorModel colorModel = (IndexColorModel) bufferedImage.getColorModel();
+//				final int size = colorModel.getMapSize();
+//				final byte[] reds = new byte[size];
+//				final byte[] greens = new byte[size];
+//				final byte[] blues = new byte[size];
+//				colorModel.getReds(reds);
+//				colorModel.getGreens(greens);
+//				colorModel.getBlues(blues);
+//				final RGB[] rgbs = new RGB[size];
+//				for (int i = 0; i < rgbs.length; i++) {
+//					rgbs[i] = new RGB(reds[i] & 0xFF, greens[i] & 0xFF, blues[i] & 0xFF);
+//				}
+//				final PaletteData palette = new PaletteData(rgbs);
+//				final ImageData data = new ImageData(
+//						bufferedImage.getWidth(),
+//						bufferedImage.getHeight(),
+//						colorModel.getPixelSize(),
+//						palette);
+//				data.transparentPixel = colorModel.getTransparentPixel();
+//				final WritableRaster raster = bufferedImage.getRaster();
+//				final int[] pixelArray = new int[1];
+//				for (int y = 0; y < data.height; y++) {
+//					for (int x = 0; x < data.width; x++) {
+//						raster.getPixel(x, y, pixelArray);
+//						data.setPixel(x, y, pixelArray[0]);
+//					}
+//				}
+//				return data;
+//
+//			} else if (bufferedImage.getColorModel() instanceof ComponentColorModel) {
+//
+//				final ComponentColorModel colorModel = (ComponentColorModel) bufferedImage.getColorModel();
+//
+//				//ASSUMES: 3 BYTE BGR IMAGE TYPE
+//
+//				final PaletteData palette = new PaletteData(0x0000FF, 0x00FF00, 0xFF0000);
+//				final ImageData data = new ImageData(
+//						bufferedImage.getWidth(),
+//						bufferedImage.getHeight(),
+//						colorModel.getPixelSize(),
+//						palette);
+//
+//				//This is valid because we are using a 3-byte Data model with no transparent pixels
+//				data.transparentPixel = -1;
+//
+//				final WritableRaster raster = bufferedImage.getRaster();
+//
+////				final int[] pixelArray = new int[3];
+//				final int[] pixelArray = colorModel.getComponentSize();
+//
+//				for (int y = 0; y < data.height; y++) {
+//					for (int x = 0; x < data.width; x++) {
+//						raster.getPixel(x, y, pixelArray);
+//						final int pixel = palette.getPixel(new RGB(pixelArray[0], pixelArray[1], pixelArray[2]));
+//						data.setPixel(x, y, pixel);
+//					}
+//				}
+//				return data;
+//			}
+//
+//		} catch (final Exception e) {
+//
+//			System.out.println(NLS.bind(//
+//					UI.timeStamp() + "Cannot convert AWT image into SWT image: {0}",
+//					imagePathName));
+//		}
+//
+//		return null;
+//	}

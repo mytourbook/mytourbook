@@ -1660,7 +1660,11 @@ public class RawDataManager {
 
 							if (view != null) {
 								view.reloadViewer();
-								view.selectFirstTour();
+
+								if (isEasyImport == false) {
+									// first tour is selected later
+									view.selectFirstTour();
+								}
 							}
 						}
 					});

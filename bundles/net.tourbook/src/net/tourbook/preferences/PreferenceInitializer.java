@@ -22,6 +22,7 @@ import net.tourbook.chart.Chart;
 import net.tourbook.common.util.StringToArrayConverter;
 import net.tourbook.data.TourMarker;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.importdata.EasyConfig;
 import net.tourbook.tour.BreakTimeTool;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.tourChart.ChartMarkerToolTip;
@@ -451,7 +452,11 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		/*
 		 * Adjust temperature
 		 */
-		store.setDefault(ITourbookPreferences.ADJUST_TEMPERATURE_AVG_TEMPERATURE, 15); // 15 °C
-		store.setDefault(ITourbookPreferences.ADJUST_TEMPERATURE_DURATION_TIME, 12 * 60); // 12 minutes
+		store.setDefault(
+				ITourbookPreferences.ADJUST_TEMPERATURE_AVG_TEMPERATURE,
+				EasyConfig.TEMPERATURE_AVG_TEMPERATURE_DEFAULT);
+		store.setDefault(
+				ITourbookPreferences.ADJUST_TEMPERATURE_DURATION_TIME,
+				EasyConfig.TEMPERATURE_ADJUSTMENT_DURATION_DEFAULT);
 	}
 }

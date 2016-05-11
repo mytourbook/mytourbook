@@ -24,6 +24,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
+import net.tourbook.importdata.EasyImportManager;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.ITourProvider2;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
@@ -45,13 +46,6 @@ public class DialogAdjustTemperature_Wizard extends Wizard {
 	private ArrayList<TourData>					_selectedTours;
 	private ITourProvider2						_tourProvider;
 
-	private static final String					LOG_TEMP_ADJUST_001_START						= Messages.Log_TemperatureAdjustment_001_Start;
-	private static final String					LOG_TEMP_ADJUST_002_END							= Messages.Log_TemperatureAdjustment_002_End;
-	private static final String					LOG_TEMP_ADJUST_003_TOUR_CHANGES				= Messages.Log_TemperatureAdjustment_003_TourChanges;
-	private static final String					LOG_TEMP_ADJUST_005_TOUR_IS_TOO_SHORT			= Messages.Log_TemperatureAdjustment_005_TourIsTooShort;
-	private static final String					LOG_TEMP_ADJUST_006_IS_ABOVE_TEMPERATURE		= Messages.Log_TemperatureAdjustment_006_IsAboveTemperature;
-	private static final String					LOG_TEMP_ADJUST_010_NO_TEMPERATURE_DATA_SERIE	= Messages.Log_TemperatureAdjustment_010_NoTemperatureDataSeries;
-	private static final String					LOG_TEMP_ADJUST_011_NO_TIME_DATA_SERIE			= Messages.Log_TemperatureAdjustment_011_NoTimeDataSeries;
 
 	public DialogAdjustTemperature_Wizard(final ArrayList<TourData> selectedTours, final ITourProvider2 tourProvider) {
 
@@ -83,7 +77,7 @@ public class DialogAdjustTemperature_Wizard extends Wizard {
 
 		TourLogManager.showLogView();
 
-		TourLogManager.logTitle(LOG_TEMP_ADJUST_001_START);
+		TourLogManager.logTitle(EasyImportManager.LOG_TEMP_ADJUST_001_START);
 
 		try {
 
@@ -94,7 +88,7 @@ public class DialogAdjustTemperature_Wizard extends Wizard {
 		}
 
 		TourLogManager.logDefault(String.format(//
-				LOG_TEMP_ADJUST_002_END,
+				EasyImportManager.LOG_TEMP_ADJUST_002_END,
 				(System.currentTimeMillis() - start) / 1000.0));
 
 		return true;
@@ -140,7 +134,7 @@ public class DialogAdjustTemperature_Wizard extends Wizard {
 					if (oldTourAvgTemperature > avgMinimumTemperature) {
 
 						TourLogManager.logSubInfo(String.format(
-								LOG_TEMP_ADJUST_006_IS_ABOVE_TEMPERATURE,
+								EasyImportManager.LOG_TEMP_ADJUST_006_IS_ABOVE_TEMPERATURE,
 								TourManager.getTourDateTimeShort(tourData),
 								oldTourAvgTemperature,
 								avgMinimumTemperature));
@@ -148,7 +142,7 @@ public class DialogAdjustTemperature_Wizard extends Wizard {
 						continue;
 					}
 
-					if (runnableAdjustTemperature(tourData, durationTime)) {
+					if (EasyImportManager.adjustTemperature(tourData, durationTime)) {
 
 						// tour is modified, save it
 
@@ -195,88 +189,6 @@ public class DialogAdjustTemperature_Wizard extends Wizard {
 		return runnable;
 	}
 
-	/**
-	 * @param tourData
-	 * @param avgTemperature
-	 * @return Returns <code>true</code> when the tour is modified, otherwise <code>false</code>.
-	 */
-	private boolean runnableAdjustTemperature(final TourData tourData, final int durationTime) {
 
-		final int[] timeSerie = tourData.timeSerie;
-		final float[] temperatureSerie = tourData.temperatureSerie;
-
-		// ensure data are available
-		if (temperatureSerie == null) {
-
-			TourLogManager.logSubError(String.format(
-					LOG_TEMP_ADJUST_010_NO_TEMPERATURE_DATA_SERIE,
-					TourManager.getTourDateTimeShort(tourData)));
-
-			return false;
-		}
-
-		if (timeSerie == null) {
-
-			TourLogManager.logSubError(String.format(
-					LOG_TEMP_ADJUST_011_NO_TIME_DATA_SERIE,
-					TourManager.getTourDateTimeShort(tourData)));
-
-			return false;
-		}
-
-		/*
-		 * Get initial temperature
-		 */
-		float initialTemperature = Integer.MIN_VALUE;
-
-		for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
-
-			final int relativeTime = timeSerie[serieIndex];
-
-			if (relativeTime > durationTime) {
-				initialTemperature = temperatureSerie[serieIndex];
-				break;
-			}
-		}
-
-		// an initial temperature could not be computed because the tour is too short
-		if (initialTemperature == Integer.MIN_VALUE) {
-
-			TourLogManager.logSubError(String.format(
-					LOG_TEMP_ADJUST_005_TOUR_IS_TOO_SHORT,
-					TourManager.getTourDateTimeShort(tourData)));
-
-			return false;
-		}
-
-		/*
-		 * Adjust temperature
-		 */
-		for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
-
-			final int relativeTime = timeSerie[serieIndex];
-
-			if (relativeTime > durationTime) {
-				break;
-			}
-
-			temperatureSerie[serieIndex] = initialTemperature;
-		}
-
-		final float oldAvgTemperature = tourData.getAvgTemperature();
-
-		tourData.computeAvg_Temperature();
-
-		final float newAvgTemperature = tourData.getAvgTemperature();
-
-		TourLogManager.addSubLog(TourLogState.IMPORT_OK, String.format(
-				LOG_TEMP_ADJUST_003_TOUR_CHANGES,
-				TourManager.getTourDateTimeShort(tourData),
-				oldAvgTemperature,
-				newAvgTemperature,
-				oldAvgTemperature - newAvgTemperature));
-
-		return true;
-	}
 
 }

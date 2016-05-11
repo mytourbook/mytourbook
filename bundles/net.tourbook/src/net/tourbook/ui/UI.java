@@ -1205,6 +1205,8 @@ public class UI {
 			// set imperial measure system
 
 			UNIT_VALUE_TEMPERATURE = UNIT_FAHRENHEIT_ADD;
+
+			net.tourbook.common.UI.UNIT_VALUE_TEMPERATURE = UNIT_VALUE_TEMPERATURE;
 			net.tourbook.common.UI.UNIT_LABEL_TEMPERATURE = net.tourbook.common.UI.UNIT_TEMPERATURE_F;
 
 		} else {
@@ -1212,6 +1214,8 @@ public class UI {
 			// default is the metric measure system
 
 			UNIT_VALUE_TEMPERATURE = 1;
+
+			net.tourbook.common.UI.UNIT_VALUE_TEMPERATURE = 1;
 			net.tourbook.common.UI.UNIT_LABEL_TEMPERATURE = net.tourbook.common.UI.UNIT_TEMPERATURE_C;
 		}
 	}

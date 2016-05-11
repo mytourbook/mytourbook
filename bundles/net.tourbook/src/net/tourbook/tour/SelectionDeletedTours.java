@@ -27,8 +27,14 @@ public class SelectionDeletedTours implements ISelection {
 
 	public ArrayList<ITourItem>	removedTours	= new ArrayList<ITourItem>();
 
+	@Override
 	public boolean isEmpty() {
 		return false;
+	}
+
+	@Override
+	public String toString() {
+		return "SelectionDeletedTours [removedTours=" + removedTours + "]";
 	}
 
 }
