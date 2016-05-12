@@ -11,6 +11,7 @@ Switch to workspace "C:\DAT\ws_mt-NL-projects"
 
 	- refresh all projects with F5
 	- Replace text (Ctrl-H) "x.y.0.qualifier" to "a.b.0.qualifier" in all NL projects
+	- Replace text (Ctrl-H) "x.y.0" to "a.b.0" in all NL projects
 
 	
 Switch to workspace "C:\DAT\ws_MT-e38"

@@ -2,7 +2,7 @@
 <feature
       id="feature.net.tourbook.app.version"
       label="MyTourbook Version"
-      version="16.4.0.qualifier"
+      version="16.5.0.qualifier"
       provider-name="MyTourbook">
 
    <description>

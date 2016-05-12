@@ -8,7 +8,7 @@ New
 * Table/Tree Header Context Menu
 
   - Hide hovered column
-  - Set value format for the hovered column, e.g. hh or hh:mm or hh:mm:ss
+  - Set value format for the hovered column, e.g. hh or hh:mm or hh:mm:ss in each column profile separately
   - Categorize all hidden columns with a submenu
   - Position the header context menu to the right border of the column (to see the content of the column)
   
