@@ -219,7 +219,7 @@ public class EasyImportManager {
 				TourManager.getTourDateTimeShort(tourData),
 				oldAvgTemperature,
 				newAvgTemperature,
-				oldAvgTemperature - newAvgTemperature));
+				newAvgTemperature - oldAvgTemperature));
 
 		return true;
 	}
