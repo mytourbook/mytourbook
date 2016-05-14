@@ -4153,9 +4153,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="32"
-     inkscape:cx="116.10425"
-     inkscape:cy="839.25851"
+     inkscape:zoom="22.627417"
+     inkscape:cx="119.76325"
+     inkscape:cy="838.53791"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -4163,7 +4163,7 @@
      inkscape:window-height="1192"
      inkscape:window-x="169"
      inkscape:window-y="0"
-     inkscape:window-maximized="0"
+     inkscape:window-maximized="1"
      inkscape:snap-grids="true"
      inkscape:snap-page="false"
      inkscape:snap-to-guides="false"
@@ -5427,7 +5427,7 @@
        inkscape:export-ydpi="90" />
     <path
        style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#a3a3a3;stroke-width:1;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
-       d="m 110.50025,214.36218 c 2.07453,1.05288 2.63693,4.04703 1.23095,5.85686 -1.14151,1.63401 -3.55923,2.15339 -5.25435,1.08973 -1.72197,-0.95108 -2.46762,-3.25402 -1.64405,-5.03759 0.34379,-0.82081 0.88435,-1.48897 1.66745,-1.909 m 0,0 c 0.0442,-1.42642 0,-4.39591 0,-5.5 0,-1.10408 0.87783,-2 1.99975,-2 1.12192,0 2.00025,0.91789 2.00025,2 0,1.08211 -0.0267,3.68523 5e-5,5.5"
+       d="m 109.48827,214.35718 c 2.06737,1.05221 2.62783,4.04446 1.2267,5.85314 -1.13757,1.63297 -3.54694,2.15202 -5.23621,1.08903 -1.71603,-0.95047 -2.45911,-3.25195 -1.63838,-5.03438 0.3426,-0.82029 0.8813,-1.48802 1.6617,-1.90779 m 0,0 c 0.044,-1.42551 0,-4.39311 0,-5.4965 0,-1.10337 0.8748,-1.99872 1.99284,-1.99872 1.11805,0 1.99335,0.9173 1.99335,1.99872 0,1.08142 -0.0266,3.68289 5e-5,5.4965"
        id="path5093"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cccccczzzc"
@@ -5436,8 +5436,17 @@
        inkscape:export-ydpi="90" />
     <path
        style="fill:none;fill-rule:evenodd;stroke:#a3a3a3;stroke-width:1.00000012px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 106.5,210.8622 3.99999,-3e-5"
-       id="path5103-8"
+       d="m 109.5,211.8622 2.49999,-3e-5"
+       id="path5103-8-0"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\state-temperature.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#a3a3a3;stroke-width:1.00000012px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 109.5,208.8622 2.49999,-3e-5"
+       id="path5103-8-0-2"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cc"
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\state-temperature.png"

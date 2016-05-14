@@ -16,11 +16,13 @@
 package net.tourbook.tour;
 
 import java.lang.reflect.InvocationTargetException;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -35,17 +37,27 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
+import org.joda.time.Period;
+import org.joda.time.PeriodType;
 
 public class DialogAdjustTemperature_Wizard extends Wizard {
 
-	private final IPreferenceStore				_prefStore										= TourbookPlugin
-																										.getPrefStore();
+	private final IPreferenceStore				_prefStore			= TourbookPlugin.getPrefStore();
 
 	private DialogAdjustTemperature_WizardPage	_wizardPage;
 
 	private ArrayList<TourData>					_selectedTours;
 	private ITourProvider2						_tourProvider;
 
+	private static PeriodType					_durationTemplate	= PeriodType.yearMonthDayTime()
+//			// hide these components
+																			.withMillisRemoved();
+
+	private final NumberFormat					_nf1				= NumberFormat.getNumberInstance();
+	{
+		_nf1.setMinimumFractionDigits(1);
+		_nf1.setMaximumFractionDigits(1);
+	}
 
 	public DialogAdjustTemperature_Wizard(final ArrayList<TourData> selectedTours, final ITourProvider2 tourProvider) {
 
@@ -77,8 +89,6 @@ public class DialogAdjustTemperature_Wizard extends Wizard {
 
 		TourLogManager.showLogView();
 
-		TourLogManager.logTitle(EasyImportManager.LOG_TEMP_ADJUST_001_START);
-
 		try {
 
 			getContainer().run(true, true, performFinish_getRunnable());
@@ -98,9 +108,20 @@ public class DialogAdjustTemperature_Wizard extends Wizard {
 
 		_wizardPage.saveState();
 
-		final float avgMinimumTemperature = _prefStore.getFloat(//
-				ITourbookPreferences.ADJUST_TEMPERATURE_AVG_TEMPERATURE);
+		final float avgTemperature = _prefStore.getFloat(ITourbookPreferences.ADJUST_TEMPERATURE_AVG_TEMPERATURE);
 		final int durationTime = _prefStore.getInt(ITourbookPreferences.ADJUST_TEMPERATURE_DURATION_TIME);
+
+		final float temperature = UI.getTemperatureFromMetric(avgTemperature);
+		final Period durationPeriod = new Period(0, durationTime * 1000, _durationTemplate);
+
+		final String logText = NLS.bind(
+				EasyImportManager.LOG_TEMP_ADJUST_001_START,
+				new Object[] {
+						durationPeriod.toString(UI.DEFAULT_DURATION_FORMATTER),
+						_nf1.format(temperature),
+						UI.UNIT_LABEL_TEMPERATURE });
+
+		TourLogManager.addLog(TourLogState.DEFAULT, logText);
 
 		final IRunnableWithProgress runnable = new IRunnableWithProgress() {
 
@@ -131,13 +152,13 @@ public class DialogAdjustTemperature_Wizard extends Wizard {
 					final float oldTourAvgTemperature = tourData.getAvgTemperature();
 
 					// skip tours which avg temperature is above the minimum avg temperature
-					if (oldTourAvgTemperature > avgMinimumTemperature) {
+					if (oldTourAvgTemperature > avgTemperature) {
 
 						TourLogManager.logSubInfo(String.format(
 								EasyImportManager.LOG_TEMP_ADJUST_006_IS_ABOVE_TEMPERATURE,
 								TourManager.getTourDateTimeShort(tourData),
 								oldTourAvgTemperature,
-								avgMinimumTemperature));
+								avgTemperature));
 
 						continue;
 					}
@@ -188,7 +209,5 @@ public class DialogAdjustTemperature_Wizard extends Wizard {
 
 		return runnable;
 	}
-
-
 
 }
