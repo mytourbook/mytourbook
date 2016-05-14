@@ -30,23 +30,31 @@ import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.DateTime;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
+import org.joda.time.Period;
+import org.joda.time.PeriodType;
 
 class DialogAdjustTemperature_WizardPage extends WizardPage {
 
-	private final IPreferenceStore	_prefStore	= TourbookPlugin.getPrefStore();
+	private final IPreferenceStore	_prefStore			= TourbookPlugin.getPrefStore();
+
+	private static PeriodType		_durationTemplate	= PeriodType.yearMonthDayTime()
+//			// hide these components
+																.withMillisRemoved();
 
 	private PixelConverter			_pc;
 
 	/*
 	 * UI controls
 	 */
-	private DateTime				_dtTemperatureAdjustmentDuration;
+	private Label					_lblDurationUnit;
 
 	private Spinner					_spinnerAvgTemperature;
+	private Spinner					_spinnerTemperatureAdjustmentDuration;
 
 	protected DialogAdjustTemperature_WizardPage(final String pageName) {
 
@@ -108,6 +116,7 @@ class DialogAdjustTemperature_WizardPage extends WizardPage {
 
 			final Composite innerContainer = new Composite(container, SWT.NONE);
 //			innerContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(innerContainer);
 			GridLayoutFactory.fillDefaults().numColumns(3).applyTo(innerContainer);
 			{
 				{
@@ -124,21 +133,38 @@ class DialogAdjustTemperature_WizardPage extends WizardPage {
 							.applyTo(label);
 
 					/*
-					 * DateTime: Duration
+					 * Spinner: Duration
 					 */
-					_dtTemperatureAdjustmentDuration = new DateTime(innerContainer, SWT.TIME | SWT.MEDIUM | SWT.BORDER);
+					_spinnerTemperatureAdjustmentDuration = new Spinner(innerContainer, SWT.BORDER);
+					_spinnerTemperatureAdjustmentDuration.setMinimum(0);
+					_spinnerTemperatureAdjustmentDuration.setMaximum(60 * 60 * 24); // 1 day
+					_spinnerTemperatureAdjustmentDuration.setPageIncrement(60); // 60 = 1 minute
+					_spinnerTemperatureAdjustmentDuration.addMouseWheelListener(new MouseWheelListener() {
+						@Override
+						public void mouseScrolled(final MouseEvent event) {
+							Util.adjustSpinnerValueOnMouseScroll(event);
+							updateUI_TemperatureAdjustmentDuration();
+						}
+					});
+					_spinnerTemperatureAdjustmentDuration.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(final SelectionEvent e) {
+							updateUI_TemperatureAdjustmentDuration();
+						}
+					});
 					GridDataFactory.fillDefaults()//
 							.align(SWT.BEGINNING, SWT.FILL)
 							.indent(0, verticalIndent)
-							.applyTo(_dtTemperatureAdjustmentDuration);
+							.applyTo(_spinnerTemperatureAdjustmentDuration);
 
 					// label: h
-					final Label unitLabel = new Label(innerContainer, SWT.NONE);
-					unitLabel.setText(UI.UNIT_LABEL_TIME);
+					_lblDurationUnit = new Label(innerContainer, SWT.NONE);
+					_lblDurationUnit.setText(UI.UNIT_LABEL_TIME);
 					GridDataFactory.fillDefaults()//
 							.align(SWT.FILL, SWT.CENTER)
 							.indent(0, verticalIndent)
-							.applyTo(unitLabel);
+							.grab(true, false)
+							.applyTo(_lblDurationUnit);
 				}
 
 				{
@@ -197,23 +223,28 @@ class DialogAdjustTemperature_WizardPage extends WizardPage {
 		final int durationTime = _prefStore.getInt(ITourbookPreferences.ADJUST_TEMPERATURE_DURATION_TIME);
 
 		_spinnerAvgTemperature.setSelection((int) (UI.getTemperatureFromMetric(avgTemperature) + 0.5));
-		_dtTemperatureAdjustmentDuration.setTime(
-				durationTime / 3600,
-				(durationTime % 3600) / 60,
-				(durationTime % 3600) % 60);
+		_spinnerTemperatureAdjustmentDuration.setSelection(durationTime);
+
+		updateUI_TemperatureAdjustmentDuration();
 	}
 
 	void saveState() {
 
 		final float avgTemperature = UI.getTemperatureToMetric(_spinnerAvgTemperature.getSelection());
 
-		final int hours = _dtTemperatureAdjustmentDuration.getHours();
-		final int minutes = _dtTemperatureAdjustmentDuration.getMinutes();
-		final int seconds = _dtTemperatureAdjustmentDuration.getSeconds();
-
-		final int durationTime = hours * 3600 + minutes * 60 + seconds;
+		final int durationTime = _spinnerTemperatureAdjustmentDuration.getSelection();
 
 		_prefStore.setValue(ITourbookPreferences.ADJUST_TEMPERATURE_AVG_TEMPERATURE, avgTemperature);
 		_prefStore.setValue(ITourbookPreferences.ADJUST_TEMPERATURE_DURATION_TIME, durationTime);
 	}
+
+	private void updateUI_TemperatureAdjustmentDuration() {
+
+		final long duration = _spinnerTemperatureAdjustmentDuration.getSelection();
+
+		final Period tourPeriod = new Period(0, duration * 1000, _durationTemplate);
+
+		_lblDurationUnit.setText(tourPeriod.toString(UI.DEFAULT_DURATION_FORMATTER));
+	}
+
 }

@@ -1,58 +1,69 @@
-Version 16.5                                               ?. May 2016
+Version 16.5                                                30. May 2016
 
   
+New 	
+===
 
-New
-===	
 
-* Table/Tree Header Context Menu
+* Running Cadence
 
-  - Hide hovered column
-  - Set value format for the hovered column, e.g. hh or hh:mm or hh:mm:ss in each column profile separately
-  - Categorize all hidden columns with a submenu
-  - Position the header context menu to the right border of the column (to see the content of the column)
-  
-  
-* Tour Book View / Tour Editor
+  The runners cadence is twice the cycling cadence, with this new 
+  feature, runners must not multiply anymore their cadence values.
 
-  - Set cadence format to rpm/spm
+  - Cadence values are multiplied with the new cadence factor, it is
+    1.0 ... Revolutions per minute (rpm)
+    2.0 ... Steps per minute (spm)
+  - The cadence factor is set to 2 when a stride sensor is detected in 
+    a .fit import
+  - Stride sensor state is displayed in the tour editor info tab
 
-	 * 1.0 = Revolutions per minute (RPM)
-	 * 2.0 = Steps per minute (SPM)
-
-* FIT Import
-
-  * Set cadence format to 2.0 when a stride sensor is detected
-  
-
-* Tour Editor - Info Tab
-
-  - Show stride sensor state
-
-	 
-* Tour Chart
  
-  - Show cadence with the correct format
-  - Replaced chart options drop-down menu with a slideout
+* Select Value Format
 
+  Sometimes less digits are better than more. How date and number values
+  are displayed can be selected.
 
-* Tour Book View
+ 
+* Adjust Tour Start Temperature Values
 
-  - New context menu actions for the selected tours
-   
-    * Adjust tour start temperature values
-    * Set cadence format for selected tours
+  During the winter season, the sportcomputer device needs some time to 
+  adjust to the environment temperature when it's moved outdoors, this 
+  tool can correct wrong temperature values.
+
+ 
+Details 	
+=======
+
+* Table/Tree Columns
+
+  - Select date/number formats, e.g. hh, hh:mm or hh:mm:ss
+  - Hide hovered column
+  - All hidden columns are categorized by a submenu
+  - The header context menu is positioned to the right border of the 
+    column (to better see the content of the column)
 
 
 * Tour Tooltip
 
-  - Use value format from the preferences
-  
-  
-* Easy Import
-
-  - Run Action "Show default columns" in the launcher table header context menu to see the new temperature adjustment column
+  - Select number/date formats in the preferences
 
 
-System
-======
+* Tour Book View
+
+  - New column which displays the cadence factor
+  - New context menu actions for the selected tours
+    -  Adjust tour start temperature values
+    -  Set cadence factor
+ 
+
+* Tour Editor
+
+  - New cadence field to selecte rpm or spm
+
+ 
+* Tour Chart
+
+  - Replaced chart options drop-down menu with a slideout
+  - Set grid line options in the chart options slideout
+
+ 

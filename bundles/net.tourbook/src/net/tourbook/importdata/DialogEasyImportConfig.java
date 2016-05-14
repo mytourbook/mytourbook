@@ -97,7 +97,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.DateTime;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
@@ -116,6 +115,8 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.part.PageBook;
+import org.joda.time.Period;
+import org.joda.time.PeriodType;
 
 /**
  * Dialog to configure the device import.
@@ -203,6 +204,10 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 		_nf1.setMaximumFractionDigits(1);
 	}
 
+	private final PeriodType				_durationTemplate					= PeriodType.yearMonthDayTime()
+																				//		// hide these components
+																						.withMillisRemoved();
+
 	private Color							COLOR_RED;
 	private Color							COLOR_FOREGROUND;
 //	private Font							FONT_BOLD;
@@ -248,8 +253,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 	private Combo							_comboIC_DeviceFolder;
 	private Combo							_comboIL_TourType;
 	//
-	private DateTime						_dtIL_TemperatureAdjustmentDuration;
-	//
 	private Label							_lblIC_ConfigName;
 	private Label							_lblIC_BackupFolder;
 	private Label							_lblIC_LocalFolderPath;
@@ -281,6 +284,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 	private Spinner							_spinnerDash_TileSize;
 	private Spinner							_spinnerIL_AvgTemperature;
 	private Spinner							_spinnerIL_LastMarkerDistance;
+	private Spinner							_spinnerIL_TemperatureAdjustmentDuration;
 	private Spinner[]						_spinnerTT_Speed_AvgSpeed;
 	//
 	private TabFolder						_tabFolderEasy;
@@ -352,7 +356,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 			super(null, AS_PUSH_BUTTON);
 
 			setToolTipText(Messages.Dialog_ImportConfig_Action_AddSpeed_Tooltip);
-			setImageDescriptor(TourbookPlugin.getImageDescriptor(net.tourbook.Messages.Image__App_Add));
+			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Add));
 		}
 
 		@Override
@@ -428,9 +432,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
 			setToolTipText(Messages.Dialog_ImportConfig_Action_SortBySpeed_Tooltip);
 
-			setImageDescriptor(TourbookPlugin.getImageDescriptor(net.tourbook.Messages.Image__App_Sort));
-			setDisabledImageDescriptor(TourbookPlugin
-					.getImageDescriptor(net.tourbook.Messages.Image__App_Sort_Disabled));
+			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Sort));
+			setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Sort_Disabled));
 		}
 
 		@Override
@@ -2275,7 +2278,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 		GridLayoutFactory.fillDefaults()//
 				.numColumns(3)
 				.applyTo(container);
-//		innerContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 		{
 			{
 				/*
@@ -2288,19 +2291,37 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 						.align(SWT.FILL, SWT.CENTER)
 						.indent(_leftPadding, 0)
 						.applyTo(_lblIL_TemperatureAdjustmentDuration);
+
 				/*
-				 * DateTime: Duration
+				 * Spinner: Duration
 				 */
-				_dtIL_TemperatureAdjustmentDuration = new DateTime(container, SWT.TIME | SWT.MEDIUM | SWT.BORDER);
+				_spinnerIL_TemperatureAdjustmentDuration = new Spinner(container, SWT.BORDER);
+				_spinnerIL_TemperatureAdjustmentDuration.setMinimum(0);
+				_spinnerIL_TemperatureAdjustmentDuration.setMaximum(60 * 60 * 24); // 1 day
+				_spinnerIL_TemperatureAdjustmentDuration.setPageIncrement(60); // 60 = 1 minute
+				_spinnerIL_TemperatureAdjustmentDuration.addMouseWheelListener(new MouseWheelListener() {
+					@Override
+					public void mouseScrolled(final MouseEvent event) {
+						Util.adjustSpinnerValueOnMouseScroll(event);
+						updateUI_TemperatureAdjustmentDuration();
+					}
+				});
+				_spinnerIL_TemperatureAdjustmentDuration.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						updateUI_TemperatureAdjustmentDuration();
+					}
+				});
 				GridDataFactory.fillDefaults()//
-						.align(SWT.BEGINNING, SWT.FILL)
-						.applyTo(_dtIL_TemperatureAdjustmentDuration);
+						.align(SWT.FILL, SWT.CENTER)
+						.applyTo(_spinnerIL_TemperatureAdjustmentDuration);
 
 				// label: h
 				_lblIL_TemperatureAdjustmentDuration_Unit = new Label(container, SWT.NONE);
 				_lblIL_TemperatureAdjustmentDuration_Unit.setText(UI.UNIT_LABEL_TIME);
 				GridDataFactory.fillDefaults()//
 						.align(SWT.FILL, SWT.CENTER)
+						.grab(true, false)
 						.applyTo(_lblIL_TemperatureAdjustmentDuration_Unit);
 			}
 
@@ -3137,12 +3158,12 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 		_txtIL_LastMarker.setEnabled(isLastMarkerSelected);
 
 		// adjust temperature
-		_dtIL_TemperatureAdjustmentDuration.setEnabled(isAdjustTemperature);
 		_lblIL_AvgTemperature.setEnabled(isAdjustTemperature);
 		_lblIL_AvgTemperature_Unit.setEnabled(isAdjustTemperature);
 		_lblIL_TemperatureAdjustmentDuration.setEnabled(isAdjustTemperature);
 		_lblIL_TemperatureAdjustmentDuration_Unit.setEnabled(isAdjustTemperature);
 		_spinnerIL_AvgTemperature.setEnabled(isAdjustTemperature);
+		_spinnerIL_TemperatureAdjustmentDuration.setEnabled(isAdjustTemperature);
 
 		_ilViewer.getTable().setEnabled(isLauncherAvailable);
 
@@ -4157,18 +4178,13 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 		_selectedIL.lastMarkerText = _txtIL_LastMarker.getText();
 
 		// adjust temperature
-		final int hours = _dtIL_TemperatureAdjustmentDuration.getHours();
-		final int minutes = _dtIL_TemperatureAdjustmentDuration.getMinutes();
-		final int seconds = _dtIL_TemperatureAdjustmentDuration.getSeconds();
-
 		final float temperature = UI.getTemperatureToMetric(_spinnerIL_AvgTemperature.getSelection());
-
 		_selectedIL.isAdjustTemperature = _chkIL_AdjustTemperature.getSelection();
 		_selectedIL.tourAvgTemperature = temperature;
-		_selectedIL.temperatureAdjustmentDuration = hours * 3600 + minutes * 60 + seconds;
+		_selectedIL.temperatureAdjustmentDuration = _spinnerIL_TemperatureAdjustmentDuration.getSelection();
 
+		// tour type
 		final Enum<TourTypeConfig> selectedTourTypeConfig = getSelectedTourTypeConfig();
-
 		_selectedIL.tourTypeConfig = selectedTourTypeConfig;
 
 		/*
@@ -4324,7 +4340,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 			final int distanceValue = (int) (distance10 + 0.5);
 			final String lastMarkerText = _selectedIL.lastMarkerText;
 
-			final int durationTime = _selectedIL.temperatureAdjustmentDuration;
 			_txtIL_ConfigName.setText(_selectedIL.name);
 			_txtIL_ConfigDescription.setText(_selectedIL.description);
 			_chkIL_SaveTour.setSelection(_selectedIL.isSaveTour);
@@ -4339,10 +4354,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 			_chkIL_AdjustTemperature.setSelection(_selectedIL.isAdjustTemperature);
 			_spinnerIL_AvgTemperature.setSelection(//
 					(int) (UI.getTemperatureFromMetric(_selectedIL.tourAvgTemperature) + 0.5));
-			_dtIL_TemperatureAdjustmentDuration.setTime(
-					durationTime / 3600,
-					(durationTime % 3600) / 60,
-					(durationTime % 3600) % 60);
+			_spinnerIL_TemperatureAdjustmentDuration.setSelection(_selectedIL.temperatureAdjustmentDuration);
+			updateUI_TemperatureAdjustmentDuration();
 
 			_chkIL_SetTourType.setSelection(isSetTourType);
 			if (isSetTourType) {
@@ -4468,5 +4481,14 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 		update_Model_From_UI_OneTourType();
 
 		redrawILViewer();
+	}
+
+	private void updateUI_TemperatureAdjustmentDuration() {
+
+		final long duration = _spinnerIL_TemperatureAdjustmentDuration.getSelection();
+
+		final Period durationPeriod = new Period(0, duration * 1000, _durationTemplate);
+
+		_lblIL_TemperatureAdjustmentDuration_Unit.setText(durationPeriod.toString(UI.DEFAULT_DURATION_FORMATTER));
 	}
 }

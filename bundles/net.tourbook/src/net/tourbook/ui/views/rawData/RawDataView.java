@@ -173,6 +173,8 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 import org.joda.time.DateTime;
+import org.joda.time.Period;
+import org.joda.time.PeriodType;
 
 /**
  *
@@ -337,6 +339,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_nf3.setMinimumFractionDigits(3);
 		_nf3.setMaximumFractionDigits(3);
 	}
+	//
+	private final PeriodType				_durationTemplate							= PeriodType.yearMonthDayTime()
+																						//		// hide these components
+																								.withMillisRemoved();
 	//
 	private boolean							_isToolTipInDate;
 	private boolean							_isToolTipInTime;
@@ -1720,7 +1726,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 				final String temperatureText = NLS.bind(Messages.Import_Data_HTML_AdjustTemperature_Yes, //
 						new Object[] {
-								UI.format_hhh_mm_ss(importLauncher.temperatureAdjustmentDuration),
+								getDurationText(importLauncher),
 								_nf1.format(temperature),
 								UI.UNIT_LABEL_TEMPERATURE });
 
@@ -3567,6 +3573,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		return _columnManager;
 	}
 
+	private String getDurationText(final ImportLauncher importLauncher) {
+
+		final int duration = importLauncher.temperatureAdjustmentDuration;
+		final Period durationPeriod = new Period(0, duration * 1000, _durationTemplate);
+
+		return durationPeriod.toString(UI.DEFAULT_DURATION_FORMATTER);
+	}
+
 	private EasyConfig getEasyConfig() {
 
 		return EasyImportManager.getInstance().getEasyConfig();
@@ -4433,7 +4447,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	}
 
 	private void runEasyImport_004_SetLastMarker(	final ImportLauncher importLauncher,
-												final ArrayList<TourData> importedTours) {
+													final ArrayList<TourData> importedTours) {
 
 		final String lastMarkerText = importLauncher.lastMarkerText;
 		if (lastMarkerText == null || lastMarkerText.trim().length() == 0) {
@@ -4482,12 +4496,18 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	}
 
 	private void runEasyImport_005_AdjustTemperature(	final ImportLauncher importLauncher,
-													final ArrayList<TourData> importedTours) {
-
-		TourLogManager.addLog(TourLogState.DEFAULT, EasyImportManager.LOG_EASY_IMPORT_005_ADJUST_TEMPERATURE);
+														final ArrayList<TourData> importedTours) {
 
 		final float avgMinimumTemperature = importLauncher.tourAvgTemperature;
+		final float temperature = UI.getTemperatureFromMetric(avgMinimumTemperature);
 		final int durationTime = importLauncher.temperatureAdjustmentDuration;
+
+		TourLogManager.addLog(
+				TourLogState.DEFAULT,
+				NLS.bind(EasyImportManager.LOG_EASY_IMPORT_005_ADJUST_TEMPERATURE, new Object[] {
+						getDurationText(importLauncher),
+						_nf1.format(temperature),
+						UI.UNIT_LABEL_TEMPERATURE }));
 
 		for (final TourData tourData : importedTours) {
 
@@ -4496,7 +4516,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			// skip tours which avg temperature is above the minimum avg temperature
 			if (oldTourAvgTemperature > avgMinimumTemperature) {
 
-				TourLogManager.logSubInfo(String.format(
+				TourLogManager.logSubError(String.format(
 						EasyImportManager.LOG_TEMP_ADJUST_006_IS_ABOVE_TEMPERATURE,
 						TourManager.getTourDateTimeShort(tourData),
 						oldTourAvgTemperature,
@@ -4516,8 +4536,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	 * @return Returns list with saved tours.
 	 */
 	private ArrayList<TourData> runEasyImport_099_SaveTour(	final TourPerson person,
-														final ArrayList<TourData> selectedTours,
-														final boolean isEasyImport) {
+															final ArrayList<TourData> selectedTours,
+															final boolean isEasyImport) {
 
 		final String css = isEasyImport //
 				? UI.EMPTY_STRING
@@ -4579,8 +4599,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	 *            backup folder.
 	 */
 	private void runEasyImport_100_DeleteTourFiles(	final boolean isDeleteAllFiles,
-												final ArrayList<TourData> allTourData,
-												final boolean isEasyImport) {
+													final ArrayList<TourData> allTourData,
+													final boolean isEasyImport) {
 
 		// open log view always then tour files are deleted
 		TourLogManager.showLogView();
