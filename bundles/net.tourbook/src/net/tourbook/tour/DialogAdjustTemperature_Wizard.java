@@ -111,7 +111,7 @@ public class DialogAdjustTemperature_Wizard extends Wizard {
 		final float avgTemperature = _prefStore.getFloat(ITourbookPreferences.ADJUST_TEMPERATURE_AVG_TEMPERATURE);
 		final int durationTime = _prefStore.getInt(ITourbookPreferences.ADJUST_TEMPERATURE_DURATION_TIME);
 
-		final float temperature = UI.getTemperatureFromMetric(avgTemperature);
+		final float temperature = UI.convertTemperatureFromMetric(avgTemperature);
 		final Period durationPeriod = new Period(0, durationTime * 1000, _durationTemplate);
 
 		final String logText = NLS.bind(

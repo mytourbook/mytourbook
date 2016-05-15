@@ -222,7 +222,7 @@ class DialogAdjustTemperature_WizardPage extends WizardPage {
 		final float avgTemperature = _prefStore.getFloat(ITourbookPreferences.ADJUST_TEMPERATURE_AVG_TEMPERATURE);
 		final int durationTime = _prefStore.getInt(ITourbookPreferences.ADJUST_TEMPERATURE_DURATION_TIME);
 
-		_spinnerAvgTemperature.setSelection((int) (UI.getTemperatureFromMetric(avgTemperature) + 0.5));
+		_spinnerAvgTemperature.setSelection((int) (UI.convertTemperatureFromMetric(avgTemperature) + 0.5));
 		_spinnerTemperatureAdjustmentDuration.setSelection(durationTime);
 
 		updateUI_TemperatureAdjustmentDuration();
@@ -230,7 +230,7 @@ class DialogAdjustTemperature_WizardPage extends WizardPage {
 
 	void saveState() {
 
-		final float avgTemperature = UI.getTemperatureToMetric(_spinnerAvgTemperature.getSelection());
+		final float avgTemperature = UI.convertTemperatureToMetric(_spinnerAvgTemperature.getSelection());
 
 		final int durationTime = _spinnerTemperatureAdjustmentDuration.getSelection();
 

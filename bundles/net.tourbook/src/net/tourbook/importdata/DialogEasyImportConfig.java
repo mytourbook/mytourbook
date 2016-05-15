@@ -65,6 +65,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerDropAdapter;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.dnd.DND;
@@ -124,6 +125,8 @@ import org.joda.time.PeriodType;
 public class DialogEasyImportConfig extends TitleAreaDialog {
 
 	private static final String				ID									= "DialogEasyImportConfig";			//$NON-NLS-1$
+	//
+	private static final String				COLUMN_ADJUST_TEMPERATURE			= "{0} - {1} {2}";						//$NON-NLS-1$
 	//
 	private static final String				STATE_BACKUP_DEVICE_HISTORY_ITEMS	= "STATE_BACKUP_DEVICE_HISTORY_ITEMS";	//$NON-NLS-1$
 	private static final String				STATE_BACKUP_FOLDER_HISTORY_ITEMS	= "STATE_BACKUP_FOLDER_HISTORY_ITEMS";	//$NON-NLS-1$
@@ -2914,7 +2917,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 		colDef.setColumnHeaderText(Messages.Dialog_ImportConfig_Column_AdjustTemperature_Header);
 		colDef.setColumnHeaderToolTipText(Messages.Dialog_ImportConfig_Column_AdjustTemperature_Tooltip);
 
-		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(7));
+		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(15));
 		colDef.setColumnWeightData(new ColumnWeightData(7));
 
 		colDef.setIsDefaultColumn();
@@ -2925,9 +2928,21 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
 				final ImportLauncher importLauncher = (ImportLauncher) cell.getElement();
 
-				cell.setText(importLauncher.isAdjustTemperature //
-						? Messages.App_Label_BooleanYes
-						: UI.EMPTY_STRING);
+				if (importLauncher.isAdjustTemperature) {
+
+					final float temperature = importLauncher.tourAvgTemperature;
+
+					final String logText = NLS.bind(COLUMN_ADJUST_TEMPERATURE, new Object[] {
+							importLauncher.temperatureAdjustmentDuration,
+							(int) (UI.convertTemperatureFromMetric(temperature) + 0.5),
+							UI.UNIT_LABEL_TEMPERATURE });
+
+					cell.setText(logText);
+
+				} else {
+
+					cell.setText(UI.EMPTY_STRING);
+				}
 			}
 		});
 	}
@@ -3750,6 +3765,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 		_selectedIL.lastMarkerDistance = getSelectedLastMarkerDistance();
 
 		_selectedIL.isAdjustTemperature = _chkIL_AdjustTemperature.getSelection();
+		_selectedIL.temperatureAdjustmentDuration = _spinnerIL_TemperatureAdjustmentDuration.getSelection();
+		_selectedIL.tourAvgTemperature = UI.convertTemperatureToMetric(_spinnerIL_AvgTemperature.getSelection());
 
 		_selectedIL.isSaveTour = _chkIL_SaveTour.getSelection();
 		_selectedIL.isShowInDashboard = _chkIL_ShowInDashboard.getSelection();
@@ -4177,12 +4194,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 		_selectedIL.lastMarkerDistance = getSelectedLastMarkerDistance();
 		_selectedIL.lastMarkerText = _txtIL_LastMarker.getText();
 
-		// adjust temperature
-		final float temperature = UI.getTemperatureToMetric(_spinnerIL_AvgTemperature.getSelection());
-		_selectedIL.isAdjustTemperature = _chkIL_AdjustTemperature.getSelection();
-		_selectedIL.tourAvgTemperature = temperature;
-		_selectedIL.temperatureAdjustmentDuration = _spinnerIL_TemperatureAdjustmentDuration.getSelection();
-
 		// tour type
 		final Enum<TourTypeConfig> selectedTourTypeConfig = getSelectedTourTypeConfig();
 		_selectedIL.tourTypeConfig = selectedTourTypeConfig;
@@ -4351,9 +4362,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 			_txtIL_LastMarker.setText(lastMarkerText == null ? UI.EMPTY_STRING : lastMarkerText);
 
 			// adjust temperature
+			final int temperature = (int) (UI.convertTemperatureFromMetric(_selectedIL.tourAvgTemperature) + 0.5);
 			_chkIL_AdjustTemperature.setSelection(_selectedIL.isAdjustTemperature);
-			_spinnerIL_AvgTemperature.setSelection(//
-					(int) (UI.getTemperatureFromMetric(_selectedIL.tourAvgTemperature) + 0.5));
+			_spinnerIL_AvgTemperature.setSelection(temperature);
 			_spinnerIL_TemperatureAdjustmentDuration.setSelection(_selectedIL.temperatureAdjustmentDuration);
 			updateUI_TemperatureAdjustmentDuration();
 

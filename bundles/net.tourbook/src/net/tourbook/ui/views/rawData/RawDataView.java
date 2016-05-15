@@ -1722,7 +1722,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			if (importLauncher.isAdjustTemperature) {
 
-				final float temperature = UI.getTemperatureFromMetric(importLauncher.tourAvgTemperature);
+				final float temperature = UI.convertTemperatureFromMetric(importLauncher.tourAvgTemperature);
 
 				final String temperatureText = NLS.bind(Messages.Import_Data_HTML_AdjustTemperature_Yes, //
 						new Object[] {
@@ -4499,7 +4499,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 														final ArrayList<TourData> importedTours) {
 
 		final float avgMinimumTemperature = importLauncher.tourAvgTemperature;
-		final float temperature = UI.getTemperatureFromMetric(avgMinimumTemperature);
+		final float temperature = UI.convertTemperatureFromMetric(avgMinimumTemperature);
 		final int durationTime = importLauncher.temperatureAdjustmentDuration;
 
 		TourLogManager.addLog(

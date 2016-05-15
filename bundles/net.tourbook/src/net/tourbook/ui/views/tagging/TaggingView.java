@@ -1218,7 +1218,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 					return;
 				}
 
-				final double temperature = net.tourbook.common.UI.getTemperatureFromMetric(//
+				final double temperature = net.tourbook.common.UI.convertTemperatureFromMetric(//
 						((TVITagViewItem) element).colAvgTemperature);
 
 				colDef.printDoubleValue(cell, temperature, element instanceof TVITagViewTour);

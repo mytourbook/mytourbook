@@ -2217,7 +2217,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
 				final Object element = cell.getElement();
 
-				final double value = UI.getTemperatureFromMetric(//
+				final double value = UI.convertTemperatureFromMetric(//
 						((TVITourBookItem) element).colAvgTemperature);
 
 				colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);

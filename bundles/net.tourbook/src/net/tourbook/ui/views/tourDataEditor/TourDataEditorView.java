@@ -688,7 +688,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			} else if (__dataSerie == _serieTemperature) {
 
-				displayedValue = UI.getTemperatureFromMetric(metricValue);
+				displayedValue = UI.convertTemperatureFromMetric(metricValue);
 			}
 
 			return Float.toString(displayedValue);
@@ -726,7 +726,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					final boolean isTemperatureSerie = __dataSerie == _serieTemperature;
 
 					if (isTemperatureSerie) {
-						metricValue = UI.getTemperatureToMetric(enteredValue);
+						metricValue = UI.convertTemperatureToMetric(enteredValue);
 					}
 
 					final int serieIndex = ((TimeSlice) element).serieIndex;
@@ -1125,7 +1125,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				// temperature
 				if (_serieTemperature != null) {
 
-					final float temperature = UI.getTemperatureFromMetric(_serieTemperature[serieIndex]);
+					final float temperature = UI.convertTemperatureFromMetric(_serieTemperature[serieIndex]);
 
 					sb.append(_nf3.format(temperature));
 				}
@@ -4088,7 +4088,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 					final TimeSlice timeSlice = (TimeSlice) cell.getElement();
 
-					final float value = UI.getTemperatureFromMetric(_serieTemperature[timeSlice.serieIndex]);
+					final float value = UI.convertTemperatureFromMetric(_serieTemperature[timeSlice.serieIndex]);
 
 					colDef.printDetailValue(cell, value);
 
@@ -6196,7 +6196,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 				final float temperature = (float) _spinTemperature.getSelection() / 10;
 
-				_tourData.setAvgTemperature(UI.getTemperatureToMetric(temperature));
+				_tourData.setAvgTemperature(UI.convertTemperatureToMetric(temperature));
 			}
 
 			_tourData.setTourStartTime(
@@ -6566,7 +6566,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		/*
 		 * avg temperature
 		 */
-		final float avgTemperature = UI.getTemperatureFromMetric(_tourData.getAvgTemperature());
+		final float avgTemperature = UI.convertTemperatureFromMetric(_tourData.getAvgTemperature());
 
 		/*
 		 * on Linux .setDigit() fires an asynch selection event that the flag _isSetField is not

@@ -550,6 +550,33 @@ public class UI {
 	}
 
 	/**
+	 * @param temperature
+	 * @return Returns the temperatur in the current measurement system.
+	 */
+	public static float convertTemperatureFromMetric(final float temperature) {
+ 
+		if (UNIT_VALUE_TEMPERATURE == 1) {
+			return temperature;
+		}
+
+		return temperature * UNIT_FAHRENHEIT_MULTI + UNIT_FAHRENHEIT_ADD;
+	}
+
+	/**
+	 * @param temperature
+	 * @return Returns the temperature from the current measurement system converted into metric
+	 *         system.
+	 */
+	public static float convertTemperatureToMetric(final float temperature) {
+
+		if (UNIT_VALUE_TEMPERATURE == 1) {
+			return temperature;
+		}
+
+		return (temperature - UNIT_FAHRENHEIT_ADD) / UNIT_FAHRENHEIT_MULTI;
+	}
+
+	/**
 	 * @return Returns a cursor which is hidden. This cursor must be disposed.
 	 */
 	public static Cursor createHiddenCursor() {
@@ -941,33 +968,6 @@ public class UI {
 		// No attempt is made to constrain the bounds. The default
 		// constraining behavior in Window will be used.
 		return result;
-	}
-
-	/**
-	 * @param temperature
-	 * @return Returns the temperatur in the current measurement system.
-	 */
-	public static float getTemperatureFromMetric(final float temperature) {
-
-		if (UNIT_VALUE_TEMPERATURE == 1) {
-			return temperature;
-		}
-
-		return temperature * UNIT_FAHRENHEIT_MULTI + UNIT_FAHRENHEIT_ADD;
-	}
-
-	/**
-	 * @param temperature
-	 * @return Returns the temperature from the current measurement system converted into metric
-	 *         system.
-	 */
-	public static float getTemperatureToMetric(final float temperature) {
-
-		if (UNIT_VALUE_TEMPERATURE == 1) {
-			return temperature;
-		}
-
-		return (temperature - UNIT_FAHRENHEIT_ADD) / UNIT_FAHRENHEIT_MULTI;
 	}
 
 	public static boolean isCtrlKey(final MouseEvent event) {
