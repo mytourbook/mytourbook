@@ -2301,18 +2301,20 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 				_spinnerIL_TemperatureAdjustmentDuration = new Spinner(container, SWT.BORDER);
 				_spinnerIL_TemperatureAdjustmentDuration.setMinimum(0);
 				_spinnerIL_TemperatureAdjustmentDuration.setMaximum(60 * 60 * 24); // 1 day
-				_spinnerIL_TemperatureAdjustmentDuration.setPageIncrement(60); // 60 = 1 minute
+				_spinnerIL_TemperatureAdjustmentDuration.setPageIncrement(60); // 1 minute
 				_spinnerIL_TemperatureAdjustmentDuration.addMouseWheelListener(new MouseWheelListener() {
 					@Override
 					public void mouseScrolled(final MouseEvent event) {
 						Util.adjustSpinnerValueOnMouseScroll(event);
 						updateUI_TemperatureAdjustmentDuration();
+						onIL_Modified();
 					}
 				});
 				_spinnerIL_TemperatureAdjustmentDuration.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
 						updateUI_TemperatureAdjustmentDuration();
+						onIL_Modified();
 					}
 				});
 				GridDataFactory.fillDefaults()//
