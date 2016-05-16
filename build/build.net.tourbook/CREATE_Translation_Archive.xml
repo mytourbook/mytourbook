@@ -131,7 +131,7 @@
 
 	<target name="create-language-archive-file">
 
-		<echo message="Create language archive ${file-translation-archive}" />
+		<echo message="Create language archive ${file-translation-archive} (and delete old)" />
 		
 		<delete file="${file-translation-archive}" failonerror="false"></delete>
 

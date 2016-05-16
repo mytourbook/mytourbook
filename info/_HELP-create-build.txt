@@ -11,7 +11,9 @@ Switch to workspace "C:\DAT\ws_mt-NL-projects"
 
 	- refresh all projects with F5
 	- Replace text (Ctrl-H) "x.y.0.qualifier" to "a.b.0.qualifier" in all NL projects
-	- Replace text (Ctrl-H) "x.y.0" to "a.b.0" in all NL projects
+	- Replace text (Ctrl-H) "x.y.0" to "a.b.0" in all NL projects 
+	    AND in "site.xml" in the project "translation-test-update-site" that the 
+	    translation test update site can be build OTHERWISE it is NOT working 
 
 	
 Switch to workspace "C:\DAT\ws_MT-e38"
@@ -83,8 +85,8 @@ Create Update site
 
 
 
-3.8.2 Archives
---------------
+3.8.2 Archives used in pom.xml
+------------------------------
 
 http://archive.eclipse.org/eclipse/downloads/drops/R-3.8.2-201301310800/org.eclipse.pde-3.8.2.zip
 http://archive.eclipse.org/eclipse/downloads/drops/R-3.8.2-201301310800/org.eclipse.jdt-3.8.2.zip
