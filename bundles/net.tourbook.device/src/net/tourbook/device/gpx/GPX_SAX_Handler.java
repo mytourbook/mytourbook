@@ -111,6 +111,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	private static final String				TAG_EXT_DATA_INDEX				= "gpxdata:index";							//$NON-NLS-1$
 	private static final String				TAG_EXT_DATA_LAP				= "gpxdata:lap";							//$NON-NLS-1$
 	private static final String				TAG_EXT_DATA_START_TIME			= "gpxdata:startTime";						//$NON-NLS-1$
+	private static final String				TAG_EXT_DATA_TEMPERATURE		= "gpxdata:temp";							//$NON-NLS-1$
 
 	private static final String				TAG_EXT_CAD						= "cadence";								//$NON-NLS-1$
 	private static final String				TAG_EXT_HR						= "heartrate";								//$NON-NLS-1$
@@ -716,9 +717,11 @@ public class GPX_SAX_Handler extends DefaultHandler {
 				_isInPower = false;
 				_timeSlice.power = getFloatValue(charData);
 
-			} else if (name.equals(TAG_EXT_TPX_TEMP)) {
+			} else if (name.equals(TAG_EXT_TPX_TEMP) //
+					|| name.equals(TAG_EXT_DATA_TEMPERATURE)) {
 
 				// </gpxtpx:atemp>
+				// </gpxdata:temp>
 
 				_isInTemp = false;
 				_timeSlice.temperature = getFloatValue(charData);
@@ -1602,7 +1605,8 @@ public class GPX_SAX_Handler extends DefaultHandler {
 				_isInPower = true;
 				_characters.delete(0, _characters.length());
 
-			} else if (name.equals(TAG_EXT_TPX_TEMP)) {
+			} else if (name.equals(TAG_EXT_TPX_TEMP) || //
+					name.equals(TAG_EXT_DATA_TEMPERATURE)) {
 
 				_isInTemp = true;
 				_characters.delete(0, _characters.length());
