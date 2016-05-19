@@ -80,6 +80,7 @@ public class FitDataReader extends TourbookDevice {
 					 */
 					if (fieldName.equals("") // //$NON-NLS-1$
 
+							|| fieldName.equals("name") //$NON-NLS-1$
 							|| fieldName.equals("time") //$NON-NLS-1$
 							|| fieldName.equals("timestamp") //$NON-NLS-1$
 
@@ -166,19 +167,19 @@ public class FitDataReader extends TourbookDevice {
 							|| fieldName.equals("pwr_calc_type") //$NON-NLS-1$
 
 							// device
-							|| fieldName.equals("manufacturer") //$NON-NLS-1$
-							|| fieldName.equals("serial_number") //$NON-NLS-1$
-							|| fieldName.equals("product") //$NON-NLS-1$
-							|| fieldName.equals("friendly_name") //$NON-NLS-1$
+							|| fieldName.equals("ant_network") //$NON-NLS-1$
+							|| fieldName.equals("battery_status") //$NON-NLS-1$
+							|| fieldName.equals("battery_voltage") //$NON-NLS-1$
+							|| fieldName.equals("cum_operating_time") //$NON-NLS-1$
 							|| fieldName.equals("device_index") //$NON-NLS-1$
 							|| fieldName.equals("device_type") //$NON-NLS-1$
-							|| fieldName.equals("software_version") //$NON-NLS-1$
+							|| fieldName.equals("friendly_name") //$NON-NLS-1$
 							|| fieldName.equals("hardware_version") //$NON-NLS-1$
-							|| fieldName.equals("battery_voltage") //$NON-NLS-1$
-							|| fieldName.equals("battery_status") //$NON-NLS-1$
-							|| fieldName.equals("ant_network") //$NON-NLS-1$
+							|| fieldName.equals("manufacturer") //$NON-NLS-1$
+							|| fieldName.equals("product") //$NON-NLS-1$
+							|| fieldName.equals("serial_number") //$NON-NLS-1$
+							|| fieldName.equals("software_version") //$NON-NLS-1$
 							|| fieldName.equals("source_type") //$NON-NLS-1$
-							|| fieldName.equals("cum_operating_time") //$NON-NLS-1$
 
 							|| fieldName.equals("trigger") //$NON-NLS-1$
 							|| fieldName.equals("type") //$NON-NLS-1$

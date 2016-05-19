@@ -1,10 +1,12 @@
 package net.tourbook.device.garmin.fit.listeners;
 
+import net.tourbook.common.UI;
 import net.tourbook.device.garmin.fit.FitContext;
 
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+import com.garmin.fit.AntNetwork;
 import com.garmin.fit.AntplusDeviceType;
 import com.garmin.fit.DeviceInfoMesg;
 import com.garmin.fit.DeviceInfoMesgListener;
@@ -39,47 +41,110 @@ public class DeviceInfoMesgListenerImpl extends AbstractMesgListener implements 
 
 	@Override
 	public void onMesg(final DeviceInfoMesg mesg) {
-
+		
 		final Short deviceType = mesg.getDeviceType();
-//		final Short antDeviceType = mesg.getAntDeviceType();
-//		final Short antplusDeviceType = mesg.getAntplusDeviceType();
-//
-//		final AntNetwork antNetwork = mesg.getAntNetwork();
-//		final BodyLocation sensorPosition = mesg.getSensorPosition();
+
 //		final DateTime timestamp = mesg.getTimestamp();
-//		final Float softwareVersion = mesg.getSoftwareVersion();
-//		final Integer antDeviceNumber = mesg.getAntDeviceNumber();
-//		final Integer garminProduct = mesg.getGarminProduct();
+
 //		final Integer manufacturer = mesg.getManufacturer();
 //		final Integer product = mesg.getProduct();
+//		final String productName = mesg.getProductName();
+//		final Integer garminProduct = mesg.getGarminProduct();
+//		final String descriptor = mesg.getDescriptor();
+//
+//		final Short batteryStatus = mesg.getBatteryStatus();
+//		final Float batteryVoltage = mesg.getBatteryVoltage();
 //		final Long cumOperatingTime = mesg.getCumOperatingTime();
+//
 //		final Long serialNumber = mesg.getSerialNumber();
+//		final Short deviceIndex = mesg.getDeviceIndex();
+//		final Short hardwareVersion = mesg.getHardwareVersion();
+//		final Float softwareVersion = mesg.getSoftwareVersion();
+//
+//		final AntNetwork antNetwork = mesg.getAntNetwork();
+//		final Short antDeviceType = mesg.getAntDeviceType();
+//		final Integer antDeviceNumber = mesg.getAntDeviceNumber();
+//		final Short antplusDeviceType = mesg.getAntplusDeviceType();
 //		final Short antTransmissionType = mesg.getAntTransmissionType();
 //
-//		final Short deviceIndex = mesg.getDeviceIndex();
-//
-//		final Float batteryVoltage = mesg.getBatteryVoltage();
-//		final Short batteryStatus = mesg.getBatteryStatus();
-//		final Short hardwareVersion = mesg.getHardwareVersion();
 //		final SourceType sourceType = mesg.getSourceType();
-//		final String descriptor = mesg.getDescriptor();
-//		final String productName = mesg.getProductName();
+//		final BodyLocation sensorPosition = mesg.getSensorPosition();
 //
-////		if (serialNumber != null && batteryVoltage != null) {
+//		if (/* serialNumber != null && batteryVoltage != null */true) {
 //
-//		final long javaTime = (timestamp.getTimestamp() * 1000) + com.garmin.fit.DateTime.OFFSET;
+//			final long javaTime = (timestamp.getTimestamp() * 1000) + com.garmin.fit.DateTime.OFFSET;
 //
-//		System.out.println(String.format("%s %10s %10s", //
+//			System.out.println(String.format(
 //
-//				_dtFormatter.print(javaTime),
+//			"%s" //
 //
-//				deviceType,
-////				antDeviceType,
-//				antplusDeviceType
-//				//
-//				));
-//		// TODO remove SYSTEM.OUT.PRINTLN
-////		}
+//					+ "   manu:"
+//					+ " %10s"
+//					+ " %10s"
+////					+ " %10s"
+//					+ " %10s"
+////					+ " %10s"
+//
+//					+ "   ser:"
+//					+ " %10s"
+//					+ " %10s"
+//					+ " %10s"
+//					+ " %10s"
+//
+//					+ "   bat:"
+//					+ " %10s"
+//					+ " %10s V"
+//					+ " %10s"
+//
+//					+ "  ant:"
+//					+ " %10s"
+//					+ " %10s"
+//					+ " %10s"
+//					+ " %10s"
+//					+ " %10s"
+//					+ " %10s"
+//
+////					+ "   src:"
+////					+ " %10s"
+//					//
+//					,
+//
+//					_dtFormatter.print(javaTime),
+//
+//					// manu
+//					removeNull(manufacturer),
+//					removeNull(product),
+////					productName,
+//					removeNull(garminProduct),
+////					descriptor,
+//
+//					// ser
+//					removeNull(serialNumber),
+//					removeNull(deviceIndex),
+//					removeNull(hardwareVersion),
+//					removeNull_3(softwareVersion),
+//
+//					// bat
+//					removeNull(batteryStatus),
+//					removeNull_3(batteryVoltage),
+//					removeNull(cumOperatingTime),
+//
+//					// ant
+//					sourceType,
+//					removeNull(antNetwork),
+//					removeNull(antDeviceType),
+//					removeNull(antDeviceNumber),
+//					removeNull(antplusDeviceType),
+//					removeNull(antTransmissionType)
+//
+//					// src
+////					sensorPosition
+//
+//					//
+//					));
+//
+//			// TODO remove SYSTEM.OUT.PRINTLN
+//		}
 
 		if (deviceType != null) {
 
@@ -126,6 +191,41 @@ public class DeviceInfoMesgListenerImpl extends AbstractMesgListener implements 
 //					));
 //			// TODO remove SYSTEM.OUT.PRINTLN
 //		}
+	}
+
+	private String removeNull(final AntNetwork value) {
+
+		return value == null //
+				? UI.EMPTY_STRING
+				: value.toString();
+	}
+
+	private String removeNull(final Integer value) {
+
+		return value == null //
+				? UI.EMPTY_STRING
+				: value.toString();
+	}
+
+	private String removeNull(final Long value) {
+
+		return value == null //
+				? UI.EMPTY_STRING
+				: value.toString();
+	}
+
+	private String removeNull(final Short value) {
+
+		return value == null //
+				? UI.EMPTY_STRING
+				: value.toString();
+	}
+
+	private String removeNull_3(final Float value) {
+
+		return value == null //
+				? UI.EMPTY_STRING
+				: String.format("%10.3f", value);
 	}
 
 }
