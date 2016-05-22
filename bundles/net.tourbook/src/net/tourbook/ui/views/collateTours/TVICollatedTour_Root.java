@@ -206,18 +206,19 @@ public class TVICollatedTour_Root extends TVICollatedTour {
 			sqlFilter.setParameters(statement, 3);
 
 			final long[] prevStart = { 0 };
-
 			final int[] eventCounter = { 0 };
+			final int[] eventIndex = { 0 };
+
 			final long start = System.currentTimeMillis();
 
-			final int[] eventIndex = { 0 };
 			boolean isLongDuration = false;
 
-			for (; eventIndex[0] < eventSize; eventIndex[0]++) {
+			for (; eventIndex[0] < eventSize;) {
 
-				final boolean isFirstEvent = eventIndex[0] == 0;
+				final int currentEventIndex = eventIndex[0]++;
 
-				final TVICollatedTour_Event collateEvent = collatedEvents.get(eventIndex[0]);
+				final boolean isFirstEvent = currentEventIndex == 0;
+				final TVICollatedTour_Event collateEvent = collatedEvents.get(currentEventIndex);
 
 				final long eventStart = isFirstEvent ? Long.MIN_VALUE : prevStart[0];
 				final long eventEnd = collateEvent.eventStart.getMillis();
@@ -269,15 +270,16 @@ public class TVICollatedTour_Root extends TVICollatedTour {
 								monitor.beginTask(Messages.Tour_Book_Monitor_CollateTask, eventSize);
 								monitor.worked(eventCounter[0]);
 
-								for (; eventIndex[0] < eventSize; eventIndex[0]++) {
+								for (; eventIndex[0] < eventSize;) {
 
 									if (monitor.isCanceled()) {
 										break;
 									}
 
-									final boolean isFirstEvent = eventIndex[0] == 0;
+									final int currentEventIndex = eventIndex[0]++;
 
-									final TVICollatedTour_Event collateEvent = collatedEvents.get(eventIndex[0]);
+									final boolean isFirstEvent = currentEventIndex == 0;
+									final TVICollatedTour_Event collateEvent = collatedEvents.get(currentEventIndex);
 
 									final long eventStart = isFirstEvent ? Long.MIN_VALUE : prevStart[0];
 									final long eventEnd = collateEvent.eventStart.getMillis();
