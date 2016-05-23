@@ -175,7 +175,7 @@ public class SearchMgr implements XHRHandler {
 	private static boolean					_isUI_ShowLuceneDocId;
 	private static boolean					_isUI_SortDateAscending;
 
-	private static final DateTimeFormatter	_dateFormatter							= DateTimeFormat.mediumDate();
+	private static final DateTimeFormatter	_dateFormatter							= DateTimeFormat.forStyle("MS");								//$NON-NLS-1$
 	//
 	static final String						TAG_TD									= "<td>";														//$NON-NLS-1$
 	static final String						TAG_TD_END								= "</td>";														//$NON-NLS-1$
