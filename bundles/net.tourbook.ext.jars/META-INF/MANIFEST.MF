@@ -15,7 +15,7 @@ Bundle-ClassPath: joda-time-2.1.jar,
  concurrentlinkedhashmap-lru-1.2.jar,
  imgscalr-lib-4.2.jar,
  org.apache.commons.imaging-0.97-r1401825-2012-10-24.jar,
- json-java7-20141126.jar
+ json-20160212.jar
 Export-Package: com.enterprisedt,
  com.enterprisedt.net.ftp,
  com.enterprisedt.net.ftp.internal,
@@ -182,7 +182,6 @@ Export-Package: com.enterprisedt,
  org.joda.time.tz.data.Indian,
  org.joda.time.tz.data.Pacific,
  org.json,
- org.json.zip,
  org.xmlpull.mxp1,
  org.xmlpull.v1
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7

@@ -1,6 +1,6 @@
 // 'use strict';
 
-/*eslint-env amd */
+/* eslint-env amd */
 define(
 	[ //
 	"dojo/_base/declare"
@@ -35,8 +35,7 @@ define(
 		SearchMgr.XHR_PARAM_ACTION_URL = "actionUrl";
 		SearchMgr.XHR_PARAM_SEARCH_OPTIONS = "searchOptions";
 		SearchMgr.XHR_PARAM_SEARCH_TEXT = "searchText";
-		SearchMgr.XHR_PARAM_SELECTED_ID = "selectedId";
-		SearchMgr.XHR_PARAM_STATE = "state";
+		SearchMgr.XHR_PARAM_SELECTED_ITEMS = "selectedItems";
 
 		/**
 		 * Timeout in ms for xhr requests.

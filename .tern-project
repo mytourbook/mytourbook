@@ -1,0 +1,7 @@
+{
+	"loadEagerly": [
+		"bundles/net.tourbook.web/WebContent-dev/tourbook/search/SearchMgr.js",
+		"bundles/net.tourbook.web/WebContent-dev/tourbook/search/SearchApp.js",
+		"bundles/net.tourbook.web/WebContent-dev/tourbook/search/nls/Messages.js"
+	]
+}

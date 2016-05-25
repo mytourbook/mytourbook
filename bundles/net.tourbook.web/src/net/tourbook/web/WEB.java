@@ -37,6 +37,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.sun.net.httpserver.Headers;
@@ -56,7 +57,7 @@ public class WEB {
 	 * {@value #WEB_CONTENT_DEVELOPMENT_FOLDER} folder otherwise it is delivered from the
 	 * {@value #WEB_CONTENT_RELEASE_FOLDER} folder.
 	 */
-	static boolean							IS_DEBUG								= false;
+	static boolean							IS_DEBUG								= true;
 
 	/*
 	 * It is very complicated to support testing for language translators, therefore it is currently
@@ -289,14 +290,6 @@ public class WEB {
 		return webContent;
 	}
 
-	public static JSONObject getJSONObject(final Object rawData) throws UnsupportedEncodingException {
-
-		final String jsData = URLDecoder.decode((String) rawData, UTF_8);
-		final JSONObject jsonData = new JSONObject(jsData);
-
-		return jsonData;
-	}
-
 	/**
 	 * @param fileName
 	 * @return Returns a file from the resource folder {@value #RESOURCE_PATH}.
@@ -453,6 +446,38 @@ public class WEB {
 		} catch (final Exception e) {
 			StatusUtil.showStatus(e);
 		}
+	}
+
+	/**
+	 * Decodes the raw json data and converts it in a {@link JSONArray}.
+	 * 
+	 * @param jsonRawData
+	 * @return Returns a {@link JSONArray} from the parsed json data.
+	 * @throws UnsupportedEncodingException
+	 */
+	public static JSONArray parseJSONArray(final Object jsonRawData) throws UnsupportedEncodingException {
+		
+		final String jsData = URLDecoder.decode((String) jsonRawData, UTF_8);
+		
+		final JSONArray jsonData = new JSONArray(jsData);
+		
+		return jsonData;
+	}
+
+	/**
+	 * Decodes the raw json data and converts it in a {@link JSONObject}.
+	 * 
+	 * @param jsonRawData
+	 * @return Returns a {@link JSONObject} from the parsed json data.
+	 * @throws UnsupportedEncodingException
+	 */
+	public static JSONObject parseJSONObject(final Object jsonRawData) throws UnsupportedEncodingException {
+ 
+		final String jsData = URLDecoder.decode((String) jsonRawData, UTF_8);
+
+		final JSONObject jsonData = new JSONObject(jsData);
+
+		return jsonData;
 	}
 
 	private static String replaceLocalDebugPath(final String webContent, final File webFile) {

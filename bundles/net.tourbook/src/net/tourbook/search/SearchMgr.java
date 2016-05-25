@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -35,6 +35,7 @@ import net.tourbook.data.TourWayPoint;
 import net.tourbook.tour.DialogMarker;
 import net.tourbook.tour.DialogQuickEdit;
 import net.tourbook.tour.SelectionTourId;
+import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.SelectionTourMarker;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
@@ -117,15 +118,13 @@ public class SearchMgr implements XHRHandler {
 	private static final String				XHR_ACTION_GET_SEARCH_OPTIONS			= "getSearchOptions";											//$NON-NLS-1$
 	private static final String				XHR_ACTION_SET_SEARCH_OPTIONS			= "setSearchOptions";											//$NON-NLS-1$
 	private static final String				XHR_ACTION_GET_STATE					= "getState";													//$NON-NLS-1$
-//	private static final String				XHR_ACTION_SET_STATE					= "setState";											//$NON-NLS-1$
 																																					//
 	private static final String				XHR_PARAM_ACTION						= "action";													//$NON-NLS-1$
 	private static final String				XHR_PARAM_ACTION_URL					= "actionUrl";													//$NON-NLS-1$
 	private static final String				XHR_PARAM_SEARCH_OPTIONS				= "searchOptions";												//$NON-NLS-1$
 	private static final String				XHR_PARAM_SEARCH_TEXT					= JSON_STATE_SEARCH_TEXT;
-	private static final String				XHR_PARAM_SELECTED_ID					= "selectedId";												//$NON-NLS-1$
-//	private static final String				XHR_PARAM_STATE							= "state";												//$NON-NLS-1$
-																																					//
+	private static final String				XHR_PARAM_SELECTED_ITEMS				= "selectedItems";												//$NON-NLS-1$
+
 	/*
 	 * JSON response values
 	 */
@@ -133,10 +132,12 @@ public class SearchMgr implements XHRHandler {
 	private static final String				JSON_NAME								= "name";														//$NON-NLS-1$
 	private static final String				JSON_HTML_CONTENT						= "htmlContent";												//$NON-NLS-1$
 	private static final String				JSON_ITEM_ACTION_URL_EDIT_ITEM			= "actionUrl_EditItem";										//$NON-NLS-1$
-	private static final String				JSON_ITEM_IS_MARKER						= "isMarker";													//$NON-NLS-1$
-	private static final String				JSON_ITEM_IS_TOUR						= "isTour";													//$NON-NLS-1$
-	private static final String				JSON_ITEM_IS_WAYPOINT					= "isWaypoint";												//$NON-NLS-1$
-	private static final String				JSON_SELECTED_ID						= "selectedId";												//$NON-NLS-1$
+	private static final String				JSON_ITEM_IS_MARKER						= "item_IsMarker";												//$NON-NLS-1$
+	private static final String				JSON_ITEM_IS_TOUR						= "item_IsTour";												//$NON-NLS-1$
+	private static final String				JSON_ITEM_IS_WAYPOINT					= "item_IsWaypoint";											//$NON-NLS-1$
+	private static final String				JSON_ITEM_ID_TOUR_ID					= "itemId_TourId";
+	private static final String				JSON_ITEM_ID_MARKER_ID					= "itemId_MarkerId";											//$NON-NLS-1$
+	//
 	//
 	// search options
 	private static final String				JSON_IS_SEARCH_OPTIONS_DEFAULT			= "isSearchOptionsDefault";									//$NON-NLS-1$
@@ -245,16 +246,18 @@ public class SearchMgr implements XHRHandler {
 
 	private static boolean					_isModalDialogOpen						= false;
 
-	class ItemResponse {
+	private class ItemResponse {
 
 		String	actionUrl_EditItem;
 
 		String	createdHtml;
-		String	selectedId;
 
-		boolean	isMarker;
-		boolean	isTour;
-		boolean	isWayPoint;
+		boolean	item_IsMarker;
+		boolean	item_IsTour;
+		boolean	item_IsWayPoint;
+
+		String	itemId_TourId;
+		String	itemId_MarkerId;	// is marker or waypoint
 	}
 
 	/**
@@ -378,7 +381,7 @@ public class SearchMgr implements XHRHandler {
 
 		case ACTION_SELECT_TOUR:
 
-			hrefAction_Tour_Select(tourId);
+			hrefAction_Tour_Select(new SelectionTourId(tourId));
 
 			break;
 
@@ -391,7 +394,7 @@ public class SearchMgr implements XHRHandler {
 
 		case ACTION_SELECT_WAY_POINT:
 
-			hrefAction_WayPoint(action, tourId, markerId);
+			hrefAction_WayPoint(tourId, markerId);
 
 			break;
 		}
@@ -529,9 +532,7 @@ public class SearchMgr implements XHRHandler {
 		}
 	}
 
-	private static void hrefAction_Tour_Select(final long tourId) {
-
-		final SelectionTourId selection = new SelectionTourId(tourId);
+	private static void hrefAction_Tour_Select(final ISelection selection) {
 
 		updateSelectionProvider(selection);
 
@@ -541,7 +542,7 @@ public class SearchMgr implements XHRHandler {
 				_searchView.getPart());
 	}
 
-	private static void hrefAction_WayPoint(final String action, final long tourId, final long markerId) {
+	private static void hrefAction_WayPoint(final long tourId, final long markerId) {
 
 		if (_searchView == null) {
 			return;
@@ -709,8 +710,6 @@ public class SearchMgr implements XHRHandler {
 
 	private ItemResponse createHTML_10_Item(final SearchResultItem resultItem, final int itemNumber) {
 
-		final StringBuilder sb = new StringBuilder();
-
 		final int docId = resultItem.docId;
 		final int docSource = resultItem.docSource;
 		final String markerId = resultItem.markerId;
@@ -724,8 +723,8 @@ public class SearchMgr implements XHRHandler {
 
 		String hoverMessage = null;
 		String hrefEditItem = null;
-		String hrefSelectItem = null;
 		String itemTitleText = null;
+//		String itemId = null;
 
 		if (isTour) {
 
@@ -733,11 +732,6 @@ public class SearchMgr implements XHRHandler {
 			if (tourTitle != null) {
 				itemTitleText = tourTitle;
 			}
-
-			hrefSelectItem = ACTION_URL
-					+ HREF_ACTION_SELECT_TOUR
-					+ (HREF_PARAM_TOUR_ID + tourId)
-					+ (HREF_PARAM_DOC_ID + docId);
 
 			hrefEditItem = ACTION_URL
 					+ HREF_ACTION_EDIT_TOUR
@@ -753,12 +747,6 @@ public class SearchMgr implements XHRHandler {
 			if (tourMarkerLabel != null) {
 				itemTitleText = tourMarkerLabel;
 			}
-
-			hrefSelectItem = ACTION_URL
-					+ HREF_ACTION_SELECT_MARKER
-					+ (HREF_PARAM_TOUR_ID + tourId)
-					+ (HREF_PARAM_MARKER_ID + markerId)
-					+ (HREF_PARAM_DOC_ID + docId);
 
 			hrefEditItem = ACTION_URL
 					+ HREF_ACTION_EDIT_MARKER
@@ -776,12 +764,6 @@ public class SearchMgr implements XHRHandler {
 				itemTitleText = tourMarkerLabel;
 			}
 
-			hrefSelectItem = ACTION_URL
-					+ HREF_ACTION_SELECT_WAY_POINT
-					+ (HREF_PARAM_TOUR_ID + tourId)
-					+ (HREF_PARAM_MARKER_ID + markerId)
-					+ (HREF_PARAM_DOC_ID + docId);
-
 			iconUrl = _iconUrl_WayPoint;
 			hoverMessage = SEARCH_APP_ACTION_EDIT_MARKER;
 		}
@@ -798,6 +780,8 @@ public class SearchMgr implements XHRHandler {
 
 		final String description = resultItem.description;
 		final boolean isDescription = description != null;
+
+		final StringBuilder sb = new StringBuilder();
 
 		// hovered actions
 		if (hrefEditItem != null) {
@@ -873,12 +857,16 @@ public class SearchMgr implements XHRHandler {
 		sb.append("</tr></tbody></table>"); //$NON-NLS-1$
 
 		final ItemResponse itemResponse = new ItemResponse();
+
 		itemResponse.createdHtml = sb.toString();
-		itemResponse.selectedId = hrefSelectItem;
-		itemResponse.isMarker = isMarker;
-		itemResponse.isTour = isTour;
-		itemResponse.isWayPoint = isWayPoint;
 		itemResponse.actionUrl_EditItem = hrefEditItem;
+
+		itemResponse.item_IsMarker = isMarker;
+		itemResponse.item_IsTour = isTour;
+		itemResponse.item_IsWayPoint = isWayPoint;
+
+		itemResponse.itemId_MarkerId = markerId;
+		itemResponse.itemId_TourId = tourId;
 
 		return itemResponse;
 	}
@@ -1158,11 +1146,12 @@ public class SearchMgr implements XHRHandler {
 				jsonResponse.put(JSON_ID, resultItem.docId);
 
 				jsonResponse.put(JSON_HTML_CONTENT, sb.toString());
-				jsonResponse.put(JSON_SELECTED_ID, itemResponse.selectedId);
 				jsonResponse.put(JSON_ITEM_ACTION_URL_EDIT_ITEM, itemResponse.actionUrl_EditItem);
-				jsonResponse.put(JSON_ITEM_IS_MARKER, itemResponse.isMarker);
-				jsonResponse.put(JSON_ITEM_IS_TOUR, itemResponse.isTour);
-				jsonResponse.put(JSON_ITEM_IS_WAYPOINT, itemResponse.isWayPoint);
+				jsonResponse.put(JSON_ITEM_ID_TOUR_ID, itemResponse.itemId_TourId);
+				jsonResponse.put(JSON_ITEM_ID_MARKER_ID, itemResponse.itemId_MarkerId);
+				jsonResponse.put(JSON_ITEM_IS_MARKER, itemResponse.item_IsMarker);
+				jsonResponse.put(JSON_ITEM_IS_TOUR, itemResponse.item_IsTour);
+				jsonResponse.put(JSON_ITEM_IS_WAYPOINT, itemResponse.item_IsWayPoint);
 
 				allItems.put(jsonResponse);
 			}
@@ -1210,19 +1199,95 @@ public class SearchMgr implements XHRHandler {
 
 	private void xhr_Select(final Map<String, Object> params) throws UnsupportedEncodingException {
 
-		final Object xhrSelectedId = params.get(XHR_PARAM_SELECTED_ID);
+		final Object selectedItems = params.get(XHR_PARAM_SELECTED_ITEMS);
 
-		if (xhrSelectedId instanceof String) {
+		if (selectedItems != null) {
 
-			final String xhrAction = URLDecoder.decode((String) xhrSelectedId, WEB.UTF_8);
+			final JSONArray jsonSelectedItems = WEB.parseJSONArray(selectedItems);
+
+			Runnable runnable = null;
+
+			if (jsonSelectedItems.length() == 1) {
+
+				// 1 item is selected
+
+				final Object item = jsonSelectedItems.get(0);
+
+				if (item instanceof JSONObject) {
+
+					final JSONObject itemObject = (JSONObject) item;
+
+					final long markerId = itemObject.optLong(JSON_ITEM_ID_MARKER_ID, Long.MIN_VALUE);
+					final long tourId = itemObject.optLong(JSON_ITEM_ID_TOUR_ID, Long.MIN_VALUE);
+
+					runnable = new Runnable() {
+						@Override
+						public void run() {
+
+							if (itemObject.optBoolean(JSON_ITEM_IS_TOUR)) {
+
+								hrefAction_Tour_Select(new SelectionTourId(tourId));
+
+							} else if (itemObject.optBoolean(JSON_ITEM_IS_MARKER)) {
+
+								hrefAction_Marker(SearchMgr.ACTION_SELECT_MARKER, tourId, markerId);
+
+							} else if (itemObject.optBoolean(JSON_ITEM_IS_WAYPOINT)) {
+
+								hrefAction_WayPoint(tourId, markerId);
+							}
+						}
+					};
+				}
+
+			} else {
+
+				// multiple items are selected
+
+				// !!! currently only multiple tours are supported !!!
+
+				final ArrayList<Long> tourIds = new ArrayList<>();
+
+				for (final Object item : jsonSelectedItems) {
+
+					if (item instanceof JSONObject) {
+
+						final JSONObject itemObject = (JSONObject) item;
+
+						if (itemObject.optBoolean(JSON_ITEM_IS_TOUR)) {
+
+							final long tourId = itemObject.optLong(JSON_ITEM_ID_TOUR_ID, Long.MIN_VALUE);
+
+							tourIds.add(tourId);
+						}
+					}
+				}
+
+				final int numTours = tourIds.size();
+
+				if (numTours > 0) {
+
+					runnable = new Runnable() {
+						@Override
+						public void run() {
+
+							final ISelection selection = numTours == 1 //
+
+									// it is possible that only 1 tour and other items are selected
+									? new SelectionTourId(tourIds.get(0))
+
+									: new SelectionTourIds(tourIds);
+
+							hrefAction_Tour_Select(selection);
+						}
+					};
+				}
+			}
 
 			// run in UI thread
-			Display.getDefault().asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					hrefAction(xhrAction);
-				}
-			});
+			if (runnable != null) {
+				Display.getDefault().asyncExec(runnable);
+			}
 		}
 	}
 
@@ -1238,7 +1303,7 @@ public class SearchMgr implements XHRHandler {
 		final JSONObject responceObj = new JSONObject();
 
 		final Object xhrSearchOptions = params.get(XHR_PARAM_SEARCH_OPTIONS);
-		final JSONObject jsonSearchOptions = WEB.getJSONObject(xhrSearchOptions);
+		final JSONObject jsonSearchOptions = WEB.parseJSONObject(xhrSearchOptions);
 
 		if (jsonSearchOptions.isNull("isRestoreDefaults") == false) { //$NON-NLS-1$
 

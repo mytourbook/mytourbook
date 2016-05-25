@@ -1,5 +1,17 @@
 Version 16.5                                                30. May 2016
 
+
+
+NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW 
+
+- Import gpx temperature <gpxdata:temp>
+
+* Tour Search
+- Select multiple tours
+- Show tour time
+
+NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW 
+
   
 New 	
 ===

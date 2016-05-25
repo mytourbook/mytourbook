@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry exported="true" kind="lib" path="json-java7-20141126.jar" sourcepath="/org.json/src"/>
+	<classpathentry exported="true" kind="lib" path="json-20160212.jar" sourcepath="/org.json/src"/>
 	<classpathentry exported="true" kind="lib" path="org.apache.commons.imaging-0.97-r1401825-2012-10-24.jar" sourcepath="/org.apache.commons.imaging/src/main/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>

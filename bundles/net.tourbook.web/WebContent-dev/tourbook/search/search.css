@@ -72,7 +72,7 @@ a
 	background-image:		none;					/* hide gray */
 	border:					1px solid #fff;			/* overwrite (hide) border */		
 	border-bottom:			1px solid #bfbfbf;		/* set border only at the bottom */
-	padding-left: 			0px;
+	padding-left: 			0;
 	margin-left:			-5px;
 }
 

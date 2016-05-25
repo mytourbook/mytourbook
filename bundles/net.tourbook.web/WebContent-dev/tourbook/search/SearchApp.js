@@ -34,7 +34,7 @@ define(
 	'./SearchMgr',
 	'dojo/i18n!./nls/Messages',
 	'dojo/domReady!'
-], function(
+], /* @callback */function(
 //	
 // dojo/_base
 declare, //
@@ -78,7 +78,7 @@ Messages //
 
 	var SearchApp = declare('tourbook.search.SearchApp', [], {
 
-		createUI : function createUI() {
+		createUI : function() {
 
 			this.createUI_Actions();
 
@@ -137,7 +137,7 @@ Messages //
 			dom.byId('domAppStatus').title = Messages.Search_App_Label_Status_Tooltip;
 		},
 
-		createUI_Actions : function createUI_Actions() {
+		createUI_Actions : function() {
 
 			var app = this;
 
@@ -162,7 +162,7 @@ Messages //
 					this._showDialog();
 				},
 
-				_showDialog : function _showDialog() {
+				_showDialog : function() {
 
 					var dialogProperties = //
 					{
@@ -198,7 +198,7 @@ Messages //
 			this._actionStartSearch.startup();
 		},
 
-		createUI_Grid : function createUI_Grid() {
+		createUI_Grid : function() {
 
 			var app = this;
 
@@ -210,7 +210,7 @@ Messages //
 				/**
 				 * Overwrite fetchRange in dstore.Cache
 				 */
-				fetchRange : function fetchRange(args) {
+				fetchRange : function(args) {
 
 					var //
 					start = args.start, //
@@ -281,7 +281,7 @@ Messages //
 				Selection
 			], {
 
-				selectionMode : 'single',
+				allowSelectAll : true,
 
 				// default is empty that it is not confusing when loading the first time, 
 				// this message will be set when a search is started manually
@@ -305,15 +305,22 @@ Messages //
 
 			}, 'domGrid');
 
-			// fire an event when tour, marker or waypoint is selected to select it in the UI
+			// fire an event when tour, marker or waypoint is selected in the UI
 			grid.on('dgrid-select', function(event) {
 
-				var row = event.rows[0];
-				var selectedId = row.data[SearchMgr.XHR_PARAM_SELECTED_ID];
+				var rows = event.rows;
+				var selectedItems = [];
+
+				rows.forEach(function(row) {
+					selectedItems.push(row.data);
+				});
+
+				var jsonSelectedItems = JSON.stringify(selectedItems);
 
 				var xhrQuery = {};
+
 				xhrQuery[SearchMgr.XHR_PARAM_ACTION] = SearchMgr.XHR_ACTION_SELECT;
-				xhrQuery[SearchMgr.XHR_PARAM_SELECTED_ID] = encodeURIComponent(selectedId);
+				xhrQuery[SearchMgr.XHR_PARAM_SELECTED_ITEMS] = encodeURIComponent(jsonSelectedItems);
 
 				xhr(SearchMgr.XHR_SEARCH_HANDLER, {
 
@@ -358,9 +365,9 @@ Messages //
 			});
 
 			/*
-			 * Run context menu action
+			 * Run context menu action @callback
 			 */
-			var runUrlAction = function doUrlAction(event) {
+			var runUrlAction = function(event) {
 
 				var actionUrl = contextMenuItemData.actionUrl_EditItem;
 				SearchApp.action(actionUrl);
@@ -372,7 +379,7 @@ Messages //
 			return grid;
 		},
 
-		restoreState : function restoreState() {
+		restoreState : function() {
 
 			var app = this;
 
@@ -449,7 +456,7 @@ Messages //
 	 * <p>
 	 * The action is also startet from the Web UI.
 	 */
-	SearchApp.action = function action(actionUrl) {
+	SearchApp.action = function(actionUrl) {
 
 		var query = {};
 		query[SearchMgr.XHR_PARAM_ACTION] = SearchMgr.XHR_ACTION_ITEM_ACTION;

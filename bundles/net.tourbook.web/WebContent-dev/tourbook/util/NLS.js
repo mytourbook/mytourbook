@@ -19,7 +19,7 @@ function(declare) {
 	NLS.bind0 = function bind0(string, replace) {
 
 		return string.replace(NLS.regExp_0, replace);
-	}
+	};
 
 	return NLS;
 });
