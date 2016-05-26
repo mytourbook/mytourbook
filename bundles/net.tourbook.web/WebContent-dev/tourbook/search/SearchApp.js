@@ -274,6 +274,39 @@ Messages //
 				useRangeHeaders : true
 			});
 
+			var selectionCallback = function(event) {
+
+				var selectedItems = [];
+
+				for ( var rowId in grid.selection) {
+
+					var row = grid.row(rowId);
+
+					selectedItems.push(row.data);
+				}
+
+				if (selectedItems.length === 0) {
+					// nothing to do
+					return;
+				}
+
+				var jsonSelectedItems = JSON.stringify(selectedItems);
+
+				var xhrQuery = {};
+
+				xhrQuery[SearchMgr.XHR_PARAM_ACTION] = SearchMgr.XHR_ACTION_SELECT;
+				xhrQuery[SearchMgr.XHR_PARAM_SELECTED_ITEMS] = encodeURIComponent(jsonSelectedItems);
+
+				xhr(SearchMgr.XHR_SEARCH_HANDLER, {
+
+					handleAs : 'json',
+					preventCache : true,
+					timeout : SearchMgr.XHR_TIMEOUT,
+
+					query : xhrQuery
+				});
+			};
+
 			var grid = new (declare('tourbook.search.Grid',
 			[
 				OnDemandList,
@@ -306,31 +339,9 @@ Messages //
 			}, 'domGrid');
 
 			// fire an event when tour, marker or waypoint is selected in the UI
-			grid.on('dgrid-select', function(event) {
-
-				var rows = event.rows;
-				var selectedItems = [];
-
-				rows.forEach(function(row) {
-					selectedItems.push(row.data);
-				});
-
-				var jsonSelectedItems = JSON.stringify(selectedItems);
-
-				var xhrQuery = {};
-
-				xhrQuery[SearchMgr.XHR_PARAM_ACTION] = SearchMgr.XHR_ACTION_SELECT;
-				xhrQuery[SearchMgr.XHR_PARAM_SELECTED_ITEMS] = encodeURIComponent(jsonSelectedItems);
-
-				xhr(SearchMgr.XHR_SEARCH_HANDLER, {
-
-					handleAs : 'json',
-					preventCache : true,
-					timeout : SearchMgr.XHR_TIMEOUT,
-
-					query : xhrQuery
-				});
-			});
+			// fire the event also when multiple items are selected and one is deselected !!!
+			grid.on('dgrid-select', selectionCallback);
+			grid.on('dgrid-deselect', selectionCallback);
 
 			/**
 			 * Context menu, is defined declaratively.

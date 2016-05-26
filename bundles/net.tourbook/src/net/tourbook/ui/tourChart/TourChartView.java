@@ -680,7 +680,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 			/*
 			 * check if the marker tour is displayed
 			 */
-			if (_tourData == null || _tourData.getTourId().equals(markerTourId)) {
+			if (_tourData == null || _tourData.getTourId().equals(markerTourId) == false) {
 
 				// show tour
 
