@@ -3961,8 +3961,14 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 
 				for (final double latitude : latitudeSerie) {
 
-					float srtmValue = elevationSRTM3.getElevation(new GeoLat(latitude), new GeoLon(
-							longitudeSerie[serieIndex]));
+					final double longitude = longitudeSerie[serieIndex];
+
+					float srtmValue = 0;
+
+					// ignore lat/lon 0/0, this is in the ocean
+					if (latitude != 0 || longitude != 0) {
+						srtmValue = elevationSRTM3.getElevation(new GeoLat(latitude), new GeoLon(longitude));
+					}
 
 					/*
 					 * set invalid values to the previous valid value
