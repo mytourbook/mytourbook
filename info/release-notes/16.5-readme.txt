@@ -7,8 +7,8 @@ NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW
 - Import gpx temperature <gpxdata:temp>
 
 * Tour Search
-- Select multiple tours
-- Show tour time
+- Select multiple tours, selecting multiple markers are not yet supported 
+- Show/hide date/time/description
 
 NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW 
 

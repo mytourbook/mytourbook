@@ -225,7 +225,7 @@ public class DeviceInfoMesgListenerImpl extends AbstractMesgListener implements 
 
 		return value == null //
 				? UI.EMPTY_STRING
-				: String.format("%10.3f", value);
+				: String.format("%10.3f", value);//$NON-NLS-1$
 	}
 
 }

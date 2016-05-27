@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -38,7 +38,9 @@ public class Messages extends NLS {
 	public static String		Search_Options_Checkbox_ShowContentTour;
 	public static String		Search_Options_Checkbox_ShowContentMarker;
 	public static String		Search_Options_Checkbox_ShowContentWaypoint;
-	public static String		Search_Options_Checkbox_ShowDateTime;
+	public static String		Search_Options_Checkbox_ShowDate;
+	public static String		Search_Options_Checkbox_ShowTime;
+	public static String		Search_Options_Checkbox_ShowDescription;
 	public static String		Search_Options_Checkbox_ShowItemNumber;
 	public static String		Search_Options_Checkbox_ShowLuceneDocId;
 	public static String		Search_Options_Dialog_Header;

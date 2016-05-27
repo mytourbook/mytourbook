@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -42,7 +42,9 @@ public class MessagesUsed {
 		used = Messages.Search_Options_Checkbox_ShowContentMarker;
 		used = Messages.Search_Options_Checkbox_ShowContentTour;
 		used = Messages.Search_Options_Checkbox_ShowContentWaypoint;
-		used = Messages.Search_Options_Checkbox_ShowDateTime;
+		used = Messages.Search_Options_Checkbox_ShowDate;
+		used = Messages.Search_Options_Checkbox_ShowTime;
+		used = Messages.Search_Options_Checkbox_ShowDescription;
 		used = Messages.Search_Options_Checkbox_ShowItemNumber;
 		used = Messages.Search_Options_Checkbox_ShowLuceneDocId;
 		used = Messages.Search_Options_Dialog_Header;

@@ -123,40 +123,64 @@
 		<!-- Group: Result -->
 		
 		<div 
-			data-dojo-type="dijit/TitlePane" 
-			data-dojo-props="toggleable:false, title: '${messages.Search_Options_Group_Result}'">
+			data-dojo-type	="dijit/TitlePane" 
+			data-dojo-props	="toggleable:false, title: '${messages.Search_Options_Group_Result}'">
 			
-			<!-- Show date/time -->
+			<!-- Show description -->
 			<div>
 				<input 
-					type="checkbox" 
-					id="apChkShowDateTime"
-					data-dojo-type="dijit/form/CheckBox" 
-					data-dojo-attach-point="apChkShowDateTime"
-					data-dojo-attach-event="click:apSelection"/> 
-				<label for="apChkShowDateTime">${messages.Search_Options_Checkbox_ShowDateTime}</label>
+					type					="checkbox" 
+					id						="apChkShowDescription"
+					data-dojo-attach-point	="apChkShowDescription"
+					data-dojo-type			="dijit/form/CheckBox" 
+					data-dojo-attach-event	="click:apSelection"/> 
+				<label for="apChkShowDescription">${messages.Search_Options_Checkbox_ShowDescription}</label>
+				<br>
+			</div>
+			
+			<!-- Show date -->
+			<div class="fieldVertSpaceTop">
+				<input 
+					type					="checkbox" 
+					id						="apChkShowDate"
+					data-dojo-attach-point	="apChkShowDate"
+					data-dojo-type			="dijit/form/CheckBox" 
+					data-dojo-attach-event	="click:apSelection"/> 
+				<label for="apChkShowDate">${messages.Search_Options_Checkbox_ShowDate}</label>
+				<br>
+			</div>
+			
+			<!-- Show time -->
+			<div class="fieldVertSpaceTop">
+				<input 
+					type					="checkbox" 
+					id						="apChkShowTime"
+					data-dojo-attach-point	="apChkShowTime"
+					data-dojo-type			="dijit/form/CheckBox" 
+					data-dojo-attach-event	="click:apSelection"/> 
+				<label for="apChkShowTime">${messages.Search_Options_Checkbox_ShowTime}</label>
 				<br>
 			</div>
 			
 			<!-- Show item number -->
 			<div class="fieldVertSpaceTop">
 				<input 
-					type="checkbox" 
-					id="apChkShowItemNumber"
-					data-dojo-type="dijit/form/CheckBox" 
-					data-dojo-attach-point="apChkShowItemNumber"
-					data-dojo-attach-event="click:apSelection"/> 
+					type					="checkbox" 
+					id						="apChkShowItemNumber"
+					data-dojo-attach-point	="apChkShowItemNumber"
+					data-dojo-type			="dijit/form/CheckBox" 
+					data-dojo-attach-event	="click:apSelection"/> 
 				<label for="apChkShowItemNumber">${messages.Search_Options_Checkbox_ShowItemNumber}</label>
 			</div>
 			
 			<!-- Show Lucene doc ID -->
 			<div class="fieldVertSpaceTop">
 				<input 
-					type="checkbox" 
-					id="apChkShowLuceneID"
-					data-dojo-attach-point="apChkShowLuceneID"
-					data-dojo-type="dijit/form/CheckBox" 
-					data-dojo-attach-event="click:apSelection"/> 
+					type					="checkbox" 
+					id						="apChkShowLuceneID"
+					data-dojo-attach-point	="apChkShowLuceneID"
+					data-dojo-type			="dijit/form/CheckBox" 
+					data-dojo-attach-event	="click:apSelection"/> 
 				<label for="apChkShowLuceneID">${messages.Search_Options_Checkbox_ShowLuceneDocId}</label>
 			</div>
 		</div>
@@ -165,10 +189,11 @@
 		
 		<!-- Actions -->
 		<div style="text-align:right;">
-			<span id="apActionDefaults"
-				data-dojo-type="dijit/form/Button"
-				data-dojo-attach-point="apActionDefaults"
-				data-dojo-attach-event="click:apActionRestoreDefaults"
+			<span 
+				id						="apActionDefaults"
+				data-dojo-attach-point	="apActionDefaults"
+				data-dojo-type			="dijit/form/Button"
+				data-dojo-attach-event	="click:apActionRestoreDefaults"
 				>${messages.Search_Options_Action_RestoreDefaults}</span> 
 		</div>
 	</div>

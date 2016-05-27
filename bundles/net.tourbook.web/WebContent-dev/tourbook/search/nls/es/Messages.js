@@ -16,7 +16,6 @@ define(//
 		Search_Options_Checkbox_ShowContentMarker          : 'Marcadores',
 		Search_Options_Checkbox_ShowContentTour            : 'Recorridos',
 		Search_Options_Checkbox_ShowContentWaypoint        : 'Puntos de Ruta',
-		Search_Options_Checkbox_ShowDateTime               : 'Mostrar fecha/hora',
 		Search_Options_Checkbox_ShowItemNumber             : 'Mostrar numeración',
 		Search_Options_Checkbox_ShowLuceneDocId            : 'Mostrar ID del documento Lucene',
 		Search_Options_Dialog_Header                       : 'Opciones de Búsqueda',

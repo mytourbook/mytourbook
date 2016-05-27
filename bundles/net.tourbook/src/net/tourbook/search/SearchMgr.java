@@ -91,8 +91,12 @@ public class SearchMgr implements XHRHandler {
 	static final String						STATE_IS_SHOW_CONTENT_WAYPOINT			= "STATE_IS_SHOW_CONTENT_WAYPOINT";							//$NON-NLS-1$
 	static final boolean					STATE_IS_SHOW_CONTENT_WAYPOINT_DEFAULT	= true;
 	//
-	static final String						STATE_IS_SHOW_DATE_TIME					= "STATE_IS_SHOW_DATE_TIME";									//$NON-NLS-1$
-	static final boolean					STATE_IS_SHOW_DATE_TIME_DEFAULT			= false;
+	static final String						STATE_IS_SHOW_DATE						= "STATE_IS_SHOW_DATE";										//$NON-NLS-1$
+	static final boolean					STATE_IS_SHOW_DATE_DEFAULT				= false;
+	static final String						STATE_IS_SHOW_TIME						= "STATE_IS_SHOW_TIME";										//$NON-NLS-1$
+	static final boolean					STATE_IS_SHOW_TIME_DEFAULT				= false;
+	static final String						STATE_IS_SHOW_DESCRIPTION				= "STATE_IS_SHOW_DESCRIPTION";									//$NON-NLS-1$
+	static final boolean					STATE_IS_SHOW_DESCRIPTION_DEFAULT		= true;
 	static final String						STATE_IS_SHOW_ITEM_NUMBER				= "STATE_IS_SHOW_ITEM_NUMBER";									//$NON-NLS-1$
 	static final boolean					STATE_IS_SHOW_ITEM_NUMBER_DEFAULT		= false;
 	static final String						STATE_IS_SHOW_LUCENE_DOC_ID				= "STATE_IS_SHOW_LUCENE_DOC_ID";								//$NON-NLS-1$
@@ -135,7 +139,7 @@ public class SearchMgr implements XHRHandler {
 	private static final String				JSON_ITEM_IS_MARKER						= "item_IsMarker";												//$NON-NLS-1$
 	private static final String				JSON_ITEM_IS_TOUR						= "item_IsTour";												//$NON-NLS-1$
 	private static final String				JSON_ITEM_IS_WAYPOINT					= "item_IsWaypoint";											//$NON-NLS-1$
-	private static final String				JSON_ITEM_ID_TOUR_ID					= "itemId_TourId";
+	private static final String				JSON_ITEM_ID_TOUR_ID					= "itemId_TourId";												//$NON-NLS-1$
 	private static final String				JSON_ITEM_ID_MARKER_ID					= "itemId_MarkerId";											//$NON-NLS-1$
 	//
 	//
@@ -147,9 +151,11 @@ public class SearchMgr implements XHRHandler {
 	private static final String				JSON_IS_SHOW_CONTENT_MARKER				= "isShowContentMarker";										//$NON-NLS-1$
 	private static final String				JSON_IS_SHOW_CONTENT_TOUR				= "isShowContentTour";											//$NON-NLS-1$
 	private static final String				JSON_IS_SHOW_CONTENT_WAYPOINT			= "isShowContentWaypoint";										//$NON-NLS-1$
-	private static final String				JSON_IS_SHOW_LUCENE_ID					= "isShowLuceneID";											//$NON-NLS-1$
+	private static final String				JSON_IS_SHOW_DATE						= "isShowDate";												//$NON-NLS-1$
+	private static final String				JSON_IS_SHOW_TIME						= "isShowTime";												//$NON-NLS-1$
+	private static final String				JSON_IS_SHOW_DESCRIPTION				= "isShowDescription";											//$NON-NLS-1$
 	private static final String				JSON_IS_SHOW_ITEM_NUMBER				= "isShowItemNumber";											//$NON-NLS-1$
-	private static final String				JSON_IS_SHOW_DATE_TIME					= "isShowDateTime";											//$NON-NLS-1$
+	private static final String				JSON_IS_SHOW_LUCENE_ID					= "isShowLuceneID";											//$NON-NLS-1$
 	private static final String				JSON_IS_SORT_BY_DATE_ASCENDING			= "isSortByDateAscending";										//$NON-NLS-1$
 	//
 	private static final String				SEARCH_FOLDER							= "/tourbook/search/";											//$NON-NLS-1$
@@ -171,12 +177,16 @@ public class SearchMgr implements XHRHandler {
 	private static boolean					_isUI_ShowContentMarker;
 	private static boolean					_isUI_ShowContentTour;
 	private static boolean					_isUI_ShowContentWaypoint;
-	private static boolean					_isUI_ShowDateTime;
+	private static boolean					_isUI_ShowDate;
+	private static boolean					_isUI_ShowTime;
+	private static boolean					_isUI_ShowDescription;
 	private static boolean					_isUI_ShowItemNumber;
 	private static boolean					_isUI_ShowLuceneDocId;
 	private static boolean					_isUI_SortDateAscending;
 
-	private static final DateTimeFormatter	_dateFormatter							= DateTimeFormat.forStyle("MS");								//$NON-NLS-1$
+	private static final DateTimeFormatter	_dateFormatter							= DateTimeFormat.forStyle("M-");								//$NON-NLS-1$
+	private static final DateTimeFormatter	_timeFormatter							= DateTimeFormat.forStyle("-S");								//$NON-NLS-1$
+	private static final DateTimeFormatter	_dateTimeFormatter						= DateTimeFormat.forStyle("MS");								//$NON-NLS-1$
 	//
 	static final String						TAG_TD									= "<td>";														//$NON-NLS-1$
 	static final String						TAG_TD_END								= "</td>";														//$NON-NLS-1$
@@ -596,7 +606,8 @@ public class SearchMgr implements XHRHandler {
 		state.put(STATE_IS_SHOW_CONTENT_TOUR, STATE_IS_SHOW_CONTENT_TOUR_DEFAULT);
 		state.put(STATE_IS_SHOW_CONTENT_WAYPOINT, STATE_IS_SHOW_CONTENT_WAYPOINT_DEFAULT);
 
-		state.put(STATE_IS_SHOW_DATE_TIME, STATE_IS_SHOW_DATE_TIME_DEFAULT);
+		state.put(STATE_IS_SHOW_DATE, STATE_IS_SHOW_DATE_DEFAULT);
+		state.put(STATE_IS_SHOW_TIME, STATE_IS_SHOW_TIME_DEFAULT);
 		state.put(STATE_IS_SHOW_ITEM_NUMBER, STATE_IS_SHOW_ITEM_NUMBER_DEFAULT);
 		state.put(STATE_IS_SHOW_LUCENE_DOC_ID, STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT);
 
@@ -642,9 +653,16 @@ public class SearchMgr implements XHRHandler {
 				STATE_IS_SHOW_CONTENT_WAYPOINT,
 				STATE_IS_SHOW_CONTENT_WAYPOINT_DEFAULT);
 
-		_isUI_ShowDateTime = Util.getStateBoolean(state, //
-				STATE_IS_SHOW_DATE_TIME,
-				STATE_IS_SHOW_DATE_TIME_DEFAULT);
+		_isUI_ShowDate = Util.getStateBoolean(state, //
+				STATE_IS_SHOW_DATE,
+				STATE_IS_SHOW_DATE_DEFAULT);
+		_isUI_ShowTime = Util.getStateBoolean(state, //
+				STATE_IS_SHOW_TIME,
+				STATE_IS_SHOW_TIME_DEFAULT);
+
+		_isUI_ShowDescription = Util.getStateBoolean(state, //
+				STATE_IS_SHOW_DESCRIPTION,
+				STATE_IS_SHOW_DESCRIPTION_DEFAULT);
 
 		_isUI_ShowLuceneDocId = Util.getStateBoolean(state, //
 				STATE_IS_SHOW_LUCENE_DOC_ID,
@@ -779,7 +797,7 @@ public class SearchMgr implements XHRHandler {
 		}
 
 		final String description = resultItem.description;
-		final boolean isDescription = description != null;
+		final boolean isDescription = _isUI_ShowDescription && description != null;
 
 		final StringBuilder sb = new StringBuilder();
 
@@ -822,21 +840,34 @@ public class SearchMgr implements XHRHandler {
 				}
 
 				// info
-				if (_isUI_ShowDateTime || _isUI_ShowItemNumber || _isUI_ShowLuceneDocId) {
+				if (_isUI_ShowDate || _isUI_ShowTime || _isUI_ShowItemNumber || _isUI_ShowLuceneDocId) {
 
 					sb.append("<div class='item-info'>"); //$NON-NLS-1$
 					sb.append("<table><tbody><tr>"); //$NON-NLS-1$
 					{
-						if (_isUI_ShowDateTime) {
+						if (_isUI_ShowDate || _isUI_ShowTime) {
 
 							final long tourStartTime = resultItem.tourStartTime;
 							if (tourStartTime != 0) {
 
 								final DateTime dt = new DateTime(tourStartTime);
 
-								sb.append(TAG_TD + String.format("%s", _dateFormatter.print(dt.getMillis())) //$NON-NLS-1$
-										+ TAG_TD_END);
+								String dateTimeText = null;
 
+								if (_isUI_ShowDate && _isUI_ShowTime) {
+
+									dateTimeText = _dateTimeFormatter.print(dt.getMillis());
+
+								} else if (_isUI_ShowDate) {
+
+									dateTimeText = _dateFormatter.print(dt.getMillis());
+
+								} else if (_isUI_ShowTime) {
+
+									dateTimeText = _timeFormatter.print(dt.getMillis());
+								}
+
+								sb.append(TAG_TD + dateTimeText + TAG_TD_END);
 							}
 						}
 
@@ -996,7 +1027,9 @@ public class SearchMgr implements XHRHandler {
 		responceObj.put(JSON_IS_SHOW_CONTENT_TOUR, _isUI_ShowContentTour);
 		responceObj.put(JSON_IS_SHOW_CONTENT_WAYPOINT, _isUI_ShowContentWaypoint);
 
-		responceObj.put(JSON_IS_SHOW_DATE_TIME, _isUI_ShowDateTime);
+		responceObj.put(JSON_IS_SHOW_DATE, _isUI_ShowDate);
+		responceObj.put(JSON_IS_SHOW_TIME, _isUI_ShowTime);
+		responceObj.put(JSON_IS_SHOW_DESCRIPTION, _isUI_ShowDescription);
 		responceObj.put(JSON_IS_SHOW_ITEM_NUMBER, _isUI_ShowItemNumber);
 		responceObj.put(JSON_IS_SHOW_LUCENE_ID, _isUI_ShowLuceneDocId);
 
@@ -1323,7 +1356,9 @@ public class SearchMgr implements XHRHandler {
 			responceObj.put(JSON_IS_SHOW_CONTENT_TOUR, STATE_IS_SHOW_CONTENT_TOUR_DEFAULT);
 			responceObj.put(JSON_IS_SHOW_CONTENT_WAYPOINT, STATE_IS_SHOW_CONTENT_WAYPOINT_DEFAULT);
 
-			responceObj.put(JSON_IS_SHOW_DATE_TIME, STATE_IS_SHOW_DATE_TIME_DEFAULT);
+			responceObj.put(JSON_IS_SHOW_DATE, STATE_IS_SHOW_DATE_DEFAULT);
+			responceObj.put(JSON_IS_SHOW_TIME, STATE_IS_SHOW_TIME_DEFAULT);
+			responceObj.put(JSON_IS_SHOW_DESCRIPTION, STATE_IS_SHOW_DESCRIPTION_DEFAULT);
 			responceObj.put(JSON_IS_SHOW_ITEM_NUMBER, STATE_IS_SHOW_ITEM_NUMBER_DEFAULT);
 			responceObj.put(JSON_IS_SHOW_LUCENE_ID, STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT);
 
@@ -1340,7 +1375,9 @@ public class SearchMgr implements XHRHandler {
 			state.put(STATE_IS_SHOW_CONTENT_TOUR, jsonSearchOptions.getBoolean(JSON_IS_SHOW_CONTENT_TOUR));
 			state.put(STATE_IS_SHOW_CONTENT_WAYPOINT, jsonSearchOptions.getBoolean(JSON_IS_SHOW_CONTENT_WAYPOINT));
 
-			state.put(STATE_IS_SHOW_DATE_TIME, jsonSearchOptions.getBoolean(JSON_IS_SHOW_DATE_TIME));
+			state.put(STATE_IS_SHOW_DATE, jsonSearchOptions.getBoolean(JSON_IS_SHOW_DATE));
+			state.put(STATE_IS_SHOW_TIME, jsonSearchOptions.getBoolean(JSON_IS_SHOW_TIME));
+			state.put(STATE_IS_SHOW_DESCRIPTION, jsonSearchOptions.getBoolean(JSON_IS_SHOW_DESCRIPTION));
 			state.put(STATE_IS_SHOW_ITEM_NUMBER, jsonSearchOptions.getBoolean(JSON_IS_SHOW_ITEM_NUMBER));
 			state.put(STATE_IS_SHOW_LUCENE_DOC_ID, jsonSearchOptions.getBoolean(JSON_IS_SHOW_LUCENE_ID));
 

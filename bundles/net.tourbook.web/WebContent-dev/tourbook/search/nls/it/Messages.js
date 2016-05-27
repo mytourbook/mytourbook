@@ -16,7 +16,6 @@ define(//
 		Search_Options_Checkbox_ShowContentMarker          : 'Riferimenti',
 		Search_Options_Checkbox_ShowContentTour            : 'Percorsi',
 		Search_Options_Checkbox_ShowContentWaypoint        : 'Punti mappa',
-		Search_Options_Checkbox_ShowDateTime               : 'Mostra data/ora',
 		Search_Options_Checkbox_ShowItemNumber             : 'Mostra numero elemento',
 		Search_Options_Checkbox_ShowLuceneDocId            : 'Mostra indice documento',
 		Search_Options_Dialog_Header                       : 'Opzioni di ricarca',

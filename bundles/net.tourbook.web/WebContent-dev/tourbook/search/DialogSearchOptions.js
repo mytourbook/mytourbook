@@ -122,7 +122,9 @@ Messages //
 
 					isSortByDateAscending : this.apSortByDateAscending.get('checked'),
 
-					isShowDateTime : this.apChkShowDateTime.get('checked'),
+					isShowDate : this.apChkShowDate.get('checked'),
+					isShowTime : this.apChkShowTime.get('checked'),
+					isShowDescription : this.apChkShowDescription.get('checked'),
 					isShowItemNumber : this.apChkShowItemNumber.get('checked'),
 					isShowLuceneID : this.apChkShowLuceneID.get('checked')
 				};
@@ -248,7 +250,9 @@ Messages //
 			dialog.apSortByDateAscending.set('checked', xhrData.isSortByDateAscending);
 			dialog.apSortByDateDescending.set('checked', !xhrData.isSortByDateAscending);
 
-			dialog.apChkShowDateTime.set('checked', xhrData.isShowDateTime);
+			dialog.apChkShowDate.set('checked', xhrData.isShowDate);
+			dialog.apChkShowTime.set('checked', xhrData.isShowTime);
+			dialog.apChkShowDescription.set('checked', xhrData.isShowDescription);
 			dialog.apChkShowItemNumber.set('checked', xhrData.isShowItemNumber);
 			dialog.apChkShowLuceneID.set('checked', xhrData.isShowLuceneID);
 

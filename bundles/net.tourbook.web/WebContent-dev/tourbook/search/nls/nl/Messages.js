@@ -16,7 +16,6 @@ define(//
 		Search_Options_Checkbox_ShowContentMarker          : 'Markers',
 		Search_Options_Checkbox_ShowContentTour            : 'Tochten',
 		Search_Options_Checkbox_ShowContentWaypoint        : 'Waypoints',
-		Search_Options_Checkbox_ShowDateTime               : 'Toon datum/tijd',
 		Search_Options_Checkbox_ShowItemNumber             : 'Toon item nummer',
 		Search_Options_Checkbox_ShowLuceneDocId            : 'Toon Lucene doc ID',
 		Search_Options_Dialog_Header                       : 'Zoek opties',

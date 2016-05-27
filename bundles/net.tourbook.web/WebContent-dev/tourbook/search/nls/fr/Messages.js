@@ -16,7 +16,6 @@ define(//
 		Search_Options_Checkbox_ShowContentMarker          : 'Marqueurs',
 		Search_Options_Checkbox_ShowContentTour            : 'Itinéraires',
 		Search_Options_Checkbox_ShowContentWaypoint        : 'Waypoints',
-		Search_Options_Checkbox_ShowDateTime               : 'Montrer date/heure',
 		Search_Options_Checkbox_ShowItemNumber             : 'Montrer le numéro de l\'article',
 		Search_Options_Checkbox_ShowLuceneDocId            : 'Montrer le doc ID Lucene',
 		Search_Options_Dialog_Header                       : 'Options de Recherche',

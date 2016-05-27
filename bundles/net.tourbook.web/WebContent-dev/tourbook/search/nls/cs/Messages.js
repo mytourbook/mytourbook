@@ -16,7 +16,6 @@ define(//
 		Search_Options_Checkbox_ShowContentMarker          : 'Značky',
 		Search_Options_Checkbox_ShowContentTour            : 'Trasy',
 		Search_Options_Checkbox_ShowContentWaypoint        : 'Trasové body',
-		Search_Options_Checkbox_ShowDateTime               : 'Zobrazit datum/čas',
 		Search_Options_Checkbox_ShowItemNumber             : 'Zobrazit číslo položky',
 		Search_Options_Checkbox_ShowLuceneDocId            : 'Zobrazit doc ID Lucene',
 		Search_Options_Dialog_Header                       : 'Možnosti vyhledávání',
