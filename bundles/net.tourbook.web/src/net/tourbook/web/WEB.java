@@ -456,11 +456,11 @@ public class WEB {
 	 * @throws UnsupportedEncodingException
 	 */
 	public static JSONArray parseJSONArray(final Object jsonRawData) throws UnsupportedEncodingException {
-		
+
 		final String jsData = URLDecoder.decode((String) jsonRawData, UTF_8);
-		
+
 		final JSONArray jsonData = new JSONArray(jsData);
-		
+
 		return jsonData;
 	}
 
@@ -472,7 +472,7 @@ public class WEB {
 	 * @throws UnsupportedEncodingException
 	 */
 	public static JSONObject parseJSONObject(final Object jsonRawData) throws UnsupportedEncodingException {
- 
+
 		final String jsData = URLDecoder.decode((String) jsonRawData, UTF_8);
 
 		final JSONObject jsonData = new JSONObject(jsData);

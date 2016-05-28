@@ -368,8 +368,8 @@ Messages //
 				/*
 				 * enable/disable actions
 				 */
-				var isMarker = contextMenuItemData.isMarker;
-				var isTour = contextMenuItemData.isTour;
+				var isMarker = contextMenuItemData.item_IsMarker;
+				var isTour = contextMenuItemData.item_IsTour;
 
 				actionEditMarker.set('disabled', !isMarker);
 				actionEditTour.set('disabled', !isTour);
