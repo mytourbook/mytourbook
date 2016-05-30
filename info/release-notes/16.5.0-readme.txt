@@ -1,19 +1,7 @@
 Version 16.5                                                30. May 2016
 
-
-
-NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW 
-
-- Import gpx temperature <gpxdata:temp>
-
-* Tour Search
-- Select multiple tours, selecting multiple markers are not yet supported 
-- Show/hide date/time/description
-
-NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW 
-
   
-New 	
+NEW 	
 ===
 
 
@@ -43,7 +31,7 @@ New
   tool can correct wrong temperature values.
 
  
-Details 	
+DETAILS 	
 =======
 
 * Table/Tree Columns
@@ -72,10 +60,29 @@ Details
 
   - New cadence field to selecte rpm or spm
 
+
+* Easy Import
+
+  - Adjust tour start temperature values
+
+
+IMPROVEMENTS
+============
  
 * Tour Chart
 
   - Replaced chart options drop-down menu with a slideout
   - Set grid line options in the chart options slideout
 
+ 
+* Tour Search
+
+  - Select multiple tours in the search result
+    (selecting multiple markers are not yet supported)
+  - Show/hide date/time/description
+
+
+* GPX Import
+
+  - Import temperature tags <gpxdata:temp> from .gpx file
  
