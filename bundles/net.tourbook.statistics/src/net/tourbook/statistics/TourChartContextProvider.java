@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -37,7 +37,7 @@ import org.eclipse.swt.widgets.Control;
 /**
  * provides the fill menu methods for the chart context menu
  */
-class TourChartContextProvider implements IChartContextProvider, ITourProvider {
+public class TourChartContextProvider implements IChartContextProvider, ITourProvider {
 
 	private final Chart					_chart;
 	private final IBarSelectionProvider	_barSelectionProvider;
@@ -63,6 +63,7 @@ class TourChartContextProvider implements IChartContextProvider, ITourProvider {
 		_actionOpenTour.setEnabled(isTourHovered);
 	}
 
+	@Override
 	public void fillBarChartContextMenu(final IMenuManager menuMgr,
 										final int hoveredBarSerieIndex,
 										final int hoveredBarValueIndex) {
@@ -74,26 +75,32 @@ class TourChartContextProvider implements IChartContextProvider, ITourProvider {
 		enableActions(hoveredBarSerieIndex != -1);
 	}
 
+	@Override
 	public void fillContextMenu(final IMenuManager menuMgr,
 								final int mouseDownDevPositionX,
 								final int mouseDownDevPositionY) {}
 
+	@Override
 	public void fillXSliderContextMenu(	final IMenuManager menuMgr,
 										final ChartXSlider leftSlider,
 										final ChartXSlider rightSlider) {}
 
+	@Override
 	public Chart getChart() {
 		return _chart;
 	}
 
+	@Override
 	public ChartXSlider getLeftSlider() {
 		return null;
 	}
 
+	@Override
 	public ChartXSlider getRightSlider() {
 		return null;
 	}
 
+	@Override
 	public ArrayList<TourData> getSelectedTours() {
 
 		final Long selectedTourId = _barSelectionProvider.getSelectedTourId();
@@ -118,6 +125,7 @@ class TourChartContextProvider implements IChartContextProvider, ITourProvider {
 	@Override
 	public void onShowContextMenu(final MenuEvent menuEvent, final Control menuParentControl) {}
 
+	@Override
 	public boolean showOnlySliderContextMenu() {
 		return false;
 	}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,10 +24,8 @@ public class Messages extends NLS {
 	public static String		LABEL_GRAPH_ALTITUDE;
 	public static String		LABEL_GRAPH_DAYTIME;
 	public static String		LABEL_GRAPH_DISTANCE;
-
-	public static String	LABEL_GRAPH_PACE;
-
-	public static String	LABEL_GRAPH_SPEED;
+	public static String		LABEL_GRAPH_PACE;
+	public static String		LABEL_GRAPH_SPEED;
 	public static String		LABEL_GRAPH_TIME;
 	public static String		LABEL_GRAPH_TIME_UNIT;
 

@@ -13,17 +13,30 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.statistics;
 
-public interface IBarSelectionProvider {
+package net.tourbook.statistics.graphs;
 
-	Integer getSelectedMonth();
+import net.tourbook.chart.ChartDataModel;
+import net.tourbook.chart.ChartType;
 
-	/**
-	 * @return Returns the selected tour, this can also be the tour when the mouse is hovered over a
-	 *         bar
-	 */
-	Long getSelectedTourId();
+public class StatisticDay_TourTime extends StatisticDay {
 
-	boolean selectTour(Long tourId);
+	@Override
+	public String toString() {
+		return "Statistic [" //
+				+ ("statisticId=" + statisticId + ", ")
+				+ ("visibleName=" + visibleName)
+				+ "]";
+	}
+
+	@Override
+	ChartDataModel updateChart() {
+
+		final ChartDataModel chartDataModel = new ChartDataModel(ChartType.BAR);
+
+		createXDataDay(chartDataModel);
+		createYDataDuration(chartDataModel);
+
+		return chartDataModel;
+	}
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,17 +13,10 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.statistics;
+package net.tourbook.statistics.graphs;
 
-public interface IBarSelectionProvider {
+public class TourData_Year extends TourData_Common {
 
-	Integer getSelectedMonth();
+	int[]	years;
 
-	/**
-	 * @return Returns the selected tour, this can also be the tour when the mouse is hovered over a
-	 *         bar
-	 */
-	Long getSelectedTourId();
-
-	boolean selectTour(Long tourId);
 }
