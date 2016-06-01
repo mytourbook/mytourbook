@@ -1,0 +1,16 @@
+Version 16.7                                                ?. July 2016
+
+  
+NEW 	
+===
+
+
+
+
+IMPROVEMENTS
+============
+
+ 
+* Statistics
+
+  - Show chart grid options in a slideout  
