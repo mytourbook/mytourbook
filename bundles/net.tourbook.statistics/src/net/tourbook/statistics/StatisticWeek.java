@@ -437,7 +437,13 @@ public abstract class StatisticWeek extends YearStatistic {
 
 	@Override
 	public void preferencesHasChanged() {
-		updateStatistic();
+
+		updateStatistic(new StatisticContext(
+				_appPerson,
+				_appTourTypeFilter,
+				_statYoungestYear,
+				_statNumberOfYears,
+				false));
 	}
 
 	@Override
@@ -448,15 +454,6 @@ public abstract class StatisticWeek extends YearStatistic {
 	@Override
 	public void setSynchScale(final boolean isSynchScaleEnabled) {
 		_isSynchScaleEnabled = isSynchScaleEnabled;
-	}
-
-	private void updateStatistic() {
-		updateStatistic(new StatisticContext(
-				_appPerson,
-				_appTourTypeFilter,
-				_statYoungestYear,
-				_statNumberOfYears,
-				false));
 	}
 
 	@Override

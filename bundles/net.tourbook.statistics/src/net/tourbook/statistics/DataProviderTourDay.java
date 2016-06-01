@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,10 @@
 
 package net.tourbook.statistics;
 
+import gnu.trove.list.array.TFloatArrayList;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.list.array.TLongArrayList;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -24,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 
-import net.tourbook.common.util.ArrayListToArray;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
@@ -116,26 +119,28 @@ public class DataProviderTourDay extends DataProvider {
 
 		try {
 
-			final ArrayList<Long> dbTourIds = new ArrayList<Long>();
+			final TLongArrayList dbTourIds = new TLongArrayList();
 
-			final ArrayList<Integer> dbYear = new ArrayList<Integer>();
-			final ArrayList<Integer> dbMonths = new ArrayList<Integer>();
-			final ArrayList<Integer> dbAllYearsDOY = new ArrayList<Integer>(); // DOY...Day Of Year
+			final TIntArrayList dbYear = new TIntArrayList();
+			final TIntArrayList dbMonths = new TIntArrayList();
+			final TIntArrayList dbAllYearsDOY = new TIntArrayList(); // DOY...Day Of Year
 
-			final ArrayList<Integer> dbTourStartTime = new ArrayList<Integer>();
-			final ArrayList<Integer> dbTourEndTime = new ArrayList<Integer>();
-			final ArrayList<Integer> dbTourStartWeek = new ArrayList<Integer>();
+			final TIntArrayList dbTourStartTime = new TIntArrayList();
+			final TIntArrayList dbTourEndTime = new TIntArrayList();
+			final TIntArrayList dbTourStartWeek = new TIntArrayList();
 
-			final ArrayList<Float> dbDistance = new ArrayList<Float>();
-			final ArrayList<Float> dbAltitude = new ArrayList<Float>();
-			final ArrayList<Integer> dbTourDuration = new ArrayList<Integer>();
-			final ArrayList<Integer> dbTourRecordingTime = new ArrayList<Integer>();
-			final ArrayList<Integer> dbTourDrivingTime = new ArrayList<Integer>();
+			final TFloatArrayList dbDistance = new TFloatArrayList();
+			final TFloatArrayList dbAvgSpeed = new TFloatArrayList();
+			final TFloatArrayList dbAvgPace = new TFloatArrayList();
+			final TFloatArrayList dbAltitudeUp = new TFloatArrayList();
+			final TIntArrayList dbTourDuration = new TIntArrayList();
+			final TIntArrayList dbTourRecordingTime = new TIntArrayList();
+			final TIntArrayList dbTourDrivingTime = new TIntArrayList();
 			final ArrayList<String> dbTourTitle = new ArrayList<String>();
 			final ArrayList<String> dbTourDescription = new ArrayList<String>();
 
-			final ArrayList<Long> dbTypeIds = new ArrayList<Long>();
-			final ArrayList<Integer> dbTypeColorIndex = new ArrayList<Integer>();
+			final TLongArrayList dbTypeIds = new TLongArrayList();
+			final TIntArrayList dbTypeColorIndex = new TIntArrayList();
 
 			final HashMap<Long, ArrayList<Long>> dbTagIds = new HashMap<Long, ArrayList<Long>>();
 
@@ -185,9 +190,13 @@ public class DataProviderTourDay extends DataProvider {
 					dbAllYearsDOY.add(getYearDOYs(tourYear) + tourDOY);
 
 					// round distance
-					final int distance = result.getInt(7);
-					dbDistance.add(distance / UI.UNIT_VALUE_DISTANCE);
-					dbAltitude.add(result.getInt(8) / UI.UNIT_VALUE_ALTITUDE);
+					final float distance = result.getFloat(7) / UI.UNIT_VALUE_DISTANCE;
+					dbDistance.add(distance);
+
+					dbAltitudeUp.add(result.getInt(8) / UI.UNIT_VALUE_ALTITUDE);
+
+					dbAvgPace.add(distance == 0 ? 0 : drivingTime * 1000f / distance / 60.0f);
+					dbAvgSpeed.add(drivingTime == 0 ? 0 : 3.6f * distance / drivingTime);
 
 					dbTourStartTime.add(startTime);
 					dbTourEndTime.add((startTime + recordingTime));
@@ -233,22 +242,28 @@ public class DataProviderTourDay extends DataProvider {
 
 			conn.close();
 
-			final int[] tourYear = ArrayListToArray.toInt(dbYear);
-			final int[] tourAllYearsDOY = ArrayListToArray.toInt(dbAllYearsDOY);
+			final int[] tourYear = dbYear.toArray();
+			final int[] tourAllYearsDOY = dbAllYearsDOY.toArray();
 
-			final int[] timeHigh = ArrayListToArray.toInt(dbTourDuration);
-			final float[] distanceHigh = ArrayListToArray.toFloat(dbDistance);
-			final float[] altitudeHigh = ArrayListToArray.toFloat(dbAltitude);
+			final int[] durationHigh = dbTourDuration.toArray();
 
-			final int serieLength = timeHigh.length;
-			final int[] timeLow = new int[serieLength];
-			final float[] distanceLow = new float[serieLength];
+			final float[] altitudeHigh = dbAltitudeUp.toArray();
+			final float[] avgPaceHigh = dbAvgPace.toArray();
+			final float[] avgSpeedHigh = dbAvgSpeed.toArray();
+			final float[] distanceHigh = dbDistance.toArray();
+
+			final int serieLength = durationHigh.length;
+			final int[] durationLow = new int[serieLength];
 			final float[] altitudeLow = new float[serieLength];
+			final float[] avgPaceLow = new float[serieLength];
+			final float[] avgSpeedLow = new float[serieLength];
+			final float[] distanceLow = new float[serieLength];
 
 			/*
 			 * adjust low/high values when a day has multiple tours
 			 */
 			int prevTourDOY = -1;
+
 			for (int tourIndex = 0; tourIndex < tourAllYearsDOY.length; tourIndex++) {
 
 				final int tourDOY = tourAllYearsDOY[tourIndex];
@@ -257,9 +272,12 @@ public class DataProviderTourDay extends DataProvider {
 
 					// current tour is at the same day as the tour before
 
-					timeHigh[tourIndex] += timeLow[tourIndex] = timeHigh[tourIndex - 1];
-					distanceHigh[tourIndex] += distanceLow[tourIndex] = distanceHigh[tourIndex - 1];
+					durationHigh[tourIndex] += durationLow[tourIndex] = durationHigh[tourIndex - 1];
+
 					altitudeHigh[tourIndex] += altitudeLow[tourIndex] = altitudeHigh[tourIndex - 1];
+					avgPaceHigh[tourIndex] += avgPaceLow[tourIndex] = avgPaceHigh[tourIndex - 1];
+					avgSpeedHigh[tourIndex] += avgSpeedLow[tourIndex] = avgSpeedHigh[tourIndex - 1];
+					distanceHigh[tourIndex] += distanceLow[tourIndex] = distanceHigh[tourIndex - 1];
 
 				} else {
 
@@ -275,24 +293,24 @@ public class DataProviderTourDay extends DataProvider {
 				yearDays += doy;
 			}
 
-			_tourDayData.tourIds = ArrayListToArray.toLong(dbTourIds);
+			_tourDayData.tourIds = dbTourIds.toArray();
 
 			_tourDayData.yearValues = tourYear;
-			_tourDayData.monthValues = ArrayListToArray.toInt(dbMonths);
+			_tourDayData.monthValues = dbMonths.toArray();
 			_tourDayData.setDoyValues(tourAllYearsDOY);
-			_tourDayData.weekValues = ArrayListToArray.toInt(dbTourStartWeek);
+			_tourDayData.weekValues = dbTourStartWeek.toArray();
 
 			_tourDayData.allDaysInAllYears = yearDays;
 			_tourDayData.yearDays = _yearDays;
 			_tourDayData.years = _years;
 
-			_tourDayData.typeIds = ArrayListToArray.toLong(dbTypeIds);
-			_tourDayData.typeColorIndex = ArrayListToArray.toInt(dbTypeColorIndex);
+			_tourDayData.typeIds = dbTypeIds.toArray();
+			_tourDayData.typeColorIndex = dbTypeColorIndex.toArray();
 
 			_tourDayData.tagIds = dbTagIds;
 
-			_tourDayData.setTimeLow(timeLow);
-			_tourDayData.setTimeHigh(timeHigh);
+			_tourDayData.setDurationLow(durationLow);
+			_tourDayData.setDurationHigh(durationHigh);
 
 			_tourDayData.distanceLow = distanceLow;
 			_tourDayData.distanceHigh = distanceHigh;
@@ -300,14 +318,20 @@ public class DataProviderTourDay extends DataProvider {
 			_tourDayData.altitudeLow = altitudeLow;
 			_tourDayData.altitudeHigh = altitudeHigh;
 
-			_tourDayData.tourStartValues = ArrayListToArray.toInt(dbTourStartTime);
-			_tourDayData.tourEndValues = ArrayListToArray.toInt(dbTourEndTime);
+			_tourDayData.avgPaceLow = avgPaceLow;
+			_tourDayData.avgPaceHigh = avgPaceHigh;
 
-			_tourDayData.tourDistanceValues = ArrayListToArray.toFloat(dbDistance);
-			_tourDayData.tourAltitudeValues = ArrayListToArray.toFloat(dbAltitude);
+			_tourDayData.avgSpeedLow = avgSpeedLow;
+			_tourDayData.avgSpeedHigh = avgSpeedHigh;
 
-			_tourDayData.recordingTime = ArrayListToArray.toInt(dbTourRecordingTime);
-			_tourDayData.drivingTime = ArrayListToArray.toInt(dbTourDrivingTime);
+			_tourDayData.tourStartValues = dbTourStartTime.toArray();
+			_tourDayData.tourEndValues = dbTourEndTime.toArray();
+
+			_tourDayData.tourDistanceValues = dbDistance.toArray();
+			_tourDayData.tourAltitudeValues = dbAltitudeUp.toArray();
+
+			_tourDayData.recordingTime = dbTourRecordingTime.toArray();
+			_tourDayData.drivingTime = dbTourDrivingTime.toArray();
 
 			_tourDayData.tourTitle = dbTourTitle;
 			_tourDayData.tourDescription = dbTourDescription;

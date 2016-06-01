@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -35,13 +35,17 @@ public class TourDataDay {
 	int[]							yearDays;
 	int								allDaysInAllYears;
 
-	float[]							distanceLow;
-	float[]							distanceHigh;
 	float[]							altitudeLow;
 	float[]							altitudeHigh;
+	float[]							avgPaceLow;
+	float[]							avgPaceHigh;
+	float[]							avgSpeedLow;
+	float[]							avgSpeedHigh;
+	float[]							distanceLow;
+	float[]							distanceHigh;
 
-	private float[]					_timeLowFloat;
-	private float[]					_timeHighFloat;
+	private float[]					_durationLowFloat;
+	private float[]					_durationHighFloat;
 
 	int[]							recordingTime;
 	int[]							drivingTime;
@@ -68,12 +72,12 @@ public class TourDataDay {
 		return _doyValuesDouble;
 	}
 
-	public float[] getTimeHighFloat() {
-		return _timeHighFloat;
+	public float[] getDurationHighFloat() {
+		return _durationHighFloat;
 	}
 
-	public float[] getTimeLowFloat() {
-		return _timeLowFloat;
+	public float[] getDurationLowFloat() {
+		return _durationLowFloat;
 	}
 
 	public void setDoyValues(final int[] doyValues) {
@@ -86,21 +90,21 @@ public class TourDataDay {
 		}
 	}
 
-	public void setTimeHigh(final int[] timeHigh) {
+	public void setDurationHigh(final int[] timeHigh) {
 
-		_timeHighFloat = new float[timeHigh.length];
+		_durationHighFloat = new float[timeHigh.length];
 
 		for (int valueIndex = 0; valueIndex < timeHigh.length; valueIndex++) {
-			_timeHighFloat[valueIndex] = timeHigh[valueIndex];
+			_durationHighFloat[valueIndex] = timeHigh[valueIndex];
 		}
 	}
 
-	public void setTimeLow(final int[] timeLow) {
+	public void setDurationLow(final int[] timeLow) {
 
-		_timeLowFloat = new float[timeLow.length];
+		_durationLowFloat = new float[timeLow.length];
 
 		for (int valueIndex = 0; valueIndex < timeLow.length; valueIndex++) {
-			_timeLowFloat[valueIndex] = timeLow[valueIndex];
+			_durationLowFloat[valueIndex] = timeLow[valueIndex];
 		}
 	}
 

@@ -13,13 +13,20 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package net.tourbook.statistics;
 
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartType;
 
 public class StatisticDayDistance extends StatisticDay {
+
+	@Override
+	public String toString() {
+		return "Statistic [" //
+				+ ("statisticId=" + statisticId + ", ")
+				+ ("visibleName=" + visibleName)
+				+ "]";
+	}
 
 	@Override
 	ChartDataModel updateChart() {

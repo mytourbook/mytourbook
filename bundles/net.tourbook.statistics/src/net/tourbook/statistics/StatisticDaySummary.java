@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,13 +13,20 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package net.tourbook.statistics;
 
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartType;
 
-public class StatisticDayCombined extends StatisticDay {
+public class StatisticDaySummary extends StatisticDay {
+
+	@Override
+	public String toString() {
+		return "Statistic [" //
+				+ ("statisticId=" + statisticId + ", ")
+				+ ("visibleName=" + visibleName)
+				+ "]";
+	}
 
 	@Override
 	ChartDataModel updateChart() {
@@ -30,6 +37,8 @@ public class StatisticDayCombined extends StatisticDay {
 		createYDataDistance(chartDataModel);
 		createYDataAltitude(chartDataModel);
 		createYDataDuration(chartDataModel);
+		createYDataAvgPace(chartDataModel);
+		createYDataAvgSpeed(chartDataModel);
 
 		return chartDataModel;
 	}

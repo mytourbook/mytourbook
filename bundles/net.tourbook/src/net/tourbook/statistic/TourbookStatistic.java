@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -220,7 +220,7 @@ public abstract class TourbookStatistic {
 	public abstract void setSynchScale(boolean isEnabled);
 
 	/**
-	 * this method is called before the statistic control will be displayed. When the toolbar
+	 * This method is called before the statistic control will be displayed. When the toolbar
 	 * manager is used, this method should put the actions into the toolbar manager
 	 * 
 	 * @param refreshToolbar

@@ -10,7 +10,7 @@
             name="%Pref_Tour_Time"/>
             
       <statistic
-            class="net.tourbook.statistics.StatisticDayCombined"
+            class="net.tourbook.statistics.StatisticDaySummary"
             id="net.tourbook.statistics.StatisticSummaryDayCombined"
             name="%Pref_Day_Summary"/>
             

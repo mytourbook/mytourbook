@@ -506,6 +506,7 @@ public class StatisticWeekHrZone extends YearStatistic {
 	}
 
 	private void updateStatistic() {
+
 		updateStatistic(new StatisticContext(
 				_appPerson,
 				_appTourTypeFilter,

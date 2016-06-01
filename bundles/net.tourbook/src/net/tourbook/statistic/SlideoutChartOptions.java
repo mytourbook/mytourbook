@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.tourChart;
+package net.tourbook.statistic;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -51,7 +51,7 @@ import org.eclipse.swt.widgets.ToolBar;
 /**
  * Tour chart marker properties slideout.
  */
-public class SlideoutTourChartOptions extends AnimatedToolTipShell {
+public class SlideoutChartOptions extends AnimatedToolTipShell {
 
 	private final IPreferenceStore	_prefStore			= TourbookPlugin.getPrefStore();
 
@@ -92,23 +92,20 @@ public class SlideoutTourChartOptions extends AnimatedToolTipShell {
 	/*
 	 * UI controls
 	 */
+	private Shell					_parentShell;
 	private Composite				_shellContainer;
-	private TourChart				_tourChart;
 
-	private Button					_chkShowBreaktimeValues;
-	private Button					_chkShowSrtmData;
-	private Button					_chkShowStartTimeOnXAxis;
-	private Button					_chkShowValuePointTooltip;
 	private Button					_chkShowGrid_HorizontalLines;
 	private Button					_chkShowGrid_VerticalLines;
 
-	private Label					_lblGridHorizontal_Unit;
 	private Label					_lblGridHorizontal;
+	private Label					_lblGridHorizontal_Unit;
 	private Label					_lblGridVertical;
 	private Label					_lblGridVertical_Unit;
 
 	private Spinner					_spinnerGridHorizontalDistance;
 	private Spinner					_spinnerGridVerticalDistance;
+
 
 	private final class WaitTimer implements Runnable {
 		@Override
@@ -117,13 +114,11 @@ public class SlideoutTourChartOptions extends AnimatedToolTipShell {
 		}
 	}
 
-	public SlideoutTourChartOptions(final Control ownerControl,
-									final ToolBar toolBar,
-									final TourChart tourChart) {
+	public SlideoutChartOptions(final Control ownerControl, final ToolBar toolBar) {
 
 		super(ownerControl);
 
-		_tourChart = tourChart;
+		_parentShell = ownerControl.getShell();
 
 		addListener(ownerControl, toolBar);
 
@@ -204,7 +199,7 @@ public class SlideoutTourChartOptions extends AnimatedToolTipShell {
 		/*
 		 * Set shell to the parent otherwise the pref dialog is closed when the slideout is closed.
 		 */
-		_actionPrefDialog.setShell(_tourChart.getShell());
+		_actionPrefDialog.setShell(_parentShell);
 	}
 
 	@Override
@@ -237,7 +232,6 @@ public class SlideoutTourChartOptions extends AnimatedToolTipShell {
 			{
 				createUI_10_Title(container);
 				createUI_12_Actions(container);
-				createUI_20_Controls(container);
 				createUI_30_Grid(container);
 			}
 		}
@@ -270,92 +264,6 @@ public class SlideoutTourChartOptions extends AnimatedToolTipShell {
 		tbm.add(_actionPrefDialog);
 
 		tbm.update(true);
-	}
-
-	private void createUI_20_Controls(final Composite parent) {
-
-//		addItem(tourChartActions.get(TourChart.ACTION_ID_IS_SHOW_BREAKTIME_VALUES));
-//		addItem(tourChartActions.get(TourChart.ACTION_ID_IS_SHOW_START_TIME));
-//		addItem(tourChartActions.get(TourChart.ACTION_ID_IS_SHOW_SRTM_DATA));
-//		addItem(tourChartActions.get(TourChart.ACTION_ID_IS_SHOW_VALUEPOINT_TOOLTIP));
-//
-//		(new Separator()).fill(_menu, -1);
-//		addItem(tourChartActions.get(TourChart.ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER));
-//		addItem(tourChartActions.get(TourChart.ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED));
-//
-//		(new Separator()).fill(_menu, -1);
-//		addItem(tourChartActions.get(TourChart.ACTION_ID_EDIT_CHART_PREFERENCES));
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-				.grab(true, false)
-				.span(2, 1)
-				.applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-		{
-			{
-				/*
-				 * Show break time values
-				 */
-				_chkShowBreaktimeValues = new Button(container, SWT.CHECK);
-				_chkShowBreaktimeValues.setText(Messages.Tour_Action_ShowBreaktimeValues);
-
-				GridDataFactory.fillDefaults()//
-						.span(2, 1)
-						.applyTo(_chkShowBreaktimeValues);
-
-				_chkShowBreaktimeValues.addSelectionListener(_defaultSelectionListener);
-			}
-			{
-				/*
-				 * Show start time on x-axis
-				 */
-				_chkShowStartTimeOnXAxis = new Button(container, SWT.CHECK);
-				_chkShowStartTimeOnXAxis.setText(Messages.Tour_Action_show_start_time_on_x_axis);
-
-				GridDataFactory.fillDefaults()//
-						.span(2, 1)
-						.applyTo(_chkShowStartTimeOnXAxis);
-
-				_chkShowStartTimeOnXAxis.addSelectionListener(_defaultSelectionListener);
-			}
-			{
-				/*
-				 * Show SRTM data
-				 */
-				_chkShowSrtmData = new Button(container, SWT.CHECK);
-				_chkShowSrtmData.setText(Messages.tour_action_show_srtm_data);
-
-				GridDataFactory.fillDefaults()//
-						.span(2, 1)
-						.applyTo(_chkShowSrtmData);
-
-				_chkShowSrtmData.addSelectionListener(_defaultSelectionListener);
-			}
-			{
-				/*
-				 * Show value point tooltip
-				 */
-				_chkShowValuePointTooltip = new Button(container, SWT.CHECK);
-				_chkShowValuePointTooltip.setText(Messages.Tour_Action_ValuePointToolTip_IsVisible);
-
-				GridDataFactory.fillDefaults()//
-						.span(2, 1)
-						.applyTo(_chkShowValuePointTooltip);
-
-				_chkShowValuePointTooltip.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(final SelectionEvent e) {
-
-						// set in pref store, tooltip is listening pref store modifications
-						_prefStore.setValue(
-								ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE,
-								_chkShowValuePointTooltip.getSelection());
-
-					}
-				});
-			}
-		}
 	}
 
 	private void createUI_30_Grid(final Composite parent) {
@@ -481,12 +389,7 @@ public class SlideoutTourChartOptions extends AnimatedToolTipShell {
 
 	private void enableControls() {
 
-//		final boolean isShowInfoTooltip = _chkShowInfoTooltip.getSelection();
-//
-//		_lblTooltipDelay.setEnabled(isShowInfoTooltip);
-//		_spinTooltipDelay.setEnabled(isShowInfoTooltip);
 	}
-
 
 	public Shell getShell() {
 
@@ -539,13 +442,12 @@ public class SlideoutTourChartOptions extends AnimatedToolTipShell {
 		saveState();
 
 		// update chart with new settings
-		_tourChart.updateTourChart();
+//		_tourChart.updateTourChart();
 
 		enableControls();
 	}
 
 	private void onSelectGridLine() {
-
 
 		// run async otherwise the update of the dialog box UI is slooooow
 		_shellContainer.getDisplay().asyncExec(new Runnable() {
@@ -609,33 +511,6 @@ public class SlideoutTourChartOptions extends AnimatedToolTipShell {
 
 	private void resetToDefaults() {
 
-		final TourChartConfiguration tcc = _tourChart.getTourChartConfig();
-
-		final boolean isShowBreaktimeValues = _prefStore.getDefaultBoolean(//
-				ITourbookPreferences.GRAPH_IS_BREAKTIME_VALUES_VISIBLE);
-
-		final boolean isTourStartTime = _prefStore.getDefaultBoolean(//
-				ITourbookPreferences.GRAPH_X_AXIS_STARTTIME);
-
-		final boolean isSrtmDataVisible = _prefStore.getDefaultBoolean(//
-				ITourbookPreferences.GRAPH_X_AXIS_STARTTIME);
-
-		final boolean isShowValuePointTooltip = _prefStore.getDefaultBoolean(//
-				ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE);
-
-		final X_AXIS_START_TIME xAxisStartTime = isTourStartTime
-				? X_AXIS_START_TIME.TOUR_START_TIME
-				: X_AXIS_START_TIME.START_WITH_0;
-
-		tcc.isShowBreaktimeValues = isShowBreaktimeValues;
-		tcc.isSRTMDataVisible = isSrtmDataVisible;
-		tcc.xAxisTime = xAxisStartTime;
-
-		_chkShowBreaktimeValues.setSelection(isShowBreaktimeValues);
-		_chkShowSrtmData.setSelection(isSrtmDataVisible);
-		_chkShowStartTimeOnXAxis.setSelection(isTourStartTime);
-		_chkShowValuePointTooltip.setSelection(isShowValuePointTooltip);
-
 		/*
 		 * Grid lines
 		 */
@@ -649,29 +524,11 @@ public class SlideoutTourChartOptions extends AnimatedToolTipShell {
 		_chkShowGrid_VerticalLines.setSelection(//
 				_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES));
 
-		// this is not set in saveState()
-		_prefStore.setValue(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE, isShowValuePointTooltip);
-
 		onChangeUI();
 	}
 
 	private void restoreState() {
 
-		final TourChartConfiguration tcc = _tourChart.getTourChartConfig();
-
-		final boolean canShowTimeOnXAxis = tcc.isShowTimeOnXAxis;
-		final boolean canShowSRTMData = tcc.canShowSRTMData;
-
-		_chkShowBreaktimeValues.setSelection(tcc.isShowBreaktimeValues);
-
-		_chkShowSrtmData.setEnabled(canShowSRTMData);
-		_chkShowSrtmData.setSelection(tcc.isSRTMDataVisible);
-
-		_chkShowStartTimeOnXAxis.setEnabled(canShowTimeOnXAxis);
-		_chkShowStartTimeOnXAxis.setSelection(tcc.xAxisTime == X_AXIS_START_TIME.TOUR_START_TIME);
-
-		_chkShowValuePointTooltip.setSelection(_prefStore.getBoolean(//
-				ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE));
 		/*
 		 * Grid
 		 */
@@ -688,23 +545,6 @@ public class SlideoutTourChartOptions extends AnimatedToolTipShell {
 
 	private void saveState() {
 
-		final TourChartConfiguration tcc = _tourChart.getTourChartConfig();
-
-		final boolean isShowBreaktimeValues = _chkShowBreaktimeValues.getSelection();
-		final boolean isTourStartTime = _chkShowStartTimeOnXAxis.getSelection();
-		final boolean isSrtmDataVisible = _chkShowSrtmData.getSelection();
-
-		final X_AXIS_START_TIME xAxisStartTime = isTourStartTime
-				? X_AXIS_START_TIME.TOUR_START_TIME
-				: X_AXIS_START_TIME.START_WITH_0;
-
-		/*
-		 * Update pref store
-		 */
-		_prefStore.setValue(ITourbookPreferences.GRAPH_IS_BREAKTIME_VALUES_VISIBLE, isShowBreaktimeValues);
-		_prefStore.setValue(ITourbookPreferences.GRAPH_IS_SRTM_VISIBLE, isSrtmDataVisible);
-		_prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME, isTourStartTime);
-
 		/*
 		 * Grid
 		 */
@@ -717,15 +557,6 @@ public class SlideoutTourChartOptions extends AnimatedToolTipShell {
 				_chkShowGrid_HorizontalLines.getSelection());
 		_prefStore.setValue(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES, //
 				_chkShowGrid_VerticalLines.getSelection());
-
-		_tourChart.setupChartConfig();
-
-		/*
-		 * Update chart config
-		 */
-		tcc.isShowBreaktimeValues = isShowBreaktimeValues;
-		tcc.isSRTMDataVisible = isSrtmDataVisible;
-		tcc.xAxisTime = xAxisStartTime;
 	}
 
 }

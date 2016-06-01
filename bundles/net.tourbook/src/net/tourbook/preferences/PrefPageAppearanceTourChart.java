@@ -56,7 +56,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
@@ -117,7 +116,6 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 	private PixelConverter			_pc;
 	private int						_columnSpacing;
-	private boolean					_isGridWarningDisplayed;
 
 	/*
 	 * UI controls
@@ -162,11 +160,10 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 	private Button					_chkShowGrid_VerticalLines;
 	private Button					_chkZoomToSlider;
 
-	private Label					_lblGridHorizontalUnit;
 	private Label					_lblGridHorizontal;
+	private Label					_lblGridHorizontal_Unit;
 	private Label					_lblGridVertical;
-	private Label					_lblGridVerticalUnit;
-	private Label					_lblGridWarning;
+	private Label					_lblGridVertical_Unit;
 	private Label					_lblMaxValue;
 	private Label					_lblMinValue;
 	private Label					_lblMinMax_Altimeter;
@@ -813,16 +810,12 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 	private void createUI_72_Grid(final Composite parent) {
 
-		final SelectionAdapter gridLineListener = new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onSelectGridLine();
-			}
-		};
-
 		final Group group = new Group(parent, SWT.NONE);
 		group.setText(Messages.Pref_Graphs_Group_Grid);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
+		GridDataFactory.fillDefaults()//
+				.grab(true, false)
+				.span(2, 1)
+				.applyTo(group);
 		GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
 //		group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 		{
@@ -839,24 +832,12 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 			{
 				/*
-				 * checkbox: show horizontal grid
-				 */
-				_chkShowGrid_HorizontalLines = new Button(group, SWT.CHECK);
-				_chkShowGrid_HorizontalLines.setText(Messages.Pref_Graphs_Checkbox_ShowHorizontalGrid);
-				_chkShowGrid_HorizontalLines.addSelectionListener(gridLineListener);
-				GridDataFactory.fillDefaults()//
-//						.indent(0, 15)
-						.span(3, 1)
-						.applyTo(_chkShowGrid_HorizontalLines);
-			}
-			{
-				/*
 				 * label: horizontal grid
 				 */
 				_lblGridHorizontal = new Label(group, SWT.NONE);
 				_lblGridHorizontal.setText(Messages.Pref_Graphs_grid_horizontal_distance);
 				GridDataFactory.fillDefaults()//
-						.indent(16, 0)
+//						.indent(16, 0)
 						.align(SWT.FILL, SWT.CENTER)
 						.applyTo(_lblGridHorizontal);
 
@@ -865,7 +846,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 				 */
 				_spinnerGridHorizontalDistance = new Spinner(group, SWT.BORDER);
 				_spinnerGridHorizontalDistance.setMinimum(10);
-				_spinnerGridHorizontalDistance.setMaximum(200);
+				_spinnerGridHorizontalDistance.setMaximum(1000);
 				_spinnerGridHorizontalDistance.addMouseWheelListener(_defaultMouseWheelListener);
 				_spinnerGridHorizontalDistance.addSelectionListener(_defaultSelectionListener);
 				GridDataFactory.fillDefaults() //
@@ -875,24 +856,13 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 				/*
 				 * Label: px
 				 */
-				_lblGridHorizontalUnit = new Label(group, SWT.NONE);
-				_lblGridHorizontalUnit.setText(Messages.App_Unit_Px);
+				_lblGridHorizontal_Unit = new Label(group, SWT.NONE);
+				_lblGridHorizontal_Unit.setText(Messages.App_Unit_Px);
 				GridDataFactory.fillDefaults()//
 						.align(SWT.FILL, SWT.CENTER)
-						.applyTo(_lblGridHorizontalUnit);
+						.applyTo(_lblGridHorizontal_Unit);
 			}
 
-			{
-				/*
-				 * checkbox: show vertical grid
-				 */
-				_chkShowGrid_VerticalLines = new Button(group, SWT.CHECK);
-				_chkShowGrid_VerticalLines.setText(Messages.Pref_Graphs_Checkbox_ShowVerticalGrid);
-				_chkShowGrid_VerticalLines.addSelectionListener(gridLineListener);
-				GridDataFactory.fillDefaults()//
-						.span(3, 1)
-						.applyTo(_chkShowGrid_VerticalLines);
-			}
 			{
 				/*
 				 * label: vertical grid
@@ -900,7 +870,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 				_lblGridVertical = new Label(group, SWT.NONE);
 				_lblGridVertical.setText(Messages.Pref_Graphs_grid_vertical_distance);
 				GridDataFactory.fillDefaults()//
-						.indent(16, 0)
+//						.indent(16, 0)
 						.align(SWT.FILL, SWT.CENTER)
 						.applyTo(_lblGridVertical);
 
@@ -909,7 +879,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 				 */
 				_spinnerGridVerticalDistance = new Spinner(group, SWT.BORDER);
 				_spinnerGridVerticalDistance.setMinimum(10);
-				_spinnerGridVerticalDistance.setMaximum(200);
+				_spinnerGridVerticalDistance.setMaximum(1000);
 				_spinnerGridVerticalDistance.addMouseWheelListener(_defaultMouseWheelListener);
 				_spinnerGridVerticalDistance.addSelectionListener(_defaultSelectionListener);
 				GridDataFactory.fillDefaults() //
@@ -918,23 +888,36 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 				/*
 				 * Label: px
 				 */
-				_lblGridVerticalUnit = new Label(group, SWT.NONE);
-				_lblGridVerticalUnit.setText(Messages.App_Unit_Px);
+				_lblGridVertical_Unit = new Label(group, SWT.NONE);
+				_lblGridVertical_Unit.setText(Messages.App_Unit_Px);
 				GridDataFactory.fillDefaults()//
 						.align(SWT.FILL, SWT.CENTER)
-						.applyTo(_lblGridVerticalUnit);
+						.applyTo(_lblGridVertical_Unit);
 			}
-
 			{
 				/*
-				 * label: grid warning
+				 * checkbox: show horizontal grid
 				 */
-				_lblGridWarning = new Label(group, SWT.WRAP);
+				_chkShowGrid_HorizontalLines = new Button(group, SWT.CHECK);
+				_chkShowGrid_HorizontalLines.setText(Messages.Pref_Graphs_Checkbox_ShowHorizontalGrid);
+				_chkShowGrid_HorizontalLines.setToolTipText(Messages.Pref_Graphs_Dialog_GridLine_Warning_Message);
+				_chkShowGrid_HorizontalLines.addSelectionListener(_defaultSelectionListener);
+				GridDataFactory.fillDefaults()//
+//						.indent(0, 15)
+						.span(3, 1)
+						.applyTo(_chkShowGrid_HorizontalLines);
+			}
+			{
+				/*
+				 * checkbox: show vertical grid
+				 */
+				_chkShowGrid_VerticalLines = new Button(group, SWT.CHECK);
+				_chkShowGrid_VerticalLines.setText(Messages.Pref_Graphs_Checkbox_ShowVerticalGrid);
+				_chkShowGrid_VerticalLines.setToolTipText(Messages.Pref_Graphs_Dialog_GridLine_Warning_Message);
+				_chkShowGrid_VerticalLines.addSelectionListener(_defaultSelectionListener);
 				GridDataFactory.fillDefaults()//
 						.span(3, 1)
-						.grab(true, false)
-//						.align(SWT.FILL, SWT.CENTER)
-						.applyTo(_lblGridWarning);
+						.applyTo(_chkShowGrid_VerticalLines);
 			}
 		}
 	}
@@ -1204,20 +1187,6 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		_colorSegmentAlternateColor.setEnabled(_chkSegmentAlternateColor.getSelection());
 	}
 
-	private void enableGridControls() {
-
-		final boolean isHorizontalGridLines = _chkShowGrid_HorizontalLines.getSelection();
-		final boolean isVerticalGridLines = _chkShowGrid_VerticalLines.getSelection();
-
-		_lblGridHorizontal.setEnabled(isHorizontalGridLines);
-		_lblGridHorizontalUnit.setEnabled(isHorizontalGridLines);
-		_lblGridVertical.setEnabled(isVerticalGridLines);
-		_lblGridVerticalUnit.setEnabled(isVerticalGridLines);
-
-		_spinnerGridHorizontalDistance.setEnabled(isHorizontalGridLines);
-		_spinnerGridVerticalDistance.setEnabled(isVerticalGridLines);
-	}
-
 	/**
 	 * check if the up/down button are enabled
 	 */
@@ -1377,25 +1346,6 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		return super.okToLeave();
 	}
 
-	private void onSelectGridLine() {
-
-		// show performance warning
-		if (_isGridWarningDisplayed == false
-				&& (_chkShowGrid_HorizontalLines.getSelection() || _chkShowGrid_VerticalLines.getSelection())) {
-
-			_isGridWarningDisplayed = true;
-
-			_lblGridWarning.setText(Messages.Pref_Graphs_Dialog_GridLine_Warning_Message);
-			_lblGridWarning.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
-
-			_tabFolder.layout(true, true);
-		}
-
-		enableGridControls();
-
-		doLiveUpdate();
-	}
-
 	private void onSelection() {
 
 		/*
@@ -1417,7 +1367,6 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 		enableActions();
 		enableControls();
-		enableGridControls();
 
 		doLiveUpdate();
 	}
@@ -1586,7 +1535,6 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 				_prefStore.getBoolean(ITourbookPreferences.GRAPH_PREF_PAGE_IS_TOUR_CHART_LIVE_UPDATE));
 
 		enableControls();
-		enableGridControls();
 	}
 
 	private void restoreState_Tab_1_Graphs() {

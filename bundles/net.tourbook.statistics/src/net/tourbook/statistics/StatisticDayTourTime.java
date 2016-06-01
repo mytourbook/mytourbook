@@ -22,6 +22,14 @@ import net.tourbook.chart.ChartType;
 public class StatisticDayTourTime extends StatisticDay {
 
 	@Override
+	public String toString() {
+		return "Statistic [" //
+				+ ("statisticId=" + statisticId + ", ")
+				+ ("visibleName=" + visibleName)
+				+ "]";
+	}
+
+	@Override
 	ChartDataModel updateChart() {
 
 		final ChartDataModel chartDataModel = new ChartDataModel(ChartType.BAR);

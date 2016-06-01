@@ -150,4 +150,12 @@ public abstract class YearStatistic extends TourbookStatistic implements IYearSt
 		ctsConfig.isShowSegmentSeparator = true;
 		ctsConfig.isShowSegmentTitle = true;
 	}
+
+	@Override
+	public String toString() {
+		return "YearStatistic [" //
+				+ ("statisticId=" + statisticId + ", ")
+				+ ("visibleName=" + visibleName)
+				+ "]";
+	}
 }

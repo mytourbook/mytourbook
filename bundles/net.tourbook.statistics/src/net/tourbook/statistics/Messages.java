@@ -24,6 +24,10 @@ public class Messages extends NLS {
 	public static String		LABEL_GRAPH_ALTITUDE;
 	public static String		LABEL_GRAPH_DAYTIME;
 	public static String		LABEL_GRAPH_DISTANCE;
+
+	public static String	LABEL_GRAPH_PACE;
+
+	public static String	LABEL_GRAPH_SPEED;
 	public static String		LABEL_GRAPH_TIME;
 	public static String		LABEL_GRAPH_TIME_UNIT;
 

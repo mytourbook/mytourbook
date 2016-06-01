@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -61,10 +61,6 @@ import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPart;
 
 public abstract class StatisticDay extends YearStatistic implements IBarSelectionProvider, ITourProvider {
-
-	private static final String			DISTANCE_DATA				= "distance";									//$NON-NLS-1$
-	private static final String			ALTITUDE_DATA				= "altitude";									//$NON-NLS-1$
-	private static final String			DURATION_DATA				= "duration";									//$NON-NLS-1$
 
 	private TourTypeFilter				_activeTourTypeFilter;
 	private TourPerson					_activePerson;
@@ -420,18 +416,58 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 				ChartType.BAR,
 				_tourDayData.altitudeLow,
 				_tourDayData.altitudeHigh);
+
 		yData.setYTitle(Messages.LABEL_GRAPH_ALTITUDE);
 		yData.setUnitLabel(UI.UNIT_LABEL_ALTITUDE);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
 		yData.setAllValueColors(0);
 		yData.setVisibleMinValue(0);
-		yData.setCustomData(ALTITUDE_DATA, 1);
 		yData.setColorIndex(new int[][] { _tourDayData.typeColorIndex });
 
 		StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE);
 		StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE, _activeTourTypeFilter);
 
 		chartModel.addYData(yData);
+	}
+
+	void createYDataAvgPace(final ChartDataModel chartDataModel) {
+
+		final ChartDataYSerie yData = new ChartDataYSerie(
+				ChartType.BAR,
+				_tourDayData.avgPaceLow,
+				_tourDayData.avgPaceHigh);
+
+		yData.setYTitle(Messages.LABEL_GRAPH_PACE);
+		yData.setUnitLabel(UI.UNIT_LABEL_PACE);
+		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
+		yData.setAllValueColors(0);
+		yData.setVisibleMinValue(0);
+		yData.setColorIndex(new int[][] { _tourDayData.typeColorIndex });
+
+		StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_PACE);
+		StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_PACE, _activeTourTypeFilter);
+
+		chartDataModel.addYData(yData);
+	}
+
+	void createYDataAvgSpeed(final ChartDataModel chartDataModel) {
+
+		final ChartDataYSerie yData = new ChartDataYSerie(
+				ChartType.BAR,
+				_tourDayData.avgSpeedLow,
+				_tourDayData.avgSpeedHigh);
+
+		yData.setYTitle(Messages.LABEL_GRAPH_SPEED);
+		yData.setUnitLabel(UI.UNIT_LABEL_SPEED);
+		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
+		yData.setAllValueColors(0);
+		yData.setVisibleMinValue(0);
+		yData.setColorIndex(new int[][] { _tourDayData.typeColorIndex });
+
+		StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_SPEED);
+		StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_SPEED, _activeTourTypeFilter);
+
+		chartDataModel.addYData(yData);
 	}
 
 	/**
@@ -443,13 +479,13 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 				ChartType.BAR,
 				_tourDayData.distanceLow,
 				_tourDayData.distanceHigh);
+
 		yData.setYTitle(Messages.LABEL_GRAPH_DISTANCE);
 		yData.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
 		yData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_NUMBER);
 		yData.setAllValueColors(0);
 		yData.setVisibleMinValue(0);
 		yData.setValueDivisor(1000);
-		yData.setCustomData(DISTANCE_DATA, 1);
 		yData.setColorIndex(new int[][] { _tourDayData.typeColorIndex });
 
 		StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_DISTANCE);
@@ -462,16 +498,17 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 	 * Time
 	 */
 	void createYDataDuration(final ChartDataModel chartModel) {
+
 		final ChartDataYSerie yData = new ChartDataYSerie(
 				ChartType.BAR,
-				_tourDayData.getTimeLowFloat(),
-				_tourDayData.getTimeHighFloat());
+				_tourDayData.getDurationLowFloat(),
+				_tourDayData.getDurationHighFloat());
+
 		yData.setYTitle(Messages.LABEL_GRAPH_TIME);
 		yData.setUnitLabel(Messages.LABEL_GRAPH_TIME_UNIT);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
 		yData.setAllValueColors(0);
 		yData.setVisibleMinValue(0);
-		yData.setCustomData(DURATION_DATA, 1);
 		yData.setColorIndex(new int[][] { _tourDayData.typeColorIndex });
 
 		StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_TIME);
@@ -519,6 +556,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 
 	@Override
 	public void preferencesHasChanged() {
+
 		updateStatistic(new StatisticContext(_activePerson, _activeTourTypeFilter, _currentYear, _numberOfYears, false));
 	}
 

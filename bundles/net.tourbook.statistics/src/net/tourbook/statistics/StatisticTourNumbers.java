@@ -256,7 +256,7 @@ public class StatisticTourNumbers extends YearStatistic {
 
 			final int diffDistance = (int) ((tourDayData.distanceHigh[tourIndex] - tourDayData.distanceLow[tourIndex] + 500) / 1000);
 			final int diffAltitude = (int) (tourDayData.altitudeHigh[tourIndex] - tourDayData.altitudeLow[tourIndex]);
-			final int diffTime = (int) (tourDayData.getTimeHighFloat()[tourIndex] - tourDayData.getTimeLowFloat()[tourIndex]);
+			final int diffTime = (int) (tourDayData.getDurationHighFloat()[tourIndex] - tourDayData.getDurationLowFloat()[tourIndex]);
 
 			unitIndex = createTourStatData(
 					diffDistance,

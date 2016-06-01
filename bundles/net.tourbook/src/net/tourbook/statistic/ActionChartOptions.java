@@ -13,13 +13,11 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.tourChart.action;
+package net.tourbook.statistic;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.tooltip.IOpeningDialog;
-import net.tourbook.ui.tourChart.SlideoutTourChartOptions;
-import net.tourbook.ui.tourChart.TourChart;
 
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.swt.SWT;
@@ -36,29 +34,26 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
-public class ActionTourChartOptions extends ContributionItem implements IOpeningDialog {
+public class ActionChartOptions extends ContributionItem implements IOpeningDialog {
 
-	private String						_dialogId	= getClass().getCanonicalName();
+	private String					_dialogId	= getClass().getCanonicalName();
 
-	private TourChart					_tourChart;
+	private ToolBar					_toolBar;
+	private ToolItem				_actionToolItem;
 
-	private ToolBar						_toolBar;
-	private ToolItem					_actionToolItem;
-
-	private SlideoutTourChartOptions	_slideoutChartOptions;
+	private SlideoutChartOptions	_slideoutChartOptions;
 
 	/*
 	 * UI controls
 	 */
-	private Control						_parent;
+	private Control					_parent;
 
-	private Image						_imageEnabled;
-	private Image						_imageDisabled;
+	private Image					_imageEnabled;
+	private Image					_imageDisabled;
 
-	public ActionTourChartOptions(final TourChart tourChart, final Control parent) {
+	public ActionChartOptions(final StatContainer statContainer) {
 
-		_tourChart = tourChart;
-		_parent = parent;
+		_parent = statContainer;
 
 		_imageEnabled = TourbookPlugin.getImageDescriptor(Messages.Image__tour_options).createImage();
 		_imageDisabled = TourbookPlugin.getImageDescriptor(Messages.Image__tour_options_disabled).createImage();
@@ -67,7 +62,7 @@ public class ActionTourChartOptions extends ContributionItem implements IOpening
 	@Override
 	public void fill(final ToolBar toolbar, final int index) {
 
-		if (_actionToolItem == null && toolbar != null) {
+		if ((_actionToolItem == null || _actionToolItem.isDisposed()) && toolbar != null) {
 
 			toolbar.addDisposeListener(new DisposeListener() {
 				@Override
@@ -99,7 +94,7 @@ public class ActionTourChartOptions extends ContributionItem implements IOpening
 				}
 			});
 
-			_slideoutChartOptions = new SlideoutTourChartOptions(_parent, _toolBar, _tourChart);
+			_slideoutChartOptions = new SlideoutChartOptions(_parent, _toolBar);
 		}
 	}
 
@@ -115,8 +110,11 @@ public class ActionTourChartOptions extends ContributionItem implements IOpening
 
 	private void onDispose() {
 
-		_actionToolItem.dispose();
-		_actionToolItem = null;
+		if (_actionToolItem != null) {
+
+			_actionToolItem.dispose();
+			_actionToolItem = null;
+		}
 	}
 
 	private void onMouseMove(final ToolItem hoveredItem, final MouseEvent mouseEvent) {
@@ -172,7 +170,7 @@ public class ActionTourChartOptions extends ContributionItem implements IOpening
 	private void openSlideout(final Rectangle itemBounds, final boolean isOpenDelayed) {
 
 		// ensure other dialogs are closed
-		_tourChart.closeOpenedDialogs(this);
+//		_tourChart.closeOpenedDialogs(this);
 
 		_slideoutChartOptions.open(itemBounds, isOpenDelayed);
 	}
