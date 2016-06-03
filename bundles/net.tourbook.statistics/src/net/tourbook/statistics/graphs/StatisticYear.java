@@ -31,7 +31,7 @@ import net.tourbook.data.TourPerson;
 import net.tourbook.statistic.StatisticContext;
 import net.tourbook.statistics.Messages;
 import net.tourbook.statistics.StatisticServices;
-import net.tourbook.statistics.YearStatistic;
+import net.tourbook.statistics.TourStatisticImpl;
 import net.tourbook.ui.TourTypeFilter;
 
 import org.eclipse.jface.viewers.IPostSelectionProvider;
@@ -39,7 +39,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IViewSite;
 
-public abstract class StatisticYear extends YearStatistic {
+public abstract class StatisticYear extends TourStatisticImpl {
 
 	private static final String			STRING_SEPARATOR	= " - ";						//$NON-NLS-1$
 
@@ -88,9 +88,9 @@ public abstract class StatisticYear extends YearStatistic {
 	}
 
 	@Override
-	public void createControl(	final Composite parent,
-								final IViewSite viewSite,
-								final IPostSelectionProvider postSelectionProvider) {
+	public void createStatisticControl(	final Composite parent,
+										final IViewSite viewSite,
+										final IPostSelectionProvider postSelectionProvider) {
 
 		super.createControl(parent);
 
@@ -259,14 +259,11 @@ public abstract class StatisticYear extends YearStatistic {
 		return allYears;
 	}
 
+	abstract ChartDataModel getChartDataModel();
+
 	@Override
 	public void preferencesHasChanged() {
 		updateStatistic(new StatisticContext(_activePerson, _activeTourTypeFilter, _currentYear, _numberOfYears, false));
-	}
-
-	@Override
-	public void resetSelection() {
-		_chart.setSelectedBars(null);
 	}
 
 	private void setChartProviders(final ChartDataModel chartModel) {
@@ -284,8 +281,6 @@ public abstract class StatisticYear extends YearStatistic {
 	public void setSynchScale(final boolean isSynchScaleEnabled) {
 		_isSynchScaleEnabled = isSynchScaleEnabled;
 	}
-
-	abstract ChartDataModel updateChart();
 
 	@Override
 	public void updateStatistic(final StatisticContext statContext) {
@@ -307,7 +302,7 @@ public abstract class StatisticYear extends YearStatistic {
 			_minMaxKeeper.resetMinMax();
 		}
 
-		final ChartDataModel chartDataModel = updateChart();
+		final ChartDataModel chartDataModel = getChartDataModel();
 
 		setChartProviders(chartDataModel);
 
@@ -315,7 +310,7 @@ public abstract class StatisticYear extends YearStatistic {
 			_minMaxKeeper.setMinMaxValues(chartDataModel);
 		}
 
-		setChartProperties(_chart);
+		updateChartProperties(_chart);
 
 		// show the fDataModel in the chart
 		_chart.updateChart(chartDataModel, true);
@@ -323,7 +318,7 @@ public abstract class StatisticYear extends YearStatistic {
 	}
 
 	@Override
-	public void updateToolBar(final boolean refreshToolbar) {
-		_chart.fillToolbar(refreshToolbar);
+	public void updateToolBar() {
+		_chart.fillToolbar(true);
 	}
 }

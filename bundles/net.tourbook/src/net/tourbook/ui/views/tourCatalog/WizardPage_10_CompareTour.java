@@ -267,7 +267,7 @@ public class WizardPage_10_CompareTour extends WizardPage {
 				_compareTourChart = new Chart(_pageBook, SWT.NONE);
 				_compareTourChart.setBackgroundColor(parent.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 
-				net.tourbook.ui.UI.setChartProperties(_compareTourChart);
+				net.tourbook.ui.UI.updateChartProperties(_compareTourChart);
 
 				_pageTourIsNotSelected = new Label(_pageBook, SWT.NONE);
 				_pageTourIsNotSelected.setText(Messages.tourCatalog_wizard_Label_a_tour_is_not_selected);

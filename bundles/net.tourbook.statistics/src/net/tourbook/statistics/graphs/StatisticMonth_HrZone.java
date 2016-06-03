@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,7 +34,7 @@ import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourPersonHRZone;
 import net.tourbook.statistic.StatisticContext;
 import net.tourbook.statistics.Messages;
-import net.tourbook.statistics.YearStatistic;
+import net.tourbook.statistics.TourStatisticImpl;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 
@@ -47,7 +47,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewSite;
 
-public class StatisticMonth_HrZone extends YearStatistic {
+public class StatisticMonth_HrZone extends TourStatisticImpl {
 
 	private static final String			STATE_HR_ZONE_START_FOR_MONTH_BAR_ORDERING	= "STATE_HR_ZONE_START_FOR_MONTH_BAR_ORDERING"; ////$NON-NLS-1$
 
@@ -114,10 +114,26 @@ public class StatisticMonth_HrZone extends YearStatistic {
 		return monthSegments;
 	}
 
+	private double[] createMonthData(final TourData_MonthHrZones monthData) {
+
+		/*
+		 * create segments for each year
+		 */
+		final int monthCounter = monthData.hrZoneValues[0].length;
+		final double allMonths[] = new double[monthCounter];
+
+		// get start/end and title for each segment
+		for (int monthIndex = 0; monthIndex < monthCounter; monthIndex++) {
+			allMonths[monthIndex] = monthIndex;
+		}
+
+		return allMonths;
+	}
+
 	@Override
-	public void createControl(	final Composite parent,
-								final IViewSite viewSite,
-								final IPostSelectionProvider postSelectionProvider) {
+	public void createStatisticControl(	final Composite parent,
+										final IViewSite viewSite,
+										final IPostSelectionProvider postSelectionProvider) {
 
 		this.createControl(parent);
 
@@ -136,22 +152,6 @@ public class StatisticMonth_HrZone extends YearStatistic {
 //				return _toolTipContext;
 //			}
 //		};
-	}
-
-	private double[] createMonthData(final TourData_MonthHrZones monthData) {
-
-		/*
-		 * create segments for each year
-		 */
-		final int monthCounter = monthData.hrZoneValues[0].length;
-		final double allMonths[] = new double[monthCounter];
-
-		// get start/end and title for each segment
-		for (int monthIndex = 0; monthIndex < monthCounter; monthIndex++) {
-			allMonths[monthIndex] = monthIndex;
-		}
-
-		return allMonths;
 	}
 
 	void createXDataMonths(final ChartDataModel chartDataModel) {
@@ -280,97 +280,6 @@ public class StatisticMonth_HrZone extends YearStatistic {
 			}
 		}
 	}
-
-	@Override
-	public void resetSelection() {
-		_chart.setSelectedBars(null);
-	}
-
-//	private ChartToolTip1 createToolTipInfo(final int serieIndex, final int valueIndex) {
-//
-//		final int oldestYear = fCurrentYear - fNumberOfYears + 1;
-//
-//		final Calendar calendar = GregorianCalendar.getInstance();
-//
-//		calendar.set(oldestYear, 0, 1);
-//		calendar.add(Calendar.MONTH, valueIndex);
-//
-//		//
-//		final StringBuffer monthStringBuffer = new StringBuffer();
-//		final FieldPosition monthPosition = new FieldPosition(DateFormat.MONTH_FIELD);
-//
-//		final Date date = new Date();
-//		date.setTime(calendar.getTimeInMillis());
-//		fDateFormatter.format(date, monthStringBuffer, monthPosition);
-//
-//		final Integer time_Recording = fTourMonthData.fRecordingTime[serieIndex][valueIndex];
-//		final Integer time_Driving = fTourMonthData.fDrivingTime[serieIndex][valueIndex];
-//		final int time_Break = time_Recording - time_Driving;
-//
-//		/*
-//		 * tool tip: title
-//		 */
-//		final StringBuilder titleString = new StringBuilder();
-//
-//		final String tourTypeName = getTourTypeName(serieIndex, fActiveTourTypeFilter);
-//		if (tourTypeName != null && tourTypeName.length() > 0) {
-//			titleString.append(tourTypeName);
-//		}
-//
-//		final String toolTipTitle = new Formatter().format(Messages.tourtime_info_date_month, //
-//				titleString.toString(),
-//				monthStringBuffer.substring(monthPosition.getBeginIndex(), monthPosition.getEndIndex()),
-//				calendar.get(Calendar.YEAR)
-//		//
-//		)
-//				.toString();
-//
-//		/*
-//		 * tool tip: label
-//		 */
-//		final StringBuilder toolTipFormat = new StringBuilder();
-//		toolTipFormat.append(Messages.tourtime_info_distance_tour);
-//		toolTipFormat.append(NEW_LINE);
-//		toolTipFormat.append(Messages.tourtime_info_altitude);
-//		toolTipFormat.append(NEW_LINE);
-//		toolTipFormat.append(NEW_LINE);
-//		toolTipFormat.append(Messages.tourtime_info_recording_time);
-//		toolTipFormat.append(NEW_LINE);
-//		toolTipFormat.append(Messages.tourtime_info_driving_time);
-//		toolTipFormat.append(NEW_LINE);
-//		toolTipFormat.append(Messages.tourtime_info_break_time);
-//
-//		final String toolTipLabel = new Formatter().format(toolTipFormat.toString(), //
-//				//
-//				(float) fTourMonthData.fDistanceHigh[serieIndex][valueIndex] / 1000,
-//				UI.UNIT_LABEL_DISTANCE,
-//				//
-//				fTourMonthData.fAltitudeHigh[serieIndex][valueIndex],
-//				UI.UNIT_LABEL_ALTITUDE,
-//				//
-//				time_Recording / 3600,
-//				(time_Recording % 3600) / 60,
-//				//
-//				time_Driving / 3600,
-//				(time_Driving % 3600) / 60,
-//				//
-//				time_Break / 3600,
-//				(time_Break % 3600) / 60
-//		//
-//		)
-//				.toString();
-//
-//		/*
-//		 * create tool tip info
-//		 */
-//
-//		final ChartToolTip1 toolTipInfo = new ChartToolTip1();
-//		toolTipInfo.setTitle(toolTipTitle);
-//		toolTipInfo.setLabel(toolTipLabel);
-////		toolTipInfo.setLabel(toolTipFormat.toString());
-//
-//		return toolTipInfo;
-//	}
 
 	@Override
 	public void restoreStateEarly(final IDialogSettings state) {
@@ -567,15 +476,15 @@ public class StatisticMonth_HrZone extends YearStatistic {
 			_minMaxKeeper.setMinMaxValues(chartDataModel);
 		}
 
-		setChartProperties(_chart);
+		updateChartProperties(_chart);
 
 		// show the fDataModel in the chart
 		_chart.updateChart(chartDataModel, true);
 	}
 
 	@Override
-	public void updateToolBar(final boolean refreshToolbar) {
-		_chart.fillToolbar(refreshToolbar);
+	public void updateToolBar() {
+		_chart.fillToolbar(true);
 	}
 
 }

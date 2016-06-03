@@ -53,14 +53,15 @@ public abstract class TourbookStatistic {
 	 * @param actionBars
 	 * @param postSelectionProvider
 	 */
-	public abstract void createControl(	Composite parent,
-										IViewSite viewSite,
-										IPostSelectionProvider postSelectionProvider);
+	protected abstract void createStatisticControl(	Composite parent,
+													IViewSite viewSite,
+													IPostSelectionProvider postSelectionProvider);
 
 	/**
 	 * Disposes of the statistic
 	 */
 	public void dispose() {
+
 		if (_container != null && _container.isDisposed() == false) {
 
 			_container.dispose();
@@ -123,11 +124,6 @@ public abstract class TourbookStatistic {
 
 		return isDataDirty;
 	}
-
-	/**
-	 * reset the selection in the statistic chart
-	 */
-	public abstract void resetSelection();
 
 	/**
 	 * Restores the state from a memento (e.g. select previous selection), default does nothing
@@ -219,13 +215,18 @@ public abstract class TourbookStatistic {
 	 */
 	public abstract void setSynchScale(boolean isEnabled);
 
+	@Override
+	public String toString() {
+		return "TourbookStatistic ["//
+				+ ("statisticId=" + statisticId + ", ")//
+				+ ("visibleName=" + visibleName)
+				+ "]";
+	}
+
 	/**
 	 * This method is called before the statistic control will be displayed. When the toolbar
 	 * manager is used, this method should put the actions into the toolbar manager
-	 * 
-	 * @param refreshToolbar
-	 *            <code>true</code> will refresh the toolbar
 	 */
-	public abstract void updateToolBar(boolean refreshToolbar);
+	public abstract void updateToolBar();
 
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -37,7 +37,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.statistic.StatisticContext;
 import net.tourbook.statistics.Messages;
 import net.tourbook.statistics.StatisticServices;
-import net.tourbook.statistics.YearStatistic;
+import net.tourbook.statistics.TourStatisticImpl;
 import net.tourbook.ui.TourTypeFilter;
 
 import org.eclipse.jface.action.IToolBarManager;
@@ -54,7 +54,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewSite;
 
-public class StatisticTour_Numbers extends YearStatistic {
+public class StatisticTour_Numbers extends TourStatisticImpl {
 
 	private final IPreferenceStore		_prefStore							= TourbookPlugin.getPrefStore();
 
@@ -102,7 +102,7 @@ public class StatisticTour_Numbers extends YearStatistic {
 
 	private boolean						_isSynchScaleEnabled;
 
-	private TourData_Day					_tourDayData;
+	private TourData_Day				_tourDayData;
 
 	private IViewSite					_viewSite;
 
@@ -171,9 +171,9 @@ public class StatisticTour_Numbers extends YearStatistic {
 	}
 
 	@Override
-	public void createControl(	final Composite parent,
-								final IViewSite viewSite,
-								final IPostSelectionProvider postSelectionProvider) {
+	public void createStatisticControl(	final Composite parent,
+										final IViewSite viewSite,
+										final IPostSelectionProvider postSelectionProvider) {
 
 		super.createControl(parent);
 
@@ -259,7 +259,8 @@ public class StatisticTour_Numbers extends YearStatistic {
 
 			final int diffDistance = (int) ((tourDayData.distanceHigh[tourIndex] - tourDayData.distanceLow[tourIndex] + 500) / 1000);
 			final int diffAltitude = (int) (tourDayData.altitudeHigh[tourIndex] - tourDayData.altitudeLow[tourIndex]);
-			final int diffTime = (int) (tourDayData.getDurationHighFloat()[tourIndex] - tourDayData.getDurationLowFloat()[tourIndex]);
+			final int diffTime = (int) (tourDayData.getDurationHighFloat()[tourIndex] - tourDayData
+					.getDurationLowFloat()[tourIndex]);
 
 			unitIndex = createTourStatData(
 					diffDistance,
@@ -618,9 +619,6 @@ public class StatisticTour_Numbers extends YearStatistic {
 	}
 
 	@Override
-	public void resetSelection() {}
-
-	@Override
 	public void setSynchScale(final boolean isSynchScaleEnabled) {
 		_isSynchScaleEnabled = isSynchScaleEnabled;
 	}
@@ -665,7 +663,7 @@ public class StatisticTour_Numbers extends YearStatistic {
 			statAltitudeMinMaxKeeper.setMinMaxValues(chartDataModel);
 		}
 
-		setChartProperties(chart);
+		updateChartProperties(chart);
 
 		// show the new data in the chart
 		chart.updateChart(chartDataModel, true);
@@ -722,7 +720,7 @@ public class StatisticTour_Numbers extends YearStatistic {
 			statDistanceMinMaxKeeper.setMinMaxValues(chartDataModel);
 		}
 
-		setChartProperties(statDistanceChart);
+		updateChartProperties(statDistanceChart);
 
 		// show the new data fDataModel in the chart
 		statDistanceChart.updateChart(chartDataModel, true);
@@ -830,7 +828,7 @@ public class StatisticTour_Numbers extends YearStatistic {
 			statDurationMinMaxKeeper.setMinMaxValues(chartDataModel);
 		}
 
-		setChartProperties(statDurationChart);
+		updateChartProperties(statDurationChart);
 
 		// show the new data data model in the chart
 		statDurationChart.updateChart(chartDataModel, true);
@@ -890,5 +888,5 @@ public class StatisticTour_Numbers extends YearStatistic {
 	}
 
 	@Override
-	public void updateToolBar(final boolean refreshToolbar) {}
+	public void updateToolBar() {}
 }

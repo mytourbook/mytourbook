@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,7 +34,7 @@ import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourPersonHRZone;
 import net.tourbook.statistic.StatisticContext;
 import net.tourbook.statistics.Messages;
-import net.tourbook.statistics.YearStatistic;
+import net.tourbook.statistics.TourStatisticImpl;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 
@@ -47,7 +47,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewSite;
 
-public class StatisticWeek_HrZone extends YearStatistic {
+public class StatisticWeek_HrZone extends TourStatisticImpl {
 
 	private static final String			STATE_HR_ZONE_WEEK_BAR_ORDERING_START	= "STATE_HR_ZONE_WEEK_BAR_ORDERING_START";	////$NON-NLS-1$
 
@@ -65,7 +65,7 @@ public class StatisticWeek_HrZone extends YearStatistic {
 
 	private final Calendar				_calendar								= GregorianCalendar.getInstance();
 
-	private TourData_WeekHrZones			_tourWeekData;
+	private TourData_WeekHrZones		_tourWeekData;
 
 	private int							_barOrderStart;
 
@@ -120,9 +120,9 @@ public class StatisticWeek_HrZone extends YearStatistic {
 	}
 
 	@Override
-	public void createControl(	final Composite parent,
-								final IViewSite viewSite,
-								final IPostSelectionProvider postSelectionProvider) {
+	public void createStatisticControl(	final Composite parent,
+										final IViewSite viewSite,
+										final IPostSelectionProvider postSelectionProvider) {
 
 		this.createControl(parent);
 
@@ -379,11 +379,6 @@ public class StatisticWeek_HrZone extends YearStatistic {
 	}
 
 	@Override
-	public void resetSelection() {
-		_chart.setSelectedBars(null);
-	}
-
-	@Override
 	public void restoreStateEarly(final IDialogSettings state) {
 		_barOrderStart = Util.getStateInt(state, STATE_HR_ZONE_WEEK_BAR_ORDERING_START, 0);
 	}
@@ -573,15 +568,15 @@ public class StatisticWeek_HrZone extends YearStatistic {
 			_minMaxKeeper.setMinMaxValues(chartDataModel);
 		}
 
-		setChartProperties(_chart);
+		updateChartProperties(_chart);
 
 		// show the data model in the chart
 		_chart.updateChart(chartDataModel, true);
 	}
 
 	@Override
-	public void updateToolBar(final boolean refreshToolbar) {
-		_chart.fillToolbar(refreshToolbar);
+	public void updateToolBar() {
+		_chart.fillToolbar(true);
 	}
 
 }

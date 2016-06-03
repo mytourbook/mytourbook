@@ -1003,7 +1003,7 @@ public class YearStatisticView extends ViewPart {
 			}
 		});
 
-		net.tourbook.ui.UI.setChartProperties(_yearChart);
+		net.tourbook.ui.UI.updateChartProperties(_yearChart);
 
 		// show the data in the chart
 		_yearChart.updateChart(chartModel, false, true);

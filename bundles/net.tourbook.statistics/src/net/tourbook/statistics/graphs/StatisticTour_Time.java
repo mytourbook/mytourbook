@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -44,7 +44,7 @@ import net.tourbook.statistics.Messages;
 import net.tourbook.statistics.StatisticServices;
 import net.tourbook.statistics.StatisticTourToolTip;
 import net.tourbook.statistics.TourChartContextProvider;
-import net.tourbook.statistics.YearStatistic;
+import net.tourbook.statistics.TourStatisticImpl;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourInfoIconToolTipProvider;
 import net.tourbook.tour.TourManager;
@@ -62,7 +62,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.IViewSite;
 
-public class StatisticTour_Time extends YearStatistic implements IBarSelectionProvider, ITourProvider {
+public class StatisticTour_Time extends TourStatisticImpl implements IBarSelectionProvider, ITourProvider {
 
 	private TourPerson					_activePerson;
 	private TourTypeFilter				_activeTourTypeFiler;
@@ -130,9 +130,9 @@ public class StatisticTour_Time extends YearStatistic implements IBarSelectionPr
 	}
 
 	@Override
-	public void createControl(	final Composite parent,
-								final IViewSite viewSite,
-								final IPostSelectionProvider postSelectionProvider) {
+	public void createStatisticControl(	final Composite parent,
+										final IViewSite viewSite,
+										final IPostSelectionProvider postSelectionProvider) {
 
 		super.createControl(parent);
 
@@ -398,11 +398,6 @@ public class StatisticTour_Time extends YearStatistic implements IBarSelectionPr
 	}
 
 	@Override
-	public void resetSelection() {
-		_chart.setSelectedBars(null);
-	}
-
-	@Override
 	public void restoreState(final IDialogSettings viewState) {
 
 		final String mementoTourId = viewState.get(MEMENTO_SELECTED_TOUR_ID);
@@ -563,7 +558,7 @@ public class StatisticTour_Time extends YearStatistic implements IBarSelectionPr
 			_minMaxKeeper.setMinMaxValues(chartModel);
 		}
 
-		setChartProperties(_chart);
+		updateChartProperties(_chart);
 
 		// show the data in the chart
 		_chart.updateChart(chartModel, false, true);
@@ -619,8 +614,8 @@ public class StatisticTour_Time extends YearStatistic implements IBarSelectionPr
 	}
 
 	@Override
-	public void updateToolBar(final boolean refreshToolbar) {
-		_chart.fillToolbar(refreshToolbar);
+	public void updateToolBar() {
+		_chart.fillToolbar(true);
 	}
 
 }

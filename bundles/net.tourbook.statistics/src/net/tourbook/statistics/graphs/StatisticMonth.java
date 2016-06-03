@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -37,7 +37,7 @@ import net.tourbook.data.TourPerson;
 import net.tourbook.statistic.StatisticContext;
 import net.tourbook.statistics.Messages;
 import net.tourbook.statistics.StatisticServices;
-import net.tourbook.statistics.YearStatistic;
+import net.tourbook.statistics.TourStatisticImpl;
 import net.tourbook.ui.TourTypeFilter;
 
 import org.eclipse.jface.viewers.IPostSelectionProvider;
@@ -45,7 +45,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IViewSite;
 
-public abstract class StatisticMonth extends YearStatistic {
+public abstract class StatisticMonth extends TourStatisticImpl {
 
 	private TourPerson					_activePerson;
 	private TourTypeFilter				_activeTourTypeFilter;
@@ -105,19 +105,6 @@ public abstract class StatisticMonth extends YearStatistic {
 		return monthSegments;
 	}
 
-	@Override
-	public void createControl(	final Composite parent,
-								final IViewSite viewSite,
-								final IPostSelectionProvider postSelectionProvider) {
-
-		super.createControl(parent);
-
-		// create chart
-		_chart = new Chart(parent, SWT.BORDER | SWT.FLAT);
-		_chart.setShowZoomActions(true);
-		_chart.setToolBarManager(viewSite.getActionBars().getToolBarManager(), false);
-	}
-
 	double[] createMonthData(final TourData_Month tourMonthData) {
 
 		/*
@@ -132,6 +119,19 @@ public abstract class StatisticMonth extends YearStatistic {
 		}
 
 		return allMonths;
+	}
+
+	@Override
+	public void createStatisticControl(	final Composite parent,
+										final IViewSite viewSite,
+										final IPostSelectionProvider postSelectionProvider) {
+
+		super.createControl(parent);
+
+		// create chart
+		_chart = new Chart(parent, SWT.BORDER | SWT.FLAT);
+		_chart.setShowZoomActions(true);
+		_chart.setToolBarManager(viewSite.getActionBars().getToolBarManager(), false);
 	}
 
 	private ChartToolTipInfo createToolTipInfo(final int serieIndex, final int valueIndex) {
@@ -282,14 +282,11 @@ public abstract class StatisticMonth extends YearStatistic {
 		chartDataModel.addYData(yData);
 	}
 
+	abstract ChartDataModel getChartDataModel();
+
 	@Override
 	public void preferencesHasChanged() {
 		updateStatistic(new StatisticContext(_activePerson, _activeTourTypeFilter, _currentYear, _numberOfYears, false));
-	}
-
-	@Override
-	public void resetSelection() {
-		_chart.setSelectedBars(null);
 	}
 
 	@Override
@@ -322,8 +319,6 @@ public abstract class StatisticMonth extends YearStatistic {
 		_isSynchScaleEnabled = isSynchScaleEnabled;
 	}
 
-	abstract ChartDataModel updateChart();
-
 	@Override
 	public void updateStatistic(final StatisticContext statContext) {
 
@@ -344,7 +339,7 @@ public abstract class StatisticMonth extends YearStatistic {
 			_minMaxKeeper.resetMinMax();
 		}
 
-		final ChartDataModel chartDataModel = updateChart();
+		final ChartDataModel chartDataModel = getChartDataModel();
 
 		setChartProviders(chartDataModel);
 
@@ -352,14 +347,14 @@ public abstract class StatisticMonth extends YearStatistic {
 			_minMaxKeeper.setMinMaxValues(chartDataModel);
 		}
 
-		setChartProperties(_chart);
+		updateChartProperties(_chart);
 
 		// show the fDataModel in the chart
 		_chart.updateChart(chartDataModel, true);
 	}
 
 	@Override
-	public void updateToolBar(final boolean refreshToolbar) {
-		_chart.fillToolbar(refreshToolbar);
+	public void updateToolBar() {
+		_chart.fillToolbar(true);
 	}
 }

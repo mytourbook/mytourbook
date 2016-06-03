@@ -5,12 +5,13 @@ NEW
 ===
 
 
+ 
+* Statistics
+
+  - New statistics average speed/pace in the day summary
+  - Show chart grid options in a slideout
+    
 
 
 IMPROVEMENTS
 ============
-
- 
-* Statistics
-
-  - Show chart grid options in a slideout  

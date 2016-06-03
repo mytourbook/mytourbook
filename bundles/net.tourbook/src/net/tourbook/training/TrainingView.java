@@ -1031,7 +1031,7 @@ public class TrainingView extends ViewPart {
 
 	private void setChartProperties() {
 
-		UI.setChartProperties(_chartHrTime);
+		UI.updateChartProperties(_chartHrTime);
 	}
 
 	@Override

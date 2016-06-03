@@ -44,7 +44,7 @@ import net.tourbook.statistics.Messages;
 import net.tourbook.statistics.StatisticServices;
 import net.tourbook.statistics.StatisticTourToolTip;
 import net.tourbook.statistics.TourChartContextProvider;
-import net.tourbook.statistics.YearStatistic;
+import net.tourbook.statistics.TourStatisticImpl;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourEvent;
@@ -66,7 +66,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPart;
 
-public abstract class StatisticDay extends YearStatistic implements IBarSelectionProvider, ITourProvider {
+public abstract class StatisticDay extends TourStatisticImpl implements IBarSelectionProvider, ITourProvider {
 
 	private TourTypeFilter				_activeTourTypeFilter;
 	private TourPerson					_activePerson;
@@ -85,7 +85,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 	private Chart						_chart;
 	private final BarChartMinMaxKeeper	_minMaxKeeper				= new BarChartMinMaxKeeper();
 
-	private TourData_Day					_tourDayData;
+	private TourData_Day				_tourDayData;
 
 	private boolean						_isSynchScaleEnabled;
 	private ITourEventListener			_tourPropertyListener;
@@ -178,9 +178,9 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 	}
 
 	@Override
-	public void createControl(	final Composite parent,
-								final IViewSite viewSite,
-								final IPostSelectionProvider postSelectionProvider) {
+	public void createStatisticControl(	final Composite parent,
+										final IViewSite viewSite,
+										final IPostSelectionProvider postSelectionProvider) {
 
 		super.createControl(parent);
 
@@ -531,6 +531,10 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 		super.dispose();
 	}
 
+	/**
+	 */
+	abstract ChartDataModel getChartDataModel();
+
 	@Override
 	public Integer getSelectedMonth() {
 		return _currentMonth;
@@ -564,11 +568,6 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 	public void preferencesHasChanged() {
 
 		updateStatistic(new StatisticContext(_activePerson, _activeTourTypeFilter, _currentYear, _numberOfYears, false));
-	}
-
-	@Override
-	public void resetSelection() {
-		_chart.setSelectedBars(null);
 	}
 
 	@Override
@@ -677,10 +676,6 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 		_isSynchScaleEnabled = isSynchScaleEnabled;
 	}
 
-	/**
-	 */
-	abstract ChartDataModel updateChart();
-
 	@Override
 	public void updateStatistic(final StatisticContext statContext) {
 
@@ -725,7 +720,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 			_minMaxKeeper.resetMinMax();
 		}
 
-		final ChartDataModel chartModel = updateChart();
+		final ChartDataModel chartModel = getChartDataModel();
 
 		/*
 		 * set graph minimum width, these is the number of days in the year
@@ -739,7 +734,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 			_minMaxKeeper.setMinMaxValues(chartModel);
 		}
 
-		setChartProperties(_chart);
+		updateChartProperties(_chart);
 
 		// show the data in the chart
 		_chart.updateChart(chartModel, false, true);
@@ -749,7 +744,7 @@ public abstract class StatisticDay extends YearStatistic implements IBarSelectio
 	}
 
 	@Override
-	public void updateToolBar(final boolean refreshToolbar) {
-		_chart.fillToolbar(refreshToolbar);
+	public void updateToolBar() {
+		_chart.fillToolbar(true);
 	}
 }

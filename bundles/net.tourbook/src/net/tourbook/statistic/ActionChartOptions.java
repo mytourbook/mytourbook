@@ -30,6 +30,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
@@ -51,9 +52,9 @@ public class ActionChartOptions extends ContributionItem implements IOpeningDial
 	private Image					_imageEnabled;
 	private Image					_imageDisabled;
 
-	public ActionChartOptions(final StatContainer statContainer) {
+	public ActionChartOptions(final Composite parent) {
 
-		_parent = statContainer;
+		_parent = parent;
 
 		_imageEnabled = TourbookPlugin.getImageDescriptor(Messages.Image__tour_options).createImage();
 		_imageDisabled = TourbookPlugin.getImageDescriptor(Messages.Image__tour_options_disabled).createImage();

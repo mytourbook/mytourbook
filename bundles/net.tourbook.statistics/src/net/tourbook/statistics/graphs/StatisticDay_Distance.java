@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,15 +21,7 @@ import net.tourbook.chart.ChartType;
 public class StatisticDay_Distance extends StatisticDay {
 
 	@Override
-	public String toString() {
-		return "Statistic [" //
-				+ ("statisticId=" + statisticId + ", ")
-				+ ("visibleName=" + visibleName)
-				+ "]";
-	}
-
-	@Override
-	ChartDataModel updateChart() {
+	ChartDataModel getChartDataModel() {
 
 		final ChartDataModel chartDataModel = new ChartDataModel(ChartType.BAR);
 

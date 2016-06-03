@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -39,7 +39,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.statistic.StatisticContext;
 import net.tourbook.statistics.Messages;
 import net.tourbook.statistics.StatisticServices;
-import net.tourbook.statistics.YearStatistic;
+import net.tourbook.statistics.TourStatisticImpl;
 import net.tourbook.ui.TourTypeFilter;
 
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -48,7 +48,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IViewSite;
 
-public abstract class StatisticWeek extends YearStatistic {
+public abstract class StatisticWeek extends TourStatisticImpl {
 
 	private static IPreferenceStore		_prefStore			= TourbookPlugin.getDefault().getPreferenceStore();
 
@@ -76,8 +76,6 @@ public abstract class StatisticWeek extends YearStatistic {
 	public boolean canTourBeVisible() {
 		return false;
 	}
-
-	abstract ChartDataModel createChartDataModel();
 
 	/**
 	 * create segments for each week
@@ -119,9 +117,9 @@ public abstract class StatisticWeek extends YearStatistic {
 	}
 
 	@Override
-	public void createControl(	final Composite parent,
-								final IViewSite viewSite,
-								final IPostSelectionProvider postSelectionProvider) {
+	public void createStatisticControl(	final Composite parent,
+										final IViewSite viewSite,
+										final IPostSelectionProvider postSelectionProvider) {
 
 		super.createControl(parent);
 
@@ -275,6 +273,16 @@ public abstract class StatisticWeek extends YearStatistic {
 		return allWeeks;
 	}
 
+	void createXDataWeek(final ChartDataModel chartDataModel) {
+
+		// set the x-axis
+		final ChartDataXSerie xData = new ChartDataXSerie(createWeekData());
+		xData.setAxisUnit(ChartDataSerie.X_AXIS_UNIT_WEEK);
+		xData.setChartSegments(createChartSegments());
+
+		chartDataModel.setXData(xData);
+	}
+
 //		System.out.println(UI.EMPTY_STRING//
 //				+ ("_firstDayOfWeek=" + _firstDayOfWeek + "\t")//
 //				+ ("dayOffset=" + dayOffset + "\t")//
@@ -349,16 +357,6 @@ public abstract class StatisticWeek extends YearStatistic {
 //		);
 //	}
 
-	void createXDataWeek(final ChartDataModel chartDataModel) {
-
-		// set the x-axis
-		final ChartDataXSerie xData = new ChartDataXSerie(createWeekData());
-		xData.setAxisUnit(ChartDataSerie.X_AXIS_UNIT_WEEK);
-		xData.setChartSegments(createChartSegments());
-
-		chartDataModel.setXData(xData);
-	}
-
 	void createYDataAltitude(final ChartDataModel chartDataModel) {
 
 		// altitude
@@ -426,9 +424,11 @@ public abstract class StatisticWeek extends YearStatistic {
 		chartDataModel.addYData(yData);
 	}
 
+	abstract ChartDataModel getChartDataModel();
+
 	private void getPreferences() {
 
-		setChartProperties(_chart);
+		updateChartProperties(_chart);
 
 		// set week start values
 		_firstDayOfWeek = _prefStore.getInt(ITourbookPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK);
@@ -447,11 +447,6 @@ public abstract class StatisticWeek extends YearStatistic {
 				_statYoungestYear,
 				_statNumberOfYears,
 				false));
-	}
-
-	@Override
-	public void resetSelection() {
-		_chart.setSelectedBars(null);
 	}
 
 	@Override
@@ -479,7 +474,7 @@ public abstract class StatisticWeek extends YearStatistic {
 			_minMaxKeeper.resetMinMax();
 		}
 
-		final ChartDataModel chartDataModel = createChartDataModel();
+		final ChartDataModel chartDataModel = getChartDataModel();
 
 		if (_isSynchScaleEnabled) {
 			_minMaxKeeper.setMinMaxValues(chartDataModel);
@@ -494,7 +489,7 @@ public abstract class StatisticWeek extends YearStatistic {
 	}
 
 	@Override
-	public void updateToolBar(final boolean refreshToolbar) {
-		_chart.fillToolbar(refreshToolbar);
+	public void updateToolBar() {
+		_chart.fillToolbar(true);
 	}
 }

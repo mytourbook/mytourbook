@@ -534,7 +534,7 @@ public class WizardPage_20_ReferenceTour extends WizardPage {
 			_groupChart.setText(NLS.bind(refTour.label + ": " //$NON-NLS-1$
 					+ Messages.tourCatalog_wizard_Group_chart_title, TourManager.getTourDateShort(tourData)));
 
-			UI.setChartProperties(_refTourChart);
+			UI.updateChartProperties(_refTourChart);
 
 			_refTourChart.updateChart(chartDataModel, false);
 

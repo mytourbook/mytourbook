@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -37,7 +37,7 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Composite;
 
-public abstract class YearStatistic extends TourbookStatistic implements IYearStatistic {
+public abstract class TourStatisticImpl extends TourbookStatistic implements IYearStatistic {
 
 	private final IPreferenceStore	_prefStore					= TourbookPlugin.getDefault().getPreferenceStore();
 
@@ -114,8 +114,9 @@ public abstract class YearStatistic extends TourbookStatistic implements IYearSt
 		}
 
 		final ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
-		final String tourTypeName = TourDatabase
-				.getTourTypeName(tourTypeList.get(serieIndex - colorOffset).getTypeId());
+		final long typeId = tourTypeList.get(serieIndex - colorOffset).getTypeId();
+		
+		final String tourTypeName = TourDatabase.getTourTypeName(typeId);
 
 		return tourTypeName;
 	}
@@ -130,14 +131,22 @@ public abstract class YearStatistic extends TourbookStatistic implements IYearSt
 		// do nothing
 	}
 
+	@Override
+	public String toString() {
+		return "TourStatisticImpl [" //
+				+ ("statisticId=" + statisticId + ", ")
+				+ ("visibleName=" + visibleName)
+				+ "]";
+	}
+
 	/**
 	 * Set chart properties from the pref store.
 	 * 
 	 * @param chart
 	 */
-	protected void setChartProperties(final Chart chart) {
+	protected void updateChartProperties(final Chart chart) {
 
-		UI.setChartProperties(chart);
+		UI.updateChartProperties(chart);
 
 		/*
 		 * These settings are currently static, a UI to modify it is not yet implemented.
@@ -149,13 +158,5 @@ public abstract class YearStatistic extends TourbookStatistic implements IYearSt
 		ctsConfig.isShowSegmentBackground = false;
 		ctsConfig.isShowSegmentSeparator = true;
 		ctsConfig.isShowSegmentTitle = true;
-	}
-
-	@Override
-	public String toString() {
-		return "YearStatistic [" //
-				+ ("statisticId=" + statisticId + ", ")
-				+ ("visibleName=" + visibleName)
-				+ "]";
 	}
 }

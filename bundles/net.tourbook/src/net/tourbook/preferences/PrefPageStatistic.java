@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.StringToArrayConverter;
-import net.tourbook.statistic.StatContainer;
+import net.tourbook.statistic.StatisticManager;
 import net.tourbook.statistic.TourbookStatistic;
 
 import org.eclipse.jface.layout.GridDataFactory;
@@ -67,12 +67,15 @@ public class PrefPageStatistic extends PreferencePage implements IWorkbenchPrefe
 
 	private class StatContentProvicer implements IStructuredContentProvider {
 
+		@Override
 		public void dispose() {}
 
+		@Override
 		public Object[] getElements(final Object inputElement) {
 			return _visibleStatistics.toArray();
 		}
 
+		@Override
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 	}
 
@@ -124,7 +127,7 @@ public class PrefPageStatistic extends PreferencePage implements IWorkbenchPrefe
 
 		final Composite uiContainer = createUI(parent);
 
-		_visibleStatistics = StatContainer.getStatisticProviders();
+		_visibleStatistics = StatisticManager.getStatisticProviders();
 
 		// load viewer
 		_statViewer.setInput(new Object());
@@ -194,6 +197,7 @@ public class PrefPageStatistic extends PreferencePage implements IWorkbenchPrefe
 		 */
 		_statViewer.setContentProvider(new StatContentProvicer());
 		_statViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
 			public void selectionChanged(final SelectionChangedEvent event) {
 				enableActions();
 			}
@@ -212,6 +216,7 @@ public class PrefPageStatistic extends PreferencePage implements IWorkbenchPrefe
 		_btnDown.setEnabled(selectedItem != null && filterTable.getSelectionIndex() < filterTable.getItemCount() - 1);
 	}
 
+	@Override
 	public void init(final IWorkbench workbench) {}
 
 	private void onMoveDown() {
@@ -276,7 +281,7 @@ public class PrefPageStatistic extends PreferencePage implements IWorkbenchPrefe
 
 		_isModified = true;
 
-		_visibleStatistics = StatContainer.getStatisticExtensionPoints();
+		_visibleStatistics = StatisticManager.getStatisticExtensionPoints();
 
 		_statViewer.setInput(new Object());
 
