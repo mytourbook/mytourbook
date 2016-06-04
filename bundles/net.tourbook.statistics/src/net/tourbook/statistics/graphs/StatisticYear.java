@@ -88,7 +88,7 @@ public abstract class StatisticYear extends TourStatisticImpl {
 	}
 
 	@Override
-	public void createStatisticControl(	final Composite parent,
+	public void createStatisticUI(	final Composite parent,
 										final IViewSite viewSite,
 										final IPostSelectionProvider postSelectionProvider) {
 

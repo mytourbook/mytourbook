@@ -133,16 +133,14 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 	void actionSynchScale(final boolean isEnabled) {
 
 		_isSynchScaleEnabled = isEnabled;
-		_activeStatistic.setSynchScale(_isSynchScaleEnabled);
 
-		if (_activeStatistic instanceof IYearStatistic) {
-			((IYearStatistic) _activeStatistic).updateStatistic(new StatisticContext(
-					_activePerson,
-					_activeTourTypeFilter,
-					_selectedYear,
-					getNumberOfYears(),
-					false));
-		}
+		_activeStatistic.setSynchScale(_isSynchScaleEnabled);
+		_activeStatistic.updateStatistic(new StatisticContext(
+				_activePerson,
+				_activeTourTypeFilter,
+				_selectedYear,
+				getNumberOfYears(),
+				false));
 	}
 
 	private void addPartListener() {
@@ -784,30 +782,27 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 			return false;
 		}
 
-		final TourbookStatistic statistic = allAvailableStatistics.get(selectedIndex);
+		final TourbookStatistic tourbookStatistic = allAvailableStatistics.get(selectedIndex);
 
-		// get statistic control
-		Composite pageStatistic = statistic.getControl();
-		if (pageStatistic != null) {
-			_activeStatistic = statistic;
-			return true;
+		Composite statisticUI = tourbookStatistic.getUIControl();
+
+		if (statisticUI == null) {
+
+			// create statistic UI in the pagebook for the selected statistic
+
+			statisticUI = new Composite(_pageBookStatistic, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, true).applyTo(statisticUI);
+			GridLayoutFactory.fillDefaults().applyTo(statisticUI);
+			{
+				tourbookStatistic.createUI(statisticUI, getViewSite(), _postSelectionProvider);
+
+//				GridDataFactory.fillDefaults().grab(true, true).applyTo(statisticUI);
+
+				tourbookStatistic.restoreStateEarly(_state);
+			}
 		}
 
-		// create statistic UI in the pagebook for the selected statistic
-		pageStatistic = new Composite(_pageBookStatistic, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(pageStatistic);
-		GridLayoutFactory.fillDefaults().applyTo(pageStatistic);
-		{
-			statistic.createStatisticControl(pageStatistic, getViewSite(), _postSelectionProvider);
-			statistic.setContainer(pageStatistic);
-
-			final Composite statControl = statistic.getControl();
-			GridDataFactory.fillDefaults().grab(true, true).applyTo(statControl);
-
-			statistic.restoreStateEarly(_state);
-		}
-
-		_activeStatistic = statistic;
+		_activeStatistic = tourbookStatistic;
 
 		return true;
 	}
@@ -837,12 +832,10 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 		// tell all existing statistics the data have changed
 		for (final TourbookStatistic statistic : getAvailableStatistics()) {
 
-			if (statistic.getControl() != null) {
-				if (statistic instanceof IYearStatistic) {
+			if (statistic.getUIControl() != null) {
 
-					statistic.setSynchScale(_isSynchScaleEnabled);
-					statistic.setDataDirty();
-				}
+				statistic.setSynchScale(_isSynchScaleEnabled);
+				statistic.setDataDirty();
 			}
 		}
 
@@ -856,7 +849,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 
 		statContext.inVerticalBarIndex = _cboBarVerticalOrder.getSelectionIndex();
 
-		((IYearStatistic) _activeStatistic).updateStatistic(statContext);
+		_activeStatistic.updateStatistic(statContext);
 
 		updateStatistic_20_PostRefresh(statContext);
 	}
@@ -885,7 +878,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 		}
 
 		// display selected statistic
-		_pageBookStatistic.showPage(_activeStatistic.getControl());
+		_pageBookStatistic.showPage(_activeStatistic.getUIControl());
 
 		selectYear(-1);
 
@@ -900,7 +893,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 
 		statContext.inVerticalBarIndex = _cboBarVerticalOrder.getSelectionIndex();
 
-		((IYearStatistic) _activeStatistic).updateStatistic(statContext);
+		_activeStatistic.updateStatistic(statContext);
 
 		updateStatistic_20_PostRefresh(statContext);
 		updateUI_Toolbar();

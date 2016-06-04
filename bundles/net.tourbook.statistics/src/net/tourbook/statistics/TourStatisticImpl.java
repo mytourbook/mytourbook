@@ -24,12 +24,10 @@ import net.tourbook.chart.ChartTitleSegmentConfig;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.statistic.IYearStatistic;
 import net.tourbook.statistic.TourbookStatistic;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 
-import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -37,7 +35,10 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Composite;
 
-public abstract class TourStatisticImpl extends TourbookStatistic implements IYearStatistic {
+/**
+ * Implementation for the statistic plugin interface.
+ */
+public abstract class TourStatisticImpl extends TourbookStatistic {
 
 	private final IPreferenceStore	_prefStore					= TourbookPlugin.getDefault().getPreferenceStore();
 
@@ -115,28 +116,10 @@ public abstract class TourStatisticImpl extends TourbookStatistic implements IYe
 
 		final ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
 		final long typeId = tourTypeList.get(serieIndex - colorOffset).getTypeId();
-		
+
 		final String tourTypeName = TourDatabase.getTourTypeName(typeId);
 
 		return tourTypeName;
-	}
-
-	@Override
-	public void restoreState(final IDialogSettings state) {
-		// do nothing
-	}
-
-	@Override
-	public void saveState(final IDialogSettings state) {
-		// do nothing
-	}
-
-	@Override
-	public String toString() {
-		return "TourStatisticImpl [" //
-				+ ("statisticId=" + statisticId + ", ")
-				+ ("visibleName=" + visibleName)
-				+ "]";
 	}
 
 	/**

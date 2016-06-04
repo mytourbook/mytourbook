@@ -26,6 +26,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.preference.IPreferenceStore;
 
 public class StatisticManager {
 
@@ -87,11 +88,10 @@ public class StatisticManager {
 		final ArrayList<TourbookStatistic> availableStatistics = getStatisticExtensionPoints();
 		final ArrayList<TourbookStatistic> visibleStatistics = new ArrayList<TourbookStatistic>();
 
-		final String[] prefStoreStatisticIds = StringToArrayConverter.//
-				convertStringToArray(TourbookPlugin
-						.getDefault()
-						.getPreferenceStore()
-						.getString(ITourbookPreferences.STATISTICS_STATISTIC_PROVIDER_IDS));
+		final IPreferenceStore prefStore = TourbookPlugin.getPrefStore();
+		final String providerIds = prefStore.getString(ITourbookPreferences.STATISTICS_STATISTIC_PROVIDER_IDS);
+
+		final String[] prefStoreStatisticIds = StringToArrayConverter.convertStringToArray(providerIds);
 
 		// get all statistics which are saved in the pref store
 		for (final String statisticId : prefStoreStatisticIds) {

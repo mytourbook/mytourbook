@@ -131,15 +131,6 @@ public abstract class StatisticDay extends TourStatisticImpl implements IBarSele
 		TourManager.getInstance().addTourEventListener(_tourPropertyListener);
 	}
 
-	@Override
-	public boolean canSelectTour() {
-		return true;
-	}
-
-	public boolean canTourBeVisible() {
-		return true;
-	}
-
 	/**
 	 * create segments for the chart
 	 */
@@ -178,9 +169,9 @@ public abstract class StatisticDay extends TourStatisticImpl implements IBarSele
 	}
 
 	@Override
-	public void createStatisticControl(	final Composite parent,
-										final IViewSite viewSite,
-										final IPostSelectionProvider postSelectionProvider) {
+	public void createStatisticUI(	final Composite parent,
+									final IViewSite viewSite,
+									final IPostSelectionProvider postSelectionProvider) {
 
 		super.createControl(parent);
 
@@ -601,32 +592,6 @@ public abstract class StatisticDay extends TourStatisticImpl implements IBarSele
 				viewState.put(MEMENTO_SELECTED_TOUR_ID, Long.toString(_tourDayData.tourIds[valueIndex]));
 			}
 		}
-	}
-
-	@Override
-	public boolean selectMonth(final Long date) {
-
-		_calendar.setTimeInMillis(date);
-		final int selectedMonth = _calendar.get(Calendar.MONTH);
-
-		final int[] tourMonths = _tourDayData.monthValues;
-		final boolean selectedItems[] = new boolean[tourMonths.length];
-
-		boolean isSelected = false;
-		// find the tours which have the same month as the selected month
-		for (int tourIndex = 0; tourIndex < tourMonths.length; tourIndex++) {
-			final boolean isMonthSelected = tourMonths[tourIndex] == selectedMonth ? true : false;
-			if (isMonthSelected) {
-				isSelected = true;
-			}
-			selectedItems[tourIndex] = isMonthSelected;
-		}
-
-		if (isSelected) {
-			_chart.setSelectedBars(selectedItems);
-		}
-
-		return isSelected;
 	}
 
 	@Override

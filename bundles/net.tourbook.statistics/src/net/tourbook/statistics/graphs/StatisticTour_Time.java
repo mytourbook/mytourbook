@@ -87,11 +87,6 @@ public class StatisticTour_Time extends TourStatisticImpl implements IBarSelecti
 	private Long						_selectedTourId				= null;
 	private int							_currentMonth;
 
-	@Override
-	public boolean canSelectTour() {
-		return true;
-	}
-
 	/**
 	 * create segments for the chart
 	 */
@@ -130,9 +125,9 @@ public class StatisticTour_Time extends TourStatisticImpl implements IBarSelecti
 	}
 
 	@Override
-	public void createStatisticControl(	final Composite parent,
-										final IViewSite viewSite,
-										final IPostSelectionProvider postSelectionProvider) {
+	public void createStatisticUI(	final Composite parent,
+									final IViewSite viewSite,
+									final IPostSelectionProvider postSelectionProvider) {
 
 		super.createControl(parent);
 
@@ -428,32 +423,6 @@ public class StatisticTour_Time extends TourStatisticImpl implements IBarSelecti
 
 			viewState.put(MEMENTO_SELECTED_TOUR_ID, Long.toString(selectedTourId));
 		}
-	}
-
-	@Override
-	public boolean selectMonth(final Long date) {
-
-		_calendar.setTimeInMillis(date);
-		final int tourMonth = _calendar.get(Calendar.MONTH);
-		final int[] tourMonths = _tourTimeData.tourMonthValues;
-
-		final boolean selectedItems[] = new boolean[tourMonths.length];
-		boolean isSelected = false;
-
-		// find the tours which have the same day as the selected day
-		for (int tourIndex = 0; tourIndex < tourMonths.length; tourIndex++) {
-			final boolean isMonthSelected = tourMonths[tourIndex] == tourMonth ? true : false;
-			if (isMonthSelected) {
-				isSelected = true;
-			}
-			selectedItems[tourIndex] = isMonthSelected;
-		}
-
-		if (isSelected) {
-			_chart.setSelectedBars(selectedItems);
-		}
-
-		return isSelected;
 	}
 
 	@Override

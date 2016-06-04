@@ -170,44 +170,6 @@ public class StatisticTour_Numbers extends TourStatisticImpl {
 		return false;
 	}
 
-	@Override
-	public void createStatisticControl(	final Composite parent,
-										final IViewSite viewSite,
-										final IPostSelectionProvider postSelectionProvider) {
-
-		super.createControl(parent);
-
-		_viewSite = viewSite;
-
-		// create statistic page
-		_statisticPage = new Composite(parent, SWT.BORDER | SWT.FLAT);
-		_statisticPage.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-
-		// remove colored border
-		_statisticPage.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
-
-		final GridLayout gl = new GridLayout(2, true);
-		gl.marginHeight = 0;
-		gl.marginWidth = 0;
-		gl.verticalSpacing = 0;
-		gl.horizontalSpacing = 0;
-		_statisticPage.setLayout(gl);
-
-		_chartDistanceCounter = new Chart(_statisticPage, SWT.NONE);
-		_chartDistanceSum = new Chart(_statisticPage, SWT.NONE);
-
-		_chartAltitudeCounter = new Chart(_statisticPage, SWT.NONE);
-		_chartAltitudeSum = new Chart(_statisticPage, SWT.NONE);
-
-		_chartDurationCounter = new Chart(_statisticPage, SWT.NONE);
-		_chartDurationSum = new Chart(_statisticPage, SWT.NONE);
-
-		_chartDistanceCounter.setToolBarManager(viewSite.getActionBars().getToolBarManager(), true);
-
-		addPrefListener(parent);
-		getPreferences();
-	}
-
 	/**
 	 * calculate data for all statistics
 	 * 
@@ -296,6 +258,44 @@ public class StatisticTour_Numbers extends TourStatisticImpl {
 		updateLowHighValues(_statAltitudeSumLow, _statAltitudeSumHigh);
 		updateLowHighValues(_statTimeCounterLow, _statTimeCounterHigh);
 		updateLowHighValues(_statTimeSumLow, _statTimeSumHigh);
+	}
+
+	@Override
+	public void createStatisticUI(	final Composite parent,
+										final IViewSite viewSite,
+										final IPostSelectionProvider postSelectionProvider) {
+
+		super.createControl(parent);
+
+		_viewSite = viewSite;
+
+		// create statistic page
+		_statisticPage = new Composite(parent, SWT.BORDER | SWT.FLAT);
+		_statisticPage.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+		// remove colored border
+		_statisticPage.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
+
+		final GridLayout gl = new GridLayout(2, true);
+		gl.marginHeight = 0;
+		gl.marginWidth = 0;
+		gl.verticalSpacing = 0;
+		gl.horizontalSpacing = 0;
+		_statisticPage.setLayout(gl);
+
+		_chartDistanceCounter = new Chart(_statisticPage, SWT.NONE);
+		_chartDistanceSum = new Chart(_statisticPage, SWT.NONE);
+
+		_chartAltitudeCounter = new Chart(_statisticPage, SWT.NONE);
+		_chartAltitudeSum = new Chart(_statisticPage, SWT.NONE);
+
+		_chartDurationCounter = new Chart(_statisticPage, SWT.NONE);
+		_chartDurationSum = new Chart(_statisticPage, SWT.NONE);
+
+		_chartDistanceCounter.setToolBarManager(viewSite.getActionBars().getToolBarManager(), true);
+
+		addPrefListener(parent);
+		getPreferences();
 	}
 
 	/**
@@ -883,8 +883,8 @@ public class StatisticTour_Numbers extends TourStatisticImpl {
 		tbm.update(true);
 
 		createStatisticData(_tourDayData);
-		updateCharts();
 
+		updateCharts();
 	}
 
 	@Override

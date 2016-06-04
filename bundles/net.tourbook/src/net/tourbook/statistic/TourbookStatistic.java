@@ -25,37 +25,40 @@ import org.eclipse.ui.IViewSite;
  */
 public abstract class TourbookStatistic {
 
+	/** ID from plugin.xml */
 	public String		statisticId;
 
+	/** Name from plugin.xml */
 	public String		visibleName;
 
 	private Composite	_container;
 
 	private boolean		_isDataDirty;
 
-	public boolean canSelectDay() {
-		return false;
-	}
-
-	public boolean canSelectMonth() {
-		return false;
-	}
-
-	public boolean canSelectTour() {
-		return false;
-	}
+	/**
+	 * Plugin constructor.
+	 */
+//	public TourbookStatistic() {}
 
 	/**
 	 * Create the statistic component
 	 * 
 	 * @param parent
 	 * @param viewSite
-	 * @param actionBars
 	 * @param postSelectionProvider
 	 */
-	protected abstract void createStatisticControl(	Composite parent,
-													IViewSite viewSite,
-													IPostSelectionProvider postSelectionProvider);
+	protected abstract void createStatisticUI(	Composite parent,
+												IViewSite viewSite,
+												IPostSelectionProvider postSelectionProvider);
+
+	public void createUI(	final Composite parent,
+							final IViewSite viewSite,
+							final IPostSelectionProvider postSelectionProvider) {
+
+		_container = parent;
+
+		createStatisticUI(parent, viewSite, postSelectionProvider);
+	}
 
 	/**
 	 * Disposes of the statistic
@@ -93,16 +96,16 @@ public abstract class TourbookStatistic {
 		return true;
 	}
 
-	public Composite getControl() {
-		return _container;
-	}
-
 	/**
 	 * @return When a tour can be selected in the statistic, this will return the tour Id of the
 	 *         selected tour or <code>null</code> otherwise.
 	 */
 	public Long getSelectedTour() {
 		return null;
+	}
+
+	public Composite getUIControl() {
+		return _container;
 	}
 
 	@Override
@@ -126,11 +129,18 @@ public abstract class TourbookStatistic {
 	}
 
 	/**
+	 * Preferences for the statistics has changed.
+	 */
+	public abstract void preferencesHasChanged();
+
+	/**
 	 * Restores the state from a memento (e.g. select previous selection), default does nothing
 	 * 
 	 * @param state
 	 */
-	public abstract void restoreState(final IDialogSettings state);
+	public void restoreState(final IDialogSettings state) {
+		// do nothing
+	}
 
 	/**
 	 * Restore state after the controls is created.
@@ -146,43 +156,8 @@ public abstract class TourbookStatistic {
 	 * 
 	 * @param viewState
 	 */
-	public abstract void saveState(final IDialogSettings viewState);
-
-	/**
-	 * Select the day in the statistic, this is used to visualize a selected tour in the statistic
-	 * chart. Deselect the day when set to <code>null</code>. <code>date</code> is in the format
-	 * milliseconds
-	 * 
-	 * @param date
-	 *            contains the date value in milliseconds
-	 * @return <code>true</code> when a day was selected
-	 */
-	public boolean selectDay(final Long date) {
-		return false;
-	}
-
-	/**
-	 * Select the month in the statistic, this is used to visualize a selected tour in the statistic
-	 * chart. Deselect the month when set to <code>null</code>
-	 * 
-	 * @param date
-	 *            contains the date value in milliseconds
-	 * @return <code>true</code> when a month was selected
-	 */
-	public boolean selectMonth(final Long date) {
-		return false;
-	}
-
-	/**
-	 * Select a tour in the statistic to visualize a selected tour.
-	 * <p>
-	 * This can be overwritten to select a tour in the statistic
-	 * 
-	 * @param tourId
-	 * @return <code>true</code> when a tour was selected
-	 */
-	public boolean selectTour(final Long tourId) {
-		return false;
+	public void saveState(final IDialogSettings viewState) {
+		// do nothing
 	}
 
 	/**
@@ -193,10 +168,6 @@ public abstract class TourbookStatistic {
 	 */
 	public void setBarVerticalOrder(final int selectedIndex) {
 		// do nothing
-	}
-
-	public void setContainer(final Composite container) {
-		_container = container;
 	}
 
 	/**
@@ -222,6 +193,13 @@ public abstract class TourbookStatistic {
 				+ ("visibleName=" + visibleName)
 				+ "]";
 	}
+
+	/**
+	 * Update statistic with the data in the context.
+	 * 
+	 * @param statContext
+	 */
+	public abstract void updateStatistic(StatisticContext statContext);
 
 	/**
 	 * This method is called before the statistic control will be displayed. When the toolbar

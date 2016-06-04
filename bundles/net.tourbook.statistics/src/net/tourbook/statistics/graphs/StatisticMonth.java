@@ -122,7 +122,7 @@ public abstract class StatisticMonth extends TourStatisticImpl {
 	}
 
 	@Override
-	public void createStatisticControl(	final Composite parent,
+	public void createStatisticUI(	final Composite parent,
 										final IViewSite viewSite,
 										final IPostSelectionProvider postSelectionProvider) {
 
@@ -287,20 +287,6 @@ public abstract class StatisticMonth extends TourStatisticImpl {
 	@Override
 	public void preferencesHasChanged() {
 		updateStatistic(new StatisticContext(_activePerson, _activeTourTypeFilter, _currentYear, _numberOfYears, false));
-	}
-
-	@Override
-	public boolean selectMonth(final Long date) {
-
-		_calendar.setTimeInMillis(date);
-		final int selectedMonth = _calendar.get(Calendar.MONTH);
-
-		final boolean selectedItems[] = new boolean[12];
-		selectedItems[selectedMonth] = true;
-
-		_chart.setSelectedBars(selectedItems);
-
-		return true;
 	}
 
 	private void setChartProviders(final ChartDataModel chartModel) {

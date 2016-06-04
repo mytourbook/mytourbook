@@ -120,7 +120,7 @@ public class StatisticWeek_HrZone extends TourStatisticImpl {
 	}
 
 	@Override
-	public void createStatisticControl(	final Composite parent,
+	public void createStatisticUI(	final Composite parent,
 										final IViewSite viewSite,
 										final IPostSelectionProvider postSelectionProvider) {
 
@@ -386,20 +386,6 @@ public class StatisticWeek_HrZone extends TourStatisticImpl {
 	@Override
 	public void saveState(final IDialogSettings state) {
 		state.put(STATE_HR_ZONE_WEEK_BAR_ORDERING_START, _barOrderStart);
-	}
-
-	@Override
-	public boolean selectMonth(final Long date) {
-
-		_calendar.setTimeInMillis(date);
-		final int selectedMonth = _calendar.get(Calendar.MONTH);
-
-		final boolean selectedItems[] = new boolean[12];
-		selectedItems[selectedMonth] = true;
-
-		_chart.setSelectedBars(selectedItems);
-
-		return true;
 	}
 
 	@Override
