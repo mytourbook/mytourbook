@@ -17,23 +17,21 @@ package net.tourbook.ui.tourChart;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.tooltip.AnimatedToolTipShell;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageAppearanceTourChart;
+import net.tourbook.ui.ChartOptions_GridUI;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackAdapter;
-import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
@@ -42,10 +40,8 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
 
 /**
@@ -65,29 +61,12 @@ public class SlideoutTourChartOptions extends AnimatedToolTipShell {
 	private boolean					_isAnotherDialogOpened;
 
 	private SelectionAdapter		_defaultSelectionListener;
-	private MouseWheelListener		_defaultMouseWheelListener;
 
-	{
-		_defaultSelectionListener = new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onChangeUI();
-			}
-		};
-
-		_defaultMouseWheelListener = new MouseWheelListener() {
-			@Override
-			public void mouseScrolled(final MouseEvent event) {
-				UI.adjustSpinnerValueOnMouseScroll(event);
-				onChangeUI();
-			}
-		};
-	}
 
 	private ActionOpenPrefDialog	_actionPrefDialog;
 	private Action					_actionRestoreDefaults;
 
-	private PixelConverter			_pc;
+	private ChartOptions_GridUI		_gridUI				= new ChartOptions_GridUI();
 
 	/*
 	 * UI controls
@@ -99,16 +78,6 @@ public class SlideoutTourChartOptions extends AnimatedToolTipShell {
 	private Button					_chkShowSrtmData;
 	private Button					_chkShowStartTimeOnXAxis;
 	private Button					_chkShowValuePointTooltip;
-	private Button					_chkShowGrid_HorizontalLines;
-	private Button					_chkShowGrid_VerticalLines;
-
-	private Label					_lblGridHorizontal_Unit;
-	private Label					_lblGridHorizontal;
-	private Label					_lblGridVertical;
-	private Label					_lblGridVertical_Unit;
-
-	private Spinner					_spinnerGridHorizontalDistance;
-	private Spinner					_spinnerGridVerticalDistance;
 
 	private final class WaitTimer implements Runnable {
 		@Override
@@ -117,9 +86,7 @@ public class SlideoutTourChartOptions extends AnimatedToolTipShell {
 		}
 	}
 
-	public SlideoutTourChartOptions(final Control ownerControl,
-									final ToolBar toolBar,
-									final TourChart tourChart) {
+	public SlideoutTourChartOptions(final Control ownerControl, final ToolBar toolBar, final TourChart tourChart) {
 
 		super(ownerControl);
 
@@ -210,7 +177,7 @@ public class SlideoutTourChartOptions extends AnimatedToolTipShell {
 	@Override
 	protected Composite createToolTipContentArea(final Composite parent) {
 
-		initUI(parent);
+		initUI();
 
 		createActions();
 
@@ -238,7 +205,7 @@ public class SlideoutTourChartOptions extends AnimatedToolTipShell {
 				createUI_10_Title(container);
 				createUI_12_Actions(container);
 				createUI_20_Controls(container);
-				createUI_30_Grid(container);
+				_gridUI.createUI(container);
 			}
 		}
 
@@ -358,127 +325,6 @@ public class SlideoutTourChartOptions extends AnimatedToolTipShell {
 		}
 	}
 
-	private void createUI_30_Grid(final Composite parent) {
-
-		final SelectionAdapter gridLineListener = new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onSelectGridLine();
-			}
-		};
-
-		final Group group = new Group(parent, SWT.NONE);
-		group.setText(Messages.Pref_Graphs_Group_Grid);
-		GridDataFactory.fillDefaults()//
-				.grab(true, false)
-				.span(2, 1)
-				.applyTo(group);
-		GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
-//		group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
-		{
-			{
-				/*
-				 * label: grid distance
-				 */
-				final Label label = new Label(group, SWT.NONE);
-				label.setText(Messages.Pref_Graphs_grid_distance);
-				GridDataFactory.fillDefaults()//
-						.span(3, 1)
-						.applyTo(label);
-			}
-
-			{
-				/*
-				 * label: horizontal grid
-				 */
-				_lblGridHorizontal = new Label(group, SWT.NONE);
-				_lblGridHorizontal.setText(Messages.Pref_Graphs_grid_horizontal_distance);
-				GridDataFactory.fillDefaults()//
-//						.indent(16, 0)
-						.align(SWT.FILL, SWT.CENTER)
-						.applyTo(_lblGridHorizontal);
-
-				/*
-				 * spinner: horizontal grid
-				 */
-				_spinnerGridHorizontalDistance = new Spinner(group, SWT.BORDER);
-				_spinnerGridHorizontalDistance.setMinimum(10);
-				_spinnerGridHorizontalDistance.setMaximum(1000);
-				_spinnerGridHorizontalDistance.addMouseWheelListener(_defaultMouseWheelListener);
-				_spinnerGridHorizontalDistance.addSelectionListener(_defaultSelectionListener);
-				GridDataFactory.fillDefaults() //
-						.align(SWT.BEGINNING, SWT.FILL)
-						.applyTo(_spinnerGridHorizontalDistance);
-
-				/*
-				 * Label: px
-				 */
-				_lblGridHorizontal_Unit = new Label(group, SWT.NONE);
-				_lblGridHorizontal_Unit.setText(Messages.App_Unit_Px);
-				GridDataFactory.fillDefaults()//
-						.align(SWT.FILL, SWT.CENTER)
-						.applyTo(_lblGridHorizontal_Unit);
-			}
-
-			{
-				/*
-				 * label: vertical grid
-				 */
-				_lblGridVertical = new Label(group, SWT.NONE);
-				_lblGridVertical.setText(Messages.Pref_Graphs_grid_vertical_distance);
-				GridDataFactory.fillDefaults()//
-//						.indent(16, 0)
-						.align(SWT.FILL, SWT.CENTER)
-						.applyTo(_lblGridVertical);
-
-				/*
-				 * spinner: vertical grid
-				 */
-				_spinnerGridVerticalDistance = new Spinner(group, SWT.BORDER);
-				_spinnerGridVerticalDistance.setMinimum(10);
-				_spinnerGridVerticalDistance.setMaximum(1000);
-				_spinnerGridVerticalDistance.addMouseWheelListener(_defaultMouseWheelListener);
-				_spinnerGridVerticalDistance.addSelectionListener(_defaultSelectionListener);
-				GridDataFactory.fillDefaults() //
-						.align(SWT.BEGINNING, SWT.FILL)
-						.applyTo(_spinnerGridVerticalDistance);
-				/*
-				 * Label: px
-				 */
-				_lblGridVertical_Unit = new Label(group, SWT.NONE);
-				_lblGridVertical_Unit.setText(Messages.App_Unit_Px);
-				GridDataFactory.fillDefaults()//
-						.align(SWT.FILL, SWT.CENTER)
-						.applyTo(_lblGridVertical_Unit);
-			}
-			{
-				/*
-				 * checkbox: show horizontal grid
-				 */
-				_chkShowGrid_HorizontalLines = new Button(group, SWT.CHECK);
-				_chkShowGrid_HorizontalLines.setText(Messages.Pref_Graphs_Checkbox_ShowHorizontalGrid);
-				_chkShowGrid_HorizontalLines.setToolTipText(Messages.Pref_Graphs_Dialog_GridLine_Warning_Message);
-				_chkShowGrid_HorizontalLines.addSelectionListener(gridLineListener);
-				GridDataFactory.fillDefaults()//
-//						.indent(0, 15)
-						.span(3, 1)
-						.applyTo(_chkShowGrid_HorizontalLines);
-			}
-			{
-				/*
-				 * checkbox: show vertical grid
-				 */
-				_chkShowGrid_VerticalLines = new Button(group, SWT.CHECK);
-				_chkShowGrid_VerticalLines.setText(Messages.Pref_Graphs_Checkbox_ShowVerticalGrid);
-				_chkShowGrid_VerticalLines.setToolTipText(Messages.Pref_Graphs_Dialog_GridLine_Warning_Message);
-				_chkShowGrid_VerticalLines.addSelectionListener(gridLineListener);
-				GridDataFactory.fillDefaults()//
-						.span(3, 1)
-						.applyTo(_chkShowGrid_VerticalLines);
-			}
-		}
-	}
-
 	private void enableControls() {
 
 //		final boolean isShowInfoTooltip = _chkShowInfoTooltip.getSelection();
@@ -486,7 +332,6 @@ public class SlideoutTourChartOptions extends AnimatedToolTipShell {
 //		_lblTooltipDelay.setEnabled(isShowInfoTooltip);
 //		_spinTooltipDelay.setEnabled(isShowInfoTooltip);
 	}
-
 
 	public Shell getShell() {
 
@@ -523,9 +368,14 @@ public class SlideoutTourChartOptions extends AnimatedToolTipShell {
 
 	}
 
-	private void initUI(final Composite parent) {
-
-		_pc = new PixelConverter(parent);
+	private void initUI() {
+		
+		_defaultSelectionListener = new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				onChangeUI();
+			}
+		};
 	}
 
 	@Override
@@ -542,18 +392,6 @@ public class SlideoutTourChartOptions extends AnimatedToolTipShell {
 		_tourChart.updateTourChart();
 
 		enableControls();
-	}
-
-	private void onSelectGridLine() {
-
-
-		// run async otherwise the update of the dialog box UI is slooooow
-		_shellContainer.getDisplay().asyncExec(new Runnable() {
-			@Override
-			public void run() {
-				onChangeUI();
-			}
-		});
 	}
 
 	/**
@@ -636,21 +474,10 @@ public class SlideoutTourChartOptions extends AnimatedToolTipShell {
 		_chkShowStartTimeOnXAxis.setSelection(isTourStartTime);
 		_chkShowValuePointTooltip.setSelection(isShowValuePointTooltip);
 
-		/*
-		 * Grid lines
-		 */
-		_spinnerGridHorizontalDistance.setSelection(//
-				_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE));
-		_spinnerGridVerticalDistance.setSelection(//
-				_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE));
-
-		_chkShowGrid_HorizontalLines.setSelection(//
-				_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES));
-		_chkShowGrid_VerticalLines.setSelection(//
-				_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES));
-
 		// this is not set in saveState()
 		_prefStore.setValue(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE, isShowValuePointTooltip);
+
+		_gridUI.resetToDefaults();
 
 		onChangeUI();
 	}
@@ -672,18 +499,8 @@ public class SlideoutTourChartOptions extends AnimatedToolTipShell {
 
 		_chkShowValuePointTooltip.setSelection(_prefStore.getBoolean(//
 				ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE));
-		/*
-		 * Grid
-		 */
-		_spinnerGridHorizontalDistance.setSelection(//
-				_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE));
-		_spinnerGridVerticalDistance.setSelection(//
-				_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE));
 
-		_chkShowGrid_HorizontalLines.setSelection(//
-				_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES));
-		_chkShowGrid_VerticalLines.setSelection(//
-				_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES));
+		_gridUI.restoreState();
 	}
 
 	private void saveState() {
@@ -705,18 +522,7 @@ public class SlideoutTourChartOptions extends AnimatedToolTipShell {
 		_prefStore.setValue(ITourbookPreferences.GRAPH_IS_SRTM_VISIBLE, isSrtmDataVisible);
 		_prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME, isTourStartTime);
 
-		/*
-		 * Grid
-		 */
-		_prefStore.setValue(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE, //
-				_spinnerGridHorizontalDistance.getSelection());
-		_prefStore.setValue(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE, //
-				_spinnerGridVerticalDistance.getSelection());
-
-		_prefStore.setValue(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES, //
-				_chkShowGrid_HorizontalLines.getSelection());
-		_prefStore.setValue(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES, //
-				_chkShowGrid_VerticalLines.getSelection());
+		_gridUI.saveState();
 
 		_tourChart.setupChartConfig();
 
