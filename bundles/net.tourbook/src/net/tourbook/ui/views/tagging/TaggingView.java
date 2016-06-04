@@ -1067,7 +1067,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 				final long value = ((TVITagViewItem) element).colDrivingTime;
 
-				colDef.printValue_0(cell, value);
+				colDef.printLongValue(cell, value, element instanceof TVITagViewTour);
 
 				setCellColor(cell, element);
 			}
@@ -1091,7 +1091,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 				final long value = ((TVITagViewItem) element).colPausedTime;
 
-				colDef.printValue_0(cell, value);
+				colDef.printLongValue(cell, value, element instanceof TVITagViewTour);
 
 				setCellColor(cell, element);
 			}
@@ -1116,7 +1116,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 				final long value = ((TVITagViewItem) element).colRecordingTime;
 
-				colDef.printValue_0(cell, value);
+				colDef.printLongValue(cell, value, element instanceof TVITagViewTour);
 
 				setCellColor(cell, element);
 			}
