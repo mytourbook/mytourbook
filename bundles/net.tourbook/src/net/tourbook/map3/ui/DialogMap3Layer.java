@@ -93,11 +93,6 @@ public class DialogMap3Layer extends AnimatedToolTipShell {
 	}
 
 	@Override
-	protected void beforeHideToolTip() {
-
-	}
-
-	@Override
 	protected boolean canCloseToolTip() {
 
 		/*

@@ -40,9 +40,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 
 /**
- * Tour chart marker properties slideout.
  */
-public class SlideoutChartOptions extends AnimatedToolTipShell {
+public class SlideoutStatisticsChartOptions extends AnimatedToolTipShell {
 
 	// initialize with default values which are (should) never be used
 	private Rectangle				_toolTipItemBounds	= new Rectangle(0, 0, 50, 50);
@@ -71,7 +70,7 @@ public class SlideoutChartOptions extends AnimatedToolTipShell {
 		}
 	}
 
-	public SlideoutChartOptions(final Control ownerControl, final ToolBar toolBar) {
+	public SlideoutStatisticsChartOptions(final Control ownerControl, final ToolBar toolBar) {
 
 		super(ownerControl);
 
@@ -98,11 +97,6 @@ public class SlideoutChartOptions extends AnimatedToolTipShell {
 				_canOpenToolTip = false;
 			}
 		});
-	}
-
-	@Override
-	protected void beforeHideToolTip() {
-
 	}
 
 	@Override

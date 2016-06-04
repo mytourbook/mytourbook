@@ -125,11 +125,6 @@ public class SlideoutTourMarkerFilter extends AnimatedToolTipShell implements IC
 	}
 
 	@Override
-	protected void beforeHideToolTip() {
-
-	}
-
-	@Override
 	protected boolean canCloseToolTip() {
 
 		/*
@@ -253,6 +248,7 @@ public class SlideoutTourMarkerFilter extends AnimatedToolTipShell implements IC
 				_spinnerGeoFilter.setDigits(GEO_FILTER_DIGITS);
 				_spinnerGeoFilter.setPageIncrement(50);
 				_spinnerGeoFilter.addMouseWheelListener(new MouseWheelListener() {
+					@Override
 					public void mouseScrolled(final MouseEvent event) {
 						UI.adjustSpinnerValueOnMouseScroll(event);
 						onSelect_GeoFilter();
@@ -305,6 +301,7 @@ public class SlideoutTourMarkerFilter extends AnimatedToolTipShell implements IC
 			_spinnerLatLonDigits.setMinimum(0);
 			_spinnerLatLonDigits.setMaximum(20);
 			_spinnerLatLonDigits.addMouseWheelListener(new MouseWheelListener() {
+				@Override
 				public void mouseScrolled(final MouseEvent event) {
 					UI.adjustSpinnerValueOnMouseScroll(event);
 					onSelect_LatLonDigits();

@@ -42,7 +42,7 @@ public class ActionChartOptions extends ContributionItem implements IOpeningDial
 	private ToolBar					_toolBar;
 	private ToolItem				_actionToolItem;
 
-	private SlideoutChartOptions	_slideoutChartOptions;
+	private SlideoutStatisticsChartOptions	_slideoutChartOptions;
 
 	/*
 	 * UI controls
@@ -95,7 +95,7 @@ public class ActionChartOptions extends ContributionItem implements IOpeningDial
 				}
 			});
 
-			_slideoutChartOptions = new SlideoutChartOptions(_parent, _toolBar);
+			_slideoutChartOptions = new SlideoutStatisticsChartOptions(_parent, _toolBar);
 		}
 	}
 

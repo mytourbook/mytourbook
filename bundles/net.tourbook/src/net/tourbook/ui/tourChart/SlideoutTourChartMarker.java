@@ -175,11 +175,6 @@ public class SlideoutTourChartMarker extends AnimatedToolTipShell implements ICo
 	}
 
 	@Override
-	protected void beforeHideToolTip() {
-
-	}
-
-	@Override
 	protected boolean canCloseToolTip() {
 
 		/*

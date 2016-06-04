@@ -221,11 +221,6 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 	}
 
 	@Override
-	protected void beforeHideToolTip() {
-
-	}
-
-	@Override
 	protected boolean canCloseToolTip() {
 
 		/*

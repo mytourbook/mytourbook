@@ -110,6 +110,7 @@ public class PhotoGalleryToolTip extends AnimatedToolTipShell {
 
 	@Override
 	protected void beforeHideToolTip() {
+
 		reset(false);
 	}
 

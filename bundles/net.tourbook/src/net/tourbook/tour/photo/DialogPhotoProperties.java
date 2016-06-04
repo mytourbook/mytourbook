@@ -181,9 +181,6 @@ public class DialogPhotoProperties extends AnimatedToolTipShell implements IPhot
 	}
 
 	@Override
-	protected void beforeHideToolTip() {}
-
-	@Override
 	protected boolean canShowToolTip() {
 		return true;
 	}
@@ -363,6 +360,7 @@ public class DialogPhotoProperties extends AnimatedToolTipShell implements IPhot
 				}
 			});
 			_spinnerImageSize.addMouseWheelListener(new MouseWheelListener() {
+				@Override
 				public void mouseScrolled(final MouseEvent event) {
 					Util.adjustSpinnerValueOnMouseScroll(event);
 					onSelectImageSize();

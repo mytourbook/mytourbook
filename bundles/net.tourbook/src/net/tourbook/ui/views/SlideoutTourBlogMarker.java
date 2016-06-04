@@ -113,11 +113,6 @@ public class SlideoutTourBlogMarker extends AnimatedToolTipShell implements ICol
 	}
 
 	@Override
-	protected void beforeHideToolTip() {
-
-	}
-
-	@Override
 	protected boolean canCloseToolTip() {
 
 		/*

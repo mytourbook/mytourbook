@@ -184,11 +184,6 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell i
 	}
 
 	@Override
-	protected void beforeHideToolTip() {
-
-	}
-
-	@Override
 	protected boolean canCloseToolTip() {
 
 		/*

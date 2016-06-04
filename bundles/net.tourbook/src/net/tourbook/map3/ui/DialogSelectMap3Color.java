@@ -254,11 +254,6 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
 	}
 
 	@Override
-	protected void beforeHideToolTip() {
-
-	}
-
-	@Override
 	protected boolean canCloseToolTip() {
 
 		/*
@@ -401,6 +396,7 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
 			 * critical for performance that these methods be as efficient as possible.
 			 */
 			final Listener paintListener = new Listener() {
+				@Override
 				public void handleEvent(final Event event) {
 
 					if (event.type == SWT.MeasureItem || event.type == SWT.PaintItem) {
@@ -449,13 +445,16 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
 
 			_colorViewer.setContentProvider(new IStructuredContentProvider() {
 
+				@Override
 				public void dispose() {}
 
+				@Override
 				public Object[] getElements(final Object inputElement) {
 
 					return colorProviders.toArray(new Map3GradientColorProvider[colorProviders.size()]);
 				}
 
+				@Override
 				public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 			});
 
@@ -481,12 +480,14 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
 			});
 
 			_colorViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+				@Override
 				public void selectionChanged(final SelectionChangedEvent event) {
 					onViewerSelectColor();
 				}
 			});
 
 			_colorViewer.addDoubleClickListener(new IDoubleClickListener() {
+				@Override
 				public void doubleClick(final DoubleClickEvent event) {
 					actionEditSelectedColor();
 				}

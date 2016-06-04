@@ -604,7 +604,9 @@ public abstract class AnimatedToolTipShell {
 	/**
 	 * Is called before the tooltip shell is set hidden.
 	 */
-	protected abstract void beforeHideToolTip();
+	protected void beforeHideToolTip() {
+		// do nothing
+	}
 
 	/**
 	 * @return When <code>false</code> is returned, the tooltip will <b>not</b> be closed. This can

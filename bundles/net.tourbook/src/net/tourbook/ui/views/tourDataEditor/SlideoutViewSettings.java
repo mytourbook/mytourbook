@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -108,11 +108,6 @@ public class SlideoutViewSettings extends AnimatedToolTipShell implements IColor
 	}
 
 	@Override
-	protected void beforeHideToolTip() {
-
-	}
-
-	@Override
 	protected boolean canCloseToolTip() {
 
 		/*
@@ -152,14 +147,11 @@ public class SlideoutViewSettings extends AnimatedToolTipShell implements IColor
 		final Composite ui = createUI(parent);
 
 		restoreState();
-		enableControls();
 
 		return ui;
 	}
 
 	private Composite createUI(final Composite parent) {
-
-		initUI(parent);
 
 		_shellContainer = new Composite(parent, SWT.NONE);
 		GridLayoutFactory.swtDefaults().applyTo(_shellContainer);
@@ -215,10 +207,6 @@ public class SlideoutViewSettings extends AnimatedToolTipShell implements IColor
 		}
 	}
 
-	private void enableControls() {
-
-	}
-
 	public Shell getShell() {
 
 		if (_shellContainer == null) {
@@ -239,12 +227,6 @@ public class SlideoutViewSettings extends AnimatedToolTipShell implements IColor
 		return new Point(devX, devY);
 	}
 
-	private void initUI(final Composite parent) {
-
-//		_pc = new PixelConverter(parent);
-//		_boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
-	}
-
 	@Override
 	protected Rectangle noHideOnMouseMove() {
 
@@ -258,8 +240,6 @@ public class SlideoutViewSettings extends AnimatedToolTipShell implements IColor
 		_state.put(TourDataEditorView.STATE_LAT_LON_DIGITS, latLonDigits);
 
 		_tourEditorView.updateUI_LatLonDigits(latLonDigits);
-
-		enableControls();
 	}
 
 	/**

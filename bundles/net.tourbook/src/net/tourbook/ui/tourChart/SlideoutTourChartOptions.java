@@ -62,7 +62,6 @@ public class SlideoutTourChartOptions extends AnimatedToolTipShell {
 
 	private SelectionAdapter		_defaultSelectionListener;
 
-
 	private ActionOpenPrefDialog	_actionPrefDialog;
 	private Action					_actionRestoreDefaults;
 
@@ -113,11 +112,6 @@ public class SlideoutTourChartOptions extends AnimatedToolTipShell {
 				_canOpenToolTip = false;
 			}
 		});
-	}
-
-	@Override
-	protected void beforeHideToolTip() {
-
 	}
 
 	@Override
@@ -369,7 +363,7 @@ public class SlideoutTourChartOptions extends AnimatedToolTipShell {
 	}
 
 	private void initUI() {
-		
+
 		_defaultSelectionListener = new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
