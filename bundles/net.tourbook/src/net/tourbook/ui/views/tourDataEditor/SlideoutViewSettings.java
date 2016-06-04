@@ -19,7 +19,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.IColorSelectorListener;
-import net.tourbook.common.tooltip.AnimatedToolTipShell;
+import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -27,38 +27,24 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
 
 /**
  * Slideout for the tour data editor settings.
  */
-public class SlideoutViewSettings extends AnimatedToolTipShell implements IColorSelectorListener {
+public class SlideoutViewSettings extends ToolbarSlideout implements IColorSelectorListener {
 
-	private final IDialogSettings	_state				= TourbookPlugin.getState(TourDataEditorView.ID);
-
-	// initialize with default values which are (should) never be used
-	private Rectangle				_toolTipItemBounds	= new Rectangle(0, 0, 50, 50);
+	private final IDialogSettings	_state	= TourbookPlugin.getState(TourDataEditorView.ID);
 
 	private TourDataEditorView		_tourEditorView;
-
-	private final WaitTimer			_waitTimer			= new WaitTimer();
-
-	private boolean					_isWaitTimerStarted;
-	private boolean					_canOpenToolTip;
-	private boolean					_isAnotherDialogOpened;
 
 	/*
 	 * UI controls
@@ -69,76 +55,20 @@ public class SlideoutViewSettings extends AnimatedToolTipShell implements IColor
 
 	private Label					_lblLatLonDigits;
 
-	private final class WaitTimer implements Runnable {
-		@Override
-		public void run() {
-			open_Runnable();
-		}
-	}
-
 	public SlideoutViewSettings(final Control ownerControl,
 								final ToolBar toolBar,
 								final IDialogSettings state,
 								final TourDataEditorView tourMarkerAllView) {
 
-		super(ownerControl);
+		super(ownerControl, toolBar);
 
 		_tourEditorView = tourMarkerAllView;
-
-		addListener(ownerControl, toolBar);
-
-		setToolTipCreateStyle(AnimatedToolTipShell.TOOLTIP_STYLE_KEEP_CONTENT);
-		setBehaviourOnMouseOver(AnimatedToolTipShell.MOUSE_OVER_BEHAVIOUR_IGNORE_OWNER);
-		setIsKeepShellOpenWhenMoved(false);
-		setFadeInSteps(1);
-		setFadeOutSteps(10);
-		setFadeOutDelaySteps(1);
-	}
-
-	private void addListener(final Control ownerControl, final ToolBar toolBar) {
-
-		toolBar.addMouseTrackListener(new MouseTrackAdapter() {
-			@Override
-			public void mouseExit(final MouseEvent e) {
-
-				// prevent to open the tooltip
-				_canOpenToolTip = false;
-			}
-		});
-	}
-
-	@Override
-	protected boolean canCloseToolTip() {
-
-		/*
-		 * Do not hide this dialog when the color selector dialog or other dialogs are opened
-		 * because it will lock the UI completely !!!
-		 */
-
-		final boolean isCanClose = _isAnotherDialogOpened == false;
-
-		return isCanClose;
-	}
-
-	@Override
-	protected boolean canShowToolTip() {
-		return true;
-	}
-
-	@Override
-	protected boolean closeShellAfterHidden() {
-
-		/*
-		 * Close the tooltip that the state is saved.
-		 */
-
-		return true;
 	}
 
 	@Override
 	public void colorDialogOpened(final boolean isDialogOpened) {
 
-		_isAnotherDialogOpened = isDialogOpened;
+		setIsAnotherDialogOpened(isDialogOpened);
 	}
 
 	@Override
@@ -207,32 +137,6 @@ public class SlideoutViewSettings extends AnimatedToolTipShell implements IColor
 		}
 	}
 
-	public Shell getShell() {
-
-		if (_shellContainer == null) {
-			return null;
-		}
-
-		return _shellContainer.getShell();
-	}
-
-	@Override
-	public Point getToolTipLocation(final Point tipSize) {
-
-		final int itemHeight = _toolTipItemBounds.height;
-
-		final int devX = _toolTipItemBounds.x - tipSize.x / 2;
-		final int devY = _toolTipItemBounds.y + itemHeight;
-
-		return new Point(devX, devY);
-	}
-
-	@Override
-	protected Rectangle noHideOnMouseMove() {
-
-		return _toolTipItemBounds;
-	}
-
 	private void onSelect_LatLonDigits() {
 
 		final int latLonDigits = _spinnerLatLonDigits.getSelection();
@@ -240,58 +144,6 @@ public class SlideoutViewSettings extends AnimatedToolTipShell implements IColor
 		_state.put(TourDataEditorView.STATE_LAT_LON_DIGITS, latLonDigits);
 
 		_tourEditorView.updateUI_LatLonDigits(latLonDigits);
-	}
-
-	/**
-	 * @param toolTipItemBounds
-	 * @param isOpenDelayed
-	 */
-	public void open(final Rectangle toolTipItemBounds, final boolean isOpenDelayed) {
-
-		if (isToolTipVisible()) {
-
-			return;
-		}
-
-		if (isOpenDelayed == false) {
-
-			if (toolTipItemBounds != null) {
-
-				_toolTipItemBounds = toolTipItemBounds;
-
-				showToolTip();
-			}
-
-		} else {
-
-			if (toolTipItemBounds == null) {
-
-				// item is not hovered any more
-
-				_canOpenToolTip = false;
-
-				return;
-			}
-
-			_toolTipItemBounds = toolTipItemBounds;
-			_canOpenToolTip = true;
-
-			if (_isWaitTimerStarted == false) {
-
-				_isWaitTimerStarted = true;
-
-				Display.getCurrent().timerExec(50, _waitTimer);
-			}
-		}
-	}
-
-	private void open_Runnable() {
-
-		_isWaitTimerStarted = false;
-
-		if (_canOpenToolTip) {
-			showToolTip();
-		}
 	}
 
 	private void restoreState() {

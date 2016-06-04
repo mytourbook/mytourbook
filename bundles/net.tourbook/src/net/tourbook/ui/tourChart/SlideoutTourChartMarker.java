@@ -20,7 +20,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorSelectorExtended;
 import net.tourbook.common.color.IColorSelectorListener;
-import net.tourbook.common.tooltip.AnimatedToolTipShell;
+import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.data.TourMarker;
 import net.tourbook.preferences.ITourbookPreferences;
 
@@ -36,41 +36,25 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
 
 /**
  * Tour chart marker properties slideout.
  */
-public class SlideoutTourChartMarker extends AnimatedToolTipShell implements IColorSelectorListener {
+public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSelectorListener {
 
-	private final IPreferenceStore	_prefStore			= TourbookPlugin.getPrefStore();
-
-	// initialize with default values which are (should) never be used
-	private Rectangle				_toolTipItemBounds	= new Rectangle(0, 0, 50, 50);
-
-	private final WaitTimer			_waitTimer			= new WaitTimer();
-
-	private boolean					_isWaitTimerStarted;
-	private boolean					_canOpenToolTip;
-	private boolean					_isAnotherDialogOpened;
+	private final IPreferenceStore	_prefStore	= TourbookPlugin.getPrefStore();
 
 	private SelectionAdapter		_defaultSelectionAdapter;
 	private MouseWheelListener		_defaultMouseWheelListener;
@@ -107,7 +91,6 @@ public class SlideoutTourChartMarker extends AnimatedToolTipShell implements ICo
 	/*
 	 * UI controls
 	 */
-	private Composite				_shellContainer;
 	private TourChart				_tourChart;
 
 	private Button					_chkDrawMarkerWithDefaultColor;
@@ -136,76 +119,20 @@ public class SlideoutTourChartMarker extends AnimatedToolTipShell implements ICo
 	private Spinner					_spinLabelOffset;
 	private Spinner					_spinMarkerPointSize;
 
-	private final class WaitTimer implements Runnable {
-		@Override
-		public void run() {
-			open_Runnable();
-		}
-	}
-
 	public SlideoutTourChartMarker(	final Control ownerControl,
 									final ToolBar toolBar,
 									final IDialogSettings state,
 									final TourChart tourChart) {
 
-		super(ownerControl);
+		super(ownerControl, toolBar);
 
 		_tourChart = tourChart;
-
-		addListener(ownerControl, toolBar);
-
-		setToolTipCreateStyle(AnimatedToolTipShell.TOOLTIP_STYLE_KEEP_CONTENT);
-		setBehaviourOnMouseOver(AnimatedToolTipShell.MOUSE_OVER_BEHAVIOUR_IGNORE_OWNER);
-		setIsKeepShellOpenWhenMoved(false);
-		setFadeInSteps(1);
-		setFadeOutSteps(10);
-		setFadeOutDelaySteps(1);
-	}
-
-	private void addListener(final Control ownerControl, final ToolBar toolBar) {
-
-		toolBar.addMouseTrackListener(new MouseTrackAdapter() {
-			@Override
-			public void mouseExit(final MouseEvent e) {
-
-				// prevent to open the tooltip
-				_canOpenToolTip = false;
-			}
-		});
-	}
-
-	@Override
-	protected boolean canCloseToolTip() {
-
-		/*
-		 * Do not hide this dialog when the color selector dialog or other dialogs are opened
-		 * because it will lock the UI completely !!!
-		 */
-
-		final boolean isCanClose = _isAnotherDialogOpened == false;
-
-		return isCanClose;
-	}
-
-	@Override
-	protected boolean canShowToolTip() {
-		return true;
-	}
-
-	@Override
-	protected boolean closeShellAfterHidden() {
-
-		/*
-		 * Close the tooltip that the state is saved.
-		 */
-
-		return true;
 	}
 
 	@Override
 	public void colorDialogOpened(final boolean isDialogOpened) {
 
-		_isAnotherDialogOpened = isDialogOpened;
+		setIsAnotherDialogOpened(isDialogOpened);
 	}
 
 	private void createActions() {
@@ -243,10 +170,10 @@ public class SlideoutTourChartMarker extends AnimatedToolTipShell implements ICo
 
 		_pc = new PixelConverter(parent);
 
-		_shellContainer = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.swtDefaults().applyTo(_shellContainer);
+		final Composite shellContainer = new Composite(parent, SWT.NONE);
+		GridLayoutFactory.swtDefaults().applyTo(shellContainer);
 		{
-			final Composite container = new Composite(_shellContainer, SWT.NONE);
+			final Composite container = new Composite(shellContainer, SWT.NONE);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 			GridLayoutFactory.fillDefaults().applyTo(container);
 //			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
@@ -259,15 +186,7 @@ public class SlideoutTourChartMarker extends AnimatedToolTipShell implements ICo
 			}
 		}
 
-		_shellContainer.addDisposeListener(new DisposeListener() {
-
-			@Override
-			public void widgetDisposed(final DisposeEvent e) {
-				onDispose();
-			}
-		});
-
-		return _shellContainer;
+		return shellContainer;
 	}
 
 	private void createUI_10_Header(final Composite parent) {
@@ -673,47 +592,6 @@ public class SlideoutTourChartMarker extends AnimatedToolTipShell implements ICo
 		for (final String position : ChartMarkerToolTip.TOOLTIP_POSITIONS) {
 			_comboTooltipPosition.add(position);
 		}
-
-	}
-
-	public Shell getShell() {
-
-		if (_shellContainer == null) {
-			return null;
-		}
-
-		return _shellContainer.getShell();
-	}
-
-	@Override
-	public Point getToolTipLocation(final Point tipSize) {
-
-//		final int tipWidth = tipSize.x;
-		final int tipHeight = tipSize.y;
-//
-//		final int itemWidth = _toolTipItemBounds.width;
-		final int itemHeight = _toolTipItemBounds.height;
-
-		// center horizontally
-		final int devX = _toolTipItemBounds.x;// + itemWidth / 2 - tipWidth / 2;
-		int devY = _toolTipItemBounds.y + itemHeight + 0;
-
-		final Rectangle displayBounds = this.getShell().getDisplay().getBounds();
-
-		if (devY + tipHeight > displayBounds.height) {
-
-			// slideout is below bottom, show it above the action button
-
-			devY = _toolTipItemBounds.y - tipHeight;
-		}
-
-		return new Point(devX, devY);
-	}
-
-	@Override
-	protected Rectangle noHideOnMouseMove() {
-
-		return _toolTipItemBounds;
 	}
 
 	private void onChangeUI() {
@@ -797,61 +675,6 @@ public class SlideoutTourChartMarker extends AnimatedToolTipShell implements ICo
 		// notify pref listener
 		TourbookPlugin.getDefault().getPreferenceStore()//
 				.setValue(ITourbookPreferences.GRAPH_MARKER_IS_MODIFIED, Math.random());
-	}
-
-	private void onDispose() {
-
-	}
-
-	/**
-	 * @param toolTipItemBounds
-	 * @param isOpenDelayed
-	 */
-	public void open(final Rectangle toolTipItemBounds, final boolean isOpenDelayed) {
-
-		if (isToolTipVisible()) {
-			return;
-		}
-
-		if (isOpenDelayed == false) {
-
-			if (toolTipItemBounds != null) {
-
-				_toolTipItemBounds = toolTipItemBounds;
-
-				showToolTip();
-			}
-
-		} else {
-
-			if (toolTipItemBounds == null) {
-
-				// item is not hovered any more
-
-				_canOpenToolTip = false;
-
-				return;
-			}
-
-			_toolTipItemBounds = toolTipItemBounds;
-			_canOpenToolTip = true;
-
-			if (_isWaitTimerStarted == false) {
-
-				_isWaitTimerStarted = true;
-
-				Display.getCurrent().timerExec(50, _waitTimer);
-			}
-		}
-	}
-
-	private void open_Runnable() {
-
-		_isWaitTimerStarted = false;
-
-		if (_canOpenToolTip) {
-			showToolTip();
-		}
 	}
 
 	private void resetToDefaults() {
