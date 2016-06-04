@@ -50,7 +50,7 @@ public class DataProvider_Tour_Day extends DataProvider {
 		return _instance;
 	}
 
-	TourData_Day getDayData(	final TourPerson person,
+	TourData_Day getDayData(final TourPerson person,
 							final TourTypeFilter tourTypeFilter,
 							final int lastYear,
 							final int numberOfYears,
@@ -222,9 +222,13 @@ public class DataProvider_Tour_Day extends DataProvider {
 					 * color index
 					 */
 					int colorIndex = 0;
+					long dbTypeId = 0;
+
 					final Object dbTypeIdObject = result.getObject(12);
-					if (dbTypeIdObject != null) {
-						final long dbTypeId = result.getLong(12);
+					if (dbTypeIdObject instanceof Long) {
+
+						dbTypeId = (Long) dbTypeIdObject;
+
 						for (int typeIndex = 0; typeIndex < tourTypes.length; typeIndex++) {
 							if (dbTypeId == tourTypes[typeIndex].getTypeId()) {
 								colorIndex = colorOffset + typeIndex;
@@ -234,7 +238,7 @@ public class DataProvider_Tour_Day extends DataProvider {
 					}
 
 					dbTypeColorIndex.add(colorIndex);
-					dbTypeIds.add((Long) dbTypeIdObject);
+					dbTypeIds.add(dbTypeId);
 				}
 
 				lastTourId = tourId;
