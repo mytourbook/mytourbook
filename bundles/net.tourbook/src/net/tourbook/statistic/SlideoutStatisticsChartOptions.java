@@ -20,7 +20,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.preferences.PrefPageAppearanceTourChart;
-import net.tourbook.ui.ChartOptions_GridUI;
+import net.tourbook.ui.ChartOptions_Grid;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
@@ -38,15 +38,17 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class SlideoutStatisticsChartOptions extends ToolbarSlideout {
 
-	private ActionOpenPrefDialog	_actionPrefDialog;
-	private Action					_actionRestoreDefaults;
+	private ActionOpenPrefDialog					_actionPrefDialog;
+	private Action									_actionRestoreDefaults;
 
-	private ChartOptions_GridUI		_gridUI	= new ChartOptions_GridUI();
+	private ChartOptions_Grid						_gridUI			= new ChartOptions_Grid();
+	private ChartOptions_Statistics_TourFrequency	_statisticUI	= new ChartOptions_Statistics_TourFrequency();
 
 	/*
 	 * UI controls
 	 */
-	private Shell					_parentShell;
+	private Shell									_parentShell;
+	private boolean									_isOption_ShowTourFrequency;
 
 	public SlideoutStatisticsChartOptions(final Control ownerControl, final ToolBar toolBar) {
 
@@ -107,6 +109,11 @@ public class SlideoutStatisticsChartOptions extends ToolbarSlideout {
 			{
 				createUI_10_Title(container);
 				createUI_12_Actions(container);
+
+				if (_isOption_ShowTourFrequency) {
+					_statisticUI.createUI(container);
+				}
+
 				_gridUI.createUI(container);
 			}
 		}
@@ -141,15 +148,33 @@ public class SlideoutStatisticsChartOptions extends ToolbarSlideout {
 		tbm.update(true);
 	}
 
+	void resetOptions() {
+
+		_isOption_ShowTourFrequency = false;
+	}
+
 	private void resetToDefaults() {
 
 		_gridUI.resetToDefaults();
-
 		_gridUI.saveState();
+
+		if (_isOption_ShowTourFrequency) {
+			_statisticUI.resetToDefaults();
+			_statisticUI.saveState();
+		}
 	}
 
 	private void restoreState() {
 
 		_gridUI.restoreState();
+
+		if (_isOption_ShowTourFrequency) {
+			_statisticUI.restoreState();
+		}
+	}
+
+	public void setOption_IsShowTourFrequency() {
+
+		_isOption_ShowTourFrequency = true;
 	}
 }

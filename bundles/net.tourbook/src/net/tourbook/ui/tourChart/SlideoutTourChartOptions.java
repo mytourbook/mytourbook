@@ -21,7 +21,7 @@ import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageAppearanceTourChart;
-import net.tourbook.ui.ChartOptions_GridUI;
+import net.tourbook.ui.ChartOptions_Grid;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
@@ -50,7 +50,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
 	private ActionOpenPrefDialog	_actionPrefDialog;
 	private Action					_actionRestoreDefaults;
 
-	private ChartOptions_GridUI		_gridUI		= new ChartOptions_GridUI();
+	private ChartOptions_Grid		_gridUI		= new ChartOptions_Grid();
 
 	/*
 	 * UI controls

@@ -386,13 +386,14 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
 
 	@Override
 	public void preferencesHasChanged() {
-		updateStatistic(new StatisticContext(_activePerson, _activeTourTypeFiler, _currentYear, _numberOfYears, false));
+
+		updateStatistic(new StatisticContext(_activePerson, _activeTourTypeFiler, _currentYear, _numberOfYears));
 	}
 
 	@Override
 	public void restoreState(final IDialogSettings viewState) {
 
-		final String mementoTourId = viewState.get(MEMENTO_SELECTED_TOUR_ID);
+		final String mementoTourId = viewState.get(STATE_SELECTED_TOUR_ID);
 		if (mementoTourId != null) {
 			try {
 				final long tourId = Long.parseLong(mementoTourId);
@@ -418,7 +419,7 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
 
 			final Long selectedTourId = _tourTimeData.tourIds[((SelectionBarChart) selection).valueIndex];
 
-			viewState.put(MEMENTO_SELECTED_TOUR_ID, Long.toString(selectedTourId));
+			viewState.put(STATE_SELECTED_TOUR_ID, Long.toString(selectedTourId));
 		}
 	}
 

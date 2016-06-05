@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,7 +21,8 @@ import net.tourbook.ui.TourTypeFilter;
 /**
  * Contains fields which are use to display the statistics.
  * <p>
- * Field prefixes which are not set in the constructor:<br>
+ * Field prefixes which are not set in the constructor:
+ * <p>
  * <code>in</code> field is set by the statistic container for the statistic implementation<br>
  * <code>out</code> field is set by the statistic implementation for the statistic container<br>
  */
@@ -47,7 +48,7 @@ public class StatisticContext {
 	 */
 	public int				statNumberOfYears;
 
-	public boolean			isRefreshData;
+	public boolean			isRefreshData				= false;
 
 	/**
 	 * Contains the index in the combo box for the selected vertical bar ordering.
@@ -92,14 +93,13 @@ public class StatisticContext {
 	public StatisticContext(final TourPerson activePerson,
 							final TourTypeFilter activeTourTypeFilter,
 							final int selectedYear,
-							final int numberOfYears,
-							final boolean isRefreshData) {
+							final int numberOfYears) {
 
 		this.appPerson = activePerson;
 		this.appTourTypeFilter = activeTourTypeFilter;
+
 		this.statYoungestYear = selectedYear;
 		this.statNumberOfYears = numberOfYears;
-		this.isRefreshData = isRefreshData;
 	}
 
 }

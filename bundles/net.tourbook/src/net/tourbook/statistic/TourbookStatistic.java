@@ -31,7 +31,7 @@ import org.eclipse.ui.IViewSite;
  */
 public abstract class TourbookStatistic {
 
-	protected static final String	MEMENTO_SELECTED_TOUR_ID	= "statistic.selected.tourId";
+	protected static final String	STATE_SELECTED_TOUR_ID	= "STATE_SELECTED_TOUR_ID";		//$NON-NLS-1$
 
 	/** ID from plugin.xml */
 	public String					statisticId;
@@ -41,7 +41,7 @@ public abstract class TourbookStatistic {
 
 	private boolean					_isDataDirty;
 
-	private final IPreferenceStore	_prefStore					= TourbookPlugin.getPrefStore();
+	private final IPreferenceStore	_prefStore				= TourbookPlugin.getPrefStore();
 
 	private IPropertyChangeListener	_prefChangeListener;
 
@@ -118,10 +118,10 @@ public abstract class TourbookStatistic {
 		if (_container != null && _container.isDisposed() == false) {
 
 			_container.dispose();
-
-			// !!! null is checked outside of this class !!!
-			_container = null;
 		}
+
+		// !!! null is checked outside of this class !!!
+		_container = null;
 	}
 
 	@Override
@@ -218,6 +218,16 @@ public abstract class TourbookStatistic {
 	 */
 	public void setBarVerticalOrder(final int selectedIndex) {
 		// do nothing
+	}
+
+	/**
+	 * Set visible options in the slideout, default is to reset all options.
+	 * 
+	 * @param slideout
+	 */
+	protected void setChartOptionsSlideout(final SlideoutStatisticsChartOptions slideout) {
+
+		slideout.resetOptions();
 	}
 
 	/**

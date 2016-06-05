@@ -33,7 +33,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 
-public class ChartOptions_GridUI {
+public class ChartOptions_Grid {
 
 	private final IPreferenceStore	_prefStore	= TourbookPlugin.getPrefStore();
 

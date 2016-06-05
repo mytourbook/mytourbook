@@ -637,7 +637,7 @@ public class TourSegmenterTooltip extends AnimatedToolTipShell implements ITourP
 	}
 
 	@Override
-	protected void onUpdateUI() {
+	protected void onAfterCreateUI() {
 
 		updateUI();
 

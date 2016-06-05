@@ -34,6 +34,7 @@ import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.statistic.SlideoutStatisticsChartOptions;
 import net.tourbook.statistic.StatisticContext;
 import net.tourbook.statistic.TourbookStatistic;
 import net.tourbook.statistics.Messages;
@@ -53,7 +54,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewSite;
 
-public class StatisticTour_Numbers extends TourbookStatistic {
+public class StatisticTour_Frequency extends TourbookStatistic {
 
 	private final IPreferenceStore		_prefStore							= TourbookPlugin.getPrefStore();
 
@@ -115,7 +116,7 @@ public class StatisticTour_Numbers extends TourbookStatistic {
 	private Chart						_chartAltitudeCounter;
 	private Chart						_chartAltitudeSum;
 
-	public StatisticTour_Numbers() {}
+	public StatisticTour_Frequency() {}
 
 	void addPrefListener(final Composite container) {
 
@@ -213,8 +214,8 @@ public class StatisticTour_Numbers extends TourbookStatistic {
 		// loop: all tours
 		for (int tourIndex = 0; tourIndex < tourDayData.distanceHigh.length; tourIndex++) {
 
-			final int typeColorIndex = tourDayData.typeColorIndex[tourIndex];
 			int unitIndex;
+			final int typeColorIndex = tourDayData.typeColorIndex[tourIndex];
 
 			final int diffDistance = (int) ((tourDayData.distanceHigh[tourIndex] - tourDayData.distanceLow[tourIndex] + 500) / 1000);
 			final int diffAltitude = (int) (tourDayData.altitudeHigh[tourIndex] - tourDayData.altitudeLow[tourIndex]);
@@ -504,11 +505,14 @@ public class StatisticTour_Numbers extends TourbookStatistic {
 			final int unit = units[unitIndex];
 
 			if (lastUnit < 0) {
+
 				// first unit
 				if (tourValue < unit) {
 					isUnitFound = true;
 				}
+
 			} else {
+
 				// second and continuous units
 				if (tourValue >= lastUnit && tourValue < unit) {
 					isUnitFound = true;
@@ -516,11 +520,14 @@ public class StatisticTour_Numbers extends TourbookStatistic {
 			}
 
 			if (isUnitFound) {
+
 				counter[unitIndex]++;
 				sum[unitIndex] += tourValue;
-				// colorIndex[unitIndex]=
+
 				return unitIndex;
+
 			} else {
+
 				lastUnit = unit;
 			}
 		}
@@ -595,7 +602,8 @@ public class StatisticTour_Numbers extends TourbookStatistic {
 
 	@Override
 	public void preferencesHasChanged() {
-		updateStatistic(new StatisticContext(_activePerson, _activeTourTypeFilter, _currentYear, _numberOfYears, false));
+
+		updateStatistic(new StatisticContext(_activePerson, _activeTourTypeFilter, _currentYear, _numberOfYears));
 	}
 
 	private void resetMinMaxKeeper() {
@@ -609,6 +617,12 @@ public class StatisticTour_Numbers extends TourbookStatistic {
 			_minMaxKeeperStatDurationCounter.resetMinMax();
 			_minMaxKeeperStatDurationSum.resetMinMax();
 		}
+	}
+
+	@Override
+	protected void setChartOptionsSlideout(final SlideoutStatisticsChartOptions slideout) {
+
+		slideout.setOption_IsShowTourFrequency();
 	}
 
 	@Override

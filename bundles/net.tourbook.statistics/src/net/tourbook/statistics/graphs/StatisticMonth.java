@@ -283,7 +283,8 @@ public abstract class StatisticMonth extends TourbookStatistic {
 
 	@Override
 	public void preferencesHasChanged() {
-		updateStatistic(new StatisticContext(_activePerson, _activeTourTypeFilter, _currentYear, _numberOfYears, false));
+
+		updateStatistic(new StatisticContext(_activePerson, _activeTourTypeFilter, _currentYear, _numberOfYears));
 	}
 
 	private void setChartProviders(final ChartDataModel chartModel) {

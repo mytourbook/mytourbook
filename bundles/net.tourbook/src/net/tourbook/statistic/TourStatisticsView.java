@@ -135,8 +135,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 				_activePerson,
 				_activeTourTypeFilter,
 				_selectedYear,
-				getNumberOfYears(),
-				false));
+				getNumberOfYears()));
 	}
 
 	private void addPartListener() {
@@ -225,6 +224,14 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 
 			@Override
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
+
+				if (part == TourStatisticsView.this) {
+					return;
+				}
+
+				System.out.println((net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+						+ ("\tselection: " + selection));
+				// TODO remove SYSTEM.OUT.PRINTLN
 
 				if (selection instanceof SelectionDeletedTours) {
 					updateStatistic();
@@ -829,9 +836,9 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 				_activePerson,
 				_activeTourTypeFilter,
 				_selectedYear,
-				getNumberOfYears(),
-				true);
+				getNumberOfYears());
 
+		statContext.isRefreshData = true;
 		statContext.inVerticalBarIndex = _cboBarVerticalOrder.getSelectionIndex();
 
 		_activeStatistic.updateStatistic(statContext);
@@ -873,8 +880,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 				_activePerson,
 				_activeTourTypeFilter,
 				selectedYear,
-				getNumberOfYears(),
-				false);
+				getNumberOfYears());
 
 		statContext.inVerticalBarIndex = _cboBarVerticalOrder.getSelectionIndex();
 
@@ -946,6 +952,9 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 
 		// update toolbar to show added items
 		tbm.update(true);
+
+		// set slideout AFTER the toolbar is created/updated/filled which creates the slideout
+		_activeStatistic.setChartOptionsSlideout(_actionChartOptions.getSlideout());
 	}
 
 	private void updateUI_VerticalBarOrder(final StatisticContext statContext) {

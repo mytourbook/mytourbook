@@ -556,13 +556,13 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 	@Override
 	public void preferencesHasChanged() {
 
-		updateStatistic(new StatisticContext(_activePerson, _activeTourTypeFilter, _currentYear, _numberOfYears, false));
+		updateStatistic(new StatisticContext(_activePerson, _activeTourTypeFilter, _currentYear, _numberOfYears));
 	}
 
 	@Override
 	public void restoreState(final IDialogSettings viewState) {
 
-		final String mementoTourId = viewState.get(MEMENTO_SELECTED_TOUR_ID);
+		final String mementoTourId = viewState.get(STATE_SELECTED_TOUR_ID);
 		if (mementoTourId != null) {
 			try {
 				final long tourId = Long.parseLong(mementoTourId);
@@ -587,7 +587,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 
 			// check array bounds
 			if (valueIndex < _tourDayData.tourIds.length) {
-				viewState.put(MEMENTO_SELECTED_TOUR_ID, Long.toString(_tourDayData.tourIds[valueIndex]));
+				viewState.put(STATE_SELECTED_TOUR_ID, Long.toString(_tourDayData.tourIds[valueIndex]));
 			}
 		}
 	}

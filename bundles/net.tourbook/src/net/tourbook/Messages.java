@@ -447,6 +447,8 @@ public class Messages extends NLS {
 
 	public static String		App_Unit_Minute;
 
+	public static String	App_Unit_Minute_Small;
+
 	public static String		App_Unit_Px;
 	public static String		App_Unit_Seconds_Small;
 
@@ -1320,6 +1322,8 @@ public class Messages extends NLS {
 //	public static String		Pref_SignImages_Dialog_Delete_Title;
 //	public static String		Pref_SignImages_Dialog_NoSelectedSignImage_Message;
 
+	public static String	Pref_Statistic_Group_TourFrequency;
+
 	public static String		Pref_Statistic_Label_altitude;
 	public static String		Pref_Statistic_Label_altitude_low_value;
 	public static String		Pref_Statistic_Label_altitude_quantity;
@@ -1332,6 +1336,12 @@ public class Messages extends NLS {
 	public static String		Pref_Statistic_Label_duration_quantity;
 	public static String		Pref_Statistic_Label_h;
 	public static String		Pref_Statistic_Label_interval;
+
+	public static String	Pref_Statistic_Label_Interval;
+
+	public static String	Pref_Statistic_Label_Minimum;
+
+	public static String	Pref_Statistic_Label_NumberOfBars;
 	public static String		Pref_Statistic_Label_separator;
 
 	public static String		Pref_Tour_Button_FailedUpdate;

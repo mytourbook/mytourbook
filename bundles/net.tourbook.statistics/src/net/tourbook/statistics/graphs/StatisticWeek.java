@@ -439,12 +439,7 @@ public abstract class StatisticWeek extends TourbookStatistic {
 	@Override
 	public void preferencesHasChanged() {
 
-		updateStatistic(new StatisticContext(
-				_appPerson,
-				_appTourTypeFilter,
-				_statYoungestYear,
-				_statNumberOfYears,
-				false));
+		updateStatistic(new StatisticContext(_appPerson, _appTourTypeFilter, _statYoungestYear, _statNumberOfYears));
 	}
 
 	@Override

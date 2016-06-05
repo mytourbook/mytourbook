@@ -714,7 +714,7 @@ public abstract class AnimatedToolTipShell {
 			createToolTipContentArea(_shell);
 		}
 
-		onUpdateUI();
+		onAfterCreateUI();
 
 		_shell.layout();
 		_shell.pack(true);
@@ -857,6 +857,13 @@ public abstract class AnimatedToolTipShell {
 	 */
 	protected Rectangle noHideOnMouseMove() {
 		return null;
+	}
+
+	/**
+	 * Is called after the UI is created but before it is packed.
+	 */
+	protected void onAfterCreateUI() {
+		// default do nothing
 	}
 
 	/**
@@ -1248,13 +1255,6 @@ public abstract class AnimatedToolTipShell {
 
 		}
 
-	}
-
-	/**
-	 * Is called after the UI is created but before it is packed.
-	 */
-	protected void onUpdateUI() {
-		// default do nothing
 	}
 
 	private void removeDisplayFilterListener() {

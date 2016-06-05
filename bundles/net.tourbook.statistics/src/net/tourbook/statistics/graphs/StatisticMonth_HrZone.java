@@ -387,12 +387,8 @@ public class StatisticMonth_HrZone extends TourbookStatistic {
 	}
 
 	private void updateStatistic() {
-		updateStatistic(new StatisticContext(
-				_appPerson,
-				_appTourTypeFilter,
-				_statYoungestYear,
-				_statNumberOfYears,
-				false));
+
+		updateStatistic(new StatisticContext(_appPerson, _appTourTypeFilter, _statYoungestYear, _statNumberOfYears));
 	}
 
 	@Override

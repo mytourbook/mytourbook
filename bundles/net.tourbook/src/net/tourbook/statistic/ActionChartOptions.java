@@ -37,20 +37,20 @@ import org.eclipse.swt.widgets.ToolItem;
 
 public class ActionChartOptions extends ContributionItem implements IOpeningDialog {
 
-	private String					_dialogId	= getClass().getCanonicalName();
+	private String							_dialogId	= getClass().getCanonicalName();
 
-	private ToolBar					_toolBar;
-	private ToolItem				_actionToolItem;
+	private ToolBar							_toolBar;
+	private ToolItem						_actionToolItem;
 
-	private SlideoutStatisticsChartOptions	_slideoutChartOptions;
+	private SlideoutStatisticsChartOptions	_slideoutStatisticChartOptions;
 
 	/*
 	 * UI controls
 	 */
-	private Control					_parent;
+	private Control							_parent;
 
-	private Image					_imageEnabled;
-	private Image					_imageDisabled;
+	private Image							_imageEnabled;
+	private Image							_imageDisabled;
 
 	public ActionChartOptions(final Composite parent) {
 
@@ -95,7 +95,7 @@ public class ActionChartOptions extends ContributionItem implements IOpeningDial
 				}
 			});
 
-			_slideoutChartOptions = new SlideoutStatisticsChartOptions(_parent, _toolBar);
+			_slideoutStatisticChartOptions = new SlideoutStatisticsChartOptions(_parent, _toolBar);
 		}
 	}
 
@@ -104,9 +104,13 @@ public class ActionChartOptions extends ContributionItem implements IOpeningDial
 		return _dialogId;
 	}
 
+	SlideoutStatisticsChartOptions getSlideout() {
+		return _slideoutStatisticChartOptions;
+	}
+
 	@Override
 	public void hideDialog() {
-		_slideoutChartOptions.hideNow();
+		_slideoutStatisticChartOptions.hideNow();
 	}
 
 	private void onDispose() {
@@ -151,7 +155,7 @@ public class ActionChartOptions extends ContributionItem implements IOpeningDial
 
 	private void onSelect() {
 
-		if (_slideoutChartOptions.isToolTipVisible() == false) {
+		if (_slideoutStatisticChartOptions.isToolTipVisible() == false) {
 
 			final Rectangle itemBounds = _actionToolItem.getBounds();
 
@@ -164,7 +168,7 @@ public class ActionChartOptions extends ContributionItem implements IOpeningDial
 
 		} else {
 
-			_slideoutChartOptions.close();
+			_slideoutStatisticChartOptions.close();
 		}
 	}
 
@@ -173,7 +177,7 @@ public class ActionChartOptions extends ContributionItem implements IOpeningDial
 		// ensure other dialogs are closed
 //		_tourChart.closeOpenedDialogs(this);
 
-		_slideoutChartOptions.open(itemBounds, isOpenDelayed);
+		_slideoutStatisticChartOptions.open(itemBounds, isOpenDelayed);
 	}
 
 	public void setEnabled(final boolean isEnabled) {

@@ -87,7 +87,7 @@
             id="net.tourbook.statistics.StatisticSummaryYearAltitude"
             name="%Pref_Year_Summary_Altitude"/>
       <statistic
-            class="net.tourbook.statistics.graphs.StatisticTour_Numbers"
+            class="net.tourbook.statistics.graphs.StatisticTour_Frequency"
             id="net.tourbook.statistics.StatisticTourNumbers"
             name="%Pref_Tour_Numbers"/>
             
