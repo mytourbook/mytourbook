@@ -15,7 +15,13 @@
  *******************************************************************************/
 package net.tourbook.statistic;
 
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.preferences.ITourbookPreferences;
+
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IViewSite;
@@ -25,20 +31,57 @@ import org.eclipse.ui.IViewSite;
  */
 public abstract class TourbookStatistic {
 
+	protected static final String	MEMENTO_SELECTED_TOUR_ID	= "statistic.selected.tourId";
+
 	/** ID from plugin.xml */
-	public String		statisticId;
+	public String					statisticId;
 
 	/** Name from plugin.xml */
-	public String		visibleName;
+	public String					visibleName;
 
-	private Composite	_container;
+	private boolean					_isDataDirty;
 
-	private boolean		_isDataDirty;
+	private final IPreferenceStore	_prefStore					= TourbookPlugin.getPrefStore();
+
+	private IPropertyChangeListener	_prefChangeListener;
+
+	/*
+	 * UI controls
+	 */
+	private Composite				_container;
 
 	/**
-	 * Plugin constructor.
+	 * Add the pref listener which is called when the color was changed
 	 */
-//	public TourbookStatistic() {}
+	private void addPrefListener() {
+
+		// create pref listener
+		_prefChangeListener = new IPropertyChangeListener() {
+			@Override
+			public void propertyChange(final PropertyChangeEvent event) {
+				final String property = event.getProperty();
+
+				// test if the color or statistic data have changed
+				if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)
+				//
+						|| property.equals(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE)
+						|| property.equals(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE)
+						|| property.equals(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
+						|| property.equals(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES)
+						|| property.equals(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR)
+						|| property.equals(ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR)
+				//
+				) {
+
+					// update chart
+					preferencesHasChanged();
+				}
+			}
+		};
+
+		// add pref listener
+		_prefStore.addPropertyChangeListener(_prefChangeListener);
+	}
 
 	/**
 	 * Create the statistic component
@@ -58,6 +101,8 @@ public abstract class TourbookStatistic {
 		_container = parent;
 
 		createStatisticUI(parent, viewSite, postSelectionProvider);
+
+		addPrefListener();
 	}
 
 	/**
@@ -65,11 +110,16 @@ public abstract class TourbookStatistic {
 	 */
 	public void dispose() {
 
+		if (_prefChangeListener != null) {
+
+			_prefStore.removePropertyChangeListener(_prefChangeListener);
+		}
+
 		if (_container != null && _container.isDisposed() == false) {
 
 			_container.dispose();
 
-			// null is checked outside of this class
+			// !!! null is checked outside of this class !!!
 			_container = null;
 		}
 	}

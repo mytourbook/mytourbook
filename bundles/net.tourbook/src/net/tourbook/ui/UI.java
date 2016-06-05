@@ -1071,7 +1071,7 @@ public class UI {
 	}
 
 	/**
-	 * Update chart properties in the chart from the pref store.
+	 * Update properties for the chart from the pref store.
 	 * 
 	 * @param chart
 	 */

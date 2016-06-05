@@ -39,12 +39,12 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.statistic.StatisticContext;
+import net.tourbook.statistic.TourbookStatistic;
 import net.tourbook.statistics.IBarSelectionProvider;
 import net.tourbook.statistics.Messages;
 import net.tourbook.statistics.StatisticServices;
 import net.tourbook.statistics.StatisticTourToolTip;
 import net.tourbook.statistics.TourChartContextProvider;
-import net.tourbook.statistics.TourStatisticImpl;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourInfoIconToolTipProvider;
 import net.tourbook.tour.TourManager;
@@ -62,7 +62,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.IViewSite;
 
-public class StatisticTour_Time extends TourStatisticImpl implements IBarSelectionProvider, ITourProvider {
+public class StatisticTour_Time extends TourbookStatistic implements IBarSelectionProvider, ITourProvider {
 
 	private TourPerson					_activePerson;
 	private TourTypeFilter				_activeTourTypeFiler;
@@ -129,13 +129,10 @@ public class StatisticTour_Time extends TourStatisticImpl implements IBarSelecti
 									final IViewSite viewSite,
 									final IPostSelectionProvider postSelectionProvider) {
 
-		super.createControl(parent);
-
 		_postSelectionProvider = postSelectionProvider;
 
 		// chart widget page
 		_chart = new Chart(parent, SWT.BORDER | SWT.FLAT);
-//		fChart.setShowPartNavigation(true);
 		_chart.setShowZoomActions(true);
 		_chart.setDrawBarChartAtBottom(false);
 		_chart.setToolBarManager(viewSite.getActionBars().getToolBarManager(), false);
@@ -527,7 +524,7 @@ public class StatisticTour_Time extends TourStatisticImpl implements IBarSelecti
 			_minMaxKeeper.setMinMaxValues(chartModel);
 		}
 
-		updateChartProperties(_chart);
+		StatisticServices.updateChartProperties(_chart);
 
 		// show the data in the chart
 		_chart.updateChart(chartModel, false, true);

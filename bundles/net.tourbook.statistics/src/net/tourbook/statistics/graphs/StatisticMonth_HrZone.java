@@ -17,8 +17,6 @@ package net.tourbook.statistics.graphs;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 import net.tourbook.chart.BarChartMinMaxKeeper;
 import net.tourbook.chart.Chart;
@@ -33,8 +31,9 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourPersonHRZone;
 import net.tourbook.statistic.StatisticContext;
+import net.tourbook.statistic.TourbookStatistic;
 import net.tourbook.statistics.Messages;
-import net.tourbook.statistics.TourStatisticImpl;
+import net.tourbook.statistics.StatisticServices;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 
@@ -47,7 +46,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewSite;
 
-public class StatisticMonth_HrZone extends TourStatisticImpl {
+public class StatisticMonth_HrZone extends TourbookStatistic {
 
 	private static final String			STATE_HR_ZONE_START_FOR_MONTH_BAR_ORDERING	= "STATE_HR_ZONE_START_FOR_MONTH_BAR_ORDERING"; ////$NON-NLS-1$
 
@@ -62,7 +61,6 @@ public class StatisticMonth_HrZone extends TourStatisticImpl {
 	private IChartInfoProvider			_tooltipProvider;
 
 	private boolean						_isSynchScaleEnabled;
-	private final Calendar				_calendar									= GregorianCalendar.getInstance();
 
 	private TourData_MonthHrZones		_tourMonthData;
 
@@ -132,26 +130,13 @@ public class StatisticMonth_HrZone extends TourStatisticImpl {
 
 	@Override
 	public void createStatisticUI(	final Composite parent,
-										final IViewSite viewSite,
-										final IPostSelectionProvider postSelectionProvider) {
-
-		this.createControl(parent);
+									final IViewSite viewSite,
+									final IPostSelectionProvider postSelectionProvider) {
 
 		// create chart
 		_chart = new Chart(parent, SWT.BORDER | SWT.FLAT);
 		_chart.setShowZoomActions(true);
 		_chart.setToolBarManager(viewSite.getActionBars().getToolBarManager(), false);
-
-//		_tooltipProvider = new IChartInfoProvider() {
-//			@Override
-//			public ChartToolTipContext getToolTipContext(final int serieIndex, final int valueIndex) {
-//
-//				_toolTipContextSerieIndex = serieIndex;
-//				_toolTipContextValueIndex = valueIndex;
-//
-//				return _toolTipContext;
-//			}
-//		};
 	}
 
 	void createXDataMonths(final ChartDataModel chartDataModel) {
@@ -462,7 +447,7 @@ public class StatisticMonth_HrZone extends TourStatisticImpl {
 			_minMaxKeeper.setMinMaxValues(chartDataModel);
 		}
 
-		updateChartProperties(_chart);
+		StatisticServices.updateChartProperties(_chart);
 
 		// show the fDataModel in the chart
 		_chart.updateChart(chartDataModel, true);

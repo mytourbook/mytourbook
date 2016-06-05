@@ -42,7 +42,6 @@ import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -60,7 +59,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
@@ -127,14 +125,12 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 
 	private PageBook						_pageBookStatistic;
 
-	private ToolBarManager					_tbm;
-	private ToolBar							_toolBar;
-
 	void actionSynchScale(final boolean isEnabled) {
 
 		_isSynchScaleEnabled = isEnabled;
 
 		_activeStatistic.setSynchScale(_isSynchScaleEnabled);
+
 		_activeStatistic.updateStatistic(new StatisticContext(
 				_activePerson,
 				_activeTourTypeFilter,
@@ -413,17 +409,6 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 					onSelectBarVerticalOrder();
 				}
 			});
-
-			/*
-			 * toolbar
-			 */
-			_toolBar = new ToolBar(container, SWT.FLAT | SWT.WRAP | SWT.RIGHT);
-			GridDataFactory.fillDefaults()//
-					.align(SWT.FILL, SWT.END)
-					.grab(true, false)
-					.applyTo(_toolBar);
-
-			_tbm = new ToolBarManager(_toolBar);
 		}
 	}
 
@@ -959,9 +944,8 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 		// add actions from the statistic
 		_activeStatistic.updateToolBar();
 
-		_tbm.update(false);
-
-		_statContainer.layout();
+		// update toolbar to show added items
+		tbm.update(true);
 	}
 
 	private void updateUI_VerticalBarOrder(final StatisticContext statContext) {

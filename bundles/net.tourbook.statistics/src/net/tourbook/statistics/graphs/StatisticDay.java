@@ -39,12 +39,12 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.statistic.StatisticContext;
+import net.tourbook.statistic.TourbookStatistic;
 import net.tourbook.statistics.IBarSelectionProvider;
 import net.tourbook.statistics.Messages;
 import net.tourbook.statistics.StatisticServices;
 import net.tourbook.statistics.StatisticTourToolTip;
 import net.tourbook.statistics.TourChartContextProvider;
-import net.tourbook.statistics.TourStatisticImpl;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourEvent;
@@ -66,7 +66,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPart;
 
-public abstract class StatisticDay extends TourStatisticImpl implements IBarSelectionProvider, ITourProvider {
+public abstract class StatisticDay extends TourbookStatistic implements IBarSelectionProvider, ITourProvider {
 
 	private TourTypeFilter				_activeTourTypeFilter;
 	private TourPerson					_activePerson;
@@ -172,8 +172,6 @@ public abstract class StatisticDay extends TourStatisticImpl implements IBarSele
 	public void createStatisticUI(	final Composite parent,
 									final IViewSite viewSite,
 									final IPostSelectionProvider postSelectionProvider) {
-
-		super.createControl(parent);
 
 		_postSelectionProvider = postSelectionProvider;
 
@@ -699,7 +697,7 @@ public abstract class StatisticDay extends TourStatisticImpl implements IBarSele
 			_minMaxKeeper.setMinMaxValues(chartModel);
 		}
 
-		updateChartProperties(_chart);
+		StatisticServices.updateChartProperties(_chart);
 
 		// show the data in the chart
 		_chart.updateChart(chartModel, false, true);

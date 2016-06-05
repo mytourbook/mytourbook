@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,13 +17,17 @@ package net.tourbook.statistics;
 
 import java.util.ArrayList;
 
+import net.tourbook.Messages;
+import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataYSerie;
+import net.tourbook.chart.ChartTitleSegmentConfig;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.TourTypeFilter;
+import net.tourbook.ui.UI;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
@@ -35,6 +39,30 @@ public class StatisticServices {
 	 * offset for tour types in the color index
 	 */
 	public static int	TOUR_TYPE_COLOR_INDEX_OFFSET	= 1;
+
+	/**
+	 * @param serieIndex
+	 * @param activeTourTypeFilter
+	 * @return Returns the tour type name for a data serie
+	 */
+	public static String getTourTypeName(final int serieIndex, final TourTypeFilter activeTourTypeFilter) {
+
+		int colorOffset = 0;
+		if (activeTourTypeFilter.showUndefinedTourTypes()) {
+			colorOffset = StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
+		}
+
+		if (serieIndex - colorOffset < 0) {
+			return Messages.ui_tour_not_defined;
+		}
+
+		final ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
+		final long typeId = tourTypeList.get(serieIndex - colorOffset).getTypeId();
+
+		final String tourTypeName = TourDatabase.getTourTypeName(typeId);
+
+		return tourTypeName;
+	}
 
 	/**
 	 * Set default colors for the y-axis, the color is defined in
@@ -184,6 +212,27 @@ public class StatisticServices {
 //
 //			System.out.println(sb.toString());
 //		}
+	}
+
+	/**
+	 * Set chart properties from the pref store.
+	 * 
+	 * @param chart
+	 */
+	public static void updateChartProperties(final Chart chart) {
+
+		UI.updateChartProperties(chart);
+
+		/*
+		 * These settings are currently static, a UI to modify it is not yet implemented.
+		 */
+		final ChartTitleSegmentConfig ctsConfig = chart.getChartTitleSegmentConfig();
+
+		ctsConfig.isMultipleSegments = true;
+
+		ctsConfig.isShowSegmentBackground = false;
+		ctsConfig.isShowSegmentSeparator = true;
+		ctsConfig.isShowSegmentTitle = true;
 	}
 
 }

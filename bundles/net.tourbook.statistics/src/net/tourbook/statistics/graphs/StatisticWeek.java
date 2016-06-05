@@ -37,9 +37,9 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourPerson;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.statistic.StatisticContext;
+import net.tourbook.statistic.TourbookStatistic;
 import net.tourbook.statistics.Messages;
 import net.tourbook.statistics.StatisticServices;
-import net.tourbook.statistics.TourStatisticImpl;
 import net.tourbook.ui.TourTypeFilter;
 
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -48,7 +48,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IViewSite;
 
-public abstract class StatisticWeek extends TourStatisticImpl {
+public abstract class StatisticWeek extends TourbookStatistic {
 
 	private static IPreferenceStore		_prefStore			= TourbookPlugin.getDefault().getPreferenceStore();
 
@@ -118,10 +118,8 @@ public abstract class StatisticWeek extends TourStatisticImpl {
 
 	@Override
 	public void createStatisticUI(	final Composite parent,
-										final IViewSite viewSite,
-										final IPostSelectionProvider postSelectionProvider) {
-
-		super.createControl(parent);
+									final IViewSite viewSite,
+									final IPostSelectionProvider postSelectionProvider) {
 
 		// create statistic chart
 		_chart = new Chart(parent, SWT.BORDER | SWT.FLAT);
@@ -190,7 +188,7 @@ public abstract class StatisticWeek extends TourStatisticImpl {
 		final Integer drivingTime = _tourWeekData.drivingTime[serieIndex][valueIndex];
 		final int breakTime = recordingTime - drivingTime;
 
-		final String tourTypeName = getTourTypeName(serieIndex, _appTourTypeFilter);
+		final String tourTypeName = StatisticServices.getTourTypeName(serieIndex, _appTourTypeFilter);
 
 		/*
 		 * tool tip: title
@@ -428,7 +426,7 @@ public abstract class StatisticWeek extends TourStatisticImpl {
 
 	private void getPreferences() {
 
-		updateChartProperties(_chart);
+		StatisticServices.updateChartProperties(_chart);
 
 		// set week start values
 		_firstDayOfWeek = _prefStore.getInt(ITourbookPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK);

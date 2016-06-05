@@ -29,9 +29,9 @@ import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.data.TourPerson;
 import net.tourbook.statistic.StatisticContext;
+import net.tourbook.statistic.TourbookStatistic;
 import net.tourbook.statistics.Messages;
 import net.tourbook.statistics.StatisticServices;
-import net.tourbook.statistics.TourStatisticImpl;
 import net.tourbook.ui.TourTypeFilter;
 
 import org.eclipse.jface.viewers.IPostSelectionProvider;
@@ -39,7 +39,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IViewSite;
 
-public abstract class StatisticYear extends TourStatisticImpl {
+public abstract class StatisticYear extends TourbookStatistic {
 
 	private static final String			STRING_SEPARATOR	= " - ";						//$NON-NLS-1$
 
@@ -89,10 +89,8 @@ public abstract class StatisticYear extends TourStatisticImpl {
 
 	@Override
 	public void createStatisticUI(	final Composite parent,
-										final IViewSite viewSite,
-										final IPostSelectionProvider postSelectionProvider) {
-
-		super.createControl(parent);
+									final IViewSite viewSite,
+									final IPostSelectionProvider postSelectionProvider) {
 
 		// create chart
 		_chart = new Chart(parent, SWT.BORDER | SWT.FLAT);
@@ -113,7 +111,7 @@ public abstract class StatisticYear extends TourStatisticImpl {
 		 */
 		final StringBuilder titleString = new StringBuilder();
 
-		final String tourTypeName = getTourTypeName(serieIndex, _activeTourTypeFilter);
+		final String tourTypeName = StatisticServices.getTourTypeName(serieIndex, _activeTourTypeFilter);
 		final boolean isTourType = tourTypeName != null && tourTypeName.length() > 0;
 
 		if (isTourType) {
@@ -310,7 +308,7 @@ public abstract class StatisticYear extends TourStatisticImpl {
 			_minMaxKeeper.setMinMaxValues(chartDataModel);
 		}
 
-		updateChartProperties(_chart);
+		StatisticServices.updateChartProperties(_chart);
 
 		// show the fDataModel in the chart
 		_chart.updateChart(chartDataModel, true);

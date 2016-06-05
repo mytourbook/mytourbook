@@ -35,9 +35,9 @@ import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.data.TourPerson;
 import net.tourbook.statistic.StatisticContext;
+import net.tourbook.statistic.TourbookStatistic;
 import net.tourbook.statistics.Messages;
 import net.tourbook.statistics.StatisticServices;
-import net.tourbook.statistics.TourStatisticImpl;
 import net.tourbook.ui.TourTypeFilter;
 
 import org.eclipse.jface.viewers.IPostSelectionProvider;
@@ -45,7 +45,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IViewSite;
 
-public abstract class StatisticMonth extends TourStatisticImpl {
+public abstract class StatisticMonth extends TourbookStatistic {
 
 	private TourPerson					_activePerson;
 	private TourTypeFilter				_activeTourTypeFilter;
@@ -58,7 +58,6 @@ public abstract class StatisticMonth extends TourStatisticImpl {
 
 	private boolean						_isSynchScaleEnabled;
 
-	private final Calendar				_calendar		= GregorianCalendar.getInstance();
 	private DateFormat					_dateFormatter	= DateFormat.getDateInstance(DateFormat.FULL);
 
 	private TourData_Month				_tourMonthData;
@@ -123,10 +122,8 @@ public abstract class StatisticMonth extends TourStatisticImpl {
 
 	@Override
 	public void createStatisticUI(	final Composite parent,
-										final IViewSite viewSite,
-										final IPostSelectionProvider postSelectionProvider) {
-
-		super.createControl(parent);
+									final IViewSite viewSite,
+									final IPostSelectionProvider postSelectionProvider) {
 
 		// create chart
 		_chart = new Chart(parent, SWT.BORDER | SWT.FLAT);
@@ -160,7 +157,7 @@ public abstract class StatisticMonth extends TourStatisticImpl {
 		 */
 		final StringBuilder titleString = new StringBuilder();
 
-		final String tourTypeName = getTourTypeName(serieIndex, _activeTourTypeFilter);
+		final String tourTypeName = StatisticServices.getTourTypeName(serieIndex, _activeTourTypeFilter);
 		if (tourTypeName != null && tourTypeName.length() > 0) {
 			titleString.append(tourTypeName);
 		}
@@ -333,7 +330,7 @@ public abstract class StatisticMonth extends TourStatisticImpl {
 			_minMaxKeeper.setMinMaxValues(chartDataModel);
 		}
 
-		updateChartProperties(_chart);
+		StatisticServices.updateChartProperties(_chart);
 
 		// show the fDataModel in the chart
 		_chart.updateChart(chartDataModel, true);

@@ -17,8 +17,6 @@ package net.tourbook.statistics.graphs;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 import net.tourbook.chart.BarChartMinMaxKeeper;
 import net.tourbook.chart.Chart;
@@ -33,8 +31,9 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourPersonHRZone;
 import net.tourbook.statistic.StatisticContext;
+import net.tourbook.statistic.TourbookStatistic;
 import net.tourbook.statistics.Messages;
-import net.tourbook.statistics.TourStatisticImpl;
+import net.tourbook.statistics.StatisticServices;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 
@@ -47,7 +46,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewSite;
 
-public class StatisticWeek_HrZone extends TourStatisticImpl {
+public class StatisticWeek_HrZone extends TourbookStatistic {
 
 	private static final String			STATE_HR_ZONE_WEEK_BAR_ORDERING_START	= "STATE_HR_ZONE_WEEK_BAR_ORDERING_START";	////$NON-NLS-1$
 
@@ -62,8 +61,6 @@ public class StatisticWeek_HrZone extends TourStatisticImpl {
 
 	private final BarChartMinMaxKeeper	_minMaxKeeper							= new BarChartMinMaxKeeper();
 	private boolean						_isSynchScaleEnabled;
-
-	private final Calendar				_calendar								= GregorianCalendar.getInstance();
 
 	private TourData_WeekHrZones		_tourWeekData;
 
@@ -121,30 +118,13 @@ public class StatisticWeek_HrZone extends TourStatisticImpl {
 
 	@Override
 	public void createStatisticUI(	final Composite parent,
-										final IViewSite viewSite,
-										final IPostSelectionProvider postSelectionProvider) {
-
-		this.createControl(parent);
+									final IViewSite viewSite,
+									final IPostSelectionProvider postSelectionProvider) {
 
 		// create chart
 		_chart = new Chart(parent, SWT.BORDER | SWT.FLAT);
 		_chart.setShowZoomActions(true);
 		_chart.setToolBarManager(viewSite.getActionBars().getToolBarManager(), false);
-
-//		_tooltipProvider = new IChartInfoProvider() {
-//
-//			@Override
-//			public ChartToolTip getToolTipInfo(final int serieIndex, final int valueIndex) {
-//				// TODO Auto-generated method stub
-//				return null;
-//			}
-//		};
-
-//		_tooltipProvider = new IChartInfoProvider() {
-//			public ChartToolTip1 getToolTipInfo(final int serieIndex, final int valueIndex) {
-//				return createToolTipInfo(serieIndex, valueIndex);
-//			}
-//		};
 	}
 
 	private double[] createWeekData() {
@@ -158,92 +138,6 @@ public class StatisticWeek_HrZone extends TourStatisticImpl {
 
 		return allWeeks;
 	}
-
-//	private ChartToolTip1 createToolTipInfo(final int serieIndex, final int valueIndex) {
-//
-//		final int oldestYear = fCurrentYear - fNumberOfYears + 1;
-//
-//		final Calendar calendar = GregorianCalendar.getInstance();
-//
-//		calendar.set(oldestYear, 0, 1);
-//		calendar.add(Calendar.MONTH, valueIndex);
-//
-//		//
-//		final StringBuffer monthStringBuffer = new StringBuffer();
-//		final FieldPosition monthPosition = new FieldPosition(DateFormat.MONTH_FIELD);
-//
-//		final Date date = new Date();
-//		date.setTime(calendar.getTimeInMillis());
-//		fDateFormatter.format(date, monthStringBuffer, monthPosition);
-//
-//		final Integer time_Recording = fTourMonthData.fRecordingTime[serieIndex][valueIndex];
-//		final Integer time_Driving = fTourMonthData.fDrivingTime[serieIndex][valueIndex];
-//		final int time_Break = time_Recording - time_Driving;
-//
-//		/*
-//		 * tool tip: title
-//		 */
-//		final StringBuilder titleString = new StringBuilder();
-//
-//		final String tourTypeName = getTourTypeName(serieIndex, fActiveTourTypeFilter);
-//		if (tourTypeName != null && tourTypeName.length() > 0) {
-//			titleString.append(tourTypeName);
-//		}
-//
-//		final String toolTipTitle = new Formatter().format(Messages.tourtime_info_date_month, //
-//				titleString.toString(),
-//				monthStringBuffer.substring(monthPosition.getBeginIndex(), monthPosition.getEndIndex()),
-//				calendar.get(Calendar.YEAR)
-//		//
-//		)
-//				.toString();
-//
-//		/*
-//		 * tool tip: label
-//		 */
-//		final StringBuilder toolTipFormat = new StringBuilder();
-//		toolTipFormat.append(Messages.tourtime_info_distance_tour);
-//		toolTipFormat.append(NEW_LINE);
-//		toolTipFormat.append(Messages.tourtime_info_altitude);
-//		toolTipFormat.append(NEW_LINE);
-//		toolTipFormat.append(NEW_LINE);
-//		toolTipFormat.append(Messages.tourtime_info_recording_time);
-//		toolTipFormat.append(NEW_LINE);
-//		toolTipFormat.append(Messages.tourtime_info_driving_time);
-//		toolTipFormat.append(NEW_LINE);
-//		toolTipFormat.append(Messages.tourtime_info_break_time);
-//
-//		final String toolTipLabel = new Formatter().format(toolTipFormat.toString(), //
-//				//
-//				(float) fTourMonthData.fDistanceHigh[serieIndex][valueIndex] / 1000,
-//				UI.UNIT_LABEL_DISTANCE,
-//				//
-//				fTourMonthData.fAltitudeHigh[serieIndex][valueIndex],
-//				UI.UNIT_LABEL_ALTITUDE,
-//				//
-//				time_Recording / 3600,
-//				(time_Recording % 3600) / 60,
-//				//
-//				time_Driving / 3600,
-//				(time_Driving % 3600) / 60,
-//				//
-//				time_Break / 3600,
-//				(time_Break % 3600) / 60
-//		//
-//		)
-//				.toString();
-//
-//		/*
-//		 * create tool tip info
-//		 */
-//
-//		final ChartToolTip1 toolTipInfo = new ChartToolTip1();
-//		toolTipInfo.setTitle(toolTipTitle);
-//		toolTipInfo.setLabel(toolTipLabel);
-////		toolTipInfo.setLabel(toolTipFormat.toString());
-//
-//		return toolTipInfo;
-//	}
 
 	void createXDataWeek(final ChartDataModel chartDataModel) {
 
@@ -554,7 +448,7 @@ public class StatisticWeek_HrZone extends TourStatisticImpl {
 			_minMaxKeeper.setMinMaxValues(chartDataModel);
 		}
 
-		updateChartProperties(_chart);
+		StatisticServices.updateChartProperties(_chart);
 
 		// show the data model in the chart
 		_chart.updateChart(chartDataModel, true);

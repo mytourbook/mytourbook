@@ -35,12 +35,11 @@ import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.statistic.StatisticContext;
+import net.tourbook.statistic.TourbookStatistic;
 import net.tourbook.statistics.Messages;
 import net.tourbook.statistics.StatisticServices;
-import net.tourbook.statistics.TourStatisticImpl;
 import net.tourbook.ui.TourTypeFilter;
 
-import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -54,7 +53,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewSite;
 
-public class StatisticTour_Numbers extends TourStatisticImpl {
+public class StatisticTour_Numbers extends TourbookStatistic {
 
 	private final IPreferenceStore		_prefStore							= TourbookPlugin.getPrefStore();
 
@@ -103,8 +102,6 @@ public class StatisticTour_Numbers extends TourStatisticImpl {
 	private boolean						_isSynchScaleEnabled;
 
 	private TourData_Day				_tourDayData;
-
-	private IViewSite					_viewSite;
 
 	/*
 	 * UI controls
@@ -262,12 +259,8 @@ public class StatisticTour_Numbers extends TourStatisticImpl {
 
 	@Override
 	public void createStatisticUI(	final Composite parent,
-										final IViewSite viewSite,
-										final IPostSelectionProvider postSelectionProvider) {
-
-		super.createControl(parent);
-
-		_viewSite = viewSite;
+									final IViewSite viewSite,
+									final IPostSelectionProvider postSelectionProvider) {
 
 		// create statistic page
 		_statisticPage = new Composite(parent, SWT.BORDER | SWT.FLAT);
@@ -303,7 +296,7 @@ public class StatisticTour_Numbers extends TourStatisticImpl {
 	 */
 	private ChartToolTipInfo createToolTipProvider(final int serieIndex, final String toolTipLabel) {
 
-		final String tourTypeName = getTourTypeName(serieIndex, _activeTourTypeFilter);
+		final String tourTypeName = StatisticServices.getTourTypeName(serieIndex, _activeTourTypeFilter);
 
 		final ChartToolTipInfo toolTipInfo = new ChartToolTipInfo();
 		toolTipInfo.setTitle(tourTypeName);
@@ -663,7 +656,7 @@ public class StatisticTour_Numbers extends TourStatisticImpl {
 			statAltitudeMinMaxKeeper.setMinMaxValues(chartDataModel);
 		}
 
-		updateChartProperties(chart);
+		StatisticServices.updateChartProperties(chart);
 
 		// show the new data in the chart
 		chart.updateChart(chartDataModel, true);
@@ -677,7 +670,6 @@ public class StatisticTour_Numbers extends TourStatisticImpl {
 	 * @param statDistanceColorIndex
 	 * @param unit
 	 * @param title
-	 * @param valueDivisor
 	 */
 	private void updateChartDistance(	final Chart statDistanceChart,
 										final BarChartMinMaxKeeper statDistanceMinMaxKeeper,
@@ -685,8 +677,7 @@ public class StatisticTour_Numbers extends TourStatisticImpl {
 										final int[][] highValues,
 										final int[][] colorIndex,
 										final String unit,
-										final String title,
-										final int valueDivisor) {
+										final String title) {
 
 		final ChartDataModel chartDataModel = new ChartDataModel(ChartType.BAR);
 
@@ -708,7 +699,7 @@ public class StatisticTour_Numbers extends TourStatisticImpl {
 		yData.setAllValueColors(0);
 		yData.setYTitle(title);
 		yData.setVisibleMinValue(0);
-		yData.setValueDivisor(valueDivisor);
+		yData.setValueDivisor(1);
 		chartDataModel.addYData(yData);
 		StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_DISTANCE);
 		StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_DISTANCE, _activeTourTypeFilter);
@@ -720,71 +711,10 @@ public class StatisticTour_Numbers extends TourStatisticImpl {
 			statDistanceMinMaxKeeper.setMinMaxValues(chartDataModel);
 		}
 
-		updateChartProperties(statDistanceChart);
+		StatisticServices.updateChartProperties(statDistanceChart);
 
 		// show the new data fDataModel in the chart
 		statDistanceChart.updateChart(chartDataModel, true);
-	}
-
-	private void updateCharts() {
-
-		updateChartDistance(
-				_chartDistanceCounter,
-				_minMaxKeeperStatDistanceCounter,
-				_statDistanceCounterLow,
-				_statDistanceCounterHigh,
-				_statDistanceCounterColorIndex,
-				Messages.NUMBERS_UNIT,
-				Messages.LABEL_GRAPH_DISTANCE,
-				1);
-
-		updateChartDistance(
-				_chartDistanceSum,
-				_minMaxKeeperStatDistanceSum,
-				_statDistanceSumLow,
-				_statDistanceSumHigh,
-				_statDistanceSumColorIndex,
-				UI.UNIT_LABEL_DISTANCE,
-				Messages.LABEL_GRAPH_DISTANCE,
-				1);
-
-		updateChartAltitude(
-				_chartAltitudeCounter,
-				_minMaxKeeperStatAltitudeCounter,
-				_statAltitudeCounterLow,
-				_statAltitudeCounterHigh,
-				_statAltitudeCounterColorIndex,
-				Messages.NUMBERS_UNIT,
-				Messages.LABEL_GRAPH_ALTITUDE);
-
-		updateChartAltitude(
-				_chartAltitudeSum,
-				_minMaxKeeperStatAltitudeSum,
-				_statAltitudeSumLow,
-				_statAltitudeSumHigh,
-				_statAltitudeSumColorIndex,
-				UI.UNIT_LABEL_ALTITUDE,
-				Messages.LABEL_GRAPH_ALTITUDE);
-
-		updateChartTime(
-				_chartDurationCounter,
-				_minMaxKeeperStatDurationCounter,
-				_statTimeCounterLow,
-				_statTimeCounterHigh,
-				_statTimeCounterColorIndex,
-				ChartDataXSerie.AXIS_UNIT_NUMBER,
-				Messages.NUMBERS_UNIT,
-				Messages.LABEL_GRAPH_TIME);
-
-		updateChartTime(
-				_chartDurationSum,
-				_minMaxKeeperStatDurationSum,
-				_statTimeSumLow,
-				_statTimeSumHigh,
-				_statTimeSumColorIndex,
-				ChartDataXSerie.AXIS_UNIT_HOUR_MINUTE,
-				Messages.LABEL_GRAPH_TIME_UNIT,
-				Messages.LABEL_GRAPH_TIME);
 	}
 
 	private void updateChartTime(	final Chart statDurationChart,
@@ -828,7 +758,7 @@ public class StatisticTour_Numbers extends TourStatisticImpl {
 			statDurationMinMaxKeeper.setMinMaxValues(chartDataModel);
 		}
 
-		updateChartProperties(statDurationChart);
+		StatisticServices.updateChartProperties(statDurationChart);
 
 		// show the new data data model in the chart
 		statDurationChart.updateChart(chartDataModel, true);
@@ -877,14 +807,63 @@ public class StatisticTour_Numbers extends TourStatisticImpl {
 			resetMinMaxKeeper();
 		}
 
-		// hide actions from other statistics
-		final IToolBarManager tbm = _viewSite.getActionBars().getToolBarManager();
-		tbm.removeAll();
-		tbm.update(true);
-
 		createStatisticData(_tourDayData);
 
-		updateCharts();
+		updateChartDistance(
+				_chartDistanceCounter,
+				_minMaxKeeperStatDistanceCounter,
+				_statDistanceCounterLow,
+				_statDistanceCounterHigh,
+				_statDistanceCounterColorIndex,
+				Messages.NUMBERS_UNIT,
+				Messages.LABEL_GRAPH_DISTANCE);
+
+		updateChartDistance(
+				_chartDistanceSum,
+				_minMaxKeeperStatDistanceSum,
+				_statDistanceSumLow,
+				_statDistanceSumHigh,
+				_statDistanceSumColorIndex,
+				UI.UNIT_LABEL_DISTANCE,
+				Messages.LABEL_GRAPH_DISTANCE);
+
+		updateChartAltitude(
+				_chartAltitudeCounter,
+				_minMaxKeeperStatAltitudeCounter,
+				_statAltitudeCounterLow,
+				_statAltitudeCounterHigh,
+				_statAltitudeCounterColorIndex,
+				Messages.NUMBERS_UNIT,
+				Messages.LABEL_GRAPH_ALTITUDE);
+
+		updateChartAltitude(
+				_chartAltitudeSum,
+				_minMaxKeeperStatAltitudeSum,
+				_statAltitudeSumLow,
+				_statAltitudeSumHigh,
+				_statAltitudeSumColorIndex,
+				UI.UNIT_LABEL_ALTITUDE,
+				Messages.LABEL_GRAPH_ALTITUDE);
+
+		updateChartTime(
+				_chartDurationCounter,
+				_minMaxKeeperStatDurationCounter,
+				_statTimeCounterLow,
+				_statTimeCounterHigh,
+				_statTimeCounterColorIndex,
+				ChartDataXSerie.AXIS_UNIT_NUMBER,
+				Messages.NUMBERS_UNIT,
+				Messages.LABEL_GRAPH_TIME);
+
+		updateChartTime(
+				_chartDurationSum,
+				_minMaxKeeperStatDurationSum,
+				_statTimeSumLow,
+				_statTimeSumHigh,
+				_statTimeSumColorIndex,
+				ChartDataXSerie.AXIS_UNIT_HOUR_MINUTE,
+				Messages.LABEL_GRAPH_TIME_UNIT,
+				Messages.LABEL_GRAPH_TIME);
 	}
 
 	@Override
