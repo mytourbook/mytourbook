@@ -191,6 +191,10 @@ public class TourLogManager {
 
 	public static void showLogView() {
 
-		_logView = (TourLogView) Util.showView(TourLogView.ID, true);
+		_logView = (TourLogView) Util.showView(TourLogView.ID,
+
+		// !!! log view MUST NOT be activated, otherwise events (e.g. deletion) are NOT fired from the source view !!!
+
+				false);
 	}
 }
