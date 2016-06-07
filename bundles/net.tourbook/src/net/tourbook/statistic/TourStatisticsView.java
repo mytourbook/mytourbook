@@ -229,10 +229,6 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 					return;
 				}
 
-				System.out.println((net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-						+ ("\tselection: " + selection));
-				// TODO remove SYSTEM.OUT.PRINTLN
-
 				if (selection instanceof SelectionDeletedTours) {
 					updateStatistic();
 				}
@@ -332,15 +328,33 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 
 	private void createUI_10_Toolbar(final Composite parent) {
 
+		final int widgetSpacing = 15;
+
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(6).applyTo(container);
 		{
 			/*
+			 * combo: statistics
+			 */
+			_cboStatistics = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+			GridDataFactory.fillDefaults()//
+					.applyTo(_cboStatistics);
+			_cboStatistics.setToolTipText(Messages.Tour_Book_Combo_statistic_tooltip);
+			_cboStatistics.setVisibleItemCount(50);
+			_cboStatistics.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onSelectStatistic();
+				}
+			});
+
+			/*
 			 * combo: year
 			 */
 			_cboYear = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
 			GridDataFactory.fillDefaults()//
+					.indent(widgetSpacing, 0)
 					.hint(_pc.convertWidthInCharsToPixels(_isOSX ? 12 : _isLinux ? 12 : 5), SWT.DEFAULT)
 					.applyTo(_cboYear);
 			_cboYear.setToolTipText(Messages.Tour_Book_Combo_year_tooltip);
@@ -358,7 +372,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 			final Label label = new Label(container, SWT.NONE);
 			GridDataFactory.fillDefaults()//
 					.align(SWT.FILL, SWT.CENTER)
-					.indent(10, 0)
+					.indent(widgetSpacing, 0)
 					.applyTo(label);
 			label.setText(Messages.tour_statistic_label_years);
 
@@ -380,22 +394,6 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 			});
 
 			/*
-			 * combo: statistics
-			 */
-			_cboStatistics = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-			GridDataFactory.fillDefaults()//
-					.indent(15, 0)
-					.applyTo(_cboStatistics);
-			_cboStatistics.setToolTipText(Messages.Tour_Book_Combo_statistic_tooltip);
-			_cboStatistics.setVisibleItemCount(50);
-			_cboStatistics.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onSelectStatistic();
-				}
-			});
-
-			/*
 			 * combo: sequence for stacked charts
 			 */
 
@@ -405,7 +403,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 
 			_cboBarVerticalOrder = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
 			GridDataFactory.fillDefaults()//
-					.indent(15, 0)
+					.indent(widgetSpacing, 0)
 					.hint(defaultTextSize.x, SWT.DEFAULT)
 					.applyTo(_cboBarVerticalOrder);
 			_cboBarVerticalOrder.setToolTipText(Messages.Tour_Statistic_Combo_BarVOrder_Tooltip);

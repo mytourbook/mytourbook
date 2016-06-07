@@ -307,6 +307,14 @@ public class StatisticWeek_HrZone extends TourbookStatistic {
 
 	@Override
 	public void setSynchScale(final boolean isSynchScaleEnabled) {
+
+		if (!isSynchScaleEnabled) {
+
+			// reset when it's disabled
+
+			_minMaxKeeper.resetMinMax();
+		}
+
 		_isSynchScaleEnabled = isSynchScaleEnabled;
 	}
 

@@ -144,7 +144,7 @@ public class StatisticTour_Frequency extends TourbookStatistic {
 					/*
 					 * reset min/max keeper because they can be changed when the pref has changed
 					 */
-					resetMinMaxKeeper();
+					resetMinMaxKeeper(true);
 
 					// update chart
 					preferencesHasChanged();
@@ -249,13 +249,6 @@ public class StatisticTour_Frequency extends TourbookStatistic {
 			_statTimeCounterColorIndex[typeColorIndex][unitIndex] = typeColorIndex;
 			_statTimeSumColorIndex[typeColorIndex][unitIndex] = typeColorIndex;
 		}
-
-		updateLowHighValues(_statDistanceCounterLow, _statDistanceCounterHigh);
-		updateLowHighValues(_statDistanceSumLow, _statDistanceSumHigh);
-		updateLowHighValues(_statAltitudeCounterLow, _statAltitudeCounterHigh);
-		updateLowHighValues(_statAltitudeSumLow, _statAltitudeSumHigh);
-		updateLowHighValues(_statTimeCounterLow, _statTimeCounterHigh);
-		updateLowHighValues(_statTimeSumLow, _statTimeSumHigh);
 	}
 
 	@Override
@@ -606,9 +599,9 @@ public class StatisticTour_Frequency extends TourbookStatistic {
 		updateStatistic(new StatisticContext(_activePerson, _activeTourTypeFilter, _currentYear, _numberOfYears));
 	}
 
-	private void resetMinMaxKeeper() {
+	private void resetMinMaxKeeper(final boolean isForceReset) {
 
-		if (_isSynchScaleEnabled == false) {
+		if (isForceReset || _isSynchScaleEnabled == false) {
 
 			_minMaxKeeperStatAltitudeCounter.resetMinMax();
 			_minMaxKeeperStatAltitudeSum.resetMinMax();
@@ -627,6 +620,11 @@ public class StatisticTour_Frequency extends TourbookStatistic {
 
 	@Override
 	public void setSynchScale(final boolean isSynchScaleEnabled) {
+
+		if (!isSynchScaleEnabled) {
+			resetMinMaxKeeper(true);
+		}
+
 		_isSynchScaleEnabled = isSynchScaleEnabled;
 	}
 
@@ -778,28 +776,6 @@ public class StatisticTour_Frequency extends TourbookStatistic {
 		statDurationChart.updateChart(chartDataModel, true);
 	}
 
-	/**
-	 * update the low and high values so they are stacked on each other
-	 * 
-	 * @param lowValues
-	 * @param highValues
-	 */
-	private void updateLowHighValues(final int[][] lowValues, final int[][] highValues) {
-
-		for (int colorIndex = 0; colorIndex < highValues.length; colorIndex++) {
-			if (colorIndex > 0) {
-				for (int valueIndex = 0; valueIndex < highValues[0].length; valueIndex++) {
-
-					if (highValues[colorIndex][valueIndex] > 0) {
-
-						final int previousHighValue = highValues[colorIndex - 1][valueIndex];
-
-						highValues[colorIndex][valueIndex] += previousHighValue;
-					}
-				}
-			}
-		}
-	}
 
 	@Override
 	public void updateStatistic(final StatisticContext statContext) {
@@ -818,7 +794,7 @@ public class StatisticTour_Frequency extends TourbookStatistic {
 
 		// reset min/max values
 		if (_isSynchScaleEnabled == false && statContext.isRefreshData) {
-			resetMinMaxKeeper();
+			resetMinMaxKeeper(false);
 		}
 
 		createStatisticData(_tourDayData);

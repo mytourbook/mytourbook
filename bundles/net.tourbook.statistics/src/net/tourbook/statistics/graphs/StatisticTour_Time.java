@@ -482,6 +482,14 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
 
 	@Override
 	public void setSynchScale(final boolean isSynchScaleEnabled) {
+
+		if (!isSynchScaleEnabled) {
+
+			// reset when it's disabled
+
+			_minMaxKeeper.resetMinMax();
+		}
+
 		_ifIsSynchScaleEnabled = isSynchScaleEnabled;
 	}
 

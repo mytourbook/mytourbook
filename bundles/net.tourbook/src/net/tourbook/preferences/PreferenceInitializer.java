@@ -88,15 +88,15 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		 */
 		store.setDefault(ITourbookPreferences.STAT_ALTITUDE_LOW_VALUE, 0);
 		store.setDefault(ITourbookPreferences.STAT_ALTITUDE_INTERVAL, 250);
-		store.setDefault(ITourbookPreferences.STAT_ALTITUDE_NUMBERS, 10);
+		store.setDefault(ITourbookPreferences.STAT_ALTITUDE_NUMBERS, 21);
 
 		store.setDefault(ITourbookPreferences.STAT_DISTANCE_LOW_VALUE, 0);
 		store.setDefault(ITourbookPreferences.STAT_DISTANCE_INTERVAL, 10);
-		store.setDefault(ITourbookPreferences.STAT_DISTANCE_NUMBERS, 10);
+		store.setDefault(ITourbookPreferences.STAT_DISTANCE_NUMBERS, 21);
 
 		store.setDefault(ITourbookPreferences.STAT_DURATION_LOW_VALUE, 0);
 		store.setDefault(ITourbookPreferences.STAT_DURATION_INTERVAL, 60);
-		store.setDefault(ITourbookPreferences.STAT_DURATION_NUMBERS, 10);
+		store.setDefault(ITourbookPreferences.STAT_DURATION_NUMBERS, 12);
 
 		/*
 		 * graph preferences
