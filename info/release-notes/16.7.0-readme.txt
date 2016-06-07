@@ -1,5 +1,18 @@
 Version 16.7                                                ?. July 2016
 
+PROBLEMS
+PROBLEMS
+PROBLEMS
+
+- SelectionDeletedTours is not fired when a tour is deleted
+- Tour frequency statistic is wrong when stacked bars are displayed 
+- Stacked bar tooltip is sometimes wrong
+
+
+PROBLEMS
+PROBLEMS
+PROBLEMS
+
   
 NEW 	
 ===
