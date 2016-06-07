@@ -423,12 +423,6 @@
 			id="net.tourbook.preferences.prefPageStatistic"
 			class="net.tourbook.preferences.PrefPageStatistic"
 		/>
-			<page
-				name="%preference_page_statistics_tourFrequency"
-				id="net.tourbook.preferences.prefPageStatisticTourFrequency"
-				class="net.tourbook.preferences.PrefPageStatisticTourFrequency"
-				category="net.tourbook.preferences.prefPageStatistic"
-			/>
 
 
 		<!--
