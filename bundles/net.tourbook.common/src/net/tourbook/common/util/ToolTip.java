@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2010 IBM Corporation and others.
+ * Copyright (c) 2006, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -152,11 +152,11 @@ public abstract class ToolTip {
 			case SWT.Dispose:
 			case SWT.KeyDown:
 			case SWT.MouseDown:
-			case SWT.MouseMove:
 			case SWT.MouseWheel:
 				toolTipHide(getShell(), event);
 				break;
-			case SWT.MouseHover:
+
+			case SWT.MouseMove:
 				toolTipCreate(event);
 				break;
 
@@ -250,9 +250,10 @@ public abstract class ToolTip {
 	 * Activate tooltip support for this control
 	 */
 	public void activate() {
+
 		deactivate();
+
 		control.addListener(SWT.Dispose, listener);
-		control.addListener(SWT.MouseHover, listener);
 		control.addListener(SWT.MouseMove, listener);
 		control.addListener(SWT.MouseExit, listener);
 		control.addListener(SWT.MouseDown, listener);
@@ -288,8 +289,8 @@ public abstract class ToolTip {
 	 * Deactivate tooltip support for the underlying control
 	 */
 	public void deactivate() {
+
 		control.removeListener(SWT.Dispose, listener);
-		control.removeListener(SWT.MouseHover, listener);
 		control.removeListener(SWT.MouseMove, listener);
 		control.removeListener(SWT.MouseExit, listener);
 		control.removeListener(SWT.MouseDown, listener);
@@ -711,7 +712,6 @@ public abstract class ToolTip {
 	private void toolTipHookBothRecursively(final Control c) {
 
 		c.addListener(SWT.MouseMove, hideListener);
-
 		c.addListener(SWT.MouseDown, hideListener);
 		c.addListener(SWT.MouseExit, hideListener);
 
@@ -724,6 +724,7 @@ public abstract class ToolTip {
 	}
 
 	private void toolTipHookByTypeRecursively(final Control c, final boolean add, final int type) {
+
 		if (add) {
 			c.addListener(type, hideListener);
 		} else {
