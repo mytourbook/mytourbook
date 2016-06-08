@@ -1730,7 +1730,6 @@ public class Messages extends NLS {
 	public static String		Tour_Segmenter_Type_ByAltitude_Merged;
 	public static String		Tour_Segmenter_Type_ByBreakTime;
 
-	public static String		Tour_Statistic_Combo_BarVOrder_InfoItem;
 	public static String		Tour_Statistic_Combo_BarVOrder_Tooltip;
 
 	public static String		tag_view_action_refresh_view_tooltip;
@@ -1867,7 +1866,6 @@ public class Messages extends NLS {
 	public static String		tour_segmenter_type_byPower;
 	public static String		tour_segmenter_type_byPulse;
 
-	public static String		tour_statistic_label_years;
 	public static String		tour_statistic_number_of_years;
 
 	public static String		TourAnalyzer_Label_average;

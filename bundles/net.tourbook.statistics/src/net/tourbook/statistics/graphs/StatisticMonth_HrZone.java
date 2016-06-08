@@ -194,6 +194,7 @@ public class StatisticMonth_HrZone extends TourbookStatistic {
 		yData.setYTitle(Messages.LABEL_GRAPH_TIME);
 		yData.setUnitLabel(Messages.LABEL_GRAPH_TIME_UNIT);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
+		yData.setShowYSlider(true);
 
 		yData.setColorIndex(hrColorIndex);
 		yData.setRgbLine(rgbLine);
@@ -268,11 +269,13 @@ public class StatisticMonth_HrZone extends TourbookStatistic {
 
 	@Override
 	public void restoreStateEarly(final IDialogSettings state) {
+
 		_barOrderStart = Util.getStateInt(state, STATE_HR_ZONE_START_FOR_MONTH_BAR_ORDERING, 0);
 	}
 
 	@Override
 	public void saveState(final IDialogSettings state) {
+
 		state.put(STATE_HR_ZONE_START_FOR_MONTH_BAR_ORDERING, _barOrderStart);
 	}
 
@@ -312,7 +315,7 @@ public class StatisticMonth_HrZone extends TourbookStatistic {
 		_isSynchScaleEnabled = isSynchScaleEnabled;
 	}
 
-	private void setupBars10HrZoneOrder(final boolean isNewPerson) {
+	private void setupBars_10_HrZoneOrder(final boolean isNewPerson) {
 
 		final ArrayList<TourPersonHRZone> originalPersonHrZones = _appPerson.getHrZonesSorted();
 		final int[][] weekHrZoneValues = _tourMonthData.hrZoneValues;
@@ -347,7 +350,7 @@ public class StatisticMonth_HrZone extends TourbookStatistic {
 	 * 
 	 * @param statContext
 	 */
-	private void setupBars20BarNames(final StatisticContext statContext) {
+	private void setupBars_20_BarNames(final StatisticContext statContext) {
 
 		final ArrayList<TourPersonHRZone> personHrZones = _appPerson.getHrZonesSorted();
 		final int maxSerieSize = Math.min(personHrZones.size(), _tourMonthData.hrZoneValues.length);
@@ -434,8 +437,8 @@ public class StatisticMonth_HrZone extends TourbookStatistic {
 				_statNumberOfYears,
 				isDataDirtyWithReset() || statContext.isRefreshData);
 
-		setupBars10HrZoneOrder(isNewPerson);
-		setupBars20BarNames(statContext);
+		setupBars_10_HrZoneOrder(isNewPerson);
+		setupBars_20_BarNames(statContext);
 
 		// reset min/max values
 		if (_isSynchScaleEnabled == false && statContext.isRefreshData) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -67,17 +67,18 @@ public class ToolTipV1 {
 		_chart = chart;
 
 		_toolTipListener = new Listener() {
+			@Override
 			public void handleEvent(final Event event) {
 				switch (event.type) {
 				case SWT.MouseHover:
 				case SWT.MouseMove:
-					if (toolTip30Update(event.x, event.y)) {
+					if (toolTip_30_Update(event.x, event.y)) {
 						break;
 					}
 					// FALL THROUGH
 				case SWT.MouseExit:
 				case SWT.MouseDown:
-					toolTip20Hide();
+					toolTip_20_Hide();
 					break;
 				}
 			}
@@ -88,7 +89,7 @@ public class ToolTipV1 {
 
 		// dispose tooltip
 		if (_toolTipShell != null) {
-			toolTip20Hide();
+			toolTip_20_Hide();
 			for (final int toolTipEvent : _toolTipEvents) {
 				_chart.removeListener(toolTipEvent, _toolTipListener);
 			}
@@ -99,7 +100,7 @@ public class ToolTipV1 {
 
 	}
 
-	void toolTip10Show(final int x, final int y, final int hoveredBarSerieIndex, final int hoveredBarValueIndex) {
+	void toolTip_10_Show(final int x, final int y, final int hoveredBarSerieIndex, final int hoveredBarValueIndex) {
 
 		_hoveredBarSerieIndex = hoveredBarSerieIndex;
 		_hoveredBarValueIndex = hoveredBarValueIndex;
@@ -132,14 +133,14 @@ public class ToolTipV1 {
 			}
 		}
 
-		if (toolTip30Update(x, y)) {
+		if (toolTip_30_Update(x, y)) {
 			_toolTipShell.setVisible(true);
 		} else {
-			toolTip20Hide();
+			toolTip_20_Hide();
 		}
 	}
 
-	void toolTip20Hide() {
+	void toolTip_20_Hide() {
 
 		if (_toolTipShell == null || _toolTipShell.isDisposed()) {
 			return;
@@ -157,9 +158,9 @@ public class ToolTipV1 {
 		}
 	}
 
-	private boolean toolTip30Update(final int x, final int y) {
+	private boolean toolTip_30_Update(final int x, final int y) {
 
-		final ChartToolTipInfo tooltipInfo = toolTip40GetInfo(x, y);
+		final ChartToolTipInfo tooltipInfo = toolTip_40_GetInfo(x, y);
 
 		if (tooltipInfo == null) {
 			return false;
@@ -168,8 +169,8 @@ public class ToolTipV1 {
 		if (tooltipInfo.isDisplayed()) {
 
 			// reposition the tool tip when necessary
-			if (tooltipInfo.isReposition() || toolTip60IsWrongPositioned()) {
-				toolTip50SetPosition();
+			if (tooltipInfo.isReposition() || toolTip_60_IsWrongPositioned()) {
+				toolTip_50_SetPosition();
 			}
 
 			return true;
@@ -221,12 +222,12 @@ public class ToolTipV1 {
 		final Rectangle area = _toolTipShell.getClientArea();
 		_toolTipContainer.setSize(area.width, area.height);
 
-		toolTip50SetPosition();
+		toolTip_50_SetPosition();
 
 		return true;
 	}
 
-	private ChartToolTipInfo toolTip40GetInfo(final int x, final int y) {
+	private ChartToolTipInfo toolTip_40_GetInfo(final int x, final int y) {
 
 		if (_hoveredBarSerieIndex != -1) {
 
@@ -268,7 +269,7 @@ public class ToolTipV1 {
 	/**
 	 * Position the tooltip and ensure that it is not located off the screen.
 	 */
-	private void toolTip50SetPosition() {
+	private void toolTip_50_SetPosition() {
 
 		final Point cursorLocation = _chart.getDisplay().getCursorLocation();
 
@@ -296,7 +297,7 @@ public class ToolTipV1 {
 	 * 
 	 * @return Returns <code>true</code> when the cursor is too far away
 	 */
-	private boolean toolTip60IsWrongPositioned() {
+	private boolean toolTip_60_IsWrongPositioned() {
 
 		final Point cursorLocation = _chart.getDisplay().getCursorLocation();
 		final Point toolTipLocation = _toolTipShell.getLocation();

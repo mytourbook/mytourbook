@@ -87,8 +87,6 @@ public class StatisticContext {
 	 *            year
 	 * @param numberOfYears
 	 *            Number of years which should be displayed in the statistic
-	 * @param isRefreshData
-	 *            When <code>true</code> the data should be updated from the database
 	 */
 	public StatisticContext(final TourPerson activePerson,
 							final TourTypeFilter activeTourTypeFilter,

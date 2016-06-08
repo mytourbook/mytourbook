@@ -134,9 +134,13 @@ public class DataProvider_Tour_Month extends DataProvider {
 
 				final Long dbTypeIdObject = (Long) result.getObject(8);
 				if (dbTypeIdObject != null) {
+
 					final long dbTypeId = result.getLong(8);
+
 					for (int typeIndex = 0; typeIndex < tourTypes.length; typeIndex++) {
+
 						if (dbTypeId == tourTypes[typeIndex].getTypeId()) {
+
 							colorIndex = colorOffset + typeIndex;
 							break;
 						}

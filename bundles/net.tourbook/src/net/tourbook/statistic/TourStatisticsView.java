@@ -54,11 +54,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
@@ -70,15 +68,18 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 
 	public static final String				ID							= "net.tourbook.views.StatisticView";				//$NON-NLS-1$
 
+	private static final String				COMBO_MINIMUM_WIDTH			= "1234567890";									//$NON-NLS-1$
+	private static final String				COMBO_MAXIMUM_WIDTH			= "123456789012345678901234567890";				//$NON-NLS-1$
+
+	private static final String				STATE_SELECTED_STATISTIC	= "statistic.container.selected_statistic";		//$NON-NLS-1$
+	private static final String				STATE_SELECTED_YEAR			= "statistic.container.selected-year";				//$NON-NLS-1$
+	private static final String				STATE_NUMBER_OF_YEARS		= "statistic.container.number_of_years";			//$NON-NLS-1$
+
 	private final IPreferenceStore			_prefStore					= TourbookPlugin.getPrefStore();
 	private final IDialogSettings			_state						= TourbookPlugin.getState("TourStatisticsView");	//$NON-NLS-1$
 
 	private final boolean					_isOSX						= net.tourbook.common.UI.IS_OSX;
 	private final boolean					_isLinux					= net.tourbook.common.UI.IS_LINUX;
-
-	private static final String				STATE_SELECTED_STATISTIC	= "statistic.container.selected_statistic";		//$NON-NLS-1$
-	private static final String				STATE_SELECTED_YEAR			= "statistic.container.selected-year";				//$NON-NLS-1$
-	private static final String				STATE_NUMBER_OF_YEARS		= "statistic.container.number_of_years";			//$NON-NLS-1$
 
 	private PostSelectionProvider			_postSelectionProvider;
 	private IPartListener2					_partListener;
@@ -111,15 +112,18 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 	private boolean							_isSynchScaleEnabled;
 	private boolean							_isVerticalOrderDisabled;
 
+	private int								_minimumComboWidth;
+	private int								_maximumComboWidth;
+
 	private PixelConverter					_pc;
 
 	/*
 	 * UI controls
 	 */
-	private Combo							_cboYear;
-	private Combo							_cboStatistics;
-	private Combo							_cboNumberOfYears;
-	private Combo							_cboBarVerticalOrder;
+	private Combo							_comboYear;
+	private Combo							_comboStatistics;
+	private Combo							_comboNumberOfYears;
+	private Combo							_comboBarVerticalOrder;
 
 	private Composite						_statContainer;
 
@@ -334,86 +338,83 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(6).applyTo(container);
 		{
-			/*
-			 * combo: statistics
-			 */
-			_cboStatistics = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-			GridDataFactory.fillDefaults()//
-					.applyTo(_cboStatistics);
-			_cboStatistics.setToolTipText(Messages.Tour_Book_Combo_statistic_tooltip);
-			_cboStatistics.setVisibleItemCount(50);
-			_cboStatistics.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onSelectStatistic();
-				}
-			});
+			{
+				/*
+				 * combo: statistics
+				 */
 
-			/*
-			 * combo: year
-			 */
-			_cboYear = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-			GridDataFactory.fillDefaults()//
-					.indent(widgetSpacing, 0)
-					.hint(_pc.convertWidthInCharsToPixels(_isOSX ? 12 : _isLinux ? 12 : 5), SWT.DEFAULT)
-					.applyTo(_cboYear);
-			_cboYear.setToolTipText(Messages.Tour_Book_Combo_year_tooltip);
-			_cboYear.setVisibleItemCount(50);
-			_cboYear.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onSelectYear();
-				}
-			});
+				_comboStatistics = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+				GridDataFactory.fillDefaults()//
+						.applyTo(_comboStatistics);
+				_comboStatistics.setToolTipText(Messages.Tour_Book_Combo_statistic_tooltip);
+				_comboStatistics.setVisibleItemCount(50);
+				_comboStatistics.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						onSelectStatistic();
+					}
+				});
+			}
 
-			/*
-			 * label: number of years
-			 */
-			final Label label = new Label(container, SWT.NONE);
-			GridDataFactory.fillDefaults()//
-					.align(SWT.FILL, SWT.CENTER)
-					.indent(widgetSpacing, 0)
-					.applyTo(label);
-			label.setText(Messages.tour_statistic_label_years);
+			{
+				/*
+				 * combo: year
+				 */
 
-			/*
-			 * combo: year numbers
-			 */
-			_cboNumberOfYears = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-			GridDataFactory.fillDefaults()//
-					.indent(2, 0)
-					.hint(_pc.convertWidthInCharsToPixels(_isOSX ? 8 : _isLinux ? 8 : 4), SWT.DEFAULT)
-					.applyTo(_cboNumberOfYears);
-			_cboNumberOfYears.setToolTipText(Messages.tour_statistic_number_of_years);
-			_cboNumberOfYears.setVisibleItemCount(20);
-			_cboNumberOfYears.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onSelectYear();
-				}
-			});
+				_comboYear = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+				GridDataFactory.fillDefaults()//
+						.indent(widgetSpacing, 0)
+						.hint(_pc.convertWidthInCharsToPixels(_isOSX ? 12 : _isLinux ? 12 : 5), SWT.DEFAULT)
+						.applyTo(_comboYear);
+				_comboYear.setToolTipText(Messages.Tour_Book_Combo_year_tooltip);
+				_comboYear.setVisibleItemCount(50);
+				_comboYear.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						onSelectYear();
+					}
+				});
+			}
 
-			/*
-			 * combo: sequence for stacked charts
-			 */
+			{
+				/*
+				 * combo: year numbers
+				 */
 
-			final GC gc = new GC(parent);
-			final Point defaultTextSize = gc.textExtent(Messages.Tour_Statistic_Combo_BarVOrder_InfoItem);
-			gc.dispose();
+				_comboNumberOfYears = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+				GridDataFactory.fillDefaults()//
+						.indent(2, 0)
+						.hint(_pc.convertWidthInCharsToPixels(_isOSX ? 8 : _isLinux ? 8 : 4), SWT.DEFAULT)
+						.applyTo(_comboNumberOfYears);
+				_comboNumberOfYears.setToolTipText(Messages.tour_statistic_number_of_years);
+				_comboNumberOfYears.setVisibleItemCount(20);
+				_comboNumberOfYears.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						onSelectYear();
+					}
+				});
+			}
 
-			_cboBarVerticalOrder = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-			GridDataFactory.fillDefaults()//
-					.indent(widgetSpacing, 0)
-					.hint(defaultTextSize.x, SWT.DEFAULT)
-					.applyTo(_cboBarVerticalOrder);
-			_cboBarVerticalOrder.setToolTipText(Messages.Tour_Statistic_Combo_BarVOrder_Tooltip);
-			_cboBarVerticalOrder.setVisibleItemCount(50);
-			_cboBarVerticalOrder.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onSelectBarVerticalOrder();
-				}
-			});
+			{
+				/*
+				 * combo: sequence for stacked charts
+				 */
+
+				_comboBarVerticalOrder = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+				GridDataFactory.fillDefaults()//
+						.indent(widgetSpacing, 0)
+//						.hint(defaultTextSize.x, SWT.DEFAULT)
+						.applyTo(_comboBarVerticalOrder);
+				_comboBarVerticalOrder.setToolTipText(Messages.Tour_Statistic_Combo_BarVOrder_Tooltip);
+				_comboBarVerticalOrder.setVisibleItemCount(50);
+				_comboBarVerticalOrder.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						onSelectBarVerticalOrder();
+					}
+				});
+			}
 		}
 	}
 
@@ -498,7 +499,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 	private int getNumberOfYears() {
 
 		int numberOfYears = 1;
-		final int selectedIndex = _cboNumberOfYears.getSelectionIndex();
+		final int selectedIndex = _comboNumberOfYears.getSelectionIndex();
 
 		if (selectedIndex != -1) {
 			numberOfYears = selectedIndex + 1;
@@ -532,6 +533,13 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 	private void initUI(final Composite parent) {
 
 		_pc = new PixelConverter(parent);
+
+		final GC gc = new GC(parent);
+		{
+			_minimumComboWidth = gc.textExtent(COMBO_MINIMUM_WIDTH).x;
+			_maximumComboWidth = gc.textExtent(COMBO_MAXIMUM_WIDTH).x;
+		}
+		gc.dispose();
 	}
 
 	private void onSelectBarVerticalOrder() {
@@ -540,7 +548,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 			return;
 		}
 
-		_activeStatistic.setBarVerticalOrder(_cboBarVerticalOrder.getSelectionIndex());
+		_activeStatistic.setBarVerticalOrder(_comboBarVerticalOrder.getSelectionIndex());
 	}
 
 	private void onSelectStatistic() {
@@ -554,10 +562,10 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 
 	private void onSelectYear() {
 
-		final int selectedItem = _cboYear.getSelectionIndex();
+		final int selectedItem = _comboYear.getSelectionIndex();
 		if (selectedItem != -1) {
 
-			_selectedYear = Integer.parseInt(_cboYear.getItem(selectedItem));
+			_selectedYear = Integer.parseInt(_comboYear.getItem(selectedItem));
 
 			updateStatistic_10_NoReload(_activePerson, _activeTourTypeFilter, _selectedYear);
 		}
@@ -571,14 +579,14 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 
 		_allStatisticProvider = StatisticManager.getStatisticProviders();
 
-		_cboStatistics.removeAll();
+		_comboStatistics.removeAll();
 		int indexCounter = 0;
 		int selectedIndex = 0;
 
 		// fill combobox with statistic names
 		for (final TourbookStatistic statistic : getAvailableStatistics()) {
 
-			_cboStatistics.add(statistic.visibleName);
+			_comboStatistics.add(statistic.visibleName);
 
 			if (_activeStatistic != null && _activeStatistic.statisticId.equals(statistic.statisticId)) {
 				selectedIndex = indexCounter;
@@ -588,7 +596,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 		}
 
 		// reselect stat
-		_cboStatistics.select(selectedIndex);
+		_comboStatistics.select(selectedIndex);
 		onSelectStatistic();
 	}
 
@@ -625,7 +633,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 			UI.showSQLException(e);
 		}
 
-		_cboYear.removeAll();
+		_comboYear.removeAll();
 
 		/*
 		 * add all years of the tours and the current year
@@ -641,13 +649,13 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 				isThisYearSet = true;
 			}
 
-			_cboYear.add(year.toString());
+			_comboYear.add(year.toString());
 		}
 
 		// add currenty year if not set
 		if (isThisYearSet == false) {
 			_availableYears.add(thisYear);
-			_cboYear.add(Integer.toString(thisYear));
+			_comboYear.add(Integer.toString(thisYear));
 		}
 	}
 
@@ -678,10 +686,10 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 		// select number of years
 		try {
 			final int numberOfYears = _state.getInt(STATE_NUMBER_OF_YEARS);
-			_cboNumberOfYears.select(numberOfYears);
+			_comboNumberOfYears.select(numberOfYears);
 		} catch (final NumberFormatException e) {
 			// select one year
-			_cboNumberOfYears.select(0);
+			_comboNumberOfYears.select(0);
 		}
 
 		// select year
@@ -695,7 +703,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 		selectYear(defaultYear);
 
 		// select statistic item
-		_cboStatistics.select(prevStatIndex);
+		_comboStatistics.select(prevStatIndex);
 		onSelectStatistic();
 
 		// restore statistic state, like reselect previous selection
@@ -712,7 +720,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 		}
 
 		// keep statistic id for the selected statistic
-		final int selectionIndex = _cboStatistics.getSelectionIndex();
+		final int selectionIndex = _comboStatistics.getSelectionIndex();
 		if (selectionIndex != -1) {
 			_state.put(STATE_SELECTED_STATISTIC, allAvailableStatistics.get(selectionIndex).statisticId);
 		}
@@ -721,7 +729,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 			tourbookStatistic.saveState(_state);
 		}
 
-		_state.put(STATE_NUMBER_OF_YEARS, _cboNumberOfYears.getSelectionIndex());
+		_state.put(STATE_NUMBER_OF_YEARS, _comboNumberOfYears.getSelectionIndex());
 		_state.put(STATE_SELECTED_YEAR, _selectedYear);
 	}
 
@@ -741,17 +749,17 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 			if (selectedYearIndex == -1) {
 
 				// year is still not selected
-				final int yearCount = _cboYear.getItemCount();
+				final int yearCount = _comboYear.getItemCount();
 
 				// reselect the youngest year if years are available
 				if (yearCount > 0) {
 					selectedYearIndex = yearCount - 1;
-					_selectedYear = Integer.parseInt(_cboYear.getItem(yearCount - 1));
+					_selectedYear = Integer.parseInt(_comboYear.getItem(yearCount - 1));
 				}
 			}
 		}
 
-		_cboYear.select(selectedYearIndex);
+		_comboYear.select(selectedYearIndex);
 	}
 
 	/**
@@ -761,7 +769,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 	private boolean setActiveStatistic() {
 
 		// get selected statistic
-		final int selectedIndex = _cboStatistics.getSelectionIndex();
+		final int selectedIndex = _comboStatistics.getSelectionIndex();
 		if (selectedIndex == -1) {
 			_activeStatistic = null;
 			return false;
@@ -799,8 +807,8 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 
 	@Override
 	public void setFocus() {
-		// TODO Auto-generated method stub
 
+		_comboStatistics.setFocus();
 	}
 
 	/**
@@ -837,7 +845,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 				getNumberOfYears());
 
 		statContext.isRefreshData = true;
-		statContext.inVerticalBarIndex = _cboBarVerticalOrder.getSelectionIndex();
+		statContext.inVerticalBarIndex = _comboBarVerticalOrder.getSelectionIndex();
 
 		_activeStatistic.updateStatistic(statContext);
 
@@ -880,7 +888,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 				selectedYear,
 				getNumberOfYears());
 
-		statContext.inVerticalBarIndex = _cboBarVerticalOrder.getSelectionIndex();
+		statContext.inVerticalBarIndex = _comboBarVerticalOrder.getSelectionIndex();
 
 		_activeStatistic.updateStatistic(statContext);
 
@@ -897,7 +905,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 			// vertical order feature is used
 			_isVerticalOrderDisabled = false;
 
-			_cboBarVerticalOrder.setVisible(true);
+			_comboBarVerticalOrder.setVisible(true);
 
 		} else {
 
@@ -905,7 +913,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 
 				// disable vertical order feature
 
-				_cboBarVerticalOrder.setVisible(false);
+				_comboBarVerticalOrder.setVisible(false);
 
 				_isVerticalOrderDisabled = true;
 			}
@@ -917,19 +925,18 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 		if (statContext.outIsUpdateBarNames) {
 			updateUI_VerticalBarOrder(statContext);
 		}
-
 	}
 
 	private void updateUI() {
 
 		// fill combobox with number of years
-		for (int years = 1; years <= 50; years++) {
-			_cboNumberOfYears.add(Integer.toString(years));
+		for (int years = 1; years <= 100; years++) {
+			_comboNumberOfYears.add(Integer.toString(years));
 		}
 
 		// fill combobox with statistic names
 		for (final TourbookStatistic statistic : getAvailableStatistics()) {
-			_cboStatistics.add(statistic.visibleName);
+			_comboStatistics.add(statistic.visibleName);
 		}
 	}
 
@@ -960,22 +967,36 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 		final String[] stackedNames = statContext.outBarNames;
 
 		if (stackedNames == null) {
-			_cboBarVerticalOrder.setVisible(false);
+			_comboBarVerticalOrder.setVisible(false);
 			_isVerticalOrderDisabled = true;
 
 			return;
 		}
 
-		_cboBarVerticalOrder.removeAll();
+		_comboBarVerticalOrder.removeAll();
 
 		for (final String name : stackedNames) {
-			_cboBarVerticalOrder.add(name);
+			_comboBarVerticalOrder.add(name);
 		}
 
 		final int selectedIndex = statContext.outVerticalBarIndex;
 
-		_cboBarVerticalOrder.select(selectedIndex >= _cboBarVerticalOrder.getItemCount() ? 0 : selectedIndex);
-		_cboBarVerticalOrder.setEnabled(true);
+		_comboBarVerticalOrder.select(selectedIndex >= _comboBarVerticalOrder.getItemCount() ? 0 : selectedIndex);
+		_comboBarVerticalOrder.setEnabled(true);
+
+		/*
+		 * Adjust the combo width
+		 */
+		final int preferredWidth = _comboBarVerticalOrder.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).x;
+
+		final GridData gd = (GridData) _comboBarVerticalOrder.getLayoutData();
+		gd.widthHint = preferredWidth > _maximumComboWidth //
+				? _maximumComboWidth
+				: preferredWidth < _minimumComboWidth //
+						? _minimumComboWidth
+						: preferredWidth;
+
+		_statContainer.layout(true, true);
 	}
 
 }

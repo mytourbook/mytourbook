@@ -202,7 +202,7 @@ public abstract class TourbookStatistic {
 	}
 
 	/**
-	 * Saves the state of the statistic into the memento, default does nothing
+	 * Saves the state of the statistic into a state, default does nothing
 	 * 
 	 * @param viewState
 	 */

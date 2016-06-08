@@ -863,4 +863,5 @@ public class StatisticTour_Frequency extends TourbookStatistic {
 
 	@Override
 	public void updateToolBar() {}
+
 }

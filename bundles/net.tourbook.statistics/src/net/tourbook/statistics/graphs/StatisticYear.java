@@ -188,7 +188,8 @@ public abstract class StatisticYear extends TourbookStatistic {
 
 		final ChartDataYSerie yData = new ChartDataYSerie(
 				ChartType.BAR,
-				ChartDataYSerie.BAR_LAYOUT_BESIDE,
+//				ChartDataYSerie.BAR_LAYOUT_BESIDE,
+				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				_tourYearData.altitudeLow,
 				_tourYearData.altitudeHigh);
 		yData.setYTitle(Messages.LABEL_GRAPH_ALTITUDE);
@@ -212,7 +213,8 @@ public abstract class StatisticYear extends TourbookStatistic {
 
 		final ChartDataYSerie yData = new ChartDataYSerie(
 				ChartType.BAR,
-				ChartDataYSerie.BAR_LAYOUT_BESIDE,
+//				ChartDataYSerie.BAR_LAYOUT_BESIDE,
+				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				_tourYearData.distanceLow,
 				_tourYearData.distanceHigh);
 		yData.setYTitle(Messages.LABEL_GRAPH_DISTANCE);
@@ -236,7 +238,8 @@ public abstract class StatisticYear extends TourbookStatistic {
 
 		final ChartDataYSerie yData = new ChartDataYSerie(
 				ChartType.BAR,
-				ChartDataYSerie.BAR_LAYOUT_BESIDE,
+//				ChartDataYSerie.BAR_LAYOUT_BESIDE,
+				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				_tourYearData.getTimeLowFloat(),
 				_tourYearData.getTimeHighFloat());
 		yData.setYTitle(Messages.LABEL_GRAPH_TIME);

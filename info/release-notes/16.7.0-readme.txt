@@ -19,10 +19,12 @@ NEW
  
 * Statistics
 
-  - New statistics average speed/pace in the day summary
+  - Day summary statistics
+    - New graphs for average speed/pace  
+    - Select visible graphs in the slideout
   - Show chart grid options in a slideout
   - Show tour frequency options in a slideout, 
-    removed from preferences dialog
+    these options are removed from the preference dialog
     
 
 

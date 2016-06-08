@@ -962,7 +962,7 @@ public class ChartComponentGraph extends Canvas {
 
 				actionSelectBars();
 
-				_hoveredBarToolTip.toolTip20Hide();
+				_hoveredBarToolTip.toolTip_20_Hide();
 				hideTooltip();
 
 				// get cursor location relativ to this graph canvas
@@ -5780,7 +5780,7 @@ public class ChartComponentGraph extends Canvas {
 						_hoveredBarSerieIndex = serieIndex;
 						_hoveredBarValueIndex = valueIndex;
 
-						_hoveredBarToolTip.toolTip10Show(devX, 100, serieIndex, valueIndex);
+						_hoveredBarToolTip.toolTip_10_Show(devX, 100, serieIndex, valueIndex);
 
 						isBarHit = true;
 						break;
@@ -5798,7 +5798,7 @@ public class ChartComponentGraph extends Canvas {
 
 		if (isBarHit == false) {
 
-			_hoveredBarToolTip.toolTip20Hide();
+			_hoveredBarToolTip.toolTip_20_Hide();
 
 			if (_hoveredBarSerieIndex != -1) {
 
@@ -6615,7 +6615,7 @@ public class ChartComponentGraph extends Canvas {
 
 		_chart.onExternalMouseExit(event.time);
 
-		_hoveredBarToolTip.toolTip20Hide();
+		_hoveredBarToolTip.toolTip_20_Hide();
 
 		boolean isRedraw = false;
 
@@ -7741,7 +7741,7 @@ public class ChartComponentGraph extends Canvas {
 		}
 
 		// hide previous tooltip
-		_hoveredBarToolTip.toolTip20Hide();
+		_hoveredBarToolTip.toolTip_20_Hide();
 
 		// force the graph to be repainted
 		redraw();
