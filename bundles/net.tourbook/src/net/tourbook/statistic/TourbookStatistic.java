@@ -221,13 +221,15 @@ public abstract class TourbookStatistic {
 	}
 
 	/**
-	 * Set visible options in the slideout, default is to reset all options.
+	 * Set additional options in the slideout.
 	 * 
 	 * @param slideout
 	 */
-	protected void setChartOptionsSlideout(final SlideoutStatisticsChartOptions slideout) {
+	protected void setChartOptions(final SlideoutStatisticsChartOptions slideout) {
 
-		slideout.resetOptions();
+		// reset previous options
+
+		slideout.setStatisticOptions(null);
 	}
 
 	/**

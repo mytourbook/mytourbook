@@ -447,7 +447,7 @@ public class Messages extends NLS {
 
 	public static String		App_Unit_Minute;
 
-	public static String	App_Unit_Minute_Small;
+	public static String		App_Unit_Minute_Small;
 
 	public static String		App_Unit_Px;
 	public static String		App_Unit_Seconds_Small;
@@ -1322,7 +1322,14 @@ public class Messages extends NLS {
 //	public static String		Pref_SignImages_Dialog_Delete_Title;
 //	public static String		Pref_SignImages_Dialog_NoSelectedSignImage_Message;
 
-	public static String	Pref_Statistic_Group_TourFrequency;
+	public static String		Pref_Statistic_Checkbox_Altitude;
+	public static String		Pref_Statistic_Checkbox_AvgPace;
+	public static String		Pref_Statistic_Checkbox_AvgSpeed;
+	public static String		Pref_Statistic_Checkbox_Distance;
+	public static String		Pref_Statistic_Checkbox_Duration;
+
+	public static String		Pref_Statistic_Group_DaySummary;
+	public static String		Pref_Statistic_Group_TourFrequency;
 
 	public static String		Pref_Statistic_Label_altitude;
 	public static String		Pref_Statistic_Label_altitude_low_value;
@@ -1337,11 +1344,11 @@ public class Messages extends NLS {
 	public static String		Pref_Statistic_Label_h;
 	public static String		Pref_Statistic_Label_interval;
 
-	public static String	Pref_Statistic_Label_Interval;
+	public static String		Pref_Statistic_Label_Interval;
 
-	public static String	Pref_Statistic_Label_Minimum;
+	public static String		Pref_Statistic_Label_Minimum;
 
-	public static String	Pref_Statistic_Label_NumberOfBars;
+	public static String		Pref_Statistic_Label_NumberOfBars;
 	public static String		Pref_Statistic_Label_separator;
 
 	public static String		Pref_Tour_Button_FailedUpdate;
@@ -1490,6 +1497,8 @@ public class Messages extends NLS {
 	public static String		Slideout_SegmenterOptions_Label_AltitudeUp;
 	public static String		Slideout_SegmenterOptions_Label_Title;
 	public static String		Slideout_SegmenterOptions_Label_Totals;
+
+	public static String		Slideout_StatisticChartOptions_Label_Title;
 
 	public static String		Slideout_TourChartOptions_Label_Title;
 

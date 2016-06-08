@@ -34,6 +34,7 @@ import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.statistic.ChartOptions_TourFrequency;
 import net.tourbook.statistic.SlideoutStatisticsChartOptions;
 import net.tourbook.statistic.StatisticContext;
 import net.tourbook.statistic.TourbookStatistic;
@@ -58,7 +59,7 @@ public class StatisticTour_Frequency extends TourbookStatistic {
 
 	private final IPreferenceStore		_prefStore							= TourbookPlugin.getPrefStore();
 
-	private IPropertyChangeListener		_prefChangeListener;
+	private IPropertyChangeListener		_statTourFrequency_PrefChangeListener;
 
 	private final BarChartMinMaxKeeper	_minMaxKeeperStatAltitudeCounter	= new BarChartMinMaxKeeper();
 	private final BarChartMinMaxKeeper	_minMaxKeeperStatAltitudeSum		= new BarChartMinMaxKeeper();
@@ -118,10 +119,10 @@ public class StatisticTour_Frequency extends TourbookStatistic {
 
 	public StatisticTour_Frequency() {}
 
-	void addPrefListener(final Composite container) {
+	private void addPrefListener(final Composite container) {
 
 		// create pref listener
-		_prefChangeListener = new IPropertyChangeListener() {
+		_statTourFrequency_PrefChangeListener = new IPropertyChangeListener() {
 			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 				final String property = event.getProperty();
@@ -153,13 +154,13 @@ public class StatisticTour_Frequency extends TourbookStatistic {
 		};
 
 		// add pref listener
-		_prefStore.addPropertyChangeListener(_prefChangeListener);
+		_prefStore.addPropertyChangeListener(_statTourFrequency_PrefChangeListener);
 
 		// remove pref listener
 		container.addDisposeListener(new DisposeListener() {
 			@Override
 			public void widgetDisposed(final DisposeEvent e) {
-				_prefStore.removePropertyChangeListener(_prefChangeListener);
+				_prefStore.removePropertyChangeListener(_statTourFrequency_PrefChangeListener);
 			}
 		});
 	}
@@ -534,24 +535,22 @@ public class StatisticTour_Frequency extends TourbookStatistic {
 
 	private void getPreferences() {
 
-		final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
-
 		_statDistanceUnits = getPrefUnits(
-				store,
+				_prefStore,
 				ITourbookPreferences.STAT_DISTANCE_NUMBERS,
 				ITourbookPreferences.STAT_DISTANCE_LOW_VALUE,
 				ITourbookPreferences.STAT_DISTANCE_INTERVAL,
 				ChartDataSerie.AXIS_UNIT_NUMBER);
 
 		_statAltitudeUnits = getPrefUnits(
-				store,
+				_prefStore,
 				ITourbookPreferences.STAT_ALTITUDE_NUMBERS,
 				ITourbookPreferences.STAT_ALTITUDE_LOW_VALUE,
 				ITourbookPreferences.STAT_ALTITUDE_INTERVAL,
 				ChartDataSerie.AXIS_UNIT_NUMBER);
 
 		_statTimeUnits = getPrefUnits(
-				store,
+				_prefStore,
 				ITourbookPreferences.STAT_DURATION_NUMBERS,
 				ITourbookPreferences.STAT_DURATION_LOW_VALUE,
 				ITourbookPreferences.STAT_DURATION_INTERVAL,
@@ -613,9 +612,9 @@ public class StatisticTour_Frequency extends TourbookStatistic {
 	}
 
 	@Override
-	protected void setChartOptionsSlideout(final SlideoutStatisticsChartOptions slideout) {
+	protected void setChartOptions(final SlideoutStatisticsChartOptions slideout) {
 
-		slideout.setOption_IsShowTourFrequency();
+		slideout.setStatisticOptions(new ChartOptions_TourFrequency());
 	}
 
 	@Override
@@ -656,6 +655,8 @@ public class StatisticTour_Frequency extends TourbookStatistic {
 		yData.setAllValueColors(0);
 		yData.setYTitle(title);
 		yData.setVisibleMinValue(0);
+		yData.setShowYSlider(true);
+
 		chartDataModel.addYData(yData);
 
 		StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE);
@@ -712,7 +713,10 @@ public class StatisticTour_Frequency extends TourbookStatistic {
 		yData.setYTitle(title);
 		yData.setVisibleMinValue(0);
 		yData.setValueDivisor(1);
+		yData.setShowYSlider(true);
+
 		chartDataModel.addYData(yData);
+
 		StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_DISTANCE);
 		StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_DISTANCE, _activeTourTypeFilter);
 		yData.setColorIndex(colorIndex);
@@ -758,6 +762,8 @@ public class StatisticTour_Frequency extends TourbookStatistic {
 		yData.setAllValueColors(0);
 		yData.setYTitle(title);
 		yData.setVisibleMinValue(0);
+		yData.setShowYSlider(true);
+
 		chartDataModel.addYData(yData);
 
 		StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_TIME);
@@ -775,7 +781,6 @@ public class StatisticTour_Frequency extends TourbookStatistic {
 		// show the new data data model in the chart
 		statDurationChart.updateChart(chartDataModel, true);
 	}
-
 
 	@Override
 	public void updateStatistic(final StatisticContext statContext) {

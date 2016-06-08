@@ -416,6 +416,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 		yData.setUnitLabel(UI.UNIT_LABEL_ALTITUDE);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
 		yData.setAllValueColors(0);
+		yData.setShowYSlider(true);
 		yData.setVisibleMinValue(0);
 		yData.setColorIndex(new int[][] { _tourDayData.typeColorIndex });
 
@@ -436,6 +437,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 		yData.setUnitLabel(UI.UNIT_LABEL_PACE);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
 		yData.setAllValueColors(0);
+		yData.setShowYSlider(true);
 		yData.setVisibleMinValue(0);
 		yData.setColorIndex(new int[][] { _tourDayData.typeColorIndex });
 
@@ -456,6 +458,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 		yData.setUnitLabel(UI.UNIT_LABEL_SPEED);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
 		yData.setAllValueColors(0);
+		yData.setShowYSlider(true);
 		yData.setVisibleMinValue(0);
 		yData.setColorIndex(new int[][] { _tourDayData.typeColorIndex });
 
@@ -479,6 +482,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 		yData.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
 		yData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_NUMBER);
 		yData.setAllValueColors(0);
+		yData.setShowYSlider(true);
 		yData.setVisibleMinValue(0);
 		yData.setValueDivisor(1000);
 		yData.setColorIndex(new int[][] { _tourDayData.typeColorIndex });
@@ -503,6 +507,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 		yData.setUnitLabel(Messages.LABEL_GRAPH_TIME_UNIT);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
 		yData.setAllValueColors(0);
+		yData.setShowYSlider(true);
 		yData.setVisibleMinValue(0);
 		yData.setColorIndex(new int[][] { _tourDayData.typeColorIndex });
 
@@ -557,6 +562,11 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 	public void preferencesHasChanged() {
 
 		updateStatistic(new StatisticContext(_activePerson, _activeTourTypeFilter, _currentYear, _numberOfYears));
+	}
+
+	void resetMinMaxKeeper() {
+
+		_minMaxKeeper.resetMinMax();
 	}
 
 	@Override
@@ -637,14 +647,12 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 	@Override
 	public void setSynchScale(final boolean isSynchScaleEnabled) {
 
-		if (!isSynchScaleEnabled) {
-
-			// reset when it's disabled
-
-			_minMaxKeeper.resetMinMax();
-		}
-
 		_isSynchScaleEnabled = isSynchScaleEnabled;
+
+		if (!isSynchScaleEnabled) {
+			// reset when sync is set to be disabled
+			resetMinMaxKeeper();
+		}
 	}
 
 	@Override
@@ -688,7 +696,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 
 		// reset min/max values
 		if (_isSynchScaleEnabled == false && statContext.isRefreshData) {
-			_minMaxKeeper.resetMinMax();
+			resetMinMaxKeeper();
 		}
 
 		final ChartDataModel chartModel = getChartDataModel();

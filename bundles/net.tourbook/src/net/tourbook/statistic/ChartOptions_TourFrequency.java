@@ -29,11 +29,12 @@ import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 
-public class ChartOptions_Statistics_TourFrequency {
+public class ChartOptions_TourFrequency implements IStatisticOptions {
 
 	private final IPreferenceStore	_prefStore	= TourbookPlugin.getPrefStore();
 
@@ -55,6 +56,7 @@ public class ChartOptions_Statistics_TourFrequency {
 	private Spinner					_spinnerDuration_Minimum;
 	private Spinner					_spinnerDuration_NumOfBars;
 
+	@Override
 	public void createUI(final Composite parent) {
 
 		initUI(parent);
@@ -374,9 +376,18 @@ public class ChartOptions_Statistics_TourFrequency {
 
 	private void onChangeUI() {
 
-		saveState();
+		// update chart async (which is done when a pref store value is modified) that the UI is updated immediately
+
+		Display.getCurrent().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+
+				saveState();
+			}
+		});
 	}
 
+	@Override
 	public void resetToDefaults() {
 
 		_spinnerAltitude_Interval.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.STAT_ALTITUDE_INTERVAL));
@@ -394,6 +405,7 @@ public class ChartOptions_Statistics_TourFrequency {
 		onChangeUI();
 	}
 
+	@Override
 	public void restoreState() {
 
 		_spinnerAltitude_Interval.setSelection(_prefStore.getInt(ITourbookPreferences.STAT_ALTITUDE_INTERVAL));
@@ -409,6 +421,7 @@ public class ChartOptions_Statistics_TourFrequency {
 		_spinnerDuration_NumOfBars.setSelection(_prefStore.getInt(ITourbookPreferences.STAT_DURATION_NUMBERS));
 	}
 
+	@Override
 	public void saveState() {
 
 		_prefStore.setValue(ITourbookPreferences.STAT_ALTITUDE_INTERVAL, //

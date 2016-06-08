@@ -4,7 +4,6 @@ PROBLEMS
 PROBLEMS
 PROBLEMS
 
-- Tour frequency statistic is wrong when stacked bars are displayed 
 - Stacked bar tooltip is sometimes wrong
 
 
@@ -22,6 +21,8 @@ NEW
 
   - New statistics average speed/pace in the day summary
   - Show chart grid options in a slideout
+  - Show tour frequency options in a slideout, 
+    removed from preferences dialog
     
 
 
@@ -32,6 +33,9 @@ IMPROVEMENTS
 BUGFIX
 ======
 
-- Fixed bug: all views are not updated when a tour is deleted, 
-  was introduced when tour log view is logging tour deletions
+* Statistics
+
+  - All views are not updated when a tour is deleted, 
+    was introduced when tour log view is logging tour deletions
+  - Tour frequency statistic is wrong when stacked bars are displayed 
 

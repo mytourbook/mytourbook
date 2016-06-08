@@ -67,6 +67,15 @@ public interface ITourbookPreferences {
 	public static final String	STAT_DURATION_INTERVAL							= "statistic.duration.interval";							//$NON-NLS-1$
 
 	/*
+	 * Statistic day summary
+	 */
+	public static final String	STAT_DAY_IS_SHOW_ALTITUDE						= "STAT_DAY_IS_SHOW_ALTITUDE";								//$NON-NLS-1$
+	public static final String	STAT_DAY_IS_SHOW_AVG_PACE						= "STAT_DAY_IS_SHOW_AVG_PACE";								//$NON-NLS-1$
+	public static final String	STAT_DAY_IS_SHOW_AVG_SPEED						= "STAT_DAY_IS_SHOW_AVG_SPEED";							//$NON-NLS-1$
+	public static final String	STAT_DAY_IS_SHOW_DISTANCE						= "STAT_DAY_IS_SHOW_DISTANCE";								//$NON-NLS-1$
+	public static final String	STAT_DAY_IS_SHOW_DURATION						= "STAT_DAY_IS_SHOW_DURATION";								//$NON-NLS-1$
+
+	/*
 	 * Graphs
 	 */
 	public static final String	GRAPH_ALL										= "graphs.all";											//$NON-NLS-1$

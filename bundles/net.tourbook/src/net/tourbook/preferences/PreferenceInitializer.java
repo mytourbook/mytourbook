@@ -84,7 +84,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ITourbookPreferences.REGIONAL_GROUP_SEPARATOR, "'"); //$NON-NLS-1$
 
 		/*
-		 * statistics
+		 * Statistics
 		 */
 		store.setDefault(ITourbookPreferences.STAT_ALTITUDE_LOW_VALUE, 0);
 		store.setDefault(ITourbookPreferences.STAT_ALTITUDE_INTERVAL, 250);
@@ -98,8 +98,14 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ITourbookPreferences.STAT_DURATION_INTERVAL, 60);
 		store.setDefault(ITourbookPreferences.STAT_DURATION_NUMBERS, 12);
 
+		store.setDefault(ITourbookPreferences.STAT_DAY_IS_SHOW_ALTITUDE, true);
+		store.setDefault(ITourbookPreferences.STAT_DAY_IS_SHOW_AVG_PACE, true);
+		store.setDefault(ITourbookPreferences.STAT_DAY_IS_SHOW_AVG_SPEED, true);
+		store.setDefault(ITourbookPreferences.STAT_DAY_IS_SHOW_DISTANCE, true);
+		store.setDefault(ITourbookPreferences.STAT_DAY_IS_SHOW_DURATION, true);
+
 		/*
-		 * graph preferences
+		 * Graph preferences
 		 */
 		store.setDefault(ITourbookPreferences.GRAPH_PREF_PAGE_IS_TOUR_CHART_LIVE_UPDATE, true);
 		store.setDefault(ITourbookPreferences.GRAPH_VISIBLE, Integer.toString(TourManager.GRAPH_ALTITUDE));

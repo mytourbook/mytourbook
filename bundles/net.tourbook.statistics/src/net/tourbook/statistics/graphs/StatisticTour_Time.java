@@ -513,6 +513,7 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
 		yData.setUnitLabel(Messages.LABEL_GRAPH_TIME_UNIT);
 		yData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_HOUR_MINUTE_24H);
 		yData.setYAxisDirection(false);
+		yData.setShowYSlider(true);
 
 		yData.setColorIndex(new int[][] { _tourTimeData.typeColorIndex });
 		StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_TIME, _activeTourTypeFiler);

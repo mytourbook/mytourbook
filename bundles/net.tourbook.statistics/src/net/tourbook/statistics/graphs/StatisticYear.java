@@ -194,6 +194,8 @@ public abstract class StatisticYear extends TourbookStatistic {
 		yData.setYTitle(Messages.LABEL_GRAPH_ALTITUDE);
 		yData.setUnitLabel(UI.UNIT_LABEL_ALTITUDE);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
+		yData.setShowYSlider(true);
+
 		StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE, _activeTourTypeFilter);
 		StatisticServices.setTourTypeColorIndex(yData, _tourYearData.typeIds, _activeTourTypeFilter);
 		StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE);
@@ -216,6 +218,8 @@ public abstract class StatisticYear extends TourbookStatistic {
 		yData.setYTitle(Messages.LABEL_GRAPH_DISTANCE);
 		yData.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
+		yData.setShowYSlider(true);
+
 		StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_DISTANCE, _activeTourTypeFilter);
 		StatisticServices.setTourTypeColorIndex(yData, _tourYearData.typeIds, _activeTourTypeFilter);
 		StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_DISTANCE);
@@ -238,6 +242,8 @@ public abstract class StatisticYear extends TourbookStatistic {
 		yData.setYTitle(Messages.LABEL_GRAPH_TIME);
 		yData.setUnitLabel(Messages.LABEL_GRAPH_TIME_UNIT);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
+		yData.setShowYSlider(true);
+
 		StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_TIME, _activeTourTypeFilter);
 		StatisticServices.setTourTypeColorIndex(yData, _tourYearData.typeIds, _activeTourTypeFilter);
 		StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_TIME);

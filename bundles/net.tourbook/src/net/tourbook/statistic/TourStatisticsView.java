@@ -952,7 +952,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 		tbm.update(true);
 
 		// set slideout AFTER the toolbar is created/updated/filled which creates the slideout
-		_activeStatistic.setChartOptionsSlideout(_actionChartOptions.getSlideout());
+		_activeStatistic.setChartOptions(_actionChartOptions.getSlideout());
 	}
 
 	private void updateUI_VerticalBarOrder(final StatisticContext statContext) {

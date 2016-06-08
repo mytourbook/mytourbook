@@ -38,17 +38,17 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class SlideoutStatisticsChartOptions extends ToolbarSlideout {
 
-	private ActionOpenPrefDialog					_actionPrefDialog;
-	private Action									_actionRestoreDefaults;
+	private ActionOpenPrefDialog	_actionPrefDialog;
+	private Action					_actionRestoreDefaults;
 
-	private ChartOptions_Grid						_gridUI			= new ChartOptions_Grid();
-	private ChartOptions_Statistics_TourFrequency	_statisticUI	= new ChartOptions_Statistics_TourFrequency();
+	private ChartOptions_Grid		_gridUI	= new ChartOptions_Grid();
 
 	/*
 	 * UI controls
 	 */
-	private Shell									_parentShell;
-	private boolean									_isOption_ShowTourFrequency;
+	private Shell					_parentShell;
+
+	private IStatisticOptions		_statisticOptions;
 
 	public SlideoutStatisticsChartOptions(final Control ownerControl, final ToolBar toolBar) {
 
@@ -110,8 +110,8 @@ public class SlideoutStatisticsChartOptions extends ToolbarSlideout {
 				createUI_10_Title(container);
 				createUI_12_Actions(container);
 
-				if (_isOption_ShowTourFrequency) {
-					_statisticUI.createUI(container);
+				if (_statisticOptions != null) {
+					_statisticOptions.createUI(container);
 				}
 
 				_gridUI.createUI(container);
@@ -128,7 +128,7 @@ public class SlideoutStatisticsChartOptions extends ToolbarSlideout {
 		 */
 		final Label label = new Label(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().applyTo(label);
-		label.setText(Messages.Slideout_TourChartOptions_Label_Title);
+		label.setText(Messages.Slideout_StatisticChartOptions_Label_Title);
 		label.setFont(JFaceResources.getBannerFont());
 	}
 
@@ -148,19 +148,14 @@ public class SlideoutStatisticsChartOptions extends ToolbarSlideout {
 		tbm.update(true);
 	}
 
-	void resetOptions() {
-
-		_isOption_ShowTourFrequency = false;
-	}
-
 	private void resetToDefaults() {
 
 		_gridUI.resetToDefaults();
 		_gridUI.saveState();
 
-		if (_isOption_ShowTourFrequency) {
-			_statisticUI.resetToDefaults();
-			_statisticUI.saveState();
+		if (_statisticOptions != null) {
+			_statisticOptions.resetToDefaults();
+			_statisticOptions.saveState();
 		}
 	}
 
@@ -168,13 +163,13 @@ public class SlideoutStatisticsChartOptions extends ToolbarSlideout {
 
 		_gridUI.restoreState();
 
-		if (_isOption_ShowTourFrequency) {
-			_statisticUI.restoreState();
+		if (_statisticOptions != null) {
+			_statisticOptions.restoreState();
 		}
 	}
 
-	public void setOption_IsShowTourFrequency() {
+	public void setStatisticOptions(final IStatisticOptions statisticOptions) {
 
-		_isOption_ShowTourFrequency = true;
+		_statisticOptions = statisticOptions;
 	}
 }
