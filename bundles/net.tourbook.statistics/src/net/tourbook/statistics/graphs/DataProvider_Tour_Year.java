@@ -170,11 +170,11 @@ public class DataProvider_Tour_Year extends DataProvider {
 
 			_tourDataYear.distanceLow = new float[serieLength][valueLength];
 			_tourDataYear.altitudeLow = new float[serieLength][valueLength];
-			_tourDataYear.setTimeLow(new int[serieLength][valueLength]);
+			_tourDataYear.setDurationTimeLow(new int[serieLength][valueLength]);
 
 			_tourDataYear.distanceHigh = dbDistance;
 			_tourDataYear.altitudeHigh = dbAltitude;
-			_tourDataYear.setTimeHigh(dbTime);
+			_tourDataYear.setDurationTimeHigh(dbTime);
 
 			_tourDataYear.recordingTime = dbRecordingTime;
 			_tourDataYear.drivingTime = dbDrivingTime;

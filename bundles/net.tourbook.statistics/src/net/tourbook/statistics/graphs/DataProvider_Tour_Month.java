@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,6 +20,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
@@ -44,7 +45,7 @@ public class DataProvider_Tour_Month extends DataProvider {
 		return _instance;
 	}
 
-	TourData_Month getMonthData(	final TourPerson person,
+	TourData_Month getMonthData(final TourPerson person,
 								final TourTypeFilter tourTypeFilter,
 								final int lastYear,
 								final int numberOfYears,
@@ -67,13 +68,14 @@ public class DataProvider_Tour_Month extends DataProvider {
 		_numberOfYears = numberOfYears;
 
 		// get the tour types
-		final ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
-		final TourType[] tourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
+		final ArrayList<TourType> allTourTypes = TourDatabase.getActiveTourTypes();
+		final TourType[] tourTypes = allTourTypes.toArray(new TourType[allTourTypes.size()]);
 
 		_tourMonthData = new TourData_Month();
 		final SQLFilter sqlFilter = new SQLFilter();
 
 		final String sqlString = "SELECT " // //$NON-NLS-1$
+
 				+ "startYear," // 					1 //$NON-NLS-1$
 				+ "startMonth," // 					2 //$NON-NLS-1$
 				+ "SUM(tourDistance)," //			3 //$NON-NLS-1$
@@ -96,21 +98,26 @@ public class DataProvider_Tour_Month extends DataProvider {
 			colorOffset = StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
 		}
 
-		int serieLength = colorOffset + tourTypes.length;
-		serieLength = serieLength == 0 ? 1 : serieLength;
-		final int valueLength = 12 * numberOfYears;
+		int numTourTypes = colorOffset + tourTypes.length;
+		numTourTypes = numTourTypes == 0 ? 1 : numTourTypes;
+		final int numMonths = 12 * numberOfYears;
 
 		try {
 
-			final float[][] dbDistance = new float[serieLength][valueLength];
-			final float[][] dbAltitude = new float[serieLength][valueLength];
+			final float[][] dbAltitude = new float[numTourTypes][numMonths];
+			final float[][] dbDistance = new float[numTourTypes][numMonths];
 
-			final int[][] dbDurationTime = new int[serieLength][valueLength];
-			final int[][] dbRecordingTime = new int[serieLength][valueLength];
-			final int[][] dbDrivingTime = new int[serieLength][valueLength];
-			final int[][] dbBreakTime = new int[serieLength][valueLength];
+			final int[][] dbDurationTime = new int[numTourTypes][numMonths];
+			final int[][] dbRecordingTime = new int[numTourTypes][numMonths];
+			final int[][] dbDrivingTime = new int[numTourTypes][numMonths];
+			final int[][] dbBreakTime = new int[numTourTypes][numMonths];
 
-			final long[][] dbTypeIds = new long[serieLength][valueLength];
+			final long[][] dbTypeIds = new long[numTourTypes][numMonths];
+
+			final long[] tourTypeSum = new long[numTourTypes];
+
+			final long[] usedTourTypeIds = new long[numTourTypes];
+			Arrays.fill(usedTourTypeIds, -1);
 
 			final Connection conn = TourDatabase.getInstance().getConnection();
 
@@ -120,11 +127,17 @@ public class DataProvider_Tour_Month extends DataProvider {
 			final ResultSet result = statement.executeQuery();
 			while (result.next()) {
 
-				final int resultYear = result.getInt(1);
-				final int resultMonth = result.getInt(2);
+				final int year = result.getInt(1);
+				final int month = result.getInt(2);
+				final int distance = (int) (result.getInt(3) / UI.UNIT_VALUE_DISTANCE);
+				final int altitude = (int) (result.getInt(4) / UI.UNIT_VALUE_ALTITUDE);
+				final int duration = result.getInt(5);
+				final int recordingTime = result.getInt(6);
+				final int drivingTime = result.getInt(7);
+				final Long tourTypeIdObject = (Long) result.getObject(8);
 
-				final int yearIndex = numberOfYears - (lastYear - resultYear + 1);
-				final int monthIndex = (resultMonth - 1) + yearIndex * 12;
+				final int yearIndex = numberOfYears - (lastYear - year + 1);
+				final int monthIndex = (month - 1) + yearIndex * 12;
 
 				/*
 				 * convert type id to the type index in the tour types list which is also the color
@@ -132,10 +145,9 @@ public class DataProvider_Tour_Month extends DataProvider {
 				 */
 				int colorIndex = 0;
 
-				final Long dbTypeIdObject = (Long) result.getObject(8);
-				if (dbTypeIdObject != null) {
+				if (tourTypeIdObject != null) {
 
-					final long dbTypeId = result.getLong(8);
+					final long dbTypeId = tourTypeIdObject;
 
 					for (int typeIndex = 0; typeIndex < tourTypes.length; typeIndex++) {
 
@@ -147,34 +159,114 @@ public class DataProvider_Tour_Month extends DataProvider {
 					}
 				}
 
-				dbTypeIds[colorIndex][monthIndex] = dbTypeIdObject == null ? -1 : dbTypeIdObject;
-				dbDistance[colorIndex][monthIndex] = (int) (result.getInt(3) / UI.UNIT_VALUE_DISTANCE);
-				dbAltitude[colorIndex][monthIndex] = (int) (result.getInt(4) / UI.UNIT_VALUE_ALTITUDE);
-				dbDurationTime[colorIndex][monthIndex] = result.getInt(5);
+				final long typeId = tourTypeIdObject == null ? -1 : tourTypeIdObject;
 
-				final int recordingTime = result.getInt(6);
-				final int drivingTime = result.getInt(7);
+				dbTypeIds[colorIndex][monthIndex] = typeId;
+
+				dbAltitude[colorIndex][monthIndex] = altitude;
+				dbDistance[colorIndex][monthIndex] = distance;
+				dbDurationTime[colorIndex][monthIndex] = duration;
 
 				dbRecordingTime[colorIndex][monthIndex] = recordingTime;
 				dbDrivingTime[colorIndex][monthIndex] = drivingTime;
 				dbBreakTime[colorIndex][monthIndex] = recordingTime - drivingTime;
+
+				usedTourTypeIds[colorIndex] = typeId;
+				tourTypeSum[colorIndex] += distance + altitude + recordingTime;
 			}
 
 			conn.close();
 
-			_tourMonthData.typeIds = dbTypeIds;
+			/*
+			 * Remove not used tour types
+			 */
+			final ArrayList<Object> typeIdsWithData = new ArrayList<Object>();
 
-			_tourMonthData.distanceLow = new float[serieLength][valueLength];
-			_tourMonthData.altitudeLow = new float[serieLength][valueLength];
-			_tourMonthData.setTimeLow(new int[serieLength][valueLength]);
+			final ArrayList<Object> altitudeWithData = new ArrayList<Object>();
+			final ArrayList<Object> distanceWithData = new ArrayList<Object>();
+			final ArrayList<Object> durationWithData = new ArrayList<Object>();
+			final ArrayList<Object> recordingTimeWithData = new ArrayList<Object>();
+			final ArrayList<Object> drivingTimeWithData = new ArrayList<Object>();
+			final ArrayList<Object> breakTimeWithData = new ArrayList<Object>();
 
-			_tourMonthData.distanceHigh = dbDistance;
-			_tourMonthData.altitudeHigh = dbAltitude;
-			_tourMonthData.setTimeHigh(dbDurationTime);
+			for (int tourTypeIndex = 0; tourTypeIndex < tourTypeSum.length; tourTypeIndex++) {
 
-			_tourMonthData.recordingTime = dbRecordingTime;
-			_tourMonthData.drivingTime = dbDrivingTime;
-			_tourMonthData.breakTime = dbBreakTime;
+				final long summary = tourTypeSum[tourTypeIndex];
+
+				if (summary > 0) {
+
+					typeIdsWithData.add(dbTypeIds[tourTypeIndex]);
+
+					altitudeWithData.add(dbAltitude[tourTypeIndex]);
+					distanceWithData.add(dbDistance[tourTypeIndex]);
+					durationWithData.add(dbDurationTime[tourTypeIndex]);
+
+					recordingTimeWithData.add(dbRecordingTime[tourTypeIndex]);
+					drivingTimeWithData.add(dbDrivingTime[tourTypeIndex]);
+					breakTimeWithData.add(dbBreakTime[tourTypeIndex]);
+				}
+			}
+
+			final int numUsedTourTypes = typeIdsWithData.size();
+
+			if (numUsedTourTypes == 0) {
+
+				// there are NO data, create dummy data that the UI do not fail
+
+				_tourMonthData.typeIds = new long[1][1];
+				_tourMonthData.usedTourTypeIds = new long[] { -1 };
+
+				_tourMonthData.altitudeLow = new float[1][numMonths];
+				_tourMonthData.distanceLow = new float[1][numMonths];
+				_tourMonthData.setDurationTimeLow(new int[1][numMonths]);
+
+				_tourMonthData.altitudeHigh = new float[1][numMonths];
+				_tourMonthData.distanceHigh = new float[1][numMonths];
+				_tourMonthData.setDurationTimeHigh(new int[1][numMonths]);
+
+				_tourMonthData.recordingTime = new int[1][numMonths];
+				_tourMonthData.drivingTime = new int[1][numMonths];
+				_tourMonthData.breakTime = new int[1][numMonths];
+
+			} else {
+
+				final long[][] usedTypeIds = new long[numUsedTourTypes][];
+
+				final float[][] usedAltitude = new float[numUsedTourTypes][];
+				final float[][] usedDistance = new float[numUsedTourTypes][];
+				final int[][] usedDuration = new int[numUsedTourTypes][];
+				final int[][] usedRecordingTime = new int[numUsedTourTypes][];
+				final int[][] usedDrivingTime = new int[numUsedTourTypes][];
+				final int[][] usedBreakTime = new int[numUsedTourTypes][];
+
+				for (int index = 0; index < numUsedTourTypes; index++) {
+
+					usedTypeIds[index] = (long[]) typeIdsWithData.get(index);
+
+					usedAltitude[index] = (float[]) altitudeWithData.get(index);
+					usedDistance[index] = (float[]) distanceWithData.get(index);
+
+					usedDuration[index] = (int[]) durationWithData.get(index);
+					usedRecordingTime[index] = (int[]) recordingTimeWithData.get(index);
+					usedDrivingTime[index] = (int[]) drivingTimeWithData.get(index);
+					usedBreakTime[index] = (int[]) breakTimeWithData.get(index);
+				}
+
+				_tourMonthData.typeIds = usedTypeIds;
+				_tourMonthData.usedTourTypeIds = usedTourTypeIds;
+
+				_tourMonthData.altitudeLow = new float[numUsedTourTypes][numMonths];
+				_tourMonthData.distanceLow = new float[numUsedTourTypes][numMonths];
+				_tourMonthData.setDurationTimeLow(new int[numUsedTourTypes][numMonths]);
+
+				_tourMonthData.altitudeHigh = usedAltitude;
+				_tourMonthData.distanceHigh = usedDistance;
+				_tourMonthData.setDurationTimeHigh(usedDuration);
+
+				_tourMonthData.recordingTime = usedRecordingTime;
+				_tourMonthData.drivingTime = usedDrivingTime;
+				_tourMonthData.breakTime = usedBreakTime;
+			}
 
 		} catch (final SQLException e) {
 			UI.showSQLException(e);

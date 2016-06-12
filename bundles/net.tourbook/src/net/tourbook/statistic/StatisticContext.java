@@ -69,6 +69,8 @@ public class StatisticContext {
 
 	/**
 	 * When stacked charts are displayed, the stacked parts can be resorted vertically.
+	 * <p>
+	 * This contains the names of the bars or <code>null</code> when bars are not available.
 	 */
 	public String[]			outBarNames					= null;
 

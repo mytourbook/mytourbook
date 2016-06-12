@@ -180,8 +180,8 @@ public class DataProvider_Tour_Week extends DataProvider {
 			_tourWeekData.yearWeeks = _yearWeeks;
 			_tourWeekData.yearDays = _yearDays;
 
-			_tourWeekData.setTimeLow(new int[serieLength][valueLength]);
-			_tourWeekData.setTimeHigh(dbDurationTime);
+			_tourWeekData.setDurationTimeLow(new int[serieLength][valueLength]);
+			_tourWeekData.setDurationTimeHigh(dbDurationTime);
 
 			_tourWeekData.distanceLow = new float[serieLength][valueLength];
 			_tourWeekData.distanceHigh = dbDistance;

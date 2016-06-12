@@ -21,6 +21,11 @@ import net.tourbook.chart.ChartType;
 public class StatisticMonth_Summary extends StatisticMonth {
 
 	@Override
+	protected String getBarOrderingStateKey() {
+		return STATE_BAR_ORDERING_MONTH_SUMMARY;
+	}
+
+	@Override
 	ChartDataModel getChartDataModel() {
 
 		final ChartDataModel chartDataModel = new ChartDataModel(ChartType.BAR);
@@ -32,5 +37,4 @@ public class StatisticMonth_Summary extends StatisticMonth {
 
 		return chartDataModel;
 	}
-
 }

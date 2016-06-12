@@ -408,8 +408,8 @@ public abstract class StatisticWeek extends TourbookStatistic {
 		final ChartDataYSerie yData = new ChartDataYSerie(
 				ChartType.BAR,
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
-				_tourWeekData.getTimeLowFloat(),
-				_tourWeekData.getTimeHighFloat());
+				_tourWeekData.getDurationTimeLowFloat(),
+				_tourWeekData.getDurationTimeHighFloat());
 
 		yData.setYTitle(Messages.LABEL_GRAPH_TIME);
 		yData.setUnitLabel(Messages.LABEL_GRAPH_TIME_UNIT);

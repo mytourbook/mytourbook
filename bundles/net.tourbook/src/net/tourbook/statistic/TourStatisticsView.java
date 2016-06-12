@@ -922,9 +922,49 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 
 	private void updateStatistic_30_BarOrdering(final StatisticContext statContext) {
 
-		if (statContext.outIsUpdateBarNames) {
-			updateUI_VerticalBarOrder(statContext);
+		// check if enabled
+		if (!statContext.outIsUpdateBarNames) {
+			return;
 		}
+
+		final String[] stackedNames = statContext.outBarNames;
+
+		// hide combo when bars are not available
+		if (stackedNames == null) {
+			_comboBarVerticalOrder.setVisible(false);
+			_isVerticalOrderDisabled = true;
+
+			return;
+		}
+
+		_comboBarVerticalOrder.removeAll();
+
+		for (final String name : stackedNames) {
+
+			if (name != null) {
+			}
+			_comboBarVerticalOrder.add(name);
+		}
+
+		final int selectedIndex = statContext.outVerticalBarIndex;
+		final int checkedIndex = selectedIndex >= _comboBarVerticalOrder.getItemCount() ? 0 : selectedIndex;
+
+		_comboBarVerticalOrder.select(checkedIndex);
+		_comboBarVerticalOrder.setEnabled(true);
+
+		/*
+		 * Adjust the combo width
+		 */
+		final int preferredWidth = _comboBarVerticalOrder.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).x;
+
+		final GridData gd = (GridData) _comboBarVerticalOrder.getLayoutData();
+		gd.widthHint = preferredWidth > _maximumComboWidth //
+				? _maximumComboWidth
+				: preferredWidth < _minimumComboWidth //
+						? _minimumComboWidth
+						: preferredWidth;
+
+		_statContainer.layout(true, true);
 	}
 
 	private void updateUI() {
@@ -960,43 +1000,6 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 
 		// set slideout AFTER the toolbar is created/updated/filled which creates the slideout
 		_activeStatistic.setChartOptions(_actionChartOptions.getSlideout());
-	}
-
-	private void updateUI_VerticalBarOrder(final StatisticContext statContext) {
-
-		final String[] stackedNames = statContext.outBarNames;
-
-		if (stackedNames == null) {
-			_comboBarVerticalOrder.setVisible(false);
-			_isVerticalOrderDisabled = true;
-
-			return;
-		}
-
-		_comboBarVerticalOrder.removeAll();
-
-		for (final String name : stackedNames) {
-			_comboBarVerticalOrder.add(name);
-		}
-
-		final int selectedIndex = statContext.outVerticalBarIndex;
-
-		_comboBarVerticalOrder.select(selectedIndex >= _comboBarVerticalOrder.getItemCount() ? 0 : selectedIndex);
-		_comboBarVerticalOrder.setEnabled(true);
-
-		/*
-		 * Adjust the combo width
-		 */
-		final int preferredWidth = _comboBarVerticalOrder.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).x;
-
-		final GridData gd = (GridData) _comboBarVerticalOrder.getLayoutData();
-		gd.widthHint = preferredWidth > _maximumComboWidth //
-				? _maximumComboWidth
-				: preferredWidth < _minimumComboWidth //
-						? _minimumComboWidth
-						: preferredWidth;
-
-		_statContainer.layout(true, true);
 	}
 
 }

@@ -31,7 +31,12 @@ import org.eclipse.ui.IViewSite;
  */
 public abstract class TourbookStatistic {
 
-	protected static final String	STATE_SELECTED_TOUR_ID	= "STATE_SELECTED_TOUR_ID";		//$NON-NLS-1$
+	protected static final String	STATE_SELECTED_TOUR_ID				= "STATE_SELECTED_TOUR_ID";			//$NON-NLS-1$
+
+	protected static final String	STATE_BAR_ORDERING_MONTH_ALTITUDE	= "STATE_BAR_ORDERING_MONTH_ALTITUDE";	//$NON-NLS-1$
+	protected static final String	STATE_BAR_ORDERING_MONTH_DISTANCE	= "STATE_BAR_ORDERING_MONTH_DISTANCE";	//$NON-NLS-1$
+	protected static final String	STATE_BAR_ORDERING_MONTH_SUMMARY	= "STATE_BAR_ORDERING_MONTH_SUMMARY";	//$NON-NLS-1$
+	protected static final String	STATE_BAR_ORDERING_MONTH_TIME		= "STATE_BAR_ORDERING_MONTH_TIME";		//$NON-NLS-1$
 
 	/** ID from plugin.xml */
 	public String					statisticId;
@@ -41,7 +46,7 @@ public abstract class TourbookStatistic {
 
 	private boolean					_isDataDirty;
 
-	private final IPreferenceStore	_prefStore				= TourbookPlugin.getPrefStore();
+	private final IPreferenceStore	_prefStore							= TourbookPlugin.getPrefStore();
 
 	private IPropertyChangeListener	_prefChangeListener;
 

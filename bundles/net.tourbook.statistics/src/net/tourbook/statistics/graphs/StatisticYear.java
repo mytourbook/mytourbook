@@ -240,8 +240,8 @@ public abstract class StatisticYear extends TourbookStatistic {
 				ChartType.BAR,
 //				ChartDataYSerie.BAR_LAYOUT_BESIDE,
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
-				_tourYearData.getTimeLowFloat(),
-				_tourYearData.getTimeHighFloat());
+				_tourYearData.getDurationTimeLowFloat(),
+				_tourYearData.getDurationTimeHighFloat());
 		yData.setYTitle(Messages.LABEL_GRAPH_TIME);
 		yData.setUnitLabel(Messages.LABEL_GRAPH_TIME_UNIT);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
