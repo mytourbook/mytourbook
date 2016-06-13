@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -29,6 +29,7 @@ import net.tourbook.common.color.ColorDefinition;
 import net.tourbook.common.color.GraphColorItem;
 import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.color.IGradientColorProvider;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
@@ -584,8 +585,8 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 	private boolean deleteTourType(final TourType tourType) {
 
-		if (deleteTourType_FromTourData(tourType)) {
-			if (deleteTourType_FromDb(tourType)) {
+		if (deleteTourType_10_FromTourData(tourType)) {
+			if (deleteTourType_20_FromDb(tourType)) {
 				return true;
 			}
 		}
@@ -593,37 +594,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		return false;
 	}
 
-	private boolean deleteTourType_FromDb(final TourType tourType) {
-
-		boolean returnResult = false;
-
-		final EntityManager em = TourDatabase.getInstance().getEntityManager();
-		final EntityTransaction ts = em.getTransaction();
-
-		try {
-			final TourType tourTypeEntity = em.find(TourType.class, tourType.getTypeId());
-
-			if (tourTypeEntity != null) {
-				ts.begin();
-				em.remove(tourTypeEntity);
-				ts.commit();
-			}
-
-		} catch (final Exception e) {
-			e.printStackTrace();
-		} finally {
-			if (ts.isActive()) {
-				ts.rollback();
-			} else {
-				returnResult = true;
-			}
-			em.close();
-		}
-
-		return returnResult;
-	}
-
-	private boolean deleteTourType_FromTourData(final TourType tourType) {
+	private boolean deleteTourType_10_FromTourData(final TourType tourType) {
 
 		boolean returnResult = false;
 
@@ -661,7 +632,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 					ts.commit();
 
 				} catch (final Exception e) {
-					e.printStackTrace();
+					StatusUtil.showStatus(e);
 				} finally {
 					if (ts.isActive()) {
 						ts.rollback();
@@ -670,6 +641,39 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 			}
 
 			returnResult = true;
+			em.close();
+		}
+
+		return returnResult;
+	}
+
+	private boolean deleteTourType_20_FromDb(final TourType tourType) {
+
+		boolean returnResult = false;
+
+		final EntityManager em = TourDatabase.getInstance().getEntityManager();
+		final EntityTransaction ts = em.getTransaction();
+
+		try {
+			final TourType tourTypeEntity = em.find(TourType.class, tourType.getTypeId());
+
+			if (tourTypeEntity != null) {
+
+				ts.begin();
+
+				em.remove(tourTypeEntity);
+
+				ts.commit();
+			}
+
+		} catch (final Exception e) {
+			StatusUtil.showStatus(e);
+		} finally {
+			if (ts.isActive()) {
+				ts.rollback();
+			} else {
+				returnResult = true;
+			}
 			em.close();
 		}
 
