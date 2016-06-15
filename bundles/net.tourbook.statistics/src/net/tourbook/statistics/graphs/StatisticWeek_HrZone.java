@@ -421,7 +421,7 @@ public class StatisticWeek_HrZone extends TourbookStatistic {
 
 		_appPerson = statContext.appPerson;
 		_appTourTypeFilter = statContext.appTourTypeFilter;
-		_statYoungestYear = statContext.statYoungestYear;
+		_statYoungestYear = statContext.statFirstYear;
 		_statNumberOfYears = statContext.statNumberOfYears;
 
 		_tourWeekData = DataProvider_HrZone_Week.getInstance().getWeekData(

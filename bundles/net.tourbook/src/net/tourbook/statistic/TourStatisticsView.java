@@ -27,6 +27,7 @@ import java.util.GregorianCalendar;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
@@ -344,10 +345,12 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 				 */
 
 				_comboStatistics = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-				GridDataFactory.fillDefaults()//
-						.applyTo(_comboStatistics);
 				_comboStatistics.setToolTipText(Messages.Tour_Book_Combo_statistic_tooltip);
 				_comboStatistics.setVisibleItemCount(50);
+
+				GridDataFactory.fillDefaults()//
+						.applyTo(_comboStatistics);
+
 				_comboStatistics.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
@@ -362,12 +365,14 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 				 */
 
 				_comboYear = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+				_comboYear.setToolTipText(Messages.Tour_Book_Combo_year_tooltip);
+				_comboYear.setVisibleItemCount(50);
+
 				GridDataFactory.fillDefaults()//
 						.indent(widgetSpacing, 0)
 						.hint(_pc.convertWidthInCharsToPixels(_isOSX ? 12 : _isLinux ? 12 : 5), SWT.DEFAULT)
 						.applyTo(_comboYear);
-				_comboYear.setToolTipText(Messages.Tour_Book_Combo_year_tooltip);
-				_comboYear.setVisibleItemCount(50);
+
 				_comboYear.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
@@ -382,12 +387,14 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 				 */
 
 				_comboNumberOfYears = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+				_comboNumberOfYears.setToolTipText(Messages.tour_statistic_number_of_years);
+				_comboNumberOfYears.setVisibleItemCount(50);
+
 				GridDataFactory.fillDefaults()//
 						.indent(2, 0)
 						.hint(_pc.convertWidthInCharsToPixels(_isOSX ? 8 : _isLinux ? 8 : 4), SWT.DEFAULT)
 						.applyTo(_comboNumberOfYears);
-				_comboNumberOfYears.setToolTipText(Messages.tour_statistic_number_of_years);
-				_comboNumberOfYears.setVisibleItemCount(20);
+
 				_comboNumberOfYears.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
@@ -402,12 +409,15 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 				 */
 
 				_comboBarVerticalOrder = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+				_comboBarVerticalOrder.setToolTipText(Messages.Tour_Statistic_Combo_BarVOrder_Tooltip);
+				_comboBarVerticalOrder.setVisibleItemCount(50);
+				_comboBarVerticalOrder.setVisible(false);
+
 				GridDataFactory.fillDefaults()//
 						.indent(widgetSpacing, 0)
 //						.hint(defaultTextSize.x, SWT.DEFAULT)
 						.applyTo(_comboBarVerticalOrder);
-				_comboBarVerticalOrder.setToolTipText(Messages.Tour_Statistic_Combo_BarVOrder_Tooltip);
-				_comboBarVerticalOrder.setVisibleItemCount(50);
+
 				_comboBarVerticalOrder.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
@@ -557,7 +567,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 			return;
 		}
 
-		updateStatistic_10_NoReload(_activePerson, _activeTourTypeFilter, _selectedYear);
+		updateStatistic_10_NoReload();
 	}
 
 	private void onSelectYear() {
@@ -567,7 +577,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 
 			_selectedYear = Integer.parseInt(_comboYear.getItem(selectedItem));
 
-			updateStatistic_10_NoReload(_activePerson, _activeTourTypeFilter, _selectedYear);
+			updateStatistic_10_NoReload();
 		}
 	}
 
@@ -669,6 +679,15 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 			return;
 		}
 
+		// select number of years
+		final int numberOfYearsIndex = Util.getStateInt(_state, STATE_NUMBER_OF_YEARS, 0);
+		_comboNumberOfYears.select(numberOfYearsIndex);
+
+		// select year
+		final int defaultYear = Util.getStateInt(_state, STATE_SELECTED_YEAR, -1);
+		refreshYearCombobox();
+		selectYear(defaultYear);
+
 		// select statistic
 		int prevStatIndex = 0;
 		final String mementoStatisticId = _state.get(STATE_SELECTED_STATISTIC);
@@ -683,30 +702,11 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 			}
 		}
 
-		// select number of years
-		try {
-			final int numberOfYears = _state.getInt(STATE_NUMBER_OF_YEARS);
-			_comboNumberOfYears.select(numberOfYears);
-		} catch (final NumberFormatException e) {
-			// select one year
-			_comboNumberOfYears.select(0);
-		}
-
-		// select year
-		int defaultYear;
-		try {
-			defaultYear = _state.getInt(STATE_SELECTED_YEAR);
-		} catch (final NumberFormatException e) {
-			defaultYear = -1;
-		}
-		refreshYearCombobox();
-		selectYear(defaultYear);
-
 		// select statistic item
 		_comboStatistics.select(prevStatIndex);
 		onSelectStatistic();
 
-		// restore statistic state, like reselect previous selection
+		// restore statistic state, e.g. reselect previous selection
 		if (_state != null) {
 			allAvailableStatistics.get(prevStatIndex).restoreState(_state);
 		}
@@ -793,9 +793,6 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 			GridLayoutFactory.fillDefaults().applyTo(statisticUI);
 			{
 				tourbookStatistic.createUI(statisticUI, getViewSite(), _postSelectionProvider);
-
-//				GridDataFactory.fillDefaults().grab(true, true).applyTo(statisticUI);
-
 				tourbookStatistic.restoreStateEarly(_state);
 			}
 		}
@@ -845,7 +842,6 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 				getNumberOfYears());
 
 		statContext.isRefreshData = true;
-		statContext.inVerticalBarIndex = _comboBarVerticalOrder.getSelectionIndex();
 
 		_activeStatistic.updateStatistic(statContext);
 
@@ -853,22 +849,13 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 	}
 
 	/**
-	 * @param person
-	 * @param activeTourTypeFilter
-	 * @param selectedYear
 	 */
-	private void updateStatistic_10_NoReload(	final TourPerson person,
-												final TourTypeFilter activeTourTypeFilter,
-												final int selectedYear) {
-
-		_activePerson = person;
-		_activeTourTypeFilter = activeTourTypeFilter;
+	private void updateStatistic_10_NoReload() {
 
 		// keep current year
-		if (selectedYear == -1) {
+		if (_selectedYear == -1) {
 			return;
 		}
-		_selectedYear = selectedYear;
 
 		if (setActiveStatistic() == false) {
 			// statistic is not available
@@ -885,10 +872,8 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 		final StatisticContext statContext = new StatisticContext(
 				_activePerson,
 				_activeTourTypeFilter,
-				selectedYear,
+				_selectedYear,
 				getNumberOfYears());
-
-		statContext.inVerticalBarIndex = _comboBarVerticalOrder.getSelectionIndex();
 
 		_activeStatistic.updateStatistic(statContext);
 
@@ -940,9 +925,6 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 		_comboBarVerticalOrder.removeAll();
 
 		for (final String name : stackedNames) {
-
-			if (name != null) {
-			}
 			_comboBarVerticalOrder.add(name);
 		}
 

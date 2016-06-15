@@ -26,6 +26,7 @@ import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.statistic.StatisticContext;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 
@@ -39,6 +40,34 @@ public class StatisticServices {
 	 * offset for tour types in the color index
 	 */
 	public static int	TOUR_TYPE_COLOR_INDEX_OFFSET	= 1;
+
+	/**
+	 * @param serieIndex
+	 * @param valueIndex
+	 * @param resortedTypeIds
+	 * @param activeTourTypeFilter
+	 * @return Returns the tour type name for a data serie
+	 */
+	public static String getTourTypeName(	final int serieIndex,
+											final int valueIndex,
+											final long[][] resortedTypeIds,
+											final TourTypeFilter activeTourTypeFilter) {
+
+		int colorOffset = 0;
+		if (activeTourTypeFilter.showUndefinedTourTypes()) {
+			colorOffset = StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
+		}
+
+		if (serieIndex - colorOffset < 0) {
+			return Messages.ui_tour_not_defined;
+		}
+
+		final long typeId = resortedTypeIds[serieIndex][valueIndex];
+
+		final String tourTypeName = TourDatabase.getTourTypeName(typeId);
+
+		return tourTypeName;
+	}
 
 	/**
 	 * @param serieIndex
@@ -89,7 +118,7 @@ public class StatisticServices {
 	 * @param tourTypeFilter
 	 */
 	public static void setTourTypeColorIndex(	final ChartDataYSerie yData,
-												final long[][] allTypeIds,
+												final long[][] resortedTypeIds,
 												final TourTypeFilter tourTypeFilter) {
 
 		final ArrayList<TourType> tourTypes = TourDatabase.getActiveTourTypes();
@@ -99,16 +128,17 @@ public class StatisticServices {
 			colorOffset = StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
 		}
 
-		final int[][] colorIndex = new int[allTypeIds.length][allTypeIds[0].length];
+		final int[][] colorIndex = new int[resortedTypeIds.length][resortedTypeIds[0].length];
 
 		int serieIndex = 0;
-		for (final long[] typeIdSerie : allTypeIds) {
+		for (final long[] typeIdSerie : resortedTypeIds) {
 
 			final int[] colorIndexSerie = new int[typeIdSerie.length];
 			for (int tourTypeIdIndex = 0; tourTypeIdIndex < typeIdSerie.length; tourTypeIdIndex++) {
 
-				final long typeId = typeIdSerie[tourTypeIdIndex];
 				int tourTypeColorIndex = 0;
+
+				final long typeId = typeIdSerie[tourTypeIdIndex];
 
 				if (typeId != -1) {
 					for (int typeIndex = 0; typeIndex < tourTypes.size(); typeIndex++) {
@@ -212,6 +242,84 @@ public class StatisticServices {
 //
 //			System.out.println(sb.toString());
 //		}
+	}
+
+	/**
+	 * Set bar names into the statistic context. The names will be displayed in a combobox in the
+	 * statistics toolbar.
+	 * 
+	 * @param statContext
+	 * @param usedTourTypeIds
+	 */
+	public static void setBarNames(	final StatisticContext statContext,
+										final long[] usedTourTypeIds,
+										final int barOrderStart) {
+
+		int numUsedTypes = 0;
+
+		// get number of used tour types, a used tour type is != -1
+		for (final long tourTypeId : usedTourTypeIds) {
+			if (tourTypeId != -1) {
+				numUsedTypes++;
+			}
+		}
+
+		final ArrayList<TourType> tourTypes = TourDatabase.getActiveTourTypes();
+
+		if (tourTypes == null || tourTypes.size() == 0 || numUsedTypes == 0) {
+
+			statContext.outIsUpdateBarNames = true;
+			statContext.outBarNames = null;
+
+			return;
+		}
+
+		int barIndex = 0;
+
+		// create bar names 2 times
+		final String[] barNames = new String[numUsedTypes * 2];
+
+		for (int inverseIndex = 0; inverseIndex < 2; inverseIndex++) {
+
+			for (int typeIndex = 0; typeIndex < tourTypes.size(); typeIndex++) {
+
+				final TourType tourType = tourTypes.get(typeIndex);
+
+				final long tourTypeId = tourType.getTypeId();
+
+				/*
+				 * Check if this type is used
+				 */
+				boolean isTourTypeUsed = false;
+				for (final long usedType : usedTourTypeIds) {
+
+					if (usedType == tourTypeId) {
+						isTourTypeUsed = true;
+						break;
+					}
+				}
+
+				if (isTourTypeUsed) {
+
+					String barName;
+
+					if (inverseIndex == 0) {
+						barName = tourType.getName();
+					} else {
+						barName = tourType.getName()
+								+ UI.SPACE
+								+ net.tourbook.statistics.Messages.Statistic_Label_Invers;
+					}
+
+					barNames[barIndex++] = barName;
+				}
+			}
+		}
+
+		// set state what the statistic container should do
+		statContext.outIsUpdateBarNames = true;
+		statContext.outBarNames = barNames;
+		statContext.outVerticalBarIndex = barOrderStart;
 	}
 
 	/**

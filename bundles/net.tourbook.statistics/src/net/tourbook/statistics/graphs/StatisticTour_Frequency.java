@@ -787,13 +787,13 @@ public class StatisticTour_Frequency extends TourbookStatistic {
 
 		_activePerson = statContext.appPerson;
 		_activeTourTypeFilter = statContext.appTourTypeFilter;
-		_currentYear = statContext.statYoungestYear;
+		_currentYear = statContext.statFirstYear;
 		_numberOfYears = statContext.statNumberOfYears;
 
 		_tourDayData = DataProvider_Tour_Day.getInstance().getDayData(
 				statContext.appPerson,
 				statContext.appTourTypeFilter,
-				statContext.statYoungestYear,
+				statContext.statFirstYear,
 				statContext.statNumberOfYears,
 				isDataDirtyWithReset() || statContext.isRefreshData);
 

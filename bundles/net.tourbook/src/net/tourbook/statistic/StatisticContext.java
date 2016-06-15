@@ -39,9 +39,10 @@ public class StatisticContext {
 	public TourTypeFilter	appTourTypeFilter;
 
 	/**
-	 * Younges year which is selected in the statistic container.
+	 * First (youngest) year which is selected in the statistic container and where the statistics
+	 * start.
 	 */
-	public int				statYoungestYear;
+	public int				statFirstYear;
 
 	/**
 	 * Number of years which should be displayed in the statistic
@@ -49,11 +50,6 @@ public class StatisticContext {
 	public int				statNumberOfYears;
 
 	public boolean			isRefreshData				= false;
-
-	/**
-	 * Contains the index in the combo box for the selected vertical bar ordering.
-	 */
-	public int				inVerticalBarIndex;
 
 	/**
 	 * Contains the state if bar reordering is supported by the statistic or not, default is
@@ -98,7 +94,7 @@ public class StatisticContext {
 		this.appPerson = activePerson;
 		this.appTourTypeFilter = activeTourTypeFilter;
 
-		this.statYoungestYear = selectedYear;
+		this.statFirstYear = selectedYear;
 		this.statNumberOfYears = numberOfYears;
 	}
 

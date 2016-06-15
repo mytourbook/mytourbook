@@ -113,14 +113,11 @@ public class DataProvider_Tour_Month extends DataProvider {
 			final int[][] dbBreakTime = new int[numTourTypes][numMonths];
 
 			final long[][] dbTypeIds = new long[numTourTypes][numMonths];
-
 			final long[] tourTypeSum = new long[numTourTypes];
-
 			final long[] usedTourTypeIds = new long[numTourTypes];
 			Arrays.fill(usedTourTypeIds, -1);
 
 			final Connection conn = TourDatabase.getInstance().getConnection();
-
 			final PreparedStatement statement = conn.prepareStatement(sqlString);
 			sqlFilter.setParameters(statement, 1);
 
@@ -207,6 +204,9 @@ public class DataProvider_Tour_Month extends DataProvider {
 				}
 			}
 
+			/*
+			 * Create statistic data
+			 */
 			final int numUsedTourTypes = typeIdsWithData.size();
 
 			if (numUsedTourTypes == 0) {
@@ -217,11 +217,12 @@ public class DataProvider_Tour_Month extends DataProvider {
 				_tourMonthData.usedTourTypeIds = new long[] { -1 };
 
 				_tourMonthData.altitudeLow = new float[1][numMonths];
-				_tourMonthData.distanceLow = new float[1][numMonths];
-				_tourMonthData.setDurationTimeLow(new int[1][numMonths]);
-
 				_tourMonthData.altitudeHigh = new float[1][numMonths];
+
+				_tourMonthData.distanceLow = new float[1][numMonths];
 				_tourMonthData.distanceHigh = new float[1][numMonths];
+
+				_tourMonthData.setDurationTimeLow(new int[1][numMonths]);
 				_tourMonthData.setDurationTimeHigh(new int[1][numMonths]);
 
 				_tourMonthData.recordingTime = new int[1][numMonths];
@@ -256,11 +257,12 @@ public class DataProvider_Tour_Month extends DataProvider {
 				_tourMonthData.usedTourTypeIds = usedTourTypeIds;
 
 				_tourMonthData.altitudeLow = new float[numUsedTourTypes][numMonths];
-				_tourMonthData.distanceLow = new float[numUsedTourTypes][numMonths];
-				_tourMonthData.setDurationTimeLow(new int[numUsedTourTypes][numMonths]);
-
 				_tourMonthData.altitudeHigh = usedAltitude;
+
+				_tourMonthData.distanceLow = new float[numUsedTourTypes][numMonths];
 				_tourMonthData.distanceHigh = usedDistance;
+
+				_tourMonthData.setDurationTimeLow(new int[numUsedTourTypes][numMonths]);
 				_tourMonthData.setDurationTimeHigh(usedDuration);
 
 				_tourMonthData.recordingTime = usedRecordingTime;

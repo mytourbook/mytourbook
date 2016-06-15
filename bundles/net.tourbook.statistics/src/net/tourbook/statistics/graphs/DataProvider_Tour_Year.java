@@ -20,6 +20,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
@@ -33,7 +34,7 @@ public class DataProvider_Tour_Year extends DataProvider {
 
 	private static DataProvider_Tour_Year	_instance;
 
-	private TourData_Year				_tourDataYear;
+	private TourData_Year					_tourDataYear;
 
 	private DataProvider_Tour_Year() {}
 
@@ -47,7 +48,7 @@ public class DataProvider_Tour_Year extends DataProvider {
 	TourData_Year getYearData(	final TourPerson person,
 								final TourTypeFilter tourTypeFilter,
 								final int lastYear,
-								final int numberOfYears,
+								final int numYears,
 								final boolean refreshData) {
 
 		/*
@@ -56,7 +57,7 @@ public class DataProvider_Tour_Year extends DataProvider {
 		if (_activePerson == person
 				&& _activeTourTypeFilter == tourTypeFilter
 				&& lastYear == _lastYear
-				&& numberOfYears == _numberOfYears
+				&& numYears == _numberOfYears
 				&& refreshData == false) {
 
 			return _tourDataYear;
@@ -65,7 +66,7 @@ public class DataProvider_Tour_Year extends DataProvider {
 		_activePerson = person;
 		_activeTourTypeFilter = tourTypeFilter;
 		_lastYear = lastYear;
-		_numberOfYears = numberOfYears;
+		_numberOfYears = numYears;
 
 		// get the tour types
 		final ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
@@ -86,7 +87,7 @@ public class DataProvider_Tour_Year extends DataProvider {
 
 				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
 
-				+ (" WHERE STARTYEAR IN (" + getYearList(lastYear, numberOfYears) + ")") //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" WHERE STARTYEAR IN (" + getYearList(lastYear, numYears) + ")") //$NON-NLS-1$ //$NON-NLS-2$
 				+ sqlFilter.getWhereClause()
 
 				+ (" GROUP BY STARTYEAR, tourType_typeId") //$NON-NLS-1$
@@ -97,21 +98,23 @@ public class DataProvider_Tour_Year extends DataProvider {
 			colorOffset = StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
 		}
 
-		int serieLength = colorOffset + allTourTypes.length;
-		serieLength = serieLength == 0 ? 1 : serieLength;
-		final int valueLength = numberOfYears;
+		int numTourTypes = colorOffset + allTourTypes.length;
+		numTourTypes = numTourTypes == 0 ? 1 : numTourTypes;
 
 		try {
 
-			final float[][] dbDistance = new float[serieLength][valueLength];
-			final float[][] dbAltitude = new float[serieLength][valueLength];
-			final int[][] dbTime = new int[serieLength][valueLength];
+			final float[][] dbDistance = new float[numTourTypes][numYears];
+			final float[][] dbAltitude = new float[numTourTypes][numYears];
+			final int[][] dbDurationTime = new int[numTourTypes][numYears];
 
-			final int[][] dbRecordingTime = new int[serieLength][valueLength];
-			final int[][] dbDrivingTime = new int[serieLength][valueLength];
-			final int[][] dbBreakTime = new int[serieLength][valueLength];
+			final int[][] dbRecordingTime = new int[numTourTypes][numYears];
+			final int[][] dbDrivingTime = new int[numTourTypes][numYears];
+			final int[][] dbBreakTime = new int[numTourTypes][numYears];
 
-			final long[][] dbTourTypeIds = new long[serieLength][valueLength];
+			final long[][] dbTypeIds = new long[numTourTypes][numYears];
+			final long[] tourTypeSum = new long[numTourTypes];
+			final long[] usedTourTypeIds = new long[numTourTypes];
+			Arrays.fill(usedTourTypeIds, -1);
 
 			final Connection conn = TourDatabase.getInstance().getConnection();
 			final PreparedStatement statement = conn.prepareStatement(sqlString);
@@ -121,7 +124,14 @@ public class DataProvider_Tour_Year extends DataProvider {
 			while (result.next()) {
 
 				final int resultYear = result.getInt(1);
-				final int yearIndex = numberOfYears - (lastYear - resultYear + 1);
+				final int altitude = (int) (result.getInt(3) / UI.UNIT_VALUE_ALTITUDE);
+				final int distance = (int) ((result.getInt(2) + 500) / 1000 / UI.UNIT_VALUE_DISTANCE);
+				final int duration = result.getInt(4);
+				final int recordingTime = result.getInt(5);
+				final int drivingTime = result.getInt(6);
+				final Long tourTypeIdObject = (Long) result.getObject(7);
+
+				final int yearIndex = numYears - (lastYear - resultYear + 1);
 
 				/*
 				 * convert type id to the type index in the tour types list which is also the color
@@ -132,9 +142,10 @@ public class DataProvider_Tour_Year extends DataProvider {
 				int colorIndex = 0;
 
 				// get colorIndex from the type id
-				final Long dbTourTypeIdObject = (Long) result.getObject(7);
-				if (dbTourTypeIdObject != null) {
-					final long dbTypeId = result.getLong(7);
+				if (tourTypeIdObject != null) {
+
+					final long dbTypeId = tourTypeIdObject;
+
 					for (int typeIndex = 0; typeIndex < allTourTypes.length; typeIndex++) {
 						if (dbTypeId == allTourTypes[typeIndex].getTypeId()) {
 							colorIndex = colorOffset + typeIndex;
@@ -143,18 +154,20 @@ public class DataProvider_Tour_Year extends DataProvider {
 					}
 				}
 
-				dbTourTypeIds[colorIndex][yearIndex] = dbTourTypeIdObject == null ? -1 : dbTourTypeIdObject;
-				dbDistance[colorIndex][yearIndex] = (int) ((result.getInt(2) + 500) / 1000 / UI.UNIT_VALUE_DISTANCE);
-				dbAltitude[colorIndex][yearIndex] = (int) (result.getInt(3) / UI.UNIT_VALUE_ALTITUDE);
-				dbTime[colorIndex][yearIndex] = result.getInt(4);
+				final long typeId = tourTypeIdObject == null ? -1 : tourTypeIdObject;
 
-				final int recordingTime = result.getInt(5);
-				final int drivingTime = result.getInt(6);
+				dbTypeIds[colorIndex][yearIndex] = typeId;
+
+				dbAltitude[colorIndex][yearIndex] = altitude;
+				dbDistance[colorIndex][yearIndex] = distance;
+				dbDurationTime[colorIndex][yearIndex] = duration;
 
 				dbRecordingTime[colorIndex][yearIndex] = recordingTime;
 				dbDrivingTime[colorIndex][yearIndex] = drivingTime;
 				dbBreakTime[colorIndex][yearIndex] = recordingTime - drivingTime;
 
+				usedTourTypeIds[colorIndex] = typeId;
+				tourTypeSum[colorIndex] += distance + altitude + recordingTime;
 			}
 
 			conn.close();
@@ -164,21 +177,103 @@ public class DataProvider_Tour_Year extends DataProvider {
 			for (int currentYear = _lastYear - _numberOfYears + 1; currentYear <= _lastYear; currentYear++) {
 				years[yearIndex++] = currentYear;
 			}
-
-			_tourDataYear.typeIds = dbTourTypeIds;
 			_tourDataYear.years = years;
 
-			_tourDataYear.distanceLow = new float[serieLength][valueLength];
-			_tourDataYear.altitudeLow = new float[serieLength][valueLength];
-			_tourDataYear.setDurationTimeLow(new int[serieLength][valueLength]);
+			/*
+			 * Remove not used tour types
+			 */
+			final ArrayList<Object> typeIdsWithData = new ArrayList<Object>();
 
-			_tourDataYear.distanceHigh = dbDistance;
-			_tourDataYear.altitudeHigh = dbAltitude;
-			_tourDataYear.setDurationTimeHigh(dbTime);
+			final ArrayList<Object> altitudeWithData = new ArrayList<Object>();
+			final ArrayList<Object> distanceWithData = new ArrayList<Object>();
+			final ArrayList<Object> durationWithData = new ArrayList<Object>();
+			final ArrayList<Object> recordingTimeWithData = new ArrayList<Object>();
+			final ArrayList<Object> drivingTimeWithData = new ArrayList<Object>();
+			final ArrayList<Object> breakTimeWithData = new ArrayList<Object>();
 
-			_tourDataYear.recordingTime = dbRecordingTime;
-			_tourDataYear.drivingTime = dbDrivingTime;
-			_tourDataYear.breakTime = dbBreakTime;
+			for (int tourTypeIndex = 0; tourTypeIndex < tourTypeSum.length; tourTypeIndex++) {
+
+				final long summary = tourTypeSum[tourTypeIndex];
+
+				if (summary > 0) {
+
+					typeIdsWithData.add(dbTypeIds[tourTypeIndex]);
+
+					altitudeWithData.add(dbAltitude[tourTypeIndex]);
+					distanceWithData.add(dbDistance[tourTypeIndex]);
+					durationWithData.add(dbDurationTime[tourTypeIndex]);
+
+					recordingTimeWithData.add(dbRecordingTime[tourTypeIndex]);
+					drivingTimeWithData.add(dbDrivingTime[tourTypeIndex]);
+					breakTimeWithData.add(dbBreakTime[tourTypeIndex]);
+				}
+			}
+
+			/*
+			 * Create statistic data
+			 */
+			final int numUsedTourTypes = typeIdsWithData.size();
+
+			if (numUsedTourTypes == 0) {
+
+				// there are NO data, create dummy data that the UI do not fail
+
+				_tourDataYear.typeIds = new long[1][1];
+				_tourDataYear.usedTourTypeIds = new long[] { -1 };
+
+				_tourDataYear.altitudeLow = new float[1][numYears];
+				_tourDataYear.altitudeHigh = new float[1][numYears];
+
+				_tourDataYear.distanceLow = new float[1][numYears];
+				_tourDataYear.distanceHigh = new float[1][numYears];
+
+				_tourDataYear.setDurationTimeLow(new int[1][numYears]);
+				_tourDataYear.setDurationTimeHigh(new int[1][numYears]);
+
+				_tourDataYear.recordingTime = new int[1][numYears];
+				_tourDataYear.drivingTime = new int[1][numYears];
+				_tourDataYear.breakTime = new int[1][numYears];
+
+			} else {
+
+				final long[][] usedTypeIds = new long[numUsedTourTypes][];
+
+				final float[][] usedAltitude = new float[numUsedTourTypes][];
+				final float[][] usedDistance = new float[numUsedTourTypes][];
+				final int[][] usedDuration = new int[numUsedTourTypes][];
+				final int[][] usedRecordingTime = new int[numUsedTourTypes][];
+				final int[][] usedDrivingTime = new int[numUsedTourTypes][];
+				final int[][] usedBreakTime = new int[numUsedTourTypes][];
+
+				for (int index = 0; index < numUsedTourTypes; index++) {
+
+					usedTypeIds[index] = (long[]) typeIdsWithData.get(index);
+
+					usedAltitude[index] = (float[]) altitudeWithData.get(index);
+					usedDistance[index] = (float[]) distanceWithData.get(index);
+
+					usedDuration[index] = (int[]) durationWithData.get(index);
+					usedRecordingTime[index] = (int[]) recordingTimeWithData.get(index);
+					usedDrivingTime[index] = (int[]) drivingTimeWithData.get(index);
+					usedBreakTime[index] = (int[]) breakTimeWithData.get(index);
+				}
+
+				_tourDataYear.typeIds = usedTypeIds;
+				_tourDataYear.usedTourTypeIds = usedTourTypeIds;
+
+				_tourDataYear.altitudeLow = new float[numUsedTourTypes][numYears];
+				_tourDataYear.altitudeHigh = usedAltitude;
+
+				_tourDataYear.distanceLow = new float[numUsedTourTypes][numYears];
+				_tourDataYear.distanceHigh = usedDistance;
+
+				_tourDataYear.setDurationTimeLow(new int[numUsedTourTypes][numYears]);
+				_tourDataYear.setDurationTimeHigh(usedDuration);
+
+				_tourDataYear.recordingTime = usedRecordingTime;
+				_tourDataYear.drivingTime = usedDrivingTime;
+				_tourDataYear.breakTime = usedBreakTime;
+			}
 
 		} catch (final SQLException e) {
 			UI.showSQLException(e);

@@ -548,7 +548,7 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
 
 		_activePerson = statContext.appPerson;
 		_activeTourTypeFiler = statContext.appTourTypeFilter;
-		_currentYear = statContext.statYoungestYear;
+		_currentYear = statContext.statFirstYear;
 		_numberOfYears = statContext.statNumberOfYears;
 
 		/*
@@ -577,7 +577,7 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
 		_tourTimeData = DataProvider_Tour_Time.getInstance().getTourTimeData(
 				statContext.appPerson,
 				statContext.appTourTypeFilter,
-				statContext.statYoungestYear,
+				statContext.statFirstYear,
 				statContext.statNumberOfYears,
 				isDataDirtyWithReset() || statContext.isRefreshData);
 

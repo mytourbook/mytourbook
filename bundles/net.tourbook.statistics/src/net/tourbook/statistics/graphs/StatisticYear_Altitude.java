@@ -21,6 +21,11 @@ import net.tourbook.chart.ChartType;
 public class StatisticYear_Altitude extends StatisticYear {
 
 	@Override
+	protected String getBarOrderingStateKey() {
+		return STATE_BAR_ORDERING_YEAR_ALTITUDE;
+	}
+
+	@Override
 	ChartDataModel getChartDataModel() {
 
 		final ChartDataModel chartDataModel = new ChartDataModel(ChartType.BAR);

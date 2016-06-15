@@ -52,11 +52,11 @@ import org.eclipse.ui.IViewSite;
 
 public abstract class StatisticMonth extends TourbookStatistic {
 
-	private TourPerson					_activePerson;
-	private TourTypeFilter				_activeTourTypeFilter;
+	private TourPerson					_appPerson;
+	private TourTypeFilter				_appTourTypeFilter;
 
-	private int							_currentYear;
-	private int							_numberOfYears;
+	private int							_statFirstYear;
+	private int							_statNumberOfYears;
 
 	private Chart						_chart;
 	private final BarChartMinMaxKeeper	_minMaxKeeper	= new BarChartMinMaxKeeper();
@@ -71,6 +71,7 @@ public abstract class StatisticMonth extends TourbookStatistic {
 	private int							_barOrderStart;
 
 	private long[][]					_resortedTypeIds;
+
 	private float[][]					_resortedAltitudeLow;
 	private float[][]					_resortedAltitudeHigh;
 	private float[][]					_resortedDistanceLow;
@@ -88,11 +89,11 @@ public abstract class StatisticMonth extends TourbookStatistic {
 		 * create segments for each year
 		 */
 		final int monthCounter = tourMonthData.altitudeHigh[0].length;
-		final double segmentStart[] = new double[_numberOfYears];
-		final double segmentEnd[] = new double[_numberOfYears];
-		final String[] segmentTitle = new String[_numberOfYears];
+		final double segmentStart[] = new double[_statNumberOfYears];
+		final double segmentEnd[] = new double[_statNumberOfYears];
+		final String[] segmentTitle = new String[_statNumberOfYears];
 
-		final int oldestYear = _currentYear - _numberOfYears + 1;
+		final int oldestYear = _statFirstYear - _statNumberOfYears + 1;
 
 		// get start/end and title for each segment
 		for (int monthIndex = 0; monthIndex < monthCounter; monthIndex++) {
@@ -149,7 +150,7 @@ public abstract class StatisticMonth extends TourbookStatistic {
 
 	private ChartToolTipInfo createToolTipInfo(final int serieIndex, final int valueIndex) {
 
-		final int oldestYear = _currentYear - _numberOfYears + 1;
+		final int oldestYear = _statFirstYear - _statNumberOfYears + 1;
 
 		final Calendar calendar = GregorianCalendar.getInstance();
 
@@ -173,7 +174,12 @@ public abstract class StatisticMonth extends TourbookStatistic {
 		 */
 		final StringBuilder titleString = new StringBuilder();
 
-		final String tourTypeName = StatisticServices.getTourTypeName(serieIndex, _activeTourTypeFilter);
+		final String tourTypeName = StatisticServices.getTourTypeName(
+				serieIndex,
+				valueIndex,
+				_resortedTypeIds,
+				_appTourTypeFilter);
+
 		if (tourTypeName != null && tourTypeName.length() > 0) {
 			titleString.append(tourTypeName);
 		}
@@ -203,10 +209,10 @@ public abstract class StatisticMonth extends TourbookStatistic {
 
 		final String toolTipLabel = String.format(toolTipFormat.toString(), //
 				//
-				_tourMonthData.distanceHigh[serieIndex][valueIndex] / 1000,
+				_resortedDistanceHigh[serieIndex][valueIndex] / 1000,
 				UI.UNIT_LABEL_DISTANCE,
 				//
-				(int) _tourMonthData.altitudeHigh[serieIndex][valueIndex],
+				(int) _resortedAltitudeHigh[serieIndex][valueIndex],
 				UI.UNIT_LABEL_ALTITUDE,
 				//
 				recordingTime / 3600,
@@ -228,7 +234,6 @@ public abstract class StatisticMonth extends TourbookStatistic {
 		final ChartToolTipInfo toolTipInfo = new ChartToolTipInfo();
 		toolTipInfo.setTitle(toolTipTitle);
 		toolTipInfo.setLabel(toolTipLabel);
-//		toolTipInfo.setLabel(toolTipFormat.toString());
 
 		return toolTipInfo;
 	}
@@ -259,8 +264,8 @@ public abstract class StatisticMonth extends TourbookStatistic {
 		yData.setShowYSlider(true);
 
 		StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE);
-		StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE, _activeTourTypeFilter);
-		StatisticServices.setTourTypeColorIndex(yData, _resortedTypeIds, _activeTourTypeFilter);
+		StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE, _appTourTypeFilter);
+		StatisticServices.setTourTypeColorIndex(yData, _resortedTypeIds, _appTourTypeFilter);
 
 		chartDataModel.addYData(yData);
 	}
@@ -282,8 +287,8 @@ public abstract class StatisticMonth extends TourbookStatistic {
 		yData.setShowYSlider(true);
 
 		StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_DISTANCE);
-		StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_DISTANCE, _activeTourTypeFilter);
-		StatisticServices.setTourTypeColorIndex(yData, _resortedTypeIds, _activeTourTypeFilter);
+		StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_DISTANCE, _appTourTypeFilter);
+		StatisticServices.setTourTypeColorIndex(yData, _resortedTypeIds, _appTourTypeFilter);
 
 		chartDataModel.addYData(yData);
 	}
@@ -304,8 +309,8 @@ public abstract class StatisticMonth extends TourbookStatistic {
 		yData.setShowYSlider(true);
 
 		StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_TIME);
-		StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_TIME, _activeTourTypeFilter);
-		StatisticServices.setTourTypeColorIndex(yData, _resortedTypeIds, _activeTourTypeFilter);
+		StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_TIME, _appTourTypeFilter);
+		StatisticServices.setTourTypeColorIndex(yData, _resortedTypeIds, _appTourTypeFilter);
 
 		chartDataModel.addYData(yData);
 	}
@@ -488,83 +493,9 @@ public abstract class StatisticMonth extends TourbookStatistic {
 		_isSynchScaleEnabled = isSynchScaleEnabled;
 	}
 
-	/**
-	 * Set bar names into the statistic context. The names will be displayed in a combobox in the
-	 * statistics toolbar.
-	 * 
-	 * @param statContext
-	 * @param usedTourTypeIds
-	 */
-	private void setupBars_20_BarNames(final StatisticContext statContext, final long[] usedTourTypeIds) {
-
-		int numUsedTypes = 0;
-
-		// get number of used tour types, a used tour type is != -1
-		for (final long tourTypeId : usedTourTypeIds) {
-			if (tourTypeId != -1) {
-				numUsedTypes++;
-			}
-		}
-
-		final ArrayList<TourType> tourTypes = TourDatabase.getActiveTourTypes();
-
-		if (tourTypes == null || tourTypes.size() == 0 || numUsedTypes == 0) {
-
-			statContext.outIsUpdateBarNames = true;
-			statContext.outBarNames = null;
-
-			return;
-		}
-
-		int barIndex = 0;
-
-		// create bar names 2 times
-		final String[] barNames = new String[numUsedTypes * 2];
-
-		for (int inverseIndex = 0; inverseIndex < 2; inverseIndex++) {
-
-			for (int typeIndex = 0; typeIndex < tourTypes.size(); typeIndex++) {
-
-				final TourType tourType = tourTypes.get(typeIndex);
-
-				final long tourTypeId = tourType.getTypeId();
-
-				/*
-				 * Check if this type is used
-				 */
-				boolean isTourTypeUsed = false;
-				for (final long usedType : usedTourTypeIds) {
-
-					if (usedType == tourTypeId) {
-						isTourTypeUsed = true;
-						break;
-					}
-				}
-
-				if (isTourTypeUsed) {
-
-					String barName;
-
-					if (inverseIndex == 0) {
-						barName = tourType.getName();
-					} else {
-						barName = tourType.getName() + UI.SPACE + Messages.Statistic_Label_Invers;
-					}
-
-					barNames[barIndex++] = barName;
-				}
-			}
-		}
-
-		// set state what the statistic container should do
-		statContext.outIsUpdateBarNames = true;
-		statContext.outBarNames = barNames;
-		statContext.outVerticalBarIndex = _barOrderStart;
-	}
-
 	private void updateStatistic() {
 
-		updateStatistic(new StatisticContext(_activePerson, _activeTourTypeFilter, _currentYear, _numberOfYears));
+		updateStatistic(new StatisticContext(_appPerson, _appTourTypeFilter, _statFirstYear, _statNumberOfYears));
 	}
 
 	@Override
@@ -575,19 +506,19 @@ public abstract class StatisticMonth extends TourbookStatistic {
 		// this statistic supports bar reordering
 		statContext.outIsBarReorderingSupported = true;
 
-		_activePerson = statContext.appPerson;
-		_activeTourTypeFilter = statContext.appTourTypeFilter;
-		_currentYear = statContext.statYoungestYear;
-		_numberOfYears = statContext.statNumberOfYears;
+		_appPerson = statContext.appPerson;
+		_appTourTypeFilter = statContext.appTourTypeFilter;
+		_statFirstYear = statContext.statFirstYear;
+		_statNumberOfYears = statContext.statNumberOfYears;
 
 		_tourMonthData = DataProvider_Tour_Month.getInstance().getMonthData(
-				statContext.appPerson,
-				statContext.appTourTypeFilter,
-				statContext.statYoungestYear,
-				statContext.statNumberOfYears,
+				_appPerson,
+				_appTourTypeFilter,
+				_statFirstYear,
+				_statNumberOfYears,
 				isDataDirtyWithReset() || statContext.isRefreshData);
 
-		setupBars_20_BarNames(statContext, _tourMonthData.usedTourTypeIds);
+		StatisticServices.setBarNames(statContext, _tourMonthData.usedTourTypeIds, _barOrderStart);
 		reorderStatData();
 
 		// reset min/max values

@@ -38,6 +38,11 @@ public abstract class TourbookStatistic {
 	protected static final String	STATE_BAR_ORDERING_MONTH_SUMMARY	= "STATE_BAR_ORDERING_MONTH_SUMMARY";	//$NON-NLS-1$
 	protected static final String	STATE_BAR_ORDERING_MONTH_TIME		= "STATE_BAR_ORDERING_MONTH_TIME";		//$NON-NLS-1$
 
+	protected static final String	STATE_BAR_ORDERING_YEAR_ALTITUDE	= "STATE_BAR_ORDERING_YEAR_ALTITUDE";	//$NON-NLS-1$
+	protected static final String	STATE_BAR_ORDERING_YEAR_DISTANCE	= "STATE_BAR_ORDERING_YEAR_DISTANCE";	//$NON-NLS-1$
+	protected static final String	STATE_BAR_ORDERING_YEAR_SUMMARY		= "STATE_BAR_ORDERING_YEAR_SUMMARY";	//$NON-NLS-1$
+	protected static final String	STATE_BAR_ORDERING_YEAR_TIME		= "STATE_BAR_ORDERING_YEAR_TIME";		//$NON-NLS-1$
+
 	/** ID from plugin.xml */
 	public String					statisticId;
 
@@ -89,7 +94,7 @@ public abstract class TourbookStatistic {
 	}
 
 	/**
-	 * Create the statistic component
+	 * Create the statistic UI component.
 	 * 
 	 * @param parent
 	 * @param viewSite
@@ -216,10 +221,10 @@ public abstract class TourbookStatistic {
 	}
 
 	/**
-	 * Bar vertical order was in the UI.
+	 * Set the bar vertical order in the UI.
 	 * 
 	 * @param selectedIndex
-	 *            Combobox selection index
+	 *            Combobox selection index, can be <code>-1</code> when combobox is empty.
 	 */
 	public void setBarVerticalOrder(final int selectedIndex) {
 		// do nothing
