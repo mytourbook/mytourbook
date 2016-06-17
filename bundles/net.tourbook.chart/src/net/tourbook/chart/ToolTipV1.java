@@ -241,6 +241,8 @@ public class ToolTipV1 {
 				if (_toolTipHoverSerieIndex == _hoveredBarSerieIndex
 						&& _toolTipHoverValueIndex == _hoveredBarValueIndex) {
 
+//this must be reset when another statistic is displayed, otherwise the wrong tooltip is displayed
+					
 					// tool tip is already displayed for the hovered bar
 
 					if (_toolTipInfo != null) {
