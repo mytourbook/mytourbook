@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -89,9 +89,7 @@ public class ConconiChartView extends ViewPart {
 	private final boolean			_isLinux						= net.tourbook.common.UI.IS_LINUX;
 
 	private final IPreferenceStore	_commonPrefStore				= CommonActivator.getPrefStore();
-
-	private final IDialogSettings	_state							= TourbookPlugin.getDefault().//
-																			getDialogSettingsSection(ID);
+	private final IDialogSettings	_state							= TourbookPlugin.getState(ID);
 
 	private ISelectionListener		_postSelectionListener;
 	private IPartListener2			_partListener;
@@ -137,10 +135,13 @@ public class ConconiChartView extends ViewPart {
 	private void addPartListener() {
 		_partListener = new IPartListener2() {
 
+			@Override
 			public void partActivated(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == ConconiChartView.this) {
 					saveTour();
@@ -148,14 +149,19 @@ public class ConconiChartView extends ViewPart {
 				}
 			}
 
+			@Override
 			public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partHidden(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partOpened(final IWorkbenchPartReference partRef) {}
 
+			@Override
 			public void partVisible(final IWorkbenchPartReference partRef) {}
 		};
 		getViewSite().getPage().addPartListener(_partListener);
@@ -167,6 +173,7 @@ public class ConconiChartView extends ViewPart {
 	private void addSelectionListener() {
 
 		_postSelectionListener = new ISelectionListener() {
+			@Override
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
 				if (part == ConconiChartView.this) {
@@ -514,34 +521,34 @@ public class ConconiChartView extends ViewPart {
 		_pageNoChart = new Label(_pageBook, SWT.NONE);
 		_pageNoChart.setText(Messages.UI_Label_TourIsNotSelected);
 
-		createUI10ConconiTest(_pageBook);
+		createUI_10_ConconiTest(_pageBook);
 	}
 
-	private void createUI10ConconiTest(final Composite parent) {
+	private void createUI_10_ConconiTest(final Composite parent) {
 
 		_pageConconiTest = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(_pageConconiTest);
 		GridLayoutFactory.fillDefaults().numColumns(1).spacing(0, 0).applyTo(_pageConconiTest);
 //		_pageConconiTest.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
-			createUI20Options(_pageConconiTest);
-			createUI60ConconiChart(_pageConconiTest);
+			createUI_20_Options(_pageConconiTest);
+			createUI_60_ConconiChart(_pageConconiTest);
 		}
 	}
 
-	private void createUI20Options(final Composite parent) {
+	private void createUI_20_Options(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory.fillDefaults().spacing(0, 0).numColumns(2).applyTo(container);
 		_pageConconiTest.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
-			createUI30Test(container);
-			createUI40ExtendedScaling(container);
+			createUI_30_Test(container);
+			createUI_40_ExtendedScaling(container);
 		}
 	}
 
-	private void createUI30Test(final Composite parent) {
+	private void createUI_30_Test(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -634,7 +641,7 @@ public class ConconiChartView extends ViewPart {
 		}
 	}
 
-	private void createUI40ExtendedScaling(final Composite parent) {
+	private void createUI_40_ExtendedScaling(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(false, false).applyTo(container);
@@ -655,7 +662,7 @@ public class ConconiChartView extends ViewPart {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					enableControls();
-					updateChart30NewTour(_selectedTour);
+					updateChart_30_NewTour(_selectedTour);
 				}
 			});
 
@@ -687,7 +694,7 @@ public class ConconiChartView extends ViewPart {
 					if (_isUpdateUI) {
 						return;
 					}
-					updateChart30NewTour(_selectedTour);
+					updateChart_30_NewTour(_selectedTour);
 				}
 			});
 			_spinFactor.addSelectionListener(new SelectionAdapter() {
@@ -696,7 +703,7 @@ public class ConconiChartView extends ViewPart {
 					if (_isUpdateUI) {
 						return;
 					}
-					updateChart30NewTour(_selectedTour);
+					updateChart_30_NewTour(_selectedTour);
 				}
 			});
 			_spinFactor.addMouseWheelListener(new MouseWheelListener() {
@@ -706,7 +713,7 @@ public class ConconiChartView extends ViewPart {
 					if (_isUpdateUI) {
 						return;
 					}
-					updateChart30NewTour(_selectedTour);
+					updateChart_30_NewTour(_selectedTour);
 				}
 			});
 
@@ -716,7 +723,7 @@ public class ConconiChartView extends ViewPart {
 	/**
 	 * chart: conconi test
 	 */
-	private void createUI60ConconiChart(final Composite parent) {
+	private void createUI_60_ConconiChart(final Composite parent) {
 
 		_chartConconiTest = new Chart(parent, SWT.FLAT);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(_chartConconiTest);
@@ -751,7 +758,7 @@ public class ConconiChartView extends ViewPart {
 
 		_modifiedTourDeflection = newDeflection;
 
-		updateUI20ConconiValues();
+		updateUI_20_ConconiValues();
 	}
 
 	private void onSelectionChanged(final ISelection selection) {
@@ -768,7 +775,7 @@ public class ConconiChartView extends ViewPart {
 
 			final TourData tourData = ((SelectionTourData) selection).getTourData();
 			if (tourData != null) {
-				updateChart20(tourData);
+				updateChart_20(tourData);
 			}
 
 		} else if (selection instanceof SelectionTourIds) {
@@ -776,7 +783,7 @@ public class ConconiChartView extends ViewPart {
 			final SelectionTourIds selectionTourId = (SelectionTourIds) selection;
 			final ArrayList<Long> tourIds = selectionTourId.getTourIds();
 			if (tourIds != null && tourIds.size() > 0) {
-				updateChart12(tourIds);
+				updateChart_12(tourIds);
 			}
 
 		} else if (selection instanceof SelectionTourId) {
@@ -784,7 +791,7 @@ public class ConconiChartView extends ViewPart {
 			final SelectionTourId selectionTourId = (SelectionTourId) selection;
 			final Long tourId = selectionTourId.getTourId();
 
-			updateChart10(tourId);
+			updateChart_10(tourId);
 
 		} else if (selection instanceof SelectionDeletedTours) {
 
@@ -803,7 +810,7 @@ public class ConconiChartView extends ViewPart {
 			selectedIndex = 0;
 		}
 
-		updateChart30NewTour(_conconiTours.get(selectedIndex));
+		updateChart_30_NewTour(_conconiTours.get(selectedIndex));
 	}
 
 	private void restoreState() {
@@ -873,6 +880,7 @@ public class ConconiChartView extends ViewPart {
 
 		// a tour is not displayed, find a tour provider which provides a tour
 		Display.getCurrent().asyncExec(new Runnable() {
+			@Override
 			public void run() {
 
 				// validate widget
@@ -895,19 +903,19 @@ public class ConconiChartView extends ViewPart {
 		});
 	}
 
-	private void updateChart10(final Long tourId) {
+	private void updateChart_10(final Long tourId) {
 
 		final ArrayList<Long> tourIds = new ArrayList<Long>();
 		tourIds.add(tourId);
 
-		updateChart12(tourIds);
+		updateChart_12(tourIds);
 	}
 
-	private void updateChart12(final ArrayList<Long> tourIds) {
-		updateChart22(TourManager.getInstance().getTourData(tourIds));
+	private void updateChart_12(final ArrayList<Long> tourIds) {
+		updateChart_22(TourManager.getInstance().getTourData(tourIds));
 	}
 
-	private void updateChart20(final TourData tourData) {
+	private void updateChart_20(final TourData tourData) {
 
 		if (tourData == null) {
 			return;
@@ -916,10 +924,10 @@ public class ConconiChartView extends ViewPart {
 		final ArrayList<TourData> tourDataList = new ArrayList<TourData>();
 		tourDataList.add(tourData);
 
-		updateChart22(tourDataList);
+		updateChart_22(tourDataList);
 	}
 
-	private void updateChart22(final ArrayList<TourData> tourDataList) {
+	private void updateChart_22(final ArrayList<TourData> tourDataList) {
 
 		/*
 		 * tour editor is not opened because it can cause a recursive attempt to active a part in
@@ -936,8 +944,8 @@ public class ConconiChartView extends ViewPart {
 
 		_conconiTours = tourDataList;
 
-		updateUI10SetupConconi();
-		updateChart30NewTour(null);
+		updateUI_10_SetupConconi();
+		updateChart_30_NewTour(null);
 
 		_pageBook.showPage(_pageConconiTest);
 
@@ -948,7 +956,7 @@ public class ConconiChartView extends ViewPart {
 	 * @param markedTour
 	 *            contains a tour which is marked in the conconi chart
 	 */
-	private void updateChart30NewTour(final TourData markedTour) {
+	private void updateChart_30_NewTour(final TourData markedTour) {
 
 		// save modified tour before chart data for a new tour is created
 		saveTour();
@@ -961,7 +969,7 @@ public class ConconiChartView extends ViewPart {
 
 		final ChartDataModel conconiChartDataModel = createChartDataModelConconiTest(_conconiTours, markedTour);
 
-		updateUI12SetupNewTour();
+		updateUI_12_SetupNewTour();
 
 		_chartConconiTest.updateChart(conconiChartDataModel, true, true);
 
@@ -970,10 +978,10 @@ public class ConconiChartView extends ViewPart {
 		 * chart is already painted (it requires drawing data)
 		 */
 		_chartConconiTest.resizeChart();
-		updateUI20ConconiValues();
+		updateUI_20_ConconiValues();
 	}
 
-	private void updateUI10SetupConconi() {
+	private void updateUI_10_SetupConconi() {
 
 		_isSelectionDisabled = true;
 		{
@@ -992,7 +1000,7 @@ public class ConconiChartView extends ViewPart {
 		_isSelectionDisabled = false;
 	}
 
-	private void updateUI12SetupNewTour() {
+	private void updateUI_12_SetupNewTour() {
 
 		if (_conconiDataForSelectedTour == null) {
 			return;
@@ -1028,7 +1036,7 @@ public class ConconiChartView extends ViewPart {
 
 	}
 
-	private void updateUI20ConconiValues() {
+	private void updateUI_20_ConconiValues() {
 
 		if (_conconiDataForSelectedTour == null) {
 			return;

@@ -73,6 +73,14 @@ public class SerieData implements Serializable {
 	public double[]				longitude;
 	public double[]				latitude;
 
+	/**
+	 * Pulse times in milliseconds.
+	 * <p>
+	 * <b>This data serie has not the same serie length as the other data series because 1 second
+	 * can have multiple values, depending on the heartrate.</b>
+	 */
+	public int[]				pulseTimes;
+
 	/*
 	 * these data series cannot be removed because they are needed to convert from int to float in
 	 * db version 20

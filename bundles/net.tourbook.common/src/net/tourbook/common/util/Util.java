@@ -347,10 +347,10 @@ public class Util {
 		for (int outerIndex = 0; outerIndex < intValues.length; outerIndex++) {
 
 			final int[] intOuterValues = intValues[outerIndex];
-			final float[] floutOuterValues = floatValues[outerIndex];
+			final float[] floatOuterValues = floatValues[outerIndex];
 
 			for (int innerIndex = 0; innerIndex < intOuterValues.length; innerIndex++) {
-				floutOuterValues[innerIndex] = intOuterValues[innerIndex];
+				floatOuterValues[innerIndex] = intOuterValues[innerIndex];
 			}
 		}
 

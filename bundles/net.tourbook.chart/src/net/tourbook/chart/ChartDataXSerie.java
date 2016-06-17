@@ -26,31 +26,31 @@ import org.joda.time.DateTime;
  */
 public class ChartDataXSerie extends ChartDataSerie {
 
-	double[][]				_lowValuesDouble;
-	double[][]				_highValuesDouble;
+	double[][]						_lowValuesDouble;
+	double[][]						_highValuesDouble;
 
 	/**
 	 * start value for the serie data, this is use to set the start point for time data to the
 	 * starting time
 	 */
-	private double			_startValue				= 0;
+	private double					_startValue				= 0;
 
 	/**
 	 * index in the x-data at which the graph is painted in the marker color, <code>-1</code>
 	 * disables the synch marker
 	 */
-	private int				_synchMarkerStartIndex	= -1;
+	private int						_synchMarkerStartIndex	= -1;
 
 	/**
 	 * index in the x-data at which the graph is stoped to painted in the marker color
 	 */
-	private int				_synchMarkerEndIndex	= -1;
+	private int						_synchMarkerEndIndex	= -1;
 
 	/**
 	 * Range marker shows an area with a different color in the graph
 	 */
-	private int[]			_rangeMarkerStartIndex;
-	private int[]			_rangeMarkerEndIndex;
+	private int[]					_rangeMarkerStartIndex;
+	private int[]					_rangeMarkerEndIndex;
 
 	/**
 	 * Segment contains information to show divide the chart into parts, e.g. statistics for several
@@ -61,27 +61,27 @@ public class ChartDataXSerie extends ChartDataSerie {
 	/**
 	 * Contains information how to draw the title for a history chart
 	 */
-	private HistoryTitle	_historyTitle;
+	private HistoryTitle			_historyTitle;
 
 	/**
 	 * Scaling for the x-axis which is computed with {@link Math#pow(double, double)} when this
 	 * value is <code>!= 1</code>. Extended scaling is used in the conconi view.
 	 */
-	private double			_scalingFactor			= 1;
+	private double					_scalingFactor			= 1;
 
-	private double			_scalingMaxValue		= 1;
+	private double					_scalingMaxValue		= 1;
 	/**
 	 * Defines <code>true</code> or <code>false</code> if a line should be drawn for a value point,
 	 * can be <code>null</code> to disable this feature.
 	 */
-	private boolean[]		_noLine;
+	private boolean[]				_noLine;
 
 	/**
 	 * X-axis start Date/Time
 	 */
-	private DateTime		_startDateTime;
+	private DateTime				_startDateTime;
 
-	private boolean			_timeSerieWithTimeZoneAdjustment;
+	private boolean					_timeSerieWithTimeZoneAdjustment;
 
 	public ChartDataXSerie(final double[] values) {
 		setMinMaxValues(new double[][] { values });
@@ -275,7 +275,4 @@ public class ChartDataXSerie extends ChartDataSerie {
 		return "[ChartDataXSerie]";//$NON-NLS-1$
 	}
 
-	public void xxxset_timeSerieWithCETAdjustment(final boolean _timeSerieWithCETAdjustment) {
-		this._timeSerieWithTimeZoneAdjustment = _timeSerieWithCETAdjustment;
-	}
 }

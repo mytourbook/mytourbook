@@ -99,7 +99,7 @@ public class TourDatabase {
 	 */
 	private static final int						TOURBOOK_DB_VERSION							= 31;
 
-//	private static final int						TOURBOOK_DB_VERSION							= 31;	// 16.5?
+//	private static final int						TOURBOOK_DB_VERSION							= 31;	// 16.5
 //	private static final int						TOURBOOK_DB_VERSION							= 30;	// 16.1
 //	private static final int						TOURBOOK_DB_VERSION							= 29;	// 15.12
 //	private static final int						TOURBOOK_DB_VERSION							= 28;	// 15.6

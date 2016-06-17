@@ -729,6 +729,13 @@
 					label="%View_Name_Training"
 					mnemonic="%View_Name_Training_Mnemonic"/>
 				
+				<!-- Heart Rate Variability -->
+				<command
+					commandId="command.net.tourbook.views.HeartRateVariabilityChart"
+					icon="icons/conconi-chart.png"
+					label="%View_Name_HeartRateVariabilityChart"
+					mnemonic="%View_Name_HeartRateVariabilityChart_Mnemonic"/>
+				
 				<!-- Conconi Test -->
 				<command
 					commandId="command.net.tourbook.views.ConconiChart"
@@ -1135,6 +1142,12 @@
 		/>
 		
 		<command
+			id="command.net.tourbook.views.HeartRateVariabilityChart"
+			name="%View_Name_HeartRateVariabilityChart"
+			defaultHandler="net.tourbook.ui.views.ActionHandler_OpenView_HeartRateVariabilityChart"
+		/>
+		
+		<command
 			id="command.net.tourbook.views.ConconiChart"
 			name="%View_Name_ConconiChart"
 			defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewConconiChart"
@@ -1506,6 +1519,14 @@
 				icon="icons/find.png"
 				id="de.byteholder.geoclipse.poi.poiView"
 				name="%View_Name_SearchPOI"
+			/>
+
+			<view
+				category="net.tourbook.category.Tools"
+				class="net.tourbook.ui.tourChart.HeartRateVariabilityChartView"
+				icon="icons/conconi-chart.png"
+				id="net.tourbook.ui.tourChart.HeartRateVariabilityChartView"
+				name="%View_Name_HeartRateVariabilityChart"
 			/>
 
 			<view

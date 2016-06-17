@@ -17,6 +17,7 @@ package net.tourbook.data;
 
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.FetchType.EAGER;
+import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.TIntObjectHashMap;
 
 import java.awt.Point;
@@ -798,6 +799,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	@Transient
 	private float[]												pulseSerieSmoothed;
+
+	@Transient
+	public int[]												pulseTimeSerie;
 
 	/**
 	 * Contains <code>true</code> or <code>false</code> for each time slice of the whole tour.
@@ -4282,6 +4286,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		}
 
 		createTimeSeries_10_DataCompleting();
+		createTimeSeries_50_PulseTimes(timeDataSerie);
 
 		tourDistance = isDistance ? distanceSerie[serieSize - 1] : 0;
 		tourRecordingTime = recordingTime;
@@ -4537,6 +4542,103 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 			return ((val1 + val2) / 2.);
 		} else {
 			return (val1 + (val2 - val1) / (time2 - time1) * (time - time1));
+		}
+	}
+
+	private void createTimeSeries_50_PulseTimes(final TimeData[] allTimeData) {
+
+		boolean isPulseTimes = false;
+
+		PULSE_TIMES:
+
+		// check if any pulse time data is available
+		for (final TimeData timeData : allTimeData) {
+
+			final int[] pulseTimes = timeData.pulseTime;
+
+			if (pulseTimes != null) {
+
+				for (final int pulseTime : pulseTimes) {
+					if (pulseTime != 0) {
+						isPulseTimes = true;
+						break PULSE_TIMES;
+					}
+				}
+			}
+		}
+
+		if (isPulseTimes == false) {
+			// no data
+			return;
+		}
+
+		final TIntArrayList pulseTimes = new TIntArrayList(allTimeData.length * 3);
+
+		for (final TimeData timeData : allTimeData) {
+
+			final int[] pulseTimes2 = timeData.pulseTime;
+
+			if (pulseTimes2 != null) {
+
+				for (final int pulseTime : pulseTimes2) {
+					if (pulseTime != 0) {
+
+						if (pulseTime == 65535) {
+							// ignore, this value occured in daum data
+						} else {
+
+							pulseTimes.add(pulseTime);
+						}
+
+//						445
+//						480
+//						470
+//						590
+//						65535
+//						1500
+//						620
+//						65535
+//						615
+//						620
+//						1225
+//						615
+//						615
+//						65535
+//						620
+//						65535
+//						615
+//						610
+//						615
+//						65535
+//						835
+//						595
+//						600
+//						605
+//						600
+//						590
+//						595
+//						595
+//						605
+//						65535
+//						595
+//						585
+//						1165
+//						585
+//						585
+//						580
+//						1155
+//						575
+//						580
+//						575
+//						575
+//						575
+					}
+				}
+			}
+		}
+
+		if (pulseTimes.size() > 0) {
+			pulseTimeSerie = pulseTimes.toArray();
 		}
 	}
 
@@ -6431,6 +6533,8 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 
 		gearSerie = serieData.gears;
 
+		pulseTimeSerie = serieData.pulseTimes;
+
 		if (powerSerie != null) {
 			isPowerSerieFromDevice = true;
 		}
@@ -6474,6 +6578,8 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		serieData.longitude = longitudeSerie;
 
 		serieData.gears = gearSerie;
+
+		serieData.pulseTimes = pulseTimeSerie;
 
 		/*
 		 * time serie size

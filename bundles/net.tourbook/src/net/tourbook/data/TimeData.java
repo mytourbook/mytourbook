@@ -125,11 +125,16 @@ public class TimeData implements Serializable {
 	public double				longitude			= Double.MIN_VALUE;
 
 	/**
-	 * a marker is set when {@link TimeData#marker} is NOT 0
+	 * A marker is set when {@link TimeData#marker} is NOT 0
 	 */
 	public int					marker				= 0;
 
 	public String				markerLabel;
+
+	/**
+	 * Pulse time in milliseconds
+	 */
+	public int[]				pulseTime;
 
 	@Override
 	public String toString() {

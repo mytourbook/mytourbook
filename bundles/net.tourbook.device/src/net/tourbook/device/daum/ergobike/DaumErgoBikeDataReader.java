@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.StringTokenizer;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.importdata.DeviceData;
@@ -40,9 +41,9 @@ import org.eclipse.jface.preference.IPreferenceStore;
 
 public class DaumErgoBikeDataReader extends TourbookDevice {
 
-	private static final String	DAUM_ERGO_BIKE_CSV_ID	= "Elapsed Time (s);Distance (km);Phys. kJoule;Slope (%);NM;RPM;Speed (km/h);Watt;Gear;Device Active;Pulse;Pulse Type;";	//$NON-NLS-1$
+	private static final String	DAUM_ERGO_BIKE_CSV_ID	= "Elapsed Time (s);Distance (km);Phys. kJoule;Slope (%);NM;RPM;Speed (km/h);Watt;Gear;Device Active;Pulse;Pulse Type;Training Type;Training Value;Pulse Time 1;2;3;4;5;6"; //$NON-NLS-1$
 
-	private static final String	CSV_STRING_TOKEN		= ";";																														//$NON-NLS-1$
+	private static final String	CSV_STRING_TOKEN		= ";";																																										//$NON-NLS-1$
 
 	private DecimalFormat		_decimalFormat			= (DecimalFormat) DecimalFormat.getInstance();
 
@@ -83,8 +84,8 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 
 		try {
 			return _decimalFormat.parse(stringValue).floatValue();
-		} catch (final ParseException e1) {
-			e1.printStackTrace();
+		} catch (final ParseException e) {
+			StatusUtil.log(e);
 		}
 
 		return 0;
@@ -201,17 +202,13 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 			int distance = 0;
 			int previousDistance = 0;
 
-			float cadence;
-			int pulse;
-			int power;
-			float energy = 0;
-			float speed;
 			boolean isFirstTime = true;
 
 			String tokenLine;
 
 			int sumPowerTime = 0;
 			float sumPower = 0;
+			float energy = 0;
 
 			// read all data points
 			while ((tokenLine = fileReader.readLine()) != null) {
@@ -223,12 +220,21 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 				energy = parseFloat(tokenizer.nextToken()); // 							3  Phys. kJoule
 				tokenizer.nextToken(); // 												4  Slope (%)
 				tokenizer.nextToken(); // 												5  NM
-				cadence = parseFloat(tokenizer.nextToken()); // 						6  RPM
-				speed = parseFloat(tokenizer.nextToken()); // 							7  Speed (km/h)
-				power = Integer.parseInt(tokenizer.nextToken()); //						8  Watt
+				final float cadence = parseFloat(tokenizer.nextToken()); // 			6  RPM
+				final float speed = parseFloat(tokenizer.nextToken()); // 				7  Speed (km/h)
+				final int power = Integer.parseInt(tokenizer.nextToken()); //			8  Watt
 				tokenizer.nextToken(); // 												9  Gear
 				tokenizer.nextToken(); // 												10 Device Active
-				pulse = Integer.parseInt(tokenizer.nextToken()); // 					11 Pulse
+				final int pulse = Integer.parseInt(tokenizer.nextToken()); // 			11 Pulse;
+				tokenizer.nextToken(); // 												12 Pulse Type;
+				tokenizer.nextToken(); // 												13 Training Type;
+				tokenizer.nextToken(); // 												14 Training Value;
+				final int pulseTime1 = Integer.parseInt(tokenizer.nextToken()); // 		15 Pulse Time 1;
+				final int pulseTime2 = Integer.parseInt(tokenizer.nextToken()); // 		16 2;
+				final int pulseTime3 = Integer.parseInt(tokenizer.nextToken()); // 		17 3;
+				final int pulseTime4 = Integer.parseInt(tokenizer.nextToken()); // 		18 4;
+				final int pulseTime5 = Integer.parseInt(tokenizer.nextToken()); // 		19 5;
+				final int pulseTime6 = Integer.parseInt(tokenizer.nextToken()); // 		20 6
 
 				timeDataList.add(timeData = new TimeData());
 
@@ -245,6 +251,7 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 				timeData.pulse = pulse;
 				timeData.power = power;
 				timeData.speed = speed;
+				timeData.pulseTime = new int[] { pulseTime1, pulseTime2, pulseTime3, pulseTime4, pulseTime5, pulseTime6 };
 
 				// ignore small cadence values
 				if (cadence > 10) {
@@ -304,15 +311,17 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 			returnValue = true;
 
 		} catch (final Exception e) {
-			e.printStackTrace();
+
+			StatusUtil.log(e);
 			return false;
+
 		} finally {
 			try {
 				if (fileReader != null) {
 					fileReader.close();
 				}
 			} catch (final IOException e) {
-				e.printStackTrace();
+				StatusUtil.log(e);
 			}
 		}
 
