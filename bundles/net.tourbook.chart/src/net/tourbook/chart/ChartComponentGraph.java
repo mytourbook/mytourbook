@@ -2074,6 +2074,7 @@ public class ChartComponentGraph extends Canvas {
 		final double devGraphWidth = graphDrawingData.devVirtualGraphWidth;
 		final boolean isCheckUnitBorderOverlap = graphDrawingData.isCheckUnitBorderOverlap();
 
+		final double xAxisStartValue = xData.getXAxisStartValue();
 		final double scalingFactor = xData.getScalingFactor();
 		final double scalingMaxValue = xData.getScalingMaxValue();
 		final boolean isExtendedScaling = scalingFactor != 1.0;
@@ -2129,13 +2130,14 @@ public class ChartComponentGraph extends Canvas {
 				// get dev x-position for the unit tick
 				if (isExtendedScaling) {
 
-					// extended scaling
+					// logarithmic scaling
 					final double scaledUnitValue = ((Math.pow(xUnit.value, scalingFactor)) * extScaleX);
 					devXUnitTick = (int) (scaledUnitValue);
 
 				} else {
+
 					// scale with devXOffset
-					devXUnitTick = (int) (scaleX * xUnit.value - _xxDevViewPortLeftBorder);
+					devXUnitTick = (int) (scaleX * (xUnit.value - xAxisStartValue) - _xxDevViewPortLeftBorder);
 				}
 			}
 
@@ -2151,8 +2153,9 @@ public class ChartComponentGraph extends Canvas {
 					devNextXUnitTick = (int) (scaledUnitValue);
 
 				} else {
+
 					// scale with devXOffset
-					devNextXUnitTick = (int) (scaleX * nextXUnit.value - _xxDevViewPortLeftBorder);
+					devNextXUnitTick = (int) (scaleX * (nextXUnit.value - xAxisStartValue) - _xxDevViewPortLeftBorder);
 				}
 
 				devUnitWidth = devNextXUnitTick - devXUnitTick;
@@ -3624,6 +3627,7 @@ public class ChartComponentGraph extends Canvas {
 		final float graphYBottom = drawingData.getGraphYBottom();
 		final double devGraphWidth = drawingData.devVirtualGraphWidth;
 
+		final double xAxisStartValue = xData.getXAxisStartValue();
 		final double scalingFactor = xData.getScalingFactor();
 		final double scalingMaxValue = xData.getScalingMaxValue();
 		final boolean isExtendedScaling = scalingFactor != 1.0;
@@ -3668,7 +3672,7 @@ public class ChartComponentGraph extends Canvas {
 				if (isExtendedScaling) {
 					devX = (int) ((Math.pow(xValue, scalingFactor)) * scaleXExtended);
 				} else {
-					devX = (int) (scaleX * xValue);
+					devX = (int) (scaleX * (xValue - xAxisStartValue));
 				}
 
 				final int devY = devYBottom - ((int) (scaleY * (yValue - graphYBottom)));

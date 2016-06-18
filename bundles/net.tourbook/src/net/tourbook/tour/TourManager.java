@@ -2559,7 +2559,7 @@ public class TourManager {
 					? 0
 					: configXAxisTime == X_AXIS_START_TIME.TOUR_START_TIME ? tourTimeOfDay : photoTimeOfDay;
 
-			xDataTime.setStartValue(xAxisStartValue);
+			xDataTime.setUnitStartValue(xAxisStartValue);
 
 			xDataTime.setIsTimeSerieWithTimeZoneAdjustment(tourData.isTimeSerieWithTimeZoneAdjustment());
 

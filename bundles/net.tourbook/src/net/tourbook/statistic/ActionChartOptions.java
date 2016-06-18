@@ -175,30 +175,8 @@ public class ActionChartOptions extends ContributionItem implements IOpeningDial
 	private void openSlideout(final Rectangle itemBounds, final boolean isOpenDelayed) {
 
 		// ensure other dialogs are closed
-//		_tourChart.closeOpenedDialogs(this);
 
 		_slideoutStatisticChartOptions.open(itemBounds, isOpenDelayed);
-	}
-
-	public void setEnabled(final boolean isEnabled) {
-
-		_actionToolItem.setEnabled(isEnabled);
-
-		if (isEnabled && _actionToolItem.getSelection() == false) {
-
-			// show default icon
-			_actionToolItem.setImage(_imageEnabled);
-		}
-	}
-
-	public void setSelected(final boolean isSelected) {
-
-		if (_actionToolItem == null) {
-			// this happened
-			return;
-		}
-
-		_actionToolItem.setSelection(isSelected);
 	}
 
 }

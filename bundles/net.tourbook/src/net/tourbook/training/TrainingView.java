@@ -1330,7 +1330,7 @@ public class TrainingView extends ViewPart {
 		final ChartDataXSerie xData = new ChartDataXSerie(_xSeriePulse);
 		xData.setAxisUnit(ChartDataXSerie.X_AXIS_UNIT_NUMBER_CENTER);
 		xData.setUnitLabel(net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit);
-		xData.setStartValue(_pulseStart);
+		xData.setUnitStartValue(_pulseStart);
 
 		chartDataModel.setXData(xData);
 

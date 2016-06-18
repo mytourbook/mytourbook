@@ -115,6 +115,10 @@ public class Messages extends NLS {
 	public static String		Graph_Label_Gradient_Unit;
 	public static String		Graph_Label_Heartbeat;
 	public static String		Graph_Label_Heartbeat_Unit;
+
+	public static String	Graph_Label_HeartRateVariability;
+
+	public static String	Graph_Label_HeartRateVariability_Unit;
 	public static String		Graph_Label_History;
 	public static String		Graph_Label_Pace;
 	public static String		Graph_Label_Power;

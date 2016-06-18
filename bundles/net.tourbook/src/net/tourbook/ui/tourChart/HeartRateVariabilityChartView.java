@@ -29,19 +29,23 @@ import net.tourbook.common.CommonActivator;
 import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.data.TourData;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.statistic.ActionChartOptions;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.UI;
 
-import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
@@ -53,37 +57,66 @@ import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
 /**
- * Show selected tours in a HRV chart
+ * Show selected tours in a Heart rate variability (HRV) chart
  */
 public class HeartRateVariabilityChartView extends ViewPart {
 
-	public static final String		ID					= "net.tourbook.ui.tourChart.HeartRateVariabilityChartView";	//$NON-NLS-1$
+	public static final String		ID										= "net.tourbook.ui.tourChart.HeartRateVariabilityChartView";			//$NON-NLS-1$
 
-	private static final int		ADJUST_PULSE_VALUE	= 5;
+	private static final String		GRAPH_LABEL_HEART_RATE_VARIABILITY		= net.tourbook.common.Messages.Graph_Label_HeartRateVariability;
+	private static final String		GRAPH_LABEL_HEART_RATE_VARIABILITY_UNIT	= net.tourbook.common.Messages.Graph_Label_HeartRateVariability_Unit;
 
-	private static final RGB		DEFAULT_RGB			= new RGB(0xd0, 0xd0, 0xd0);
+	private static final int		ADJUST_PULSE_VALUE						= 10;
 
-	private final boolean			_isOSX				= net.tourbook.common.UI.IS_OSX;
-	private final boolean			_isLinux			= net.tourbook.common.UI.IS_LINUX;
+	private final IPreferenceStore	_prefStore								= TourbookPlugin.getPrefStore();
+	private final IPreferenceStore	_commonPrefStore						= CommonActivator.getPrefStore();
 
-	private final IPreferenceStore	_commonPrefStore	= CommonActivator.getPrefStore();
-	private final IDialogSettings	_state				= TourbookPlugin.getState(ID);
-
+	private IPropertyChangeListener	_prefChangeListener;
 	private ISelectionListener		_postSelectionListener;
 	private ITourEventListener		_tourEventListener;
 
-	private PixelConverter			_pc;
+	private ArrayList<TourData>		_hrvTours;
 
+	private ActionChartOptions		_actionChartOptions;
+//	private ActionSynchChartScale	_actionSynchChartScale;
 	/*
 	 * UI controls
 	 */
 	private PageBook				_pageBook;
 	private Label					_pageNoChart;
 	private Composite				_pageHrvChart;
-
-	private ArrayList<TourData>		_hrvTours;
-
 	private Chart					_chartHRV;
+
+	private void addPrefListener() {
+
+		_prefChangeListener = new IPropertyChangeListener() {
+			@Override
+			public void propertyChange(final PropertyChangeEvent event) {
+
+				final String property = event.getProperty();
+
+				/*
+				 * set a new chart configuration when the preferences has changed
+				 */
+				if (property.equals(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE)
+						|| property.equals(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE)
+						|| property.equals(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
+						|| property.equals(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES)
+						|| property.equals(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR)
+						|| property.equals(ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR)
+				//
+				) {
+
+					UI.updateChartProperties(_chartHRV);
+
+					// grid has changed, update chart
+					updateChart_30_CurrentTours();
+				}
+			}
+		};
+
+		_prefStore.addPropertyChangeListener(_prefChangeListener);
+	}
 
 	/**
 	 * listen for events when a tour is selected
@@ -113,6 +146,12 @@ public class HeartRateVariabilityChartView extends ViewPart {
 		}
 
 		_pageBook.showPage(_pageNoChart);
+	}
+
+	private void createActions() {
+
+		_actionChartOptions = new ActionChartOptions(_pageBook);
+//		_actionSynchChartScale = new ActionSynchChartScale(this);
 	}
 
 	/**
@@ -149,7 +188,7 @@ public class HeartRateVariabilityChartView extends ViewPart {
 		// display error when required data are not available
 		if (validDataLength == 0) {
 
-			chartDataModel.setErrorMessage(Messages.Conconi_Chart_InvalidData);
+			chartDataModel.setErrorMessage(Messages.HRV_Chart_InvalidData);
 
 			return chartDataModel;
 		}
@@ -207,32 +246,29 @@ public class HeartRateVariabilityChartView extends ViewPart {
 		}
 
 		/*
-		 * RR
+		 * X axis: RR
 		 */
 		final ChartDataXSerie xDataRR0 = new ChartDataXSerie(rr0Series);
-		xDataRR0.setLabel(net.tourbook.common.Messages.Graph_Label_Power);
-		xDataRR0.setUnitLabel(net.tourbook.common.Messages.Graph_Label_Power_Unit);
+		xDataRR0.setLabel(GRAPH_LABEL_HEART_RATE_VARIABILITY);
+		xDataRR0.setUnitLabel(GRAPH_LABEL_HEART_RATE_VARIABILITY_UNIT);
+		xDataRR0.setXAxisStartValue(xDataRR0.getVisibleMinValue() - ADJUST_PULSE_VALUE);
+
+		chartDataModel.setXData(xDataRR0);
 
 		/*
-		 * RR +1
+		 * Y axis: RR +1
 		 */
 		final ChartDataYSerie yDataRR1 = new ChartDataYSerie(ChartType.XY_SCATTER, rr1Series);
-		yDataRR1.setYTitle(net.tourbook.common.Messages.Graph_Label_Heartbeat);
-		yDataRR1.setUnitLabel(net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit);
+		yDataRR1.setYTitle(GRAPH_LABEL_HEART_RATE_VARIABILITY);
+		yDataRR1.setUnitLabel(GRAPH_LABEL_HEART_RATE_VARIABILITY_UNIT);
 		yDataRR1.setDefaultRGB(rgbPrefLine);
 		yDataRR1.setRgbLine(rgbLine);
 		yDataRR1.setRgbDark(rgbDark);
 		yDataRR1.setRgbBright(rgbBright);
 
-		//adjust min/max values that the chart do not stick to a border
-		xDataRR0.setVisibleMinValueForced(xDataRR0.getVisibleMinValue() - ADJUST_PULSE_VALUE);
-		xDataRR0.setVisibleMaxValueForced(xDataRR0.getVisibleMaxValue() + ADJUST_PULSE_VALUE);
-
 		yDataRR1.setVisibleMinValueForced(yDataRR1.getVisibleMinValue() - ADJUST_PULSE_VALUE);
 		yDataRR1.setVisibleMaxValueForced(yDataRR1.getVisibleMaxValue() + ADJUST_PULSE_VALUE);
 
-		// setup chart data model
-		chartDataModel.setXData(xDataRR0);
 		chartDataModel.addYData(yDataRR1);
 
 		return chartDataModel;
@@ -243,17 +279,19 @@ public class HeartRateVariabilityChartView extends ViewPart {
 
 		createUI(parent);
 
+		createActions();
+		fillToolbar();
+
 		restoreState();
 
 		addSelectionListener();
+		addPrefListener();
 
 		// show hrv chart from selection service
 		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
 	}
 
 	private void createUI(final Composite parent) {
-
-		_pc = new PixelConverter(parent);
 
 		_pageBook = new PageBook(parent, SWT.NONE);
 
@@ -271,6 +309,8 @@ public class HeartRateVariabilityChartView extends ViewPart {
 		{
 			_chartHRV = new Chart(_pageHrvChart, SWT.FLAT);
 			GridDataFactory.fillDefaults().grab(true, true).applyTo(_chartHRV);
+
+			UI.updateChartProperties(_chartHRV);
 		}
 	}
 
@@ -281,6 +321,22 @@ public class HeartRateVariabilityChartView extends ViewPart {
 		TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
 		super.dispose();
+	}
+
+	/**
+	 * Each statistic has it's own toolbar
+	 */
+	private void fillToolbar() {
+
+		// update view toolbar
+		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
+		tbm.removeAll();
+
+//		tbm.add(_actionSynchChartScale);
+		tbm.add(_actionChartOptions);
+
+		// update toolbar to show added items
+		tbm.update(true);
 	}
 
 	private void onSelectionChanged(final ISelection selection) {
@@ -338,6 +394,7 @@ public class HeartRateVariabilityChartView extends ViewPart {
 	}
 
 	private void updateChart_12(final ArrayList<Long> tourIds) {
+
 		updateChart_22(TourManager.getInstance().getTourData(tourIds));
 	}
 
@@ -370,7 +427,7 @@ public class HeartRateVariabilityChartView extends ViewPart {
 
 		_hrvTours = tourDataList;
 
-		updateChart_30_NewTour();
+		updateChart_30_CurrentTours();
 
 		_pageBook.showPage(_pageHrvChart);
 
@@ -379,7 +436,7 @@ public class HeartRateVariabilityChartView extends ViewPart {
 
 	/**
 	 */
-	private void updateChart_30_NewTour() {
+	private void updateChart_30_CurrentTours() {
 
 		if (_hrvTours == null) {
 			_pageBook.showPage(_pageNoChart);

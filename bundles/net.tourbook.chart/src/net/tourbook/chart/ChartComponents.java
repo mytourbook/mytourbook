@@ -350,13 +350,14 @@ public class ChartComponents extends Composite {
 
 		final ChartDataXSerie xData = drawingData.getXData();
 
+		final double graphMinValue = xData.getXAxisStartValue();
 		final double graphMaxValue = xData.getOriginalMaxValue();
+		final double graphRange = graphMaxValue - graphMinValue;
+
 		final long devVirtualGraphWidth = componentGraph.getXXDevGraphWidth();
+		final double scaleX = (devVirtualGraphWidth) / graphRange;
 
 		drawingData.devVirtualGraphWidth = devVirtualGraphWidth;
-
-//		final double scaleX = ((double) devVirtualGraphWidth - 1) / graphMaxValue;
-		final double scaleX = (devVirtualGraphWidth) / graphMaxValue;
 		drawingData.setScaleX(scaleX);
 
 		/*
@@ -366,7 +367,7 @@ public class ChartComponents extends Composite {
 		final long defaultUnitCount = devVirtualGraphWidth / _chart.gridHorizontalDistance;
 
 		// unit raw value (not yet rounded) is the number in data values for one unit
-		final double graphDefaultUnit = graphMaxValue / Math.max(1, defaultUnitCount);
+		final double graphDefaultUnit = graphRange / Math.max(1, defaultUnitCount);
 
 		final int unitType = xData.getAxisUnit();
 		switch (unitType) {
@@ -429,7 +430,7 @@ public class ChartComponents extends Composite {
 			 */
 
 			// get the unitOffset when a startValue is set
-			final double xStartValue = xData.getStartValue();
+			final double xStartValue = xData.getUnitStartValue();
 			double unitOffset = 0;
 			if (xStartValue != 0) {
 				unitOffset = xStartValue % graphUnit;
@@ -475,12 +476,6 @@ public class ChartComponents extends Composite {
 					unitLabelValue = unitLabelValue % DAY_IN_SECONDS;
 				}
 
-//				String unitLabel = net.tourbook.chart.Util.formatValue(
-//						(float) unitLabelValue,
-//						unitType,
-//						valueDivisor,
-//						true);
-
 				final int valueDecimals = 3;
 				final String unitLabel = net.tourbook.chart.Util.formatNumber(
 						unitLabelValue,
@@ -493,7 +488,7 @@ public class ChartComponents extends Composite {
 				xUnits.add(new ChartUnit(unitPos, unitLabel, isMajorValue));
 
 				// check for an infinity loop
-				if (graphValue == graphMaxValue || loopCounter++ > 10000) {
+				if (graphValue >= graphMaxValue || loopCounter++ > 10000) {
 					break;
 				}
 

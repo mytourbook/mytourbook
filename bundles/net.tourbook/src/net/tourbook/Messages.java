@@ -715,6 +715,8 @@ public class Messages extends NLS {
 	public static String		HRMaxFormula_Name_HRmax_220_age;
 	public static String		HRMaxFormula_Name_Manual;
 
+	public static String		HRV_Chart_InvalidData;
+
 	public static String		Image__App_Add;
 	public static String		Image__App_Add_2x;
 	public static String		Image__App_Cancel;

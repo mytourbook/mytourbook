@@ -1077,7 +1077,11 @@ public class UI {
 	 */
 	public static void updateChartProperties(final Chart chart) {
 
-		final IPreferenceStore prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+		if (chart == null) {
+			return;
+		}
+
+		final IPreferenceStore prefStore = TourbookPlugin.getPrefStore();
 
 		chart.updateProperties(
 				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),

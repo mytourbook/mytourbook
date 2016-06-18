@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -30,10 +30,15 @@ public class ChartDataXSerie extends ChartDataSerie {
 	double[][]						_highValuesDouble;
 
 	/**
-	 * start value for the serie data, this is use to set the start point for time data to the
-	 * starting time
+	 * Start value for the serie data, this is use to set the start point for time data to the
+	 * starting time other than 0.
 	 */
-	private double					_startValue				= 0;
+	private double					_unitStartValue;
+
+	/**
+	 * Start value for the x-axis
+	 */
+	private double					_xAxisStart;
 
 	/**
 	 * index in the x-data at which the graph is painted in the marker color, <code>-1</code>
@@ -138,13 +143,6 @@ public class ChartDataXSerie extends ChartDataSerie {
 	}
 
 	/**
-	 * @return Returns the startValue.
-	 */
-	public double getStartValue() {
-		return _startValue;
-	}
-
-	/**
 	 * @return Returns the xMarkerEndIndex.
 	 */
 	public int getSynchMarkerEndIndex() {
@@ -156,6 +154,17 @@ public class ChartDataXSerie extends ChartDataSerie {
 	 */
 	public int getSynchMarkerStartIndex() {
 		return _synchMarkerStartIndex;
+	}
+
+	/**
+	 * @return Returns the startValue.
+	 */
+	public double getUnitStartValue() {
+		return _unitStartValue;
+	}
+
+	public double getXAxisStartValue() {
+		return _xAxisStart;
 	}
 
 	public boolean isTimeSerieWithTimeZoneAdjustment() {
@@ -251,14 +260,6 @@ public class ChartDataXSerie extends ChartDataSerie {
 	}
 
 	/**
-	 * @param startValue
-	 *            The startValue to set.
-	 */
-	public void setStartValue(final double startValue) {
-		_startValue = startValue;
-	}
-
-	/**
 	 * set the start/end value index for the marker which is displayed in a different color, by
 	 * default the synch marker is disabled
 	 * 
@@ -268,6 +269,18 @@ public class ChartDataXSerie extends ChartDataSerie {
 	public void setSynchMarkerValueIndex(final int startIndex, final int endIndex) {
 		_synchMarkerStartIndex = startIndex;
 		_synchMarkerEndIndex = endIndex;
+	}
+
+	/**
+	 * @param startValue
+	 *            The startValue to set.
+	 */
+	public void setUnitStartValue(final double startValue) {
+		_unitStartValue = startValue;
+	}
+
+	public void setXAxisStartValue(final double xAxisStart) {
+		_xAxisStart = xAxisStart;
 	}
 
 	@Override
