@@ -93,6 +93,7 @@ public class RawDataManager {
 	private static final String				LOG_REIMPORT_ONLY_ALTITUDE			= Messages.Log_Reimport_Only_Altitude;
 	private static final String				LOG_REIMPORT_ONLY_GEAR				= Messages.Log_Reimport_Only_Gear;
 	private static final String				LOG_REIMPORT_ONLY_POWER_SPEED		= Messages.Log_Reimport_Only_PowerSpeed;
+	private static final String				LOG_REIMPORT_ONLY_POWER_PULSE		= Messages.Log_Reimport_Only_PowerPulse;
 	private static final String				LOG_REIMPORT_ONLY_MARKER			= Messages.Log_Reimport_Only_TourMarker;
 	private static final String				LOG_REIMPORT_ONLY_TEMPERATURE		= Messages.Log_Reimport_Only_Temperature;
 	private static final String				LOG_REIMPORT_TOUR					= Messages.Log_Reimport_Tour;
@@ -188,6 +189,7 @@ public class RawDataManager {
 		OnlyAltitudeValues, //
 		OnlyGearValues, //
 		OnlyPowerAndSpeedValues, //
+		OnlyPowerAndPulseValues, //
 		OnlyTourMarker, //
 		OnlyTemperatureValues, //
 		Tour, //
@@ -489,6 +491,19 @@ public class RawDataManager {
 
 				TourLogManager.addLog(TourLogState.DEFAULT,//
 						LOG_REIMPORT_ONLY_GEAR,
+						TourLogView.CSS_LOG_TITLE);
+
+				return true;
+			}
+
+		} else if (reimportTour == ReImport.OnlyPowerAndPulseValues) {
+
+			if (actionReimportTour_12_ConfirmDialog(
+					ITourbookPreferences.TOGGLE_STATE_REIMPORT_POWER_AND_PULSE_VALUES,
+					Messages.Import_Data_Dialog_ConfirmReimportPowerAndPulseValues_Message)) {
+
+				TourLogManager.addLog(TourLogState.DEFAULT,//
+						LOG_REIMPORT_ONLY_POWER_PULSE,
 						TourLogView.CSS_LOG_TITLE);
 
 				return true;
@@ -837,6 +852,7 @@ public class RawDataManager {
 			} else if (reimportId == ReImport.AllTimeSlices
 					|| reimportId == ReImport.OnlyAltitudeValues
 					|| reimportId == ReImport.OnlyGearValues
+					|| reimportId == ReImport.OnlyPowerAndPulseValues
 					|| reimportId == ReImport.OnlyPowerAndSpeedValues
 					|| reimportId == ReImport.OnlyTemperatureValues) {
 
@@ -894,12 +910,14 @@ public class RawDataManager {
 													final TourData oldTourData,
 													final TourData reimportedTourData) {
 
+		// ALTITUDE
 		if (reimportId == ReImport.AllTimeSlices || reimportId == ReImport.OnlyAltitudeValues) {
 
 			// reimport altitude only
 			oldTourData.altitudeSerie = reimportedTourData.altitudeSerie;
 		}
 
+		// GEAR
 		if (reimportId == ReImport.AllTimeSlices || reimportId == ReImport.OnlyGearValues) {
 
 			// reimport gear only
@@ -908,7 +926,10 @@ public class RawDataManager {
 			oldTourData.setRearShiftCount(reimportedTourData.getRearShiftCount());
 		}
 
-		if (reimportId == ReImport.AllTimeSlices || reimportId == ReImport.OnlyPowerAndSpeedValues) {
+		// POWER
+		if (reimportId == ReImport.AllTimeSlices
+				|| reimportId == ReImport.OnlyPowerAndPulseValues
+				|| reimportId == ReImport.OnlyPowerAndSpeedValues) {
 
 			oldTourData.setCalories(reimportedTourData.getCalories());
 
@@ -938,6 +959,21 @@ public class RawDataManager {
 				oldTourData.setPower_AvgRightTorqueEffectiveness(	reimportedTourData.getPower_AvgRightTorqueEffectiveness());
 				//SET_FORMATTING_ON
 			}
+		}
+
+		// PULSE
+		if (reimportId == ReImport.AllTimeSlices || reimportId == ReImport.OnlyPowerAndPulseValues) {
+
+			// reimport pulse
+
+			oldTourData.pulseSerie = reimportedTourData.pulseSerie;
+			oldTourData.pulseTimeSerie = reimportedTourData.pulseTimeSerie;
+		}
+
+		// SPEED
+		if (reimportId == ReImport.AllTimeSlices || reimportId == ReImport.OnlyPowerAndSpeedValues) {
+
+			// reimport speed
 
 			final boolean isDeviceSpeed = reimportedTourData.isSpeedSerieFromDevice();
 			if (isDeviceSpeed) {
@@ -948,12 +984,15 @@ public class RawDataManager {
 			}
 		}
 
+		// TEMPERATURE
 		if (reimportId == ReImport.AllTimeSlices || reimportId == ReImport.OnlyTemperatureValues) {
 
 			// reimport temperature only
+
 			oldTourData.temperatureSerie = reimportedTourData.temperatureSerie;
 		}
 
+		// ALL
 		if (reimportId == ReImport.AllTimeSlices) {
 
 			// reimport all other data series
@@ -967,7 +1006,6 @@ public class RawDataManager {
 			oldTourData.distanceSerie = reimportedTourData.distanceSerie;
 			oldTourData.latitudeSerie = reimportedTourData.latitudeSerie;
 			oldTourData.longitudeSerie = reimportedTourData.longitudeSerie;
-			oldTourData.pulseSerie = reimportedTourData.pulseSerie;
 			oldTourData.timeSerie = reimportedTourData.timeSerie;
 		}
 	}
