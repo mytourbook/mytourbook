@@ -27,7 +27,9 @@ Set version number / year
 	- "net.tourbook.application.ApplicationVersion"
 	- Replace text (Ctrl-H) "x.y.0-SNAPSHOT" to "a.b.0-SNAPSHOT" in all "pom*.xml"
 	- Replace text (Ctrl-H) "x.y.0.qualifier" to "a.b.0.qualifier" in all other files
-	- Replace text (Ctrl-H) "x.y.z" to "a.b.c" in these files
+	
+	- Replace text (Ctrl-H) "x.y.z" to "a.b.c" in these files BUT ONLY WHEN A MAJOR RELEASE IS CREATED
+	  DON'T MODIFY WHEN AN UPDATE SITE IS CREATED
 
 		"feature.xml" in "feature.net.tourbook.app"
 		"feature.xml" in "feature.net.tourbook.app.nl" 
@@ -62,7 +64,7 @@ Copy/Merge app files to build folder
 	Run ant script "CREATE_MT_BuildFiles.xml" in project "build.net.tourbook"
 
 
-Create Version
+Build Product
 --------------
 	Open cmd
 		- Select folder "C:\DAT\MT\mytourbook"
@@ -70,7 +72,7 @@ Create Version
 		- Run "mvn verify -P build-release -X --log-file ../log.txt"
 
 
-Create Update site
+Build Update site
 ------------------
 	Open cmd
 		- Select folder "C:\DAT\MT\mytourbook"

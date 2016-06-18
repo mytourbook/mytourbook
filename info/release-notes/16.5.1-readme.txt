@@ -1,0 +1,12 @@
+Version 16.5.1                                             1?. June 2016
+
+  
+BUGFIX 	
+======
+
+* Tagging view
+  - Time columns show the value in a wrong format
+
+* Tourbook view
+  - When a tour is deleted, any opened views are still showing the 
+    deleted tour
