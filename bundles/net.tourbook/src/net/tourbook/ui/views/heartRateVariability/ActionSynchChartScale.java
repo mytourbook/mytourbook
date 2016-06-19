@@ -13,23 +13,32 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.views;
+package net.tourbook.ui.views.heartRateVariability;
 
-import net.tourbook.common.util.Util;
-import net.tourbook.ui.tourChart.HeartRateVariabilityChartView;
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.ui.UI;
 
-import org.eclipse.core.commands.AbstractHandler;
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.jface.action.Action;
 
-public class ActionHandler_OpenView_HeartRateVariabilityChart extends AbstractHandler {
+public class ActionSynchChartScale extends Action {
 
-	@Override
-	public Object execute(final ExecutionEvent event) throws ExecutionException {
+	private HeartRateVariabilityView	_hrvView;
 
-		Util.showView(HeartRateVariabilityChartView.ID, true);
+	public ActionSynchChartScale(final HeartRateVariabilityView hrvView) {
 
-		return null;
+		super(UI.EMPTY_STRING, AS_CHECK_BOX);
+
+		_hrvView = hrvView;
+
+		setToolTipText(Messages.HRV_View_Action_SynchChartScale);
+
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__synch_statistics));
+		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__synch_statistics_Disabled));
 	}
 
+	@Override
+	public void run() {
+		_hrvView.actionSynchChartScale();
+	}
 }

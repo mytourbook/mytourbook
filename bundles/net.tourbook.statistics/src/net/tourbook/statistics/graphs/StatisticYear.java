@@ -17,7 +17,7 @@ package net.tourbook.statistics.graphs;
 
 import java.util.ArrayList;
 
-import net.tourbook.chart.BarChartMinMaxKeeper;
+import net.tourbook.chart.MinMaxKeeper_YData;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
@@ -59,7 +59,7 @@ public abstract class StatisticYear extends TourbookStatistic {
 
 	private Chart						_chart;
 
-	private final BarChartMinMaxKeeper	_minMaxKeeper		= new BarChartMinMaxKeeper();
+	private final MinMaxKeeper_YData	_minMaxKeeper		= new MinMaxKeeper_YData();
 	private TourData_Year				_tourYearData;
 
 	private boolean						_isSynchScaleEnabled;

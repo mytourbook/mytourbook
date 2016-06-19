@@ -21,7 +21,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.chart.BarChartMinMaxKeeper;
+import net.tourbook.chart.MinMaxKeeper_YData;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
@@ -53,7 +53,7 @@ public abstract class StatisticWeek extends TourbookStatistic {
 	private static IPreferenceStore		_prefStore			= TourbookPlugin.getDefault().getPreferenceStore();
 
 	private Chart						_chart;
-	private final BarChartMinMaxKeeper	_minMaxKeeper		= new BarChartMinMaxKeeper();
+	private final MinMaxKeeper_YData	_minMaxKeeper		= new MinMaxKeeper_YData();
 
 	private TourPerson					_appPerson;
 	private TourTypeFilter				_appTourTypeFilter;

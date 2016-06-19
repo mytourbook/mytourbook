@@ -18,7 +18,7 @@ package net.tourbook.statistics.graphs;
 import java.util.ArrayList;
 
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.chart.BarChartMinMaxKeeper;
+import net.tourbook.chart.MinMaxKeeper_YData;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
@@ -61,12 +61,12 @@ public class StatisticTour_Frequency extends TourbookStatistic {
 
 	private IPropertyChangeListener		_statTourFrequency_PrefChangeListener;
 
-	private final BarChartMinMaxKeeper	_minMaxKeeperStatAltitudeCounter	= new BarChartMinMaxKeeper();
-	private final BarChartMinMaxKeeper	_minMaxKeeperStatAltitudeSum		= new BarChartMinMaxKeeper();
-	private final BarChartMinMaxKeeper	_minMaxKeeperStatDistanceCounter	= new BarChartMinMaxKeeper();
-	private final BarChartMinMaxKeeper	_minMaxKeeperStatDistanceSum		= new BarChartMinMaxKeeper();
-	private final BarChartMinMaxKeeper	_minMaxKeeperStatDurationCounter	= new BarChartMinMaxKeeper();
-	private final BarChartMinMaxKeeper	_minMaxKeeperStatDurationSum		= new BarChartMinMaxKeeper();
+	private final MinMaxKeeper_YData	_minMaxKeeperStatAltitudeCounter	= new MinMaxKeeper_YData();
+	private final MinMaxKeeper_YData	_minMaxKeeperStatAltitudeSum		= new MinMaxKeeper_YData();
+	private final MinMaxKeeper_YData	_minMaxKeeperStatDistanceCounter	= new MinMaxKeeper_YData();
+	private final MinMaxKeeper_YData	_minMaxKeeperStatDistanceSum		= new MinMaxKeeper_YData();
+	private final MinMaxKeeper_YData	_minMaxKeeperStatDurationCounter	= new MinMaxKeeper_YData();
+	private final MinMaxKeeper_YData	_minMaxKeeperStatDurationSum		= new MinMaxKeeper_YData();
 
 	private int[]						_statDistanceUnits;
 	private int[]						_statAltitudeUnits;
@@ -628,7 +628,7 @@ public class StatisticTour_Frequency extends TourbookStatistic {
 	}
 
 	private void updateChartAltitude(	final Chart chart,
-										final BarChartMinMaxKeeper statAltitudeMinMaxKeeper,
+										final MinMaxKeeper_YData statAltitudeMinMaxKeeper,
 										final int[][] lowValues,
 										final int[][] highValues,
 										final int[][] colorIndex,
@@ -685,7 +685,7 @@ public class StatisticTour_Frequency extends TourbookStatistic {
 	 * @param title
 	 */
 	private void updateChartDistance(	final Chart statDistanceChart,
-										final BarChartMinMaxKeeper statDistanceMinMaxKeeper,
+										final MinMaxKeeper_YData statDistanceMinMaxKeeper,
 										final int[][] lowValues,
 										final int[][] highValues,
 										final int[][] colorIndex,
@@ -734,7 +734,7 @@ public class StatisticTour_Frequency extends TourbookStatistic {
 	}
 
 	private void updateChartTime(	final Chart statDurationChart,
-									final BarChartMinMaxKeeper statDurationMinMaxKeeper,
+									final MinMaxKeeper_YData statDurationMinMaxKeeper,
 									final int[][] lowValues,
 									final int[][] highValues,
 									final int[][] colorIndex,

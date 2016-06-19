@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -869,9 +869,9 @@ public class Chart extends ViewForm {
 	}
 
 	ChartMouseEvent onExternalMouseDown(final long eventTime,
-											final int devXMouse,
-											final int devYMouse,
-											final int stateMask) {
+										final int devXMouse,
+										final int devYMouse,
+										final int stateMask) {
 
 		final ChartMouseEvent event = new ChartMouseEvent(Chart.MouseDown, eventTime, devXMouse, devYMouse, stateMask);
 
@@ -1308,10 +1308,10 @@ public class Chart extends ViewForm {
 	 * 
 	 * @param chartDataModel
 	 * @param isResetSelection
-	 *            <code>true</code> to reset the last selection in the chart
+	 *            <code>true</code> will reset the last selection in the chart.
 	 * @param isShowAllData
-	 *            set <code>true</code> to show the entire data in the chart, otherwise the min max
-	 *            values will be kept
+	 *            When <code>true</code> then the entire data in the chart is displayed, otherwise
+	 *            the min max values will be kept.
 	 */
 	public void updateChart(final ChartDataModel chartDataModel,
 							final boolean isResetSelection,

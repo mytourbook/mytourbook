@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import net.tourbook.chart.BarChartMinMaxKeeper;
+import net.tourbook.chart.MinMaxKeeper_YData;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataXSerie;
@@ -79,7 +79,7 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
 
 	private TourData_Time				_tourTimeData;
 
-	private final BarChartMinMaxKeeper	_minMaxKeeper				= new BarChartMinMaxKeeper();
+	private final MinMaxKeeper_YData	_minMaxKeeper				= new MinMaxKeeper_YData();
 	private boolean						_ifIsSynchScaleEnabled;
 
 	private IPostSelectionProvider		_postSelectionProvider;

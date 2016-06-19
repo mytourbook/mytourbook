@@ -41,6 +41,11 @@ public class ChartDataXSerie extends ChartDataSerie {
 	private double					_xAxisStart;
 
 	/**
+	 * End value for the x-axis or {@link Double#MIN_VALUE} when not set.
+	 */
+	private double					_xAxisEnd				= Double.MIN_VALUE;	;
+
+	/**
 	 * index in the x-data at which the graph is painted in the marker color, <code>-1</code>
 	 * disables the synch marker
 	 */
@@ -163,6 +168,16 @@ public class ChartDataXSerie extends ChartDataSerie {
 		return _unitStartValue;
 	}
 
+	/**
+	 * @return Returns the end value for the x-axis or {@link Double#MIN_VALUE} when not set
+	 */
+	public double getXAxisEndValue() {
+		return _xAxisEnd;
+	}
+
+	/**
+	 * @return Returns the start value for the x-axis
+	 */
 	public double getXAxisStartValue() {
 		return _xAxisStart;
 	}
@@ -277,6 +292,10 @@ public class ChartDataXSerie extends ChartDataSerie {
 	 */
 	public void setUnitStartValue(final double startValue) {
 		_unitStartValue = startValue;
+	}
+
+	public void setXAxisEndValue(final double xAxisEnd) {
+		_xAxisEnd = xAxisEnd;
 	}
 
 	public void setXAxisStartValue(final double xAxisStart) {

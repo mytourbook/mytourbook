@@ -351,7 +351,11 @@ public class ChartComponents extends Composite {
 		final ChartDataXSerie xData = drawingData.getXData();
 
 		final double graphMinValue = xData.getXAxisStartValue();
-		final double graphMaxValue = xData.getOriginalMaxValue();
+
+		final double graphOriginalMaxValue = xData.getOriginalMaxValue();
+		final double xAxisEndValue = xData.getXAxisEndValue();
+		final double graphMaxValue = xAxisEndValue == Double.MIN_VALUE ? xData.getOriginalMaxValue() : xAxisEndValue;
+
 		final double graphRange = graphMaxValue - graphMinValue;
 
 		final long devVirtualGraphWidth = componentGraph.getXXDevGraphWidth();
@@ -488,7 +492,7 @@ public class ChartComponents extends Composite {
 				xUnits.add(new ChartUnit(unitPos, unitLabel, isMajorValue));
 
 				// check for an infinity loop
-				if (graphValue >= graphMaxValue || loopCounter++ > 10000) {
+				if (graphValue >= graphOriginalMaxValue || loopCounter++ > 10000) {
 					break;
 				}
 

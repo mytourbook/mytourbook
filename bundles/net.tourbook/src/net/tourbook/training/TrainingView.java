@@ -21,7 +21,7 @@ import java.util.Collections;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.chart.BarChartMinMaxKeeper;
+import net.tourbook.chart.MinMaxKeeper_YData;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
@@ -141,7 +141,7 @@ public class TrainingView extends ViewPart {
 	private double[]					_xSeriePulse;
 
 	private ArrayList<TourPersonHRZone>	_personHrZones							= new ArrayList<TourPersonHRZone>();
-	private final BarChartMinMaxKeeper	_minMaxKeeper							= new BarChartMinMaxKeeper();
+	private final MinMaxKeeper_YData	_minMaxKeeper							= new MinMaxKeeper_YData();
 
 	private final NumberFormat			_nf1									= NumberFormat.getNumberInstance();
 	{

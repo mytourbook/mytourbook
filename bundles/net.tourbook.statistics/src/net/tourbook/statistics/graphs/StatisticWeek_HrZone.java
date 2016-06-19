@@ -18,7 +18,7 @@ package net.tourbook.statistics.graphs;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import net.tourbook.chart.BarChartMinMaxKeeper;
+import net.tourbook.chart.MinMaxKeeper_YData;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
@@ -59,7 +59,7 @@ public class StatisticWeek_HrZone extends TourbookStatistic {
 
 	private IChartInfoProvider			_tooltipProvider;
 
-	private final BarChartMinMaxKeeper	_minMaxKeeper							= new BarChartMinMaxKeeper();
+	private final MinMaxKeeper_YData	_minMaxKeeper							= new MinMaxKeeper_YData();
 	private boolean						_isSynchScaleEnabled;
 
 	private TourData_WeekHrZones		_tourWeekData;

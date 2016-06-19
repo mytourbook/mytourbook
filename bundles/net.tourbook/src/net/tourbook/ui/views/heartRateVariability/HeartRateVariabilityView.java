@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.tourChart;
+package net.tourbook.ui.views.heartRateVariability;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,6 +25,8 @@ import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartType;
+import net.tourbook.chart.MinMaxKeeper_XData;
+import net.tourbook.chart.MinMaxKeeper_YData;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.preferences.ICommonPreferences;
@@ -59,33 +61,53 @@ import org.eclipse.ui.part.ViewPart;
 /**
  * Show selected tours in a Heart rate variability (HRV) chart
  */
-public class HeartRateVariabilityChartView extends ViewPart {
+public class HeartRateVariabilityView extends ViewPart {
 
-	public static final String		ID										= "net.tourbook.ui.tourChart.HeartRateVariabilityChartView";			//$NON-NLS-1$
+	public static final String			ID										= "net.tourbook.ui.views.heartRateVariability.HeartRateVariabilityView";	//$NON-NLS-1$
 
-	private static final String		GRAPH_LABEL_HEART_RATE_VARIABILITY		= net.tourbook.common.Messages.Graph_Label_HeartRateVariability;
-	private static final String		GRAPH_LABEL_HEART_RATE_VARIABILITY_UNIT	= net.tourbook.common.Messages.Graph_Label_HeartRateVariability_Unit;
+	private static final String			GRAPH_LABEL_HEART_RATE_VARIABILITY		= net.tourbook.common.Messages.Graph_Label_HeartRateVariability;
+	private static final String			GRAPH_LABEL_HEART_RATE_VARIABILITY_UNIT	= net.tourbook.common.Messages.Graph_Label_HeartRateVariability_Unit;
 
-	private static final int		ADJUST_PULSE_VALUE						= 10;
+	private static final int			ADJUST_PULSE_VALUE						= 10;
 
-	private final IPreferenceStore	_prefStore								= TourbookPlugin.getPrefStore();
-	private final IPreferenceStore	_commonPrefStore						= CommonActivator.getPrefStore();
+	private final IPreferenceStore		_prefStore								= TourbookPlugin.getPrefStore();
+	private final IPreferenceStore		_commonPrefStore						= CommonActivator.getPrefStore();
 
-	private IPropertyChangeListener	_prefChangeListener;
-	private ISelectionListener		_postSelectionListener;
-	private ITourEventListener		_tourEventListener;
+	private IPropertyChangeListener		_prefChangeListener;
+	private ISelectionListener			_postSelectionListener;
+	private ITourEventListener			_tourEventListener;
 
-	private ArrayList<TourData>		_hrvTours;
+	private ArrayList<TourData>			_hrvTours;
 
-	private ActionChartOptions		_actionChartOptions;
-//	private ActionSynchChartScale	_actionSynchChartScale;
+	private ActionChartOptions			_actionChartOptions;
+	private ActionSynchChartScale		_actionSynchChartScaling;
+
+	private boolean						_isSynchChartScaling;
+	private final MinMaxKeeper_XData	_xMinMaxKeeper							= new MinMaxKeeper_XData();
+	private final MinMaxKeeper_YData	_yMinMaxKeeper							= new MinMaxKeeper_YData();
+
 	/*
 	 * UI controls
 	 */
-	private PageBook				_pageBook;
-	private Label					_pageNoChart;
-	private Composite				_pageHrvChart;
-	private Chart					_chartHRV;
+	private PageBook					_pageBook;
+	private Label						_pageNoTour;
+	private Composite					_pageHrvChart;
+	private Chart						_chartHRV;
+
+	private Label						_pageInvalidData;
+
+	void actionSynchChartScale() {
+
+		_isSynchChartScaling = _actionSynchChartScaling.isChecked();
+
+		if (_isSynchChartScaling == false) {
+
+			_xMinMaxKeeper.resetMinMax();
+			_yMinMaxKeeper.resetMinMax();
+		}
+
+		updateChart_50_CurrentTours(!_isSynchChartScaling);
+	}
 
 	private void addPrefListener() {
 
@@ -110,7 +132,7 @@ public class HeartRateVariabilityChartView extends ViewPart {
 					UI.updateChartProperties(_chartHRV);
 
 					// grid has changed, update chart
-					updateChart_30_CurrentTours();
+					updateChart_50_CurrentTours(true);
 				}
 			}
 		};
@@ -127,7 +149,7 @@ public class HeartRateVariabilityChartView extends ViewPart {
 			@Override
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
-				if (part == HeartRateVariabilityChartView.this) {
+				if (part == HeartRateVariabilityView.this) {
 					return;
 				}
 
@@ -145,13 +167,13 @@ public class HeartRateVariabilityChartView extends ViewPart {
 			_chartHRV.updateChart(null, false);
 		}
 
-		_pageBook.showPage(_pageNoChart);
+		_pageBook.showPage(_pageNoTour);
 	}
 
 	private void createActions() {
 
 		_actionChartOptions = new ActionChartOptions(_pageBook);
-//		_actionSynchChartScale = new ActionSynchChartScale(this);
+		_actionSynchChartScaling = new ActionSynchChartScale(this);
 	}
 
 	/**
@@ -187,10 +209,7 @@ public class HeartRateVariabilityChartView extends ViewPart {
 
 		// display error when required data are not available
 		if (validDataLength == 0) {
-
-			chartDataModel.setErrorMessage(Messages.HRV_Chart_InvalidData);
-
-			return chartDataModel;
+			return null;
 		}
 
 		final String prefGraphName = ICommonPreferences.GRAPH_COLORS + GraphColorManager.PREF_GRAPH_HEARTBEAT + "."; //$NON-NLS-1$
@@ -252,6 +271,7 @@ public class HeartRateVariabilityChartView extends ViewPart {
 		xDataRR0.setLabel(GRAPH_LABEL_HEART_RATE_VARIABILITY);
 		xDataRR0.setUnitLabel(GRAPH_LABEL_HEART_RATE_VARIABILITY_UNIT);
 		xDataRR0.setXAxisStartValue(xDataRR0.getVisibleMinValue() - ADJUST_PULSE_VALUE);
+		xDataRR0.setXAxisEndValue(xDataRR0.getVisibleMaxValue() + ADJUST_PULSE_VALUE);
 
 		chartDataModel.setXData(xDataRR0);
 
@@ -270,6 +290,12 @@ public class HeartRateVariabilityChartView extends ViewPart {
 		yDataRR1.setVisibleMaxValueForced(yDataRR1.getVisibleMaxValue() + ADJUST_PULSE_VALUE);
 
 		chartDataModel.addYData(yDataRR1);
+
+		if (_isSynchChartScaling) {
+
+			_xMinMaxKeeper.setMinMaxValues(chartDataModel);
+			_yMinMaxKeeper.setMinMaxValues(chartDataModel);
+		}
 
 		return chartDataModel;
 	}
@@ -295,8 +321,11 @@ public class HeartRateVariabilityChartView extends ViewPart {
 
 		_pageBook = new PageBook(parent, SWT.NONE);
 
-		_pageNoChart = new Label(_pageBook, SWT.NONE);
-		_pageNoChart.setText(Messages.UI_Label_TourIsNotSelected);
+		_pageNoTour = new Label(_pageBook, SWT.WRAP);
+		_pageNoTour.setText(Messages.UI_Label_TourIsNotSelected);
+
+		_pageInvalidData = new Label(_pageBook, SWT.WRAP);
+		_pageInvalidData.setText(Messages.HRV_View_InvalidData);
 
 		createUI_10_HrvChart(_pageBook);
 	}
@@ -332,7 +361,7 @@ public class HeartRateVariabilityChartView extends ViewPart {
 		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 		tbm.removeAll();
 
-//		tbm.add(_actionSynchChartScale);
+		tbm.add(_actionSynchChartScaling);
 		tbm.add(_actionChartOptions);
 
 		// update toolbar to show added items
@@ -427,25 +456,31 @@ public class HeartRateVariabilityChartView extends ViewPart {
 
 		_hrvTours = tourDataList;
 
-		updateChart_30_CurrentTours();
-
-		_pageBook.showPage(_pageHrvChart);
+		updateChart_50_CurrentTours(true);
 
 		return;
 	}
 
 	/**
+	 * @param isShowAllData
 	 */
-	private void updateChart_30_CurrentTours() {
+	private void updateChart_50_CurrentTours(final boolean isShowAllData) {
 
 		if (_hrvTours == null) {
-			_pageBook.showPage(_pageNoChart);
+			_pageBook.showPage(_pageNoTour);
 			return;
 		}
 
 		final ChartDataModel chartDataModel = createChartDataModel(_hrvTours);
 
-		_chartHRV.updateChart(chartDataModel, true, true);
+		if (chartDataModel == null) {
+			_pageBook.showPage(_pageInvalidData);
+			return;
+		}
+
+		_chartHRV.updateChart(chartDataModel, true, isShowAllData);
+
+		_pageBook.showPage(_pageHrvChart);
 	}
 
 }

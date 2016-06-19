@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,21 +18,22 @@ package net.tourbook.chart;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class BarChartMinMaxKeeper {
+public class MinMaxKeeper_YData {
 
-	/**
+	/*
 	 * min/max values for the y-axis data
 	 */
 	private HashMap<Integer, Double>	_minValues	= new HashMap<Integer, Double>();
 	private HashMap<Integer, Double>	_maxValues	= new HashMap<Integer, Double>();
 
 	public void resetMinMax() {
+
 		_minValues.clear();
 		_maxValues.clear();
 	}
 
 	/**
-	 * save the min/max values from the chart data model
+	 * Save the min/max values from the chart data model
 	 * 
 	 * @param chartDataModel
 	 */
@@ -45,10 +46,12 @@ public class BarChartMinMaxKeeper {
 
 		final ArrayList<ChartDataYSerie> yDataSerie = chartDataModel.getYData();
 
-		// loop: save min/max values for all data series
 		Integer yDataId = 0;
+
+		// loop: save min/max values for all data series
 		for (final ChartDataSerie yData : yDataSerie) {
 			if (yData instanceof ChartDataYSerie) {
+
 				setYDataMinMaxValues((ChartDataYSerie) yData, yDataId++);
 			}
 		}

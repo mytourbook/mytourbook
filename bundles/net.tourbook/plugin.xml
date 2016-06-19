@@ -1144,7 +1144,7 @@
 		<command
 			id="command.net.tourbook.views.HeartRateVariabilityChart"
 			name="%View_Name_HeartRateVariabilityChart"
-			defaultHandler="net.tourbook.ui.views.ActionHandler_OpenView_HeartRateVariabilityChart"
+			defaultHandler="net.tourbook.ui.views.heartRateVariability.ActionHandler_OpenView_HeartRateVariability"
 		/>
 		
 		<command
@@ -1523,9 +1523,9 @@
 
 			<view
 				category="net.tourbook.category.Tools"
-				class="net.tourbook.ui.tourChart.HeartRateVariabilityChartView"
+				class="net.tourbook.ui.views.heartRateVariability.HeartRateVariabilityView"
 				icon="icons/conconi-chart.png"
-				id="net.tourbook.ui.tourChart.HeartRateVariabilityChartView"
+				id="net.tourbook.ui.views.heartRateVariability.HeartRateVariabilityView"
 				name="%View_Name_HeartRateVariabilityChart"
 			/>
 
