@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,7 +21,6 @@ import java.util.Collections;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.chart.MinMaxKeeper_YData;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
@@ -29,6 +28,7 @@ import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IBarSelectionListener;
+import net.tourbook.chart.MinMaxKeeper_YData;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.HrZoneContext;
 import net.tourbook.data.TourData;
@@ -900,11 +900,6 @@ public class TrainingView extends ViewPart {
 			}
 		};
 
-//		_chartToolTipProvider = new IChartInfoProvider() {
-//			public ChartToolTip1 getToolTipInfo(final int serieIndex, final int valueIndex) {
-//				return createToolTipInfo(valueIndex);
-//			}
-//		};
 	}
 
 	private void onModifyHrBorder() {
@@ -1246,9 +1241,9 @@ public class TrainingView extends ViewPart {
 		final int pulseRange = (int) (maxPulse - _pulseStart + 1);
 
 		_xSeriePulse = new double[pulseRange];
-		final float[] ySeriePulseTime = new float[pulseRange];
+		final float[] ySeriePulseDuration = new float[pulseRange];
 
-		final int[] colorIndex = new int[timeSerieSize];
+		final int[] colorIndex = new int[pulseRange];
 
 		final float[] zoneMinBpm = zoneMinMaxBpm.zoneMinBpm;
 		final float[] zoneMaxBpm = zoneMinMaxBpm.zoneMaxBpm;
@@ -1258,8 +1253,7 @@ public class TrainingView extends ViewPart {
 			_xSeriePulse[pulseIndex] = pulseIndex;
 
 			// set color index for each pulse value
-			zoneIndex = 0;
-			for (; zoneIndex < zoneSize; zoneIndex++) {
+			for (zoneIndex = 0; zoneIndex < zoneSize; zoneIndex++) {
 
 				final float minValue = zoneMinBpm[zoneIndex];
 				final float maxValue = zoneMaxBpm[zoneIndex];
@@ -1268,14 +1262,10 @@ public class TrainingView extends ViewPart {
 
 				if (pulse >= minValue && pulse <= maxValue) {
 
-					int colorPulseIndex = pulseIndex;
+					// pulse is in the current zone
 
-					// check array bounds
-					if (colorPulseIndex >= timeSerieSize) {
-						colorPulseIndex = timeSerieSize - 1;
-					}
+					colorIndex[pulseIndex] = zoneIndex;
 
-					colorIndex[colorPulseIndex] = zoneIndex;
 					break;
 				}
 			}
@@ -1312,7 +1302,7 @@ public class TrainingView extends ViewPart {
 
 			// check array bounds
 			if (pulseIndex >= 0 && pulseIndex < pulseRange) {
-				ySeriePulseTime[pulseIndex] += timeDiff;
+				ySeriePulseDuration[pulseIndex] += timeDiff;
 			}
 		}
 
@@ -1320,9 +1310,6 @@ public class TrainingView extends ViewPart {
 
 //		chartDataModel.setTitle(TourManager.getTourDateTimeFull(_tourData));
 		chartDataModel.setTitle(TourManager.getTourDateTimeShort(_tourData));
-
-		// set tool tip info provider
-//		chartDataModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, _chartToolTipProvider);
 
 		/*
 		 * x-axis: pulse
@@ -1341,7 +1328,7 @@ public class TrainingView extends ViewPart {
 				ChartType.BAR,
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				new float[][] { new float[pulseRange] },
-				new float[][] { ySeriePulseTime });
+				new float[][] { ySeriePulseDuration });
 
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
 		yData.setYTitle(Messages.App_Label_H_MM);
@@ -1467,7 +1454,9 @@ public class TrainingView extends ViewPart {
 			_lblTourMinMaxValue[tourZoneIndex].setText(((int) zoneMinBpm) + UI.DASH + zoneMaxBpmText);
 			_lblTourMinMaxValue[tourZoneIndex].setToolTipText(hrZoneTooltip);
 
-			_lblTourMinMaxHours[tourZoneIndex].setText(net.tourbook.common.UI.format_hh_mm((long) (zoneTime + 30)).toString());
+			_lblTourMinMaxHours[tourZoneIndex].setText(net.tourbook.common.UI
+					.format_hh_mm((long) (zoneTime + 30))
+					.toString());
 			_lblTourMinMaxHours[tourZoneIndex].setToolTipText(hrZoneTooltip);
 
 			_lblHRZoneName[tourZoneIndex].setToolTipText(hrZoneTooltip);
