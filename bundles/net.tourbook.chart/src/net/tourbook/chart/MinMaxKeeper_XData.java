@@ -23,6 +23,16 @@ public class MinMaxKeeper_XData {
 	private double	_minValue	= Double.MIN_VALUE;
 	private double	_maxValue	= Double.MIN_VALUE;
 
+	/**
+	 * This offset is used that the data have a padding to the chart border.
+	 */
+	private int		_minMaxPadding;
+
+	public MinMaxKeeper_XData(final int minMaxPadding) {
+
+		_minMaxPadding = minMaxPadding;
+	}
+
 	public void resetMinMax() {
 
 		_minValue = Double.MIN_VALUE;
@@ -70,8 +80,11 @@ public class MinMaxKeeper_XData {
 		_minValue = keeperMinValue;
 		_maxValue = keeperMaxValue;
 
-		xData.setXAxisStartValue(keeperMinValue);
-		xData.setXAxisEndValue(keeperMaxValue);
+		xData.forceXAxisMinValue(keeperMinValue - _minMaxPadding);
+		xData.forceXAxisMaxValue(keeperMaxValue + _minMaxPadding);
+
+		xData.setVisibleMinValue(keeperMinValue - _minMaxPadding);
+		xData.setVisibleMaxValue(keeperMaxValue + _minMaxPadding);
 	}
 
 }

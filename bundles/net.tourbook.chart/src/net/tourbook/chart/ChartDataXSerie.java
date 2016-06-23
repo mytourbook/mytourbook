@@ -38,12 +38,12 @@ public class ChartDataXSerie extends ChartDataSerie {
 	/**
 	 * Start value for the x-axis
 	 */
-	private double					_xAxisStart;
+	private double					_xAxisMinValueForced;
 
 	/**
 	 * End value for the x-axis or {@link Double#MIN_VALUE} when not set.
 	 */
-	private double					_xAxisEnd				= Double.MIN_VALUE;	;
+	private double					_xAxisMaxValueForced	= Double.MIN_VALUE;	;
 
 	/**
 	 * index in the x-data at which the graph is painted in the marker color, <code>-1</code>
@@ -99,6 +99,14 @@ public class ChartDataXSerie extends ChartDataSerie {
 
 	public ChartDataXSerie(final double[][] values) {
 		setMinMaxValues(values);
+	}
+
+	public void forceXAxisMaxValue(final double xAxisValue) {
+		_xAxisMaxValueForced = xAxisValue;
+	}
+
+	public void forceXAxisMinValue(final double xAxisValue) {
+		_xAxisMinValueForced = xAxisValue;
 	}
 
 	public ChartStatisticSegments getChartSegments() {
@@ -171,15 +179,15 @@ public class ChartDataXSerie extends ChartDataSerie {
 	/**
 	 * @return Returns the end value for the x-axis or {@link Double#MIN_VALUE} when not set
 	 */
-	public double getXAxisEndValue() {
-		return _xAxisEnd;
+	public double getXAxisMaxValueForced() {
+		return _xAxisMaxValueForced;
 	}
 
 	/**
 	 * @return Returns the start value for the x-axis
 	 */
-	public double getXAxisStartValue() {
-		return _xAxisStart;
+	public double getXAxisMinValueForced() {
+		return _xAxisMinValueForced;
 	}
 
 	public boolean isTimeSerieWithTimeZoneAdjustment() {
@@ -292,14 +300,6 @@ public class ChartDataXSerie extends ChartDataSerie {
 	 */
 	public void setUnitStartValue(final double startValue) {
 		_unitStartValue = startValue;
-	}
-
-	public void setXAxisEndValue(final double xAxisEnd) {
-		_xAxisEnd = xAxisEnd;
-	}
-
-	public void setXAxisStartValue(final double xAxisStart) {
-		_xAxisStart = xAxisStart;
 	}
 
 	@Override

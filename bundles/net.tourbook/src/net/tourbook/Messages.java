@@ -1483,6 +1483,8 @@ public class Messages extends NLS {
 	public static String		Slideout_ChartMarkerOptions_Label_Offset_Tooltip;
 	public static String		Slideout_ChartMarkerOptions_Label_Title;
 
+	public static String		Slideout_HVROptions_Label_Title;
+
 	public static String		Slideout_SegmenterChartOptions_Checkbox_HideSmallValues;
 	public static String		Slideout_SegmenterChartOptions_Checkbox_HideSmallValues_Tooltip;
 	public static String		Slideout_SegmenterChartOptions_Checkbox_IsShowDecimalPlaces;
@@ -1565,6 +1567,7 @@ public class Messages extends NLS {
 	public static String		Tour_Action_auto_move_sliders_when_zoomed;
 	public static String		Tour_Action_auto_zoom_to_slider_position;
 	public static String		Tour_Action_EditChartPreferences;
+	public static String		Tour_Action_EditStatisticPreferences;
 	public static String		Tour_Action_graph_altimeter_tooltip;
 	public static String		Tour_Action_graph_altitude_tooltip;
 	public static String		Tour_Action_graph_analyzer_tooltip;

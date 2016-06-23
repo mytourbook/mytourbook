@@ -406,12 +406,12 @@ public class TrainingView extends ViewPart {
 		GridLayoutFactory.fillDefaults().spacing(0, 0).numColumns(1).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
 		{
-			createUI10HeaderToolbar(container);
-			createUI12PageBook(container);
+			createUI_10_HeaderToolbar(container);
+			createUI_12_PageBook(container);
 		}
 	}
 
-	private void createUI10HeaderToolbar(final Composite parent) {
+	private void createUI_10_HeaderToolbar(final Composite parent) {
 
 		_headerToolbar = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
@@ -489,20 +489,20 @@ public class TrainingView extends ViewPart {
 		label.setText(UI.EMPTY_STRING);
 	}
 
-	private void createUI12PageBook(final Composite parent) {
+	private void createUI_12_PageBook(final Composite parent) {
 
 		_pageBookHrZones = new PageBook(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageBookHrZones);
 
-		_pageHrZones = createUI20PageHrZones(_pageBookHrZones);
-		_pageNoHrZones = createUI14PageNoHrZones(_pageBookHrZones);
+		_pageHrZones = createUI_20_PageHrZones(_pageBookHrZones);
+		_pageNoHrZones = createUI_14_PageNoHrZones(_pageBookHrZones);
 
 		_pageNoPerson = UI.createLabel(_tk, _pageBookHrZones, Messages.UI_Label_PersonIsRequired);
 		_pageNoTour = UI.createLabel(_tk, _pageBookHrZones, Messages.UI_Label_no_chart_is_selected);
 		_pageNoPulse = UI.createLabel(_tk, _pageBookHrZones, Messages.Training_View_Label_NoPulseData);
 	}
 
-	private Composite createUI14PageNoHrZones(final Composite parent) {
+	private Composite createUI_14_PageNoHrZones(final Composite parent) {
 
 		final Composite container = _tk.createComposite(parent);
 		GridDataFactory.fillDefaults().grab(true, true).align(SWT.BEGINNING, SWT.CENTER).applyTo(container);
@@ -533,7 +533,7 @@ public class TrainingView extends ViewPart {
 		return container;
 	}
 
-	private Composite createUI20PageHrZones(final Composite parent) {
+	private Composite createUI_20_PageHrZones(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
@@ -546,15 +546,16 @@ public class TrainingView extends ViewPart {
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		container.setBackground(_tk.getColors().getBackground());
 		{
-			createUI30HrZoneChart(container);
-			createUI40HrZoneImage(container);
-			createUI50HrZoneDataContainer(container);
+			// feature request to show the zone image first https://sourceforge.net/p/mytourbook/feature-requests/132/
+			createUI_40_HrZoneImage(container);
+			createUI_30_HrZoneChart(container);
+			createUI_50_HrZoneDataContainer(container);
 		}
 
 		return container;
 	}
 
-	private void createUI30HrZoneChart(final Composite parent) {
+	private void createUI_30_HrZoneChart(final Composite parent) {
 
 		/*
 		 * chart
@@ -573,7 +574,7 @@ public class TrainingView extends ViewPart {
 		});
 	}
 
-	private void createUI32HrZoneDataContainerContent() {
+	private void createUI_32_HrZoneDataContainerContent() {
 
 		// person and zones are already checked
 
@@ -590,14 +591,14 @@ public class TrainingView extends ViewPart {
 		GridLayoutFactory.fillDefaults().applyTo(_hrZoneDataContainerContent);
 //		_hrZoneDataContainerContent.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_CYAN));
 		{
-			createUI34HrZoneDataContent(_hrZoneDataContainerContent);
+			createUI_34_HrZoneDataContent(_hrZoneDataContainerContent);
 		}
 
 		// layout is necessary, dependent which other view is previously opened
 		_pageBookHrZones.layout(true, true);
 	}
 
-	private Composite createUI34HrZoneDataContent(final Composite parent) {
+	private Composite createUI_34_HrZoneDataContent(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
@@ -605,8 +606,8 @@ public class TrainingView extends ViewPart {
 				.applyTo(container);
 		GridLayoutFactory.swtDefaults().numColumns(5).applyTo(container);
 		{
-			createUI36HrZoneHeader(container);
-			createUI38HrZoneFields(container);
+			createUI_36_HrZoneHeader(container);
+			createUI_38_HrZoneFields(container);
 		}
 		_tk.adapt(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
@@ -614,7 +615,7 @@ public class TrainingView extends ViewPart {
 		return container;
 	}
 
-	private void createUI36HrZoneHeader(final Composite parent) {
+	private void createUI_36_HrZoneHeader(final Composite parent) {
 
 		/*
 		 * label: zone name
@@ -657,7 +658,7 @@ public class TrainingView extends ViewPart {
 		label = _tk.createLabel(parent, UI.EMPTY_STRING);
 	}
 
-	private void createUI38HrZoneFields(final Composite parent) {
+	private void createUI_38_HrZoneFields(final Composite parent) {
 
 		final int hrZoneSize = _personHrZones.size();
 
@@ -734,7 +735,7 @@ public class TrainingView extends ViewPart {
 		}
 	}
 
-	private void createUI40HrZoneImage(final Composite parent) {
+	private void createUI_40_HrZoneImage(final Composite parent) {
 
 		final Composite container = _tk.createComposite(parent);
 		GridDataFactory.fillDefaults().applyTo(container);
@@ -789,7 +790,7 @@ public class TrainingView extends ViewPart {
 		}
 	}
 
-	private void createUI50HrZoneDataContainer(final Composite parent) {
+	private void createUI_50_HrZoneDataContainer(final Composite parent) {
 
 		_hrZoneDataContainer = _tk.createComposite(parent);
 		GridDataFactory.fillDefaults()//
@@ -1027,6 +1028,9 @@ public class TrainingView extends ViewPart {
 	private void setChartProperties() {
 
 		UI.updateChartProperties(_chartHrTime);
+
+		// show title
+		_chartHrTime.getChartTitleSegmentConfig().isShowSegmentTitle = true;
 	}
 
 	@Override
@@ -1357,7 +1361,7 @@ public class TrainingView extends ViewPart {
 
 		// create hr zones when not yet done or disposed
 		if (_hrZoneDataContainerContent == null || _hrZoneDataContainerContent.isDisposed()) {
-			createUI32HrZoneDataContainerContent();
+			createUI_32_HrZoneDataContainerContent();
 		}
 
 		final int personZoneSize = _personHrZones.size();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -55,6 +55,8 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageStatistic extends PreferencePage implements IWorkbenchPreferencePage {
+
+	public static final String				ID			= "net.tourbook.preferences.PrefPageStatistic"; //$NON-NLS-1$
 
 	private TableViewer						_statViewer;
 

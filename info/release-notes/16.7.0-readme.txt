@@ -19,12 +19,13 @@ NEW
  
 * Statistics
 
+  - Heart Rate Variability
   - Day summary statistics
     - New graphs for average speed/pace  
     - Select visible graphs in the slideout
   - Show chart grid options in a slideout
   - Show tour frequency options in a slideout, 
-    these options are removed from the preference dialog
+    these options were removed from the preference dialog
     
 
 

@@ -2834,7 +2834,7 @@ public class TourManager {
 
 				final int minValue = _prefStore.getInt(ITourbookPreferences.GRAPH_ALTIMETER_MIN_VALUE);
 
-				yDataAltimeter.setVisibleMinValueForced(minValue + TourChart.MIN_ADJUSTMENT);
+				yDataAltimeter.forceYAxisMinValue(minValue + TourChart.MIN_ADJUSTMENT);
 			}
 
 			if (_prefStore.getBoolean(ITourbookPreferences.GRAPH_ALTIMETER_IS_MAX_ENABLED)) {
@@ -2843,7 +2843,7 @@ public class TourManager {
 
 				final double maxAdjust = 1e-2;
 				// set max value after min value, adjust max otherwise values above the max are painted
-				yDataAltimeter.setVisibleMaxValueForced(maxValue > 0 //
+				yDataAltimeter.forceYAxisMaxValue(maxValue > 0 //
 						? maxValue - maxAdjust
 						: maxValue + maxAdjust);
 			}
@@ -3480,7 +3480,7 @@ public class TourManager {
 
 		if (_prefStore.getBoolean(prefName_IsMinEnabled)) {
 
-			yData.setVisibleMinValueForced(_prefStore.getInt(prefName_MinValue) * valueMultiplier);
+			yData.forceYAxisMinValue(_prefStore.getInt(prefName_MinValue) * valueMultiplier);
 		}
 
 		// set max value after min value, adjust max otherwise values above the max are painted
@@ -3490,11 +3490,11 @@ public class TourManager {
 
 			if (maxValueAdjustment == 0) {
 
-				yData.setVisibleMaxValueForced(maxValue);
+				yData.forceYAxisMaxValue(maxValue);
 
 			} else {
 
-				yData.setVisibleMaxValueForced(maxValue > 0 //
+				yData.forceYAxisMaxValue(maxValue > 0 //
 						? maxValue - maxValueAdjustment
 						: maxValue + maxValueAdjustment);
 			}

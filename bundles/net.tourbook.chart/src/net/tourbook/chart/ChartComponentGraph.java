@@ -2074,7 +2074,7 @@ public class ChartComponentGraph extends Canvas {
 		final double devGraphWidth = graphDrawingData.devVirtualGraphWidth;
 		final boolean isCheckUnitBorderOverlap = graphDrawingData.isCheckUnitBorderOverlap();
 
-		final double xAxisStartValue = xData.getXAxisStartValue();
+		final double xAxisStartValue = xData.getXAxisMinValueForced();
 		final double scalingFactor = xData.getScalingFactor();
 		final double scalingMaxValue = xData.getScalingMaxValue();
 		final boolean isExtendedScaling = scalingFactor != 1.0;
@@ -3627,7 +3627,7 @@ public class ChartComponentGraph extends Canvas {
 		final float graphYBottom = drawingData.getGraphYBottom();
 		final double devGraphWidth = drawingData.devVirtualGraphWidth;
 
-		final double xAxisStartValue = xData.getXAxisStartValue();
+		final double xAxisStartValue = xData.getXAxisMinValueForced();
 		final double scalingFactor = xData.getScalingFactor();
 		final double scalingMaxValue = xData.getScalingMaxValue();
 		final boolean isExtendedScaling = scalingFactor != 1.0;

@@ -26,6 +26,15 @@ public class MinMaxKeeper_YData {
 	private HashMap<Integer, Double>	_minValues	= new HashMap<Integer, Double>();
 	private HashMap<Integer, Double>	_maxValues	= new HashMap<Integer, Double>();
 
+	private int							_minMaxPadding;
+
+	public MinMaxKeeper_YData() {}
+
+	public MinMaxKeeper_YData(final int minMaxPadding) {
+
+		_minMaxPadding = minMaxPadding;
+	}
+
 	public void resetMinMax() {
 
 		_minValues.clear();
@@ -93,8 +102,8 @@ public class MinMaxKeeper_YData {
 		_minValues.put(yDataId, keeperMinValue);
 		_maxValues.put(yDataId, keeperMaxValue);
 
-		yData.setVisibleMinValue(keeperMinValue);
-		yData.setVisibleMaxValue(keeperMaxValue);
+		yData.setVisibleMinValue(keeperMinValue - _minMaxPadding);
+		yData.setVisibleMaxValue(keeperMaxValue + _minMaxPadding);
 	}
 
 }

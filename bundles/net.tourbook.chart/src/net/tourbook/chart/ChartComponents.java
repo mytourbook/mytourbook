@@ -304,10 +304,11 @@ public class ChartComponents extends Composite {
 			// set chart title above the first graph
 			if (graphIndex == 1) {
 
-				graphDrawingData.setXTitle(_chartDataModel.getTitle());
+				final String title = _chartDataModel.getTitle();
+
+				graphDrawingData.setXTitle(title);
 
 				// set the chart title height and margin
-				final String title = graphDrawingData.getXTitle();
 				final ChartStatisticSegments chartSegments = xData.getChartSegments();
 
 				if (title != null && title.length() > 0 || //
@@ -350,10 +351,10 @@ public class ChartComponents extends Composite {
 
 		final ChartDataXSerie xData = drawingData.getXData();
 
-		final double graphMinValue = xData.getXAxisStartValue();
+		final double graphMinValue = xData.getXAxisMinValueForced();
 
 		final double graphOriginalMaxValue = xData.getOriginalMaxValue();
-		final double xAxisEndValue = xData.getXAxisEndValue();
+		final double xAxisEndValue = xData.getXAxisMaxValueForced();
 		final double graphMaxValue = xAxisEndValue == Double.MIN_VALUE ? xData.getOriginalMaxValue() : xAxisEndValue;
 
 		final double graphRange = graphMaxValue - graphMinValue;
@@ -492,7 +493,7 @@ public class ChartComponents extends Composite {
 				xUnits.add(new ChartUnit(unitPos, unitLabel, isMajorValue));
 
 				// check for an infinity loop
-				if (graphValue >= graphOriginalMaxValue || loopCounter++ > 10000) {
+				if (/* graphValue > graphMaxVisibleValue || */loopCounter++ > 10000) {
 					break;
 				}
 

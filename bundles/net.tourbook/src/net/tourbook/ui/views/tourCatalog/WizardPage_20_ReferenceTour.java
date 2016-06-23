@@ -536,6 +536,9 @@ public class WizardPage_20_ReferenceTour extends WizardPage {
 
 			UI.updateChartProperties(_refTourChart);
 
+			// show title
+			_refTourChart.getChartTitleSegmentConfig().isShowSegmentTitle = true;
+
 			_refTourChart.updateChart(chartDataModel, false);
 
 			_pageBook.showPage(_refTourChart);

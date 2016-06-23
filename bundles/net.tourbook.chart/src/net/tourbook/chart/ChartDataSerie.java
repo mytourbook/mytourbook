@@ -46,7 +46,7 @@ public abstract class ChartDataSerie {
 	/**
 	 * divisor for highValues
 	 */
-	private int						_valueDivisor							= 1;
+	protected int					_valueDivisor							= 1;
 
 	/**
 	 * Number of digits which are displayed.
@@ -79,13 +79,16 @@ public abstract class ChartDataSerie {
 	double							_avgPositiveValue;
 
 	/**
-	 * when <code>true</code> the minimum value is forced when the dataserie is displayed
+	 * When <code>true</code> the minimum value is forced when the dataserie is displayed, this
+	 * applys only to the y-axis.
+	 * <p>
+	 * The x-axis can be forced with setXAxisStart/EndValue.
 	 */
-	private boolean					_isForceMinValue						= false;
-	private boolean					_isForceMaxValue						= false;
+	protected boolean				_isForceMinValue						= false;
+	protected boolean				_isForceMaxValue						= false;
 
-	private double					_visibleMaxValueForced;
-	private double					_visibleMinValueForced;
+	protected double				_visibleMinValueForced;
+	protected double				_visibleMaxValueForced;
 
 	/**
 	 * Unit which is drawn on the x or y axis
@@ -281,18 +284,6 @@ public abstract class ChartDataSerie {
 		_visibleMaxValue = maxValue;
 	}
 
-	public void setVisibleMaxValueForced(final double maxValue) {
-
-		_isForceMaxValue = true;
-
-		// ensure max is larger than min
-		_visibleMaxValue = maxValue > _visibleMinValue //
-				? maxValue
-				: _visibleMinValue * _valueDivisor;
-
-		_visibleMaxValueForced = _visibleMaxValue;
-	}
-
 	public void setVisibleMinValue(final double minValue) {
 
 // debug: check Nan
@@ -302,14 +293,6 @@ public abstract class ChartDataSerie {
 //		}
 
 		_visibleMinValue = minValue;
-	}
-
-	public void setVisibleMinValueForced(final double minValue) {
-
-		_isForceMinValue = true;
-
-		_visibleMinValue = minValue;
-		_visibleMinValueForced = minValue;
 	}
 
 }

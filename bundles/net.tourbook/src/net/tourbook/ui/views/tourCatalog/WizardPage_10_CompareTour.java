@@ -269,6 +269,9 @@ public class WizardPage_10_CompareTour extends WizardPage {
 
 				net.tourbook.ui.UI.updateChartProperties(_compareTourChart);
 
+				// show title
+				_compareTourChart.getChartTitleSegmentConfig().isShowSegmentTitle = true;
+
 				_pageTourIsNotSelected = new Label(_pageBook, SWT.NONE);
 				_pageTourIsNotSelected.setText(Messages.tourCatalog_wizard_Label_a_tour_is_not_selected);
 				_pageTourIsNotSelected.setEnabled(false);

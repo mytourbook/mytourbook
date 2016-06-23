@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -184,6 +184,26 @@ public class ChartDataYSerie extends ChartDataSerie {
 		_chartLayout = chartLayout;
 
 		setMinMaxValues(lowValueSeries, highValueSeries);
+	}
+
+	public void forceYAxisMaxValue(final double maxValue) {
+
+		_isForceMaxValue = true;
+
+		// ensure max is larger than min
+		_visibleMaxValue = maxValue > _visibleMinValue //
+				? maxValue
+				: _visibleMinValue * _valueDivisor;
+
+		_visibleMaxValueForced = _visibleMaxValue;
+	}
+
+	public void forceYAxisMinValue(final double minValue) {
+
+		_isForceMinValue = true;
+
+		_visibleMinValue = minValue;
+		_visibleMinValueForced = minValue;
 	}
 
 	/**
@@ -473,6 +493,7 @@ public class ChartDataYSerie extends ChartDataSerie {
 
 			_visibleMaxValue = _visibleMinValue = 0;
 			_originalMaxValue = _originalMinValue = 0;
+			
 			_avgPositiveValue = 0;
 
 		} else {

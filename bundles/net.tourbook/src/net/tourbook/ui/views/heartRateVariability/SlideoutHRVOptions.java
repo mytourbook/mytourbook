@@ -13,13 +13,12 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.statistic;
+package net.tourbook.ui.views.heartRateVariability;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.tooltip.ToolbarSlideout;
-import net.tourbook.preferences.PrefPageStatistic;
+import net.tourbook.statistic.IStatisticOptions;
 import net.tourbook.ui.ChartOptions_Grid;
 
 import org.eclipse.jface.action.Action;
@@ -31,30 +30,26 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 
 /**
  */
-public class SlideoutStatisticsChartOptions extends ToolbarSlideout {
+public class SlideoutHRVOptions extends ToolbarSlideout {
 
-	private ActionOpenPrefDialog	_actionPrefDialog;
-	private Action					_actionRestoreDefaults;
+	private Action				_actionRestoreDefaults;
 
-	private ChartOptions_Grid		_gridUI	= new ChartOptions_Grid();
+	private ChartOptions_Grid	_gridUI	= new ChartOptions_Grid();
+
+	private IStatisticOptions	_hrvOptions;
 
 	/*
 	 * UI controls
 	 */
-	private Shell					_parentShell;
 
-	private IStatisticOptions		_statisticOptions;
 
-	public SlideoutStatisticsChartOptions(final Control ownerControl, final ToolBar toolBar) {
+	public SlideoutHRVOptions(final Control ownerControl, final ToolBar toolBar) {
 
 		super(ownerControl, toolBar);
-
-		_parentShell = ownerControl.getShell();
 	}
 
 	private void createActions() {
@@ -69,18 +64,9 @@ public class SlideoutStatisticsChartOptions extends ToolbarSlideout {
 			}
 		};
 
+		_actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
 		_actionRestoreDefaults.setImageDescriptor(//
 				TourbookPlugin.getImageDescriptor(Messages.Image__App_RestoreDefault));
-		_actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
-
-		_actionPrefDialog = new ActionOpenPrefDialog(
-				Messages.Tour_Action_EditStatisticPreferences,
-				PrefPageStatistic.ID);
-
-		/*
-		 * Set shell to the parent otherwise the pref dialog is closed when the slideout is closed.
-		 */
-		_actionPrefDialog.setShell(_parentShell);
 	}
 
 	@Override
@@ -110,8 +96,8 @@ public class SlideoutStatisticsChartOptions extends ToolbarSlideout {
 				createUI_10_Title(container);
 				createUI_12_Actions(container);
 
-				if (_statisticOptions != null) {
-					_statisticOptions.createUI(container);
+				if (_hrvOptions != null) {
+					_hrvOptions.createUI(container);
 				}
 
 				_gridUI.createUI(container);
@@ -128,7 +114,7 @@ public class SlideoutStatisticsChartOptions extends ToolbarSlideout {
 		 */
 		final Label label = new Label(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().applyTo(label);
-		label.setText(Messages.Slideout_StatisticChartOptions_Label_Title);
+		label.setText(Messages.Slideout_HVROptions_Label_Title);
 		label.setFont(JFaceResources.getBannerFont());
 	}
 
@@ -143,7 +129,6 @@ public class SlideoutStatisticsChartOptions extends ToolbarSlideout {
 		final ToolBarManager tbm = new ToolBarManager(toolbar);
 
 		tbm.add(_actionRestoreDefaults);
-		tbm.add(_actionPrefDialog);
 
 		tbm.update(true);
 	}
@@ -153,9 +138,9 @@ public class SlideoutStatisticsChartOptions extends ToolbarSlideout {
 		_gridUI.resetToDefaults();
 		_gridUI.saveState();
 
-		if (_statisticOptions != null) {
-			_statisticOptions.resetToDefaults();
-			_statisticOptions.saveState();
+		if (_hrvOptions != null) {
+			_hrvOptions.resetToDefaults();
+			_hrvOptions.saveState();
 		}
 	}
 
@@ -163,13 +148,13 @@ public class SlideoutStatisticsChartOptions extends ToolbarSlideout {
 
 		_gridUI.restoreState();
 
-		if (_statisticOptions != null) {
-			_statisticOptions.restoreState();
+		if (_hrvOptions != null) {
+			_hrvOptions.restoreState();
 		}
 	}
 
 	public void setStatisticOptions(final IStatisticOptions statisticOptions) {
 
-		_statisticOptions = statisticOptions;
+		_hrvOptions = statisticOptions;
 	}
 }

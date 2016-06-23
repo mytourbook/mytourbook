@@ -32,7 +32,6 @@ import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.statistic.ActionChartOptions;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourData;
@@ -68,7 +67,7 @@ public class HeartRateVariabilityView extends ViewPart {
 	private static final String			GRAPH_LABEL_HEART_RATE_VARIABILITY		= net.tourbook.common.Messages.Graph_Label_HeartRateVariability;
 	private static final String			GRAPH_LABEL_HEART_RATE_VARIABILITY_UNIT	= net.tourbook.common.Messages.Graph_Label_HeartRateVariability_Unit;
 
-	private static final int			ADJUST_PULSE_VALUE						= 10;
+	private static final int			ADJUST_PULSE_VALUE						= 50;
 
 	private final IPreferenceStore		_prefStore								= TourbookPlugin.getPrefStore();
 	private final IPreferenceStore		_commonPrefStore						= CommonActivator.getPrefStore();
@@ -79,12 +78,15 @@ public class HeartRateVariabilityView extends ViewPart {
 
 	private ArrayList<TourData>			_hrvTours;
 
-	private ActionChartOptions			_actionChartOptions;
+	private ActionHrvOptions			_actionHrvOptions;
 	private ActionSynchChartScale		_actionSynchChartScaling;
 
 	private boolean						_isSynchChartScaling;
-	private final MinMaxKeeper_XData	_xMinMaxKeeper							= new MinMaxKeeper_XData();
-	private final MinMaxKeeper_YData	_yMinMaxKeeper							= new MinMaxKeeper_YData();
+
+	private final MinMaxKeeper_XData	_xMinMaxKeeper							= new MinMaxKeeper_XData(
+																						ADJUST_PULSE_VALUE);
+	private final MinMaxKeeper_YData	_yMinMaxKeeper							= new MinMaxKeeper_YData(
+																						ADJUST_PULSE_VALUE);
 
 	/*
 	 * UI controls
@@ -172,7 +174,7 @@ public class HeartRateVariabilityView extends ViewPart {
 
 	private void createActions() {
 
-		_actionChartOptions = new ActionChartOptions(_pageBook);
+		_actionHrvOptions = new ActionHrvOptions(_pageBook);
 		_actionSynchChartScaling = new ActionSynchChartScale(this);
 	}
 
@@ -264,14 +266,19 @@ public class HeartRateVariabilityView extends ViewPart {
 			rgbBright[tourIndex] = rgbPrefBright;
 		}
 
+		if (validDataLength == 1) {
+			chartDataModel.setTitle(TourManager.getTourDateTimeShort(validTours[0]));
+		}
+
 		/*
 		 * X axis: RR
 		 */
 		final ChartDataXSerie xDataRR0 = new ChartDataXSerie(rr0Series);
 		xDataRR0.setLabel(GRAPH_LABEL_HEART_RATE_VARIABILITY);
 		xDataRR0.setUnitLabel(GRAPH_LABEL_HEART_RATE_VARIABILITY_UNIT);
-		xDataRR0.setXAxisStartValue(xDataRR0.getVisibleMinValue() - ADJUST_PULSE_VALUE);
-		xDataRR0.setXAxisEndValue(xDataRR0.getVisibleMaxValue() + ADJUST_PULSE_VALUE);
+
+		xDataRR0.forceXAxisMinValue(xDataRR0.getOriginalMinValue() - ADJUST_PULSE_VALUE);
+		xDataRR0.forceXAxisMaxValue(xDataRR0.getOriginalMaxValue() + ADJUST_PULSE_VALUE);
 
 		chartDataModel.setXData(xDataRR0);
 
@@ -286,8 +293,8 @@ public class HeartRateVariabilityView extends ViewPart {
 		yDataRR1.setRgbDark(rgbDark);
 		yDataRR1.setRgbBright(rgbBright);
 
-		yDataRR1.setVisibleMinValueForced(yDataRR1.getVisibleMinValue() - ADJUST_PULSE_VALUE);
-		yDataRR1.setVisibleMaxValueForced(yDataRR1.getVisibleMaxValue() + ADJUST_PULSE_VALUE);
+		yDataRR1.forceYAxisMinValue(yDataRR1.getOriginalMinValue() - ADJUST_PULSE_VALUE);
+		yDataRR1.forceYAxisMaxValue(yDataRR1.getOriginalMaxValue() + ADJUST_PULSE_VALUE);
 
 		chartDataModel.addYData(yDataRR1);
 
@@ -340,6 +347,9 @@ public class HeartRateVariabilityView extends ViewPart {
 			GridDataFactory.fillDefaults().grab(true, true).applyTo(_chartHRV);
 
 			UI.updateChartProperties(_chartHRV);
+
+			// Show title
+			_chartHRV.getChartTitleSegmentConfig().isShowSegmentTitle = true;
 		}
 	}
 
@@ -362,7 +372,7 @@ public class HeartRateVariabilityView extends ViewPart {
 		tbm.removeAll();
 
 		tbm.add(_actionSynchChartScaling);
-		tbm.add(_actionChartOptions);
+		tbm.add(_actionHrvOptions);
 
 		// update toolbar to show added items
 		tbm.update(true);

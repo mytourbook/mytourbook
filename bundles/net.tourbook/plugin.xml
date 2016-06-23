@@ -420,7 +420,7 @@
 
 		<page
 			name="%preference_page_statistics"
-			id="net.tourbook.preferences.prefPageStatistic"
+			id="net.tourbook.preferences.PrefPageStatistic"
 			class="net.tourbook.preferences.PrefPageStatistic"
 		/>
 
