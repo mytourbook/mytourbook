@@ -26,7 +26,6 @@ import java.util.GregorianCalendar;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
@@ -82,7 +81,6 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 	private final boolean					_isOSX						= net.tourbook.common.UI.IS_OSX;
 	private final boolean					_isLinux					= net.tourbook.common.UI.IS_LINUX;
 
-	private PostSelectionProvider			_postSelectionProvider;
 	private IPartListener2					_partListener;
 	private IPropertyChangeListener			_prefChangeListener;
 	private ITourEventListener				_tourEventListener;
@@ -107,7 +105,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 	 */
 	private ArrayList<TourbookStatistic>	_allStatisticProvider;
 
-	private ActionChartOptions				_actionChartOptions;
+	private ActionStatisticOptions			_actionStatisticOptions;
 	private ActionSynchChartScale			_actionSynchChartScale;
 
 	private boolean							_isSynchScaleEnabled;
@@ -149,7 +147,14 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 		_partListener = new IPartListener2() {
 
 			@Override
-			public void partActivated(final IWorkbenchPartReference partRef) {}
+			public void partActivated(final IWorkbenchPartReference partRef) {
+
+//				if (partRef.getPart(false) == TourStatisticsView.this) {
+//
+//					int a = 0;
+//					a++;
+//				}
+			}
 
 			@Override
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
@@ -277,7 +282,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 
 	private void createActions() {
 
-		_actionChartOptions = new ActionChartOptions(_statContainer);
+		_actionStatisticOptions = new ActionStatisticOptions(_statContainer);
 		_actionSynchChartScale = new ActionSynchChartScale(this);
 	}
 
@@ -295,9 +300,6 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 		addPrefListener();
 		addSelectionListener();
 		addTourEventListener();
-
-		// this view is a selection provider
-		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
 
 		/*
 		 * Start async that the workspace is fully initialized with all data filters
@@ -792,7 +794,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 			GridDataFactory.fillDefaults().grab(true, true).applyTo(statisticUI);
 			GridLayoutFactory.fillDefaults().applyTo(statisticUI);
 			{
-				tourbookStatistic.createUI(statisticUI, getViewSite(), _postSelectionProvider);
+				tourbookStatistic.createUI(statisticUI, getViewSite());
 				tourbookStatistic.restoreStateEarly(_state);
 			}
 		}
@@ -972,7 +974,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 		tbm.removeAll();
 
 		tbm.add(_actionSynchChartScale);
-		tbm.add(_actionChartOptions);
+		tbm.add(_actionStatisticOptions);
 
 		// add actions from the statistic
 		_activeStatistic.updateToolBar();
@@ -980,8 +982,11 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 		// update toolbar to show added items
 		tbm.update(true);
 
-		// set slideout AFTER the toolbar is created/updated/filled which creates the slideout
-		_activeStatistic.setChartOptions(_actionChartOptions.getSlideout());
+		// get slideout AFTER the toolbar is created/updated/filled, this creates it
+		final SlideoutStatisticOptions slideout = _actionStatisticOptions.getSlideout();
+
+		_activeStatistic.setupStatisticSlideout(slideout);
+		slideout.setGridPrefPrefix(_activeStatistic.getGridPrefPrefix());
 	}
 
 }

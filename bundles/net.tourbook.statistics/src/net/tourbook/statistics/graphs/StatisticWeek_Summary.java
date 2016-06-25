@@ -33,4 +33,9 @@ public class StatisticWeek_Summary extends StatisticWeek {
 		return chartDataModel;
 	}
 
+	@Override
+	protected String getGridPrefPrefix() {
+		return GRID_WEEK_SUMMARY;
+	}
+
 }

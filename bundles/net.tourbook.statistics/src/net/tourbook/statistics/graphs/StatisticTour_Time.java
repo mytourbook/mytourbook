@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import net.tourbook.chart.MinMaxKeeper_YData;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataXSerie;
@@ -30,6 +29,7 @@ import net.tourbook.chart.ChartToolTipInfo;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IBarSelectionListener;
 import net.tourbook.chart.IChartInfoProvider;
+import net.tourbook.chart.MinMaxKeeper_YData;
 import net.tourbook.chart.SelectionBarChart;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
@@ -46,6 +46,7 @@ import net.tourbook.statistics.StatisticServices;
 import net.tourbook.statistics.StatisticTourToolTip;
 import net.tourbook.statistics.TourChartContextProvider;
 import net.tourbook.tour.SelectionTourId;
+import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourInfoIconToolTipProvider;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
@@ -53,7 +54,6 @@ import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.action.ActionEditQuick;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.TraverseEvent;
@@ -81,8 +81,6 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
 
 	private final MinMaxKeeper_YData	_minMaxKeeper				= new MinMaxKeeper_YData();
 	private boolean						_ifIsSynchScaleEnabled;
-
-	private IPostSelectionProvider		_postSelectionProvider;
 
 	private Long						_selectedTourId				= null;
 	private int							_currentMonth;
@@ -125,11 +123,7 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
 	}
 
 	@Override
-	public void createStatisticUI(	final Composite parent,
-									final IViewSite viewSite,
-									final IPostSelectionProvider postSelectionProvider) {
-
-		_postSelectionProvider = postSelectionProvider;
+	public void createStatisticUI(final Composite parent, final IViewSite viewSite) {
 
 		// chart widget page
 		_chart = new Chart(parent, SWT.BORDER | SWT.FLAT);
@@ -167,7 +161,12 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
 					_tourInfoToolTipProvider.setTourId(_selectedTourId);
 
 					DataProvider_Tour_Time.getInstance().setSelectedTourId(_selectedTourId);
-					_postSelectionProvider.setSelection(new SelectionTourId(_selectedTourId));
+
+					// this view can be inactive -> selection is not fired with the SelectionProvider interface
+					TourManager.fireEventWithCustomData(
+							TourEventId.TOUR_SELECTION,
+							new SelectionTourId(_selectedTourId),
+							viewSite.getPart());
 				}
 			}
 		});
@@ -356,6 +355,11 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
 	}
 
 	@Override
+	protected String getGridPrefPrefix() {
+		return GRID_TOUR_TIME;
+	}
+
+	@Override
 	public Integer getSelectedMonth() {
 		return _currentMonth;
 	}
@@ -534,7 +538,7 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
 			_minMaxKeeper.setMinMaxValues(chartModel);
 		}
 
-		StatisticServices.updateChartProperties(_chart);
+		StatisticServices.updateChartProperties(_chart, getGridPrefPrefix());
 
 		// show the data in the chart
 		_chart.updateChart(chartModel, false, true);

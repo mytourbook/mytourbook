@@ -18,7 +18,6 @@ package net.tourbook.statistics.graphs;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import net.tourbook.chart.MinMaxKeeper_YData;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
@@ -27,6 +26,7 @@ import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartStatisticSegments;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IChartInfoProvider;
+import net.tourbook.chart.MinMaxKeeper_YData;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourPersonHRZone;
@@ -38,7 +38,6 @@ import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
@@ -117,9 +116,7 @@ public class StatisticWeek_HrZone extends TourbookStatistic {
 	}
 
 	@Override
-	public void createStatisticUI(	final Composite parent,
-									final IViewSite viewSite,
-									final IPostSelectionProvider postSelectionProvider) {
+	public void createStatisticUI(final Composite parent, final IViewSite viewSite) {
 
 		// create chart
 		_chart = new Chart(parent, SWT.BORDER | SWT.FLAT);
@@ -209,6 +206,11 @@ public class StatisticWeek_HrZone extends TourbookStatistic {
 		yData.setDefaultRGB(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY).getRGB());
 
 		chartDataModel.addYData(yData);
+	}
+
+	@Override
+	protected String getGridPrefPrefix() {
+		return GRID_WEEK_HR_ZONE;
 	}
 
 	@Override
@@ -452,7 +454,7 @@ public class StatisticWeek_HrZone extends TourbookStatistic {
 			_minMaxKeeper.setMinMaxValues(chartDataModel);
 		}
 
-		StatisticServices.updateChartProperties(_chart);
+		StatisticServices.updateChartProperties(_chart, getGridPrefPrefix());
 
 		// show the data model in the chart
 		_chart.updateChart(chartDataModel, true);

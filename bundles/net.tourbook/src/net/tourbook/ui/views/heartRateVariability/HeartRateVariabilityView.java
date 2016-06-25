@@ -37,6 +37,7 @@ import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
+import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
 
@@ -62,10 +63,17 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class HeartRateVariabilityView extends ViewPart {
 
-	public static final String			ID										= "net.tourbook.ui.views.heartRateVariability.HeartRateVariabilityView";	//$NON-NLS-1$
+	public static final String			ID										= "net.tourbook.ui.views.heartRateVariability.HeartRateVariabilityView";				//$NON-NLS-1$
 
 	private static final String			GRAPH_LABEL_HEART_RATE_VARIABILITY		= net.tourbook.common.Messages.Graph_Label_HeartRateVariability;
 	private static final String			GRAPH_LABEL_HEART_RATE_VARIABILITY_UNIT	= net.tourbook.common.Messages.Graph_Label_HeartRateVariability_Unit;
+
+	private static final String			GRID_PREF_PREFIX						= "GRID_HEART_RATE_VARIABILITY__";														//$NON-NLS-1$
+
+	private static final String			GRID_IS_SHOW_VERTICAL_GRIDLINES			= (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES);
+	private static final String			GRID_IS_SHOW_HORIZONTAL_GRIDLINES		= (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
+	private static final String			GRID_VERTICAL_DISTANCE					= (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE);
+	private static final String			GRID_HORIZONTAL_DISTANCE				= (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE);
 
 	private static final int			ADJUST_PULSE_VALUE						= 50;
 
@@ -122,16 +130,17 @@ public class HeartRateVariabilityView extends ViewPart {
 				/*
 				 * set a new chart configuration when the preferences has changed
 				 */
-				if (property.equals(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE)
-						|| property.equals(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE)
-						|| property.equals(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
-						|| property.equals(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES)
+				if (property.equals(GRID_HORIZONTAL_DISTANCE)
+						|| property.equals(GRID_VERTICAL_DISTANCE)
+						|| property.equals(GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
+						|| property.equals(GRID_IS_SHOW_VERTICAL_GRIDLINES)
+
 						|| property.equals(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR)
 						|| property.equals(ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR)
 				//
 				) {
 
-					UI.updateChartProperties(_chartHRV);
+					UI.updateChartProperties(_chartHRV, GRID_PREF_PREFIX);
 
 					// grid has changed, update chart
 					updateChart_50_CurrentTours(true);
@@ -161,6 +170,27 @@ public class HeartRateVariabilityView extends ViewPart {
 		getSite().getPage().addPostSelectionListener(_postSelectionListener);
 	}
 
+	private void addTourEventListener() {
+
+		_tourEventListener = new ITourEventListener() {
+
+			@Override
+			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
+
+				if (part == HeartRateVariabilityView.this) {
+					return;
+				}
+
+				if (eventId == TourEventId.TOUR_SELECTION && eventData instanceof ISelection) {
+
+					onSelectionChanged((ISelection) eventData);
+				}
+			}
+		};
+
+		TourManager.getInstance().addTourEventListener(_tourEventListener);
+	}
+
 	private void clearView() {
 
 		_hrvTours = null;
@@ -174,7 +204,7 @@ public class HeartRateVariabilityView extends ViewPart {
 
 	private void createActions() {
 
-		_actionHrvOptions = new ActionHrvOptions(_pageBook);
+		_actionHrvOptions = new ActionHrvOptions(_pageBook, GRID_PREF_PREFIX);
 		_actionSynchChartScaling = new ActionSynchChartScale(this);
 	}
 
@@ -319,6 +349,7 @@ public class HeartRateVariabilityView extends ViewPart {
 
 		addSelectionListener();
 		addPrefListener();
+		addTourEventListener();
 
 		// show hrv chart from selection service
 		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
@@ -346,7 +377,7 @@ public class HeartRateVariabilityView extends ViewPart {
 			_chartHRV = new Chart(_pageHrvChart, SWT.FLAT);
 			GridDataFactory.fillDefaults().grab(true, true).applyTo(_chartHRV);
 
-			UI.updateChartProperties(_chartHRV);
+			UI.updateChartProperties(_chartHRV, GRID_PREF_PREFIX);
 
 			// Show title
 			_chartHRV.getChartTitleSegmentConfig().isShowSegmentTitle = true;

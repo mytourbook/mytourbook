@@ -18,7 +18,6 @@ package net.tourbook.statistics.graphs;
 import java.util.ArrayList;
 
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.chart.MinMaxKeeper_YData;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
@@ -27,6 +26,7 @@ import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartToolTipInfo;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IChartInfoProvider;
+import net.tourbook.chart.MinMaxKeeper_YData;
 import net.tourbook.chart.Util;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
@@ -35,7 +35,7 @@ import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.statistic.ChartOptions_TourFrequency;
-import net.tourbook.statistic.SlideoutStatisticsChartOptions;
+import net.tourbook.statistic.SlideoutStatisticOptions;
 import net.tourbook.statistic.StatisticContext;
 import net.tourbook.statistic.TourbookStatistic;
 import net.tourbook.statistics.Messages;
@@ -45,7 +45,6 @@ import net.tourbook.ui.TourTypeFilter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -253,9 +252,7 @@ public class StatisticTour_Frequency extends TourbookStatistic {
 	}
 
 	@Override
-	public void createStatisticUI(	final Composite parent,
-									final IViewSite viewSite,
-									final IPostSelectionProvider postSelectionProvider) {
+	public void createStatisticUI(final Composite parent, final IViewSite viewSite) {
 
 		// create statistic page
 		_statisticPage = new Composite(parent, SWT.BORDER | SWT.FLAT);
@@ -533,6 +530,11 @@ public class StatisticTour_Frequency extends TourbookStatistic {
 		return units.length - 1;
 	}
 
+	@Override
+	protected String getGridPrefPrefix() {
+		return GRID_TOUR_FREQUENCY;
+	}
+
 	private void getPreferences() {
 
 		_statDistanceUnits = getPrefUnits(
@@ -612,7 +614,7 @@ public class StatisticTour_Frequency extends TourbookStatistic {
 	}
 
 	@Override
-	protected void setChartOptions(final SlideoutStatisticsChartOptions slideout) {
+	protected void setupStatisticSlideout(final SlideoutStatisticOptions slideout) {
 
 		slideout.setStatisticOptions(new ChartOptions_TourFrequency());
 	}
@@ -669,7 +671,7 @@ public class StatisticTour_Frequency extends TourbookStatistic {
 			statAltitudeMinMaxKeeper.setMinMaxValues(chartDataModel);
 		}
 
-		StatisticServices.updateChartProperties(chart);
+		StatisticServices.updateChartProperties(chart, getGridPrefPrefix());
 
 		// show the new data in the chart
 		chart.updateChart(chartDataModel, true);
@@ -727,7 +729,7 @@ public class StatisticTour_Frequency extends TourbookStatistic {
 			statDistanceMinMaxKeeper.setMinMaxValues(chartDataModel);
 		}
 
-		StatisticServices.updateChartProperties(statDistanceChart);
+		StatisticServices.updateChartProperties(statDistanceChart, getGridPrefPrefix());
 
 		// show the new data fDataModel in the chart
 		statDistanceChart.updateChart(chartDataModel, true);
@@ -776,7 +778,7 @@ public class StatisticTour_Frequency extends TourbookStatistic {
 			statDurationMinMaxKeeper.setMinMaxValues(chartDataModel);
 		}
 
-		StatisticServices.updateChartProperties(statDurationChart);
+		StatisticServices.updateChartProperties(statDurationChart, getGridPrefPrefix());
 
 		// show the new data data model in the chart
 		statDurationChart.updateChart(chartDataModel, true);

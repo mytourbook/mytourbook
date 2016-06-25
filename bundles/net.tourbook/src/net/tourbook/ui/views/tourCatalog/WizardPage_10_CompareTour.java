@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -267,7 +267,9 @@ public class WizardPage_10_CompareTour extends WizardPage {
 				_compareTourChart = new Chart(_pageBook, SWT.NONE);
 				_compareTourChart.setBackgroundColor(parent.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 
-				net.tourbook.ui.UI.updateChartProperties(_compareTourChart);
+				net.tourbook.ui.UI.updateChartProperties(
+						_compareTourChart,
+						WizardTourComparer.GRID_PREFIX_REF_TOUR_COMPARE_TOUR);
 
 				// show title
 				_compareTourChart.getChartTitleSegmentConfig().isShowSegmentTitle = true;

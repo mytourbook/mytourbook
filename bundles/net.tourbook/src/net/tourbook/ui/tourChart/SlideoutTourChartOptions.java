@@ -39,18 +39,20 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
 
 /**
- * Tour chart marker properties slideout.
+ * Tour chart properties slideout.
  */
 public class SlideoutTourChartOptions extends ToolbarSlideout {
 
-	private final IPreferenceStore	_prefStore	= TourbookPlugin.getPrefStore();
+	private static final String		PREF_STORE_PREFIX	= "TourChart_";							//$NON-NLS-1$
+
+	private final IPreferenceStore	_prefStore			= TourbookPlugin.getPrefStore();
 
 	private SelectionAdapter		_defaultSelectionListener;
 
 	private ActionOpenPrefDialog	_actionPrefDialog;
 	private Action					_actionRestoreDefaults;
 
-	private ChartOptions_Grid		_gridUI		= new ChartOptions_Grid();
+	private ChartOptions_Grid		_gridUI				= new ChartOptions_Grid(PREF_STORE_PREFIX);
 
 	/*
 	 * UI controls

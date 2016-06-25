@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.views.heartRateVariability;
+package net.tourbook.ui.views.tourCatalog;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -35,26 +35,26 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
-public class ActionHrvOptions extends ContributionItem implements IOpeningDialog {
+public class Action_RefTour_YearStatisticOptions extends ContributionItem implements IOpeningDialog {
 
-	private String				_dialogId	= getClass().getCanonicalName();
+	private String							_dialogId	= getClass().getCanonicalName();
 
-	private ToolBar				_toolBar;
-	private ToolItem			_actionToolItem;
+	private ToolBar							_toolBar;
+	private ToolItem						_actionToolItem;
 
-	private SlideoutHRVOptions	_slideoutHrvOptions;
+	private Slideout_YearStatisticOptions	_slideoutYearStatOptions;
 
-	private String				_prefStoreGridPrefix;
+	private String							_prefStoreGridPrefix;
 
 	/*
 	 * UI controls
 	 */
-	private Control				_parent;
+	private Control							_parent;
 
-	private Image				_imageEnabled;
-	private Image				_imageDisabled;
+	private Image							_imageEnabled;
+	private Image							_imageDisabled;
 
-	public ActionHrvOptions(final Composite parent, final String prefStoreGridPrefix) {
+	public Action_RefTour_YearStatisticOptions(final Composite parent, final String prefStoreGridPrefix) {
 
 		_parent = parent;
 
@@ -99,7 +99,7 @@ public class ActionHrvOptions extends ContributionItem implements IOpeningDialog
 				}
 			});
 
-			_slideoutHrvOptions = new SlideoutHRVOptions(_parent, _toolBar, _prefStoreGridPrefix);
+			_slideoutYearStatOptions = new Slideout_YearStatisticOptions(_parent, _toolBar, _prefStoreGridPrefix);
 		}
 	}
 
@@ -108,13 +108,13 @@ public class ActionHrvOptions extends ContributionItem implements IOpeningDialog
 		return _dialogId;
 	}
 
-	SlideoutHRVOptions getSlideout() {
-		return _slideoutHrvOptions;
+	Slideout_YearStatisticOptions getSlideout() {
+		return _slideoutYearStatOptions;
 	}
 
 	@Override
 	public void hideDialog() {
-		_slideoutHrvOptions.hideNow();
+		_slideoutYearStatOptions.hideNow();
 	}
 
 	private void onDispose() {
@@ -159,7 +159,7 @@ public class ActionHrvOptions extends ContributionItem implements IOpeningDialog
 
 	private void onSelect() {
 
-		if (_slideoutHrvOptions.isToolTipVisible() == false) {
+		if (_slideoutYearStatOptions.isToolTipVisible() == false) {
 
 			final Rectangle itemBounds = _actionToolItem.getBounds();
 
@@ -172,7 +172,7 @@ public class ActionHrvOptions extends ContributionItem implements IOpeningDialog
 
 		} else {
 
-			_slideoutHrvOptions.close();
+			_slideoutYearStatOptions.close();
 		}
 	}
 
@@ -180,7 +180,7 @@ public class ActionHrvOptions extends ContributionItem implements IOpeningDialog
 
 		// ensure other dialogs are closed
 
-		_slideoutHrvOptions.open(itemBounds, isOpenDelayed);
+		_slideoutYearStatOptions.open(itemBounds, isOpenDelayed);
 	}
 
 }

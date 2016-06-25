@@ -13,12 +13,13 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.views.heartRateVariability;
+package net.tourbook.statistic;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.tooltip.ToolbarSlideout;
-import net.tourbook.statistic.IStatisticOptions;
+import net.tourbook.preferences.PrefPageStatistic;
 import net.tourbook.ui.ChartOptions_Grid;
 
 import org.eclipse.jface.action.Action;
@@ -30,27 +31,29 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 
-/**
- */
-public class SlideoutHRVOptions extends ToolbarSlideout {
+public class SlideoutStatisticOptions extends ToolbarSlideout {
 
-	private Action				_actionRestoreDefaults;
+	private ActionOpenPrefDialog	_actionPrefDialog;
+	private Action					_actionRestoreDefaults;
+	private String					_gridPrefPrefix;
 
-	private ChartOptions_Grid	_gridUI;
-
-	private IStatisticOptions	_hrvOptions;
+	private ChartOptions_Grid		_gridUI;
 
 	/*
 	 * UI controls
 	 */
+	private Shell					_parentShell;
 
-	public SlideoutHRVOptions(final Control ownerControl, final ToolBar toolBar, final String prefStoreGridPrefix) {
+	private IStatisticOptions		_statisticOptions;
+
+	public SlideoutStatisticOptions(final Control ownerControl, final ToolBar toolBar) {
 
 		super(ownerControl, toolBar);
 
-		_gridUI = new ChartOptions_Grid(prefStoreGridPrefix);
+		_parentShell = ownerControl.getShell();
 	}
 
 	private void createActions() {
@@ -65,15 +68,26 @@ public class SlideoutHRVOptions extends ToolbarSlideout {
 			}
 		};
 
-		_actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
 		_actionRestoreDefaults.setImageDescriptor(//
 				TourbookPlugin.getImageDescriptor(Messages.Image__App_RestoreDefault));
+		_actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
+
+		_actionPrefDialog = new ActionOpenPrefDialog(
+				Messages.Tour_Action_EditStatisticPreferences,
+				PrefPageStatistic.ID);
+
+		/*
+		 * Set shell to the parent otherwise the pref dialog is closed when the slideout is closed.
+		 */
+		_actionPrefDialog.setShell(_parentShell);
 	}
 
 	@Override
 	protected Composite createToolTipContentArea(final Composite parent) {
 
 		createActions();
+
+		_gridUI = new ChartOptions_Grid(_gridPrefPrefix);
 
 		final Composite ui = createUI(parent);
 
@@ -97,8 +111,8 @@ public class SlideoutHRVOptions extends ToolbarSlideout {
 				createUI_10_Title(container);
 				createUI_12_Actions(container);
 
-				if (_hrvOptions != null) {
-					_hrvOptions.createUI(container);
+				if (_statisticOptions != null) {
+					_statisticOptions.createUI(container);
 				}
 
 				_gridUI.createUI(container);
@@ -115,7 +129,7 @@ public class SlideoutHRVOptions extends ToolbarSlideout {
 		 */
 		final Label label = new Label(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().applyTo(label);
-		label.setText(Messages.Slideout_HVROptions_Label_Title);
+		label.setText(Messages.Slideout_StatisticChartOptions_Label_Title);
 		label.setFont(JFaceResources.getBannerFont());
 	}
 
@@ -130,6 +144,7 @@ public class SlideoutHRVOptions extends ToolbarSlideout {
 		final ToolBarManager tbm = new ToolBarManager(toolbar);
 
 		tbm.add(_actionRestoreDefaults);
+		tbm.add(_actionPrefDialog);
 
 		tbm.update(true);
 	}
@@ -139,9 +154,9 @@ public class SlideoutHRVOptions extends ToolbarSlideout {
 		_gridUI.resetToDefaults();
 		_gridUI.saveState();
 
-		if (_hrvOptions != null) {
-			_hrvOptions.resetToDefaults();
-			_hrvOptions.saveState();
+		if (_statisticOptions != null) {
+			_statisticOptions.resetToDefaults();
+			_statisticOptions.saveState();
 		}
 	}
 
@@ -149,13 +164,18 @@ public class SlideoutHRVOptions extends ToolbarSlideout {
 
 		_gridUI.restoreState();
 
-		if (_hrvOptions != null) {
-			_hrvOptions.restoreState();
+		if (_statisticOptions != null) {
+			_statisticOptions.restoreState();
 		}
+	}
+
+	void setGridPrefPrefix(final String gridPrefPrefix) {
+
+		_gridPrefPrefix = gridPrefPrefix;
 	}
 
 	public void setStatisticOptions(final IStatisticOptions statisticOptions) {
 
-		_hrvOptions = statisticOptions;
+		_statisticOptions = statisticOptions;
 	}
 }

@@ -35,4 +35,9 @@ public class StatisticYear_TourTime extends StatisticYear {
 
 		return chartDataModel;
 	}
+
+	@Override
+	protected String getGridPrefPrefix() {
+		return GRID_YEAR_TIME;
+	}
 }

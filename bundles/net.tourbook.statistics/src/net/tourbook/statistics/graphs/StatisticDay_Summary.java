@@ -20,12 +20,11 @@ import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartType;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.statistic.ChartOptions_DaySummary;
-import net.tourbook.statistic.SlideoutStatisticsChartOptions;
+import net.tourbook.statistic.SlideoutStatisticOptions;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Composite;
@@ -80,11 +79,9 @@ public class StatisticDay_Summary extends StatisticDay {
 	}
 
 	@Override
-	public void createStatisticUI(	final Composite parent,
-									final IViewSite viewSite,
-									final IPostSelectionProvider postSelectionProvider) {
+	public void createStatisticUI(final Composite parent, final IViewSite viewSite) {
 
-		super.createStatisticUI(parent, viewSite, postSelectionProvider);
+		super.createStatisticUI(parent, viewSite);
 
 		addPrefListener(parent);
 		getPreferences();
@@ -120,6 +117,11 @@ public class StatisticDay_Summary extends StatisticDay {
 		return chartDataModel;
 	}
 
+	@Override
+	protected String getGridPrefPrefix() {
+		return GRID_DAY_SUMMARY;
+	}
+
 	private void getPreferences() {
 
 		_isShowAltitude = _prefStore.getBoolean(ITourbookPreferences.STAT_DAY_IS_SHOW_ALTITUDE);
@@ -130,7 +132,7 @@ public class StatisticDay_Summary extends StatisticDay {
 	}
 
 	@Override
-	protected void setChartOptions(final SlideoutStatisticsChartOptions slideout) {
+	protected void setupStatisticSlideout(final SlideoutStatisticOptions slideout) {
 
 		slideout.setStatisticOptions(new ChartOptions_DaySummary());
 	}

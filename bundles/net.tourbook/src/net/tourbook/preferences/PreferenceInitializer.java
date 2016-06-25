@@ -199,10 +199,10 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ITourbookPreferences.GRAPH_MOVE_SLIDERS_WHEN_ZOOMED, false);
 
 		// graph grid
-		store.setDefault(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE, 80);
-		store.setDefault(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE, 80);
-		store.setDefault(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES, false);
-		store.setDefault(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES, false);
+		store.setDefault(ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE, 80);
+		store.setDefault(ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE, 80);
+		store.setDefault(ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES, false);
+		store.setDefault(ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES, false);
 
 		/*
 		 * Min/Max values

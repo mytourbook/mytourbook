@@ -18,7 +18,6 @@ package net.tourbook.statistics.graphs;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import net.tourbook.chart.MinMaxKeeper_YData;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
@@ -27,6 +26,7 @@ import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartStatisticSegments;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IChartInfoProvider;
+import net.tourbook.chart.MinMaxKeeper_YData;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourPersonHRZone;
@@ -38,7 +38,6 @@ import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
@@ -48,8 +47,6 @@ import org.eclipse.ui.IViewSite;
 
 public class StatisticMonth_HrZone extends TourbookStatistic {
 
-	private static final String			STATE_HR_ZONE_START_FOR_MONTH_BAR_ORDERING	= "STATE_HR_ZONE_START_FOR_MONTH_BAR_ORDERING"; ////$NON-NLS-1$
-
 	private TourPerson					_appPerson;
 	private TourTypeFilter				_appTourTypeFilter;
 
@@ -57,7 +54,7 @@ public class StatisticMonth_HrZone extends TourbookStatistic {
 	private int							_statNumberOfYears;
 
 	private Chart						_chart;
-	private final MinMaxKeeper_YData	_minMaxKeeper								= new MinMaxKeeper_YData();
+	private final MinMaxKeeper_YData	_minMaxKeeper	= new MinMaxKeeper_YData();
 	private IChartInfoProvider			_tooltipProvider;
 
 	private boolean						_isSynchScaleEnabled;
@@ -129,9 +126,7 @@ public class StatisticMonth_HrZone extends TourbookStatistic {
 	}
 
 	@Override
-	public void createStatisticUI(	final Composite parent,
-									final IViewSite viewSite,
-									final IPostSelectionProvider postSelectionProvider) {
+	public void createStatisticUI(final Composite parent, final IViewSite viewSite) {
 
 		// create chart
 		_chart = new Chart(parent, SWT.BORDER | SWT.FLAT);
@@ -206,6 +201,11 @@ public class StatisticMonth_HrZone extends TourbookStatistic {
 	}
 
 	@Override
+	protected String getGridPrefPrefix() {
+		return GRID_MONTH_HR_ZONE;
+	}
+
+	@Override
 	public void preferencesHasChanged() {
 		updateStatistic();
 	}
@@ -270,13 +270,13 @@ public class StatisticMonth_HrZone extends TourbookStatistic {
 	@Override
 	public void restoreStateEarly(final IDialogSettings state) {
 
-		_barOrderStart = Util.getStateInt(state, STATE_HR_ZONE_START_FOR_MONTH_BAR_ORDERING, 0);
+		_barOrderStart = Util.getStateInt(state, STATE_BAR_ORDERING_HR_ZONE_START_FOR_MONTH, 0);
 	}
 
 	@Override
 	public void saveState(final IDialogSettings state) {
 
-		state.put(STATE_HR_ZONE_START_FOR_MONTH_BAR_ORDERING, _barOrderStart);
+		state.put(STATE_BAR_ORDERING_HR_ZONE_START_FOR_MONTH, _barOrderStart);
 	}
 
 	@Override
@@ -454,7 +454,7 @@ public class StatisticMonth_HrZone extends TourbookStatistic {
 			_minMaxKeeper.setMinMaxValues(chartDataModel);
 		}
 
-		StatisticServices.updateChartProperties(_chart);
+		StatisticServices.updateChartProperties(_chart, getGridPrefPrefix());
 
 		// show the fDataModel in the chart
 		_chart.updateChart(chartDataModel, true);

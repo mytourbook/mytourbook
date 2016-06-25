@@ -35,4 +35,9 @@ public class StatisticMonth_TourTime extends StatisticMonth {
 
 		return chartDataModel;
 	}
+
+	@Override
+	public String getGridPrefPrefix() {
+		return GRID_MONTH_TIME;
+	}
 }

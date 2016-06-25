@@ -94,6 +94,84 @@ public class StatisticServices {
 	}
 
 	/**
+	 * Set bar names into the statistic context. The names will be displayed in a combobox in the
+	 * statistics toolbar.
+	 * 
+	 * @param statContext
+	 * @param usedTourTypeIds
+	 */
+	public static void setBarNames(	final StatisticContext statContext,
+									final long[] usedTourTypeIds,
+									final int barOrderStart) {
+
+		int numUsedTypes = 0;
+
+		// get number of used tour types, a used tour type is != -1
+		for (final long tourTypeId : usedTourTypeIds) {
+			if (tourTypeId != -1) {
+				numUsedTypes++;
+			}
+		}
+
+		final ArrayList<TourType> tourTypes = TourDatabase.getActiveTourTypes();
+
+		if (tourTypes == null || tourTypes.size() == 0 || numUsedTypes == 0) {
+
+			statContext.outIsUpdateBarNames = true;
+			statContext.outBarNames = null;
+
+			return;
+		}
+
+		int barIndex = 0;
+
+		// create bar names 2 times
+		final String[] barNames = new String[numUsedTypes * 2];
+
+		for (int inverseIndex = 0; inverseIndex < 2; inverseIndex++) {
+
+			for (int typeIndex = 0; typeIndex < tourTypes.size(); typeIndex++) {
+
+				final TourType tourType = tourTypes.get(typeIndex);
+
+				final long tourTypeId = tourType.getTypeId();
+
+				/*
+				 * Check if this type is used
+				 */
+				boolean isTourTypeUsed = false;
+				for (final long usedType : usedTourTypeIds) {
+
+					if (usedType == tourTypeId) {
+						isTourTypeUsed = true;
+						break;
+					}
+				}
+
+				if (isTourTypeUsed) {
+
+					String barName;
+
+					if (inverseIndex == 0) {
+						barName = tourType.getName();
+					} else {
+						barName = tourType.getName()
+								+ UI.SPACE
+								+ net.tourbook.statistics.Messages.Statistic_Label_Invers;
+					}
+
+					barNames[barIndex++] = barName;
+				}
+			}
+		}
+
+		// set state what the statistic container should do
+		statContext.outIsUpdateBarNames = true;
+		statContext.outBarNames = barNames;
+		statContext.outVerticalBarIndex = barOrderStart;
+	}
+
+	/**
 	 * Set default colors for the y-axis, the color is defined in
 	 * {@link GraphColorManager#PREF_COLOR_LINE}
 	 * 
@@ -245,91 +323,15 @@ public class StatisticServices {
 	}
 
 	/**
-	 * Set bar names into the statistic context. The names will be displayed in a combobox in the
-	 * statistics toolbar.
-	 * 
-	 * @param statContext
-	 * @param usedTourTypeIds
-	 */
-	public static void setBarNames(	final StatisticContext statContext,
-										final long[] usedTourTypeIds,
-										final int barOrderStart) {
-
-		int numUsedTypes = 0;
-
-		// get number of used tour types, a used tour type is != -1
-		for (final long tourTypeId : usedTourTypeIds) {
-			if (tourTypeId != -1) {
-				numUsedTypes++;
-			}
-		}
-
-		final ArrayList<TourType> tourTypes = TourDatabase.getActiveTourTypes();
-
-		if (tourTypes == null || tourTypes.size() == 0 || numUsedTypes == 0) {
-
-			statContext.outIsUpdateBarNames = true;
-			statContext.outBarNames = null;
-
-			return;
-		}
-
-		int barIndex = 0;
-
-		// create bar names 2 times
-		final String[] barNames = new String[numUsedTypes * 2];
-
-		for (int inverseIndex = 0; inverseIndex < 2; inverseIndex++) {
-
-			for (int typeIndex = 0; typeIndex < tourTypes.size(); typeIndex++) {
-
-				final TourType tourType = tourTypes.get(typeIndex);
-
-				final long tourTypeId = tourType.getTypeId();
-
-				/*
-				 * Check if this type is used
-				 */
-				boolean isTourTypeUsed = false;
-				for (final long usedType : usedTourTypeIds) {
-
-					if (usedType == tourTypeId) {
-						isTourTypeUsed = true;
-						break;
-					}
-				}
-
-				if (isTourTypeUsed) {
-
-					String barName;
-
-					if (inverseIndex == 0) {
-						barName = tourType.getName();
-					} else {
-						barName = tourType.getName()
-								+ UI.SPACE
-								+ net.tourbook.statistics.Messages.Statistic_Label_Invers;
-					}
-
-					barNames[barIndex++] = barName;
-				}
-			}
-		}
-
-		// set state what the statistic container should do
-		statContext.outIsUpdateBarNames = true;
-		statContext.outBarNames = barNames;
-		statContext.outVerticalBarIndex = barOrderStart;
-	}
-
-	/**
 	 * Set chart properties from the pref store.
 	 * 
 	 * @param chart
+	 * @param prefGridPrefix
+	 *            Prefix for grid preferences.
 	 */
-	public static void updateChartProperties(final Chart chart) {
+	public static void updateChartProperties(final Chart chart, final String prefGridPrefix) {
 
-		UI.updateChartProperties(chart);
+		UI.updateChartProperties(chart, prefGridPrefix);
 
 		/*
 		 * These settings are currently static, a UI to modify it is not yet implemented.

@@ -35,24 +35,24 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
-public class ActionChartOptions extends ContributionItem implements IOpeningDialog {
+public class ActionStatisticOptions extends ContributionItem implements IOpeningDialog {
 
-	private String							_dialogId	= getClass().getCanonicalName();
+	private String						_dialogId	= getClass().getCanonicalName();
 
-	private ToolBar							_toolBar;
-	private ToolItem						_actionToolItem;
+	private ToolBar						_toolBar;
+	private ToolItem					_actionToolItem;
 
-	private SlideoutStatisticsChartOptions	_slideoutStatisticChartOptions;
+	private SlideoutStatisticOptions	_slideoutStatisticOptions;
 
 	/*
 	 * UI controls
 	 */
-	private Control							_parent;
+	private Control						_parent;
 
-	private Image							_imageEnabled;
-	private Image							_imageDisabled;
+	private Image						_imageEnabled;
+	private Image						_imageDisabled;
 
-	public ActionChartOptions(final Composite parent) {
+	public ActionStatisticOptions(final Composite parent) {
 
 		_parent = parent;
 
@@ -95,7 +95,7 @@ public class ActionChartOptions extends ContributionItem implements IOpeningDial
 				}
 			});
 
-			_slideoutStatisticChartOptions = new SlideoutStatisticsChartOptions(_parent, _toolBar);
+			_slideoutStatisticOptions = new SlideoutStatisticOptions(_parent, _toolBar);
 		}
 	}
 
@@ -104,13 +104,13 @@ public class ActionChartOptions extends ContributionItem implements IOpeningDial
 		return _dialogId;
 	}
 
-	SlideoutStatisticsChartOptions getSlideout() {
-		return _slideoutStatisticChartOptions;
+	SlideoutStatisticOptions getSlideout() {
+		return _slideoutStatisticOptions;
 	}
 
 	@Override
 	public void hideDialog() {
-		_slideoutStatisticChartOptions.hideNow();
+		_slideoutStatisticOptions.hideNow();
 	}
 
 	private void onDispose() {
@@ -155,7 +155,7 @@ public class ActionChartOptions extends ContributionItem implements IOpeningDial
 
 	private void onSelect() {
 
-		if (_slideoutStatisticChartOptions.isToolTipVisible() == false) {
+		if (_slideoutStatisticOptions.isToolTipVisible() == false) {
 
 			final Rectangle itemBounds = _actionToolItem.getBounds();
 
@@ -168,7 +168,7 @@ public class ActionChartOptions extends ContributionItem implements IOpeningDial
 
 		} else {
 
-			_slideoutStatisticChartOptions.close();
+			_slideoutStatisticOptions.close();
 		}
 	}
 
@@ -176,7 +176,7 @@ public class ActionChartOptions extends ContributionItem implements IOpeningDial
 
 		// ensure other dialogs are closed
 
-		_slideoutStatisticChartOptions.open(itemBounds, isOpenDelayed);
+		_slideoutStatisticOptions.open(itemBounds, isOpenDelayed);
 	}
 
 }

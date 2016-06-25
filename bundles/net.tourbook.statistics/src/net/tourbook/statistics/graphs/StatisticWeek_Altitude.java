@@ -30,4 +30,9 @@ public class StatisticWeek_Altitude extends StatisticWeek {
 
 		return chartDataModel;
 	}
+
+	@Override
+	protected String getGridPrefPrefix() {
+		return GRID_WEEK_ALTITUDE;
+	}
 }

@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import net.tourbook.chart.MinMaxKeeper_YData;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
@@ -31,6 +30,7 @@ import net.tourbook.chart.ChartToolTipInfo;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IBarSelectionListener;
 import net.tourbook.chart.IChartInfoProvider;
+import net.tourbook.chart.MinMaxKeeper_YData;
 import net.tourbook.chart.SelectionBarChart;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
@@ -56,7 +56,6 @@ import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.action.ActionEditQuick;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.TraverseEvent;
@@ -79,8 +78,6 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 
 	private final Calendar				_calendar					= GregorianCalendar.getInstance();
 	private final DateFormat			_dateFormatter				= DateFormat.getDateInstance(DateFormat.FULL);
-
-	private IPostSelectionProvider		_postSelectionProvider;
 
 	private Chart						_chart;
 	private final MinMaxKeeper_YData	_minMaxKeeper				= new MinMaxKeeper_YData();
@@ -169,11 +166,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 	}
 
 	@Override
-	public void createStatisticUI(	final Composite parent,
-									final IViewSite viewSite,
-									final IPostSelectionProvider postSelectionProvider) {
-
-		_postSelectionProvider = postSelectionProvider;
+	public void createStatisticUI(final Composite parent, final IViewSite viewSite) {
 
 		// create statistic chart
 		_chart = new Chart(parent, SWT.BORDER | SWT.FLAT);
@@ -202,7 +195,11 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 					_selectedTourId = _tourDayData.tourIds[valueIndex];
 					_tourInfoToolTipProvider.setTourId(_selectedTourId);
 
-					_postSelectionProvider.setSelection(new SelectionTourId(_selectedTourId));
+					// this view can be inactive -> selection is not fired with the SelectionProvider interface
+					TourManager.fireEventWithCustomData(
+							TourEventId.TOUR_SELECTION,
+							new SelectionTourId(_selectedTourId),
+							viewSite.getPart());
 				}
 			}
 		});
@@ -713,7 +710,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 			_minMaxKeeper.setMinMaxValues(chartModel);
 		}
 
-		StatisticServices.updateChartProperties(_chart);
+		StatisticServices.updateChartProperties(_chart, getGridPrefPrefix());
 
 		// show the data in the chart
 		_chart.updateChart(chartModel, false, true);

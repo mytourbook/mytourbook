@@ -35,4 +35,9 @@ public class StatisticYear_Altitude extends StatisticYear {
 
 		return chartDataModel;
 	}
+
+	@Override
+	protected String getGridPrefPrefix() {
+		return GRID_YEAR_ALTITUDE;
+	}
 }

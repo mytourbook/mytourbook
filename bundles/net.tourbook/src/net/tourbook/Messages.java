@@ -1485,6 +1485,8 @@ public class Messages extends NLS {
 
 	public static String		Slideout_HVROptions_Label_Title;
 
+	public static String		Slideout_RefTour_YearStatisticOptions_Label_Title;
+
 	public static String		Slideout_SegmenterChartOptions_Checkbox_HideSmallValues;
 	public static String		Slideout_SegmenterChartOptions_Checkbox_HideSmallValues_Tooltip;
 	public static String		Slideout_SegmenterChartOptions_Checkbox_IsShowDecimalPlaces;

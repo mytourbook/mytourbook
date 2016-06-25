@@ -30,4 +30,9 @@ public class StatisticDay_Altitude extends StatisticDay {
 
 		return chartDataModel;
 	}
+
+	@Override
+	protected String getGridPrefPrefix() {
+		return GRID_DAY_ALTITUDE;
+	}
 }

@@ -181,11 +181,6 @@ public interface ITourbookPreferences {
 	public static final String	GRAPH_TEMPERATURE_MIN_VALUE						= "GRAPH_TEMPERATURE_MIN_VALUE";							//$NON-NLS-1$
 	public static final String	GRAPH_TEMPERATURE_MAX_VALUE						= "GRAPH_TEMPERATURE_MAX_VALUE";							//$NON-NLS-1$
 
-	public static final String	GRAPH_GRID_VERTICAL_DISTANCE					= "graphs.grid.vertical-distance";							//$NON-NLS-1$
-	public static final String	GRAPH_GRID_HORIZONTAL_DISTANCE					= "graphs.grid.horizontal-distance";						//$NON-NLS-1$
-	public static final String	GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES			= "GraphGrid_IsShowHorizontalGridlines";					//$NON-NLS-1$
-	public static final String	GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES			= "GraphGrid_IsShowVerticalGridlines";						//$NON-NLS-1$
-
 	public static final String	GRAPH_SMOOTHING_SMOOTHING_ALGORITHM				= "GraphSmoothing_SmoothingAlgorithm";						//$NON-NLS-1$
 	public static final String	GRAPH_JAMET_SMOOTHING_IS_SYNCH_SMOOTHING		= "GraphJametSmoothing_IsSynchSmoothing";					//$NON-NLS-1$
 	public static final String	GRAPH_JAMET_SMOOTHING_IS_ALTITUDE				= "GraphJametSmoothing_IsAltitudeSmoothing";				//$NON-NLS-1$
@@ -214,6 +209,14 @@ public interface ITourbookPreferences {
 
 	public static final String	GRAPH_PROPERTY_IS_PACE_CLIPPING					= "graph.property.is.pace_clipping";						//$NON-NLS-1$
 	public static final String	GRAPH_PROPERTY_PACE_CLIPPING_VALUE				= "graph.property.is.pace_clipping.value";					//$NON-NLS-1$
+
+	/*
+	 * Chart grid
+	 */
+	public static final String	CHART_GRID_VERTICAL_DISTANCE					= "CHART_GRID_VERTICAL_DISTANCE";							//$NON-NLS-1$
+	public static final String	CHART_GRID_HORIZONTAL_DISTANCE					= "CHART_GRID_HORIZONTAL_DISTANCE";						//$NON-NLS-1$
+	public static final String	CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES			= "CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES";				//$NON-NLS-1$
+	public static final String	CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES			= "CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES";					//$NON-NLS-1$
 
 	public static final String	DEFAULT_IMPORT_TOUR_TYPE_ID						= "tourtype.import.default";								//$NON-NLS-1$
 

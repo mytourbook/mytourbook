@@ -101,21 +101,25 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TrainingView extends ViewPart {
 
-	public static final String			ID										= "net.tourbook.training.TrainingView"; //$NON-NLS-1$
+	public static final String			ID										= "net.tourbook.training.TrainingView";												//$NON-NLS-1$
 
 	private static final int			HR_LEFT_MIN_BORDER						= 0;
 	private static final int			HR_RIGHT_MAX_BORDER						= 230;
 
-	private static final String			STATE_HR_CHART_LEFT_BORDER				= "HrLeftChartBorder";					//$NON-NLS-1$
-	private static final String			STATE_HR_CHART_RIGHT_BORDER				= "HrRightChartBorder";				//$NON-NLS-1$
-	private static final String			STATE_IS_SHOW_ALL_PULSE_VALUES			= "IsShowAllPulseValues";				//$NON-NLS-1$
-	private static final String			STATE_IS_SYNC_VERTICAL_CHART_SCALING	= "IsSyncVerticalChartScaling";		//$NON-NLS-1$
+	private static final String			STATE_HR_CHART_LEFT_BORDER				= "HrLeftChartBorder";																	//$NON-NLS-1$
+	private static final String			STATE_HR_CHART_RIGHT_BORDER				= "HrRightChartBorder";																//$NON-NLS-1$
+	private static final String			STATE_IS_SHOW_ALL_PULSE_VALUES			= "IsShowAllPulseValues";																//$NON-NLS-1$
+	private static final String			STATE_IS_SYNC_VERTICAL_CHART_SCALING	= "IsSyncVerticalChartScaling";														//$NON-NLS-1$
 
-	private final IPreferenceStore		_prefStore								= TourbookPlugin.getDefault()//
-																						.getPreferenceStore();
+	private static final String			GRID_PREF_PREFIX						= "GRID_TRAINING__";																	//$NON-NLS-1$
 
-	private final IDialogSettings		_state									= TourbookPlugin.getDefault()//
-																						.getDialogSettingsSection(ID);
+	private static final String			GRID_IS_SHOW_VERTICAL_GRIDLINES			= (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES);
+	private static final String			GRID_IS_SHOW_HORIZONTAL_GRIDLINES		= (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
+	private static final String			GRID_VERTICAL_DISTANCE					= (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE);
+	private static final String			GRID_HORIZONTAL_DISTANCE				= (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE);
+
+	private final IPreferenceStore		_prefStore								= TourbookPlugin.getPrefStore();
+	private final IDialogSettings		_state									= TourbookPlugin.getState(ID);
 
 	private IPartListener2				_partListener;
 	private ISelectionListener			_postSelectionListener;
@@ -284,10 +288,11 @@ public class TrainingView extends ViewPart {
 
 					onModifyPerson();
 
-				} else if (property.equals(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE)
-						|| property.equals(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE)
-						|| property.equals(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
-						|| property.equals(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES)
+				} else if (property.equals(GRID_HORIZONTAL_DISTANCE)
+						|| property.equals(GRID_VERTICAL_DISTANCE)
+						|| property.equals(GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
+						|| property.equals(GRID_IS_SHOW_VERTICAL_GRIDLINES)
+
 						|| property.equals(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR)
 						|| property.equals(ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR)
 				//
@@ -335,7 +340,12 @@ public class TrainingView extends ViewPart {
 				}
 
 				if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+
 					clearView();
+
+				} else if (eventId == TourEventId.TOUR_SELECTION && eventData instanceof ISelection) {
+
+					onSelectionChanged((ISelection) eventData);
 
 				} else if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
 
@@ -1027,7 +1037,7 @@ public class TrainingView extends ViewPart {
 
 	private void setChartProperties() {
 
-		UI.updateChartProperties(_chartHrTime);
+		UI.updateChartProperties(_chartHrTime, GRID_PREF_PREFIX);
 
 		// show title
 		_chartHrTime.getChartTitleSegmentConfig().isShowSegmentTitle = true;

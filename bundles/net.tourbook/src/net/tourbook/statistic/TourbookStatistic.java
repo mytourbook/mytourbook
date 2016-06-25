@@ -22,7 +22,6 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IViewSite;
 
@@ -31,17 +30,48 @@ import org.eclipse.ui.IViewSite;
  */
 public abstract class TourbookStatistic {
 
-	protected static final String	STATE_SELECTED_TOUR_ID				= "STATE_SELECTED_TOUR_ID";			//$NON-NLS-1$
+	protected static final String	STATE_SELECTED_TOUR_ID						= "STATE_SELECTED_TOUR_ID";					//$NON-NLS-1$
 
-	protected static final String	STATE_BAR_ORDERING_MONTH_ALTITUDE	= "STATE_BAR_ORDERING_MONTH_ALTITUDE";	//$NON-NLS-1$
-	protected static final String	STATE_BAR_ORDERING_MONTH_DISTANCE	= "STATE_BAR_ORDERING_MONTH_DISTANCE";	//$NON-NLS-1$
-	protected static final String	STATE_BAR_ORDERING_MONTH_SUMMARY	= "STATE_BAR_ORDERING_MONTH_SUMMARY";	//$NON-NLS-1$
-	protected static final String	STATE_BAR_ORDERING_MONTH_TIME		= "STATE_BAR_ORDERING_MONTH_TIME";		//$NON-NLS-1$
+	protected static final String	STATE_BAR_ORDERING_MONTH_ALTITUDE			= "STATE_BAR_ORDERING_MONTH_ALTITUDE";			//$NON-NLS-1$
+	protected static final String	STATE_BAR_ORDERING_MONTH_DISTANCE			= "STATE_BAR_ORDERING_MONTH_DISTANCE";			//$NON-NLS-1$
+	protected static final String	STATE_BAR_ORDERING_MONTH_SUMMARY			= "STATE_BAR_ORDERING_MONTH_SUMMARY";			//$NON-NLS-1$
+	protected static final String	STATE_BAR_ORDERING_MONTH_TIME				= "STATE_BAR_ORDERING_MONTH_TIME";				//$NON-NLS-1$
 
-	protected static final String	STATE_BAR_ORDERING_YEAR_ALTITUDE	= "STATE_BAR_ORDERING_YEAR_ALTITUDE";	//$NON-NLS-1$
-	protected static final String	STATE_BAR_ORDERING_YEAR_DISTANCE	= "STATE_BAR_ORDERING_YEAR_DISTANCE";	//$NON-NLS-1$
-	protected static final String	STATE_BAR_ORDERING_YEAR_SUMMARY		= "STATE_BAR_ORDERING_YEAR_SUMMARY";	//$NON-NLS-1$
-	protected static final String	STATE_BAR_ORDERING_YEAR_TIME		= "STATE_BAR_ORDERING_YEAR_TIME";		//$NON-NLS-1$
+	protected static final String	STATE_BAR_ORDERING_YEAR_ALTITUDE			= "STATE_BAR_ORDERING_YEAR_ALTITUDE";			//$NON-NLS-1$
+	protected static final String	STATE_BAR_ORDERING_YEAR_DISTANCE			= "STATE_BAR_ORDERING_YEAR_DISTANCE";			//$NON-NLS-1$
+	protected static final String	STATE_BAR_ORDERING_YEAR_SUMMARY				= "STATE_BAR_ORDERING_YEAR_SUMMARY";			//$NON-NLS-1$
+	protected static final String	STATE_BAR_ORDERING_YEAR_TIME				= "STATE_BAR_ORDERING_YEAR_TIME";				//$NON-NLS-1$
+
+	protected static final String	STATE_BAR_ORDERING_HR_ZONE_START_FOR_MONTH	= "STATE_BAR_ORDERING_HR_ZONE_START_FOR_MONTH"; ////$NON-NLS-1$
+
+	/*
+	 * Grid prefixes
+	 */
+	protected static final String	GRID_DAY_ALTITUDE							= "GRID_DAY_ALTITUDE__";						//$NON-NLS-1$
+	protected static final String	GRID_DAY_DISTANCE							= "GRID_DAY_DISTANCE__";						//$NON-NLS-1$
+	protected static final String	GRID_DAY_SUMMARY							= "GRID_DAY_SUMMARY__";						//$NON-NLS-1$
+	protected static final String	GRID_DAY_TIME								= "GRID_DAY_TIME__";							//$NON-NLS-1$
+
+	protected static final String	GRID_WEEK_ALTITUDE							= "GRID_WEEK_ALTITUDE__";						//$NON-NLS-1$
+	protected static final String	GRID_WEEK_DISTANCE							= "GRID_WEEK_DISTANCE__";						//$NON-NLS-1$
+	protected static final String	GRID_WEEK_SUMMARY							= "GRID_WEEK_SUMMARY__";						//$NON-NLS-1$
+	protected static final String	GRID_WEEK_TIME								= "GRID_WEEK_TIME__";							//$NON-NLS-1$
+
+	protected static final String	GRID_MONTH_ALTITUDE							= "GRID_MONTH_ALTITUDE__";						//$NON-NLS-1$
+	protected static final String	GRID_MONTH_DISTANCE							= "GRID_MONTH_DISTANCE__";						//$NON-NLS-1$
+	protected static final String	GRID_MONTH_SUMMARY							= "GRID_MONTH_SUMMARY__";						//$NON-NLS-1$
+	protected static final String	GRID_MONTH_TIME								= "GRID_MONTH_TIME__";							//$NON-NLS-1$
+
+	protected static final String	GRID_YEAR_ALTITUDE							= "GRID_YEAR_ALTITUDE__";						//$NON-NLS-1$
+	protected static final String	GRID_YEAR_DISTANCE							= "GRID_YEAR_DISTANCE__";						//$NON-NLS-1$
+	protected static final String	GRID_YEAR_SUMMARY							= "GRID_YEAR_SUMMARY__";						//$NON-NLS-1$
+	protected static final String	GRID_YEAR_TIME								= "GRID_YEAR_TIME__";							//$NON-NLS-1$
+
+	protected static final String	GRID_WEEK_HR_ZONE							= "GRID_WEEK_HR_ZONE__";						//$NON-NLS-1$
+	protected static final String	GRID_MONTH_HR_ZONE							= "GRID_MONTH_HR_ZONE__";						//$NON-NLS-1$
+
+	protected static final String	GRID_TOUR_FREQUENCY							= "GRID_TOUR_FREQUENCY__";						//$NON-NLS-1$
+	protected static final String	GRID_TOUR_TIME								= "GRID_TOUR_TIME__";							//$NON-NLS-1$
 
 	/** ID from plugin.xml */
 	public String					statisticId;
@@ -51,7 +81,7 @@ public abstract class TourbookStatistic {
 
 	private boolean					_isDataDirty;
 
-	private final IPreferenceStore	_prefStore							= TourbookPlugin.getPrefStore();
+	private final IPreferenceStore	_prefStore									= TourbookPlugin.getPrefStore();
 
 	private IPropertyChangeListener	_prefChangeListener;
 
@@ -65,6 +95,13 @@ public abstract class TourbookStatistic {
 	 */
 	private void addPrefListener() {
 
+		final String gridPrefix = getGridPrefPrefix();
+
+		final String gridHDistance = gridPrefix + ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE;
+		final String gridVDistance = gridPrefix + ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE;
+		final String gridIsHGridline = gridPrefix + ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES;
+		final String gridIsVGridline = gridPrefix + ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES;
+
 		// create pref listener
 		_prefChangeListener = new IPropertyChangeListener() {
 			@Override
@@ -74,10 +111,11 @@ public abstract class TourbookStatistic {
 				// test if the color or statistic data have changed
 				if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)
 				//
-						|| property.equals(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE)
-						|| property.equals(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE)
-						|| property.equals(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
-						|| property.equals(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES)
+						|| property.equals(gridHDistance)
+						|| property.equals(gridVDistance)
+						|| property.equals(gridIsHGridline)
+						|| property.equals(gridIsVGridline)
+
 						|| property.equals(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR)
 						|| property.equals(ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR)
 				//
@@ -100,17 +138,13 @@ public abstract class TourbookStatistic {
 	 * @param viewSite
 	 * @param postSelectionProvider
 	 */
-	protected abstract void createStatisticUI(	Composite parent,
-												IViewSite viewSite,
-												IPostSelectionProvider postSelectionProvider);
+	protected abstract void createStatisticUI(Composite parent, IViewSite viewSite);
 
-	public void createUI(	final Composite parent,
-							final IViewSite viewSite,
-							final IPostSelectionProvider postSelectionProvider) {
+	public void createUI(final Composite parent, final IViewSite viewSite) {
 
 		_container = parent;
 
-		createStatisticUI(parent, viewSite, postSelectionProvider);
+		createStatisticUI(parent, viewSite);
 
 		addPrefListener();
 	}
@@ -155,6 +189,11 @@ public abstract class TourbookStatistic {
 		}
 		return true;
 	}
+
+	/**
+	 * @return Returns a prefix which is used to access the grid preferences in the pref store.
+	 */
+	protected abstract String getGridPrefPrefix();
 
 	/**
 	 * @return When a tour can be selected in the statistic, this will return the tour Id of the
@@ -231,18 +270,6 @@ public abstract class TourbookStatistic {
 	}
 
 	/**
-	 * Set additional options in the slideout.
-	 * 
-	 * @param slideout
-	 */
-	protected void setChartOptions(final SlideoutStatisticsChartOptions slideout) {
-
-		// reset previous options
-
-		slideout.setStatisticOptions(null);
-	}
-
-	/**
 	 * Set statistic data dirty that they must be reloaded when the chart is displayed the next
 	 * time.
 	 */
@@ -257,6 +284,18 @@ public abstract class TourbookStatistic {
 	 *            <code>true</code> when the synch is enabled, <code>false</code> when it's disabled
 	 */
 	public abstract void setSynchScale(boolean isEnabled);
+
+	/**
+	 * Set additional options in the slideout.
+	 * 
+	 * @param slideout
+	 */ 
+	protected void setupStatisticSlideout(final SlideoutStatisticOptions slideout) {
+
+		// reset previous options
+
+		slideout.setStatisticOptions(null);
+	}
 
 	@Override
 	public String toString() {

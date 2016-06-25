@@ -554,7 +554,7 @@ public class UI {
 	 * @return Returns the temperatur in the current measurement system.
 	 */
 	public static float convertTemperatureFromMetric(final float temperature) {
- 
+
 		if (UNIT_VALUE_TEMPERATURE == 1) {
 			return temperature;
 		}

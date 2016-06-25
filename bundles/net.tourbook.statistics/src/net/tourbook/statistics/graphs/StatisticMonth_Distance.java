@@ -35,4 +35,9 @@ public class StatisticMonth_Distance extends StatisticMonth {
 
 		return chartDataModel;
 	}
+
+	@Override
+	public String getGridPrefPrefix() {
+		return GRID_MONTH_DISTANCE;
+	}
 }

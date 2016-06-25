@@ -44,6 +44,7 @@ import java.util.List;
 import net.tourbook.common.UI;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
@@ -2179,5 +2180,31 @@ public class Util {
 				}
 			}
 		}
+	}
+
+	public static boolean getPrefixPrefBoolean(final IPreferenceStore prefStore, final String prefPrefix, final String prefKey) {
+	
+		boolean prefValue;
+	
+		if (prefStore.contains(prefPrefix + prefKey)) {
+			prefValue = prefStore.getBoolean(prefPrefix + prefKey);
+		} else {
+			prefValue = prefStore.getDefaultBoolean(prefKey);
+		}
+	
+		return prefValue;
+	}
+
+	public static int getPrefixPrefInt(final IPreferenceStore prefStore, final String prefPrefix, final String prefKey) {
+	
+		int prefValue;
+	
+		if (prefStore.contains(prefPrefix + prefKey)) {
+			prefValue = prefStore.getInt(prefPrefix + prefKey);
+		} else {
+			prefValue = prefStore.getDefaultInt(prefKey);
+		}
+	
+		return prefValue;
 	}
 }

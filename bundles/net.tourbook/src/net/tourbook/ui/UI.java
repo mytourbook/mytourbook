@@ -1074,8 +1074,10 @@ public class UI {
 	 * Update properties for the chart from the pref store.
 	 * 
 	 * @param chart
+	 * @param gridPrefix
+	 *            Pref store prefix for grid preferences.
 	 */
-	public static void updateChartProperties(final Chart chart) {
+	public static void updateChartProperties(final Chart chart, final String gridPrefix) {
 
 		if (chart == null) {
 			return;
@@ -1084,10 +1086,14 @@ public class UI {
 		final IPreferenceStore prefStore = TourbookPlugin.getPrefStore();
 
 		chart.updateProperties(
-				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE),
-				prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE),
-				prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES),
-				prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES),
+
+				Util.getPrefixPrefInt(prefStore, gridPrefix, ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE),
+				Util.getPrefixPrefInt(prefStore, gridPrefix, ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE),
+				Util.getPrefixPrefBoolean(prefStore, gridPrefix,//
+						ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES),
+				Util.getPrefixPrefBoolean(prefStore, gridPrefix, //
+						ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES),
+
 				prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR),
 				PreferenceConverter.getColor(prefStore, ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR));
 	}

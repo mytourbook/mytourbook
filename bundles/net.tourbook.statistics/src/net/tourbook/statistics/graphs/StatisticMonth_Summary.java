@@ -37,4 +37,9 @@ public class StatisticMonth_Summary extends StatisticMonth {
 
 		return chartDataModel;
 	}
+
+	@Override
+	public String getGridPrefPrefix() {
+		return GRID_MONTH_SUMMARY;
+	}
 }

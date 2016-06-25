@@ -21,7 +21,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.chart.MinMaxKeeper_YData;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
@@ -31,6 +30,7 @@ import net.tourbook.chart.ChartStatisticSegments;
 import net.tourbook.chart.ChartToolTipInfo;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IChartInfoProvider;
+import net.tourbook.chart.MinMaxKeeper_YData;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.util.Util;
@@ -43,7 +43,6 @@ import net.tourbook.statistics.StatisticServices;
 import net.tourbook.ui.TourTypeFilter;
 
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IViewSite;
@@ -117,9 +116,7 @@ public abstract class StatisticWeek extends TourbookStatistic {
 	}
 
 	@Override
-	public void createStatisticUI(	final Composite parent,
-									final IViewSite viewSite,
-									final IPostSelectionProvider postSelectionProvider) {
+	public void createStatisticUI(final Composite parent, final IViewSite viewSite) {
 
 		// create statistic chart
 		_chart = new Chart(parent, SWT.BORDER | SWT.FLAT);
@@ -429,7 +426,7 @@ public abstract class StatisticWeek extends TourbookStatistic {
 
 	private void getPreferences() {
 
-		StatisticServices.updateChartProperties(_chart);
+		StatisticServices.updateChartProperties(_chart, getGridPrefPrefix());
 
 		// set week start values
 		_firstDayOfWeek = _prefStore.getInt(ITourbookPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK);

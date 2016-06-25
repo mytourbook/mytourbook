@@ -17,6 +17,7 @@ package net.tourbook.ui;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
 
 import org.eclipse.jface.layout.GridDataFactory;
@@ -41,6 +42,8 @@ public class ChartOptions_Grid {
 	private MouseWheelListener		_defaultMouseWheelListener;
 	private SelectionAdapter		_gridLineListener;
 
+	private String					_prefStorePrefix;
+
 	/*
 	 * UI controls
 	 */
@@ -54,6 +57,18 @@ public class ChartOptions_Grid {
 
 	private Spinner					_spinnerGridHorizontalDistance;
 	private Spinner					_spinnerGridVerticalDistance;
+
+	@SuppressWarnings("unused")
+	private ChartOptions_Grid() {}
+
+	/**
+	 * @param prefStorePrefix
+	 *            Prefix for the grid pref store values.
+	 */
+	public ChartOptions_Grid(final String prefStorePrefix) {
+
+		_prefStorePrefix = prefStorePrefix;
+	}
 
 	public void createUI(final Composite parent) {
 
@@ -210,20 +225,21 @@ public class ChartOptions_Grid {
 //				onChangeUI();
 //			}
 //		});
+
 		onChangeUI();
 	}
 
 	public void resetToDefaults() {
 
 		_spinnerGridHorizontalDistance.setSelection(//
-				_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE));
+				_prefStore.getDefaultInt(ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE));
 		_spinnerGridVerticalDistance.setSelection(//
-				_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE));
+				_prefStore.getDefaultInt(ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE));
 
 		_chkShowGrid_HorizontalLines.setSelection(//
-				_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES));
+				_prefStore.getDefaultBoolean(ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES));
 		_chkShowGrid_VerticalLines.setSelection(//
-				_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES));
+				_prefStore.getDefaultBoolean(ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES));
 
 		onChangeUI();
 	}
@@ -231,26 +247,36 @@ public class ChartOptions_Grid {
 	public void restoreState() {
 
 		_spinnerGridHorizontalDistance.setSelection(//
-				_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE));
+				Util
+						.getPrefixPrefInt(
+								_prefStore,
+								_prefStorePrefix,
+								ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE));
 		_spinnerGridVerticalDistance.setSelection(//
-				_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE));
+				Util.getPrefixPrefInt(_prefStore, _prefStorePrefix, ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE));
 
 		_chkShowGrid_HorizontalLines.setSelection(//
-				_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES));
+				Util.getPrefixPrefBoolean(
+						_prefStore,
+						_prefStorePrefix,
+						ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES));
 		_chkShowGrid_VerticalLines.setSelection(//
-				_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES));
+				Util.getPrefixPrefBoolean(
+						_prefStore,
+						_prefStorePrefix,
+						ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES));
 	}
 
 	public void saveState() {
 
-		_prefStore.setValue(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE, //
+		_prefStore.setValue(_prefStorePrefix + ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE, //
 				_spinnerGridHorizontalDistance.getSelection());
-		_prefStore.setValue(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE, //
+		_prefStore.setValue(_prefStorePrefix + ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE, //
 				_spinnerGridVerticalDistance.getSelection());
 
-		_prefStore.setValue(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES, //
+		_prefStore.setValue(_prefStorePrefix + ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES, //
 				_chkShowGrid_HorizontalLines.getSelection());
-		_prefStore.setValue(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES, //
+		_prefStore.setValue(_prefStorePrefix + ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES, //
 				_chkShowGrid_VerticalLines.getSelection());
 	}
 }

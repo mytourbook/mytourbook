@@ -37,4 +37,9 @@ public class StatisticYear_Summary extends StatisticYear {
 
 		return chartDataModel;
 	}
+
+	@Override
+	protected String getGridPrefPrefix() {
+		return GRID_YEAR_SUMMARY;
+	}
 }

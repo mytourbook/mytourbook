@@ -30,4 +30,9 @@ public class StatisticDay_Distance extends StatisticDay {
 
 		return chartDataModel;
 	}
+
+	@Override
+	protected String getGridPrefPrefix() {
+		return GRID_DAY_DISTANCE;
+	}
 }

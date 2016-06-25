@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -71,30 +71,35 @@ import org.joda.time.DateTimeConstants;
 
 public class YearStatisticView extends ViewPart {
 
-	public static final String					ID							= "net.tourbook.views.tourCatalog.yearStatisticView";		//$NON-NLS-1$
+	public static final String					ID									= "net.tourbook.views.tourCatalog.yearStatisticView";									//$NON-NLS-1$
 
-	private static final String					GRAPH_LABEL_HEARTBEAT		= net.tourbook.common.Messages.Graph_Label_Heartbeat;
-	private static final String					GRAPH_LABEL_HEARTBEAT_UNIT	= net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
+	private static final String					GRAPH_LABEL_HEARTBEAT				= net.tourbook.common.Messages.Graph_Label_Heartbeat;
+	private static final String					GRAPH_LABEL_HEARTBEAT_UNIT			= net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
 
-	private final boolean						_isOSX						= net.tourbook.common.UI.IS_OSX;
-	private final boolean						_isLinux					= net.tourbook.common.UI.IS_LINUX;
+	private final boolean						_isOSX								= net.tourbook.common.UI.IS_OSX;
+	private final boolean						_isLinux							= net.tourbook.common.UI.IS_LINUX;
 
-	static final String							STATE_NUMBER_OF_YEARS		= "numberOfYearsToDisplay";								//$NON-NLS-1$
+	static final String							STATE_NUMBER_OF_YEARS				= "numberOfYearsToDisplay";															//$NON-NLS-1$
 
-	private final IPreferenceStore				_prefStore					= TourbookPlugin.getDefault() //
-																					.getPreferenceStore();
-	private final IDialogSettings				_state						= TourbookPlugin.getDefault() //
-																					.getDialogSettingsSection(
-																							"TourCatalogViewYearStatistic");			//$NON-NLS-1$
+	private static final String					GRID_PREF_PREFIX					= "GRID_REF_TOUR_YEAR_STATISTIC__";													//$NON-NLS-1$
+
+	private static final String					GRID_IS_SHOW_VERTICAL_GRIDLINES		= (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES);
+	private static final String					GRID_IS_SHOW_HORIZONTAL_GRIDLINES	= (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
+	private static final String					GRID_VERTICAL_DISTANCE				= (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE);
+	private static final String					GRID_HORIZONTAL_DISTANCE			= (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE);
+
+	private final IPreferenceStore				_prefStore							= TourbookPlugin.getPrefStore();
+	private final IDialogSettings				_state								= TourbookPlugin
+																							.getState("TourCatalogViewYearStatistic");										//$NON-NLS-1$
 
 	private IPropertyChangeListener				_prefChangeListener;
 	private IPartListener2						_partListener;
 	private ISelectionListener					_postSelectionListener;
 	private PostSelectionProvider				_postSelectionProvider;
 
-	private final DateFormat					_dtFormatter				= DateFormat
-																					.getDateInstance(DateFormat.FULL);
-	private NumberFormat						_nf1						= NumberFormat.getNumberInstance();
+	private final DateFormat					_dtFormatter						= DateFormat
+																							.getDateInstance(DateFormat.FULL);
+	private NumberFormat						_nf1								= NumberFormat.getNumberInstance();
 	{
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
@@ -107,33 +112,33 @@ public class YearStatisticView extends ViewPart {
 	/**
 	 * contains all {@link TVICatalogComparedTour} tour objects for all years
 	 */
-	private ArrayList<TVICatalogComparedTour>	_allTours					= new ArrayList<TVICatalogComparedTour>();
+	private ArrayList<TVICatalogComparedTour>	_allTours							= new ArrayList<TVICatalogComparedTour>();
 
 	/**
 	 * Years which the user can select as start year in the combo box
 	 */
-	private ArrayList<Integer>					_comboYears					= new ArrayList<Integer>();
+	private ArrayList<Integer>					_comboYears							= new ArrayList<Integer>();
 
 	/**
 	 * Day of year values for all displayed years<br>
 	 * DOY...Day Of Year
 	 */
-	private ArrayList<Integer>					_DOYValues					= new ArrayList<Integer>();
+	private ArrayList<Integer>					_DOYValues							= new ArrayList<Integer>();
 
 	/**
 	 * Tour speed for all years
 	 */
-	private ArrayList<Float>					_tourSpeed					= new ArrayList<Float>();
+	private ArrayList<Float>					_tourSpeed							= new ArrayList<Float>();
 
 	/**
 	 * Average pulse for all years.
 	 */
-	private ArrayList<Float>					_avgPulse					= new ArrayList<Float>();
+	private ArrayList<Float>					_avgPulse							= new ArrayList<Float>();
 
 	/**
 	 * this is the last year (on the right side) which is displayed in the statistics
 	 */
-	private int									_lastYear					= new DateTime().getYear();
+	private int									_lastYear							= new DateTime().getYear();
 
 	/**
 	 * year item for the visible statistics
@@ -156,6 +161,12 @@ public class YearStatisticView extends ViewPart {
 	 */
 	private int									_selectedTourIndex;
 
+	private IAction								_actionSynchChartScale;
+	private Action_RefTour_YearStatisticOptions	_actionYearStatOptions;
+
+	private YearStatisticTourToolTip			_tourToolTip;
+	private TourInfoIconToolTipProvider			_tourInfoToolTipProvider			= new TourInfoIconToolTipProvider();
+
 	/*
 	 * UI controls
 	 */
@@ -163,14 +174,10 @@ public class YearStatisticView extends ViewPart {
 	private Label								_pageNoChart;
 
 	private Chart								_yearChart;
-	private YearStatisticTourToolTip			_tourToolTip;
-	private TourInfoIconToolTipProvider			_tourInfoToolTipProvider	= new TourInfoIconToolTipProvider();
 
 	private Composite							_toolbar;
 	private Combo								_cboLastYear;
 	private Combo								_cboNumberOfYears;
-
-	private IAction								_actionSynchChartScale;
 
 	private Composite							_pageChart;
 
@@ -234,6 +241,15 @@ public class YearStatisticView extends ViewPart {
 					createUI_30_Chart(_pageChart);
 
 					_pageChart.layout();
+
+					updateUI_YearChart(false);
+
+				} else if (property.equals(GRID_HORIZONTAL_DISTANCE)
+						|| property.equals(GRID_VERTICAL_DISTANCE)
+						|| property.equals(GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
+						|| property.equals(GRID_IS_SHOW_VERTICAL_GRIDLINES)
+				//
+				) {
 
 					updateUI_YearChart(false);
 				}
@@ -331,9 +347,11 @@ public class YearStatisticView extends ViewPart {
 	private void createActions() {
 
 		_actionSynchChartScale = new ActionSynchYearScale(this);
+		_actionYearStatOptions = new Action_RefTour_YearStatisticOptions(_pageBook, GRID_PREF_PREFIX);
 
 		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 		tbm.add(_actionSynchChartScale);
+		tbm.add(_actionYearStatOptions);
 
 		tbm.update(true);
 	}
@@ -1003,7 +1021,7 @@ public class YearStatisticView extends ViewPart {
 			}
 		});
 
-		net.tourbook.ui.UI.updateChartProperties(_yearChart);
+		net.tourbook.ui.UI.updateChartProperties(_yearChart, GRID_PREF_PREFIX);
 
 		// show the data in the chart
 		_yearChart.updateChart(chartModel, false, true);

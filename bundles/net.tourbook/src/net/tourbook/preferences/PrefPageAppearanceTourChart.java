@@ -1410,14 +1410,14 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		} else if (selectedTab == _tab3_Grid) {
 
 			_spinnerGridHorizontalDistance.setSelection(//
-					_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE));
+					_prefStore.getDefaultInt(ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE));
 			_spinnerGridVerticalDistance.setSelection(//
-					_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE));
+					_prefStore.getDefaultInt(ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE));
 
 			_chkShowGrid_HorizontalLines.setSelection(//
-					_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES));
+					_prefStore.getDefaultBoolean(ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES));
 			_chkShowGrid_VerticalLines.setSelection(//
-					_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES));
+					_prefStore.getDefaultBoolean(ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES));
 
 		} else if (selectedTab == _tab2_MinMax) {
 
@@ -1673,14 +1673,14 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 		 * Grid
 		 */
 		_spinnerGridHorizontalDistance.setSelection(//
-				_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE));
+				_prefStore.getInt(ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE));
 		_spinnerGridVerticalDistance.setSelection(//
-				_prefStore.getInt(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE));
+				_prefStore.getInt(ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE));
 
 		_chkShowGrid_HorizontalLines.setSelection(//
-				_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES));
+				_prefStore.getBoolean(ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES));
 		_chkShowGrid_VerticalLines.setSelection(//
-				_prefStore.getBoolean(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES));
+				_prefStore.getBoolean(ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES));
 
 		/*
 		 * Units
@@ -1835,14 +1835,14 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 
 	private void saveState_Tab_3_Grid() {
 
-		_prefStore.setValue(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE, //
+		_prefStore.setValue(ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE, //
 				_spinnerGridHorizontalDistance.getSelection());
-		_prefStore.setValue(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE, //
+		_prefStore.setValue(ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE, //
 				_spinnerGridVerticalDistance.getSelection());
 
-		_prefStore.setValue(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES, //
+		_prefStore.setValue(ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES, //
 				_chkShowGrid_HorizontalLines.getSelection());
-		_prefStore.setValue(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES, //
+		_prefStore.setValue(ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES, //
 				_chkShowGrid_VerticalLines.getSelection());
 
 		if (_rdoShowTime.getSelection()) {

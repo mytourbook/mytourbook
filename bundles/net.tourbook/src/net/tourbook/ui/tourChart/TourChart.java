@@ -929,10 +929,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 						|| property.equals(ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR)
 						|| property.equals(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE)
 						|| property.equals(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING)
-						|| property.equals(ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE)
-						|| property.equals(ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE)
-						|| property.equals(ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
-						|| property.equals(ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES)
+
+						|| property.equals(ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE)
+						|| property.equals(ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE)
+						|| property.equals(ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
+						|| property.equals(ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES)
 				//
 				) {
 
@@ -4030,14 +4031,14 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 				ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING);
 
 		gridVerticalDistance = _prefStore.getInt(//
-				ITourbookPreferences.GRAPH_GRID_VERTICAL_DISTANCE);
+				ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE);
 		gridHorizontalDistance = _prefStore.getInt(//
-				ITourbookPreferences.GRAPH_GRID_HORIZONTAL_DISTANCE);
+				ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE);
 
 		isShowHorizontalGridLines = _prefStore.getBoolean(//
-				ITourbookPreferences.GRAPH_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
+				ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
 		isShowVerticalGridLines = _prefStore.getBoolean(//
-				ITourbookPreferences.GRAPH_GRID_IS_SHOW_VERTICAL_GRIDLINES);
+				ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES);
 	}
 
 	private void setupChartSegmentTitle() {
@@ -4587,7 +4588,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		 * x-axis time/distance
 		 */
 		final boolean isShowTimeOnXAxis = _tcc.isShowTimeOnXAxis;
-
 
 		tourAction = _allTourChartActions.get(ACTION_ID_X_AXIS_TIME);
 		tourAction.setEnabled(true); // time data are always available
