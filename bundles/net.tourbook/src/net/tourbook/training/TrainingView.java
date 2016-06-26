@@ -292,9 +292,6 @@ public class TrainingView extends ViewPart {
 						|| property.equals(GRID_VERTICAL_DISTANCE)
 						|| property.equals(GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
 						|| property.equals(GRID_IS_SHOW_VERTICAL_GRIDLINES)
-
-						|| property.equals(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR)
-						|| property.equals(ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR)
 				//
 				) {
 

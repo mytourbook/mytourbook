@@ -99,8 +99,6 @@ public class HeartRateVariabilityView extends ViewPart {
 	private final MinMaxKeeper_YData	_yMinMaxKeeper							= new MinMaxKeeper_YData(
 																						ADJUST_PULSE_VALUE);
 
-//	new SlideoutHRVOptions(_parent, _toolBar, _prefStoreGridPrefix);
-
 	/*
 	 * UI controls
 	 */
@@ -148,9 +146,6 @@ public class HeartRateVariabilityView extends ViewPart {
 						|| property.equals(GRID_VERTICAL_DISTANCE)
 						|| property.equals(GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
 						|| property.equals(GRID_IS_SHOW_VERTICAL_GRIDLINES)
-
-						|| property.equals(ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR)
-						|| property.equals(ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR)
 				//
 				) {
 
