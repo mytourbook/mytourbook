@@ -32,6 +32,8 @@ import net.tourbook.chart.IBarSelectionListener;
 import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
+import net.tourbook.common.tooltip.ActionToolbarSlideout;
+import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.ArrayListToArray;
 import net.tourbook.common.util.IToolTipHideListener;
 import net.tourbook.common.util.PostSelectionProvider;
@@ -60,6 +62,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
@@ -162,7 +165,7 @@ public class YearStatisticView extends ViewPart {
 	private int									_selectedTourIndex;
 
 	private IAction								_actionSynchChartScale;
-	private Action_RefTour_YearStatisticOptions	_actionYearStatOptions;
+	private ActionToolbarSlideout				_actionYearStatOptions;
 
 	private YearStatisticTourToolTip			_tourToolTip;
 	private TourInfoIconToolTipProvider			_tourInfoToolTipProvider			= new TourInfoIconToolTipProvider();
@@ -180,6 +183,15 @@ public class YearStatisticView extends ViewPart {
 	private Combo								_cboNumberOfYears;
 
 	private Composite							_pageChart;
+
+	private class ActionYearStatisticOptions extends ActionToolbarSlideout {
+
+		@Override
+		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+
+			return new Slideout_YearStatisticOptions(_pageBook, toolbar, GRID_PREF_PREFIX);
+		}
+	}
 
 	public YearStatisticView() {}
 
@@ -347,7 +359,7 @@ public class YearStatisticView extends ViewPart {
 	private void createActions() {
 
 		_actionSynchChartScale = new ActionSynchYearScale(this);
-		_actionYearStatOptions = new Action_RefTour_YearStatisticOptions(_pageBook, GRID_PREF_PREFIX);
+		_actionYearStatOptions = new ActionYearStatisticOptions();
 
 		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 		tbm.add(_actionSynchChartScale);

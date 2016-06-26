@@ -26,6 +26,8 @@ import java.util.GregorianCalendar;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.tooltip.ActionToolbarSlideout;
+import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
@@ -57,6 +59,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
@@ -127,6 +130,20 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 	private Composite						_statContainer;
 
 	private PageBook						_pageBookStatistic;
+
+	private SlideoutStatisticOptions		_slideoutStatisticOptions;
+
+	private class ActionStatisticOptions extends ActionToolbarSlideout {
+
+		@Override
+		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+
+			_slideoutStatisticOptions = new SlideoutStatisticOptions(_statContainer, toolbar);
+
+			return _slideoutStatisticOptions;
+		}
+
+	}
 
 	void actionSynchScale(final boolean isEnabled) {
 
@@ -282,7 +299,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 
 	private void createActions() {
 
-		_actionStatisticOptions = new ActionStatisticOptions(_statContainer);
+		_actionStatisticOptions = new ActionStatisticOptions();
 		_actionSynchChartScale = new ActionSynchChartScale(this);
 	}
 
@@ -982,11 +999,9 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 		// update toolbar to show added items
 		tbm.update(true);
 
-		// get slideout AFTER the toolbar is created/updated/filled, this creates it
-		final SlideoutStatisticOptions slideout = _actionStatisticOptions.getSlideout();
-
-		_activeStatistic.setupStatisticSlideout(slideout);
-		slideout.setGridPrefPrefix(_activeStatistic.getGridPrefPrefix());
+		// use slideout AFTER the toolbar is created/updated/filled, this creates it
+		_activeStatistic.setupStatisticSlideout(_slideoutStatisticOptions);
+		_slideoutStatisticOptions.setGridPrefPrefix(_activeStatistic.getGridPrefPrefix());
 	}
 
 }

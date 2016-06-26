@@ -13,11 +13,10 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.statistic;
+package net.tourbook.common.tooltip;
 
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.tooltip.IOpeningDialog;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.Messages;
 
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.swt.SWT;
@@ -30,35 +29,34 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
-public class ActionStatisticOptions extends ContributionItem implements IOpeningDialog {
+/**
+ * Action to open a slideout in a toolbar.
+ */
+public abstract class ActionToolbarSlideout extends ContributionItem implements IOpeningDialog {
 
-	private String						_dialogId	= getClass().getCanonicalName();
+	private String			_dialogId	= getClass().getCanonicalName();
 
-	private ToolBar						_toolBar;
-	private ToolItem					_actionToolItem;
+	private ToolBar			_toolBar;
+	private ToolItem		_actionToolItem;
 
-	private SlideoutStatisticOptions	_slideoutStatisticOptions;
+	private ToolbarSlideout	_slideoutOptions;
 
 	/*
 	 * UI controls
 	 */
-	private Control						_parent;
+	private Image			_imageEnabled;
+	private Image			_imageDisabled;
 
-	private Image						_imageEnabled;
-	private Image						_imageDisabled;
+	public ActionToolbarSlideout() {
 
-	public ActionStatisticOptions(final Composite parent) {
-
-		_parent = parent;
-
-		_imageEnabled = TourbookPlugin.getImageDescriptor(Messages.Image__tour_options).createImage();
-		_imageDisabled = TourbookPlugin.getImageDescriptor(Messages.Image__tour_options_disabled).createImage();
+		_imageEnabled = CommonActivator.getImageDescriptor(Messages.Image__TourOptions).createImage();
+		_imageDisabled = CommonActivator.getImageDescriptor(Messages.Image__TourOptions_Disabled).createImage();
 	}
+
+	protected abstract ToolbarSlideout createSlideout(ToolBar toolbar);
 
 	@Override
 	public void fill(final ToolBar toolbar, final int index) {
@@ -95,7 +93,7 @@ public class ActionStatisticOptions extends ContributionItem implements IOpening
 				}
 			});
 
-			_slideoutStatisticOptions = new SlideoutStatisticOptions(_parent, _toolBar);
+			_slideoutOptions = createSlideout(toolbar);
 		}
 	}
 
@@ -104,13 +102,16 @@ public class ActionStatisticOptions extends ContributionItem implements IOpening
 		return _dialogId;
 	}
 
-	SlideoutStatisticOptions getSlideout() {
-		return _slideoutStatisticOptions;
-	}
-
 	@Override
 	public void hideDialog() {
-		_slideoutStatisticOptions.hideNow();
+		_slideoutOptions.hideNow();
+	}
+
+	/**
+	 * Is called before the slideout is opened, this allows to close other dialogs
+	 */
+	protected void onBeforeOpenSlideout() {
+		
 	}
 
 	private void onDispose() {
@@ -155,7 +156,7 @@ public class ActionStatisticOptions extends ContributionItem implements IOpening
 
 	private void onSelect() {
 
-		if (_slideoutStatisticOptions.isToolTipVisible() == false) {
+		if (_slideoutOptions.isToolTipVisible() == false) {
 
 			final Rectangle itemBounds = _actionToolItem.getBounds();
 
@@ -168,15 +169,36 @@ public class ActionStatisticOptions extends ContributionItem implements IOpening
 
 		} else {
 
-			_slideoutStatisticOptions.close();
+			_slideoutOptions.close();
 		}
 	}
 
 	private void openSlideout(final Rectangle itemBounds, final boolean isOpenDelayed) {
 
 		// ensure other dialogs are closed
+		onBeforeOpenSlideout();
 
-		_slideoutStatisticOptions.open(itemBounds, isOpenDelayed);
+		_slideoutOptions.open(itemBounds, isOpenDelayed);
 	}
 
+	public void setEnabled(final boolean isEnabled) {
+
+		_actionToolItem.setEnabled(isEnabled);
+
+		if (isEnabled && _actionToolItem.getSelection() == false) {
+
+			// show default icon
+			_actionToolItem.setImage(_imageEnabled);
+		}
+	}
+
+	public void setSelected(final boolean isSelected) {
+
+		if (_actionToolItem == null) {
+			// this happened
+			return;
+		}
+
+		_actionToolItem.setSelection(isSelected);
+	}
 }

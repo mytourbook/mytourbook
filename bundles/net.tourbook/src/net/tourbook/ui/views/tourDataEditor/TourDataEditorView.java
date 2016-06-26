@@ -44,6 +44,8 @@ import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.tooltip.ActionToolbarSlideout;
+import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer2;
@@ -163,6 +165,7 @@ import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISaveablePart2;
@@ -573,6 +576,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private Text								_txtStrideSensor;
 	private Text								_txtTimeSlicesCount;
 	private Text								_txtTourId;
+
+	private class ActionViewSettings extends ActionToolbarSlideout {
+
+		@Override
+		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+
+			return new SlideoutViewSettings(_pageBook, toolbar, _state, TourDataEditorView.this);
+		}
+	}
 
 	private final class SliceDoubleEditingSupport extends EditingSupport {
 
@@ -1781,7 +1793,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_actionSplitTour = new ActionSplitTour(this);
 		_actionExtractTour = new ActionExtractTour(this);
 
-		_actionViewSettings = new ActionViewSettings(this, _uiParent);
+		_actionViewSettings = new ActionViewSettings();
 
 		_actionOpenTourTypePrefs = new ActionOpenPrefDialog(
 				Messages.action_tourType_modify_tourTypes,

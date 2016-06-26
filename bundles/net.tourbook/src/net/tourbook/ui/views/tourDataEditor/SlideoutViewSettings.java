@@ -58,11 +58,11 @@ public class SlideoutViewSettings extends ToolbarSlideout implements IColorSelec
 	public SlideoutViewSettings(final Control ownerControl,
 								final ToolBar toolBar,
 								final IDialogSettings state,
-								final TourDataEditorView tourMarkerAllView) {
+								final TourDataEditorView tourEditorView) {
 
 		super(ownerControl, toolBar);
 
-		_tourEditorView = tourMarkerAllView;
+		_tourEditorView = tourEditorView;
 	}
 
 	@Override

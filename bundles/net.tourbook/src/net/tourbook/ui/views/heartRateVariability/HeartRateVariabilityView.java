@@ -30,6 +30,8 @@ import net.tourbook.chart.MinMaxKeeper_YData;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.preferences.ICommonPreferences;
+import net.tourbook.common.tooltip.ActionToolbarSlideout;
+import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
@@ -53,6 +55,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.PageBook;
@@ -86,7 +89,7 @@ public class HeartRateVariabilityView extends ViewPart {
 
 	private ArrayList<TourData>			_hrvTours;
 
-	private ActionHrvOptions			_actionHrvOptions;
+	private ActionToolbarSlideout		_actionHrvOptions;
 	private ActionSynchChartScale		_actionSynchChartScaling;
 
 	private boolean						_isSynchChartScaling;
@@ -96,15 +99,26 @@ public class HeartRateVariabilityView extends ViewPart {
 	private final MinMaxKeeper_YData	_yMinMaxKeeper							= new MinMaxKeeper_YData(
 																						ADJUST_PULSE_VALUE);
 
+//	new SlideoutHRVOptions(_parent, _toolBar, _prefStoreGridPrefix);
+
 	/*
 	 * UI controls
 	 */
 	private PageBook					_pageBook;
+
 	private Label						_pageNoTour;
 	private Composite					_pageHrvChart;
 	private Chart						_chartHRV;
-
 	private Label						_pageInvalidData;
+
+	private class ActionHrvOptions extends ActionToolbarSlideout {
+
+		@Override
+		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+
+			return new SlideoutHRVOptions(_pageBook, toolbar, GRID_PREF_PREFIX);
+		}
+	}
 
 	void actionSynchChartScale() {
 
@@ -204,7 +218,7 @@ public class HeartRateVariabilityView extends ViewPart {
 
 	private void createActions() {
 
-		_actionHrvOptions = new ActionHrvOptions(_pageBook, GRID_PREF_PREFIX);
+		_actionHrvOptions = new ActionHrvOptions();
 		_actionSynchChartScaling = new ActionSynchChartScale(this);
 	}
 

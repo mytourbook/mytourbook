@@ -43,16 +43,14 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class SlideoutTourChartOptions extends ToolbarSlideout {
 
-	private static final String		PREF_STORE_PREFIX	= "TourChart_";							//$NON-NLS-1$
-
-	private final IPreferenceStore	_prefStore			= TourbookPlugin.getPrefStore();
+	private final IPreferenceStore	_prefStore	= TourbookPlugin.getPrefStore();
 
 	private SelectionAdapter		_defaultSelectionListener;
 
 	private ActionOpenPrefDialog	_actionPrefDialog;
 	private Action					_actionRestoreDefaults;
 
-	private ChartOptions_Grid		_gridUI				= new ChartOptions_Grid(PREF_STORE_PREFIX);
+	private ChartOptions_Grid		_gridUI;
 
 	/*
 	 * UI controls
@@ -64,11 +62,16 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
 	private Button					_chkShowStartTimeOnXAxis;
 	private Button					_chkShowValuePointTooltip;
 
-	public SlideoutTourChartOptions(final Control ownerControl, final ToolBar toolBar, final TourChart tourChart) {
+	public SlideoutTourChartOptions(final Control ownerControl,
+									final ToolBar toolBar,
+									final TourChart tourChart,
+									final String gridPrefPrefix) {
 
 		super(ownerControl, toolBar);
 
 		_tourChart = tourChart;
+
+		_gridUI = new ChartOptions_Grid(gridPrefPrefix);
 	}
 
 	private void createActions() {
