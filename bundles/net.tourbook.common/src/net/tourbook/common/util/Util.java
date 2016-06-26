@@ -756,6 +756,34 @@ public class Util {
 		return counter;
 	}
 
+	public static boolean getPrefixPrefBoolean(	final IPreferenceStore prefStore,
+												final String prefPrefix,
+												final String prefKey) {
+
+		boolean prefValue;
+
+		if (prefStore.contains(prefPrefix + prefKey)) {
+			prefValue = prefStore.getBoolean(prefPrefix + prefKey);
+		} else {
+			prefValue = prefStore.getDefaultBoolean(prefKey);
+		}
+
+		return prefValue;
+	}
+
+	public static int getPrefixPrefInt(final IPreferenceStore prefStore, final String prefPrefix, final String prefKey) {
+
+		int prefValue;
+
+		if (prefStore.contains(prefPrefix + prefKey)) {
+			prefValue = prefStore.getInt(prefPrefix + prefKey);
+		} else {
+			prefValue = prefStore.getDefaultInt(prefKey);
+		}
+
+		return prefValue;
+	}
+
 	public static String getSQLExceptionText(final SQLException e) {
 
 		final String text = ""// //$NON-NLS-1$
@@ -1873,10 +1901,11 @@ public class Util {
 					unit = //
 							//
 					unit > 3000 ? 3000 : //
-							unit > 2400 ? 2400 : //
+							unit > 1200 ? 1200 : //
 									unit > 600 ? 600 : //
 											unit > 300 ? 300 : //
-													60;
+													unit > 120 ? 120 : //
+															60;
 				}
 
 			} else {
@@ -2180,31 +2209,5 @@ public class Util {
 				}
 			}
 		}
-	}
-
-	public static boolean getPrefixPrefBoolean(final IPreferenceStore prefStore, final String prefPrefix, final String prefKey) {
-	
-		boolean prefValue;
-	
-		if (prefStore.contains(prefPrefix + prefKey)) {
-			prefValue = prefStore.getBoolean(prefPrefix + prefKey);
-		} else {
-			prefValue = prefStore.getDefaultBoolean(prefKey);
-		}
-	
-		return prefValue;
-	}
-
-	public static int getPrefixPrefInt(final IPreferenceStore prefStore, final String prefPrefix, final String prefKey) {
-	
-		int prefValue;
-	
-		if (prefStore.contains(prefPrefix + prefKey)) {
-			prefValue = prefStore.getInt(prefPrefix + prefKey);
-		} else {
-			prefValue = prefStore.getDefaultInt(prefKey);
-		}
-	
-		return prefValue;
 	}
 }

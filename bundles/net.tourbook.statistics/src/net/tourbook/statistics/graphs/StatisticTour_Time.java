@@ -162,6 +162,11 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
 
 					DataProvider_Tour_Time.getInstance().setSelectedTourId(_selectedTourId);
 
+					// don't fire an event when preferences are updated
+					if (isInPreferencesUpdate()) {
+						return;
+					}
+
 					// this view can be inactive -> selection is not fired with the SelectionProvider interface
 					TourManager.fireEventWithCustomData(
 							TourEventId.TOUR_SELECTION,

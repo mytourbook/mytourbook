@@ -353,7 +353,6 @@ public class ChartComponents extends Composite {
 
 		final double graphMinValue = xData.getXAxisMinValueForced();
 
-		final double graphOriginalMaxValue = xData.getOriginalMaxValue();
 		final double xAxisEndValue = xData.getXAxisMaxValueForced();
 		final double graphMaxValue = xAxisEndValue == Double.MIN_VALUE ? xData.getOriginalMaxValue() : xAxisEndValue;
 

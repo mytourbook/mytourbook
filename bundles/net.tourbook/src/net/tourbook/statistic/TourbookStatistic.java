@@ -90,6 +90,8 @@ public abstract class TourbookStatistic {
 	 */
 	private Composite				_container;
 
+	private boolean					_isInPrefUpdate;
+
 	/**
 	 * Add the pref listener which is called when the color was changed
 	 */
@@ -121,8 +123,12 @@ public abstract class TourbookStatistic {
 				//
 				) {
 
-					// update chart
-					preferencesHasChanged();
+					_isInPrefUpdate = true;
+					{
+						// update chart
+						preferencesHasChanged();
+					}
+					_isInPrefUpdate = false;
 				}
 			}
 		};
@@ -227,6 +233,10 @@ public abstract class TourbookStatistic {
 		return isDataDirty;
 	}
 
+	public boolean isInPreferencesUpdate() {
+		return _isInPrefUpdate;
+	}
+
 	/**
 	 * Preferences for the statistics has changed.
 	 */
@@ -289,7 +299,7 @@ public abstract class TourbookStatistic {
 	 * Set additional options in the slideout.
 	 * 
 	 * @param slideout
-	 */ 
+	 */
 	protected void setupStatisticSlideout(final SlideoutStatisticOptions slideout) {
 
 		// reset previous options
