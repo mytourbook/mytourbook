@@ -29,6 +29,8 @@ import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IBarSelectionListener;
 import net.tourbook.chart.MinMaxKeeper_YData;
+import net.tourbook.common.tooltip.ActionToolbarSlideout;
+import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.HrZoneContext;
 import net.tourbook.data.TourData;
@@ -137,9 +139,12 @@ public class TrainingView extends ViewPart {
 	private boolean						_isShowAllPulseValues;
 	private boolean						_isSynchChartVerticalValues;
 
+	private ToolBarManager				_headerToolbarManager;
+
 	private ActionEditHrZones			_actionEditHrZones;
 	private ActionShowAllPulseValues	_actionShowAllPulseValues;
 	private ActionSynchChartScale		_actionSynchVerticalChartScaling;
+	private ActionTrainingOptions		_actionTrainingOptions;
 
 	private double						_pulseStart;
 	private double[]					_xSeriePulse;
@@ -204,6 +209,15 @@ public class TrainingView extends ViewPart {
 	 * Percentage for current tour and for each HR zone
 	 */
 	private double[]					_tourHrZonePercent;
+
+	private class ActionTrainingOptions extends ActionToolbarSlideout {
+
+		@Override
+		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+
+			return new SlideoutTrainingOptions(_pageBookHrZones, toolbar, GRID_PREF_PREFIX);
+		}
+	}
 
 	public TrainingView() {}
 
@@ -380,8 +394,10 @@ public class TrainingView extends ViewPart {
 	private void createActions() {
 
 		_actionEditHrZones = new ActionEditHrZones(this);
+		_actionShowAllPulseValues = new ActionShowAllPulseValues(this);
+		_actionSynchVerticalChartScaling = new ActionSynchChartScale(this);
+		_actionTrainingOptions = new ActionTrainingOptions();
 
-		fillActionBars();
 	}
 
 	@Override
@@ -390,6 +406,7 @@ public class TrainingView extends ViewPart {
 		createUI(parent);
 
 		createActions();
+		fillActionBars();
 
 		// show default page
 		_pageBookHrZones.showPage(_pageNoTour);
@@ -476,15 +493,7 @@ public class TrainingView extends ViewPart {
 			GridDataFactory.fillDefaults()//
 					.align(SWT.BEGINNING, SWT.CENTER)
 					.applyTo(toolbar);
-			final ToolBarManager tbm = new ToolBarManager(toolbar);
-
-			_actionShowAllPulseValues = new ActionShowAllPulseValues(this);
-			_actionSynchVerticalChartScaling = new ActionSynchChartScale(this);
-
-			tbm.add(_actionSynchVerticalChartScaling);
-			tbm.add(_actionShowAllPulseValues);
-
-			tbm.update(true);
+			_headerToolbarManager = new ToolBarManager(toolbar);
 		}
 
 		// label: horizontal separator
@@ -860,6 +869,7 @@ public class TrainingView extends ViewPart {
 
 		_actionSynchVerticalChartScaling.setEnabled(isCustomScaling);
 		_actionShowAllPulseValues.setEnabled(isHrZoneAvailable);
+		_actionTrainingOptions.setEnabled(isHrZoneAvailable);
 	}
 
 	private void fillActionBars() {
@@ -869,6 +879,15 @@ public class TrainingView extends ViewPart {
 		 */
 		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
 		menuMgr.add(_actionEditHrZones);
+
+		/*
+		 * Header toolbar
+		 */
+		_headerToolbarManager.add(_actionShowAllPulseValues);
+		_headerToolbarManager.add(_actionSynchVerticalChartScaling);
+		_headerToolbarManager.add(_actionTrainingOptions);
+
+		_headerToolbarManager.update(true);
 	}
 
 	private void initUI(final Composite parent) {

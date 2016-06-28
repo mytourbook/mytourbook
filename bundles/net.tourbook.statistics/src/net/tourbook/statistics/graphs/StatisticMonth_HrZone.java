@@ -34,6 +34,7 @@ import net.tourbook.statistic.StatisticContext;
 import net.tourbook.statistic.TourbookStatistic;
 import net.tourbook.statistics.Messages;
 import net.tourbook.statistics.StatisticServices;
+import net.tourbook.ui.ChartOptions_Grid;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 
@@ -198,6 +199,14 @@ public class StatisticMonth_HrZone extends TourbookStatistic {
 		yData.setDefaultRGB(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY).getRGB());
 
 		chartDataModel.addYData(yData);
+	}
+
+	@Override
+	public int getEnabledGridOptions() {
+
+		return ChartOptions_Grid.GRID_VERTICAL_DISTANCE
+				| ChartOptions_Grid.GRID_IS_SHOW_HORIZONTAL_LINE
+				| ChartOptions_Grid.GRID_IS_SHOW_VERTICAL_LINE;
 	}
 
 	@Override

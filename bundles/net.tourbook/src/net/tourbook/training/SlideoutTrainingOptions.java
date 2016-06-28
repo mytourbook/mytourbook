@@ -13,13 +13,12 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.statistic;
+package net.tourbook.training;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.tooltip.ToolbarSlideout;
-import net.tourbook.preferences.PrefPageStatistic;
+import net.tourbook.statistic.IStatisticOptions;
 import net.tourbook.ui.ChartOptions_Grid;
 
 import org.eclipse.jface.action.Action;
@@ -31,30 +30,27 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 
-public class SlideoutStatisticOptions extends ToolbarSlideout {
+/**
+ */
+public class SlideoutTrainingOptions extends ToolbarSlideout {
 
-	private ActionOpenPrefDialog	_actionPrefDialog;
-	private Action					_actionRestoreDefaults;
-	private String					_gridPrefPrefix;
+	private Action				_actionRestoreDefaults;
 
-	private ChartOptions_Grid		_gridUI;
+	private ChartOptions_Grid	_gridUI;
+
+	private IStatisticOptions	_trainingOptions;
 
 	/*
 	 * UI controls
 	 */
-	private Shell					_parentShell;
 
-	private IStatisticOptions		_statisticOptions;
-	private int						_gridOptionsEnabled;
-
-	public SlideoutStatisticOptions(final Control ownerControl, final ToolBar toolBar) {
+	public SlideoutTrainingOptions(final Control ownerControl, final ToolBar toolBar, final String prefStoreGridPrefix) {
 
 		super(ownerControl, toolBar);
 
-		_parentShell = ownerControl.getShell();
+		_gridUI = new ChartOptions_Grid(prefStoreGridPrefix);
 	}
 
 	private void createActions() {
@@ -69,18 +65,9 @@ public class SlideoutStatisticOptions extends ToolbarSlideout {
 			}
 		};
 
+		_actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
 		_actionRestoreDefaults.setImageDescriptor(//
 				TourbookPlugin.getImageDescriptor(Messages.Image__App_RestoreDefault));
-		_actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
-
-		_actionPrefDialog = new ActionOpenPrefDialog(
-				Messages.Tour_Action_EditStatisticPreferences,
-				PrefPageStatistic.ID);
-
-		/*
-		 * Set shell to the parent otherwise the pref dialog is closed when the slideout is closed.
-		 */
-		_actionPrefDialog.setShell(_parentShell);
 	}
 
 	@Override
@@ -88,13 +75,9 @@ public class SlideoutStatisticOptions extends ToolbarSlideout {
 
 		createActions();
 
-		_gridUI = new ChartOptions_Grid(_gridPrefPrefix);
-
 		final Composite ui = createUI(parent);
 
 		restoreState();
-
-		_gridUI.enableGridOptions(_gridOptionsEnabled);
 
 		return ui;
 	}
@@ -114,8 +97,8 @@ public class SlideoutStatisticOptions extends ToolbarSlideout {
 				createUI_10_Title(container);
 				createUI_12_Actions(container);
 
-				if (_statisticOptions != null) {
-					_statisticOptions.createUI(container);
+				if (_trainingOptions != null) {
+					_trainingOptions.createUI(container);
 				}
 
 				_gridUI.createUI(container);
@@ -132,7 +115,7 @@ public class SlideoutStatisticOptions extends ToolbarSlideout {
 		 */
 		final Label label = new Label(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().applyTo(label);
-		label.setText(Messages.Slideout_StatisticChartOptions_Label_Title);
+		label.setText(Messages.Slideout_TrainingOptions_Label_Title);
 		label.setFont(JFaceResources.getBannerFont());
 	}
 
@@ -147,7 +130,6 @@ public class SlideoutStatisticOptions extends ToolbarSlideout {
 		final ToolBarManager tbm = new ToolBarManager(toolbar);
 
 		tbm.add(_actionRestoreDefaults);
-		tbm.add(_actionPrefDialog);
 
 		tbm.update(true);
 	}
@@ -157,9 +139,9 @@ public class SlideoutStatisticOptions extends ToolbarSlideout {
 		_gridUI.resetToDefaults();
 		_gridUI.saveState();
 
-		if (_statisticOptions != null) {
-			_statisticOptions.resetToDefaults();
-			_statisticOptions.saveState();
+		if (_trainingOptions != null) {
+			_trainingOptions.resetToDefaults();
+			_trainingOptions.saveState();
 		}
 	}
 
@@ -167,19 +149,13 @@ public class SlideoutStatisticOptions extends ToolbarSlideout {
 
 		_gridUI.restoreState();
 
-		if (_statisticOptions != null) {
-			_statisticOptions.restoreState();
+		if (_trainingOptions != null) {
+			_trainingOptions.restoreState();
 		}
 	}
 
 	public void setStatisticOptions(final IStatisticOptions statisticOptions) {
 
-		_statisticOptions = statisticOptions;
-	}
-
-	public void setupGrid(final String gridPrefPrefix, final int enabledGridOptions) {
-
-		_gridPrefPrefix = gridPrefPrefix;
-		_gridOptionsEnabled = enabledGridOptions;
+		_trainingOptions = statisticOptions;
 	}
 }

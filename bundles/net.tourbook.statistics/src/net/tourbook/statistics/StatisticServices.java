@@ -55,7 +55,7 @@ public class StatisticServices {
 
 		int colorOffset = 0;
 		if (activeTourTypeFilter.showUndefinedTourTypes()) {
-			colorOffset = StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
+			colorOffset = TOUR_TYPE_COLOR_INDEX_OFFSET;
 		}
 
 		if (serieIndex - colorOffset < 0) {
@@ -78,7 +78,7 @@ public class StatisticServices {
 
 		int colorOffset = 0;
 		if (activeTourTypeFilter.showUndefinedTourTypes()) {
-			colorOffset = StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
+			colorOffset = TOUR_TYPE_COLOR_INDEX_OFFSET;
 		}
 
 		if (serieIndex - colorOffset < 0) {
@@ -203,7 +203,7 @@ public class StatisticServices {
 
 		int colorOffset = 0;
 		if (tourTypeFilter.showUndefinedTourTypes()) {
-			colorOffset = StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
+			colorOffset = TOUR_TYPE_COLOR_INDEX_OFFSET;
 		}
 
 		final int[][] colorIndex = new int[resortedTypeIds.length][resortedTypeIds[0].length];

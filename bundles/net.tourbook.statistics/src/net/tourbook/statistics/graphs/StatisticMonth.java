@@ -42,6 +42,7 @@ import net.tourbook.statistic.StatisticContext;
 import net.tourbook.statistic.TourbookStatistic;
 import net.tourbook.statistics.Messages;
 import net.tourbook.statistics.StatisticServices;
+import net.tourbook.ui.ChartOptions_Grid;
 import net.tourbook.ui.TourTypeFilter;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -315,6 +316,14 @@ public abstract class StatisticMonth extends TourbookStatistic {
 	protected abstract String getBarOrderingStateKey();
 
 	abstract ChartDataModel getChartDataModel();
+
+	@Override
+	public int getEnabledGridOptions() {
+
+		return ChartOptions_Grid.GRID_VERTICAL_DISTANCE
+				| ChartOptions_Grid.GRID_IS_SHOW_HORIZONTAL_LINE
+				| ChartOptions_Grid.GRID_IS_SHOW_VERTICAL_LINE;
+	}
 
 	@Override
 	public void preferencesHasChanged() {

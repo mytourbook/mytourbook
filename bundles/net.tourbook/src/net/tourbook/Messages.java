@@ -1530,6 +1530,8 @@ public class Messages extends NLS {
 	public static String		Slideout_TourMarkerFilter_Label_GeoFilterArea;
 	public static String		Slideout_TourMarkerFilter_Label_GeoFilterNotAvailable;
 
+	public static String		Slideout_TrainingOptions_Label_Title;
+
 	public static String		Tooltip_ValuePoint_Action_CloseContextMenu;
 	public static String		Tooltip_ValuePoint_Action_OpenToolTipMenu_ToolTip;
 	public static String		Tooltip_ValuePoint_Action_Orientation_Horizontal;

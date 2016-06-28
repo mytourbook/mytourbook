@@ -51,6 +51,7 @@ import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourInfoIconToolTipProvider;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.ChartOptions_Grid;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.action.ActionEditQuick;
@@ -74,20 +75,21 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 
 	private int							_currentYear;
 	private int							_currentMonth;
+
 	private int							_numberOfYears;
-
 	private final Calendar				_calendar					= GregorianCalendar.getInstance();
+
 	private final DateFormat			_dateFormatter				= DateFormat.getDateInstance(DateFormat.FULL);
-
 	private Chart						_chart;
-	private final MinMaxKeeper_YData	_minMaxKeeper				= new MinMaxKeeper_YData();
 
+	private final MinMaxKeeper_YData	_minMaxKeeper				= new MinMaxKeeper_YData();
 	private TourData_Day				_tourDayData;
 
 	private boolean						_isSynchScaleEnabled;
-	private ITourEventListener			_tourPropertyListener;
 
+	private ITourEventListener			_tourPropertyListener;
 	private StatisticTourToolTip		_tourToolTip;
+
 	private TourInfoIconToolTipProvider	_tourInfoToolTipProvider	= new TourInfoIconToolTipProvider();
 
 	private void addTourPropertyListener() {
@@ -525,6 +527,14 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 	/**
 	 */
 	abstract ChartDataModel getChartDataModel();
+
+	@Override
+	public int getEnabledGridOptions() {
+
+		return ChartOptions_Grid.GRID_VERTICAL_DISTANCE
+				| ChartOptions_Grid.GRID_IS_SHOW_HORIZONTAL_LINE
+				| ChartOptions_Grid.GRID_IS_SHOW_VERTICAL_LINE;
+	}
 
 	@Override
 	public Integer getSelectedMonth() {

@@ -36,7 +36,13 @@ import org.eclipse.swt.widgets.Spinner;
 
 public class ChartOptions_Grid {
 
-	private final IPreferenceStore	_prefStore	= TourbookPlugin.getPrefStore();
+	public static int				GRID_ALL						= 0;
+	public static int				GRID_HORIZONTAL_DISTANCE		= 1 << 1;
+	public static int				GRID_VERTICAL_DISTANCE			= 1 << 2;
+	public static int				GRID_IS_SHOW_HORIZONTAL_LINE	= 1 << 3;
+	public static int				GRID_IS_SHOW_VERTICAL_LINE		= 1 << 4;
+
+	private final IPreferenceStore	_prefStore						= TourbookPlugin.getPrefStore();
 
 	private SelectionAdapter		_defaultSelectionListener;
 	private MouseWheelListener		_defaultMouseWheelListener;
@@ -184,6 +190,27 @@ public class ChartOptions_Grid {
 						.applyTo(_chkShowGrid_VerticalLines);
 			}
 		}
+	}
+
+	public void enableGridOptions(final int gridOptions) {
+
+		final boolean isShowAll = gridOptions == GRID_ALL;
+
+		final boolean isGridHorizontalDistance = isShowAll || (gridOptions & GRID_HORIZONTAL_DISTANCE) != 0;
+		final boolean isGridVerticalDistance = isShowAll || (gridOptions & GRID_VERTICAL_DISTANCE) != 0;
+		final boolean isShowGridHorizontal = isShowAll || (gridOptions & GRID_IS_SHOW_HORIZONTAL_LINE) != 0;
+		final boolean isShowGridVertical = isShowAll || (gridOptions & GRID_IS_SHOW_VERTICAL_LINE) != 0;
+
+		_lblGridHorizontal.setEnabled(isGridHorizontalDistance);
+		_lblGridHorizontal_Unit.setEnabled(isGridHorizontalDistance);
+		_spinnerGridHorizontalDistance.setEnabled(isGridHorizontalDistance);
+
+		_lblGridVertical.setEnabled(isGridVerticalDistance);
+		_lblGridVertical_Unit.setEnabled(isGridVerticalDistance);
+		_spinnerGridVerticalDistance.setEnabled(isGridVerticalDistance);
+
+		_chkShowGrid_HorizontalLines.setEnabled(isShowGridHorizontal);
+		_chkShowGrid_VerticalLines.setEnabled(isShowGridVertical);
 	}
 
 	private void initUI(final Composite parent) {

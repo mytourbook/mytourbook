@@ -49,6 +49,7 @@ import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourInfoIconToolTipProvider;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.ChartOptions_Grid;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.action.ActionEditQuick;
@@ -357,6 +358,14 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
 		toolTipInfo.setLabel(toolTipLabel);
 
 		return toolTipInfo;
+	}
+
+	@Override
+	public int getEnabledGridOptions() {
+
+		return ChartOptions_Grid.GRID_VERTICAL_DISTANCE
+				| ChartOptions_Grid.GRID_IS_SHOW_HORIZONTAL_LINE
+				| ChartOptions_Grid.GRID_IS_SHOW_VERTICAL_LINE;
 	}
 
 	@Override

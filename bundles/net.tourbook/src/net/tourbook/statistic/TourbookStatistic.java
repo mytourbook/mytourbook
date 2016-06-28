@@ -17,6 +17,7 @@ package net.tourbook.statistic;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.ui.ChartOptions_Grid;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -194,6 +195,15 @@ public abstract class TourbookStatistic {
 			return false;
 		}
 		return true;
+	}
+
+	/**
+	 * @return Returns {@link ChartOptions_Grid#GRID_ALL} to enable all grid options, this can be
+	 *         overwritten to enable only a part of the grid options.
+	 */
+	public int getEnabledGridOptions() {
+
+		return ChartOptions_Grid.GRID_ALL;
 	}
 
 	/**

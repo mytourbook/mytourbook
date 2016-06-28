@@ -40,6 +40,7 @@ import net.tourbook.statistic.StatisticContext;
 import net.tourbook.statistic.TourbookStatistic;
 import net.tourbook.statistics.Messages;
 import net.tourbook.statistics.StatisticServices;
+import net.tourbook.ui.ChartOptions_Grid;
 import net.tourbook.ui.TourTypeFilter;
 
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -278,6 +279,29 @@ public abstract class StatisticWeek extends TourbookStatistic {
 		chartDataModel.setXData(xData);
 	}
 
+	void createYDataAltitude(final ChartDataModel chartDataModel) {
+
+		// altitude
+		final ChartDataYSerie yData = new ChartDataYSerie(
+				ChartType.BAR,
+				ChartDataYSerie.BAR_LAYOUT_STACKED,
+				_tourWeekData.altitudeLow,
+				_tourWeekData.altitudeHigh);
+
+		yData.setYTitle(Messages.LABEL_GRAPH_ALTITUDE);
+		yData.setUnitLabel(UI.UNIT_LABEL_ALTITUDE);
+		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
+		yData.setAllValueColors(0);
+		yData.setVisibleMinValue(0);
+		yData.setShowYSlider(true);
+
+		StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE, _appTourTypeFilter);
+		StatisticServices.setTourTypeColorIndex(yData, _tourWeekData.typeIds, _appTourTypeFilter);
+		StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE);
+
+		chartDataModel.addYData(yData);
+	}
+
 //		System.out.println(UI.EMPTY_STRING//
 //				+ ("_firstDayOfWeek=" + _firstDayOfWeek + "\t")//
 //				+ ("dayOffset=" + dayOffset + "\t")//
@@ -352,29 +376,6 @@ public abstract class StatisticWeek extends TourbookStatistic {
 //		);
 //	}
 
-	void createYDataAltitude(final ChartDataModel chartDataModel) {
-
-		// altitude
-		final ChartDataYSerie yData = new ChartDataYSerie(
-				ChartType.BAR,
-				ChartDataYSerie.BAR_LAYOUT_STACKED,
-				_tourWeekData.altitudeLow,
-				_tourWeekData.altitudeHigh);
-
-		yData.setYTitle(Messages.LABEL_GRAPH_ALTITUDE);
-		yData.setUnitLabel(UI.UNIT_LABEL_ALTITUDE);
-		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
-		yData.setAllValueColors(0);
-		yData.setVisibleMinValue(0);
-		yData.setShowYSlider(true);
-
-		StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE, _appTourTypeFilter);
-		StatisticServices.setTourTypeColorIndex(yData, _tourWeekData.typeIds, _appTourTypeFilter);
-		StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_ALTITUDE);
-
-		chartDataModel.addYData(yData);
-	}
-
 	void createYDataDistance(final ChartDataModel chartDataModel) {
 
 		// distance
@@ -423,6 +424,14 @@ public abstract class StatisticWeek extends TourbookStatistic {
 	}
 
 	abstract ChartDataModel getChartDataModel();
+
+	@Override
+	public int getEnabledGridOptions() {
+
+		return ChartOptions_Grid.GRID_VERTICAL_DISTANCE
+				| ChartOptions_Grid.GRID_IS_SHOW_HORIZONTAL_LINE
+				| ChartOptions_Grid.GRID_IS_SHOW_VERTICAL_LINE;
+	}
 
 	private void getPreferences() {
 

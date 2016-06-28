@@ -1001,7 +1001,9 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 
 		// use slideout AFTER the toolbar is created/updated/filled, this creates it
 		_activeStatistic.setupStatisticSlideout(_slideoutStatisticOptions);
-		_slideoutStatisticOptions.setGridPrefPrefix(_activeStatistic.getGridPrefPrefix());
+		_slideoutStatisticOptions.setupGrid(
+				_activeStatistic.getGridPrefPrefix(),
+				_activeStatistic.getEnabledGridOptions());
 	}
 
 }
