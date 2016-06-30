@@ -4526,10 +4526,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		final ArrayList<TourData> modifiedTour = new ArrayList<TourData>();
 		modifiedTour.add(_tourData);
 
-		final TourEvent propertyData = new TourEvent(modifiedTour);
-		propertyData.isTourModified = true;
+		final TourEvent tourEvent = new TourEvent(modifiedTour);
+		tourEvent.isTourModified = true;
 
-		TourManager.fireEvent(TourEventId.TOUR_CHANGED, propertyData, TourDataEditorView.this);
+		TourManager.fireEvent(TourEventId.TOUR_CHANGED, tourEvent, TourDataEditorView.this);
 	}
 
 	/**

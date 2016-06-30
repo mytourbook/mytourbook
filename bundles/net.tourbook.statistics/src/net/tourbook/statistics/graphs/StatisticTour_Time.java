@@ -75,6 +75,8 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
 
 	private Chart						_chart;
 
+	private StatisticContext			_statContext;
+
 	private StatisticTourToolTip		_tourToolTip;
 	private TourInfoIconToolTipProvider	_tourInfoToolTipProvider	= new TourInfoIconToolTipProvider();
 
@@ -164,7 +166,7 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
 					DataProvider_Tour_Time.getInstance().setSelectedTourId(_selectedTourId);
 
 					// don't fire an event when preferences are updated
-					if (isInPreferencesUpdate()) {
+					if (isInPreferencesUpdate() || _statContext.canFireEvents() == false) {
 						return;
 					}
 
@@ -563,6 +565,8 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
 
 	@Override
 	public void updateStatistic(final StatisticContext statContext) {
+
+		_statContext = statContext;
 
 		_activePerson = statContext.appPerson;
 		_activeTourTypeFiler = statContext.appTourTypeFilter;

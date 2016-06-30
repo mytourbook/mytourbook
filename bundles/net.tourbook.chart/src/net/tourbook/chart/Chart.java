@@ -1298,6 +1298,7 @@ public class Chart extends ViewForm {
 	 *            values will be kept
 	 */
 	public void updateChart(final ChartDataModel chartDataModel, final boolean isShowAllData) {
+
 		updateChart(chartDataModel, true, isShowAllData);
 	}
 

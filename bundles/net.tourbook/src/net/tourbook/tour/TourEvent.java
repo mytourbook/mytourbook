@@ -44,12 +44,15 @@ public class TourEvent {
 	 */
 	public TourData				tourDataEditorSavedTour;
 
+	@SuppressWarnings("unused")
+	private TourEvent() {}
+
 	public TourEvent(final ArrayList<TourData> modifiedTour) {
 		_modifiedTours = modifiedTour;
 	}
 
 	public TourEvent(final TourData tourData) {
-		
+
 		_modifiedTours = new ArrayList<TourData>();
 
 		if (tourData != null) {

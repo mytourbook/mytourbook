@@ -90,16 +90,15 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 	 */
 	private boolean					_isForceUpdate;
 
-//	private boolean					_isPartActive;
-
 	private PostSelectionProvider	_postSelectionProvider;
 	private ISelectionListener		_postSelectionListener;
 	private IPropertyChangeListener	_prefChangeListener;
 	private ITourEventListener		_tourEventListener;
 	private IPartListener2			_partListener;
 
-	private boolean					_isInSliderPositionFired;
+	private boolean					_isInSaving;
 	private boolean					_isInSelectionChanged;
+	private boolean					_isInSliderPositionFired;
 
 	/*
 	 * UI controls
@@ -274,7 +273,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 				} else if (eventId == TourEventId.TOUR_CHANGED && eventData instanceof TourEvent) {
 
-					if (_tourData == null) {
+					if (_tourData == null || _isInSaving) {
 						return;
 					}
 
@@ -460,6 +459,16 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 			_isInSliderPositionFired = true;
 			{
+				if (_isInSaving) {
+
+					final TourMarker hoveredMarker = _tourChart.getLastHoveredTourMarker();
+
+					if (hoveredMarker != null) {
+
+						chartInfo.selectedSliderValuesIndex = hoveredMarker.getSerieIndex();
+					}
+				}
+
 				TourManager.fireEventWithCustomData(//
 						TourEventId.SLIDER_POSITION_CHANGED,
 						chartInfo,
@@ -491,6 +500,10 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 		// prevent to listen to own events
 		if (_isInSliderPositionFired) {
+			return;
+		}
+
+		if (_isInSaving) {
 			return;
 		}
 
@@ -810,9 +823,13 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 	@Override
 	public void tourIsModified(final TourData tourData) {
 
+		_isInSaving = true;
+
 		final TourData savedTourData = TourManager.saveModifiedTour(tourData);
 
 		updateChart(savedTourData);
+
+		_isInSaving = false;
 	}
 
 	/**

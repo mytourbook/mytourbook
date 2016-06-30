@@ -1939,12 +1939,14 @@ public class TourManager {
 		}
 
 		if (savedTour != null) {
-			savedTours.add(savedTour);
-		}
 
-//		System.out.println(UI.timeStampNano() + " [saveModifiedToursOneTour] Old Tour\t" + tourData);
-//		System.out.println(UI.timeStampNano() + " [saveModifiedToursOneTour] Saved Tour\t" + savedTour);
-//		// TODO remove SYSTEM.OUT.PRINTLN
+			savedTours.add(savedTour);
+
+			// keep the current map position that a saved tour is not centered with default size
+			savedTour.mapZoomLevel = tourData.mapZoomLevel;
+			savedTour.mapCenterPositionLatitude = tourData.mapCenterPositionLatitude;
+			savedTour.mapCenterPositionLongitude = tourData.mapCenterPositionLongitude;
+		}
 	}
 
 	public static boolean setAltitudeValuesFromSRTM(final ArrayList<TourData> tourDataList) {

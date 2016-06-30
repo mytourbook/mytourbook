@@ -1634,6 +1634,15 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		}
 	}
 
+	private void keepMapPosition(final TourData tourData) {
+
+		final GeoPosition centerPosition = _map.getGeoCenter();
+
+		tourData.mapZoomLevel = _map.getZoom();
+		tourData.mapCenterPositionLatitude = centerPosition.latitude;
+		tourData.mapCenterPositionLongitude = centerPosition.longitude;
+	}
+
 	private void onSelectionChanged(final ISelection selection) {
 
 //		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
@@ -1983,6 +1992,8 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 				positionMapTo_ValueIndex(tourData, leftSliderValueIndex);
 			}
+
+			keepMapPosition(tourData);
 		}
 	}
 
@@ -2295,13 +2306,9 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 			if (((forceRedraw == false) && (_previousTourData != null)) || (tourData == _previousTourData)) {
 
 				/*
-				 * keep map configuration for the previous tour
+				 * keep map area for the previous tour
 				 */
-				_previousTourData.mapZoomLevel = _map.getZoom();
-
-				final GeoPosition centerPosition = _map.getGeoCenter();
-				_previousTourData.mapCenterPositionLatitude = centerPosition.latitude;
-				_previousTourData.mapCenterPositionLongitude = centerPosition.longitude;
+				keepMapPosition(_previousTourData);
 			}
 
 			if (tourData.mapCenterPositionLatitude == Double.MIN_VALUE) {
@@ -2789,7 +2796,6 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	}
 
 	private void selectTourSegments(final SelectedTourSegmenterSegments selectedSegmenterConfig) {
-
 
 		if (_allTourData.size() < 1) {
 			return;

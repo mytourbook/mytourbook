@@ -111,6 +111,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 	private ActionStatisticOptions			_actionStatisticOptions;
 	private ActionSynchChartScale			_actionSynchChartScale;
 
+	private boolean							_isInUpdateUI;
 	private boolean							_isSynchScaleEnabled;
 	private boolean							_isVerticalOrderDisabled;
 
@@ -285,16 +286,26 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 						return;
 					}
 
+					_isInUpdateUI = true;
+
 					// update statistics
 					updateStatistic();
 
+					_isInUpdateUI = false;
+
 				} else if (eventId == TourEventId.UPDATE_UI || //
 						eventId == TourEventId.ALL_TOURS_ARE_MODIFIED) {
+
 					updateStatistic();
 				}
 			}
 		};
 		TourManager.getInstance().addTourEventListener(_tourEventListener);
+	}
+
+	public boolean canFireEvents() {
+
+		return _isInUpdateUI == false;
 	}
 
 	private void createActions() {
@@ -861,6 +872,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 				getNumberOfYears());
 
 		statContext.isRefreshData = true;
+		statContext.eventManager = this;
 
 		_activeStatistic.updateStatistic(statContext);
 

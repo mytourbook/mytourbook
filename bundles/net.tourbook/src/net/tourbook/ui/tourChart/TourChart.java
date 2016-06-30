@@ -252,6 +252,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	//
 	private boolean							_isSegmentTitleHovered;
 	private ChartTitleSegment				_chartTitleSegment;
+	private TourMarker						_lastHoveredTourMarker;
 
 	/**
 	 * Hide tour segments when tour chart is displayed in dialogs.
@@ -2589,7 +2590,15 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 				tourMarker = (TourMarker) hoveredMarkerLabel.data;
 			}
 		}
+
+		_lastHoveredTourMarker = tourMarker;
+
 		return tourMarker;
+	}
+
+	public TourMarker getLastHoveredTourMarker() {
+
+		return _lastHoveredTourMarker;
 	}
 
 	ChartLayerMarker getLayerTourMarker() {

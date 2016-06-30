@@ -31,49 +31,51 @@ public class StatisticContext {
 	/**
 	 * Person which is selected in the application.
 	 */
-	public TourPerson		appPerson;
+	public TourPerson			appPerson;
 
 	/**
 	 * Tour type filter which is selected in the application.
 	 */
-	public TourTypeFilter	appTourTypeFilter;
+	public TourTypeFilter		appTourTypeFilter;
 
 	/**
 	 * First (youngest) year which is selected in the statistic container and where the statistics
 	 * start.
 	 */
-	public int				statFirstYear;
+	public int					statFirstYear;
 
 	/**
 	 * Number of years which should be displayed in the statistic
 	 */
-	public int				statNumberOfYears;
+	public int					statNumberOfYears;
 
-	public boolean			isRefreshData				= false;
+	public boolean				isRefreshData				= false;
 
 	/**
 	 * Contains the state if bar reordering is supported by the statistic or not, default is
 	 * <code>false</code>.
 	 */
-	public boolean			outIsBarReorderingSupported	= false;
+	public boolean				outIsBarReorderingSupported	= false;
 
 	/**
 	 * Is <code>true</code> when bar names in the statistic UI must be updated with data from
 	 * {@link #outBarNames} and {@link #outVerticalBarIndex}.
 	 */
-	public boolean			outIsUpdateBarNames			= false;
+	public boolean				outIsUpdateBarNames			= false;
 
 	/**
 	 * When stacked charts are displayed, the stacked parts can be resorted vertically.
 	 * <p>
 	 * This contains the names of the bars or <code>null</code> when bars are not available.
 	 */
-	public String[]			outBarNames					= null;
+	public String[]				outBarNames					= null;
 
 	/**
 	 * Index which bar should be selected in the combo box.
 	 */
-	public int				outVerticalBarIndex;
+	public int					outVerticalBarIndex;
+
+	public TourStatisticsView	eventManager;
 
 	/**
 	 * @param person
@@ -96,6 +98,15 @@ public class StatisticContext {
 
 		this.statFirstYear = selectedYear;
 		this.statNumberOfYears = numberOfYears;
+	};
+
+	/**
+	 * @return Returns <code>true</code> when events can be fired otherwise they cannot be fired
+	 *         because the view is already processing events.
+	 */
+	public boolean canFireEvents() {
+
+		return eventManager == null || eventManager.canFireEvents();
 	}
 
 }
