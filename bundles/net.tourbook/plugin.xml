@@ -732,7 +732,7 @@
 				<!-- Heart Rate Variability -->
 				<command
 					commandId="command.net.tourbook.views.HeartRateVariabilityChart"
-					icon="icons/conconi-chart.png"
+					icon="icons/heart-rate-variability.png"
 					label="%View_Name_HeartRateVariabilityChart"
 					mnemonic="%View_Name_HeartRateVariabilityChart_Mnemonic"/>
 				
@@ -1524,7 +1524,7 @@
 			<view
 				category="net.tourbook.category.Tools"
 				class="net.tourbook.ui.views.heartRateVariability.HeartRateVariabilityView"
-				icon="icons/conconi-chart.png"
+				icon="icons/heart-rate-variability.png"
 				id="net.tourbook.ui.views.heartRateVariability.HeartRateVariabilityView"
 				name="%View_Name_HeartRateVariabilityChart"
 			/>

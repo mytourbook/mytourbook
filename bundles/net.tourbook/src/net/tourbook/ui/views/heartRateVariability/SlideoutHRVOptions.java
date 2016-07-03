@@ -17,38 +17,66 @@ package net.tourbook.ui.views.heartRateVariability;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.tooltip.ToolbarSlideout;
-import net.tourbook.statistic.IStatisticOptions;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.ChartOptions_Grid;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseWheelListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
 
 /**
  */
 public class SlideoutHRVOptions extends ToolbarSlideout {
 
-	private Action				_actionRestoreDefaults;
+	private final IPreferenceStore		_prefStore	= TourbookPlugin.getPrefStore();
 
-	private ChartOptions_Grid	_gridUI;
+	private Action						_actionRestoreDefaults;
 
-	private IStatisticOptions	_hrvOptions;
+	private ChartOptions_Grid			_gridUI;
+
+	private MouseWheelListener			_defaultMouseWheelListener;
+	private SelectionAdapter			_defaultSelectionListener;
+
+	private HeartRateVariabilityView	_heartRateVariabilityView;
 
 	/*
 	 * UI controls
 	 */
+	private Button						_chkFix2xErrors;
 
-	public SlideoutHRVOptions(final Control ownerControl, final ToolBar toolBar, final String prefStoreGridPrefix) {
+	private Label						_lbl2xErrorTolerance;
+	private Label						_lbl2xErrorTolerance_Unit;
+	private Label						_lbl2xToleranceResult;
+	private Label						_lbl2xToleranceResult_Value;
+
+	private Spinner						_spinner2xErrorTolerance;
+
+	public SlideoutHRVOptions(	final Control ownerControl,
+								final ToolBar toolBar,
+								final String prefStoreGridPrefix,
+								final HeartRateVariabilityView heartRateVariabilityView) {
 
 		super(ownerControl, toolBar);
+
+		_heartRateVariabilityView = heartRateVariabilityView;
 
 		_gridUI = new ChartOptions_Grid(prefStoreGridPrefix);
 	}
@@ -73,11 +101,16 @@ public class SlideoutHRVOptions extends ToolbarSlideout {
 	@Override
 	protected Composite createToolTipContentArea(final Composite parent) {
 
+		initUI(parent);
 		createActions();
 
 		final Composite ui = createUI(parent);
 
 		restoreState();
+
+		enableControls();
+
+		updateUI();
 
 		return ui;
 	}
@@ -97,9 +130,7 @@ public class SlideoutHRVOptions extends ToolbarSlideout {
 				createUI_10_Title(container);
 				createUI_12_Actions(container);
 
-				if (_hrvOptions != null) {
-					_hrvOptions.createUI(container);
-				}
+				createUI_20_Options(container);
 
 				_gridUI.createUI(container);
 			}
@@ -134,28 +165,165 @@ public class SlideoutHRVOptions extends ToolbarSlideout {
 		tbm.update(true);
 	}
 
+	private void createUI_20_Options(final Composite parent) {
+
+		final Group group = new Group(parent, SWT.NONE);
+		group.setText(Messages.Slideout_HVROptions_Group);
+		GridDataFactory.fillDefaults()//
+				.grab(true, false)
+				.span(2, 1)
+				.applyTo(group);
+		GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
+		{
+			{
+				/*
+				 * Show distance
+				 */
+				_chkFix2xErrors = new Button(group, SWT.CHECK);
+				_chkFix2xErrors.setText(Messages.Slideout_HVROptions_Checkbox_2xValues);
+				_chkFix2xErrors.setToolTipText(Messages.Slideout_HVROptions_Checkbox_2xValues_Tooltip);
+				_chkFix2xErrors.addSelectionListener(_defaultSelectionListener);
+				GridDataFactory.fillDefaults().span(3, 1).applyTo(_chkFix2xErrors);
+			}
+
+			{
+				/*
+				 * Label: 2x tolerance
+				 */
+				_lbl2xErrorTolerance = new Label(group, SWT.NONE);
+				_lbl2xErrorTolerance.setText(Messages.Slideout_HVROptions_Label_2xTolerance);
+				GridDataFactory.fillDefaults()//
+						.indent(16, 0)
+						.align(SWT.FILL, SWT.CENTER)
+						.applyTo(_lbl2xErrorTolerance);
+
+				/*
+				 * Spinner: 2x tolerance
+				 */
+				_spinner2xErrorTolerance = new Spinner(group, SWT.BORDER);
+				_spinner2xErrorTolerance.setMinimum(0);
+				_spinner2xErrorTolerance.setMaximum(1000);
+				_spinner2xErrorTolerance.addMouseWheelListener(_defaultMouseWheelListener);
+				_spinner2xErrorTolerance.addSelectionListener(_defaultSelectionListener);
+				GridDataFactory.fillDefaults() //
+						.align(SWT.BEGINNING, SWT.FILL)
+						.applyTo(_spinner2xErrorTolerance);
+
+				/*
+				 * Label: ms
+				 */
+				_lbl2xErrorTolerance_Unit = new Label(group, SWT.NONE);
+				_lbl2xErrorTolerance_Unit.setText(Messages.App_Unit_Milliseconds);
+				GridDataFactory.fillDefaults()//
+						.align(SWT.FILL, SWT.CENTER)
+						.applyTo(_lbl2xErrorTolerance_Unit);
+			}
+			{
+				/*
+				 * Label: Correction result
+				 */
+				_lbl2xToleranceResult = new Label(group, SWT.NONE);
+				_lbl2xToleranceResult.setText(Messages.Slideout_HVROptions_Label_2xToleranceResult);
+				GridDataFactory.fillDefaults()//
+						.indent(16, 0)
+						.align(SWT.FILL, SWT.CENTER)
+						.applyTo(_lbl2xToleranceResult);
+
+				/*
+				 * Label: Result values
+				 */
+				_lbl2xToleranceResult_Value = new Label(group, SWT.NONE);
+				GridDataFactory.fillDefaults()//
+						.align(SWT.FILL, SWT.CENTER)
+						.grab(true, false)
+						.span(2, 1)
+						.applyTo(_lbl2xToleranceResult_Value);
+			}
+		}
+	}
+
+	private void enableControls() {
+
+		final boolean isRemove2xValue = _chkFix2xErrors.getSelection();
+
+		_lbl2xErrorTolerance.setEnabled(isRemove2xValue);
+		_lbl2xErrorTolerance_Unit.setEnabled(isRemove2xValue);
+		_spinner2xErrorTolerance.setEnabled(isRemove2xValue);
+
+		_lbl2xToleranceResult.setEnabled(isRemove2xValue);
+		_lbl2xToleranceResult_Value.setEnabled(isRemove2xValue);
+	}
+
+	/*
+	 * UI controls
+	 */
+	private void initUI(final Composite parent) {
+
+		_defaultSelectionListener = new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				onChangeUI();
+			}
+		};
+
+		_defaultMouseWheelListener = new MouseWheelListener() {
+			@Override
+			public void mouseScrolled(final MouseEvent event) {
+				net.tourbook.common.UI.adjustSpinnerValueOnMouseScroll(event);
+				onChangeUI();
+			}
+		};
+	}
+
+	private void onChangeUI() {
+
+		enableControls();
+
+		// update chart async (which is done when a pref store value is modified) that the UI is updated immediately
+		Display.getCurrent().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+
+				saveState();
+				updateUI();
+			}
+		});
+	}
+
 	private void resetToDefaults() {
+
+		_chkFix2xErrors.setSelection(//
+				_prefStore.getDefaultBoolean(ITourbookPreferences.HRV_OPTIONS_IS_FIX_2X_ERROR));
+		_spinner2xErrorTolerance.setSelection(//
+				_prefStore.getDefaultInt(ITourbookPreferences.HRV_OPTIONS_2X_ERROR_TOLERANCE));
 
 		_gridUI.resetToDefaults();
 		_gridUI.saveState();
 
-		if (_hrvOptions != null) {
-			_hrvOptions.resetToDefaults();
-			_hrvOptions.saveState();
-		}
+		onChangeUI();
 	}
 
 	private void restoreState() {
 
+		_chkFix2xErrors.setSelection(_prefStore.getBoolean(ITourbookPreferences.HRV_OPTIONS_IS_FIX_2X_ERROR));
+		_spinner2xErrorTolerance.setSelection(_prefStore.getInt(ITourbookPreferences.HRV_OPTIONS_2X_ERROR_TOLERANCE));
+
 		_gridUI.restoreState();
-
-		if (_hrvOptions != null) {
-			_hrvOptions.restoreState();
-		}
 	}
 
-	public void setStatisticOptions(final IStatisticOptions statisticOptions) {
+	private void saveState() {
 
-		_hrvOptions = statisticOptions;
+		_prefStore.setValue(ITourbookPreferences.HRV_OPTIONS_IS_FIX_2X_ERROR, //
+				_chkFix2xErrors.getSelection());
+		_prefStore.setValue(ITourbookPreferences.HRV_OPTIONS_2X_ERROR_TOLERANCE, //
+				_spinner2xErrorTolerance.getSelection());
 	}
+
+	private void updateUI() {
+
+		_lbl2xToleranceResult_Value.setText(_heartRateVariabilityView.getFixed2xErrors_0()
+				+ UI.DASH_WITH_SPACE
+				+ _heartRateVariabilityView.getFixed2xErrors_1());
+	}
+
 }

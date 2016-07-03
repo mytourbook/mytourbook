@@ -99,22 +99,32 @@ public class HeartRateVariabilityView extends ViewPart {
 	private final MinMaxKeeper_YData	_yMinMaxKeeper							= new MinMaxKeeper_YData(
 																						ADJUST_PULSE_VALUE);
 
+	private int							_fixed2xErrors_0;
+	private int							_fixed2xErrors_1;
+
 	/*
 	 * UI controls
 	 */
 	private PageBook					_pageBook;
 
-	private Label						_pageNoTour;
+	private Composite					_pageNoTour;
 	private Composite					_pageHrvChart;
+	private Composite					_pageInvalidData;
+
 	private Chart						_chartHRV;
-	private Label						_pageInvalidData;
 
 	private class ActionHrvOptions extends ActionToolbarSlideout {
 
 		@Override
 		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
-			return new SlideoutHRVOptions(_pageBook, toolbar, GRID_PREF_PREFIX);
+			final SlideoutHRVOptions slideoutHRVOptions = new SlideoutHRVOptions(
+					_pageBook,
+					toolbar,
+					GRID_PREF_PREFIX,
+					HeartRateVariabilityView.this);
+
+			return slideoutHRVOptions;
 		}
 	}
 
@@ -149,9 +159,16 @@ public class HeartRateVariabilityView extends ViewPart {
 				//
 				) {
 
+					// grid has changed
+
 					UI.updateChartProperties(_chartHRV, GRID_PREF_PREFIX);
 
-					// grid has changed, update chart
+					updateChart_50_CurrentTours(true);
+
+				} else if (property.equals(ITourbookPreferences.HRV_OPTIONS_IS_FIX_2X_ERROR)
+						| property.equals(ITourbookPreferences.HRV_OPTIONS_2X_ERROR_TOLERANCE)) {
+
+					// hrv options has changed
 					updateChart_50_CurrentTours(true);
 				}
 			}
@@ -253,6 +270,9 @@ public class HeartRateVariabilityView extends ViewPart {
 			return null;
 		}
 
+		final boolean isFix2xErrors = _prefStore.getBoolean(ITourbookPreferences.HRV_OPTIONS_IS_FIX_2X_ERROR);
+		final int error2xTolerance = _prefStore.getInt(ITourbookPreferences.HRV_OPTIONS_2X_ERROR_TOLERANCE);
+
 		final String prefGraphName = ICommonPreferences.GRAPH_COLORS + GraphColorManager.PREF_GRAPH_HEARTBEAT + "."; //$NON-NLS-1$
 
 		final RGB rgbPrefLine = PreferenceConverter.getColor(//
@@ -276,6 +296,9 @@ public class HeartRateVariabilityView extends ViewPart {
 
 		final TourData[] validTours = validTourList.toArray(new TourData[validTourList.size()]);
 
+		_fixed2xErrors_0 = 0;
+		_fixed2xErrors_1 = 0;
+
 		/*
 		 * create data series which contain valid data, reduce data that the highes value for an x
 		 * value is displayed
@@ -293,8 +316,27 @@ public class HeartRateVariabilityView extends ViewPart {
 			// loop: all values in the current serie
 			for (int valueIndex = 0; valueIndex < numPulseTimes; valueIndex++) {
 
-				rr0Values[valueIndex] = pulseTimeSerie[valueIndex];
-				rr1Values[valueIndex] = pulseTimeSerie[valueIndex + 1];
+				int rr0Value = pulseTimeSerie[valueIndex];
+				int rr1Value = pulseTimeSerie[valueIndex + 1];
+
+				if (isFix2xErrors) {
+
+					final double rr0ValueFixed = rr0Value / 2.0;
+					final double rr1ValueFixed = rr1Value / 2.0;
+
+					if (rr1Value >= rr0ValueFixed - error2xTolerance && rr1Value <= rr0ValueFixed + error2xTolerance) {
+						rr0Value = (int) rr0ValueFixed;
+						_fixed2xErrors_0++;
+					}
+
+					if (rr0Value >= rr1ValueFixed - error2xTolerance && rr0Value <= rr1ValueFixed + error2xTolerance) {
+						rr1Value = (int) rr1ValueFixed;
+						_fixed2xErrors_1++;
+					}
+				}
+
+				rr0Values[valueIndex] = rr0Value;
+				rr1Values[valueIndex] = rr1Value;
 			}
 
 			rr0Series[tourIndex] = rr0Values;
@@ -360,6 +402,9 @@ public class HeartRateVariabilityView extends ViewPart {
 		addPrefListener();
 		addTourEventListener();
 
+		// show default page
+		_pageBook.showPage(_pageNoTour);
+
 		// show hrv chart from selection service
 		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
 	}
@@ -368,29 +413,36 @@ public class HeartRateVariabilityView extends ViewPart {
 
 		_pageBook = new PageBook(parent, SWT.NONE);
 
-		_pageNoTour = new Label(_pageBook, SWT.WRAP);
-		_pageNoTour.setText(Messages.UI_Label_TourIsNotSelected);
+		_pageNoTour = new Composite(_pageBook, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(_pageNoTour);
+		GridLayoutFactory.swtDefaults().applyTo(_pageNoTour);
+		{
+			final Label label = new Label(_pageNoTour, SWT.WRAP);
+			label.setText(Messages.UI_Label_TourIsNotSelected);
+		}
 
-		_pageInvalidData = new Label(_pageBook, SWT.WRAP);
-		_pageInvalidData.setText(Messages.HRV_View_InvalidData);
+		_pageInvalidData = new Composite(_pageBook, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(_pageInvalidData);
+		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(_pageInvalidData);
+		{
+			final Label label = new Label(_pageInvalidData, SWT.WRAP);
+			label.setText(Messages.HRV_View_InvalidData);
+		}
 
-		createUI_10_HrvChart(_pageBook);
+		_pageHrvChart = createUI_30_Chart(_pageBook);
 	}
 
-	private void createUI_10_HrvChart(final Composite parent) {
+	private Composite createUI_30_Chart(final Composite parent) {
 
-		_pageHrvChart = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(_pageHrvChart);
-		GridLayoutFactory.fillDefaults().numColumns(1).spacing(0, 0).applyTo(_pageHrvChart);
-		{
-			_chartHRV = new Chart(_pageHrvChart, SWT.FLAT);
-			GridDataFactory.fillDefaults().grab(true, true).applyTo(_chartHRV);
+		_chartHRV = new Chart(parent, SWT.FLAT);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(_chartHRV);
 
-			UI.updateChartProperties(_chartHRV, GRID_PREF_PREFIX);
+		UI.updateChartProperties(_chartHRV, GRID_PREF_PREFIX);
 
-			// Show title
-			_chartHRV.getChartTitleSegmentConfig().isShowSegmentTitle = true;
-		}
+		// Show title
+		_chartHRV.getChartTitleSegmentConfig().isShowSegmentTitle = true;
+
+		return _chartHRV;
 	}
 
 	@Override
@@ -416,6 +468,14 @@ public class HeartRateVariabilityView extends ViewPart {
 
 		// update toolbar to show added items
 		tbm.update(true);
+	}
+
+	public int getFixed2xErrors_0() {
+		return _fixed2xErrors_0;
+	}
+
+	public int getFixed2xErrors_1() {
+		return _fixed2xErrors_1;
 	}
 
 	private void onSelectionChanged(final ISelection selection) {

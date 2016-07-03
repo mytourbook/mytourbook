@@ -464,5 +464,11 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(
 				ITourbookPreferences.ADJUST_TEMPERATURE_DURATION_TIME,
 				EasyConfig.TEMPERATURE_ADJUSTMENT_DURATION_DEFAULT);
+
+		/*
+		 * Heart rate variability
+		 */
+		store.setDefault(ITourbookPreferences.HRV_OPTIONS_2X_ERROR_TOLERANCE, 20); // milliseconds
+		store.setDefault(ITourbookPreferences.HRV_OPTIONS_IS_FIX_2X_ERROR, false);
 	}
 }

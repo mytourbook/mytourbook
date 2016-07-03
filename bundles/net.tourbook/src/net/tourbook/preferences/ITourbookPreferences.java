@@ -456,4 +456,10 @@ public interface ITourbookPreferences {
 	public static final String	ADJUST_TEMPERATURE_AVG_TEMPERATURE				= "ADJUST_TEMPERATURE_AVG_TEMPERATURE";					//$NON-NLS-1$
 	public static final String	ADJUST_TEMPERATURE_DURATION_TIME				= "ADJUST_TEMPERATURE_DURATION_TIME";						//$NON-NLS-1$
 
+	/*
+	 * Heart rate variability
+	 */
+	public static final String	HRV_OPTIONS_2X_ERROR_TOLERANCE					= "HRV_OPTIONS_2X_ERROR_TOLERANCE";						//$NON-NLS-1$
+	public static final String	HRV_OPTIONS_IS_FIX_2X_ERROR						= "HRV_OPTIONS_IS_FIX_2X_ERROR";							//$NON-NLS-1$
+
 }

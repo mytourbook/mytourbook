@@ -23,7 +23,7 @@ NEW
   - Day summary statistics
     - New graphs for average speed/pace  
     - Select visible graphs in the slideout
-  - Show chart grid options in a slideout
+  - Show chart grid options in a slideout and set the options for each chart individually
   - Show tour frequency options in a slideout, 
     these options were removed from the preference dialog
     
@@ -31,6 +31,10 @@ NEW
 
 IMPROVEMENTS
 ============
+
+* Map
+
+  - Keep map positon when a tour is saved, e.g. setting the tour marker position in the tour chart (this will also save the tour)
 
 
 BUGFIX

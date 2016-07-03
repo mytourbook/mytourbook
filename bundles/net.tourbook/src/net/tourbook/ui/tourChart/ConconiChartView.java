@@ -39,6 +39,7 @@ import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
+import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -184,6 +185,27 @@ public class ConconiChartView extends ViewPart {
 			}
 		};
 		getSite().getPage().addPostSelectionListener(_postSelectionListener);
+	}
+
+	private void addTourEventListener() {
+
+		_tourEventListener = new ITourEventListener() {
+
+			@Override
+			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
+
+				if (part == ConconiChartView.this) {
+					return;
+				}
+
+				if (eventId == TourEventId.TOUR_SELECTION && eventData instanceof ISelection) {
+
+					onSelectionChanged((ISelection) eventData);
+				}
+			}
+		};
+
+		TourManager.getInstance().addTourEventListener(_tourEventListener);
 	}
 
 	private void clearView() {
@@ -499,6 +521,7 @@ public class ConconiChartView extends ViewPart {
 		restoreState();
 		enableControls();
 
+		addTourEventListener();
 		addSelectionListener();
 		addPartListener();
 

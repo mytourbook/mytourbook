@@ -445,10 +445,9 @@ public class Messages extends NLS {
 	public static String		App_TourType_ToolTip;
 	public static String		App_TourType_ToolTipTitle;
 
+	public static String		App_Unit_Milliseconds;
 	public static String		App_Unit_Minute;
-
 	public static String		App_Unit_Minute_Small;
-
 	public static String		App_Unit_Px;
 	public static String		App_Unit_Seconds_Small;
 
@@ -1482,6 +1481,16 @@ public class Messages extends NLS {
 	public static String		Slideout_ChartMarkerOptions_Label_Offset;
 	public static String		Slideout_ChartMarkerOptions_Label_Offset_Tooltip;
 	public static String		Slideout_ChartMarkerOptions_Label_Title;
+
+	public static String		Slideout_HVROptions_Checkbox_2xValues;
+
+	public static String		Slideout_HVROptions_Checkbox_2xValues_Tooltip;
+
+	public static String		Slideout_HVROptions_Group;
+
+	public static String		Slideout_HVROptions_Label_2xTolerance;
+
+	public static String	Slideout_HVROptions_Label_2xToleranceResult;
 
 	public static String		Slideout_HVROptions_Label_Title;
 
