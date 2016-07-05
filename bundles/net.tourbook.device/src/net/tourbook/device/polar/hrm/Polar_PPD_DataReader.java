@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -42,19 +42,20 @@ import org.eclipse.swt.graphics.RGB;
 /**
  * This device reader is importing data from Polar Person File
  */
-public class PolarPPDDataReader extends TourbookDevice {
+public class Polar_PPD_DataReader extends TourbookDevice {
 
-	private static final String		DATA_DELIMITER			= "\t";										//$NON-NLS-1$
+	private static final String		DATA_DELIMITER			= "\t";				//$NON-NLS-1$
 
-	private static final String		SECTION_PERSON_INFO		= "[PersonInfo]";								//$NON-NLS-1$
-	private static final String		SECTION_SPORTS_INFO		= "[PersonSports]";							//$NON-NLS-1$
-	private static final String		SECTION_PERSON_HRZONES	= "[PersonHRZones]";							//$NON-NLS-1$
+	private static final String		SECTION_PERSON_INFO		= "[PersonInfo]";		//$NON-NLS-1$
+	private static final String		SECTION_SPORTS_INFO		= "[PersonSports]";	//$NON-NLS-1$
+	private static final String		SECTION_PERSON_HRZONES	= "[PersonHRZones]";	//$NON-NLS-1$
 	//
 	private boolean					_isDebug				= true;
 
 	private HashMap<Integer, Sport>	_sports;
 	private Person					_person;
-	private PolarPDDDataReader		_polarPDDDataReader;
+
+	private Polar_PDD_DataReader	_polarPDDDataReader;
 
 	@SuppressWarnings("unused")
 	private class Person {
@@ -74,17 +75,16 @@ public class PolarPPDDataReader extends TourbookDevice {
 
 	}
 
-	class SilentPolarHRMDateReader extends PolarHRMDataReader {
-		
+	class SilentPolarHRMDateReader extends Polar_HRM_DataReader {
+
 		@Override
 		protected void showError(final String error) {
 
 		}
-
 	}
 
-	class SilentPolarPDDDataReader extends PolarPDDDataReader {
-		
+	class SilentPolarPDDDataReader extends Polar_PDD_DataReader {
+
 		@Override
 		protected TourbookDevice getGPXDeviceDataReader() {
 			return new SilentGPXDeviceDataReader();
@@ -94,7 +94,6 @@ public class PolarPPDDataReader extends TourbookDevice {
 		protected TourbookDevice getPolarHRMDataReader() {
 			return new SilentPolarHRMDateReader();
 		}
-
 	}
 
 	@SuppressWarnings("unused")
@@ -105,15 +104,15 @@ public class PolarPPDDataReader extends TourbookDevice {
 		private int		color;
 
 		public Sport(final int id, final String name, final int color) {
+
 			this.id = id;
 			this.name = name;
 			this.color = color;
 		}
-
 	}
 
 	// plugin constructor
-	public PolarPPDDataReader() {
+	public Polar_PPD_DataReader() {
 
 		_polarPDDDataReader = new SilentPolarPDDDataReader();
 
@@ -122,9 +121,9 @@ public class PolarPPDDataReader extends TourbookDevice {
 	private HashMap<Integer, TourType> addAllMissingSportTypes() {
 
 		final HashMap<Integer, TourType> tourTypeForSport = new HashMap<Integer, TourType>();
-		
+
 		final HashMap<String, TourType> knownTourTypes = new HashMap<String, TourType>();
-		
+
 		final ArrayList<TourType> backendTourTypes = TourDatabase.getAllTourTypes();
 
 		for (final TourType tourType : backendTourTypes) {
@@ -160,7 +159,10 @@ public class PolarPPDDataReader extends TourbookDevice {
 				newTourType.setColorText(d);
 
 				// add new entity to db
-				final TourType savedTourType = TourDatabase.saveEntity( newTourType, newTourType.getTypeId(), TourType.class);
+				final TourType savedTourType = TourDatabase.saveEntity(
+						newTourType,
+						newTourType.getTypeId(),
+						TourType.class);
 				if (null != savedTourType) {
 					tourTypeForSport.put(sportId, savedTourType);
 					backendTourTypes.add(savedTourType);
@@ -190,6 +192,7 @@ public class PolarPPDDataReader extends TourbookDevice {
 		return _polarPDDDataReader.getAdditionalImportedFiles();
 	}
 
+	@Override
 	public String getDeviceModeName(final int profileId) {
 		return null;
 	}
@@ -204,6 +207,7 @@ public class PolarPPDDataReader extends TourbookDevice {
 		return -1;
 	}
 
+	@Override
 	public int getTransferDataSize() {
 		return -1;
 	}
@@ -455,21 +459,21 @@ public class PolarPPDDataReader extends TourbookDevice {
 		if (_isDebug) {
 			System.out.println(importFilePath);
 		}
-		
+
 		// parse this person file
 		if (!parseSection(importFilePath)) {
 			return false;
 		}
-		
+
 		// check all sports and create TourTypes if the are not there
 		final HashMap<Integer, TourType> tourTypeForSport = addAllMissingSportTypes();
-		
+
 		// read all exercise file names for this person
 		final File dataDir = new File(_person.dataPath);
-		if (! dataDir.isDirectory()) {
+		if (!dataDir.isDirectory()) {
 			return false;
 		}
-		
+
 		// first find all years containing data
 		final File[] directoriesToProcess = dataDir.listFiles(new FilenameFilter() {
 			@Override

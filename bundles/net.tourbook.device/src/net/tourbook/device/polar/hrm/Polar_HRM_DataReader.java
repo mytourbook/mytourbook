@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -44,52 +44,52 @@ import org.joda.time.DateTime;
 /**
  * This device reader is importing data from Polar device files.
  */
-public class PolarHRMDataReader extends TourbookDevice {
+public class Polar_HRM_DataReader extends TourbookDevice {
 
 	/**
 	 * Speed is saved in the .hrm file with 0.1 km/h
 	 */
 	private static final int		SPEED_SCALING			= 10;
 
-	private static final String		DATA_DELIMITER			= "\t";											//$NON-NLS-1$
+	private static final String		DATA_DELIMITER			= "\t";						//$NON-NLS-1$
 
-	private static final String		SECTION_START_CHARACTER	= "[";												//$NON-NLS-1$
-	private static final String		SECTION_PARAMS			= "[Params]";										//$NON-NLS-1$
+	private static final String		SECTION_START_CHARACTER	= "[";							//$NON-NLS-1$
+	private static final String		SECTION_PARAMS			= "[Params]";					//$NON-NLS-1$
 	//
-	private static final String		SECTION_NOTE			= "[Note]";										//$NON-NLS-1$
-	private static final String		SECTION_INT_TIMES		= "[IntTimes]";									//$NON-NLS-1$
-	private static final String		SECTION_INT_NOTES		= "[IntNotes]";									//$NON-NLS-1$
-	private static final String		SECTION_EXTRA_DATA		= "[ExtraData]";									//$NON-NLS-1$
-	private static final String		SECTION_LAP_NAMES		= "[LapNames]";									//$NON-NLS-1$
-	private static final String		SECTION_SUMMARY_123		= "[Summary-123]";									//$NON-NLS-1$
-	private static final String		SECTION_SUMMARY_TH		= "[Summary-TH]";									//$NON-NLS-1$
-	private static final String		SECTION_HR_ZONES		= "[HRZones]";										//$NON-NLS-1$
-	private static final String		SECTION_SWAP_TIMES		= "[SwapTimes]";									//$NON-NLS-1$
-	private static final String		SECTION_TRIP			= "[Trip]";										//$NON-NLS-1$
-	private static final String		SECTION_HR_DATA			= "[HRData]";										//$NON-NLS-1$
+	private static final String		SECTION_NOTE			= "[Note]";					//$NON-NLS-1$
+	private static final String		SECTION_INT_TIMES		= "[IntTimes]";				//$NON-NLS-1$
+	private static final String		SECTION_INT_NOTES		= "[IntNotes]";				//$NON-NLS-1$
+	private static final String		SECTION_EXTRA_DATA		= "[ExtraData]";				//$NON-NLS-1$
+	private static final String		SECTION_LAP_NAMES		= "[LapNames]";				//$NON-NLS-1$
+	private static final String		SECTION_SUMMARY_123		= "[Summary-123]";				//$NON-NLS-1$
+	private static final String		SECTION_SUMMARY_TH		= "[Summary-TH]";				//$NON-NLS-1$
+	private static final String		SECTION_HR_ZONES		= "[HRZones]";					//$NON-NLS-1$
+	private static final String		SECTION_SWAP_TIMES		= "[SwapTimes]";				//$NON-NLS-1$
+	private static final String		SECTION_TRIP			= "[Trip]";					//$NON-NLS-1$
+	private static final String		SECTION_HR_DATA			= "[HRData]";					//$NON-NLS-1$
 	//
-	private static final String		PARAMS_MONITOR			= "Monitor";										//$NON-NLS-1$
-	private static final String		PARAMS_VERSION			= "Version";										//$NON-NLS-1$
-	private static final String		PARAMS_S_MODE			= "SMode";											//$NON-NLS-1$
-	private static final String		PARAMS_DATE				= "Date";											//$NON-NLS-1$
-	private static final String		PARAMS_START_TIME		= "StartTime";										//$NON-NLS-1$
-	private static final String		PARAMS_LENGTH			= "Length";										//$NON-NLS-1$
-	private static final String		PARAMS_INTERVAL			= "Interval";										//$NON-NLS-1$
-	private static final String		PARAMS_UPPER1			= "Upper1";										//$NON-NLS-1$
-	private static final String		PARAMS_LOWER1			= "Lower1";										//$NON-NLS-1$
-	private static final String		PARAMS_UPPER2			= "Upper2";										//$NON-NLS-1$
-	private static final String		PARAMS_LOWER2			= "Lower2";										//$NON-NLS-1$
-	private static final String		PARAMS_UPPER3			= "Upper3";										//$NON-NLS-1$
-	private static final String		PARAMS_LOWER3			= "Lower3";										//$NON-NLS-1$
-	private static final String		PARAMS_TIMER1			= "Timer1";										//$NON-NLS-1$
-	private static final String		PARAMS_TIMER2			= "Timer2";										//$NON-NLS-1$
-	private static final String		PARAMS_TIMER3			= "Timer3";										//$NON-NLS-1$
-	private static final String		PARAMS_ACTIVE_LIMIT		= "ActiveLimit";									//$NON-NLS-1$
-	private static final String		PARAMS_MAX_HR			= "MaxHR";											//$NON-NLS-1$
-	private static final String		PARAMS_REST_HR			= "RestHR";										//$NON-NLS-1$
-	private static final String		PARAMS_START_DELAY		= "StartDelay";									//$NON-NLS-1$
-	private static final String		PARAMS_VO2MAX			= "VO2max";										//$NON-NLS-1$
-	private static final String		PARAMS_WEIGHT			= "Weight";										//$NON-NLS-1$
+	private static final String		PARAMS_MONITOR			= "Monitor";					//$NON-NLS-1$
+	private static final String		PARAMS_VERSION			= "Version";					//$NON-NLS-1$
+	private static final String		PARAMS_S_MODE			= "SMode";						//$NON-NLS-1$
+	private static final String		PARAMS_DATE				= "Date";						//$NON-NLS-1$
+	private static final String		PARAMS_START_TIME		= "StartTime";					//$NON-NLS-1$
+	private static final String		PARAMS_LENGTH			= "Length";					//$NON-NLS-1$
+	private static final String		PARAMS_INTERVAL			= "Interval";					//$NON-NLS-1$
+	private static final String		PARAMS_UPPER1			= "Upper1";					//$NON-NLS-1$
+	private static final String		PARAMS_LOWER1			= "Lower1";					//$NON-NLS-1$
+	private static final String		PARAMS_UPPER2			= "Upper2";					//$NON-NLS-1$
+	private static final String		PARAMS_LOWER2			= "Lower2";					//$NON-NLS-1$
+	private static final String		PARAMS_UPPER3			= "Upper3";					//$NON-NLS-1$
+	private static final String		PARAMS_LOWER3			= "Lower3";					//$NON-NLS-1$
+	private static final String		PARAMS_TIMER1			= "Timer1";					//$NON-NLS-1$
+	private static final String		PARAMS_TIMER2			= "Timer2";					//$NON-NLS-1$
+	private static final String		PARAMS_TIMER3			= "Timer3";					//$NON-NLS-1$
+	private static final String		PARAMS_ACTIVE_LIMIT		= "ActiveLimit";				//$NON-NLS-1$
+	private static final String		PARAMS_MAX_HR			= "MaxHR";						//$NON-NLS-1$
+	private static final String		PARAMS_REST_HR			= "RestHR";					//$NON-NLS-1$
+	private static final String		PARAMS_START_DELAY		= "StartDelay";				//$NON-NLS-1$
+	private static final String		PARAMS_VO2MAX			= "VO2max";					//$NON-NLS-1$
+	private static final String		PARAMS_WEIGHT			= "Weight";					//$NON-NLS-1$
 	//
 	private DeviceData				_deviceData;
 	private String					_importFilePath;
@@ -98,9 +98,10 @@ public class PolarHRMDataReader extends TourbookDevice {
 
 	private SectionParams			_sectionParams;
 	private SectionTrip				_sectionTrip;
-	private ArrayList<LapData>		_sectionLapData			= new ArrayList<PolarHRMDataReader.LapData>();
-	private ArrayList<LapNotes>		_sectionLapNotes		= new ArrayList<PolarHRMDataReader.LapNotes>();
-	private ArrayList<HRDataSlice>	_sectionHRData			= new ArrayList<PolarHRMDataReader.HRDataSlice>();
+
+	private ArrayList<LapData>		_sectionLapData			= new ArrayList<LapData>();
+	private ArrayList<LapNotes>		_sectionLapNotes		= new ArrayList<LapNotes>();
+	private ArrayList<HRDataSlice>	_sectionHRData			= new ArrayList<HRDataSlice>();
 	//
 	private boolean					_isDebug				= false;
 
@@ -416,7 +417,7 @@ public class PolarHRMDataReader extends TourbookDevice {
 	}
 
 	// plugin constructor
-	public PolarHRMDataReader() {}
+	public Polar_HRM_DataReader() {}
 
 	@Override
 	public String buildFileNameFromRawData(final String rawDataFileName) {
@@ -869,7 +870,7 @@ public class PolarHRMDataReader extends TourbookDevice {
 
 				if (line.startsWith(SECTION_PARAMS)) {
 
-					isValid = parseSection10Params(fileReader, deviceData);
+					isValid = parseSection_10_Params(fileReader, deviceData);
 
 				} else if (line.startsWith(SECTION_NOTE)) {
 
@@ -878,12 +879,12 @@ public class PolarHRMDataReader extends TourbookDevice {
 				} else if (line.startsWith(SECTION_INT_TIMES)) {
 
 					if (_hrmVersion == 106) {
-						isValid = parseSection20LapData106(fileReader);
+						isValid = parseSection_20_LapData106(fileReader);
 					}
 
 				} else if (line.startsWith(SECTION_INT_NOTES)) {
 
-					isValid = parseSection21LapNotes(fileReader);
+					isValid = parseSection_21_LapNotes(fileReader);
 
 				} else if (line.startsWith(SECTION_EXTRA_DATA)) {
 
@@ -911,12 +912,12 @@ public class PolarHRMDataReader extends TourbookDevice {
 
 				} else if (line.startsWith(SECTION_TRIP)) {
 
-					isValid = parseSection80Trip(fileReader);
+					isValid = parseSection_80_Trip(fileReader);
 
 				} else if (line.startsWith(SECTION_HR_DATA)) {
 
 					if (_hrmVersion == 106) {
-						isValid = parseSection90HRData106(fileReader);
+						isValid = parseSection_90_HRData106(fileReader);
 					}
 				}
 
@@ -952,7 +953,7 @@ public class PolarHRMDataReader extends TourbookDevice {
 		return returnValue;
 	}
 
-	private boolean parseSection10Params(final BufferedReader fileReader, final DeviceData deviceData)
+	private boolean parseSection_10_Params(final BufferedReader fileReader, final DeviceData deviceData)
 			throws IOException {
 
 		_sectionParams = new SectionParams();
@@ -1167,7 +1168,7 @@ public class PolarHRMDataReader extends TourbookDevice {
 	 * @return
 	 * @throws IOException
 	 */
-	private boolean parseSection20LapData106(final BufferedReader fileReader) throws IOException {
+	private boolean parseSection_20_LapData106(final BufferedReader fileReader) throws IOException {
 
 		String line;
 
@@ -1371,7 +1372,7 @@ public class PolarHRMDataReader extends TourbookDevice {
 	 * @return
 	 * @throws IOException
 	 */
-	private boolean parseSection21LapNotes(final BufferedReader fileReader) throws IOException {
+	private boolean parseSection_21_LapNotes(final BufferedReader fileReader) throws IOException {
 
 		String line;
 
@@ -1429,7 +1430,7 @@ public class PolarHRMDataReader extends TourbookDevice {
 	 * @return
 	 * @throws IOException
 	 */
-	private boolean parseSection80Trip(final BufferedReader fileReader) throws IOException {
+	private boolean parseSection_80_Trip(final BufferedReader fileReader) throws IOException {
 
 		_sectionTrip = new SectionTrip();
 
@@ -1548,7 +1549,7 @@ public class PolarHRMDataReader extends TourbookDevice {
 	 * @return
 	 * @throws IOException
 	 */
-	private boolean parseSection90HRData106(final BufferedReader fileReader) throws IOException {
+	private boolean parseSection_90_HRData106(final BufferedReader fileReader) throws IOException {
 
 		String line;
 		while ((line = fileReader.readLine()) != null) {

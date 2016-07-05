@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -46,7 +46,7 @@ import org.joda.time.DateTime;
 /**
  * This device reader is importing data from Polar device files.
  */
-public class PolarPDDDataReader extends TourbookDevice {
+public class Polar_PDD_DataReader extends TourbookDevice {
 
 	private static final String		DATA_DELIMITER				= "\t";										//$NON-NLS-1$
 
@@ -92,7 +92,7 @@ public class PolarPDDDataReader extends TourbookDevice {
 	}
 
 	// plugin constructor
-	public PolarPDDDataReader() {}
+	public Polar_PDD_DataReader() {}
 
 	@Override
 	public String buildFileNameFromRawData(final String rawDataFileName) {
@@ -455,7 +455,7 @@ public class PolarPDDDataReader extends TourbookDevice {
 	}
 
 	protected TourbookDevice getPolarHRMDataReader() {
-		return new PolarHRMDataReader();
+		return new Polar_HRM_DataReader();
 	}
 
 	@Override

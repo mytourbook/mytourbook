@@ -192,7 +192,7 @@
    <extension	point="net.tourbook.deviceDataReader">
 
       <device
-            class="net.tourbook.device.polar.hrm.PolarPPDDataReader"
+            class="net.tourbook.device.polar.hrm.Polar_PPD_DataReader"
             extensionSortPriority="1"
             fileextension="ppd"
             id="net.tourbook.device.PolarPPDDataReader"
@@ -200,7 +200,7 @@
             />
 
       <device
-            class="net.tourbook.device.polar.hrm.PolarPDDDataReader"
+            class="net.tourbook.device.polar.hrm.Polar_PDD_DataReader"
             extensionSortPriority="1"
             fileextension="pdd"
             id="net.tourbook.device.PolarPDDDataReader"
@@ -208,7 +208,7 @@
             />
 
       <device
-            class="net.tourbook.device.polar.hrm.PolarHRMDataReader"
+            class="net.tourbook.device.polar.hrm.Polar_HRM_DataReader"
             fileextension="hrm"
             id="net.tourbook.device.PolarHRMDataReader"
             name="Polar HRM (Heart Rate Monitor)"/>
