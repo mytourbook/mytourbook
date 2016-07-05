@@ -729,19 +729,19 @@
 					label="%View_Name_Training"
 					mnemonic="%View_Name_Training_Mnemonic"/>
 				
-				<!-- Heart Rate Variability -->
-				<command
-					commandId="command.net.tourbook.views.HeartRateVariabilityChart"
-					icon="icons/heart-rate-variability.png"
-					label="%View_Name_HeartRateVariabilityChart"
-					mnemonic="%View_Name_HeartRateVariabilityChart_Mnemonic"/>
-				
 				<!-- Conconi Test -->
 				<command
 					commandId="command.net.tourbook.views.ConconiChart"
 					icon="icons/conconi-chart.png"
 					label="%View_Name_ConconiChart"
 					mnemonic="%View_Name_ConconiChart_Mnemonic"/>
+				
+				<!-- Heart Rate Variability -->
+				<command
+					commandId="command.net.tourbook.views.HeartRateVariabilityChart"
+					icon="icons/heart-rate-variability.png"
+					label="%View_Name_HeartRateVariabilityChart"
+					mnemonic="%View_Name_HeartRateVariabilityChart_Mnemonic"/>
 		
 		</menuContribution>
 

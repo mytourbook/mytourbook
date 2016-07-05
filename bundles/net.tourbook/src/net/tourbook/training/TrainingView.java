@@ -427,7 +427,9 @@ public class TrainingView extends ViewPart {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-		GridLayoutFactory.fillDefaults().spacing(0, 0).numColumns(1).applyTo(container);
+		GridLayoutFactory.fillDefaults()//
+				.spacing(0, 0)
+				.applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
 		{
 			createUI_10_HeaderToolbar(container);
@@ -442,7 +444,10 @@ public class TrainingView extends ViewPart {
 				.grab(true, false)
 				.align(SWT.BEGINNING, SWT.FILL)
 				.applyTo(_headerToolbar);
-		GridLayoutFactory.fillDefaults().numColumns(6).applyTo(_headerToolbar);
+		GridLayoutFactory.fillDefaults()//
+				.numColumns(6)
+				.margins(0, 3)
+				.applyTo(_headerToolbar);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
 			/*
@@ -450,7 +455,7 @@ public class TrainingView extends ViewPart {
 			 */
 			_lblHrMin = new Label(_headerToolbar, SWT.NONE);
 			GridDataFactory.fillDefaults()//
-					.indent(10, 0)
+					.indent(5, 0)
 					.align(SWT.BEGINNING, SWT.CENTER)
 					.applyTo(_lblHrMin);
 			_lblHrMin.setText(Messages.Training_View_Label_LeftChartBorder);

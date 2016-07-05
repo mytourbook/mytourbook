@@ -32,6 +32,7 @@ import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
@@ -43,7 +44,9 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
 
-import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -52,12 +55,22 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseWheelListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
@@ -71,6 +84,11 @@ public class HeartRateVariabilityView extends ViewPart {
 	private static final String			GRAPH_LABEL_HEART_RATE_VARIABILITY		= net.tourbook.common.Messages.Graph_Label_HeartRateVariability;
 	private static final String			GRAPH_LABEL_HEART_RATE_VARIABILITY_UNIT	= net.tourbook.common.Messages.Graph_Label_HeartRateVariability_Unit;
 
+	private static final String			STATE_HRV_MIN_TIME						= "STATE_HRV_MIN_TIME";																//$NON-NLS-1$
+	private static final String			STATE_HRV_MAX_TIME						= "STATE_HRV_MAX_TIME";																//$NON-NLS-1$
+	private static final String			STATE_IS_SHOW_ALL_VALUES				= "STATE_IS_SHOW_ALL_VALUES";															//$NON-NLS-1$
+	private static final String			STATE_IS_SYNC_CHART_SCALING				= "STATE_IS_SYNC_CHART_SCALING";														//$NON-NLS-1$
+
 	private static final String			GRID_PREF_PREFIX						= "GRID_HEART_RATE_VARIABILITY__";														//$NON-NLS-1$
 
 	private static final String			GRID_IS_SHOW_VERTICAL_GRIDLINES			= (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES);
@@ -80,19 +98,30 @@ public class HeartRateVariabilityView extends ViewPart {
 
 	private static final int			ADJUST_PULSE_VALUE						= 50;
 
+	private static final int			HRV_TIME_MIN_BORDER						= 0;																					// ms
+	private static final int			HRV_TIME_MAX_BORDER						= 9999;																				//ms
+
 	private final IPreferenceStore		_prefStore								= TourbookPlugin.getPrefStore();
 	private final IPreferenceStore		_commonPrefStore						= CommonActivator.getPrefStore();
+	private final IDialogSettings		_state									= TourbookPlugin.getState(ID);
 
-	private IPropertyChangeListener		_prefChangeListener;
+	private ModifyListener				_defaultSpinnerModifyListener;
+	private MouseWheelListener			_defaultSpinnerMouseWheelListener;
+	private SelectionAdapter			_defaultSpinnerSelectionListener;
+	private IPartListener2				_partListener;
 	private ISelectionListener			_postSelectionListener;
+	private IPropertyChangeListener		_prefChangeListener;
 	private ITourEventListener			_tourEventListener;
 
 	private ArrayList<TourData>			_hrvTours;
 
 	private ActionToolbarSlideout		_actionHrvOptions;
 	private ActionSynchChartScale		_actionSynchChartScaling;
+	private ActionShowAllValues			_actionShowAllValues;
 
+	private boolean						_isUpdateUI;
 	private boolean						_isSynchChartScaling;
+	private boolean						_isShowAllValues;
 
 	private final MinMaxKeeper_XData	_xMinMaxKeeper							= new MinMaxKeeper_XData(
 																						ADJUST_PULSE_VALUE);
@@ -102,16 +131,24 @@ public class HeartRateVariabilityView extends ViewPart {
 	private int							_fixed2xErrors_0;
 	private int							_fixed2xErrors_1;
 
+	private ToolBarManager				_headerToolbarManager;
+
 	/*
 	 * UI controls
 	 */
 	private PageBook					_pageBook;
 
-	private Composite					_pageNoTour;
-	private Composite					_pageHrvChart;
-	private Composite					_pageInvalidData;
+	private Composite					_page_NoTour;
+	private Composite					_page_Chart;
+	private Composite					_page_InvalidData;
 
 	private Chart						_chartHRV;
+
+	private Label						_lblMinTime;
+	private Label						_lblMaxTime;
+
+	private Spinner						_spinnerMinTime;
+	private Spinner						_spinnerMaxTime;
 
 	private class ActionHrvOptions extends ActionToolbarSlideout {
 
@@ -128,7 +165,48 @@ public class HeartRateVariabilityView extends ViewPart {
 		}
 	}
 
-	void actionSynchChartScale() {
+	private class ActionShowAllValues extends Action {
+
+		public ActionShowAllValues() {
+
+			super(UI.EMPTY_STRING, AS_CHECK_BOX);
+
+			setToolTipText(Messages.Training_View_Action_ShowAllPulseValues);
+			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ZoomFitGraph));
+		}
+
+		@Override
+		public void run() {
+			actionShowAllValues();
+		}
+	}
+
+	private class ActionSynchChartScale extends Action {
+
+		public ActionSynchChartScale() {
+
+			super(UI.EMPTY_STRING, AS_CHECK_BOX);
+
+			setToolTipText(Messages.HRV_View_Action_SynchChartScale);
+
+			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__synch_statistics));
+			setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__synch_statistics_Disabled));
+		}
+
+		@Override
+		public void run() {
+			actionSynchChartScale();
+		}
+	}
+
+	private void actionShowAllValues() {
+
+		_isShowAllValues = _actionShowAllValues.isChecked();
+
+		updateChart_50_CurrentTours(!_isSynchChartScaling);
+	}
+
+	private void actionSynchChartScale() {
 
 		_isSynchChartScaling = _actionSynchChartScaling.isChecked();
 
@@ -139,6 +217,41 @@ public class HeartRateVariabilityView extends ViewPart {
 		}
 
 		updateChart_50_CurrentTours(!_isSynchChartScaling);
+	}
+
+	private void addPartListener() {
+
+		getViewSite().getPage().addPartListener(_partListener = new IPartListener2() {
+
+			@Override
+			public void partActivated(final IWorkbenchPartReference partRef) {}
+
+			@Override
+			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
+
+			@Override
+			public void partClosed(final IWorkbenchPartReference partRef) {
+
+				if (partRef.getPart(false) == HeartRateVariabilityView.this) {
+					saveState();
+				}
+			}
+
+			@Override
+			public void partDeactivated(final IWorkbenchPartReference partRef) {}
+
+			@Override
+			public void partHidden(final IWorkbenchPartReference partRef) {}
+
+			@Override
+			public void partInputChanged(final IWorkbenchPartReference partRef) {}
+
+			@Override
+			public void partOpened(final IWorkbenchPartReference partRef) {}
+
+			@Override
+			public void partVisible(final IWorkbenchPartReference partRef) {}
+		});
 	}
 
 	private void addPrefListener() {
@@ -225,13 +338,16 @@ public class HeartRateVariabilityView extends ViewPart {
 			_chartHRV.updateChart(null, false);
 		}
 
-		_pageBook.showPage(_pageNoTour);
+		_pageBook.showPage(_page_NoTour);
+
+		enableControls();
 	}
 
 	private void createActions() {
 
 		_actionHrvOptions = new ActionHrvOptions();
-		_actionSynchChartScaling = new ActionSynchChartScale(this);
+		_actionSynchChartScaling = new ActionSynchChartScale();
+		_actionShowAllValues = new ActionShowAllValues();
 	}
 
 	/**
@@ -391,6 +507,8 @@ public class HeartRateVariabilityView extends ViewPart {
 	@Override
 	public void createPartControl(final Composite parent) {
 
+		initUI(parent);
+
 		createUI(parent);
 
 		createActions();
@@ -398,41 +516,130 @@ public class HeartRateVariabilityView extends ViewPart {
 
 		restoreState();
 
+		addPartListener();
 		addSelectionListener();
 		addPrefListener();
 		addTourEventListener();
 
 		// show default page
-		_pageBook.showPage(_pageNoTour);
+		_pageBook.showPage(_page_NoTour);
 
-		// show hrv chart from selection service
-		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
+		showTour();
 	}
 
 	private void createUI(final Composite parent) {
 
 		_pageBook = new PageBook(parent, SWT.NONE);
 
-		_pageNoTour = new Composite(_pageBook, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(_pageNoTour);
-		GridLayoutFactory.swtDefaults().applyTo(_pageNoTour);
+		_page_NoTour = new Composite(_pageBook, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(_page_NoTour);
+		GridLayoutFactory.swtDefaults().applyTo(_page_NoTour);
 		{
-			final Label label = new Label(_pageNoTour, SWT.WRAP);
+			final Label label = new Label(_page_NoTour, SWT.WRAP);
 			label.setText(Messages.UI_Label_TourIsNotSelected);
 		}
 
-		_pageInvalidData = new Composite(_pageBook, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(_pageInvalidData);
-		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(_pageInvalidData);
+		_page_InvalidData = new Composite(_pageBook, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(_page_InvalidData);
+		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(_page_InvalidData);
 		{
-			final Label label = new Label(_pageInvalidData, SWT.WRAP);
+			final Label label = new Label(_page_InvalidData, SWT.WRAP);
 			label.setText(Messages.HRV_View_InvalidData);
 		}
 
-		_pageHrvChart = createUI_30_Chart(_pageBook);
+		_page_Chart = createUI_10_ChartPage(_pageBook);
 	}
 
-	private Composite createUI_30_Chart(final Composite parent) {
+	private Composite createUI_10_ChartPage(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults()//
+				.spacing(0, 0)
+				.applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
+		{
+			createUI_20_HeaderToolbar(container);
+			createUI_30_Chart(container);
+		}
+
+		return container;
+	}
+
+	private void createUI_20_HeaderToolbar(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+				.grab(true, false)
+				.align(SWT.BEGINNING, SWT.FILL)
+				.applyTo(container);
+		GridLayoutFactory.fillDefaults()//
+				.numColumns(5)
+				.margins(0, 3)
+				.applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+		{
+			/*
+			 * label: hr min
+			 */
+			_lblMinTime = new Label(container, SWT.NONE);
+			GridDataFactory.fillDefaults()//
+					.indent(5, 0)
+					.align(SWT.BEGINNING, SWT.CENTER)
+					.applyTo(_lblMinTime);
+			_lblMinTime.setText(Messages.Training_View_Label_LeftChartBorder);
+			_lblMinTime.setToolTipText(Messages.Training_View_Label_LeftChartBorder_Tooltip);
+
+			/*
+			 * spinner: hr min
+			 */
+			_spinnerMinTime = new Spinner(container, SWT.BORDER);
+			_spinnerMinTime.setMinimum(HRV_TIME_MIN_BORDER);
+			_spinnerMinTime.setMaximum(HRV_TIME_MAX_BORDER);
+			_spinnerMinTime.addModifyListener(_defaultSpinnerModifyListener);
+			_spinnerMinTime.addSelectionListener(_defaultSpinnerSelectionListener);
+			_spinnerMinTime.addMouseWheelListener(_defaultSpinnerMouseWheelListener);
+
+			/*
+			 * label: hr max
+			 */
+			_lblMaxTime = new Label(container, SWT.NONE);
+			GridDataFactory.fillDefaults()//
+					.align(SWT.BEGINNING, SWT.CENTER)
+					.applyTo(_lblMaxTime);
+			_lblMaxTime.setText(Messages.Training_View_Label_RightChartBorder);
+			_lblMaxTime.setToolTipText(Messages.Training_View_Label_RightChartBorder_Tooltip);
+
+			/*
+			 * spinner: hr max
+			 */
+			_spinnerMaxTime = new Spinner(container, SWT.BORDER);
+			_spinnerMaxTime.setMinimum(HRV_TIME_MIN_BORDER);
+			_spinnerMaxTime.setMaximum(HRV_TIME_MAX_BORDER);
+			_spinnerMaxTime.addModifyListener(_defaultSpinnerModifyListener);
+			_spinnerMaxTime.addSelectionListener(_defaultSpinnerSelectionListener);
+			_spinnerMaxTime.addMouseWheelListener(_defaultSpinnerMouseWheelListener);
+
+			/*
+			 * toolbar actions
+			 */
+			final ToolBar toolbar = new ToolBar(container, SWT.FLAT);
+			GridDataFactory.fillDefaults()//
+					.align(SWT.BEGINNING, SWT.CENTER)
+					.applyTo(toolbar);
+			_headerToolbarManager = new ToolBarManager(toolbar);
+		}
+
+		// label: horizontal separator
+		final Label label = new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL);
+		GridDataFactory.fillDefaults()//
+				.grab(true, false)
+				.hint(SWT.DEFAULT, 1)
+				.applyTo(label);
+		label.setText(UI.EMPTY_STRING);
+	}
+
+	private void createUI_30_Chart(final Composite parent) {
 
 		_chartHRV = new Chart(parent, SWT.FLAT);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(_chartHRV);
@@ -441,33 +648,43 @@ public class HeartRateVariabilityView extends ViewPart {
 
 		// Show title
 		_chartHRV.getChartTitleSegmentConfig().isShowSegmentTitle = true;
-
-		return _chartHRV;
 	}
 
 	@Override
 	public void dispose() {
 
 		getSite().getPage().removeSelectionListener(_postSelectionListener);
+		getViewSite().getPage().removePartListener(_partListener);
+
 		TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
 		super.dispose();
 	}
 
+	private void enableControls() {
+
+		final boolean isTourAvailable = _hrvTours != null;
+		final boolean isCustomScaling = _isShowAllValues == false;
+
+		_spinnerMinTime.setEnabled(isCustomScaling);
+		_spinnerMaxTime.setEnabled(isCustomScaling);
+		_lblMinTime.setEnabled(isCustomScaling);
+		_lblMaxTime.setEnabled(isCustomScaling);
+
+		_actionSynchChartScaling.setEnabled(isCustomScaling);
+		_actionShowAllValues.setEnabled(isTourAvailable);
+	}
+
 	/**
-	 * Each statistic has it's own toolbar
 	 */
 	private void fillToolbar() {
 
-		// update view toolbar
-		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
-		tbm.removeAll();
-
-		tbm.add(_actionSynchChartScaling);
-		tbm.add(_actionHrvOptions);
+		_headerToolbarManager.add(_actionShowAllValues);
+		_headerToolbarManager.add(_actionSynchChartScaling);
+		_headerToolbarManager.add(_actionHrvOptions);
 
 		// update toolbar to show added items
-		tbm.update(true);
+		_headerToolbarManager.update(true);
 	}
 
 	public int getFixed2xErrors_0() {
@@ -476,6 +693,68 @@ public class HeartRateVariabilityView extends ViewPart {
 
 	public int getFixed2xErrors_1() {
 		return _fixed2xErrors_1;
+	}
+
+	private void initUI(final Composite parent) {
+
+		_defaultSpinnerModifyListener = new ModifyListener() {
+			@Override
+			public void modifyText(final ModifyEvent e) {
+				if (_isUpdateUI) {
+					return;
+				}
+				onModifyMinMaxTime();
+			}
+		};
+
+		_defaultSpinnerSelectionListener = new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				if (_isUpdateUI) {
+					return;
+				}
+				onModifyMinMaxTime();
+			}
+		};
+
+		_defaultSpinnerMouseWheelListener = new MouseWheelListener() {
+			@Override
+			public void mouseScrolled(final MouseEvent event) {
+				Util.adjustSpinnerValueOnMouseScroll(event);
+				if (_isUpdateUI) {
+					return;
+				}
+				onModifyMinMaxTime();
+			}
+		};
+	}
+
+	private void onModifyMinMaxTime() {
+
+		int left = _spinnerMinTime.getSelection();
+		int right = _spinnerMaxTime.getSelection();
+
+		_isUpdateUI = true;
+		{
+			if (left == HRV_TIME_MIN_BORDER && right == HRV_TIME_MIN_BORDER) {
+
+				right++;
+				_spinnerMaxTime.setSelection(right);
+
+			} else if (left == HRV_TIME_MAX_BORDER && right == HRV_TIME_MAX_BORDER) {
+
+				left--;
+				_spinnerMinTime.setSelection(left);
+
+			} else if (left >= right) {
+
+				left = right - 1;
+				_spinnerMinTime.setSelection(left);
+			}
+		}
+		_isUpdateUI = false;
+
+		updateChart_50_CurrentTours(!_isSynchChartScaling);
 	}
 
 	private void onSelectionChanged(final ISelection selection) {
@@ -514,14 +793,73 @@ public class HeartRateVariabilityView extends ViewPart {
 
 	private void restoreState() {
 
+		_isShowAllValues = Util.getStateBoolean(_state, STATE_IS_SHOW_ALL_VALUES, false);
+		_actionShowAllValues.setChecked(_isShowAllValues);
+
+		_isSynchChartScaling = Util.getStateBoolean(_state, STATE_IS_SYNC_CHART_SCALING, false);
+		_actionSynchChartScaling.setChecked(_isSynchChartScaling);
+
+		_isUpdateUI = true;
+		{
+			_spinnerMinTime.setSelection(Util.getStateInt(_state, STATE_HRV_MIN_TIME, 200));
+			_spinnerMaxTime.setSelection(Util.getStateInt(_state, STATE_HRV_MAX_TIME, 1000));
+		}
+		_isUpdateUI = false;
+	}
+
+	private void saveState() {
+
+		_state.put(STATE_HRV_MIN_TIME, _spinnerMinTime.getSelection());
+		_state.put(STATE_HRV_MAX_TIME, _spinnerMaxTime.getSelection());
+
+		_state.put(STATE_IS_SHOW_ALL_VALUES, _actionShowAllValues.isChecked());
+		_state.put(STATE_IS_SYNC_CHART_SCALING, _actionSynchChartScaling.isChecked());
 	}
 
 	@Override
 	public void setFocus() {
 
-		if (_pageHrvChart != null && _pageHrvChart.isVisible()) {
+		if (_page_Chart != null && _page_Chart.isVisible()) {
 			_chartHRV.setFocus();
 		}
+	}
+
+	private void showTour() {
+
+		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
+
+		if (_hrvTours == null) {
+			showTourFromTourProvider();
+		}
+
+		enableControls();
+	}
+
+	private void showTourFromTourProvider() {
+
+		// a tour is not displayed, find a tour provider which provides a tour
+		Display.getCurrent().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+
+				// validate widget
+				if (_pageBook.isDisposed()) {
+					return;
+				}
+
+				/*
+				 * check if tour was set from a selection provider
+				 */
+				if (_hrvTours != null) {
+					return;
+				}
+
+				final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
+				if (selectedTours != null && selectedTours.size() > 0) {
+					updateChart_22(selectedTours);
+				}
+			}
+		});
 	}
 
 	private void updateChart_10(final Long tourId) {
@@ -576,21 +914,23 @@ public class HeartRateVariabilityView extends ViewPart {
 	 */
 	private void updateChart_50_CurrentTours(final boolean isShowAllData) {
 
+		enableControls();
+
 		if (_hrvTours == null) {
-			_pageBook.showPage(_pageNoTour);
+			_pageBook.showPage(_page_NoTour);
 			return;
 		}
 
 		final ChartDataModel chartDataModel = createChartDataModel(_hrvTours);
 
 		if (chartDataModel == null) {
-			_pageBook.showPage(_pageInvalidData);
+			_pageBook.showPage(_page_InvalidData);
 			return;
 		}
 
 		_chartHRV.updateChart(chartDataModel, true, isShowAllData);
 
-		_pageBook.showPage(_pageHrvChart);
+		_pageBook.showPage(_page_Chart);
 	}
 
 }
