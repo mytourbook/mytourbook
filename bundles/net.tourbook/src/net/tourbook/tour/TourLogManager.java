@@ -105,6 +105,11 @@ public class TourLogManager {
 		addLog(tourLog);
 	}
 
+	public static void logError_CannotReadDataFile(final String importFilePath, final Exception e) {
+
+		logEx(String.format("Could not read data file '%s'", importFilePath), e); //$NON-NLS-1$
+	}
+
 	public static void logEx(final Exception e) {
 
 		final String stackTrace = Util.getStackTrace(e);

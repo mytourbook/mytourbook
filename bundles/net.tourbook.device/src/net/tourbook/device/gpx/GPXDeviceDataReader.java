@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -33,6 +33,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
+import net.tourbook.tour.TourLogManager;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
@@ -222,12 +223,14 @@ public class GPXDeviceDataReader extends TourbookDevice {
 				}
 			});
 
-			e.printStackTrace();
+			TourLogManager.logEx(e);
+
 			return false;
 
 		} catch (final Exception e) {
 
-			StatusUtil.log("Error parsing file: " + importFilePath, e); //$NON-NLS-1$
+			TourLogManager.logError_CannotReadDataFile(importFilePath, e);
+
 			return false;
 		}
 

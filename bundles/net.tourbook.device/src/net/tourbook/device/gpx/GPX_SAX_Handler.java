@@ -62,6 +62,9 @@ public class GPX_SAX_Handler extends DefaultHandler {
 //	private static final String				CDATA_START					= "<![CDATA[";										//$NON-NLS-1$
 //	private static final String				CDATA_END					= "]]>";											//$NON-NLS-1$
 
+	private static final String				ATTR_GPX_VERSION				= "version";								//$NON-NLS-1$
+	private static final String				ATTR_GPX_VERSION_1_0			= "1.0";									//$NON-NLS-1$
+
 	private static final String				NAME_SPACE_GPX_1_0				= "http://www.topografix.com/GPX/1/0";		//$NON-NLS-1$
 	private static final String				NAME_SPACE_GPX_1_1				= "http://www.topografix.com/GPX/1/1";		//$NON-NLS-1$
 	private static final String				POLAR_WEBSYNC_CREATOR_2_3		= "Polar WebSync 2.3 - www.polar.fi";		//$NON_NLS-1$ //$NON-NLS-1$
@@ -1424,17 +1427,19 @@ public class GPX_SAX_Handler extends DefaultHandler {
 				 */
 				for (int attrIndex = 0; attrIndex < attributes.getLength(); attrIndex++) {
 
+					final String qName = attributes.getQName(attrIndex);
 					final String value = attributes.getValue(attrIndex);
 
-					if (value.contains(NAME_SPACE_GPX_1_0)) {
+					if (value.contains(NAME_SPACE_GPX_1_0)
+
+					// tolerate 'version="1.0"'
+							|| (qName.toLowerCase().equals(ATTR_GPX_VERSION) && value.equals(ATTR_GPX_VERSION_1_0))) {
 
 						_gpxVersion = GPX_VERSION_1_0;
 
 						if (_device.isMergeTracks) {
 							initNewTrack();
 						}
-
-//						break;
 
 					} else if (value.contains(NAME_SPACE_GPX_1_1)) {
 
@@ -1444,13 +1449,10 @@ public class GPX_SAX_Handler extends DefaultHandler {
 							initNewTrack();
 						}
 
-//						break;
-
 					} else if (value.contains(POLAR_WEBSYNC_CREATOR_2_3)) {
 
 						_gpxHasLocalTime = true;
 
-//						break;
 					} else if (value.contains(GH600)) {
 
 						_gpxHasLocalTime = true;

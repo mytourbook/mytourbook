@@ -332,7 +332,7 @@ public class FitDataReader extends TourbookDevice {
 			returnValue = true;
 
 		} catch (final IOException e) {
-			TourLogManager.logEx(String.format("Could not read data file '%s'", importFilePath), e); //$NON-NLS-1$
+			TourLogManager.logError_CannotReadDataFile(importFilePath, e);
 		}
 
 		return returnValue;
@@ -348,7 +348,7 @@ public class FitDataReader extends TourbookDevice {
 			fis = new FileInputStream(fileName);
 			returnValue = new Decode().checkFileIntegrity(fis);
 		} catch (final FileNotFoundException e) {
-			TourLogManager.logEx(String.format("Could not read data file '%s'", fileName), e); //$NON-NLS-1$
+			TourLogManager.logError_CannotReadDataFile(fileName, e);
 		} catch (final FitRuntimeException e) {
 			TourLogManager.logEx(String.format("Invalid data file '%s'", fileName), e); //$NON-NLS-1$
 		} finally {
