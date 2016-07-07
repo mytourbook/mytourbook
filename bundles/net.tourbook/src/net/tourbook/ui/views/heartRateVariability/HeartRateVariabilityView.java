@@ -45,6 +45,7 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -679,9 +680,17 @@ public class HeartRateVariabilityView extends ViewPart {
 	 */
 	private void fillToolbar() {
 
+		/*
+		 * View toolbar
+		 */
+		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
+		tbm.add(_actionHrvOptions);
+
+		/*
+		 * Header toolbar
+		 */
 		_headerToolbarManager.add(_actionShowAllValues);
 		_headerToolbarManager.add(_actionSynchChartScaling);
-		_headerToolbarManager.add(_actionHrvOptions);
 
 		// update toolbar to show added items
 		_headerToolbarManager.update(true);

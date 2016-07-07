@@ -1490,7 +1490,7 @@ public class Messages extends NLS {
 
 	public static String		Slideout_HVROptions_Label_2xTolerance;
 
-	public static String	Slideout_HVROptions_Label_2xToleranceResult;
+	public static String		Slideout_HVROptions_Label_2xToleranceResult;
 
 	public static String		Slideout_HVROptions_Label_Title;
 
@@ -2000,6 +2000,7 @@ public class Messages extends NLS {
 	public static String		TourEditor_Dialog_SetAltitudeFromSRTM_Title;
 
 	public static String		Training_Action_EditHrZones;
+	public static String		Training_Action_EditHrZones_Tooltip;
 
 	public static String		Training_HRZone_Label_Header_Zone;
 

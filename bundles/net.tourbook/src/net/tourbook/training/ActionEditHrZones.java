@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,6 +27,9 @@ public class ActionEditHrZones extends Action {
 	public ActionEditHrZones(final TrainingView trainingView) {
 
 		super(Messages.Training_Action_EditHrZones, AS_PUSH_BUTTON);
+
+		setToolTipText(Messages.Training_Action_EditHrZones_Tooltip);
+
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__options));
 
 		_trainingView = trainingView;

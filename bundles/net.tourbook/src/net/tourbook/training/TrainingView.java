@@ -53,7 +53,7 @@ import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 
-import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -141,7 +141,6 @@ public class TrainingView extends ViewPart {
 
 	private ToolBarManager				_headerToolbarManager;
 
-	private ActionEditHrZones			_actionEditHrZones;
 	private ActionShowAllPulseValues	_actionShowAllPulseValues;
 	private ActionSynchChartScale		_actionSynchVerticalChartScaling;
 	private ActionTrainingOptions		_actionTrainingOptions;
@@ -215,7 +214,7 @@ public class TrainingView extends ViewPart {
 		@Override
 		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
-			return new SlideoutTrainingOptions(_pageBookHrZones, toolbar, GRID_PREF_PREFIX);
+			return new SlideoutTrainingOptions(_pageBookHrZones, toolbar, GRID_PREF_PREFIX, TrainingView.this);
 		}
 	}
 
@@ -393,7 +392,6 @@ public class TrainingView extends ViewPart {
 
 	private void createActions() {
 
-		_actionEditHrZones = new ActionEditHrZones(this);
 		_actionShowAllPulseValues = new ActionShowAllPulseValues(this);
 		_actionSynchVerticalChartScaling = new ActionSynchChartScale(this);
 		_actionTrainingOptions = new ActionTrainingOptions();
@@ -406,7 +404,7 @@ public class TrainingView extends ViewPart {
 		createUI(parent);
 
 		createActions();
-		fillActionBars();
+		fillToolbar();
 
 		// show default page
 		_pageBookHrZones.showPage(_pageNoTour);
@@ -877,20 +875,22 @@ public class TrainingView extends ViewPart {
 		_actionTrainingOptions.setEnabled(isHrZoneAvailable);
 	}
 
-	private void fillActionBars() {
+	private void fillToolbar() {
 
 		/*
-		 * fill view menu
+		 * View toolbar
 		 */
-		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
-		menuMgr.add(_actionEditHrZones);
+		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
+		tbm.add(_actionTrainingOptions);
+
+		// update toolbar which creates the slideout
+		tbm.update(true);
 
 		/*
 		 * Header toolbar
 		 */
 		_headerToolbarManager.add(_actionShowAllPulseValues);
 		_headerToolbarManager.add(_actionSynchVerticalChartScaling);
-		_headerToolbarManager.add(_actionTrainingOptions);
 
 		_headerToolbarManager.update(true);
 	}

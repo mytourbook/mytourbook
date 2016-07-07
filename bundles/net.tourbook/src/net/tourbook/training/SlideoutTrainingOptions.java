@@ -18,7 +18,6 @@ package net.tourbook.training;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.tooltip.ToolbarSlideout;
-import net.tourbook.statistic.IStatisticOptions;
 import net.tourbook.ui.ChartOptions_Grid;
 
 import org.eclipse.jface.action.Action;
@@ -36,19 +35,25 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class SlideoutTrainingOptions extends ToolbarSlideout {
 
+	private TrainingView		_trainingView;
+
 	private Action				_actionRestoreDefaults;
+	private ActionEditHrZones	_actionEditHrZones;
 
 	private ChartOptions_Grid	_gridUI;
-
-	private IStatisticOptions	_trainingOptions;
 
 	/*
 	 * UI controls
 	 */
 
-	public SlideoutTrainingOptions(final Control ownerControl, final ToolBar toolBar, final String prefStoreGridPrefix) {
+	public SlideoutTrainingOptions(	final Control ownerControl,
+									final ToolBar toolBar,
+									final String prefStoreGridPrefix,
+									final TrainingView trainingView) {
 
 		super(ownerControl, toolBar);
+
+		_trainingView = trainingView;
 
 		_gridUI = new ChartOptions_Grid(prefStoreGridPrefix);
 	}
@@ -68,6 +73,8 @@ public class SlideoutTrainingOptions extends ToolbarSlideout {
 		_actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
 		_actionRestoreDefaults.setImageDescriptor(//
 				TourbookPlugin.getImageDescriptor(Messages.Image__App_RestoreDefault));
+
+		_actionEditHrZones = new ActionEditHrZones(_trainingView);
 	}
 
 	@Override
@@ -96,10 +103,6 @@ public class SlideoutTrainingOptions extends ToolbarSlideout {
 			{
 				createUI_10_Title(container);
 				createUI_12_Actions(container);
-
-				if (_trainingOptions != null) {
-					_trainingOptions.createUI(container);
-				}
 
 				_gridUI.createUI(container);
 			}
@@ -130,6 +133,7 @@ public class SlideoutTrainingOptions extends ToolbarSlideout {
 		final ToolBarManager tbm = new ToolBarManager(toolbar);
 
 		tbm.add(_actionRestoreDefaults);
+		tbm.add(_actionEditHrZones);
 
 		tbm.update(true);
 	}
@@ -139,23 +143,11 @@ public class SlideoutTrainingOptions extends ToolbarSlideout {
 		_gridUI.resetToDefaults();
 		_gridUI.saveState();
 
-		if (_trainingOptions != null) {
-			_trainingOptions.resetToDefaults();
-			_trainingOptions.saveState();
-		}
 	}
 
 	private void restoreState() {
 
 		_gridUI.restoreState();
-
-		if (_trainingOptions != null) {
-			_trainingOptions.restoreState();
-		}
 	}
 
-	public void setStatisticOptions(final IStatisticOptions statisticOptions) {
-
-		_trainingOptions = statisticOptions;
-	}
 }
