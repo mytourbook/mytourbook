@@ -102,11 +102,17 @@ public class ChartDataXSerie extends ChartDataSerie {
 	}
 
 	public void forceXAxisMaxValue(final double xAxisValue) {
+
 		_xAxisMaxValueForced = xAxisValue;
+
+		_isForceMaxValue = true;
 	}
 
 	public void forceXAxisMinValue(final double xAxisValue) {
+
 		_xAxisMinValueForced = xAxisValue;
+
+		_isForceMinValue = true;
 	}
 
 	public ChartStatisticSegments getChartSegments() {

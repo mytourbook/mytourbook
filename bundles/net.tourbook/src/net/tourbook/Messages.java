@@ -714,8 +714,13 @@ public class Messages extends NLS {
 	public static String		HRMaxFormula_Name_HRmax_220_age;
 	public static String		HRMaxFormula_Name_Manual;
 
+	public static String		HRV_View_Action_ShowAllValues;
 	public static String		HRV_View_Action_SynchChartScale;
-	public static String		HRV_View_InvalidData;
+	public static String		HRV_View_Label_InvalidData;
+	public static String		HRV_View_Label_LeftChartBorder;
+	public static String		HRV_View_Label_LeftChartBorder_Tooltip;
+	public static String		HRV_View_Label_RightChartBorder;
+	public static String		HRV_View_Label_RightChartBorder_Tooltip;
 
 	public static String		Image__App_Add;
 	public static String		Image__App_Add_2x;
@@ -1483,15 +1488,11 @@ public class Messages extends NLS {
 	public static String		Slideout_ChartMarkerOptions_Label_Title;
 
 	public static String		Slideout_HVROptions_Checkbox_2xValues;
-
 	public static String		Slideout_HVROptions_Checkbox_2xValues_Tooltip;
-
 	public static String		Slideout_HVROptions_Group;
-
 	public static String		Slideout_HVROptions_Label_2xTolerance;
-
 	public static String		Slideout_HVROptions_Label_2xToleranceResult;
-
+	public static String		Slideout_HVROptions_Label_2xToleranceResult_Tooltip;
 	public static String		Slideout_HVROptions_Label_Title;
 
 	public static String		Slideout_RefTour_YearStatisticOptions_Label_Title;

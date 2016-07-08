@@ -136,7 +136,7 @@ public class TrainingView extends ViewPart {
 	private TourData					_tourData;
 
 	private boolean						_isUpdateUI;
-	private boolean						_isShowAllPulseValues;
+	private boolean						_isShowAllValues;
 	private boolean						_isSynchChartVerticalValues;
 
 	private ToolBarManager				_headerToolbarManager;
@@ -145,7 +145,6 @@ public class TrainingView extends ViewPart {
 	private ActionSynchChartScale		_actionSynchVerticalChartScaling;
 	private ActionTrainingOptions		_actionTrainingOptions;
 
-	private double						_pulseStart;
 	private double[]					_xSeriePulse;
 
 	private ArrayList<TourPersonHRZone>	_personHrZones							= new ArrayList<TourPersonHRZone>();
@@ -235,7 +234,7 @@ public class TrainingView extends ViewPart {
 
 	void actionShowAllPulseValues() {
 
-		_isShowAllPulseValues = _actionShowAllPulseValues.isChecked();
+		_isShowAllValues = _actionShowAllPulseValues.isChecked();
 
 		updateUI_30_HrZonesFromModel();
 	}
@@ -861,7 +860,7 @@ public class TrainingView extends ViewPart {
 	private void enableControls() {
 
 		final boolean isHrZoneAvailable = TrainingManager.isRequiredHrZoneDataAvailable(_tourData);
-		final boolean isCustomScaling = isHrZoneAvailable && _isShowAllPulseValues == false;
+		final boolean isCustomScaling = isHrZoneAvailable && _isShowAllValues == false;
 
 //		_comboTrainingChart.setEnabled(canShowHrZones);
 
@@ -1033,8 +1032,8 @@ public class TrainingView extends ViewPart {
 
 	private void restoreState() {
 
-		_isShowAllPulseValues = Util.getStateBoolean(_state, STATE_IS_SHOW_ALL_PULSE_VALUES, false);
-		_actionShowAllPulseValues.setChecked(_isShowAllPulseValues);
+		_isShowAllValues = Util.getStateBoolean(_state, STATE_IS_SHOW_ALL_PULSE_VALUES, false);
+		_actionShowAllPulseValues.setChecked(_isShowAllValues);
 
 		_isSynchChartVerticalValues = Util.getStateBoolean(_state, STATE_IS_SYNC_VERTICAL_CHART_SCALING, false);
 		_actionSynchVerticalChartScaling.setChecked(_isSynchChartVerticalValues);
@@ -1249,31 +1248,32 @@ public class TrainingView extends ViewPart {
 		}
 
 		/*
-		 * minPulse will be the first x-data point with the x-value = 0
+		 * Get min/max values
 		 */
-		float maxPulse;
+		float pulseMin;
+		float pulseMax;
 
-		if (_isShowAllPulseValues) {
+		if (_isShowAllValues) {
 
-			_pulseStart = maxPulse = pulseSerie[0];
+			pulseMin = pulseMax = pulseSerie[0];
 
 			for (final float pulse : pulseSerie) {
-				if (pulse < _pulseStart) {
-					_pulseStart = pulse;
-				} else if (pulse > maxPulse) {
-					maxPulse = pulse;
+				if (pulse < pulseMin) {
+					pulseMin = pulse;
+				} else if (pulse > pulseMax) {
+					pulseMax = pulse;
 				}
 			}
 
 		} else {
-			_pulseStart = _spinnerHrLeft.getSelection();
-			maxPulse = _spinnerHrRight.getSelection();
+			pulseMin = _spinnerHrLeft.getSelection();
+			pulseMax = _spinnerHrRight.getSelection();
 		}
 
 		/*
 		 * create x-data series
 		 */
-		final int pulseRange = (int) (maxPulse - _pulseStart + 1);
+		final int pulseRange = (int) (pulseMax - pulseMin + 1);
 
 		_xSeriePulse = new double[pulseRange];
 		final float[] ySeriePulseDuration = new float[pulseRange];
@@ -1293,7 +1293,7 @@ public class TrainingView extends ViewPart {
 				final float minValue = zoneMinBpm[zoneIndex];
 				final float maxValue = zoneMaxBpm[zoneIndex];
 
-				final double pulse = _pulseStart + pulseIndex;
+				final double pulse = pulseMin + pulseIndex;
 
 				if (pulse >= minValue && pulse <= maxValue) {
 
@@ -1333,7 +1333,7 @@ public class TrainingView extends ViewPart {
 			}
 
 			final float pulse = pulseSerie[serieIndex];
-			final int pulseIndex = (int) (pulse - _pulseStart);
+			final int pulseIndex = (int) (pulse - pulseMin);
 
 			// check array bounds
 			if (pulseIndex >= 0 && pulseIndex < pulseRange) {
@@ -1352,7 +1352,7 @@ public class TrainingView extends ViewPart {
 		final ChartDataXSerie xData = new ChartDataXSerie(_xSeriePulse);
 		xData.setAxisUnit(ChartDataXSerie.X_AXIS_UNIT_NUMBER_CENTER);
 		xData.setUnitLabel(net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit);
-		xData.setUnitStartValue(_pulseStart);
+		xData.setUnitStartValue(pulseMin);
 
 		chartDataModel.setXData(xData);
 
@@ -1376,7 +1376,7 @@ public class TrainingView extends ViewPart {
 
 		chartDataModel.addYData(yData);
 
-		if (_isSynchChartVerticalValues && _isShowAllPulseValues == false) {
+		if (_isSynchChartVerticalValues && _isShowAllValues == false) {
 			_minMaxKeeper.setMinMaxValues(chartDataModel);
 		}
 

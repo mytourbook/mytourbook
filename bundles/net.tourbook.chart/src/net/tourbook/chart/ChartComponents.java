@@ -453,6 +453,13 @@ public class ChartComponents extends Composite {
 			double graphMinVisibleValue = xData.getVisibleMinValue();
 			double graphMaxVisibleValue = xData.getVisibleMaxValue() + graphUnit;
 
+			if (xData.isForceMinValue()) {
+				graphMinVisibleValue = xData.getXAxisMinValueForced();
+			}
+			if (xData.isForceMaxValue()) {
+				graphMaxVisibleValue = xData.getXAxisMaxValueForced();
+			}
+
 			// decrease min value when it does not fit to unit borders
 			final double graphMinRemainder = graphMinVisibleValue % graphUnit;
 			graphMinVisibleValue = graphMinVisibleValue - graphMinRemainder;

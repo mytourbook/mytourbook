@@ -224,6 +224,7 @@ public class SlideoutHRVOptions extends ToolbarSlideout {
 				 */
 				_lbl2xToleranceResult = new Label(group, SWT.NONE);
 				_lbl2xToleranceResult.setText(Messages.Slideout_HVROptions_Label_2xToleranceResult);
+				_lbl2xToleranceResult.setToolTipText(Messages.Slideout_HVROptions_Label_2xToleranceResult_Tooltip);
 				GridDataFactory.fillDefaults()//
 						.indent(16, 0)
 						.align(SWT.FILL, SWT.CENTER)
@@ -233,6 +234,8 @@ public class SlideoutHRVOptions extends ToolbarSlideout {
 				 * Label: Result values
 				 */
 				_lbl2xToleranceResult_Value = new Label(group, SWT.NONE);
+				_lbl2xToleranceResult_Value
+						.setToolTipText(Messages.Slideout_HVROptions_Label_2xToleranceResult_Tooltip);
 				GridDataFactory.fillDefaults()//
 						.align(SWT.FILL, SWT.CENTER)
 						.grab(true, false)

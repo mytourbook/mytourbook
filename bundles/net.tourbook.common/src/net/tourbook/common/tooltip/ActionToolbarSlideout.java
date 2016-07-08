@@ -111,7 +111,7 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
 	 * Is called before the slideout is opened, this allows to close other dialogs
 	 */
 	protected void onBeforeOpenSlideout() {
-		
+
 	}
 
 	private void onDispose() {
@@ -182,6 +182,11 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
 	}
 
 	public void setEnabled(final boolean isEnabled) {
+
+		if (_actionToolItem == null) {
+			// this can occure when the toolbar is not yet fully created
+			return;
+		}
 
 		_actionToolItem.setEnabled(isEnabled);
 

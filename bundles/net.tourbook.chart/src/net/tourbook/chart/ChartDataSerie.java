@@ -79,10 +79,7 @@ public abstract class ChartDataSerie {
 	double							_avgPositiveValue;
 
 	/**
-	 * When <code>true</code> the minimum value is forced when the dataserie is displayed, this
-	 * applys only to the y-axis.
-	 * <p>
-	 * The x-axis can be forced with setXAxisStart/EndValue.
+	 * When <code>true</code> the minimum value is forced when the dataserie is displayed.
 	 */
 	protected boolean				_isForceMinValue						= false;
 	protected boolean				_isForceMaxValue						= false;

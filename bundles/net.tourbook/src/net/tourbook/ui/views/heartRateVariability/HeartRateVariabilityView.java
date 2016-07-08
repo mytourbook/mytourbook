@@ -55,6 +55,7 @@ import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -145,6 +146,7 @@ public class HeartRateVariabilityView extends ViewPart {
 
 	private Chart						_chartHRV;
 
+	private Label						_lblInvalidData;
 	private Label						_lblMinTime;
 	private Label						_lblMaxTime;
 
@@ -172,7 +174,7 @@ public class HeartRateVariabilityView extends ViewPart {
 
 			super(UI.EMPTY_STRING, AS_CHECK_BOX);
 
-			setToolTipText(Messages.Training_View_Action_ShowAllPulseValues);
+			setToolTipText(Messages.HRV_View_Action_ShowAllValues);
 			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ZoomFitGraph));
 		}
 
@@ -204,6 +206,11 @@ public class HeartRateVariabilityView extends ViewPart {
 
 		_isShowAllValues = _actionShowAllValues.isChecked();
 
+		if (_isShowAllValues) {
+			_actionSynchChartScaling.setChecked(false);
+			_isSynchChartScaling = false;
+		}
+
 		updateChart_50_CurrentTours(!_isSynchChartScaling);
 	}
 
@@ -215,6 +222,11 @@ public class HeartRateVariabilityView extends ViewPart {
 
 			_xMinMaxKeeper.resetMinMax();
 			_yMinMaxKeeper.resetMinMax();
+		}
+
+		if (_isSynchChartScaling) {
+			_actionShowAllValues.setChecked(false);
+			_isShowAllValues = false;
 		}
 
 		updateChart_50_CurrentTours(!_isSynchChartScaling);
@@ -339,7 +351,7 @@ public class HeartRateVariabilityView extends ViewPart {
 			_chartHRV.updateChart(null, false);
 		}
 
-		_pageBook.showPage(_page_NoTour);
+		showPage(_page_NoTour);
 
 		enableControls();
 	}
@@ -496,10 +508,26 @@ public class HeartRateVariabilityView extends ViewPart {
 
 		chartDataModel.addYData(yDataRR1);
 
-		if (_isSynchChartScaling) {
+		if (_isSynchChartScaling && _isShowAllValues == false) {
+
+			// sync scaling between different tours
 
 			_xMinMaxKeeper.setMinMaxValues(chartDataModel);
 			_yMinMaxKeeper.setMinMaxValues(chartDataModel);
+
+		} else if (_isShowAllValues == false) {
+
+			// use user min/max values
+
+			final int timeMinValue = _spinnerMinTime.getSelection();
+			final int timeMaxValue = _spinnerMaxTime.getSelection();
+
+			xDataRR0.forceXAxisMinValue(timeMinValue);
+			xDataRR0.forceXAxisMaxValue(timeMaxValue - 0);
+
+			// + 1 = fix wrong units
+			yDataRR1.forceYAxisMinValue(timeMinValue + 1);
+			yDataRR1.forceYAxisMaxValue(timeMaxValue - 1);
 		}
 
 		return chartDataModel;
@@ -523,7 +551,7 @@ public class HeartRateVariabilityView extends ViewPart {
 		addTourEventListener();
 
 		// show default page
-		_pageBook.showPage(_page_NoTour);
+		showPage(_page_NoTour);
 
 		showTour();
 	}
@@ -542,10 +570,10 @@ public class HeartRateVariabilityView extends ViewPart {
 
 		_page_InvalidData = new Composite(_pageBook, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(_page_InvalidData);
-		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(_page_InvalidData);
+		GridLayoutFactory.swtDefaults().applyTo(_page_InvalidData);
 		{
-			final Label label = new Label(_page_InvalidData, SWT.WRAP);
-			label.setText(Messages.HRV_View_InvalidData);
+			_lblInvalidData = new Label(_page_InvalidData, SWT.WRAP);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblInvalidData);
 		}
 
 		_page_Chart = createUI_10_ChartPage(_pageBook);
@@ -588,9 +616,9 @@ public class HeartRateVariabilityView extends ViewPart {
 					.indent(5, 0)
 					.align(SWT.BEGINNING, SWT.CENTER)
 					.applyTo(_lblMinTime);
-			_lblMinTime.setText(Messages.Training_View_Label_LeftChartBorder);
-			_lblMinTime.setToolTipText(Messages.Training_View_Label_LeftChartBorder_Tooltip);
-
+			_lblMinTime.setText(Messages.HRV_View_Label_LeftChartBorder);
+			_lblMinTime.setToolTipText(Messages.HRV_View_Label_LeftChartBorder_Tooltip);
+//			Heart beat which is displayed at the left chart border.
 			/*
 			 * spinner: hr min
 			 */
@@ -608,8 +636,8 @@ public class HeartRateVariabilityView extends ViewPart {
 			GridDataFactory.fillDefaults()//
 					.align(SWT.BEGINNING, SWT.CENTER)
 					.applyTo(_lblMaxTime);
-			_lblMaxTime.setText(Messages.Training_View_Label_RightChartBorder);
-			_lblMaxTime.setToolTipText(Messages.Training_View_Label_RightChartBorder_Tooltip);
+			_lblMaxTime.setText(Messages.HRV_View_Label_RightChartBorder);
+			_lblMaxTime.setToolTipText(Messages.HRV_View_Label_RightChartBorder_Tooltip);
 
 			/*
 			 * spinner: hr max
@@ -665,14 +693,14 @@ public class HeartRateVariabilityView extends ViewPart {
 	private void enableControls() {
 
 		final boolean isTourAvailable = _hrvTours != null;
-		final boolean isCustomScaling = _isShowAllValues == false;
+		final boolean isCustomScaling = _isShowAllValues == false && _isSynchChartScaling == false;
 
 		_spinnerMinTime.setEnabled(isCustomScaling);
 		_spinnerMaxTime.setEnabled(isCustomScaling);
 		_lblMinTime.setEnabled(isCustomScaling);
 		_lblMaxTime.setEnabled(isCustomScaling);
 
-		_actionSynchChartScaling.setEnabled(isCustomScaling);
+		_actionSynchChartScaling.setEnabled(isTourAvailable);
 		_actionShowAllValues.setEnabled(isTourAvailable);
 	}
 
@@ -802,7 +830,7 @@ public class HeartRateVariabilityView extends ViewPart {
 
 	private void restoreState() {
 
-		_isShowAllValues = Util.getStateBoolean(_state, STATE_IS_SHOW_ALL_VALUES, false);
+		_isShowAllValues = Util.getStateBoolean(_state, STATE_IS_SHOW_ALL_VALUES, true);
 		_actionShowAllValues.setChecked(_isShowAllValues);
 
 		_isSynchChartScaling = Util.getStateBoolean(_state, STATE_IS_SYNC_CHART_SCALING, false);
@@ -831,6 +859,15 @@ public class HeartRateVariabilityView extends ViewPart {
 		if (_page_Chart != null && _page_Chart.isVisible()) {
 			_chartHRV.setFocus();
 		}
+	}
+
+	private void showPage(final Composite page) {
+
+		_pageBook.showPage(page);
+		
+		final boolean isEnableOptions = page==_page_Chart;
+		
+		_actionHrvOptions.setEnabled(isEnableOptions);
 	}
 
 	private void showTour() {
@@ -903,8 +940,10 @@ public class HeartRateVariabilityView extends ViewPart {
 		 * the middle of activating a part
 		 */
 		if (tourDataList == null || tourDataList.size() == 0 || TourManager.isTourEditorModified(false)) {
+
 			// nothing to do
 			clearView();
+
 			return;
 		}
 
@@ -926,20 +965,30 @@ public class HeartRateVariabilityView extends ViewPart {
 		enableControls();
 
 		if (_hrvTours == null) {
-			_pageBook.showPage(_page_NoTour);
+
+			showPage(_page_NoTour);
 			return;
 		}
 
 		final ChartDataModel chartDataModel = createChartDataModel(_hrvTours);
 
 		if (chartDataModel == null) {
-			_pageBook.showPage(_page_InvalidData);
+
+			// currently only the first tour is used -> this can be improved when necessary
+			final TourData tourData = _hrvTours.get(0);
+
+			// update page info
+			_lblInvalidData.setText(NLS.bind(
+					Messages.HRV_View_Label_InvalidData,
+					TourManager.getTourDateTimeShort(tourData)));
+
+			showPage(_page_InvalidData);
 			return;
 		}
 
 		_chartHRV.updateChart(chartDataModel, true, isShowAllData);
 
-		_pageBook.showPage(_page_Chart);
+		showPage(_page_Chart);
 	}
 
 }
