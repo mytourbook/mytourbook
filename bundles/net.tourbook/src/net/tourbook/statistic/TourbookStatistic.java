@@ -319,10 +319,10 @@ public abstract class TourbookStatistic {
 
 	@Override
 	public String toString() {
-		return "TourbookStatistic ["//
-				+ ("statisticId=" + statisticId + ", ")//
-				+ ("visibleName=" + visibleName)
-				+ "]";
+		return "TourbookStatistic ["// //$NON-NLS-1$
+				+ ("statisticId=" + statisticId + ", ")// //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("visibleName=" + visibleName) //$NON-NLS-1$
+				+ "]"; //$NON-NLS-1$
 	}
 
 	/**

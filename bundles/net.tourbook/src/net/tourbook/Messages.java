@@ -1342,24 +1342,11 @@ public class Messages extends NLS {
 	public static String		Pref_Statistic_Group_TourFrequency;
 
 	public static String		Pref_Statistic_Label_altitude;
-	public static String		Pref_Statistic_Label_altitude_low_value;
-	public static String		Pref_Statistic_Label_altitude_quantity;
 	public static String		Pref_Statistic_Label_distance;
-	public static String		Pref_Statistic_Label_distance_low_value;
-	public static String		Pref_Statistic_Label_distance_quantity;
 	public static String		Pref_Statistic_Label_duration;
-	public static String		Pref_Statistic_Label_duration_interval;
-	public static String		Pref_Statistic_Label_duration_low_value;
-	public static String		Pref_Statistic_Label_duration_quantity;
-	public static String		Pref_Statistic_Label_h;
-	public static String		Pref_Statistic_Label_interval;
-
 	public static String		Pref_Statistic_Label_Interval;
-
 	public static String		Pref_Statistic_Label_Minimum;
-
 	public static String		Pref_Statistic_Label_NumberOfBars;
-	public static String		Pref_Statistic_Label_separator;
 
 	public static String		Pref_Tour_Button_FailedUpdate;
 	public static String		Pref_Tour_Dialog_ConfirmDatabaseUpdate_Message;
