@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,7 +16,7 @@
 package net.tourbook.ui.views;
 
 import net.tourbook.common.util.Util;
-import net.tourbook.ui.tourChart.ConconiChartView;
+import net.tourbook.conconi.ConconiView;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -24,9 +24,10 @@ import org.eclipse.core.commands.ExecutionException;
 
 public class ActionHandlerOpenViewConconiChart extends AbstractHandler {
 
+	@Override
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
 
-		Util.showView(ConconiChartView.ID, true);
+		Util.showView(ConconiView.ID, true);
 
 		return null;
 	}

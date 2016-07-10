@@ -1531,9 +1531,9 @@
 
 			<view
 				category="net.tourbook.category.Tools"
-				class="net.tourbook.ui.tourChart.ConconiChartView"
+				class="net.tourbook.conconi.ConconiView"
 				icon="icons/conconi-chart.png"
-				id="net.tourbook.views.ConconiChartView"
+				id="net.tourbook.conconi.ConconiView"
 				name="%View_Name_ConconiChart"
 			/>
 

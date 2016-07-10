@@ -394,7 +394,6 @@ public class TrainingView extends ViewPart {
 		_actionShowAllPulseValues = new ActionShowAllPulseValues(this);
 		_actionSynchVerticalChartScaling = new ActionSynchChartScale(this);
 		_actionTrainingOptions = new ActionTrainingOptions();
-
 	}
 
 	@Override
@@ -443,7 +442,7 @@ public class TrainingView extends ViewPart {
 				.applyTo(_toolbar);
 		GridLayoutFactory.fillDefaults()//
 				.numColumns(6)
-				.margins(5, 3)
+				.margins(3, 3)
 				.applyTo(_toolbar);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{

@@ -1487,6 +1487,8 @@ public class Messages extends NLS {
 	public static String		Slideout_ChartMarkerOptions_Label_Offset_Tooltip;
 	public static String		Slideout_ChartMarkerOptions_Label_Title;
 
+	public static String		Slideout_ConconiOptions_Label_Title;
+
 	public static String		Slideout_HVROptions_Checkbox_2xValues;
 	public static String		Slideout_HVROptions_Checkbox_2xValues_Tooltip;
 	public static String		Slideout_HVROptions_Group;

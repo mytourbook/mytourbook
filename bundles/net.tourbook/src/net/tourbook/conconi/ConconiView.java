@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.tourChart;
+package net.tourbook.conconi;
 
 import gnu.trove.list.array.TDoubleArrayList;
 
@@ -32,8 +32,11 @@ import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.preferences.ICommonPreferences;
+import net.tourbook.common.tooltip.ActionToolbarSlideout;
+import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourData;
@@ -42,12 +45,15 @@ import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -64,6 +70,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Spinner;
+import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
@@ -75,39 +82,50 @@ import org.eclipse.ui.part.ViewPart;
 /**
  * Show selected tours in a conconi test chart
  */
-public class ConconiChartView extends ViewPart {
+public class ConconiView extends ViewPart {
 
-	public static final String		ID								= "net.tourbook.views.ConconiChartView";	//$NON-NLS-1$
+	public static final String		ID									= "net.tourbook.conconi.ConconiView";													//$NON-NLS-1$
 
-	private static final int		ADJUST_MAX_PULSE_VALUE			= 5;
-	private static final int		ADJUST_MAX_POWER_VALUE			= 10;
+	private static final int		ADJUST_MAX_PULSE_VALUE				= 5;
+	private static final int		ADJUST_MAX_POWER_VALUE				= 10;
 
-	private static final String		STATE_CONCONI_IS_LOG_SCALING	= "STATE_CONCONI_LOG_SCALING";				//$NON-NLS-1$
-	private static final String		STATE_CONCONI_SCALING_FACTOR	= "STATE_CONCONI_SCALING_FACTOR";			//$NON-NLS-1$
+	private static final String		STATE_CONCONI_IS_LOG_SCALING		= "STATE_CONCONI_LOG_SCALING";															//$NON-NLS-1$
+	private static final String		STATE_CONCONI_SCALING_FACTOR		= "STATE_CONCONI_SCALING_FACTOR";														//$NON-NLS-1$
 
-	private static final RGB		DEFAULT_RGB						= new RGB(0xd0, 0xd0, 0xd0);
+	private static final RGB		DEFAULT_RGB							= new RGB(0xd0, 0xd0, 0xd0);
 
-	private final IPreferenceStore	_commonPrefStore				= CommonActivator.getPrefStore();
-	private final IDialogSettings	_state							= TourbookPlugin.getState(ID);
+	private static final String		GRID_PREF_PREFIX					= "GRID_CONCONI__";																	//$NON-NLS-1$
 
-	private ISelectionListener		_postSelectionListener;
+	private static final String		GRID_IS_SHOW_VERTICAL_GRIDLINES		= (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES);
+	private static final String		GRID_IS_SHOW_HORIZONTAL_GRIDLINES	= (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
+	private static final String		GRID_VERTICAL_DISTANCE				= (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE);
+	private static final String		GRID_HORIZONTAL_DISTANCE			= (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE);
+
+	private final IPreferenceStore	_prefStore							= TourbookPlugin.getPrefStore();
+	private final IPreferenceStore	_commonPrefStore					= CommonActivator.getPrefStore();
+	private final IDialogSettings	_state								= TourbookPlugin.getState(ID);
+
 	private IPartListener2			_partListener;
+	private ISelectionListener		_postSelectionListener;
+	private IPropertyChangeListener	_prefChangeListener;
 	private ITourEventListener		_tourEventListener;
 
 	private ChartDataYSerie			_yDataPulse;
 	private ConconiData				_conconiDataForSelectedTour;
 
-	protected boolean				_isUpdateUI						= false;
-	private boolean					_isSelectionDisabled			= true;
+	protected boolean				_isUpdateUI							= false;
+	private boolean					_isSelectionDisabled				= true;
 	private boolean					_isSaving;
 
 	private TourData				_selectedTour;
 
-	private int						_originalTourDeflection			= -1;
-	private int						_modifiedTourDeflection			= -1;
+	private int						_originalTourDeflection				= -1;
+	private int						_modifiedTourDeflection				= -1;
 
 	private PixelConverter			_pc;
 	private FormToolkit				_tk;
+
+	private ActionConconiOptions	_actionConconiOptions;
 
 	private int						_hintDefaultSpinnerWidth;
 
@@ -132,6 +150,15 @@ public class ConconiChartView extends ViewPart {
 	private Label					_lblFactor;
 	private Spinner					_spinFactor;
 
+	private class ActionConconiOptions extends ActionToolbarSlideout {
+
+		@Override
+		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+
+			return new SlideoutConconiOptions(_pageBook, toolbar, GRID_PREF_PREFIX, ConconiView.this);
+		}
+	}
+
 	private void addPartListener() {
 		_partListener = new IPartListener2() {
 
@@ -143,7 +170,7 @@ public class ConconiChartView extends ViewPart {
 
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == ConconiChartView.this) {
+				if (partRef.getPart(false) == ConconiView.this) {
 					saveTour();
 					saveState();
 				}
@@ -167,6 +194,33 @@ public class ConconiChartView extends ViewPart {
 		getViewSite().getPage().addPartListener(_partListener);
 	}
 
+	private void addPrefListener() {
+
+		_prefChangeListener = new IPropertyChangeListener() {
+			@Override
+			public void propertyChange(final PropertyChangeEvent event) {
+
+				final String property = event.getProperty();
+
+				/*
+				 * set a new chart configuration when the preferences has changed
+				 */
+				if (property.equals(GRID_HORIZONTAL_DISTANCE)
+						|| property.equals(GRID_VERTICAL_DISTANCE)
+						|| property.equals(GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
+						|| property.equals(GRID_IS_SHOW_VERTICAL_GRIDLINES)
+				//
+				) {
+
+					// grid has changed, update chart
+					updateChartProperties();
+				}
+			}
+		};
+
+		_prefStore.addPropertyChangeListener(_prefChangeListener);
+	}
+
 	/**
 	 * listen for events when a tour is selected
 	 */
@@ -176,7 +230,7 @@ public class ConconiChartView extends ViewPart {
 			@Override
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
-				if (part == ConconiChartView.this) {
+				if (part == ConconiView.this) {
 					return;
 				}
 
@@ -193,7 +247,7 @@ public class ConconiChartView extends ViewPart {
 			@Override
 			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
-				if (part == ConconiChartView.this) {
+				if (part == ConconiView.this) {
 					return;
 				}
 
@@ -217,6 +271,12 @@ public class ConconiChartView extends ViewPart {
 		}
 
 		_pageBook.showPage(_page_NoTour);
+	}
+
+	private void createActions() {
+
+		_actionConconiOptions = new ActionConconiOptions();
+
 	}
 
 	/**
@@ -517,9 +577,14 @@ public class ConconiChartView extends ViewPart {
 	public void createPartControl(final Composite parent) {
 
 		createUI(parent);
+
+		createActions();
+		fillToolbar();
+
 		restoreState();
 		enableControls();
 
+		addPrefListener();
 		addTourEventListener();
 		addSelectionListener();
 		addPartListener();
@@ -575,7 +640,7 @@ public class ConconiChartView extends ViewPart {
 		GridLayoutFactory.fillDefaults()//
 				.numColumns(2)
 				.spacing(0, 0)
-				.extendedMargins(5, 5, 5, 0)
+				.extendedMargins(3, 3, 3, 0)
 				.applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
@@ -748,6 +813,9 @@ public class ConconiChartView extends ViewPart {
 		_chartConconiTest = new Chart(parent, SWT.FLAT);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(_chartConconiTest);
 
+		// set chart properties
+		updateChartProperties();
+
 		_conconiLayer = new ChartLayerConconiTest();
 	}
 
@@ -757,6 +825,7 @@ public class ConconiChartView extends ViewPart {
 		getViewSite().getPage().removePartListener(_partListener);
 		getSite().getPage().removeSelectionListener(_postSelectionListener);
 		TourManager.getInstance().removeTourEventListener(_tourEventListener);
+		_prefStore.removePropertyChangeListener(_prefChangeListener);
 
 		super.dispose();
 	}
@@ -767,6 +836,18 @@ public class ConconiChartView extends ViewPart {
 
 		_lblFactor.setEnabled(isExtScaling);
 		_spinFactor.setEnabled(isExtScaling);
+	}
+
+	private void fillToolbar() {
+
+		/*
+		 * View toolbar
+		 */
+		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
+		tbm.add(_actionConconiOptions);
+
+		// update toolbar which creates the slideout
+		tbm.update(true);
 	}
 
 	private void initUI(final Composite parent) {
@@ -1007,6 +1088,11 @@ public class ConconiChartView extends ViewPart {
 		 */
 		_chartConconiTest.resizeChart();
 		updateUI_20_ConconiValues();
+	}
+
+	private void updateChartProperties() {
+
+		net.tourbook.ui.UI.updateChartProperties(_chartConconiTest, GRID_PREF_PREFIX);
 	}
 
 	private void updateUI_10_SetupConconi() {
