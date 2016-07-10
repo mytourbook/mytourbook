@@ -65,6 +65,7 @@ import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
@@ -99,6 +100,8 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 	private boolean					_isInSaving;
 	private boolean					_isInSelectionChanged;
 	private boolean					_isInSliderPositionFired;
+
+	private FormToolkit				_tk;
 
 	/*
 	 * UI controls
@@ -394,9 +397,11 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 	private void createUI(final Composite parent) {
 
+		initUI(parent);
+
 		_pageBook = new PageBook(parent, SWT.NONE);
 
-		_pageNoData = net.tourbook.common.UI.createUI_PageNoData(_pageBook, Messages.UI_Label_no_chart_is_selected);
+		_pageNoData = UI.createPage(_tk, _pageBook, Messages.UI_Label_TourIsNotSelected);
 
 		_tourChart = new TourChart(_pageBook, SWT.FLAT, this);
 		_tourChart.setCanShowTourSegments(true);
@@ -494,6 +499,11 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 	@Override
 	public TourChart getTourChart() {
 		return _tourChart;
+	}
+
+	private void initUI(final Composite parent) {
+
+		_tk = new FormToolkit(parent.getDisplay());
 	}
 
 	private void onSelectionChanged(final ISelection selection) {

@@ -604,7 +604,7 @@ public class ConconiView extends ViewPart {
 
 		_pageBook = new PageBook(parent, SWT.NONE);
 
-		_page_NoTour = net.tourbook.ui.UI.createLabel(_tk, _pageBook, Messages.UI_Label_TourIsNotSelected);
+		_page_NoTour = net.tourbook.ui.UI.createPage(_tk, _pageBook, Messages.UI_Label_TourIsNotSelected);
 
 		createUI_10_ConconiTest(_pageBook);
 	}

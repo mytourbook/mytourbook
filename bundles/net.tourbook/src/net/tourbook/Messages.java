@@ -1507,7 +1507,7 @@ public class Messages extends NLS {
 	public static String		Slideout_SegmenterOptions_Label_Title;
 	public static String		Slideout_SegmenterOptions_Label_Totals;
 
-	public static String		Slideout_StatisticChartOptions_Label_Title;
+	public static String		Slideout_StatisticOptions_Label_Title;
 
 	public static String		Slideout_TourChartOptions_Label_Title;
 

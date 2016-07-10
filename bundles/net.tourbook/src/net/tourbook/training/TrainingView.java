@@ -514,9 +514,9 @@ public class TrainingView extends ViewPart {
 		_page_HrZones = createUI_20_PageHrZones(_pageBook);
 		_page_NoHrZones = createUI_14_PageNoHrZones(_pageBook);
 
-		_page_NoPerson = UI.createLabel(_tk, _pageBook, Messages.UI_Label_PersonIsRequired);
-		_page_NoTour = UI.createLabel(_tk, _pageBook, Messages.UI_Label_no_chart_is_selected);
-		_page_NoPulse = UI.createLabel(_tk, _pageBook, Messages.Training_View_Label_NoPulseData);
+		_page_NoPerson = UI.createPage(_tk, _pageBook, Messages.UI_Label_PersonIsRequired);
+		_page_NoTour = UI.createPage(_tk, _pageBook, Messages.UI_Label_no_chart_is_selected);
+		_page_NoPulse = UI.createPage(_tk, _pageBook, Messages.Training_View_Label_NoPulseData);
 	}
 
 	private Composite createUI_14_PageNoHrZones(final Composite parent) {

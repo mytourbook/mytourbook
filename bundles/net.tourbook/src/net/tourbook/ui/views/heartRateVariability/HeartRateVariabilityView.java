@@ -562,7 +562,7 @@ public class HeartRateVariabilityView extends ViewPart {
 
 		_pageBook = new PageBook(parent, SWT.NONE);
 
-		_page_NoTour = UI.createLabel(_tk, _pageBook, Messages.UI_Label_TourIsNotSelected);
+		_page_NoTour = UI.createPage(_tk, _pageBook, Messages.UI_Label_TourIsNotSelected);
 
 		_page_InvalidData = _tk.createComposite(_pageBook);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(_page_InvalidData);

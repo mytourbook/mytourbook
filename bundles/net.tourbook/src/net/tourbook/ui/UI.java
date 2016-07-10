@@ -563,14 +563,14 @@ public class UI {
 	}
 
 	/**
-	 * Creates a label which is wrapped and grabs the width.
+	 * Creates a page with a static text.
 	 * 
 	 * @param formToolkit
 	 * @param parent
 	 * @param labelText
 	 * @return
 	 */
-	public static Composite createLabel(final FormToolkit formToolkit, final Composite parent, final String labelText) {
+	public static Composite createPage(final FormToolkit formToolkit, final Composite parent, final String labelText) {
 
 		final Composite container = formToolkit.createComposite(parent);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);

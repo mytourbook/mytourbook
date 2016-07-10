@@ -131,7 +131,7 @@ public class SlideoutStatisticOptions extends ToolbarSlideout {
 		 */
 		final Label label = new Label(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().applyTo(label);
-		label.setText(Messages.Slideout_StatisticChartOptions_Label_Title);
+		label.setText(Messages.Slideout_StatisticOptions_Label_Title);
 		label.setFont(JFaceResources.getBannerFont());
 	}
 
