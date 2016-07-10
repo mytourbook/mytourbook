@@ -25,7 +25,7 @@ public class ActionHandlerOpenViewStatistic extends AbstractHandler {
 
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
 
-		Util.showView(TourStatisticsView.ID, true);
+		Util.showView(StatisticsView.ID, true);
 
 		return null;
 	}

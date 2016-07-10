@@ -80,6 +80,11 @@ public class ChartOptions_Grid {
 
 		initUI(parent);
 
+		createUI_10_Grid(parent);
+	}
+
+	private void createUI_10_Grid(final Composite parent) {
+
 		final Group group = new Group(parent, SWT.NONE);
 		group.setText(Messages.Pref_Graphs_Group_Grid);
 		GridDataFactory.fillDefaults()//
@@ -192,6 +197,12 @@ public class ChartOptions_Grid {
 		}
 	}
 
+	/**
+	 * Enable/disable grid options, this <b>must</b> be called <b>after</b>
+	 * {@link ChartOptions_Grid#createUI(Composite)}.
+	 * 
+	 * @param gridOptions
+	 */
 	public void enableGridOptions(final int gridOptions) {
 
 		final boolean isShowAll = gridOptions == GRID_ALL;

@@ -115,9 +115,8 @@ public class ConconiChartView extends ViewPart {
 	 * UI controls
 	 */
 	private PageBook				_pageBook;
-	private Label					_pageNoChart;
-
-	private Composite				_pageConconiTest;
+	private Composite				_page_NoTour;
+	private Composite				_page_ConconiTest;
 
 	private ArrayList<TourData>		_conconiTours;
 
@@ -217,7 +216,7 @@ public class ConconiChartView extends ViewPart {
 			_chartConconiTest.updateChart(null, false);
 		}
 
-		_pageBook.showPage(_pageNoChart);
+		_pageBook.showPage(_page_NoTour);
 	}
 
 	/**
@@ -541,21 +540,26 @@ public class ConconiChartView extends ViewPart {
 
 		_pageBook = new PageBook(parent, SWT.NONE);
 
-		_pageNoChart = new Label(_pageBook, SWT.NONE);
-		_pageNoChart.setText(Messages.UI_Label_TourIsNotSelected);
+		_page_NoTour = new Composite(_pageBook, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(_page_NoTour);
+		GridLayoutFactory.swtDefaults().applyTo(_page_NoTour);
+		{
+			final Label label = new Label(_page_NoTour, SWT.WRAP);
+			label.setText(Messages.UI_Label_TourIsNotSelected);
+		}
 
 		createUI_10_ConconiTest(_pageBook);
 	}
 
 	private void createUI_10_ConconiTest(final Composite parent) {
 
-		_pageConconiTest = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(_pageConconiTest);
-		GridLayoutFactory.fillDefaults().numColumns(1).spacing(0, 0).applyTo(_pageConconiTest);
+		_page_ConconiTest = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(_page_ConconiTest);
+		GridLayoutFactory.fillDefaults().numColumns(1).spacing(0, 0).applyTo(_page_ConconiTest);
 //		_pageConconiTest.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
-			createUI_20_Options(_pageConconiTest);
-			createUI_60_ConconiChart(_pageConconiTest);
+			createUI_20_Options(_page_ConconiTest);
+			createUI_60_ConconiChart(_page_ConconiTest);
 		}
 	}
 
@@ -564,7 +568,7 @@ public class ConconiChartView extends ViewPart {
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory.fillDefaults().spacing(0, 0).numColumns(2).applyTo(container);
-		_pageConconiTest.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+		_page_ConconiTest.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
 			createUI_30_Test(container);
 			createUI_40_ExtendedScaling(container);
@@ -892,14 +896,14 @@ public class ConconiChartView extends ViewPart {
 	@Override
 	public void setFocus() {
 
-		if (_pageConconiTest != null && _pageConconiTest.isVisible()) {
+		if (_page_ConconiTest != null && _page_ConconiTest.isVisible()) {
 			_chartConconiTest.setFocus();
 		}
 	}
 
 	private void showTourFromTourProvider() {
 
-		_pageBook.showPage(_pageNoChart);
+		_pageBook.showPage(_page_NoTour);
 
 		// a tour is not displayed, find a tour provider which provides a tour
 		Display.getCurrent().asyncExec(new Runnable() {
@@ -970,7 +974,7 @@ public class ConconiChartView extends ViewPart {
 		updateUI_10_SetupConconi();
 		updateChart_30_NewTour(null);
 
-		_pageBook.showPage(_pageConconiTest);
+		_pageBook.showPage(_page_ConconiTest);
 
 		return;
 	}
@@ -986,7 +990,7 @@ public class ConconiChartView extends ViewPart {
 
 		if (_conconiTours == null) {
 			// bugfix for: http://sourceforge.net/tracker/?func=detail&atid=890601&aid=3269916&group_id=179799
-			_pageBook.showPage(_pageNoChart);
+			_pageBook.showPage(_page_NoTour);
 			return;
 		}
 

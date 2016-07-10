@@ -255,7 +255,7 @@ public class StatisticTour_Frequency extends TourbookStatistic {
 	public void createStatisticUI(final Composite parent, final IViewSite viewSite) {
 
 		// create statistic page
-		_statisticPage = new Composite(parent, SWT.BORDER | SWT.FLAT);
+		_statisticPage = new Composite(parent, SWT.FLAT);
 		_statisticPage.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
 		// remove colored border
@@ -614,12 +614,6 @@ public class StatisticTour_Frequency extends TourbookStatistic {
 	}
 
 	@Override
-	protected void setupStatisticSlideout(final SlideoutStatisticOptions slideout) {
-
-		slideout.setStatisticOptions(new ChartOptions_TourFrequency());
-	}
-
-	@Override
 	public void setSynchScale(final boolean isSynchScaleEnabled) {
 
 		if (!isSynchScaleEnabled) {
@@ -627,6 +621,12 @@ public class StatisticTour_Frequency extends TourbookStatistic {
 		}
 
 		_isSynchScaleEnabled = isSynchScaleEnabled;
+	}
+
+	@Override
+	protected void setupStatisticSlideout(final SlideoutStatisticOptions slideout) {
+
+		slideout.setStatisticOptions(new ChartOptions_TourFrequency());
 	}
 
 	private void updateChartAltitude(	final Chart chart,

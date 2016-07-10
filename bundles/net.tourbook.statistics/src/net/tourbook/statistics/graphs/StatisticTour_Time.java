@@ -129,7 +129,7 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
 	public void createStatisticUI(final Composite parent, final IViewSite viewSite) {
 
 		// chart widget page
-		_chart = new Chart(parent, SWT.BORDER | SWT.FLAT);
+		_chart = new Chart(parent, SWT.FLAT);
 		_chart.setShowZoomActions(true);
 		_chart.setDrawBarChartAtBottom(false);
 		_chart.setToolBarManager(viewSite.getActionBars().getToolBarManager(), false);

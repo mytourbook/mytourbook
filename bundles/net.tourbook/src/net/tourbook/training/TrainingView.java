@@ -171,16 +171,16 @@ public class TrainingView extends ViewPart {
 	/*
 	 * Pagebook for the training view
 	 */
-	private PageBook					_pageBookHrZones;
-	private Composite					_pageHrZones;
-	private Composite					_pageNoTour;
-	private Composite					_pageNoPerson;
-	private Composite					_pageNoHrZones;
-	private Composite					_pageNoPulse;
+	private PageBook					_pageBook;
+	private Composite					_page_HrZones;
+	private Composite					_page_NoTour;
+	private Composite					_page_NoPerson;
+	private Composite					_page_NoHrZones;
+	private Composite					_page_NoPulse;
 
 	private Label						_lblNoHrZone;
 
-	private Composite					_headerToolbar;
+	private Composite					_toolbar;
 	private Chart						_chartHrTime;
 
 	private Spinner						_spinnerHrLeft;
@@ -213,7 +213,7 @@ public class TrainingView extends ViewPart {
 		@Override
 		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
-			return new SlideoutTrainingOptions(_pageBookHrZones, toolbar, GRID_PREF_PREFIX, TrainingView.this);
+			return new SlideoutTrainingOptions(_pageBook, toolbar, GRID_PREF_PREFIX, TrainingView.this);
 		}
 	}
 
@@ -224,7 +224,7 @@ public class TrainingView extends ViewPart {
 		final TourPerson person = _currentPerson != null ? _currentPerson : TourbookPlugin.getActivePerson();
 
 		PreferencesUtil.createPreferenceDialogOn(
-				_pageBookHrZones.getShell(),
+				_pageBook.getShell(),
 				PrefPagePeople.ID,
 				null,
 				new PrefPagePeopleData(PrefPagePeople.PREF_DATA_SELECT_HR_ZONES, person)//
@@ -385,7 +385,7 @@ public class TrainingView extends ViewPart {
 
 //		_tourChart.updateChart(null, false);
 
-		_pageBookHrZones.showPage(_pageNoTour);
+		_pageBook.showPage(_page_NoTour);
 		enableControls();
 	}
 
@@ -406,7 +406,7 @@ public class TrainingView extends ViewPart {
 		fillToolbar();
 
 		// show default page
-		_pageBookHrZones.showPage(_pageNoTour);
+		_pageBook.showPage(_page_NoTour);
 
 		addSelectionListener();
 		addPrefListener();
@@ -429,30 +429,30 @@ public class TrainingView extends ViewPart {
 				.applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
 		{
-			createUI_10_HeaderToolbar(container);
+			createUI_10_Toolbar(container);
 			createUI_12_PageBook(container);
 		}
 	}
 
-	private void createUI_10_HeaderToolbar(final Composite parent) {
+	private void createUI_10_Toolbar(final Composite parent) {
 
-		_headerToolbar = new Composite(parent, SWT.NONE);
+		_toolbar = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
 				.grab(true, false)
 				.align(SWT.BEGINNING, SWT.FILL)
-				.applyTo(_headerToolbar);
+				.applyTo(_toolbar);
 		GridLayoutFactory.fillDefaults()//
 				.numColumns(6)
-				.margins(0, 3)
-				.applyTo(_headerToolbar);
+				.margins(5, 3)
+				.applyTo(_toolbar);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
 			/*
 			 * label: hr min
 			 */
-			_lblHrMin = new Label(_headerToolbar, SWT.NONE);
+			_lblHrMin = new Label(_toolbar, SWT.NONE);
 			GridDataFactory.fillDefaults()//
-					.indent(5, 0)
+//					.indent(5, 0)
 					.align(SWT.BEGINNING, SWT.CENTER)
 					.applyTo(_lblHrMin);
 			_lblHrMin.setText(Messages.Training_View_Label_LeftChartBorder);
@@ -461,7 +461,7 @@ public class TrainingView extends ViewPart {
 			/*
 			 * spinner: hr min
 			 */
-			_spinnerHrLeft = new Spinner(_headerToolbar, SWT.BORDER);
+			_spinnerHrLeft = new Spinner(_toolbar, SWT.BORDER);
 			_spinnerHrLeft.setMinimum(HR_LEFT_MIN_BORDER);
 			_spinnerHrLeft.setMaximum(HR_RIGHT_MAX_BORDER);
 			_spinnerHrLeft.addModifyListener(_defaultSpinnerModifyListener);
@@ -471,7 +471,7 @@ public class TrainingView extends ViewPart {
 			/*
 			 * label: hr max
 			 */
-			_lblHrMax = new Label(_headerToolbar, SWT.NONE);
+			_lblHrMax = new Label(_toolbar, SWT.NONE);
 			GridDataFactory.fillDefaults()//
 					.align(SWT.BEGINNING, SWT.CENTER)
 					.applyTo(_lblHrMax);
@@ -481,7 +481,7 @@ public class TrainingView extends ViewPart {
 			/*
 			 * spinner: hr max
 			 */
-			_spinnerHrRight = new Spinner(_headerToolbar, SWT.BORDER);
+			_spinnerHrRight = new Spinner(_toolbar, SWT.BORDER);
 			_spinnerHrRight.setMinimum(HR_LEFT_MIN_BORDER);
 			_spinnerHrRight.setMaximum(HR_RIGHT_MAX_BORDER);
 			_spinnerHrRight.addModifyListener(_defaultSpinnerModifyListener);
@@ -491,33 +491,33 @@ public class TrainingView extends ViewPart {
 			/*
 			 * toolbar actions
 			 */
-			final ToolBar toolbar = new ToolBar(_headerToolbar, SWT.FLAT);
+			final ToolBar toolbar = new ToolBar(_toolbar, SWT.FLAT);
 			GridDataFactory.fillDefaults()//
 					.align(SWT.BEGINNING, SWT.CENTER)
 					.applyTo(toolbar);
 			_headerToolbarManager = new ToolBarManager(toolbar);
 		}
 
-		// label: horizontal separator
-		final Label label = new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL);
-		GridDataFactory.fillDefaults()//
-				.grab(true, false)
-				.hint(SWT.DEFAULT, 1)
-				.applyTo(label);
-		label.setText(UI.EMPTY_STRING);
+//		// label: horizontal separator
+//		final Label label = new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL);
+//		GridDataFactory.fillDefaults()//
+//				.grab(true, false)
+//				.hint(SWT.DEFAULT, 1)
+//				.applyTo(label);
+//		label.setText(UI.EMPTY_STRING);
 	}
 
 	private void createUI_12_PageBook(final Composite parent) {
 
-		_pageBookHrZones = new PageBook(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageBookHrZones);
+		_pageBook = new PageBook(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageBook);
 
-		_pageHrZones = createUI_20_PageHrZones(_pageBookHrZones);
-		_pageNoHrZones = createUI_14_PageNoHrZones(_pageBookHrZones);
+		_page_HrZones = createUI_20_PageHrZones(_pageBook);
+		_page_NoHrZones = createUI_14_PageNoHrZones(_pageBook);
 
-		_pageNoPerson = UI.createLabel(_tk, _pageBookHrZones, Messages.UI_Label_PersonIsRequired);
-		_pageNoTour = UI.createLabel(_tk, _pageBookHrZones, Messages.UI_Label_no_chart_is_selected);
-		_pageNoPulse = UI.createLabel(_tk, _pageBookHrZones, Messages.Training_View_Label_NoPulseData);
+		_page_NoPerson = UI.createLabel(_tk, _pageBook, Messages.UI_Label_PersonIsRequired);
+		_page_NoTour = UI.createLabel(_tk, _pageBook, Messages.UI_Label_no_chart_is_selected);
+		_page_NoPulse = UI.createLabel(_tk, _pageBook, Messages.Training_View_Label_NoPulseData);
 	}
 
 	private Composite createUI_14_PageNoHrZones(final Composite parent) {
@@ -613,7 +613,7 @@ public class TrainingView extends ViewPart {
 		}
 
 		// layout is necessary, dependent which other view is previously opened
-		_pageBookHrZones.layout(true, true);
+		_pageBook.layout(true, true);
 	}
 
 	private Composite createUI_34_HrZoneDataContent(final Composite parent) {
@@ -1087,7 +1087,7 @@ public class TrainingView extends ViewPart {
 			public void run() {
 
 				// validate widget
-				if (_pageBookHrZones.isDisposed()) {
+				if (_pageBook.isDisposed()) {
 					return;
 				}
 
@@ -1155,7 +1155,7 @@ public class TrainingView extends ViewPart {
 		if (_tourData == null) {
 
 			// a tour is not selected
-			_pageBookHrZones.showPage(_pageNoTour);
+			_pageBook.showPage(_page_NoTour);
 
 			return;
 		}
@@ -1167,7 +1167,7 @@ public class TrainingView extends ViewPart {
 		if (pulseSerie == null || pulseSerie.length == 0) {
 
 			// pulse data are not available
-			_pageBookHrZones.showPage(_pageNoPulse);
+			_pageBook.showPage(_page_NoPulse);
 
 			return;
 		}
@@ -1178,7 +1178,7 @@ public class TrainingView extends ViewPart {
 		if (_currentPerson == null) {
 
 			// selected tour do not contain a person
-			_pageBookHrZones.showPage(_pageNoPerson);
+			_pageBook.showPage(_page_NoPerson);
 
 			return;
 		}
@@ -1194,7 +1194,7 @@ public class TrainingView extends ViewPart {
 			_lblNoHrZone.setText(NLS.bind(Messages.Training_View_Label_NoHrZones, _currentPerson.getName()));
 			_lblNoHrZone.getParent().layout(true, true);
 
-			_pageBookHrZones.showPage(_pageNoHrZones);
+			_pageBook.showPage(_page_NoHrZones);
 
 			return;
 		}
@@ -1207,7 +1207,7 @@ public class TrainingView extends ViewPart {
 		setTitleToolTip(TourManager.getTourDateShort(_tourData));
 
 		// display page for the selected chart
-		_pageBookHrZones.showPage(_pageHrZones);
+		_pageBook.showPage(_page_HrZones);
 
 		final HrZoneContext zoneMinMaxBpm = _currentPerson.getHrZoneContext(
 				_currentPerson.getHrMaxFormula(),

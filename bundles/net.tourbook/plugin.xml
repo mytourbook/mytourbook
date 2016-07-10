@@ -561,7 +561,7 @@
 		            
 				<!-- Statistics -->
 				<command 
-					commandId="command.net.tourbook.views.StatisticView"
+					commandId="command.net.tourbook.statistic.StatisticView"
 					icon="icons/statistics.gif"
 					label="%view_name_Statistics"
 					mnemonic="%view_name_Statistics_Mnemonic"/>
@@ -1096,7 +1096,7 @@
             defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTourCatalog"
             />
       <command
-            id="command.net.tourbook.views.StatisticView"
+            id="command.net.tourbook.statistic.StatisticView"
             name="%view_name_Statistics"
             defaultHandler="net.tourbook.statistic.ActionHandlerOpenViewStatistic"
             />
@@ -1437,9 +1437,9 @@
 				name="%view_name_ReferenceTours"/>
 			<view
 				category="net.tourbook.category.tourList"
-				class="net.tourbook.statistic.TourStatisticsView"
+				class="net.tourbook.statistic.StatisticsView"
 				icon="icons/statistics.gif"
-				id="net.tourbook.views.StatisticView"
+				id="net.tourbook.statistic.StatisticView"
 				name="%view_name_Statistics"/>
 			<view
 				category="net.tourbook.category.tourList"

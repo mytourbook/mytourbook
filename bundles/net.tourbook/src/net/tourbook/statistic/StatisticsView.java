@@ -67,9 +67,9 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
-public class TourStatisticsView extends ViewPart implements ITourProvider {
+public class StatisticsView extends ViewPart implements ITourProvider {
 
-	public static final String				ID							= "net.tourbook.views.StatisticView";				//$NON-NLS-1$
+	public static final String				ID							= "net.tourbook.statistic.StatisticView";				//$NON-NLS-1$
 
 	private static final String				COMBO_MINIMUM_WIDTH			= "1234567890";									//$NON-NLS-1$
 	private static final String				COMBO_MAXIMUM_WIDTH			= "123456789012345678901234567890";				//$NON-NLS-1$
@@ -179,7 +179,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == TourStatisticsView.this) {
+				if (partRef.getPart(false) == StatisticsView.this) {
 					saveState();
 				}
 			}
@@ -253,7 +253,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 			@Override
 			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
-				if (part == TourStatisticsView.this) {
+				if (part == StatisticsView.this) {
 					return;
 				}
 
@@ -275,7 +275,7 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 
 				if (eventId == TourEventId.TOUR_CHANGED && propertyData instanceof TourEvent) {
 
-					if (part == TourStatisticsView.this) {
+					if (part == StatisticsView.this) {
 						return;
 					}
 
@@ -365,9 +365,20 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 
 		final int widgetSpacing = 15;
 
+
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(6).applyTo(container);
+		GridDataFactory.fillDefaults()//
+				.grab(true, false)
+				.align(SWT.BEGINNING, SWT.FILL)
+				.applyTo(container);
+		GridLayoutFactory.fillDefaults()//
+				.numColumns(6)
+				.margins(3, 3)
+				.applyTo(container);
+
+//		final Composite container = new Composite(parent, SWT.NONE);
+//		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+//		GridLayoutFactory.fillDefaults().numColumns(6).applyTo(container);
 		{
 			{
 				/*
@@ -378,8 +389,8 @@ public class TourStatisticsView extends ViewPart implements ITourProvider {
 				_comboStatistics.setToolTipText(Messages.Tour_Book_Combo_statistic_tooltip);
 				_comboStatistics.setVisibleItemCount(50);
 
-				GridDataFactory.fillDefaults()//
-						.applyTo(_comboStatistics);
+//				GridDataFactory.fillDefaults()//
+//						.applyTo(_comboStatistics);
 
 				_comboStatistics.addSelectionListener(new SelectionAdapter() {
 					@Override

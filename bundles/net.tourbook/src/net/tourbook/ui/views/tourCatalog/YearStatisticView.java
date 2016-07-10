@@ -491,13 +491,14 @@ public class YearStatisticView extends ViewPart {
 		final PixelConverter pc = new PixelConverter(parent);
 
 		_toolbar = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(_toolbar);
+		GridDataFactory.fillDefaults()//
+				.grab(true, false)
+				.align(SWT.BEGINNING, SWT.FILL)
+				.applyTo(_toolbar);
 		GridLayoutFactory.fillDefaults()//
 				.numColumns(3)
-				.extendedMargins(0, 0, 0, 1)
-				.spacing(0, 0)
+				.margins(3, 3)
 				.applyTo(_toolbar);
-
 		{
 			/*
 			 * combo: last year
@@ -553,7 +554,7 @@ public class YearStatisticView extends ViewPart {
 	 */
 	private void createUI_30_Chart(final Composite parent) {
 
-		_yearChart = new Chart(parent, SWT.BORDER);
+		_yearChart = new Chart(parent, SWT.NONE);
 
 		_yearChart.addBarSelectionListener(new IBarSelectionListener() {
 			@Override

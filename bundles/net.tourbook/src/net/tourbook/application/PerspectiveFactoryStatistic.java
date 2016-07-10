@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.application;
 
-import net.tourbook.statistic.TourStatisticsView;
+import net.tourbook.statistic.StatisticsView;
 import net.tourbook.ui.tourChart.TourChartView;
 
 import org.eclipse.ui.IFolderLayout;
@@ -40,7 +40,7 @@ public class PerspectiveFactoryStatistic implements IPerspectiveFactory {
 				0.5f,
 				IPageLayout.ID_EDITOR_AREA);
 
-		topFolder.addView(TourStatisticsView.ID);
+		topFolder.addView(StatisticsView.ID);
 
 		//--------------------------------------------------------------------------------
 

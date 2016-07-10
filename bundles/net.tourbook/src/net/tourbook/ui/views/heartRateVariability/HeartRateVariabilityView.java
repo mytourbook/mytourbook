@@ -73,6 +73,7 @@ import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
@@ -133,7 +134,8 @@ public class HeartRateVariabilityView extends ViewPart {
 	private int							_fixed2xErrors_0;
 	private int							_fixed2xErrors_1;
 
-	private ToolBarManager				_headerToolbarManager;
+	private ToolBarManager				_toolbarManager;
+	private FormToolkit					_tk;
 
 	/*
 	 * UI controls
@@ -560,19 +562,19 @@ public class HeartRateVariabilityView extends ViewPart {
 
 		_pageBook = new PageBook(parent, SWT.NONE);
 
-		_page_NoTour = new Composite(_pageBook, SWT.NONE);
+		_page_NoTour = _tk.createComposite(_pageBook);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(_page_NoTour);
 		GridLayoutFactory.swtDefaults().applyTo(_page_NoTour);
 		{
-			final Label label = new Label(_page_NoTour, SWT.WRAP);
-			label.setText(Messages.UI_Label_TourIsNotSelected);
+			final Label label = _tk.createLabel(_page_NoTour, Messages.UI_Label_TourIsNotSelected, SWT.WRAP);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
 		}
 
-		_page_InvalidData = new Composite(_pageBook, SWT.NONE);
+		_page_InvalidData = _tk.createComposite(_pageBook);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(_page_InvalidData);
 		GridLayoutFactory.swtDefaults().applyTo(_page_InvalidData);
 		{
-			_lblInvalidData = new Label(_page_InvalidData, SWT.WRAP);
+			_lblInvalidData = _tk.createLabel(_page_InvalidData, Messages.UI_Label_TourIsNotSelected, SWT.WRAP);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblInvalidData);
 		}
 
@@ -588,14 +590,14 @@ public class HeartRateVariabilityView extends ViewPart {
 				.applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
 		{
-			createUI_20_HeaderToolbar(container);
+			createUI_20_Toolbar(container);
 			createUI_30_Chart(container);
 		}
 
 		return container;
 	}
 
-	private void createUI_20_HeaderToolbar(final Composite parent) {
+	private void createUI_20_Toolbar(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults()//
@@ -604,7 +606,7 @@ public class HeartRateVariabilityView extends ViewPart {
 				.applyTo(container);
 		GridLayoutFactory.fillDefaults()//
 				.numColumns(5)
-				.margins(0, 3)
+				.margins(3, 3)
 				.applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
@@ -613,12 +615,11 @@ public class HeartRateVariabilityView extends ViewPart {
 			 */
 			_lblMinTime = new Label(container, SWT.NONE);
 			GridDataFactory.fillDefaults()//
-					.indent(5, 0)
 					.align(SWT.BEGINNING, SWT.CENTER)
 					.applyTo(_lblMinTime);
 			_lblMinTime.setText(Messages.HRV_View_Label_LeftChartBorder);
 			_lblMinTime.setToolTipText(Messages.HRV_View_Label_LeftChartBorder_Tooltip);
-//			Heart beat which is displayed at the left chart border.
+
 			/*
 			 * spinner: hr min
 			 */
@@ -656,16 +657,16 @@ public class HeartRateVariabilityView extends ViewPart {
 			GridDataFactory.fillDefaults()//
 					.align(SWT.BEGINNING, SWT.CENTER)
 					.applyTo(toolbar);
-			_headerToolbarManager = new ToolBarManager(toolbar);
+			_toolbarManager = new ToolBarManager(toolbar);
 		}
 
-		// label: horizontal separator
-		final Label label = new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL);
-		GridDataFactory.fillDefaults()//
-				.grab(true, false)
-				.hint(SWT.DEFAULT, 1)
-				.applyTo(label);
-		label.setText(UI.EMPTY_STRING);
+//		// label: horizontal separator
+//		final Label label = new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL);
+//		GridDataFactory.fillDefaults()//
+//				.grab(true, false)
+//				.hint(SWT.DEFAULT, 1)
+//				.applyTo(label);
+//		label.setText(UI.EMPTY_STRING);
 	}
 
 	private void createUI_30_Chart(final Composite parent) {
@@ -686,6 +687,8 @@ public class HeartRateVariabilityView extends ViewPart {
 		getViewSite().getPage().removePartListener(_partListener);
 
 		TourManager.getInstance().removeTourEventListener(_tourEventListener);
+
+		_prefStore.removePropertyChangeListener(_prefChangeListener);
 
 		super.dispose();
 	}
@@ -717,11 +720,11 @@ public class HeartRateVariabilityView extends ViewPart {
 		/*
 		 * Header toolbar
 		 */
-		_headerToolbarManager.add(_actionShowAllValues);
-		_headerToolbarManager.add(_actionSynchChartScaling);
+		_toolbarManager.add(_actionShowAllValues);
+		_toolbarManager.add(_actionSynchChartScaling);
 
 		// update toolbar to show added items
-		_headerToolbarManager.update(true);
+		_toolbarManager.update(true);
 	}
 
 	public int getFixed2xErrors_0() {
@@ -733,6 +736,8 @@ public class HeartRateVariabilityView extends ViewPart {
 	}
 
 	private void initUI(final Composite parent) {
+
+		_tk = new FormToolkit(parent.getDisplay());
 
 		_defaultSpinnerModifyListener = new ModifyListener() {
 			@Override
@@ -864,9 +869,9 @@ public class HeartRateVariabilityView extends ViewPart {
 	private void showPage(final Composite page) {
 
 		_pageBook.showPage(page);
-		
-		final boolean isEnableOptions = page==_page_Chart;
-		
+
+		final boolean isEnableOptions = page == _page_Chart;
+
 		_actionHrvOptions.setEnabled(isEnableOptions);
 	}
 

@@ -17,7 +17,7 @@ package net.tourbook.application;
 
 import net.tourbook.map2.view.Map2View;
 import net.tourbook.photo.PicDirView;
-import net.tourbook.statistic.TourStatisticsView;
+import net.tourbook.statistic.StatisticsView;
 import net.tourbook.tour.TourLogView;
 import net.tourbook.ui.tourChart.TourChartView;
 import net.tourbook.ui.views.TourWaypointView;
@@ -82,7 +82,7 @@ public class PerspectiveFactoryTourBook implements IPerspectiveFactory {
 		listFolder.addView(TourBookView.ID);
 		listFolder.addView(CalendarView.ID);
 		listFolder.addPlaceholder(CollatedToursView.ID);
-		listFolder.addView(TourStatisticsView.ID);
+		listFolder.addView(StatisticsView.ID);
 		listFolder.addPlaceholder(PicDirView.ID);
 
 		//--------------------------------------------------------------------------------

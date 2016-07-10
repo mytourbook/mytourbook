@@ -48,7 +48,7 @@ public class SlideoutStatisticOptions extends ToolbarSlideout {
 	private Shell					_parentShell;
 
 	private IStatisticOptions		_statisticOptions;
-	private int						_gridOptionsEnabled;
+	private int						_gridOptions_Enabled;
 
 	public SlideoutStatisticOptions(final Control ownerControl, final ToolBar toolBar) {
 
@@ -94,8 +94,6 @@ public class SlideoutStatisticOptions extends ToolbarSlideout {
 
 		restoreState();
 
-		_gridUI.enableGridOptions(_gridOptionsEnabled);
-
 		return ui;
 	}
 
@@ -119,6 +117,7 @@ public class SlideoutStatisticOptions extends ToolbarSlideout {
 				}
 
 				_gridUI.createUI(container);
+				_gridUI.enableGridOptions(_gridOptions_Enabled);
 			}
 		}
 
@@ -180,6 +179,6 @@ public class SlideoutStatisticOptions extends ToolbarSlideout {
 	public void setupGrid(final String gridPrefPrefix, final int enabledGridOptions) {
 
 		_gridPrefPrefix = gridPrefPrefix;
-		_gridOptionsEnabled = enabledGridOptions;
+		_gridOptions_Enabled = enabledGridOptions;
 	}
 }

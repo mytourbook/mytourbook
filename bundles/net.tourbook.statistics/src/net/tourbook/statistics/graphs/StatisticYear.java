@@ -110,7 +110,7 @@ public abstract class StatisticYear extends TourbookStatistic {
 	public void createStatisticUI(final Composite parent, final IViewSite viewSite) {
 
 		// create chart
-		_chart = new Chart(parent, SWT.BORDER | SWT.FLAT);
+		_chart = new Chart(parent, SWT.FLAT);
 		_chart.setShowZoomActions(true);
 		_chart.setToolBarManager(viewSite.getActionBars().getToolBarManager(), false);
 	}

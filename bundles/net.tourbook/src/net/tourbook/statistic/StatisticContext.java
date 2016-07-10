@@ -75,7 +75,7 @@ public class StatisticContext {
 	 */
 	public int					outVerticalBarIndex;
 
-	public TourStatisticsView	eventManager;
+	public StatisticsView	eventManager;
 
 	/**
 	 * @param person

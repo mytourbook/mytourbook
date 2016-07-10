@@ -46,7 +46,9 @@ public class Slideout_YearStatisticOptions extends ToolbarSlideout {
 	 * UI controls
 	 */
 
-	public Slideout_YearStatisticOptions(final Control ownerControl, final ToolBar toolBar, final String prefStoreGridPrefix) {
+	public Slideout_YearStatisticOptions(	final Control ownerControl,
+											final ToolBar toolBar,
+											final String prefStoreGridPrefix) {
 
 		super(ownerControl, toolBar);
 
@@ -102,6 +104,10 @@ public class Slideout_YearStatisticOptions extends ToolbarSlideout {
 				}
 
 				_gridUI.createUI(container);
+
+				_gridUI.enableGridOptions(ChartOptions_Grid.GRID_VERTICAL_DISTANCE
+						| ChartOptions_Grid.GRID_IS_SHOW_HORIZONTAL_LINE
+						| ChartOptions_Grid.GRID_IS_SHOW_VERTICAL_LINE);
 			}
 		}
 
