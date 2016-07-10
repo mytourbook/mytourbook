@@ -998,7 +998,7 @@ public class TourManager {
 	}
 
 	/**
-	 * Searches all tour providers in the workbench and returns tours which are selected
+	 * Searches all tour providers in the workbench and return tours which are selected.
 	 * 
 	 * @return Returns tour id's or <code>null</code> when tours are not found
 	 */
@@ -1008,14 +1008,14 @@ public class TourManager {
 
 		// get all tourProviders
 		for (final IWorkbenchWindow wbWindow : wbWindows) {
+
 			final IWorkbenchPage[] pages = wbWindow.getPages();
-
 			for (final IWorkbenchPage wbPage : pages) {
+
 				final IViewReference[] viewRefs = wbPage.getViewReferences();
-
 				for (final IViewReference viewRef : viewRefs) {
-					final IViewPart view = viewRef.getView(false);
 
+					final IViewPart view = viewRef.getView(false);
 					if (view instanceof ITourProvider) {
 
 						final ITourProvider tourProvider = (ITourProvider) view;

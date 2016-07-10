@@ -68,6 +68,7 @@ import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
@@ -85,9 +86,6 @@ public class ConconiChartView extends ViewPart {
 	private static final String		STATE_CONCONI_SCALING_FACTOR	= "STATE_CONCONI_SCALING_FACTOR";			//$NON-NLS-1$
 
 	private static final RGB		DEFAULT_RGB						= new RGB(0xd0, 0xd0, 0xd0);
-
-	private final boolean			_isOSX							= net.tourbook.common.UI.IS_OSX;
-	private final boolean			_isLinux						= net.tourbook.common.UI.IS_LINUX;
 
 	private final IPreferenceStore	_commonPrefStore				= CommonActivator.getPrefStore();
 	private final IDialogSettings	_state							= TourbookPlugin.getState(ID);
@@ -109,6 +107,8 @@ public class ConconiChartView extends ViewPart {
 	private int						_modifiedTourDeflection			= -1;
 
 	private PixelConverter			_pc;
+	private FormToolkit				_tk;
+
 	private int						_hintDefaultSpinnerWidth;
 
 	/*
@@ -535,18 +535,11 @@ public class ConconiChartView extends ViewPart {
 
 	private void createUI(final Composite parent) {
 
-		_pc = new PixelConverter(parent);
-		_hintDefaultSpinnerWidth = _isLinux ? SWT.DEFAULT : _pc.convertWidthInCharsToPixels(_isOSX ? 10 : 5);
+		initUI(parent);
 
 		_pageBook = new PageBook(parent, SWT.NONE);
 
-		_page_NoTour = new Composite(_pageBook, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(_page_NoTour);
-		GridLayoutFactory.swtDefaults().applyTo(_page_NoTour);
-		{
-			final Label label = new Label(_page_NoTour, SWT.WRAP);
-			label.setText(Messages.UI_Label_TourIsNotSelected);
-		}
+		_page_NoTour = net.tourbook.ui.UI.createLabel(_tk, _pageBook, Messages.UI_Label_TourIsNotSelected);
 
 		createUI_10_ConconiTest(_pageBook);
 	}
@@ -776,6 +769,14 @@ public class ConconiChartView extends ViewPart {
 		_spinFactor.setEnabled(isExtScaling);
 	}
 
+	private void initUI(final Composite parent) {
+
+		_pc = new PixelConverter(parent);
+		_tk = new FormToolkit(parent.getDisplay());
+
+		_hintDefaultSpinnerWidth = UI.IS_LINUX ? SWT.DEFAULT : _pc.convertWidthInCharsToPixels(UI.IS_OSX ? 10 : 5);
+	}
+
 	private void onSelectDeflection() {
 
 		// update conconi data
@@ -924,7 +925,7 @@ public class ConconiChartView extends ViewPart {
 
 				final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
 				if (selectedTours != null && selectedTours.size() > 0) {
-//					updateChart10(selectedTours.get(0));
+					updateChart_22(selectedTours);
 				}
 			}
 		});
