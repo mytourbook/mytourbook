@@ -6,90 +6,130 @@
          
       <statistic
             class="net.tourbook.statistics.graphs.StatisticTour_Time"
+            category-data="Time"
             id="net.tourbook.statistics.StatisticTourTime"
-            name="%Pref_Tour_Time"/>
+            name="%Pref_Tour_Time"
+            category-time="Day"/>
             
       <statistic
             class="net.tourbook.statistics.graphs.StatisticDay_Summary"
+            category-data="Summary"
             id="net.tourbook.statistics.StatisticSummaryDayCombined"
-            name="%Pref_Day_Summary"/>
+            name="%Pref_Day_Summary"
+            category-time="Day"/>
             
       <statistic
             class="net.tourbook.statistics.graphs.StatisticWeek_Summary"
+            category-data="Summary"
             id="net.tourbook.statistics.StatisticSummaryWeekCombined"
-            name="%Pref_Week_Summary"/>
+            name="%Pref_Week_Summary"
+            category-time="Week"/>
       <statistic
             class="net.tourbook.statistics.graphs.StatisticMonth_Summary"
+            category-data="Summary"
             id="net.tourbook.statistics.StatisticSummaryMonthCombined"
-            name="%Pref_Month_Summary"/>
+            name="%Pref_Month_Summary"
+            category-time="Month"/>
       <statistic
             class="net.tourbook.statistics.graphs.StatisticYear_Summary"
+            category-data="Summary"
             id="net.tourbook.statistics.StatisticSummaryYear"
-            name="%Pref_Year_Summary"/>
+            name="%Pref_Year_Summary"
+            category-time="Year"/>
 
       <statistic
             class="net.tourbook.statistics.graphs.StatisticWeek_HrZone"
+            category-data="HR"
             id="net.tourbook.statistics.StatisticWeekHrZone"
-            name="%Hr_Zone_Week"/>
+            name="%Hr_Zone_Week"
+            category-time="Week"/>
       <statistic
             class="net.tourbook.statistics.graphs.StatisticMonth_HrZone"
+            category-data="HR"
             id="net.tourbook.statistics.StatisticMonthHrZone"
-            name="%Hr_Zone_Month"/>
+            name="%Hr_Zone_Month"
+            category-time="Month"/>
 
       <statistic
             class="net.tourbook.statistics.graphs.StatisticDay_TourTime"
+            category-data="Time"
             id="net.tourbook.statistics.StatisticSummaryDayTourTime"
-            name="%Pref_Day_Summary_Duration"/>
+            name="%Pref_Day_Summary_Duration"
+            category-time="Day"/>
       <statistic
             class="net.tourbook.statistics.graphs.StatisticWeek_TourTime"
+            category-data="Time"
             id="net.tourbook.statistics.StatisticSummaryWeekDuration"
-            name="%Pref_Week_Summary_Duration"/>
+            name="%Pref_Week_Summary_Duration"
+            category-time="Week"/>
       <statistic
             class="net.tourbook.statistics.graphs.StatisticMonth_TourTime"
+            category-data="Time"
             id="net.tourbook.statistics.StatisticSummaryMonthTourTime"
-            name="%Pref_Month_Summary_TourTime"/>
+            name="%Pref_Month_Summary_TourTime"
+            category-time="Month"/>
       <statistic
             class="net.tourbook.statistics.graphs.StatisticYear_TourTime"
+            category-data="Time"
             id="net.tourbook.statistics.StatisticSummaryYearTourTime"
-            name="%Pref_Year_Summary_TourTime"/>
+            name="%Pref_Year_Summary_TourTime"
+            category-time="Year"/>
 
       <statistic
             class="net.tourbook.statistics.graphs.StatisticDay_Distance"
+            category-data="Distance"
             id="net.tourbook.statistics.StatisticSummaryDayDistance"
-            name="%Pref_Day_Summary_Distance"/>
+            name="%Pref_Day_Summary_Distance"
+            category-time="Day"/>
       <statistic
             class="net.tourbook.statistics.graphs.StatisticWeek_Distance"
+            category-data="Distance"
             id="net.tourbook.statistics.StatisticSummaryWeekDistance"
-            name="%Pref_Week_Summary_Distance"/>
+            name="%Pref_Week_Summary_Distance"
+            category-time="Week"/>
       <statistic
             class="net.tourbook.statistics.graphs.StatisticMonth_Distance"
+            category-data="Distance"
             id="net.tourbook.statistics.StatisticSummaryMonthDistance"
-            name="%Pref_Month_Summary_Distance"/>
+            name="%Pref_Month_Summary_Distance"
+            category-time="Month"/>
       <statistic
             class="net.tourbook.statistics.graphs.StatisticYear_Distance"
+            category-data="Distance"
             id="net.tourbook.statistics.StatisticSummaryYearDistance"
-            name="%Pref_Year_Summary_Distance"/>
+            name="%Pref_Year_Summary_Distance"
+            category-time="Year"/>
 
       <statistic
             class="net.tourbook.statistics.graphs.StatisticDay_Altitude"
+            category-data="Altitude"
             id="net.tourbook.statistics.StatisticSummaryDayAltitude"
-            name="%Pref_Day_Summary_Altitude"/>
+            name="%Pref_Day_Summary_Altitude"
+            category-time="Day"/>
       <statistic
             class="net.tourbook.statistics.graphs.StatisticWeek_Altitude"
+            category-data="Altitude"
             id="net.tourbook.statistics.StatisticSummaryWeekAltitude"
-            name="%Pref_Week_Summary_Altitude"/>
+            name="%Pref_Week_Summary_Altitude"
+            category-time="Week"/>
       <statistic
             class="net.tourbook.statistics.graphs.StatisticMonth_Altitude"
+            category-data="Altitude"
             id="net.tourbook.statistics.StatisticSummaryMonthAltitude"
-            name="%Pref_Month_Summary_Altitude"/>
+            name="%Pref_Month_Summary_Altitude"
+            category-time="Month"/>
       <statistic
             class="net.tourbook.statistics.graphs.StatisticYear_Altitude"
+            category-data="Altitude"
             id="net.tourbook.statistics.StatisticSummaryYearAltitude"
-            name="%Pref_Year_Summary_Altitude"/>
+            name="%Pref_Year_Summary_Altitude"
+            category-time="Year"/>
       <statistic
             class="net.tourbook.statistics.graphs.StatisticTour_Frequency"
+            category-data="Other"
             id="net.tourbook.statistics.StatisticTourNumbers"
-            name="%Pref_Tour_Numbers"/>
+            name="%Pref_Tour_Numbers"
+            category-time="Other"/>
             
 
    </extension>

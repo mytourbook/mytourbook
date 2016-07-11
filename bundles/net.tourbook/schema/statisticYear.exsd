@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="net.tourbook">
+<schema targetNamespace="net.tourbook" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appInfo>
          <meta.schema plugin="net.tourbook" id="statisticYear" name="Year Statistic"/>
@@ -11,6 +11,11 @@
    </annotation>
 
    <element name="extension">
+      <annotation>
+         <appInfo>
+            <meta.element />
+         </appInfo>
+      </annotation>
       <complexType>
          <choice minOccurs="0" maxOccurs="unbounded">
             <element ref="statistic"/>
@@ -52,7 +57,7 @@
          <attribute name="id" type="string" use="required">
             <annotation>
                <documentation>
-                  each statistic needs a unique id
+                  Every statistic needs a unique id
                </documentation>
             </annotation>
          </attribute>
@@ -76,8 +81,61 @@
                </appInfo>
             </annotation>
          </attribute>
+         <attribute name="category-data" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+            <simpleType>
+               <restriction base="string">
+                  <enumeration value="Other">
+                  </enumeration>
+                  <enumeration value="Summary">
+                  </enumeration>
+                  <enumeration value="Altitude">
+                  </enumeration>
+                  <enumeration value="Distance">
+                  </enumeration>
+                  <enumeration value="Time">
+                  </enumeration>
+                  <enumeration value="HR">
+                  </enumeration>
+               </restriction>
+            </simpleType>
+         </attribute>
+         <attribute name="category-time" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+            <simpleType>
+               <restriction base="string">
+                  <enumeration value="Other">
+                  </enumeration>
+                  <enumeration value="Day">
+                  </enumeration>
+                  <enumeration value="Week">
+                  </enumeration>
+                  <enumeration value="Month">
+                  </enumeration>
+                  <enumeration value="Year">
+                  </enumeration>
+               </restriction>
+            </simpleType>
+         </attribute>
       </complexType>
    </element>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="apiInfo"/>
+      </appInfo>
+      <documentation>
+         [Enter API information here.]
+      </documentation>
+   </annotation>
 
    <annotation>
       <appInfo>
@@ -99,15 +157,6 @@
 
    <annotation>
       <appInfo>
-         <meta.section type="apiInfo"/>
-      </appInfo>
-      <documentation>
-         [Enter API information here.]
-      </documentation>
-   </annotation>
-
-   <annotation>
-      <appInfo>
          <meta.section type="implementation"/>
       </appInfo>
       <documentation>
@@ -115,13 +164,5 @@
       </documentation>
    </annotation>
 
-   <annotation>
-      <appInfo>
-         <meta.section type="copyright"/>
-      </appInfo>
-      <documentation>
-         
-      </documentation>
-   </annotation>
 
 </schema>

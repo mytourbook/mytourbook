@@ -64,8 +64,10 @@ public class StatisticManager {
 
 								final TourbookStatistic statisticItem = (TourbookStatistic) object;
 
-								statisticItem.visibleName = configElement.getAttribute("name"); //$NON-NLS-1$
-								statisticItem.statisticId = configElement.getAttribute("id"); //$NON-NLS-1$
+								statisticItem.plugin_StatisticId = configElement.getAttribute("id"); //$NON-NLS-1$
+								statisticItem.plugin_VisibleName = configElement.getAttribute("name"); //$NON-NLS-1$
+								statisticItem.plugin_Category_Data = configElement.getAttribute("category-data"); //$NON-NLS-1$
+								statisticItem.plugin_Category_Time = configElement.getAttribute("category-time"); //$NON-NLS-1$
 
 								_statisticExtensionPoints.add(statisticItem);
 							}
@@ -98,7 +100,7 @@ public class StatisticManager {
 
 			// get statistic item from the id
 			for (final TourbookStatistic tourbookStatistic : availableStatistics) {
-				if (statisticId.equals(tourbookStatistic.statisticId)) {
+				if (statisticId.equals(tourbookStatistic.plugin_StatisticId)) {
 					visibleStatistics.add(tourbookStatistic);
 					break;
 				}

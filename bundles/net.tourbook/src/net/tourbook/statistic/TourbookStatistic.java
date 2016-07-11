@@ -75,10 +75,16 @@ public abstract class TourbookStatistic {
 	protected static final String	GRID_TOUR_TIME								= "GRID_TOUR_TIME__";							//$NON-NLS-1$
 
 	/** ID from plugin.xml */
-	public String					statisticId;
+	public String					plugin_StatisticId;
 
 	/** Name from plugin.xml */
-	public String					visibleName;
+	public String					plugin_VisibleName;
+
+	/** Data category from plugin.xml */
+	public String					plugin_Category_Data;
+
+	/** Time category from plugin.xml */
+	public String					plugin_Category_Time;
 
 	private boolean					_isDataDirty;
 
@@ -187,11 +193,11 @@ public abstract class TourbookStatistic {
 			return false;
 		}
 		final TourbookStatistic other = (TourbookStatistic) obj;
-		if (statisticId == null) {
-			if (other.statisticId != null) {
+		if (plugin_StatisticId == null) {
+			if (other.plugin_StatisticId != null) {
 				return false;
 			}
-		} else if (!statisticId.equals(other.statisticId)) {
+		} else if (!plugin_StatisticId.equals(other.plugin_StatisticId)) {
 			return false;
 		}
 		return true;
@@ -227,7 +233,7 @@ public abstract class TourbookStatistic {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((statisticId == null) ? 0 : statisticId.hashCode());
+		result = prime * result + ((plugin_StatisticId == null) ? 0 : plugin_StatisticId.hashCode());
 		return result;
 	}
 
@@ -320,8 +326,8 @@ public abstract class TourbookStatistic {
 	@Override
 	public String toString() {
 		return "TourbookStatistic ["// //$NON-NLS-1$
-				+ ("statisticId=" + statisticId + ", ")// //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("visibleName=" + visibleName) //$NON-NLS-1$
+				+ ("statisticId=" + plugin_StatisticId + ", ")// //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("visibleName=" + plugin_VisibleName) //$NON-NLS-1$
 				+ "]"; //$NON-NLS-1$
 	}
 

@@ -637,9 +637,9 @@ public class StatisticsView extends ViewPart implements ITourProvider {
 		// fill combobox with statistic names
 		for (final TourbookStatistic statistic : getAvailableStatistics()) {
 
-			_comboStatistics.add(statistic.visibleName);
+			_comboStatistics.add(statistic.plugin_VisibleName);
 
-			if (_activeStatistic != null && _activeStatistic.statisticId.equals(statistic.statisticId)) {
+			if (_activeStatistic != null && _activeStatistic.plugin_StatisticId.equals(statistic.plugin_StatisticId)) {
 				selectedIndex = indexCounter;
 			}
 
@@ -735,7 +735,7 @@ public class StatisticsView extends ViewPart implements ITourProvider {
 		if (mementoStatisticId != null) {
 			int statIndex = 0;
 			for (final TourbookStatistic statistic : allAvailableStatistics) {
-				if (mementoStatisticId.equalsIgnoreCase(statistic.statisticId)) {
+				if (mementoStatisticId.equalsIgnoreCase(statistic.plugin_StatisticId)) {
 					prevStatIndex = statIndex;
 					break;
 				}
@@ -763,7 +763,7 @@ public class StatisticsView extends ViewPart implements ITourProvider {
 		// keep statistic id for the selected statistic
 		final int selectionIndex = _comboStatistics.getSelectionIndex();
 		if (selectionIndex != -1) {
-			_state.put(STATE_SELECTED_STATISTIC, allAvailableStatistics.get(selectionIndex).statisticId);
+			_state.put(STATE_SELECTED_STATISTIC, allAvailableStatistics.get(selectionIndex).plugin_StatisticId);
 		}
 
 		for (final TourbookStatistic tourbookStatistic : allAvailableStatistics) {
@@ -1000,7 +1000,7 @@ public class StatisticsView extends ViewPart implements ITourProvider {
 
 		// fill combobox with statistic names
 		for (final TourbookStatistic statistic : getAvailableStatistics()) {
-			_comboStatistics.add(statistic.visibleName);
+			_comboStatistics.add(statistic.plugin_VisibleName);
 		}
 	}
 

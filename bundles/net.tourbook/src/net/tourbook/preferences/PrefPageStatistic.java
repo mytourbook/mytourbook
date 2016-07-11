@@ -16,6 +16,9 @@
 package net.tourbook.preferences;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -43,8 +46,6 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -56,16 +57,83 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageStatistic extends PreferencePage implements IWorkbenchPreferencePage {
 
-	public static final String				ID			= "net.tourbook.preferences.PrefPageStatistic"; //$NON-NLS-1$
+	public static final String						ID						= "net.tourbook.preferences.PrefPageStatistic"; //$NON-NLS-1$
 
-	private TableViewer						_statViewer;
+	private TableViewer								_statViewer;
 
-	private boolean							_isModified	= false;
+	private boolean									_isModified				= false;
 
-	private ArrayList<TourbookStatistic>	_visibleStatistics;
+	private ArrayList<TourbookStatistic>			_visibleStatistics;
 
-	private Button							_btnUp;
-	private Button							_btnDown;
+	private Button									_btnMoveDown;
+	private Button									_btnMoveUp;
+	private Button									_btnSortByData;
+	private Button									_btnSortByTime;
+
+//  <attribute name="category-data" use="required">
+//  <annotation>
+//     <documentation>
+//
+//     </documentation>
+//  </annotation>
+//  <simpleType>
+//     <restriction base="string">
+//        <enumeration value="Other">
+//        </enumeration>
+//        <enumeration value="Summary">
+//        </enumeration>
+//        <enumeration value="Altitude">
+//        </enumeration>
+//        <enumeration value="Distance">
+//        </enumeration>
+//        <enumeration value="Time">
+//        </enumeration>
+//        <enumeration value="HR">
+//        </enumeration>
+//     </restriction>
+//  </simpleType>
+//	</attribute>
+
+	private static final HashMap<String, Integer>	_sortingByCategoryData	= new HashMap<>();
+	{
+		_sortingByCategoryData.put("Summary", 1); //$NON-NLS-1$
+		_sortingByCategoryData.put("HR", 2); //$NON-NLS-1$
+		_sortingByCategoryData.put("Time", 3); //$NON-NLS-1$
+		_sortingByCategoryData.put("Altitude", 4); //$NON-NLS-1$
+		_sortingByCategoryData.put("Distance", 5); //$NON-NLS-1$
+		_sortingByCategoryData.put("Other", 99); //$NON-NLS-1$
+	}
+
+//    <attribute name="category-time" use="required">
+//    <annotation>
+//       <documentation>
+//
+//       </documentation>
+//    </annotation>
+//    <simpleType>
+//       <restriction base="string">
+//          <enumeration value="Other">
+//          </enumeration>
+//          <enumeration value="Day">
+//          </enumeration>
+//          <enumeration value="Week">
+//          </enumeration>
+//          <enumeration value="Month">
+//          </enumeration>
+//          <enumeration value="Year">
+//          </enumeration>
+//       </restriction>
+//    </simpleType>
+//    </attribute>
+
+	private static final HashMap<String, Integer>	_sortingByCategoryTime	= new HashMap<>();
+	{
+		_sortingByCategoryTime.put("Day", 1); //$NON-NLS-1$
+		_sortingByCategoryTime.put("Week", 2); //$NON-NLS-1$
+		_sortingByCategoryTime.put("Month", 3); //$NON-NLS-1$
+		_sortingByCategoryTime.put("Year", 4); //$NON-NLS-1$
+		_sortingByCategoryTime.put("Other", 99); //$NON-NLS-1$
+	}
 
 	private class StatContentProvicer implements IStructuredContentProvider {
 
@@ -89,39 +157,6 @@ public class PrefPageStatistic extends PreferencePage implements IWorkbenchPrefe
 
 	public PrefPageStatistic(final String title, final ImageDescriptor image) {
 		super(title, image);
-	}
-
-	private void createButtons(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		container.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
-		final GridLayout gl = new GridLayout();
-		gl.marginHeight = 0;
-		gl.marginWidth = 0;
-		container.setLayout(gl);
-
-		// button: up
-		_btnUp = new Button(container, SWT.NONE);
-		_btnUp.setText(Messages.app_action_button_up);
-		setButtonLayoutData(_btnUp);
-		_btnUp.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onMoveUp();
-			}
-		});
-
-		// button: down
-		_btnDown = new Button(container, SWT.NONE);
-		_btnDown.setText(Messages.app_action_button_down);
-		setButtonLayoutData(_btnDown);
-		_btnDown.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onMoveDown();
-			}
-		});
-
 	}
 
 	@Override
@@ -148,14 +183,15 @@ public class PrefPageStatistic extends PreferencePage implements IWorkbenchPrefe
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-
-		createViewer(container);
-		createButtons(container);
+		{
+			createUI_10_List(container);
+			createUI_20_Actions(container);
+		}
 
 		return container;
 	}
 
-	private void createViewer(final Composite parent) {
+	private void createUI_10_List(final Composite parent) {
 
 		final TableColumnLayout tableLayout = new TableColumnLayout();
 
@@ -189,7 +225,18 @@ public class PrefPageStatistic extends PreferencePage implements IWorkbenchPrefe
 
 				final TourbookStatistic statistic = (TourbookStatistic) cell.getElement();
 
-				cell.setText(statistic.visibleName);
+				final String statisticName = statistic.plugin_VisibleName
+
+// THIS IS FOR DEBUGGING
+//						+ UI.SPACE3
+//						+ UI.SYMBOL_BRACKET_LEFT
+//						+ statistic.plugin_Category_Data
+//						+ UI.DASH_WITH_SPACE
+//						+ statistic.plugin_Category_Time
+//						+ UI.SYMBOL_BRACKET_RIGHT
+				;
+
+				cell.setText(statisticName);
 			}
 		});
 		tableLayout.setColumnData(tvc.getColumn(), new ColumnWeightData(4, true));
@@ -206,6 +253,66 @@ public class PrefPageStatistic extends PreferencePage implements IWorkbenchPrefe
 		});
 	}
 
+	private void createUI_20_Actions(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+		{
+			{
+				// Button: move up
+				_btnMoveUp = new Button(container, SWT.NONE);
+				_btnMoveUp.setText(Messages.app_action_button_up);
+				setButtonLayoutData(_btnMoveUp);
+				_btnMoveUp.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						onMoveUp();
+					}
+				});
+			}
+
+			{
+				// Button: move down
+				_btnMoveDown = new Button(container, SWT.NONE);
+				_btnMoveDown.setText(Messages.app_action_button_down);
+				setButtonLayoutData(_btnMoveDown);
+				_btnMoveDown.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						onMoveDown();
+					}
+				});
+			}
+
+			{
+				// Button: Sort by data
+				_btnSortByData = new Button(container, SWT.NONE);
+				_btnSortByData.setText(Messages.Pref_Statistic_Action_SortByData);
+				setButtonLayoutData(_btnSortByData);
+				_btnSortByData.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						onSortByData();
+					}
+				});
+			}
+
+			{
+				// Button: Sort by time
+				_btnSortByTime = new Button(container, SWT.NONE);
+				_btnSortByTime.setText(Messages.Pref_Statistic_Action_SortByTime);
+				setButtonLayoutData(_btnSortByTime);
+				_btnSortByTime.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						onSortByTime();
+					}
+				});
+			}
+		}
+	}
+
 	private void enableActions() {
 
 		final IStructuredSelection selection = (IStructuredSelection) _statViewer.getSelection();
@@ -213,9 +320,9 @@ public class PrefPageStatistic extends PreferencePage implements IWorkbenchPrefe
 		final Object selectedItem = selection.getFirstElement();
 		final Table filterTable = _statViewer.getTable();
 
-		_btnUp.setEnabled(selectedItem != null && filterTable.getSelectionIndex() > 0);
-
-		_btnDown.setEnabled(selectedItem != null && filterTable.getSelectionIndex() < filterTable.getItemCount() - 1);
+		_btnMoveUp.setEnabled(selectedItem != null && filterTable.getSelectionIndex() > 0);
+		_btnMoveDown.setEnabled(selectedItem != null
+				&& filterTable.getSelectionIndex() < filterTable.getItemCount() - 1);
 	}
 
 	@Override
@@ -240,9 +347,9 @@ public class PrefPageStatistic extends PreferencePage implements IWorkbenchPrefe
 			_statViewer.setSelection(new StructuredSelection(selectedItem));
 
 			if (viewerTable.getSelectionIndex() == viewerTable.getItemCount() - 1) {
-				_btnUp.setFocus();
+				_btnMoveUp.setFocus();
 			} else {
-				_btnDown.setFocus();
+				_btnMoveDown.setFocus();
 			}
 
 			_isModified = true;
@@ -267,13 +374,47 @@ public class PrefPageStatistic extends PreferencePage implements IWorkbenchPrefe
 			_statViewer.setSelection(new StructuredSelection(selectedItem));
 
 			if (viewerTable.getSelectionIndex() == 0) {
-				_btnDown.setFocus();
+				_btnMoveDown.setFocus();
 			} else {
-				_btnUp.setFocus();
+				_btnMoveUp.setFocus();
 			}
 
 			_isModified = true;
 		}
+	}
+
+	private void onSortByData() {
+
+		Collections.sort(_visibleStatistics, new Comparator<TourbookStatistic>() {
+
+			@Override
+			public int compare(final TourbookStatistic stat1, final TourbookStatistic stat2) {
+
+				final int stat1Sorting = _sortingByCategoryData.get(stat1.plugin_Category_Data);
+				final int stat2Sorting = _sortingByCategoryData.get(stat2.plugin_Category_Data);
+
+				return stat1Sorting - stat2Sorting;
+			}
+		});
+
+		updateUI_WithReselection();
+	}
+
+	private void onSortByTime() {
+
+		Collections.sort(_visibleStatistics, new Comparator<TourbookStatistic>() {
+
+			@Override
+			public int compare(final TourbookStatistic stat1, final TourbookStatistic stat2) {
+
+				final int stat1Sorting = _sortingByCategoryTime.get(stat1.plugin_Category_Time);
+				final int stat2Sorting = _sortingByCategoryTime.get(stat2.plugin_Category_Time);
+
+				return stat1Sorting - stat2Sorting;
+			}
+		});
+
+		updateUI_WithReselection();
 	}
 
 	@Override
@@ -281,14 +422,10 @@ public class PrefPageStatistic extends PreferencePage implements IWorkbenchPrefe
 
 		super.performDefaults();
 
-		_isModified = true;
-
+		// use default sorting
 		_visibleStatistics = StatisticManager.getStatisticExtensionPoints();
 
-		_statViewer.setInput(new Object());
-
-		// select first statistic provider
-		_statViewer.setSelection(new StructuredSelection(_visibleStatistics.get(0)));
+		updateUI_WithReselection();
 	}
 
 	@Override
@@ -297,13 +434,13 @@ public class PrefPageStatistic extends PreferencePage implements IWorkbenchPrefe
 		final boolean isOK = super.performOk();
 
 		if (isOK && _isModified) {
-			saveSettings();
+			saveState();
 		}
 
 		return isOK;
 	}
 
-	private void saveSettings() {
+	private void saveState() {
 
 		/*
 		 * save order of all statistic providers in the pref store
@@ -312,7 +449,7 @@ public class PrefPageStatistic extends PreferencePage implements IWorkbenchPrefe
 		final String[] statisticIds = new String[items.length];
 
 		for (int itemIndex = 0; itemIndex < items.length; itemIndex++) {
-			statisticIds[itemIndex] = ((TourbookStatistic) items[itemIndex].getData()).statisticId;
+			statisticIds[itemIndex] = ((TourbookStatistic) items[itemIndex].getData()).plugin_StatisticId;
 		}
 
 		// set new value and fire event
@@ -323,6 +460,20 @@ public class PrefPageStatistic extends PreferencePage implements IWorkbenchPrefe
 						ITourbookPreferences.STATISTICS_STATISTIC_PROVIDER_IDS,
 						StringToArrayConverter.convertArrayToString(statisticIds));
 
+	}
+
+	private void updateUI_WithReselection() {
+
+		final Object selectedItem = ((IStructuredSelection) _statViewer.getSelection()).getFirstElement();
+
+		_isModified = true;
+
+		_statViewer.setInput(new Object());
+
+		// select first statistic provider
+		_statViewer.setSelection(new StructuredSelection(selectedItem == null
+				? _visibleStatistics.get(0)
+				: selectedItem));
 	}
 
 }

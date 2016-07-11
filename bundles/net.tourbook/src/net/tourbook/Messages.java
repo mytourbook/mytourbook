@@ -1332,6 +1332,9 @@ public class Messages extends NLS {
 //	public static String		Pref_SignImages_Dialog_Delete_Title;
 //	public static String		Pref_SignImages_Dialog_NoSelectedSignImage_Message;
 
+	public static String		Pref_Statistic_Action_SortByData;
+	public static String		Pref_Statistic_Action_SortByTime;
+
 	public static String		Pref_Statistic_Checkbox_Altitude;
 	public static String		Pref_Statistic_Checkbox_AvgPace;
 	public static String		Pref_Statistic_Checkbox_AvgSpeed;
