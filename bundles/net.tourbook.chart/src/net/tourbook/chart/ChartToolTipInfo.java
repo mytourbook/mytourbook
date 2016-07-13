@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -44,7 +44,7 @@ public class ChartToolTipInfo {
 	}
 
 	public void setLabel(final String label) {
-		this._label = label;
+		_label = label;
 	}
 
 	public void setReposition(final boolean isReposition) {
@@ -52,7 +52,7 @@ public class ChartToolTipInfo {
 	}
 
 	public void setTitle(final String title) {
-		this._title = title;
+		_title = title;
 	}
 
 }

@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.statistics.graphs;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -62,31 +61,36 @@ import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.IViewSite;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 public class StatisticTour_Time extends TourbookStatistic implements IBarSelectionProvider, ITourProvider {
+
+	private static final String			TOUR_TOOLTIP_FORMAT_DATE_WEEK_TIME	= net.tourbook.ui.Messages.Tour_Tooltip_Format_DateWeekTime;
 
 	private TourPerson					_activePerson;
 	private TourTypeFilter				_activeTourTypeFiler;
 	private int							_currentYear;
 	private int							_numberOfYears;
 
-	private final Calendar				_calendar					= GregorianCalendar.getInstance();
-	private final DateFormat			_dateFormatter				= DateFormat.getDateInstance(DateFormat.FULL);
+	private final Calendar				_calendar							= GregorianCalendar.getInstance();
+	private final DateTimeFormatter		_dateFormatter						= DateTimeFormat.fullDate();
+	private final DateTimeFormatter		_timeFormatter						= DateTimeFormat.mediumTime();
 
 	private Chart						_chart;
 
 	private StatisticContext			_statContext;
 
 	private StatisticTourToolTip		_tourToolTip;
-	private TourInfoIconToolTipProvider	_tourInfoToolTipProvider	= new TourInfoIconToolTipProvider();
+	private TourInfoIconToolTipProvider	_tourInfoToolTipProvider			= new TourInfoIconToolTipProvider();
 
 	private TourData_Time				_tourTimeData;
 
-	private final MinMaxKeeper_YData	_minMaxKeeper				= new MinMaxKeeper_YData();
+	private final MinMaxKeeper_YData	_minMaxKeeper						= new MinMaxKeeper_YData();
 	private boolean						_ifIsSynchScaleEnabled;
 
-	private Long						_selectedTourId				= null;
-	private int							_currentMonth;
+	private Long						_selectedTourId						= null;
 
 	/**
 	 * create segments for the chart
@@ -239,13 +243,6 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
 		/*
 		 * set calendar day/month/year
 		 */
-		final int oldestYear = _currentYear - _numberOfYears + 1;
-		final int tourDOY = tourDOYValues[valueIndex];
-		_calendar.set(oldestYear, 0, 1);
-		_calendar.set(Calendar.DAY_OF_YEAR, tourDOY + 1);
-		final String beginDate = _dateFormatter.format(_calendar.getTime());
-
-		_currentMonth = _calendar.get(Calendar.MONTH) + 1;
 		final long tooltipTourId = _tourTimeData.tourIds[valueIndex];
 
 		final String tourTypeName = TourDatabase.getTourTypeName(_tourTimeData.typeIds[valueIndex]);
@@ -257,16 +254,19 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
 		final int[] startValue = _tourTimeData.tourTimeStartValues;
 		final int[] endValue = _tourTimeData.tourTimeEndValues;
 
-		final Integer recordingTime = _tourTimeData.tourRecordingTimeValues.get(valueIndex);
-		final Integer drivingTime = _tourTimeData.tourDrivingTimeValues.get(valueIndex);
+		final int recordingTime = _tourTimeData.tourRecordingTimeValues[valueIndex];
+		final int drivingTime = _tourTimeData.tourDrivingTimeValues[valueIndex];
 		final int breakTime = recordingTime - drivingTime;
+
+		final DateTime dtTourStart = _tourTimeData.tourStartDateTimes.get(valueIndex);
+		final DateTime dtTourEnd = dtTourStart.plus(recordingTime * 1000);
 
 		final float distance = _tourTimeData.tourDistanceValues[valueIndex];
 		final float speed = drivingTime == 0 ? 0 : distance / (drivingTime / 3.6f);
-		final int pace = (int) (distance == 0 ? 0 : (drivingTime * 1000 / distance));
+		final float pace = distance == 0 ? 0 : drivingTime * 1000 / distance;
 
 		final StringBuilder toolTipFormat = new StringBuilder();
-		toolTipFormat.append(Messages.TourTime_Info_DateDay); //			%s - CW %d
+		toolTipFormat.append(TOUR_TOOLTIP_FORMAT_DATE_WEEK_TIME); //		%s - %s - %s - CW %d
 		toolTipFormat.append(UI.NEW_LINE);
 		toolTipFormat.append(UI.NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_distance_tour);
@@ -302,8 +302,10 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
 
 		final String toolTipLabel = String.format(toolTipFormat.toString(),
 		//
-				beginDate,
-				_tourTimeData.weekValues[valueIndex],
+				_dateFormatter.print(dtTourStart.getMillis()),
+				_timeFormatter.print(dtTourStart.getMillis()),
+				_timeFormatter.print(dtTourEnd.getMillis()),
+				dtTourStart.getWeekOfWeekyear(),
 				//
 				distance / 1000,
 				UI.UNIT_LABEL_DISTANCE,
@@ -334,15 +336,15 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
 				speed,
 				UI.UNIT_LABEL_SPEED,
 				//
-				pace / 60,
-				pace % 60,
+				(int) pace / 60,
+				(int) pace % 60,
 				UI.UNIT_LABEL_PACE,
 				//
 				tourTypeName,
 				tourTags,
 				//
 				tourDescription
-//
+		//
 				)
 				.toString();
 

@@ -49,6 +49,13 @@
             id="net.tourbook.statistics.StatisticMonthHrZone"
             name="%Hr_Zone_Month"
             category-time="Month"/>
+      <statistic
+            category-data="Other"
+            category-time="Other"
+            class="net.tourbook.statistics.graphs.StatisticTour_Frequency"
+            id="net.tourbook.statistics.StatisticTourNumbers"
+            name="%Pref_Tour_Numbers">
+      </statistic>
 
       <statistic
             class="net.tourbook.statistics.graphs.StatisticDay_TourTime"
@@ -124,12 +131,6 @@
             id="net.tourbook.statistics.StatisticSummaryYearAltitude"
             name="%Pref_Year_Summary_Altitude"
             category-time="Year"/>
-      <statistic
-            class="net.tourbook.statistics.graphs.StatisticTour_Frequency"
-            category-data="Other"
-            id="net.tourbook.statistics.StatisticTourNumbers"
-            name="%Pref_Tour_Numbers"
-            category-time="Other"/>
             
 
    </extension>

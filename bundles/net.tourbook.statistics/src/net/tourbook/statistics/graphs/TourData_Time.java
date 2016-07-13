@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,6 +17,8 @@ package net.tourbook.statistics.graphs;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import org.joda.time.DateTime;
 
 public class TourData_Time {
 
@@ -40,12 +42,13 @@ public class TourData_Time {
 
 	int[]							tourTimeStartValues;
 	int[]							tourTimeEndValues;
+	ArrayList<DateTime>				tourStartDateTimes;
 
 	int[]							tourAltitudeValues;
 	int[]							tourDistanceValues;
 
-	ArrayList<Integer>				tourRecordingTimeValues;
-	ArrayList<Integer>				tourDrivingTimeValues;
+	int[]							tourRecordingTimeValues;
+	int[]							tourDrivingTimeValues;
 
 	ArrayList<String>				tourTitle;
 	ArrayList<String>				tourDescription;

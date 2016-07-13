@@ -417,13 +417,14 @@ public class PrefPageStatistic extends PreferencePage implements IWorkbenchPrefe
 		updateUI_WithReselection();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void performDefaults() {
 
 		super.performDefaults();
 
-		// use default sorting
-		_visibleStatistics = StatisticManager.getStatisticExtensionPoints();
+		// use default sorting, clone original sorting
+		_visibleStatistics = (ArrayList<TourbookStatistic>) StatisticManager.getStatisticExtensionPoints().clone();
 
 		updateUI_WithReselection();
 	}

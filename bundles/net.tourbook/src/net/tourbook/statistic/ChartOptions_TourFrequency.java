@@ -183,7 +183,7 @@ public class ChartOptions_TourFrequency implements IStatisticOptions {
 					// spinner
 					_spinnerDistance_NumOfBars = new Spinner(group, SWT.BORDER);
 					_spinnerDistance_NumOfBars.setMinimum(1);
-					_spinnerDistance_NumOfBars.setMaximum(100);
+					_spinnerDistance_NumOfBars.setMaximum(1000);
 					_spinnerDistance_NumOfBars.addMouseWheelListener(_defaultMouseWheelListener);
 					_spinnerDistance_NumOfBars.addSelectionListener(_defaultSelectionListener);
 					GridDataFactory.fillDefaults() //
@@ -263,7 +263,7 @@ public class ChartOptions_TourFrequency implements IStatisticOptions {
 					// spinner
 					_spinnerAltitude_NumOfBars = new Spinner(group, SWT.BORDER);
 					_spinnerAltitude_NumOfBars.setMinimum(1);
-					_spinnerAltitude_NumOfBars.setMaximum(100);
+					_spinnerAltitude_NumOfBars.setMaximum(1000);
 					_spinnerAltitude_NumOfBars.addMouseWheelListener(_defaultMouseWheelListener);
 					_spinnerAltitude_NumOfBars.addSelectionListener(_defaultSelectionListener);
 					GridDataFactory.fillDefaults() //
@@ -343,7 +343,7 @@ public class ChartOptions_TourFrequency implements IStatisticOptions {
 					// spinner
 					_spinnerDuration_NumOfBars = new Spinner(group, SWT.BORDER);
 					_spinnerDuration_NumOfBars.setMinimum(1);
-					_spinnerDuration_NumOfBars.setMaximum(100);
+					_spinnerDuration_NumOfBars.setMaximum(1000);
 					_spinnerDuration_NumOfBars.addMouseWheelListener(_defaultMouseWheelListener);
 					_spinnerDuration_NumOfBars.addSelectionListener(_defaultSelectionListener);
 					GridDataFactory.fillDefaults() //
