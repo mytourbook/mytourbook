@@ -376,11 +376,6 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
 	}
 
 	@Override
-	public Integer getSelectedMonth() {
-		return _currentMonth;
-	}
-
-	@Override
 	public Long getSelectedTour() {
 		return _selectedTourId;
 	}

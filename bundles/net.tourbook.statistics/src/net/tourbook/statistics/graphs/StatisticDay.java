@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.statistics.graphs;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -65,24 +64,30 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPart;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 public abstract class StatisticDay extends TourbookStatistic implements IBarSelectionProvider, ITourProvider {
+
+	private static final String			TOUR_TOOLTIP_FORMAT_DATE_WEEK_TIME	= net.tourbook.ui.Messages.Tour_Tooltip_Format_DateWeekTime;
 
 	private TourTypeFilter				_activeTourTypeFilter;
 	private TourPerson					_activePerson;
 
-	private long						_selectedTourId				= -1;
+	private long						_selectedTourId						= -1;
 
 	private int							_currentYear;
-	private int							_currentMonth;
 
 	private int							_numberOfYears;
-	private final Calendar				_calendar					= GregorianCalendar.getInstance();
+	private final Calendar				_calendar							= GregorianCalendar.getInstance();
 
-	private final DateFormat			_dateFormatter				= DateFormat.getDateInstance(DateFormat.FULL);
+	private final DateTimeFormatter		_dateFormatter						= DateTimeFormat.fullDate();
+	private final DateTimeFormatter		_timeFormatter						= DateTimeFormat.mediumTime();
+
 	private Chart						_chart;
 
-	private final MinMaxKeeper_YData	_minMaxKeeper				= new MinMaxKeeper_YData();
+	private final MinMaxKeeper_YData	_minMaxKeeper						= new MinMaxKeeper_YData();
 	private TourData_Day				_tourDayData;
 
 	private boolean						_isSynchScaleEnabled;
@@ -90,7 +95,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 	private ITourEventListener			_tourPropertyListener;
 	private StatisticTourToolTip		_tourToolTip;
 
-	private TourInfoIconToolTipProvider	_tourInfoToolTipProvider	= new TourInfoIconToolTipProvider();
+	private TourInfoIconToolTipProvider	_tourInfoToolTipProvider			= new TourInfoIconToolTipProvider();
 
 	private void addTourPropertyListener() {
 
@@ -259,17 +264,6 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 			return null;
 		}
 
-		/*
-		 * set calendar day/month/year
-		 */
-		final int oldestYear = _currentYear - _numberOfYears + 1;
-		final int tourDOY = tourDOYValues[valueIndex];
-		_calendar.set(oldestYear, 0, 1);
-		_calendar.set(Calendar.DAY_OF_YEAR, tourDOY + 1);
-
-		final String beginDate = _dateFormatter.format(_calendar.getTime());
-
-		_currentMonth = _calendar.get(Calendar.MONTH) + 1;
 		final long tooltipTourId = _tourDayData.tourIds[valueIndex];
 
 		final String tourTypeName = TourDatabase.getTourTypeName(_tourDayData.typeIds[valueIndex]);
@@ -285,12 +279,16 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 		final int drivingTime = _tourDayData.drivingTime[valueIndex];
 		final int breakTime = recordingTime - drivingTime;
 
+		final DateTime dtTourStart = _tourDayData.tourStartDateTimes.get(valueIndex);
+		final DateTime dtTourEnd = dtTourStart.plus(recordingTime * 1000);
+
 		final float distance = _tourDayData.tourDistanceValues[valueIndex];
 		final float speed = drivingTime == 0 ? 0 : distance / (drivingTime / 3.6f);
 		final float pace = distance == 0 ? 0 : drivingTime * 1000 / distance;
 
 		final StringBuilder toolTipFormat = new StringBuilder();
-		toolTipFormat.append(Messages.TourTime_Info_DateDay); //			%s - CW %d
+		toolTipFormat.append(TOUR_TOOLTIP_FORMAT_DATE_WEEK_TIME); //		%s - %s - %s - CW %d
+
 		toolTipFormat.append(UI.NEW_LINE);
 		toolTipFormat.append(UI.NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_distance_tour);
@@ -324,14 +322,15 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 			toolTipFormat.append(Messages.tourtime_info_description_text);
 		}
 
-//		System.out.println("\t");
-//		System.out.println(toolTipFormat.toString());
-//		// TODO remove SYSTEM.OUT.PRINTLN
+		final int tourStartTime = startValue[valueIndex];
+		final int tourEndTime = endValue[valueIndex];
 
 		final String toolTipLabel = String.format(toolTipFormat.toString(),
 		//
-				beginDate,
-				_tourDayData.weekValues[valueIndex],
+				_dateFormatter.print(dtTourStart.getMillis()),
+				_timeFormatter.print(dtTourStart.getMillis()),
+				_timeFormatter.print(dtTourEnd.getMillis()),
+				dtTourStart.getWeekOfWeekyear(),
 				//
 				// distance
 				distance / 1000,
@@ -342,12 +341,12 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 				UI.UNIT_LABEL_ALTITUDE,
 				//
 				// start time
-				startValue[valueIndex] / 3600,
-				(startValue[valueIndex] % 3600) / 60,
+				tourStartTime / 3600,
+				(tourStartTime % 3600) / 60,
 				//
 				// end time
-				(endValue[valueIndex] / 3600) % 24,
-				(endValue[valueIndex] % 3600) / 60,
+				(tourEndTime / 3600) % 24,
+				(tourEndTime % 3600) / 60,
 				//
 				recordingTime / 3600,
 				(recordingTime % 3600) / 60,
@@ -537,11 +536,6 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 	}
 
 	@Override
-	public Integer getSelectedMonth() {
-		return _currentMonth;
-	}
-
-	@Override
 	public Long getSelectedTour() {
 		return _selectedTourId;
 	}
@@ -709,7 +703,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 		final ChartDataModel chartModel = getChartDataModel();
 
 		/*
-		 * set graph minimum width, these is the number of days in the year
+		 * set graph minimum width, this is the number of days in the year
 		 */
 		_calendar.set(_currentYear, 11, 31);
 		chartModel.setChartMinWidth(_calendar.get(Calendar.DAY_OF_YEAR));
