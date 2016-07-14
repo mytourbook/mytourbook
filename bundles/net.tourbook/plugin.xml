@@ -136,22 +136,22 @@
          point="org.eclipse.ui.perspectives">
       <perspective
             class="net.tourbook.application.PerspectiveFactoryRawData"
-            icon="icons/rawdata-perspective.gif"
+            icon="icons/imported-tours-perspective.png"
             id="net.tourbook.perspective.RawData"
             name="%perspective_name_RawData"/>
       <perspective
             class="net.tourbook.application.PerspectiveFactoryTourBook"
-            icon="icons/tour-list-perspective.gif"
+            icon="icons/tourbook-tours-perspective.png"
             id="net.tourbook.perspective.TourBook"
             name="%perspective_name_TourBook"/>
       <perspective
             class="net.tourbook.application.PerspectiveFactoryTourCatalog"
-            icon="icons/tour-map-perspective.gif"
+            icon="icons/reference-tours-perspective.png"
             id="net.tourbook.perspective.TourCatalog"
             name="%perspective_name_ReferenceTours"/>
       <perspective
             class="net.tourbook.application.PerspectiveFactoryStatistic"
-            icon="icons/statistics-perspective.gif"
+            icon="icons/statistics-perspective.png"
             id="net.tourbook.perspective.Statistic"
             name="%perspective_name_Statistics"/>
       <perspective
@@ -562,7 +562,7 @@
 				<!-- Statistics -->
 				<command 
 					commandId="command.net.tourbook.statistic.StatisticView"
-					icon="icons/statistics.gif"
+					icon="icons/statistics.png"
 					label="%view_name_Statistics"
 					mnemonic="%view_name_Statistics_Mnemonic"/>
    
@@ -1438,7 +1438,7 @@
 			<view
 				category="net.tourbook.category.tourList"
 				class="net.tourbook.statistic.StatisticsView"
-				icon="icons/statistics.gif"
+				icon="icons/statistics.png"
 				id="net.tourbook.statistic.StatisticView"
 				name="%view_name_Statistics"/>
 			<view
