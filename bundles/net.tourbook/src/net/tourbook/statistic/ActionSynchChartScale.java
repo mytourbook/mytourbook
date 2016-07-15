@@ -23,9 +23,9 @@ import org.eclipse.jface.action.Action;
 
 public class ActionSynchChartScale extends Action {
 
-	private StatisticsView	_statView;
+	private StatisticView	_statView;
 
-	public ActionSynchChartScale(final StatisticsView statView) {
+	public ActionSynchChartScale(final StatisticView statView) {
 
 		super(UI.EMPTY_STRING, AS_CHECK_BOX);
 

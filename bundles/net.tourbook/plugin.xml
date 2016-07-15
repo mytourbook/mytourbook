@@ -1437,7 +1437,7 @@
 				name="%view_name_ReferenceTours"/>
 			<view
 				category="net.tourbook.category.tourList"
-				class="net.tourbook.statistic.StatisticsView"
+				class="net.tourbook.statistic.StatisticView"
 				icon="icons/statistics.png"
 				id="net.tourbook.statistic.StatisticView"
 				name="%view_name_Statistics"/>
