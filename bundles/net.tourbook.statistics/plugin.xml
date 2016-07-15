@@ -6,7 +6,7 @@
          
       <statistic
             class="net.tourbook.statistics.graphs.StatisticTour_Time"
-            category-data="Time"
+            category-data="Summary"
             id="net.tourbook.statistics.StatisticTourTime"
             name="%Pref_Tour_Time"
             category-time="Day"/>
@@ -36,6 +36,13 @@
             id="net.tourbook.statistics.StatisticSummaryYear"
             name="%Pref_Year_Summary"
             category-time="Year"/>
+      <statistic
+            category-data="Summary"
+            category-time="Year"
+            class="net.tourbook.statistics.graphs.StatisticTour_Frequency"
+            id="net.tourbook.statistics.StatisticTourNumbers"
+            name="%Pref_Tour_Numbers">
+      </statistic>
 
       <statistic
             class="net.tourbook.statistics.graphs.StatisticWeek_HrZone"
@@ -49,13 +56,6 @@
             id="net.tourbook.statistics.StatisticMonthHrZone"
             name="%Hr_Zone_Month"
             category-time="Month"/>
-      <statistic
-            category-data="Other"
-            category-time="Other"
-            class="net.tourbook.statistics.graphs.StatisticTour_Frequency"
-            id="net.tourbook.statistics.StatisticTourNumbers"
-            name="%Pref_Tour_Numbers">
-      </statistic>
 
       <statistic
             class="net.tourbook.statistics.graphs.StatisticDay_TourTime"
