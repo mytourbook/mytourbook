@@ -1,45 +1,63 @@
 Version 16.7                                                ?. July 2016
 
-  
-NEW 	
+New 	
 ===
 
-
- 
 * Statistics
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-The "old" statistic view is not displayed in version 16.7, just open the "new" statistic view from the menu Directory/Statistics
-
-This is because of some internal changes, all features are still available !!!
-
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-  - Heart Rate Variability
   - Day summary statistics
-    - New graphs for average speed/pace  
-    - Select visible graphs in the slideout
-  - Show chart grid options in a slideout and set the options for each chart individually
-  - Show tour frequency options in a slideout, 
-    these options are removed now from the preference dialog
-    
+    - New graphs for average speed/pace (the values are stacked for the 
+      same day, this can maybe improved)
+    - Select visible graphs in the options slideout
+
+  - Select chart grid options in the options slideout and set the 
+    options for each chart individually
+
+  - Select tour frequency options in the options slideout
+    (these options are removed now from the preference dialog)
+
+  - Order bar sequence for month/year statistics
+
+  - Sort statistics sequence by data/time (in the preference dialog)
 
 
-IMPROVEMENTS
+  When MyTourbook is opened with version 16.7 then the "old" statistic 
+  view is not displayed any more.
+
+  To open the "new" statistic view, select Directory / Statistics in 
+  the app menu.
+
+  This is because of some internal changes, all features are still 
+  available + new features.
+
+
+* Heart Rate Variability
+
+  - This is a new view, it requires heart rate time data 
+    (R-R time in ms)
+
+ 
+Improvements 	
 ============
 
 * Map
 
-  - Keep map positon when a tour is saved, e.g. setting the tour marker position in the tour chart (which also saves the tour)
+  - Keep map position when a tour is saved, e.g. setting the tour marker 
+    position in the tour chart (which also saves the tour).
 
+ 
 
-BUGFIX
+* Icons
+
+  - A few icons changed
+
+ 
+Bugfix 	
 ======
 
 * Statistics
 
-  - All views are not updated when a tour is deleted, 
-    was introduced when tour log view is logging tour deletions
-  - Tour frequency statistic is wrong when stacked bars are displayed 
+  - All views are not updated when a tour is deleted,
+    this was introduced when the tour log view is logging tour deletions
 
+  - Tour frequency statistic is wrong when stacked bars are displayed
