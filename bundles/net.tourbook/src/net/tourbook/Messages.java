@@ -836,6 +836,10 @@ public class Messages extends NLS {
 	public static String		Image__synch_statistics_Disabled;
 	public static String		Image__SearchExternal;
 	public static String		Image__SearchExternal_Disabled;
+
+	public static String	Image__Smoothing;
+
+	public static String	Image__Smoothing_Disabled;
 	public static String		Image__State_AdjustTemperature;
 	public static String		Image__State_Copy;
 	public static String		Image__State_Deleted_Backup;
@@ -1513,6 +1517,8 @@ public class Messages extends NLS {
 	public static String		Slideout_StatisticOptions_Label_Title;
 
 	public static String		Slideout_TourChartOptions_Label_Title;
+
+	public static String	Slideout_TourChartSmoothing_Label_Title;
 
 	public static String		Slideout_TourEditor_Label_LatLonDigits;
 	public static String		Slideout_TourEditor_Label_LatLonDigits_Tooltip;

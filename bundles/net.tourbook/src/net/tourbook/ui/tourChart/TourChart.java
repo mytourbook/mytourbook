@@ -185,9 +185,10 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	private Map<String, Action>				_allTourChartActions;
 	private ActionEditQuick					_actionEditQuick;
 	private ActionOpenMarkerDialog			_actionOpenMarkerDialog;
+	private ActionTourChartOptions			_actionTourChartOptions;
+	private ActionTourChartSmoothing		_actionTourChartSmoothing;
 	private ActionTourChartInfo				_actionTourInfo;
 	private ActionTourChartMarker			_actionTourMarker;
-	private ActionTourChartOptions			_actionTourChartOptions;
 	//
 	/**
 	 * datamodel listener is called when the chart data is created
@@ -290,7 +291,26 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 		@Override
 		protected void onBeforeOpenSlideout() {
+			closeOpenedDialogs(this);
+		}
+	}
 
+	private class ActionTourChartSmoothing extends ActionToolbarSlideout {
+
+		public ActionTourChartSmoothing(final ImageDescriptor imageDescriptor,
+										final ImageDescriptor imageDescriptorDisabled) {
+
+			super(imageDescriptor, imageDescriptorDisabled);
+		}
+
+		@Override
+		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+
+			return new SlideoutTourChartSmoothing(_parent, toolbar, TourChart.this);
+		}
+
+		@Override
+		protected void onBeforeOpenSlideout() {
 			closeOpenedDialogs(this);
 		}
 	}
@@ -1245,6 +1265,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		 */
 		_actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
 		_actionTourChartOptions = new ActionTourChartOptions();
+		_actionTourChartSmoothing = new ActionTourChartSmoothing(
+				TourbookPlugin.getImageDescriptor(Messages.Image__Smoothing),
+				TourbookPlugin.getImageDescriptor(Messages.Image__Smoothing_Disabled));
 		_actionTourInfo = new ActionTourChartInfo(this, _parent);
 		_actionTourMarker = new ActionTourChartMarker(this, _parent);
 
@@ -2431,6 +2454,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		tbm.add(_allTourChartActions.get(ACTION_ID_IS_SHOW_TOUR_PHOTOS));
 		tbm.add(_actionTourMarker);
 		tbm.add(_actionTourInfo);
+		tbm.add(_actionTourChartSmoothing);
 		tbm.add(_actionTourChartOptions);
 
 		tbm.update(true);

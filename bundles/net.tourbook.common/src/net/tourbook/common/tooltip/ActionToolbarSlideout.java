@@ -19,6 +19,7 @@ import net.tourbook.common.CommonActivator;
 import net.tourbook.common.Messages;
 
 import org.eclipse.jface.action.ContributionItem;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -54,6 +55,12 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
 
 		_imageEnabled = CommonActivator.getImageDescriptor(Messages.Image__TourOptions).createImage();
 		_imageDisabled = CommonActivator.getImageDescriptor(Messages.Image__TourOptions_Disabled).createImage();
+	}
+
+	public ActionToolbarSlideout(final ImageDescriptor actionImage, final ImageDescriptor actionImageDisabled) {
+
+		_imageEnabled = actionImage.createImage();
+		_imageDisabled = actionImageDisabled.createImage();
 	}
 
 	protected abstract ToolbarSlideout createSlideout(ToolBar toolbar);
