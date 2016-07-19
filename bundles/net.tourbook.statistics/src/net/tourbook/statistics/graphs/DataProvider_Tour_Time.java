@@ -194,8 +194,8 @@ public class DataProvider_Tour_Time extends DataProvider {
 					final int dbTourStartWeek = result.getInt(5);
 
 					final long dbStartTime = result.getLong(6);
-					final int dbDrivingTime = result.getInt(7);
-					final int dbRecordingTime = result.getInt(8);
+					final int dbRecordingTime = result.getInt(7);
+					final int dbDrivingTime = result.getInt(8);
 
 					final float dbDistance = result.getFloat(9);
 					final int dbAltitudeUp = result.getInt(10);
