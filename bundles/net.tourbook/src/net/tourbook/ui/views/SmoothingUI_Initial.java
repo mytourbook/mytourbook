@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -37,7 +37,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
-class SmoothingAlgorithmInitial implements ISmoothingAlgorithm {
+class SmoothingUI_Initial implements ISmoothingAlgorithm {
 
 	private final IPreferenceStore	_prefStore	= TourbookPlugin.getDefault().getPreferenceStore();
 
@@ -61,10 +61,16 @@ class SmoothingAlgorithmInitial implements ISmoothingAlgorithm {
 	private Spinner					_spinnerPaceClipping;
 	private Spinner					_spinnerSpeedMinTime;
 
-	SmoothingAlgorithmInitial() {}
+	SmoothingUI_Initial() {}
 
 	@Override
-	public Composite createUI(final SmoothingUI smoothingUI, final Composite parent, final boolean isShowDescription) {
+	public Composite createUI(	final SmoothingUI smoothingUI,
+								final Composite parent,
+								final FormToolkit tk,
+								final boolean isShowDescription,
+								final boolean isShowAdditionalActions) {
+
+		_tk = tk;
 
 		createUI_0_init(parent);
 
@@ -77,7 +83,9 @@ class SmoothingAlgorithmInitial implements ISmoothingAlgorithm {
 
 	private void createUI_0_init(final Composite parent) {
 
-		_tk = new FormToolkit(parent.getDisplay());
+		if (_tk == null) {
+			_tk = new FormToolkit(parent.getDisplay());
+		}
 
 		_defaultSelectionListener = new SelectionAdapter() {
 			@Override
@@ -90,6 +98,7 @@ class SmoothingAlgorithmInitial implements ISmoothingAlgorithm {
 		};
 
 		_defaultMouseWheelListener = new MouseWheelListener() {
+			@Override
 			public void mouseScrolled(final MouseEvent event) {
 				UI.adjustSpinnerValueOnMouseScroll(event);
 				onChangeProperty();
@@ -239,10 +248,7 @@ class SmoothingAlgorithmInitial implements ISmoothingAlgorithm {
 	}
 
 	@Override
-	public void dispose() {
-
-		_tk.dispose();
-	}
+	public void dispose() {}
 
 	private void enableControls() {
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,7 @@
 package net.tourbook.ui.views;
 
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.forms.widgets.FormToolkit;
 
 public interface ISmoothingAlgorithm {
 
@@ -26,9 +27,14 @@ public interface ISmoothingAlgorithm {
 	 * @param smoothingUI
 	 * @param parent
 	 * @param isShowDescription
+	 * @param isShowAdditionalActions
 	 * @return
 	 */
-	Composite createUI(SmoothingUI smoothingUI, Composite parent, boolean isShowDescription);
+	Composite createUI(	SmoothingUI smoothingUI,
+						Composite parent,
+						FormToolkit toolkit,
+						boolean isShowDescription,
+						boolean isShowAdditionalActions);
 
 	void dispose();
 

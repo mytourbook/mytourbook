@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -44,7 +44,7 @@ import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
-public class SmoothingAlgorithmJamet implements ISmoothingAlgorithm {
+public class SmoothingUI_Jamet implements ISmoothingAlgorithm {
 
 	private static final int		MAX_TAU			= 5000;
 
@@ -99,12 +99,17 @@ public class SmoothingAlgorithmJamet implements ISmoothingAlgorithm {
 	private CLabel					_iconGradient;
 	private CLabel					_iconAltitude;
 
-	public SmoothingAlgorithmJamet() {}
+	public SmoothingUI_Jamet() {}
 
 	@Override
-	public Composite createUI(final SmoothingUI smoothingUI, final Composite parent, final boolean isShowDescription) {
+	public Composite createUI(	final SmoothingUI smoothingUI,
+								final Composite parent,
+								final FormToolkit tk,
+								final boolean isShowDescription,
+								final boolean isShowAdditionalActions) {
 
 		_smoothingUI = smoothingUI;
+		_tk = tk;
 
 		initUI(parent);
 
@@ -113,14 +118,16 @@ public class SmoothingAlgorithmJamet implements ISmoothingAlgorithm {
 		GridLayoutFactory.fillDefaults().spacing(5, 5).numColumns(3).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
-			createUI10Tau(container);
-			createUI20SmoothSpeed(container);
-			createUI22SmoothGradient(container);
-			createUI24SmoothPulse(container);
-			createUI26SmoothAltitude(container);
-			createUI30Iterations(container);
+			createUI_10_Tau(container);
+			createUI_20_SmoothSpeed(container);
+			createUI_22_SmoothGradient(container);
+			createUI_24_SmoothPulse(container);
+			createUI_26_SmoothAltitude(container);
+			createUI_30_Iterations(container);
 
-			createUI50Actions(container);
+			if (isShowAdditionalActions) {
+				createUI_50_Actions(container);
+			}
 		}
 
 		restoreState();
@@ -129,13 +136,13 @@ public class SmoothingAlgorithmJamet implements ISmoothingAlgorithm {
 		return container;
 	}
 
-	private void createUI10Tau(final Composite parent) {
+	private void createUI_10_Tau(final Composite parent) {
 
 		final Label label = _tk.createLabel(parent, Messages.TourChart_Smoothing_Label_TauParameter);
 		GridDataFactory.fillDefaults().span(3, 1).grab(false, false).applyTo(label);
 	}
 
-	private void createUI20SmoothSpeed(final Composite parent) {
+	private void createUI_20_SmoothSpeed(final Composite parent) {
 
 		/*
 		 * image: speed
@@ -168,7 +175,7 @@ public class SmoothingAlgorithmJamet implements ISmoothingAlgorithm {
 		_spinnerSpeedTau.addMouseWheelListener(_spinnerMouseWheelListener);
 	}
 
-	private void createUI22SmoothGradient(final Composite parent) {
+	private void createUI_22_SmoothGradient(final Composite parent) {
 
 		/*
 		 * image: gradient
@@ -201,7 +208,7 @@ public class SmoothingAlgorithmJamet implements ISmoothingAlgorithm {
 		_spinnerGradientTau.addMouseWheelListener(_spinnerMouseWheelListener);
 	}
 
-	private void createUI24SmoothPulse(final Composite parent) {
+	private void createUI_24_SmoothPulse(final Composite parent) {
 
 		/*
 		 * image: pulse
@@ -238,7 +245,7 @@ public class SmoothingAlgorithmJamet implements ISmoothingAlgorithm {
 		_spinnerPulseTau.addMouseWheelListener(_spinnerMouseWheelListener);
 	}
 
-	private void createUI26SmoothAltitude(final Composite parent) {
+	private void createUI_26_SmoothAltitude(final Composite parent) {
 
 		/*
 		 * image: altitude
@@ -263,7 +270,7 @@ public class SmoothingAlgorithmJamet implements ISmoothingAlgorithm {
 		_chkIsAltitudeSmoothing.addSelectionListener(_selectionListener);
 	}
 
-	private void createUI30Iterations(final Composite parent) {
+	private void createUI_30_Iterations(final Composite parent) {
 
 		/*
 		 * sync smoothing
@@ -336,7 +343,7 @@ public class SmoothingAlgorithmJamet implements ISmoothingAlgorithm {
 		}
 	}
 
-	private void createUI50Actions(final Composite parent) {
+	private void createUI_50_Actions(final Composite parent) {
 
 		final Composite container = _tk.createComposite(parent);
 		GridDataFactory.fillDefaults().grab(true, true).span(3, 1).applyTo(container);
@@ -428,8 +435,6 @@ public class SmoothingAlgorithmJamet implements ISmoothingAlgorithm {
 		Util.disposeResource(_imageGradient);
 		Util.disposeResource(_imagePulse);
 		Util.disposeResource(_imageSpeed);
-
-		_tk.dispose();
 	}
 
 	private void enableControls() {
@@ -446,8 +451,6 @@ public class SmoothingAlgorithmJamet implements ISmoothingAlgorithm {
 
 		_pc = new PixelConverter(parent);
 		_hintDefaultSpinnerWidth = _isLinux ? SWT.DEFAULT : _pc.convertWidthInCharsToPixels(_isOSX ? 10 : 5);
-
-		_tk = new FormToolkit(parent.getDisplay());
 
 		_selectionListener = new SelectionAdapter() {
 			@Override

@@ -239,7 +239,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 					.applyTo(_smoothingScrolledContent);
 //			_smoothingScrolledContent.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
 			{
-				_smoothingUI.createUI(_smoothingScrolledContent, true);
+				_smoothingUI.createUI(_smoothingScrolledContent, true, true);
 			}
 
 			// setup scrolled container
@@ -864,7 +864,9 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			public String getResultText() {
 
 				return NLS.bind(Messages.Compute_BreakTime_ForAllTour_Job_Result, //
-						new Object[] { net.tourbook.common.UI.format_hh_mm_ss(oldBreakTime[0]), net.tourbook.common.UI.format_hh_mm_ss(newBreakTime[0]), });
+						new Object[] {
+								net.tourbook.common.UI.format_hh_mm_ss(oldBreakTime[0]),
+								net.tourbook.common.UI.format_hh_mm_ss(newBreakTime[0]), });
 			}
 
 			@Override
@@ -882,7 +884,9 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 					newBreakTime[0] += tourRecordingTime - tourDrivingTime;
 
 					subTaskText = NLS.bind(Messages.Compute_BreakTime_ForAllTour_Job_SubTask,//
-							new Object[] { net.tourbook.common.UI.format_hh_mm_ss(oldBreakTime[0]), net.tourbook.common.UI.format_hh_mm_ss(newBreakTime[0]), });
+							new Object[] {
+									net.tourbook.common.UI.format_hh_mm_ss(oldBreakTime[0]),
+									net.tourbook.common.UI.format_hh_mm_ss(newBreakTime[0]), });
 				}
 
 				return subTaskText;

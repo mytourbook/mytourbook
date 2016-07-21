@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -29,9 +29,6 @@ public class TourChartSmoothingView extends ViewPart {
 
 	private FormToolkit			_tk;
 
-//	private ScrolledComposite	_scrolledContainer;
-//	private Composite			_scrolledContent;
-
 	public TourChartSmoothingView() {}
 
 	@Override
@@ -51,35 +48,8 @@ public class TourChartSmoothingView extends ViewPart {
 		GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
-			_smoothingUI.createUI(container, false);
+			_smoothingUI.createUI(container, false, true);
 		}
-
-		/*
-		 * Disabled scrolled container, that the spinner controls can be modified with the mouse
-		 * wheel, otherwise the container is scrolled.
-		 */
-
-//		_scrolledContainer = new ScrolledComposite(parent, SWT.V_SCROLL);
-//		{
-//			_scrolledContent = _tk.createComposite(_scrolledContainer);
-//			GridDataFactory.fillDefaults().applyTo(_scrolledContent);
-//			GridLayoutFactory.swtDefaults().numColumns(1).applyTo(_scrolledContent);
-//			{
-//				_smoothingUI.createUI(_scrolledContent, false);
-//			}
-//
-//			// setup scrolled container
-//			_scrolledContainer.setExpandVertical(true);
-//			_scrolledContainer.setExpandHorizontal(true);
-//			_scrolledContainer.addControlListener(new ControlAdapter() {
-//				@Override
-//				public void controlResized(final ControlEvent e) {
-//					onResizeScrolledContainer(_scrolledContent);
-//				}
-//			});
-//
-//			_scrolledContainer.setContent(_scrolledContent);
-//		}
 	}
 
 	@Override
@@ -90,10 +60,6 @@ public class TourChartSmoothingView extends ViewPart {
 
 		super.dispose();
 	}
-
-//	private void onResizeScrolledContainer(final Composite container) {
-//		_scrolledContainer.setMinSize(container.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-//	}
 
 	@Override
 	public void setFocus() {}

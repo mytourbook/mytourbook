@@ -17,6 +17,7 @@ package net.tourbook.common.action;
 
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.Messages;
+import net.tourbook.common.tooltip.AnimatedToolTipShell;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.widgets.Display;
@@ -25,10 +26,12 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
 
 public class ActionOpenPrefDialog extends Action {
 
-	private String	_prefPageId;
-	private Object	_prefDialogData;
+	private String					_prefPageId;
+	private Object					_prefDialogData;
 
-	private Shell	_shell	= Display.getCurrent().getActiveShell();
+	private Shell					_shell	= Display.getCurrent().getActiveShell();
+
+	private AnimatedToolTipShell	_openedTooltip;
 
 	/**
 	 * @param text
@@ -57,11 +60,26 @@ public class ActionOpenPrefDialog extends Action {
 	@Override
 	public void run() {
 
+		// hide other opened dialog
+		if (_openedTooltip != null) {
+			_openedTooltip.hideNow();
+		}
+
 		PreferencesUtil.createPreferenceDialogOn(//
 				_shell,
 				_prefPageId,
 				null,
 				_prefDialogData).open();
+	}
+
+	/**
+	 * This tooltip will be closed when the pref dialog is opened.
+	 * 
+	 * @param openedTooltip
+	 */
+	public void setCloseThisTooltip(final AnimatedToolTipShell openedTooltip) {
+
+		_openedTooltip = openedTooltip;
 	}
 
 	public void setPrefData(final Object data) {
