@@ -77,9 +77,7 @@ public class SlideoutStatisticOptions extends ToolbarSlideout {
 				Messages.Tour_Action_EditStatisticPreferences,
 				PrefPageStatistic.ID);
 
-		/*
-		 * Set shell to the parent otherwise the pref dialog is closed when the slideout is closed.
-		 */
+		_actionPrefDialog.closeThisTooltip(this);
 		_actionPrefDialog.setShell(_parentShell);
 	}
 

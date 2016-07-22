@@ -93,10 +93,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
 		_actionPrefDialog = new ActionOpenPrefDialog(
 				Messages.Tour_Action_EditChartPreferences,
 				PrefPageAppearanceTourChart.ID);
-
-		/*
-		 * Set shell to the parent otherwise the pref dialog is closed when the slideout is closed.
-		 */
+		_actionPrefDialog.closeThisTooltip(this);
 		_actionPrefDialog.setShell(_tourChart.getShell());
 	}
 

@@ -97,16 +97,11 @@ public class SlideoutTourChartSmoothing extends ToolbarSlideout {
 		_actionPrefDialog = new ActionOpenPrefDialog(
 				Messages.Tour_Action_EditSmoothingPreferences,
 				PrefPageComputedValues.ID);
+		_actionPrefDialog.closeThisTooltip(this);
+		_actionPrefDialog.setShell(_tourChart.getShell());
 
 		// select smoothing folder when opened
 		_actionPrefDialog.setPrefData(PrefPageComputedValues.TAB_FOLDER_SMOOTHING);
-
-		/*
-		 * Set shell to the parent otherwise the pref dialog is closed when the slideout is closed.
-		 */
-		_actionPrefDialog.setShell(_tourChart.getShell());
-
-		_actionPrefDialog.setCloseThisTooltip(this);
 	}
 
 	@Override

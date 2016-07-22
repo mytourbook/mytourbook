@@ -77,7 +77,7 @@ public class ActionOpenPrefDialog extends Action {
 	 * 
 	 * @param openedTooltip
 	 */
-	public void setCloseThisTooltip(final AnimatedToolTipShell openedTooltip) {
+	public void closeThisTooltip(final AnimatedToolTipShell openedTooltip) {
 
 		_openedTooltip = openedTooltip;
 	}

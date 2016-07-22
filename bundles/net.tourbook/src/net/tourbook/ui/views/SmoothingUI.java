@@ -192,30 +192,7 @@ public class SmoothingUI {
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
 		{
 			createUI_10_SmoothingAlgorithm(_uiContainer);
-
-			/*
-			 * pagebook: smoothing algorithm
-			 */
-			_pagebookSmoothingAlgo = new PageBook(_uiContainer, SWT.NONE);
-			GridDataFactory.fillDefaults()//
-					.grab(true, true)
-					.span(2, 1)
-					.applyTo(_pagebookSmoothingAlgo);
-			{
-				_pageInitialUI = _smoothingInitial.createUI(
-						this,
-						_pagebookSmoothingAlgo,
-						_tk,
-						isShowDescription,
-						isShowAdditionalActions);
-
-				_pageJametUI = _smoothingJamet.createUI(
-						this,
-						_pagebookSmoothingAlgo,
-						_tk,
-						isShowDescription,
-						isShowAdditionalActions);
-			}
+			createUI_20_SmoothingPagebook(_uiContainer, isShowDescription, isShowAdditionalActions);
 		}
 	}
 
@@ -232,7 +209,6 @@ public class SmoothingUI {
 			final Label label = _tk.createLabel(container, Messages.TourChart_Smoothing_Label_SmoothingAlgorithm);
 			GridDataFactory.fillDefaults()//
 					.align(SWT.FILL, SWT.CENTER)
-					.grab(true, false)
 					.applyTo(label);
 
 			/*
@@ -241,7 +217,8 @@ public class SmoothingUI {
 			_comboAlgorithm = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
 			_comboAlgorithm.setVisibleItemCount(10);
 			GridDataFactory.fillDefaults()//
-					.align(SWT.END, SWT.FILL)
+//					.align(SWT.END, SWT.FILL)
+					.indent(20, 0)
 					.applyTo(_comboAlgorithm);
 			_tk.adapt(_comboAlgorithm, true, true);
 			_comboAlgorithm.addSelectionListener(new SelectionAdapter() {
@@ -253,6 +230,34 @@ public class SmoothingUI {
 					onSelectSmoothingAlgo();
 				}
 			});
+		}
+	}
+
+	private void createUI_20_SmoothingPagebook(	final Composite parent,
+												final boolean isShowDescription,
+												final boolean isShowAdditionalActions) {
+		/*
+		 * pagebook: smoothing algorithm
+		 */
+		_pagebookSmoothingAlgo = new PageBook(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+				.grab(true, true)
+				.span(2, 1)
+				.applyTo(_pagebookSmoothingAlgo);
+		{
+			_pageInitialUI = _smoothingInitial.createUI(
+					this,
+					_pagebookSmoothingAlgo,
+					_tk,
+					isShowDescription,
+					isShowAdditionalActions);
+
+			_pageJametUI = _smoothingJamet.createUI(
+					this,
+					_pagebookSmoothingAlgo,
+					_tk,
+					isShowDescription,
+					isShowAdditionalActions);
 		}
 	}
 
