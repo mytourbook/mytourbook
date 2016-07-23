@@ -35,8 +35,6 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
@@ -224,12 +222,6 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 
 		_tourData = _tourChart.getTourData();
 
-		shell.addDisposeListener(new DisposeListener() {
-			@Override
-			public void widgetDisposed(final DisposeEvent e) {
-				onDispose();
-			}
-		});
 
 		createActions();
 
@@ -844,7 +836,8 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 		_titleColor = _colorCache.getColor(new RGB(0x50, 0x50, 0x50));
 	}
 
-	private void onDispose() {
+	@Override
+	protected void onDispose() {
 
 		_colorCache.dispose();
 

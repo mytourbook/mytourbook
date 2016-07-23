@@ -30,12 +30,9 @@ import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.MouseWheelListener;
@@ -101,7 +98,6 @@ public class DialogPhotoProperties extends AnimatedToolTipShell implements IPhot
 	private Color					_fgColor;
 	private Color					_bgColor;
 
-	private PixelConverter			_pc;
 	private MapFilterData			_oldMapFilterData;
 
 	/*
@@ -161,13 +157,6 @@ public class DialogPhotoProperties extends AnimatedToolTipShell implements IPhot
 			}
 		});
 
-		ownerControl.addDisposeListener(new DisposeListener() {
-			@Override
-			public void widgetDisposed(final DisposeEvent e) {
-				onDispose();
-			}
-		});
-
 		PhotoManager.addPhotoEventListener(this);
 
 		setToolTipCreateStyle(AnimatedToolTipShell.TOOLTIP_STYLE_KEEP_CONTENT);
@@ -187,8 +176,6 @@ public class DialogPhotoProperties extends AnimatedToolTipShell implements IPhot
 
 	@Override
 	protected Composite createToolTipContentArea(final Composite parent) {
-
-		_pc = new PixelConverter(parent);
 
 		final Composite container = createUI(parent);
 
@@ -394,7 +381,6 @@ public class DialogPhotoProperties extends AnimatedToolTipShell implements IPhot
 	public Point getToolTipLocation(final Point tipSize) {
 
 		final int tipWidth = tipSize.x;
-		final int tipHeight = tipSize.y;
 
 		final int itemWidth = _itemBounds.width;
 		final int itemHeight = _itemBounds.height;
@@ -413,7 +399,8 @@ public class DialogPhotoProperties extends AnimatedToolTipShell implements IPhot
 		return _itemBounds;
 	}
 
-	private void onDispose() {
+	@Override
+	protected void onDispose() {
 
 		PhotoManager.removePhotoEventListener(this);
 	}

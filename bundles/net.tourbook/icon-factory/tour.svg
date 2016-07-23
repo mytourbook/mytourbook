@@ -20,6 +20,17 @@
   <defs
      id="defs2987">
     <linearGradient
+       id="4513">
+      <stop
+         style="stop-color:#9e541d;stop-opacity:1;"
+         offset="0"
+         id="stop5122" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="1"
+         id="stop5124" />
+    </linearGradient>
+    <linearGradient
        id="linearGradient5160">
       <stop
          style="stop-color:#ffffff;stop-opacity:1;"
@@ -114,7 +125,7 @@
          id="stop6485" />
     </linearGradient>
     <linearGradient
-       id="linearGradient4513-8-4-5-3-6-2-7">
+       id="linearGradient5126">
       <stop
          id="stop6475"
          offset="0"
@@ -3869,12 +3880,12 @@
        x1="250.74466"
        gradientUnits="userSpaceOnUse"
        id="linearGradient4780-5"
-       xlink:href="#linearGradient4513-8-4-5-3-6-2-7"
+       xlink:href="#4513"
        inkscape:collect="always" />
     <linearGradient
        id="linearGradient6479">
       <stop
-         style="stop-color:#9e541d;stop-opacity:1;"
+         style="stop-color:#005fb3;stop-opacity:1;"
          offset="0"
          id="stop4515-8-9-2-8-6-6-8" />
       <stop
@@ -3889,7 +3900,7 @@
        x1="270.10889"
        gradientUnits="userSpaceOnUse"
        id="linearGradient4825"
-       xlink:href="#linearGradient4513-8-4-5-3-6-2-7"
+       xlink:href="#4513"
        inkscape:collect="always"
        gradientTransform="translate(3.18e-6,-6.2812512e-8)" />
     <linearGradient
@@ -4153,16 +4164,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="5.6568542"
-     inkscape:cx="223.37323"
-     inkscape:cy="904.0562"
+     inkscape:zoom="22.627417"
+     inkscape:cx="298.105"
+     inkscape:cy="998.117"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
-     inkscape:window-width="1910"
-     inkscape:window-height="1407"
-     inkscape:window-x="309"
-     inkscape:window-y="0"
+     inkscape:window-width="1500"
+     inkscape:window-height="1334"
+     inkscape:window-x="351"
+     inkscape:window-y="74"
      inkscape:window-maximized="0"
      inkscape:snap-grids="true"
      inkscape:snap-page="false"
@@ -4211,13 +4222,6 @@
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\graph-all.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
-    <image
-       y="16.123436"
-       x="100"
-       id="image3859"
-       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAAA3NCSVQICAjb4U/gAAABN0lEQVQo kZWSTU7CUBSFzymNKQoBjYkmBuuAMUthzg7YAUswYcKIGTiFpFtgJRqNUVJsSRigLaK8HgcQavgJ 4Q7fPfd998t7lIRjyjoqvXfACzwv8Ha27J2nruNa3APXVvVH/UWyMInpjXrb3R0EN+tONQVYPisf duj43WK2EJgwXAR5J9/1OwcGLk8vwmQ8NkFgwsCEV7nr7sfDXunWsFU6L4UmhAACAjL4Sj7/Z7h+ uKbfdBzHtjPAMk9BEE1iZnHcuGlsEmZJHCGC2fYEwU1C470RnUQLy4Ci0oAAChCL34X72/uUECv2 4SNZ3gcBACmIICRATFJC/bX+ZD/OrR9olQQACSQEERAssPJbad+1bQATTN40hAEBSQDJ9R9e8Qi8 MAeAtefagIM555umSpdbKlGsqvoHmsa2PAg3dkAAAAAASUVORK5CYII= "
-       height="16"
-       width="16" />
     <path
        style="fill:url(#linearGradient4963);fill-opacity:1;stroke:url(#linearGradient4394);stroke-width:1;stroke-linejoin:round;stroke-linecap:butt"
        d="m 100.5,76.862183 15,0 -7.5,-15 z"
@@ -4236,13 +4240,6 @@
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90"
        sodipodi:nodetypes="cccc" />
-    <image
-       y="16.121487"
-       x="120.36611"
-       id="image4476"
-       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAAA3NCSVQICAjb4U/gAAABEElEQVQo kZWRvU7DQBCEv7UTUBAIpBQ0dEiIko4GRBshoVQpScEb0lDyBHQ8AwJfUITs0DjxDoVtbPIjka1O 9+3s3OyZJLapaKvuzYLZiNloLemsF3RusA1Iq5UN5bl8ruxuFa4b0x1hXYCdh384pAMViYogn8gn Sm+X+Ero7hBNUMADHtgd833f5n8F2RXxGZ6ggCd4IDrGP9st1nxcNqBzTXxaE0OA4e/MHzl4rvbX SjPF9vGk6ZZhtrTf2iG9IL4k6oP9oupsoJz8icPXloNybIFCyavZZXnp02s5fJ0Qn9dXVmnMkLUM ncULR2+lQwEpSsGQYUCdGBqN7QGmaQ/rY1Hz6LKpzG11dIGEPn4ArryxWHn0rpkAAAAASUVORK5C YII= "
-       height="16"
-       width="16" />
     <path
        style="fill:url(#linearGradient4519);fill-opacity:1;stroke:#eede00;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
        d="m 120.5,51.862183 14.99999,0 -7.49999,-15 z"
@@ -4252,13 +4249,6 @@
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90"
        sodipodi:nodetypes="cccc" />
-    <image
-       y="16.121487"
-       x="140.1676"
-       id="image4537"
-       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAAA3NCSVQICAjb4U/gAAAA+ElEQVQo kZWRMW7CQBBF32yWSEhOiCtOkRwiuQc1LX3SQIUsUVm0vk1yCEroEpB2UyDsmEmBrbUVUPAUW+y+ P29WI6pKlzKd6MuBLCPLzr7Y84HBoIshTYkfiGPS9DpDFOG/Ebi7v8KQJBiDdziHgST5L2Bv8B7n q7Nnmc8vjzSdYi37PQgopw2VZRORsLi3V35KjscTDFQZI/Rumc3+GPIC7ytWCTFRovD72jCZsNtR FKANQ6XBGIZDFouG4XBguw1gMNQ3/X7DMB6zWpHnja6K1DlVEAQen1guLYB3fH2GxoFr12YNiI5G fLy32rfGFxREURDh+eUXtZ1pCOqUH8YAAAAASUVORK5CYII= "
-       height="16"
-       width="16" />
     <path
        style="fill:url(#linearGradient4555);fill-opacity:1;stroke:#ff1f1e;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
        d="m 140.5,51.862183 14.99999,0 -7.49999,-15 z"
@@ -4268,13 +4258,6 @@
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90"
        sodipodi:nodetypes="cccc" />
-    <image
-       y="16.059023"
-       x="160.15648"
-       id="image4582"
-       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAAA3NCSVQICAjb4U/gAAABHUlEQVQo kZWRPU7DQBSEvzGLyI9AkANwDQokrkJHxVGo6CgRVSigo6OgoKGIlCI34AAgRJzY6x0KJwQbU7DF Svv2zXzz9GSb/5zsX91/Ch5m1cMsdn6FzupeD6nbq6N6P42joQ4G3E07IB2E3Z4WUZj9fodduzSe xF7QvGBeshMYT9qQtqC/neVReem8JC8Y7ui2qWlEunmJe4NsXhgkGcAqqsai9L2465cYMrayn0wL peSi8ulRaBNiRUoySDaqnSSAlH4Rrp5jlUirhvoyrh+y0rY4Ow4bQqzIS1lghC0Edm1gkIM3hMun +L7AllfmqwHWKDDg0YDzkxCAZeRzWUffBGpoAfSxMKCLx/L1jeTaUN/RWedfjSNkDkd8Ab4Qhjli 82FiAAAAAElFTkSuQmCC "
-       height="16"
-       width="16" />
     <path
        style="fill:url(#linearGradient4600);fill-opacity:1;stroke:#6eacfb;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
        d="m 160.5,51.862183 14.99999,0 -7.49999,-15 z"
@@ -4284,13 +4267,6 @@
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90"
        sodipodi:nodetypes="cccc" />
-    <image
-       y="15.996556"
-       x="180.27031"
-       id="image4627"
-       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAAA3NCSVQICAjb4U/gAAABUUlEQVQo kZWSP0sDQRDF3+zF3EURCxUlJCDo17Gzs0xr68ewsbC2UhCs1EoxCGKlfgE78Q+SGA/Ey93t7jyL M0ZjAmaaZZn33m+GXSGJccqMpR5puGnGN814uIPD6q2Vx+389iL+2xpCuD6PK1MmnDTq/zHS1Umn thJlCbOEteXo8uh1QFAaDAjEGJMmChCCcjiY+Ot+dtCer4VZ16ddnyaaJjpbLZ/ut0YSwlDUM/ug CkRBgEBlOvipke+HO959qa9UgkAICkGg6NDz/q672lgcJESRsblaAOwHFZ6fkK/G4c7zQj0UAxJS BBPFCYpSWw/52ka1TwgrJk+VhEhvEhIEIYCCiKaCPmFv63FmriSQIq+n73l727937PpmTUgebD9N lA1BgVBJEWH/E5MFTrzX7EODpVIjKBnv6B2dpbNUC2fpHZ2jy+mtOgtv6T2txSfYfvjvLDJdigAA AABJRU5ErkJggg== "
-       height="16"
-       width="16" />
     <path
        style="fill:url(#linearGradient4645);fill-opacity:1.0;stroke:#9e77f8;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
        d="m 180.5,51.862183 14.99999,0 -7.49999,-15 z"
@@ -4300,13 +4276,6 @@
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90"
        sodipodi:nodetypes="cccc" />
-    <image
-       y="16.121487"
-       x="200.25919"
-       id="image4672"
-       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAAA3NCSVQICAjb4U/gAAABHElEQVQo kZWSP0vDYBCHn4uJ1dhaKIIQsSLFxS8giJNDQRBBkIBugl/MQQdRXBSEOhTFz+AoUjqIGBEMkkY9 hybNvxbs8W73u3t+d/eKqjJOGGOpRxe4bdz28JQW4+hBbzra6urhfTFpDunx+sVSGYTP8B+Wtm85 aOCFeD32G2y1cvkCQcA28QIAy6CcF2QJ69c0F3gPkrfpsHY1mlCx+FXeAqS/EBBw7IyD5HCrl+zU KcVMFQRQfpSLZx53C4S5Kfxv/MHhU5T6TIGweMbGPIZkpk8+jXL3QsdNEWolPkJQNCOM6wTHZvmc pz0ToHbKyixeEE2JogNLkQ+gf0cTYHoCr5dIRSJGqgTANqmeiE4eU7Hi3jk/uWkEP/wD4IiFUPJA 3v0AAAAASUVORK5CYII= "
-       height="16"
-       width="16" />
     <path
        style="fill:url(#linearGradient4690);fill-opacity:1;stroke:#ff13a6;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
        d="m 200.5,51.862183 14.99999,0 -7.49999,-15 z"
@@ -4316,13 +4285,6 @@
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90"
        sodipodi:nodetypes="cccc" />
-    <image
-       y="16.059021"
-       x="220.49794"
-       id="image4717"
-       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAAA3NCSVQICAjb4U/gAAAA7ElEQVQo kZWRzUoDMRhFzzdNioiI4Fh/Hs+lK1/DnTu3ulCELvtOguLUgtBRp8l10diZ1IrTLEJI7uF85Jok tlnFVuk/gcmMyWwz4DbeHjqsv2E85dRz4hlP+xlKz0dExsj3MDxU7BfUog7sDbiv/gMOHLWYx7SX jsecyUa6feVsSB1pqzE+855sVdxdxW6Bz39HsBDvgfPyl+ErMjQWaqOrQ+hIkuHmBVcw6OQyRjTi YtQxBAjxJ2Sg5ZZhreH6mQak1K4MrYkMwY5xeYwDGjFXegAU16da8jIAu3rSWyBlDIQMU/JYdyRx 5PkGF51tr3Rhe7UAAAAASUVORK5CYII= "
-       height="16"
-       width="16" />
     <path
        style="fill:url(#linearGradient4735);fill-opacity:1;stroke:#0fe1ff;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
        d="m 220.5,51.862183 14.99999,0 -7.49999,-15 z"
@@ -4332,13 +4294,6 @@
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90"
        sodipodi:nodetypes="cccc" />
-    <image
-       y="16.121487"
-       x="240.36188"
-       id="image4762"
-       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAAA3NCSVQICAjb4U/gAAAA9klEQVQo kZWRsUoDQRRFzx1nhQgxdvkJRfAP/BdbW0vBSitNmz6fYmMhCIFgJKBgGRE3orI7ZJ+FCc6YBDdT PZh773lzR2bGOsetpV5teOzx1Ft645cbNpug2oRRF9/Ctxh16xE2tph+APhmDcKwgxwhJ+QIhp3/ DHKE95khTFDG/eXqlQbnyMEXJmSzd1uVBP5+XP8MC1iF/vTjcBm7pwsEC5Rv8zJTT7a9QLg7oXjF yshPhHI02uxfRIRpQTEG0n2i2Tciwu0xk4ckPpZKGCB29ji48gAhp3zBDM2lcUsIDInPZ0B2c8T4 miqk0ZH0Z5Yw0T78BqP0WT7tfu66AAAAAElFTkSuQmCC "
-       height="16"
-       width="16" />
     <path
        style="fill:url(#linearGradient4780);fill-opacity:1;stroke:#ffab00;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
        d="m 240.5,51.862183 14.99999,0 -7.49999,-15 z"
@@ -4348,13 +4303,6 @@
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90"
        sodipodi:nodetypes="cccc" />
-    <image
-       y="16.183952"
-       x="260.16336"
-       id="image4807"
-       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAAA3NCSVQICAjb4U/gAAABN0lEQVQo kZWRvUoDQRSFz92dbFhBooKGkEZBSCMWNj6ED2HlAwRJl8pSC1/AQq0ULUVfQG3S+AIWFoJByS4J OyS43GMxya4/iSHTzbn3nO/eGSGJWY43U/dEg21d2db12JIZqwarW5OyxqjJ/amYopggeTifbuje HZlyTZNYbWQqte7t4ZSRxDNgqjYCBKAE4X+E+LLhL1Y1iTSJ1XaYRGahEl/sTyaYItM+0j5AEOqQ YenHCNnHdU52C9VNMQYEBE4VQKnpy9PS3tkfQiHUQU8GAJwFABQQiITzvwnvxzv+yronMtIJCAGA AiGYtp+X6zc5QfwANlKXKwAzBtU1FMOc0D7Y9ktlACCRQxyIMgwQ7X2Um49mGGOjfBZk6aPth+/C t+aGvDbWvGAuW+mbyd2FeQb52f8CukeAvQ3FLLUAAAAASUVORK5CYII= "
-       height="16"
-       width="16" />
     <path
        style="fill:url(#linearGradient4825);fill-opacity:1;stroke:#9e541d;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
        d="m 260.5,51.862183 14.99999,0 -7.49999,-15 z"
@@ -4502,7 +4450,7 @@
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\graph-gears.png"
        inkscape:connector-curvature="0"
        id="path6328-0"
-       d="m 300.49997,51.862183 14.99999,0 -7.49999,-15 z"
+       d="m 280.49997,51.862183 14.99999,0 -7.49999,-15 z"
        style="fill:url(#linearGradient4966);fill-opacity:1;stroke:url(#linearGradient5004);stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1" />
     <path
        style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:medium;line-height:normal;font-family:sans-serif;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;baseline-shift:baseline;text-anchor:start;white-space:normal;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:#969696;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
@@ -5640,6 +5588,31 @@
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="ccccccccccc"
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\synch-statistics.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       sodipodi:nodetypes="cccc"
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\graph-min-max.png"
+       inkscape:connector-curvature="0"
+       id="use5090"
+       d="m 300.50001,51.862185 15.00011,0 -7.50005,-15.00013 z"
+       style="fill:none;fill-opacity:1;stroke:#369df7;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#8c8c8c;stroke-width:1.00000012px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 304.70005,42.862176 6.6,0 0,0 0,0"
+       id="path5128"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\graph-min-max.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#8c8c8c;stroke-width:1.00000024px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 301.7,48.862186 12.6,0 0,0 0,0"
+       id="path5128-2"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\graph-min-max.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
   </g>

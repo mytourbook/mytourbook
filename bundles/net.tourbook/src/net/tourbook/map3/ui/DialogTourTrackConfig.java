@@ -40,8 +40,6 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseEvent;
@@ -209,13 +207,6 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 
 				// prevent to open the tooltip
 				_canOpenToolTip = false;
-			}
-		});
-
-		ownerControl.addDisposeListener(new DisposeListener() {
-			@Override
-			public void widgetDisposed(final DisposeEvent e) {
-				onDispose();
 			}
 		});
 	}
@@ -1094,10 +1085,6 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 	protected Rectangle noHideOnMouseMove() {
 
 		return _toolTipItemBounds;
-	}
-
-	private void onDispose() {
-
 	}
 
 	private void onModifyConfig() {

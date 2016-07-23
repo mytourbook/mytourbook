@@ -23,8 +23,6 @@ import net.tourbook.map3.view.TVIMap3Layer;
 
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.graphics.Point;
@@ -137,14 +135,6 @@ public class DialogMap3Layer extends AnimatedToolTipShell {
 			_layerUI = new Map3LayerUI(_shellContainer);
 		}
 
-		_shellContainer.addDisposeListener(new DisposeListener() {
-
-			@Override
-			public void widgetDisposed(final DisposeEvent e) {
-				onDispose();
-			}
-		});
-
 		return _shellContainer;
 	}
 
@@ -178,7 +168,8 @@ public class DialogMap3Layer extends AnimatedToolTipShell {
 		return _toolTipItemBounds;
 	}
 
-	private void onDispose() {
+	@Override
+	protected void onDispose() {
 
 		Map3Manager.setMap3LayerDialog(null);
 	}

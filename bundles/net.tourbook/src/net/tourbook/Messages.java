@@ -771,6 +771,8 @@ public class Messages extends NLS {
 	public static String		Image__Graph_Gears;
 	public static String		Image__Graph_Gears_disabled;
 	public static String		Image__Graph_Overlapped;
+	public static String		Image__GraphMinMax;
+	public static String		Image__GraphMinMax_Disabled;
 	public static String		Image__graph_pace_disabled;
 	public static String		Image__graph_power_disabled;
 	public static String		Image__graph_speed_disabled;
@@ -1482,6 +1484,8 @@ public class Messages extends NLS {
 	public static String		Slideout_ChartMarkerOptions_Label_Title;
 
 	public static String		Slideout_ConconiOptions_Label_Title;
+
+	public static String		Slideout_GraphMinMax_Label_Title;
 
 	public static String		Slideout_HVROptions_Checkbox_2xValues;
 	public static String		Slideout_HVROptions_Checkbox_2xValues_Tooltip;

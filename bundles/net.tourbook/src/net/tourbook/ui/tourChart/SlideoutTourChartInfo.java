@@ -27,7 +27,6 @@ import net.tourbook.preferences.PrefPageAppearanceTourChart;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
-import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
@@ -106,7 +105,6 @@ public class SlideoutTourChartInfo extends ToolbarSlideout implements IColorSele
 
 	public SlideoutTourChartInfo(	final Control ownerControl,
 									final ToolBar toolBar,
-									final IDialogSettings state,
 									final TourChart tourChart) {
 
 		super(ownerControl, toolBar);

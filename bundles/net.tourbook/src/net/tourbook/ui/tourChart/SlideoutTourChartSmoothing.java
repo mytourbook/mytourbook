@@ -28,8 +28,6 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -182,13 +180,6 @@ public class SlideoutTourChartSmoothing extends ToolbarSlideout {
 
 	private void initUI(final Composite parent) {
 
-		parent.addDisposeListener(new DisposeListener() {
-
-			@Override
-			public void widgetDisposed(final DisposeEvent e) {
-				onDispose();
-			}
-		});
 	}
 
 	private void onChangeUI() {
@@ -199,7 +190,8 @@ public class SlideoutTourChartSmoothing extends ToolbarSlideout {
 		_tourChart.updateTourChart();
 	}
 
-	private void onDispose() {
+	@Override
+	protected void onDispose() {
 
 		_smoothingUI.dispose();
 	}

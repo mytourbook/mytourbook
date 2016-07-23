@@ -184,6 +184,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	//
 	private Map<String, Action>				_allTourChartActions;
 	private ActionEditQuick					_actionEditQuick;
+	private ActionGraphMinMax				_actionGraphMinMax;
 	private ActionOpenMarkerDialog			_actionOpenMarkerDialog;
 	private ActionTourChartOptions			_actionTourChartOptions;
 	private ActionTourChartSmoothing		_actionTourChartSmoothing;
@@ -280,6 +281,25 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	//
 	private Color							_photoOverlayBGColorLink;
 	private Color							_photoOverlayBGColorTour;
+
+	private class ActionGraphMinMax extends ActionToolbarSlideout {
+
+		public ActionGraphMinMax(final ImageDescriptor imageDescriptor, final ImageDescriptor imageDescriptorDisabled) {
+
+			super(imageDescriptor, imageDescriptorDisabled);
+		}
+
+		@Override
+		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+
+			return new SlideoutGraphMinMax(_parent, toolbar);
+		}
+
+		@Override
+		protected void onBeforeOpenSlideout() {
+			closeOpenedDialogs(this);
+		}
+	}
 
 	private class ActionTourChartOptions extends ActionToolbarSlideout {
 
@@ -1268,6 +1288,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		_actionTourChartSmoothing = new ActionTourChartSmoothing(
 				TourbookPlugin.getImageDescriptor(Messages.Image__Smoothing),
 				TourbookPlugin.getImageDescriptor(Messages.Image__Smoothing_Disabled));
+		_actionGraphMinMax = new ActionGraphMinMax(
+				TourbookPlugin.getImageDescriptor(Messages.Image__GraphMinMax),
+				TourbookPlugin.getImageDescriptor(Messages.Image__GraphMinMax_Disabled));
 		_actionTourInfo = new ActionTourChartInfo(this, _parent);
 		_actionTourMarker = new ActionTourChartMarker(this, _parent);
 
@@ -2455,6 +2478,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		tbm.add(_actionTourMarker);
 		tbm.add(_actionTourInfo);
 		tbm.add(_actionTourChartSmoothing);
+		tbm.add(_actionGraphMinMax);
 		tbm.add(_actionTourChartOptions);
 
 		tbm.update(true);

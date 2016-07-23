@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,7 +23,6 @@ import net.tourbook.ui.tourChart.SlideoutTourChartInfo;
 import net.tourbook.ui.tourChart.TourChart;
 
 import org.eclipse.jface.action.ContributionItem;
-import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -43,9 +42,6 @@ public class ActionTourChartInfo extends ContributionItem implements IOpeningDia
 	private static final String		IMAGE_TOUR_INFO				= Messages.Image__TourInfo;
 	private static final String		IMAGE_TOUR_INFO_DISABLED	= Messages.Image__TourInfo_Disabled;
 
-	private static final String		ID							= "net.tourbook.ui.tourChart.action.ActionTourChartInfo";	//$NON-NLS-1$
-
-	private IDialogSettings			_state						= TourbookPlugin.getState(ID);
 	private String					_dialogId					= getClass().getCanonicalName();
 
 	private TourChart				_tourChart;
@@ -108,7 +104,7 @@ public class ActionTourChartInfo extends ContributionItem implements IOpeningDia
 				}
 			});
 
-			_slideoutTourInfo = new SlideoutTourChartInfo(_parent, _toolBar, _state, _tourChart);
+			_slideoutTourInfo = new SlideoutTourChartInfo(_parent, _toolBar, _tourChart);
 
 			updateUI();
 		}

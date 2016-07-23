@@ -36,8 +36,6 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Point;
@@ -161,13 +159,6 @@ public class TourSegmenterTooltip extends AnimatedToolTipShell implements ITourP
 		if (_hoveredSegment == null) {
 			return null;
 		}
-
-		shell.addDisposeListener(new DisposeListener() {
-			@Override
-			public void widgetDisposed(final DisposeEvent e) {
-				onDispose();
-			}
-		});
 
 		final Display display = shell.getDisplay();
 
@@ -630,10 +621,6 @@ public class TourSegmenterTooltip extends AnimatedToolTipShell implements ITourP
 
 			return isInNoHideArea;
 		}
-	}
-
-	private void onDispose() {
-
 	}
 
 	@Override

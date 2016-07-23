@@ -1026,6 +1026,11 @@ public abstract class AnimatedToolTipShell {
 
 	}
 
+	/**
+	 * Is called when the shell is disposed.
+	 */
+	protected void onDispose() {}
+
 	private void onDispose(final Event event) {
 
 		if (_shell == null || _shell.isDisposed()) {
@@ -1251,10 +1256,10 @@ public abstract class AnimatedToolTipShell {
 
 		case SWT.Dispose:
 
+			onDispose();
+
 			break;
-
 		}
-
 	}
 
 	private void removeDisplayFilterListener() {
