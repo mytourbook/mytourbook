@@ -2,7 +2,7 @@
 <feature
       id="feature.net.tourbook.app"
       label="MyTourbook Application"
-      version="16.7.0.qualifier"
+      version="16.8.0.qualifier"
       provider-name="MyTourbook"
       plugin="net.tourbook.branding">
 
@@ -49,7 +49,7 @@
       <import plugin="org.eclipse.equinox.p2.touchpoint.eclipse"/>
       <import plugin="org.eclipse.equinox.p2.transport.ecf"/>
       <import plugin="org.eclipse.equinox.p2.ui"/>
-      <import feature="feature.net.tourbook.app.version" version="16.7.0" match="equivalent"/>
+      <import feature="feature.net.tourbook.app.version" version="16.8.0" match="equivalent"/>
    </requires>
 
    <plugin

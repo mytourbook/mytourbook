@@ -1,4 +1,4 @@
-Version 16.7                                                ?. July 2016
+Version 16.8                                              2. August 2016
 
 New 	
 ===
@@ -21,7 +21,7 @@ New
   - Sort statistics sequence by data/time (in the preference dialog)
 
 
-  When MyTourbook is opened with version 16.7 then the "old" statistic 
+  When MyTourbook is opened with version 16.8 then the "old" statistic 
   view is not displayed any more.
 
   To open the "new" statistic view, select Directory / Statistics in 
@@ -40,11 +40,19 @@ New
 Improvements 	
 ============
 
+* Tour Chart
+
+  Easier acces to existing tools
+
+  - Chart slideout for the chart smoothing tool
+  - Chart slideout for the graph min/max values, this is a replacement 
+    for the preference page
+
+
 * Map
 
   - Keep map position when a tour is saved, e.g. setting the tour marker 
     position in the tour chart (which also saves the tour).
-
  
 
 * Icons

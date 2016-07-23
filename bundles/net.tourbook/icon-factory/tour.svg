@@ -4164,30 +4164,30 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="22.627417"
-     inkscape:cx="298.105"
-     inkscape:cy="998.117"
+     inkscape:zoom="32"
+     inkscape:cx="310.19902"
+     inkscape:cy="1002.8221"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
-     inkscape:window-width="1500"
-     inkscape:window-height="1334"
-     inkscape:window-x="351"
-     inkscape:window-y="74"
-     inkscape:window-maximized="0"
+     inkscape:window-width="1427"
+     inkscape:window-height="1333"
+     inkscape:window-x="324"
+     inkscape:window-y="75"
+     inkscape:window-maximized="1"
      inkscape:snap-grids="true"
      inkscape:snap-page="false"
      inkscape:snap-to-guides="false"
      inkscape:snap-nodes="true"
      showguides="true"
-     inkscape:snap-global="true"
+     inkscape:snap-global="false"
      inkscape:snap-bbox="true"
      inkscape:bbox-paths="true"
      inkscape:bbox-nodes="true"
-     inkscape:snap-bbox-edge-midpoints="false"
+     inkscape:snap-bbox-edge-midpoints="true"
      inkscape:snap-bbox-midpoints="true"
      inkscape:object-nodes="true"
-     inkscape:snap-object-midpoints="false">
+     inkscape:snap-object-midpoints="true">
     <inkscape:grid
        type="xygrid"
        id="grid2993"
@@ -5591,29 +5591,13 @@
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <path
-       sodipodi:nodetypes="cccc"
+       sodipodi:nodetypes="ccccccccccccccccccccccccccccccccccc"
        inkscape:export-ydpi="90"
        inkscape:export-xdpi="90"
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\graph-min-max.png"
        inkscape:connector-curvature="0"
        id="use5090"
-       d="m 300.50001,51.862185 15.00011,0 -7.50005,-15.00013 z"
-       style="fill:none;fill-opacity:1;stroke:#369df7;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
-    <path
-       style="fill:none;fill-rule:evenodd;stroke:#8c8c8c;stroke-width:1.00000012px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 304.70005,42.862176 6.6,0 0,0 0,0"
-       id="path5128"
-       inkscape:connector-curvature="0"
-       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\graph-min-max.png"
-       inkscape:export-xdpi="90"
-       inkscape:export-ydpi="90" />
-    <path
-       style="fill:none;fill-rule:evenodd;stroke:#8c8c8c;stroke-width:1.00000024px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 301.7,48.862186 12.6,0 0,0 0,0"
-       id="path5128-2"
-       inkscape:connector-curvature="0"
-       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\graph-min-max.png"
-       inkscape:export-xdpi="90"
-       inkscape:export-ydpi="90" />
+       d="m 301.90627,49.049661 c 0.3125,-0.625009 0.625,-1.250013 0.93751,-1.875017 l 0.46875,-0.937508 0.46876,-0.937508 0.46875,-0.937508 c 0.34958,-0.689384 0.68697,-1.384766 1.0259,-2.079414 m -0.0387,0.08286 0.41903,-0.815974 0.46875,-0.937508 0.46876,-0.937509 0.46875,-0.937508 0.46876,-0.937508 0.46875,-0.937508 0.46875,0.937508 0.46876,0.937508 0.46875,0.937508 0.46875,0.937509 0.46876,0.937508 0.38036,0.793877 m -0.0276,-0.06077 0.58476,1.141906 0.46875,0.937508 0.46876,0.937508 0.46875,0.937508 0.46875,0.937508 0.46876,0.937508 0.375,0.765634 -11.98473,-0.04687 -0.57786,1.156258 -0.46876,0.937508 -0.46875,0.937508 15.00011,0 -0.46875,-0.937508 -0.46876,-0.937508 -0.5625,-1.109383"
+       style="fill:#369df7;fill-opacity:1;stroke:#369df7;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
   </g>
 </svg>
