@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="WINDOWS-1252"?><jardesc>
+    <jar path="net.tourbook.ext.jars/lat-lon-timezone-converter-2016-05-04.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/net.tourbook.ext.jars/create-lat-long-timezone-converter-jar.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
+    <selectedProjects/>
+    <manifest generateManifest="true" manifestLocation="" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
+        <sealing sealJar="false">
+            <packagesToSeal/>
+            <packagesToUnSeal/>
+        </sealing>
+    </manifest>
+    <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
+        <javaElement handleIdentifier="=LatLongToTimezone/src\/main\/java&lt;com.skedgo.converter"/>
+    </selectedElements>
+</jardesc>
