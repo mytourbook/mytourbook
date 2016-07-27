@@ -301,6 +301,9 @@ public class Messages extends NLS {
 	public static String		ColumnFactory_TimeDelta_Header;
 	public static String		ColumnFactory_TimeDelta_Label;
 	public static String		ColumnFactory_TimeDelta_Tooltip;
+	public static String		ColumnFactory_TimeZone_Header;
+	public static String		ColumnFactory_TimeZone_Label;
+	public static String		ColumnFactory_TimeZone_Tooltip;
 	public static String		ColumnFactory_Tour_DayTime;
 	public static String		ColumnFactory_Tour_DayTime_Tooltip;
 	public static String		ColumnFactory_Tour_WeekDay_Header;

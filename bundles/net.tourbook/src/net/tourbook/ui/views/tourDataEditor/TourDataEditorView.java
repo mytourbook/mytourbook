@@ -44,7 +44,7 @@ import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
-import net.tourbook.common.time.TimeUtils;
+import net.tourbook.common.time.TimeZoneUtils;
 import net.tourbook.common.time.TimeZone;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.ToolbarSlideout;
@@ -461,7 +461,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	//
 	// ################################################## UI controls ##################################################
 	//
-	
 
 	private Composite							_pageNoData;
 	private Form								_pageEditorForm;
@@ -515,7 +514,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	//
 	private Button								_rdoCadence_Rpm;
 	private Button								_rdoCadence_Spm;
-	//	
+	//
 	private CLabel								_lblCloudIcon;
 	private CLabel								_lblTourType;
 	//
@@ -533,6 +532,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private Label								_lblAltitudeDownUnit;
 	private Label								_lblSpeedUnit;
 	private Label								_lblTemperatureUnit;
+	private Label								_lblTimeZoneOffset;
 	private Label								_lblTourDistanceUnit;
 	private Label								_lblTourTags;
 	//
@@ -556,7 +556,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private TimeDuration						_timeDriving;
 	private TimeDuration						_timePaused;
 	private TimeDuration						_timeRecording;
-	//	
+	//
 	/*
 	 * tab: info
 	 */
@@ -2448,8 +2448,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
 			createUISection_122_DateTime_Col1(container);
-			createUISection_124_DateTime_Col2(container);
-			createUISection_126_DateTime_TimeZone(container);
+			createUISection_123_DateTime_Col2(container);
+
+			createUISection_125_DateTime_TimeZone(container);
+
+			createUISection_127_DateTime_Col1(container);
+			createUISection_128_DateTime_Col2(container);
 		}
 	}
 
@@ -2466,7 +2470,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			/*
 			 * date
 			 */
-			Label label = _tk.createLabel(container, Messages.tour_editor_label_tour_date);
+			final Label label = _tk.createLabel(container, Messages.tour_editor_label_tour_date);
 			_firstColumnControls.add(label);
 
 			_dtTourDate = new DateTime(container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
@@ -2476,11 +2480,98 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			//////////////////////////////////////
 			createUISeparator(container);
+		}
+	}
 
+	/**
+	 * 2. column
+	 */
+	private void createUISection_123_DateTime_Col2(final Composite section) {
+
+		final Composite container = _tk.createComposite(section);
+		GridDataFactory.fillDefaults().applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		{
+			{
+				/*
+				 * start time
+				 */
+				final Label label = _tk.createLabel(container, Messages.tour_editor_label_start_time);
+				_secondColumnControls.add(label);
+
+				_dtStartTime = new DateTime(container, SWT.TIME | SWT.MEDIUM | SWT.BORDER);
+				_tk.adapt(_dtStartTime, true, false);
+				_dtStartTime.addSelectionListener(_dateTimeListener);
+			}
+		}
+	}
+
+	private void createUISection_125_DateTime_TimeZone(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+				.grab(false, false)
+				.span(2, 1)
+				.applyTo(container);
+		GridLayoutFactory.fillDefaults()//
+				.numColumns(3)
+				.applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
+		{
+			/*
+			 * Time zone
+			 */
+
+			{
+				// label
+				final Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_TimeZone);
+				_firstColumnControls.add(label);
+			}
+
+			{
+				// label: offset
+				_lblTimeZoneOffset = _tk.createLabel(container, UI.EMPTY_STRING);
+				GridDataFactory.fillDefaults()//
+						.grab(true, false)
+						.align(SWT.FILL, SWT.CENTER)
+						.applyTo(_lblTimeZoneOffset);
+			}
+
+			{
+				// combo
+				_comboTimeZone = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
+				_comboTimeZone.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+
+						if (_isSetField || _isSavingInProgress) {
+							return;
+						}
+						updateUI_TimeZone();
+					}
+				});
+
+				_tk.adapt(_comboTimeZone, true, false);
+
+				// fill combobox
+				for (final TimeZone timeZone : TimeZoneUtils.getAllTimeZones()) {
+					_comboTimeZone.add(timeZone.zoneId);
+				}
+			}
+		}
+	}
+
+	private void createUISection_127_DateTime_Col1(final Composite section) {
+
+		final Composite container = _tk.createComposite(section);
+		GridDataFactory.fillDefaults().applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+		_firstColumnContainerControls.add(container);
+		{
 			/*
 			 * tour distance
 			 */
-			label = _tk.createLabel(container, Messages.tour_editor_label_tour_distance);
+			Label label = _tk.createLabel(container, Messages.tour_editor_label_tour_distance);
 			_firstColumnControls.add(label);
 
 			_txtTourDistance = _tk.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
@@ -2548,24 +2639,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	/**
 	 * 2. column
 	 */
-	private void createUISection_124_DateTime_Col2(final Composite section) {
+	private void createUISection_128_DateTime_Col2(final Composite section) {
 
 		final Composite container = _tk.createComposite(section);
 		GridDataFactory.fillDefaults().applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 		{
-			{
-				/*
-				 * start time
-				 */
-				final Label label = _tk.createLabel(container, Messages.tour_editor_label_start_time);
-				_secondColumnControls.add(label);
-
-				_dtStartTime = new DateTime(container, SWT.TIME | SWT.MEDIUM | SWT.BORDER);
-				_tk.adapt(_dtStartTime, true, false);
-				_dtStartTime.addSelectionListener(_dateTimeListener);
-			}
-
 			{
 				/*
 				 * recording time
@@ -2596,38 +2675,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				_timeDriving = new TimeDuration(container);
 			}
 		}
-	}
-
-	private void createUISection_126_DateTime_TimeZone(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-				.grab(true, false)
-				.span(2, 1)
-				.applyTo(container);
-		GridLayoutFactory.fillDefaults()//
-				.numColumns(2)
-				.applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
-		{
-			/*
-			 * Time zone
-			 */
-			final Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_TimeZone);
-			_firstColumnControls.add(label);
-
-			// combo
-			_comboTimeZone = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
-			_comboTimeZone.addSelectionListener(_selectionListener);
-
-			_tk.adapt(_comboTimeZone, true, false);
-
-			// fill combobox
-			for (final TimeZone timeZone : TimeUtils.getAllTimeZones()) {
-				_comboTimeZone.add(timeZone.label);
-			}
-		}
-
 	}
 
 	private void createUISection_130_Personal(final Composite parent) {
@@ -4579,16 +4626,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		TourManager.fireEvent(TourEventId.TOUR_CHANGED, tourEvent, TourDataEditorView.this);
 	}
 
-//	@Override
-//	public Object getAdapter(final Class adapter) {
-//
-//		if (adapter == ColumnViewer.class) {
-//			return _sliceViewer;
-//		}
-//
-//		return Platform.getAdapterManager().getAdapter(this, adapter);
-//	}
-
 	/**
 	 * select the chart slider(s) according to the selected marker(s)
 	 * 
@@ -4695,6 +4732,16 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		return sliderSelection;
 	}
 
+//	@Override
+//	public Object getAdapter(final Class adapter) {
+//
+//		if (adapter == ColumnViewer.class) {
+//			return _sliceViewer;
+//		}
+//
+//		return Platform.getAdapterManager().getAdapter(this, adapter);
+//	}
+
 	@Override
 	public ColumnManager getColumnManager() {
 
@@ -4791,31 +4838,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		return 0;
 	}
 
-//	/**
-//	 * Converts a string into a int value
-//	 *
-//	 * @param valueText
-//	 * @return Returns the float value for the parameter valueText, return <code>0</code>
-//	 * @throws IllegalArgumentException
-//	 */
-//	private int getIntValue(String valueText) throws IllegalArgumentException {
-//
-//		valueText = valueText.trim();
-//		if (valueText.length() == 0) {
-//
-//			return 0;
-//
-//		} else {
-//
-//			final Object convertedValue = StringToNumberConverter.toInteger(true).convert(valueText);
-//			if (convertedValue instanceof Integer) {
-//				return ((Integer) convertedValue).intValue();
-//			}
-//		}
-//
-//		return 0;
-//	}
-
 	private TimeSlice[] getRemainingSliceItems(final Object[] dataViewerItems, final int firstIndex, final int lastIndex) {
 
 		final int oldSerieLength = dataViewerItems.length;
@@ -4853,6 +4875,31 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		return newViewerItems;
 	}
+
+//	/**
+//	 * Converts a string into a int value
+//	 *
+//	 * @param valueText
+//	 * @return Returns the float value for the parameter valueText, return <code>0</code>
+//	 * @throws IllegalArgumentException
+//	 */
+//	private int getIntValue(String valueText) throws IllegalArgumentException {
+//
+//		valueText = valueText.trim();
+//		if (valueText.length() == 0) {
+//
+//			return 0;
+//
+//		} else {
+//
+//			final Object convertedValue = StringToNumberConverter.toInteger(true).convert(valueText);
+//			if (convertedValue instanceof Integer) {
+//				return ((Integer) convertedValue).intValue();
+//			}
+//		}
+//
+//		return 0;
+//	}
 
 	@Override
 	public ArrayList<TourData> getSelectedTours() {
@@ -6891,6 +6938,23 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_timeRecording.setTime(recTime / 3600, ((recTime % 3600) / 60), ((recTime % 3600) % 60));
 		_timeDriving.setTime(driveTime / 3600, ((driveTime % 3600) / 60), ((driveTime % 3600) % 60));
 		_timePaused.setTime(pausedTime / 3600, ((pausedTime % 3600) / 60), ((pausedTime % 3600) % 60));
+	}
+
+	private void updateUI_TimeZone() {
+
+		final int selectedTimeZoneIndex = _comboTimeZone.getSelectionIndex();
+
+		if (selectedTimeZoneIndex == -1) {
+			return;
+		}
+
+		final ArrayList<TimeZone> allTimeZone = TimeZoneUtils.getAllTimeZones();
+		final TimeZone selectedTimeZone = allTimeZone.get(selectedTimeZoneIndex);
+
+		// update
+		_lblTimeZoneOffset.setText(TimeZoneUtils.printOffset(selectedTimeZone.zoneOffset));
+
+		setTourDirty();
 	}
 
 	/**

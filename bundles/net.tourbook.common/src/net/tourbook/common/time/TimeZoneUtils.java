@@ -23,7 +23,7 @@ import org.joda.time.DateTimeConstants;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.FormatUtils;
 
-public class TimeUtils {
+public class TimeZoneUtils {
 
 	private static ArrayList<TimeZone>	_allSortedTimeZones;
 
@@ -44,7 +44,7 @@ public class TimeUtils {
 				final int dtZoneOffset = dtZone.getOffset(0);
 				final String dtZoneNameKey = dtZone.getNameKey(0);
 
-				final String label = TimeUtils.printOffset(dtZoneOffset) + UI.SPACE4 + dtZoneId;
+				final String label = TimeZoneUtils.printOffset(dtZoneOffset) + UI.SPACE4 + dtZoneId;
 
 				final TimeZone timeZone = new TimeZone();
 
@@ -80,6 +80,44 @@ public class TimeUtils {
 		}
 
 		return _allSortedTimeZones;
+	}
+
+	/**
+	 * @param timeZoneId
+	 * @return Returns the timezone for the ID or <code>null</code> when not available.
+	 */
+	public static TimeZone getTimeZone(final String timeZoneId) {
+
+		final ArrayList<TimeZone> allTimeZones = getAllTimeZones();
+
+		for (final TimeZone timeZone : allTimeZones) {
+
+			if (timeZone.zoneId.equals(timeZoneId)) {
+				return timeZone;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * @param timeZoneId
+	 * @return Returns the timezone index for the timezone ID or -1 when not available.
+	 */
+	public static int getTimeZoneIndex(final String timeZoneId) {
+
+		final ArrayList<TimeZone> allTimeZones = getAllTimeZones();
+
+		for (int timeZoneIndex = 0; timeZoneIndex < allTimeZones.size(); timeZoneIndex++) {
+
+			final TimeZone timeZone = allTimeZones.get(timeZoneIndex);
+
+			if (timeZone.zoneId.equals(timeZoneId)) {
+				return timeZoneIndex;
+			}
+		}
+
+		return -1;
 	}
 
 	/**

@@ -35,6 +35,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.formatter.FormatManager;
+import net.tourbook.common.time.TimeZoneUtils;
 import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.tooltip.OpenDialogManager;
 import net.tourbook.common.util.ColumnDefinition;
@@ -804,6 +805,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 		defineColumn_1stColumn_Date();
 		defineColumn_Time_WeekDay();
 		defineColumn_Time_TourStartTime();
+		defineColumn_Time_TimeZone();
 		defineColumn_Time_DrivingTime();
 		defineColumn_Time_RecordingTime();
 		defineColumn_Time_PausedTime();
@@ -1801,6 +1803,29 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				colDef.printLongValue(cell, value, element instanceof TVITourBookTour);
 
 				setCellColor(cell, element);
+			}
+		});
+	}
+
+	/**
+	 * column: Timezone
+	 */
+	private void defineColumn_Time_TimeZone() {
+
+		final TreeColumnDefinition colDef = TreeColumnFactory.TIME_TIME_ZONE.createColumn(_columnManager, _pc);
+
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final Object element = cell.getElement();
+				if (element instanceof TVITourBookTour) {
+
+					final int timeZoneOffset = ((TVITourBookTour) element).colTimeZoneOffset;
+
+					cell.setText(TimeZoneUtils.printOffset(timeZoneOffset));
+					setCellColor(cell, element);
+				}
 			}
 		});
 	}

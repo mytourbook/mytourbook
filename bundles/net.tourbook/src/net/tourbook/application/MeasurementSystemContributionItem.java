@@ -40,6 +40,8 @@ public class MeasurementSystemContributionItem extends CustomControlContribution
 
 	private final static IPreferenceStore	_prefStore				= TourbookPlugin.getDefault().getPreferenceStore();
 
+	private static int						_oldSystemIndex			= Integer.MIN_VALUE;
+
 	private IPropertyChangeListener			_prefChangeListener;
 
 	private boolean							_isFireSelectionEvent	= true;
@@ -75,6 +77,13 @@ public class MeasurementSystemContributionItem extends CustomControlContribution
 	 *            0...metric, 1...imperial
 	 */
 	public static void selectSystemInPrefStore(final int systemIndex) {
+
+		if (systemIndex == _oldSystemIndex) {
+			// nothing has changed
+			return;
+		}
+
+		_oldSystemIndex = systemIndex;
 
 		if (systemIndex == 0) {
 
@@ -180,6 +189,7 @@ public class MeasurementSystemContributionItem extends CustomControlContribution
 		_combo.setToolTipText(Messages.App_measurement_tooltip);
 
 		_combo.addDisposeListener(new DisposeListener() {
+			@Override
 			public void widgetDisposed(final DisposeEvent e) {
 				_prefStore.removePropertyChangeListener(_prefChangeListener);
 			}

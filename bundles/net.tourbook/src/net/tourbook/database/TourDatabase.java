@@ -51,6 +51,8 @@ import net.tourbook.Messages;
 import net.tourbook.application.MyTourbookSplashHandler;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.NIO;
+import net.tourbook.common.time.TimeZone;
+import net.tourbook.common.time.TimeZoneUtils;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourBike;
@@ -91,14 +93,16 @@ import org.eclipse.ui.PlatformUI;
 import org.joda.time.DateTime;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
+import com.skedgo.converter.TimezoneMapper;
 
 public class TourDatabase {
 
 	/**
 	 * version for the database which is required that the tourbook application works successfully
 	 */
-	private static final int						TOURBOOK_DB_VERSION							= 31;
+	private static final int						TOURBOOK_DB_VERSION							= 32;
 
+//	private static final int						TOURBOOK_DB_VERSION							= 32;	// >16.8
 //	private static final int						TOURBOOK_DB_VERSION							= 31;	// 16.5
 //	private static final int						TOURBOOK_DB_VERSION							= 30;	// 16.1
 //	private static final int						TOURBOOK_DB_VERSION							= 29;	// 15.12
@@ -2595,12 +2599,18 @@ public class TourDatabase {
 				//
 				// version 30 end ---------
 
-				// version 31 start  -  16.5?
+				// version 31 start  -  16.5
 				//
 				+ "	CadenceMultiplier						FLOAT DEFAULT 1.0,								\n" //$NON-NLS-1$
 				+ " IsStrideSensorPresent					INTEGER DEFAULT 0,								\n" //$NON-NLS-1$
 				//
 				// version 31 end ---------
+
+				// version 32 start  -  >16.8 ???
+				//
+				+ " TimeZoneOffset							INTEGER DEFAULT 0,								\n" //$NON-NLS-1$
+				//
+				// version 32 end ---------
 
 				+ "	serieData				BLOB 															\n" //$NON-NLS-1$
 
@@ -4090,6 +4100,15 @@ public class TourDatabase {
 			}
 
 			/*
+			 * 31 -> 32
+			 */
+			boolean isPostUpdate32 = false;
+			if (currentDbVersion == 31) {
+				isPostUpdate32 = true;
+				currentDbVersion = newVersion = updateDbDesign_031_to_032(conn, monitor);
+			}
+
+			/*
 			 * update version number
 			 */
 			updateDbDesign_VersionNumber(conn, newVersion);
@@ -4131,6 +4150,9 @@ public class TourDatabase {
 			}
 			if (isPostUpdate29) {
 				updateDbDesign_028_to_029_PostUpdate(conn, monitor);
+			}
+			if (isPostUpdate32) {
+				updateDbDesign_031_to_032_PostUpdate(conn, monitor);
 			}
 
 		} catch (final SQLException e) {
@@ -5962,6 +5984,85 @@ public class TourDatabase {
 		logDb_UpdateEnd(newDbVersion);
 
 		return newDbVersion;
+	}
+
+	private int updateDbDesign_031_to_032(final Connection conn, final IProgressMonitor monitor) throws SQLException {
+
+		final int newDbVersion = 32;
+
+		logDb_UpdateStart(newDbVersion);
+		updateMonitor(monitor, newDbVersion);
+
+		final Statement stmt = conn.createStatement();
+		{
+			// check if db is updated to version 32
+			if (isColumnAvailable(conn, TABLE_TOUR_DATA, "TimeZoneOffset") == false) { //$NON-NLS-1$
+
+				// Add new columns
+				SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "TimeZoneOffset", DEFAULT_0); //$NON-NLS-1$
+			}
+		}
+		stmt.close();
+
+		logDb_UpdateEnd(newDbVersion);
+
+		return newDbVersion;
+	}
+
+	/**
+	 * Set timezone in a tour to the tour starting point when lat/lon is available.
+	 * 
+	 * @param conn
+	 * @param monitor
+	 * @throws SQLException
+	 */
+	private void updateDbDesign_031_to_032_PostUpdate(final Connection conn, final IProgressMonitor monitor)
+			throws SQLException {
+
+		int tourIdx = 1;
+		final ArrayList<Long> tourList = getAllTourIds();
+
+		final EntityManager em = TourDatabase.getInstance().getEntityManager();
+		try {
+
+			// loop: all tours
+			for (final Long tourId : tourList) {
+
+				if (monitor != null) {
+
+					monitor.subTask(NLS.bind(//
+							Messages.Tour_Database_PostUpdate_032_SetTourTimeZone,
+							new Object[] { tourIdx, tourList.size() }));
+
+					tourIdx++;
+				}
+
+				final TourData tourData = em.find(TourData.class, tourId);
+
+				if (tourData != null && tourData.latitudeSerie != null) {
+
+					final double lat = tourData.latitudeSerie[0];
+					final double lon = tourData.longitudeSerie[0];
+
+					final String timeZoneId = TimezoneMapper.latLngToTimezoneString(lat, lon);
+
+					final TimeZone timeZone = TimeZoneUtils.getTimeZone(timeZoneId);
+					if (timeZone != null) {
+
+						tourData.setTimeZoneOffset(timeZone.zoneOffset);
+
+						TourDatabase.saveEntity(tourData, tourId, TourData.class);
+					}
+				}
+			}
+
+		} catch (final Exception e) {
+			e.printStackTrace();
+		} finally {
+
+			em.close();
+		}
+
 	}
 
 	private void updateDbDesign_VersionNumber(final Connection conn, final int newVersion) throws SQLException {

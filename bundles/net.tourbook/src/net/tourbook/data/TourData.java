@@ -164,8 +164,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	@Transient
 	private static IPreferenceStore								_prefStore							= TourbookPlugin
-																											.getDefault()
-																											.getPreferenceStore();
+																											.getPrefStore();
 
 	/**
 	 * This instance is static, otherwise each TourData creation creates a new instance which can
@@ -261,6 +260,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 */
 	@XmlElement
 	private long												tourDrivingTime;
+
+	/**
+	 * Timezone offset in ms
+	 * 
+	 * @since Is long since db version 22, before it was int
+	 */
+	private int													timeZoneOffset;
 
 	// ############################################# DISTANCE #############################################
 
@@ -6014,6 +6020,10 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		return getTimeSerieDouble();
 	}
 
+	public int getTimeZoneOffset() {
+		return timeZoneOffset;
+	}
+
 	public int getTourAltDown() {
 		return tourAltDown;
 	}
@@ -7072,6 +7082,10 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 
 	public void setTimeSerieDouble(final double[] timeSerieDouble) {
 		this.timeSerieDouble = timeSerieDouble;
+	}
+
+	public void setTimeZoneOffset(final int timeZoneOffset) {
+		this.timeZoneOffset = timeZoneOffset;
 	}
 
 	public void setTourAltDown(final float tourAltDown) {

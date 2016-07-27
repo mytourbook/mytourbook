@@ -67,6 +67,7 @@ public abstract class TreeColumnFactory {
 	public static final TreeColumnFactory	TIME_PAUSED_TIME;
 	public static final TreeColumnFactory	TIME_PAUSED_TIME_RELATIVE;
 	public static final TreeColumnFactory	TIME_RECORDING_TIME;
+	public static final TreeColumnFactory	TIME_TIME_ZONE;
 	public static final TreeColumnFactory	TIME_TOUR_START_TIME;
 	public static final TreeColumnFactory	TIME_WEEK_DAY;
 	public static final TreeColumnFactory	TIME_WEEK_NO;
@@ -880,7 +881,6 @@ public abstract class TreeColumnFactory {
 			};
 		};
 
-
 		/*
 		 * Time
 		 */
@@ -995,6 +995,26 @@ public abstract class TreeColumnFactory {
 						ValueFormat.TIME_HH,
 						ValueFormat.TIME_HH_MM,
 						columnManager);
+
+				return colDef;
+			};
+		};
+
+		TIME_TIME_ZONE = new TreeColumnFactory() {
+
+			@Override
+			public TreeColumnDefinition createColumn(	final ColumnManager columnManager,
+														final PixelConverter pixelConverter) {
+
+				final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TIME_TIME_ZONE", //$NON-NLS-1$
+						SWT.TRAIL);
+
+				colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
+				colDef.setColumnLabel(Messages.ColumnFactory_TimeZone_Label);
+				colDef.setColumnHeaderText(Messages.ColumnFactory_TimeZone_Header);
+				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_TimeZone_Tooltip);
+
+				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
 				return colDef;
 			};

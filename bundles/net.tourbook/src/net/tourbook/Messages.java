@@ -1172,8 +1172,10 @@ public class Messages extends NLS {
 	public static String		Pref_General_CalendarWeek;
 	public static String		Pref_General_Dialog_CalendarWeekIsModified_Message;
 	public static String		Pref_General_Dialog_CalendarWeekIsModified_Title;
+	public static String		Pref_General_Group_TimeZone;
 	public static String		Pref_General_Label_FirstDayOfWeek;
 	public static String		Pref_General_Label_FirstDayOfWeek_Tooltip;
+	public static String		Pref_General_Label_LocalTimeZone;
 	public static String		Pref_General_Label_MeasurementSystem;
 	public static String		Pref_General_Label_MinimalDaysInFirstWeek;
 	public static String		Pref_General_Label_MinimalDaysInFirstWeek_Tooltip;
@@ -1661,6 +1663,7 @@ public class Messages extends NLS {
 	public static String		Tour_Database_load_all_tours;
 	public static String		Tour_Database_PostUpdate_028_SetAvgPulse;
 	public static String		Tour_Database_PostUpdate_029_SetImportFileName;
+	public static String		Tour_Database_PostUpdate_032_SetTourTimeZone;
 	public static String		Tour_Database_PostUpdate011_SetTourCreateTime;
 	public static String		Tour_Database_PostUpdate020_ConvertIntToFloat;
 	public static String		Tour_Database_PostUpdate021_SetTourStartEndTime;

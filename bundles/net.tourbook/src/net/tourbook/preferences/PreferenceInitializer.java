@@ -470,5 +470,16 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		 */
 		store.setDefault(ITourbookPreferences.HRV_OPTIONS_2X_ERROR_TOLERANCE, 20); // milliseconds
 		store.setDefault(ITourbookPreferences.HRV_OPTIONS_IS_FIX_2X_ERROR, false);
+
+		/*
+		 * Timezone
+		 */
+		// TimeZone [zoneNameKey=NZST, zoneOffset=43200000,  zoneId=Antarctica/South_Pole, label=+12:00    Antarctica/South_Pole, ]
+		// TimeZone [zoneNameKey=NZST, zoneOffset=43200000,  zoneId=Pacific/Auckland,      label=+12:00    Pacific/Auckland, ]
+		// TimeZone [zoneNameKey=ECT,  zoneOffset=-18000000, zoneId=Pacific/Galapagos,    label=-05:00    Pacific/Galapagos, ]
+		store.setDefault(ITourbookPreferences.TIME_ZONE_IS_LIVE_UPDATE, true);
+		store.setDefault(ITourbookPreferences.TIME_ZONE_LOCAL_ID, "Antarctica/South_Pole");//$NON-NLS-1$
+		store.setDefault(ITourbookPreferences.TIME_ZONE_LOCAL_OFFSET, 43200000);
 	}
+
 }
