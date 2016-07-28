@@ -26,8 +26,8 @@ import net.tourbook.Messages;
 import net.tourbook.application.MeasurementSystemContributionItem;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.preferences.BooleanFieldEditor2;
-import net.tourbook.common.time.TimeZoneUtils;
 import net.tourbook.common.time.TimeZone;
+import net.tourbook.common.time.TimeZoneUtils;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.UI;
 
@@ -71,7 +71,6 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 	private boolean				_showMeasurementSystemInUI;
 
 	private PixelConverter		_pc;
-	private SelectionAdapter	_defaultSelectionListener;
 
 	/*
 	 * UI controls
@@ -167,7 +166,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
 						updateUI_TimeZone();
-						doLiveUpdate();
+						doTimeZoneLiveUpdate();
 					}
 				});
 				GridDataFactory.fillDefaults()//
@@ -427,11 +426,16 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 			_chkLiveUpdate = new Button(container, SWT.CHECK);
 			_chkLiveUpdate.setText(Messages.Pref_LiveUpdate_Checkbox);
 			_chkLiveUpdate.setToolTipText(Messages.Pref_LiveUpdate_Checkbox_Tooltip);
-			_chkLiveUpdate.addSelectionListener(_defaultSelectionListener);
+			_chkLiveUpdate.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					doTimeZoneLiveUpdate();
+				}
+			});
 		}
 	}
 
-	private void doLiveUpdate() {
+	private void doTimeZoneLiveUpdate() {
 
 		if (_chkLiveUpdate.getSelection()) {
 			performApply();
@@ -470,13 +474,6 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 	private void initUI(final Composite parent) {
 
 		_pc = new PixelConverter(parent);
-
-		_defaultSelectionListener = new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				doLiveUpdate();
-			}
-		};
 	}
 
 	@Override
@@ -573,7 +570,6 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 		_currentMinimalDaysInFirstWeek = _comboMinDaysInFirstWeek.getSelectionIndex() + 1;
 	}
 
-
 	private void onSelectSystem() {
 
 		int selectedSystem = _comboSystem.getSelectionIndex();
@@ -622,6 +618,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 		_timeZoneOffset = _prefStore.getDefaultInt(ITourbookPreferences.TIME_ZONE_LOCAL_OFFSET);
 
 		validateTimeZoneId();
+		doTimeZoneLiveUpdate();
 
 		// calendar week
 		_backupFirstDayOfWeek = //
@@ -632,7 +629,6 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 				.getDefaultInt(ITourbookPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK);
 
 		updateUI_CalendarWeek();
-
 	}
 
 	@Override

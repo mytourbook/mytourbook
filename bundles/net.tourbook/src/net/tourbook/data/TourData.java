@@ -262,11 +262,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	private long												tourDrivingTime;
 
 	/**
-	 * Timezone offset in ms
+	 * Timezone offset in ms or <code>-1</code> when a timezone is not available then the default
+	 * timezone is used (which is set in the preferences) to display the tour.
 	 * 
 	 * @since Is long since db version 22, before it was int
 	 */
-	private int													timeZoneOffset;
+	private int													timeZoneOffset						= -1;
 
 	// ############################################# DISTANCE #############################################
 

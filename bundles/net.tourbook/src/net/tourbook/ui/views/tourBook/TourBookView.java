@@ -203,7 +203,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
 	private static YearSubCategory						_yearSubCategory					= YearSubCategory.MONTH;
 
-	private final IPreferenceStore						_prefStore							= TourbookPlugin
+	private final static IPreferenceStore				_prefStore							= TourbookPlugin
 																									.getPrefStore();
 	private final IDialogSettings						_state								= TourbookPlugin
 																									.getState(ID);
@@ -226,6 +226,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 	private final NumberFormat							_nf2;
 	private final NumberFormat							_nf1_NoGroup;
 
+	private static int									_defaultTimeZoneOffset;
 	private final Calendar								_calendar;
 	private final DateFormat							_timeFormatter;
 	private static final String[]						_weekDays;
@@ -255,11 +256,13 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 	}
 
 	static {
+
 		_weekDays = DateFormatSymbols.getInstance().getShortWeekdays();
+
+		_defaultTimeZoneOffset = _prefStore.getInt(ITourbookPreferences.TIME_ZONE_LOCAL_OFFSET);
 	}
 
 	private int											_selectedYear						= -1;
-
 	private int											_selectedYearSub					= -1;
 	private final ArrayList<Long>						_selectedTourIds					= new ArrayList<Long>();
 
@@ -534,6 +537,12 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 					defineAllColumns(_viewerContainer);
 
 					_tourViewer = (TreeViewer) recreateViewer(_tourViewer);
+
+				} else if (property.equals(ITourbookPreferences.TIME_ZONE_LOCAL_OFFSET)) {
+
+					_defaultTimeZoneOffset = _prefStore.getInt(ITourbookPreferences.TIME_ZONE_LOCAL_OFFSET);
+
+					_tourViewer.refresh();
 
 				} else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
@@ -1821,9 +1830,15 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				final Object element = cell.getElement();
 				if (element instanceof TVITourBookTour) {
 
-					final int timeZoneOffset = ((TVITourBookTour) element).colTimeZoneOffset;
+					int timeZoneOffset = ((TVITourBookTour) element).colTimeZoneOffset;
+
+					if (timeZoneOffset == -1) {
+						// timezone is not set, use default
+						timeZoneOffset = _defaultTimeZoneOffset;
+					}
 
 					cell.setText(TimeZoneUtils.printOffset(timeZoneOffset));
+
 					setCellColor(cell, element);
 				}
 			}

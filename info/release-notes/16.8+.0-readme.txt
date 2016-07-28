@@ -1,0 +1,19 @@
+Version 16.8+                                             ?. August 2016
+
+New 	
+===
+
+* Timezone
+
+  - Timezone for a tour is set automatically by it's geo position when available.
+    
+ 
+Improvements 	
+============
+
+
+
+ 
+Bugfix 	
+======
+

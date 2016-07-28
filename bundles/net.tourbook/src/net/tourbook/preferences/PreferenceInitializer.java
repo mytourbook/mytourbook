@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,7 @@
 package net.tourbook.preferences;
 
 import java.util.Calendar;
+import java.util.TimeZone;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
@@ -477,9 +478,10 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		// TimeZone [zoneNameKey=NZST, zoneOffset=43200000,  zoneId=Antarctica/South_Pole, label=+12:00    Antarctica/South_Pole, ]
 		// TimeZone [zoneNameKey=NZST, zoneOffset=43200000,  zoneId=Pacific/Auckland,      label=+12:00    Pacific/Auckland, ]
 		// TimeZone [zoneNameKey=ECT,  zoneOffset=-18000000, zoneId=Pacific/Galapagos,    label=-05:00    Pacific/Galapagos, ]
+		final TimeZone defaultTimeZone = TimeZone.getDefault();
 		store.setDefault(ITourbookPreferences.TIME_ZONE_IS_LIVE_UPDATE, true);
-		store.setDefault(ITourbookPreferences.TIME_ZONE_LOCAL_ID, "Antarctica/South_Pole");//$NON-NLS-1$
-		store.setDefault(ITourbookPreferences.TIME_ZONE_LOCAL_OFFSET, 43200000);
+		store.setDefault(ITourbookPreferences.TIME_ZONE_LOCAL_ID, defaultTimeZone.getID());
+		store.setDefault(ITourbookPreferences.TIME_ZONE_LOCAL_OFFSET, defaultTimeZone.getOffset(0));
 	}
 
 }

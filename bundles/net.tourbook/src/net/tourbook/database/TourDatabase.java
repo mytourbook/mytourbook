@@ -227,6 +227,7 @@ public class TourDatabase {
 	//
 	private static final String						DEFAULT_0									= "0";										//$NON-NLS-1$
 	private static final String						DEFAULT_1_0									= "1.0";									//$NON-NLS-1$
+	private static final String						DEFAULT__1									= "-1";									//$NON-NLS-1$
 	//
 	private static volatile TourDatabase			_instance;
 
@@ -248,7 +249,6 @@ public class TourDatabase {
 	 * cached distinct fields
 	 */
 	private static TreeSet<String>					_dbTourTitles;
-
 	private static TreeSet<String>					_dbTourStartPlace;
 	private static TreeSet<String>					_dbTourEndPlace;
 	private static TreeSet<String>					_dbTourMarkerNames;
@@ -2608,7 +2608,7 @@ public class TourDatabase {
 
 				// version 32 start  -  >16.8 ???
 				//
-				+ " TimeZoneOffset							INTEGER DEFAULT 0,								\n" //$NON-NLS-1$
+				+ " TimeZoneOffset							INTEGER DEFAULT -1,								\n" //$NON-NLS-1$
 				//
 				// version 32 end ---------
 
@@ -5999,7 +5999,7 @@ public class TourDatabase {
 			if (isColumnAvailable(conn, TABLE_TOUR_DATA, "TimeZoneOffset") == false) { //$NON-NLS-1$
 
 				// Add new columns
-				SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "TimeZoneOffset", DEFAULT_0); //$NON-NLS-1$
+				SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "TimeZoneOffset", DEFAULT__1); //$NON-NLS-1$
 			}
 		}
 		stmt.close();
