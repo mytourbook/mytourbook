@@ -20,7 +20,6 @@ public class ChartToolTipInfo {
 	private String	_title;
 	private String	_label;
 
-	private boolean	_isDisplayed	= false;
 	private boolean	_isReposition	= false;
 
 	public String getLabel() {
@@ -31,16 +30,8 @@ public class ChartToolTipInfo {
 		return _title;
 	}
 
-	boolean isDisplayed() {
-		return _isDisplayed;
-	}
-
 	boolean isReposition() {
 		return _isReposition;
-	}
-
-	public void setIsDisplayed(final boolean isDisplayed) {
-		_isDisplayed = isDisplayed;
 	}
 
 	public void setLabel(final String label) {

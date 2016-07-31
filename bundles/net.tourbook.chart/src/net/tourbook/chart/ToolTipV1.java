@@ -55,11 +55,7 @@ public class ToolTipV1 {
 			SWT.MouseDown,
 			SWT.DragDetect							};
 
-	private int					_toolTipHoverSerieIndex;
-	private int					_toolTipHoverValueIndex;
-
 	private int					_hoveredBarSerieIndex;
-
 	private int					_hoveredBarValueIndex;
 
 	public ToolTipV1(final Chart chart) {
@@ -166,16 +162,6 @@ public class ToolTipV1 {
 			return false;
 		}
 
-		if (tooltipInfo.isDisplayed()) {
-
-			// reposition the tool tip when necessary
-			if (tooltipInfo.isReposition() || toolTip_60_IsWrongPositioned()) {
-				toolTip_50_SetPosition();
-			}
-
-			return true;
-		}
-
 		final String toolTipLabel = tooltipInfo.getLabel();
 		final String toolTipTitle = tooltipInfo.getTitle();
 
@@ -238,32 +224,11 @@ public class ToolTipV1 {
 
 			if (toolTipInfoProvider != null) {
 
-				if (_toolTipHoverSerieIndex == _hoveredBarSerieIndex
-						&& _toolTipHoverValueIndex == _hoveredBarValueIndex) {
-
-//this must be reset when another statistic is displayed, otherwise the wrong tooltip is displayed
-					
-					// tool tip is already displayed for the hovered bar
-
-					if (_toolTipInfo != null) {
-						_toolTipInfo.setIsDisplayed(true);
-					}
-
-				} else {
-
-					_toolTipHoverSerieIndex = _hoveredBarSerieIndex;
-					_toolTipHoverValueIndex = _hoveredBarValueIndex;
-
-					_toolTipInfo = toolTipInfoProvider.getToolTipInfo(_hoveredBarSerieIndex, _hoveredBarValueIndex);
-				}
+				_toolTipInfo = toolTipInfoProvider.getToolTipInfo(_hoveredBarSerieIndex, _hoveredBarValueIndex);
 
 				return _toolTipInfo;
 			}
 		}
-
-		// reset tool tip hover index
-		_toolTipHoverSerieIndex = -1;
-		_toolTipHoverValueIndex = -1;
 
 		return null;
 	}
