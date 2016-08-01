@@ -26,6 +26,7 @@ Export-Package: cop.swt.widgets.viewers.table.celleditors,
  net.tourbook.common.weather,
  net.tourbook.common.widgets,
  net.tourbook.opengl
-Import-Package: gnu.trove.map.hash,
+Import-Package: com.skedgo.converter,
+ gnu.trove.map.hash,
  org.joda.time,
  org.joda.time.format

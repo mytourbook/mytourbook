@@ -43,6 +43,7 @@ public class TourData_Time {
 	int[]							tourTimeStartValues;
 	int[]							tourTimeEndValues;
 	ArrayList<DateTime>				tourStartDateTimes;
+	int[]							tourUtcTimeOffset;
 
 	int[]							tourAltitudeValues;
 	int[]							tourDistanceValues;

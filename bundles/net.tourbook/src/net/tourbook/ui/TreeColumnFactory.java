@@ -1007,7 +1007,7 @@ public abstract class TreeColumnFactory {
 														final PixelConverter pixelConverter) {
 
 				final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TIME_TIME_ZONE", //$NON-NLS-1$
-						SWT.TRAIL);
+						SWT.LEAD);
 
 				colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
 				colDef.setColumnLabel(Messages.ColumnFactory_TimeZone_Label);

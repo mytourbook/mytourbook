@@ -35,4 +35,17 @@ public interface ICommonPreferences {
 
 	public static final String	DISPLAY_FORMAT_IS_LIVE_UPDATE	= "DISPLAY_FORMAT_IS_LIVE_UPDATE";	//$NON-NLS-1$
 
+	/*
+	 * Timezone
+	 */
+	public static final String	TIME_ZONE_ACTIVE_ZONE			= "TIME_ZONE_ACTIVE_ZONE";			//$NON-NLS-1$
+	public static final String	TIME_ZONE_IS_LIVE_UPDATE		= "TIME_ZONE_IS_LIVE_UPDATE";		//$NON-NLS-1$
+	public static final String	TIME_ZONE_IS_USE_TIME_ZONE		= "TIME_ZONE_IS_USE_TIME_ZONE";	//$NON-NLS-1$
+	public static final String	TIME_ZONE_LOCAL_ID				= "TIME_ZONE_LOCAL_ID";			//$NON-NLS-1$
+	public static final String	TIME_ZONE_LOCAL_ID_1			= "TIME_ZONE_LOCAL_ID_1";			//$NON-NLS-1$
+	public static final String	TIME_ZONE_LOCAL_ID_2			= "TIME_ZONE_LOCAL_ID_2";			//$NON-NLS-1$
+	public static final String	TIME_ZONE_LOCAL_OFFSET			= "TIME_ZONE_LOCAL_OFFSET";		//$NON-NLS-1$
+	public static final String	TIME_ZONE_LOCAL_OFFSET_1		= "TIME_ZONE_LOCAL_OFFSET_1";		//$NON-NLS-1$
+	public static final String	TIME_ZONE_LOCAL_OFFSET_2		= "TIME_ZONE_LOCAL_OFFSET_2";		//$NON-NLS-1$
+
 }

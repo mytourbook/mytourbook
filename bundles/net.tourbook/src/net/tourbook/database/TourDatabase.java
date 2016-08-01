@@ -29,6 +29,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.NumberFormat;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -51,8 +54,6 @@ import net.tourbook.Messages;
 import net.tourbook.application.MyTourbookSplashHandler;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.NIO;
-import net.tourbook.common.time.TimeZone;
-import net.tourbook.common.time.TimeZoneUtils;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourBike;
@@ -227,7 +228,6 @@ public class TourDatabase {
 	//
 	private static final String						DEFAULT_0									= "0";										//$NON-NLS-1$
 	private static final String						DEFAULT_1_0									= "1.0";									//$NON-NLS-1$
-	private static final String						DEFAULT__1									= "-1";									//$NON-NLS-1$
 	//
 	private static volatile TourDatabase			_instance;
 
@@ -320,6 +320,7 @@ public class TourDatabase {
 	public static final double						DEFAULT_DOUBLE								= -1E+300;									//Float.MIN_VALUE;
 
 	private static final String						SQL_LONG_MIN_VALUE;
+	private static final String						SQL_INT_MIN_VALUE;
 	private static final String						SQL_FLOAT_MIN_VALUE;
 	private static final String						SQL_DOUBLE_MIN_VALUE;
 
@@ -337,6 +338,7 @@ public class TourDatabase {
 //
 ////////////////////////////////////////////////////////////////////////////////////////
 
+		SQL_INT_MIN_VALUE = Integer.toString(Integer.MIN_VALUE);
 		SQL_LONG_MIN_VALUE = Long.toString(Long.MIN_VALUE);
 
 		SQL_FLOAT_MIN_VALUE = (new Float(DEFAULT_FLOAT)).toString();
@@ -2608,7 +2610,7 @@ public class TourDatabase {
 
 				// version 32 start  -  >16.8 ???
 				//
-				+ " TimeZoneOffset							INTEGER DEFAULT -1,								\n" //$NON-NLS-1$
+				+ (" TimeZoneOffset							INTEGER DEFAULT " + SQL_INT_MIN_VALUE + ",		\n") //$NON-NLS-1$ //$NON-NLS-2$
 				//
 				// version 32 end ---------
 
@@ -5999,7 +6001,7 @@ public class TourDatabase {
 			if (isColumnAvailable(conn, TABLE_TOUR_DATA, "TimeZoneOffset") == false) { //$NON-NLS-1$
 
 				// Add new columns
-				SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "TimeZoneOffset", DEFAULT__1); //$NON-NLS-1$
+				SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "TimeZoneOffset", SQL_INT_MIN_VALUE); //$NON-NLS-1$
 			}
 		}
 		stmt.close();
@@ -6025,14 +6027,30 @@ public class TourDatabase {
 		final EntityManager em = TourDatabase.getInstance().getEntityManager();
 		try {
 
+			long lastUpdateTime = System.currentTimeMillis();
+
 			// loop: all tours
 			for (final Long tourId : tourList) {
 
 				if (monitor != null) {
 
-					monitor.subTask(NLS.bind(//
-							Messages.Tour_Database_PostUpdate_032_SetTourTimeZone,
-							new Object[] { tourIdx, tourList.size() }));
+					final long currentTime = System.currentTimeMillis();
+					final float timeDiff = currentTime - lastUpdateTime;
+
+					// reduce logging
+					if (timeDiff > 100) {
+
+						lastUpdateTime = currentTime;
+
+						final String percent = String.format("%.1f", (float) tourIdx / tourList.size() * 100.0);//$NON-NLS-1$
+
+						monitor.subTask(NLS.bind(//
+								Messages.Tour_Database_PostUpdate_032_SetTourTimeZone,
+								new Object[] {
+										tourIdx,
+										tourList.size(),
+										percent }));
+					}
 
 					tourIdx++;
 				}
@@ -6044,15 +6062,15 @@ public class TourDatabase {
 					final double lat = tourData.latitudeSerie[0];
 					final double lon = tourData.longitudeSerie[0];
 
-					final String timeZoneId = TimezoneMapper.latLngToTimezoneString(lat, lon);
+					final String zoneId = TimezoneMapper.latLngToTimezoneString(lat, lon);
 
-					final TimeZone timeZone = TimeZoneUtils.getTimeZone(timeZoneId);
-					if (timeZone != null) {
+					final ZoneId zone = ZoneId.of(zoneId);
+					final OffsetDateTime zonedDateTime = OffsetDateTime.now(zone);
+					final ZoneOffset offset = zonedDateTime.getOffset();
 
-						tourData.setTimeZoneOffset(timeZone.zoneOffset);
+					tourData.setTimeZoneOffset(offset.getTotalSeconds());
 
-						TourDatabase.saveEntity(tourData, tourId, TourData.class);
-					}
+					TourDatabase.saveEntity(tourData, tourId, TourData.class);
 				}
 			}
 

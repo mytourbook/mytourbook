@@ -26,6 +26,8 @@ import java.util.GregorianCalendar;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
@@ -79,6 +81,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
 	private static final String				STATE_NUMBER_OF_YEARS		= "statistic.container.number_of_years";			//$NON-NLS-1$
 
 	private final IPreferenceStore			_prefStore					= TourbookPlugin.getPrefStore();
+	private final IPreferenceStore			_prefStoreCommon			= CommonActivator.getPrefStore();
 	private final IDialogSettings			_state						= TourbookPlugin.getState("TourStatisticsView");	//$NON-NLS-1$
 
 	private final boolean					_isOSX						= net.tourbook.common.UI.IS_OSX;
@@ -86,6 +89,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
 	private IPartListener2					_partListener;
 	private IPropertyChangeListener			_prefChangeListener;
+	private IPropertyChangeListener			_prefChangeListenerCommon;
 	private ITourEventListener				_tourEventListener;
 	private ISelectionListener				_postSelectionListener;
 
@@ -243,6 +247,26 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
 		// register the listener
 		_prefStore.addPropertyChangeListener(_prefChangeListener);
+
+		/*
+		 * Common preferences
+		 */
+		_prefChangeListenerCommon = new IPropertyChangeListener() {
+			@Override
+			public void propertyChange(final PropertyChangeEvent event) {
+
+				final String property = event.getProperty();
+
+				if (property.equals(ICommonPreferences.TIME_ZONE_LOCAL_OFFSET)
+						|| property.equals(ICommonPreferences.TIME_ZONE_IS_USE_TIME_ZONE)) {
+
+					updateStatistic();
+				}
+			}
+		};
+
+		// register the listener
+		_prefStoreCommon.addPropertyChangeListener(_prefChangeListenerCommon);
 	}
 
 	private void addSelectionListener() {
@@ -474,6 +498,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
 		TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
 		_prefStore.removePropertyChangeListener(_prefChangeListener);
+		_prefStoreCommon.removePropertyChangeListener(_prefChangeListenerCommon);
 
 		super.dispose();
 	}

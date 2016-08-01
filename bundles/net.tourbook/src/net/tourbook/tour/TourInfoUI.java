@@ -21,6 +21,7 @@ import java.util.Set;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.formatter.FormatManager;
+import net.tourbook.common.time.TimeZoneUtils;
 import net.tourbook.common.util.IToolTipProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
@@ -178,6 +179,7 @@ public class TourInfoUI {
 	private Label								_lblRecordingTimeHour;
 	private Label								_lblRestPulse;
 	private Label								_lblTemperature;
+	private Label								_lblUtcTimeOffset;
 	private Label								_lblTitle;
 	private Label								_lblTourTags;
 	private Label								_lblTourTypeText;
@@ -393,41 +395,62 @@ public class TourInfoUI {
 	}
 
 	private void createUI_32_Time(final Composite container) {
-		/*
-		 * recording time
-		 */
-		Label label = createUI_Label(container, Messages.Tour_Tooltip_Label_RecordingTime);
-		_firstColumnControls.add(label);
 
-		_lblRecordingTime = createUI_LabelValue(container, SWT.TRAIL);
-		_secondColumnControls.add(_lblRecordingTime);
+		{
+			/*
+			 * recording time
+			 */
+			final Label label = createUI_Label(container, Messages.Tour_Tooltip_Label_RecordingTime);
+			_firstColumnControls.add(label);
 
-		_lblRecordingTimeHour = createUI_Label(container, Messages.Tour_Tooltip_Label_Hour);
+			_lblRecordingTime = createUI_LabelValue(container, SWT.TRAIL);
+			_secondColumnControls.add(_lblRecordingTime);
 
-		// force this column to take the rest of the space
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblRecordingTimeHour);
+			_lblRecordingTimeHour = createUI_Label(container, Messages.Tour_Tooltip_Label_Hour);
 
-		/*
-		 * moving time
-		 */
-		label = createUI_Label(container, Messages.Tour_Tooltip_Label_MovingTime);
-		_firstColumnControls.add(label);
+			// force this column to take the rest of the space
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblRecordingTimeHour);
+		}
 
-		_lblMovingTime = createUI_LabelValue(container, SWT.TRAIL);
-		_secondColumnControls.add(_lblMovingTime);
+		{
+			/*
+			 * moving time
+			 */
+			final Label label = createUI_Label(container, Messages.Tour_Tooltip_Label_MovingTime);
+			_firstColumnControls.add(label);
 
-		_lblMovingTimeHour = createUI_Label(container, Messages.Tour_Tooltip_Label_Hour);
+			_lblMovingTime = createUI_LabelValue(container, SWT.TRAIL);
+			_secondColumnControls.add(_lblMovingTime);
 
-		/*
-		 * break time
-		 */
-		label = createUI_Label(container, Messages.Tour_Tooltip_Label_BreakTime);
-		_firstColumnControls.add(label);
+			_lblMovingTimeHour = createUI_Label(container, Messages.Tour_Tooltip_Label_Hour);
+		}
 
-		_lblBreakTime = createUI_LabelValue(container, SWT.TRAIL);
-		_secondColumnControls.add(_lblBreakTime);
+		{
+			/*
+			 * break time
+			 */
+			final Label label = createUI_Label(container, Messages.Tour_Tooltip_Label_BreakTime);
+			_firstColumnControls.add(label);
 
-		_lblBreakTimeHour = createUI_Label(container, Messages.Tour_Tooltip_Label_Hour);
+			_lblBreakTime = createUI_LabelValue(container, SWT.TRAIL);
+			_secondColumnControls.add(_lblBreakTime);
+
+			_lblBreakTimeHour = createUI_Label(container, Messages.Tour_Tooltip_Label_Hour);
+		}
+
+		{
+			/*
+			 * Timezone
+			 */
+			final Label label = createUI_Label(container, Messages.Tour_Tooltip_Label_TimeZone);
+			_firstColumnControls.add(label);
+
+			_lblUtcTimeOffset = createUI_LabelValue(container, SWT.TRAIL);
+			_secondColumnControls.add(_lblUtcTimeOffset);
+
+			// hour
+			createUI_Label(container, Messages.Tour_Tooltip_Label_Hour);
+		}
 	}
 
 	private void createUI_34_DistanceAltitude(final Composite container) {
@@ -1029,7 +1052,7 @@ public class TourInfoUI {
 		final DateTime dtTourStart = _tourData.getTourStartTime();
 		final DateTime dtTourEnd = dtTourStart.plus(recordingTime * 1000);
 
-		final boolean isShortDuration = recordingTime < net.tourbook.common.UI.DAY_IN_SECONDS;
+		final boolean isShortDuration = recordingTime < UI.DAY_IN_SECONDS;
 
 		if (isShortDuration) {
 
@@ -1075,6 +1098,10 @@ public class TourInfoUI {
 			_lblBreakTime.setText(breakPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
 		}
 
+		// time zone
+		final int tzOffset = _tourData.getTimeZoneOffset();
+		_lblUtcTimeOffset.setText(TimeZoneUtils.getUtcTimeZoneOffset(tzOffset));
+
 		int windSpeed = _tourData.getWeatherWindSpeed();
 		windSpeed = (int) (windSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
 
@@ -1105,7 +1132,7 @@ public class TourInfoUI {
 		final String cloudText = IWeather.cloudText[weatherIndex];
 		final String cloudImageName = IWeather.cloudIcon[weatherIndex];
 
-		_lblClouds.setImage(net.tourbook.common.UI.IMAGE_REGISTRY.get(cloudImageName));
+		_lblClouds.setImage(UI.IMAGE_REGISTRY.get(cloudImageName));
 		_lblCloudsUnit.setText(cloudText.equals(IWeather.cloudIsNotDefined) ? UI.EMPTY_STRING : cloudText);
 
 		/*

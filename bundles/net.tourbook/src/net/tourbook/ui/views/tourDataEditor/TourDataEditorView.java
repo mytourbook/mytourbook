@@ -44,8 +44,8 @@ import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.time.TimeZoneData;
 import net.tourbook.common.time.TimeZoneUtils;
-import net.tourbook.common.time.TimeZone;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.ColumnDefinition;
@@ -532,7 +532,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private Label								_lblAltitudeDownUnit;
 	private Label								_lblSpeedUnit;
 	private Label								_lblTemperatureUnit;
-	private Label								_lblTimeZoneOffset;
 	private Label								_lblTourDistanceUnit;
 	private Label								_lblTourTags;
 	//
@@ -2514,7 +2513,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				.span(2, 1)
 				.applyTo(container);
 		GridLayoutFactory.fillDefaults()//
-				.numColumns(3)
+				.numColumns(2)
 				.applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
 		{
@@ -2529,33 +2528,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			}
 
 			{
-				// label: offset
-				_lblTimeZoneOffset = _tk.createLabel(container, UI.EMPTY_STRING);
-				GridDataFactory.fillDefaults()//
-						.grab(true, false)
-						.align(SWT.FILL, SWT.CENTER)
-						.applyTo(_lblTimeZoneOffset);
-			}
-
-			{
 				// combo
 				_comboTimeZone = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
-				_comboTimeZone.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(final SelectionEvent e) {
-
-						if (_isSetField || _isSavingInProgress) {
-							return;
-						}
-						updateUI_TimeZone();
-					}
-				});
+				_comboTimeZone.addSelectionListener(_selectionListener);
 
 				_tk.adapt(_comboTimeZone, true, false);
 
 				// fill combobox
-				for (final TimeZone timeZone : TimeZoneUtils.getAllTimeZones()) {
-					_comboTimeZone.add(timeZone.zoneId);
+				for (final TimeZoneData timeZone : TimeZoneUtils.getAllTimeZones()) {
+					_comboTimeZone.add(timeZone.label);
 				}
 			}
 		}
@@ -4451,6 +4432,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		_dtTourDate.setEnabled(canEdit);
 		_dtStartTime.setEnabled(canEdit);
+		_comboTimeZone.setEnabled(canEdit);
+
 		_timeRecording.setEditMode(isManualAndEdit);
 		_timePaused.setEditMode(isManualAndEdit);
 		_timeDriving.setEditMode(isManualAndEdit);
@@ -6701,6 +6684,17 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_timeDriving.setTime(drivingTime);
 		_timePaused.setTime(pausedTime);
 
+		// time zone
+		double lat0 = Double.MIN_VALUE;
+		double lat1 = Double.MIN_VALUE;
+		if (_tourData.latitudeSerie != null && _tourData.longitudeSerie != null) {
+			lat0 = _tourData.latitudeSerie[0];
+			lat1 = _tourData.longitudeSerie[0];
+		}
+
+		final int timeZoneIndex = TimeZoneUtils.getTimeZoneIndex(lat0, lat1);
+		_comboTimeZone.select(timeZoneIndex);
+
 		// tour type/tags
 		net.tourbook.ui.UI.updateUI_TourType(_tourData, _lblTourType, true);
 		net.tourbook.ui.UI.updateUI_Tags(_tourData, _lblTourTags);
@@ -6940,22 +6934,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_timePaused.setTime(pausedTime / 3600, ((pausedTime % 3600) / 60), ((pausedTime % 3600) % 60));
 	}
 
-	private void updateUI_TimeZone() {
-
-		final int selectedTimeZoneIndex = _comboTimeZone.getSelectionIndex();
-
-		if (selectedTimeZoneIndex == -1) {
-			return;
-		}
-
-		final ArrayList<TimeZone> allTimeZone = TimeZoneUtils.getAllTimeZones();
-		final TimeZone selectedTimeZone = allTimeZone.get(selectedTimeZoneIndex);
-
-		// update
-		_lblTimeZoneOffset.setText(TimeZoneUtils.printOffset(selectedTimeZone.zoneOffset));
-
-		setTourDirty();
-	}
 
 	/**
 	 * Update title of the view with the modified date/time

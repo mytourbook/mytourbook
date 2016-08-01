@@ -462,11 +462,4 @@ public interface ITourbookPreferences {
 	public static final String	HRV_OPTIONS_2X_ERROR_TOLERANCE					= "HRV_OPTIONS_2X_ERROR_TOLERANCE";						//$NON-NLS-1$
 	public static final String	HRV_OPTIONS_IS_FIX_2X_ERROR						= "HRV_OPTIONS_IS_FIX_2X_ERROR";							//$NON-NLS-1$
 
-	/*
-	 * Timezone
-	 */
-	public static final String	TIME_ZONE_IS_LIVE_UPDATE						= "TIME_ZONE_IS_LIVE_UPDATE";								//$NON-NLS-1$
-	public static final String	TIME_ZONE_LOCAL_ID								= "TIME_ZONE_LOCAL_ID";									//$NON-NLS-1$
-	public static final String	TIME_ZONE_LOCAL_OFFSET							= "TIME_ZONE_LOCAL_OFFSET";								//$NON-NLS-1$
-
 }

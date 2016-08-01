@@ -5,7 +5,7 @@ Bundle-SymbolicName: net.tourbook.ext.jars;singleton:=true
 Bundle-Version: 15.3.0.qualifier
 Eclipse-BuddyPolicy: registered
 Bundle-Vendor: MyTourbook
-Bundle-ClassPath: joda-time-2.1.jar,
+Bundle-ClassPath: joda-time-2.9.4.jar,
  c3p0-0.9.1.2.jar,
  xpp3_min-1.1.4c.jar,
  xstream-1.3.1.jar,
@@ -176,6 +176,7 @@ Export-Package: com.enterprisedt,
  org.joda.time.tz.data.America.Kentucky,
  org.joda.time.tz.data.America.North_Dakota,
  org.joda.time.tz.data.Antarctica,
+ org.joda.time.tz.data.Arctic,
  org.joda.time.tz.data.Asia,
  org.joda.time.tz.data.Atlantic,
  org.joda.time.tz.data.Australia,

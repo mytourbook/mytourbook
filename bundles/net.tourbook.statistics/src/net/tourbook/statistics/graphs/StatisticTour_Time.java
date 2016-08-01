@@ -32,6 +32,7 @@ import net.tourbook.chart.MinMaxKeeper_YData;
 import net.tourbook.chart.SelectionBarChart;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
+import net.tourbook.common.time.TimeZoneUtils;
 import net.tourbook.common.util.IToolTipHideListener;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -265,6 +266,8 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
 		final float speed = drivingTime == 0 ? 0 : distance / (drivingTime / 3.6f);
 		final float pace = distance == 0 ? 0 : drivingTime * 1000 / distance;
 
+		final int utcTimeOffset = _tourTimeData.tourUtcTimeOffset[valueIndex];
+
 		final StringBuilder toolTipFormat = new StringBuilder();
 		toolTipFormat.append(TOUR_TOOLTIP_FORMAT_DATE_WEEK_TIME); //		%s - %s - %s - CW %d
 		toolTipFormat.append(UI.NEW_LINE);
@@ -274,6 +277,8 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
 		toolTipFormat.append(Messages.tourtime_info_altitude);
 		toolTipFormat.append(UI.NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_time);
+		toolTipFormat.append(UI.NEW_LINE);
+		toolTipFormat.append(Messages.Tourtime_Info_TimeZoneOffset);
 		toolTipFormat.append(UI.NEW_LINE);
 		toolTipFormat.append(UI.NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_recording_time_tour);
@@ -320,6 +325,9 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
 				// end time
 				endValue[valueIndex] / 3600 % 24,
 				(endValue[valueIndex] % 3600) / 60,
+				//
+				// time zone
+				TimeZoneUtils.getUtcTimeZoneOffset(utcTimeOffset),
 				//
 				recordingTime / 3600,
 				(recordingTime % 3600) / 60,

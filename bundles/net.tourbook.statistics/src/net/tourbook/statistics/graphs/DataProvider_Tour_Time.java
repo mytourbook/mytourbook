@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
@@ -35,9 +37,12 @@ import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.joda.time.DateTime;
 
 public class DataProvider_Tour_Time extends DataProvider {
+
+	private IPreferenceStore				_prefStoreCommon	= CommonActivator.getPrefStore();
 
 	private static DataProvider_Tour_Time	_instance;
 
@@ -65,22 +70,27 @@ public class DataProvider_Tour_Time extends DataProvider {
 	 * @param tourTypeFilter
 	 * @param lastYear
 	 * @param numberOfYears
+	 * @param isForceUpdate
 	 * @return
 	 */
 	TourData_Time getTourTimeData(	final TourPerson person,
 									final TourTypeFilter tourTypeFilter,
 									final int lastYear,
 									final int numberOfYears,
-									final boolean refreshData) {
+									final boolean isForceUpdate) {
 
 		// dont reload data which are already here
 		if (_activePerson == person
 				&& _activeTourTypeFilter == tourTypeFilter
 				&& _lastYear == lastYear
 				&& _numberOfYears == numberOfYears
-				&& refreshData == false) {
+				&& isForceUpdate == false) {
 			return _tourDataTime;
 		}
+
+		// default timezone offset in ms
+		final boolean isUseTimeZone = _prefStoreCommon.getBoolean(ICommonPreferences.TIME_ZONE_IS_USE_TIME_ZONE);
+		final int defaultTimeZoneOffset = _prefStoreCommon.getInt(ICommonPreferences.TIME_ZONE_LOCAL_OFFSET);
 
 		_activePerson = person;
 		_activeTourTypeFilter = tourTypeFilter;
@@ -109,16 +119,17 @@ public class DataProvider_Tour_Time extends DataProvider {
 				+ "StartDay," //				4 //$NON-NLS-1$
 				+ "StartWeek," //				5 //$NON-NLS-1$
 				+ "TourStartTime," //			6 //$NON-NLS-1$
-				+ "TourRecordingTime," //		7 //$NON-NLS-1$
-				+ "TourDrivingTime,"//			8 //$NON-NLS-1$
+				+ "TimeZoneOffset,"//			7 //$NON-NLS-1$
+				+ "TourRecordingTime," //		8 //$NON-NLS-1$
+				+ "TourDrivingTime,"//			9 //$NON-NLS-1$
 
-				+ "TourDistance," //			9 //$NON-NLS-1$
-				+ "TourAltUp," //				10 //$NON-NLS-1$
-				+ "TourTitle," //				11 //$NON-NLS-1$
-				+ "TourDescription," // 		12 //$NON-NLS-1$
+				+ "TourDistance," //			10 //$NON-NLS-1$
+				+ "TourAltUp," //				11 //$NON-NLS-1$
+				+ "TourTitle," //				12 //$NON-NLS-1$
+				+ "TourDescription," // 		13 //$NON-NLS-1$
 
-				+ "TourType_typeId,"//			13 //$NON-NLS-1$
-				+ "jTdataTtag.TourTag_tagId"//	14 //$NON-NLS-1$
+				+ "TourType_typeId,"//			14 //$NON-NLS-1$
+				+ "jTdataTtag.TourTag_tagId"//	15 //$NON-NLS-1$
 
 				+ UI.NEW_LINE
 
@@ -145,6 +156,7 @@ public class DataProvider_Tour_Time extends DataProvider {
 			final TIntArrayList allTourEndTime = new TIntArrayList();
 			final TIntArrayList allTourStartWeek = new TIntArrayList();
 			final ArrayList<DateTime> allTourStartDateTime = new ArrayList<>();
+			final TIntArrayList allTourUtcTimeOffset = new TIntArrayList();
 
 			final TIntArrayList allTourRecordingTime = new TIntArrayList();
 			final TIntArrayList allTourDrivingTime = new TIntArrayList();
@@ -172,7 +184,7 @@ public class DataProvider_Tour_Time extends DataProvider {
 			while (result.next()) {
 
 				final long dbTourId = result.getLong(1);
-				final Object dbTagId = result.getObject(14);
+				final Object dbTagId = result.getObject(15);
 
 				if (dbTourId == lastTourId) {
 
@@ -194,21 +206,42 @@ public class DataProvider_Tour_Time extends DataProvider {
 					final int dbTourStartWeek = result.getInt(5);
 
 					final long dbStartTime = result.getLong(6);
-					final int dbRecordingTime = result.getInt(7);
-					final int dbDrivingTime = result.getInt(8);
+					final int dbTimeZoneOffset = result.getInt(7);
+					final int dbRecordingTime = result.getInt(8);
+					final int dbDrivingTime = result.getInt(9);
 
-					final float dbDistance = result.getFloat(9);
-					final int dbAltitudeUp = result.getInt(10);
+					final float dbDistance = result.getFloat(10);
+					final int dbAltitudeUp = result.getInt(11);
 
-					final String dbTourTitle = result.getString(11);
-					final String dbDescription = result.getString(12);
-					final Object dbTypeIdObject = result.getObject(13);
+					final String dbTourTitle = result.getString(12);
+					final String dbDescription = result.getString(13);
+					final Object dbTypeIdObject = result.getObject(14);
 
 					// get number of days for the year, start with 0
 					_calendar.set(dbTourYear, dbTourMonth, dbTourDay);
 					final int tourDOY = _calendar.get(Calendar.DAY_OF_YEAR) - 1;
 
-					final DateTime tourStartDateTime = new DateTime(dbStartTime);
+					DateTime tourStartDateTime = new DateTime(dbStartTime);
+
+					int utcTimeOffset = 0;
+
+					/*
+					 * Adjust tour start time by the time zone offset
+					 */
+					if (dbTimeZoneOffset == Integer.MIN_VALUE) {
+
+						// timezone is not set, use original time without offset
+
+					} else if (isUseTimeZone && dbTimeZoneOffset != defaultTimeZoneOffset) {
+
+						// tour has not the default time zone
+
+						final int timeZoneOffsetDiff = dbTimeZoneOffset - defaultTimeZoneOffset;
+
+						tourStartDateTime = tourStartDateTime.plusSeconds(timeZoneOffsetDiff);
+						utcTimeOffset += timeZoneOffsetDiff;
+					}
+
 					final int startTime = tourStartDateTime.getMillisOfDay() / 1000;
 
 					allTourYear.add(dbTourYear);
@@ -217,6 +250,7 @@ public class DataProvider_Tour_Time extends DataProvider {
 					allTourStartWeek.add(dbTourStartWeek);
 
 					allTourStartDateTime.add(tourStartDateTime);
+					allTourUtcTimeOffset.add(utcTimeOffset);
 					allTourStartTime.add(startTime);
 					allTourEndTime.add((startTime + dbRecordingTime));
 					allTourRecordingTime.add(dbRecordingTime);
@@ -225,11 +259,9 @@ public class DataProvider_Tour_Time extends DataProvider {
 					allDistance.add((int) (dbDistance / UI.UNIT_VALUE_DISTANCE));
 					allAltitudeUp.add((int) (dbAltitudeUp / UI.UNIT_VALUE_ALTITUDE));
 
-
 					allTourTitle.add(dbTourTitle);
 
 					allTourDescription.add(dbDescription == null ? UI.EMPTY_STRING : dbDescription);
-
 
 					if (dbTagId instanceof Long) {
 						tagIds = new ArrayList<Long>();
@@ -294,6 +326,7 @@ public class DataProvider_Tour_Time extends DataProvider {
 			_tourDataTime.weekValues = allTourStartWeek.toArray();
 
 			_tourDataTime.tourTimeStartValues = allTourStartTime.toArray();
+			_tourDataTime.tourUtcTimeOffset = allTourUtcTimeOffset.toArray();
 			_tourDataTime.tourTimeEndValues = allTourEndTime.toArray();
 			_tourDataTime.tourStartDateTimes = allTourStartDateTime;
 

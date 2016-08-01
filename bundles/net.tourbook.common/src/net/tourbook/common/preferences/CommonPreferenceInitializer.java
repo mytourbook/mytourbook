@@ -15,6 +15,10 @@
  *******************************************************************************/
 package net.tourbook.common.preferences;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.color.ColorDefinition;
 import net.tourbook.common.color.GraphColorManager;
@@ -71,5 +75,24 @@ public class CommonPreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_PAUSED_TIME, ValueFormat.TIME_HH_MM.name());
 		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_RECORDING_TIME, ValueFormat.TIME_HH_MM.name());
 
+		/*
+		 * Timezone
+		 */
+		final ZoneId defaultZoneId = ZoneId.systemDefault();
+		final OffsetDateTime defaultZonedDateTime = OffsetDateTime.now(defaultZoneId);
+		final ZoneOffset defaultZoneOffset = defaultZonedDateTime.getOffset();
+
+		final String defaultId = defaultZoneId.getId();
+		final int defaultOffset = defaultZoneOffset.getTotalSeconds();
+
+		store.setDefault(ICommonPreferences.TIME_ZONE_ACTIVE_ZONE, 1);
+		store.setDefault(ICommonPreferences.TIME_ZONE_IS_LIVE_UPDATE, true);
+		store.setDefault(ICommonPreferences.TIME_ZONE_IS_USE_TIME_ZONE, true);
+		store.setDefault(ICommonPreferences.TIME_ZONE_LOCAL_ID, defaultId);
+		store.setDefault(ICommonPreferences.TIME_ZONE_LOCAL_ID_1, defaultId);
+		store.setDefault(ICommonPreferences.TIME_ZONE_LOCAL_ID_2, defaultId);
+		store.setDefault(ICommonPreferences.TIME_ZONE_LOCAL_OFFSET, defaultOffset);
+		store.setDefault(ICommonPreferences.TIME_ZONE_LOCAL_OFFSET_1, defaultOffset);
+		store.setDefault(ICommonPreferences.TIME_ZONE_LOCAL_OFFSET_2, defaultOffset);
 	}
 }

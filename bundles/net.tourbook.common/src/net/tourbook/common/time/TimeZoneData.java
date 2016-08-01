@@ -15,21 +15,19 @@
  *******************************************************************************/
 package net.tourbook.common.time;
 
-public class TimeZone {
+public class TimeZoneData {
 
 	public String	label;
 
-	public int		zoneOffset;
+	public int		zoneOffsetSeconds;
 
 	public String	zoneId;
-	public String	zoneNameKey;
 
 	@Override
 	public String toString() {
 		return "TimeZone ["
 
-				+ ("zoneNameKey=" + zoneNameKey + ", ")
-				+ ("zoneOffset=" + zoneOffset + ", ")
+		+ ("zoneOffset=" + zoneOffsetSeconds + ", ") //
 				+ ("zoneId=" + zoneId + ", ")
 				+ ("label=" + label + ", ")
 

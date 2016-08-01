@@ -21,20 +21,19 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.text.DateFormat;
 import java.text.DateFormatSymbols;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.formatter.FormatManager;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeZoneUtils;
 import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.tooltip.OpenDialogManager;
@@ -138,6 +137,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
@@ -205,6 +205,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
 	private final static IPreferenceStore				_prefStore							= TourbookPlugin
 																									.getPrefStore();
+	private final static IPreferenceStore				_prefStoreCommon					= CommonActivator
+																									.getPrefStore();
 	private final IDialogSettings						_state								= TourbookPlugin
 																									.getState(ID);
 	//
@@ -216,19 +218,19 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 	private IPartListener2								_partListener;
 	private ITourEventListener							_tourPropertyListener;
 	private IPropertyChangeListener						_prefChangeListener;
+	private IPropertyChangeListener						_prefChangeListenerCommon;
 	//
 	private TVITourBookRoot								_rootItem;
 	//
 	private final DateTimeFormatter						_dtFormatter;
+	private final DateTimeFormatter						_dtTimeFormatterS;
+	private final DateTimeFormatter						_dtTimeFormatterM;
 	private final DateTimeFormatter						_isoFormatter;
 	private final NumberFormat							_nf0;
 	private final NumberFormat							_nf1;
 	private final NumberFormat							_nf2;
 	private final NumberFormat							_nf1_NoGroup;
 
-	private static int									_defaultTimeZoneOffset;
-	private final Calendar								_calendar;
-	private final DateFormat							_timeFormatter;
 	private static final String[]						_weekDays;
 	{
 		_nf0 = NumberFormat.getNumberInstance();
@@ -251,15 +253,20 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 		_dtFormatter = DateTimeFormat.forPattern("yyyy-MM-dd_HH-mm-ss"); //$NON-NLS-1$
 		_isoFormatter = ISODateTimeFormat.basicDateTimeNoMillis();
 
-		_calendar = GregorianCalendar.getInstance();
-		_timeFormatter = DateFormat.getTimeInstance(DateFormat.SHORT);
+		_dtTimeFormatterS = DateTimeFormat.shortTime();
+		_dtTimeFormatterM = DateTimeFormat.mediumTime();
 	}
 
 	static {
 
 		_weekDays = DateFormatSymbols.getInstance().getShortWeekdays();
+	}
 
-		_defaultTimeZoneOffset = _prefStore.getInt(ITourbookPreferences.TIME_ZONE_LOCAL_OFFSET);
+	private int											_defaultTimeZoneOffset;
+	private boolean										_isUseTimeZone;
+	{
+		_isUseTimeZone = _prefStoreCommon.getBoolean(ICommonPreferences.TIME_ZONE_IS_USE_TIME_ZONE);
+		_defaultTimeZoneOffset = _prefStoreCommon.getInt(ICommonPreferences.TIME_ZONE_LOCAL_OFFSET);
 	}
 
 	private int											_selectedYear						= -1;
@@ -538,12 +545,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
 					_tourViewer = (TreeViewer) recreateViewer(_tourViewer);
 
-				} else if (property.equals(ITourbookPreferences.TIME_ZONE_LOCAL_OFFSET)) {
-
-					_defaultTimeZoneOffset = _prefStore.getInt(ITourbookPreferences.TIME_ZONE_LOCAL_OFFSET);
-
-					_tourViewer.refresh();
-
 				} else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
 					_tourViewer.getTree().setLinesVisible(
@@ -562,6 +563,29 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
 		// register the listener
 		_prefStore.addPropertyChangeListener(_prefChangeListener);
+
+		/*
+		 * Common preferences
+		 */
+		_prefChangeListenerCommon = new IPropertyChangeListener() {
+			@Override
+			public void propertyChange(final PropertyChangeEvent event) {
+
+				final String property = event.getProperty();
+
+				if (property.equals(ICommonPreferences.TIME_ZONE_IS_USE_TIME_ZONE)
+						|| property.equals(ICommonPreferences.TIME_ZONE_LOCAL_OFFSET)) {
+
+					_isUseTimeZone = _prefStoreCommon.getBoolean(ICommonPreferences.TIME_ZONE_IS_USE_TIME_ZONE);
+					_defaultTimeZoneOffset = _prefStoreCommon.getInt(ICommonPreferences.TIME_ZONE_LOCAL_OFFSET);
+
+					_tourViewer.refresh();
+				}
+			}
+		};
+
+		// register the listener
+		_prefStoreCommon.addPropertyChangeListener(_prefChangeListenerCommon);
 	}
 
 	private void addSelectionListener() {
@@ -1830,14 +1854,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				final Object element = cell.getElement();
 				if (element instanceof TVITourBookTour) {
 
-					int timeZoneOffset = ((TVITourBookTour) element).colTimeZoneOffset;
+					final int timeZoneOffset = ((TVITourBookTour) element).colTimeZoneOffset;
 
-					if (timeZoneOffset == -1) {
-						// timezone is not set, use default
-						timeZoneOffset = _defaultTimeZoneOffset;
-					}
-
-					cell.setText(TimeZoneUtils.printOffset(timeZoneOffset));
+					cell.setText(TimeZoneUtils.getUtcTimeZoneOffset(timeZoneOffset));
 
 					setCellColor(cell, element);
 				}
@@ -1878,9 +1897,22 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				if (element instanceof TVITourBookTour) {
 
 					final long tourDate = ((TVITourBookTour) element).colTourDate;
-					_calendar.setTimeInMillis(tourDate);
 
-					cell.setText(_timeFormatter.format(_calendar.getTime()));
+					final int dbTimeZoneOffset = ((TVITourBookTour) element).colTimeZoneOffset;
+					int timeZoneOffset = 0;
+
+					if (dbTimeZoneOffset == Integer.MIN_VALUE) {
+
+						// timezone is not set, use original time without offset
+
+					} else if (_isUseTimeZone && dbTimeZoneOffset != _defaultTimeZoneOffset) {
+
+						// tour has not the default time zone
+
+						timeZoneOffset = dbTimeZoneOffset - _defaultTimeZoneOffset;
+					}
+
+					cell.setText(_dtTimeFormatterS.print(tourDate + (timeZoneOffset * 1000)));
 					setCellColor(cell, element);
 				}
 			}
@@ -2360,6 +2392,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 		TourManager.getInstance().removeTourEventListener(_tourPropertyListener);
 
 		_prefStore.removePropertyChangeListener(_prefChangeListener);
+		_prefStoreCommon.removePropertyChangeListener(_prefChangeListenerCommon);
 
 		super.dispose();
 	}
@@ -2498,6 +2531,12 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				exportWriter.write(sb.toString());
 			}
 
+			System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+					+ ("\n\n")
+					+ sb.toString()
+					+ ("\n\n"));
+			// TODO remove SYSTEM.OUT.PRINTLN
+
 		} catch (final IOException e) {
 			StatusUtil.showStatus(e);
 		} finally {
@@ -2626,8 +2665,27 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 	private void exportCSV_30_OtherColumns(final StringBuilder sb, final boolean isTour, final TVITourBookItem tviItem) {
 
 		TVITourBookTour tviTour = null;
+		DateTime dtTourStartTime = null;
+
 		if (isTour) {
+
 			tviTour = (TVITourBookTour) tviItem;
+
+			final long tourStartTime = tviItem.colTourDate;
+
+			int timeZoneOffset = tviItem.colTimeZoneOffset;
+			if (timeZoneOffset == -1) {
+				// timezone is not set, use default
+				timeZoneOffset = _defaultTimeZoneOffset;
+			}
+
+			// add zone offset
+			final DateTimeZone zone = DateTimeZone.forOffsetMillis(timeZoneOffset);
+
+			final DateTime dt0 = new DateTime(tourStartTime);
+
+			dtTourStartTime = dt0.withZone(zone);
+			final DateTime dt6 = dt0.withZoneRetainFields(zone);
 		}
 
 		// CSV_HEADER_WEEKDAY
@@ -2641,8 +2699,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 		// CSV_HEADER_TIME
 		{
 			if (isTour) {
-				_calendar.setTimeInMillis(tviItem.colTourDate);
-				sb.append(_timeFormatter.format(_calendar.getTime()));
+
+				sb.append(_dtTimeFormatterM.print(dtTourStartTime));
 			}
 			sb.append(UI.TAB);
 		}
@@ -2650,7 +2708,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 		// CSV_HEADER_ISO_DATE_TIME
 		{
 			if (isTour) {
-				sb.append(_isoFormatter.print(tviItem.colTourDate));
+				sb.append(_isoFormatter.print(dtTourStartTime));
 			}
 			sb.append(UI.TAB);
 		}
@@ -3637,4 +3695,5 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 		_isToolTipInTitle = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_TITLE);
 		_isToolTipInTags = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURBOOK_TAGS);
 	}
+
 }

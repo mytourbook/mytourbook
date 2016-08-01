@@ -15,66 +15,108 @@
  *******************************************************************************/
 package net.tourbook.common.time;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.zone.ZoneRules;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
+import net.tourbook.common.preferences.ICommonPreferences;
 
-import org.joda.time.DateTimeConstants;
-import org.joda.time.DateTimeZone;
-import org.joda.time.format.FormatUtils;
+import org.eclipse.jface.preference.IPreferenceStore;
+
+import com.skedgo.converter.TimezoneMapper;
 
 public class TimeZoneUtils {
 
-	private static ArrayList<TimeZone>	_allSortedTimeZones;
+	private static final String				ZERO_0				= ":0";									//$NON-NLS-1$
+	private static final String				ZERO_00_00			= "+00:00";								//$NON-NLS-1$
+
+	/*
+	 * Copied from java.time.LocalTime
+	 */
+	/** Hours per day. */
+	static final int						HOURS_PER_DAY		= 24;
+	/** Minutes per hour. */
+	static final int						MINUTES_PER_HOUR	= 60;
+	/** Minutes per day. */
+	static final int						MINUTES_PER_DAY		= MINUTES_PER_HOUR * HOURS_PER_DAY;
+	/** Seconds per minute. */
+	static final int						SECONDS_PER_MINUTE	= 60;
+	/** Seconds per hour. */
+	static final int						SECONDS_PER_HOUR	= SECONDS_PER_MINUTE * MINUTES_PER_HOUR;
+	/** Seconds per day. */
+	static final int						SECONDS_PER_DAY		= SECONDS_PER_HOUR * HOURS_PER_DAY;
+
+	final static IPreferenceStore			_prefStoreCommon	= CommonActivator.getPrefStore();
+
+	private static ArrayList<TimeZoneData>	_allSortedTimeZones;
+
+	private static boolean					_isUseTimeZone;
+	private static String					_defaultTimeZoneId;
+	private static int						_defaultTimeZoneOffset;
+
+	static {
+
+		_isUseTimeZone = _prefStoreCommon.getBoolean(ICommonPreferences.TIME_ZONE_IS_USE_TIME_ZONE);
+		_defaultTimeZoneId = _prefStoreCommon.getString(ICommonPreferences.TIME_ZONE_LOCAL_ID);
+		_defaultTimeZoneOffset = _prefStoreCommon.getInt(ICommonPreferences.TIME_ZONE_LOCAL_OFFSET);
+	}
 
 	/**
 	 * @return Returns a list with all available time zones which are sorted by zone offset, zone id
 	 *         and zone name key.
 	 */
-	public static ArrayList<TimeZone> getAllTimeZones() {
+	public static ArrayList<TimeZoneData> getAllTimeZones() {
 
 		if (_allSortedTimeZones == null) {
 
-			final ArrayList<TimeZone> sortedTimeZones = new ArrayList<>();
+			final ArrayList<TimeZoneData> sortedTimeZones = new ArrayList<>();
 
-			for (final String dtZoneId : DateTimeZone.getAvailableIDs()) {
+			for (final String rawZoneId : ZoneId.getAvailableZoneIds()) {
 
-				final DateTimeZone dtZone = DateTimeZone.forID(dtZoneId);
+				final ZoneId zoneId = ZoneId.of(rawZoneId);
+				final OffsetDateTime zonedDateTime = OffsetDateTime.now(zoneId);
 
-				final int dtZoneOffset = dtZone.getOffset(0);
-				final String dtZoneNameKey = dtZone.getNameKey(0);
+				final ZoneOffset zoneOffset = zonedDateTime.getOffset();
+				final ZoneRules tzRules = zoneOffset.getRules();
 
-				final String label = TimeZoneUtils.printOffset(dtZoneOffset) + UI.SPACE4 + dtZoneId;
+				final ZoneOffset standardOffset = tzRules.getStandardOffset(zonedDateTime.toInstant());
 
-				final TimeZone timeZone = new TimeZone();
+				final int timeZoneSeconds = zoneOffset.getTotalSeconds();
+				final int adjustedToDefaultTZ = timeZoneSeconds - _defaultTimeZoneOffset;
+
+				final String label = printOffset(timeZoneSeconds) + UI.SPACE4 + zoneId.getId();
+
+				final TimeZoneData timeZone = new TimeZoneData();
 
 				timeZone.label = label;
-
-				timeZone.zoneId = dtZoneId;
-				timeZone.zoneOffset = dtZoneOffset;
-				timeZone.zoneNameKey = dtZoneNameKey;
+				timeZone.zoneId = zoneId.getId();
+				timeZone.zoneOffsetSeconds = adjustedToDefaultTZ;
 
 				sortedTimeZones.add(timeZone);
 			}
 
-//		Collections.sort(sortedTimeZones, new Comparator<TimeZone>() {
-//
-//			@Override
-//			public int compare(final TimeZone tz1, final TimeZone tz2) {
-//
-//				int result = tz1.zoneOffset - tz2.zoneOffset;
-//
-//				if (result == 0) {
-//					result = tz1.zoneId.compareTo(tz2.zoneId);
-//				}
-//
-//				if (result == 0) {
-//					result = tz1.zoneNameKey.compareTo(tz2.zoneNameKey);
-//				}
-//
-//				return result;
-//			}
-//		});
+			Collections.sort(sortedTimeZones, new Comparator<TimeZoneData>() {
+
+				@Override
+				public int compare(final TimeZoneData tz1, final TimeZoneData tz2) {
+
+					int result;
+
+					result = tz1.zoneId.compareTo(tz2.zoneId);
+
+					if (result == 0) {
+						result = tz1.zoneOffsetSeconds - tz2.zoneOffsetSeconds;
+					}
+
+					return result;
+				}
+			});
 
 			_allSortedTimeZones = sortedTimeZones;
 		}
@@ -86,11 +128,11 @@ public class TimeZoneUtils {
 	 * @param timeZoneId
 	 * @return Returns the timezone for the ID or <code>null</code> when not available.
 	 */
-	public static TimeZone getTimeZone(final String timeZoneId) {
+	public static TimeZoneData getTimeZone(final String timeZoneId) {
 
-		final ArrayList<TimeZone> allTimeZones = getAllTimeZones();
+		final ArrayList<TimeZoneData> allTimeZones = getAllTimeZones();
 
-		for (final TimeZone timeZone : allTimeZones) {
+		for (final TimeZoneData timeZone : allTimeZones) {
 
 			if (timeZone.zoneId.equals(timeZoneId)) {
 				return timeZone;
@@ -101,16 +143,43 @@ public class TimeZoneUtils {
 	}
 
 	/**
+	 * @param latitude
+	 * @param longitude
+	 * @return Returns the time zone index in {@link #getAllTimeZones()}, when latitude is
+	 *         {@link Double#MIN_VALUE} then the time zone index for the default time zone is
+	 *         returned.
+	 */
+	public static int getTimeZoneIndex(final double latitude, final double longitude) {
+
+		TimeZoneData timeZone = null;
+
+		if (latitude != Double.MIN_VALUE) {
+
+			final String timeZoneIdFromLatLon = TimezoneMapper.latLngToTimezoneString(latitude, longitude);
+			final TimeZoneData timeZoneFromLatLon = TimeZoneUtils.getTimeZone(timeZoneIdFromLatLon);
+
+			timeZone = timeZoneFromLatLon;
+		}
+
+		if (timeZone == null) {
+			// use default
+			timeZone = TimeZoneUtils.getTimeZone(_defaultTimeZoneId);
+		}
+
+		return getTimeZoneIndex(timeZone.zoneId);
+	}
+
+	/**
 	 * @param timeZoneId
 	 * @return Returns the timezone index for the timezone ID or -1 when not available.
 	 */
 	public static int getTimeZoneIndex(final String timeZoneId) {
 
-		final ArrayList<TimeZone> allTimeZones = getAllTimeZones();
+		final ArrayList<TimeZoneData> allTimeZones = getAllTimeZones();
 
 		for (int timeZoneIndex = 0; timeZoneIndex < allTimeZones.size(); timeZoneIndex++) {
 
-			final TimeZone timeZone = allTimeZones.get(timeZoneIndex);
+			final TimeZoneData timeZone = allTimeZones.get(timeZoneIndex);
 
 			if (timeZone.zoneId.equals(timeZoneId)) {
 				return timeZoneIndex;
@@ -121,51 +190,77 @@ public class TimeZoneUtils {
 	}
 
 	/**
-	 * Formats a timezone offset string.
-	 * <p>
-	 * This method is kept separate from the formatting classes to speed and simplify startup and
-	 * classloading.
-	 * 
-	 * @param offset
-	 *            the offset in milliseconds
-	 * @return the time zone string
+	 * @param timeZoneOffset
+	 * @return Returns the text for the time zone, adds a * when default time zone is used.
 	 */
-	public static String printOffset(int offset) {
+	public static String getUtcTimeZoneOffset(int timeZoneOffset) {
+
+		if (_isUseTimeZone) {
+
+			boolean isDefaultZone = false;
+
+			if (timeZoneOffset == Integer.MIN_VALUE) {
+
+				// timezone is not set, use default
+				timeZoneOffset = _defaultTimeZoneOffset;
+
+				isDefaultZone = true;
+			}
+
+			String tzOffset = printOffset(timeZoneOffset);
+
+			if (isDefaultZone) {
+				// mark the default zone with a star
+				tzOffset += UI.SYMBOL_STAR;
+			}
+
+			return tzOffset;
+
+		} else {
+
+			return "no TZ";
+		}
+	}
+
+	public static String printOffset(final int timeZoneOffset) {
 
 		/*
-		 * Copied from org.joda.time.DateTimeZone
+		 * Copied (and modified) from java.time.ZoneOffset.buildId(int)
 		 */
+		if (timeZoneOffset == 0) {
 
-		final StringBuffer buf = new StringBuffer();
-		if (offset >= 0) {
-			buf.append('+');
+			return ZERO_00_00;
+
 		} else {
-			buf.append('-');
-			offset = -offset;
+
+			final int absTotalSeconds = Math.abs(timeZoneOffset);
+			final int absHours = absTotalSeconds / SECONDS_PER_HOUR;
+			final int absMinutes = (absTotalSeconds / SECONDS_PER_MINUTE) % MINUTES_PER_HOUR;
+
+			final StringBuilder sb = new StringBuilder()
+					.append(timeZoneOffset < 0 ? '-' : '+')
+					.append(absHours < 10 ? '0' : UI.EMPTY_STRING)
+					.append(absHours)
+					.append(absMinutes < 10 ? ZERO_0 : ':')
+					.append(absMinutes);
+
+			final int absSeconds = absTotalSeconds % SECONDS_PER_MINUTE;
+
+			if (absSeconds != 0) {
+				sb.append(absSeconds < 10 ? ZERO_0 : ':').append(absSeconds);
+			}
+
+			return sb.toString();
 		}
-
-		final int hours = offset / DateTimeConstants.MILLIS_PER_HOUR;
-		FormatUtils.appendPaddedInteger(buf, hours, 2);
-		offset -= hours * DateTimeConstants.MILLIS_PER_HOUR;
-
-		final int minutes = offset / DateTimeConstants.MILLIS_PER_MINUTE;
-		buf.append(':');
-		FormatUtils.appendPaddedInteger(buf, minutes, 2);
-		offset -= minutes * DateTimeConstants.MILLIS_PER_MINUTE;
-		if (offset == 0) {
-			return buf.toString();
-		}
-
-		final int seconds = offset / DateTimeConstants.MILLIS_PER_SECOND;
-		buf.append(':');
-		FormatUtils.appendPaddedInteger(buf, seconds, 2);
-		offset -= seconds * DateTimeConstants.MILLIS_PER_SECOND;
-		if (offset == 0) {
-			return buf.toString();
-		}
-
-		buf.append('.');
-		FormatUtils.appendPaddedInteger(buf, offset, 3);
-		return buf.toString();
 	}
+
+	public static void setDefaultTimeZoneOffset(final boolean isUseTimeZone,
+												final String timeZoneId,
+												final int timeZoneOffset) {
+
+		_isUseTimeZone = isUseTimeZone;
+		_defaultTimeZoneId = timeZoneId;
+		_defaultTimeZoneOffset = timeZoneOffset;
+	}
+
 }
