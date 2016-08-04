@@ -15,9 +15,9 @@
  *******************************************************************************/
 package net.tourbook.common.time;
 
-import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.zone.ZoneRules;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -80,7 +80,7 @@ public class TimeZoneUtils {
 			for (final String rawZoneId : ZoneId.getAvailableZoneIds()) {
 
 				final ZoneId zoneId = ZoneId.of(rawZoneId);
-				final OffsetDateTime zonedDateTime = OffsetDateTime.now(zoneId);
+				final ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
 
 				final ZoneOffset zoneOffset = zonedDateTime.getOffset();
 				final ZoneRules tzRules = zoneOffset.getRules();
@@ -90,7 +90,7 @@ public class TimeZoneUtils {
 				final int timeZoneSeconds = zoneOffset.getTotalSeconds();
 				final int adjustedToDefaultTZ = timeZoneSeconds - _defaultTimeZoneOffset;
 
-				final String label = printOffset(timeZoneSeconds) + UI.SPACE4 + zoneId.getId();
+				final String label = printOffset(adjustedToDefaultTZ) + UI.SPACE4 + zoneId.getId();
 
 				final TimeZoneData timeZone = new TimeZoneData();
 
@@ -222,11 +222,11 @@ public class TimeZoneUtils {
 		}
 	}
 
+	/*
+	 * Copied (and modified) from java.time.ZoneOffset.buildId(int)
+	 */
 	public static String printOffset(final int timeZoneOffset) {
 
-		/*
-		 * Copied (and modified) from java.time.ZoneOffset.buildId(int)
-		 */
 		if (timeZoneOffset == 0) {
 
 			return ZERO_00_00;

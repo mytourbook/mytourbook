@@ -29,9 +29,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.NumberFormat;
-import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.zone.ZoneRules;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -6046,10 +6047,7 @@ public class TourDatabase {
 
 						monitor.subTask(NLS.bind(//
 								Messages.Tour_Database_PostUpdate_032_SetTourTimeZone,
-								new Object[] {
-										tourIdx,
-										tourList.size(),
-										percent }));
+								new Object[] { tourIdx, tourList.size(), percent }));
 					}
 
 					tourIdx++;
@@ -6062,13 +6060,17 @@ public class TourDatabase {
 					final double lat = tourData.latitudeSerie[0];
 					final double lon = tourData.longitudeSerie[0];
 
-					final String zoneId = TimezoneMapper.latLngToTimezoneString(lat, lon);
+					final String rawZoneId = TimezoneMapper.latLngToTimezoneString(lat, lon);
 
-					final ZoneId zone = ZoneId.of(zoneId);
-					final OffsetDateTime zonedDateTime = OffsetDateTime.now(zone);
-					final ZoneOffset offset = zonedDateTime.getOffset();
+					final ZoneId zoneId = ZoneId.of(rawZoneId);
+					final ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
 
-					tourData.setTimeZoneOffset(offset.getTotalSeconds());
+					final ZoneOffset zoneOffset = zonedDateTime.getOffset();
+					final ZoneRules tzRules = zoneOffset.getRules();
+
+					final ZoneOffset standardOffset = tzRules.getStandardOffset(zonedDateTime.toInstant());
+
+					tourData.setTimeZoneOffset(zoneOffset.getTotalSeconds());
 
 					TourDatabase.saveEntity(tourData, tourId, TourData.class);
 				}
