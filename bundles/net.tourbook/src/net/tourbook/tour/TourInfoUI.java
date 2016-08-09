@@ -1100,7 +1100,7 @@ public class TourInfoUI {
 
 		// time zone
 		final int tzOffset = _tourData.getTimeZoneOffset();
-		_lblUtcTimeOffset.setText(TimeZoneUtils.getUtcTimeZoneOffset(tzOffset));
+		_lblUtcTimeOffset.setText(TimeZoneUtils.getTimeZoneOffsetTextFromDbValue(tzOffset));
 
 		int windSpeed = _tourData.getWeatherWindSpeed();
 		windSpeed = (int) (windSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);

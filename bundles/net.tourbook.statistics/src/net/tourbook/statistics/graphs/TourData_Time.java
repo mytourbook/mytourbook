@@ -15,10 +15,9 @@
  *******************************************************************************/
 package net.tourbook.statistics.graphs;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import org.joda.time.DateTime;
 
 public class TourData_Time {
 
@@ -42,8 +41,8 @@ public class TourData_Time {
 
 	int[]							tourTimeStartValues;
 	int[]							tourTimeEndValues;
-	ArrayList<DateTime>				tourStartDateTimes;
-	int[]							tourUtcTimeOffset;
+	ArrayList<ZonedDateTime>		tourStartDateTimes;
+	ArrayList<String>				tourTimeZoneOffset;
 
 	int[]							tourAltitudeValues;
 	int[]							tourDistanceValues;

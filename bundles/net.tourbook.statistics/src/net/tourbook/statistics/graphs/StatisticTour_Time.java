@@ -15,6 +15,10 @@
  *******************************************************************************/
 package net.tourbook.statistics.graphs;
 
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.time.temporal.IsoFields;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -32,7 +36,6 @@ import net.tourbook.chart.MinMaxKeeper_YData;
 import net.tourbook.chart.SelectionBarChart;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
-import net.tourbook.common.time.TimeZoneUtils;
 import net.tourbook.common.util.IToolTipHideListener;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -62,9 +65,6 @@ import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.IViewSite;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 public class StatisticTour_Time extends TourbookStatistic implements IBarSelectionProvider, ITourProvider {
 
@@ -76,8 +76,10 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
 	private int							_numberOfYears;
 
 	private final Calendar				_calendar							= GregorianCalendar.getInstance();
-	private final DateTimeFormatter		_dateFormatter						= DateTimeFormat.fullDate();
-	private final DateTimeFormatter		_timeFormatter						= DateTimeFormat.mediumTime();
+	private final DateTimeFormatter		_dateFormatter						= DateTimeFormatter
+																					.ofLocalizedDate(FormatStyle.FULL);
+	private final DateTimeFormatter		_timeFormatter						= DateTimeFormatter
+																					.ofLocalizedTime(FormatStyle.MEDIUM);
 
 	private Chart						_chart;
 
@@ -259,14 +261,14 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
 		final int drivingTime = _tourTimeData.tourDrivingTimeValues[valueIndex];
 		final int breakTime = recordingTime - drivingTime;
 
-		final DateTime dtTourStart = _tourTimeData.tourStartDateTimes.get(valueIndex);
-		final DateTime dtTourEnd = dtTourStart.plus(recordingTime * 1000);
+		final ZonedDateTime zdtTourStart = _tourTimeData.tourStartDateTimes.get(valueIndex);
+		final ZonedDateTime zdtTourEnd = zdtTourStart.plusSeconds(recordingTime);
 
 		final float distance = _tourTimeData.tourDistanceValues[valueIndex];
 		final float speed = drivingTime == 0 ? 0 : distance / (drivingTime / 3.6f);
 		final float pace = distance == 0 ? 0 : drivingTime * 1000 / distance;
 
-		final int utcTimeOffset = _tourTimeData.tourUtcTimeOffset[valueIndex];
+		final String tourTimeZoneOffset = _tourTimeData.tourTimeZoneOffset.get(valueIndex);
 
 		final StringBuilder toolTipFormat = new StringBuilder();
 		toolTipFormat.append(TOUR_TOOLTIP_FORMAT_DATE_WEEK_TIME); //		%s - %s - %s - CW %d
@@ -307,10 +309,10 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
 
 		final String toolTipLabel = String.format(toolTipFormat.toString(),
 		//
-				_dateFormatter.print(dtTourStart.getMillis()),
-				_timeFormatter.print(dtTourStart.getMillis()),
-				_timeFormatter.print(dtTourEnd.getMillis()),
-				dtTourStart.getWeekOfWeekyear(),
+				zdtTourStart.format(_dateFormatter),
+				zdtTourStart.format(_timeFormatter),
+				zdtTourEnd.format(_timeFormatter),
+				zdtTourStart.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR),
 				//
 				distance / 1000,
 				UI.UNIT_LABEL_DISTANCE,
@@ -326,8 +328,8 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
 				endValue[valueIndex] / 3600 % 24,
 				(endValue[valueIndex] % 3600) / 60,
 				//
-				// time zone
-				TimeZoneUtils.getUtcTimeZoneOffset(utcTimeOffset),
+				// time zone offset
+				tourTimeZoneOffset,
 				//
 				recordingTime / 3600,
 				(recordingTime % 3600) / 60,

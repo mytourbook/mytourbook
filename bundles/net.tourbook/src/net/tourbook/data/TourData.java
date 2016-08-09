@@ -609,6 +609,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	private int													rearShiftCount;
 
+	// ############################################# GEO POSITIONS #############################################
+
+	private double												latitudeStart;
+	private double												longitudeStart;
+	private double												latitudeMin;
+	private double												longitudeMin;
+	private double												latitudeMax;
+	private double												longitudeMax;
+
 	// ############################################# UNUSED FIELDS - START #############################################
 	/**
 	 * ssss distance msw
@@ -5460,6 +5469,30 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		return UI.EMPTY_STRING;
 	}
 
+	public double getLatitudeMax() {
+		return latitudeMax;
+	}
+
+	public double getLatitudeMin() {
+		return latitudeMin;
+	}
+
+	public double getLatitudeStart() {
+		return latitudeStart;
+	}
+
+	public double getLongitudeMax() {
+		return longitudeMax;
+	}
+
+	public double getLongitudeMin() {
+		return longitudeMin;
+	}
+
+	public double getLongitudeStart() {
+		return longitudeStart;
+	}
+
 	/**
 	 * @return the maxAltitude
 	 */
@@ -6159,7 +6192,8 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	}
 
 	/**
-	 * @return Returns tour start time in milliseconds since 1970-01-01T00:00:00Z
+	 * @return Returns the tour start time in milliseconds since 1970-01-01T00:00:00Z with the local
+	 *         time zone.
 	 */
 	public long getTourStartTimeMS() {
 		return tourStartTime;
@@ -6868,6 +6902,21 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		this.rearShiftCount = rearShifts;
 	}
 
+	public void setGeoBounds() {
+
+		final GeoPosition[] geoBounds = getGeoBounds();
+
+		if (geoBounds == null) {
+			return;
+		}
+
+		latitudeMin = geoBounds[0].latitude;
+		longitudeMin = geoBounds[0].longitude;
+
+		latitudeMax = geoBounds[1].latitude;
+		longitudeMax = geoBounds[1].longitude;
+	}
+
 	/**
 	 * Set only the import folder.
 	 * 
@@ -6934,6 +6983,30 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		if (isFromSensor) {
 			cadenceMultiplier = 2.0f;
 		}
+	}
+
+	public void setLatitudeMax(final double latitudeMax) {
+		this.latitudeMax = latitudeMax;
+	}
+
+	public void setLatitudeMin(final double latitudeMin) {
+		this.latitudeMin = latitudeMin;
+	}
+
+	public void setLatitudeStart(final double latitudeStart) {
+		this.latitudeStart = latitudeStart;
+	}
+
+	public void setLongitudeMax(final double longitudeMax) {
+		this.longitudeMax = longitudeMax;
+	}
+
+	public void setLongitudeMin(final double longitudeMin) {
+		this.longitudeMin = longitudeMin;
+	}
+
+	public void setLongitudeStart(final double longitudeStart) {
+		this.longitudeStart = longitudeStart;
 	}
 
 	public void setMaxPulse(final float maxPulse) {

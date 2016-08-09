@@ -29,10 +29,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.NumberFormat;
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.time.zone.ZoneRules;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -6057,20 +6057,23 @@ public class TourDatabase {
 
 				if (tourData != null && tourData.latitudeSerie != null) {
 
+					// get time zone from lat/lon
 					final double lat = tourData.latitudeSerie[0];
 					final double lon = tourData.longitudeSerie[0];
-
 					final String rawZoneId = TimezoneMapper.latLngToTimezoneString(lat, lon);
-
 					final ZoneId zoneId = ZoneId.of(rawZoneId);
-					final ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
 
+					final long tourStartTime = tourData.getTourStartTimeMS();
+					final Instant tourStartInstant = Instant.ofEpochMilli(tourStartTime);
+
+					final ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(tourStartInstant, zoneId);
 					final ZoneOffset zoneOffset = zonedDateTime.getOffset();
-					final ZoneRules tzRules = zoneOffset.getRules();
-
-					final ZoneOffset standardOffset = tzRules.getStandardOffset(zonedDateTime.toInstant());
 
 					tourData.setTimeZoneOffset(zoneOffset.getTotalSeconds());
+
+					tourData.setLatitudeStart(lat);
+					tourData.setLongitudeStart(lon);
+					tourData.setGeoBounds();
 
 					TourDatabase.saveEntity(tourData, tourId, TourData.class);
 				}

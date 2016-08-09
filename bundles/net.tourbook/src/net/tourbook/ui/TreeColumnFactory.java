@@ -1012,7 +1012,9 @@ public abstract class TreeColumnFactory {
 				colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
 				colDef.setColumnLabel(Messages.ColumnFactory_TimeZone_Label);
 				colDef.setColumnHeaderText(Messages.ColumnFactory_TimeZone_Header);
-				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_TimeZone_Tooltip);
+
+				// THIS MUST BE SET IN THE VIEW TO SET THE CORRECT DEFAULT TIME ZONE
+//				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_TimeZone_Tooltip);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 

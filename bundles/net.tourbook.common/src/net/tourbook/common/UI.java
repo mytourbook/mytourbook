@@ -311,6 +311,8 @@ public class UI {
 	 */
 	private static final String				DIALOG_FONT_DATA						= "DIALOG_FONT_NAME";														//$NON-NLS-1$
 
+	public static final String				UTC										= "UTC";																	//$NON-NLS-1$
+
 	public static final DateFormat			TimeFormatterShort						= DateFormat
 																							.getTimeInstance(DateFormat.SHORT);
 	public static final DateFormat			DateFormatterShort						= DateFormat

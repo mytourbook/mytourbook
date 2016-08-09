@@ -15,10 +15,12 @@
  *******************************************************************************/
 package net.tourbook.common.time;
 
+import gnu.trove.map.hash.TIntObjectHashMap;
+
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.time.zone.ZoneRules;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -33,32 +35,40 @@ import com.skedgo.converter.TimezoneMapper;
 
 public class TimeZoneUtils {
 
-	private static final String				ZERO_0				= ":0";									//$NON-NLS-1$
-	private static final String				ZERO_00_00			= "+00:00";								//$NON-NLS-1$
+	private static final String						ZERO_0				= ":0";									//$NON-NLS-1$
+	private static final String						ZERO_00_00			= "+00:00";								//$NON-NLS-1$
+
+	public static final String						TIME_ZONE_UTC		= "UTC";									//$NON-NLS-1$
+
+	/**
+	 * Cached time zone text.
+	 */
+	private static final TIntObjectHashMap<String>	_timeZoneOffsets	= new TIntObjectHashMap<>();
+	private static final TIntObjectHashMap<String>	_dbTimeZoneOffsets	= new TIntObjectHashMap<>();
 
 	/*
 	 * Copied from java.time.LocalTime
 	 */
 	/** Hours per day. */
-	static final int						HOURS_PER_DAY		= 24;
+	static final int								HOURS_PER_DAY		= 24;
 	/** Minutes per hour. */
-	static final int						MINUTES_PER_HOUR	= 60;
+	static final int								MINUTES_PER_HOUR	= 60;
 	/** Minutes per day. */
-	static final int						MINUTES_PER_DAY		= MINUTES_PER_HOUR * HOURS_PER_DAY;
+	static final int								MINUTES_PER_DAY		= MINUTES_PER_HOUR * HOURS_PER_DAY;
 	/** Seconds per minute. */
-	static final int						SECONDS_PER_MINUTE	= 60;
+	static final int								SECONDS_PER_MINUTE	= 60;
 	/** Seconds per hour. */
-	static final int						SECONDS_PER_HOUR	= SECONDS_PER_MINUTE * MINUTES_PER_HOUR;
+	static final int								SECONDS_PER_HOUR	= SECONDS_PER_MINUTE * MINUTES_PER_HOUR;
 	/** Seconds per day. */
-	static final int						SECONDS_PER_DAY		= SECONDS_PER_HOUR * HOURS_PER_DAY;
+	static final int								SECONDS_PER_DAY		= SECONDS_PER_HOUR * HOURS_PER_DAY;
 
-	final static IPreferenceStore			_prefStoreCommon	= CommonActivator.getPrefStore();
+	final static IPreferenceStore					_prefStoreCommon	= CommonActivator.getPrefStore();
 
-	private static ArrayList<TimeZoneData>	_allSortedTimeZones;
+	private static ArrayList<TimeZoneData>			_allSortedTimeZones;
 
-	private static boolean					_isUseTimeZone;
-	private static String					_defaultTimeZoneId;
-	private static int						_defaultTimeZoneOffset;
+	private static boolean							_isUseTimeZone;
+	private static String							_defaultTimeZoneId;
+	private static int								_defaultTimeZoneOffset;
 
 	static {
 
@@ -83,20 +93,15 @@ public class TimeZoneUtils {
 				final ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
 
 				final ZoneOffset zoneOffset = zonedDateTime.getOffset();
-				final ZoneRules tzRules = zoneOffset.getRules();
+				final int utcTimeZoneSeconds = zoneOffset.getTotalSeconds();
 
-				final ZoneOffset standardOffset = tzRules.getStandardOffset(zonedDateTime.toInstant());
-
-				final int timeZoneSeconds = zoneOffset.getTotalSeconds();
-				final int adjustedToDefaultTZ = timeZoneSeconds - _defaultTimeZoneOffset;
-
-				final String label = printOffset(adjustedToDefaultTZ) + UI.SPACE4 + zoneId.getId();
+				final String label = printOffset(utcTimeZoneSeconds) + UI.SPACE4 + zoneId.getId();
 
 				final TimeZoneData timeZone = new TimeZoneData();
 
 				timeZone.label = label;
 				timeZone.zoneId = zoneId.getId();
-				timeZone.zoneOffsetSeconds = adjustedToDefaultTZ;
+				timeZone.zoneOffsetSeconds = utcTimeZoneSeconds;
 
 				sortedTimeZones.add(timeZone);
 			}
@@ -190,42 +195,115 @@ public class TimeZoneUtils {
 	}
 
 	/**
-	 * @param timeZoneOffset
+	 * @param dbStartTimeMilli
+	 * @param dbTimeZoneOffset
+	 *            Time zone offset in seconds or {@link Integer#MIN_VALUE} when the time zone offset
+	 *            is not defined then the local time zone is used.
 	 * @return Returns the text for the time zone, adds a * when default time zone is used.
 	 */
-	public static String getUtcTimeZoneOffset(int timeZoneOffset) {
+	public static String getTimeZoneOffsetTextFromDbValue(final int dbTimeZoneOffset) {
 
-		if (_isUseTimeZone) {
+		String tzText = _dbTimeZoneOffsets.get(dbTimeZoneOffset);
 
-			boolean isDefaultZone = false;
+		if (tzText == null) {
 
-			if (timeZoneOffset == Integer.MIN_VALUE) {
+			if (_isUseTimeZone) {
 
-				// timezone is not set, use default
-				timeZoneOffset = _defaultTimeZoneOffset;
+				boolean isDefaultZone = false;
+				int tourTimeOffset;
 
-				isDefaultZone = true;
+				if (dbTimeZoneOffset == Integer.MIN_VALUE) {
+
+					// timezone is not set, use default
+
+					isDefaultZone = true;
+
+					tourTimeOffset = _defaultTimeZoneOffset;
+
+				} else {
+
+					tourTimeOffset = dbTimeZoneOffset;
+				}
+
+				final int tour2defaultOffset = _defaultTimeZoneOffset - tourTimeOffset;
+
+				String tzOffset = printOffset(tour2defaultOffset);
+
+				if (isDefaultZone) {
+					// mark the default zone with a star
+					tzOffset += UI.SYMBOL_STAR;
+				}
+
+				tzText = tzOffset;
+
+				_dbTimeZoneOffsets.put(dbTimeZoneOffset, tzText);
+
+			} else {
+
+				tzText = "no TZ";
 			}
-
-			String tzOffset = printOffset(timeZoneOffset);
-
-			if (isDefaultZone) {
-				// mark the default zone with a star
-				tzOffset += UI.SYMBOL_STAR;
-			}
-
-			return tzOffset;
-
-		} else {
-
-			return "no TZ";
 		}
+
+		return tzText;
+	}
+
+	/**
+	 * Adjust tour time with the time zone offset.
+	 * 
+	 * @param epochMilli
+	 *            The number of milliseconds from 1970-01-01T00:00:00Z
+	 * @param dbTimeZoneOffset
+	 *            Time zone offset in seconds or {@link Integer#MIN_VALUE} when the time zone offset
+	 *            is not defined then the local time zone is used.
+	 * @return
+	 */
+	public static ZonedDateTime getTourTime(final long epochMilli, final int dbTimeZoneOffset) {
+
+		final Instant tourStartInstant = Instant.ofEpochMilli(epochMilli);
+
+		final int tourUtcTimeOffset = getTourUTCTimeOffset(dbTimeZoneOffset);
+
+		final ZoneOffset zoneOffset = ZoneOffset.ofTotalSeconds(tourUtcTimeOffset);
+		final ZoneId zoneId = ZoneId.ofOffset(TIME_ZONE_UTC, zoneOffset);
+
+		final ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(tourStartInstant, zoneId);
+
+		return zonedDateTime;
+	}
+
+	/**
+	 * @param dbTimeZoneOffset
+	 *            Time zone offset in seconds or {@link Integer#MIN_VALUE} when the time zone offset
+	 *            is not defined then the local time zone is used.
+	 * @return
+	 */
+	private static int getTourUTCTimeOffset(final int dbTimeZoneOffset) {
+
+		int tourUTCTimeOffset = _defaultTimeZoneOffset;
+
+		if (dbTimeZoneOffset == Integer.MIN_VALUE) {
+
+			// timezone is not set, use original time without offset
+
+		} else if (_isUseTimeZone) {
+
+			// tour has a UTC time zone offset
+
+			tourUTCTimeOffset = dbTimeZoneOffset;
+		}
+
+		return tourUTCTimeOffset;
 	}
 
 	/*
 	 * Copied (and modified) from java.time.ZoneOffset.buildId(int)
 	 */
-	public static String printOffset(final int timeZoneOffset) {
+	/**
+	 * @param timeZoneOffset
+	 *            Time zone offset in seconds.
+	 * @return
+	 */
+	private static String printOffset(final int timeZoneOffset) {
 
 		if (timeZoneOffset == 0) {
 
@@ -233,24 +311,35 @@ public class TimeZoneUtils {
 
 		} else {
 
-			final int absTotalSeconds = Math.abs(timeZoneOffset);
-			final int absHours = absTotalSeconds / SECONDS_PER_HOUR;
-			final int absMinutes = (absTotalSeconds / SECONDS_PER_MINUTE) % MINUTES_PER_HOUR;
+			String tzText = _timeZoneOffsets.get(timeZoneOffset);
 
-			final StringBuilder sb = new StringBuilder()
-					.append(timeZoneOffset < 0 ? '-' : '+')
-					.append(absHours < 10 ? '0' : UI.EMPTY_STRING)
-					.append(absHours)
-					.append(absMinutes < 10 ? ZERO_0 : ':')
-					.append(absMinutes);
+			if (tzText == null) {
 
-			final int absSeconds = absTotalSeconds % SECONDS_PER_MINUTE;
+				// create text
 
-			if (absSeconds != 0) {
-				sb.append(absSeconds < 10 ? ZERO_0 : ':').append(absSeconds);
+				final int absTotalSeconds = Math.abs(timeZoneOffset);
+				final int absHours = absTotalSeconds / SECONDS_PER_HOUR;
+				final int absMinutes = (absTotalSeconds / SECONDS_PER_MINUTE) % MINUTES_PER_HOUR;
+
+				final StringBuilder sb = new StringBuilder()
+						.append(timeZoneOffset < 0 ? '-' : '+')
+						.append(absHours < 10 ? '0' : UI.EMPTY_STRING)
+						.append(absHours)
+						.append(absMinutes < 10 ? ZERO_0 : ':')
+						.append(absMinutes);
+
+				final int absSeconds = absTotalSeconds % SECONDS_PER_MINUTE;
+
+				if (absSeconds != 0) {
+					sb.append(absSeconds < 10 ? ZERO_0 : ':').append(absSeconds);
+				}
+
+				tzText = sb.toString();
+
+				_timeZoneOffsets.put(timeZoneOffset, tzText);
 			}
 
-			return sb.toString();
+			return tzText;
 		}
 	}
 
@@ -261,6 +350,12 @@ public class TimeZoneUtils {
 		_isUseTimeZone = isUseTimeZone;
 		_defaultTimeZoneId = timeZoneId;
 		_defaultTimeZoneOffset = timeZoneOffset;
+
+		_dbTimeZoneOffsets.clear();
+
+		System.out.println((UI.timeStampNano() + " [TimeZoneUtils] ") + ("\ttimeZoneOffset: " + timeZoneOffset));
+		// TODO remove SYSTEM.OUT.PRINTLN
+
 	}
 
 }

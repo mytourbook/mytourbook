@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package net.tourbook.statistics.graphs;
 
 import gnu.trove.list.array.TIntArrayList;
@@ -23,12 +22,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 
 import net.tourbook.common.CommonActivator;
-import net.tourbook.common.preferences.ICommonPreferences;
+import net.tourbook.common.time.TimeZoneUtils;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
@@ -38,9 +38,10 @@ import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.joda.time.DateTime;
 
 public class DataProvider_Tour_Time extends DataProvider {
+
+	private static final String				UTC					= "UTC";							//$NON-NLS-1$
 
 	private IPreferenceStore				_prefStoreCommon	= CommonActivator.getPrefStore();
 
@@ -87,10 +88,6 @@ public class DataProvider_Tour_Time extends DataProvider {
 				&& isForceUpdate == false) {
 			return _tourDataTime;
 		}
-
-		// default timezone offset in ms
-		final boolean isUseTimeZone = _prefStoreCommon.getBoolean(ICommonPreferences.TIME_ZONE_IS_USE_TIME_ZONE);
-		final int defaultTimeZoneOffset = _prefStoreCommon.getInt(ICommonPreferences.TIME_ZONE_LOCAL_OFFSET);
 
 		_activePerson = person;
 		_activeTourTypeFilter = tourTypeFilter;
@@ -155,8 +152,8 @@ public class DataProvider_Tour_Time extends DataProvider {
 			final TIntArrayList allTourStartTime = new TIntArrayList();
 			final TIntArrayList allTourEndTime = new TIntArrayList();
 			final TIntArrayList allTourStartWeek = new TIntArrayList();
-			final ArrayList<DateTime> allTourStartDateTime = new ArrayList<>();
-			final TIntArrayList allTourUtcTimeOffset = new TIntArrayList();
+			final ArrayList<ZonedDateTime> allTourStartDateTime = new ArrayList<>();
+			final ArrayList<String> allTourTimeOffset = new ArrayList();
 
 			final TIntArrayList allTourRecordingTime = new TIntArrayList();
 			final TIntArrayList allTourDrivingTime = new TIntArrayList();
@@ -205,7 +202,7 @@ public class DataProvider_Tour_Time extends DataProvider {
 					final int dbTourDay = result.getShort(4);
 					final int dbTourStartWeek = result.getInt(5);
 
-					final long dbStartTime = result.getLong(6);
+					final long dbStartTimeMilli = result.getLong(6);
 					final int dbTimeZoneOffset = result.getInt(7);
 					final int dbRecordingTime = result.getInt(8);
 					final int dbDrivingTime = result.getInt(9);
@@ -221,38 +218,24 @@ public class DataProvider_Tour_Time extends DataProvider {
 					_calendar.set(dbTourYear, dbTourMonth, dbTourDay);
 					final int tourDOY = _calendar.get(Calendar.DAY_OF_YEAR) - 1;
 
-					DateTime tourStartDateTime = new DateTime(dbStartTime);
+					final String tourTimeOffset = TimeZoneUtils.getTimeZoneOffsetTextFromDbValue(dbTimeZoneOffset);
+					final ZonedDateTime zonedStartDateTime = TimeZoneUtils.getTourTime(
+							dbStartTimeMilli,
+							dbTimeZoneOffset);
 
-					int utcTimeOffset = 0;
-
-					/*
-					 * Adjust tour start time by the time zone offset
-					 */
-					if (dbTimeZoneOffset == Integer.MIN_VALUE) {
-
-						// timezone is not set, use original time without offset
-
-					} else if (isUseTimeZone && dbTimeZoneOffset != defaultTimeZoneOffset) {
-
-						// tour has not the default time zone
-
-						final int timeZoneOffsetDiff = dbTimeZoneOffset - defaultTimeZoneOffset;
-
-						tourStartDateTime = tourStartDateTime.plusSeconds(timeZoneOffsetDiff);
-						utcTimeOffset += timeZoneOffsetDiff;
-					}
-
-					final int startTime = tourStartDateTime.getMillisOfDay() / 1000;
+					final int startDayTime = (zonedStartDateTime.getHour() * 3600)
+							+ (zonedStartDateTime.getMinute() * 60)
+							+ zonedStartDateTime.getSecond();
 
 					allTourYear.add(dbTourYear);
 					allTourMonths.add(dbTourMonth);
 					allYearsDOY.add(getYearDOYs(dbTourYear) + tourDOY);
 					allTourStartWeek.add(dbTourStartWeek);
 
-					allTourStartDateTime.add(tourStartDateTime);
-					allTourUtcTimeOffset.add(utcTimeOffset);
-					allTourStartTime.add(startTime);
-					allTourEndTime.add((startTime + dbRecordingTime));
+					allTourStartDateTime.add(zonedStartDateTime);
+					allTourTimeOffset.add(tourTimeOffset);
+					allTourStartTime.add(startDayTime);
+					allTourEndTime.add((startDayTime + dbRecordingTime));
 					allTourRecordingTime.add(dbRecordingTime);
 					allTourDrivingTime.add(dbDrivingTime);
 
@@ -326,7 +309,7 @@ public class DataProvider_Tour_Time extends DataProvider {
 			_tourDataTime.weekValues = allTourStartWeek.toArray();
 
 			_tourDataTime.tourTimeStartValues = allTourStartTime.toArray();
-			_tourDataTime.tourUtcTimeOffset = allTourUtcTimeOffset.toArray();
+			_tourDataTime.tourTimeZoneOffset = allTourTimeOffset;
 			_tourDataTime.tourTimeEndValues = allTourEndTime.toArray();
 			_tourDataTime.tourStartDateTimes = allTourStartDateTime;
 
