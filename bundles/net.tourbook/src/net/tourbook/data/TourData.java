@@ -613,8 +613,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	private double												latitudeStart;
 	private double												longitudeStart;
+
 	private double												latitudeMin;
 	private double												longitudeMin;
+
 	private double												latitudeMax;
 	private double												longitudeMax;
 

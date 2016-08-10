@@ -2612,6 +2612,15 @@ public class TourDatabase {
 				// version 32 start  -  >16.8 ???
 				//
 				+ (" TimeZoneOffset							INTEGER DEFAULT " + SQL_INT_MIN_VALUE + ",		\n") //$NON-NLS-1$ //$NON-NLS-2$
+
+				+ "	latitudeStart 							DOUBLE DEFAULT " + SQL_DOUBLE_MIN_VALUE + ",	\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	longitudeStart 							DOUBLE DEFAULT " + SQL_DOUBLE_MIN_VALUE + ",	\n" //$NON-NLS-1$ //$NON-NLS-2$
+
+				+ "	latitudeMin 							DOUBLE DEFAULT " + SQL_DOUBLE_MIN_VALUE + ",	\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	longitudeMin 							DOUBLE DEFAULT " + SQL_DOUBLE_MIN_VALUE + ",	\n" //$NON-NLS-1$ //$NON-NLS-2$
+
+				+ "	latitudeMax 							DOUBLE DEFAULT " + SQL_DOUBLE_MIN_VALUE + ",	\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	longitudeMax 							DOUBLE DEFAULT " + SQL_DOUBLE_MIN_VALUE + ",	\n" //$NON-NLS-1$ //$NON-NLS-2$
 				//
 				// version 32 end ---------
 
@@ -6003,6 +6012,15 @@ public class TourDatabase {
 
 				// Add new columns
 				SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "TimeZoneOffset", SQL_INT_MIN_VALUE); //$NON-NLS-1$
+
+				SQL.AddCol_Double(stmt, TABLE_TOUR_DATA, "latitudeStart", SQL_DOUBLE_MIN_VALUE); //$NON-NLS-1$
+				SQL.AddCol_Double(stmt, TABLE_TOUR_DATA, "longitudeStart", SQL_DOUBLE_MIN_VALUE); //$NON-NLS-1$
+
+				SQL.AddCol_Double(stmt, TABLE_TOUR_DATA, "latitudeMin", SQL_DOUBLE_MIN_VALUE); //$NON-NLS-1$
+				SQL.AddCol_Double(stmt, TABLE_TOUR_DATA, "longitudeMin", SQL_DOUBLE_MIN_VALUE); //$NON-NLS-1$
+
+				SQL.AddCol_Double(stmt, TABLE_TOUR_DATA, "latitudeMax", SQL_DOUBLE_MIN_VALUE); //$NON-NLS-1$
+				SQL.AddCol_Double(stmt, TABLE_TOUR_DATA, "longitudeMax", SQL_DOUBLE_MIN_VALUE); //$NON-NLS-1$
 			}
 		}
 		stmt.close();

@@ -91,6 +91,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 	int								tourDay;
 
 	int								colTimeZoneOffset;
+	double							colLatitudeStart;
+	double							colLongitudeStart;
 
 	/**
 	 * Returns this Calendar's time value in milliseconds.

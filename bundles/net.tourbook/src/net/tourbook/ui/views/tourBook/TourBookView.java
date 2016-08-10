@@ -143,6 +143,8 @@ import org.eclipse.ui.part.ViewPart;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
+import com.skedgo.converter.TimezoneMapper;
+
 public class TourBookView extends ViewPart implements ITourProvider2, ITourViewer3, ITourProviderByID {
 
 	static public final String								ID									= "net.tourbook.views.tourListView";						//$NON-NLS-1$
@@ -1845,8 +1847,21 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				if (element instanceof TVITourBookTour) {
 
 					final int dbTimeZoneOffset = ((TVITourBookTour) element).colTimeZoneOffset;
+					final double dbLatitudeStart = ((TVITourBookTour) element).colLatitudeStart;
+					final double dbLongitudeStart = ((TVITourBookTour) element).colLongitudeStart;
 
-					cell.setText(TimeZoneUtils.getTimeZoneOffsetTextFromDbValue(dbTimeZoneOffset));
+					final String tzName = dbLatitudeStart == TourDatabase.DEFAULT_DOUBLE
+
+					// time zone is not available
+							? UI.EMPTY_STRING
+
+							: TimezoneMapper.latLngToTimezoneString(dbLatitudeStart, dbLongitudeStart);
+
+					cell.setText(String.format("%+10d", dbTimeZoneOffset)
+							+ UI.SPACE4
+							+ TimeZoneUtils.getTimeZoneOffsetTextFromDbValue(dbTimeZoneOffset)
+							+ UI.SPACE2
+							+ tzName);
 
 					setCellColor(cell, element);
 				}

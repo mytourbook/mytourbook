@@ -136,8 +136,11 @@ public class TVITourBookYearSub extends TVITourBookItem {
 				+ "deviceFirmwareVersion, " //						53	//$NON-NLS-1$
 
 				+ "cadenceMultiplier, " //							54	//$NON-NLS-1$
-				+ "TimeZoneOffset, " //								55	//$NON-NLS-1$
-				+ "TourStartTime " //						        56	//$NON-NLS-1$
+				+ "TourStartTime, " //						        55	//$NON-NLS-1$
+
+				+ "TimeZoneOffset, " //								56	//$NON-NLS-1$
+				+ "LatitudeStart, " //						        57	//$NON-NLS-1$
+				+ "LongitudeStart " //						        58	//$NON-NLS-1$
 
 				+ UI.NEW_LINE
 
@@ -286,8 +289,11 @@ public class TVITourBookYearSub extends TVITourBookItem {
 					// -----------------------------------------------
 
 					final float dbCadenceMultiplier = result.getFloat(54);
-					tourItem.colTimeZoneOffset = result.getInt(55);
-					final long dbTourStartTime = result.getLong(56);
+					final long dbTourStartTime = result.getLong(55);
+
+					tourItem.colTimeZoneOffset = result.getInt(56);
+					tourItem.colLatitudeStart = result.getDouble(57);
+					tourItem.colLongitudeStart = result.getDouble(58);
 
 					// -----------------------------------------------
 
