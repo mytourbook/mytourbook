@@ -16,7 +16,6 @@
 package net.tourbook.ui.views.collateTours;
 
 import java.text.DateFormat;
-import java.text.DateFormatSymbols;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -129,11 +128,9 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	static public final String							ID						= "net.tourbook.ui.views.collateTours.CollatedToursView";	//$NON-NLS-1$
 
 	private static Styler								DATE_STYLER;
-	private static final String[]						WEEK_DAYS;
 
 	static {
 
-		WEEK_DAYS = DateFormatSymbols.getInstance().getShortWeekdays();
 		DATE_STYLER = StyledString.createColorRegistryStyler(net.tourbook.ui.UI.VIEW_COLOR_SUB, null);
 	}
 
@@ -1363,9 +1360,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 				final Object element = cell.getElement();
 				if (element instanceof TVICollatedTour_Tour) {
 
-					final int weekDay = ((TVICollatedTour_Tour) element).colWeekDay;
-
-					cell.setText(WEEK_DAYS[weekDay]);
+					cell.setText(((TVICollatedTour_Tour) element).colWeekDay);
 					setCellColor(cell, element);
 				}
 			}

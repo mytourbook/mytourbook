@@ -240,7 +240,7 @@ public class TourManager {
 			 * <p>
 			 * When cache size is 0, each time when the same tour is requested from the tour
 			 * manager, a new TourData entity is created. So each opened view gets a new tourdata
-			 * for the same tour which causes a LOT of troubles.
+			 * for the same tour which causes LOTs of troubles.
 			 */
 			_tourDataCache = new TourDataCache(10);
 		}
@@ -1132,7 +1132,7 @@ public class TourManager {
 
 	public static String getTourDateTimeShort(final TourData tourData) {
 
-		return UI.DTFormatterShort.print(tourData.getTourStartTime());
+		return tourData.getTourStartTime8().format(UI.DateTimeFormatter_Short);
 	}
 
 	private static String getTourTimeShort(final Date date) {

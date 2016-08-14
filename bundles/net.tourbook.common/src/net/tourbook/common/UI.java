@@ -19,6 +19,8 @@ import java.awt.Font;
 import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Formatter;
 
@@ -80,8 +82,6 @@ import org.epics.css.dal.Timestamp;
 import org.epics.css.dal.Timestamp.Format;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
 
@@ -321,10 +321,16 @@ public class UI {
 																							.getDateInstance(DateFormat.LONG);
 	public static final DateFormat			DateFormatterFull						= DateFormat
 																							.getDateInstance(DateFormat.FULL);
-	public static final SimpleDateFormat	MonthFormatter							= new SimpleDateFormat("MMM");												//$NON-NLS-1$
+
+	public static final DateTimeFormatter	MonthFormatter							= DateTimeFormatter
+																							.ofPattern("MMM");													//$NON-NLS-1$
+	public static final DateTimeFormatter	WeekMonthFormatter						= DateTimeFormatter
+																							.ofPattern("dd MMM");												//$NON-NLS-1$
+
+	public static final DateTimeFormatter	DateTimeFormatter_Short					= DateTimeFormatter
+																							.ofLocalizedDateTime(FormatStyle.SHORT);
+
 	public static final SimpleDateFormat	WeekDayFormatter						= new SimpleDateFormat("EEEE");											//$NON-NLS-1$
-	public static final DateTimeFormatter	DTFormatterShort						= DateTimeFormat.shortDateTime();
-	public static final DateTimeFormatter	DTFormatterMedium						= DateTimeFormat.mediumDateTime();
 
 	public static final Font				AWT_FONT_ARIAL_8						= Font.decode("Arial-plain-8");											//$NON-NLS-1$
 	public static final Font				AWT_FONT_ARIAL_10						= Font.decode("Arial-plain-10");											//$NON-NLS-1$

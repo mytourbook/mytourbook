@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,14 +19,15 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
 
+import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.SQLFilter;
-import net.tourbook.ui.UI;
 
 public class TVITourBookYear extends TVITourBookItem {
 
@@ -44,6 +45,8 @@ public class TVITourBookYear extends TVITourBookItem {
 	@Override
 	protected void fetchChildren() {
 
+		final boolean isWeekDisplayed = _subCategory == YearSubCategory.WEEK;
+
 		final ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
 		setChildren(children);
 
@@ -51,16 +54,25 @@ public class TVITourBookYear extends TVITourBookItem {
 
 		String sumYear = UI.EMPTY_STRING;
 		String sumYearSub = UI.EMPTY_STRING;
-		if (_subCategory == YearSubCategory.WEEK) {
+
+
+		if (isWeekDisplayed) {
+
+			// week
+
 			sumYear = "startWeekYear"; //$NON-NLS-1$
 			sumYearSub = "startWeek"; //$NON-NLS-1$
-		} else { // default to month
+
+		} else {
+
+			// month
+
 			sumYear = "startYear"; //$NON-NLS-1$
 			sumYearSub = "startMonth"; //$NON-NLS-1$
 		}
 
 		final String sql = "" //$NON-NLS-1$
-		//
+				//
 				+ "SELECT " //$NON-NLS-1$
 
 				+ (sumYear + ", ") //$NON-NLS-1$
@@ -77,6 +89,10 @@ public class TVITourBookYear extends TVITourBookItem {
 
 		try {
 
+			final ZonedDateTime tourWeek = calendar8.with(//
+					TimeTools.calendarWeek.dayOfWeek(),
+					TimeTools.calendarWeek.getFirstDayOfWeek().getValue());
+
 			final Connection conn = TourDatabase.getInstance().getConnection();
 
 			final PreparedStatement statement = conn.prepareStatement(sql);
@@ -87,19 +103,43 @@ public class TVITourBookYear extends TVITourBookItem {
 			while (result.next()) {
 
 				final TVITourBookItem tourItem = new TVITourBookYearSub(tourBookView, this, _subCategory);
-				;
+
 				children.add(tourItem);
 
 				final int dbYear = result.getInt(1);
 				final int dbYearSub = result.getInt(2);
 
-//				final DateTime tourDate = new DateTime(dbYear, dbMonth, 1, 0, 0, 0, 0);
-				tourItem.treeColumn = formatItemString(dbYear, dbYearSub);
+				String columnText;
+				ZonedDateTime categoryDateTime;
+
+				if (isWeekDisplayed) {
+
+					// week
+
+					categoryDateTime = tourWeek//
+							.with(TimeTools.calendarWeek.weekBasedYear(), dbYear)
+							.with(TimeTools.calendarWeek.weekOfYear(), dbYearSub);
+
+					columnText = String.format("[%02d] %s", //
+							dbYearSub,
+							categoryDateTime.format(UI.WeekMonthFormatter));
+
+				} else {
+
+					// month
+
+					categoryDateTime = tourWeek//
+							.withYear(dbYear)
+							.withMonth(dbYearSub);
+
+					columnText = categoryDateTime.format(UI.MonthFormatter);
+				}
+
+				tourItem.treeColumn = columnText;
 
 				tourItem.tourYear = dbYear;
 				tourItem.tourYearSub = dbYearSub;
-//				tourItem.colTourDate = tourDate;
-				tourItem.colTourDate = calendar.getTimeInMillis();
+				tourItem.colTourDateTime = new TourDateTime(categoryDateTime);
 
 				tourItem.addSumColumns(result, 3);
 			}
@@ -107,26 +147,8 @@ public class TVITourBookYear extends TVITourBookItem {
 			conn.close();
 
 		} catch (final SQLException e) {
-			UI.showSQLException(e);
+			net.tourbook.ui.UI.showSQLException(e);
 		}
 	}
 
-	private String formatItemString(final int year, final int yearSub) {
-
-		if (_subCategory == YearSubCategory.WEEK) {
-
-			calendar.set(Calendar.YEAR, year);
-			calendar.set(Calendar.WEEK_OF_YEAR, yearSub);
-			calendar.set(Calendar.DAY_OF_WEEK, calendar.getFirstDayOfWeek());
-
-			// the number_of_week is broken in Java.text.SimpleDateFormat :-(
-			return String.format("[%02d]", yearSub) //$NON-NLS-1$
-					+ (new SimpleDateFormat(" dd MMM")).format(calendar.getTime()); //$NON-NLS-1$
-
-		} else { // default to month
-
-			calendar.set(year, yearSub - 1, 1);
-			return net.tourbook.common.UI.MonthFormatter.format(calendar.getTime());
-		}
-	}
 }

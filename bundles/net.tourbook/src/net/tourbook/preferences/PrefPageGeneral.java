@@ -18,9 +18,8 @@ package net.tourbook.preferences;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.text.DateFormatSymbols;
+import java.time.DayOfWeek;
 import java.util.ArrayList;
-import java.util.Calendar;
 
 import net.tourbook.Messages;
 import net.tourbook.application.MeasurementSystemContributionItem;
@@ -28,8 +27,8 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.preferences.BooleanFieldEditor2;
 import net.tourbook.common.preferences.ICommonPreferences;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.time.TimeZoneData;
-import net.tourbook.common.time.TimeZoneUtils;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.UI;
 
@@ -65,8 +64,6 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
 	private String				_timeZoneId1;
 	private String				_timeZoneId2;
-	private int					_timeZoneOffset1;
-	private int					_timeZoneOffset2;
 
 	private int					_backupFirstDayOfWeek;
 	private int					_backupMinimalDaysInFirstWeek;
@@ -200,7 +197,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 						.applyTo(_comboTimeZone1);
 
 				// fill combobox
-				for (final TimeZoneData timeZone : TimeZoneUtils.getAllTimeZones()) {
+				for (final TimeZoneData timeZone : TimeTools.getAllTimeZones()) {
 					_comboTimeZone1.add(timeZone.label);
 				}
 			}
@@ -224,7 +221,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 						.applyTo(_comboTimeZone2);
 
 				// fill combobox
-				for (final TimeZoneData timeZone : TimeZoneUtils.getAllTimeZones()) {
+				for (final TimeZoneData timeZone : TimeTools.getAllTimeZones()) {
 					_comboTimeZone2.add(timeZone.label);
 				}
 			}
@@ -406,16 +403,19 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 				}
 			});
 
-			// fill combo, first week day entry is ignore
-			final String[] weekDays = DateFormatSymbols.getInstance().getWeekdays();
-			for (int dayIndex = 1; dayIndex < weekDays.length; dayIndex++) {
+			// fill combo
+			final int mondayValue = DayOfWeek.MONDAY.getValue();
+			final String[] weekDays = TimeTools.weekDays_Full;
+
+			for (int dayIndex = 0; dayIndex < weekDays.length; dayIndex++) {
 
 				String weekDay = weekDays[dayIndex];
 
-				if (dayIndex == Calendar.MONDAY) {
-					// add iso marker
-					weekDay = weekDay + " - " + Messages.App_Label_ISO8601;// + ")"; //$NON-NLS-1$
+				// add iso marker
+				if (dayIndex + 1 == mondayValue) {
+					weekDay = weekDay + UI.DASH_WITH_SPACE + Messages.App_Label_ISO8601;
 				}
+
 				_comboFirstDay.add(weekDay);
 			}
 
@@ -511,7 +511,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
 	private TimeZoneData getSelectedTimeZone(final int selectedTimeZoneIndex) {
 
-		final ArrayList<TimeZoneData> allTimeZone = TimeZoneUtils.getAllTimeZones();
+		final ArrayList<TimeZoneData> allTimeZone = TimeTools.getAllTimeZones();
 
 		if (selectedTimeZoneIndex == -1) {
 			return allTimeZone.get(0);
@@ -584,10 +584,10 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
 		saveState();
 
-		_currentFirstDayOfWeek = _backupFirstDayOfWeek = _prefStore
-				.getInt(ITourbookPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK);
-		_currentMinimalDaysInFirstWeek = _backupMinimalDaysInFirstWeek = _prefStore
-				.getInt(ITourbookPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK);
+		_currentFirstDayOfWeek = _backupFirstDayOfWeek = _prefStoreCommon
+				.getInt(ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK);
+		_currentMinimalDaysInFirstWeek = _backupMinimalDaysInFirstWeek = _prefStoreCommon
+				.getInt(ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK);
 
 		final IRunnableWithProgress runnable = new IRunnableWithProgress() {
 			@Override
@@ -675,8 +675,6 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 		_chkUseTimeZone.setSelection(_prefStoreCommon.getDefaultBoolean(ICommonPreferences.TIME_ZONE_IS_USE_TIME_ZONE));
 		_timeZoneId1 = _prefStoreCommon.getDefaultString(ICommonPreferences.TIME_ZONE_LOCAL_ID_1);
 		_timeZoneId2 = _prefStoreCommon.getDefaultString(ICommonPreferences.TIME_ZONE_LOCAL_ID_2);
-		_timeZoneOffset1 = _prefStoreCommon.getDefaultInt(ICommonPreferences.TIME_ZONE_LOCAL_OFFSET_1);
-		_timeZoneOffset2 = _prefStoreCommon.getDefaultInt(ICommonPreferences.TIME_ZONE_LOCAL_OFFSET_2);
 
 		_rdoTimeZone_1.setSelection(activeZone == 1);
 		_rdoTimeZone_2.setSelection(activeZone != 1);
@@ -686,11 +684,11 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
 		// calendar week
 		_backupFirstDayOfWeek = //
-		_currentFirstDayOfWeek = _prefStore.getDefaultInt(ITourbookPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK);
+		_currentFirstDayOfWeek = _prefStoreCommon.getDefaultInt(ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK);
 
 		_backupMinimalDaysInFirstWeek = //
-		_currentMinimalDaysInFirstWeek = _prefStore
-				.getDefaultInt(ITourbookPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK);
+		_currentMinimalDaysInFirstWeek = _prefStoreCommon
+				.getDefaultInt(ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK);
 
 		updateUI_CalendarWeek();
 
@@ -737,8 +735,6 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 		_chkUseTimeZone.setSelection(_prefStoreCommon.getBoolean(ICommonPreferences.TIME_ZONE_IS_USE_TIME_ZONE));
 		_timeZoneId1 = _prefStoreCommon.getString(ICommonPreferences.TIME_ZONE_LOCAL_ID_1);
 		_timeZoneId2 = _prefStoreCommon.getString(ICommonPreferences.TIME_ZONE_LOCAL_ID_2);
-		_timeZoneOffset1 = _prefStoreCommon.getInt(ICommonPreferences.TIME_ZONE_LOCAL_OFFSET_1);
-		_timeZoneOffset2 = _prefStoreCommon.getInt(ICommonPreferences.TIME_ZONE_LOCAL_OFFSET_2);
 		final int activeZone = _prefStoreCommon.getInt(ICommonPreferences.TIME_ZONE_ACTIVE_ZONE);
 
 		_rdoTimeZone_1.setSelection(activeZone == 1);
@@ -747,10 +743,11 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
 		// calendar week
 		_backupFirstDayOfWeek = //
-		_currentFirstDayOfWeek = _prefStore.getInt(ITourbookPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK);
+		_currentFirstDayOfWeek = _prefStoreCommon.getInt(ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK);
 
 		_backupMinimalDaysInFirstWeek = //
-		_currentMinimalDaysInFirstWeek = _prefStore.getInt(ITourbookPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK);
+		_currentMinimalDaysInFirstWeek = _prefStoreCommon
+				.getInt(ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK);
 
 		updateUI_CalendarWeek();
 
@@ -766,11 +763,10 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
 		final int activeZone = _rdoTimeZone_1.getSelection() ? 1 : 2;
 		final String timeZoneId = activeZone == 1 ? _timeZoneId1 : _timeZoneId2;
-		final int timeZoneOffset = activeZone == 1 ? _timeZoneOffset1 : _timeZoneOffset2;
 		final boolean isUseTimeZone = _chkUseTimeZone.getSelection();
 
 		// update static field BEFORE event is fired !!!
-		TimeZoneUtils.setDefaultTimeZoneOffset(isUseTimeZone, timeZoneId, timeZoneOffset);
+		TimeTools.setDefaultTimeZoneOffset(isUseTimeZone, timeZoneId);
 
 		// time zone
 		_prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_IS_LIVE_UPDATE, _chkLiveUpdate.getSelection());
@@ -779,16 +775,14 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 		_prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_LOCAL_ID, timeZoneId);
 		_prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_LOCAL_ID_1, _timeZoneId1);
 		_prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_LOCAL_ID_2, _timeZoneId2);
-		_prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_LOCAL_OFFSET, timeZoneOffset);
-		_prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_LOCAL_OFFSET_1, _timeZoneOffset1);
-		_prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_LOCAL_OFFSET_2, _timeZoneOffset2);
 
 		// calendar week
 		final int firstDayOfWeek = _comboFirstDay.getSelectionIndex() + 1;
 		final int minDays = _comboMinDaysInFirstWeek.getSelectionIndex() + 1;
 
-		_prefStore.setValue(ITourbookPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK, firstDayOfWeek);
-		_prefStore.setValue(ITourbookPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK, minDays);
+		_prefStoreCommon.setValue(ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK, firstDayOfWeek);
+		_prefStoreCommon.setValue(ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK, minDays);
+		TimeTools.setCalendarWeek(firstDayOfWeek, minDays);
 
 		// general
 		_prefStore.setValue(ITourbookPreferences.GENERAL_NOTES, _txtNotes.getText());
@@ -809,8 +803,6 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
 		_timeZoneId1 = selectedTimeZone1.zoneId;
 		_timeZoneId2 = selectedTimeZone2.zoneId;
-		_timeZoneOffset1 = selectedTimeZone1.zoneOffsetSeconds;
-		_timeZoneOffset2 = selectedTimeZone2.zoneOffsetSeconds;
 	}
 
 	protected void updateUI_CalendarWeek() {
@@ -824,19 +816,17 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 	 */
 	private void validateTimeZoneId() {
 
-		final TimeZoneData firstTimeZone = TimeZoneUtils.getAllTimeZones().get(0);
+		final TimeZoneData firstTimeZone = TimeTools.getAllTimeZones().get(0);
 
-		final int timeZoneIndex1 = TimeZoneUtils.getTimeZoneIndex(_timeZoneId1);
-		final int timeZoneIndex2 = TimeZoneUtils.getTimeZoneIndex(_timeZoneId2);
+		final int timeZoneIndex1 = TimeTools.getTimeZoneIndex(_timeZoneId1);
+		final int timeZoneIndex2 = TimeTools.getTimeZoneIndex(_timeZoneId2);
 
 		if (timeZoneIndex1 == -1) {
 			_timeZoneId1 = firstTimeZone.zoneId;
-			_timeZoneOffset1 = firstTimeZone.zoneOffsetSeconds;
 		}
 
 		if (timeZoneIndex2 == -1) {
 			_timeZoneId2 = firstTimeZone.zoneId;
-			_timeZoneOffset2 = firstTimeZone.zoneOffsetSeconds;
 		}
 
 		_comboTimeZone1.select(timeZoneIndex1);

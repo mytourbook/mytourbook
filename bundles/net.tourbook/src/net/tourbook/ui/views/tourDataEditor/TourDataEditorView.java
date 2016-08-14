@@ -45,7 +45,7 @@ import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.time.TimeZoneData;
-import net.tourbook.common.time.TimeZoneUtils;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.ColumnDefinition;
@@ -2535,7 +2535,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				_tk.adapt(_comboTimeZone, true, false);
 
 				// fill combobox
-				for (final TimeZoneData timeZone : TimeZoneUtils.getAllTimeZones()) {
+				for (final TimeZoneData timeZone : TimeTools.getAllTimeZones()) {
 					_comboTimeZone.add(timeZone.label);
 				}
 			}
@@ -6692,7 +6692,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			lat1 = _tourData.longitudeSerie[0];
 		}
 
-		final int timeZoneIndex = TimeZoneUtils.getTimeZoneIndex(lat0, lat1);
+		final int timeZoneIndex = TimeTools.getTimeZoneIndex(lat0, lat1);
 		_comboTimeZone.select(timeZoneIndex);
 
 		// tour type/tags

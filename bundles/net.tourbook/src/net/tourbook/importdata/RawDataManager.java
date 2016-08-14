@@ -1674,7 +1674,7 @@ public class RawDataManager {
 									TourLogState.IMPORT_OK,
 									String.format(//
 											LOG_IMPORT_TOUR_IMPORTED,
-											UI.DTFormatterShort.print(tourData.getTourStartTimeMS()),
+											UI.DateTimeFormatter_Short.print(tourData.getTourStartTimeMS()),
 											osFilePath));
 						}
 

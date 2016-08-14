@@ -20,9 +20,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashSet;
 
+import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.SQLFilter;
@@ -88,8 +89,10 @@ public class TVITourBookYearSub extends TVITourBookItem {
 				+ "(DOUBLE(avgTemperature) / temperatureScale), " // 19	//$NON-NLS-1$
 				+ "jTdataTtag.TourTag_tagId, "//					20	//$NON-NLS-1$
 				+ "Tmarker.markerId, "//					        21	//$NON-NLS-1$
-				+ "startHour, " //						            22	//$NON-NLS-1$
-				+ "startMinute, " //						        23	//$NON-NLS-1$
+
+				+ "TourStartTime, " //						        22	//$NON-NLS-1$
+				+ "TimeZoneId, " //									23	//$NON-NLS-1$
+
 				+ "startWeek, " //						            24	//$NON-NLS-1$
 				+ "startWeekYear, " //					            25	//$NON-NLS-1$
 				//
@@ -135,12 +138,7 @@ public class TVITourBookYearSub extends TVITourBookItem {
 				+ "devicePluginName, " //							52	//$NON-NLS-1$
 				+ "deviceFirmwareVersion, " //						53	//$NON-NLS-1$
 
-				+ "cadenceMultiplier, " //							54	//$NON-NLS-1$
-				+ "TourStartTime, " //						        55	//$NON-NLS-1$
-
-				+ "TimeZoneOffset, " //								56	//$NON-NLS-1$
-				+ "LatitudeStart, " //						        57	//$NON-NLS-1$
-				+ "LongitudeStart " //						        58	//$NON-NLS-1$
+				+ "cadenceMultiplier " //							54	//$NON-NLS-1$
 
 				+ UI.NEW_LINE
 
@@ -158,7 +156,7 @@ public class TVITourBookYearSub extends TVITourBookItem {
 				+ (" AND " + sumYearSub + " = ?")//					//$NON-NLS-1$ //$NON-NLS-2$
 				+ sqlFilter.getWhereClause()
 
-				+ " ORDER BY startYear, startMonth, startDay, startHour, startMinute"; //$NON-NLS-1$
+				+ " ORDER BY TourStartTime"; //$NON-NLS-1$
 
 		try {
 
@@ -236,8 +234,8 @@ public class TVITourBookYearSub extends TVITourBookItem {
 					final float dbAvgCadence = result.getFloat(18);
 					tourItem.colAvgTemperature = result.getFloat(19);
 
-					final int dbHour = result.getInt(22);
-					final int dbMinute = result.getInt(23);
+					final long dbTourStartTime = result.getLong(22);
+					final String dbTimeZoneId = result.getString(23);
 
 					tourItem.colWeekNo = result.getInt(24);
 					tourItem.colWeekYear = result.getInt(25);
@@ -289,11 +287,6 @@ public class TVITourBookYearSub extends TVITourBookItem {
 					// -----------------------------------------------
 
 					final float dbCadenceMultiplier = result.getFloat(54);
-					final long dbTourStartTime = result.getLong(55);
-
-					tourItem.colTimeZoneOffset = result.getInt(56);
-					tourItem.colLatitudeStart = result.getDouble(57);
-					tourItem.colLongitudeStart = result.getDouble(58);
 
 					// -----------------------------------------------
 
@@ -320,9 +313,11 @@ public class TVITourBookYearSub extends TVITourBookItem {
 
 					// -----------------------------------------------
 
-					calendar.set(dbYear, dbMonth - 1, dbDay, dbHour, dbMinute);
-					tourItem.colTourDate = dbTourStartTime;
-					tourItem.colWeekDay = calendar.get(Calendar.DAY_OF_WEEK);
+					final TourDateTime tourDateTime = TimeTools.getTourDateTime(dbTourStartTime, dbTimeZoneId);
+
+					tourItem.colTourDateTime = tourDateTime;
+					tourItem.colTimeZoneId = dbTimeZoneId;
+					tourItem.colWeekDay = tourDateTime.weekDay;
 
 					tourItem.tourTypeId = (tourTypeId == null ? //
 							TourDatabase.ENTITY_IS_NOT_SAVED

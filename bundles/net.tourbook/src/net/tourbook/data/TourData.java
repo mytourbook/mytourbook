@@ -26,13 +26,16 @@ import java.io.PrintStream;
 import java.io.StringWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -66,6 +69,8 @@ import net.tourbook.algorithm.DPPoint;
 import net.tourbook.algorithm.DouglasPeuckerSimplifier;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.map.GeoPosition;
+import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
@@ -123,6 +128,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	public static final int										DB_LENGTH_TOUR_END_PLACE			= 255;
 	public static final int										DB_LENGTH_TOUR_IMPORT_FILE_PATH		= 255;
 	public static final int										DB_LENGTH_TOUR_IMPORT_FILE_NAME		= 255;
+	public static final int										DB_LENGTH_TIME_ZONE_ID				= 255;
 
 	public static final int										DB_LENGTH_WEATHER					= 1000;
 	public static final int										DB_LENGTH_WEATHER_CLOUDS			= 255;
@@ -165,14 +171,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	@Transient
 	private static IPreferenceStore								_prefStore							= TourbookPlugin
 																											.getPrefStore();
-
-	/**
-	 * This instance is static, otherwise each TourData creation creates a new instance which can
-	 * occure very often.
-	 */
-	@Transient
-	private static final Calendar								_calendar							= GregorianCalendar
-																											.getInstance();
 
 	/**
 	 * Unique entity id which identifies the tour
@@ -227,18 +225,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	private int													startSecond;																				// db-version 7
 
 	/**
-	 * THIS IS NOT UNUSED !!!<br>
-	 * <br>
-	 * week of the tour provided by {@link Calendar#get(int)}
+	 * Calendar week of the tour.
+	 * <p>
+	 * This is used in sql queries.
 	 */
 	@SuppressWarnings("unused")
 	private short												startWeek;
 
 	/**
-	 * THIS IS NOT UNUSED !!!<br>
-	 * this field can be read with sql statements
+	 * Year for {@link #startWeek}, this is mostly the {@link #startYear} but it can be the year
+	 * before or after depending when a week starts and ends.
 	 * <p>
-	 * year for startWeek
+	 * This is used in sql queries.
 	 */
 	@SuppressWarnings("unused")
 	private short												startWeekYear;
@@ -266,7 +264,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * default timezone is used (which is set in the preferences) to display the tour when not
 	 * available.
 	 */
-	private int													timeZoneOffset						= Integer.MIN_VALUE;
+	private String												timeZoneId;
 
 	// ############################################# DISTANCE #############################################
 
@@ -611,14 +609,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	// ############################################# GEO POSITIONS #############################################
 
-	private double												latitudeStart;
-	private double												longitudeStart;
-
-	private double												latitudeMin;
-	private double												longitudeMin;
-
-	private double												latitudeMax;
-	private double												longitudeMax;
+//	private double												latitudeStart;
+//	private double												longitudeStart;
+//
+//	private double												latitudeMin;
+//	private double												longitudeMin;
+//
+//	private double												latitudeMax;
+//	private double												longitudeMax;
 
 	// ############################################# UNUSED FIELDS - START #############################################
 	/**
@@ -1121,6 +1119,13 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	private DateTime											_dateTimeStart;
 
 	/**
+	 * Tour start time with Java 8, this will replace {@link #_dateTimeStart} when all is replaced
+	 * with this date time.
+	 */
+	@Transient
+	private ZonedDateTime										_dateTimeStart8;
+
+	/**
 	 * Tour markers which are sorted by serie index
 	 */
 	@Transient
@@ -1510,20 +1515,6 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 			final long tourStartTime2 = otherTourData.tourStartTime;
 
 			return tourStartTime > tourStartTime2 ? 1 : tourStartTime < tourStartTime2 ? -1 : 0;
-
-//			return startYear < otherTourData.startYear ? -1 : startYear == otherTourData.startYear
-//					? startMonth < otherTourData.startMonth ? -1 : startMonth == otherTourData.startMonth
-//							? startDay < otherTourData.startDay ? -1 : startDay == otherTourData.startDay
-//									? startHour < otherTourData.startHour ? -1 : startHour == otherTourData.startHour
-//											? startMinute < otherTourData.startMinute
-//													? -1
-//													: startSecond == otherTourData.startSecond //
-//															? 0
-//															: 1 //
-//											: 1 //
-//									: 1 //
-//							: 1 //
-//					: 1;
 		}
 
 		return 0;
@@ -5471,30 +5462,6 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		return UI.EMPTY_STRING;
 	}
 
-	public double getLatitudeMax() {
-		return latitudeMax;
-	}
-
-	public double getLatitudeMin() {
-		return latitudeMin;
-	}
-
-	public double getLatitudeStart() {
-		return latitudeStart;
-	}
-
-	public double getLongitudeMax() {
-		return longitudeMax;
-	}
-
-	public double getLongitudeMin() {
-		return longitudeMin;
-	}
-
-	public double getLongitudeStart() {
-		return longitudeStart;
-	}
-
 	/**
 	 * @return the maxAltitude
 	 */
@@ -6055,12 +6022,8 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		return getTimeSerieDouble();
 	}
 
-	/**
-	 * @return Returns the time zone offset in seconds or {@link Integer#MIN_VALUE} when a time zone
-	 *         is not available.
-	 */
-	public int getTimeZoneOffset() {
-		return timeZoneOffset;
+	public String getTimeZoneId() {
+		return timeZoneId;
 	}
 
 	public int getTourAltDown() {
@@ -6073,6 +6036,15 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 
 	public TourBike getTourBike() {
 		return tourBike;
+	}
+
+	/**
+	 * !!! THIS VALUE IS NOT CACHED BECAUSE WHEN THE DEFAULT TIME ZONE IS CHANGING THEN THIS VALUE
+	 * IS WRONG !!!
+	 */
+	public TourDateTime getTourDateTime() {
+
+		return TimeTools.getTourDateTime(getTourStartTimeMS(), getTimeZoneId());
 	}
 
 	/**
@@ -6191,6 +6163,21 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		}
 
 		return _dateTimeStart;
+	}
+
+	/**
+	 * @return Returns date/time for the tour start (Java 8 - java.time)
+	 */
+	public ZonedDateTime getTourStartTime8() {
+
+		if (_dateTimeStart8 == null) {
+
+			_dateTimeStart8 = ZonedDateTime.ofInstant(
+					Instant.ofEpochMilli(tourStartTime),
+					ZoneId.of(ZoneOffset.systemDefault().getId()));
+		}
+
+		return _dateTimeStart8;
 	}
 
 	/**
@@ -6708,6 +6695,19 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	}
 
 	/**
+	 * Set the calendar week in the tour.
+	 * 
+	 * @param dateTime
+	 */
+	private void setCalendarWeek(final ZonedDateTime dateTime) {
+
+		final WeekFields cw = TimeTools.calendarWeek;
+
+		startWeek = (short) dateTime.get(cw.weekOfYear());
+		startWeekYear = (short) dateTime.get(cw.weekBasedYear());
+	}
+
+	/**
 	 * @param calories
 	 *            the calories to set
 	 */
@@ -6904,21 +6904,6 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		this.rearShiftCount = rearShifts;
 	}
 
-	public void setGeoBounds() {
-
-		final GeoPosition[] geoBounds = getGeoBounds();
-
-		if (geoBounds == null) {
-			return;
-		}
-
-		latitudeMin = geoBounds[0].latitude;
-		longitudeMin = geoBounds[0].longitude;
-
-		latitudeMax = geoBounds[1].latitude;
-		longitudeMax = geoBounds[1].longitude;
-	}
-
 	/**
 	 * Set only the import folder.
 	 * 
@@ -6985,30 +6970,6 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		if (isFromSensor) {
 			cadenceMultiplier = 2.0f;
 		}
-	}
-
-	public void setLatitudeMax(final double latitudeMax) {
-		this.latitudeMax = latitudeMax;
-	}
-
-	public void setLatitudeMin(final double latitudeMin) {
-		this.latitudeMin = latitudeMin;
-	}
-
-	public void setLatitudeStart(final double latitudeStart) {
-		this.latitudeStart = latitudeStart;
-	}
-
-	public void setLongitudeMax(final double longitudeMax) {
-		this.longitudeMax = longitudeMax;
-	}
-
-	public void setLongitudeMin(final double longitudeMin) {
-		this.longitudeMin = longitudeMin;
-	}
-
-	public void setLongitudeStart(final double longitudeStart) {
-		this.longitudeStart = longitudeStart;
 	}
 
 	public void setMaxPulse(final float maxPulse) {
@@ -7163,8 +7124,8 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		this.timeSerieDouble = timeSerieDouble;
 	}
 
-	public void setTimeZoneOffset(final int timeZoneOffset) {
-		this.timeZoneOffset = timeZoneOffset;
+	public void setTimeZoneId(final String timeZoneId) {
+		this.timeZoneId = timeZoneId;
 	}
 
 	public void setTourAltDown(final float tourAltDown) {
@@ -7317,6 +7278,10 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 
 		_dateTimeStart = start;
 
+		_dateTimeStart8 = ZonedDateTime.ofInstant(
+				Instant.ofEpochMilli(start.getMillis()),
+				ZoneId.of(start.getZone().getID()));
+
 		tourStartTime = _dateTimeStart.getMillis();
 
 		startYear = (short) start.getYear();
@@ -7326,7 +7291,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		startMinute = (short) start.getMinuteOfHour();
 		startSecond = start.getSecondOfMinute();
 
-		setWeek(_dateTimeStart);
+		setCalendarWeek(_dateTimeStart8);
 	}
 
 	/**
@@ -7355,6 +7320,17 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 				tourStartMinute,
 				tourStartSecond,
 				0);
+
+		_dateTimeStart8 = ZonedDateTime.of(
+				tourStartYear,
+				tourStartMonth,
+				tourStartDay,
+				tourStartHour,
+				tourStartMinute,
+				tourStartSecond,
+				0,
+				ZoneId.systemDefault());
+
 		tourStartTime = _dateTimeStart.getMillis();
 
 		if (tourStartMonth < 1 || tourStartMonth > 12) {
@@ -7371,7 +7347,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		startMinute = (short) tourStartMinute;
 		startSecond = tourStartSecond;
 
-		setWeek(_dateTimeStart);
+		setCalendarWeek(_dateTimeStart8);
 	}
 
 	public void setTourTags(final Set<TourTag> tourTags) {
@@ -7764,20 +7740,6 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 
 	public void setWeatherWindSpeed(final int weatherWindSpeed) {
 		this.weatherWindSpd = weatherWindSpeed;
-	}
-
-	private void setWeek(final DateTime dt) {
-
-		final int firstDayOfWeek = _prefStore.getInt(ITourbookPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK);
-		final int minimalDaysInFirstWeek = _prefStore.getInt(ITourbookPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK);
-
-		_calendar.setFirstDayOfWeek(firstDayOfWeek);
-		_calendar.setMinimalDaysInFirstWeek(minimalDaysInFirstWeek);
-
-		_calendar.set(dt.getYear(), dt.getMonthOfYear() - 1, dt.getDayOfMonth());
-
-		startWeek = (short) _calendar.get(Calendar.WEEK_OF_YEAR);
-		startWeekYear = (short) Util.getYearForWeek(_calendar);
 	}
 
 	/**

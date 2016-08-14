@@ -100,7 +100,7 @@ public class ActionDeleteTour extends Action {
 
 				final Long tourId = tourItem.getTourId();
 				final TourData tourData = TourManager.getTour(tourId);
-				final String tour = UI.DTFormatterShort.print(tourData.getTourStartTimeMS());
+				final String tour = UI.DateTimeFormatter_Short.print(tourData.getTourStartTimeMS());
 
 				if (TourDatabase.deleteTour(tourId)) {
 

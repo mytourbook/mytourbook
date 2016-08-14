@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,30 +17,19 @@ package net.tourbook.ui.views.tourBook;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
+import java.time.ZonedDateTime;
 
-import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.TreeViewerItem;
-import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourItem;
 import net.tourbook.ui.UI;
 
-import org.eclipse.jface.preference.IPreferenceStore;
-
 public abstract class TVITourBookItem extends TreeViewerItem implements ITourItem {
 
-//	static final int				ITEM_TYPE_ROOT	= 0;
-//	static final int				ITEM_TYPE_YEAR	= 20;
-//	static final int				ITEM_TYPE_MONTH	= 30;
-//	static final int				ITEM_TYPE_WEEK	= 40;
-//	static final int				ITEM_TYPE_DAY	= 50;
-//	static final int				ITEM_TYPE_TOUR	= 60;
+	static ZonedDateTime	calendar8	= ZonedDateTime.now().with(TimeTools.calendarWeek.dayOfWeek(), 1);
 
-	static final Calendar			calendar	= GregorianCalendar.getInstance();
-	private final IPreferenceStore	prefStore	= TourbookPlugin.getDefault().getPreferenceStore();
-
-	static final String				SQL_SUM_COLUMNS;
+	static final String		SQL_SUM_COLUMNS;
 
 	static {
 
@@ -76,103 +65,98 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 				+ "SUM(rearShiftCount)"; //								22	//$NON-NLS-1$
 	}
 
-	TourBookView					tourBookView;
+	TourBookView			tourBookView;
 
-	String							treeColumn;
+	String					treeColumn;
 
-	int								tourYear;
+	int						tourYear;
 
 	/**
 	 * month starts with 1 for january
 	 */
-	int								tourMonth;
-	int								tourWeek;
-	int								tourYearSub;
-	int								tourDay;
-
-	int								colTimeZoneOffset;
-	double							colLatitudeStart;
-	double							colLongitudeStart;
+	int						tourMonth;
+	int						tourWeek;
+	int						tourYearSub;
+	int						tourDay;
 
 	/**
-	 * Returns this Calendar's time value in milliseconds.
+	 * Contain the tour date time with time zone info when available.
 	 */
-	long							colTourDate;
-	String							colTourTitle;
-	long							colPersonId;													// tourPerson_personId
+	TourDateTime			colTourDateTime;
+	String					colTimeZoneId;
 
-	long							colCounter;
-	long							colCalories;
-	long							colDistance;
-	float							colBodyWeight;
+	String					colTourTitle;
+	long					colPersonId;																	// tourPerson_personId
 
-	long							colRecordingTime;
-	long							colDrivingTime;
-	long							colPausedTime;
+	long					colCounter;
+	long					colCalories;
+	long					colDistance;
+	float					colBodyWeight;
 
-	long							colAltitudeUp;
-	long							colAltitudeDown;
+	long					colRecordingTime;
+	long					colDrivingTime;
+	long					colPausedTime;
 
-	float							colMaxSpeed;
-	long							colMaxAltitude;
-	long							colMaxPulse;
+	long					colAltitudeUp;
+	long					colAltitudeDown;
 
-	float							colAvgSpeed;
-	float							colAvgPace;
-	float							colAvgPulse;
-	float							colAvgCadence;
-	float							colAvgTemperature;
+	float					colMaxSpeed;
+	long					colMaxAltitude;
+	long					colMaxPulse;
 
-	int								colWindSpd;
-	int								colWindDir;
-	String							colClouds;
-	int								colRestPulse;
+	float					colAvgSpeed;
+	float					colAvgPace;
+	float					colAvgPulse;
+	float					colAvgCadence;
+	float					colAvgTemperature;
 
-	int								colWeekNo;
-	int								colWeekDay;
-	int								colWeekYear;
+	int						colWindSpd;
+	int						colWindDir;
+	String					colClouds;
+	int						colRestPulse;
 
-	int								colNumberOfTimeSlices;
-	int								colNumberOfPhotos;
+	int						colWeekNo;
+	String					colWeekDay;
+	int						colWeekYear;
 
-	int								colDPTolerance;
+	int						colNumberOfTimeSlices;
+	int						colNumberOfPhotos;
 
-	int								colFrontShiftCount;
-	int								colRearShiftCount;
+	int						colDPTolerance;
 
-	float							colCadenceMultiplier;
+	int						colFrontShiftCount;
+	int						colRearShiftCount;
+
+	float					colCadenceMultiplier;
 
 	// ----------- POWER ---------
 
-	float							colPower_AvgLeftTorqueEffectiveness;
-	float							colPower_AvgRightTorqueEffectiveness;
-	float							colPower_AvgLeftPedalSmoothness;
-	float							colPower_AvgRightPedalSmoothness;
-	int								colPower_PedalLeftRightBalance;
+	float					colPower_AvgLeftTorqueEffectiveness;
+	float					colPower_AvgRightTorqueEffectiveness;
+	float					colPower_AvgLeftPedalSmoothness;
+	float					colPower_AvgRightPedalSmoothness;
+	int						colPower_PedalLeftRightBalance;
 
-	float							colPower_Avg;
-	int								colPower_Max;
-	int								colPower_Normalized;
-	long							colPower_TotalWork;
+	float					colPower_Avg;
+	int						colPower_Max;
+	int						colPower_Normalized;
+	long					colPower_TotalWork;
 
-	int								colPower_FTP;
-	float							colPower_TrainingStressScore;
-	float							colPower_IntensityFactor;
+	int						colPower_FTP;
+	float					colPower_TrainingStressScore;
+	float					colPower_IntensityFactor;
 
-	float							colPower_PowerToWeight;
+	float					colPower_PowerToWeight;
 
 	// ----------- IMPORT ---------
 
-	String							col_ImportFileName;
-	String							col_ImportFilePath;
-	String							col_DeviceName;
+	String					col_ImportFileName;
+	String					col_ImportFilePath;
+	String					col_DeviceName;
 
 	TVITourBookItem(final TourBookView view) {
 
 		tourBookView = view;
-
-		calendar.setFirstDayOfWeek(prefStore.getInt(ITourbookPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK));
-		calendar.setMinimalDaysInFirstWeek(prefStore.getInt(ITourbookPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK));
 	}
 
 	public void addSumColumns(final ResultSet result, final int startIndex) throws SQLException {

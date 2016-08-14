@@ -13,17 +13,48 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.views.tourCatalog;
+package net.tourbook.common.time;
 
 import java.time.ZonedDateTime;
 
-import net.tourbook.common.time.TimeTools;
-import net.tourbook.common.util.TreeViewerItem;
+import net.tourbook.common.UI;
 
-public abstract class TVIWizardCompareItem extends TreeViewerItem {
+/**
+ * Contains the date/time of a tour or view item.
+ */
+public class TourDateTime {
 
-	static ZonedDateTime	calendar8	= ZonedDateTime.now().with(TimeTools.calendarWeek.dayOfWeek(), 1);
+	public ZonedDateTime	tourZonedDateTime;
 
-	String					treeColumn;
+	/**
+	 * Time zone offset of this tour, can be empty when a time zone is not set.
+	 */
+	public String			timeZoneOffsetLabel;
+
+	/**
+	 * Tour week day.
+	 */
+	public String			weekDay;
+
+	/**
+	 * @param tourZonedDateTime
+	 */
+	public TourDateTime(final ZonedDateTime tourZonedDateTime) {
+
+		this.tourZonedDateTime = tourZonedDateTime;
+		this.timeZoneOffsetLabel = UI.EMPTY_STRING;
+	}
+
+	/**
+	 * @param tourZonedDateTime
+	 * @param timeZoneOffsetLabel
+	 * @param weekDay
+	 */
+	public TourDateTime(final ZonedDateTime tourZonedDateTime, final String timeZoneOffsetLabel, final String weekDay) {
+
+		this.tourZonedDateTime = tourZonedDateTime;
+		this.timeZoneOffsetLabel = timeZoneOffsetLabel;
+		this.weekDay = weekDay;
+	}
 
 }

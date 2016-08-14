@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,25 +17,20 @@ package net.tourbook.ui.views.collateTours;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.HashSet;
 
-import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.TreeViewerItem;
-import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourItem;
 import net.tourbook.ui.UI;
 
-import org.eclipse.jface.preference.IPreferenceStore;
-
 public abstract class TVICollatedTour extends TreeViewerItem implements ITourItem {
 
-	static final Calendar					calendar	= GregorianCalendar.getInstance();
-	static private final IPreferenceStore	prefStore	= TourbookPlugin.getPrefStore();
+	static ZonedDateTime	calendar8	= ZonedDateTime.now().with(TimeTools.calendarWeek.dayOfWeek(), 1);
 
-	static final String						SQL_SUM_COLUMNS;
+	static final String		SQL_SUM_COLUMNS;
 
 	static {
 
@@ -69,68 +64,66 @@ public abstract class TVICollatedTour extends TreeViewerItem implements ITourIte
 				+ "SUM(rearShiftCount)"; //								21	//$NON-NLS-1$
 	}
 
-	CollatedToursView						collateToursView;
+	CollatedToursView		collateToursView;
 
-	String									treeColumn;
+	String					treeColumn;
 
 	/**
 	 * Id's for the tags or <code>null</code> when tags are not available.
 	 */
-	private ArrayList<Long>					_tagIds;
-	HashSet<Long>							sqlTagIds;
+	private ArrayList<Long>	_tagIds;
+	HashSet<Long>			sqlTagIds;
 
 	/**
 	 * Tour start time in ms.
 	 */
-	long									colTourStartTime;
+	long					colTourStartTime;
 
-	String									colTourTitle;
-	long									colPersonId;									// tourPerson_personId
-	long									colCounter;
-	long									colCalories;
+	String					colTourTitle;
+	long					colPersonId;																	// tourPerson_personId
+	long					colCounter;
+	long					colCalories;
 
-	long									colDistance;
-	long									colRecordingTime;
-	long									colDrivingTime;
+	long					colDistance;
+	long					colRecordingTime;
+	long					colDrivingTime;
 
-	long									colPausedTime;
-	long									colAltitudeUp;
-	long									colAltitudeDown;
+	long					colPausedTime;
+	long					colAltitudeUp;
+	long					colAltitudeDown;
 
-	float									colMaxSpeed;
-	long									colMaxAltitude;
+	float					colMaxSpeed;
+	long					colMaxAltitude;
 
-	long									colMaxPulse;
-	float									colAvgSpeed;
-	float									colAvgPace;
+	long					colMaxPulse;
+	float					colAvgSpeed;
+	float					colAvgPace;
 
-	float									colAvgPulse;
-	float									colAvgCadence;
-	float									colAvgTemperature;
-	int										colWindSpd;
-	int										colWindDir;
+	float					colAvgPulse;
+	float					colAvgCadence;
+	float					colAvgTemperature;
+	int						colWindSpd;
+	int						colWindDir;
 
-	String									colClouds;
-	int										colRestPulse;
-	int										colWeekNo;
-	int										colWeekDay;
+	String					colClouds;
+	int						colRestPulse;
+	int						colWeekNo;
+	String					colWeekDay;
 
-	int										colWeekYear;
-	int										colNumberOfTimeSlices;
-	int										colNumberOfPhotos;
+	int						colWeekYear;
+	int						colNumberOfTimeSlices;
+	int						colNumberOfPhotos;
 
-	int										colDPTolerance;
-	int										colFrontShiftCount;
+	int						colDPTolerance;
+	int						colFrontShiftCount;
 
-	int										colRearShiftCount;
+	int						colRearShiftCount;
 
 	TVICollatedTour(final CollatedToursView view) {
 
 		collateToursView = view;
-
-		calendar.setFirstDayOfWeek(prefStore.getInt(ITourbookPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK));
-		calendar.setMinimalDaysInFirstWeek(prefStore.getInt(ITourbookPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK));
 	}
+
 	void addSumColumns(final ResultSet result, final int startIndex) throws SQLException {
 
 		colDistance = result.getLong(startIndex + 0);

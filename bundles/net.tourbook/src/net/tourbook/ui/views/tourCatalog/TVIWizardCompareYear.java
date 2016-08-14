@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,9 +21,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.ui.UI;
 
 public class TVIWizardCompareYear extends TVIWizardCompareItem {
 
@@ -68,8 +68,11 @@ public class TVIWizardCompareYear extends TVIWizardCompareItem {
 
 				final int dbYear = result.getInt(1);
 				final int dbMonth = result.getInt(2);
-				fCalendar.set(dbYear, dbMonth - 1, 1);
-				monthItem.treeColumn = net.tourbook.common.UI.MonthFormatter.format(fCalendar.getTime());
+
+				monthItem.treeColumn = calendar8//
+						.withYear(dbYear)
+						.withMonth(dbMonth)
+						.format(UI.MonthFormatter);
 
 				monthItem.tourYear = dbYear;
 				monthItem.tourMonth = dbMonth;
@@ -78,7 +81,7 @@ public class TVIWizardCompareYear extends TVIWizardCompareItem {
 			conn.close();
 
 		} catch (final SQLException e) {
-			UI.showSQLException(e);
+			net.tourbook.ui.UI.showSQLException(e);
 		}
 	}
 }

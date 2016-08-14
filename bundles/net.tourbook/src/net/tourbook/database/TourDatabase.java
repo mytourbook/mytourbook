@@ -29,10 +29,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.NumberFormat;
-import java.time.Instant;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -2611,16 +2608,8 @@ public class TourDatabase {
 
 				// version 32 start  -  >16.8 ???
 				//
-				+ (" TimeZoneOffset							INTEGER DEFAULT " + SQL_INT_MIN_VALUE + ",		\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ "	TimeZoneId				VARCHAR(" + TourData.DB_LENGTH_TIME_ZONE_ID + "),				\n" //$NON-NLS-1$ //$NON-NLS-2$
 
-				+ "	latitudeStart 							DOUBLE DEFAULT " + SQL_DOUBLE_MIN_VALUE + ",	\n" //$NON-NLS-1$ //$NON-NLS-2$
-				+ "	longitudeStart 							DOUBLE DEFAULT " + SQL_DOUBLE_MIN_VALUE + ",	\n" //$NON-NLS-1$ //$NON-NLS-2$
-
-				+ "	latitudeMin 							DOUBLE DEFAULT " + SQL_DOUBLE_MIN_VALUE + ",	\n" //$NON-NLS-1$ //$NON-NLS-2$
-				+ "	longitudeMin 							DOUBLE DEFAULT " + SQL_DOUBLE_MIN_VALUE + ",	\n" //$NON-NLS-1$ //$NON-NLS-2$
-
-				+ "	latitudeMax 							DOUBLE DEFAULT " + SQL_DOUBLE_MIN_VALUE + ",	\n" //$NON-NLS-1$ //$NON-NLS-2$
-				+ "	longitudeMax 							DOUBLE DEFAULT " + SQL_DOUBLE_MIN_VALUE + ",	\n" //$NON-NLS-1$ //$NON-NLS-2$
 				//
 				// version 32 end ---------
 
@@ -6008,19 +5997,10 @@ public class TourDatabase {
 		final Statement stmt = conn.createStatement();
 		{
 			// check if db is updated to version 32
-			if (isColumnAvailable(conn, TABLE_TOUR_DATA, "TimeZoneOffset") == false) { //$NON-NLS-1$
+			if (isColumnAvailable(conn, TABLE_TOUR_DATA, "TimeZoneId") == false) { //$NON-NLS-1$
 
-				// Add new columns
-				SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "TimeZoneOffset", SQL_INT_MIN_VALUE); //$NON-NLS-1$
-
-				SQL.AddCol_Double(stmt, TABLE_TOUR_DATA, "latitudeStart", SQL_DOUBLE_MIN_VALUE); //$NON-NLS-1$
-				SQL.AddCol_Double(stmt, TABLE_TOUR_DATA, "longitudeStart", SQL_DOUBLE_MIN_VALUE); //$NON-NLS-1$
-
-				SQL.AddCol_Double(stmt, TABLE_TOUR_DATA, "latitudeMin", SQL_DOUBLE_MIN_VALUE); //$NON-NLS-1$
-				SQL.AddCol_Double(stmt, TABLE_TOUR_DATA, "longitudeMin", SQL_DOUBLE_MIN_VALUE); //$NON-NLS-1$
-
-				SQL.AddCol_Double(stmt, TABLE_TOUR_DATA, "latitudeMax", SQL_DOUBLE_MIN_VALUE); //$NON-NLS-1$
-				SQL.AddCol_Double(stmt, TABLE_TOUR_DATA, "longitudeMax", SQL_DOUBLE_MIN_VALUE); //$NON-NLS-1$
+				// TABLE_TOUR_DATA: add column TimeZoneId
+				SQL.AddCol_VarCar(stmt, TABLE_TOUR_DATA, "TimeZoneId", TourData.DB_LENGTH_TIME_ZONE_ID); //$NON-NLS-1$
 			}
 		}
 		stmt.close();
@@ -6081,17 +6061,13 @@ public class TourDatabase {
 					final String rawZoneId = TimezoneMapper.latLngToTimezoneString(lat, lon);
 					final ZoneId zoneId = ZoneId.of(rawZoneId);
 
-					final long tourStartTime = tourData.getTourStartTimeMS();
-					final Instant tourStartInstant = Instant.ofEpochMilli(tourStartTime);
+					tourData.setTimeZoneId(zoneId.getId());
 
-					final ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(tourStartInstant, zoneId);
-					final ZoneOffset zoneOffset = zonedDateTime.getOffset();
-
-					tourData.setTimeZoneOffset(zoneOffset.getTotalSeconds());
-
-					tourData.setLatitudeStart(lat);
-					tourData.setLongitudeStart(lon);
-					tourData.setGeoBounds();
+//					final long tourStartTime = tourData.getTourStartTimeMS();
+//					final Instant tourStartInstant = Instant.ofEpochMilli(tourStartTime);
+//
+//					final ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(tourStartInstant, zoneId);
+//					final ZoneOffset zoneOffset = zonedDateTime.getOffset();
 
 					TourDatabase.saveEntity(tourData, tourId, TourData.class);
 				}

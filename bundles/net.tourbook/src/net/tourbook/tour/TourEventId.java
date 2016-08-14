@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,7 +17,6 @@ package net.tourbook.tour;
 
 import net.tourbook.data.TourData;
 import net.tourbook.tag.ChangedTags;
-import net.tourbook.ui.UI;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
 public enum TourEventId {
@@ -36,7 +35,7 @@ public enum TourEventId {
 	 * {@link TourData} has been modified, the UI must be updated by reloading {@link TourData}
 	 * <p>
 	 * When this event is fired, {@link TourDataEditorView} must <b>NOT</b> be dirty, this can be
-	 * checked with the method {@link UI#isTourEditorModified(TourData)}, it must return
+	 * checked with the method {@link TourManager#isTourEditorModified(TourData)}, it must return
 	 * <code>false</code>.
 	 * <p>
 	 * When a tour is modified, the event {@link #TOUR_CHANGED} must be fired

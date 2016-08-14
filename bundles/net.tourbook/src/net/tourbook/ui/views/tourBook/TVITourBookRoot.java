@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,6 +22,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.common.util.Util;
@@ -78,8 +79,7 @@ public class TVITourBookRoot extends TVITourBookItem {
 				yearItem.treeColumn = Integer.toString(dbYear);
 				yearItem.tourYear = dbYear;
 
-				calendar.set(dbYear, 0, 1);
-				yearItem.colTourDate = calendar.getTimeInMillis();
+				yearItem.colTourDateTime = new TourDateTime(calendar8.withYear(dbYear));
 
 				yearItem.addSumColumns(result, 2);
 			}

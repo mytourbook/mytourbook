@@ -21,7 +21,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.text.DateFormatSymbols;
 import java.text.NumberFormat;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -37,7 +36,7 @@ import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.preferences.ICommonPreferences;
-import net.tourbook.common.time.TimeZoneUtils;
+import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.tooltip.OpenDialogManager;
 import net.tourbook.common.util.ColumnDefinition;
@@ -143,8 +142,6 @@ import org.eclipse.ui.part.ViewPart;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
-import com.skedgo.converter.TimezoneMapper;
-
 public class TourBookView extends ViewPart implements ITourProvider2, ITourViewer3, ITourProviderByID {
 
 	static public final String								ID									= "net.tourbook.views.tourListView";						//$NON-NLS-1$
@@ -206,8 +203,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 	private static final String								CSV_EXPORT_DURATION_HHH_MM_SS		= "hhh:mm:ss";												//$NON-NLS-1$
 
 	private static YearSubCategory							_yearSubCategory					= YearSubCategory.MONTH;
-
-	private static String[]									_weekDays;
 
 	private final static IPreferenceStore					_prefStore							= TourbookPlugin
 																										.getPrefStore();
@@ -566,7 +561,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				final String property = event.getProperty();
 
 				if (property.equals(ICommonPreferences.TIME_ZONE_IS_USE_TIME_ZONE)
-						|| property.equals(ICommonPreferences.TIME_ZONE_LOCAL_OFFSET)) {
+						|| property.equals(ICommonPreferences.TIME_ZONE_LOCAL_ID)) {
 
 					_tourViewer = (TreeViewer) recreateViewer(_tourViewer);
 				}
@@ -1846,22 +1841,10 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				final Object element = cell.getElement();
 				if (element instanceof TVITourBookTour) {
 
-					final int dbTimeZoneOffset = ((TVITourBookTour) element).colTimeZoneOffset;
-					final double dbLatitudeStart = ((TVITourBookTour) element).colLatitudeStart;
-					final double dbLongitudeStart = ((TVITourBookTour) element).colLongitudeStart;
+					final TourDateTime tourDateTime = ((TVITourBookTour) element).colTourDateTime;
+					final String timeZoneId = ((TVITourBookTour) element).colTimeZoneId;
 
-					final String tzName = dbLatitudeStart == TourDatabase.DEFAULT_DOUBLE
-
-					// time zone is not available
-							? UI.EMPTY_STRING
-
-							: TimezoneMapper.latLngToTimezoneString(dbLatitudeStart, dbLongitudeStart);
-
-					cell.setText(String.format("%+10d", dbTimeZoneOffset)
-							+ UI.SPACE4
-							+ TimeZoneUtils.getTimeZoneOffsetTextFromDbValue(dbTimeZoneOffset)
-							+ UI.SPACE2
-							+ tzName);
+					cell.setText(tourDateTime.timeZoneOffsetLabel + UI.SPACE2 + timeZoneId);
 
 					setCellColor(cell, element);
 				}
@@ -1901,14 +1884,10 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				final Object element = cell.getElement();
 				if (element instanceof TVITourBookTour) {
 
-					final long dbStartTimeMilli = ((TVITourBookTour) element).colTourDate;
-					final int dbTimeZoneOffset = ((TVITourBookTour) element).colTimeZoneOffset;
+					final TourDateTime tourDateTime = ((TVITourBookTour) element).colTourDateTime;
+					final ZonedDateTime tourStartDateTime = tourDateTime.tourZonedDateTime;
 
-					final ZonedDateTime zonedStartDateTime = TimeZoneUtils.getTourTime(
-							dbStartTimeMilli,
-							dbTimeZoneOffset);
-
-					cell.setText(zonedStartDateTime.format(_dtTimeFormatterS));
+					cell.setText(tourStartDateTime.format(_dtTimeFormatterS));
 
 					setCellColor(cell, element);
 				}
@@ -1948,9 +1927,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				final Object element = cell.getElement();
 				if (element instanceof TVITourBookTour) {
 
-					final int weekDay = ((TVITourBookTour) element).colWeekDay;
-
-					cell.setText(_weekDays[weekDay]);
+					cell.setText(((TVITourBookTour) element).colWeekDay);
 					setCellColor(cell, element);
 				}
 			}
@@ -2662,22 +2639,21 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 	private void exportCSV_30_OtherColumns(final StringBuilder sb, final boolean isTour, final TVITourBookItem tviItem) {
 
 		TVITourBookTour tviTour = null;
-		ZonedDateTime zonedStartDateTime = null;
+		TourDateTime tourDateTime = null;
+		ZonedDateTime tourStartDateTime = null;
 
 		if (isTour) {
 
 			tviTour = (TVITourBookTour) tviItem;
 
-			final long tourStartTime = tviItem.colTourDate;
-			final int timeZoneOffset = tviItem.colTimeZoneOffset;
-
-			zonedStartDateTime = TimeZoneUtils.getTourTime(tourStartTime, timeZoneOffset);
+			tourDateTime = tviItem.colTourDateTime;
+			tourStartDateTime = tourDateTime.tourZonedDateTime;
 		}
 
 		// CSV_HEADER_WEEKDAY
 		{
 			if (isTour) {
-				sb.append(_weekDays[tviItem.colWeekDay]);
+				sb.append(tourDateTime.weekDay);
 			}
 			sb.append(UI.TAB);
 		}
@@ -2686,7 +2662,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 		{
 			if (isTour) {
 
-				sb.append(zonedStartDateTime.format(_dtTimeFormatterM));
+				sb.append(tourStartDateTime.format(_dtTimeFormatterM));
 			}
 			sb.append(UI.TAB);
 		}
@@ -2694,7 +2670,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 		// CSV_HEADER_ISO_DATE_TIME
 		{
 			if (isTour) {
-				sb.append(zonedStartDateTime.format(_isoFormatter));
+				sb.append(tourStartDateTime.format(_isoFormatter));
 			}
 			sb.append(UI.TAB);
 		}
@@ -3274,8 +3250,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 	private void initUI(final Composite parent) {
 
 		_pc = new PixelConverter(parent);
-
-		_weekDays = DateFormatSymbols.getInstance().getShortWeekdays();
 
 		_dtTimeFormatterS = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT);
 		_dtTimeFormatterM = DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM);

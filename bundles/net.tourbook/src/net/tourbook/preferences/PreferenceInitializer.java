@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.preferences;
 
-import java.util.Calendar;
-
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.common.util.StringToArrayConverter;
@@ -402,12 +400,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
 		// DP tolerance when computing altitude up/down
 		store.setDefault(ITourbookPreferences.COMPUTED_ALTITUDE_DP_TOLERANCE, 7.0f);
-
-		/*
-		 * calendar week
-		 */
-		store.setDefault(ITourbookPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK, Calendar.MONDAY);
-		store.setDefault(ITourbookPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK, 4);
 
 		/*
 		 * view column tooltip

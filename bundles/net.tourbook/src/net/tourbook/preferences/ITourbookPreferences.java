@@ -367,11 +367,6 @@ public interface ITourbookPreferences {
 	 */
 	public static final String	ADJUST_ALTITUDE_CHART_X_AXIS_UNIT				= "adjust.altitude.x-axis-unit";							//$NON-NLS-1$
 
-	/*
-	 * calendar week
-	 */
-	public static final String	CALENDAR_WEEK_FIRST_DAY_OF_WEEK					= "calendar.week.first-day-of-week";						//$NON-NLS-1$
-	public static final String	CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK			= "calendar.week.minimum-days-in-first-week";				//$NON-NLS-1$
 
 	/*
 	 * view tooltip

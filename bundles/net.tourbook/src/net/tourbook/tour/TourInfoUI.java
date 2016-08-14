@@ -21,7 +21,7 @@ import java.util.Set;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.formatter.FormatManager;
-import net.tourbook.common.time.TimeZoneUtils;
+import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.IToolTipProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
@@ -179,7 +179,7 @@ public class TourInfoUI {
 	private Label								_lblRecordingTimeHour;
 	private Label								_lblRestPulse;
 	private Label								_lblTemperature;
-	private Label								_lblUtcTimeOffset;
+	private Label								_lblTimeZoneOffset;
 	private Label								_lblTitle;
 	private Label								_lblTourTags;
 	private Label								_lblTourTypeText;
@@ -445,8 +445,8 @@ public class TourInfoUI {
 			final Label label = createUI_Label(container, Messages.Tour_Tooltip_Label_TimeZone);
 			_firstColumnControls.add(label);
 
-			_lblUtcTimeOffset = createUI_LabelValue(container, SWT.TRAIL);
-			_secondColumnControls.add(_lblUtcTimeOffset);
+			_lblTimeZoneOffset = createUI_LabelValue(container, SWT.TRAIL);
+			_secondColumnControls.add(_lblTimeZoneOffset);
 
 			// hour
 			createUI_Label(container, Messages.Tour_Tooltip_Label_Hour);
@@ -1099,8 +1099,8 @@ public class TourInfoUI {
 		}
 
 		// time zone
-		final int tzOffset = _tourData.getTimeZoneOffset();
-		_lblUtcTimeOffset.setText(TimeZoneUtils.getTimeZoneOffsetTextFromDbValue(tzOffset));
+		final TourDateTime tourDateTime = _tourData.getTourDateTime();
+		_lblTimeZoneOffset.setText(tourDateTime.timeZoneOffsetLabel);
 
 		int windSpeed = _tourData.getWeatherWindSpeed();
 		windSpeed = (int) (windSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);

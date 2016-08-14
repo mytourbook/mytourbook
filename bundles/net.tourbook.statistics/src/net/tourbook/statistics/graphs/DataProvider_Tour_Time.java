@@ -23,12 +23,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoField;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 
-import net.tourbook.common.CommonActivator;
-import net.tourbook.common.time.TimeZoneUtils;
+import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.time.TourDateTime;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
@@ -37,13 +37,7 @@ import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 
-import org.eclipse.jface.preference.IPreferenceStore;
-
 public class DataProvider_Tour_Time extends DataProvider {
-
-	private static final String				UTC					= "UTC";							//$NON-NLS-1$
-
-	private IPreferenceStore				_prefStoreCommon	= CommonActivator.getPrefStore();
 
 	private static DataProvider_Tour_Time	_instance;
 
@@ -116,7 +110,7 @@ public class DataProvider_Tour_Time extends DataProvider {
 				+ "StartDay," //				4 //$NON-NLS-1$
 				+ "StartWeek," //				5 //$NON-NLS-1$
 				+ "TourStartTime," //			6 //$NON-NLS-1$
-				+ "TimeZoneOffset,"//			7 //$NON-NLS-1$
+				+ "TimeZoneId,"//				7 //$NON-NLS-1$
 				+ "TourRecordingTime," //		8 //$NON-NLS-1$
 				+ "TourDrivingTime,"//			9 //$NON-NLS-1$
 
@@ -139,7 +133,7 @@ public class DataProvider_Tour_Time extends DataProvider {
 				+ (" WHERE StartYear IN (" + getYearList(lastYear, numberOfYears) + ")" + UI.NEW_LINE) //$NON-NLS-1$ //$NON-NLS-2$
 				+ sqlFilter.getWhereClause()
 
-				+ (" ORDER BY StartYear, StartMonth, StartDay, StartHour, StartMinute"); //$NON-NLS-1$
+				+ (" ORDER BY TourStartTime"); //$NON-NLS-1$
 
 		try {
 
@@ -153,7 +147,7 @@ public class DataProvider_Tour_Time extends DataProvider {
 			final TIntArrayList allTourEndTime = new TIntArrayList();
 			final TIntArrayList allTourStartWeek = new TIntArrayList();
 			final ArrayList<ZonedDateTime> allTourStartDateTime = new ArrayList<>();
-			final ArrayList<String> allTourTimeOffset = new ArrayList();
+			final ArrayList<String> allTourTimeOffset = new ArrayList<>();
 
 			final TIntArrayList allTourRecordingTime = new TIntArrayList();
 			final TIntArrayList allTourDrivingTime = new TIntArrayList();
@@ -199,11 +193,13 @@ public class DataProvider_Tour_Time extends DataProvider {
 
 					final int dbTourYear = result.getShort(2);
 					final int dbTourMonth = result.getShort(3) - 1;
+
+					// needs cleanup
 					final int dbTourDay = result.getShort(4);
 					final int dbTourStartWeek = result.getInt(5);
 
 					final long dbStartTimeMilli = result.getLong(6);
-					final int dbTimeZoneOffset = result.getInt(7);
+					final String dbTimeZoneId = result.getString(7);
 					final int dbRecordingTime = result.getInt(8);
 					final int dbDrivingTime = result.getInt(9);
 
@@ -214,14 +210,11 @@ public class DataProvider_Tour_Time extends DataProvider {
 					final String dbDescription = result.getString(13);
 					final Object dbTypeIdObject = result.getObject(14);
 
-					// get number of days for the year, start with 0
-					_calendar.set(dbTourYear, dbTourMonth, dbTourDay);
-					final int tourDOY = _calendar.get(Calendar.DAY_OF_YEAR) - 1;
+					final TourDateTime tourDateTime = TimeTools.getTourDateTime(dbStartTimeMilli, dbTimeZoneId);
+					final ZonedDateTime zonedStartDateTime = tourDateTime.tourZonedDateTime;
 
-					final String tourTimeOffset = TimeZoneUtils.getTimeZoneOffsetTextFromDbValue(dbTimeZoneOffset);
-					final ZonedDateTime zonedStartDateTime = TimeZoneUtils.getTourTime(
-							dbStartTimeMilli,
-							dbTimeZoneOffset);
+					// get number of days for the year, start with 0
+					final int tourDOY = tourDateTime.tourZonedDateTime.get(ChronoField.DAY_OF_YEAR);
 
 					final int startDayTime = (zonedStartDateTime.getHour() * 3600)
 							+ (zonedStartDateTime.getMinute() * 60)
@@ -233,7 +226,7 @@ public class DataProvider_Tour_Time extends DataProvider {
 					allTourStartWeek.add(dbTourStartWeek);
 
 					allTourStartDateTime.add(zonedStartDateTime);
-					allTourTimeOffset.add(tourTimeOffset);
+					allTourTimeOffset.add(tourDateTime.timeZoneOffsetLabel);
 					allTourStartTime.add(startDayTime);
 					allTourEndTime.add((startDayTime + dbRecordingTime));
 					allTourRecordingTime.add(dbRecordingTime);

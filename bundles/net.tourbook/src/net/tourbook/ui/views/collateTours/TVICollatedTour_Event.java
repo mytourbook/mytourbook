@@ -20,10 +20,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashSet;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
@@ -96,7 +97,9 @@ public class TVICollatedTour_Event extends TVICollatedTour {
 				+ "dpTolerance, " //									30	//$NON-NLS-1$
 				//
 				+ "frontShiftCount, " //								31	//$NON-NLS-1$
-				+ "rearShiftCount" //									32	//$NON-NLS-1$
+				+ "rearShiftCount," //									32	//$NON-NLS-1$
+				//
+				+ "TimeZoneId " //										33	//$NON-NLS-1$
 				//
 				+ UI.NEW_LINE
 
@@ -165,9 +168,10 @@ public class TVICollatedTour_Event extends TVICollatedTour {
 					tourItem.colPersonId = result.getLong(2);
 					final Object tourTypeId = result.getObject(3);
 
-					final long dbTourStartTime = result.getLong(6);
-					tourItem.colTourStartTime = dbTourStartTime;
+					// 4: tag id
+					// 5: marker id
 
+					final long dbTourStartTime = result.getLong(6);
 					final long dbDistance = tourItem.colDistance = result.getLong(7);
 					tourItem.colRecordingTime = result.getLong(8);
 					final long dbDrivingTime = tourItem.colDrivingTime = result.getLong(9);
@@ -202,10 +206,15 @@ public class TVICollatedTour_Event extends TVICollatedTour {
 					tourItem.colFrontShiftCount = result.getInt(31);
 					tourItem.colRearShiftCount = result.getInt(32);
 
+					final String dbTimeZoneId = result.getString(33);
+
 					// -----------------------------------------------
 
-					calendar.setTimeInMillis(dbTourStartTime);
-					tourItem.colWeekDay = calendar.get(Calendar.DAY_OF_WEEK);
+					final TourDateTime tourDateTime = TimeTools.getTourDateTime(dbTourStartTime, dbTimeZoneId);
+
+					tourItem.colTourStartTime = dbTourStartTime;
+
+					tourItem.colWeekDay = tourDateTime.weekDay;
 
 					tourItem.tourTypeId = (tourTypeId == null ? //
 							TourDatabase.ENTITY_IS_NOT_SAVED
