@@ -4570,7 +4570,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 							TourLogState.TOUR_SAVED,
 							String.format(
 									TourLogManager.LOG_TOUR_SAVE_TOURS_FILE,
-									UI.DateTimeFormatter_Short.print(tourData.getTourStartTimeMS()),
+									tourData.getTourStartTime8().format(UI.DateTimeFormatter_Short),
 									tourData.getImportFilePathNameText()));
 
 					monitor.worked(1);

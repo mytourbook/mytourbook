@@ -15,9 +15,8 @@
  *******************************************************************************/
 package net.tourbook.statistics.graphs;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
@@ -33,6 +32,7 @@ import net.tourbook.chart.MinMaxKeeper_YData;
 import net.tourbook.chart.SelectionBarChart;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.IToolTipHideListener;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
@@ -64,9 +64,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPart;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 public abstract class StatisticDay extends TourbookStatistic implements IBarSelectionProvider, ITourProvider {
 
@@ -78,12 +75,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 	private long						_selectedTourId						= -1;
 
 	private int							_currentYear;
-
 	private int							_numberOfYears;
-	private final Calendar				_calendar							= GregorianCalendar.getInstance();
-
-	private final DateTimeFormatter		_dateFormatter						= DateTimeFormat.fullDate();
-	private final DateTimeFormatter		_timeFormatter						= DateTimeFormat.mediumTime();
 
 	private Chart						_chart;
 
@@ -279,8 +271,8 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 		final int drivingTime = _tourDayData.drivingTime[valueIndex];
 		final int breakTime = recordingTime - drivingTime;
 
-		final DateTime dtTourStart = _tourDayData.tourStartDateTimes.get(valueIndex);
-		final DateTime dtTourEnd = dtTourStart.plus(recordingTime * 1000);
+		final ZonedDateTime zdtTourStart = _tourDayData.tourStartDateTimes.get(valueIndex);
+		final ZonedDateTime zdtTourEnd = zdtTourStart.plusSeconds(recordingTime);
 
 		final float distance = _tourDayData.tourDistanceValues[valueIndex];
 		final float speed = drivingTime == 0 ? 0 : distance / (drivingTime / 3.6f);
@@ -327,10 +319,11 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 
 		final String toolTipLabel = String.format(toolTipFormat.toString(),
 		//
-				_dateFormatter.print(dtTourStart.getMillis()),
-				_timeFormatter.print(dtTourStart.getMillis()),
-				_timeFormatter.print(dtTourEnd.getMillis()),
-				dtTourStart.getWeekOfWeekyear(),
+		// date/time
+				zdtTourStart.format(TimeTools.dateFormatter_Full),
+				zdtTourStart.format(TimeTools.timeFormatter_Medium),
+				zdtTourEnd.format(TimeTools.timeFormatter_Medium),
+				zdtTourStart.get(TimeTools.calendarWeek.weekOfWeekBasedYear()),
 				//
 				// distance
 				distance / 1000,
@@ -705,8 +698,8 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 		/*
 		 * set graph minimum width, this is the number of days in the year
 		 */
-		_calendar.set(_currentYear, 11, 31);
-		chartModel.setChartMinWidth(_calendar.get(Calendar.DAY_OF_YEAR));
+		final int yearDays = TimeTools.getNumberOfDaysWithYear(_currentYear);
+		chartModel.setChartMinWidth(yearDays);
 
 		setChartProviders(_chart, chartModel);
 

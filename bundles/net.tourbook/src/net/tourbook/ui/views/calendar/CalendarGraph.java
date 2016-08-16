@@ -19,12 +19,12 @@ package net.tourbook.ui.views.calendar;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.color.ColorCacheSWT;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourDoubleClickState;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProviderAll;
@@ -74,7 +74,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 	private Composite							_parent;
 
-	private static IPreferenceStore				_prefStore					= TourbookPlugin.getPrefStore();
+	private final static IPreferenceStore		_prefStoreCommon			= CommonActivator.getPrefStore();
+
 	private Display								_display					= Display.getCurrent();
 
 	private final TourDoubleClickState			_tourDoubleClickState		= new TourDoubleClickState();
@@ -1153,11 +1154,14 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 	private int getFirstDayOfWeek() {
 
-		int firstDayOfWeek = _prefStore.getInt(ITourbookPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK);
-		firstDayOfWeek--; // the prefStore is using Calendar Constants (SO=1 ... SA=7) we are using Joda (MO=1 .. SO=7)
-		if (firstDayOfWeek < 1) {
-			firstDayOfWeek = 7;
-		}
+		final int firstDayOfWeek = _prefStoreCommon.getInt(ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK);
+
+//		int firstDayOfWeek = _prefStore.getInt(ITourbookPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK);
+//		firstDayOfWeek--; // the prefStore is using Calendar Constants (SO=1 ... SA=7) we are using Joda (MO=1 .. SO=7)
+//		if (firstDayOfWeek < 1) {
+//			firstDayOfWeek = 7;
+//		}
+
 		return firstDayOfWeek;
 
 	}

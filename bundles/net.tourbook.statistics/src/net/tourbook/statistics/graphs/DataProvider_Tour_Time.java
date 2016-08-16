@@ -110,7 +110,7 @@ public class DataProvider_Tour_Time extends DataProvider {
 				+ "StartDay," //				4 //$NON-NLS-1$
 				+ "StartWeek," //				5 //$NON-NLS-1$
 				+ "TourStartTime," //			6 //$NON-NLS-1$
-				+ "TimeZoneId,"//				7 //$NON-NLS-1$
+				+ "TimeZoneId, "//				7 //$NON-NLS-1$
 				+ "TourRecordingTime," //		8 //$NON-NLS-1$
 				+ "TourDrivingTime,"//			9 //$NON-NLS-1$
 
@@ -214,7 +214,7 @@ public class DataProvider_Tour_Time extends DataProvider {
 					final ZonedDateTime zonedStartDateTime = tourDateTime.tourZonedDateTime;
 
 					// get number of days for the year, start with 0
-					final int tourDOY = tourDateTime.tourZonedDateTime.get(ChronoField.DAY_OF_YEAR);
+					final int tourDOY = tourDateTime.tourZonedDateTime.get(ChronoField.DAY_OF_YEAR) - 1;
 
 					final int startDayTime = (zonedStartDateTime.getHour() * 3600)
 							+ (zonedStartDateTime.getMinute() * 60)

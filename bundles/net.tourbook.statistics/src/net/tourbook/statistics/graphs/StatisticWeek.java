@@ -20,7 +20,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
@@ -31,11 +30,12 @@ import net.tourbook.chart.ChartToolTipInfo;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.chart.MinMaxKeeper_YData;
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourPerson;
-import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.statistic.StatisticContext;
 import net.tourbook.statistic.TourbookStatistic;
 import net.tourbook.statistics.Messages;
@@ -50,28 +50,28 @@ import org.eclipse.ui.IViewSite;
 
 public abstract class StatisticWeek extends TourbookStatistic {
 
-	private static IPreferenceStore		_prefStore			= TourbookPlugin.getDefault().getPreferenceStore();
+	private final static IPreferenceStore	_prefStoreCommon	= CommonActivator.getPrefStore();
 
-	private Chart						_chart;
-	private final MinMaxKeeper_YData	_minMaxKeeper		= new MinMaxKeeper_YData();
+	private Chart							_chart;
+	private final MinMaxKeeper_YData		_minMaxKeeper		= new MinMaxKeeper_YData();
 
-	private TourPerson					_appPerson;
-	private TourTypeFilter				_appTourTypeFilter;
+	private TourPerson						_appPerson;
+	private TourTypeFilter					_appTourTypeFilter;
 
-	private int							_statYoungestYear;
-	private int							_statNumberOfYears;
+	private int								_statYoungestYear;
+	private int								_statNumberOfYears;
 
-	private boolean						_isSynchScaleEnabled;
+	private boolean							_isSynchScaleEnabled;
 
-	private final DateFormat			_dateFormatter		= DateFormat.getDateInstance(DateFormat.FULL);
+	private final DateFormat				_dateFormatter		= DateFormat.getDateInstance(DateFormat.FULL);
 
-	private TourData_Week				_tourWeekData;
+	private TourData_Week					_tourWeekData;
 
-	private Calendar					_tooltipCalendar	= GregorianCalendar.getInstance();
-	private int							_firstDayOfWeek;
-	private int							_minimalDaysInFirstWeek;
+	private Calendar						_tooltipCalendar	= GregorianCalendar.getInstance();
+	private int								_firstDayOfWeek;
+	private int								_minimalDaysInFirstWeek;
 
-	private IChartInfoProvider			_chartInfoProvider;
+	private IChartInfoProvider				_chartInfoProvider;
 
 	public boolean canTourBeVisible() {
 		return false;
@@ -438,8 +438,8 @@ public abstract class StatisticWeek extends TourbookStatistic {
 		StatisticServices.updateChartProperties(_chart, getGridPrefPrefix());
 
 		// set week start values
-		_firstDayOfWeek = _prefStore.getInt(ITourbookPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK);
-		_minimalDaysInFirstWeek = _prefStore.getInt(ITourbookPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK);
+		_firstDayOfWeek = _prefStoreCommon.getInt(ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK);
+		_minimalDaysInFirstWeek = _prefStoreCommon.getInt(ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK);
 
 		_tooltipCalendar.setFirstDayOfWeek(_firstDayOfWeek);
 		_tooltipCalendar.setMinimalDaysInFirstWeek(_minimalDaysInFirstWeek);

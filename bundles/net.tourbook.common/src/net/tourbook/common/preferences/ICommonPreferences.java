@@ -48,6 +48,7 @@ public interface ICommonPreferences {
 	/*
 	 * Calendar week
 	 */
+	/** MO=1 .. SO=7 */
 	public static final String	CALENDAR_WEEK_FIRST_DAY_OF_WEEK			= "CALENDAR_WEEK_FIRST_DAY_OF_WEEK";		//$NON-NLS-1$
 	public static final String	CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK	= "CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK";	//$NON-NLS-1$
 

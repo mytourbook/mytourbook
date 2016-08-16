@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2013  Matthias Helmling and Contributors
+ * Copyright (C) 2016 Matthias Helmling and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,6 +22,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorDefinition;
 import net.tourbook.common.color.GraphColorManager;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.util.SelectionProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -62,7 +63,7 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 import org.joda.time.DateTime;
-//import net.tourbook.ui.UI;
+
 
 public class CalendarView extends ViewPart implements ITourProvider {
 
@@ -71,12 +72,10 @@ public class CalendarView extends ViewPart implements ITourProvider {
 	 */
 	public static final String					ID										= "net.tourbook.views.calendar.CalendarView";	//$NON-NLS-1$
 
-	private final IPreferenceStore				_prefStore								= TourbookPlugin.getDefault() //
-																								.getPreferenceStore();
+	private final IPreferenceStore				_prefStore								= TourbookPlugin.getPrefStore();
 
-	private final IDialogSettings				_state									= TourbookPlugin.getDefault() //
-																								.getDialogSettingsSection(
-																										"TourCalendarView");			//$NON-NLS-1$
+	private final IDialogSettings				_state									= TourbookPlugin
+																								.getState("TourCalendarView");			//$NON-NLS-1$
 
 	private PageBook							_pageBook;
 
@@ -162,9 +161,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 				}
 			},
 			// - Moving Time -
-			new WeekSummaryFormatter(
-					GraphColorManager.PREF_GRAPH_TIME,
-					Messages.Calendar_View_Action_SummaryMovingTime) {
+			new WeekSummaryFormatter(GraphColorManager.PREF_GRAPH_TIME, Messages.Calendar_View_Action_SummaryMovingTime) {
 
 				@Override
 				String format(final CalendarTourData data) {
@@ -691,15 +688,16 @@ public class CalendarView extends ViewPart implements ITourProvider {
 
 		_propChangeListener = new IPropertyChangeListener() {
 
+			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
 
 				if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
 					refreshCalendar();
-				} else if (property.equals(ITourbookPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK)) {
+				} else if (property.equals(ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK)) {
 					refreshCalendar();
-				} else if (property.equals(ITourbookPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK)) {
+				} else if (property.equals(ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK)) {
 					refreshCalendar();
 				} else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
 
@@ -782,6 +780,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		final IActionBars bars = getViewSite().getActionBars();
 		final IMenuManager menuManager = bars.getMenuManager();
 		menuManager.addMenuListener(new IMenuListener() {
+			@Override
 			public void menuAboutToShow(final IMenuManager manager) {
 				fillLocalPullDown(manager);
 			}
@@ -1084,6 +1083,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		if (null != _calendarGraph) {
 
 			BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+				@Override
 				public void run() {
 					_calendarGraph.refreshCalendar();
 				}

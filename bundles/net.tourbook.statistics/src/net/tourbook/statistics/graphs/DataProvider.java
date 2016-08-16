@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,42 +15,36 @@
  *******************************************************************************/
 package net.tourbook.statistics.graphs;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
+import java.time.ZonedDateTime;
 
-import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.data.TourPerson;
-import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.TourTypeFilter;
-
-import org.eclipse.jface.preference.IPreferenceStore;
 
 public abstract class DataProvider {
 
-	TourPerson						_activePerson;
-	TourTypeFilter					_activeTourTypeFilter;
+	TourPerson				_activePerson;
+	TourTypeFilter			_activeTourTypeFilter;
 
-	int								_lastYear;
-	int								_numberOfYears;
+	int						_lastYear;
+	int						_numberOfYears;
 
 	/**
 	 * all years
 	 */
-	int[]							_years;
+	int[]					_years;
 
 	/**
 	 * number of days in a year
 	 */
-	int[]							_yearDays;
+	int[]					_yearDays;
 
 	/**
 	 * number of weeks in a year
 	 */
-	int[]							_yearWeeks;
+	int[]					_yearWeeks;
 
-	Calendar						_calendar	= GregorianCalendar.getInstance();
-
-	private static IPreferenceStore	_prefStore	= TourbookPlugin.getDefault().getPreferenceStore();
+	static ZonedDateTime	calendar8	= ZonedDateTime.now().with(TimeTools.calendarWeek.dayOfWeek(), 1);
 
 	/**
 	 * @param finalYear
@@ -101,15 +95,10 @@ public abstract class DataProvider {
 	 * Get different data for each year, data are set into <br>
 	 * <br>
 	 * All years in {@link #years} <br>
-	 * Number of day's in {@link #daysInEachYear} <br>
+	 * Number of day's in {@link #_yearDays} <br>
 	 * Number of week's in {@link #_yearWeeks}
 	 */
 	void initYearNumbers() {
-
-		_calendar.setFirstDayOfWeek(_prefStore//
-				.getInt(ITourbookPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK));
-		_calendar.setMinimalDaysInFirstWeek(_prefStore
-				.getInt(ITourbookPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK));
 
 		_years = new int[_numberOfYears];
 		_yearDays = new int[_numberOfYears];
@@ -120,16 +109,13 @@ public abstract class DataProvider {
 
 		for (int currentYear = firstYear; currentYear <= _lastYear; currentYear++) {
 
-			_calendar.set(currentYear, 0, 1);
-
-			final int weekOfYear = _calendar.getActualMaximum(Calendar.WEEK_OF_YEAR);
-			final int dayOfYear = _calendar.getActualMaximum(Calendar.DAY_OF_YEAR);
-
 			_years[yearIndex] = currentYear;
-			_yearDays[yearIndex] = dayOfYear;
-			_yearWeeks[yearIndex] = weekOfYear;
+
+			_yearDays[yearIndex] = TimeTools.getNumberOfDaysWithYear(currentYear);
+			_yearWeeks[yearIndex] = TimeTools.getNumberOfWeeksWithYear(currentYear);
 
 			yearIndex++;
 		}
 	}
+
 }

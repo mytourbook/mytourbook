@@ -16,11 +16,15 @@
 package net.tourbook.tour;
 
 import java.text.NumberFormat;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Set;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.formatter.FormatManager;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.IToolTipProvider;
 import net.tourbook.common.util.Util;
@@ -52,11 +56,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
-import org.joda.time.DateTime;
 import org.joda.time.Period;
 import org.joda.time.PeriodType;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 public class TourInfoUI {
 
@@ -69,12 +70,16 @@ public class TourInfoUI {
 	private Color								_fgColor;
 	private Font								_boldFont;
 
-	private final DateTimeFormatter				_dateFormatter			= DateTimeFormat.fullDate();
-	private final DateTimeFormatter				_timeFormatter			= DateTimeFormat.mediumTime();
-	private final DateTimeFormatter				_dtFormatterCreated		= DateTimeFormat.mediumDateTime();
+//	private final DateTimeFormatter				_dateFormatter			= DateTimeFormat.fullDate();
+//	private final DateTimeFormatter				_timeFormatter			= DateTimeFormat.mediumTime();
+//	private final DateTimeFormatter				_dtFormatterCreated		= DateTimeFormat.mediumDateTime();
 
-	private final DateTimeFormatter				_dtHistoryFormatter		= DateTimeFormat.forStyle("FM");		//$NON-NLS-1$
-//	private final DateTimeFormatter		_dtWeekday				= DateTimeFormat.forPattern("E");	//$NON-NLS-1$
+//	private final DateTimeFormatter				_dtHistoryFormatter		= DateTimeFormatter.forStyle("FM");	//$NON-NLS-1$
+//	private final DateTimeFormatter				_dtWeekday				= DateTimeFormat.forPattern("E");	//$NON-NLS-1$
+
+	public static final DateTimeFormatter		_dtHistoryFormatter		= DateTimeFormatter.ofLocalizedDateTime(
+																				FormatStyle.FULL,
+																				FormatStyle.MEDIUM);
 
 	private final NumberFormat					_nf0					= NumberFormat.getNumberInstance();
 	private final NumberFormat					_nf1					= NumberFormat.getInstance();
@@ -191,8 +196,8 @@ public class TourInfoUI {
 	/*
 	 * fields which are optionally displayed when they are not null
 	 */
-	private DateTime							_uiDtCreated;
-	private DateTime							_uiDtModified;
+//	private DateTime							_uiDtCreated;
+//	private DateTime							_uiDtModified;
 	private String								_uiTourTypeName;
 
 	private IToolTipProvider					_tourToolTipProvider;
@@ -1049,8 +1054,8 @@ public class TourInfoUI {
 		final long movingTime = _tourData.getTourDrivingTime();
 		final long breakTime = recordingTime - movingTime;
 
-		final DateTime dtTourStart = _tourData.getTourStartTime();
-		final DateTime dtTourEnd = dtTourStart.plus(recordingTime * 1000);
+		final ZonedDateTime zdtTourStart = _tourData.getTourStartTime8();
+		final ZonedDateTime zdtTourEnd = zdtTourStart.plusSeconds(recordingTime);
 
 		final boolean isShortDuration = recordingTime < UI.DAY_IN_SECONDS;
 
@@ -1060,10 +1065,12 @@ public class TourInfoUI {
 
 			_lblDate.setText(String.format(//
 					Messages.Tour_Tooltip_Format_DateWeekTime,
-					_dateFormatter.print(dtTourStart.getMillis()),
-					_timeFormatter.print(dtTourStart.getMillis()),
-					_timeFormatter.print(dtTourEnd.getMillis()),
-					dtTourStart.getWeekOfWeekyear()));
+					zdtTourStart.format(TimeTools.dateFormatter_Full),
+					zdtTourStart.format(TimeTools.timeFormatter_Medium),
+					zdtTourEnd.format(TimeTools.timeFormatter_Medium),
+					zdtTourStart.get(TimeTools.calendarWeek.weekOfWeekBasedYear())
+
+			));
 
 			_lblRecordingTimeHour.setVisible(true);
 			_lblMovingTimeHour.setVisible(true);
@@ -1079,9 +1086,8 @@ public class TourInfoUI {
 
 			_lblDate.setText(String.format(//
 					Messages.Tour_Tooltip_Format_HistoryDateTime,
-					_dtHistoryFormatter.print(dtTourStart.getMillis()),
-					_dtHistoryFormatter.print(dtTourEnd.getMillis())
-			//
+					zdtTourStart.format(_dtHistoryFormatter),
+					zdtTourEnd.format(_dtHistoryFormatter)//
 					));
 
 			// hide labels, they are displayed with the period values
@@ -1089,7 +1095,7 @@ public class TourInfoUI {
 			_lblMovingTimeHour.setVisible(false);
 			_lblBreakTimeHour.setVisible(false);
 
-			final Period recordingPeriod = new Period(dtTourStart, dtTourEnd, _tourPeriodTemplate);
+			final Period recordingPeriod = new Period(zdtTourStart, zdtTourEnd, _tourPeriodTemplate);
 			final Period movingPeriod = new Period(0, movingTime * 1000, _tourPeriodTemplate);
 			final Period breakPeriod = new Period(0, breakTime * 1000, _tourPeriodTemplate);
 

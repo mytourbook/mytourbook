@@ -16,12 +16,7 @@
 package net.tourbook.statistics.graphs;
 
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
-import java.time.temporal.IsoFields;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
@@ -36,6 +31,7 @@ import net.tourbook.chart.MinMaxKeeper_YData;
 import net.tourbook.chart.SelectionBarChart;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.IToolTipHideListener;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -74,12 +70,6 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
 	private TourTypeFilter				_activeTourTypeFiler;
 	private int							_currentYear;
 	private int							_numberOfYears;
-
-	private final Calendar				_calendar							= GregorianCalendar.getInstance();
-	private final DateTimeFormatter		_dateFormatter						= DateTimeFormatter
-																					.ofLocalizedDate(FormatStyle.FULL);
-	private final DateTimeFormatter		_timeFormatter						= DateTimeFormatter
-																					.ofLocalizedTime(FormatStyle.MEDIUM);
 
 	private Chart						_chart;
 
@@ -309,10 +299,11 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
 
 		final String toolTipLabel = String.format(toolTipFormat.toString(),
 		//
-				zdtTourStart.format(_dateFormatter),
-				zdtTourStart.format(_timeFormatter),
-				zdtTourEnd.format(_timeFormatter),
-				zdtTourStart.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR),
+		// date/time
+				zdtTourStart.format(TimeTools.dateFormatter_Full),
+				zdtTourStart.format(TimeTools.timeFormatter_Medium),
+				zdtTourEnd.format(TimeTools.timeFormatter_Medium),
+				zdtTourStart.get(TimeTools.calendarWeek.weekOfWeekBasedYear()),
 				//
 				distance / 1000,
 				UI.UNIT_LABEL_DISTANCE,
@@ -551,8 +542,7 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
 		/*
 		 * set graph minimum width, this is the number of days in the year
 		 */
-		_calendar.set(_currentYear, 11, 31);
-		final int yearDays = _calendar.get(Calendar.DAY_OF_YEAR);
+		final int yearDays = TimeTools.getNumberOfDaysWithYear(_currentYear);
 		chartModel.setChartMinWidth(yearDays);
 
 		setChartProviders(_chart, chartModel);

@@ -30,6 +30,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.NumberFormat;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -100,8 +101,8 @@ public class TourDatabase {
 	 * version for the database which is required that the tourbook application works successfully
 	 */
 	private static final int						TOURBOOK_DB_VERSION							= 32;
-
 //	private static final int						TOURBOOK_DB_VERSION							= 32;	// >16.8
+
 //	private static final int						TOURBOOK_DB_VERSION							= 31;	// 16.5
 //	private static final int						TOURBOOK_DB_VERSION							= 30;	// 16.1
 //	private static final int						TOURBOOK_DB_VERSION							= 29;	// 15.12
@@ -1928,15 +1929,15 @@ public class TourDatabase {
 		 */
 		tourData.getNumberOfHrZones();
 
-		final DateTime dtNow = new DateTime();
+		final ZonedDateTime zdtNow = ZonedDateTime.now();
 
-		final long dtSaved = (dtNow.getYear() * 10000000000L)
-				+ (dtNow.getMonthOfYear() * 100000000L)
-				+ (dtNow.getDayOfMonth() * 1000000L)
+		final long dtSaved = (zdtNow.getYear() * 10000000000L)
+				+ (zdtNow.getMonthValue() * 100000000L)
+				+ (zdtNow.getDayOfMonth() * 1000000L)
 				//
-				+ (dtNow.getHourOfDay() * 10000L)
-				+ (dtNow.getMinuteOfHour() * 100L)
-				+ dtNow.getSecondOfMinute();
+				+ (zdtNow.getHour() * 10000L)
+				+ (zdtNow.getMinute() * 100L)
+				+ zdtNow.getSecond();
 
 		checkUnsavedTransientInstances(tourData);
 
@@ -6058,16 +6059,11 @@ public class TourDatabase {
 					// get time zone from lat/lon
 					final double lat = tourData.latitudeSerie[0];
 					final double lon = tourData.longitudeSerie[0];
+
 					final String rawZoneId = TimezoneMapper.latLngToTimezoneString(lat, lon);
 					final ZoneId zoneId = ZoneId.of(rawZoneId);
 
 					tourData.setTimeZoneId(zoneId.getId());
-
-//					final long tourStartTime = tourData.getTourStartTimeMS();
-//					final Instant tourStartInstant = Instant.ofEpochMilli(tourStartTime);
-//
-//					final ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(tourStartInstant, zoneId);
-//					final ZoneOffset zoneOffset = zonedDateTime.getOffset();
 
 					TourDatabase.saveEntity(tourData, tourId, TourData.class);
 				}

@@ -15,17 +15,23 @@
  *******************************************************************************/
 package net.tourbook.common.time;
 
+import static java.time.DayOfWeek.THURSDAY;
+import static java.time.DayOfWeek.WEDNESDAY;
 import static java.time.temporal.ChronoField.DAY_OF_WEEK;
 import gnu.trove.map.hash.TIntObjectHashMap;
 
 import java.time.DayOfWeek;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.Year;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.FormatStyle;
 import java.time.format.TextStyle;
+import java.time.temporal.ValueRange;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,34 +47,41 @@ import com.skedgo.converter.TimezoneMapper;
 
 public class TimeTools {
 
-	private static final String						ZERO_0					= ":0";									//$NON-NLS-1$
-	private static final String						ZERO_00_00				= "+00:00";								//$NON-NLS-1$
-	private static final String						ZERO_00_00_DEFAULT		= ZERO_00_00 + '*';
+	private static final String						ZERO_0						= ":0";											//$NON-NLS-1$
+	private static final String						ZERO_00_00					= "+00:00";										//$NON-NLS-1$
+	private static final String						ZERO_00_00_DEFAULT			= ZERO_00_00 + '*';
 
-	public static final String						TIME_ZONE_UTC			= "UTC";									//$NON-NLS-1$
+	public static final String						TIME_ZONE_UTC				= "UTC";											//$NON-NLS-1$
 
 	/**
 	 * Cached time zone labels.
 	 */
-	private static final TIntObjectHashMap<String>	_timeZoneOffsetLabels	= new TIntObjectHashMap<>();
+	private static final TIntObjectHashMap<String>	_timeZoneOffsetLabels		= new TIntObjectHashMap<>();
 
 	/*
 	 * Copied from java.time.LocalTime
 	 */
-	/** Hours per day. */
-	static final int								HOURS_PER_DAY			= 24;
+//	/** Hours per day. */
+//	private static final int						HOURS_PER_DAY			= 24;
 	/** Minutes per hour. */
-	static final int								MINUTES_PER_HOUR		= 60;
-	/** Minutes per day. */
-	static final int								MINUTES_PER_DAY			= MINUTES_PER_HOUR * HOURS_PER_DAY;
+	private static final int						MINUTES_PER_HOUR			= 60;
+//	/** Minutes per day. */
+//	private static final int						MINUTES_PER_DAY			= MINUTES_PER_HOUR * HOURS_PER_DAY;
 	/** Seconds per minute. */
-	static final int								SECONDS_PER_MINUTE		= 60;
+	private static final int						SECONDS_PER_MINUTE			= 60;
 	/** Seconds per hour. */
-	static final int								SECONDS_PER_HOUR		= SECONDS_PER_MINUTE * MINUTES_PER_HOUR;
-	/** Seconds per day. */
-	static final int								SECONDS_PER_DAY			= SECONDS_PER_HOUR * HOURS_PER_DAY;
+	private static final int						SECONDS_PER_HOUR			= SECONDS_PER_MINUTE * MINUTES_PER_HOUR;
+//	/** Seconds per day. */
+//	private static final int						SECONDS_PER_DAY			= SECONDS_PER_HOUR * HOURS_PER_DAY;
 
-	final static IPreferenceStore					_prefStoreCommon		= CommonActivator.getPrefStore();
+	public static final DateTimeFormatter			dateFormatter_Full			= DateTimeFormatter
+																						.ofLocalizedDate(FormatStyle.FULL);
+	public static final DateTimeFormatter			dateTimeFormatter_Medium	= DateTimeFormatter
+																						.ofLocalizedDateTime(FormatStyle.MEDIUM);
+	public static final DateTimeFormatter			timeFormatter_Medium		= DateTimeFormatter
+																						.ofLocalizedTime(FormatStyle.MEDIUM);
+
+	final static IPreferenceStore					_prefStoreCommon			= CommonActivator.getPrefStore();
 
 	private static ArrayList<TimeZoneData>			_allSortedTimeZones;
 
@@ -90,6 +103,8 @@ public class TimeTools {
 	 * output "Monday".
 	 */
 	public static String[]							weekDays_Full;
+
+	private static LocalDate						_dateToGetNumOfWeeks		= LocalDate.of(2000, 5, 5);
 
 	static {
 
@@ -192,6 +207,33 @@ public class TimeTools {
 		}
 
 		return _allSortedTimeZones;
+	}
+
+	/**
+	 * @param year
+	 * @return Returns the number of days in a year
+	 */
+	public static int getNumberOfDaysWithYear(final int year) {
+
+		return Year.of(year).length();
+	}
+
+	/**
+	 * @param year
+	 * @return Returns the number of weeks in a year.
+	 */
+	public static int getNumberOfWeeksWithYear(final int year) {
+
+		/*
+		 * The date MUST not be in the first or last week of the year, this is very tricky to get
+		 * the number of weeks in a year, found in the www.
+		 */
+		final LocalDate date = _dateToGetNumOfWeeks.withYear(year);
+		final ValueRange range = date.range(calendarWeek.weekOfWeekBasedYear());
+
+		final long numOfWeeks = range.getMaximum();
+
+		return (int) numOfWeeks;
 	}
 
 	/**
@@ -393,6 +435,20 @@ public class TimeTools {
 
 		_isUseTimeZone = isUseTimeZone;
 		_defaultTimeZoneId = ZoneId.of(timeZoneId);
+	}
+
+	private static int weekRange(final int weekBasedYear) {
+
+		final LocalDate date = LocalDate.of(weekBasedYear, 1, 1);
+
+		final DayOfWeek dayOfWeek = date.getDayOfWeek();
+
+		// 53 weeks if standard year starts on Thursday, or Wed in a leap year
+		if (dayOfWeek == THURSDAY || (dayOfWeek == WEDNESDAY && date.isLeapYear())) {
+			return 53;
+		}
+
+		return 52;
 	}
 
 }

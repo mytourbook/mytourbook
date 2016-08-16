@@ -23,10 +23,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoField;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 
+import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.time.TourDateTime;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
@@ -34,8 +37,6 @@ import net.tourbook.statistics.StatisticServices;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
-
-import org.joda.time.DateTime;
 
 public class DataProvider_Tour_Day extends DataProvider {
 
@@ -88,23 +89,23 @@ public class DataProvider_Tour_Day extends DataProvider {
 
 		final String sqlString = "SELECT " // //$NON-NLS-1$
 				//
-				+ "TourId, " //					// 1 	//$NON-NLS-1$
+				+ "TourId, " //					1 	//$NON-NLS-1$
 
-				+ "StartYear, " // 				// 2	//$NON-NLS-1$
-				+ "StartMonth, " // 			// 3	//$NON-NLS-1$
-				+ "StartDay, " // 				// 4	//$NON-NLS-1$
-				+ "StartWeek," //				// 5	//$NON-NLS-1$
-				+ "TourStartTime, " // 			// 6	//$NON-NLS-1$
-				+ "TourDrivingTime, " // 		// 7	//$NON-NLS-1$
-				+ "TourRecordingTime, " // 		// 8	//$NON-NLS-1$
+				+ "StartYear, " // 				2	//$NON-NLS-1$
+				+ "StartWeek," //				3	//$NON-NLS-1$
+				+ "TourStartTime, " // 			4	//$NON-NLS-1$
+				+ "TimeZoneId, "//				5	//$NON-NLS-1$
 
-				+ "TourDistance, " // 			// 9	//$NON-NLS-1$
-				+ "TourAltUp, " // 				// 10	//$NON-NLS-1$
-				+ "TourTitle, " //				// 11	//$NON-NLS-1$
-				+ "TourDescription, " // 		// 12	//$NON-NLS-1$
+				+ "TourDrivingTime, " // 		6	//$NON-NLS-1$
+				+ "TourRecordingTime, " // 		7	//$NON-NLS-1$
+
+				+ "TourDistance, " // 			8	//$NON-NLS-1$
+				+ "TourAltUp, " // 				9	//$NON-NLS-1$
+				+ "TourTitle, " //				10	//$NON-NLS-1$
+				+ "TourDescription, " // 		11	//$NON-NLS-1$
 				//
-				+ "TourType_typeId, " // 		// 13	//$NON-NLS-1$
-				+ "jTdataTtag.TourTag_tagId"//	// 14	//$NON-NLS-1$
+				+ "TourType_typeId, " // 		12	//$NON-NLS-1$
+				+ "jTdataTtag.TourTag_tagId"//	13	//$NON-NLS-1$
 				//
 				+ UI.NEW_LINE
 				//
@@ -117,7 +118,7 @@ public class DataProvider_Tour_Day extends DataProvider {
 				+ (" WHERE StartYear IN (" + getYearList(lastYear, numberOfYears) + ")" + UI.NEW_LINE) //$NON-NLS-1$ //$NON-NLS-2$
 				+ sqlFilter.getWhereClause()
 				//
-				+ (" ORDER BY StartYear, StartMonth, StartDay, StartHour, StartMinute "); //$NON-NLS-1$
+				+ (" ORDER BY TourStartTime "); //$NON-NLS-1$
 
 		try {
 
@@ -130,7 +131,7 @@ public class DataProvider_Tour_Day extends DataProvider {
 			final TIntArrayList allTourStartTime = new TIntArrayList();
 			final TIntArrayList allTourEndTime = new TIntArrayList();
 			final TIntArrayList allTourStartWeek = new TIntArrayList();
-			final ArrayList<DateTime> allTourStartDateTime = new ArrayList<>();
+			final ArrayList<ZonedDateTime> allTourStartDateTime = new ArrayList<>();
 
 			final TIntArrayList allTourDuration = new TIntArrayList();
 			final TIntArrayList allTourRecordingTime = new TIntArrayList();
@@ -161,7 +162,7 @@ public class DataProvider_Tour_Day extends DataProvider {
 			while (result.next()) {
 
 				final long dbTourId = result.getLong(1);
-				final Object dbTagId = result.getObject(14);
+				final Object dbTagId = result.getObject(13);
 
 				if (dbTourId == lastTourId) {
 
@@ -176,38 +177,41 @@ public class DataProvider_Tour_Day extends DataProvider {
 					// get first record from a tour
 
 					final int dbTourYear = result.getShort(2);
-					final int dbTourMonth = result.getShort(3) - 1;
-					final int dbTourDay = result.getShort(4);
-					final int dbTourStartWeek = result.getInt(5);
+					final int dbTourStartWeek = result.getInt(3);
 
-					final long dbStartTime = result.getLong(6);
-					final int dbDrivingTime = result.getInt(7);
-					final int dbRecordingTime = result.getInt(8);
+					final long dbStartTimeMilli = result.getLong(4);
+					final String dbTimeZoneId = result.getString(5);
 
-					final float dbDistance = result.getFloat(9);
-					final int dbAltitudeUp = result.getInt(10);
+					final int dbDrivingTime = result.getInt(6);
+					final int dbRecordingTime = result.getInt(7);
 
-					final String dbTourTitle = result.getString(11);
-					final String dbDescription = result.getString(12);
-					final Object dbTypeIdObject = result.getObject(13);
+					final float dbDistance = result.getFloat(8);
+					final int dbAltitudeUp = result.getInt(9);
+
+					final String dbTourTitle = result.getString(10);
+					final String dbDescription = result.getString(11);
+					final Object dbTypeIdObject = result.getObject(12);
+
+					final TourDateTime tourDateTime = TimeTools.getTourDateTime(dbStartTimeMilli, dbTimeZoneId);
+					final ZonedDateTime zonedStartDateTime = tourDateTime.tourZonedDateTime;
 
 					// get number of days for the year, start with 0
-					_calendar.set(dbTourYear, dbTourMonth, dbTourDay);
-					final int tourDOY = _calendar.get(Calendar.DAY_OF_YEAR) - 1;
+					final int tourDOY = tourDateTime.tourZonedDateTime.get(ChronoField.DAY_OF_YEAR) - 1;
 
-					final DateTime tourStartDateTime = new DateTime(dbStartTime);
-					final int startTime = tourStartDateTime.getMillisOfDay() / 1000;
+					final int startDayTime = (zonedStartDateTime.getHour() * 3600)
+							+ (zonedStartDateTime.getMinute() * 60)
+							+ zonedStartDateTime.getSecond();
 
 					allTourIds.add(dbTourId);
 
 					allYears.add(dbTourYear);
-					allMonths.add(dbTourMonth);
+					allMonths.add(zonedStartDateTime.getMonthValue());
 					allYearsDOY.add(getYearDOYs(dbTourYear) + tourDOY);
 					allTourStartWeek.add(dbTourStartWeek);
 
-					allTourStartDateTime.add(tourStartDateTime);
-					allTourStartTime.add(startTime);
-					allTourEndTime.add((startTime + dbRecordingTime));
+					allTourStartDateTime.add(zonedStartDateTime);
+					allTourStartTime.add(startDayTime);
+					allTourEndTime.add((startDayTime + dbRecordingTime));
 					allTourRecordingTime.add(dbRecordingTime);
 					allTourDrivingTime.add(dbDrivingTime);
 
