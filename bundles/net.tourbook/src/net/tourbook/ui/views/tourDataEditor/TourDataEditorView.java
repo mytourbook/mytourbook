@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.text.NumberFormat;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -44,8 +45,8 @@ import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
-import net.tourbook.common.time.TimeZoneData;
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.time.TimeZoneData;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.ColumnDefinition;
@@ -184,8 +185,6 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.progress.UIJob;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 // author: Wolfgang Schramm
 // create: 24.08.2007
@@ -276,7 +275,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private ITourSaveListener					_tourSaveListener;
 	//
 	private final Calendar						_calendar						= GregorianCalendar.getInstance();
-	private final DateTimeFormatter				_dtFormatter					= DateTimeFormat.mediumDateTime();
 	private final NumberFormat					_nf1							= NumberFormat.getNumberInstance();
 	private final NumberFormat					_nf1NoGroup						= NumberFormat.getNumberInstance();
 	private final NumberFormat					_nf2							= NumberFormat.getNumberInstance();
@@ -469,6 +467,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private CTabItem							_tabTour;
 	private CTabItem							_tabSlices;
 	private CTabItem							_tabInfo;
+
 	/**
 	 * contains the controls which are displayed in the first column, these controls are used to get
 	 * the maximum width and set the first column within the differenct section to the same width
@@ -2449,10 +2448,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			createUISection_122_DateTime_Col1(container);
 			createUISection_123_DateTime_Col2(container);
 
-			createUISection_125_DateTime_TimeZone(container);
 
 			createUISection_127_DateTime_Col1(container);
 			createUISection_128_DateTime_Col2(container);
+
+			createUISection_129_DateTime_TimeZone(container);
 		}
 	}
 
@@ -2501,43 +2501,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				_dtStartTime = new DateTime(container, SWT.TIME | SWT.MEDIUM | SWT.BORDER);
 				_tk.adapt(_dtStartTime, true, false);
 				_dtStartTime.addSelectionListener(_dateTimeListener);
-			}
-		}
-	}
-
-	private void createUISection_125_DateTime_TimeZone(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-				.grab(false, false)
-				.span(2, 1)
-				.applyTo(container);
-		GridLayoutFactory.fillDefaults()//
-				.numColumns(2)
-				.applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
-		{
-			/*
-			 * Time zone
-			 */
-
-			{
-				// label
-				final Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_TimeZone);
-				_firstColumnControls.add(label);
-			}
-
-			{
-				// combo
-				_comboTimeZone = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
-				_comboTimeZone.addSelectionListener(_selectionListener);
-
-				_tk.adapt(_comboTimeZone, true, false);
-
-				// fill combobox
-				for (final TimeZoneData timeZone : TimeTools.getAllTimeZones()) {
-					_comboTimeZone.add(timeZone.label);
-				}
 			}
 		}
 	}
@@ -2654,6 +2617,43 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				_secondColumnControls.add(label);
 
 				_timeDriving = new TimeDuration(container);
+			}
+		}
+	}
+
+	private void createUISection_129_DateTime_TimeZone(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+				.grab(false, false)
+				.span(2, 1)
+				.applyTo(container);
+		GridLayoutFactory.fillDefaults()//
+				.numColumns(2)
+				.applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
+		{
+			/*
+			 * Time zone
+			 */
+
+			{
+				// label
+				final Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_TimeZone);
+				_firstColumnControls.add(label);
+			}
+
+			{
+				// combo
+				_comboTimeZone = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
+				_comboTimeZone.addSelectionListener(_selectionListener);
+
+				_tk.adapt(_comboTimeZone, true, false);
+
+				// fill combobox
+				for (final TimeZoneData timeZone : TimeTools.getAllTimeZones()) {
+					_comboTimeZone.add(timeZone.label);
+				}
 			}
 		}
 	}
@@ -4948,7 +4948,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 */
 	private String getTourTitle() {
 
-		if (_tourData.isMultipleTours) {
+		if (_tourData.isMultipleTours()) {
 
 			return TourManager.getTourTitleMultiple(_tourData);
 
@@ -6822,18 +6822,18 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		/*
 		 * date/time created
 		 */
-		final org.joda.time.DateTime dtCreated = _tourData.getDateTimeCreated();
+		final ZonedDateTime dtCreated = _tourData.getDateTimeCreated();
 		_txtDateTimeCreated.setText(dtCreated == null ? //
 				UI.EMPTY_STRING
-				: _dtFormatter.print(dtCreated.getMillis()));
+				: dtCreated.format(TimeTools.dateTimeFormatter_Medium));
 
 		/*
 		 * date/time modified
 		 */
-		final org.joda.time.DateTime dtModified = _tourData.getDateTimeModified();
+		final ZonedDateTime dtModified = _tourData.getDateTimeModified();
 		_txtDateTimeModified.setText(dtModified == null ? //
 				UI.EMPTY_STRING
-				: _dtFormatter.print(dtModified.getMillis()));
+				: dtModified.format(TimeTools.dateTimeFormatter_Medium));
 
 		/*
 		 * merge from tour ID

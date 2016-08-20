@@ -438,7 +438,7 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
 				/*
 				 * Get tour id for each segment
 				 */
-				if (_tourData.isMultipleTours) {
+				if (_tourData.isMultipleTours()) {
 
 					// multiple tours are displayed
 

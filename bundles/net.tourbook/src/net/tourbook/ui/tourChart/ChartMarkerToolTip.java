@@ -200,7 +200,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 
 	private void createActions() {
 
-		final boolean isSingleTour = _tourData.isMultipleTours == false;
+		final boolean isSingleTour = _tourData.isMultipleTours() == false;
 
 		_actionOpenMarkerDialog = new ActionOpenMarkerDialogInTooltip();
 
@@ -364,7 +364,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
 	private void createUI_70_Values(final Composite parent) {
 
 		int valueIndex;
-		if (_tourData.isMultipleTours) {
+		if (_tourData.isMultipleTours()) {
 			valueIndex = _hoveredTourMarker.getMultiTourSerieIndex();
 		} else {
 			valueIndex = _hoveredTourMarker.getSerieIndex();

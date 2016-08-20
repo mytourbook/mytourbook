@@ -981,7 +981,9 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 	@Override
 	protected void performDefaults() {
 
-		if (_tabFolder.getSelectionIndex() == TAB_FOLDER_ELEVATION) {
+		final int selectedTab = _tabFolder.getSelectionIndex();
+
+		if (selectedTab == TAB_FOLDER_ELEVATION) {
 
 			/*
 			 * compute altitude
@@ -990,14 +992,14 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 					ITourbookPreferences.COMPUTED_ALTITUDE_DP_TOLERANCE) * 10;
 			_spinnerDPTolerance.setSelection((int) prefDPTolerance);
 
-		} else if (_tabFolder.getSelectionIndex() == TAB_FOLDER_SMOOTHING) {
+		} else if (selectedTab == TAB_FOLDER_SMOOTHING) {
 
 			/*
 			 * compute smoothing
 			 */
 			_smoothingUI.performDefaults();
 
-		} else if (_tabFolder.getSelectionIndex() == TAB_FOLDER_BREAK_TIME) {
+		} else if (selectedTab == TAB_FOLDER_BREAK_TIME) {
 
 			_isUpdateUI = true;
 			{

@@ -35,6 +35,8 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -388,7 +390,7 @@ public class Util {
 	 * @param yyyymmddhhmmss
 	 * @return
 	 */
-	public static DateTime createDateTimeFromYMDhms(final long yyyymmddhhmmss) {
+	public static ZonedDateTime createDateTimeFromYMDhms(final long yyyymmddhhmmss) {
 
 		final int year = (int) (yyyymmddhhmmss / 10000000000L) % 10000;
 		final int month = (int) (yyyymmddhhmmss / 100000000) % 100;
@@ -397,7 +399,7 @@ public class Util {
 		final int minute = (int) (yyyymmddhhmmss / 100 % 100);
 		final int second = (int) (yyyymmddhhmmss % 100);
 
-		return new DateTime(year, month, day, hour, minute, second, 0);
+		return ZonedDateTime.of(year, month, day, hour, minute, second, 0, ZoneId.systemDefault());
 	}
 
 	/**

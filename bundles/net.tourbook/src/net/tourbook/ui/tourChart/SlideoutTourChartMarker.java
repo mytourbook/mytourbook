@@ -561,7 +561,7 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 		final boolean isTooltipVisible = _chkShowMarkerTooltip.getSelection();
 
 		final boolean isMarkerVisible = isLabelVisible || isMarkerPointVisible;// || isImageVisible;
-		final boolean isMultipleTours = _tourChart.getTourData().isMultipleTours;
+		final boolean isMultipleTours = _tourChart.getTourData().isMultipleTours();
 
 		_comboTooltipPosition.setEnabled(isTooltipVisible);
 		_chkShowAbsoluteValues.setEnabled(isTooltipVisible && isMultipleTours);

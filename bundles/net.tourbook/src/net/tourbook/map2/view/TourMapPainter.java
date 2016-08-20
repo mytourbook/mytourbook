@@ -1107,7 +1107,7 @@ public class TourMapPainter extends MapPainter {
 									final double[] latitudeSerie,
 									final double[] longitudeSerie) {
 
-		if (tourData.isMultipleTours) {
+		if (tourData.isMultipleTours()) {
 
 			final int[] multipleStartTimeIndex = tourData.multipleTourStartIndex;
 			final int[] multipleNumberOfMarkers = tourData.multipleNumberOfMarkers;

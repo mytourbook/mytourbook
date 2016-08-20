@@ -2907,7 +2907,7 @@ public class TourManager {
 
 			final String cadenceUnit;
 
-			if (tourData.isMultipleTours) {
+			if (tourData.isMultipleTours()) {
 
 				final boolean isRpm = tourData.multipleTour_IsCadenceRpm;
 				final boolean isSpm = tourData.multipleTour_IsCadenceSpm;
@@ -3150,7 +3150,7 @@ public class TourManager {
 			chartDataModel.addYData(yDataHistory);
 			chartDataModel.setCustomData(CUSTOM_DATA_HISTORY, yDataHistory);
 
-		} else if (tourData.isMultipleTours) {
+		} else if (tourData.isMultipleTours()) {
 
 			createStatisticSegments(tourData, chartDataModel);
 		}

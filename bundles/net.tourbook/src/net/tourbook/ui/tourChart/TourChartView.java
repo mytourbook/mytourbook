@@ -322,7 +322,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 						return;
 					}
 
-					if (_tourData.isMultipleTours) {
+					if (_tourData.isMultipleTours()) {
 
 						clearView();
 					}
@@ -718,7 +718,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 			final TourMarker firstTourMarker = tourMarker.get(0);
 
 			int leftSliderValueIndex;
-			if (tourData.isMultipleTours) {
+			if (tourData.isMultipleTours()) {
 				leftSliderValueIndex = firstTourMarker.getMultiTourSerieIndex();
 			} else {
 				leftSliderValueIndex = firstTourMarker.getSerieIndex();
@@ -734,7 +734,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 				final TourMarker lastTourMarker = tourMarker.get(numberOfTourMarkers - 1);
 
-				if (tourData.isMultipleTours) {
+				if (tourData.isMultipleTours()) {
 					rightSliderValueIndex = lastTourMarker.getMultiTourSerieIndex();
 				} else {
 					rightSliderValueIndex = lastTourMarker.getSerieIndex();

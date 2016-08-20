@@ -70,13 +70,6 @@ public class TourInfoUI {
 	private Color								_fgColor;
 	private Font								_boldFont;
 
-//	private final DateTimeFormatter				_dateFormatter			= DateTimeFormat.fullDate();
-//	private final DateTimeFormatter				_timeFormatter			= DateTimeFormat.mediumTime();
-//	private final DateTimeFormatter				_dtFormatterCreated		= DateTimeFormat.mediumDateTime();
-
-//	private final DateTimeFormatter				_dtHistoryFormatter		= DateTimeFormatter.forStyle("FM");	//$NON-NLS-1$
-//	private final DateTimeFormatter				_dtWeekday				= DateTimeFormat.forPattern("E");	//$NON-NLS-1$
-
 	public static final DateTimeFormatter		_dtHistoryFormatter		= DateTimeFormatter.ofLocalizedDateTime(
 																				FormatStyle.FULL,
 																				FormatStyle.MEDIUM);
@@ -185,6 +178,7 @@ public class TourInfoUI {
 	private Label								_lblRestPulse;
 	private Label								_lblTemperature;
 	private Label								_lblTimeZoneOffset;
+	private Label								_lblTimeZoneOffsetValue;
 	private Label								_lblTitle;
 	private Label								_lblTourTags;
 	private Label								_lblTourTypeText;
@@ -196,8 +190,8 @@ public class TourInfoUI {
 	/*
 	 * fields which are optionally displayed when they are not null
 	 */
-//	private DateTime							_uiDtCreated;
-//	private DateTime							_uiDtModified;
+	private ZonedDateTime						_uiDtCreated;
+	private ZonedDateTime						_uiDtModified;
 	private String								_uiTourTypeName;
 
 	private IToolTipProvider					_tourToolTipProvider;
@@ -443,15 +437,16 @@ public class TourInfoUI {
 			_lblBreakTimeHour = createUI_Label(container, Messages.Tour_Tooltip_Label_Hour);
 		}
 
-		{
+		if (isSimpleTour()) {
+
 			/*
 			 * Timezone
 			 */
-			final Label label = createUI_Label(container, Messages.Tour_Tooltip_Label_TimeZone);
-			_firstColumnControls.add(label);
+			_lblTimeZoneOffset = createUI_Label(container, Messages.Tour_Tooltip_Label_TimeZone);
+			_firstColumnControls.add(_lblTimeZoneOffset);
 
-			_lblTimeZoneOffset = createUI_LabelValue(container, SWT.TRAIL);
-			_secondColumnControls.add(_lblTimeZoneOffset);
+			_lblTimeZoneOffsetValue = createUI_LabelValue(container, SWT.TRAIL);
+			_secondColumnControls.add(_lblTimeZoneOffsetValue);
 
 			// hour
 			createUI_Label(container, Messages.Tour_Tooltip_Label_Hour);
@@ -1000,6 +995,16 @@ public class TourInfoUI {
 		return speedValueIndex;
 	}
 
+	private boolean isSimpleTour() {
+
+		final long recordingTime = _tourData.getTourRecordingTime();
+
+		final boolean isShortTour = recordingTime < UI.DAY_IN_SECONDS;
+		final boolean isSingleTour = !_tourData.isMultipleTours();
+
+		return isShortTour || isSingleTour;
+	}
+
 	/**
 	 * Enable/disable tour edit actions, actions are disabled by default
 	 * 
@@ -1057,9 +1062,7 @@ public class TourInfoUI {
 		final ZonedDateTime zdtTourStart = _tourData.getTourStartTime8();
 		final ZonedDateTime zdtTourEnd = zdtTourStart.plusSeconds(recordingTime);
 
-		final boolean isShortDuration = recordingTime < UI.DAY_IN_SECONDS;
-
-		if (isShortDuration) {
+		if (isSimpleTour()) {
 
 			// < 1 day
 
@@ -1080,6 +1083,10 @@ public class TourInfoUI {
 			_lblMovingTime.setText(FormatManager.formatDrivingTime(movingTime));
 			_lblBreakTime.setText(FormatManager.formatPausedTime(breakTime));
 
+			// time zone
+			final TourDateTime tourDateTime = _tourData.getTourDateTime();
+			_lblTimeZoneOffsetValue.setText(tourDateTime.timeZoneOffsetLabel);
+
 		} else {
 
 			// > 1 day
@@ -1095,7 +1102,10 @@ public class TourInfoUI {
 			_lblMovingTimeHour.setVisible(false);
 			_lblBreakTimeHour.setVisible(false);
 
-			final Period recordingPeriod = new Period(zdtTourStart, zdtTourEnd, _tourPeriodTemplate);
+			final Period recordingPeriod = new Period(
+					_tourData.getTourStartTimeMS(),
+					_tourData.getTourEndTimeMS(),
+					_tourPeriodTemplate);
 			final Period movingPeriod = new Period(0, movingTime * 1000, _tourPeriodTemplate);
 			final Period breakPeriod = new Period(0, breakTime * 1000, _tourPeriodTemplate);
 
@@ -1103,10 +1113,6 @@ public class TourInfoUI {
 			_lblMovingTime.setText(movingPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
 			_lblBreakTime.setText(breakPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
 		}
-
-		// time zone
-		final TourDateTime tourDateTime = _tourData.getTourDateTime();
-		_lblTimeZoneOffset.setText(tourDateTime.timeZoneOffsetLabel);
 
 		int windSpeed = _tourData.getWeatherWindSpeed();
 		windSpeed = (int) (windSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
@@ -1222,7 +1228,7 @@ public class TourInfoUI {
 
 			_lblDateTimeCreatedValue.setText(_uiDtCreated == null ? //
 					UI.EMPTY_STRING
-					: _dtFormatterCreated.print(_uiDtCreated.getMillis()));
+					: _uiDtCreated.format(TimeTools.dateTimeFormatter_Medium));
 		}
 
 		// date/time modified
@@ -1230,7 +1236,7 @@ public class TourInfoUI {
 
 			_lblDateTimeModifiedValue.setText(_uiDtModified == null ? //
 					UI.EMPTY_STRING
-					: _dtFormatterCreated.print(_uiDtModified.getMillis()));
+					: _uiDtModified.format(TimeTools.dateTimeFormatter_Medium));
 		}
 	}
 }

@@ -1733,7 +1733,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 				tourData = tourChart.getTourData();
 			}
 
-			if (tourData != null && tourData.isMultipleTours) {
+			if (tourData != null && tourData.isMultipleTours()) {
 
 				// multiple tours are selected
 
@@ -1950,7 +1950,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		int leftSliderValueIndex = 0;
 		int rightSliderValueIndex = 0;
 
-		if (tourData.isMultipleTours) {
+		if (tourData.isMultipleTours()) {
 
 			if (numberOfTourMarkers == 1) {
 

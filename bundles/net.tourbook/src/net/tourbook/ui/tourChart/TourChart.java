@@ -1471,7 +1471,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 		final boolean isTimeSerie = timeSerie != null;
 
-		final boolean isMultipleTours = _tourData.isMultipleTours;
+		final boolean isMultipleTours = _tourData.isMultipleTours();
 		final int[] multipleStartTimeIndex = _tourData.multipleTourStartIndex;
 		final long[] multipleStartTime = _tourData.multipleTourStartTime;
 
@@ -1733,7 +1733,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 				_tourData.getTimeSerieDouble()
 				: _tourData.getDistanceSerieDouble();
 
-		if (_tourData.isMultipleTours) {
+		if (_tourData.isMultipleTours()) {
 
 			final int[] multipleStartTimeIndex = _tourData.multipleTourStartIndex;
 			final int[] multipleNumberOfMarkers = _tourData.multipleNumberOfMarkers;
@@ -2667,7 +2667,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 			TourData tourData = null;
 
-			if (_tourData.isMultipleTours) {
+			if (_tourData.isMultipleTours()) {
 
 				if (_selectedTourMarker != null) {
 
@@ -4157,7 +4157,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			ctsConfig.isShowSegmentTitle = false;
 		}
 
-		ctsConfig.isMultipleSegments = _tourData.isMultipleTours;
+		ctsConfig.isMultipleSegments = _tourData.isMultipleTours();
 
 		_tourTitleTooltip.setFadeInDelayTime(_tcc.tourInfoTooltipDelay);
 	}
@@ -4851,7 +4851,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 		_tourInfoIconTooltipProvider.setTourData(_tourData);
 		_valuePointTooltip.setTourData(_tourData);
-		_tourMarkerTooltip.setIsShowMarkerActions(_tourData.isMultipleTours == false);
+		_tourMarkerTooltip.setIsShowMarkerActions(_tourData.isMultipleTours() == false);
 	}
 
 	/**

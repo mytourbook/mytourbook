@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.common.time;
 
-import static java.time.DayOfWeek.THURSDAY;
-import static java.time.DayOfWeek.WEDNESDAY;
 import static java.time.temporal.ChronoField.DAY_OF_WEEK;
 import gnu.trove.map.hash.TIntObjectHashMap;
 
@@ -50,8 +48,6 @@ public class TimeTools {
 	private static final String						ZERO_0						= ":0";											//$NON-NLS-1$
 	private static final String						ZERO_00_00					= "+00:00";										//$NON-NLS-1$
 	private static final String						ZERO_00_00_DEFAULT			= ZERO_00_00 + '*';
-
-	public static final String						TIME_ZONE_UTC				= "UTC";											//$NON-NLS-1$
 
 	/**
 	 * Cached time zone labels.
@@ -210,6 +206,17 @@ public class TimeTools {
 	}
 
 	/**
+	 * @return Returns the time zone offset for the default time zone.
+	 */
+	public static String getDefaultTimeZoneOffset() {
+
+		final ZonedDateTime zdt = ZonedDateTime.now();
+		final int tzOffset = zdt.getOffset().getTotalSeconds();
+
+		return printOffset(tzOffset, false);
+	}
+
+	/**
 	 * @param year
 	 * @return Returns the number of days in a year
 	 */
@@ -342,7 +349,7 @@ public class TimeTools {
 
 			tourZonedDateTime = ZonedDateTime.ofInstant(tourStartInstant, ZoneId.systemDefault());
 
-			timeZoneOffsetLabel = "no TZ";
+			timeZoneOffsetLabel = printOffset(0, true);
 		}
 
 		// set an offset to have the index in the week array
@@ -356,9 +363,11 @@ public class TimeTools {
 	 */
 	/**
 	 * @param timeZoneOffset
-	 *            Time zone offset in seconds.
+	 *            Time zone offset in seconds
 	 * @param isDefaultZone
-	 * @return
+	 *            When <code>true</code>, then a star is added to the offset value to indicate the
+	 *            default zone
+	 * @return Returns a time offset string
 	 */
 	private static String printOffset(final int timeZoneOffset, final boolean isDefaultZone) {
 
@@ -417,38 +426,12 @@ public class TimeTools {
 		final DayOfWeek dow = DayOfWeek.SUNDAY.plus(firstDayOfWeek - 1);
 
 		calendarWeek = WeekFields.of(dow, minimalDaysInFirstWeek);
-
-//		final ZonedDateTime tourWeek = ZonedDateTime.now().with(//
-//				calendarWeek.dayOfWeek(),
-//				calendarWeek.getFirstDayOfWeek().getValue());
-//
-//		final int year = 2016;
-//
-//		final LocalDate date = LocalDate
-//				.now()
-//				.with(calendarWeek.weekBasedYear(), year)
-//				.with(calendarWeek.weekOfWeekBasedYear(), 1)
-//				.with(ChronoField.DAY_OF_WEEK, 1);
 	}
 
 	public static void setDefaultTimeZoneOffset(final boolean isUseTimeZone, final String timeZoneId) {
 
 		_isUseTimeZone = isUseTimeZone;
 		_defaultTimeZoneId = ZoneId.of(timeZoneId);
-	}
-
-	private static int weekRange(final int weekBasedYear) {
-
-		final LocalDate date = LocalDate.of(weekBasedYear, 1, 1);
-
-		final DayOfWeek dayOfWeek = date.getDayOfWeek();
-
-		// 53 weeks if standard year starts on Thursday, or Wed in a leap year
-		if (dayOfWeek == THURSDAY || (dayOfWeek == WEDNESDAY && date.isLeapYear())) {
-			return 53;
-		}
-
-		return 52;
 	}
 
 }

@@ -1013,7 +1013,7 @@ public abstract class TreeColumnFactory {
 				colDef.setColumnLabel(Messages.ColumnFactory_TimeZone_Label);
 				colDef.setColumnHeaderText(Messages.ColumnFactory_TimeZone_Header);
 
-				// THIS MUST BE SET IN THE VIEW TO SET THE CORRECT DEFAULT TIME ZONE
+// THIS MUST BE SET IN THE VIEW TO SET THE CORRECT DEFAULT TIME ZONE
 //				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_TimeZone_Tooltip);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));

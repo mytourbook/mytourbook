@@ -149,7 +149,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
 				Object[] tourMarkers;
 
-				if (_tourData.isMultipleTours) {
+				if (_tourData.isMultipleTours()) {
 
 					tourMarkers = _tourData.multiTourMarkers.toArray();
 
@@ -325,7 +325,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
 									// get modified tour
 									_tourData = tourData;
-									_isMultipleTours = tourData.isMultipleTours;
+									_isMultipleTours = tourData.isMultipleTours();
 
 									updateUI_MarkerViewer();
 
@@ -787,7 +787,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 	private void enableActions() {
 
 		final boolean isTourInDb = isTourSavedInDb();
-		final boolean isSingleTour = _tourData != null && _tourData.isMultipleTours == false;
+		final boolean isSingleTour = _tourData != null && _tourData.isMultipleTours() == false;
 
 		_actionEditTourMarkers.setEnabled(isTourInDb && isSingleTour);
 	}
@@ -949,13 +949,13 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 				tourData = TourManager.getInstance().getTourData(tourId);
 				if (tourData != null) {
 					_tourData = tourData;
-					_isMultipleTours = tourData.isMultipleTours;
+					_isMultipleTours = tourData.isMultipleTours();
 				}
 			}
 		} else {
 
 			_tourData = tourData;
-			_isMultipleTours = tourData.isMultipleTours;
+			_isMultipleTours = tourData.isMultipleTours();
 		}
 
 		updateUI_MarkerViewer();
@@ -976,7 +976,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 			if (tourData != _tourData) {
 
 				_tourData = tourData;
-				_isMultipleTours = tourData.isMultipleTours;
+				_isMultipleTours = tourData.isMultipleTours();
 
 				updateUI_MarkerViewer();
 			}

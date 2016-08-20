@@ -1170,24 +1170,23 @@ public class Messages extends NLS {
 	public static String		Pref_general_system_temperature;
 	public static String		Pref_General_Button_ComputeCalendarWeek;
 	public static String		Pref_General_CalendarWeek;
-
-	public static String	Pref_General_Checkbox_UseTimeZone;
-
-	public static String	Pref_General_Checkbox_UseTimeZone_Tooltip;
+	public static String		Pref_General_Checkbox_SetTimeZone;
+	public static String		Pref_General_Checkbox_SetTimeZone_Tooltip;
 	public static String		Pref_General_Dialog_CalendarWeekIsModified_Message;
 	public static String		Pref_General_Dialog_CalendarWeekIsModified_Title;
 	public static String		Pref_General_Group_TimeZone;
+	public static String		Pref_General_Label_DefaultLocalTimeZone;
+	public static String		Pref_General_Label_DefaultLocalTimeZone_Tooltip;
 	public static String		Pref_General_Label_FirstDayOfWeek;
 	public static String		Pref_General_Label_FirstDayOfWeek_Tooltip;
 	public static String		Pref_General_Label_LocalTimeZone;
-
-	public static String	Pref_General_Label_LocalTimeZone_1;
-
-	public static String	Pref_General_Label_LocalTimeZone_2;
-
+	public static String		Pref_General_Label_LocalTimeZone_1;
+	public static String		Pref_General_Label_LocalTimeZone_2;
 	public static String		Pref_General_Label_MeasurementSystem;
 	public static String		Pref_General_Label_MinimalDaysInFirstWeek;
 	public static String		Pref_General_Label_MinimalDaysInFirstWeek_Tooltip;
+	public static String		Pref_General_Label_SetAnotherTimeZone;
+	
 	public static String		Pref_General_Notes;
 	public static String		Pref_General_Notes_Tooltip;
 

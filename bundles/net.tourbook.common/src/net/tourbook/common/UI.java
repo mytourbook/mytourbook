@@ -26,6 +26,7 @@ import java.util.Formatter;
 
 import net.tourbook.common.weather.IWeather;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -1383,7 +1384,12 @@ public class UI {
 
 		// set width for all first column controls
 		for (final Control control : columnControls) {
-			((GridData) control.getLayoutData()).widthHint = maxWidth;
+
+			final Object layoutData = control.getLayoutData();
+
+			Assert.isNotNull(layoutData);
+
+			((GridData) layoutData).widthHint = maxWidth;
 		}
 	}
 

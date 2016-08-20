@@ -845,7 +845,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		final float[] pulseSerie = tourData.pulseSerie;
 
 		final Object[] markerSerie;
-		if (tourData.isMultipleTours) {
+		if (tourData.isMultipleTours()) {
 			markerSerie = tourData.multiTourMarkers.toArray();
 		} else {
 			markerSerie = tourData.getTourMarkers().toArray();
@@ -1378,7 +1378,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 	private void createSegmentsBy_Marker() {
 
-		final boolean isMultipleTours = _tourData.isMultipleTours;
+		final boolean isMultipleTours = _tourData.isMultipleTours();
 		final int[] timeSerie = _tourData.timeSerie;
 		final int numTimeSlices = timeSerie.length;
 
@@ -3236,7 +3236,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	 */
 	private float getDPTolerance_FromTour() {
 
-		if (_tourData.isMultipleTours) {
+		if (_tourData.isMultipleTours()) {
 
 			// DP tolerance is saved in the pref store
 
@@ -3278,7 +3278,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 	private int[] getTourAndMarkerIndices() {
 
-		final boolean isMultipleTours = _tourData.isMultipleTours;
+		final boolean isMultipleTours = _tourData.isMultipleTours();
 		final int[] timeSerie = _tourData.timeSerie;
 		final int numTimeSlices = timeSerie.length;
 
@@ -3372,7 +3372,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 	private int[] getTourIndices() {
 
-		final boolean isMultipleTours = _tourData.isMultipleTours;
+		final boolean isMultipleTours = _tourData.isMultipleTours();
 		final int[] multipleTourStartIndex = _tourData.multipleTourStartIndex;
 
 		int[] forcedIndices = null;
@@ -3424,7 +3424,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 	private String getTourTitle() {
 
-		if (_tourData.isMultipleTours) {
+		if (_tourData.isMultipleTours()) {
 
 			return TourManager.getTourTitleMultiple(_tourData);
 
@@ -3686,7 +3686,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		_dpTolerancePower = dpTolerancePower;
 		_dpTolerancePulse = dpTolerancePulse;
 
-		if (_tourData.isMultipleTours) {
+		if (_tourData.isMultipleTours()) {
 			_dpToleranceAltitudeMultipleTours = dpToleranceAlti;
 		}
 
@@ -3922,7 +3922,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		 */
 		_dpToleranceAltitudeMultipleTours = (float) (STATE_DP_TOLERANCE_ALTITUDE_MULTIPLE_TOURS_DEFAULT / 10.0);
 
-		if (_tourData != null && _tourData.isMultipleTours) {
+		if (_tourData != null && _tourData.isMultipleTours()) {
 			_spinnerDPTolerance_Altitude.setSelection(STATE_DP_TOLERANCE_ALTITUDE_MULTIPLE_TOURS_DEFAULT);
 		}
 	}

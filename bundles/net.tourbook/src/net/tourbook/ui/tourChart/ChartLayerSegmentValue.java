@@ -420,7 +420,7 @@ public class ChartLayerSegmentValue implements IChartLayer {
 				/*
 				 * Get tour id for each segment
 				 */
-				if (_tourData.isMultipleTours) {
+				if (_tourData.isMultipleTours()) {
 
 					// multiple tours are displayed
 

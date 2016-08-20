@@ -1844,7 +1844,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 					final TourDateTime tourDateTime = ((TVITourBookTour) element).colTourDateTime;
 					final String timeZoneId = ((TVITourBookTour) element).colTimeZoneId;
 
-					cell.setText(tourDateTime.timeZoneOffsetLabel + UI.SPACE2 + timeZoneId);
+					final String tzIdText = timeZoneId == null ? UI.EMPTY_STRING : UI.SPACE2 + timeZoneId;
+
+					cell.setText(tourDateTime.timeZoneOffsetLabel + tzIdText);
 
 					setCellColor(cell, element);
 				}

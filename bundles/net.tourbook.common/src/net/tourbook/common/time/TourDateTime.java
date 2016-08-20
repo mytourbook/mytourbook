@@ -57,4 +57,15 @@ public class TourDateTime {
 		this.weekDay = weekDay;
 	}
 
+	@Override
+	public String toString() {
+		return "TourDateTime ["
+
+				+ ("tourZonedDateTime=" + tourZonedDateTime + ", ")
+				+ ("timeZoneOffsetLabel=" + timeZoneOffsetLabel + ", ")
+				+ ("weekDay=" + weekDay)
+
+				+ "]";
+	}
+
 }

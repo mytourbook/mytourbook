@@ -1107,10 +1107,10 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	private TourData											_mergeSourceTourData;
 
 	@Transient
-	private DateTime											_dateTimeCreated;
+	private ZonedDateTime										_dateTimeCreated;
 
 	@Transient
-	private DateTime											_dateTimeModified;
+	private ZonedDateTime										_dateTimeModified;
 
 	/**
 	 * Tour start time
@@ -1193,7 +1193,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	 * are selected to be displayed in the {@link TourChart}.
 	 */
 	@Transient
-	public boolean												isMultipleTours;
+	private boolean												isMultipleTours;
 
 	/**
 	 * Contains the tour id's
@@ -5128,7 +5128,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	 * @return Returns {@link DateTime} when the tour was created or <code>null</code> when
 	 *         date/time is not available
 	 */
-	public DateTime getDateTimeCreated() {
+	public ZonedDateTime getDateTimeCreated() {
 
 		if (_dateTimeCreated != null || dateTimeCreated == 0) {
 			return _dateTimeCreated;
@@ -5143,7 +5143,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	 * @return Returns {@link DateTime} when the tour was modified or <code>null</code> when
 	 *         date/time is not available
 	 */
-	public DateTime getDateTimeModified() {
+	public ZonedDateTime getDateTimeModified() {
 
 		if (_dateTimeModified != null || dateTimeModified == 0) {
 			return _dateTimeModified;
@@ -6334,6 +6334,10 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 				|| devicePluginId.equals(DEVICE_ID_CSV_TOUR_DATA_READER);
 	}
 
+	public boolean isMultipleTours() {
+		return isMultipleTours;
+	}
+
 	/**
 	 * This is the state of the device which is not related to the availability of power data. Power
 	 * data should be available but is not checked.
@@ -7170,6 +7174,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	}
 
 	private void setTourEndTimeMS() {
+
 		tourEndTime = tourStartTime + (tourRecordingTime * 1000);
 	}
 

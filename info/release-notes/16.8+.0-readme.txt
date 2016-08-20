@@ -1,11 +1,21 @@
-Version 16.8+                                             ?. August 2016
+Version 16.8+                                             ?. ? 2016
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+Set time zone for new imported tours
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
 
 New 	
 ===
 
 * Timezone
 
-  - Timezone for a tour is set automatically by it's geo position when available.
+  - Timezone for a tour is set automatically by it's geo position, when available.
     
  
 Improvements 	

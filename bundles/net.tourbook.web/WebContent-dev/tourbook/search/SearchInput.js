@@ -1,5 +1,7 @@
 // 'use strict';
 
+/*eslint-env browser */
+/*eslint-env amd */
 define(
 [
 	"dojo/_base/declare",
