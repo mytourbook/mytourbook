@@ -260,9 +260,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	private long												tourDrivingTime;
 
 	/**
-	 * Timezone offset in seconds or {@link Integer#MIN_VALUE} when a timezone is not available. The
-	 * default timezone is used (which is set in the preferences) to display the tour when not
-	 * available.
+	 * Time zone ID or <code>null</code> when the time zone ID is not available.
 	 */
 	private String												timeZoneId;
 
@@ -6022,6 +6020,9 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		return getTimeSerieDouble();
 	}
 
+	/**
+	 * @return Returns Time zone ID or <code>null</code> when the time zone ID is not available.
+	 */
 	public String getTimeZoneId() {
 		return timeZoneId;
 	}
@@ -6044,7 +6045,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	 */
 	public TourDateTime getTourDateTime() {
 
-		return TimeTools.getTourDateTime(getTourStartTimeMS(), getTimeZoneId());
+		return TimeTools.getTourDateTime(getTourStartTimeMS(), timeZoneId);
 	}
 
 	/**
@@ -6314,6 +6315,13 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		} else {
 			return tourReferences.size() > 0;
 		}
+	}
+
+	/**
+	 * @return Returns <code>true</code> when the tour has no time zone.
+	 */
+	public boolean isDefaultTimeZone() {
+		return timeZoneId == null;
 	}
 
 	public boolean isDistanceSensorPresent() {

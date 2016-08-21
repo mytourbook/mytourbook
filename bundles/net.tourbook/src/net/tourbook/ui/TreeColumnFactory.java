@@ -68,6 +68,7 @@ public abstract class TreeColumnFactory {
 	public static final TreeColumnFactory	TIME_PAUSED_TIME_RELATIVE;
 	public static final TreeColumnFactory	TIME_RECORDING_TIME;
 	public static final TreeColumnFactory	TIME_TIME_ZONE;
+	public static final TreeColumnFactory	TIME_TIME_ZONE_DIFFERENCE;
 	public static final TreeColumnFactory	TIME_TOUR_START_TIME;
 	public static final TreeColumnFactory	TIME_WEEK_DAY;
 	public static final TreeColumnFactory	TIME_WEEK_NO;
@@ -1013,7 +1014,28 @@ public abstract class TreeColumnFactory {
 				colDef.setColumnLabel(Messages.ColumnFactory_TimeZone_Label);
 				colDef.setColumnHeaderText(Messages.ColumnFactory_TimeZone_Header);
 
-// THIS MUST BE SET IN THE VIEW TO SET THE CORRECT DEFAULT TIME ZONE
+				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(25));
+
+				return colDef;
+			};
+		};
+
+		TIME_TIME_ZONE_DIFFERENCE = new TreeColumnFactory() {
+
+			@Override
+			public TreeColumnDefinition createColumn(	final ColumnManager columnManager,
+														final PixelConverter pixelConverter) {
+
+				final TreeColumnDefinition colDef = new TreeColumnDefinition(
+						columnManager,
+						"TIME_TIME_ZONE_DIFFERENCE", //$NON-NLS-1$
+						SWT.LEAD);
+
+				colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
+				colDef.setColumnLabel(Messages.ColumnFactory_TimeZoneDifference_Label);
+				colDef.setColumnHeaderText(Messages.ColumnFactory_TimeZoneDifference_Header);
+
+// !!! THIS MUST BE SET IN THE VIEW TO SET THE CORRECT DEFAULT TIME ZONE !!!
 //				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_TimeZone_Tooltip);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));

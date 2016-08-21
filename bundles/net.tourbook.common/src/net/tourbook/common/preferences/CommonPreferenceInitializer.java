@@ -82,7 +82,7 @@ public class CommonPreferenceInitializer extends AbstractPreferenceInitializer {
 
 		store.setDefault(ICommonPreferences.TIME_ZONE_ACTIVE_ZONE, 1);
 		store.setDefault(ICommonPreferences.TIME_ZONE_IS_LIVE_UPDATE, true);
-		store.setDefault(ICommonPreferences.TIME_ZONE_IS_USE_TIME_ZONE, true);
+		store.setDefault(ICommonPreferences.TIME_ZONE_IS_USE_SYSTEM_TIME_ZONE, true);
 		store.setDefault(ICommonPreferences.TIME_ZONE_LOCAL_ID, defaultId);
 		store.setDefault(ICommonPreferences.TIME_ZONE_LOCAL_ID_1, defaultId);
 		store.setDefault(ICommonPreferences.TIME_ZONE_LOCAL_ID_2, defaultId);

@@ -54,6 +54,7 @@ public class TourDateTime {
 
 		this.tourZonedDateTime = tourZonedDateTime;
 		this.timeZoneOffsetLabel = timeZoneOffsetLabel;
+
 		this.weekDay = weekDay;
 	}
 

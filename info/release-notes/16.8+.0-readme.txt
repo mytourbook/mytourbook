@@ -5,6 +5,9 @@ Version 16.8+                                             ?. ? 2016
 
 Set time zone for new imported tours
 
+Explain: Time zone OFFSET vs time zone DIFF
+
+
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 

@@ -110,6 +110,8 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
+import org.eclipse.jface.fieldassist.ControlDecoration;
+import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
@@ -236,6 +238,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	static final String							STATE_LAT_LON_DIGITS			= "STATE_LAT_LON_DIGITS";									//$NON-NLS-1$
 	static final int							DEFAULT_LAT_LON_DIGITS			= 5;
 	//
+	private static final int					DECORATOR_HORIZONTAL_INDENT		= 2;
+	//
 	/**
 	 * Tour start daytime in seconds
 	 */
@@ -341,6 +345,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 * influences the width of the columns in this editor
 	 */
 	private final int							_hintTextColumnWidth			= _isOSX ? 200 : 150;
+
+	private int									_hintValueFieldWidth;
 
 	private int									_hintDefaultSpinnerWidth;
 	/**
@@ -517,6 +523,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private CLabel								_lblCloudIcon;
 	private CLabel								_lblTourType;
 	//
+	private ControlDecoration					_decoTimeZone;
+	//
 	private Combo								_comboClouds;
 	private Combo								_comboLocation_Start;
 	private Combo								_comboLocation_End;
@@ -531,9 +539,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private Label								_lblAltitudeDownUnit;
 	private Label								_lblSpeedUnit;
 	private Label								_lblTemperatureUnit;
+	private Label								_lblTimeZone;
 	private Label								_lblTourDistanceUnit;
 	private Label								_lblTourTags;
 	//
+	private Link								_linkDefaultTimeZone;
 	private Link								_linkTag;
 	private Link								_linkTourType;
 	//
@@ -1352,6 +1362,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		saveTourIntoDB();
 	}
 
+	private void actionSetDefaultTimeZone() {
+
+		// select default time zone
+		_comboTimeZone.select(TimeTools.getTimeZoneIndexDefault());
+
+		updateModelFromUI();
+		setTourDirty();
+	}
+
 	void actionSetStartDistanceTo0000() {
 
 		// it is already checked if a valid data serie is available and first distance is > 0
@@ -2074,7 +2093,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	@Override
 	public void createPartControl(final Composite parent) {
 
-		_pc = new PixelConverter(parent);
+		initUI(parent);
 
 		updateInternalUnitValues();
 
@@ -2140,8 +2159,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	}
 
 	private void createUI(final Composite parent) {
-
-		_hintDefaultSpinnerWidth = _isLinux ? SWT.DEFAULT : _pc.convertWidthInCharsToPixels(_isOSX ? 14 : 7);
 
 		_pageBook = new PageBook(parent, SWT.NONE);
 		_pageBook.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -2448,7 +2465,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			createUISection_122_DateTime_Col1(container);
 			createUISection_123_DateTime_Col2(container);
 
-
 			createUISection_127_DateTime_Col1(container);
 			createUISection_128_DateTime_Col2(container);
 
@@ -2512,71 +2528,77 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
 		_firstColumnContainerControls.add(container);
 		{
-			/*
-			 * tour distance
-			 */
-			Label label = _tk.createLabel(container, Messages.tour_editor_label_tour_distance);
-			_firstColumnControls.add(label);
+			{
+				/*
+				 * tour distance
+				 */
+				final Label label = _tk.createLabel(container, Messages.tour_editor_label_tour_distance);
+				_firstColumnControls.add(label);
 
-			_txtTourDistance = _tk.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
-			GridDataFactory.fillDefaults().applyTo(_txtTourDistance);
-			_txtTourDistance.addModifyListener(_verifyFloatValue);
-			_txtTourDistance.setData(WIDGET_KEY, WIDGET_KEY_TOURDISTANCE);
-			_txtTourDistance.addKeyListener(new KeyListener() {
-				@Override
-				public void keyPressed(final KeyEvent e) {
-					_isDistManuallyModified = true;
-				}
+				_txtTourDistance = _tk.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
+				_txtTourDistance.addModifyListener(_verifyFloatValue);
+				_txtTourDistance.setData(WIDGET_KEY, WIDGET_KEY_TOURDISTANCE);
+				_txtTourDistance.addKeyListener(new KeyListener() {
+					@Override
+					public void keyPressed(final KeyEvent e) {
+						_isDistManuallyModified = true;
+					}
 
-				@Override
-				public void keyReleased(final KeyEvent e) {}
-			});
+					@Override
+					public void keyReleased(final KeyEvent e) {}
+				});
+				GridDataFactory.fillDefaults().hint(_hintValueFieldWidth, SWT.DEFAULT).applyTo(_txtTourDistance);
 
-			_lblTourDistanceUnit = _tk.createLabel(container, UI.UNIT_LABEL_DISTANCE);
+				_lblTourDistanceUnit = _tk.createLabel(container, UI.UNIT_LABEL_DISTANCE);
+			}
 
-			/*
-			 * altitude up
-			 */
-			label = _tk.createLabel(container, Messages.Tour_Editor_Label_AltitudeUp);
-			_firstColumnControls.add(label);
+			{
+				/*
+				 * altitude up
+				 */
+				final Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_AltitudeUp);
+				_firstColumnControls.add(label);
 
-			_txtAltitudeUp = _tk.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
-			GridDataFactory.fillDefaults().applyTo(_txtAltitudeUp);
-			_txtAltitudeUp.addModifyListener(_verifyIntValue);
-			_txtAltitudeUp.setData(WIDGET_KEY, WIDGET_KEY_ALTITUDE_UP);
-			_txtAltitudeUp.addKeyListener(new KeyListener() {
-				@Override
-				public void keyPressed(final KeyEvent e) {
-					_isAltitudeManuallyModified = true;
-				}
+				_txtAltitudeUp = _tk.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
+				_txtAltitudeUp.addModifyListener(_verifyIntValue);
+				_txtAltitudeUp.setData(WIDGET_KEY, WIDGET_KEY_ALTITUDE_UP);
+				_txtAltitudeUp.addKeyListener(new KeyListener() {
+					@Override
+					public void keyPressed(final KeyEvent e) {
+						_isAltitudeManuallyModified = true;
+					}
 
-				@Override
-				public void keyReleased(final KeyEvent e) {}
-			});
+					@Override
+					public void keyReleased(final KeyEvent e) {}
+				});
+				GridDataFactory.fillDefaults().hint(_hintValueFieldWidth, SWT.DEFAULT).applyTo(_txtAltitudeUp);
 
-			_lblAltitudeUpUnit = _tk.createLabel(container, UI.UNIT_LABEL_ALTITUDE);
+				_lblAltitudeUpUnit = _tk.createLabel(container, UI.UNIT_LABEL_ALTITUDE);
+			}
 
-			/*
-			 * altitude down
-			 */
-			label = _tk.createLabel(container, Messages.Tour_Editor_Label_AltitudeDown);
-			_firstColumnControls.add(label);
+			{
+				/*
+				 * altitude down
+				 */
+				final Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_AltitudeDown);
+				_firstColumnControls.add(label);
 
-			_txtAltitudeDown = _tk.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
-			GridDataFactory.fillDefaults().applyTo(_txtAltitudeDown);
-			_txtAltitudeDown.addModifyListener(_verifyIntValue);
-			_txtAltitudeDown.setData(WIDGET_KEY, WIDGET_KEY_ALTITUDE_DOWN);
-			_txtAltitudeDown.addKeyListener(new KeyListener() {
-				@Override
-				public void keyPressed(final KeyEvent e) {
-					_isAltitudeManuallyModified = true;
-				}
+				_txtAltitudeDown = _tk.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
+				_txtAltitudeDown.addModifyListener(_verifyIntValue);
+				_txtAltitudeDown.setData(WIDGET_KEY, WIDGET_KEY_ALTITUDE_DOWN);
+				_txtAltitudeDown.addKeyListener(new KeyListener() {
+					@Override
+					public void keyPressed(final KeyEvent e) {
+						_isAltitudeManuallyModified = true;
+					}
 
-				@Override
-				public void keyReleased(final KeyEvent e) {}
-			});
+					@Override
+					public void keyReleased(final KeyEvent e) {}
+				});
+				GridDataFactory.fillDefaults().hint(_hintValueFieldWidth, SWT.DEFAULT).applyTo(_txtAltitudeDown);
 
-			_lblAltitudeDownUnit = _tk.createLabel(container, UI.UNIT_LABEL_ALTITUDE);
+				_lblAltitudeDownUnit = _tk.createLabel(container, UI.UNIT_LABEL_ALTITUDE);
+			}
 		}
 	}
 
@@ -2629,7 +2651,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				.span(2, 1)
 				.applyTo(container);
 		GridLayoutFactory.fillDefaults()//
-				.numColumns(2)
+				.numColumns(3)
 				.applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
 		{
@@ -2639,8 +2661,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			{
 				// label
-				final Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_TimeZone);
-				_firstColumnControls.add(label);
+				_lblTimeZone = _tk.createLabel(container, Messages.Tour_Editor_Label_TimeZone);
+				_firstColumnControls.add(_lblTimeZone);
 			}
 
 			{
@@ -2654,6 +2676,42 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				for (final TimeZoneData timeZone : TimeTools.getAllTimeZones()) {
 					_comboTimeZone.add(timeZone.label);
 				}
+
+				/*
+				 * Add decoration
+				 */
+				final Image image = FieldDecorationRegistry
+						.getDefault()
+						.getFieldDecoration(FieldDecorationRegistry.DEC_INFORMATION)
+						.getImage();
+
+				_decoTimeZone = new ControlDecoration(_comboTimeZone, SWT.TOP | SWT.LEFT);
+				_decoTimeZone.setImage(image);
+				_decoTimeZone.setDescriptionText(Messages.Tour_Editor_Decorator_TimeZone_Tooltip);
+				_decoTimeZone.hide();
+
+				// indent the combo that the decorator is not truncated
+				GridDataFactory.fillDefaults()//
+						.indent(DECORATOR_HORIZONTAL_INDENT, 0)
+						.applyTo(_comboTimeZone);
+			}
+
+			{
+				// action: set default
+
+				_linkDefaultTimeZone = new Link(container, SWT.NONE);
+				_linkDefaultTimeZone.setText(Messages.Tour_Editor_Link_SetDefautTimeZone);
+				_linkDefaultTimeZone.setToolTipText(Messages.Tour_Editor_Link_SetDefautTimeZone_Tooltip);
+				_linkDefaultTimeZone.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						actionSetDefaultTimeZone();
+					}
+				});
+//				GridDataFactory.fillDefaults()//
+//				.align(SWT.BEGINNING, SWT.BEGINNING)
+//				.applyTo(_linkDefaultTimeZone);
+				_tk.adapt(_linkDefaultTimeZone, true, true);
 			}
 		}
 	}
@@ -3465,6 +3523,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		_tab1Container.layout(true, true);
 		UI.setEqualizeColumWidths(_firstColumnContainerControls);
+
+		/*
+		 * Reduce width that the decorator is not truncated
+		 */
+		final GridData gd = (GridData) _lblTimeZone.getLayoutData();
+		gd.widthHint -= DECORATOR_HORIZONTAL_INDENT;
 
 		return _tab1Container;
 	}
@@ -4407,7 +4471,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		final boolean canEdit = _isEditMode && isTourInDb();
 		final boolean isManualAndEdit = _isManualTour && canEdit;
-		final boolean isNotManualTour = _isManualTour == false;
+		final boolean isDeviceTour = _isManualTour == false;
 
 		final float[] serieDistance = _tourData == null ? null : _tourData.distanceSerie;
 		final boolean isDistanceSerie = serieDistance != null && serieDistance.length > 0;
@@ -4433,6 +4497,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_dtTourDate.setEnabled(canEdit);
 		_dtStartTime.setEnabled(canEdit);
 		_comboTimeZone.setEnabled(canEdit);
+		_linkDefaultTimeZone.setEnabled(canEdit);
 
 		_timeRecording.setEditMode(isManualAndEdit);
 		_timePaused.setEditMode(isManualAndEdit);
@@ -4452,7 +4517,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_linkTag.setEnabled(canEdit);
 		_linkTourType.setEnabled(canEdit);
 
-		_sliceViewer.getTable().setEnabled(isNotManualTour);
+		_sliceViewer.getTable().setEnabled(isDeviceTour);
 	}
 
 	/**
@@ -4715,16 +4780,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		return sliderSelection;
 	}
 
-//	@Override
-//	public Object getAdapter(final Class adapter) {
-//
-//		if (adapter == ColumnViewer.class) {
-//			return _sliceViewer;
-//		}
-//
-//		return Platform.getAdapterManager().getAdapter(this, adapter);
-//	}
-
 	@Override
 	public ColumnManager getColumnManager() {
 
@@ -4736,6 +4791,16 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		return null;
 	}
+
+//	@Override
+//	public Object getAdapter(final Class adapter) {
+//
+//		if (adapter == ColumnViewer.class) {
+//			return _sliceViewer;
+//		}
+//
+//		return Platform.getAdapterManager().getAdapter(this, adapter);
+//	}
 
 	private void getDataSeriesFromTourData() {
 
@@ -4859,6 +4924,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		return newViewerItems;
 	}
 
+	@Override
+	public ArrayList<TourData> getSelectedTours() {
+
+		if (_tourData == null) {
+			return null;
+		}
+
+		final ArrayList<TourData> tourDataList = new ArrayList<TourData>();
+		tourDataList.add(_tourData);
+
+		return tourDataList;
+	}
+
 //	/**
 //	 * Converts a string into a int value
 //	 *
@@ -4883,19 +4961,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 //
 //		return 0;
 //	}
-
-	@Override
-	public ArrayList<TourData> getSelectedTours() {
-
-		if (_tourData == null) {
-			return null;
-		}
-
-		final ArrayList<TourData> tourDataList = new ArrayList<TourData>();
-		tourDataList.add(_tourData);
-
-		return tourDataList;
-	}
 
 	TableViewer getSliceViewer() {
 		return _sliceViewer;
@@ -4997,6 +5062,17 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 
 		return speedValueIndex;
+	}
+
+	private void initUI(final Composite parent) {
+
+		_pc = new PixelConverter(parent);
+
+		_hintDefaultSpinnerWidth = _isLinux //
+				? SWT.DEFAULT
+				: _pc.convertWidthInCharsToPixels(_isOSX ? 14 : 7);
+
+		_hintValueFieldWidth = _pc.convertWidthInCharsToPixels(10);
 	}
 
 	@Override
@@ -5936,8 +6012,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		// refresh combos
 
 		if (_isTitleModified) {
+
 			_comboTitle.clearSelection();
 			_comboTitle.removeAll();
+
 			// fill combobox
 			final TreeSet<String> arr = TourDatabase.getAllTourTitles();
 			for (final String string : arr) {
@@ -5948,8 +6026,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 
 		if (_isStartLocationModified) {
+
 			_comboLocation_Start.clearSelection();
 			_comboLocation_Start.removeAll();
+
 			// fill combobox
 			final TreeSet<String> arr = TourDatabase.getAllTourPlaceStarts();
 			for (final String string : arr) {
@@ -5960,8 +6040,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 
 		if (_isEndLocationModified) {
+
 			_comboLocation_End.clearSelection();
 			_comboLocation_End.removeAll();
+
 			// fill combobox
 			final TreeSet<String> arr = TourDatabase.getAllTourPlaceEnds();
 			for (final String string : arr) {
@@ -6198,10 +6280,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	}
 
 	@Override
-	public void updateColumnHeader(final ColumnDefinition colDef) {
-		// TODO Auto-generated method stub
-
-	}
+	public void updateColumnHeader(final ColumnDefinition colDef) {}
 
 	private void updateInternalUnitValues() {
 
@@ -6284,6 +6363,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					_dtStartTime.getHours(),
 					_dtStartTime.getMinutes(),
 					_dtStartTime.getSeconds());
+
+			// time zone
+			final int selectedTimeZoneIndex = _comboTimeZone.getSelectionIndex();
+			final TimeZoneData timeZoneData = TimeTools.getTimeZoneByIndex(selectedTimeZoneIndex);
+			final String timeZoneId = timeZoneData.zoneId;
+			_tourData.setTimeZoneId(timeZoneId);
 
 			if (_isDistManuallyModified) {
 				/*
@@ -6684,16 +6769,40 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_timeDriving.setTime(drivingTime);
 		_timePaused.setTime(pausedTime);
 
-		// time zone
-		double lat0 = Double.MIN_VALUE;
-		double lat1 = Double.MIN_VALUE;
-		if (_tourData.latitudeSerie != null && _tourData.longitudeSerie != null) {
-			lat0 = _tourData.latitudeSerie[0];
-			lat1 = _tourData.longitudeSerie[0];
-		}
+		/*
+		 * Time zone
+		 */
+		int timeZoneIndex;
+		final String timeZoneId = _tourData.getTimeZoneId();
+		if (timeZoneId == null) {
 
-		final int timeZoneIndex = TimeTools.getTimeZoneIndex(lat0, lat1);
+			// time zone is not set, try to get it from the geo position
+			double lat0 = Double.MIN_VALUE;
+			double lat1 = Double.MIN_VALUE;
+
+			if (_tourData.latitudeSerie != null && _tourData.longitudeSerie != null) {
+				lat0 = _tourData.latitudeSerie[0];
+				lat1 = _tourData.longitudeSerie[0];
+			}
+
+			timeZoneIndex = TimeTools.getTimeZoneIndex(lat0, lat1);
+
+		} else {
+
+			timeZoneIndex = TimeTools.getTimeZoneIndexWithDefault(timeZoneId);
+		}
 		_comboTimeZone.select(timeZoneIndex);
+
+		// show/hide time zone decorator
+		if (_tourData.isDefaultTimeZone()) {
+
+			// show info
+			_decoTimeZone.show();
+
+		} else {
+			// hide info
+			_decoTimeZone.hide();
+		}
 
 		// tour type/tags
 		net.tourbook.ui.UI.updateUI_TourType(_tourData, _lblTourType, true);
@@ -6933,7 +7042,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_timeDriving.setTime(driveTime / 3600, ((driveTime % 3600) / 60), ((driveTime % 3600) % 60));
 		_timePaused.setTime(pausedTime / 3600, ((pausedTime % 3600) / 60), ((pausedTime % 3600) % 60));
 	}
-
 
 	/**
 	 * Update title of the view with the modified date/time

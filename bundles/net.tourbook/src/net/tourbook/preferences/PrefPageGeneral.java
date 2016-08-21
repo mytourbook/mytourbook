@@ -620,18 +620,6 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 		_rdoTemperatureFahrenheit.setEnabled(false);
 	}
 
-	private TimeZoneData getSelectedTimeZone(final int selectedTimeZoneIndex) {
-
-		final ArrayList<TimeZoneData> allTimeZone = TimeTools.getAllTimeZones();
-
-		if (selectedTimeZoneIndex == -1) {
-			return allTimeZone.get(0);
-		}
-
-		final TimeZoneData selectedTimeZone = allTimeZone.get(selectedTimeZoneIndex);
-
-		return selectedTimeZone;
-	}
 
 	@Override
 	public void init(final IWorkbench workbench) {
@@ -764,7 +752,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 			_chkLiveUpdate
 					.setSelection(_prefStoreCommon.getDefaultBoolean(ICommonPreferences.TIME_ZONE_IS_LIVE_UPDATE));
 			_chkSetTimeZone.setSelection(_prefStoreCommon
-					.getDefaultBoolean(ICommonPreferences.TIME_ZONE_IS_USE_TIME_ZONE));
+					.getDefaultBoolean(ICommonPreferences.TIME_ZONE_IS_USE_SYSTEM_TIME_ZONE));
 			_timeZoneId1 = _prefStoreCommon.getDefaultString(ICommonPreferences.TIME_ZONE_LOCAL_ID_1);
 			_timeZoneId2 = _prefStoreCommon.getDefaultString(ICommonPreferences.TIME_ZONE_LOCAL_ID_2);
 
@@ -838,7 +826,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 			// time zone
 
 			_chkLiveUpdate.setSelection(_prefStoreCommon.getBoolean(ICommonPreferences.TIME_ZONE_IS_LIVE_UPDATE));
-			_chkSetTimeZone.setSelection(_prefStoreCommon.getBoolean(ICommonPreferences.TIME_ZONE_IS_USE_TIME_ZONE));
+			_chkSetTimeZone.setSelection(_prefStoreCommon.getBoolean(ICommonPreferences.TIME_ZONE_IS_USE_SYSTEM_TIME_ZONE));
 			_timeZoneId1 = _prefStoreCommon.getString(ICommonPreferences.TIME_ZONE_LOCAL_ID_1);
 			_timeZoneId2 = _prefStoreCommon.getString(ICommonPreferences.TIME_ZONE_LOCAL_ID_2);
 			final int activeZone = _prefStoreCommon.getInt(ICommonPreferences.TIME_ZONE_ACTIVE_ZONE);
@@ -902,7 +890,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
 			// time zone
 			_prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_IS_LIVE_UPDATE, _chkLiveUpdate.getSelection());
-			_prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_IS_USE_TIME_ZONE, isUseTimeZone);
+			_prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_IS_USE_SYSTEM_TIME_ZONE, isUseTimeZone);
 			_prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_ACTIVE_ZONE, activeZone);
 			_prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_LOCAL_ID, timeZoneId);
 			_prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_LOCAL_ID_1, _timeZoneId1);
@@ -938,8 +926,8 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
 	private void updateModel_TimeZone() {
 
-		final TimeZoneData selectedTimeZone1 = getSelectedTimeZone(_comboTimeZone1.getSelectionIndex());
-		final TimeZoneData selectedTimeZone2 = getSelectedTimeZone(_comboTimeZone2.getSelectionIndex());
+		final TimeZoneData selectedTimeZone1 = TimeTools.getTimeZoneByIndex(_comboTimeZone1.getSelectionIndex());
+		final TimeZoneData selectedTimeZone2 = TimeTools.getTimeZoneByIndex(_comboTimeZone2.getSelectionIndex());
 
 		_timeZoneId1 = selectedTimeZone1.zoneId;
 		_timeZoneId2 = selectedTimeZone2.zoneId;

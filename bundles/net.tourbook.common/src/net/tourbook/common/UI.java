@@ -1390,6 +1390,9 @@ public class UI {
 			Assert.isNotNull(layoutData);
 
 			((GridData) layoutData).widthHint = maxWidth;
+
+//			System.out.println(String.format("%-30s", control) + ("\t" + maxWidth));
+//			// TODO remove SYSTEM.OUT.PRINTLN
 		}
 	}
 

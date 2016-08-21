@@ -57,18 +57,12 @@ public class TimeTools {
 	/*
 	 * Copied from java.time.LocalTime
 	 */
-//	/** Hours per day. */
-//	private static final int						HOURS_PER_DAY			= 24;
 	/** Minutes per hour. */
 	private static final int						MINUTES_PER_HOUR			= 60;
-//	/** Minutes per day. */
-//	private static final int						MINUTES_PER_DAY			= MINUTES_PER_HOUR * HOURS_PER_DAY;
 	/** Seconds per minute. */
 	private static final int						SECONDS_PER_MINUTE			= 60;
 	/** Seconds per hour. */
 	private static final int						SECONDS_PER_HOUR			= SECONDS_PER_MINUTE * MINUTES_PER_HOUR;
-//	/** Seconds per day. */
-//	private static final int						SECONDS_PER_DAY			= SECONDS_PER_HOUR * HOURS_PER_DAY;
 
 	public static final DateTimeFormatter			dateFormatter_Full			= DateTimeFormatter
 																						.ofLocalizedDate(FormatStyle.FULL);
@@ -81,7 +75,11 @@ public class TimeTools {
 
 	private static ArrayList<TimeZoneData>			_allSortedTimeZones;
 
-	private static boolean							_isUseTimeZone;
+	/**
+	 * When <code>true</code> then the system time zone is used to display time values, otherwise
+	 * the defined time zone is used.
+	 */
+	private static boolean							_isUseSystemTimeZone;
 	private static ZoneId							_defaultTimeZoneId;
 
 	/**
@@ -104,7 +102,8 @@ public class TimeTools {
 
 	static {
 
-		_isUseTimeZone = _prefStoreCommon.getBoolean(ICommonPreferences.TIME_ZONE_IS_USE_TIME_ZONE);
+		_isUseSystemTimeZone = _prefStoreCommon.getBoolean(//
+				ICommonPreferences.TIME_ZONE_IS_USE_SYSTEM_TIME_ZONE);
 		_defaultTimeZoneId = ZoneId.of(_prefStoreCommon.getString(ICommonPreferences.TIME_ZONE_LOCAL_ID));
 
 		/*
@@ -261,6 +260,19 @@ public class TimeTools {
 		return null;
 	}
 
+	public static TimeZoneData getTimeZoneByIndex(final int selectedTimeZoneIndex) {
+
+		final ArrayList<TimeZoneData> allTimeZone = getAllTimeZones();
+
+		if (selectedTimeZoneIndex == -1) {
+			return allTimeZone.get(0);
+		}
+
+		final TimeZoneData selectedTimeZone = allTimeZone.get(selectedTimeZoneIndex);
+
+		return selectedTimeZone;
+	}
+
 	/**
 	 * @param latitude
 	 * @param longitude
@@ -291,7 +303,7 @@ public class TimeTools {
 
 	/**
 	 * @param timeZoneId
-	 * @return Returns the timezone index for the timezone ID or -1 when not available.
+	 * @return Returns the time zone index for the time zone ID or -1 when not available.
 	 */
 	public static int getTimeZoneIndex(final String timeZoneId) {
 
@@ -307,6 +319,29 @@ public class TimeTools {
 		}
 
 		return -1;
+	}
+
+	/**
+	 * @return Returns the time zone index for the default time zone.
+	 */
+	public static int getTimeZoneIndexDefault() {
+		return getTimeZoneIndex(_defaultTimeZoneId.getId());
+	}
+
+	/**
+	 * @param timeZoneId
+	 * @return Returns the time zone index for the time zone ID or the index for the default time
+	 *         zone when not available.
+	 */
+	public static int getTimeZoneIndexWithDefault(final String timeZoneId) {
+
+		int tzIndex = getTimeZoneIndex(timeZoneId);
+
+		if (tzIndex == -1) {
+			tzIndex = getTimeZoneIndex(_defaultTimeZoneId.getId());
+		}
+
+		return tzIndex;
 	}
 
 	/**
@@ -332,7 +367,7 @@ public class TimeTools {
 		ZonedDateTime tourZonedDateTime;
 		String timeZoneOffsetLabel = null;
 
-		if (_isUseTimeZone) {
+		if (_isUseSystemTimeZone) {
 
 			tourZonedDateTime = ZonedDateTime.ofInstant(tourStartInstant, zoneId);
 
@@ -430,7 +465,7 @@ public class TimeTools {
 
 	public static void setDefaultTimeZoneOffset(final boolean isUseTimeZone, final String timeZoneId) {
 
-		_isUseTimeZone = isUseTimeZone;
+		_isUseSystemTimeZone = isUseTimeZone;
 		_defaultTimeZoneId = ZoneId.of(timeZoneId);
 	}
 

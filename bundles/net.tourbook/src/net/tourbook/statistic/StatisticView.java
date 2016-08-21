@@ -258,7 +258,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
 				final String property = event.getProperty();
 
 				if (property.equals(ICommonPreferences.TIME_ZONE_LOCAL_ID)
-						|| property.equals(ICommonPreferences.TIME_ZONE_IS_USE_TIME_ZONE)) {
+						|| property.equals(ICommonPreferences.TIME_ZONE_IS_USE_SYSTEM_TIME_ZONE)) {
 
 					updateStatistic();
 				}

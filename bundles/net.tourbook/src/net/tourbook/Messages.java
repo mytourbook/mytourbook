@@ -1186,7 +1186,7 @@ public class Messages extends NLS {
 	public static String		Pref_General_Label_MinimalDaysInFirstWeek;
 	public static String		Pref_General_Label_MinimalDaysInFirstWeek_Tooltip;
 	public static String		Pref_General_Label_SetAnotherTimeZone;
-	
+
 	public static String		Pref_General_Notes;
 	public static String		Pref_General_Notes_Tooltip;
 
@@ -1687,6 +1687,8 @@ public class Messages extends NLS {
 	public static String		Tour_Database_UpdateDone;
 	public static String		Tour_Database_UpdateInfo;
 
+	public static String		Tour_Editor_Decorator_TimeZone_Tooltip;
+
 	public static String		Tour_Editor_Label_AltitudeDown;
 	public static String		Tour_Editor_Label_AltitudeUp;
 	public static String		Tour_Editor_Label_BodyWeight;
@@ -1711,6 +1713,10 @@ public class Messages extends NLS {
 	public static String		Tour_Editor_Label_TimeZone;
 	public static String		Tour_Editor_Label_Weather;
 	public static String		Tour_Editor_Label_WindDirection_Unit;
+
+	public static String		Tour_Editor_Link_SetDefautTimeZone;
+	public static String		Tour_Editor_Link_SetDefautTimeZone_Tooltip;
+
 	public static String		Tour_Editor_Radio_Cadence_Rpm;
 	public static String		Tour_Editor_Radio_Cadence_Spm;
 
