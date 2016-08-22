@@ -57,6 +57,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.PlatformUI;
+
 //import net.tourbook.ui.UI;
 
 public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
@@ -75,8 +76,9 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 	private IPreferenceStore			_prefStore						= TourbookPlugin.getPrefStore();
 	private IPreferenceStore			_prefStoreCommon				= CommonActivator.getPrefStore();
 
-	private String						_timeZoneId1;
-	private String						_timeZoneId2;
+	private String						_timeZoneId_1;
+	private String						_timeZoneId_2;
+	private String						_timeZoneId_3;
 
 	private int							_backupFirstDayOfWeek;
 	private int							_backupMinimalDaysInFirstWeek;
@@ -96,13 +98,20 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 	/*
 	 * UI controls
 	 */
+	private TabFolder					_tabFolder;
+
 	// timezone
-	private Button						_chkSetTimeZone;
-	private Combo						_comboTimeZone1;
-	private Combo						_comboTimeZone2;
+	private Button						_chkTimeZoneLiveUpdate;
+	private Button						_chkUseAnotherTimeZone;
 	private Button						_rdoTimeZone_1;
 	private Button						_rdoTimeZone_2;
+	private Button						_rdoTimeZone_3;
+	private Combo						_comboTimeZone_1;
+	private Combo						_comboTimeZone_2;
+	private Combo						_comboTimeZone_3;
 
+	// measurement system
+	private Button						_chkShowMeasurementInAppToolbar;
 	private Combo						_comboSystem;
 
 	private Label						_lblSystemAltitude;
@@ -117,17 +126,12 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 	private Button						_rdoTemperatureCelcius;
 	private Button						_rdoTemperatureFahrenheit;
 
+	// calendar week
 	private Combo						_comboFirstDay;
 	private Combo						_comboMinDaysInFirstWeek;
 
+	// notes
 	private Text						_txtNotes;
-
-	// live update
-	private Button						_chkLiveUpdate;
-
-	private TabFolder					_tabFolder;
-
-	private Button						_chkShowMeasurementInAppToolbar;
 
 	/**
 	 * check if the user has changed calendar week and if the tour data are inconsistent
@@ -364,13 +368,13 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 				/*
 				 * Checkbox: Set time zone
 				 */
-				_chkSetTimeZone = new Button(container, SWT.CHECK);
-				_chkSetTimeZone.setText(Messages.Pref_General_Checkbox_SetTimeZone);
-				_chkSetTimeZone.addSelectionListener(timeZoneListener);
+				_chkUseAnotherTimeZone = new Button(container, SWT.CHECK);
+				_chkUseAnotherTimeZone.setText(Messages.Pref_General_Checkbox_SetTimeZone);
+				_chkUseAnotherTimeZone.addSelectionListener(timeZoneListener);
 				GridDataFactory.fillDefaults()//
 						.span(2, 1)
 						.indent(0, 2 * verticalSpacing)
-						.applyTo(_chkSetTimeZone);
+						.applyTo(_chkUseAnotherTimeZone);
 			}
 
 			{
@@ -401,17 +405,17 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 						.applyTo(_rdoTimeZone_1);
 
 				// combo
-				_comboTimeZone1 = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
-				_comboTimeZone1.setVisibleItemCount(50);
-				_comboTimeZone1.addSelectionListener(timeZoneListener);
+				_comboTimeZone_1 = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
+				_comboTimeZone_1.setVisibleItemCount(50);
+				_comboTimeZone_1.addSelectionListener(timeZoneListener);
 				GridDataFactory.fillDefaults()//
 						.indent(_pc.convertWidthInCharsToPixels(2), 2 * verticalSpacing)
 						.align(SWT.BEGINNING, SWT.FILL)
-						.applyTo(_comboTimeZone1);
+						.applyTo(_comboTimeZone_1);
 
 				// fill combobox
 				for (final TimeZoneData timeZone : TimeTools.getAllTimeZones()) {
-					_comboTimeZone1.add(timeZone.label);
+					_comboTimeZone_1.add(timeZone.label);
 				}
 			}
 
@@ -428,17 +432,44 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 						.applyTo(_rdoTimeZone_2);
 
 				// combo
-				_comboTimeZone2 = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
-				_comboTimeZone2.setVisibleItemCount(50);
-				_comboTimeZone2.addSelectionListener(timeZoneListener);
+				_comboTimeZone_2 = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
+				_comboTimeZone_2.setVisibleItemCount(50);
+				_comboTimeZone_2.addSelectionListener(timeZoneListener);
 				GridDataFactory.fillDefaults()//
 						.indent(_pc.convertWidthInCharsToPixels(2), 0)
 						.align(SWT.BEGINNING, SWT.FILL)
-						.applyTo(_comboTimeZone2);
+						.applyTo(_comboTimeZone_2);
 
 				// fill combobox
 				for (final TimeZoneData timeZone : TimeTools.getAllTimeZones()) {
-					_comboTimeZone2.add(timeZone.label);
+					_comboTimeZone_2.add(timeZone.label);
+				}
+			}
+
+			{
+				/*
+				 * Time zone 3
+				 */
+				// radio
+				_rdoTimeZone_3 = new Button(container, SWT.RADIO);
+				_rdoTimeZone_3.setText(Messages.Pref_General_Label_LocalTimeZone_3);
+				_rdoTimeZone_3.addSelectionListener(timeZoneListener);
+				GridDataFactory.fillDefaults()//
+						.indent(columnIndent, 0)
+						.applyTo(_rdoTimeZone_3);
+
+				// combo
+				_comboTimeZone_3 = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
+				_comboTimeZone_3.setVisibleItemCount(50);
+				_comboTimeZone_3.addSelectionListener(timeZoneListener);
+				GridDataFactory.fillDefaults()//
+						.indent(_pc.convertWidthInCharsToPixels(2), 0)
+						.align(SWT.BEGINNING, SWT.FILL)
+						.applyTo(_comboTimeZone_3);
+
+				// fill combobox
+				for (final TimeZoneData timeZone : TimeTools.getAllTimeZones()) {
+					_comboTimeZone_3.add(timeZone.label);
 				}
 			}
 
@@ -446,10 +477,10 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 				/*
 				 * Checkbox: live update
 				 */
-				_chkLiveUpdate = new Button(container, SWT.CHECK);
-				_chkLiveUpdate.setText(Messages.Pref_LiveUpdate_Checkbox);
-				_chkLiveUpdate.setToolTipText(Messages.Pref_LiveUpdate_Checkbox_Tooltip);
-				_chkLiveUpdate.addSelectionListener(new SelectionAdapter() {
+				_chkTimeZoneLiveUpdate = new Button(container, SWT.CHECK);
+				_chkTimeZoneLiveUpdate.setText(Messages.Pref_LiveUpdate_Checkbox);
+				_chkTimeZoneLiveUpdate.setToolTipText(Messages.Pref_LiveUpdate_Checkbox_Tooltip);
+				_chkTimeZoneLiveUpdate.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
 						doTimeZoneLiveUpdate();
@@ -460,7 +491,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 						.align(SWT.FILL, SWT.END)
 						.span(2, 1)
 						.indent(0, 2 * verticalSpacing)
-						.applyTo(_chkLiveUpdate);
+						.applyTo(_chkTimeZoneLiveUpdate);
 			}
 		}
 
@@ -587,20 +618,22 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
 	private void doTimeZoneLiveUpdate() {
 
-		if (_chkLiveUpdate.getSelection()) {
+		if (_chkTimeZoneLiveUpdate.getSelection()) {
 			performApply();
 		}
 	}
 
 	private void enableControls() {
 
-		final boolean isUseTimeZone = _chkSetTimeZone.getSelection();
+		final boolean isUseTimeZone = _chkUseAnotherTimeZone.getSelection();
 
 		_lblTimeZoneInfo.setEnabled(isUseTimeZone);
 		_rdoTimeZone_1.setEnabled(isUseTimeZone);
 		_rdoTimeZone_2.setEnabled(isUseTimeZone);
-		_comboTimeZone1.setEnabled(isUseTimeZone);
-		_comboTimeZone2.setEnabled(isUseTimeZone);
+		_rdoTimeZone_3.setEnabled(isUseTimeZone);
+		_comboTimeZone_1.setEnabled(isUseTimeZone);
+		_comboTimeZone_2.setEnabled(isUseTimeZone);
+		_comboTimeZone_3.setEnabled(isUseTimeZone);
 
 		/*
 		 * disable all individual measurement controls because this is currently not working when
@@ -620,6 +653,27 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 		_rdoTemperatureFahrenheit.setEnabled(false);
 	}
 
+	private String getSelectedTimeZoneId(final int selectedZone) {
+
+		if (selectedZone == 1) {
+			return _timeZoneId_1;
+		} else if (selectedZone == 2) {
+			return _timeZoneId_2;
+		} else {
+			return _timeZoneId_3;
+		}
+	}
+
+	private int getSelectedZone() {
+
+		if (_rdoTimeZone_1.getSelection()) {
+			return 1;
+		} else if (_rdoTimeZone_2.getSelection()) {
+			return 2;
+		} else {
+			return 3;
+		}
+	}
 
 	@Override
 	public void init(final IWorkbench workbench) {
@@ -749,15 +803,20 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
 			// time zone
 			final int activeZone = _prefStoreCommon.getDefaultInt(ICommonPreferences.TIME_ZONE_ACTIVE_ZONE);
-			_chkLiveUpdate
-					.setSelection(_prefStoreCommon.getDefaultBoolean(ICommonPreferences.TIME_ZONE_IS_LIVE_UPDATE));
-			_chkSetTimeZone.setSelection(_prefStoreCommon
-					.getDefaultBoolean(ICommonPreferences.TIME_ZONE_IS_USE_SYSTEM_TIME_ZONE));
-			_timeZoneId1 = _prefStoreCommon.getDefaultString(ICommonPreferences.TIME_ZONE_LOCAL_ID_1);
-			_timeZoneId2 = _prefStoreCommon.getDefaultString(ICommonPreferences.TIME_ZONE_LOCAL_ID_2);
 
-			_rdoTimeZone_1.setSelection(activeZone == 1);
-			_rdoTimeZone_2.setSelection(activeZone != 1);
+			_chkTimeZoneLiveUpdate.setSelection(//
+					_prefStoreCommon.getDefaultBoolean(ICommonPreferences.TIME_ZONE_IS_LIVE_UPDATE));
+
+			_chkUseAnotherTimeZone.setSelection(//
+					_prefStoreCommon.getDefaultBoolean(ICommonPreferences.TIME_ZONE_IS_USE_SYSTEM_TIME_ZONE) == false);
+
+			_timeZoneId_1 = _prefStoreCommon.getDefaultString(ICommonPreferences.TIME_ZONE_LOCAL_ID_1);
+			_timeZoneId_2 = _prefStoreCommon.getDefaultString(ICommonPreferences.TIME_ZONE_LOCAL_ID_2);
+			_timeZoneId_3 = _prefStoreCommon.getDefaultString(ICommonPreferences.TIME_ZONE_LOCAL_ID_3);
+
+			_rdoTimeZone_1.setSelection(activeZone != 2 && activeZone != 3);
+			_rdoTimeZone_2.setSelection(activeZone == 2);
+			_rdoTimeZone_3.setSelection(activeZone == 3);
 
 			validateTimeZoneId();
 			doTimeZoneLiveUpdate();
@@ -825,14 +884,21 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 		{
 			// time zone
 
-			_chkLiveUpdate.setSelection(_prefStoreCommon.getBoolean(ICommonPreferences.TIME_ZONE_IS_LIVE_UPDATE));
-			_chkSetTimeZone.setSelection(_prefStoreCommon.getBoolean(ICommonPreferences.TIME_ZONE_IS_USE_SYSTEM_TIME_ZONE));
-			_timeZoneId1 = _prefStoreCommon.getString(ICommonPreferences.TIME_ZONE_LOCAL_ID_1);
-			_timeZoneId2 = _prefStoreCommon.getString(ICommonPreferences.TIME_ZONE_LOCAL_ID_2);
 			final int activeZone = _prefStoreCommon.getInt(ICommonPreferences.TIME_ZONE_ACTIVE_ZONE);
 
-			_rdoTimeZone_1.setSelection(activeZone == 1);
-			_rdoTimeZone_2.setSelection(activeZone != 1);
+			_chkTimeZoneLiveUpdate.setSelection(_prefStoreCommon
+					.getBoolean(ICommonPreferences.TIME_ZONE_IS_LIVE_UPDATE));
+			_chkUseAnotherTimeZone.setSelection(//
+					_prefStoreCommon.getBoolean(ICommonPreferences.TIME_ZONE_IS_USE_SYSTEM_TIME_ZONE) == false);
+
+			_timeZoneId_1 = _prefStoreCommon.getString(ICommonPreferences.TIME_ZONE_LOCAL_ID_1);
+			_timeZoneId_2 = _prefStoreCommon.getString(ICommonPreferences.TIME_ZONE_LOCAL_ID_2);
+			_timeZoneId_3 = _prefStoreCommon.getString(ICommonPreferences.TIME_ZONE_LOCAL_ID_3);
+
+			_rdoTimeZone_1.setSelection(activeZone != 2 && activeZone != 3);
+			_rdoTimeZone_2.setSelection(activeZone == 2);
+			_rdoTimeZone_3.setSelection(activeZone == 3);
+
 			validateTimeZoneId();
 		}
 
@@ -881,20 +947,23 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 		{
 			// time zone
 
-			final int activeZone = _rdoTimeZone_1.getSelection() ? 1 : 2;
-			final String timeZoneId = activeZone == 1 ? _timeZoneId1 : _timeZoneId2;
-			final boolean isUseTimeZone = _chkSetTimeZone.getSelection();
+			final int selectedZone = getSelectedZone();
+			final String selectedTimeZoneId = getSelectedTimeZoneId(selectedZone);
+			final boolean isUseSystemTimeZone = !_chkUseAnotherTimeZone.getSelection();
 
 			// update static field BEFORE event is fired !!!
-			TimeTools.setDefaultTimeZoneOffset(isUseTimeZone, timeZoneId);
+			TimeTools.setTimeZone(isUseSystemTimeZone, selectedTimeZoneId);
 
 			// time zone
-			_prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_IS_LIVE_UPDATE, _chkLiveUpdate.getSelection());
-			_prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_IS_USE_SYSTEM_TIME_ZONE, isUseTimeZone);
-			_prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_ACTIVE_ZONE, activeZone);
-			_prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_LOCAL_ID, timeZoneId);
-			_prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_LOCAL_ID_1, _timeZoneId1);
-			_prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_LOCAL_ID_2, _timeZoneId2);
+			_prefStoreCommon.setValue(
+					ICommonPreferences.TIME_ZONE_IS_LIVE_UPDATE,
+					_chkTimeZoneLiveUpdate.getSelection());
+			_prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_IS_USE_SYSTEM_TIME_ZONE, isUseSystemTimeZone);
+			_prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_ACTIVE_ZONE, selectedZone);
+			_prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_LOCAL_ID, selectedTimeZoneId);
+			_prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_LOCAL_ID_1, _timeZoneId_1);
+			_prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_LOCAL_ID_2, _timeZoneId_2);
+			_prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_LOCAL_ID_3, _timeZoneId_3);
 		}
 
 		{
@@ -926,11 +995,13 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
 	private void updateModel_TimeZone() {
 
-		final TimeZoneData selectedTimeZone1 = TimeTools.getTimeZoneByIndex(_comboTimeZone1.getSelectionIndex());
-		final TimeZoneData selectedTimeZone2 = TimeTools.getTimeZoneByIndex(_comboTimeZone2.getSelectionIndex());
+		final TimeZoneData selectedTimeZone_1 = TimeTools.getTimeZoneByIndex(_comboTimeZone_1.getSelectionIndex());
+		final TimeZoneData selectedTimeZone_2 = TimeTools.getTimeZoneByIndex(_comboTimeZone_2.getSelectionIndex());
+		final TimeZoneData selectedTimeZone_3 = TimeTools.getTimeZoneByIndex(_comboTimeZone_3.getSelectionIndex());
 
-		_timeZoneId1 = selectedTimeZone1.zoneId;
-		_timeZoneId2 = selectedTimeZone2.zoneId;
+		_timeZoneId_1 = selectedTimeZone_1.zoneId;
+		_timeZoneId_2 = selectedTimeZone_2.zoneId;
+		_timeZoneId_3 = selectedTimeZone_3.zoneId;
 	}
 
 	protected void updateUI_CalendarWeek() {
@@ -946,18 +1017,22 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
 		final TimeZoneData firstTimeZone = TimeTools.getAllTimeZones().get(0);
 
-		final int timeZoneIndex1 = TimeTools.getTimeZoneIndex(_timeZoneId1);
-		final int timeZoneIndex2 = TimeTools.getTimeZoneIndex(_timeZoneId2);
+		final int timeZoneIndex_1 = TimeTools.getTimeZoneIndex(_timeZoneId_1);
+		final int timeZoneIndex_2 = TimeTools.getTimeZoneIndex(_timeZoneId_2);
+		final int timeZoneIndex_3 = TimeTools.getTimeZoneIndex(_timeZoneId_3);
 
-		if (timeZoneIndex1 == -1) {
-			_timeZoneId1 = firstTimeZone.zoneId;
+		if (timeZoneIndex_1 == -1) {
+			_timeZoneId_1 = firstTimeZone.zoneId;
+		}
+		if (timeZoneIndex_2 == -1) {
+			_timeZoneId_2 = firstTimeZone.zoneId;
+		}
+		if (timeZoneIndex_3 == -1) {
+			_timeZoneId_3 = firstTimeZone.zoneId;
 		}
 
-		if (timeZoneIndex2 == -1) {
-			_timeZoneId2 = firstTimeZone.zoneId;
-		}
-
-		_comboTimeZone1.select(timeZoneIndex1);
-		_comboTimeZone2.select(timeZoneIndex2);
+		_comboTimeZone_1.select(timeZoneIndex_1);
+		_comboTimeZone_2.select(timeZoneIndex_2);
+		_comboTimeZone_3.select(timeZoneIndex_3);
 	}
 }

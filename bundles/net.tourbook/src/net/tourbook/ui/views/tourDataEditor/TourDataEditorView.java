@@ -43,8 +43,10 @@ import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.time.TimeZoneData;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
@@ -204,6 +206,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private static final int					COLUMN_SPACING					= 20;
 	//
 	private final IPreferenceStore				_prefStore						= TourbookPlugin.getPrefStore();
+	private final IPreferenceStore				_prefStoreCommon				= CommonActivator.getPrefStore();
 	private final IDialogSettings				_state							= TourbookPlugin.getState(ID);
 	private final IDialogSettings				_stateSlice						= TourbookPlugin
 																						.getState(ID + ".slice");							//$NON-NLS-1$
@@ -275,6 +278,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private ISelectionListener					_postSelectionListener;
 	private IPartListener2						_partListener;
 	private IPropertyChangeListener				_prefChangeListener;
+	private IPropertyChangeListener				_prefChangeListenerCommon;
 	private ITourEventListener					_tourEventListener;
 	private ITourSaveListener					_tourSaveListener;
 	//
@@ -411,12 +415,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	private boolean								_isTitleModified;
 
-	private boolean								_isStartLocationModified;
-	private boolean								_isEndLocationModified;
-	private boolean								_isDistManuallyModified;
 	private boolean								_isAltitudeManuallyModified;
-	private boolean								_isWindSpeedManuallyModified;
+	private boolean								_isDistManuallyModified;
+	private boolean								_isLocationStartModified;
+	private boolean								_isLocationEndModified;
+	private boolean								_isTimeZoneManuallyModified;
 	private boolean								_isTemperatureManuallyModified;
+	private boolean								_isWindSpeedManuallyModified;
 	private boolean								_isSetDigits					= false;
 
 	/*
@@ -1366,9 +1371,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		// select default time zone
 		_comboTimeZone.select(TimeTools.getTimeZoneIndexDefault());
+		_isTimeZoneManuallyModified = true;
 
 		updateModelFromUI();
 		setTourDirty();
+
+		updateUI_TimeZoneDecorator();
 	}
 
 	void actionSetStartDistanceTo0000() {
@@ -1552,6 +1560,28 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			}
 		};
 		_prefStore.addPropertyChangeListener(_prefChangeListener);
+
+		/*
+		 * Common preferences
+		 */
+		_prefChangeListenerCommon = new IPropertyChangeListener() {
+			@Override
+			public void propertyChange(final PropertyChangeEvent event) {
+
+				final String property = event.getProperty();
+
+				if (property.equals(ICommonPreferences.TIME_ZONE_IS_USE_SYSTEM_TIME_ZONE)
+						|| property.equals(ICommonPreferences.TIME_ZONE_LOCAL_ID)) {
+
+					// reload tour data
+
+					updateUI_FromModel(_tourData, false, true);
+				}
+			}
+		};
+
+		// register the listener
+		_prefStoreCommon.addPropertyChangeListener(_prefChangeListenerCommon);
 	}
 
 	/**
@@ -2398,7 +2428,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					if (_isSetField || _isSavingInProgress) {
 						return;
 					}
-					_isStartLocationModified = true;
+					_isLocationStartModified = true;
 					setTourDirty();
 				}
 			});
@@ -2435,7 +2465,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					if (_isSetField || _isSavingInProgress) {
 						return;
 					}
-					_isEndLocationModified = true;
+					_isLocationEndModified = true;
 					setTourDirty();
 				}
 			});
@@ -2668,7 +2698,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			{
 				// combo
 				_comboTimeZone = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
-				_comboTimeZone.addSelectionListener(_selectionListener);
+				_comboTimeZone.setVisibleItemCount(50);
+				_comboTimeZone.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+
+						_isTimeZoneManuallyModified = true;
+
+						updateModelFromUI();
+						setTourDirty();
+
+						updateUI_TimeZoneDecorator();
+					}
+				});
 
 				_tk.adapt(_comboTimeZone, true, false);
 
@@ -2686,9 +2728,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 						.getImage();
 
 				_decoTimeZone = new ControlDecoration(_comboTimeZone, SWT.TOP | SWT.LEFT);
+				_decoTimeZone.hide();
 				_decoTimeZone.setImage(image);
 				_decoTimeZone.setDescriptionText(Messages.Tour_Editor_Decorator_TimeZone_Tooltip);
-				_decoTimeZone.hide();
 
 				// indent the combo that the decorator is not truncated
 				GridDataFactory.fillDefaults()//
@@ -2697,7 +2739,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			}
 
 			{
-				// action: set default
+				// link: set default
 
 				_linkDefaultTimeZone = new Link(container, SWT.NONE);
 				_linkDefaultTimeZone.setText(Messages.Tour_Editor_Link_SetDefautTimeZone);
@@ -2708,9 +2750,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 						actionSetDefaultTimeZone();
 					}
 				});
-//				GridDataFactory.fillDefaults()//
-//				.align(SWT.BEGINNING, SWT.BEGINNING)
-//				.applyTo(_linkDefaultTimeZone);
 				_tk.adapt(_linkDefaultTimeZone, true, true);
 			}
 		}
@@ -4349,6 +4388,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		page.removePartListener(_partListener);
 
 		_prefStore.removePropertyChangeListener(_prefChangeListener);
+		_prefStoreCommon.removePropertyChangeListener(_prefChangeListenerCommon);
 
 		TourManager.getInstance().removeTourEventListener(_tourEventListener);
 		TourManager.getInstance().removeTourSaveListener(_tourSaveListener);
@@ -6025,7 +6065,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_isTitleModified = false;
 		}
 
-		if (_isStartLocationModified) {
+		if (_isLocationStartModified) {
 
 			_comboLocation_Start.clearSelection();
 			_comboLocation_Start.removeAll();
@@ -6036,10 +6076,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				_comboLocation_Start.add(string);
 			}
 			_comboLocation_Start.update();
-			_isStartLocationModified = false;
+			_isLocationStartModified = false;
 		}
 
-		if (_isEndLocationModified) {
+		if (_isLocationEndModified) {
 
 			_comboLocation_End.clearSelection();
 			_comboLocation_End.removeAll();
@@ -6050,7 +6090,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				_comboLocation_End.add(string);
 			}
 			_comboLocation_End.update();
-			_isEndLocationModified = false;
+			_isLocationEndModified = false;
 		}
 
 		setTourClean();
@@ -6185,10 +6225,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		_isTourDirty = false;
 
-		_isDistManuallyModified = false;
 		_isAltitudeManuallyModified = false;
-		_isWindSpeedManuallyModified = false;
+		_isDistManuallyModified = false;
 		_isTemperatureManuallyModified = false;
+		_isTimeZoneManuallyModified = false;
+		_isWindSpeedManuallyModified = false;
 
 		enableActions();
 		enableControls();
@@ -6365,11 +6406,17 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					_dtStartTime.getSeconds());
 
 			// time zone
-			final int selectedTimeZoneIndex = _comboTimeZone.getSelectionIndex();
-			final TimeZoneData timeZoneData = TimeTools.getTimeZoneByIndex(selectedTimeZoneIndex);
-			final String timeZoneId = timeZoneData.zoneId;
-			_tourData.setTimeZoneId(timeZoneId);
+			if (_isTimeZoneManuallyModified) {
 
+				// set time zone ONLY when manually modified
+
+				final int selectedTimeZoneIndex = _comboTimeZone.getSelectionIndex();
+				final TimeZoneData timeZoneData = TimeTools.getTimeZoneByIndex(selectedTimeZoneIndex);
+				final String timeZoneId = timeZoneData.zoneId;
+				_tourData.setTimeZoneId(timeZoneId);
+			}
+
+			// distance
 			if (_isDistManuallyModified) {
 				/*
 				 * update the distance only when it was modified because when the measurement is
@@ -6380,6 +6427,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				_tourData.setTourDistance(distanceValue);
 			}
 
+			// altitude
 			if (_isAltitudeManuallyModified) {
 
 				/*
@@ -6407,6 +6455,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				_tourData.setTourAltDown((int) altitudeDownValue);
 			}
 
+			// manual tour
 			if (_isManualTour) {
 
 				_tourData.setTourRecordingTime(_timeRecording.getTime());
@@ -6793,16 +6842,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 		_comboTimeZone.select(timeZoneIndex);
 
-		// show/hide time zone decorator
-		if (_tourData.isDefaultTimeZone()) {
-
-			// show info
-			_decoTimeZone.show();
-
-		} else {
-			// hide info
-			_decoTimeZone.hide();
-		}
+		updateUI_TimeZoneDecorator();
 
 		// tour type/tags
 		net.tourbook.ui.UI.updateUI_TourType(_tourData, _lblTourType, true);
@@ -7041,6 +7081,20 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_timeRecording.setTime(recTime / 3600, ((recTime % 3600) / 60), ((recTime % 3600) % 60));
 		_timeDriving.setTime(driveTime / 3600, ((driveTime % 3600) / 60), ((driveTime % 3600) % 60));
 		_timePaused.setTime(pausedTime / 3600, ((pausedTime % 3600) / 60), ((pausedTime % 3600) % 60));
+	}
+
+	private void updateUI_TimeZoneDecorator() {
+
+		// show/hide time zone decorator
+		if (_tourData.isDefaultTimeZone()) {
+
+			// show info
+			_decoTimeZone.show();
+
+		} else {
+			// hide info
+			_decoTimeZone.hide();
+		}
 	}
 
 	/**

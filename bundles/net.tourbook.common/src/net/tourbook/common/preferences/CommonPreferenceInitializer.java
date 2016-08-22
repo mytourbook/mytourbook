@@ -86,6 +86,7 @@ public class CommonPreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ICommonPreferences.TIME_ZONE_LOCAL_ID, defaultId);
 		store.setDefault(ICommonPreferences.TIME_ZONE_LOCAL_ID_1, defaultId);
 		store.setDefault(ICommonPreferences.TIME_ZONE_LOCAL_ID_2, defaultId);
+		store.setDefault(ICommonPreferences.TIME_ZONE_LOCAL_ID_3, defaultId);
 
 		/*
 		 * calendar week

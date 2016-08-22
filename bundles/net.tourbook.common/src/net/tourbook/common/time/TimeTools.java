@@ -54,9 +54,6 @@ public class TimeTools {
 	 */
 	private static final TIntObjectHashMap<String>	_timeZoneOffsetLabels		= new TIntObjectHashMap<>();
 
-	/*
-	 * Copied from java.time.LocalTime
-	 */
 	/** Minutes per hour. */
 	private static final int						MINUTES_PER_HOUR			= 60;
 	/** Seconds per minute. */
@@ -80,7 +77,7 @@ public class TimeTools {
 	 * the defined time zone is used.
 	 */
 	private static boolean							_isUseSystemTimeZone;
-	private static ZoneId							_defaultTimeZoneId;
+	private static ZoneId							_selectedTimeZoneId;
 
 	/**
 	 * Calendar week which is defined in the preferences.
@@ -104,7 +101,8 @@ public class TimeTools {
 
 		_isUseSystemTimeZone = _prefStoreCommon.getBoolean(//
 				ICommonPreferences.TIME_ZONE_IS_USE_SYSTEM_TIME_ZONE);
-		_defaultTimeZoneId = ZoneId.of(_prefStoreCommon.getString(ICommonPreferences.TIME_ZONE_LOCAL_ID));
+
+		_selectedTimeZoneId = ZoneId.of(_prefStoreCommon.getString(ICommonPreferences.TIME_ZONE_LOCAL_ID));
 
 		/*
 		 * Set calendar week
@@ -295,7 +293,7 @@ public class TimeTools {
 		if (timeZoneData == null) {
 
 			// use default
-			timeZoneData = TimeTools.getTimeZone(_defaultTimeZoneId.getId());
+			timeZoneData = TimeTools.getTimeZone(_selectedTimeZoneId.getId());
 		}
 
 		return getTimeZoneIndex(timeZoneData.zoneId);
@@ -325,7 +323,7 @@ public class TimeTools {
 	 * @return Returns the time zone index for the default time zone.
 	 */
 	public static int getTimeZoneIndexDefault() {
-		return getTimeZoneIndex(_defaultTimeZoneId.getId());
+		return getTimeZoneIndex(_selectedTimeZoneId.getId());
 	}
 
 	/**
@@ -338,7 +336,7 @@ public class TimeTools {
 		int tzIndex = getTimeZoneIndex(timeZoneId);
 
 		if (tzIndex == -1) {
-			tzIndex = getTimeZoneIndex(_defaultTimeZoneId.getId());
+			tzIndex = getTimeZoneIndex(_selectedTimeZoneId.getId());
 		}
 
 		return tzIndex;
@@ -361,7 +359,7 @@ public class TimeTools {
 		final boolean isDefaultZone = dbTimeZoneId == null;
 
 		final ZoneId zoneId = isDefaultZone //
-				? _defaultTimeZoneId
+				? _selectedTimeZoneId
 				: ZoneId.of(dbTimeZoneId);
 
 		ZonedDateTime tourZonedDateTime;
@@ -369,23 +367,26 @@ public class TimeTools {
 
 		if (_isUseSystemTimeZone) {
 
+			tourZonedDateTime = ZonedDateTime.ofInstant(tourStartInstant, ZoneId.systemDefault());
+
+			timeZoneOffsetLabel = printOffset(0, true);
+
+		} else {
+
+			// use selected time zone
+
 			tourZonedDateTime = ZonedDateTime.ofInstant(tourStartInstant, zoneId);
 
 			final ZonedDateTime tourDateTimeWithDefaultZoneId = tourZonedDateTime
-					.withZoneSameInstant(_defaultTimeZoneId);
+					.withZoneSameInstant(_selectedTimeZoneId);
 
 			final int tourOffset = tourZonedDateTime.getOffset().getTotalSeconds();
 			final int defaultOffset = tourDateTimeWithDefaultZoneId.getOffset().getTotalSeconds();
 
 			final int offsetDiff = tourOffset - defaultOffset;
 			timeZoneOffsetLabel = printOffset(offsetDiff, isDefaultZone);
-
-		} else {
-
-			tourZonedDateTime = ZonedDateTime.ofInstant(tourStartInstant, ZoneId.systemDefault());
-
-			timeZoneOffsetLabel = printOffset(0, true);
 		}
+
 
 		// set an offset to have the index in the week array
 		final int weekDayIndex = tourZonedDateTime.getDayOfWeek().getValue() - 1;
@@ -463,10 +464,10 @@ public class TimeTools {
 		calendarWeek = WeekFields.of(dow, minimalDaysInFirstWeek);
 	}
 
-	public static void setDefaultTimeZoneOffset(final boolean isUseTimeZone, final String timeZoneId) {
+	public static void setTimeZone(final boolean isUseSystemTimeZone, final String selectedTimeZoneId) {
 
-		_isUseSystemTimeZone = isUseTimeZone;
-		_defaultTimeZoneId = ZoneId.of(timeZoneId);
+		_isUseSystemTimeZone = isUseSystemTimeZone;
+		_selectedTimeZoneId = ZoneId.of(selectedTimeZoneId);
 	}
 
 }

@@ -1182,6 +1182,7 @@ public class Messages extends NLS {
 	public static String		Pref_General_Label_LocalTimeZone;
 	public static String		Pref_General_Label_LocalTimeZone_1;
 	public static String		Pref_General_Label_LocalTimeZone_2;
+	public static String		Pref_General_Label_LocalTimeZone_3;
 	public static String		Pref_General_Label_MeasurementSystem;
 	public static String		Pref_General_Label_MinimalDaysInFirstWeek;
 	public static String		Pref_General_Label_MinimalDaysInFirstWeek_Tooltip;
