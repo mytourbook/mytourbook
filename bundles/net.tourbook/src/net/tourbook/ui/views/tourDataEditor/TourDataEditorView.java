@@ -29,7 +29,6 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -4872,7 +4871,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_latitudeEditingSupport.setDataSerie(_serieLatitude);
 		_longitudeEditingSupport.setDataSerie(_serieLongitude);
 
-		final org.joda.time.DateTime start = _tourData.getTourStartTime();
+		final org.joda.time.DateTime start = _tourData.getTourStartTime8();
 
 		_tourStartDayTime = (start.getHourOfDay() * 3600) //
 				+ (start.getMinuteOfHour() * 60)
@@ -5059,7 +5058,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		} else {
 
-			final Date tourDate = _tourData.getTourStartTime().toDate();
+			final ZonedDateTime tourDate = _tourData.getTourStartTime8();
 
 			return TourManager.getTourTitle(tourDate);
 		}
@@ -6789,9 +6788,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_spinTemperature.setSelection((int) ((avgTemperature * 10) + 0.5));
 
 		// set start date/time
-		final org.joda.time.DateTime start = _tourData.getTourStartTime();
-		_dtTourDate.setDate(start.getYear(), start.getMonthOfYear() - 1, start.getDayOfMonth());
-		_dtStartTime.setTime(start.getHourOfDay(), start.getMinuteOfHour(), start.getSecondOfMinute());
+		final ZonedDateTime start = _tourData.getTourStartTime8();
+		_dtTourDate.setDate(start.getYear(), start.getMonthValue() - 1, start.getDayOfMonth());
+		_dtStartTime.setTime(start.getHour(), start.getMinute(), start.getSecond());
 
 		// tour distance
 		final float tourDistance = _tourData.getTourDistance();

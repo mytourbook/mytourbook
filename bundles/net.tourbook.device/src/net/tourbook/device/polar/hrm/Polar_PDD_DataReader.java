@@ -22,6 +22,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.StringTokenizer;
@@ -35,7 +36,6 @@ import net.tourbook.device.gpx.GPXDeviceDataReader;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
-import net.tourbook.tour.TourManager;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -293,11 +293,11 @@ public class Polar_PDD_DataReader extends TourbookDevice {
 		/*
 		 * set gpx tour start to the same time as the hrm tour start
 		 */
-		final DateTime hrmTourStart = TourManager.getTourDateTime(hrmTourData);
-		final DateTime gpxTourStart = TourManager.getTourDateTime(gpxTourData);
+		final ZonedDateTime hrmTourStart = hrmTourData.getTourStartTime8();
+		final ZonedDateTime gpxTourStart = gpxTourData.getTourStartTime8();
 
-		final long absoluteHrmTourStart = hrmTourStart.getMillis() / 1000;
-		long absoluteGpxTourStart = gpxTourStart.getMillis() / 1000;
+		final long absoluteHrmTourStart = hrmTourStart.toInstant().getEpochSecond();
+		long absoluteGpxTourStart = gpxTourStart.toInstant().getEpochSecond();
 
 		final int timeDiff = (int) (absoluteHrmTourStart - absoluteGpxTourStart);
 		final int timeDiffHours = (timeDiff / 3600) * 3600;

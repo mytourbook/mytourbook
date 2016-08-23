@@ -16,6 +16,7 @@
 package net.tourbook.tour;
 
 import java.lang.reflect.InvocationTargetException;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -1088,11 +1089,13 @@ public class TourManager {
 	}
 
 	public static String getTourDateFull(final TourData tourData) {
+
 		return UI.DateFormatterFull.format(tourData.getTourStartTimeMS());
 	}
 
-	private static String getTourDateLong(final Date date) {
-		return UI.DateFormatterLong.format(date.getTime());
+	private static String getTourDateLong(final ZonedDateTime tourDate) {
+
+		return tourDate.format(UI.DateFormatter_Long);
 	}
 
 	/**
@@ -1105,14 +1108,6 @@ public class TourManager {
 		}
 
 		return UI.DateFormatterShort.format(tourData.getTourStartTimeMS());
-	}
-
-	/**
-	 * @return Returns date/time of the tour start
-	 */
-	public static DateTime getTourDateTime(final TourData tourData) {
-
-		return tourData.getTourStartTime();
 	}
 
 	public static String getTourDateTimeFull(final Date dt) {
@@ -1135,28 +1130,17 @@ public class TourManager {
 		return tourData.getTourStartTime8().format(UI.DateTimeFormatter_Short);
 	}
 
-	private static String getTourTimeShort(final Date date) {
-
-		return UI.TimeFormatterShort.format(date.getTime());
-	}
-
 	/**
 	 * @return returns the date of this tour
 	 */
 	public static String getTourTimeShort(final TourData tourData) {
 
-		return UI.TimeFormatterShort.format(tourData.getTourStartTimeMS());
+		return tourData.getTourStartTime8().format(UI.TimeFormatter_Short);
 	}
 
-	public static String getTourTitle(final Date date) {
+	private static String getTourTimeShort(final ZonedDateTime tourDate) {
 
-		final String weekDay = UI.WeekDayFormatter.format(date);
-
-		return weekDay //
-				+ UI.COMMA_SPACE
-				+ getTourDateLong(date)
-				+ UI.DASH_WITH_SPACE
-				+ getTourTimeShort(date);
+		return tourDate.format(UI.TimeFormatter_Short);
 	}
 
 	/**
@@ -1164,9 +1148,20 @@ public class TourManager {
 	 */
 	public static String getTourTitle(final TourData tourData) {
 
-		return getTourDateLong(getTourDateTime(tourData).toDate())//
+		return getTourDateLong(tourData.getTourStartTime8())//
 				+ UI.DASH_WITH_SPACE
 				+ getTourTimeShort(tourData);
+	}
+
+	public static String getTourTitle(final ZonedDateTime tourDate) {
+
+		final String weekDay = tourDate.format(UI.WeekDayFormatter);
+
+		return weekDay //
+				+ UI.COMMA_SPACE
+				+ getTourDateLong(tourDate)
+				+ UI.DASH_WITH_SPACE
+				+ getTourTimeShort(tourDate);
 	}
 
 	/**

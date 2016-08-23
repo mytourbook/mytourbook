@@ -1820,8 +1820,12 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
 				final Object element = cell.getElement();
 				final long value = ((TVITourBookItem) element).colRecordingTime;
+//
+//				colDef.printLongValue(cell, value, element instanceof TVITourBookTour);
+				
+				
 
-				colDef.printLongValue(cell, value, element instanceof TVITourBookTour);
+				cell.setText(Long.toString(value));
 
 				setCellColor(cell, element);
 			}

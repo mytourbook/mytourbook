@@ -18,7 +18,6 @@ package net.tourbook.common;
 import java.awt.Font;
 import java.nio.charset.Charset;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.ArrayList;
@@ -314,12 +313,12 @@ public class UI {
 
 	public static final String				UTC										= "UTC";																	//$NON-NLS-1$
 
-	public static final DateFormat			TimeFormatterShort						= DateFormat
-																							.getTimeInstance(DateFormat.SHORT);
+//	public static final DateFormat			TimeFormatterShort						= DateFormat
+//																							.getTimeInstance(DateFormat.SHORT);
 	public static final DateFormat			DateFormatterShort						= DateFormat
 																							.getDateInstance(DateFormat.SHORT);
-	public static final DateFormat			DateFormatterLong						= DateFormat
-																							.getDateInstance(DateFormat.LONG);
+//	public static final DateFormat			DateFormatterLong						= DateFormat
+//																							.getDateInstance(DateFormat.LONG);
 	public static final DateFormat			DateFormatterFull						= DateFormat
 																							.getDateInstance(DateFormat.FULL);
 
@@ -327,11 +326,15 @@ public class UI {
 																							.ofPattern("MMM");													//$NON-NLS-1$
 	public static final DateTimeFormatter	WeekMonthFormatter						= DateTimeFormatter
 																							.ofPattern("dd MMM");												//$NON-NLS-1$
+	public static final DateTimeFormatter	WeekDayFormatter						= DateTimeFormatter
+																							.ofPattern("EEEE");												//$NON-NLS-1$
 
+	public static final DateTimeFormatter	DateFormatter_Long						= DateTimeFormatter
+																							.ofLocalizedDate(FormatStyle.LONG);
 	public static final DateTimeFormatter	DateTimeFormatter_Short					= DateTimeFormatter
 																							.ofLocalizedDateTime(FormatStyle.SHORT);
-
-	public static final SimpleDateFormat	WeekDayFormatter						= new SimpleDateFormat("EEEE");											//$NON-NLS-1$
+	public static final DateTimeFormatter	TimeFormatter_Short						= DateTimeFormatter
+																							.ofLocalizedTime(FormatStyle.SHORT);
 
 	public static final Font				AWT_FONT_ARIAL_8						= Font.decode("Arial-plain-8");											//$NON-NLS-1$
 	public static final Font				AWT_FONT_ARIAL_10						= Font.decode("Arial-plain-10");											//$NON-NLS-1$

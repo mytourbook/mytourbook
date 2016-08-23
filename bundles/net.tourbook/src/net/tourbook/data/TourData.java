@@ -106,6 +106,8 @@ import org.hibernate.annotations.Cascade;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import com.skedgo.converter.TimezoneMapper;
+
 /**
  * Tour data contains all data for a tour (except markers), an entity will be saved in the database
  */
@@ -4314,6 +4316,21 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		}
 
 		/*
+		 * Set time zone from geo position
+		 */
+		if (isGPS) {
+
+			// get time zone from lat/lon
+			final double lat = latitudeSerie[0];
+			final double lon = longitudeSerie[0];
+
+			final String rawZoneId = TimezoneMapper.latLngToTimezoneString(lat, lon);
+			final ZoneId zoneId = ZoneId.of(rawZoneId);
+
+			setTimeZoneId(zoneId.getId());
+		}
+
+		/*
 		 * create marker after all other data are setup
 		 */
 		if (isCreateMarker) {
@@ -6173,9 +6190,13 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 
 		if (_dateTimeStart8 == null) {
 
-			_dateTimeStart8 = ZonedDateTime.ofInstant(
+			final String zoneIdRaw = timeZoneId == null //
+					? ZoneOffset.systemDefault().getId()
+					: timeZoneId;
+
+			_dateTimeStart8 = ZonedDateTime.ofInstant(//
 					Instant.ofEpochMilli(tourStartTime),
-					ZoneId.of(ZoneOffset.systemDefault().getId()));
+					ZoneId.of(zoneIdRaw));
 		}
 
 		return _dateTimeStart8;

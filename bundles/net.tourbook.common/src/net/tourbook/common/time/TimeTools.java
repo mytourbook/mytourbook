@@ -19,6 +19,7 @@ import static java.time.temporal.ChronoField.DAY_OF_WEEK;
 import gnu.trove.map.hash.TIntObjectHashMap;
 
 import java.time.DayOfWeek;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Year;
@@ -31,23 +32,29 @@ import java.time.format.FormatStyle;
 import java.time.format.TextStyle;
 import java.time.temporal.ValueRange;
 import java.time.temporal.WeekFields;
+import java.time.zone.ZoneRules;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.preferences.ICommonPreferences;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.joda.time.Period;
+import org.joda.time.format.PeriodFormatter;
+import org.joda.time.format.PeriodFormatterBuilder;
 
 import com.skedgo.converter.TimezoneMapper;
 
 public class TimeTools {
 
+	private static final String						DST_FORMAT					= " - %s %s";										//$NON-NLS-1$
 	private static final String						ZERO_0						= ":0";											//$NON-NLS-1$
 	private static final String						ZERO_00_00					= "+00:00";										//$NON-NLS-1$
-	private static final String						ZERO_00_00_DEFAULT			= ZERO_00_00 + '*';
+	private static final String						ZERO_00_00_DEFAULT			= "*";												//$NON-NLS-1$
 
 	/**
 	 * Cached time zone labels.
@@ -67,6 +74,22 @@ public class TimeTools {
 																						.ofLocalizedDateTime(FormatStyle.MEDIUM);
 	public static final DateTimeFormatter			timeFormatter_Medium		= DateTimeFormatter
 																						.ofLocalizedTime(FormatStyle.MEDIUM);
+	private static final PeriodFormatter			DURATION_FORMATTER;
+
+	static {
+
+		DURATION_FORMATTER = new PeriodFormatterBuilder()
+//
+				.appendHours()
+				.appendSuffix(Messages.Period_Format_Hour_Short, Messages.Period_Format_Hour_Short)
+//				.appendSeparator(commaSpace, space2, variants)
+
+				.appendMinutes()
+				.appendSuffix(Messages.Period_Format_Minute_Short, Messages.Period_Format_Minute_Short)
+//				.appendSeparator(commaSpace, space2, variants)
+
+				.toFormatter();
+	}
 
 	final static IPreferenceStore					_prefStoreCommon			= CommonActivator.getPrefStore();
 
@@ -76,7 +99,7 @@ public class TimeTools {
 	 * When <code>true</code> then the system time zone is used to display time values, otherwise
 	 * the defined time zone is used.
 	 */
-	private static boolean							_isUseSystemTimeZone;
+//	private static boolean							_isUseSystemTimeZone;
 	private static ZoneId							_selectedTimeZoneId;
 
 	/**
@@ -99,8 +122,8 @@ public class TimeTools {
 
 	static {
 
-		_isUseSystemTimeZone = _prefStoreCommon.getBoolean(//
-				ICommonPreferences.TIME_ZONE_IS_USE_SYSTEM_TIME_ZONE);
+//		_isUseSystemTimeZone = _prefStoreCommon.getBoolean(//
+//				ICommonPreferences.TIME_ZONE_IS_USE_SYSTEM_TIME_ZONE);
 
 		_selectedTimeZoneId = ZoneId.of(_prefStoreCommon.getString(ICommonPreferences.TIME_ZONE_LOCAL_ID));
 
@@ -158,23 +181,59 @@ public class TimeTools {
 
 		if (_allSortedTimeZones == null) {
 
+			final int currentYear = LocalDate.now().getYear();
+
 			final ArrayList<TimeZoneData> sortedTimeZones = new ArrayList<>();
 
 			for (final String rawZoneId : ZoneId.getAvailableZoneIds()) {
 
 				final ZoneId zoneId = ZoneId.of(rawZoneId);
-				final ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
+				final ZoneRules zoneRules = zoneId.getRules();
 
-				final ZoneOffset zoneOffset = zonedDateTime.getOffset();
-				final int utcTimeZoneSeconds = zoneOffset.getTotalSeconds();
+				final ZonedDateTime zonedDateTimeWinter = ZonedDateTime.of(currentYear, 1, 1, 12, 0, 0, 0, zoneId);
+				final ZonedDateTime zonedDateTimeSummer = ZonedDateTime.of(currentYear, 6, 1, 12, 0, 0, 0, zoneId);
 
-				final String label = printOffset(utcTimeZoneSeconds, false) + UI.SPACE4 + zoneId.getId();
+				final ZoneOffset zoneOffsetWinter = zonedDateTimeWinter.getOffset();
+				final ZoneOffset zoneOffsetSummer = zonedDateTimeSummer.getOffset();
+				final int utcTimeZoneSecondsWinter = zoneOffsetWinter.getTotalSeconds();
+				final int utcTimeZoneSecondsSummer = zoneOffsetSummer.getTotalSeconds();
+
+				final Instant nowInstantWinter = zonedDateTimeWinter.toInstant();
+				final Instant nowInstantSummer = zonedDateTimeSummer.toInstant();
+
+				final Boolean isDstWinter = zoneRules.isDaylightSavings(nowInstantWinter);
+				final Boolean isDstSummer = zoneRules.isDaylightSavings(nowInstantSummer);
+
+				final Duration dstDurationWinter = zoneRules.getDaylightSavings(nowInstantWinter);
+				final Duration dstDurationSummer = zoneRules.getDaylightSavings(nowInstantSummer);
+
+//				final String dst = isDst //
+//						? String.format(
+//								DST_FORMAT,
+//								Messages.TimeTools_Time_Tools_DST,
+//								printDSTDuration(dstDuration.getSeconds() * 1000))
+//						: UI.EMPTY_STRING;
+
+				final String dst = ""// //$NON-NLS-1$
+						+ (isDstWinter //
+								? ("        DST " + printDSTDuration(dstDurationWinter.getSeconds() * 1000) + " - Winter") //$NON-NLS-1$ //$NON-NLS-2$
+								: "") //$NON-NLS-1$
+						+ (isDstSummer //
+								? ("        DST " + printDSTDuration(dstDurationSummer.getSeconds() * 1000) + " - Summer") //$NON-NLS-1$ //$NON-NLS-2$
+								: ""); //$NON-NLS-1$
+
+				final String label = "" //$NON-NLS-1$
+						+ (printOffset(utcTimeZoneSecondsWinter, false) + UI.SPACE4)
+						+ (printOffset(utcTimeZoneSecondsSummer, false) + UI.SPACE4)
+						+ zoneId.getId()
+						+ dst;
+//				final String label = dst;
 
 				final TimeZoneData timeZone = new TimeZoneData();
 
 				timeZone.label = label;
 				timeZone.zoneId = zoneId.getId();
-				timeZone.zoneOffsetSeconds = utcTimeZoneSeconds;
+				timeZone.zoneOffsetSeconds = utcTimeZoneSecondsWinter;
 
 				sortedTimeZones.add(timeZone);
 			}
@@ -210,7 +269,11 @@ public class TimeTools {
 		final ZonedDateTime zdt = ZonedDateTime.now();
 		final int tzOffset = zdt.getOffset().getTotalSeconds();
 
-		return printOffset(tzOffset, false);
+		final Period period = new Period(tzOffset * 1000);
+
+		return period.toString(DURATION_FORMATTER);
+
+//		return printOffset(tzOffset, false);
 	}
 
 	/**
@@ -357,6 +420,7 @@ public class TimeTools {
 		final Instant tourStartInstant = Instant.ofEpochMilli(epochMilli);
 
 		final boolean isDefaultZone = dbTimeZoneId == null;
+		final boolean isTourTimeZone = dbTimeZoneId != null;
 
 		final ZoneId zoneId = isDefaultZone //
 				? _selectedTimeZoneId
@@ -365,15 +429,9 @@ public class TimeTools {
 		ZonedDateTime tourZonedDateTime;
 		String timeZoneOffsetLabel = null;
 
-		if (_isUseSystemTimeZone) {
+		if (isTourTimeZone) {
 
-			tourZonedDateTime = ZonedDateTime.ofInstant(tourStartInstant, ZoneId.systemDefault());
-
-			timeZoneOffsetLabel = printOffset(0, true);
-
-		} else {
-
-			// use selected time zone
+			// use tour time zone
 
 			tourZonedDateTime = ZonedDateTime.ofInstant(tourStartInstant, zoneId);
 
@@ -385,13 +443,31 @@ public class TimeTools {
 
 			final int offsetDiff = tourOffset - defaultOffset;
 			timeZoneOffsetLabel = printOffset(offsetDiff, isDefaultZone);
+
+		} else {
+
+			tourZonedDateTime = ZonedDateTime.ofInstant(tourStartInstant, ZoneId.systemDefault());
+
+			timeZoneOffsetLabel = printOffset(0, true);
 		}
 
-
-		// set an offset to have the index in the week array
-		final int weekDayIndex = tourZonedDateTime.getDayOfWeek().getValue() - 1;
+		final int weekDayIndex = tourZonedDateTime.getDayOfWeek().getValue()
+		// use an offset to have the index in the week array
+		- 1;
 
 		return new TourDateTime(tourZonedDateTime, timeZoneOffsetLabel, weekDays_Short[weekDayIndex]);
+	}
+
+	/**
+	 * @param duration
+	 *            in milliseconds.
+	 * @return
+	 */
+	public static String printDSTDuration(final long duration) {
+
+		final Period period = new Period(duration);
+
+		return period.toString(DURATION_FORMATTER);
 	}
 
 	/*
@@ -466,7 +542,7 @@ public class TimeTools {
 
 	public static void setTimeZone(final boolean isUseSystemTimeZone, final String selectedTimeZoneId) {
 
-		_isUseSystemTimeZone = isUseSystemTimeZone;
+//		_isUseSystemTimeZone = isUseSystemTimeZone;
 		_selectedTimeZoneId = ZoneId.of(selectedTimeZoneId);
 	}
 

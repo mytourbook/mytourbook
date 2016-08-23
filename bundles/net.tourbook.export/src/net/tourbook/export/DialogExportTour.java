@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,6 +28,7 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -227,7 +228,7 @@ public class DialogExportTour extends TitleAreaDialog {
 	private boolean							_isSetup_MultipleTours;
 
 	private int								_mergedDistance;
-	private DateTime						_mergedTime;
+	private ZonedDateTime					_mergedTime;
 
 	private Point							_shellDefaultSize;
 
@@ -1020,7 +1021,7 @@ public class DialogExportTour extends TitleAreaDialog {
 			final ArrayList<TourMarker> tourMarkers = new ArrayList<TourMarker>();
 
 			final TourData tourData = _tourDataList.get(0);
-			final DateTime trackStartTime = TourManager.getTourDateTime(tourData);
+			final ZonedDateTime trackStartTime = tourData.getTourStartTime8();
 
 			final GarminLap tourLap = doExport_50_Lap(tourData);
 
@@ -1088,7 +1089,7 @@ public class DialogExportTour extends TitleAreaDialog {
 			 * merge all tours into one
 			 */
 
-			_mergedTime = TourManager.getTourDateTime(_tourDataList.get(0));
+			_mergedTime = _tourDataList.get(0).getTourStartTime8();
 			_mergedDistance = 0;
 
 			final ArrayList<GarminTrack> tracks = new ArrayList<GarminTrack>();
@@ -1112,11 +1113,11 @@ public class DialogExportTour extends TitleAreaDialog {
 
 				doExport_52_Laps(tourData, tourLap);
 
-				DateTime trackStartTime;
+				ZonedDateTime trackStartTime;
 				if (_exportState_IsCamouflageSpeed) {
 					trackStartTime = _mergedTime;
 				} else {
-					trackStartTime = TourManager.getTourDateTime(tourData);
+					trackStartTime = tourData.getTourStartTime8();
 				}
 
 				final GarminTrack track = doExport_60_TrackPoints(tourData, trackStartTime);
@@ -1167,7 +1168,7 @@ public class DialogExportTour extends TitleAreaDialog {
 				final ArrayList<TourWayPoint> wayPoints = new ArrayList<TourWayPoint>();
 				final ArrayList<TourMarker> tourMarkers = new ArrayList<TourMarker>();
 
-				final DateTime trackStartTime = TourManager.getTourDateTime(tourData);
+				final ZonedDateTime trackStartTime = tourData.getTourStartTime8();
 
 				final GarminLap tourLap = doExport_50_Lap(tourData);
 
@@ -1540,7 +1541,7 @@ public class DialogExportTour extends TitleAreaDialog {
 	 * @param trackDateTime
 	 * @return Returns a track or <code>null</code> when tour data cannot be exported.
 	 */
-	private GarminTrack doExport_60_TrackPoints(final TourData tourData, final DateTime trackDateTime) {
+	private GarminTrack doExport_60_TrackPoints(final TourData tourData, final ZonedDateTime trackDateTime) {
 
 		final int[] timeSerie = tourData.timeSerie;
 
@@ -1566,7 +1567,7 @@ public class DialogExportTour extends TitleAreaDialog {
 		final boolean isTemperature = (temperatureSerie != null) && (temperatureSerie.length > 0);
 
 		int prevTime = -1;
-		DateTime lastTrackDateTime = null;
+		ZonedDateTime lastTrackDateTime = null;
 
 		// default is to use all trackpoints
 		int startIndex = 0;
@@ -1673,7 +1674,8 @@ public class DialogExportTour extends TitleAreaDialog {
 			if (relativeTime != prevTime) {
 
 				lastTrackDateTime = trackDateTime.plusSeconds(relativeTime);
-				tpExt.setDate(lastTrackDateTime.toDate());
+
+				tpExt.setDate(Date.from(lastTrackDateTime.toInstant()));
 
 				track.addWaypoint(tpExt);
 			}
@@ -1698,7 +1700,7 @@ public class DialogExportTour extends TitleAreaDialog {
 	private void doExport_70_WayPoints(	final ArrayList<TourWayPoint> exportedWayPoints,
 										final ArrayList<TourMarker> exportedTourMarkers,
 										final TourData tourData,
-										final DateTime tourStartTime) {
+										final ZonedDateTime tourStartTime) {
 
 		// get markers when this option is checked
 		if (_exportState_GPX_IsExportMarkers == false) {
@@ -1784,14 +1786,15 @@ public class DialogExportTour extends TitleAreaDialog {
 				relativeTime = timeSerie[serieIndex];
 			}
 
-			final long markerTime = tourStartTime.getMillis() + relativeTime * 1000;
+			final ZonedDateTime zonedMarkerTime = tourStartTime.plusSeconds(relativeTime);
+			final long absoluteMarkerTime = zonedMarkerTime.toInstant().toEpochMilli();
 
 			/*
 			 * Setup exported tour marker
 			 */
 			final TourMarker exportedTourMarker = tourMarker.clone();
 
-			exportedTourMarker.setTime(relativeTime, markerTime);
+			exportedTourMarker.setTime(relativeTime, absoluteMarkerTime);
 			exportedTourMarker.setLatitude(latitudeSerie[serieIndex]);
 			exportedTourMarker.setLongitude(longitudeSerie[serieIndex]);
 
@@ -2078,13 +2081,13 @@ public class DialogExportTour extends TitleAreaDialog {
 		final long minTourMillis = 0;
 
 		for (final TourData tourData : _tourDataList) {
-			final DateTime checkingTourDate = TourManager.getTourDateTime(tourData);
 
 			if (minTourData == null) {
 				minTourData = tourData;
 			} else {
 
-				final long tourMillis = checkingTourDate.getMillis();
+				final long tourMillis = tourData.getTourStartTime8().toInstant().toEpochMilli();
+
 				if (tourMillis < minTourMillis) {
 					minTourData = tourData;
 				}
