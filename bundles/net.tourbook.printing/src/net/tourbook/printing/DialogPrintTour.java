@@ -1,13 +1,14 @@
 /*******************************************************************************
- * 
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -17,7 +18,6 @@ package net.tourbook.printing;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -30,7 +30,6 @@ import javax.xml.transform.TransformerException;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
-import net.tourbook.tour.TourManager;
 import net.tourbook.tour.printing.PrintTourExtension;
 import net.tourbook.ui.ImageComboLabel;
 
@@ -79,18 +78,18 @@ public class DialogPrintTour extends TitleAreaDialog {
 	private static final int				SIZING_TEXT_FIELD_WIDTH		= 250;
 	private static final int				COMBO_HISTORY_LENGTH		= 20;
 
-	private static final String				STATE_PAPER_SIZE			= "printPaperSize";								//$NON-NLS-1$
-	private static final String				STATE_PAPER_ORIENTATION		= "printPaperOrientation";							//$NON-NLS-1$
+	private static final String				STATE_PAPER_SIZE			= "printPaperSize";				//$NON-NLS-1$
+	private static final String				STATE_PAPER_ORIENTATION		= "printPaperOrientation";			//$NON-NLS-1$
 
 	private static final String[]			PAPER_SIZE_ITEMS;
 	private static final String[]			PAPER_ORIENTATION_ITEMS;
 
-	private static final String				STATE_IS_PRINT_MARKERS		= "isPrintMarkers";								//$NON-NLS-1$
-	private static final String				STATE_IS_PRINT_NOTES		= "isPrintNotes";									//$NON-NLS-1$
+	private static final String				STATE_IS_PRINT_MARKERS		= "isPrintMarkers";				//$NON-NLS-1$
+	private static final String				STATE_IS_PRINT_NOTES		= "isPrintNotes";					//$NON-NLS-1$
 
-	private static final String				STATE_PRINT_PATH_NAME		= "printPathName";									//$NON-NLS-1$
-	private static final String				STATE_PRINT_FILE_NAME		= "printtFileName";								//$NON-NLS-1$
-	private static final String				STATE_IS_OVERWRITE_FILES	= "isOverwriteFiles";								//$NON-NLS-1$
+	private static final String				STATE_PRINT_PATH_NAME		= "printPathName";					//$NON-NLS-1$
+	private static final String				STATE_PRINT_FILE_NAME		= "printtFileName";				//$NON-NLS-1$
+	private static final String				STATE_IS_OVERWRITE_FILES	= "isOverwriteFiles";				//$NON-NLS-1$
 
 	private static final DecimalFormat		_intFormatter				= (DecimalFormat) NumberFormat
 																				.getInstance(Locale.US);
@@ -99,10 +98,8 @@ public class DialogPrintTour extends TitleAreaDialog {
 	private static final DecimalFormat		_double6Formatter			= (DecimalFormat) NumberFormat
 																				.getInstance(Locale.US);
 	private static final SimpleDateFormat	_dateFormat					= new SimpleDateFormat();
-	private static final DateFormat			_timeFormatter				= DateFormat.getTimeInstance(DateFormat.MEDIUM);
-	private static final NumberFormat		_numberFormatter			= NumberFormat.getNumberInstance();
 
-	private static final String				PDF_FILE_EXTENSION			= "pdf";											//$NON-NLS-1$
+	private static final String				PDF_FILE_EXTENSION			= "pdf";							//$NON-NLS-1$
 
 	private static String					_dlgDefaultMessage;
 
@@ -125,7 +122,7 @@ public class DialogPrintTour extends TitleAreaDialog {
 	private final IDialogSettings			_state						= TourbookPlugin
 																				.getDefault()
 																				.getDialogSettingsSection(
-																						"DialogPrintTour");				//$NON-NLS-1$
+																						"DialogPrintTour"); //$NON-NLS-1$
 
 	private final PrintTourExtension		_printExtensionPoint;
 
@@ -787,13 +784,13 @@ public class DialogPrintTour extends TitleAreaDialog {
 		final long minTourMillis = 0;
 
 		for (final TourData tourData : _tourDataList) {
-			final DateTime checkingTourDate = TourManager.getTourDateTime(tourData);
 
 			if (minTourData == null) {
 				minTourData = tourData;
 			} else {
 
-				final long tourMillis = checkingTourDate.getMillis();
+				final long tourMillis = tourData.getTourStartTime8().toInstant().toEpochMilli();
+
 				if (tourMillis < minTourMillis) {
 					minTourData = tourData;
 				}

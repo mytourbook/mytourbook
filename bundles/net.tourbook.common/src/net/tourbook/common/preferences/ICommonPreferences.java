@@ -38,13 +38,13 @@ public interface ICommonPreferences {
 	/*
 	 * Timezone
 	 */
-	public static final String	TIME_ZONE_ACTIVE_ZONE					= "TIME_ZONE_ACTIVE_ZONE";					//$NON-NLS-1$
 	public static final String	TIME_ZONE_IS_LIVE_UPDATE				= "TIME_ZONE_IS_LIVE_UPDATE";				//$NON-NLS-1$
 	public static final String	TIME_ZONE_IS_USE_SYSTEM_TIME_ZONE		= "TIME_ZONE_IS_USE_SYSTEM_TIME_ZONE";		//$NON-NLS-1$
 	public static final String	TIME_ZONE_LOCAL_ID						= "TIME_ZONE_LOCAL_ID";					//$NON-NLS-1$
 	public static final String	TIME_ZONE_LOCAL_ID_1					= "TIME_ZONE_LOCAL_ID_1";					//$NON-NLS-1$
 	public static final String	TIME_ZONE_LOCAL_ID_2					= "TIME_ZONE_LOCAL_ID_2";					//$NON-NLS-1$
 	public static final String	TIME_ZONE_LOCAL_ID_3					= "TIME_ZONE_LOCAL_ID_3";					//$NON-NLS-1$
+	public static final String	TIME_ZONE_SELECTED_CUSTOM_ZONE			= "TIME_ZONE_SELECTED_CUSTOM_ZONE";		//$NON-NLS-1$
 
 	/*
 	 * Calendar week

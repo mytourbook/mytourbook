@@ -144,63 +144,63 @@ import org.joda.time.format.DateTimeFormat;
 
 public class TourBookView extends ViewPart implements ITourProvider2, ITourViewer3, ITourProviderByID {
 
-	static public final String								ID										= "net.tourbook.views.tourListView";								//$NON-NLS-1$
+	static public final String								ID										= "net.tourbook.views.tourListView";									//$NON-NLS-1$
 
 	private static final String								COLUMN_FACTORY_TIME_ZONE_DIFF_TOOLTIP	= net.tourbook.ui.Messages.ColumnFactory_TimeZoneDifference_Tooltip;
 	private static final String								GRAPH_LABEL_HEARTBEAT_UNIT				= net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
 
-	private static final String								STATE_CSV_EXPORT_PATH					= "STATE_CSV_EXPORT_PATH";											//$NON-NLS-1$
-	private static final String								STATE_IS_SELECT_YEAR_MONTH_TOURS		= "IsSelectYearMonthTours";										//$NON-NLS-1$
-	private static final String								STATE_SELECTED_YEAR						= "SelectedYear";													//$NON-NLS-1$
-	private static final String								STATE_SELECTED_MONTH					= "SelectedMonth";													//$NON-NLS-1$
-	private static final String								STATE_SELECTED_TOURS					= "SelectedTours";													//$NON-NLS-1$
-	private static final String								STATE_YEAR_SUB_CATEGORY					= "YearSubCategory";												//$NON-NLS-1$
+	private static final String								STATE_CSV_EXPORT_PATH					= "STATE_CSV_EXPORT_PATH";												//$NON-NLS-1$
+	private static final String								STATE_IS_SELECT_YEAR_MONTH_TOURS		= "IsSelectYearMonthTours";											//$NON-NLS-1$
+	private static final String								STATE_SELECTED_YEAR						= "SelectedYear";														//$NON-NLS-1$
+	private static final String								STATE_SELECTED_MONTH					= "SelectedMonth";														//$NON-NLS-1$
+	private static final String								STATE_SELECTED_TOURS					= "SelectedTours";														//$NON-NLS-1$
+	private static final String								STATE_YEAR_SUB_CATEGORY					= "YearSubCategory";													//$NON-NLS-1$
 
-	private static final String								CSV_HEADER_AVERAGE_CADENCE				= "AvgCadence";													//$NON-NLS-1$
-	private static final String								CSV_HEADER_AVERAGE_PACE					= "AvgPace (%s)";													//$NON-NLS-1$
-	private static final String								CSV_HEADER_AVERAGE_PULSE				= "AvgPulse (%s)";													//$NON-NLS-1$
-	private static final String								CSV_HEADER_AVERAGE_SPEED				= "AvgSpeed (%s)";													//$NON-NLS-1$
-	private static final String								CSV_HEADER_AVERAGE_TEMPERATURE			= "AvgTemperature (%s)";											//$NON-NLS-1$
-	private static final String								CSV_HEADER_ALTITUDE_DOWN				= "AltitudeDown (%s)";												//$NON-NLS-1$
-	private static final String								CSV_HEADER_ALTITUDE_UP					= "AltitudeUp (%s)";												//$NON-NLS-1$
-	private static final String								CSV_HEADER_CALORIES						= "Calories";														//$NON-NLS-1$
-	private static final String								CSV_HEADER_DAY							= "Day";															//$NON-NLS-1$
-	private static final String								CSV_HEADER_DEVICE_START_DISTANCE		= "DeviceStartDistance";											//$NON-NLS-1$
-	private static final String								CSV_HEADER_DISTANCE						= "Distance (%s)";													//$NON-NLS-1$
-	private static final String								CSV_HEADER_DP_TOLERANCE					= "DPTolerance";													//$NON-NLS-1$
-	private static final String								CSV_HEADER_GEAR_FRONT_SHIFT_COUNT		= "FrontShiftCount";												//$NON-NLS-1$
-	private static final String								CSV_HEADER_GEAR_REAR_SHIFT_COUNT		= "RearShiftCount";												//$NON-NLS-1$
-	private static final String								CSV_HEADER_ISO_DATE_TIME				= "ISO8601";														//$NON-NLS-1$
-	private static final String								CSV_HEADER_MOVING_TIME					= "MovingTime (%s)";												//$NON-NLS-1$
-	private static final String								CSV_HEADER_NUMBER_OF_MARKER				= "NumberOfMarkers";												//$NON-NLS-1$
-	private static final String								CSV_HEADER_NUMBER_OF_PHOTOS				= "NumberOfPhotos";												//$NON-NLS-1$
-	private static final String								CSV_HEADER_NUMBER_OF_TOURS				= "NumberOfTours";													//$NON-NLS-1$
-	private static final String								CSV_HEADER_WEATHER						= "Weather";														//$NON-NLS-1$
-	private static final String								CSV_HEADER_WIND_DIRECTION				= "WindDirection";													//$NON-NLS-1$
-	private static final String								CSV_HEADER_WIND_SPEED					= "WindSpeed";														//$NON-NLS-1$
-	private static final String								CSV_HEADER_MAX_ALTITUDE					= "MaxAltitude (%s)";												//$NON-NLS-1$
-	private static final String								CSV_HEADER_MAX_PULSE					= "MaxPulse";														//$NON-NLS-1$
-	private static final String								CSV_HEADER_MAX_SPEED					= "MaxSpeed (%s)";													//$NON-NLS-1$
-	private static final String								CSV_HEADER_MONTH						= "Month";															//$NON-NLS-1$
-	private static final String								CSV_HEADER_PAUSED_TIME					= "PausedTime (%s)";												//$NON-NLS-1$
-	private static final String								CSV_HEADER_PAUSED_TIME_RELATIVE			= "RelativePausedTime (%)";										//$NON-NLS-1$
-	private static final String								CSV_HEADER_PERSON						= "Person";														//$NON-NLS-1$
-	private static final String								CSV_HEADER_RECORDING_TIME				= "RecordingTime (%s)";											//$NON-NLS-1$
-	private static final String								CSV_HEADER_RESTPULSE					= "RestPulse";														//$NON-NLS-1$
-	private static final String								CSV_HEADER_TAGS							= "Tags";															//$NON-NLS-1$
-	private static final String								CSV_HEADER_TIME							= "Time";															//$NON-NLS-1$
-	private static final String								CSV_HEADER_TIME_INTERVAL				= "TimeInterval";													//$NON-NLS-1$
-	private static final String								CSV_HEADER_TIME_SLICES					= "TimeSlices";													//$NON-NLS-1$
-	private static final String								CSV_HEADER_TITLE						= "Title";															//$NON-NLS-1$
-	private static final String								CSV_HEADER_TOUR_TYPE_ID					= "TourTypeId";													//$NON-NLS-1$
-	private static final String								CSV_HEADER_TOUR_TYPE_NAME				= "TourTypeName";													//$NON-NLS-1$
-	private static final String								CSV_HEADER_WEEK							= "Week";															//$NON-NLS-1$
-	private static final String								CSV_HEADER_WEEKDAY						= "Weekday";														//$NON-NLS-1$
-	private static final String								CSV_HEADER_WEEK_YEAR					= "WeekYear";														//$NON-NLS-1$
-	private static final String								CSV_HEADER_YEAR							= "Year";															//$NON-NLS-1$
+	private static final String								CSV_HEADER_AVERAGE_CADENCE				= "AvgCadence";														//$NON-NLS-1$
+	private static final String								CSV_HEADER_AVERAGE_PACE					= "AvgPace (%s)";														//$NON-NLS-1$
+	private static final String								CSV_HEADER_AVERAGE_PULSE				= "AvgPulse (%s)";														//$NON-NLS-1$
+	private static final String								CSV_HEADER_AVERAGE_SPEED				= "AvgSpeed (%s)";														//$NON-NLS-1$
+	private static final String								CSV_HEADER_AVERAGE_TEMPERATURE			= "AvgTemperature (%s)";												//$NON-NLS-1$
+	private static final String								CSV_HEADER_ALTITUDE_DOWN				= "AltitudeDown (%s)";													//$NON-NLS-1$
+	private static final String								CSV_HEADER_ALTITUDE_UP					= "AltitudeUp (%s)";													//$NON-NLS-1$
+	private static final String								CSV_HEADER_CALORIES						= "Calories";															//$NON-NLS-1$
+	private static final String								CSV_HEADER_DAY							= "Day";																//$NON-NLS-1$
+	private static final String								CSV_HEADER_DEVICE_START_DISTANCE		= "DeviceStartDistance";												//$NON-NLS-1$
+	private static final String								CSV_HEADER_DISTANCE						= "Distance (%s)";														//$NON-NLS-1$
+	private static final String								CSV_HEADER_DP_TOLERANCE					= "DPTolerance";														//$NON-NLS-1$
+	private static final String								CSV_HEADER_GEAR_FRONT_SHIFT_COUNT		= "FrontShiftCount";													//$NON-NLS-1$
+	private static final String								CSV_HEADER_GEAR_REAR_SHIFT_COUNT		= "RearShiftCount";													//$NON-NLS-1$
+	private static final String								CSV_HEADER_ISO_DATE_TIME				= "ISO8601";															//$NON-NLS-1$
+	private static final String								CSV_HEADER_MOVING_TIME					= "MovingTime (%s)";													//$NON-NLS-1$
+	private static final String								CSV_HEADER_NUMBER_OF_MARKER				= "NumberOfMarkers";													//$NON-NLS-1$
+	private static final String								CSV_HEADER_NUMBER_OF_PHOTOS				= "NumberOfPhotos";													//$NON-NLS-1$
+	private static final String								CSV_HEADER_NUMBER_OF_TOURS				= "NumberOfTours";														//$NON-NLS-1$
+	private static final String								CSV_HEADER_WEATHER						= "Weather";															//$NON-NLS-1$
+	private static final String								CSV_HEADER_WIND_DIRECTION				= "WindDirection";														//$NON-NLS-1$
+	private static final String								CSV_HEADER_WIND_SPEED					= "WindSpeed";															//$NON-NLS-1$
+	private static final String								CSV_HEADER_MAX_ALTITUDE					= "MaxAltitude (%s)";													//$NON-NLS-1$
+	private static final String								CSV_HEADER_MAX_PULSE					= "MaxPulse";															//$NON-NLS-1$
+	private static final String								CSV_HEADER_MAX_SPEED					= "MaxSpeed (%s)";														//$NON-NLS-1$
+	private static final String								CSV_HEADER_MONTH						= "Month";																//$NON-NLS-1$
+	private static final String								CSV_HEADER_PAUSED_TIME					= "PausedTime (%s)";													//$NON-NLS-1$
+	private static final String								CSV_HEADER_PAUSED_TIME_RELATIVE			= "RelativePausedTime (%)";											//$NON-NLS-1$
+	private static final String								CSV_HEADER_PERSON						= "Person";															//$NON-NLS-1$
+	private static final String								CSV_HEADER_RECORDING_TIME				= "RecordingTime (%s)";												//$NON-NLS-1$
+	private static final String								CSV_HEADER_RESTPULSE					= "RestPulse";															//$NON-NLS-1$
+	private static final String								CSV_HEADER_TAGS							= "Tags";																//$NON-NLS-1$
+	private static final String								CSV_HEADER_TIME							= "Time";																//$NON-NLS-1$
+	private static final String								CSV_HEADER_TIME_INTERVAL				= "TimeInterval";														//$NON-NLS-1$
+	private static final String								CSV_HEADER_TIME_SLICES					= "TimeSlices";														//$NON-NLS-1$
+	private static final String								CSV_HEADER_TITLE						= "Title";																//$NON-NLS-1$
+	private static final String								CSV_HEADER_TOUR_TYPE_ID					= "TourTypeId";														//$NON-NLS-1$
+	private static final String								CSV_HEADER_TOUR_TYPE_NAME				= "TourTypeName";														//$NON-NLS-1$
+	private static final String								CSV_HEADER_WEEK							= "Week";																//$NON-NLS-1$
+	private static final String								CSV_HEADER_WEEKDAY						= "Weekday";															//$NON-NLS-1$
+	private static final String								CSV_HEADER_WEEK_YEAR					= "WeekYear";															//$NON-NLS-1$
+	private static final String								CSV_HEADER_YEAR							= "Year";																//$NON-NLS-1$
 
-	private static final String								CSV_EXPORT_DEFAULT_FILE_NAME			= "TourBook_";														//$NON-NLS-1$
-	private static final String								CSV_EXPORT_DURATION_HHH_MM_SS			= "hhh:mm:ss";														//$NON-NLS-1$
+	private static final String								CSV_EXPORT_DEFAULT_FILE_NAME			= "TourBook_";															//$NON-NLS-1$
+	private static final String								CSV_EXPORT_DURATION_HHH_MM_SS			= "hhh:mm:ss";															//$NON-NLS-1$
 
 	private static YearSubCategory							_yearSubCategory						= YearSubCategory.MONTH;
 
@@ -560,8 +560,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
 				final String property = event.getProperty();
 
-				if (property.equals(ICommonPreferences.TIME_ZONE_IS_USE_SYSTEM_TIME_ZONE)
-						|| property.equals(ICommonPreferences.TIME_ZONE_LOCAL_ID)) {
+				if (property.equals(ICommonPreferences.TIME_ZONE_LOCAL_ID)) {
 
 					_tourViewer = (TreeViewer) recreateViewer(_tourViewer);
 				}
@@ -1822,8 +1821,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				final long value = ((TVITourBookItem) element).colRecordingTime;
 //
 //				colDef.printLongValue(cell, value, element instanceof TVITourBookTour);
-				
-				
 
 				cell.setText(Long.toString(value));
 

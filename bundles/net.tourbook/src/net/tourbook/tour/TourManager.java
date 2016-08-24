@@ -1153,15 +1153,15 @@ public class TourManager {
 				+ getTourTimeShort(tourData);
 	}
 
-	public static String getTourTitle(final ZonedDateTime tourDate) {
+	public static String getTourTitle(final ZonedDateTime tourDateTime) {
 
-		final String weekDay = tourDate.format(UI.WeekDayFormatter);
+		final String weekDay = tourDateTime.format(UI.WeekDayFormatter);
 
 		return weekDay //
 				+ UI.COMMA_SPACE
-				+ getTourDateLong(tourDate)
+				+ getTourDateLong(tourDateTime)
 				+ UI.DASH_WITH_SPACE
-				+ getTourTimeShort(tourDate);
+				+ getTourTimeShort(tourDateTime);
 	}
 
 	/**

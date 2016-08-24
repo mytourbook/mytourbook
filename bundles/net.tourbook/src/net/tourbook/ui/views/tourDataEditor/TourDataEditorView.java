@@ -22,14 +22,16 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.text.NumberFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
@@ -281,7 +283,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private ITourEventListener					_tourEventListener;
 	private ITourSaveListener					_tourSaveListener;
 	//
-	private final Calendar						_calendar						= GregorianCalendar.getInstance();
 	private final NumberFormat					_nf1							= NumberFormat.getNumberInstance();
 	private final NumberFormat					_nf1NoGroup						= NumberFormat.getNumberInstance();
 	private final NumberFormat					_nf2							= NumberFormat.getNumberInstance();
@@ -1569,8 +1570,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 				final String property = event.getProperty();
 
-				if (property.equals(ICommonPreferences.TIME_ZONE_IS_USE_SYSTEM_TIME_ZONE)
-						|| property.equals(ICommonPreferences.TIME_ZONE_LOCAL_ID)) {
+				if (property.equals(ICommonPreferences.TIME_ZONE_LOCAL_ID)) {
 
 					// reload tour data
 
@@ -4871,11 +4871,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_latitudeEditingSupport.setDataSerie(_serieLatitude);
 		_longitudeEditingSupport.setDataSerie(_serieLongitude);
 
-		final org.joda.time.DateTime start = _tourData.getTourStartTime8();
-
-		_tourStartDayTime = (start.getHourOfDay() * 3600) //
-				+ (start.getMinuteOfHour() * 60)
-				+ start.getSecondOfMinute();
+		_tourStartDayTime = _tourData.getStartTimeOfDay();
 
 		if (_isManualTour == false) {
 
@@ -6789,6 +6785,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		// set start date/time
 		final ZonedDateTime start = _tourData.getTourStartTime8();
+
+		final Instant instant = Instant.ofEpochMilli(_tourData.getTourStartTimeMS());
+		LocalDateTime.ofInstant(instant, ZoneId.of("Z"));
+
+		final LocalDateTime ldt = LocalDateTime.ofEpochSecond(_tourData.getTourStartTimeMS() / 1000, 0, ZoneOffset.UTC);
+
 		_dtTourDate.setDate(start.getYear(), start.getMonthValue() - 1, start.getDayOfMonth());
 		_dtStartTime.setTime(start.getHour(), start.getMinute(), start.getSecond());
 
@@ -7101,15 +7103,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 */
 	private void updateUI_Title() {
 
-		_calendar.set(
+		final ZonedDateTime tourStartTime = ZonedDateTime.of(
 				_dtTourDate.getYear(),
-				_dtTourDate.getMonth(),
+				_dtTourDate.getMonth() + 1,
 				_dtTourDate.getDay(),
 				_dtStartTime.getHours(),
 				_dtStartTime.getMinutes(),
-				_dtStartTime.getSeconds());
+				_dtStartTime.getSeconds(),
+				0,
+				_tourData.getTimeZoneIdWithDefault());
 
-		updateUI_TitleAsynch(TourManager.getTourTitle(_calendar.getTime()));
+		final String tourTitle = TourManager.getTourTitle(tourStartTime);
+
+		updateUI_TitleAsynch(tourTitle);
 	}
 
 	/**

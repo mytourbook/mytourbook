@@ -653,18 +653,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 		_rdoTemperatureFahrenheit.setEnabled(false);
 	}
 
-	private String getSelectedTimeZoneId(final int selectedZone) {
-
-		if (selectedZone == 1) {
-			return _timeZoneId_1;
-		} else if (selectedZone == 2) {
-			return _timeZoneId_2;
-		} else {
-			return _timeZoneId_3;
-		}
-	}
-
-	private int getSelectedZone() {
+	private int getSelectedCustomZoneNumber() {
 
 		if (_rdoTimeZone_1.getSelection()) {
 			return 1;
@@ -672,6 +661,24 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 			return 2;
 		} else {
 			return 3;
+		}
+	}
+
+	private String getSelectedTimeZoneId(final boolean isUseSystemTimeZone, final int selectedZone) {
+
+		if (isUseSystemTimeZone) {
+
+			return ZoneId.systemDefault().getId();
+
+		} else {
+
+			if (selectedZone == 1) {
+				return _timeZoneId_1;
+			} else if (selectedZone == 2) {
+				return _timeZoneId_2;
+			} else {
+				return _timeZoneId_3;
+			}
 		}
 	}
 
@@ -802,7 +809,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 		} else if (selectedTab == TAB_FOLDER_TIME_ZONE) {
 
 			// time zone
-			final int activeZone = _prefStoreCommon.getDefaultInt(ICommonPreferences.TIME_ZONE_ACTIVE_ZONE);
+			final int activeZone = _prefStoreCommon.getDefaultInt(ICommonPreferences.TIME_ZONE_SELECTED_CUSTOM_ZONE);
 
 			_chkTimeZoneLiveUpdate.setSelection(//
 					_prefStoreCommon.getDefaultBoolean(ICommonPreferences.TIME_ZONE_IS_LIVE_UPDATE));
@@ -884,7 +891,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 		{
 			// time zone
 
-			final int activeZone = _prefStoreCommon.getInt(ICommonPreferences.TIME_ZONE_ACTIVE_ZONE);
+			final int activeZone = _prefStoreCommon.getInt(ICommonPreferences.TIME_ZONE_SELECTED_CUSTOM_ZONE);
 
 			_chkTimeZoneLiveUpdate.setSelection(_prefStoreCommon
 					.getBoolean(ICommonPreferences.TIME_ZONE_IS_LIVE_UPDATE));
@@ -947,19 +954,19 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 		{
 			// time zone
 
-			final int selectedZone = getSelectedZone();
-			final String selectedTimeZoneId = getSelectedTimeZoneId(selectedZone);
 			final boolean isUseSystemTimeZone = !_chkUseAnotherTimeZone.getSelection();
+			final int selectedZone = getSelectedCustomZoneNumber();
+			final String selectedTimeZoneId = getSelectedTimeZoneId(isUseSystemTimeZone, selectedZone);
 
-			// update static field BEFORE event is fired !!!
-			TimeTools.setTimeZone(isUseSystemTimeZone, selectedTimeZoneId);
+			// update static field BEFORE an event is fired !!!
+			TimeTools.setTimeZone(selectedTimeZoneId);
 
 			// time zone
 			_prefStoreCommon.setValue(
 					ICommonPreferences.TIME_ZONE_IS_LIVE_UPDATE,
 					_chkTimeZoneLiveUpdate.getSelection());
 			_prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_IS_USE_SYSTEM_TIME_ZONE, isUseSystemTimeZone);
-			_prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_ACTIVE_ZONE, selectedZone);
+			_prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_SELECTED_CUSTOM_ZONE, selectedZone);
 			_prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_LOCAL_ID, selectedTimeZoneId);
 			_prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_LOCAL_ID_1, _timeZoneId_1);
 			_prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_LOCAL_ID_2, _timeZoneId_2);

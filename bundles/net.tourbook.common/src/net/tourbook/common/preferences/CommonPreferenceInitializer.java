@@ -80,7 +80,7 @@ public class CommonPreferenceInitializer extends AbstractPreferenceInitializer {
 		final ZoneId defaultZoneId = ZoneId.systemDefault();
 		final String defaultId = defaultZoneId.getId();
 
-		store.setDefault(ICommonPreferences.TIME_ZONE_ACTIVE_ZONE, 1);
+		store.setDefault(ICommonPreferences.TIME_ZONE_SELECTED_CUSTOM_ZONE, 1);
 		store.setDefault(ICommonPreferences.TIME_ZONE_IS_LIVE_UPDATE, true);
 		store.setDefault(ICommonPreferences.TIME_ZONE_IS_USE_SYSTEM_TIME_ZONE, true);
 		store.setDefault(ICommonPreferences.TIME_ZONE_LOCAL_ID, defaultId);

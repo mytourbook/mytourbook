@@ -28,7 +28,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
@@ -6038,10 +6037,25 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	}
 
 	/**
-	 * @return Returns Time zone ID or <code>null</code> when the time zone ID is not available.
+	 * @return Returns Tour time zone ID or <code>null</code> when the time zone ID is not
+	 *         available.
 	 */
 	public String getTimeZoneId() {
 		return timeZoneId;
+	}
+
+	/**
+	 * @return Returns the tour time zone id, when the tour time zone is not set then the system
+	 *         time zone is returned.
+	 */
+	public ZoneId getTimeZoneIdWithDefault() {
+
+
+		final String zoneIdRaw = timeZoneId == null //
+				? TimeTools.getDefaultTimeZoneId()
+				: timeZoneId;
+
+		return ZoneId.of(zoneIdRaw);
 	}
 
 	public int getTourAltDown() {
@@ -6190,13 +6204,10 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 
 		if (_dateTimeStart8 == null) {
 
-			final String zoneIdRaw = timeZoneId == null //
-					? ZoneOffset.systemDefault().getId()
-					: timeZoneId;
+			final Instant tourStartMills = Instant.ofEpochMilli(tourStartTime);
+			final ZoneId timeZoneId = getTimeZoneIdWithDefault();
 
-			_dateTimeStart8 = ZonedDateTime.ofInstant(//
-					Instant.ofEpochMilli(tourStartTime),
-					ZoneId.of(zoneIdRaw));
+			_dateTimeStart8 = ZonedDateTime.ofInstant(tourStartMills, timeZoneId);
 		}
 
 		return _dateTimeStart8;
@@ -7363,7 +7374,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 				tourStartMinute,
 				tourStartSecond,
 				0,
-				ZoneId.systemDefault());
+				TimeTools.getDefaultTimeZone());
 
 		tourStartTime = _dateTimeStart.getMillis();
 

@@ -22,6 +22,7 @@ import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Year;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -95,11 +96,6 @@ public class TimeTools {
 
 	private static ArrayList<TimeZoneData>			_allSortedTimeZones;
 
-	/**
-	 * When <code>true</code> then the system time zone is used to display time values, otherwise
-	 * the defined time zone is used.
-	 */
-//	private static boolean							_isUseSystemTimeZone;
 	private static ZoneId							_selectedTimeZoneId;
 
 	/**
@@ -121,9 +117,6 @@ public class TimeTools {
 	private static LocalDate						_dateToGetNumOfWeeks		= LocalDate.of(2000, 5, 5);
 
 	static {
-
-//		_isUseSystemTimeZone = _prefStoreCommon.getBoolean(//
-//				ICommonPreferences.TIME_ZONE_IS_USE_SYSTEM_TIME_ZONE);
 
 		_selectedTimeZoneId = ZoneId.of(_prefStoreCommon.getString(ICommonPreferences.TIME_ZONE_LOCAL_ID));
 
@@ -216,10 +209,10 @@ public class TimeTools {
 
 				final String dst = ""// //$NON-NLS-1$
 						+ (isDstWinter //
-								? ("        DST " + printDSTDuration(dstDurationWinter.getSeconds() * 1000) + " - Winter") //$NON-NLS-1$ //$NON-NLS-2$
+								? ("        DST " + printDSTDuration(dstDurationWinter.getSeconds() * 1000) + " - S") //$NON-NLS-1$ //$NON-NLS-2$
 								: "") //$NON-NLS-1$
 						+ (isDstSummer //
-								? ("        DST " + printDSTDuration(dstDurationSummer.getSeconds() * 1000) + " - Summer") //$NON-NLS-1$ //$NON-NLS-2$
+								? ("        DST " + printDSTDuration(dstDurationSummer.getSeconds() * 1000) + " - N") //$NON-NLS-1$ //$NON-NLS-2$
 								: ""); //$NON-NLS-1$
 
 				final String label = "" //$NON-NLS-1$
@@ -261,6 +254,16 @@ public class TimeTools {
 		return _allSortedTimeZones;
 	}
 
+	public static ZoneId getDefaultTimeZone() {
+
+		return _selectedTimeZoneId;
+	}
+
+	public static String getDefaultTimeZoneId() {
+
+		return _selectedTimeZoneId.getId();
+	}
+
 	/**
 	 * @return Returns the time zone offset for the default time zone.
 	 */
@@ -272,8 +275,22 @@ public class TimeTools {
 		final Period period = new Period(tzOffset * 1000);
 
 		return period.toString(DURATION_FORMATTER);
+	}
 
-//		return printOffset(tzOffset, false);
+	/**
+	 * @param epochTime
+	 *            The number of milliseconds from 1970-01-01T00:00:00Z
+	 * @return Returns the epoch time as a {@link LocalDateTime}.
+	 */
+	public static LocalDateTime getLocalDateTime(final long epochTime) {
+
+		final long epochSeconds = epochTime / 1000;
+		int epochNanoSeconds = (int) (epochTime % 1000);
+		epochNanoSeconds *= 1000000;
+
+		final LocalDateTime ldt = LocalDateTime.ofEpochSecond(epochSeconds, epochNanoSeconds, ZoneOffset.UTC);
+
+		return ldt;
 	}
 
 	/**
@@ -540,9 +557,8 @@ public class TimeTools {
 		calendarWeek = WeekFields.of(dow, minimalDaysInFirstWeek);
 	}
 
-	public static void setTimeZone(final boolean isUseSystemTimeZone, final String selectedTimeZoneId) {
+	public static void setTimeZone(final String selectedTimeZoneId) {
 
-//		_isUseSystemTimeZone = isUseSystemTimeZone;
 		_selectedTimeZoneId = ZoneId.of(selectedTimeZoneId);
 	}
 
