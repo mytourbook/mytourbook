@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -70,7 +71,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.joda.time.DateTime;
 
 public class DialogPrintTour extends TitleAreaDialog {
 
@@ -789,7 +789,7 @@ public class DialogPrintTour extends TitleAreaDialog {
 				minTourData = tourData;
 			} else {
 
-				final long tourMillis = tourData.getTourStartTime8().toInstant().toEpochMilli();
+				final long tourMillis = tourData.getTourStartTime().toInstant().toEpochMilli();
 
 				if (tourMillis < minTourMillis) {
 					minTourData = tourData;
@@ -801,18 +801,18 @@ public class DialogPrintTour extends TitleAreaDialog {
 
 			// display the start date/time
 
-			final DateTime dtTour = minTourData.getTourStartTime();
+			final ZonedDateTime dtTour = minTourData.getTourStartTime();
 
 			final int startTime = minTourData.timeSerie[_tourStartIndex];
-			final DateTime tourTime = dtTour.plusSeconds(startTime);
+			final ZonedDateTime tourTime = dtTour.plusSeconds(startTime);
 
 			_comboFile.setText(UI.format_yyyymmdd_hhmmss(
 					tourTime.getYear(),
-					tourTime.getMonthOfYear(),
+					tourTime.getMonthValue(),
 					tourTime.getDayOfMonth(),
-					tourTime.getHourOfDay(),
-					tourTime.getMinuteOfHour(),
-					tourTime.getSecondOfMinute()));
+					tourTime.getHour(),
+					tourTime.getMinute(),
+					tourTime.getSecond()));
 		} else {
 
 			// display the tour date/time

@@ -16,13 +16,13 @@
 package net.tourbook.common.time;
 
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 
 public class AllTimeZones {
 
 	public static String[]	allTimeZones;
-
 
 	private static void createListWithAllTimeZones() {
 
@@ -74,6 +74,32 @@ public class AllTimeZones {
 	public static void main(final String[] args) {
 
 		createListWithAllTimeZones();
+		testInstant();
+	}
+
+	private static void sysOut(final ZonedDateTime now, final String tzId) {
+
+//		final ZonedDateTime zdt = now.withZoneSameInstant(ZoneId.of(tzId));
+//		final ZonedDateTime zdt = now.withZoneSameLocal(ZoneId.of(tzId));
+
+		final ZonedDateTime zdt = now.toInstant().atZone(ZoneId.of(tzId));
+
+		final long instant = zdt.toInstant().toEpochMilli();
+
+		System.out.println(String.format("%-50s %d", //
+				zdt,
+				instant));
+	}
+
+	private static void testInstant() {
+
+		final ZonedDateTime now = ZonedDateTime.now();
+
+		sysOut(now, "Europe/Busingen");
+		sysOut(now, "Europe/Dublin");
+		sysOut(now, "Europe/Riga");
+		sysOut(now, "America/Vancouver");
+
 	}
 
 }

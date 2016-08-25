@@ -15,16 +15,15 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
-import java.text.DateFormat;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.TreeSet;
 
 import net.sf.swtaddons.autocomplete.combo.AutocompleteComboInput;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
@@ -59,7 +58,6 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
-import org.joda.time.DateTime;
 
 public class DialogQuickEdit extends TitleAreaDialog {
 
@@ -67,10 +65,6 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
 	private final boolean				_isOSX							= net.tourbook.common.UI.IS_OSX;
 	private final boolean				_isLinux						= net.tourbook.common.UI.IS_LINUX;
-
-	private static final Calendar		_calendar						= GregorianCalendar.getInstance();
-	private static final DateFormat		_dateFormatter					= DateFormat.getDateInstance(DateFormat.FULL);
-	private static final DateFormat		_timeFormatter					= DateFormat.getTimeInstance(DateFormat.SHORT);
 
 	private final TourData				_tourData;
 
@@ -170,16 +164,11 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
 		setTitle(Messages.dialog_quick_edit_dialog_area_title);
 
-		final DateTime tourStart = _tourData.getTourStartTime();
+		final ZonedDateTime tourStart = _tourData.getTourStartTime();
 
-		_calendar.set(//
-				tourStart.getYear(),
-				tourStart.getMonthOfYear() - 1,
-				tourStart.getDayOfMonth(),
-				tourStart.getHourOfDay(),
-				tourStart.getMinuteOfHour());
-
-		setMessage(_dateFormatter.format(_calendar.getTime()) + "  " + _timeFormatter.format(_calendar.getTime())); //$NON-NLS-1$
+		setMessage(tourStart.format(TimeTools.Formatter_Full_Date)
+				+ UI.SPACE2
+				+ tourStart.format(TimeTools.Formatter_Short_Time));
 	}
 
 	@Override

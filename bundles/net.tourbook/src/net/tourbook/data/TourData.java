@@ -1112,17 +1112,10 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	private ZonedDateTime										_dateTimeModified;
 
 	/**
-	 * Tour start time
+	 * Tour start time with a time zone.
 	 */
 	@Transient
-	private DateTime											_dateTimeStart;
-
-	/**
-	 * Tour start time with Java 8, this will replace {@link #_dateTimeStart} when all is replaced
-	 * with this date time.
-	 */
-	@Transient
-	private ZonedDateTime										_dateTimeStart8;
+	private ZonedDateTime										_zonedStartTime;
 
 	/**
 	 * Tour markers which are sorted by serie index
@@ -4759,7 +4752,8 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		 * ???
 		 */
 //		tourMarker.setTime((int) (relativeTime + timeData.marker));
-		tourMarker.setTime(relativeTime, tourStartTime);
+
+		tourMarker.setTime(relativeTime, tourStartTime + (relativeTime * 1000));
 		tourMarker.setDistance(distanceAbsolute);
 		tourMarker.setSerieIndex(serieIndex);
 
@@ -5989,10 +5983,10 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 			return null;
 		}
 
-		final DateTime tourStartDefaultZone = getTourStartTime();
-		final int utcZoneOffset = tourStartDefaultZone.getZone().getOffset(tourStartDefaultZone.getMillis());
+		final ZonedDateTime tourStartDefaultZone = getTourStartTime();
+		final int utcZoneOffset = tourStartDefaultZone.getOffset().getTotalSeconds();
 
-		final long tourStartUTC = tourStartDefaultZone.getMillis() + utcZoneOffset;
+		final long tourStartUTC = tourStartDefaultZone.plusSeconds(utcZoneOffset).toInstant().toEpochMilli();
 		final long tourEnd = tourEndTime;
 
 		final DateTimeZone defaultZone = DateTimeZone.getDefault();
@@ -6045,17 +6039,19 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	}
 
 	/**
-	 * @return Returns the tour time zone id, when the tour time zone is not set then the system
-	 *         time zone is returned.
+	 * @return Returns the tour time zone id, when the tour time zone is not set in the tour, then
+	 *         the default time zone is returned which is defined in the preferences.
 	 */
 	public ZoneId getTimeZoneIdWithDefault() {
 
-
 		final String zoneIdRaw = timeZoneId == null //
+
 				? TimeTools.getDefaultTimeZoneId()
 				: timeZoneId;
 
-		return ZoneId.of(zoneIdRaw);
+		final ZoneId tzId = ZoneId.of(zoneIdRaw);
+
+		return tzId;
 	}
 
 	public int getTourAltDown() {
@@ -6186,36 +6182,46 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	}
 
 	/**
-	 * @return Returns date/time for the tour start
+	 * @return Returns the tour start date time with the default or the tour time zone.
 	 */
-	public DateTime getTourStartTime() {
+	public ZonedDateTime getTourStartTime() {
 
-		if (_dateTimeStart == null) {
-			_dateTimeStart = new DateTime(tourStartTime);
-		}
-
-		return _dateTimeStart;
-	}
-
-	/**
-	 * @return Returns date/time for the tour start (Java 8 - java.time)
-	 */
-	public ZonedDateTime getTourStartTime8() {
-
-		if (_dateTimeStart8 == null) {
+		if (_zonedStartTime == null) {
 
 			final Instant tourStartMills = Instant.ofEpochMilli(tourStartTime);
-			final ZoneId timeZoneId = getTimeZoneIdWithDefault();
+			final ZoneId tourStartTimeZoneId = getTimeZoneIdWithDefault();
 
-			_dateTimeStart8 = ZonedDateTime.ofInstant(tourStartMills, timeZoneId);
+			final ZonedDateTime zonedStartTime = ZonedDateTime.ofInstant(tourStartMills, tourStartTimeZoneId);
+
+			if (timeZoneId == null) {
+
+				/*
+				 * Tour has no time zone but this can be changed in the preferences, so this value
+				 * is not cached
+				 */
+
+				setCalendarWeek(zonedStartTime);
+
+				return zonedStartTime;
+
+			} else {
+
+				/*
+				 * Cache this values until the tour zone is modified
+				 */
+
+				_zonedStartTime = zonedStartTime;
+
+				setCalendarWeek(_zonedStartTime);
+			}
 		}
 
-		return _dateTimeStart8;
+		return _zonedStartTime;
 	}
 
 	/**
-	 * @return Returns the tour start time in milliseconds since 1970-01-01T00:00:00Z with the local
-	 *         time zone.
+	 * @return Returns the tour start time in milliseconds since 1970-01-01T00:00:00Z with the
+	 *         default time zone.
 	 */
 	public long getTourStartTimeMS() {
 		return tourStartTime;
@@ -7169,7 +7175,11 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	}
 
 	public void setTimeZoneId(final String timeZoneId) {
+
 		this.timeZoneId = timeZoneId;
+
+		// reset cached date time with time zone to recognize the new time zone
+		_zonedStartTime = null;
 	}
 
 	public void setTourAltDown(final float tourAltDown) {
@@ -7319,26 +7329,6 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		this.tourStartPlace = tourStartPlace;
 	}
 
-	public void setTourStartTime(final DateTime start) {
-
-		_dateTimeStart = start;
-
-		_dateTimeStart8 = ZonedDateTime.ofInstant(
-				Instant.ofEpochMilli(start.getMillis()),
-				ZoneId.of(start.getZone().getID()));
-
-		tourStartTime = _dateTimeStart.getMillis();
-
-		startYear = (short) start.getYear();
-		startMonth = (short) start.getMonthOfYear();
-		startDay = (short) start.getDayOfMonth();
-		startHour = (short) start.getHourOfDay();
-		startMinute = (short) start.getMinuteOfHour();
-		startSecond = start.getSecondOfMinute();
-
-		setCalendarWeek(_dateTimeStart8);
-	}
-
 	/**
 	 * Set tour start date/time and week.
 	 * 
@@ -7357,16 +7347,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 									final int tourStartMinute,
 									final int tourStartSecond) {
 
-		_dateTimeStart = new DateTime(
-				tourStartYear,
-				tourStartMonth,
-				tourStartDay,
-				tourStartHour,
-				tourStartMinute,
-				tourStartSecond,
-				0);
-
-		_dateTimeStart8 = ZonedDateTime.of(
+		final ZonedDateTime zonedStartTime = ZonedDateTime.of(
 				tourStartYear,
 				tourStartMonth,
 				tourStartDay,
@@ -7376,7 +7357,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 				0,
 				TimeTools.getDefaultTimeZone());
 
-		tourStartTime = _dateTimeStart.getMillis();
+		tourStartTime = zonedStartTime.toInstant().toEpochMilli();
 
 		if (tourStartMonth < 1 || tourStartMonth > 12) {
 			StatusUtil.log(new Exception("Month is invalid: " + tourStartMonth)); //$NON-NLS-1$
@@ -7392,7 +7373,29 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		startMinute = (short) tourStartMinute;
 		startSecond = tourStartSecond;
 
-		setCalendarWeek(_dateTimeStart8);
+		setCalendarWeek(zonedStartTime);
+
+		// cache zoned date time
+		_zonedStartTime = zonedStartTime;
+	}
+
+	public void setTourStartTime(final ZonedDateTime zonedStartTime) {
+
+		// set the start of the tour
+
+		tourStartTime = zonedStartTime.toInstant().toEpochMilli();
+
+		startYear = (short) zonedStartTime.getYear();
+		startMonth = (short) zonedStartTime.getMonthValue();
+		startDay = (short) zonedStartTime.getDayOfMonth();
+		startHour = (short) zonedStartTime.getHour();
+		startMinute = (short) zonedStartTime.getMinute();
+		startSecond = zonedStartTime.getSecond();
+
+		setCalendarWeek(zonedStartTime);
+
+		// cache zoned date time
+		_zonedStartTime = zonedStartTime;
 	}
 
 	public void setTourTags(final Set<TourTag> tourTags) {

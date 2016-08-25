@@ -16,6 +16,8 @@
 package net.tourbook.preferences;
 
 import java.text.NumberFormat;
+import java.time.Period;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -26,6 +28,7 @@ import java.util.Set;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.HrZoneContext;
 import net.tourbook.data.TourData;
@@ -104,16 +107,15 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
-import org.joda.time.Period;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferencePage {
 
-	public static final String			ID							= "net.tourbook.preferences.PrefPagePeopleId";	//$NON-NLS-1$
+	public static final String			ID							= "net.tourbook.preferences.PrefPagePeopleId";			//$NON-NLS-1$
 
-	private static final String			STATE_SELECTED_PERSON		= "selectedPersonId";							//$NON-NLS-1$
-	private static final String			STATE_SELECTED_TAB_FOLDER	= "selectedTabFolder";							//$NON-NLS-1$
+	private static final String			STATE_SELECTED_PERSON		= "selectedPersonId";									//$NON-NLS-1$
+	private static final String			STATE_SELECTED_TAB_FOLDER	= "selectedTabFolder";									//$NON-NLS-1$
 
 	public static final int				HEART_BEAT_MIN				= 10;
 	public static final int				HEART_BEAT_MAX				= 300;
@@ -122,7 +124,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	 * Id to indicate that the hr zones should be displayed for the active person when the pref
 	 * dialog is opened
 	 */
-	public static final String			PREF_DATA_SELECT_HR_ZONES	= "SelectHrZones";								//$NON-NLS-1$
+	public static final String			PREF_DATA_SELECT_HR_ZONES	= "SelectHrZones";										//$NON-NLS-1$
 
 	private final IPreferenceStore		_prefStore					= TourbookPlugin.getDefault()//
 																			.getPreferenceStore();
@@ -168,8 +170,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	private TourPerson					_newPerson;
 	private Set<TourPersonHRZone>		_backupSelectedPersonHrZones;
 
-	private org.joda.time.DateTime		_today						= new org.joda.time.DateTime()//
-																			.withTime(0, 0, 0, 0);
+	private ZonedDateTime				_today						= TimeTools.now();
 
 	private Font						_fontItalic;
 	private Color[]						_hrZoneColors;
@@ -468,7 +469,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 		newPerson.setHeight(1.77f);
 		newPerson.setWeight(77.7f);
-		newPerson.setBirthDay(TourPerson.DEFAULT_BIRTHDAY.getMillis());
+		newPerson.setBirthDay(TourPerson.DEFAULT_BIRTHDAY.toInstant().toEpochMilli());
 
 		newPerson.setGender(0);
 		newPerson.setRestPulse(TourPerson.DEFAULT_REST_PULSE);
@@ -1175,9 +1176,9 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		}
 	}
 
-	private void createUI_80_HrZone_InnerContainer(final int hrMaxFormulaKey,
-												final int hrMaxPulse,
-												final org.joda.time.DateTime birthDay) {
+	private void createUI_80_HrZone_InnerContainer(	final int hrMaxFormulaKey,
+													final int hrMaxPulse,
+													final ZonedDateTime birthDay) {
 
 		// get current scroll position
 		final Point scrollBackup = _hrZoneScrolledContainer.getOrigin();
@@ -1267,10 +1268,10 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 //		label.addMouseListener(_hrZoneMouseListener);
 	}
 
-	private void createUI_84_HrZone_Fields(final Composite parent,
-										final int hrMaxFormulaKey,
-										final int hrMaxPulse,
-										final org.joda.time.DateTime birthDay) {
+	private void createUI_84_HrZone_Fields(	final Composite parent,
+											final int hrMaxFormulaKey,
+											final int hrMaxPulse,
+											final ZonedDateTime birthDay) {
 
 		final TourPerson currentPerson = getCurrentPerson();
 		if (currentPerson == null) {
@@ -1654,16 +1655,17 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		}
 	}
 
-	private org.joda.time.DateTime getBirthdayFromUI() {
+	private ZonedDateTime getBirthdayFromUI() {
 
-		return new org.joda.time.DateTime(
+		return ZonedDateTime.of(
 				_dtBirthday.getYear(),
 				_dtBirthday.getMonth() + 1,
 				_dtBirthday.getDay(),
 				0,
 				0,
 				0,
-				0);
+				0,
+				TimeTools.getDefaultTimeZone());
 	}
 
 	/**
@@ -2136,7 +2138,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 		person.setFirstName(_txtFirstName.getText());
 		person.setLastName(_txtLastName.getText());
 
-		person.setBirthDay(getBirthdayFromUI().getMillis());
+		person.setBirthDay(getBirthdayFromUI().toInstant().toEpochMilli());
 		person.setWeight(_spinnerWeight.getSelection() / 10.0f);
 		person.setHeight(_spinnerHeight.getSelection() / 100.0f);
 
@@ -2181,7 +2183,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	 */
 	private int updateUIAge() {
 
-		final Period age = new Period(getBirthdayFromUI().getMillis(), _today.getMillis());
+		final Period age = Period.between(getBirthdayFromUI().toLocalDate(), _today.toLocalDate());
 
 		final int ageYears = age.getYears();
 		final String ageText = UI.SPACE + Integer.toString(ageYears) + UI.SPACE2 + Messages.Pref_People_Label_Years;
@@ -2208,13 +2210,13 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
 		_isUpdateUI = true;
 		{
-			final org.joda.time.DateTime dtBirthday = new org.joda.time.DateTime(person.getBirthDayWithDefault());
+			final ZonedDateTime dtBirthday = person.getBirthDayWithDefault();
 			final int gender = person.getGender();
 			final int restPulse = person.getRestPulse();
 
 			_txtFirstName.setText(person.getFirstName());
 			_txtLastName.setText(person.getLastName());
-			_dtBirthday.setDate(dtBirthday.getYear(), dtBirthday.getMonthOfYear() - 1, dtBirthday.getDayOfMonth());
+			_dtBirthday.setDate(dtBirthday.getYear(), dtBirthday.getMonthValue() - 1, dtBirthday.getDayOfMonth());
 			_spinnerWeight.setSelection((int) (person.getWeight() * 10));
 			_spinnerHeight.setSelection((int) (person.getHeight() * 100));
 			_rawDataPathEditor.setStringValue(person.getRawDataPath());

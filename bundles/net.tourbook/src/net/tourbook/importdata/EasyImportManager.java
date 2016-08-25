@@ -1263,7 +1263,7 @@ public class EasyImportManager {
 				TourLogState.DEFAULT,
 				String.format(//
 						LOG_EASY_IMPORT_003_TOUR_TYPE_ITEM,
-						tourData.getTourStartTime8().format(UI.DateTimeFormatter_Short),
+						tourData.getTourStartTime().format(UI.DateTimeFormatter_Short),
 						tourTypeName));
 	}
 }

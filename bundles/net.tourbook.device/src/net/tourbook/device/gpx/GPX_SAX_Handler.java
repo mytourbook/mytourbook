@@ -17,6 +17,8 @@ package net.tourbook.device.gpx;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -27,6 +29,7 @@ import java.util.Set;
 import java.util.TimeZone;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TimeData;
@@ -48,7 +51,6 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
@@ -549,12 +551,17 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 		} else if (name.equals(TAG_MT_TOUR_START_TIME)) {
 
-			_tourData.setTourStartTime(new DateTime(getLongValue(charData)));
+			final long tourStartMills = getLongValue(charData);
+
+			final ZonedDateTime tourStartTime = ZonedDateTime.ofInstant(
+					Instant.ofEpochMilli(tourStartMills),
+					TimeTools.getDefaultTimeZone());
+
+			_tourData.setTourStartTime(tourStartTime);
 			_isInMT_Tour = false;
 
 		} else if (name.equals(TAG_MT_TOUR_END_TIME)) {
 
-//					_tourData;
 			_isInMT_Tour = false;
 
 		} else if (name.equals(TAG_MT_TOUR_DRIVING_TIME)) {
@@ -990,14 +997,20 @@ public class GPX_SAX_Handler extends DefaultHandler {
 			// set tour start date/time
 
 			final TimeData firstTimeData = _timeDataList.get(0);
-			DateTime dtTourStart;
+			final Instant tourStartInstant = Instant.ofEpochMilli(firstTimeData.absoluteTime);
+
+			ZonedDateTime dtTourStart;
 
 			if (_gpxHasLocalTime) {
+
 				// Polar WebSync creates GPX files with local time :-(
 				// workaround: create DateTime object with UTC TimeZone => time is NOT converted to localtime
-				dtTourStart = new DateTime(firstTimeData.absoluteTime, DateTimeZone.UTC);
+
+				dtTourStart = ZonedDateTime.ofInstant(tourStartInstant, TimeTools.UTC);
+
 			} else {
-				dtTourStart = new DateTime(firstTimeData.absoluteTime);
+
+				dtTourStart = ZonedDateTime.ofInstant(tourStartInstant, TimeTools.getDefaultTimeZone());
 			}
 
 			_tourData.setTourStartTime(dtTourStart);

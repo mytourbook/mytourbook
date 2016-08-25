@@ -1,5 +1,7 @@
 package net.tourbook.device.garmin.fit;
 
+import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -8,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.GearData;
 import net.tourbook.data.TimeData;
@@ -124,7 +127,11 @@ public class FitContext {
 							(recordStartTime - sessionStartTime) / 1000));
 				}
 
-				tourData.setTourStartTime(new DateTime(recordStartTime));
+				final ZonedDateTime zonedStartTime = ZonedDateTime.ofInstant(
+						Instant.ofEpochMilli(recordStartTime),
+						TimeTools.getDefaultTimeZone());
+
+				tourData.setTourStartTime(zonedStartTime);
 
 				tourData.createTimeSeries(timeDataList, false);
 

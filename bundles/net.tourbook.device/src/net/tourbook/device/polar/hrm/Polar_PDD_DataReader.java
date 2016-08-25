@@ -293,8 +293,8 @@ public class Polar_PDD_DataReader extends TourbookDevice {
 		/*
 		 * set gpx tour start to the same time as the hrm tour start
 		 */
-		final ZonedDateTime hrmTourStart = hrmTourData.getTourStartTime8();
-		final ZonedDateTime gpxTourStart = gpxTourData.getTourStartTime8();
+		final ZonedDateTime hrmTourStart = hrmTourData.getTourStartTime();
+		final ZonedDateTime gpxTourStart = gpxTourData.getTourStartTime();
 
 		final long absoluteHrmTourStart = hrmTourStart.toInstant().getEpochSecond();
 		long absoluteGpxTourStart = gpxTourStart.toInstant().getEpochSecond();

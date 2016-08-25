@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -23,6 +24,7 @@ import java.util.Set;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -69,7 +71,6 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.joda.time.DateTime;
 
 /**
  * Split tour at a time slice position and save extracted time slices as a new tour
@@ -180,7 +181,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 	 */
 	private boolean								_canRemoveTimeSlices;
 
-	private DateTime							_extractedTourStartTime;
+	private ZonedDateTime						_extractedTourStartTime;
 
 	private ActionOpenPrefDialog				_actionOpenTourTypePrefs;
 
@@ -819,19 +820,20 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 		/*
 		 * get start date/time
 		 */
-		DateTime extractedTourStart = null;
+		ZonedDateTime extractedTourStart = null;
 		final boolean isOriginalTime = _chkKeepOriginalDateTime.getSelection();
 		if (isOriginalTime) {
 			extractedTourStart = _extractedTourStartTime;
 		} else {
-			extractedTourStart = new DateTime(
+			extractedTourStart = ZonedDateTime.of(
 					_dtTourDate.getYear(),
 					_dtTourDate.getMonth() + 1,
 					_dtTourDate.getDay(),
 					_dtTourTime.getHours(),
 					_dtTourTime.getMinutes(),
 					_dtTourTime.getSeconds(),
-					0);
+					0,
+					TimeTools.getDefaultTimeZone());
 		}
 
 		int relTourStartTime = 0;
@@ -1276,7 +1278,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 		 * update UI from selected tours
 		 */
 
-		final DateTime tourStartTime = _tourDataSource.getTourStartTime();
+		final ZonedDateTime tourStartTime = _tourDataSource.getTourStartTime();
 
 		int relativeExtractedStartTime = 0;
 
@@ -1290,13 +1292,13 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 		// date/time
 		_dtTourDate.setDate(
 				_extractedTourStartTime.getYear(),
-				_extractedTourStartTime.getMonthOfYear() - 1,
+				_extractedTourStartTime.getMonthValue() - 1,
 				_extractedTourStartTime.getDayOfMonth());
 
 		_dtTourTime.setTime(
-				_extractedTourStartTime.getHourOfDay(),
-				_extractedTourStartTime.getMinuteOfHour(),
-				_extractedTourStartTime.getSecondOfMinute());
+				_extractedTourStartTime.getHour(),
+				_extractedTourStartTime.getMinute(),
+				_extractedTourStartTime.getSecond());
 
 		/*
 		 * fill person combo and reselect previous person

@@ -1059,7 +1059,7 @@ public class TourInfoUI {
 		final long movingTime = _tourData.getTourDrivingTime();
 		final long breakTime = recordingTime - movingTime;
 
-		final ZonedDateTime zdtTourStart = _tourData.getTourStartTime8();
+		final ZonedDateTime zdtTourStart = _tourData.getTourStartTime();
 		final ZonedDateTime zdtTourEnd = zdtTourStart.plusSeconds(recordingTime);
 
 		if (isSimpleTour()) {
@@ -1068,9 +1068,9 @@ public class TourInfoUI {
 
 			_lblDate.setText(String.format(//
 					Messages.Tour_Tooltip_Format_DateWeekTime,
-					zdtTourStart.format(TimeTools.dateFormatter_Full),
-					zdtTourStart.format(TimeTools.timeFormatter_Medium),
-					zdtTourEnd.format(TimeTools.timeFormatter_Medium),
+					zdtTourStart.format(TimeTools.Formatter_Full_Date),
+					zdtTourStart.format(TimeTools.Formatter_Medium_Time),
+					zdtTourEnd.format(TimeTools.Formatter_Medium_Time),
 					zdtTourStart.get(TimeTools.calendarWeek.weekOfWeekBasedYear())
 
 			));
@@ -1228,7 +1228,7 @@ public class TourInfoUI {
 
 			_lblDateTimeCreatedValue.setText(_uiDtCreated == null ? //
 					UI.EMPTY_STRING
-					: _uiDtCreated.format(TimeTools.dateTimeFormatter_Medium));
+					: _uiDtCreated.format(TimeTools.Formatter_Medium_DateTime));
 		}
 
 		// date/time modified
@@ -1236,7 +1236,7 @@ public class TourInfoUI {
 
 			_lblDateTimeModifiedValue.setText(_uiDtModified == null ? //
 					UI.EMPTY_STRING
-					: _uiDtModified.format(TimeTools.dateTimeFormatter_Medium));
+					: _uiDtModified.format(TimeTools.Formatter_Medium_DateTime));
 		}
 	}
 }

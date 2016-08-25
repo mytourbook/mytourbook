@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,6 +17,9 @@ package net.tourbook.data;
 
 import static javax.persistence.CascadeType.ALL;
 
+import java.time.Instant;
+import java.time.Period;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -35,75 +38,79 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.training.TrainingManager;
 import net.tourbook.ui.UI;
 
 import org.hibernate.annotations.Cascade;
-import org.joda.time.DateTime;
-import org.joda.time.Period;
 
 @Entity
 public class TourPerson implements Comparable<Object> {
 
-	public static final org.joda.time.DateTime	DEFAULT_BIRTHDAY			= new org.joda.time.DateTime(1977, 7, 7, //
-																					0,
-																					0,
-																					0,
-																					0);
-	public static final int						DB_LENGTH_LAST_NAME			= 80;
-	public static final int						DB_LENGTH_FIRST_NAME		= 80;
-	public static final int						DB_LENGTH_RAW_DATA_PATH		= 255;
-	public static final int						DB_LENGTH_DEVICE_READER_ID	= 255;
+	public static final ZonedDateTime		DEFAULT_BIRTHDAY			= ZonedDateTime.of(
+																				1977,
+																				7,
+																				7,
+																				0,
+																				0,
+																				0,
+																				0,
+																				TimeTools.getDefaultTimeZone());
+	public static final int					DB_LENGTH_LAST_NAME			= 80;
+	public static final int					DB_LENGTH_FIRST_NAME		= 80;
+	public static final int					DB_LENGTH_RAW_DATA_PATH		= 255;
+	public static final int					DB_LENGTH_DEVICE_READER_ID	= 255;
 
-	public static final int						PERSON_ID_NOT_DEFINED		= -1;
+	public static final int					PERSON_ID_NOT_DEFINED		= -1;
 
 	/**
 	 * Default rest pulse
 	 */
-	public static final int						DEFAULT_REST_PULSE			= 60;
+	public static final int					DEFAULT_REST_PULSE			= 60;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long								personId					= PERSON_ID_NOT_DEFINED;
+	private long							personId					= PERSON_ID_NOT_DEFINED;
 
 	@Basic(optional = false)
-	private String								firstName;
+	private String							firstName;
 
-	private String								lastName;
+	private String							lastName;
 
-	private float								weight;
+	private float							weight;
 
-	private float								height;
+	private float							height;
 
 	/**
-	 * Birthday of this person, default value is 0 when birthday is not set.
+	 * Birthday of this person in milliseconds from 1970-01-01T00:00:00, default value is 0 when
+	 * birthday is not set.
 	 * <p>
 	 * since: db version 15
 	 */
-	private long								birthDay;
+	private long							birthDay;
 
 	/**
 	 * Gender: Male = 0, Female = 1
 	 * <p>
 	 * since: db version 16
 	 */
-	private int									gender;
+	private int								gender;
 
 	/**
 	 * Resting heart rate
 	 * <p>
 	 * since: db version 16
 	 */
-	private int									restPulse;
+	private int								restPulse;
 
 	/**
 	 * Max heart rate, when {@link #hrMaxFormula} is not computed
 	 * <p>
 	 * since: db version 16
 	 */
-	private int									maxPulse;
+	private int								maxPulse;
 
 	/**
 	 * Formula how max heart rate is computed. The formulas are defined in
@@ -113,58 +120,58 @@ public class TourPerson implements Comparable<Object> {
 	 * <p>
 	 * since: db version 16
 	 */
-	private int									hrMaxFormula;
+	private int								hrMaxFormula;
 
 	/**
 	 * Device used by this person, reference to the device plugin
 	 */
-	private String								deviceReaderId;
+	private String							deviceReaderId;
 
 	/**
 	 * path where the raw tour data will be saved after import
 	 */
-	private String								rawDataPath;
+	private String							rawDataPath;
 
 	/**
 	 * default bike being used by this person
 	 */
 	@ManyToOne
-	private TourBike							tourBike;
+	private TourBike						tourBike;
 
 	/**
 	 * Tour hr zones
 	 */
 	@OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourPerson")
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-	private Set<TourPersonHRZone>				hrZones						= new HashSet<TourPersonHRZone>();
+	private Set<TourPersonHRZone>			hrZones						= new HashSet<TourPersonHRZone>();
 
 	/**
 	 * manually created person creates a unique id to identify it, saved person is compared with the
 	 * person id
 	 */
-	private static int							_createCounter				= 0;
+	private static int						_createCounter				= 0;
 
 	/**
 	 * unique id for manually created person because the {@link #personId} is
 	 * {@value #PERSON_ID_NOT_DEFINED} when it's not persisted
 	 */
 	@Transient
-	private long								_createId					= 0;
+	private long							_createId					= 0;
 
 	@Transient
-	private DateTime							_birthDay;
+	private ZonedDateTime					_zonedBirthDay;
 
 	/**
 	 * Cached HR zones, key is the age of the person
 	 */
 	@Transient
-	private HashMap<Integer, HrZoneContext>		_hrZoneMinMaxBpm			= new HashMap<Integer, HrZoneContext>();
+	private HashMap<Integer, HrZoneContext>	_hrZoneMinMaxBpm			= new HashMap<Integer, HrZoneContext>();
 
 	/**
 	 * Sorted HR zones
 	 */
 	@Transient
-	private ArrayList<TourPersonHRZone>			_sortedHrZones;
+	private ArrayList<TourPersonHRZone>		_sortedHrZones;
 
 	/**
 	 * default constructor used in ejb
@@ -296,27 +303,38 @@ public class TourPerson implements Comparable<Object> {
 	 * @param dateTime
 	 * @return Returns age for this person at a specific day
 	 */
-	private int getAge(final DateTime birthDay, final DateTime dateTime) {
+	private int getAge(final ZonedDateTime zonedBirthDay, final ZonedDateTime dateTime) {
 
-		final Period age = new Period(birthDay.getMillis(), dateTime.getMillis());
+		final Period age = Period.between(zonedBirthDay.toLocalDate(), dateTime.toLocalDate());
 
 		return age.getYears();
 	}
 
 	/**
-	 * @return Returns birthday of this person, is 0 when birthday is not set.
+	 * @return Returns birthday of this person in milliseconds from 1970-01-01T00:00:00, is 0 when
+	 *         birthday is not set.
 	 */
 	public long getBirthDay() {
 		return birthDay;
 	}
 
-	public DateTime getBirthDayWithDefault() {
+	public ZonedDateTime getBirthDayWithDefault() {
 
-		if (_birthDay == null) {
-			_birthDay = birthDay == 0 ? DEFAULT_BIRTHDAY : new DateTime(birthDay);
+		if (_zonedBirthDay == null) {
+
+			if (birthDay == 0) {
+
+				_zonedBirthDay = DEFAULT_BIRTHDAY;
+
+			} else {
+
+				_zonedBirthDay = ZonedDateTime.ofInstant(//
+						Instant.ofEpochMilli(birthDay),
+						TimeTools.getDefaultTimeZone());
+			}
 		}
 
-		return _birthDay;
+		return _zonedBirthDay;
 	}
 
 	public String getDeviceReaderId() {
@@ -335,16 +353,6 @@ public class TourPerson implements Comparable<Object> {
 		return height;
 	}
 
-//	/**
-//	 * @param dateTime
-//	 *            Date when HR max should be computed.
-//	 * @return Returns HR max depending on the HR max formula and the age of the person at a
-//	 *         specific date.
-//	 */
-//	private int getHrMax(final int age) {
-//		return getHrMax(hrMaxFormula, maxPulse, age);
-//	}
-
 	public int getHrMaxFormula() {
 		return hrMaxFormula;
 	}
@@ -359,8 +367,8 @@ public class TourPerson implements Comparable<Object> {
 	 */
 	public HrZoneContext getHrZoneContext(	final int hrMaxFormulaKey,
 											final int hrMaxPulse,
-											final DateTime birthDay,
-											final DateTime dateTime) {
+											final ZonedDateTime birthDay,
+											final ZonedDateTime dateTime) {
 
 		if (hrZones == null || hrZones.size() == 0) {
 			return null;

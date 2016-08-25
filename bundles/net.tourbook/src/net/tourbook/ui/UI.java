@@ -21,6 +21,7 @@ import java.net.URL;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.HashMap;
@@ -78,7 +79,6 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.joda.time.DateTime;
 
 public class UI {
 
@@ -617,16 +617,16 @@ public class UI {
 
 		_formatterSB.setLength(0);
 
-		final DateTime dt = tourData.getTourStartTime();
+		final ZonedDateTime dt = tourData.getTourStartTime();
 
 		return _formatter.format(//
 				Messages.Format_yyyymmdd_hhmmss,
 				dt.getYear(),
-				dt.getMonthOfYear(),
+				dt.getMonthValue(),
 				dt.getDayOfMonth(),
-				dt.getHourOfDay(),
-				dt.getMinuteOfHour(),
-				dt.getSecondOfMinute())//
+				dt.getHour(),
+				dt.getMinute(),
+				dt.getSecond())//
 				.toString();
 	}
 

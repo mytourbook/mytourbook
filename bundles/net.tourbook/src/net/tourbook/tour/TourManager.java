@@ -1127,7 +1127,7 @@ public class TourManager {
 
 	public static String getTourDateTimeShort(final TourData tourData) {
 
-		return tourData.getTourStartTime8().format(UI.DateTimeFormatter_Short);
+		return tourData.getTourStartTime().format(UI.DateTimeFormatter_Short);
 	}
 
 	/**
@@ -1135,7 +1135,7 @@ public class TourManager {
 	 */
 	public static String getTourTimeShort(final TourData tourData) {
 
-		return tourData.getTourStartTime8().format(UI.TimeFormatter_Short);
+		return tourData.getTourStartTime().format(UI.TimeFormatter_Short);
 	}
 
 	private static String getTourTimeShort(final ZonedDateTime tourDate) {
@@ -1148,7 +1148,7 @@ public class TourManager {
 	 */
 	public static String getTourTitle(final TourData tourData) {
 
-		return getTourDateLong(tourData.getTourStartTime8())//
+		return getTourDateLong(tourData.getTourStartTime())//
 				+ UI.DASH_WITH_SPACE
 				+ getTourTimeShort(tourData);
 	}

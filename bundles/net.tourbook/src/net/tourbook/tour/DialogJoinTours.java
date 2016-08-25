@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -23,6 +24,7 @@ import java.util.Set;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -69,38 +71,35 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
-	private static final String					STATE_TOUR_TITLE						= "Title";							//$NON-NLS-1$
-	private static final String					STATE_TOUR_TYPE_ID						= "TourTypeId";					//$NON-NLS-1$
-	private static final String					STATE_PERSON_ID							= "PersonId";						//$NON-NLS-1$
+	private static final String					STATE_TOUR_TITLE						= "Title";								//$NON-NLS-1$
+	private static final String					STATE_TOUR_TYPE_ID						= "TourTypeId";						//$NON-NLS-1$
+	private static final String					STATE_PERSON_ID							= "PersonId";							//$NON-NLS-1$
 
-	private static final String					STATE_IS_KEEP_ORIGINAL_TIME				= "isKeepOriginalTime";			//$NON-NLS-1$
-	private static final String					STATE_IS_INCLUDE_DESCRIPTION			= "isIncludeDescription";			//$NON-NLS-1$
-	private static final String					STATE_IS_INCLUDE_MARKER_WAYPOINTS		= "isIncludeMarkerWaypoints";		//$NON-NLS-1$
-	private static final String					STATE_IS_CREATE_TOUR_MARKER				= "isCreateTourMarker";			//$NON-NLS-1$
+	private static final String					STATE_IS_KEEP_ORIGINAL_TIME				= "isKeepOriginalTime";				//$NON-NLS-1$
+	private static final String					STATE_IS_INCLUDE_DESCRIPTION			= "isIncludeDescription";				//$NON-NLS-1$
+	private static final String					STATE_IS_INCLUDE_MARKER_WAYPOINTS		= "isIncludeMarkerWaypoints";			//$NON-NLS-1$
+	private static final String					STATE_IS_CREATE_TOUR_MARKER				= "isCreateTourMarker";				//$NON-NLS-1$
 
-	private static final String					STATE_JOIN_METHOD						= "JoinMethod";					//$NON-NLS-1$
-	private static final String					STATE_JOIN_METHOD_ORIGINAL				= "original";						//$NON-NLS-1$
-	private static final String					STATE_JOIN_METHOD_CONCATENATED			= "concatenated";					//$NON-NLS-1$
+	private static final String					STATE_JOIN_METHOD						= "JoinMethod";						//$NON-NLS-1$
+	private static final String					STATE_JOIN_METHOD_ORIGINAL				= "original";							//$NON-NLS-1$
+	private static final String					STATE_JOIN_METHOD_CONCATENATED			= "concatenated";						//$NON-NLS-1$
 
-	private static final String					STATE_TOUR_TITLE_SOURCE					= "TourTitleSource";				//$NON-NLS-1$
-	private static final String					STATE_TOUR_TITLE_SOURCE_FROM_TOUR		= "fromTour";						//$NON-NLS-1$
-	private static final String					STATE_TOUR_TITLE_SOURCE_CUSTOM			= "custom";						//$NON-NLS-1$
+	private static final String					STATE_TOUR_TITLE_SOURCE					= "TourTitleSource";					//$NON-NLS-1$
+	private static final String					STATE_TOUR_TITLE_SOURCE_FROM_TOUR		= "fromTour";							//$NON-NLS-1$
+	private static final String					STATE_TOUR_TITLE_SOURCE_CUSTOM			= "custom";							//$NON-NLS-1$
 
-	private static final String					STATE_TYPE_SOURCE						= "TourTypeSource";				//$NON-NLS-1$
-	private static final String					STATE_TYPE_SOURCE_FROM_SELECTED_TOURS	= "fromTour";						//$NON-NLS-1$
-	private static final String					STATE_TYPE_SOURCE_PREVIOUS_JOINED_TOUR	= "previous";						//$NON-NLS-1$
-	private static final String					STATE_TYPE_SOURCE_CUSTOM				= "custom";						//$NON-NLS-1$
+	private static final String					STATE_TYPE_SOURCE						= "TourTypeSource";					//$NON-NLS-1$
+	private static final String					STATE_TYPE_SOURCE_FROM_SELECTED_TOURS	= "fromTour";							//$NON-NLS-1$
+	private static final String					STATE_TYPE_SOURCE_PREVIOUS_JOINED_TOUR	= "previous";							//$NON-NLS-1$
+	private static final String					STATE_TYPE_SOURCE_CUSTOM				= "custom";							//$NON-NLS-1$
 
-	private static final String					STATE_MARKER_TYPE						= "TourMarkerType";				//$NON-NLS-1$
-	private static final String					STATE_MARKER_TYPE_SMALL					= "small";							//$NON-NLS-1$
-	private static final String					STATE_MARKER_TYPE_MEDIUM				= "medium";						//$NON-NLS-1$
-	private static final String					STATE_MARKER_TYPE_LARGE					= "large";							//$NON-NLS-1$
+	private static final String					STATE_MARKER_TYPE						= "TourMarkerType";					//$NON-NLS-1$
+	private static final String					STATE_MARKER_TYPE_SMALL					= "small";								//$NON-NLS-1$
+	private static final String					STATE_MARKER_TYPE_MEDIUM				= "medium";							//$NON-NLS-1$
+	private static final String					STATE_MARKER_TYPE_LARGE					= "large";								//$NON-NLS-1$
 
 	/**
 	 * state: join method
@@ -151,14 +150,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 																						};
 
 	private final IDialogSettings				_state									= TourbookPlugin
-																								.getDefault()
-																								.getDialogSettingsSection(
-																										"DialogJoinTours"); //$NON-NLS-1$
-
-	private final DateTimeFormatter				_dtFormatterShort						= DateTimeFormat.shortDate();
-	private final DateTimeFormatter				_dtFormatterMedium						= DateTimeFormat
-																								.shortDateTime();
-	private final DateTimeFormatter				_dtFormatterFull						= DateTimeFormat.fullDateTime();
+																								.getState("DialogJoinTours");	//$NON-NLS-1$
 
 	private TagMenuManager						_tagMenuMgr;
 	private ActionOpenPrefDialog				_actionOpenTourTypePrefs;
@@ -963,7 +955,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 		long relTourTimeOffset = 0;
 		long absFirstTourStartTimeSec = 0;
 		long absJoinedTourStartTimeSec = 0;
-		DateTime joinedTourStart = null;
+		ZonedDateTime joinedTourStart = null;
 
 		boolean isFirstTour = true;
 
@@ -1007,7 +999,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 			/*
 			 * set tour time
 			 */
-			final DateTime tourStartTime = tourTourData.getTourStartTime();
+			final ZonedDateTime tourStartTime = tourTourData.getTourStartTime();
 
 			if (isFirstTour) {
 
@@ -1019,18 +1011,19 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
 				} else {
 
-					joinedTourStart = new DateTime(
+					joinedTourStart = ZonedDateTime.of(
 							_dtTourDate.getYear(),
 							_dtTourDate.getMonth() + 1,
 							_dtTourDate.getDay(),
 							_dtTourTime.getHours(),
 							_dtTourTime.getMinutes(),
 							_dtTourTime.getSeconds(),
-							0);
+							0,
+							TimeTools.getDefaultTimeZone());
 				}
 
 				// tour start in absolute seconds
-				absJoinedTourStartTimeSec = joinedTourStart.getMillis() / 1000;
+				absJoinedTourStartTimeSec = joinedTourStart.toInstant().getEpochSecond();
 				absFirstTourStartTimeSec = absJoinedTourStartTimeSec;
 
 			} else {
@@ -1039,9 +1032,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
 				if (isOriginalTime) {
 
-					final DateTime tourStart = tourStartTime;
-
-					final long absTourStartTimeSec = tourStart.getMillis() / 1000;
+					final long absTourStartTimeSec = tourStartTime.toInstant().getEpochSecond();
 
 					// keep original time
 					relTourTimeOffset = absTourStartTimeSec - absFirstTourStartTimeSec;
@@ -1154,7 +1145,9 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
 					if (isJoinTime) {
 						final int relativeTourTime = joinedTimeSerie[joinMarkerIndex];
-						tourMarker.setTime(relativeTourTime, joinedTourStart.getMillis() + (relativeTourTime * 1000));
+						tourMarker.setTime(//
+								relativeTourTime,
+								joinedTourStart.toInstant().toEpochMilli() + (relativeTourTime * 1000));
 					}
 					if (isJoinDistance) {
 						clonedMarker.setDistance(joinedDistanceSerie[joinMarkerIndex]);
@@ -1212,16 +1205,20 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
 					// create tour marker label
 					final String stateTourMarker = getStateTourMarker();
-					final long tourStartTimeMS = tourStartTime.getMillis();
 
 					String markerLabel = UI.EMPTY_STRING;
 
 					if (stateTourMarker.equals(STATE_MARKER_TYPE_SMALL)) {
-						markerLabel = _dtFormatterShort.print(tourStartTimeMS);
+
+						markerLabel = tourStartTime.format(TimeTools.Formatter_Short_Date);
+
 					} else if (stateTourMarker.equals(STATE_MARKER_TYPE_MEDIUM)) {
-						markerLabel = _dtFormatterMedium.print(tourStartTimeMS);
+
+						markerLabel = tourStartTime.format(TimeTools.Formatter_Short_DateTime);
+
 					} else if (stateTourMarker.equals(STATE_MARKER_TYPE_LARGE)) {
-						markerLabel = _dtFormatterFull.print(tourStartTimeMS);
+
+						markerLabel = tourStartTime.format(TimeTools.Formatter_Full_DateTime);
 					}
 
 					final int joinMarkerIndex = joinedTourStartIndex + tourMarkerIndex;
@@ -1233,9 +1230,14 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 					tourMarker.setLabelPosition(TourMarker.LABEL_POS_VERTICAL_ABOVE_GRAPH);
 
 					if (isJoinTime) {
+
 						final int relativeTourTime = joinedTimeSerie[joinMarkerIndex];
-						tourMarker.setTime(relativeTourTime, joinedTourStart.getMillis() + (relativeTourTime * 1000));
+
+						tourMarker.setTime(//
+								relativeTourTime,
+								joinedTourStart.toInstant().toEpochMilli() + (relativeTourTime * 1000));
 					}
+
 					if (isJoinDistance) {
 						tourMarker.setDistance(joinedDistanceSerie[joinMarkerIndex]);
 					}
@@ -1518,17 +1520,17 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
 		// date/time
 		final TourData firstTour = _selectedTours.get(0);
-		final DateTime firstTourStart = firstTour.getTourStartTime();
+		final ZonedDateTime firstTourStart = firstTour.getTourStartTime();
 
 		_dtTourDate.setDate(
 				firstTourStart.getYear(),
-				firstTourStart.getMonthOfYear() - 1,
+				firstTourStart.getMonthValue() - 1,
 				firstTourStart.getDayOfMonth());
 
-		_dtTourTime.setTime(
-				firstTourStart.getHourOfDay(),
-				firstTourStart.getMinuteOfHour(),
-				firstTourStart.getSecondOfMinute());
+		_dtTourTime.setTime(//
+				firstTourStart.getHour(),
+				firstTourStart.getMinute(),
+				firstTourStart.getSecond());
 
 		/*
 		 * fill person combo and reselect previous person
@@ -1634,14 +1636,15 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 	 */
 	private void updateUIMarker(final boolean isRestoreState) {
 
-		final DateTime joinedTourStart = new DateTime(
+		final ZonedDateTime joinedTourStart = ZonedDateTime.of(
 				_dtTourDate.getYear(),
 				_dtTourDate.getMonth() + 1,
 				_dtTourDate.getDay(),
 				_dtTourTime.getHours(),
 				_dtTourTime.getMinutes(),
 				_dtTourTime.getSeconds(),
-				0);
+				0,
+				TimeTools.getDefaultTimeZone());
 
 		/**
 		 * !!! this list must correspond to the states {@link #ALL_STATES_TOUR_MARKER} !!!
@@ -1649,15 +1652,15 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 		final String[] markerItems = new String[3];
 		markerItems[0] = NLS.bind(
 				Messages.Dialog_JoinTours_ComboText_MarkerTourTime,
-				_dtFormatterShort.print(joinedTourStart.getMillis()));
+				joinedTourStart.format(TimeTools.Formatter_Short_Date));
 
 		markerItems[1] = NLS.bind(
 				Messages.Dialog_JoinTours_ComboText_MarkerTourTime,
-				_dtFormatterMedium.print(joinedTourStart.getMillis()));
+				joinedTourStart.format(TimeTools.Formatter_Short_DateTime));
 
 		markerItems[2] = NLS.bind(
 				Messages.Dialog_JoinTours_ComboText_MarkerTourTime,
-				_dtFormatterFull.print(joinedTourStart.getMillis()));
+				joinedTourStart.format(TimeTools.Formatter_Full_DateTime));
 
 		final int selectedMarkerIndex = _cboTourMarker.getSelectionIndex();
 

@@ -1475,7 +1475,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		final int[] multipleStartTimeIndex = _tourData.multipleTourStartIndex;
 		final long[] multipleStartTime = _tourData.multipleTourStartTime;
 
-		final long tourStart = _tourData.getTourStartTime().getMillis() / 1000;
+		final long tourStart = _tourData.getTourStartTimeMS() / 1000;
 		final int numberOfTimeSlices = isTimeSerie ? timeSerie.length : historySerie.length;
 
 		/*

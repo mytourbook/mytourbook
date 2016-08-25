@@ -300,9 +300,9 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
 		final String toolTipLabel = String.format(toolTipFormat.toString(),
 		//
 		// date/time
-				zdtTourStart.format(TimeTools.dateFormatter_Full),
-				zdtTourStart.format(TimeTools.timeFormatter_Medium),
-				zdtTourEnd.format(TimeTools.timeFormatter_Medium),
+				zdtTourStart.format(TimeTools.Formatter_Full_Date),
+				zdtTourStart.format(TimeTools.Formatter_Medium_Time),
+				zdtTourEnd.format(TimeTools.Formatter_Medium_Time),
 				zdtTourStart.get(TimeTools.calendarWeek.weekOfWeekBasedYear()),
 				//
 				distance / 1000,

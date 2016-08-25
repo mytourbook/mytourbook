@@ -69,34 +69,30 @@ public class TimeTools {
 	/** Seconds per hour. */
 	private static final int						SECONDS_PER_HOUR			= SECONDS_PER_MINUTE * MINUTES_PER_HOUR;
 
-	public static final DateTimeFormatter			dateFormatter_Full			= DateTimeFormatter
-																						.ofLocalizedDate(FormatStyle.FULL);
-	public static final DateTimeFormatter			dateTimeFormatter_Medium	= DateTimeFormatter
-																						.ofLocalizedDateTime(FormatStyle.MEDIUM);
-	public static final DateTimeFormatter			timeFormatter_Medium		= DateTimeFormatter
+	public static final DateTimeFormatter			Formatter_Short_Date		= DateTimeFormatter
+																						.ofLocalizedDate(FormatStyle.SHORT);
+	public static final DateTimeFormatter			Formatter_Short_Time		= DateTimeFormatter
+																						.ofLocalizedTime(FormatStyle.SHORT);
+	public static final DateTimeFormatter			Formatter_Short_DateTime	= DateTimeFormatter
+																						.ofLocalizedDateTime(FormatStyle.SHORT);
+
+	public static final DateTimeFormatter			Formatter_Medium_Date		= DateTimeFormatter
+																						.ofLocalizedDate(FormatStyle.MEDIUM);
+	public static final DateTimeFormatter			Formatter_Medium_Time		= DateTimeFormatter
 																						.ofLocalizedTime(FormatStyle.MEDIUM);
+	public static final DateTimeFormatter			Formatter_Medium_DateTime	= DateTimeFormatter
+																						.ofLocalizedDateTime(FormatStyle.MEDIUM);
+
+	public static final DateTimeFormatter			Formatter_Full_Date			= DateTimeFormatter
+																						.ofLocalizedDate(FormatStyle.FULL);
+	public static final DateTimeFormatter			Formatter_Full_Time			= DateTimeFormatter
+																						.ofLocalizedTime(FormatStyle.FULL);
+	public static final DateTimeFormatter			Formatter_Full_DateTime		= DateTimeFormatter
+																						.ofLocalizedDateTime(FormatStyle.FULL);
+
 	private static final PeriodFormatter			DURATION_FORMATTER;
 
-	static {
-
-		DURATION_FORMATTER = new PeriodFormatterBuilder()
-//
-				.appendHours()
-				.appendSuffix(Messages.Period_Format_Hour_Short, Messages.Period_Format_Hour_Short)
-//				.appendSeparator(commaSpace, space2, variants)
-
-				.appendMinutes()
-				.appendSuffix(Messages.Period_Format_Minute_Short, Messages.Period_Format_Minute_Short)
-//				.appendSeparator(commaSpace, space2, variants)
-
-				.toFormatter();
-	}
-
-	final static IPreferenceStore					_prefStoreCommon			= CommonActivator.getPrefStore();
-
-	private static ArrayList<TimeZoneData>			_allSortedTimeZones;
-
-	private static ZoneId							_selectedTimeZoneId;
+	public static final ZoneId						UTC							= ZoneId.of("UTC");								//$NON-NLS-1$
 
 	/**
 	 * Calendar week which is defined in the preferences.
@@ -114,11 +110,31 @@ public class TimeTools {
 	 */
 	public static String[]							weekDays_Full;
 
+	private final static IPreferenceStore			_prefStoreCommon			= CommonActivator.getPrefStore();
+
+	private static ArrayList<TimeZoneData>			_allSortedTimeZones;
+
+	/**
+	 * Default time zone ID which is set in the preferences.
+	 */
+	private static ZoneId							_defaultTimeZoneId;
 	private static LocalDate						_dateToGetNumOfWeeks		= LocalDate.of(2000, 5, 5);
 
 	static {
 
-		_selectedTimeZoneId = ZoneId.of(_prefStoreCommon.getString(ICommonPreferences.TIME_ZONE_LOCAL_ID));
+		DURATION_FORMATTER = new PeriodFormatterBuilder()
+//
+				.appendHours()
+				.appendSuffix(Messages.Period_Format_Hour_Short, Messages.Period_Format_Hour_Short)
+//				.appendSeparator(commaSpace, space2, variants)
+
+				.appendMinutes()
+				.appendSuffix(Messages.Period_Format_Minute_Short, Messages.Period_Format_Minute_Short)
+//				.appendSeparator(commaSpace, space2, variants)
+
+				.toFormatter();
+
+		_defaultTimeZoneId = ZoneId.of(_prefStoreCommon.getString(ICommonPreferences.TIME_ZONE_LOCAL_ID));
 
 		/*
 		 * Set calendar week
@@ -254,14 +270,20 @@ public class TimeTools {
 		return _allSortedTimeZones;
 	}
 
+	/**
+	 * @return Returns the time zone which is defined in the preferences.
+	 */
 	public static ZoneId getDefaultTimeZone() {
 
-		return _selectedTimeZoneId;
+		return _defaultTimeZoneId;
 	}
 
+	/**
+	 * @return Returns the time zone ID which is defined in the preferences.
+	 */
 	public static String getDefaultTimeZoneId() {
 
-		return _selectedTimeZoneId.getId();
+		return _defaultTimeZoneId.getId();
 	}
 
 	/**
@@ -324,7 +346,7 @@ public class TimeTools {
 	 * @param timeZoneId
 	 * @return Returns the timezone for the ID or <code>null</code> when not available.
 	 */
-	public static TimeZoneData getTimeZone(final String timeZoneId) {
+	private static TimeZoneData getTimeZone(final String timeZoneId) {
 
 		final ArrayList<TimeZoneData> allTimeZones = getAllTimeZones();
 
@@ -365,7 +387,7 @@ public class TimeTools {
 		if (latitude != Double.MIN_VALUE) {
 
 			final String timeZoneIdFromLatLon = TimezoneMapper.latLngToTimezoneString(latitude, longitude);
-			final TimeZoneData timeZoneFromLatLon = TimeTools.getTimeZone(timeZoneIdFromLatLon);
+			final TimeZoneData timeZoneFromLatLon = getTimeZone(timeZoneIdFromLatLon);
 
 			timeZoneData = timeZoneFromLatLon;
 		}
@@ -373,7 +395,7 @@ public class TimeTools {
 		if (timeZoneData == null) {
 
 			// use default
-			timeZoneData = TimeTools.getTimeZone(_selectedTimeZoneId.getId());
+			timeZoneData = getTimeZone(_defaultTimeZoneId.getId());
 		}
 
 		return getTimeZoneIndex(timeZoneData.zoneId);
@@ -403,7 +425,7 @@ public class TimeTools {
 	 * @return Returns the time zone index for the default time zone.
 	 */
 	public static int getTimeZoneIndexDefault() {
-		return getTimeZoneIndex(_selectedTimeZoneId.getId());
+		return getTimeZoneIndex(_defaultTimeZoneId.getId());
 	}
 
 	/**
@@ -416,7 +438,7 @@ public class TimeTools {
 		int tzIndex = getTimeZoneIndex(timeZoneId);
 
 		if (tzIndex == -1) {
-			tzIndex = getTimeZoneIndex(_selectedTimeZoneId.getId());
+			tzIndex = getTimeZoneIndex(_defaultTimeZoneId.getId());
 		}
 
 		return tzIndex;
@@ -440,7 +462,7 @@ public class TimeTools {
 		final boolean isTourTimeZone = dbTimeZoneId != null;
 
 		final ZoneId zoneId = isDefaultZone //
-				? _selectedTimeZoneId
+				? _defaultTimeZoneId
 				: ZoneId.of(dbTimeZoneId);
 
 		ZonedDateTime tourZonedDateTime;
@@ -453,7 +475,7 @@ public class TimeTools {
 			tourZonedDateTime = ZonedDateTime.ofInstant(tourStartInstant, zoneId);
 
 			final ZonedDateTime tourDateTimeWithDefaultZoneId = tourZonedDateTime
-					.withZoneSameInstant(_selectedTimeZoneId);
+					.withZoneSameInstant(_defaultTimeZoneId);
 
 			final int tourOffset = tourZonedDateTime.getOffset().getTotalSeconds();
 			final int defaultOffset = tourDateTimeWithDefaultZoneId.getOffset().getTotalSeconds();
@@ -473,6 +495,14 @@ public class TimeTools {
 		- 1;
 
 		return new TourDateTime(tourZonedDateTime, timeZoneOffsetLabel, weekDays_Short[weekDayIndex]);
+	}
+
+	/**
+	 * @return Return now with the default time zone.
+	 */
+	public static ZonedDateTime now() {
+
+		return ZonedDateTime.now(getDefaultTimeZone());
 	}
 
 	/**
@@ -559,7 +589,7 @@ public class TimeTools {
 
 	public static void setTimeZone(final String selectedTimeZoneId) {
 
-		_selectedTimeZoneId = ZoneId.of(selectedTimeZoneId);
+		_defaultTimeZoneId = ZoneId.of(selectedTimeZoneId);
 	}
 
 }

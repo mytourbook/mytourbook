@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.device.polartrainer;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
@@ -22,6 +23,7 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TimeData;
@@ -36,7 +38,6 @@ import net.tourbook.preferences.TourTypeColorDefinition;
 import net.tourbook.ui.tourChart.ChartLabel;
 
 import org.eclipse.osgi.util.NLS;
-import org.joda.time.DateTime;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -185,34 +186,34 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
 
 	private class Exercise {
 
-		private String		tourTitle;
-		private String		sport;
+		private String			tourTitle;
+		private String			sport;
 
-		private DateTime	tourStart;
-		private DateTime	dtCreated;
-		private DateTime	dtStartTime;
+		private ZonedDateTime	tourStart;
+		private ZonedDateTime	dtCreated;
+		private ZonedDateTime	dtStartTime;
 
-		private short		timeInterval;
+		private short			timeInterval;
 
 		/**
 		 * in kcal
 		 */
-		private int			calories	= -1;
+		private int				calories	= -1;
 
-		private int			restPulse;
-		private int			recordingRate;
+		private int				restPulse;
+		private int				recordingRate;
 
 		/**
 		 * in seconds
 		 */
-		private long		duration	= -1;
+		private long			duration	= -1;
 
-		private float[]		altitudeValues;
-		private float[]		cadenceValues;
-		private float[]		distanceValues;
-		private float[]		pulseValues;
-		private float[]		speedValues;
-		private float[]		temperatureValues;
+		private float[]			altitudeValues;
+		private float[]			cadenceValues;
+		private float[]			distanceValues;
+		private float[]			pulseValues;
+		private float[]			speedValues;
+		private float[]			temperatureValues;
 
 	}
 
@@ -433,18 +434,18 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
 		final float[] speedValues = _currentExercise.speedValues;
 		final float[] temperatureValues = _currentExercise.temperatureValues;
 
-		final DateTime dtCreated = _currentExercise.dtCreated;
-		final DateTime dtExerciseStartTime = _currentExercise.dtStartTime;
+		final ZonedDateTime dtCreated = _currentExercise.dtCreated;
+		final ZonedDateTime dtExerciseStartTime = _currentExercise.dtStartTime;
 		final long exerciseDuration = _currentExercise.duration;
 
 		/*
 		 * dtCreated is always available (minOccurs="1"), exercise start time is optional
 		 */
-		DateTime dtStartTime = dtExerciseStartTime;
+		ZonedDateTime dtStartTime = dtExerciseStartTime;
 		if (dtStartTime == null) {
 			dtStartTime = dtCreated;
 		}
-		final long tourStartTime = dtStartTime.getMillis();
+		final long tourStartTime = dtStartTime.toInstant().toEpochMilli();
 		_currentExercise.tourStart = dtStartTime;
 
 		/*
@@ -670,7 +671,7 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
 	 * @param dtValue
 	 * @return Returns parsed date/time or <code>null</code> when the format is not correct.
 	 */
-	private DateTime getDateTime(final String dtValue) {
+	private ZonedDateTime getDateTime(final String dtValue) {
 
 		final Matcher matcherResult = _patternDateTime.matcher(dtValue);
 		if (matcherResult.matches()) {
@@ -713,7 +714,7 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
 					}
 				}
 
-				return new DateTime(year, month, day, hour, minute, seconds, 0);
+				return ZonedDateTime.of(year, month, day, hour, minute, seconds, 0, TimeTools.getDefaultTimeZone());
 
 			} catch (final NumberFormatException e) {
 				return null;

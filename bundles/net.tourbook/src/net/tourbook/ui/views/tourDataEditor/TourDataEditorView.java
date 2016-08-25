@@ -22,10 +22,6 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.text.NumberFormat;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1015,17 +1011,17 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		final TourData manualTourData = new TourData();
 
-		/*
-		 * set tour start date/time
-		 */
-		manualTourData.setTourStartTime(new org.joda.time.DateTime());
+		// set tour start date/time
+		manualTourData.setTourStartTime(TimeTools.now());
 
 		// tour id must be created after the tour date/time is set
 		manualTourData.createTourId();
 
 		manualTourData.setDeviceId(TourData.DEVICE_ID_FOR_MANUAL_TOUR);
-
 		manualTourData.setTourPerson(activePerson);
+
+		// ensure that the time zone is saved in the tour
+		_isTimeZoneManuallyModified = true;
 
 		// update UI
 		_tourData = manualTourData;
@@ -1042,6 +1038,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		// select tour tab and first field
 		_tabFolder.setSelection(_tabTour);
 		_comboTitle.setFocus();
+
+		// set tour dirty even when nothing is entered but the user can see that this tour must be saved or discarded
+		setTourDirty();
 	}
 
 	void actionCsvTimeSliceExport() {
@@ -5054,7 +5053,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		} else {
 
-			final ZonedDateTime tourDate = _tourData.getTourStartTime8();
+			final ZonedDateTime tourDate = _tourData.getTourStartTime();
 
 			return TourManager.getTourTitle(tourDate);
 		}
@@ -6392,15 +6391,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				_tourData.setAvgTemperature(UI.convertTemperatureToMetric(temperature));
 			}
 
-			_tourData.setTourStartTime(
-					_dtTourDate.getYear(),
-					_dtTourDate.getMonth() + 1,
-					_dtTourDate.getDay(),
-					_dtStartTime.getHours(),
-					_dtStartTime.getMinutes(),
-					_dtStartTime.getSeconds());
-
-			// time zone
+			// set time zone BEFORE the time is set
 			if (_isTimeZoneManuallyModified) {
 
 				// set time zone ONLY when manually modified
@@ -6408,8 +6399,21 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				final int selectedTimeZoneIndex = _comboTimeZone.getSelectionIndex();
 				final TimeZoneData timeZoneData = TimeTools.getTimeZoneByIndex(selectedTimeZoneIndex);
 				final String timeZoneId = timeZoneData.zoneId;
+
 				_tourData.setTimeZoneId(timeZoneId);
 			}
+
+			final ZonedDateTime tourStartTime = ZonedDateTime.of(
+					_dtTourDate.getYear(),
+					_dtTourDate.getMonth() + 1,
+					_dtTourDate.getDay(),
+					_dtStartTime.getHours(),
+					_dtStartTime.getMinutes(),
+					_dtStartTime.getSeconds(),
+					0,
+					_tourData.getTimeZoneIdWithDefault());
+
+			_tourData.setTourStartTime(tourStartTime);
 
 			// distance
 			if (_isDistManuallyModified) {
@@ -6783,16 +6787,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_spinTemperature.setDigits(1);
 		_spinTemperature.setSelection((int) ((avgTemperature * 10) + 0.5));
 
-		// set start date/time
-		final ZonedDateTime start = _tourData.getTourStartTime8();
-
-		final Instant instant = Instant.ofEpochMilli(_tourData.getTourStartTimeMS());
-		LocalDateTime.ofInstant(instant, ZoneId.of("Z"));
-
-		final LocalDateTime ldt = LocalDateTime.ofEpochSecond(_tourData.getTourStartTimeMS() / 1000, 0, ZoneOffset.UTC);
-
-		_dtTourDate.setDate(start.getYear(), start.getMonthValue() - 1, start.getDayOfMonth());
-		_dtStartTime.setTime(start.getHour(), start.getMinute(), start.getSecond());
+		// set start date/time without time zone
+		final ZonedDateTime tourStartTime = _tourData.getTourStartTime();
+		_dtTourDate.setDate(tourStartTime.getYear(), tourStartTime.getMonthValue(), tourStartTime.getDayOfMonth());
+		_dtStartTime.setTime(tourStartTime.getHour(), tourStartTime.getMinute(), tourStartTime.getSecond());
 
 		// tour distance
 		final float tourDistance = _tourData.getTourDistance();
@@ -6975,7 +6973,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		final ZonedDateTime dtCreated = _tourData.getDateTimeCreated();
 		_txtDateTimeCreated.setText(dtCreated == null ? //
 				UI.EMPTY_STRING
-				: dtCreated.format(TimeTools.dateTimeFormatter_Medium));
+				: dtCreated.format(TimeTools.Formatter_Medium_DateTime));
 
 		/*
 		 * date/time modified
@@ -6983,7 +6981,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		final ZonedDateTime dtModified = _tourData.getDateTimeModified();
 		_txtDateTimeModified.setText(dtModified == null ? //
 				UI.EMPTY_STRING
-				: dtModified.format(TimeTools.dateTimeFormatter_Medium));
+				: dtModified.format(TimeTools.Formatter_Medium_DateTime));
 
 		/*
 		 * merge from tour ID

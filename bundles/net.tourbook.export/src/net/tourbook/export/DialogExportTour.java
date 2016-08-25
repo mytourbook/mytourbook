@@ -24,7 +24,6 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
-import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -41,6 +40,7 @@ import java.util.TimeZone;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -98,34 +98,33 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
-import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.osgi.framework.Version;
 
 public class DialogExportTour extends TitleAreaDialog {
 
-	private static final String				EXPORT_ID_GPX					= "net.tourbook.export.gpx";					//$NON-NLS-1$
-	private static final String				EXPORT_ID_TCX					= "net.tourbook.export.tcx";					//$NON-NLS-1$
+	private static final String				EXPORT_ID_GPX					= "net.tourbook.export.gpx";			//$NON-NLS-1$
+	private static final String				EXPORT_ID_TCX					= "net.tourbook.export.tcx";			//$NON-NLS-1$
 
-	private static final String				STATE_GPX_IS_ABSOLUTE_DISTANCE	= "STATE_GPX_IS_ABSOLUTE_DISTANCE";			//$NON-NLS-1$
-	private static final String				STATE_GPX_IS_EXPORT_DESCRITION	= "STATE_GPX_IS_EXPORT_DESCRITION";			//$NON-NLS-1$
-	private static final String				STATE_GPX_IS_EXPORT_MARKERS		= "STATE_GPX_IS_EXPORT_MARKERS";				//$NON-NLS-1$
-	private static final String				STATE_GPX_IS_EXPORT_TOUR_DATA	= "STATE_GPX_IS_EXPORT_TOUR_DATA";				//$NON-NLS-1$
-	private static final String				STATE_GPX_IS_WITH_BAROMETER		= "STATE_GPX_IS_WITH_BAROMETER";				//$NON-NLS-1$
+	private static final String				STATE_GPX_IS_ABSOLUTE_DISTANCE	= "STATE_GPX_IS_ABSOLUTE_DISTANCE";	//$NON-NLS-1$
+	private static final String				STATE_GPX_IS_EXPORT_DESCRITION	= "STATE_GPX_IS_EXPORT_DESCRITION";	//$NON-NLS-1$
+	private static final String				STATE_GPX_IS_EXPORT_MARKERS		= "STATE_GPX_IS_EXPORT_MARKERS";		//$NON-NLS-1$
+	private static final String				STATE_GPX_IS_EXPORT_TOUR_DATA	= "STATE_GPX_IS_EXPORT_TOUR_DATA";		//$NON-NLS-1$
+	private static final String				STATE_GPX_IS_WITH_BAROMETER		= "STATE_GPX_IS_WITH_BAROMETER";		//$NON-NLS-1$
 
-	private static final String				STATE_TCX_IS_COURSES			= "STATE_TCX_IS_COURSES";						//$NON-NLS-1$
-	private static final String				STATE_TCX_IS_EXPORT_DESCRITION	= "STATE_TCX_IS_EXPORT_DESCRITION";			//$NON-NLS-1$
-	private static final String				STATE_TCX_IS_NAME_FROM_TOUR		= "STATE_TCX_IS_NAME_FROM_TOUR";				//$NON-NLS-1$
-	private static final String				STATE_TCX_COURSE_NAME			= "STATE_TCX_COURSE_NAME";						//$NON-NLS-1$
+	private static final String				STATE_TCX_IS_COURSES			= "STATE_TCX_IS_COURSES";				//$NON-NLS-1$
+	private static final String				STATE_TCX_IS_EXPORT_DESCRITION	= "STATE_TCX_IS_EXPORT_DESCRITION";	//$NON-NLS-1$
+	private static final String				STATE_TCX_IS_NAME_FROM_TOUR		= "STATE_TCX_IS_NAME_FROM_TOUR";		//$NON-NLS-1$
+	private static final String				STATE_TCX_COURSE_NAME			= "STATE_TCX_COURSE_NAME";				//$NON-NLS-1$
 
-	private static final String				STATE_CAMOUFLAGE_SPEED			= "camouflageSpeedValue";						//$NON-NLS-1$
-	private static final String				STATE_IS_CAMOUFLAGE_SPEED		= "isCamouflageSpeed";							//$NON-NLS-1$
-	private static final String				STATE_IS_EXPORT_TOUR_RANGE		= "isExportTourRange";							//$NON-NLS-1$
-	private static final String				STATE_IS_OVERWRITE_FILES		= "isOverwriteFiles";							//$NON-NLS-1$
-	private static final String				STATE_IS_MERGE_ALL_TOURS		= "isMergeAllTours";							//$NON-NLS-1$
-	private static final String				STATE_EXPORT_PATH_NAME			= "exportPathName";							//$NON-NLS-1$
-	private static final String				STATE_EXPORT_FILE_NAME			= "exportFileName";							//$NON-NLS-1$
+	private static final String				STATE_CAMOUFLAGE_SPEED			= "camouflageSpeedValue";				//$NON-NLS-1$
+	private static final String				STATE_IS_CAMOUFLAGE_SPEED		= "isCamouflageSpeed";					//$NON-NLS-1$
+	private static final String				STATE_IS_EXPORT_TOUR_RANGE		= "isExportTourRange";					//$NON-NLS-1$
+	private static final String				STATE_IS_OVERWRITE_FILES		= "isOverwriteFiles";					//$NON-NLS-1$
+	private static final String				STATE_IS_MERGE_ALL_TOURS		= "isMergeAllTours";					//$NON-NLS-1$
+	private static final String				STATE_EXPORT_PATH_NAME			= "exportPathName";					//$NON-NLS-1$
+	private static final String				STATE_EXPORT_FILE_NAME			= "exportFileName";					//$NON-NLS-1$
 
 	/**
 	 * This is a special parameter to force elevation values from the device and not from the
@@ -134,23 +133,23 @@ public class DialogExportTour extends TitleAreaDialog {
 	 * 
 	 * @since 15.6
 	 */
-	private static final String				STRAVA_WITH_BAROMETER			= " with barometer";							//$NON-NLS-1$
+	private static final String				STRAVA_WITH_BAROMETER			= " with barometer";					//$NON-NLS-1$
 
 	/*
 	 * Velocity (VC) context values
 	 */
-	private static final String				VC_HAS_TOUR_MARKERS				= "hasTourMarkers";							//$NON-NLS-1$
-	private static final String				VC_HAS_TRACKS					= "hasTracks";									//$NON-NLS-1$
-	private static final String				VC_HAS_WAY_POINTS				= "hasWayPoints";								//$NON-NLS-1$
-	private static final String				VC_IS_EXPORT_ALL_TOUR_DATA		= "isExportAllTourData";						//$NON-NLS-1$
+	private static final String				VC_HAS_TOUR_MARKERS				= "hasTourMarkers";					//$NON-NLS-1$
+	private static final String				VC_HAS_TRACKS					= "hasTracks";							//$NON-NLS-1$
+	private static final String				VC_HAS_WAY_POINTS				= "hasWayPoints";						//$NON-NLS-1$
+	private static final String				VC_IS_EXPORT_ALL_TOUR_DATA		= "isExportAllTourData";				//$NON-NLS-1$
 
-	private static final String				VC_LAP							= "lap";										//$NON-NLS-1$
-	private static final String				VC_TOUR_DATA					= "tourData";									//$NON-NLS-1$
-	private static final String				VC_TOUR_MARKERS					= "tourMarkers";								//$NON-NLS-1$
-	private static final String				VC_TRACKS						= "tracks";									//$NON-NLS-1$
-	private static final String				VC_WAY_POINTS					= "wayPoints";									//$NON-NLS-1$
+	private static final String				VC_LAP							= "lap";								//$NON-NLS-1$
+	private static final String				VC_TOUR_DATA					= "tourData";							//$NON-NLS-1$
+	private static final String				VC_TOUR_MARKERS					= "tourMarkers";						//$NON-NLS-1$
+	private static final String				VC_TRACKS						= "tracks";							//$NON-NLS-1$
+	private static final String				VC_WAY_POINTS					= "wayPoints";							//$NON-NLS-1$
 
-	private static final String				ZERO							= "0";											//$NON-NLS-1$
+	private static final String				ZERO							= "0";									//$NON-NLS-1$
 
 	private static final int				VERTICAL_SECTION_MARGIN			= 10;
 	private static final int				SIZING_TEXT_FIELD_WIDTH			= 250;
@@ -167,8 +166,6 @@ public class DialogExportTour extends TitleAreaDialog {
 
 	private static final DateTimeFormatter	_dtIso							= ISODateTimeFormat.dateTimeNoMillis();
 	private static final SimpleDateFormat	_dateFormat						= new SimpleDateFormat();
-	private static final DateFormat			_timeFormatter					= DateFormat
-																					.getTimeInstance(DateFormat.MEDIUM);
 
 	static {
 
@@ -192,7 +189,7 @@ public class DialogExportTour extends TitleAreaDialog {
 	private final String					_formatTemplate;
 
 	private final IDialogSettings			_state							= TourbookPlugin
-																					.getState("DialogExportTour");			//$NON-NLS-1$
+																					.getState("DialogExportTour");	//$NON-NLS-1$
 
 	private final ExportTourExtension		_exportExtensionPoint;
 
@@ -557,10 +554,10 @@ public class DialogExportTour extends TitleAreaDialog {
 			final int startTime = timeSerie[_tourStartIndex];
 			final int endTime = timeSerie[_tourEndIndex];
 
-			final DateTime dtTour = tourData.getTourStartTime();
+			final ZonedDateTime dtTour = tourData.getTourStartTime();
 
-			final String uiStartTime = _timeFormatter.format(dtTour.plusSeconds(startTime).toDate());
-			final String uiEndTime = _timeFormatter.format(dtTour.plusSeconds(endTime).toDate());
+			final String uiStartTime = dtTour.plusSeconds(startTime).format(TimeTools.Formatter_Medium_Time);
+			final String uiEndTime = dtTour.plusSeconds(endTime).format(TimeTools.Formatter_Medium_Time);
 
 			if (isDistance) {
 
@@ -1021,7 +1018,7 @@ public class DialogExportTour extends TitleAreaDialog {
 			final ArrayList<TourMarker> tourMarkers = new ArrayList<TourMarker>();
 
 			final TourData tourData = _tourDataList.get(0);
-			final ZonedDateTime trackStartTime = tourData.getTourStartTime8();
+			final ZonedDateTime trackStartTime = tourData.getTourStartTime();
 
 			final GarminLap tourLap = doExport_50_Lap(tourData);
 
@@ -1089,7 +1086,7 @@ public class DialogExportTour extends TitleAreaDialog {
 			 * merge all tours into one
 			 */
 
-			_mergedTime = _tourDataList.get(0).getTourStartTime8();
+			_mergedTime = _tourDataList.get(0).getTourStartTime();
 			_mergedDistance = 0;
 
 			final ArrayList<GarminTrack> tracks = new ArrayList<GarminTrack>();
@@ -1117,7 +1114,7 @@ public class DialogExportTour extends TitleAreaDialog {
 				if (_exportState_IsCamouflageSpeed) {
 					trackStartTime = _mergedTime;
 				} else {
-					trackStartTime = tourData.getTourStartTime8();
+					trackStartTime = tourData.getTourStartTime();
 				}
 
 				final GarminTrack track = doExport_60_TrackPoints(tourData, trackStartTime);
@@ -1168,7 +1165,7 @@ public class DialogExportTour extends TitleAreaDialog {
 				final ArrayList<TourWayPoint> wayPoints = new ArrayList<TourWayPoint>();
 				final ArrayList<TourMarker> tourMarkers = new ArrayList<TourMarker>();
 
-				final ZonedDateTime trackStartTime = tourData.getTourStartTime8();
+				final ZonedDateTime trackStartTime = tourData.getTourStartTime();
 
 				final GarminLap tourLap = doExport_50_Lap(tourData);
 
@@ -2086,7 +2083,7 @@ public class DialogExportTour extends TitleAreaDialog {
 				minTourData = tourData;
 			} else {
 
-				final long tourMillis = tourData.getTourStartTime8().toInstant().toEpochMilli();
+				final long tourMillis = tourData.getTourStartTime().toInstant().toEpochMilli();
 
 				if (tourMillis < minTourMillis) {
 					minTourData = tourData;
@@ -2104,19 +2101,19 @@ public class DialogExportTour extends TitleAreaDialog {
 
 			// display the start date/time
 
-			final DateTime dtTour = minTourData.getTourStartTime();
+			final ZonedDateTime dtTour = minTourData.getTourStartTime();
 
 			// adjust start time
 			final int startTime = minTourData.timeSerie[_tourStartIndex];
-			final DateTime tourTime = dtTour.plusSeconds(startTime);
+			final ZonedDateTime tourTime = dtTour.plusSeconds(startTime);
 
 			_comboFile.setText(UI.format_yyyymmdd_hhmmss(
 					tourTime.getYear(),
-					tourTime.getMonthOfYear(),
+					tourTime.getMonthValue(),
 					tourTime.getDayOfMonth(),
-					tourTime.getHourOfDay(),
-					tourTime.getMinuteOfHour(),
-					tourTime.getSecondOfMinute()));
+					tourTime.getHour(),
+					tourTime.getMinute(),
+					tourTime.getSecond()));
 		} else {
 
 			// display the tour date/time
