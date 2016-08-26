@@ -19,7 +19,7 @@
  */
 package net.tourbook.chart;
 
-import org.joda.time.DateTime;
+import java.time.ZonedDateTime;
 
 /**
  * Contains data values for the x-axis
@@ -89,7 +89,7 @@ public class ChartDataXSerie extends ChartDataSerie {
 	/**
 	 * X-axis start Date/Time
 	 */
-	private DateTime				_startDateTime;
+	private ZonedDateTime			_startDateTime;
 
 	private boolean					_timeSerieWithTimeZoneAdjustment;
 
@@ -157,7 +157,7 @@ public class ChartDataXSerie extends ChartDataSerie {
 	/**
 	 * @return Returns x-axis start date/time or <code>null</code> when not available.
 	 */
-	public DateTime getStartDateTime() {
+	public ZonedDateTime getStartDateTime() {
 		return _startDateTime;
 	}
 
@@ -284,7 +284,7 @@ public class ChartDataXSerie extends ChartDataSerie {
 	/**
 	 * @param dateTime
 	 */
-	public void setStartDateTime(final DateTime dateTime) {
+	public void setStartDateTime(final ZonedDateTime dateTime) {
 		_startDateTime = dateTime;
 	}
 

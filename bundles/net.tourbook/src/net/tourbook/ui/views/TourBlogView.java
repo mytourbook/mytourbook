@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,6 +18,7 @@ package net.tourbook.ui.views;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Set;
@@ -26,6 +27,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.CSS;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.StatusUtil;
@@ -81,9 +83,6 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 public class TourBlogView extends ViewPart {
 
@@ -156,9 +155,6 @@ public class TourBlogView extends ViewPart {
 
 	private ActionTourBlogMarker	_actionTourBlogMarker;
 
-	private final DateTimeFormatter	_dateFormatter							= DateTimeFormat.fullDate();
-	private final DateTimeFormatter	_timeFormatter							= DateTimeFormat.mediumTime();
-
 	/*
 	 * UI controls
 	 */
@@ -172,7 +168,6 @@ public class TourBlogView extends ViewPart {
 	private Browser					_browser;
 	private TourChart				_tourChart;
 	private Text					_txtNoBrowser;
-
 
 	private void addPartListener() {
 
@@ -321,8 +316,6 @@ public class TourBlogView extends ViewPart {
 		showInvalidPage();
 	}
 
-
-
 	private String create_10_Head() {
 
 		final String html = ""// //$NON-NLS-1$
@@ -371,15 +364,16 @@ public class TourBlogView extends ViewPart {
 		 * Date/Time header
 		 */
 		final long recordingTime = _tourData.getTourRecordingTime();
-		final DateTime dtTourStart = _tourData.getTourStartTime();
-		final DateTime dtTourEnd = dtTourStart.plus(recordingTime * 1000);
 
-		final String date = String.format(_dateFormatter.print(dtTourStart.getMillis()));
+		final ZonedDateTime dtTourStart = _tourData.getTourStartTime();
+		final ZonedDateTime dtTourEnd = dtTourStart.plusSeconds(recordingTime);
+
+		final String date = dtTourStart.format(TimeTools.Formatter_Full_Date);
 
 		final String time = String.format(//
 				"%s - %s", //$NON-NLS-1$
-				_timeFormatter.print(dtTourStart.getMillis()),
-				_timeFormatter.print(dtTourEnd.getMillis()));
+				dtTourStart.format(TimeTools.Formatter_Medium_Time),
+				dtTourEnd.format(TimeTools.Formatter_Medium_Time));
 
 		sb.append("<div class='date'>" + date + "</div>\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		sb.append("<div class='time'>" + time + "</div>\n"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -526,8 +520,10 @@ public class TourBlogView extends ViewPart {
 		 * Description
 		 */
 		final String description = tourMarker.getDescription();
+		final String descriptionWithLineBreaks = WEB.convertHTML_LineBreaks(description);
+
 		sb.append("<a class='label-text' href='" + hrefOpenMarker + "' title='" + hoverOpenMarker + "'>\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		sb.append("	<p class='description'" + htmlMarkerStyle + ">" + WEB.convertHTML_LineBreaks(description) + "</p>\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		sb.append("	<p class='description'" + htmlMarkerStyle + ">" + descriptionWithLineBreaks + "</p>\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		sb.append("</a>\n"); //$NON-NLS-1$
 	}
 

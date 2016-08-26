@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.StringTokenizer;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -41,7 +42,6 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
-import org.joda.time.DateTime;
 
 /**
  * This device reader is importing data from Polar device files.
@@ -72,23 +72,22 @@ public class Polar_PDD_DataReader extends TourbookDevice {
 
 	private class Day {
 
-		private DateTime	date;
-
+		private ZonedDateTime	date;
 	}
 
 	private class Exercise {
 
-		private int			fileVersion;
+		private int				fileVersion;
 
-		private String		title;
-		private String		description;
+		private String			title;
+		private String			description;
 
-		private DateTime	startTime;
-		private int			distance;
-		private int			duration;
+		private ZonedDateTime	startTime;
+		private int				distance;
+		private int				duration;
 
-		private int			calories;
-		private int			sport;
+		private int				calories;
+		private int				sport;
 	}
 
 	// plugin constructor
@@ -641,7 +640,7 @@ public class Polar_PDD_DataReader extends TourbookDevice {
 			final int year = Integer.parseInt(date.substring(0, 4));
 			final int month = Integer.parseInt(date.substring(4, 6));
 			final int day = Integer.parseInt(date.substring(6, 8));
-			_currentDay.date = new DateTime(year, month, day, 0, 0, 0, 0);
+			_currentDay.date = ZonedDateTime.of(year, month, day, 0, 0, 0, 0, TimeTools.getDefaultTimeZone());
 
 			// 2
 			tokenLine.nextToken();

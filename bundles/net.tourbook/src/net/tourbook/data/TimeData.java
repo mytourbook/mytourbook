@@ -21,9 +21,8 @@
 package net.tourbook.data;
 
 import java.io.Serializable;
-import java.sql.Date;
 
-import org.joda.time.DateTime;
+import net.tourbook.common.time.TimeTools;
 
 /**
  * Contains data for one time slice.
@@ -43,8 +42,9 @@ public class TimeData implements Serializable {
 	public int					time;
 
 	/**
-	 * Contains the time value from {@link Date#getTime()} or {@link Long#MIN_VALUE} when the time
-	 * is not set. This time value is set when the tour is created by GPS devices
+	 * Contains number of milliseconds since the epoch of 1970-01-01T00:00:00Z value or
+	 * {@link Long#MIN_VALUE} when the time is not set. This time value is set when the tour is
+	 * created by GPS devices
 	 */
 	public long					absoluteTime		= Long.MIN_VALUE;
 
@@ -141,7 +141,7 @@ public class TimeData implements Serializable {
 		return "TimeData [" //$NON-NLS-1$
 //				+ ("id=" + id) //$NON-NLS-1$
 //				+ (", time=" + time) //$NON-NLS-1$
-				+ (", absoluteTime=" + new DateTime(absoluteTime)) //$NON-NLS-1$
+				+ (", absoluteTime=" + TimeTools.getZonedDateTime(absoluteTime)) //$NON-NLS-1$
 //				+ (", relativeTime=" + relativeTime) //$NON-NLS-1$
 //				+ (", pulse=" + pulse) //$NON-NLS-1$
 //				+ (", temperature=" + temperature)

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,11 +17,13 @@ package net.tourbook.device.suunto;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TimeZone;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
@@ -31,8 +33,6 @@ import net.tourbook.tour.TourManager;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -51,8 +51,6 @@ public class Suunto3SAXHandler extends DefaultHandler {
 	 * This time is used when a time is not available.
 	 */
 	private static final long				DEFAULT_TIME			= new DateTime(2007, 4, 1, 0, 0, 0, 0).getMillis();
-
-	private static final DateTimeFormatter	_dtParser				= ISODateTimeFormat.dateTimeParser();
 
 	private static final SimpleDateFormat	TIME_FORMAT				= new SimpleDateFormat(//
 																			"yyyy-MM-dd'T'HH:mm:ss'Z'");				//$NON-NLS-1$
@@ -329,7 +327,7 @@ public class Suunto3SAXHandler extends DefaultHandler {
 			final String timeString = _characters.toString();
 
 			try {
-				_currentTime = _dtParser.parseDateTime(timeString).getMillis();
+				_currentTime = ZonedDateTime.parse(timeString).toInstant().toEpochMilli();
 			} catch (final Exception e0) {
 				try {
 					_currentTime = TIME_FORMAT.parse(timeString).getTime();
@@ -447,7 +445,7 @@ public class Suunto3SAXHandler extends DefaultHandler {
 		/*
 		 * set tour start date/time
 		 */
-		tourData.setTourStartTime(new DateTime(_sampleList.get(0).absoluteTime));
+		tourData.setTourStartTime(TimeTools.getZonedDateTime(_sampleList.get(0).absoluteTime));
 
 		tourData.setDeviceTimeInterval((short) -1);
 		tourData.setImportFilePath(_importFilePath);

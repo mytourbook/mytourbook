@@ -1,5 +1,8 @@
 package net.tourbook.device.garmin.fit.listeners;
 
+import java.time.ZonedDateTime;
+
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.data.TourData;
 import net.tourbook.device.garmin.fit.FitContext;
 import net.tourbook.device.garmin.fit.FitDataReaderException;
@@ -36,7 +39,9 @@ public class SessionMesgListenerImpl extends AbstractMesgListener implements Ses
 //      This problem is corrected in FIT SDK 14.10 but it took me several days to investigate it
 //		and then came the idea to check for a new FIT SDK which solved this problem.
 // !!!!
-		final org.joda.time.DateTime tourStartTime = new org.joda.time.DateTime(startTime.getDate());
+
+		final ZonedDateTime tourStartTime = TimeTools.getZonedDateTime(startTime.getDate().getTime());
+
 		context.setSessionStartTime(tourStartTime);
 		tourData.setTourStartTime(tourStartTime);
 

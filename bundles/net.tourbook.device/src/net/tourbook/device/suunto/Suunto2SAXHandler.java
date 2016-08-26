@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,11 +17,13 @@ package net.tourbook.device.suunto;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TimeZone;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
@@ -30,9 +32,6 @@ import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -50,46 +49,53 @@ public class Suunto2SAXHandler extends DefaultHandler {
 	/**
 	 * This time is used when a time is not available.
 	 */
-	private static final long				DEFAULT_TIME			= new DateTime(2007, 4, 1, 0, 0, 0, 0).getMillis();
+	private static final long				DEFAULT_TIME;
 
-	private static final DateTimeFormatter	_dtParser				= ISODateTimeFormat.dateTimeParser();
+	static {
+
+		DEFAULT_TIME = ZonedDateTime
+				.of(2007, 4, 1, 0, 0, 0, 0, TimeTools.getDefaultTimeZone())
+				.toInstant()
+				.toEpochMilli();
+	}
+
 
 	private static final SimpleDateFormat	TIME_FORMAT				= new SimpleDateFormat(//
-																			"yyyy-MM-dd'T'HH:mm:ss'Z'");				//$NON-NLS-1$
+																			"yyyy-MM-dd'T'HH:mm:ss'Z'");		//$NON-NLS-1$
 	private static final SimpleDateFormat	TIME_FORMAT_SSSZ		= new SimpleDateFormat(//
-																			"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");			//$NON-NLS-1$
+																			"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");	//$NON-NLS-1$
 	private static final SimpleDateFormat	TIME_FORMAT_RFC822		= new SimpleDateFormat(//
-																			"yyyy-MM-dd'T'HH:mm:ssZ");					//$NON-NLS-1$
+																			"yyyy-MM-dd'T'HH:mm:ssZ");			//$NON-NLS-1$
 
-	private static final String				SAMPLE_TYPE_GPS_BASE	= "gps-base";										//$NON-NLS-1$
-	private static final String				SAMPLE_TYPE_GPS_TINY	= "gps-tiny";										//$NON-NLS-1$
-	private static final String				SAMPLE_TYPE_GPS_SMALL	= "gps-small";										//$NON-NLS-1$
-	private static final String				SAMPLE_TYPE_PERIODIC	= "periodic";										//$NON-NLS-1$
+	private static final String				SAMPLE_TYPE_GPS_BASE	= "gps-base";								//$NON-NLS-1$
+	private static final String				SAMPLE_TYPE_GPS_TINY	= "gps-tiny";								//$NON-NLS-1$
+	private static final String				SAMPLE_TYPE_GPS_SMALL	= "gps-small";								//$NON-NLS-1$
+	private static final String				SAMPLE_TYPE_PERIODIC	= "periodic";								//$NON-NLS-1$
 
 	// root tags
-	private static final String				TAG_ROOT_DEVICE			= "Device";										//$NON-NLS-1$
-	private static final String				TAG_ROOT_HEADER			= "header";										//$NON-NLS-1$
-	private static final String				TAG_ROOT_SAMPLES		= "Samples";										//$NON-NLS-1$
+	private static final String				TAG_ROOT_DEVICE			= "Device";								//$NON-NLS-1$
+	private static final String				TAG_ROOT_HEADER			= "header";								//$NON-NLS-1$
+	private static final String				TAG_ROOT_SAMPLES		= "Samples";								//$NON-NLS-1$
 
 	// header tags
-	private static final String				TAG_ENERGY				= "Energy";										//$NON-NLS-1$
+	private static final String				TAG_ENERGY				= "Energy";								//$NON-NLS-1$
 
 	// device tags
-	private static final String				TAG_SW					= "SW";											//$NON-NLS-1$
+	private static final String				TAG_SW					= "SW";									//$NON-NLS-1$
 
 	// sample tags
-	private static final String				TAG_ALTITUDE			= "Altitude";										//$NON-NLS-1$
-	private static final String				TAG_CADENCE				= "Cadence";										//$NON-NLS-1$
-	private static final String				TAG_DISTANCE			= "Distance";										//$NON-NLS-1$
-	private static final String				TAG_EVENTS				= "Events";										//$NON-NLS-1$
-	private static final String				TAG_HR					= "HR";											//$NON-NLS-1$
-	private static final String				TAG_LAP					= "Lap";											//$NON-NLS-1$
-	private static final String				TAG_LATITUDE			= "Latitude";										//$NON-NLS-1$
-	private static final String				TAG_LONGITUDE			= "Longitude";										//$NON-NLS-1$
-	private static final String				TAG_SAMPLE				= "Sample";										//$NON-NLS-1$
-	private static final String				TAG_SAMPLE_TYPE			= "SampleType";									//$NON-NLS-1$
-	private static final String				TAG_TEMPERATURE			= "Temperature";									//$NON-NLS-1$
-	private static final String				TAG_UTC					= "UTC";											//$NON-NLS-1$
+	private static final String				TAG_ALTITUDE			= "Altitude";								//$NON-NLS-1$
+	private static final String				TAG_CADENCE				= "Cadence";								//$NON-NLS-1$
+	private static final String				TAG_DISTANCE			= "Distance";								//$NON-NLS-1$
+	private static final String				TAG_EVENTS				= "Events";								//$NON-NLS-1$
+	private static final String				TAG_HR					= "HR";									//$NON-NLS-1$
+	private static final String				TAG_LAP					= "Lap";									//$NON-NLS-1$
+	private static final String				TAG_LATITUDE			= "Latitude";								//$NON-NLS-1$
+	private static final String				TAG_LONGITUDE			= "Longitude";								//$NON-NLS-1$
+	private static final String				TAG_SAMPLE				= "Sample";								//$NON-NLS-1$
+	private static final String				TAG_SAMPLE_TYPE			= "SampleType";							//$NON-NLS-1$
+	private static final String				TAG_TEMPERATURE			= "Temperature";							//$NON-NLS-1$
+	private static final String				TAG_UTC					= "UTC";									//$NON-NLS-1$
 
 	//
 	private HashMap<Long, TourData>			_alreadyImportedTours;
@@ -143,10 +149,10 @@ public class Suunto2SAXHandler extends DefaultHandler {
 		TIME_FORMAT_RFC822.setTimeZone(utc);
 	}
 
-	public Suunto2SAXHandler(final TourbookDevice deviceDataReader,
-							final String importFileName,
-							final HashMap<Long, TourData> alreadyImportedTours,
-							final HashMap<Long, TourData> newlyImportedTours) {
+	public Suunto2SAXHandler(	final TourbookDevice deviceDataReader,
+								final String importFileName,
+								final HashMap<Long, TourData> alreadyImportedTours,
+								final HashMap<Long, TourData> newlyImportedTours) {
 
 		_device = deviceDataReader;
 		_importFilePath = importFileName;
@@ -317,7 +323,7 @@ public class Suunto2SAXHandler extends DefaultHandler {
 			final String timeString = _characters.toString();
 
 			try {
-				_currentTime = _dtParser.parseDateTime(timeString).getMillis();
+				_currentTime = ZonedDateTime.parse(timeString).toInstant().toEpochMilli();
 			} catch (final Exception e0) {
 				try {
 					_currentTime = TIME_FORMAT.parse(timeString).getTime();
@@ -435,7 +441,7 @@ public class Suunto2SAXHandler extends DefaultHandler {
 		/*
 		 * set tour start date/time
 		 */
-		tourData.setTourStartTime(new DateTime(_sampleList.get(0).absoluteTime));
+		tourData.setTourStartTime(TimeTools.getZonedDateTime(_sampleList.get(0).absoluteTime));
 
 		tourData.setDeviceTimeInterval((short) -1);
 		tourData.setImportFilePath(_importFilePath);

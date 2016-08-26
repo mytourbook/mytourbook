@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,82 +15,79 @@
  *******************************************************************************/
 package net.tourbook.tour.photo;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.data.HistoryData;
 import net.tourbook.data.TourData;
 import net.tourbook.photo.Photo;
 
-import org.joda.time.DateTime;
 import org.joda.time.Period;
 import org.joda.time.PeriodType;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 public class TourPhotoLink {
 
-	private static final PeriodType			_tourPeriodTemplate	= PeriodType.yearMonthDayTime()
-																// hide these components
-																		.withMinutesRemoved()
-																		.withSecondsRemoved()
-																		.withMillisRemoved();
+	private static final PeriodType	_tourPeriodTemplate	= PeriodType.yearMonthDayTime()
+														// hide these components
+																.withMinutesRemoved()
+																.withSecondsRemoved()
+																.withMillisRemoved();
 
-	private static final DateTimeFormatter	_dtFormatter		= DateTimeFormat.forStyle("SL");	//$NON-NLS-1$
-
-	boolean									isHistoryTour;
+	boolean							isHistoryTour;
 
 	/**
 	 * Contains tour id when it's a real tour, otherwise it contains {@link Long#MIN_VALUE}.
 	 */
-	public long								tourId				= Long.MIN_VALUE;
+	public long						tourId				= Long.MIN_VALUE;
 
-	long									tourTypeId			= -1;
+	long							tourTypeId			= -1;
 
 	/**
 	 * Unique id for this link.
 	 */
-	long									linkId;
+	long							linkId;
 
 	/**
 	 * Tour start time in ms
 	 */
-	long									tourStartTime;
+	long							tourStartTime;
 
 	/**
 	 * Tour end time in ms.
 	 */
-	long									tourEndTime			= Long.MIN_VALUE;
+	long							tourEndTime			= Long.MIN_VALUE;
 
-	long									historyStartTime	= Long.MIN_VALUE;
-	long									historyEndTime		= Long.MIN_VALUE;
+	long							historyStartTime	= Long.MIN_VALUE;
+	long							historyEndTime		= Long.MIN_VALUE;
 
-	private DateTime						tourStartDateTime;
-	Period									tourPeriod;
+	private ZonedDateTime			tourStartDateTime;
+	Period							tourPeriod;
 
-	int										numberOfGPSPhotos;
-	int										numberOfNoGPSPhotos;
+	int								numberOfGPSPhotos;
+	int								numberOfNoGPSPhotos;
 
 	/**
 	 * Number of photos which are saved in a real tour.
 	 */
-	int										numberOfTourPhotos;
+	int								numberOfTourPhotos;
 
 	/**
 	 * Adjusted time in seconds.
 	 */
-	int										photoTimeAdjustment;
+	int								photoTimeAdjustment;
 
 	/**
 	 * Contains all photos for this tour.
 	 */
-	public ArrayList<Photo>					linkPhotos			= new ArrayList<Photo>();
+	public ArrayList<Photo>			linkPhotos			= new ArrayList<Photo>();
 
-	private TourData						_historyTourData;
+	private TourData				_historyTourData;
 
 	/**
 	 * Contains names for all cameras which are used to take pictures for the current tour.
 	 */
-	String									tourCameras;
+	String							tourCameras;
 
 	/**
 	 * Constructor for a history tour.
@@ -211,7 +208,7 @@ public class TourPhotoLink {
 		}
 
 		// update adjusted start
-		tourStartDateTime = new DateTime(tourStartTime);
+		tourStartDateTime = TimeTools.getZonedDateTime(tourStartTime);
 
 		/*
 		 * adjust start and end that the dummy tour do not start at the chart border
@@ -294,16 +291,19 @@ public class TourPhotoLink {
 
 		// remove milliseconds
 		tourStartTime = time / 1000 * 1000;
-		tourStartDateTime = new DateTime(time);
+		tourStartDateTime = TimeTools.getZonedDateTime(tourStartTime);
 	}
 
 	@Override
 	public String toString() {
+
+//		private static final DateTimeFormatter	_dtFormatter		= DateTimeFormat.forStyle("SL");	//$NON-NLS-1$
+
 		return "TourPhotoLink " //$NON-NLS-1$
 //				+ ("\n\ttourStart=\t\t" + tourStartTime)
-				+ ("\n\ttourStart=\t\t" + _dtFormatter.print(tourStartTime)) //$NON-NLS-1$
+				+ ("\n\ttourStart=\t\t" + TimeTools.getZonedDateTime(tourStartTime).format(TimeTools.Formatter_Medium_DateTime)) //$NON-NLS-1$
 //				+ ("\n\ttourEnd=\t\t" + _dtFormatter.print(tourEndTime))
-				+ ("\n\thistoryStartTime=\t" + _dtFormatter.print(historyStartTime)) //$NON-NLS-1$
+				+ ("\n\thistoryStartTime=\t" + TimeTools.getZonedDateTime(historyStartTime).format(TimeTools.Formatter_Medium_DateTime)) //$NON-NLS-1$
 //				+ ("\n\thistoryEndTime=\t\t" + _dtFormatter.print(historyEndTime))
 				+ ("\n\tisHistory=" + isHistoryTour) //$NON-NLS-1$
 				+ ("\tlinkId=" + linkId) //$NON-NLS-1$

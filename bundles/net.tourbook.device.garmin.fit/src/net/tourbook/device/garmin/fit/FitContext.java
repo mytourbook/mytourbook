@@ -1,6 +1,5 @@
 package net.tourbook.device.garmin.fit;
 
-import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,7 +19,6 @@ import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.tour.TourLogManager;
 
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -53,7 +51,7 @@ public class FitContext {
 
 	private String					_sessionIndex;
 
-	private DateTime				_sessionTime;
+	private ZonedDateTime			_sessionTime;
 
 	private float					_lapDistance;
 	private int						_lapTime;
@@ -113,7 +111,7 @@ public class FitContext {
 				tourData.setIsStrideSensorPresent(_isStrideSensorPresent);
 
 				final long recordStartTime = timeDataList.get(0).absoluteTime;
-				final long sessionStartTime = _sessionTime.getMillis();
+				final long sessionStartTime = _sessionTime.toInstant().toEpochMilli();
 
 				if (recordStartTime != sessionStartTime) {
 
@@ -127,9 +125,7 @@ public class FitContext {
 							(recordStartTime - sessionStartTime) / 1000));
 				}
 
-				final ZonedDateTime zonedStartTime = ZonedDateTime.ofInstant(
-						Instant.ofEpochMilli(recordStartTime),
-						TimeTools.getDefaultTimeZone());
+				final ZonedDateTime zonedStartTime = TimeTools.getZonedDateTime(recordStartTime);
 
 				tourData.setTourStartTime(zonedStartTime);
 
@@ -443,7 +439,7 @@ public class FitContext {
 		_sessionIndex = sessionIndex;
 	}
 
-	public void setSessionStartTime(final org.joda.time.DateTime dateTime) {
+	public void setSessionStartTime(final ZonedDateTime dateTime) {
 		_sessionTime = dateTime;
 	}
 

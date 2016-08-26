@@ -39,6 +39,7 @@ import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.preferences.ICommonPreferences;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringToArrayConverter;
@@ -85,9 +86,6 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 public class TourManager {
 
@@ -165,7 +163,6 @@ public class TourManager {
 
 	private static TourManager				_instance;
 
-	private final static DateTimeFormatter	_dtFormatter							= DateTimeFormat.shortDate();
 	private final static StringBuilder		_sbFormatter							= new StringBuilder();
 	private final static Formatter			_formatter								= new Formatter(_sbFormatter);
 
@@ -705,6 +702,8 @@ public class TourManager {
 			tourAltUp += fromTourData.getTourAltUp();
 			tourAltDown += fromTourData.getTourAltDown();
 
+//			private final static DateTimeFormatter	_dtFormatter							= DateTimeFormat.shortDate();
+
 			// tour titles
 			final long tourStartTime = fromTourData.getTourStartTimeMS();
 			allTourTitle[tourIndex] = _dtFormatter.print(tourStartTime);
@@ -750,7 +749,7 @@ public class TourManager {
 		multiTourData.setTourPhotos(allTourPhoto, null);
 
 		final TourData firstTour = validatedMultipleTours.get(0);
-		final DateTime tourStartTime = new DateTime(firstTour.getTourStartTimeMS());
+		final ZonedDateTime tourStartTime = TimeTools.getZonedDateTime(firstTour.getTourStartTimeMS());
 
 		multiTourData.setTourStartTime(tourStartTime);
 		multiTourData.setTourRecordingTime(tourRecordingTime);
@@ -2535,7 +2534,7 @@ public class TourManager {
 				chartDataModel.addXyData(xDataDist);
 			}
 
-			final DateTime tourStartTime = tourData.getTourStartTime();
+			final ZonedDateTime tourStartTime = tourData.getTourStartTime();
 
 			// set date/time when x-axis starts
 			xDataTime.setStartDateTime(tourStartTime);

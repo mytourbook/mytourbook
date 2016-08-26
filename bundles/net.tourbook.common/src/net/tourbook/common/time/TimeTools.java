@@ -304,7 +304,7 @@ public class TimeTools {
 	 *            The number of milliseconds from 1970-01-01T00:00:00Z
 	 * @return Returns the epoch time as a {@link LocalDateTime}.
 	 */
-	public static LocalDateTime getLocalDateTime(final long epochTime) {
+	private static LocalDateTime getLocalDateTime(final long epochTime) {
 
 		final long epochSeconds = epochTime / 1000;
 		int epochNanoSeconds = (int) (epochTime % 1000);
@@ -495,6 +495,18 @@ public class TimeTools {
 		- 1;
 
 		return new TourDateTime(tourZonedDateTime, timeZoneOffsetLabel, weekDays_Short[weekDayIndex]);
+	}
+
+	/**
+	 * @param epochOfMilli
+	 *            The number of milliseconds from 1970-01-01T00:00:00Z
+	 * @return Returns a zoned date time from epochOfMilli with the default time zone.
+	 */
+	public static ZonedDateTime getZonedDateTime(final long epochOfMilli) {
+
+		return ZonedDateTime.ofInstant(//
+				Instant.ofEpochMilli(epochOfMilli),
+				getDefaultTimeZone());
 	}
 
 	/**

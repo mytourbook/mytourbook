@@ -17,7 +17,6 @@ package net.tourbook.data;
 
 import static javax.persistence.CascadeType.ALL;
 
-import java.time.Instant;
 import java.time.Period;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -328,9 +327,7 @@ public class TourPerson implements Comparable<Object> {
 
 			} else {
 
-				_zonedBirthDay = ZonedDateTime.ofInstant(//
-						Instant.ofEpochMilli(birthDay),
-						TimeTools.getDefaultTimeZone());
+				_zonedBirthDay = TimeTools.getZonedDateTime(birthDay);
 			}
 		}
 

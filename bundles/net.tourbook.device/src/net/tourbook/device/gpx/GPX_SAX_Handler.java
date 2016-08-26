@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -50,10 +50,8 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
-import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -190,7 +188,6 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	private static final String				ATTR_LATITUDE					= "lat";									//$NON-NLS-1$
 	private static final String				ATTR_LONGITUDE					= "lon";									//$NON-NLS-1$
 
-	private static final DateTimeFormatter	_dtIsoParser					= ISODateTimeFormat.dateTimeParser();
 	private static final DateTimeFormatter	_dtFormatterShort				= DateTimeFormat.mediumDateTime();
 
 	private static final SimpleDateFormat	GPX_TIME_FORMAT					= new SimpleDateFormat(
@@ -199,6 +196,19 @@ public class GPX_SAX_Handler extends DefaultHandler {
 																					"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");	//$NON-NLS-1$
 	private static final SimpleDateFormat	GPX_TIME_FORMAT_RFC822			= new SimpleDateFormat(
 																					"yyyy-MM-dd'T'HH:mm:ssZ");			//$NON-NLS-1$
+	private static final long				DEFAULT_DATE_TIME				= ZonedDateTime
+																					.of(
+																							2000,
+																							1,
+																							1,
+																							0,
+																							0,
+																							0,
+																							0,
+																							TimeTools
+																									.getDefaultTimeZone())
+																					.toInstant()
+																					.toEpochMilli();
 
 	private IPreferenceStore				_prefStore						= Activator
 																					.getDefault()
@@ -553,9 +563,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 			final long tourStartMills = getLongValue(charData);
 
-			final ZonedDateTime tourStartTime = ZonedDateTime.ofInstant(
-					Instant.ofEpochMilli(tourStartMills),
-					TimeTools.getDefaultTimeZone());
+			final ZonedDateTime tourStartTime = TimeTools.getZonedDateTime(tourStartMills);
 
 			_tourData.setTourStartTime(tourStartTime);
 			_isInMT_Tour = false;
@@ -660,7 +668,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 				_isInTime = false;
 
 				try {
-					_timeSlice.absoluteTime = _dtIsoParser.parseDateTime(charData).getMillis();
+					_timeSlice.absoluteTime = ZonedDateTime.parse(charData).toInstant().toEpochMilli();
 				} catch (final Exception e0) {
 					try {
 						_timeSlice.absoluteTime = GPX_TIME_FORMAT.parse(charData).getTime();
@@ -789,7 +797,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 				_isInGpxDataStartTime = false;
 
 				try {
-					_gpxDataLap.absoluteTime = _dtIsoParser.parseDateTime(charData).getMillis();
+					_gpxDataLap.absoluteTime = ZonedDateTime.parse(charData).toInstant().toEpochMilli();
 				} catch (final Exception e0) {
 					try {
 						_gpxDataLap.absoluteTime = GPX_TIME_FORMAT.parse(charData).getTime();
@@ -839,7 +847,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 			_isInWpt_Time = false;
 
 			try {
-				_wayPoint.setTime(_dtIsoParser.parseDateTime(charData).getMillis());
+				_wayPoint.setTime(ZonedDateTime.parse(charData).toInstant().toEpochMilli());
 			} catch (final Exception e0) {
 				try {
 					_wayPoint.setTime(GPX_TIME_FORMAT.parse(charData).getTime());
@@ -1191,7 +1199,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 		// set virtual time if time is not available
 		if (_timeSlice.absoluteTime == Long.MIN_VALUE) {
-			_timeSlice.absoluteTime = new DateTime(2000, 1, 1, 0, 0, 0, 0).getMillis();
+			_timeSlice.absoluteTime = DEFAULT_DATE_TIME;
 		}
 
 		if (_isSetTrackMarker) {

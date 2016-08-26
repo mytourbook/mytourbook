@@ -1712,13 +1712,13 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 		final int[] timeSerie = tourData.timeSerie;
 		final int numberOfTimeSlices = timeSerie.length;
 
-		final long tourStart = tourData.getTourStartTime().getMillis() / 1000;
+		final long tourStartSeconds = tourData.getTourStartTime().toInstant().toEpochMilli() / 1000;
 		long timeSliceEnd;
 		if (numberOfTimeSlices > 1) {
-			timeSliceEnd = tourStart + (long) (timeSerie[1] / 2.0);
+			timeSliceEnd = tourStartSeconds + (long) (timeSerie[1] / 2.0);
 		} else {
 			// tour contains only 1 time slice
-			timeSliceEnd = tourStart;
+			timeSliceEnd = tourStartSeconds;
 		}
 
 		int timeIndex = 0;
@@ -1809,7 +1809,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 				final long valuePointTime = timeSerie[timeIndex];
 				final long sliceDuration = timeSerie[timeIndex + 1] - valuePointTime;
 
-				timeSliceEnd = tourStart + valuePointTime + (sliceDuration / 2);
+				timeSliceEnd = tourStartSeconds + valuePointTime + (sliceDuration / 2);
 			}
 		}
 	}

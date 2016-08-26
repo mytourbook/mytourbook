@@ -17,6 +17,7 @@ package net.tourbook.device.garmin;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -25,6 +26,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TimeData;
@@ -39,7 +41,6 @@ import org.eclipse.swt.widgets.Display;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -79,7 +80,6 @@ public class GarminSAXHandler extends DefaultHandler {
 	private static final String				SENSOR_STATE_PRESENT		= "Present";													//$NON-NLS-1$
 	private static final String				ATTR_VALUE_SPORT			= "Sport";														//$NON-NLS-1$
 
-	private static final DateTimeFormatter	_dtParser					= ISODateTimeFormat.dateTimeParser();
 
 	private static final SimpleDateFormat	TIME_FORMAT;
 	private static final SimpleDateFormat	TIME_FORMAT_SSSZ;
@@ -116,7 +116,7 @@ public class GarminSAXHandler extends DefaultHandler {
 	private TourbookDevice					_device;
 	private String							_importFilePath;
 	//
-	private ArrayList<TimeData>				_dtList						= new ArrayList<TimeData>();
+	private ArrayList<TimeData>				_dtList						= new ArrayList<>();
 	private TimeData						_timeData;
 
 	private int								_dataVersion				= -1;
@@ -550,7 +550,7 @@ public class GarminSAXHandler extends DefaultHandler {
 		 * set tour start date/time
 		 */
 		adjustTourStart();
-		tourData.setTourStartTime(new DateTime(_dtList.get(0).absoluteTime));
+		tourData.setTourStartTime(TimeTools.getZonedDateTime(_dtList.get(0).absoluteTime));
 
 		tourData.setIsDistanceFromSensor(_isDistanceFromSensor);
 		tourData.setDeviceTimeInterval((short) -1);
@@ -595,6 +595,7 @@ public class GarminSAXHandler extends DefaultHandler {
 
 		_isImported = true;
 	}
+
 
 	private void finalizeTrackpoint() {
 
@@ -786,7 +787,7 @@ public class GarminSAXHandler extends DefaultHandler {
 			final String timeString = _characters.toString();
 
 			try {
-				_currentTime = _dtParser.parseDateTime(timeString).getMillis();
+				_currentTime = ZonedDateTime.parse(timeString).toInstant().toEpochMilli();
 			} catch (final Exception e0) {
 				try {
 					_currentTime = TIME_FORMAT.parse(timeString).getTime();

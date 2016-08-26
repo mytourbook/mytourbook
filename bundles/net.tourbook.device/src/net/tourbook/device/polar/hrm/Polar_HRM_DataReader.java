@@ -19,12 +19,14 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TimeData;
@@ -39,7 +41,6 @@ import net.tourbook.ui.tourChart.ChartLabel;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
-import org.joda.time.DateTime;
 
 /**
  * This device reader is importing data from Polar device files.
@@ -455,14 +456,15 @@ public class Polar_HRM_DataReader extends TourbookDevice {
 		/*
 		 * set tour start date/time
 		 */
-		final DateTime dtTourStart = new DateTime(
+		final ZonedDateTime dtTourStart = ZonedDateTime.of(
 				_sectionParams.startYear,
 				_sectionParams.startMonth,
 				_sectionParams.startDay,
 				_sectionParams.startHour,
 				_sectionParams.startMinute,
 				_sectionParams.startSecond,
-				0);
+				0,
+				TimeTools.getDefaultTimeZone());
 
 		tourData.setTourStartTime(dtTourStart);
 
@@ -511,7 +513,7 @@ public class Polar_HRM_DataReader extends TourbookDevice {
 	 * @param dtTourStart
 	 * @return
 	 */
-	private ArrayList<TimeData> createTourData_10_CreateTimeSeries(final DateTime dtTourStart) {
+	private ArrayList<TimeData> createTourData_10_CreateTimeSeries(final ZonedDateTime dtTourStart) {
 
 		final boolean isImperial = _sectionParams.isUSUnit;
 		final int sliceTimeInterval = _sectionParams.interval;
@@ -526,7 +528,7 @@ public class Polar_HRM_DataReader extends TourbookDevice {
 			final TimeData tourSlice = new TimeData();
 
 			tourSlice.relativeTime = relativeTime;
-			tourSlice.absoluteTime = dtTourStart.plusSeconds(relativeTime).getMillis();
+			tourSlice.absoluteTime = dtTourStart.plusSeconds(relativeTime).toInstant().toEpochMilli();
 
 			if (hrSlice.pulse != Integer.MIN_VALUE) {
 				tourSlice.pulse = hrSlice.pulse;

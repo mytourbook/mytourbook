@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 
 import javax.xml.transform.Result;
@@ -18,6 +19,7 @@ import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.data.IXmlSerializable;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.printing.PrintTourExtension;
@@ -30,24 +32,17 @@ import org.apache.fop.apps.FopFactory;
 import org.apache.xmlgraphics.util.MimeConstants;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Display;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-//import net.tourbook.ui.UI;
 
 /**
  * @author Jo Klaps
  */
 public class PrintTourPDF extends PrintTourExtension {
 
-	private static final String		TOURDATA_2_FO_XSL	= "/printing-templates/tourdata2fo.xsl";	//$NON-NLS-1$
+	private static final String	TOURDATA_2_FO_XSL	= "/printing-templates/tourdata2fo.xsl";	//$NON-NLS-1$
 
-	private final FopFactory		_fopFactory			= FopFactory.newInstance();
-//	private final String			_printOutputPath	= (Platform.getInstanceLocation().getURL().getPath() + "print-output"); //$NON-NLS-1$
-	private final DateTimeFormatter	_dateFormatter		= DateTimeFormat.fullDate();
-	private final DateTimeFormatter	_timeFormatter		= DateTimeFormat.shortTime();
+	private final FopFactory	_fopFactory			= FopFactory.newInstance();
 
-	private DialogPrintTour			dpt;
+	private DialogPrintTour		dpt;
 
 	/**
 	 * plugin extension constructor
@@ -64,15 +59,15 @@ public class PrintTourPDF extends PrintTourExtension {
 	 */
 	private String formatStartDate(final TourData _tourData) {
 
-		final DateTime dtTourStart = _tourData.getTourStartTime();
-		final DateTime dtTourEnd = dtTourStart.plusSeconds((int) _tourData.getTourRecordingTime());
+		final ZonedDateTime dtTourStart = _tourData.getTourStartTime();
+		final ZonedDateTime dtTourEnd = dtTourStart.plusSeconds(_tourData.getTourRecordingTime());
 
 		return String.format(
 				net.tourbook.ui.Messages.Tour_Tooltip_Format_DateWeekTime,
-				_dateFormatter.print(dtTourStart.getMillis()),
-				_timeFormatter.print(dtTourStart.getMillis()),
-				_timeFormatter.print(dtTourEnd.getMillis()),
-				dtTourStart.getWeekOfWeekyear());
+				dtTourStart.format(TimeTools.Formatter_Full_Date),
+				dtTourStart.format(TimeTools.Formatter_Medium_Time),
+				dtTourEnd.format(TimeTools.Formatter_Medium_Time),
+				dtTourStart.get(TimeTools.calendarWeek.weekOfWeekBasedYear()));
 	}
 
 	/**
