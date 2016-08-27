@@ -20,6 +20,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.data.TourData;
 import net.tourbook.device.garmin.fit.listeners.ActivityMesgListenerImpl;
 import net.tourbook.device.garmin.fit.listeners.BikeProfileMesgListenerImpl;
@@ -36,7 +37,6 @@ import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.tour.TourLogManager;
 
 import org.apache.commons.io.IOUtils;
-import org.joda.time.DateTime;
 
 import com.garmin.fit.Decode;
 import com.garmin.fit.Field;
@@ -230,7 +230,7 @@ public class FitDataReader extends TourbookDevice {
 					final long javaTime = (garminTimestamp * 1000) + com.garmin.fit.DateTime.OFFSET;
 
 					System.out.println(String.format("%s %d %s %-5d %-30s %20s %s", //$NON-NLS-1$
-							new DateTime(javaTime), // show readable date/time
+							TimeTools.getZonedDateTime(javaTime), // show readable date/time
 							javaTime / 1000,
 							Long.toString(garminTimestamp),
 							field.getNum(),

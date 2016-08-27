@@ -6973,7 +6973,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		final ZonedDateTime dtCreated = _tourData.getDateTimeCreated();
 		_txtDateTimeCreated.setText(dtCreated == null ? //
 				UI.EMPTY_STRING
-				: dtCreated.format(TimeTools.Formatter_Medium_DateTime));
+				: dtCreated.format(TimeTools.Formatter_DateTime_M));
 
 		/*
 		 * date/time modified
@@ -6981,7 +6981,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		final ZonedDateTime dtModified = _tourData.getDateTimeModified();
 		_txtDateTimeModified.setText(dtModified == null ? //
 				UI.EMPTY_STRING
-				: dtModified.format(TimeTools.Formatter_Medium_DateTime));
+				: dtModified.format(TimeTools.Formatter_DateTime_M));
 
 		/*
 		 * merge from tour ID

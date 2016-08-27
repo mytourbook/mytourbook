@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,12 +16,14 @@
 package net.tourbook.photo.internal;
 
 import java.text.NumberFormat;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.photo.ILoadCallBack;
 import net.tourbook.photo.IPhotoServiceProvider;
@@ -61,9 +63,6 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.imgscalr.Scalr.Rotation;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 /**
  * Paint image in the gallery canvas.
@@ -80,13 +79,9 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	/**
 	 * this value has been evaluated by some test
 	 */
-	private int							_textMinThumbSize		= 50;
+	private int							_textMinThumbSize	= 50;
 
-	private int							_fontHeight				= -1;
-
-	private final DateTimeFormatter		_dtFormatterDate		= DateTimeFormat.forStyle("M-");			//$NON-NLS-1$
-	private final DateTimeFormatter		_dtFormatterTime		= DateTimeFormat.forStyle("-F");			//$NON-NLS-1$
-	private final DateTimeFormatter		_dtFormatterDateTime	= DateTimeFormat.forStyle("MM");			//$NON-NLS-1$
+	private int							_fontHeight			= -1;
 
 //	private final DateTimeFormatter		_dtFormatterDateTime	= new DateTimeFormatterBuilder()
 //																		.appendYear(4, 4)
@@ -131,8 +126,8 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	private ImageGallery				_imageGallery;
 	private GalleryMT20					_galleryMT;
 
-	private int							_gridBorderSize			= 1;
-	private int							_imageBorderSize		= 5;
+	private int							_gridBorderSize		= 1;
+	private int							_imageBorderSize	= 5;
 
 	/**
 	 * photo dimension without grid border but including image border
@@ -151,7 +146,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	/**
 	 * Width for the painted image or <code>-1</code> when not initialized.
 	 */
-	private int							_paintedDest_Width		= -1;
+	private int							_paintedDest_Width	= -1;
 	private int							_paintedDest_Height;
 
 	private boolean						_isShowFullsizeHQImage;
@@ -198,9 +193,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	private boolean						_isFullsizeImageAvailable;
 	private boolean						_isFullsizeLoadingError;
 
-	private final DateTimeFormatter		_dtFormatter			= DateTimeFormat.forStyle("ML");			//$NON-NLS-1$
-	private final DateTimeFormatter		_dtWeekday				= DateTimeFormat.forPattern("E");			//$NON-NLS-1$
-	private final NumberFormat			_nfMByte				= NumberFormat.getNumberInstance();
+	private final NumberFormat			_nfMByte			= NumberFormat.getNumberInstance();
 	{
 		_nfMByte.setMinimumFractionDigits(3);
 		_nfMByte.setMaximumFractionDigits(3);
@@ -217,12 +210,12 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 	/*
 	 * UI resources
 	 */
-	private Color						_fullsizeBgColor		= Display.getCurrent()//
-																		.getSystemColor(SWT.COLOR_BLACK);
-	private Color						_fgColor				= Display.getCurrent()//
-																		.getSystemColor(SWT.COLOR_WHITE);
-	private Color						_bgColor				= Display.getCurrent()//
-																		.getSystemColor(SWT.COLOR_RED);
+	private Color						_fullsizeBgColor	= Display.getCurrent()//
+																	.getSystemColor(SWT.COLOR_BLACK);
+	private Color						_fgColor			= Display.getCurrent()//
+																	.getSystemColor(SWT.COLOR_WHITE);
+	private Color						_bgColor			= Display.getCurrent()//
+																	.getSystemColor(SWT.COLOR_RED);
 	private Color						_selectionFgColor;
 	private Color						_noFocusSelectionFgColor;
 
@@ -300,6 +293,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 			// mark image area as needed to be redrawn
 			Display.getDefault().syncExec(new Runnable() {
 
+				@Override
 				public void run() {
 
 					if (_imageGallery.isDisposed()) {
@@ -646,19 +640,22 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 		}
 
 		if (_isShowDateInfo) {
-			final DateTime dateTime = photo.getOriginalDateTime();
+
+			final ZonedDateTime dateTime = photo.getOriginalDateTime();
+
 			if (dateTime != null) {
 
 				if (_photoDateInfo == PhotoDateInfo.Date) {
 
-					textDateTime = _dtFormatterDate.print(dateTime);
+					textDateTime = dateTime.format(TimeTools.Formatter_Date_M);
 
 				} else if (_photoDateInfo == PhotoDateInfo.Time) {
 
-					textDateTime = _dtFormatterTime.print(dateTime);
+					textDateTime = dateTime.format(TimeTools.Formatter_Time_F);
 
 				} else {
-					textDateTime = _dtFormatterDateTime.print(dateTime);
+
+					textDateTime = dateTime.format(TimeTools.Formatter_DateTime_M);
 				}
 
 				textDateTimeWidth = gc.textExtent(textDateTime).x;
@@ -1057,10 +1054,13 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 					/*
 					 * date/time
 					 */
-					final DateTime dateTime = photo.getOriginalDateTime();
 					String textDateTime = UI.EMPTY_STRING;
+
+					final ZonedDateTime dateTime = photo.getOriginalDateTime();
 					if (dateTime != null) {
-						textDateTime = _dtWeekday.print(dateTime) + UI.SPACE2 + _dtFormatter.print(dateTime);
+						textDateTime = dateTime.format(TimeTools.Formatter_Weekday)
+								+ UI.SPACE2
+								+ dateTime.format(TimeTools.Formatter_DateTime_ML);
 					}
 
 					/*

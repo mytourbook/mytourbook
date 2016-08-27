@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,8 +18,10 @@ package net.tourbook.device.garmin;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Locale;
@@ -38,9 +40,6 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -79,7 +78,6 @@ public class GarminSAXHandler extends DefaultHandler {
 
 	private static final String				SENSOR_STATE_PRESENT		= "Present";													//$NON-NLS-1$
 	private static final String				ATTR_VALUE_SPORT			= "Sport";														//$NON-NLS-1$
-
 
 	private static final SimpleDateFormat	TIME_FORMAT;
 	private static final SimpleDateFormat	TIME_FORMAT_SSSZ;
@@ -158,9 +156,6 @@ public class GarminSAXHandler extends DefaultHandler {
 
 	}
 
-//	private static DateTimeFormatter		_jodaWeekFormatter			= DateTimeFormat.forPattern("ww yyyy");						//$NON-NLS-1$
-//	private static SimpleDateFormat			_jdkWeekFormatter			= new SimpleDateFormat("ww yyyy");								//$NON-NLS-1$
-
 	public GarminSAXHandler(final TourbookDevice deviceDataReader,
 							final String importFileName,
 							final DeviceData deviceData,
@@ -181,19 +176,21 @@ public class GarminSAXHandler extends DefaultHandler {
 									final SimpleDateFormat jdkFormatter,
 									final StringBuilder sbJdk,
 									final StringBuilder sbJoda,
-									final DateTime dt,
+									final ZonedDateTime dt,
 									final Calendar jdkCalendar) {
 
-		sbJoda.append(jodaFormatter.print(dt));
+		final Date dtDate = Date.from(dt.toInstant());
+
+		sbJoda.append(dt.format(jodaFormatter));
 		sbJoda.append(" | "); //$NON-NLS-1$
 
 		jdkCalendar.setFirstDayOfWeek(Calendar.MONDAY);
 		jdkCalendar.setMinimalDaysInFirstWeek(4);
 
-		jdkCalendar.setTime(dt.toDate());
+		jdkCalendar.setTime(dtDate);
 		final int weekYear = Util.getYearForWeek(jdkCalendar);
 
-		sbJdk.append(jdkFormatter.format(dt.toDate()));
+		sbJdk.append(jdkFormatter.format(dtDate));
 		sbJdk.append(" " + weekYear + " | "); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
@@ -236,7 +233,7 @@ public class GarminSAXHandler extends DefaultHandler {
 		final String jodPattern = "ww xx     "; //$NON-NLS-1$
 		final String jdkPattern = "ww yy"; //$NON-NLS-1$
 
-		final DateTimeFormatter jodaFormatter = DateTimeFormat.forPattern(jodPattern);
+		final DateTimeFormatter jodaFormatter = DateTimeFormatter.ofPattern(jodPattern);
 		final StringBuilder sbJdk = new StringBuilder();
 		final StringBuilder sbJoda = new StringBuilder();
 
@@ -264,7 +261,7 @@ public class GarminSAXHandler extends DefaultHandler {
 				sbJdk.append(year + ": "); //$NON-NLS-1$
 
 				int days = 0;
-				final DateTime dt = new DateTime(year, 12, 22, 8, 0, 0, 0);
+				final ZonedDateTime dt = ZonedDateTime.of(year, 12, 22, 8, 0, 0, 0, TimeTools.getDefaultTimeZone());
 
 				formatDT(jodaFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
 				formatDT(jodaFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
@@ -306,14 +303,14 @@ public class GarminSAXHandler extends DefaultHandler {
 	private void adjustTourStart() {
 
 		int validIndex = 0;
-		DateTime checkedTourStart = null;
+		ZonedDateTime checkedTourStart = null;
 
 		for (final TimeData timeData : _dtList) {
 
-			checkedTourStart = new DateTime(timeData.absoluteTime);
+			checkedTourStart = TimeTools.getZonedDateTime(timeData.absoluteTime);
 
 			if (checkedTourStart.getYear() == 2007
-					&& checkedTourStart.getMonthOfYear() == 4
+					&& checkedTourStart.getMonthValue() == 4
 					&& checkedTourStart.getDayOfMonth() == 1) {
 
 				// this is an invalid time slice
@@ -408,7 +405,7 @@ public class GarminSAXHandler extends DefaultHandler {
 				NLS.bind(//
 						Messages.Garmin_SAXHandler_InvalidDate_2007_04_01,
 						_importFilePath,
-						new DateTime(_dtList.get(0).absoluteTime).toString()));
+						TimeTools.getZonedDateTime(_dtList.get(0).absoluteTime)));
 	}
 
 	@Override
@@ -596,14 +593,16 @@ public class GarminSAXHandler extends DefaultHandler {
 		_isImported = true;
 	}
 
-
 	private void finalizeTrackpoint() {
 
 		if (_timeData != null) {
 
 			// set virtual time if time is not available
 			if (_timeData.absoluteTime == Long.MIN_VALUE) {
-				_timeData.absoluteTime = new DateTime(2007, 4, 1, 0, 0, 0, 0).getMillis();
+				_timeData.absoluteTime = ZonedDateTime
+						.of(2007, 4, 1, 0, 0, 0, 0, TimeTools.getDefaultTimeZone())
+						.toInstant()
+						.toEpochMilli();
 			}
 
 			if (_isSetLapMarker) {

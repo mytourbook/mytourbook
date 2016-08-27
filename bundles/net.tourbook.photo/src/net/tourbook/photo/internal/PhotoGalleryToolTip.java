@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,8 +16,11 @@
 package net.tourbook.photo.internal;
 
 import java.text.NumberFormat;
+import java.time.Duration;
+import java.time.ZonedDateTime;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.AnimatedToolTipShell;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.photo.ImageQuality;
@@ -47,59 +50,52 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.joda.time.DateTime;
-import org.joda.time.Duration;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 /**
  * created: 4.10.2012
  */
 public class PhotoGalleryToolTip extends AnimatedToolTipShell {
 
-	private static final int		DEFAULT_TEXT_WIDTH	= 50;
+	private static final int	DEFAULT_TEXT_WIDTH	= 50;
 
-	private GalleryMT20				_gallery;
+	private GalleryMT20			_gallery;
 
-	private Photo					_photo;
+	private Photo				_photo;
 
 	/**
 	 * Contains gallery item which is currently hovered with the mouse or <code>null</code> when
 	 * mouse is not hovering a gallery item.
 	 */
-	private GalleryMT20Item			_currentHoveredGalleryItem;
+	private GalleryMT20Item		_currentHoveredGalleryItem;
 
-	private int						_imageWidth			= 0;
-	private int						_imageHeight		= 0;
+	private int					_imageWidth			= 0;
+	private int					_imageHeight		= 0;
 
-	private int						_imagePaintedWidth	= 0;
-	private int						_imagePaintedHeight	= 0;
+	private int					_imagePaintedWidth	= 0;
+	private int					_imagePaintedHeight	= 0;
 
-	private int						_galleryImageSize	= 120;
+	private int					_galleryImageSize	= 120;
 
-	private int						_defaultTextWidthPixel;
+	private int					_defaultTextWidthPixel;
 
-	private final DateTimeFormatter	_dtFormatter		= DateTimeFormat.forStyle("ML");	//$NON-NLS-1$
-	private final DateTimeFormatter	_dtWeekday			= DateTimeFormat.forPattern("E");	//$NON-NLS-1$
-
-	private final NumberFormat		_nfMByte			= NumberFormat.getNumberInstance();
+	private final NumberFormat	_nfMByte			= NumberFormat.getNumberInstance();
 	{
 		_nfMByte.setMinimumFractionDigits(3);
 		_nfMByte.setMaximumFractionDigits(3);
 		_nfMByte.setMinimumIntegerDigits(1);
 	}
 
-	private PixelConverter			_pc;
+	private PixelConverter		_pc;
 
 	/*
 	 * UI resources
 	 */
-	private Image					_photoImage;
+	private Image				_photoImage;
 
-	private Canvas					_canvas;
-	private Composite				_canvasContainer;
+	private Canvas				_canvas;
+	private Composite			_canvasContainer;
 
-	private Label					_labelError;
+	private Label				_labelError;
 
 	public PhotoGalleryToolTip(final GalleryMT20 gallery) {
 
@@ -219,8 +215,8 @@ public class PhotoGalleryToolTip extends AnimatedToolTipShell {
 
 	private void createUI_Metadata(final Composite parent, final PhotoImageMetadata metaData, final boolean isDrawImage) {
 
-		final DateTime exifDateTime = _photo.getExifDateTime();
-		final DateTime imageFileDateTime = _photo.getImageFileDateTime();
+		final ZonedDateTime exifDateTime = _photo.getExifDateTime();
+		final ZonedDateTime imageFileDateTime = _photo.getImageFileDateTime();
 
 		final boolean isTitle = metaData.objectName != null;
 		final boolean isDescription = metaData.captionAbstract != null;
@@ -243,17 +239,19 @@ public class PhotoGalleryToolTip extends AnimatedToolTipShell {
 
 				createUI_MetadataLine(container, //
 						Messages.Photo_ToolTip_ExifDate,
-						_dtWeekday.print(exifDateTime) + UI.SPACE2 + _dtFormatter.print(exifDateTime));
+						exifDateTime.format(TimeTools.Formatter_Weekday)
+								+ UI.SPACE2
+								+ exifDateTime.format(TimeTools.Formatter_DateTime_ML));
 
 				// display modified date only when it differs from the exif/original date
 
-				final Duration duration = new Duration(exifDateTime, imageFileDateTime);
-				final long durationMills = duration.getMillis();
+				final Duration duration = Duration.between(exifDateTime, imageFileDateTime);
+				final long durationSeconds = duration.getSeconds();
 
 				/*
 				 * sometimes the difference is 1 second but it does not make sense to display it
 				 */
-				if (Math.abs(durationMills) <= 2000) {
+				if (Math.abs(durationSeconds) <= 2) {
 					isDrawFileDate = false;
 				}
 
@@ -268,7 +266,9 @@ public class PhotoGalleryToolTip extends AnimatedToolTipShell {
 			if (isDrawFileDate) {
 				createUI_MetadataLine(container, //
 						Messages.Photo_ToolTip_FileDate,
-						_dtWeekday.print(imageFileDateTime) + UI.SPACE2 + _dtFormatter.print(imageFileDateTime));
+						imageFileDateTime.format(TimeTools.Formatter_Weekday)
+								+ UI.SPACE2
+								+ imageFileDateTime.format(TimeTools.Formatter_DateTime_ML));
 			}
 
 			/*
@@ -653,7 +653,5 @@ public class PhotoGalleryToolTip extends AnimatedToolTipShell {
 //		_canvasContainer.setBackground(_gallery.getBackground());
 
 	}
-
-
 
 }

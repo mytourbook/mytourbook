@@ -320,9 +320,9 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 		final String toolTipLabel = String.format(toolTipFormat.toString(),
 		//
 		// date/time
-				zdtTourStart.format(TimeTools.Formatter_Full_Date),
-				zdtTourStart.format(TimeTools.Formatter_Medium_Time),
-				zdtTourEnd.format(TimeTools.Formatter_Medium_Time),
+				zdtTourStart.format(TimeTools.Formatter_Date_F),
+				zdtTourStart.format(TimeTools.Formatter_Time_M),
+				zdtTourEnd.format(TimeTools.Formatter_Time_M),
 				zdtTourStart.get(TimeTools.calendarWeek.weekOfWeekBasedYear()),
 				//
 				// distance

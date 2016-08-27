@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,7 @@
 package net.tourbook.device;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.Util;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.ui.views.rawData.RawDataView;
@@ -38,7 +39,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
-import org.joda.time.DateTime;
 
 public class PrefPageImportHAC45 extends PreferencePage implements IWorkbenchPreferencePage {
 
@@ -141,6 +141,7 @@ public class PrefPageImportHAC45 extends PreferencePage implements IWorkbenchPre
 				_spinnerImportYear.setMaximum(3000);
 				_spinnerImportYear.setMinimum(1800);
 				_spinnerImportYear.addMouseWheelListener(new MouseWheelListener() {
+					@Override
 					public void mouseScrolled(final MouseEvent event) {
 						Util.adjustSpinnerValueOnMouseScroll(event);
 					}
@@ -157,6 +158,7 @@ public class PrefPageImportHAC45 extends PreferencePage implements IWorkbenchPre
 		_spinnerImportYear.setEnabled(isAdjustYear);
 	}
 
+	@Override
 	public void init(final IWorkbench workbench) {}
 
 	private void initUI(final Composite parent) {
@@ -172,7 +174,7 @@ public class PrefPageImportHAC45 extends PreferencePage implements IWorkbenchPre
 
 		// HAC 4/5: adjust import year, this value is never saved in a state
 		_chkAdjustImportYear.setSelection(false);
-		_spinnerImportYear.setSelection(new DateTime().getYear());
+		_spinnerImportYear.setSelection(TimeTools.now().getYear());
 
 		enableControls();
 
@@ -203,7 +205,7 @@ public class PrefPageImportHAC45 extends PreferencePage implements IWorkbenchPre
 		// HAC 4/5: adjust import year, this value is never saved in a state but a temp state is available
 		final boolean isDisabled = _rawDataMgr.getImportYear() == RawDataManager.ADJUST_IMPORT_YEAR_IS_DISABLED;
 		_chkAdjustImportYear.setSelection(!isDisabled);
-		_spinnerImportYear.setSelection(new DateTime().getYear());
+		_spinnerImportYear.setSelection(TimeTools.now().getYear());
 	}
 
 	private void saveState() {

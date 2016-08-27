@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,7 +17,7 @@ package net.tourbook.data;
 
 import java.io.Serializable;
 
-import org.joda.time.DateTime;
+import net.tourbook.common.time.TimeTools;
 
 public class GearData implements Serializable {
 
@@ -54,7 +54,7 @@ public class GearData implements Serializable {
 	@Override
 	public String toString() {
 		return "GearData [" //$NON-NLS-1$
-				+ ("absoluteTime=" + new DateTime(absoluteTime) + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("absoluteTime=" + TimeTools.getZonedDateTime(absoluteTime) + ", ") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("FrontGearNum=" + getFrontGearNum() + ", ") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("FrontGearTeeth=" + getFrontGearTeeth() + ", ") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("RearGearNum=" + getRearGearNum() + ", ") //$NON-NLS-1$ //$NON-NLS-2$

@@ -1210,15 +1210,15 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
 					if (stateTourMarker.equals(STATE_MARKER_TYPE_SMALL)) {
 
-						markerLabel = tourStartTime.format(TimeTools.Formatter_Short_Date);
+						markerLabel = tourStartTime.format(TimeTools.Formatter_Date_S);
 
 					} else if (stateTourMarker.equals(STATE_MARKER_TYPE_MEDIUM)) {
 
-						markerLabel = tourStartTime.format(TimeTools.Formatter_Short_DateTime);
+						markerLabel = tourStartTime.format(TimeTools.Formatter_DateTime_S);
 
 					} else if (stateTourMarker.equals(STATE_MARKER_TYPE_LARGE)) {
 
-						markerLabel = tourStartTime.format(TimeTools.Formatter_Full_DateTime);
+						markerLabel = tourStartTime.format(TimeTools.Formatter_DateTime_F);
 					}
 
 					final int joinMarkerIndex = joinedTourStartIndex + tourMarkerIndex;
@@ -1652,15 +1652,15 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 		final String[] markerItems = new String[3];
 		markerItems[0] = NLS.bind(
 				Messages.Dialog_JoinTours_ComboText_MarkerTourTime,
-				joinedTourStart.format(TimeTools.Formatter_Short_Date));
+				joinedTourStart.format(TimeTools.Formatter_Date_S));
 
 		markerItems[1] = NLS.bind(
 				Messages.Dialog_JoinTours_ComboText_MarkerTourTime,
-				joinedTourStart.format(TimeTools.Formatter_Short_DateTime));
+				joinedTourStart.format(TimeTools.Formatter_DateTime_S));
 
 		markerItems[2] = NLS.bind(
 				Messages.Dialog_JoinTours_ComboText_MarkerTourTime,
-				joinedTourStart.format(TimeTools.Formatter_Full_DateTime));
+				joinedTourStart.format(TimeTools.Formatter_DateTime_F));
 
 		final int selectedMarkerIndex = _cboTourMarker.getSelectionIndex();
 

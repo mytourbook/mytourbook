@@ -1068,9 +1068,9 @@ public class TourInfoUI {
 
 			_lblDate.setText(String.format(//
 					Messages.Tour_Tooltip_Format_DateWeekTime,
-					zdtTourStart.format(TimeTools.Formatter_Full_Date),
-					zdtTourStart.format(TimeTools.Formatter_Medium_Time),
-					zdtTourEnd.format(TimeTools.Formatter_Medium_Time),
+					zdtTourStart.format(TimeTools.Formatter_Date_F),
+					zdtTourStart.format(TimeTools.Formatter_Time_M),
+					zdtTourEnd.format(TimeTools.Formatter_Time_M),
 					zdtTourStart.get(TimeTools.calendarWeek.weekOfWeekBasedYear())
 
 			));
@@ -1228,7 +1228,7 @@ public class TourInfoUI {
 
 			_lblDateTimeCreatedValue.setText(_uiDtCreated == null ? //
 					UI.EMPTY_STRING
-					: _uiDtCreated.format(TimeTools.Formatter_Medium_DateTime));
+					: _uiDtCreated.format(TimeTools.Formatter_DateTime_M));
 		}
 
 		// date/time modified
@@ -1236,7 +1236,7 @@ public class TourInfoUI {
 
 			_lblDateTimeModifiedValue.setText(_uiDtModified == null ? //
 					UI.EMPTY_STRING
-					: _uiDtModified.format(TimeTools.Formatter_Medium_DateTime));
+					: _uiDtModified.format(TimeTools.Formatter_DateTime_M));
 		}
 	}
 }

@@ -20,11 +20,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.TreeViewerItem;
@@ -37,7 +39,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.osgi.util.NLS;
-import org.joda.time.DateTime;
 
 public class TVICollatedTour_Root extends TVICollatedTour {
 
@@ -137,7 +138,7 @@ public class TVICollatedTour_Root extends TVICollatedTour {
 					final TVICollatedTour_Event collateEvent = new TVICollatedTour_Event(collateToursView, this);
 					collateEvents.add(collateEvent);
 
-					final DateTime eventStart = new DateTime(dbTourStartTime);
+					final ZonedDateTime eventStart = TimeTools.getZonedDateTime(dbTourStartTime);
 
 					collateEvent.treeColumn = dbTourTitle == null ? UI.EMPTY_STRING : dbTourTitle;
 
@@ -173,7 +174,7 @@ public class TVICollatedTour_Root extends TVICollatedTour {
 		final TVICollatedTour_Event collateEvent = new TVICollatedTour_Event(collateToursView, this);
 		collateEvents.add(collateEvent);
 
-		final DateTime eventStart = new DateTime();
+		final ZonedDateTime eventStart = TimeTools.now();
 
 		collateEvent.treeColumn = UI.EMPTY_STRING;
 		collateEvent.eventStart = eventStart;
@@ -221,15 +222,15 @@ public class TVICollatedTour_Root extends TVICollatedTour {
 				final TVICollatedTour_Event collateEvent = collatedEvents.get(currentEventIndex);
 
 				final long eventStart = isFirstEvent ? Long.MIN_VALUE : prevStart[0];
-				final long eventEnd = collateEvent.eventStart.getMillis();
+				final long eventEnd = collateEvent.eventStart.toInstant().toEpochMilli();
 
 				prevStart[0] = eventEnd;
 
 				/*
 				 * This is a highly complicated algorithim that the eventStart is overwritten again
 				 */
-				collateEvent.eventStart = new DateTime(eventStart);
-				collateEvent.eventEnd = new DateTime(eventEnd);
+				collateEvent.eventStart = TimeTools.getZonedDateTime(eventStart);
+				collateEvent.eventEnd = TimeTools.getZonedDateTime(eventEnd);
 				collateEvent.isFirstEvent = isFirstEvent;
 
 				statement.setLong(1, eventStart);
@@ -282,7 +283,7 @@ public class TVICollatedTour_Root extends TVICollatedTour {
 									final TVICollatedTour_Event collateEvent = collatedEvents.get(currentEventIndex);
 
 									final long eventStart = isFirstEvent ? Long.MIN_VALUE : prevStart[0];
-									final long eventEnd = collateEvent.eventStart.getMillis();
+									final long eventEnd = collateEvent.eventStart.toInstant().toEpochMilli();
 
 									prevStart[0] = eventEnd;
 
@@ -290,8 +291,8 @@ public class TVICollatedTour_Root extends TVICollatedTour {
 									 * This is a highly complicated algorithim that the eventStart
 									 * is overwritten again
 									 */
-									collateEvent.eventStart = new DateTime(eventStart);
-									collateEvent.eventEnd = new DateTime(eventEnd);
+									collateEvent.eventStart = TimeTools.getZonedDateTime(eventStart);
+									collateEvent.eventEnd = TimeTools.getZonedDateTime(eventEnd);
 									collateEvent.isFirstEvent = isFirstEvent;
 
 									statement.setLong(1, eventStart);

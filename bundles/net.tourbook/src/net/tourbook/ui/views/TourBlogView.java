@@ -368,12 +368,12 @@ public class TourBlogView extends ViewPart {
 		final ZonedDateTime dtTourStart = _tourData.getTourStartTime();
 		final ZonedDateTime dtTourEnd = dtTourStart.plusSeconds(recordingTime);
 
-		final String date = dtTourStart.format(TimeTools.Formatter_Full_Date);
+		final String date = dtTourStart.format(TimeTools.Formatter_Date_F);
 
 		final String time = String.format(//
 				"%s - %s", //$NON-NLS-1$
-				dtTourStart.format(TimeTools.Formatter_Medium_Time),
-				dtTourEnd.format(TimeTools.Formatter_Medium_Time));
+				dtTourStart.format(TimeTools.Formatter_Time_M),
+				dtTourEnd.format(TimeTools.Formatter_Time_M));
 
 		sb.append("<div class='date'>" + date + "</div>\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		sb.append("<div class='time'>" + time + "</div>\n"); //$NON-NLS-1$ //$NON-NLS-2$

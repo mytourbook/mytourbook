@@ -166,9 +166,9 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
 		final ZonedDateTime tourStart = _tourData.getTourStartTime();
 
-		setMessage(tourStart.format(TimeTools.Formatter_Full_Date)
+		setMessage(tourStart.format(TimeTools.Formatter_Date_F)
 				+ UI.SPACE2
-				+ tourStart.format(TimeTools.Formatter_Short_Time));
+				+ tourStart.format(TimeTools.Formatter_Time_S));
 	}
 
 	@Override

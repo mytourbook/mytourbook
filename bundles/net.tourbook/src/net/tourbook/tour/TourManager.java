@@ -17,6 +17,7 @@ package net.tourbook.tour;
 
 import java.lang.reflect.InvocationTargetException;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -706,7 +707,7 @@ public class TourManager {
 
 			// tour titles
 			final long tourStartTime = fromTourData.getTourStartTimeMS();
-			allTourTitle[tourIndex] = _dtFormatter.print(tourStartTime);
+			allTourTitle[tourIndex] = TimeTools.getZonedDateTime(tourStartTime).format(TimeTools.Formatter_Date_S);
 			allStartTime[tourIndex] = tourStartTime;
 
 			/*
@@ -2543,9 +2544,7 @@ public class TourManager {
 			 * when time is displayed, the x-axis can show the start time starting from 0 or from
 			 * the current time of the day
 			 */
-			final int tourTimeOfDay = (tourStartTime.getHourOfDay() * 3600)
-					+ (tourStartTime.getMinuteOfHour() * 60)
-					+ tourStartTime.getSecondOfMinute();
+			final int tourTimeOfDay = tourStartTime.get(ChronoField.SECOND_OF_DAY);
 
 			final int photoTimeOfDay = tourTimeOfDay - tourData.getPhotoTimeAdjustment();
 

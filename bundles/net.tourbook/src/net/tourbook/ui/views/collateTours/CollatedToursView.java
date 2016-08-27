@@ -15,8 +15,8 @@
  *******************************************************************************/
 package net.tourbook.ui.views.collateTours;
 
-import java.text.DateFormat;
 import java.text.NumberFormat;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -26,6 +26,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.formatter.FormatManager;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.tooltip.OpenDialogManager;
 import net.tourbook.common.util.ColumnDefinition;
@@ -121,7 +122,6 @@ import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
-import org.joda.time.DateTime;
 
 public class CollatedToursView extends ViewPart implements ITourProvider, ITourViewer3, ITourProviderByID {
 
@@ -152,9 +152,6 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 	private final NumberFormat							_nf1;
 	private final NumberFormat							_nf1_NoGroup;
 
-	private final DateFormat							_df;
-	private final DateFormat							_timeFormatter;
-
 	{
 		_nf0 = NumberFormat.getNumberInstance();
 		_nf0.setMinimumFractionDigits(0);
@@ -168,9 +165,6 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 		_nf1_NoGroup.setMinimumFractionDigits(1);
 		_nf1_NoGroup.setMaximumFractionDigits(1);
 		_nf1_NoGroup.setGroupingUsed(false);
-
-		_df = DateFormat.getDateInstance(DateFormat.SHORT);
-		_timeFormatter = DateFormat.getTimeInstance(DateFormat.SHORT);
 	}
 
 	private final ArrayList<Long>						_selectedTourIds		= new ArrayList<Long>();
@@ -699,7 +693,9 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 				if (element instanceof TVICollatedTour_Tour) {
 
 					// tour item
-					cell.setText(_df.format(tourItem.colTourStartTime));
+					cell.setText(TimeTools//
+							.getZonedDateTime(tourItem.colTourStartTime)
+							.format(TimeTools.Formatter_Date_S));
 
 				} else if (element instanceof TVICollatedTour_Event) {
 
@@ -717,7 +713,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 					if (collatedEvent.isFirstEvent) {
 						startText = Messages.Collate_Tours_Label_TimeScale_BeforePresent;
 					} else {
-						startText = _df.format(collatedEvent.eventStart.getMillis());
+						startText = collatedEvent.eventStart.format(TimeTools.Formatter_Date_S);
 					}
 					styledString.append(startText, DATE_STYLER);
 
@@ -725,7 +721,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 					 * Event end
 					 */
 					styledString.append(UI.DASH_WITH_SPACE);
-					final DateTime eventEnd = collatedEvent.eventEnd;
+					final ZonedDateTime eventEnd = collatedEvent.eventEnd;
 					if (eventEnd == null) {
 
 						// this can be null when the collation process is canceled by the user
@@ -739,7 +735,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 						if (collatedEvent.isLastEvent) {
 							endText = Messages.Collate_Tours_Label_TimeScale_Today;
 						} else {
-							endText = _df.format(eventEnd.getMillis());
+							endText = eventEnd.format(TimeTools.Formatter_Date_S);
 						}
 
 						styledString.append(endText, DATE_STYLER);
@@ -1329,7 +1325,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 
 					final long tourStartTime = ((TVICollatedTour_Tour) element).colTourStartTime;
 
-					cell.setText(_timeFormatter.format(tourStartTime));
+					cell.setText(TimeTools.getZonedDateTime(tourStartTime).format(TimeTools.Formatter_Date_S));
 					setCellColor(cell, element);
 				}
 			}

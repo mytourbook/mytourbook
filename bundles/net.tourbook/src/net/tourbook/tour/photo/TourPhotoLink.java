@@ -301,9 +301,9 @@ public class TourPhotoLink {
 
 		return "TourPhotoLink " //$NON-NLS-1$
 //				+ ("\n\ttourStart=\t\t" + tourStartTime)
-				+ ("\n\ttourStart=\t\t" + TimeTools.getZonedDateTime(tourStartTime).format(TimeTools.Formatter_Medium_DateTime)) //$NON-NLS-1$
+				+ ("\n\ttourStart=\t\t" + TimeTools.getZonedDateTime(tourStartTime).format(TimeTools.Formatter_DateTime_M)) //$NON-NLS-1$
 //				+ ("\n\ttourEnd=\t\t" + _dtFormatter.print(tourEndTime))
-				+ ("\n\thistoryStartTime=\t" + TimeTools.getZonedDateTime(historyStartTime).format(TimeTools.Formatter_Medium_DateTime)) //$NON-NLS-1$
+				+ ("\n\thistoryStartTime=\t" + TimeTools.getZonedDateTime(historyStartTime).format(TimeTools.Formatter_DateTime_M)) //$NON-NLS-1$
 //				+ ("\n\thistoryEndTime=\t\t" + _dtFormatter.print(historyEndTime))
 				+ ("\n\tisHistory=" + isHistoryTour) //$NON-NLS-1$
 				+ ("\tlinkId=" + linkId) //$NON-NLS-1$

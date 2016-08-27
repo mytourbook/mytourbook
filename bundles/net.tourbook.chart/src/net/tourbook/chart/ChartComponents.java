@@ -1129,7 +1129,7 @@ public class ChartComponents extends Composite {
 //						private final DateTimeFormatter	_dtFormatter				= DateTimeFormat.forStyle("M-");	//$NON-NLS-1$
 
 						final String dayTitle = TimeTools.getZonedDateTime(graphDay).format(
-								TimeTools.Formatter_Medium_Date);
+								TimeTools.Formatter_Date_M);
 
 						titleText.add(dayTitle);
 					}

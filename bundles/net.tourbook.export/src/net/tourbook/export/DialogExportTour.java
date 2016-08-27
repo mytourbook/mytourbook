@@ -556,8 +556,8 @@ public class DialogExportTour extends TitleAreaDialog {
 
 			final ZonedDateTime dtTour = tourData.getTourStartTime();
 
-			final String uiStartTime = dtTour.plusSeconds(startTime).format(TimeTools.Formatter_Medium_Time);
-			final String uiEndTime = dtTour.plusSeconds(endTime).format(TimeTools.Formatter_Medium_Time);
+			final String uiStartTime = dtTour.plusSeconds(startTime).format(TimeTools.Formatter_Time_M);
+			final String uiEndTime = dtTour.plusSeconds(endTime).format(TimeTools.Formatter_Time_M);
 
 			if (isDistance) {
 

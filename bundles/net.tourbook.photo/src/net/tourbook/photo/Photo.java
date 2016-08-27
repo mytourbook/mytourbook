@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,6 +17,8 @@ package net.tourbook.photo;
 
 import java.awt.Point;
 import java.io.File;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +27,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import net.tourbook.common.UI;
 import net.tourbook.common.map.CommonMapProvider;
 import net.tourbook.common.map.GeoPosition;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 
@@ -46,9 +49,6 @@ import org.apache.commons.imaging.formats.tiff.taginfos.TagInfoShortOrLong;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.osgi.util.NLS;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 public class Photo {
 
@@ -144,8 +144,8 @@ public class Photo {
 	/**
 	 * Last modified in GMT
 	 */
-	private DateTime									_imageFileDateTime;
-	private DateTime									_exifDateTime;
+	private ZonedDateTime								_imageFileDateTime;
+	private ZonedDateTime								_exifDateTime;
 
 	/**
 	 * <pre>
@@ -201,9 +201,9 @@ public class Photo {
 	private double										_imageDirection					= Double.MIN_VALUE;
 	private double										_altitude						= Double.MIN_VALUE;
 
-	private static final DateTimeFormatter				_dtParser						= DateTimeFormat//
-																								.forPattern("yyyy:MM:dd HH:mm:ss") //$NON-NLS-1$
-//																			.withZone(DateTimeZone.UTC)
+	private static final DateTimeFormatter				_dtParser						= DateTimeFormatter
+																								.ofPattern("yyyy:MM:dd HH:mm:ss") //$NON-NLS-1$
+//																								.withZone(DateTimeZone.UTC)
 																						;
 //	private static final DateTimeFormatter	_dtFormatter			= DateTimeFormat.forStyle("SL");	//$NON-NLS-1$
 
@@ -418,7 +418,7 @@ public class Photo {
 
 		// set file date time
 //		photoMetadata.fileDateTime = new DateTime(DateTimeZone.UTC).withMillis(imageFileLastModified);
-		photoMetadata.fileDateTime = new DateTime(imageFileLastModified);
+		photoMetadata.fileDateTime = TimeTools.getZonedDateTime(imageFileLastModified);
 
 //// this will log all available meta data
 //		System.out.println(UI.timeStampNano());
@@ -545,7 +545,7 @@ public class Photo {
 		return sbDimenstion.toString();
 	}
 
-	public DateTime getExifDateTime() {
+	public ZonedDateTime getExifDateTime() {
 		return _exifDateTime;
 	}
 
@@ -569,7 +569,7 @@ public class Photo {
 	 * @param file
 	 * @return
 	 */
-	private DateTime getExifValueDate(final JpegImageMetadata jpegMetadata) {
+	private ZonedDateTime getExifValueDate(final JpegImageMetadata jpegMetadata) {
 
 //		/*
 //		 * !!! time is not correct, maybe it is the time when the GPS signal was
@@ -583,22 +583,13 @@ public class Photo {
 					ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL);
 
 			if (exifDate != null) {
-
-				final DateTime parsedExifDateTime = _dtParser.parseDateTime(exifDate.getStringValue());
-
-//				System.out.println((exifDate.getValueDescription())
-//						+ ("\t" + parsedExifDateTime)
-//						+ ("\t" + parsedExifDateTime.toDateTime(DateTimeZone.UTC))
-//						+ ("\t" + _dtFormatter.print(parsedExifDateTime)));
-//				// TODO remove SYSTEM.OUT.PRINTLN
-
-				return parsedExifDateTime;
+				return ZonedDateTime.parse(exifDate.getStringValue(), _dtParser);
 			}
 
 			final TiffField tiffDate = jpegMetadata.findEXIFValueWithExactMatch(TiffTagConstants.TIFF_TAG_DATE_TIME);
 
 			if (tiffDate != null) {
-				return _dtParser.parseDateTime(tiffDate.getStringValue());
+				return ZonedDateTime.parse(tiffDate.getStringValue(), _dtParser);
 			}
 
 		} catch (final Exception e) {
@@ -733,7 +724,7 @@ public class Photo {
 		return _imageDirection;
 	}
 
-	public DateTime getImageFileDateTime() {
+	public ZonedDateTime getImageFileDateTime() {
 		return _imageFileDateTime;
 	}
 
@@ -913,7 +904,7 @@ public class Photo {
 	 * @return Return date/time for the image. First EXIF date is returned, when not available,
 	 *         image file date/time is returned.
 	 */
-	public DateTime getOriginalDateTime() {
+	public ZonedDateTime getOriginalDateTime() {
 		return _exifDateTime != null ? _exifDateTime : _imageFileDateTime;
 	}
 
@@ -932,19 +923,19 @@ public class Photo {
 		return _photoSqlLoadingState;
 	}
 
-	private DateTime getTiffValueDate(final TiffImageMetadata tiffMetadata) {
+	private ZonedDateTime getTiffValueDate(final TiffImageMetadata tiffMetadata) {
 
 		try {
 
 			final TiffField exifDate = tiffMetadata.findField(ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL, true);
 
 			if (exifDate != null) {
-				return _dtParser.parseDateTime(exifDate.getStringValue());
+				return ZonedDateTime.parse(exifDate.getStringValue(), _dtParser);
 			}
 
 			final TiffField date = tiffMetadata.findField(TiffTagConstants.TIFF_TAG_DATE_TIME, true);
 			if (date != null) {
-				return _dtParser.parseDateTime(date.getStringValue());
+				return ZonedDateTime.parse(date.getStringValue(), _dtParser);
 			}
 
 		} catch (final Exception e) {
@@ -1277,14 +1268,14 @@ public class Photo {
 		return "" //$NON-NLS-1$
 //				+"Photo " //
 				+ (imageFileName)
-				+ ("\t_exifDateTime " + new DateTime(_exifDateTime).toString()) //$NON-NLS-1$
+				+ ("\t_exifDateTime " + _exifDateTime) //$NON-NLS-1$
 //				+ (_exifDateTime == null ? "-no date-" : "\t" + _exifDateTime)
 //				+ ("\trotate:" + rotateDegree)
 //				+ (_imageWidth == Integer.MIN_VALUE ? "-no size-" : "\t" + _imageWidth + "x" + _imageHeight)
 //				+ ("\tEXIF GPS: " + _exifLatitude + " - " + _exifLongitude) //$NON-NLS-1$ //$NON-NLS-2$
 //				+ ("\tLink GPS: " + _linkLatitude + " - " + _linkLongitude) //$NON-NLS-1$ //$NON-NLS-2$
 //				+ ("\tTour GPS: " + _tourLatitude + " - " + _tourLongitude) //$NON-NLS-1$ //$NON-NLS-2$
-		//
+				//
 		;
 	}
 
@@ -1353,7 +1344,7 @@ public class Photo {
 		// sort by exif date when available
 		if (_exifDateTime != null) {
 
-			final long exifUTCMills = _exifDateTime.getMillis();
+			final long exifUTCMills = _exifDateTime.toInstant().toEpochMilli();
 
 			imageExifTime = exifUTCMills;
 //			imageUTCZoneOffset = DateTimeZone.getDefault().getOffset(exifUTCMills);

@@ -53,9 +53,6 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -183,10 +180,6 @@ public class SearchMgr implements XHRHandler {
 	private static boolean					_isUI_ShowItemNumber;
 	private static boolean					_isUI_ShowLuceneDocId;
 	private static boolean					_isUI_SortDateAscending;
-
-	private static final DateTimeFormatter	_dateFormatter							= DateTimeFormat.forStyle("M-");								//$NON-NLS-1$
-	private static final DateTimeFormatter	_timeFormatter							= DateTimeFormat.forStyle("-S");								//$NON-NLS-1$
-	private static final DateTimeFormatter	_dateTimeFormatter						= DateTimeFormat.forStyle("MS");								//$NON-NLS-1$
 	//
 	static final String						TAG_TD									= "<td>";														//$NON-NLS-1$
 	static final String						TAG_TD_END								= "</td>";														//$NON-NLS-1$
@@ -849,6 +842,11 @@ public class SearchMgr implements XHRHandler {
 
 							final long tourStartTime = resultItem.tourStartTime;
 							if (tourStartTime != 0) {
+
+
+private static final DateTimeFormatter	_dateFormatter							= DateTimeFormat.forStyle("M-");								//$NON-NLS-1$
+private static final DateTimeFormatter	_timeFormatter							= DateTimeFormat.forStyle("-S");								//$NON-NLS-1$
+private static final DateTimeFormatter	_dateTimeFormatter						= DateTimeFormat.forStyle("MS");								//$NON-NLS-1$
 
 								final DateTime dt = new DateTime(tourStartTime);
 

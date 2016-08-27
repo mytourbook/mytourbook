@@ -52,47 +52,55 @@ import com.skedgo.converter.TimezoneMapper;
 
 public class TimeTools {
 
-	private static final String						DST_FORMAT					= " - %s %s";										//$NON-NLS-1$
-	private static final String						ZERO_0						= ":0";											//$NON-NLS-1$
-	private static final String						ZERO_00_00					= "+00:00";										//$NON-NLS-1$
-	private static final String						ZERO_00_00_DEFAULT			= "*";												//$NON-NLS-1$
+	private static final String						DST_FORMAT				= " - %s %s";										//$NON-NLS-1$
+	private static final String						ZERO_0					= ":0";											//$NON-NLS-1$
+	private static final String						ZERO_00_00				= "+00:00";										//$NON-NLS-1$
+	private static final String						ZERO_00_00_DEFAULT		= "*";												//$NON-NLS-1$
 
 	/**
 	 * Cached time zone labels.
 	 */
-	private static final TIntObjectHashMap<String>	_timeZoneOffsetLabels		= new TIntObjectHashMap<>();
+	private static final TIntObjectHashMap<String>	_timeZoneOffsetLabels	= new TIntObjectHashMap<>();
 
 	/** Minutes per hour. */
-	private static final int						MINUTES_PER_HOUR			= 60;
+	private static final int						MINUTES_PER_HOUR		= 60;
 	/** Seconds per minute. */
-	private static final int						SECONDS_PER_MINUTE			= 60;
+	private static final int						SECONDS_PER_MINUTE		= 60;
 	/** Seconds per hour. */
-	private static final int						SECONDS_PER_HOUR			= SECONDS_PER_MINUTE * MINUTES_PER_HOUR;
+	private static final int						SECONDS_PER_HOUR		= SECONDS_PER_MINUTE * MINUTES_PER_HOUR;
 
-	public static final DateTimeFormatter			Formatter_Short_Date		= DateTimeFormatter
-																						.ofLocalizedDate(FormatStyle.SHORT);
-	public static final DateTimeFormatter			Formatter_Short_Time		= DateTimeFormatter
-																						.ofLocalizedTime(FormatStyle.SHORT);
-	public static final DateTimeFormatter			Formatter_Short_DateTime	= DateTimeFormatter
-																						.ofLocalizedDateTime(FormatStyle.SHORT);
+	public static final DateTimeFormatter			Formatter_Date_S		= DateTimeFormatter
+																					.ofLocalizedDate(FormatStyle.SHORT);
+	public static final DateTimeFormatter			Formatter_Date_M		= DateTimeFormatter
+																					.ofLocalizedDate(FormatStyle.MEDIUM);
+	public static final DateTimeFormatter			Formatter_Date_F		= DateTimeFormatter
+																					.ofLocalizedDate(FormatStyle.FULL);
 
-	public static final DateTimeFormatter			Formatter_Medium_Date		= DateTimeFormatter
-																						.ofLocalizedDate(FormatStyle.MEDIUM);
-	public static final DateTimeFormatter			Formatter_Medium_Time		= DateTimeFormatter
-																						.ofLocalizedTime(FormatStyle.MEDIUM);
-	public static final DateTimeFormatter			Formatter_Medium_DateTime	= DateTimeFormatter
-																						.ofLocalizedDateTime(FormatStyle.MEDIUM);
+	public static final DateTimeFormatter			Formatter_Time_S		= DateTimeFormatter
+																					.ofLocalizedTime(FormatStyle.SHORT);
+	public static final DateTimeFormatter			Formatter_Time_M		= DateTimeFormatter
+																					.ofLocalizedTime(FormatStyle.MEDIUM);
+	public static final DateTimeFormatter			Formatter_Time_F		= DateTimeFormatter
+																					.ofLocalizedTime(FormatStyle.FULL);
 
-	public static final DateTimeFormatter			Formatter_Full_Date			= DateTimeFormatter
-																						.ofLocalizedDate(FormatStyle.FULL);
-	public static final DateTimeFormatter			Formatter_Full_Time			= DateTimeFormatter
-																						.ofLocalizedTime(FormatStyle.FULL);
-	public static final DateTimeFormatter			Formatter_Full_DateTime		= DateTimeFormatter
-																						.ofLocalizedDateTime(FormatStyle.FULL);
+	public static final DateTimeFormatter			Formatter_DateTime_S	= DateTimeFormatter
+																					.ofLocalizedDateTime(FormatStyle.SHORT);
+	public static final DateTimeFormatter			Formatter_DateTime_M	= DateTimeFormatter
+																					.ofLocalizedDateTime(FormatStyle.MEDIUM);
+	public static final DateTimeFormatter			Formatter_DateTime_ML	= DateTimeFormatter.ofLocalizedDateTime(
+																					FormatStyle.MEDIUM,
+																					FormatStyle.LONG);
+	public static final DateTimeFormatter			Formatter_DateTime_F	= DateTimeFormatter
+																					.ofLocalizedDateTime(FormatStyle.FULL);
+
+	public static final DateTimeFormatter			Formatter_Weekday		= DateTimeFormatter.ofPattern("E");				//$NON-NLS-1$
+
+	public static final DateTimeFormatter			Formatter_FileName		= DateTimeFormatter
+																					.ofPattern("yyyy-MM-dd_HH-mm-ss");			//$NON-NLS-1$
 
 	private static final PeriodFormatter			DURATION_FORMATTER;
 
-	public static final ZoneId						UTC							= ZoneId.of("UTC");								//$NON-NLS-1$
+	public static final ZoneId						UTC						= ZoneId.of("UTC");								//$NON-NLS-1$
 
 	/**
 	 * Calendar week which is defined in the preferences.
@@ -110,7 +118,7 @@ public class TimeTools {
 	 */
 	public static String[]							weekDays_Full;
 
-	private final static IPreferenceStore			_prefStoreCommon			= CommonActivator.getPrefStore();
+	private final static IPreferenceStore			_prefStoreCommon		= CommonActivator.getPrefStore();
 
 	private static ArrayList<TimeZoneData>			_allSortedTimeZones;
 
@@ -118,7 +126,7 @@ public class TimeTools {
 	 * Default time zone ID which is set in the preferences.
 	 */
 	private static ZoneId							_defaultTimeZoneId;
-	private static LocalDate						_dateToGetNumOfWeeks		= LocalDate.of(2000, 5, 5);
+	private static LocalDate						_dateToGetNumOfWeeks	= LocalDate.of(2000, 5, 5);
 
 	static {
 

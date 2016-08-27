@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,6 +27,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 import javax.imageio.ImageIO;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.SWT2Dutil;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.photo.ILoadCallBack;
@@ -51,7 +52,6 @@ import org.eclipse.swt.widgets.Display;
 import org.imgscalr.Scalr;
 import org.imgscalr.Scalr.Method;
 import org.imgscalr.Scalr.Rotation;
-import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
 public class PhotoImageLoader {
@@ -388,7 +388,7 @@ public class PhotoImageLoader {
 		 */
 		final LocalDate dtModified = new LocalDate(storeImageFile.lastModified());
 		if (dtModified.equals(new LocalDate()) == false) {
-			storeImageFile.setLastModified(new DateTime().getMillis());
+			storeImageFile.setLastModified(TimeTools.now().toInstant().toEpochMilli());
 		}
 
 		try {

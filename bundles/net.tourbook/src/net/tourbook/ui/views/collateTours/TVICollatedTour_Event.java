@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,6 +19,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -30,17 +31,15 @@ import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.SQLFilter;
 
-import org.joda.time.DateTime;
-
 public class TVICollatedTour_Event extends TVICollatedTour {
 
-	long		tourId;
+	long			tourId;
 
-	DateTime	eventStart;
-	DateTime	eventEnd;
+	ZonedDateTime	eventStart;
+	ZonedDateTime	eventEnd;
 
-	boolean		isFirstEvent;
-	boolean		isLastEvent;
+	boolean			isFirstEvent;
+	boolean			isLastEvent;
 
 	TVICollatedTour_Event(final CollatedToursView view, final TVICollatedTour parentItem) {
 
@@ -125,8 +124,8 @@ public class TVICollatedTour_Event extends TVICollatedTour {
 			conn = TourDatabase.getInstance().getConnection();
 
 			final PreparedStatement statement = conn.prepareStatement(sqlString);
-			statement.setLong(1, eventStart.getMillis());
-			statement.setLong(2, eventEnd.getMillis());
+			statement.setLong(1, eventStart.toInstant().toEpochMilli());
+			statement.setLong(2, eventEnd.toInstant().toEpochMilli());
 
 			sqlFilter.setParameters(statement, 3);
 

@@ -64,9 +64,9 @@ public class PrintTourPDF extends PrintTourExtension {
 
 		return String.format(
 				net.tourbook.ui.Messages.Tour_Tooltip_Format_DateWeekTime,
-				dtTourStart.format(TimeTools.Formatter_Full_Date),
-				dtTourStart.format(TimeTools.Formatter_Medium_Time),
-				dtTourEnd.format(TimeTools.Formatter_Medium_Time),
+				dtTourStart.format(TimeTools.Formatter_Date_F),
+				dtTourStart.format(TimeTools.Formatter_Time_M),
+				dtTourEnd.format(TimeTools.Formatter_Time_M),
 				dtTourStart.get(TimeTools.calendarWeek.weekOfWeekBasedYear()));
 	}
 

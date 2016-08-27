@@ -49,6 +49,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.formatter.FormatManager;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer3;
@@ -172,7 +173,6 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
-import org.joda.time.DateTime;
 import org.joda.time.Period;
 import org.joda.time.PeriodType;
 
@@ -4918,7 +4918,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 				final Runnable runnable = thread_WatchFolders_Runnable();
 
-				_watchingFolderThread = new Thread(runnable, "WatchDeviceFolder - " + new DateTime()); //$NON-NLS-1$
+				_watchingFolderThread = new Thread(runnable, "WatchDeviceFolder - " + TimeTools.now()); //$NON-NLS-1$
 				_watchingFolderThread.setDaemon(true);
 				_watchingFolderThread.start();
 			}
@@ -5012,7 +5012,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 					if (isDeviceFolderValid) {
 
 						Thread.currentThread().setName(//
-								"WatchingDeviceFolder: " + deviceFolder + " - " + new DateTime()); //$NON-NLS-1$ //$NON-NLS-2$
+								"WatchingDeviceFolder: " + deviceFolder + " - " + TimeTools.now()); //$NON-NLS-1$ //$NON-NLS-2$
 
 					} else {
 

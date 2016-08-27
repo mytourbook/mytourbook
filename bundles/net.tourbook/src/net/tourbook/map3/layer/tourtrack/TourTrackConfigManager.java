@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.Map3GradientColorManager;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.map3.Messages;
@@ -35,9 +36,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
@@ -240,8 +238,6 @@ public class TourTrackConfigManager {
 	private static final IPath						_stateLocation								= Platform
 																										.getStateLocation(_bundle);
 
-	private static final DateTimeFormatter			_dtFormatter								= ISODateTimeFormat
-																										.basicDateTimeNoMillis();
 
 	/**
 	 * Contains all configurations which are loaded from a xml file.
@@ -256,7 +252,7 @@ public class TourTrackConfigManager {
 		final XMLMemento xmlRoot = XMLMemento.createWriteRoot(TAG_ROOT);
 
 		// date/time
-		xmlRoot.putString(Util.ATTR_ROOT_DATETIME, _dtFormatter.print(new DateTime()));
+		xmlRoot.putString(Util.ATTR_ROOT_DATETIME, TimeTools.now().toString());
 
 		// plugin version
 		final Version version = _bundle.getVersion();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,9 +27,11 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.UnknownHostException;
 import java.text.NumberFormat;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.web.WEB;
 
@@ -105,7 +107,6 @@ import org.geotools.data.ows.OperationType;
 import org.geotools.data.ows.Service;
 import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.ows.WMSRequest;
-import org.joda.time.DateTime;
 
 import de.byteholder.geoclipse.map.UI;
 import de.byteholder.geoclipse.mapprovider.DialogMP;
@@ -1815,10 +1816,10 @@ public class PrefPageMapProviders extends PreferencePage implements IWorkbenchPr
 				Messages.PrefPageMapProviders_Pref_Map_FileDialog_AllFiles,
 				Messages.PrefPageMapProviders_Pref_Map_FileDialog_XmlFiles });
 
-		final DateTime today = new DateTime();
+		final ZonedDateTime today = TimeTools.now();
 
 		// add leading 0 when necessary
-		final String month = CHARACTER_0 + Integer.toString(today.getMonthOfYear());
+		final String month = CHARACTER_0 + Integer.toString(today.getMonthValue());
 		final String day = CHARACTER_0 + Integer.toString(today.getDayOfMonth());
 
 		final String currentDate = //

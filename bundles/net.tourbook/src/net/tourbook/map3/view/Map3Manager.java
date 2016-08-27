@@ -42,6 +42,7 @@ import java.util.LinkedHashMap;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.Map3GradientColorManager;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.common.util.Util;
@@ -67,9 +68,6 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
@@ -163,8 +161,6 @@ public class Map3Manager {
 	private static ArrayList<TVIMap3Category>			_uiExpandedCategoriesFromXml	= new ArrayList<TVIMap3Category>();
 	private static ArrayList<Layer>						_xmlLayers						= new ArrayList<Layer>();
 
-	private static final DateTimeFormatter				_dtFormatter					= ISODateTimeFormat
-																								.basicDateTimeNoMillis();
 
 	static {
 
@@ -663,7 +659,7 @@ public class Map3Manager {
 		final XMLMemento xmlRoot = XMLMemento.createWriteRoot(TAG_ROOT);
 
 		// date/time
-		xmlRoot.putString(Util.ATTR_ROOT_DATETIME, _dtFormatter.print(new DateTime()));
+		xmlRoot.putString(Util.ATTR_ROOT_DATETIME, TimeTools.now().toString());
 
 		// plugin version
 		final Version version = _bundle.getVersion();
