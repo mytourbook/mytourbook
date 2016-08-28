@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,6 +28,7 @@ import java.util.Set;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
@@ -105,8 +106,6 @@ import org.eclipse.ui.handlers.RegistryToggleState;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 import org.joda.time.Period;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
 
@@ -171,8 +170,6 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 	private ActionModifyColumns					_actionModifyColumns;
 	private ActionSavePhotosInTour				_actionSavePhotoInTour;
 
-	private final DateTimeFormatter				_dateFormatter						= DateTimeFormat.shortDate();
-	private final DateTimeFormatter				_timeFormatter						= DateTimeFormat.mediumTime();
 	private final PeriodFormatter				_durationFormatter;
 	private final NumberFormat					_nf_1_1;
 	{
@@ -925,7 +922,9 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 	 */
 	private void defineColumn_Photo_NumberOfNoGPSPhotos() {
 
-		final ColumnDefinition colDef = TableColumnFactory.PHOTO_NUMBER_OF_NO_GPS_PHOTOS.createColumn(_columnManager, _pc);
+		final ColumnDefinition colDef = TableColumnFactory.PHOTO_NUMBER_OF_NO_GPS_PHOTOS.createColumn(
+				_columnManager,
+				_pc);
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -1058,8 +1057,9 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 				final TourPhotoLink link = (TourPhotoLink) cell.getElement();
 				final long historyTime = link.historyEndTime;
 
-				cell.setText(historyTime == Long.MIN_VALUE ? _dateFormatter.print(link.tourEndTime) : _dateFormatter
-						.print(historyTime));
+				cell.setText(historyTime == Long.MIN_VALUE //
+						? TimeTools.getZonedDateTime(link.tourEndTime).format(TimeTools.Formatter_Date_S)
+						: TimeTools.getZonedDateTime(historyTime).format(TimeTools.Formatter_Date_S));
 
 				setBgColor(cell, link);
 			}
@@ -1079,8 +1079,9 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 				final TourPhotoLink link = (TourPhotoLink) cell.getElement();
 				final long historyTime = link.historyEndTime;
 
-				cell.setText(historyTime == Long.MIN_VALUE ? _timeFormatter.print(link.tourEndTime) : _timeFormatter
-						.print(historyTime));
+				cell.setText(historyTime == Long.MIN_VALUE //
+						? TimeTools.getZonedDateTime(link.tourEndTime).format(TimeTools.Formatter_Time_M)
+						: TimeTools.getZonedDateTime(historyTime).format(TimeTools.Formatter_Time_M));
 
 				setBgColor(cell, link);
 			}
@@ -1102,8 +1103,9 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 				final TourPhotoLink link = (TourPhotoLink) cell.getElement();
 				final long historyTime = link.historyStartTime;
 
-				cell.setText(historyTime == Long.MIN_VALUE ? _dateFormatter.print(link.tourStartTime) : _dateFormatter
-						.print(historyTime));
+				cell.setText(historyTime == Long.MIN_VALUE //
+						? TimeTools.getZonedDateTime(link.tourStartTime).format(TimeTools.Formatter_Date_S)
+						: TimeTools.getZonedDateTime(historyTime).format(TimeTools.Formatter_Date_S));
 
 				setBgColor(cell, link);
 			}
@@ -1123,8 +1125,9 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 				final TourPhotoLink link = (TourPhotoLink) cell.getElement();
 				final long historyTime = link.historyStartTime;
 
-				cell.setText(historyTime == Long.MIN_VALUE ? _timeFormatter.print(link.tourStartTime) : _timeFormatter
-						.print(historyTime));
+				cell.setText(historyTime == Long.MIN_VALUE //
+						? TimeTools.getZonedDateTime(link.tourStartTime).format(TimeTools.Formatter_Time_M)
+						: TimeTools.getZonedDateTime(historyTime).format(TimeTools.Formatter_Time_M));
 
 				setBgColor(cell, link);
 			}
@@ -1745,7 +1748,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 	@Override
 	public void updateColumnHeader(final ColumnDefinition colDef) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	private void updateUI(	final ArrayList<TourPhotoLink> tourPhotoLinksWhichShouldBeSelected,

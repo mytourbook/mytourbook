@@ -29,7 +29,6 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -38,6 +37,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.map.GeoPosition;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringToArrayConverter;
 
@@ -61,8 +61,6 @@ import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.Service;
 import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.WebMapServer;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 import org.opengis.geometry.DirectPosition;
 import org.osgi.framework.Version;
 import org.w3c.dom.Document;
@@ -85,95 +83,95 @@ public class MapProviderManager {
 	 * This prefix is used to sort the map providers at the end when the map provider is not a map
 	 * profile
 	 */
-	private static final String				SINGLE_MAP_PROVIDER_NAME_PREFIX					= "_";								//$NON-NLS-1$
+	private static final String			SINGLE_MAP_PROVIDER_NAME_PREFIX					= "_";								//$NON-NLS-1$
 
-	private static final int				OSM_BACKGROUND_COLOR							= 0xE8EEF1;
-	private static final int				DEFAULT_ALPHA									= 100;
+	private static final int			OSM_BACKGROUND_COLOR							= 0xE8EEF1;
+	private static final int			DEFAULT_ALPHA									= 100;
 
-	private static final String				URL_PREFIX_HTTP									= "http";							//$NON-NLS-1$
-	private static final String				URL_PREFIX_HTTP_PROTOCOL						= "http://";						//$NON-NLS-1$
+	private static final String			URL_PREFIX_HTTP									= "http";							//$NON-NLS-1$
+	private static final String			URL_PREFIX_HTTP_PROTOCOL						= "http://";						//$NON-NLS-1$
 
-	private static final String				MAP_PROVIDER_TYPE_WMS							= "wms";							//$NON-NLS-1$
-	private static final String				MAP_PROVIDER_TYPE_CUSTOM						= "custom";						//$NON-NLS-1$
-	private static final String				MAP_PROVIDER_TYPE_MAP_PROFILE					= "profile";						//$NON-NLS-1$
-	private static final String				MAP_PROVIDER_TYPE_PLUGIN						= "plugin";						//$NON-NLS-1$
+	private static final String			MAP_PROVIDER_TYPE_WMS							= "wms";							//$NON-NLS-1$
+	private static final String			MAP_PROVIDER_TYPE_CUSTOM						= "custom";						//$NON-NLS-1$
+	private static final String			MAP_PROVIDER_TYPE_MAP_PROFILE					= "profile";						//$NON-NLS-1$
+	private static final String			MAP_PROVIDER_TYPE_PLUGIN						= "plugin";						//$NON-NLS-1$
 
-	public static final String				MIME_PNG										= "image/png";						//$NON-NLS-1$
-	public static final String				MIME_GIF										= "image/gif";						//$NON-NLS-1$
-	public static final String				MIME_JPG										= "image/jpg";						//$NON-NLS-1$
-	public static final String				MIME_JPEG										= "image/jpeg";					//$NON-NLS-1$
+	public static final String			MIME_PNG										= "image/png";						//$NON-NLS-1$
+	public static final String			MIME_GIF										= "image/gif";						//$NON-NLS-1$
+	public static final String			MIME_JPG										= "image/jpg";						//$NON-NLS-1$
+	public static final String			MIME_JPEG										= "image/jpeg";					//$NON-NLS-1$
 
-	public static final String				DEFAULT_IMAGE_FORMAT							= MIME_PNG;
+	public static final String			DEFAULT_IMAGE_FORMAT							= MIME_PNG;
 
-	public static final String				FILE_EXTENSION_PNG								= "png";							//$NON-NLS-1$
-	public static final String				FILE_EXTENSION_GIF								= "gif";							//$NON-NLS-1$
-	public static final String				FILE_EXTENSION_JPG								= "jpg";							//$NON-NLS-1$
+	public static final String			FILE_EXTENSION_PNG								= "png";							//$NON-NLS-1$
+	public static final String			FILE_EXTENSION_GIF								= "gif";							//$NON-NLS-1$
+	public static final String			FILE_EXTENSION_JPG								= "jpg";							//$NON-NLS-1$
 
 	/**
 	 * This file name part is attached to saved tile images for profile map providers were only a
 	 * part of the child images are available.
 	 */
-	public static final String				PART_IMAGE_FILE_NAME_SUFFIX						= "-part";							//$NON-NLS-1$
+	public static final String			PART_IMAGE_FILE_NAME_SUFFIX						= "-part";							//$NON-NLS-1$
 
 	/*
 	 * map provider file and root tag
 	 */
-	private static final String				CUSTOM_MAP_PROVIDER_FILE_NAME					= "custom-map-provider.xml";		//$NON-NLS-1$
+	private static final String			CUSTOM_MAP_PROVIDER_FILE_NAME					= "custom-map-provider.xml";		//$NON-NLS-1$
 
-	private static final String				TAG_MAP_PROVIDER_LIST							= "MapProviderList";				//$NON-NLS-1$
-	private static final String				ATTR_ROOT_DATETIME								= "Created";						//$NON-NLS-1$
-	private static final String				ATTR_ROOT_VERSION_MAJOR							= "VersionMajor";					//$NON-NLS-1$
-	private static final String				ATTR_ROOT_VERSION_MINOR							= "VersionMinor";					//$NON-NLS-1$
-	private static final String				ATTR_ROOT_VERSION_MICRO							= "VersionMicro";					//$NON-NLS-1$
-	private static final String				ATTR_ROOT_VERSION_QUALIFIER						= "VersionQualifier";				//$NON-NLS-1$
-	private static final String				ATTR_ROOT_IS_MANUAL_EXPORT						= "IsExport";						//$NON-NLS-1$
+	private static final String			TAG_MAP_PROVIDER_LIST							= "MapProviderList";				//$NON-NLS-1$
+	private static final String			ATTR_ROOT_DATETIME								= "Created";						//$NON-NLS-1$
+	private static final String			ATTR_ROOT_VERSION_MAJOR							= "VersionMajor";					//$NON-NLS-1$
+	private static final String			ATTR_ROOT_VERSION_MINOR							= "VersionMinor";					//$NON-NLS-1$
+	private static final String			ATTR_ROOT_VERSION_MICRO							= "VersionMicro";					//$NON-NLS-1$
+	private static final String			ATTR_ROOT_VERSION_QUALIFIER						= "VersionQualifier";				//$NON-NLS-1$
+	private static final String			ATTR_ROOT_IS_MANUAL_EXPORT						= "IsExport";						//$NON-NLS-1$
 
 	/*
 	 * map provider common fields
 	 */
-	private static final String				ROOT_CHILD_TAG_MAP_PROVIDER						= "MapProvider";					//$NON-NLS-1$
+	private static final String			ROOT_CHILD_TAG_MAP_PROVIDER						= "MapProvider";					//$NON-NLS-1$
 
 	/**
 	 * tag for map providers which are wrapped into a map profile
 	 */
-	private static final String				ROOT_CHILD_TAG_WRAPPED_MAP_PROVIDER				= "WrappedMapProvider";			//$NON-NLS-1$
+	private static final String			ROOT_CHILD_TAG_WRAPPED_MAP_PROVIDER				= "WrappedMapProvider";			//$NON-NLS-1$
 
-	private static final String				ATTR_MP_NAME									= "Name";							//$NON-NLS-1$
-	private static final String				ATTR_MP_ID										= "Id";							//$NON-NLS-1$
-	private static final String				ATTR_MP_DESCRIPTION								= "Description";					//$NON-NLS-1$
-	private static final String				ATTR_MP_OFFLINE_FOLDER							= "OfflineFolder";					//$NON-NLS-1$
-	private static final String				ATTR_MP_TYPE									= "Type";							//$NON-NLS-1$
-	private static final String				ATTR_MP_IMAGE_SIZE								= "ImageSize";						//$NON-NLS-1$
-	private static final String				ATTR_MP_IMAGE_FORMAT							= "ImageFormat";					//$NON-NLS-1$
-	private static final String				ATTR_MP_ZOOM_LEVEL_MIN							= "ZoomMin";						//$NON-NLS-1$
-	private static final String				ATTR_MP_ZOOM_LEVEL_MAX							= "ZoomMax";						//$NON-NLS-1$
-	private static final String				ATTR_MP_LAST_USED_ZOOM_LEVEL					= "LastUsedZoomLevel";				//$NON-NLS-1$
-	private static final String				ATTR_MP_LAST_USED_LATITUDE						= "LastUsedLatitude";				//$NON-NLS-1$
-	private static final String				ATTR_MP_LAST_USED_LONGITUDE						= "LastUsedLongitude";				//$NON-NLS-1$
-	private static final String				ATTR_MP_FAVORITE_ZOOM_LEVEL						= "FavoriteZoomLevel";				//$NON-NLS-1$
-	private static final String				ATTR_MP_FAVORITE_LATITUDE						= "FavoriteLatitude";				//$NON-NLS-1$
-	private static final String				ATTR_MP_FAVORITE_LONGITUDE						= "FavoriteLongitude";				//$NON-NLS-1$
+	private static final String			ATTR_MP_NAME									= "Name";							//$NON-NLS-1$
+	private static final String			ATTR_MP_ID										= "Id";							//$NON-NLS-1$
+	private static final String			ATTR_MP_DESCRIPTION								= "Description";					//$NON-NLS-1$
+	private static final String			ATTR_MP_OFFLINE_FOLDER							= "OfflineFolder";					//$NON-NLS-1$
+	private static final String			ATTR_MP_TYPE									= "Type";							//$NON-NLS-1$
+	private static final String			ATTR_MP_IMAGE_SIZE								= "ImageSize";						//$NON-NLS-1$
+	private static final String			ATTR_MP_IMAGE_FORMAT							= "ImageFormat";					//$NON-NLS-1$
+	private static final String			ATTR_MP_ZOOM_LEVEL_MIN							= "ZoomMin";						//$NON-NLS-1$
+	private static final String			ATTR_MP_ZOOM_LEVEL_MAX							= "ZoomMax";						//$NON-NLS-1$
+	private static final String			ATTR_MP_LAST_USED_ZOOM_LEVEL					= "LastUsedZoomLevel";				//$NON-NLS-1$
+	private static final String			ATTR_MP_LAST_USED_LATITUDE						= "LastUsedLatitude";				//$NON-NLS-1$
+	private static final String			ATTR_MP_LAST_USED_LONGITUDE						= "LastUsedLongitude";				//$NON-NLS-1$
+	private static final String			ATTR_MP_FAVORITE_ZOOM_LEVEL						= "FavoriteZoomLevel";				//$NON-NLS-1$
+	private static final String			ATTR_MP_FAVORITE_LATITUDE						= "FavoriteLatitude";				//$NON-NLS-1$
+	private static final String			ATTR_MP_FAVORITE_LONGITUDE						= "FavoriteLongitude";				//$NON-NLS-1$
 
 	/*
 	 * custom map provider
 	 */
-	private static final String				ATTR_CUSTOM_CUSTOM_URL							= "CustomUrl";						//$NON-NLS-1$
+	private static final String			ATTR_CUSTOM_CUSTOM_URL							= "CustomUrl";						//$NON-NLS-1$
 
-	private static final String				TAG_URL_PART									= "UrlPart";						//$NON-NLS-1$
-	private static final String				ATTR_CUSTOM_PART_TYPE							= "PartType";						//$NON-NLS-1$
-	private static final String				ATTR_CUSTOM_PART_POSITION						= "Position";						//$NON-NLS-1$
-	private static final String				ATTR_CUSTOM_PART_CONTENT_HTML					= "Html";							//$NON-NLS-1$
-	private static final String				ATTR_CUSTOM_PART_CONTENT_RANDOM_INTEGER_START	= "RandomIntegerStart";			//$NON-NLS-1$
-	private static final String				ATTR_CUSTOM_PART_CONTENT_RANDOM_INTEGER_END		= "RandomIntegerEnd";				//$NON-NLS-1$
-	private static final String				ATTR_CUSTOM_PART_CONTENT_RANDOM_ALPHA_START		= "RandomAlphaStart";				//$NON-NLS-1$
-	private static final String				ATTR_CUSTOM_PART_CONTENT_RANDOM_ALPHA_END		= "RandomAlphaEnd";				//$NON-NLS-1$
+	private static final String			TAG_URL_PART									= "UrlPart";						//$NON-NLS-1$
+	private static final String			ATTR_CUSTOM_PART_TYPE							= "PartType";						//$NON-NLS-1$
+	private static final String			ATTR_CUSTOM_PART_POSITION						= "Position";						//$NON-NLS-1$
+	private static final String			ATTR_CUSTOM_PART_CONTENT_HTML					= "Html";							//$NON-NLS-1$
+	private static final String			ATTR_CUSTOM_PART_CONTENT_RANDOM_INTEGER_START	= "RandomIntegerStart";			//$NON-NLS-1$
+	private static final String			ATTR_CUSTOM_PART_CONTENT_RANDOM_INTEGER_END		= "RandomIntegerEnd";				//$NON-NLS-1$
+	private static final String			ATTR_CUSTOM_PART_CONTENT_RANDOM_ALPHA_START		= "RandomAlphaStart";				//$NON-NLS-1$
+	private static final String			ATTR_CUSTOM_PART_CONTENT_RANDOM_ALPHA_END		= "RandomAlphaEnd";				//$NON-NLS-1$
 
-	private static final String				PART_TYPE_HTML									= "HTML";							//$NON-NLS-1$
-	private static final String				PART_TYPE_RANDOM_INTEGER						= "RANDOM_INTEGER";				//$NON-NLS-1$
-	private static final String				PART_TYPE_RANDOM_ALPHA							= "RANDOM_ALPHA";					//$NON-NLS-1$
-	private static final String				PART_TYPE_X										= "X";								//$NON-NLS-1$;
-	private static final String				PART_TYPE_Y										= "Y";								//$NON-NLS-1$;
-	private static final String				PART_TYPE_ZOOM									= "ZOOM";							//$NON-NLS-1$;
+	private static final String			PART_TYPE_HTML									= "HTML";							//$NON-NLS-1$
+	private static final String			PART_TYPE_RANDOM_INTEGER						= "RANDOM_INTEGER";				//$NON-NLS-1$
+	private static final String			PART_TYPE_RANDOM_ALPHA							= "RANDOM_ALPHA";					//$NON-NLS-1$
+	private static final String			PART_TYPE_X										= "X";								//$NON-NLS-1$;
+	private static final String			PART_TYPE_Y										= "Y";								//$NON-NLS-1$;
+	private static final String			PART_TYPE_ZOOM									= "ZOOM";							//$NON-NLS-1$;
 //	private static final String				PART_TYPE_LAT_TOP								= "LATITUDE_TOP";					//$NON-NLS-1$
 //	private static final String				PART_TYPE_LAT_BOTTOM							= "LATITUDE_BOTTOM";				//$NON-NLS-1$;
 //	private static final String				PART_TYPE_LON_LEFT								= "LONGITUDE_LEFT";				//$NON-NLS-1$;
@@ -182,51 +180,49 @@ public class MapProviderManager {
 	/*
 	 * wms map provider
 	 */
-	private static final String				ATTR_WMS_CAPS_URL								= "CapsUrl";						//$NON-NLS-1$
-	private static final String				ATTR_WMS_MAP_URL								= "GetMapUrl";						//$NON-NLS-1$
-	private static final String				ATTR_WMS_LOAD_TRANSPARENT_IMAGES				= "LoadTransparentImages";			//$NON-NLS-1$
+	private static final String			ATTR_WMS_CAPS_URL								= "CapsUrl";						//$NON-NLS-1$
+	private static final String			ATTR_WMS_MAP_URL								= "GetMapUrl";						//$NON-NLS-1$
+	private static final String			ATTR_WMS_LOAD_TRANSPARENT_IMAGES				= "LoadTransparentImages";			//$NON-NLS-1$
 
-	private static final String				TAG_LAYER										= "Layer";							//$NON-NLS-1$
-	private static final String				ATTR_LAYER_NAME									= "Name";							//$NON-NLS-1$
-	private static final String				ATTR_LAYER_TITLE								= "Title";							//$NON-NLS-1$
-	private static final String				ATTR_LAYER_IS_DISPLAYED							= "IsDisplayed";					//$NON-NLS-1$
-	private static final String				ATTR_LAYER_POSITION								= "Position";						//$NON-NLS-1$
+	private static final String			TAG_LAYER										= "Layer";							//$NON-NLS-1$
+	private static final String			ATTR_LAYER_NAME									= "Name";							//$NON-NLS-1$
+	private static final String			ATTR_LAYER_TITLE								= "Title";							//$NON-NLS-1$
+	private static final String			ATTR_LAYER_IS_DISPLAYED							= "IsDisplayed";					//$NON-NLS-1$
+	private static final String			ATTR_LAYER_POSITION								= "Position";						//$NON-NLS-1$
 
 	/*
 	 * map profile
 	 */
-	private static final String				TAG_MAP_PROVIDER_WRAPPER						= "MapProviderWrapper";			//$NON-NLS-1$
-	private static final String				ATTR_PMP_BACKGROUND_COLOR						= "BackgroundColor";				//$NON-NLS-1$
+	private static final String			TAG_MAP_PROVIDER_WRAPPER						= "MapProviderWrapper";			//$NON-NLS-1$
+	private static final String			ATTR_PMP_BACKGROUND_COLOR						= "BackgroundColor";				//$NON-NLS-1$
 
 	// profile map provider settings
-	private static final String				ATTR_PMP_MAP_PROVIDER_ID						= "Id";							//$NON-NLS-1$
-	private static final String				ATTR_PMP_MAP_PROVIDER_TYPE						= "Type";							//$NON-NLS-1$
-	private static final String				ATTR_PMP_POSITION								= "Position";						//$NON-NLS-1$
-	private static final String				ATTR_PMP_IS_DISPLAYED							= "IsDisplayed";					//$NON-NLS-1$
-	private static final String				ATTR_PMP_ALPHA									= "Alpha";							//$NON-NLS-1$
-	private static final String				ATTR_PMP_IS_TRANSPARENT							= "IsTransparent";					//$NON-NLS-1$
-	private static final String				ATTR_PMP_IS_BLACK_TRANSPARENT					= "IsBlackTransparent";			//$NON-NLS-1$
-	private static final String				ATTR_PMP_IS_BRIGHTNESS_FOR_NEXT_MP				= "IsBrightnessForNextMP";			//$NON-NLS-1$
-	private static final String				ATTR_PMP_BRIGHTNESS_FOR_NEXT_MP					= "BrightnessForNextMP";			//$NON-NLS-1$
+	private static final String			ATTR_PMP_MAP_PROVIDER_ID						= "Id";							//$NON-NLS-1$
+	private static final String			ATTR_PMP_MAP_PROVIDER_TYPE						= "Type";							//$NON-NLS-1$
+	private static final String			ATTR_PMP_POSITION								= "Position";						//$NON-NLS-1$
+	private static final String			ATTR_PMP_IS_DISPLAYED							= "IsDisplayed";					//$NON-NLS-1$
+	private static final String			ATTR_PMP_ALPHA									= "Alpha";							//$NON-NLS-1$
+	private static final String			ATTR_PMP_IS_TRANSPARENT							= "IsTransparent";					//$NON-NLS-1$
+	private static final String			ATTR_PMP_IS_BLACK_TRANSPARENT					= "IsBlackTransparent";			//$NON-NLS-1$
+	private static final String			ATTR_PMP_IS_BRIGHTNESS_FOR_NEXT_MP				= "IsBrightnessForNextMP";			//$NON-NLS-1$
+	private static final String			ATTR_PMP_BRIGHTNESS_FOR_NEXT_MP					= "BrightnessForNextMP";			//$NON-NLS-1$
 
 	// transparent pixel
-	private static final String				TAG_TRANSPARENT_COLOR							= "TransparentColor";				//$NON-NLS-1$
-	private static final String				ATTR_TRANSPARENT_COLOR_VALUE					= "Value";							//$NON-NLS-1$
+	private static final String			TAG_TRANSPARENT_COLOR							= "TransparentColor";				//$NON-NLS-1$
+	private static final String			ATTR_TRANSPARENT_COLOR_VALUE					= "Value";							//$NON-NLS-1$
 
 	/**
 	 * Id for the default map provider
 	 */
-	public static String					DEFAULT_MAP_PROVIDER_ID							= OSMMapProvider.FACTORY_ID;
+	public static String				DEFAULT_MAP_PROVIDER_ID							= OSMMapProvider.FACTORY_ID;
 
 	/**
 	 * size for osm images
 	 */
-	public static final int					OSM_IMAGE_SIZE									= 256;
-	public static final String				DEFAULT_IMAGE_SIZE								= Integer
-																									.toString(OSM_IMAGE_SIZE);
-	public static final String[]			IMAGE_SIZE										= {
-			DEFAULT_IMAGE_SIZE,
-			"300", //$NON-NLS-1$
+	public static final int				OSM_IMAGE_SIZE									= 256;
+	public static final String			DEFAULT_IMAGE_SIZE								= Integer
+																								.toString(OSM_IMAGE_SIZE);
+	public static final String[]		IMAGE_SIZE										= { DEFAULT_IMAGE_SIZE, "300", //$NON-NLS-1$
 			"400", //$NON-NLS-1$
 			"500", //$NON-NLS-1$
 			"512", //$NON-NLS-1$
@@ -237,35 +233,32 @@ public class MapProviderManager {
 			"900", //$NON-NLS-1$
 			"1000", //$NON-NLS-1$
 			"1024", //$NON-NLS-1$
-																							};
+																						};
 
-	private static final ReentrantLock		WMS_LOCK										= new ReentrantLock();
+	private static final ReentrantLock	WMS_LOCK										= new ReentrantLock();
 
-	private static MapProviderManager		_instance;
+	private static MapProviderManager	_instance;
 
 	/**
 	 * contains all available map providers, including empty map provider and map profiles
 	 */
-	private static ArrayList<MP>			_allMapProviders;
+	private static ArrayList<MP>		_allMapProviders;
 
-	private MPPlugin						_mpDefault;
+	private MPPlugin					_mpDefault;
 
-	private ArrayList<String>				_errorLog										= new ArrayList<String>();
+	private ArrayList<String>			_errorLog										= new ArrayList<String>();
 
-	private static IPreferenceStore			_prefStore										= TourbookPlugin
-																									.getDefault()
-																									.getPreferenceStore();
+	private static IPreferenceStore		_prefStore										= TourbookPlugin
+																								.getDefault()
+																								.getPreferenceStore();
 
-	private static final ListenerList		_mapProviderListeners							= new ListenerList(
-																									ListenerList.IDENTITY);
+	private static final ListenerList	_mapProviderListeners							= new ListenerList(
+																								ListenerList.IDENTITY);
 
-	private static final DateTimeFormatter	_dtFormatter									= ISODateTimeFormat
-																									.basicDateTimeNoMillis();
-
-	private static boolean					_isDeleteError;
-	private static long						_deleteUIUpdateTime;
-	private static int						_deleteUIDeletedFiles;
-	private static int						_deleteUICheckedFiles;
+	private static boolean				_isDeleteError;
+	private static long					_deleteUIUpdateTime;
+	private static int					_deleteUIDeletedFiles;
+	private static int					_deleteUICheckedFiles;
 
 	private MapProviderManager() {}
 
@@ -312,6 +305,7 @@ public class MapProviderManager {
 
 		final IRunnableWithProgress progressRunnable = new IRunnableWithProgress() {
 
+			@Override
 			public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
 				final String capsUrlFinal = mpWms == null ? //
@@ -367,6 +361,7 @@ public class MapProviderManager {
 		final Display display = Display.getDefault();
 
 		display.syncExec(new Runnable() {
+			@Override
 			public void run() {
 				try {
 					new ProgressMonitorDialog(display.getActiveShell()).run(false, false, progressRunnable);
@@ -1124,7 +1119,7 @@ public class MapProviderManager {
 			final XMLMemento tagRoot = new XMLMemento(document, rootElement);
 
 			// date/time
-			tagRoot.putString(ATTR_ROOT_DATETIME, _dtFormatter.print(new Date().getTime()));
+			tagRoot.putString(ATTR_ROOT_DATETIME, TimeTools.now().toString());
 
 			// plugin version
 			final Version version = TourbookPlugin.getDefault().getBundle().getVersion();
@@ -1675,6 +1670,7 @@ public class MapProviderManager {
 
 		// sort parts by position
 		Collections.sort(urlParts, new Comparator<UrlPart>() {
+			@Override
 			public int compare(final UrlPart p1, final UrlPart p2) {
 				return p1.getPosition() - p2.getPosition();
 			}

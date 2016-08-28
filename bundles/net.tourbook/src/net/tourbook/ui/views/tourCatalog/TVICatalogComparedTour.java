@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourCatalog;
 
-import java.sql.Date;
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 import net.tourbook.common.util.TreeViewerItem;
@@ -44,7 +44,8 @@ public class TVICatalogComparedTour extends TVICatalogTourItem {
 	 */
 	long			tourTypeId;
 	String			tourTitle;
-	Date			tourDate;
+
+	LocalDate		tourDate;
 
 	float			tourSpeed;
 	float			avgPulse;
@@ -100,10 +101,6 @@ public class TVICatalogComparedTour extends TVICatalogTourItem {
 
 	public int getStartIndex() {
 		return startIndex;
-	}
-
-	public Date getTourDate() {
-		return tourDate;
 	}
 
 	public float getTourSpeed() {

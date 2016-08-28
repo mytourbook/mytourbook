@@ -21,7 +21,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
 
@@ -72,7 +72,7 @@ public class TVIWizardCompareYear extends TVIWizardCompareItem {
 				monthItem.treeColumn = calendar8//
 						.withYear(dbYear)
 						.withMonth(dbMonth)
-						.format(UI.MonthFormatter);
+						.format(TimeTools.Formatter_Month);
 
 				monthItem.tourYear = dbYear;
 				monthItem.tourMonth = dbMonth;

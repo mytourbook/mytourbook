@@ -35,6 +35,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.PerspectiveFactoryRawData;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.ITourViewer3;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.widgets.ComboEnumEntry;
@@ -1674,7 +1675,7 @@ public class RawDataManager {
 									TourLogState.IMPORT_OK,
 									String.format(//
 											LOG_IMPORT_TOUR_IMPORTED,
-											tourData.getTourStartTime().format(UI.DateTimeFormatter_Short),
+											tourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S),
 											osFilePath));
 						}
 

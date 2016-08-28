@@ -53,6 +53,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.MyTourbookSplashHandler;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.NIO;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourBike;
@@ -90,7 +91,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.PlatformUI;
-import org.joda.time.DateTime;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 import com.skedgo.converter.TimezoneMapper;
@@ -5272,12 +5272,21 @@ public class TourDatabase {
 
 				final long recordingTime = result.getLong(7);
 
-				final DateTime dtStart = new DateTime(dbYear, dbMonth, dbDay, dbHour, dbMinute, dbSecond);
-				final DateTime dtEnd = dtStart.plus(recordingTime * 1000);
+				final ZonedDateTime dtStart = ZonedDateTime.of(
+						dbYear,
+						dbMonth,
+						dbDay,
+						dbHour,
+						dbMinute,
+						dbSecond,
+						0,
+						TimeTools.getDefaultTimeZone());
+
+				final ZonedDateTime dtEnd = dtStart.plusSeconds(recordingTime);
 
 				// update tour start/end in the database
-				stmtUpdate.setLong(1, dtStart.getMillis());
-				stmtUpdate.setLong(2, dtEnd.getMillis());
+				stmtUpdate.setLong(1, dtStart.toInstant().toEpochMilli());
+				stmtUpdate.setLong(2, dtEnd.toInstant().toEpochMilli());
 				stmtUpdate.setLong(3, tourId);
 				stmtUpdate.executeUpdate();
 			}

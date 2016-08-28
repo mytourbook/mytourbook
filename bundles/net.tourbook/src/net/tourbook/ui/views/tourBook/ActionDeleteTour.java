@@ -21,7 +21,7 @@ import java.util.Iterator;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.TreeViewerItem;
@@ -100,7 +100,7 @@ public class ActionDeleteTour extends Action {
 
 				final Long tourId = tourItem.getTourId();
 				final TourData tourData = TourManager.getTour(tourId);
-				final String tour = tourData.getTourStartTime().format(UI.DateTimeFormatter_Short);
+				final String tour = tourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S);
 
 				if (TourDatabase.deleteTour(tourId)) {
 

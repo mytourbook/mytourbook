@@ -3,9 +3,6 @@ package net.tourbook.device.garmin.fit.listeners;
 import net.tourbook.common.UI;
 import net.tourbook.device.garmin.fit.FitContext;
 
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-
 import com.garmin.fit.AntNetwork;
 import com.garmin.fit.AntplusDeviceType;
 import com.garmin.fit.DeviceInfoMesg;
@@ -13,7 +10,6 @@ import com.garmin.fit.DeviceInfoMesgListener;
 
 public class DeviceInfoMesgListenerImpl extends AbstractMesgListener implements DeviceInfoMesgListener {
 
-	private final DateTimeFormatter	_dtFormatter	= DateTimeFormat.forStyle("MM");	//$NON-NLS-1$
 
 	public DeviceInfoMesgListenerImpl(final FitContext context) {
 		super(context);

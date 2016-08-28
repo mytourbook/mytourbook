@@ -31,6 +31,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.FormatStyle;
 import java.time.format.TextStyle;
+import java.time.temporal.ChronoField;
 import java.time.temporal.ValueRange;
 import java.time.temporal.WeekFields;
 import java.time.zone.ZoneRules;
@@ -52,6 +53,42 @@ import com.skedgo.converter.TimezoneMapper;
 
 public class TimeTools {
 
+
+// SET_FORMATTING_OFF
+	
+	public static final DateTimeFormatter			Formatter_Date_S		= DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
+	public static final DateTimeFormatter			Formatter_Date_M		= DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM);
+	public static final DateTimeFormatter			Formatter_Date_L		= DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG);
+	public static final DateTimeFormatter			Formatter_Date_F		= DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL);
+	
+	public static final DateTimeFormatter			Formatter_Time_S		= DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT);
+	public static final DateTimeFormatter			Formatter_Time_M		= DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM);
+	public static final DateTimeFormatter			Formatter_Time_F		= DateTimeFormatter.ofLocalizedTime(FormatStyle.FULL);
+	
+	public static final DateTimeFormatter			Formatter_DateTime_S	= DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT);
+	public static final DateTimeFormatter			Formatter_DateTime_M	= DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM);
+	public static final DateTimeFormatter			Formatter_DateTime_MS	= DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT);
+	public static final DateTimeFormatter			Formatter_DateTime_ML	= DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.LONG);
+	public static final DateTimeFormatter			Formatter_DateTime_F	= DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL);
+	
+	
+	public static final DateTimeFormatter			Formatter_FileName		= DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");		//$NON-NLS-1$
+	
+	public static final DateTimeFormatter			Formatter_Month			= DateTimeFormatter.ofPattern("MMM");						//$NON-NLS-1$
+	public static final DateTimeFormatter			Formatter_Week_Month	= DateTimeFormatter.ofPattern("dd MMM");					//$NON-NLS-1$
+	public static final DateTimeFormatter			Formatter_Weekday		= DateTimeFormatter.ofPattern("E");							//$NON-NLS-1$
+	public static final DateTimeFormatter			Formatter_Weekday_L		= DateTimeFormatter.ofPattern("EEEE");						//$NON-NLS-1$
+
+	public static final DateTimeFormatter			Formatter_Time_ISO		= new DateTimeFormatterBuilder()//
+																				.appendValue(ChronoField.HOUR_OF_DAY, 2)
+																				.appendLiteral(':')
+																				.appendValue(ChronoField.MINUTE_OF_HOUR, 2)
+																				.appendLiteral(':')
+																				.appendValue(ChronoField.SECOND_OF_MINUTE, 2)
+																				.toFormatter();
+
+// SET_FORMATTING_ON
+
 	private static final String						DST_FORMAT				= " - %s %s";										//$NON-NLS-1$
 	private static final String						ZERO_0					= ":0";											//$NON-NLS-1$
 	private static final String						ZERO_00_00				= "+00:00";										//$NON-NLS-1$
@@ -68,35 +105,6 @@ public class TimeTools {
 	private static final int						SECONDS_PER_MINUTE		= 60;
 	/** Seconds per hour. */
 	private static final int						SECONDS_PER_HOUR		= SECONDS_PER_MINUTE * MINUTES_PER_HOUR;
-
-	public static final DateTimeFormatter			Formatter_Date_S		= DateTimeFormatter
-																					.ofLocalizedDate(FormatStyle.SHORT);
-	public static final DateTimeFormatter			Formatter_Date_M		= DateTimeFormatter
-																					.ofLocalizedDate(FormatStyle.MEDIUM);
-	public static final DateTimeFormatter			Formatter_Date_F		= DateTimeFormatter
-																					.ofLocalizedDate(FormatStyle.FULL);
-
-	public static final DateTimeFormatter			Formatter_Time_S		= DateTimeFormatter
-																					.ofLocalizedTime(FormatStyle.SHORT);
-	public static final DateTimeFormatter			Formatter_Time_M		= DateTimeFormatter
-																					.ofLocalizedTime(FormatStyle.MEDIUM);
-	public static final DateTimeFormatter			Formatter_Time_F		= DateTimeFormatter
-																					.ofLocalizedTime(FormatStyle.FULL);
-
-	public static final DateTimeFormatter			Formatter_DateTime_S	= DateTimeFormatter
-																					.ofLocalizedDateTime(FormatStyle.SHORT);
-	public static final DateTimeFormatter			Formatter_DateTime_M	= DateTimeFormatter
-																					.ofLocalizedDateTime(FormatStyle.MEDIUM);
-	public static final DateTimeFormatter			Formatter_DateTime_ML	= DateTimeFormatter.ofLocalizedDateTime(
-																					FormatStyle.MEDIUM,
-																					FormatStyle.LONG);
-	public static final DateTimeFormatter			Formatter_DateTime_F	= DateTimeFormatter
-																					.ofLocalizedDateTime(FormatStyle.FULL);
-
-	public static final DateTimeFormatter			Formatter_Weekday		= DateTimeFormatter.ofPattern("E");				//$NON-NLS-1$
-
-	public static final DateTimeFormatter			Formatter_FileName		= DateTimeFormatter
-																					.ofPattern("yyyy-MM-dd_HH-mm-ss");			//$NON-NLS-1$
 
 	private static final PeriodFormatter			DURATION_FORMATTER;
 
@@ -126,19 +134,21 @@ public class TimeTools {
 	 * Default time zone ID which is set in the preferences.
 	 */
 	private static ZoneId							_defaultTimeZoneId;
+
+	/**
+	 * The date must not be in the first or last week of the year.
+	 */
 	private static LocalDate						_dateToGetNumOfWeeks	= LocalDate.of(2000, 5, 5);
 
 	static {
 
 		DURATION_FORMATTER = new PeriodFormatterBuilder()
-//
+		//
 				.appendHours()
 				.appendSuffix(Messages.Period_Format_Hour_Short, Messages.Period_Format_Hour_Short)
-//				.appendSeparator(commaSpace, space2, variants)
 
 				.appendMinutes()
 				.appendSuffix(Messages.Period_Format_Minute_Short, Messages.Period_Format_Minute_Short)
-//				.appendSeparator(commaSpace, space2, variants)
 
 				.toFormatter();
 

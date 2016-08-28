@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -45,6 +45,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.NIO;
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -1263,7 +1264,7 @@ public class EasyImportManager {
 				TourLogState.DEFAULT,
 				String.format(//
 						LOG_EASY_IMPORT_003_TOUR_TYPE_ITEM,
-						tourData.getTourStartTime().format(UI.DateTimeFormatter_Short),
+						tourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S),
 						tourTypeName));
 	}
 }

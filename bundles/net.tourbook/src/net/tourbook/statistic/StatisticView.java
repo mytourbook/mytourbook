@@ -15,14 +15,14 @@
  *******************************************************************************/
 package net.tourbook.statistic;
 
+import gnu.trove.list.array.TIntArrayList;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -96,16 +96,14 @@ public class StatisticView extends ViewPart implements ITourProvider {
 	private TourPerson						_activePerson;
 	private TourTypeFilter					_activeTourTypeFilter;
 
-	private final Calendar					_calendar					= GregorianCalendar.getInstance();
-
 	private int								_selectedYear				= -1;
 
 	private TourbookStatistic				_activeStatistic;
 
 	/**
-	 * contains all years which have tours for the selected tour type and person
+	 * Contains all years which have tours for the selected tour type and person.
 	 */
-	private ArrayList<Integer>				_availableYears;
+	private TIntArrayList					_availableYears;
 
 	/**
 	 * contains the statistics in the same sort order as the statistic combo box
@@ -521,7 +519,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
 		if (defaultYear != -1) {
 
 			int yearIndex = 0;
-			for (final Integer year : _availableYears) {
+			for (final int year : _availableYears.toArray()) {
 
 				if (year == defaultYear) {
 
@@ -537,7 +535,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
 		 * try to get year index of the selected year
 		 */
 		int yearIndex = 0;
-		for (final Integer year : _availableYears) {
+		for (final int year : _availableYears.toArray()) {
 			if (year == _selectedYear) {
 				selectedYearIndex = yearIndex;
 				break;
@@ -681,7 +679,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
 				+ " WHERE 1=1 " + sqlFilter.getWhereClause() //		//$NON-NLS-1$
 				+ " GROUP BY STARTYEAR ORDER BY STARTYEAR"; //		//$NON-NLS-1$
 
-		_availableYears = new ArrayList<Integer>();
+		_availableYears = new TIntArrayList();
 
 		try {
 			final Connection conn = TourDatabase.getInstance().getConnection();
@@ -705,18 +703,17 @@ public class StatisticView extends ViewPart implements ITourProvider {
 		/*
 		 * add all years of the tours and the current year
 		 */
-		_calendar.setTime(new Date());
-		final int thisYear = _calendar.get(Calendar.YEAR);
+		final int thisYear = LocalDate.now().getYear();
 
 		boolean isThisYearSet = false;
 
-		for (final Integer year : _availableYears) {
+		for (final int year : _availableYears.toArray()) {
 
-			if (year.intValue() == thisYear) {
+			if (year == thisYear) {
 				isThisYearSet = true;
 			}
 
-			_comboYear.add(year.toString());
+			_comboYear.add(Integer.toString(year));
 		}
 
 		// add currenty year if not set

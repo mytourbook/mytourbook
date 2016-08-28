@@ -19,6 +19,7 @@ import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -66,8 +67,6 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 
@@ -79,8 +78,6 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 																					.getDialogSettingsSection(ID);
 	private final IPreferenceStore			_prefStore						= TourbookPlugin.getDefault()//
 																					.getPreferenceStore();
-
-	private final DateTimeFormatter			_dtFormatter					= DateTimeFormat.forStyle("ML");			//$NON-NLS-1$
 
 	private PostSelectionProvider			_postSelectionProvider;
 
@@ -645,12 +642,17 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 		String labelText;
 
 		if (size == 1) {
-			labelText = _dtFormatter.print(_photoStartTime);
+
+			labelText = TimeTools.getZonedDateTime(_photoStartTime).format(TimeTools.Formatter_DateTime_ML);
+
 		} else if (size > 1) {
-			labelText = _dtFormatter.print(_photoStartTime)
+
+			labelText = TimeTools.getZonedDateTime(_photoStartTime).format(TimeTools.Formatter_DateTime_ML)
 					+ UI.DASH_WITH_DOUBLE_SPACE
-					+ _dtFormatter.print(_photoEndTime);
+					+ TimeTools.getZonedDateTime(_photoEndTime).format(TimeTools.Formatter_DateTime_ML);
+
 		} else {
+
 			labelText = UI.EMPTY_STRING;
 		}
 

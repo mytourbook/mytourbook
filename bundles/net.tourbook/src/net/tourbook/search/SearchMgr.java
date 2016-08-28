@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.IconRequestMgr;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -64,152 +66,152 @@ import com.sun.net.httpserver.HttpExchange;
  */
 public class SearchMgr implements XHRHandler {
 
-	private static final String				SEARCH_APP_ACTION_EDIT_MARKER			= tourbook.search.nls.Messages.Search_App_Action_EditMarker;
-	private static final String				SEARCH_APP_ACTION_EDIT_TOUR				= tourbook.search.nls.Messages.Search_App_Action_EditTour;
+	private static final String		SEARCH_APP_ACTION_EDIT_MARKER			= tourbook.search.nls.Messages.Search_App_Action_EditMarker;
+	private static final String		SEARCH_APP_ACTION_EDIT_TOUR				= tourbook.search.nls.Messages.Search_App_Action_EditTour;
 
-	private static final String				IMAGE_ACTION_TOUR_WAY_POINT				= net.tourbook.map2.Messages.Image_Action_TourWayPoint;
+	private static final String		IMAGE_ACTION_TOUR_WAY_POINT				= net.tourbook.map2.Messages.Image_Action_TourWayPoint;
 
-	final static IDialogSettings			state									= TourbookPlugin
-																							.getState("net.tourbook.search.SearchMgr");			//$NON-NLS-1$
+	final static IDialogSettings	state									= TourbookPlugin
+																					.getState("net.tourbook.search.SearchMgr");			//$NON-NLS-1$
 
-	private static final String				JSON_STATE_SEARCH_TEXT					= "searchText";												//$NON-NLS-1$
+	private static final String		JSON_STATE_SEARCH_TEXT					= "searchText";												//$NON-NLS-1$
 
-	private static final String				STATE_CURRENT_SEARCH_TEXT				= "STATE_CURRENT_SEARCH_TEXT";									//$NON-NLS-1$
+	private static final String		STATE_CURRENT_SEARCH_TEXT				= "STATE_CURRENT_SEARCH_TEXT";									//$NON-NLS-1$
 
-	static final String						STATE_IS_EASE_SEARCHING					= "STATE_IS_EASE_SEARCHING";									//$NON-NLS-1$
-	static final boolean					STATE_IS_EASE_SEARCHING_DEFAULT			= true;
+	static final String				STATE_IS_EASE_SEARCHING					= "STATE_IS_EASE_SEARCHING";									//$NON-NLS-1$
+	static final boolean			STATE_IS_EASE_SEARCHING_DEFAULT			= true;
 
-	static final String						STATE_IS_SHOW_CONTENT_ALL				= "STATE_IS_SHOW_CONTENT_ALL";									//$NON-NLS-1$
-	static final boolean					STATE_IS_SHOW_CONTENT_ALL_DEFAULT		= true;
-	static final String						STATE_IS_SHOW_CONTENT_MARKER			= "STATE_IS_SHOW_CONTENT_MARKER";								//$NON-NLS-1$
-	static final boolean					STATE_IS_SHOW_CONTENT_MARKER_DEFAULT	= true;
-	static final String						STATE_IS_SHOW_CONTENT_TOUR				= "STATE_IS_SHOW_CONTENT_TOUR";								//$NON-NLS-1$
-	static final boolean					STATE_IS_SHOW_CONTENT_TOUR_DEFAULT		= true;
-	static final String						STATE_IS_SHOW_CONTENT_WAYPOINT			= "STATE_IS_SHOW_CONTENT_WAYPOINT";							//$NON-NLS-1$
-	static final boolean					STATE_IS_SHOW_CONTENT_WAYPOINT_DEFAULT	= true;
+	static final String				STATE_IS_SHOW_CONTENT_ALL				= "STATE_IS_SHOW_CONTENT_ALL";									//$NON-NLS-1$
+	static final boolean			STATE_IS_SHOW_CONTENT_ALL_DEFAULT		= true;
+	static final String				STATE_IS_SHOW_CONTENT_MARKER			= "STATE_IS_SHOW_CONTENT_MARKER";								//$NON-NLS-1$
+	static final boolean			STATE_IS_SHOW_CONTENT_MARKER_DEFAULT	= true;
+	static final String				STATE_IS_SHOW_CONTENT_TOUR				= "STATE_IS_SHOW_CONTENT_TOUR";								//$NON-NLS-1$
+	static final boolean			STATE_IS_SHOW_CONTENT_TOUR_DEFAULT		= true;
+	static final String				STATE_IS_SHOW_CONTENT_WAYPOINT			= "STATE_IS_SHOW_CONTENT_WAYPOINT";							//$NON-NLS-1$
+	static final boolean			STATE_IS_SHOW_CONTENT_WAYPOINT_DEFAULT	= true;
 	//
-	static final String						STATE_IS_SHOW_DATE						= "STATE_IS_SHOW_DATE";										//$NON-NLS-1$
-	static final boolean					STATE_IS_SHOW_DATE_DEFAULT				= false;
-	static final String						STATE_IS_SHOW_TIME						= "STATE_IS_SHOW_TIME";										//$NON-NLS-1$
-	static final boolean					STATE_IS_SHOW_TIME_DEFAULT				= false;
-	static final String						STATE_IS_SHOW_DESCRIPTION				= "STATE_IS_SHOW_DESCRIPTION";									//$NON-NLS-1$
-	static final boolean					STATE_IS_SHOW_DESCRIPTION_DEFAULT		= true;
-	static final String						STATE_IS_SHOW_ITEM_NUMBER				= "STATE_IS_SHOW_ITEM_NUMBER";									//$NON-NLS-1$
-	static final boolean					STATE_IS_SHOW_ITEM_NUMBER_DEFAULT		= false;
-	static final String						STATE_IS_SHOW_LUCENE_DOC_ID				= "STATE_IS_SHOW_LUCENE_DOC_ID";								//$NON-NLS-1$
-	static final boolean					STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT		= false;
+	static final String				STATE_IS_SHOW_DATE						= "STATE_IS_SHOW_DATE";										//$NON-NLS-1$
+	static final boolean			STATE_IS_SHOW_DATE_DEFAULT				= false;
+	static final String				STATE_IS_SHOW_TIME						= "STATE_IS_SHOW_TIME";										//$NON-NLS-1$
+	static final boolean			STATE_IS_SHOW_TIME_DEFAULT				= false;
+	static final String				STATE_IS_SHOW_DESCRIPTION				= "STATE_IS_SHOW_DESCRIPTION";									//$NON-NLS-1$
+	static final boolean			STATE_IS_SHOW_DESCRIPTION_DEFAULT		= true;
+	static final String				STATE_IS_SHOW_ITEM_NUMBER				= "STATE_IS_SHOW_ITEM_NUMBER";									//$NON-NLS-1$
+	static final boolean			STATE_IS_SHOW_ITEM_NUMBER_DEFAULT		= false;
+	static final String				STATE_IS_SHOW_LUCENE_DOC_ID				= "STATE_IS_SHOW_LUCENE_DOC_ID";								//$NON-NLS-1$
+	static final boolean			STATE_IS_SHOW_LUCENE_DOC_ID_DEFAULT		= false;
 	//
-	static final String						STATE_IS_SORT_DATE_ASCENDING			= "STATE_IS_SORT_DATE_ASCENDING";								//$NON-NLS-1$
-	static final boolean					STATE_IS_SORT_DATE_ASCENDING_DEFAULT	= false;
+	static final String				STATE_IS_SORT_DATE_ASCENDING			= "STATE_IS_SORT_DATE_ASCENDING";								//$NON-NLS-1$
+	static final boolean			STATE_IS_SORT_DATE_ASCENDING_DEFAULT	= false;
 
-	private static final String				REQUEST_HEADER_RANGE					= "Range";														//$NON-NLS-1$
+	private static final String		REQUEST_HEADER_RANGE					= "Range";														//$NON-NLS-1$
 
-	private static final String				CONTENT_RANGE_ITEMS						= "items %d-%d/%d";											//$NON-NLS-1$
-	private static final String				CONTENT_RANGE_ZERO						= "0-0/0";														//$NON-NLS-1$
+	private static final String		CONTENT_RANGE_ITEMS						= "items %d-%d/%d";											//$NON-NLS-1$
+	private static final String		CONTENT_RANGE_ZERO						= "0-0/0";														//$NON-NLS-1$
 
 	/*
 	 * This will handle all xhr actions, they are also defined in SearchMgr.js
 	 */
-	private static final String				XHR_SEARCH_INPUT_HANDLER				= "/xhrSearch";												//$NON-NLS-1$
+	private static final String		XHR_SEARCH_INPUT_HANDLER				= "/xhrSearch";												//$NON-NLS-1$
 	//
-	private static final String				XHR_ACTION_ITEM_ACTION					= "itemAction";												//$NON-NLS-1$
-	private static final String				XHR_ACTION_PROPOSALS					= "proposals";													//$NON-NLS-1$
-	private static final String				XHR_ACTION_SEARCH						= "search";													//$NON-NLS-1$
-	private static final String				XHR_ACTION_SELECT						= "select";													//$NON-NLS-1$
-	private static final String				XHR_ACTION_GET_SEARCH_OPTIONS			= "getSearchOptions";											//$NON-NLS-1$
-	private static final String				XHR_ACTION_SET_SEARCH_OPTIONS			= "setSearchOptions";											//$NON-NLS-1$
-	private static final String				XHR_ACTION_GET_STATE					= "getState";													//$NON-NLS-1$
-																																					//
-	private static final String				XHR_PARAM_ACTION						= "action";													//$NON-NLS-1$
-	private static final String				XHR_PARAM_ACTION_URL					= "actionUrl";													//$NON-NLS-1$
-	private static final String				XHR_PARAM_SEARCH_OPTIONS				= "searchOptions";												//$NON-NLS-1$
-	private static final String				XHR_PARAM_SEARCH_TEXT					= JSON_STATE_SEARCH_TEXT;
-	private static final String				XHR_PARAM_SELECTED_ITEMS				= "selectedItems";												//$NON-NLS-1$
+	private static final String		XHR_ACTION_ITEM_ACTION					= "itemAction";												//$NON-NLS-1$
+	private static final String		XHR_ACTION_PROPOSALS					= "proposals";													//$NON-NLS-1$
+	private static final String		XHR_ACTION_SEARCH						= "search";													//$NON-NLS-1$
+	private static final String		XHR_ACTION_SELECT						= "select";													//$NON-NLS-1$
+	private static final String		XHR_ACTION_GET_SEARCH_OPTIONS			= "getSearchOptions";											//$NON-NLS-1$
+	private static final String		XHR_ACTION_SET_SEARCH_OPTIONS			= "setSearchOptions";											//$NON-NLS-1$
+	private static final String		XHR_ACTION_GET_STATE					= "getState";													//$NON-NLS-1$
+																																			//
+	private static final String		XHR_PARAM_ACTION						= "action";													//$NON-NLS-1$
+	private static final String		XHR_PARAM_ACTION_URL					= "actionUrl";													//$NON-NLS-1$
+	private static final String		XHR_PARAM_SEARCH_OPTIONS				= "searchOptions";												//$NON-NLS-1$
+	private static final String		XHR_PARAM_SEARCH_TEXT					= JSON_STATE_SEARCH_TEXT;
+	private static final String		XHR_PARAM_SELECTED_ITEMS				= "selectedItems";												//$NON-NLS-1$
 
 	/*
 	 * JSON response values
 	 */
-	private static final String				JSON_ID									= "id";														//$NON-NLS-1$
-	private static final String				JSON_NAME								= "name";														//$NON-NLS-1$
-	private static final String				JSON_HTML_CONTENT						= "htmlContent";												//$NON-NLS-1$
-	private static final String				JSON_ITEM_ACTION_URL_EDIT_ITEM			= "actionUrl_EditItem";										//$NON-NLS-1$
-	private static final String				JSON_ITEM_IS_MARKER						= "item_IsMarker";												//$NON-NLS-1$
-	private static final String				JSON_ITEM_IS_TOUR						= "item_IsTour";												//$NON-NLS-1$
-	private static final String				JSON_ITEM_IS_WAYPOINT					= "item_IsWaypoint";											//$NON-NLS-1$
-	private static final String				JSON_ITEM_ID_TOUR_ID					= "itemId_TourId";												//$NON-NLS-1$
-	private static final String				JSON_ITEM_ID_MARKER_ID					= "itemId_MarkerId";											//$NON-NLS-1$
+	private static final String		JSON_ID									= "id";														//$NON-NLS-1$
+	private static final String		JSON_NAME								= "name";														//$NON-NLS-1$
+	private static final String		JSON_HTML_CONTENT						= "htmlContent";												//$NON-NLS-1$
+	private static final String		JSON_ITEM_ACTION_URL_EDIT_ITEM			= "actionUrl_EditItem";										//$NON-NLS-1$
+	private static final String		JSON_ITEM_IS_MARKER						= "item_IsMarker";												//$NON-NLS-1$
+	private static final String		JSON_ITEM_IS_TOUR						= "item_IsTour";												//$NON-NLS-1$
+	private static final String		JSON_ITEM_IS_WAYPOINT					= "item_IsWaypoint";											//$NON-NLS-1$
+	private static final String		JSON_ITEM_ID_TOUR_ID					= "itemId_TourId";												//$NON-NLS-1$
+	private static final String		JSON_ITEM_ID_MARKER_ID					= "itemId_MarkerId";											//$NON-NLS-1$
 	//
 	//
 	// search options
-	private static final String				JSON_IS_SEARCH_OPTIONS_DEFAULT			= "isSearchOptionsDefault";									//$NON-NLS-1$
+	private static final String		JSON_IS_SEARCH_OPTIONS_DEFAULT			= "isSearchOptionsDefault";									//$NON-NLS-1$
 	//
-	private static final String				JSON_IS_EASE_SEARCHING					= "isEaseSearching";											//$NON-NLS-1$
-	private static final String				JSON_IS_SHOW_CONTENT_ALL				= "isShowContentAll";											//$NON-NLS-1$
-	private static final String				JSON_IS_SHOW_CONTENT_MARKER				= "isShowContentMarker";										//$NON-NLS-1$
-	private static final String				JSON_IS_SHOW_CONTENT_TOUR				= "isShowContentTour";											//$NON-NLS-1$
-	private static final String				JSON_IS_SHOW_CONTENT_WAYPOINT			= "isShowContentWaypoint";										//$NON-NLS-1$
-	private static final String				JSON_IS_SHOW_DATE						= "isShowDate";												//$NON-NLS-1$
-	private static final String				JSON_IS_SHOW_TIME						= "isShowTime";												//$NON-NLS-1$
-	private static final String				JSON_IS_SHOW_DESCRIPTION				= "isShowDescription";											//$NON-NLS-1$
-	private static final String				JSON_IS_SHOW_ITEM_NUMBER				= "isShowItemNumber";											//$NON-NLS-1$
-	private static final String				JSON_IS_SHOW_LUCENE_ID					= "isShowLuceneID";											//$NON-NLS-1$
-	private static final String				JSON_IS_SORT_BY_DATE_ASCENDING			= "isSortByDateAscending";										//$NON-NLS-1$
+	private static final String		JSON_IS_EASE_SEARCHING					= "isEaseSearching";											//$NON-NLS-1$
+	private static final String		JSON_IS_SHOW_CONTENT_ALL				= "isShowContentAll";											//$NON-NLS-1$
+	private static final String		JSON_IS_SHOW_CONTENT_MARKER				= "isShowContentMarker";										//$NON-NLS-1$
+	private static final String		JSON_IS_SHOW_CONTENT_TOUR				= "isShowContentTour";											//$NON-NLS-1$
+	private static final String		JSON_IS_SHOW_CONTENT_WAYPOINT			= "isShowContentWaypoint";										//$NON-NLS-1$
+	private static final String		JSON_IS_SHOW_DATE						= "isShowDate";												//$NON-NLS-1$
+	private static final String		JSON_IS_SHOW_TIME						= "isShowTime";												//$NON-NLS-1$
+	private static final String		JSON_IS_SHOW_DESCRIPTION				= "isShowDescription";											//$NON-NLS-1$
+	private static final String		JSON_IS_SHOW_ITEM_NUMBER				= "isShowItemNumber";											//$NON-NLS-1$
+	private static final String		JSON_IS_SHOW_LUCENE_ID					= "isShowLuceneID";											//$NON-NLS-1$
+	private static final String		JSON_IS_SORT_BY_DATE_ASCENDING			= "isSortByDateAscending";										//$NON-NLS-1$
 	//
-	private static final String				SEARCH_FOLDER							= "/tourbook/search/";											//$NON-NLS-1$
-	private static final String				SEARCH_PAGE								= "search.mthtml";												//$NON-NLS-1$
+	private static final String		SEARCH_FOLDER							= "/tourbook/search/";											//$NON-NLS-1$
+	private static final String		SEARCH_PAGE								= "search.mthtml";												//$NON-NLS-1$
 	//
 	/**
 	 * This is necessary otherwise XULrunner in Linux do not fire a location change event.
 	 */
-	static String							ACTION_URL;
-	static String							SEARCH_URL;
+	static String					ACTION_URL;
+	static String					SEARCH_URL;
 	//
-	private static String					_actionUrl_EditImage;
-	private static String					_iconUrl_Tour;
-	private static String					_iconUrl_Marker;
-	private static String					_iconUrl_WayPoint;
+	private static String			_actionUrl_EditImage;
+	private static String			_iconUrl_Tour;
+	private static String			_iconUrl_Marker;
+	private static String			_iconUrl_WayPoint;
 	//
-	private static boolean					_isUI_EaseSearching;
-	private static boolean					_isUI_ShowContentAll;
-	private static boolean					_isUI_ShowContentMarker;
-	private static boolean					_isUI_ShowContentTour;
-	private static boolean					_isUI_ShowContentWaypoint;
-	private static boolean					_isUI_ShowDate;
-	private static boolean					_isUI_ShowTime;
-	private static boolean					_isUI_ShowDescription;
-	private static boolean					_isUI_ShowItemNumber;
-	private static boolean					_isUI_ShowLuceneDocId;
-	private static boolean					_isUI_SortDateAscending;
+	private static boolean			_isUI_EaseSearching;
+	private static boolean			_isUI_ShowContentAll;
+	private static boolean			_isUI_ShowContentMarker;
+	private static boolean			_isUI_ShowContentTour;
+	private static boolean			_isUI_ShowContentWaypoint;
+	private static boolean			_isUI_ShowDate;
+	private static boolean			_isUI_ShowTime;
+	private static boolean			_isUI_ShowDescription;
+	private static boolean			_isUI_ShowItemNumber;
+	private static boolean			_isUI_ShowLuceneDocId;
+	private static boolean			_isUI_SortDateAscending;
 	//
-	static final String						TAG_TD									= "<td>";														//$NON-NLS-1$
-	static final String						TAG_TD_END								= "</td>";														//$NON-NLS-1$
-	static final String						CSS_ITEM_CONTAINER						= "item-container";											//$NON-NLS-1$
+	static final String				TAG_TD									= "<td>";														//$NON-NLS-1$
+	static final String				TAG_TD_END								= "</td>";														//$NON-NLS-1$
+	static final String				CSS_ITEM_CONTAINER						= "item-container";											//$NON-NLS-1$
 
-	static final String						PAGE_ABOUT_BLANK						= "about:blank";												//$NON-NLS-1$
+	static final String				PAGE_ABOUT_BLANK						= "about:blank";												//$NON-NLS-1$
 
-	static final String						HREF_TOKEN								= "&";															//$NON-NLS-1$
-	static final String						HREF_VALUE_SEP							= "=";															//$NON-NLS-1$
+	static final String				HREF_TOKEN								= "&";															//$NON-NLS-1$
+	static final String				HREF_VALUE_SEP							= "=";															//$NON-NLS-1$
 
-	static final String						PARAM_ACTION							= "action";													//$NON-NLS-1$
-	static final String						PARAM_DOC_ID							= "docId";														//$NON-NLS-1$
-	static final String						PARAM_MARKER_ID							= "markerId";													//$NON-NLS-1$
-	static final String						PARAM_TOUR_ID							= "tourId";													//$NON-NLS-1$
+	static final String				PARAM_ACTION							= "action";													//$NON-NLS-1$
+	static final String				PARAM_DOC_ID							= "docId";														//$NON-NLS-1$
+	static final String				PARAM_MARKER_ID							= "markerId";													//$NON-NLS-1$
+	static final String				PARAM_TOUR_ID							= "tourId";													//$NON-NLS-1$
 
-	static final String						ACTION_EDIT_MARKER						= "EditMarker";												//$NON-NLS-1$
-	static final String						ACTION_EDIT_TOUR						= "EditTour";													//$NON-NLS-1$
-	static final String						ACTION_SELECT_TOUR						= "SelectTour";												//$NON-NLS-1$
-	static final String						ACTION_SELECT_MARKER					= "SelectMarker";												//$NON-NLS-1$
-	static final String						ACTION_SELECT_WAY_POINT					= "SelectWayPoint";											//$NON-NLS-1$
+	static final String				ACTION_EDIT_MARKER						= "EditMarker";												//$NON-NLS-1$
+	static final String				ACTION_EDIT_TOUR						= "EditTour";													//$NON-NLS-1$
+	static final String				ACTION_SELECT_TOUR						= "SelectTour";												//$NON-NLS-1$
+	static final String				ACTION_SELECT_MARKER					= "SelectMarker";												//$NON-NLS-1$
+	static final String				ACTION_SELECT_WAY_POINT					= "SelectWayPoint";											//$NON-NLS-1$
 
-	static final String						HREF_ACTION_EDIT_MARKER;
-	static final String						HREF_ACTION_EDIT_TOUR;
-	static final String						HREF_ACTION_SELECT_TOUR;
-	static final String						HREF_ACTION_SELECT_MARKER;
-	static final String						HREF_ACTION_SELECT_WAY_POINT;
+	static final String				HREF_ACTION_EDIT_MARKER;
+	static final String				HREF_ACTION_EDIT_TOUR;
+	static final String				HREF_ACTION_SELECT_TOUR;
+	static final String				HREF_ACTION_SELECT_MARKER;
+	static final String				HREF_ACTION_SELECT_WAY_POINT;
 
-	static final String						HREF_PARAM_DOC_ID;
-	static final String						HREF_PARAM_MARKER_ID;
-	static final String						HREF_PARAM_TOUR_ID;
+	static final String				HREF_PARAM_DOC_ID;
+	static final String				HREF_PARAM_MARKER_ID;
+	static final String				HREF_PARAM_TOUR_ID;
 
 	static {
 
@@ -243,11 +245,11 @@ public class SearchMgr implements XHRHandler {
 		setInternalSearchOptions();
 	}
 
-	private static SearchMgr				_searchMgr;
+	private static SearchMgr		_searchMgr;
 
-	private static ISearchView				_searchView;
+	private static ISearchView		_searchView;
 
-	private static boolean					_isModalDialogOpen						= false;
+	private static boolean			_isModalDialogOpen						= false;
 
 	private class ItemResponse {
 
@@ -843,26 +845,21 @@ public class SearchMgr implements XHRHandler {
 							final long tourStartTime = resultItem.tourStartTime;
 							if (tourStartTime != 0) {
 
-
-private static final DateTimeFormatter	_dateFormatter							= DateTimeFormat.forStyle("M-");								//$NON-NLS-1$
-private static final DateTimeFormatter	_timeFormatter							= DateTimeFormat.forStyle("-S");								//$NON-NLS-1$
-private static final DateTimeFormatter	_dateTimeFormatter						= DateTimeFormat.forStyle("MS");								//$NON-NLS-1$
-
-								final DateTime dt = new DateTime(tourStartTime);
+								final ZonedDateTime dt = TimeTools.getZonedDateTime(tourStartTime);
 
 								String dateTimeText = null;
 
 								if (_isUI_ShowDate && _isUI_ShowTime) {
 
-									dateTimeText = _dateTimeFormatter.print(dt.getMillis());
+									dateTimeText = dt.format(TimeTools.Formatter_DateTime_MS);
 
 								} else if (_isUI_ShowDate) {
 
-									dateTimeText = _dateFormatter.print(dt.getMillis());
+									dateTimeText = dt.format(TimeTools.Formatter_Date_M);
 
 								} else if (_isUI_ShowTime) {
 
-									dateTimeText = _timeFormatter.print(dt.getMillis());
+									dateTimeText = dt.format(TimeTools.Formatter_Time_S);
 								}
 
 								sb.append(TAG_TD + dateTimeText + TAG_TD_END);

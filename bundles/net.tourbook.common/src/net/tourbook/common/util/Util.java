@@ -35,7 +35,6 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,6 +43,7 @@ import java.util.Collections;
 import java.util.List;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -68,7 +68,6 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.XMLMemento;
-import org.joda.time.DateTime;
 import org.xml.sax.Attributes;
 
 public class Util {
@@ -385,7 +384,7 @@ public class Util {
 	}
 
 	/**
-	 * Creates a {@link DateTime} from the number: YYYYMMDDhhmmss
+	 * Creates a {@link ZonedDateTime} from the number: YYYYMMDDhhmmss
 	 * 
 	 * @param yyyymmddhhmmss
 	 * @return
@@ -399,7 +398,7 @@ public class Util {
 		final int minute = (int) (yyyymmddhhmmss / 100 % 100);
 		final int second = (int) (yyyymmddhhmmss % 100);
 
-		return ZonedDateTime.of(year, month, day, hour, minute, second, 0, ZoneId.systemDefault());
+		return ZonedDateTime.of(year, month, day, hour, minute, second, 0, TimeTools.getDefaultTimeZone());
 	}
 
 	/**

@@ -72,7 +72,5 @@ public class LapMesgListenerImpl extends AbstractMesgListener implements LapMesg
 
 		tourMarker.setDeviceLapTime(javaTime.getTime());
 
-//		System.out.println(new org.joda.time.DateTime(javaTime.getTime()) + "\tLapMesgListener\t");
-//		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 }

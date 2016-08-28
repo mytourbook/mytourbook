@@ -15,35 +15,23 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.DateTimeFormatterBuilder;
+import net.tourbook.common.time.TimeTools;
 
 class TourLog {
 
-	private final DateTimeFormatter	_dtFormatterTime	= new DateTimeFormatterBuilder()
-																.appendHourOfDay(2)
-																.appendLiteral(':')
-																.appendMinuteOfHour(2)
-																.appendLiteral(':')
-																.appendSecondOfMinute(2)
-// TOO MUCH DETAIL
-//																.appendLiteral(',')
-//																.appendFractionOfSecond(3, 3)
 
-																.toFormatter();
+	public String				time;
 
-	public String					time;
+	public TourLogState			state;
 
-	public TourLogState				state;
+	public String				message;
+	public boolean				isSubLogItem;
 
-	public String					message;
-	public boolean					isSubLogItem;
-
-	public String					css;
+	public String				css;
 
 	public TourLog(final TourLogState state, final String message) {
 
-		this.time = _dtFormatterTime.print(System.currentTimeMillis());
+		this.time = TimeTools.now().format(TimeTools.Formatter_Time_ISO);
 
 		this.state = state;
 		this.message = message;

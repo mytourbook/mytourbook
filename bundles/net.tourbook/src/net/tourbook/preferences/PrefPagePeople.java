@@ -107,15 +107,13 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferencePage {
 
-	public static final String			ID							= "net.tourbook.preferences.PrefPagePeopleId";			//$NON-NLS-1$
+	public static final String			ID							= "net.tourbook.preferences.PrefPagePeopleId";	//$NON-NLS-1$
 
-	private static final String			STATE_SELECTED_PERSON		= "selectedPersonId";									//$NON-NLS-1$
-	private static final String			STATE_SELECTED_TAB_FOLDER	= "selectedTabFolder";									//$NON-NLS-1$
+	private static final String			STATE_SELECTED_PERSON		= "selectedPersonId";							//$NON-NLS-1$
+	private static final String			STATE_SELECTED_TAB_FOLDER	= "selectedTabFolder";							//$NON-NLS-1$
 
 	public static final int				HEART_BEAT_MIN				= 10;
 	public static final int				HEART_BEAT_MAX				= 300;
@@ -124,7 +122,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	 * Id to indicate that the hr zones should be displayed for the active person when the pref
 	 * dialog is opened
 	 */
-	public static final String			PREF_DATA_SELECT_HR_ZONES	= "SelectHrZones";										//$NON-NLS-1$
+	public static final String			PREF_DATA_SELECT_HR_ZONES	= "SelectHrZones";								//$NON-NLS-1$
 
 	private final IPreferenceStore		_prefStore					= TourbookPlugin.getDefault()//
 																			.getPreferenceStore();
@@ -139,8 +137,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 	 * this device list has all the devices which are visible in the device combobox
 	 */
 	private ArrayList<ExternalDevice>	_deviceList;
-
-	private final DateTimeFormatter		_dtFormatter				= DateTimeFormat.shortDate();
 
 	private final NumberFormat			_nf1						= NumberFormat.getNumberInstance();
 	private final NumberFormat			_nf2						= NumberFormat.getNumberInstance();
@@ -1526,7 +1522,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 				if (birthDayValue == 0) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(_dtFormatter.print(birthDayValue));
+					cell.setText(TimeTools.getZonedDateTime(birthDayValue).format(TimeTools.Formatter_Date_S));
 				}
 			}
 		});

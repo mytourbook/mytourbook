@@ -122,7 +122,7 @@ public class TVITourBookYear extends TVITourBookItem {
 
 					columnText = String.format("[%02d] %s", //
 							dbYearSub,
-							categoryDateTime.format(UI.WeekMonthFormatter));
+							categoryDateTime.format(TimeTools.Formatter_Week_Month));
 
 				} else {
 
@@ -132,7 +132,7 @@ public class TVITourBookYear extends TVITourBookItem {
 							.withYear(dbYear)
 							.withMonth(dbYearSub);
 
-					columnText = categoryDateTime.format(UI.MonthFormatter);
+					columnText = categoryDateTime.format(TimeTools.Formatter_Month);
 				}
 
 				tourItem.treeColumn = columnText;

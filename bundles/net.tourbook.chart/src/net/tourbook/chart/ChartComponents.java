@@ -16,11 +16,10 @@
 package net.tourbook.chart;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoField;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
@@ -76,12 +75,12 @@ public class ChartComponents extends Composite {
 
 //	static final int				CHART_MAX_WIDTH				= Integer.MAX_VALUE;				// 2'147'483'647
 //	static final int				CHART_MAX_WIDTH				= 1000000000;						// 1'000'000'000
-	static final long			CHART_MAX_WIDTH				= 1000000000000L;					// 1'000'000'000'000
+	static final long			CHART_MAX_WIDTH				= 1000000000000L;			// 1'000'000'000'000
 //																									//   308'333'095
 	static final int			CHART_MAX_HEIGHT			= 10000;
 
 	static final int			SLIDER_BAR_HEIGHT			= 10;
-	static final int			TITLE_BAR_HEIGHT			= 18;								//15;
+	static final int			TITLE_BAR_HEIGHT			= 18;						//15;
 	static final int			MARGIN_TOP_WITH_TITLE		= 5;
 	static final int			MARGIN_TOP_WITHOUT_TITLE	= 10;
 
@@ -190,8 +189,6 @@ public class ChartComponents extends Composite {
 
 	private final int[]			_keyDownCounter				= new int[1];
 	private final int[]			_lastKeyDownCounter			= new int[1];
-
-	private final Calendar		_calendar					= GregorianCalendar.getInstance();
 
 	/**
 	 * this error message is displayed instead of the chart when it's not <code>null</code>
@@ -1128,8 +1125,7 @@ public class ChartComponents extends Composite {
 
 //						private final DateTimeFormatter	_dtFormatter				= DateTimeFormat.forStyle("M-");	//$NON-NLS-1$
 
-						final String dayTitle = TimeTools.getZonedDateTime(graphDay).format(
-								TimeTools.Formatter_Date_M);
+						final String dayTitle = TimeTools.getZonedDateTime(graphDay).format(TimeTools.Formatter_Date_M);
 
 						titleText.add(dayTitle);
 					}
@@ -1931,8 +1927,9 @@ public class ChartComponents extends Composite {
 			// create month units
 			for (int monthIndex = 0; monthIndex < 12; monthIndex++) {
 
-				_calendar.set(years[yearIndex], monthIndex, 1);
-				final int firstDayInMonth = _calendar.get(Calendar.DAY_OF_YEAR) - 1;
+				final int firstDayInMonth = LocalDate//
+						.of(years[yearIndex], monthIndex + 1, 1)
+						.get(ChronoField.DAY_OF_YEAR) - 1;
 
 				final int unitIndex = yearIndex * 12 + monthIndex;
 				daysForAllUnits[unitIndex] = allDays + firstDayInMonth;

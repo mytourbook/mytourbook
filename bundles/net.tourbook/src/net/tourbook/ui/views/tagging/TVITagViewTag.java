@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,13 +19,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
 import javax.persistence.EntityManager;
 
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
@@ -37,15 +37,13 @@ import org.eclipse.jface.viewers.TreeViewer;
 
 public class TVITagViewTag extends TVITagViewItem {
 
-	private static final DateFormat	_df		= DateFormat.getDateInstance(DateFormat.SHORT);
+	long			tagId;
 
-	long							tagId;
+	String			name;
 
-	String							name;
+	private int		_expandType;
 
-	private int						_expandType;
-
-	public boolean					isRoot	= false;
+	public boolean	isRoot	= false;
 
 	public TVITagViewTag(final TVITagViewItem parentItem) {
 		setParentItem(parentItem);
@@ -207,7 +205,7 @@ public class TVITagViewTag extends TVITagViewItem {
 					tourItem.tourId = tourId;
 					tourItem.getTourColumnData(result, resultTagId, 3);
 
-					tourItem.treeColumn = _df.format(tourItem.tourDate.toDate());
+					tourItem.treeColumn = tourItem.tourDate.format(TimeTools.Formatter_Date_S);
 				}
 
 				previousTourId = tourId;

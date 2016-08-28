@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,11 +20,14 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Properties;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.imageio.ImageIO;
 
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.ImageQuality;
@@ -45,9 +48,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.widgets.Display;
-import org.joda.time.DateTime;
-import org.joda.time.Days;
-import org.joda.time.LocalDate;
 
 public class ThumbnailStore {
 
@@ -72,7 +72,7 @@ public class ThumbnailStore {
 	/**
 	 * Images will be deleted when they are older than this date (in milliseconds)
 	 */
-	private static long					_dateToDeleteOlderImages;
+	private static long					_dateToDeleteOlderImagesMillis;
 
 	private static long					_deleteUI_UpdateTime;
 	private static int					_deleteUI_DeletedFiles;
@@ -151,27 +151,33 @@ public class ThumbnailStore {
 			final int cleanupPeriod = _prefStore.getInt(//
 					IPhotoPreferences.PHOTO_THUMBNAIL_STORE_CLEANUP_PERIOD);
 
-			LocalDate dtLastCleanup;
+			ZonedDateTime dtLastCleanup;
 			if (lastCleanup == 0) {
 				// cleanup is never done
-				dtLastCleanup = new LocalDate().minusYears(99);
+				dtLastCleanup = TimeTools.now().minusYears(99);
 			} else {
-				dtLastCleanup = new LocalDate(lastCleanup);
+				dtLastCleanup = TimeTools.getZonedDateTime(lastCleanup);
 			}
 
-			final LocalDate today = new LocalDate();
+			final ZonedDateTime today = TimeTools.now();
 
-			final Days daysBetween = Days.daysBetween(dtLastCleanup, today);
-			final int lastCleanupDayDiff = daysBetween.getDays();
+			final long lastCleanupDayDiff = ChronoUnit.DAYS.between(dtLastCleanup, today);
 
 			// check if cleanup needs to be done
 			if (isIgnoreCleanupPeriod || cleanupPeriod == 0 || lastCleanupDayDiff >= cleanupPeriod) {
 
 				// convert kept days into a date in milliseconds
-				final LocalDate cleanupDate = today.minusDays(daysToKeepImages);
-				final long dateToDeleteOlderImages = cleanupDate.toDateTimeAtCurrentTime().getMillis();
+				final ZonedDateTime cleanupDate = today.minusDays(daysToKeepImages);
 
-				doCleanup(daysToKeepImages, dateToDeleteOlderImages, false);
+				final ZonedDateTime cleanupDateTime = TimeTools
+						.now()
+						.withYear(cleanupDate.getYear())
+						.withMonth(cleanupDate.getMonthValue())
+						.withDayOfMonth(cleanupDate.getDayOfMonth());
+
+				final long dateToDeleteOlderImagesMillis = cleanupDateTime.toInstant().toEpochMilli();
+
+				doCleanup(daysToKeepImages, dateToDeleteOlderImagesMillis, false);
 			}
 		}
 
@@ -239,11 +245,11 @@ public class ThumbnailStore {
 	}
 
 	private static void doCleanup(	final int daysToKeepImages,
-									final long dateToDeleteOlderImages,
+									final long dateToDeleteOlderImagesMillis,
 									final boolean isDeleteAll) {
 
 		_errorFile = null;
-		_dateToDeleteOlderImages = dateToDeleteOlderImages;
+		_dateToDeleteOlderImagesMillis = dateToDeleteOlderImagesMillis;
 
 		_deleteUI_UpdateTime = System.currentTimeMillis();
 		_deleteUI_DeletedFiles = 0;
@@ -295,7 +301,9 @@ public class ThumbnailStore {
 		}
 
 		// update last cleanup time
-		_prefStore.setValue(IPhotoPreferences.PHOTO_THUMBNAIL_STORE_LAST_CLEANUP_DATE_TIME, new DateTime().getMillis());
+		_prefStore.setValue(//
+				IPhotoPreferences.PHOTO_THUMBNAIL_STORE_LAST_CLEANUP_DATE_TIME,
+				TimeTools.now().toInstant().toEpochMilli());
 	}
 
 	/**
@@ -393,7 +401,8 @@ public class ThumbnailStore {
 
 			// file is a file
 
-			if (_dateToDeleteOlderImages == Long.MIN_VALUE || fileOrFolder.lastModified() < _dateToDeleteOlderImages) {
+			if (_dateToDeleteOlderImagesMillis == Long.MIN_VALUE
+					|| fileOrFolder.lastModified() < _dateToDeleteOlderImagesMillis) {
 				doDeleteFileFolder = true;
 				isFile = true;
 			}

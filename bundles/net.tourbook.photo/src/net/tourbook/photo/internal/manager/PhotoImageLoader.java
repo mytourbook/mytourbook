@@ -20,6 +20,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Properties;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -52,7 +53,6 @@ import org.eclipse.swt.widgets.Display;
 import org.imgscalr.Scalr;
 import org.imgscalr.Scalr.Method;
 import org.imgscalr.Scalr.Rotation;
-import org.joda.time.LocalDate;
 
 public class PhotoImageLoader {
 
@@ -386,8 +386,10 @@ public class PhotoImageLoader {
 		 * touch store file when it is not yet done today, this is done to track last access time so
 		 * that a store cleanup can check the date
 		 */
-		final LocalDate dtModified = new LocalDate(storeImageFile.lastModified());
-		if (dtModified.equals(new LocalDate()) == false) {
+		final LocalDate dtModified = TimeTools.getZonedDateTime(storeImageFile.lastModified()).toLocalDate();
+
+		if (dtModified.equals(LocalDate.now()) == false) {
+
 			storeImageFile.setLastModified(TimeTools.now().toInstant().toEpochMilli());
 		}
 

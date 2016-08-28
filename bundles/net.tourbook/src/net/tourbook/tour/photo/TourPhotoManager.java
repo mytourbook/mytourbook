@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -82,7 +82,6 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.joda.time.DateTime;
 
 public class TourPhotoManager implements IPhotoServiceProvider {
 
@@ -554,8 +553,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 			final TourPhotoLink firstTour = _dbTourPhotoLinks.get(0);
 			final Photo firstPhoto = allPhotos.get(0);
 
-			final DateTime firstPhotoTime = new DateTime(firstPhoto.adjustedTimeLink);
-			if (firstPhotoTime.isBefore(firstTour.tourStartTime)) {
+			if (firstPhoto.adjustedTimeLink < firstTour.tourStartTime) {
 
 				// first photo is before the first tour, create dummy tour
 
@@ -574,10 +572,9 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
 			// 1st tour is a history tour
 
-			final long tourStartUTC = allPhotos.get(0).adjustedTimeLink;
-//			final int tourStartUTCZoneOffset = DateTimeZone.getDefault().getOffset(tourStartUTC);
+			final long tourStart = allPhotos.get(0).adjustedTimeLink;
 
-			currentTourPhotoLink = new TourPhotoLink(tourStartUTC);
+			currentTourPhotoLink = new TourPhotoLink(tourStart);
 		}
 
 		return currentTourPhotoLink;
@@ -1712,8 +1709,9 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 		final int[] timeSerie = tourData.timeSerie;
 		final int numberOfTimeSlices = timeSerie.length;
 
-		final long tourStartSeconds = tourData.getTourStartTime().toInstant().toEpochMilli() / 1000;
+		final long tourStartSeconds = tourData.getTourStartTime().toInstant().getEpochSecond();
 		long timeSliceEnd;
+
 		if (numberOfTimeSlices > 1) {
 			timeSliceEnd = tourStartSeconds + (long) (timeSerie[1] / 2.0);
 		} else {

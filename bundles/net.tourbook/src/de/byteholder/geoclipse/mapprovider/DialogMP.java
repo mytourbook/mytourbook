@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,10 +15,13 @@
  *******************************************************************************/
 package de.byteholder.geoclipse.mapprovider;
 
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.map.GeoPosition;
+import net.tourbook.common.time.TimeTools;
 
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -30,8 +33,6 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 
 import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.Tile;
@@ -40,14 +41,17 @@ import de.byteholder.geoclipse.preferences.IMappingPreferences;
 
 public class DialogMP extends TitleAreaDialog {
 
-	private static final String				TIME_SPACER				= "       ";									//$NON-NLS-1$
-	private static final String				COLUMN_SPACER			= "  ";										//$NON-NLS-1$
+	private static final String				TIME_SPACER				= "       ";			//$NON-NLS-1$
+	private static final String				COLUMN_SPACER			= "  ";				//$NON-NLS-1$
 
-	private static final String				DEFAULT_MONO_FONT		= "Courier"; //$NON-NLS-1$
+	private static final String				DEFAULT_MONO_FONT		= "Courier";			//$NON-NLS-1$
+
+	private static final DateTimeFormatter	_timeFormatter			= new DateTimeFormatterBuilder()
+																			.append(DateTimeFormatter.ISO_TIME)
+																			.appendInstant(3)
+																			.toFormatter();
 
 	protected static final int				MAX_VISIBLE_LOG_ENTRIES	= 500;
-
-	private static final DateTimeFormatter	_dtFormatter			= ISODateTimeFormat.hourMinuteSecondMillis();
 
 	// the config dialogs is using different map providers
 	private MP								_mp;
@@ -90,6 +94,7 @@ public class DialogMP extends TitleAreaDialog {
 		createMonoFont(shell.getDisplay());
 
 		shell.addDisposeListener(new DisposeListener() {
+			@Override
 			public void widgetDisposed(final DisposeEvent e) {
 				if (_fontMono != null) {
 					_fontMono.dispose();
@@ -113,7 +118,7 @@ public class DialogMP extends TitleAreaDialog {
 
 		if (_fontMono == null) {
 			_fontMono = new Font(display, DEFAULT_MONO_FONT, 9, SWT.NORMAL);
- 		}
+		}
 	}
 
 	/**
@@ -137,7 +142,7 @@ public class DialogMP extends TitleAreaDialog {
 			}
 
 			sb.setLength(0);
-			sb.append(_dtFormatter.print(logEntry.time));
+			sb.append(TimeTools.getZonedDateTime(logEntry.time).format(_timeFormatter));
 			sb.append(COLUMN_SPACER);
 			sb.append(logEntry.counter);
 			sb.append(COLUMN_SPACER);

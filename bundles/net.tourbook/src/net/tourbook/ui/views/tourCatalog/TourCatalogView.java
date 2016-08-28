@@ -15,14 +15,15 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourCatalog;
 
-import java.text.DateFormat;
 import java.text.NumberFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
@@ -704,9 +705,9 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
 					// compared tour item
 
-					cell.setText(DateFormat.getDateInstance(DateFormat.SHORT).format(
-							((TVICatalogComparedTour) element).getTourDate()));
+					final LocalDate tourDate = ((TVICatalogComparedTour) element).tourDate;
 
+					cell.setText(tourDate.format(TimeTools.Formatter_Date_S));
 				}
 			}
 		});

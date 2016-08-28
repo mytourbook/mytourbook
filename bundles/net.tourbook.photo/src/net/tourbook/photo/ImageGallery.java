@@ -30,6 +30,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
@@ -104,8 +105,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.progress.UIJob;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 /**
  * This class is a compilation from different source codes:
@@ -299,7 +298,6 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 	private Double					_contentGalleryPosition;
 	private boolean					_isLinkPhotoDisplayed;
 
-	private final DateTimeFormatter	_timeFormatter					= DateTimeFormat.mediumTime();
 	private final NumberFormat		_nf1							= NumberFormat.getNumberInstance();
 	{
 		_nf1.setMinimumFractionDigits(1);
@@ -334,6 +332,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 		_galleryPositions = new LRUMap<String, Double>(MAX_GALLERY_POSITIONS);
 
 		_workerRunnable = new Runnable() {
+			@Override
 			public void run() {
 
 				while (!_workerStopped) {
@@ -400,8 +399,10 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 
 	private class ContentProvider implements IStructuredContentProvider {
 
+		@Override
 		public void dispose() {}
 
+		@Override
 		public Object[] getElements(final Object inputElement) {
 
 //			return _sortedGalleryItems
@@ -413,6 +414,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 			return _sortedAndFilteredPhotos;
 		}
 
+		@Override
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 	}
 
@@ -514,6 +516,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 		menuMgr.setRemoveAllWhenShown(true);
 
 		menuMgr.addMenuListener(new IMenuListener() {
+			@Override
 			public void menuAboutToShow(final IMenuManager menuMgr2) {
 				fillContextMenu(menuMgr2);
 			}
@@ -718,6 +721,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 
 			// a modify event is fired when gallery is zoomed in/out
 
+			@Override
 			public void handleEvent(final Event event) {
 
 				PhotoLoadManager.stopImageLoading(false);
@@ -780,6 +784,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 //		_photoViewer.setComparator(new ContentComparator());
 
 		_photoViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
 			public void selectionChanged(final SelectionChangedEvent event) {
 				final ISelection eventSelection = event.getSelection();
 				if (eventSelection instanceof StructuredSelection) {
@@ -907,7 +912,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 
 				final Photo photo = (Photo) cell.getElement();
 
-				cell.setText(_timeFormatter.print(photo.imageExifTime));
+				cell.setText(TimeTools.getZonedDateTime(photo.imageExifTime).format(TimeTools.Formatter_Time_M));
 			}
 		});
 	}
@@ -1354,6 +1359,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 		if (property.equals(IPhotoPreferences.PHOTO_VIEWER_PREF_EVENT_IMAGE_QUALITY_IS_MODIFIED)) {
 
 			_display.asyncExec(new Runnable() {
+				@Override
 				public void run() {
 
 					final MessageDialog messageDialog = new MessageDialog(
@@ -2777,6 +2783,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 					private int			__delayCounter	= _delayCounter[0];
 					private Composite	__page			= page;
 
+					@Override
 					public void run() {
 
 						// check if this still the same page which should be displayed
@@ -2847,6 +2854,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 		_currentSorting = gallerySorting;
 
 		BusyIndicator.showWhile(_display, new Runnable() {
+			@Override
 			public void run() {
 				sortGallery_10_Runnable();
 			}
@@ -3033,6 +3041,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 	private void updateUI_GalleryInfo() {
 
 		_display.syncExec(new Runnable() {
+			@Override
 			public void run() {
 
 				if (_galleryMT20.isDisposed()) {
@@ -3122,6 +3131,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 		_sortedAndFilteredPhotos = filteredAndSortedPhotos;
 
 		_display.syncExec(new Runnable() {
+			@Override
 			public void run() {
 
 				if (_galleryMT20.isDisposed()) {
@@ -3163,6 +3173,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 	public void updateUI_StatusMessageInUIThread(final String message) {
 
 		_display.asyncExec(new Runnable() {
+			@Override
 			public void run() {
 
 				if (_galleryMT20.isDisposed()) {
@@ -3190,6 +3201,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 		if (_workerStateDir != null) {
 
 			_display.syncExec(new Runnable() {
+				@Override
 				public void run() {
 
 					// guard against the ui being closed before this runs
@@ -3273,6 +3285,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 		_allPhotos = photos;
 
 		_display.syncExec(new Runnable() {
+			@Override
 			public void run() {
 
 				// guard against the ui being closed before this runs

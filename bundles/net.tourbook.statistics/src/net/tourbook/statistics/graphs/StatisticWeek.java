@@ -165,6 +165,7 @@ public abstract class StatisticWeek extends TourbookStatistic {
 		// validate calendar week
 		final int checkDayOfWeek = _tooltipCalendar.get(Calendar.DAY_OF_WEEK);
 		if (_firstDayOfWeek != checkDayOfWeek) {
+
 			System.out.println("first day in first week is incorrect\t_firstDayOfWeek=" //$NON-NLS-1$
 					+ _firstDayOfWeek
 					+ " != " //$NON-NLS-1$

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,7 @@
 package net.tourbook.ui.views.tourCatalog;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -140,7 +141,7 @@ public class TVICatalogYearItem extends TVICatalogItem {
 					tourItem.compareId = result.getLong(1);
 					tourItem.setTourId(tourId);
 
-					tourItem.tourDate = result.getDate(3);
+					final Date tourDate = result.getDate(3);
 
 					tourItem.avgPulse = result.getFloat(4);
 					tourItem.tourSpeed = result.getFloat(5);
@@ -149,9 +150,14 @@ public class TVICatalogYearItem extends TVICatalogItem {
 					tourItem.endIndex = result.getInt(7);
 
 					tourItem.tourTitle = result.getString(8);
+					final Object tourTypeId = result.getObject(9);
+
+					// tour date
+					if (tourDate != null) {
+						tourItem.tourDate = tourDate.toLocalDate();
+					}
 
 					// tour type
-					final Object tourTypeId = result.getObject(9);
 					tourItem.tourTypeId = (tourTypeId == null ? //
 							TourDatabase.ENTITY_IS_NOT_SAVED
 							: (Long) tourTypeId);

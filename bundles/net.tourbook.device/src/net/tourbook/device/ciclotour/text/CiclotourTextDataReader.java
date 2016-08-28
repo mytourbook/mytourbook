@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,12 +20,14 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.text.DateFormat;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.StringTokenizer;
 
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TimeData;
@@ -63,9 +65,9 @@ public class CiclotourTextDataReader extends TourbookDevice {
 	 * @return A Date object that has its calendar information set correctly, but not its time
 	 *         information.
 	 */
-	private Calendar deriveDateFromFile(final File file) {
+	private ZonedDateTime deriveDateFromFile(final File file) {
 
-		final Calendar cal = Calendar.getInstance();
+		ZonedDateTime fileDate = null;
 
 		// only get the last part of the filename
 		final String filename = file.getName();
@@ -75,6 +77,7 @@ public class CiclotourTextDataReader extends TourbookDevice {
 		// careful.
 		try {
 			if (filename.length() > 6) {
+
 				final String dayDenom = filename.substring(0, 2);
 				final String monthDenom = filename.substring(2, 4);
 				final String yearDenom = filename.substring(4, 6);
@@ -92,15 +95,14 @@ public class CiclotourTextDataReader extends TourbookDevice {
 					year += 1900;
 				}
 
-				cal.set(Calendar.DAY_OF_MONTH, day);
-				cal.set(Calendar.MONTH, month - 1);
-				cal.set(Calendar.YEAR, year);
+				fileDate = ZonedDateTime.of(year, month, day, 0, 0, 0, 0, TimeTools.getDefaultTimeZone());
 			}
+
 		} catch (final Exception e) {
 			StatusUtil.showStatus(e);
 		}
 
-		return cal;
+		return fileDate;
 	}
 
 	@Override
@@ -158,15 +160,9 @@ public class CiclotourTextDataReader extends TourbookDevice {
 		// but if we are really lucky, the user did not change the filename
 		// format,
 		// and we at least get the correct date. Time info is lost.
-		final Calendar cal = deriveDateFromFile(file);
+		final ZonedDateTime fileDate = deriveDateFromFile(file);
 
-		tourData.setTourStartTime(
-				cal.get(Calendar.YEAR),
-				cal.get(Calendar.MONTH) + 1,
-				cal.get(Calendar.DAY_OF_MONTH),
-				0,
-				0,
-				0);
+		tourData.setTourStartTime(fileDate);
 
 		StringTokenizer tokenizer = null;
 		String tokenLine;
@@ -226,7 +222,7 @@ public class CiclotourTextDataReader extends TourbookDevice {
 				final Calendar dataCal = Calendar.getInstance();
 
 				dataCal.setTime(df.parse(recTime));
-				time = this.getSeconds(dataCal);
+				time = getSeconds(dataCal);
 
 				// values are recorded absolutely, but we need to get the difference
 				// between the current and the previous data point. Let's compute
@@ -242,13 +238,13 @@ public class CiclotourTextDataReader extends TourbookDevice {
 				timeData.pulse = heartrate;
 				timeData.temperature = temperature;
 				timeData.time = timeDelta;
+
 				// distance is stored in kilometers, but we need meters.
 				timeData.distance = Math.round(distanceDelta * 1000);
 
 				previousTime = time;
 				previousDistance = distance;
 				previousAlt = alt;
-
 			}
 
 			tourData.setStartDistance(Math.round(distance));

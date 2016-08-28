@@ -21,7 +21,6 @@ import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.Formatter;
 import java.util.HashSet;
 import java.util.Set;
@@ -1090,12 +1089,12 @@ public class TourManager {
 
 	public static String getTourDateFull(final TourData tourData) {
 
-		return UI.DateFormatterFull.format(tourData.getTourStartTimeMS());
+		return tourData.getTourStartTime().format(TimeTools.Formatter_Date_F);
 	}
 
 	private static String getTourDateLong(final ZonedDateTime tourDate) {
 
-		return tourDate.format(UI.DateFormatter_Long);
+		return tourDate.format(TimeTools.Formatter_Date_L);
 	}
 
 	/**
@@ -1107,12 +1106,7 @@ public class TourManager {
 			return UI.EMPTY_STRING;
 		}
 
-		return UI.DateFormatterShort.format(tourData.getTourStartTimeMS());
-	}
-
-	public static String getTourDateTimeFull(final Date dt) {
-
-		return UI.DateFormatterFull.format(dt) + UI.DASH_WITH_SPACE;
+		return tourData.getTourStartTime().format(TimeTools.Formatter_Date_S);
 	}
 
 	/**
@@ -1127,7 +1121,7 @@ public class TourManager {
 
 	public static String getTourDateTimeShort(final TourData tourData) {
 
-		return tourData.getTourStartTime().format(UI.DateTimeFormatter_Short);
+		return tourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S);
 	}
 
 	/**
@@ -1135,12 +1129,12 @@ public class TourManager {
 	 */
 	public static String getTourTimeShort(final TourData tourData) {
 
-		return tourData.getTourStartTime().format(UI.TimeFormatter_Short);
+		return tourData.getTourStartTime().format(TimeTools.Formatter_Time_S);
 	}
 
 	private static String getTourTimeShort(final ZonedDateTime tourDate) {
 
-		return tourDate.format(UI.TimeFormatter_Short);
+		return tourDate.format(TimeTools.Formatter_Time_S);
 	}
 
 	/**
@@ -1155,7 +1149,7 @@ public class TourManager {
 
 	public static String getTourTitle(final ZonedDateTime tourDateTime) {
 
-		final String weekDay = tourDateTime.format(UI.WeekDayFormatter);
+		final String weekDay = tourDateTime.format(TimeTools.Formatter_Weekday_L);
 
 		return weekDay //
 				+ UI.COMMA_SPACE

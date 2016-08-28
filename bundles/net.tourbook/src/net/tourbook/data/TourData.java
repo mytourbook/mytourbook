@@ -102,8 +102,6 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 import org.hibernate.annotations.Cascade;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 
 import com.skedgo.converter.TimezoneMapper;
 
@@ -4716,7 +4714,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 
 				// this case happened when startMonth had a wrong value
 
-				tourId = Long.valueOf(new DateTime().getMillis());
+				tourId = Long.valueOf(TimeTools.now().toInstant().toEpochMilli());
 			}
 		}
 
@@ -5133,7 +5131,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	}
 
 	/**
-	 * @return Returns {@link DateTime} when the tour was created or <code>null</code> when
+	 * @return Returns {@link ZonedDateTime} when the tour was created or <code>null</code> when
 	 *         date/time is not available
 	 */
 	public ZonedDateTime getDateTimeCreated() {
@@ -5148,7 +5146,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	}
 
 	/**
-	 * @return Returns {@link DateTime} when the tour was modified or <code>null</code> when
+	 * @return Returns {@link ZonedDateTime} when the tour was modified or <code>null</code> when
 	 *         date/time is not available
 	 */
 	public ZonedDateTime getDateTimeModified() {
@@ -5989,9 +5987,9 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		final long tourStartUTC = tourStartDefaultZone.plusSeconds(utcZoneOffset).toInstant().toEpochMilli();
 		final long tourEnd = tourEndTime;
 
-		final DateTimeZone defaultZone = DateTimeZone.getDefault();
+		final ZoneId defaultZone = TimeTools.getDefaultTimeZone();
 
-		if (defaultZone.getID().equals(TIME_ZONE_ID_EUROPE_BERLIN)) {
+		if (defaultZone.getId().equals(TIME_ZONE_ID_EUROPE_BERLIN)) {
 
 			if (tourStartUTC < net.tourbook.common.UI.beforeCET && tourEnd > net.tourbook.common.UI.afterCETBegin) {
 
@@ -6182,7 +6180,8 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	}
 
 	/**
-	 * @return Returns the tour start date time with the default or the tour time zone.
+	 * @return Returns the tour start date time with the tour time zone, when not available with the
+	 *         default time zone.
 	 */
 	public ZonedDateTime getTourStartTime() {
 

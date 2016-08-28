@@ -20,6 +20,7 @@ import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
@@ -84,8 +85,6 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 public class TourWaypointView extends ViewPart implements ITourProvider, ITourViewer {
 
@@ -133,9 +132,6 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 	 * measurement unit values
 	 */
 	private float					_unitValueAltitude;
-
-	private final DateTimeFormatter	_dateFormatter			= DateTimeFormat.shortDate();
-	private final DateTimeFormatter	_timeFormatter			= DateTimeFormat.mediumTime();
 
 	private final NumberFormat		_nf_1_1					= NumberFormat.getNumberInstance();
 
@@ -611,7 +607,9 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 				final TourWayPoint wp = (TourWayPoint) cell.getElement();
 				final long time = wp.getTime();
 
-				cell.setText(time == 0 ? UI.EMPTY_STRING : _dateFormatter.print(time));
+				cell.setText(time == 0 //
+						? UI.EMPTY_STRING
+						: TimeTools.getZonedDateTime(time).format(TimeTools.Formatter_Date_S));
 			}
 		});
 	}
@@ -738,7 +736,9 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 				final TourWayPoint wp = (TourWayPoint) cell.getElement();
 				final long time = wp.getTime();
 
-				cell.setText(time == 0 ? UI.EMPTY_STRING : _timeFormatter.print(time));
+				cell.setText(time == 0 //
+						? UI.EMPTY_STRING
+						: TimeTools.getZonedDateTime(time).format(TimeTools.Formatter_Time_M));
 			}
 		});
 	}
@@ -1003,7 +1003,7 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
 	@Override
 	public void updateColumnHeader(final ColumnDefinition colDef) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	private void updateInternalUnitValues() {

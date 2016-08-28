@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,11 +19,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.SQLFilter;
@@ -31,17 +30,14 @@ import net.tourbook.ui.UI;
 
 public class TVITagViewYear extends TVITagViewItem {
 
-	private final int				_year;
-	private TVITagViewTag			_tagItem;
-
-	private static Calendar			_calendar		= GregorianCalendar.getInstance();
-	private static SimpleDateFormat	_monthFormatter	= new SimpleDateFormat("MMM");		//$NON-NLS-1$
+	private final int		_year;
+	private TVITagViewTag	_tagItem;
 
 	/**
 	 * <code>true</code> when the children of this year item contains month items<br>
 	 * <code>false</code> when the children of this year item contains tour items
 	 */
-	private boolean					_isMonth;
+	private boolean			_isMonth;
 
 	public TVITagViewYear(final TVITagViewTag parentItem, final int year, final boolean isMonth) {
 
@@ -185,8 +181,7 @@ public class TVITagViewYear extends TVITagViewItem {
 				final TVITagViewMonth tourItem = new TVITagViewMonth(this, dbYear, dbMonth);
 				children.add(tourItem);
 
-				_calendar.set(Calendar.MONTH, dbMonth - 1);
-				tourItem.treeColumn = _monthFormatter.format(_calendar.getTime());
+				tourItem.treeColumn = LocalDate.of(dbYear, dbMonth, 1).format(TimeTools.Formatter_Month);
 
 				tourItem.readSumColumnData(result, 3);
 			}
@@ -270,7 +265,7 @@ public class TVITagViewYear extends TVITagViewItem {
 					tourItem.tourId = tourId;
 					tourItem.getTourColumnData(result, resultTagId, 3);
 
-					tourItem.treeColumn = net.tourbook.common.UI.DateFormatterShort.format(tourItem.tourDate.toDate());
+					tourItem.treeColumn = tourItem.tourDate.format(TimeTools.Formatter_Date_S);
 				}
 
 				lastTourId = tourId;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,7 @@
 package net.tourbook.photo.internal.preferences;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.Util;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.PhotoImageCache;
@@ -49,16 +50,12 @@ import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 public class PrefPagePhotoThumbnailStore extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
 	private IPreferenceStore		_prefStore					= Activator.getDefault().getPreferenceStore();
 
 	private final String			_defaultThumbnailStorePath	= Platform.getInstanceLocation().getURL().getPath();
-
-	private final DateTimeFormatter	_dateFormatter				= DateTimeFormat.fullDateTime();
 
 	/*
 	 * UI controls
@@ -208,6 +205,7 @@ public class PrefPagePhotoThumbnailStore extends FieldEditorPreferencePage imple
 			_spinnerCleanupPeriod.setMinimum(0);
 			_spinnerCleanupPeriod.setMaximum(9999);
 			_spinnerCleanupPeriod.addMouseWheelListener(new MouseWheelListener() {
+				@Override
 				public void mouseScrolled(final MouseEvent event) {
 					Util.adjustSpinnerValueOnMouseScroll(event);
 				}
@@ -246,6 +244,7 @@ public class PrefPagePhotoThumbnailStore extends FieldEditorPreferencePage imple
 			_spinnerNumberOfDaysToKeepImages.setMinimum(0);
 			_spinnerNumberOfDaysToKeepImages.setMaximum(9999);
 			_spinnerNumberOfDaysToKeepImages.addMouseWheelListener(new MouseWheelListener() {
+				@Override
 				public void mouseScrolled(final MouseEvent event) {
 					Util.adjustSpinnerValueOnMouseScroll(event);
 				}
@@ -376,6 +375,7 @@ public class PrefPagePhotoThumbnailStore extends FieldEditorPreferencePage imple
 		_btnCleanupNow.setEnabled(isValid);
 	}
 
+	@Override
 	public void init(final IWorkbench workbench) {
 		setPreferenceStore(_prefStore);
 	}
@@ -394,6 +394,7 @@ public class PrefPagePhotoThumbnailStore extends FieldEditorPreferencePage imple
 		// #####################################################################################
 
 		final IPropertyChangeListener propListener = new IPropertyChangeListener() {
+			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 				enableControls();
 			}
@@ -514,6 +515,8 @@ public class PrefPagePhotoThumbnailStore extends FieldEditorPreferencePage imple
 		final long lastCleanup = _prefStore.getLong(//
 				IPhotoPreferences.PHOTO_THUMBNAIL_STORE_LAST_CLEANUP_DATE_TIME);
 
-		_lblLastCleanup.setText(lastCleanup == 0 ? UI.EMPTY_STRING : _dateFormatter.print(lastCleanup));
+		_lblLastCleanup.setText(lastCleanup == 0 //
+				? UI.EMPTY_STRING
+				: TimeTools.getZonedDateTime(lastCleanup).format(TimeTools.Formatter_DateTime_F));
 	}
 }

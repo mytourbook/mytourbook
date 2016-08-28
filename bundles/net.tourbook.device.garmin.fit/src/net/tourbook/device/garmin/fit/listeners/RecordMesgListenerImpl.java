@@ -120,7 +120,6 @@ public class RecordMesgListenerImpl extends AbstractMesgListener implements Reco
 			}
 		}
 
-
 		final Integer positionLat = mesg.getPositionLat();
 		if (positionLat != null) {
 			timeData.latitude = DataConverters.convertSemicirclesToDegrees(positionLat);
@@ -176,9 +175,6 @@ public class RecordMesgListenerImpl extends AbstractMesgListener implements Reco
 				timeData.temperature = mesgTemperature;
 			}
 		}
-
-//		System.out.println(new org.joda.time.DateTime(absoluteTime) + "\tRecordMesgListener\t");
-//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		context.onMesgRecord_20_After();
 	}

@@ -15,12 +15,11 @@
  *******************************************************************************/
 package net.tourbook.statistics.graphs;
 
-import java.text.DateFormat;
-import java.text.FieldPosition;
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.format.TextStyle;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
+import java.util.Locale;
 
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
@@ -62,8 +61,6 @@ public abstract class StatisticMonth extends TourbookStatistic {
 	private final MinMaxKeeper_YData	_minMaxKeeper	= new MinMaxKeeper_YData();
 
 	private boolean						_isSynchScaleEnabled;
-
-	private DateFormat					_dateFormatter	= DateFormat.getDateInstance(DateFormat.FULL);
 
 	private TourData_Month				_tourMonthData;
 	private StatisticContext			_statContext;
@@ -150,18 +147,11 @@ public abstract class StatisticMonth extends TourbookStatistic {
 
 		final int oldestYear = _statFirstYear - _statNumberOfYears + 1;
 
-		final Calendar calendar = GregorianCalendar.getInstance();
+		final LocalDate monthDate = LocalDate.of(oldestYear, 1, 1).plusMonths(valueIndex);
 
-		calendar.set(oldestYear, 0, 1);
-		calendar.add(Calendar.MONTH, valueIndex);
-
-		//
-		final StringBuffer monthStringBuffer = new StringBuffer();
-		final FieldPosition monthPosition = new FieldPosition(DateFormat.MONTH_FIELD);
-
-		final Date date = new Date();
-		date.setTime(calendar.getTimeInMillis());
-		_dateFormatter.format(date, monthStringBuffer, monthPosition);
+		final String monthText = Month
+				.of(monthDate.getMonthValue())
+				.getDisplayName(TextStyle.FULL, Locale.getDefault());
 
 		final Integer recordingTime = _tourMonthData.recordingTime[serieIndex][valueIndex];
 		final Integer drivingTime = _tourMonthData.drivingTime[serieIndex][valueIndex];
@@ -170,7 +160,7 @@ public abstract class StatisticMonth extends TourbookStatistic {
 		/*
 		 * tool tip: title
 		 */
-		final StringBuilder titleString = new StringBuilder();
+		final StringBuilder sbTitle = new StringBuilder();
 
 		final String tourTypeName = StatisticServices.getTourTypeName(
 				serieIndex,
@@ -179,16 +169,14 @@ public abstract class StatisticMonth extends TourbookStatistic {
 				_appTourTypeFilter);
 
 		if (tourTypeName != null && tourTypeName.length() > 0) {
-			titleString.append(tourTypeName);
+			sbTitle.append(tourTypeName);
 		}
 
-		final String toolTipTitle = String.format(Messages.tourtime_info_date_month, //
-				titleString.toString(),
-				monthStringBuffer.substring(monthPosition.getBeginIndex(), monthPosition.getEndIndex()),
-				calendar.get(Calendar.YEAR)
-		//
-				)
-				.toString();
+		final String toolTipTitle = String.format(
+				Messages.tourtime_info_date_month,
+				sbTitle.toString(),
+				monthText,
+				monthDate.getYear());
 
 		/*
 		 * tool tip: label

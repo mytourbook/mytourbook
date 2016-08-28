@@ -15,8 +15,9 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourCatalog;
 
-import java.text.DateFormat;
 import java.text.NumberFormat;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
@@ -32,6 +33,7 @@ import net.tourbook.chart.IBarSelectionListener;
 import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.ArrayListToArray;
@@ -69,8 +71,6 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
 
 public class YearStatisticView extends ViewPart {
 
@@ -100,8 +100,6 @@ public class YearStatisticView extends ViewPart {
 	private ISelectionListener					_postSelectionListener;
 	private PostSelectionProvider				_postSelectionProvider;
 
-	private final DateFormat					_dtFormatter						= DateFormat
-																							.getDateInstance(DateFormat.FULL);
 	private NumberFormat						_nf1								= NumberFormat.getNumberInstance();
 	{
 		_nf1.setMinimumFractionDigits(1);
@@ -141,7 +139,7 @@ public class YearStatisticView extends ViewPart {
 	/**
 	 * this is the last year (on the right side) which is displayed in the statistics
 	 */
-	private int									_lastYear							= new DateTime().getYear();
+	private int									_lastYear							= TimeTools.now().getYear();
 
 	/**
 	 * year item for the visible statistics
@@ -443,7 +441,10 @@ public class YearStatisticView extends ViewPart {
 		 */
 		final int firstYear = getFirstYear();
 		final int tourDOY = _DOYValues.get(valueIndex);
-		final DateTime tourDate = new DateTime(firstYear, 1, 1, 0, 0, 0, 1).plusDays(tourDOY);
+
+		final ZonedDateTime tourDate = ZonedDateTime
+				.of(firstYear, 1, 1, 0, 0, 0, 1, TimeTools.getDefaultTimeZone())
+				.plusDays(tourDOY);
 
 		final StringBuilder toolTipFormat = new StringBuilder();
 		toolTipFormat.append(Messages.tourCatalog_view_tooltip_speed);
@@ -456,7 +457,7 @@ public class YearStatisticView extends ViewPart {
 
 		final ChartToolTipInfo toolTipInfo = new ChartToolTipInfo();
 
-		toolTipInfo.setTitle(_dtFormatter.format(tourDate.toDate()));
+		toolTipInfo.setTitle(tourDate.format(TimeTools.Formatter_Date_F));
 		toolTipInfo.setLabel(ttText);
 
 		return toolTipInfo;
@@ -734,7 +735,7 @@ public class YearStatisticView extends ViewPart {
 				int yearIndex = 0;
 				for (final TVICatalogComparedTour tourItem : _allTours) {
 
-					if (new DateTime(tourItem.getTourDate()).getYear() == _lastYear) {
+					if (tourItem.tourDate.getYear() == _lastYear) {
 						break;
 					}
 					yearIndex++;
@@ -876,16 +877,11 @@ public class YearStatisticView extends ViewPart {
 
 		final int firstYear = getFirstYear();
 
-		final DateTime dt = (new DateTime())
-				.withYear(firstYear)
-				.withWeekOfWeekyear(1)
-				.withDayOfWeek(DateTimeConstants.MONDAY);
-
 		int yearIndex = 0;
 		for (int currentYear = firstYear; currentYear <= _lastYear; currentYear++) {
 
 			_displayedYears[yearIndex] = currentYear;
-			_numberOfDaysInYear[yearIndex] = dt.withYear(currentYear).dayOfYear().getMaximumValue();
+			_numberOfDaysInYear[yearIndex] = TimeTools.getNumberOfDaysWithYear(currentYear);
 
 			yearIndex++;
 		}
@@ -960,10 +956,10 @@ public class YearStatisticView extends ViewPart {
 
 							final TVICatalogComparedTour tourItem = (TVICatalogComparedTour) tourItemObj;
 
-							final DateTime dt = new DateTime(tourItem.getTourDate());
+							final LocalDate tourDate = tourItem.tourDate;
 
 							_allTours.add(tourItem);
-							_DOYValues.add(getYearDOYs(dt.getYear()) + dt.getDayOfYear() - 1);
+							_DOYValues.add(getYearDOYs(tourDate.getYear()) + tourDate.getDayOfYear() - 1);
 
 							_avgPulse.add(tourItem.getAvgPulse());
 							_tourSpeed.add(tourItem.getTourSpeed() / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);

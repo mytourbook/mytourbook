@@ -50,8 +50,6 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -188,8 +186,6 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	private static final String				ATTR_LATITUDE					= "lat";									//$NON-NLS-1$
 	private static final String				ATTR_LONGITUDE					= "lon";									//$NON-NLS-1$
 
-	private static final DateTimeFormatter	_dtFormatterShort				= DateTimeFormat.mediumDateTime();
-
 	private static final SimpleDateFormat	GPX_TIME_FORMAT					= new SimpleDateFormat(
 																					"yyyy-MM-dd'T'HH:mm:ss'Z'");		//$NON-NLS-1$
 	private static final SimpleDateFormat	GPX_TIME_FORMAT_SSSZ			= new SimpleDateFormat(
@@ -197,14 +193,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	private static final SimpleDateFormat	GPX_TIME_FORMAT_RFC822			= new SimpleDateFormat(
 																					"yyyy-MM-dd'T'HH:mm:ssZ");			//$NON-NLS-1$
 	private static final long				DEFAULT_DATE_TIME				= ZonedDateTime
-																					.of(
-																							2000,
-																							1,
-																							1,
-																							0,
-																							0,
-																							0,
-																							0,
+																					.of(2000, 1, 1, 0, 0, 0, 0,//
 																							TimeTools
 																									.getDefaultTimeZone())
 																					.toInstant()
@@ -1209,7 +1198,8 @@ public class GPX_SAX_Handler extends DefaultHandler {
 			final String labelText = Integer.toString(_trackCounter) + //
 					(originalTime == Long.MIN_VALUE //
 							? UI.EMPTY_STRING
-							: UI.DASH_WITH_SPACE + _dtFormatterShort.print(_timeSlice.absoluteTime));
+							: UI.DASH_WITH_SPACE + TimeTools.getZonedDateTime(_timeSlice.absoluteTime)//
+									.format(TimeTools.Formatter_DateTime_M));
 
 			final String markerLabel = NLS.bind(Messages.Marker_Label_Track, labelText);
 

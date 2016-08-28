@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,12 +17,12 @@ package net.tourbook.ui.views.tagging;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.UI;
-
-import org.joda.time.DateTime;
 
 public class TVITagViewTour extends TVITagViewItem {
 
@@ -41,7 +41,7 @@ public class TVITagViewTour extends TVITagViewItem {
 
 	long						tourId;
 
-	DateTime					tourDate;
+	ZonedDateTime				tourDate;
 
 	int							tourYear;
 	int							tourMonth;
@@ -84,7 +84,7 @@ public class TVITagViewTour extends TVITagViewItem {
 		tourMonth = result.getInt(startIndex + 1);
 		tourDay = result.getInt(startIndex + 2);
 
-		tourDate = new DateTime(tourYear, tourMonth, tourDay, 0, 0, 0, 0);
+		tourDate = ZonedDateTime.of(tourYear, tourMonth, tourDay, 0, 0, 0, 0, TimeTools.getDefaultTimeZone());
 
 		tourTitle = result.getString(startIndex + 3);
 

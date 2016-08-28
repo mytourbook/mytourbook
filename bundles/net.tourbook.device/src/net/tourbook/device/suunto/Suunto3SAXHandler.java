@@ -32,7 +32,6 @@ import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
-import org.joda.time.DateTime;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -50,46 +49,54 @@ public class Suunto3SAXHandler extends DefaultHandler {
 	/**
 	 * This time is used when a time is not available.
 	 */
-	private static final long				DEFAULT_TIME			= new DateTime(2007, 4, 1, 0, 0, 0, 0).getMillis();
+	private static final long				DEFAULT_TIME;
+
+	static {
+
+		DEFAULT_TIME = ZonedDateTime
+				.of(2007, 4, 1, 0, 0, 0, 0, TimeTools.getDefaultTimeZone())
+				.toInstant()
+				.toEpochMilli();
+	}
 
 	private static final SimpleDateFormat	TIME_FORMAT				= new SimpleDateFormat(//
-																			"yyyy-MM-dd'T'HH:mm:ss'Z'");				//$NON-NLS-1$
+																			"yyyy-MM-dd'T'HH:mm:ss'Z'");		//$NON-NLS-1$
 	private static final SimpleDateFormat	TIME_FORMAT_SSSZ		= new SimpleDateFormat(//
-																			"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");			//$NON-NLS-1$
+																			"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");	//$NON-NLS-1$
 	private static final SimpleDateFormat	TIME_FORMAT_RFC822		= new SimpleDateFormat(//
-																			"yyyy-MM-dd'T'HH:mm:ssZ");					//$NON-NLS-1$
+																			"yyyy-MM-dd'T'HH:mm:ssZ");			//$NON-NLS-1$
 
-	private static final String				SAMPLE_TYPE_GPS_BASE	= "gps-base";										//$NON-NLS-1$
-	private static final String				SAMPLE_TYPE_GPS_TINY	= "gps-tiny";										//$NON-NLS-1$
-	private static final String				SAMPLE_TYPE_GPS_SMALL	= "gps-small";										//$NON-NLS-1$
-	private static final String				SAMPLE_TYPE_PERIODIC	= "periodic";										//$NON-NLS-1$
+	private static final String				SAMPLE_TYPE_GPS_BASE	= "gps-base";								//$NON-NLS-1$
+	private static final String				SAMPLE_TYPE_GPS_TINY	= "gps-tiny";								//$NON-NLS-1$
+	private static final String				SAMPLE_TYPE_GPS_SMALL	= "gps-small";								//$NON-NLS-1$
+	private static final String				SAMPLE_TYPE_PERIODIC	= "periodic";								//$NON-NLS-1$
 
 	// root tags
-	private static final String				TAG_DEVLOG				= "DeviceLog";										//$NON-NLS-1$
-	private static final String				TAG_DEVLOG_DEVICE		= "Device";										//$NON-NLS-1$
-	private static final String				TAG_DEVLOG_HEADER		= "Header";										//$NON-NLS-1$
-	private static final String				TAG_DEVLOG_SAMPLES		= "Samples";										//$NON-NLS-1$
+	private static final String				TAG_DEVLOG				= "DeviceLog";								//$NON-NLS-1$
+	private static final String				TAG_DEVLOG_DEVICE		= "Device";								//$NON-NLS-1$
+	private static final String				TAG_DEVLOG_HEADER		= "Header";								//$NON-NLS-1$
+	private static final String				TAG_DEVLOG_SAMPLES		= "Samples";								//$NON-NLS-1$
 
 	// header tags
-	private static final String				TAG_ENERGY				= "Energy";										//$NON-NLS-1$
+	private static final String				TAG_ENERGY				= "Energy";								//$NON-NLS-1$
 
 	// device tags
-	private static final String				TAG_DEVICE_SW			= "SW";											//$NON-NLS-1$
-	private static final String				TAG_DEVICE_NAME			= "Name";											//$NON-NLS-1$
+	private static final String				TAG_DEVICE_SW			= "SW";									//$NON-NLS-1$
+	private static final String				TAG_DEVICE_NAME			= "Name";									//$NON-NLS-1$
 
 	// sample tags
-	private static final String				TAG_ALTITUDE			= "Altitude";										//$NON-NLS-1$
-	private static final String				TAG_CADENCE				= "Cadence";										//$NON-NLS-1$
-	private static final String				TAG_DISTANCE			= "Distance";										//$NON-NLS-1$
-	private static final String				TAG_EVENTS				= "Events";										//$NON-NLS-1$
-	private static final String				TAG_HR					= "HR";											//$NON-NLS-1$
-	private static final String				TAG_LAP					= "Lap";											//$NON-NLS-1$
-	private static final String				TAG_LATITUDE			= "Latitude";										//$NON-NLS-1$
-	private static final String				TAG_LONGITUDE			= "Longitude";										//$NON-NLS-1$
-	private static final String				TAG_SAMPLE				= "Sample";										//$NON-NLS-1$
-	private static final String				TAG_SAMPLE_TYPE			= "SampleType";									//$NON-NLS-1$
-	private static final String				TAG_TEMPERATURE			= "Temperature";									//$NON-NLS-1$
-	private static final String				TAG_UTC					= "UTC";											//$NON-NLS-1$
+	private static final String				TAG_ALTITUDE			= "Altitude";								//$NON-NLS-1$
+	private static final String				TAG_CADENCE				= "Cadence";								//$NON-NLS-1$
+	private static final String				TAG_DISTANCE			= "Distance";								//$NON-NLS-1$
+	private static final String				TAG_EVENTS				= "Events";								//$NON-NLS-1$
+	private static final String				TAG_HR					= "HR";									//$NON-NLS-1$
+	private static final String				TAG_LAP					= "Lap";									//$NON-NLS-1$
+	private static final String				TAG_LATITUDE			= "Latitude";								//$NON-NLS-1$
+	private static final String				TAG_LONGITUDE			= "Longitude";								//$NON-NLS-1$
+	private static final String				TAG_SAMPLE				= "Sample";								//$NON-NLS-1$
+	private static final String				TAG_SAMPLE_TYPE			= "SampleType";							//$NON-NLS-1$
+	private static final String				TAG_TEMPERATURE			= "Temperature";							//$NON-NLS-1$
+	private static final String				TAG_UTC					= "UTC";									//$NON-NLS-1$
 
 	//
 	private HashMap<Long, TourData>			_alreadyImportedTours;
