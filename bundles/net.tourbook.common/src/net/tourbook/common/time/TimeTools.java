@@ -52,7 +52,11 @@ import org.joda.time.format.PeriodFormatterBuilder;
 import com.skedgo.converter.TimezoneMapper;
 
 public class TimeTools {
-
+	
+	private static final String						DST_FORMAT				= " - %s %s";										//$NON-NLS-1$
+	private static final String						ZERO_0					= ":0";											//$NON-NLS-1$
+	private static final String						ZERO_00_00				= "+00:00";										//$NON-NLS-1$
+	private static final String						ZERO_00_00_DEFAULT		= "*";												//$NON-NLS-1$
 
 // SET_FORMATTING_OFF
 	
@@ -88,11 +92,6 @@ public class TimeTools {
 																				.toFormatter();
 
 // SET_FORMATTING_ON
-
-	private static final String						DST_FORMAT				= " - %s %s";										//$NON-NLS-1$
-	private static final String						ZERO_0					= ":0";											//$NON-NLS-1$
-	private static final String						ZERO_00_00				= "+00:00";										//$NON-NLS-1$
-	private static final String						ZERO_00_00_DEFAULT		= "*";												//$NON-NLS-1$
 
 	/**
 	 * Cached time zone labels.

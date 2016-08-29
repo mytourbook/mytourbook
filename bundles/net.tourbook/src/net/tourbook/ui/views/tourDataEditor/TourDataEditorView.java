@@ -23,6 +23,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.text.NumberFormat;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -2332,6 +2333,17 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		return txtField;
 	}
 
+	private void createUI_LabelSeparator(final Composite parent) {
+
+		_tk.createLabel(parent, UI.EMPTY_STRING);
+	}
+
+	private void createUI_SectionSeparator(final Composite parent) {
+
+		final Composite sep = _tk.createComposite(parent);
+		GridDataFactory.fillDefaults().hint(SWT.DEFAULT, 5).applyTo(sep);
+	}
+
 	private void createUISection_110_Title(final Composite parent) {
 
 		Label label;
@@ -2522,7 +2534,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_dtTourDate.addSelectionListener(_dateTimeListener);
 
 			//////////////////////////////////////
-			createUISeparator(container);
+			createUI_LabelSeparator(container);
 		}
 	}
 
@@ -3372,6 +3384,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		// keep border style
 		final int defaultBorderStyle = _tk.getBorderStyle();
 		_tk.setBorderStyle(SWT.NULL);
+
 		_sectionInfo = createSection(parent, _tk, Messages.tour_editor_section_info, false, false);
 		final Composite container = (Composite) _sectionInfo.getClient();
 //		LayoutConstants.getSpacing();
@@ -3504,15 +3517,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_tk.setBorderStyle(defaultBorderStyle);
 	}
 
-	private void createUISectionSeparator(final Composite parent) {
-		final Composite sep = _tk.createComposite(parent);
-		GridDataFactory.fillDefaults().hint(SWT.DEFAULT, 5).applyTo(sep);
-	}
-
-	private void createUISeparator(final Composite parent) {
-		_tk.createLabel(parent, UI.EMPTY_STRING);
-	}
-
 	private Composite createUITab_10_Tour(final Composite parent) {
 
 		// scrolled container
@@ -3538,16 +3542,16 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			_tk.setBorderStyle(SWT.BORDER);
 			{
 				createUISection_110_Title(_tourContainer);
-				createUISectionSeparator(_tourContainer);
+				createUI_SectionSeparator(_tourContainer);
 
 				createUISection_120_DateTime(_tourContainer);
-				createUISectionSeparator(_tourContainer);
+				createUI_SectionSeparator(_tourContainer);
 
 				createUISection_130_Personal(_tourContainer);
-				createUISectionSeparator(_tourContainer);
+				createUI_SectionSeparator(_tourContainer);
 
 				createUISection_140_Weather(_tourContainer);
-				createUISectionSeparator(_tourContainer);
+				createUI_SectionSeparator(_tourContainer);
 
 				createUISection_150_Characteristics(_tourContainer);
 			}
@@ -6840,6 +6844,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			timeZoneIndex = TimeTools.getTimeZoneIndexWithDefault(timeZoneId);
 		}
 		_comboTimeZone.select(timeZoneIndex);
+
+		_lblTimeZone.setToolTipText(NLS.bind(//
+				Messages.Tour_Editor_Label_TimeZone_Tooltip,
+//				tourStartTime.withZoneSameInstant(ZoneOffset.UTC).format(TimeTools.Formatter_DateTime_F)));
+				tourStartTime.format(DateTimeFormatter.ISO_INSTANT)));
 
 		updateUI_TimeZoneDecorator();
 

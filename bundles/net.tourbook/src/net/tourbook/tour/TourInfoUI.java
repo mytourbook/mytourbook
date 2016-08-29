@@ -22,8 +22,10 @@ import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Set;
 
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.formatter.FormatManager;
+import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.IToolTipProvider;
@@ -44,7 +46,9 @@ import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.graphics.Color;
@@ -66,9 +70,7 @@ public class TourInfoUI {
 
 	private static final String					REAR_SHIFT_FORMAT		= "/  ";								//$NON-NLS-1$
 
-	private Color								_bgColor;
-	private Color								_fgColor;
-	private Font								_boldFont;
+	private final static IPreferenceStore		_prefStoreCommon		= CommonActivator.getPrefStore();
 
 	public static final DateTimeFormatter		_dtHistoryFormatter		= DateTimeFormatter.ofLocalizedDateTime(
 																				FormatStyle.FULL,
@@ -126,6 +128,13 @@ public class TourInfoUI {
 	 */
 	private final ArrayList<Control>			_firstColumnControls	= new ArrayList<Control>();
 	private final ArrayList<Control>			_secondColumnControls	= new ArrayList<Control>();
+
+	/*
+	 * UI resources
+	 */
+	private Color								_bgColor;
+	private Color								_fgColor;
+	private Font								_boldFont;
 
 	/*
 	 * UI controls
@@ -442,7 +451,17 @@ public class TourInfoUI {
 			/*
 			 * Timezone
 			 */
-			_lblTimeZoneOffset = createUI_Label(container, Messages.Tour_Tooltip_Label_TimeZone);
+			_lblTimeZone = createUI_Label(container, Messages.Tour_Tooltip_Label_TimeZone);
+			_firstColumnControls.add(_lblTimeZone);
+
+			_lblTimeZoneValue = createUI_LabelValue(container, SWT.TRAIL);
+			_secondColumnControls.add(_lblTimeZoneValue);
+			final GridData gd = _lblTimeZoneValue.getLayoutData();
+
+			/*
+			 * Timezone difference
+			 */
+			_lblTimeZoneOffset = createUI_Label(container, Messages.Tour_Tooltip_Label_TimeZoneDifference);
 			_firstColumnControls.add(_lblTimeZoneOffset);
 
 			_lblTimeZoneOffsetValue = createUI_LabelValue(container, SWT.TRAIL);
@@ -1086,6 +1105,12 @@ public class TourInfoUI {
 			// time zone
 			final TourDateTime tourDateTime = _tourData.getTourDateTime();
 			_lblTimeZoneOffsetValue.setText(tourDateTime.timeZoneOffsetLabel);
+
+			// set tooltip text
+			final String timeZone = _prefStoreCommon.getString(ICommonPreferences.TIME_ZONE_LOCAL_ID);
+			final String timeZoneTooltip = NLS.bind(Messages.ColumnFactory_TimeZoneDifference_Tooltip, timeZone);
+			_lblTimeZoneOffset.setToolTipText(timeZoneTooltip);
+			_lblTimeZoneOffsetValue.setToolTipText(timeZoneTooltip);
 
 		} else {
 
