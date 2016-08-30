@@ -22,7 +22,6 @@ import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.Year;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -52,46 +51,11 @@ import org.joda.time.format.PeriodFormatterBuilder;
 import com.skedgo.converter.TimezoneMapper;
 
 public class TimeTools {
-	
-	private static final String						DST_FORMAT				= " - %s %s";										//$NON-NLS-1$
+
+
 	private static final String						ZERO_0					= ":0";											//$NON-NLS-1$
 	private static final String						ZERO_00_00				= "+00:00";										//$NON-NLS-1$
-	private static final String						ZERO_00_00_DEFAULT		= "*";												//$NON-NLS-1$
-
-// SET_FORMATTING_OFF
-	
-	public static final DateTimeFormatter			Formatter_Date_S		= DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
-	public static final DateTimeFormatter			Formatter_Date_M		= DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM);
-	public static final DateTimeFormatter			Formatter_Date_L		= DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG);
-	public static final DateTimeFormatter			Formatter_Date_F		= DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL);
-	
-	public static final DateTimeFormatter			Formatter_Time_S		= DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT);
-	public static final DateTimeFormatter			Formatter_Time_M		= DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM);
-	public static final DateTimeFormatter			Formatter_Time_F		= DateTimeFormatter.ofLocalizedTime(FormatStyle.FULL);
-	
-	public static final DateTimeFormatter			Formatter_DateTime_S	= DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT);
-	public static final DateTimeFormatter			Formatter_DateTime_M	= DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM);
-	public static final DateTimeFormatter			Formatter_DateTime_MS	= DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT);
-	public static final DateTimeFormatter			Formatter_DateTime_ML	= DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.LONG);
-	public static final DateTimeFormatter			Formatter_DateTime_F	= DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL);
-	
-	
-	public static final DateTimeFormatter			Formatter_FileName		= DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");		//$NON-NLS-1$
-	
-	public static final DateTimeFormatter			Formatter_Month			= DateTimeFormatter.ofPattern("MMM");						//$NON-NLS-1$
-	public static final DateTimeFormatter			Formatter_Week_Month	= DateTimeFormatter.ofPattern("dd MMM");					//$NON-NLS-1$
-	public static final DateTimeFormatter			Formatter_Weekday		= DateTimeFormatter.ofPattern("E");							//$NON-NLS-1$
-	public static final DateTimeFormatter			Formatter_Weekday_L		= DateTimeFormatter.ofPattern("EEEE");						//$NON-NLS-1$
-
-	public static final DateTimeFormatter			Formatter_Time_ISO		= new DateTimeFormatterBuilder()//
-																				.appendValue(ChronoField.HOUR_OF_DAY, 2)
-																				.appendLiteral(':')
-																				.appendValue(ChronoField.MINUTE_OF_HOUR, 2)
-																				.appendLiteral(':')
-																				.appendValue(ChronoField.SECOND_OF_MINUTE, 2)
-																				.toFormatter();
-
-// SET_FORMATTING_ON
+	private static final String						ZERO_00_00_DEFAULT		= "*";											//$NON-NLS-1$
 
 	/**
 	 * Cached time zone labels.
@@ -124,6 +88,40 @@ public class TimeTools {
 	 * output "Monday".
 	 */
 	public static String[]							weekDays_Full;
+	
+// SET_FORMATTING_OFF
+		
+	public static final DateTimeFormatter	Formatter_Date_S		= DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
+	public static final DateTimeFormatter	Formatter_Date_M		= DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM);
+	public static final DateTimeFormatter	Formatter_Date_L		= DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG);
+	public static final DateTimeFormatter	Formatter_Date_F		= DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL);
+	
+	public static final DateTimeFormatter	Formatter_Time_S		= DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT);
+	public static final DateTimeFormatter	Formatter_Time_M		= DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM);
+	public static final DateTimeFormatter	Formatter_Time_F		= DateTimeFormatter.ofLocalizedTime(FormatStyle.FULL);
+	
+	public static final DateTimeFormatter	Formatter_DateTime_S	= DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT);
+	public static final DateTimeFormatter	Formatter_DateTime_M	= DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM);
+	public static final DateTimeFormatter	Formatter_DateTime_MS	= DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT);
+	public static final DateTimeFormatter	Formatter_DateTime_ML	= DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.LONG);
+	public static final DateTimeFormatter	Formatter_DateTime_F	= DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL);
+	
+	
+	public static final DateTimeFormatter	Formatter_FileName		= DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");		//$NON-NLS-1$
+	
+	public static final DateTimeFormatter	Formatter_Month			= DateTimeFormatter.ofPattern("MMM");						//$NON-NLS-1$
+	public static final DateTimeFormatter	Formatter_Week_Month	= DateTimeFormatter.ofPattern("dd MMM");					//$NON-NLS-1$
+	public static final DateTimeFormatter	Formatter_Weekday		= DateTimeFormatter.ofPattern("E");							//$NON-NLS-1$
+	public static final DateTimeFormatter	Formatter_Weekday_L		= DateTimeFormatter.ofPattern("EEEE");						//$NON-NLS-1$
+
+	public static final DateTimeFormatter	Formatter_Time_ISO		= new DateTimeFormatterBuilder()//
+																			.appendValue(ChronoField.HOUR_OF_DAY, 2)
+																			.appendLiteral(':')
+																			.appendValue(ChronoField.MINUTE_OF_HOUR, 2)
+																			.appendLiteral(':')
+																			.appendValue(ChronoField.SECOND_OF_MINUTE, 2)
+																			.toFormatter();
+// SET_FORMATTING_ON
 
 	private final static IPreferenceStore			_prefStoreCommon		= CommonActivator.getPrefStore();
 
@@ -233,27 +231,18 @@ public class TimeTools {
 				final Duration dstDurationWinter = zoneRules.getDaylightSavings(nowInstantWinter);
 				final Duration dstDurationSummer = zoneRules.getDaylightSavings(nowInstantSummer);
 
-//				final String dst = isDst //
-//						? String.format(
-//								DST_FORMAT,
-//								Messages.TimeTools_Time_Tools_DST,
-//								printDSTDuration(dstDuration.getSeconds() * 1000))
-//						: UI.EMPTY_STRING;
+				final String dstSouth = "        DST " + printDSTDuration(dstDurationWinter.getSeconds() * 1000) + " - S";
+				final String dstNorth = "        DST " + printDSTDuration(dstDurationSummer.getSeconds() * 1000) + " - N";
 
-				final String dst = ""// //$NON-NLS-1$
-						+ (isDstWinter //
-								? ("        DST " + printDSTDuration(dstDurationWinter.getSeconds() * 1000) + " - S") //$NON-NLS-1$ //$NON-NLS-2$
-								: "") //$NON-NLS-1$
-						+ (isDstSummer //
-								? ("        DST " + printDSTDuration(dstDurationSummer.getSeconds() * 1000) + " - N") //$NON-NLS-1$ //$NON-NLS-2$
-								: ""); //$NON-NLS-1$
+				final String dst = UI.EMPTY_STRING
+						+ (isDstWinter ? dstSouth : UI.EMPTY_STRING)
+						+ (isDstSummer ? dstNorth : UI.EMPTY_STRING);
 
-				final String label = "" //$NON-NLS-1$
+				final String label = UI.EMPTY_STRING
 						+ (printOffset(utcTimeZoneSecondsWinter, false) + UI.SPACE4)
 						+ (printOffset(utcTimeZoneSecondsSummer, false) + UI.SPACE4)
 						+ zoneId.getId()
 						+ dst;
-//				final String label = dst;
 
 				final TimeZoneData timeZone = new TimeZoneData();
 
@@ -314,22 +303,6 @@ public class TimeTools {
 		final Period period = new Period(tzOffset * 1000);
 
 		return period.toString(DURATION_FORMATTER);
-	}
-
-	/**
-	 * @param epochTime
-	 *            The number of milliseconds from 1970-01-01T00:00:00Z
-	 * @return Returns the epoch time as a {@link LocalDateTime}.
-	 */
-	private static LocalDateTime getLocalDateTime(final long epochTime) {
-
-		final long epochSeconds = epochTime / 1000;
-		int epochNanoSeconds = (int) (epochTime % 1000);
-		epochNanoSeconds *= 1000000;
-
-		final LocalDateTime ldt = LocalDateTime.ofEpochSecond(epochSeconds, epochNanoSeconds, ZoneOffset.UTC);
-
-		return ldt;
 	}
 
 	/**

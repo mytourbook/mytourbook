@@ -332,6 +332,8 @@ public class UI {
 
 	public final static ImageRegistry	IMAGE_REGISTRY;
 
+	public static final int				DECORATOR_HORIZONTAL_INDENT				= 2;
+
 	static {
 
 		IMAGE_REGISTRY = CommonActivator.getDefault().getImageRegistry();

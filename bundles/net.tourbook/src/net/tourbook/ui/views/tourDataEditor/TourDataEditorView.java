@@ -239,7 +239,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	static final String							STATE_LAT_LON_DIGITS			= "STATE_LAT_LON_DIGITS";									//$NON-NLS-1$
 	static final int							DEFAULT_LAT_LON_DIGITS			= 5;
 	//
-	private static final int					DECORATOR_HORIZONTAL_INDENT		= 2;
 	//
 	/**
 	 * Tour start daytime in seconds
@@ -2732,19 +2731,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				/*
 				 * Add decoration
 				 */
-				final Image image = FieldDecorationRegistry
+				final Image infoImage = FieldDecorationRegistry
 						.getDefault()
 						.getFieldDecoration(FieldDecorationRegistry.DEC_INFORMATION)
 						.getImage();
 
 				_decoTimeZone = new ControlDecoration(_comboTimeZone, SWT.TOP | SWT.LEFT);
 				_decoTimeZone.hide();
-				_decoTimeZone.setImage(image);
+				_decoTimeZone.setImage(infoImage);
 				_decoTimeZone.setDescriptionText(Messages.Tour_Editor_Decorator_TimeZone_Tooltip);
 
 				// indent the combo that the decorator is not truncated
 				GridDataFactory.fillDefaults()//
-						.indent(DECORATOR_HORIZONTAL_INDENT, 0)
+						.indent(UI.DECORATOR_HORIZONTAL_INDENT, 0)
 						.applyTo(_comboTimeZone);
 			}
 
@@ -3569,7 +3568,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		 * Reduce width that the decorator is not truncated
 		 */
 		final GridData gd = (GridData) _lblTimeZone.getLayoutData();
-		gd.widthHint -= DECORATOR_HORIZONTAL_INDENT;
+		gd.widthHint -= UI.DECORATOR_HORIZONTAL_INDENT;
 
 		return _tab1Container;
 	}

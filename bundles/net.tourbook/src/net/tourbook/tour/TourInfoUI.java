@@ -43,6 +43,8 @@ import net.tourbook.ui.action.ActionTourToolTip_EditQuick;
 import net.tourbook.ui.action.ActionTourToolTip_EditTour;
 
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.fieldassist.ControlDecoration;
+import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
@@ -53,6 +55,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -130,6 +133,16 @@ public class TourInfoUI {
 	private final ArrayList<Control>			_secondColumnControls	= new ArrayList<Control>();
 
 	/*
+	 * fields which are optionally displayed when they are not null
+	 */
+	private ZonedDateTime						_uiDtCreated;
+	private ZonedDateTime						_uiDtModified;
+	private String								_uiTourTypeName;
+
+	private IToolTipProvider					_tourToolTipProvider;
+	private ITourProvider						_tourProvider;
+
+	/*
 	 * UI resources
 	 */
 	private Color								_bgColor;
@@ -140,6 +153,8 @@ public class TourInfoUI {
 	 * UI controls
 	 */
 	private Composite							_ttContainer;
+
+	private ControlDecoration					_decoTimeZone;
 
 	private Text								_txtDescription;
 	private Text								_txtWeather;
@@ -186,8 +201,10 @@ public class TourInfoUI {
 	private Label								_lblRecordingTimeHour;
 	private Label								_lblRestPulse;
 	private Label								_lblTemperature;
-	private Label								_lblTimeZoneOffset;
-	private Label								_lblTimeZoneOffsetValue;
+	private Label								_lblTimeZone;
+	private Label								_lblTimeZone_Value;
+	private Label								_lblTimeZoneDifference;
+	private Label								_lblTimeZoneDifference_Value;
 	private Label								_lblTitle;
 	private Label								_lblTourTags;
 	private Label								_lblTourTypeText;
@@ -195,16 +212,6 @@ public class TourInfoUI {
 	private Label								_lblWindSpeedUnit;
 	private Label								_lblWindDirection;
 	private Label								_lblWindDirectionUnit;
-
-	/*
-	 * fields which are optionally displayed when they are not null
-	 */
-	private ZonedDateTime						_uiDtCreated;
-	private ZonedDateTime						_uiDtModified;
-	private String								_uiTourTypeName;
-
-	private IToolTipProvider					_tourToolTipProvider;
-	private ITourProvider						_tourProvider;
 
 	/**
 	 * Run tour action quick edit.
@@ -252,12 +259,9 @@ public class TourInfoUI {
 //		_ttContainer.setRedraw(false);
 
 		updateUI();
-		enableControls();
+		updateUI_Layout();
 
-		// compute width for all controls and equalize column width for the different sections
-		_ttContainer.layout(true, true);
-		UI.setEqualizeColumWidths(_firstColumnControls, 5);
-		UI.setEqualizeColumWidths(_secondColumnControls);
+		enableControls();
 
 //		_ttContainer.setRedraw(true);
 
@@ -448,27 +452,49 @@ public class TourInfoUI {
 
 		if (isSimpleTour()) {
 
-			/*
-			 * Timezone
-			 */
-			_lblTimeZone = createUI_Label(container, Messages.Tour_Tooltip_Label_TimeZone);
-			_firstColumnControls.add(_lblTimeZone);
+			createUI_Spacer(container);
 
-			_lblTimeZoneValue = createUI_LabelValue(container, SWT.TRAIL);
-			_secondColumnControls.add(_lblTimeZoneValue);
-			final GridData gd = _lblTimeZoneValue.getLayoutData();
+			{
+				/*
+				 * Timezone difference
+				 */
 
-			/*
-			 * Timezone difference
-			 */
-			_lblTimeZoneOffset = createUI_Label(container, Messages.Tour_Tooltip_Label_TimeZoneDifference);
-			_firstColumnControls.add(_lblTimeZoneOffset);
+				_lblTimeZoneDifference = createUI_Label(container, Messages.Tour_Tooltip_Label_TimeZoneDifference);
+				_firstColumnControls.add(_lblTimeZoneDifference);
 
-			_lblTimeZoneOffsetValue = createUI_LabelValue(container, SWT.TRAIL);
-			_secondColumnControls.add(_lblTimeZoneOffsetValue);
+				/*
+				 * Add decoration
+				 */
+				final Image infoImage = FieldDecorationRegistry
+						.getDefault()
+						.getFieldDecoration(FieldDecorationRegistry.DEC_INFORMATION)
+						.getImage();
 
-			// hour
-			createUI_Label(container, Messages.Tour_Tooltip_Label_Hour);
+				_decoTimeZone = new ControlDecoration(_lblTimeZoneDifference, SWT.TOP | SWT.RIGHT);
+				_decoTimeZone.setImage(infoImage);
+
+				_lblTimeZoneDifference_Value = createUI_LabelValue(container, SWT.TRAIL);
+				_secondColumnControls.add(_lblTimeZoneDifference_Value);
+
+				// hour
+				createUI_Label(container, Messages.Tour_Tooltip_Label_Hour);
+			}
+			{
+				/*
+				 * Timezone
+				 */
+				_lblTimeZone = createUI_Label(container, Messages.Tour_Tooltip_Label_TimeZone);
+				_firstColumnControls.add(_lblTimeZone);
+
+				_lblTimeZone_Value = createUI_LabelValue(container, SWT.TRAIL);
+//				final GridData gd = (GridData) _lblTimeZone_Value.getLayoutData();
+//				gd.horizontalSpan = 2;
+//				gd.horizontalAlignment = SWT.CENTER;
+				_secondColumnControls.add(_lblTimeZone_Value);
+
+				// spacer
+				createUI_LabelValue(container, SWT.TRAIL);
+			}
 		}
 	}
 
@@ -1102,15 +1128,23 @@ public class TourInfoUI {
 			_lblMovingTime.setText(FormatManager.formatDrivingTime(movingTime));
 			_lblBreakTime.setText(FormatManager.formatPausedTime(breakTime));
 
-			// time zone
+			/*
+			 * Time zone
+			 */
+			final String tourTimeZoneId = _tourData.getTimeZoneId();
 			final TourDateTime tourDateTime = _tourData.getTourDateTime();
-			_lblTimeZoneOffsetValue.setText(tourDateTime.timeZoneOffsetLabel);
+			_lblTimeZone_Value.setText(tourTimeZoneId == null ? UI.EMPTY_STRING : tourTimeZoneId);
+			_lblTimeZoneDifference_Value.setText(tourDateTime.timeZoneOffsetLabel);
 
 			// set tooltip text
-			final String timeZone = _prefStoreCommon.getString(ICommonPreferences.TIME_ZONE_LOCAL_ID);
-			final String timeZoneTooltip = NLS.bind(Messages.ColumnFactory_TimeZoneDifference_Tooltip, timeZone);
-			_lblTimeZoneOffset.setToolTipText(timeZoneTooltip);
-			_lblTimeZoneOffsetValue.setToolTipText(timeZoneTooltip);
+			final String defaultTimeZoneId = _prefStoreCommon.getString(ICommonPreferences.TIME_ZONE_LOCAL_ID);
+			final String timeZoneTooltip = NLS.bind(
+					Messages.ColumnFactory_TimeZoneDifference_Tooltip,
+					defaultTimeZoneId);
+
+			_lblTimeZoneDifference.setToolTipText(timeZoneTooltip);
+			_lblTimeZoneDifference_Value.setToolTipText(timeZoneTooltip);
+			_decoTimeZone.setDescriptionText(timeZoneTooltip);
 
 		} else {
 
@@ -1263,5 +1297,19 @@ public class TourInfoUI {
 					UI.EMPTY_STRING
 					: _uiDtModified.format(TimeTools.Formatter_DateTime_M));
 		}
+	}
+
+	public void updateUI_Layout() {
+
+		// compute width for all controls and equalize column width for the different sections
+		_ttContainer.layout(true, true);
+		UI.setEqualizeColumWidths(_firstColumnControls, 5);
+		UI.setEqualizeColumWidths(_secondColumnControls);
+
+		/*
+		 * Reduce width that the decorator is not truncated
+		 */
+		final GridData gd = (GridData) _lblTimeZoneDifference.getLayoutData();
+		gd.widthHint -= UI.DECORATOR_HORIZONTAL_INDENT;
 	}
 }
