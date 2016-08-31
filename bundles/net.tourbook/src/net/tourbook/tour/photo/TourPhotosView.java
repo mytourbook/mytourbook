@@ -643,13 +643,13 @@ public class TourPhotosView extends ViewPart implements IPhotoEventListener {
 
 		if (size == 1) {
 
-			labelText = TimeTools.getZonedDateTime(_photoStartTime).format(TimeTools.Formatter_DateTime_ML);
+			labelText = TimeTools.getZonedDateTime(_photoStartTime).format(TimeTools.Formatter_DateTime_M);
 
 		} else if (size > 1) {
 
-			labelText = TimeTools.getZonedDateTime(_photoStartTime).format(TimeTools.Formatter_DateTime_ML)
+			labelText = TimeTools.getZonedDateTime(_photoStartTime).format(TimeTools.Formatter_DateTime_M)
 					+ UI.DASH_WITH_DOUBLE_SPACE
-					+ TimeTools.getZonedDateTime(_photoEndTime).format(TimeTools.Formatter_DateTime_ML);
+					+ TimeTools.getZonedDateTime(_photoEndTime).format(TimeTools.Formatter_DateTime_M);
 
 		} else {
 

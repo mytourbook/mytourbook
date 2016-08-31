@@ -490,7 +490,7 @@ public class TourInfoUI {
 //				final GridData gd = (GridData) _lblTimeZone_Value.getLayoutData();
 //				gd.horizontalSpan = 2;
 //				gd.horizontalAlignment = SWT.CENTER;
-				_secondColumnControls.add(_lblTimeZone_Value);
+//				_secondColumnControls.add(_lblTimeZone_Value);
 
 				// spacer
 				createUI_LabelValue(container, SWT.TRAIL);

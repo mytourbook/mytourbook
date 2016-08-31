@@ -5876,7 +5876,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	}
 
 	/**
-	 * @return Returns the tour start date time in seconds.
+	 * @return Returns the tour start date time in seconds of the day.
 	 */
 	public int getStartTimeOfDay() {
 		return (startHour * 3600) + (startMinute * 60) + startSecond;

@@ -22,8 +22,9 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.text.NumberFormat;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -538,28 +539,29 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	//
 	private Label								_lblAltitudeUpUnit;
 	private Label								_lblAltitudeDownUnit;
+	private Label								_lblDistanceUnit;
 	private Label								_lblSpeedUnit;
+	private Label								_lblStartTime;
+	private Label								_lblTags;
 	private Label								_lblTemperatureUnit;
 	private Label								_lblTimeZone;
-	private Label								_lblTourDistanceUnit;
-	private Label								_lblTourTags;
 	//
 	private Link								_linkDefaultTimeZone;
 	private Link								_linkTag;
 	private Link								_linkTourType;
 	//
 	private Spinner								_spinBodyWeight;
+	private Spinner								_spinCalories;
 	private Spinner								_spinFTP;
 	private Spinner								_spinRestPuls;
 	private Spinner								_spinTemperature;
-	private Spinner								_spinTourCalories;
 	private Spinner								_spinWindDirectionValue;
 	private Spinner								_spinWindSpeedValue;
 	//
 	private Text								_txtAltitudeDown;
 	private Text								_txtAltitudeUp;
 	private Text								_txtDescription;
-	private Text								_txtTourDistance;
+	private Text								_txtDistance;
 	private Text								_txtWeather;
 	//
 	private TimeDuration						_timeDriving;
@@ -2550,8 +2552,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				/*
 				 * start time
 				 */
-				final Label label = _tk.createLabel(container, Messages.tour_editor_label_start_time);
-				_secondColumnControls.add(label);
+				_lblStartTime = _tk.createLabel(container, Messages.tour_editor_label_start_time);
+				_secondColumnControls.add(_lblStartTime);
 
 				_dtStartTime = new DateTime(container, SWT.TIME | SWT.MEDIUM | SWT.BORDER);
 				_tk.adapt(_dtStartTime, true, false);
@@ -2574,10 +2576,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				final Label label = _tk.createLabel(container, Messages.tour_editor_label_tour_distance);
 				_firstColumnControls.add(label);
 
-				_txtTourDistance = _tk.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
-				_txtTourDistance.addModifyListener(_verifyFloatValue);
-				_txtTourDistance.setData(WIDGET_KEY, WIDGET_KEY_TOURDISTANCE);
-				_txtTourDistance.addKeyListener(new KeyListener() {
+				_txtDistance = _tk.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
+				_txtDistance.addModifyListener(_verifyFloatValue);
+				_txtDistance.setData(WIDGET_KEY, WIDGET_KEY_TOURDISTANCE);
+				_txtDistance.addKeyListener(new KeyListener() {
 					@Override
 					public void keyPressed(final KeyEvent e) {
 						_isDistManuallyModified = true;
@@ -2586,9 +2588,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 					@Override
 					public void keyReleased(final KeyEvent e) {}
 				});
-				GridDataFactory.fillDefaults().hint(_hintValueFieldWidth, SWT.DEFAULT).applyTo(_txtTourDistance);
+				GridDataFactory.fillDefaults().hint(_hintValueFieldWidth, SWT.DEFAULT).applyTo(_txtDistance);
 
-				_lblTourDistanceUnit = _tk.createLabel(container, UI.UNIT_LABEL_DISTANCE);
+				_lblDistanceUnit = _tk.createLabel(container, UI.UNIT_LABEL_DISTANCE);
 			}
 
 			{
@@ -2798,13 +2800,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				_firstColumnControls.add(label);
 
 				// spinner
-				_spinTourCalories = new Spinner(container, SWT.BORDER);
-				GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_spinTourCalories);
-				_spinTourCalories.setMinimum(0);
-				_spinTourCalories.setMaximum(1000000);
+				_spinCalories = new Spinner(container, SWT.BORDER);
+				GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_spinCalories);
+				_spinCalories.setMinimum(0);
+				_spinCalories.setMaximum(1000000);
 
-				_spinTourCalories.addMouseWheelListener(_mouseWheelListener);
-				_spinTourCalories.addSelectionListener(_selectionListener);
+				_spinCalories.addMouseWheelListener(_mouseWheelListener);
+				_spinCalories.addSelectionListener(_selectionListener);
 
 				// label: kcal
 				_tk.createLabel(container, VALUE_UNIT_K_CALORIES);
@@ -3312,7 +3314,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				_tk.adapt(_linkTag, true, true);
 				_firstColumnControls.add(_linkTag);
 
-				_lblTourTags = _tk.createLabel(container, UI.EMPTY_STRING, SWT.WRAP);
+				_lblTags = _tk.createLabel(container, UI.EMPTY_STRING, SWT.WRAP);
 				GridDataFactory.fillDefaults()//
 						.grab(true, true)
 						/*
@@ -3320,7 +3322,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 						 */
 						.hint(2 * _hintTextColumnWidth, SWT.DEFAULT)
 						.span(3, 1)
-						.applyTo(_lblTourTags);
+						.applyTo(_lblTags);
 			}
 
 			{
@@ -4545,7 +4547,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_timeDriving.setEditMode(isManualAndEdit);
 
 		// distance can be edited when no distance time slices are available
-		_txtTourDistance.setEnabled(canEdit && isDistanceSerie == false);
+		_txtDistance.setEnabled(canEdit && isDistanceSerie == false);
 		_txtAltitudeUp.setEnabled(isManualAndEdit);
 		_txtAltitudeDown.setEnabled(isManualAndEdit);
 
@@ -4553,7 +4555,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_spinBodyWeight.setEnabled(canEdit);
 		_spinFTP.setEnabled(canEdit);
 		_spinRestPuls.setEnabled(canEdit);
-		_spinTourCalories.setEnabled(canEdit);
+		_spinCalories.setEnabled(canEdit);
 
 		_linkTag.setEnabled(canEdit);
 		_linkTourType.setEnabled(canEdit);
@@ -4873,7 +4875,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_latitudeEditingSupport.setDataSerie(_serieLatitude);
 		_longitudeEditingSupport.setDataSerie(_serieLongitude);
 
-		_tourStartDayTime = _tourData.getStartTimeOfDay();
+		final ZonedDateTime tourStartTime = _tourData.getTourStartTime();
+
+//		_tourStartDayTime = _tourData.getStartTimeOfDay();
+		_tourStartDayTime = tourStartTime.get(ChronoField.SECOND_OF_DAY);
 
 		if (_isManualTour == false) {
 
@@ -6363,7 +6368,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 			_tourData.setBodyWeight((float) (_spinBodyWeight.getSelection() / 10.0));
 			_tourData.setPower_FTP(_spinFTP.getSelection());
-			_tourData.setCalories(_spinTourCalories.getSelection());
+			_tourData.setCalories(_spinCalories.getSelection());
 			_tourData.setRestPulse(_spinRestPuls.getSelection());
 
 			_tourData.setCadenceMultiplier(_rdoCadence_Rpm.getSelection() ? 1.0f : 2.0f);
@@ -6425,7 +6430,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				 * changed when the tour is being modified then the computation of the distance
 				 * value can cause rounding errors
 				 */
-				final float distanceValue = getFloatValue(_txtTourDistance.getText()) * _unitValueDistance * 1000;
+				final float distanceValue = getFloatValue(_txtDistance.getText()) * _unitValueDistance * 1000;
 				_tourData.setTourDistance(distanceValue);
 			}
 
@@ -6753,7 +6758,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_spinBodyWeight.setSelection(Math.round(_tourData.getBodyWeight() * 10));
 		_spinFTP.setSelection(_tourData.getPower_FTP());
 		_spinRestPuls.setSelection(_tourData.getRestPulse());
-		_spinTourCalories.setSelection(_tourData.getCalories());
+		_spinCalories.setSelection(_tourData.getCalories());
 
 		/*
 		 * wind properties
@@ -6792,17 +6797,17 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		// set start date/time without time zone
 		final ZonedDateTime tourStartTime = _tourData.getTourStartTime();
-		_dtTourDate.setDate(tourStartTime.getYear(), tourStartTime.getMonthValue(), tourStartTime.getDayOfMonth());
+		_dtTourDate.setDate(tourStartTime.getYear(), tourStartTime.getMonthValue() - 1, tourStartTime.getDayOfMonth());
 		_dtStartTime.setTime(tourStartTime.getHour(), tourStartTime.getMinute(), tourStartTime.getSecond());
 
 		// tour distance
 		final float tourDistance = _tourData.getTourDistance();
 		if (tourDistance == 0) {
-			_txtTourDistance.setText(Integer.toString(0));
+			_txtDistance.setText(Integer.toString(0));
 		} else {
 
 			final float distance = tourDistance / 1000 / _unitValueDistance;
-			_txtTourDistance.setText(_nf3NoGroup.format(distance));
+			_txtDistance.setText(_nf3NoGroup.format(distance));
 		}
 
 		// altitude up/down
@@ -6844,19 +6849,23 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		}
 		_comboTimeZone.select(timeZoneIndex);
 
-		_lblTimeZone.setToolTipText(NLS.bind(//
-				Messages.Tour_Editor_Label_TimeZone_Tooltip,
-//				tourStartTime.withZoneSameInstant(ZoneOffset.UTC).format(TimeTools.Formatter_DateTime_F)));
-				tourStartTime.format(DateTimeFormatter.ISO_INSTANT)));
+		final String tourStartTooltip = NLS.bind(//
+				Messages.Tour_Editor_Label_TourStartTime_Tooltip,
+				tourStartTime.withZoneSameInstant(ZoneOffset.UTC).format(TimeTools.Formatter_DateTime_SM)
+//				tourStartTime.format(DateTimeFormatter.ISO_INSTANT)
+				);
+
+		_lblStartTime.setToolTipText(tourStartTooltip);
+		_lblTimeZone.setToolTipText(tourStartTooltip);
 
 		updateUI_TimeZoneDecorator();
 
 		// tour type/tags
 		net.tourbook.ui.UI.updateUI_TourType(_tourData, _lblTourType, true);
-		net.tourbook.ui.UI.updateUI_Tags(_tourData, _lblTourTags);
+		net.tourbook.ui.UI.updateUI_Tags(_tourData, _lblTags);
 
 		// measurement system
-		_lblTourDistanceUnit.setText(UI.UNIT_LABEL_DISTANCE);
+		_lblDistanceUnit.setText(UI.UNIT_LABEL_DISTANCE);
 		_lblAltitudeUpUnit.setText(UI.UNIT_LABEL_ALTITUDE);
 		_lblAltitudeDownUnit.setText(UI.UNIT_LABEL_ALTITUDE);
 		_lblTemperatureUnit.setText(UI.UNIT_LABEL_TEMPERATURE);
@@ -7158,7 +7167,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		// tour type/tags
 		net.tourbook.ui.UI.updateUI_TourType(_tourData, _lblTourType, true);
-		net.tourbook.ui.UI.updateUI_Tags(_tourData, _lblTourTags);
+		net.tourbook.ui.UI.updateUI_Tags(_tourData, _lblTags);
 
 		// reflow layout that the tags are aligned correctly
 		_tourContainer.layout(true);

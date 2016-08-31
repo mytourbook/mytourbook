@@ -16,7 +16,7 @@
 package net.tourbook.photo.internal;
 
 import java.text.NumberFormat;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -641,7 +641,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 		if (_isShowDateInfo) {
 
-			final ZonedDateTime dateTime = photo.getOriginalDateTime();
+			final LocalDateTime dateTime = photo.getOriginalDateTime();
 
 			if (dateTime != null) {
 
@@ -651,7 +651,7 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 
 				} else if (_photoDateInfo == PhotoDateInfo.Time) {
 
-					textDateTime = dateTime.format(TimeTools.Formatter_Time_F);
+					textDateTime = dateTime.format(TimeTools.Formatter_Time_M);
 
 				} else {
 
@@ -1056,11 +1056,12 @@ public class PhotoRenderer extends AbstractGalleryMT20ItemRenderer {
 					 */
 					String textDateTime = UI.EMPTY_STRING;
 
-					final ZonedDateTime dateTime = photo.getOriginalDateTime();
+					final LocalDateTime dateTime = photo.getOriginalDateTime();
 					if (dateTime != null) {
+
 						textDateTime = dateTime.format(TimeTools.Formatter_Weekday)
 								+ UI.SPACE2
-								+ dateTime.format(TimeTools.Formatter_DateTime_ML);
+								+ dateTime.format(TimeTools.Formatter_DateTime_M);
 					}
 
 					/*

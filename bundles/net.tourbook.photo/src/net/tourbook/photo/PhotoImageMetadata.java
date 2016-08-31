@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 
 /**
  * Metadata for the original photo image file.
@@ -29,10 +29,15 @@ public class PhotoImageMetadata {
 	public boolean			isExifFromImage;
 
 	/**
-	 * Last modified in GMT
+	 * Last modified date/time of the image file which is provided by the file system with the
+	 * system time zone.
 	 */
-	public ZonedDateTime	fileDateTime;
-	public ZonedDateTime	exifDateTime;
+	public LocalDateTime	fileDateTime;
+
+	/**
+	 * Exif date/time which has no time zone.
+	 */
+	public LocalDateTime	exifDateTime;
 
 	public int				imageWidth		= Integer.MIN_VALUE;
 	public int				imageHeight		= Integer.MIN_VALUE;
@@ -71,6 +76,7 @@ public class PhotoImageMetadata {
 
 	@Override
 	public String toString() {
+
 		return "PhotoImageMetadata\n[\n" //$NON-NLS-1$
 
 				+ ("fileDateTime=" + fileDateTime + ", \n") //$NON-NLS-1$ //$NON-NLS-2$

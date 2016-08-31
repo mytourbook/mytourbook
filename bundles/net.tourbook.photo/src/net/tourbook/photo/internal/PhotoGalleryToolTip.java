@@ -17,7 +17,7 @@ package net.tourbook.photo.internal;
 
 import java.text.NumberFormat;
 import java.time.Duration;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
@@ -215,8 +215,8 @@ public class PhotoGalleryToolTip extends AnimatedToolTipShell {
 
 	private void createUI_Metadata(final Composite parent, final PhotoImageMetadata metaData, final boolean isDrawImage) {
 
-		final ZonedDateTime exifDateTime = _photo.getExifDateTime();
-		final ZonedDateTime imageFileDateTime = _photo.getImageFileDateTime();
+		final LocalDateTime exifDateTime = _photo.getExifDateTime();
+		final LocalDateTime imageFileDateTime = _photo.getImageFileDateTime();
 
 		final boolean isTitle = metaData.objectName != null;
 		final boolean isDescription = metaData.captionAbstract != null;
@@ -241,7 +241,7 @@ public class PhotoGalleryToolTip extends AnimatedToolTipShell {
 						Messages.Photo_ToolTip_ExifDate,
 						exifDateTime.format(TimeTools.Formatter_Weekday)
 								+ UI.SPACE2
-								+ exifDateTime.format(TimeTools.Formatter_DateTime_ML));
+								+ exifDateTime.format(TimeTools.Formatter_DateTime_M));
 
 				// display modified date only when it differs from the exif/original date
 
@@ -259,7 +259,7 @@ public class PhotoGalleryToolTip extends AnimatedToolTipShell {
 //				final LocalDateTime fileLocal = imageFileDateTime.toLocalDateTime();
 //				System.out.println("exif\t" + exifLocal);
 //				System.out.println("file\t" + fileLocal);
-//				System.out.println("\t" + durationMills + " ms");
+//				System.out.println("diff\t" + durationSeconds + " s");
 //				// TODO remove SYSTEM.OUT.PRINTLN
 			}
 
@@ -268,7 +268,7 @@ public class PhotoGalleryToolTip extends AnimatedToolTipShell {
 						Messages.Photo_ToolTip_FileDate,
 						imageFileDateTime.format(TimeTools.Formatter_Weekday)
 								+ UI.SPACE2
-								+ imageFileDateTime.format(TimeTools.Formatter_DateTime_ML));
+								+ imageFileDateTime.format(TimeTools.Formatter_DateTime_M));
 			}
 
 			/*
@@ -314,18 +314,18 @@ public class PhotoGalleryToolTip extends AnimatedToolTipShell {
 		 */
 		Label label;
 		label = new Label(container, SWT.NONE);
-		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
 		label.setText(name);
+		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
 
 		/*
 		 * value
 		 */
 		label = new Label(container, SWT.WRAP);
+		label.setText(valueText);
 		GridDataFactory.fillDefaults()//
 				.align(SWT.BEGINNING, SWT.BEGINNING)
 				.hint(hintX, SWT.DEFAULT)
 				.applyTo(label);
-		label.setText(valueText);
 	}
 
 	private void createUI_MetadataLine2(final Composite container,
@@ -354,21 +354,21 @@ public class PhotoGalleryToolTip extends AnimatedToolTipShell {
 			 * value 1
 			 */
 			label = new Label(valueContainer, SWT.WRAP);
+			label.setText(value);
 			GridDataFactory.fillDefaults()//
 					.align(SWT.BEGINNING, SWT.BEGINNING)
 					.hint(hintX, SWT.DEFAULT)
 					.applyTo(label);
-			label.setText(value);
 
 			/*
 			 * value 2
 			 */
 			label = new Label(valueContainer, SWT.WRAP);
+			label.setText(value2);
 			GridDataFactory.fillDefaults()//
 					.align(SWT.END, SWT.BEGINNING)
 					.grab(true, false)
 					.applyTo(label);
-			label.setText(value2);
 		}
 	}
 

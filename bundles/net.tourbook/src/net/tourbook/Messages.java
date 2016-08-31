@@ -1712,7 +1712,7 @@ public class Messages extends NLS {
 	public static String		Tour_Editor_Label_Sensor_Yes;
 	public static String		Tour_Editor_Label_StrideSensor;
 	public static String		Tour_Editor_Label_TimeZone;
-	public static String		Tour_Editor_Label_TimeZone_Tooltip;
+	public static String		Tour_Editor_Label_TourStartTime_Tooltip;
 	public static String		Tour_Editor_Label_Weather;
 	public static String		Tour_Editor_Label_WindDirection_Unit;
 	public static String		Tour_Editor_Link_SetDefautTimeZone;

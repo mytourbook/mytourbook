@@ -22,6 +22,7 @@ import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Year;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -51,6 +52,11 @@ import org.joda.time.format.PeriodFormatterBuilder;
 import com.skedgo.converter.TimezoneMapper;
 
 public class TimeTools {
+
+
+
+
+
 
 
 	private static final String						ZERO_0					= ":0";											//$NON-NLS-1$
@@ -101,6 +107,7 @@ public class TimeTools {
 	public static final DateTimeFormatter	Formatter_Time_F		= DateTimeFormatter.ofLocalizedTime(FormatStyle.FULL);
 	
 	public static final DateTimeFormatter	Formatter_DateTime_S	= DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT);
+	public static final DateTimeFormatter	Formatter_DateTime_SM	= DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT,FormatStyle.MEDIUM);
 	public static final DateTimeFormatter	Formatter_DateTime_M	= DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM);
 	public static final DateTimeFormatter	Formatter_DateTime_MS	= DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT);
 	public static final DateTimeFormatter	Formatter_DateTime_ML	= DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.LONG);
@@ -136,7 +143,6 @@ public class TimeTools {
 	 * The date must not be in the first or last week of the year.
 	 */
 	private static LocalDate						_dateToGetNumOfWeeks	= LocalDate.of(2000, 5, 5);
-
 	static {
 
 		DURATION_FORMATTER = new PeriodFormatterBuilder()
@@ -231,8 +237,12 @@ public class TimeTools {
 				final Duration dstDurationWinter = zoneRules.getDaylightSavings(nowInstantWinter);
 				final Duration dstDurationSummer = zoneRules.getDaylightSavings(nowInstantSummer);
 
-				final String dstSouth = "        DST " + printDSTDuration(dstDurationWinter.getSeconds() * 1000) + " - S";
-				final String dstNorth = "        DST " + printDSTDuration(dstDurationSummer.getSeconds() * 1000) + " - N";
+				final String dstSouth = "        DST "
+						+ printDSTDuration(dstDurationWinter.getSeconds() * 1000)
+						+ " - S";
+				final String dstNorth = "        DST "
+						+ printDSTDuration(dstDurationSummer.getSeconds() * 1000)
+						+ " - N";
 
 				final String dst = UI.EMPTY_STRING
 						+ (isDstWinter ? dstSouth : UI.EMPTY_STRING)
@@ -475,7 +485,7 @@ public class TimeTools {
 
 		} else {
 
-			tourZonedDateTime = ZonedDateTime.ofInstant(tourStartInstant, ZoneId.systemDefault());
+			tourZonedDateTime = ZonedDateTime.ofInstant(tourStartInstant, zoneId);
 
 			timeZoneOffsetLabel = printOffset(0, true);
 		}
@@ -497,6 +507,18 @@ public class TimeTools {
 		return ZonedDateTime.ofInstant(//
 				Instant.ofEpochMilli(epochOfMilli),
 				getDefaultTimeZone());
+	}
+
+	/**
+	 * @param epochOfMilli
+	 *            The number of milliseconds from 1970-01-01T00:00:00Z
+	 * @return Returns a zoned date time from epochOfMilli with the UTC time zone.
+	 */
+	public static ZonedDateTime getZonedDateTimeWithUTC(final long epochOfMilli) {
+
+		return ZonedDateTime.ofInstant(//
+				Instant.ofEpochMilli(epochOfMilli),
+				ZoneOffset.UTC);
 	}
 
 	/**
@@ -592,6 +614,35 @@ public class TimeTools {
 	public static void setTimeZone(final String selectedTimeZoneId) {
 
 		_defaultTimeZoneId = ZoneId.of(selectedTimeZoneId);
+	}
+
+	/**
+	 * Converts a {@link LocalDateTime} to the number of milliseconds from the epoch of
+	 * 1970-01-01T00:00:00Z.
+	 * 
+	 * @param localDateTime
+	 * @return
+	 */
+	public static long toEpochMilli(final LocalDateTime localDateTime) {
+
+		return localDateTime.toInstant(ZoneOffset.UTC).toEpochMilli();
+	}
+
+	public static long toEpochMilli(final ZonedDateTime zonedDateTime) {
+
+		return zonedDateTime.toInstant().toEpochMilli();
+	}
+
+	/**
+	 * @param epochOfMilli
+	 *            The number of milliseconds from 1970-01-01T00:00:00Z
+	 * @return Returns a zoned date time from epochOfMilli with the default time zone.
+	 */
+	public static LocalDateTime toLocalDateTime(final long epochOfMilli) {
+
+		return LocalDateTime.ofInstant(//
+				Instant.ofEpochMilli(epochOfMilli),
+				ZoneOffset.UTC);
 	}
 
 }

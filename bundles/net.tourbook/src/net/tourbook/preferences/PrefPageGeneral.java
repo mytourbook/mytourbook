@@ -354,8 +354,10 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
 				label.setText(NLS.bind(//
 						Messages.Pref_General_Label_DefaultLocalTimeZone,
-						ZoneId.systemDefault().getId(),
-						TimeTools.getDefaultTimeZoneOffset()));
+						new Object[] {
+								ZoneId.systemDefault().getId(),
+								TimeTools.getDefaultTimeZoneOffset(),
+								TimeTools.now().format(TimeTools.Formatter_Date_F) }));
 
 				GridDataFactory.fillDefaults()//
 						.span(2, 1)
@@ -962,8 +964,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 			TimeTools.setTimeZone(selectedTimeZoneId);
 
 			// time zone
-			_prefStoreCommon.setValue(
-					ICommonPreferences.TIME_ZONE_IS_LIVE_UPDATE,
+			_prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_IS_LIVE_UPDATE,//
 					_chkTimeZoneLiveUpdate.getSelection());
 			_prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_IS_USE_SYSTEM_TIME_ZONE, isUseSystemTimeZone);
 			_prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_SELECTED_CUSTOM_ZONE, selectedZone);

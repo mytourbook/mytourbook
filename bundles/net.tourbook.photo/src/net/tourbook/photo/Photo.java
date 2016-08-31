@@ -17,7 +17,9 @@ package net.tourbook.photo;
 
 import java.awt.Point;
 import java.io.File;
-import java.time.ZonedDateTime;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -75,9 +77,15 @@ public class Photo {
 	public String										imageFilePathName;
 
 	/**
-	 * Last modified in GMT
+	 * Last modified date/time of the image file which is provided by the file system with the
+	 * system time zone.
 	 */
-	public long											imageFileLastModified;
+	private LocalDateTime								_imageFileLastModified;
+
+	/**
+	 * Exif date/time, it has no time zone but UTC with 0 time offset is used
+	 */
+	private LocalDateTime								_exifDateTime;
 
 	/**
 	 * Exif time in milliseconds, when not available, the last modified time of the image file is
@@ -142,12 +150,6 @@ public class Photo {
 	private PhotoImageMetadata							_photoImageMetadata;
 
 	/**
-	 * Last modified in GMT
-	 */
-	private ZonedDateTime								_imageFileDateTime;
-	private ZonedDateTime								_exifDateTime;
-
-	/**
 	 * <pre>
 	 * Orientation
 	 * 
@@ -201,11 +203,12 @@ public class Photo {
 	private double										_imageDirection					= Double.MIN_VALUE;
 	private double										_altitude						= Double.MIN_VALUE;
 
-	private static final DateTimeFormatter				_dtParser						= DateTimeFormatter
-																								.ofPattern("yyyy:MM:dd HH:mm:ss") //$NON-NLS-1$
-//																								.withZone(DateTimeZone.UTC)
-																						;
-//	private static final DateTimeFormatter	_dtFormatter			= DateTimeFormat.forStyle("SL");	//$NON-NLS-1$
+	private static DateTimeFormatter					_dtParser;
+
+	static {
+
+		setupTimeZone();
+	}
 
 	/**
 	 * caches the world positions for the photo lat/long values for each zoom level
@@ -213,23 +216,23 @@ public class Photo {
 	 * key: projection id + zoom level
 	 */
 	private final HashMap<Integer, Point>				_tourWorldPosition				= new HashMap<Integer, Point>();
-	private final HashMap<Integer, Point>				_linkWorldPosition				= new HashMap<Integer, Point>();
 
+	private final HashMap<Integer, Point>				_linkWorldPosition				= new HashMap<Integer, Point>();
 	/**
 	 * Contains image keys for each image quality which can be used to get images from an image
 	 * cache
 	 */
 	private String										_imageKeyThumb;
+
 	private String										_imageKeyHQ;
 	private String										_imageKeyOriginal;
-
 	/**
 	 * This array keeps track of the loading state for the photo images and for different qualities
 	 */
 	private PhotoLoadingState							_photoLoadingStateThumb;
+
 	private PhotoLoadingState							_photoLoadingStateHQ;
 	private PhotoLoadingState							_photoLoadingStateOriginal;
-
 	/**
 	 * Is <code>true</code> when loading the image causes an error.
 	 */
@@ -297,6 +300,13 @@ public class Photo {
 
 	public static void setPhotoServiceProvider(final IPhotoServiceProvider photoServiceProvider) {
 		_photoServiceProvider = photoServiceProvider;
+	}
+
+	public static void setupTimeZone() {
+
+		_dtParser = DateTimeFormatter//
+				.ofPattern("yyyy:MM:dd HH:mm:ss") //$NON-NLS-1$
+				.withZone(TimeTools.getDefaultTimeZone());
 	}
 
 	public void addTour(final Long tourId, final long photoId) {
@@ -417,8 +427,7 @@ public class Photo {
 		}
 
 		// set file date time
-//		photoMetadata.fileDateTime = new DateTime(DateTimeZone.UTC).withMillis(imageFileLastModified);
-		photoMetadata.fileDateTime = TimeTools.getZonedDateTime(imageFileLastModified);
+		photoMetadata.fileDateTime = _imageFileLastModified;
 
 //// this will log all available meta data
 //		System.out.println(UI.timeStampNano());
@@ -545,7 +554,7 @@ public class Photo {
 		return sbDimenstion.toString();
 	}
 
-	public ZonedDateTime getExifDateTime() {
+	public LocalDateTime getExifDateTime() {
 		return _exifDateTime;
 	}
 
@@ -569,7 +578,7 @@ public class Photo {
 	 * @param file
 	 * @return
 	 */
-	private ZonedDateTime getExifValueDate(final JpegImageMetadata jpegMetadata) {
+	private LocalDateTime getExifValueDate(final JpegImageMetadata jpegMetadata) {
 
 //		/*
 //		 * !!! time is not correct, maybe it is the time when the GPS signal was
@@ -583,13 +592,13 @@ public class Photo {
 					ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL);
 
 			if (exifDate != null) {
-				return ZonedDateTime.parse(exifDate.getStringValue(), _dtParser);
+				return LocalDateTime.parse(exifDate.getStringValue(), _dtParser);
 			}
 
 			final TiffField tiffDate = jpegMetadata.findEXIFValueWithExactMatch(TiffTagConstants.TIFF_TAG_DATE_TIME);
 
 			if (tiffDate != null) {
-				return ZonedDateTime.parse(tiffDate.getStringValue(), _dtParser);
+				return LocalDateTime.parse(tiffDate.getStringValue(), _dtParser);
 			}
 
 		} catch (final Exception e) {
@@ -724,8 +733,8 @@ public class Photo {
 		return _imageDirection;
 	}
 
-	public ZonedDateTime getImageFileDateTime() {
-		return _imageFileDateTime;
+	public LocalDateTime getImageFileDateTime() {
+		return _imageFileLastModified;
 	}
 
 	/**
@@ -904,8 +913,8 @@ public class Photo {
 	 * @return Return date/time for the image. First EXIF date is returned, when not available,
 	 *         image file date/time is returned.
 	 */
-	public ZonedDateTime getOriginalDateTime() {
-		return _exifDateTime != null ? _exifDateTime : _imageFileDateTime;
+	public LocalDateTime getOriginalDateTime() {
+		return _exifDateTime != null ? _exifDateTime : _imageFileLastModified;
 	}
 
 	public int getPhotoImageHeight() {
@@ -923,19 +932,19 @@ public class Photo {
 		return _photoSqlLoadingState;
 	}
 
-	private ZonedDateTime getTiffValueDate(final TiffImageMetadata tiffMetadata) {
+	private LocalDateTime getTiffValueDate(final TiffImageMetadata tiffMetadata) {
 
 		try {
 
 			final TiffField exifDate = tiffMetadata.findField(ExifTagConstants.EXIF_TAG_DATE_TIME_ORIGINAL, true);
 
 			if (exifDate != null) {
-				return ZonedDateTime.parse(exifDate.getStringValue(), _dtParser);
+				return LocalDateTime.parse(exifDate.getStringValue(), _dtParser);
 			}
 
 			final TiffField date = tiffMetadata.findField(TiffTagConstants.TIFF_TAG_DATE_TIME, true);
 			if (date != null) {
-				return ZonedDateTime.parse(date.getStringValue(), _dtParser);
+				return LocalDateTime.parse(date.getStringValue(), _dtParser);
 			}
 
 		} catch (final Exception e) {
@@ -1224,7 +1233,12 @@ public class Photo {
 		imageFileExt = photoImagePath.getFileExtension();
 
 		imageFileSize = photoImageFile.length();
-		imageFileLastModified = lastModified;
+		_imageFileLastModified = LocalDateTime.ofInstant(//
+				Instant.ofEpochMilli(lastModified),
+//				ZoneOffset.UTC
+				ZoneId.systemDefault()
+		//
+				);
 
 		// initially sort by file date until exif data are loaded
 		imageExifTime = lastModified;
@@ -1282,8 +1296,6 @@ public class Photo {
 	public void updateImageMetadata(final PhotoImageMetadata photoImageMetadata) {
 
 		_photoImageMetadata = photoImageMetadata;
-
-		_imageFileDateTime = photoImageMetadata.fileDateTime;
 
 		if (photoImageMetadata.isExifFromImage) {
 
@@ -1344,10 +1356,10 @@ public class Photo {
 		// sort by exif date when available
 		if (_exifDateTime != null) {
 
-			final long exifUTCMills = _exifDateTime.toInstant().toEpochMilli();
+			final long exifUTCMills = TimeTools.toEpochMilli(_exifDateTime);
 
 			imageExifTime = exifUTCMills;
-//			imageUTCZoneOffset = DateTimeZone.getDefault().getOffset(exifUTCMills);
 		}
 	}
+
 }

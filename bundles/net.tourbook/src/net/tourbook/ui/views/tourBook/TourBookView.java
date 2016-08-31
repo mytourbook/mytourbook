@@ -3682,6 +3682,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
 		// set tooltip text
 		final String timeZone = _prefStoreCommon.getString(ICommonPreferences.TIME_ZONE_LOCAL_ID);
+
 		final String timeZoneTooltip = NLS.bind(COLUMN_FACTORY_TIME_ZONE_DIFF_TOOLTIP, timeZone);
 
 		_timeZoneOffsetColDef.setColumnHeaderToolTipText(timeZoneTooltip);
