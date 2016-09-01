@@ -192,12 +192,13 @@ public class GPX_SAX_Handler extends DefaultHandler {
 																					"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");	//$NON-NLS-1$
 	private static final SimpleDateFormat	GPX_TIME_FORMAT_RFC822			= new SimpleDateFormat(
 																					"yyyy-MM-dd'T'HH:mm:ssZ");			//$NON-NLS-1$
-	private static final long				DEFAULT_DATE_TIME				= ZonedDateTime
-																					.of(2000, 1, 1, 0, 0, 0, 0,//
-																							TimeTools
-																									.getDefaultTimeZone())
-																					.toInstant()
-																					.toEpochMilli();
+	private static final long				DEFAULT_DATE_TIME;
+	static {
+		DEFAULT_DATE_TIME = ZonedDateTime
+				.of(2000, 1, 1, 0, 0, 0, 0, TimeTools.getDefaultTimeZone())
+				.toInstant()
+				.toEpochMilli();
+	}
 
 	private IPreferenceStore				_prefStore						= Activator
 																					.getDefault()

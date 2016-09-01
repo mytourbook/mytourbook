@@ -83,6 +83,18 @@ public class GarminSAXHandler extends DefaultHandler {
 	private static final SimpleDateFormat	TIME_FORMAT_SSSZ;
 	private static final SimpleDateFormat	TIME_FORMAT_RFC822;
 
+	private static final int				DEFAULT_YEAR				= 2007;
+	private static final int				DEFAULT_MONTH				= 4;
+	private static final int				DEFAULT_DAY					= 1;
+
+	private static final long				DEFAULT_TIME;
+	static {
+		DEFAULT_TIME = ZonedDateTime
+				.of(DEFAULT_YEAR, DEFAULT_MONTH, DEFAULT_DAY, 0, 0, 0, 0, TimeTools.getDefaultTimeZone())
+				.toInstant()
+				.toEpochMilli();
+	}
+
 	private boolean							_importState_IsIgnoreSpeedValues;
 
 	private boolean							_isInActivity				= false;
@@ -172,17 +184,17 @@ public class GarminSAXHandler extends DefaultHandler {
 		_importState_IsIgnoreSpeedValues = store.getBoolean(IPreferences.IS_IGNORE_SPEED_VALUES);
 	}
 
-	private static void formatDT(	final DateTimeFormatter jodaFormatter,
+	private static void formatDT(	final DateTimeFormatter zonedFormatter,
 									final SimpleDateFormat jdkFormatter,
 									final StringBuilder sbJdk,
-									final StringBuilder sbJoda,
+									final StringBuilder sbZoned,
 									final ZonedDateTime dt,
 									final Calendar jdkCalendar) {
 
 		final Date dtDate = Date.from(dt.toInstant());
 
-		sbJoda.append(dt.format(jodaFormatter));
-		sbJoda.append(" | "); //$NON-NLS-1$
+		sbZoned.append(dt.format(zonedFormatter));
+		sbZoned.append(" | "); //$NON-NLS-1$
 
 		jdkCalendar.setFirstDayOfWeek(Calendar.MONDAY);
 		jdkCalendar.setMinimalDaysInFirstWeek(4);
@@ -233,7 +245,7 @@ public class GarminSAXHandler extends DefaultHandler {
 		final String jodPattern = "ww xx     "; //$NON-NLS-1$
 		final String jdkPattern = "ww yy"; //$NON-NLS-1$
 
-		final DateTimeFormatter jodaFormatter = DateTimeFormatter.ofPattern(jodPattern);
+		final DateTimeFormatter zonedFormatter = DateTimeFormatter.ofPattern(jodPattern);
 		final StringBuilder sbJdk = new StringBuilder();
 		final StringBuilder sbJoda = new StringBuilder();
 
@@ -263,27 +275,27 @@ public class GarminSAXHandler extends DefaultHandler {
 				int days = 0;
 				final ZonedDateTime dt = ZonedDateTime.of(year, 12, 22, 8, 0, 0, 0, TimeTools.getDefaultTimeZone());
 
-				formatDT(jodaFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
-				formatDT(jodaFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
-				formatDT(jodaFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
-				formatDT(jodaFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
-				formatDT(jodaFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
-				formatDT(jodaFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
-				formatDT(jodaFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
-				formatDT(jodaFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
-				formatDT(jodaFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
-				formatDT(jodaFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
+				formatDT(zonedFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
+				formatDT(zonedFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
+				formatDT(zonedFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
+				formatDT(zonedFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
+				formatDT(zonedFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
+				formatDT(zonedFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
+				formatDT(zonedFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
+				formatDT(zonedFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
+				formatDT(zonedFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
+				formatDT(zonedFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
 				sbJoda.append("    "); //$NON-NLS-1$
 				sbJdk.append("    "); //$NON-NLS-1$
-				formatDT(jodaFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
-				formatDT(jodaFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
-				formatDT(jodaFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
-				formatDT(jodaFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
-				formatDT(jodaFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
-				formatDT(jodaFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
-				formatDT(jodaFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
-				formatDT(jodaFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
-				formatDT(jodaFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
+				formatDT(zonedFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
+				formatDT(zonedFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
+				formatDT(zonedFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
+				formatDT(zonedFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
+				formatDT(zonedFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
+				formatDT(zonedFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
+				formatDT(zonedFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
+				formatDT(zonedFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
+				formatDT(zonedFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
 
 				System.out.println(sbJoda.toString());
 				System.out.println(sbJdk.toString());
@@ -309,9 +321,9 @@ public class GarminSAXHandler extends DefaultHandler {
 
 			checkedTourStart = TimeTools.getZonedDateTime(timeData.absoluteTime);
 
-			if (checkedTourStart.getYear() == 2007
-					&& checkedTourStart.getMonthValue() == 4
-					&& checkedTourStart.getDayOfMonth() == 1) {
+			if (checkedTourStart.getYear() == DEFAULT_YEAR
+					&& checkedTourStart.getMonthValue() == DEFAULT_MONTH
+					&& checkedTourStart.getDayOfMonth() == DEFAULT_DAY) {
 
 				// this is an invalid time slice
 
@@ -599,10 +611,7 @@ public class GarminSAXHandler extends DefaultHandler {
 
 			// set virtual time if time is not available
 			if (_timeData.absoluteTime == Long.MIN_VALUE) {
-				_timeData.absoluteTime = ZonedDateTime
-						.of(2007, 4, 1, 0, 0, 0, 0, TimeTools.getDefaultTimeZone())
-						.toInstant()
-						.toEpochMilli();
+				_timeData.absoluteTime = DEFAULT_TIME;
 			}
 
 			if (_isSetLapMarker) {

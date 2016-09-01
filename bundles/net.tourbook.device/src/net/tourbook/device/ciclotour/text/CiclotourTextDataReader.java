@@ -67,7 +67,7 @@ public class CiclotourTextDataReader extends TourbookDevice {
 	 */
 	private ZonedDateTime deriveDateFromFile(final File file) {
 
-		ZonedDateTime fileDate = null;
+		ZonedDateTime fileDate = ZonedDateTime.now();
 
 		// only get the last part of the filename
 		final String filename = file.getName();
