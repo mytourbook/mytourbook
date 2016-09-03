@@ -205,7 +205,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 		private static final int	DESCENDING		= 1;
 
 		private String				__sortColumnId	= COLUMN_TOUR_ID;
-		private int					__sortDirection;
+		private int					__sortDirection	= ASCENDING;
 
 		@Override
 		public int compare(final Viewer viewer, final Object e1, final Object e2) {
@@ -1759,7 +1759,7 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 	@Override
 	public void updateColumnHeader(final ColumnDefinition colDef) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	void updateUI_GeoFilter() {

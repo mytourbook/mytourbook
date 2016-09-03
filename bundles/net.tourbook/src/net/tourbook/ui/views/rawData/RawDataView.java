@@ -141,6 +141,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -168,7 +169,9 @@ import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchActionConstants;
@@ -295,6 +298,16 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private RawDataManager					_rawDataMgr									= RawDataManager.getInstance();
 	private TableViewer						_tourViewer;
 	private TableViewerTourInfoToolTip		_tourInfoToolTip;
+	private ColumnManager					_columnManager;
+	private SelectionAdapter				_columnSortListener;
+	private TableColumnDefinition			_timeZoneOffsetColDef;
+	private ImportComparator				_importComparator;
+	//
+	private String							_columnId_DeviceName;
+	private String							_columnId_ImportFileName;
+	private String							_columnId_TimeZone;
+	private String							_columnId_Title;
+	private String							_columnId_TourStartDate;
 	//
 	private PostSelectionProvider			_postSelectionProvider;
 	private IPartListener2					_partListener;
@@ -332,8 +345,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	protected boolean						_isPartVisible								= false;
 	protected boolean						_isViewerPersonDataDirty					= false;
 	//
-	private ColumnManager					_columnManager;
-	private TableColumnDefinition			_timeZoneOffsetColDef;
 	//
 	private final NumberFormat				_nf1;
 	private final NumberFormat				_nf3;
@@ -375,6 +386,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	//
 	private boolean							_isBrowserCompleted;
 	private boolean							_isInUIStartup;
+	private boolean							_isInUpdate;
 	private boolean							_isNewUI;
 
 	/**
@@ -429,10 +441,126 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 	private Composite						_dashboardPage_WithBrowser;
 
 	private Composite						_parent;
+	private Composite						_viewerContainer;
+
 	private Text							_txtNoBrowser;
+
 	private Link							_linkImport;
 
 	private Browser							_browser;
+
+	private class ImportComparator extends ViewerComparator {
+
+		static final int			ASCENDING		= 0;
+		private static final int	DESCENDING		= 1;
+
+		private String				__sortColumnId;
+		private int					__sortDirection;
+
+		@Override
+		public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
+
+			final TourData tourData1 = ((TourData) obj1);
+			final TourData tourData2 = ((TourData) obj2);
+
+			int result = 0;
+
+			if (__sortColumnId.equals(_columnId_TourStartDate)) {
+
+				// date/time
+
+				result = tourData1.getTourStartTimeMS() > tourData2.getTourStartTimeMS() ? 1 : -1;
+
+			} else if (__sortColumnId.equals(_columnId_Title)) {
+
+				// title
+
+				result = tourData1.getTourTitle().compareTo(tourData2.getTourTitle());
+
+			} else if (__sortColumnId.equals(_columnId_ImportFileName)) {
+
+				// file name
+
+				final String importFilePath1 = tourData1.getImportFilePath();
+				final String importFilePath2 = tourData2.getImportFilePath();
+
+				if (importFilePath1 != null && importFilePath2 != null) {
+
+					result = importFilePath1.compareTo(importFilePath2);
+				}
+
+			} else if (__sortColumnId.equals(_columnId_DeviceName)) {
+
+				// device name
+
+				result = tourData1.getDeviceName().compareTo(tourData2.getDeviceName());
+
+			} else if (__sortColumnId.equals(_columnId_TimeZone)) {
+
+				// time zone
+
+				final String timeZoneId1 = tourData1.getTimeZoneId();
+				final String timeZoneId2 = tourData2.getTimeZoneId();
+
+				if (timeZoneId1 != null && timeZoneId2 != null) {
+
+					final int zoneCompareResult = timeZoneId1.compareTo(timeZoneId2);
+
+					result = zoneCompareResult;
+
+				} else if (timeZoneId1 != null) {
+
+					result = 1;
+
+				} else if (timeZoneId2 != null) {
+
+					result = -1;
+				}
+			}
+
+			// do a 2nd sorting by date/time
+			if (result == 0) {
+				result = tourData1.getTourStartTimeMS() > tourData2.getTourStartTimeMS() ? 1 : -1;
+			}
+
+			// if descending order, flip the direction
+			if (__sortDirection == DESCENDING) {
+				result = -result;
+			}
+
+			return result;
+		}
+
+		/**
+		 * Does the sort. If it's a different column from the previous sort, do an ascending sort.
+		 * If it's the same column as the last sort, toggle the sort direction.
+		 * 
+		 * @param widget
+		 *            Column widget
+		 */
+		private void setSortColumn(final Widget widget) {
+
+			final ColumnDefinition columnDefinition = (ColumnDefinition) widget.getData();
+			final String columnId = columnDefinition.getColumnId();
+
+			if (columnId.equals(__sortColumnId)) {
+
+				// Same column as last sort; toggle the direction
+
+				__sortDirection = 1 - __sortDirection;
+
+			} else {
+
+				// New column; do an ascent sorting
+
+				__sortColumnId = columnId;
+				__sortDirection = ASCENDING;
+			}
+
+			updateUI_ShowSortDirection(__sortColumnId, __sortDirection);
+		}
+
+	}
 
 	private class JS_OnSelectImportConfig extends BrowserFunction {
 
@@ -795,6 +923,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
 				if (part == RawDataView.this) {
+					return;
+				}
+				if (_isInUpdate) {
 					return;
 				}
 
@@ -2363,13 +2494,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 	private Composite createUI_90_Page_TourViewer(final Composite parent) {
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.fillDefaults().applyTo(container);
+		_viewerContainer = new Composite(parent, SWT.NONE);
+		GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
 		{
-			createUI_92_TourViewer(container);
+			createUI_92_TourViewer(_viewerContainer);
 		}
 
-		return container;
+		return _viewerContainer;
 	}
 
 	/**
@@ -2389,7 +2520,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		// table viewer
 		_tourViewer.setContentProvider(new TourDataContentProvider());
-		_tourViewer.setSorter(new DeviceImportSorter());
+		_tourViewer.setComparator(_importComparator);
 
 		_tourViewer.addDoubleClickListener(new IDoubleClickListener() {
 			@Override
@@ -2406,12 +2537,28 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		_tourViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			@Override
 			public void selectionChanged(final SelectionChangedEvent event) {
+
+				if (_isInUpdate) {
+					return;
+				}
+
 				fireSelectedTour();
 			}
 		});
 
 		// set tour info tooltip provider
 		_tourInfoToolTip = new TableViewerTourInfoToolTip(_tourViewer);
+
+		/*
+		 * Setup tour comparator
+		 */
+		_importComparator.__sortColumnId = _columnId_TourStartDate;
+		_importComparator.__sortDirection = ImportComparator.ASCENDING;
+
+		// show the sorting indicator in the viewer
+		updateUI_ShowSortDirection(//
+				_importComparator.__sortColumnId,
+				_importComparator.__sortDirection);
 
 		createUI_94_ContextMenu();
 	}
@@ -2578,6 +2725,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		final ColumnDefinition colDef = TableColumnFactory.DATA_IMPORT_FILE_NAME.createColumn(_columnManager, _pc);
 
+		colDef.setColumnSelectionListener(_columnSortListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -2591,13 +2739,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			}
 		});
 
-		colDef.setColumnSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent event) {
-				((DeviceImportSorter) _tourViewer.getSorter()).doSort(COLUMN_FILE_NAME);
-				_tourViewer.refresh();
-			}
-		});
+		_columnId_ImportFileName = colDef.getColumnId();
 	}
 
 	/**
@@ -2643,6 +2785,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		final ColumnDefinition colDef = TableColumnFactory.DEVICE_NAME.createColumn(_columnManager, _pc);
 
+		colDef.setColumnSelectionListener(_columnSortListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -2660,13 +2803,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			}
 		});
 
-		colDef.setColumnSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent event) {
-				((DeviceImportSorter) _tourViewer.getSorter()).doSort(COLUMN_DATA_FORMAT);
-				_tourViewer.refresh();
-			}
-		});
+		_columnId_DeviceName = colDef.getColumnId();
 	}
 
 	/**
@@ -2849,6 +2986,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		final TableColumnDefinition colDef = TableColumnFactory.TIME_TIME_ZONE.createColumn(_columnManager, _pc);
 
+		colDef.setColumnSelectionListener(_columnSortListener);
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(final ViewerCell cell) {
@@ -2860,13 +2998,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			}
 		});
 
-		colDef.setColumnSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent event) {
-				((DeviceImportSorter) _tourViewer.getSorter()).doSort(COLUMN_TIME_ZONE);
-				_tourViewer.refresh();
-			}
-		});
+		_columnId_TimeZone = colDef.getColumnId();
 	}
 
 	/**
@@ -2897,6 +3029,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		colDef.setIsDefaultColumn();
 		colDef.setCanModifyVisibility(false);
+		colDef.setColumnSelectionListener(_columnSortListener);
 		colDef.setLabelProvider(new TourInfoToolTipCellLabelProvider() {
 
 			@Override
@@ -2918,14 +3051,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			}
 		});
 
-		// sort column
-		colDef.setColumnSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent event) {
-				((DeviceImportSorter) _tourViewer.getSorter()).doSort(COLUMN_DATE);
-				_tourViewer.refresh();
-			}
-		});
+		_columnId_TourStartDate = colDef.getColumnId();
 	}
 
 	/**
@@ -2937,6 +3063,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		colDef.setIsDefaultColumn();
 		colDef.setCanModifyVisibility(false);
+		colDef.setColumnSelectionListener(_columnSortListener);
 		colDef.setLabelProvider(new TourInfoToolTipCellLabelProvider() {
 
 			@Override
@@ -2955,15 +3082,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				final TourData tourData = (TourData) cell.getElement();
 
 				cell.setText(tourData.getTourStartTime().format(TimeTools.Formatter_Time_S));
-			}
-		});
-
-		// sort column
-		colDef.setColumnSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent event) {
-				((DeviceImportSorter) _tourViewer.getSorter()).doSort(COLUMN_DATE);
-				_tourViewer.refresh();
 			}
 		});
 	}
@@ -3054,6 +3172,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		final ColumnDefinition colDef = TableColumnFactory.TOUR_TITLE.createColumn(_columnManager, _pc);
 
 		colDef.setIsDefaultColumn();
+		colDef.setColumnSelectionListener(_columnSortListener);
 		colDef.setLabelProvider(new TourInfoToolTipCellLabelProvider() {
 
 			@Override
@@ -3072,13 +3191,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				cell.setText(tourData.getTourTitle());
 			}
 		});
-		colDef.setColumnSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent event) {
-				((DeviceImportSorter) _tourViewer.getSorter()).doSort(COLUMN_TITLE);
-				_tourViewer.refresh();
-			}
-		});
+
+		_columnId_Title = colDef.getColumnId();
 	}
 
 	/**
@@ -3822,6 +3936,27 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		return selectedTourData;
 	}
 
+	/**
+	 * @param sortColumnId
+	 * @return Returns the column widget by it's column id, when column id is not found then the
+	 *         first column is returned.
+	 */
+	private TableColumn getSortColumn(final String sortColumnId) {
+
+		final TableColumn[] allColumns = _tourViewer.getTable().getColumns();
+
+		for (final TableColumn column : allColumns) {
+
+			final String columnId = ((ColumnDefinition) column.getData()).getColumnId();
+
+			if (columnId.equals(sortColumnId)) {
+				return column;
+			}
+		}
+
+		return allColumns[0];
+	}
+
 	Image getStateImage_Db(final TourData tourData) {
 
 		final TourPerson tourPerson = tourData.getTourPerson();
@@ -3875,6 +4010,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 		createResources_Image();
 		createResources_Web();
+
+		_importComparator = new ImportComparator();
+		_columnSortListener = new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				onSelect_SortColumn(e);
+			}
+		};
 	}
 
 	/**
@@ -4014,6 +4157,30 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 			onSelectUI_Old();
 		}
+	}
+
+	private void onSelect_SortColumn(final SelectionEvent e) {
+
+		_viewerContainer.setRedraw(false);
+		{
+			// keep selection
+			final ISelection selectionBackup = _tourViewer.getSelection();
+
+			// update viewer with new sorting
+			_importComparator.setSortColumn(e.widget);
+			_tourViewer.refresh();
+
+			// reselect
+			_isInUpdate = true;
+			{
+				_tourViewer.setSelection(selectionBackup, true);
+
+				final Table table = _tourViewer.getTable();
+				table.showSelection();
+			}
+			_isInUpdate = false;
+		}
+		_viewerContainer.setRedraw(true);
 	}
 
 	/**
@@ -5477,6 +5644,21 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 					+ ("\tupdateDOM_DeviceState: " + isSuccess + js)); //$NON-NLS-1$
 			// TODO remove SYSTEM.OUT.PRINTLN
 		}
+	}
+
+	/**
+	 * Set the sort column direction indicator for a column.
+	 * 
+	 * @param sortColumnId
+	 * @param isAscendingSort
+	 */
+	private void updateUI_ShowSortDirection(final String sortColumnId, final int sortDirection) {
+
+		final Table table = _tourViewer.getTable();
+		final TableColumn tc = getSortColumn(sortColumnId);
+
+		table.setSortColumn(tc);
+		table.setSortDirection(sortDirection == ImportComparator.ASCENDING ? SWT.UP : SWT.DOWN);
 	}
 
 	private void updateUI_TourViewerColumns() {
