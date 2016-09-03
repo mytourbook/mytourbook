@@ -17,8 +17,8 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Import-Package: de.byteholder.geoclipse.map,
  net.tourbook,
  net.tourbook.application,
- net.tourbook.chart,
  net.tourbook.common,
+ net.tourbook.common.time,
  net.tourbook.common.util,
  net.tourbook.common.weather,
  net.tourbook.data,
@@ -28,6 +28,4 @@ Import-Package: de.byteholder.geoclipse.map,
  net.tourbook.tour,
  net.tourbook.ui,
  net.tourbook.ui.tourChart,
- net.tourbook.ui.views.rawData,
- org.joda.time,
- org.joda.time.format
+ net.tourbook.ui.views.rawData

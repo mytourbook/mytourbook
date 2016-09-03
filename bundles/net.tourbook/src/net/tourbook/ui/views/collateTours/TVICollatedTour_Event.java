@@ -209,7 +209,7 @@ public class TVICollatedTour_Event extends TVICollatedTour {
 
 					// -----------------------------------------------
 
-					final TourDateTime tourDateTime = TimeTools.getTourDateTime(dbTourStartTime, dbTimeZoneId);
+					final TourDateTime tourDateTime = TimeTools.createTourDateTime(dbTourStartTime, dbTimeZoneId);
 
 					tourItem.colTourStartTime = dbTourStartTime;
 

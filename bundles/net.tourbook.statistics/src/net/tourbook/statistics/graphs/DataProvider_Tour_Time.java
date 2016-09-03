@@ -210,7 +210,7 @@ public class DataProvider_Tour_Time extends DataProvider {
 					final String dbDescription = result.getString(13);
 					final Object dbTypeIdObject = result.getObject(14);
 
-					final TourDateTime tourDateTime = TimeTools.getTourDateTime(dbStartTimeMilli, dbTimeZoneId);
+					final TourDateTime tourDateTime = TimeTools.createTourDateTime(dbStartTimeMilli, dbTimeZoneId);
 					final ZonedDateTime zonedStartDateTime = tourDateTime.tourZonedDateTime;
 
 					// get number of days for the year, start with 0

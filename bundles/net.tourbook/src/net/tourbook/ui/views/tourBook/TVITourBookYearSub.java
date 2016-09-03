@@ -313,9 +313,7 @@ public class TVITourBookYearSub extends TVITourBookItem {
 
 					// -----------------------------------------------
 
-					final TourDateTime tourDateTime = TimeTools.getTourDateTime(dbTourStartTime, dbTimeZoneId);
-
-					tourItem.colRecordingTime = dbTourStartTime;
+					final TourDateTime tourDateTime = TimeTools.createTourDateTime(dbTourStartTime, dbTimeZoneId);
 
 					tourItem.colTourDateTime = tourDateTime;
 					tourItem.colTimeZoneId = dbTimeZoneId;

@@ -95,6 +95,8 @@ public abstract class TableColumnFactory {
 	public static final TableColumnFactory	TIME_PAUSED_TIME;
 	public static final TableColumnFactory	TIME_RECORDING_TIME;
 	public static final TableColumnFactory	TIME_RECORDING_TIME_TOTAL;
+	public static final TableColumnFactory	TIME_TIME_ZONE;
+	public static final TableColumnFactory	TIME_TIME_ZONE_DIFFERENCE;
 	public static final TableColumnFactory	TIME_TOUR_TIME_DIFF;
 	public static final TableColumnFactory	TIME_TOUR_TIME_HH_MM_SS;
 	public static final TableColumnFactory	TIME_TOUR_TIME;
@@ -1380,6 +1382,49 @@ public abstract class TableColumnFactory {
 			};
 		};
 
+		TIME_TIME_ZONE = new TableColumnFactory() {
+
+			@Override
+			public TableColumnDefinition createColumn(	final ColumnManager columnManager,
+														final PixelConverter pixelConverter) {
+
+				final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "TIME_TIME_ZONE", //$NON-NLS-1$
+						SWT.LEAD);
+
+				colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
+				colDef.setColumnLabel(Messages.ColumnFactory_TimeZone_Label);
+				colDef.setColumnHeaderText(Messages.ColumnFactory_TimeZone_Header);
+
+				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(25));
+
+				return colDef;
+			};
+		};
+
+		TIME_TIME_ZONE_DIFFERENCE = new TableColumnFactory() {
+
+			@Override
+			public TableColumnDefinition createColumn(	final ColumnManager columnManager,
+														final PixelConverter pixelConverter) {
+
+				final TableColumnDefinition colDef = new TableColumnDefinition(
+						columnManager,
+						"TIME_TIME_ZONE_DIFFERENCE", //$NON-NLS-1$
+						SWT.LEAD);
+
+				colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
+				colDef.setColumnLabel(Messages.ColumnFactory_TimeZoneDifference_Label);
+				colDef.setColumnHeaderText(Messages.ColumnFactory_TimeZoneDifference_Header);
+
+// !!! THIS MUST BE SET IN THE VIEW TO SET THE CORRECT DEFAULT TIME ZONE !!!
+//				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_TimeZone_Tooltip);
+
+				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+				return colDef;
+			};
+		};
+
 		TIME_TOUR_TIME_DIFF = new TableColumnFactory() {
 
 			@Override
@@ -2055,10 +2100,7 @@ public abstract class TableColumnFactory {
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_temperature_tooltip);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
-				colDef.setValueFormats(
-						ValueFormatSet.Number,
-						ValueFormat.NUMBER_1_1,
-						columnManager);
+				colDef.setValueFormats(ValueFormatSet.Number, ValueFormat.NUMBER_1_1, columnManager);
 
 				return colDef;
 			};

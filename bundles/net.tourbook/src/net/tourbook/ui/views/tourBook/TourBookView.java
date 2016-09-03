@@ -1797,7 +1797,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 	}
 
 	/**
-	 * column: recording time (h)
+	 * column: Recording time (h)
 	 */
 	private void defineColumn_Time_RecordingTime() {
 
@@ -1809,10 +1809,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
 				final Object element = cell.getElement();
 				final long value = ((TVITourBookItem) element).colRecordingTime;
-//
-//				colDef.printLongValue(cell, value, element instanceof TVITourBookTour);
 
-				cell.setText(Long.toString(value));
+				colDef.printLongValue(cell, value, element instanceof TVITourBookTour);
 
 				setCellColor(cell, element);
 			}
@@ -1844,7 +1842,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 	}
 
 	/**
-	 * column: Timezone offset
+	 * column: Timezone difference
 	 */
 	private void defineColumn_Time_TimeZoneDifference() {
 

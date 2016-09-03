@@ -46,13 +46,16 @@ public class DeviceImportSorter extends ViewerSorter {
 		switch (column) {
 		case RawDataView.COLUMN_DATE:
 
-			result = compareDateTime(tourData1, tourData2);
+			result = tourData1.getTourStartTimeMS() > tourData2.getTourStartTimeMS() ? 1 : -1;
+
 			break;
 
 		case RawDataView.COLUMN_TITLE:
 
 			// sort by title
+
 			result = tourData1.getTourTitle().compareTo(tourData2.getTourTitle());
+
 			break;
 
 		case RawDataView.COLUMN_FILE_NAME:
@@ -61,43 +64,59 @@ public class DeviceImportSorter extends ViewerSorter {
 			final String importFilePath2 = tourData2.getImportFilePath();
 
 			// sort by file name
+
 			if (importFilePath1 == null || importFilePath2 == null) {
 				break;
 			}
 
 			result = importFilePath1.compareTo(importFilePath2);
 
-			if (result == 0) {
-				result = compareDateTime(tourData1, tourData2);
-			}
-
 			break;
 
 		case RawDataView.COLUMN_DATA_FORMAT:
 
 			// sort by import data format
+
 			result = tourData1.getDeviceName().compareTo(tourData2.getDeviceName());
 
-			if (result == 0) {
-				result = compareDateTime(tourData1, tourData2);
+			break;
+
+		case RawDataView.COLUMN_TIME_ZONE:
+
+			// sort by time zone
+
+			final String timeZoneId1 = tourData1.getTimeZoneId();
+			final String timeZoneId2 = tourData2.getTimeZoneId();
+
+			if (timeZoneId1 != null && timeZoneId2 != null) {
+
+				final int zoneCompareResult = timeZoneId1.compareTo(timeZoneId2);
+
+				result = zoneCompareResult;
+
+			} else if (timeZoneId1 != null) {
+
+				result = 1;
+
+			} else if (timeZoneId2 != null) {
+
+				result = -1;
 			}
+
 			break;
 		}
 
-		// If descending order, flip the direction
+		// do 2nd sorting by time
+		if (result == 0) {
+			result = tourData1.getTourStartTimeMS() > tourData2.getTourStartTimeMS() ? 1 : -1;
+		}
+
+		// if descending order, flip the direction
 		if (direction == DESCENDING) {
 			result = -result;
 		}
 
 		return result;
-	}
-
-	private int compareDateTime(final TourData tourData1, final TourData tourData2) {
-
-		final long start1 = tourData1.getTourStartTimeMS();
-		final long start2 = tourData2.getTourStartTimeMS();
-
-		return start1 > start2 ? 1 : -1;
 	}
 
 	/**

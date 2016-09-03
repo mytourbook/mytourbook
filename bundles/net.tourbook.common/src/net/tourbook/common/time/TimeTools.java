@@ -53,12 +53,6 @@ import com.skedgo.converter.TimezoneMapper;
 
 public class TimeTools {
 
-
-
-
-
-
-
 	private static final String						ZERO_0					= ":0";											//$NON-NLS-1$
 	private static final String						ZERO_00_00				= "+00:00";										//$NON-NLS-1$
 	private static final String						ZERO_00_00_DEFAULT		= "*";											//$NON-NLS-1$
@@ -454,7 +448,7 @@ public class TimeTools {
 	 *            local time zone is used.
 	 * @return
 	 */
-	public static TourDateTime getTourDateTime(final long epochMilli, final String dbTimeZoneId) {
+	public static TourDateTime createTourDateTime(final long epochMilli, final String dbTimeZoneId) {
 
 		final Instant tourStartInstant = Instant.ofEpochMilli(epochMilli);
 

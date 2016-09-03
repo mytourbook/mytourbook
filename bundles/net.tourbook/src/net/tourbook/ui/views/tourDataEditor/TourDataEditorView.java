@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.text.NumberFormat;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoField;
@@ -7118,6 +7119,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 */
 	private void updateUI_Title() {
 
+		final ZoneId zoneId = _tourData == null //
+				? TimeTools.getDefaultTimeZone()
+				: _tourData.getTimeZoneIdWithDefault();
+
 		final ZonedDateTime tourStartTime = ZonedDateTime.of(
 				_dtTourDate.getYear(),
 				_dtTourDate.getMonth() + 1,
@@ -7126,7 +7131,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				_dtStartTime.getMinutes(),
 				_dtStartTime.getSeconds(),
 				0,
-				_tourData.getTimeZoneIdWithDefault());
+				zoneId);
 
 		final String tourTitle = TourManager.getTourTitle(tourStartTime);
 

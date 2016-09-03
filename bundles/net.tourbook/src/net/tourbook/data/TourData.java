@@ -6070,7 +6070,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	 */
 	public TourDateTime getTourDateTime() {
 
-		return TimeTools.getTourDateTime(getTourStartTimeMS(), timeZoneId);
+		return TimeTools.createTourDateTime(tourStartTime, timeZoneId);
 	}
 
 	/**
