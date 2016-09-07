@@ -83,6 +83,7 @@ import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionRefreshView;
 import net.tourbook.ui.action.ActionSetAltitudeValuesFromSRTM;
 import net.tourbook.ui.action.ActionSetPerson;
+import net.tourbook.ui.action.ActionSetTimeZone;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.ui.views.TourInfoToolTipCellLabelProvider;
 import net.tourbook.ui.views.TourInfoToolTipStyledCellLabelProvider;
@@ -263,6 +264,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 	private TreeViewerTourInfoToolTip					_tourInfoToolTip;
 
 	private ActionAdjustTemperature						_actionAdjustTemperature;
+	private ActionSetTimeZone							_actionSetTimeZone;
 	private ActionCollapseAll							_actionCollapseAll;
 	private ActionCollapseOthers						_actionCollapseOthers;
 	private ActionComputeDistanceValuesFromGeoposition	_actionComputeDistanceValuesFromGeoposition;
@@ -636,6 +638,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 		_actionSetAltitudeFromSRTM = new ActionSetAltitudeValuesFromSRTM(this);
 		_actionSetCadenceSubMenu = new ActionCadenceSubMenu(this);
 		_actionSetOtherPerson = new ActionSetPerson(this);
+		_actionSetTimeZone = new ActionSetTimeZone(this);
 		_actionSetTourType = new ActionSetTourTypeMenu(this);
 		_actionSelectAllTours = new ActionSelectAllTours(this);
 		_actionToggleMonthWeek = new ActionToggleMonthWeek(this);
@@ -3119,6 +3122,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 		menuMgr.add(_actionComputeDistanceValuesFromGeoposition);
 		menuMgr.add(_actionSetAltitudeFromSRTM);
 		menuMgr.add(_actionSetCadenceSubMenu);
+		menuMgr.add(_actionSetTimeZone);
 
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionReimportSubMenu);

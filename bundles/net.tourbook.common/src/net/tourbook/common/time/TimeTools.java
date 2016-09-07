@@ -53,6 +53,7 @@ import com.skedgo.converter.TimezoneMapper;
 
 public class TimeTools {
 
+
 	private static final String						ZERO_0					= ":0";											//$NON-NLS-1$
 	private static final String						ZERO_00_00				= "+00:00";										//$NON-NLS-1$
 	private static final String						ZERO_00_00_DEFAULT		= "*";											//$NON-NLS-1$
@@ -195,6 +196,59 @@ public class TimeTools {
 			weekDayFormatter_Full.format(DayOfWeek.SATURDAY),
 			weekDayFormatter_Full.format(DayOfWeek.SUNDAY) //
 		};
+	}
+
+	/**
+	 * Creates a tour date time with the tour time zone.
+	 * 
+	 * @param epochMilli
+	 *            The number of milliseconds from 1970-01-01T00:00:00Z
+	 * @param dbTimeZoneId
+	 *            Time zone ID or <code>null</code> when the time zone ID is not defined, then the
+	 *            local time zone is used.
+	 * @return
+	 */
+	public static TourDateTime createTourDateTime(final long epochMilli, final String dbTimeZoneId) {
+
+		final Instant tourStartInstant = Instant.ofEpochMilli(epochMilli);
+
+		final boolean isDefaultZone = dbTimeZoneId == null;
+		final boolean isTourTimeZone = dbTimeZoneId != null;
+
+		final ZoneId zoneId = isDefaultZone //
+				? _defaultTimeZoneId
+				: ZoneId.of(dbTimeZoneId);
+
+		ZonedDateTime tourZonedDateTime;
+		String timeZoneOffsetLabel = null;
+
+		if (isTourTimeZone) {
+
+			// use tour time zone
+
+			tourZonedDateTime = ZonedDateTime.ofInstant(tourStartInstant, zoneId);
+
+			final ZonedDateTime tourDateTimeWithDefaultZoneId = tourZonedDateTime
+					.withZoneSameInstant(_defaultTimeZoneId);
+
+			final int tourOffset = tourZonedDateTime.getOffset().getTotalSeconds();
+			final int defaultOffset = tourDateTimeWithDefaultZoneId.getOffset().getTotalSeconds();
+
+			final int offsetDiff = tourOffset - defaultOffset;
+			timeZoneOffsetLabel = printOffset(offsetDiff, isDefaultZone);
+
+		} else {
+
+			tourZonedDateTime = ZonedDateTime.ofInstant(tourStartInstant, zoneId);
+
+			timeZoneOffsetLabel = printOffset(0, true);
+		}
+
+		final int weekDayIndex = tourZonedDateTime.getDayOfWeek().getValue()
+		// use an offset to have the index in the week array
+		- 1;
+
+		return new TourDateTime(tourZonedDateTime, timeZoneOffsetLabel, weekDays_Short[weekDayIndex]);
 	}
 
 	/**
@@ -354,7 +408,7 @@ public class TimeTools {
 		return null;
 	}
 
-	public static TimeZoneData getTimeZoneByIndex(final int selectedTimeZoneIndex) {
+	public static TimeZoneData getTimeZone_ByIndex(final int selectedTimeZoneIndex) {
 
 		final ArrayList<TimeZoneData> allTimeZone = getAllTimeZones();
 
@@ -418,7 +472,7 @@ public class TimeTools {
 	/**
 	 * @return Returns the time zone index for the default time zone.
 	 */
-	public static int getTimeZoneIndexDefault() {
+	public static int getTimeZoneIndex_Default() {
 		return getTimeZoneIndex(_defaultTimeZoneId.getId());
 	}
 
@@ -427,7 +481,7 @@ public class TimeTools {
 	 * @return Returns the time zone index for the time zone ID or the index for the default time
 	 *         zone when not available.
 	 */
-	public static int getTimeZoneIndexWithDefault(final String timeZoneId) {
+	public static int getTimeZoneIndex_WithDefault(final String timeZoneId) {
 
 		int tzIndex = getTimeZoneIndex(timeZoneId);
 
@@ -436,59 +490,6 @@ public class TimeTools {
 		}
 
 		return tzIndex;
-	}
-
-	/**
-	 * Creates a tour date time with the tour time zone.
-	 * 
-	 * @param epochMilli
-	 *            The number of milliseconds from 1970-01-01T00:00:00Z
-	 * @param dbTimeZoneId
-	 *            Time zone ID or <code>null</code> when the time zone ID is not defined, then the
-	 *            local time zone is used.
-	 * @return
-	 */
-	public static TourDateTime createTourDateTime(final long epochMilli, final String dbTimeZoneId) {
-
-		final Instant tourStartInstant = Instant.ofEpochMilli(epochMilli);
-
-		final boolean isDefaultZone = dbTimeZoneId == null;
-		final boolean isTourTimeZone = dbTimeZoneId != null;
-
-		final ZoneId zoneId = isDefaultZone //
-				? _defaultTimeZoneId
-				: ZoneId.of(dbTimeZoneId);
-
-		ZonedDateTime tourZonedDateTime;
-		String timeZoneOffsetLabel = null;
-
-		if (isTourTimeZone) {
-
-			// use tour time zone
-
-			tourZonedDateTime = ZonedDateTime.ofInstant(tourStartInstant, zoneId);
-
-			final ZonedDateTime tourDateTimeWithDefaultZoneId = tourZonedDateTime
-					.withZoneSameInstant(_defaultTimeZoneId);
-
-			final int tourOffset = tourZonedDateTime.getOffset().getTotalSeconds();
-			final int defaultOffset = tourDateTimeWithDefaultZoneId.getOffset().getTotalSeconds();
-
-			final int offsetDiff = tourOffset - defaultOffset;
-			timeZoneOffsetLabel = printOffset(offsetDiff, isDefaultZone);
-
-		} else {
-
-			tourZonedDateTime = ZonedDateTime.ofInstant(tourStartInstant, zoneId);
-
-			timeZoneOffsetLabel = printOffset(0, true);
-		}
-
-		final int weekDayIndex = tourZonedDateTime.getDayOfWeek().getValue()
-		// use an offset to have the index in the week array
-		- 1;
-
-		return new TourDateTime(tourZonedDateTime, timeZoneOffsetLabel, weekDays_Short[weekDayIndex]);
 	}
 
 	/**
@@ -605,7 +606,7 @@ public class TimeTools {
 		calendarWeek = WeekFields.of(dow, minimalDaysInFirstWeek);
 	}
 
-	public static void setTimeZone(final String selectedTimeZoneId) {
+	public static void setDefaultTimeZone(final String selectedTimeZoneId) {
 
 		_defaultTimeZoneId = ZoneId.of(selectedTimeZoneId);
 	}

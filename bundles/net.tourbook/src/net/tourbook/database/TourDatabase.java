@@ -101,7 +101,7 @@ public class TourDatabase {
 	 * version for the database which is required that the tourbook application works successfully
 	 */
 	private static final int						TOURBOOK_DB_VERSION							= 32;
-//	private static final int						TOURBOOK_DB_VERSION							= 32;	// >16.8
+//	private static final int						TOURBOOK_DB_VERSION							= 32;	// 16.10
 
 //	private static final int						TOURBOOK_DB_VERSION							= 31;	// 16.5
 //	private static final int						TOURBOOK_DB_VERSION							= 30;	// 16.1
@@ -6084,7 +6084,6 @@ public class TourDatabase {
 
 			em.close();
 		}
-
 	}
 
 	private void updateDbDesign_VersionNumber(final Connection conn, final int newVersion) throws SQLException {

@@ -107,7 +107,7 @@ class DialogAdjustTemperature_WizardPage extends WizardPage {
 				 * Label: Temperature adjustment info
 				 */
 				final Label label = new Label(container, SWT.WRAP | SWT.READ_ONLY);
-				label.setText(Messages.Dialog_AdjustTemperature_Info_TemperatureAdjustment);
+				label.setText(Messages.Dialog_AdjustTemperature_Label_Info);
 				GridDataFactory.fillDefaults()//
 						.hint(infoWidth, SWT.DEFAULT)
 						.grab(true, false)
@@ -207,7 +207,7 @@ class DialogAdjustTemperature_WizardPage extends WizardPage {
 				 * Label: Hint
 				 */
 				final Label label = new Label(container, SWT.WRAP | SWT.READ_ONLY);
-				label.setText(Messages.Dialog_AdjustTemperature_Info_Hint);
+				label.setText(Messages.Dialog_AdjustTemperature_Label_InfoHint);
 				GridDataFactory.fillDefaults()//
 						.hint(infoWidth, SWT.DEFAULT)
 						.indent(0, _pc.convertVerticalDLUsToPixels(8))

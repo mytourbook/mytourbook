@@ -367,7 +367,6 @@ public interface ITourbookPreferences {
 	 */
 	public static final String	ADJUST_ALTITUDE_CHART_X_AXIS_UNIT				= "adjust.altitude.x-axis-unit";							//$NON-NLS-1$
 
-
 	/*
 	 * view tooltip
 	 */
@@ -456,5 +455,11 @@ public interface ITourbookPreferences {
 	 */
 	public static final String	HRV_OPTIONS_2X_ERROR_TOLERANCE					= "HRV_OPTIONS_2X_ERROR_TOLERANCE";						//$NON-NLS-1$
 	public static final String	HRV_OPTIONS_IS_FIX_2X_ERROR						= "HRV_OPTIONS_IS_FIX_2X_ERROR";							//$NON-NLS-1$
+
+	/*
+	 * Time zone
+	 */
+	public static final String	DIALOG_SET_TIME_ZONE_ACTION						= "DIALOG_SET_TIME_ZONE_ACTION";							//$NON-NLS-1$
+	public static final String	DIALOG_SET_TIME_ZONE_SELECTED_ZONE_ID			= "DIALOG_SET_TIME_ZONE_SELECTED_ZONE_ID";					//$NON-NLS-1$
 
 }

@@ -1372,7 +1372,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private void actionSetDefaultTimeZone() {
 
 		// select default time zone
-		_comboTimeZone.select(TimeTools.getTimeZoneIndexDefault());
+		_comboTimeZone.select(TimeTools.getTimeZoneIndex_Default());
 		_isTimeZoneManuallyModified = true;
 
 		updateModelFromUI();
@@ -6406,7 +6406,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				// set time zone ONLY when manually modified
 
 				final int selectedTimeZoneIndex = _comboTimeZone.getSelectionIndex();
-				final TimeZoneData timeZoneData = TimeTools.getTimeZoneByIndex(selectedTimeZoneIndex);
+				final TimeZoneData timeZoneData = TimeTools.getTimeZone_ByIndex(selectedTimeZoneIndex);
 				final String timeZoneId = timeZoneData.zoneId;
 
 				_tourData.setTimeZoneId(timeZoneId);
@@ -6846,7 +6846,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		} else {
 
-			timeZoneIndex = TimeTools.getTimeZoneIndexWithDefault(timeZoneId);
+			timeZoneIndex = TimeTools.getTimeZoneIndex_WithDefault(timeZoneId);
 		}
 		_comboTimeZone.select(timeZoneIndex);
 

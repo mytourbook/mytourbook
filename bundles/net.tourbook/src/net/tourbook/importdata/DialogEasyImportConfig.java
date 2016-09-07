@@ -2266,7 +2266,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 			 */
 			_chkIL_AdjustTemperature = new Button(parent, SWT.CHECK);
 			_chkIL_AdjustTemperature.setText(Messages.Dialog_ImportConfig_Checkbox_AdjustTemperature);
-			_chkIL_AdjustTemperature.setToolTipText(Messages.Dialog_AdjustTemperature_Info_TemperatureAdjustment);
+			_chkIL_AdjustTemperature.setToolTipText(Messages.Dialog_AdjustTemperature_Label_Info);
 			_chkIL_AdjustTemperature.addSelectionListener(_defaultModify_Listener);
 			GridDataFactory.fillDefaults()//
 					.span(2, 1)

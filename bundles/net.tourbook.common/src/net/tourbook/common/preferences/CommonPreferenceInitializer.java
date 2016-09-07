@@ -75,7 +75,7 @@ public class CommonPreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ICommonPreferences.DISPLAY_FORMAT_RECORDING_TIME, ValueFormat.TIME_HH_MM.name());
 
 		/*
-		 * Timezone
+		 * Time zone
 		 */
 		final ZoneId defaultZoneId = ZoneId.systemDefault();
 		final String defaultId = defaultZoneId.getId();

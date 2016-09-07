@@ -4771,7 +4771,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			if (oldTourAvgTemperature > avgMinimumTemperature) {
 
 				TourLogManager.logSubError(String.format(
-						EasyImportManager.LOG_TEMP_ADJUST_006_IS_ABOVE_TEMPERATURE,
+						TourManager.LOG_TEMP_ADJUST_006_IS_ABOVE_TEMPERATURE,
 						TourManager.getTourDateTimeShort(tourData),
 						oldTourAvgTemperature,
 						avgMinimumTemperature));
@@ -4779,7 +4779,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 				continue;
 			}
 
-			EasyImportManager.adjustTemperature(tourData, durationTime);
+			TourManager.adjustTemperature(tourData, durationTime);
 		}
 	}
 

@@ -119,9 +119,9 @@ public class Messages extends NLS {
 	public static String		Dialog_AdjustTemperature_Button_AdjustTemperature;
 	public static String		Dialog_AdjustTemperature_Dialog_Message;
 	public static String		Dialog_AdjustTemperature_Dialog_Title;
-	public static String		Dialog_AdjustTemperature_Info_Hint;
-	public static String		Dialog_AdjustTemperature_Info_TemperatureAdjustment;
 	public static String		Dialog_AdjustTemperature_Label_AvgTemperature;
+	public static String		Dialog_AdjustTemperature_Label_Info;
+	public static String		Dialog_AdjustTemperature_Label_InfoHint;
 	public static String		Dialog_AdjustTemperature_Label_Progress_SubTask;
 	public static String		Dialog_AdjustTemperature_Label_Progress_Task;
 	public static String		Dialog_AdjustTemperature_Label_TemperatureAdjustmentDuration;
@@ -611,6 +611,17 @@ public class Messages extends NLS {
 	public static String		Dialog_JoinTours_Label_TourType;
 	public static String		Dialog_JoinTours_Link_TourType;
 
+	public static String		Dialog_SetTimeZone_Button_AdjustTimeZone;
+	public static String		Dialog_SetTimeZone_Dialog_Message;
+	public static String		Dialog_SetTimeZone_Dialog_Title;
+	public static String		Dialog_SetTimeZone_Info_FromGeoPosition;
+	public static String		Dialog_SetTimeZone_Label_Info;
+	public static String		Dialog_SetTimeZone_Label_Progress_SubTask;
+	public static String		Dialog_SetTimeZone_Label_Progress_Task;
+	public static String		Dialog_SetTimeZone_Radio_RemoveTimeZone;
+	public static String		Dialog_SetTimeZone_Radio_SetTimeZone_FromCombo;
+	public static String		Dialog_SetTimeZone_Radio_SetTimeZone_FromGeo;
+
 	public static String		Dialog_SplitTour_Checkbox_IncludeDescription;
 	public static String		Dialog_SplitTour_Checkbox_KeepTime;
 	public static String		Dialog_SplitTour_ComboText_KeepSlices;
@@ -1051,6 +1062,15 @@ public class Messages extends NLS {
 	public static String		Log_Reimport_PreviousFiles;
 	public static String		Log_Reimport_PreviousFiles_End;
 	public static String		Log_Reimport_Tour;
+
+	public static String		Log_SetTimeZone_001_Start_FromGeo;
+	public static String		Log_SetTimeZone_001_Start_FromList;
+	public static String		Log_SetTimeZone_001_Start_Remove;
+	public static String		Log_SetTimeZone_002_End;
+	public static String		Log_SetTimeZone_010_SetSelected;
+	public static String		Log_SetTimeZone_011_SetFromGeo;
+	public static String		Log_SetTimeZone_012_NoGeo;
+	public static String		Log_SetTimeZone_013_Removed;
 
 	public static String		Log_TemperatureAdjustment_001_Start;
 	public static String		Log_TemperatureAdjustment_002_End;
@@ -1628,6 +1648,7 @@ public class Messages extends NLS {
 	public static String		Tour_Action_show_start_time_on_x_axis;
 	public static String		Tour_Action_show_time_on_x_axis;
 	public static String		Tour_Action_show_time_on_x_axis_tooltip;
+	public static String		Tour_Action_SetTimeZone;
 	public static String		Tour_Action_ShowBreaktimeValues;
 	public static String		Tour_Action_ShowHrZones_Tooltip;
 	public static String		Tour_Action_ShowTourMarker;

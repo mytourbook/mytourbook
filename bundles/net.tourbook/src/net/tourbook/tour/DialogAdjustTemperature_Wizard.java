@@ -26,7 +26,6 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
-import net.tourbook.importdata.EasyImportManager;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.ITourProvider2;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
@@ -98,7 +97,7 @@ public class DialogAdjustTemperature_Wizard extends Wizard {
 		}
 
 		TourLogManager.logDefault(String.format(//
-				EasyImportManager.LOG_TEMP_ADJUST_002_END,
+				TourManager.LOG_TEMP_ADJUST_002_END,
 				(System.currentTimeMillis() - start) / 1000.0));
 
 		return true;
@@ -115,7 +114,7 @@ public class DialogAdjustTemperature_Wizard extends Wizard {
 		final Period durationPeriod = new Period(0, durationTime * 1000, _durationTemplate);
 
 		final String logText = NLS.bind(
-				EasyImportManager.LOG_TEMP_ADJUST_001_START,
+				TourManager.LOG_TEMP_ADJUST_001_START,
 				new Object[] {
 						durationPeriod.toString(UI.DEFAULT_DURATION_FORMATTER),
 						_nf1.format(temperature),
@@ -155,7 +154,7 @@ public class DialogAdjustTemperature_Wizard extends Wizard {
 					if (oldTourAvgTemperature > avgTemperature) {
 
 						TourLogManager.logSubInfo(String.format(
-								EasyImportManager.LOG_TEMP_ADJUST_006_IS_ABOVE_TEMPERATURE,
+								TourManager.LOG_TEMP_ADJUST_006_IS_ABOVE_TEMPERATURE,
 								TourManager.getTourDateTimeShort(tourData),
 								oldTourAvgTemperature,
 								avgTemperature));
@@ -163,7 +162,7 @@ public class DialogAdjustTemperature_Wizard extends Wizard {
 						continue;
 					}
 
-					if (EasyImportManager.adjustTemperature(tourData, durationTime)) {
+					if (TourManager.adjustTemperature(tourData, durationTime)) {
 
 						// tour is modified, save it
 

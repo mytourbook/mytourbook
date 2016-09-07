@@ -961,7 +961,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 			final String selectedTimeZoneId = getSelectedTimeZoneId(isUseSystemTimeZone, selectedZone);
 
 			// update static field BEFORE an event is fired !!!
-			TimeTools.setTimeZone(selectedTimeZoneId);
+			TimeTools.setDefaultTimeZone(selectedTimeZoneId);
 
 			// time zone
 			_prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_IS_LIVE_UPDATE,//
@@ -1003,9 +1003,9 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
 	private void updateModel_TimeZone() {
 
-		final TimeZoneData selectedTimeZone_1 = TimeTools.getTimeZoneByIndex(_comboTimeZone_1.getSelectionIndex());
-		final TimeZoneData selectedTimeZone_2 = TimeTools.getTimeZoneByIndex(_comboTimeZone_2.getSelectionIndex());
-		final TimeZoneData selectedTimeZone_3 = TimeTools.getTimeZoneByIndex(_comboTimeZone_3.getSelectionIndex());
+		final TimeZoneData selectedTimeZone_1 = TimeTools.getTimeZone_ByIndex(_comboTimeZone_1.getSelectionIndex());
+		final TimeZoneData selectedTimeZone_2 = TimeTools.getTimeZone_ByIndex(_comboTimeZone_2.getSelectionIndex());
+		final TimeZoneData selectedTimeZone_3 = TimeTools.getTimeZone_ByIndex(_comboTimeZone_3.getSelectionIndex());
 
 		_timeZoneId_1 = selectedTimeZone_1.zoneId;
 		_timeZoneId_2 = selectedTimeZone_2.zoneId;
