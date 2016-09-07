@@ -2521,12 +2521,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				exportWriter.write(sb.toString());
 			}
 
-			System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-					+ ("\n\n")
-					+ sb.toString()
-					+ ("\n\n"));
-			// TODO remove SYSTEM.OUT.PRINTLN
-
 		} catch (final IOException e) {
 			StatusUtil.showStatus(e);
 		} finally {

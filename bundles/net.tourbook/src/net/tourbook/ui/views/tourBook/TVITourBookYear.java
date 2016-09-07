@@ -31,7 +31,9 @@ import net.tourbook.ui.SQLFilter;
 
 public class TVITourBookYear extends TVITourBookItem {
 
-	private YearSubCategory	_subCategory;
+	private static final String	YEAR_WEEK_FORMAT	= "[%02d] %s";	//$NON-NLS-1$
+
+	private YearSubCategory		_subCategory;
 
 	public TVITourBookYear(final TourBookView view, final TVITourBookItem parentItem) {
 
@@ -54,7 +56,6 @@ public class TVITourBookYear extends TVITourBookItem {
 
 		String sumYear = UI.EMPTY_STRING;
 		String sumYearSub = UI.EMPTY_STRING;
-
 
 		if (isWeekDisplayed) {
 
@@ -120,7 +121,7 @@ public class TVITourBookYear extends TVITourBookItem {
 							.with(TimeTools.calendarWeek.weekBasedYear(), dbYear)
 							.with(TimeTools.calendarWeek.weekOfYear(), dbYearSub);
 
-					columnText = String.format("[%02d] %s", //
+					columnText = String.format(YEAR_WEEK_FORMAT, //
 							dbYearSub,
 							categoryDateTime.format(TimeTools.Formatter_Week_Month));
 

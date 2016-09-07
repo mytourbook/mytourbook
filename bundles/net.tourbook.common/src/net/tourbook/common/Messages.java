@@ -249,7 +249,8 @@ public class Messages extends NLS {
 
 	public static String		rgv_vertex_class_cast_exception;
 
-	public static String		TimeTools_Time_Tools_DST;
+	public static String		Time_Tools_DST_North;
+	public static String		Time_Tools_DST_South;
 
 	public static String		Value_Formatter_Number_1_0;
 	public static String		Value_Formatter_Number_1_1;

@@ -60,13 +60,13 @@ public class TourDateTime {
 
 	@Override
 	public String toString() {
-		return "TourDateTime ["
+		return "TourDateTime [" //$NON-NLS-1$
 
-				+ ("tourZonedDateTime=" + tourZonedDateTime + ", ")
-				+ ("timeZoneOffsetLabel=" + timeZoneOffsetLabel + ", ")
-				+ ("weekDay=" + weekDay)
+				+ ("tourZonedDateTime=" + tourZonedDateTime + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("timeZoneOffsetLabel=" + timeZoneOffsetLabel + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("weekDay=" + weekDay) //$NON-NLS-1$
 
-				+ "]";
+				+ "]"; //$NON-NLS-1$
 	}
 
 }

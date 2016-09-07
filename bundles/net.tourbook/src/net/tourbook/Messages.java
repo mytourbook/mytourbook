@@ -612,9 +612,7 @@ public class Messages extends NLS {
 	public static String		Dialog_JoinTours_Link_TourType;
 
 	public static String		Dialog_SetTimeZone_Button_AdjustTimeZone;
-	public static String		Dialog_SetTimeZone_Dialog_Message;
 	public static String		Dialog_SetTimeZone_Dialog_Title;
-	public static String		Dialog_SetTimeZone_Info_FromGeoPosition;
 	public static String		Dialog_SetTimeZone_Label_Info;
 	public static String		Dialog_SetTimeZone_Label_Progress_SubTask;
 	public static String		Dialog_SetTimeZone_Label_Progress_Task;
@@ -1191,15 +1189,12 @@ public class Messages extends NLS {
 	public static String		Pref_General_Button_ComputeCalendarWeek;
 	public static String		Pref_General_CalendarWeek;
 	public static String		Pref_General_Checkbox_SetTimeZone;
-	public static String		Pref_General_Checkbox_SetTimeZone_Tooltip;
 	public static String		Pref_General_Dialog_CalendarWeekIsModified_Message;
 	public static String		Pref_General_Dialog_CalendarWeekIsModified_Title;
 	public static String		Pref_General_Group_TimeZone;
 	public static String		Pref_General_Label_DefaultLocalTimeZone;
-	public static String		Pref_General_Label_DefaultLocalTimeZone_Tooltip;
 	public static String		Pref_General_Label_FirstDayOfWeek;
 	public static String		Pref_General_Label_FirstDayOfWeek_Tooltip;
-	public static String		Pref_General_Label_LocalTimeZone;
 	public static String		Pref_General_Label_LocalTimeZone_1;
 	public static String		Pref_General_Label_LocalTimeZone_2;
 	public static String		Pref_General_Label_LocalTimeZone_3;
@@ -1233,7 +1228,6 @@ public class Messages extends NLS {
 	public static String		Pref_Graphs_Checkbox_ShowVerticalGrid;
 	public static String		Pref_Graphs_Dialog_GridLine_Warning_Message;
 	public static String		Pref_Graphs_Error_one_graph_must_be_selected;
-	public static String		Pref_Graphs_force_minimum_value;
 	public static String		Pref_Graphs_grid_distance;
 	public static String		Pref_Graphs_grid_horizontal_distance;
 	public static String		Pref_Graphs_grid_vertical_distance;
@@ -1254,7 +1248,6 @@ public class Messages extends NLS {
 	public static String		Pref_Graphs_Radio_mouse_mode_zoom;
 	public static String		Pref_Graphs_Radio_show_distance;
 	public static String		Pref_Graphs_Radio_show_time;
-	public static String		Pref_Graphs_Tab_default_values;
 	public static String		Pref_Graphs_Tab_graph_defaults;
 	public static String		Pref_Graphs_Tab_Grid;
 	public static String		Pref_Graphs_Tab_zoom_options;

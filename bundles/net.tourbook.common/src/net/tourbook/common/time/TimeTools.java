@@ -45,6 +45,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.preferences.ICommonPreferences;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.osgi.util.NLS;
 import org.joda.time.Period;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
@@ -52,6 +53,11 @@ import org.joda.time.format.PeriodFormatterBuilder;
 import com.skedgo.converter.TimezoneMapper;
 
 public class TimeTools {
+
+
+
+
+
 
 
 	private static final String						ZERO_0					= ":0";											//$NON-NLS-1$
@@ -285,12 +291,13 @@ public class TimeTools {
 				final Duration dstDurationWinter = zoneRules.getDaylightSavings(nowInstantWinter);
 				final Duration dstDurationSummer = zoneRules.getDaylightSavings(nowInstantSummer);
 
-				final String dstSouth = "        DST "
-						+ printDSTDuration(dstDurationWinter.getSeconds() * 1000)
-						+ " - S";
-				final String dstNorth = "        DST "
-						+ printDSTDuration(dstDurationSummer.getSeconds() * 1000)
-						+ " - N";
+				final String dstSouth = NLS.bind(
+						Messages.Time_Tools_DST_South,
+						printDSTDuration(dstDurationWinter.getSeconds() * 1000));
+
+				final String dstNorth = NLS.bind(
+						Messages.Time_Tools_DST_North,
+						printDSTDuration(dstDurationSummer.getSeconds() * 1000));
 
 				final String dst = UI.EMPTY_STRING
 						+ (isDstWinter ? dstSouth : UI.EMPTY_STRING)

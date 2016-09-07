@@ -47,26 +47,26 @@ public class AllTimeZones {
 
 		final Package javaRuntime = Runtime.class.getPackage();
 
-		sb.append("static {\n\n");
+		sb.append("static {\n\n"); //$NON-NLS-1$
 
-		sb.append(String.format("\t// java.version:          %s\n\n", System.getProperty("java.version"))); //$NON-NLS-1$
+		sb.append(String.format("\t// java.version:          %s\n\n", System.getProperty("java.version"))); //$NON-NLS-1$ //$NON-NLS-2$
 
 		sb.append(String.format("\t// ImplementationVendor:  %s\n", javaRuntime.getImplementationVendor())); //$NON-NLS-1$
 		sb.append(String.format("\t// ImplementationVersion: %s\n\n", javaRuntime.getImplementationVersion())); //$NON-NLS-1$
 
 		sb.append(String.format("\t// SpecificationVendor:   %s\n", javaRuntime.getSpecificationVendor())); //$NON-NLS-1$
 		sb.append(String.format("\t// SpecificationVersion:  %s\n", javaRuntime.getSpecificationVersion())); //$NON-NLS-1$
-		sb.append("\n\n");
+		sb.append("\n\n"); //$NON-NLS-1$
 
-		sb.append("	/**\n");
-		sb.append("	 * This list is create with Java 8, the index is the key for the zone id in the\n");
-		sb.append("	 * Tourdatabase.\n");
-		sb.append("	*/\n\n");
+		sb.append("	/**\n"); //$NON-NLS-1$
+		sb.append("	 * This list is create with Java 8, the index is the key for the zone id in the\n"); //$NON-NLS-1$
+		sb.append("	 * Tourdatabase.\n"); //$NON-NLS-1$
+		sb.append("	*/\n\n"); //$NON-NLS-1$
 
 		sb.append(String.format("\tallTimeZones = new String[%d];\n\n", allZoneIds.size())); //$NON-NLS-1$
 		sb.append(sbZones);
 
-		sb.append("}\n");
+		sb.append("}\n"); //$NON-NLS-1$
 
 		System.out.println(sb.toString());
 	}
@@ -86,7 +86,7 @@ public class AllTimeZones {
 
 		final long instant = zdt.toInstant().toEpochMilli();
 
-		System.out.println(String.format("%-50s %d", //
+		System.out.println(String.format("%-50s %d", // //$NON-NLS-1$
 				zdt,
 				instant));
 	}
@@ -95,10 +95,10 @@ public class AllTimeZones {
 
 		final ZonedDateTime now = ZonedDateTime.now();
 
-		sysOut(now, "Europe/Busingen");
-		sysOut(now, "Europe/Dublin");
-		sysOut(now, "Europe/Riga");
-		sysOut(now, "America/Vancouver");
+		sysOut(now, "Europe/Busingen"); //$NON-NLS-1$
+		sysOut(now, "Europe/Dublin"); //$NON-NLS-1$
+		sysOut(now, "Europe/Riga"); //$NON-NLS-1$
+		sysOut(now, "America/Vancouver"); //$NON-NLS-1$
 
 	}
 

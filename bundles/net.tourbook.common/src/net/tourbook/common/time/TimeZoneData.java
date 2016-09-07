@@ -25,12 +25,12 @@ public class TimeZoneData {
 
 	@Override
 	public String toString() {
-		return "TimeZone ["
+		return "TimeZone [" //$NON-NLS-1$
 
-		+ ("zoneOffset=" + zoneOffsetSeconds + ", ") //
-				+ ("zoneId=" + zoneId + ", ")
-				+ ("label=" + label + ", ")
+		+ ("zoneOffset=" + zoneOffsetSeconds + ", ") // //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("zoneId=" + zoneId + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("label=" + label + ", ") //$NON-NLS-1$ //$NON-NLS-2$
 
-				+ "]\n";
+				+ "]\n"; //$NON-NLS-1$
 	}
 }
