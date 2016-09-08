@@ -60,6 +60,9 @@ public class TimeTools {
 
 
 
+
+
+
 	private static final String						ZERO_0					= ":0";											//$NON-NLS-1$
 	private static final String						ZERO_00_00				= "+00:00";										//$NON-NLS-1$
 	private static final String						ZERO_00_00_DEFAULT		= "*";											//$NON-NLS-1$
@@ -307,7 +310,9 @@ public class TimeTools {
 						+ (printOffset(utcTimeZoneSecondsWinter, false) + UI.SPACE4)
 						+ (printOffset(utcTimeZoneSecondsSummer, false) + UI.SPACE4)
 						+ zoneId.getId()
-						+ dst;
+						+ (dst.length() == 0 //
+								? UI.EMPTY_STRING
+								: UI.DASH_WITH_DOUBLE_SPACE + dst);
 
 				final TimeZoneData timeZone = new TimeZoneData();
 

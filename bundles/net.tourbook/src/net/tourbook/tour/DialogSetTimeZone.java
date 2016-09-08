@@ -16,8 +16,10 @@
 package net.tourbook.tour;
 
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
@@ -31,6 +33,9 @@ public class DialogSetTimeZone extends WizardDialog {
 	public static final int	TIME_ZONE_ACTION_SET_FROM_LIST			= 0;
 	public static final int	TIME_ZONE_ACTION_SET_FROM_GEO_POSITION	= 1;
 	public static final int	TIME_ZONE_ACTION_REMOVE_TIME_ZONE		= 10;
+
+	private IDialogSettings	_state									= TourbookPlugin
+																			.getState("net.tourbook.tour.DialogSetTimeZone");	//$NON-NLS-1$
 
 	public DialogSetTimeZone(final Shell parentShell, final IWizard wizard) {
 
@@ -50,6 +55,13 @@ public class DialogSetTimeZone extends WizardDialog {
 		// ensure the button is wide enough
 		final GridData gd = (GridData) button.getLayoutData();
 		gd.widthHint = SWT.DEFAULT;
+	}
+
+	@Override
+	protected IDialogSettings getDialogBoundsSettings() {
+
+		// use state to keep window position
+		return _state;
 	}
 
 }

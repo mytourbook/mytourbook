@@ -321,6 +321,8 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
 	private Composite createUI_20_TimeZone(final Composite parent) {
 
+		final String defaultTimeZoneId = ZoneId.systemDefault().getId();
+
 		final SelectionAdapter timeZoneListener = new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
@@ -352,12 +354,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 				 */
 				final Label label = new Label(container, SWT.WRAP);
 
-				label.setText(NLS.bind(//
-						Messages.Pref_General_Label_DefaultLocalTimeZone,
-						new Object[] {
-								ZoneId.systemDefault().getId(),
-								TimeTools.getDefaultTimeZoneOffset(),
-								TimeTools.now().format(TimeTools.Formatter_Date_F) }));
+				label.setText(NLS.bind(Messages.Pref_General_Label_DefaultLocalTimeZone, defaultTimeZoneId));
 
 				GridDataFactory.fillDefaults()//
 						.span(2, 1)
@@ -371,7 +368,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 				 * Checkbox: Set time zone
 				 */
 				_chkUseAnotherTimeZone = new Button(container, SWT.CHECK);
-				_chkUseAnotherTimeZone.setText(Messages.Pref_General_Checkbox_SetTimeZone);
+				_chkUseAnotherTimeZone.setText(NLS.bind(Messages.Pref_General_Checkbox_SetTimeZone, defaultTimeZoneId));
 				_chkUseAnotherTimeZone.addSelectionListener(timeZoneListener);
 				GridDataFactory.fillDefaults()//
 						.span(2, 1)
