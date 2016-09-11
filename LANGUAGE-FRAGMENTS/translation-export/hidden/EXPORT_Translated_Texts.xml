@@ -18,10 +18,10 @@
 
 	<property name="export-language" value="${osgi.nl}" />
 
-	<property name="path-mt-nl-projects" value="../" />
-	<property name="path-temp-export-folder" value="../TEMP-EXPORT-FOLDER" />
+	<property name="path-mt-nl-projects" value="../../" />
+	<property name="path-temp-export-folder" value="../../TEMP-EXPORT-FOLDER" />
 
-	<property name="file-export-archive" value="../mt-${export-language}-${TODAY}.zip" />
+	<property name="file-export-archive" value="../../mt-${export-language}-${TODAY}.zip" />
 
 	<condition property="isEN">
 		<equals arg1="${export-language}" arg2="en" />
