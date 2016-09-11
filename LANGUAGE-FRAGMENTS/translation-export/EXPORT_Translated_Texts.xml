@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="create-export-archive" default="create-export-archive">
+
+	<!--
+		Create an archive file which contains only translated text files from the current default language
+		
+		IMPORTANT
+		
+		This ant must be running in the workspace JRE otherwise the language is not recognized.
+		
+	-->
+
+	<!-- set today format -->
+	<tstamp>
+		<format property="TODAY" pattern="yyyy-MM-dd_HHmmss" />
+	</tstamp>
+
+	<property name="export-language" value="${osgi.nl}" />
+
+	<property name="path-mt-nl-projects" value="../" />
+	<property name="path-temp-export-folder" value="../TEMP-EXPORT-FOLDER" />
+
+	<property name="file-export-archive" value="../mt-${export-language}-${TODAY}.zip" />
+
+	<condition property="isEN">
+		<equals arg1="${export-language}" arg2="en" />
+	</condition>
+	
+	<target name="set-name-en" if="isEN">
+		<property name="lanugage-part" value=""/>
+	</target>
+	<target name="set-name-not-en" unless="isEN">
+		<property name="lanugage-part" value="*_${export-language}"/>
+	</target>
+
+	<!--
+		DEFAULT target
+	-->
+	<target name="create-export-archive" depends="set-name-en,set-name-not-en">
+
+		<echo>export language: ${export-language}</echo>
+
+		<antcall target="delete-temp-dir" />
+
+		<antcall target="copy-language-property-files" />
+		<antcall target="create-export-archive-file" />
+
+		<antcall target="delete-temp-dir" />
+
+	</target>
+
+
+	<target name="delete-temp-dir">
+
+		<echo message="delete temp dir: ${path-temp-export-folder}" />
+
+		<delete includeemptydirs="true" quiet="true">
+			<fileset dir="${path-temp-export-folder}" includes="**/*" />
+		</delete>
+
+	</target>
+
+
+	<target name="copy-language-property-files">
+
+		<echo message="Copy language property files into ${path-temp-export-folder}" />
+
+
+		<copy todir="${path-temp-export-folder}/" preservelastmodified="true" includeemptydirs="true">
+
+			<fileset dir="${path-mt-nl-projects}">
+
+				<include name="**/plugin${lanugage-part}.properties" />
+				<include name="**/messages${lanugage-part}.properties" />
+
+				<!-- ignore empty files -->
+				<size value="0" when="more" />
+
+			</fileset>
+
+		</copy>
+
+	</target>
+
+
+	<target name="create-export-archive-file">
+
+		<echo message="Create export archive ${file-export-archive}" />
+
+		<zip destfile="${file-export-archive}">
+			<fileset dir="${path-temp-export-folder}" />
+		</zip>
+
+	</target>
+
+
+</project>
