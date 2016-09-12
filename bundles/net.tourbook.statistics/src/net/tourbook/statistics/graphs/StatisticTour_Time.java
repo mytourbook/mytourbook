@@ -270,7 +270,10 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
 		toolTipFormat.append(UI.NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_time);
 		toolTipFormat.append(UI.NEW_LINE);
-		toolTipFormat.append(Messages.Tourtime_Info_TimeZoneOffset);
+		toolTipFormat.append(UI.NEW_LINE);
+		toolTipFormat.append(Messages.Tourtime_Info_TimeZone);
+		toolTipFormat.append(UI.NEW_LINE);
+		toolTipFormat.append(Messages.Tourtime_Info_TimeZoneDifference);
 		toolTipFormat.append(UI.NEW_LINE);
 		toolTipFormat.append(UI.NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_recording_time_tour);
@@ -319,7 +322,8 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
 				endValue[valueIndex] / 3600 % 24,
 				(endValue[valueIndex] % 3600) / 60,
 				//
-				// time zone offset
+				// time zone
+				zdtTourStart.getZone().getId(),
 				tourTimeZoneOffset,
 				//
 				recordingTime / 3600,

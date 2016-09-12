@@ -67,8 +67,8 @@ public class Messages extends NLS {
 	public static String		tourtime_info_recording_time_tour;
 	public static String		tourtime_info_tags;
 	public static String		tourtime_info_time;
-
-	public static String	Tourtime_Info_TimeZoneOffset;
+	public static String		Tourtime_Info_TimeZone;
+	public static String		Tourtime_Info_TimeZoneDifference;
 	public static String		tourtime_info_tour_type;
 	public static String		tourtime_info_week;
 
