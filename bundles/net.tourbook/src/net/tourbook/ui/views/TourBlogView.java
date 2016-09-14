@@ -431,6 +431,12 @@ public class TourBlogView extends ViewPart {
 					 * Weather
 					 */
 					if (isWeather) {
+
+						if (isDescription) {
+							// write spacer
+							sb.append("<div>&nbsp;</div>");//$NON-NLS-1$
+						}
+
 						sb.append("<div class='title'>" + Messages.tour_editor_section_weather + "</div>\n"); //$NON-NLS-1$ //$NON-NLS-2$
 						sb.append("<p class='description'>" + WEB.convertHTML_LineBreaks(tourWeather) + "</p>\n"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
