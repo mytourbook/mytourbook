@@ -1083,6 +1083,7 @@ public class TourMapPainter extends MapPainter {
 						projectionId,
 						mapZoomLevel,
 						_tourPaintConfig.isLinkPhotoDisplayed);
+
 				if (photoWorldPixel == null) {
 					continue;
 				}

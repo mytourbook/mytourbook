@@ -290,7 +290,6 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	private int								_hashTourData;
 	private long							_hashTourOverlayKey;
 
-	private int								_hashFilteredPhotos;
 	private int								_hashAllPhotos;
 
 	/**
@@ -558,7 +557,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 			_map.paint();
 		}
 
-		enableActions();
+		enableActions(true);
 	}
 
 	public void actionSynchWithSlider() {
@@ -2058,25 +2057,22 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_map.paint();
 	}
 
-	private void paintPhotos(final ArrayList<Photo> allPhotos) {
+	private void paintPhotos(final ArrayList<Photo> allNewPhotos) {
 
 		/*
 		 * TESTING if a map redraw can be avoided, 15.6.2015
 		 */
 // DISABLED BECAUSE PHOTOS ARE NOT ALWAYS DISPLAYED
-//		final int filteredPhotoHash = _filteredPhotos.hashCode();
-//		final int allPhotoHash = _allPhotos.hashCode();
-//		if (filteredPhotoHash == _hashFilteredPhotos && allPhotoHash == _hashAllPhotos) {
-//			return;
-//		}
+		final int allNewPhotoHash = allNewPhotos.hashCode();
+		if (allNewPhotoHash == _hashAllPhotos) {
+			return;
+		}
 
 		_allPhotos.clear();
-		_allPhotos.addAll(allPhotos);
+		_allPhotos.addAll(allNewPhotos);
+		_hashAllPhotos = _allPhotos.hashCode();
 
 		runPhotoFilter();
-
-		_hashFilteredPhotos = _filteredPhotos.hashCode();
-		_hashAllPhotos = _allPhotos.hashCode();
 
 //		// dump tour photos
 //		System.out.println(net.tourbook.common.UI.timeStampNano() + " paintPhotos\t");
@@ -2714,7 +2710,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 		_tourPainterConfig.setPhotos(_filteredPhotos, _isShowPhoto, _isLinkPhotoDisplayed);
 
-		enableActions();
+		enableActions(true);
 
 		PhotoManager.firePhotoEvent(this, PhotoEventId.PHOTO_FILTER, new MapFilterData(
 				_allPhotos.size(),
