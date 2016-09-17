@@ -1729,6 +1729,8 @@ public class Messages extends NLS {
 	public static String		Tour_Editor_Label_TourStartTime_Tooltip;
 	public static String		Tour_Editor_Label_Weather;
 	public static String		Tour_Editor_Label_WindDirection_Unit;
+	public static String		Tour_Editor_Link_RemoveTimeZone;
+	public static String		Tour_Editor_Link_RemoveTimeZone_Tooltip;
 	public static String		Tour_Editor_Link_SetDefautTimeZone;
 	public static String		Tour_Editor_Link_SetDefautTimeZone_Tooltip;
 	public static String		Tour_Editor_Radio_Cadence_Rpm;

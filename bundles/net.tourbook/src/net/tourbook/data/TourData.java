@@ -6315,6 +6315,13 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	}
 
 	/**
+	 * @return Returns <code>true</code> when the tour has a time zone.
+	 */
+	public boolean hasATimeZone() {
+		return timeZoneId != null;
+	}
+
+	/**
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
@@ -6352,13 +6359,6 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		} else {
 			return tourReferences.size() > 0;
 		}
-	}
-
-	/**
-	 * @return Returns <code>true</code> when the tour has no time zone.
-	 */
-	public boolean isDefaultTimeZone() {
-		return timeZoneId == null;
 	}
 
 	public boolean isDistanceSensorPresent() {
