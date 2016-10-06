@@ -26,6 +26,7 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -142,7 +143,9 @@ class DialogSetTimeZone_WizardPage extends WizardPage {
 
 						_linkDefaultTimeZone = new Link(setContainer, SWT.NONE);
 						_linkDefaultTimeZone.setText(Messages.Tour_Editor_Link_SetDefautTimeZone);
-						_linkDefaultTimeZone.setToolTipText(Messages.Tour_Editor_Link_SetDefautTimeZone_Tooltip);
+						_linkDefaultTimeZone.setToolTipText(NLS.bind(
+								Messages.Tour_Editor_Link_SetDefautTimeZone_Tooltip,
+								TimeTools.getDefaultTimeZoneId()));
 						_linkDefaultTimeZone.addSelectionListener(new SelectionAdapter() {
 							@Override
 							public void widgetSelected(final SelectionEvent e) {
