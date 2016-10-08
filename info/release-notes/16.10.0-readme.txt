@@ -1,0 +1,56 @@
+Version 16.10.0                                          8. October 2016
+
+
+This Version is currently EXPERIMENTAL
+======================================
+
+There has been many (smaller+larger) modification everywhere in the 
+application to implement the new time zone feature.
+
+Testing was done to import tours with different file formats which 
+needed some adjustments but there can still be unsolved problems which 
+were not yet detected by these tests.
+
+Already saved tours from previous versions should not be a problem 
+(because the tour start time is never modified) but newly imported tours
+should be observed if the tour start time is displayed correctly.
+
+I'm not shure if all time zone descriptions on this site and the app are
+understandable or are more confusing.
+
+ 
+New 	
+===
+
+* Time zone
+
+  With this version, a tour start time is now always associated with a 
+  specific time zone, previously only the system time zone was used to 
+  display the tour time.
+
+  This caused the problem that a local time in Boston at 8 a.m. was 
+  displayed at 14:00 o'clock in middle Europe and not at 8:00.
+
+  A tour start time is now displayed always with the local time, no 
+  math is needed any more to get it correctly.
+
+  More info about the usage of time zones is described in the 
+  preferences.
+
+ 
+* Time Zone Tools 	
+
+  - Set/remove a time zone in a tour with the tour editor
+  - Set/remove a time zone for multiple tours in the tour book view
+  - Select default time zone in the preferences
+
+  These tools will NEVER change the tour start time, only the tour 
+  time zone
+
+ 
+Improvements 	
+============
+
+* General preference page
+
+  - Splitted page layout into tabs
