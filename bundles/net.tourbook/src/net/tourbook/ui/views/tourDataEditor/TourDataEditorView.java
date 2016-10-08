@@ -2544,10 +2544,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			createUISection_122_DateTime_Col1(container);
 			createUISection_123_DateTime_Col2(container);
 
+			createUISection_129_DateTime_TimeZone(container);
+
+			final Label label = createUI_LabelSeparator(container);
+			GridDataFactory.fillDefaults().span(2, 1).applyTo(label);
+
 			createUISection_127_DateTime_Col1(container);
 			createUISection_128_DateTime_Col2(container);
-
-			createUISection_129_DateTime_TimeZone(container);
 		}
 	}
 

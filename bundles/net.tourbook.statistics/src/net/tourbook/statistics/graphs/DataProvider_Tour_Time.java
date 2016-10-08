@@ -48,9 +48,11 @@ public class DataProvider_Tour_Time extends DataProvider {
 	private DataProvider_Tour_Time() {}
 
 	public static DataProvider_Tour_Time getInstance() {
+
 		if (_instance == null) {
 			_instance = new DataProvider_Tour_Time();
 		}
+
 		return _instance;
 	}
 
@@ -107,20 +109,19 @@ public class DataProvider_Tour_Time extends DataProvider {
 
 				+ "StartYear," //				2 //$NON-NLS-1$
 				+ "StartMonth," //				3 //$NON-NLS-1$
-				+ "StartDay," //				4 //$NON-NLS-1$
-				+ "StartWeek," //				5 //$NON-NLS-1$
-				+ "TourStartTime," //			6 //$NON-NLS-1$
-				+ "TimeZoneId, "//				7 //$NON-NLS-1$
-				+ "TourRecordingTime," //		8 //$NON-NLS-1$
-				+ "TourDrivingTime,"//			9 //$NON-NLS-1$
+				+ "StartWeek," //				4 //$NON-NLS-1$
+				+ "TourStartTime," //			5 //$NON-NLS-1$
+				+ "TimeZoneId, "//				6 //$NON-NLS-1$
+				+ "TourRecordingTime," //		7 //$NON-NLS-1$
+				+ "TourDrivingTime,"//			8 //$NON-NLS-1$
 
-				+ "TourDistance," //			10 //$NON-NLS-1$
-				+ "TourAltUp," //				11 //$NON-NLS-1$
-				+ "TourTitle," //				12 //$NON-NLS-1$
-				+ "TourDescription," // 		13 //$NON-NLS-1$
+				+ "TourDistance," //			9 //$NON-NLS-1$
+				+ "TourAltUp," //				10 //$NON-NLS-1$
+				+ "TourTitle," //				11 //$NON-NLS-1$
+				+ "TourDescription," // 		12 //$NON-NLS-1$
 
-				+ "TourType_typeId,"//			14 //$NON-NLS-1$
-				+ "jTdataTtag.TourTag_tagId"//	15 //$NON-NLS-1$
+				+ "TourType_typeId,"//			13 //$NON-NLS-1$
+				+ "jTdataTtag.TourTag_tagId"//	14 //$NON-NLS-1$
 
 				+ UI.NEW_LINE
 
@@ -175,7 +176,7 @@ public class DataProvider_Tour_Time extends DataProvider {
 			while (result.next()) {
 
 				final long dbTourId = result.getLong(1);
-				final Object dbTagId = result.getObject(15);
+				final Object dbTagId = result.getObject(14);
 
 				if (dbTourId == lastTourId) {
 
@@ -194,21 +195,19 @@ public class DataProvider_Tour_Time extends DataProvider {
 					final int dbTourYear = result.getShort(2);
 					final int dbTourMonth = result.getShort(3) - 1;
 
-					// needs cleanup
-					final int dbTourDay = result.getShort(4);
-					final int dbTourStartWeek = result.getInt(5);
+					final int dbTourStartWeek = result.getInt(4);
 
-					final long dbStartTimeMilli = result.getLong(6);
-					final String dbTimeZoneId = result.getString(7);
-					final int dbRecordingTime = result.getInt(8);
-					final int dbDrivingTime = result.getInt(9);
+					final long dbStartTimeMilli = result.getLong(5);
+					final String dbTimeZoneId = result.getString(6);
+					final int dbRecordingTime = result.getInt(7);
+					final int dbDrivingTime = result.getInt(8);
 
-					final float dbDistance = result.getFloat(10);
-					final int dbAltitudeUp = result.getInt(11);
+					final float dbDistance = result.getFloat(9);
+					final int dbAltitudeUp = result.getInt(10);
 
-					final String dbTourTitle = result.getString(12);
-					final String dbDescription = result.getString(13);
-					final Object dbTypeIdObject = result.getObject(14);
+					final String dbTourTitle = result.getString(11);
+					final String dbDescription = result.getString(12);
+					final Object dbTypeIdObject = result.getObject(13);
 
 					final TourDateTime tourDateTime = TimeTools.createTourDateTime(dbStartTimeMilli, dbTimeZoneId);
 					final ZonedDateTime zonedStartDateTime = tourDateTime.tourZonedDateTime;
