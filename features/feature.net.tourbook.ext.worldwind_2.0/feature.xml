@@ -25,7 +25,7 @@
          id="net.tourbook.ext.worldwind_2.0"
          download-size="0"
          install-size="0"
-         version="2.0.2230"
+         version="2.0.2230.2016_10_21"
          unpack="false"/>
 
    <plugin
@@ -47,17 +47,6 @@
          version="2.0.2230"
          fragment="true"
          unpack="false"/>
-
-<!--
-   <plugin
-         id="net.tourbook.ext.worldwind.macosx_2.0"
-         os="macosx"
-         download-size="0"
-         install-size="0"
-         version="2.0.2230"
-         fragment="true"
-         unpack="false"/>
--->
 
    <plugin
          id="net.tourbook.ext.worldwind.win32_2.0"

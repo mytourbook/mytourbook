@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: World Wind Resources
 Bundle-SymbolicName: net.tourbook.ext.worldwind_2.0;singleton:=true
-Bundle-Version: 2.0.2230
+Bundle-Version: 2.0.2230.2016_10_21
 Bundle-Vendor: NASA World Wind
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
@@ -70,6 +70,7 @@ Export-Package: com.jogamp.common,
  gov.nasa.worldwind.awt,
  gov.nasa.worldwind.cache,
  gov.nasa.worldwind.data,
+ gov.nasa.worldwind.drag,
  gov.nasa.worldwind.event,
  gov.nasa.worldwind.exception,
  gov.nasa.worldwind.formats.csv,
@@ -128,6 +129,7 @@ Export-Package: com.jogamp.common,
  gov.nasa.worldwind.terrain,
  gov.nasa.worldwind.tracks,
  gov.nasa.worldwind.util,
+ gov.nasa.worldwind.util.combine,
  gov.nasa.worldwind.util.dashboard,
  gov.nasa.worldwind.util.gdal,
  gov.nasa.worldwind.util.layertree,

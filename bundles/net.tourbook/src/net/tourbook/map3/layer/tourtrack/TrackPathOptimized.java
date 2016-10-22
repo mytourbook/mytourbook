@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,22 @@
  *******************************************************************************/
 package net.tourbook.map3.layer.tourtrack;
 
+import java.awt.Color; 
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.media.opengl.GL2;
+
+import org.eclipse.swt.graphics.RGB;
+
+import com.jogamp.common.nio.Buffers;
+
+import net.tourbook.common.color.ColorUtil;
+import net.tourbook.map3.view.Map3View;
+
 import gnu.trove.list.array.TIntArrayList;
 import gov.nasa.worldwind.View;
 import gov.nasa.worldwind.WorldWind;
@@ -27,31 +43,15 @@ import gov.nasa.worldwind.render.DrawContext;
 import gov.nasa.worldwind.render.Path;
 import gov.nasa.worldwind.terrain.Terrain;
 
-import java.awt.Color;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.media.opengl.GL2;
-
-import net.tourbook.common.color.ColorUtil;
-import net.tourbook.map3.view.Map3View;
-
-import org.eclipse.swt.graphics.RGB;
-
-import com.jogamp.common.nio.Buffers;
-
 public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackPath {
 
 	private static final int	SKIP_COUNTER		= 30;
 
-	private TourTrack			_tourTrack;
-
 	private static final String	ARROW_BORDER_KEY	= TrackPathOptimized.class.getName() + ".ArrowBorder";		//$NON-NLS-1$
 	private static final String	ARROW_POSITION_KEY	= TrackPathOptimized.class.getName() + ".ArrowPosition";	//$NON-NLS-1$
-	private static final String	ARROW_SURFACE_KEY	= TrackPathOptimized.class.getName() + ".ArrowSurface";	//$NON-NLS-1$
+	private static final String	ARROW_SURFACE_KEY	= TrackPathOptimized.class.getName() + ".ArrowSurface";		//$NON-NLS-1$
+
+	private TourTrack			_tourTrack;
 
 	/** The length, in meters, of the arrowhead, from tip to base. */
 	protected double			_arrowLength		= 30.0;
@@ -473,14 +473,11 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 
 				// set solid color
 
-				dc
-						.getGL()
-						.getGL2()
-						.glColor4ub(
-								(byte) solidColor.getRed(),
-								(byte) solidColor.getGreen(),
-								(byte) solidColor.getBlue(),
-								(byte) solidColor.getAlpha());
+				dc.getGL().getGL2().glColor4ub(
+						(byte) solidColor.getRed(),
+						(byte) solidColor.getGreen(),
+						(byte) solidColor.getBlue(),
+						(byte) solidColor.getAlpha());
 			}
 
 			super.doDrawInteriorVBO(dc, vboIds, pathData);
@@ -631,7 +628,7 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 
 		try {
 
-			if (isSurfacePath()) {
+			if (isSurfacePath(dc)) {
 
 				// Pull the arrow triangles forward just a bit to ensure they show over the terrain.
 				dc.pushProjectionOffest(SURFACE_PATH_DEPTH_OFFSET);
@@ -775,10 +772,8 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 		final PathData pathData = getCurrentPathData();
 
 		int numberOfIds = isShowPositions() ? //
-				3
-				: pathData.isHasExtrusionPoints() && isDrawVerticals() ? //
-						2
-						: 1;
+				3 : pathData.isHasExtrusionPoints() && isDrawVerticals() ? //
+						2 : 1;
 
 		// show arrow keys
 		if (config.isShowDirectionArrows) {
@@ -796,8 +791,7 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 		final int vSize = pathData.getRenderedPath().limit() * 4;
 
 		int iSize = pathData.isHasExtrusionPoints() && isDrawVerticals() ? //
-				pathData.getTessellatedPositions().size() * 2 * 4
-				: 0;
+				pathData.getTessellatedPositions().size() * 2 * 4 : 0;
 
 		if (isShowPositions()) {
 			iSize += pathData.getTessellatedPositions().size();
