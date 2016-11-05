@@ -88,6 +88,20 @@ Build Update site
 
 
 
+* Test translations
+-------------------
+	
+	- Select favorite mt-TRANSLATION-TEST in Q-Dir
+	- Select folder "C:\DAT\ws_mt-Translation-TEST"
+	- Delete all folders and files but NOT ".metadata"
+	- Extract "mt-translations.zip" into this folder
+
+	- Switch to workspace "C:\DAT\ws_mt-Translation-TEST"
+		- Refresh all projects with F5
+		- Run Project/clean... for all projects
+
+
+
 3.8.2 Archives used in pom.xml
 ------------------------------
 
@@ -100,13 +114,15 @@ http://archive.eclipse.org/eclipse/downloads/drops/R-3.8.2-201301310800/org.ecli
 
 
 
-######################################
-######################################
+
+
+############################################################################
+############################################################################
 
  BUILD COMMANDS BEFORE TYCHO (<= 16.1)
 
-######################################
-######################################
+############################################################################
+############################################################################
 
 
 ##########################
