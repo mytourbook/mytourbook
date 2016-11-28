@@ -1,0 +1,13 @@
+Version 16.11.0                                        21. November 2016
+
+
+This version is almost the same as 16.10.Experimental which has 0 
+complaints until now after some weeks of using it.
+
+
+What has changed?
+=================
+
+* Czech and Italian translation
+* Prevent 2D Map redraw when nothing has changed
+* Updated 3D Map to newest version

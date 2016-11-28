@@ -11,9 +11,10 @@ Switch to workspace "C:\DAT\ws_mt-NL-projects"
 
 	- refresh all projects with F5
 	- Replace text (Ctrl-H) "x.y.0.qualifier" to "a.b.0.qualifier" in all NL projects
-	- Replace text (Ctrl-H) "x.y.0" to "a.b.0" in all NL projects 
-	    AND in "site.xml" in the project "translation-test-update-site" that the 
-	    translation test update site can be build OTHERWISE it is NOT working 
+	- Replace text (Ctrl-H) "x.y.0" to "a.b.0" in 
+	    - All NL projects 
+	    - "site.xml" in the project "translation-test-update-site" that the 
+	      translation test update site can be build OTHERWISE it is NOT working 
 
 	
 Switch to workspace "C:\DAT\ws_MT-e38"
@@ -23,10 +24,10 @@ Switch to workspace "C:\DAT\ws_MT-e38"
 Set version number / year
 -------------------------
 
-	- "about.mappings"
-	- "net.tourbook.application.ApplicationVersion"
+	- Replace year in "net.tourbook.application.ApplicationVersion"
 	- Replace text (Ctrl-H) "x.y.0-SNAPSHOT" to "a.b.0-SNAPSHOT" in all "pom*.xml"
 	- Replace text (Ctrl-H) "x.y.0.qualifier" to "a.b.0.qualifier" in all other files
+	- Replace text (Ctrl-H) "x.y.z" to "a.b.c" in "about.mappings"
 	
 	- Replace text (Ctrl-H) "x.y.z" to "a.b.c" in these files BUT ONLY WHEN A MAJOR RELEASE IS CREATED
 	  DON'T MODIFY WHEN AN UPDATE SITE IS CREATED

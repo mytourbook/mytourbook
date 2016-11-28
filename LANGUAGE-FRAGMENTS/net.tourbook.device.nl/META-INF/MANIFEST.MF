@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Language support
 Bundle-SymbolicName: net.tourbook.device.nl;singleton:=true
-Bundle-Version: 16.10.0.qualifier
+Bundle-Version: 16.11.0.qualifier
 Bundle-Vendor: MyTourbook
 Fragment-Host: net.tourbook.device
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
