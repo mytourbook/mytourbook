@@ -294,6 +294,11 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
 
 		final TourChartConfiguration tcc = _tourChart.getTourChartConfig();
 
+		if (tcc == null) {
+			// this occured when tour chart is empty
+			return;
+		}
+
 		final boolean canShowTimeOnXAxis = tcc.isShowTimeOnXAxis;
 		final boolean canShowSRTMData = tcc.canShowSRTMData;
 
