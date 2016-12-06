@@ -221,7 +221,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private static final String					WIDGET_KEY_PERSON				= "tourPerson";											//$NON-NLS-1$
 	//
 	private static final String					MESSAGE_KEY_ANOTHER_SELECTION	= "anotherSelection";										//$NON-NLS-1$
-
 	/**
 	 * shows the busy indicator to load the slice viewer when there are more items as this value
 	 */
@@ -232,6 +231,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private static final String					STATE_IS_EDIT_MODE				= "tourDataEditor.isEditMode";								//$NON-NLS-1$
 	private static final String					STATE_CSV_EXPORT_PATH			= "tourDataEditor.csvExportPath";							//$NON-NLS-1$
 	private static final String					STATE_SECTION_CHARACTERISTICS	= "STATE_SECTION_CHARACTERISTICS";							//$NON-NLS-1$
+
 	private static final String					STATE_SECTION_DATE_TIME			= "STATE_SECTION_DATE_TIME";								//$NON-NLS-1$
 	private static final String					STATE_SECTION_INFO				= "STATE_SECTION_INFO";									//$NON-NLS-1$
 	private static final String					STATE_SECTION_PERSONAL			= "STATE_SECTION_PERSONAL";								//$NON-NLS-1$
@@ -4599,7 +4599,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		final float[] serieDistance = _tourData == null ? null : _tourData.distanceSerie;
 		final boolean isDistanceSerie = serieDistance != null && serieDistance.length > 0;
-		final boolean isGeoAvailable = _tourData.latitudeSerie != null && _tourData.latitudeSerie.length > 0;
+		final boolean isGeoAvailable = _tourData != null
+				&& _tourData.latitudeSerie != null
+				&& _tourData.latitudeSerie.length > 0;
 
 		_comboTitle.setEnabled(canEdit);
 		_txtDescription.setEnabled(canEdit);
@@ -4608,7 +4610,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_comboLocation_End.setEnabled(canEdit);
 
 		_txtWeather.setEnabled(canEdit);
-		_spinTemperature.setEnabled(canEdit && (_tourData.temperatureSerie == null));
+		_spinTemperature.setEnabled(canEdit && (_tourData != null && _tourData.temperatureSerie == null));
 		_comboClouds.setEnabled(canEdit);
 		_spinWindDirectionValue.setEnabled(canEdit);
 
