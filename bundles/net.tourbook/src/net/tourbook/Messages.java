@@ -879,6 +879,10 @@ public class Messages extends NLS {
 	public static String		Image__TourBook_SelectAll;
 	public static String		Image__TourBook_Week;
 	public static String		Image__TourChart;
+
+	public static String Image__TourFilter;
+
+	public static String Image__TourFilter_Disabled;
 	public static String		Image__TourInfo;
 	public static String		Image__TourInfo_Disabled;
 	public static String		Image__TourLog;
@@ -1550,6 +1554,8 @@ public class Messages extends NLS {
 
 	public static String		Slideout_TourEditor_Label_LatLonDigits;
 	public static String		Slideout_TourEditor_Label_LatLonDigits_Tooltip;
+
+	public static String Slideout_TourFilter_Label_Title;
 
 	public static String		Slideout_TourInfoOptions_Checkbox_IsShowInfoTooltip;
 	public static String		Slideout_TourInfoOptions_Checkbox_IsShowTourSeparator;

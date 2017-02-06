@@ -147,7 +147,7 @@ public class SlideoutTourFilter extends ToolbarSlideout implements IColorSelecto
 		 */
 		final Label label = new Label(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().applyTo(label);
-		label.setText(Messages.Slideout_TourInfoOptions_Label_Title);
+		label.setText(Messages.Slideout_TourFilter_Label_Title);
 		label.setFont(JFaceResources.getBannerFont());
 	}
 
