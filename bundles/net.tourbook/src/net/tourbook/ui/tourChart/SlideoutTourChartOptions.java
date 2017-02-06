@@ -62,6 +62,12 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
 	private Button					_chkShowStartTimeOnXAxis;
 	private Button					_chkShowValuePointTooltip;
 
+	/**
+	 * @param ownerControl
+	 * @param toolBar
+	 * @param tourChart
+	 * @param gridPrefPrefix
+	 */
 	public SlideoutTourChartOptions(final Control ownerControl,
 									final ToolBar toolBar,
 									final TourChart tourChart,
