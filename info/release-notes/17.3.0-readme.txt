@@ -1,0 +1,20 @@
+Version 17.3                                              ???
+
+
+New 	
+===
+
+* 
+ 
+
+Improvements 	
+============
+
+* 
+ 
+Bugfix 	
+======
+
+These problems are fixed
+
+* Selecting an item in a combobox list has closed the slideout, this problem existed since the beginning of using slideouts 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,6 +20,7 @@ import java.text.NumberFormat;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.data.TourData;
 import net.tourbook.database.IComputeTourValues;
 import net.tourbook.database.TourDatabase;
@@ -34,6 +35,8 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Combo;
@@ -46,53 +49,86 @@ import org.eclipse.ui.part.PageBook;
 
 public class SmoothingUI {
 
-	private final IPreferenceStore				_prefStore			= TourbookPlugin.getPrefStore();
-
-	private ITourEventListener					_tourEventListener;
-
-	private boolean								_isUpdateUI;
-
-	private ISmoothingAlgorithm					_smoothingInitial	= new SmoothingUI_Initial();
-	private ISmoothingAlgorithm					_smoothingJamet		= new SmoothingUI_Jamet();
-
-	private NumberFormat						_nf0				= NumberFormat.getNumberInstance();
-	{
-		_nf0.setMinimumFractionDigits(0);
-		_nf0.setMaximumFractionDigits(0);
-	}
-
 	private static final SmoothingAlgorithm[]	SMOOTHING_ALGORITHM	= {
 			//
 			new SmoothingAlgorithm(
 					ISmoothingAlgorithm.SMOOTHING_ALGORITHM_INITIAL,
 					Messages.TourChart_Smoothing_Algorithm_Initial),
+
 			new SmoothingAlgorithm(
 					ISmoothingAlgorithm.SMOOTHING_ALGORITHM_JAMET,
 					Messages.TourChart_Smoothing_Algorithm_Jamet),
-																	//
-																	};
+			//
+	};
+
+	private final IPreferenceStore				_prefStore			= TourbookPlugin.getPrefStore();
+
+	private ITourEventListener					_tourEventListener;
+
+	private FocusListener						_keepOpenListener;
+	{
+		_keepOpenListener = new FocusListener() {
+
+			@Override
+			public void focusGained(final FocusEvent e) {
+
+				if (_slideout != null) {
+
+					/*
+					 * This will fix the problem that when the list of a combobox is displayed, then
+					 * the slideout will disappear :-(((
+					 */
+					_slideout.setIsAnotherDialogOpened(true);
+				}
+			}
+
+			@Override
+			public void focusLost(final FocusEvent e) {
+
+				if (_slideout != null) {
+					_slideout.setIsAnotherDialogOpened(false);
+				}
+
+			}
+		};
+	}
+
+	private boolean				_isUpdateUI;
+	private ISmoothingAlgorithm	_smoothingInitial	= new SmoothingUI_Initial();
+
+	private ISmoothingAlgorithm	_smoothingJamet		= new SmoothingUI_Jamet();
+	private NumberFormat		_nf0				= NumberFormat.getNumberInstance();
+
+	{
+		_nf0.setMinimumFractionDigits(0);
+		_nf0.setMaximumFractionDigits(0);
+	}
 
 	/*
 	 * UI controls
 	 */
-	private FormToolkit							_tk;
+	private FormToolkit		_tk;
 
-	private Composite							_uiContainer;
-	private Combo								_comboAlgorithm;
+	private Composite		_uiContainer;
+	private Combo			_comboAlgorithm;
 
-	private PageBook							_pagebookSmoothingAlgo;
-	private Composite							_pageJametUI;
-	private Composite							_pageInitialUI;
+	private PageBook		_pagebookSmoothingAlgo;
+	private Composite		_pageJametUI;
+	private Composite		_pageInitialUI;
+
+	private ToolbarSlideout	_slideout;
 
 	public SmoothingUI() {}
 
 	/**
 	 * @param tk
 	 *            This toolkit will be disposed when the UI is disposed;
+	 * @param toolbarSlideout
 	 */
-	public SmoothingUI(final FormToolkit tk) {
+	public SmoothingUI(final FormToolkit tk, final ToolbarSlideout slideout) {
 
 		_tk = tk;
+		_slideout = slideout;
 	}
 
 	private void addTourEventListener() {
@@ -166,7 +202,9 @@ public class SmoothingUI {
 		fireTourModifyEvent();
 	}
 
-	public void createUI(final Composite parent, final boolean isShowDescription, final boolean isShowAdditionalActions) {
+	public void createUI(	final Composite parent,
+							final boolean isShowDescription,
+							final boolean isShowAdditionalActions) {
 
 		initUI(parent);
 
@@ -185,7 +223,8 @@ public class SmoothingUI {
 								final boolean isShowAdditionalActions) {
 
 		_uiContainer = _tk.createComposite(parent);
-		GridDataFactory.fillDefaults()//
+		GridDataFactory
+				.fillDefaults()//
 				.grab(true, true)
 				.applyTo(_uiContainer);
 		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(_uiContainer);
@@ -207,7 +246,8 @@ public class SmoothingUI {
 			 * label: smoothing algorithm
 			 */
 			final Label label = _tk.createLabel(container, Messages.TourChart_Smoothing_Label_SmoothingAlgorithm);
-			GridDataFactory.fillDefaults()//
+			GridDataFactory
+					.fillDefaults()//
 					.align(SWT.FILL, SWT.CENTER)
 					.applyTo(label);
 
@@ -216,11 +256,7 @@ public class SmoothingUI {
 			 */
 			_comboAlgorithm = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
 			_comboAlgorithm.setVisibleItemCount(10);
-			GridDataFactory.fillDefaults()//
-//					.align(SWT.END, SWT.FILL)
-					.indent(20, 0)
-					.applyTo(_comboAlgorithm);
-			_tk.adapt(_comboAlgorithm, true, true);
+			_comboAlgorithm.addFocusListener(_keepOpenListener);
 			_comboAlgorithm.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
@@ -230,6 +266,12 @@ public class SmoothingUI {
 					onSelectSmoothingAlgo();
 				}
 			});
+			GridDataFactory
+					.fillDefaults()//
+//					.align(SWT.END, SWT.FILL)
+					.indent(20, 0)
+					.applyTo(_comboAlgorithm);
+			_tk.adapt(_comboAlgorithm, true, true);
 		}
 	}
 
@@ -240,19 +282,20 @@ public class SmoothingUI {
 		 * pagebook: smoothing algorithm
 		 */
 		_pagebookSmoothingAlgo = new PageBook(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
+		GridDataFactory
+				.fillDefaults()//
 				.grab(true, true)
 				.span(2, 1)
 				.applyTo(_pagebookSmoothingAlgo);
 		{
-			_pageInitialUI = _smoothingInitial.createUI(
+			_pageInitialUI = _smoothingInitial.createUI(//
 					this,
 					_pagebookSmoothingAlgo,
 					_tk,
 					isShowDescription,
 					isShowAdditionalActions);
 
-			_pageJametUI = _smoothingJamet.createUI(
+			_pageJametUI = _smoothingJamet.createUI(//
 					this,
 					_pagebookSmoothingAlgo,
 					_tk,
@@ -347,7 +390,7 @@ public class SmoothingUI {
 	private void saveState() {
 
 		// smoothing algorithm
-		_prefStore.setValue(
+		_prefStore.setValue(//
 				ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM,
 				getSelectedAlgorithm().algorithmId);
 	}

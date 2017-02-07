@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -55,8 +55,8 @@ public class SlideoutTourChartSmoothing extends ToolbarSlideout {
 
 	public class SlideoutSmoothingUI extends SmoothingUI {
 
-		public SlideoutSmoothingUI(final FormToolkit tk) {
-			super(tk);
+		public SlideoutSmoothingUI(final FormToolkit tk, final ToolbarSlideout slideout) {
+			super(tk, slideout);
 		}
 
 		@Override
@@ -143,7 +143,7 @@ public class SlideoutTourChartSmoothing extends ToolbarSlideout {
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(smoothingContainer);
 			GridLayoutFactory.fillDefaults().numColumns(1).applyTo(smoothingContainer);
 			{
-				_smoothingUI = new SlideoutSmoothingUI(_tk);
+				_smoothingUI = new SlideoutSmoothingUI(_tk, this);
 				_smoothingUI.createUI(smoothingContainer, false, false);
 			}
 		}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -36,6 +36,8 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -59,6 +61,7 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 	private SelectionAdapter		_defaultSelectionAdapter;
 	private MouseWheelListener		_defaultMouseWheelListener;
 	private IPropertyChangeListener	_defaultPropertyChangeListener;
+	private FocusListener			_keepOpenListener;
 
 	{
 		_defaultSelectionAdapter = new SelectionAdapter() {
@@ -80,6 +83,24 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 				onChangeUI();
+			}
+		};
+
+		_keepOpenListener = new FocusListener() {
+
+			@Override
+			public void focusGained(final FocusEvent e) {
+
+				/*
+				 * This will fix the problem that when the list of a combobox is displayed, then the
+				 * slideout will disappear :-(((
+				 */
+				setIsAnotherDialogOpened(true);
+			}
+
+			@Override
+			public void focusLost(final FocusEvent e) {
+				setIsAnotherDialogOpened(false);
 			}
 		};
 	}
@@ -206,7 +227,8 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 			}
 			{
 				final ToolBar toolbar = new ToolBar(container, SWT.FLAT);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.grab(true, false)
 						.align(SWT.END, SWT.BEGINNING)
 						.applyTo(toolbar);
@@ -229,7 +251,8 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 		{
 			{
 				final Composite ttContainer = new Composite(container, SWT.NONE);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.grab(true, false)
 						.span(2, 1)
 						.applyTo(ttContainer);
@@ -240,7 +263,8 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 						 * Show marker tooltip
 						 */
 						_chkShowMarkerTooltip = new Button(ttContainer, SWT.CHECK);
-						GridDataFactory.fillDefaults()//
+						GridDataFactory
+								.fillDefaults()//
 								.applyTo(_chkShowMarkerTooltip);
 						_chkShowMarkerTooltip.setText(//
 								Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerTooltip);
@@ -251,7 +275,8 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 						 * Combo: tooltip position
 						 */
 						_comboTooltipPosition = new Combo(ttContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
-						GridDataFactory.fillDefaults()//
+						GridDataFactory
+								.fillDefaults()//
 								.grab(true, false)
 								.align(SWT.END, SWT.FILL)
 								.applyTo(_comboTooltipPosition);
@@ -259,13 +284,15 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 						_comboTooltipPosition.setToolTipText(//
 								Messages.Slideout_ChartMarkerOptions_Combo_TooltipPosition_Tooltip);
 						_comboTooltipPosition.addSelectionListener(_defaultSelectionAdapter);
+						_comboTooltipPosition.addFocusListener(_keepOpenListener);
 					}
 					{
 						/*
 						 * Show relative/absolute values
 						 */
 						_chkShowAbsoluteValues = new Button(ttContainer, SWT.CHECK);
-						GridDataFactory.fillDefaults()//
+						GridDataFactory
+								.fillDefaults()//
 								.span(2, 1)
 								.indent(_pc.convertWidthInCharsToPixels(3), 0)
 								.applyTo(_chkShowAbsoluteValues);
@@ -284,7 +311,8 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 				 */
 				// show label
 				_chkShowMarkerLabel = new Button(container, SWT.CHECK);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.span(2, 1)
 						.applyTo(_chkShowMarkerLabel);
 				_chkShowMarkerLabel.setText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowMarker);
@@ -296,7 +324,8 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 				 * Show marker point
 				 */
 				_chkShowMarkerPoint = new Button(container, SWT.CHECK);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.span(2, 1)
 						.applyTo(_chkShowMarkerPoint);
 				_chkShowMarkerPoint.setText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowMarkerPoint);
@@ -308,7 +337,8 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 				 * Show hidden marker
 				 */
 				_chkShowHiddenMarker = new Button(container, SWT.CHECK);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.span(2, 1)
 						.applyTo(_chkShowHiddenMarker);
 				_chkShowHiddenMarker.setText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowHiddenMarker);
@@ -320,7 +350,8 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 				 * Show hidden marker
 				 */
 				_chkShowOnlyWithDescription = new Button(container, SWT.CHECK);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.span(2, 1)
 						.applyTo(_chkShowOnlyWithDescription);
 				_chkShowOnlyWithDescription
@@ -333,7 +364,8 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 				 * Draw marker with default color
 				 */
 				_chkDrawMarkerWithDefaultColor = new Button(container, SWT.CHECK);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.span(2, 1)
 						.applyTo(_chkDrawMarkerWithDefaultColor);
 				_chkDrawMarkerWithDefaultColor.setText(//
@@ -352,7 +384,8 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 			 * Temp position
 			 */
 			final Composite tempContainer = new Composite(parent, SWT.NONE);
-			GridDataFactory.fillDefaults()//
+			GridDataFactory
+					.fillDefaults()//
 					.grab(true, false)
 					.span(2, 1)
 					.applyTo(tempContainer);
@@ -361,7 +394,8 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 			{
 				// show temp position
 				_chkShowLabelTempPosition = new Button(tempContainer, SWT.CHECK);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.applyTo(_chkShowLabelTempPosition);
 				_chkShowLabelTempPosition.setText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowTempPosition);
 				_chkShowLabelTempPosition.setToolTipText(//
@@ -373,11 +407,13 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 					 * Combo: temp position
 					 */
 					_comboLabelTempPosition = new Combo(tempContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
-					GridDataFactory.fillDefaults()//
+					GridDataFactory
+							.fillDefaults()//
 							.indent(_pc.convertWidthInCharsToPixels(3), 0)
 							.applyTo(_comboLabelTempPosition);
 					_comboLabelTempPosition.setVisibleItemCount(20);
 					_comboLabelTempPosition.addSelectionListener(_defaultSelectionAdapter);
+					_comboLabelTempPosition.addFocusListener(_keepOpenListener);
 				}
 			}
 		}
@@ -386,10 +422,12 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 	private void createUI_90_Bottom(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
+		GridDataFactory
+				.fillDefaults()//
 				.grab(true, false)
 				.applyTo(container);
-		GridLayoutFactory.fillDefaults()//
+		GridLayoutFactory
+				.fillDefaults()//
 				.numColumns(2)
 				.spacing(_pc.convertWidthInCharsToPixels(4), 0)
 				.applyTo(container);
@@ -412,7 +450,8 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 
 				// Label
 				_lblLabelOffset = new Label(container, SWT.NONE);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.align(SWT.FILL, SWT.CENTER)
 						.applyTo(_lblLabelOffset);
 				_lblLabelOffset.setText(Messages.Slideout_ChartMarkerOptions_Label_Offset);
@@ -434,7 +473,8 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 
 				// Label
 				_lblMarkerPointSize = new Label(container, SWT.NONE);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.align(SWT.FILL, SWT.CENTER)
 						.applyTo(_lblMarkerPointSize);
 				_lblMarkerPointSize.setText(Messages.Slideout_ChartMarkerOptions_Label_MarkerSize);
@@ -456,7 +496,8 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 
 				// Label
 				final Label label = new Label(container, SWT.NONE);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.align(SWT.FILL, SWT.CENTER)
 						.applyTo(label);
 				label.setText(Messages.Slideout_ChartMarkerOptions_Label_HoverSize);
@@ -476,7 +517,8 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 	private void createUI_94_Colors(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
+		GridDataFactory
+				.fillDefaults()//
 				.grab(true, false)
 				.align(SWT.FILL, SWT.BEGINNING)
 				.applyTo(container);
@@ -489,14 +531,16 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 			{
 				// Label
 				final Label label = new Label(container, SWT.NONE);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.align(SWT.FILL, SWT.CENTER)
 						.applyTo(label);
 				label.setText(Messages.Slideout_ChartMarkerOptions_Label_MarkerColor);
 
 				// Color selector
 				_colorDefaultMarker = new ColorSelectorExtended(container);
-				GridDataFactory.swtDefaults()//
+				GridDataFactory
+						.swtDefaults()//
 						.grab(false, true)
 						.align(SWT.BEGINNING, SWT.BEGINNING)
 						.applyTo(_colorDefaultMarker.getButton());
@@ -511,7 +555,8 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 			{
 				// Label
 				final Label label = new Label(container, SWT.NONE);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.align(SWT.FILL, SWT.CENTER)
 						.applyTo(label);
 				label.setText(Messages.Slideout_ChartMarkerOptions_Label_DeviceMarkerColor);
@@ -519,7 +564,8 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 
 				// Color selector
 				_colorDeviceMarker = new ColorSelectorExtended(container);
-				GridDataFactory.swtDefaults()//
+				GridDataFactory
+						.swtDefaults()//
 						.grab(false, true)
 						.align(SWT.BEGINNING, SWT.BEGINNING)
 						.applyTo(_colorDeviceMarker.getButton());
@@ -534,7 +580,8 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 			{
 				// Label
 				final Label label = new Label(container, SWT.NONE);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.align(SWT.FILL, SWT.CENTER)
 						.applyTo(label);
 				label.setText(Messages.Slideout_ChartMarkerOptions_Label_HiddenMarkerColor);
@@ -542,7 +589,8 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 
 				// Color selector
 				_colorHiddenMarker = new ColorSelectorExtended(container);
-				GridDataFactory.swtDefaults()//
+				GridDataFactory
+						.swtDefaults()//
 						.grab(false, true)
 						.align(SWT.BEGINNING, SWT.BEGINNING)
 						.applyTo(_colorHiddenMarker.getButton());
@@ -635,15 +683,9 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 		_prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_MARKER_TOOLTIP, isShowMarkerTooltip);
 		_prefStore.setValue(ITourbookPreferences.GRAPH_MARKER_IS_SHOW_ONLY_WITH_DESCRIPTION, isShowOnlyWithDescription);
 
-		PreferenceConverter.setValue(_prefStore, //
-				ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT,
-				defaultColor);
-		PreferenceConverter.setValue(_prefStore, //
-				ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE,
-				deviceColor);
-		PreferenceConverter.setValue(_prefStore, //
-				ITourbookPreferences.GRAPH_MARKER_COLOR_HIDDEN,
-				hiddenColor);
+		PreferenceConverter.setValue(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEFAULT, defaultColor);
+		PreferenceConverter.setValue(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_DEVICE, deviceColor);
+		PreferenceConverter.setValue(_prefStore, ITourbookPreferences.GRAPH_MARKER_COLOR_HIDDEN, hiddenColor);
 
 		/*
 		 * Update chart config
@@ -673,8 +715,7 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 		enableControls();
 
 		// notify pref listener
-		TourbookPlugin.getDefault().getPreferenceStore()//
-				.setValue(ITourbookPreferences.GRAPH_MARKER_IS_MODIFIED, Math.random());
+		TourbookPlugin.getPrefStore().setValue(ITourbookPreferences.GRAPH_MARKER_IS_MODIFIED, Math.random());
 	}
 
 	private void resetToDefaults() {

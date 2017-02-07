@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -128,7 +128,7 @@ import org.eclipse.ui.IWorkbenchPart;
  */
 public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdater, ILineSelectionPainter {
 
-	private static final String				ID										= "net.tourbook.ui.tourChart";															//$NON-NLS-1$
+	private static final String				ID										= "net.tourbook.ui.tourChart";							//$NON-NLS-1$
 	//
 	private static final int				PAGE_NAVIGATION_SEGMENTS				= 10;
 	//
@@ -144,26 +144,26 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	private static final String				GRAPH_LABEL_TEMPERATURE					= net.tourbook.common.Messages.Graph_Label_Temperature;
 	private static final String				GRAPH_LABEL_TOUR_COMPARE				= net.tourbook.common.Messages.Graph_Label_Tour_Compare;
 	//
-	public static final String				ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER		= "ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER";													//$NON-NLS-1$
-	public static final String				ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED	= "ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED";											//$NON-NLS-1$
-	public static final String				ACTION_ID_EDIT_CHART_PREFERENCES		= "ACTION_ID_EDIT_CHART_PREFERENCES";													//$NON-NLS-1$
-	private static final String				ACTION_ID_IS_GRAPH_OVERLAPPED			= "ACTION_ID_IS_GRAPH_OVERLAPPED";														//$NON-NLS-1$
-	public static final String				ACTION_ID_IS_SHOW_TOUR_PHOTOS			= "ACTION_ID_IS_SHOW_TOUR_PHOTOS";														//$NON-NLS-1$
-	public static final String				ACTION_ID_HR_ZONE_DROPDOWN_MENU			= "ACTION_ID_HR_ZONE_DROPDOWN_MENU";													//$NON-NLS-1$
-	public static final String				ACTION_ID_HR_ZONE_STYLE_GRAPH_TOP		= "ACTION_ID_HR_ZONE_STYLE_GRAPH_TOP";													//$NON-NLS-1$
-	public static final String				ACTION_ID_HR_ZONE_STYLE_NO_GRADIENT		= "ACTION_ID_HR_ZONE_STYLE_NO_GRADIENT";												//$NON-NLS-1$
-	public static final String				ACTION_ID_HR_ZONE_STYLE_WHITE_BOTTOM	= "ACTION_ID_HR_ZONE_STYLE_WHITE_BOTTOM";												//$NON-NLS-1$
-	public static final String				ACTION_ID_HR_ZONE_STYLE_WHITE_TOP		= "ACTION_ID_HR_ZONE_STYLE_WHITE_TOP";													//$NON-NLS-1$
-	public static final String				ACTION_ID_X_AXIS_DISTANCE				= "ACTION_ID_X_AXIS_DISTANCE";															//$NON-NLS-1$
-	public static final String				ACTION_ID_X_AXIS_TIME					= "ACTION_ID_X_AXIS_TIME";																//$NON-NLS-1$
+	public static final String				ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER		= "ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER";					//$NON-NLS-1$
+	public static final String				ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED	= "ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED";				//$NON-NLS-1$
+	public static final String				ACTION_ID_EDIT_CHART_PREFERENCES		= "ACTION_ID_EDIT_CHART_PREFERENCES";					//$NON-NLS-1$
+	private static final String				ACTION_ID_IS_GRAPH_OVERLAPPED			= "ACTION_ID_IS_GRAPH_OVERLAPPED";						//$NON-NLS-1$
+	public static final String				ACTION_ID_IS_SHOW_TOUR_PHOTOS			= "ACTION_ID_IS_SHOW_TOUR_PHOTOS";						//$NON-NLS-1$
+	public static final String				ACTION_ID_HR_ZONE_DROPDOWN_MENU			= "ACTION_ID_HR_ZONE_DROPDOWN_MENU";					//$NON-NLS-1$
+	public static final String				ACTION_ID_HR_ZONE_STYLE_GRAPH_TOP		= "ACTION_ID_HR_ZONE_STYLE_GRAPH_TOP";					//$NON-NLS-1$
+	public static final String				ACTION_ID_HR_ZONE_STYLE_NO_GRADIENT		= "ACTION_ID_HR_ZONE_STYLE_NO_GRADIENT";				//$NON-NLS-1$
+	public static final String				ACTION_ID_HR_ZONE_STYLE_WHITE_BOTTOM	= "ACTION_ID_HR_ZONE_STYLE_WHITE_BOTTOM";				//$NON-NLS-1$
+	public static final String				ACTION_ID_HR_ZONE_STYLE_WHITE_TOP		= "ACTION_ID_HR_ZONE_STYLE_WHITE_TOP";					//$NON-NLS-1$
+	public static final String				ACTION_ID_X_AXIS_DISTANCE				= "ACTION_ID_X_AXIS_DISTANCE";							//$NON-NLS-1$
+	public static final String				ACTION_ID_X_AXIS_TIME					= "ACTION_ID_X_AXIS_TIME";								//$NON-NLS-1$
 	//
-	private static final String				GRID_PREF_PREFIX						= "GRID_TOUR_CHART__";																	//$NON-NLS-1$
-	//
-	private static final String				GRID_IS_SHOW_VERTICAL_GRIDLINES			= (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES);
-	private static final String				GRID_IS_SHOW_HORIZONTAL_GRIDLINES		= (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
-	private static final String				GRID_VERTICAL_DISTANCE					= (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE);
-	private static final String				GRID_HORIZONTAL_DISTANCE				= (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE);
-	//
+	private static final String				GRID_PREF_PREFIX						= "GRID_TOUR_CHART__";									//$NON-NLS-1$
+	//SET_FORMATTING_OFF
+	private static final String				GRID_IS_SHOW_VERTICAL_GRIDLINES			= (GRID_PREF_PREFIX	+ ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES);
+	private static final String				GRID_IS_SHOW_HORIZONTAL_GRIDLINES		= (GRID_PREF_PREFIX	+ ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
+	private static final String				GRID_VERTICAL_DISTANCE					= (GRID_PREF_PREFIX	+ ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE);
+	private static final String				GRID_HORIZONTAL_DISTANCE				= (GRID_PREF_PREFIX	+ ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE);
+	//SET_FORMATTING_ON
 	/**
 	 * 1e-5 is too small for the min value, it do not correct the graph.
 	 */
@@ -177,7 +177,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	/**
 	 * Part in which the tour chart is created, can be <code>null</code> when created in a dialog.
 	 */
-	private IWorkbenchPart					_part;																															;
+	private IWorkbenchPart					_part;;
 	//
 	private TourData						_tourData;
 	private TourChartConfiguration			_tcc;
@@ -213,12 +213,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	 * it.
 	 */
 	private TourMarker						_selectedTourMarker;
+	//SET_FORMATTING_OFF
+	private ImageDescriptor					_imagePhoto								= TourbookPlugin.getImageDescriptor(Messages.Image__PhotoPhotos);
+	private ImageDescriptor					_imagePhotoTooltip						= TourbookPlugin.getImageDescriptor(Messages.Image__PhotoImage);
+	//SET_FORMATTING_ON
 
-	private ImageDescriptor					_imagePhoto								= TourbookPlugin
-																							.getImageDescriptor(Messages.Image__PhotoPhotos);
-
-	private ImageDescriptor					_imagePhotoTooltip						= TourbookPlugin
-																							.getImageDescriptor(Messages.Image__PhotoImage);
 	private IFillPainter					_hrZonePainter;
 
 	private OpenDialogManager				_openDlgMgr								= new OpenDialogManager();
@@ -348,7 +347,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	 */
 	private class ControlListener implements Listener {
 
-		TourChart	__tourChart	= TourChart.this;
+		TourChart __tourChart = TourChart.this;
 
 		@Override
 		public void handleEvent(final Event event) {
@@ -463,7 +462,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 			if (_tcc.isShowTourPhotoTooltip) {
 
-				_photoTooltip.showChartPhotoToolTip(
+				_photoTooltip.showChartPhotoToolTip(//
 						_layerPhoto,
 						eventTime,
 						devHoveredValue,
@@ -631,9 +630,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 		final GraphColorManager colorProvider = GraphColorManager.getInstance();
 
-		_photoOverlayBGColorLink = new Color(getDisplay(), //
+		_photoOverlayBGColorLink = new Color(
+				getDisplay(), //
 				colorProvider.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_HISTORY).getLineColor_Active());
-		_photoOverlayBGColorTour = new Color(getDisplay(), //
+		_photoOverlayBGColorTour = new Color(
+				getDisplay(), //
 				colorProvider.getGraphColorDefinition(GraphColorManager.PREF_GRAPH_TOUR).getLineColor_Active());
 
 		setupChartConfig();
@@ -767,13 +768,17 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		_prefStore.setValue(ITourbookPreferences.GRAPH_HR_ZONE_STYLE, selectedGraphType);
 		_tcc.hrZoneStyle = selectedGraphType;
 
-		setActionChecked(ACTION_ID_HR_ZONE_STYLE_GRAPH_TOP, //
+		setActionChecked(
+				ACTION_ID_HR_ZONE_STYLE_GRAPH_TOP, //
 				ACTION_ID_HR_ZONE_STYLE_GRAPH_TOP.equals(selectedGraphType));
-		setActionChecked(ACTION_ID_HR_ZONE_STYLE_NO_GRADIENT, //
+		setActionChecked(
+				ACTION_ID_HR_ZONE_STYLE_NO_GRADIENT, //
 				ACTION_ID_HR_ZONE_STYLE_NO_GRADIENT.equals(selectedGraphType));
-		setActionChecked(ACTION_ID_HR_ZONE_STYLE_WHITE_TOP, //
+		setActionChecked(
+				ACTION_ID_HR_ZONE_STYLE_WHITE_TOP, //
 				ACTION_ID_HR_ZONE_STYLE_WHITE_TOP.equals(selectedGraphType));
-		setActionChecked(ACTION_ID_HR_ZONE_STYLE_WHITE_BOTTOM,//
+		setActionChecked(
+				ACTION_ID_HR_ZONE_STYLE_WHITE_BOTTOM, //
 				ACTION_ID_HR_ZONE_STYLE_WHITE_BOTTOM.equals(selectedGraphType));
 
 		if (_tcc.isHrZoneDisplayed == false) {
@@ -1301,7 +1306,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		_allTourChartActions.put(ACTION_ID_X_AXIS_DISTANCE, new ActionXAxisDistance(this));
 		_allTourChartActions.put(ACTION_ID_X_AXIS_TIME, new ActionXAxisTime(this));
 
-		_allTourChartActions.put(ACTION_ID_EDIT_CHART_PREFERENCES, new ActionOpenPrefDialog(
+		_allTourChartActions.put(ACTION_ID_EDIT_CHART_PREFERENCES, new ActionOpenPrefDialog(//
 				Messages.Tour_Action_EditChartPreferences,
 				PrefPageAppearanceTourChart.ID));
 
@@ -1310,25 +1315,33 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		 */
 		_allTourChartActions.put(ACTION_ID_HR_ZONE_DROPDOWN_MENU, new ActionHrZoneDropDownMenu(this));
 
-		_allTourChartActions.put(ACTION_ID_HR_ZONE_STYLE_GRAPH_TOP, new ActionHrZoneGraphType(
-				this,
+		_allTourChartActions.put(
 				ACTION_ID_HR_ZONE_STYLE_GRAPH_TOP,
-				Messages.Tour_Action_HrZoneGraphType_Default));
+				new ActionHrZoneGraphType(
+						this,
+						ACTION_ID_HR_ZONE_STYLE_GRAPH_TOP,
+						Messages.Tour_Action_HrZoneGraphType_Default));
 
-		_allTourChartActions.put(ACTION_ID_HR_ZONE_STYLE_NO_GRADIENT, new ActionHrZoneGraphType(
-				this,
+		_allTourChartActions.put(
 				ACTION_ID_HR_ZONE_STYLE_NO_GRADIENT,
-				Messages.Tour_Action_HrZoneGraphType_NoGradient));
+				new ActionHrZoneGraphType(
+						this,
+						ACTION_ID_HR_ZONE_STYLE_NO_GRADIENT,
+						Messages.Tour_Action_HrZoneGraphType_NoGradient));
 
-		_allTourChartActions.put(ACTION_ID_HR_ZONE_STYLE_WHITE_TOP, new ActionHrZoneGraphType(
-				this,
+		_allTourChartActions.put(
 				ACTION_ID_HR_ZONE_STYLE_WHITE_TOP,
-				Messages.Tour_Action_HrZoneGraphType_WhiteTop));
+				new ActionHrZoneGraphType(
+						this,
+						ACTION_ID_HR_ZONE_STYLE_WHITE_TOP,
+						Messages.Tour_Action_HrZoneGraphType_WhiteTop));
 
-		_allTourChartActions.put(ACTION_ID_HR_ZONE_STYLE_WHITE_BOTTOM, new ActionHrZoneGraphType(
-				this,
+		_allTourChartActions.put(
 				ACTION_ID_HR_ZONE_STYLE_WHITE_BOTTOM,
-				Messages.Tour_Action_HrZoneGraphType_WhiteBottom));
+				new ActionHrZoneGraphType(
+						this,
+						ACTION_ID_HR_ZONE_STYLE_WHITE_BOTTOM,
+						Messages.Tour_Action_HrZoneGraphType_WhiteBottom));
 
 		/*
 		 * This is a special case because the quick edit action in the tour info tooltip can not yet
@@ -1729,8 +1742,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		_tourMarkerTooltip.setChartMarkerConfig(cmc);
 
 		// set data serie for the x-axis
-		final double[] xAxisSerie = _tcc.isShowTimeOnXAxis ? //
-				_tourData.getTimeSerieDouble()
+		final double[] xAxisSerie = _tcc.isShowTimeOnXAxis
+				? _tourData.getTimeSerieDouble()
 				: _tourData.getDistanceSerieDouble();
 
 		if (_tourData.isMultipleTours()) {
@@ -1967,7 +1980,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 				_tourSegmenterState,
 				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_LINE,
 				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_LINE_DEFAULT);
-		final int lineOpacity = Util.getStateInt(_tourSegmenterState,//
+		final int lineOpacity = Util.getStateInt(
+				_tourSegmenterState, //
 				TourSegmenterView.STATE_LINE_OPACITY,
 				TourSegmenterView.STATE_LINE_OPACITY_DEFAULT);
 
@@ -1991,12 +2005,13 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 				TourSegmenterView.STATE_STACKED_VISIBLE_VALUES,
 				TourSegmenterView.STATE_STACKED_VISIBLE_VALUES_DEFAULT);
 
-		final int graphOpacity = Util.getStateInt(_tourSegmenterState,//
+		final int graphOpacity = Util.getStateInt(
+				_tourSegmenterState, //
 				TourSegmenterView.STATE_GRAPH_OPACITY,
 				TourSegmenterView.STATE_GRAPH_OPACITY_DEFAULT);
 
-		final double[] xDataSerie = _tcc.isShowTimeOnXAxis ? //
-				_tourData.getTimeSerieDouble()
+		final double[] xDataSerie = _tcc.isShowTimeOnXAxis
+				? _tourData.getTimeSerieDouble()
 				: _tourData.getDistanceSerieDouble();
 
 		/*
@@ -2153,8 +2168,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 				allValueRGBs.add(paintedSegment.paintedRGB);
 
 			} else if (labelSegmentIndex >= selectedSegmentIndexStart
-			//
-			// check if this value is valid
+					//
+					// check if this value is valid
 					&& paintedSegment.paintedX1 != Integer.MIN_VALUE
 			//
 			) {
@@ -2959,7 +2974,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		}
 
 		// check if photos are hovered
-		final PhotoCategory hoveredPhotoCategory = _layerPhoto.getHoveredPhotoCategory(
+		final PhotoCategory hoveredPhotoCategory = _layerPhoto.getHoveredPhotoCategory(//
 				mouseEvent.eventTime,
 				mouseEvent.devXMouse,
 				mouseEvent.devYMouse);
@@ -4103,7 +4118,8 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 		isShowSegmentAlternateColor = _prefStore.getBoolean(//
 				ITourbookPreferences.GRAPH_IS_SEGMENT_ALTERNATE_COLOR);
-		segmentAlternateColor = PreferenceConverter.getColor(_prefStore, //
+		segmentAlternateColor = PreferenceConverter.getColor(
+				_prefStore, //
 				ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR);
 
 		graphTransparencyLine = _prefStore.getInt(//
@@ -4121,12 +4137,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 				GRID_PREF_PREFIX,
 				ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES);
 
-		gridVerticalDistance = Util.getPrefixPrefInt(
+		gridVerticalDistance = Util.getPrefixPrefInt(//
 				_prefStore,
 				GRID_PREF_PREFIX,
 				ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE);
 
-		gridHorizontalDistance = Util.getPrefixPrefInt(
+		gridHorizontalDistance = Util.getPrefixPrefInt(//
 				_prefStore,
 				GRID_PREF_PREFIX,
 				ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE);
@@ -4373,7 +4389,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 			_segmenterValueFont.dispose();
 		}
 
-		final FontData[] valueFontData = PreferenceConverter.getFontDataArray(
+		final FontData[] valueFontData = PreferenceConverter.getFontDataArray(//
 				_prefStore,
 				ITourbookPreferences.TOUR_SEGMENTER_CHART_VALUE_FONT);
 
@@ -4386,7 +4402,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	 */
 	private void setupTourSegmenter() {
 
-		final boolean isSegmenterActive = Util.getStateBoolean(
+		final boolean isSegmenterActive = Util.getStateBoolean(//
 				_tourSegmenterState,
 				TourSegmenterView.STATE_IS_SEGMENTER_ACTIVE,
 				false);
@@ -4804,7 +4820,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		hidePhotoLayer();
 		resetSegmenterSelection();
 
-		final ChartDataModel newChartDataModel = TourManager.getInstance().createChartDataModel(
+		final ChartDataModel newChartDataModel = TourManager.getInstance().createChartDataModel(//
 				_tourData,
 				_tcc,
 				isPropertyChanged);
