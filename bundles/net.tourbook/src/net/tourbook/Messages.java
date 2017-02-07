@@ -1744,6 +1744,8 @@ public class Messages extends NLS {
 	public static String		Tour_Editor_Radio_Cadence_Rpm;
 	public static String		Tour_Editor_Radio_Cadence_Spm;
 
+	public static String Tour_Filter_Action_Tooltip;
+
 	public static String		Tour_Log_Action_Clear_Tooltip;
 
 	public static String		Tour_Marker_Column_Description_ShortCut;

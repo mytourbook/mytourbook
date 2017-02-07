@@ -18,7 +18,11 @@ public class ActionTourFilter extends ActionToolbarSlideout {
 // SET_FORMATTING_ON
 
 	public ActionTourFilter() {
+
 		super(actionImage, actionImageDisabled);
+
+		isToggleAction = true;
+		notSelectedTooltip = Messages.Tour_Filter_Action_Tooltip;
 	}
 
 	@Override

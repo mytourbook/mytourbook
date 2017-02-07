@@ -133,7 +133,7 @@ public class SlideoutTourFilter extends ToolbarSlideout implements IColorSelecto
 			{
 				createUI_10_Title(container);
 				createUI_12_Actions(container);
-				createUI_20_Controls(container);
+				createUI_20_Filter_Photo(container);
 			}
 		}
 
@@ -168,16 +168,24 @@ public class SlideoutTourFilter extends ToolbarSlideout implements IColorSelecto
 		tbm.update(true);
 	}
 
-	private void createUI_20_Controls(final Composite parent) {
+	private void createUI_20_Filter_Photo(final Composite parent) {
 
-		final Composite ttContainer = new Composite(parent, SWT.NONE);
+//		Action_TourPhotoFilter         = Show only tours with photos
+//				Action_TourPhotoFilter_Tooltip = Tour Photo Filter:\n\
+//				                                 \n\
+//				                                 When this filter is activated, only tours with photos \n\
+//				                                 will be displayed in ALL views, except the tour import view.
+
+		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory
 				.fillDefaults()//
 				.grab(true, false)
 				.span(2, 1)
-				.applyTo(ttContainer);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(ttContainer);
-		{}
+				.applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		{
+
+		}
 	}
 
 	private void enableControls() {

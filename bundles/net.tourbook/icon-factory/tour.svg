@@ -4164,9 +4164,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="22.627417"
-     inkscape:cx="285.05602"
-     inkscape:cy="948.34637"
+     inkscape:zoom="32"
+     inkscape:cx="311.38704"
+     inkscape:cy="951.66421"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -5635,6 +5635,25 @@
        x="280"
        y="86.362183"
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\tour-filter.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <path
+       style="fill:none;fill-opacity:1;stroke:#3a9ff7;stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 302.1,90.362198 4.9,6.00001 v 4.999972 h 2 v -4.999972 l 4.9,-6.00001 z"
+       id="path5771-6-9-5-5-4-8"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\tour-filter-2.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       sodipodi:nodetypes="ccccccc" />
+    <rect
+       style="opacity:0.98999999;fill:none;stroke:none;stroke-width:1.00000012"
+       id="rect6561-7-5-9-4"
+       width="15.999998"
+       height="16.000002"
+       x="300"
+       y="86.362183"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\tour-filter-2.png"
        inkscape:export-xdpi="96"
        inkscape:export-ydpi="96" />
   </g>
