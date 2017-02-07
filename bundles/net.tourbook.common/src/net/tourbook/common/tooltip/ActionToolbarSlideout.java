@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,6 +17,7 @@ package net.tourbook.common.tooltip;
 
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.Messages;
+import net.tourbook.common.UI;
 
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -38,7 +39,7 @@ import org.eclipse.swt.widgets.ToolItem;
  */
 public abstract class ActionToolbarSlideout extends ContributionItem implements IOpeningDialog {
 
-	private String			_dialogId	= getClass().getCanonicalName();
+	private String			_dialogId			= getClass().getCanonicalName();
 
 	private ToolBar			_toolBar;
 	private ToolItem		_actionToolItem;
@@ -50,6 +51,16 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
 	 */
 	private Image			_imageEnabled;
 	private Image			_imageDisabled;
+
+	/**
+	 * When <code>true</code> then the action can be toggeled, default is <code>false</code>.
+	 */
+	protected boolean		isToggleAction;
+
+	/**
+	 * This tooltip will be displayed when the action is not selected.
+	 */
+	protected String		notSelectedTooltip	= UI.EMPTY_STRING;
 
 	public ActionToolbarSlideout() {
 
@@ -79,7 +90,12 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
 
 			_toolBar = toolbar;
 
-			_actionToolItem = new ToolItem(toolbar, SWT.PUSH);
+			if (isToggleAction) {
+				_actionToolItem = new ToolItem(toolbar, SWT.CHECK);
+			} else {
+				_actionToolItem = new ToolItem(toolbar, SWT.PUSH);
+			}
+
 			_actionToolItem.setImage(_imageEnabled);
 			_actionToolItem.setDisabledImage(_imageDisabled);
 			_actionToolItem.addSelectionListener(new SelectionAdapter() {
@@ -101,6 +117,8 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
 			});
 
 			_slideoutOptions = createSlideout(toolbar);
+
+			updateUI();
 		}
 	}
 
@@ -137,33 +155,39 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
 			return;
 		}
 
+		// ignore when disabled
 		if (_actionToolItem.isEnabled() == false) {
-
-			// a graph is not displayed
-
 			return;
 		}
 
-		final boolean isToolItemHovered = hoveredItem == _actionToolItem;
-
-		Rectangle itemBounds = null;
-
-		if (isToolItemHovered) {
-
-			itemBounds = hoveredItem.getBounds();
-
-			final Point itemDisplayPosition = _toolBar.toDisplay(itemBounds.x, itemBounds.y);
-
-			itemBounds.x = itemDisplayPosition.x;
-			itemBounds.y = itemDisplayPosition.y;
-
-			openSlideout(itemBounds, true);
+		// ignore when not selected
+		if (isToggleAction && _actionToolItem.getSelection() == false) {
+			return;
 		}
+
+		// get tooltip position
+		final Rectangle itemBounds = hoveredItem.getBounds();
+
+		final Point itemDisplayPosition = _toolBar.toDisplay(itemBounds.x, itemBounds.y);
+
+		itemBounds.x = itemDisplayPosition.x;
+		itemBounds.y = itemDisplayPosition.y;
+
+		openSlideout(itemBounds, true);
 	}
 
 	private void onSelect() {
 
+		// ignore when it can not toggle
+		if (isToggleAction == false) {
+			return;
+		}
+
+		updateUI();
+
 		if (_slideoutOptions.isToolTipVisible() == false) {
+
+			// tooltip is hidden, open it
 
 			final Rectangle itemBounds = _actionToolItem.getBounds();
 
@@ -212,5 +236,21 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
 		}
 
 		_actionToolItem.setSelection(isSelected);
+
+		updateUI();
+	}
+
+	private void updateUI() {
+
+		if (_actionToolItem.getSelection()) {
+
+			// hide tooltip because the slideout is displayed
+
+			_actionToolItem.setToolTipText(UI.EMPTY_STRING);
+
+		} else {
+
+			_actionToolItem.setToolTipText(notSelectedTooltip);
+		}
 	}
 }

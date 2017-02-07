@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -181,8 +181,8 @@ public abstract class ToolbarSlideout extends AnimatedToolTipShell {
 		}
 	}
 
-	public void setIsAnotherDialogOpened(final boolean _isAnotherDialogOpened) {
-		this._isAnotherDialogOpened = _isAnotherDialogOpened;
+	public void setIsAnotherDialogOpened(final boolean isAnotherDialogOpened) {
+		this._isAnotherDialogOpened = isAnotherDialogOpened;
 	}
 
 }
