@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,7 +18,6 @@ package net.tourbook.ui.views.tourMarker;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
-import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.tooltip.AnimatedToolTipShell;
 import net.tourbook.common.util.Util;
 import net.tourbook.ui.views.tourMarker.TourMarkerAllView.TourMarkerItem;
@@ -50,7 +49,7 @@ import org.eclipse.swt.widgets.ToolBar;
 /**
  * Tour chart marker properties slideout.
  */
-public class SlideoutTourMarkerFilter extends AnimatedToolTipShell implements IColorSelectorListener {
+public class SlideoutTourMarkerFilter extends AnimatedToolTipShell {
 
 	private static final int		GEO_FILTER_DIGITS	= 4;
 
@@ -65,7 +64,6 @@ public class SlideoutTourMarkerFilter extends AnimatedToolTipShell implements IC
 
 	private boolean					_isWaitTimerStarted;
 	private boolean					_canOpenToolTip;
-	private boolean					_isAnotherDialogOpened;
 
 //	private PixelConverter			_pc;
 	private Font					_boldFont;
@@ -125,19 +123,6 @@ public class SlideoutTourMarkerFilter extends AnimatedToolTipShell implements IC
 	}
 
 	@Override
-	protected boolean canCloseToolTip() {
-
-		/*
-		 * Do not hide this dialog when the color selector dialog or other dialogs are opened
-		 * because it will lock the UI completely !!!
-		 */
-
-		final boolean isCanClose = _isAnotherDialogOpened == false;
-
-		return isCanClose;
-	}
-
-	@Override
 	protected boolean canShowToolTip() {
 		return true;
 	}
@@ -150,12 +135,6 @@ public class SlideoutTourMarkerFilter extends AnimatedToolTipShell implements IC
 		 */
 
 		return true;
-	}
-
-	@Override
-	public void colorDialogOpened(final boolean isDialogOpened) {
-
-		_isAnotherDialogOpened = isDialogOpened;
 	}
 
 	@Override
@@ -195,7 +174,8 @@ public class SlideoutTourMarkerFilter extends AnimatedToolTipShell implements IC
 		 * Group: Geo filter
 		 */
 		_groupGeoFilter = new Group(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
+		GridDataFactory
+				.fillDefaults()//
 				.align(SWT.FILL, SWT.CENTER)
 				.grab(true, false)
 				.span(3, 1)
@@ -210,7 +190,8 @@ public class SlideoutTourMarkerFilter extends AnimatedToolTipShell implements IC
 			{
 				// label
 				_lblSelectedMarker = new Label(_groupGeoFilter, SWT.READ_ONLY);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.span(4, 1)
 						.align(SWT.FILL, SWT.CENTER)
 //					.indent(_pc.convertWidthInCharsToPixels(3), 0)
@@ -224,7 +205,8 @@ public class SlideoutTourMarkerFilter extends AnimatedToolTipShell implements IC
 			{
 				// label
 				_lblGeoFilterArea = new Label(_groupGeoFilter, SWT.NONE);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.align(SWT.FILL, SWT.CENTER)
 						.grab(true, false)
 //					.indent(_pc.convertWidthInCharsToPixels(3), 0)
@@ -233,14 +215,16 @@ public class SlideoutTourMarkerFilter extends AnimatedToolTipShell implements IC
 
 				// value prefix: plus/minus
 				_lblGeoFilterValuePrefix = new Label(_groupGeoFilter, SWT.NONE);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.align(SWT.END, SWT.CENTER)
 						.applyTo(_lblGeoFilterValuePrefix);
 				_lblGeoFilterValuePrefix.setText(UI.SYMBOL_PLUS_MINUS);
 
 				// spinner
 				_spinnerGeoFilter = new Spinner(_groupGeoFilter, SWT.BORDER);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.align(SWT.END, SWT.CENTER)
 						.applyTo(_spinnerGeoFilter);
 				_spinnerGeoFilter.setMinimum(0);
@@ -263,7 +247,8 @@ public class SlideoutTourMarkerFilter extends AnimatedToolTipShell implements IC
 
 				// unit
 				_lblGeoFilterUnit = new Label(_groupGeoFilter, SWT.NONE);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.align(SWT.BEGINNING, SWT.CENTER)
 						.applyTo(_lblGeoFilterUnit);
 				_lblGeoFilterUnit.setText(UI.SYMBOL_DEGREE);
@@ -286,7 +271,8 @@ public class SlideoutTourMarkerFilter extends AnimatedToolTipShell implements IC
 		{
 			// checkbox: lat/lon digits
 			_chkLatLonDigits = new Button(parent, SWT.CHECK);
-			GridDataFactory.fillDefaults()//
+			GridDataFactory
+					.fillDefaults()//
 					.span(2, 1)
 					.applyTo(_chkLatLonDigits);
 			_chkLatLonDigits.setText(Messages.Slideout_TourMarkerFilter_Checkbox_IsReduceLatLonDigits);
@@ -295,7 +281,8 @@ public class SlideoutTourMarkerFilter extends AnimatedToolTipShell implements IC
 
 			// spinner
 			_spinnerLatLonDigits = new Spinner(parent, SWT.BORDER);
-			GridDataFactory.fillDefaults() //
+			GridDataFactory
+					.fillDefaults() //
 					.align(SWT.END, SWT.CENTER)
 					.applyTo(_spinnerLatLonDigits);
 			_spinnerLatLonDigits.setMinimum(0);
@@ -438,7 +425,8 @@ public class SlideoutTourMarkerFilter extends AnimatedToolTipShell implements IC
 		 * Geo filter
 		 */
 
-		final double stateGeoFilterRange = Util.getStateDouble(_state,//
+		final double stateGeoFilterRange = Util.getStateDouble(
+				_state, //
 				TourMarkerAllView.STATE_GEO_FILTER_AREA,
 				TourMarkerAllView.DEFAULT_GEO_FILTER_AREA);
 
@@ -447,19 +435,20 @@ public class SlideoutTourMarkerFilter extends AnimatedToolTipShell implements IC
 		final TourMarkerItem selectedMarker = _tourMarkerAllView.getFilterMarker();
 		final boolean isGeoFilterActive = selectedMarker == null;
 
-		_lblSelectedMarker.setText(isGeoFilterActive
-				? Messages.Slideout_TourMarkerFilter_Label_GeoFilterNotAvailable
-				: selectedMarker.label);
+		_lblSelectedMarker.setText(
+				isGeoFilterActive
+						? Messages.Slideout_TourMarkerFilter_Label_GeoFilterNotAvailable
+						: selectedMarker.label);
 
 		/*
 		 * Lat/lon digits
 		 */
-		_chkLatLonDigits.setSelection(Util.getStateBoolean(
+		_chkLatLonDigits.setSelection(Util.getStateBoolean(//
 				_state,
 				TourMarkerAllView.STATE_IS_LAT_LON_DIGITS_ENABLED,
 				TourMarkerAllView.DEFAULT_IS_LAT_LON_DIGITS_ENABLED));
 
-		_spinnerLatLonDigits.setSelection(Util.getStateInt(
+		_spinnerLatLonDigits.setSelection(Util.getStateInt(//
 				_state,
 				TourMarkerAllView.STATE_LAT_LON_DIGITS,
 				TourMarkerAllView.DEFAULT_LAT_LON_DIGITS));

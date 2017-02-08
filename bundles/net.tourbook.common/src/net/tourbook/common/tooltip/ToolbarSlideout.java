@@ -35,7 +35,6 @@ public abstract class ToolbarSlideout extends AnimatedToolTipShell {
 
 	private boolean			_isWaitTimerStarted;
 	private boolean			_canOpenToolTip;
-	private boolean			_isAnotherDialogOpened;
 
 	private final class WaitTimer implements Runnable {
 		@Override
@@ -71,18 +70,6 @@ public abstract class ToolbarSlideout extends AnimatedToolTipShell {
 		});
 	}
 
-	@Override
-	protected boolean canCloseToolTip() {
-
-		/*
-		 * Do not hide this dialog when the color selector dialog or other dialogs are opened
-		 * because it will lock the UI completely !!!
-		 */
-
-		final boolean isCanClose = _isAnotherDialogOpened == false;
-
-		return isCanClose;
-	}
 
 	@Override
 	protected boolean canShowToolTip() {
@@ -181,8 +168,5 @@ public abstract class ToolbarSlideout extends AnimatedToolTipShell {
 		}
 	}
 
-	public void setIsAnotherDialogOpened(final boolean isAnotherDialogOpened) {
-		this._isAnotherDialogOpened = isAnotherDialogOpened;
-	}
 
 }

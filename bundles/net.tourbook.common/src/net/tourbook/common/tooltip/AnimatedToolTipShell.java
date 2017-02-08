@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -107,6 +107,14 @@ public abstract class AnimatedToolTipShell {
 	 * which creates a border. Set <code>false</code> to hide the border.
 	 */
 	private boolean						_isShowShellTrimStyle					= true;
+
+	/**
+	 * * When <code>true</code> then this tooltip will not be closed until <code>false</code> is
+	 * set.
+	 * <p>
+	 * This is used to keep this tooltip opened until other shells are close which were opened here.
+	 */
+	private boolean						_isAnotherDialogOpened;
 
 	private Point						_shellStartLocation;
 	private Point						_shellEndLocation						= new Point(0, 0);
@@ -614,7 +622,10 @@ public abstract class AnimatedToolTipShell {
 	 *         default is <code>true</code>.
 	 */
 	protected boolean canCloseToolTip() {
-		return true;
+
+		final boolean isCanClose = _isAnotherDialogOpened == false;
+
+		return isCanClose;
 	}
 
 	/**
@@ -678,7 +689,7 @@ public abstract class AnimatedToolTipShell {
 					 */
 //					| SWT.TOOL
 //					| SWT.RESIZE
-					| SWT.NO_FOCUS
+					| SWT.NO_FOCUS //
 					| trimStyle;
 
 			_shell = new Shell(_ownerControl.getShell(), shellStyle);
@@ -1241,7 +1252,7 @@ public abstract class AnimatedToolTipShell {
 						// ... main window is active
 						_ownerControl.getShell() == _shell.getDisplay().getActiveShell()
 
-						// ... a sub shell is opened
+								// ... a sub shell is opened
 								|| canCloseToolTip() == false) {
 
 							return;
@@ -1316,6 +1327,18 @@ public abstract class AnimatedToolTipShell {
 	 */
 	public void setIsAnimateLocation(final boolean isAnimateLocation) {
 		_isAnimateLocation = isAnimateLocation;
+	}
+
+	/**
+	 * @param isAnotherDialogOpened
+	 *            When <code>true</code> then this tooltip will not be closed until
+	 *            <code>false</code> is set.
+	 *            <p>
+	 *            This is used to keep the tooltip opened until a subshell is closed which were
+	 *            opened in the tooltip.
+	 */
+	public void setIsAnotherDialogOpened(final boolean isAnotherDialogOpened) {
+		_isAnotherDialogOpened = isAnotherDialogOpened;
 	}
 
 	public void setIsFixedBottomLocation(final boolean isFixedBottomLocation) {
@@ -1430,6 +1453,11 @@ public abstract class AnimatedToolTipShell {
 	private void ttHide() {
 
 		if (isShellHidden()) {
+			return;
+		}
+
+		// prevent closing when a sub shell is opened
+		if (canCloseToolTip() == false) {
 			return;
 		}
 

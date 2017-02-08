@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -58,8 +58,8 @@ import org.eclipse.swt.widgets.ToolBar;
 /**
  * Tour chart marker properties slideout.
  */
-public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell implements IFontDialogListener,
-		IColorSelectorListener {
+public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell
+		implements IFontDialogListener, IColorSelectorListener {
 
 	private static final IPreferenceStore	_prefStore			= TourbookPlugin.getPrefStore();
 	private static final IDialogSettings	_segmenterState		= TourSegmenterView.getState();
@@ -108,42 +108,41 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell i
 		};
 	}
 
-	private boolean							_isAnotherDialogOpened;
-	private PixelConverter					_pc;
-	private int								_firstColumnIndent;
+	private PixelConverter			_pc;
+	private int						_firstColumnIndent;
 
-	private TourSegmenterView				_tourSegmenterView;
+	private TourSegmenterView		_tourSegmenterView;
 
-	private Action							_actionRestoreDefaults;
+	private Action					_actionRestoreDefaults;
 
 	/*
 	 * UI controls
 	 */
-	private Composite						_shellContainer;
-	private Composite						_fontContainer;
+	private Composite				_shellContainer;
+	private Composite				_fontContainer;
 
-	private Button							_chkHideSmallValues;
-	private Button							_chkShowDecimalPlaces;
-	private Button							_chkShowSegmentLine;
-	private Button							_chkShowSegmentMarker;
-	private Button							_chkShowSegmentTooltip;
-	private Button							_chkShowSegmentValue;
+	private Button					_chkHideSmallValues;
+	private Button					_chkShowDecimalPlaces;
+	private Button					_chkShowSegmentLine;
+	private Button					_chkShowSegmentMarker;
+	private Button					_chkShowSegmentTooltip;
+	private Button					_chkShowSegmentValue;
 
-	private FontFieldEditorExtended			_valueFontEditor;
+	private FontFieldEditorExtended	_valueFontEditor;
 
-	private ColorSelectorExtended			_colorSegmenterAltitudeUp;
-	private ColorSelectorExtended			_colorSegmenterAltitudeDown;
-	private ColorSelectorExtended			_colorSegmenterTotals;
+	private ColorSelectorExtended	_colorSegmenterAltitudeUp;
+	private ColorSelectorExtended	_colorSegmenterAltitudeDown;
+	private ColorSelectorExtended	_colorSegmenterTotals;
 
-	private Label							_lblGraphOpacity;
-	private Label							_lblHideSmallValuesUnit;
-	private Label							_lblLineOpacity;
-	private Label							_lblVisibleStackedValues;
+	private Label					_lblGraphOpacity;
+	private Label					_lblHideSmallValuesUnit;
+	private Label					_lblLineOpacity;
+	private Label					_lblVisibleStackedValues;
 
-	private Spinner							_spinGraphOpacity;
-	private Spinner							_spinHideSmallValues;
-	private Spinner							_spinLineOpacity;
-	private Spinner							_spinVisibleValuesStacked;
+	private Spinner					_spinGraphOpacity;
+	private Spinner					_spinHideSmallValues;
+	private Spinner					_spinLineOpacity;
+	private Spinner					_spinVisibleValuesStacked;
 
 	private final class WaitTimer implements Runnable {
 		@Override
@@ -184,27 +183,13 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell i
 	}
 
 	@Override
-	protected boolean canCloseToolTip() {
-
-		/*
-		 * Do not hide this dialog when the color selector dialog or other dialogs are opened
-		 * because it will lock the UI completely !!!
-		 */
-
-		final boolean isCanClose = _isAnotherDialogOpened == false;
-
-		return isCanClose;
-	}
-
-	@Override
 	protected boolean canShowToolTip() {
 		return true;
 	}
 
 	@Override
 	public void colorDialogOpened(final boolean isDialogOpened) {
-
-		_isAnotherDialogOpened = isDialogOpened;
+		setIsAnotherDialogOpened(isDialogOpened);
 	}
 
 	private void createActions() {
@@ -247,7 +232,8 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell i
 		{
 			final Composite container = new Composite(_shellContainer, SWT.NONE);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-			GridLayoutFactory.fillDefaults()//
+			GridLayoutFactory
+					.fillDefaults()//
 					.numColumns(4)
 					.applyTo(container);
 //			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
@@ -271,7 +257,8 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell i
 			 * Label: Slideout title
 			 */
 			final Label label = new Label(parent, SWT.NONE);
-			GridDataFactory.fillDefaults()//
+			GridDataFactory
+					.fillDefaults()//
 					.span(3, 1)
 					.applyTo(label);
 			label.setText(Messages.Slideout_SegmenterChartOptions_Label_Title);
@@ -282,7 +269,8 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell i
 	private void createUI_12_Actions(final Composite parent) {
 
 		final ToolBar toolbar = new ToolBar(parent, SWT.FLAT);
-		GridDataFactory.fillDefaults()//
+		GridDataFactory
+				.fillDefaults()//
 				.grab(true, false)
 				.align(SWT.END, SWT.BEGINNING)
 				.applyTo(toolbar);
@@ -301,7 +289,8 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell i
 			 * Checkbox: Show segment line
 			 */
 			_chkShowSegmentLine = new Button(parent, SWT.CHECK);
-			GridDataFactory.fillDefaults()//
+			GridDataFactory
+					.fillDefaults()//
 					.span(2, 1)
 					.applyTo(_chkShowSegmentLine);
 			_chkShowSegmentLine.setText(Messages.Slideout_SegmenterChartOptions_Checkbox_IsShowSegmentLine);
@@ -313,7 +302,8 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell i
 			 */
 			// Label
 			_lblLineOpacity = new Label(parent, SWT.NONE);
-			GridDataFactory.fillDefaults()//
+			GridDataFactory
+					.fillDefaults()//
 					.align(SWT.FILL, SWT.CENTER)
 					.applyTo(_lblLineOpacity);
 			_lblLineOpacity.setText(Messages.Slideout_SegmenterChartOptions_Label_LineOpacity);
@@ -332,7 +322,8 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell i
 			 * Checkbox: Show segment marker
 			 */
 			_chkShowSegmentMarker = new Button(parent, SWT.CHECK);
-			GridDataFactory.fillDefaults()//
+			GridDataFactory
+					.fillDefaults()//
 					.span(2, 1)
 					.applyTo(_chkShowSegmentMarker);
 			_chkShowSegmentMarker.setText(Messages.Slideout_SegmenterChartOptions_Checkbox_IsShowSegmentMarker);
@@ -344,7 +335,8 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell i
 			 */
 			// Label
 			_lblGraphOpacity = new Label(parent, SWT.NONE);
-			GridDataFactory.fillDefaults()//
+			GridDataFactory
+					.fillDefaults()//
 					.align(SWT.FILL, SWT.CENTER)
 					.applyTo(_lblGraphOpacity);
 			_lblGraphOpacity.setText(Messages.Slideout_SegmenterChartOptions_Label_GraphOpacity);
@@ -363,7 +355,8 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell i
 			 * Checkbox: Show segment tooltip
 			 */
 			_chkShowSegmentTooltip = new Button(parent, SWT.CHECK);
-			GridDataFactory.fillDefaults()//
+			GridDataFactory
+					.fillDefaults()//
 					.span(2, 1)
 					.applyTo(_chkShowSegmentTooltip);
 			_chkShowSegmentTooltip.setText(Messages.Slideout_SegmenterChartOptions_Checkbox_IsShowSegmentTooltip);
@@ -378,7 +371,8 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell i
 			 * Checkbox: Show segment value
 			 */
 			_chkShowSegmentValue = new Button(parent, SWT.CHECK);
-			GridDataFactory.fillDefaults()//
+			GridDataFactory
+					.fillDefaults()//
 					.span(4, 1)
 					.applyTo(_chkShowSegmentValue);
 			_chkShowSegmentValue.setText(Messages.Slideout_SegmenterChartOptions_Checkbox_IsShowSegmentValue);
@@ -389,7 +383,8 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell i
 			 * Checkbox: Show decimal places
 			 */
 			_chkShowDecimalPlaces = new Button(parent, SWT.CHECK);
-			GridDataFactory.fillDefaults()//
+			GridDataFactory
+					.fillDefaults()//
 					.span(2, 1)
 					.indent(_firstColumnIndent, 0)
 					.applyTo(_chkShowDecimalPlaces);
@@ -402,7 +397,8 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell i
 			 */
 			// Label
 			_lblVisibleStackedValues = new Label(parent, SWT.NONE);
-			GridDataFactory.fillDefaults()//
+			GridDataFactory
+					.fillDefaults()//
 					.align(SWT.FILL, SWT.CENTER)
 					.applyTo(_lblVisibleStackedValues);
 			_lblVisibleStackedValues.setText(Messages.Slideout_SegmenterChartOptions_Label_StackedValues);
@@ -429,7 +425,8 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell i
 			{
 				// Checkbox
 				_chkHideSmallValues = new Button(containerSmall, SWT.CHECK);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.align(SWT.FILL, SWT.CENTER)
 						.indent(_firstColumnIndent, 0)
 						.applyTo(_chkHideSmallValues);
@@ -448,7 +445,8 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell i
 
 				// Label %
 				_lblHideSmallValuesUnit = new Label(containerSmall, SWT.NONE);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.align(SWT.FILL, SWT.CENTER)
 						.applyTo(_lblHideSmallValuesUnit);
 				_lblHideSmallValuesUnit.setText(UI.SYMBOL_PERCENTAGE);
@@ -459,7 +457,8 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell i
 			 * Font editor
 			 */
 			_fontContainer = new Composite(parent, SWT.NONE);
-			GridDataFactory.fillDefaults()//
+			GridDataFactory
+					.fillDefaults()//
 					.grab(true, false)
 					.span(4, 1)
 					.applyTo(_fontContainer);
@@ -485,7 +484,8 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell i
 			 * Label: Segmenter title
 			 */
 			final Label label = new Label(parent, SWT.NONE);
-			GridDataFactory.fillDefaults()//
+			GridDataFactory
+					.fillDefaults()//
 					.span(4, 1)
 					.applyTo(label);
 			label.setText(Messages.Slideout_SegmenterOptions_Label_Title);
@@ -496,7 +496,8 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell i
 	private void createUI_60_SegmenterColors(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
+		GridDataFactory
+				.fillDefaults()//
 				.grab(true, false)
 				.span(4, 1)
 				.applyTo(container);
@@ -512,7 +513,8 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell i
 					 */
 					// Label
 					final Label label = new Label(containerLeft, SWT.NONE);
-					GridDataFactory.fillDefaults()//
+					GridDataFactory
+							.fillDefaults()//
 							.align(SWT.BEGINNING, SWT.CENTER)
 							.applyTo(label);
 					label.setText(Messages.Slideout_SegmenterOptions_Label_AltitudeUp);
@@ -528,7 +530,8 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell i
 					 */
 					// Label
 					final Label label = new Label(containerLeft, SWT.NONE);
-					GridDataFactory.fillDefaults()//
+					GridDataFactory
+							.fillDefaults()//
 							.align(SWT.BEGINNING, SWT.CENTER)
 							.applyTo(label);
 					label.setText(Messages.Slideout_SegmenterOptions_Label_AltitudeDown);
@@ -550,7 +553,8 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell i
 					 */
 					// Label
 					final Label label = new Label(containerRight, SWT.NONE);
-					GridDataFactory.fillDefaults()//
+					GridDataFactory
+							.fillDefaults()//
 							.align(SWT.BEGINNING, SWT.CENTER)
 							.applyTo(label);
 					label.setText(Messages.Slideout_SegmenterOptions_Label_Totals);
@@ -587,8 +591,7 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell i
 
 	@Override
 	public void fontDialogOpened(final boolean isDialogOpened) {
-
-		_isAnotherDialogOpened = isDialogOpened;
+		setIsAnotherDialogOpened(isDialogOpened);
 	}
 
 	@Override
@@ -790,51 +793,51 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell i
 	private void restoreState() {
 
 		// hide small values
-		_chkHideSmallValues.setSelection(Util.getStateBoolean(
+		_chkHideSmallValues.setSelection(Util.getStateBoolean(//
 				_segmenterState,
 				TourSegmenterView.STATE_IS_HIDE_SMALL_VALUES,
 				TourSegmenterView.STATE_IS_HIDE_SMALL_VALUES_DEFAULT));
-		_spinHideSmallValues.setSelection(Util.getStateInt(
+		_spinHideSmallValues.setSelection(Util.getStateInt(//
 				_segmenterState,
 				TourSegmenterView.STATE_SMALL_VALUE_SIZE,
 				TourSegmenterView.STATE_SMALL_VALUE_SIZE_DEFAULT));
 
 		// show segment lines
-		_chkShowSegmentLine.setSelection(Util.getStateBoolean(
+		_chkShowSegmentLine.setSelection(Util.getStateBoolean(//
 				_segmenterState,
 				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_LINE,
 				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_LINE_DEFAULT));
-		_spinLineOpacity.setSelection(Util.getStateInt(
+		_spinLineOpacity.setSelection(Util.getStateInt(//
 				_segmenterState,
 				TourSegmenterView.STATE_LINE_OPACITY,
 				TourSegmenterView.STATE_LINE_OPACITY_DEFAULT));
 
-		_chkShowDecimalPlaces.setSelection(Util.getStateBoolean(
+		_chkShowDecimalPlaces.setSelection(Util.getStateBoolean(//
 				_segmenterState,
 				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_DECIMAL_PLACES,
 				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_DECIMAL_PLACES_DEFAULT));
 
 		_chkShowSegmentMarker.setSelection(Util.getStateBoolean(
-				_segmenterState,
+				_segmenterState, //
 				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_MARKER,
 				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_MARKER_DEFAULT));
 
-		_chkShowSegmentTooltip.setSelection(Util.getStateBoolean(
+		_chkShowSegmentTooltip.setSelection(Util.getStateBoolean(//
 				_segmenterState,
 				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_TOOLTIP,
 				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_TOOLTIP_DEFAULT));
 
-		_chkShowSegmentValue.setSelection(Util.getStateBoolean(
+		_chkShowSegmentValue.setSelection(Util.getStateBoolean(//
 				_segmenterState,
 				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_VALUE,
 				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_VALUE_DEFAULT));
 
-		_spinGraphOpacity.setSelection(Util.getStateInt(
+		_spinGraphOpacity.setSelection(Util.getStateInt(//
 				_segmenterState,
 				TourSegmenterView.STATE_GRAPH_OPACITY,
 				TourSegmenterView.STATE_GRAPH_OPACITY_DEFAULT));
 
-		_spinVisibleValuesStacked.setSelection(Util.getStateInt(
+		_spinVisibleValuesStacked.setSelection(Util.getStateInt(//
 				_segmenterState,
 				TourSegmenterView.STATE_STACKED_VISIBLE_VALUES,
 				TourSegmenterView.STATE_STACKED_VISIBLE_VALUES_DEFAULT));
@@ -854,17 +857,17 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell i
 		/*
 		 * Colors
 		 */
-		_colorSegmenterAltitudeDown.setColorValue(Util.getStateRGB(
+		_colorSegmenterAltitudeDown.setColorValue(Util.getStateRGB(//
 				_segmenterState,
 				TourSegmenterView.STATE_COLOR_ALTITUDE_DOWN,
 				TourSegmenterView.STATE_COLOR_ALTITUDE_DOWN_DEFAULT));
 
-		_colorSegmenterAltitudeUp.setColorValue(Util.getStateRGB(
+		_colorSegmenterAltitudeUp.setColorValue(Util.getStateRGB(//
 				_segmenterState,
 				TourSegmenterView.STATE_COLOR_ALTITUDE_UP,
 				TourSegmenterView.STATE_COLOR_ALTITUDE_UP_DEFAULT));
 
-		_colorSegmenterTotals.setColorValue(Util.getStateRGB(
+		_colorSegmenterTotals.setColorValue(Util.getStateRGB(//
 				_segmenterState,
 				TourSegmenterView.STATE_COLOR_TOTALS,
 				TourSegmenterView.STATE_COLOR_TOTALS_DEFAULT));
@@ -875,29 +878,39 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell i
 		// !!! font editor saves it's values automatically !!!
 
 		// hide small values
-		_segmenterState.put(TourSegmenterView.STATE_IS_HIDE_SMALL_VALUES, //
+		_segmenterState.put(
+				TourSegmenterView.STATE_IS_HIDE_SMALL_VALUES, //
 				_chkHideSmallValues.getSelection());
-		_segmenterState.put(TourSegmenterView.STATE_SMALL_VALUE_SIZE, //
+		_segmenterState.put(
+				TourSegmenterView.STATE_SMALL_VALUE_SIZE, //
 				_spinHideSmallValues.getSelection());
 
 		// show segment lines
-		_segmenterState.put(TourSegmenterView.STATE_IS_SHOW_SEGMENTER_LINE, //
+		_segmenterState.put(
+				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_LINE, //
 				_chkShowSegmentLine.getSelection());
-		_segmenterState.put(TourSegmenterView.STATE_LINE_OPACITY, //
+		_segmenterState.put(
+				TourSegmenterView.STATE_LINE_OPACITY, //
 				_spinLineOpacity.getSelection());
 
-		_segmenterState.put(TourSegmenterView.STATE_IS_SHOW_SEGMENTER_DECIMAL_PLACES,//
+		_segmenterState.put(
+				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_DECIMAL_PLACES, //
 				_chkShowDecimalPlaces.getSelection());
-		_segmenterState.put(TourSegmenterView.STATE_IS_SHOW_SEGMENTER_MARKER, //
+		_segmenterState.put(
+				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_MARKER, //
 				_chkShowSegmentMarker.getSelection());
-		_segmenterState.put(TourSegmenterView.STATE_IS_SHOW_SEGMENTER_TOOLTIP, //
+		_segmenterState.put(
+				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_TOOLTIP, //
 				_chkShowSegmentTooltip.getSelection());
-		_segmenterState.put(TourSegmenterView.STATE_IS_SHOW_SEGMENTER_VALUE, //
+		_segmenterState.put(
+				TourSegmenterView.STATE_IS_SHOW_SEGMENTER_VALUE, //
 				_chkShowSegmentValue.getSelection());
 
-		_segmenterState.put(TourSegmenterView.STATE_GRAPH_OPACITY, //
+		_segmenterState.put(
+				TourSegmenterView.STATE_GRAPH_OPACITY, //
 				_spinGraphOpacity.getSelection());
-		_segmenterState.put(TourSegmenterView.STATE_STACKED_VISIBLE_VALUES, //
+		_segmenterState.put(
+				TourSegmenterView.STATE_STACKED_VISIBLE_VALUES, //
 				_spinVisibleValuesStacked.getSelection());
 	}
 

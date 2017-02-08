@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -52,7 +52,6 @@ public class SlideoutTourBlogMarker extends AnimatedToolTipShell implements ICol
 
 	private boolean					_isWaitTimerStarted;
 	private boolean					_canOpenToolTip;
-	private boolean					_isAnotherDialogOpened;
 
 	private SelectionAdapter		_defaultSelectionAdapter;
 
@@ -68,11 +67,11 @@ public class SlideoutTourBlogMarker extends AnimatedToolTipShell implements ICol
 	/*
 	 * UI controls
 	 */
-	private Composite				_shellContainer;
-	private TourBlogView			_tourBlogView;
+	private Composite		_shellContainer;
+	private TourBlogView	_tourBlogView;
 
-	private Button					_chkDrawMarkerWithDefaultColor;
-	private Button					_chkShowHiddenMarker;
+	private Button			_chkDrawMarkerWithDefaultColor;
+	private Button			_chkShowHiddenMarker;
 
 	private final class WaitTimer implements Runnable {
 		@Override
@@ -113,19 +112,6 @@ public class SlideoutTourBlogMarker extends AnimatedToolTipShell implements ICol
 	}
 
 	@Override
-	protected boolean canCloseToolTip() {
-
-		/*
-		 * Do not hide this dialog when the color selector dialog or other dialogs are opened
-		 * because it will lock the UI completely !!!
-		 */
-
-		final boolean isCanClose = _isAnotherDialogOpened == false;
-
-		return isCanClose;
-	}
-
-	@Override
 	protected boolean canShowToolTip() {
 		return true;
 	}
@@ -142,8 +128,7 @@ public class SlideoutTourBlogMarker extends AnimatedToolTipShell implements ICol
 
 	@Override
 	public void colorDialogOpened(final boolean isDialogOpened) {
-
-		_isAnotherDialogOpened = isDialogOpened;
+		setIsAnotherDialogOpened(isDialogOpened);
 	}
 
 	@Override
@@ -184,7 +169,8 @@ public class SlideoutTourBlogMarker extends AnimatedToolTipShell implements ICol
 				 * Show hidden marker
 				 */
 				_chkShowHiddenMarker = new Button(container, SWT.CHECK);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.span(2, 1)
 						.applyTo(_chkShowHiddenMarker);
 				_chkShowHiddenMarker.setText(Messages.Slideout_ChartMarkerOptions_Checkbox_IsShowHiddenMarker);
@@ -196,7 +182,8 @@ public class SlideoutTourBlogMarker extends AnimatedToolTipShell implements ICol
 				 * Draw marker with default color
 				 */
 				_chkDrawMarkerWithDefaultColor = new Button(container, SWT.CHECK);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.span(2, 1)
 						.applyTo(_chkDrawMarkerWithDefaultColor);
 
