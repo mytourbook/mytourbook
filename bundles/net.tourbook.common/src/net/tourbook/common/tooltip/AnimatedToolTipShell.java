@@ -18,7 +18,6 @@ package net.tourbook.common.tooltip;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 
-import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Point;
@@ -34,7 +33,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
 
 /**
- * Part of this tooltip is copied from {@link ToolTip}.
+ * Part of this tooltip is copied from {@link org.eclipse.jface.window.ToolTip}.
  */
 public abstract class AnimatedToolTipShell {
 
@@ -109,10 +108,9 @@ public abstract class AnimatedToolTipShell {
 	private boolean						_isShowShellTrimStyle					= true;
 
 	/**
-	 * * When <code>true</code> then this tooltip will not be closed until <code>false</code> is
-	 * set.
-	 * <p>
-	 * This is used to keep this tooltip opened until other shells are close which were opened here.
+	 * When <code>true</code> then the tooltip is <b>not</b> closed. This can be used when the
+	 * tooltip opens another dialog which prevents to close this tooltip, default is
+	 * <code>false</code>.
 	 */
 	private boolean						_isAnotherDialogOpened;
 
@@ -617,18 +615,6 @@ public abstract class AnimatedToolTipShell {
 	}
 
 	/**
-	 * @return When <code>false</code> is returned, the tooltip will <b>not</b> be closed. This can
-	 *         be used when the tooltip opens another dialog which prevents to close this tooltip,
-	 *         default is <code>true</code>.
-	 */
-	protected boolean canCloseToolTip() {
-
-		final boolean isCanClose = _isAnotherDialogOpened == false;
-
-		return isCanClose;
-	}
-
-	/**
 	 * Is called before the tooltip is displayed.
 	 * 
 	 * @return Returns <code>true</code> when the tooltip should be opened, otherwise
@@ -823,6 +809,15 @@ public abstract class AnimatedToolTipShell {
 	}
 
 	/**
+	 * @return When <code>true</code> then the tooltip is <b>not</b> closed. This can be used when
+	 *         the tooltip opens another dialog which prevents to close this tooltip, default is
+	 *         <code>false</code>.
+	 */
+	public boolean isAnotherDialogOpened() {
+		return _isAnotherDialogOpened;
+	}
+
+	/**
 	 * @param displayCursorLocation
 	 * @return Returns <code>true</code> when the tooltip should not be closed.
 	 */
@@ -888,7 +883,7 @@ public abstract class AnimatedToolTipShell {
 			return false;
 		}
 
-		if (canCloseToolTip() == false) {
+		if (isAnotherDialogOpened()) {
 
 //			System.out.println(UI.timeStampNano()
 //					+ " ["
@@ -1253,7 +1248,7 @@ public abstract class AnimatedToolTipShell {
 						_ownerControl.getShell() == _shell.getDisplay().getActiveShell()
 
 								// ... a sub shell is opened
-								|| canCloseToolTip() == false) {
+								|| isAnotherDialogOpened()) {
 
 							return;
 						}
@@ -1457,7 +1452,7 @@ public abstract class AnimatedToolTipShell {
 		}
 
 		// prevent closing when a sub shell is opened
-		if (canCloseToolTip() == false) {
+		if (isAnotherDialogOpened()) {
 			return;
 		}
 

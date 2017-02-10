@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,9 +21,6 @@ import gov.nasa.worldwind.layers.TerrainProfileLayer;
 import java.awt.Dimension;
 
 import net.tourbook.common.UI;
-import net.tourbook.common.tooltip.IToolProvider;
-import net.tourbook.common.tooltip.ToolTip3;
-import net.tourbook.common.tooltip.ToolTip3Tool;
 import net.tourbook.common.util.Util;
 import net.tourbook.map3.Messages;
 import net.tourbook.map3.view.Map3Manager;
@@ -48,38 +45,42 @@ import org.eclipse.swt.widgets.Spinner;
 
 public class DialogTerrainProfileConfig {
 
-	private static final String			STATE_PREFIX							= "STATE_TERRAIN_PROFILE_";				//$NON-NLS-1$
+	private static final String			STATE_PREFIX							= "STATE_TERRAIN_PROFILE_";					//$NON-NLS-1$
 	private static final String			STATE_TERRAIN_PROFILE_FOLLOW			= "STATE_TERRAIN_PROFILE_FOLLOW";			//$NON-NLS-1$
 	private static final String			STATE_TERRAIN_PROFILE_DIMENSION			= "STATE_TERRAIN_PROFILE_DIMENSION";		//$NON-NLS-1$
-	private static final String			STATE_TERRAIN_PROFILE_KEEP_PROPORTIONS	= "STATE_TERRAIN_PROFILE_KEEP_PROPORTIONS"; //$NON-NLS-1$
+	private static final String			STATE_TERRAIN_PROFILE_KEEP_PROPORTIONS	= "STATE_TERRAIN_PROFILE_KEEP_PROPORTIONS";	//$NON-NLS-1$
 	private static final String			STATE_TERRAIN_PROFILE_ZERO_BASED		= "STATE_TERRAIN_PROFILE_ZERO_BASED";		//$NON-NLS-1$
-	private static final String			STATE_TERRAIN_PROFILE_SHOW_EYE			= "STATE_TERRAIN_PROFILE_SHOW_EYE";		//$NON-NLS-1$
+	private static final String			STATE_TERRAIN_PROFILE_SHOW_EYE			= "STATE_TERRAIN_PROFILE_SHOW_EYE";			//$NON-NLS-1$
 	private static final String			STATE_TERRAIN_PROFILE_PROFILE_LENGTH	= "STATE_TERRAIN_PROFILE_PROFILE_LENGTH";	//$NON-NLS-1$
-	private static final String			STATE_TERRAIN_PROFILE_IS_TOOLTIP_MOVED	= "STATE_TERRAIN_PROFILE_IS_TOOLTIP_MOVED"; //$NON-NLS-1$
-
-	private IDialogSettings				_state;
-
-	private WorldWindowGLCanvas			_wwcanvas;
-	private TerrainProfileLayer			_profileLayer;
-
-	private boolean						_isUpdateUI;
+	private static final String			STATE_TERRAIN_PROFILE_IS_TOOLTIP_MOVED	= "STATE_TERRAIN_PROFILE_IS_TOOLTIP_MOVED";	//$NON-NLS-1$
 
 	private static final String[]		DIMENSION_LABEL							= {
+
 			Messages.Terrain_Profile_Dimension_Small,
 			Messages.Terrain_Profile_Dimension_Medium,
-			Messages.Terrain_Profile_Dimension_Large							};
+			Messages.Terrain_Profile_Dimension_Large };
 
 	private static final Dimension[]	DIMENSION_VALUE							= {
+
 			new Dimension(250, 100),
 			new Dimension(450, 140),
-			new Dimension(655, 240)											};
+			new Dimension(655, 240) };
 
 	private static final String[]		FOLLOW_LABEL							= {
+
 			Messages.Terrain_Follow_View,
 			Messages.Terrain_Follow_Cursor,
 			Messages.Terrain_Follow_Eye,
 			Messages.Terrain_Follow_None,
-			Messages.Terrain_Follow_Object										};
+			Messages.Terrain_Follow_Object };
+
+	private IDialogSettings				_state;
+
+	private WorldWindowGLCanvas			_wwcanvas;
+
+	private TerrainProfileLayer			_profileLayer;
+
+	private boolean						_isUpdateUI;
 
 	private SelectionAdapter			_selectionListener;
 
@@ -89,13 +90,17 @@ public class DialogTerrainProfileConfig {
 	private IToolProvider				_toolProvider;
 
 	// UI controls
-	private Combo						_comboDimension;
+	private Shell						_shell;
 
+	private Combo						_comboDimension;
 	private Combo						_comboFollow;
+
 	private Button						_chkShowEye;
 	private Button						_chkKeepProportions;
 	private Button						_chkZeroBased;
+
 	private Label						_lblProfileLength;
+
 	private Spinner						_spinnerProfileLength;
 
 	private class TerrainToolProvider implements IToolProvider {
@@ -165,6 +170,8 @@ public class DialogTerrainProfileConfig {
 				saveState();
 			}
 		});
+
+		_shell = parent.getShell();
 
 		createUI_10(parent);
 
@@ -260,6 +267,7 @@ public class DialogTerrainProfileConfig {
 
 				});
 				_spinnerProfileLength.addMouseWheelListener(new MouseWheelListener() {
+					@Override
 					public void mouseScrolled(final MouseEvent event) {
 						Util.adjustSpinnerValueOnMouseScroll(event);
 						onModify();
@@ -387,17 +395,15 @@ public class DialogTerrainProfileConfig {
 		final boolean isTTMoved = Util.getStateBoolean(_state, STATE_TERRAIN_PROFILE_IS_TOOLTIP_MOVED, false);
 		if (isTTMoved) {
 
-			final DialogMap3Layer map3LayerDialog = Map3Manager.getMap3LayerDialog();
+			final SlideoutMap3Layer map3LayerDialog = Map3Manager.getMap3LayerSlideout();
 			if (map3LayerDialog != null) {
 
-				final Shell dialogShell = map3LayerDialog.getShell();
-				if (dialogShell != null) {
+				if (_shell != null) {
 
-					_initialTTLocation = UI.getInitialLocation(
-							_state,
+					_initialTTLocation = UI.getInitialLocation(_state,
 							STATE_PREFIX,
 							_comboDimension.getShell(),
-							dialogShell);
+							_shell);
 				}
 			}
 		}
@@ -434,13 +440,11 @@ public class DialogTerrainProfileConfig {
 
 				// save dialog position ONLY when moved, when not moved the tooltip is displayed at the default location
 
-				final DialogMap3Layer map3LayerDialog = Map3Manager.getMap3LayerDialog();
+				final SlideoutMap3Layer map3LayerDialog = Map3Manager.getMap3LayerSlideout();
 				if (map3LayerDialog != null) {
 
-					final Shell dialogShell = map3LayerDialog.getShell();
-
-					if (dialogShell != null) {
-						UI.saveDialogBounds(_state, STATE_PREFIX, ttShell, dialogShell);
+					if (_shell != null) {
+						UI.saveDialogBounds(_state, STATE_PREFIX, ttShell, _shell);
 					}
 				}
 			}

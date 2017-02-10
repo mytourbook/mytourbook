@@ -15,11 +15,7 @@
  *******************************************************************************/
 package net.tourbook.map3.ui;
 
-import java.util.ArrayList;
-
 import net.tourbook.common.tooltip.AnimatedToolTipShell;
-import net.tourbook.map3.view.Map3Manager;
-import net.tourbook.map3.view.TVIMap3Layer;
 
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
@@ -91,17 +87,6 @@ public class DialogMap3Layer extends AnimatedToolTipShell {
 	}
 
 	@Override
-	protected boolean canCloseToolTip() {
-
-		/*
-		 * Do not hide this dialog when the color selector dialog or other dialogs are opened
-		 * because it will lock the UI completely !!!
-		 */
-
-		return true;
-	}
-
-	@Override
 	protected boolean canShowToolTip() {
 		return true;
 	}
@@ -119,7 +104,7 @@ public class DialogMap3Layer extends AnimatedToolTipShell {
 	@Override
 	protected Composite createToolTipContentArea(final Composite parent) {
 
-		Map3Manager.setMap3LayerDialog(this);
+//		Map3Manager.setMap3LayerDialog(this);
 
 		return createUI(parent);
 	}
@@ -166,12 +151,6 @@ public class DialogMap3Layer extends AnimatedToolTipShell {
 	protected Rectangle noHideOnMouseMove() {
 
 		return _toolTipItemBounds;
-	}
-
-	@Override
-	protected void onDispose() {
-
-		Map3Manager.setMap3LayerDialog(null);
 	}
 
 	/**
@@ -224,21 +203,6 @@ public class DialogMap3Layer extends AnimatedToolTipShell {
 		if (_canOpenToolTip) {
 			showToolTip();
 		}
-	}
-
-	public void setLayerVisible(final TVIMap3Layer tviLayer, final boolean isVisible) {
-
-		_layerUI.setLayerVisible(tviLayer, isVisible);
-	}
-
-	public void setLayerVisible_TourTrack(final TVIMap3Layer tviLayer, final boolean isTrackVisible) {
-
-		_layerUI.setLayerVisible_TourTrack(tviLayer, isTrackVisible);
-	}
-
-	public void updateUI_NewLayer(final ArrayList<TVIMap3Layer> insertedLayers) {
-
-		_layerUI.updateUI_NewLayer(insertedLayers);
 	}
 
 }

@@ -118,7 +118,7 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
 
 			_slideoutOptions = createSlideout(toolbar);
 
-			updateUI();
+			updateUI_Tooltip();
 		}
 	}
 
@@ -146,6 +146,16 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
 			_actionToolItem.dispose();
 			_actionToolItem = null;
 		}
+
+// THIS DO NOT WORK, AN EXCEPTION IS THROWN BECAUSE OF DISPOSED IMAGE
+//
+//		if (_imageEnabled != null) {
+//			_imageEnabled.dispose();
+//		}
+//
+//		if (_imageDisabled != null) {
+//			_imageDisabled.dispose();
+//		}
 	}
 
 	private void onMouseMove(final ToolItem hoveredItem, final MouseEvent mouseEvent) {
@@ -183,7 +193,7 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
 			return;
 		}
 
-		updateUI();
+		updateUI_Tooltip();
 
 		if (_slideoutOptions.isToolTipVisible() == false) {
 
@@ -237,10 +247,10 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
 
 		_actionToolItem.setSelection(isSelected);
 
-		updateUI();
+		updateUI_Tooltip();
 	}
 
-	private void updateUI() {
+	private void updateUI_Tooltip() {
 
 		if (_actionToolItem.getSelection()) {
 

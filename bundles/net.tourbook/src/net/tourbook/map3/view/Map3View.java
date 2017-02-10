@@ -54,8 +54,10 @@ import net.tourbook.common.color.IGradientColorProvider;
 import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.MapGraphId;
 import net.tourbook.common.color.MapUnits;
+import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.tooltip.OpenDialogManager;
+import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.SWTPopupOverAWT;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -89,6 +91,7 @@ import net.tourbook.map3.layer.tourtrack.TourMap3Position;
 import net.tourbook.map3.layer.tourtrack.TourTrackConfig;
 import net.tourbook.map3.layer.tourtrack.TourTrackConfigManager;
 import net.tourbook.map3.layer.tourtrack.TourTrackLayer;
+import net.tourbook.map3.ui.SlideoutMap3Layer;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageMap3Color;
 import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
@@ -117,6 +120,7 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
@@ -128,6 +132,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IPartListener2;
@@ -155,23 +160,26 @@ public class Map3View extends ViewPart implements ITourProvider {
 	private static final String					STATE_IS_LEGEND_VISIBLE					= "STATE_IS_LEGEND_VISIBLE";								//$NON-NLS-1$
 	private static final String					STATE_IS_MARKER_VISIBLE					= "STATE_IS_MARKER_VISIBLE";								//$NON-NLS-1$
 	private static final String					STATE_IS_SYNC_MAP_VIEW_WITH_TOUR		= "STATE_IS_SYNC_MAP_VIEW_WITH_TOUR";						//$NON-NLS-1$
-	private static final String					STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER	= "STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER";				//$NON-NLS-1$
+	private static final String					STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER	= "STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER";					//$NON-NLS-1$
 	private static final String					STATE_IS_TOUR_VISIBLE					= "STATE_IS_TOUR_VISIBLE";									//$NON-NLS-1$
 	private static final String					STATE_IS_TRACK_SLIDER_VISIBLE			= "STATE_IS_TRACK_SLIDERVISIBLE";							//$NON-NLS-1$
 	private static final String					STATE_MAP3_VIEW							= "STATE_MAP3_VIEW";										//$NON-NLS-1$
 	private static final String					STATE_TOUR_COLOR_ID						= "STATE_TOUR_COLOR_ID";									//$NON-NLS-1$
 
-	private final IPreferenceStore				_prefStore								= TourbookPlugin.getPrefStore();
-
-	private final IDialogSettings				_state									= TourbookPlugin
-																								.getState(getClass()
-																										.getCanonicalName());
-
 	private static final WorldWindowGLCanvas	_wwCanvas								= Map3Manager.getWWCanvas();
+
+// SET_FORMATTING_OFF
+	
+	private static final ImageDescriptor		_map3LayerImageDescriptor				= TourbookPlugin.getImageDescriptor(Messages.Image_Map3_Map3PropertiesView);
+
+	private final IPreferenceStore				_prefStore								= TourbookPlugin.getPrefStore();
+	private final IDialogSettings				_state									= TourbookPlugin.getState(getClass().getCanonicalName());
+	
+// SET_FORMATTING_ON
 
 	private ActionMap3Color						_actionMap3Color;
 	private ActionOpenPrefDialog				_actionMap3Colors;
-//	private ActionOpenGLVersions				_actionOpenGLVersions;
+	//	private ActionOpenGLVersions				_actionOpenGLVersions;
 	private ActionOpenMap3StatisticsView		_actionOpenMap3StatisticsView;
 	private ActionSetTrackSliderPositionLeft	_actionSetTrackSliderLeft;
 	private ActionSetTrackSliderPositionRight	_actionSetTrackSliderRight;
@@ -180,6 +188,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 	private ActionShowEntireTour				_actionShowEntireTour;
 	private ActionShowLegend					_actionShowLegendInMap;
 	private ActionShowMap3Layer					_actionShowMap3Layer;
+	private ActionShowMap3Layer2				_actionShowMap3Layer2;
 	private ActionShowMarker					_actionShowMarker;
 	private ActionShowTourInMap3				_actionShowTourInMap3;
 	private ActionSyncMapWithChartSlider		_actionSynMapWithChartSlider;
@@ -191,7 +200,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 	private ActionTourColor						_actionTourColorPace;
 	private ActionTourColor						_actionTourColorHrZone;
 	private ArrayList<ActionTourColor>			_allColorActions;
-
+	//
 	// context menu actions
 	private ActionEditQuick						_actionEditQuick;
 	private ActionEditTour						_actionEditTour;
@@ -200,7 +209,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 	private ActionOpenMarkerDialog				_actionOpenMarkerDialog;
 	private ActionOpenTour						_actionOpenTour;
 	private ActionPrint							_actionPrintTour;
-
+	//
 	private IPartListener2						_partListener;
 	private ISelectionListener					_postSelectionListener;
 	private IPropertyChangeListener				_prefChangeListener;
@@ -208,13 +217,12 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 	private MouseAdapter						_wwMouseListener;
 
-//	private boolean								_isPartActive;
 	private boolean								_isPartVisible;
 	private boolean								_isRestored;
 	private boolean								_isContextMenuVisible;
-
+	//
 	private ISelection							_lastHiddenSelection;
-
+	//
 	private boolean								_isSyncMapWithChartSlider;
 	private boolean								_isSyncMapViewWithTour;
 
@@ -222,7 +230,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 	 * Contains all tours which are displayed in the map.
 	 */
 	private ArrayList<TourData>					_allTours								= new ArrayList<TourData>();
-
+	//
 	private int									_allTourIdHash;
 	private int									_allTourDataHash;
 
@@ -239,7 +247,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 	private int									_currentLeftSliderValueIndex;
 	private int									_currentRightSliderValueIndex;
 	private Position							_currentTrackInfoSliderPosition;
-
+	//
 	private ITrackPath							_currentHoveredTrack;
 	private Integer								_currentHoveredTrackPosition;
 
@@ -249,6 +257,22 @@ public class Map3View extends ViewPart implements ITourProvider {
 	private Composite							_mapContainer;
 	private Frame								_awtFrame;
 	private Menu								_swtContextMenu;
+
+	private class ActionShowMap3Layer2 extends ActionToolbarSlideout {
+
+		public ActionShowMap3Layer2(final Map3View map3View, final Composite parent) {
+
+			super(_map3LayerImageDescriptor, _map3LayerImageDescriptor);
+
+			//notSelectedTooltip = Messages.Map3_Action_OpenMap3PropertiesView;
+		}
+
+		@Override
+		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+
+			return new SlideoutMap3Layer(toolbar, toolbar);
+		}
+	}
 
 	private class Map3ContextMenu extends SWTPopupOverAWT {
 
@@ -792,6 +816,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 		_actionShowEntireTour = new ActionShowEntireTour(this);
 		_actionShowLegendInMap = new ActionShowLegend(this);
 		_actionShowMap3Layer = new ActionShowMap3Layer(this, parent);
+		_actionShowMap3Layer2 = new ActionShowMap3Layer2(this, parent);
 		_actionShowMarker = new ActionShowMarker(this);
 		_actionShowTourInMap3 = new ActionShowTourInMap3(this, parent);
 		_actionSynMapWithChartSlider = new ActionSyncMapWithChartSlider(this);
@@ -837,7 +862,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 		// Add listener to repopulate the menu each time
 		_swtContextMenu.addMenuListener(new MenuAdapter() {
 
-			boolean	_isFilled;
+			boolean _isFilled;
 
 			@Override
 			public void menuHidden(final MenuEvent e) {
@@ -969,7 +994,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 			final float[] paceSerie = tourData.getPaceSerie();
 			if (paceSerie != null) {
 				final float pace = paceSerie[positionIndex];
-				graphValueText = String.format(
+				graphValueText = String.format(//
 						SLIDER_TEXT_PACE,
 						UI.format_mm_ss((long) pace),
 						UI.UNIT_LABEL_PACE);
@@ -1140,6 +1165,7 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		tbm.add(_actionShowMarker);
 		tbm.add(_actionShowMap3Layer);
+		tbm.add(_actionShowMap3Layer2);
 
 		/*
 		 * fill view menu
@@ -1684,7 +1710,9 @@ public class Map3View extends ViewPart implements ITourProvider {
 		}
 	}
 
-	private void setAnnotationColors(final TourData tourData, final int positionIndex, final GlobeAnnotation trackPoint) {
+	private void setAnnotationColors(	final TourData tourData,
+										final int positionIndex,
+										final GlobeAnnotation trackPoint) {
 
 		final Color bgColor;
 		final Color fgColor;
@@ -1920,7 +1948,8 @@ public class Map3View extends ViewPart implements ITourProvider {
 		Map3Manager.redrawMap();
 	}
 
-	private void showAllTours_Final(final boolean isSyncMapViewWithTour, final ArrayList<TourMap3Position> allPositions) {
+	private void showAllTours_Final(final boolean isSyncMapViewWithTour,
+									final ArrayList<TourMap3Position> allPositions) {
 
 		if (isSyncMapViewWithTour) {
 

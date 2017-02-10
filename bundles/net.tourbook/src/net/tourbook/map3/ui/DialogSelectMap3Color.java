@@ -254,17 +254,6 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
 	}
 
 	@Override
-	protected boolean canCloseToolTip() {
-
-		/*
-		 * Do not hide this dialog when the color selector dialog or other dialogs are opened
-		 * because it will lock the UI completely !!!
-		 */
-
-		return true;
-	}
-
-	@Override
 	protected boolean canShowToolTip() {
 		return true;
 	}
@@ -325,7 +314,8 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
 	private Composite createUI(final Composite parent) {
 
 		_shellContainer = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.fillDefaults()//
+		GridLayoutFactory
+				.fillDefaults()//
 				.margins(SHELL_MARGIN, SHELL_MARGIN)
 				.spacing(0, 0)
 				.applyTo(_shellContainer);
@@ -363,7 +353,7 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
 
 			tableStyle = SWT.CHECK //
 					| SWT.FULL_SELECTION
-//				| SWT.H_SCROLL
+					//				| SWT.H_SCROLL
 					| SWT.V_SCROLL
 					| SWT.NO_SCROLL;
 		} else {
@@ -376,7 +366,8 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
 		}
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
+		GridDataFactory
+				.fillDefaults()//
 				.grab(true, true)
 				.applyTo(container);
 
@@ -499,7 +490,8 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults()//
+		GridLayoutFactory
+				.fillDefaults()//
 				.numColumns(2)
 				.extendedMargins(2, 0, 3, 2)
 				.applyTo(container);
@@ -838,6 +830,7 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
 		return _toolTipItemBounds;
 	}
 
+	@Override
 	public void onDispose() {
 
 		disposeProfileImages();

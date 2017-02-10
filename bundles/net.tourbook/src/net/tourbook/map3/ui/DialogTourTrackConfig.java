@@ -267,8 +267,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 //		_shellContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
 			final Composite container = new Composite(_shellContainer, SWT.NO_FOCUS);
-			GridLayoutFactory
-					.fillDefaults()//
+			GridLayoutFactory.fillDefaults()//
 					.numColumns(2)
 					.applyTo(container);
 //			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
@@ -294,8 +293,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		 * Label: Title
 		 */
 		final Label title = new Label(parent, SWT.LEAD);
-		GridDataFactory
-				.fillDefaults()//
+		GridDataFactory.fillDefaults()//
 				.grab(true, false)
 				.align(SWT.BEGINNING, SWT.CENTER)
 				.applyTo(title);
@@ -312,8 +310,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 			 * Combo: Configutation
 			 */
 			_comboName = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
-			GridDataFactory
-					.fillDefaults()
+			GridDataFactory.fillDefaults()
 					.grab(true, false)
 					.align(SWT.BEGINNING, SWT.CENTER)
 // this is too small in linux
@@ -332,8 +329,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 			 * Button: Reset
 			 */
 			_btnReset = new Button(container, SWT.PUSH);
-			GridDataFactory
-					.fillDefaults()//
+			GridDataFactory.fillDefaults()//
 					.align(SWT.END, SWT.CENTER)
 					.applyTo(_btnReset);
 			_btnReset.setText(Messages.TourTrack_Properties_Button_Default);
@@ -363,8 +359,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 			 * Spinner: Line width
 			 */
 			_spinnerOutlineWidth = new Spinner(parent, SWT.BORDER);
-			GridDataFactory
-					.fillDefaults() //
+			GridDataFactory.fillDefaults() //
 					.align(SWT.BEGINNING, SWT.FILL)
 					.applyTo(_spinnerOutlineWidth);
 			_spinnerOutlineWidth.setMinimum(TourTrackConfigManager.OUTLINE_WIDTH_MIN);
@@ -399,8 +394,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 				 * Size
 				 */
 				_spinnerDirectionArrowSize = new Spinner(container, SWT.BORDER);
-				GridDataFactory
-						.fillDefaults() //
+				GridDataFactory.fillDefaults() //
 						.align(SWT.BEGINNING, SWT.FILL)
 						.applyTo(_spinnerDirectionArrowSize);
 				_spinnerDirectionArrowSize.setMinimum(TourTrackConfigManager.DIRECTION_ARROW_SIZE_MIN);
@@ -414,8 +408,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 				 * Vertical distance
 				 */
 				_spinnerDirectionArrowDistance = new Spinner(container, SWT.BORDER);
-				GridDataFactory
-						.fillDefaults() //
+				GridDataFactory.fillDefaults() //
 						.align(SWT.BEGINNING, SWT.FILL)
 						.applyTo(_spinnerDirectionArrowDistance);
 				_spinnerDirectionArrowDistance.setMinimum(TourTrackConfigManager.DIRECTION_ARROW_VERTICAL_DISTANCE_MIN);
@@ -444,8 +437,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 			 * label: Track position threshold
 			 */
 			_lblTrackPositionThreshold = new Label(parent, SWT.NONE);
-			GridDataFactory
-					.fillDefaults()//
+			GridDataFactory.fillDefaults()//
 					.align(SWT.FILL, SWT.CENTER)
 					.indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
 					.applyTo(_lblTrackPositionThreshold);
@@ -463,8 +455,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 				 * Spinner: Track position threshold
 				 */
 				_spinnerTrackPositionThreshold = new Spinner(container, SWT.BORDER);
-				GridDataFactory
-						.fillDefaults() //
+				GridDataFactory.fillDefaults() //
 						.align(SWT.BEGINNING, SWT.FILL)
 						.applyTo(_spinnerTrackPositionThreshold);
 				_spinnerTrackPositionThreshold.setMinimum(TourTrackConfigManager.TRACK_POSITION_THRESHOLD_MIN);
@@ -490,8 +481,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		 */
 		{
 			_lblTrackColor = new Label(parent, SWT.NONE);
-			GridDataFactory
-					.fillDefaults()//
+			GridDataFactory.fillDefaults()//
 					.align(SWT.FILL, SWT.CENTER)
 					.applyTo(_lblTrackColor);
 
@@ -526,8 +516,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		 */
 		{
 			_lblOutlineColor = new Label(parent, SWT.NONE);
-			GridDataFactory
-					.fillDefaults()//
+			GridDataFactory.fillDefaults()//
 					.align(SWT.FILL, SWT.CENTER)
 					.applyTo(_lblOutlineColor);
 
@@ -550,8 +539,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		 */
 		{
 			_lblOutlineColor_Selected = new Label(parent, SWT.NONE);
-			GridDataFactory
-					.fillDefaults()//
+			GridDataFactory.fillDefaults()//
 					.align(SWT.FILL, SWT.CENTER)
 					.applyTo(_lblOutlineColor_Selected);
 
@@ -574,8 +562,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		 */
 		{
 			final Label label = new Label(parent, SWT.NONE);
-			GridDataFactory
-					.fillDefaults()//
+			GridDataFactory.fillDefaults()//
 					.align(SWT.FILL, SWT.CENTER)
 					.applyTo(label);
 
@@ -639,8 +626,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		 */
 		{
 			_lblInteriorColor = new Label(parent, SWT.NONE);
-			GridDataFactory
-					.fillDefaults()//
+			GridDataFactory.fillDefaults()//
 					.align(SWT.FILL, SWT.CENTER)
 					.indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
 					.applyTo(_lblInteriorColor);
@@ -663,8 +649,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		 */
 		{
 			_lblInteriorColor_Selected = new Label(parent, SWT.NONE);
-			GridDataFactory
-					.fillDefaults()//
+			GridDataFactory.fillDefaults()//
 					.align(SWT.FILL, SWT.CENTER)
 					.indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
 					.applyTo(_lblInteriorColor_Selected);
@@ -687,8 +672,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		 */
 		{
 			_lblInteriorColor_Hovered = new Label(parent, SWT.NONE);
-			GridDataFactory
-					.fillDefaults()//
+			GridDataFactory.fillDefaults()//
 					.align(SWT.FILL, SWT.CENTER)
 					.indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
 					.applyTo(_lblInteriorColor_Hovered);
@@ -711,8 +695,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		 */
 		{
 			_lblInteriorColor_HovSel = new Label(parent, SWT.NONE);
-			GridDataFactory
-					.fillDefaults()//
+			GridDataFactory.fillDefaults()//
 					.align(SWT.FILL, SWT.CENTER)
 					.indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
 					.applyTo(_lblInteriorColor_HovSel);
@@ -737,8 +720,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		 * Checkbox: Draw verticals for the extruded path
 		 */
 		_chkDrawVerticals = new Button(parent, SWT.CHECK);
-		GridDataFactory
-				.fillDefaults()//
+		GridDataFactory.fillDefaults()//
 				.span(2, 1)
 				.indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
 				.applyTo(_chkDrawVerticals);
@@ -774,8 +756,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 			 * checkbox: Altitude offset
 			 */
 			_chkAltitudeOffset = new Button(parent, SWT.CHECK);
-			GridDataFactory
-					.fillDefaults()//
+			GridDataFactory.fillDefaults()//
 					.indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
 					.applyTo(_chkAltitudeOffset);
 			_chkAltitudeOffset.setText(Messages.TourTrack_Properties_Checkbox_AltitudeOffset);
@@ -799,8 +780,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 			 * Radio: Absolute
 			 */
 			_rdoOffsetAbsolute = new Button(parent, SWT.RADIO);
-			GridDataFactory
-					.fillDefaults()//
+			GridDataFactory.fillDefaults()//
 					.indent(2 * UI.FORM_FIRST_COLUMN_INDENT, 0)
 					.applyTo(_rdoOffsetAbsolute);
 			_rdoOffsetAbsolute.setText(Messages.TourTrack_Properties_Radio_AltitudeOffsetAbsolute);
@@ -815,8 +795,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 				 * Spinner: Altitude offset
 				 */
 				_spinnerAltitudeOffsetAbsolute = new Spinner(containerOffsetAbsolute, SWT.BORDER);
-				GridDataFactory
-						.fillDefaults() //
+				GridDataFactory.fillDefaults() //
 						.align(SWT.BEGINNING, SWT.FILL)
 						.applyTo(_spinnerAltitudeOffsetAbsolute);
 				_spinnerAltitudeOffsetAbsolute.setMinimum(TourTrackConfigManager.ALTITUDE_OFFSET_ABSOLUTE_MIN);
@@ -839,8 +818,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 			 * Radio: Relative
 			 */
 			_rdoOffsetRelative = new Button(parent, SWT.RADIO);
-			GridDataFactory
-					.fillDefaults()//
+			GridDataFactory.fillDefaults()//
 					.indent(2 * UI.FORM_FIRST_COLUMN_INDENT, 0)
 					.applyTo(_rdoOffsetRelative);
 			_rdoOffsetRelative.setText(Messages.TourTrack_Properties_Radio_AltitudeOffsetRelative);
@@ -855,8 +833,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 				 * Spinner: Altitude offset relative
 				 */
 				_spinnerAltitudeOffsetRelative = new Spinner(containerOffsetRelative, SWT.BORDER);
-				GridDataFactory
-						.fillDefaults() //
+				GridDataFactory.fillDefaults() //
 						.align(SWT.BEGINNING, SWT.FILL)
 						.applyTo(_spinnerAltitudeOffsetRelative);
 				_spinnerAltitudeOffsetRelative.setMinimum(TourTrackConfigManager.ALTITUDE_OFFSET_RELATIVE_MIN);
@@ -879,8 +856,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 			 * checkbox: Follow terrain
 			 */
 			_chkFollowTerrain = new Button(parent, SWT.CHECK);
-			GridDataFactory
-					.fillDefaults()//
+			GridDataFactory.fillDefaults()//
 					.span(2, 1)
 					.applyTo(_chkFollowTerrain);
 			_chkFollowTerrain.setText(Messages.TourTrack_Properties_Checkbox_IsFollowTerrain);
@@ -920,8 +896,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 	private ColorSelectorExtended createUI_ColorSelector(final Composite parent) {
 
 		final ColorSelectorExtended colorSelector = new ColorSelectorExtended(parent);
-		GridDataFactory
-				.swtDefaults()//
+		GridDataFactory.swtDefaults()//
 				.grab(false, true)
 				.align(SWT.BEGINNING, SWT.BEGINNING)
 				.applyTo(colorSelector.getButton());
@@ -952,8 +927,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 	private Spinner createUI_Spinner_ColorOpacity(final Composite parent) {
 
 		final Spinner spinnerOpacity = new Spinner(parent, SWT.BORDER);
-		GridDataFactory
-				.fillDefaults() //
+		GridDataFactory.fillDefaults() //
 				.align(SWT.BEGINNING, SWT.FILL)
 				.applyTo(spinnerOpacity);
 
@@ -971,8 +945,7 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 	private Spinner createUI_Spinner_PositionSize(final Composite container) {
 
 		final Spinner spinnerPositionSize = new Spinner(container, SWT.BORDER);
-		GridDataFactory
-				.fillDefaults() //
+		GridDataFactory.fillDefaults() //
 				.align(SWT.BEGINNING, SWT.FILL)
 				.applyTo(spinnerPositionSize);
 
@@ -1465,15 +1438,12 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 		final double positionThreshold = Math.pow(10, config.trackPositionThreshold) / 1000;
 
 		_lblTrackPositionThresholdAbsolute.setText(String.format(//
-				FORMAT_POSITION_THRESHOLD,
-				positionThreshold,
-				UI.UNIT_LABEL_DISTANCE));
+				FORMAT_POSITION_THRESHOLD, positionThreshold, UI.UNIT_LABEL_DISTANCE));
 
 		_lblTrackPositionThresholdAbsolute.getParent().layout();
 
 		_lblConfigName.setToolTipText(NLS.bind(//
-				Messages.TourTrack_Properties_Label_Name_Tooltip,
-				config.defaultId));
+				Messages.TourTrack_Properties_Label_Name_Tooltip, config.defaultId));
 	}
 
 	private void updateUI_ComboConfigName(final boolean isReplaceItems) {

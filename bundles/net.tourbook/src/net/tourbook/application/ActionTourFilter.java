@@ -12,14 +12,14 @@ public class ActionTourFilter extends ActionToolbarSlideout {
 
 // SET_FORMATTING_OFF
 
-	private static final ImageDescriptor	actionImage			= TourbookPlugin.getImageDescriptor(Messages.Image__TourFilter);
-	private static final ImageDescriptor	actionImageDisabled	= TourbookPlugin.getImageDescriptor(Messages.Image__TourFilter_Disabled);
+	private static final ImageDescriptor	actionImageDescriptor			= TourbookPlugin.getImageDescriptor(Messages.Image__TourFilter);
+	private static final ImageDescriptor	actionImageDisabledDescriptor	= TourbookPlugin.getImageDescriptor(Messages.Image__TourFilter_Disabled);
 
 // SET_FORMATTING_ON
 
 	public ActionTourFilter() {
 
-		super(actionImage, actionImageDisabled);
+		super(actionImageDescriptor, actionImageDisabledDescriptor);
 
 		isToggleAction = true;
 		notSelectedTooltip = Messages.Tour_Filter_Action_Tooltip;

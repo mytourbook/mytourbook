@@ -16,7 +16,8 @@
 package net.tourbook.map3.view;
 
 import gov.nasa.worldwind.layers.Layer;
-import net.tourbook.common.tooltip.IToolProvider;
+
+import net.tourbook.map3.ui.IToolProvider;
 
 public class TVIMap3Layer extends TVIMap3Item {
 

@@ -13,46 +13,50 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.preferences;
+package net.tourbook.map3.ui;
 
-import net.tourbook.map3.ui.Map3LayerUI;
-import net.tourbook.map3.view.Map3Manager;
+import net.tourbook.common.tooltip.ToolbarSlideout;
 
-import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.eclipse.swt.widgets.ToolBar;
 
-public class PrefPageMap3Layer extends PreferencePage implements IWorkbenchPreferencePage {
+public class SlideoutMap3LayerTooltip extends ToolbarSlideout {
 
-	public static final String	ID	= "net.tourbook.preferences.PrefPageMap3Layer"; //$NON-NLS-1$
+	private Composite	_shellContainer;
 
-	public PrefPageMap3Layer() {
+	private Map3LayerUI	_layerUI;
 
-		noDefaultAndApplyButton();
+	public SlideoutMap3LayerTooltip(final Control ownerControl, final ToolBar toolBar) {
+		super(ownerControl, toolBar);
 	}
 
 	@Override
-	protected Control createContents(final Composite parent) {
+	protected Composite createToolTipContentArea(final Composite parent) {
 
-		// close layer tooltip because the UI could be changed in this pref page
-		Map3Manager.closeMap3LayerTooltip();
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+		return createUI(parent);
+	}
+
+	private Composite createUI(final Composite parent) {
+
+		_shellContainer = new Composite(parent, SWT.NONE);
+		GridLayoutFactory.fillDefaults()//
+				.margins(0, 0)
+				.spacing(0, 0)
+				.applyTo(_shellContainer);
 		{
-			new Map3LayerUI(container);
+			_layerUI = new Map3LayerUI(_shellContainer);
 		}
 
-		return container;
+		return _shellContainer;
 	}
 
 	@Override
-	public void init(final IWorkbench workbench) {}
+	protected void onDispose() {
+
+	}
 
 }

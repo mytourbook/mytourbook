@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.common.tooltip;
+package net.tourbook.map3.ui;
 
 import net.tourbook.common.Messages;
 import net.tourbook.common.UI;
@@ -194,8 +194,8 @@ class FlexTool {
 					.applyTo(_btnDefaultLocation);
 
 			_btnDefaultLocation.setText(btnDefaultText);
-//			_btnDefaultLocation.setText("«");
-//			_btnDefaultLocation.setText("•");
+//			_btnDefaultLocation.setText("ï¿½");
+//			_btnDefaultLocation.setText("ï¿½");
 //			_btnDefaultLocation.setText(Messages.Map3_PropertyTooltip_Action_MoveToDefaultLocation);
 			_btnDefaultLocation.setToolTipText(Messages.Map3_PropertyTooltip_Action_MoveToDefaultLocation_Tooltip);
 

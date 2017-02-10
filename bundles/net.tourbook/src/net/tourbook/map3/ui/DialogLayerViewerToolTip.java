@@ -16,10 +16,8 @@
 package net.tourbook.map3.ui;
 
 import gov.nasa.worldwind.layers.Layer;
+
 import net.tourbook.common.UI;
-import net.tourbook.common.tooltip.IToolProvider;
-import net.tourbook.common.tooltip.ToolProviderAdapter;
-import net.tourbook.common.tooltip.ToolTip3;
 import net.tourbook.map3.Messages;
 import net.tourbook.map3.view.TVIMap3Layer;
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -97,17 +97,6 @@ public class _TEMPLATE_DialogAnimatedToolTipShell extends AnimatedToolTipShell {
 	}
 
 	@Override
-	protected boolean canCloseToolTip() {
-
-		/*
-		 * Do not hide this dialog when other dialogs are opened because it will lock the UI
-		 * completely !!!
-		 */
-
-		return true;
-	}
-
-	@Override
 	protected boolean canShowToolTip() {
 		return true;
 	}
@@ -125,7 +114,8 @@ public class _TEMPLATE_DialogAnimatedToolTipShell extends AnimatedToolTipShell {
 	private Composite createUI(final Composite parent) {
 
 		_shellContainer = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.fillDefaults()//
+		GridLayoutFactory
+				.fillDefaults()//
 				.margins(SHELL_MARGIN, SHELL_MARGIN)
 				.spacing(0, 0)
 				.applyTo(_shellContainer);
@@ -179,6 +169,7 @@ public class _TEMPLATE_DialogAnimatedToolTipShell extends AnimatedToolTipShell {
 		return _toolTipItemBounds;
 	}
 
+	@Override
 	public void onDispose() {
 
 	}

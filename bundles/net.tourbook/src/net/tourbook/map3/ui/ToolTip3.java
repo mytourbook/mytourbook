@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.common.tooltip;
+package net.tourbook.map3.ui;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,6 +23,7 @@ import java.util.Set;
 import javax.tools.ToolProvider;
 
 import net.tourbook.common.UI;
+import net.tourbook.map3.view.Map3Manager;
 
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ViewerCell;
@@ -148,6 +149,7 @@ public abstract class ToolTip3 {
 	}
 
 	private class DisplayFilterListener implements Listener {
+		@Override
 		public void handleEvent(final Event event) {
 
 			switch (event.type) {
@@ -159,6 +161,7 @@ public abstract class ToolTip3 {
 	}
 
 	private class OwnerControlListener implements Listener {
+		@Override
 		public void handleEvent(final Event event) {
 			onOwnerEventControl(event);
 		}
@@ -177,6 +180,7 @@ public abstract class ToolTip3 {
 	}
 
 	private final class OwnerShellListener implements Listener {
+		@Override
 		public void handleEvent(final Event event) {
 			onOwnerEventShell(event);
 		}
@@ -186,6 +190,7 @@ public abstract class ToolTip3 {
 	 * This listener is added to ALL widgets within the tooltip shell.
 	 */
 	private class ToolTipAllControlsListener implements Listener {
+		@Override
 		public void handleEvent(final Event event) {
 			onTTControlEvent(event);
 		}
@@ -205,6 +210,7 @@ public abstract class ToolTip3 {
 	}
 
 	private final class ToolTipShellListener implements Listener {
+		@Override
 		public void handleEvent(final Event event) {
 			onTTShellEvent(event);
 		}
@@ -917,6 +923,25 @@ public abstract class ToolTip3 {
 
 		if (isHide) {
 			checkedShell.setVisible(false);
+			keepParentOpen(false);
+		}
+	}
+
+	/**
+	 * Keep or stop to keep slideout open when a sub tooltip/shell is opened
+	 * 
+	 * @param isKeepOpen
+	 */
+	private void keepParentOpen(final boolean isKeepOpen) {
+
+		final SlideoutMap3Layer map3LayerSlideout = Map3Manager.getMap3LayerSlideout();
+
+		if (map3LayerSlideout != null) {
+			map3LayerSlideout.setIsAnotherDialogOpened(isKeepOpen);
+			System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+					+ ("\tkeepParentOpen: " + isKeepOpen));
+			// TODO remove SYSTEM.OUT.PRINTLN
+
 		}
 	}
 
@@ -946,6 +971,7 @@ public abstract class ToolTip3 {
 		if (defaultLocation == null) {
 
 			toolShell.setVisible(false);
+			keepParentOpen(false);
 
 		} else {
 
@@ -1186,6 +1212,7 @@ public abstract class ToolTip3 {
 
 			_display.asyncExec(new Runnable() {
 
+				@Override
 				public void run() {
 
 					// hide tooltip when another shell is activated
@@ -1404,6 +1431,7 @@ public abstract class ToolTip3 {
 
 				_display.asyncExec(new Runnable() {
 
+					@Override
 					public void run() {
 
 						// hide tooltip when another shell is activated
@@ -1496,6 +1524,8 @@ public abstract class ToolTip3 {
 			shell.setVisible(false);
 
 			removeDisplayFilterListener();
+
+			keepParentOpen(false);
 		}
 	}
 
@@ -1553,6 +1583,8 @@ public abstract class ToolTip3 {
 			return;
 		}
 
+		keepParentOpen(false);
+
 		if (_isShellFadingOut) {
 
 			// shell is already fading out
@@ -1571,6 +1603,9 @@ public abstract class ToolTip3 {
 	 * Show active {@link #_hoveredTool}.
 	 */
 	private void ttShow() {
+
+		// keep slideout open when a sub tooltip/shell is opened
+		keepParentOpen(true);
 
 //		System.out.println(UI.timeStampNano() + " ttShow\t");
 //		// TODO remove SYSTEM.OUT.PRINTLN

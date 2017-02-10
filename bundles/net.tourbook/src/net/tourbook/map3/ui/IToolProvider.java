@@ -1,4 +1,4 @@
-package net.tourbook.common.tooltip;
+package net.tourbook.map3.ui;
 
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
