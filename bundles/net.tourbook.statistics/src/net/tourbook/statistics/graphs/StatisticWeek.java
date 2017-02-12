@@ -270,7 +270,7 @@ public abstract class StatisticWeek extends TourbookStatistic {
 		return allWeeks;
 	}
 
-	void createXDataWeek(final ChartDataModel chartDataModel) {
+	void createXData_Week(final ChartDataModel chartDataModel) {
 
 		// set the x-axis
 		final ChartDataXSerie xData = new ChartDataXSerie(createWeekData());
@@ -280,7 +280,7 @@ public abstract class StatisticWeek extends TourbookStatistic {
 		chartDataModel.setXData(xData);
 	}
 
-	void createYDataAltitude(final ChartDataModel chartDataModel) {
+	void createYData_Altitude(final ChartDataModel chartDataModel) {
 
 		// altitude
 		final ChartDataYSerie yData = new ChartDataYSerie(
@@ -377,7 +377,7 @@ public abstract class StatisticWeek extends TourbookStatistic {
 //		);
 //	}
 
-	void createYDataDistance(final ChartDataModel chartDataModel) {
+	void createYData_Distance(final ChartDataModel chartDataModel) {
 
 		// distance
 		final ChartDataYSerie yData = new ChartDataYSerie(
@@ -401,7 +401,7 @@ public abstract class StatisticWeek extends TourbookStatistic {
 		chartDataModel.addYData(yData);
 	}
 
-	void createYDataDuration(final ChartDataModel chartDataModel) {
+	void createYData_Duration(final ChartDataModel chartDataModel) {
 
 		// duration
 		final ChartDataYSerie yData = new ChartDataYSerie(

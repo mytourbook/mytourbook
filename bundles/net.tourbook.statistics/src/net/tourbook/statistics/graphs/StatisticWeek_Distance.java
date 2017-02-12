@@ -25,8 +25,8 @@ public class StatisticWeek_Distance extends StatisticWeek {
 
 		final ChartDataModel chartDataModel = new ChartDataModel(ChartType.BAR);
 
-		createXDataWeek(chartDataModel);
-		createYDataDistance(chartDataModel);
+		createXData_Week(chartDataModel);
+		createYData_Distance(chartDataModel);
 
 		return chartDataModel;
 	}

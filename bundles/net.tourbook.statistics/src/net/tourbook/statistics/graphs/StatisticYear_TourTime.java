@@ -30,8 +30,8 @@ public class StatisticYear_TourTime extends StatisticYear {
 
 		final ChartDataModel chartDataModel = new ChartDataModel(ChartType.BAR);
 
-		createXDataYear(chartDataModel);
-		createYDataDuration(chartDataModel);
+		createXData_Year(chartDataModel);
+		createYData_Duration(chartDataModel);
 
 		return chartDataModel;
 	}

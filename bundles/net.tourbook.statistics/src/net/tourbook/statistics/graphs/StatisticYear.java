@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,12 +17,14 @@ package net.tourbook.statistics.graphs;
 
 import java.util.ArrayList;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartStatisticSegments;
+import net.tourbook.chart.ChartTitleSegmentConfig;
 import net.tourbook.chart.ChartToolTipInfo;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IChartInfoProvider;
@@ -33,6 +35,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.statistic.StatisticContext;
 import net.tourbook.statistic.TourbookStatistic;
 import net.tourbook.statistics.Messages;
@@ -41,13 +44,16 @@ import net.tourbook.ui.ChartOptions_Grid;
 import net.tourbook.ui.TourTypeFilter;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IViewSite;
 
 public abstract class StatisticYear extends TourbookStatistic {
 
-	private static final String			STRING_SEPARATOR	= " - ";					//$NON-NLS-1$
+	private static final String			STRING_SEPARATOR	= " - ";						//$NON-NLS-1$
+
+	private final IPreferenceStore		_prefStore			= TourbookPlugin.getPrefStore();
 
 	private StatisticContext			_statContext;
 
@@ -128,8 +134,7 @@ public abstract class StatisticYear extends TourbookStatistic {
 		 */
 		final StringBuilder titleString = new StringBuilder();
 
-		final String tourTypeName = StatisticServices.getTourTypeName(
-				serieIndex,
+		final String tourTypeName = StatisticServices.getTourTypeName(serieIndex,
 				valueIndex,
 				_resortedTypeIds,
 				_appTourTypeFilter);
@@ -177,8 +182,7 @@ public abstract class StatisticYear extends TourbookStatistic {
 				breakTime / 3600,
 				(breakTime % 3600) / 60
 		//
-				)
-				.toString();
+		).toString();
 
 		/*
 		 * create tool tip info
@@ -191,7 +195,7 @@ public abstract class StatisticYear extends TourbookStatistic {
 		return toolTipInfo;
 	}
 
-	void createXDataYear(final ChartDataModel chartDataModel) {
+	void createXData_Year(final ChartDataModel chartDataModel) {
 
 		// set the x-axis
 		final ChartDataXSerie xData = new ChartDataXSerie(createYearData(_tourYearData));
@@ -205,10 +209,9 @@ public abstract class StatisticYear extends TourbookStatistic {
 	 * 
 	 * @param chartDataModel
 	 */
-	void createYDataAltitude(final ChartDataModel chartDataModel) {
+	void createYData_Altitude(final ChartDataModel chartDataModel) {
 
-		final ChartDataYSerie yData = new ChartDataYSerie(
-				ChartType.BAR,
+		final ChartDataYSerie yData = new ChartDataYSerie(ChartType.BAR,
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				_resortedAltitudeLow,
 				_resortedAltitudeHigh);
@@ -230,10 +233,9 @@ public abstract class StatisticYear extends TourbookStatistic {
 	 * 
 	 * @param chartDataModel
 	 */
-	void createYDataDistance(final ChartDataModel chartDataModel) {
+	void createYData_Distance(final ChartDataModel chartDataModel) {
 
-		final ChartDataYSerie yData = new ChartDataYSerie(
-				ChartType.BAR,
+		final ChartDataYSerie yData = new ChartDataYSerie(ChartType.BAR,
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				_resortedDistanceLow,
 				_resortedDistanceHigh);
@@ -255,10 +257,9 @@ public abstract class StatisticYear extends TourbookStatistic {
 	 * 
 	 * @param chartDataModel
 	 */
-	void createYDataDuration(final ChartDataModel chartDataModel) {
+	void createYData_Duration(final ChartDataModel chartDataModel) {
 
-		final ChartDataYSerie yData = new ChartDataYSerie(
-				ChartType.BAR,
+		final ChartDataYSerie yData = new ChartDataYSerie(ChartType.BAR,
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				_resortedTimeLow,
 				_resortedTimeHigh);
@@ -489,8 +490,7 @@ public abstract class StatisticYear extends TourbookStatistic {
 		_statFirstYear = statContext.statFirstYear;
 		_statNumberOfYears = statContext.statNumberOfYears;
 
-		_tourYearData = DataProvider_Tour_Year.getInstance().getYearData(
-				statContext.appPerson,
+		_tourYearData = DataProvider_Tour_Year.getInstance().getYearData(statContext.appPerson,
 				statContext.appTourTypeFilter,
 				statContext.statFirstYear,
 				statContext.statNumberOfYears,
@@ -514,9 +514,12 @@ public abstract class StatisticYear extends TourbookStatistic {
 
 		StatisticServices.updateChartProperties(_chart, getGridPrefPrefix());
 
-		// show the fDataModel in the chart
-		_chart.updateChart(chartDataModel, true);
+		// update title segment config AFTER defaults are set above
+		final ChartTitleSegmentConfig ctsConfig = _chart.getChartTitleSegmentConfig();
+		ctsConfig.isShowSegmentSeparator = _prefStore.getBoolean(ITourbookPreferences.STAT_YEAR_IS_SHOW_YEAR_SEPARATOR);
 
+		// show the chart data model in the chart
+		_chart.updateChart(chartDataModel, true);
 	}
 
 	@Override

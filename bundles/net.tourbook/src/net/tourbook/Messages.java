@@ -1371,8 +1371,12 @@ public class Messages extends NLS {
 	public static String		Pref_Statistic_Checkbox_Distance;
 	public static String		Pref_Statistic_Checkbox_Duration;
 
+	public static String		Pref_Statistic_Checkbox_YearSeparator;
 	public static String		Pref_Statistic_Group_DaySummary;
+	public static String		Pref_Statistic_Group_MonthSummary;
 	public static String		Pref_Statistic_Group_TourFrequency;
+	public static String		Pref_Statistic_Group_WeekSummary;
+	public static String		Pref_Statistic_Group_YearSummary;
 
 	public static String		Pref_Statistic_Label_altitude;
 	public static String		Pref_Statistic_Label_distance;

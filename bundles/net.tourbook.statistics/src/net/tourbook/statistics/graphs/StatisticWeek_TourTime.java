@@ -25,8 +25,8 @@ public class StatisticWeek_TourTime extends StatisticWeek {
 
 		final ChartDataModel chartDataModel = new ChartDataModel(ChartType.BAR);
 
-		createXDataWeek(chartDataModel);
-		createYDataDuration(chartDataModel);
+		createXData_Week(chartDataModel);
+		createYData_Duration(chartDataModel);
 
 		return chartDataModel;
 	}

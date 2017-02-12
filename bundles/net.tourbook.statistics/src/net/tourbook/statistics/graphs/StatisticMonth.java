@@ -21,12 +21,14 @@ import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartStatisticSegments;
+import net.tourbook.chart.ChartTitleSegmentConfig;
 import net.tourbook.chart.ChartToolTipInfo;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IChartInfoProvider;
@@ -37,6 +39,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.statistic.StatisticContext;
 import net.tourbook.statistic.TourbookStatistic;
 import net.tourbook.statistics.Messages;
@@ -45,11 +48,14 @@ import net.tourbook.ui.ChartOptions_Grid;
 import net.tourbook.ui.TourTypeFilter;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IViewSite;
 
 public abstract class StatisticMonth extends TourbookStatistic {
+
+	private final IPreferenceStore		_prefStore		= TourbookPlugin.getPrefStore();
 
 	private TourPerson					_appPerson;
 	private TourTypeFilter				_appTourTypeFilter;
@@ -149,9 +155,8 @@ public abstract class StatisticMonth extends TourbookStatistic {
 
 		final LocalDate monthDate = LocalDate.of(oldestYear, 1, 1).plusMonths(valueIndex);
 
-		final String monthText = Month
-				.of(monthDate.getMonthValue())
-				.getDisplayName(TextStyle.FULL, Locale.getDefault());
+		final String monthText = Month.of(monthDate.getMonthValue()).getDisplayName(TextStyle.FULL,
+				Locale.getDefault());
 
 		final Integer recordingTime = _tourMonthData.recordingTime[serieIndex][valueIndex];
 		final Integer drivingTime = _tourMonthData.drivingTime[serieIndex][valueIndex];
@@ -162,8 +167,7 @@ public abstract class StatisticMonth extends TourbookStatistic {
 		 */
 		final StringBuilder sbTitle = new StringBuilder();
 
-		final String tourTypeName = StatisticServices.getTourTypeName(
-				serieIndex,
+		final String tourTypeName = StatisticServices.getTourTypeName(serieIndex,
 				valueIndex,
 				_resortedTypeIds,
 				_appTourTypeFilter);
@@ -172,8 +176,7 @@ public abstract class StatisticMonth extends TourbookStatistic {
 			sbTitle.append(tourTypeName);
 		}
 
-		final String toolTipTitle = String.format(
-				Messages.tourtime_info_date_month,
+		final String toolTipTitle = String.format(Messages.tourtime_info_date_month,
 				sbTitle.toString(),
 				monthText,
 				monthDate.getYear());
@@ -210,8 +213,7 @@ public abstract class StatisticMonth extends TourbookStatistic {
 				breakTime / 3600,
 				(breakTime % 3600) / 60
 		//
-				)
-				.toString();
+		).toString();
 
 		/*
 		 * create tool tip info
@@ -224,7 +226,7 @@ public abstract class StatisticMonth extends TourbookStatistic {
 		return toolTipInfo;
 	}
 
-	void createXDataMonths(final ChartDataModel chartDataModel) {
+	void createXData_Months(final ChartDataModel chartDataModel) {
 
 		// set the x-axis
 		final ChartDataXSerie xData = new ChartDataXSerie(createMonthData(_tourMonthData));
@@ -234,12 +236,11 @@ public abstract class StatisticMonth extends TourbookStatistic {
 		chartDataModel.setXData(xData);
 	}
 
-	void createYDataAltitude(final ChartDataModel chartDataModel) {
+	void createYData_Altitude(final ChartDataModel chartDataModel) {
 
 		// altitude
 
-		final ChartDataYSerie yData = new ChartDataYSerie(
-				ChartType.BAR,
+		final ChartDataYSerie yData = new ChartDataYSerie(ChartType.BAR,
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				_resortedAltitudeLow,
 				_resortedAltitudeHigh);
@@ -256,12 +257,11 @@ public abstract class StatisticMonth extends TourbookStatistic {
 		chartDataModel.addYData(yData);
 	}
 
-	void createYDataDistance(final ChartDataModel chartDataModel) {
+	void createYData_Distance(final ChartDataModel chartDataModel) {
 
 		// distance
 
-		final ChartDataYSerie yData = new ChartDataYSerie(
-				ChartType.BAR,
+		final ChartDataYSerie yData = new ChartDataYSerie(ChartType.BAR,
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				_resortedDistanceLow,
 				_resortedDistanceHigh);
@@ -279,12 +279,11 @@ public abstract class StatisticMonth extends TourbookStatistic {
 		chartDataModel.addYData(yData);
 	}
 
-	void createYDataTourTime(final ChartDataModel chartDataModel) {
+	void createYData_Duration(final ChartDataModel chartDataModel) {
 
 		// duration
 
-		final ChartDataYSerie yData = new ChartDataYSerie(
-				ChartType.BAR,
+		final ChartDataYSerie yData = new ChartDataYSerie(ChartType.BAR,
 				ChartDataYSerie.BAR_LAYOUT_STACKED,
 				_resortedTimeLow,
 				_resortedTimeHigh);
@@ -505,8 +504,7 @@ public abstract class StatisticMonth extends TourbookStatistic {
 		_statFirstYear = statContext.statFirstYear;
 		_statNumberOfYears = statContext.statNumberOfYears;
 
-		_tourMonthData = DataProvider_Tour_Month.getInstance().getMonthData(
-				_appPerson,
+		_tourMonthData = DataProvider_Tour_Month.getInstance().getMonthData(_appPerson,
 				_appTourTypeFilter,
 				_statFirstYear,
 				_statNumberOfYears,
@@ -529,6 +527,11 @@ public abstract class StatisticMonth extends TourbookStatistic {
 		}
 
 		StatisticServices.updateChartProperties(_chart, getGridPrefPrefix());
+
+		// update title segment config AFTER defaults are set above
+		final ChartTitleSegmentConfig ctsConfig = _chart.getChartTitleSegmentConfig();
+		ctsConfig.isShowSegmentSeparator = _prefStore.getBoolean(//
+				ITourbookPreferences.STAT_MONTH_IS_SHOW_YEAR_SEPARATOR);
 
 		// show the fDataModel in the chart
 		_chart.updateChart(chartDataModel, true);
