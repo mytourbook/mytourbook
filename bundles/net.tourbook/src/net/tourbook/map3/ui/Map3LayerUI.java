@@ -70,12 +70,13 @@ import cop.swt.widgets.viewers.table.celleditors.SpinnerCellEditor;
  */
 public class Map3LayerUI {
 
-	private static final String			OPACITY_CAN_NOT_BE_SET	= "...."; //$NON-NLS-1$
+	private static final String			OPACITY_CAN_NOT_BE_SET	= "....";								//$NON-NLS-1$
 
 	public static final Double			DEFAULT_OPACITY			= new Double(1.0);
 
 	private ContainerCheckedTreeViewer	_layerViewer;
-	private DialogLayerViewerToolTip	_propToolTip;
+//	private DialogLayerViewerToolTip	_propToolTip;
+	private SlideoutMap3LayerTooltip	_propToolTip;
 
 	private OpacityEditingSupport		_opacityEditingSupport;
 	private final RangeContent			_opacityRange			= new RangeContent(0.0, 1.0, 0.01, 100);
@@ -88,7 +89,7 @@ public class Map3LayerUI {
 	/*
 	 * UI resources
 	 */
-	private PixelConverter				_pc;
+	private PixelConverter _pc;
 
 	/*
 	 * UI controls
@@ -272,8 +273,8 @@ public class Map3LayerUI {
 			tree = new Tree(layoutContainer, //
 					SWT.H_SCROLL //
 							| SWT.V_SCROLL
-//							| SWT.BORDER
-//							| SWT.MULTI
+							//							| SWT.BORDER
+							//							| SWT.MULTI
 							| SWT.FULL_SELECTION
 							| SWT.CHECK);
 
@@ -343,7 +344,8 @@ public class Map3LayerUI {
 		// hide default tooltip and display the custom tooltip
 		tree.setToolTipText(UI.EMPTY_STRING);
 
-		_propToolTip = new DialogLayerViewerToolTip(_layerViewer);
+//		_propToolTip = new DialogLayerViewerToolTip(_layerViewer);
+		_propToolTip = new SlideoutMap3LayerTooltip(_layerViewer);
 
 		return layoutContainer;
 	}
