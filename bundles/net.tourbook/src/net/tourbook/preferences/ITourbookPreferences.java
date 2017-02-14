@@ -77,19 +77,25 @@ public interface ITourbookPreferences {
 	public static final String	STAT_DAY_IS_SHOW_DURATION						= "STAT_DAY_IS_SHOW_DURATION";								//$NON-NLS-1$
 	public static final String	STAT_DAY_IS_SHOW_YEAR_SEPARATOR					= "STAT_DAY_IS_SHOW_YEAR_SEPARATOR";						//$NON-NLS-1$
 
+	public static final String	STAT_WEEK_CHART_TYPE							= "STAT_WEEK_CHART_TYPE";									//$NON-NLS-1$
 	public static final String	STAT_WEEK_IS_SHOW_ALTITUDE						= "STAT_WEEK_IS_SHOW_ALTITUDE";								//$NON-NLS-1$
 	public static final String	STAT_WEEK_IS_SHOW_DISTANCE						= "STAT_WEEK_IS_SHOW_DISTANCE";								//$NON-NLS-1$
 	public static final String	STAT_WEEK_IS_SHOW_DURATION						= "STAT_WEEK_IS_SHOW_DURATION";								//$NON-NLS-1$
+	public static final String	STAT_WEEK_IS_SHOW_NUM_TOURS						= "STAT_WEEK_IS_SHOW_NUM_TOURS";							//$NON-NLS-1$
 	public static final String	STAT_WEEK_IS_SHOW_YEAR_SEPARATOR				= "STAT_WEEK_IS_SHOW_YEAR_SEPARATOR";						//$NON-NLS-1$
 
+	public static final String	STAT_MONTH_CHART_TYPE							= "STAT_MONTH_CHART_TYPE";									//$NON-NLS-1$
 	public static final String	STAT_MONTH_IS_SHOW_ALTITUDE						= "STAT_MONTH_IS_SHOW_ALTITUDE";							//$NON-NLS-1$
 	public static final String	STAT_MONTH_IS_SHOW_DISTANCE						= "STAT_MONTH_IS_SHOW_DISTANCE";							//$NON-NLS-1$
 	public static final String	STAT_MONTH_IS_SHOW_DURATION						= "STAT_MONTH_IS_SHOW_DURATION";							//$NON-NLS-1$
+	public static final String	STAT_MONTH_IS_SHOW_NUM_TOURS					= "STAT_MONTH_IS_SHOW_NUM_TOURS";							//$NON-NLS-1$
 	public static final String	STAT_MONTH_IS_SHOW_YEAR_SEPARATOR				= "STAT_MONTH_IS_SHOW_YEAR_SEPARATOR";						//$NON-NLS-1$
 
+	public static final String	STAT_YEAR_CHART_TYPE							= "STAT_YEAR_CHART_TYPE";									//$NON-NLS-1$
 	public static final String	STAT_YEAR_IS_SHOW_ALTITUDE						= "STAT_YEAR_IS_SHOW_ALTITUDE";								//$NON-NLS-1$
 	public static final String	STAT_YEAR_IS_SHOW_DISTANCE						= "STAT_YEAR_IS_SHOW_DISTANCE";								//$NON-NLS-1$
 	public static final String	STAT_YEAR_IS_SHOW_DURATION						= "STAT_YEAR_IS_SHOW_DURATION";								//$NON-NLS-1$
+	public static final String	STAT_YEAR_IS_SHOW_NUM_TOURS						= "STAT_YEAR_IS_SHOW_NUM_TOURS";							//$NON-NLS-1$
 	public static final String	STAT_YEAR_IS_SHOW_YEAR_SEPARATOR				= "STAT_YEAR_IS_SHOW_YEAR_SEPARATOR";						//$NON-NLS-1$
 
 	/*

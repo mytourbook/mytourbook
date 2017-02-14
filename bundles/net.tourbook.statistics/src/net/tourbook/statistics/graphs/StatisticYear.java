@@ -64,6 +64,7 @@ public abstract class StatisticYear extends TourbookStatistic {
 	private int							_statNumberOfYears;
 
 	private Chart						_chart;
+	private String						_chartType;
 
 	private final MinMaxKeeper_YData	_minMaxKeeper		= new MinMaxKeeper_YData();
 	private TourData_Year				_tourYearData;
@@ -78,8 +79,11 @@ public abstract class StatisticYear extends TourbookStatistic {
 	private float[][]					_resortedAltitudeHigh;
 	private float[][]					_resortedDistanceLow;
 	private float[][]					_resortedDistanceHigh;
+	private float[][]					_resortedNumToursLow;
+	private float[][]					_resortedNumToursHigh;
 	private float[][]					_resortedTimeLow;
 	private float[][]					_resortedTimeHigh;
+
 
 	public boolean canTourBeVisible() {
 		return false;
@@ -212,7 +216,7 @@ public abstract class StatisticYear extends TourbookStatistic {
 	void createYData_Altitude(final ChartDataModel chartDataModel) {
 
 		final ChartDataYSerie yData = new ChartDataYSerie(ChartType.BAR,
-				ChartDataYSerie.BAR_LAYOUT_STACKED,
+				getChartType(_chartType),
 				_resortedAltitudeLow,
 				_resortedAltitudeHigh);
 
@@ -236,7 +240,7 @@ public abstract class StatisticYear extends TourbookStatistic {
 	void createYData_Distance(final ChartDataModel chartDataModel) {
 
 		final ChartDataYSerie yData = new ChartDataYSerie(ChartType.BAR,
-				ChartDataYSerie.BAR_LAYOUT_STACKED,
+				getChartType(_chartType),
 				_resortedDistanceLow,
 				_resortedDistanceHigh);
 
@@ -260,7 +264,7 @@ public abstract class StatisticYear extends TourbookStatistic {
 	void createYData_Duration(final ChartDataModel chartDataModel) {
 
 		final ChartDataYSerie yData = new ChartDataYSerie(ChartType.BAR,
-				ChartDataYSerie.BAR_LAYOUT_STACKED,
+				getChartType(_chartType),
 				_resortedTimeLow,
 				_resortedTimeHigh);
 
@@ -271,6 +275,30 @@ public abstract class StatisticYear extends TourbookStatistic {
 
 		StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_TIME);
 		StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_TIME, _appTourTypeFilter);
+		StatisticServices.setTourTypeColorIndex(yData, _resortedTypeIds, _appTourTypeFilter);
+
+		chartDataModel.addYData(yData);
+	}
+
+	/**
+	 * Number of tours
+	 * 
+	 * @param chartDataModel
+	 */
+	void createYData_NumTours(final ChartDataModel chartDataModel) {
+
+		final ChartDataYSerie yData = new ChartDataYSerie(ChartType.BAR,
+				getChartType(_chartType),
+				_resortedNumToursLow,
+				_resortedNumToursHigh);
+
+		yData.setYTitle(Messages.LABEL_GRAPH_DISTANCE);
+		yData.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
+		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
+		yData.setShowYSlider(true);
+
+		StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_DISTANCE);
+		StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_DISTANCE, _appTourTypeFilter);
 		StatisticServices.setTourTypeColorIndex(yData, _resortedTypeIds, _appTourTypeFilter);
 
 		chartDataModel.addYData(yData);
@@ -320,6 +348,8 @@ public abstract class StatisticYear extends TourbookStatistic {
 		_resortedAltitudeHigh = new float[barLength][];
 		_resortedDistanceLow = new float[barLength][];
 		_resortedDistanceHigh = new float[barLength][];
+		_resortedNumToursLow = new float[barLength][];
+		_resortedNumToursHigh = new float[barLength][];
 		_resortedTimeLow = new float[barLength][];
 		_resortedTimeHigh = new float[barLength][];
 
@@ -333,6 +363,8 @@ public abstract class StatisticYear extends TourbookStatistic {
 			_resortedAltitudeHigh = new float[1][1];
 			_resortedDistanceLow = new float[1][1];
 			_resortedDistanceHigh = new float[1][1];
+			_resortedNumToursLow = new float[1][1];
+			_resortedNumToursHigh = new float[1][1];
 			_resortedTimeLow = new float[1][1];
 			_resortedTimeHigh = new float[1][1];
 
@@ -347,6 +379,8 @@ public abstract class StatisticYear extends TourbookStatistic {
 		final float[][] altitudeHighValues = _tourYearData.altitudeHigh;
 		final float[][] distanceLowValues = _tourYearData.distanceLow;
 		final float[][] distanceHighValues = _tourYearData.distanceHigh;
+//		final float[][] numToursLowValues = _tourYearData.numToursLow;
+//		final float[][] numToursHighValues = _tourYearData.numToursHigh;
 		final float[][] timeLowValues = _tourYearData.getDurationTimeLowFloat();
 		final float[][] timeHighValues = _tourYearData.getDurationTimeHighFloat();
 
@@ -363,6 +397,8 @@ public abstract class StatisticYear extends TourbookStatistic {
 				_resortedAltitudeHigh[resortedIndex] = altitudeHighValues[serieIndex];
 				_resortedDistanceLow[resortedIndex] = distanceLowValues[serieIndex];
 				_resortedDistanceHigh[resortedIndex] = distanceHighValues[serieIndex];
+//				_resortedNumToursLow[resortedIndex] = numToursLowValues[serieIndex];
+//				_resortedNumToursHigh[resortedIndex] = numToursHighValues[serieIndex];
 				_resortedTimeLow[resortedIndex] = timeLowValues[serieIndex];
 				_resortedTimeHigh[resortedIndex] = timeHighValues[serieIndex];
 
@@ -378,6 +414,8 @@ public abstract class StatisticYear extends TourbookStatistic {
 				_resortedAltitudeHigh[resortedIndex] = altitudeHighValues[serieIndex];
 				_resortedDistanceLow[resortedIndex] = distanceLowValues[serieIndex];
 				_resortedDistanceHigh[resortedIndex] = distanceHighValues[serieIndex];
+//				_resortedNumToursLow[resortedIndex] = numToursLowValues[serieIndex];
+//				_resortedNumToursHigh[resortedIndex] = numToursHighValues[serieIndex];
 				_resortedTimeLow[resortedIndex] = timeLowValues[serieIndex];
 				_resortedTimeHigh[resortedIndex] = timeHighValues[serieIndex];
 
@@ -397,6 +435,8 @@ public abstract class StatisticYear extends TourbookStatistic {
 				_resortedAltitudeHigh[resortedIndex] = altitudeHighValues[serieIndex];
 				_resortedDistanceLow[resortedIndex] = distanceLowValues[serieIndex];
 				_resortedDistanceHigh[resortedIndex] = distanceHighValues[serieIndex];
+//				_resortedNumToursLow[resortedIndex] = numToursLowValues[serieIndex];
+//				_resortedNumToursHigh[resortedIndex] = numToursHighValues[serieIndex];
 				_resortedTimeLow[resortedIndex] = timeLowValues[serieIndex];
 				_resortedTimeHigh[resortedIndex] = timeHighValues[serieIndex];
 
@@ -412,6 +452,8 @@ public abstract class StatisticYear extends TourbookStatistic {
 				_resortedAltitudeHigh[resortedIndex] = altitudeHighValues[serieIndex];
 				_resortedDistanceLow[resortedIndex] = distanceLowValues[serieIndex];
 				_resortedDistanceHigh[resortedIndex] = distanceHighValues[serieIndex];
+//				_resortedNumToursLow[resortedIndex] = numToursLowValues[serieIndex];
+//				_resortedNumToursHigh[resortedIndex] = numToursHighValues[serieIndex];
 				_resortedTimeLow[resortedIndex] = timeLowValues[serieIndex];
 				_resortedTimeHigh[resortedIndex] = timeHighValues[serieIndex];
 
@@ -479,6 +521,8 @@ public abstract class StatisticYear extends TourbookStatistic {
 
 	@Override
 	public void updateStatistic(final StatisticContext statContext) {
+
+		_chartType = _prefStore.getString(ITourbookPreferences.STAT_YEAR_CHART_TYPE);
 
 		_statContext = statContext;
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -76,22 +76,23 @@ public class DataProvider_Tour_Year extends DataProvider {
 		final SQLFilter sqlFilter = new SQLFilter();
 
 		final String sqlString = //
-		"SELECT " // //$NON-NLS-1$
-				+ "StartYear				, " // 		1 //$NON-NLS-1$
-				+ "SUM(TOURDISTANCE)		, " // 		2 //$NON-NLS-1$
-				+ "SUM(TOURALTUP)			, " // 		3 //$NON-NLS-1$
-				+ "SUM(CASE WHEN tourDrivingTime > 0 THEN tourDrivingTime ELSE tourRecordingTime END)," // 4 //$NON-NLS-1$
-				+ "SUM(TourRecordingTime)	, " //		5 //$NON-NLS-1$
-				+ "SUM(TourDrivingTime)		, " //		6 //$NON-NLS-1$
-				+ "tourType_typeId 			\n" //		7 //$NON-NLS-1$
+				"SELECT " // //$NON-NLS-1$
+						+ "StartYear				, " // 		1 //$NON-NLS-1$
+						+ "SUM(TOURDISTANCE)		, " // 		2 //$NON-NLS-1$
+						+ "SUM(TOURALTUP)			, " // 		3 //$NON-NLS-1$
+						+ "SUM(CASE WHEN tourDrivingTime > 0 THEN tourDrivingTime ELSE tourRecordingTime END)," // 4 //$NON-NLS-1$
+						+ "SUM(TourRecordingTime)	, " //		5 //$NON-NLS-1$
+						+ "SUM(TourDrivingTime)		, " //		6 //$NON-NLS-1$
+						+ "SUM(1)					, " //		7 //$NON-NLS-1$
+						+ "tourType_typeId 			\n" //		8 //$NON-NLS-1$
 
-				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
+						+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
 
-				+ (" WHERE STARTYEAR IN (" + getYearList(lastYear, numYears) + ")") //$NON-NLS-1$ //$NON-NLS-2$
-				+ sqlFilter.getWhereClause()
+						+ (" WHERE STARTYEAR IN (" + getYearList(lastYear, numYears) + ")") //$NON-NLS-1$ //$NON-NLS-2$
+						+ sqlFilter.getWhereClause()
 
-				+ (" GROUP BY STARTYEAR, tourType_typeId") //$NON-NLS-1$
-				+ (" ORDER BY STARTYEAR"); //$NON-NLS-1$
+						+ (" GROUP BY STARTYEAR, tourType_typeId") //$NON-NLS-1$
+						+ (" ORDER BY STARTYEAR"); //$NON-NLS-1$
 
 		int colorOffset = 0;
 		if (tourTypeFilter.showUndefinedTourTypes()) {
@@ -106,6 +107,7 @@ public class DataProvider_Tour_Year extends DataProvider {
 			final float[][] dbDistance = new float[numTourTypes][numYears];
 			final float[][] dbAltitude = new float[numTourTypes][numYears];
 			final int[][] dbDurationTime = new int[numTourTypes][numYears];
+			final int[][] dbNumTours = new int[numTourTypes][numYears];
 
 			final int[][] dbRecordingTime = new int[numTourTypes][numYears];
 			final int[][] dbDrivingTime = new int[numTourTypes][numYears];
@@ -129,7 +131,8 @@ public class DataProvider_Tour_Year extends DataProvider {
 				final int duration = result.getInt(4);
 				final int recordingTime = result.getInt(5);
 				final int drivingTime = result.getInt(6);
-				final Long tourTypeIdObject = (Long) result.getObject(7);
+				final int numTours = result.getInt(7);
+				final Long tourTypeIdObject = (Long) result.getObject(8);
 
 				final int yearIndex = numYears - (lastYear - resultYear + 1);
 
@@ -161,6 +164,7 @@ public class DataProvider_Tour_Year extends DataProvider {
 				dbAltitude[colorIndex][yearIndex] = altitude;
 				dbDistance[colorIndex][yearIndex] = distance;
 				dbDurationTime[colorIndex][yearIndex] = duration;
+				dbNumTours[colorIndex][yearIndex] = numTours;
 
 				dbRecordingTime[colorIndex][yearIndex] = recordingTime;
 				dbDrivingTime[colorIndex][yearIndex] = drivingTime;
@@ -187,6 +191,7 @@ public class DataProvider_Tour_Year extends DataProvider {
 			final ArrayList<Object> altitudeWithData = new ArrayList<Object>();
 			final ArrayList<Object> distanceWithData = new ArrayList<Object>();
 			final ArrayList<Object> durationWithData = new ArrayList<Object>();
+			final ArrayList<Object> numToursWithData = new ArrayList<Object>();
 			final ArrayList<Object> recordingTimeWithData = new ArrayList<Object>();
 			final ArrayList<Object> drivingTimeWithData = new ArrayList<Object>();
 			final ArrayList<Object> breakTimeWithData = new ArrayList<Object>();
@@ -202,6 +207,7 @@ public class DataProvider_Tour_Year extends DataProvider {
 					altitudeWithData.add(dbAltitude[tourTypeIndex]);
 					distanceWithData.add(dbDistance[tourTypeIndex]);
 					durationWithData.add(dbDurationTime[tourTypeIndex]);
+					numToursWithData.add(dbNumTours[tourTypeIndex]);
 
 					recordingTimeWithData.add(dbRecordingTime[tourTypeIndex]);
 					drivingTimeWithData.add(dbDrivingTime[tourTypeIndex]);
@@ -234,6 +240,9 @@ public class DataProvider_Tour_Year extends DataProvider {
 				_tourDataYear.drivingTime = new int[1][numYears];
 				_tourDataYear.breakTime = new int[1][numYears];
 
+//				_tourDataYear.numToursLow = new int[1][numYears];
+//				_tourDataYear.numToursHigh = new int[1][numYears];
+
 			} else {
 
 				final long[][] usedTypeIds = new long[numUsedTourTypes][];
@@ -244,6 +253,7 @@ public class DataProvider_Tour_Year extends DataProvider {
 				final int[][] usedRecordingTime = new int[numUsedTourTypes][];
 				final int[][] usedDrivingTime = new int[numUsedTourTypes][];
 				final int[][] usedBreakTime = new int[numUsedTourTypes][];
+				final int[][] usedNumTours = new int[numUsedTourTypes][];
 
 				for (int index = 0; index < numUsedTourTypes; index++) {
 
@@ -256,6 +266,8 @@ public class DataProvider_Tour_Year extends DataProvider {
 					usedRecordingTime[index] = (int[]) recordingTimeWithData.get(index);
 					usedDrivingTime[index] = (int[]) drivingTimeWithData.get(index);
 					usedBreakTime[index] = (int[]) breakTimeWithData.get(index);
+
+					usedNumTours[index] = (int[]) numToursWithData.get(index);
 				}
 
 				_tourDataYear.typeIds = usedTypeIds;

@@ -39,6 +39,7 @@ public class StatisticYear_Summary extends StatisticYear {
 	private boolean					_isShowAltitude;
 	private boolean					_isShowDistance;
 	private boolean					_isShowDuration;
+	private boolean					_isShowNumTours;
 
 	private void addPrefListener(final Composite container) {
 
@@ -49,11 +50,15 @@ public class StatisticYear_Summary extends StatisticYear {
 
 				final String property = event.getProperty();
 
-				// observe which data are displayed
-				if (property.equals(ITourbookPreferences.STAT_YEAR_IS_SHOW_ALTITUDE)
+				// observe changes in stat options
+				if (property.equals(ITourbookPreferences.STAT_YEAR_CHART_TYPE)
+						|| property.equals(ITourbookPreferences.STAT_YEAR_IS_SHOW_ALTITUDE)
 						|| property.equals(ITourbookPreferences.STAT_YEAR_IS_SHOW_DISTANCE)
 						|| property.equals(ITourbookPreferences.STAT_YEAR_IS_SHOW_DURATION)
-						|| property.equals(ITourbookPreferences.STAT_YEAR_IS_SHOW_YEAR_SEPARATOR)) {
+						|| property.equals(ITourbookPreferences.STAT_YEAR_IS_SHOW_NUM_TOURS)
+						|| property.equals(ITourbookPreferences.STAT_YEAR_IS_SHOW_YEAR_SEPARATOR)
+				//
+				) {
 
 					// get the changed preferences
 					getPreferences();
@@ -109,6 +114,10 @@ public class StatisticYear_Summary extends StatisticYear {
 			createYData_Duration(chartDataModel);
 		}
 
+		if (_isShowNumTours) {
+//			createYData_NumTours(chartDataModel);
+		}
+
 		return chartDataModel;
 	}
 
@@ -122,6 +131,7 @@ public class StatisticYear_Summary extends StatisticYear {
 		_isShowAltitude = _prefStore.getBoolean(ITourbookPreferences.STAT_YEAR_IS_SHOW_ALTITUDE);
 		_isShowDistance = _prefStore.getBoolean(ITourbookPreferences.STAT_YEAR_IS_SHOW_DISTANCE);
 		_isShowDuration = _prefStore.getBoolean(ITourbookPreferences.STAT_YEAR_IS_SHOW_DURATION);
+		_isShowNumTours = _prefStore.getBoolean(ITourbookPreferences.STAT_YEAR_IS_SHOW_NUM_TOURS);
 	}
 
 	@Override

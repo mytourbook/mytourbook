@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -64,6 +64,7 @@ public abstract class StatisticMonth extends TourbookStatistic {
 	private int							_statNumberOfYears;
 
 	private Chart						_chart;
+	private String						_chartType;
 	private final MinMaxKeeper_YData	_minMaxKeeper	= new MinMaxKeeper_YData();
 
 	private boolean						_isSynchScaleEnabled;
@@ -241,7 +242,7 @@ public abstract class StatisticMonth extends TourbookStatistic {
 		// altitude
 
 		final ChartDataYSerie yData = new ChartDataYSerie(ChartType.BAR,
-				ChartDataYSerie.BAR_LAYOUT_STACKED,
+				getChartType(_chartType),
 				_resortedAltitudeLow,
 				_resortedAltitudeHigh);
 
@@ -262,7 +263,7 @@ public abstract class StatisticMonth extends TourbookStatistic {
 		// distance
 
 		final ChartDataYSerie yData = new ChartDataYSerie(ChartType.BAR,
-				ChartDataYSerie.BAR_LAYOUT_STACKED,
+				getChartType(_chartType),
 				_resortedDistanceLow,
 				_resortedDistanceHigh);
 
@@ -284,7 +285,7 @@ public abstract class StatisticMonth extends TourbookStatistic {
 		// duration
 
 		final ChartDataYSerie yData = new ChartDataYSerie(ChartType.BAR,
-				ChartDataYSerie.BAR_LAYOUT_STACKED,
+				getChartType(_chartType),
 				_resortedTimeLow,
 				_resortedTimeHigh);
 
@@ -493,6 +494,8 @@ public abstract class StatisticMonth extends TourbookStatistic {
 
 	@Override
 	public void updateStatistic(final StatisticContext statContext) {
+
+		_chartType = _prefStore.getString(ITourbookPreferences.STAT_MONTH_CHART_TYPE);
 
 		_statContext = statContext;
 

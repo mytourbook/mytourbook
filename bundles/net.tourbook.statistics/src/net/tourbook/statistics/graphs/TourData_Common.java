@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -25,11 +25,14 @@ public abstract class TourData_Common {
 	long[][]			typeIds;
 	int[][]				typeColorIndex;
 
+	float[][]			altitudeLow;
+	float[][]			altitudeHigh;
+
 	float[][]			distanceLow;
 	float[][]			distanceHigh;
 
-	float[][]			altitudeLow;
-	float[][]			altitudeHigh;
+//	float[][]			numToursLow;
+//	float[][]			numToursHigh;
 
 	private float[][]	_durationTimeLowFloat;
 	private float[][]	_durationTimeHighFloat;

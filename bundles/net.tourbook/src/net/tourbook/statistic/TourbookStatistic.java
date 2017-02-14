@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,8 @@
 package net.tourbook.statistic;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.chart.ChartDataSerie;
+import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.ChartOptions_Grid;
 
@@ -31,7 +33,7 @@ import org.eclipse.ui.IViewSite;
  */
 public abstract class TourbookStatistic {
 
-	protected static final String	STATE_SELECTED_TOUR_ID						= "STATE_SELECTED_TOUR_ID";					//$NON-NLS-1$
+	protected static final String	STATE_SELECTED_TOUR_ID						= "STATE_SELECTED_TOUR_ID";						//$NON-NLS-1$
 
 	protected static final String	STATE_BAR_ORDERING_MONTH_ALTITUDE			= "STATE_BAR_ORDERING_MONTH_ALTITUDE";			//$NON-NLS-1$
 	protected static final String	STATE_BAR_ORDERING_MONTH_DISTANCE			= "STATE_BAR_ORDERING_MONTH_DISTANCE";			//$NON-NLS-1$
@@ -43,14 +45,14 @@ public abstract class TourbookStatistic {
 	protected static final String	STATE_BAR_ORDERING_YEAR_SUMMARY				= "STATE_BAR_ORDERING_YEAR_SUMMARY";			//$NON-NLS-1$
 	protected static final String	STATE_BAR_ORDERING_YEAR_TIME				= "STATE_BAR_ORDERING_YEAR_TIME";				//$NON-NLS-1$
 
-	protected static final String	STATE_BAR_ORDERING_HR_ZONE_START_FOR_MONTH	= "STATE_BAR_ORDERING_HR_ZONE_START_FOR_MONTH"; ////$NON-NLS-1$
+	protected static final String	STATE_BAR_ORDERING_HR_ZONE_START_FOR_MONTH	= "STATE_BAR_ORDERING_HR_ZONE_START_FOR_MONTH";	////$NON-NLS-1$
 
 	/*
 	 * Grid prefixes
 	 */
 	protected static final String	GRID_DAY_ALTITUDE							= "GRID_DAY_ALTITUDE__";						//$NON-NLS-1$
 	protected static final String	GRID_DAY_DISTANCE							= "GRID_DAY_DISTANCE__";						//$NON-NLS-1$
-	protected static final String	GRID_DAY_SUMMARY							= "GRID_DAY_SUMMARY__";						//$NON-NLS-1$
+	protected static final String	GRID_DAY_SUMMARY							= "GRID_DAY_SUMMARY__";							//$NON-NLS-1$
 	protected static final String	GRID_DAY_TIME								= "GRID_DAY_TIME__";							//$NON-NLS-1$
 
 	protected static final String	GRID_WEEK_ALTITUDE							= "GRID_WEEK_ALTITUDE__";						//$NON-NLS-1$
@@ -88,7 +90,7 @@ public abstract class TourbookStatistic {
 
 	private boolean					_isDataDirty;
 
-	private final IPreferenceStore	_prefStore									= TourbookPlugin.getPrefStore();
+	protected final IPreferenceStore	_prefStore									= TourbookPlugin.getPrefStore();
 
 	private IPropertyChangeListener	_prefChangeListener;
 
@@ -119,7 +121,7 @@ public abstract class TourbookStatistic {
 
 				// test if the color or statistic data have changed
 				if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)
-				//
+						//
 						|| property.equals(gridHDistance)
 						|| property.equals(gridVDistance)
 						|| property.equals(gridIsHGridline)
@@ -201,6 +203,26 @@ public abstract class TourbookStatistic {
 			return false;
 		}
 		return true;
+	}
+
+	/**
+	 * Convert 'old' chart type format into 'new' format.
+	 * 
+	 * @param _chartType
+	 * @return
+	 */
+	protected int getChartType(final String _chartType) {
+
+		switch (_chartType) {
+
+		case ChartDataSerie.CHART_TYPE_BAR_ADJACENT:
+			return ChartDataYSerie.BAR_LAYOUT_BESIDE;
+
+		case ChartDataSerie.CHART_TYPE_BAR_STACKED:
+			return ChartDataYSerie.BAR_LAYOUT_STACKED;
+		}
+
+		return ChartDataYSerie.BAR_LAYOUT_STACKED;
 	}
 
 	/**

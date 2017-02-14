@@ -1,0 +1,27 @@
+Version 17.3                                              ?. March 2017
+
+
+New 	
+===
+
+* Statistics
+
+  - Show number of tours in week/month/year summary
+  - Select bar chart type between adjacent/stacked for week/month/year summary
+ 
+
+Improvements 	
+============
+
+* Statistics
+
+  - Select statistics which should be displayed in the week/month/year summary
+  - Show/hide year separator in month/year summary
+  
+ 
+Bugfix 	
+======
+
+These problems are fixed
+
+* 

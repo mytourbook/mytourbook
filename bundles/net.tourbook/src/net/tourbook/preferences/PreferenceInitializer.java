@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,6 +17,7 @@ package net.tourbook.preferences;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
+import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StringToArrayConverter;
 import net.tourbook.data.TourMarker;
@@ -97,19 +98,25 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ITourbookPreferences.STAT_DAY_IS_SHOW_DURATION, true);
 		store.setDefault(ITourbookPreferences.STAT_DAY_IS_SHOW_YEAR_SEPARATOR, true);
 
+		store.setDefault(ITourbookPreferences.STAT_WEEK_CHART_TYPE, ChartDataSerie.CHART_TYPE_BAR_STACKED);
 		store.setDefault(ITourbookPreferences.STAT_WEEK_IS_SHOW_ALTITUDE, true);
 		store.setDefault(ITourbookPreferences.STAT_WEEK_IS_SHOW_DISTANCE, true);
 		store.setDefault(ITourbookPreferences.STAT_WEEK_IS_SHOW_DURATION, true);
+		store.setDefault(ITourbookPreferences.STAT_WEEK_IS_SHOW_NUM_TOURS, true);
 		store.setDefault(ITourbookPreferences.STAT_WEEK_IS_SHOW_YEAR_SEPARATOR, true);
 		
+		store.setDefault(ITourbookPreferences.STAT_MONTH_CHART_TYPE, ChartDataSerie.CHART_TYPE_BAR_STACKED);
 		store.setDefault(ITourbookPreferences.STAT_MONTH_IS_SHOW_ALTITUDE, true);
 		store.setDefault(ITourbookPreferences.STAT_MONTH_IS_SHOW_DISTANCE, true);
 		store.setDefault(ITourbookPreferences.STAT_MONTH_IS_SHOW_DURATION, true);
+		store.setDefault(ITourbookPreferences.STAT_MONTH_IS_SHOW_NUM_TOURS, true);
 		store.setDefault(ITourbookPreferences.STAT_MONTH_IS_SHOW_YEAR_SEPARATOR, true);
 		
+		store.setDefault(ITourbookPreferences.STAT_YEAR_CHART_TYPE, ChartDataSerie.CHART_TYPE_BAR_STACKED);
 		store.setDefault(ITourbookPreferences.STAT_YEAR_IS_SHOW_ALTITUDE, true);
 		store.setDefault(ITourbookPreferences.STAT_YEAR_IS_SHOW_DISTANCE, true);
 		store.setDefault(ITourbookPreferences.STAT_YEAR_IS_SHOW_DURATION, true);
+		store.setDefault(ITourbookPreferences.STAT_YEAR_IS_SHOW_NUM_TOURS, true);
 		store.setDefault(ITourbookPreferences.STAT_YEAR_IS_SHOW_YEAR_SEPARATOR, true);
 
 		/*

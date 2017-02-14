@@ -50,7 +50,8 @@ public class StatisticMonth_Summary extends StatisticMonth {
 				final String property = event.getProperty();
 
 				// observe which data are displayed
-				if (property.equals(ITourbookPreferences.STAT_MONTH_IS_SHOW_ALTITUDE)
+				if (property.equals(ITourbookPreferences.STAT_MONTH_CHART_TYPE)
+						|| property.equals(ITourbookPreferences.STAT_MONTH_IS_SHOW_ALTITUDE)
 						|| property.equals(ITourbookPreferences.STAT_MONTH_IS_SHOW_DISTANCE)
 						|| property.equals(ITourbookPreferences.STAT_MONTH_IS_SHOW_DURATION)
 						|| property.equals(ITourbookPreferences.STAT_MONTH_IS_SHOW_YEAR_SEPARATOR)) {

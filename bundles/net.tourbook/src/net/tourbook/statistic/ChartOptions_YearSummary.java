@@ -17,6 +17,7 @@ package net.tourbook.statistic;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.preferences.ITourbookPreferences;
 
 import org.eclipse.jface.layout.GridDataFactory;
@@ -44,10 +45,19 @@ public class ChartOptions_YearSummary implements IStatisticOptions {
 	private Button					_chkShowDuration;
 	private Button					_chkShowYearSeparator;
 
+	private Button					_rdoChartType_BarAdjacent;
+	private Button					_rdoChartType_BarStacked;
+
 	@Override
 	public void createUI(final Composite parent) {
 
 		initUI(parent);
+
+		createUI_100_Graphs(parent);
+		createUI_200_ChartType(parent);
+	}
+
+	private void createUI_100_Graphs(final Composite parent) {
 
 		final Group group = new Group(parent, SWT.NONE);
 //		group.setText(Messages.Pref_Graphs_Group_Grid);
@@ -59,12 +69,12 @@ public class ChartOptions_YearSummary implements IStatisticOptions {
 		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
 //		group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 		{
-			createUI_10_Left(group);
-			createUI_20_Right(group);
+			createUI_110_Left(group);
+			createUI_120_Right(group);
 		}
 	}
 
-	private void createUI_10_Left(final Composite parent) {
+	private void createUI_110_Left(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -97,7 +107,7 @@ public class ChartOptions_YearSummary implements IStatisticOptions {
 		}
 	}
 
-	private void createUI_20_Right(final Composite parent) {
+	private void createUI_120_Right(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -110,6 +120,34 @@ public class ChartOptions_YearSummary implements IStatisticOptions {
 				_chkShowYearSeparator = new Button(container, SWT.CHECK);
 				_chkShowYearSeparator.setText(Messages.Pref_Statistic_Checkbox_YearSeparator);
 				_chkShowYearSeparator.addSelectionListener(_defaultSelectionListener);
+			}
+		}
+	}
+
+	private void createUI_200_ChartType(final Composite parent) {
+
+		final Group group = new Group(parent, SWT.NONE);
+//		group.setText(Messages.Pref_Graphs_Group_Grid);
+		group.setText(Messages.Pref_Statistic_Group_ChartType);
+		GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(group);
+		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
+//		group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+		{
+			{
+				/*
+				 * Bar adjacent
+				 */
+				_rdoChartType_BarAdjacent = new Button(group, SWT.RADIO);
+				_rdoChartType_BarAdjacent.setText(Messages.Pref_Statistic_Radio_BarAdjacent);
+				_rdoChartType_BarAdjacent.addSelectionListener(_defaultSelectionListener);
+			}
+			{
+				/*
+				 * Bar adjacent
+				 */
+				_rdoChartType_BarStacked = new Button(group, SWT.RADIO);
+				_rdoChartType_BarStacked.setText(Messages.Pref_Statistic_Radio_BarStacked);
+				_rdoChartType_BarStacked.addSelectionListener(_defaultSelectionListener);
 			}
 		}
 	}
@@ -143,8 +181,13 @@ public class ChartOptions_YearSummary implements IStatisticOptions {
 		_chkShowAltitude.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_YEAR_IS_SHOW_ALTITUDE));
 		_chkShowDistance.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_YEAR_IS_SHOW_DISTANCE));
 		_chkShowDuration.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_YEAR_IS_SHOW_DURATION));
+
 		_chkShowYearSeparator.setSelection(//
 				_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_YEAR_IS_SHOW_YEAR_SEPARATOR));
+
+		final String chartType = _prefStore.getDefaultString(ITourbookPreferences.STAT_YEAR_CHART_TYPE);
+		_rdoChartType_BarAdjacent.setSelection(chartType.equals(ChartDataSerie.CHART_TYPE_BAR_ADJACENT));
+		_rdoChartType_BarStacked.setSelection(chartType.equals(ChartDataSerie.CHART_TYPE_BAR_STACKED));
 	}
 
 	@Override
@@ -153,8 +196,13 @@ public class ChartOptions_YearSummary implements IStatisticOptions {
 		_chkShowAltitude.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_YEAR_IS_SHOW_ALTITUDE));
 		_chkShowDistance.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_YEAR_IS_SHOW_DISTANCE));
 		_chkShowDuration.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_YEAR_IS_SHOW_DURATION));
+
 		_chkShowYearSeparator.setSelection(//
 				_prefStore.getBoolean(ITourbookPreferences.STAT_YEAR_IS_SHOW_YEAR_SEPARATOR));
+
+		final String chartType = _prefStore.getString(ITourbookPreferences.STAT_YEAR_CHART_TYPE);
+		_rdoChartType_BarAdjacent.setSelection(chartType.equals(ChartDataSerie.CHART_TYPE_BAR_ADJACENT));
+		_rdoChartType_BarStacked.setSelection(chartType.equals(ChartDataSerie.CHART_TYPE_BAR_STACKED));
 	}
 
 	@Override
@@ -163,7 +211,13 @@ public class ChartOptions_YearSummary implements IStatisticOptions {
 		_prefStore.setValue(ITourbookPreferences.STAT_YEAR_IS_SHOW_ALTITUDE, _chkShowAltitude.getSelection());
 		_prefStore.setValue(ITourbookPreferences.STAT_YEAR_IS_SHOW_DISTANCE, _chkShowDistance.getSelection());
 		_prefStore.setValue(ITourbookPreferences.STAT_YEAR_IS_SHOW_DURATION, _chkShowDuration.getSelection());
+
 		_prefStore.setValue(ITourbookPreferences.STAT_YEAR_IS_SHOW_YEAR_SEPARATOR,
 				_chkShowYearSeparator.getSelection());
+
+		_prefStore.setValue(ITourbookPreferences.STAT_YEAR_CHART_TYPE,
+				_rdoChartType_BarAdjacent.getSelection()
+						? ChartDataSerie.CHART_TYPE_BAR_ADJACENT
+						: ChartDataSerie.CHART_TYPE_BAR_STACKED);
 	}
 }

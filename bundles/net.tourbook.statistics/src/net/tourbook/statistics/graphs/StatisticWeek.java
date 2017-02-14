@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -36,6 +36,7 @@ import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourPerson;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.statistic.StatisticContext;
 import net.tourbook.statistic.TourbookStatistic;
 import net.tourbook.statistics.Messages;
@@ -53,6 +54,7 @@ public abstract class StatisticWeek extends TourbookStatistic {
 	private final static IPreferenceStore	_prefStoreCommon	= CommonActivator.getPrefStore();
 
 	private Chart							_chart;
+	private String							_chartType;
 	private final MinMaxKeeper_YData		_minMaxKeeper		= new MinMaxKeeper_YData();
 
 	private TourPerson						_appPerson;
@@ -196,13 +198,12 @@ public abstract class StatisticWeek extends TourbookStatistic {
 		titleFormat.append(Messages.tourtime_info_week);
 		titleFormat.append(UI.NEW_LINE);
 
-		final String toolTipTitle = String.format(titleFormat.toString(),//
+		final String toolTipTitle = String.format(titleFormat.toString(), //
 				tourTypeName,
 				weekOfYear,
 				weekYear
 		//
-				)
-				.toString();
+		).toString();
 
 		/*
 		 * // tool tip: label
@@ -242,8 +243,7 @@ public abstract class StatisticWeek extends TourbookStatistic {
 				breakTime / 3600,
 				(breakTime % 3600) / 60
 		//
-				)
-				.toString();
+		).toString();
 
 		/*
 		 * create tool tip info
@@ -283,9 +283,8 @@ public abstract class StatisticWeek extends TourbookStatistic {
 	void createYData_Altitude(final ChartDataModel chartDataModel) {
 
 		// altitude
-		final ChartDataYSerie yData = new ChartDataYSerie(
-				ChartType.BAR,
-				ChartDataYSerie.BAR_LAYOUT_STACKED,
+		final ChartDataYSerie yData = new ChartDataYSerie(ChartType.BAR,
+				getChartType(_chartType),
 				_tourWeekData.altitudeLow,
 				_tourWeekData.altitudeHigh);
 
@@ -380,9 +379,8 @@ public abstract class StatisticWeek extends TourbookStatistic {
 	void createYData_Distance(final ChartDataModel chartDataModel) {
 
 		// distance
-		final ChartDataYSerie yData = new ChartDataYSerie(
-				ChartType.BAR,
-				ChartDataYSerie.BAR_LAYOUT_STACKED,
+		final ChartDataYSerie yData = new ChartDataYSerie(ChartType.BAR,
+				getChartType(_chartType),
 				_tourWeekData.distanceLow,
 				_tourWeekData.distanceHigh);
 
@@ -404,9 +402,8 @@ public abstract class StatisticWeek extends TourbookStatistic {
 	void createYData_Duration(final ChartDataModel chartDataModel) {
 
 		// duration
-		final ChartDataYSerie yData = new ChartDataYSerie(
-				ChartType.BAR,
-				ChartDataYSerie.BAR_LAYOUT_STACKED,
+		final ChartDataYSerie yData = new ChartDataYSerie(ChartType.BAR,
+				getChartType(_chartType),
 				_tourWeekData.getDurationTimeLowFloat(),
 				_tourWeekData.getDurationTimeHighFloat());
 
@@ -468,13 +465,14 @@ public abstract class StatisticWeek extends TourbookStatistic {
 	@Override
 	public void updateStatistic(final StatisticContext statContext) {
 
+		_chartType = _prefStore.getString(ITourbookPreferences.STAT_WEEK_CHART_TYPE);
+
 		_appPerson = statContext.appPerson;
 		_appTourTypeFilter = statContext.appTourTypeFilter;
 		_statYoungestYear = statContext.statFirstYear;
 		_statNumberOfYears = statContext.statNumberOfYears;
 
-		_tourWeekData = DataProvider_Tour_Week.getInstance().getWeekData(
-				_appPerson,
+		_tourWeekData = DataProvider_Tour_Week.getInstance().getWeekData(_appPerson,
 				_appTourTypeFilter,
 				_statYoungestYear,
 				_statNumberOfYears,
