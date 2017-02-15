@@ -33,7 +33,7 @@ public class DataProvider_Tour_Week extends DataProvider {
 
 	private static DataProvider_Tour_Week	_instance;
 
-	private TourData_Week				_tourWeekData;
+	private TourData_Week					_tourWeekData;
 
 	private DataProvider_Tour_Week() {}
 
@@ -73,9 +73,9 @@ public class DataProvider_Tour_Week extends DataProvider {
 		final ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
 		final TourType[] tourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
 
-		int weekCounter = 0;
+		int numWeeks = 0;
 		for (final int weeks : _yearWeeks) {
-			weekCounter += weeks;
+			numWeeks += weeks;
 		}
 
 		int colorOffset = 0;
@@ -86,7 +86,6 @@ public class DataProvider_Tour_Week extends DataProvider {
 		int serieLength = colorOffset + tourTypes.length;
 		serieLength = serieLength == 0 ? 1 : serieLength;
 
-		final int valueLength = weekCounter;
 		final SQLFilter sqlFilter = new SQLFilter();
 
 		final String sqlString = "SELECT \n" //$NON-NLS-1$
@@ -109,15 +108,15 @@ public class DataProvider_Tour_Week extends DataProvider {
 
 		try {
 
-			final float[][] dbDistance = new float[serieLength][valueLength];
-			final float[][] dbAltitude = new float[serieLength][valueLength];
+			final float[][] dbDistance = new float[serieLength][numWeeks];
+			final float[][] dbAltitude = new float[serieLength][numWeeks];
 
-			final int[][] dbDurationTime = new int[serieLength][valueLength];
-			final int[][] dbRecordingTime = new int[serieLength][valueLength];
-			final int[][] dbDrivingTime = new int[serieLength][valueLength];
-			final int[][] dbBreakTime = new int[serieLength][valueLength];
+			final int[][] dbDurationTime = new int[serieLength][numWeeks];
+			final int[][] dbRecordingTime = new int[serieLength][numWeeks];
+			final int[][] dbDrivingTime = new int[serieLength][numWeeks];
+			final int[][] dbBreakTime = new int[serieLength][numWeeks];
 
-			final long[][] dbTypeIds = new long[serieLength][valueLength];
+			final long[][] dbTypeIds = new long[serieLength][numWeeks];
 
 			final Connection conn = TourDatabase.getInstance().getConnection();
 			final PreparedStatement statement = conn.prepareStatement(sqlString);
@@ -139,6 +138,21 @@ public class DataProvider_Tour_Week extends DataProvider {
 				}
 
 				final int weekIndex = allWeeks + dbWeek - 1;
+
+				if (weekIndex >= numWeeks) {
+
+					/**
+					 * This problem occured but is not yet fully fixed, it needs more investigation.
+					 * <p>
+					 * Problem with this configuration</br>
+					 * Statistic: Week summary</br>
+					 * Tour type: Velo (3 bars)</br>
+					 * Displayed years: 2013 + 2014
+					 * <p>
+					 * Problem occured when selecting year 2015
+					 */
+					continue;
+				}
 
 				/*
 				 * convert type id to the type index in the tour types list which is also the color
@@ -180,13 +194,13 @@ public class DataProvider_Tour_Week extends DataProvider {
 			_tourWeekData.yearWeeks = _yearWeeks;
 			_tourWeekData.yearDays = _yearDays;
 
-			_tourWeekData.setDurationTimeLow(new int[serieLength][valueLength]);
+			_tourWeekData.setDurationTimeLow(new int[serieLength][numWeeks]);
 			_tourWeekData.setDurationTimeHigh(dbDurationTime);
 
-			_tourWeekData.distanceLow = new float[serieLength][valueLength];
+			_tourWeekData.distanceLow = new float[serieLength][numWeeks];
 			_tourWeekData.distanceHigh = dbDistance;
 
-			_tourWeekData.altitudeLow = new float[serieLength][valueLength];
+			_tourWeekData.altitudeLow = new float[serieLength][numWeeks];
 			_tourWeekData.altitudeHigh = dbAltitude;
 
 			_tourWeekData.recordingTime = dbRecordingTime;
