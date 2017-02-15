@@ -116,7 +116,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(ITourbookPreferences.STAT_YEAR_IS_SHOW_ALTITUDE, true);
 		store.setDefault(ITourbookPreferences.STAT_YEAR_IS_SHOW_DISTANCE, true);
 		store.setDefault(ITourbookPreferences.STAT_YEAR_IS_SHOW_DURATION, true);
-		store.setDefault(ITourbookPreferences.STAT_YEAR_IS_SHOW_NUM_TOURS, true);
+		store.setDefault(ITourbookPreferences.STAT_YEAR_IS_SHOW_NUMBER_OF_TOURS, true);
 		store.setDefault(ITourbookPreferences.STAT_YEAR_IS_SHOW_YEAR_SEPARATOR, true);
 
 		/*

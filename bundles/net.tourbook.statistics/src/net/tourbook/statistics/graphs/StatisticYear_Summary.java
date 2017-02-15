@@ -55,7 +55,7 @@ public class StatisticYear_Summary extends StatisticYear {
 						|| property.equals(ITourbookPreferences.STAT_YEAR_IS_SHOW_ALTITUDE)
 						|| property.equals(ITourbookPreferences.STAT_YEAR_IS_SHOW_DISTANCE)
 						|| property.equals(ITourbookPreferences.STAT_YEAR_IS_SHOW_DURATION)
-						|| property.equals(ITourbookPreferences.STAT_YEAR_IS_SHOW_NUM_TOURS)
+						|| property.equals(ITourbookPreferences.STAT_YEAR_IS_SHOW_NUMBER_OF_TOURS)
 						|| property.equals(ITourbookPreferences.STAT_YEAR_IS_SHOW_YEAR_SEPARATOR)
 				//
 				) {
@@ -115,7 +115,7 @@ public class StatisticYear_Summary extends StatisticYear {
 		}
 
 		if (_isShowNumTours) {
-//			createYData_NumTours(chartDataModel);
+			createYData_NumTours(chartDataModel);
 		}
 
 		return chartDataModel;
@@ -131,7 +131,7 @@ public class StatisticYear_Summary extends StatisticYear {
 		_isShowAltitude = _prefStore.getBoolean(ITourbookPreferences.STAT_YEAR_IS_SHOW_ALTITUDE);
 		_isShowDistance = _prefStore.getBoolean(ITourbookPreferences.STAT_YEAR_IS_SHOW_DISTANCE);
 		_isShowDuration = _prefStore.getBoolean(ITourbookPreferences.STAT_YEAR_IS_SHOW_DURATION);
-		_isShowNumTours = _prefStore.getBoolean(ITourbookPreferences.STAT_YEAR_IS_SHOW_NUM_TOURS);
+		_isShowNumTours = _prefStore.getBoolean(ITourbookPreferences.STAT_YEAR_IS_SHOW_NUMBER_OF_TOURS);
 	}
 
 	@Override

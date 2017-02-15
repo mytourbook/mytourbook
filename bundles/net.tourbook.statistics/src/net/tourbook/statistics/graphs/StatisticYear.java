@@ -379,8 +379,8 @@ public abstract class StatisticYear extends TourbookStatistic {
 		final float[][] altitudeHighValues = _tourYearData.altitudeHigh;
 		final float[][] distanceLowValues = _tourYearData.distanceLow;
 		final float[][] distanceHighValues = _tourYearData.distanceHigh;
-//		final float[][] numToursLowValues = _tourYearData.numToursLow;
-//		final float[][] numToursHighValues = _tourYearData.numToursHigh;
+		final float[][] numToursLowValues = _tourYearData.numToursLow;
+		final float[][] numToursHighValues = _tourYearData.numToursHigh;
 		final float[][] timeLowValues = _tourYearData.getDurationTimeLowFloat();
 		final float[][] timeHighValues = _tourYearData.getDurationTimeHighFloat();
 
@@ -397,8 +397,8 @@ public abstract class StatisticYear extends TourbookStatistic {
 				_resortedAltitudeHigh[resortedIndex] = altitudeHighValues[serieIndex];
 				_resortedDistanceLow[resortedIndex] = distanceLowValues[serieIndex];
 				_resortedDistanceHigh[resortedIndex] = distanceHighValues[serieIndex];
-//				_resortedNumToursLow[resortedIndex] = numToursLowValues[serieIndex];
-//				_resortedNumToursHigh[resortedIndex] = numToursHighValues[serieIndex];
+				_resortedNumToursLow[resortedIndex] = numToursLowValues[serieIndex];
+				_resortedNumToursHigh[resortedIndex] = numToursHighValues[serieIndex];
 				_resortedTimeLow[resortedIndex] = timeLowValues[serieIndex];
 				_resortedTimeHigh[resortedIndex] = timeHighValues[serieIndex];
 
@@ -414,8 +414,8 @@ public abstract class StatisticYear extends TourbookStatistic {
 				_resortedAltitudeHigh[resortedIndex] = altitudeHighValues[serieIndex];
 				_resortedDistanceLow[resortedIndex] = distanceLowValues[serieIndex];
 				_resortedDistanceHigh[resortedIndex] = distanceHighValues[serieIndex];
-//				_resortedNumToursLow[resortedIndex] = numToursLowValues[serieIndex];
-//				_resortedNumToursHigh[resortedIndex] = numToursHighValues[serieIndex];
+				_resortedNumToursLow[resortedIndex] = numToursLowValues[serieIndex];
+				_resortedNumToursHigh[resortedIndex] = numToursHighValues[serieIndex];
 				_resortedTimeLow[resortedIndex] = timeLowValues[serieIndex];
 				_resortedTimeHigh[resortedIndex] = timeHighValues[serieIndex];
 
@@ -435,8 +435,8 @@ public abstract class StatisticYear extends TourbookStatistic {
 				_resortedAltitudeHigh[resortedIndex] = altitudeHighValues[serieIndex];
 				_resortedDistanceLow[resortedIndex] = distanceLowValues[serieIndex];
 				_resortedDistanceHigh[resortedIndex] = distanceHighValues[serieIndex];
-//				_resortedNumToursLow[resortedIndex] = numToursLowValues[serieIndex];
-//				_resortedNumToursHigh[resortedIndex] = numToursHighValues[serieIndex];
+				_resortedNumToursLow[resortedIndex] = numToursLowValues[serieIndex];
+				_resortedNumToursHigh[resortedIndex] = numToursHighValues[serieIndex];
 				_resortedTimeLow[resortedIndex] = timeLowValues[serieIndex];
 				_resortedTimeHigh[resortedIndex] = timeHighValues[serieIndex];
 
@@ -452,8 +452,8 @@ public abstract class StatisticYear extends TourbookStatistic {
 				_resortedAltitudeHigh[resortedIndex] = altitudeHighValues[serieIndex];
 				_resortedDistanceLow[resortedIndex] = distanceLowValues[serieIndex];
 				_resortedDistanceHigh[resortedIndex] = distanceHighValues[serieIndex];
-//				_resortedNumToursLow[resortedIndex] = numToursLowValues[serieIndex];
-//				_resortedNumToursHigh[resortedIndex] = numToursHighValues[serieIndex];
+				_resortedNumToursLow[resortedIndex] = numToursLowValues[serieIndex];
+				_resortedNumToursHigh[resortedIndex] = numToursHighValues[serieIndex];
 				_resortedTimeLow[resortedIndex] = timeLowValues[serieIndex];
 				_resortedTimeHigh[resortedIndex] = timeHighValues[serieIndex];
 

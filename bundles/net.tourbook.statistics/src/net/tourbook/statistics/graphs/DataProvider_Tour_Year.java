@@ -107,7 +107,7 @@ public class DataProvider_Tour_Year extends DataProvider {
 			final float[][] dbDistance = new float[numTourTypes][numYears];
 			final float[][] dbAltitude = new float[numTourTypes][numYears];
 			final int[][] dbDurationTime = new int[numTourTypes][numYears];
-			final int[][] dbNumTours = new int[numTourTypes][numYears];
+			final float[][] dbNumTours = new float[numTourTypes][numYears];
 
 			final int[][] dbRecordingTime = new int[numTourTypes][numYears];
 			final int[][] dbDrivingTime = new int[numTourTypes][numYears];
@@ -240,8 +240,8 @@ public class DataProvider_Tour_Year extends DataProvider {
 				_tourDataYear.drivingTime = new int[1][numYears];
 				_tourDataYear.breakTime = new int[1][numYears];
 
-//				_tourDataYear.numToursLow = new int[1][numYears];
-//				_tourDataYear.numToursHigh = new int[1][numYears];
+				_tourDataYear.numToursLow = new float[1][numYears];
+				_tourDataYear.numToursHigh = new float[1][numYears];
 
 			} else {
 
@@ -253,7 +253,7 @@ public class DataProvider_Tour_Year extends DataProvider {
 				final int[][] usedRecordingTime = new int[numUsedTourTypes][];
 				final int[][] usedDrivingTime = new int[numUsedTourTypes][];
 				final int[][] usedBreakTime = new int[numUsedTourTypes][];
-				final int[][] usedNumTours = new int[numUsedTourTypes][];
+				final float[][] usedNumTours = new float[numUsedTourTypes][];
 
 				for (int index = 0; index < numUsedTourTypes; index++) {
 
@@ -267,7 +267,7 @@ public class DataProvider_Tour_Year extends DataProvider {
 					usedDrivingTime[index] = (int[]) drivingTimeWithData.get(index);
 					usedBreakTime[index] = (int[]) breakTimeWithData.get(index);
 
-					usedNumTours[index] = (int[]) numToursWithData.get(index);
+					usedNumTours[index] = (float[]) numToursWithData.get(index);
 				}
 
 				_tourDataYear.typeIds = usedTypeIds;
@@ -285,6 +285,9 @@ public class DataProvider_Tour_Year extends DataProvider {
 				_tourDataYear.recordingTime = usedRecordingTime;
 				_tourDataYear.drivingTime = usedDrivingTime;
 				_tourDataYear.breakTime = usedBreakTime;
+
+				_tourDataYear.numToursLow = new float[numUsedTourTypes][numYears];
+				_tourDataYear.numToursHigh = usedNumTours;
 			}
 
 		} catch (final SQLException e) {

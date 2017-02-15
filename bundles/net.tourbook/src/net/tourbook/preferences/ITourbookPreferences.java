@@ -95,7 +95,7 @@ public interface ITourbookPreferences {
 	public static final String	STAT_YEAR_IS_SHOW_ALTITUDE						= "STAT_YEAR_IS_SHOW_ALTITUDE";								//$NON-NLS-1$
 	public static final String	STAT_YEAR_IS_SHOW_DISTANCE						= "STAT_YEAR_IS_SHOW_DISTANCE";								//$NON-NLS-1$
 	public static final String	STAT_YEAR_IS_SHOW_DURATION						= "STAT_YEAR_IS_SHOW_DURATION";								//$NON-NLS-1$
-	public static final String	STAT_YEAR_IS_SHOW_NUM_TOURS						= "STAT_YEAR_IS_SHOW_NUM_TOURS";							//$NON-NLS-1$
+	public static final String	STAT_YEAR_IS_SHOW_NUMBER_OF_TOURS				= "STAT_YEAR_IS_SHOW_NUMBER_OF_TOURS";						//$NON-NLS-1$
 	public static final String	STAT_YEAR_IS_SHOW_YEAR_SEPARATOR				= "STAT_YEAR_IS_SHOW_YEAR_SEPARATOR";						//$NON-NLS-1$
 
 	/*
