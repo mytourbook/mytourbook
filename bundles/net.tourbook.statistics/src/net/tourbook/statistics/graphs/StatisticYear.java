@@ -84,7 +84,6 @@ public abstract class StatisticYear extends TourbookStatistic {
 	private float[][]					_resortedTimeLow;
 	private float[][]					_resortedTimeHigh;
 
-
 	public boolean canTourBeVisible() {
 		return false;
 	}
@@ -129,8 +128,8 @@ public abstract class StatisticYear extends TourbookStatistic {
 
 		final int oldestYear = _statFirstYear - _statNumberOfYears + 1;
 
-		final Integer recordingTime = _tourYearData.recordingTime[serieIndex][valueIndex];
-		final Integer drivingTime = _tourYearData.drivingTime[serieIndex][valueIndex];
+		final int recordingTime = _tourYearData.recordingTime[serieIndex][valueIndex];
+		final int drivingTime = _tourYearData.drivingTime[serieIndex][valueIndex];
 		final int breakTime = recordingTime - drivingTime;
 
 		/*
@@ -138,7 +137,8 @@ public abstract class StatisticYear extends TourbookStatistic {
 		 */
 		final StringBuilder titleString = new StringBuilder();
 
-		final String tourTypeName = StatisticServices.getTourTypeName(serieIndex,
+		final String tourTypeName = StatisticServices.getTourTypeName(//
+				serieIndex,
 				valueIndex,
 				_resortedTypeIds,
 				_appTourTypeFilter);
@@ -167,8 +167,12 @@ public abstract class StatisticYear extends TourbookStatistic {
 		toolTipFormat.append(Messages.tourtime_info_driving_time);
 		toolTipFormat.append(UI.NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_break_time);
+		toolTipFormat.append(UI.NEW_LINE);
+		toolTipFormat.append(UI.NEW_LINE);
+		toolTipFormat.append(Messages.TourTime_Info_NumberOfTours);
 
-		final String toolTipLabel = String.format(toolTipFormat.toString(), //
+		final String toolTipLabel = String.format(
+				toolTipFormat.toString(), //
 				//
 				//
 				(int) _resortedDistanceHigh[serieIndex][valueIndex],
@@ -184,7 +188,9 @@ public abstract class StatisticYear extends TourbookStatistic {
 				(drivingTime % 3600) / 60,
 				//
 				breakTime / 3600,
-				(breakTime % 3600) / 60
+				(breakTime % 3600) / 60,
+				//
+				(int) _resortedNumToursHigh[serieIndex][valueIndex]
 		//
 		).toString();
 
@@ -215,7 +221,8 @@ public abstract class StatisticYear extends TourbookStatistic {
 	 */
 	void createYData_Altitude(final ChartDataModel chartDataModel) {
 
-		final ChartDataYSerie yData = new ChartDataYSerie(ChartType.BAR,
+		final ChartDataYSerie yData = new ChartDataYSerie(
+				ChartType.BAR,
 				getChartType(_chartType),
 				_resortedAltitudeLow,
 				_resortedAltitudeHigh);
@@ -239,7 +246,8 @@ public abstract class StatisticYear extends TourbookStatistic {
 	 */
 	void createYData_Distance(final ChartDataModel chartDataModel) {
 
-		final ChartDataYSerie yData = new ChartDataYSerie(ChartType.BAR,
+		final ChartDataYSerie yData = new ChartDataYSerie(
+				ChartType.BAR,
 				getChartType(_chartType),
 				_resortedDistanceLow,
 				_resortedDistanceHigh);
@@ -263,7 +271,8 @@ public abstract class StatisticYear extends TourbookStatistic {
 	 */
 	void createYData_Duration(final ChartDataModel chartDataModel) {
 
-		final ChartDataYSerie yData = new ChartDataYSerie(ChartType.BAR,
+		final ChartDataYSerie yData = new ChartDataYSerie(
+				ChartType.BAR,
 				getChartType(_chartType),
 				_resortedTimeLow,
 				_resortedTimeHigh);
@@ -287,18 +296,19 @@ public abstract class StatisticYear extends TourbookStatistic {
 	 */
 	void createYData_NumTours(final ChartDataModel chartDataModel) {
 
-		final ChartDataYSerie yData = new ChartDataYSerie(ChartType.BAR,
+		final ChartDataYSerie yData = new ChartDataYSerie(
+				ChartType.BAR,
 				getChartType(_chartType),
 				_resortedNumToursLow,
 				_resortedNumToursHigh);
 
-		yData.setYTitle(Messages.LABEL_GRAPH_DISTANCE);
-		yData.setUnitLabel(UI.UNIT_LABEL_DISTANCE);
+		yData.setYTitle(Messages.LABEL_GRAPH_NUMBER_OF_TOURS);
+		yData.setUnitLabel(Messages.NUMBERS_UNIT);
 		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
 		yData.setShowYSlider(true);
 
-		StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_DISTANCE);
-		StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_DISTANCE, _appTourTypeFilter);
+		StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_TOUR);
+		StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_TOUR, _appTourTypeFilter);
 		StatisticServices.setTourTypeColorIndex(yData, _resortedTypeIds, _appTourTypeFilter);
 
 		chartDataModel.addYData(yData);
@@ -534,7 +544,8 @@ public abstract class StatisticYear extends TourbookStatistic {
 		_statFirstYear = statContext.statFirstYear;
 		_statNumberOfYears = statContext.statNumberOfYears;
 
-		_tourYearData = DataProvider_Tour_Year.getInstance().getYearData(statContext.appPerson,
+		_tourYearData = DataProvider_Tour_Year.getInstance().getYearData(
+				statContext.appPerson,
 				statContext.appTourTypeFilter,
 				statContext.statFirstYear,
 				statContext.statNumberOfYears,

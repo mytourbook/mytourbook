@@ -80,6 +80,8 @@ public abstract class StatisticMonth extends TourbookStatistic {
 	private float[][]					_resortedAltitudeHigh;
 	private float[][]					_resortedDistanceLow;
 	private float[][]					_resortedDistanceHigh;
+	private float[][]					_resortedNumToursLow;
+	private float[][]					_resortedNumToursHigh;
 	private float[][]					_resortedTimeLow;
 	private float[][]					_resortedTimeHigh;
 
@@ -156,8 +158,9 @@ public abstract class StatisticMonth extends TourbookStatistic {
 
 		final LocalDate monthDate = LocalDate.of(oldestYear, 1, 1).plusMonths(valueIndex);
 
-		final String monthText = Month.of(monthDate.getMonthValue()).getDisplayName(TextStyle.FULL,
-				Locale.getDefault());
+		final String monthText = Month
+				.of(monthDate.getMonthValue())
+				.getDisplayName(TextStyle.FULL, Locale.getDefault());
 
 		final Integer recordingTime = _tourMonthData.recordingTime[serieIndex][valueIndex];
 		final Integer drivingTime = _tourMonthData.drivingTime[serieIndex][valueIndex];
@@ -168,19 +171,15 @@ public abstract class StatisticMonth extends TourbookStatistic {
 		 */
 		final StringBuilder sbTitle = new StringBuilder();
 
-		final String tourTypeName = StatisticServices.getTourTypeName(serieIndex,
-				valueIndex,
-				_resortedTypeIds,
-				_appTourTypeFilter);
+		final String tourTypeName = StatisticServices
+				.getTourTypeName(serieIndex, valueIndex, _resortedTypeIds, _appTourTypeFilter);
 
 		if (tourTypeName != null && tourTypeName.length() > 0) {
 			sbTitle.append(tourTypeName);
 		}
 
-		final String toolTipTitle = String.format(Messages.tourtime_info_date_month,
-				sbTitle.toString(),
-				monthText,
-				monthDate.getYear());
+		final String toolTipTitle = String
+				.format(Messages.tourtime_info_date_month, sbTitle.toString(), monthText, monthDate.getYear());
 
 		/*
 		 * tool tip: label
@@ -196,8 +195,12 @@ public abstract class StatisticMonth extends TourbookStatistic {
 		toolTipFormat.append(Messages.tourtime_info_driving_time);
 		toolTipFormat.append(UI.NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_break_time);
+		toolTipFormat.append(UI.NEW_LINE);
+		toolTipFormat.append(UI.NEW_LINE);
+		toolTipFormat.append(Messages.TourTime_Info_NumberOfTours);
 
-		final String toolTipLabel = String.format(toolTipFormat.toString(), //
+		final String toolTipLabel = String.format(
+				toolTipFormat.toString(), //
 				//
 				_resortedDistanceHigh[serieIndex][valueIndex] / 1000,
 				UI.UNIT_LABEL_DISTANCE,
@@ -212,7 +215,9 @@ public abstract class StatisticMonth extends TourbookStatistic {
 				(drivingTime % 3600) / 60,
 				//
 				breakTime / 3600,
-				(breakTime % 3600) / 60
+				(breakTime % 3600) / 60,
+				//
+				(int) _resortedNumToursHigh[serieIndex][valueIndex]
 		//
 		).toString();
 
@@ -241,7 +246,8 @@ public abstract class StatisticMonth extends TourbookStatistic {
 
 		// altitude
 
-		final ChartDataYSerie yData = new ChartDataYSerie(ChartType.BAR,
+		final ChartDataYSerie yData = new ChartDataYSerie(
+				ChartType.BAR,
 				getChartType(_chartType),
 				_resortedAltitudeLow,
 				_resortedAltitudeHigh);
@@ -262,7 +268,8 @@ public abstract class StatisticMonth extends TourbookStatistic {
 
 		// distance
 
-		final ChartDataYSerie yData = new ChartDataYSerie(ChartType.BAR,
+		final ChartDataYSerie yData = new ChartDataYSerie(
+				ChartType.BAR,
 				getChartType(_chartType),
 				_resortedDistanceLow,
 				_resortedDistanceHigh);
@@ -284,7 +291,8 @@ public abstract class StatisticMonth extends TourbookStatistic {
 
 		// duration
 
-		final ChartDataYSerie yData = new ChartDataYSerie(ChartType.BAR,
+		final ChartDataYSerie yData = new ChartDataYSerie(
+				ChartType.BAR,
 				getChartType(_chartType),
 				_resortedTimeLow,
 				_resortedTimeHigh);
@@ -296,6 +304,31 @@ public abstract class StatisticMonth extends TourbookStatistic {
 
 		StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_TIME);
 		StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_TIME, _appTourTypeFilter);
+		StatisticServices.setTourTypeColorIndex(yData, _resortedTypeIds, _appTourTypeFilter);
+
+		chartDataModel.addYData(yData);
+	}
+
+	/**
+	 * Number of tours
+	 * 
+	 * @param chartDataModel
+	 */
+	void createYData_NumTours(final ChartDataModel chartDataModel) {
+
+		final ChartDataYSerie yData = new ChartDataYSerie(
+				ChartType.BAR,
+				getChartType(_chartType),
+				_resortedNumToursLow,
+				_resortedNumToursHigh);
+
+		yData.setYTitle(Messages.LABEL_GRAPH_NUMBER_OF_TOURS);
+		yData.setUnitLabel(Messages.NUMBERS_UNIT);
+		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
+		yData.setShowYSlider(true);
+
+		StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_TOUR);
+		StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_TOUR, _appTourTypeFilter);
 		StatisticServices.setTourTypeColorIndex(yData, _resortedTypeIds, _appTourTypeFilter);
 
 		chartDataModel.addYData(yData);
@@ -334,6 +367,8 @@ public abstract class StatisticMonth extends TourbookStatistic {
 		_resortedAltitudeHigh = new float[barLength][];
 		_resortedDistanceLow = new float[barLength][];
 		_resortedDistanceHigh = new float[barLength][];
+		_resortedNumToursLow = new float[barLength][];
+		_resortedNumToursHigh = new float[barLength][];
 		_resortedTimeLow = new float[barLength][];
 		_resortedTimeHigh = new float[barLength][];
 
@@ -347,6 +382,8 @@ public abstract class StatisticMonth extends TourbookStatistic {
 			_resortedAltitudeHigh = new float[1][1];
 			_resortedDistanceLow = new float[1][1];
 			_resortedDistanceHigh = new float[1][1];
+			_resortedNumToursLow = new float[1][1];
+			_resortedNumToursHigh = new float[1][1];
 			_resortedTimeLow = new float[1][1];
 			_resortedTimeHigh = new float[1][1];
 
@@ -361,6 +398,8 @@ public abstract class StatisticMonth extends TourbookStatistic {
 		final float[][] altitudeHighValues = _tourMonthData.altitudeHigh;
 		final float[][] distanceLowValues = _tourMonthData.distanceLow;
 		final float[][] distanceHighValues = _tourMonthData.distanceHigh;
+		final float[][] numToursLowValues = _tourMonthData.numToursLow;
+		final float[][] numToursHighValues = _tourMonthData.numToursHigh;
 		final float[][] timeLowValues = _tourMonthData.getDurationTimeLowFloat();
 		final float[][] timeHighValues = _tourMonthData.getDurationTimeHighFloat();
 
@@ -377,6 +416,8 @@ public abstract class StatisticMonth extends TourbookStatistic {
 				_resortedAltitudeHigh[resortedIndex] = altitudeHighValues[serieIndex];
 				_resortedDistanceLow[resortedIndex] = distanceLowValues[serieIndex];
 				_resortedDistanceHigh[resortedIndex] = distanceHighValues[serieIndex];
+				_resortedNumToursLow[resortedIndex] = numToursLowValues[serieIndex];
+				_resortedNumToursHigh[resortedIndex] = numToursHighValues[serieIndex];
 				_resortedTimeLow[resortedIndex] = timeLowValues[serieIndex];
 				_resortedTimeHigh[resortedIndex] = timeHighValues[serieIndex];
 
@@ -392,6 +433,8 @@ public abstract class StatisticMonth extends TourbookStatistic {
 				_resortedAltitudeHigh[resortedIndex] = altitudeHighValues[serieIndex];
 				_resortedDistanceLow[resortedIndex] = distanceLowValues[serieIndex];
 				_resortedDistanceHigh[resortedIndex] = distanceHighValues[serieIndex];
+				_resortedNumToursLow[resortedIndex] = numToursLowValues[serieIndex];
+				_resortedNumToursHigh[resortedIndex] = numToursHighValues[serieIndex];
 				_resortedTimeLow[resortedIndex] = timeLowValues[serieIndex];
 				_resortedTimeHigh[resortedIndex] = timeHighValues[serieIndex];
 
@@ -411,6 +454,8 @@ public abstract class StatisticMonth extends TourbookStatistic {
 				_resortedAltitudeHigh[resortedIndex] = altitudeHighValues[serieIndex];
 				_resortedDistanceLow[resortedIndex] = distanceLowValues[serieIndex];
 				_resortedDistanceHigh[resortedIndex] = distanceHighValues[serieIndex];
+				_resortedNumToursLow[resortedIndex] = numToursLowValues[serieIndex];
+				_resortedNumToursHigh[resortedIndex] = numToursHighValues[serieIndex];
 				_resortedTimeLow[resortedIndex] = timeLowValues[serieIndex];
 				_resortedTimeHigh[resortedIndex] = timeHighValues[serieIndex];
 
@@ -426,6 +471,8 @@ public abstract class StatisticMonth extends TourbookStatistic {
 				_resortedAltitudeHigh[resortedIndex] = altitudeHighValues[serieIndex];
 				_resortedDistanceLow[resortedIndex] = distanceLowValues[serieIndex];
 				_resortedDistanceHigh[resortedIndex] = distanceHighValues[serieIndex];
+				_resortedNumToursLow[resortedIndex] = numToursLowValues[serieIndex];
+				_resortedNumToursHigh[resortedIndex] = numToursHighValues[serieIndex];
 				_resortedTimeLow[resortedIndex] = timeLowValues[serieIndex];
 				_resortedTimeHigh[resortedIndex] = timeHighValues[serieIndex];
 
@@ -507,7 +554,8 @@ public abstract class StatisticMonth extends TourbookStatistic {
 		_statFirstYear = statContext.statFirstYear;
 		_statNumberOfYears = statContext.statNumberOfYears;
 
-		_tourMonthData = DataProvider_Tour_Month.getInstance().getMonthData(_appPerson,
+		_tourMonthData = DataProvider_Tour_Month.getInstance().getMonthData(
+				_appPerson,
 				_appTourTypeFilter,
 				_statFirstYear,
 				_statNumberOfYears,

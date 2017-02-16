@@ -229,8 +229,9 @@ public class ChartOptions_YearSummary implements IStatisticOptions {
 				ITourbookPreferences.STAT_YEAR_IS_SHOW_NUMBER_OF_TOURS,
 				_chkShowNumberOfTours.getSelection());
 
-		_prefStore
-				.setValue(ITourbookPreferences.STAT_YEAR_IS_SHOW_YEAR_SEPARATOR, _chkShowYearSeparator.getSelection());
+		_prefStore.setValue(//
+				ITourbookPreferences.STAT_YEAR_IS_SHOW_YEAR_SEPARATOR,
+				_chkShowYearSeparator.getSelection());
 
 		_prefStore.setValue(
 				ITourbookPreferences.STAT_YEAR_CHART_TYPE,

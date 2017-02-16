@@ -43,6 +43,7 @@ public class ChartOptions_WeekSummary implements IStatisticOptions {
 	private Button					_chkShowAltitude;
 	private Button					_chkShowDistance;
 	private Button					_chkShowDuration;
+	private Button					_chkShowNumberOfTours;
 
 	private Button					_rdoChartType_BarAdjacent;
 	private Button					_rdoChartType_BarStacked;
@@ -61,7 +62,8 @@ public class ChartOptions_WeekSummary implements IStatisticOptions {
 		final Group group = new Group(parent, SWT.NONE);
 //		group.setText(Messages.Pref_Graphs_Group_Grid);
 		group.setText(Messages.Pref_Statistic_Group_WeekSummary);
-		GridDataFactory.fillDefaults()//
+		GridDataFactory
+				.fillDefaults()//
 				.grab(true, false)
 				.span(2, 1)
 				.applyTo(group);
@@ -101,6 +103,14 @@ public class ChartOptions_WeekSummary implements IStatisticOptions {
 				_chkShowDuration = new Button(container, SWT.CHECK);
 				_chkShowDuration.setText(Messages.Pref_Statistic_Checkbox_Duration);
 				_chkShowDuration.addSelectionListener(_defaultSelectionListener);
+			}
+			{
+				/*
+				 * Show number of tours
+				 */
+				_chkShowNumberOfTours = new Button(container, SWT.CHECK);
+				_chkShowNumberOfTours.setText(Messages.Pref_Statistic_Checkbox_NumberOfTours);
+				_chkShowNumberOfTours.addSelectionListener(_defaultSelectionListener);
 			}
 		}
 	}
@@ -162,6 +172,8 @@ public class ChartOptions_WeekSummary implements IStatisticOptions {
 		_chkShowAltitude.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_WEEK_IS_SHOW_ALTITUDE));
 		_chkShowDistance.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_WEEK_IS_SHOW_DISTANCE));
 		_chkShowDuration.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_WEEK_IS_SHOW_DURATION));
+		_chkShowNumberOfTours.setSelection(//
+				_prefStore.getDefaultBoolean(ITourbookPreferences.STAT_WEEK_IS_SHOW_NUMBER_OF_TOURS));
 
 		final String chartType = _prefStore.getDefaultString(ITourbookPreferences.STAT_WEEK_CHART_TYPE);
 		_rdoChartType_BarAdjacent.setSelection(chartType.equals(ChartDataSerie.CHART_TYPE_BAR_ADJACENT));
@@ -174,6 +186,8 @@ public class ChartOptions_WeekSummary implements IStatisticOptions {
 		_chkShowAltitude.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_WEEK_IS_SHOW_ALTITUDE));
 		_chkShowDistance.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_WEEK_IS_SHOW_DISTANCE));
 		_chkShowDuration.setSelection(_prefStore.getBoolean(ITourbookPreferences.STAT_WEEK_IS_SHOW_DURATION));
+		_chkShowNumberOfTours.setSelection(//
+				_prefStore.getBoolean(ITourbookPreferences.STAT_WEEK_IS_SHOW_NUMBER_OF_TOURS));
 
 		final String chartType = _prefStore.getString(ITourbookPreferences.STAT_WEEK_CHART_TYPE);
 		_rdoChartType_BarAdjacent.setSelection(chartType.equals(ChartDataSerie.CHART_TYPE_BAR_ADJACENT));
@@ -186,8 +200,12 @@ public class ChartOptions_WeekSummary implements IStatisticOptions {
 		_prefStore.setValue(ITourbookPreferences.STAT_WEEK_IS_SHOW_ALTITUDE, _chkShowAltitude.getSelection());
 		_prefStore.setValue(ITourbookPreferences.STAT_WEEK_IS_SHOW_DISTANCE, _chkShowDistance.getSelection());
 		_prefStore.setValue(ITourbookPreferences.STAT_WEEK_IS_SHOW_DURATION, _chkShowDuration.getSelection());
+		_prefStore.setValue(//
+				ITourbookPreferences.STAT_WEEK_IS_SHOW_NUMBER_OF_TOURS,
+				_chkShowNumberOfTours.getSelection());
 
-		_prefStore.setValue(ITourbookPreferences.STAT_WEEK_CHART_TYPE,
+		_prefStore.setValue(
+				ITourbookPreferences.STAT_WEEK_CHART_TYPE,
 				_rdoChartType_BarAdjacent.getSelection()
 						? ChartDataSerie.CHART_TYPE_BAR_ADJACENT
 						: ChartDataSerie.CHART_TYPE_BAR_STACKED);

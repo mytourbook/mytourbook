@@ -39,6 +39,7 @@ public class StatisticWeek_Summary extends StatisticWeek {
 	private boolean					_isShowAltitude;
 	private boolean					_isShowDistance;
 	private boolean					_isShowDuration;
+	private boolean					_isShowNumTours;
 
 	private void addPrefListener(final Composite container) {
 
@@ -53,7 +54,10 @@ public class StatisticWeek_Summary extends StatisticWeek {
 				if (property.equals(ITourbookPreferences.STAT_WEEK_CHART_TYPE)
 						|| property.equals(ITourbookPreferences.STAT_WEEK_IS_SHOW_ALTITUDE)
 						|| property.equals(ITourbookPreferences.STAT_WEEK_IS_SHOW_DISTANCE)
-						|| property.equals(ITourbookPreferences.STAT_WEEK_IS_SHOW_DURATION)) {
+						|| property.equals(ITourbookPreferences.STAT_WEEK_IS_SHOW_DURATION)
+						|| property.equals(ITourbookPreferences.STAT_WEEK_IS_SHOW_NUMBER_OF_TOURS)
+				//
+				) {
 
 					// get the changed preferences
 					getPreferences();
@@ -104,6 +108,10 @@ public class StatisticWeek_Summary extends StatisticWeek {
 			createYData_Duration(chartDataModel);
 		}
 
+		if (_isShowNumTours) {
+			createYData_NumTours(chartDataModel);
+		}
+
 		return chartDataModel;
 	}
 
@@ -117,6 +125,7 @@ public class StatisticWeek_Summary extends StatisticWeek {
 		_isShowAltitude = _prefStore.getBoolean(ITourbookPreferences.STAT_WEEK_IS_SHOW_ALTITUDE);
 		_isShowDistance = _prefStore.getBoolean(ITourbookPreferences.STAT_WEEK_IS_SHOW_DISTANCE);
 		_isShowDuration = _prefStore.getBoolean(ITourbookPreferences.STAT_WEEK_IS_SHOW_DURATION);
+		_isShowNumTours = _prefStore.getBoolean(ITourbookPreferences.STAT_WEEK_IS_SHOW_NUMBER_OF_TOURS);
 	}
 
 	@Override

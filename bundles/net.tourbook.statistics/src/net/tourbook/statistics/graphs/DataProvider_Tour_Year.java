@@ -106,9 +106,9 @@ public class DataProvider_Tour_Year extends DataProvider {
 
 			final float[][] dbDistance = new float[numTourTypes][numYears];
 			final float[][] dbAltitude = new float[numTourTypes][numYears];
-			final int[][] dbDurationTime = new int[numTourTypes][numYears];
 			final float[][] dbNumTours = new float[numTourTypes][numYears];
 
+			final int[][] dbDurationTime = new int[numTourTypes][numYears];
 			final int[][] dbRecordingTime = new int[numTourTypes][numYears];
 			final int[][] dbDrivingTime = new int[numTourTypes][numYears];
 			final int[][] dbBreakTime = new int[numTourTypes][numYears];
@@ -192,6 +192,7 @@ public class DataProvider_Tour_Year extends DataProvider {
 			final ArrayList<Object> distanceWithData = new ArrayList<Object>();
 			final ArrayList<Object> durationWithData = new ArrayList<Object>();
 			final ArrayList<Object> numToursWithData = new ArrayList<Object>();
+
 			final ArrayList<Object> recordingTimeWithData = new ArrayList<Object>();
 			final ArrayList<Object> drivingTimeWithData = new ArrayList<Object>();
 			final ArrayList<Object> breakTimeWithData = new ArrayList<Object>();

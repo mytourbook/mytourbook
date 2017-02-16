@@ -39,6 +39,7 @@ public class StatisticMonth_Summary extends StatisticMonth {
 	private boolean					_isShowAltitude;
 	private boolean					_isShowDistance;
 	private boolean					_isShowDuration;
+	private boolean					_isShowNumTours;
 
 	private void addPrefListener(final Composite container) {
 
@@ -54,6 +55,7 @@ public class StatisticMonth_Summary extends StatisticMonth {
 						|| property.equals(ITourbookPreferences.STAT_MONTH_IS_SHOW_ALTITUDE)
 						|| property.equals(ITourbookPreferences.STAT_MONTH_IS_SHOW_DISTANCE)
 						|| property.equals(ITourbookPreferences.STAT_MONTH_IS_SHOW_DURATION)
+						|| property.equals(ITourbookPreferences.STAT_MONTH_IS_SHOW_NUMBER_OF_TOURS)
 						|| property.equals(ITourbookPreferences.STAT_MONTH_IS_SHOW_YEAR_SEPARATOR)) {
 
 					// get the changed preferences
@@ -110,6 +112,10 @@ public class StatisticMonth_Summary extends StatisticMonth {
 			createYData_Duration(chartDataModel);
 		}
 
+		if (_isShowNumTours) {
+			createYData_NumTours(chartDataModel);
+		}
+
 		return chartDataModel;
 	}
 
@@ -123,6 +129,7 @@ public class StatisticMonth_Summary extends StatisticMonth {
 		_isShowAltitude = _prefStore.getBoolean(ITourbookPreferences.STAT_MONTH_IS_SHOW_ALTITUDE);
 		_isShowDistance = _prefStore.getBoolean(ITourbookPreferences.STAT_MONTH_IS_SHOW_DISTANCE);
 		_isShowDuration = _prefStore.getBoolean(ITourbookPreferences.STAT_MONTH_IS_SHOW_DURATION);
+		_isShowNumTours = _prefStore.getBoolean(ITourbookPreferences.STAT_MONTH_IS_SHOW_NUMBER_OF_TOURS);
 	}
 
 	@Override

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -89,14 +89,15 @@ public class DataProvider_Tour_Week extends DataProvider {
 		final SQLFilter sqlFilter = new SQLFilter();
 
 		final String sqlString = "SELECT \n" //$NON-NLS-1$
-				+ " StartWeekYear,			\n" // 1 //$NON-NLS-1$
-				+ " StartWeek,				\n" // 2 //$NON-NLS-1$
-				+ " SUM(TourDistance),		\n" // 3 //$NON-NLS-1$
-				+ " SUM(TourAltUp),			\n" // 4 //$NON-NLS-1$
-				+ " SUM(CASE WHEN TourDrivingTime > 0 THEN TourDrivingTime ELSE TourRecordingTime END),\n" // 5 //$NON-NLS-1$
-				+ " SUM(TourRecordingTime),	\n" // 6 //$NON-NLS-1$
-				+ " SUM(TourDrivingTime),	\n" // 7 //$NON-NLS-1$
-				+ " TourType_TypeId 		\n" // 8 //$NON-NLS-1$
+				+ "StartWeekYear,			\n" // 1 //$NON-NLS-1$
+				+ "StartWeek,				\n" // 2 //$NON-NLS-1$
+				+ "SUM(TourDistance),		\n" // 3 //$NON-NLS-1$
+				+ "SUM(TourAltUp),			\n" // 4 //$NON-NLS-1$
+				+ "SUM(CASE WHEN TourDrivingTime > 0 THEN TourDrivingTime ELSE TourRecordingTime END),\n" // 5 //$NON-NLS-1$
+				+ "SUM(TourRecordingTime),	\n" // 6 //$NON-NLS-1$
+				+ "SUM(TourDrivingTime),	\n" // 7 //$NON-NLS-1$
+				+ "SUM(1), 					\n" // 8 //$NON-NLS-1$
+				+ "TourType_TypeId 			\n" // 9 //$NON-NLS-1$
 				//
 				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -110,6 +111,7 @@ public class DataProvider_Tour_Week extends DataProvider {
 
 			final float[][] dbDistance = new float[serieLength][numWeeks];
 			final float[][] dbAltitude = new float[serieLength][numWeeks];
+			final float[][] dbNumTours = new float[serieLength][numWeeks];
 
 			final int[][] dbDurationTime = new int[serieLength][numWeeks];
 			final int[][] dbRecordingTime = new int[serieLength][numWeeks];
@@ -159,9 +161,9 @@ public class DataProvider_Tour_Week extends DataProvider {
 				 * index
 				 */
 				int colorIndex = 0;
-				final Long dbTypeIdObject = (Long) result.getObject(8);
+				final Long dbTypeIdObject = (Long) result.getObject(9);
 				if (dbTypeIdObject != null) {
-					final long dbTypeId = result.getLong(8);
+					final long dbTypeId = result.getLong(9);
 					for (int typeIndex = 0; typeIndex < tourTypes.length; typeIndex++) {
 						if (dbTypeId == tourTypes[typeIndex].getTypeId()) {
 							colorIndex = colorOffset + typeIndex;
@@ -180,6 +182,9 @@ public class DataProvider_Tour_Week extends DataProvider {
 
 				final int recordingTime = result.getInt(6);
 				final int drivingTime = result.getInt(7);
+				final int numTours = result.getInt(8);
+
+				dbNumTours[colorIndex][weekIndex] = numTours;
 
 				dbRecordingTime[colorIndex][weekIndex] = recordingTime;
 				dbDrivingTime[colorIndex][weekIndex] = drivingTime;
@@ -206,6 +211,9 @@ public class DataProvider_Tour_Week extends DataProvider {
 			_tourWeekData.recordingTime = dbRecordingTime;
 			_tourWeekData.drivingTime = dbDrivingTime;
 			_tourWeekData.breakTime = dbBreakTime;
+
+			_tourWeekData.numToursLow = new float[serieLength][numWeeks];
+			_tourWeekData.numToursHigh = dbNumTours;
 
 		} catch (final SQLException e) {
 			UI.showSQLException(e);

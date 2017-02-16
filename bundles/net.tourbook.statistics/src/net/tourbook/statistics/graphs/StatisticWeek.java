@@ -198,7 +198,8 @@ public abstract class StatisticWeek extends TourbookStatistic {
 		titleFormat.append(Messages.tourtime_info_week);
 		titleFormat.append(UI.NEW_LINE);
 
-		final String toolTipTitle = String.format(titleFormat.toString(), //
+		final String toolTipTitle = String.format(
+				titleFormat.toString(), //
 				tourTypeName,
 				weekOfYear,
 				weekYear
@@ -222,8 +223,12 @@ public abstract class StatisticWeek extends TourbookStatistic {
 		toolTipFormat.append(Messages.tourtime_info_driving_time);
 		toolTipFormat.append(UI.NEW_LINE);
 		toolTipFormat.append(Messages.tourtime_info_break_time);
+		toolTipFormat.append(UI.NEW_LINE);
+		toolTipFormat.append(UI.NEW_LINE);
+		toolTipFormat.append(Messages.TourTime_Info_NumberOfTours);
 
-		final String toolTipLabel = String.format(toolTipFormat.toString(), //
+		final String toolTipLabel = String.format(
+				toolTipFormat.toString(), //
 				//
 				beginDate,
 				endDate,
@@ -241,7 +246,9 @@ public abstract class StatisticWeek extends TourbookStatistic {
 				(drivingTime % 3600) / 60,
 				//
 				breakTime / 3600,
-				(breakTime % 3600) / 60
+				(breakTime % 3600) / 60,
+				//
+				(int) _tourWeekData.numToursHigh[serieIndex][valueIndex]
 		//
 		).toString();
 
@@ -283,7 +290,8 @@ public abstract class StatisticWeek extends TourbookStatistic {
 	void createYData_Altitude(final ChartDataModel chartDataModel) {
 
 		// altitude
-		final ChartDataYSerie yData = new ChartDataYSerie(ChartType.BAR,
+		final ChartDataYSerie yData = new ChartDataYSerie(
+				ChartType.BAR,
 				getChartType(_chartType),
 				_tourWeekData.altitudeLow,
 				_tourWeekData.altitudeHigh);
@@ -379,7 +387,8 @@ public abstract class StatisticWeek extends TourbookStatistic {
 	void createYData_Distance(final ChartDataModel chartDataModel) {
 
 		// distance
-		final ChartDataYSerie yData = new ChartDataYSerie(ChartType.BAR,
+		final ChartDataYSerie yData = new ChartDataYSerie(
+				ChartType.BAR,
 				getChartType(_chartType),
 				_tourWeekData.distanceLow,
 				_tourWeekData.distanceHigh);
@@ -402,7 +411,8 @@ public abstract class StatisticWeek extends TourbookStatistic {
 	void createYData_Duration(final ChartDataModel chartDataModel) {
 
 		// duration
-		final ChartDataYSerie yData = new ChartDataYSerie(ChartType.BAR,
+		final ChartDataYSerie yData = new ChartDataYSerie(
+				ChartType.BAR,
 				getChartType(_chartType),
 				_tourWeekData.getDurationTimeLowFloat(),
 				_tourWeekData.getDurationTimeHighFloat());
@@ -417,6 +427,31 @@ public abstract class StatisticWeek extends TourbookStatistic {
 		StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_TIME, _appTourTypeFilter);
 		StatisticServices.setTourTypeColorIndex(yData, _tourWeekData.typeIds, _appTourTypeFilter);
 		StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_TIME);
+
+		chartDataModel.addYData(yData);
+	}
+
+	/**
+	 * Number of tours
+	 * 
+	 * @param chartDataModel
+	 */
+	void createYData_NumTours(final ChartDataModel chartDataModel) {
+
+		final ChartDataYSerie yData = new ChartDataYSerie(
+				ChartType.BAR,
+				getChartType(_chartType),
+				_tourWeekData.numToursLow,
+				_tourWeekData.numToursHigh);
+
+		yData.setYTitle(Messages.LABEL_GRAPH_NUMBER_OF_TOURS);
+		yData.setUnitLabel(Messages.NUMBERS_UNIT);
+		yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
+		yData.setShowYSlider(true);
+
+		StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_TOUR);
+		StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_TOUR, _appTourTypeFilter);
+		StatisticServices.setTourTypeColorIndex(yData, _tourWeekData.typeIds, _appTourTypeFilter);
 
 		chartDataModel.addYData(yData);
 	}
@@ -472,7 +507,8 @@ public abstract class StatisticWeek extends TourbookStatistic {
 		_statYoungestYear = statContext.statFirstYear;
 		_statNumberOfYears = statContext.statNumberOfYears;
 
-		_tourWeekData = DataProvider_Tour_Week.getInstance().getWeekData(_appPerson,
+		_tourWeekData = DataProvider_Tour_Week.getInstance().getWeekData(
+				_appPerson,
 				_appTourTypeFilter,
 				_statYoungestYear,
 				_statNumberOfYears,
