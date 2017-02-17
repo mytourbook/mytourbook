@@ -30,8 +30,8 @@ public class StatisticMonth_Altitude extends StatisticMonth {
 
 		final ChartDataModel chartDataModel = new ChartDataModel(ChartType.BAR);
 
-		createXDataMonths(chartDataModel);
-		createYDataAltitude(chartDataModel);
+		createXData_Months(chartDataModel);
+		createYData_Altitude(chartDataModel);
 
 		return chartDataModel;
 	}

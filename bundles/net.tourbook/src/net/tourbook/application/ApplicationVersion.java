@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,7 +24,7 @@ public class ApplicationVersion {
 	/**
 	 * Copyright year which is displayed in the splash screen.
 	 */
-	public static final String	SPLASH_COPYRIGHT_YEAR		= "2016";			//$NON-NLS-1$
+	public static final String	SPLASH_COPYRIGHT_YEAR		= "2017";			//$NON-NLS-1$
 
 // X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
 	private static final String	DEVELOPMENT_VERSION_TEXT	= UI.EMPTY_STRING;

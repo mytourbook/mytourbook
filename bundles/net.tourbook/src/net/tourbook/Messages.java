@@ -1374,9 +1374,15 @@ public class Messages extends NLS {
 	public static String		Pref_Statistic_Checkbox_AvgSpeed;
 	public static String		Pref_Statistic_Checkbox_Distance;
 	public static String		Pref_Statistic_Checkbox_Duration;
+	public static String		Pref_Statistic_Checkbox_NumberOfTours;
+	public static String		Pref_Statistic_Checkbox_YearSeparator;
 
+	public static String		Pref_Statistic_Group_ChartType;
 	public static String		Pref_Statistic_Group_DaySummary;
+	public static String		Pref_Statistic_Group_MonthSummary;
 	public static String		Pref_Statistic_Group_TourFrequency;
+	public static String		Pref_Statistic_Group_WeekSummary;
+	public static String		Pref_Statistic_Group_YearSummary;
 
 	public static String		Pref_Statistic_Label_altitude;
 	public static String		Pref_Statistic_Label_distance;
@@ -1384,6 +1390,9 @@ public class Messages extends NLS {
 	public static String		Pref_Statistic_Label_Interval;
 	public static String		Pref_Statistic_Label_Minimum;
 	public static String		Pref_Statistic_Label_NumberOfBars;
+
+	public static String		Pref_Statistic_Radio_BarAdjacent;
+	public static String		Pref_Statistic_Radio_BarStacked;
 
 	public static String		Pref_Tour_Button_FailedUpdate;
 	public static String		Pref_Tour_Dialog_ConfirmDatabaseUpdate_Message;

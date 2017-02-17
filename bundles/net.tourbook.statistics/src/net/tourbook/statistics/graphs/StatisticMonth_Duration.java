@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,7 +18,7 @@ package net.tourbook.statistics.graphs;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartType;
 
-public class StatisticMonth_TourTime extends StatisticMonth {
+public class StatisticMonth_Duration extends StatisticMonth {
 
 	@Override
 	protected String getBarOrderingStateKey() {
@@ -30,8 +30,8 @@ public class StatisticMonth_TourTime extends StatisticMonth {
 
 		final ChartDataModel chartDataModel = new ChartDataModel(ChartType.BAR);
 
-		createXDataMonths(chartDataModel);
-		createYDataTourTime(chartDataModel);
+		createXData_Months(chartDataModel);
+		createYData_Duration(chartDataModel);
 
 		return chartDataModel;
 	}

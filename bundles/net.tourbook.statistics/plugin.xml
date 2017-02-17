@@ -70,7 +70,7 @@
             name="%Pref_Week_Summary_Duration"
             category-time="Week"/>
       <statistic
-            class="net.tourbook.statistics.graphs.StatisticMonth_TourTime"
+            class="net.tourbook.statistics.graphs.StatisticMonth_Duration"
             category-data="Time"
             id="net.tourbook.statistics.StatisticSummaryMonthTourTime"
             name="%Pref_Month_Summary_TourTime"

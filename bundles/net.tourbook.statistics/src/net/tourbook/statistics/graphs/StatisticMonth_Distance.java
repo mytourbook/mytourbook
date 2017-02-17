@@ -30,8 +30,8 @@ public class StatisticMonth_Distance extends StatisticMonth {
 
 		final ChartDataModel chartDataModel = new ChartDataModel(ChartType.BAR);
 
-		createXDataMonths(chartDataModel);
-		createYDataDistance(chartDataModel);
+		createXData_Months(chartDataModel);
+		createYData_Distance(chartDataModel);
 
 		return chartDataModel;
 	}

@@ -25,8 +25,8 @@ public class StatisticWeek_Altitude extends StatisticWeek {
 
 		final ChartDataModel chartDataModel = new ChartDataModel(ChartType.BAR);
 
-		createXDataWeek(chartDataModel);
-		createYDataAltitude(chartDataModel);
+		createXData_Week(chartDataModel);
+		createYData_Altitude(chartDataModel);
 
 		return chartDataModel;
 	}

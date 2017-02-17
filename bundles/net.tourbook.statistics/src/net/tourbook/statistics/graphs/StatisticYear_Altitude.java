@@ -30,8 +30,8 @@ public class StatisticYear_Altitude extends StatisticYear {
 
 		final ChartDataModel chartDataModel = new ChartDataModel(ChartType.BAR);
 
-		createXDataYear(chartDataModel);
-		createYDataAltitude(chartDataModel);
+		createXData_Year(chartDataModel);
+		createYData_Altitude(chartDataModel);
 
 		return chartDataModel;
 	}

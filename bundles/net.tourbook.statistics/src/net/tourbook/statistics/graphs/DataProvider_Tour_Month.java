@@ -76,14 +76,15 @@ public class DataProvider_Tour_Month extends DataProvider {
 
 		final String sqlString = "SELECT " // //$NON-NLS-1$
 
-				+ "startYear," // 					1 //$NON-NLS-1$
-				+ "startMonth," // 					2 //$NON-NLS-1$
-				+ "SUM(tourDistance)," //			3 //$NON-NLS-1$
-				+ "SUM(tourAltUp)," // 				4 //$NON-NLS-1$
-				+ "SUM(CASE WHEN tourDrivingTime > 0 THEN tourDrivingTime ELSE tourRecordingTime END)," // 5 //$NON-NLS-1$
-				+ "SUM(tourRecordingTime)," // 		6 //$NON-NLS-1$
-				+ "SUM(tourDrivingTime)," // 		7 //$NON-NLS-1$
-				+ "tourType_typeId" // 				8 //$NON-NLS-1$
+				+ "startYear, " // 						1 //$NON-NLS-1$
+				+ "startMonth, " // 					2 //$NON-NLS-1$
+				+ "SUM(tourDistance), " //				3 //$NON-NLS-1$
+				+ "SUM(tourAltUp), " // 				4 //$NON-NLS-1$
+				+ "SUM(CASE WHEN tourDrivingTime > 0 THEN tourDrivingTime ELSE tourRecordingTime END), " // 5 //$NON-NLS-1$
+				+ "SUM(tourRecordingTime), " // 		6 //$NON-NLS-1$
+				+ "SUM(tourDrivingTime), " // 			7 //$NON-NLS-1$
+				+ "SUM(1), " //							8 //$NON-NLS-1$
+				+ "tourType_typeId" // 					9 //$NON-NLS-1$
 
 				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -106,6 +107,7 @@ public class DataProvider_Tour_Month extends DataProvider {
 
 			final float[][] dbAltitude = new float[numTourTypes][numMonths];
 			final float[][] dbDistance = new float[numTourTypes][numMonths];
+			final float[][] dbNumTours = new float[numTourTypes][numMonths];
 
 			final int[][] dbDurationTime = new int[numTourTypes][numMonths];
 			final int[][] dbRecordingTime = new int[numTourTypes][numMonths];
@@ -131,7 +133,8 @@ public class DataProvider_Tour_Month extends DataProvider {
 				final int duration = result.getInt(5);
 				final int recordingTime = result.getInt(6);
 				final int drivingTime = result.getInt(7);
-				final Long tourTypeIdObject = (Long) result.getObject(8);
+				final int numTours = result.getInt(8);
+				final Long tourTypeIdObject = (Long) result.getObject(9);
 
 				final int yearIndex = numberOfYears - (lastYear - year + 1);
 				final int monthIndex = (month - 1) + yearIndex * 12;
@@ -163,6 +166,7 @@ public class DataProvider_Tour_Month extends DataProvider {
 				dbAltitude[colorIndex][monthIndex] = altitude;
 				dbDistance[colorIndex][monthIndex] = distance;
 				dbDurationTime[colorIndex][monthIndex] = duration;
+				dbNumTours[colorIndex][monthIndex] = numTours;
 
 				dbRecordingTime[colorIndex][monthIndex] = recordingTime;
 				dbDrivingTime[colorIndex][monthIndex] = drivingTime;
@@ -182,6 +186,8 @@ public class DataProvider_Tour_Month extends DataProvider {
 			final ArrayList<Object> altitudeWithData = new ArrayList<Object>();
 			final ArrayList<Object> distanceWithData = new ArrayList<Object>();
 			final ArrayList<Object> durationWithData = new ArrayList<Object>();
+			final ArrayList<Object> numToursWithData = new ArrayList<Object>();
+
 			final ArrayList<Object> recordingTimeWithData = new ArrayList<Object>();
 			final ArrayList<Object> drivingTimeWithData = new ArrayList<Object>();
 			final ArrayList<Object> breakTimeWithData = new ArrayList<Object>();
@@ -197,6 +203,7 @@ public class DataProvider_Tour_Month extends DataProvider {
 					altitudeWithData.add(dbAltitude[tourTypeIndex]);
 					distanceWithData.add(dbDistance[tourTypeIndex]);
 					durationWithData.add(dbDurationTime[tourTypeIndex]);
+					numToursWithData.add(dbNumTours[tourTypeIndex]);
 
 					recordingTimeWithData.add(dbRecordingTime[tourTypeIndex]);
 					drivingTimeWithData.add(dbDrivingTime[tourTypeIndex]);
@@ -229,12 +236,18 @@ public class DataProvider_Tour_Month extends DataProvider {
 				_tourMonthData.drivingTime = new int[1][numMonths];
 				_tourMonthData.breakTime = new int[1][numMonths];
 
+				_tourMonthData.numToursLow = new float[1][numMonths];
+				_tourMonthData.numToursHigh = new float[1][numMonths];
+
 			} else {
 
 				final long[][] usedTypeIds = new long[numUsedTourTypes][];
 
 				final float[][] usedAltitude = new float[numUsedTourTypes][];
 				final float[][] usedDistance = new float[numUsedTourTypes][];
+
+				final float[][] usedNumTours = new float[numUsedTourTypes][];
+
 				final int[][] usedDuration = new int[numUsedTourTypes][];
 				final int[][] usedRecordingTime = new int[numUsedTourTypes][];
 				final int[][] usedDrivingTime = new int[numUsedTourTypes][];
@@ -251,6 +264,8 @@ public class DataProvider_Tour_Month extends DataProvider {
 					usedRecordingTime[index] = (int[]) recordingTimeWithData.get(index);
 					usedDrivingTime[index] = (int[]) drivingTimeWithData.get(index);
 					usedBreakTime[index] = (int[]) breakTimeWithData.get(index);
+
+					usedNumTours[index] = (float[]) numToursWithData.get(index);
 				}
 
 				_tourMonthData.typeIds = usedTypeIds;
@@ -268,6 +283,9 @@ public class DataProvider_Tour_Month extends DataProvider {
 				_tourMonthData.recordingTime = usedRecordingTime;
 				_tourMonthData.drivingTime = usedDrivingTime;
 				_tourMonthData.breakTime = usedBreakTime;
+
+				_tourMonthData.numToursLow = new float[numUsedTourTypes][numMonths];
+				_tourMonthData.numToursHigh = usedNumTours;
 			}
 
 		} catch (final SQLException e) {

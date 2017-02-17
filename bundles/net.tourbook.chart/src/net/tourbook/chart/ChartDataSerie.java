@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -37,6 +37,9 @@ public abstract class ChartDataSerie {
 	public static final int			X_AXIS_UNIT_WEEK						= 100;
 	public static final int			X_AXIS_UNIT_NUMBER_CENTER				= 101;
 	public static final int			X_AXIS_UNIT_HISTORY						= 102;
+
+	public static final String		CHART_TYPE_BAR_ADJACENT					= "CHART_TYPE_BAR_ADJACENT";		//$NON-NLS-1$
+	public static final String		CHART_TYPE_BAR_STACKED					= "CHART_TYPE_BAR_STACKED";			//$NON-NLS-1$
 
 	/**
 	 * Default color, when default color is not set

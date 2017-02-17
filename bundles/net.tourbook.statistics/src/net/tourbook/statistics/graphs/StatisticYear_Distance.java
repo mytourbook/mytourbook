@@ -30,8 +30,8 @@ public class StatisticYear_Distance extends StatisticYear {
 
 		final ChartDataModel chartDataModel = new ChartDataModel(ChartType.BAR);
 
-		createXDataYear(chartDataModel);
-		createYDataDistance(chartDataModel);
+		createXData_Year(chartDataModel);
+		createYData_Distance(chartDataModel);
 
 		return chartDataModel;
 	}

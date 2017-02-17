@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -33,7 +33,7 @@ public class DataProvider_Tour_Week extends DataProvider {
 
 	private static DataProvider_Tour_Week	_instance;
 
-	private TourData_Week				_tourWeekData;
+	private TourData_Week					_tourWeekData;
 
 	private DataProvider_Tour_Week() {}
 
@@ -73,9 +73,9 @@ public class DataProvider_Tour_Week extends DataProvider {
 		final ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
 		final TourType[] tourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
 
-		int weekCounter = 0;
+		int numWeeks = 0;
 		for (final int weeks : _yearWeeks) {
-			weekCounter += weeks;
+			numWeeks += weeks;
 		}
 
 		int colorOffset = 0;
@@ -86,18 +86,18 @@ public class DataProvider_Tour_Week extends DataProvider {
 		int serieLength = colorOffset + tourTypes.length;
 		serieLength = serieLength == 0 ? 1 : serieLength;
 
-		final int valueLength = weekCounter;
 		final SQLFilter sqlFilter = new SQLFilter();
 
 		final String sqlString = "SELECT \n" //$NON-NLS-1$
-				+ " StartWeekYear,			\n" // 1 //$NON-NLS-1$
-				+ " StartWeek,				\n" // 2 //$NON-NLS-1$
-				+ " SUM(TourDistance),		\n" // 3 //$NON-NLS-1$
-				+ " SUM(TourAltUp),			\n" // 4 //$NON-NLS-1$
-				+ " SUM(CASE WHEN TourDrivingTime > 0 THEN TourDrivingTime ELSE TourRecordingTime END),\n" // 5 //$NON-NLS-1$
-				+ " SUM(TourRecordingTime),	\n" // 6 //$NON-NLS-1$
-				+ " SUM(TourDrivingTime),	\n" // 7 //$NON-NLS-1$
-				+ " TourType_TypeId 		\n" // 8 //$NON-NLS-1$
+				+ "StartWeekYear,			\n" // 1 //$NON-NLS-1$
+				+ "StartWeek,				\n" // 2 //$NON-NLS-1$
+				+ "SUM(TourDistance),		\n" // 3 //$NON-NLS-1$
+				+ "SUM(TourAltUp),			\n" // 4 //$NON-NLS-1$
+				+ "SUM(CASE WHEN TourDrivingTime > 0 THEN TourDrivingTime ELSE TourRecordingTime END),\n" // 5 //$NON-NLS-1$
+				+ "SUM(TourRecordingTime),	\n" // 6 //$NON-NLS-1$
+				+ "SUM(TourDrivingTime),	\n" // 7 //$NON-NLS-1$
+				+ "SUM(1), 					\n" // 8 //$NON-NLS-1$
+				+ "TourType_TypeId 			\n" // 9 //$NON-NLS-1$
 				//
 				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + " \n") //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -109,15 +109,16 @@ public class DataProvider_Tour_Week extends DataProvider {
 
 		try {
 
-			final float[][] dbDistance = new float[serieLength][valueLength];
-			final float[][] dbAltitude = new float[serieLength][valueLength];
+			final float[][] dbDistance = new float[serieLength][numWeeks];
+			final float[][] dbAltitude = new float[serieLength][numWeeks];
+			final float[][] dbNumTours = new float[serieLength][numWeeks];
 
-			final int[][] dbDurationTime = new int[serieLength][valueLength];
-			final int[][] dbRecordingTime = new int[serieLength][valueLength];
-			final int[][] dbDrivingTime = new int[serieLength][valueLength];
-			final int[][] dbBreakTime = new int[serieLength][valueLength];
+			final int[][] dbDurationTime = new int[serieLength][numWeeks];
+			final int[][] dbRecordingTime = new int[serieLength][numWeeks];
+			final int[][] dbDrivingTime = new int[serieLength][numWeeks];
+			final int[][] dbBreakTime = new int[serieLength][numWeeks];
 
-			final long[][] dbTypeIds = new long[serieLength][valueLength];
+			final long[][] dbTypeIds = new long[serieLength][numWeeks];
 
 			final Connection conn = TourDatabase.getInstance().getConnection();
 			final PreparedStatement statement = conn.prepareStatement(sqlString);
@@ -140,14 +141,29 @@ public class DataProvider_Tour_Week extends DataProvider {
 
 				final int weekIndex = allWeeks + dbWeek - 1;
 
+				if (weekIndex >= numWeeks) {
+
+					/**
+					 * This problem occured but is not yet fully fixed, it needs more investigation.
+					 * <p>
+					 * Problem with this configuration</br>
+					 * Statistic: Week summary</br>
+					 * Tour type: Velo (3 bars)</br>
+					 * Displayed years: 2013 + 2014
+					 * <p>
+					 * Problem occured when selecting year 2015
+					 */
+					continue;
+				}
+
 				/*
 				 * convert type id to the type index in the tour types list which is also the color
 				 * index
 				 */
 				int colorIndex = 0;
-				final Long dbTypeIdObject = (Long) result.getObject(8);
+				final Long dbTypeIdObject = (Long) result.getObject(9);
 				if (dbTypeIdObject != null) {
-					final long dbTypeId = result.getLong(8);
+					final long dbTypeId = result.getLong(9);
 					for (int typeIndex = 0; typeIndex < tourTypes.length; typeIndex++) {
 						if (dbTypeId == tourTypes[typeIndex].getTypeId()) {
 							colorIndex = colorOffset + typeIndex;
@@ -166,6 +182,9 @@ public class DataProvider_Tour_Week extends DataProvider {
 
 				final int recordingTime = result.getInt(6);
 				final int drivingTime = result.getInt(7);
+				final int numTours = result.getInt(8);
+
+				dbNumTours[colorIndex][weekIndex] = numTours;
 
 				dbRecordingTime[colorIndex][weekIndex] = recordingTime;
 				dbDrivingTime[colorIndex][weekIndex] = drivingTime;
@@ -180,18 +199,21 @@ public class DataProvider_Tour_Week extends DataProvider {
 			_tourWeekData.yearWeeks = _yearWeeks;
 			_tourWeekData.yearDays = _yearDays;
 
-			_tourWeekData.setDurationTimeLow(new int[serieLength][valueLength]);
+			_tourWeekData.setDurationTimeLow(new int[serieLength][numWeeks]);
 			_tourWeekData.setDurationTimeHigh(dbDurationTime);
 
-			_tourWeekData.distanceLow = new float[serieLength][valueLength];
+			_tourWeekData.distanceLow = new float[serieLength][numWeeks];
 			_tourWeekData.distanceHigh = dbDistance;
 
-			_tourWeekData.altitudeLow = new float[serieLength][valueLength];
+			_tourWeekData.altitudeLow = new float[serieLength][numWeeks];
 			_tourWeekData.altitudeHigh = dbAltitude;
 
 			_tourWeekData.recordingTime = dbRecordingTime;
 			_tourWeekData.drivingTime = dbDrivingTime;
 			_tourWeekData.breakTime = dbBreakTime;
+
+			_tourWeekData.numToursLow = new float[serieLength][numWeeks];
+			_tourWeekData.numToursHigh = dbNumTours;
 
 		} catch (final SQLException e) {
 			UI.showSQLException(e);

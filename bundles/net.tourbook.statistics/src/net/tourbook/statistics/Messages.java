@@ -24,6 +24,7 @@ public class Messages extends NLS {
 	public static String		LABEL_GRAPH_ALTITUDE;
 	public static String		LABEL_GRAPH_DAYTIME;
 	public static String		LABEL_GRAPH_DISTANCE;
+	public static String		LABEL_GRAPH_NUMBER_OF_TOURS;
 	public static String		LABEL_GRAPH_PACE;
 	public static String		LABEL_GRAPH_SPEED;
 	public static String		LABEL_GRAPH_TIME;
@@ -67,6 +68,7 @@ public class Messages extends NLS {
 	public static String		tourtime_info_recording_time_tour;
 	public static String		tourtime_info_tags;
 	public static String		tourtime_info_time;
+	public static String		TourTime_Info_NumberOfTours;
 	public static String		Tourtime_Info_TimeZone;
 	public static String		Tourtime_Info_TimeZoneDifference;
 	public static String		tourtime_info_tour_type;
