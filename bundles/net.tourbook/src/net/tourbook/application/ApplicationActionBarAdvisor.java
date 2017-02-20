@@ -18,6 +18,7 @@ package net.tourbook.application;
 import net.tourbook.Messages;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourTypeFilterManager;
+import net.tourbook.tour.filter.TourFilterManager;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.action.ActionContributionItem;
@@ -189,6 +190,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 		coolBar.add(tbItemTourFilter);
 		tbMgr_TourFilter.add(_actionTourFilter);
+		TourFilterManager.setTourFilterAction(_actionTourFilter);
 
 		/*
 		 * Toolbar: Measurement
@@ -279,12 +281,13 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	}
 
 	@Override
-	public IStatus saveState(final IMemento memento) {
+	public IStatus saveState(final IMemento state) {
 
-		_personContribItem.saveState(memento);
-		TourTypeFilterManager.saveState(memento);
+		_personContribItem.saveState(state);
+		TourTypeFilterManager.saveState(state);
+		TourFilterManager.saveState();
 
-		return super.saveState(memento);
+		return super.saveState(state);
 	}
 
 }

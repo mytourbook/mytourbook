@@ -300,13 +300,52 @@ public class SlideoutMap3LayerTooltip extends AnimatedToolTipShell {
 		}
 
 		final IToolProvider toolProvider = mapLayer.toolProvider;
-
 		if (toolProvider != null) {
 
 			// update UI when a tool provider is set in the layer
 
 			toggleToolVisibility(toolProvider, mapLayer.isLayerVisible, isUpdateUI);
 		}
+	}
+	/**
+	 * Show/hide tooltip.
+	 * 
+	 * @param toolProvider
+	 * @param isVisible
+	 * @param isUpdateUI
+	 */
+	protected void toggleToolVisibility(final IToolProvider toolProvider,
+										final boolean isVisible,
+										final boolean isUpdateUI) {
+
+//		final Object ttArea = toolProvider.getToolTipArea();
+//
+//		final ToolTip3Tool existingTool = _allTools.get(ttArea);
+//
+//		if (existingTool != null) {
+//
+//			if (toolProvider.isFlexTool()) {
+//
+//				// update tool visibility state
+//				existingTool.setToolVisibility(isVisible);
+//
+//			} else {
+//
+//				// remove default tool that the flex tool is created
+//
+//				_allTools.remove(ttArea);
+//			}
+//		}
+//
+//		/*
+//		 * force to create toggled tooltip
+//		 */
+//		closeTool(existingTool);
+//
+//		// UI is only updated when mouse is hovering the tool, otherwise tool is not set or displayed at the wrong location
+//		if (isUpdateUI) {
+//			onOwnerHovered(ttArea);
+//		}
 	}
 
 }

@@ -70,7 +70,6 @@ public abstract class ToolbarSlideout extends AnimatedToolTipShell {
 		});
 	}
 
-
 	@Override
 	protected boolean canShowToolTip() {
 		return true;
@@ -89,14 +88,20 @@ public abstract class ToolbarSlideout extends AnimatedToolTipShell {
 	@Override
 	public Point getToolTipLocation(final Point tipSize) {
 
-//		final int tipWidth = tipSize.x;
+		final int tipWidth = tipSize.x;
 		final int tipHeight = tipSize.y;
 
-//		final int itemWidth = _toolTipItemBounds.width;
+		final int itemWidth = _toolTipItemBounds.width;
 		final int itemHeight = _toolTipItemBounds.height;
 
 		// center horizontally
-		final int devX = _toolTipItemBounds.x;// + itemWidth / 2 - tipWidth / 2;
+
+		int devX = _toolTipItemBounds.x;
+
+		if (isCenterHorizontal()) {
+			devX += itemWidth / 2 - tipWidth / 2;
+		}
+
 		int devY = _toolTipItemBounds.y + itemHeight + 0;
 
 		final Rectangle displayBounds = Display.getCurrent().getBounds();
@@ -109,6 +114,14 @@ public abstract class ToolbarSlideout extends AnimatedToolTipShell {
 		}
 
 		return new Point(devX, devY);
+	}
+
+	/**
+	 * @return Returns <code>true</code> to center the slideout horizontal, otherwise it is
+	 *         displayed to the right of the action button.
+	 */
+	protected boolean isCenterHorizontal() {
+		return false;
 	}
 
 	@Override
@@ -167,6 +180,5 @@ public abstract class ToolbarSlideout extends AnimatedToolTipShell {
 			showToolTip();
 		}
 	}
-
 
 }

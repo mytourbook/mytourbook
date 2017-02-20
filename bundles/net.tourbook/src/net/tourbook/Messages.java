@@ -880,9 +880,9 @@ public class Messages extends NLS {
 	public static String		Image__TourBook_Week;
 	public static String		Image__TourChart;
 
-	public static String Image__TourFilter;
+	public static String		Image__TourFilter;
 
-	public static String Image__TourFilter_Disabled;
+	public static String		Image__TourFilter_Disabled;
 	public static String		Image__TourInfo;
 	public static String		Image__TourInfo_Disabled;
 	public static String		Image__TourLog;
@@ -1564,7 +1564,15 @@ public class Messages extends NLS {
 	public static String		Slideout_TourEditor_Label_LatLonDigits;
 	public static String		Slideout_TourEditor_Label_LatLonDigits_Tooltip;
 
-	public static String Slideout_TourFilter_Label_Title;
+	public static String		Slideout_TourFilter_Action_AddProfile_Tooltip;
+	public static String		Slideout_TourFilter_Action_CopyProfile_Tooltip;
+	public static String		Slideout_TourFilter_Action_DeleteProfile_Tooltip;
+	public static String		Slideout_TourFilter_Checkbox_IsFilterByDate;
+
+	public static String Slideout_TourFilter_Column_ProfileName;
+	public static String Slideout_TourFilter_Label_ProfileName;
+
+	public static String		Slideout_TourFilter_Label_Title;
 
 	public static String		Slideout_TourInfoOptions_Checkbox_IsShowInfoTooltip;
 	public static String		Slideout_TourInfoOptions_Checkbox_IsShowTourSeparator;
@@ -1753,7 +1761,7 @@ public class Messages extends NLS {
 	public static String		Tour_Editor_Radio_Cadence_Rpm;
 	public static String		Tour_Editor_Radio_Cadence_Spm;
 
-	public static String Tour_Filter_Action_Tooltip;
+	public static String		Tour_Filter_Action_Tooltip;
 
 	public static String		Tour_Log_Action_Clear_Tooltip;
 

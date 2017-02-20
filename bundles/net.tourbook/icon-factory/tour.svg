@@ -4164,9 +4164,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="32"
-     inkscape:cx="311.38704"
-     inkscape:cy="951.66421"
+     inkscape:zoom="22.627417"
+     inkscape:cx="326.43826"
+     inkscape:cy="949.25299"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -4174,7 +4174,7 @@
      inkscape:window-height="1334"
      inkscape:window-x="421"
      inkscape:window-y="74"
-     inkscape:window-maximized="0"
+     inkscape:window-maximized="1"
      inkscape:snap-grids="true"
      inkscape:snap-page="false"
      inkscape:snap-to-guides="false"
@@ -5654,6 +5654,25 @@
        x="300"
        y="86.362183"
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\tour-filter-2.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <path
+       style="fill:none;fill-opacity:1;stroke:#3a9ff7;stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 322.10777,89.362201 4.9,6.000009 v 4.99997 H 328 v -4.99997 l 4.908,-6.000009 z"
+       id="path5771-6-9-5-5-4-8-3"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\tour-filter.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       sodipodi:nodetypes="ccccccc" />
+    <rect
+       style="opacity:0.98999999;fill:none;stroke:none;stroke-width:1.00000012"
+       id="rect6561-7-5-9-4-3"
+       width="15.999998"
+       height="16.000002"
+       x="320.00772"
+       y="86.362167"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\tour-filter.png"
        inkscape:export-xdpi="96"
        inkscape:export-ydpi="96" />
   </g>

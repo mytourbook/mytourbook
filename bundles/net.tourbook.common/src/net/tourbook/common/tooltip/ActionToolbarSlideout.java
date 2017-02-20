@@ -127,6 +127,13 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
 		return _dialogId;
 	}
 
+	/**
+	 * @return Returns <code>true</code> when the action is selected, otherwise <code>false</code>.
+	 */
+	public boolean getSelection() {
+		return _actionToolItem.getSelection();
+	}
+
 	@Override
 	public void hideDialog() {
 		_slideoutOptions.hideNow();
@@ -186,7 +193,11 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
 		openSlideout(itemBounds, true);
 	}
 
-	private void onSelect() {
+	/**
+	 * Is called when the action item is selected or deselected. This will open/close the slideout,
+	 * the selection state is available with {@link #getSelection()}.
+	 */
+	protected void onSelect() {
 
 		// ignore when it can not toggle
 		if (isToggleAction == false) {
@@ -238,7 +249,7 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
 		}
 	}
 
-	public void setSelected(final boolean isSelected) {
+	public void setSelection(final boolean isSelected) {
 
 		if (_actionToolItem == null) {
 			// this happened

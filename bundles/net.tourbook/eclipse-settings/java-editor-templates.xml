@@ -120,7 +120,8 @@ ${imp:import(org.eclipse.e4.ui.di.Focus)}
 	${cursor}
 }</template><template autoinsert="false" context="java-statements" deleted="false" description="iterate over an array or Iterable" enabled="true" id="org.eclipse.jdt.ui.templates.for_iterable" name="foreach">for (${iterable_type} ${iterable_element} : ${iterable}) {
 	${cursor}
-}</template><template autoinsert="true" context="java" deleted="false" description="Set formatting ON/OFF" enabled="true" name="formatting">// SET_FORMATTING_OFF</template><template autoinsert="false" context="swt-statements" deleted="false" description="new GridData for a Control" enabled="true" id="org.eclipse.jdt.ui.text.codetemplates.swt.griddata" name="GridData">${gridData:newType(org.eclipse.swt.layout.GridData)} ${layoutData:newName(org.eclipse.swt.layout.GridData)} = new ${gridData}(SWT.${horizontal:link(FILL, BEGINNING, CENTER, END)}, SWT.${vertical:link(FILL, TOP, CENTER, BOTTOM)}, ${hex:link(true, false)}, ${vex:link(false, true)});
+}</template><template autoinsert="true" context="java" deleted="false" description="Set formatting ON/OFF" enabled="true" name="formatting">// SET_FORMATTING_OFF&#13;
+// SET_FORMATTING_ON</template><template autoinsert="false" context="swt-statements" deleted="false" description="new GridData for a Control" enabled="true" id="org.eclipse.jdt.ui.text.codetemplates.swt.griddata" name="GridData">${gridData:newType(org.eclipse.swt.layout.GridData)} ${layoutData:newName(org.eclipse.swt.layout.GridData)} = new ${gridData}(SWT.${horizontal:link(FILL, BEGINNING, CENTER, END)}, SWT.${vertical:link(FILL, TOP, CENTER, BOTTOM)}, ${hex:link(true, false)}, ${vex:link(false, true)});
 ${layoutData}.widthHint= ${width:link(SWT.DEFAULT)};
 ${layoutData}.heightHint= ${height:link(SWT.DEFAULT)};
 ${parent:var(org.eclipse.swt.widgets.Control)}.setLayoutData(${layoutData});

@@ -40,6 +40,7 @@ import net.tourbook.search.FTSearchManager;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.TourTypeFilterManager;
 import net.tourbook.tour.TourTypeMenuManager;
+import net.tourbook.tour.filter.TourFilterManager;
 import net.tourbook.tour.photo.TourPhotoManager;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.views.rawData.RawDataView;
@@ -85,20 +86,20 @@ import org.eclipse.ui.internal.WorkbenchPlugin;
 public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 
+	private static IPreferenceStore				_prefStore		= TourbookPlugin.getDefault().getPreferenceStore();
+
 	private ApplicationActionBarAdvisor			_applicationActionBarAdvisor;
-
 	private IPerspectiveDescriptor				_lastPerspective;
-	private IWorkbenchPage						_lastActivePage;
 
+	private IWorkbenchPage						_lastActivePage;
 	private IWorkbenchPart						_lastActivePart;
 	private String								_lastPartTitle	= UI.EMPTY_STRING;
+
 	private String								_appTitle;
 
 	private final ApplicationWorkbenchAdvisor	_wbAdvisor;
 
 	private IPropertyListener					_partPropertyListener;
-
-	private static IPreferenceStore				_prefStore		= TourbookPlugin.getDefault().getPreferenceStore();
 
 	public ApplicationWorkbenchWindowAdvisor(	final ApplicationWorkbenchAdvisor wbAdvisor,
 												final IWorkbenchWindowConfigurer configurer) {
@@ -441,6 +442,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		 * TOURTYPE.
 		 */
 		TourTypeFilterManager.restoreState();
+		TourFilterManager.restoreState();
 	}
 
 	@Override
