@@ -20,23 +20,23 @@ import net.tourbook.application.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
 
-public class Action_AddProfile extends Action {
+public class Action_Profile_Copy extends Action {
 
 	private SlideoutTourFilter _slideoutTourFilter;
 
-	public Action_AddProfile(final SlideoutTourFilter slideoutTourFilter) {
+	public Action_Profile_Copy(final SlideoutTourFilter slideoutTourFilter) {
 
 		super(null, AS_PUSH_BUTTON);
 
 		_slideoutTourFilter = slideoutTourFilter;
 
-		setToolTipText(Messages.Slideout_TourFilter_Action_AddProfile_Tooltip);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Add));
+		setToolTipText(Messages.Slideout_TourFilter_Action_CopyProfile_Tooltip);
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Add_2x));
 	}
 
 	@Override
 	public void run() {
-		_slideoutTourFilter.action_ProfileAdd();
+		_slideoutTourFilter.action_ProfileCopy();
 	}
 
 }

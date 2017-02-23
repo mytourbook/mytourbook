@@ -1565,13 +1565,17 @@ public class Messages extends NLS {
 	public static String		Slideout_TourEditor_Label_LatLonDigits_Tooltip;
 
 	public static String		Slideout_TourFilter_Action_AddProfile_Tooltip;
+	public static String		Slideout_TourFilter_Action_AddProperty_Tooltip;
 	public static String		Slideout_TourFilter_Action_CopyProfile_Tooltip;
 	public static String		Slideout_TourFilter_Action_DeleteProfile_Tooltip;
+	public static String		Slideout_TourFilter_Action_DeleteProperty_Tooltip;
 	public static String		Slideout_TourFilter_Checkbox_IsFilterByDate;
-
-	public static String Slideout_TourFilter_Column_ProfileName;
-	public static String Slideout_TourFilter_Label_ProfileName;
-
+	public static String		Slideout_TourFilter_Column_ProfileName;
+	public static String		Slideout_TourFilter_Confirm_DeleteProfile_Message;
+	public static String		Slideout_TourFilter_Confirm_DeleteProfile_Title;
+	public static String		Slideout_TourFilter_Confirm_DeleteProperty_Message;
+	public static String		Slideout_TourFilter_Confirm_DeleteProperty_Title;
+	public static String		Slideout_TourFilter_Label_ProfileName;
 	public static String		Slideout_TourFilter_Label_Title;
 
 	public static String		Slideout_TourInfoOptions_Checkbox_IsShowInfoTooltip;
@@ -1762,6 +1766,27 @@ public class Messages extends NLS {
 	public static String		Tour_Editor_Radio_Cadence_Spm;
 
 	public static String		Tour_Filter_Action_Tooltip;
+	
+	public static String		Tour_Filter_Field_BreakTime;
+	public static String		Tour_Filter_Field_DrivingTime;
+	public static String		Tour_Filter_Field_RecordingTime;
+	public static String		Tour_Filter_Field_Season;
+	public static String		Tour_Filter_Field_Temperature;
+	public static String		Tour_Filter_Field_TourDate;
+	public static String		Tour_Filter_Field_TourTime;
+	public static String		Tour_Filter_Field_TourTitle;
+	public static String		Tour_Filter_Operator_Between;
+	public static String		Tour_Filter_Operator_EndsWith;
+	public static String		Tour_Filter_Operator_Equals;
+	public static String		Tour_Filter_Operator_GreaterThan;
+	public static String		Tour_Filter_Operator_GreaterThanOrEqual;
+	public static String		Tour_Filter_Operator_IsEmpty;
+	public static String		Tour_Filter_Operator_IsNotEmpty;
+	public static String		Tour_Filter_Operator_LessThan;
+	public static String		Tour_Filter_Operator_LessThanOrEqual;
+	public static String		Tour_Filter_Operator_NotBetween;
+	public static String		Tour_Filter_Operator_NotEquals;
+	public static String		Tour_Filter_Operator_StartsWith;
 
 	public static String		Tour_Log_Action_Clear_Tooltip;
 

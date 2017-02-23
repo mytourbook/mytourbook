@@ -20,6 +20,7 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
+import net.tourbook.Messages;
 import net.tourbook.application.ActionTourFilter;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -39,33 +40,125 @@ import org.osgi.framework.Version;
 
 public class TourFilterManager {
 
-	private static final String					TAG_PROFILE					= "Profile";								//$NON-NLS-1$
-	private static final String					TAG_ROOT					= "TourFilterProfiles";						//$NON-NLS-1$
+	private static final String							TOUR_FILTER_FILE_NAME		= "tour-filter.xml";											//$NON-NLS-1$
+	private static final int							TOUR_FILTER_VERSION			= 1;
 
-	private static final String					ATTR_IS_SELECTED			= "isSelected";								//$NON-NLS-1$
-	private static final String					ATTR_NAME					= "name";									//$NON-NLS-1$
-	private static final String					ATTR_TOUR_FILTER_VERSION	= "TourFilterVersion";						//$NON-NLS-1$
+	private static final String							TAG_PROFILE					= "Profile";													//$NON-NLS-1$
+	private static final String							TAG_PROPERTY				= "Property";													//$NON-NLS-1$
+	private static final String							TAG_ROOT					= "TourFilterProfiles";											//$NON-NLS-1$
 
-	private static final int					TOUR_FILTER_VERSION			= 1;
-	private static final String					TOUR_FILTER_FILE_NAME		= "tour-filter.xml";						//$NON-NLS-1$
+	private static final String							ATTR_IS_SELECTED			= "isSelected";													//$NON-NLS-1$
+	private static final String							ATTR_FILTER_TYPE			= "filterType";													//$NON-NLS-1$
+	private static final String							ATTR_NAME					= "name";														//$NON-NLS-1$
+	private static final String							ATTR_TOUR_FILTER_VERSION	= "TourFilterVersion";											//$NON-NLS-1$
 
 // SET_FORMATTING_OFF
-	
-	/**
-	 * _bundle must be set here otherwise an exception occures in saveState()
-	 */
-	private static final Bundle					_bundle						= TourbookPlugin.getDefault().getBundle();
-	private static final IDialogSettings		_state						= TourbookPlugin.getState("net.tourbook.tour.filter.TourFilterManager");
-	private static final IPath					_stateLocation				= Platform.getStateLocation(_bundle);
 
-	private final static IPreferenceStore		_prefStore					= TourbookPlugin.getPrefStore();
+	public static final TourFilterFieldOperatorConfig[]	TOUR_FILTER_OPERATORS		= {
+	                                   		                   			   
+	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.STARTS_WITH,				Messages.Tour_Filter_Operator_StartsWith),
+	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.ENDS_WITH,					Messages.Tour_Filter_Operator_EndsWith),
+	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.EQUALS,					Messages.Tour_Filter_Operator_Equals),
+	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.NOT_EQUALS,				Messages.Tour_Filter_Operator_NotEquals),
+	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.LESS_THAN,					Messages.Tour_Filter_Operator_LessThan),
+	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.LESS_THAN_OR_EQUAL,		Messages.Tour_Filter_Operator_LessThanOrEqual),
+	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.GREATER_THAN,				Messages.Tour_Filter_Operator_GreaterThan),
+	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.GREATER_THAN_OR_EQUAL,		Messages.Tour_Filter_Operator_GreaterThanOrEqual),
+	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.BETWEEN,					Messages.Tour_Filter_Operator_Between),
+	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.NOT_BETWEEN,				Messages.Tour_Filter_Operator_NotBetween),
+	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.IS_EMPTY,					Messages.Tour_Filter_Operator_IsEmpty),
+	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.IS_NOT_EMPTY,				Messages.Tour_Filter_Operator_IsNotEmpty),
+
+// is not yet implemented
+//
+//	   new TourFilterOperatorDef(TourFilterOperator.LIKE,					Messages.Tour_Filter_Operator_Like),
+//	   new TourFilterOperatorDef(TourFilterOperator.NOT_LIKE,				Messages.Tour_Filter_Operator_NotLike),
+//	   new TourFilterOperatorDef(TourFilterOperator.INCLUDE_ANY,			Messages.Tour_Filter_Operator_IncludeAny),
+//	   new TourFilterOperatorDef(TourFilterOperator.EXCLUDE_ALL,			Messages.Tour_Filter_Operator_ExcludeAll),
+	};
+	
+	public static final TourFilterFieldOperator[]			FILTER_OPERATORS_DATE_TIME = {
+	                                        	                        
+	   TourFilterFieldOperator.EQUALS,
+	   TourFilterFieldOperator.NOT_EQUALS,
+	   TourFilterFieldOperator.LESS_THAN,
+	   TourFilterFieldOperator.LESS_THAN_OR_EQUAL,
+	   TourFilterFieldOperator.GREATER_THAN,
+	   TourFilterFieldOperator.GREATER_THAN_OR_EQUAL,
+	   TourFilterFieldOperator.BETWEEN,
+	   TourFilterFieldOperator.NOT_BETWEEN,
+	   TourFilterFieldOperator.IS_EMPTY,
+	   TourFilterFieldOperator.IS_NOT_EMPTY,
+	};
+
+	public static final TourFilterFieldOperator[]			FILTER_OPERATORS_NUMBER = {
+	                                        	                         
+		TourFilterFieldOperator.EQUALS,
+		TourFilterFieldOperator.NOT_EQUALS,
+		TourFilterFieldOperator.LESS_THAN,
+		TourFilterFieldOperator.LESS_THAN_OR_EQUAL,
+		TourFilterFieldOperator.GREATER_THAN,
+		TourFilterFieldOperator.GREATER_THAN_OR_EQUAL,
+		TourFilterFieldOperator.BETWEEN,
+		TourFilterFieldOperator.NOT_BETWEEN,
+	};
+	
+	public static final TourFilterFieldOperator[]			FILTER_OPERATORS_TEXT = {
+	                                        	                           
+		TourFilterFieldOperator.STARTS_WITH,
+		TourFilterFieldOperator.ENDS_WITH,
+		TourFilterFieldOperator.EQUALS,
+		TourFilterFieldOperator.NOT_EQUALS,
+		TourFilterFieldOperator.LESS_THAN,
+		TourFilterFieldOperator.LESS_THAN_OR_EQUAL,
+		TourFilterFieldOperator.GREATER_THAN,
+		TourFilterFieldOperator.GREATER_THAN_OR_EQUAL,
+		TourFilterFieldOperator.BETWEEN,
+		TourFilterFieldOperator.NOT_BETWEEN,
+		TourFilterFieldOperator.IS_EMPTY,
+		TourFilterFieldOperator.IS_NOT_EMPTY,
+	};
+
+	public static final TourFilterFieldOperator[]			FILTER_OPERATORS_SEASON = {
+	                                             			                         
+		TourFilterFieldOperator.LESS_THAN,
+		TourFilterFieldOperator.LESS_THAN_OR_EQUAL,
+		TourFilterFieldOperator.GREATER_THAN,
+		TourFilterFieldOperator.GREATER_THAN_OR_EQUAL,
+		TourFilterFieldOperator.BETWEEN,
+		TourFilterFieldOperator.NOT_BETWEEN,
+	};
+	
+	public static final TourFilterFieldConfig[]				FILTER_FIELD_CONFIG = {
+	                                       		                 			   
+		new TourFilterFieldConfig(TourFilterField.TOUR_DATE,			Messages.Tour_Filter_Field_TourDate,			FILTER_OPERATORS_DATE_TIME),
+		new TourFilterFieldConfig(TourFilterField.TOUR_TIME,			Messages.Tour_Filter_Field_TourTime,			FILTER_OPERATORS_DATE_TIME),
+		new TourFilterFieldConfig(TourFilterField.SEASON_DATE,			Messages.Tour_Filter_Field_Season,				FILTER_OPERATORS_SEASON),
+		new TourFilterFieldConfig(TourFilterField.RECORDING_TIME,		Messages.Tour_Filter_Field_RecordingTime,		FILTER_OPERATORS_NUMBER),
+		new TourFilterFieldConfig(TourFilterField.BREAK_TIME,			Messages.Tour_Filter_Field_BreakTime,			FILTER_OPERATORS_NUMBER),
+		new TourFilterFieldConfig(TourFilterField.DRIVING_TIME,			Messages.Tour_Filter_Field_DrivingTime,			FILTER_OPERATORS_NUMBER),
+		new TourFilterFieldConfig(TourFilterField.TOUR_TITLE,			Messages.Tour_Filter_Field_TourTitle,			FILTER_OPERATORS_TEXT),
+		new TourFilterFieldConfig(TourFilterField.TEMPERATURE,			Messages.Tour_Filter_Field_Temperature,			FILTER_OPERATORS_NUMBER),
+	                                       		                 			   
+	};
+
+	private static final Bundle					_bundle				= TourbookPlugin.getDefault().getBundle();
+
+	
+	private static final IDialogSettings		_state				= TourbookPlugin.getState("net.tourbook.tour.filter.TourFilterManager"); //$NON-NLS-1$
+	private static final IPath					_stateLocation		= Platform.getStateLocation(_bundle);
+	private final static IPreferenceStore		_prefStore			= TourbookPlugin.getPrefStore();
+
+	private static ActionTourFilter				_actionTourFilter;
 	
 // SET_FORMATTING_ON
 
-	private static ActionTourFilter				_actionTourFilter;
+	private static ArrayList<TourFilterProfile>			_filterProfiles				= new ArrayList<>();
 
-	private static ArrayList<TourFilterProfile>	_filterProfiles				= new ArrayList<>();
-	private static TourFilterProfile			_selectedProfile;
+	private static TourFilterProfile					_selectedProfile;
+	{
+
+	}
 
 	/**
 	 * Fire event that the tour filter has changed.
@@ -75,11 +168,83 @@ public class TourFilterManager {
 		_prefStore.setValue(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED, Math.random());
 	}
 
-	public static ArrayList<TourFilterProfile> getProfiles() {
+	static TourFilterFieldOperator getFieldOperator(final TourFilterField filterField, final int operatorIndex) {
+
+		final TourFilterFieldOperator[] fieldOperators = getFieldOperators(filterField);
+
+		return fieldOperators[operatorIndex];
+	}
+
+	static int getFieldOperatorIndex(final TourFilterField filterField, final TourFilterFieldOperator fieldOperator) {
+
+		final TourFilterFieldOperator[] fieldOperators = getFieldOperators(filterField);
+
+		for (int operatorIndex = 0; operatorIndex < fieldOperators.length; operatorIndex++) {
+
+			final TourFilterFieldOperator filterFieldOperator = fieldOperators[operatorIndex];
+			
+			if (fieldOperator == filterFieldOperator) {
+				return operatorIndex;
+			}
+		}
+
+		return 0;
+	}
+
+	static String getFieldOperatorName(final TourFilterFieldOperator filterOperator) {
+
+		for (final TourFilterFieldOperatorConfig fieldOperatorConfig : TOUR_FILTER_OPERATORS) {
+			if (filterOperator == fieldOperatorConfig.fieldOperator) {
+				return fieldOperatorConfig.name;
+			}
+		}
+
+		// this should not happen
+		return null;
+	}
+
+	static TourFilterFieldOperator[] getFieldOperators(final TourFilterField filterField) {
+
+		for (final TourFilterFieldConfig fieldConfig : FILTER_FIELD_CONFIG) {
+			if (filterField == fieldConfig.filterField) {
+				return fieldConfig.filterOperators;
+			}
+		}
+
+		// this should not happen
+		return null;
+	}
+
+	/**
+	 * @param filterField
+	 * @return Returns the index of the requested filter type.
+	 */
+	static int getFilterFieldIndex(final TourFilterField filterField) {
+
+		for (int typeIndex = 0; typeIndex < FILTER_FIELD_CONFIG.length; typeIndex++) {
+
+			final TourFilterFieldConfig filterTemplate = FILTER_FIELD_CONFIG[typeIndex];
+
+			if (filterTemplate.filterField.equals(filterField)) {
+				return typeIndex;
+			}
+		}
+
+		return 0;
+	}
+
+	static String getFilterFieldName(final TourFilterField filterField) {
+
+		final int index = getFilterFieldIndex(filterField);
+
+		return FILTER_FIELD_CONFIG[index].name;
+	}
+
+	static ArrayList<TourFilterProfile> getProfiles() {
 		return _filterProfiles;
 	}
 
-	public static TourFilterProfile getSelectedProfile() {
+	static TourFilterProfile getSelectedProfile() {
 		return _selectedProfile;
 	}
 
@@ -119,6 +284,28 @@ public class TourFilterManager {
 						if (Util.getXmlBoolean(xmlProfile, ATTR_IS_SELECTED, false)) {
 							_selectedProfile = tourFilterProfile;
 						}
+
+						for (final IMemento mementoProperty : xmlProfile.getChildren(TAG_PROPERTY)) {
+
+							final XMLMemento xmlProperty = (XMLMemento) mementoProperty;
+
+							final TourFilterProperty filterProperty = new TourFilterProperty();
+
+							filterProperty.filterField = (TourFilterField) Util.getXmlEnum(//
+									xmlProperty,
+									ATTR_FILTER_TYPE,
+									TourFilterField.TOUR_DATE);
+
+							tourFilterProfile.filterProperties.add(filterProperty);
+						}
+
+						// loop: properties
+//						for (final TourFilterProperty filterProperty : tourFilterProfile.filterProperties) {
+//
+//							final IMemento xmlProperty = xmlProfile.createChild(TAG_PROPERTY);
+//
+//							Util.setXmlEnum(xmlProperty, ATTR_FILTER_TYPE, filterProperty.filterType);
+//						}
 					}
 				}
 
@@ -147,7 +334,7 @@ public class TourFilterManager {
 		Util.writeXml(xmlRoot, xmlFile);
 	}
 
-	public static void setSelectedProfile(final TourFilterProfile selectedProfile) {
+	static void setSelectedProfile(final TourFilterProfile selectedProfile) {
 		_selectedProfile = selectedProfile;
 	}
 
@@ -177,6 +364,7 @@ public class TourFilterManager {
 
 			xmlRoot = writeFilterProfile_100_Root();
 
+			// loop: profiles
 			for (final TourFilterProfile tourFilterProfile : _filterProfiles) {
 
 				final IMemento xmlProfile = xmlRoot.createChild(TAG_PROFILE);
@@ -188,6 +376,13 @@ public class TourFilterManager {
 					xmlProfile.putBoolean(ATTR_IS_SELECTED, true);
 				}
 
+				// loop: properties
+				for (final TourFilterProperty filterProperty : tourFilterProfile.filterProperties) {
+
+					final IMemento xmlProperty = xmlProfile.createChild(TAG_PROPERTY);
+
+					Util.setXmlEnum(xmlProperty, ATTR_FILTER_TYPE, filterProperty.filterField);
+				}
 			}
 
 		} catch (final Exception e) {

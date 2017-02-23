@@ -15,15 +15,19 @@
  *******************************************************************************/
 package net.tourbook.tour.filter;
 
+import java.util.ArrayList;
+
 import net.tourbook.common.UI;
 
 public class TourFilterProfile {
 
-	private static int	_idCounter	= 0;
+	private static int				_idCounter			= 0;
 
-	int					profileId;
+	int								profileId;
 
-	String				name		= UI.EMPTY_STRING;
+	String							name				= UI.EMPTY_STRING;
+
+	ArrayList<TourFilterProperty>	filterProperties	= new ArrayList<>();
 
 	public TourFilterProfile() {
 
@@ -64,6 +68,15 @@ public class TourFilterProfile {
 		result = prime * result + profileId;
 
 		return result;
+	}
+
+	@Override
+	public String toString() {
+		return "TourFilterProfile [\n"
+				+ ("profileId=" + profileId + ", \n")//
+				+ ("name=" + name + ", \n")
+				+ ("filterProperties=" + filterProperties + ", \n")
+				+ "]";
 	}
 
 }
