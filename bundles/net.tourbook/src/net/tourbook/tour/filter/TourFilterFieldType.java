@@ -15,22 +15,14 @@
  *******************************************************************************/
 package net.tourbook.tour.filter;
 
-public enum TourFilterField {
+public enum TourFilterFieldType {
 
-	TOUR_DATE, //
-	TOUR_TIME, //
+	TEXT, //
+	NUMBER, //
 
-	/**
-	 * DATE_SEASON or DATE_PERIOD, is a repeated interval, e.g. from start year until today,
-	 * repeated for each year
-	 */
-	SEASON_DATE,
+	DATE, //
+	TIME, //
 
-	RECORDING_TIME, //
-	DRIVING_TIME, //
-	BREAK_TIME, //
+	SEASON, //
 
-	TOUR_TITLE, //
-
-	TEMPERATURE, //
 }

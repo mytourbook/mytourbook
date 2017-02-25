@@ -15,10 +15,12 @@
  *******************************************************************************/
 package net.tourbook.tour.filter;
 
+import java.text.DateFormatSymbols;
+import java.time.LocalDateTime;
+import java.time.MonthDay;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 
@@ -28,7 +30,6 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.layout.TableColumnLayout;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnWeightData;
@@ -64,43 +65,34 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.DateTime;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.Widget;
 
 /**
  * Tour chart marker properties slideout.
  */
 public class SlideoutTourFilter extends ToolbarSlideout {
 
-	private final IPreferenceStore	_prefStore	= TourbookPlugin.getPrefStore();
+//	private final IPreferenceStore	_prefStore	= TourbookPlugin.getPrefStore();
 
-	private SelectionAdapter		_defaultSelectionListener;
-	private ModifyListener			_defaultModifyListener;
-	private MouseWheelListener		_defaultMouseWheelListener;
-	private FocusListener			_keepOpenListener;
+	private static final String	FIELD_NO	= "fieldNo";			//$NON-NLS-1$
 
-	private boolean					_isUpdateUI;
+	private ModifyListener		_defaultModifyListener;
+	private FocusListener		_keepOpenListener;
+
+	private SelectionAdapter	_fieldSelectionListener_DateTime;
+
+	private boolean				_isUpdateUI;
 
 	{
-		_defaultSelectionListener = new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onChangeUI();
-			}
-		};
-
-		_defaultMouseWheelListener = new MouseWheelListener() {
-			@Override
-			public void mouseScrolled(final MouseEvent event) {
-				UI.adjustSpinnerValueOnMouseScroll(event);
-				onChangeUI();
-			}
-		};
-
 		_defaultModifyListener = new ModifyListener() {
 			@Override
 			public void modifyText(final ModifyEvent e) {
@@ -108,6 +100,13 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 					return;
 				}
 				onProfile_Modify();
+			}
+		};
+
+		_fieldSelectionListener_DateTime = new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent event) {
+				onField_Select_DateTime(event);
 			}
 		};
 
@@ -227,7 +226,7 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 		_selectedProfile.filterProperties.add(filterProperty);
 
 		// update UI
-		createUI_410_FilterContent();
+		createUI_410_FilterProperties();
 		updateUI_Properties();
 	}
 
@@ -240,11 +239,12 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 		setIsAnotherDialogOpened(true);
 		{
 			isDeleteProfile = MessageDialog.openConfirm(
+
 					Display.getCurrent().getActiveShell(),
 					Messages.Slideout_TourFilter_Confirm_DeleteProperty_Title,
 					NLS.bind(
 							Messages.Slideout_TourFilter_Confirm_DeleteProperty_Message,
-							TourFilterManager.getFilterFieldName(filterProperty.filterField)));
+							filterProperty.fieldConfig.name));
 		}
 		setIsAnotherDialogOpened(false);
 
@@ -257,7 +257,7 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 		filterProperties.remove(filterProperty);
 
 		// update UI
-		createUI_410_FilterContent();
+		createUI_410_FilterProperties();
 		updateUI_Properties();
 	}
 
@@ -316,7 +316,7 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 				GridLayoutFactory.fillDefaults().numColumns(1).applyTo(filterContainer);
 				{
 					createUI_300_FilterInfo(filterContainer);
-					createUI_400_Filter(filterContainer);
+					createUI_400_FilterOuterContainer(filterContainer);
 					createUI_800_FilterActions(filterContainer);
 				}
 			}
@@ -477,14 +477,14 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 				_txtProfileName.addModifyListener(_defaultModifyListener);
 				GridDataFactory
 						.fillDefaults()//
-						.grab(true, false)
+//						.grab(true, false)
 						.hint(_pc.convertWidthInCharsToPixels(20), SWT.DEFAULT)
 						.applyTo(_txtProfileName);
 			}
 		}
 	}
 
-	private void createUI_400_Filter(final Composite parent) {
+	private void createUI_400_FilterOuterContainer(final Composite parent) {
 
 		_filterOuterContainer = new Composite(parent, SWT.NONE);
 		GridLayoutFactory.fillDefaults().applyTo(_filterOuterContainer);
@@ -501,7 +501,7 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 	/**
 	 * Create the filter fields from the selected profile.
 	 */
-	private void createUI_410_FilterContent() {
+	private void createUI_410_FilterProperties() {
 
 		// ensure that this is reseted
 		setIsAnotherDialogOpened(false);
@@ -532,50 +532,31 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 			return;
 		}
 
-		final Composite parent = _filterOuterContainer;
-		final Display display = parent.getDisplay();
-
-		final Composite filterContainer = createUI_420_FilterScrolledContainer(parent);
-
 		/*
 		 * Field listener
 		 */
-//		final MouseAdapter colorMouseListener = new MouseAdapter() {
-//			@Override
-//			public void mouseDown(final MouseEvent e) {
-//				onFieldMouseDown(display, e);
-//			}
-//		};
-//
-//		// value listener
-//		final SelectionListener valueSelectionListener = new SelectionAdapter() {
-//			@Override
-//			public void widgetSelected(final SelectionEvent event) {
-//				onFieldSelectValue(event.widget);
-//			}
-//		};
-//		final MouseWheelListener valueMouseWheelListener = new MouseWheelListener() {
-//			@Override
-//			public void mouseScrolled(final MouseEvent event) {
-//				UI.adjustSpinnerValueOnMouseScroll(event);
-//				onFieldSelectValue(event.widget);
-//			}
-//		};
-//
-//		final SelectionListener prontoListener = new SelectionAdapter() {
-//			@Override
-//			public void widgetSelected(final SelectionEvent event) {
-//				onFieldSelectPronto(event.widget);
-//			}
-//		};
-
-		final SelectionListener filterFieldSelectionListener = new SelectionAdapter() {
+		final SelectionListener fieldListener = new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				onProperty_SelectField(e);
 			}
 
 		};
+		final SelectionAdapter operatorListener = new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				onProperty_SelectOperator(e);
+			}
+		};
+
+		final Composite parent = _filterOuterContainer;
+
+		final Composite filterContainer = createUI_420_FilterScrolledContainer(parent);
+		GridLayoutFactory
+				.fillDefaults()//
+				.numColumns(4)
+				.applyTo(filterContainer);
+//		filterContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 
 		filterContainer.setRedraw(false);
 		{
@@ -583,36 +564,41 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 
 				final TourFilterProperty filterProperty = filterProperties.get(propertyIndex);
 
-				Combo comboFilterField;
-				Composite propertyContainer;
-
 				{
 					/*
 					 * Combo: Filter field
 					 */
-					comboFilterField = new Combo(filterContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
+					final Combo comboFilterField = new Combo(filterContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
 					comboFilterField.setData(filterProperty);
 					comboFilterField.addFocusListener(_keepOpenListener);
-					comboFilterField.addSelectionListener(filterFieldSelectionListener);
-
-					// fill combo
-					for (final TourFilterFieldConfig filterTemplate : TourFilterManager.FILTER_FIELD_CONFIG) {
-						comboFilterField.add(filterTemplate.name);
-					}
+					comboFilterField.addSelectionListener(fieldListener);
 
 					// keep combo reference
-					filterProperty.comboFilterField = comboFilterField;
+					filterProperty.comboFieldName = comboFilterField;
 				}
 				{
 					/*
-					 * Container: Field properties
+					 * Combo: Field operator
 					 */
-					propertyContainer = new Composite(filterContainer, SWT.NONE);
-					GridDataFactory.fillDefaults().grab(true, false).applyTo(propertyContainer);
-					GridLayoutFactory.fillDefaults().numColumns(1).applyTo(propertyContainer);
-					{
-						createUI_Property(propertyContainer, filterProperty);
-					}
+					final Combo comboFieldOperator = new Combo(filterContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
+					comboFieldOperator.setData(filterProperty);
+					comboFieldOperator.addFocusListener(_keepOpenListener);
+					comboFieldOperator.addSelectionListener(operatorListener);
+
+					// keep combo reference
+					filterProperty.comboFieldOperator = comboFieldOperator;
+				}
+
+				{
+					/*
+					 * Container: Field details
+					 */
+					final Composite fieldDetailOuterContainer = new Composite(filterContainer, SWT.NONE);
+					GridDataFactory.fillDefaults().grab(true, false).applyTo(fieldDetailOuterContainer);
+					GridLayoutFactory.fillDefaults().numColumns(1).applyTo(fieldDetailOuterContainer);
+
+					filterProperty.fieldDetailOuterContainer = fieldDetailOuterContainer;
+//					fieldDetailOuterContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 				}
 				{
 					/*
@@ -632,9 +618,6 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 			}
 		}
 		filterContainer.setRedraw(true);
-//		filterContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
-
-		_filterOuterContainer.layout(true);
 
 		// set scroll position to previous position
 		if (scrollOrigin != null) {
@@ -655,10 +638,9 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 
 		// properties container
 		final Composite filterContainer = new Composite(_filterScrolledContainer, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(filterContainer);
-		GridLayoutFactory
+		GridDataFactory
 				.fillDefaults()//
-				.numColumns(3)
+//				.grab(true, true)
 				.applyTo(filterContainer);
 
 		_filterScrolledContainer.setContent(filterContainer);
@@ -670,6 +652,143 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 		});
 
 		return filterContainer;
+	}
+
+	private void createUI_430_FieldDetail(final TourFilterProperty filterProperty) {
+
+		// remove previous content
+		filterProperty.disposeFieldInnerContainer();
+
+		final Composite fieldOuterContainer = filterProperty.fieldDetailOuterContainer;
+
+		fieldOuterContainer.setRedraw(false);
+		{
+			final Composite container = new Composite(fieldOuterContainer, SWT.NONE);
+			GridDataFactory.fillDefaults().applyTo(container);
+//			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+
+			// default for number of columns is 1
+			int numColumns = 1;
+
+			{
+				final TourFilterFieldConfig fieldConfig = filterProperty.fieldConfig;
+
+				final TourFilterFieldType fieldType = fieldConfig.fieldType;
+
+				switch (filterProperty.fieldOperator) {
+				case GREATER_THAN:
+				case GREATER_THAN_OR_EQUAL:
+				case LESS_THAN:
+				case LESS_THAN_OR_EQUAL:
+				case EQUALS:
+				case NOT_EQUALS:
+
+					switch (fieldType) {
+					case DATE:
+
+						filterProperty.uiDateTime1 = createUI_Field_Date(container, filterProperty, 1);
+
+						break;
+
+					case TIME:
+
+						filterProperty.uiDateTime1 = createUI_Field_Time(container, filterProperty, 1);
+
+						break;
+
+					case NUMBER:
+
+						break;
+
+					case TEXT:
+
+						break;
+
+					case SEASON:
+
+						numColumns = 2;
+
+						filterProperty.uiSpinnerDay1 = createUI_Field_SeasonDay(container, filterProperty, 1);
+						filterProperty.uiComboMonth1 = createUI_Field_SeasonMonth(container, filterProperty, 1);
+
+						break;
+					}
+
+					break;
+
+				case BETWEEN:
+				case NOT_BETWEEN:
+
+					switch (fieldType) {
+					case DATE:
+
+						numColumns = 3;
+
+						filterProperty.uiDateTime1 = createUI_Field_Date(container, filterProperty, 1);
+						createUI_Operator_And(container);
+						filterProperty.uiDateTime2 = createUI_Field_Date(container, filterProperty, 2);
+
+						break;
+
+					case TIME:
+
+						numColumns = 3;
+
+						filterProperty.uiDateTime1 = createUI_Field_Time(container, filterProperty, 1);
+						createUI_Operator_And(container);
+						filterProperty.uiDateTime2 = createUI_Field_Time(container, filterProperty, 2);
+
+						break;
+
+					case NUMBER:
+
+						break;
+
+					case TEXT:
+
+						break;
+
+					case SEASON:
+
+						numColumns = 5;
+
+						filterProperty.uiSpinnerDay1 = createUI_Field_SeasonDay(container, filterProperty, 1);
+						filterProperty.uiComboMonth1 = createUI_Field_SeasonMonth(container, filterProperty, 1);
+						createUI_Operator_And(container);
+						filterProperty.uiSpinnerDay2 = createUI_Field_SeasonDay(container, filterProperty, 2);
+						filterProperty.uiComboMonth2 = createUI_Field_SeasonMonth(container, filterProperty, 2);
+
+						break;
+					}
+
+					break;
+
+				case STARTS_WITH:
+					break;
+				case ENDS_WITH:
+					break;
+
+				case INCLUDE_ANY:
+					break;
+				case EXCLUDE_ALL:
+					break;
+
+				case IS_EMPTY:
+					break;
+				case IS_NOT_EMPTY:
+					break;
+
+				case LIKE:
+					break;
+				case NOT_LIKE:
+					break;
+				}
+			}
+
+			GridLayoutFactory.fillDefaults().numColumns(numColumns).applyTo(container);
+		}
+		fieldOuterContainer.setRedraw(true);
+		fieldOuterContainer.layout(true);
 	}
 
 	private void createUI_800_FilterActions(final Composite parent) {
@@ -693,38 +812,126 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 		}
 	}
 
-	private void createUI_Property(final Composite parent, final TourFilterProperty filterProperty) {
+	private DateTime createUI_Field_Date(	final Composite parent,
+											final TourFilterProperty filterProperty,
+											final int fieldNo) {
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
-		{
-			{
-				/*
-				 * Combo: Field operator
-				 */
-				final Combo comboFieldOperator = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-				comboFieldOperator.setData(filterProperty);
-				comboFieldOperator.addFocusListener(_keepOpenListener);
-				comboFieldOperator.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(final SelectionEvent e) {
-						onProperty_SelectOperator(e);
-					}
-				});
+		final DateTime dtTourDate = new DateTime(parent, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
 
-				// fill combo
-				for (final TourFilterFieldOperator filterOperator : TourFilterManager
-						.getFieldOperators(filterProperty.filterField)) {
+		dtTourDate.setData(filterProperty);
+		dtTourDate.setData(FIELD_NO, fieldNo);
 
-					comboFieldOperator.add(TourFilterManager.getFieldOperatorName(filterOperator));
-				}
+		dtTourDate.addFocusListener(_keepOpenListener);
+		dtTourDate.addSelectionListener(_fieldSelectionListener_DateTime);
 
-				// keep combo reference
-				filterProperty.comboFieldOperator = comboFieldOperator;
+		GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).applyTo(dtTourDate);
+
+		return dtTourDate;
+	}
+
+	private Spinner createUI_Field_SeasonDay(	final Composite container,
+												final TourFilterProperty filterProperty,
+												final int fieldNo) {
+
+		final Spinner spinnerDay = new Spinner(container, SWT.BORDER);
+
+		spinnerDay.setMinimum(1);
+		spinnerDay.setMaximum(31);
+		spinnerDay.setPageIncrement(5);
+
+		spinnerDay.setData(filterProperty);
+		spinnerDay.setData(FIELD_NO, fieldNo);
+
+		spinnerDay.addMouseWheelListener(new MouseWheelListener() {
+			@Override
+			public void mouseScrolled(final MouseEvent event) {
+				UI.adjustSpinnerValueOnMouseScroll(event);
+				onField_Select_SeasonDay(event.widget);
 			}
+		});
+
+		spinnerDay.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent event) {
+				onField_Select_SeasonDay(event.widget);
+			}
+		});
+
+		// ensure that this field is not empty
+		if (fieldNo == 1) {
+			// select year start
+			spinnerDay.setSelection(1);
+		} else {
+			// select today
+			spinnerDay.setSelection(MonthDay.now().getDayOfMonth());
 		}
+
+		return spinnerDay;
+	}
+
+	private Combo createUI_Field_SeasonMonth(	final Composite container,
+												final TourFilterProperty filterProperty,
+												final int fieldNo) {
+
+		final Combo comboMonth = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+
+		comboMonth.setData(filterProperty);
+		comboMonth.setData(FIELD_NO, fieldNo);
+
+		comboMonth.addFocusListener(_keepOpenListener);
+
+		comboMonth.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent event) {
+				onField_Select_SeasonMonth(event.widget);
+			}
+		});
+
+		comboMonth.addMouseWheelListener(new MouseWheelListener() {
+			@Override
+			public void mouseScrolled(final MouseEvent event) {
+				UI.adjustSpinnerValueOnMouseScroll(event);
+				onField_Select_SeasonMonth(event.widget);
+			}
+		});
+
+		for (final String month : DateFormatSymbols.getInstance().getMonths()) {
+			comboMonth.add(month);
+		}
+
+		// ensure that this field is not empty
+		if (fieldNo == 1) {
+			// select year start
+			comboMonth.select(0);
+		} else {
+			// select today
+			comboMonth.select(MonthDay.now().getMonthValue() - 1);
+		}
+
+		return comboMonth;
+	}
+
+	private DateTime createUI_Field_Time(	final Composite parent,
+											final TourFilterProperty filterProperty,
+											final int fieldNo) {
+
+		final DateTime dtTourTime = new DateTime(parent, SWT.TIME | SWT.SHORT | SWT.BORDER);
+
+		dtTourTime.setData(filterProperty);
+		dtTourTime.setData(FIELD_NO, fieldNo);
+
+		dtTourTime.addFocusListener(_keepOpenListener);
+		dtTourTime.addSelectionListener(_fieldSelectionListener_DateTime);
+
+		GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).applyTo(dtTourTime);
+
+		return dtTourTime;
+	}
+
+	private void createUI_Operator_And(final Composite parent) {
+
+		final Label label = new Label(parent, SWT.NONE);
+		label.setText(Messages.Tour_Filter_Operator_And);
 	}
 
 	private void enableControls() {
@@ -736,6 +943,59 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 
 		_lblProfileName.setEnabled(isProfileSelected);
 		_txtProfileName.setEnabled(isProfileSelected);
+	}
+
+	private int getMonthMaxDays(final int month) {
+
+		switch (month) {
+		case 4:
+		case 6:
+		case 9:
+		case 11:
+			return 30;
+
+		case 2:
+			return 29;
+
+		default:
+			return 31;
+		}
+	}
+
+	/**
+	 * Ensure that the selected month has also a valid day, {@link MonthDay} shows valid values.
+	 * 
+	 * @param filterProperty
+	 * @param fieldNo
+	 * @param selectedMonth
+	 * @return
+	 */
+	private int getValidSeasonDay(final TourFilterProperty filterProperty, final int fieldNo, final int selectedMonth) {
+
+		final MonthDay oldField = fieldNo == 1 //
+				? filterProperty.monthDay1
+				: filterProperty.monthDay2;
+
+		int oldDay = oldField.getDayOfMonth();
+
+		final int monthMaxDays = getMonthMaxDays(selectedMonth);
+
+		final Spinner spinnerDay = fieldNo == 1 //
+				? filterProperty.uiSpinnerDay1
+				: filterProperty.uiSpinnerDay2;
+
+		if (oldDay > monthMaxDays) {
+
+			oldDay = monthMaxDays;
+
+			// update day UI
+
+			spinnerDay.setSelection(monthMaxDays);
+		}
+
+		spinnerDay.setMaximum(monthMaxDays);
+
+		return oldDay;
 	}
 
 	private void initUI(final Composite parent) {
@@ -762,9 +1022,82 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 		return false;
 	}
 
-	private void onChangeUI() {
+	private void onField_Select_DateTime(final SelectionEvent event) {
 
-		enableControls();
+		final DateTime dateTime = (DateTime) (event.widget);
+
+		final TourFilterProperty filterProperty = (TourFilterProperty) dateTime.getData();
+		final int fieldNo = (int) dateTime.getData(FIELD_NO);
+
+		final LocalDateTime localDateTime = LocalDateTime.of(
+				dateTime.getYear(),
+				dateTime.getMonth() + 1,
+				dateTime.getDay(),
+				dateTime.getHours(),
+				dateTime.getMinutes());
+
+		if (fieldNo == 1) {
+			filterProperty.dateTime1 = localDateTime;
+		} else {
+			filterProperty.dateTime2 = localDateTime;
+		}
+	}
+
+	private void onField_Select_SeasonDay(final Widget widget) {
+
+		final Spinner spinnerDay = (Spinner) widget;
+
+		final TourFilterProperty filterProperty = (TourFilterProperty) spinnerDay.getData();
+		final int fieldNo = (int) spinnerDay.getData(FIELD_NO);
+
+		final int selectedDay = spinnerDay.getSelection();
+
+		final MonthDay oldField = fieldNo == 1 //
+				? filterProperty.monthDay1
+				: filterProperty.monthDay2;
+		final int oldMonth = oldField.getMonthValue();
+
+		final MonthDay monthDay = MonthDay.of(oldMonth, selectedDay);
+
+		if (fieldNo == 1) {
+			filterProperty.monthDay1 = monthDay;
+		} else {
+			filterProperty.monthDay2 = monthDay;
+		}
+
+		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] Day  ") //
+				+ ("\t" + filterProperty.monthDay1)
+				+ ("\t" + filterProperty.monthDay2)
+		//
+		);
+		// TODO remove SYSTEM.OUT.PRINTLN
+	}
+
+	private void onField_Select_SeasonMonth(final Widget widget) {
+
+		final Combo comboMonth = (Combo) widget;
+
+		final TourFilterProperty filterProperty = (TourFilterProperty) comboMonth.getData();
+		final int fieldNo = (int) comboMonth.getData(FIELD_NO);
+
+		final int selectedMonth = comboMonth.getSelectionIndex() + 1;
+
+		final int oldDay = getValidSeasonDay(filterProperty, fieldNo, selectedMonth);
+
+		final MonthDay monthDay = MonthDay.of(selectedMonth, oldDay);
+
+		if (fieldNo == 1) {
+			filterProperty.monthDay1 = monthDay;
+		} else {
+			filterProperty.monthDay2 = monthDay;
+		}
+
+		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] Month") //
+				+ ("\t" + filterProperty.monthDay1)
+				+ ("\t" + filterProperty.monthDay2)
+		//
+		);
+		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
 	private void onProfile_DeleteSelected() {
@@ -812,7 +1145,7 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 
 			_selectedProfile = null;
 
-			createUI_410_FilterContent();
+			createUI_410_FilterProperties();
 			enableControls();
 
 		} else {
@@ -862,7 +1195,7 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 			_txtProfileName.setText(_selectedProfile.name);
 		}
 
-		createUI_410_FilterContent();
+		createUI_410_FilterProperties();
 		updateUI_Properties();
 
 		enableControls();
@@ -870,33 +1203,25 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 
 	private void onProperty_SelectField(final SelectionEvent event) {
 
-//		System.out.println(
-//				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tonProperty_SelectField"));
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
 		final TourFilterProperty filterProperty = (TourFilterProperty) event.widget.getData();
 
 		final int selectedFilterConfigIndex = ((Combo) (event.widget)).getSelectionIndex();
 
-		filterProperty.filterField = TourFilterManager.FILTER_FIELD_CONFIG[selectedFilterConfigIndex].filterField;
+		filterProperty.fieldConfig = TourFilterManager.FILTER_FIELD_CONFIG[selectedFilterConfigIndex];
 
-		createUI_410_FilterContent();
 		updateUI_Properties();
 	}
 
 	private void onProperty_SelectOperator(final SelectionEvent event) {
 
-//		System.out.println(
-//				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tonProperty_SelectOperator"));
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
 		final TourFilterProperty filterProperty = (TourFilterProperty) event.widget.getData();
 
 		final int selectedIndex = ((Combo) (event.widget)).getSelectionIndex();
 
-		filterProperty.fieldOperator = TourFilterManager.getFieldOperator(filterProperty.filterField, selectedIndex);
+		filterProperty.fieldOperator = TourFilterManager.getFieldOperator(//
+				filterProperty.fieldConfig.fieldId,
+				selectedIndex);
 
-		createUI_410_FilterContent();
 		updateUI_Properties();
 	}
 
@@ -936,16 +1261,40 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 		for (int properyIndex = 0; properyIndex < filterProperties.size(); properyIndex++) {
 
 			final TourFilterProperty filterProperty = filterProperties.get(properyIndex);
+			final TourFilterFieldConfig fieldConfig = filterProperty.fieldConfig;
+			final TourFilterFieldOperator fieldOperator = filterProperty.fieldOperator;
 
-			final int filterFieldIndex = TourFilterManager.getFilterFieldIndex(filterProperty.filterField);
-			final int fieldOperatorIndex = TourFilterManager.getFieldOperatorIndex(//
-					filterProperty.filterField,
-					filterProperty.fieldOperator);
+			final TourFilterFieldId filterField = fieldConfig.fieldId;
 
-			filterProperty.comboFilterField.select(filterFieldIndex);
-			filterProperty.comboFieldOperator.select(fieldOperatorIndex);
+			final Combo comboFilterField = filterProperty.comboFieldName;
+			final Combo comboFieldOperator = filterProperty.comboFieldOperator;
+
+			createUI_430_FieldDetail(filterProperty);
+
+			// fill field combo with all available fields
+			comboFilterField.removeAll();
+			for (final TourFilterFieldConfig filterTemplate : TourFilterManager.FILTER_FIELD_CONFIG) {
+				comboFilterField.add(filterTemplate.name);
+			}
+
+			// fill operator combo
+			comboFieldOperator.removeAll();
+			final TourFilterFieldOperator[] fieldOperators = TourFilterManager.getFieldOperators(filterField);
+			for (final TourFilterFieldOperator filterOperator : fieldOperators) {
+				comboFieldOperator.add(TourFilterManager.getFieldOperatorName(filterOperator));
+			}
+
+			final int fieldIndex = TourFilterManager.getFilterFieldIndex(filterField);
+			final int operatorIndex = TourFilterManager.getFieldOperatorIndex(filterField, fieldOperator);
+
+			comboFilterField.select(fieldIndex);
+			comboFieldOperator.select(operatorIndex);
 		}
 
+		_filterOuterContainer.layout(true);
+
+		final Shell shell = _filterOuterContainer.getShell();
+		shell.pack(true);
 	}
 
 }

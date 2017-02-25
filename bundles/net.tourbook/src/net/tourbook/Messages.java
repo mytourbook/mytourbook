@@ -1575,6 +1575,7 @@ public class Messages extends NLS {
 	public static String		Slideout_TourFilter_Confirm_DeleteProfile_Title;
 	public static String		Slideout_TourFilter_Confirm_DeleteProperty_Message;
 	public static String		Slideout_TourFilter_Confirm_DeleteProperty_Title;
+	public static String		Slideout_TourFilter_Label_DayMonth;
 	public static String		Slideout_TourFilter_Label_ProfileName;
 	public static String		Slideout_TourFilter_Label_Title;
 
@@ -1766,7 +1767,6 @@ public class Messages extends NLS {
 	public static String		Tour_Editor_Radio_Cadence_Spm;
 
 	public static String		Tour_Filter_Action_Tooltip;
-	
 	public static String		Tour_Filter_Field_BreakTime;
 	public static String		Tour_Filter_Field_DrivingTime;
 	public static String		Tour_Filter_Field_RecordingTime;
@@ -1775,6 +1775,7 @@ public class Messages extends NLS {
 	public static String		Tour_Filter_Field_TourDate;
 	public static String		Tour_Filter_Field_TourTime;
 	public static String		Tour_Filter_Field_TourTitle;
+	public static String		Tour_Filter_Operator_And;
 	public static String		Tour_Filter_Operator_Between;
 	public static String		Tour_Filter_Operator_EndsWith;
 	public static String		Tour_Filter_Operator_Equals;

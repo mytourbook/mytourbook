@@ -15,21 +15,51 @@
  *******************************************************************************/
 package net.tourbook.tour.filter;
 
+import java.util.Arrays;
+
+/**
+ * Configuration for a tour filter field
+ */
 public class TourFilterFieldConfig {
 
-	String					name;
+	/**
+	 * Visible field name
+	 */
+	final String					name;
 
-	TourFilterField			filterField;
-	TourFilterFieldOperator[]	filterOperators;
+	/**
+	 * Every field can be identified by its unique id
+	 */
+	final TourFilterFieldId			fieldId;
 
-	public TourFilterFieldConfig(	final TourFilterField filterField,
-									final String name,
-									final TourFilterFieldOperator[] filterOperators) {
+	final TourFilterFieldType		fieldType;
+
+	/**
+	 * Contains all operators which are allowed for this field
+	 */
+	final TourFilterFieldOperator[]	fieldOperators;
+
+	public TourFilterFieldConfig(	final String name,
+									final TourFilterFieldId fieldId,
+									final TourFilterFieldType fieldType,
+									final TourFilterFieldOperator[] fieldOperators) {
 
 		this.name = name;
 
-		this.filterField = filterField;
-		this.filterOperators = filterOperators;
+		this.fieldId = fieldId;
+		this.fieldType = fieldType;
+
+		this.fieldOperators = fieldOperators;
+	}
+
+	@Override
+	public String toString() {
+		return "TourFilterFieldConfig ["
+				+ ("name=" + name + ", ")
+				+ ("fieldId=" + fieldId + ", ")
+				+ ("fieldType=" + fieldType + ", ")
+				+ ("fieldOperators=" + Arrays.toString(fieldOperators))
+				+ "]";
 	}
 
 }

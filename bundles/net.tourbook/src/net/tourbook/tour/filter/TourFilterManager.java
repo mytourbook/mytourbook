@@ -18,6 +18,8 @@ package net.tourbook.tour.filter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.time.LocalDateTime;
+import java.time.MonthDay;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
@@ -48,9 +50,18 @@ public class TourFilterManager {
 	private static final String							TAG_ROOT					= "TourFilterProfiles";											//$NON-NLS-1$
 
 	private static final String							ATTR_IS_SELECTED			= "isSelected";													//$NON-NLS-1$
-	private static final String							ATTR_FILTER_TYPE			= "filterType";													//$NON-NLS-1$
+	private static final String							ATTR_FIELD_ID				= "fieldId";													//$NON-NLS-1$
+	private static final String							ATTR_FIELD_OPERATOR			= "fieldOperator";												//$NON-NLS-1$
 	private static final String							ATTR_NAME					= "name";														//$NON-NLS-1$
+	private static final String							ATTR_SEASON_DAY				= "seasonDay";													//$NON-NLS-1$
+	private static final String							ATTR_SEASON_MONTH			= "seasonMonth";												//$NON-NLS-1$
 	private static final String							ATTR_TOUR_FILTER_VERSION	= "TourFilterVersion";											//$NON-NLS-1$
+
+	private static final String							ATTR_DATE_YEAR				= "dateYear";													//$NON-NLS-1$
+	private static final String							ATTR_DATE_MONTH				= "dateMonth";													//$NON-NLS-1$
+	private static final String							ATTR_DATE_DAY				= "dateDay";													//$NON-NLS-1$
+	private static final String							ATTR_TIME_HOUR				= "timeHour";													//$NON-NLS-1$
+	private static final String							ATTR_TIME_MINUTE			= "timeMinute";													//$NON-NLS-1$
 
 // SET_FORMATTING_OFF
 
@@ -131,14 +142,14 @@ public class TourFilterManager {
 	
 	public static final TourFilterFieldConfig[]				FILTER_FIELD_CONFIG = {
 	                                       		                 			   
-		new TourFilterFieldConfig(TourFilterField.TOUR_DATE,			Messages.Tour_Filter_Field_TourDate,			FILTER_OPERATORS_DATE_TIME),
-		new TourFilterFieldConfig(TourFilterField.TOUR_TIME,			Messages.Tour_Filter_Field_TourTime,			FILTER_OPERATORS_DATE_TIME),
-		new TourFilterFieldConfig(TourFilterField.SEASON_DATE,			Messages.Tour_Filter_Field_Season,				FILTER_OPERATORS_SEASON),
-		new TourFilterFieldConfig(TourFilterField.RECORDING_TIME,		Messages.Tour_Filter_Field_RecordingTime,		FILTER_OPERATORS_NUMBER),
-		new TourFilterFieldConfig(TourFilterField.BREAK_TIME,			Messages.Tour_Filter_Field_BreakTime,			FILTER_OPERATORS_NUMBER),
-		new TourFilterFieldConfig(TourFilterField.DRIVING_TIME,			Messages.Tour_Filter_Field_DrivingTime,			FILTER_OPERATORS_NUMBER),
-		new TourFilterFieldConfig(TourFilterField.TOUR_TITLE,			Messages.Tour_Filter_Field_TourTitle,			FILTER_OPERATORS_TEXT),
-		new TourFilterFieldConfig(TourFilterField.TEMPERATURE,			Messages.Tour_Filter_Field_Temperature,			FILTER_OPERATORS_NUMBER),
+		new TourFilterFieldConfig(Messages.Tour_Filter_Field_TourDate,			TourFilterFieldId.TOUR_DATE,			TourFilterFieldType.DATE,		FILTER_OPERATORS_DATE_TIME),
+		new TourFilterFieldConfig(Messages.Tour_Filter_Field_TourTime,			TourFilterFieldId.TOUR_TIME,			TourFilterFieldType.TIME,		FILTER_OPERATORS_DATE_TIME),
+		new TourFilterFieldConfig(Messages.Tour_Filter_Field_Season,			TourFilterFieldId.SEASON_DATE,		TourFilterFieldType.SEASON,		FILTER_OPERATORS_SEASON),
+		new TourFilterFieldConfig(Messages.Tour_Filter_Field_RecordingTime,		TourFilterFieldId.RECORDING_TIME,		TourFilterFieldType.NUMBER,		FILTER_OPERATORS_NUMBER),
+		new TourFilterFieldConfig(Messages.Tour_Filter_Field_BreakTime,			TourFilterFieldId.BREAK_TIME,			TourFilterFieldType.NUMBER,		FILTER_OPERATORS_NUMBER),
+		new TourFilterFieldConfig(Messages.Tour_Filter_Field_DrivingTime,		TourFilterFieldId.DRIVING_TIME,		TourFilterFieldType.NUMBER,		FILTER_OPERATORS_NUMBER),
+		new TourFilterFieldConfig(Messages.Tour_Filter_Field_TourTitle,			TourFilterFieldId.TOUR_TITLE,			TourFilterFieldType.TEXT,		FILTER_OPERATORS_TEXT),
+		new TourFilterFieldConfig(Messages.Tour_Filter_Field_Temperature,		TourFilterFieldId.TEMPERATURE,		TourFilterFieldType.NUMBER,		FILTER_OPERATORS_NUMBER),
 	                                       		                 			   
 	};
 
@@ -149,16 +160,14 @@ public class TourFilterManager {
 	private static final IPath					_stateLocation		= Platform.getStateLocation(_bundle);
 	private final static IPreferenceStore		_prefStore			= TourbookPlugin.getPrefStore();
 
-	private static ActionTourFilter				_actionTourFilter;
 	
 // SET_FORMATTING_ON
 
 	private static ArrayList<TourFilterProfile>			_filterProfiles				= new ArrayList<>();
 
-	private static TourFilterProfile					_selectedProfile;
-	{
+	private static ActionTourFilter						_actionTourFilter;
 
-	}
+	private static TourFilterProfile					_selectedProfile;
 
 	/**
 	 * Fire event that the tour filter has changed.
@@ -168,21 +177,38 @@ public class TourFilterManager {
 		_prefStore.setValue(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED, Math.random());
 	}
 
-	static TourFilterFieldOperator getFieldOperator(final TourFilterField filterField, final int operatorIndex) {
+	/**
+	 * @param filterField
+	 * @return Returns the configuration for a filter field.
+	 */
+	static TourFilterFieldConfig getFieldConfig(final TourFilterFieldId filterField) {
+
+		for (final TourFilterFieldConfig fieldConfig : FILTER_FIELD_CONFIG) {
+
+			if (filterField == fieldConfig.fieldId) {
+				return fieldConfig;
+			}
+		}
+
+		// this should not happen
+		return null;
+	}
+
+	static TourFilterFieldOperator getFieldOperator(final TourFilterFieldId filterField, final int operatorIndex) {
 
 		final TourFilterFieldOperator[] fieldOperators = getFieldOperators(filterField);
 
 		return fieldOperators[operatorIndex];
 	}
 
-	static int getFieldOperatorIndex(final TourFilterField filterField, final TourFilterFieldOperator fieldOperator) {
+	static int getFieldOperatorIndex(final TourFilterFieldId filterField, final TourFilterFieldOperator fieldOperator) {
 
 		final TourFilterFieldOperator[] fieldOperators = getFieldOperators(filterField);
 
 		for (int operatorIndex = 0; operatorIndex < fieldOperators.length; operatorIndex++) {
 
 			final TourFilterFieldOperator filterFieldOperator = fieldOperators[operatorIndex];
-			
+
 			if (fieldOperator == filterFieldOperator) {
 				return operatorIndex;
 			}
@@ -203,11 +229,11 @@ public class TourFilterManager {
 		return null;
 	}
 
-	static TourFilterFieldOperator[] getFieldOperators(final TourFilterField filterField) {
+	static TourFilterFieldOperator[] getFieldOperators(final TourFilterFieldId filterField) {
 
 		for (final TourFilterFieldConfig fieldConfig : FILTER_FIELD_CONFIG) {
-			if (filterField == fieldConfig.filterField) {
-				return fieldConfig.filterOperators;
+			if (filterField == fieldConfig.fieldId) {
+				return fieldConfig.fieldOperators;
 			}
 		}
 
@@ -219,25 +245,18 @@ public class TourFilterManager {
 	 * @param filterField
 	 * @return Returns the index of the requested filter type.
 	 */
-	static int getFilterFieldIndex(final TourFilterField filterField) {
+	static int getFilterFieldIndex(final TourFilterFieldId filterField) {
 
 		for (int typeIndex = 0; typeIndex < FILTER_FIELD_CONFIG.length; typeIndex++) {
 
 			final TourFilterFieldConfig filterTemplate = FILTER_FIELD_CONFIG[typeIndex];
 
-			if (filterTemplate.filterField.equals(filterField)) {
+			if (filterTemplate.fieldId.equals(filterField)) {
 				return typeIndex;
 			}
 		}
 
 		return 0;
-	}
-
-	static String getFilterFieldName(final TourFilterField filterField) {
-
-		final int index = getFilterFieldIndex(filterField);
-
-		return FILTER_FIELD_CONFIG[index].name;
 	}
 
 	static ArrayList<TourFilterProfile> getProfiles() {
@@ -285,27 +304,30 @@ public class TourFilterManager {
 							_selectedProfile = tourFilterProfile;
 						}
 
+						// loop: all properties
 						for (final IMemento mementoProperty : xmlProfile.getChildren(TAG_PROPERTY)) {
 
 							final XMLMemento xmlProperty = (XMLMemento) mementoProperty;
 
+							final TourFilterFieldId fieldId = (TourFilterFieldId) Util.getXmlEnum(//
+									xmlProperty,
+									ATTR_FIELD_ID,
+									TourFilterFieldId.TOUR_DATE);
+
+							final TourFilterFieldOperator fieldOperator = (TourFilterFieldOperator) Util.getXmlEnum(//
+									xmlProperty,
+									ATTR_FIELD_OPERATOR,
+									TourFilterFieldOperator.EQUALS);
+
+							final TourFilterFieldConfig fieldConfig = getFieldConfig(fieldId);
+
 							final TourFilterProperty filterProperty = new TourFilterProperty();
 
-							filterProperty.filterField = (TourFilterField) Util.getXmlEnum(//
-									xmlProperty,
-									ATTR_FILTER_TYPE,
-									TourFilterField.TOUR_DATE);
+							filterProperty.fieldConfig = fieldConfig;
+							filterProperty.fieldOperator = fieldOperator;
 
 							tourFilterProfile.filterProperties.add(filterProperty);
 						}
-
-						// loop: properties
-//						for (final TourFilterProperty filterProperty : tourFilterProfile.filterProperties) {
-//
-//							final IMemento xmlProperty = xmlProfile.createChild(TAG_PROPERTY);
-//
-//							Util.setXmlEnum(xmlProperty, ATTR_FILTER_TYPE, filterProperty.filterType);
-//						}
 					}
 				}
 
@@ -379,9 +401,117 @@ public class TourFilterManager {
 				// loop: properties
 				for (final TourFilterProperty filterProperty : tourFilterProfile.filterProperties) {
 
+					final TourFilterFieldConfig fieldConfig = filterProperty.fieldConfig;
+					final TourFilterFieldOperator fieldOperator = filterProperty.fieldOperator;
+
+					final TourFilterFieldType fieldType = fieldConfig.fieldType;
+
+					final LocalDateTime dateTime1 = filterProperty.dateTime1;
+					final LocalDateTime dateTime2 = filterProperty.dateTime2;
+
+					final MonthDay monthDay1 = filterProperty.monthDay1;
+					final MonthDay monthDay2 = filterProperty.monthDay2;
+
 					final IMemento xmlProperty = xmlProfile.createChild(TAG_PROPERTY);
 
-					Util.setXmlEnum(xmlProperty, ATTR_FILTER_TYPE, filterProperty.filterField);
+					Util.setXmlEnum(xmlProperty, ATTR_FIELD_ID, fieldConfig.fieldId);
+					Util.setXmlEnum(xmlProperty, ATTR_FIELD_OPERATOR, fieldOperator);
+
+					switch (fieldOperator) {
+					case GREATER_THAN:
+					case GREATER_THAN_OR_EQUAL:
+					case LESS_THAN:
+					case LESS_THAN_OR_EQUAL:
+					case EQUALS:
+					case NOT_EQUALS:
+
+						switch (fieldType) {
+						case DATE:
+
+							writeXml_Date(xmlProperty, dateTime1, 1);
+
+							break;
+
+						case TIME:
+
+							writeXml_Time(xmlProperty, dateTime1, 1);
+
+							break;
+
+						case NUMBER:
+
+							break;
+
+						case TEXT:
+
+							break;
+
+						case SEASON:
+
+							writeXml_Season(xmlProperty, monthDay1, 1);
+
+							break;
+						}
+
+						break;
+
+					case BETWEEN:
+					case NOT_BETWEEN:
+
+						switch (fieldType) {
+						case DATE:
+
+							writeXml_Date(xmlProperty, dateTime1, 1);
+							writeXml_Date(xmlProperty, dateTime2, 2);
+
+							break;
+
+						case TIME:
+
+							writeXml_Time(xmlProperty, dateTime1, 1);
+							writeXml_Time(xmlProperty, dateTime2, 2);
+
+							break;
+
+						case NUMBER:
+
+							break;
+
+						case TEXT:
+
+							break;
+
+						case SEASON:
+
+							writeXml_Season(xmlProperty, monthDay1, 1);
+							writeXml_Season(xmlProperty, monthDay2, 2);
+
+							break;
+						}
+
+						break;
+
+					case STARTS_WITH:
+						break;
+					case ENDS_WITH:
+						break;
+
+					case INCLUDE_ANY:
+						break;
+					case EXCLUDE_ALL:
+						break;
+
+					case IS_EMPTY:
+						break;
+					case IS_NOT_EMPTY:
+						break;
+
+					case LIKE:
+						break;
+					case NOT_LIKE:
+						break;
+					}
+
 				}
 			}
 
@@ -410,6 +540,25 @@ public class TourFilterManager {
 		xmlRoot.putInteger(ATTR_TOUR_FILTER_VERSION, TOUR_FILTER_VERSION);
 
 		return xmlRoot;
+	}
+
+	private static void writeXml_Date(final IMemento xmlProperty, final LocalDateTime dateTime, final int fieldNo) {
+
+		xmlProperty.putInteger(ATTR_DATE_YEAR + fieldNo, dateTime.getYear());
+		xmlProperty.putInteger(ATTR_DATE_MONTH + fieldNo, dateTime.getMonthValue());
+		xmlProperty.putInteger(ATTR_DATE_DAY + fieldNo, dateTime.getDayOfMonth());
+	}
+
+	private static void writeXml_Season(final IMemento xmlProperty, final MonthDay monthDay, final int fieldNo) {
+
+		xmlProperty.putInteger(ATTR_SEASON_MONTH + fieldNo, monthDay.getMonthValue());
+		xmlProperty.putInteger(ATTR_SEASON_DAY + fieldNo, monthDay.getDayOfMonth());
+	}
+
+	private static void writeXml_Time(final IMemento xmlProperty, final LocalDateTime dateTime, final int fieldNo) {
+
+		xmlProperty.putInteger(ATTR_TIME_HOUR + fieldNo, dateTime.getHour());
+		xmlProperty.putInteger(ATTR_TIME_MINUTE + fieldNo, dateTime.getMinute());
 	}
 
 }

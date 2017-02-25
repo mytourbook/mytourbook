@@ -15,25 +15,73 @@
  *******************************************************************************/
 package net.tourbook.tour.filter;
 
+import java.time.LocalDateTime;
+import java.time.MonthDay;
+
 import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.DateTime;
+import org.eclipse.swt.widgets.Spinner;
 
 public class TourFilterProperty {
 
-	TourFilterField			filterField		= TourFilterField.TOUR_DATE;
+	TourFilterFieldConfig	fieldConfig		= TourFilterManager.getFieldConfig(TourFilterFieldId.TOUR_DATE);
+
+	/**
+	 * Selected operator for the property field
+	 */
 	TourFilterFieldOperator	fieldOperator	= TourFilterFieldOperator.EQUALS;
 
-	Combo					comboFilterField;
+	/*
+	 * Field data for the different operators and field types
+	 */
+	LocalDateTime			dateTime1		= LocalDateTime.now().withDayOfMonth(1).withMonth(1);
+	LocalDateTime			dateTime2		= LocalDateTime.now();
+
+	MonthDay				monthDay1		= MonthDay.of(1, 1);
+	MonthDay				monthDay2		= MonthDay.now();
+
+	/*
+	 * UI controls, not all of them are used, depending on the selected field type and operator
+	 */
+	Combo					comboFieldName;
 	Combo					comboFieldOperator;
 
+	Composite				fieldDetailOuterContainer;
+
+	DateTime				uiDateTime1;
+	DateTime				uiDateTime2;
+
+	Combo					uiComboMonth1;
+	Combo					uiComboMonth2;
+	Spinner					uiSpinnerDay1;
+	Spinner					uiSpinnerDay2;
+
 	public TourFilterProperty() {}
+
+	void disposeFieldInnerContainer() {
+
+		for (final Control control : fieldDetailOuterContainer.getChildren()) {
+			control.dispose();
+		}
+
+		uiDateTime1 = null;
+		uiDateTime2 = null;
+
+		uiComboMonth1 = null;
+		uiComboMonth2 = null;
+		uiSpinnerDay1 = null;
+		uiSpinnerDay2 = null;
+	}
 
 	@Override
 	public String toString() {
 
 		return "\nTourFilterProperty [" //
 
-				+ ("filterField=" + filterField + ", ")
-				+ ("fieldOperator=" + fieldOperator)
+				+ ("fieldConfig=" + fieldConfig + ", ")
+				+ ("fieldOperator=" + fieldOperator + ", ")
 
 				+ "]";
 	}
