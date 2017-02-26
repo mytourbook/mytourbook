@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.tour.filter;
 
-import java.util.Arrays;
-
 /**
  * Configuration for a tour filter field
  */
@@ -39,6 +37,10 @@ public class TourFilterFieldConfig {
 	 */
 	final TourFilterFieldOperator[]	fieldOperators;
 
+	int								minValue;
+	int								maxValue;
+	int								pageIncrement;
+
 	public TourFilterFieldConfig(	final String name,
 									final TourFilterFieldId fieldId,
 									final TourFilterFieldType fieldType,
@@ -52,14 +54,30 @@ public class TourFilterFieldConfig {
 		this.fieldOperators = fieldOperators;
 	}
 
+	public TourFilterFieldConfig(	final String name,
+									final TourFilterFieldId fieldId,
+									final TourFilterFieldType fieldType,
+									final TourFilterFieldOperator[] filterOperators,
+									final int minValue,
+									final int maxValue,
+									final int pageIncrement) {
+
+		this(name, fieldId, fieldType, filterOperators);
+
+		this.minValue = minValue;
+		this.maxValue = maxValue;
+		this.pageIncrement = pageIncrement;
+
+	}
+
 	@Override
 	public String toString() {
-		return "TourFilterFieldConfig ["
+		return "TourFilterFieldConfig [\n"
 				+ ("name=" + name + ", ")
 				+ ("fieldId=" + fieldId + ", ")
 				+ ("fieldType=" + fieldType + ", ")
-				+ ("fieldOperators=" + Arrays.toString(fieldOperators))
-				+ "]";
+				// + ("fieldOperators=" + Arrays.toString(fieldOperators))
+				+ "\n]\n";
 	}
 
 }

@@ -25,6 +25,9 @@ public class TourFilterProfile {
 
 	int								profileId;
 
+	/**
+	 * Profile name
+	 */
 	String							name				= UI.EMPTY_STRING;
 
 	ArrayList<TourFilterProperty>	filterProperties	= new ArrayList<>();

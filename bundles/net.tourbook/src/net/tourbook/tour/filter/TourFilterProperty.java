@@ -18,6 +18,7 @@ package net.tourbook.tour.filter;
 import java.time.LocalDateTime;
 import java.time.MonthDay;
 
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -33,6 +34,11 @@ public class TourFilterProperty {
 	 */
 	TourFilterFieldOperator	fieldOperator	= TourFilterFieldOperator.EQUALS;
 
+	/**
+	 * This property is enabled when <code>true</code>
+	 */
+	boolean					isEnabled		= true;
+
 	/*
 	 * Field data for the different operators and field types
 	 */
@@ -45,18 +51,27 @@ public class TourFilterProperty {
 	/*
 	 * UI controls, not all of them are used, depending on the selected field type and operator
 	 */
+
+	Button					checkboxIsEnabled;
+
 	Combo					comboFieldName;
 	Combo					comboFieldOperator;
 
 	Composite				fieldDetailOuterContainer;
 
+	// ---------------------------------------------------------------------
+
 	DateTime				uiDateTime1;
 	DateTime				uiDateTime2;
 
-	Combo					uiComboMonth1;
-	Combo					uiComboMonth2;
-	Spinner					uiSpinnerDay1;
-	Spinner					uiSpinnerDay2;
+	// season
+	Combo					uiCombo_SeasonMonth1;
+	Combo					uiCombo_SeasonMonth2;
+	Spinner					uiSpinner_SeasonDay1;
+	Spinner					uiSpinner_SeasonDay2;
+
+	Spinner					uiSpinner_Number1;
+	Spinner					uiSpinner_Number2;
 
 	public TourFilterProperty() {}
 
@@ -69,10 +84,13 @@ public class TourFilterProperty {
 		uiDateTime1 = null;
 		uiDateTime2 = null;
 
-		uiComboMonth1 = null;
-		uiComboMonth2 = null;
-		uiSpinnerDay1 = null;
-		uiSpinnerDay2 = null;
+		uiCombo_SeasonMonth1 = null;
+		uiCombo_SeasonMonth2 = null;
+		uiSpinner_SeasonDay1 = null;
+		uiSpinner_SeasonDay2 = null;
+
+		uiSpinner_Number1 = null;
+		uiSpinner_Number2 = null;
 	}
 
 	@Override
@@ -83,6 +101,6 @@ public class TourFilterProperty {
 				+ ("fieldConfig=" + fieldConfig + ", ")
 				+ ("fieldOperator=" + fieldOperator + ", ")
 
-				+ "]";
+				+ "]\n\n";
 	}
 }

@@ -1569,7 +1569,14 @@ public class Messages extends NLS {
 	public static String		Slideout_TourFilter_Action_CopyProfile_Tooltip;
 	public static String		Slideout_TourFilter_Action_DeleteProfile_Tooltip;
 	public static String		Slideout_TourFilter_Action_DeleteProperty_Tooltip;
+
+	public static String Slideout_TourFilter_Action_MovePropertyDown_Tooltip;
+
+	public static String Slideout_TourFilter_Action_MovePropertyUp_Tooltip;
+
 	public static String		Slideout_TourFilter_Checkbox_IsFilterByDate;
+
+	public static String Slideout_TourFilter_Checkbox_IsPropertyEnabled_Tooltip;
 	public static String		Slideout_TourFilter_Column_ProfileName;
 	public static String		Slideout_TourFilter_Confirm_DeleteProfile_Message;
 	public static String		Slideout_TourFilter_Confirm_DeleteProfile_Title;

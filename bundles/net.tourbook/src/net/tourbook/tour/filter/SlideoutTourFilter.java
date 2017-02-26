@@ -19,6 +19,7 @@ import java.text.DateFormatSymbols;
 import java.time.LocalDateTime;
 import java.time.MonthDay;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
@@ -62,6 +63,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -261,6 +263,28 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 		updateUI_Properties();
 	}
 
+	void action_PropertyMoveDown(final TourFilterProperty filterProperty) {
+
+		final ArrayList<TourFilterProperty> filterProperties = _selectedProfile.filterProperties;
+		final int selectedIndex = filterProperties.indexOf(filterProperty);
+
+		Collections.swap(filterProperties, selectedIndex, selectedIndex + 1);
+
+		createUI_410_FilterProperties();
+		updateUI_Properties();
+	}
+
+	void action_PropertyMoveUp(final TourFilterProperty filterProperty) {
+
+		final ArrayList<TourFilterProperty> filterProperties = _selectedProfile.filterProperties;
+		final int selectedIndex = filterProperties.indexOf(filterProperty);
+
+		Collections.swap(filterProperties, selectedIndex, selectedIndex - 1);
+
+		createUI_410_FilterProperties();
+		updateUI_Properties();
+	}
+
 	@Override
 	protected void beforeHideToolTip() {}
 
@@ -317,7 +341,7 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 				{
 					createUI_300_FilterInfo(filterContainer);
 					createUI_400_FilterOuterContainer(filterContainer);
-					createUI_800_FilterActions(filterContainer);
+					createUI_500_FilterActions(filterContainer);
 				}
 			}
 		}
@@ -478,7 +502,7 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 				GridDataFactory
 						.fillDefaults()//
 //						.grab(true, false)
-						.hint(_pc.convertWidthInCharsToPixels(20), SWT.DEFAULT)
+						.hint(_pc.convertWidthInCharsToPixels(30), SWT.DEFAULT)
 						.applyTo(_txtProfileName);
 			}
 		}
@@ -538,14 +562,21 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 		final SelectionListener fieldListener = new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
-				onProperty_SelectField(e);
+				onProperty_SelectField(e.widget);
 			}
 
 		};
 		final SelectionAdapter operatorListener = new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
-				onProperty_SelectOperator(e);
+				onProperty_SelectOperator(e.widget);
+			}
+		};
+
+		final SelectionAdapter enabledListener = new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				onProperty_SelectEnabled(e.widget);
 			}
 		};
 
@@ -554,7 +585,7 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 		final Composite filterContainer = createUI_420_FilterScrolledContainer(parent);
 		GridLayoutFactory
 				.fillDefaults()//
-				.numColumns(4)
+				.numColumns(5)
 				.applyTo(filterContainer);
 //		filterContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 
@@ -564,6 +595,19 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 
 				final TourFilterProperty filterProperty = filterProperties.get(propertyIndex);
 
+				{
+					/*
+					 * checkbox: show vertical grid
+					 */
+					final Button chkIsFieldEnabled = new Button(filterContainer, SWT.CHECK);
+					chkIsFieldEnabled.setData(filterProperty);
+
+					chkIsFieldEnabled.setText(String.format("&%d", propertyIndex + 1));//$NON-NLS-1$
+					chkIsFieldEnabled.setToolTipText(Messages.Slideout_TourFilter_Checkbox_IsPropertyEnabled_Tooltip);
+					chkIsFieldEnabled.addSelectionListener(enabledListener);
+
+					filterProperty.checkboxIsEnabled = chkIsFieldEnabled;
+				}
 				{
 					/*
 					 * Combo: Filter field
@@ -598,22 +642,13 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 					GridLayoutFactory.fillDefaults().numColumns(1).applyTo(fieldDetailOuterContainer);
 
 					filterProperty.fieldDetailOuterContainer = fieldDetailOuterContainer;
-//					fieldDetailOuterContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 				}
+
 				{
 					/*
 					 * Toolbar: Property actions
 					 */
-					final Action_Property_Delete actionProperty_Delete = new Action_Property_Delete(
-							this,
-							filterProperty);
-
-					final ToolBar toolbar = new ToolBar(filterContainer, SWT.FLAT);
-					final ToolBarManager tbm = new ToolBarManager(toolbar);
-
-					tbm.add(actionProperty_Delete);
-
-					tbm.update(true);
+					createUI_418_PropertyActions(filterContainer, filterProperty, propertyIndex, numProperties);
 				}
 			}
 		}
@@ -625,7 +660,59 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 		}
 
 		// set focus back to the slideout
-		_txtProfileName.setFocus();
+//		_txtProfileName.setFocus();
+	}
+
+	private void createUI_418_PropertyActions(	final Composite filterContainer,
+												final TourFilterProperty filterProperty,
+												final int propertyIndex,
+												final int numProperties) {
+		boolean isMoveUp = false;
+		boolean isMoveDown = false;
+
+		if (numProperties == 1) {
+
+			// no up or down
+
+		} else if (propertyIndex == 0) {
+
+			// this is the first property
+
+			isMoveDown = true;
+
+		} else if (propertyIndex == numProperties - 1) {
+
+			// this is the last property
+
+			isMoveUp = true;
+
+		} else {
+
+			isMoveUp = true;
+			isMoveDown = true;
+		}
+
+		final Action_Property_Delete actionDeleteProperty = new Action_Property_Delete(this, filterProperty);
+
+		final ToolBar toolbar = new ToolBar(filterContainer, SWT.FLAT);
+		GridDataFactory
+				.fillDefaults()//
+				.align(SWT.END, SWT.CENTER)
+				.applyTo(toolbar);
+
+		final ToolBarManager tbm = new ToolBarManager(toolbar);
+
+		if (isMoveUp) {
+			tbm.add(new Action_Property_MoveUp(this, filterProperty));
+		}
+
+		if (isMoveDown) {
+			tbm.add(new Action_Property_MoveDown(this, filterProperty));
+		}
+
+		tbm.add(actionDeleteProperty);
+
+		tbm.update(true);
 	}
 
 	private Composite createUI_420_FilterScrolledContainer(final Composite parent) {
@@ -698,6 +785,14 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 
 					case NUMBER:
 
+						filterProperty.uiSpinner_Number1 = createUI_Field_Number(
+								container,
+								filterProperty,
+								1,
+								fieldConfig.minValue,
+								fieldConfig.maxValue,
+								fieldConfig.pageIncrement);
+
 						break;
 
 					case TEXT:
@@ -708,8 +803,8 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 
 						numColumns = 2;
 
-						filterProperty.uiSpinnerDay1 = createUI_Field_SeasonDay(container, filterProperty, 1);
-						filterProperty.uiComboMonth1 = createUI_Field_SeasonMonth(container, filterProperty, 1);
+						filterProperty.uiSpinner_SeasonDay1 = createUI_Field_SeasonDay(container, filterProperty, 1);
+						filterProperty.uiCombo_SeasonMonth1 = createUI_Field_SeasonMonth(container, filterProperty, 1);
 
 						break;
 					}
@@ -752,11 +847,11 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 
 						numColumns = 5;
 
-						filterProperty.uiSpinnerDay1 = createUI_Field_SeasonDay(container, filterProperty, 1);
-						filterProperty.uiComboMonth1 = createUI_Field_SeasonMonth(container, filterProperty, 1);
+						filterProperty.uiSpinner_SeasonDay1 = createUI_Field_SeasonDay(container, filterProperty, 1);
+						filterProperty.uiCombo_SeasonMonth1 = createUI_Field_SeasonMonth(container, filterProperty, 1);
 						createUI_Operator_And(container);
-						filterProperty.uiSpinnerDay2 = createUI_Field_SeasonDay(container, filterProperty, 2);
-						filterProperty.uiComboMonth2 = createUI_Field_SeasonMonth(container, filterProperty, 2);
+						filterProperty.uiSpinner_SeasonDay2 = createUI_Field_SeasonDay(container, filterProperty, 2);
+						filterProperty.uiCombo_SeasonMonth2 = createUI_Field_SeasonMonth(container, filterProperty, 2);
 
 						break;
 					}
@@ -791,7 +886,7 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 		fieldOuterContainer.layout(true);
 	}
 
-	private void createUI_800_FilterActions(final Composite parent) {
+	private void createUI_500_FilterActions(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -827,6 +922,40 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 		GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).applyTo(dtTourDate);
 
 		return dtTourDate;
+	}
+
+	private Spinner createUI_Field_Number(	final Composite container,
+											final TourFilterProperty filterProperty,
+											final int fieldNo,
+											final int minValue,
+											final int maxValue,
+											final int pageIncrement) {
+
+		final Spinner spinner = new Spinner(container, SWT.BORDER);
+
+		spinner.setMinimum(minValue);
+		spinner.setMaximum(maxValue);
+		spinner.setPageIncrement(pageIncrement);
+
+		spinner.setData(filterProperty);
+		spinner.setData(FIELD_NO, fieldNo);
+
+		spinner.addMouseWheelListener(new MouseWheelListener() {
+			@Override
+			public void mouseScrolled(final MouseEvent event) {
+				UI.adjustSpinnerValueOnMouseScroll(event);
+//				onField_Select_SeasonDay(event.widget);
+			}
+		});
+
+		spinner.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent event) {
+//				onField_Select_SeasonDay(event.widget);
+			}
+		});
+
+		return spinner;
 	}
 
 	private Spinner createUI_Field_SeasonDay(	final Composite container,
@@ -943,6 +1072,20 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 
 		_lblProfileName.setEnabled(isProfileSelected);
 		_txtProfileName.setEnabled(isProfileSelected);
+
+		// enable property UI controls
+		if (isProfileSelected) {
+
+			for (final TourFilterProperty property : _selectedProfile.filterProperties) {
+
+				final boolean isEnabled = property.isEnabled;
+
+				property.comboFieldName.setEnabled(isEnabled);
+				property.comboFieldOperator.setEnabled(isEnabled);
+
+				UI.setEnabledForAllChildren(property.fieldDetailOuterContainer, isEnabled);
+			}
+		}
 	}
 
 	private int getMonthMaxDays(final int month) {
@@ -981,8 +1124,8 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 		final int monthMaxDays = getMonthMaxDays(selectedMonth);
 
 		final Spinner spinnerDay = fieldNo == 1 //
-				? filterProperty.uiSpinnerDay1
-				: filterProperty.uiSpinnerDay2;
+				? filterProperty.uiSpinner_SeasonDay1
+				: filterProperty.uiSpinner_SeasonDay2;
 
 		if (oldDay > monthMaxDays) {
 
@@ -1064,13 +1207,6 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 		} else {
 			filterProperty.monthDay2 = monthDay;
 		}
-
-		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] Day  ") //
-				+ ("\t" + filterProperty.monthDay1)
-				+ ("\t" + filterProperty.monthDay2)
-		//
-		);
-		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
 	private void onField_Select_SeasonMonth(final Widget widget) {
@@ -1091,13 +1227,6 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 		} else {
 			filterProperty.monthDay2 = monthDay;
 		}
-
-		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] Month") //
-				+ ("\t" + filterProperty.monthDay1)
-				+ ("\t" + filterProperty.monthDay2)
-		//
-		);
-		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
 	private void onProfile_DeleteSelected() {
@@ -1169,18 +1298,21 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 
 	private void onProfile_Select() {
 
-		// update model from previous profile
-		if (_selectedProfile != null) {
-
-			_selectedProfile.name = _txtProfileName.getText();
-		}
+		TourFilterProfile selectedProfile = null;
 
 		// get selected profile from viewer
 		final StructuredSelection selection = (StructuredSelection) _profileViewer.getSelection();
 		final Object firstElement = selection.getFirstElement();
 		if (firstElement != null) {
-			_selectedProfile = (TourFilterProfile) firstElement;
+			selectedProfile = (TourFilterProfile) firstElement;
 		}
+
+		if (_selectedProfile != null && _selectedProfile == selectedProfile) {
+			// a new profile is not selected
+			return;
+		}
+
+		_selectedProfile = selectedProfile;
 
 		// update model
 		TourFilterManager.setSelectedProfile(_selectedProfile);
@@ -1197,26 +1329,35 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 
 		createUI_410_FilterProperties();
 		updateUI_Properties();
+	}
+
+	private void onProperty_SelectEnabled(final Widget widget) {
+
+		final TourFilterProperty filterProperty = (TourFilterProperty) widget.getData();
+
+		final boolean isFieldEnabled = ((Button) (widget)).getSelection();
+
+		filterProperty.isEnabled = isFieldEnabled;
 
 		enableControls();
 	}
 
-	private void onProperty_SelectField(final SelectionEvent event) {
+	private void onProperty_SelectField(final Widget widget) {
 
-		final TourFilterProperty filterProperty = (TourFilterProperty) event.widget.getData();
+		final TourFilterProperty filterProperty = (TourFilterProperty) widget.getData();
 
-		final int selectedFilterConfigIndex = ((Combo) (event.widget)).getSelectionIndex();
+		final int selectedFilterConfigIndex = ((Combo) (widget)).getSelectionIndex();
 
 		filterProperty.fieldConfig = TourFilterManager.FILTER_FIELD_CONFIG[selectedFilterConfigIndex];
 
 		updateUI_Properties();
 	}
 
-	private void onProperty_SelectOperator(final SelectionEvent event) {
+	private void onProperty_SelectOperator(final Widget widget) {
 
-		final TourFilterProperty filterProperty = (TourFilterProperty) event.widget.getData();
+		final TourFilterProperty filterProperty = (TourFilterProperty) widget.getData();
 
-		final int selectedIndex = ((Combo) (event.widget)).getSelectionIndex();
+		final int selectedIndex = ((Combo) (widget)).getSelectionIndex();
 
 		filterProperty.fieldOperator = TourFilterManager.getFieldOperator(//
 				filterProperty.fieldConfig.fieldId,
@@ -1289,9 +1430,13 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 
 			comboFilterField.select(fieldIndex);
 			comboFieldOperator.select(operatorIndex);
+
+			filterProperty.checkboxIsEnabled.setSelection(filterProperty.isEnabled);
 		}
 
 		_filterOuterContainer.layout(true);
+
+		enableControls();
 
 		final Shell shell = _filterOuterContainer.getShell();
 		shell.pack(true);
