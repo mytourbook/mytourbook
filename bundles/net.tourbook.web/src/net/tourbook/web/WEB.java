@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -65,21 +65,20 @@ public class WEB {
 	 */
 //	static boolean							IS_DEBUG_NLS							= true;
 
-	static String							DEFAULT_LANGUAGE						= "en";										//$NON-NLS-1$
+	static String							DEFAULT_LANGUAGE						= "en";											//$NON-NLS-1$
 
 	/**
 	 * Supported languages.
 	 */
-	static String[]							SUPPORTED_LANGUAGES						= { //
-																					// cs_CZ
-			"cs", //$NON-NLS-1$
-			"de",//$NON-NLS-1$
-			DEFAULT_LANGUAGE,
-			"es",//$NON-NLS-1$
-			"fr",//$NON-NLS-1$
-			"it",//$NON-NLS-1$
-			"nl" //$NON-NLS-1$
-																					};
+	static String[]							SUPPORTED_LANGUAGES						= {
+																						"cs",										//$NON-NLS-1$
+																						"de",										//$NON-NLS-1$
+																						DEFAULT_LANGUAGE,
+																						"es",										//$NON-NLS-1$
+																						"fr",										//$NON-NLS-1$
+																						"it",										//$NON-NLS-1$
+																						"nl"										//$NON-NLS-1$
+	};
 
 	static final String						DEBUG_PATH_DOJO							= "C:/E/js-resources/dojo/";					//$NON-NLS-1$
 	private static final String				DEBUG_PATH_XUL_RUNNER					= "C:/E/XULRunner/";							//$NON-NLS-1$
@@ -97,13 +96,17 @@ public class WEB {
 	 * Root folder for web content in the web plugin.
 	 */
 	private static final String				WEB_CONTENT_FOLDER						= IS_DEBUG
-																							? WEB_CONTENT_DEVELOPMENT_FOLDER
-																							: WEB_CONTENT_RELEASE_FOLDER;
+			? WEB_CONTENT_DEVELOPMENT_FOLDER
+			: WEB_CONTENT_RELEASE_FOLDER;
 
 	public static final String				UTF_8									= "UTF-8";										//$NON-NLS-1$
 
 	private static final String				URL_SPACE								= " ";											//$NON-NLS-1$
 	private static final String				URL_SPACE_REPLACEMENT					= "%20";										//$NON-NLS-1$
+	private static final String				URL_SQB_OPEN							= "\\[";										//$NON-NLS-1$
+	private static final String				URL_SQB_OPEN_REPLACEMENT				= "%5B";										//$NON-NLS-1$
+	private static final String				URL_SQB_CLOSE							= "\\]";										//$NON-NLS-1$
+	private static final String				URL_SQB_CLOSE_REPLACEMENT				= "%5D";										//$NON-NLS-1$
 
 	public static final String				HTML_ELEMENT_BR							= "<br>";										//$NON-NLS-1$
 
@@ -114,11 +117,11 @@ public class WEB {
 
 	private static final String				CONTENT_ENCODING_GZIP					= "gzip";										//$NON-NLS-1$
 
-	private static final String				CONTENT_TYPE_APPLICATION_JAVASCRIPT		= "application/javascript";					//$NON-NLS-1$
+	private static final String				CONTENT_TYPE_APPLICATION_JAVASCRIPT		= "application/javascript";						//$NON-NLS-1$
 	public static final String				CONTENT_TYPE_APPLICATION_JSON			= "application/json";							//$NON-NLS-1$
 	private static final String				CONTENT_TYPE_APPLICATION_X_JAVASCRIPT	= "application/x-javascript; charset=UTF-8";	//$NON-NLS-1$
 	private static final String				CONTENT_TYPE_IMAGE_GIF					= "image/gif";									//$NON-NLS-1$
-	private static final String				CONTENT_TYPE_IMAGE_JPG					= "image/jpeg";								//$NON-NLS-1$
+	private static final String				CONTENT_TYPE_IMAGE_JPG					= "image/jpeg";									//$NON-NLS-1$
 	private static final String				CONTENT_TYPE_IMAGE_PNG					= "image/png";									//$NON-NLS-1$
 	private static final String				CONTENT_TYPE_IMAGE_X_ICO				= "image/x-icon";								//$NON-NLS-1$
 	private static final String				CONTENT_TYPE_TEXT_CSS					= "text/css";									//$NON-NLS-1$
@@ -131,7 +134,7 @@ public class WEB {
 	private static final String				FILE_EXTENSION_ICO						= "ico";										//$NON-NLS-1$
 	private static final String				FILE_EXTENSION_JGZ						= "jgz";										//$NON-NLS-1$
 	private static final String				FILE_EXTENSION_JPG						= "jpg";										//$NON-NLS-1$
-	private static final String				FILE_EXTENSION_JS						= "js";										//$NON-NLS-1$
+	private static final String				FILE_EXTENSION_JS						= "js";											//$NON-NLS-1$
 	private static final String				FILE_EXTENSION_MAP						= "map";										//$NON-NLS-1$
 	private static final String				FILE_EXTENSION_PNG						= "png";										//$NON-NLS-1$
 
@@ -139,15 +142,15 @@ public class WEB {
 	 * This file extension is for HTML pages which contain variable replacements, processed in
 	 * {@link ReplacingOutputStream}.
 	 */
-	public static final String				FILE_EXTENSION_MTHTML					= "mthtml";									//$NON-NLS-1$
+	public static final String				FILE_EXTENSION_MTHTML					= "mthtml";										//$NON-NLS-1$
 
-	public static final String				STATE_EXTERNAL_WEB_BROWSER				= "STATE_EXTERNAL_WEB_BROWSER";				//$NON-NLS-1$
+	public static final String				STATE_EXTERNAL_WEB_BROWSER				= "STATE_EXTERNAL_WEB_BROWSER";					//$NON-NLS-1$
 	public static final String				STATE_EXTERNAL_WEB_BROWSER_DEFAULT		= UI.EMPTY_STRING;
-	public static final String				STATE_USE_EXTERNAL_WEB_BROWSER			= "STATE_USE_EXTERNAL_WEB_BROWSER";			//$NON-NLS-1$
+	public static final String				STATE_USE_EXTERNAL_WEB_BROWSER			= "STATE_USE_EXTERNAL_WEB_BROWSER";				//$NON-NLS-1$
 	public static final boolean				STATE_USE_EXTERNAL_WEB_BROWSER_DEFAULT	= false;
 
-	private static final IDialogSettings	_state									= Activator.getState(WEB.class
-																							.getCanonicalName());
+	private static final IDialogSettings	_state									= Activator
+			.getState(WEB.class.getCanonicalName());
 
 	/**
 	 * Converts Java newline into HTML newline.
@@ -176,7 +179,51 @@ public class WEB {
 	 */
 	public static String encodeSpace(final String urlString) {
 
-		return urlString.replaceAll(URL_SPACE, URL_SPACE_REPLACEMENT);
+		String escaped;
+
+		escaped = urlString.replaceAll(URL_SPACE, URL_SPACE_REPLACEMENT);
+		escaped = escaped.replaceAll(URL_SQB_OPEN, URL_SQB_OPEN_REPLACEMENT);
+		escaped = escaped.replaceAll(URL_SQB_CLOSE, URL_SQB_CLOSE_REPLACEMENT);
+
+		return escaped;
+	}
+
+	/**
+	 * Hex-encodes a URL argument
+	 *
+	 * @param urlString
+	 *            The URL argument to encode
+	 * @param obfuscateAll
+	 *            True to force hex-encoding on all argument characters
+	 * @return The StringBuffer where the hex-encoded String will be placed
+	 */
+	public static String encodeUrl(final String urlString, final boolean obfuscateAll) {
+
+		final StringBuilder sb = new StringBuilder();
+
+		if (urlString != null) {
+
+			final char ch[] = new char[urlString.length()];
+
+			urlString.getChars(0, urlString.length(), ch, 0);
+
+			for (final char element : ch) {
+
+				if (obfuscateAll || shouldEncodeArgChar(element)) {
+
+					// escape non-alphanumeric characters
+					sb.append("%"); //$NON-NLS-1$
+					sb.append(Integer.toHexString(0x100 + (element & 0xFF)).substring(1));
+
+				} else {
+
+					// letters and digits are ok as-is
+					sb.append(element);
+				}
+			}
+		}
+
+		return sb.toString();
 	}
 
 	/**
@@ -629,5 +676,25 @@ public class WEB {
 		}
 
 		return extension;
+	}
+
+	/**
+	 * Returns true if the specified character should be hex-encoded in a URL
+	 *
+	 * @param ch
+	 *            The character to test
+	 * @return True if the specified character should be hex-encoded in a URL
+	 */
+	private static boolean shouldEncodeArgChar(final char ch) {
+
+		if (Character.isLetterOrDigit(ch)) {
+			return false;
+
+		} else if ((ch == '_') || (ch == '-') || (ch == '.')) {
+			return false;
+
+		} else {
+			return true;
+		}
 	}
 }
