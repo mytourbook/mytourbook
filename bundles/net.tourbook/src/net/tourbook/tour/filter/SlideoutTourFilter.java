@@ -85,7 +85,7 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 
 //	private final IPreferenceStore	_prefStore	= TourbookPlugin.getPrefStore();
 
-	private static final String	FIELD_NO	= "fieldNo";			//$NON-NLS-1$
+	static final String			FIELD_NO	= "fieldNo";			//$NON-NLS-1$
 
 	private ModifyListener		_defaultModifyListener;
 	private FocusListener		_keepOpenListener;
@@ -606,7 +606,7 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 					chkIsFieldEnabled.setToolTipText(Messages.Slideout_TourFilter_Checkbox_IsPropertyEnabled_Tooltip);
 					chkIsFieldEnabled.addSelectionListener(enabledListener);
 
-					filterProperty.checkboxIsEnabled = chkIsFieldEnabled;
+					filterProperty.checkboxIsPropertyEnabled = chkIsFieldEnabled;
 				}
 				{
 					/*
@@ -757,127 +757,133 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 			// default for number of columns is 1
 			int numColumns = 1;
 
-			{
-				final TourFilterFieldConfig fieldConfig = filterProperty.fieldConfig;
+			final TourFilterFieldConfig fieldConfig = filterProperty.fieldConfig;
+			final TourFilterFieldType fieldType = fieldConfig.fieldType;
 
-				final TourFilterFieldType fieldType = fieldConfig.fieldType;
+			switch (filterProperty.fieldOperator) {
+			case GREATER_THAN:
+			case GREATER_THAN_OR_EQUAL:
+			case LESS_THAN:
+			case LESS_THAN_OR_EQUAL:
+			case EQUALS:
+			case NOT_EQUALS:
 
-				switch (filterProperty.fieldOperator) {
-				case GREATER_THAN:
-				case GREATER_THAN_OR_EQUAL:
-				case LESS_THAN:
-				case LESS_THAN_OR_EQUAL:
-				case EQUALS:
-				case NOT_EQUALS:
+				switch (fieldType) {
+				case DATE:
+					filterProperty.uiDateTime1 = createUI_Field_Date(container, filterProperty, 1);
+					break;
 
-					switch (fieldType) {
-					case DATE:
+				case TIME:
+					filterProperty.uiDateTime1 = createUI_Field_Time(container, filterProperty, 1);
+					break;
 
-						filterProperty.uiDateTime1 = createUI_Field_Date(container, filterProperty, 1);
+				case DURATION:
+					filterProperty.uiDuration1 = createUI_Field_Duration(container, filterProperty, 1);
+					break;
 
-						break;
+				case NUMBER:
 
-					case TIME:
-
-						filterProperty.uiDateTime1 = createUI_Field_Time(container, filterProperty, 1);
-
-						break;
-
-					case NUMBER:
-
-						filterProperty.uiSpinner_Number1 = createUI_Field_Number(
-								container,
-								filterProperty,
-								1,
-								fieldConfig.minValue,
-								fieldConfig.maxValue,
-								fieldConfig.pageIncrement);
-
-						break;
-
-					case TEXT:
-
-						break;
-
-					case SEASON:
-
-						numColumns = 2;
-
-						filterProperty.uiSpinner_SeasonDay1 = createUI_Field_SeasonDay(container, filterProperty, 1);
-						filterProperty.uiCombo_SeasonMonth1 = createUI_Field_SeasonMonth(container, filterProperty, 1);
-
-						break;
-					}
+					filterProperty.uiSpinner_Number1 = createUI_Field_Number(
+							container,
+							filterProperty,
+							1,
+							fieldConfig.minValue,
+							fieldConfig.maxValue,
+							fieldConfig.pageIncrement);
 
 					break;
 
-				case BETWEEN:
-				case NOT_BETWEEN:
-
-					switch (fieldType) {
-					case DATE:
-
-						numColumns = 3;
-
-						filterProperty.uiDateTime1 = createUI_Field_Date(container, filterProperty, 1);
-						createUI_Operator_And(container);
-						filterProperty.uiDateTime2 = createUI_Field_Date(container, filterProperty, 2);
-
-						break;
-
-					case TIME:
-
-						numColumns = 3;
-
-						filterProperty.uiDateTime1 = createUI_Field_Time(container, filterProperty, 1);
-						createUI_Operator_And(container);
-						filterProperty.uiDateTime2 = createUI_Field_Time(container, filterProperty, 2);
-
-						break;
-
-					case NUMBER:
-
-						break;
-
-					case TEXT:
-
-						break;
-
-					case SEASON:
-
-						numColumns = 5;
-
-						filterProperty.uiSpinner_SeasonDay1 = createUI_Field_SeasonDay(container, filterProperty, 1);
-						filterProperty.uiCombo_SeasonMonth1 = createUI_Field_SeasonMonth(container, filterProperty, 1);
-						createUI_Operator_And(container);
-						filterProperty.uiSpinner_SeasonDay2 = createUI_Field_SeasonDay(container, filterProperty, 2);
-						filterProperty.uiCombo_SeasonMonth2 = createUI_Field_SeasonMonth(container, filterProperty, 2);
-
-						break;
-					}
+				case TEXT:
 
 					break;
 
-				case STARTS_WITH:
-					break;
-				case ENDS_WITH:
-					break;
+				case SEASON:
 
-				case INCLUDE_ANY:
-					break;
-				case EXCLUDE_ALL:
-					break;
+					numColumns = 2;
 
-				case IS_EMPTY:
-					break;
-				case IS_NOT_EMPTY:
-					break;
+					filterProperty.uiSpinner_SeasonDay1 = createUI_Field_SeasonDay(container, filterProperty, 1);
+					filterProperty.uiCombo_SeasonMonth1 = createUI_Field_SeasonMonth(container, filterProperty, 1);
 
-				case LIKE:
-					break;
-				case NOT_LIKE:
 					break;
 				}
+
+				break;
+
+			case BETWEEN:
+			case NOT_BETWEEN:
+
+				switch (fieldType) {
+				case DATE:
+
+					numColumns = 3;
+
+					filterProperty.uiDateTime1 = createUI_Field_Date(container, filterProperty, 1);
+					createUI_Operator_And(container);
+					filterProperty.uiDateTime2 = createUI_Field_Date(container, filterProperty, 2);
+
+					break;
+
+				case TIME:
+
+					numColumns = 3;
+
+					filterProperty.uiDateTime1 = createUI_Field_Time(container, filterProperty, 1);
+					createUI_Operator_And(container);
+					filterProperty.uiDateTime2 = createUI_Field_Time(container, filterProperty, 2);
+
+					break;
+
+				case DURATION:
+
+					numColumns = 3;
+
+					filterProperty.uiDuration1 = createUI_Field_Duration(container, filterProperty, 1);
+					createUI_Operator_And(container);
+					filterProperty.uiDuration2 = createUI_Field_Duration(container, filterProperty, 2);
+					break;
+
+				case NUMBER:
+
+					break;
+
+				case TEXT:
+
+					break;
+
+				case SEASON:
+
+					numColumns = 5;
+
+					filterProperty.uiSpinner_SeasonDay1 = createUI_Field_SeasonDay(container, filterProperty, 1);
+					filterProperty.uiCombo_SeasonMonth1 = createUI_Field_SeasonMonth(container, filterProperty, 1);
+					createUI_Operator_And(container);
+					filterProperty.uiSpinner_SeasonDay2 = createUI_Field_SeasonDay(container, filterProperty, 2);
+					filterProperty.uiCombo_SeasonMonth2 = createUI_Field_SeasonMonth(container, filterProperty, 2);
+
+					break;
+				}
+
+				break;
+
+			case STARTS_WITH:
+				break;
+			case ENDS_WITH:
+				break;
+
+			case INCLUDE_ANY:
+				break;
+			case EXCLUDE_ALL:
+				break;
+
+			case IS_EMPTY:
+				break;
+			case IS_NOT_EMPTY:
+				break;
+
+			case LIKE:
+				break;
+			case NOT_LIKE:
+				break;
 			}
 
 			GridLayoutFactory.fillDefaults().numColumns(numColumns).applyTo(container);
@@ -922,6 +928,22 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 		GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).applyTo(dtTourDate);
 
 		return dtTourDate;
+	}
+
+	private TimeDuration createUI_Field_Duration(	final Composite parent,
+													final TourFilterProperty filterProperty,
+													final int fieldNo) {
+
+		final TimeDuration duration = new TimeDuration(parent, filterProperty, fieldNo);
+
+		duration.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				onField_Select_Duration(duration, e.item);
+			}
+		});
+
+		return duration;
 	}
 
 	private Spinner createUI_Field_Number(	final Composite container,
@@ -1186,6 +1208,20 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 		}
 	}
 
+	private void onField_Select_Duration(final TimeDuration duration, final Widget widget) {
+
+		final int durationTime = duration.getTime();
+
+		final TourFilterProperty filterProperty = (TourFilterProperty) widget.getData();
+		final int fieldNo = (int) widget.getData(FIELD_NO);
+
+		if (fieldNo == 1) {
+			filterProperty.number1 = durationTime;
+		} else {
+			filterProperty.number2 = durationTime;
+		}
+	}
+
 	private void onField_Select_SeasonDay(final Widget widget) {
 
 		final Spinner spinnerDay = (Spinner) widget;
@@ -1431,7 +1467,9 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 			comboFilterField.select(fieldIndex);
 			comboFieldOperator.select(operatorIndex);
 
-			filterProperty.checkboxIsEnabled.setSelection(filterProperty.isEnabled);
+			filterProperty.checkboxIsPropertyEnabled.setSelection(filterProperty.isEnabled);
+
+			updateUI_PropertyDetail(filterProperty);
 		}
 
 		_filterOuterContainer.layout(true);
@@ -1440,6 +1478,207 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 
 		final Shell shell = _filterOuterContainer.getShell();
 		shell.pack(true);
+	}
+
+	private void updateUI_PropertyDetail(final TourFilterProperty filterProperty) {
+
+		final TourFilterFieldConfig fieldConfig = filterProperty.fieldConfig;
+		final TourFilterFieldType fieldType = fieldConfig.fieldType;
+
+		switch (filterProperty.fieldOperator) {
+		case GREATER_THAN:
+		case GREATER_THAN_OR_EQUAL:
+		case LESS_THAN:
+		case LESS_THAN_OR_EQUAL:
+		case EQUALS:
+		case NOT_EQUALS:
+
+			switch (fieldType) {
+			case DATE:
+				updateUI_PropertyDetail_Date(filterProperty, 1);
+				break;
+
+			case TIME:
+				updateUI_PropertyDetail_Time(filterProperty, 1);
+				break;
+
+			case DURATION:
+				updateUI_PropertyDetail_Duration(filterProperty, 1);
+				break;
+
+			case NUMBER:
+				updateUI_PropertyDetail_Number(filterProperty, 1);
+				break;
+
+			case TEXT:
+
+				break;
+
+			case SEASON:
+				updateUI_PropertyDetail_Season(filterProperty, 1);
+				break;
+			}
+
+			break;
+
+		case BETWEEN:
+		case NOT_BETWEEN:
+
+			switch (fieldType) {
+			case DATE:
+				updateUI_PropertyDetail_Date(filterProperty, 1);
+				updateUI_PropertyDetail_Date(filterProperty, 2);
+				break;
+
+			case TIME:
+				updateUI_PropertyDetail_Time(filterProperty, 1);
+				updateUI_PropertyDetail_Time(filterProperty, 2);
+				break;
+
+			case DURATION:
+				updateUI_PropertyDetail_Duration(filterProperty, 1);
+				updateUI_PropertyDetail_Duration(filterProperty, 2);
+				break;
+
+			case NUMBER:
+				updateUI_PropertyDetail_Number(filterProperty, 1);
+				updateUI_PropertyDetail_Number(filterProperty, 2);
+				break;
+
+			case TEXT:
+
+				break;
+
+			case SEASON:
+				updateUI_PropertyDetail_Season(filterProperty, 1);
+				updateUI_PropertyDetail_Season(filterProperty, 2);
+				break;
+			}
+
+			break;
+
+		case STARTS_WITH:
+			break;
+		case ENDS_WITH:
+			break;
+
+		case INCLUDE_ANY:
+			break;
+		case EXCLUDE_ALL:
+			break;
+
+		case IS_EMPTY:
+			break;
+		case IS_NOT_EMPTY:
+			break;
+
+		case LIKE:
+			break;
+		case NOT_LIKE:
+			break;
+		}
+	}
+
+	private void updateUI_PropertyDetail_Date(final TourFilterProperty filterProperty, final int fieldNo) {
+
+		DateTime uiDateTime;
+		LocalDateTime dateTime;
+
+		if (fieldNo == 1) {
+
+			uiDateTime = filterProperty.uiDateTime1;
+			dateTime = filterProperty.dateTime1;
+
+		} else {
+
+			uiDateTime = filterProperty.uiDateTime2;
+			dateTime = filterProperty.dateTime2;
+		}
+
+		uiDateTime.setYear(dateTime.getYear());
+		uiDateTime.setMonth(dateTime.getMonthValue());
+		uiDateTime.setDay(dateTime.getDayOfMonth());
+	}
+
+	private void updateUI_PropertyDetail_Duration(final TourFilterProperty filterProperty, final int fieldNo) {
+
+		if (fieldNo == 1) {
+
+			filterProperty.uiDuration1.setTime(filterProperty.number1);
+
+		} else {
+
+			filterProperty.uiDuration2.setTime(filterProperty.number2);
+		}
+	}
+
+	private void updateUI_PropertyDetail_Number(final TourFilterProperty filterProperty, final int fieldNo) {
+
+		final TourFilterFieldConfig fieldConfig = filterProperty.fieldConfig;
+		Spinner spinner;
+
+		if (fieldNo == 1) {
+
+			spinner = filterProperty.uiSpinner_Number1;
+
+			spinner.setSelection(filterProperty.number1);
+
+		} else {
+
+			spinner = filterProperty.uiSpinner_Number2;
+
+			spinner.setSelection(filterProperty.number2);
+		}
+
+		spinner.setMinimum(fieldConfig.minValue);
+		spinner.setMaximum(fieldConfig.maxValue);
+		spinner.setPageIncrement(fieldConfig.pageIncrement);
+	}
+
+	private void updateUI_PropertyDetail_Season(final TourFilterProperty filterProperty, final int fieldNo) {
+
+		MonthDay monthDay;
+
+		Combo uiComboMonth;
+		Spinner uiSpinnerDay;
+
+		if (fieldNo == 1) {
+
+			monthDay = filterProperty.monthDay1;
+
+			uiComboMonth = filterProperty.uiCombo_SeasonMonth1;
+			uiSpinnerDay = filterProperty.uiSpinner_SeasonDay1;
+
+		} else {
+
+			monthDay = filterProperty.monthDay2;
+
+			uiComboMonth = filterProperty.uiCombo_SeasonMonth2;
+			uiSpinnerDay = filterProperty.uiSpinner_SeasonDay2;
+		}
+
+		uiSpinnerDay.setSelection(monthDay.getDayOfMonth());
+		uiComboMonth.select(monthDay.getMonthValue() - 1);
+	}
+
+	private void updateUI_PropertyDetail_Time(final TourFilterProperty filterProperty, final int fieldNo) {
+
+		DateTime uiDateTime;
+		LocalDateTime dateTime;
+
+		if (fieldNo == 1) {
+
+			uiDateTime = filterProperty.uiDateTime1;
+			dateTime = filterProperty.dateTime1;
+
+		} else {
+
+			uiDateTime = filterProperty.uiDateTime2;
+			dateTime = filterProperty.dateTime2;
+		}
+
+		uiDateTime.setHours(dateTime.getHour());
+		uiDateTime.setMinutes(dateTime.getMinute());
 	}
 
 }

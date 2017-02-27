@@ -27,51 +27,61 @@ import org.eclipse.swt.widgets.Spinner;
 
 public class TourFilterProperty {
 
-	TourFilterFieldConfig	fieldConfig		= TourFilterManager.getFieldConfig(TourFilterFieldId.TOUR_DATE);
+	static final LocalDateTime	DEFAULT_DATE_1	= LocalDateTime.now().withDayOfMonth(1).withMonth(1);
+	static final LocalDateTime	DEFAULT_DATE_2	= LocalDateTime.now();
+	static final MonthDay		DEFAULT_SEASON_1	= MonthDay.of(1, 1);
+	static final MonthDay		DEFAULT_SEASON_2	= MonthDay.now();
+
+	TourFilterFieldConfig		fieldConfig		= TourFilterManager.getFieldConfig(TourFilterFieldId.TOUR_DATE);
 
 	/**
 	 * Selected operator for the property field
 	 */
-	TourFilterFieldOperator	fieldOperator	= TourFilterFieldOperator.EQUALS;
+	TourFilterFieldOperator		fieldOperator	= TourFilterFieldOperator.EQUALS;
 
 	/**
 	 * This property is enabled when <code>true</code>
 	 */
-	boolean					isEnabled		= true;
+	boolean						isEnabled		= true;
 
 	/*
 	 * Field data for the different operators and field types
 	 */
-	LocalDateTime			dateTime1		= LocalDateTime.now().withDayOfMonth(1).withMonth(1);
-	LocalDateTime			dateTime2		= LocalDateTime.now();
+	LocalDateTime				dateTime1		= DEFAULT_DATE_1;
+	LocalDateTime				dateTime2		= DEFAULT_DATE_2;
 
-	MonthDay				monthDay1		= MonthDay.of(1, 1);
-	MonthDay				monthDay2		= MonthDay.now();
+	MonthDay					monthDay1		= DEFAULT_SEASON_1;
+	MonthDay					monthDay2		= DEFAULT_SEASON_2;
+
+	int							number1;
+	int							number2;
 
 	/*
 	 * UI controls, not all of them are used, depending on the selected field type and operator
 	 */
 
-	Button					checkboxIsEnabled;
+	Button						checkboxIsPropertyEnabled;
 
-	Combo					comboFieldName;
-	Combo					comboFieldOperator;
+	Combo						comboFieldName;
+	Combo						comboFieldOperator;
 
-	Composite				fieldDetailOuterContainer;
+	Composite					fieldDetailOuterContainer;
 
 	// ---------------------------------------------------------------------
 
-	DateTime				uiDateTime1;
-	DateTime				uiDateTime2;
+	DateTime					uiDateTime1;
+	DateTime					uiDateTime2;
+	TimeDuration				uiDuration1;
+	TimeDuration				uiDuration2;
 
 	// season
-	Combo					uiCombo_SeasonMonth1;
-	Combo					uiCombo_SeasonMonth2;
-	Spinner					uiSpinner_SeasonDay1;
-	Spinner					uiSpinner_SeasonDay2;
+	Combo						uiCombo_SeasonMonth1;
+	Combo						uiCombo_SeasonMonth2;
+	Spinner						uiSpinner_SeasonDay1;
+	Spinner						uiSpinner_SeasonDay2;
 
-	Spinner					uiSpinner_Number1;
-	Spinner					uiSpinner_Number2;
+	Spinner						uiSpinner_Number1;
+	Spinner						uiSpinner_Number2;
 
 	public TourFilterProperty() {}
 
@@ -83,6 +93,8 @@ public class TourFilterProperty {
 
 		uiDateTime1 = null;
 		uiDateTime2 = null;
+		uiDuration1 = null;
+		uiDuration2 = null;
 
 		uiCombo_SeasonMonth1 = null;
 		uiCombo_SeasonMonth2 = null;

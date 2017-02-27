@@ -22,6 +22,7 @@ public enum TourFilterFieldType {
 
 	DATE, //
 	TIME, //
+	DURATION, //
 
 	SEASON, //
 
