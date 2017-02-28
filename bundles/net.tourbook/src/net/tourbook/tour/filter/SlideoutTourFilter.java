@@ -748,147 +748,136 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 
 		final Composite fieldOuterContainer = filterProperty.fieldDetailOuterContainer;
 
-		fieldOuterContainer.setRedraw(false);
-		{
-			final Composite container = new Composite(fieldOuterContainer, SWT.NONE);
-			GridDataFactory.fillDefaults().applyTo(container);
-//			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+		final Composite container = new Composite(fieldOuterContainer, SWT.NONE);
+		GridDataFactory.fillDefaults().applyTo(container);
 
-			// default for number of columns is 1
-			int numColumns = 1;
+		// default for number of columns is 1
+		int numColumns = 1;
 
-			final TourFilterFieldConfig fieldConfig = filterProperty.fieldConfig;
-			final TourFilterFieldType fieldType = fieldConfig.fieldType;
+		final TourFilterFieldConfig fieldConfig = filterProperty.fieldConfig;
+		final TourFilterFieldType fieldType = fieldConfig.fieldType;
 
-			switch (filterProperty.fieldOperator) {
-			case GREATER_THAN:
-			case GREATER_THAN_OR_EQUAL:
-			case LESS_THAN:
-			case LESS_THAN_OR_EQUAL:
-			case EQUALS:
-			case NOT_EQUALS:
+		switch (filterProperty.fieldOperator) {
+		case GREATER_THAN:
+		case GREATER_THAN_OR_EQUAL:
+		case LESS_THAN:
+		case LESS_THAN_OR_EQUAL:
+		case EQUALS:
+		case NOT_EQUALS:
 
-				switch (fieldType) {
-				case DATE:
-					filterProperty.uiDateTime1 = createUI_Field_Date(container, filterProperty, 1);
-					break;
+			switch (fieldType) {
+			case DATE:
+				createUI_Field_Date(container, filterProperty, 1);
+				break;
 
-				case TIME:
-					filterProperty.uiDateTime1 = createUI_Field_Time(container, filterProperty, 1);
-					break;
+			case TIME:
+				createUI_Field_Time(container, filterProperty, 1);
+				break;
 
-				case DURATION:
-					filterProperty.uiDuration1 = createUI_Field_Duration(container, filterProperty, 1);
-					break;
+			case DURATION:
+				createUI_Field_Duration(container, filterProperty, 1);
+				break;
 
-				case NUMBER:
+			case NUMBER:
+				createUI_Field_Number(container, filterProperty, fieldConfig, 1);
+				break;
 
-					filterProperty.uiSpinner_Number1 = createUI_Field_Number(
-							container,
-							filterProperty,
-							1,
-							fieldConfig.minValue,
-							fieldConfig.maxValue,
-							fieldConfig.pageIncrement);
-
-					break;
-
-				case TEXT:
-
-					break;
-
-				case SEASON:
-
-					numColumns = 2;
-
-					filterProperty.uiSpinner_SeasonDay1 = createUI_Field_SeasonDay(container, filterProperty, 1);
-					filterProperty.uiCombo_SeasonMonth1 = createUI_Field_SeasonMonth(container, filterProperty, 1);
-
-					break;
-				}
+			case TEXT:
 
 				break;
 
-			case BETWEEN:
-			case NOT_BETWEEN:
+			case SEASON:
 
-				switch (fieldType) {
-				case DATE:
+				numColumns = 2;
 
-					numColumns = 3;
-
-					filterProperty.uiDateTime1 = createUI_Field_Date(container, filterProperty, 1);
-					createUI_Operator_And(container);
-					filterProperty.uiDateTime2 = createUI_Field_Date(container, filterProperty, 2);
-
-					break;
-
-				case TIME:
-
-					numColumns = 3;
-
-					filterProperty.uiDateTime1 = createUI_Field_Time(container, filterProperty, 1);
-					createUI_Operator_And(container);
-					filterProperty.uiDateTime2 = createUI_Field_Time(container, filterProperty, 2);
-
-					break;
-
-				case DURATION:
-
-					numColumns = 3;
-
-					filterProperty.uiDuration1 = createUI_Field_Duration(container, filterProperty, 1);
-					createUI_Operator_And(container);
-					filterProperty.uiDuration2 = createUI_Field_Duration(container, filterProperty, 2);
-					break;
-
-				case NUMBER:
-
-					break;
-
-				case TEXT:
-
-					break;
-
-				case SEASON:
-
-					numColumns = 5;
-
-					filterProperty.uiSpinner_SeasonDay1 = createUI_Field_SeasonDay(container, filterProperty, 1);
-					filterProperty.uiCombo_SeasonMonth1 = createUI_Field_SeasonMonth(container, filterProperty, 1);
-					createUI_Operator_And(container);
-					filterProperty.uiSpinner_SeasonDay2 = createUI_Field_SeasonDay(container, filterProperty, 2);
-					filterProperty.uiCombo_SeasonMonth2 = createUI_Field_SeasonMonth(container, filterProperty, 2);
-
-					break;
-				}
-
-				break;
-
-			case STARTS_WITH:
-				break;
-			case ENDS_WITH:
-				break;
-
-			case INCLUDE_ANY:
-				break;
-			case EXCLUDE_ALL:
-				break;
-
-			case IS_EMPTY:
-				break;
-			case IS_NOT_EMPTY:
-				break;
-
-			case LIKE:
-				break;
-			case NOT_LIKE:
+				createUI_Field_SeasonDay(container, filterProperty, 1);
+				createUI_Field_SeasonMonth(container, filterProperty, 1);
 				break;
 			}
 
-			GridLayoutFactory.fillDefaults().numColumns(numColumns).applyTo(container);
+			break;
+
+		case BETWEEN:
+		case NOT_BETWEEN:
+
+			switch (fieldType) {
+			case DATE:
+
+				numColumns = 3;
+
+				createUI_Field_Date(container, filterProperty, 1);
+				createUI_Operator_And(container);
+				createUI_Field_Date(container, filterProperty, 2);
+				break;
+
+			case TIME:
+
+				numColumns = 3;
+
+				createUI_Field_Time(container, filterProperty, 1);
+				createUI_Operator_And(container);
+				createUI_Field_Time(container, filterProperty, 2);
+				break;
+
+			case DURATION:
+
+				numColumns = 3;
+
+				createUI_Field_Duration(container, filterProperty, 1);
+				createUI_Operator_And(container);
+				createUI_Field_Duration(container, filterProperty, 2);
+				break;
+
+			case NUMBER:
+
+				numColumns = 3;
+
+				createUI_Field_Number(container, filterProperty, fieldConfig, 1);
+				createUI_Operator_And(container);
+				createUI_Field_Number(container, filterProperty, fieldConfig, 2);
+				break;
+
+			case TEXT:
+
+				break;
+
+			case SEASON:
+
+				numColumns = 5;
+
+				createUI_Field_SeasonDay(container, filterProperty, 1);
+				createUI_Field_SeasonMonth(container, filterProperty, 1);
+				createUI_Operator_And(container);
+				createUI_Field_SeasonDay(container, filterProperty, 2);
+				createUI_Field_SeasonMonth(container, filterProperty, 2);
+				break;
+			}
+
+			break;
+
+		case STARTS_WITH:
+			break;
+		case ENDS_WITH:
+			break;
+
+		case INCLUDE_ANY:
+			break;
+		case EXCLUDE_ALL:
+			break;
+
+		case IS_EMPTY:
+			break;
+		case IS_NOT_EMPTY:
+			break;
+
+		case LIKE:
+			break;
+		case NOT_LIKE:
+			break;
 		}
-		fieldOuterContainer.setRedraw(true);
+
+		GridLayoutFactory.fillDefaults().numColumns(numColumns).applyTo(container);
+
 		fieldOuterContainer.layout(true);
 	}
 
@@ -913,9 +902,9 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 		}
 	}
 
-	private DateTime createUI_Field_Date(	final Composite parent,
-											final TourFilterProperty filterProperty,
-											final int fieldNo) {
+	private void createUI_Field_Date(	final Composite parent,
+										final TourFilterProperty filterProperty,
+										final int fieldNo) {
 
 		final DateTime dtTourDate = new DateTime(parent, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
 
@@ -927,12 +916,16 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 
 		GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).applyTo(dtTourDate);
 
-		return dtTourDate;
+		if (fieldNo == 1) {
+			filterProperty.uiDateTime1 = dtTourDate;
+		} else {
+			filterProperty.uiDateTime2 = dtTourDate;
+		}
 	}
 
-	private TimeDuration createUI_Field_Duration(	final Composite parent,
-													final TourFilterProperty filterProperty,
-													final int fieldNo) {
+	private void createUI_Field_Duration(	final Composite parent,
+											final TourFilterProperty filterProperty,
+											final int fieldNo) {
 
 		final TimeDuration duration = new TimeDuration(parent, filterProperty, fieldNo);
 
@@ -943,21 +936,23 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 			}
 		});
 
-		return duration;
+		if (fieldNo == 1) {
+			filterProperty.uiDuration1 = duration;
+		} else {
+			filterProperty.uiDuration2 = duration;
+		}
 	}
 
-	private Spinner createUI_Field_Number(	final Composite container,
-											final TourFilterProperty filterProperty,
-											final int fieldNo,
-											final int minValue,
-											final int maxValue,
-											final int pageIncrement) {
+	private void createUI_Field_Number(	final Composite parent,
+										final TourFilterProperty filterProperty,
+										final TourFilterFieldConfig fieldConfig,
+										final int fieldNo) {
 
-		final Spinner spinner = new Spinner(container, SWT.BORDER);
+		final Spinner spinner = new Spinner(parent, SWT.BORDER);
 
-		spinner.setMinimum(minValue);
-		spinner.setMaximum(maxValue);
-		spinner.setPageIncrement(pageIncrement);
+		spinner.setMinimum(fieldConfig.minValue);
+		spinner.setMaximum(fieldConfig.maxValue);
+		spinner.setPageIncrement(fieldConfig.pageIncrement);
 
 		spinner.setData(filterProperty);
 		spinner.setData(FIELD_NO, fieldNo);
@@ -966,25 +961,29 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 			@Override
 			public void mouseScrolled(final MouseEvent event) {
 				UI.adjustSpinnerValueOnMouseScroll(event);
-//				onField_Select_SeasonDay(event.widget);
+				onField_Select_Number(event.widget);
 			}
 		});
 
 		spinner.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
-//				onField_Select_SeasonDay(event.widget);
+				onField_Select_Number(event.widget);
 			}
 		});
 
-		return spinner;
+		if (fieldNo == 1) {
+			filterProperty.uiSpinner_Number1 = spinner;
+		} else {
+			filterProperty.uiSpinner_Number2 = spinner;
+		}
 	}
 
-	private Spinner createUI_Field_SeasonDay(	final Composite container,
-												final TourFilterProperty filterProperty,
-												final int fieldNo) {
+	private void createUI_Field_SeasonDay(	final Composite parent,
+											final TourFilterProperty filterProperty,
+											final int fieldNo) {
 
-		final Spinner spinnerDay = new Spinner(container, SWT.BORDER);
+		final Spinner spinnerDay = new Spinner(parent, SWT.BORDER);
 
 		spinnerDay.setMinimum(1);
 		spinnerDay.setMaximum(31);
@@ -1010,21 +1009,26 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 
 		// ensure that this field is not empty
 		if (fieldNo == 1) {
+
 			// select year start
 			spinnerDay.setSelection(1);
+
+			filterProperty.uiSpinner_SeasonDay1 = spinnerDay;
+
 		} else {
+
 			// select today
 			spinnerDay.setSelection(MonthDay.now().getDayOfMonth());
-		}
 
-		return spinnerDay;
+			filterProperty.uiSpinner_SeasonDay2 = spinnerDay;
+		}
 	}
 
-	private Combo createUI_Field_SeasonMonth(	final Composite container,
-												final TourFilterProperty filterProperty,
-												final int fieldNo) {
+	private void createUI_Field_SeasonMonth(final Composite parent,
+											final TourFilterProperty filterProperty,
+											final int fieldNo) {
 
-		final Combo comboMonth = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+		final Combo comboMonth = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
 
 		comboMonth.setData(filterProperty);
 		comboMonth.setData(FIELD_NO, fieldNo);
@@ -1052,19 +1056,24 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 
 		// ensure that this field is not empty
 		if (fieldNo == 1) {
+
 			// select year start
 			comboMonth.select(0);
+
+			filterProperty.uiCombo_SeasonMonth1 = comboMonth;
+
 		} else {
+
 			// select today
 			comboMonth.select(MonthDay.now().getMonthValue() - 1);
-		}
 
-		return comboMonth;
+			filterProperty.uiCombo_SeasonMonth2 = comboMonth;
+		}
 	}
 
-	private DateTime createUI_Field_Time(	final Composite parent,
-											final TourFilterProperty filterProperty,
-											final int fieldNo) {
+	private void createUI_Field_Time(	final Composite parent,
+										final TourFilterProperty filterProperty,
+										final int fieldNo) {
 
 		final DateTime dtTourTime = new DateTime(parent, SWT.TIME | SWT.SHORT | SWT.BORDER);
 
@@ -1076,7 +1085,11 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 
 		GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).applyTo(dtTourTime);
 
-		return dtTourTime;
+		if (fieldNo == 1) {
+			filterProperty.uiDateTime1 = dtTourTime;
+		} else {
+			filterProperty.uiDateTime2 = dtTourTime;
+		}
 	}
 
 	private void createUI_Operator_And(final Composite parent) {
@@ -1219,6 +1232,22 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 			filterProperty.number1 = durationTime;
 		} else {
 			filterProperty.number2 = durationTime;
+		}
+	}
+
+	private void onField_Select_Number(final Widget widget) {
+
+		final Spinner spinner = (Spinner) widget;
+
+		final TourFilterProperty filterProperty = (TourFilterProperty) spinner.getData();
+		final int fieldNo = (int) spinner.getData(FIELD_NO);
+
+		final int selectedValue = spinner.getSelection();
+
+		if (fieldNo == 1) {
+			filterProperty.number1 = selectedValue;
+		} else {
+			filterProperty.number2 = selectedValue;
 		}
 	}
 
@@ -1433,44 +1462,48 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 			return;
 		}
 
-		final ArrayList<TourFilterProperty> filterProperties = _selectedProfile.filterProperties;
+		_filterOuterContainer.setRedraw(false);
+		{
+			final ArrayList<TourFilterProperty> filterProperties = _selectedProfile.filterProperties;
 
-		for (int properyIndex = 0; properyIndex < filterProperties.size(); properyIndex++) {
+			for (int properyIndex = 0; properyIndex < filterProperties.size(); properyIndex++) {
 
-			final TourFilterProperty filterProperty = filterProperties.get(properyIndex);
-			final TourFilterFieldConfig fieldConfig = filterProperty.fieldConfig;
-			final TourFilterFieldOperator fieldOperator = filterProperty.fieldOperator;
+				final TourFilterProperty filterProperty = filterProperties.get(properyIndex);
+				final TourFilterFieldConfig fieldConfig = filterProperty.fieldConfig;
+				final TourFilterFieldOperator fieldOperator = filterProperty.fieldOperator;
 
-			final TourFilterFieldId filterField = fieldConfig.fieldId;
+				final TourFilterFieldId filterField = fieldConfig.fieldId;
 
-			final Combo comboFilterField = filterProperty.comboFieldName;
-			final Combo comboFieldOperator = filterProperty.comboFieldOperator;
+				final Combo comboFilterField = filterProperty.comboFieldName;
+				final Combo comboFieldOperator = filterProperty.comboFieldOperator;
 
-			createUI_430_FieldDetail(filterProperty);
+				createUI_430_FieldDetail(filterProperty);
 
-			// fill field combo with all available fields
-			comboFilterField.removeAll();
-			for (final TourFilterFieldConfig filterTemplate : TourFilterManager.FILTER_FIELD_CONFIG) {
-				comboFilterField.add(filterTemplate.name);
+				// fill field combo with all available fields
+				comboFilterField.removeAll();
+				for (final TourFilterFieldConfig filterTemplate : TourFilterManager.FILTER_FIELD_CONFIG) {
+					comboFilterField.add(filterTemplate.name);
+				}
+
+				// fill operator combo
+				comboFieldOperator.removeAll();
+				final TourFilterFieldOperator[] fieldOperators = TourFilterManager.getFieldOperators(filterField);
+				for (final TourFilterFieldOperator filterOperator : fieldOperators) {
+					comboFieldOperator.add(TourFilterManager.getFieldOperatorName(filterOperator));
+				}
+
+				final int fieldIndex = TourFilterManager.getFilterFieldIndex(filterField);
+				final int operatorIndex = TourFilterManager.getFieldOperatorIndex(filterField, fieldOperator);
+
+				comboFilterField.select(fieldIndex);
+				comboFieldOperator.select(operatorIndex);
+
+				filterProperty.checkboxIsPropertyEnabled.setSelection(filterProperty.isEnabled);
+
+				updateUI_PropertyDetail(filterProperty);
 			}
-
-			// fill operator combo
-			comboFieldOperator.removeAll();
-			final TourFilterFieldOperator[] fieldOperators = TourFilterManager.getFieldOperators(filterField);
-			for (final TourFilterFieldOperator filterOperator : fieldOperators) {
-				comboFieldOperator.add(TourFilterManager.getFieldOperatorName(filterOperator));
-			}
-
-			final int fieldIndex = TourFilterManager.getFilterFieldIndex(filterField);
-			final int operatorIndex = TourFilterManager.getFieldOperatorIndex(filterField, fieldOperator);
-
-			comboFilterField.select(fieldIndex);
-			comboFieldOperator.select(operatorIndex);
-
-			filterProperty.checkboxIsPropertyEnabled.setSelection(filterProperty.isEnabled);
-
-			updateUI_PropertyDetail(filterProperty);
 		}
+		_filterOuterContainer.setRedraw(true);
 
 		_filterOuterContainer.layout(true);
 
@@ -1596,7 +1629,7 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 		}
 
 		uiDateTime.setYear(dateTime.getYear());
-		uiDateTime.setMonth(dateTime.getMonthValue());
+		uiDateTime.setMonth(dateTime.getMonthValue() - 1);
 		uiDateTime.setDay(dateTime.getDayOfMonth());
 	}
 

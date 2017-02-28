@@ -723,11 +723,8 @@ public class TourFilterManager {
 				break;
 
 			case DURATION:
-				writeXml_Number(xmlProperty, number1, 1);
-				break;
-
 			case NUMBER:
-
+				writeXml_Number(xmlProperty, number1, 1);
 				break;
 
 			case TEXT:
@@ -761,12 +758,9 @@ public class TourFilterManager {
 				break;
 
 			case DURATION:
+			case NUMBER:
 				writeXml_Number(xmlProperty, number1, 1);
 				writeXml_Number(xmlProperty, number2, 2);
-				break;
-
-			case NUMBER:
-
 				break;
 
 			case TEXT:
