@@ -285,9 +285,6 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 		updateUI_Properties();
 	}
 
-	@Override
-	protected void beforeHideToolTip() {}
-
 	private void createActions() {
 
 		_actionProfile_Add = new Action_Profile_Add(this);

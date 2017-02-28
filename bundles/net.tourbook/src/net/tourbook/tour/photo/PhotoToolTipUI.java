@@ -514,7 +514,7 @@ public abstract class PhotoToolTipUI extends AdvancedToolTipShell {
 	}
 
 	@Override
-	protected boolean isVerticalGallery() {
+	protected boolean isVerticalLayout() {
 		return _isVerticalGallery;
 	}
 

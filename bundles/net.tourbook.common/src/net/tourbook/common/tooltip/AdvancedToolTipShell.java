@@ -45,24 +45,24 @@ public abstract class AdvancedToolTipShell {
 	/**
 	 * how long each tick is when fading in/out (in ms)
 	 */
-	private static final int			FADE_TIME_INTERVAL					= UI.IS_OSX ? 1 : 10;
-
+	private static final int			FADE_TIME_INTERVAL					= UI.IS_OSX ? 10 : 10;
+ 
 	/**
 	 * Number of steps when fading in
 	 */
-	private static final int			FADE_IN_STEPS						= 20;
+	private static final int			SHELL_FADE_IN_STEPS					= 20;
 
 	/**
 	 * Number of steps when fading out
 	 */
-	private static final int			FADE_OUT_STEPS						= 20;
+	private static final int			SHELL_FADE_OUT_STEPS				= 20;
 
 	/**
 	 * Number of steps before fading out
 	 */
-	private static final int			FADE_OUT_DELAY_STEPS				= 20;
+	private static final int			SHELL_FADE_OUT_DELAY_STEPS			= 20;
 
-	private static final int			MOVE_STEPS							= 30;
+	private static final int			SHELL_MOVE_STEPS					= 30;
 
 	private static final int			ALPHA_OPAQUE						= 0xff;
 
@@ -81,6 +81,11 @@ public abstract class AdvancedToolTipShell {
 	private static final int			MIN_SHELL_HORIZ_HEIGHT				= 60;
 	private static final int			MIN_SHELL_VERT_WIDTH				= 100;
 	private static final int			MIN_SHELL_VERT_HEIGHT				= 60;
+
+	private int							_shellFadeInSteps					= SHELL_FADE_IN_STEPS;
+	private int							_shellFadeOutSteps					= SHELL_FADE_OUT_STEPS;
+	private int							_shellFadeOutDelaySteps				= SHELL_FADE_OUT_DELAY_STEPS;
+	private int							_shellMoveSteps						= SHELL_MOVE_STEPS;
 
 	private IDialogSettings				_state;
 
@@ -325,7 +330,7 @@ public abstract class AdvancedToolTipShell {
 				Point contentLocation;
 				if (_isToolTipPinned) {
 
-					if (isVerticalGallery()) {
+					if (isVerticalLayout()) {
 						contentLocation = new Point(_vertPinLocationX, _vertPinLocationY);
 					} else {
 						contentLocation = new Point(_horizPinLocationX, _horizPinLocationY);
@@ -426,7 +431,7 @@ public abstract class AdvancedToolTipShell {
 					final boolean isInTarget = shellCurrentLocation.x == shellEndX
 							&& shellCurrentLocation.y == shellEndY;
 
-					final int diffAlpha = ALPHA_OPAQUE / FADE_IN_STEPS;
+					final int diffAlpha = ALPHA_OPAQUE / _shellFadeInSteps;
 
 					newAlpha = currentAlpha + diffAlpha;
 					if (newAlpha > ALPHA_OPAQUE) {
@@ -451,8 +456,8 @@ public abstract class AdvancedToolTipShell {
 							final int diffX = shellStartX - shellEndX;
 							final int diffY = shellStartY - shellEndY;
 
-							final double moveX = (double) diffX / MOVE_STEPS * _animationMoveCounter;
-							final double moveY = (double) diffY / MOVE_STEPS * _animationMoveCounter;
+							final double moveX = (double) diffX / _shellMoveSteps * _animationMoveCounter;
+							final double moveY = (double) diffY / _shellMoveSteps * _animationMoveCounter;
 
 							final int shellCurrentX = (int) (shellStartX - moveX);
 							final int shellCurrentY = (int) (shellStartY - moveY);
@@ -463,7 +468,7 @@ public abstract class AdvancedToolTipShell {
 
 				} else if (_isShellFadingOut) {
 
-					if (currentAlpha == 0xff && _fadeOutDelayCounter++ < FADE_OUT_DELAY_STEPS) {
+					if (currentAlpha == 0xff && _fadeOutDelayCounter++ < _shellFadeOutDelaySteps) {
 
 						// delay fade out only when shell is fully visible
 
@@ -472,7 +477,7 @@ public abstract class AdvancedToolTipShell {
 						return;
 					}
 
-					final int alphaDiff = ALPHA_OPAQUE / FADE_OUT_STEPS;
+					final int alphaDiff = ALPHA_OPAQUE / _shellFadeOutSteps;
 
 					newAlpha = currentAlpha - alphaDiff;
 					finalFadeAlpha = 0;
@@ -669,7 +674,7 @@ public abstract class AdvancedToolTipShell {
 	 * @return Returns size of the tooltip content
 	 */
 	protected Point getContentSize() {
-		if (isVerticalGallery()) {
+		if (isVerticalLayout()) {
 			return new Point(_vertContentWidth, _vertContentHeight);
 		} else {
 			return new Point(_horizContentWidth, _horizContentHeight);
@@ -752,7 +757,13 @@ public abstract class AdvancedToolTipShell {
 		return _isToolTipPinned;
 	}
 
-	protected abstract boolean isVerticalGallery();
+	/**
+	 * A tooltip can have 2 layouts, vertical and horizontal, each of them has different screen
+	 * locations which are preserved in a state.
+	 * 
+	 * @return Returns <code>true</code> when vertical, otherwise it is horizontal.
+	 */
+	protected abstract boolean isVerticalLayout();
 
 	private void onOwnerControlEvent(final Event event) {
 
@@ -1075,7 +1086,7 @@ public abstract class AdvancedToolTipShell {
 			isResizeAdjusted = true;
 		}
 
-		if (isVerticalGallery()) {
+		if (isVerticalLayout()) {
 			_vertContentWidth = newContentWidth;
 			_vertContentHeight = newContentHeight;
 		} else {
@@ -1289,6 +1300,18 @@ public abstract class AdvancedToolTipShell {
 		_isShellToggled = true;
 	}
 
+	protected void setShellFadeInSteps(final int shellFadeInSteps) {
+		_shellFadeInSteps = shellFadeInSteps;
+	}
+
+	protected void setShellFadeOutDelaySteps(final int shellFadeOutDelaySteps) {
+		_shellFadeOutDelaySteps = shellFadeOutDelaySteps;
+	}
+
+	protected void setShellFadeOutSteps(final int shellFadeOutSteps) {
+		_shellFadeOutSteps = shellFadeOutSteps;
+	}
+
 	protected void setShellLocation(final int diffX, final int diffY) {
 
 		final Rectangle shellBounds = _visibleShell.getBounds();
@@ -1301,12 +1324,9 @@ public abstract class AdvancedToolTipShell {
 		_visibleRRShell.setShellLocation(fixedLocation.x, fixedLocation.y, 4);
 	}
 
-//	/**
-//	 * @param isAutoMoved
-//	 *            Is <code>true</code> when tooltip is auto moved, otherwise it is
-//	 *            <code>false</code>.
-//	 */
-//	abstract void toolTipIsAutoMoved(boolean isAutoMoved);
+	protected void setShellMoveSteps(final int shellMoveSteps) {
+		_shellMoveSteps = shellMoveSteps;
+	}
 
 	private void setShellVisible(final boolean isVisible) {
 
@@ -1337,7 +1357,7 @@ public abstract class AdvancedToolTipShell {
 
 		final Point contentLocation = _visibleRRShell.getShellContentLocation();
 
-		if (isVerticalGallery()) {
+		if (isVerticalLayout()) {
 			_vertPinLocationX = contentLocation.x;
 			_vertPinLocationY = contentLocation.y;
 		} else {
