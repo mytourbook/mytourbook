@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.tooltip.AdvancedToolTipShell;
 import net.tourbook.common.util.Util;
 import net.tourbook.photo.IPhotoGalleryProvider;
 import net.tourbook.photo.IPhotoPreferences;
@@ -63,7 +64,7 @@ import org.eclipse.swt.widgets.ToolBar;
  * @author Wolfgang Schramm, created 3.8.2012
  */
 
-public abstract class PhotoToolTipUI extends PhotoToolTipShell {
+public abstract class PhotoToolTipUI extends AdvancedToolTipShell {
 
 	private static final String				STATE_PHOTO_GALLERY_IS_VERTICAL	= "STATE_PHOTO_GALLERY_IS_VERTICAL";	//$NON-NLS-1$
 	private static final String				STATE_TOOL_TIP_LOCATION			= "STATE_TOOL_TIP_LOCATION";			//$NON-NLS-1$
@@ -207,7 +208,6 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 		createActions();
 	}
-
 	private void actionCloseToolTip() {
 
 		/*
@@ -250,7 +250,6 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 
 		_photoGallery.setVertical(_isVerticalGallery);
 	}
-
 	private void actionToolTipLocation() {
 
 		_toolTipLocationUpDown = _toolTipLocationUpDown == 1 ? 0 : 1;
@@ -300,7 +299,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 	}
 
 	@Override
-	void beforeHideToolTip() {
+	protected void beforeHideToolTip() {
 
 		// force to show the same images
 
@@ -356,10 +355,12 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 	private void createUI_10_Gallery(final Composite parent) {
 
 		_galleryContainer = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
+		GridDataFactory
+				.fillDefaults()//
 				.grab(true, true)
 				.applyTo(_galleryContainer);
-		GridLayoutFactory.fillDefaults()//
+		GridLayoutFactory
+				.fillDefaults()//
 				.numColumns(1)
 				.extendedMargins(0, 0, 0, 0)
 				.applyTo(_galleryContainer);
@@ -389,7 +390,8 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 			 * create toolbar for the exit button
 			 */
 			_ttToolbarControlExit = new ToolBar(container, SWT.FLAT);
-			GridDataFactory.fillDefaults()//
+			GridDataFactory
+					.fillDefaults()//
 					.applyTo(_ttToolbarControlExit);
 //			_ttToolbarControlExit.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 
@@ -397,7 +399,8 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 			 * spacer
 			 */
 			_labelDragToolTip = new Label(container, SWT.NONE);
-			GridDataFactory.fillDefaults()//
+			GridDataFactory
+					.fillDefaults()//
 					.grab(true, false)
 					.hint(50, SWT.DEFAULT)
 					.applyTo(_labelDragToolTip);
@@ -440,7 +443,8 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 			 * create gallery toolbar
 			 */
 			_galleryToolbarControl = new ToolBar(container, SWT.FLAT);
-			GridDataFactory.fillDefaults()//
+			GridDataFactory
+					.fillDefaults()//
 					.align(SWT.END, SWT.FILL)
 					.applyTo(_galleryToolbarControl);
 		}
@@ -474,6 +478,26 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 		_galleryToolbarManager.add(new Separator());
 	}
 
+	@Override
+	protected Color getShellColor_Background(final ColorRegistry colorRegistry) {
+		return colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND);
+	}
+
+	@Override
+	protected Color getShellColor_Foreground(final ColorRegistry colorRegistry) {
+		return colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOREGROUND);
+	}
+
+	@Override
+	protected String getShellTitle_NoResize() {
+		return Messages.Photo_Tooltip_Label_ShellNoResize;
+	}
+
+	@Override
+	protected String getShellTitle_WithResize() {
+		return Messages.Photo_Tooltip_Label_ShellWithResize;
+	}
+
 	/**
 	 * @return Returns current tooltip location
 	 *         <p>
@@ -490,7 +514,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 	}
 
 	@Override
-	boolean isVerticalGallery() {
+	protected boolean isVerticalGallery() {
 		return _isVerticalGallery;
 	}
 
@@ -568,7 +592,7 @@ public abstract class PhotoToolTipUI extends PhotoToolTipShell {
 	}
 
 	@Override
-	void setToolTipPinned(final boolean isToolTipPinned) {
+	protected void setToolTipPinned(final boolean isToolTipPinned) {
 		_actionPinToolTip.setChecked(isToolTipPinned);
 	}
 

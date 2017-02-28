@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,14 +13,11 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.tour.photo;
+package net.tourbook.common.tooltip;
 
-import net.tourbook.Messages;
 import net.tourbook.common.UI;
-import net.tourbook.common.tooltip.AbstractRRShell;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
-import net.tourbook.photo.IPhotoPreferences;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.resource.ColorRegistry;
@@ -43,47 +40,47 @@ import org.eclipse.swt.widgets.Shell;
 /**
  * Part of this tooltip is copied from {@link ToolTip}.
  */
-public abstract class PhotoToolTipShell {
+public abstract class AdvancedToolTipShell {
 
 	/**
 	 * how long each tick is when fading in/out (in ms)
 	 */
-	private static final int			FADE_TIME_INTERVAL							= UI.IS_OSX ? 1 : 10;
+	private static final int			FADE_TIME_INTERVAL					= UI.IS_OSX ? 1 : 10;
 
 	/**
 	 * Number of steps when fading in
 	 */
-	private static final int			FADE_IN_STEPS								= 20;
+	private static final int			FADE_IN_STEPS						= 20;
 
 	/**
 	 * Number of steps when fading out
 	 */
-	private static final int			FADE_OUT_STEPS								= 20;
+	private static final int			FADE_OUT_STEPS						= 20;
 
 	/**
 	 * Number of steps before fading out
 	 */
-	private static final int			FADE_OUT_DELAY_STEPS						= 20;
+	private static final int			FADE_OUT_DELAY_STEPS				= 20;
 
-	private static final int			MOVE_STEPS									= 30;
+	private static final int			MOVE_STEPS							= 30;
 
-	private static final int			ALPHA_OPAQUE								= 0xff;
+	private static final int			ALPHA_OPAQUE						= 0xff;
 
-	private static final String			STATE_PHOTO_HORIZ_TOOL_TIP_WIDTH			= "STATE_PHOTO_HORIZ_TOOL_TIP_WIDTH";			//$NON-NLS-1$
-	private static final String			STATE_PHOTO_HORIZ_TOOL_TIP_HEIGHT			= "STATE_PHOTO_HORIZ_TOOL_TIP_HEIGHT";			//$NON-NLS-1$
-	private static final String			STATE_PHOTO_VERT_TOOL_TIP_WIDTH				= "STATE_PHOTO_VERT_TOOL_TIP_WIDTH";			//$NON-NLS-1$
-	private static final String			STATE_PHOTO_VERT_TOOL_TIP_HEIGHT			= "STATE_PHOTO_VERT_TOOL_TIP_HEIGHT";			//$NON-NLS-1$
+	private static final String			STATE_HORIZ_TOOL_TIP_WIDTH			= "STATE_HORIZ_TOOL_TIP_WIDTH";				//$NON-NLS-1$
+	private static final String			STATE_HORIZ_TOOL_TIP_HEIGHT			= "STATE_HORIZ_TOOL_TIP_HEIGHT";			//$NON-NLS-1$
+	private static final String			STATE_VERT_TOOL_TIP_WIDTH			= "STATE_VERT_TOOL_TIP_WIDTH";				//$NON-NLS-1$
+	private static final String			STATE_VERT_TOOL_TIP_HEIGHT			= "STATE_VERT_TOOL_TIP_HEIGHT";				//$NON-NLS-1$
 
-	private static final String			STATE_PHOTO_IS_TOOL_TIP_PINNED				= "STATE_PHOTO_IS_TOOL_TIP_PINNED";			//$NON-NLS-1$
-	private static final String			STATE_PHOTO_HORIZ_TOOL_TIP_PIN_LOCATION_X	= "STATE_PHOTO_HORIZ_TOOL_TIP_PIN_LOCATION_X";	//$NON-NLS-1$
-	private static final String			STATE_PHOTO_HORIZ_TOOL_TIP_PIN_LOCATION_Y	= "STATE_PHOTO_HORIZ_TOOL_TIP_PIN_LOCATION_Y";	//$NON-NLS-1$
-	private static final String			STATE_PHOTO_VERT_TOOL_TIP_PIN_LOCATION_X	= "STATE_PHOTO_VERT_TOOL_TIP_PIN_LOCATION_X";	//$NON-NLS-1$
-	private static final String			STATE_PHOTO_VERT_TOOL_TIP_PIN_LOCATION_Y	= "STATE_PHOTO_VERT_TOOL_TIP_PIN_LOCATION_Y";	//$NON-NLS-1$
+	private static final String			STATE_IS_TOOL_TIP_PINNED			= "STATE_IS_TOOL_TIP_PINNED";				//$NON-NLS-1$
+	private static final String			STATE_HORIZ_TOOL_TIP_PIN_LOCATION_X	= "STATE_HORIZ_TOOL_TIP_PIN_LOCATION_X";	//$NON-NLS-1$
+	private static final String			STATE_HORIZ_TOOL_TIP_PIN_LOCATION_Y	= "STATE_HORIZ_TOOL_TIP_PIN_LOCATION_Y";	//$NON-NLS-1$
+	private static final String			STATE_VERT_TOOL_TIP_PIN_LOCATION_X	= "STATE_VERT_TOOL_TIP_PIN_LOCATION_X";		//$NON-NLS-1$
+	private static final String			STATE_VERT_TOOL_TIP_PIN_LOCATION_Y	= "STATE_VERT_TOOL_TIP_PIN_LOCATION_Y";		//$NON-NLS-1$
 
-	private static final int			MIN_SHELL_HORIZ_WIDTH						= 100;
-	private static final int			MIN_SHELL_HORIZ_HEIGHT						= 60;
-	private static final int			MIN_SHELL_VERT_WIDTH						= 100;
-	private static final int			MIN_SHELL_VERT_HEIGHT						= 60;
+	private static final int			MIN_SHELL_HORIZ_WIDTH				= 100;
+	private static final int			MIN_SHELL_HORIZ_HEIGHT				= 60;
+	private static final int			MIN_SHELL_VERT_WIDTH				= 100;
+	private static final int			MIN_SHELL_VERT_HEIGHT				= 60;
 
 	private IDialogSettings				_state;
 
@@ -113,14 +110,14 @@ public abstract class PhotoToolTipShell {
 	private boolean						_isToolTipPinned;
 
 	private Point						_shellStartLocation;
-	private Point						_shellEndLocation							= new Point(0, 0);
+	private Point						_shellEndLocation					= new Point(0, 0);
 
 	private int							_fadeOutDelayCounter;
 
-	private int							_horizContentWidth							= MIN_SHELL_HORIZ_WIDTH;
-	private int							_horizContentHeight							= MIN_SHELL_HORIZ_HEIGHT;
-	private int							_vertContentWidth							= MIN_SHELL_VERT_WIDTH;
-	private int							_vertContentHeight							= MIN_SHELL_VERT_HEIGHT;
+	private int							_horizContentWidth					= MIN_SHELL_HORIZ_WIDTH;
+	private int							_horizContentHeight					= MIN_SHELL_HORIZ_HEIGHT;
+	private int							_vertContentWidth					= MIN_SHELL_VERT_WIDTH;
+	private int							_vertContentHeight					= MIN_SHELL_VERT_HEIGHT;
 
 	private int							_horizPinLocationX;
 	private int							_horizPinLocationY;
@@ -160,12 +157,14 @@ public abstract class PhotoToolTipShell {
 	}
 
 	private class OwnerControlListener implements Listener {
+		@Override
 		public void handleEvent(final Event event) {
 			onOwnerControlEvent(event);
 		}
 	}
 
 	private final class OwnerShellListener implements Listener {
+		@Override
 		public void handleEvent(final Event event) {
 			onOwnerShellEvent(event);
 		}
@@ -179,7 +178,7 @@ public abstract class PhotoToolTipShell {
 
 		@Override
 		public Point getContentSize() {
-			return PhotoToolTipShell.this.getContentSize();
+			return AdvancedToolTipShell.this.getContentSize();
 		}
 	}
 
@@ -187,6 +186,7 @@ public abstract class PhotoToolTipShell {
 	 * This listener is added to ALL widgets within the tooltip shell.
 	 */
 	private class ToolTipAllControlsListener implements Listener {
+		@Override
 		public void handleEvent(final Event event) {
 			onTTAllControlsEvent(event);
 		}
@@ -194,6 +194,7 @@ public abstract class PhotoToolTipShell {
 	}
 
 	private class ToolTipDisplayListener implements Listener {
+		@Override
 		public void handleEvent(final Event event) {
 
 			switch (event.type) {
@@ -205,6 +206,7 @@ public abstract class PhotoToolTipShell {
 	}
 
 	private final class ToolTipShellListener implements Listener {
+		@Override
 		public void handleEvent(final Event event) {
 			onTTShellEvent(event);
 		}
@@ -217,7 +219,7 @@ public abstract class PhotoToolTipShell {
 	 * @param ownerControl
 	 *            the control on whose action the tooltip is shown
 	 */
-	public PhotoToolTipShell(final Control ownerControl, final IDialogSettings state) {
+	public AdvancedToolTipShell(final Control ownerControl, final IDialogSettings state) {
 
 		_ownerControl = ownerControl;
 		_state = state;
@@ -535,7 +537,7 @@ public abstract class PhotoToolTipShell {
 		}
 	}
 
-	abstract void beforeHideToolTip();
+	protected abstract void beforeHideToolTip();
 
 	/**
 	 * <b>VERY IMPORTANT</b>
@@ -582,12 +584,12 @@ public abstract class PhotoToolTipShell {
 		/*
 		 * resize shell
 		 */
-		_rrShellWithResize = new RRShell(_ownerControl.getShell(), //
+		_rrShellWithResize = new RRShell(
+				_ownerControl.getShell(), //
 				SWT.ON_TOP //
 //						| SWT.TOOL
-						| SWT.RESIZE
-						| SWT.NO_FOCUS,
-				Messages.Photo_Tooltip_Label_ShellWithResize,
+						| SWT.RESIZE | SWT.NO_FOCUS,
+				getShellTitle_WithResize(),
 				true);
 
 		final Shell shellWithResize = _rrShellWithResize.getShell();
@@ -603,11 +605,12 @@ public abstract class PhotoToolTipShell {
 		/*
 		 * no resize shell
 		 */
-		_rrShellNoResize = new RRShell(_ownerControl.getShell(), //
+		_rrShellNoResize = new RRShell(
+				_ownerControl.getShell(), //
 				SWT.ON_TOP //
 //						| SWT.TOOL
 						| SWT.NO_FOCUS,
-				Messages.Photo_Tooltip_Label_ShellNoResize,
+				getShellTitle_NoResize(),
 				false);
 
 		ttShellAddListener(_rrShellNoResize.getShell());
@@ -629,7 +632,7 @@ public abstract class PhotoToolTipShell {
 		afterCreateShell(_visibleShell);
 	}
 
-	void doNotStopAnimation() {
+	protected void doNotStopAnimation() {
 		_isDoNotStopAnimation = true;
 	}
 
@@ -665,7 +668,7 @@ public abstract class PhotoToolTipShell {
 	/**
 	 * @return Returns size of the tooltip content
 	 */
-	Point getContentSize() {
+	protected Point getContentSize() {
 		if (isVerticalGallery()) {
 			return new Point(_vertContentWidth, _vertContentHeight);
 		} else {
@@ -698,6 +701,22 @@ public abstract class PhotoToolTipShell {
 		}
 
 		return displayBounds;
+	}
+
+	protected Color getShellColor_Background(final ColorRegistry colorRegistry) {
+		return Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
+	};
+
+	protected Color getShellColor_Foreground(final ColorRegistry colorRegistry) {
+		return Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_FOREGROUND);
+	};
+
+	protected String getShellTitle_NoResize() {
+		return UI.EMPTY_STRING;
+	}
+
+	protected String getShellTitle_WithResize() {
+		return UI.EMPTY_STRING;
 	}
 
 	/**
@@ -733,7 +752,7 @@ public abstract class PhotoToolTipShell {
 		return _isToolTipPinned;
 	}
 
-	abstract boolean isVerticalGallery();
+	protected abstract boolean isVerticalGallery();
 
 	private void onOwnerControlEvent(final Event event) {
 
@@ -769,6 +788,7 @@ public abstract class PhotoToolTipShell {
 
 			_display.asyncExec(new Runnable() {
 
+				@Override
 				public void run() {
 
 					// hide tooltip when another shell is activated
@@ -985,6 +1005,7 @@ public abstract class PhotoToolTipShell {
 
 				_display.asyncExec(new Runnable() {
 
+					@Override
 					public void run() {
 
 						// hide tooltip when another shell is activated
@@ -1199,8 +1220,8 @@ public abstract class PhotoToolTipShell {
 		/*
 		 * get horizontal gallery values
 		 */
-		_horizContentWidth = Util.getStateInt(_state, STATE_PHOTO_HORIZ_TOOL_TIP_WIDTH, 300);
-		_horizContentHeight = Util.getStateInt(_state, STATE_PHOTO_HORIZ_TOOL_TIP_HEIGHT, 150);
+		_horizContentWidth = Util.getStateInt(_state, STATE_HORIZ_TOOL_TIP_WIDTH, 300);
+		_horizContentHeight = Util.getStateInt(_state, STATE_HORIZ_TOOL_TIP_HEIGHT, 150);
 
 		// ensure min values
 		if (_horizContentWidth < MIN_SHELL_HORIZ_WIDTH) {
@@ -1214,8 +1235,8 @@ public abstract class PhotoToolTipShell {
 		/*
 		 * get vertical gallery values
 		 */
-		_vertContentWidth = Util.getStateInt(_state, STATE_PHOTO_VERT_TOOL_TIP_WIDTH, 400);
-		_vertContentHeight = Util.getStateInt(_state, STATE_PHOTO_VERT_TOOL_TIP_HEIGHT, 250);
+		_vertContentWidth = Util.getStateInt(_state, STATE_VERT_TOOL_TIP_WIDTH, 400);
+		_vertContentHeight = Util.getStateInt(_state, STATE_VERT_TOOL_TIP_HEIGHT, 250);
 
 		// ensure min values
 		if (_vertContentWidth < MIN_SHELL_VERT_WIDTH) {
@@ -1229,28 +1250,28 @@ public abstract class PhotoToolTipShell {
 		/*
 		 * pinned locations
 		 */
-		_isToolTipPinned = Util.getStateBoolean(_state, STATE_PHOTO_IS_TOOL_TIP_PINNED, false);
+		_isToolTipPinned = Util.getStateBoolean(_state, STATE_IS_TOOL_TIP_PINNED, false);
 		setToolTipPinned(_isToolTipPinned);
 
 		final int defaultPosition = 20;
-		_horizPinLocationX = Util.getStateInt(_state, STATE_PHOTO_HORIZ_TOOL_TIP_PIN_LOCATION_X, defaultPosition);
-		_horizPinLocationY = Util.getStateInt(_state, STATE_PHOTO_HORIZ_TOOL_TIP_PIN_LOCATION_Y, defaultPosition);
-		_vertPinLocationX = Util.getStateInt(_state, STATE_PHOTO_VERT_TOOL_TIP_PIN_LOCATION_X, defaultPosition);
-		_vertPinLocationY = Util.getStateInt(_state, STATE_PHOTO_VERT_TOOL_TIP_PIN_LOCATION_Y, defaultPosition);
+		_horizPinLocationX = Util.getStateInt(_state, STATE_HORIZ_TOOL_TIP_PIN_LOCATION_X, defaultPosition);
+		_horizPinLocationY = Util.getStateInt(_state, STATE_HORIZ_TOOL_TIP_PIN_LOCATION_Y, defaultPosition);
+		_vertPinLocationX = Util.getStateInt(_state, STATE_VERT_TOOL_TIP_PIN_LOCATION_X, defaultPosition);
+		_vertPinLocationY = Util.getStateInt(_state, STATE_VERT_TOOL_TIP_PIN_LOCATION_Y, defaultPosition);
 	}
 
 	protected void saveState() {
 
-		_state.put(STATE_PHOTO_HORIZ_TOOL_TIP_WIDTH, _horizContentWidth);
-		_state.put(STATE_PHOTO_HORIZ_TOOL_TIP_HEIGHT, _horizContentHeight);
-		_state.put(STATE_PHOTO_VERT_TOOL_TIP_WIDTH, _vertContentWidth);
-		_state.put(STATE_PHOTO_VERT_TOOL_TIP_HEIGHT, _vertContentHeight);
+		_state.put(STATE_HORIZ_TOOL_TIP_WIDTH, _horizContentWidth);
+		_state.put(STATE_HORIZ_TOOL_TIP_HEIGHT, _horizContentHeight);
+		_state.put(STATE_VERT_TOOL_TIP_WIDTH, _vertContentWidth);
+		_state.put(STATE_VERT_TOOL_TIP_HEIGHT, _vertContentHeight);
 
-		_state.put(STATE_PHOTO_IS_TOOL_TIP_PINNED, _isToolTipPinned);
-		_state.put(STATE_PHOTO_HORIZ_TOOL_TIP_PIN_LOCATION_X, _horizPinLocationX);
-		_state.put(STATE_PHOTO_HORIZ_TOOL_TIP_PIN_LOCATION_Y, _horizPinLocationY);
-		_state.put(STATE_PHOTO_VERT_TOOL_TIP_PIN_LOCATION_X, _vertPinLocationX);
-		_state.put(STATE_PHOTO_VERT_TOOL_TIP_PIN_LOCATION_Y, _vertPinLocationY);
+		_state.put(STATE_IS_TOOL_TIP_PINNED, _isToolTipPinned);
+		_state.put(STATE_HORIZ_TOOL_TIP_PIN_LOCATION_X, _horizPinLocationX);
+		_state.put(STATE_HORIZ_TOOL_TIP_PIN_LOCATION_Y, _horizPinLocationY);
+		_state.put(STATE_VERT_TOOL_TIP_PIN_LOCATION_X, _vertPinLocationX);
+		_state.put(STATE_VERT_TOOL_TIP_PIN_LOCATION_Y, _vertPinLocationY);
 	}
 
 	/**
@@ -1268,7 +1289,7 @@ public abstract class PhotoToolTipShell {
 		_isShellToggled = true;
 	}
 
-	void setShellLocation(final int diffX, final int diffY) {
+	protected void setShellLocation(final int diffX, final int diffY) {
 
 		final Rectangle shellBounds = _visibleShell.getBounds();
 
@@ -1279,6 +1300,13 @@ public abstract class PhotoToolTipShell {
 
 		_visibleRRShell.setShellLocation(fixedLocation.x, fixedLocation.y, 4);
 	}
+
+//	/**
+//	 * @param isAutoMoved
+//	 *            Is <code>true</code> when tooltip is auto moved, otherwise it is
+//	 *            <code>false</code>.
+//	 */
+//	abstract void toolTipIsAutoMoved(boolean isAutoMoved);
 
 	private void setShellVisible(final boolean isVisible) {
 
@@ -1300,14 +1328,7 @@ public abstract class PhotoToolTipShell {
 		}
 	}
 
-	abstract void setToolTipPinned(boolean isToolTipPinned);
-
-//	/**
-//	 * @param isAutoMoved
-//	 *            Is <code>true</code> when tooltip is auto moved, otherwise it is
-//	 *            <code>false</code>.
-//	 */
-//	abstract void toolTipIsAutoMoved(boolean isAutoMoved);
+	protected abstract void setToolTipPinned(boolean isToolTipPinned);
 
 	/**
 	 * Set location where the tooltip is pinned.
@@ -1468,7 +1489,7 @@ public abstract class PhotoToolTipShell {
 	/**
 	 * Hide current shell immediatedly without animation.
 	 */
-	void ttHide() {
+	protected void ttHide() {
 
 		closeInternalShells();
 
@@ -1539,8 +1560,8 @@ public abstract class PhotoToolTipShell {
 	private void updateUI_Colors() {
 
 		final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
-		final Color fgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOREGROUND);
-		final Color bgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND);
+		final Color fgColor = getShellColor_Foreground(colorRegistry);
+		final Color bgColor = getShellColor_Background(colorRegistry);
 
 		_rrShellNoResize.updateColors(fgColor, bgColor);
 		_rrShellWithResize.updateColors(fgColor, bgColor);
