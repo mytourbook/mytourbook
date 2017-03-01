@@ -73,6 +73,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 	PersonContributionItem						_personContribItem;
 	private ActionTourFilter					_actionTourFilter;
+	private ActionTourFilterAdv					_actionTourFilterAdv;
 	private TourTypeContributionItem			_tourTypeContribItem;
 	private MeasurementSystemContributionItem	_measurementContribItem;
 
@@ -190,7 +191,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 		coolBar.add(tbItemTourFilter);
 		tbMgr_TourFilter.add(_actionTourFilter);
+		tbMgr_TourFilter.add(_actionTourFilterAdv);
 		TourFilterManager.setTourFilterAction(_actionTourFilter);
+		TourFilterManager.setTourFilterAction(_actionTourFilterAdv);
 
 		/*
 		 * Toolbar: Measurement
@@ -238,6 +241,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 		_personContribItem = new PersonContributionItem();
 		_actionTourFilter = new ActionTourFilter();
+		_actionTourFilterAdv = new ActionTourFilterAdv();
 		_tourTypeContribItem = new TourTypeContributionItem();
 		_measurementContribItem = new MeasurementSystemContributionItem();
 

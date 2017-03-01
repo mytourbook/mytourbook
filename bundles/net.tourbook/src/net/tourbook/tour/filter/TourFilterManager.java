@@ -24,6 +24,7 @@ import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.application.ActionTourFilter;
+import net.tourbook.application.ActionTourFilterAdv;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
@@ -231,6 +232,7 @@ public class TourFilterManager {
 	private static ArrayList<TourFilterProfile>	_filterProfiles	= new ArrayList<>();
 
 	private static ActionTourFilter				_actionTourFilter;
+	private static ActionTourFilterAdv			_actionTourFilterAdv;
 
 	private static TourFilterProfile			_selectedProfile;
 
@@ -590,13 +592,15 @@ public class TourFilterManager {
 		final boolean isTourFilterActive = _prefStore.getBoolean(ITourbookPreferences.APP_TOUR_FILTER_IS_SELECTED);
 
 		_actionTourFilter.setSelection(isTourFilterActive);
+		_actionTourFilterAdv.setSelection(isTourFilterActive);
 
 		readFilterProfile();
 	}
 
 	public static void saveState() {
 
-		_prefStore.setValue(ITourbookPreferences.APP_TOUR_FILTER_IS_SELECTED, _actionTourFilter.getSelection());
+//		_prefStore.setValue(ITourbookPreferences.APP_TOUR_FILTER_IS_SELECTED, _actionTourFilter.getSelection());
+		_prefStore.setValue(ITourbookPreferences.APP_TOUR_FILTER_IS_SELECTED, _actionTourFilterAdv.getSelection());
 
 		final XMLMemento xmlRoot = writeFilterProfile();
 		final File xmlFile = getXmlFile();
@@ -621,6 +625,10 @@ public class TourFilterManager {
 
 	public static void setTourFilterAction(final ActionTourFilter actionTourFilter) {
 		_actionTourFilter = actionTourFilter;
+	}
+
+	public static void setTourFilterAction(final ActionTourFilterAdv actionTourFilterAdv) {
+		_actionTourFilterAdv = actionTourFilterAdv;
 	}
 
 	/**

@@ -101,12 +101,13 @@ public abstract class PhotoToolTipUI extends AdvancedToolTipShell {
 	private Composite						_galleryContainer;
 
 	private PhotoGallery					_photoGallery;
+
 	private ToolBar							_ttToolbarControlExit;
-
 	private ToolBar							_galleryToolbarControl;
-	private Label							_labelDragToolTip;
-	private Cursor							_cursorResize;
 
+	private Label							_labelDragToolTip;
+
+	private Cursor							_cursorResize;
 	private Cursor							_cursorHand;
 
 	private class ActionCloseToolTip extends Action {

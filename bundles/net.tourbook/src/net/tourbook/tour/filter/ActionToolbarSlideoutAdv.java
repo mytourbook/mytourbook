@@ -13,11 +13,12 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.common.tooltip;
+package net.tourbook.tour.filter;
 
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.Messages;
 import net.tourbook.common.UI;
+import net.tourbook.common.tooltip.IOpeningDialog;
 
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -37,44 +38,44 @@ import org.eclipse.swt.widgets.ToolItem;
 /**
  * Action to open a slideout in a toolbar.
  */
-public abstract class ActionToolbarSlideout extends ContributionItem implements IOpeningDialog {
+public abstract class ActionToolbarSlideoutAdv extends ContributionItem implements IOpeningDialog {
 
-	private String			_dialogId			= getClass().getCanonicalName();
+	private String					_dialogId			= getClass().getCanonicalName();
 
-	private ToolBar			_toolBar;
-	private ToolItem		_actionToolItem;
+	private ToolBar					_toolBar;
+	private ToolItem				_actionToolItem;
 
-	private ToolbarSlideout	_toolbarSlideout;
+	private SlideoutTourFilterAdv	_toolbarSlideoutAdv;
 
 	/*
 	 * UI controls
 	 */
-	private Image			_imageEnabled;
-	private Image			_imageDisabled;
+	private Image					_imageEnabled;
+	private Image					_imageDisabled;
 
 	/**
 	 * When <code>true</code> then the action can be toggeled, default is <code>false</code>.
 	 */
-	protected boolean		isToggleAction;
+	protected boolean				isToggleAction;
 
 	/**
 	 * This tooltip will be displayed when the action is not selected.
 	 */
-	protected String		notSelectedTooltip	= UI.EMPTY_STRING;
+	protected String				notSelectedTooltip	= UI.EMPTY_STRING;
 
-	public ActionToolbarSlideout() {
+	public ActionToolbarSlideoutAdv() {
 
 		_imageEnabled = CommonActivator.getImageDescriptor(Messages.Image__TourOptions).createImage();
 		_imageDisabled = CommonActivator.getImageDescriptor(Messages.Image__TourOptions_Disabled).createImage();
 	}
 
-	public ActionToolbarSlideout(final ImageDescriptor actionImage, final ImageDescriptor actionImageDisabled) {
+	public ActionToolbarSlideoutAdv(final ImageDescriptor actionImage, final ImageDescriptor actionImageDisabled) {
 
 		_imageEnabled = actionImage.createImage();
 		_imageDisabled = actionImageDisabled.createImage();
 	}
 
-	protected abstract ToolbarSlideout createSlideout(ToolBar toolbar);
+	protected abstract SlideoutTourFilterAdv createSlideout(ToolBar toolbar);
 
 	@Override
 	public void fill(final ToolBar toolbar, final int index) {
@@ -116,7 +117,7 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
 				}
 			});
 
-			_toolbarSlideout = createSlideout(toolbar);
+			_toolbarSlideoutAdv = createSlideout(toolbar);
 
 			updateUI_Tooltip();
 		}
@@ -136,7 +137,7 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
 
 	@Override
 	public void hideDialog() {
-		_toolbarSlideout.hideNow();
+		_toolbarSlideoutAdv.hideNow();
 	}
 
 	/**
@@ -206,7 +207,7 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
 
 		updateUI_Tooltip();
 
-		if (_toolbarSlideout.isToolTipVisible() == false) {
+		if (_toolbarSlideoutAdv.isVisible() == false) {
 
 			// tooltip is hidden, open it
 
@@ -221,7 +222,7 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
 
 		} else {
 
-			_toolbarSlideout.close();
+			_toolbarSlideoutAdv.hide();
 		}
 	}
 
@@ -230,7 +231,7 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
 		// ensure other dialogs are closed
 		onBeforeOpenSlideout();
 
-		_toolbarSlideout.open(itemBounds, isOpenDelayed);
+		_toolbarSlideoutAdv.open(itemBounds, isOpenDelayed);
 	}
 
 	public void setEnabled(final boolean isEnabled) {

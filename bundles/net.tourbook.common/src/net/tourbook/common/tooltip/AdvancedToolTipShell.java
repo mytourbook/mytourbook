@@ -46,7 +46,7 @@ public abstract class AdvancedToolTipShell {
 	 * how long each tick is when fading in/out (in ms)
 	 */
 	private static final int			FADE_TIME_INTERVAL					= UI.IS_OSX ? 10 : 10;
- 
+
 	/**
 	 * Number of steps when fading in
 	 */
@@ -152,6 +152,9 @@ public abstract class AdvancedToolTipShell {
 	 */
 	private Shell						_visibleShell;
 
+	/**
+	 * The control on whose action the tooltip is shown
+	 */
 	private Control						_ownerControl;
 
 	private final class AnimationTimer implements Runnable {
@@ -222,7 +225,7 @@ public abstract class AdvancedToolTipShell {
 	 * 
 	 * @param state
 	 * @param ownerControl
-	 *            the control on whose action the tooltip is shown
+	 *            The control on whose action the tooltip is shown
 	 */
 	public AdvancedToolTipShell(final Control ownerControl, final IDialogSettings state) {
 
@@ -397,7 +400,7 @@ public abstract class AdvancedToolTipShell {
 
 //		final long start = System.nanoTime();
 
-		if (_visibleShell == null || _visibleShell.isDisposed() || _visibleShell.isVisible() == false) {
+		if (isHidden()) {
 			return;
 		}
 
@@ -741,10 +744,22 @@ public abstract class AdvancedToolTipShell {
 	}
 
 	/**
-	 * Hide the currently active tool tip
+	 * Hide the currently active tool tip with animation.
 	 */
 	public void hide() {
 		ttHide(null);
+	}
+
+	/**
+	 * Hide the currently active tool tip immediately.
+	 */
+	public void hideNow() {
+		ttHide();
+	}
+
+	private boolean isHidden() {
+
+		return _visibleShell == null || _visibleShell.isDisposed() || _visibleShell.isVisible() == false;
 	}
 
 	/**
@@ -764,6 +779,13 @@ public abstract class AdvancedToolTipShell {
 	 * @return Returns <code>true</code> when vertical, otherwise it is horizontal.
 	 */
 	protected abstract boolean isVerticalLayout();
+
+	/**
+	 * @return Returns <code>true</code> when the shell for the tooltip is visible.
+	 */
+	public boolean isVisible() {
+		return !isHidden();
+	}
 
 	private void onOwnerControlEvent(final Event event) {
 
@@ -875,7 +897,7 @@ public abstract class AdvancedToolTipShell {
 //		System.out.println(UI.timeStampNano() + " onTTDisplayMouseMove\t");
 //		// TODO remove SYSTEM.OUT.PRINTLN
 
-		if (_visibleShell == null || _visibleShell.isDisposed() || _visibleShell.isVisible() == false) {
+		if (isHidden()) {
 			return;
 		}
 
@@ -1405,7 +1427,7 @@ public abstract class AdvancedToolTipShell {
 
 	private void showShellWhenVisible() {
 
-		if (_visibleShell == null || _visibleShell.isDisposed() || _visibleShell.isVisible() == false) {
+		if (isHidden()) {
 			return;
 		}
 
@@ -1530,10 +1552,7 @@ public abstract class AdvancedToolTipShell {
 
 	private void ttHide(final Event event) {
 
-//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tttHide"));
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
-		if (_visibleShell == null || _visibleShell.isDisposed() || _visibleShell.isVisible() == false) {
+		if (isHidden()) {
 			return;
 		}
 
