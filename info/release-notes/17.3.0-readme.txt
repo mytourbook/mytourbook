@@ -24,4 +24,4 @@ Bugfix
 
 These problems are fixed
 
-* 
+* GPX Import: Tolerate "version=1.1" without namespace

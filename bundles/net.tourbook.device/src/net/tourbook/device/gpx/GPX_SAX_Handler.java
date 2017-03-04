@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -62,6 +62,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 	private static final String				ATTR_GPX_VERSION				= "version";								//$NON-NLS-1$
 	private static final String				ATTR_GPX_VERSION_1_0			= "1.0";									//$NON-NLS-1$
+	private static final String				ATTR_GPX_VERSION_1_1			= "1.1";								//$NON-NLS-1$
 
 	private static final String				NAME_SPACE_GPX_1_0				= "http://www.topografix.com/GPX/1/0";		//$NON-NLS-1$
 	private static final String				NAME_SPACE_GPX_1_1				= "http://www.topografix.com/GPX/1/1";		//$NON-NLS-1$
@@ -1444,8 +1445,10 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 					if (value.contains(NAME_SPACE_GPX_1_0)
 
-					// tolerate 'version="1.0"'
-							|| (qName.toLowerCase().equals(ATTR_GPX_VERSION) && value.equals(ATTR_GPX_VERSION_1_0))) {
+							// tolerate 'version="1.0"' without namespace
+							|| (qName.toLowerCase().equals(ATTR_GPX_VERSION) && value.equals(ATTR_GPX_VERSION_1_0))
+
+					) {
 
 						_gpxVersion = GPX_VERSION_1_0;
 
@@ -1453,7 +1456,12 @@ public class GPX_SAX_Handler extends DefaultHandler {
 							initNewTrack();
 						}
 
-					} else if (value.contains(NAME_SPACE_GPX_1_1)) {
+					} else if (value.contains(NAME_SPACE_GPX_1_1)
+
+							// tolerate 'version="1.1"' without namespace
+							|| (qName.toLowerCase().equals(ATTR_GPX_VERSION) && value.equals(ATTR_GPX_VERSION_1_1))
+
+					) {
 
 						_gpxVersion = GPX_VERSION_1_1;
 
