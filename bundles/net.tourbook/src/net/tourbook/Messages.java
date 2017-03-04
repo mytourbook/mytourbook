@@ -377,6 +377,8 @@ public class Messages extends NLS {
 
 	public static String		App_Action_About;
 	public static String		App_Action_Cancel;
+	public static String App_Action_Close;
+
 	public static String		App_Action_Close_ToolTip;
 	public static String		App_Action_Columns;
 	public static String		App_Action_Dialog_ActionIsInProgress_Message;
@@ -432,6 +434,8 @@ public class Messages extends NLS {
 	public static String		App_Label_max;
 
 	public static String		App_Link_RestoreDefaultValues;
+
+	public static String App_Slideout_Action_PinSlideout;
 
 	public static String		App_Splash_Copyright;
 

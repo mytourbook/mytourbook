@@ -16,8 +16,8 @@
 package net.tourbook.application;
 
 import net.tourbook.Messages;
+import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.tour.filter.ActionToolbarSlideoutAdv;
-import net.tourbook.tour.filter.SlideoutTourFilterAdv;
 import net.tourbook.tour.filter.TourFilterManager;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -44,9 +44,9 @@ public class ActionTourFilterAdv extends ActionToolbarSlideoutAdv {
 	}
 
 	@Override
-	protected SlideoutTourFilterAdv createSlideout(final ToolBar toolbar) {
+	protected AdvancedSlideout createSlideout(final ToolBar toolbar) {
 
-		return new SlideoutTourFilterAdv(toolbar, toolbar, _state);
+		return new AdvancedSlideout(toolbar, toolbar, _state);
 	}
 
 	@Override

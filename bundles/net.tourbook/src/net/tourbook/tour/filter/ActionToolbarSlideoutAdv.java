@@ -19,6 +19,7 @@ import net.tourbook.common.CommonActivator;
 import net.tourbook.common.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.tooltip.IOpeningDialog;
+import net.tourbook.common.tooltip.AdvancedSlideout;
 
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -45,7 +46,7 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
 	private ToolBar					_toolBar;
 	private ToolItem				_actionToolItem;
 
-	private SlideoutTourFilterAdv	_toolbarSlideoutAdv;
+	private AdvancedSlideout	_toolbarSlideout;
 
 	/*
 	 * UI controls
@@ -59,7 +60,8 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
 	protected boolean				isToggleAction;
 
 	/**
-	 * This tooltip will be displayed when the action is not selected.
+	 * This tooltip will be displayed when the action is not selected which causes that the slideout
+	 * is not displayed.
 	 */
 	protected String				notSelectedTooltip	= UI.EMPTY_STRING;
 
@@ -75,7 +77,7 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
 		_imageDisabled = actionImageDisabled.createImage();
 	}
 
-	protected abstract SlideoutTourFilterAdv createSlideout(ToolBar toolbar);
+	protected abstract AdvancedSlideout createSlideout(ToolBar toolbar);
 
 	@Override
 	public void fill(final ToolBar toolbar, final int index) {
@@ -117,7 +119,7 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
 				}
 			});
 
-			_toolbarSlideoutAdv = createSlideout(toolbar);
+			_toolbarSlideout = createSlideout(toolbar);
 
 			updateUI_Tooltip();
 		}
@@ -137,7 +139,7 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
 
 	@Override
 	public void hideDialog() {
-		_toolbarSlideoutAdv.hideNow();
+		_toolbarSlideout.hideNow();
 	}
 
 	/**
@@ -207,7 +209,7 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
 
 		updateUI_Tooltip();
 
-		if (_toolbarSlideoutAdv.isVisible() == false) {
+		if (_toolbarSlideout.isVisible() == false) {
 
 			// tooltip is hidden, open it
 
@@ -222,16 +224,16 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
 
 		} else {
 
-			_toolbarSlideoutAdv.hide();
+			_toolbarSlideout.hide();
 		}
 	}
 
-	private void openSlideout(final Rectangle itemBounds, final boolean isOpenDelayed) {
+	private void openSlideout(final Rectangle slideoutParentBounds, final boolean isOpenDelayed) {
 
 		// ensure other dialogs are closed
 		onBeforeOpenSlideout();
 
-		_toolbarSlideoutAdv.open(itemBounds, isOpenDelayed);
+		_toolbarSlideout.open(slideoutParentBounds, isOpenDelayed);
 	}
 
 	public void setEnabled(final boolean isEnabled) {

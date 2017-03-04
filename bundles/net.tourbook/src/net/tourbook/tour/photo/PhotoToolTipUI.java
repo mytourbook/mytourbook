@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
-import net.tourbook.common.tooltip.AdvancedToolTipShell;
+import net.tourbook.common.tooltip.AdvancedSlideoutShell;
 import net.tourbook.common.util.Util;
 import net.tourbook.photo.IPhotoGalleryProvider;
 import net.tourbook.photo.IPhotoPreferences;
@@ -64,7 +64,7 @@ import org.eclipse.swt.widgets.ToolBar;
  * @author Wolfgang Schramm, created 3.8.2012
  */
 
-public abstract class PhotoToolTipUI extends AdvancedToolTipShell {
+public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
 
 	private static final String				STATE_PHOTO_GALLERY_IS_VERTICAL	= "STATE_PHOTO_GALLERY_IS_VERTICAL";	//$NON-NLS-1$
 	private static final String				STATE_TOOL_TIP_LOCATION			= "STATE_TOOL_TIP_LOCATION";			//$NON-NLS-1$
@@ -138,7 +138,7 @@ public abstract class PhotoToolTipUI extends AdvancedToolTipShell {
 
 		@Override
 		public void run() {
-			actionPinToolTip(_actionPinToolTip.isChecked());
+			actionPinSlideout(_actionPinToolTip.isChecked());
 		}
 	}
 
@@ -209,6 +209,7 @@ public abstract class PhotoToolTipUI extends AdvancedToolTipShell {
 
 		createActions();
 	}
+
 	private void actionCloseToolTip() {
 
 		/*
@@ -251,6 +252,7 @@ public abstract class PhotoToolTipUI extends AdvancedToolTipShell {
 
 		_photoGallery.setVertical(_isVerticalGallery);
 	}
+
 	private void actionToolTipLocation() {
 
 		_toolTipLocationUpDown = _toolTipLocationUpDown == 1 ? 0 : 1;
@@ -558,7 +560,7 @@ public abstract class PhotoToolTipUI extends AdvancedToolTipShell {
 
 			_labelDragToolTip.setCursor(null);
 
-			setToolTipPinnedLocation();
+			setSlideoutPinnedLocation();
 		}
 	}
 
@@ -569,7 +571,6 @@ public abstract class PhotoToolTipUI extends AdvancedToolTipShell {
 
 	protected abstract void onSelectPhoto(final PhotoSelection photoSelection);
 
-	@Override
 	protected void restoreState() {
 
 		_isVerticalGallery = Util.getStateBoolean(_state, STATE_PHOTO_GALLERY_IS_VERTICAL, true);
@@ -578,22 +579,17 @@ public abstract class PhotoToolTipUI extends AdvancedToolTipShell {
 		updateUI_ToogleAction();
 		updateUI_ToolTipLocation();
 
-		super.restoreState();
-
 		enableControls();
 	}
 
-	@Override
 	protected void saveState() {
 
 		_state.put(STATE_PHOTO_GALLERY_IS_VERTICAL, _isVerticalGallery);
 		_state.put(STATE_TOOL_TIP_LOCATION, _toolTipLocationUpDown);
-
-		super.saveState();
 	}
 
 	@Override
-	protected void setToolTipPinned(final boolean isToolTipPinned) {
+	protected void restoreSlideoutIsPinned(final boolean isToolTipPinned) {
 		_actionPinToolTip.setChecked(isToolTipPinned);
 	}
 

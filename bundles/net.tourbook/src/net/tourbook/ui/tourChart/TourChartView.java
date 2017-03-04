@@ -772,6 +772,11 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
 	private void saveState() {
 
+		if (_tourChart == null) {
+			// this occured when testing
+			return;
+		}
+
 		_tourChart.saveState();
 	}
 

@@ -40,7 +40,7 @@ import org.eclipse.swt.widgets.Shell;
 /**
  * Part of this tooltip is copied from {@link ToolTip}.
  */
-public abstract class AdvancedToolTipShell {
+public abstract class AdvancedSlideoutShell {
 
 	/**
 	 * how long each tick is when fading in/out (in ms)
@@ -66,16 +66,16 @@ public abstract class AdvancedToolTipShell {
 
 	private static final int			ALPHA_OPAQUE						= 0xff;
 
-	private static final String			STATE_HORIZ_TOOL_TIP_WIDTH			= "STATE_HORIZ_TOOL_TIP_WIDTH";				//$NON-NLS-1$
-	private static final String			STATE_HORIZ_TOOL_TIP_HEIGHT			= "STATE_HORIZ_TOOL_TIP_HEIGHT";			//$NON-NLS-1$
-	private static final String			STATE_VERT_TOOL_TIP_WIDTH			= "STATE_VERT_TOOL_TIP_WIDTH";				//$NON-NLS-1$
-	private static final String			STATE_VERT_TOOL_TIP_HEIGHT			= "STATE_VERT_TOOL_TIP_HEIGHT";				//$NON-NLS-1$
+	private static final String			STATE_HORIZ_SLIDEOUT_WIDTH			= "STATE_HORIZ_SLIDEOUT_WIDTH";				//$NON-NLS-1$
+	private static final String			STATE_HORIZ_SLIDEOUT_HEIGHT			= "STATE_HORIZ_SLIDEOUT_HEIGHT";			//$NON-NLS-1$
+	private static final String			STATE_VERT_SLIDEOUT_WIDTH			= "STATE_VERT_SLIDEOUT_WIDTH";				//$NON-NLS-1$
+	private static final String			STATE_VERT_SLIDEOUT_HEIGHT			= "STATE_VERT_SLIDEOUT_HEIGHT";				//$NON-NLS-1$
 
-	private static final String			STATE_IS_TOOL_TIP_PINNED			= "STATE_IS_TOOL_TIP_PINNED";				//$NON-NLS-1$
-	private static final String			STATE_HORIZ_TOOL_TIP_PIN_LOCATION_X	= "STATE_HORIZ_TOOL_TIP_PIN_LOCATION_X";	//$NON-NLS-1$
-	private static final String			STATE_HORIZ_TOOL_TIP_PIN_LOCATION_Y	= "STATE_HORIZ_TOOL_TIP_PIN_LOCATION_Y";	//$NON-NLS-1$
-	private static final String			STATE_VERT_TOOL_TIP_PIN_LOCATION_X	= "STATE_VERT_TOOL_TIP_PIN_LOCATION_X";		//$NON-NLS-1$
-	private static final String			STATE_VERT_TOOL_TIP_PIN_LOCATION_Y	= "STATE_VERT_TOOL_TIP_PIN_LOCATION_Y";		//$NON-NLS-1$
+	private static final String			STATE_IS_SLIDEOUT_PINNED			= "STATE_IS_SLIDEOUT_PINNED";				//$NON-NLS-1$
+	private static final String			STATE_HORIZ_SLIDEOUT_PIN_LOCATION_X	= "STATE_HORIZ_SLIDEOUT_PIN_LOCATION_X";	//$NON-NLS-1$
+	private static final String			STATE_HORIZ_SLIDEOUT_PIN_LOCATION_Y	= "STATE_HORIZ_SLIDEOUT_PIN_LOCATION_Y";	//$NON-NLS-1$
+	private static final String			STATE_VERT_SLIDEOUT_PIN_LOCATION_X	= "STATE_VERT_SLIDEOUT_PIN_LOCATION_X";		//$NON-NLS-1$
+	private static final String			STATE_VERT_SLIDEOUT_PIN_LOCATION_Y	= "STATE_VERT_SLIDEOUT_PIN_LOCATION_Y";		//$NON-NLS-1$
 
 	private static final int			MIN_SHELL_HORIZ_WIDTH				= 100;
 	private static final int			MIN_SHELL_HORIZ_HEIGHT				= 60;
@@ -112,7 +112,7 @@ public abstract class AdvancedToolTipShell {
 	 */
 	private boolean						_isShellFadingIn;
 
-	private boolean						_isToolTipPinned;
+	private boolean						_isSlideoutPinned;
 
 	private Point						_shellStartLocation;
 	private Point						_shellEndLocation					= new Point(0, 0);
@@ -186,7 +186,7 @@ public abstract class AdvancedToolTipShell {
 
 		@Override
 		public Point getContentSize() {
-			return AdvancedToolTipShell.this.getContentSize();
+			return AdvancedSlideoutShell.this.getContentSize();
 		}
 	}
 
@@ -227,7 +227,7 @@ public abstract class AdvancedToolTipShell {
 	 * @param ownerControl
 	 *            The control on whose action the tooltip is shown
 	 */
-	public AdvancedToolTipShell(final Control ownerControl, final IDialogSettings state) {
+	public AdvancedSlideoutShell(final Control ownerControl, final IDialogSettings state) {
 
 		_ownerControl = ownerControl;
 		_state = state;
@@ -244,14 +244,16 @@ public abstract class AdvancedToolTipShell {
 		_animationTimer = new AnimationTimer();
 
 		ownerControlAddListener();
+
+		restoreState();
 	}
 
-	protected void actionPinToolTip(final boolean isPinned) {
+	protected void actionPinSlideout(final boolean isPinned) {
 
-		_isToolTipPinned = isPinned;
+		_isSlideoutPinned = isPinned;
 
 		if (isPinned) {
-			setToolTipPinnedLocation();
+			setSlideoutPinnedLocation();
 		}
 
 		enableControls();
@@ -331,7 +333,7 @@ public abstract class AdvancedToolTipShell {
 				final Point shellSize = _visibleRRShell.getShellSize(contentSize);
 
 				Point contentLocation;
-				if (_isToolTipPinned) {
+				if (_isSlideoutPinned) {
 
 					if (isVerticalLayout()) {
 						contentLocation = new Point(_vertPinLocationX, _vertPinLocationY);
@@ -361,7 +363,7 @@ public abstract class AdvancedToolTipShell {
 				// set new end location
 				_shellEndLocation = shellEndLocation;
 
-				if (_isToolTipPinned == false && isShellVisible) {
+				if (_isSlideoutPinned == false && isShellVisible) {
 
 					// shell is already visible, move from the current position to the target position
 
@@ -637,6 +639,9 @@ public abstract class AdvancedToolTipShell {
 
 		updateUI_Colors();
 
+		// restore tooltip pin state
+		restoreSlideoutIsPinned(_isSlideoutPinned);
+
 		afterCreateShell(_visibleShell);
 	}
 
@@ -769,7 +774,7 @@ public abstract class AdvancedToolTipShell {
 	protected abstract boolean isToolTipDragged();
 
 	protected boolean isToolTipPinned() {
-		return _isToolTipPinned;
+		return _isSlideoutPinned;
 	}
 
 	/**
@@ -1248,13 +1253,20 @@ public abstract class AdvancedToolTipShell {
 		}
 	}
 
-	protected void restoreState() {
+	/**
+	 * Restore slideout pin state.
+	 * 
+	 * @param isSlideoutPinned
+	 */
+	protected abstract void restoreSlideoutIsPinned(boolean isSlideoutPinned);
+
+	private void restoreState() {
 
 		/*
 		 * get horizontal gallery values
 		 */
-		_horizContentWidth = Util.getStateInt(_state, STATE_HORIZ_TOOL_TIP_WIDTH, 300);
-		_horizContentHeight = Util.getStateInt(_state, STATE_HORIZ_TOOL_TIP_HEIGHT, 150);
+		_horizContentWidth = Util.getStateInt(_state, STATE_HORIZ_SLIDEOUT_WIDTH, 300);
+		_horizContentHeight = Util.getStateInt(_state, STATE_HORIZ_SLIDEOUT_HEIGHT, 150);
 
 		// ensure min values
 		if (_horizContentWidth < MIN_SHELL_HORIZ_WIDTH) {
@@ -1268,8 +1280,8 @@ public abstract class AdvancedToolTipShell {
 		/*
 		 * get vertical gallery values
 		 */
-		_vertContentWidth = Util.getStateInt(_state, STATE_VERT_TOOL_TIP_WIDTH, 400);
-		_vertContentHeight = Util.getStateInt(_state, STATE_VERT_TOOL_TIP_HEIGHT, 250);
+		_vertContentWidth = Util.getStateInt(_state, STATE_VERT_SLIDEOUT_WIDTH, 400);
+		_vertContentHeight = Util.getStateInt(_state, STATE_VERT_SLIDEOUT_HEIGHT, 250);
 
 		// ensure min values
 		if (_vertContentWidth < MIN_SHELL_VERT_WIDTH) {
@@ -1283,28 +1295,27 @@ public abstract class AdvancedToolTipShell {
 		/*
 		 * pinned locations
 		 */
-		_isToolTipPinned = Util.getStateBoolean(_state, STATE_IS_TOOL_TIP_PINNED, false);
-		setToolTipPinned(_isToolTipPinned);
+		_isSlideoutPinned = Util.getStateBoolean(_state, STATE_IS_SLIDEOUT_PINNED, false);
 
 		final int defaultPosition = 20;
-		_horizPinLocationX = Util.getStateInt(_state, STATE_HORIZ_TOOL_TIP_PIN_LOCATION_X, defaultPosition);
-		_horizPinLocationY = Util.getStateInt(_state, STATE_HORIZ_TOOL_TIP_PIN_LOCATION_Y, defaultPosition);
-		_vertPinLocationX = Util.getStateInt(_state, STATE_VERT_TOOL_TIP_PIN_LOCATION_X, defaultPosition);
-		_vertPinLocationY = Util.getStateInt(_state, STATE_VERT_TOOL_TIP_PIN_LOCATION_Y, defaultPosition);
+		_horizPinLocationX = Util.getStateInt(_state, STATE_HORIZ_SLIDEOUT_PIN_LOCATION_X, defaultPosition);
+		_horizPinLocationY = Util.getStateInt(_state, STATE_HORIZ_SLIDEOUT_PIN_LOCATION_Y, defaultPosition);
+		_vertPinLocationX = Util.getStateInt(_state, STATE_VERT_SLIDEOUT_PIN_LOCATION_X, defaultPosition);
+		_vertPinLocationY = Util.getStateInt(_state, STATE_VERT_SLIDEOUT_PIN_LOCATION_Y, defaultPosition);
 	}
 
-	protected void saveState() {
+	private void saveState() {
 
-		_state.put(STATE_HORIZ_TOOL_TIP_WIDTH, _horizContentWidth);
-		_state.put(STATE_HORIZ_TOOL_TIP_HEIGHT, _horizContentHeight);
-		_state.put(STATE_VERT_TOOL_TIP_WIDTH, _vertContentWidth);
-		_state.put(STATE_VERT_TOOL_TIP_HEIGHT, _vertContentHeight);
+		_state.put(STATE_HORIZ_SLIDEOUT_WIDTH, _horizContentWidth);
+		_state.put(STATE_HORIZ_SLIDEOUT_HEIGHT, _horizContentHeight);
+		_state.put(STATE_VERT_SLIDEOUT_WIDTH, _vertContentWidth);
+		_state.put(STATE_VERT_SLIDEOUT_HEIGHT, _vertContentHeight);
 
-		_state.put(STATE_IS_TOOL_TIP_PINNED, _isToolTipPinned);
-		_state.put(STATE_HORIZ_TOOL_TIP_PIN_LOCATION_X, _horizPinLocationX);
-		_state.put(STATE_HORIZ_TOOL_TIP_PIN_LOCATION_Y, _horizPinLocationY);
-		_state.put(STATE_VERT_TOOL_TIP_PIN_LOCATION_X, _vertPinLocationX);
-		_state.put(STATE_VERT_TOOL_TIP_PIN_LOCATION_Y, _vertPinLocationY);
+		_state.put(STATE_IS_SLIDEOUT_PINNED, _isSlideoutPinned);
+		_state.put(STATE_HORIZ_SLIDEOUT_PIN_LOCATION_X, _horizPinLocationX);
+		_state.put(STATE_HORIZ_SLIDEOUT_PIN_LOCATION_Y, _horizPinLocationY);
+		_state.put(STATE_VERT_SLIDEOUT_PIN_LOCATION_X, _vertPinLocationX);
+		_state.put(STATE_VERT_SLIDEOUT_PIN_LOCATION_Y, _vertPinLocationY);
 	}
 
 	/**
@@ -1352,6 +1363,9 @@ public abstract class AdvancedToolTipShell {
 
 	private void setShellVisible(final boolean isVisible) {
 
+		if (isVisible == false) {
+			saveState();
+		}
 //		final Rectangle shellBounds = _visibleShell.getBounds();
 
 //		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
@@ -1370,12 +1384,10 @@ public abstract class AdvancedToolTipShell {
 		}
 	}
 
-	protected abstract void setToolTipPinned(boolean isToolTipPinned);
-
 	/**
 	 * Set location where the tooltip is pinned.
 	 */
-	protected void setToolTipPinnedLocation() {
+	protected void setSlideoutPinnedLocation() {
 
 		final Point contentLocation = _visibleRRShell.getShellContentLocation();
 

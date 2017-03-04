@@ -13,12 +13,11 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.tour.filter;
+package net.tourbook.common.tooltip;
 
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.Messages;
 import net.tourbook.common.UI;
-import net.tourbook.common.tooltip.AdvancedToolTipShell;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
@@ -43,12 +42,12 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 
-public class SlideoutTourFilterAdv extends AdvancedToolTipShell {
+public class AdvancedSlideout extends AdvancedSlideoutShell {
 
 	// initialize with default values which are (should) never be used
-	private Rectangle			_toolTipItemBounds	= new Rectangle(0, 0, 50, 50);
+	private Rectangle			_slideoutParentBounds	= new Rectangle(0, 0, 50, 50);
 
-	private final WaitTimer		_waitTimer			= new WaitTimer();
+	private final WaitTimer		_waitTimer				= new WaitTimer();
 
 	private boolean				_isWaitTimerStarted;
 	private boolean				_canOpenToolTip;
@@ -57,27 +56,27 @@ public class SlideoutTourFilterAdv extends AdvancedToolTipShell {
 	private int					_devXMousedown;
 	private int					_devYMousedown;
 
-	private ActionCloseToolTip	_actionCloseToolTip;
-	private ActionPinToolTip	_actionPinToolTip;
+	private ActionCloseSlideout	_actionCloseSlideout;
+	private ActionPinSlideout	_actionPinSlideout;
 
 	/*
 	 * UI controls
 	 */
 	private ToolBar				_ttToolbarControlExit;
 
-	private Label				_labelDragToolTip;
+	private Label				_labelDragSlideout;
 
 	private Cursor				_cursorResize;
 	private Cursor				_cursorHand;
 
-	private class ActionCloseToolTip extends Action {
+	private class ActionCloseSlideout extends Action {
 
-		public ActionCloseToolTip() {
+		public ActionCloseSlideout() {
 
 			super(null, Action.AS_PUSH_BUTTON);
 
-			setToolTipText(Messages.App_Action_Close_ToolTip);
-			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Close));
+			setToolTipText(Messages.App_Action_Close_Tooltip);
+			setImageDescriptor(CommonActivator.getImageDescriptor(Messages.Image__App_Close));
 		}
 
 		@Override
@@ -86,19 +85,19 @@ public class SlideoutTourFilterAdv extends AdvancedToolTipShell {
 		}
 	}
 
-	private class ActionPinToolTip extends Action {
+	private class ActionPinSlideout extends Action {
 
-		public ActionPinToolTip() {
+		public ActionPinSlideout() {
 
 			super(null, Action.AS_CHECK_BOX);
 
-			setToolTipText(Messages.Photo_Tooltip_Action_PinToolTip_ToolTip);
-			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Pin_Blue));
+			setToolTipText(Messages.App_Action_PinSlideout_Tooltip);
+			setImageDescriptor(CommonActivator.getImageDescriptor(Messages.Image__Pin_Blue));
 		}
 
 		@Override
 		public void run() {
-			actionPinToolTip(_actionPinToolTip.isChecked());
+			actionPinSlideout(_actionPinSlideout.isChecked());
 		}
 	}
 
@@ -109,13 +108,13 @@ public class SlideoutTourFilterAdv extends AdvancedToolTipShell {
 		}
 	}
 
-	public SlideoutTourFilterAdv(final Control ownerControl, final ToolBar toolBar, final IDialogSettings state) {
+	public AdvancedSlideout(final Control ownerControl, final Control toolBar, final IDialogSettings state) {
 
 		super(ownerControl, state);
 
-		setShellFadeInSteps(1);
-		setShellFadeOutSteps(10);
-		setShellFadeOutDelaySteps(1);
+		setShellFadeInSteps(10);
+		setShellFadeOutSteps(30);
+		setShellFadeOutDelaySteps(30);
 
 		initUI(ownerControl);
 		addListener(ownerControl, toolBar);
@@ -123,7 +122,7 @@ public class SlideoutTourFilterAdv extends AdvancedToolTipShell {
 		createActions();
 	}
 
-	private void addListener(final Control ownerControl, final ToolBar toolBar) {
+	private void addListener(final Control ownerControl, final Control toolBar) {
 
 		toolBar.addMouseTrackListener(new MouseTrackAdapter() {
 			@Override
@@ -152,8 +151,8 @@ public class SlideoutTourFilterAdv extends AdvancedToolTipShell {
 
 	private void createActions() {
 
-		_actionPinToolTip = new ActionPinToolTip();
-		_actionCloseToolTip = new ActionCloseToolTip();
+		_actionPinSlideout = new ActionPinSlideout();
+		_actionCloseSlideout = new ActionCloseSlideout();
 	}
 
 	@Override
@@ -199,25 +198,27 @@ public class SlideoutTourFilterAdv extends AdvancedToolTipShell {
 			/*
 			 * spacer
 			 */
-			_labelDragToolTip = new Label(container, SWT.NONE);
+			_labelDragSlideout = new Label(container, SWT.NONE);
 			GridDataFactory
 					.fillDefaults()//
 					.grab(true, false)
 					.hint(50, SWT.DEFAULT)
-					.applyTo(_labelDragToolTip);
-			_labelDragToolTip.setText(UI.EMPTY_STRING);
-			_labelDragToolTip.setToolTipText(Messages.Photo_Tooltip_Action_MoveToolTip_ToolTip);
+					.applyTo(_labelDragSlideout);
+			_labelDragSlideout.setText(UI.EMPTY_STRING);
+//			Photo_Tooltip_Action_MoveToolTip_ToolTip = Drag photo tooltip
+
+			_labelDragSlideout.setToolTipText(Messages.App_Action_DragSlideout_ToolTip);
 //			_labelDragToolTip.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-			_labelDragToolTip.addMouseTrackListener(new MouseTrackListener() {
+			_labelDragSlideout.addMouseTrackListener(new MouseTrackListener() {
 
 				@Override
 				public void mouseEnter(final MouseEvent e) {
-					_labelDragToolTip.setCursor(_cursorHand);
+					_labelDragSlideout.setCursor(_cursorHand);
 				}
 
 				@Override
 				public void mouseExit(final MouseEvent e) {
-					_labelDragToolTip.setCursor(null);
+					_labelDragSlideout.setCursor(null);
 				}
 
 				@Override
@@ -226,7 +227,7 @@ public class SlideoutTourFilterAdv extends AdvancedToolTipShell {
 				}
 			});
 
-			_labelDragToolTip.addMouseListener(new MouseAdapter() {
+			_labelDragSlideout.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseDown(final MouseEvent e) {
 					onMouseDown(e);
@@ -237,7 +238,7 @@ public class SlideoutTourFilterAdv extends AdvancedToolTipShell {
 					onMouseUp(e);
 				}
 			});
-			_labelDragToolTip.addMouseMoveListener(new MouseMoveListener() {
+			_labelDragSlideout.addMouseMoveListener(new MouseMoveListener() {
 				@Override
 				public void mouseMove(final MouseEvent e) {
 					onMouseMove(e);
@@ -263,8 +264,8 @@ public class SlideoutTourFilterAdv extends AdvancedToolTipShell {
 		 */
 		final ToolBarManager exitToolbarManager = new ToolBarManager(_ttToolbarControlExit);
 
-		exitToolbarManager.add(_actionCloseToolTip);
-		exitToolbarManager.add(_actionPinToolTip);
+		exitToolbarManager.add(_actionCloseSlideout);
+		exitToolbarManager.add(_actionPinSlideout);
 
 		exitToolbarManager.update(true);
 	}
@@ -275,15 +276,15 @@ public class SlideoutTourFilterAdv extends AdvancedToolTipShell {
 		final int tipWidth = tipSize.x;
 		final int tipHeight = tipSize.y;
 
-		final int itemWidth = _toolTipItemBounds.width;
-		final int itemHeight = _toolTipItemBounds.height;
+		final int itemWidth = _slideoutParentBounds.width;
+		final int itemHeight = _slideoutParentBounds.height;
 
 		// center horizontally
 
-		int devX = _toolTipItemBounds.x;
+		int devX = _slideoutParentBounds.x;
 		devX += itemWidth / 2 - tipWidth / 2;
 
-		int devY = _toolTipItemBounds.y + itemHeight + 0;
+		int devY = _slideoutParentBounds.y + itemHeight + 0;
 
 		final Rectangle displayBounds = Display.getCurrent().getBounds();
 
@@ -291,7 +292,7 @@ public class SlideoutTourFilterAdv extends AdvancedToolTipShell {
 
 			// slideout is below bottom, show it above the action button
 
-			devY = _toolTipItemBounds.y - tipHeight;
+			devY = _slideoutParentBounds.y - tipHeight;
 		}
 
 		return new Point(devX, devY);
@@ -334,7 +335,7 @@ public class SlideoutTourFilterAdv extends AdvancedToolTipShell {
 		_devXMousedown = e.x;
 		_devYMousedown = e.y;
 
-		_labelDragToolTip.setCursor(_cursorResize);
+		_labelDragSlideout.setCursor(_cursorResize);
 	}
 
 	private void onMouseMove(final MouseEvent e) {
@@ -358,9 +359,9 @@ public class SlideoutTourFilterAdv extends AdvancedToolTipShell {
 
 			_isShellDragged = false;
 
-			_labelDragToolTip.setCursor(_cursorHand);
+			_labelDragSlideout.setCursor(_cursorHand);
 
-			setToolTipPinnedLocation();
+			setSlideoutPinnedLocation();
 		}
 	}
 
@@ -370,10 +371,10 @@ public class SlideoutTourFilterAdv extends AdvancedToolTipShell {
 	}
 
 	/**
-	 * @param toolTipItemBounds
+	 * @param slideoutParentBounds
 	 * @param isOpenDelayed
 	 */
-	public void open(final Rectangle toolTipItemBounds, final boolean isOpenDelayed) {
+	public void open(final Rectangle slideoutParentBounds, final boolean isOpenDelayed) {
 
 		if (isVisible()) {
 			return;
@@ -381,16 +382,16 @@ public class SlideoutTourFilterAdv extends AdvancedToolTipShell {
 
 		if (isOpenDelayed == false) {
 
-			if (toolTipItemBounds != null) {
+			if (slideoutParentBounds != null) {
 
-				_toolTipItemBounds = toolTipItemBounds;
+				_slideoutParentBounds = slideoutParentBounds;
 
 				showShell();
 			}
 
 		} else {
 
-			if (toolTipItemBounds == null) {
+			if (slideoutParentBounds == null) {
 
 				// item is not hovered any more
 
@@ -399,7 +400,7 @@ public class SlideoutTourFilterAdv extends AdvancedToolTipShell {
 				return;
 			}
 
-			_toolTipItemBounds = toolTipItemBounds;
+			_slideoutParentBounds = slideoutParentBounds;
 			_canOpenToolTip = true;
 
 			if (_isWaitTimerStarted == false) {
@@ -421,8 +422,9 @@ public class SlideoutTourFilterAdv extends AdvancedToolTipShell {
 	}
 
 	@Override
-	protected void setToolTipPinned(final boolean isToolTipPinned) {
+	protected void restoreSlideoutIsPinned(final boolean isToolTipPinned) {
 
+		_actionPinSlideout.setChecked(isToolTipPinned);
 	}
 
 }

@@ -21,7 +21,13 @@ public class Messages extends NLS {
 
 	private static final String	BUNDLE_NAME	= "net.tourbook.common.messages";				//$NON-NLS-1$
 
+	public static String App_Action_Close_Tooltip;
+
+	public static String App_Action_DragSlideout_ToolTip;
+
 	public static String		App_Action_New_WithConfirm;
+
+	public static String App_Action_PinSlideout_Tooltip;
 	public static String		App_Action_Remove_NoConfirm;
 	public static String		App_Action_Rename_WithConfirm;
 
@@ -141,9 +147,13 @@ public class Messages extends NLS {
 	public static String		Graph_Pref_ColorText;
 
 	public static String		Image___Empty16;
+
+	public static String Image__App_Close;
 	public static String		Image__ColumnCategory;
 	public static String		Image__CustomizeProfilesColumns;
 	public static String		Image__options;
+
+	public static String Image__Pin_Blue;
 	public static String		Image__TourOptions;
 	public static String		Image__TourOptions_Disabled;
 	public static String		Image__weather_sunny;
