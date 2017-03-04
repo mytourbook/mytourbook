@@ -23,15 +23,15 @@ import java.util.Collections;
 
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
-import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.common.tooltip.AdvancedSlideout;
 
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.layout.TableColumnLayout;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -70,7 +70,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DateTime;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -81,7 +80,7 @@ import org.eclipse.swt.widgets.Widget;
 /**
  * Tour chart marker properties slideout.
  */
-public class SlideoutTourFilter extends ToolbarSlideout {
+public class SlideoutTourFilter extends AdvancedSlideout {
 
 //	private final IPreferenceStore	_prefStore	= TourbookPlugin.getPrefStore();
 
@@ -121,12 +120,12 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 				 * This will fix the problem that when the list of a combobox is displayed, then the
 				 * slideout will disappear :-(((
 				 */
-				setIsAnotherDialogOpened(true);
+				setIsKeepSlideoutOpen(true);
 			}
 
 			@Override
 			public void focusLost(final FocusEvent e) {
-				setIsAnotherDialogOpened(false);
+				setIsKeepSlideoutOpen(false);
 			}
 		};
 	}
@@ -191,9 +190,11 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 	}
 
-	public SlideoutTourFilter(final Control ownerControl, final ToolBar toolBar) {
+	public SlideoutTourFilter(final Control ownerControl, final Control toolBar, final IDialogSettings state) {
 
-		super(ownerControl, toolBar);
+		super(ownerControl, toolBar, state, new int[] { 700, 300, 700, 300 });
+
+		setDraggerText(Messages.Slideout_TourFilter_Label_Title);
 	}
 
 	void action_ProfileAdd() {
@@ -238,7 +239,7 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 		 * Confirm deletion
 		 */
 		boolean isDeleteProfile;
-		setIsAnotherDialogOpened(true);
+		setIsKeepSlideoutOpen(true);
 		{
 			isDeleteProfile = MessageDialog.openConfirm(
 
@@ -248,7 +249,7 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 							Messages.Slideout_TourFilter_Confirm_DeleteProperty_Message,
 							filterProperty.fieldConfig.name));
 		}
-		setIsAnotherDialogOpened(false);
+		setIsKeepSlideoutOpen(false);
 
 		if (isDeleteProfile == false) {
 			return;
@@ -295,7 +296,7 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 	}
 
 	@Override
-	protected Composite createToolTipContentArea(final Composite parent) {
+	protected void createSlideoutContent(final Composite parent) {
 
 		/*
 		 * Reset to a valid state when the slideout is opened again
@@ -305,26 +306,24 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 		initUI(parent);
 		createActions();
 
-		final Composite ui = createUI(parent);
+		createUI(parent);
 
 		// load viewer
 		_profileViewer.setInput(new Object());
 
 		restoreState();
 		enableControls();
-
-		return ui;
 	}
 
 	private Composite createUI(final Composite parent) {
 
 		final Composite shellContainer = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(shellContainer);
 		GridLayoutFactory.swtDefaults().applyTo(shellContainer);
+//		shellContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
-			createUI_100_Title(shellContainer);
-
 			final Composite container = new Composite(shellContainer, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+			GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
 			GridLayoutFactory
 					.fillDefaults()//
 					.numColumns(2)
@@ -333,7 +332,7 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 				createUI_200_Profiles(container);
 
 				final Composite filterContainer = new Composite(container, SWT.NONE);
-				GridDataFactory.fillDefaults().grab(true, false).applyTo(filterContainer);
+				GridDataFactory.fillDefaults().grab(true, true).applyTo(filterContainer);
 				GridLayoutFactory.fillDefaults().numColumns(1).applyTo(filterContainer);
 				{
 					createUI_300_FilterInfo(filterContainer);
@@ -346,24 +345,13 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 		return shellContainer;
 	}
 
-	private void createUI_100_Title(final Composite parent) {
-
-		/*
-		 * Label: Slideout title
-		 */
-		final Label label = new Label(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().applyTo(label);
-		label.setText(Messages.Slideout_TourFilter_Label_Title);
-		label.setFont(JFaceResources.getBannerFont());
-	}
 
 	private void createUI_200_Profiles(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory
 				.fillDefaults()//
-//				.grab(true, true)
-				.hint(_pc.convertWidthInCharsToPixels(20), _pc.convertHeightInCharsToPixels(15))
+				.hint(_pc.convertWidthInCharsToPixels(20), _pc.convertHeightInCharsToPixels(5))
 				.applyTo(container);
 		GridLayoutFactory
 				.fillDefaults()//
@@ -371,6 +359,12 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 				.spacing(0, 2)
 				.applyTo(container);
 		{
+			{
+				final Label label = new Label(container, SWT.NONE);
+				GridDataFactory.fillDefaults().applyTo(label);
+				label.setText(Messages.Slideout_TourFilter_Label_Profiles);
+			}
+
 			createUI_210_ProfileViewer(container);
 
 			{
@@ -512,7 +506,7 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 		GridDataFactory
 				.fillDefaults()//
 				.grab(true, true)
-				.hint(SWT.DEFAULT, _pc.convertHeightInCharsToPixels(10))
+				.hint(SWT.DEFAULT, _pc.convertHeightInCharsToPixels(2))
 				.applyTo(_filterOuterContainer);
 		{
 //			createUI_410_FilterContent();
@@ -523,9 +517,6 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 	 * Create the filter fields from the selected profile.
 	 */
 	private void createUI_410_FilterProperties() {
-
-		// ensure that this is reseted
-		setIsAnotherDialogOpened(false);
 
 		if (isFilterDisposed()) {
 			return;
@@ -715,10 +706,10 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 	private Composite createUI_420_FilterScrolledContainer(final Composite parent) {
 
 		// scrolled container
-		_filterScrolledContainer = new ScrolledComposite(parent, SWT.V_SCROLL);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(_filterScrolledContainer);
+		_filterScrolledContainer = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL);
 		_filterScrolledContainer.setExpandVertical(true);
 		_filterScrolledContainer.setExpandHorizontal(true);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(_filterScrolledContainer);
 
 		// properties container
 		final Composite filterContainer = new Composite(_filterScrolledContainer, SWT.NONE);
@@ -726,7 +717,6 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 				.fillDefaults()//
 //				.grab(true, true)
 				.applyTo(filterContainer);
-
 		_filterScrolledContainer.setContent(filterContainer);
 		_filterScrolledContainer.addControlListener(new ControlAdapter() {
 			@Override
@@ -1178,11 +1168,6 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 		_pc = new PixelConverter(parent);
 	}
 
-	@Override
-	protected boolean isCenterHorizontal() {
-		return true;
-	}
-
 	private boolean isFilterDisposed() {
 
 		if (_filterOuterContainer != null && _filterOuterContainer.isDisposed()) {
@@ -1302,14 +1287,14 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 		 * Confirm deletion
 		 */
 		boolean isDeleteProfile;
-		setIsAnotherDialogOpened(true);
+		setIsKeepSlideoutOpen(true);
 		{
 			isDeleteProfile = MessageDialog.openConfirm(
 					Display.getCurrent().getActiveShell(),
 					Messages.Slideout_TourFilter_Confirm_DeleteProfile_Title,
 					NLS.bind(Messages.Slideout_TourFilter_Confirm_DeleteProfile_Message, _selectedProfile.name));
 		}
-		setIsAnotherDialogOpened(false);
+		setIsKeepSlideoutOpen(false);
 
 		if (isDeleteProfile == false) {
 			return;
@@ -1506,8 +1491,8 @@ public class SlideoutTourFilter extends ToolbarSlideout {
 
 		enableControls();
 
-		final Shell shell = _filterOuterContainer.getShell();
-		shell.pack(true);
+//		final Shell shell = _filterOuterContainer.getShell();
+//		shell.pack(true);
 	}
 
 	private void updateUI_PropertyDetail(final TourFilterProperty filterProperty) {

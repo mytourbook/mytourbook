@@ -23,7 +23,6 @@ import java.time.MonthDay;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
-import net.tourbook.application.ActionTourFilter;
 import net.tourbook.application.ActionTourFilterAdv;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -34,7 +33,6 @@ import net.tourbook.preferences.ITourbookPreferences;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
@@ -222,7 +220,7 @@ public class TourFilterManager {
 	
 	private static final Bundle					_bundle				= TourbookPlugin.getDefault().getBundle();
 
-	private static final IDialogSettings		_state				= TourbookPlugin.getState("net.tourbook.tour.filter.TourFilterManager"); //$NON-NLS-1$
+//	private static final IDialogSettings		_state				= TourbookPlugin.getState("net.tourbook.tour.filter.TourFilterManager"); //$NON-NLS-1$
 	private static final IPath					_stateLocation		= Platform.getStateLocation(_bundle);
 	private final static IPreferenceStore		_prefStore			= TourbookPlugin.getPrefStore();
 
@@ -231,7 +229,6 @@ public class TourFilterManager {
 
 	private static ArrayList<TourFilterProfile>	_filterProfiles	= new ArrayList<>();
 
-	private static ActionTourFilter				_actionTourFilter;
 	private static ActionTourFilterAdv			_actionTourFilterAdv;
 
 	private static TourFilterProfile			_selectedProfile;
@@ -591,7 +588,6 @@ public class TourFilterManager {
 
 		final boolean isTourFilterActive = _prefStore.getBoolean(ITourbookPreferences.APP_TOUR_FILTER_IS_SELECTED);
 
-		_actionTourFilter.setSelection(isTourFilterActive);
 		_actionTourFilterAdv.setSelection(isTourFilterActive);
 
 		readFilterProfile();
@@ -599,7 +595,6 @@ public class TourFilterManager {
 
 	public static void saveState() {
 
-//		_prefStore.setValue(ITourbookPreferences.APP_TOUR_FILTER_IS_SELECTED, _actionTourFilter.getSelection());
 		_prefStore.setValue(ITourbookPreferences.APP_TOUR_FILTER_IS_SELECTED, _actionTourFilterAdv.getSelection());
 
 		final XMLMemento xmlRoot = writeFilterProfile();
@@ -620,12 +615,8 @@ public class TourFilterManager {
 	public static void setSelection(final boolean isSelected) {
 
 		fireTourFilterModifyEvent();
-
 	}
 
-	public static void setTourFilterAction(final ActionTourFilter actionTourFilter) {
-		_actionTourFilter = actionTourFilter;
-	}
 
 	public static void setTourFilterAction(final ActionTourFilterAdv actionTourFilterAdv) {
 		_actionTourFilterAdv = actionTourFilterAdv;

@@ -138,7 +138,12 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
 
 		@Override
 		public void run() {
-			actionPinSlideout(_actionPinToolTip.isChecked());
+
+			final boolean isPinned = _actionPinToolTip.isChecked();
+
+			setIsSlideoutPinned(isPinned);
+
+			enableControls();
 		}
 	}
 
@@ -193,7 +198,7 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
 
 	public PhotoToolTipUI(final Control ownerControl, final IDialogSettings state) {
 
-		super(ownerControl, state);
+		super(ownerControl, state, null);
 
 		_state = state;
 
@@ -326,7 +331,7 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
 	}
 
 	@Override
-	protected Composite createToolTipContentArea(final Composite parent) {
+	protected Composite createSlideoutContentArea(final Composite parent) {
 
 		final Composite container = createUI(parent);
 
@@ -453,7 +458,6 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
 		}
 	}
 
-	@Override
 	protected void enableControls() {
 
 		_actionToolTipLocation.setEnabled(isToolTipPinned() == false);
@@ -582,15 +586,15 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
 		enableControls();
 	}
 
+	@Override
+	protected void restoreState_SlideoutIsPinned(final boolean isToolTipPinned) {
+		_actionPinToolTip.setChecked(isToolTipPinned);
+	}
+
 	protected void saveState() {
 
 		_state.put(STATE_PHOTO_GALLERY_IS_VERTICAL, _isVerticalGallery);
 		_state.put(STATE_TOOL_TIP_LOCATION, _toolTipLocationUpDown);
-	}
-
-	@Override
-	protected void restoreSlideoutIsPinned(final boolean isToolTipPinned) {
-		_actionPinToolTip.setChecked(isToolTipPinned);
 	}
 
 	protected void showPhotoToolTip(final ArrayList<ChartPhoto> hoveredPhotos, final boolean isLinkPhotoDisplayed) {

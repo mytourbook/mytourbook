@@ -18,6 +18,7 @@ package net.tourbook.application;
 import net.tourbook.Messages;
 import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.tour.filter.ActionToolbarSlideoutAdv;
+import net.tourbook.tour.filter.SlideoutTourFilter;
 import net.tourbook.tour.filter.TourFilterManager;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -33,6 +34,8 @@ public class ActionTourFilterAdv extends ActionToolbarSlideoutAdv {
 
 	private static final IDialogSettings	_state	= TourbookPlugin.getState("TourFilter");//$NON-NLS-1$
 	
+	private SlideoutTourFilter _slideoutTourFilter;
+	
 // SET_FORMATTING_ON
 
 	public ActionTourFilterAdv() {
@@ -46,7 +49,9 @@ public class ActionTourFilterAdv extends ActionToolbarSlideoutAdv {
 	@Override
 	protected AdvancedSlideout createSlideout(final ToolBar toolbar) {
 
-		return new AdvancedSlideout(toolbar, toolbar, _state);
+		_slideoutTourFilter = new SlideoutTourFilter(toolbar, toolbar, _state);
+
+		return _slideoutTourFilter;
 	}
 
 	@Override

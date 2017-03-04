@@ -24,6 +24,7 @@ import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -42,32 +43,37 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 
-public class AdvancedSlideout extends AdvancedSlideoutShell {
+public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 
 	// initialize with default values which are (should) never be used
-	private Rectangle			_slideoutParentBounds	= new Rectangle(0, 0, 50, 50);
+	private Rectangle				_slideoutParentBounds	= new Rectangle(0, 0, 50, 50);
 
-	private final WaitTimer		_waitTimer				= new WaitTimer();
+	private final WaitTimer			_waitTimer				= new WaitTimer();
 
-	private boolean				_isWaitTimerStarted;
-	private boolean				_canOpenToolTip;
+	private boolean					_isWaitTimerStarted;
+	private boolean					_canOpenToolTip;
 
-	private boolean				_isShellDragged;
-	private int					_devXMousedown;
-	private int					_devYMousedown;
+	private boolean					_isShellDragged;
+	private int						_devXMousedown;
+	private int						_devYMousedown;
 
-	private ActionCloseSlideout	_actionCloseSlideout;
-	private ActionPinSlideout	_actionPinSlideout;
+	private ActionCloseSlideout		_actionCloseSlideout;
+	private ActionSlideoutKeepOpen	_actionKeepSlideoutOpen;
+	private ActionPinSlideout		_actionPinSlideout;
+
+	private boolean					_isToolbarPositionRight	= true;
+
+	private String					_draggerText			= UI.EMPTY_STRING;
 
 	/*
 	 * UI controls
 	 */
-	private ToolBar				_ttToolbarControlExit;
+	private ToolBar					_toolbarSlideoutActions;
 
-	private Label				_labelDragSlideout;
+	private Label					_labelDragSlideout;
 
-	private Cursor				_cursorResize;
-	private Cursor				_cursorHand;
+	private Cursor					_cursorResize;
+	private Cursor					_cursorHand;
 
 	private class ActionCloseSlideout extends Action {
 
@@ -81,7 +87,7 @@ public class AdvancedSlideout extends AdvancedSlideoutShell {
 
 		@Override
 		public void run() {
-			hideNow();
+			close();
 		}
 	}
 
@@ -91,13 +97,29 @@ public class AdvancedSlideout extends AdvancedSlideoutShell {
 
 			super(null, Action.AS_CHECK_BOX);
 
-			setToolTipText(Messages.App_Action_PinSlideout_Tooltip);
+			setToolTipText(Messages.Slideout_Dialog_Action_PinSlideoutLocation_Tooltip);
 			setImageDescriptor(CommonActivator.getImageDescriptor(Messages.Image__Pin_Blue));
 		}
 
 		@Override
 		public void run() {
-			actionPinSlideout(_actionPinSlideout.isChecked());
+			setIsSlideoutPinned(isChecked());
+		}
+	}
+
+	private class ActionSlideoutKeepOpen extends Action {
+
+		public ActionSlideoutKeepOpen() {
+
+			super(null, Action.AS_CHECK_BOX);
+
+			setToolTipText(Messages.Slideout_Dialog_Action_KeepSlideoutOpen_Tooltip);
+			setImageDescriptor(CommonActivator.getImageDescriptor(Messages.Image__BookOpen));
+		}
+
+		@Override
+		public void run() {
+			setIsKeepSlideoutOpen(isChecked());
 		}
 	}
 
@@ -108,13 +130,16 @@ public class AdvancedSlideout extends AdvancedSlideoutShell {
 		}
 	}
 
-	public AdvancedSlideout(final Control ownerControl, final Control toolBar, final IDialogSettings state) {
+	public AdvancedSlideout(final Control ownerControl,
+							final Control toolBar,
+							final IDialogSettings state,
+							final int[] slideoutDefaultSize) {
 
-		super(ownerControl, state);
+		super(ownerControl, state, slideoutDefaultSize);
 
 		setShellFadeInSteps(10);
 		setShellFadeOutSteps(30);
-		setShellFadeOutDelaySteps(30);
+		setShellFadeOutDelaySteps(10);
 
 		initUI(ownerControl);
 		addListener(ownerControl, toolBar);
@@ -151,12 +176,20 @@ public class AdvancedSlideout extends AdvancedSlideoutShell {
 
 	private void createActions() {
 
-		_actionPinSlideout = new ActionPinSlideout();
 		_actionCloseSlideout = new ActionCloseSlideout();
+		_actionKeepSlideoutOpen = new ActionSlideoutKeepOpen();
+		_actionPinSlideout = new ActionPinSlideout();
 	}
 
+	/**
+	 * Create the content for the slideout.
+	 * 
+	 * @param parent
+	 */
+	protected abstract void createSlideoutContent(Composite parent);
+
 	@Override
-	protected Composite createToolTipContentArea(final Composite parent) {
+	protected Composite createSlideoutContentArea(final Composite parent) {
 
 		final Composite container = createUI(parent);
 
@@ -166,11 +199,14 @@ public class AdvancedSlideout extends AdvancedSlideoutShell {
 	private Composite createUI(final Composite parent) {
 
 		final Composite shellContainer = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.fillDefaults().numColumns(1).spacing(2, 2).applyTo(shellContainer);
-//		shellContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+		GridLayoutFactory
+				.fillDefaults()//
+				.spacing(0, 0)
+				.applyTo(shellContainer);
+//		shellContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 		{
 			createUI_10_ActionBar(shellContainer);
-			createUI_20_TourFilter(shellContainer);
+			createSlideoutContent(shellContainer);
 		}
 
 		fillActionBar();
@@ -180,81 +216,88 @@ public class AdvancedSlideout extends AdvancedSlideoutShell {
 
 	private void createUI_10_ActionBar(final Composite parent) {
 
-		GridLayoutFactory.fillDefaults().applyTo(parent);
-
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+
 		{
-			/*
-			 * create toolbar for the exit button
-			 */
-			_ttToolbarControlExit = new ToolBar(container, SWT.FLAT);
-			GridDataFactory
-					.fillDefaults()//
-					.applyTo(_ttToolbarControlExit);
-//			_ttToolbarControlExit.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+			if (_isToolbarPositionRight) {
 
-			/*
-			 * spacer
-			 */
-			_labelDragSlideout = new Label(container, SWT.NONE);
-			GridDataFactory
-					.fillDefaults()//
-					.grab(true, false)
-					.hint(50, SWT.DEFAULT)
-					.applyTo(_labelDragSlideout);
-			_labelDragSlideout.setText(UI.EMPTY_STRING);
-//			Photo_Tooltip_Action_MoveToolTip_ToolTip = Drag photo tooltip
+				createUI_12_ActionBar_Draggable(container);
+				createUI_14_ActionBar_Toolbar(container);
 
-			_labelDragSlideout.setToolTipText(Messages.App_Action_DragSlideout_ToolTip);
-//			_labelDragToolTip.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-			_labelDragSlideout.addMouseTrackListener(new MouseTrackListener() {
+			} else {
 
-				@Override
-				public void mouseEnter(final MouseEvent e) {
-					_labelDragSlideout.setCursor(_cursorHand);
-				}
+				// toolbar is on the left side
 
-				@Override
-				public void mouseExit(final MouseEvent e) {
-					_labelDragSlideout.setCursor(null);
-				}
-
-				@Override
-				public void mouseHover(final MouseEvent e) {
-
-				}
-			});
-
-			_labelDragSlideout.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseDown(final MouseEvent e) {
-					onMouseDown(e);
-				}
-
-				@Override
-				public void mouseUp(final MouseEvent e) {
-					onMouseUp(e);
-				}
-			});
-			_labelDragSlideout.addMouseMoveListener(new MouseMoveListener() {
-				@Override
-				public void mouseMove(final MouseEvent e) {
-					onMouseMove(e);
-				}
-			});
+				createUI_14_ActionBar_Toolbar(container);
+				createUI_12_ActionBar_Draggable(container);
+			}
 		}
 	}
 
-	private void createUI_20_TourFilter(final Composite parent) {
-		// TODO Auto-generated method stub
+	private void createUI_12_ActionBar_Draggable(final Composite container) {
 
+		_labelDragSlideout = new Label(container, SWT.NONE);
+		GridDataFactory
+				.fillDefaults()//
+				.grab(true, false)
+				.align(SWT.FILL, SWT.CENTER)
+				.indent(3, 0)
+				.applyTo(_labelDragSlideout);
+		_labelDragSlideout.setText(_draggerText);
+		_labelDragSlideout.setToolTipText(Messages.App_Action_DragSlideout_ToolTip);
+		_labelDragSlideout.setFont(JFaceResources.getBannerFont());
+//		_labelDragSlideout.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
+
+		_labelDragSlideout.addMouseTrackListener(new MouseTrackListener() {
+
+			@Override
+			public void mouseEnter(final MouseEvent e) {
+				_labelDragSlideout.setCursor(_cursorHand);
+			}
+
+			@Override
+			public void mouseExit(final MouseEvent e) {
+				_labelDragSlideout.setCursor(null);
+			}
+
+			@Override
+			public void mouseHover(final MouseEvent e) {
+
+			}
+		});
+
+		_labelDragSlideout.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseDown(final MouseEvent e) {
+				onMouseDown(e);
+			}
+
+			@Override
+			public void mouseUp(final MouseEvent e) {
+				onMouseUp(e);
+			}
+		});
+		_labelDragSlideout.addMouseMoveListener(new MouseMoveListener() {
+			@Override
+			public void mouseMove(final MouseEvent e) {
+				onMouseMove(e);
+			}
+		});
 	}
 
-	@Override
-	protected void enableControls() {
+	/**
+	 * Create toolbar for the exit button
+	 */
+	private void createUI_14_ActionBar_Toolbar(final Composite container) {
 
+		_toolbarSlideoutActions = new ToolBar(container, SWT.FLAT);
+		GridDataFactory
+				.fillDefaults()//
+				.applyTo(_toolbarSlideoutActions);
+//			_ttToolbarControlExit.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 	}
 
 	private void fillActionBar() {
@@ -262,10 +305,20 @@ public class AdvancedSlideout extends AdvancedSlideoutShell {
 		/*
 		 * fill exit toolbar
 		 */
-		final ToolBarManager exitToolbarManager = new ToolBarManager(_ttToolbarControlExit);
+		final ToolBarManager exitToolbarManager = new ToolBarManager(_toolbarSlideoutActions);
 
-		exitToolbarManager.add(_actionCloseSlideout);
-		exitToolbarManager.add(_actionPinSlideout);
+		if (_isToolbarPositionRight) {
+
+			exitToolbarManager.add(_actionPinSlideout);
+			exitToolbarManager.add(_actionKeepSlideoutOpen);
+			exitToolbarManager.add(_actionCloseSlideout);
+
+		} else {
+
+			exitToolbarManager.add(_actionCloseSlideout);
+			exitToolbarManager.add(_actionKeepSlideoutOpen);
+			exitToolbarManager.add(_actionPinSlideout);
+		}
 
 		exitToolbarManager.update(true);
 	}
@@ -422,9 +475,30 @@ public class AdvancedSlideout extends AdvancedSlideoutShell {
 	}
 
 	@Override
-	protected void restoreSlideoutIsPinned(final boolean isToolTipPinned) {
+	protected void restoreState_KeepSlideoutOpen(final boolean isKeepSlideoutOpen) {
+
+		_actionKeepSlideoutOpen.setChecked(isKeepSlideoutOpen);
+	}
+
+	@Override
+	protected void restoreState_SlideoutIsPinned(final boolean isToolTipPinned) {
 
 		_actionPinSlideout.setChecked(isToolTipPinned);
+	}
+
+	protected void setDraggerText(final String draggerText) {
+		_draggerText = draggerText;
+	}
+
+	/**
+	 * Set the toolbar horizontal position
+	 * 
+	 * @param isToolbarPositionRight
+	 *            When <code>true</code> the toolbar is positioned on the right side otherwise on
+	 *            the left side.
+	 */
+	public void setIsToolbarPosition(final boolean isToolbarPositionRight) {
+		_isToolbarPositionRight = isToolbarPositionRight;
 	}
 
 }

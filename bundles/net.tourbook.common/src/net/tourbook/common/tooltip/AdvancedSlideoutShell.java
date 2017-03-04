@@ -77,6 +77,8 @@ public abstract class AdvancedSlideoutShell {
 	private static final String			STATE_VERT_SLIDEOUT_PIN_LOCATION_X	= "STATE_VERT_SLIDEOUT_PIN_LOCATION_X";		//$NON-NLS-1$
 	private static final String			STATE_VERT_SLIDEOUT_PIN_LOCATION_Y	= "STATE_VERT_SLIDEOUT_PIN_LOCATION_Y";		//$NON-NLS-1$
 
+	private static final String			STATE_IS_KEEP_SLIDEOUT_OPEN			= "STATE_IS_KEEP_SLIDEOUT_OPEN";			//$NON-NLS-1$
+
 	private static final int			MIN_SHELL_HORIZ_WIDTH				= 100;
 	private static final int			MIN_SHELL_HORIZ_HEIGHT				= 60;
 	private static final int			MIN_SHELL_VERT_WIDTH				= 100;
@@ -113,6 +115,7 @@ public abstract class AdvancedSlideoutShell {
 	private boolean						_isShellFadingIn;
 
 	private boolean						_isSlideoutPinned;
+	private boolean						_isKeepSlideoutOpen;
 
 	private Point						_shellStartLocation;
 	private Point						_shellEndLocation					= new Point(0, 0);
@@ -226,8 +229,24 @@ public abstract class AdvancedSlideoutShell {
 	 * @param state
 	 * @param ownerControl
 	 *            The control on whose action the tooltip is shown
+	 * @param slideoutDefaultSize
+	 *            Slideout default size or <code>null</code> when not available.
+	 *            <p>
+	 *            The default default size is
+	 *            <p>
+	 * 
+	 *            <pre>
+	 *            horizContentDefaultWidth = 300;
+	 *            horizContentDefaultHeight = 150;
+	 * 
+	 *            vertContentDefaultWidth = 400;
+	 *            vertContentDefaultHeight = 250;
+	 * 
+	 *            </pre>
 	 */
-	public AdvancedSlideoutShell(final Control ownerControl, final IDialogSettings state) {
+	public AdvancedSlideoutShell(	final Control ownerControl,
+									final IDialogSettings state,
+									final int[] slideoutDefaultSize) {
 
 		_ownerControl = ownerControl;
 		_state = state;
@@ -245,18 +264,7 @@ public abstract class AdvancedSlideoutShell {
 
 		ownerControlAddListener();
 
-		restoreState();
-	}
-
-	protected void actionPinSlideout(final boolean isPinned) {
-
-		_isSlideoutPinned = isPinned;
-
-		if (isPinned) {
-			setSlideoutPinnedLocation();
-		}
-
-		enableControls();
+		restoreState(slideoutDefaultSize);
 	}
 
 	/**
@@ -563,9 +571,22 @@ public abstract class AdvancedSlideoutShell {
 			return true;
 		}
 
+		if (_isKeepSlideoutOpen) {
+			return false;
+		}
+
 		final Shell[] openedShells = _visibleShell.getShells();
 
 		return openedShells.length == 0;
+	}
+
+	/**
+	 * Close the slideout, any possible flags to keep it open are ignored, the shell will be also
+	 * disposed.
+	 */
+	public void close() {
+
+		ttHide_NoFlags();
 	}
 
 	protected abstract void closeInternalShells();
@@ -577,7 +598,7 @@ public abstract class AdvancedSlideoutShell {
 	 *            the parent of the content area
 	 * @return the content area created
 	 */
-	protected abstract Composite createToolTipContentArea(Composite parent);
+	protected abstract Composite createSlideoutContentArea(Composite parent);
 
 	/**
 	 * Create a shell but do not display it
@@ -633,14 +654,15 @@ public abstract class AdvancedSlideoutShell {
 		ownerShellAddListener();
 
 		// create UI
-		_ttContentArea = createToolTipContentArea(_rrShellNoResize.getShellPage());
+		_ttContentArea = createSlideoutContentArea(_rrShellNoResize.getShellPage());
 
 		ttAllControlsAddListener(_visibleShell);
 
 		updateUI_Colors();
 
 		// restore tooltip pin state
-		restoreSlideoutIsPinned(_isSlideoutPinned);
+		restoreState_SlideoutIsPinned(_isSlideoutPinned);
+		restoreState_KeepSlideoutOpen(_isKeepSlideoutOpen);
 
 		afterCreateShell(_visibleShell);
 	}
@@ -648,8 +670,6 @@ public abstract class AdvancedSlideoutShell {
 	protected void doNotStopAnimation() {
 		_isDoNotStopAnimation = true;
 	}
-
-	protected abstract void enableControls();
 
 	private Point fixupDisplayBounds(final Point tipSize, final Point location) {
 
@@ -718,7 +738,7 @@ public abstract class AdvancedSlideoutShell {
 
 	protected Color getShellColor_Background(final ColorRegistry colorRegistry) {
 		return Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
-	};
+	}
 
 	protected Color getShellColor_Foreground(final ColorRegistry colorRegistry) {
 		return Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_FOREGROUND);
@@ -726,7 +746,7 @@ public abstract class AdvancedSlideoutShell {
 
 	protected String getShellTitle_NoResize() {
 		return UI.EMPTY_STRING;
-	}
+	};
 
 	protected String getShellTitle_WithResize() {
 		return UI.EMPTY_STRING;
@@ -752,7 +772,7 @@ public abstract class AdvancedSlideoutShell {
 	 * Hide the currently active tool tip with animation.
 	 */
 	public void hide() {
-		ttHide(null);
+		ttHide_WithAnimation();
 	}
 
 	/**
@@ -832,7 +852,7 @@ public abstract class AdvancedSlideoutShell {
 					// hide tooltip when another shell is activated
 
 					if (_display.getActiveShell() != _visibleShell) {
-						ttHide(event);
+						ttHide_WithAnimation();
 					}
 				}
 			});
@@ -1024,7 +1044,7 @@ public abstract class AdvancedSlideoutShell {
 				return;
 			}
 
-			ttHide(event);
+			ttHide_WithAnimation();
 		}
 
 //		System.out.println("time\t" + ((float) (System.nanoTime() - start) / 1000000) + " ms");
@@ -1062,7 +1082,7 @@ public abstract class AdvancedSlideoutShell {
 							return;
 						}
 
-						ttHide(event);
+						ttHide_WithAnimation();
 					}
 				});
 			}
@@ -1253,20 +1273,33 @@ public abstract class AdvancedSlideoutShell {
 		}
 	}
 
-	/**
-	 * Restore slideout pin state.
-	 * 
-	 * @param isSlideoutPinned
-	 */
-	protected abstract void restoreSlideoutIsPinned(boolean isSlideoutPinned);
+	private void restoreState(final int[] defaultSize) {
 
-	private void restoreState() {
+		int horizContentDefaultWidth;
+		int horizContentDefaultHeight;
+		int vertContentDefaultWidth;
+		int vertContentDefaultHeight;
+
+		if (defaultSize != null && defaultSize.length == 4) {
+
+			horizContentDefaultWidth = defaultSize[0];
+			horizContentDefaultHeight = defaultSize[1];
+			vertContentDefaultWidth = defaultSize[2];
+			vertContentDefaultHeight = defaultSize[3];
+
+		} else {
+
+			horizContentDefaultWidth = 300;
+			horizContentDefaultHeight = 150;
+			vertContentDefaultWidth = 400;
+			vertContentDefaultHeight = 250;
+		}
 
 		/*
 		 * get horizontal gallery values
 		 */
-		_horizContentWidth = Util.getStateInt(_state, STATE_HORIZ_SLIDEOUT_WIDTH, 300);
-		_horizContentHeight = Util.getStateInt(_state, STATE_HORIZ_SLIDEOUT_HEIGHT, 150);
+		_horizContentWidth = Util.getStateInt(_state, STATE_HORIZ_SLIDEOUT_WIDTH, horizContentDefaultWidth);
+		_horizContentHeight = Util.getStateInt(_state, STATE_HORIZ_SLIDEOUT_HEIGHT, horizContentDefaultHeight);
 
 		// ensure min values
 		if (_horizContentWidth < MIN_SHELL_HORIZ_WIDTH) {
@@ -1280,8 +1313,8 @@ public abstract class AdvancedSlideoutShell {
 		/*
 		 * get vertical gallery values
 		 */
-		_vertContentWidth = Util.getStateInt(_state, STATE_VERT_SLIDEOUT_WIDTH, 400);
-		_vertContentHeight = Util.getStateInt(_state, STATE_VERT_SLIDEOUT_HEIGHT, 250);
+		_vertContentWidth = Util.getStateInt(_state, STATE_VERT_SLIDEOUT_WIDTH, vertContentDefaultWidth);
+		_vertContentHeight = Util.getStateInt(_state, STATE_VERT_SLIDEOUT_HEIGHT, vertContentDefaultHeight);
 
 		// ensure min values
 		if (_vertContentWidth < MIN_SHELL_VERT_WIDTH) {
@@ -1302,7 +1335,23 @@ public abstract class AdvancedSlideoutShell {
 		_horizPinLocationY = Util.getStateInt(_state, STATE_HORIZ_SLIDEOUT_PIN_LOCATION_Y, defaultPosition);
 		_vertPinLocationX = Util.getStateInt(_state, STATE_VERT_SLIDEOUT_PIN_LOCATION_X, defaultPosition);
 		_vertPinLocationY = Util.getStateInt(_state, STATE_VERT_SLIDEOUT_PIN_LOCATION_Y, defaultPosition);
+
+		_isKeepSlideoutOpen = Util.getStateBoolean(_state, STATE_IS_KEEP_SLIDEOUT_OPEN, false);
 	}
+
+	/**
+	 * Restore keep open slideout state.
+	 * 
+	 * @param isKeepSlideoutOpen
+	 */
+	protected void restoreState_KeepSlideoutOpen(final boolean isKeepSlideoutOpen) {}
+
+	/**
+	 * Restore slideout pin state.
+	 * 
+	 * @param isSlideoutPinned
+	 */
+	protected void restoreState_SlideoutIsPinned(final boolean isSlideoutPinned) {}
 
 	private void saveState() {
 
@@ -1316,6 +1365,8 @@ public abstract class AdvancedSlideoutShell {
 		_state.put(STATE_HORIZ_SLIDEOUT_PIN_LOCATION_Y, _horizPinLocationY);
 		_state.put(STATE_VERT_SLIDEOUT_PIN_LOCATION_X, _vertPinLocationX);
 		_state.put(STATE_VERT_SLIDEOUT_PIN_LOCATION_Y, _vertPinLocationY);
+
+		_state.put(STATE_IS_KEEP_SLIDEOUT_OPEN, _isKeepSlideoutOpen);
 	}
 
 	/**
@@ -1329,8 +1380,25 @@ public abstract class AdvancedSlideoutShell {
 		_visibleShell = rrShell.getShell();
 	}
 
+	/**
+	 * @param isKeepOpen
+	 *            When <code>true</code> then the slideout will never be closed.
+	 */
+	protected void setIsKeepSlideoutOpen(final boolean isKeepOpen) {
+		_isKeepSlideoutOpen = isKeepOpen;
+	}
+
 	protected void setIsShellToggle() {
 		_isShellToggled = true;
+	}
+
+	protected void setIsSlideoutPinned(final boolean isPinned) {
+
+		_isSlideoutPinned = isPinned;
+
+		if (isPinned) {
+			setSlideoutPinnedLocation();
+		}
 	}
 
 	protected void setShellFadeInSteps(final int shellFadeInSteps) {
@@ -1366,11 +1434,6 @@ public abstract class AdvancedSlideoutShell {
 		if (isVisible == false) {
 			saveState();
 		}
-//		final Rectangle shellBounds = _visibleShell.getBounds();
-
-//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//				+ ("\tsetShellVisible: " + isVisible)+("\t"+shellBounds));
-		// TODO remove SYSTEM.OUT.PRINTLN
 
 		_visibleShell.setVisible(isVisible);
 
@@ -1562,7 +1625,29 @@ public abstract class AdvancedSlideoutShell {
 		_isDoNotStopAnimation = false;
 	}
 
-	private void ttHide(final Event event) {
+	/**
+	 * Hide current shell immediatedly without animation and any flags.
+	 */
+	private void ttHide_NoFlags() {
+
+		closeInternalShells();
+
+		_visibleShell.setAlpha(0);
+
+		// hide shell
+		setShellVisible(false);
+
+		_isShellFadingIn = false;
+		_isShellFadingOut = false;
+
+		_isDoNotStopAnimation = false;
+
+		// finally dispose the UI
+		_visibleShell.dispose();
+		_visibleShell = null;
+	}
+
+	private void ttHide_WithAnimation() {
 
 		if (isHidden()) {
 			return;
@@ -1593,6 +1678,7 @@ public abstract class AdvancedSlideoutShell {
 	}
 
 	private void ttShellAddListener(final Shell shell) {
+
 		// hide tooltip if user selects outside of the shell
 		shell.addListener(SWT.Deactivate, _ttShellListener);
 		shell.addListener(SWT.Dispose, _ttShellListener);

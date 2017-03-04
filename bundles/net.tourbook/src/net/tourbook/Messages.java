@@ -377,8 +377,7 @@ public class Messages extends NLS {
 
 	public static String		App_Action_About;
 	public static String		App_Action_Cancel;
-	public static String App_Action_Close;
-
+	public static String		App_Action_Close;
 	public static String		App_Action_Close_ToolTip;
 	public static String		App_Action_Columns;
 	public static String		App_Action_Dialog_ActionIsInProgress_Message;
@@ -435,7 +434,7 @@ public class Messages extends NLS {
 
 	public static String		App_Link_RestoreDefaultValues;
 
-	public static String App_Slideout_Action_PinSlideout;
+	public static String		App_Slideout_Action_PinSlideout;
 
 	public static String		App_Splash_Copyright;
 
@@ -1573,14 +1572,10 @@ public class Messages extends NLS {
 	public static String		Slideout_TourFilter_Action_CopyProfile_Tooltip;
 	public static String		Slideout_TourFilter_Action_DeleteProfile_Tooltip;
 	public static String		Slideout_TourFilter_Action_DeleteProperty_Tooltip;
-
-	public static String Slideout_TourFilter_Action_MovePropertyDown_Tooltip;
-
-	public static String Slideout_TourFilter_Action_MovePropertyUp_Tooltip;
-
+	public static String		Slideout_TourFilter_Action_MovePropertyDown_Tooltip;
+	public static String		Slideout_TourFilter_Action_MovePropertyUp_Tooltip;
 	public static String		Slideout_TourFilter_Checkbox_IsFilterByDate;
-
-	public static String Slideout_TourFilter_Checkbox_IsPropertyEnabled_Tooltip;
+	public static String		Slideout_TourFilter_Checkbox_IsPropertyEnabled_Tooltip;
 	public static String		Slideout_TourFilter_Column_ProfileName;
 	public static String		Slideout_TourFilter_Confirm_DeleteProfile_Message;
 	public static String		Slideout_TourFilter_Confirm_DeleteProfile_Title;
@@ -1588,6 +1583,7 @@ public class Messages extends NLS {
 	public static String		Slideout_TourFilter_Confirm_DeleteProperty_Title;
 	public static String		Slideout_TourFilter_Label_DayMonth;
 	public static String		Slideout_TourFilter_Label_ProfileName;
+	public static String		Slideout_TourFilter_Label_Profiles;
 	public static String		Slideout_TourFilter_Label_Title;
 
 	public static String		Slideout_TourInfoOptions_Checkbox_IsShowInfoTooltip;

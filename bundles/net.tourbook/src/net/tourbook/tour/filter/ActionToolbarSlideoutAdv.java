@@ -18,8 +18,8 @@ package net.tourbook.tour.filter;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.Messages;
 import net.tourbook.common.UI;
-import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.tooltip.AdvancedSlideout;
+import net.tourbook.common.tooltip.IOpeningDialog;
 
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -41,29 +41,29 @@ import org.eclipse.swt.widgets.ToolItem;
  */
 public abstract class ActionToolbarSlideoutAdv extends ContributionItem implements IOpeningDialog {
 
-	private String					_dialogId			= getClass().getCanonicalName();
+	private String				_dialogId			= getClass().getCanonicalName();
 
-	private ToolBar					_toolBar;
-	private ToolItem				_actionToolItem;
+	private ToolBar				_toolBar;
+	private ToolItem			_actionToolItem;
 
 	private AdvancedSlideout	_toolbarSlideout;
 
 	/*
 	 * UI controls
 	 */
-	private Image					_imageEnabled;
-	private Image					_imageDisabled;
+	private Image				_imageEnabled;
+	private Image				_imageDisabled;
 
 	/**
 	 * When <code>true</code> then the action can be toggeled, default is <code>false</code>.
 	 */
-	protected boolean				isToggleAction;
+	protected boolean			isToggleAction;
 
 	/**
 	 * This tooltip will be displayed when the action is not selected which causes that the slideout
 	 * is not displayed.
 	 */
-	protected String				notSelectedTooltip	= UI.EMPTY_STRING;
+	protected String			notSelectedTooltip	= UI.EMPTY_STRING;
 
 	public ActionToolbarSlideoutAdv() {
 
@@ -224,7 +224,7 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
 
 		} else {
 
-			_toolbarSlideout.hide();
+			_toolbarSlideout.close();
 		}
 	}
 
