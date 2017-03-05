@@ -1794,6 +1794,7 @@ public class Messages extends NLS {
 	public static String		Tour_Filter_Operator_LessThanOrEqual;
 	public static String		Tour_Filter_Operator_NotBetween;
 	public static String		Tour_Filter_Operator_NotEquals;
+	public static String		Tour_Filter_Operator_SeasonToday;
 	public static String		Tour_Filter_Operator_StartsWith;
 
 	public static String		Tour_Log_Action_Clear_Tooltip;

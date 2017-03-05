@@ -23,7 +23,7 @@ import java.time.MonthDay;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
-import net.tourbook.application.ActionTourFilterAdv;
+import net.tourbook.application.ActionTourFilter;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
@@ -78,6 +78,7 @@ public class TourFilterManager {
 	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.GREATER_THAN_OR_EQUAL,		Messages.Tour_Filter_Operator_GreaterThanOrEqual),
 	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.BETWEEN,					Messages.Tour_Filter_Operator_Between),
 	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.NOT_BETWEEN,				Messages.Tour_Filter_Operator_NotBetween),
+	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.SEASON_TODAY,				Messages.Tour_Filter_Operator_SeasonToday),
 	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.IS_EMPTY,					Messages.Tour_Filter_Operator_IsEmpty),
 	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.IS_NOT_EMPTY,				Messages.Tour_Filter_Operator_IsNotEmpty),
 
@@ -139,6 +140,7 @@ public class TourFilterManager {
 		TourFilterFieldOperator.GREATER_THAN_OR_EQUAL,
 		TourFilterFieldOperator.BETWEEN,
 		TourFilterFieldOperator.NOT_BETWEEN,
+		TourFilterFieldOperator.SEASON_TODAY,
 	};
 
 // SET_FORMATTING_ON
@@ -227,11 +229,19 @@ public class TourFilterManager {
 	
 // SET_FORMATTING_ON
 
+	/**
+	 * Contains all available profiles.
+	 */
 	private static ArrayList<TourFilterProfile>	_filterProfiles	= new ArrayList<>();
 
-	private static ActionTourFilterAdv			_actionTourFilterAdv;
-
+	/**
+	 * Contains the selected profile or <code>null</code> when a profile is not selected.
+	 */
 	private static TourFilterProfile			_selectedProfile;
+
+	private static boolean						_isTourFilterEnabled;
+
+	private static ActionTourFilter				_actionTourFilter;
 
 	/**
 	 * Fire event that the tour filter has changed.
@@ -327,7 +337,10 @@ public class TourFilterManager {
 		return _filterProfiles;
 	}
 
-	static TourFilterProfile getSelectedProfile() {
+	/**
+	 * @return Returns the selected profile or <code>null</code> when a profile is not selected.
+	 */
+	public static TourFilterProfile getSelectedProfile() {
 		return _selectedProfile;
 	}
 
@@ -336,6 +349,10 @@ public class TourFilterManager {
 		final File layerFile = _stateLocation.append(TOUR_FILTER_FILE_NAME).toFile();
 
 		return layerFile;
+	}
+
+	public static boolean isFilterActive() {
+		return _isTourFilterEnabled;
 	}
 
 	/**
@@ -586,16 +603,16 @@ public class TourFilterManager {
 
 	public static void restoreState() {
 
-		final boolean isTourFilterActive = _prefStore.getBoolean(ITourbookPreferences.APP_TOUR_FILTER_IS_SELECTED);
+		_isTourFilterEnabled = _prefStore.getBoolean(ITourbookPreferences.APP_TOUR_FILTER_IS_SELECTED);
 
-		_actionTourFilterAdv.setSelection(isTourFilterActive);
+		_actionTourFilter.setSelection(_isTourFilterEnabled);
 
 		readFilterProfile();
 	}
 
 	public static void saveState() {
 
-		_prefStore.setValue(ITourbookPreferences.APP_TOUR_FILTER_IS_SELECTED, _actionTourFilterAdv.getSelection());
+		_prefStore.setValue(ITourbookPreferences.APP_TOUR_FILTER_IS_SELECTED, _actionTourFilter.getSelection());
 
 		final XMLMemento xmlRoot = writeFilterProfile();
 		final File xmlFile = getXmlFile();
@@ -603,23 +620,25 @@ public class TourFilterManager {
 		Util.writeXml(xmlRoot, xmlFile);
 	}
 
-	static void setSelectedProfile(final TourFilterProfile selectedProfile) {
-		_selectedProfile = selectedProfile;
-	}
-
 	/**
 	 * Sets the state if the tour filter is active or not.
 	 * 
-	 * @param isSelected
+	 * @param isEnabled
 	 */
-	public static void setSelection(final boolean isSelected) {
+	public static void setFilterEnabled(final boolean isEnabled) {
+
+		_isTourFilterEnabled = isEnabled;
 
 		fireTourFilterModifyEvent();
 	}
 
+	static void setSelectedProfile(final TourFilterProfile selectedProfile) {
 
-	public static void setTourFilterAction(final ActionTourFilterAdv actionTourFilterAdv) {
-		_actionTourFilterAdv = actionTourFilterAdv;
+		_selectedProfile = selectedProfile;
+	}
+
+	public static void setTourFilterAction(final ActionTourFilter actionTourFilterAdv) {
+		_actionTourFilter = actionTourFilterAdv;
 	}
 
 	/**

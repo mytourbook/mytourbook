@@ -338,7 +338,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
 		final Composite shellContainer = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(shellContainer);
-		GridLayoutFactory.swtDefaults().applyTo(shellContainer);
+		GridLayoutFactory.fillDefaults().applyTo(shellContainer);
 //		shellContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
 			{
@@ -393,7 +393,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		GridLayoutFactory
 				.fillDefaults()//
 				.numColumns(1)
-				.spacing(0, 2)
+//				.spacing(0, 2)
 				.extendedMargins(0, 3, 0, 0)
 				.applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_MAGENTA));

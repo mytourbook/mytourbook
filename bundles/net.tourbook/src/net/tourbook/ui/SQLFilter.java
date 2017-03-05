@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,9 +21,12 @@ import java.util.ArrayList;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourPerson;
+import net.tourbook.tour.filter.TourFilterManager;
+import net.tourbook.tour.filter.TourFilterProfile;
 
 /**
- * The filter provides a sql WHERE which contains the selected person and tour type.
+ * The filter provides a sql WHERE which contains all tour filter, e.g. selected person, tour type,
+ * photo and advanced tour filter.
  */
 public class SQLFilter {
 
@@ -77,6 +80,18 @@ public class SQLFilter {
 
 			sb.append(sqlData.getWhereString());
 			_parameters.addAll(sqlData.getParameters());
+		}
+
+		/*
+		 * Advanced tour filter
+		 */
+		if (TourFilterManager.isFilterActive()) {
+			
+			final TourFilterProfile selectedProfile = TourFilterManager.getSelectedProfile();
+
+			if (selectedProfile != null) {
+				final TourFilterSQLData sqlData = TourFilterManager.getSQLData();
+			}
 		}
 
 		_sqlWhereClause = sb.toString();

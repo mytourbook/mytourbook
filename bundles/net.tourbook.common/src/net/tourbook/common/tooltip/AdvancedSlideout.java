@@ -197,7 +197,7 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 
 		final Composite shellContainer = new Composite(parent, SWT.NONE);
 		GridLayoutFactory
-				.fillDefaults()//
+				.swtDefaults() //
 				.spacing(0, 0)
 				.applyTo(shellContainer);
 //		shellContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
@@ -215,7 +215,11 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		GridLayoutFactory
+				.fillDefaults()//
+				.numColumns(2)
+				.extendedMargins(0, 0, 0, 5)
+				.applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 
 		{
@@ -241,7 +245,7 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 				.fillDefaults()//
 				.grab(true, false)
 				.align(SWT.FILL, SWT.CENTER)
-				.indent(3, 0)
+//				.indent(3, 0)
 				.applyTo(_labelDragSlideout);
 		_labelDragSlideout.setText(_draggerText);
 		_labelDragSlideout.setToolTipText(Messages.App_Action_DragSlideout_ToolTip);
