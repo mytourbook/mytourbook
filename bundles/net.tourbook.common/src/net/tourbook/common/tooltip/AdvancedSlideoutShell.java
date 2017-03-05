@@ -444,7 +444,9 @@ public abstract class AdvancedSlideoutShell {
 					final boolean isInTarget = shellCurrentLocation.x == shellEndX
 							&& shellCurrentLocation.y == shellEndY;
 
-					final int diffAlpha = ALPHA_OPAQUE / _shellFadeInSteps;
+					final int diffAlpha = _shellFadeInSteps == 0 //
+							? ALPHA_OPAQUE
+							: ALPHA_OPAQUE / _shellFadeInSteps;
 
 					newAlpha = currentAlpha + diffAlpha;
 					if (newAlpha > ALPHA_OPAQUE) {
@@ -779,7 +781,7 @@ public abstract class AdvancedSlideoutShell {
 	 * Hide the currently active tool tip immediately.
 	 */
 	public void hideNow() {
-		ttHide();
+		ttHide_WithoutAnimation();
 	}
 
 	private boolean isHidden() {
@@ -1606,7 +1608,7 @@ public abstract class AdvancedSlideoutShell {
 	/**
 	 * Hide current shell immediatedly without animation.
 	 */
-	protected void ttHide() {
+	protected void ttHide_WithoutAnimation() {
 
 		closeInternalShells();
 

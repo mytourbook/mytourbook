@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.tour.filter;
 
-import net.tourbook.Messages; 
+import net.tourbook.Messages;
 import net.tourbook.common.UI;
 
 import org.eclipse.jface.layout.GridDataFactory;
@@ -61,7 +61,7 @@ class TimeDuration {
 			_spinHours = new Spinner(container, SWT.BORDER);
 			_spinHours.setData(filterProperty);
 			_spinHours.setData(SlideoutTourFilter.FIELD_NO, fieldNo);
-			_spinHours.setMinimum(-1);
+			_spinHours.setMinimum(0);
 			_spinHours.setMaximum(999);
 			_spinHours.setToolTipText(Messages.Tour_Editor_Label_Hours_Tooltip);
 
@@ -78,7 +78,7 @@ class TimeDuration {
 			_spinMinutes = new Spinner(container, SWT.BORDER);
 			_spinMinutes.setData(filterProperty);
 			_spinMinutes.setData(SlideoutTourFilter.FIELD_NO, fieldNo);
-			_spinMinutes.setMinimum(-1);
+			_spinMinutes.setMinimum(0);
 			_spinMinutes.setMaximum(60);
 			_spinMinutes.setToolTipText(Messages.Tour_Editor_Label_Minutes_Tooltip);
 
@@ -97,7 +97,7 @@ class TimeDuration {
 //					.fillDefaults()//
 //					.align(SWT.BEGINNING, SWT.CENTER)
 //					.applyTo(_spinSeconds);
-//			_spinSeconds.setMinimum(-1);
+//			_spinSeconds.setMinimum(0);
 //			_spinSeconds.setMaximum(60);
 //			_spinSeconds.setToolTipText(Messages.Tour_Editor_Label_Seconds_Tooltip);
 //

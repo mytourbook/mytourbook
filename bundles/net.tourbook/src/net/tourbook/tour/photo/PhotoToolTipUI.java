@@ -224,7 +224,7 @@ public abstract class PhotoToolTipUI extends AdvancedSlideoutShell {
 		_photoGallery.closePhotoTooltip();
 
 		// hide this shell
-		ttHide();
+		ttHide_WithoutAnimation();
 	}
 
 	private void actionToggleVH() {

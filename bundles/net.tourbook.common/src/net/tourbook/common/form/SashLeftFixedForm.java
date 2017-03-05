@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -117,6 +117,7 @@ public class SashLeftFixedForm {
 		});
 
 		sash.addListener(SWT.Selection, new Listener() {
+			@Override
 			public void handleEvent(final Event e) {
 
 				final Rectangle sashRect = sash.getBounds();
@@ -146,7 +147,7 @@ public class SashLeftFixedForm {
 		return _sashWidth == null ? MINIMUM_PART_WIDTH : _sashWidth;
 	}
 
-	private void onResize() {
+	public void onResize() {
 
 		if (_isInitialResize) {
 

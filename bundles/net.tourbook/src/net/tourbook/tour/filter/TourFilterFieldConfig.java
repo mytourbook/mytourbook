@@ -41,6 +41,12 @@ public class TourFilterFieldConfig {
 	int								maxValue;
 	int								pageIncrement;
 
+	/**
+	 * @param name
+	 * @param fieldId
+	 * @param fieldType
+	 * @param fieldOperators
+	 */
 	public TourFilterFieldConfig(	final String name,
 									final TourFilterFieldId fieldId,
 									final TourFilterFieldType fieldType,
@@ -54,6 +60,15 @@ public class TourFilterFieldConfig {
 		this.fieldOperators = fieldOperators;
 	}
 
+	/**
+	 * @param name
+	 * @param fieldId
+	 * @param fieldType
+	 * @param filterOperators
+	 * @param minValue
+	 * @param maxValue
+	 * @param pageIncrement
+	 */
 	public TourFilterFieldConfig(	final String name,
 									final TourFilterFieldId fieldId,
 									final TourFilterFieldType fieldType,

@@ -43,6 +43,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 
+/*
+ * Resize control: org.eclipse.jface.text.AbstractInformationControl
+ */
 public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 
 	// initialize with default values which are (should) never be used
@@ -137,7 +140,7 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 
 		super(ownerControl, state, slideoutDefaultSize);
 
-		setShellFadeInSteps(10);
+		setShellFadeInSteps(0);
 		setShellFadeOutSteps(30);
 		setShellFadeOutDelaySteps(10);
 
@@ -160,19 +163,13 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 	}
 
 	@Override
-	protected void afterCreateShell(final Shell shell) {
-
-	}
+	protected void afterCreateShell(final Shell shell) {}
 
 	@Override
-	protected void beforeHideToolTip() {
-
-	}
+	protected void beforeHideToolTip() {}
 
 	@Override
-	protected void closeInternalShells() {
-
-	}
+	protected void closeInternalShells() {}
 
 	private void createActions() {
 
@@ -381,6 +378,8 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 		_cursorHand.dispose();
 	}
 
+	abstract protected void onFocus();
+
 	private void onMouseDown(final MouseEvent e) {
 
 		_isShellDragged = true;
@@ -421,6 +420,9 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 	@Override
 	protected void onReparentShell(final Shell reparentedShell) {
 
+		reparentedShell.setFocus();
+
+		onFocus();
 	}
 
 	/**
