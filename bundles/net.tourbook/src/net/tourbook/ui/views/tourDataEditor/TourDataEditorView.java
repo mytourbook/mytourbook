@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -205,15 +205,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 //	//
 	private static final int					COLUMN_SPACING					= 20;
 	//
-	private final IPreferenceStore				_prefStore						= TourbookPlugin.getPrefStore();
-	private final IPreferenceStore				_prefStoreCommon				= CommonActivator.getPrefStore();
-	private final IDialogSettings				_state							= TourbookPlugin.getState(ID);
-	private final IDialogSettings				_stateSlice						= TourbookPlugin
-																						.getState(ID + ".slice");							//$NON-NLS-1$
-	//
-	private final boolean						_isOSX							= net.tourbook.common.UI.IS_OSX;
-	private final boolean						_isLinux						= net.tourbook.common.UI.IS_LINUX;
-	//
 	private static final String					WIDGET_KEY						= "widgetKey";												//$NON-NLS-1$
 	private static final String					WIDGET_KEY_TOURDISTANCE			= "tourDistance";											//$NON-NLS-1$
 	private static final String					WIDGET_KEY_ALTITUDE_UP			= "altitudeUp";											//$NON-NLS-1$
@@ -230,8 +221,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	private static final String					STATE_ROW_EDIT_MODE				= "tourDataEditor.rowEditMode";							//$NON-NLS-1$
 	private static final String					STATE_IS_EDIT_MODE				= "tourDataEditor.isEditMode";								//$NON-NLS-1$
 	private static final String					STATE_CSV_EXPORT_PATH			= "tourDataEditor.csvExportPath";							//$NON-NLS-1$
+	//
 	private static final String					STATE_SECTION_CHARACTERISTICS	= "STATE_SECTION_CHARACTERISTICS";							//$NON-NLS-1$
-
 	private static final String					STATE_SECTION_DATE_TIME			= "STATE_SECTION_DATE_TIME";								//$NON-NLS-1$
 	private static final String					STATE_SECTION_INFO				= "STATE_SECTION_INFO";									//$NON-NLS-1$
 	private static final String					STATE_SECTION_PERSONAL			= "STATE_SECTION_PERSONAL";								//$NON-NLS-1$
@@ -240,6 +231,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	//
 	static final String							STATE_LAT_LON_DIGITS			= "STATE_LAT_LON_DIGITS";									//$NON-NLS-1$
 	static final int							DEFAULT_LAT_LON_DIGITS			= 5;
+	//
+	private final IPreferenceStore				_prefStore						= TourbookPlugin.getPrefStore();
+	private final IPreferenceStore				_prefStoreCommon				= CommonActivator.getPrefStore();
+	private final IDialogSettings				_state							= TourbookPlugin.getState(ID);
+	private final IDialogSettings				_stateSlice						= TourbookPlugin.getState(ID + ".slice");							//$NON-NLS-1$
+	//
+	private final boolean						_isOSX							= net.tourbook.common.UI.IS_OSX;
+	private final boolean						_isLinux						= net.tourbook.common.UI.IS_LINUX;
 	//
 	//
 	/**
@@ -4407,6 +4406,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			Display.getCurrent().asyncExec(new Runnable() {
 				@Override
 				public void run() {
+
+					if (_pageBook.isDisposed()) {
+						return;
+					}
 
 					/*
 					 * check if tour is set from a selection provider

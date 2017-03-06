@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,125 +34,125 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 	static {
 
 		SQL_SUM_COLUMNS = UI.EMPTY_STRING
-		//
-				+ "SUM(TOURDISTANCE)," // 								0	//$NON-NLS-1$
-				+ "SUM(TOURRECORDINGTIME)," //							1	//$NON-NLS-1$
-				+ "SUM(TOURDRIVINGTIME)," //							2	//$NON-NLS-1$
-				+ "SUM(TOURALTUP)," //									3	//$NON-NLS-1$
-				+ "SUM(TOURALTDOWN)," //								4	//$NON-NLS-1$
-				+ "SUM(1)," //											5	//$NON-NLS-1$
 				//
-				+ "MAX(MAXSPEED)," //									6	//$NON-NLS-1$
-				+ "SUM(TOURDISTANCE)," //								7	//$NON-NLS-1$
-				+ "SUM(TOURDRIVINGTIME)," //							8	//$NON-NLS-1$
-				+ "MAX(MAXALTITUDE)," //								9	//$NON-NLS-1$
-				+ "MAX(MAXPULSE)," //									10	//$NON-NLS-1$
+				+ "SUM(TOURDISTANCE),\n" // 							0	//$NON-NLS-1$
+				+ "SUM(TOURRECORDINGTIME),\n" //						1	//$NON-NLS-1$
+				+ "SUM(TOURDRIVINGTIME),\n" //							2	//$NON-NLS-1$
+				+ "SUM(TOURALTUP),\n" //								3	//$NON-NLS-1$
+				+ "SUM(TOURALTDOWN),\n" //								4	//$NON-NLS-1$
+				+ "SUM(1),\n" //										5	//$NON-NLS-1$
 				//
-				+ "AVG( CASE WHEN AVGPULSE = 0			THEN NULL ELSE AVGPULSE END)," //			11	//$NON-NLS-1$
-				+ "AVG( CASE WHEN AVGCADENCE = 0		THEN NULL ELSE DOUBLE(AvgCadence) * CadenceMultiplier END )," //	12	//$NON-NLS-1$
-				+ "AVG( CASE WHEN AvgTemperature = 0	THEN NULL ELSE DOUBLE(AvgTemperature) / TemperatureScale END )," //	13	//$NON-NLS-1$
-				+ "AVG( CASE WHEN WEATHERWINDDIR = 0	THEN NULL ELSE WEATHERWINDDIR END )," //	14	//$NON-NLS-1$
-				+ "AVG( CASE WHEN WEATHERWINDSPD = 0	THEN NULL ELSE WEATHERWINDSPD END )," //	15	//$NON-NLS-1$
-				+ "AVG( CASE WHEN RESTPULSE = 0			THEN NULL ELSE RESTPULSE END )," //			16	//$NON-NLS-1$
+				+ "MAX(MAXSPEED),\n" //									6	//$NON-NLS-1$
+				+ "SUM(TOURDISTANCE),\n" //								7	//$NON-NLS-1$
+				+ "SUM(TOURDRIVINGTIME),\n" //							8	//$NON-NLS-1$
+				+ "MAX(MAXALTITUDE),\n" //								9	//$NON-NLS-1$
+				+ "MAX(MAXPULSE),\n" //									10	//$NON-NLS-1$
 				//
-				+ "SUM(CALORIES)," //									17	//$NON-NLS-1$
-				+ "SUM(power_TotalWork)," //							18	//$NON-NLS-1$
+				+ "AVG( CASE WHEN AVGPULSE = 0			THEN NULL ELSE AVGPULSE END),\n" //										11	//$NON-NLS-1$
+				+ "AVG( CASE WHEN AVGCADENCE = 0		THEN NULL ELSE DOUBLE(AvgCadence) * CadenceMultiplier END ),\n" //		12	//$NON-NLS-1$
+				+ "AVG( CASE WHEN AvgTemperature = 0	THEN NULL ELSE DOUBLE(AvgTemperature) / TemperatureScale END ),\n" //	13	//$NON-NLS-1$
+				+ "AVG( CASE WHEN WEATHERWINDDIR = 0	THEN NULL ELSE WEATHERWINDDIR END ),\n" //								14	//$NON-NLS-1$
+				+ "AVG( CASE WHEN WEATHERWINDSPD = 0	THEN NULL ELSE WEATHERWINDSPD END ),\n" //								15	//$NON-NLS-1$
+				+ "AVG( CASE WHEN RESTPULSE = 0			THEN NULL ELSE RESTPULSE END ),\n" //									16	//$NON-NLS-1$
+				//
+				+ "SUM(CALORIES),\n" //									17	//$NON-NLS-1$
+				+ "SUM(power_TotalWork),\n" //							18	//$NON-NLS-1$
 
-				+ "SUM(numberOfTimeSlices)," //							19	//$NON-NLS-1$
-				+ "SUM(numberOfPhotos)," //								20	//$NON-NLS-1$
+				+ "SUM(numberOfTimeSlices),\n" //						19	//$NON-NLS-1$
+				+ "SUM(numberOfPhotos),\n" //							20	//$NON-NLS-1$
 				//
-				+ "SUM(frontShiftCount)," //							21	//$NON-NLS-1$
-				+ "SUM(rearShiftCount)"; //								22	//$NON-NLS-1$
+				+ "SUM(frontShiftCount),\n" //							21	//$NON-NLS-1$
+				+ "SUM(rearShiftCount)\n"; //							22	//$NON-NLS-1$
 	}
 
-	TourBookView			tourBookView;
+	TourBookView	tourBookView;
 
-	String					treeColumn;
+	String			treeColumn;
 
-	int						tourYear;
+	int				tourYear;
 
 	/**
 	 * month starts with 1 for january
 	 */
-	int						tourMonth;
-	int						tourWeek;
-	int						tourYearSub;
-	int						tourDay;
+	int				tourMonth;
+	int				tourWeek;
+	int				tourYearSub;
+	int				tourDay;
 
 	/**
 	 * Contain the tour date time with time zone info when available.
 	 */
-	TourDateTime			colTourDateTime;
-	String					colTimeZoneId;
+	TourDateTime	colTourDateTime;
+	String			colTimeZoneId;
 
-	String					colTourTitle;
-	long					colPersonId;																	// tourPerson_personId
+	String			colTourTitle;
+	long			colPersonId;							// tourPerson_personId
 
-	long					colCounter;
-	long					colCalories;
-	long					colDistance;
-	float					colBodyWeight;
+	long			colCounter;
+	long			colCalories;
+	long			colDistance;
+	float			colBodyWeight;
 
-	long					colRecordingTime;
-	long					colDrivingTime;
-	long					colPausedTime;
+	long			colRecordingTime;
+	long			colDrivingTime;
+	long			colPausedTime;
 
-	long					colAltitudeUp;
-	long					colAltitudeDown;
+	long			colAltitudeUp;
+	long			colAltitudeDown;
 
-	float					colMaxSpeed;
-	long					colMaxAltitude;
-	long					colMaxPulse;
+	float			colMaxSpeed;
+	long			colMaxAltitude;
+	long			colMaxPulse;
 
-	float					colAvgSpeed;
-	float					colAvgPace;
-	float					colAvgPulse;
-	float					colAvgCadence;
-	float					colAvgTemperature;
+	float			colAvgSpeed;
+	float			colAvgPace;
+	float			colAvgPulse;
+	float			colAvgCadence;
+	float			colAvgTemperature;
 
-	int						colWindSpd;
-	int						colWindDir;
-	String					colClouds;
-	int						colRestPulse;
+	int				colWindSpd;
+	int				colWindDir;
+	String			colClouds;
+	int				colRestPulse;
 
-	int						colWeekNo;
-	String					colWeekDay;
-	int						colWeekYear;
+	int				colWeekNo;
+	String			colWeekDay;
+	int				colWeekYear;
 
-	int						colNumberOfTimeSlices;
-	int						colNumberOfPhotos;
+	int				colNumberOfTimeSlices;
+	int				colNumberOfPhotos;
 
-	int						colDPTolerance;
+	int				colDPTolerance;
 
-	int						colFrontShiftCount;
-	int						colRearShiftCount;
+	int				colFrontShiftCount;
+	int				colRearShiftCount;
 
-	float					colCadenceMultiplier;
+	float			colCadenceMultiplier;
 
 	// ----------- POWER ---------
 
-	float					colPower_AvgLeftTorqueEffectiveness;
-	float					colPower_AvgRightTorqueEffectiveness;
-	float					colPower_AvgLeftPedalSmoothness;
-	float					colPower_AvgRightPedalSmoothness;
-	int						colPower_PedalLeftRightBalance;
+	float			colPower_AvgLeftTorqueEffectiveness;
+	float			colPower_AvgRightTorqueEffectiveness;
+	float			colPower_AvgLeftPedalSmoothness;
+	float			colPower_AvgRightPedalSmoothness;
+	int				colPower_PedalLeftRightBalance;
 
-	float					colPower_Avg;
-	int						colPower_Max;
-	int						colPower_Normalized;
-	long					colPower_TotalWork;
+	float			colPower_Avg;
+	int				colPower_Max;
+	int				colPower_Normalized;
+	long			colPower_TotalWork;
 
-	int						colPower_FTP;
-	float					colPower_TrainingStressScore;
-	float					colPower_IntensityFactor;
+	int				colPower_FTP;
+	float			colPower_TrainingStressScore;
+	float			colPower_IntensityFactor;
 
-	float					colPower_PowerToWeight;
+	float			colPower_PowerToWeight;
 
 	// ----------- IMPORT ---------
 
-	String					col_ImportFileName;
-	String					col_ImportFilePath;
-	String					col_DeviceName;
+	String			col_ImportFileName;
+	String			col_ImportFilePath;
+	String			col_DeviceName;
 
 	TVITourBookItem(final TourBookView view) {
 

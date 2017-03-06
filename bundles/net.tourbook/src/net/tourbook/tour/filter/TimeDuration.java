@@ -16,13 +16,14 @@
 package net.tourbook.tour.filter;
 
 import net.tourbook.Messages;
-import net.tourbook.common.UI;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Spinner;
@@ -32,16 +33,6 @@ import org.eclipse.swt.widgets.Spinner;
  */
 class TimeDuration {
 
-	private MouseWheelListener _mouseWheelListener;
-	{
-		_mouseWheelListener = new MouseWheelListener() {
-			@Override
-			public void mouseScrolled(final MouseEvent event) {
-				UI.adjustSpinnerValueOnMouseScroll(event);
-			}
-		};
-	}
-
 	/*
 	 * UI controls
 	 */
@@ -50,6 +41,20 @@ class TimeDuration {
 //	private Spinner	_spinSeconds;
 
 	public TimeDuration(final Composite parent, final TourFilterProperty filterProperty, final int fieldNo) {
+
+		final SelectionListener selectionListener = new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				onUpdateUI();
+			}
+		};
+
+		final MouseWheelListener mouseWheelListener = new MouseWheelListener() {
+			@Override
+			public void mouseScrolled(final MouseEvent e) {
+				onUpdateUI();
+			}
+		};
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -61,11 +66,12 @@ class TimeDuration {
 			_spinHours = new Spinner(container, SWT.BORDER);
 			_spinHours.setData(filterProperty);
 			_spinHours.setData(SlideoutTourFilter.FIELD_NO, fieldNo);
-			_spinHours.setMinimum(0);
+			_spinHours.setMinimum(-1);
 			_spinHours.setMaximum(999);
 			_spinHours.setToolTipText(Messages.Tour_Editor_Label_Hours_Tooltip);
 
-			_spinHours.addMouseWheelListener(_mouseWheelListener);
+			_spinHours.addSelectionListener(selectionListener);
+			_spinHours.addMouseWheelListener(mouseWheelListener);
 
 			GridDataFactory
 					.fillDefaults()//
@@ -78,11 +84,12 @@ class TimeDuration {
 			_spinMinutes = new Spinner(container, SWT.BORDER);
 			_spinMinutes.setData(filterProperty);
 			_spinMinutes.setData(SlideoutTourFilter.FIELD_NO, fieldNo);
-			_spinMinutes.setMinimum(0);
+			_spinMinutes.setMinimum(-1);
 			_spinMinutes.setMaximum(60);
 			_spinMinutes.setToolTipText(Messages.Tour_Editor_Label_Minutes_Tooltip);
 
-			_spinMinutes.addMouseWheelListener(_mouseWheelListener);
+			_spinMinutes.addSelectionListener(selectionListener);
+			_spinMinutes.addMouseWheelListener(mouseWheelListener);
 
 			GridDataFactory
 					.fillDefaults()//
@@ -105,6 +112,12 @@ class TimeDuration {
 		}
 	}
 
+	public void addMouseWheelListener(final MouseWheelListener mouseWheelListener) {
+
+		_spinHours.addMouseWheelListener(mouseWheelListener);
+		_spinMinutes.addMouseWheelListener(mouseWheelListener);
+	}
+
 	public void addSelectionListener(final SelectionListener selectionListener) {
 
 		_spinHours.addSelectionListener(selectionListener);
@@ -120,6 +133,17 @@ class TimeDuration {
 				+ (_spinMinutes.getSelection() * 60)
 //				+ _spinSeconds.getSelection()
 		;
+	}
+
+	private void onUpdateUI() {
+
+		int recTime = getTime();
+
+		if (recTime < 0) {
+			recTime = 0;
+		}
+
+		setTime(recTime);
 	}
 
 	/**

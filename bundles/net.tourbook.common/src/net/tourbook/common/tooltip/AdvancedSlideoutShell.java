@@ -114,9 +114,6 @@ public abstract class AdvancedSlideoutShell {
 	 */
 	private boolean						_isShellFadingIn;
 
-	private boolean						_isSlideoutPinned;
-	private boolean						_isKeepSlideoutOpen;
-
 	private Point						_shellStartLocation;
 	private Point						_shellEndLocation					= new Point(0, 0);
 
@@ -135,8 +132,19 @@ public abstract class AdvancedSlideoutShell {
 	private final AnimationTimer		_animationTimer;
 	private int							_animationMoveCounter;
 
+	private boolean						_isSlideoutPinned;
+
+	/**
+	 * This is used internally, when <code>true</code> then the slideout is NOT closed.
+	 */
+	private boolean						_isKeepOpenInternally;
+
+	/**
+	 * This is used from the UI with a keep open action.
+	 */
+	private boolean						_isKeepSlideoutOpen;
+
 	private boolean						_isInShellResize;
-	private boolean						_isKeepToolTipOpen;
 	private boolean						_isDoNotStopAnimation;
 
 	private AbstractRRShell				_visibleRRShell;
@@ -318,11 +326,11 @@ public abstract class AdvancedSlideoutShell {
 //		System.out.println(UI.timeStampNano() + " in " + _isShellFadingIn + ("\tout " + _isShellFadingOut));
 //		// TODO remove SYSTEM.OUT.PRINTLN
 
-		if (_isKeepToolTipOpen) {
+		if (_isKeepOpenInternally) {
 
 			// hiding has started, stop it and keep tooltip open
 
-			_isKeepToolTipOpen = false;
+			_isKeepOpenInternally = false;
 
 			final Point shellCurrentLocation = _visibleShell.getLocation();
 
@@ -573,7 +581,7 @@ public abstract class AdvancedSlideoutShell {
 			return true;
 		}
 
-		if (_isKeepSlideoutOpen) {
+		if (_isKeepOpenInternally || _isKeepSlideoutOpen) {
 			return false;
 		}
 
@@ -662,7 +670,7 @@ public abstract class AdvancedSlideoutShell {
 
 		updateUI_Colors();
 
-		// restore tooltip pin state
+		// restore slideout state
 		restoreState_SlideoutIsPinned(_isSlideoutPinned);
 		restoreState_KeepSlideoutOpen(_isKeepSlideoutOpen);
 
@@ -1034,7 +1042,7 @@ public abstract class AdvancedSlideoutShell {
 
 			// don't hide when mouse is hovering hiding tooltip
 
-			_isKeepToolTipOpen = true;
+			_isKeepOpenInternally = true;
 
 			ttShow();
 
@@ -1092,6 +1100,8 @@ public abstract class AdvancedSlideoutShell {
 			break;
 
 		case SWT.Dispose:
+
+			saveState();
 
 			break;
 
@@ -1255,7 +1265,7 @@ public abstract class AdvancedSlideoutShell {
 
 		ttAllControlsAddListener(newReparentedShell.getShell());
 
-		final boolean isShellMoving = _isShellFadingIn && _isKeepToolTipOpen == false;
+		final boolean isShellMoving = _isShellFadingIn && _isKeepOpenInternally == false;
 		if (isShellMoving) {
 
 			/*
@@ -1382,12 +1392,16 @@ public abstract class AdvancedSlideoutShell {
 		_visibleShell = rrShell.getShell();
 	}
 
+	public void setIsKeepSlideoutOpen(final boolean isKeepSlideoutOpen) {
+		_isKeepSlideoutOpen = isKeepSlideoutOpen;
+	}
+
 	/**
 	 * @param isKeepOpen
 	 *            When <code>true</code> then the slideout will never be closed.
 	 */
-	protected void setIsKeepSlideoutOpen(final boolean isKeepOpen) {
-		_isKeepSlideoutOpen = isKeepOpen;
+	protected void setIsKeepOpenInternally(final boolean isKeepOpen) {
+		_isKeepOpenInternally = isKeepOpen;
 	}
 
 	protected void setIsShellToggle() {
@@ -1432,10 +1446,6 @@ public abstract class AdvancedSlideoutShell {
 	}
 
 	private void setShellVisible(final boolean isVisible) {
-
-		if (isVisible == false) {
-			saveState();
-		}
 
 		_visibleShell.setVisible(isVisible);
 
@@ -1606,28 +1616,6 @@ public abstract class AdvancedSlideoutShell {
 	}
 
 	/**
-	 * Hide current shell immediatedly without animation.
-	 */
-	protected void ttHide_WithoutAnimation() {
-
-		closeInternalShells();
-
-		if (canCloseShell() == false) {
-			return;
-		}
-
-		_visibleShell.setAlpha(0);
-
-		// hide shell
-		setShellVisible(false);
-
-		_isShellFadingIn = false;
-		_isShellFadingOut = false;
-
-		_isDoNotStopAnimation = false;
-	}
-
-	/**
 	 * Hide current shell immediatedly without animation and any flags.
 	 */
 	private void ttHide_NoFlags() {
@@ -1677,6 +1665,28 @@ public abstract class AdvancedSlideoutShell {
 		_isShellFadingOut = true;
 
 		animation10_Start();
+	}
+
+	/**
+	 * Hide current shell immediatedly without animation.
+	 */
+	protected void ttHide_WithoutAnimation() {
+
+		closeInternalShells();
+
+		if (canCloseShell() == false) {
+			return;
+		}
+
+		_visibleShell.setAlpha(0);
+
+		// hide shell
+		setShellVisible(false);
+
+		_isShellFadingIn = false;
+		_isShellFadingOut = false;
+
+		_isDoNotStopAnimation = false;
 	}
 
 	private void ttShellAddListener(final Shell shell) {

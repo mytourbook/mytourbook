@@ -92,16 +92,14 @@ public class TourFilterManager {
 	
 	public static final TourFilterFieldOperator[]			FILTER_OPERATORS_DATE_TIME = {
 	                                        	                        
-	   TourFilterFieldOperator.EQUALS,
-	   TourFilterFieldOperator.NOT_EQUALS,
 	   TourFilterFieldOperator.LESS_THAN,
 	   TourFilterFieldOperator.LESS_THAN_OR_EQUAL,
 	   TourFilterFieldOperator.GREATER_THAN,
 	   TourFilterFieldOperator.GREATER_THAN_OR_EQUAL,
 	   TourFilterFieldOperator.BETWEEN,
 	   TourFilterFieldOperator.NOT_BETWEEN,
-	   TourFilterFieldOperator.IS_EMPTY,
-	   TourFilterFieldOperator.IS_NOT_EMPTY,
+	   TourFilterFieldOperator.EQUALS,
+	   TourFilterFieldOperator.NOT_EQUALS,
 	};
 
 	public static final TourFilterFieldOperator[]			FILTER_OPERATORS_NUMBER = {
@@ -344,15 +342,126 @@ public class TourFilterManager {
 		return _selectedProfile;
 	}
 
+	/**
+	 * @return Returns sql data for the selected tour filter profile or <code>null</code> when not
+	 *         available.
+	 */
+	public static TourFilterSQLData getSQLData() {
+
+		if (_isTourFilterEnabled == false || _selectedProfile == null) {
+
+			// tour filter is not enabled or not selected
+
+			return null;
+		}
+
+		final StringBuilder sqlWhere = new StringBuilder();
+		final ArrayList<Long> sqlParameters = new ArrayList<>();
+
+		for (final TourFilterProperty filterProperty : _selectedProfile.filterProperties) {
+
+			if (filterProperty.isEnabled == false) {
+				continue;
+			}
+
+			final TourFilterFieldConfig fieldConfig = filterProperty.fieldConfig;
+			final TourFilterFieldOperator fieldOperator = filterProperty.fieldOperator;
+
+			final TourFilterFieldId fieldId = fieldConfig.fieldId;
+
+//			final TourFilterFieldOperator[] fieldOperators = getFieldOperators(fieldId);
+
+			final LocalDateTime dateTime1 = filterProperty.dateTime1;
+
+			switch (fieldId) {
+			case TOUR_DATE:
+				break;
+
+			case TOUR_TIME:
+
+//				   TourFilterFieldOperator.LESS_THAN,
+//				   TourFilterFieldOperator.LESS_THAN_OR_EQUAL,
+//				   TourFilterFieldOperator.GREATER_THAN,
+//				   TourFilterFieldOperator.GREATER_THAN_OR_EQUAL,
+//				   TourFilterFieldOperator.BETWEEN,
+//				   TourFilterFieldOperator.NOT_BETWEEN,
+//				   TourFilterFieldOperator.EQUALS,
+//				   TourFilterFieldOperator.NOT_EQUALS,
+
+//				private short												startHour;
+//				private short												startMinute;
+
+				final int hour = dateTime1.getHour();
+				final int minute = dateTime1.getMinute();
+
+				final long duration1 = hour * 3600 + minute;
+				final String sqlFields = " AND (TourData.startHour*3600 + TourData.startHour)\n";
+
+				switch (fieldOperator) {
+				case LESS_THAN:
+					sqlWhere.append(sqlFields + " < ?");
+					sqlParameters.add(duration1);
+					break;
+
+				case LESS_THAN_OR_EQUAL:
+					sqlWhere.append(sqlFields + " <= ?");
+					sqlParameters.add(duration1);
+					break;
+
+				case GREATER_THAN:
+					sqlWhere.append(sqlFields + " > ?");
+					sqlParameters.add(duration1);
+					break;
+				case GREATER_THAN_OR_EQUAL:
+					sqlWhere.append(sqlFields + " >= ?");
+					sqlParameters.add(duration1);
+					break;
+
+				case EQUALS:
+					sqlWhere.append(sqlFields + " == ?");
+					sqlParameters.add(duration1);
+					break;
+				case NOT_EQUALS:
+					sqlWhere.append(sqlFields + " != ?");
+					sqlParameters.add(duration1);
+					break;
+
+				case BETWEEN:
+					break;
+				case NOT_BETWEEN:
+					break;
+				}
+
+				break;
+
+			case BREAK_TIME:
+				break;
+
+			case DRIVING_TIME:
+				break;
+
+			case RECORDING_TIME:
+				break;
+
+			case SEASON_DATE:
+				break;
+
+			case TEMPERATURE:
+				break;
+
+			case TOUR_TITLE:
+				break;
+			}
+		}
+
+		return new TourFilterSQLData(sqlWhere.toString(), sqlParameters);
+	}
+
 	private static File getXmlFile() {
 
 		final File layerFile = _stateLocation.append(TOUR_FILTER_FILE_NAME).toFile();
 
 		return layerFile;
-	}
-
-	public static boolean isFilterActive() {
-		return _isTourFilterEnabled;
 	}
 
 	/**

@@ -27,31 +27,31 @@ import org.eclipse.swt.widgets.Spinner;
 
 public class TourFilterProperty {
 
-	static final LocalDateTime	DEFAULT_DATE_1	= LocalDateTime.now().withDayOfMonth(1).withMonth(1);
-	static final LocalDateTime	DEFAULT_DATE_2	= LocalDateTime.now();
+	static final LocalDateTime	DEFAULT_DATE_1		= LocalDateTime.now().withDayOfMonth(1).withMonth(1);
+	static final LocalDateTime	DEFAULT_DATE_2		= LocalDateTime.now();
 	static final MonthDay		DEFAULT_SEASON_1	= MonthDay.of(1, 1);
 	static final MonthDay		DEFAULT_SEASON_2	= MonthDay.now();
 
-	TourFilterFieldConfig		fieldConfig		= TourFilterManager.getFieldConfig(TourFilterFieldId.TOUR_DATE);
+	/**
+	 * Is <code>true</code> when this property is enabled
+	 */
+	boolean						isEnabled			= true;
+
+	TourFilterFieldConfig		fieldConfig			= TourFilterManager.getFieldConfig(TourFilterFieldId.TOUR_DATE);
 
 	/**
 	 * Selected operator for the property field
 	 */
-	TourFilterFieldOperator		fieldOperator	= TourFilterFieldOperator.EQUALS;
-
-	/**
-	 * This property is enabled when <code>true</code>
-	 */
-	boolean						isEnabled		= true;
+	TourFilterFieldOperator		fieldOperator		= TourFilterFieldOperator.EQUALS;
 
 	/*
 	 * Field data for the different operators and field types
 	 */
-	LocalDateTime				dateTime1		= DEFAULT_DATE_1;
-	LocalDateTime				dateTime2		= DEFAULT_DATE_2;
+	LocalDateTime				dateTime1			= DEFAULT_DATE_1;
+	LocalDateTime				dateTime2			= DEFAULT_DATE_2;
 
-	MonthDay					monthDay1		= DEFAULT_SEASON_1;
-	MonthDay					monthDay2		= DEFAULT_SEASON_2;
+	MonthDay					monthDay1			= DEFAULT_SEASON_1;
+	MonthDay					monthDay2			= DEFAULT_SEASON_2;
 
 	int							number1;
 	int							number2;

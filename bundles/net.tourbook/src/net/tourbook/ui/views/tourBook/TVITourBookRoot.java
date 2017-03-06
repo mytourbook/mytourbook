@@ -56,8 +56,8 @@ public class TVITourBookRoot extends TVITourBookItem {
 
 				+ (" WHERE 1=1" + sqlFilter.getWhereClause()) // //$NON-NLS-1$
 
-				+ " GROUP BY startYear" //			//$NON-NLS-1$
-				+ " ORDER BY startYear";//			//$NON-NLS-1$
+				+ " GROUP BY startYear\n" //			//$NON-NLS-1$
+				+ " ORDER BY startYear\n";//			//$NON-NLS-1$
 
 		Connection conn = null;
 

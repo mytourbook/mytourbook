@@ -234,13 +234,13 @@ public class TourTypeFilter {
 				sqlWhereClause = UI.EMPTY_STRING;
 			} else {
 				// select tour types which are not defined
-				sqlWhereClause = " AND TourData.tourType_typeId IS NULL"; //$NON-NLS-1$
+				sqlWhereClause = " AND TourData.tourType_typeId IS NULL\n"; //$NON-NLS-1$
 			}
 			break;
 
 		case FILTER_TYPE_DB:
 
-			sqlWhereClause = " AND TourData.tourType_typeId=?"; //$NON-NLS-1$
+			sqlWhereClause = " AND TourData.tourType_typeId=?\n"; //$NON-NLS-1$
 			sqlTourTypes.add(_tourType.getTypeId());
 			break;
 
@@ -252,7 +252,7 @@ public class TourTypeFilter {
 
 				// select nothing
 
-				sqlWhereClause = " AND 1=0"; //$NON-NLS-1$
+				sqlWhereClause = " AND 1=0\n"; //$NON-NLS-1$
 
 			} else {
 

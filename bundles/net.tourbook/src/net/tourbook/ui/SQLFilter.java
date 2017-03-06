@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourPerson;
 import net.tourbook.tour.filter.TourFilterManager;
-import net.tourbook.tour.filter.TourFilterProfile;
+import net.tourbook.tour.filter.TourFilterSQLData;
 
 /**
  * The filter provides a sql WHERE which contains all tour filter, e.g. selected person, tour type,
@@ -58,7 +58,7 @@ public class SQLFilter {
 
 			// select only one person
 
-			sb.append(" AND TourData.tourPerson_personId = ?"); //$NON-NLS-1$
+			sb.append(" AND TourData.tourPerson_personId = ?\n"); //$NON-NLS-1$
 			_parameters.add(activePerson.getPersonId());
 		}
 
@@ -67,7 +67,7 @@ public class SQLFilter {
 		 */
 		if (isUsePhotoFilter && TourbookPlugin.getActivePhotoFilter()) {
 
-			sb.append(" AND TourData.numberOfPhotos > 0"); //$NON-NLS-1$
+			sb.append(" AND TourData.numberOfPhotos > 0\n"); //$NON-NLS-1$
 		}
 
 		/*
@@ -85,13 +85,11 @@ public class SQLFilter {
 		/*
 		 * Advanced tour filter
 		 */
-		if (TourFilterManager.isFilterActive()) {
-			
-			final TourFilterProfile selectedProfile = TourFilterManager.getSelectedProfile();
+		final TourFilterSQLData sqlData = TourFilterManager.getSQLData();
+		if (sqlData != null) {
 
-			if (selectedProfile != null) {
-				final TourFilterSQLData sqlData = TourFilterManager.getSQLData();
-			}
+			sb.append(sqlData.getWhereString());
+			_parameters.addAll(sqlData.getParameters());
 		}
 
 		_sqlWhereClause = sb.toString();

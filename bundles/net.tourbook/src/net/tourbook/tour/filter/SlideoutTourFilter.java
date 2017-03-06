@@ -124,12 +124,12 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 				 * This will fix the problem that when the list of a combobox is displayed, then the
 				 * slideout will disappear :-(((
 				 */
-				setIsKeepSlideoutOpen(true);
+				setIsKeepOpenInternally(true);
 			}
 
 			@Override
 			public void focusLost(final FocusEvent e) {
-				setIsKeepSlideoutOpen(false);
+				setIsKeepOpenInternally(false);
 			}
 		};
 	}
@@ -258,7 +258,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		 * Confirm deletion
 		 */
 		boolean isDeleteProfile;
-		setIsKeepSlideoutOpen(true);
+		setIsKeepOpenInternally(true);
 		{
 			isDeleteProfile = MessageDialog.openConfirm(
 
@@ -268,7 +268,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 							Messages.Slideout_TourFilter_Confirm_DeleteProperty_Message,
 							filterProperty.fieldConfig.name));
 		}
-		setIsKeepSlideoutOpen(false);
+		setIsKeepOpenInternally(false);
 
 		if (isDeleteProfile == false) {
 			return;
@@ -987,6 +987,13 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 			}
 		});
 
+		duration.addMouseWheelListener(new MouseWheelListener() {
+			@Override
+			public void mouseScrolled(final MouseEvent event) {
+				UI.adjustSpinnerValueOnMouseScroll(event);
+				onField_Select_Duration(duration, event.widget);
+			}
+		});
 		if (fieldNo == 1) {
 			filterProperty.uiDuration1 = duration;
 		} else {
@@ -1281,6 +1288,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		}
 	}
 
+
 	private void onField_Select_Number(final Widget widget) {
 
 		final Spinner spinner = (Spinner) widget;
@@ -1359,14 +1367,14 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		 * Confirm deletion
 		 */
 		boolean isDeleteProfile;
-		setIsKeepSlideoutOpen(true);
+		setIsKeepOpenInternally(true);
 		{
 			isDeleteProfile = MessageDialog.openConfirm(
 					Display.getCurrent().getActiveShell(),
 					Messages.Slideout_TourFilter_Confirm_DeleteProfile_Title,
 					NLS.bind(Messages.Slideout_TourFilter_Confirm_DeleteProfile_Message, _selectedProfile.name));
 		}
-		setIsKeepSlideoutOpen(false);
+		setIsKeepOpenInternally(false);
 
 		if (isDeleteProfile == false) {
 			return;
