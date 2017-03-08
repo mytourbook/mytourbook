@@ -53,8 +53,11 @@ public class TourFilterProperty {
 	MonthDay					monthDay1			= DEFAULT_SEASON_1;
 	MonthDay					monthDay2			= DEFAULT_SEASON_2;
 
-	int							number1;
-	int							number2;
+	int							intValue1;
+	int							intValue2;
+ 
+	float						floatValue1;
+	float						floatValue2;
 
 	/*
 	 * UI controls, not all of them are used, depending on the selected field type and operator

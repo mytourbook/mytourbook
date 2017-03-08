@@ -15,17 +15,10 @@
  *******************************************************************************/
 package net.tourbook.tour.filter;
 
-public enum TourFilterFieldType {
- 
-	TEXT, //
+public abstract class FieldValueProvider {
 
-	NUMBER_INTEGER, //
-	NUMBER_METRIC, //
+	abstract float convertFromMetric(float value);
 
-	DATE, //
-	TIME, //
-	DURATION, //
-
-	SEASON, //
+	abstract float convertToMetric(float value);
 
 }

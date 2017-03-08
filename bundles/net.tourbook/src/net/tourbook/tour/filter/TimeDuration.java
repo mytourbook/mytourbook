@@ -16,16 +16,18 @@
 package net.tourbook.tour.filter;
 
 import net.tourbook.Messages;
+import net.tourbook.common.UI;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.LayoutConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 
 /**
@@ -33,95 +35,116 @@ import org.eclipse.swt.widgets.Spinner;
  */
 class TimeDuration {
 
+	private boolean					_isSetField;
+
+	private TimeDurationListener	_timeDurationListener;
+
+	private MouseWheelListener		_mouseWheelListener;
+	private SelectionAdapter		_selectionListener;
+
+	{
+		_selectionListener = new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+
+				if (_isSetField) {
+					return;
+				}
+
+				onUpdateUI();
+			}
+		};
+
+		_mouseWheelListener = new MouseWheelListener() {
+			@Override
+			public void mouseScrolled(final MouseEvent e) {
+
+				if (_isSetField) {
+					return;
+				}
+
+				UI.adjustSpinnerValueOnMouseScroll(e);
+				onUpdateUI();
+			}
+		};
+	}
+
 	/*
 	 * UI controls
 	 */
 	private Spinner	_spinHours;
 	private Spinner	_spinMinutes;
-//	private Spinner	_spinSeconds;
 
-	public TimeDuration(final Composite parent, final TourFilterProperty filterProperty, final int fieldNo) {
-
-		final SelectionListener selectionListener = new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onUpdateUI();
-			}
-		};
-
-		final MouseWheelListener mouseWheelListener = new MouseWheelListener() {
-			@Override
-			public void mouseScrolled(final MouseEvent e) {
-				onUpdateUI();
-			}
-		};
+	/**
+	 * @param parent
+	 * @param maxHours
+	 * @param dateWithoutKey
+	 * @param dataWithKey
+	 */
+	public TimeDuration(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).spacing(0, 0).applyTo(container);
+		GridLayoutFactory
+				.fillDefaults()//
+				.numColumns(3)
+				.spacing(0, 0)
+				.applyTo(container);
 		{
-			/*
-			 * hour
-			 */
-			_spinHours = new Spinner(container, SWT.BORDER);
-			_spinHours.setData(filterProperty);
-			_spinHours.setData(SlideoutTourFilter.FIELD_NO, fieldNo);
-			_spinHours.setMinimum(-1);
-			_spinHours.setMaximum(999);
-			_spinHours.setToolTipText(Messages.Tour_Editor_Label_Hours_Tooltip);
+			{
+				/*
+				 * Spinner: Hour
+				 */
+				_spinHours = new Spinner(container, SWT.BORDER);
+				_spinHours.setMinimum(-1);
+				_spinHours.setMaximum(24);
 
-			_spinHours.addSelectionListener(selectionListener);
-			_spinHours.addMouseWheelListener(mouseWheelListener);
+				_spinHours.addSelectionListener(_selectionListener);
+				_spinHours.addMouseWheelListener(_mouseWheelListener);
 
-			GridDataFactory
-					.fillDefaults()//
-					.align(SWT.BEGINNING, SWT.CENTER)
-					.applyTo(_spinHours);
+				GridDataFactory
+						.fillDefaults()//
+						.align(SWT.BEGINNING, SWT.CENTER)
+						.applyTo(_spinHours);
+			}
+ 
+			{
+				/*
+				 * Spinner: Minute
+				 */
+				_spinMinutes = new Spinner(container, SWT.BORDER);
+				_spinMinutes.setMinimum(-1);
+				_spinMinutes.setMaximum(60);
 
-			/*
-			 * minute
-			 */
-			_spinMinutes = new Spinner(container, SWT.BORDER);
-			_spinMinutes.setData(filterProperty);
-			_spinMinutes.setData(SlideoutTourFilter.FIELD_NO, fieldNo);
-			_spinMinutes.setMinimum(-1);
-			_spinMinutes.setMaximum(60);
-			_spinMinutes.setToolTipText(Messages.Tour_Editor_Label_Minutes_Tooltip);
+				_spinMinutes.addSelectionListener(_selectionListener);
+				_spinMinutes.addMouseWheelListener(_mouseWheelListener);
 
-			_spinMinutes.addSelectionListener(selectionListener);
-			_spinMinutes.addMouseWheelListener(mouseWheelListener);
-
-			GridDataFactory
-					.fillDefaults()//
-					.align(SWT.BEGINNING, SWT.CENTER)
-					.applyTo(_spinMinutes);
-
-//			/*
-//			 * seconds
-//			 */
-//			_spinSeconds = new Spinner(container, SWT.BORDER);
-//			GridDataFactory
-//					.fillDefaults()//
-//					.align(SWT.BEGINNING, SWT.CENTER)
-//					.applyTo(_spinSeconds);
-//			_spinSeconds.setMinimum(0);
-//			_spinSeconds.setMaximum(60);
-//			_spinSeconds.setToolTipText(Messages.Tour_Editor_Label_Seconds_Tooltip);
-//
-//			_spinSeconds.addMouseWheelListener(_mouseWheelListener);
+				GridDataFactory
+						.fillDefaults()//
+						.align(SWT.BEGINNING, SWT.CENTER)
+						.applyTo(_spinMinutes);
+			}
+			{
+				/*
+				 * Label: Unit
+				 */
+				final Label label = new Label(container, SWT.NONE);
+				label.setText(Messages.App_Unit_HHMM);
+				GridDataFactory
+						.fillDefaults()//
+						.align(SWT.FILL, SWT.CENTER)
+						.indent(LayoutConstants.getSpacing().x, 0)
+						.applyTo(label);
+			}
 		}
 	}
 
-	public void addMouseWheelListener(final MouseWheelListener mouseWheelListener) {
-
-		_spinHours.addMouseWheelListener(mouseWheelListener);
-		_spinMinutes.addMouseWheelListener(mouseWheelListener);
+	public Object getData() {
+		return _spinHours.getData();
 	}
 
-	public void addSelectionListener(final SelectionListener selectionListener) {
-
-		_spinHours.addSelectionListener(selectionListener);
-		_spinMinutes.addSelectionListener(selectionListener);
+	public Object getData(final String key) {
+		return _spinHours.getData(key);
 	}
 
 	/**
@@ -130,20 +153,38 @@ class TimeDuration {
 	public int getTime() {
 
 		return (_spinHours.getSelection() * 3600) //
-				+ (_spinMinutes.getSelection() * 60)
-//				+ _spinSeconds.getSelection()
-		;
+				+ (_spinMinutes.getSelection() * 60);
 	}
 
 	private void onUpdateUI() {
 
-		int recTime = getTime();
+		int time = getTime();
 
-		if (recTime < 0) {
-			recTime = 0;
+		if (time < 0) {
+			time = 0;
 		}
 
-		setTime(recTime);
+		setTime(time);
+
+		if (_timeDurationListener != null) {
+			_timeDurationListener.timeSelected(time);
+		}
+	}
+
+	public void setData(final Object data) {
+		_spinHours.setData(data);
+	}
+
+	public void setData(final String key, final Object data) {
+		_spinHours.setData(key, data);
+	}
+
+	/**
+	 * @param maxHours
+	 *            Default is 24
+	 */
+	public void setMaxHours(final int maxHours) {
+		_spinHours.setMaximum(maxHours);
 	}
 
 	/**
@@ -154,11 +195,17 @@ class TimeDuration {
 
 		final int hours = time / 3600;
 		final int minutes = (time % 3600) / 60;
-//		final int seconds = (time % 3600) % 60;
 
-		_spinHours.setSelection(hours);
-		_spinMinutes.setSelection(minutes);
-//		_spinSeconds.setSelection(seconds);
+		_isSetField = true;
+		{
+			_spinHours.setSelection(hours);
+			_spinMinutes.setSelection(minutes);
+		}
+		_isSetField = false;
+	}
+
+	public void setTimeListener(final TimeDurationListener timeDurationListener) {
+		_timeDurationListener = timeDurationListener;
 	}
 
 }

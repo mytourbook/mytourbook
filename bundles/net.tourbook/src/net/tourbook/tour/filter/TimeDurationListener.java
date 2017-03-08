@@ -15,17 +15,11 @@
  *******************************************************************************/
 package net.tourbook.tour.filter;
 
-public enum TourFilterFieldType {
- 
-	TEXT, //
+public class TimeDurationListener {
 
-	NUMBER_INTEGER, //
-	NUMBER_METRIC, //
-
-	DATE, //
-	TIME, //
-	DURATION, //
-
-	SEASON, //
-
+	/**
+	 * @param durationTime
+	 *            Selected duration time in seconds.
+	 */
+	public void timeSelected(final int durationTime) {}
 }

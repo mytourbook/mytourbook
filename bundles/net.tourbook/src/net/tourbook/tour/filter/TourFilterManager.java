@@ -18,10 +18,11 @@ package net.tourbook.tour.filter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.MonthDay;
 import java.util.ArrayList;
-
+ 
 import net.tourbook.Messages;
 import net.tourbook.application.ActionTourFilter;
 import net.tourbook.application.TourbookPlugin;
@@ -34,6 +35,9 @@ import net.tourbook.preferences.ITourbookPreferences;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
 import org.osgi.framework.Bundle;
@@ -41,28 +45,41 @@ import org.osgi.framework.Version;
 
 public class TourFilterManager {
 
-	private static final String							TOUR_FILTER_FILE_NAME		= "tour-filter.xml";											//$NON-NLS-1$
-	private static final int							TOUR_FILTER_VERSION			= 1;
+	private static final String							TOUR_FILTER_FILE_NAME			= "tour-filter.xml";													//$NON-NLS-1$
+	private static final int							TOUR_FILTER_VERSION				= 1;
 
-	private static final String							TAG_PROFILE					= "Profile";													//$NON-NLS-1$
-	private static final String							TAG_PROPERTY				= "Property";													//$NON-NLS-1$
-	private static final String							TAG_ROOT					= "TourFilterProfiles";											//$NON-NLS-1$
+	private static final String							TAG_PROFILE						= "Profile";															//$NON-NLS-1$
+	private static final String							TAG_PROPERTY					= "Property";															//$NON-NLS-1$
+	private static final String							TAG_ROOT						= "TourFilterProfiles";													//$NON-NLS-1$
 
-	private static final String							ATTR_IS_ENABLED				= "isEnabled";													//$NON-NLS-1$
-	private static final String							ATTR_IS_SELECTED			= "isSelected";													//$NON-NLS-1$
-	private static final String							ATTR_FIELD_ID				= "fieldId";													//$NON-NLS-1$
-	private static final String							ATTR_FIELD_OPERATOR			= "fieldOperator";												//$NON-NLS-1$
-	private static final String							ATTR_NAME					= "name";														//$NON-NLS-1$
-	private static final String							ATTR_SEASON_DAY				= "seasonDay";													//$NON-NLS-1$
-	private static final String							ATTR_SEASON_MONTH			= "seasonMonth";												//$NON-NLS-1$
-	private static final String							ATTR_TOUR_FILTER_VERSION	= "tourFilterVersion";											//$NON-NLS-1$
-	private static final String							ATTR_VALUE					= "value";														//$NON-NLS-1$
+	private static final String							ATTR_IS_ENABLED					= "isEnabled";															//$NON-NLS-1$
+	private static final String							ATTR_IS_SELECTED				= "isSelected";															//$NON-NLS-1$
+	private static final String							ATTR_FIELD_ID					= "fieldId";															//$NON-NLS-1$
+	private static final String							ATTR_FIELD_OPERATOR				= "fieldOperator";														//$NON-NLS-1$
+	private static final String							ATTR_NAME						= "name";																//$NON-NLS-1$
+	private static final String							ATTR_SEASON_DAY					= "seasonDay";															//$NON-NLS-1$
+	private static final String							ATTR_SEASON_MONTH				= "seasonMonth";														//$NON-NLS-1$
+	private static final String							ATTR_TOUR_FILTER_VERSION		= "tourFilterVersion";													//$NON-NLS-1$
+	private static final String							ATTR_VALUE						= "value";																//$NON-NLS-1$
 
-	private static final String							ATTR_DATE_YEAR				= "dateYear";													//$NON-NLS-1$
-	private static final String							ATTR_DATE_MONTH				= "dateMonth";													//$NON-NLS-1$
-	private static final String							ATTR_DATE_DAY				= "dateDay";													//$NON-NLS-1$
-	private static final String							ATTR_TIME_HOUR				= "timeHour";													//$NON-NLS-1$
-	private static final String							ATTR_TIME_MINUTE			= "timeMinute";													//$NON-NLS-1$
+	private static final String							ATTR_DATE_YEAR					= "dateYear";															//$NON-NLS-1$
+	private static final String							ATTR_DATE_MONTH					= "dateMonth";															//$NON-NLS-1$
+	private static final String							ATTR_DATE_DAY					= "dateDay";															//$NON-NLS-1$
+	private static final String							ATTR_TIME_HOUR					= "timeHour";															//$NON-NLS-1$
+	private static final String							ATTR_TIME_MINUTE				= "timeMinute";															//$NON-NLS-1$
+
+	private static final String							OP_BR_OPEN						= "(";																	//$NON-NLS-1$
+	private static final String							OP_BR_CLOSE						= ")";																	//$NON-NLS-1$
+	private static final String							OP_AND							= " AND ";																//$NON-NLS-1$
+	private static final String							OP_OR							= " OR ";																//$NON-NLS-1$
+
+	private static final String							OP_EQUALS						= " = ?\n";																//$NON-NLS-1$
+	private static final String							OP_NOT_EQUALS					= " != ?\n";															//$NON-NLS-1$
+	private static final String							OP_GREATER_THAN					= " > ?\n";																//$NON-NLS-1$
+	private static final String							OP_GREATER_THAN_OR_EQUAL		= " >= ?\n";															//$NON-NLS-1$
+	private static final String							OP_GREATER_THAN_OR_EQUAL_1		= " >= 1\n";															//$NON-NLS-1$
+	private static final String							OP_LESS_THAN					= " < ?\n";																//$NON-NLS-1$
+	private static final String							OP_LESS_THAN_OR_EQUAL			= " <= ?\n";															//$NON-NLS-1$
 
 // SET_FORMATTING_OFF
 
@@ -78,9 +95,13 @@ public class TourFilterManager {
 	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.GREATER_THAN_OR_EQUAL,		Messages.Tour_Filter_Operator_GreaterThanOrEqual),
 	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.BETWEEN,					Messages.Tour_Filter_Operator_Between),
 	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.NOT_BETWEEN,				Messages.Tour_Filter_Operator_NotBetween),
-	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.SEASON_TODAY,				Messages.Tour_Filter_Operator_SeasonToday),
 	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.IS_EMPTY,					Messages.Tour_Filter_Operator_IsEmpty),
 	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.IS_NOT_EMPTY,				Messages.Tour_Filter_Operator_IsNotEmpty),
+	   
+	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.SEASON_YEAR_START_UNTIL_TODAY,	Messages.Tour_Filter_Operator_Season_YearStart_Until_Today),
+	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.SEASON_DATE_UNTIL_TODAY,		Messages.Tour_Filter_Operator_Season_Date_Until_Today),
+	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.SEASON_TODAY_UNTIL_YEAR_END,	Messages.Tour_Filter_Operator_Season_Today_Until_YearEnd),
+	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.SEASON_TODAY_UNTIL_DATE,		Messages.Tour_Filter_Operator_Season_Today_Until_Date),
 
 // is not yet implemented
 //
@@ -96,20 +117,20 @@ public class TourFilterManager {
 	   TourFilterFieldOperator.LESS_THAN_OR_EQUAL,
 	   TourFilterFieldOperator.GREATER_THAN,
 	   TourFilterFieldOperator.GREATER_THAN_OR_EQUAL,
-	   TourFilterFieldOperator.BETWEEN,
-	   TourFilterFieldOperator.NOT_BETWEEN,
 	   TourFilterFieldOperator.EQUALS,
 	   TourFilterFieldOperator.NOT_EQUALS,
+	   TourFilterFieldOperator.BETWEEN,
+	   TourFilterFieldOperator.NOT_BETWEEN,
 	};
 
 	public static final TourFilterFieldOperator[]			FILTER_OPERATORS_NUMBER = {
 	                                        	                         
-		TourFilterFieldOperator.EQUALS,
-		TourFilterFieldOperator.NOT_EQUALS,
 		TourFilterFieldOperator.LESS_THAN,
 		TourFilterFieldOperator.LESS_THAN_OR_EQUAL,
 		TourFilterFieldOperator.GREATER_THAN,
 		TourFilterFieldOperator.GREATER_THAN_OR_EQUAL,
+		TourFilterFieldOperator.EQUALS,
+		TourFilterFieldOperator.NOT_EQUALS,
 		TourFilterFieldOperator.BETWEEN,
 		TourFilterFieldOperator.NOT_BETWEEN,
 	};
@@ -132,16 +153,17 @@ public class TourFilterManager {
 
 	public static final TourFilterFieldOperator[]			FILTER_OPERATORS_SEASON = {
 	                                             			                         
-		TourFilterFieldOperator.LESS_THAN,
-		TourFilterFieldOperator.LESS_THAN_OR_EQUAL,
-		TourFilterFieldOperator.GREATER_THAN,
-		TourFilterFieldOperator.GREATER_THAN_OR_EQUAL,
+		TourFilterFieldOperator.SEASON_YEAR_START_UNTIL_TODAY,
+		TourFilterFieldOperator.SEASON_TODAY_UNTIL_YEAR_END,
+		TourFilterFieldOperator.SEASON_DATE_UNTIL_TODAY,
+		TourFilterFieldOperator.SEASON_TODAY_UNTIL_DATE,
 		TourFilterFieldOperator.BETWEEN,
 		TourFilterFieldOperator.NOT_BETWEEN,
-		TourFilterFieldOperator.SEASON_TODAY,
 	};
 
 // SET_FORMATTING_ON
+
+	private static FieldValueProvider					_fieldValueProvider_temperature	= new FieldValueProvider_Temperature();
 
 	/**
 	 * This is also the sequence how the fields are displayed in the UI
@@ -160,7 +182,7 @@ public class TourFilterManager {
 							FILTER_OPERATORS_DATE_TIME),
 
 					new TourFilterFieldConfig(
-							Messages.Tour_Filter_Field_TourTime,
+							Messages.Tour_Filter_Field_TourStartTime,
 							TourFilterFieldId.TOUR_TIME,
 							TourFilterFieldType.TIME,
 							FILTER_OPERATORS_DATE_TIME),
@@ -207,11 +229,15 @@ public class TourFilterManager {
 					new TourFilterFieldConfig(
 							Messages.Tour_Filter_Field_Temperature,
 							TourFilterFieldId.TEMPERATURE,
-							TourFilterFieldType.NUMBER,
+							TourFilterFieldType.NUMBER_METRIC,
 							FILTER_OPERATORS_NUMBER,
 							-600,
 							1500,
-							10), };
+							10,
+							1,
+							_fieldValueProvider_temperature),
+				//
+				};
 
 		FILTER_FIELD_CONFIG = CONFIG;
 	}
@@ -220,12 +246,29 @@ public class TourFilterManager {
 	
 	private static final Bundle					_bundle				= TourbookPlugin.getDefault().getBundle();
 
-//	private static final IDialogSettings		_state				= TourbookPlugin.getState("net.tourbook.tour.filter.TourFilterManager"); //$NON-NLS-1$
 	private static final IPath					_stateLocation		= Platform.getStateLocation(_bundle);
 	private final static IPreferenceStore		_prefStore			= TourbookPlugin.getPrefStore();
-
 	
 // SET_FORMATTING_ON
+
+	private static IPropertyChangeListener	_prefChangeListener;
+	static {
+
+		_prefChangeListener = new IPropertyChangeListener() {
+			@Override
+			public void propertyChange(final PropertyChangeEvent event) {
+
+				final String property = event.getProperty();
+
+				if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
+
+					updateUnits();
+				}
+			}
+		};
+
+		_prefStore.addPropertyChangeListener(_prefChangeListener);
+	}
 
 	/**
 	 * Contains all available profiles.
@@ -244,9 +287,19 @@ public class TourFilterManager {
 	/**
 	 * Fire event that the tour filter has changed.
 	 */
-	private static void fireTourFilterModifyEvent() {
+	static void fireTourFilterModifyEvent() {
 
-		_prefStore.setValue(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED, Math.random());
+//		System.out.println(
+//				(UI.timeStampNano() + " [" + "] ") + ("\tfireTourFilterModifyEvent"));
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				_prefStore.setValue(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED, Math.random());
+			}
+		});
+
 	}
 
 	/**
@@ -346,7 +399,7 @@ public class TourFilterManager {
 	 * @return Returns sql data for the selected tour filter profile or <code>null</code> when not
 	 *         available.
 	 */
-	public static TourFilterSQLData getSQLData() {
+	public static TourFilterSQLData getSQL() {
 
 		if (_isTourFilterEnabled == false || _selectedProfile == null) {
 
@@ -355,8 +408,10 @@ public class TourFilterManager {
 			return null;
 		}
 
+		final LocalDate today = LocalDate.now();
+
 		final StringBuilder sqlWhere = new StringBuilder();
-		final ArrayList<Long> sqlParameters = new ArrayList<>();
+		final ArrayList<Object> sqlParameters = new ArrayList<>();
 
 		for (final TourFilterProperty filterProperty : _selectedProfile.filterProperties) {
 
@@ -369,84 +424,156 @@ public class TourFilterManager {
 
 			final TourFilterFieldId fieldId = fieldConfig.fieldId;
 
-//			final TourFilterFieldOperator[] fieldOperators = getFieldOperators(fieldId);
-
 			final LocalDateTime dateTime1 = filterProperty.dateTime1;
+			final LocalDateTime dateTime2 = filterProperty.dateTime2;
+			final MonthDay monthDay1 = filterProperty.monthDay1;
+			final MonthDay monthDay2 = filterProperty.monthDay2;
+
+			final Integer int1 = filterProperty.intValue1;
+			final Integer int2 = filterProperty.intValue2;
+			final Float float1 = filterProperty.floatValue1;
+			final Float float2 = filterProperty.floatValue2;
+
+			String sql;
+
+			long value1;
+			long value2;
 
 			switch (fieldId) {
 			case TOUR_DATE:
+
+				sql = "TourData.tourStartTime"; //$NON-NLS-1$
+
+				value1 = LocalDate
+						.of(dateTime1.getYear(), dateTime1.getMonthValue(), dateTime1.getDayOfMonth())
+						.toEpochDay() * 86400_000;
+
+				value2 = LocalDate
+						.of(dateTime2.getYear(), dateTime2.getMonthValue(), dateTime2.getDayOfMonth())
+						.toEpochDay() * 86400_000;
+
+				getSQL__FieldOperators_DateTime(sqlWhere, sqlParameters, fieldOperator, sql, value1, value2);
 				break;
 
 			case TOUR_TIME:
 
-//				   TourFilterFieldOperator.LESS_THAN,
-//				   TourFilterFieldOperator.LESS_THAN_OR_EQUAL,
-//				   TourFilterFieldOperator.GREATER_THAN,
-//				   TourFilterFieldOperator.GREATER_THAN_OR_EQUAL,
-//				   TourFilterFieldOperator.BETWEEN,
-//				   TourFilterFieldOperator.NOT_BETWEEN,
-//				   TourFilterFieldOperator.EQUALS,
-//				   TourFilterFieldOperator.NOT_EQUALS,
+				sql = "(TourData.startHour * 3600 + TourData.startMinute)"; //$NON-NLS-1$
 
-//				private short												startHour;
-//				private short												startMinute;
+				value1 = dateTime1.getHour() * 3600 + dateTime1.getMinute();
+				value2 = dateTime2.getHour() * 3600 + dateTime2.getMinute();
 
-				final int hour = dateTime1.getHour();
-				final int minute = dateTime1.getMinute();
+				getSQL__FieldOperators_DateTime(sqlWhere, sqlParameters, fieldOperator, sql, value1, value2);
 
-				final long duration1 = hour * 3600 + minute;
-				final String sqlFields = " AND (TourData.startHour*3600 + TourData.startHour)\n";
+				break;
+
+			case SEASON_DATE:
+
+				final int todayDay = today.getDayOfMonth();
+				final int todayMonth = today.getMonthValue();
+
+				final int todayValue = todayMonth * 100 + todayDay;
+
+				final int day1 = monthDay1.getDayOfMonth();
+				final int day2 = monthDay2.getDayOfMonth();
+				final int month1 = monthDay1.getMonthValue();
+				final int month2 = monthDay2.getMonthValue();
+
+				final int dateValue1 = month1 * 100 + day1;
+				final int dateValue2 = month2 * 100 + day2;
+
+				sql = "(TourData.startMonth * 100 + TourData.startDay)"; //$NON-NLS-1$
 
 				switch (fieldOperator) {
-				case LESS_THAN:
-					sqlWhere.append(sqlFields + " < ?");
-					sqlParameters.add(duration1);
+				case SEASON_YEAR_START_UNTIL_TODAY:
+					sqlWhere.append(OP_AND + sql + OP_LESS_THAN_OR_EQUAL);
+					sqlParameters.add(todayValue);
 					break;
 
-				case LESS_THAN_OR_EQUAL:
-					sqlWhere.append(sqlFields + " <= ?");
-					sqlParameters.add(duration1);
+				case SEASON_TODAY_UNTIL_YEAR_END:
+					sqlWhere.append(OP_AND + sql + OP_GREATER_THAN_OR_EQUAL);
+					sqlParameters.add(todayValue);
 					break;
 
-				case GREATER_THAN:
-					sqlWhere.append(sqlFields + " > ?");
-					sqlParameters.add(duration1);
-					break;
-				case GREATER_THAN_OR_EQUAL:
-					sqlWhere.append(sqlFields + " >= ?");
-					sqlParameters.add(duration1);
+				case SEASON_DATE_UNTIL_TODAY:
+
+					sqlWhere.append(OP_AND
+							+ (sql + OP_GREATER_THAN_OR_EQUAL) // date
+							+ OP_AND
+							+ (sql + OP_LESS_THAN_OR_EQUAL) // today
+					);
+
+					sqlParameters.add(dateValue1);
+					sqlParameters.add(todayValue);
+
 					break;
 
-				case EQUALS:
-					sqlWhere.append(sqlFields + " == ?");
-					sqlParameters.add(duration1);
-					break;
-				case NOT_EQUALS:
-					sqlWhere.append(sqlFields + " != ?");
-					sqlParameters.add(duration1);
+				case SEASON_TODAY_UNTIL_DATE:
+
+					sqlWhere.append(OP_AND
+							+ (sql + OP_GREATER_THAN_OR_EQUAL) // date
+							+ OP_AND
+							+ (sql + OP_LESS_THAN_OR_EQUAL) // today
+					);
+
+					sqlParameters.add(todayValue);
+					sqlParameters.add(dateValue1);
+
 					break;
 
 				case BETWEEN:
+
+					sqlWhere.append(OP_AND
+							+ (sql + OP_GREATER_THAN_OR_EQUAL) // date
+							+ OP_AND
+							+ (sql + OP_LESS_THAN_OR_EQUAL) // today
+					);
+
+					sqlParameters.add(dateValue1);
+					sqlParameters.add(dateValue2);
 					break;
+
 				case NOT_BETWEEN:
+
+					sqlWhere.append(OP_AND
+
+							+ OP_BR_OPEN
+
+							+ (sql + OP_LESS_THAN)
+
+							+ OP_OR
+
+							+ (sql + OP_GREATER_THAN)
+
+							+ OP_BR_CLOSE
+					//
+					);
+
+					sqlParameters.add(dateValue1);
+					sqlParameters.add(dateValue2);
 					break;
 				}
 
 				break;
 
 			case BREAK_TIME:
+				sql = "(TourData.tourRecordingTime - TourData.tourDrivingTime)"; //$NON-NLS-1$
+				getSQL__FieldOperators_Number(sqlWhere, sqlParameters, fieldOperator, sql, int1, int2);
 				break;
 
 			case DRIVING_TIME:
+				sql = "TourData.tourDrivingTime"; //$NON-NLS-1$
+				getSQL__FieldOperators_Number(sqlWhere, sqlParameters, fieldOperator, sql, int1, int2);
+
 				break;
 
 			case RECORDING_TIME:
-				break;
-
-			case SEASON_DATE:
+				sql = "TourData.tourRecordingTime"; //$NON-NLS-1$
+				getSQL__FieldOperators_Number(sqlWhere, sqlParameters, fieldOperator, sql, int1, int2);
 				break;
 
 			case TEMPERATURE:
+				sql = "TourData.avgTemperature"; //$NON-NLS-1$
+				getSQL__FieldOperators_Number(sqlWhere, sqlParameters, fieldOperator, sql, float1, float2);
 				break;
 
 			case TOUR_TITLE:
@@ -454,7 +581,175 @@ public class TourFilterManager {
 			}
 		}
 
-		return new TourFilterSQLData(sqlWhere.toString(), sqlParameters);
+		final TourFilterSQLData tourFilterSQLData = new TourFilterSQLData(sqlWhere.toString(), sqlParameters);
+
+		return tourFilterSQLData;
+	}
+
+	private static void getSQL__FieldOperators_DateTime(final StringBuilder sqlWhere,
+														final ArrayList<Object> sqlParameters,
+														final TourFilterFieldOperator fieldOperator,
+														final String sqlField,
+														final Long value1,
+														final Long value2) {
+
+		switch (fieldOperator) {
+		case LESS_THAN:
+			getSQL_LessThan(sqlWhere, sqlParameters, sqlField, value1);
+			break;
+		case LESS_THAN_OR_EQUAL:
+			getSQL_LessThanOrEqual(sqlWhere, sqlParameters, sqlField, value1);
+			break;
+
+		case GREATER_THAN:
+			getSQL_GreaterThan(sqlWhere, sqlParameters, sqlField, value1);
+			break;
+		case GREATER_THAN_OR_EQUAL:
+			getSQL_GreaterThanOrEqual(sqlWhere, sqlParameters, sqlField, value1);
+			break;
+
+		case EQUALS:
+			getSQL_Equals(sqlWhere, sqlParameters, sqlField, value1);
+			break;
+		case NOT_EQUALS:
+			getSQL_NotEquals(sqlWhere, sqlParameters, value1, sqlField);
+			break;
+
+		case BETWEEN:
+			getSQL_Between(sqlWhere, sqlParameters, sqlField, value1, value2);
+			break;
+		case NOT_BETWEEN:
+			getSQL_NotBetween(sqlWhere, sqlParameters, sqlField, value1, value2);
+			break;
+		}
+	}
+
+	private static void getSQL__FieldOperators_Number(	final StringBuilder sqlWhere,
+														final ArrayList<Object> sqlParameters,
+														final TourFilterFieldOperator fieldOperator,
+														final String sqlField,
+														final Object value1,
+														final Object value2) {
+
+		switch (fieldOperator) {
+		case LESS_THAN:
+			getSQL_LessThan(sqlWhere, sqlParameters, sqlField, value1);
+			break;
+		case LESS_THAN_OR_EQUAL:
+			getSQL_LessThanOrEqual(sqlWhere, sqlParameters, sqlField, value1);
+			break;
+
+		case GREATER_THAN:
+			getSQL_GreaterThan(sqlWhere, sqlParameters, sqlField, value1);
+			break;
+		case GREATER_THAN_OR_EQUAL:
+			getSQL_GreaterThanOrEqual(sqlWhere, sqlParameters, sqlField, value1);
+			break;
+
+		case EQUALS:
+			getSQL_Equals(sqlWhere, sqlParameters, sqlField, value1);
+			break;
+		case NOT_EQUALS:
+			getSQL_NotEquals(sqlWhere, sqlParameters, value1, sqlField);
+			break;
+
+		case BETWEEN:
+			getSQL_Between(sqlWhere, sqlParameters, sqlField, value1, value2);
+			break;
+		case NOT_BETWEEN:
+			getSQL_NotBetween(sqlWhere, sqlParameters, sqlField, value1, value2);
+			break;
+		}
+	}
+
+	private static void getSQL_Between(	final StringBuilder sqlWhere,
+										final ArrayList<Object> sqlParameters,
+										final String sqlField,
+										final Object value1,
+										final Object value2) {
+
+		sqlWhere.append(OP_AND + sqlField + OP_GREATER_THAN_OR_EQUAL);
+		sqlWhere.append(OP_AND + sqlField + OP_LESS_THAN_OR_EQUAL);
+
+		sqlParameters.add(value1);
+		sqlParameters.add(value2);
+	}
+
+	private static void getSQL_Equals(	final StringBuilder sqlWhere,
+										final ArrayList<Object> sqlParameters,
+										final String sqlField,
+										final Object value1) {
+
+		sqlWhere.append(OP_AND + sqlField + OP_EQUALS);
+		sqlParameters.add(value1);
+	}
+
+	private static void getSQL_GreaterThan(	final StringBuilder sqlWhere,
+											final ArrayList<Object> sqlParameters,
+											final String sqlField,
+											final Object value1) {
+
+		sqlWhere.append(OP_AND + sqlField + OP_GREATER_THAN);
+		sqlParameters.add(value1);
+	}
+
+	private static void getSQL_GreaterThanOrEqual(	final StringBuilder sqlWhere,
+													final ArrayList<Object> sqlParameters,
+													final String sqlField,
+													final Object value1) {
+
+		sqlWhere.append(OP_AND + sqlField + OP_GREATER_THAN_OR_EQUAL);
+		sqlParameters.add(value1);
+	}
+
+	private static void getSQL_LessThan(final StringBuilder sqlWhere,
+										final ArrayList<Object> sqlParameters,
+										final String sqlField,
+										final Object value1) {
+
+		sqlWhere.append(OP_AND + sqlField + OP_LESS_THAN);
+		sqlParameters.add(value1);
+	}
+
+	private static void getSQL_LessThanOrEqual(	final StringBuilder sqlWhere,
+												final ArrayList<Object> sqlParameters,
+												final String sqlField,
+												final Object value1) {
+
+		sqlWhere.append(OP_AND + sqlField + OP_LESS_THAN_OR_EQUAL);
+		sqlParameters.add(value1);
+	}
+
+	private static void getSQL_NotBetween(	final StringBuilder sqlWhere,
+											final ArrayList<Object> sqlParameters,
+											final String sqlField,
+											final Object value1,
+											final Object value2) {
+		sqlWhere.append(OP_AND
+
+				+ OP_BR_OPEN
+
+				+ (sqlField + OP_LESS_THAN)
+
+				+ OP_OR
+
+				+ (sqlField + OP_GREATER_THAN)
+
+				+ OP_BR_CLOSE
+		//
+		);
+
+		sqlParameters.add(value1);
+		sqlParameters.add(value2);
+	}
+
+	private static void getSQL_NotEquals(	final StringBuilder sqlWhere,
+											final ArrayList<Object> sqlParameters,
+											final Object value1,
+											final String sqlField) {
+
+		sqlWhere.append(OP_AND + sqlField + OP_NOT_EQUALS);
+		sqlParameters.add(value1);
 	}
 
 	private static File getXmlFile() {
@@ -555,11 +850,15 @@ public class TourFilterManager {
 				break;
 
 			case DURATION:
-				readXml_Integer(xmlProperty, filterProperty, 1);
+				readXml_Number_Integer(xmlProperty, filterProperty, 1);
 				break;
 
-			case NUMBER:
+			case NUMBER_INTEGER:
+				readXml_Number_Integer(xmlProperty, filterProperty, 1);
+				break;
 
+			case NUMBER_METRIC:
+				readXml_Number_Float(xmlProperty, filterProperty, 1);
 				break;
 
 			case TEXT:
@@ -593,12 +892,18 @@ public class TourFilterManager {
 				break;
 
 			case DURATION:
-				readXml_Integer(xmlProperty, filterProperty, 1);
-				readXml_Integer(xmlProperty, filterProperty, 2);
+				readXml_Number_Integer(xmlProperty, filterProperty, 1);
+				readXml_Number_Integer(xmlProperty, filterProperty, 2);
 				break;
 
-			case NUMBER:
+			case NUMBER_INTEGER:
+				readXml_Number_Integer(xmlProperty, filterProperty, 1);
+				readXml_Number_Integer(xmlProperty, filterProperty, 2);
+				break;
 
+			case NUMBER_METRIC:
+				readXml_Number_Float(xmlProperty, filterProperty, 1);
+				readXml_Number_Float(xmlProperty, filterProperty, 2);
 				break;
 
 			case TEXT:
@@ -657,16 +962,38 @@ public class TourFilterManager {
 		}
 	}
 
-	private static void readXml_Integer(final IMemento xmlProperty,
-										final TourFilterProperty filterProperty,
-										final int fieldNo) {
+	private static void readXml_Number_Float(	final IMemento xmlProperty,
+												final TourFilterProperty filterProperty,
+												final int fieldNo) {
+
+		final TourFilterFieldConfig fieldConfig = filterProperty.fieldConfig;
+
+		final float value = Util.getXmlFloatFloat(
+
+				(XMLMemento) xmlProperty,
+				ATTR_VALUE + fieldNo,
+
+				0f,
+				fieldConfig.minValue,
+				fieldConfig.maxValue);
+
+		if (fieldNo == 1) {
+			filterProperty.floatValue1 = value;
+		} else {
+			filterProperty.floatValue2 = value;
+		}
+	}
+
+	private static void readXml_Number_Integer(	final IMemento xmlProperty,
+												final TourFilterProperty filterProperty,
+												final int fieldNo) {
 
 		final int value = Util.getXmlInteger(xmlProperty, ATTR_VALUE + fieldNo, 0);
 
 		if (fieldNo == 1) {
-			filterProperty.number1 = value;
+			filterProperty.intValue1 = value;
 		} else {
-			filterProperty.number2 = value;
+			filterProperty.intValue2 = value;
 		}
 	}
 
@@ -750,6 +1077,13 @@ public class TourFilterManager {
 		_actionTourFilter = actionTourFilterAdv;
 	}
 
+	public static void updateUnits() {
+
+		// set label celcius or fahrenheit
+		final TourFilterFieldConfig fieldConfigTemperature = getFieldConfig(TourFilterFieldId.TEMPERATURE);
+		fieldConfigTemperature.unitLabel = UI.UNIT_LABEL_TEMPERATURE;
+	}
+
 	/**
 	 * @return
 	 */
@@ -829,8 +1163,11 @@ public class TourFilterManager {
 		final MonthDay monthDay1 = filterProperty.monthDay1;
 		final MonthDay monthDay2 = filterProperty.monthDay2;
 
-		final int number1 = filterProperty.number1;
-		final int number2 = filterProperty.number2;
+		final int intValue1 = filterProperty.intValue1;
+		final int intValue2 = filterProperty.intValue2;
+
+		final float floatValue1 = filterProperty.floatValue1;
+		final float floatValue2 = filterProperty.floatValue2;
 
 		switch (fieldOperator) {
 		case GREATER_THAN:
@@ -850,8 +1187,12 @@ public class TourFilterManager {
 				break;
 
 			case DURATION:
-			case NUMBER:
-				writeXml_Number(xmlProperty, number1, 1);
+			case NUMBER_INTEGER:
+				writeXml_Number_Integer(xmlProperty, intValue1, 1);
+				break;
+
+			case NUMBER_METRIC:
+				writeXml_Number_Float(xmlProperty, floatValue1, 1);
 				break;
 
 			case TEXT:
@@ -885,9 +1226,14 @@ public class TourFilterManager {
 				break;
 
 			case DURATION:
-			case NUMBER:
-				writeXml_Number(xmlProperty, number1, 1);
-				writeXml_Number(xmlProperty, number2, 2);
+			case NUMBER_INTEGER:
+				writeXml_Number_Integer(xmlProperty, intValue1, 1);
+				writeXml_Number_Integer(xmlProperty, intValue2, 2);
+				break;
+
+			case NUMBER_METRIC:
+				writeXml_Number_Float(xmlProperty, floatValue1, 1);
+				writeXml_Number_Float(xmlProperty, floatValue2, 2);
 				break;
 
 			case TEXT:
@@ -932,9 +1278,14 @@ public class TourFilterManager {
 		xmlProperty.putInteger(ATTR_DATE_DAY + fieldNo, dateTime.getDayOfMonth());
 	}
 
-	private static void writeXml_Number(final IMemento xmlProperty, final int number, final int fieldNo) {
+	private static void writeXml_Number_Float(final IMemento xmlProperty, final float value, final int fieldNo) {
 
-		xmlProperty.putInteger(ATTR_VALUE + fieldNo, number);
+		xmlProperty.putFloat(ATTR_VALUE + fieldNo, value);
+	}
+
+	private static void writeXml_Number_Integer(final IMemento xmlProperty, final int value, final int fieldNo) {
+
+		xmlProperty.putInteger(ATTR_VALUE + fieldNo, value);
 	}
 
 	private static void writeXml_Season(final IMemento xmlProperty, final MonthDay monthDay, final int fieldNo) {

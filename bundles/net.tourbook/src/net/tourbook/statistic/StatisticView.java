@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -73,10 +73,10 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
 	public static final String				ID							= "net.tourbook.statistic.StatisticView";			//$NON-NLS-1$
 
-	private static final String				COMBO_MINIMUM_WIDTH			= "1234567890";									//$NON-NLS-1$
-	private static final String				COMBO_MAXIMUM_WIDTH			= "123456789012345678901234567890";				//$NON-NLS-1$
+	private static final String				COMBO_MINIMUM_WIDTH			= "1234567890";										//$NON-NLS-1$
+	private static final String				COMBO_MAXIMUM_WIDTH			= "123456789012345678901234567890";					//$NON-NLS-1$
 
-	private static final String				STATE_SELECTED_STATISTIC	= "statistic.container.selected_statistic";		//$NON-NLS-1$
+	private static final String				STATE_SELECTED_STATISTIC	= "statistic.container.selected_statistic";			//$NON-NLS-1$
 	private static final String				STATE_SELECTED_YEAR			= "statistic.container.selected-year";				//$NON-NLS-1$
 	private static final String				STATE_NUMBER_OF_YEARS		= "statistic.container.number_of_years";			//$NON-NLS-1$
 
@@ -154,7 +154,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
 		_activeStatistic.setSynchScale(_isSynchScaleEnabled);
 
-		_activeStatistic.updateStatistic(new StatisticContext(
+		_activeStatistic.updateStatistic(new StatisticContext(//
 				_activePerson,
 				_activeTourTypeFilter,
 				_selectedYear,
@@ -315,7 +315,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
 					_isInUpdateUI = false;
 
 				} else if (eventId == TourEventId.UPDATE_UI || //
-						eventId == TourEventId.ALL_TOURS_ARE_MODIFIED) {
+				eventId == TourEventId.ALL_TOURS_ARE_MODIFIED) {
 
 					updateStatistic();
 				}
@@ -387,11 +387,13 @@ public class StatisticView extends ViewPart implements ITourProvider {
 		final int widgetSpacing = 15;
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
+		GridDataFactory
+				.fillDefaults()//
 				.grab(true, false)
 				.align(SWT.BEGINNING, SWT.FILL)
 				.applyTo(container);
-		GridLayoutFactory.fillDefaults()//
+		GridLayoutFactory
+				.fillDefaults()//
 				.numColumns(6)
 				.margins(3, 3)
 				.applyTo(container);
@@ -422,7 +424,8 @@ public class StatisticView extends ViewPart implements ITourProvider {
 				_comboYear.setToolTipText(Messages.Tour_Book_Combo_year_tooltip);
 				_comboYear.setVisibleItemCount(50);
 
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.indent(widgetSpacing, 0)
 						.hint(_pc.convertWidthInCharsToPixels(_isOSX ? 12 : _isLinux ? 12 : 5), SWT.DEFAULT)
 						.applyTo(_comboYear);
@@ -444,7 +447,8 @@ public class StatisticView extends ViewPart implements ITourProvider {
 				_comboNumberOfYears.setToolTipText(Messages.tour_statistic_number_of_years);
 				_comboNumberOfYears.setVisibleItemCount(50);
 
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.indent(2, 0)
 						.hint(_pc.convertWidthInCharsToPixels(_isOSX ? 8 : _isLinux ? 8 : 4), SWT.DEFAULT)
 						.applyTo(_comboNumberOfYears);
@@ -467,7 +471,8 @@ public class StatisticView extends ViewPart implements ITourProvider {
 				_comboBarVerticalOrder.setVisibleItemCount(50);
 				_comboBarVerticalOrder.setVisible(false);
 
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.indent(widgetSpacing, 0)
 //						.hint(defaultTextSize.x, SWT.DEFAULT)
 						.applyTo(_comboBarVerticalOrder);
@@ -672,12 +677,13 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
 		final SQLFilter sqlFilter = new SQLFilter();
 
-		final String sqlString = //
-		"SELECT" // 												//$NON-NLS-1$
-				+ " startYear " //									//$NON-NLS-1$
-				+ " FROM " + TourDatabase.TABLE_TOUR_DATA //		//$NON-NLS-1$
-				+ " WHERE 1=1 " + sqlFilter.getWhereClause() //		//$NON-NLS-1$
-				+ " GROUP BY STARTYEAR ORDER BY STARTYEAR"; //		//$NON-NLS-1$
+		final String sqlString = "\n\n" //								//$NON-NLS-1$
+				+ "SELECT" // 											//$NON-NLS-1$
+				+ " startYear " //										//$NON-NLS-1$
+				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA) //			//$NON-NLS-1$
+				+ (" WHERE 1=1 " + sqlFilter.getWhereClause()) //		//$NON-NLS-1$
+				+ " GROUP BY STARTYEAR ORDER BY STARTYEAR" //			//$NON-NLS-1$
+				+ "\n\n"; //											//$NON-NLS-1$
 
 		_availableYears = new TIntArrayList();
 
@@ -1037,7 +1043,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
 		// use slideout AFTER the toolbar is created/updated/filled, this creates it
 		_activeStatistic.setupStatisticSlideout(_slideoutStatisticOptions);
-		_slideoutStatisticOptions.setupGrid(
+		_slideoutStatisticOptions.setupGrid(//
 				_activeStatistic.getGridPrefPrefix(),
 				_activeStatistic.getEnabledGridOptions());
 	}

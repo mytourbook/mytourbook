@@ -30,9 +30,9 @@ import net.tourbook.tour.filter.TourFilterSQLData;
  */
 public class SQLFilter {
 
-	private String			_sqlWhereClause	= UI.EMPTY_STRING;
+	private String				_sqlWhereClause	= UI.EMPTY_STRING;
 
-	private ArrayList<Long>	_parameters		= new ArrayList<Long>();
+	private ArrayList<Object>	_parameters		= new ArrayList<>();
 
 	public SQLFilter() {
 		this(true);
@@ -85,7 +85,7 @@ public class SQLFilter {
 		/*
 		 * Advanced tour filter
 		 */
-		final TourFilterSQLData sqlData = TourFilterManager.getSQLData();
+		final TourFilterSQLData sqlData = TourFilterManager.getSQL();
 		if (sqlData != null) {
 
 			sb.append(sqlData.getWhereString());
@@ -114,13 +114,26 @@ public class SQLFilter {
 
 		int parameterIndex = startIndex;
 
-		for (final Long longParameter : _parameters) {
+		for (final Object parameter : _parameters) {
 
-			if (longParameter != null) {
+			if (parameter instanceof Long) {
 
-				statement.setLong(parameterIndex, longParameter.longValue());
-
+				statement.setLong(parameterIndex, (Long) parameter);
 				parameterIndex++;
+
+			} else if (parameter instanceof Float) {
+
+				statement.setFloat(parameterIndex, (Float) parameter);
+				parameterIndex++;
+
+			} else if (parameter instanceof Integer) {
+
+				statement.setInt(parameterIndex, (Integer) parameter);
+				parameterIndex++;
+
+			} else {
+
+				throw new RuntimeException("SQL filter parameter is not supported, " + parameter.getClass());//$NON-NLS-1$
 			}
 		}
 	}

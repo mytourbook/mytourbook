@@ -87,38 +87,40 @@ public class DataProvider_Tour_Day extends DataProvider {
 
 		final SQLFilter sqlFilter = new SQLFilter();
 
-		final String sqlString = "SELECT " // //$NON-NLS-1$
-				//
-				+ "TourId, " //					1 	//$NON-NLS-1$
+		final String sqlString = "\n\n"
 
-				+ "StartYear, " // 				2	//$NON-NLS-1$
-				+ "StartWeek," //				3	//$NON-NLS-1$
-				+ "TourStartTime, " // 			4	//$NON-NLS-1$
-				+ "TimeZoneId, "//				5	//$NON-NLS-1$
+				+ "SELECT " // //$NON-NLS-1$
+				//
+				+ " TourId, " //					1 	//$NON-NLS-1$
 
-				+ "TourDrivingTime, " // 		6	//$NON-NLS-1$
-				+ "TourRecordingTime, " // 		7	//$NON-NLS-1$
+				+ " StartYear, " // 				2	//$NON-NLS-1$
+				+ " StartWeek," //					3	//$NON-NLS-1$
+				+ " TourStartTime, " // 			4	//$NON-NLS-1$
+				+ " TimeZoneId, "//					5	//$NON-NLS-1$
 
-				+ "TourDistance, " // 			8	//$NON-NLS-1$
-				+ "TourAltUp, " // 				9	//$NON-NLS-1$
-				+ "TourTitle, " //				10	//$NON-NLS-1$
-				+ "TourDescription, " // 		11	//$NON-NLS-1$
+				+ " TourDrivingTime, " // 			6	//$NON-NLS-1$
+				+ " TourRecordingTime, " // 		7	//$NON-NLS-1$
+
+				+ " TourDistance, " // 				8	//$NON-NLS-1$
+				+ " TourAltUp, " // 				9	//$NON-NLS-1$
+				+ " TourTitle, " //					10	//$NON-NLS-1$
+				+ " TourDescription, " // 			11	//$NON-NLS-1$
 				//
-				+ "TourType_typeId, " // 		12	//$NON-NLS-1$
-				+ "jTdataTtag.TourTag_tagId"//	13	//$NON-NLS-1$
+				+ " TourType_typeId, " // 			12	//$NON-NLS-1$
+				+ " jTdataTtag.TourTag_tagId"//		13	//$NON-NLS-1$
 				//
-				+ UI.NEW_LINE
+				+ "\n"
 				//
-				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + UI.NEW_LINE) //$NON-NLS-1$
+				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + "\n") //$NON-NLS-1$
 				//
 				// get tag id's
 				+ (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag") //$NON-NLS-1$ //$NON-NLS-2$
-				+ (" ON tourID = jTdataTtag.TourData_tourId") //$NON-NLS-1$
+				+ (" ON tourID = jTdataTtag.TourData_tourId \n") //$NON-NLS-1$
 				//
-				+ (" WHERE StartYear IN (" + getYearList(lastYear, numberOfYears) + ")" + UI.NEW_LINE) //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" WHERE StartYear IN (" + getYearList(lastYear, numberOfYears) + ")\n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ sqlFilter.getWhereClause()
 				//
-				+ (" ORDER BY TourStartTime "); //$NON-NLS-1$
+				+ (" ORDER BY TourStartTime \n\n"); //$NON-NLS-1$
 
 		try {
 
@@ -159,6 +161,7 @@ public class DataProvider_Tour_Day extends DataProvider {
 			sqlFilter.setParameters(statement, 1);
 
 			final ResultSet result = statement.executeQuery();
+			
 			while (result.next()) {
 
 				final long dbTourId = result.getLong(1);

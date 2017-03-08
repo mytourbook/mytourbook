@@ -15,8 +15,9 @@
  *******************************************************************************/
 package net.tourbook.data;
 
-import static javax.persistence.CascadeType.ALL;
-import static javax.persistence.FetchType.EAGER;
+import static javax.persistence.CascadeType.*;
+import static javax.persistence.FetchType.*;
+
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.TIntObjectHashMap;
 
@@ -132,7 +133,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	public static final int										DB_LENGTH_WEATHER					= 1000;
 	public static final int										DB_LENGTH_WEATHER_CLOUDS			= 255;
 
-	private static final String									TIME_ZONE_ID_EUROPE_BERLIN			= "Europe/Berlin";										//$NON-NLS-1$
+	private static final String									TIME_ZONE_ID_EUROPE_BERLIN			= "Europe/Berlin";									//$NON-NLS-1$
 
 	public static final int										MIN_TIMEINTERVAL_FOR_MAX_SPEED		= 20;
 
@@ -154,7 +155,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * disabled because they are not available, tour duration can be edited<br>
 	 * this is the id of the deviceDataReader
 	 */
-	public static final String									DEVICE_ID_CSV_TOUR_DATA_READER		= "net.tourbook.device.CSVTourDataReader";				//$NON-NLS-1$
+	public static final String									DEVICE_ID_CSV_TOUR_DATA_READER		= "net.tourbook.device.CSVTourDataReader";			//$NON-NLS-1$
 
 	/**
 	 * THIS IS NOT UNUSED !!!<br>
@@ -169,7 +170,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 	@Transient
 	private static IPreferenceStore								_prefStore							= TourbookPlugin
-																											.getPrefStore();
+			.getPrefStore();
 
 	/**
 	 * Unique entity id which identifies the tour
@@ -221,7 +222,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	/**
 	 * 
 	 */
-	private int													startSecond;																				// db-version 7
+	private int													startSecond;																			// db-version 7
 
 	/**
 	 * Calendar week of the tour.
@@ -284,7 +285,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * 0 == false <i>(default, no distance sensor)</i> <br>
 	 * 1 == true
 	 */
-	private short												isDistanceFromSensor				= 0;													// db-version 8
+	private short												isDistanceFromSensor				= 0;												// db-version 8
 
 	// ############################################# ALTITUDE #############################################
 
@@ -313,12 +314,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	private short												startPulse;
 
 	@XmlElement
-	private int													restPulse;																					// db-version 8
+	private int													restPulse;																				// db-version 8
 
 	@XmlElement
-	private Integer												calories;																					// db-version 4
+	private Integer												calories;																				// db-version 4
 
-	private float												bikerWeight;																				// db-version 4
+	private float												bikerWeight;																			// db-version 4
 
 	/**
 	 * A flag indicating that the power is from a sensor. This is the state of the device which is
@@ -327,7 +328,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * <br>
 	 * 0 == false, 1 == true
 	 */
-	private int													isPowerSensorPresent				= 0;													// db-version 12
+	private int													isPowerSensorPresent				= 0;												// db-version 12
 
 	// ############################################# PULSE #############################################
 
@@ -337,7 +338,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * @since is float since db version 21, before it was int
 	 */
 	@XmlElement
-	private float												avgPulse;																					// db-version 4
+	private float												avgPulse;																				// db-version 4
 
 	/**
 	 * Maximum pulse for the current tour.
@@ -345,12 +346,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * @since is float since db version 21, before it was int
 	 */
 	@XmlElement
-	private float												maxPulse;																					// db-version 4
+	private float												maxPulse;																				// db-version 4
 
 	/**
 	 * Number of HR zones which are available for this tour, is 0 when HR zones are not defined.
 	 */
-	private int													numberOfHrZones						= 0;													// db-version 18
+	private int													numberOfHrZones						= 0;												// db-version 18
 
 	/**
 	 * Time for all HR zones are contained in {@link #hrZone0} ... {@link #hrZone9}. Each tour can
@@ -358,16 +359,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * <p>
 	 * These values are used in the statistic views.
 	 */
-	private int													hrZone0								= -1;													// db-version 16
-	private int													hrZone1								= -1;													// db-version 16
-	private int													hrZone2								= -1;													// db-version 16
-	private int													hrZone3								= -1;													// db-version 16
-	private int													hrZone4								= -1;													// db-version 16
-	private int													hrZone5								= -1;													// db-version 16
-	private int													hrZone6								= -1;													// db-version 16
-	private int													hrZone7								= -1;													// db-version 16
-	private int													hrZone8								= -1;													// db-version 16
-	private int													hrZone9								= -1;													// db-version 16
+	private int													hrZone0								= -1;												// db-version 16
+	private int													hrZone1								= -1;												// db-version 16
+	private int													hrZone2								= -1;												// db-version 16
+	private int													hrZone3								= -1;												// db-version 16
+	private int													hrZone4								= -1;												// db-version 16
+	private int													hrZone5								= -1;												// db-version 16
+	private int													hrZone6								= -1;												// db-version 16
+	private int													hrZone7								= -1;												// db-version 16
+	private int													hrZone8								= -1;												// db-version 16
+	private int													hrZone9								= -1;												// db-version 16
 
 	/**
 	 * A flag indicating that the pulse is from a sensor. This is the state of the device which is
@@ -376,7 +377,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * <br>
 	 * 0 == false, 1 == true
 	 */
-	private int													isPulseSensorPresent				= 0;													// db-version 12
+	private int													isPulseSensorPresent				= 0;												// db-version 12
 
 	// ############################################# DEVICE TOUR TYPE #############################################
 
@@ -404,7 +405,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * @since is float since db version 21, before it was int
 	 */
 	@XmlElement
-	private float												maxAltitude;																				// db-version 4
+	private float												maxAltitude;																			// db-version 4
 
 	// ############################################# MAX VALUES #############################################
 
@@ -412,7 +413,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * maximum speed in metric system
 	 */
 	@XmlElement
-	private float												maxSpeed;																					// db-version 4
+	private float												maxSpeed;																				// db-version 4
 
 	// ############################################# AVERAGE VALUES #############################################
 
@@ -423,6 +424,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	private float												avgCadence;																				// db-version 4
 
 	/**
+	 * Average temperature with metric system
+	 * 
 	 * @since Is float since db version 21, before it was int. In db version 20 this field was
 	 *        already float but not the database field.
 	 */
@@ -433,8 +436,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	private int													weatherWindDir;																			// db-version 8
 
 	private int													weatherWindSpd;																			// db-version 8
-	private String												weatherClouds;																				// db-version 8
-	private String												weather;																					// db-version 13
+	private String												weatherClouds;																			// db-version 8
+	private String												weather;																				// db-version 13
 
 	// ############################################# POWER #############################################
 
@@ -458,16 +461,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	// ############################################# OTHER TOUR/DEVICE DATA #############################################
 
 	@XmlElement
-	private String												tourTitle;																					// db-version 4
+	private String												tourTitle;																				// db-version 4
 
 	@XmlElement
-	private String												tourDescription;																			// db-version 4
+	private String												tourDescription;																		// db-version 4
 
 	@XmlElement
 	private String												tourStartPlace;																			// db-version 4
 
 	@XmlElement
-	private String												tourEndPlace;																				// db-version 4
+	private String												tourEndPlace;																			// db-version 4
 
 	/**
 	 * Date/Time when tour data was created. This value is set to the tour start date before db
@@ -475,14 +478,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * <p>
 	 * Data format: YYYYMMDDhhmmss
 	 */
-	private long												dateTimeCreated;																			// db-version 11
+	private long												dateTimeCreated;																		// db-version 11
 
 	/**
 	 * Date/Time when tour data was modified, default value is 0
 	 * <p>
 	 * Data format: YYYYMMDDhhmmss
 	 */
-	private long												dateTimeModified;																			// db-version 11
+	private long												dateTimeModified;																		// db-version 11
 
 	/** Folder path from the import file. */
 	private String												tourImportFilePath;																		// db-version 6
@@ -493,13 +496,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	/**
 	 * Tolerance for the Douglas Peucker algorithm.
 	 */
-	private short												dpTolerance							= 50;													// 5.0 since version 14.7
+	private short												dpTolerance							= 50;												// 5.0 since version 14.7
 
 	/**
 	 * Time difference in seconds between 2 time slices or <code>-1</code> for GPS devices when the
 	 * time slices has variable time duration
 	 */
-	private short												deviceTimeInterval					= -1;													// db-version 3
+	private short												deviceTimeInterval					= -1;												// db-version 3
 
 	/**
 	 * Scaling factor for the temperature data serie, e.g. when set to 10 the temperature data serie
@@ -509,12 +512,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * disabled when float was introduces in 11.after8, preserved in database that older ejb objects
 	 * can be loaded
 	 */
-	private int													temperatureScale					= 1;													// db-version 13
+	private int													temperatureScale					= 1;												// db-version 13
 
 	/**
 	 * Firmware version of the device
 	 */
-	private String												deviceFirmwareVersion;																		// db-version 12
+	private String												deviceFirmwareVersion;																	// db-version 12
 
 	/**
 	 * This value is multiplied with the cadence data serie when displayed, cadence data serie is
@@ -538,23 +541,23 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * when a tour is merged with another tour, {@link #mergeSourceTourId} contains the tour id of
 	 * the tour which is merged into this tour
 	 */
-	private Long												mergeSourceTourId;																			// db-version 7
+	private Long												mergeSourceTourId;																		// db-version 7
 
 	/**
 	 * when a tour is merged into another tour, {@link #mergeTargetTourId} contains the tour id of
 	 * the tour into which this tour is merged
 	 */
-	private Long												mergeTargetTourId;																			// db-version 7
+	private Long												mergeTargetTourId;																		// db-version 7
 
 	/**
 	 * positive or negative time offset in seconds for the merged tour
 	 */
-	private int													mergedTourTimeOffset;																		// db-version 7
+	private int													mergedTourTimeOffset;																	// db-version 7
 
 	/**
 	 * altitude difference for the merged tour
 	 */
-	private int													mergedAltitudeOffset;																		// db-version 7
+	private int													mergedAltitudeOffset;																	// db-version 7
 
 	/**
 	 * Unique plugin id for the device data reader which created this tour, this id is defined in
@@ -571,7 +574,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * <p>
 	 * a better name would be <i>pluginName</i>
 	 */
-	private String												devicePluginName;																			// db-version 4
+	private String												devicePluginName;																		// db-version 4
 
 	/**
 	 * Deflection point in the conconi test, this value is the index for the data serie on the
@@ -730,7 +733,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * <br>
 	 * <br>
 	 * <br>
-	 * ################################### TRANSIENT DATA ######################################## <br>
+	 * ################################### TRANSIENT DATA ########################################
+	 * <br>
 	 * <br>
 	 * <br>
 	 * <br>
@@ -920,10 +924,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * Back gear number<br>
 	 * <code>
 	 * <pre>
-final long	frontTeeth	= (gearRaw &gt;&gt; 24 &amp; 0xff);
-final long	frontGear	= (gearRaw &gt;&gt; 16 &amp; 0xff);
-final long	rearTeeth	= (gearRaw &gt;&gt; 8 &amp; 0xff);
-final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
+	final long	frontTeeth	= (gearRaw &gt;&gt; 24 &amp; 0xff);
+	final long	frontGear	= (gearRaw &gt;&gt; 16 &amp; 0xff);
+	final long	rearTeeth	= (gearRaw &gt;&gt; 8 &amp; 0xff);
+	final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	 * </pre>
 	 * </code>
 	 */
@@ -1557,7 +1561,8 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 			return;
 		}
 
-		if (_prefStore.getString(ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM)//
+		if (_prefStore
+				.getString(ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM)//
 				.equals(ISmoothingAlgorithm.SMOOTHING_ALGORITHM_JAMET)) {
 
 			computeSmoothedDataSeries();
@@ -2058,7 +2063,8 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 
 								currentSegmentSerieIndex = serieIndex - 1;
 
-								segmentSerie.add(new AltitudeUpDownSegment(currentSegmentSerieIndex, //
+								segmentSerie.add(new AltitudeUpDownSegment(
+										currentSegmentSerieIndex, //
 										segmentAltiDiff));
 							}
 
@@ -2465,14 +2471,14 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 
 		} else if (btConfig.breakTimeMethodId.equals(BreakTimeTool.BREAK_TIME_METHOD_BY_SLICE_SPEED)) {
 
-			breakTimeResult = BreakTimeTool.computeBreakTimeBySpeed(
+			breakTimeResult = BreakTimeTool.computeBreakTimeBySpeed(//
 					this,
 					btConfig.breakTimeMethodId,
 					btConfig.breakMinSliceSpeed);
 
 		} else if (btConfig.breakTimeMethodId.equals(BreakTimeTool.BREAK_TIME_METHOD_BY_AVG_SPEED)) {
 
-			breakTimeResult = BreakTimeTool.computeBreakTimeBySpeed(
+			breakTimeResult = BreakTimeTool.computeBreakTimeBySpeed(//
 					this,
 					btConfig.breakTimeMethodId,
 					btConfig.breakMinAvgSpeed);
@@ -2542,8 +2548,8 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		}
 
 		final GeoPosition[] gpsBounds = new GeoPosition[] {
-				new GeoPosition(minLatitude, minLongitude),
-				new GeoPosition(maxLatitude, maxLongitude) };
+															new GeoPosition(minLatitude, minLongitude),
+															new GeoPosition(maxLatitude, maxLongitude) };
 
 		return gpsBounds;
 	}
@@ -2644,16 +2650,17 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		hrZone8 = zoneSize > 8 ? hrZones[8] : -1;
 		hrZone9 = zoneSize > 9 ? hrZones[9] : -1;
 
-		_hrZones = new int[] { hrZone0, //
-				hrZone1,
-				hrZone2,
-				hrZone3,
-				hrZone4,
-				hrZone5,
-				hrZone6,
-				hrZone7,
-				hrZone8,
-				hrZone9 };
+		_hrZones = new int[] {
+								hrZone0, //
+								hrZone1,
+								hrZone2,
+								hrZone3,
+								hrZone4,
+								hrZone5,
+								hrZone6,
+								hrZone7,
+								hrZone8,
+								hrZone9 };
 	}
 
 	private void computeMaxAltitude() {
@@ -2733,9 +2740,9 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 			return;
 		}
 
-		final boolean isInitialAlgorithm = _prefStore.getString(
-				ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM).equals(
-				ISmoothingAlgorithm.SMOOTHING_ALGORITHM_INITIAL);
+		final boolean isInitialAlgorithm = _prefStore
+				.getString(ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM)
+				.equals(ISmoothingAlgorithm.SMOOTHING_ALGORITHM_INITIAL);
 
 		if (isInitialAlgorithm) {
 
@@ -2838,7 +2845,8 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 
 				for (int serieIndex = 0; serieIndex < size; serieIndex++) {
 					altitudeSerieSmoothed[serieIndex] = (float) altitude_sc[serieIndex];
-					altitudeSerieImperialSmoothed[serieIndex] = (float) (altitude_sc[serieIndex] / UI.UNIT_VALUE_ALTITUDE);
+					altitudeSerieImperialSmoothed[serieIndex] = (float) (altitude_sc[serieIndex]
+							/ UI.UNIT_VALUE_ALTITUDE);
 				}
 			} else {
 
@@ -2987,8 +2995,8 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 				final double vh_sc_Value = Vh_sc[serieIndex];
 
 				// check divide by 0
-				gradientSerie[serieIndex] = vh_sc_Value == 0.0 ? //
-						0
+				gradientSerie[serieIndex] = vh_sc_Value == 0.0 //
+						? 0
 						: (float) (Vv_sc[serieIndex] / vh_sc_Value * 100.0);
 
 				final double vSpeedSmoothed = Vv_sc[serieIndex] * 3600.0;
@@ -3047,7 +3055,8 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 
 			// speed is computed from distance and time
 
-			if (_prefStore.getString(ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM)//
+			if (_prefStore
+					.getString(ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM)//
 					.equals(ISmoothingAlgorithm.SMOOTHING_ALGORITHM_JAMET)) {
 
 				computeSmoothedDataSeries();
@@ -3239,8 +3248,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		paceSerieMinuteImperial = new float[serieLength];
 
 		final boolean isUseLatLon = (latitudeSerie != null) && //
-				(longitudeSerie != null)
-				&& (isDistanceFromSensor == 0); // --> distance is measured with the gps device and not from a sensor
+				(longitudeSerie != null) && (isDistanceFromSensor == 0); // --> distance is measured with the gps device and not from a sensor
 
 		boolean isLatLongEqual = false;
 		int equalStartIndex = 0;
@@ -3288,7 +3296,8 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 						// speed must be greater than 1.8 km/h
 					} else {
 
-						for (int equalSerieIndex = equalStartIndex + 1; equalSerieIndex < serieIndex; equalSerieIndex++) {
+						for (int equalSerieIndex = equalStartIndex
+								+ 1; equalSerieIndex < serieIndex; equalSerieIndex++) {
 
 							final int equalSegmentTimeDiff = timeSerie[equalSerieIndex]
 									- timeSerie[equalSerieIndex - 1];
@@ -3439,8 +3448,8 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 
 			final int intValue = intDataSerie[serieIndex];
 
-			floatDataSerie[serieIndex] = scale > 0 ? //
-					(float) intValue / scale
+			floatDataSerie[serieIndex] = scale > 0 //
+					? (float) intValue / scale
 					: (float) intValue;
 		}
 
@@ -3691,8 +3700,8 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		float altitudeDownSummarizedBorder = 0;
 		float altitudeDownSummarizedComputed = 0;
 
-		final float tourPace = tourDistance == 0 ? //
-				0
+		final float tourPace = tourDistance == 0 //
+				? 0
 				: tourDrivingTime * 1000 / (tourDistance * UI.UNIT_VALUE_DISTANCE);
 
 		segmentSerie_Time_Recording = new int[segmentSerieLength];
@@ -3773,8 +3782,8 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 				if (segmentDistance != 0.0) {
 
 					// speed
-					segmentSerie_Speed[segmentIndex] = segment.speed = segmentDrivingTime == 0.0f ? //
-							0.0f
+					segmentSerie_Speed[segmentIndex] = segment.speed = segmentDrivingTime == 0.0f //
+							? 0.0f
 							: segmentDistance / segmentDrivingTime * 3.6f / UI.UNIT_VALUE_DISTANCE;
 
 					// pace
@@ -3886,7 +3895,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 
 				// gradient
 				segmentSerie_Gradient[segmentIndex] = segment.gradient = //
-				segment.altitude_Segment_Border_Diff * 100 / segmentDistance;
+						segment.altitude_Segment_Border_Diff * 100 / segmentDistance;
 			}
 
 			if (isPulseSerie) {
@@ -3911,8 +3920,8 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		/*
 		 * Add total segment
 		 */
-		final float totalSpeed = totalTime_Driving == 0 ? //
-				0
+		final float totalSpeed = totalTime_Driving == 0 //
+				? 0
 				: totalDistance / totalTime_Driving * 3.6f / UI.UNIT_VALUE_DISTANCE;
 
 		final float totalPace = totalDistance == 0 //
@@ -4160,9 +4169,10 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 				 */
 				if (isAltitude) {
 					final float absoluteAltitude = timeData.absoluteAltitude;
-					altitudeSerie[serieIndex] = (absoluteAltitude == Float.MIN_VALUE || (absoluteAltitude >= Integer.MAX_VALUE))
-							? Float.MIN_VALUE
-							: absoluteAltitude;
+					altitudeSerie[serieIndex] = (absoluteAltitude == Float.MIN_VALUE
+							|| (absoluteAltitude >= Integer.MAX_VALUE)) //
+									? Float.MIN_VALUE
+									: absoluteAltitude;
 				}
 
 				/*
@@ -4784,7 +4794,8 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 	public void dumpTime() {
 		final PrintStream out = System.out;
 
-		out.print((getTourRecordingTime() / 3600) + ":" //$NON-NLS-1$
+		out.print((getTourRecordingTime() / 3600)
+				+ ":" //$NON-NLS-1$
 				+ ((getTourRecordingTime() % 3600) / 60)
 				+ ":" //$NON-NLS-1$
 				+ ((getTourRecordingTime() % 3600) % 60)
@@ -4803,16 +4814,14 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 				+ ":" //$NON-NLS-1$
 				+ ((getTourRecordingTime() % 3600) / 60)
 				+ ":" //$NON-NLS-1$
-				+ (getTourRecordingTime() % 3600)
-				% 60);
+				+ (getTourRecordingTime() % 3600) % 60);
 
 		out.println("Driving time:		" //$NON-NLS-1$
 				+ (getTourDrivingTime() / 3600)
 				+ ":" //$NON-NLS-1$
 				+ ((getTourDrivingTime() % 3600) / 60)
 				+ ":" //$NON-NLS-1$
-				+ (getTourDrivingTime() % 3600)
-				% 60);
+				+ (getTourDrivingTime() % 3600) % 60);
 
 		out.println("Altitude up (m):	" + getTourAltUp()); //$NON-NLS-1$
 		out.println("Altitude down (m):	" + getTourAltDown()); //$NON-NLS-1$
@@ -6475,7 +6484,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		/*
 		 * check: tour title
 		 */
-		FIELD_VALIDATION fieldValidation = TourDatabase.isFieldValidForSave(
+		FIELD_VALIDATION fieldValidation = TourDatabase.isFieldValidForSave(//
 				tourTitle,
 				DB_LENGTH_TOUR_TITLE,
 				Messages.Db_Field_TourData_Title,
@@ -6565,7 +6574,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 		/*
 		 * check: weather
 		 */
-		fieldValidation = TourDatabase.isFieldValidForSave(
+		fieldValidation = TourDatabase.isFieldValidForSave(//
 				weather,
 				DB_LENGTH_WEATHER,
 				Messages.Db_Field_TourData_Weather,
@@ -7826,7 +7835,7 @@ final long	rearGear	= (gearRaw &gt;&gt; 0 &amp; 0xff);
 				+ ("object=" + super.toString() + "\n") //												//$NON-NLS-1$ //$NON-NLS-2$
 				+ ("identityHashCode=" + System.identityHashCode(this) + "\n") //						//$NON-NLS-1$ //$NON-NLS-2$
 
-//				+ ("marker size:" + tourMarkers.size() + " " + tourMarkers+"\n") //$NON-NLS-1$
+				//				+ ("marker size:" + tourMarkers.size() + " " + tourMarkers+"\n") //$NON-NLS-1$
 
 				+ "]"; //$NON-NLS-1$
 	}

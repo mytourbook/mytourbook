@@ -298,9 +298,9 @@ public class TourDatabase {
 
 // set derby debug properties
 //		System.setProperty("derby.language.logQueryPlan", "true"); //$NON-NLS-1$
-//		System.setProperty("derby.language.logStatementText", "true"); //$NON-NLS-1$
+		System.setProperty("derby.language.logStatementText", "true"); //$NON-NLS-1$
 	}
-
+ 
 	private static final Object						DB_LOCK										= new Object();
 
 //	Derby Limitations

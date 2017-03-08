@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -268,7 +268,8 @@ public class TourTypeFilter {
 						sb.append(" ?"); //$NON-NLS-1$
 					} else {
 
-						sb.append("\n, ?"); //$NON-NLS-1$
+						sb.append(", ?"); //$NON-NLS-1$
+//						sb.append("\n, ?"); //$NON-NLS-1$
 					}
 
 					sqlTourTypes.add(((TourType) item).getTypeId());

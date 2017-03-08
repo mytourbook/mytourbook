@@ -448,6 +448,7 @@ public class Messages extends NLS {
 	public static String		App_TourType_ToolTip;
 	public static String		App_TourType_ToolTipTitle;
 
+	public static String		App_Unit_HHMM;
 	public static String		App_Unit_Milliseconds;
 	public static String		App_Unit_Minute;
 	public static String		App_Unit_Minute_Small;
@@ -1569,12 +1570,15 @@ public class Messages extends NLS {
 
 	public static String		Slideout_TourFilter_Action_AddProfile_Tooltip;
 	public static String		Slideout_TourFilter_Action_AddProperty_Tooltip;
+	public static String		Slideout_TourFilter_Action_Apply;
 	public static String		Slideout_TourFilter_Action_CopyProfile_Tooltip;
 	public static String		Slideout_TourFilter_Action_DeleteProfile_Tooltip;
 	public static String		Slideout_TourFilter_Action_DeleteProperty_Tooltip;
 	public static String		Slideout_TourFilter_Action_MovePropertyDown_Tooltip;
 	public static String		Slideout_TourFilter_Action_MovePropertyUp_Tooltip;
 	public static String		Slideout_TourFilter_Checkbox_IsFilterByDate;
+	public static String		Slideout_TourFilter_Checkbox_IsLiveUpdate;
+	public static String		Slideout_TourFilter_Checkbox_IsLiveUpdate_Tooltip;
 	public static String		Slideout_TourFilter_Checkbox_IsPropertyEnabled_Tooltip;
 	public static String		Slideout_TourFilter_Column_ProfileName;
 	public static String		Slideout_TourFilter_Confirm_DeleteProfile_Message;
@@ -1780,7 +1784,7 @@ public class Messages extends NLS {
 	public static String		Tour_Filter_Field_Season;
 	public static String		Tour_Filter_Field_Temperature;
 	public static String		Tour_Filter_Field_TourDate;
-	public static String		Tour_Filter_Field_TourTime;
+	public static String		Tour_Filter_Field_TourStartTime;
 	public static String		Tour_Filter_Field_TourTitle;
 	public static String		Tour_Filter_Operator_And;
 	public static String		Tour_Filter_Operator_Between;
@@ -1794,7 +1798,11 @@ public class Messages extends NLS {
 	public static String		Tour_Filter_Operator_LessThanOrEqual;
 	public static String		Tour_Filter_Operator_NotBetween;
 	public static String		Tour_Filter_Operator_NotEquals;
-	public static String		Tour_Filter_Operator_SeasonToday;
+	public static String		Tour_Filter_Operator_Season_Date_Until_Today;
+	public static String		Tour_Filter_Operator_Season_Today_Until_Date;
+	public static String		Tour_Filter_Operator_Season_Today_Until_YearEnd;
+	public static String		Tour_Filter_Operator_Season_UntilToday;
+	public static String		Tour_Filter_Operator_Season_YearStart_Until_Today;
 	public static String		Tour_Filter_Operator_StartsWith;
 
 	public static String		Tour_Log_Action_Clear_Tooltip;

@@ -42,6 +42,7 @@ import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tour.filter.TourFilterManager;
 import net.tourbook.tour.photo.TourPhotoLinkView;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 import net.tourbook.web.WEB;
@@ -1220,6 +1221,8 @@ public class UI {
 			net.tourbook.common.UI.UNIT_VALUE_TEMPERATURE = 1;
 			net.tourbook.common.UI.UNIT_LABEL_TEMPERATURE = net.tourbook.common.UI.UNIT_TEMPERATURE_C;
 		}
+
+		TourFilterManager.updateUnits();
 	}
 
 	private ImageData createTourTypeImage(final long typeId) {

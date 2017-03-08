@@ -15,24 +15,35 @@
  *******************************************************************************/
 package net.tourbook.tour.filter;
 
-import java.util.ArrayList; 
+import java.util.ArrayList;
 
-public class TourFilterSQLData {
+public class TourFilterSQLData { 
 
-	private String			_whereString;
-	private ArrayList<Long>	_parameters;
+	private String				_whereString;
+	private ArrayList<Object>	_parameters;
 
-	public TourFilterSQLData(final String whereString, final ArrayList<Long> parameters) {
+	public TourFilterSQLData(final String whereString, final ArrayList<Object> parameters) {
 
 		_whereString = whereString;
 		_parameters = parameters;
 	}
 
-	public ArrayList<Long> getParameters() {
+	public ArrayList<Object> getParameters() {
 		return _parameters;
 	}
 
 	public String getWhereString() {
 		return _whereString;
+	}
+
+	@Override
+	public String toString() {
+
+		return "TourFilterSQLData [\n" //
+
+				+ ("_whereString=" + _whereString + "\n")
+				+ ("_parameters=" + _parameters + "\n")
+
+				+ "]";
 	}
 }

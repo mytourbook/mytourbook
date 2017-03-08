@@ -14,7 +14,7 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.tour.filter;
-
+ 
 public enum TourFilterFieldOperator {
 
 	STARTS_WITH, //
@@ -41,6 +41,9 @@ public enum TourFilterFieldOperator {
 	IS_EMPTY, //
 	IS_NOT_EMPTY,
 
-	SEASON_TODAY, //
+	SEASON_YEAR_START_UNTIL_TODAY, //
+	SEASON_DATE_UNTIL_TODAY, //
+	SEASON_TODAY_UNTIL_YEAR_END, //
+	SEASON_TODAY_UNTIL_DATE, //
 
 }

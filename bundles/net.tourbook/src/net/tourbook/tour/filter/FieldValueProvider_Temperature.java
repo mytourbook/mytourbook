@@ -15,17 +15,24 @@
  *******************************************************************************/
 package net.tourbook.tour.filter;
 
-public enum TourFilterFieldType {
- 
-	TEXT, //
+import net.tourbook.common.UI;
 
-	NUMBER_INTEGER, //
-	NUMBER_METRIC, //
+public class FieldValueProvider_Temperature extends FieldValueProvider {
 
-	DATE, //
-	TIME, //
-	DURATION, //
+	@Override
+	float convertFromMetric(final float value) {
 
-	SEASON, //
+		final float uiValue = UI.convertTemperatureFromMetric(value);
+		
+		return uiValue;
+	}
+
+	@Override
+	float convertToMetric(final float value) {
+
+		final float metricValue = UI.convertTemperatureFromMetric(value);
+
+		return metricValue;
+	 }
 
 }
