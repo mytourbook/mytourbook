@@ -18,12 +18,15 @@ package net.tourbook.tour.filter;
 import java.time.LocalDateTime;
 import java.time.MonthDay;
 
+import net.tourbook.common.UI;
+
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DateTime;
 import org.eclipse.swt.widgets.Spinner;
+import org.eclipse.swt.widgets.Text;
 
 public class TourFilterProperty {
 
@@ -55,9 +58,12 @@ public class TourFilterProperty {
 
 	int							intValue1;
 	int							intValue2;
- 
-	float						floatValue1;
-	float						floatValue2;
+
+	double						doubleValue1;
+	double						doubleValue2;
+
+	String						textValue1			= UI.EMPTY_STRING;
+	String						textValue2			= UI.EMPTY_STRING;
 
 	/*
 	 * UI controls, not all of them are used, depending on the selected field type and operator
@@ -86,6 +92,9 @@ public class TourFilterProperty {
 	Spinner						uiSpinner_Number1;
 	Spinner						uiSpinner_Number2;
 
+	Text						uiText1;
+	Text						uiText2;
+
 	public TourFilterProperty() {}
 
 	void disposeFieldInnerContainer() {
@@ -106,6 +115,9 @@ public class TourFilterProperty {
 
 		uiSpinner_Number1 = null;
 		uiSpinner_Number2 = null;
+
+		uiText1 = null;
+		uiText2 = null;
 	}
 
 	@Override

@@ -20,17 +20,17 @@ import net.tourbook.common.UI;
 public class FieldValueProvider_Temperature extends FieldValueProvider {
 
 	@Override
-	float convertFromMetric(final float value) {
+	double convertFromMetric(final double value) {
 
-		final float uiValue = UI.convertTemperatureFromMetric(value);
+		final float uiValue = UI.convertTemperatureFromMetric((float) value);
 		
 		return uiValue;
 	}
 
 	@Override
-	float convertToMetric(final float value) {
+	double convertToMetric(final double value) {
 
-		final float metricValue = UI.convertTemperatureFromMetric(value);
+		final float metricValue = UI.convertTemperatureToMetric((float) value);
 
 		return metricValue;
 	 }

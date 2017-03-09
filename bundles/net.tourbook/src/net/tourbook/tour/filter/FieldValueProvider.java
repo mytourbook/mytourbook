@@ -17,8 +17,8 @@ package net.tourbook.tour.filter;
 
 public abstract class FieldValueProvider {
 
-	abstract float convertFromMetric(float value);
+	abstract double convertFromMetric(double value);
 
-	abstract float convertToMetric(float value);
+	abstract double convertToMetric(double value);
 
 }

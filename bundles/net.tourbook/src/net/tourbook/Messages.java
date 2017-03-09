@@ -449,6 +449,7 @@ public class Messages extends NLS {
 	public static String		App_TourType_ToolTipTitle;
 
 	public static String		App_Unit_HHMM;
+	public static String		App_Unit_HHMMSS;
 	public static String		App_Unit_Milliseconds;
 	public static String		App_Unit_Minute;
 	public static String		App_Unit_Minute_Small;

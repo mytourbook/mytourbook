@@ -121,14 +121,24 @@ public class SQLFilter {
 				statement.setLong(parameterIndex, (Long) parameter);
 				parameterIndex++;
 
+			} else if (parameter instanceof Integer) {
+
+				statement.setInt(parameterIndex, (Integer) parameter);
+				parameterIndex++;
+
 			} else if (parameter instanceof Float) {
 
 				statement.setFloat(parameterIndex, (Float) parameter);
 				parameterIndex++;
 
-			} else if (parameter instanceof Integer) {
+			} else if (parameter instanceof Double) {
 
-				statement.setInt(parameterIndex, (Integer) parameter);
+				statement.setDouble(parameterIndex, (Double) parameter);
+				parameterIndex++;
+
+			} else if (parameter instanceof String) {
+
+				statement.setString(parameterIndex, (String) parameter);
 				parameterIndex++;
 
 			} else {
