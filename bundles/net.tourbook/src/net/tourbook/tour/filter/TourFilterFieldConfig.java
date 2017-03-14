@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.tour.filter;
 
+import java.util.Arrays;
+
 /**
  * Configuration for a tour filter field
  */
@@ -49,7 +51,7 @@ public class TourFilterFieldConfig {
 	FieldValueProvider				fieldValueProvider;
 
 	String							unitLabel;
- 
+
 	/**
 	 * @param name
 	 * @param fieldId
@@ -126,12 +128,12 @@ public class TourFilterFieldConfig {
 
 	@Override
 	public String toString() {
-		return "TourFilterFieldConfig [\n"
-				+ ("name=" + name + ", ")
-				+ ("fieldId=" + fieldId + ", ")
-				+ ("fieldType=" + fieldType + ", ")
-				// + ("fieldOperators=" + Arrays.toString(fieldOperators))
-				+ "\n]\n";
+		return "TourFilterFieldConfig [\n" //$NON-NLS-1$
+				+ ("name=" + name + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("fieldId=" + fieldId + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("fieldType=" + fieldType + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("fieldOperators=" + Arrays.toString(fieldOperators)) //$NON-NLS-1$
+				+ "\n]\n"; //$NON-NLS-1$
 	}
 
 }

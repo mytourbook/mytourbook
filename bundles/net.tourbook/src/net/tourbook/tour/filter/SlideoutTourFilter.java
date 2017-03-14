@@ -28,6 +28,7 @@ import net.tourbook.common.form.SashLeftFixedForm;
 import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.search.SearchView;
 
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -80,6 +81,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DateTime;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
@@ -265,6 +267,8 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		// update UI
 		createUI_410_FilterProperties();
 		updateUI_Properties();
+
+		fireModifyEvent();
 	}
 
 	void action_PropertyDelete(final TourFilterProperty filterProperty) {
@@ -296,6 +300,8 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		// update UI
 		createUI_410_FilterProperties();
 		updateUI_Properties();
+
+		fireModifyEvent();
 	}
 
 	void action_PropertyMoveDown(final TourFilterProperty filterProperty) {
@@ -888,10 +894,6 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 			case NUMBER_METRIC:
 				numColumns += createUI_Field_Number_Metric(container, filterProp, fldConfig, 1, true);
 				break;
-
-			case TEXT:
-				numColumns += createUI_Field_Text(container, filterProp, 1);
-				break;
 			}
 
 			break;
@@ -952,8 +954,14 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 			break;
 
 		case IS_EMPTY:
-			break;
 		case IS_NOT_EMPTY:
+
+			switch (fieldType) {
+			case TEXT:
+				numColumns += createUI_Field_Text(container);
+				break;
+			}
+
 			break;
 
 		case LIKE:
@@ -962,20 +970,15 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 			break;
 
 		case SEASON_YEAR_START_UNTIL_TODAY:
-			break;
 		case SEASON_TODAY_UNTIL_YEAR_END:
+			// no additional controls
 			break;
 
 		case SEASON_DATE_UNTIL_TODAY:
-			numColumns += createUI_Field_SeasonDay(container, filterProp, 1);
-			numColumns += createUI_Field_SeasonMonth(container, filterProp, 1);
-			break;
-
 		case SEASON_TODAY_UNTIL_DATE:
 			numColumns += createUI_Field_SeasonDay(container, filterProp, 1);
 			numColumns += createUI_Field_SeasonMonth(container, filterProp, 1);
 			break;
-
 		}
 
 		GridLayoutFactory.fillDefaults().numColumns(numColumns).applyTo(container);
@@ -1146,7 +1149,10 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		int numColumns = 0;
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridDataFactory
+				.fillDefaults()//
+//				.grab(true, false)
+				.applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 		{
 			{
@@ -1297,33 +1303,21 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		return 1;
 	}
 
-	private int createUI_Field_Text(final Composite parent,
-									final TourFilterProperty filterProperty,
-									final int fieldNo) {
+	private int createUI_Field_Text(final Composite parent) {
 
-		final Text text = new Text(parent, SWT.BORDER);
-
-		text.setData(filterProperty);
-		text.setData(FIELD_NO, fieldNo);
-
-		text.addFocusListener(_keepOpenListener);
-		text.addModifyListener(new ModifyListener() {
-			@Override
-			public void modifyText(final ModifyEvent event) {
-				onField_Select_Text(event.widget);
-			}
-		});
-
-		GridDataFactory
-				.fillDefaults()//
-				.grab(true, false)
-				.align(SWT.FILL, SWT.CENTER)
-				.applyTo(text);
-
-		if (fieldNo == 1) {
-			filterProperty.uiText1 = text;
-		} else {
-			filterProperty.uiText2 = text;
+		{
+			/*
+			 * Link: Fulltext search hint
+			 */
+			final Link link = new Link(parent, SWT.NONE);
+			link.setText(Messages.Slideout_TourFilter_Link_TextSearchHint);
+			link.setToolTipText(Messages.Slideout_TourFilter_Link_TextSearchHint_Tooltip);
+			link.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					Util.showView(SearchView.ID, true);
+				}
+			});
 		}
 
 		return 1;
@@ -1754,11 +1748,16 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
 	private void onProperty_SelectField(final Widget widget) {
 
-		final TourFilterProperty filterProperty = (TourFilterProperty) widget.getData();
-
+		// get selected field config
 		final int selectedFilterConfigIndex = ((Combo) (widget)).getSelectionIndex();
+		final TourFilterFieldConfig selectedFieldConfig = TourFilterManager.FILTER_FIELD_CONFIG[selectedFilterConfigIndex];
 
-		filterProperty.fieldConfig = TourFilterManager.FILTER_FIELD_CONFIG[selectedFilterConfigIndex];
+		// setup filter property with a new config
+		final TourFilterProperty filterProperty = (TourFilterProperty) widget.getData();
+		filterProperty.fieldConfig = selectedFieldConfig;
+
+		// init with first available operator, otherwise an old and wrong operator could be set
+		filterProperty.fieldOperator = selectedFieldConfig.fieldOperators[0];
 
 		updateUI_Properties();
 
@@ -1925,11 +1924,9 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 				break;
 
 			case TEXT:
-
 				break;
 
 			case SEASON:
-				updateUI_PropertyDetail_Season(filterProperty, 1);
 				break;
 			}
 
@@ -1965,7 +1962,6 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 				break;
 
 			case TEXT:
-
 				break;
 
 			case SEASON:
@@ -1994,6 +1990,16 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		case LIKE:
 			break;
 		case NOT_LIKE:
+			break;
+
+		case SEASON_YEAR_START_UNTIL_TODAY:
+		case SEASON_TODAY_UNTIL_YEAR_END:
+			// no additional controls
+			break;
+
+		case SEASON_DATE_UNTIL_TODAY:
+		case SEASON_TODAY_UNTIL_DATE:
+			updateUI_PropertyDetail_Season(filterProperty, 1);
 			break;
 		}
 	}

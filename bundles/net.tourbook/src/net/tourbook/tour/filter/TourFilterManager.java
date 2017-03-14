@@ -84,6 +84,9 @@ public class TourFilterManager {
 	private static final String							OP_LESS_THAN					= " < ?\n";																//$NON-NLS-1$
 	private static final String							OP_LESS_THAN_OR_EQUAL			= " <= ?\n";															//$NON-NLS-1$
 
+	private static final String							OP_NULL							= " IS NULL\n";															//$NON-NLS-1$
+	private static final String							OP_NOT_NULL						= " IS NOT NULL\n";														//$NON-NLS-1$
+
 // SET_FORMATTING_OFF
 
 	public static final TourFilterFieldOperatorConfig[]	TOUR_FILTER_OPERATORS		= {
@@ -150,20 +153,18 @@ public class TourFilterManager {
 	
 	public static final TourFilterFieldOperator[]			FILTER_OPERATORS_TEXT = {
 	                                             			                         
-		TourFilterFieldOperator.LESS_THAN,
-		TourFilterFieldOperator.LESS_THAN_OR_EQUAL,
-		TourFilterFieldOperator.GREATER_THAN,
-		TourFilterFieldOperator.GREATER_THAN_OR_EQUAL,
-		TourFilterFieldOperator.EQUALS,
-		TourFilterFieldOperator.NOT_EQUALS,
-		TourFilterFieldOperator.BETWEEN,
-		TourFilterFieldOperator.NOT_BETWEEN,
-		TourFilterFieldOperator.STARTS_WITH,
-		TourFilterFieldOperator.ENDS_WITH,
-		TourFilterFieldOperator.EQUALS,
-		TourFilterFieldOperator.NOT_EQUALS,
+//		TourFilterFieldOperator.LESS_THAN,
+//		TourFilterFieldOperator.LESS_THAN_OR_EQUAL,
+//		TourFilterFieldOperator.GREATER_THAN,
+//		TourFilterFieldOperator.GREATER_THAN_OR_EQUAL,
 		TourFilterFieldOperator.IS_EMPTY,
 		TourFilterFieldOperator.IS_NOT_EMPTY,
+//		TourFilterFieldOperator.EQUALS,
+//		TourFilterFieldOperator.NOT_EQUALS,
+//		TourFilterFieldOperator.BETWEEN,
+//		TourFilterFieldOperator.NOT_BETWEEN,
+//		TourFilterFieldOperator.STARTS_WITH,
+//		TourFilterFieldOperator.ENDS_WITH,
 	};
 
 // SET_FORMATTING_ON
@@ -505,6 +506,9 @@ public class TourFilterManager {
 
 		final TourFilterSQLData tourFilterSQLData = new TourFilterSQLData(sqlWhere.toString(), sqlParameters);
 
+//		System.out.println((UI.timeStampNano() + " [" + "] ") + ("\ttourFilterSQLData: " + tourFilterSQLData));
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
 		return tourFilterSQLData;
 	}
 
@@ -531,17 +535,17 @@ public class TourFilterManager {
 			break;
 
 		case EQUALS:
-			getSQL_Equals(sqlWhere, sqlParameters, sqlField, value1);
+			getSQL_Equals(sqlWhere, sqlParameters, sqlField, value1, true);
 			break;
 		case NOT_EQUALS:
-			getSQL_NotEquals(sqlWhere, sqlParameters, value1, sqlField);
+			getSQL_Equals(sqlWhere, sqlParameters, sqlField, value1, false);
 			break;
 
 		case BETWEEN:
-			getSQL_Between(sqlWhere, sqlParameters, sqlField, value1, value2);
+			getSQL_Between(sqlWhere, sqlParameters, sqlField, value1, value2, true);
 			break;
 		case NOT_BETWEEN:
-			getSQL_NotBetween(sqlWhere, sqlParameters, sqlField, value1, value2);
+			getSQL_Between(sqlWhere, sqlParameters, sqlField, value1, value2, false);
 			break;
 		}
 	}
@@ -569,17 +573,17 @@ public class TourFilterManager {
 			break;
 
 		case EQUALS:
-			getSQL_Equals(sqlWhere, sqlParameters, sqlField, value1);
+			getSQL_Equals(sqlWhere, sqlParameters, sqlField, value1, true);
 			break;
 		case NOT_EQUALS:
-			getSQL_NotEquals(sqlWhere, sqlParameters, value1, sqlField);
+			getSQL_Equals(sqlWhere, sqlParameters, sqlField, value1, false);
 			break;
 
 		case BETWEEN:
-			getSQL_Between(sqlWhere, sqlParameters, sqlField, value1, value2);
+			getSQL_Between(sqlWhere, sqlParameters, sqlField, value1, value2, true);
 			break;
 		case NOT_BETWEEN:
-			getSQL_NotBetween(sqlWhere, sqlParameters, sqlField, value1, value2);
+			getSQL_Between(sqlWhere, sqlParameters, sqlField, value1, value2, false);
 			break;
 		}
 	}
@@ -684,33 +688,40 @@ public class TourFilterManager {
 													final String value2) {
 
 		switch (fieldOperator) {
-		case LESS_THAN:
-			getSQL_LessThan(sqlWhere, sqlParameters, sqlField, value1);
+//		case LESS_THAN:
+//			getSQL_LessThan(sqlWhere, sqlParameters, sqlField, value1);
+//			break;
+//		case LESS_THAN_OR_EQUAL:
+//			getSQL_LessThanOrEqual(sqlWhere, sqlParameters, sqlField, value1);
+//			break;
+//
+//		case GREATER_THAN:
+//			getSQL_GreaterThan(sqlWhere, sqlParameters, sqlField, value1);
+//			break;
+//		case GREATER_THAN_OR_EQUAL:
+//			getSQL_GreaterThanOrEqual(sqlWhere, sqlParameters, sqlField, value1);
+//			break;
+//
+//		case EQUALS:
+//			getSQL_Equals(sqlWhere, sqlParameters, sqlField, value1, true);
+//			break;
+//		case NOT_EQUALS:
+//			getSQL_Equals(sqlWhere, sqlParameters, sqlField, value1, false);
+//			break;
+
+		case IS_EMPTY:
+			getSQL_Empty(sqlWhere, sqlParameters, sqlField, true);
 			break;
-		case LESS_THAN_OR_EQUAL:
-			getSQL_LessThanOrEqual(sqlWhere, sqlParameters, sqlField, value1);
+		case IS_NOT_EMPTY:
+			getSQL_Empty(sqlWhere, sqlParameters, sqlField, false);
 			break;
 
-		case GREATER_THAN:
-			getSQL_GreaterThan(sqlWhere, sqlParameters, sqlField, value1);
-			break;
-		case GREATER_THAN_OR_EQUAL:
-			getSQL_GreaterThanOrEqual(sqlWhere, sqlParameters, sqlField, value1);
-			break;
-
-		case EQUALS:
-			getSQL_Equals(sqlWhere, sqlParameters, sqlField, value1);
-			break;
-		case NOT_EQUALS:
-			getSQL_NotEquals(sqlWhere, sqlParameters, value1, sqlField);
-			break;
-
-		case BETWEEN:
-			getSQL_Between(sqlWhere, sqlParameters, sqlField, value1, value2);
-			break;
-		case NOT_BETWEEN:
-			getSQL_NotBetween(sqlWhere, sqlParameters, sqlField, value1, value2);
-			break;
+//		case BETWEEN:
+//			getSQL_Between(sqlWhere, sqlParameters, sqlField, value1, value2, true);
+//			break;
+//		case NOT_BETWEEN:
+//			getSQL_Between(sqlWhere, sqlParameters, sqlField, value1, value2, false);
+//			break;
 		}
 	}
 
@@ -718,21 +729,70 @@ public class TourFilterManager {
 										final ArrayList<Object> sqlParameters,
 										final String sqlField,
 										final Object value1,
-										final Object value2) {
+										final Object value2,
+										final boolean isBetween) {
 
-		sqlWhere.append(OP_AND + sqlField + OP_GREATER_THAN_OR_EQUAL);
-		sqlWhere.append(OP_AND + sqlField + OP_LESS_THAN_OR_EQUAL);
+		final String op = isBetween ? OP_BETWEEN : OP_NOT_BETWEEN;
+
+		sqlWhere.append(OP_AND
+
+				+ sqlField
+				+ op
+
+				+ OP_PARAMETER
+				+ OP_AND
+				+ OP_PARAMETER
+		//
+		);
 
 		sqlParameters.add(value1);
 		sqlParameters.add(value2);
 	}
 
+	private static void getSQL_Empty(	final StringBuilder sqlWhere,
+										final ArrayList<Object> sqlParameters,
+										final String sqlField,
+										final boolean isOp) {
+
+		if (isOp) {
+
+			sqlWhere.append(OP_AND //
+
+					+ OP_BR_OPEN
+
+					+ (sqlField + OP_NULL)
+					+ OP_OR
+					+ ("LENGTH(TRIM(" + sqlField + ")) = 0\n")
+
+					+ OP_BR_CLOSE);
+
+		} else {
+
+			sqlWhere.append(OP_AND //
+
+					+ (sqlField + OP_NOT_NULL)
+					+ OP_AND
+					+ ("LENGTH(TRIM(" + sqlField + ")) > 0\n")
+
+			);
+		}
+	}
+
 	private static void getSQL_Equals(	final StringBuilder sqlWhere,
 										final ArrayList<Object> sqlParameters,
 										final String sqlField,
-										final Object value1) {
+										final Object value1,
+										final boolean isOp) {
 
-		sqlWhere.append(OP_AND + sqlField + OP_EQUALS);
+		if (isOp) {
+
+			sqlWhere.append(OP_AND + sqlField + OP_EQUALS);
+
+		} else {
+
+			sqlWhere.append(OP_AND + sqlField + OP_NOT_EQUALS);
+		}
+
 		sqlParameters.add(value1);
 	}
 
@@ -769,38 +829,6 @@ public class TourFilterManager {
 												final Object value1) {
 
 		sqlWhere.append(OP_AND + sqlField + OP_LESS_THAN_OR_EQUAL);
-		sqlParameters.add(value1);
-	}
-
-	private static void getSQL_NotBetween(	final StringBuilder sqlWhere,
-											final ArrayList<Object> sqlParameters,
-											final String sqlField,
-											final Object value1,
-											final Object value2) {
-		sqlWhere.append(OP_AND
-
-				+ OP_BR_OPEN
-
-				+ (sqlField + OP_LESS_THAN)
-
-				+ OP_OR
-
-				+ (sqlField + OP_GREATER_THAN)
-
-				+ OP_BR_CLOSE
-		//
-		);
-
-		sqlParameters.add(value1);
-		sqlParameters.add(value2);
-	}
-
-	private static void getSQL_NotEquals(	final StringBuilder sqlWhere,
-											final ArrayList<Object> sqlParameters,
-											final Object value1,
-											final String sqlField) {
-
-		sqlWhere.append(OP_AND + sqlField + OP_NOT_EQUALS);
 		sqlParameters.add(value1);
 	}
 
