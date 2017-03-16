@@ -153,22 +153,13 @@ public class TourFilterManager {
 	
 	public static final TourFilterFieldOperator[]			FILTER_OPERATORS_TEXT = {
 	                                             			                         
-//		TourFilterFieldOperator.LESS_THAN,
-//		TourFilterFieldOperator.LESS_THAN_OR_EQUAL,
-//		TourFilterFieldOperator.GREATER_THAN,
-//		TourFilterFieldOperator.GREATER_THAN_OR_EQUAL,
 		TourFilterFieldOperator.IS_EMPTY,
 		TourFilterFieldOperator.IS_NOT_EMPTY,
-//		TourFilterFieldOperator.EQUALS,
-//		TourFilterFieldOperator.NOT_EQUALS,
-//		TourFilterFieldOperator.BETWEEN,
-//		TourFilterFieldOperator.NOT_BETWEEN,
-//		TourFilterFieldOperator.STARTS_WITH,
-//		TourFilterFieldOperator.ENDS_WITH,
 	};
 
 // SET_FORMATTING_ON
 
+	private static FieldValueProvider					_fieldValueProvider_distance	= new FieldValueProvider_Distance();
 	private static FieldValueProvider					_fieldValueProvider_temperature	= new FieldValueProvider_Temperature();
 
 	/**
@@ -242,6 +233,17 @@ public class TourFilterManager {
 							10,
 							1,
 							_fieldValueProvider_temperature),
+
+					new TourFilterFieldConfig(
+							Messages.Tour_Filter_Field_Distance,
+							TourFilterFieldId.DISTANCE,
+							TourFilterFieldType.NUMBER_METRIC,
+							FILTER_OPERATORS_NUMBER,
+							0,
+							Integer.MAX_VALUE,
+							10,
+							1,
+							_fieldValueProvider_distance),
 				//
 				};
 
@@ -490,6 +492,17 @@ public class TourFilterManager {
 			case RECORDING_TIME:
 				sql = "TourData.tourRecordingTime"; //$NON-NLS-1$
 				getSQL__FieldOperators_Number(sqlWhere, sqlParameters, fieldOperator, sql, int1, int2);
+				break;
+
+			case DISTANCE:
+
+				sql = "TourData.tourDistance"; //$NON-NLS-1$
+
+				// convert from km to m
+				final double distance1 = double1 * 1000;
+				final double distance2 = double2 * 1000;
+
+				getSQL__FieldOperators_Number(sqlWhere, sqlParameters, fieldOperator, sql, distance1, distance2);
 				break;
 
 			case TEMPERATURE:
@@ -762,7 +775,7 @@ public class TourFilterManager {
 
 					+ (sqlField + OP_NULL)
 					+ OP_OR
-					+ ("LENGTH(TRIM(" + sqlField + ")) = 0\n")
+					+ ("LENGTH(TRIM(" + sqlField + ")) = 0\n") //$NON-NLS-1$ //$NON-NLS-2$
 
 					+ OP_BR_CLOSE);
 
@@ -772,7 +785,7 @@ public class TourFilterManager {
 
 					+ (sqlField + OP_NOT_NULL)
 					+ OP_AND
-					+ ("LENGTH(TRIM(" + sqlField + ")) > 0\n")
+					+ ("LENGTH(TRIM(" + sqlField + ")) > 0\n") //$NON-NLS-1$ //$NON-NLS-2$
 
 			);
 		}
@@ -940,16 +953,6 @@ public class TourFilterManager {
 			case NUMBER_METRIC:
 				readXml_Number_Float(xmlProperty, filterProperty, 1);
 				break;
-
-			case TEXT:
-
-				break;
-
-			case SEASON:
-				readXml_Season(xmlProperty, filterProperty, 1);
-				break;
-			default:
-				break;
 			}
 
 			break;
@@ -959,14 +962,11 @@ public class TourFilterManager {
 
 			switch (fieldType) {
 			case DATE:
-
 				readXml_Date(xmlProperty, filterProperty, 1);
 				readXml_Date(xmlProperty, filterProperty, 2);
-
 				break;
 
 			case TIME:
-
 				readXml_Time(xmlProperty, filterProperty, 1);
 				readXml_Time(xmlProperty, filterProperty, 2);
 				break;
@@ -987,11 +987,9 @@ public class TourFilterManager {
 				break;
 
 			case TEXT:
-
 				break;
 
 			case SEASON:
-
 				readXml_Season(xmlProperty, filterProperty, 1);
 				readXml_Season(xmlProperty, filterProperty, 2);
 				break;
@@ -999,24 +997,9 @@ public class TourFilterManager {
 
 			break;
 
-		case STARTS_WITH:
-			break;
-		case ENDS_WITH:
-			break;
-
-		case INCLUDE_ANY:
-			break;
-		case EXCLUDE_ALL:
-			break;
-
-		case IS_EMPTY:
-			break;
-		case IS_NOT_EMPTY:
-			break;
-
-		case LIKE:
-			break;
-		case NOT_LIKE:
+		case SEASON_DATE_UNTIL_TODAY:
+		case SEASON_TODAY_UNTIL_DATE:
+			readXml_Season(xmlProperty, filterProperty, 1);
 			break;
 		}
 	}
@@ -1169,9 +1152,15 @@ public class TourFilterManager {
 
 	public static void updateUnits() {
 
+		TourFilterFieldConfig fieldConfig;
+
+		// set label km or mi
+		fieldConfig = getFieldConfig(TourFilterFieldId.DISTANCE);
+		fieldConfig.unitLabel = UI.UNIT_LABEL_DISTANCE;
+
 		// set label celcius or fahrenheit
-		final TourFilterFieldConfig fieldConfigTemperature = getFieldConfig(TourFilterFieldId.TEMPERATURE);
-		fieldConfigTemperature.unitLabel = UI.UNIT_LABEL_TEMPERATURE;
+		fieldConfig = getFieldConfig(TourFilterFieldId.TEMPERATURE);
+		fieldConfig.unitLabel = UI.UNIT_LABEL_TEMPERATURE;
 	}
 
 	/**
@@ -1284,16 +1273,6 @@ public class TourFilterManager {
 			case NUMBER_METRIC:
 				writeXml_Number_Double(xmlProperty, doubleValue1, 1);
 				break;
-
-			case TEXT:
-
-				break;
-
-			case SEASON:
-				writeXml_Season(xmlProperty, monthDay1, 1);
-				break;
-			default:
-				break;
 			}
 
 			break;
@@ -1303,14 +1282,11 @@ public class TourFilterManager {
 
 			switch (fieldType) {
 			case DATE:
-
 				writeXml_Date(xmlProperty, dateTime1, 1);
 				writeXml_Date(xmlProperty, dateTime2, 2);
-
 				break;
 
 			case TIME:
-
 				writeXml_Time(xmlProperty, dateTime1, 1);
 				writeXml_Time(xmlProperty, dateTime2, 2);
 				break;
@@ -1326,12 +1302,7 @@ public class TourFilterManager {
 				writeXml_Number_Double(xmlProperty, doubleValue2, 2);
 				break;
 
-			case TEXT:
-
-				break;
-
 			case SEASON:
-
 				writeXml_Season(xmlProperty, monthDay1, 1);
 				writeXml_Season(xmlProperty, monthDay2, 2);
 				break;
@@ -1339,24 +1310,9 @@ public class TourFilterManager {
 
 			break;
 
-		case STARTS_WITH:
-			break;
-		case ENDS_WITH:
-			break;
-
-		case INCLUDE_ANY:
-			break;
-		case EXCLUDE_ALL:
-			break;
-
-		case IS_EMPTY:
-			break;
-		case IS_NOT_EMPTY:
-			break;
-
-		case LIKE:
-			break;
-		case NOT_LIKE:
+		case SEASON_DATE_UNTIL_TODAY:
+		case SEASON_TODAY_UNTIL_DATE:
+			writeXml_Season(xmlProperty, monthDay1, 1);
 			break;
 		}
 	}

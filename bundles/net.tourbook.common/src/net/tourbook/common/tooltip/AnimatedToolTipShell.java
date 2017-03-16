@@ -787,14 +787,14 @@ public abstract class AnimatedToolTipShell {
 	protected abstract Point getToolTipLocation(Point size);
 
 	/**
-	 * Hide the currently active tool tip
+	 * Hide tool tip with animation.
 	 */
 	public void hide() {
 		ttHide();
 	}
 
 	/**
-	 * Hide the currently active tool tip without delay.
+	 * Hide tool tip without delay.
 	 */
 	public void hideNow() {
 

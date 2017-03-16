@@ -46,7 +46,7 @@ public class TourFilterFieldConfig {
 	/**
 	 * Number of digits
 	 */
-	int								valueDigits;
+	int								numDigits;
 
 	FieldValueProvider				fieldValueProvider;
 
@@ -104,7 +104,7 @@ public class TourFilterFieldConfig {
 	 * @param minValue
 	 * @param maxValue
 	 * @param pageIncrement
-	 * @param valueDigits
+	 * @param numDigits
 	 * @param fieldValueProvider
 	 */
 	public TourFilterFieldConfig(	final String name,
@@ -114,7 +114,7 @@ public class TourFilterFieldConfig {
 									final int minValue,
 									final int maxValue,
 									final int pageIncrement,
-									final int valueDigits,
+									final int numDigits,
 									final FieldValueProvider fieldValueProvider) {
 
 		this(name, fieldId, fieldType, filterOperators);
@@ -122,7 +122,7 @@ public class TourFilterFieldConfig {
 		this.minValue = minValue;
 		this.maxValue = maxValue;
 		this.pageIncrement = pageIncrement;
-		this.valueDigits = valueDigits;
+		this.numDigits = numDigits;
 		this.fieldValueProvider = fieldValueProvider;
 	}
 

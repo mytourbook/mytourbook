@@ -15,23 +15,20 @@
  *******************************************************************************/
 package net.tourbook.tour.filter;
 
-public enum TourFilterFieldId {
+import net.tourbook.ui.UI;
 
-	TOUR_DATE, //
-	TOUR_TIME, //
+public class FieldValueProvider_Distance extends FieldValueProvider {
 
-	/**
-	 * DATE_SEASON or DATE_PERIOD, is a repeated interval, e.g. from start year until today,
-	 * repeated for each year
-	 */
-	SEASON_DATE,
+	@Override
+	double convertFromMetric(final double value) {
 
-	RECORDING_TIME, //
-	DRIVING_TIME, //
-	BREAK_TIME, //
+		return value / UI.UNIT_VALUE_DISTANCE;
+	}
 
-	TOUR_TITLE, //
+	@Override
+	double convertToMetric(final double value) {
 
-	DISTANCE, //
-	TEMPERATURE, //
+		return value * UI.UNIT_VALUE_DISTANCE;
+	}
+
 }

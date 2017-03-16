@@ -223,9 +223,9 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 	}
 
-	public SlideoutTourFilter(final Control ownerControl, final Control toolBar, final IDialogSettings state) {
+	public SlideoutTourFilter(final Control ownerControl, final IDialogSettings state) {
 
-		super(ownerControl, toolBar, state, new int[] { 700, 300, 700, 300 });
+		super(ownerControl, state, new int[] { 700, 300, 700, 300 });
 
 		_state = state;
 
@@ -1160,7 +1160,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
 				final Spinner spinner = new Spinner(container, SWT.BORDER);
 
-				spinner.setDigits(fieldConfig.valueDigits);
+				spinner.setDigits(fieldConfig.numDigits);
 				spinner.setMinimum(fieldConfig.minValue);
 				spinner.setMaximum(fieldConfig.maxValue);
 				spinner.setPageIncrement(fieldConfig.pageIncrement);
@@ -1541,7 +1541,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		final TourFilterFieldConfig fieldConfig = filterProperty.fieldConfig;
 
 		// remove spinner digits
-		double fieldValue = selectedValue / Math.pow(10, fieldConfig.valueDigits);
+		double fieldValue = selectedValue / Math.pow(10, fieldConfig.numDigits);
 
 		if (fieldConfig.fieldValueProvider != null) {
 			fieldValue = fieldConfig.fieldValueProvider.convertToMetric(fieldValue);
@@ -2064,7 +2064,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
 		final TourFilterFieldConfig fieldConfig = filterProperty.fieldConfig;
 		final FieldValueProvider fieldValueProvider = fieldConfig.fieldValueProvider;
-		final int valueDigits = fieldConfig.valueDigits;
+		final int valueDigits = fieldConfig.numDigits;
 
 		Spinner spinner;
 		double doubleValue;

@@ -164,51 +164,62 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	@Override
 	protected void fillCoolBar(final ICoolBarManager coolBar) {
 
-		/*
-		 * Toolbar: People
-		 */
-		final IToolBarManager tbMgr_People = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
-		tbMgr_People.add(_personContribItem);
+		{
+			/*
+			 * Toolbar: People
+			 */
+			final IToolBarManager tbMgr_People = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
+			tbMgr_People.add(_personContribItem);
 
-		final ToolBarContributionItem tbItemPeople = new ToolBarContributionItem(tbMgr_People, "people"); //$NON-NLS-1$
-		coolBar.add(tbItemPeople);
+			final ToolBarContributionItem tbItemPeople = new ToolBarContributionItem(tbMgr_People, "people"); //$NON-NLS-1$
+			coolBar.add(tbItemPeople);
+		}
 
-		/*
-		 * Toolbar: Tour type
-		 */
-		final IToolBarManager tbMgr_TourType = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
-		final ToolBarContributionItem tbItemTourType = new ToolBarContributionItem(tbMgr_TourType, "tourtype"); //$NON-NLS-1$
+		{
+			/*
+			 * Toolbar: Tour type
+			 */
+			final IToolBarManager tbMgr_TourType = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
+			final ToolBarContributionItem tbItemTourType = new ToolBarContributionItem(tbMgr_TourType, "tourtype"); //$NON-NLS-1$
 
-		coolBar.add(tbItemTourType);
-		tbMgr_TourType.add(_tourTypeContribItem);
+			coolBar.add(tbItemTourType);
+			tbMgr_TourType.add(_tourTypeContribItem);
+		}
 
-		/*
-		 * Toolbar: Tour filter
-		 */
-		final IToolBarManager tbMgr_TourFilter = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
-		final ToolBarContributionItem tbItemTourFilter = new ToolBarContributionItem(tbMgr_TourFilter, "tourfilter"); //$NON-NLS-1$
+		{
+			/*
+			 * Toolbar: Tour filter
+			 */
+			final IToolBarManager tbMgr_TourFilter = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
+			final ToolBarContributionItem tbItemTourFilter = new ToolBarContributionItem(
+					tbMgr_TourFilter,
+					"mc_tb_AppFilter"); //$NON-NLS-1$
 
-		coolBar.add(tbItemTourFilter);
-		tbMgr_TourFilter.add(_actionTourFilter);
-		TourFilterManager.setTourFilterAction(_actionTourFilter);
+			coolBar.add(tbItemTourFilter);
+			tbMgr_TourFilter.add(_actionTourFilter);
 
-		/*
-		 * Toolbar: Measurement
-		 */
-		final boolean isShowMeasurement = TourbookPlugin
-				.getDefault()
-				.getPreferenceStore()
-				.getBoolean(ITourbookPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI);
+			TourFilterManager.setTourFilterAction(_actionTourFilter);
+		}
 
-		if (isShowMeasurement) {
+		{
+			/*
+			 * Toolbar: Measurement
+			 */
+			final boolean isShowMeasurement = TourbookPlugin
+					.getDefault()
+					.getPreferenceStore()
+					.getBoolean(ITourbookPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI);
 
-			final IToolBarManager tbMgr_System = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
-			tbMgr_System.add(_measurementContribItem);
+			if (isShowMeasurement) {
 
-			final ToolBarContributionItem tbItemMeasurement = new ToolBarContributionItem(
-					tbMgr_System,
-					"measurementSystem"); //$NON-NLS-1$
-			coolBar.add(tbItemMeasurement);
+				final IToolBarManager tbMgr_System = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
+				tbMgr_System.add(_measurementContribItem);
+
+				final ToolBarContributionItem tbItemMeasurement = new ToolBarContributionItem(
+						tbMgr_System,
+						"measurementSystem"); //$NON-NLS-1$
+				coolBar.add(tbItemMeasurement);
+			}
 		}
 
 		// this must be set after the coolbar is created, otherwise it stops populating the coolbar

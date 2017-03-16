@@ -33,6 +33,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
@@ -77,7 +78,7 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
 		_imageDisabled = actionImageDisabled.createImage();
 	}
 
-	protected abstract AdvancedSlideout createSlideout(ToolBar toolbar);
+	protected abstract AdvancedSlideout createSlideout(Control ownerControl);
 
 	@Override
 	public void fill(final ToolBar toolbar, final int index) {
@@ -143,11 +144,10 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
 	}
 
 	/**
-	 * Is called before the slideout is opened, this allows to close other dialogs
+	 * Is called before the slideout is opened, this allows to close other dialogs, default do
+	 * nothing.
 	 */
-	protected void onBeforeOpenSlideout() {
-
-	}
+	protected void onBeforeOpenSlideout() {}
 
 	private void onDispose() {
 
@@ -172,6 +172,13 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
 
 		// ignore other items in the toolbar
 		if (hoveredItem != _actionToolItem) {
+
+			// hide slideout when other tool items are hovered
+
+			if (_toolbarSlideout != null) {
+				_toolbarSlideout.hideNow();
+			}
+
 			return;
 		}
 
@@ -262,6 +269,15 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
 		_actionToolItem.setSelection(isSelected);
 
 		updateUI_Tooltip();
+	}
+
+	@Override
+	public void update() {
+
+		if (_toolbarSlideout != null) {
+			return;
+		}
+
 	}
 
 	private void updateUI_Tooltip() {

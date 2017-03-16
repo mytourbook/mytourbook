@@ -23,7 +23,7 @@ import net.tourbook.tour.filter.TourFilterManager;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.Control;
 
 public class ActionTourFilter extends ActionToolbarSlideoutAdv {
 
@@ -47,9 +47,9 @@ public class ActionTourFilter extends ActionToolbarSlideoutAdv {
 	}
 
 	@Override
-	protected AdvancedSlideout createSlideout(final ToolBar toolbar) {
+	protected AdvancedSlideout createSlideout(final Control ownerControl) {
 
-		_slideoutTourFilter = new SlideoutTourFilter(toolbar, toolbar, _state);
+		_slideoutTourFilter = new SlideoutTourFilter(ownerControl, _state);
 
 		return _slideoutTourFilter;
 	}

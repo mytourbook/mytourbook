@@ -133,8 +133,7 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 		}
 	}
 
-	public AdvancedSlideout(final Control ownerControl,
-							final Control toolBar,
+	public AdvancedSlideout(final Control ownerControl, //
 							final IDialogSettings state,
 							final int[] slideoutDefaultSize) {
 
@@ -145,14 +144,14 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 		setShellFadeOutDelaySteps(10);
 
 		initUI(ownerControl);
-		addListener(ownerControl, toolBar);
+		addListener(ownerControl);
 
 		createActions();
 	}
 
-	private void addListener(final Control ownerControl, final Control toolBar) {
+	private void addListener(final Control ownerControl) {
 
-		toolBar.addMouseTrackListener(new MouseTrackAdapter() {
+		ownerControl.addMouseTrackListener(new MouseTrackAdapter() {
 			@Override
 			public void mouseExit(final MouseEvent e) {
 
