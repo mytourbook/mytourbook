@@ -497,9 +497,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
 				if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
 
-//					fActivePerson = TourbookPlugin.getDefault().getActivePerson();
-//					fActiveTourTypeFilter = TourbookPlugin.getDefault().getActiveTourTypeFilter();
-
 					reloadViewer();
 
 				} else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {

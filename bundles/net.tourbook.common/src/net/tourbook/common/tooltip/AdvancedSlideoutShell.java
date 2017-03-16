@@ -1392,16 +1392,16 @@ public abstract class AdvancedSlideoutShell {
 		_visibleShell = rrShell.getShell();
 	}
 
-	public void setIsKeepSlideoutOpen(final boolean isKeepSlideoutOpen) {
-		_isKeepSlideoutOpen = isKeepSlideoutOpen;
-	}
-
 	/**
 	 * @param isKeepOpen
 	 *            When <code>true</code> then the slideout will never be closed.
 	 */
 	protected void setIsKeepOpenInternally(final boolean isKeepOpen) {
 		_isKeepOpenInternally = isKeepOpen;
+	}
+
+	public void setIsKeepSlideoutOpen(final boolean isKeepSlideoutOpen) {
+		_isKeepSlideoutOpen = isKeepSlideoutOpen;
 	}
 
 	protected void setIsShellToggle() {
@@ -1675,6 +1675,10 @@ public abstract class AdvancedSlideoutShell {
 		closeInternalShells();
 
 		if (canCloseShell() == false) {
+			return;
+		}
+
+		if (_visibleShell == null) {
 			return;
 		}
 

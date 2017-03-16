@@ -169,6 +169,22 @@ public class TourFilterManager {
 
 	static {
 
+//		public static String		ColumnFactory_Category_Altitude;
+//		public static String		ColumnFactory_Category_Body;
+//		public static String		ColumnFactory_Category_Data;
+//		public static String		ColumnFactory_Category_Device;
+//		public static String		ColumnFactory_Category_Marker;
+//		public static String		ColumnFactory_Category_Motion;
+//		public static String		ColumnFactory_Category_Photo;
+//		public static String		ColumnFactory_Category_Power;
+//		public static String		ColumnFactory_Category_Powertrain;
+//		public static String		ColumnFactory_Category_State;
+//		public static String		ColumnFactory_Category_Time;
+//		public static String		ColumnFactory_Category_Tour;
+//		public static String		ColumnFactory_Category_Training;
+//		public static String		ColumnFactory_Category_Waypoint;
+//		public static String		ColumnFactory_Category_Weather;
+
 		final TourFilterFieldConfig[] CONFIG =
 
 				{
@@ -241,7 +257,7 @@ public class TourFilterManager {
 							FILTER_OPERATORS_NUMBER,
 							0,
 							Integer.MAX_VALUE,
-							10,
+							100,
 							1,
 							_fieldValueProvider_distance),
 				//
@@ -281,7 +297,7 @@ public class TourFilterManager {
 	/**
 	 * Contains all available profiles.
 	 */
-	private static ArrayList<TourFilterProfile>	_filterProfiles	= new ArrayList<>();
+	private static ArrayList<TourFilterProfile>	_filterProfiles		= new ArrayList<>();
 
 	/**
 	 * Contains the selected profile or <code>null</code> when a profile is not selected.
@@ -290,6 +306,8 @@ public class TourFilterManager {
 
 	private static boolean						_isTourFilterEnabled;
 
+	private static int[]						_fireEventCounter	= new int[1];
+
 	private static ActionTourFilter				_actionTourFilter;
 
 	/**
@@ -297,13 +315,22 @@ public class TourFilterManager {
 	 */
 	static void fireTourFilterModifyEvent() {
 
-//		System.out.println(
-//				(UI.timeStampNano() + " [" + "] ") + ("\tfireTourFilterModifyEvent"));
-//		// TODO remove SYSTEM.OUT.PRINTLN
+		_fireEventCounter[0]++;
 
 		Display.getDefault().asyncExec(new Runnable() {
+
+			final int __runnableCounter = _fireEventCounter[0];
+
 			@Override
 			public void run() {
+
+				// skip all events which has not yet been executed
+				if (__runnableCounter != _fireEventCounter[0]) {
+
+					// a new event occured
+					return;
+				}
+
 				_prefStore.setValue(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED, Math.random());
 			}
 		});
