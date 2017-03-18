@@ -40,7 +40,7 @@ public class TourFilterProperty {
 	 */
 	boolean						isEnabled			= true;
 
-	TourFilterFieldConfig		fieldConfig			= TourFilterManager.getFieldConfig(TourFilterFieldId.TOUR_DATE);
+	TourFilterFieldConfig		fieldConfig			= TourFilterManager.getFieldConfig(TourFilterFieldId.TIME_TOUR_DATE);
 
 	/**
 	 * Selected operator for the property field

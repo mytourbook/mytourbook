@@ -17,6 +17,8 @@ package net.tourbook.tour.filter;
 
 import java.util.Arrays;
 
+import net.tourbook.common.UI;
+
 /**
  * Configuration for a tour filter field
  */
@@ -25,105 +27,171 @@ public class TourFilterFieldConfig {
 	/**
 	 * Visible field name
 	 */
-	final String					name;
+	final String				name;
 
 	/**
-	 * Every field can be identified by its unique id
+	 * Every field must have a unique id, it is <code>null</code> when it's a category. config.
 	 */
-	final TourFilterFieldId			fieldId;
+	TourFilterFieldId			fieldId;
 
-	final TourFilterFieldType		fieldType;
+	TourFilterFieldType			fieldType;
+
+	/**
+	 * Default field id when {@link #fieldType} is {@link TourFilterFieldType#CATEGORY}
+	 */
+	TourFilterFieldId			categoryDefaultFieldId;
 
 	/**
 	 * Contains all operators which are allowed for this field
 	 */
-	final TourFilterFieldOperator[]	fieldOperators;
+	TourFilterFieldOperator[]	fieldOperators;
 
-	int								minValue;
-	int								maxValue;
-	int								pageIncrement;
+	int							minValue;
+	int							maxValue		= Integer.MAX_VALUE;
 
-	/**
-	 * Number of digits
-	 */
-	int								numDigits;
-
-	FieldValueProvider				fieldValueProvider;
-
-	String							unitLabel;
+	int							pageIncrement	= 10;
 
 	/**
-	 * @param name
-	 * @param fieldId
-	 * @param fieldType
-	 * @param fieldOperators
+	 * Number of digits, default is 0.
 	 */
-	public TourFilterFieldConfig(	final String name,
-									final TourFilterFieldId fieldId,
-									final TourFilterFieldType fieldType,
-									final TourFilterFieldOperator[] fieldOperators) {
+	int							numDigits;
 
+	FieldValueConverter			fieldValueConverter;
+
+	String						unitLabel		= UI.EMPTY_STRING;
+
+	private TourFilterFieldConfig(final String name) {
 		this.name = name;
+	}
 
+	/**
+	 * Create a field category configuration.
+	 * 
+	 * @param name
+	 * @param fieldType
+	 * @param categoryDefaultFieldId
+	 */
+	public TourFilterFieldConfig(final String name, final TourFilterFieldId categoryDefaultFieldId) {
+
+		this.name = createLabel_Category(name);
+
+		this.fieldId = null;
+		this.fieldType = TourFilterFieldType.CATEGORY;
+
+		this.fieldOperators = null;
+
+		this.categoryDefaultFieldId = categoryDefaultFieldId;
+	}
+
+	private static String createLabel_Category(final String category) {
+
+		final String label = UI.EMPTY_STRING
+//				+ UI.SYMBOL_DBL_ANGLE_QMARK_RIGHT
+//				+ UI.SYMBOL_DBL_ANGLE_QMARK_RIGHT
+				+ UI.SPACE
+				+ UI.SYMBOL_DBL_ANGLE_QMARK_RIGHT
+				+ UI.SPACE
+				+ UI.SYMBOL_DBL_ANGLE_QMARK_RIGHT
+				+ UI.SPACE
+				+ UI.SYMBOL_DBL_ANGLE_QMARK_RIGHT
+				+ UI.SPACE
+				+ category.toUpperCase()
+				+ UI.SPACE
+				+ UI.SYMBOL_DBL_ANGLE_QMARK_LEFT
+				+ UI.SPACE
+				+ UI.SYMBOL_DBL_ANGLE_QMARK_LEFT
+				+ UI.SPACE
+				+ UI.SYMBOL_DBL_ANGLE_QMARK_LEFT
+				+ UI.SPACE
+//				+ UI.SYMBOL_DBL_ANGLE_QMARK_LEFT
+//				+ UI.SYMBOL_DBL_ANGLE_QMARK_LEFT
+
+		;
+
+		return label;
+	}
+
+	/**
+	 * Creates a default {@link TourFilterFieldConfig} with
+	 * <p>
+	 * field type {@link TourFilterFieldType#NUMBER_INTEGER} <br>
+	 * field operators {@link TourFilterManager#FILTER_OPERATORS_NUMBER}
+	 * 
+	 * @param name
+	 * @return
+	 */
+	static TourFilterFieldConfig name(final String name) {
+
+		final TourFilterFieldConfig config = new TourFilterFieldConfig(name);
+
+		config.fieldType = TourFilterFieldType.NUMBER_INTEGER;
+		config.fieldOperators = TourFilterManager.FILTER_OPERATORS_NUMBER;
+
+		return config;
+	}
+
+	TourFilterFieldConfig fieldId(final TourFilterFieldId fieldId) {
 		this.fieldId = fieldId;
-		this.fieldType = fieldType;
+		return this;
+	}
 
+	/**
+	 * Set the field operators, default is {@link TourFilterManager#FILTER_OPERATORS_NUMBER}
+	 * 
+	 * @param fieldOperators
+	 * @return
+	 */
+	TourFilterFieldConfig fieldOperators(final TourFilterFieldOperator[] fieldOperators) {
 		this.fieldOperators = fieldOperators;
+		return this;
 	}
 
 	/**
-	 * @param name
-	 * @param fieldId
+	 * Set the field type, default is {@link TourFilterFieldType#NUMBER_INTEGER}
+	 * 
 	 * @param fieldType
-	 * @param filterOperators
-	 * @param minValue
-	 * @param maxValue
-	 * @param pageIncrement
+	 * @return
 	 */
-	public TourFilterFieldConfig(	final String name,
-									final TourFilterFieldId fieldId,
-									final TourFilterFieldType fieldType,
-									final TourFilterFieldOperator[] filterOperators,
-									final int minValue,
-									final int maxValue,
-									final int pageIncrement) {
-
-		this(name, fieldId, fieldType, filterOperators);
-
-		this.minValue = minValue;
-		this.maxValue = maxValue;
-		this.pageIncrement = pageIncrement;
-
+	TourFilterFieldConfig fieldType(final TourFilterFieldType fieldType) {
+		this.fieldType = fieldType;
+		return this;
 	}
 
 	/**
-	 * @param name
-	 * @param fieldId
-	 * @param fieldType
-	 * @param filterOperators
-	 * @param minValue
-	 * @param maxValue
-	 * @param pageIncrement
-	 * @param numDigits
+	 * Set the field value provider, default is <code>null</code>.
+	 * 
 	 * @param fieldValueProvider
+	 * @return
 	 */
-	public TourFilterFieldConfig(	final String name,
-									final TourFilterFieldId fieldId,
-									final TourFilterFieldType fieldType,
-									final TourFilterFieldOperator[] filterOperators,
-									final int minValue,
-									final int maxValue,
-									final int pageIncrement,
-									final int numDigits,
-									final FieldValueProvider fieldValueProvider) {
+	TourFilterFieldConfig fieldValueProvider(final FieldValueConverter fieldValueProvider) {
+		this.fieldValueConverter = fieldValueProvider;
+		return this;
+	}
 
-		this(name, fieldId, fieldType, filterOperators);
-
-		this.minValue = minValue;
+	/**
+	 * Set maximum integer value, default is {@link Integer#MAX_VALUE}.
+	 * 
+	 * @param maxValue
+	 * @return
+	 */
+	TourFilterFieldConfig maxValue(final int maxValue) {
 		this.maxValue = maxValue;
-		this.pageIncrement = pageIncrement;
+		return this;
+	}
+
+	TourFilterFieldConfig minValue(final int minValue) {
+		this.minValue = minValue;
+		return this;
+	}
+
+	TourFilterFieldConfig numDigits(final int numDigits) {
 		this.numDigits = numDigits;
-		this.fieldValueProvider = fieldValueProvider;
+		return this;
+	}
+
+	TourFilterFieldConfig pageIncrement(final int pageIncrement) {
+		this.pageIncrement = pageIncrement;
+		return this;
 	}
 
 	@Override
@@ -134,6 +202,17 @@ public class TourFilterFieldConfig {
 				+ ("fieldType=" + fieldType + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("fieldOperators=" + Arrays.toString(fieldOperators)) //$NON-NLS-1$
 				+ "\n]\n"; //$NON-NLS-1$
+	}
+
+	/**
+	 * Default is an empty string.
+	 * 
+	 * @param unitLabel
+	 * @return
+	 */
+	TourFilterFieldConfig unitLabel(final String unitLabel) {
+		this.unitLabel = unitLabel;
+		return this;
 	}
 
 }

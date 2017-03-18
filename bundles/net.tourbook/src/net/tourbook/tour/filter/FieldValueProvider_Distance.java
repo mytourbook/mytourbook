@@ -17,16 +17,16 @@ package net.tourbook.tour.filter;
 
 import net.tourbook.ui.UI;
 
-public class FieldValueProvider_Distance extends FieldValueProvider {
+public class FieldValueProvider_Distance extends FieldValueConverter {
 
 	@Override
-	double convertFromMetric(final double value) {
+	double convert_Model_To_UI(final double value) {
 
 		return value / UI.UNIT_VALUE_DISTANCE;
 	}
 
 	@Override
-	double convertToMetric(final double value) {
+	double convert_UI_To_Model(final double value) {
 
 		return value * UI.UNIT_VALUE_DISTANCE;
 	}

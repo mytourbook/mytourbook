@@ -17,10 +17,10 @@ package net.tourbook.tour.filter;
 
 import net.tourbook.common.UI;
 
-public class FieldValueProvider_Temperature extends FieldValueProvider {
+public class FieldValueProvider_Temperature extends FieldValueConverter {
 
 	@Override
-	double convertFromMetric(final double value) {
+	double convert_Model_To_UI(final double value) {
 
 		final float uiValue = UI.convertTemperatureFromMetric((float) value);
 		
@@ -28,7 +28,7 @@ public class FieldValueProvider_Temperature extends FieldValueProvider {
 	}
 
 	@Override
-	double convertToMetric(final double value) {
+	double convert_UI_To_Model(final double value) {
 
 		final float metricValue = UI.convertTemperatureToMetric((float) value);
 

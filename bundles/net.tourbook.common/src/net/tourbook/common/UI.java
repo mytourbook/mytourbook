@@ -130,6 +130,8 @@ public class UI {
 	public static final String			SYMBOL_IDENTICAL_TO						= "\u2261";											//$NON-NLS-1$
 	public static final String			SYMBOL_INFINITY_MAX						= "\u221E";											//$NON-NLS-1$
 	public static final String			SYMBOL_INFINITY_MIN						= "-\u221E";										//$NON-NLS-1$
+	public static final String			SYMBOL_DBL_ANGLE_QMARK_LEFT				= "\u00AB";											//$NON-NLS-1$
+	public static final String			SYMBOL_DBL_ANGLE_QMARK_RIGHT			= "\u00BB";											//$NON-NLS-1$
 	public static final String			SYMBOL_PLUS_MINUS						= "\u00B1";											//$NON-NLS-1$
 	public static final String			SYMBOL_SUM_WITH_SPACE					= "\u2211 ";										//$NON-NLS-1$
 	public static final String			SYMBOL_SUN								= "\u263C";											//$NON-NLS-1$
@@ -254,6 +256,7 @@ public class UI {
 	public static final String			UNIT_MS									= "ms";												//$NON-NLS-1$
 	public static final String			UNIT_POWER_TO_WEIGHT_RATIO				= "W/Kg";											//$NON-NLS-1$
 	public static final String			UNIT_POWER								= "Watt";											//$NON-NLS-1$
+	public static final String			UNIT_POWER_SHORT						= "W";												//$NON-NLS-1$
 	public static final String			UNIT_WEIGHT_KG							= "kg";												//$NON-NLS-1$
 
 	public static final PeriodFormatter	DEFAULT_DURATION_FORMATTER;

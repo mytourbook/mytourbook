@@ -17,21 +17,28 @@ package net.tourbook.tour.filter;
 
 public enum TourFilterFieldId {
 
-	TOUR_DATE, //
-	TOUR_TIME, //
+	TIME_RECORDING_TIME, //
+	TIME_DRIVING_TIME, //
+	TIME_BREAK_TIME, //
+	TIME_TOUR_DATE, //
+	TIME_TOUR_TIME, //
 
 	/**
 	 * DATE_SEASON or DATE_PERIOD, is a repeated interval, e.g. from start year until today,
 	 * repeated for each year
 	 */
-	SEASON_DATE,
+	TIME_SEASON_DATE,
 
-	RECORDING_TIME, //
-	DRIVING_TIME, //
-	BREAK_TIME, //
-
+//	TOUR_MARKERS, //
+	TOUR_PHOTOS, //
 	TOUR_TITLE, //
 
-	DISTANCE, //
-	TEMPERATURE, //
+	MOTION_DISTANCE, //
+
+	POWER_AVERAGE, //
+	POWER_MAX, //
+	POWER_NORMALIZED, //
+	POWER_TOTAL_WORK, //
+
+	WEATHER_TEMPERATURE, //
 }

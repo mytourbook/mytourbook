@@ -15,10 +15,9 @@
  *******************************************************************************/
 package net.tourbook.tour.filter;
 
-public abstract class FieldValueProvider {
+public abstract class FieldValueConverter {
 
-	abstract double convertFromMetric(double value);
+	abstract double convert_Model_To_UI(double value);
 
-	abstract double convertToMetric(double value);
-
+	abstract double convert_UI_To_Model(double value);
 }

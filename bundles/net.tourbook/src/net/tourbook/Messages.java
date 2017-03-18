@@ -1784,6 +1784,9 @@ public class Messages extends NLS {
 	public static String		Tour_Filter_Field_BreakTime;
 	public static String		Tour_Filter_Field_Distance;
 	public static String		Tour_Filter_Field_DrivingTime;
+	public static String		Tour_Filter_Field_Markers;
+	public static String		Tour_Filter_Field_Photos;
+	public static String		Tour_Filter_Field_Power_Average;
 	public static String		Tour_Filter_Field_RecordingTime;
 	public static String		Tour_Filter_Field_Season;
 	public static String		Tour_Filter_Field_Temperature;

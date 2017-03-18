@@ -585,8 +585,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	// ############################################# PHOTO  DATA #############################################
 
 	/**
-	 * Number of photos which are set in {@link #tourPhotos}. This field is displayed only in views
-	 * or works as tour filter.
+	 * Number of photos.
 	 */
 	@SuppressWarnings("unused")
 	private int													numberOfPhotos;

@@ -33,6 +33,7 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -45,6 +46,39 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
 public class TourFilterManager {
+
+	private static final String							TOUR_DATA_AVG_TEMPERATURE		= "TourData.avgTemperature";
+	private static final String							TOUR_DATA_NUMBER_OF_PHOTOS		= "TourData.numberOfPhotos";
+	private static final String							TOUR_DATA_POWER_AVG				= "TourData.power_Avg";
+	private static final String							TOUR_DATA_POWER_MAX				= "TourData.power_Max";
+	private static final String							TOUR_DATA_POWER_NORMALIZED		= "TourData.power_Normalized";
+	private static final String							TOUR_DATA_POWER_TOTAL_WORK		= "TourData.power_TotalWork";
+	private static final String							TOUR_DATA_TOUR_DISTANCE			= "TourData.tourDistance";
+	private static final String							TOUR_DATA_TOUR_DRIVING_TIME		= "TourData.tourDrivingTime";
+	private static final String							TOUR_DATA_TOUR_RECORDING_TIME	= "TourData.tourRecordingTime";
+	private static final String							TOUR_DATA_TOUR_START_TIME		= "TourData.tourStartTime";
+	private static final String							TOUR_DATA_TOUR_TITLE			= "TourData.tourTitle";
+
+	private static final String							COLUMN_FACTORY_POWER_AVG		= net.tourbook.ui.Messages.ColumnFactory_Power_Avg_Tooltip;
+	private static final String							COLUMN_FACTORY_POWER_MAX		= net.tourbook.ui.Messages.ColumnFactory_Power_Max_Tooltip;
+	private static final String							COLUMN_FACTORY_POWER_NORMALIZED	= net.tourbook.ui.Messages.ColumnFactory_Power_Normalized_Tooltip;
+	private static final String							COLUMN_FACTORY_POWER_TOTAL_WORK	= net.tourbook.ui.Messages.ColumnFactory_Power_TotalWork_Tooltip;
+
+	private static final String							CATEGORY_ALTITUDE				= net.tourbook.ui.Messages.ColumnFactory_Category_Altitude;
+	private static final String							CATEGORY_BODY					= net.tourbook.ui.Messages.ColumnFactory_Category_Body;
+	private static final String							CATEGORY_DATA					= net.tourbook.ui.Messages.ColumnFactory_Category_Data;
+	private static final String							CATEGORY_DEVICE					= net.tourbook.ui.Messages.ColumnFactory_Category_Device;
+	private static final String							CATEGORY_MARKER					= net.tourbook.ui.Messages.ColumnFactory_Category_Marker;
+	private static final String							CATEGORY_MOTION					= net.tourbook.ui.Messages.ColumnFactory_Category_Motion;
+	private static final String							CATEGORY_PHOTO					= net.tourbook.ui.Messages.ColumnFactory_Category_Photo;
+	private static final String							CATEGORY_POWER					= net.tourbook.ui.Messages.ColumnFactory_Category_Power;
+	private static final String							CATEGORY_POWERTRAIN				= net.tourbook.ui.Messages.ColumnFactory_Category_Powertrain;
+	private static final String							CATEGORY_STATE					= net.tourbook.ui.Messages.ColumnFactory_Category_State;
+	private static final String							CATEGORY_TIME					= net.tourbook.ui.Messages.ColumnFactory_Category_Time;
+	private static final String							CATEGORY_TOUR					= net.tourbook.ui.Messages.ColumnFactory_Category_Tour;
+	private static final String							CATEGORY_TRAINING				= net.tourbook.ui.Messages.ColumnFactory_Category_Training;
+	private static final String							CATEGORY_WAYPOINT				= net.tourbook.ui.Messages.ColumnFactory_Category_Waypoint;
+	private static final String							CATEGORY_WEATHER				= net.tourbook.ui.Messages.ColumnFactory_Category_Weather;
 
 	private static final String							TOUR_FILTER_FILE_NAME			= "tour-filter.xml";													//$NON-NLS-1$
 	private static final int							TOUR_FILTER_VERSION				= 1;
@@ -108,13 +142,6 @@ public class TourFilterManager {
 	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.SEASON_DATE_UNTIL_TODAY,		Messages.Tour_Filter_Operator_Season_Date_Until_Today),
 	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.SEASON_TODAY_UNTIL_YEAR_END,	Messages.Tour_Filter_Operator_Season_Today_Until_YearEnd),
 	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.SEASON_TODAY_UNTIL_DATE,		Messages.Tour_Filter_Operator_Season_Today_Until_Date),
-
-// is not yet implemented
-//
-//	   new TourFilterOperatorDef(TourFilterOperator.LIKE,					Messages.Tour_Filter_Operator_Like),
-//	   new TourFilterOperatorDef(TourFilterOperator.NOT_LIKE,				Messages.Tour_Filter_Operator_NotLike),
-//	   new TourFilterOperatorDef(TourFilterOperator.INCLUDE_ANY,			Messages.Tour_Filter_Operator_IncludeAny),
-//	   new TourFilterOperatorDef(TourFilterOperator.EXCLUDE_ALL,			Messages.Tour_Filter_Operator_ExcludeAll),
 	};
 	
 	public static final TourFilterFieldOperator[]			FILTER_OPERATORS_DATE_TIME = {
@@ -159,8 +186,8 @@ public class TourFilterManager {
 
 // SET_FORMATTING_ON
 
-	private static FieldValueProvider					_fieldValueProvider_distance	= new FieldValueProvider_Distance();
-	private static FieldValueProvider					_fieldValueProvider_temperature	= new FieldValueProvider_Temperature();
+	private static FieldValueConverter					_fieldValueProvider_distance	= new FieldValueProvider_Distance();
+	private static FieldValueConverter					_fieldValueProvider_temperature	= new FieldValueProvider_Temperature();
 
 	/**
 	 * This is also the sequence how the fields are displayed in the UI
@@ -169,101 +196,32 @@ public class TourFilterManager {
 
 	static {
 
-//		public static String		ColumnFactory_Category_Altitude;
-//		public static String		ColumnFactory_Category_Body;
-//		public static String		ColumnFactory_Category_Data;
-//		public static String		ColumnFactory_Category_Device;
-//		public static String		ColumnFactory_Category_Marker;
-//		public static String		ColumnFactory_Category_Motion;
-//		public static String		ColumnFactory_Category_Photo;
-//		public static String		ColumnFactory_Category_Power;
-//		public static String		ColumnFactory_Category_Powertrain;
-//		public static String		ColumnFactory_Category_State;
-//		public static String		ColumnFactory_Category_Time;
-//		public static String		ColumnFactory_Category_Tour;
-//		public static String		ColumnFactory_Category_Training;
-//		public static String		ColumnFactory_Category_Waypoint;
-//		public static String		ColumnFactory_Category_Weather;
+		final ArrayList<TourFilterFieldConfig> allConfigs = new ArrayList<TourFilterFieldConfig>();
 
-		final TourFilterFieldConfig[] CONFIG =
+		createConfig_Time(allConfigs);
+		createConfig_Altitude(allConfigs);
+		createConfig_Motion(allConfigs);
+		createConfig_Power(allConfigs);
+		createConfig_Training(allConfigs);
+		createConfig_Powertrain(allConfigs);
+		createConfig_Tour(allConfigs);
+		createConfig_Weather(allConfigs);
+		createConfig_Body(allConfigs);
+		createConfig_Device(allConfigs);
+		createConfig_Data(allConfigs);
 
-				{
-					new TourFilterFieldConfig(
-							Messages.Tour_Filter_Field_TourDate,
-							TourFilterFieldId.TOUR_DATE,
-							TourFilterFieldType.DATE,
-							FILTER_OPERATORS_DATE_TIME),
+//		final TourFilterFieldConfig[] CONFIG =
+//
+//				{
+//					new TourFilterFieldConfig(COLUMN_FACTORY_CATEGORY_PHOTO, TourFilterFieldType.CATEGORY),
+//				 	new TourFilterFieldConfig(COLUMN_FACTORY_CATEGORY_MARKER, TourFilterFieldType.CATEGORY),
+//					new TourFilterFieldConfig(COLUMN_FACTORY_CATEGORY_STATE, TourFilterFieldType.CATEGORY),
+//					new TourFilterFieldConfig(COLUMN_FACTORY_CATEGORY_WAYPOINT, TourFilterFieldType.CATEGORY),
+//
+//				//
+//				};
 
-					new TourFilterFieldConfig(
-							Messages.Tour_Filter_Field_TourStartTime,
-							TourFilterFieldId.TOUR_TIME,
-							TourFilterFieldType.TIME,
-							FILTER_OPERATORS_DATE_TIME),
-
-					new TourFilterFieldConfig(
-							Messages.Tour_Filter_Field_Season,
-							TourFilterFieldId.SEASON_DATE,
-							TourFilterFieldType.SEASON,
-							FILTER_OPERATORS_SEASON),
-
-					new TourFilterFieldConfig(
-							Messages.Tour_Filter_Field_RecordingTime,
-							TourFilterFieldId.RECORDING_TIME,
-							TourFilterFieldType.DURATION,
-							FILTER_OPERATORS_NUMBER,
-							0,
-							Integer.MAX_VALUE,
-							60),
-
-					new TourFilterFieldConfig(
-							Messages.Tour_Filter_Field_DrivingTime,
-							TourFilterFieldId.DRIVING_TIME,
-							TourFilterFieldType.DURATION,
-							FILTER_OPERATORS_NUMBER,
-							0,
-							Integer.MAX_VALUE,
-							60),
-
-					new TourFilterFieldConfig(
-							Messages.Tour_Filter_Field_BreakTime,
-							TourFilterFieldId.BREAK_TIME,
-							TourFilterFieldType.DURATION,
-							FILTER_OPERATORS_NUMBER,
-							0,
-							Integer.MAX_VALUE,
-							60),
-
-					new TourFilterFieldConfig(
-							Messages.Tour_Filter_Field_TourTitle,
-							TourFilterFieldId.TOUR_TITLE,
-							TourFilterFieldType.TEXT,
-							FILTER_OPERATORS_TEXT),
-
-					new TourFilterFieldConfig(
-							Messages.Tour_Filter_Field_Temperature,
-							TourFilterFieldId.TEMPERATURE,
-							TourFilterFieldType.NUMBER_METRIC,
-							FILTER_OPERATORS_NUMBER,
-							-600,
-							1500,
-							10,
-							1,
-							_fieldValueProvider_temperature),
-
-					new TourFilterFieldConfig(
-							Messages.Tour_Filter_Field_Distance,
-							TourFilterFieldId.DISTANCE,
-							TourFilterFieldType.NUMBER_METRIC,
-							FILTER_OPERATORS_NUMBER,
-							0,
-							Integer.MAX_VALUE,
-							100,
-							1,
-							_fieldValueProvider_distance),
-				//
-				};
-
-		FILTER_FIELD_CONFIG = CONFIG;
+		FILTER_FIELD_CONFIG = allConfigs.toArray(new TourFilterFieldConfig[allConfigs.size()]);
 	}
 
 // SET_FORMATTING_OFF
@@ -309,6 +267,275 @@ public class TourFilterManager {
 	private static int[]						_fireEventCounter	= new int[1];
 
 	private static ActionTourFilter				_actionTourFilter;
+
+	private static void createConfig_Altitude(final ArrayList<TourFilterFieldConfig> allConfigs) {
+
+//		// Altitude
+//		defineColumn_Altitude_Up();
+//		defineColumn_Altitude_Down();
+//		defineColumn_Altitude_Max();
+
+//		allConfigs.add(new TourFilterFieldConfig(COLUMN_FACTORY_CATEGORY_ALTITUDE, TourFilterFieldType.CATEGORY));
+	}
+
+	private static void createConfig_Body(final ArrayList<TourFilterFieldConfig> allConfigs) {
+
+//		// Body
+//		defineColumn_Body_Calories();
+//		defineColumn_Body_RestPulse();
+//		defineColumn_Body_MaxPulse();
+//		defineColumn_Body_AvgPulse();
+//		defineColumn_Body_Weight();
+//		defineColumn_Body_Person();
+
+//		allConfigs.add(new TourFilterFieldConfig(COLUMN_FACTORY_CATEGORY_BODY, TourFilterFieldType.CATEGORY));
+	}
+
+	private static void createConfig_Data(final ArrayList<TourFilterFieldConfig> allConfigs) {
+
+		//
+//		// Data
+//		defineColumn_Data_DPTolerance();
+//		defineColumn_Data_ImportFilePath();
+//		defineColumn_Data_ImportFileName();
+//		defineColumn_Data_TimeInterval();
+//		defineColumn_Data_NumTimeSlices();
+
+//		allConfigs.add(new TourFilterFieldConfig(COLUMN_FACTORY_CATEGORY_DATA, TourFilterFieldType.CATEGORY));
+	}
+
+	private static void createConfig_Device(final ArrayList<TourFilterFieldConfig> allConfigs) {
+
+		//
+//		// Device
+//		defineColumn_Device_Name();
+//		defineColumn_Device_Distance();
+
+//		allConfigs.add(new TourFilterFieldConfig(COLUMN_FACTORY_CATEGORY_DEVICE, TourFilterFieldType.CATEGORY));
+	}
+
+	private static void createConfig_Motion(final ArrayList<TourFilterFieldConfig> allConfigs) {
+
+//
+//		// Motion / Bewegung
+//		defineColumn_Motion_Distance();
+//		defineColumn_Motion_MaxSpeed();
+//		defineColumn_Motion_AvgSpeed();
+//		defineColumn_Motion_AvgPace();
+//
+		allConfigs.add(new TourFilterFieldConfig(CATEGORY_MOTION, TourFilterFieldId.MOTION_DISTANCE));
+
+		allConfigs.add(
+				TourFilterFieldConfig
+						.name(Messages.Tour_Filter_Field_Distance)
+						.fieldId(TourFilterFieldId.MOTION_DISTANCE)
+						.fieldType(TourFilterFieldType.NUMBER_FLOAT)
+						.fieldOperators(FILTER_OPERATORS_NUMBER)
+						.pageIncrement(100)
+						.numDigits(1)
+						.fieldValueProvider(_fieldValueProvider_distance));
+	}
+
+	private static void createConfig_Power(final ArrayList<TourFilterFieldConfig> allConfigs) {
+
+		//
+//		// Power - Leistung
+//		defineColumn_Power_Avg();
+//		defineColumn_Power_Max();
+//		defineColumn_Power_Normalized();
+//		defineColumn_Power_TotalWork();
+//				(net.tourbook.ui.Messages.ColumnFactory_Category_Power)
+//						+ (net.tourbook.ui.Messages.ColumnFactory_Power_Avg_Label)
+//						+ (net.tourbook.ui.Messages.ColumnFactory_Power_Avg_Header)
+//						+ (net.tourbook.ui.Messages.ColumnFactory_power)
+//						+ (net.tourbook.ui.Messages.ColumnFactory_Power_Avg_Tooltip)
+
+		allConfigs.add(new TourFilterFieldConfig(CATEGORY_POWER, TourFilterFieldId.POWER_AVERAGE));
+
+		allConfigs.add(TourFilterFieldConfig//
+				.name(COLUMN_FACTORY_POWER_AVG)
+				.fieldId(TourFilterFieldId.POWER_AVERAGE)
+				.unitLabel(UI.UNIT_POWER_SHORT));
+
+		allConfigs.add(TourFilterFieldConfig//
+				.name(COLUMN_FACTORY_POWER_MAX)
+				.fieldId(TourFilterFieldId.POWER_MAX)
+				.unitLabel(UI.UNIT_POWER_SHORT));
+
+		allConfigs.add(TourFilterFieldConfig//
+				.name(COLUMN_FACTORY_POWER_NORMALIZED)
+				.fieldId(TourFilterFieldId.POWER_NORMALIZED)
+				.unitLabel(UI.UNIT_POWER_SHORT));
+
+		allConfigs.add(TourFilterFieldConfig//
+				.name(COLUMN_FACTORY_POWER_TOTAL_WORK)
+				.fieldId(TourFilterFieldId.POWER_TOTAL_WORK)
+				.fieldType(TourFilterFieldType.NUMBER_FLOAT)
+				.unitLabel(UI.UNIT_JOULE_MEGA)
+				.numDigits(1));
+	}
+
+	private static void createConfig_Powertrain(final ArrayList<TourFilterFieldConfig> allConfigs) {
+		//
+//		// Powertrain - Antrieb/Pedal
+//		defineColumn_Powertrain_AvgCadence();
+//		defineColumn_Powertrain_CadenceMultiplier();
+//		defineColumn_Powertrain_Gear_FrontShiftCount();
+//		defineColumn_Powertrain_Gear_RearShiftCount();
+//		defineColumn_Powertrain_AvgLeftPedalSmoothness();
+//		defineColumn_Powertrain_AvgLeftTorqueEffectiveness();
+//		defineColumn_Powertrain_AvgRightPedalSmoothness();
+//		defineColumn_Powertrain_AvgRightTorqueEffectiveness();
+//		defineColumn_Powertrain_PedalLeftRightBalance();
+
+//		allConfigs.add(new TourFilterFieldConfig(COLUMN_FACTORY_CATEGORY_POWERTRAIN, TourFilterFieldType.CATEGORY));
+	}
+
+	private static void createConfig_Time(final ArrayList<TourFilterFieldConfig> allConfigs) {
+
+//		// Time
+//		defineColumn_1stColumn_Date();
+//		defineColumn_Time_WeekDay();
+//		defineColumn_Time_TourStartTime();
+//		defineColumn_Time_TimeZoneDifference();
+//		defineColumn_Time_TimeZone();
+//		defineColumn_Time_DrivingTime();
+//		defineColumn_Time_RecordingTime();
+//		defineColumn_Time_PausedTime();
+//		defineColumn_Time_PausedTime_Relative();
+//		defineColumn_Time_WeekNo();
+//		defineColumn_Time_WeekYear();
+
+		allConfigs.add(new TourFilterFieldConfig(CATEGORY_TIME, TourFilterFieldId.TIME_TOUR_DATE));
+
+		allConfigs.add(
+				TourFilterFieldConfig
+						.name(Messages.Tour_Filter_Field_TourDate)
+						.fieldId(TourFilterFieldId.TIME_TOUR_DATE)
+						.fieldType(TourFilterFieldType.DATE)
+						.fieldOperators(FILTER_OPERATORS_DATE_TIME));
+
+		allConfigs.add(
+				TourFilterFieldConfig
+						.name(Messages.Tour_Filter_Field_TourStartTime)
+						.fieldId(TourFilterFieldId.TIME_TOUR_TIME)
+						.fieldType(TourFilterFieldType.TIME)
+						.fieldOperators(FILTER_OPERATORS_DATE_TIME));
+
+		allConfigs.add(
+				TourFilterFieldConfig
+						.name(Messages.Tour_Filter_Field_Season)
+						.fieldId(TourFilterFieldId.TIME_SEASON_DATE)
+						.fieldType(TourFilterFieldType.SEASON)
+						.fieldOperators(FILTER_OPERATORS_SEASON));
+
+		allConfigs.add(
+				TourFilterFieldConfig
+						.name(Messages.Tour_Filter_Field_RecordingTime)
+						.fieldId(TourFilterFieldId.TIME_RECORDING_TIME)
+						.fieldType(TourFilterFieldType.DURATION)
+						.fieldOperators(FILTER_OPERATORS_NUMBER)
+						.pageIncrement(60));
+
+		allConfigs.add(
+				TourFilterFieldConfig
+						.name(Messages.Tour_Filter_Field_DrivingTime)
+						.fieldId(TourFilterFieldId.TIME_DRIVING_TIME)
+						.fieldType(TourFilterFieldType.DURATION)
+						.fieldOperators(FILTER_OPERATORS_NUMBER)
+						.pageIncrement(60));
+
+		allConfigs.add(
+				TourFilterFieldConfig
+						.name(Messages.Tour_Filter_Field_BreakTime)
+						.fieldId(TourFilterFieldId.TIME_BREAK_TIME)
+						.fieldType(TourFilterFieldType.DURATION)
+						.fieldOperators(FILTER_OPERATORS_NUMBER)
+						.pageIncrement(60));
+	}
+
+	private static void createConfig_Tour(final ArrayList<TourFilterFieldConfig> allConfigs) {
+
+//		// Tour
+//		defineColumn_Tour_TypeImage();
+//		defineColumn_Tour_TypeText();
+//		defineColumn_Tour_Title();
+//		defineColumn_Tour_Marker();
+//		defineColumn_Tour_Photos();
+//		defineColumn_Tour_Tags();
+
+		allConfigs.add(new TourFilterFieldConfig(CATEGORY_TOUR, TourFilterFieldId.TOUR_TITLE));
+
+		allConfigs.add(
+				TourFilterFieldConfig
+						.name(Messages.Tour_Filter_Field_TourTitle)
+						.fieldId(TourFilterFieldId.TOUR_TITLE)
+						.fieldType(TourFilterFieldType.TEXT)
+						.fieldOperators(FILTER_OPERATORS_TEXT));
+
+		allConfigs.add(
+				TourFilterFieldConfig
+						.name(Messages.Tour_Filter_Field_Photos)
+						.fieldId(TourFilterFieldId.TOUR_PHOTOS)
+						.fieldType(TourFilterFieldType.NUMBER_INTEGER)
+						.fieldOperators(FILTER_OPERATORS_NUMBER)
+						.pageIncrement(10));
+
+//		allConfigs.add(
+//				new TourFilterFieldConfig(
+//						Messages.Tour_Filter_Field_Photos,
+//						TourFilterFieldId.TOUR_PHOTOS,
+//						TourFilterFieldType.NUMBER_INTEGER,
+//						FILTER_OPERATORS_NUMBER,
+//						0,
+//						Integer.MAX_VALUE,
+//						10));
+
+//		allConfigs.add(
+//				new TourFilterFieldConfig(
+//						Messages.Tour_Filter_Field_Markers,
+//						TourFilterFieldId.TOUR_MARKERS,
+//						TourFilterFieldType.NUMBER_INTEGER,
+//						FILTER_OPERATORS_NUMBER,
+//						0,
+//						Integer.MAX_VALUE,
+//						10));
+	}
+
+	private static void createConfig_Training(final ArrayList<TourFilterFieldConfig> allConfigs) {
+
+		//
+//		// Training - Trainingsanalyse
+//		defineColumn_Training_FTP();
+//		defineColumn_Training_PowerToWeightRatio();
+//		defineColumn_Training_IntensityFactor();
+//		defineColumn_Training_StressScore();
+
+//		allConfigs.add(new TourFilterFieldConfig(COLUMN_FACTORY_CATEGORY_TRAINING, TourFilterFieldType.CATEGORY));
+	}
+
+	private static void createConfig_Weather(final ArrayList<TourFilterFieldConfig> allConfigs) {
+
+//		// Weather
+//		defineColumn_Weather_Clouds();
+//		defineColumn_Weather_AvgTemperature();
+//		defineColumn_Weather_WindSpeed();
+//		defineColumn_Weather_WindDirection();
+//
+		allConfigs.add(new TourFilterFieldConfig(CATEGORY_WEATHER, TourFilterFieldId.WEATHER_TEMPERATURE));
+
+		allConfigs.add(
+				TourFilterFieldConfig
+						.name(Messages.Tour_Filter_Field_Temperature)
+						.fieldId(TourFilterFieldId.WEATHER_TEMPERATURE)
+						.fieldType(TourFilterFieldType.NUMBER_FLOAT)
+						.fieldOperators(FILTER_OPERATORS_NUMBER)
+						.minValue(-600)
+						.maxValue(1500)
+						.pageIncrement(10)
+						.numDigits(1)
+						.fieldValueProvider(_fieldValueProvider_temperature));
+	}
 
 	/**
 	 * Fire event that the tour filter has changed.
@@ -402,16 +629,46 @@ public class TourFilterManager {
 	}
 
 	/**
-	 * @param filterField
-	 * @return Returns the index of the requested filter type.
+	 * @param requestedFieldId
+	 * @param startIndex
+	 * @return Returns the index of the requested field id.
 	 */
-	static int getFilterFieldIndex(final TourFilterFieldId filterField) {
+	static int getFilterFieldIndex(final TourFilterFieldId requestedFieldId) {
 
+		TourFilterFieldConfig categoryConfig = null;
+
+		/*
+		 * get index for a 'normal' field id
+		 */
 		for (int typeIndex = 0; typeIndex < FILTER_FIELD_CONFIG.length; typeIndex++) {
 
-			final TourFilterFieldConfig filterTemplate = FILTER_FIELD_CONFIG[typeIndex];
+			final TourFilterFieldConfig fieldConfig = FILTER_FIELD_CONFIG[typeIndex];
+			final TourFilterFieldId fieldId = fieldConfig.fieldId;
 
-			if (filterTemplate.fieldId.equals(filterField)) {
+			if (fieldId != null && fieldId.equals(requestedFieldId)) {
+
+				if (fieldConfig.fieldType == TourFilterFieldType.CATEGORY) {
+
+					categoryConfig = fieldConfig;
+					break;
+				}
+
+				return typeIndex;
+			}
+		}
+
+		Assert.isNotNull(categoryConfig);
+
+		/*
+		 * get index for the category default field id
+		 */
+		final TourFilterFieldId defaultFieldId = categoryConfig.categoryDefaultFieldId;
+		for (int typeIndex = 0; typeIndex < FILTER_FIELD_CONFIG.length; typeIndex++) {
+
+			final TourFilterFieldConfig fieldConfig = FILTER_FIELD_CONFIG[typeIndex];
+			final TourFilterFieldId fieldId = fieldConfig.fieldId;
+
+			if (fieldId.equals(defaultFieldId)) {
 				return typeIndex;
 			}
 		}
@@ -476,9 +733,9 @@ public class TourFilterManager {
 			long value2;
 
 			switch (fieldId) {
-			case TOUR_DATE:
+			case TIME_TOUR_DATE:
 
-				sql = "TourData.tourStartTime"; //$NON-NLS-1$
+				sql = TOUR_DATA_TOUR_START_TIME;
 
 				value1 = LocalDate
 						.of(dateTime1.getYear(), dateTime1.getMonthValue(), dateTime1.getDayOfMonth())
@@ -491,7 +748,7 @@ public class TourFilterManager {
 				getSQL__FieldOperators_DateTime(sqlWhere, sqlParameters, fieldOperator, sql, value1, value2);
 				break;
 
-			case TOUR_TIME:
+			case TIME_TOUR_TIME:
 
 				sql = "(TourData.startHour * 3600 + TourData.startMinute)"; //$NON-NLS-1$
 
@@ -501,29 +758,29 @@ public class TourFilterManager {
 				getSQL__FieldOperators_DateTime(sqlWhere, sqlParameters, fieldOperator, sql, value1, value2);
 				break;
 
-			case SEASON_DATE:
+			case TIME_SEASON_DATE:
 				getSQL__FieldOperators_SeasonDate(sqlWhere, sqlParameters, filterProperty, today);
 				break;
 
-			case BREAK_TIME:
+			case TIME_BREAK_TIME:
 				sql = "(TourData.tourRecordingTime - TourData.tourDrivingTime)"; //$NON-NLS-1$
 				getSQL__FieldOperators_Number(sqlWhere, sqlParameters, fieldOperator, sql, int1, int2);
 				break;
 
-			case DRIVING_TIME:
-				sql = "TourData.tourDrivingTime"; //$NON-NLS-1$
+			case TIME_DRIVING_TIME:
+				sql = TOUR_DATA_TOUR_DRIVING_TIME;
 				getSQL__FieldOperators_Number(sqlWhere, sqlParameters, fieldOperator, sql, int1, int2);
 
 				break;
 
-			case RECORDING_TIME:
-				sql = "TourData.tourRecordingTime"; //$NON-NLS-1$
+			case TIME_RECORDING_TIME:
+				sql = TOUR_DATA_TOUR_RECORDING_TIME;
 				getSQL__FieldOperators_Number(sqlWhere, sqlParameters, fieldOperator, sql, int1, int2);
 				break;
 
-			case DISTANCE:
+			case MOTION_DISTANCE:
 
-				sql = "TourData.tourDistance"; //$NON-NLS-1$
+				sql = TOUR_DATA_TOUR_DISTANCE;
 
 				// convert from km to m
 				final double distance1 = double1 * 1000;
@@ -532,22 +789,44 @@ public class TourFilterManager {
 				getSQL__FieldOperators_Number(sqlWhere, sqlParameters, fieldOperator, sql, distance1, distance2);
 				break;
 
-			case TEMPERATURE:
-				sql = "TourData.avgTemperature"; //$NON-NLS-1$
+			case WEATHER_TEMPERATURE:
+				sql = TOUR_DATA_AVG_TEMPERATURE;
 				getSQL__FieldOperators_Number(sqlWhere, sqlParameters, fieldOperator, sql, double1, double2);
 				break;
 
+			case POWER_AVERAGE:
+				sql = TOUR_DATA_POWER_AVG;
+				getSQL__FieldOperators_Number(sqlWhere, sqlParameters, fieldOperator, sql, int1, int2);
+				break;
+
+			case POWER_MAX:
+				sql = TOUR_DATA_POWER_MAX;
+				getSQL__FieldOperators_Number(sqlWhere, sqlParameters, fieldOperator, sql, int1, int2);
+				break;
+
+			case POWER_NORMALIZED:
+				sql = TOUR_DATA_POWER_NORMALIZED;
+				getSQL__FieldOperators_Number(sqlWhere, sqlParameters, fieldOperator, sql, int1, int2);
+				break;
+
+			case POWER_TOTAL_WORK:
+				sql = TOUR_DATA_POWER_TOTAL_WORK;
+				getSQL__FieldOperators_Number(sqlWhere, sqlParameters, fieldOperator, sql, int1, int2);
+				break;
+
+			case TOUR_PHOTOS:
+				sql = TOUR_DATA_NUMBER_OF_PHOTOS;
+				getSQL__FieldOperators_Number(sqlWhere, sqlParameters, fieldOperator, sql, int1, int2);
+				break;
+
 			case TOUR_TITLE:
-				sql = "TourData.tourTitle"; //$NON-NLS-1$
+				sql = TOUR_DATA_TOUR_TITLE;
 				getSQL__FieldOperators_Text(sqlWhere, sqlParameters, fieldOperator, sql, text1, text2);
 				break;
 			}
 		}
 
 		final TourFilterSQLData tourFilterSQLData = new TourFilterSQLData(sqlWhere.toString(), sqlParameters);
-
-//		System.out.println((UI.timeStampNano() + " [" + "] ") + ("\ttourFilterSQLData: " + tourFilterSQLData));
-//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		return tourFilterSQLData;
 	}
@@ -917,7 +1196,7 @@ public class TourFilterManager {
 							final TourFilterFieldId fieldId = (TourFilterFieldId) Util.getXmlEnum(//
 									xmlProperty,
 									ATTR_FIELD_ID,
-									TourFilterFieldId.TOUR_DATE);
+									TourFilterFieldId.TIME_TOUR_DATE);
 
 							final TourFilterFieldOperator fieldOperator = (TourFilterFieldOperator) Util.getXmlEnum(//
 									xmlProperty,
@@ -977,7 +1256,7 @@ public class TourFilterManager {
 				readXml_Number_Integer(xmlProperty, filterProperty, 1);
 				break;
 
-			case NUMBER_METRIC:
+			case NUMBER_FLOAT:
 				readXml_Number_Float(xmlProperty, filterProperty, 1);
 				break;
 			}
@@ -1008,7 +1287,7 @@ public class TourFilterManager {
 				readXml_Number_Integer(xmlProperty, filterProperty, 2);
 				break;
 
-			case NUMBER_METRIC:
+			case NUMBER_FLOAT:
 				readXml_Number_Float(xmlProperty, filterProperty, 1);
 				readXml_Number_Float(xmlProperty, filterProperty, 2);
 				break;
@@ -1182,11 +1461,11 @@ public class TourFilterManager {
 		TourFilterFieldConfig fieldConfig;
 
 		// set label km or mi
-		fieldConfig = getFieldConfig(TourFilterFieldId.DISTANCE);
+		fieldConfig = getFieldConfig(TourFilterFieldId.MOTION_DISTANCE);
 		fieldConfig.unitLabel = UI.UNIT_LABEL_DISTANCE;
 
 		// set label celcius or fahrenheit
-		fieldConfig = getFieldConfig(TourFilterFieldId.TEMPERATURE);
+		fieldConfig = getFieldConfig(TourFilterFieldId.WEATHER_TEMPERATURE);
 		fieldConfig.unitLabel = UI.UNIT_LABEL_TEMPERATURE;
 	}
 
@@ -1297,8 +1576,8 @@ public class TourFilterManager {
 				writeXml_Number_Integer(xmlProperty, intValue1, 1);
 				break;
 
-			case NUMBER_METRIC:
-				writeXml_Number_Double(xmlProperty, doubleValue1, 1);
+			case NUMBER_FLOAT:
+				writeXml_Number_Float(xmlProperty, doubleValue1, 1);
 				break;
 			}
 
@@ -1324,9 +1603,9 @@ public class TourFilterManager {
 				writeXml_Number_Integer(xmlProperty, intValue2, 2);
 				break;
 
-			case NUMBER_METRIC:
-				writeXml_Number_Double(xmlProperty, doubleValue1, 1);
-				writeXml_Number_Double(xmlProperty, doubleValue2, 2);
+			case NUMBER_FLOAT:
+				writeXml_Number_Float(xmlProperty, doubleValue1, 1);
+				writeXml_Number_Float(xmlProperty, doubleValue2, 2);
 				break;
 
 			case SEASON:
@@ -1351,7 +1630,7 @@ public class TourFilterManager {
 		xmlProperty.putInteger(ATTR_DATE_DAY + fieldNo, dateTime.getDayOfMonth());
 	}
 
-	private static void writeXml_Number_Double(final IMemento xmlProperty, final double value, final int fieldNo) {
+	private static void writeXml_Number_Float(final IMemento xmlProperty, final double value, final int fieldNo) {
 
 		xmlProperty.putFloat(ATTR_VALUE + fieldNo, (float) value);
 	}
