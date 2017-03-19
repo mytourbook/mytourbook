@@ -434,20 +434,25 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	// ############################################# WEATHER #############################################
 
 	private int													weatherWindDir;																			// db-version 8
-
 	private int													weatherWindSpd;																			// db-version 8
 	private String												weatherClouds;																			// db-version 8
 	private String												weather;																				// db-version 13
 
 	// ############################################# POWER #############################################
 
+	/** Unit is Watt */
 	private float												power_Avg;
+
+	/** Unit is Watt */
 	private int													power_Max;
+
+	/** Unit is Watt */
 	private int													power_Normalized;
 
 	/** Functional Threshold Power (FTP) */
 	private int													power_FTP;
 
+	/** Total work in Joule */
 	private long												power_TotalWork;
 	private float												power_TrainingStressScore;
 	private float												power_IntensityFactor;

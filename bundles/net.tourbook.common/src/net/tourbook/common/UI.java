@@ -140,6 +140,7 @@ public class UI {
 	public static final CharSequence	SYMBOL_BACKSLASH						= "\\";												//$NON-NLS-1$
 	public static final String			SYMBOL_COLON							= ":";												//$NON-NLS-1$
 	public static final String			SYMBOL_DOT								= ".";												//$NON-NLS-1$
+	public static final String			SYMBOL_MIDDLE_DOT						= "·";												//$NON-NLS-1$
 	// this looks ugly "\u2551";
 	public static final String			SYMBOL_DOUBLE_VERTICAL					= "||";												//$NON-NLS-1$
 	public static final String			SYMBOL_EQUAL							= "=";												//$NON-NLS-1$

@@ -54,6 +54,8 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Resource;
 import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Spinner;
@@ -505,6 +507,42 @@ public class Util {
 		return sb.toString();
 	}
 
+	public static void dumpTabList(final Control parent, final int indent) {
+
+		final StringBuilder tabIndent = new StringBuilder();
+		for (int i = 0; i < indent; i++) {
+			tabIndent.append("\t");
+		}
+
+		if (parent instanceof Composite) {
+
+			final Composite container = (Composite) parent;
+
+			final Control[] tabList = container.getTabList();
+
+			if (tabList.length > 0) {
+
+				System.out.println(
+						UI.timeStampNano()
+								+ tabIndent.toString()
+								+ container
+								+ "\tTabList\t"
+								+ Arrays.toString(tabList));
+			} else {
+
+				System.out.println(UI.timeStampNano() + tabIndent.toString() + container);
+			}
+
+			for (final Control child : container.getChildren()) {
+				dumpTabList(child, indent + 1);
+			}
+
+		} else {
+
+			System.out.println(UI.timeStampNano() + tabIndent.toString() + parent);
+		}
+	}
+
 	public static boolean getBoolean(final Object data) {
 
 		boolean is = false;
@@ -574,14 +612,34 @@ public class Util {
 		unit = graphUnit / multiplier;
 
 		unit = //
-		unit == 1000 ? 5000 : unit == 500 ? 1000 : unit == 200 ? 1000 : //
-				unit == 100 ? 500 : unit == 50 ? 200 : unit == 20 ? 100 : //
-						unit == 10 ? 50 : unit == 5 ? 20 : unit == 2 ? 10 : //
-								unit == 1 ? 5 : unit == 0.5 ? 2.0 : unit == 0.2 ? 1 : //
-										unit == 0.1 ? 0.5 : unit == 0.05 ? 0.2 : unit == 0.02 ? 0.1 : //
-												unit == 0.01 ? 0.05 : unit == 0.005 ? 0.02 : unit == 0.002
-														? 0.01
-														: 0.005;
+				unit == 1000
+						? 5000
+						: unit == 500
+								? 1000
+								: unit == 200 ? 1000 : //
+										unit == 100
+												? 500
+												: unit == 50
+														? 200
+														: unit == 20 ? 100 : //
+																unit == 10 ? 50 : unit == 5 ? 20 : unit == 2 ? 10 : //
+																		unit == 1
+																				? 5
+																				: unit == 0.5 ? 2.0 : unit == 0.2 ? 1 : //
+																						unit == 0.1
+																								? 0.5
+																								: unit == 0.05
+																										? 0.2
+																										: unit == 0.02
+																												? 0.1
+																												: //
+																												unit == 0.01
+																														? 0.05
+																														: unit == 0.005
+																																? 0.02
+																																: unit == 0.002
+																																		? 0.01
+																																		: 0.005;
 
 		unit *= multiplier;
 
@@ -601,17 +659,17 @@ public class Util {
 		unit = graphUnit / multiplier;
 
 		unit = //
-		unit == 1000 ? 5000 : //
-				unit == 500 ? 1000 : //
-						unit == 200 ? 1000 : //
-								unit == 100 ? 500 : //
-										unit == 50 ? 200 : //
-												unit == 20 ? 100 : //
-														unit == 10 ? 50 : //
-																unit == 5 ? 20 : //
-																		unit == 2 ? 10 : //
-																				unit == 1 ? 5 : //
-																						1;
+				unit == 1000 ? 5000 : //
+						unit == 500 ? 1000 : //
+								unit == 200 ? 1000 : //
+										unit == 100 ? 500 : //
+												unit == 50 ? 200 : //
+														unit == 20 ? 100 : //
+																unit == 10 ? 50 : //
+																		unit == 5 ? 20 : //
+																				unit == 2 ? 10 : //
+																						unit == 1 ? 5 : //
+																								1;
 
 		unit *= multiplier;
 
@@ -639,22 +697,22 @@ public class Util {
 
 				unit = //
 						//
-				unit >= 360 ? 3600 : //
-						unit >= 60 ? 360 : //
-								unit >= 15 ? 60 : //
-										12;
+						unit >= 360 ? 3600 : //
+								unit >= 60 ? 360 : //
+										unit >= 15 ? 60 : //
+												12;
 
 			} else {
 
 				unit = //
 						//
-				unit >= 120 ? 720 : //
-						unit >= 30 ? 360 : //
-								unit >= 15 ? 120 : //
-										unit >= 10 ? 60 : //
-												unit >= 5 ? 30 : //
-														unit >= 2 ? 10 : //
-																5;
+						unit >= 120 ? 720 : //
+								unit >= 30 ? 360 : //
+										unit >= 15 ? 120 : //
+												unit >= 10 ? 60 : //
+														unit >= 5 ? 30 : //
+																unit >= 2 ? 10 : //
+																		5;
 			}
 
 		} else {
@@ -663,24 +721,24 @@ public class Util {
 
 				unit = //
 						//
-				unit >= 720 ? 3600 : //
-						unit >= 240 ? 720 : //
-								unit >= 120 ? 240 : //
-										unit >= 24 ? 120 : //
-												10;
+						unit >= 720 ? 3600 : //
+								unit >= 240 ? 720 : //
+										unit >= 120 ? 240 : //
+												unit >= 24 ? 120 : //
+														10;
 			} else {
 
 				// multiplier < 1 hour (3600 sec)
 
 				unit = //
 						//
-				unit >= 120 ? 600 : //
-						unit >= 60 ? 300 : //
-								unit >= 30 ? 120 : //
-										unit >= 15 ? 60 : //
-												unit >= 10 ? 60 : //
-														unit >= 5 ? 20 : //
-																10;
+						unit >= 120 ? 600 : //
+								unit >= 60 ? 300 : //
+										unit >= 30 ? 120 : //
+												unit >= 15 ? 60 : //
+														unit >= 10 ? 60 : //
+																unit >= 5 ? 20 : //
+																		10;
 			}
 		}
 
@@ -709,27 +767,27 @@ public class Util {
 		if (multiplier >= 3600) {
 
 			unitRounded = //
-			//
-			unitRounded >= 6 ? 24 : //
-					unitRounded >= 2 ? 12 : //
-							unitRounded >= 1 ? 6 : //
-									1;
+					//
+					unitRounded >= 6 ? 24 : //
+							unitRounded >= 2 ? 12 : //
+									unitRounded >= 1 ? 6 : //
+											1;
 
 		} else {
 
 			unitRounded = //
-			//
-			unitRounded >= 3600 ? 3600 * 6 : unitRounded >= 1800 ? 3600 * 3 : unitRounded >= 1200 ? 7200 : //
-					unitRounded >= 600 ? 3600 : //
-							unitRounded >= 300 ? 1800 : //
-									unitRounded >= 120 ? 600 : //
-											unitRounded >= 60 ? 300 : //
-													unitRounded >= 30 ? 180 : //
-															unitRounded >= 20 ? 60 : //
-																	unitRounded >= 10 ? 30 : //
-																			unitRounded >= 5 ? 20 : //
-																					unitRounded >= 2 ? 10 : //
-																							5;
+					//
+					unitRounded >= 3600 ? 3600 * 6 : unitRounded >= 1800 ? 3600 * 3 : unitRounded >= 1200 ? 7200 : //
+							unitRounded >= 600 ? 3600 : //
+									unitRounded >= 300 ? 1800 : //
+											unitRounded >= 120 ? 600 : //
+													unitRounded >= 60 ? 300 : //
+															unitRounded >= 30 ? 180 : //
+																	unitRounded >= 20 ? 60 : //
+																			unitRounded >= 10 ? 30 : //
+																					unitRounded >= 5 ? 20 : //
+																							unitRounded >= 2 ? 10 : //
+																									5;
 		}
 
 		final long unitFinal = (long) (unitRounded * multiplier);
@@ -772,7 +830,9 @@ public class Util {
 		return prefValue;
 	}
 
-	public static int getPrefixPrefInt(final IPreferenceStore prefStore, final String prefPrefix, final String prefKey) {
+	public static int getPrefixPrefInt(	final IPreferenceStore prefStore,
+										final String prefPrefix,
+										final String prefKey) {
 
 		int prefValue;
 
@@ -1729,12 +1789,12 @@ public class Util {
 
 		unit = //
 				//
-		unit >= 12 ? 12 : //
-				unit >= 6 ? 6 : //
-						unit >= 4 ? 4 : //
-								unit >= 3 ? 3 : //
-										unit >= 2 ? 2 : //
-												1;
+				unit >= 12 ? 12 : //
+						unit >= 6 ? 6 : //
+								unit >= 4 ? 4 : //
+										unit >= 3 ? 3 : //
+												unit >= 2 ? 2 : //
+														1;
 		return (int) unit;
 	}
 
@@ -1750,10 +1810,10 @@ public class Util {
 
 		unit = //
 				//
-		unit >= 10 ? 10 : //
-				unit >= 5 ? 5 : //
-						unit >= 2 ? 2 : //
-								1;
+				unit >= 10 ? 10 : //
+						unit >= 5 ? 5 : //
+								unit >= 2 ? 2 : //
+										1;
 
 		unit *= multiplier;
 
@@ -1780,33 +1840,49 @@ public class Util {
 
 			// > 1h
 
-			unitRounded = //
-							//
-			unitRounded >= 24 ? 48 : //
-					unitRounded >= 12 ? 24 : //
-							unitRounded >= 6 ? 12 : //
-									unitRounded >= 3 ? 6 : //
-											unitRounded >= 2 ? 2 : //
-													1;
+			unitRounded =
+					//
+					unitRounded >= 24 //
+							? 48
+							: unitRounded >= 12 //
+									? 24
+									: unitRounded >= 6 //
+											? 12
+											: unitRounded >= 3 //
+													? 6
+													: unitRounded >= 2 //
+															? 2
+															: 1;
 
 		} else {
 
 			// <  1h
 
-			unitRounded = //
-							//
-			unitRounded >= 1800 ? 1800 : //
-					unitRounded >= 1200 ? 1200 : //
-							unitRounded >= 600 ? 600 : //
-									unitRounded >= 240 ? 300 : //
-											unitRounded >= 120 ? 120 : //
-													unitRounded >= 60 ? 60 : //
-															unitRounded >= 30 ? 30 : //
-																	unitRounded >= 10 ? 20 : //
-																			unitRounded >= 5 ? 10 : //
-																					unitRounded >= 2 ? 5 : //
-																							unitRounded > 1 ? 2 : //
-																									1;
+			unitRounded =
+					//
+					unitRounded >= 1800
+							? 1800
+							: unitRounded >= 1200
+									? 1200
+									: unitRounded >= 600
+											? 600
+											: unitRounded >= 240
+													? 300
+													: unitRounded >= 120
+															? 120
+															: unitRounded >= 60
+																	? 60
+																	: unitRounded >= 30
+																			? 30
+																			: unitRounded >= 10
+																					? 20
+																					: unitRounded >= 5
+																							? 10
+																							: unitRounded >= 2
+																									? 5
+																									: unitRounded > 1
+																											? 2
+																											: 1;
 		}
 
 		final long unitFinal = (long) (unitRounded * multiplier);
@@ -1843,26 +1919,26 @@ public class Util {
 
 				unit = //
 						//
-				unit >= 120 ? 120 : //
-						unit >= 60 ? 60 : //
-								unit >= 30 ? 30 : //
-										unit >= 15 ? 15 : //
-												unit >= 12 ? 12 : //
-														unit > 6 ? 6 : //
-																unit > 5 ? 5 : //
-																		unit > 2 ? 2 : //
-																				1;
+						unit >= 120 ? 120 : //
+								unit >= 60 ? 60 : //
+										unit >= 30 ? 30 : //
+												unit >= 15 ? 15 : //
+														unit >= 12 ? 12 : //
+																unit > 6 ? 6 : //
+																		unit > 5 ? 5 : //
+																				unit > 2 ? 2 : //
+																						1;
 
 			} else {
 
 				unit = //
 						//
-				unit >= 120 ? 120 : //
-						unit >= 60 ? 60 : //
-								unit >= 30 ? 30 : //
-										unit >= 15 ? 15 : //
-												unit >= 10 ? 10 : //
-														5;
+						unit >= 120 ? 120 : //
+								unit >= 60 ? 60 : //
+										unit >= 30 ? 30 : //
+												unit >= 15 ? 15 : //
+														unit >= 10 ? 10 : //
+																5;
 			}
 
 		} else {
@@ -1882,11 +1958,11 @@ public class Util {
 
 					unit = //
 							//
-					unit > 720 ? 720 : //
-							unit > 240 ? 240 : //
-									unit > 120 ? 120 : //
-											unit > 24 ? 24 : //
-													10;
+							unit > 720 ? 720 : //
+									unit > 240 ? 240 : //
+											unit > 120 ? 120 : //
+													unit > 24 ? 24 : //
+															10;
 //					unit = //
 //							//
 //					unit > 1000 ? 1000 : //
@@ -1901,12 +1977,12 @@ public class Util {
 
 					unit = //
 							//
-					unit > 3000 ? 3000 : //
-							unit > 1200 ? 1200 : //
-									unit > 600 ? 600 : //
-											unit > 300 ? 300 : //
-													unit > 120 ? 120 : //
-															60;
+							unit > 3000 ? 3000 : //
+									unit > 1200 ? 1200 : //
+											unit > 600 ? 600 : //
+													unit > 300 ? 300 : //
+															unit > 120 ? 120 : //
+																	60;
 				}
 
 			} else {
@@ -1920,14 +1996,14 @@ public class Util {
 
 				unit = //
 						//
-				unit > 120 ? 120 : //
-						unit > 60 ? 60 : //
-								unit > 30 ? 30 : //
-										unit > 15 ? 15 : //
-												unit > 10 ? 10 : //
-														unit > 5 ? 5 : //
-																unit > 2 ? 2 : //
-																		1;
+						unit > 120 ? 120 : //
+								unit > 60 ? 60 : //
+										unit > 30 ? 30 : //
+												unit > 15 ? 15 : //
+														unit > 10 ? 10 : //
+																unit > 5 ? 5 : //
+																		unit > 2 ? 2 : //
+																				1;
 			}
 		}
 

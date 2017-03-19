@@ -31,9 +31,11 @@ import net.tourbook.ui.UI;
 
 public class TVITourBookYearSub extends TVITourBookItem {
 
-	private YearSubCategory	_category;
+	private YearSubCategory _category;
 
-	public TVITourBookYearSub(final TourBookView view, final TVITourBookItem parentItem, final YearSubCategory itemType) {
+	public TVITourBookYearSub(	final TourBookView view,
+								final TVITourBookItem parentItem,
+								final YearSubCategory itemType) {
 
 		super(view);
 
@@ -64,9 +66,9 @@ public class TVITourBookYearSub extends TVITourBookItem {
 
 		final SQLFilter sqlFilter = new SQLFilter();
 
-		final String sqlString = UI.EMPTY_STRING + //
+		final String sqlString = UI.NEW_LINE
 				//
-				"SELECT " //								//$NON-NLS-1$
+				+ "SELECT " //								//$NON-NLS-1$
 				//
 				+ "startYear, " //									1	//$NON-NLS-1$
 				+ "startMonth, " //									2	//$NON-NLS-1$
@@ -150,13 +152,13 @@ public class TVITourBookYearSub extends TVITourBookItem {
 
 				// get marker id's
 				+ (" LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_MARKER + " Tmarker") //$NON-NLS-1$ //$NON-NLS-2$
-				+ (" ON TourData.tourId = Tmarker.TourData_tourId") //$NON-NLS-1$
+				+ (" ON TourData.tourId = Tmarker.TourData_tourId\n") //$NON-NLS-1$
 
-				+ (" WHERE " + sumYear + " = ?")//				//$NON-NLS-1$ //$NON-NLS-2$
-				+ (" AND " + sumYearSub + " = ?")//					//$NON-NLS-1$ //$NON-NLS-2$
+				+ (" WHERE " + sumYear + " = ?\n")//				//$NON-NLS-1$ //$NON-NLS-2$
+				+ (" AND " + sumYearSub + " = ?\n")//					//$NON-NLS-1$ //$NON-NLS-2$
 				+ sqlFilter.getWhereClause()
 
-				+ " ORDER BY TourStartTime"; //$NON-NLS-1$
+				+ " ORDER BY TourStartTime\n"; //$NON-NLS-1$
 
 		try {
 
@@ -319,8 +321,8 @@ public class TVITourBookYearSub extends TVITourBookItem {
 					tourItem.colTimeZoneId = dbTimeZoneId;
 					tourItem.colWeekDay = tourDateTime.weekDay;
 
-					tourItem.tourTypeId = (tourTypeId == null ? //
-							TourDatabase.ENTITY_IS_NOT_SAVED
+					tourItem.tourTypeId = (tourTypeId == null //
+							? TourDatabase.ENTITY_IS_NOT_SAVED
 							: (Long) tourTypeId);
 
 					// compute average speed/pace, prevent divide by 0

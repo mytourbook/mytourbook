@@ -72,21 +72,21 @@ public class TVITourBookYear extends TVITourBookItem {
 			sumYearSub = "startMonth"; //$NON-NLS-1$
 		}
 
-		final String sql = "" //$NON-NLS-1$
+		final String sql = UI.NEW_LINE
 				//
-				+ "SELECT " //$NON-NLS-1$
+				+ "SELECT \n" //$NON-NLS-1$
 
-				+ (sumYear + ", ") //$NON-NLS-1$
-				+ (sumYearSub + ",") //$NON-NLS-1$
+				+ (sumYear + ",\n") //$NON-NLS-1$
+				+ (sumYearSub + ",\n") //$NON-NLS-1$
 				+ SQL_SUM_COLUMNS
 
-				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA) //$NON-NLS-1$
+				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + "\n") //$NON-NLS-1$
 
-				+ (" WHERE " + sumYear + "=?") //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" WHERE " + sumYear + "=?\n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ sqlFilter.getWhereClause()
 
-				+ (" GROUP BY " + sumYear + ", " + sumYearSub) //$NON-NLS-1$ //$NON-NLS-2$
-				+ (" ORDER BY " + sumYearSub); //$NON-NLS-1$
+				+ (" GROUP BY " + sumYear + ",\n" + sumYearSub) //$NON-NLS-1$ //$NON-NLS-2$
+				+ (" ORDER BY " + sumYearSub + "\n"); //$NON-NLS-1$
 
 		try {
 
@@ -121,7 +121,8 @@ public class TVITourBookYear extends TVITourBookItem {
 							.with(TimeTools.calendarWeek.weekBasedYear(), dbYear)
 							.with(TimeTools.calendarWeek.weekOfYear(), dbYearSub);
 
-					columnText = String.format(YEAR_WEEK_FORMAT, //
+					columnText = String.format(
+							YEAR_WEEK_FORMAT,
 							dbYearSub,
 							categoryDateTime.format(TimeTools.Formatter_Week_Month));
 

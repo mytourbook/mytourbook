@@ -74,7 +74,7 @@ public class TourFilterProperty {
 	Combo						comboFieldName;
 	Combo						comboFieldOperator;
 
-	Composite					fieldDetailOuterContainer;
+	Composite					fieldDetailContainer;
 
 	// ---------------------------------------------------------------------
 
@@ -99,7 +99,7 @@ public class TourFilterProperty {
 
 	void disposeFieldInnerContainer() {
 
-		for (final Control control : fieldDetailOuterContainer.getChildren()) {
+		for (final Control control : fieldDetailContainer.getChildren()) {
 			control.dispose();
 		}
 

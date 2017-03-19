@@ -40,5 +40,23 @@ public enum TourFilterFieldId {
 	POWER_NORMALIZED, //
 	POWER_TOTAL_WORK, //
 
+//	// Powertrain - Antrieb/Pedal
+//	defineColumn_Powertrain_AvgCadence();
+//	defineColumn_Powertrain_CadenceMultiplier();
+//	defineColumn_Powertrain_Gear_FrontShiftCount();
+//	defineColumn_Powertrain_Gear_RearShiftCount();
+//	defineColumn_Powertrain_AvgLeftPedalSmoothness();
+//	defineColumn_Powertrain_AvgLeftTorqueEffectiveness();
+//	defineColumn_Powertrain_AvgRightPedalSmoothness();
+//	defineColumn_Powertrain_AvgRightTorqueEffectiveness();
+//	defineColumn_Powertrain_PedalLeftRightBalance();
+
+	POWERTRAIN_AVG_CADENCE, //
+
+	TRAINING_FTP, //
+	TRAINING_POWER_TO_WEIGHT_RATIO, //
+	TRAINING_INTENSITY_FACTOR, //
+	TRAINING_STRESS_SCORE, //
+
 	WEATHER_TEMPERATURE, //
 }

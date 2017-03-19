@@ -19,7 +19,6 @@ import java.text.DateFormatSymbols;
 import java.time.LocalDateTime;
 import java.time.MonthDay;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 
 import net.tourbook.Messages;
@@ -75,6 +74,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -172,12 +172,13 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 	/*
 	 * UI controls
 	 */
-	private Composite							_filterScrolledContent;
+	private Composite							_shellContainer;
+	private Composite							_filterScrolled_Content;
 	private Composite							_filterOuterContainer;
 	private Composite							_containerFilter;
 	private Composite							_containerProfiles;
 
-	private ScrolledComposite					_filterScrolledContainer;
+	private ScrolledComposite					_filterScrolled_Container;
 
 	private Button								_chkLiveUpdate;
 
@@ -382,17 +383,17 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		enableControls();
 	}
 
-	private Composite createUI(final Composite parent) {
+	private void createUI(final Composite parent) {
 
-		final Composite shellContainer = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(shellContainer);
-		GridLayoutFactory.fillDefaults().applyTo(shellContainer);
+		_shellContainer = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(_shellContainer);
+		GridLayoutFactory.fillDefaults().applyTo(_shellContainer);
 //		shellContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
 			{
 
 			}
-			final Composite containerSash = new Composite(shellContainer, SWT.NONE);
+			final Composite containerSash = new Composite(_shellContainer, SWT.NONE);
 			GridDataFactory
 					.fillDefaults()//
 					.grab(true, true)
@@ -427,8 +428,6 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 						20);
 			}
 		}
-
-		return shellContainer;
 	}
 
 	private Composite createUI_200_Profiles(final Composite parent) {
@@ -629,12 +628,12 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		Point scrollOrigin = null;
 
 		// dispose previous content
-		if (_filterScrolledContainer != null && !_filterScrolledContainer.isDisposed()) {
+		if (_filterScrolled_Container != null && !_filterScrolled_Container.isDisposed()) {
 
 			// get current scroll position
-			scrollOrigin = _filterScrolledContainer.getOrigin();
+			scrollOrigin = _filterScrolled_Container.getOrigin();
 
-			_filterScrolledContainer.dispose();
+			_filterScrolled_Container.dispose();
 		}
 
 		if (_selectedProfile == null) {
@@ -678,19 +677,39 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 			}
 		};
 
-		createUI_420_FilterScrolledContainer(_filterOuterContainer);
+		{
+			// scrolled container
+			_filterScrolled_Container = new ScrolledComposite(_filterOuterContainer, SWT.H_SCROLL | SWT.V_SCROLL);
+			_filterScrolled_Container.setExpandVertical(true);
+			_filterScrolled_Container.setExpandHorizontal(true);
+			GridDataFactory.fillDefaults().grab(true, true).applyTo(_filterScrolled_Container);
+		}
 
-		final Composite scrolledContentContainer = _filterScrolledContent;
+		{
+			// properties container
+			_filterScrolled_Content = new Composite(_filterScrolled_Container, SWT.NONE);
+			GridDataFactory
+					.fillDefaults()//
+					//				.grab(true, true)
+					.applyTo(_filterScrolled_Content);
+			_filterScrolled_Container.setContent(_filterScrolled_Content);
+			_filterScrolled_Container.addControlListener(new ControlAdapter() {
+				@Override
+				public void controlResized(final ControlEvent e) {
+					onResizeFilterContent();
+				}
+			});
 
-		GridLayoutFactory
-				.fillDefaults()//
+			GridLayoutFactory
+					.fillDefaults()//
 //				.spacing(5, 2)
-				.numColumns(5)
-				.applyTo(scrolledContentContainer);
+					.numColumns(5)
+					.applyTo(_filterScrolled_Content);
+		}
 
 //		scrolledContentContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 
-		scrolledContentContainer.setRedraw(false);
+		_filterScrolled_Content.setRedraw(false);
 		{
 			for (int propertyIndex = 0; propertyIndex < numProperties; propertyIndex++) {
 
@@ -700,7 +719,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 					/*
 					 * Checkbox: Is filter enabled
 					 */
-					final Button chkIsFieldEnabled = new Button(scrolledContentContainer, SWT.CHECK);
+					final Button chkIsFieldEnabled = new Button(_filterScrolled_Content, SWT.CHECK);
 					chkIsFieldEnabled.setData(filterProperty);
 
 					chkIsFieldEnabled.setText(String.format("&%d", propertyIndex + 1));//$NON-NLS-1$
@@ -715,7 +734,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 					/*
 					 * Combo: Filter field
 					 */
-					final Combo comboFilterField = new Combo(scrolledContentContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
+					final Combo comboFilterField = new Combo(_filterScrolled_Content, SWT.DROP_DOWN | SWT.READ_ONLY);
 					comboFilterField.setData(filterProperty);
 					comboFilterField.setVisibleItemCount(30);
 					comboFilterField.addFocusListener(_keepOpenListener);
@@ -728,7 +747,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 					/*
 					 * Combo: Field operator
 					 */
-					final Combo comboFieldOperator = new Combo(scrolledContentContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
+					final Combo comboFieldOperator = new Combo(_filterScrolled_Content, SWT.DROP_DOWN | SWT.READ_ONLY);
 					comboFieldOperator.setData(filterProperty);
 					comboFieldOperator.setVisibleItemCount(30);
 					comboFieldOperator.addFocusListener(_keepOpenListener);
@@ -742,40 +761,30 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 					/*
 					 * Container: Field details
 					 */
-					final Composite fieldDetailOuterContainer = new Composite(scrolledContentContainer, SWT.NONE);
+					final Composite fieldContainer = new Composite(_filterScrolled_Content, SWT.NONE);
 					GridDataFactory
 							.fillDefaults()//
 							.grab(true, false)
-							.applyTo(fieldDetailOuterContainer);
-					GridLayoutFactory.fillDefaults().numColumns(1).applyTo(fieldDetailOuterContainer);
+							.applyTo(fieldContainer);
+					GridLayoutFactory.fillDefaults().numColumns(1).applyTo(fieldContainer);
 //					fieldDetailOuterContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 
-					filterProperty.fieldDetailOuterContainer = fieldDetailOuterContainer;
+					filterProperty.fieldDetailContainer = fieldContainer;
 				}
 
 				{
 					/*
 					 * Toolbar: Property actions
 					 */
-					createUI_418_PropertyActions(
-							scrolledContentContainer,
-							filterProperty,
-							propertyIndex,
-							numProperties);
+					createUI_418_PropertyActions(_filterScrolled_Content, filterProperty, propertyIndex, numProperties);
 				}
 			}
 		}
-		scrolledContentContainer.setRedraw(true);
-
-		System.out.println(
-				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-						+ ("\t_filterScrolledContent:tabList\n"
-								+ Arrays.toString(_filterScrolledContent.getChildren())));
-		// TODO remove SYSTEM.OUT.PRINTLN
+		_filterScrolled_Content.setRedraw(true);
 
 		// set scroll position to previous position
 		if (scrollOrigin != null) {
-			_filterScrolledContainer.setOrigin(scrollOrigin);
+			_filterScrolled_Container.setOrigin(scrollOrigin);
 		}
 	}
 
@@ -831,42 +840,19 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		tbm.update(true);
 	}
 
-	private void createUI_420_FilterScrolledContainer(final Composite parent) {
-
-		// scrolled container
-		_filterScrolledContainer = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL);
-		_filterScrolledContainer.setExpandVertical(true);
-		_filterScrolledContainer.setExpandHorizontal(true);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(_filterScrolledContainer);
-
-		// properties container
-		_filterScrolledContent = new Composite(_filterScrolledContainer, SWT.NONE);
-		GridDataFactory
-				.fillDefaults()//
-//				.grab(true, true)
-				.applyTo(_filterScrolledContent);
-		_filterScrolledContainer.setContent(_filterScrolledContent);
-		_filterScrolledContainer.addControlListener(new ControlAdapter() {
-			@Override
-			public void controlResized(final ControlEvent e) {
-				onResizeFilterContent();
-			}
-		});
-	}
-
 	private void createUI_430_FieldDetail(final TourFilterProperty filterProp) {
 
 		// remove previous content
 		filterProp.disposeFieldInnerContainer();
 
-		final Composite fieldOuterContainer = filterProp.fieldDetailOuterContainer;
+		final Composite fieldContainer = filterProp.fieldDetailContainer;
 
-		final Composite container = new Composite(fieldOuterContainer, SWT.NONE);
-		GridDataFactory
-				.fillDefaults()//
-				.grab(true, true)
-				.align(SWT.FILL, SWT.CENTER)
-				.applyTo(container);
+//		final Composite fieldInnerContainer = new Composite(fieldContainer, SWT.NONE);
+//		GridDataFactory
+//				.fillDefaults()//
+//				.grab(true, true)
+//				.align(SWT.FILL, SWT.CENTER)
+//				.applyTo(fieldInnerContainer);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 
 		// default for number of columns is 0
@@ -885,23 +871,23 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
 			switch (fieldType) {
 			case DATE:
-				numColumns += createUI_Field_Date(container, filterProp, 1);
+				numColumns += createUI_Field_Date(fieldContainer, filterProp, 1);
 				break;
 
 			case TIME:
-				numColumns += createUI_Field_Time(container, filterProp, 1);
+				numColumns += createUI_Field_Time(fieldContainer, filterProp, 1);
 				break;
 
 			case DURATION:
-				numColumns += createUI_Field_Duration(container, filterProp, 1, true);
+				numColumns += createUI_Field_Duration(fieldContainer, filterProp, 1, true);
 				break;
 
 			case NUMBER_INTEGER:
-				numColumns += createUI_Field_Number_Integer(container, filterProp, fldConfig, 1, true);
+				numColumns += createUI_Field_Number_Integer(fieldContainer, filterProp, fldConfig, 1, true);
 				break;
 
 			case NUMBER_FLOAT:
-				numColumns += createUI_Field_Number_Float(container, filterProp, fldConfig, 1, true);
+				numColumns += createUI_Field_Number_Float(fieldContainer, filterProp, fldConfig, 1, true);
 				break;
 			}
 
@@ -912,41 +898,41 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
 			switch (fieldType) {
 			case DATE:
-				numColumns += createUI_Field_Date(container, filterProp, 1);
-				numColumns += createUI_Operator_And(container);
-				numColumns += createUI_Field_Date(container, filterProp, 2);
+				numColumns += createUI_Field_Date(fieldContainer, filterProp, 1);
+				numColumns += createUI_Operator_And(fieldContainer);
+				numColumns += createUI_Field_Date(fieldContainer, filterProp, 2);
 				break;
 
 			case TIME:
-				numColumns += createUI_Field_Time(container, filterProp, 1);
-				numColumns += createUI_Operator_And(container);
-				numColumns += createUI_Field_Time(container, filterProp, 2);
+				numColumns += createUI_Field_Time(fieldContainer, filterProp, 1);
+				numColumns += createUI_Operator_And(fieldContainer);
+				numColumns += createUI_Field_Time(fieldContainer, filterProp, 2);
 				break;
 
 			case DURATION:
-				numColumns += createUI_Field_Duration(container, filterProp, 1, false);
-				numColumns += createUI_Operator_And(container);
-				numColumns += createUI_Field_Duration(container, filterProp, 2, true);
+				numColumns += createUI_Field_Duration(fieldContainer, filterProp, 1, false);
+				numColumns += createUI_Operator_And(fieldContainer);
+				numColumns += createUI_Field_Duration(fieldContainer, filterProp, 2, true);
 				break;
 
 			case NUMBER_INTEGER:
-				numColumns += createUI_Field_Number_Integer(container, filterProp, fldConfig, 1, false);
-				numColumns += createUI_Operator_And(container);
-				numColumns += createUI_Field_Number_Integer(container, filterProp, fldConfig, 2, true);
+				numColumns += createUI_Field_Number_Integer(fieldContainer, filterProp, fldConfig, 1, false);
+				numColumns += createUI_Operator_And(fieldContainer);
+				numColumns += createUI_Field_Number_Integer(fieldContainer, filterProp, fldConfig, 2, true);
 				break;
 
 			case NUMBER_FLOAT:
-				numColumns += createUI_Field_Number_Float(container, filterProp, fldConfig, 1, false);
-				numColumns += createUI_Operator_And(container);
-				numColumns += createUI_Field_Number_Float(container, filterProp, fldConfig, 2, true);
+				numColumns += createUI_Field_Number_Float(fieldContainer, filterProp, fldConfig, 1, false);
+				numColumns += createUI_Operator_And(fieldContainer);
+				numColumns += createUI_Field_Number_Float(fieldContainer, filterProp, fldConfig, 2, true);
 				break;
 
 			case SEASON:
-				numColumns += createUI_Field_SeasonDay(container, filterProp, 1);
-				numColumns += createUI_Field_SeasonMonth(container, filterProp, 1);
-				numColumns += createUI_Operator_And(container);
-				numColumns += createUI_Field_SeasonDay(container, filterProp, 2);
-				numColumns += createUI_Field_SeasonMonth(container, filterProp, 2);
+				numColumns += createUI_Field_SeasonDay(fieldContainer, filterProp, 1);
+				numColumns += createUI_Field_SeasonMonth(fieldContainer, filterProp, 1);
+				numColumns += createUI_Operator_And(fieldContainer);
+				numColumns += createUI_Field_SeasonDay(fieldContainer, filterProp, 2);
+				numColumns += createUI_Field_SeasonMonth(fieldContainer, filterProp, 2);
 				break;
 			}
 
@@ -967,7 +953,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
 			switch (fieldType) {
 			case TEXT:
-				numColumns += createUI_Field_Text(container);
+				numColumns += createUI_Field_Text(fieldContainer);
 				break;
 			}
 
@@ -985,19 +971,15 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
 		case SEASON_DATE_UNTIL_TODAY:
 		case SEASON_TODAY_UNTIL_DATE:
-			numColumns += createUI_Field_SeasonDay(container, filterProp, 1);
-			numColumns += createUI_Field_SeasonMonth(container, filterProp, 1);
+			numColumns += createUI_Field_SeasonDay(fieldContainer, filterProp, 1);
+			numColumns += createUI_Field_SeasonMonth(fieldContainer, filterProp, 1);
 			break;
 		}
 
-		GridLayoutFactory.fillDefaults().numColumns(numColumns).applyTo(container);
+		final GridLayout gl = (GridLayout) fieldContainer.getLayout();
+		gl.numColumns = numColumns;
 
-		fieldOuterContainer.layout(true);
-
-		System.out.println(
-				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-						+ ("\tcontainer:tabList\n" + Arrays.toString(container.getChildren())));
-		// TODO remove SYSTEM.OUT.PRINTLN
+		fieldContainer.layout(true);
 	}
 
 	private void createUI_500_FilterActions(final Composite parent) {
@@ -1124,59 +1106,60 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
 		int numColumns = 0;
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().applyTo(container);
 		{
-			{
+			/*
+			 * Spinner: float number
+			 */
+			numColumns++;
+
+			final Spinner spinner = new Spinner(parent, SWT.BORDER);
+
+			spinner.setDigits(fieldConfig.numDigits);
+			spinner.setMinimum(fieldConfig.minValue);
+			spinner.setMaximum(fieldConfig.maxValue);
+			spinner.setPageIncrement(fieldConfig.pageIncrement);
+
+			spinner.setData(filterProperty);
+			spinner.setData(FIELD_NO, fieldNo);
+
+			spinner.addMouseWheelListener(new MouseWheelListener() {
+				@Override
+				public void mouseScrolled(final MouseEvent event) {
+					UI.adjustSpinnerValueOnMouseScroll(event);
+					onField_Select_Number_Float(event.widget);
+				}
+			});
+
+			spinner.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent event) {
+					onField_Select_Number_Float(event.widget);
+				}
+			});
+
+			if (fieldNo == 1) {
+				filterProperty.uiSpinner_Number1 = spinner;
+			} else {
+				filterProperty.uiSpinner_Number2 = spinner;
+			}
+		}
+		{
+			/*
+			 * Label: Unit
+			 */
+			if (isShowUnitLabel && fieldConfig.unitLabel != null) {
+
+				// show label
+
 				numColumns++;
 
-				final Spinner spinner = new Spinner(container, SWT.BORDER);
-
-				spinner.setDigits(fieldConfig.numDigits);
-				spinner.setMinimum(fieldConfig.minValue);
-				spinner.setMaximum(fieldConfig.maxValue);
-				spinner.setPageIncrement(fieldConfig.pageIncrement);
-
-				spinner.setData(filterProperty);
-				spinner.setData(FIELD_NO, fieldNo);
-
-				spinner.addMouseWheelListener(new MouseWheelListener() {
-					@Override
-					public void mouseScrolled(final MouseEvent event) {
-						UI.adjustSpinnerValueOnMouseScroll(event);
-						onField_Select_Number_Float(event.widget);
-					}
-				});
-
-				spinner.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(final SelectionEvent event) {
-						onField_Select_Number_Float(event.widget);
-					}
-				});
-
-				if (fieldNo == 1) {
-					filterProperty.uiSpinner_Number1 = spinner;
-				} else {
-					filterProperty.uiSpinner_Number2 = spinner;
-				}
+				final Label label = new Label(parent, SWT.NONE);
+				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+				label.setText(fieldConfig.unitLabel);
 			}
-			{
-				// show label
-				if (isShowUnitLabel && fieldConfig.unitLabel != null) {
-
-					numColumns++;
-
-					final Label label = new Label(container, SWT.NONE);
-					GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
-					label.setText(fieldConfig.unitLabel);
-				}
-			}
-
-			GridLayoutFactory.fillDefaults().numColumns(numColumns).applyTo(container);
 		}
 
-		return 1;
+		return numColumns;
 	}
 
 	/**
@@ -1195,58 +1178,58 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
 		int numColumns = 0;
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().applyTo(container);
 		{
-			{
+			/*
+			 * Spinner: integer number
+			 */
+			numColumns++;
+
+			final Spinner spinner = new Spinner(parent, SWT.BORDER);
+
+			spinner.setMinimum(fieldConfig.minValue);
+			spinner.setMaximum(fieldConfig.maxValue);
+			spinner.setPageIncrement(fieldConfig.pageIncrement);
+
+			spinner.setData(filterProperty);
+			spinner.setData(FIELD_NO, fieldNo);
+
+			spinner.addMouseWheelListener(new MouseWheelListener() {
+				@Override
+				public void mouseScrolled(final MouseEvent event) {
+					UI.adjustSpinnerValueOnMouseScroll(event);
+					onField_Select_Number_Integer(event.widget);
+				}
+			});
+
+			spinner.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent event) {
+					onField_Select_Number_Integer(event.widget);
+				}
+			});
+
+			if (fieldNo == 1) {
+				filterProperty.uiSpinner_Number1 = spinner;
+			} else {
+				filterProperty.uiSpinner_Number2 = spinner;
+			}
+		}
+		{
+			/*
+			 * Label: Unit
+			 */
+			if (isShowUnitLabel && fieldConfig.unitLabel != null) {
+
+				// show label
 				numColumns++;
 
-				final Spinner spinner = new Spinner(container, SWT.BORDER);
-
-				spinner.setMinimum(fieldConfig.minValue);
-				spinner.setMaximum(fieldConfig.maxValue);
-				spinner.setPageIncrement(fieldConfig.pageIncrement);
-
-				spinner.setData(filterProperty);
-				spinner.setData(FIELD_NO, fieldNo);
-
-				spinner.addMouseWheelListener(new MouseWheelListener() {
-					@Override
-					public void mouseScrolled(final MouseEvent event) {
-						UI.adjustSpinnerValueOnMouseScroll(event);
-						onField_Select_Number_Integer(event.widget);
-					}
-				});
-
-				spinner.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(final SelectionEvent event) {
-						onField_Select_Number_Integer(event.widget);
-					}
-				});
-
-				if (fieldNo == 1) {
-					filterProperty.uiSpinner_Number1 = spinner;
-				} else {
-					filterProperty.uiSpinner_Number2 = spinner;
-				}
+				final Label label = new Label(parent, SWT.NONE);
+				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+				label.setText(fieldConfig.unitLabel);
 			}
-			{
-				// show label
-				if (isShowUnitLabel && fieldConfig.unitLabel != null) {
-
-					numColumns++;
-
-					final Label label = new Label(container, SWT.NONE);
-					GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
-					label.setText(fieldConfig.unitLabel);
-				}
-			}
-
-			GridLayoutFactory.fillDefaults().numColumns(numColumns).applyTo(container);
 		}
 
-		return 1;
+		return numColumns;
 	}
 
 	private int createUI_Field_SeasonDay(	final Composite parent,
@@ -1433,7 +1416,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 				property.comboFieldName.setEnabled(isEnabled);
 				property.comboFieldOperator.setEnabled(isEnabled);
 
-				UI.setEnabledForAllChildren(property.fieldDetailOuterContainer, isEnabled);
+				UI.setEnabledForAllChildren(property.fieldDetailContainer, isEnabled);
 			}
 		}
 	}
@@ -1580,7 +1563,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		final TourFilterProperty filterProperty = (TourFilterProperty) spinner.getData();
 		final int fieldNo = (int) spinner.getData(FIELD_NO);
 
-		final float selectedValue = spinner.getSelection();
+		final double selectedValue = spinner.getSelection();
 		final TourFilterFieldConfig fieldConfig = filterProperty.fieldConfig;
 
 		// remove spinner digits
@@ -1872,13 +1855,13 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
 	private void onResizeFilterContent() {
 
-		if (_filterScrolledContent == null || _filterScrolledContent.isDisposed()) {
+		if (_filterScrolled_Content == null || _filterScrolled_Content.isDisposed()) {
 			return;
 		}
 
-		final Point contentSize = _filterScrolledContent.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+		final Point contentSize = _filterScrolled_Content.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 
-		_filterScrolledContainer.setMinSize(contentSize);
+		_filterScrolled_Container.setMinSize(contentSize);
 	}
 
 	private void restoreState() {
@@ -1925,7 +1908,6 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		}
 
 		_filterOuterContainer.setRedraw(false);
-//		_containerFilter.setRedraw(false);
 		{
 			final ArrayList<TourFilterProperty> filterProperties = _selectedProfile.filterProperties;
 
@@ -1975,18 +1957,10 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 			onResizeFilterContent();
 		}
 		_filterOuterContainer.setRedraw(true);
-//		_containerFilter.setRedraw(true);
 
 		enableControls();
 
-		if (!_filterScrolledContent.isDisposed()) {
-
-			System.out.println(
-					(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-							+ ("\t_filterScrolledContent:tabList\n"
-									+ Arrays.toString(_filterScrolledContent.getChildren())));
-			// TODO remove SYSTEM.OUT.PRINTLN
-		}
+//		Util.dumpTabList(_shellContainer, 0);
 	}
 
 	private void updateUI_PropertyDetail(final TourFilterProperty filterProperty) {
@@ -2020,7 +1994,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 				break;
 
 			case NUMBER_FLOAT:
-				updateUI_PropertyDetail_Number_Metric(filterProperty, 1);
+				updateUI_PropertyDetail_Number_Float(filterProperty, 1);
 				break;
 
 			case TEXT:
@@ -2057,8 +2031,8 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 				break;
 
 			case NUMBER_FLOAT:
-				updateUI_PropertyDetail_Number_Metric(filterProperty, 1);
-				updateUI_PropertyDetail_Number_Metric(filterProperty, 2);
+				updateUI_PropertyDetail_Number_Float(filterProperty, 1);
+				updateUI_PropertyDetail_Number_Float(filterProperty, 2);
 				break;
 
 			case TEXT:
@@ -2137,6 +2111,40 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		}
 	}
 
+	private void updateUI_PropertyDetail_Number_Float(final TourFilterProperty filterProperty, final int fieldNo) {
+
+		final TourFilterFieldConfig fieldConfig = filterProperty.fieldConfig;
+		final FieldValueConverter fieldValueProvider = fieldConfig.fieldValueConverter;
+		final int valueDigits = fieldConfig.numDigits;
+
+		Spinner spinner;
+		double modelValue;
+
+		if (fieldNo == 1) {
+			modelValue = filterProperty.doubleValue1;
+			spinner = filterProperty.uiSpinner_Number1;
+		} else {
+			modelValue = filterProperty.doubleValue2;
+			spinner = filterProperty.uiSpinner_Number2;
+		}
+
+		double uiValue = modelValue;
+
+		if (fieldValueProvider != null) {
+			uiValue = fieldValueProvider.convert_Model_To_UI(modelValue);
+		}
+
+		// add spinner digits
+		final int spinnerValue = (int) (uiValue * Math.pow(10, valueDigits));
+
+		spinner.setSelection(spinnerValue);
+
+		spinner.setDigits(valueDigits);
+		spinner.setMinimum(fieldConfig.minValue);
+		spinner.setMaximum(fieldConfig.maxValue);
+		spinner.setPageIncrement(fieldConfig.pageIncrement);
+	}
+
 	private void updateUI_PropertyDetail_Number_Integer(final TourFilterProperty filterProperty, final int fieldNo) {
 
 		final TourFilterFieldConfig fieldConfig = filterProperty.fieldConfig;
@@ -2155,43 +2163,6 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 			spinner.setSelection(filterProperty.intValue2);
 		}
 
-		spinner.setMinimum(fieldConfig.minValue);
-		spinner.setMaximum(fieldConfig.maxValue);
-		spinner.setPageIncrement(fieldConfig.pageIncrement);
-	}
-
-	private void updateUI_PropertyDetail_Number_Metric(final TourFilterProperty filterProperty, final int fieldNo) {
-
-		final TourFilterFieldConfig fieldConfig = filterProperty.fieldConfig;
-		final FieldValueConverter fieldValueProvider = fieldConfig.fieldValueConverter;
-		final int valueDigits = fieldConfig.numDigits;
-
-		Spinner spinner;
-		double doubleValue;
-
-		if (fieldNo == 1) {
-
-			doubleValue = filterProperty.doubleValue1;
-			spinner = filterProperty.uiSpinner_Number1;
-
-		} else {
-
-			doubleValue = filterProperty.doubleValue2;
-			spinner = filterProperty.uiSpinner_Number2;
-		}
-
-		int intValue = (int) doubleValue;
-
-		if (fieldValueProvider != null) {
-
-			final double uiValue = fieldValueProvider.convert_Model_To_UI(doubleValue);
-
-			intValue = (int) (uiValue * Math.pow(10, valueDigits));
-		}
-
-		spinner.setSelection(intValue);
-
-		spinner.setDigits(valueDigits);
 		spinner.setMinimum(fieldConfig.minValue);
 		spinner.setMaximum(fieldConfig.maxValue);
 		spinner.setPageIncrement(fieldConfig.pageIncrement);
