@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,6 +27,7 @@ import net.tourbook.common.weather.IWeather;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -54,6 +55,7 @@ import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
@@ -63,6 +65,7 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.TextLayout;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -266,6 +269,8 @@ public class UI {
 	private static StringBuilder		_formatterSB							= new StringBuilder();
 	private static Formatter			_formatter								= new Formatter(_formatterSB);
 
+	private static FontMetrics			_fontMetrics;
+
 	/*
 	 * SET_FORMATTING_OFF
 	 */
@@ -467,7 +472,19 @@ public class UI {
 				.appendSuffix(Messages.Period_Format_Millisecond_Short, Messages.Period_Format_Millisecond_Short)
 
 				.toFormatter();
+
+		initializeDialogUnits(Display.getDefault().getActiveShell());
 	}
+
+	/**
+	 * Number of horizontal dialog units per character, value <code>4</code>.
+	 */
+	private static final int	HORIZONTAL_DIALOG_UNIT_PER_CHAR	= 4;
+
+	/**
+	 * Number of vertical dialog units per character, value <code>8</code>.
+	 */
+	private static final int	VERTICAL_DIALOG_UNITS_PER_CHAR	= 8;
 
 	public static void addSashColorHandler(final Sash sash) {
 
@@ -553,6 +570,51 @@ public class UI {
 
 		final int oldValue = spinner.getSelection();
 		spinner.setSelection(oldValue + valueAdjustment);
+	}
+
+	/**
+	 * Returns the number of pixels corresponding to the given number of horizontal dialog units.
+	 * <p>
+	 * The required <code>FontMetrics</code> parameter may be created in the following way: <code>
+	 * 	GC gc = new GC(control);
+	 *	gc.setFont(control.getFont());
+	 *	fontMetrics = gc.getFontMetrics();
+	 *	gc.dispose();
+	 * </code>
+	 * </p>
+	 * 
+	 * @param fontMetrics
+	 *            used in performing the conversion
+	 * @param dlus
+	 *            the number of horizontal dialog units
+	 * @return the number of pixels
+	 * @since 2.0
+	 */
+	public static int convertHorizontalDLUsToPixels(final FontMetrics fontMetrics, final int dlus) {
+		// round to the nearest pixel
+		return (fontMetrics.getAverageCharWidth() * dlus + HORIZONTAL_DIALOG_UNIT_PER_CHAR / 2)
+				/ HORIZONTAL_DIALOG_UNIT_PER_CHAR;
+	}
+
+	/**
+	 * Returns the number of pixels corresponding to the given number of horizontal dialog units.
+	 * <p>
+	 * This method may only be called after <code>initializeDialogUnits</code> has been called.
+	 * </p>
+	 * <p>
+	 * Clients may call this framework method, but should not override it.
+	 * </p>
+	 * 
+	 * @param dlus
+	 *            the number of horizontal dialog units
+	 * @return the number of pixels
+	 */
+	private static int convertHorizontalDLUsToPixels(final int dlus) {
+		// test for failure to initialize for backward compatibility
+		if (_fontMetrics == null) {
+			return 0;
+		}
+		return convertHorizontalDLUsToPixels(_fontMetrics, dlus);
 	}
 
 	/**
@@ -981,6 +1043,24 @@ public class UI {
 		return result;
 	}
 
+	/**
+	 * Initializes the computation of horizontal and vertical dialog units based on the size of
+	 * current font.
+	 * <p>
+	 * This method must be called before any of the dialog unit based conversion methods are called.
+	 * </p>
+	 * 
+	 * @param control
+	 *            a control from which to obtain the current font
+	 */
+	private static void initializeDialogUnits(final Control control) {
+		// Compute and store a font metric
+		final GC gc = new GC(control);
+		gc.setFont(JFaceResources.getDialogFont());
+		_fontMetrics = gc.getFontMetrics();
+		gc.dispose();
+	}
+
 	public static boolean isCtrlKey(final MouseEvent event) {
 
 		boolean isCtrlKey;
@@ -1239,6 +1319,19 @@ public class UI {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Set the layout data of the button to a GridData with appropriate heights and widths.
+	 * 
+	 * @param button
+	 */
+	public static void setButtonLayoutData(final Button button) {
+		final GridData data = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
+		final int widthHint = convertHorizontalDLUsToPixels(IDialogConstants.BUTTON_WIDTH);
+		final Point minSize = button.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
+		data.widthHint = Math.max(widthHint, minSize.x);
+		button.setLayoutData(data);
 	}
 
 	/**
