@@ -1569,10 +1569,13 @@ public class Messages extends NLS {
 	public static String		Slideout_TourEditor_Label_LatLonDigits;
 	public static String		Slideout_TourEditor_Label_LatLonDigits_Tooltip;
 
+	public static String		Slideout_TourFilter_Action_AddProfile;
 	public static String		Slideout_TourFilter_Action_AddProfile_Tooltip;
+	public static String		Slideout_TourFilter_Action_AddProperty;
 	public static String		Slideout_TourFilter_Action_AddProperty_Tooltip;
 	public static String		Slideout_TourFilter_Action_Apply;
 	public static String		Slideout_TourFilter_Action_CopyProfile_Tooltip;
+	public static String		Slideout_TourFilter_Action_DeleteProfile;
 	public static String		Slideout_TourFilter_Action_DeleteProfile_Tooltip;
 	public static String		Slideout_TourFilter_Action_DeleteProperty_Tooltip;
 	public static String		Slideout_TourFilter_Action_MovePropertyDown_Tooltip;

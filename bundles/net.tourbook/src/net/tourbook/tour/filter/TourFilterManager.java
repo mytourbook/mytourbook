@@ -54,6 +54,8 @@ public class TourFilterManager {
 	private static final String							TOUR_DATA_POWER_NORMALIZED			= "TourData.power_Normalized";
 	private static final String							TOUR_DATA_POWER_TOTAL_WORK			= "TourData.power_TotalWork";
 	private static final String							TOUR_DATA_POWERTRAIN_AVG_CADENCE	= "TourData.avgCadence";
+	private static final String							TOUR_DATA_POWERTRAIN_FRONT_SHIFT	= "TourData.frontShiftCount";
+	private static final String							TOUR_DATA_POWERTRAIN_REAR_SHIFT		= "TourData.rearShiftCount";
 	private static final String							TOUR_DATA_TRAINING_FTP				= "TourData.power_FTP";
 
 	private static final String							TOUR_DATA_TOUR_DISTANCE				= "TourData.tourDistance";
@@ -72,6 +74,8 @@ public class TourFilterManager {
 	private static final String							LABEL_POWER_TO_WEIGHT				= net.tourbook.ui.Messages.ColumnFactory_Power_PowerToWeight_Tooltip;
 	private static final String							LABEL_POWERTRAIN_AVG_CADENCE		= net.tourbook.ui.Messages.ColumnFactory_avg_cadence_label;
 	private static final String							LABEL_POWERTRAIN_AVG_CADENCE_UNIT	= net.tourbook.ui.Messages.ColumnFactory_avg_cadence;
+	private static final String							LABEL_POWERTRAIN_GEAR_FRONT_SHIFT	= net.tourbook.ui.Messages.ColumnFactory_GearFrontShiftCount_Label;
+	private static final String							LABEL_POWERTRAIN_GEAR_REAR_SHIFT	= net.tourbook.ui.Messages.ColumnFactory_GearRearShiftCount_Label;
 
 	private static final String							CATEGORY_ALTITUDE					= net.tourbook.ui.Messages.ColumnFactory_Category_Altitude;
 	private static final String							CATEGORY_BODY						= net.tourbook.ui.Messages.ColumnFactory_Category_Body;
@@ -340,6 +344,7 @@ public class TourFilterManager {
 						.fieldId(TourFilterFieldId.MOTION_DISTANCE)
 						.fieldType(TourFilterFieldType.NUMBER_FLOAT)
 						.fieldOperators(FILTER_OPERATORS_NUMBER)
+						.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
 						.pageIncrement(100)
 						.numDigits(1)
 						.fieldValueProvider(_fieldValueProvider_distance));
@@ -364,22 +369,26 @@ public class TourFilterManager {
 		allConfigs.add(TourFilterFieldConfig//
 				.name(LABEL_POWER_AVG)
 				.fieldId(TourFilterFieldId.POWER_AVERAGE)
+				.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
 				.unitLabel(UI.UNIT_POWER_SHORT));
 
 		allConfigs.add(TourFilterFieldConfig//
 				.name(LABEL_POWER_MAX)
 				.fieldId(TourFilterFieldId.POWER_MAX)
+				.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
 				.unitLabel(UI.UNIT_POWER_SHORT));
 
 		allConfigs.add(TourFilterFieldConfig//
 				.name(LABEL_POWER_NORMALIZED)
 				.fieldId(TourFilterFieldId.POWER_NORMALIZED)
+				.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
 				.unitLabel(UI.UNIT_POWER_SHORT));
 
 		allConfigs.add(TourFilterFieldConfig//
 				.name(LABEL_POWER_TOTAL_WORK)
 				.fieldId(TourFilterFieldId.POWER_TOTAL_WORK)
 				.fieldType(TourFilterFieldType.NUMBER_FLOAT)
+				.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
 				.unitLabel(UI.UNIT_JOULE_MEGA)
 				.numDigits(1));
 	}
@@ -403,8 +412,19 @@ public class TourFilterManager {
 				.name(LABEL_POWERTRAIN_AVG_CADENCE)
 				.fieldId(TourFilterFieldId.POWERTRAIN_AVG_CADENCE)
 				.fieldType(TourFilterFieldType.NUMBER_FLOAT)
+				.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
 				.unitLabel(LABEL_POWERTRAIN_AVG_CADENCE_UNIT)
 				.numDigits(1));
+
+		allConfigs.add(TourFilterFieldConfig//
+				.name(LABEL_POWERTRAIN_GEAR_FRONT_SHIFT)
+				.fieldId(TourFilterFieldId.POWERTRAIN_GEAR_FRONT_SHIFT_COUNT)
+				.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN));
+
+		allConfigs.add(TourFilterFieldConfig//
+				.name(LABEL_POWERTRAIN_GEAR_REAR_SHIFT)
+				.fieldId(TourFilterFieldId.POWERTRAIN_GEAR_REAR_SHIFT_COUNT)
+				.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN));
 
 	}
 
@@ -430,27 +450,31 @@ public class TourFilterManager {
 						.name(Messages.Tour_Filter_Field_TourDate)
 						.fieldId(TourFilterFieldId.TIME_TOUR_DATE)
 						.fieldType(TourFilterFieldType.DATE)
-						.fieldOperators(FILTER_OPERATORS_DATE_TIME));
+						.fieldOperators(FILTER_OPERATORS_DATE_TIME)
+						.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN));
 
 		allConfigs.add(
 				TourFilterFieldConfig
 						.name(Messages.Tour_Filter_Field_TourStartTime)
 						.fieldId(TourFilterFieldId.TIME_TOUR_TIME)
 						.fieldType(TourFilterFieldType.TIME)
-						.fieldOperators(FILTER_OPERATORS_DATE_TIME));
+						.fieldOperators(FILTER_OPERATORS_DATE_TIME)
+						.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN));
 
 		allConfigs.add(
 				TourFilterFieldConfig
 						.name(Messages.Tour_Filter_Field_Season)
 						.fieldId(TourFilterFieldId.TIME_SEASON_DATE)
 						.fieldType(TourFilterFieldType.SEASON)
-						.fieldOperators(FILTER_OPERATORS_SEASON));
+						.fieldOperators(FILTER_OPERATORS_SEASON)
+						.defaultFieldOperator(TourFilterFieldOperator.LESS_THAN_OR_EQUAL));
 
 		allConfigs.add(
 				TourFilterFieldConfig
 						.name(Messages.Tour_Filter_Field_RecordingTime)
 						.fieldId(TourFilterFieldId.TIME_RECORDING_TIME)
 						.fieldType(TourFilterFieldType.DURATION)
+						.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
 						.pageIncrement(60));
 
 		allConfigs.add(
@@ -458,6 +482,7 @@ public class TourFilterManager {
 						.name(Messages.Tour_Filter_Field_DrivingTime)
 						.fieldId(TourFilterFieldId.TIME_DRIVING_TIME)
 						.fieldType(TourFilterFieldType.DURATION)
+						.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
 						.pageIncrement(60));
 
 		allConfigs.add(
@@ -465,6 +490,7 @@ public class TourFilterManager {
 						.name(Messages.Tour_Filter_Field_BreakTime)
 						.fieldId(TourFilterFieldId.TIME_BREAK_TIME)
 						.fieldType(TourFilterFieldType.DURATION)
+						.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
 						.pageIncrement(60));
 	}
 
@@ -491,6 +517,7 @@ public class TourFilterManager {
 				TourFilterFieldConfig
 						.name(Messages.Tour_Filter_Field_Photos)
 						.fieldId(TourFilterFieldId.TOUR_PHOTOS)
+						.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
 						.pageIncrement(10));
 
 //		allConfigs.add(
@@ -530,6 +557,7 @@ public class TourFilterManager {
 		allConfigs.add(TourFilterFieldConfig//
 				.name(LABEL_POWER_FTP)
 				.fieldId(TourFilterFieldId.TRAINING_FTP)
+				.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
 				.unitLabel(UI.UNIT_POWER_SHORT));
 
 //		allConfigs.add(TourFilterFieldConfig//
@@ -554,6 +582,7 @@ public class TourFilterManager {
 						.name(Messages.Tour_Filter_Field_Temperature)
 						.fieldId(TourFilterFieldId.WEATHER_TEMPERATURE)
 						.fieldType(TourFilterFieldType.NUMBER_FLOAT)
+						.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
 						.minValue(-600)
 						.maxValue(1500)
 						.pageIncrement(10)
@@ -847,6 +876,16 @@ public class TourFilterManager {
 			case POWERTRAIN_AVG_CADENCE:
 				sql = TOUR_DATA_POWERTRAIN_AVG_CADENCE;
 				getSQL__FieldOperators_Number(sqlWhere, sqlParameters, fieldOperator, sql, double1, double2);
+				break;
+
+			case POWERTRAIN_GEAR_FRONT_SHIFT_COUNT:
+				sql = TOUR_DATA_POWERTRAIN_FRONT_SHIFT;
+				getSQL__FieldOperators_Number(sqlWhere, sqlParameters, fieldOperator, sql, int1, int2);
+				break;
+
+			case POWERTRAIN_GEAR_REAR_SHIFT_COUNT:
+				sql = TOUR_DATA_POWERTRAIN_REAR_SHIFT;
+				getSQL__FieldOperators_Number(sqlWhere, sqlParameters, fieldOperator, sql, int1, int2);
 				break;
 
 			case TRAINING_FTP:

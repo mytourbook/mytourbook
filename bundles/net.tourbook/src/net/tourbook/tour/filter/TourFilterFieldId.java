@@ -52,6 +52,8 @@ public enum TourFilterFieldId {
 //	defineColumn_Powertrain_PedalLeftRightBalance();
 
 	POWERTRAIN_AVG_CADENCE, //
+	POWERTRAIN_GEAR_FRONT_SHIFT_COUNT, //
+	POWERTRAIN_GEAR_REAR_SHIFT_COUNT, //
 
 	TRAINING_FTP, //
 	TRAINING_POWER_TO_WEIGHT_RATIO, //

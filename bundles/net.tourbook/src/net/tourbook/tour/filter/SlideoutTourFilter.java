@@ -151,11 +151,6 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
 	private PixelConverter						_pc;
 
-	private Action_Profile_Add					_actionProfile_Add;
-//	private Action_CopyProfile					_actionProfile_Copy;
-	private Action_Profile_Delete				_actionProfile_Delete;
-	private Action_Property_Add					_actionProperty_Add;
-
 	private TableViewer							_profileViewer;
 
 	private final ArrayList<TourFilterProfile>	_filterProfiles			= TourFilterManager.getProfiles();
@@ -180,6 +175,8 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
 	private ScrolledComposite					_filterScrolled_Container;
 
+	private Button								_btnAddProperty;
+	private Button								_btnDeleteProfile;
 	private Button								_chkLiveUpdate;
 
 	private Label								_lblProfileName;
@@ -233,44 +230,6 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
 		setShellFadeOutDelaySteps(50);
 		setDraggerText(Messages.Slideout_TourFilter_Label_Title);
-	}
-
-	void action_ProfileAdd() {
-
-		final TourFilterProfile filterProfile = new TourFilterProfile();
-
-		// update model
-		_filterProfiles.add(filterProfile);
-
-		// update viewer
-		_profileViewer.refresh();
-
-		// select new profile
-		selectProfile(filterProfile);
-
-		_txtProfileName.setFocus();
-	}
-
-	void action_ProfileCopy() {
-
-	}
-
-	void action_ProfileDelete() {
-		onProfile_DeleteSelected();
-	}
-
-	void action_PropertyAdd() {
-
-		final TourFilterProperty filterProperty = new TourFilterProperty();
-
-		// update model
-		_selectedProfile.filterProperties.add(filterProperty);
-
-		// update UI
-		createUI_410_FilterProperties();
-		updateUI_Properties();
-
-		fireModifyEvent();
 	}
 
 	void action_PropertyDelete(final TourFilterProperty filterProperty) {
@@ -354,11 +313,6 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
 	private void createActions() {
 
-		_actionProfile_Add = new Action_Profile_Add(this);
-//		_actionProfile_Copy = new Action_CopyProfile(this);
-		_actionProfile_Delete = new Action_Profile_Delete(this);
-
-		_actionProperty_Add = new Action_Property_Add(this);
 	}
 
 	@Override
@@ -452,21 +406,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 			}
 
 			createUI_210_ProfileViewer(container);
-
-			{
-				/*
-				 * Toolbar: Profile actions
-				 */
-				final ToolBar toolbar = new ToolBar(container, SWT.FLAT);
-
-				final ToolBarManager tbm = new ToolBarManager(toolbar);
-
-				tbm.add(_actionProfile_Add);
-//				tbm.add(_actionProfile_Copy);
-				tbm.add(_actionProfile_Delete);
-
-				tbm.update(true);
-			}
+			createUI_220_ProfileActions(container);
 		}
 
 		return container;
@@ -547,13 +487,56 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 			public void keyPressed(final KeyEvent e) {
 
 				if (e.keyCode == SWT.DEL) {
-					onProfile_DeleteSelected();
+					onProfile_Delete();
 				}
 			}
 
 			@Override
 			public void keyReleased(final KeyEvent e) {}
 		});
+	}
+
+	private void createUI_220_ProfileActions(final Composite parent) {
+
+		final Composite containerActions = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(containerActions);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerActions);
+		{
+			{
+				/*
+				 * Button: Add
+				 */
+				final Button button = new Button(containerActions, SWT.PUSH);
+				button.setText(Messages.Slideout_TourFilter_Action_AddProfile);
+				button.setToolTipText(Messages.Slideout_TourFilter_Action_AddProfile_Tooltip);
+				button.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						onProfile_Add();
+					}
+				});
+//				UI.setButtonLayoutData(button);
+				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(button);
+			}
+			{
+				/*
+				 * Button: Delete
+				 */
+				_btnDeleteProfile = new Button(containerActions, SWT.PUSH);
+				_btnDeleteProfile.setText(Messages.Slideout_TourFilter_Action_DeleteProfile);
+				_btnDeleteProfile.setToolTipText(Messages.Slideout_TourFilter_Action_DeleteProfile_Tooltip);
+				_btnDeleteProfile.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						onProfile_Delete();
+					}
+				});
+//				UI.setButtonLayoutData(_btnDeleteProfile);
+//				final GridData gd = (GridData) _btnDeleteProfile.getLayoutData();
+//				gd.verticalAlignment = SWT.CENTER;
+				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_btnDeleteProfile);
+			}
+		}
 	}
 
 	private Composite createUI_300_Filter(final Composite parent) {
@@ -846,14 +829,12 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		filterProp.disposeFieldInnerContainer();
 
 		final Composite fieldContainer = filterProp.fieldDetailContainer;
-
-//		final Composite fieldInnerContainer = new Composite(fieldContainer, SWT.NONE);
-//		GridDataFactory
-//				.fillDefaults()//
-//				.grab(true, true)
-//				.align(SWT.FILL, SWT.CENTER)
-//				.applyTo(fieldInnerContainer);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+		GridDataFactory
+				.fillDefaults()//
+				.grab(true, false)
+				.align(SWT.FILL, SWT.CENTER)
+				.applyTo(fieldContainer);
+//		fieldContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 
 		// default for number of columns is 0
 		int numColumns = 0;
@@ -991,15 +972,19 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		{
 			{
 				/*
-				 * Toolbar: Property actions
+				 * Button: Add Property
 				 */
-				final ToolBar toolbar = new ToolBar(container, SWT.FLAT);
+				_btnAddProperty = new Button(container, SWT.PUSH);
+				_btnAddProperty.setText(Messages.Slideout_TourFilter_Action_AddProperty);
+				_btnAddProperty.setToolTipText(Messages.Slideout_TourFilter_Action_AddProperty_Tooltip);
 
-				final ToolBarManager tbm = new ToolBarManager(toolbar);
-
-				tbm.add(_actionProperty_Add);
-
-				tbm.update(true);
+				_btnAddProperty.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						onProperty_Add();
+					}
+				});
+				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_btnAddProperty);
 			}
 			{
 				/*
@@ -1400,8 +1385,8 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
 		final boolean isProfileSelected = _selectedProfile != null;
 
-		_actionProfile_Delete.setEnabled(isProfileSelected);
-		_actionProperty_Add.setEnabled(isProfileSelected);
+		_btnAddProperty.setEnabled(isProfileSelected);
+		_btnDeleteProfile.setEnabled(isProfileSelected);
 
 		_lblProfileName.setEnabled(isProfileSelected);
 		_txtProfileName.setEnabled(isProfileSelected);
@@ -1673,7 +1658,23 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		_profileViewer.getTable().setFocus();
 	}
 
-	private void onProfile_DeleteSelected() {
+	private void onProfile_Add() {
+
+		final TourFilterProfile filterProfile = new TourFilterProfile();
+
+		// update model
+		_filterProfiles.add(filterProfile);
+
+		// update viewer
+		_profileViewer.refresh();
+
+		// select new profile
+		selectProfile(filterProfile);
+
+		_txtProfileName.setFocus();
+	}
+
+	private void onProfile_Delete() {
 
 		if (_selectedProfile == null) {
 			// ignore
@@ -1725,6 +1726,8 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
 			selectProfile((TourFilterProfile) nextSelectedProfile);
 		}
+
+		enableControls();
 	}
 
 	private void onProfile_Modify() {
@@ -1773,6 +1776,25 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
 		createUI_410_FilterProperties();
 		updateUI_Properties();
+
+		fireModifyEvent();
+	}
+
+	private void onProperty_Add() {
+
+		final TourFilterProperty filterProperty = new TourFilterProperty();
+		final ArrayList<TourFilterProperty> filterProperties = _selectedProfile.filterProperties;
+
+		// update model
+		filterProperties.add(filterProperty);
+
+		// update UI
+		createUI_410_FilterProperties();
+		updateUI_Properties();
+
+		// set focus to the last created property
+		final TourFilterProperty lastProperty = filterProperties.get(filterProperties.size() - 1);
+		lastProperty.checkboxIsPropertyEnabled.setFocus();
 
 		fireModifyEvent();
 	}
@@ -1830,8 +1852,19 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		final TourFilterProperty filterProperty = (TourFilterProperty) widget.getData();
 		filterProperty.fieldConfig = selectedFieldConfig;
 
-		// init with first available operator, otherwise an old and wrong operator could be set
-		filterProperty.fieldOperator = selectedFieldConfig.fieldOperators[0];
+		/*
+		 * select default operator
+		 */
+		final TourFilterFieldOperator defaultFieldOperator = selectedFieldConfig.defaultFieldOperator;
+		if (defaultFieldOperator == null) {
+
+			// init with first available operator, otherwise an old and wrong operator could be set
+			filterProperty.fieldOperator = selectedFieldConfig.fieldOperators[0];
+
+		} else {
+
+			filterProperty.fieldOperator = defaultFieldOperator;
+		}
 
 		updateUI_Properties();
 

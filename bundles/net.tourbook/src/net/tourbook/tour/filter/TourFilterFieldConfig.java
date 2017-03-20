@@ -46,10 +46,12 @@ public class TourFilterFieldConfig {
 	 */
 	TourFilterFieldOperator[]	fieldOperators;
 
-	int							minValue;
-	int							maxValue		= Integer.MAX_VALUE;
+	TourFilterFieldOperator		defaultFieldOperator	= TourFilterFieldOperator.GREATER_THAN;
 
-	int							pageIncrement	= 10;
+	int							minValue;
+	int							maxValue				= Integer.MAX_VALUE;
+
+	int							pageIncrement			= 10;
 
 	/**
 	 * Number of digits, default is 0.
@@ -58,7 +60,7 @@ public class TourFilterFieldConfig {
 
 	FieldValueConverter			fieldValueConverter;
 
-	String						unitLabel		= UI.EMPTY_STRING;
+	String						unitLabel				= UI.EMPTY_STRING;
 
 	private TourFilterFieldConfig(final String name) {
 		this.name = name;
@@ -88,27 +90,47 @@ public class TourFilterFieldConfig {
 		final String label = UI.EMPTY_STRING
 //				+ UI.SYMBOL_DBL_ANGLE_QMARK_RIGHT
 //				+ UI.SYMBOL_DBL_ANGLE_QMARK_RIGHT
-				+ UI.SYMBOL_UNDERSCORE
-				+ UI.SPACE
-				+ UI.SYMBOL_UNDERSCORE
-				+ UI.SPACE
-				+ UI.SYMBOL_UNDERSCORE
-				+ UI.SPACE
-				+ UI.SYMBOL_UNDERSCORE
-				+ UI.SPACE
-				+ UI.SYMBOL_UNDERSCORE
+//				+ UI.SYMBOL_UNDERSCORE
+//				+ UI.SPACE
+//				+ UI.SYMBOL_UNDERSCORE
+//				+ UI.SPACE
+//				+ UI.SYMBOL_UNDERSCORE
+//				+ UI.SPACE
+//				+ UI.SYMBOL_UNDERSCORE
+//				+ UI.SPACE
+//				+ UI.SYMBOL_UNDERSCORE
+				+ UI.SYMBOL_DOT
+				+ UI.SYMBOL_DOT
+				+ UI.SYMBOL_DOT
+				+ UI.SYMBOL_DOT
+				+ UI.SYMBOL_DOT
+				+ UI.SYMBOL_DOT
+				+ UI.SYMBOL_DOT
+				+ UI.SYMBOL_DOT
+				+ UI.SYMBOL_DOT
+				+ UI.SYMBOL_DOT
 				+ UI.SPACE
 				+ category.toUpperCase()
 				+ UI.SPACE
-				+ UI.SYMBOL_UNDERSCORE
-				+ UI.SPACE
-				+ UI.SYMBOL_UNDERSCORE
-				+ UI.SPACE
-				+ UI.SYMBOL_UNDERSCORE
-				+ UI.SPACE
-				+ UI.SYMBOL_UNDERSCORE
-				+ UI.SPACE
-				+ UI.SYMBOL_UNDERSCORE
+				+ UI.SYMBOL_DOT
+				+ UI.SYMBOL_DOT
+				+ UI.SYMBOL_DOT
+				+ UI.SYMBOL_DOT
+				+ UI.SYMBOL_DOT
+				+ UI.SYMBOL_DOT
+				+ UI.SYMBOL_DOT
+				+ UI.SYMBOL_DOT
+				+ UI.SYMBOL_DOT
+				+ UI.SYMBOL_DOT
+//				+ UI.SYMBOL_UNDERSCORE
+//				+ UI.SPACE
+//				+ UI.SYMBOL_UNDERSCORE
+//				+ UI.SPACE
+//				+ UI.SYMBOL_UNDERSCORE
+//				+ UI.SPACE
+//				+ UI.SYMBOL_UNDERSCORE
+//				+ UI.SPACE
+//				+ UI.SYMBOL_UNDERSCORE
 //				+ UI.SYMBOL_MIDDLE_DOT
 //				+ UI.SYMBOL_DBL_ANGLE_QMARK_LEFT
 //				+ UI.SYMBOL_DBL_ANGLE_QMARK_LEFT
@@ -137,19 +159,36 @@ public class TourFilterFieldConfig {
 		return config;
 	}
 
+	/**
+	 * Set the default field operator, when not set then
+	 * {@link TourFilterFieldOperator#GREATER_THAN} is used or the first operator from
+	 * {@link #fieldOperators} when the default is not available.
+	 * 
+	 * @param defaultFieldOperator
+	 * @return
+	 */
+	TourFilterFieldConfig defaultFieldOperator(final TourFilterFieldOperator defaultFieldOperator) {
+		this.defaultFieldOperator = defaultFieldOperator;
+		return this;
+	}
+
 	TourFilterFieldConfig fieldId(final TourFilterFieldId fieldId) {
 		this.fieldId = fieldId;
 		return this;
 	}
 
 	/**
-	 * Set the field operators, default is {@link TourFilterManager#FILTER_OPERATORS_NUMBER}
+	 * Set the field operators, default is {@link TourFilterManager#FILTER_OPERATORS_NUMBER} and set
+	 * the {@link #defaultFieldOperator} with the first operator in the fieldOperators.
 	 * 
 	 * @param fieldOperators
 	 * @return
 	 */
 	TourFilterFieldConfig fieldOperators(final TourFilterFieldOperator[] fieldOperators) {
+
 		this.fieldOperators = fieldOperators;
+		this.defaultFieldOperator = fieldOperators[0];
+
 		return this;
 	}
 

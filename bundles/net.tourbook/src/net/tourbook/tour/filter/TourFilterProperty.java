@@ -45,7 +45,7 @@ public class TourFilterProperty {
 	/**
 	 * Selected operator for the property field
 	 */
-	TourFilterFieldOperator		fieldOperator		= TourFilterFieldOperator.EQUALS;
+	TourFilterFieldOperator		fieldOperator		= TourFilterFieldOperator.GREATER_THAN;
 
 	/*
 	 * Field data for the different operators and field types
