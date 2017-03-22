@@ -17,7 +17,7 @@ package net.tourbook.tour.filter;
 
 import java.util.ArrayList;
 
-import net.tourbook.common.UI;
+import net.tourbook.Messages;
 
 public class TourFilterProfile {
 
@@ -28,7 +28,7 @@ public class TourFilterProfile {
 	/**
 	 * Profile name
 	 */
-	String							name				= UI.EMPTY_STRING;
+	String							name				= Messages.Tour_Filter_Default_ProfileName;
 
 	ArrayList<TourFilterProperty>	filterProperties	= new ArrayList<>();
 

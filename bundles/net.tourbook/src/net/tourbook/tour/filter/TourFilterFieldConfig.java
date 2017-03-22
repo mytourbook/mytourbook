@@ -88,52 +88,25 @@ public class TourFilterFieldConfig {
 	private static String createLabel_Category(final String category) {
 
 		final String label = UI.EMPTY_STRING
-//				+ UI.SYMBOL_DBL_ANGLE_QMARK_RIGHT
-//				+ UI.SYMBOL_DBL_ANGLE_QMARK_RIGHT
-//				+ UI.SYMBOL_UNDERSCORE
-//				+ UI.SPACE
-//				+ UI.SYMBOL_UNDERSCORE
-//				+ UI.SPACE
-//				+ UI.SYMBOL_UNDERSCORE
-//				+ UI.SPACE
-//				+ UI.SYMBOL_UNDERSCORE
-//				+ UI.SPACE
-//				+ UI.SYMBOL_UNDERSCORE
 				+ UI.SYMBOL_DOT
+				+ UI.SPACE
+				+ UI.SPACE
 				+ UI.SYMBOL_DOT
+				+ UI.SPACE
+				+ UI.SPACE
 				+ UI.SYMBOL_DOT
-				+ UI.SYMBOL_DOT
-				+ UI.SYMBOL_DOT
-				+ UI.SYMBOL_DOT
-				+ UI.SYMBOL_DOT
-				+ UI.SYMBOL_DOT
-				+ UI.SYMBOL_DOT
-				+ UI.SYMBOL_DOT
+				+ UI.SPACE
 				+ UI.SPACE
 				+ category.toUpperCase()
 				+ UI.SPACE
+				+ UI.SPACE
 				+ UI.SYMBOL_DOT
+				+ UI.SPACE
+				+ UI.SPACE
 				+ UI.SYMBOL_DOT
+				+ UI.SPACE
+				+ UI.SPACE
 				+ UI.SYMBOL_DOT
-				+ UI.SYMBOL_DOT
-				+ UI.SYMBOL_DOT
-				+ UI.SYMBOL_DOT
-				+ UI.SYMBOL_DOT
-				+ UI.SYMBOL_DOT
-				+ UI.SYMBOL_DOT
-				+ UI.SYMBOL_DOT
-//				+ UI.SYMBOL_UNDERSCORE
-//				+ UI.SPACE
-//				+ UI.SYMBOL_UNDERSCORE
-//				+ UI.SPACE
-//				+ UI.SYMBOL_UNDERSCORE
-//				+ UI.SPACE
-//				+ UI.SYMBOL_UNDERSCORE
-//				+ UI.SPACE
-//				+ UI.SYMBOL_UNDERSCORE
-//				+ UI.SYMBOL_MIDDLE_DOT
-//				+ UI.SYMBOL_DBL_ANGLE_QMARK_LEFT
-//				+ UI.SYMBOL_DBL_ANGLE_QMARK_LEFT
 
 		;
 
@@ -225,6 +198,12 @@ public class TourFilterFieldConfig {
 		return this;
 	}
 
+	/**
+	 * Set minimum integer value, default is 0.
+	 * 
+	 * @param minValue
+	 * @return
+	 */
 	TourFilterFieldConfig minValue(final int minValue) {
 		this.minValue = minValue;
 		return this;

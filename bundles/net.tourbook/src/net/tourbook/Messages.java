@@ -19,7 +19,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-	private static final String	BUNDLE_NAME	= "net.tourbook.messages";										//$NON-NLS-1$
+	private static final String	BUNDLE_NAME	= "net.tourbook.messages";																				//$NON-NLS-1$
 
 	public static String		Action_Cadence_Set;
 	public static String		Action_Cadence_Set_Rpm;
@@ -1784,6 +1784,10 @@ public class Messages extends NLS {
 	public static String		Tour_Editor_Radio_Cadence_Spm;
 
 	public static String		Tour_Filter_Action_Tooltip;
+	public static String		Tour_Filter_Default_ProfileName;
+	public static String		Tour_Filter_Field_Altitude_Ascent;
+	public static String		Tour_Filter_Field_Altitude_Descent;
+	public static String		Tour_Filter_Field_Altitude_Max;
 	public static String		Tour_Filter_Field_BreakTime;
 	public static String		Tour_Filter_Field_Distance;
 	public static String		Tour_Filter_Field_DrivingTime;

@@ -17,6 +17,10 @@ package net.tourbook.tour.filter;
 
 public enum TourFilterFieldId {
 
+	ALTITUDE_UP, //
+	ALTITUDE_DOWN, //
+	ALTITUDE_MAX, //
+
 	TIME_RECORDING_TIME, //
 	TIME_DRIVING_TIME, //
 	TIME_BREAK_TIME, //
@@ -61,4 +65,5 @@ public enum TourFilterFieldId {
 	TRAINING_STRESS_SCORE, //
 
 	WEATHER_TEMPERATURE, //
+
 }

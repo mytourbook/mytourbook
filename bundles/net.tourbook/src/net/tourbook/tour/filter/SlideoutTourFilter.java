@@ -96,10 +96,10 @@ import org.eclipse.swt.widgets.Widget;
  */
 public class SlideoutTourFilter extends AdvancedSlideout {
 
-	static final String				FIELD_NO				= "fieldNo";					//$NON-NLS-1$
+	static final String				FIELD_NO				= "fieldNo";																																								//$NON-NLS-1$
 
-	private static final String		STATE_IS_LIVE_UPDATE	= "STATE_IS_LIVE_UPDATE";		//$NON-NLS-1$
-	private static final String		STATE_SASH_WIDTH		= "STATE_SASH_WIDTH";			//$NON-NLS-1$
+	private static final String		STATE_IS_LIVE_UPDATE	= "STATE_IS_LIVE_UPDATE";																//$NON-NLS-1$
+	private static final String		STATE_SASH_WIDTH		= "STATE_SASH_WIDTH";																								//$NON-NLS-1$
 
 	private final IPreferenceStore	_prefStore				= TourbookPlugin.getPrefStore();
 	private final IDialogSettings	_state;
@@ -224,11 +224,11 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
 	public SlideoutTourFilter(final Control ownerControl, final IDialogSettings state) {
 
-		super(ownerControl, state, new int[] { 700, 300, 700, 300 });
+		super(ownerControl, state, new int[] { 800, 300, 800, 300 });
 
 		_state = state;
 
-		setShellFadeOutDelaySteps(50);
+		setShellFadeOutDelaySteps(30);
 		setDraggerText(Messages.Slideout_TourFilter_Label_Title);
 	}
 
@@ -304,7 +304,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		parent.addDisposeListener(new DisposeListener() {
 			@Override
 			public void widgetDisposed(final DisposeEvent e) {
-				_prefStore.removePropertyChangeListener(_prefChangeListener);
+				onDisposeSlideout();
 			}
 		});
 
@@ -379,7 +379,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 						_containerProfiles,
 						sash,
 						_containerFilter,
-						20);
+						30);
 			}
 		}
 	}
@@ -389,7 +389,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory
 				.fillDefaults()//
-				.hint(_pc.convertWidthInCharsToPixels(20), _pc.convertHeightInCharsToPixels(5))
+				.hint(_pc.convertWidthInCharsToPixels(30), _pc.convertHeightInCharsToPixels(5))
 				.applyTo(container);
 		GridLayoutFactory
 				.fillDefaults()//
@@ -515,8 +515,10 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 						onProfile_Add();
 					}
 				});
-//				UI.setButtonLayoutData(button);
 				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(button);
+
+				// set button default width
+				UI.setButtonLayoutData(button);
 			}
 			{
 				/*
@@ -531,10 +533,10 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 						onProfile_Delete();
 					}
 				});
-//				UI.setButtonLayoutData(_btnDeleteProfile);
-//				final GridData gd = (GridData) _btnDeleteProfile.getLayoutData();
-//				gd.verticalAlignment = SWT.CENTER;
 				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_btnDeleteProfile);
+
+				// set button default width
+				UI.setButtonLayoutData(_btnDeleteProfile);
 			}
 		}
 	}
@@ -542,7 +544,10 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 	private Composite createUI_300_Filter(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+		GridDataFactory
+				.fillDefaults()//
+				.grab(true, true)
+				.applyTo(container);
 		GridLayoutFactory
 				.fillDefaults()//
 				.numColumns(1)
@@ -985,6 +990,9 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 					}
 				});
 				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_btnAddProperty);
+
+				// set button default width
+				UI.setButtonLayoutData(_btnAddProperty);
 			}
 			{
 				/*
@@ -1022,6 +1030,9 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 //						.grab(true, false)
 						.align(SWT.FILL, SWT.CENTER)
 						.applyTo(buttonApply);
+
+				// set button default width
+				UI.setButtonLayoutData(buttonApply);
 			}
 		}
 	}
@@ -1504,6 +1515,11 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		return false;
 	}
 
+	private void onDisposeSlideout() {
+
+		_prefStore.removePropertyChangeListener(_prefChangeListener);
+	}
+
 	private void onField_Select_DateTime(final SelectionEvent event) {
 
 		final DateTime dateTime = (DateTime) (event.widget);
@@ -1653,9 +1669,19 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 	@Override
 	protected void onFocus() {
 
-//		_txtProfileName.setFocus();
+		if (_selectedProfile != null
+				&& _selectedProfile.name != null
+				&& _selectedProfile.name.equals(Messages.Tour_Filter_Default_ProfileName)) {
 
-		_profileViewer.getTable().setFocus();
+			// default profile is selected, make is easy to rename it
+
+			_txtProfileName.selectAll();
+			_txtProfileName.setFocus();
+
+		} else {
+
+			_profileViewer.getTable().setFocus();
+		}
 	}
 
 	private void onProfile_Add() {
@@ -1772,6 +1798,14 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		} else {
 
 			_txtProfileName.setText(_selectedProfile.name);
+
+			if (_selectedProfile.name.equals(Messages.Tour_Filter_Default_ProfileName)) {
+
+				// a default profile is selected, make is easy to rename it
+
+				_txtProfileName.selectAll();
+				_txtProfileName.setFocus();
+			}
 		}
 
 		createUI_410_FilterProperties();
@@ -1818,7 +1852,8 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
 		// get selected field config
 		final int selectedFilterConfigIndex = comboFilterField.getSelectionIndex();
-		final TourFilterFieldConfig selectedFieldConfig = TourFilterManager.FILTER_FIELD_CONFIG[selectedFilterConfigIndex];
+		final TourFilterFieldConfig selectedFieldConfig =
+				TourFilterManager.FILTER_FIELD_CONFIG[selectedFilterConfigIndex];
 
 		if (selectedFieldConfig.fieldType == TourFilterFieldType.CATEGORY) {
 
@@ -1834,7 +1869,8 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 					comboFilterField.select(defaultIndex);
 
 					// get default config
-					final TourFilterFieldConfig newSelectedFieldConfig = TourFilterManager.FILTER_FIELD_CONFIG[defaultIndex];
+					final TourFilterFieldConfig newSelectedFieldConfig =
+							TourFilterManager.FILTER_FIELD_CONFIG[defaultIndex];
 
 					onProperty_SelectField_Update(widget, newSelectedFieldConfig);
 				}
@@ -1922,7 +1958,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		_chkLiveUpdate.setSelection(_isLiveUpdate);
 
 		// restore width for the profile list
-		final int leftPartWidth = Util.getStateInt(_state, STATE_SASH_WIDTH, _pc.convertWidthInCharsToPixels(20));
+		final int leftPartWidth = Util.getStateInt(_state, STATE_SASH_WIDTH, _pc.convertWidthInCharsToPixels(35));
 		_sashForm.setViewerWidth(leftPartWidth);
 	}
 

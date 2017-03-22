@@ -47,22 +47,7 @@ import org.osgi.framework.Version;
 
 public class TourFilterManager {
 
-	private static final String							TOUR_DATA_AVG_TEMPERATURE			= "TourData.avgTemperature";
-	private static final String							TOUR_DATA_NUMBER_OF_PHOTOS			= "TourData.numberOfPhotos";
-	private static final String							TOUR_DATA_POWER_AVG					= "TourData.power_Avg";
-	private static final String							TOUR_DATA_POWER_MAX					= "TourData.power_Max";
-	private static final String							TOUR_DATA_POWER_NORMALIZED			= "TourData.power_Normalized";
-	private static final String							TOUR_DATA_POWER_TOTAL_WORK			= "TourData.power_TotalWork";
-	private static final String							TOUR_DATA_POWERTRAIN_AVG_CADENCE	= "TourData.avgCadence";
-	private static final String							TOUR_DATA_POWERTRAIN_FRONT_SHIFT	= "TourData.frontShiftCount";
-	private static final String							TOUR_DATA_POWERTRAIN_REAR_SHIFT		= "TourData.rearShiftCount";
-	private static final String							TOUR_DATA_TRAINING_FTP				= "TourData.power_FTP";
-
-	private static final String							TOUR_DATA_TOUR_DISTANCE				= "TourData.tourDistance";
-	private static final String							TOUR_DATA_TOUR_DRIVING_TIME			= "TourData.tourDrivingTime";
-	private static final String							TOUR_DATA_TOUR_RECORDING_TIME		= "TourData.tourRecordingTime";
-	private static final String							TOUR_DATA_TOUR_START_TIME			= "TourData.tourStartTime";
-	private static final String							TOUR_DATA_TOUR_TITLE				= "TourData.tourTitle";
+// SET_FORMATTING_OFF
 
 	private static final String							LABEL_POWER_AVG						= net.tourbook.ui.Messages.ColumnFactory_Power_Avg_Tooltip;
 	private static final String							LABEL_POWER_MAX						= net.tourbook.ui.Messages.ColumnFactory_Power_Max_Tooltip;
@@ -93,46 +78,67 @@ public class TourFilterManager {
 	private static final String							CATEGORY_WAYPOINT					= net.tourbook.ui.Messages.ColumnFactory_Category_Waypoint;
 	private static final String							CATEGORY_WEATHER					= net.tourbook.ui.Messages.ColumnFactory_Category_Weather;
 
-	private static final String							TOUR_FILTER_FILE_NAME				= "tour-filter.xml";													//$NON-NLS-1$
+	private static final String							TOUR_DATA_ALTITUDE_DOWN 			= "TourData.tourAltDown";
+	private static final String 						TOUR_DATA_ALTITUDE_UP 				= "TourData.tourAltUp";
+	private static final String 						TOUR_DATA_ALTITUDE_MAX 				= "TourData.maxAltitude";
+	private static final String							TOUR_DATA_AVG_TEMPERATURE			= "TourData.avgTemperature";											//$NON-NLS-1$
+	private static final String							TOUR_DATA_NUMBER_OF_PHOTOS			= "TourData.numberOfPhotos";											//$NON-NLS-1$
+	private static final String							TOUR_DATA_POWER_AVG					= "TourData.power_Avg";													//$NON-NLS-1$
+	private static final String							TOUR_DATA_POWER_MAX					= "TourData.power_Max";													//$NON-NLS-1$
+	private static final String							TOUR_DATA_POWER_NORMALIZED			= "TourData.power_Normalized";											//$NON-NLS-1$
+	private static final String							TOUR_DATA_POWER_TOTAL_WORK			= "TourData.power_TotalWork";											//$NON-NLS-1$
+	private static final String							TOUR_DATA_POWERTRAIN_AVG_CADENCE	= "TourData.avgCadence";												//$NON-NLS-1$
+	private static final String							TOUR_DATA_POWERTRAIN_FRONT_SHIFT	= "TourData.frontShiftCount";											//$NON-NLS-1$
+	private static final String							TOUR_DATA_POWERTRAIN_REAR_SHIFT		= "TourData.rearShiftCount";											//$NON-NLS-1$
+	private static final String							TOUR_DATA_TRAINING_FTP				= "TourData.power_FTP";													//$NON-NLS-1$
+
+	private static final String							TOUR_DATA_TOUR_DISTANCE				= "TourData.tourDistance";												//$NON-NLS-1$
+	private static final String							TOUR_DATA_TOUR_DRIVING_TIME			= "TourData.tourDrivingTime";											//$NON-NLS-1$
+	private static final String							TOUR_DATA_TOUR_RECORDING_TIME		= "TourData.tourRecordingTime";											//$NON-NLS-1$
+	private static final String							TOUR_DATA_TOUR_START_TIME			= "TourData.tourStartTime";												//$NON-NLS-1$
+	private static final String							TOUR_DATA_TOUR_TITLE				= "TourData.tourTitle";													//$NON-NLS-1$
+// SET_FORMATTING_ON
+
+	private static final String							TOUR_FILTER_FILE_NAME				= "tour-filter.xml";																																																																																																																																																																																																																							//$NON-NLS-1$
 	private static final int							TOUR_FILTER_VERSION					= 1;
 
-	private static final String							TAG_PROFILE							= "Profile";															//$NON-NLS-1$
-	private static final String							TAG_PROPERTY						= "Property";															//$NON-NLS-1$
-	private static final String							TAG_ROOT							= "TourFilterProfiles";													//$NON-NLS-1$
+	private static final String							TAG_PROFILE							= "Profile";																																																																																																																																																																																																																																																																																																																																																																																																																																			//$NON-NLS-1$
+	private static final String							TAG_PROPERTY						= "Property";																																																																																																																																																																																																																																																																																																																																																																																																																																			//$NON-NLS-1$
+	private static final String							TAG_ROOT							= "TourFilterProfiles";																																																																																																																																																																																																																							//$NON-NLS-1$
 
-	private static final String							ATTR_IS_ENABLED						= "isEnabled";															//$NON-NLS-1$
-	private static final String							ATTR_IS_SELECTED					= "isSelected";															//$NON-NLS-1$
-	private static final String							ATTR_FIELD_ID						= "fieldId";															//$NON-NLS-1$
-	private static final String							ATTR_FIELD_OPERATOR					= "fieldOperator";														//$NON-NLS-1$
-	private static final String							ATTR_NAME							= "name";																//$NON-NLS-1$
-	private static final String							ATTR_SEASON_DAY						= "seasonDay";															//$NON-NLS-1$
-	private static final String							ATTR_SEASON_MONTH					= "seasonMonth";														//$NON-NLS-1$
-	private static final String							ATTR_TOUR_FILTER_VERSION			= "tourFilterVersion";													//$NON-NLS-1$
-	private static final String							ATTR_VALUE							= "value";																//$NON-NLS-1$
+	private static final String							ATTR_IS_ENABLED						= "isEnabled";																																																																																																																																																																																																																																																																																																																																																																																																																																			//$NON-NLS-1$
+	private static final String							ATTR_IS_SELECTED					= "isSelected";																																																																																																																																																																																																																																																																																																																																																																																																																																			//$NON-NLS-1$
+	private static final String							ATTR_FIELD_ID						= "fieldId";																																																																																																																																																																																																																																																																																																																																																																																																																																			//$NON-NLS-1$
+	private static final String							ATTR_FIELD_OPERATOR					= "fieldOperator";																																																																																																																																																																																																																																																																																																																													//$NON-NLS-1$
+	private static final String							ATTR_NAME							= "name";																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																									//$NON-NLS-1$
+	private static final String							ATTR_SEASON_DAY						= "seasonDay";																																																																																																																																																																																																																																																																																																																																																																																																																																			//$NON-NLS-1$
+	private static final String							ATTR_SEASON_MONTH					= "seasonMonth";																																																																																																																																																																																																																																																																																																																													//$NON-NLS-1$
+	private static final String							ATTR_TOUR_FILTER_VERSION			= "tourFilterVersion";																																																																																																																																																																																																																							//$NON-NLS-1$
+	private static final String							ATTR_VALUE							= "value";																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																									//$NON-NLS-1$
 
-	private static final String							ATTR_DATE_YEAR						= "dateYear";															//$NON-NLS-1$
-	private static final String							ATTR_DATE_MONTH						= "dateMonth";															//$NON-NLS-1$
-	private static final String							ATTR_DATE_DAY						= "dateDay";															//$NON-NLS-1$
-	private static final String							ATTR_TIME_HOUR						= "timeHour";															//$NON-NLS-1$
-	private static final String							ATTR_TIME_MINUTE					= "timeMinute";															//$NON-NLS-1$
+	private static final String							ATTR_DATE_YEAR						= "dateYear";																																																																																																																																																																																																																																																																																																																																																																																																																																			//$NON-NLS-1$
+	private static final String							ATTR_DATE_MONTH						= "dateMonth";																																																																																																																																																																																																																																																																																																																																																																																																																																			//$NON-NLS-1$
+	private static final String							ATTR_DATE_DAY						= "dateDay";																																																																																																																																																																																																																																																																																																																																																																																																																																			//$NON-NLS-1$
+	private static final String							ATTR_TIME_HOUR						= "timeHour";																																																																																																																																																																																																																																																																																																																																																																																																																																			//$NON-NLS-1$
+	private static final String							ATTR_TIME_MINUTE					= "timeMinute";																																																																																																																																																																																																																																																																																																																																																																																																																																			//$NON-NLS-1$
 
-	private static final String							OP_BR_OPEN							= "(";																	//$NON-NLS-1$
-	private static final String							OP_BR_CLOSE							= ")";																	//$NON-NLS-1$
-	private static final String							OP_AND								= " AND ";																//$NON-NLS-1$
-	private static final String							OP_BETWEEN							= " BETWEEN ";															//$NON-NLS-1$
-	private static final String							OP_NOT_BETWEEN						= " NOT BETWEEN ";														//$NON-NLS-1$
-	private static final String							OP_OR								= " OR ";																//$NON-NLS-1$
+	private static final String							OP_BR_OPEN							= "(";																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																															//$NON-NLS-1$
+	private static final String							OP_BR_CLOSE							= ")";																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																															//$NON-NLS-1$
+	private static final String							OP_AND								= " AND ";																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																									//$NON-NLS-1$
+	private static final String							OP_BETWEEN							= " BETWEEN ";																																																																																																																																																																																																																																																																																																																																																																																																																																			//$NON-NLS-1$
+	private static final String							OP_NOT_BETWEEN						= " NOT BETWEEN ";																																																																																																																																																																																																																																																																																																																													//$NON-NLS-1$
+	private static final String							OP_OR								= " OR ";																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																									//$NON-NLS-1$
 
-	private static final String							OP_PARAMETER						= " ?\n";																//$NON-NLS-1$
-	private static final String							OP_EQUALS							= " = ?\n";																//$NON-NLS-1$
-	private static final String							OP_NOT_EQUALS						= " != ?\n";															//$NON-NLS-1$
-	private static final String							OP_GREATER_THAN						= " > ?\n";																//$NON-NLS-1$
-	private static final String							OP_GREATER_THAN_OR_EQUAL			= " >= ?\n";															//$NON-NLS-1$
-	private static final String							OP_LESS_THAN						= " < ?\n";																//$NON-NLS-1$
-	private static final String							OP_LESS_THAN_OR_EQUAL				= " <= ?\n";															//$NON-NLS-1$
+	private static final String							OP_PARAMETER						= " ?\n";																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																									//$NON-NLS-1$
+	private static final String							OP_EQUALS							= " = ?\n";																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																									//$NON-NLS-1$
+	private static final String							OP_NOT_EQUALS						= " != ?\n";																																																																																																																																																																																																																																																																																																																																																																																																																																			//$NON-NLS-1$
+	private static final String							OP_GREATER_THAN						= " > ?\n";																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																									//$NON-NLS-1$
+	private static final String							OP_GREATER_THAN_OR_EQUAL			= " >= ?\n";																																																																																																																																																																																																																																																																																																																																																																																																																																			//$NON-NLS-1$
+	private static final String							OP_LESS_THAN						= " < ?\n";																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																									//$NON-NLS-1$
+	private static final String							OP_LESS_THAN_OR_EQUAL				= " <= ?\n";																																																																																																																																																																																																																																																																																																																																																																																																																																			//$NON-NLS-1$
 
-	private static final String							OP_NULL								= " IS NULL\n";															//$NON-NLS-1$
-	private static final String							OP_NOT_NULL							= " IS NOT NULL\n";														//$NON-NLS-1$
+	private static final String							OP_NULL								= " IS NULL\n";																																																																																																																																																																																																																																																																																																																																																																																																																																			//$NON-NLS-1$
+	private static final String							OP_NOT_NULL							= " IS NOT NULL\n";																																																																																																																																																																																																																																																																																																																													//$NON-NLS-1$
 
 // SET_FORMATTING_OFF
 
@@ -197,10 +203,11 @@ public class TourFilterManager {
 		TourFilterFieldOperator.IS_NOT_EMPTY,
 	};
 
-// SET_FORMATTING_ON
+	private static FieldValueConverter					_fieldValueProvider_Altitude		= new FieldValueProvider_Altitude();
+	private static FieldValueConverter					_fieldValueProvider_Distance		= new FieldValueProvider_Distance();
+	private static FieldValueConverter					_fieldValueProvider_Temperature		= new FieldValueProvider_Temperature();
 
-	private static FieldValueConverter					_fieldValueProvider_distance		= new FieldValueProvider_Distance();
-	private static FieldValueConverter					_fieldValueProvider_temperature		= new FieldValueProvider_Temperature();
+// SET_FORMATTING_ON
 
 	/**
 	 * This is also the sequence how the fields are displayed in the UI
@@ -211,17 +218,17 @@ public class TourFilterManager {
 
 		final ArrayList<TourFilterFieldConfig> allConfigs = new ArrayList<TourFilterFieldConfig>();
 
-		createConfig_Time(allConfigs);
 		createConfig_Altitude(allConfigs);
+		createConfig_Body(allConfigs);
+		createConfig_Data(allConfigs);
+		createConfig_Device(allConfigs);
 		createConfig_Motion(allConfigs);
 		createConfig_Power(allConfigs);
-		createConfig_Training(allConfigs);
 		createConfig_Powertrain(allConfigs);
+		createConfig_Training(allConfigs);
+		createConfig_Time(allConfigs);
 		createConfig_Tour(allConfigs);
 		createConfig_Weather(allConfigs);
-		createConfig_Body(allConfigs);
-		createConfig_Device(allConfigs);
-		createConfig_Data(allConfigs);
 
 //		final TourFilterFieldConfig[] CONFIG =
 //
@@ -283,12 +290,26 @@ public class TourFilterManager {
 
 	private static void createConfig_Altitude(final ArrayList<TourFilterFieldConfig> allConfigs) {
 
-//		// Altitude
-//		defineColumn_Altitude_Up();
-//		defineColumn_Altitude_Down();
-//		defineColumn_Altitude_Max();
+		allConfigs.add(new TourFilterFieldConfig(CATEGORY_ALTITUDE, TourFilterFieldId.ALTITUDE_UP));
 
-//		allConfigs.add(new TourFilterFieldConfig(COLUMN_FACTORY_CATEGORY_ALTITUDE, TourFilterFieldType.CATEGORY));
+		allConfigs.add(TourFilterFieldConfig//
+				.name(Messages.Tour_Filter_Field_Altitude_Ascent)
+				.fieldId(TourFilterFieldId.ALTITUDE_UP)
+				.pageIncrement(100)
+				.fieldValueProvider(_fieldValueProvider_Altitude));
+
+		allConfigs.add(TourFilterFieldConfig//
+				.name(Messages.Tour_Filter_Field_Altitude_Descent)
+				.fieldId(TourFilterFieldId.ALTITUDE_DOWN)
+				.pageIncrement(100)
+				.minValue(Integer.MIN_VALUE)
+				.fieldValueProvider(_fieldValueProvider_Altitude));
+
+		allConfigs.add(TourFilterFieldConfig//
+				.name(Messages.Tour_Filter_Field_Altitude_Max)
+				.fieldId(TourFilterFieldId.ALTITUDE_MAX)
+				.pageIncrement(100)
+				.fieldValueProvider(_fieldValueProvider_Altitude));
 	}
 
 	private static void createConfig_Body(final ArrayList<TourFilterFieldConfig> allConfigs) {
@@ -338,16 +359,15 @@ public class TourFilterManager {
 //
 		allConfigs.add(new TourFilterFieldConfig(CATEGORY_MOTION, TourFilterFieldId.MOTION_DISTANCE));
 
-		allConfigs.add(
-				TourFilterFieldConfig
-						.name(Messages.Tour_Filter_Field_Distance)
-						.fieldId(TourFilterFieldId.MOTION_DISTANCE)
-						.fieldType(TourFilterFieldType.NUMBER_FLOAT)
-						.fieldOperators(FILTER_OPERATORS_NUMBER)
-						.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
-						.pageIncrement(100)
-						.numDigits(1)
-						.fieldValueProvider(_fieldValueProvider_distance));
+		allConfigs.add(TourFilterFieldConfig//
+				.name(Messages.Tour_Filter_Field_Distance)
+				.fieldId(TourFilterFieldId.MOTION_DISTANCE)
+				.fieldType(TourFilterFieldType.NUMBER_FLOAT)
+				.fieldOperators(FILTER_OPERATORS_NUMBER)
+				.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
+				.pageIncrement(100)
+				.numDigits(1)
+				.fieldValueProvider(_fieldValueProvider_Distance));
 	}
 
 	private static void createConfig_Power(final ArrayList<TourFilterFieldConfig> allConfigs) {
@@ -445,53 +465,47 @@ public class TourFilterManager {
 
 		allConfigs.add(new TourFilterFieldConfig(CATEGORY_TIME, TourFilterFieldId.TIME_TOUR_DATE));
 
-		allConfigs.add(
-				TourFilterFieldConfig
-						.name(Messages.Tour_Filter_Field_TourDate)
-						.fieldId(TourFilterFieldId.TIME_TOUR_DATE)
-						.fieldType(TourFilterFieldType.DATE)
-						.fieldOperators(FILTER_OPERATORS_DATE_TIME)
-						.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN));
+		allConfigs.add(TourFilterFieldConfig //
+				.name(Messages.Tour_Filter_Field_TourDate)
+				.fieldId(TourFilterFieldId.TIME_TOUR_DATE)
+				.fieldType(TourFilterFieldType.DATE)
+				.fieldOperators(FILTER_OPERATORS_DATE_TIME)
+				.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN));
 
-		allConfigs.add(
-				TourFilterFieldConfig
-						.name(Messages.Tour_Filter_Field_TourStartTime)
-						.fieldId(TourFilterFieldId.TIME_TOUR_TIME)
-						.fieldType(TourFilterFieldType.TIME)
-						.fieldOperators(FILTER_OPERATORS_DATE_TIME)
-						.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN));
+		allConfigs.add(TourFilterFieldConfig //
+				.name(Messages.Tour_Filter_Field_TourStartTime)
+				.fieldId(TourFilterFieldId.TIME_TOUR_TIME)
+				.fieldType(TourFilterFieldType.TIME)
+				.fieldOperators(FILTER_OPERATORS_DATE_TIME)
+				.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN));
 
-		allConfigs.add(
-				TourFilterFieldConfig
-						.name(Messages.Tour_Filter_Field_Season)
-						.fieldId(TourFilterFieldId.TIME_SEASON_DATE)
-						.fieldType(TourFilterFieldType.SEASON)
-						.fieldOperators(FILTER_OPERATORS_SEASON)
-						.defaultFieldOperator(TourFilterFieldOperator.LESS_THAN_OR_EQUAL));
+		allConfigs.add(TourFilterFieldConfig //
+				.name(Messages.Tour_Filter_Field_Season)
+				.fieldId(TourFilterFieldId.TIME_SEASON_DATE)
+				.fieldType(TourFilterFieldType.SEASON)
+				.fieldOperators(FILTER_OPERATORS_SEASON)
+				.defaultFieldOperator(TourFilterFieldOperator.LESS_THAN_OR_EQUAL));
 
-		allConfigs.add(
-				TourFilterFieldConfig
-						.name(Messages.Tour_Filter_Field_RecordingTime)
-						.fieldId(TourFilterFieldId.TIME_RECORDING_TIME)
-						.fieldType(TourFilterFieldType.DURATION)
-						.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
-						.pageIncrement(60));
+		allConfigs.add(TourFilterFieldConfig //
+				.name(Messages.Tour_Filter_Field_RecordingTime)
+				.fieldId(TourFilterFieldId.TIME_RECORDING_TIME)
+				.fieldType(TourFilterFieldType.DURATION)
+				.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
+				.pageIncrement(60));
 
-		allConfigs.add(
-				TourFilterFieldConfig
-						.name(Messages.Tour_Filter_Field_DrivingTime)
-						.fieldId(TourFilterFieldId.TIME_DRIVING_TIME)
-						.fieldType(TourFilterFieldType.DURATION)
-						.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
-						.pageIncrement(60));
+		allConfigs.add(TourFilterFieldConfig //
+				.name(Messages.Tour_Filter_Field_DrivingTime)
+				.fieldId(TourFilterFieldId.TIME_DRIVING_TIME)
+				.fieldType(TourFilterFieldType.DURATION)
+				.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
+				.pageIncrement(60));
 
-		allConfigs.add(
-				TourFilterFieldConfig
-						.name(Messages.Tour_Filter_Field_BreakTime)
-						.fieldId(TourFilterFieldId.TIME_BREAK_TIME)
-						.fieldType(TourFilterFieldType.DURATION)
-						.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
-						.pageIncrement(60));
+		allConfigs.add(TourFilterFieldConfig //
+				.name(Messages.Tour_Filter_Field_BreakTime)
+				.fieldId(TourFilterFieldId.TIME_BREAK_TIME)
+				.fieldType(TourFilterFieldType.DURATION)
+				.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
+				.pageIncrement(60));
 	}
 
 	private static void createConfig_Tour(final ArrayList<TourFilterFieldConfig> allConfigs) {
@@ -506,19 +520,17 @@ public class TourFilterManager {
 
 		allConfigs.add(new TourFilterFieldConfig(CATEGORY_TOUR, TourFilterFieldId.TOUR_TITLE));
 
-		allConfigs.add(
-				TourFilterFieldConfig
-						.name(Messages.Tour_Filter_Field_TourTitle)
-						.fieldId(TourFilterFieldId.TOUR_TITLE)
-						.fieldType(TourFilterFieldType.TEXT)
-						.fieldOperators(FILTER_OPERATORS_TEXT));
+		allConfigs.add(TourFilterFieldConfig //
+				.name(Messages.Tour_Filter_Field_TourTitle)
+				.fieldId(TourFilterFieldId.TOUR_TITLE)
+				.fieldType(TourFilterFieldType.TEXT)
+				.fieldOperators(FILTER_OPERATORS_TEXT));
 
-		allConfigs.add(
-				TourFilterFieldConfig
-						.name(Messages.Tour_Filter_Field_Photos)
-						.fieldId(TourFilterFieldId.TOUR_PHOTOS)
-						.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
-						.pageIncrement(10));
+		allConfigs.add(TourFilterFieldConfig //
+				.name(Messages.Tour_Filter_Field_Photos)
+				.fieldId(TourFilterFieldId.TOUR_PHOTOS)
+				.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
+				.pageIncrement(10));
 
 //		allConfigs.add(
 //				new TourFilterFieldConfig(
@@ -577,17 +589,16 @@ public class TourFilterManager {
 //
 		allConfigs.add(new TourFilterFieldConfig(CATEGORY_WEATHER, TourFilterFieldId.WEATHER_TEMPERATURE));
 
-		allConfigs.add(
-				TourFilterFieldConfig
-						.name(Messages.Tour_Filter_Field_Temperature)
-						.fieldId(TourFilterFieldId.WEATHER_TEMPERATURE)
-						.fieldType(TourFilterFieldType.NUMBER_FLOAT)
-						.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
-						.minValue(-600)
-						.maxValue(1500)
-						.pageIncrement(10)
-						.numDigits(1)
-						.fieldValueProvider(_fieldValueProvider_temperature));
+		allConfigs.add(TourFilterFieldConfig
+				.name(Messages.Tour_Filter_Field_Temperature)
+				.fieldId(TourFilterFieldId.WEATHER_TEMPERATURE)
+				.fieldType(TourFilterFieldType.NUMBER_FLOAT)
+				.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
+				.minValue(-600)
+				.maxValue(1500)
+				.pageIncrement(10)
+				.numDigits(1)
+				.fieldValueProvider(_fieldValueProvider_Temperature));
 	}
 
 	/**
@@ -786,17 +797,40 @@ public class TourFilterManager {
 			long value2;
 
 			switch (fieldId) {
+			case ALTITUDE_DOWN:
+
+				sql = TOUR_DATA_ALTITUDE_DOWN;
+
+				/*
+				 * Altitude down values have no sign in the database, they are always > 0
+				 */
+				value1 = int1 < 0 ? -int1 : int1;
+				value2 = int2 < 0 ? -int2 : int2;
+
+				getSQL__FieldOperators_Number(sqlWhere, sqlParameters, fieldOperator, sql, value1, value2);
+				break;
+
+			case ALTITUDE_UP:
+				sql = TOUR_DATA_ALTITUDE_UP;
+				getSQL__FieldOperators_Number(sqlWhere, sqlParameters, fieldOperator, sql, int1, int2);
+				break;
+
+			case ALTITUDE_MAX:
+				sql = TOUR_DATA_ALTITUDE_MAX;
+				getSQL__FieldOperators_Number(sqlWhere, sqlParameters, fieldOperator, sql, int1, int2);
+				break;
+
 			case TIME_TOUR_DATE:
 
 				sql = TOUR_DATA_TOUR_START_TIME;
 
-				value1 = LocalDate
+				value1 = (LocalDate
 						.of(dateTime1.getYear(), dateTime1.getMonthValue(), dateTime1.getDayOfMonth())
-						.toEpochDay() * 86400_000;
+						.toEpochDay() + 1) * 86400_000;
 
-				value2 = LocalDate
+				value2 = (LocalDate
 						.of(dateTime2.getYear(), dateTime2.getMonthValue(), dateTime2.getDayOfMonth())
-						.toEpochDay() * 86400_000;
+						.toEpochDay() + 1) * 86400_000;
 
 				getSQL__FieldOperators_DateTime(sqlWhere, sqlParameters, fieldOperator, sql, value1, value2);
 				break;

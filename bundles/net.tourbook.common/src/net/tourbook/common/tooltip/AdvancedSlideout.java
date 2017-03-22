@@ -133,6 +133,24 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 		}
 	}
 
+	/**
+	 * @param ownerControl
+	 * @param state
+	 * @param slideoutDefaultSize
+	 *            Slideout default size or <code>null</code> when not available.
+	 *            <p>
+	 *            The default default size is
+	 *            <p>
+	 * 
+	 *            <pre>
+	 *            horizContentDefaultWidth = 300;
+	 *            horizContentDefaultHeight = 150;
+	 * 
+	 *            vertContentDefaultWidth = 400;
+	 *            vertContentDefaultHeight = 250;
+	 * 
+	 *            </pre>
+	 */
 	public AdvancedSlideout(final Control ownerControl, //
 							final IDialogSettings state,
 							final int[] slideoutDefaultSize) {
