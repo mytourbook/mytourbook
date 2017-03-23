@@ -96,10 +96,10 @@ import org.eclipse.swt.widgets.Widget;
  */
 public class SlideoutTourFilter extends AdvancedSlideout {
 
-	static final String				FIELD_NO				= "fieldNo";																																								//$NON-NLS-1$
+	static final String				FIELD_NO				= "fieldNo";																																																																																					//$NON-NLS-1$
 
-	private static final String		STATE_IS_LIVE_UPDATE	= "STATE_IS_LIVE_UPDATE";																//$NON-NLS-1$
-	private static final String		STATE_SASH_WIDTH		= "STATE_SASH_WIDTH";																								//$NON-NLS-1$
+	private static final String		STATE_IS_LIVE_UPDATE	= "STATE_IS_LIVE_UPDATE";																																		//$NON-NLS-1$
+	private static final String		STATE_SASH_WIDTH		= "STATE_SASH_WIDTH";																																																			//$NON-NLS-1$
 
 	private final IPreferenceStore	_prefStore				= TourbookPlugin.getPrefStore();
 	private final IDialogSettings	_state;
@@ -950,12 +950,18 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		case NOT_LIKE:
 			break;
 
-		case SEASON_YEAR_START_UNTIL_TODAY:
+		case SEASON_UNTIL_TODAY_FROM_YEAR_START:
 		case SEASON_TODAY_UNTIL_YEAR_END:
+		case SEASON_CURRENT_DAY:
+		case SEASON_CURRENT_MONTH:
 			// no additional controls
 			break;
 
-		case SEASON_DATE_UNTIL_TODAY:
+		case SEASON_MONTH:
+			numColumns += createUI_Field_SeasonMonth(fieldContainer, filterProp, 1);
+			break;
+
+		case SEASON_UNTIL_TODAY_FROM_DATE:
 		case SEASON_TODAY_UNTIL_DATE:
 			numColumns += createUI_Field_SeasonDay(fieldContainer, filterProp, 1);
 			numColumns += createUI_Field_SeasonMonth(fieldContainer, filterProp, 1);
@@ -1470,6 +1476,15 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 	 */
 	private int getValidSeasonDay(final TourFilterProperty filterProperty, final int fieldNo, final int selectedMonth) {
 
+		final Spinner spinnerDay = fieldNo == 1 //
+				? filterProperty.uiSpinner_SeasonDay1
+				: filterProperty.uiSpinner_SeasonDay2;
+
+		// Spinner day can be null when only the month UI is displayed but not the day UI
+		if (spinnerDay == null) {
+			return 1;
+		}
+
 		final MonthDay oldField = fieldNo == 1 //
 				? filterProperty.monthDay1
 				: filterProperty.monthDay2;
@@ -1477,10 +1492,6 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		int oldDay = oldField.getDayOfMonth();
 
 		final int monthMaxDays = getMonthMaxDays(selectedMonth);
-
-		final Spinner spinnerDay = fieldNo == 1 //
-				? filterProperty.uiSpinner_SeasonDay1
-				: filterProperty.uiSpinner_SeasonDay2;
 
 		if (oldDay > monthMaxDays) {
 
@@ -1513,6 +1524,10 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		}
 
 		return false;
+	}
+
+	private boolean isValidFieldOperator(final TourFilterFieldOperator defaultFieldOperator) {
+		return defaultFieldOperator == null;
 	}
 
 	private void onDisposeSlideout() {
@@ -1888,19 +1903,8 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		final TourFilterProperty filterProperty = (TourFilterProperty) widget.getData();
 		filterProperty.fieldConfig = selectedFieldConfig;
 
-		/*
-		 * select default operator
-		 */
-		final TourFilterFieldOperator defaultFieldOperator = selectedFieldConfig.defaultFieldOperator;
-		if (defaultFieldOperator == null) {
-
-			// init with first available operator, otherwise an old and wrong operator could be set
-			filterProperty.fieldOperator = selectedFieldConfig.fieldOperators[0];
-
-		} else {
-
-			filterProperty.fieldOperator = defaultFieldOperator;
-		}
+		// select default operator
+		filterProperty.fieldOperator = selectedFieldConfig.getDefaultFieldOperator();
 
 		updateUI_Properties();
 
@@ -2135,12 +2139,18 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		case NOT_LIKE:
 			break;
 
-		case SEASON_YEAR_START_UNTIL_TODAY:
+		case SEASON_UNTIL_TODAY_FROM_YEAR_START:
 		case SEASON_TODAY_UNTIL_YEAR_END:
+		case SEASON_CURRENT_DAY:
+		case SEASON_CURRENT_MONTH:
 			// no additional controls
 			break;
 
-		case SEASON_DATE_UNTIL_TODAY:
+		case SEASON_MONTH:
+			updateUI_PropertyDetail_Season_Month(filterProperty);
+			break;
+
+		case SEASON_UNTIL_TODAY_FROM_DATE:
 		case SEASON_TODAY_UNTIL_DATE:
 			updateUI_PropertyDetail_Season(filterProperty, 1);
 			break;
@@ -2260,6 +2270,17 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		}
 
 		uiSpinnerDay.setSelection(monthDay.getDayOfMonth());
+		uiComboMonth.select(monthDay.getMonthValue() - 1);
+	}
+
+	private void updateUI_PropertyDetail_Season_Month(final TourFilterProperty filterProperty) {
+
+		MonthDay monthDay;
+		Combo uiComboMonth;
+
+		monthDay = filterProperty.monthDay1;
+		uiComboMonth = filterProperty.uiCombo_SeasonMonth1;
+
 		uiComboMonth.select(monthDay.getMonthValue() - 1);
 	}
 

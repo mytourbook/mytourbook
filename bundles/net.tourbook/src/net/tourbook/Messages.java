@@ -19,7 +19,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-	private static final String	BUNDLE_NAME	= "net.tourbook.messages";																				//$NON-NLS-1$
+	private static final String	BUNDLE_NAME	= "net.tourbook.messages";																														//$NON-NLS-1$
 
 	public static String		Action_Cadence_Set;
 	public static String		Action_Cadence_Set_Rpm;
@@ -1812,11 +1812,16 @@ public class Messages extends NLS {
 	public static String		Tour_Filter_Operator_LessThanOrEqual;
 	public static String		Tour_Filter_Operator_NotBetween;
 	public static String		Tour_Filter_Operator_NotEquals;
-	public static String		Tour_Filter_Operator_Season_Date_Until_Today;
+	public static String		Tour_Filter_Operator_Season_Current_Day;
+	public static String		Tour_Filter_Operator_Season_Current_Month;
+	public static String		Tour_Filter_Operator_Season_Month;
+	public static String		Tour_Filter_Operator_Season_This_Month;
+	public static String		Tour_Filter_Operator_Season_Today;
 	public static String		Tour_Filter_Operator_Season_Today_Until_Date;
 	public static String		Tour_Filter_Operator_Season_Today_Until_YearEnd;
 	public static String		Tour_Filter_Operator_Season_UntilToday;
-	public static String		Tour_Filter_Operator_Season_YearStart_Until_Today;
+	public static String		Tour_Filter_Operator_Season_UntilToday_From_Date;
+	public static String		Tour_Filter_Operator_Season_UntilToday_From_YearStart;
 	public static String		Tour_Filter_Operator_StartsWith;
 
 	public static String		Tour_Log_Action_Clear_Tooltip;

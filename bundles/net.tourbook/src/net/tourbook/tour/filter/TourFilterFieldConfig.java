@@ -27,40 +27,44 @@ public class TourFilterFieldConfig {
 	/**
 	 * Visible field name
 	 */
-	final String				name;
+	final String					name;
 
 	/**
 	 * Every field must have a unique id, it is <code>null</code> when it's a category. config.
 	 */
-	TourFilterFieldId			fieldId;
+	TourFilterFieldId				fieldId;
 
-	TourFilterFieldType			fieldType;
+	TourFilterFieldType				fieldType;
 
 	/**
 	 * Default field id when {@link #fieldType} is {@link TourFilterFieldType#CATEGORY}
 	 */
-	TourFilterFieldId			categoryDefaultFieldId;
+	TourFilterFieldId				categoryDefaultFieldId;
 
 	/**
 	 * Contains all operators which are allowed for this field
 	 */
-	TourFilterFieldOperator[]	fieldOperators;
+	TourFilterFieldOperator[]		fieldOperators;
 
-	TourFilterFieldOperator		defaultFieldOperator	= TourFilterFieldOperator.GREATER_THAN;
+	/**
+	 * Set default operator, the default default can be wrong when it is not supported but it will
+	 * be checked when requested.
+	 */
+	private TourFilterFieldOperator	_defaultFieldOperator	= TourFilterFieldOperator.GREATER_THAN;
 
-	int							minValue;
-	int							maxValue				= Integer.MAX_VALUE;
+	int								minValue;
+	int								maxValue				= Integer.MAX_VALUE;
 
-	int							pageIncrement			= 10;
+	int								pageIncrement			= 10;
 
 	/**
 	 * Number of digits, default is 0.
 	 */
-	int							numDigits;
+	int								numDigits;
 
-	FieldValueConverter			fieldValueConverter;
+	FieldValueConverter				fieldValueConverter;
 
-	String						unitLabel				= UI.EMPTY_STRING;
+	String							unitLabel				= UI.EMPTY_STRING;
 
 	private TourFilterFieldConfig(final String name) {
 		this.name = name;
@@ -141,7 +145,7 @@ public class TourFilterFieldConfig {
 	 * @return
 	 */
 	TourFilterFieldConfig defaultFieldOperator(final TourFilterFieldOperator defaultFieldOperator) {
-		this.defaultFieldOperator = defaultFieldOperator;
+		_defaultFieldOperator = defaultFieldOperator;
 		return this;
 	}
 
@@ -152,7 +156,7 @@ public class TourFilterFieldConfig {
 
 	/**
 	 * Set the field operators, default is {@link TourFilterManager#FILTER_OPERATORS_NUMBER} and set
-	 * the {@link #defaultFieldOperator} with the first operator in the fieldOperators.
+	 * the {@link #_defaultFieldOperator} with the first operator in the fieldOperators.
 	 * 
 	 * @param fieldOperators
 	 * @return
@@ -160,7 +164,7 @@ public class TourFilterFieldConfig {
 	TourFilterFieldConfig fieldOperators(final TourFilterFieldOperator[] fieldOperators) {
 
 		this.fieldOperators = fieldOperators;
-		this.defaultFieldOperator = fieldOperators[0];
+		_defaultFieldOperator = fieldOperators[0];
 
 		return this;
 	}
@@ -185,6 +189,19 @@ public class TourFilterFieldConfig {
 	TourFilterFieldConfig fieldValueProvider(final FieldValueConverter fieldValueProvider) {
 		this.fieldValueConverter = fieldValueProvider;
 		return this;
+	}
+
+	TourFilterFieldOperator getDefaultFieldOperator() {
+
+		// validate default operator
+		for (final TourFilterFieldOperator fieldOperator : fieldOperators) {
+			if (fieldOperator.equals(_defaultFieldOperator)) {
+				return fieldOperator;
+			}
+		}
+
+		// default operator is invalid, get first operator
+		return fieldOperators[0];
 	}
 
 	/**

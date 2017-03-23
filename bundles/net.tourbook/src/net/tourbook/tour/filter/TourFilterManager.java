@@ -23,6 +23,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.MonthDay;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import net.tourbook.Messages;
 import net.tourbook.application.ActionTourFilter;
@@ -62,25 +63,25 @@ public class TourFilterManager {
 	private static final String							LABEL_POWERTRAIN_GEAR_FRONT_SHIFT	= net.tourbook.ui.Messages.ColumnFactory_GearFrontShiftCount_Label;
 	private static final String							LABEL_POWERTRAIN_GEAR_REAR_SHIFT	= net.tourbook.ui.Messages.ColumnFactory_GearRearShiftCount_Label;
 
-	private static final String							CATEGORY_ALTITUDE					= net.tourbook.ui.Messages.ColumnFactory_Category_Altitude;
-	private static final String							CATEGORY_BODY						= net.tourbook.ui.Messages.ColumnFactory_Category_Body;
-	private static final String							CATEGORY_DATA						= net.tourbook.ui.Messages.ColumnFactory_Category_Data;
-	private static final String							CATEGORY_DEVICE						= net.tourbook.ui.Messages.ColumnFactory_Category_Device;
-	private static final String							CATEGORY_MARKER						= net.tourbook.ui.Messages.ColumnFactory_Category_Marker;
-	private static final String							CATEGORY_MOTION						= net.tourbook.ui.Messages.ColumnFactory_Category_Motion;
-	private static final String							CATEGORY_PHOTO						= net.tourbook.ui.Messages.ColumnFactory_Category_Photo;
-	private static final String							CATEGORY_POWER						= net.tourbook.ui.Messages.ColumnFactory_Category_Power;
-	private static final String							CATEGORY_POWERTRAIN					= net.tourbook.ui.Messages.ColumnFactory_Category_Powertrain;
-	private static final String							CATEGORY_STATE						= net.tourbook.ui.Messages.ColumnFactory_Category_State;
-	private static final String							CATEGORY_TIME						= net.tourbook.ui.Messages.ColumnFactory_Category_Time;
-	private static final String							CATEGORY_TOUR						= net.tourbook.ui.Messages.ColumnFactory_Category_Tour;
-	private static final String							CATEGORY_TRAINING					= net.tourbook.ui.Messages.ColumnFactory_Category_Training;
-	private static final String							CATEGORY_WAYPOINT					= net.tourbook.ui.Messages.ColumnFactory_Category_Waypoint;
-	private static final String							CATEGORY_WEATHER					= net.tourbook.ui.Messages.ColumnFactory_Category_Weather;
+	private static final String							LABEL_CATEGORY_ALTITUDE				= net.tourbook.ui.Messages.ColumnFactory_Category_Altitude;
+	private static final String							LABEL_CATEGORY_BODY					= net.tourbook.ui.Messages.ColumnFactory_Category_Body;
+	private static final String							LABEL_CATEGORY_DATA					= net.tourbook.ui.Messages.ColumnFactory_Category_Data;
+	private static final String							LABEL_CATEGORY_DEVICE				= net.tourbook.ui.Messages.ColumnFactory_Category_Device;
+	private static final String							LABEL_CATEGORY_MARKER				= net.tourbook.ui.Messages.ColumnFactory_Category_Marker;
+	private static final String							LABEL_CATEGORY_MOTION				= net.tourbook.ui.Messages.ColumnFactory_Category_Motion;
+	private static final String							LABEL_CATEGORY_PHOTO				= net.tourbook.ui.Messages.ColumnFactory_Category_Photo;
+	private static final String							LABEL_CATEGORY_POWER				= net.tourbook.ui.Messages.ColumnFactory_Category_Power;
+	private static final String							LABEL_CATEGORY_POWERTRAIN			= net.tourbook.ui.Messages.ColumnFactory_Category_Powertrain;
+	private static final String							LABEL_CATEGORY_STATE				= net.tourbook.ui.Messages.ColumnFactory_Category_State;
+	private static final String							LABEL_CATEGORY_TIME					= net.tourbook.ui.Messages.ColumnFactory_Category_Time;
+	private static final String							LABEL_CATEGORY_TOUR					= net.tourbook.ui.Messages.ColumnFactory_Category_Tour;
+	private static final String							LABEL_CATEGORY_TRAINING				= net.tourbook.ui.Messages.ColumnFactory_Category_Training;
+	private static final String							LABEL_CATEGORY_WAYPOINT				= net.tourbook.ui.Messages.ColumnFactory_Category_Waypoint;
+	private static final String							LABEL_CATEGORY_WEATHER				= net.tourbook.ui.Messages.ColumnFactory_Category_Weather;
 
-	private static final String							TOUR_DATA_ALTITUDE_DOWN 			= "TourData.tourAltDown";
-	private static final String 						TOUR_DATA_ALTITUDE_UP 				= "TourData.tourAltUp";
-	private static final String 						TOUR_DATA_ALTITUDE_MAX 				= "TourData.maxAltitude";
+	private static final String							TOUR_DATA_ALTITUDE_DOWN 			= "TourData.tourAltDown"; //$NON-NLS-1$
+	private static final String 						TOUR_DATA_ALTITUDE_UP 				= "TourData.tourAltUp"; //$NON-NLS-1$
+	private static final String 						TOUR_DATA_ALTITUDE_MAX 				= "TourData.maxAltitude"; //$NON-NLS-1$
 	private static final String							TOUR_DATA_AVG_TEMPERATURE			= "TourData.avgTemperature";											//$NON-NLS-1$
 	private static final String							TOUR_DATA_NUMBER_OF_PHOTOS			= "TourData.numberOfPhotos";											//$NON-NLS-1$
 	private static final String							TOUR_DATA_POWER_AVG					= "TourData.power_Avg";													//$NON-NLS-1$
@@ -99,68 +100,71 @@ public class TourFilterManager {
 	private static final String							TOUR_DATA_TOUR_TITLE				= "TourData.tourTitle";													//$NON-NLS-1$
 // SET_FORMATTING_ON
 
-	private static final String							TOUR_FILTER_FILE_NAME				= "tour-filter.xml";																																																																																																																																																																																																																							//$NON-NLS-1$
+	private static final String							TOUR_FILTER_FILE_NAME				= "tour-filter.xml";																																																																																																																																																																																																																																																																																																						//$NON-NLS-1$
 	private static final int							TOUR_FILTER_VERSION					= 1;
 
-	private static final String							TAG_PROFILE							= "Profile";																																																																																																																																																																																																																																																																																																																																																																																																																																			//$NON-NLS-1$
-	private static final String							TAG_PROPERTY						= "Property";																																																																																																																																																																																																																																																																																																																																																																																																																																			//$NON-NLS-1$
-	private static final String							TAG_ROOT							= "TourFilterProfiles";																																																																																																																																																																																																																							//$NON-NLS-1$
+	private static final String							TAG_PROFILE							= "Profile";																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																														//$NON-NLS-1$
+	private static final String							TAG_PROPERTY						= "Property";																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																														//$NON-NLS-1$
+	private static final String							TAG_ROOT							= "TourFilterProfiles";																																																																																																																																																																																																																																																																																																						//$NON-NLS-1$
 
-	private static final String							ATTR_IS_ENABLED						= "isEnabled";																																																																																																																																																																																																																																																																																																																																																																																																																																			//$NON-NLS-1$
-	private static final String							ATTR_IS_SELECTED					= "isSelected";																																																																																																																																																																																																																																																																																																																																																																																																																																			//$NON-NLS-1$
-	private static final String							ATTR_FIELD_ID						= "fieldId";																																																																																																																																																																																																																																																																																																																																																																																																																																			//$NON-NLS-1$
-	private static final String							ATTR_FIELD_OPERATOR					= "fieldOperator";																																																																																																																																																																																																																																																																																																																													//$NON-NLS-1$
-	private static final String							ATTR_NAME							= "name";																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																									//$NON-NLS-1$
-	private static final String							ATTR_SEASON_DAY						= "seasonDay";																																																																																																																																																																																																																																																																																																																																																																																																																																			//$NON-NLS-1$
-	private static final String							ATTR_SEASON_MONTH					= "seasonMonth";																																																																																																																																																																																																																																																																																																																													//$NON-NLS-1$
-	private static final String							ATTR_TOUR_FILTER_VERSION			= "tourFilterVersion";																																																																																																																																																																																																																							//$NON-NLS-1$
-	private static final String							ATTR_VALUE							= "value";																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																									//$NON-NLS-1$
+	private static final String							ATTR_IS_ENABLED						= "isEnabled";																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																														//$NON-NLS-1$
+	private static final String							ATTR_IS_SELECTED					= "isSelected";																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																														//$NON-NLS-1$
+	private static final String							ATTR_FIELD_ID						= "fieldId";																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																														//$NON-NLS-1$
+	private static final String							ATTR_FIELD_OPERATOR					= "fieldOperator";																																																																																																																																																																																																																																																																																																																																																																																																																																																		//$NON-NLS-1$
+	private static final String							ATTR_NAME							= "name";																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																										//$NON-NLS-1$
+	private static final String							ATTR_SEASON_DAY						= "seasonDay";																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																														//$NON-NLS-1$
+	private static final String							ATTR_SEASON_MONTH					= "seasonMonth";																																																																																																																																																																																																																																																																																																																																																																																																																																																		//$NON-NLS-1$
+	private static final String							ATTR_TOUR_FILTER_VERSION			= "tourFilterVersion";																																																																																																																																																																																																																																																																																																						//$NON-NLS-1$
+	private static final String							ATTR_VALUE							= "value";																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																										//$NON-NLS-1$
 
-	private static final String							ATTR_DATE_YEAR						= "dateYear";																																																																																																																																																																																																																																																																																																																																																																																																																																			//$NON-NLS-1$
-	private static final String							ATTR_DATE_MONTH						= "dateMonth";																																																																																																																																																																																																																																																																																																																																																																																																																																			//$NON-NLS-1$
-	private static final String							ATTR_DATE_DAY						= "dateDay";																																																																																																																																																																																																																																																																																																																																																																																																																																			//$NON-NLS-1$
-	private static final String							ATTR_TIME_HOUR						= "timeHour";																																																																																																																																																																																																																																																																																																																																																																																																																																			//$NON-NLS-1$
-	private static final String							ATTR_TIME_MINUTE					= "timeMinute";																																																																																																																																																																																																																																																																																																																																																																																																																																			//$NON-NLS-1$
+	private static final String							ATTR_DATE_YEAR						= "dateYear";																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																														//$NON-NLS-1$
+	private static final String							ATTR_DATE_MONTH						= "dateMonth";																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																														//$NON-NLS-1$
+	private static final String							ATTR_DATE_DAY						= "dateDay";																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																														//$NON-NLS-1$
+	private static final String							ATTR_TIME_HOUR						= "timeHour";																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																														//$NON-NLS-1$
+	private static final String							ATTR_TIME_MINUTE					= "timeMinute";																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																														//$NON-NLS-1$
 
-	private static final String							OP_BR_OPEN							= "(";																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																															//$NON-NLS-1$
-	private static final String							OP_BR_CLOSE							= ")";																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																															//$NON-NLS-1$
-	private static final String							OP_AND								= " AND ";																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																									//$NON-NLS-1$
-	private static final String							OP_BETWEEN							= " BETWEEN ";																																																																																																																																																																																																																																																																																																																																																																																																																																			//$NON-NLS-1$
-	private static final String							OP_NOT_BETWEEN						= " NOT BETWEEN ";																																																																																																																																																																																																																																																																																																																													//$NON-NLS-1$
-	private static final String							OP_OR								= " OR ";																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																									//$NON-NLS-1$
+	private static final String							OP_BR_OPEN							= "(";																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																						//$NON-NLS-1$
+	private static final String							OP_BR_CLOSE							= ")";																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																						//$NON-NLS-1$
+	private static final String							OP_AND								= " AND ";																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																										//$NON-NLS-1$
+	private static final String							OP_BETWEEN							= " BETWEEN ";																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																														//$NON-NLS-1$
+	private static final String							OP_NOT_BETWEEN						= " NOT BETWEEN ";																																																																																																																																																																																																																																																																																																																																																																																																																																																		//$NON-NLS-1$
+	private static final String							OP_OR								= " OR ";																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																										//$NON-NLS-1$
 
-	private static final String							OP_PARAMETER						= " ?\n";																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																									//$NON-NLS-1$
-	private static final String							OP_EQUALS							= " = ?\n";																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																									//$NON-NLS-1$
-	private static final String							OP_NOT_EQUALS						= " != ?\n";																																																																																																																																																																																																																																																																																																																																																																																																																																			//$NON-NLS-1$
-	private static final String							OP_GREATER_THAN						= " > ?\n";																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																									//$NON-NLS-1$
-	private static final String							OP_GREATER_THAN_OR_EQUAL			= " >= ?\n";																																																																																																																																																																																																																																																																																																																																																																																																																																			//$NON-NLS-1$
-	private static final String							OP_LESS_THAN						= " < ?\n";																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																									//$NON-NLS-1$
-	private static final String							OP_LESS_THAN_OR_EQUAL				= " <= ?\n";																																																																																																																																																																																																																																																																																																																																																																																																																																			//$NON-NLS-1$
+	private static final String							OP_PARAMETER						= " ?\n";																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																										//$NON-NLS-1$
+	private static final String							OP_EQUALS							= " = ?\n";																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																										//$NON-NLS-1$
+	private static final String							OP_NOT_EQUALS						= " != ?\n";																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																														//$NON-NLS-1$
+	private static final String							OP_GREATER_THAN						= " > ?\n";																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																										//$NON-NLS-1$
+	private static final String							OP_GREATER_THAN_OR_EQUAL			= " >= ?\n";																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																														//$NON-NLS-1$
+	private static final String							OP_LESS_THAN						= " < ?\n";																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																										//$NON-NLS-1$
+	private static final String							OP_LESS_THAN_OR_EQUAL				= " <= ?\n";																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																														//$NON-NLS-1$
 
-	private static final String							OP_NULL								= " IS NULL\n";																																																																																																																																																																																																																																																																																																																																																																																																																																			//$NON-NLS-1$
-	private static final String							OP_NOT_NULL							= " IS NOT NULL\n";																																																																																																																																																																																																																																																																																																																													//$NON-NLS-1$
+	private static final String							OP_NULL								= " IS NULL\n";																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																														//$NON-NLS-1$
+	private static final String							OP_NOT_NULL							= " IS NOT NULL\n";																																																																																																																																																																																																																																																																																																																																																																																																																																																		//$NON-NLS-1$
 
 // SET_FORMATTING_OFF
 
-	public static final TourFilterFieldOperatorConfig[]	TOUR_FILTER_OPERATORS		= {
+	public static final TourFilterFieldOperatorConfig[]	TOUR_FILTER_OPERATORS = {
 	                                   		                   			   
-	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.STARTS_WITH,				Messages.Tour_Filter_Operator_StartsWith),
-	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.ENDS_WITH,					Messages.Tour_Filter_Operator_EndsWith),
-	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.EQUALS,					Messages.Tour_Filter_Operator_Equals),
-	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.NOT_EQUALS,				Messages.Tour_Filter_Operator_NotEquals),
-	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.LESS_THAN,					Messages.Tour_Filter_Operator_LessThan),
-	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.LESS_THAN_OR_EQUAL,		Messages.Tour_Filter_Operator_LessThanOrEqual),
-	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.GREATER_THAN,				Messages.Tour_Filter_Operator_GreaterThan),
-	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.GREATER_THAN_OR_EQUAL,		Messages.Tour_Filter_Operator_GreaterThanOrEqual),
-	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.BETWEEN,					Messages.Tour_Filter_Operator_Between),
-	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.NOT_BETWEEN,				Messages.Tour_Filter_Operator_NotBetween),
-	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.IS_EMPTY,					Messages.Tour_Filter_Operator_IsEmpty),
-	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.IS_NOT_EMPTY,				Messages.Tour_Filter_Operator_IsNotEmpty),
+	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.STARTS_WITH,					Messages.Tour_Filter_Operator_StartsWith),
+	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.ENDS_WITH,						Messages.Tour_Filter_Operator_EndsWith),
+	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.EQUALS,						Messages.Tour_Filter_Operator_Equals),
+	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.NOT_EQUALS,					Messages.Tour_Filter_Operator_NotEquals),
+	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.LESS_THAN,						Messages.Tour_Filter_Operator_LessThan),
+	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.LESS_THAN_OR_EQUAL,			Messages.Tour_Filter_Operator_LessThanOrEqual),
+	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.GREATER_THAN,					Messages.Tour_Filter_Operator_GreaterThan),
+	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.GREATER_THAN_OR_EQUAL,			Messages.Tour_Filter_Operator_GreaterThanOrEqual),
+	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.BETWEEN,						Messages.Tour_Filter_Operator_Between),
+	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.NOT_BETWEEN,					Messages.Tour_Filter_Operator_NotBetween),
+	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.IS_EMPTY,						Messages.Tour_Filter_Operator_IsEmpty),
+	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.IS_NOT_EMPTY,					Messages.Tour_Filter_Operator_IsNotEmpty),
 	   
-	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.SEASON_YEAR_START_UNTIL_TODAY,	Messages.Tour_Filter_Operator_Season_YearStart_Until_Today),
-	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.SEASON_DATE_UNTIL_TODAY,		Messages.Tour_Filter_Operator_Season_Date_Until_Today),
-	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.SEASON_TODAY_UNTIL_YEAR_END,	Messages.Tour_Filter_Operator_Season_Today_Until_YearEnd),
-	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.SEASON_TODAY_UNTIL_DATE,		Messages.Tour_Filter_Operator_Season_Today_Until_Date),
+	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.SEASON_UNTIL_TODAY_FROM_YEAR_START,	Messages.Tour_Filter_Operator_Season_UntilToday_From_YearStart),
+	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.SEASON_UNTIL_TODAY_FROM_DATE,			Messages.Tour_Filter_Operator_Season_UntilToday_From_Date),
+	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.SEASON_CURRENT_DAY,					Messages.Tour_Filter_Operator_Season_Current_Day),
+	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.SEASON_CURRENT_MONTH,					Messages.Tour_Filter_Operator_Season_Current_Month),
+	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.SEASON_MONTH,							Messages.Tour_Filter_Operator_Season_Month),
+	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.SEASON_TODAY_UNTIL_YEAR_END,			Messages.Tour_Filter_Operator_Season_Today_Until_YearEnd),
+	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.SEASON_TODAY_UNTIL_DATE,				Messages.Tour_Filter_Operator_Season_Today_Until_Date),
 	};
 	
 	public static final TourFilterFieldOperator[]			FILTER_OPERATORS_DATE_TIME = {
@@ -189,10 +193,13 @@ public class TourFilterManager {
 
 	public static final TourFilterFieldOperator[]			FILTER_OPERATORS_SEASON = {
 	                                             			                         
-		TourFilterFieldOperator.SEASON_YEAR_START_UNTIL_TODAY,
+		TourFilterFieldOperator.SEASON_UNTIL_TODAY_FROM_YEAR_START,
+		TourFilterFieldOperator.SEASON_UNTIL_TODAY_FROM_DATE,
 		TourFilterFieldOperator.SEASON_TODAY_UNTIL_YEAR_END,
-		TourFilterFieldOperator.SEASON_DATE_UNTIL_TODAY,
 		TourFilterFieldOperator.SEASON_TODAY_UNTIL_DATE,
+		TourFilterFieldOperator.SEASON_CURRENT_DAY,
+		TourFilterFieldOperator.SEASON_CURRENT_MONTH,
+		TourFilterFieldOperator.SEASON_MONTH,
 		TourFilterFieldOperator.BETWEEN,
 		TourFilterFieldOperator.NOT_BETWEEN,
 	};
@@ -203,9 +210,9 @@ public class TourFilterManager {
 		TourFilterFieldOperator.IS_NOT_EMPTY,
 	};
 
-	private static FieldValueConverter					_fieldValueProvider_Altitude		= new FieldValueProvider_Altitude();
-	private static FieldValueConverter					_fieldValueProvider_Distance		= new FieldValueProvider_Distance();
-	private static FieldValueConverter					_fieldValueProvider_Temperature		= new FieldValueProvider_Temperature();
+	private static FieldValueConverter		_fieldValueProvider_Altitude		= new FieldValueProvider_Altitude();
+	private static FieldValueConverter		_fieldValueProvider_Distance		= new FieldValueProvider_Distance();
+	private static FieldValueConverter		_fieldValueProvider_Temperature		= new FieldValueProvider_Temperature();
 
 // SET_FORMATTING_ON
 
@@ -216,42 +223,85 @@ public class TourFilterManager {
 
 	static {
 
+		/*
+		 * Get all category labels sorted by localized name
+		 */
+		final String[] allCategories = new String[] {
+				LABEL_CATEGORY_ALTITUDE,
+				LABEL_CATEGORY_STATE,
+				LABEL_CATEGORY_BODY,
+				LABEL_CATEGORY_DATA,
+				LABEL_CATEGORY_DEVICE,
+				LABEL_CATEGORY_MARKER,
+				LABEL_CATEGORY_MOTION,
+				LABEL_CATEGORY_PHOTO,
+				LABEL_CATEGORY_POWER,
+				LABEL_CATEGORY_POWERTRAIN,
+				LABEL_CATEGORY_TIME,
+				LABEL_CATEGORY_TOUR,
+				LABEL_CATEGORY_TRAINING,
+				LABEL_CATEGORY_WAYPOINT,
+				LABEL_CATEGORY_WEATHER
+		};
+		Arrays.sort(allCategories);
+
+		/*
+		 * Create category configs sorted by localized name
+		 */
 		final ArrayList<TourFilterFieldConfig> allConfigs = new ArrayList<TourFilterFieldConfig>();
 
-		createConfig_Altitude(allConfigs);
-		createConfig_Body(allConfigs);
-		createConfig_Data(allConfigs);
-		createConfig_Device(allConfigs);
-		createConfig_Motion(allConfigs);
-		createConfig_Power(allConfigs);
-		createConfig_Powertrain(allConfigs);
-		createConfig_Training(allConfigs);
-		createConfig_Time(allConfigs);
-		createConfig_Tour(allConfigs);
-		createConfig_Weather(allConfigs);
+		for (final String category : allCategories) {
 
-//		final TourFilterFieldConfig[] CONFIG =
-//
-//				{
-//					new TourFilterFieldConfig(COLUMN_FACTORY_CATEGORY_PHOTO, TourFilterFieldType.CATEGORY),
-//				 	new TourFilterFieldConfig(COLUMN_FACTORY_CATEGORY_MARKER, TourFilterFieldType.CATEGORY),
-//					new TourFilterFieldConfig(COLUMN_FACTORY_CATEGORY_STATE, TourFilterFieldType.CATEGORY),
-//					new TourFilterFieldConfig(COLUMN_FACTORY_CATEGORY_WAYPOINT, TourFilterFieldType.CATEGORY),
-//
-//				//
-//				};
+			if (category.equals(LABEL_CATEGORY_ALTITUDE)) {
+				createConfig_Altitude(allConfigs);
+
+			} else if (category.equals(LABEL_CATEGORY_BODY)) {
+				createConfig_Body(allConfigs);
+
+			} else if (category.equals(LABEL_CATEGORY_DATA)) {
+				createConfig_Data(allConfigs);
+
+			} else if (category.equals(LABEL_CATEGORY_DEVICE)) {
+				createConfig_Device(allConfigs);
+
+			} else if (category.equals(LABEL_CATEGORY_MARKER)) {
+
+			} else if (category.equals(LABEL_CATEGORY_MOTION)) {
+				createConfig_Motion(allConfigs);
+
+			} else if (category.equals(LABEL_CATEGORY_PHOTO)) {
+				createConfig_Power(allConfigs);
+
+			} else if (category.equals(LABEL_CATEGORY_POWER)) {
+
+			} else if (category.equals(LABEL_CATEGORY_POWERTRAIN)) {
+				createConfig_Powertrain(allConfigs);
+
+			} else if (category.equals(LABEL_CATEGORY_STATE)) {
+
+			} else if (category.equals(LABEL_CATEGORY_TIME)) {
+				createConfig_Time(allConfigs);
+
+			} else if (category.equals(LABEL_CATEGORY_TOUR)) {
+				createConfig_Tour(allConfigs);
+
+			} else if (category.equals(LABEL_CATEGORY_TRAINING)) {
+				createConfig_Training(allConfigs);
+
+			} else if (category.equals(LABEL_CATEGORY_WAYPOINT)) {
+
+			} else if (category.equals(LABEL_CATEGORY_WEATHER)) {
+				createConfig_Weather(allConfigs);
+			}
+		}
 
 		FILTER_FIELD_CONFIG = allConfigs.toArray(new TourFilterFieldConfig[allConfigs.size()]);
 	}
 
-// SET_FORMATTING_OFF
-	
-	private static final Bundle					_bundle				= TourbookPlugin.getDefault().getBundle();
+	private static final Bundle				_bundle			= TourbookPlugin.getDefault().getBundle();
 
-	private static final IPath					_stateLocation		= Platform.getStateLocation(_bundle);
-	private final static IPreferenceStore		_prefStore			= TourbookPlugin.getPrefStore();
-	
-// SET_FORMATTING_ON
+	private static final IPath				_stateLocation	= Platform.getStateLocation(_bundle);
+	private final static IPreferenceStore	_prefStore		= TourbookPlugin.getPrefStore();
 
 	private static IPropertyChangeListener	_prefChangeListener;
 	static {
@@ -290,7 +340,7 @@ public class TourFilterManager {
 
 	private static void createConfig_Altitude(final ArrayList<TourFilterFieldConfig> allConfigs) {
 
-		allConfigs.add(new TourFilterFieldConfig(CATEGORY_ALTITUDE, TourFilterFieldId.ALTITUDE_UP));
+		allConfigs.add(new TourFilterFieldConfig(LABEL_CATEGORY_ALTITUDE, TourFilterFieldId.ALTITUDE_UP));
 
 		allConfigs.add(TourFilterFieldConfig//
 				.name(Messages.Tour_Filter_Field_Altitude_Ascent)
@@ -357,7 +407,7 @@ public class TourFilterManager {
 //		defineColumn_Motion_AvgSpeed();
 //		defineColumn_Motion_AvgPace();
 //
-		allConfigs.add(new TourFilterFieldConfig(CATEGORY_MOTION, TourFilterFieldId.MOTION_DISTANCE));
+		allConfigs.add(new TourFilterFieldConfig(LABEL_CATEGORY_MOTION, TourFilterFieldId.MOTION_DISTANCE));
 
 		allConfigs.add(TourFilterFieldConfig//
 				.name(Messages.Tour_Filter_Field_Distance)
@@ -384,7 +434,7 @@ public class TourFilterManager {
 //						+ (net.tourbook.ui.Messages.ColumnFactory_power)
 //						+ (net.tourbook.ui.Messages.ColumnFactory_Power_Avg_Tooltip)
 
-		allConfigs.add(new TourFilterFieldConfig(CATEGORY_POWER, TourFilterFieldId.POWER_AVERAGE));
+		allConfigs.add(new TourFilterFieldConfig(LABEL_CATEGORY_POWER, TourFilterFieldId.POWER_AVERAGE));
 
 		allConfigs.add(TourFilterFieldConfig//
 				.name(LABEL_POWER_AVG)
@@ -426,7 +476,7 @@ public class TourFilterManager {
 //		defineColumn_Powertrain_AvgRightTorqueEffectiveness();
 //		defineColumn_Powertrain_PedalLeftRightBalance();
 
-		allConfigs.add(new TourFilterFieldConfig(CATEGORY_POWERTRAIN, TourFilterFieldId.POWERTRAIN_AVG_CADENCE));
+		allConfigs.add(new TourFilterFieldConfig(LABEL_CATEGORY_POWERTRAIN, TourFilterFieldId.POWERTRAIN_AVG_CADENCE));
 
 		allConfigs.add(TourFilterFieldConfig//
 				.name(LABEL_POWERTRAIN_AVG_CADENCE)
@@ -463,7 +513,7 @@ public class TourFilterManager {
 //		defineColumn_Time_WeekNo();
 //		defineColumn_Time_WeekYear();
 
-		allConfigs.add(new TourFilterFieldConfig(CATEGORY_TIME, TourFilterFieldId.TIME_TOUR_DATE));
+		allConfigs.add(new TourFilterFieldConfig(LABEL_CATEGORY_TIME, TourFilterFieldId.TIME_TOUR_DATE));
 
 		allConfigs.add(TourFilterFieldConfig //
 				.name(Messages.Tour_Filter_Field_TourDate)
@@ -518,7 +568,7 @@ public class TourFilterManager {
 //		defineColumn_Tour_Photos();
 //		defineColumn_Tour_Tags();
 
-		allConfigs.add(new TourFilterFieldConfig(CATEGORY_TOUR, TourFilterFieldId.TOUR_TITLE));
+		allConfigs.add(new TourFilterFieldConfig(LABEL_CATEGORY_TOUR, TourFilterFieldId.TOUR_TITLE));
 
 		allConfigs.add(TourFilterFieldConfig //
 				.name(Messages.Tour_Filter_Field_TourTitle)
@@ -564,7 +614,7 @@ public class TourFilterManager {
 
 //		allConfigs.add(new TourFilterFieldConfig(COLUMN_FACTORY_CATEGORY_TRAINING, TourFilterFieldType.CATEGORY));
 
-		allConfigs.add(new TourFilterFieldConfig(CATEGORY_TRAINING, TourFilterFieldId.TRAINING_FTP));
+		allConfigs.add(new TourFilterFieldConfig(LABEL_CATEGORY_TRAINING, TourFilterFieldId.TRAINING_FTP));
 
 		allConfigs.add(TourFilterFieldConfig//
 				.name(LABEL_POWER_FTP)
@@ -587,7 +637,7 @@ public class TourFilterManager {
 //		defineColumn_Weather_WindSpeed();
 //		defineColumn_Weather_WindDirection();
 //
-		allConfigs.add(new TourFilterFieldConfig(CATEGORY_WEATHER, TourFilterFieldId.WEATHER_TEMPERATURE));
+		allConfigs.add(new TourFilterFieldConfig(LABEL_CATEGORY_WEATHER, TourFilterFieldId.WEATHER_TEMPERATURE));
 
 		allConfigs.add(TourFilterFieldConfig
 				.name(Messages.Tour_Filter_Field_Temperature)
@@ -1042,9 +1092,10 @@ public class TourFilterManager {
 		final int dateValue2 = month2 * 100 + day2;
 
 		final String sql = "(TourData.startMonth * 100 + TourData.startDay)"; //$NON-NLS-1$
+		final String sqlMonth = "TourData.startMonth";//$NON-NLS-1$
 
 		switch (filterProperty.fieldOperator) {
-		case SEASON_YEAR_START_UNTIL_TODAY:
+		case SEASON_UNTIL_TODAY_FROM_YEAR_START:
 			sqlWhere.append(OP_AND + sql + OP_LESS_THAN_OR_EQUAL);
 			sqlParameters.add(todayValue);
 			break;
@@ -1054,7 +1105,7 @@ public class TourFilterManager {
 			sqlParameters.add(todayValue);
 			break;
 
-		case SEASON_DATE_UNTIL_TODAY:
+		case SEASON_UNTIL_TODAY_FROM_DATE:
 
 			sqlWhere.append(OP_AND
 					+ (sql + OP_GREATER_THAN_OR_EQUAL) // date
@@ -1077,6 +1128,30 @@ public class TourFilterManager {
 
 			sqlParameters.add(todayValue);
 			sqlParameters.add(dateValue1);
+
+			break;
+
+		case SEASON_CURRENT_DAY:
+
+			sqlWhere.append(OP_AND
+					+ (sql + OP_EQUALS) // today
+			);
+
+			sqlParameters.add(todayValue);
+
+			break;
+
+		case SEASON_CURRENT_MONTH:
+
+			sqlWhere.append(OP_AND + (sqlMonth + OP_EQUALS));
+			sqlParameters.add(todayMonth);
+
+			break;
+
+		case SEASON_MONTH:
+
+			sqlWhere.append(OP_AND + (sqlMonth + OP_EQUALS));
+			sqlParameters.add(month1);
 
 			break;
 
@@ -1416,7 +1491,7 @@ public class TourFilterManager {
 
 			break;
 
-		case SEASON_DATE_UNTIL_TODAY:
+		case SEASON_UNTIL_TODAY_FROM_DATE:
 		case SEASON_TODAY_UNTIL_DATE:
 			readXml_Season(xmlProperty, filterProperty, 1);
 			break;
@@ -1729,8 +1804,9 @@ public class TourFilterManager {
 
 			break;
 
-		case SEASON_DATE_UNTIL_TODAY:
+		case SEASON_UNTIL_TODAY_FROM_DATE:
 		case SEASON_TODAY_UNTIL_DATE:
+		case SEASON_MONTH:
 			writeXml_Season(xmlProperty, monthDay1, 1);
 			break;
 		}
