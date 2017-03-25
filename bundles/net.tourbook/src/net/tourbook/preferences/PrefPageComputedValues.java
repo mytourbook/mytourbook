@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -69,7 +69,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
 	public static final String			ID									= "net.tourbook.preferences.PrefPageComputedValues";				//$NON-NLS-1$
 
-	public static final String			URL_DOUGLAS_PEUCKER_ALGORITHM		= "http://en.wikipedia.org/wiki/Ramer–Douglas–Peucker_algorithm";	//$NON-NLS-1$
+	public static final String	URL_DOUGLAS_PEUCKER_ALGORITHM		=
+			"https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm";															//$NON-NLS-1$
 
 	private static final String			STATE_COMPUTED_VALUE_SELECTED_TAB	= "computedValue.selectedTab";										//$NON-NLS-1$
 
