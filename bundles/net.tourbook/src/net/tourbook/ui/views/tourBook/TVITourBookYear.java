@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,7 +19,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
+import java.time.temporal.TemporalField;
 import java.util.ArrayList;
 
 import net.tourbook.common.UI;
@@ -31,7 +33,7 @@ import net.tourbook.ui.SQLFilter;
 
 public class TVITourBookYear extends TVITourBookItem {
 
-	private static final String	YEAR_WEEK_FORMAT	= "[%02d] %s";	//$NON-NLS-1$
+	private static final String	YEAR_WEEK_FORMAT	= "[%02d] %s";							//$NON-NLS-1$
 
 	private YearSubCategory		_subCategory;
 
@@ -111,37 +113,49 @@ public class TVITourBookYear extends TVITourBookItem {
 				final int dbYearSub = result.getInt(2);
 
 				String columnText;
-				ZonedDateTime categoryDateTime;
+
+				/*
+				 * Fixed "java.time.LocalDate cannot be cast to java.time.ZonedDateTime" exception
+				 * with this special date/time contruction
+				 */
+				LocalDate categoryDate;
+				final LocalDate tourWeekLocal = tourWeek.toLocalDate();
 
 				if (isWeekDisplayed) {
 
 					// week
 
-					categoryDateTime = tourWeek//
-							.with(TimeTools.calendarWeek.weekBasedYear(), dbYear)
-							.with(TimeTools.calendarWeek.weekOfYear(), dbYearSub);
+					final TemporalField weekBasedYear = TimeTools.calendarWeek.weekBasedYear();
+					final TemporalField weekOfYear = TimeTools.calendarWeek.weekOfYear();
+
+					categoryDate = tourWeekLocal//
+							.with(weekBasedYear, dbYear)
+							.with(weekOfYear, dbYearSub);
 
 					columnText = String.format(
 							YEAR_WEEK_FORMAT,
 							dbYearSub,
-							categoryDateTime.format(TimeTools.Formatter_Week_Month));
+							categoryDate.format(TimeTools.Formatter_Week_Month));
 
 				} else {
 
 					// month
 
-					categoryDateTime = tourWeek//
+					categoryDate = tourWeekLocal//
 							.withYear(dbYear)
 							.withMonth(dbYearSub);
 
-					columnText = categoryDateTime.format(TimeTools.Formatter_Month);
+					columnText = categoryDate.format(TimeTools.Formatter_Month);
 				}
+
+				final ZonedDateTime zonedWeek = ZonedDateTime.from(tourWeek);
+				final ZonedDateTime zonedWeekDate = zonedWeek.with(categoryDate);
 
 				tourItem.treeColumn = columnText;
 
 				tourItem.tourYear = dbYear;
 				tourItem.tourYearSub = dbYearSub;
-				tourItem.colTourDateTime = new TourDateTime(categoryDateTime);
+				tourItem.colTourDateTime = new TourDateTime(zonedWeekDate);
 
 				tourItem.addSumColumns(result, 3);
 			}
