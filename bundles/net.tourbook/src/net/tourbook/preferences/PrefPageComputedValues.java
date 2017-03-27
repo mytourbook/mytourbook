@@ -67,34 +67,34 @@ import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 
 public class PrefPageComputedValues extends PreferencePage implements IWorkbenchPreferencePage {
 
-	public static final String			ID									= "net.tourbook.preferences.PrefPageComputedValues";				//$NON-NLS-1$
+	public static final String	ID									= "net.tourbook.preferences.PrefPageComputedValues";				//$NON-NLS-1$
 
 	public static final String	URL_DOUGLAS_PEUCKER_ALGORITHM		=
-			"https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm";															//$NON-NLS-1$
+			"https://en.wikipedia.org/wiki/Ramer%E2%80%93Douglas%E2%80%93Peucker_algorithm";																													//$NON-NLS-1$
 
-	private static final String			STATE_COMPUTED_VALUE_SELECTED_TAB	= "computedValue.selectedTab";										//$NON-NLS-1$
+	private static final String	STATE_COMPUTED_VALUE_SELECTED_TAB	= "computedValue.selectedTab";																						//$NON-NLS-1$
 
 	/*
 	 * contains the tab folder index
 	 */
-	public static final int				TAB_FOLDER_SMOOTHING				= 0;
-	public static final int				TAB_FOLDER_BREAK_TIME				= 1;
-	public static final int				TAB_FOLDER_ELEVATION				= 2;
+	public static final int		TAB_FOLDER_SMOOTHING				= 0;
+	public static final int		TAB_FOLDER_BREAK_TIME				= 1;
+	public static final int		TAB_FOLDER_ELEVATION				= 2;
 
-	private static final float			SPEED_DIGIT_VALUE					= 10.0f;
+	private static final float	SPEED_DIGIT_VALUE					= 10.0f;
 
 	/**
 	 * 100 km/h is very high but it supports air planes which are slow on the ground
 	 */
-	public static final int				BREAK_MAX_SPEED_KM_H				= 1000;															// 100.0 km/h
+	public static final int		BREAK_MAX_SPEED_KM_H				= 1000;																																							// 100.0 km/h
 
-	private int							DEFAULT_DESCRIPTION_WIDTH;
-	private int							DEFAULT_V_DISTANCE_PARAGRAPH;
+	private int					DEFAULT_DESCRIPTION_WIDTH;
+	private int					DEFAULT_V_DISTANCE_PARAGRAPH;
 
-	private IPreferenceStore			_prefStore							= TourbookPlugin.getPrefStore();
+	private IPreferenceStore	_prefStore							= TourbookPlugin.getPrefStore();
 
-	private NumberFormat				_nf0								= NumberFormat.getNumberInstance();
-	private NumberFormat				_nf1								= NumberFormat.getNumberInstance();
+	private NumberFormat		_nf0								= NumberFormat.getNumberInstance();
+	private NumberFormat		_nf1								= NumberFormat.getNumberInstance();
 	{
 		_nf0.setMinimumFractionDigits(0);
 		_nf0.setMaximumFractionDigits(0);
@@ -110,7 +110,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 	 * contains the controls which are displayed in the first column, these controls are used to get
 	 * the maximum width and set the first column within the differenct section to the same width
 	 */
-	private final ArrayList<Control>	_firstColBreakTime					= new ArrayList<Control>();
+	private final ArrayList<Control>	_firstColBreakTime	= new ArrayList<>();
 
 	private PixelConverter				_pc;
 
@@ -171,7 +171,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 	private Composite createUI(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
+		GridDataFactory
+				.fillDefaults()//
 				.grab(true, true)
 				.applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(1).spacing(0, 15).applyTo(container);
@@ -187,7 +188,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			 * tab folder: computed values
 			 */
 			_tabFolder = new TabFolder(container, SWT.TOP);
-			GridDataFactory.fillDefaults()//
+			GridDataFactory
+					.fillDefaults()//
 					.grab(true, true)
 					.applyTo(_tabFolder);
 			{
@@ -230,11 +232,13 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(_smoothingScrolledContainer);
 		{
 			_smoothingScrolledContent = _tk.createComposite(_smoothingScrolledContainer);
-			GridDataFactory.fillDefaults()//
+			GridDataFactory
+					.fillDefaults()//
 					.grab(true, true)
 					.hint(DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
 					.applyTo(_smoothingScrolledContent);
-			GridLayoutFactory.swtDefaults() //
+			GridLayoutFactory
+					.swtDefaults() //
 					.extendedMargins(5, 5, 10, 5)
 					.numColumns(1)
 					.applyTo(_smoothingScrolledContent);
@@ -299,7 +303,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			{
 				// label: description
 				Label label = new Label(container, SWT.WRAP);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.indent(0, DEFAULT_V_DISTANCE_PARAGRAPH)
 						.hint(DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
 						.grab(true, false)
@@ -308,7 +313,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
 				// label: tip
 				final Composite tipContainer = new Composite(container, SWT.NONE);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.indent(0, DEFAULT_V_DISTANCE_PARAGRAPH)
 						.grab(true, false)
 						.applyTo(tipContainer);
@@ -317,7 +323,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 				{
 					// label: description
 					label = new Label(tipContainer, SWT.WRAP);
-					GridDataFactory.fillDefaults()//
+					GridDataFactory
+							.fillDefaults()//
 							.hint(DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
 							.grab(true, false)
 							.applyTo(label);
@@ -331,7 +338,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			{
 				// button: compute computed values
 				final Button btnComputValues = new Button(btnContainer, SWT.NONE);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.indent(0, DEFAULT_V_DISTANCE_PARAGRAPH)
 						.applyTo(btnComputValues);
 				btnComputValues.setText(Messages.compute_tourValueElevation_button_computeValues);
@@ -405,7 +413,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			 * label: description part II
 			 */
 			label = new Label(container, SWT.WRAP);
-			GridDataFactory.fillDefaults()//
+			GridDataFactory
+					.fillDefaults()//
 					.span(2, 1)
 					.indent(0, DEFAULT_V_DISTANCE_PARAGRAPH)
 					.hint(DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
@@ -416,7 +425,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			/*
 			 * hints
 			 */
-			FormTools.createBullets(container, //
+			FormTools.createBullets(
+					container, //
 					Messages.Compute_BreakTime_Label_Hints,
 					1,
 					2,
@@ -474,7 +484,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
 				// spinner: minimum speed
 				_spinnerBreakMinAvgSpeedAS = new Spinner(container, SWT.BORDER);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.applyTo(_spinnerBreakMinAvgSpeedAS);
 				_spinnerBreakMinAvgSpeedAS.setMinimum(0); // 0.0 km/h
 				_spinnerBreakMinAvgSpeedAS.setMaximum(BREAK_MAX_SPEED_KM_H); // 10.0 km/h
@@ -498,7 +509,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
 				// spinner: minimum speed
 				_spinnerBreakMinSliceSpeedAS = new Spinner(container, SWT.BORDER);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.applyTo(_spinnerBreakMinSliceSpeedAS);
 				_spinnerBreakMinSliceSpeedAS.setMinimum(0); // 0.0 km/h
 				_spinnerBreakMinSliceSpeedAS.setMaximum(BREAK_MAX_SPEED_KM_H); // 10.0 km/h
@@ -522,7 +534,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
 				// spinner: minimum slice time
 				_spinnerBreakMinSliceTimeAS = new Spinner(container, SWT.BORDER);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.applyTo(_spinnerBreakMinSliceTimeAS);
 				_spinnerBreakMinSliceTimeAS.setMinimum(0); // 0 sec
 				_spinnerBreakMinSliceTimeAS.setMaximum(10); // 10 sec
@@ -538,7 +551,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			 * label: description
 			 */
 			final Label label = new Label(container, SWT.WRAP);
-			GridDataFactory.fillDefaults()//
+			GridDataFactory
+					.fillDefaults()//
 					.span(3, 1)
 					.indent(0, DEFAULT_V_DISTANCE_PARAGRAPH)
 					.hint(DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
@@ -568,7 +582,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
 			// spinner: minimum speed
 			_spinnerBreakMinAvgSpeed = new Spinner(container, SWT.BORDER);
-			GridDataFactory.fillDefaults()//
+			GridDataFactory
+					.fillDefaults()//
 					.applyTo(_spinnerBreakMinAvgSpeed);
 			_spinnerBreakMinAvgSpeed.setMinimum(0); // 0.0 km/h
 			_spinnerBreakMinAvgSpeed.setMaximum(BREAK_MAX_SPEED_KM_H); // 10.0 km/h
@@ -584,7 +599,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			 * label: description
 			 */
 			label = new Label(container, SWT.WRAP);
-			GridDataFactory.fillDefaults()//
+			GridDataFactory
+					.fillDefaults()//
 					.span(3, 1)
 					.indent(0, DEFAULT_V_DISTANCE_PARAGRAPH)
 					.hint(DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
@@ -614,7 +630,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
 			// spinner: minimum speed
 			_spinnerBreakMinSliceSpeed = new Spinner(container, SWT.BORDER);
-			GridDataFactory.fillDefaults()//
+			GridDataFactory
+					.fillDefaults()//
 					.applyTo(_spinnerBreakMinSliceSpeed);
 			_spinnerBreakMinSliceSpeed.setMinimum(0); // 0.0 km/h
 			_spinnerBreakMinSliceSpeed.setMaximum(BREAK_MAX_SPEED_KM_H); // 10.0 km/h
@@ -630,7 +647,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			 * label: description
 			 */
 			label = new Label(container, SWT.WRAP);
-			GridDataFactory.fillDefaults()//
+			GridDataFactory
+					.fillDefaults()//
 					.span(3, 1)
 					.indent(0, DEFAULT_V_DISTANCE_PARAGRAPH)
 					.hint(DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
@@ -659,7 +677,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
 				// spinner: break minimum time
 				_spinnerBreakShortestTime = new Spinner(container, SWT.BORDER);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.applyTo(_spinnerBreakShortestTime);
 				_spinnerBreakShortestTime.setMinimum(1);
 				_spinnerBreakShortestTime.setMaximum(120); // 120 seconds
@@ -682,7 +701,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
 				// spinner: break minimum time
 				_spinnerBreakMaxDistance = new Spinner(container, SWT.BORDER);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.applyTo(_spinnerBreakMaxDistance);
 				_spinnerBreakMaxDistance.setMinimum(1);
 				_spinnerBreakMaxDistance.setMaximum(1000); // 1000 m/yards
@@ -692,7 +712,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 				// label: unit
 				_lblBreakDistanceUnit = new Label(container, SWT.NONE);
 				_lblBreakDistanceUnit.setText(net.tourbook.common.UI.UNIT_LABEL_DISTANCE_SMALL);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 //						.span(2, 1)
 						.align(SWT.FILL, SWT.CENTER)
 						.applyTo(_lblBreakDistanceUnit);
@@ -710,7 +731,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
 				// spinner: slice diff break time
 				_spinnerBreakSliceDiff = new Spinner(container, SWT.BORDER);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.applyTo(_spinnerBreakSliceDiff);
 				_spinnerBreakSliceDiff.setMinimum(0);
 				_spinnerBreakSliceDiff.setMaximum(60); // minutes
@@ -726,7 +748,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			 * label: description
 			 */
 			final Label label = new Label(container, SWT.WRAP);
-			GridDataFactory.fillDefaults()//
+			GridDataFactory
+					.fillDefaults()//
 					.span(3, 1)
 					.indent(0, DEFAULT_V_DISTANCE_PARAGRAPH)
 					.hint(DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
@@ -752,7 +775,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 					(IWorkbenchPreferenceContainer) getContainer(),
 					new PrefPagePeopleData(PrefPagePeople.PREF_DATA_SELECT_HR_ZONES, null));
 
-			GridDataFactory.fillDefaults()//
+			GridDataFactory
+					.fillDefaults()//
 					.grab(true, false)
 					.hint(DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
 					.applyTo(prefLink.getControl());
@@ -864,7 +888,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			@Override
 			public String getResultText() {
 
-				return NLS.bind(Messages.Compute_BreakTime_ForAllTour_Job_Result, //
+				return NLS.bind(
+						Messages.Compute_BreakTime_ForAllTour_Job_Result, //
 						new Object[] {
 								net.tourbook.common.UI.format_hh_mm_ss(oldBreakTime[0]),
 								net.tourbook.common.UI.format_hh_mm_ss(newBreakTime[0]), });
@@ -884,7 +909,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 					final int tourDrivingTime = (int) savedTourData.getTourDrivingTime();
 					newBreakTime[0] += tourRecordingTime - tourDrivingTime;
 
-					subTaskText = NLS.bind(Messages.Compute_BreakTime_ForAllTour_Job_SubTask,//
+					subTaskText = NLS.bind(
+							Messages.Compute_BreakTime_ForAllTour_Job_SubTask,//
 							new Object[] {
 									net.tourbook.common.UI.format_hh_mm_ss(oldBreakTime[0]),
 									net.tourbook.common.UI.format_hh_mm_ss(newBreakTime[0]), });
@@ -929,7 +955,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 			@Override
 			public String getResultText() {
 
-				return NLS.bind(Messages.Compute_TourValue_ElevationGain_ResultText, //
+				return NLS.bind(
+						Messages.Compute_TourValue_ElevationGain_ResultText, //
 						new Object[] {
 								dpTolerance,
 								_nf0.format((elevation[1] - elevation[0]) / UI.UNIT_VALUE_ALTITUDE),
@@ -947,7 +974,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 					// summarize new values
 					elevation[1] += savedTourData.getTourAltUp();
 
-					subTaskText = NLS.bind(Messages.compute_tourValueElevation_subTaskText,//
+					subTaskText = NLS.bind(
+							Messages.compute_tourValueElevation_subTaskText,//
 							new Object[] {
 									_nf0.format((elevation[1] - elevation[0]) / UI.UNIT_VALUE_ALTITUDE),
 									net.tourbook.common.UI.UNIT_LABEL_ALTITUDE //

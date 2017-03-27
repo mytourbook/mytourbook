@@ -51,6 +51,8 @@ public class ActionTourFilter extends ActionToolbarSlideoutAdv {
 
 		_slideoutTourFilter = new SlideoutTourFilter(ownerControl, _state);
 
+		_slideoutTourFilter.setVerticalPosition(true);
+
 		return _slideoutTourFilter;
 	}
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -43,7 +43,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 
 	public static final String	ID					= "net.tourbook.device.PrefPageFit";			//$NON-NLS-1$
 
-	private static final String	DEGREE_CELCIUS		= "\u0394 °C";									//$NON-NLS-1$
+	private static final String	DEGREE_CELCIUS		= "\u0394 \u00b0C";								//$NON-NLS-1$
 
 	private static final float	TEMPERATURE_DIGITS	= 10.0f;
 
@@ -126,8 +126,8 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 						.applyTo(_spinnerTemperatureAdjustment);
 				_spinnerTemperatureAdjustment.setDigits(1);
 				_spinnerTemperatureAdjustment.setPageIncrement(10);
-				_spinnerTemperatureAdjustment.setMinimum(-100); // - 10.0 °C
-				_spinnerTemperatureAdjustment.setMaximum(100); // +10.0 °C
+				_spinnerTemperatureAdjustment.setMinimum(-100); // - 10.0 ï¿½C
+				_spinnerTemperatureAdjustment.setMaximum(100); // +10.0 ï¿½C
 				_spinnerTemperatureAdjustment.addMouseWheelListener(new MouseWheelListener() {
 					@Override
 					public void mouseScrolled(final MouseEvent event) {
@@ -136,7 +136,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 				});
 			}
 
-			// label: °C
+			// label: ï¿½C
 			{
 				final Label label = new Label(group, SWT.NONE);
 				GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(label);

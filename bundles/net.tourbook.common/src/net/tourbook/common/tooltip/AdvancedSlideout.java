@@ -49,34 +49,40 @@ import org.eclipse.swt.widgets.ToolBar;
 public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 
 	// initialize with default values which are (should) never be used
-	private Rectangle				_slideoutParentBounds	= new Rectangle(0, 0, 50, 50);
+	private Rectangle			   _slideoutParentBounds   = new Rectangle(0, 0, 50, 50);
 
-	private final WaitTimer			_waitTimer				= new WaitTimer();
+	private final WaitTimer		   _waitTimer			   = new WaitTimer();
 
-	private boolean					_isWaitTimerStarted;
-	private boolean					_canOpenToolTip;
+	private boolean				   _isWaitTimerStarted;
+	private boolean				   _canOpenToolTip;
 
-	private boolean					_isShellDragged;
-	private int						_devXMousedown;
-	private int						_devYMousedown;
+	private boolean				   _isShellDragged;
+	private int					   _devXMousedown;
+	private int					   _devYMousedown;
 
-	private ActionCloseSlideout		_actionCloseSlideout;
-	private ActionSlideoutKeepOpen	_actionKeepSlideoutOpen;
-	private ActionPinSlideout		_actionPinSlideout;
+	private ActionCloseSlideout	   _actionCloseSlideout;
+	private ActionSlideoutKeepOpen _actionKeepSlideoutOpen;
+	private ActionPinSlideout	   _actionPinSlideout;
 
-	private boolean					_isToolbarPositionRight	= true;
+	private boolean				   _isToolbarPositionRight = true;
 
-	private String					_draggerText			= UI.EMPTY_STRING;
+	/**
+	 * When <code>true</code> then the slideout is displayed above the toolitem, otherwise below
+	 * which is the default.
+	 */
+	private boolean				   _isShowAboveToolItem;
+
+	private String				   _draggerText			   = UI.EMPTY_STRING;
 
 	/*
 	 * UI controls
 	 */
-	private ToolBar					_toolbarSlideoutActions;
+	private ToolBar				   _toolbarSlideoutActions;
 
-	private Label					_labelDragSlideout;
+	private Label				   _labelDragSlideout;
 
-	private Cursor					_cursorResize;
-	private Cursor					_cursorHand;
+	private Cursor				   _cursorResize;
+	private Cursor				   _cursorHand;
 
 	private class ActionCloseSlideout extends Action {
 
@@ -359,7 +365,11 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 
 		final Rectangle displayBounds = Display.getCurrent().getBounds();
 
-		if (devY + tipHeight > displayBounds.height) {
+		if (_isShowAboveToolItem) {
+
+			devY = _slideoutParentBounds.y - tipHeight;
+
+		} else if (devY + tipHeight > displayBounds.height) {
 
 			// slideout is below bottom, show it above the action button
 
@@ -522,6 +532,10 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 	 */
 	public void setIsToolbarPosition(final boolean isToolbarPositionRight) {
 		_isToolbarPositionRight = isToolbarPositionRight;
+	}
+
+	public void setVerticalPosition(final boolean isAboveToolItem) {
+		_isShowAboveToolItem = isAboveToolItem;
 	}
 
 }

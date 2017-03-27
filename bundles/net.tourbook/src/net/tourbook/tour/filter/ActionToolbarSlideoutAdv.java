@@ -42,29 +42,30 @@ import org.eclipse.swt.widgets.ToolItem;
  */
 public abstract class ActionToolbarSlideoutAdv extends ContributionItem implements IOpeningDialog {
 
-	private String				_dialogId			= getClass().getCanonicalName();
+	private String			 _dialogId			= getClass().getCanonicalName();
 
-	private ToolBar				_toolBar;
-	private ToolItem			_actionToolItem;
+	private ToolBar			 _toolBar;
+	private ToolItem		 _actionToolItem;
 
-	private AdvancedSlideout	_toolbarSlideout;
+	private AdvancedSlideout _toolbarSlideout;
 
 	/*
 	 * UI controls
 	 */
-	private Image				_imageEnabled;
-	private Image				_imageDisabled;
-
+	private Image			 _imageEnabled;
+	private Image			 _imageDisabled;
 	/**
 	 * When <code>true</code> then the action can be toggeled, default is <code>false</code>.
 	 */
-	protected boolean			isToggleAction;
+	protected boolean		 isToggleAction;
 
 	/**
 	 * This tooltip will be displayed when the action is not selected which causes that the slideout
 	 * is not displayed.
 	 */
-	protected String			notSelectedTooltip	= UI.EMPTY_STRING;
+	protected String		 notSelectedTooltip	= UI.EMPTY_STRING;
+
+	private Rectangle		 _toolItemBounds;
 
 	public ActionToolbarSlideoutAdv() {
 
@@ -220,14 +221,14 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
 
 			// tooltip is hidden, open it
 
-			final Rectangle itemBounds = _actionToolItem.getBounds();
+			_toolItemBounds = _actionToolItem.getBounds();
 
-			final Point itemDisplayPosition = _toolBar.toDisplay(itemBounds.x, itemBounds.y);
+			final Point itemDisplayPosition = _toolBar.toDisplay(_toolItemBounds.x, _toolItemBounds.y);
 
-			itemBounds.x = itemDisplayPosition.x;
-			itemBounds.y = itemDisplayPosition.y;
+			_toolItemBounds.x = itemDisplayPosition.x;
+			_toolItemBounds.y = itemDisplayPosition.y;
 
-			openSlideout(itemBounds, false);
+			openSlideout(_toolItemBounds, false);
 
 		} else {
 

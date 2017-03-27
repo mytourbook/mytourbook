@@ -155,8 +155,8 @@ public class UI {
 	public static final String			SYMBOL_QUESTION_MARK					= "?";												//$NON-NLS-1$
 	public static final char			SYMBOL_SEMICOLON						= ';';
 	public static final String			SYMBOL_STAR								= "*";												//$NON-NLS-1$
-	public static final String			SYMBOL_TEMPERATURE_CELCIUS				= "�C";												//$NON-NLS-1$
-	public static final String			SYMBOL_TEMPERATURE_FAHRENHEIT			= "�F";												//$NON-NLS-1$
+	public static final String			SYMBOL_TEMPERATURE_CELCIUS				= "\u00b0C";																								//$NON-NLS-1$
+	public static final String			SYMBOL_TEMPERATURE_FAHRENHEIT			= "\u00b0F";																								//$NON-NLS-1$
 	public static final String			SYMBOL_UNDERSCORE						= "_";												//$NON-NLS-1$
 	public static final String			SYMBOL_WIND_WITH_SPACE					= "W ";												//$NON-NLS-1$
 

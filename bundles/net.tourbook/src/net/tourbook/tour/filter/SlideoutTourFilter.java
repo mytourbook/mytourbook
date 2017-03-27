@@ -41,6 +41,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -96,12 +97,12 @@ import org.eclipse.swt.widgets.Widget;
  */
 public class SlideoutTourFilter extends AdvancedSlideout {
 
-	static final String				FIELD_NO				= "fieldNo";																																																																																					//$NON-NLS-1$
+	static final String				FIELD_NO			 = "fieldNo";					 					 					 					 					 					 					 					 					 					 					 					 					 					 					 					 					 					//$NON-NLS-1$
 
-	private static final String		STATE_IS_LIVE_UPDATE	= "STATE_IS_LIVE_UPDATE";																																		//$NON-NLS-1$
-	private static final String		STATE_SASH_WIDTH		= "STATE_SASH_WIDTH";																																																			//$NON-NLS-1$
+	private static final String		STATE_IS_LIVE_UPDATE = "STATE_IS_LIVE_UPDATE";		 		 		 		 		 		 		 		 		 		 		 		 		 		 		 		 		 		//$NON-NLS-1$
+	private static final String		STATE_SASH_WIDTH	 = "STATE_SASH_WIDTH";			 			 			 			 			 			 			 			 			 			 			 			 			 			 			 			 			 			//$NON-NLS-1$
 
-	private final IPreferenceStore	_prefStore				= TourbookPlugin.getPrefStore();
+	private final IPreferenceStore	_prefStore			 = TourbookPlugin.getPrefStore();
 	private final IDialogSettings	_state;
 
 	private ModifyListener			_defaultModifyListener;
@@ -149,41 +150,41 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		};
 	}
 
-	private PixelConverter						_pc;
+	private PixelConverter					   _pc;
 
-	private TableViewer							_profileViewer;
+	private TableViewer						   _profileViewer;
 
-	private final ArrayList<TourFilterProfile>	_filterProfiles			= TourFilterManager.getProfiles();
-	private TourFilterProfile					_selectedProfile;
+	private final ArrayList<TourFilterProfile> _filterProfiles		= TourFilterManager.getProfiles();
+	private TourFilterProfile				   _selectedProfile;
 
-	private boolean								_isLiveUpdate;
+	private boolean							   _isLiveUpdate;
 
 	/**
 	 * Contains the controls which are displayed in the first column, these controls are used to get
 	 * the maximum width and set the first column within the differenct section to the same width.
 	 */
-	private final ArrayList<Control>			_firstColumnControls	= new ArrayList<Control>();
+	private final ArrayList<Control>		   _firstColumnControls	= new ArrayList<Control>();
 
 	/*
 	 * UI controls
 	 */
-	private Composite							_shellContainer;
-	private Composite							_filterScrolled_Content;
-	private Composite							_filterOuterContainer;
-	private Composite							_containerFilter;
-	private Composite							_containerProfiles;
+	private Composite						   _filterScrolled_Content;
+	private Composite						   _filterOuterContainer;
+	private Composite						   _containerFilter;
+	private Composite						   _containerProfiles;
 
-	private ScrolledComposite					_filterScrolled_Container;
+	private ScrolledComposite				   _filterScrolled_Container;
 
-	private Button								_btnAddProperty;
-	private Button								_btnDeleteProfile;
-	private Button								_chkLiveUpdate;
+	private Button							   _btnAddProperty;
+	private Button							   _btnCopyProfile;
+	private Button							   _btnDeleteProfile;
+	private Button							   _chkLiveUpdate;
 
-	private Label								_lblProfileName;
+	private Label							   _lblProfileName;
 
-	private Text								_txtProfileName;
+	private Text							   _txtProfileName;
 
-	private SashLeftFixedForm					_sashForm;
+	private SashLeftFixedForm				   _sashForm;
 
 	private class FilterProfileComparator extends ViewerComparator {
 
@@ -224,7 +225,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
 	public SlideoutTourFilter(final Control ownerControl, final IDialogSettings state) {
 
-		super(ownerControl, state, new int[] { 800, 300, 800, 300 });
+		super(ownerControl, state, new int[] { 900, 300, 900, 300 });
 
 		_state = state;
 
@@ -261,6 +262,9 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		// update UI
 		createUI_410_FilterProperties();
 		updateUI_Properties();
+
+		// update number of properties
+		_profileViewer.update(_selectedProfile, null);
 
 		fireModifyEvent();
 	}
@@ -339,48 +343,50 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
 	private void createUI(final Composite parent) {
 
-		_shellContainer = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(_shellContainer);
-		GridLayoutFactory.fillDefaults().applyTo(_shellContainer);
+		final Composite shellContainer = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(shellContainer);
+		GridLayoutFactory.fillDefaults().applyTo(shellContainer);
 //		shellContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
+			createUI_100_Sash(shellContainer);
+		}
+	}
+
+	private void createUI_100_Sash(final Composite parent) {
+
+		final Composite containerSash = new Composite(parent, SWT.NONE);
+		GridDataFactory
+				.fillDefaults()//
+				.grab(true, true)
+				.applyTo(containerSash);
+		GridLayoutFactory.swtDefaults().applyTo(containerSash);
+		{
+			// left part
+			_containerProfiles = createUI_200_Profiles(containerSash);
+
+			// sash
+			final Sash sash = new Sash(containerSash, SWT.VERTICAL);
 			{
+				UI.addSashColorHandler(sash);
 
+				// save sash width
+				sash.addMouseListener(new MouseAdapter() {
+					@Override
+					public void mouseUp(final MouseEvent e) {
+						_state.put(STATE_SASH_WIDTH, _containerProfiles.getSize().x);
+					}
+				});
 			}
-			final Composite containerSash = new Composite(_shellContainer, SWT.NONE);
-			GridDataFactory
-					.fillDefaults()//
-					.grab(true, true)
-					.applyTo(containerSash);
-			GridLayoutFactory.swtDefaults().applyTo(containerSash);
-			{
-				// left part
-				_containerProfiles = createUI_200_Profiles(containerSash);
 
-				// sash
-				final Sash sash = new Sash(containerSash, SWT.VERTICAL);
-				{
-					UI.addSashColorHandler(sash);
+			// right part
+			_containerFilter = createUI_300_Filter(containerSash);
 
-					// save sash width
-					sash.addMouseListener(new MouseAdapter() {
-						@Override
-						public void mouseUp(final MouseEvent e) {
-							_state.put(STATE_SASH_WIDTH, _containerProfiles.getSize().x);
-						}
-					});
-				}
-
-				// right part
-				_containerFilter = createUI_300_Filter(containerSash);
-
-				_sashForm = new SashLeftFixedForm(//
-						containerSash,
-						_containerProfiles,
-						sash,
-						_containerFilter,
-						30);
-			}
+			_sashForm = new SashLeftFixedForm(//
+					containerSash,
+					_containerProfiles,
+					sash,
+					_containerFilter,
+					30);
 		}
 	}
 
@@ -389,7 +395,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory
 				.fillDefaults()//
-				.hint(_pc.convertWidthInCharsToPixels(30), _pc.convertHeightInCharsToPixels(5))
+//				.hint(_pc.convertWidthInCharsToPixels(30), _pc.convertHeightInCharsToPixels(5))
 				.applyTo(container);
 		GridLayoutFactory
 				.fillDefaults()//
@@ -417,6 +423,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		final Composite layoutContainer = new Composite(parent, SWT.NONE);
 		GridDataFactory
 				.fillDefaults()//
+//				.hint(_pc.convertWidthInCharsToPixels(230), SWT.DEFAULT)
 				.grab(true, true)
 				.applyTo(layoutContainer);
 
@@ -441,21 +448,42 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		TableViewerColumn tvc;
 		TableColumn tc;
 
-		// Column: Profile name
-		tvc = new TableViewerColumn(_profileViewer, SWT.LEAD);
-		tc = tvc.getColumn();
-		tc.setText(Messages.Slideout_TourFilter_Column_ProfileName);
-//		tc.setResizable(false);
-		tvc.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
+		{
+			// Column: Profile name
 
-				final TourFilterProfile profile = (TourFilterProfile) cell.getElement();
+			tvc = new TableViewerColumn(_profileViewer, SWT.LEAD);
+			tc = tvc.getColumn();
+			tc.setText(Messages.Slideout_TourFilter_Column_ProfileName);
+			tvc.setLabelProvider(new CellLabelProvider() {
+				@Override
+				public void update(final ViewerCell cell) {
 
-				cell.setText(profile.name);
-			}
-		});
-		tableLayout.setColumnData(tc, new ColumnWeightData(1, false));
+					final TourFilterProfile profile = (TourFilterProfile) cell.getElement();
+
+					cell.setText(profile.name);
+				}
+			});
+			tableLayout.setColumnData(tc, new ColumnWeightData(1, false));
+		}
+
+		{
+			// Column: Number of properties
+
+			tvc = new TableViewerColumn(_profileViewer, SWT.TRAIL);
+			tc = tvc.getColumn();
+			tc.setText(Messages.Slideout_TourFilter_Column_Properties);
+			tc.setText(Messages.Slideout_TourFilter_Column_Properties_Tooltip);
+			tvc.setLabelProvider(new CellLabelProvider() {
+				@Override
+				public void update(final ViewerCell cell) {
+
+					final TourFilterProfile profile = (TourFilterProfile) cell.getElement();
+
+					cell.setText(Integer.toString(profile.filterProperties.size()));
+				}
+			});
+			tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(6), false));
+		}
 
 		/*
 		 * create table viewer
@@ -498,15 +526,16 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
 	private void createUI_220_ProfileActions(final Composite parent) {
 
-		final Composite containerActions = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(containerActions);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerActions);
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 		{
 			{
 				/*
 				 * Button: Add
 				 */
-				final Button button = new Button(containerActions, SWT.PUSH);
+				final Button button = new Button(container, SWT.PUSH);
 				button.setText(Messages.Slideout_TourFilter_Action_AddProfile);
 				button.setToolTipText(Messages.Slideout_TourFilter_Action_AddProfile_Tooltip);
 				button.addSelectionListener(new SelectionAdapter() {
@@ -515,16 +544,32 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 						onProfile_Add();
 					}
 				});
-				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(button);
 
 				// set button default width
 				UI.setButtonLayoutData(button);
 			}
 			{
 				/*
+				 * Button: Copy
+				 */
+				_btnCopyProfile = new Button(container, SWT.PUSH);
+				_btnCopyProfile.setText(Messages.Slideout_TourFilter_Action_CopyProfile);
+				_btnCopyProfile.setToolTipText(Messages.Slideout_TourFilter_Action_CopyProfile_Tooltip);
+				_btnCopyProfile.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						onProfile_Copy();
+					}
+				});
+
+				// set button default width
+				UI.setButtonLayoutData(_btnCopyProfile);
+			}
+			{
+				/*
 				 * Button: Delete
 				 */
-				_btnDeleteProfile = new Button(containerActions, SWT.PUSH);
+				_btnDeleteProfile = new Button(container, SWT.PUSH);
 				_btnDeleteProfile.setText(Messages.Slideout_TourFilter_Action_DeleteProfile);
 				_btnDeleteProfile.setToolTipText(Messages.Slideout_TourFilter_Action_DeleteProfile_Tooltip);
 				_btnDeleteProfile.addSelectionListener(new SelectionAdapter() {
@@ -533,7 +578,6 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 						onProfile_Delete();
 					}
 				});
-				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_btnDeleteProfile);
 
 				// set button default width
 				UI.setButtonLayoutData(_btnDeleteProfile);
@@ -554,7 +598,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 				.extendedMargins(3, 0, 0, 0)
 				.applyTo(container);
 		{
-			createUI_310_FilterInfo(container);
+			createUI_310_FilterName(container);
 			createUI_400_FilterOuterContainer(container);
 			createUI_500_FilterActions(container);
 		}
@@ -562,7 +606,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		return container;
 	}
 
-	private void createUI_310_FilterInfo(final Composite parent) {
+	private void createUI_310_FilterName(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory
@@ -690,12 +734,11 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
 			GridLayoutFactory
 					.fillDefaults()//
-//				.spacing(5, 2)
 					.numColumns(5)
 					.applyTo(_filterScrolled_Content);
 		}
 
-//		scrolledContentContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+//		_filterScrolled_Content.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_CYAN));
 
 		_filterScrolled_Content.setRedraw(false);
 		{
@@ -752,7 +795,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 					final Composite fieldContainer = new Composite(_filterScrolled_Content, SWT.NONE);
 					GridDataFactory
 							.fillDefaults()//
-							.grab(true, false)
+//							.grab(true, false)
 							.applyTo(fieldContainer);
 					GridLayoutFactory.fillDefaults().numColumns(1).applyTo(fieldContainer);
 //					fieldDetailOuterContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
@@ -776,10 +819,10 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		}
 	}
 
-	private void createUI_418_PropertyActions(	final Composite filterContainer,
-												final TourFilterProperty filterProperty,
-												final int propertyIndex,
-												final int numProperties) {
+	private void createUI_418_PropertyActions(final Composite filterContainer,
+											  final TourFilterProperty filterProperty,
+											  final int propertyIndex,
+											  final int numProperties) {
 		boolean isMoveUp = false;
 		boolean isMoveDown = false;
 
@@ -810,6 +853,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		final ToolBar toolbar = new ToolBar(filterContainer, SWT.FLAT);
 		GridDataFactory
 				.fillDefaults()//
+				.grab(true, false)
 				.align(SWT.END, SWT.CENTER)
 				.applyTo(toolbar);
 
@@ -836,7 +880,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		final Composite fieldContainer = filterProp.fieldDetailContainer;
 		GridDataFactory
 				.fillDefaults()//
-				.grab(true, false)
+//				.grab(true, false)
 				.align(SWT.FILL, SWT.CENTER)
 				.applyTo(fieldContainer);
 //		fieldContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
@@ -979,7 +1023,6 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
 			{
 				/*
@@ -995,7 +1038,6 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 						onProperty_Add();
 					}
 				});
-				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_btnAddProperty);
 
 				// set button default width
 				UI.setButtonLayoutData(_btnAddProperty);
@@ -1013,11 +1055,16 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 						doLiveUpdate();
 					}
 				});
+
 				GridDataFactory
 						.fillDefaults()//
 						.grab(true, false)
 						.align(SWT.END, SWT.CENTER)
 						.applyTo(_chkLiveUpdate);
+
+//				final GridData gd = (GridData) buttonApply.getLayoutData();
+//				gd.grabExcessHorizontalSpace = true;
+//				gd.horizontalAlignment = SWT.END;
 			}
 			{
 				/*
@@ -1031,11 +1078,6 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 						doApply();
 					}
 				});
-				GridDataFactory
-						.fillDefaults()//
-//						.grab(true, false)
-						.align(SWT.FILL, SWT.CENTER)
-						.applyTo(buttonApply);
 
 				// set button default width
 				UI.setButtonLayoutData(buttonApply);
@@ -1172,11 +1214,11 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 	 * @param isShowUnitLabel
 	 * @return
 	 */
-	private int createUI_Field_Number_Integer(	final Composite parent,
-												final TourFilterProperty filterProperty,
-												final TourFilterFieldConfig fieldConfig,
-												final int fieldNo,
-												final boolean isShowUnitLabel) {
+	private int createUI_Field_Number_Integer(final Composite parent,
+											  final TourFilterProperty filterProperty,
+											  final TourFilterFieldConfig fieldConfig,
+											  final int fieldNo,
+											  final boolean isShowUnitLabel) {
 
 		int numColumns = 0;
 
@@ -1226,7 +1268,10 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 				numColumns++;
 
 				final Label label = new Label(parent, SWT.NONE);
-				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+				GridDataFactory
+						.fillDefaults()//
+						.align(SWT.BEGINNING, SWT.CENTER)
+						.applyTo(label);
 				label.setText(fieldConfig.unitLabel);
 			}
 		}
@@ -1234,9 +1279,9 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		return numColumns;
 	}
 
-	private int createUI_Field_SeasonDay(	final Composite parent,
-											final TourFilterProperty filterProperty,
-											final int fieldNo) {
+	private int createUI_Field_SeasonDay(final Composite parent,
+										 final TourFilterProperty filterProperty,
+										 final int fieldNo) {
 
 		final Spinner spinnerDay = new Spinner(parent, SWT.BORDER);
 
@@ -1281,9 +1326,9 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		return 1;
 	}
 
-	private int createUI_Field_SeasonMonth(	final Composite parent,
-											final TourFilterProperty filterProperty,
-											final int fieldNo) {
+	private int createUI_Field_SeasonMonth(final Composite parent,
+										   final TourFilterProperty filterProperty,
+										   final int fieldNo) {
 
 		final Combo comboMonth = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
 
@@ -1308,6 +1353,12 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		});
 
 		for (final String month : DateFormatSymbols.getInstance().getMonths()) {
+
+			// 13 months are returned !!!
+			if (month.length() == 0) {
+				continue;
+			}
+
 			comboMonth.add(month);
 		}
 
@@ -1403,6 +1454,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		final boolean isProfileSelected = _selectedProfile != null;
 
 		_btnAddProperty.setEnabled(isProfileSelected);
+		_btnCopyProfile.setEnabled(isProfileSelected);
 		_btnDeleteProfile.setEnabled(isProfileSelected);
 
 		_lblProfileName.setEnabled(isProfileSelected);
@@ -1715,6 +1767,16 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		_txtProfileName.setFocus();
 	}
 
+	private void onProfile_Copy() {
+		// TODO Auto-generated method stub
+
+		if (_selectedProfile == null) {
+			// ignore
+			return;
+		}
+
+	}
+
 	private void onProfile_Delete() {
 
 		if (_selectedProfile == null) {
@@ -1841,6 +1903,9 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		createUI_410_FilterProperties();
 		updateUI_Properties();
 
+		// update number of properties
+		_profileViewer.update(_selectedProfile, null);
+
 		// set focus to the last created property
 		final TourFilterProperty lastProperty = filterProperties.get(filterProperties.size() - 1);
 		lastProperty.checkboxIsPropertyEnabled.setFocus();
@@ -1962,7 +2027,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		_chkLiveUpdate.setSelection(_isLiveUpdate);
 
 		// restore width for the profile list
-		final int leftPartWidth = Util.getStateInt(_state, STATE_SASH_WIDTH, _pc.convertWidthInCharsToPixels(35));
+		final int leftPartWidth = Util.getStateInt(_state, STATE_SASH_WIDTH, _pc.convertWidthInCharsToPixels(50));
 		_sashForm.setViewerWidth(leftPartWidth);
 	}
 
