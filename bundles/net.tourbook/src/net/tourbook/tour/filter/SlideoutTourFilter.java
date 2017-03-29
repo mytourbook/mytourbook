@@ -426,7 +426,8 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		table.setLayout(new TableLayout());
 
 		// !!! this prevents that the horizontal scrollbar is displayed, but is not always working :-(
-		table.setHeaderVisible(false);
+//		table.setHeaderVisible(false);
+		table.setHeaderVisible(true);
 
 		_profileViewer = new TableViewer(table);
 
@@ -460,7 +461,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 			tvc = new TableViewerColumn(_profileViewer, SWT.TRAIL);
 			tc = tvc.getColumn();
 			tc.setText(Messages.Slideout_TourFilter_Column_Properties);
-			tc.setText(Messages.Slideout_TourFilter_Column_Properties_Tooltip);
+			tc.setToolTipText(Messages.Slideout_TourFilter_Column_Properties_Tooltip);
 			tvc.setLabelProvider(new CellLabelProvider() {
 				@Override
 				public void update(final ViewerCell cell) {

@@ -1,8 +1,10 @@
-Version 17.3                                              ?. March 2017
+Version 17.4                                              ?. April 2017
 
 
 New 	
 ===
+
+* Tour Filter
 
 * Statistics
 

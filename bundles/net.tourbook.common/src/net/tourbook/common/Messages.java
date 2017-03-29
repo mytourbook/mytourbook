@@ -22,7 +22,6 @@ public class Messages extends NLS {
 	private static final String	BUNDLE_NAME	= "net.tourbook.common.messages";												//$NON-NLS-1$
 
 	public static String		App_Action_Close_Tooltip;
-	public static String		App_Action_DragSlideout_ToolTip;
 	public static String		App_Action_New_WithConfirm;
 	public static String		App_Action_Remove_NoConfirm;
 	public static String		App_Action_Rename_WithConfirm;
@@ -254,6 +253,8 @@ public class Messages extends NLS {
 	public static String		legend_color_lighten_color;
 
 	public static String		rgv_vertex_class_cast_exception;
+
+	public static String Slideout_Dialog_Action_DragSlideout_ToolTip;
 
 	public static String		Slideout_Dialog_Action_KeepSlideoutOpen_Tooltip;
 	public static String		Slideout_Dialog_Action_PinSlideoutLocation_Tooltip;

@@ -271,7 +271,7 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 //				.indent(3, 0)
 				.applyTo(_labelDragSlideout);
 		_labelDragSlideout.setText(_draggerText);
-		_labelDragSlideout.setToolTipText(Messages.App_Action_DragSlideout_ToolTip);
+		_labelDragSlideout.setToolTipText(Messages.Slideout_Dialog_Action_DragSlideout_ToolTip);
 		_labelDragSlideout.setFont(JFaceResources.getBannerFont());
 //		_labelDragSlideout.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
 
