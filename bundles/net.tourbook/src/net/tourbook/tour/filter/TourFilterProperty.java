@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 import java.time.MonthDay;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.util.StatusUtil;
 
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
@@ -28,7 +29,7 @@ import org.eclipse.swt.widgets.DateTime;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 
-public class TourFilterProperty {
+public class TourFilterProperty implements Cloneable {
 
 	static final LocalDateTime	DEFAULT_DATE_1		= LocalDateTime.now().withDayOfMonth(1).withMonth(1);
 	static final LocalDateTime	DEFAULT_DATE_2		= LocalDateTime.now();
@@ -40,7 +41,8 @@ public class TourFilterProperty {
 	 */
 	boolean						isEnabled			= true;
 
-	TourFilterFieldConfig		fieldConfig			= TourFilterManager.getFieldConfig(TourFilterFieldId.TIME_TOUR_DATE);
+	TourFilterFieldConfig		fieldConfig			= TourFilterManager.getFieldConfig(
+			TourFilterFieldId.TIME_TOUR_DATE);
 
 	/**
 	 * Selected operator for the property field
@@ -97,10 +99,38 @@ public class TourFilterProperty {
 
 	public TourFilterProperty() {}
 
+	@Override
+	protected TourFilterProperty clone() throws CloneNotSupportedException {
+
+		TourFilterProperty clonedObject = null;
+
+		try {
+
+			clonedObject = (TourFilterProperty) super.clone();
+
+			/*
+			 * Reset UI controls
+			 */
+			disposeFieldInnerContainer();
+
+			clonedObject.checkboxIsPropertyEnabled = null;
+			clonedObject.comboFieldName = null;
+			clonedObject.comboFieldOperator = null;
+
+		} catch (final CloneNotSupportedException e) {
+			StatusUtil.log(e);
+		}
+
+		return clonedObject;
+	}
+
 	void disposeFieldInnerContainer() {
 
-		for (final Control control : fieldDetailContainer.getChildren()) {
-			control.dispose();
+		if (fieldDetailContainer != null) {
+
+			for (final Control control : fieldDetailContainer.getChildren()) {
+				control.dispose();
+			}
 		}
 
 		uiDateTime1 = null;

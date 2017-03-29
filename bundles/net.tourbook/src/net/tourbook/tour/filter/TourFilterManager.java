@@ -345,12 +345,14 @@ public class TourFilterManager {
 
 		allConfigs.add(TourFilterFieldConfig//
 				.name(Messages.Tour_Filter_Field_Altitude_Ascent)
+				.unitLabel(UI.UNIT_LABEL_ALTITUDE)
 				.fieldId(TourFilterFieldId.ALTITUDE_UP)
 				.pageIncrement(100)
 				.fieldValueProvider(_fieldValueProvider_Altitude));
 
 		allConfigs.add(TourFilterFieldConfig//
 				.name(Messages.Tour_Filter_Field_Altitude_Descent)
+				.unitLabel(UI.UNIT_LABEL_ALTITUDE)
 				.fieldId(TourFilterFieldId.ALTITUDE_DOWN)
 				.pageIncrement(100)
 				.minValue(Integer.MIN_VALUE)
@@ -358,6 +360,7 @@ public class TourFilterManager {
 
 		allConfigs.add(TourFilterFieldConfig//
 				.name(Messages.Tour_Filter_Field_Altitude_Max)
+				.unitLabel(UI.UNIT_LABEL_ALTITUDE)
 				.fieldId(TourFilterFieldId.ALTITUDE_MAX)
 				.pageIncrement(100)
 				.fieldValueProvider(_fieldValueProvider_Altitude));
@@ -418,7 +421,8 @@ public class TourFilterManager {
 				.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
 				.pageIncrement(100)
 				.numDigits(1)
-				.fieldValueProvider(_fieldValueProvider_Distance));
+				.fieldValueProvider(_fieldValueProvider_Distance)
+				.unitLabel(UI.UNIT_LABEL_DISTANCE));
 	}
 
 	private static void createConfig_Power(final ArrayList<TourFilterFieldConfig> allConfigs) {
@@ -1647,15 +1651,16 @@ public class TourFilterManager {
 
 	public static void updateUnits() {
 
-		TourFilterFieldConfig fieldConfig;
-
 		// set label km or mi
-		fieldConfig = getFieldConfig(TourFilterFieldId.MOTION_DISTANCE);
-		fieldConfig.unitLabel = UI.UNIT_LABEL_DISTANCE;
+		getFieldConfig(TourFilterFieldId.MOTION_DISTANCE).unitLabel(UI.UNIT_LABEL_DISTANCE);
 
 		// set label celcius or fahrenheit
-		fieldConfig = getFieldConfig(TourFilterFieldId.WEATHER_TEMPERATURE);
-		fieldConfig.unitLabel = UI.UNIT_LABEL_TEMPERATURE;
+		getFieldConfig(TourFilterFieldId.WEATHER_TEMPERATURE).unitLabel(UI.UNIT_LABEL_TEMPERATURE);
+
+		// set km or mi
+		getFieldConfig(TourFilterFieldId.ALTITUDE_UP).unitLabel(UI.UNIT_LABEL_ALTITUDE);
+		getFieldConfig(TourFilterFieldId.ALTITUDE_DOWN).unitLabel(UI.UNIT_LABEL_ALTITUDE);
+		getFieldConfig(TourFilterFieldId.ALTITUDE_MAX).unitLabel(UI.UNIT_LABEL_ALTITUDE);
 	}
 
 	/**

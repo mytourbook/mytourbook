@@ -19,7 +19,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-	private static final String	BUNDLE_NAME	= "net.tourbook.messages";									  																														//$NON-NLS-1$
+	private static final String	BUNDLE_NAME	= "net.tourbook.messages";																													  																														//$NON-NLS-1$
 
 	public static String		Action_Cadence_Set;
 	public static String		Action_Cadence_Set_Rpm;
@@ -1568,7 +1568,8 @@ public class Messages extends NLS {
 
 	public static String		Slideout_TourEditor_Label_LatLonDigits;
 	public static String		Slideout_TourEditor_Label_LatLonDigits_Tooltip;
-
+	public static String		Slideout_TourFilter_Action_ActivateAll;
+	public static String		Slideout_TourFilter_Action_ActivateAll_Tooltip;
 	public static String		Slideout_TourFilter_Action_AddProfile;
 	public static String		Slideout_TourFilter_Action_AddProfile_Tooltip;
 	public static String		Slideout_TourFilter_Action_AddProperty;
@@ -1576,6 +1577,8 @@ public class Messages extends NLS {
 	public static String		Slideout_TourFilter_Action_Apply;
 	public static String		Slideout_TourFilter_Action_CopyProfile;
 	public static String		Slideout_TourFilter_Action_CopyProfile_Tooltip;
+	public static String		Slideout_TourFilter_Action_DeactivateAll;
+	public static String		Slideout_TourFilter_Action_DeactivateAll_Tooltip;
 	public static String		Slideout_TourFilter_Action_DeleteProfile;
 	public static String		Slideout_TourFilter_Action_DeleteProfile_Tooltip;
 	public static String		Slideout_TourFilter_Action_DeleteProperty_Tooltip;

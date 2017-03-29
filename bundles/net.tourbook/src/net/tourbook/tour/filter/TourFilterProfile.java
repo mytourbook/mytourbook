@@ -18,8 +18,10 @@ package net.tourbook.tour.filter;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
+import net.tourbook.common.UI;
+import net.tourbook.common.util.StatusUtil;
 
-public class TourFilterProfile {
+public class TourFilterProfile implements Cloneable {
 
 	private static int				_idCounter			= 0;
 
@@ -35,6 +37,33 @@ public class TourFilterProfile {
 	public TourFilterProfile() {
 
 		profileId = ++_idCounter;
+	}
+
+	@Override
+	protected TourFilterProfile clone() {
+
+		TourFilterProfile clonedObject = null;
+
+		try {
+
+			clonedObject = (TourFilterProfile) super.clone();
+
+			clonedObject.profileId = ++_idCounter;
+
+			// create a unique name
+			clonedObject.name = name + UI.SPACE + Integer.toString(clonedObject.profileId);
+
+			clonedObject.filterProperties = new ArrayList<>();
+
+			for (final TourFilterProperty tourFilterProperty : filterProperties) {
+				clonedObject.filterProperties.add(tourFilterProperty.clone());
+			}
+
+		} catch (final CloneNotSupportedException e) {
+			StatusUtil.log(e);
+		}
+
+		return clonedObject;
 	}
 
 	@Override
