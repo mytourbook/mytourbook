@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -139,91 +139,78 @@ public class TourDatabase {
 
 	private static final int						MAX_TRIES_TO_PING_SERVER					= 10;
 
+// SET_FORMATTING_OFF
+	
 	/**
 	 * <b> !!! Table names are set to uppercase otherwise conn.getMetaData().getColumns() would not
 	 * work !!! </b>
 	 */
-	public static final String						TABLE_SCHEMA								= "USER";									//$NON-NLS-1$
-
-	private static final String						TABLE_DB_VERSION							= "DBVERSION";								//$NON-NLS-1$
-	//
-//	public static final String						TABLE_SHARED_MARKER							= "SHAREDMARKER";							//$NON-NLS-1$
-	public static final String						TABLE_TOUR_BIKE								= "TOURBIKE";								//$NON-NLS-1$
-	public static final String						TABLE_TOUR_COMPARED							= "TOURCOMPARED";							//$NON-NLS-1$
-	public static final String						TABLE_TOUR_DATA								= "TOURDATA";								//$NON-NLS-1$
-	public static final String						TABLE_TOUR_MARKER							= "TOURMARKER";							//$NON-NLS-1$
-	public static final String						TABLE_TOUR_PERSON							= "TOURPERSON";							//$NON-NLS-1$
-	public static final String						TABLE_TOUR_PERSON_HRZONE					= "TOURPERSONHRZONE";						//$NON-NLS-1$
-	public static final String						TABLE_TOUR_PHOTO							= "TOURPHOTO";								//$NON-NLS-1$
-	public static final String						TABLE_TOUR_REFERENCE						= "TOURREFERENCE";							//$NON-NLS-1$
-//	public static final String						TABLE_TOUR_SIGN								= "TOURSIGN";								//$NON-NLS-1$
-//	public static final String						TABLE_TOUR_SIGN_CATEGORY					= "TOURSIGNCATEGORY";						//$NON-NLS-1$
-	public static final String						TABLE_TOUR_TAG								= "TOURTAG";								//$NON-NLS-1$
-	public static final String						TABLE_TOUR_TAG_CATEGORY						= "TOURTAGCATEGORY";						//$NON-NLS-1$
-	public static final String						TABLE_TOUR_TYPE								= "TOURTYPE";								//$NON-NLS-1$
-	public static final String						TABLE_TOUR_WAYPOINT							= "TOURWAYPOINT";							//$NON-NLS-1$
-	//
-//	public static final String						JOINTABLE__TOURDATA__SHAREDMARKER			= TABLE_TOUR_DATA
-//																										+ "_" + TABLE_SHARED_MARKER;		//$NON-NLS-1$
-	public static final String						JOINTABLE__TOURDATA__TOURTAG				= TABLE_TOUR_DATA
-																										+ "_" + TABLE_TOUR_TAG;			//$NON-NLS-1$
-	public static final String						JOINTABLE__TOURTAGCATEGORY_TOURTAG			= TABLE_TOUR_TAG_CATEGORY
-																										+ "_" + TABLE_TOUR_TAG;			//$NON-NLS-1$
-	public static final String						JOINTABLE__TOURTAGCATEGORY_TOURTAGCATEGORY	= TABLE_TOUR_TAG_CATEGORY
-																										+ "_" + TABLE_TOUR_TAG_CATEGORY;	//$NON-NLS-1$
+	public static final String						TABLE_SCHEMA								= "USER";														//$NON-NLS-1$
+                                                                                                                                                    
+	private static final String						TABLE_DB_VERSION							= "DBVERSION";													//$NON-NLS-1$
+	                                                                                                                                                
+//	public static final String						TABLE_SHARED_MARKER							= "SHAREDMARKER";												//$NON-NLS-1$
+	public static final String						TABLE_TOUR_BIKE								= "TOURBIKE";													//$NON-NLS-1$
+	public static final String						TABLE_TOUR_COMPARED							= "TOURCOMPARED";												//$NON-NLS-1$
+	public static final String						TABLE_TOUR_DATA								= "TOURDATA";													//$NON-NLS-1$
+	public static final String						TABLE_TOUR_MARKER							= "TOURMARKER";													//$NON-NLS-1$
+	public static final String						TABLE_TOUR_PERSON							= "TOURPERSON";													//$NON-NLS-1$
+	public static final String						TABLE_TOUR_PERSON_HRZONE					= "TOURPERSONHRZONE";											//$NON-NLS-1$
+	public static final String						TABLE_TOUR_PHOTO							= "TOURPHOTO";													//$NON-NLS-1$
+	public static final String						TABLE_TOUR_REFERENCE						= "TOURREFERENCE";												//$NON-NLS-1$
+//	public static final String						TABLE_TOUR_SIGN								= "TOURSIGN";													//$NON-NLS-1$
+//	public static final String						TABLE_TOUR_SIGN_CATEGORY					= "TOURSIGNCATEGORY";											//$NON-NLS-1$
+	public static final String						TABLE_TOUR_TAG								= "TOURTAG";													//$NON-NLS-1$
+	public static final String						TABLE_TOUR_TAG_CATEGORY						= "TOURTAGCATEGORY";											//$NON-NLS-1$
+	public static final String						TABLE_TOUR_TYPE								= "TOURTYPE";													//$NON-NLS-1$
+	public static final String						TABLE_TOUR_WAYPOINT							= "TOURWAYPOINT";												//$NON-NLS-1$
+	
+//	public static final String						JOINTABLE__TOURDATA__SHAREDMARKER			= TABLE_TOUR_DATA			+ "_" + TABLE_SHARED_MARKER;		//$NON-NLS-1$
+	public static final String						JOINTABLE__TOURDATA__TOURTAG				= TABLE_TOUR_DATA			+ "_" + TABLE_TOUR_TAG;				//$NON-NLS-1$
+	public static final String						JOINTABLE__TOURTAGCATEGORY_TOURTAG			= TABLE_TOUR_TAG_CATEGORY	+ "_" + TABLE_TOUR_TAG;				//$NON-NLS-1$
+	public static final String						JOINTABLE__TOURTAGCATEGORY_TOURTAGCATEGORY	= TABLE_TOUR_TAG_CATEGORY	+ "_" + TABLE_TOUR_TAG_CATEGORY;	//$NON-NLS-1$
+	
 	/*
 	 * Tables which never have been used, they are dropped in db version 24
 	 */
-	private static final String						JOINTABLE__TOURDATA__TOURMARKER				= TABLE_TOUR_DATA
-																										+ "_" + TABLE_TOUR_MARKER;			//$NON-NLS-1$
-	private static final String						JOINTABLE__TOURDATA__TOURPHOTO				= TABLE_TOUR_DATA
-																										+ "_" + TABLE_TOUR_PHOTO;			//$NON-NLS-1$
-	private static final String						JOINTABLE__TOURDATA__TOURREFERENCE			= TABLE_TOUR_DATA
-																										+ "_" + TABLE_TOUR_REFERENCE;		//$NON-NLS-1$
-	private static final String						JOINTABLE__TOURDATA__TOURWAYPOINT			= TABLE_TOUR_DATA
-																										+ "_" + TABLE_TOUR_WAYPOINT;		//$NON-NLS-1$
-	private static final String						JOINTABLE__TOURPERSON__TOURPERSON_HRZONE	= TABLE_TOUR_PERSON
-																										+ "_" + TABLE_TOUR_PERSON_HRZONE;	//$NON-NLS-1$
+	private static final String						JOINTABLE__TOURDATA__TOURMARKER				= TABLE_TOUR_DATA			+ "_" + TABLE_TOUR_MARKER;			//$NON-NLS-1$
+	private static final String						JOINTABLE__TOURDATA__TOURPHOTO				= TABLE_TOUR_DATA			+ "_" + TABLE_TOUR_PHOTO;			//$NON-NLS-1$
+	private static final String						JOINTABLE__TOURDATA__TOURREFERENCE			= TABLE_TOUR_DATA			+ "_" + TABLE_TOUR_REFERENCE;		//$NON-NLS-1$
+	private static final String						JOINTABLE__TOURDATA__TOURWAYPOINT			= TABLE_TOUR_DATA			+ "_" + TABLE_TOUR_WAYPOINT;		//$NON-NLS-1$
+	private static final String						JOINTABLE__TOURPERSON__TOURPERSON_HRZONE	= TABLE_TOUR_PERSON			+ "_" + TABLE_TOUR_PERSON_HRZONE;	//$NON-NLS-1$
+	
 	// never used tables, is needed to drop them
-	private final static String						TABLE_TOUR_CATEGORY							= "TourCategory";							//$NON-NLS-1$
-	private final static String						TABLE_TOURCATEGORY__TOURDATA				= TABLE_TOUR_CATEGORY
-																										+ "_" + TABLE_TOUR_DATA;			//$NON-NLS-1$
+	private final static String						TABLE_TOUR_CATEGORY							= "TourCategory";												//$NON-NLS-1$
+	private final static String						TABLE_TOURCATEGORY__TOURDATA				= TABLE_TOUR_CATEGORY		+ "_" + TABLE_TOUR_DATA;			//$NON-NLS-1$
 	/**
 	 * Is <code>-1</code> which is the id for a not saved entity.
 	 */
 	public static final int							ENTITY_IS_NOT_SAVED							= -1;
 	//
-	private static final String						ENTITY_ID_BIKE								= "BikeID";								//$NON-NLS-1$
-	private static final String						ENTITY_ID_COMPARED							= "ComparedID";							//$NON-NLS-1$
-	private static final String						ENTITY_ID_HR_ZONE							= "HrZoneID";								//$NON-NLS-1$
-	private static final String						ENTITY_ID_MARKER							= "MarkerID";								//$NON-NLS-1$
-	private static final String						ENTITY_ID_PERSON							= "PersonID";								//$NON-NLS-1$
-	private static final String						ENTITY_ID_PHOTO								= "PhotoID";								//$NON-NLS-1$
-	private static final String						ENTITY_ID_REF								= "RefID";									//$NON-NLS-1$
-//	private static final String						ENTITY_ID_SIGN								= "SignID";								//$NON-NLS-1$
-//	private static final String						ENTITY_ID_SHARED_MARKER						= "SharedMarkerID";						//$NON-NLS-1$
-	private static final String						ENTITY_ID_TAG								= "TagID";									//$NON-NLS-1$
-	private static final String						ENTITY_ID_TAG_CATEGORY						= "TagCategoryID";							//$NON-NLS-1$
-	public static final String						ENTITY_ID_TOUR								= "TourID";								//$NON-NLS-1$
-	private static final String						ENTITY_ID_TYPE								= "TypeID";								//$NON-NLS-1$
-	public static final String						ENTITY_ID_WAY_POINT							= "WayPointID";							//$NON-NLS-1$
+	private static final String						ENTITY_ID_BIKE								= "BikeID";														//$NON-NLS-1$
+	private static final String						ENTITY_ID_COMPARED							= "ComparedID";													//$NON-NLS-1$
+	private static final String						ENTITY_ID_HR_ZONE							= "HrZoneID";													//$NON-NLS-1$
+	private static final String						ENTITY_ID_MARKER							= "MarkerID";													//$NON-NLS-1$
+	private static final String						ENTITY_ID_PERSON							= "PersonID";													//$NON-NLS-1$
+	private static final String						ENTITY_ID_PHOTO								= "PhotoID";													//$NON-NLS-1$
+	private static final String						ENTITY_ID_REF								= "RefID";														//$NON-NLS-1$
+//	private static final String						ENTITY_ID_SIGN								= "SignID";														//$NON-NLS-1$
+//	private static final String						ENTITY_ID_SHARED_MARKER						= "SharedMarkerID";												//$NON-NLS-1$
+	private static final String						ENTITY_ID_TAG								= "TagID";														//$NON-NLS-1$
+	private static final String						ENTITY_ID_TAG_CATEGORY						= "TagCategoryID";												//$NON-NLS-1$
+	public static final String						ENTITY_ID_TOUR								= "TourID";														//$NON-NLS-1$
+	private static final String						ENTITY_ID_TYPE								= "TypeID";														//$NON-NLS-1$
+	public static final String						ENTITY_ID_WAY_POINT							= "WayPointID";													//$NON-NLS-1$
 	//
-	private static final String						KEY_BIKE									= TABLE_TOUR_BIKE
-																										+ "_" + ENTITY_ID_BIKE;			//$NON-NLS-1$
-	private static final String						KEY_PERSON									= TABLE_TOUR_PERSON
-																										+ "_" + ENTITY_ID_PERSON;			//$NON-NLS-1$
-//	private static final String						KEY_SIGN									= TABLE_TOUR_SIGN
-//																										+ "_" + ENTITY_ID_SIGN;			//$NON-NLS-1$
-//	private static final String						KEY_SHARED_MARKER							= TABLE_SHARED_MARKER
-//																										+ "_" + ENTITY_ID_SHARED_MARKER;	//$NON-NLS-1$
-	private static final String						KEY_TAG										= TABLE_TOUR_TAG
-																										+ "_" + ENTITY_ID_TAG;				//$NON-NLS-1$
-	private static final String						KEY_TAG_CATEGORY							= TABLE_TOUR_TAG_CATEGORY
-																										+ "_" + ENTITY_ID_TAG_CATEGORY;	//$NON-NLS-1$
-	public static final String						KEY_TOUR									= TABLE_TOUR_DATA
-																										+ "_" + ENTITY_ID_TOUR;			//$NON-NLS-1$
-	private static final String						KEY_TYPE									= TABLE_TOUR_TYPE
-																										+ "_" + ENTITY_ID_TYPE;			//$NON-NLS-1$
+	private static final String						KEY_BIKE									= TABLE_TOUR_BIKE 			+ "_" + ENTITY_ID_BIKE;				//$NON-NLS-1$
+	private static final String						KEY_PERSON									= TABLE_TOUR_PERSON			+ "_" + ENTITY_ID_PERSON;			//$NON-NLS-1$
+//	private static final String						KEY_SIGN									= TABLE_TOUR_SIGN			+ "_" + ENTITY_ID_SIGN;				//$NON-NLS-1$
+//	private static final String						KEY_SHARED_MARKER							= TABLE_SHARED_MARKER		+ "_" + ENTITY_ID_SHARED_MARKER;	//$NON-NLS-1$
+	private static final String						KEY_TAG										= TABLE_TOUR_TAG			+ "_" + ENTITY_ID_TAG;				//$NON-NLS-1$
+	private static final String						KEY_TAG_CATEGORY							= TABLE_TOUR_TAG_CATEGORY	+ "_" + ENTITY_ID_TAG_CATEGORY;		//$NON-NLS-1$
+	public static final String						KEY_TOUR									= TABLE_TOUR_DATA			+ "_" + ENTITY_ID_TOUR;				//$NON-NLS-1$
+	private static final String						KEY_TYPE									= TABLE_TOUR_TYPE			+ "_" + ENTITY_ID_TYPE;				//$NON-NLS-1$
+// SET_FORMATTING_ON
 	//
 	private static final String						DEFAULT_0									= "0";										//$NON-NLS-1$
 	private static final String						DEFAULT_1_0									= "1.0";									//$NON-NLS-1$
@@ -255,27 +242,12 @@ public class TourDatabase {
 	private static final IPreferenceStore			_prefStore									= TourbookPlugin
 																										.getPrefStore();
 
-	private boolean									_isDbInitialized;
-	private boolean									_isTableChecked;
-	private boolean									_isVersionChecked;
-
-	private final ListenerList						_propertyListeners							= new ListenerList(
-																										ListenerList.IDENTITY);
-
 	private final static String						_databasePath								= Platform
 																										.getInstanceLocation()
 																										.getURL()
 																										.getPath()
 																										+ "derby-database";				//$NON-NLS-1$
-
-	private boolean									_isSQLUpdateError							= false;
-
-	/**
-	 * Database version before a db update is performed
-	 */
-	private int										_dbVersionBeforeUpdate;
-	private int										_dbVersionAfterUpdate;
-
+	
 	private static final String						DERBY_DB_TOURBOOK							= "tourbook";								//$NON-NLS-1$
 	private static String							DERBY_DRIVER_CLASS;
 	private static String							DERBY_URL;
@@ -283,22 +255,19 @@ public class TourDatabase {
 	private static final String						DERBY_URL_COMMAND_SHUTDOWN_TRUE				= ";shutdown=true";						//$NON-NLS-1$
 	private static final String						DERBY_URL_COMMAND_UPGRADE_TRUE				= ";upgrade=true";							//$NON-NLS-1$
 
-	private boolean									_isDerbyEmbedded;
-	private boolean									_isChecked_DbUpgraded;
-	private boolean									_isChecked_DbCreated;
-
 	private static NetworkServerControl				_server;
 
 	private static volatile EntityManagerFactory	_emFactory;
-
 	private static volatile ComboPooledDataSource	_pooledDataSource;
-	{
+	
+	static {
+		
 		// set storage location for the database
 		System.setProperty("derby.system.home", _databasePath); //$NON-NLS-1$
 
 // set derby debug properties
-//		System.setProperty("derby.language.logQueryPlan", "true"); 
-//		System.setProperty("derby.language.logStatementText", "true"); 
+//		System.setProperty("derby.language.logQueryPlan", "true");
+//		System.setProperty("derby.language.logStatementText", "true");
 	}
  
 	private static final Object						DB_LOCK										= new Object();
@@ -344,6 +313,25 @@ public class TourDatabase {
 		SQL_DOUBLE_MIN_VALUE = (new Double(DEFAULT_DOUBLE)).toString();
 	}
 
+	private boolean									_isDbInitialized;
+	private boolean									_isTableChecked;
+	private boolean									_isVersionChecked;
+	
+	private final ListenerList						_propertyListeners							= new ListenerList(
+			ListenerList.IDENTITY);
+	
+	private boolean									_isSQLUpdateError							= false;
+	
+	/**
+	 * Database version before a db update is performed
+	 */
+	private int										_dbVersionBeforeUpdate;
+	private int										_dbVersionAfterUpdate;
+	
+	private boolean									_isDerbyEmbedded;
+	private boolean									_isChecked_DbUpgraded;
+	private boolean									_isChecked_DbCreated;
+	
 	/**
 	 * SQL utilities.
 	 */
