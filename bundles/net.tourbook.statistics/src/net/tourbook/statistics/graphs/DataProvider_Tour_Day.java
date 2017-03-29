@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -87,9 +87,9 @@ public class DataProvider_Tour_Day extends DataProvider {
 
 		final SQLFilter sqlFilter = new SQLFilter();
 
-		final String sqlString = "\n\n"
+		final String sqlString = "\n\n" //$NON-NLS-1$
 
-				+ "SELECT " // //$NON-NLS-1$
+				+ "SELECT " // 							//$NON-NLS-1$
 				//
 				+ " TourId, " //					1 	//$NON-NLS-1$
 
@@ -109,9 +109,9 @@ public class DataProvider_Tour_Day extends DataProvider {
 				+ " TourType_typeId, " // 			12	//$NON-NLS-1$
 				+ " jTdataTtag.TourTag_tagId"//		13	//$NON-NLS-1$
 				//
-				+ "\n"
+				+ "\n" //								//$NON-NLS-1$
 				//
-				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + "\n") //$NON-NLS-1$
+				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + "\n") //$NON-NLS-1$ //$NON-NLS-2$
 				//
 				// get tag id's
 				+ (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag") //$NON-NLS-1$ //$NON-NLS-2$
@@ -161,7 +161,7 @@ public class DataProvider_Tour_Day extends DataProvider {
 			sqlFilter.setParameters(statement, 1);
 
 			final ResultSet result = statement.executeQuery();
-			
+
 			while (result.next()) {
 
 				final long dbTourId = result.getLong(1);

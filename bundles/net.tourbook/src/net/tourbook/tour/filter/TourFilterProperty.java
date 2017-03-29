@@ -153,11 +153,11 @@ public class TourFilterProperty implements Cloneable {
 	@Override
 	public String toString() {
 
-		return "\nTourFilterProperty [" //
+		return "\nTourFilterProperty [" // //$NON-NLS-1$
 
-				+ ("fieldConfig=" + fieldConfig + ", ")
-				+ ("fieldOperator=" + fieldOperator + ", ")
+				+ ("fieldConfig=" + fieldConfig + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("fieldOperator=" + fieldOperator + ", ") //$NON-NLS-1$ //$NON-NLS-2$
 
-				+ "]\n\n";
+				+ "]\n\n"; //$NON-NLS-1$
 	}
 }

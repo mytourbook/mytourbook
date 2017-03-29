@@ -104,11 +104,11 @@ public class TourFilterProfile implements Cloneable {
 
 	@Override
 	public String toString() {
-		return "TourFilterProfile [\n"
-				+ ("profileId=" + profileId + ", \n")//
-				+ ("name=" + name + ", \n")
-				+ ("filterProperties=" + filterProperties + ", \n")
-				+ "]";
+		return "TourFilterProfile [\n" //$NON-NLS-1$
+				+ ("profileId=" + profileId + ", \n")// //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("name=" + name + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("filterProperties=" + filterProperties + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ "]"; //$NON-NLS-1$
 	}
 
 }

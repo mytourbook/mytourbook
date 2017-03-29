@@ -377,7 +377,6 @@ public class Messages extends NLS {
 
 	public static String		App_Action_About;
 	public static String		App_Action_Cancel;
-	public static String		App_Action_Close;
 	public static String		App_Action_Close_ToolTip;
 	public static String		App_Action_Columns;
 	public static String		App_Action_Dialog_ActionIsInProgress_Message;
@@ -434,7 +433,6 @@ public class Messages extends NLS {
 
 	public static String		App_Link_RestoreDefaultValues;
 
-	public static String		App_Slideout_Action_PinSlideout;
 
 	public static String		App_Splash_Copyright;
 
@@ -448,7 +446,6 @@ public class Messages extends NLS {
 	public static String		App_TourType_ToolTip;
 	public static String		App_TourType_ToolTipTitle;
 
-	public static String		App_Unit_HHMM;
 	public static String		App_Unit_HHMMSS;
 	public static String		App_Unit_Milliseconds;
 	public static String		App_Unit_Minute;
@@ -1584,7 +1581,6 @@ public class Messages extends NLS {
 	public static String		Slideout_TourFilter_Action_DeleteProperty_Tooltip;
 	public static String		Slideout_TourFilter_Action_MovePropertyDown_Tooltip;
 	public static String		Slideout_TourFilter_Action_MovePropertyUp_Tooltip;
-	public static String		Slideout_TourFilter_Checkbox_IsFilterByDate;
 	public static String		Slideout_TourFilter_Checkbox_IsLiveUpdate;
 	public static String		Slideout_TourFilter_Checkbox_IsLiveUpdate_Tooltip;
 	public static String		Slideout_TourFilter_Checkbox_IsPropertyEnabled_Tooltip;
@@ -1595,7 +1591,6 @@ public class Messages extends NLS {
 	public static String		Slideout_TourFilter_Confirm_DeleteProfile_Title;
 	public static String		Slideout_TourFilter_Confirm_DeleteProperty_Message;
 	public static String		Slideout_TourFilter_Confirm_DeleteProperty_Title;
-	public static String		Slideout_TourFilter_Label_DayMonth;
 	public static String		Slideout_TourFilter_Label_ProfileName;
 	public static String		Slideout_TourFilter_Label_Profiles;
 	public static String		Slideout_TourFilter_Label_Title;
@@ -1797,9 +1792,7 @@ public class Messages extends NLS {
 	public static String		Tour_Filter_Field_BreakTime;
 	public static String		Tour_Filter_Field_Distance;
 	public static String		Tour_Filter_Field_DrivingTime;
-	public static String		Tour_Filter_Field_Markers;
 	public static String		Tour_Filter_Field_Photos;
-	public static String		Tour_Filter_Field_Power_Average;
 	public static String		Tour_Filter_Field_RecordingTime;
 	public static String		Tour_Filter_Field_Season;
 	public static String		Tour_Filter_Field_Temperature;
@@ -1821,11 +1814,8 @@ public class Messages extends NLS {
 	public static String		Tour_Filter_Operator_Season_Current_Day;
 	public static String		Tour_Filter_Operator_Season_Current_Month;
 	public static String		Tour_Filter_Operator_Season_Month;
-	public static String		Tour_Filter_Operator_Season_This_Month;
-	public static String		Tour_Filter_Operator_Season_Today;
 	public static String		Tour_Filter_Operator_Season_Today_Until_Date;
 	public static String		Tour_Filter_Operator_Season_Today_Until_YearEnd;
-	public static String		Tour_Filter_Operator_Season_UntilToday;
 	public static String		Tour_Filter_Operator_Season_UntilToday_From_Date;
 	public static String		Tour_Filter_Operator_Season_UntilToday_From_YearStart;
 	public static String		Tour_Filter_Operator_StartsWith;

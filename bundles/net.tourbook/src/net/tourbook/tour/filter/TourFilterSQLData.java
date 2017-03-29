@@ -39,11 +39,11 @@ public class TourFilterSQLData {
 	@Override
 	public String toString() {
 
-		return "TourFilterSQLData [\n" //
+		return "TourFilterSQLData [\n" // //$NON-NLS-1$
 
-				+ ("_whereString=" + _whereString + "\n")
-				+ ("_parameters=" + _parameters + "\n")
+				+ ("_whereString=" + _whereString + "\n") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("_parameters=" + _parameters + "\n") //$NON-NLS-1$ //$NON-NLS-2$
 
-				+ "]";
+				+ "]"; //$NON-NLS-1$
 	}
 }

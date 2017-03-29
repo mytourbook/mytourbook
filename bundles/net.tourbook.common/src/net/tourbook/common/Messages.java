@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,15 +19,11 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-	private static final String	BUNDLE_NAME	= "net.tourbook.common.messages";				//$NON-NLS-1$
+	private static final String	BUNDLE_NAME	= "net.tourbook.common.messages";												//$NON-NLS-1$
 
-	public static String App_Action_Close_Tooltip;
-
-	public static String App_Action_DragSlideout_ToolTip;
-
+	public static String		App_Action_Close_Tooltip;
+	public static String		App_Action_DragSlideout_ToolTip;
 	public static String		App_Action_New_WithConfirm;
-
-	public static String App_Action_PinSlideout_Tooltip;
 	public static String		App_Action_Remove_NoConfirm;
 	public static String		App_Action_Rename_WithConfirm;
 
@@ -148,14 +144,12 @@ public class Messages extends NLS {
 
 	public static String		Image___Empty16;
 
-	public static String Image__App_Close;
-
-	public static String Image__BookOpen;
+	public static String		Image__App_Close;
+	public static String		Image__BookOpen;
 	public static String		Image__ColumnCategory;
 	public static String		Image__CustomizeProfilesColumns;
 	public static String		Image__options;
-
-	public static String Image__Pin_Blue;
+	public static String		Image__Pin_Blue;
 	public static String		Image__TourOptions;
 	public static String		Image__TourOptions_Disabled;
 	public static String		Image__weather_sunny;
@@ -261,9 +255,8 @@ public class Messages extends NLS {
 
 	public static String		rgv_vertex_class_cast_exception;
 
-	public static String Slideout_Dialog_Action_KeepSlideoutOpen_Tooltip;
-
-	public static String Slideout_Dialog_Action_PinSlideoutLocation_Tooltip;
+	public static String		Slideout_Dialog_Action_KeepSlideoutOpen_Tooltip;
+	public static String		Slideout_Dialog_Action_PinSlideoutLocation_Tooltip;
 
 	public static String		Time_Tools_DST_North;
 	public static String		Time_Tools_DST_South;

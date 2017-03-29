@@ -82,13 +82,13 @@ public class TVITourBookYear extends TVITourBookItem {
 				+ (sumYearSub + ",\n") //$NON-NLS-1$
 				+ SQL_SUM_COLUMNS
 
-				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + "\n") //$NON-NLS-1$
+				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + "\n") //$NON-NLS-1$ //$NON-NLS-2$
 
 				+ (" WHERE " + sumYear + "=?\n") //$NON-NLS-1$ //$NON-NLS-2$
 				+ sqlFilter.getWhereClause()
 
 				+ (" GROUP BY " + sumYear + ",\n" + sumYearSub) //$NON-NLS-1$ //$NON-NLS-2$
-				+ (" ORDER BY " + sumYearSub + "\n"); //$NON-NLS-1$
+				+ (" ORDER BY " + sumYearSub + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		try {
 

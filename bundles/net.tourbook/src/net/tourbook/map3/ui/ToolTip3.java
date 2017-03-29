@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -49,7 +49,7 @@ public abstract class ToolTip3 {
 
 	public static final int					SHELL_MARGIN						= 5;
 
-	public static final String				SHELL_DATA_TOOL						= "SHELL_DATA_TOOL";					//$NON-NLS-1$
+	public static final String				SHELL_DATA_TOOL						= "SHELL_DATA_TOOL";	//$NON-NLS-1$
 
 	public static final int					TOOLTIP_STYLE_RECREATE_CONTENT		= 0;
 	public static final int					TOOLTIP_STYLE_KEEP_CONTENT			= 1;
@@ -938,10 +938,6 @@ public abstract class ToolTip3 {
 
 		if (map3LayerSlideout != null) {
 			map3LayerSlideout.setIsAnotherDialogOpened(isKeepOpen);
-			System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-					+ ("\tkeepParentOpen: " + isKeepOpen));
-			// TODO remove SYSTEM.OUT.PRINTLN
-
 		}
 	}
 

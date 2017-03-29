@@ -511,7 +511,7 @@ public class Util {
 
 		final StringBuilder tabIndent = new StringBuilder();
 		for (int i = 0; i < indent; i++) {
-			tabIndent.append("\t");
+			tabIndent.append("\t"); //$NON-NLS-1$
 		}
 
 		if (parent instanceof Composite) {
@@ -526,7 +526,7 @@ public class Util {
 						UI.timeStampNano()
 								+ tabIndent.toString()
 								+ container
-								+ "\tTabList\t"
+								+ "\tTabList\t" //$NON-NLS-1$
 								+ Arrays.toString(tabList));
 			} else {
 
