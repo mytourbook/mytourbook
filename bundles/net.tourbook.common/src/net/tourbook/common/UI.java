@@ -1054,10 +1054,27 @@ public class UI {
 	 *            a control from which to obtain the current font
 	 */
 	private static void initializeDialogUnits(final Control control) {
-		// Compute and store a font metric
+
+		if (_fontMetrics == null) {
+
+			// Compute and keep a font metric
+
+			final Shell activeShell = Display.getDefault().getActiveShell();
+			final GC gc = new GC(activeShell);
+			{
+				gc.setFont(JFaceResources.getDialogFont());
+				_fontMetrics = gc.getFontMetrics();
+			}
+			gc.dispose();
+
+		}
+
+		// Compute and keep a font metric
 		final GC gc = new GC(control);
-		gc.setFont(JFaceResources.getDialogFont());
-		_fontMetrics = gc.getFontMetrics();
+		{
+			gc.setFont(JFaceResources.getDialogFont());
+			_fontMetrics = gc.getFontMetrics();
+		}
 		gc.dispose();
 	}
 
