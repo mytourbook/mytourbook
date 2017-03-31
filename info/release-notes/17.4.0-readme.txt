@@ -6,6 +6,9 @@ New
 
 * Tour Filter
 
+  - Filter tours by tour fields additonally to Person/Tour type/Tour photo
+  
+
 * Statistics
 
   - Show number of tours in week/month/year summary
@@ -26,5 +29,11 @@ Bugfix
 
 These problems are fixed
 
-* Selecting an item in a combobox list has closed the slideout, this problem existed since the beginning of using slideouts
-* Error occured in the search tour URI when the app folder path contained square brackets, e.g [16.11] 
+* Slideout dialog
+  Selecting an item in a combobox list has closed the slideout, this problem existed since the beginning of using slideouts
+ 
+* GPX import 
+  Tolerate "version=1.1" without namespace
+  
+* Tour search
+  Error occured in the search tour URI when the app folder path contained square brackets, e.g [16.11]
