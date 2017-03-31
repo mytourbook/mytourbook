@@ -426,8 +426,8 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		table.setLayout(new TableLayout());
 
 		// !!! this prevents that the horizontal scrollbar is displayed, but is not always working :-(
-//		table.setHeaderVisible(false);
-		table.setHeaderVisible(true);
+		table.setHeaderVisible(false);
+//		table.setHeaderVisible(true);
 
 		_profileViewer = new TableViewer(table);
 
