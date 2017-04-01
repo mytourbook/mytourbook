@@ -398,10 +398,10 @@ public class UI {
 		final String commaSpace = Messages.Period_Format_CommaSpace;
 		final String space2 = Messages.Period_Format_SpaceAndSpace;
 		final String[] variants = {
-									Messages.Period_Format_Space,
-									Messages.Period_Format_Comma,
-									Messages.Period_Format_CommaAndAnd,
-									Messages.Period_Format_CommaSpaceAnd };
+				Messages.Period_Format_Space,
+				Messages.Period_Format_Comma,
+				Messages.Period_Format_CommaAndAnd,
+				Messages.Period_Format_CommaSpaceAnd };
 
 		DEFAULT_DURATION_FORMATTER = new PeriodFormatterBuilder()
 
@@ -472,8 +472,6 @@ public class UI {
 				.appendSuffix(Messages.Period_Format_Millisecond_Short, Messages.Period_Format_Millisecond_Short)
 
 				.toFormatter();
-
-		initializeDialogUnits(Display.getDefault().getActiveShell());
 	}
 
 	/**
@@ -610,10 +608,13 @@ public class UI {
 	 * @return the number of pixels
 	 */
 	private static int convertHorizontalDLUsToPixels(final int dlus) {
-		// test for failure to initialize for backward compatibility
-		if (_fontMetrics == null) {
-			return 0;
+
+		if (setupUI_FontMetrics() == false) {
+
+			// create default
+			return dlus * 4;
 		}
+
 		return convertHorizontalDLUsToPixels(_fontMetrics, dlus);
 	}
 
@@ -1043,41 +1044,6 @@ public class UI {
 		return result;
 	}
 
-	/**
-	 * Initializes the computation of horizontal and vertical dialog units based on the size of
-	 * current font.
-	 * <p>
-	 * This method must be called before any of the dialog unit based conversion methods are called.
-	 * </p>
-	 * 
-	 * @param control
-	 *            a control from which to obtain the current font
-	 */
-	private static void initializeDialogUnits(final Control control) {
-
-		if (_fontMetrics == null) {
-
-			// Compute and keep a font metric
-
-			final Shell activeShell = Display.getDefault().getActiveShell();
-			final GC gc = new GC(activeShell);
-			{
-				gc.setFont(JFaceResources.getDialogFont());
-				_fontMetrics = gc.getFontMetrics();
-			}
-			gc.dispose();
-
-		}
-
-		// Compute and keep a font metric
-		final GC gc = new GC(control);
-		{
-			gc.setFont(JFaceResources.getDialogFont());
-			_fontMetrics = gc.getFontMetrics();
-		}
-		gc.dispose();
-	}
-
 	public static boolean isCtrlKey(final MouseEvent event) {
 
 		boolean isCtrlKey;
@@ -1324,9 +1290,9 @@ public class UI {
 			for (final Control child : children) {
 
 				if (child != null
-				&& child.isDisposed() == false //
+						&& child.isDisposed() == false //
 
-				// exclude controls which look ugly
+						// exclude controls which look ugly
 						&& !child.getClass().equals(Combo.class)
 						&& !child.getClass().equals(Spinner.class)
 				//
@@ -1457,9 +1423,9 @@ public class UI {
 			for (final Control child : children) {
 
 				if (child != null
-				&& child.isDisposed() == false //
+						&& child.isDisposed() == false //
 
-				// exclude controls which look ugly
+						// exclude controls which look ugly
 						&& !child.getClass().equals(Combo.class)
 						&& !child.getClass().equals(Spinner.class)
 				//
@@ -1578,6 +1544,31 @@ public class UI {
 		gd.widthHint = width;
 		field.getTextControl(parent).setLayoutData(gd);
 		return gd;
+	}
+
+	private static boolean setupUI_FontMetrics() {
+
+		if (_fontMetrics != null) {
+			return true;
+		}
+
+		// Compute and keep a font metric
+
+		final Shell activeShell = Display.getDefault().getActiveShell();
+		if (activeShell == null) {
+
+			// this can occure when called too early
+			return false;
+		}
+
+		final GC gc = new GC(activeShell);
+		{
+			gc.setFont(JFaceResources.getDialogFont());
+			_fontMetrics = gc.getFontMetrics();
+		}
+		gc.dispose();
+
+		return true;
 	}
 
 	/**
