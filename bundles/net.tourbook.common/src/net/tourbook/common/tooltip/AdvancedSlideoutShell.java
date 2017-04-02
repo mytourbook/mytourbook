@@ -967,8 +967,8 @@ public abstract class AdvancedSlideoutShell {
 
 		if (hoveredControl == null) {
 
-			System.out.println(UI.timeStampNano() + " exit 0 - Hide - hoveredControl==null");
-			// TODO remove SYSTEM.OUT.PRINTLN
+//			System.out.println(UI.timeStampNano() + " exit 0 - Hide - hoveredControl==null");
+//			// TODO remove SYSTEM.OUT.PRINTLN
 
 			isHide = true;
 
@@ -988,8 +988,8 @@ public abstract class AdvancedSlideoutShell {
 
 					isKeepVisible = true;
 
-					System.out.println(UI.timeStampNano() + " exit 1 - No hide - hoveredParent==shell");
-					// TODO remove SYSTEM.OUT.PRINTLN
+//					System.out.println(UI.timeStampNano() + " exit 1 - No hide - hoveredParent==shell");
+//					// TODO remove SYSTEM.OUT.PRINTLN
 
 					break;
 				}
@@ -1000,8 +1000,8 @@ public abstract class AdvancedSlideoutShell {
 
 					isKeepVisible = true;
 
-					System.out.println(UI.timeStampNano() + " exit 2 - No hide - hoveredParent==owner");
-					// TODO remove SYSTEM.OUT.PRINTLN
+//					System.out.println(UI.timeStampNano() + " exit 2 - No hide - hoveredParent==owner");
+//					// TODO remove SYSTEM.OUT.PRINTLN
 
 					break;
 				}
@@ -1012,8 +1012,8 @@ public abstract class AdvancedSlideoutShell {
 
 					// mouse has left the tooltip and the owner control
 
-					System.out.println(UI.timeStampNano() + " exit 3 - Hide - hoveredParent==null");
-					// TODO remove SYSTEM.OUT.PRINTLN
+//					System.out.println(UI.timeStampNano() + " exit 3 - Hide - hoveredParent==null");
+//					// TODO remove SYSTEM.OUT.PRINTLN
 
 					isHide = true;
 
@@ -1052,21 +1052,21 @@ public abstract class AdvancedSlideoutShell {
 			reparentShell(_rrShellNoResize);
 		}
 
-		System.out.println(UI.timeStampNano()
-				+ ("\tisKeepVisible:" + isKeepVisible)
-				+ ("\tisHide:" + isHide)
-				+ ("\tisInTooltip:" + isInTooltip));
-		// TODO remove SYSTEM.OUT.PRINTLN
+//		System.out.println(UI.timeStampNano()
+//				+ ("\tisKeepVisible:" + isKeepVisible)
+//				+ ("\tisHide:" + isHide)
+//				+ ("\tisInTooltip:" + isInTooltip));
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		if (isKeepVisible == false && isHide == false && isInTooltip == false) {
 			isHide = true;
 		}
 
-		System.out.println(UI.timeStampNano()
-				+ ("\tisKeepVisible:" + isKeepVisible)
-				+ ("\tisHide:" + isHide)
-				+ ("\tisInTooltip:" + isInTooltip));
-		// TODO remove SYSTEM.OUT.PRINTLN
+//		System.out.println(UI.timeStampNano()
+//				+ ("\tisKeepVisible:" + isKeepVisible)
+//				+ ("\tisHide:" + isHide)
+//				+ ("\tisInTooltip:" + isInTooltip));
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		if (isInTooltip && _isShellFadingOut) {
 

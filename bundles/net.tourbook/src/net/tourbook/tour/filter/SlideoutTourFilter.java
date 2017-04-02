@@ -98,6 +98,8 @@ import org.eclipse.swt.widgets.Widget;
  */
 public class SlideoutTourFilter extends AdvancedSlideout {
 
+	private static final String					HIDE_ALLOWED_DATE_TIME	= "DateTime";
+
 	static final String							FIELD_NO				= "fieldNo";						//$NON-NLS-1$
 
 	private static final String					STATE_IS_LIVE_UPDATE	= "STATE_IS_LIVE_UPDATE";			//$NON-NLS-1$
@@ -321,20 +323,27 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 	protected boolean canCloseShell(final Shell[] openedShells) {
 
 		/*
-		 * Linux creates a shell for DateTime which prepents to close the slideout, accept this
-		 * "shell".
+		 * Linux creates a shell in DateTime widget which prevents to close the slideout, accept
+		 * this "shell".
 		 */
-
-		final boolean canClose;
 
 		for (final Shell shell : openedShells) {
 
-			if (shell instanceof DateTime) {
+//			Util.dumpChildren(shell, 1);
 
+			for (final Control child : shell.getChildren()) {
+
+				final String controlText = child.toString();
+
+//				System.out.println(this.getClass().getName() + "\tcontrolText:" + controlText);
+
+				if (controlText.startsWith(HIDE_ALLOWED_DATE_TIME) == false) {
+					return false;
+				}
 			}
 		}
 
-		return canClose;
+		return true;
 	}
 
 	@Override

@@ -505,7 +505,9 @@ public class Util {
 
 			final Composite container = (Composite) parent;
 
-			System.out.println(UI.timeStampNano() + tabIndent.toString() + container);
+			final String containerText = container.toString();
+
+			System.out.println(UI.timeStampNano() + tabIndent.toString() + containerText);
 
 			for (final Control child : container.getChildren()) {
 				dumpChildren(child, indent + 1);
