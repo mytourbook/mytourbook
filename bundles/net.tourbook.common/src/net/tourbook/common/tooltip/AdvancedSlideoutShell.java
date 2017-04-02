@@ -66,16 +66,16 @@ public abstract class AdvancedSlideoutShell {
 
 	private static final int			ALPHA_OPAQUE						= 0xff;
 
-	private static final String			STATE_HORIZ_SLIDEOUT_WIDTH			= "STATE_HORIZ_SLIDEOUT_WIDTH";				//$NON-NLS-1$
+	private static final String			STATE_HORIZ_SLIDEOUT_WIDTH			= "STATE_HORIZ_SLIDEOUT_WIDTH";			//$NON-NLS-1$
 	private static final String			STATE_HORIZ_SLIDEOUT_HEIGHT			= "STATE_HORIZ_SLIDEOUT_HEIGHT";			//$NON-NLS-1$
 	private static final String			STATE_VERT_SLIDEOUT_WIDTH			= "STATE_VERT_SLIDEOUT_WIDTH";				//$NON-NLS-1$
-	private static final String			STATE_VERT_SLIDEOUT_HEIGHT			= "STATE_VERT_SLIDEOUT_HEIGHT";				//$NON-NLS-1$
+	private static final String			STATE_VERT_SLIDEOUT_HEIGHT			= "STATE_VERT_SLIDEOUT_HEIGHT";			//$NON-NLS-1$
 
 	private static final String			STATE_IS_SLIDEOUT_PINNED			= "STATE_IS_SLIDEOUT_PINNED";				//$NON-NLS-1$
 	private static final String			STATE_HORIZ_SLIDEOUT_PIN_LOCATION_X	= "STATE_HORIZ_SLIDEOUT_PIN_LOCATION_X";	//$NON-NLS-1$
 	private static final String			STATE_HORIZ_SLIDEOUT_PIN_LOCATION_Y	= "STATE_HORIZ_SLIDEOUT_PIN_LOCATION_Y";	//$NON-NLS-1$
-	private static final String			STATE_VERT_SLIDEOUT_PIN_LOCATION_X	= "STATE_VERT_SLIDEOUT_PIN_LOCATION_X";		//$NON-NLS-1$
-	private static final String			STATE_VERT_SLIDEOUT_PIN_LOCATION_Y	= "STATE_VERT_SLIDEOUT_PIN_LOCATION_Y";		//$NON-NLS-1$
+	private static final String			STATE_VERT_SLIDEOUT_PIN_LOCATION_X	= "STATE_VERT_SLIDEOUT_PIN_LOCATION_X";	//$NON-NLS-1$
+	private static final String			STATE_VERT_SLIDEOUT_PIN_LOCATION_Y	= "STATE_VERT_SLIDEOUT_PIN_LOCATION_Y";	//$NON-NLS-1$
 
 	private static final String			STATE_IS_KEEP_SLIDEOUT_OPEN			= "STATE_IS_KEEP_SLIDEOUT_OPEN";			//$NON-NLS-1$
 
@@ -244,13 +244,13 @@ public abstract class AdvancedSlideoutShell {
 	 *            <p>
 	 * 
 	 *            <pre>
-	 *            horizContentDefaultWidth = 300;
-	 *            horizContentDefaultHeight = 150;
+	 * horizContentDefaultWidth = 300;
+	 * horizContentDefaultHeight = 150;
 	 * 
-	 *            vertContentDefaultWidth = 400;
-	 *            vertContentDefaultHeight = 250;
+	 * vertContentDefaultWidth = 400;
+	 * vertContentDefaultHeight = 250;
 	 * 
-	 *            </pre>
+	 * </pre>
 	 */
 	public AdvancedSlideoutShell(	final Control ownerControl,
 									final IDialogSettings state,
@@ -587,7 +587,23 @@ public abstract class AdvancedSlideoutShell {
 
 		final Shell[] openedShells = _visibleShell.getShells();
 
-		return openedShells.length == 0;
+//		System.out.println(UI.timeStampNano() + "openedShells:" + openedShells.length);
+//
+//		for (final Shell shell : openedShells) {
+//			Util.dumpChildren(shell, 0);
+//		}
+
+		boolean canCloseShell = openedShells.length == 0;
+
+		if (openedShells.length > 0) {
+			canCloseShell = canCloseShell(openedShells);
+		}
+
+		return canCloseShell;
+	}
+
+	protected boolean canCloseShell(final Shell[] openedShells) {
+		return true;
 	}
 
 	/**
@@ -625,11 +641,11 @@ public abstract class AdvancedSlideoutShell {
 		/*
 		 * resize shell
 		 */
-		_rrShellWithResize = new RRShell(
-				_ownerControl.getShell(), //
+		_rrShellWithResize = new RRShell(_ownerControl.getShell(), //
 				SWT.ON_TOP //
 //						| SWT.TOOL
-						| SWT.RESIZE | SWT.NO_FOCUS,
+						| SWT.RESIZE
+						| SWT.NO_FOCUS,
 				getShellTitle_WithResize(),
 				true);
 
@@ -646,8 +662,7 @@ public abstract class AdvancedSlideoutShell {
 		/*
 		 * no resize shell
 		 */
-		_rrShellNoResize = new RRShell(
-				_ownerControl.getShell(), //
+		_rrShellNoResize = new RRShell(_ownerControl.getShell(), //
 				SWT.ON_TOP //
 //						| SWT.TOOL
 						| SWT.NO_FOCUS,
@@ -879,6 +894,9 @@ public abstract class AdvancedSlideoutShell {
 
 	private void onTTAllControlsEvent(final Event event) {
 
+//		System.out.println(UI.timeStampNano() + " onTTAllControlsEvent\t");
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
 		if (_visibleShell == null || _visibleShell.isDisposed()) {
 			return;
 		}
@@ -949,8 +967,8 @@ public abstract class AdvancedSlideoutShell {
 
 		if (hoveredControl == null) {
 
-//			System.out.println(UI.timeStampNano() + " exit 0 hide");
-//			// TODO remove SYSTEM.OUT.PRINTLN
+			System.out.println(UI.timeStampNano() + " exit 0 - Hide - hoveredControl==null");
+			// TODO remove SYSTEM.OUT.PRINTLN
 
 			isHide = true;
 
@@ -970,8 +988,8 @@ public abstract class AdvancedSlideoutShell {
 
 					isKeepVisible = true;
 
-//					System.out.println(UI.timeStampNano() + " exit 1 no hide");
-//					// TODO remove SYSTEM.OUT.PRINTLN
+					System.out.println(UI.timeStampNano() + " exit 1 - No hide - hoveredParent==shell");
+					// TODO remove SYSTEM.OUT.PRINTLN
 
 					break;
 				}
@@ -982,8 +1000,8 @@ public abstract class AdvancedSlideoutShell {
 
 					isKeepVisible = true;
 
-//					System.out.println(UI.timeStampNano() + " exit 2 no hide");
-//					// TODO remove SYSTEM.OUT.PRINTLN
+					System.out.println(UI.timeStampNano() + " exit 2 - No hide - hoveredParent==owner");
+					// TODO remove SYSTEM.OUT.PRINTLN
 
 					break;
 				}
@@ -994,8 +1012,8 @@ public abstract class AdvancedSlideoutShell {
 
 					// mouse has left the tooltip and the owner control
 
-//					System.out.println(UI.timeStampNano() + " exit 3 hide");
-//					// TODO remove SYSTEM.OUT.PRINTLN
+					System.out.println(UI.timeStampNano() + " exit 3 - Hide - hoveredParent==null");
+					// TODO remove SYSTEM.OUT.PRINTLN
 
 					isHide = true;
 
@@ -1034,9 +1052,21 @@ public abstract class AdvancedSlideoutShell {
 			reparentShell(_rrShellNoResize);
 		}
 
+		System.out.println(UI.timeStampNano()
+				+ ("\tisKeepVisible:" + isKeepVisible)
+				+ ("\tisHide:" + isHide)
+				+ ("\tisInTooltip:" + isInTooltip));
+		// TODO remove SYSTEM.OUT.PRINTLN
+
 		if (isKeepVisible == false && isHide == false && isInTooltip == false) {
 			isHide = true;
 		}
+
+		System.out.println(UI.timeStampNano()
+				+ ("\tisKeepVisible:" + isKeepVisible)
+				+ ("\tisHide:" + isHide)
+				+ ("\tisInTooltip:" + isInTooltip));
+		// TODO remove SYSTEM.OUT.PRINTLN
 
 		if (isInTooltip && _isShellFadingOut) {
 
