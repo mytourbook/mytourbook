@@ -244,13 +244,13 @@ public abstract class AdvancedSlideoutShell {
 	 *            <p>
 	 * 
 	 *            <pre>
-	 * horizContentDefaultWidth = 300;
-	 * horizContentDefaultHeight = 150;
+	 *            horizContentDefaultWidth = 300;
+	 *            horizContentDefaultHeight = 150;
 	 * 
-	 * vertContentDefaultWidth = 400;
-	 * vertContentDefaultHeight = 250;
+	 *            vertContentDefaultWidth = 400;
+	 *            vertContentDefaultHeight = 250;
 	 * 
-	 * </pre>
+	 *            </pre>
 	 */
 	public AdvancedSlideoutShell(	final Control ownerControl,
 									final IDialogSettings state,
@@ -361,12 +361,14 @@ public abstract class AdvancedSlideoutShell {
 					contentLocation = getToolTipLocation(contentSize);
 				}
 
-				Point shellEndLocation = _visibleRRShell.getShellLocation(contentLocation);
-				shellEndLocation = fixupDisplayBounds(shellSize, shellEndLocation);
+				Point newShellEndLocation = _visibleRRShell.getShellLocation(contentLocation);
+				newShellEndLocation = fixupDisplayBounds(shellSize, newShellEndLocation);
 
 				final boolean isShellVisible = _visibleShell.isVisible();
 
-				if (shellEndLocation.x == _shellEndLocation.x && isShellVisible) {
+				if (isShellVisible //
+						&& newShellEndLocation.x == _shellEndLocation.x
+						&& newShellEndLocation.y == _shellEndLocation.y) {
 
 					// shell is already fading in with the correct location
 
@@ -377,7 +379,7 @@ public abstract class AdvancedSlideoutShell {
 				}
 
 				// set new end location
-				_shellEndLocation = shellEndLocation;
+				_shellEndLocation = newShellEndLocation;
 
 				if (_isSlideoutPinned == false && isShellVisible) {
 
@@ -446,6 +448,16 @@ public abstract class AdvancedSlideoutShell {
 					final int shellStartY = _shellStartLocation.y;
 					final int shellEndX = _shellEndLocation.x;
 					final int shellEndY = _shellEndLocation.y;
+
+//					System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
+//							+ ("\tfrom:" + shellStartX)
+//							+ ("\tto:" + shellEndX)
+//							+ "\t"
+//							+ ("\tfrom:" + shellStartY)
+//							+ ("\tto:" + shellEndY)
+//					//
+//					);
+//					// TODO remove SYSTEM.OUT.PRINTLN
 
 					final Point shellCurrentLocation = _visibleShell.getLocation();
 
@@ -641,7 +653,8 @@ public abstract class AdvancedSlideoutShell {
 		/*
 		 * resize shell
 		 */
-		_rrShellWithResize = new RRShell(_ownerControl.getShell(), //
+		_rrShellWithResize = new RRShell(
+				_ownerControl.getShell(), //
 				SWT.ON_TOP //
 //						| SWT.TOOL
 						| SWT.RESIZE
@@ -662,7 +675,8 @@ public abstract class AdvancedSlideoutShell {
 		/*
 		 * no resize shell
 		 */
-		_rrShellNoResize = new RRShell(_ownerControl.getShell(), //
+		_rrShellNoResize = new RRShell(
+				_ownerControl.getShell(), //
 				SWT.ON_TOP //
 //						| SWT.TOOL
 						| SWT.NO_FOCUS,

@@ -243,7 +243,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 								final ToolItem toolItem,
 								final IDialogSettings state) {
 
-		super(ownerControl, state, new int[] { 900, 300, 900, 300 });
+		super(ownerControl, state, new int[] { 900, 200, 900, 200 });
 
 		_state = state;
 		_ownerToolbar = (ToolBar) ownerControl;
@@ -1591,13 +1591,20 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		int devX = itemDisplayPosition.x;
 		devX += itemWidth / 2 - slideoutWidth / 2;
 
-		int devY = itemDisplayPosition.y + itemHeight + 0;
+		int devY = itemDisplayPosition.y + itemHeight;
 
 		final Rectangle displayBounds = Display.getCurrent().getBounds();
 
 		if (isShowAboveToolItem()) {
 
 			devY = itemDisplayPosition.y - slideoutHeight;
+
+			if (devY < 0) {
+
+				// slideout will hide the tool item, show it below
+
+				devY = itemDisplayPosition.y + itemHeight;
+			}
 
 		} else if (devY + slideoutHeight > displayBounds.height) {
 
