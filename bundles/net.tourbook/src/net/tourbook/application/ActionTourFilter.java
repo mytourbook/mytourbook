@@ -24,6 +24,7 @@ import net.tourbook.tour.filter.TourFilterManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.ToolItem;
 
 public class ActionTourFilter extends ActionToolbarSlideoutAdv {
 
@@ -47,9 +48,9 @@ public class ActionTourFilter extends ActionToolbarSlideoutAdv {
 	}
 
 	@Override
-	protected AdvancedSlideout createSlideout(final Control ownerControl) {
+	protected AdvancedSlideout createSlideout(final Control ownerControl, final ToolItem toolItem) {
 
-		_slideoutTourFilter = new SlideoutTourFilter(ownerControl, _state);
+		_slideoutTourFilter = new SlideoutTourFilter(ownerControl, toolItem, _state);
 
 		_slideoutTourFilter.setVerticalPosition(true);
 

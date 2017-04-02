@@ -348,10 +348,10 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 	}
 
 	@Override
-	public Point getToolTipLocation(final Point tipSize) {
+	public Point getToolTipLocation(final Point slideoutSize) {
 
-		final int tipWidth = tipSize.x;
-		final int tipHeight = tipSize.y;
+		final int slideoutWidth = slideoutSize.x;
+		final int slideoutHeight = slideoutSize.y;
 
 		final int itemWidth = _slideoutParentBounds.width;
 		final int itemHeight = _slideoutParentBounds.height;
@@ -359,7 +359,7 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 		// center horizontally
 
 		int devX = _slideoutParentBounds.x;
-		devX += itemWidth / 2 - tipWidth / 2;
+		devX += itemWidth / 2 - slideoutWidth / 2;
 
 		int devY = _slideoutParentBounds.y + itemHeight + 0;
 
@@ -367,13 +367,13 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 
 		if (_isShowAboveToolItem) {
 
-			devY = _slideoutParentBounds.y - tipHeight;
+			devY = _slideoutParentBounds.y - slideoutHeight;
 
-		} else if (devY + tipHeight > displayBounds.height) {
+		} else if (devY + slideoutHeight > displayBounds.height) {
 
 			// slideout is below bottom, show it above the action button
 
-			devY = _slideoutParentBounds.y - tipHeight;
+			devY = _slideoutParentBounds.y - slideoutHeight;
 		}
 
 		return new Point(devX, devY);
@@ -391,6 +391,10 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 				onDispose();
 			}
 		});
+	}
+
+	protected boolean isShowAboveToolItem() {
+		return _isShowAboveToolItem;
 	}
 
 	@Override
@@ -537,5 +541,6 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 	public void setVerticalPosition(final boolean isAboveToolItem) {
 		_isShowAboveToolItem = isAboveToolItem;
 	}
+
 
 }

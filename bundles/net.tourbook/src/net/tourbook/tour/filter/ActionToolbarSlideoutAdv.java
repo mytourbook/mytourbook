@@ -42,30 +42,28 @@ import org.eclipse.swt.widgets.ToolItem;
  */
 public abstract class ActionToolbarSlideoutAdv extends ContributionItem implements IOpeningDialog {
 
-	private String			 _dialogId			= getClass().getCanonicalName();
+	private String				_dialogId			= getClass().getCanonicalName();
 
-	private ToolBar			 _toolBar;
-	private ToolItem		 _actionToolItem;
+	private ToolBar				_toolBar;
+	private ToolItem			_actionToolItem;
 
-	private AdvancedSlideout _toolbarSlideout;
+	private AdvancedSlideout	_toolbarSlideout;
 
 	/*
 	 * UI controls
 	 */
-	private Image			 _imageEnabled;
-	private Image			 _imageDisabled;
+	private Image				_imageEnabled;
+	private Image				_imageDisabled;
 	/**
 	 * When <code>true</code> then the action can be toggeled, default is <code>false</code>.
 	 */
-	protected boolean		 isToggleAction;
+	protected boolean			isToggleAction;
 
 	/**
 	 * This tooltip will be displayed when the action is not selected which causes that the slideout
 	 * is not displayed.
 	 */
-	protected String		 notSelectedTooltip	= UI.EMPTY_STRING;
-
-	private Rectangle		 _toolItemBounds;
+	protected String			notSelectedTooltip	= UI.EMPTY_STRING;
 
 	public ActionToolbarSlideoutAdv() {
 
@@ -79,7 +77,7 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
 		_imageDisabled = actionImageDisabled.createImage();
 	}
 
-	protected abstract AdvancedSlideout createSlideout(Control ownerControl);
+	protected abstract AdvancedSlideout createSlideout(Control ownerControl, ToolItem toolItem);
 
 	@Override
 	public void fill(final ToolBar toolbar, final int index) {
@@ -121,7 +119,7 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
 				}
 			});
 
-			_toolbarSlideout = createSlideout(toolbar);
+			_toolbarSlideout = createSlideout(toolbar, _actionToolItem);
 
 			updateUI_Tooltip();
 		}
@@ -221,14 +219,14 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
 
 			// tooltip is hidden, open it
 
-			_toolItemBounds = _actionToolItem.getBounds();
+			final Rectangle toolItemBounds = _actionToolItem.getBounds();
 
-			final Point itemDisplayPosition = _toolBar.toDisplay(_toolItemBounds.x, _toolItemBounds.y);
+			final Point itemDisplayPosition = _toolBar.toDisplay(toolItemBounds.x, toolItemBounds.y);
 
-			_toolItemBounds.x = itemDisplayPosition.x;
-			_toolItemBounds.y = itemDisplayPosition.y;
+			toolItemBounds.x = itemDisplayPosition.x;
+			toolItemBounds.y = itemDisplayPosition.y;
 
-			openSlideout(_toolItemBounds, false);
+			openSlideout(toolItemBounds, false);
 
 		} else {
 
