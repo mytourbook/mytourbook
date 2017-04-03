@@ -34,7 +34,7 @@ public class Action_Property_MoveDown extends Action {
 		_filterProperty = filterProperty;
 
 		setToolTipText(Messages.Slideout_TourFilter_Action_MovePropertyDown_Tooltip);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ArrowDown));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ArrowDown_Themed));
 	}
 
 	@Override

@@ -19,7 +19,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-	private static final String	BUNDLE_NAME	= "net.tourbook.common.messages";												//$NON-NLS-1$
+	private static final String	BUNDLE_NAME	= "net.tourbook.common.messages";//$NON-NLS-1$
 
 	public static String		App_Action_Close_Tooltip;
 	public static String		App_Action_New_WithConfirm;
@@ -144,11 +144,14 @@ public class Messages extends NLS {
 	public static String		Image___Empty16;
 
 	public static String		Image__App_Close;
+	public static String		Image__App_Close_Themed;
 	public static String		Image__BookOpen;
+	public static String		Image__BookOpen_Themed;
 	public static String		Image__ColumnCategory;
 	public static String		Image__CustomizeProfilesColumns;
 	public static String		Image__options;
 	public static String		Image__Pin_Blue;
+	public static String		Image__Pin_Themed;
 	public static String		Image__TourOptions;
 	public static String		Image__TourOptions_Disabled;
 	public static String		Image__weather_sunny;
@@ -254,8 +257,7 @@ public class Messages extends NLS {
 
 	public static String		rgv_vertex_class_cast_exception;
 
-	public static String Slideout_Dialog_Action_DragSlideout_ToolTip;
-
+	public static String		Slideout_Dialog_Action_DragSlideout_ToolTip;
 	public static String		Slideout_Dialog_Action_KeepSlideoutOpen_Tooltip;
 	public static String		Slideout_Dialog_Action_PinSlideoutLocation_Tooltip;
 

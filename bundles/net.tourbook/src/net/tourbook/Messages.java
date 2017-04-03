@@ -19,7 +19,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-	private static final String	BUNDLE_NAME	= "net.tourbook.messages";																													  																														//$NON-NLS-1$
+	private static final String	BUNDLE_NAME	= "net.tourbook.messages";//$NON-NLS-1$
 
 	public static String		Action_Cadence_Set;
 	public static String		Action_Cadence_Set_Rpm;
@@ -433,7 +433,6 @@ public class Messages extends NLS {
 
 	public static String		App_Link_RestoreDefaultValues;
 
-
 	public static String		App_Splash_Copyright;
 
 	public static String		App_Title;
@@ -744,8 +743,11 @@ public class Messages extends NLS {
 	public static String		Image__App_Sort_Disabled;
 	public static String		Image__App_Trash;
 	public static String		Image__App_Trash_Disabled;
+	public static String		Image__App_Trash_Themed;
 	public static String		Image__ArrowDown;
+	public static String		Image__ArrowDown_Themed;
 	public static String		Image__ArrowUp;
+	public static String		Image__ArrowUp_Themed;
 	public static String		Image__assignMergedTour;
 	public static String		Image__assignMergedTour_disabled;
 	public static String		Image__chart_analyzer;
