@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -40,6 +40,7 @@ import org.apache.commons.io.IOUtils;
 
 import com.garmin.fit.Decode;
 import com.garmin.fit.Field;
+import com.garmin.fit.Fit;
 import com.garmin.fit.FitRuntimeException;
 import com.garmin.fit.Mesg;
 import com.garmin.fit.MesgBroadcaster;
@@ -84,9 +85,9 @@ public class FitDataReader extends TourbookDevice {
 							|| fieldName.equals("time") //$NON-NLS-1$
 							|| fieldName.equals("timestamp") //$NON-NLS-1$
 
-							//
-							// record data
-							//
+					//
+					// record data
+					//
 
 							|| fieldName.equals("activity_type") //$NON-NLS-1$
 							|| fieldName.equals("event") //$NON-NLS-1$
@@ -119,9 +120,9 @@ public class FitDataReader extends TourbookDevice {
 							|| fieldName.equals("stance_time_percent") //$NON-NLS-1$
 							|| fieldName.equals("vertical_oscillation") //$NON-NLS-1$
 
-							//
-							// lap data
-							//
+					//
+					// lap data
+					//
 							|| fieldName.equals("avg_cadence") //$NON-NLS-1$
 							|| fieldName.equals("avg_fractional_cadence") //$NON-NLS-1$
 							|| fieldName.equals("avg_heart_rate") //$NON-NLS-1$
@@ -153,7 +154,7 @@ public class FitDataReader extends TourbookDevice {
 							|| fieldName.equals("avg_stance_time_percent") //$NON-NLS-1$
 							|| fieldName.equals("avg_vertical_oscillation") //$NON-NLS-1$
 
-							// power
+					// power
 							|| fieldName.equals("power") //$NON-NLS-1$
 							|| fieldName.equals("accumulated_power") //$NON-NLS-1$
 							|| fieldName.equals("left_right_balance") //$NON-NLS-1$
@@ -166,7 +167,7 @@ public class FitDataReader extends TourbookDevice {
 							|| fieldName.equals("power_setting") //$NON-NLS-1$
 							|| fieldName.equals("pwr_calc_type") //$NON-NLS-1$
 
-							// device
+					// device
 							|| fieldName.equals("ant_network") //$NON-NLS-1$
 							|| fieldName.equals("battery_status") //$NON-NLS-1$
 							|| fieldName.equals("battery_voltage") //$NON-NLS-1$
@@ -220,7 +221,7 @@ public class FitDataReader extends TourbookDevice {
 							|| fieldName.equals("temperature_setting") //$NON-NLS-1$
 							|| fieldName.equals("weight_setting") //$NON-NLS-1$
 
-							//
+					//
 							|| fieldName.equals("unknown") //$NON-NLS-1$
 					//
 					) {
@@ -229,7 +230,8 @@ public class FitDataReader extends TourbookDevice {
 
 					final long javaTime = (garminTimestamp * 1000) + com.garmin.fit.DateTime.OFFSET;
 
-					System.out.println(String.format("%s %d %s %-5d %-30s %20s %s", //$NON-NLS-1$
+					System.out.println(String.format(
+							"%s %d %s %-5d %-30s %20s %s", //$NON-NLS-1$
 							TimeTools.getZonedDateTime(javaTime), // show readable date/time
 							javaTime / 1000,
 							Long.toString(garminTimestamp),
@@ -345,8 +347,19 @@ public class FitDataReader extends TourbookDevice {
 		FileInputStream fis = null;
 
 		try {
+
 			fis = new FileInputStream(fileName);
 			returnValue = new Decode().checkFileIntegrity(fis);
+
+			if (!returnValue) {
+				TourLogManager.logError(
+						String.format(
+								"FIT checkFileIntegrity failed '%s' - FIT SDK %d.%d", //$NON-NLS-1$
+								fileName,
+								Fit.PROFILE_VERSION_MAJOR,
+								Fit.PROFILE_VERSION_MINOR));
+			}
+
 		} catch (final FileNotFoundException e) {
 			TourLogManager.logError_CannotReadDataFile(fileName, e);
 		} catch (final FitRuntimeException e) {

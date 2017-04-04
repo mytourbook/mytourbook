@@ -8,6 +8,10 @@ New
 
   - Filter tours by tour fields additonally to Person/Tour type/Tour photo
   
+  - Problem with Linux (Windows do not have this problem)
+    When the calendar area of a date widget in a filter property is hovered with the mouse and the calendar area is outside of the slideout border, then the calendar area will be closed.
+    Workaround: Enlarge the slideout
+    Background: Linux creates a shell for each date widget and this shell cannot be controled from outside of the widget
 
 * Statistics
 
@@ -37,3 +41,11 @@ These problems are fixed
   
 * Tour search
   Error occured in the search tour URI when the app folder path contained square brackets, e.g [16.11]
+
+  
+System
+======
+
+* FIT SDK
+  Updated to newest version 20.27 which fixed this problem 
+  https://sourceforge.net/p/mytourbook/discussion/622811/thread/320590c3/
