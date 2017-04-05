@@ -10,7 +10,9 @@ New
   
   - Problem with Linux (Windows do not have this problem)
     When the calendar area of a date widget in a filter property is hovered with the mouse and the calendar area is outside of the slideout border, then the calendar area will be closed.
-    Workaround: Enlarge the slideout
+    Workaround: 
+    - Enlarge the slideout
+    - Enter date with keyboard
     Background: Linux creates a shell for each date widget and this shell cannot be controled from outside of the widget
 
 * Statistics
