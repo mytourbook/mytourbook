@@ -565,7 +565,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		{
 			{
 				/*
-				 * Button: Add
+				 * Button: New
 				 */
 				final Button button = new Button(container, SWT.PUSH);
 				button.setText(Messages.Slideout_TourFilter_Action_AddProfile);
