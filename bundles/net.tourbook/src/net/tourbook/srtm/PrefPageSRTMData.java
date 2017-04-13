@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -53,7 +53,8 @@ import de.byteholder.geoclipse.map.UI;
 
 public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPreferencePage {
 
-	public static final String		PROTOCOL_HTTP			= "http://";											//$NON-NLS-1$
+	public static final String		PROTOCOL_HTTP			= "http://";										//$NON-NLS-1$
+	public static final String		PROTOCOL_HTTPS			= "https://";										//$NON-NLS-1$
 	public static final String		PROTOCOL_FTP			= "ftp://";											//$NON-NLS-1$
 
 //	http://dds.cr.usgs.gov/srtm/version2_1/SRTM3/Eurasia/N47E008.hgt.zip
@@ -122,6 +123,7 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
 			_useDefaultLocation.setPage(this);
 			_useDefaultLocation.setPreferenceStore(_prefStore);
 			_useDefaultLocation.setPropertyChangeListener(new IPropertyChangeListener() {
+				@Override
 				public void propertyChange(final PropertyChangeEvent event) {
 					enableControls();
 				}
@@ -140,6 +142,7 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
 				_dataPathEditor.setPreferenceStore(_prefStore);
 				_dataPathEditor.setEmptyStringAllowed(false);
 				_dataPathEditor.setPropertyChangeListener(new IPropertyChangeListener() {
+					@Override
 					public void propertyChange(final PropertyChangeEvent event) {
 						validateData();
 					}
@@ -162,6 +165,7 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
 		};
 
 		final ModifyListener modifyListener = new ModifyListener() {
+			@Override
 			public void modifyText(final ModifyEvent e) {
 				validateData();
 			}
@@ -233,6 +237,7 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
 		_txtSRTM3HttpUrl.setEnabled(!isFTP);
 	}
 
+	@Override
 	public void init(final IWorkbench workbench) {}
 
 	@Override
@@ -248,6 +253,7 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
 	private void onCheckConnection() {
 
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+			@Override
 			public void run() {
 
 				String baseUrl;
@@ -275,7 +281,8 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
 
 						final String message = response == HttpURLConnection.HTTP_OK//
 								? NLS.bind(Messages.prefPage_srtm_checkHTTPConnectionOK_message, baseUrl)
-								: NLS.bind(Messages.prefPage_srtm_checkHTTPConnectionFAILED_message,//
+								: NLS.bind(
+										Messages.prefPage_srtm_checkHTTPConnectionFAILED_message, //
 										new Object[] {
 												baseUrl,
 												Integer.toString(response),
@@ -406,7 +413,8 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
 
 			// check http url
 
-			if (_txtSRTM3HttpUrl.getText().trim().toLowerCase().startsWith(PROTOCOL_HTTP) == false) {
+			final String httpUrl = _txtSRTM3HttpUrl.getText().trim().toLowerCase();
+			if (httpUrl.startsWith(PROTOCOL_HTTP) == false && httpUrl.startsWith(PROTOCOL_HTTPS) == false) {
 
 				isValid = false;
 

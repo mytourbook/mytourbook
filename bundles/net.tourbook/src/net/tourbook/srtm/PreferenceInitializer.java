@@ -46,6 +46,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		// srtm3 server
 		prefStore.setDefault(IPreferences.STATE_IS_SRTM3_FTP, false);
 		prefStore.setDefault(IPreferences.STATE_SRTM3_FTP_URL, "ftp://e0srp01u.ecs.nasa.gov"); //$NON-NLS-1$
-		prefStore.setDefault(IPreferences.STATE_SRTM3_HTTP_URL, "http://dds.cr.usgs.gov/srtm/version2_1"); //$NON-NLS-1$
+		prefStore.setDefault(IPreferences.STATE_SRTM3_HTTP_URL, "https://dds.cr.usgs.gov/srtm/version2_1"); //$NON-NLS-1$
 	}
 }
