@@ -7,4 +7,4 @@
 
 
 #define AppRoot         "c:\dat\MT\"
-#define ProductRoot     "d:\dat\mytourbook-PRODUCT\"
+#define ProductRoot     "c:\dat\mytourbook-PRODUCT\"
