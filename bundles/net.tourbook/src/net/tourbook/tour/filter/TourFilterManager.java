@@ -56,8 +56,7 @@ public class TourFilterManager {
 	private static final String							LABEL_POWER_TOTAL_WORK				= net.tourbook.ui.Messages.ColumnFactory_Power_TotalWork;
 
 	/* Training */
-	private static final String							LABEL_POWER_FTP						= net.tourbook.ui.Messages.ColumnFactory_Power_FTP_Tooltip;
-	private static final String							LABEL_POWER_TO_WEIGHT				= net.tourbook.ui.Messages.ColumnFactory_Power_PowerToWeight_Tooltip;
+	private static final String							LABEL_POWER_FTP						= net.tourbook.ui.Messages.ColumnFactory_Power_FTP_Label;
 	private static final String							LABEL_POWERTRAIN_AVG_CADENCE		= net.tourbook.ui.Messages.ColumnFactory_avg_cadence_label;
 	private static final String							LABEL_POWERTRAIN_AVG_CADENCE_UNIT	= net.tourbook.ui.Messages.ColumnFactory_avg_cadence;
 	private static final String							LABEL_POWERTRAIN_GEAR_FRONT_SHIFT	= net.tourbook.ui.Messages.ColumnFactory_GearFrontShiftCount_Label;
