@@ -1,6 +1,9 @@
 bin
-/repositories
-target
+build/
+target/
+repositories/
+
 .apt_generated
+
 *.js.map
 *.js.uncompressed.js
