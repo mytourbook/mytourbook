@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -54,10 +54,8 @@ import net.tourbook.common.color.IGradientColorProvider;
 import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.common.color.MapGraphId;
 import net.tourbook.common.color.MapUnits;
-import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.tooltip.OpenDialogManager;
-import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.SWTPopupOverAWT;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -91,7 +89,6 @@ import net.tourbook.map3.layer.tourtrack.TourMap3Position;
 import net.tourbook.map3.layer.tourtrack.TourTrackConfig;
 import net.tourbook.map3.layer.tourtrack.TourTrackConfigManager;
 import net.tourbook.map3.layer.tourtrack.TourTrackLayer;
-import net.tourbook.map3.ui.SlideoutMap3Layer;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageMap3Color;
 import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
@@ -120,7 +117,6 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
@@ -132,7 +128,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IPartListener2;
@@ -146,36 +141,34 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class Map3View extends ViewPart implements ITourProvider {
 
-	private static final String					IMAGE_GRAPH_ALL							= net.tourbook.Messages.Image__options;
-	private static final String					GRAPH_LABEL_HEARTBEAT_UNIT				= net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
-
-	private static final String					SLIDER_TEXT_ALTITUDE					= "%.1f %s";												//$NON-NLS-1$
-	private static final String					SLIDER_TEXT_GRADIENT					= "%.1f %%";												//$NON-NLS-1$
-	private static final String					SLIDER_TEXT_PACE						= "%s %s";													//$NON-NLS-1$
-	private static final String					SLIDER_TEXT_PULSE						= "%.0f %s";												//$NON-NLS-1$
-	private static final String					SLIDER_TEXT_SPEED						= "%.1f %s";												//$NON-NLS-1$
-
-	public static final String					ID										= "net.tourbook.map3.view.Map3ViewId";						//$NON-NLS-1$
-
-	private static final String					STATE_IS_LEGEND_VISIBLE					= "STATE_IS_LEGEND_VISIBLE";								//$NON-NLS-1$
-	private static final String					STATE_IS_MARKER_VISIBLE					= "STATE_IS_MARKER_VISIBLE";								//$NON-NLS-1$
-	private static final String					STATE_IS_SYNC_MAP_VIEW_WITH_TOUR		= "STATE_IS_SYNC_MAP_VIEW_WITH_TOUR";						//$NON-NLS-1$
-	private static final String					STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER	= "STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER";					//$NON-NLS-1$
-	private static final String					STATE_IS_TOUR_VISIBLE					= "STATE_IS_TOUR_VISIBLE";									//$NON-NLS-1$
-	private static final String					STATE_IS_TRACK_SLIDER_VISIBLE			= "STATE_IS_TRACK_SLIDERVISIBLE";							//$NON-NLS-1$
-	private static final String					STATE_MAP3_VIEW							= "STATE_MAP3_VIEW";										//$NON-NLS-1$
-	private static final String					STATE_TOUR_COLOR_ID						= "STATE_TOUR_COLOR_ID";									//$NON-NLS-1$
-
-	private static final WorldWindowGLCanvas	_wwCanvas								= Map3Manager.getWWCanvas();
-
 // SET_FORMATTING_OFF
 	
-	private static final ImageDescriptor		_map3LayerImageDescriptor				= TourbookPlugin.getImageDescriptor(Messages.Image_Map3_Map3PropertiesView);
+	private static final String		IMAGE_GRAPH_ALL							= net.tourbook.Messages.Image__options;
+	private static final String		GRAPH_LABEL_HEARTBEAT_UNIT				= net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
 
-	private final IPreferenceStore				_prefStore								= TourbookPlugin.getPrefStore();
-	private final IDialogSettings				_state									= TourbookPlugin.getState(getClass().getCanonicalName());
+	private static final String		SLIDER_TEXT_ALTITUDE					= "%.1f %s";								//$NON-NLS-1$
+	private static final String		SLIDER_TEXT_GRADIENT					= "%.1f %%";								//$NON-NLS-1$
+	private static final String		SLIDER_TEXT_PACE						= "%s %s";									//$NON-NLS-1$
+	private static final String		SLIDER_TEXT_PULSE						= "%.0f %s";								//$NON-NLS-1$
+	private static final String		SLIDER_TEXT_SPEED						= "%.1f %s";								//$NON-NLS-1$
+
+	public static final String		ID										= "net.tourbook.map3.view.Map3ViewId";		//$NON-NLS-1$
+
+	private static final String		STATE_IS_LEGEND_VISIBLE					= "STATE_IS_LEGEND_VISIBLE";				//$NON-NLS-1$
+	private static final String		STATE_IS_MARKER_VISIBLE					= "STATE_IS_MARKER_VISIBLE";				//$NON-NLS-1$
+	private static final String		STATE_IS_SYNC_MAP_VIEW_WITH_TOUR		= "STATE_IS_SYNC_MAP_VIEW_WITH_TOUR";		//$NON-NLS-1$
+	private static final String		STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER	= "STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER";	//$NON-NLS-1$
+	private static final String		STATE_IS_TOUR_VISIBLE					= "STATE_IS_TOUR_VISIBLE";					//$NON-NLS-1$
+	private static final String		STATE_IS_TRACK_SLIDER_VISIBLE			= "STATE_IS_TRACK_SLIDERVISIBLE";																				//$NON-NLS-1$
+	private static final String		STATE_MAP3_VIEW							= "STATE_MAP3_VIEW";						//$NON-NLS-1$
+	private static final String		STATE_TOUR_COLOR_ID						= "STATE_TOUR_COLOR_ID";					//$NON-NLS-1$
+
+	private static final WorldWindowGLCanvas	_wwCanvas								= Map3Manager.getWWCanvas();
+	private final IPreferenceStore				_prefStore					= TourbookPlugin.getPrefStore();
 	
 // SET_FORMATTING_ON
+
+	private final IDialogSettings				_state						= TourbookPlugin.getState(getClass().getCanonicalName());
 
 	private ActionMap3Color						_actionMap3Color;
 	private ActionOpenPrefDialog				_actionMap3Colors;
@@ -188,7 +181,6 @@ public class Map3View extends ViewPart implements ITourProvider {
 	private ActionShowEntireTour				_actionShowEntireTour;
 	private ActionShowLegend					_actionShowLegendInMap;
 	private ActionShowMap3Layer					_actionShowMap3Layer;
-	private ActionShowMap3Layer2				_actionShowMap3Layer2;
 	private ActionShowMarker					_actionShowMarker;
 	private ActionShowTourInMap3				_actionShowTourInMap3;
 	private ActionSyncMapWithChartSlider		_actionSynMapWithChartSlider;
@@ -258,22 +250,6 @@ public class Map3View extends ViewPart implements ITourProvider {
 	private Frame								_awtFrame;
 	private Menu								_swtContextMenu;
 
-	private class ActionShowMap3Layer2 extends ActionToolbarSlideout {
-
-		public ActionShowMap3Layer2(final Map3View map3View, final Composite parent) {
-
-			super(_map3LayerImageDescriptor, _map3LayerImageDescriptor);
-
-			//notSelectedTooltip = Messages.Map3_Action_OpenMap3PropertiesView;
-		}
-
-		@Override
-		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
-
-			return new SlideoutMap3Layer(toolbar, toolbar);
-		}
-	}
-
 	private class Map3ContextMenu extends SWTPopupOverAWT {
 
 		public Map3ContextMenu(final Display display, final Menu swtContextMenu) {
@@ -298,8 +274,10 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		final boolean isAbsoluteAltitudeMode = config.altitudeMode == WorldWind.ABSOLUTE;
 		final boolean isAltitudeOffset = config.isAltitudeOffset;
-		final boolean isOffsetModeAbsolute = config.altitudeOffsetMode == TourTrackConfigManager.ALTITUDE_OFFSET_MODE_ABSOLUTE;
-		final boolean isOffsetModeRelative = config.altitudeOffsetMode == TourTrackConfigManager.ALTITUDE_OFFSET_MODE_RELATIVE;
+		final boolean isOffsetModeAbsolute =
+				config.altitudeOffsetMode == TourTrackConfigManager.ALTITUDE_OFFSET_MODE_ABSOLUTE;
+		final boolean isOffsetModeRelative =
+				config.altitudeOffsetMode == TourTrackConfigManager.ALTITUDE_OFFSET_MODE_RELATIVE;
 
 		final int relativeOffset = config.altitudeOffsetDistanceRelative;
 
@@ -816,7 +794,6 @@ public class Map3View extends ViewPart implements ITourProvider {
 		_actionShowEntireTour = new ActionShowEntireTour(this);
 		_actionShowLegendInMap = new ActionShowLegend(this);
 		_actionShowMap3Layer = new ActionShowMap3Layer(this, parent);
-		_actionShowMap3Layer2 = new ActionShowMap3Layer2(this, parent);
 		_actionShowMarker = new ActionShowMarker(this);
 		_actionShowTourInMap3 = new ActionShowTourInMap3(this, parent);
 		_actionSynMapWithChartSlider = new ActionSyncMapWithChartSlider(this);
@@ -1165,7 +1142,6 @@ public class Map3View extends ViewPart implements ITourProvider {
 
 		tbm.add(_actionShowMarker);
 		tbm.add(_actionShowMap3Layer);
-		tbm.add(_actionShowMap3Layer2);
 
 		/*
 		 * fill view menu
@@ -1561,9 +1537,10 @@ public class Map3View extends ViewPart implements ITourProvider {
 					final int leftSliderValueIndex = xSliderPos.getLeftSliderValueIndex();
 					int rightSliderValueIndex = xSliderPos.getRightSliderValueIndex();
 
-					rightSliderValueIndex = rightSliderValueIndex == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION
-							? leftSliderValueIndex
-							: rightSliderValueIndex;
+					rightSliderValueIndex =
+							rightSliderValueIndex == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION
+									? leftSliderValueIndex
+									: rightSliderValueIndex;
 
 					syncMapWith_ChartSlider(//
 							tourData,
