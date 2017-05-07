@@ -1,0 +1,9 @@
+/usr/bin/firefox -P MTProfile -no-remote 
+-width 600
+-height 800
+
+
+sudo apt-get install libwebkitgtk-1.0-0
+
+
+"No more handles [Unknown Mozilla path (MOZILLA_FIVE_HOME not set)]"
