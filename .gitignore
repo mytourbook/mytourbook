@@ -3,6 +3,7 @@ build/
 target/
 repositories/
 
+# VTM external files
 libs/
 
 .apt_generated
