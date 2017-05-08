@@ -1,0 +1,17 @@
+rootProject.name = 'VTM_RCP'
+
+// rcp projects
+include ':VTM_RCP_App'
+include ':VTM_RCP_Externals'
+
+// vtm projects
+include ':vtm'
+include ':vtm-themes'
+include ':vtm-gdx'
+include ':vtm-desktop'
+
+project(':vtm'			).projectDir	= new File('../vtm-parent/vtm')
+project(':vtm-themes'	).projectDir	= new File('../vtm-parent/vtm-themes')
+project(':vtm-gdx'		).projectDir	= new File('../vtm-parent/vtm-gdx')
+project(':vtm-desktop'	).projectDir	= new File('../vtm-parent/vtm-desktop')
+

@@ -1,0 +1,199 @@
+/*
+ This is my first gradle script, it may be complicate but it works, 
+ it's very likely that it can be optimized.
+ 
+ Wolfgang 4.5.2017
+ 
+*/
+
+plugins {
+
+    // osgi bundle support
+	id 'com.diffplug.gradle.osgi.bndmanifest' version '3.7.0'
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+repositories {
+    mavenCentral()
+}
+
+def bundleVersion	= '0.1.0'
+
+
+dependencies {
+
+	compile project(':vtm')
+	compile project(':vtm-desktop')
+	compile project(':vtm-gdx')
+	compile project(':vtm-themes')
+}
+
+
+// -----------------------------------
+// Create Eclipse .project file
+// -----------------------------------
+eclipse {
+
+    project {
+
+		buildCommand 'org.eclipse.jdt.core.javabuilder'
+
+		natures = [
+		        'org.eclipse.pde.PluginNature',
+		        'org.eclipse.jdt.core.javanature'
+		] 
+    }
+}
+
+
+
+// sync will remove old jar's !!!
+task copyDependenciesIntoLibFolder(type: Sync) {
+
+	// sync compile jar's (dependencies) into the lib folder
+    into 'libs'
+    from configurations.compile
+}
+
+// MUST be set AFTER task declaration !!!
+tasks.classes.dependsOn(
+
+	// copy jars from dependencies to 'public' project folder
+	copyDependenciesIntoLibFolder,
+	
+	// recreate eclipse files
+	cleanEclipseClasspath, 
+	cleanEclipseProject, 
+	cleanEclipseJdt, 
+	
+	eclipseClasspath, 
+	eclipseProject, 
+	eclipseJdt, 
+
+	// !!! THIS IS NOT WORKING !!!
+	// cleanEclipse, 
+	// eclipse, 
+)
+
+// Convert created .classpath entries from
+//
+//	<classpathentry 
+//		kind		="lib" 
+//		path		="C:/Users/<user>/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-lang3/3.5/6c6c702c89bfff3cd9e80b04d668c5e190d588c6/commons-lang3-3.5.jar"
+//		sourcepath	="C:/Users/<user>/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-lang3/3.5/f7d878153e86a1cdddf6b37850e00a9f8bff726f/commons-lang3-3.5-sources.jar" 
+//	/>
+//
+// into plugin "local" folders
+//
+//	<classpathentry 
+//		kind		="lib" 
+//		exported	="true" 
+//		path		="libs/commons-lang3-3.5.jar"
+//		sourcepath	="libs/commons-lang3-3.5-sources.jar" 
+//	/>
+eclipse.classpath.file { 
+
+	// remove natives classpath entries, they causes errors
+    whenMerged { classpath ->
+        classpath.entries.removeAll{ entry -> entry.path.contains('vtm-parent/vtm-desktop/natives') }
+    }
+
+    
+	withXml { xml ->
+
+		def node = xml.asNode()
+	
+		// log all classpath items
+		println 'All classpathentry items'
+		node.classpathentry.each {
+			println '\t' + it
+		}
+	
+		// add 'libs/' folder for jar files
+		node.classpathentry.findAll { it.@kind == 'lib'}.each {
+		
+			//remove path from dependency name
+			def jarFileName = it.@path.tokenize('/')[-1]
+		
+			it.@exported	= 'true'
+			it.@path		= 'libs/' + jarFileName
+		}
+		
+		// src from a project dependency is not working, convert it into a jar, jar's are already created :-)
+		node.findAll { it.@kind == 'src'}.each {
+		
+			println 'converted'
+			println '\tfrom:\t' + it
+		
+			def srcPath = it.@path
+			
+			it.@kind		= 'lib'
+			it.@exported	= 'true'
+			it.@path		= 'libs' + srcPath + '.jar'
+			it.@sourcepath	= srcPath
+	
+			println '\tinto:\t' + it
+		}
+		
+		// add libs/ which contains the vtm natives
+		//	<classpathentry exported="true" kind="lib" path="libs/"/>
+	    node.appendNode('classpathentry', [ exported: true, kind: 'lib', path: 'libs/' ])
+	}
+}
+
+
+// -----------------------------------
+// OSGI
+// -----------------------------------
+
+// copy manifest
+apply plugin: 'com.diffplug.gradle.osgi.bndmanifest'
+osgiBndManifest {
+	copyTo 'META-INF/MANIFEST.MF'
+}
+
+def createBundleClassPath() {
+
+    def list = []
+
+	// use only compile time resources and not runtime resources, this trick excludes :sources 
+    configurations.compile.each {
+    
+    	def name = it.name
+    	
+    	if(name.equals('linux') || name.equals('osx') || name.equals('windows')){ 
+	    	// skip /natives/ items: linux, osx, windows
+    	} else { 
+	        list += 'libs/' + name
+    	}
+    }
+
+	// add libs/ which contains the vtm natives
+    list += 'libs/'
+
+    return list.join(',')
+}
+
+// set MANIFEST.MF properties to configure OSGi bundle
+jar.manifest.attributes(
+
+	'Bundle-SymbolicName': 						project.name,
+	
+	// qualifier is an easy readable time stamp
+	'Bundle-Version':							bundleVersion + '.v${tstamp;yyyyMMdd-HHmm}',
+
+	'Bundle-Vendor':							"It's me",
+	'Bundle-License': 							'http://www.apache.org/licenses/LICENSE-2.0',
+	
+	// eclipse 4.6 manifest editor creates this property and not 'Require-Capability'
+	'Bundle-RequiredExecutionEnvironment':		'JavaSE-1.8',
+
+	// export all packages from all included jar's
+	'Export-Package': 							'*',
+    'Bundle-ClassPath': 						createBundleClassPath(),
+
+	'-removeheaders':							'Bnd-LastModified, Bundle-Name, Created-By, Tool, Private-Package, Require-Capability',
+)
+

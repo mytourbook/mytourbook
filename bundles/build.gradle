@@ -1,0 +1,19 @@
+buildscript {
+
+    repositories {
+        jcenter()
+    }
+}
+
+subprojects {
+
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+}
+
+allprojects {
+
+    ext.gdxVersion = "1.9.5"
+}

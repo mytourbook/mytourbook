@@ -3,6 +3,8 @@ build/
 target/
 repositories/
 
+libs/
+
 .apt_generated
 
 *.js.map
