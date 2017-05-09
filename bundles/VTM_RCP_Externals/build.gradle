@@ -188,7 +188,7 @@ jar.manifest.attributes(
 	'Bundle-License': 							'http://www.apache.org/licenses/LICENSE-2.0',
 	
 	// eclipse 4.6 manifest editor creates this property and not 'Require-Capability'
-	'Bundle-RequiredExecutionEnvironment':		'JavaSE-1.8',
+	'Bundle-RequiredExecutionEnvironment':		'JavaSE-1.7',
 
 	// export all packages from all included jar's
 	'Export-Package': 							'*',

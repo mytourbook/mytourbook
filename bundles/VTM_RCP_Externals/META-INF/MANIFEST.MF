@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ClassPath: libs/vtm.jar,libs/vtm-desktop.jar,libs/vtm-gdx.jar,l
- ibs/vtm-themes.jar,libs/slf4j-api-1.7.21.jar,libs/gdx-platform-1.9.5-
- natives-desktop.jar,libs/gdx-backend-lwjgl-1.9.5.jar,libs/svg-salaman
- der-0.1.19.jar,libs/gdx-1.9.5.jar,libs/lwjgl-2.9.2.jar,libs/lwjgl_uti
+ ibs/vtm-themes.jar,libs/slf4j-api-1.7.21.jar,libs/gdx-platform-1.9.6-
+ natives-desktop.jar,libs/gdx-backend-lwjgl-1.9.6.jar,libs/svg-salaman
+ der-0.1.19.jar,libs/gdx-1.9.6.jar,libs/lwjgl-2.9.2.jar,libs/lwjgl_uti
  l-2.9.2.jar,libs/jlayer-1.0.1-gdx.jar,libs/jorbis-0.0.17.jar,libs/lwj
  gl-platform-2.9.2-natives-windows.jar,libs/lwjgl-platform-2.9.2-nativ
  es-linux.jar,libs/lwjgl-platform-2.9.2-natives-osx.jar,libs/jinput-2.
@@ -14,7 +14,7 @@ Bundle-ManifestVersion: 2
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-SymbolicName: VTM_RCP_Externals
 Bundle-Vendor: It's me
-Bundle-Version: 0.1.0.v20170506-1314
+Bundle-Version: 0.1.0.v20170509-1549
 Export-Package: assets.patterns;version="0.1.0",assets.shaders;version
  ="0.1.0",assets.symbols;version="0.1.0",assets.symbols.accommodation;
  version="0.1.0",assets.symbols.amenity;version="0.1.0",assets.symbols
