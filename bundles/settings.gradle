@@ -1,8 +1,8 @@
-rootProject.name = 'VTM_RCP'
+rootProject.name = 'MyTourbook-Bundles'
 
 // rcp projects
 include ':VTM_RCP_App'
-include ':VTM_RCP_Externals'
+include ':net.tourbook.ext.vtm'
 
 // vtm projects
 include ':vtm'

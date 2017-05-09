@@ -12,9 +12,9 @@ Bundle-ClassPath: libs/vtm.jar,libs/vtm-desktop.jar,libs/vtm-gdx.jar,l
 Bundle-License: http://www.apache.org/licenses/LICENSE-2.0
 Bundle-ManifestVersion: 2
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Bundle-SymbolicName: VTM_RCP_Externals
+Bundle-SymbolicName: net.tourbook.ext.vtm
 Bundle-Vendor: It's me
-Bundle-Version: 0.1.0.v20170509-1549
+Bundle-Version: 0.1.0.v20170509-1606
 Export-Package: assets.patterns;version="0.1.0",assets.shaders;version
  ="0.1.0",assets.symbols;version="0.1.0",assets.symbols.accommodation;
  version="0.1.0",assets.symbols.amenity;version="0.1.0",assets.symbols

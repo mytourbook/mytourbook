@@ -6,6 +6,6 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: vtm.rcp.app.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- VTM_RCP_Externals
+ net.tourbook.ext.vtm
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
