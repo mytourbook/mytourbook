@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: VTM_RCP_App
-Bundle-SymbolicName: VTM_RCP_App;singleton:=true
+Bundle-SymbolicName: net.tourbook.vtm;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: vtm.rcp.app.Activator
 Require-Bundle: org.eclipse.ui,
