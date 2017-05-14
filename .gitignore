@@ -1,7 +1,10 @@
+.settings/
+
 bin
 build/
 target/
 repositories/
+
 
 # VTM external files
 libs/

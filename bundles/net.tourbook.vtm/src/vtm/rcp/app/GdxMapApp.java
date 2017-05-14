@@ -24,7 +24,14 @@ import org.oscim.backend.GLAdapter;
 import org.oscim.gdx.GdxAssets;
 import org.oscim.gdx.GdxMap;
 import org.oscim.gdx.LwjglGL20;
+import org.oscim.layers.tile.buildings.BuildingLayer;
+import org.oscim.layers.tile.vector.VectorTileLayer;
+import org.oscim.layers.tile.vector.labeling.LabelLayer;
+import org.oscim.theme.VtmThemes;
 import org.oscim.tiling.TileSource;
+import org.oscim.tiling.source.OkHttpEngine;
+import org.oscim.tiling.source.UrlTileSource;
+import org.oscim.tiling.source.mvt.MapboxTileSource;
 import org.oscim.tiling.source.oscimap4.OSciMap4TileSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +43,22 @@ import com.badlogic.gdx.utils.SharedLibraryLoader;
 public class GdxMapApp extends GdxMap {
 
 	public static final Logger log = LoggerFactory.getLogger(GdxMapApp.class);
+
+	protected static LwjglApplicationConfiguration getConfig(final String title) {
+
+		LwjglApplicationConfiguration.disableAudio = true;
+		final LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
+
+		cfg.title = title != null ? title : "vtm-gdx";
+		cfg.width = 1200; //800;
+		cfg.height = 1000; //600;
+		cfg.stencil = 8;
+		cfg.samples = 2;
+		cfg.foregroundFPS = 30;
+		cfg.backgroundFPS = 10;
+
+		return cfg;
+	}
 
 	public static void init() {
 
@@ -51,36 +74,52 @@ public class GdxMapApp extends GdxMap {
 		GLAdapter.GDX_DESKTOP_QUIRKS = true;
 	}
 
-	public void run(Canvas canvas) {
-
-		init();
-
-		new LwjglApplication(new GdxMapApp(), getConfig(null), canvas);
-	}
-
-	protected static LwjglApplicationConfiguration getConfig(String title) {
-
-		LwjglApplicationConfiguration.disableAudio = true;
-		LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
-
-		cfg.title = title != null ? title : "vtm-gdx";
-		cfg.width = 1200; //800;
-		cfg.height = 1000; //600;
-		cfg.stencil = 8;
-		cfg.samples = 2;
-		cfg.foregroundFPS = 30;
-		cfg.backgroundFPS = 10;
-
-		return cfg;
+	public static void main2(final String[] args) {
+		GdxMapApp.init();
+		GdxMapApp.run(new MapboxTest());
 	}
 
 	@Override
 	public void createLayers() {
 
-		TileSource tileSource = new OSciMap4TileSource();
+		final TileSource tileSource = new OSciMap4TileSource();
 
 		initDefaultLayers(tileSource, false, true, true);
 
 		mMap.setMapPosition(0, 0, 1 << 2);
+
+		/////////////////////////////////////////////////////////////////////////////
+
+		final OkHttpEngine.OkHttpFactory httpFactory = new OkHttpEngine.OkHttpFactory();
+
+		final OSciMap4TileSource tileSource2 = OSciMap4TileSource//
+				.builder()
+				.httpFactory(httpFactory)
+				.build();
+
+	}
+
+	@Override
+	public void createLayers2() {
+
+		final UrlTileSource tileSource = MapboxTileSource
+				.builder()
+				.apiKey("mapzen-xxxxxxx") // Put a proper API key
+				.httpFactory(new OkHttpEngine.OkHttpFactory())
+				//.locale("en")
+				.build();
+
+		final VectorTileLayer l = mMap.setBaseMap(tileSource);
+		mMap.setTheme(VtmThemes.MAPZEN);
+
+		mMap.layers().add(new BuildingLayer(mMap, l));
+		mMap.layers().add(new LabelLayer(mMap, l));
+	}
+
+	public void run(final Canvas canvas) {
+
+		init();
+
+		new LwjglApplication(new GdxMapApp(), getConfig(null), canvas);
 	}
 }

@@ -6,12 +6,14 @@ include ':net.tourbook.ext.vtm'
 
 // vtm projects
 include ':vtm'
-include ':vtm-themes'
-include ':vtm-gdx'
 include ':vtm-desktop'
+include ':vtm-gdx'
+include ':vtm-http'
+include ':vtm-themes'
 
 project(':vtm'			).projectDir	= new File('../../vtm-parent/vtm')
-project(':vtm-themes'	).projectDir	= new File('../../vtm-parent/vtm-themes')
-project(':vtm-gdx'		).projectDir	= new File('../../vtm-parent/vtm-gdx')
 project(':vtm-desktop'	).projectDir	= new File('../../vtm-parent/vtm-desktop')
+project(':vtm-gdx'		).projectDir	= new File('../../vtm-parent/vtm-gdx')
+project(':vtm-http'		).projectDir	= new File('../../vtm-parent/vtm-http')
+project(':vtm-themes'	).projectDir	= new File('../../vtm-parent/vtm-themes')
 

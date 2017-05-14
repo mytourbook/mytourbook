@@ -27,6 +27,7 @@ dependencies {
 	compile project(':vtm')
 	compile project(':vtm-desktop')
 	compile project(':vtm-gdx')
+	compile project(':vtm-http')
 	compile project(':vtm-themes')
 }
 
