@@ -39,10 +39,10 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.badlogic.gdx.utils.SharedLibraryLoader;
 
-public class GdxMapApp extends GdxMap {
+public class VtmMap extends GdxMap {
 
 
-	public static final Logger log = LoggerFactory.getLogger(GdxMapApp.class);
+	public static final Logger log = LoggerFactory.getLogger(VtmMap.class);
 
 	protected static LwjglApplicationConfiguration getConfig(final String title) {
 
@@ -113,10 +113,31 @@ public class GdxMapApp extends GdxMap {
 		mMap.layers().add(new LabelLayer(mMap, l));
 	}
 
+	@Override
+	public void dispose() {
+
+//		Probably related to how initialize / free the GL resources at start / end of view.
+//		There is Map.destroy and LWJGL could have life cycle methods too to check.
+
+//		Exception in thread "LWJGL Application" java.lang.RuntimeException: No OpenGL context found in the current thread.
+//		at org.lwjgl.opengl.GLContext.getCapabilities(GLContext.java:124)
+//		at org.lwjgl.opengl.GL11.glGetError(GL11.java:1299)
+//		at org.lwjgl.opengl.Util.checkGLError(Util.java:57)
+//		at org.lwjgl.opengl.WindowsContextImplementation.setSwapInterval(WindowsContextImplementation.java:113)
+//		at org.lwjgl.opengl.ContextGL.setSwapInterval(ContextGL.java:232)
+//		at org.lwjgl.opengl.DrawableGL.setSwapInterval(DrawableGL.java:86)
+//		at org.lwjgl.opengl.Display.setSwapInterval(Display.java:1129)
+//		at org.lwjgl.opengl.Display.setVSyncEnabled(Display.java:1142)
+//		at com.badlogic.gdx.backends.lwjgl.LwjglGraphics.setVSync(LwjglGraphics.java:558)
+//		at com.badlogic.gdx.backends.lwjgl.LwjglApplication$1.run(LwjglApplication.java:124)
+
+		super.dispose();
+	}
+
 	public void run(final Canvas canvas) {
 
 		init();
 
-		new LwjglApplication(new GdxMapApp(), getConfig(null), canvas);
+		new LwjglApplication(new VtmMap(), getConfig(null), canvas);
 	}
 }

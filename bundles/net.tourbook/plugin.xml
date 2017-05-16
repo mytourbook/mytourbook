@@ -1848,4 +1848,71 @@
    
    </extension>
 
+	<!-- 
+	
+	 MAP VTM  -  MAP VTM  -  MAP VTM  -  MAP VTM  -  MAP VTM  -  MAP VTM  -  MAP VTM   
+	
+	-->
+	
+	
+	<!-- COMMANDS -->
+
+   <extension point="org.eclipse.ui.commands">
+
+      <command
+            id="net.tourbook.map.vtm.command.TourMapVtm"
+            name="%View_Name_TourMapVtm"
+            defaultHandler="net.tourbook.map.vtm.action.ActionHandlerOpenTourMapVtmView"
+            />
+	            
+   </extension>
+
+
+
+	<!-- MENUS -->
+
+   <extension point="org.eclipse.ui.menus">
+
+		<menuContribution locationURI="menu:m_Tour?endof=sep_Map" >
+		            
+			<command commandId="net.tourbook.map.vtm.command.TourMapVtm"
+				icon="icons/map-vtm-view.png"
+				label="%View_Name_TourMapVtm"
+				mnemonic="%View_Name_TourMapVtm_Mnemonic"/>
+		
+		</menuContribution>
+
+		<menuContribution locationURI="toolbar:org.eclipse.ui.main.toolbar">
+		            
+			<toolbar id="mc_tb_Tour">
+		            
+				<command
+					commandId="net.tourbook.map.vtm.command.TourMapVtm"
+					icon="icons/map-vtm-view.png"
+					label="%View_Name_TourMapVtm"
+					tooltip="%View_Name_TourMapVtm_Tooltip"/>
+
+			</toolbar>
+		
+		</menuContribution>
+
+
+   </extension>
+
+
+
+	<!-- VIEWS -->
+
+   <extension point="org.eclipse.ui.views">
+
+		<view
+			category="net.tourbook.category.map"
+			class="net.tourbook.map.vtm.MapVtmView"
+			icon="icons/map-vtm-view.png"
+			id="net.tourbook.map.vtm.MapVtmView"
+			name="%View_Name_TourMapVtm"
+		/>
+   
+   </extension>
+
 </plugin>
