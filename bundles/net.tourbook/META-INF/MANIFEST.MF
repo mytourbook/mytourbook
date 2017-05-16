@@ -21,7 +21,8 @@ Require-Bundle: org.eclipse.ui,
  net.tourbook.ext.ejb3,
  net.tourbook.ext.rxtx_2.2,
  net.tourbook.ext.worldwind_2.0,
- net.tourbook.p2
+ net.tourbook.p2,
+ net.tourbook.ext.vtm
 Export-Package: de.byteholder.geoclipse.map,
  de.byteholder.geoclipse.map.event,
  de.byteholder.geoclipse.mapprovider,

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package vtm.rcp.app;
+package net.tourbook.map.vtm;
 
 import java.awt.Canvas;
 
@@ -28,7 +28,6 @@ import org.oscim.layers.tile.buildings.BuildingLayer;
 import org.oscim.layers.tile.vector.VectorTileLayer;
 import org.oscim.layers.tile.vector.labeling.LabelLayer;
 import org.oscim.theme.VtmThemes;
-import org.oscim.tiling.TileSource;
 import org.oscim.tiling.source.OkHttpEngine;
 import org.oscim.tiling.source.UrlTileSource;
 import org.oscim.tiling.source.mvt.MapboxTileSource;
@@ -41,6 +40,7 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.badlogic.gdx.utils.SharedLibraryLoader;
 
 public class GdxMapApp extends GdxMap {
+
 
 	public static final Logger log = LoggerFactory.getLogger(GdxMapApp.class);
 
@@ -74,32 +74,29 @@ public class GdxMapApp extends GdxMap {
 		GLAdapter.GDX_DESKTOP_QUIRKS = true;
 	}
 
-	public static void main2(final String[] args) {
-		GdxMapApp.init();
-		GdxMapApp.run(new MapboxTest());
-	}
-
 	@Override
 	public void createLayers() {
 
-		final TileSource tileSource = new OSciMap4TileSource();
-
-		initDefaultLayers(tileSource, false, true, true);
-
-		mMap.setMapPosition(0, 0, 1 << 2);
+//		final TileSource tileSource = new OSciMap4TileSource();
+//
+//		initDefaultLayers(tileSource, false, true, true);
+//
+//		mMap.setMapPosition(0, 0, 1 << 2);
 
 		/////////////////////////////////////////////////////////////////////////////
 
 		final OkHttpEngine.OkHttpFactory httpFactory = new OkHttpEngine.OkHttpFactory();
 
-		final OSciMap4TileSource tileSource2 = OSciMap4TileSource//
+		final OSciMap4TileSource tileSource = OSciMap4TileSource//
 				.builder()
 				.httpFactory(httpFactory)
 				.build();
 
+		initDefaultLayers(tileSource, false, true, true);
+
+		mMap.setMapPosition(0, 0, 1 << 2);
 	}
 
-	@Override
 	public void createLayers2() {
 
 		final UrlTileSource tileSource = MapboxTileSource
