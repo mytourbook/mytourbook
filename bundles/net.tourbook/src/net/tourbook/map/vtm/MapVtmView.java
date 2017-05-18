@@ -115,9 +115,9 @@ public class MapVtmView extends ViewPart {
 	@Override
 	public void dispose() {
 
-		_vtmMap.dispose();
-
 		getViewSite().getPage().removePartListener(_partListener);
+
+		_vtmMap.destroy();
 
 		super.dispose();
 	}
