@@ -19,6 +19,9 @@ import java.awt.BorderLayout;
 import java.awt.Canvas;
 import java.awt.Frame;
 
+import net.tourbook.application.TourbookPlugin;
+
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.widgets.Composite;
@@ -28,13 +31,15 @@ import org.eclipse.ui.part.ViewPart;
 
 public class MapVtmView extends ViewPart {
 
-	public static final String	ID	= "net.tourbook.map.vtm.MapVtmView";//$NON-NLS-1$
+	public static final String				ID		= "net.tourbook.map.vtm.MapVtmView";	//$NON-NLS-1$
 
-	private VtmMap				_vtmMap;
+	private static final IDialogSettings	_state	= TourbookPlugin.getState(ID);
 
-	private IPartListener2		_partListener;
+	private VtmMap							_vtmMap;
 
-	protected boolean			_isPartVisible;
+	private IPartListener2					_partListener;
+
+	protected boolean						_isPartVisible;
 
 	private void addPartListener() {
 
@@ -49,7 +54,7 @@ public class MapVtmView extends ViewPart {
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == MapVtmView.this) {
-					saveState();
+//					saveState();
 				}
 			}
 
@@ -108,7 +113,7 @@ public class MapVtmView extends ViewPart {
 		awtCanvas.setFocusable(true);
 		awtCanvas.requestFocus();
 
-		_vtmMap = new VtmMap();
+		_vtmMap = new VtmMap(_state);
 		_vtmMap.run(awtCanvas);
 	}
 
@@ -117,18 +122,11 @@ public class MapVtmView extends ViewPart {
 
 		getViewSite().getPage().removePartListener(_partListener);
 
-		_vtmMap.destroy();
+		_vtmMap.stop();
 
 		super.dispose();
 	}
 
-	private void saveState() {
-		// TODO Auto-generated method stub
-
-	}
-
-//	Probably related to how initialize / free the GL resources at start / end of view.
-//	There is Map.destroy and LWJGL could have life cycle methods too to check.
 
 	@Override
 	public void setFocus() {}

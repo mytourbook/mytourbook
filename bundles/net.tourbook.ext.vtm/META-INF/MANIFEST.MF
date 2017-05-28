@@ -1,21 +1,21 @@
 Manifest-Version: 1.0
 Bundle-ClassPath: libs/vtm.jar,libs/vtm-desktop.jar,libs/vtm-gdx.jar,l
- ibs/vtm-http.jar,libs/vtm-themes.jar,libs/slf4j-api-1.7.21.jar,libs/g
- dx-platform-1.9.6-natives-desktop.jar,libs/gdx-backend-lwjgl-1.9.6.ja
- r,libs/svg-salamander-0.1.19.jar,libs/gdx-1.9.6.jar,libs/okhttp-3.6.0
- .jar,libs/lwjgl-2.9.2.jar,libs/lwjgl_util-2.9.2.jar,libs/jlayer-1.0.1
- -gdx.jar,libs/jorbis-0.0.17.jar,libs/okio-1.11.0.jar,libs/lwjgl-platf
- orm-2.9.2-natives-windows.jar,libs/lwjgl-platform-2.9.2-natives-linux
- .jar,libs/lwjgl-platform-2.9.2-natives-osx.jar,libs/jinput-2.0.5.jar,
- libs/jutils-1.0.0.jar,libs/jinput-platform-2.0.5-natives-linux.jar,li
- bs/jinput-platform-2.0.5-natives-windows.jar,libs/jinput-platform-2.0
- .5-natives-osx.jar,libs/
+ ibs/vtm-http.jar,libs/vtm-themes.jar,libs/slf4j-simple-1.7.21.jar,lib
+ s/slf4j-api-1.7.21.jar,libs/gdx-platform-1.9.6-natives-desktop.jar,li
+ bs/gdx-backend-lwjgl-1.9.6.jar,libs/svg-salamander-0.1.19.jar,libs/gd
+ x-1.9.6.jar,libs/okhttp-3.6.0.jar,libs/lwjgl-2.9.2.jar,libs/lwjgl_uti
+ l-2.9.2.jar,libs/jlayer-1.0.1-gdx.jar,libs/jorbis-0.0.17.jar,libs/oki
+ o-1.11.0.jar,libs/lwjgl-platform-2.9.2-natives-windows.jar,libs/lwjgl
+ -platform-2.9.2-natives-linux.jar,libs/lwjgl-platform-2.9.2-natives-o
+ sx.jar,libs/jinput-2.0.5.jar,libs/jutils-1.0.0.jar,libs/jinput-platfo
+ rm-2.0.5-natives-linux.jar,libs/jinput-platform-2.0.5-natives-windows
+ .jar,libs/jinput-platform-2.0.5-natives-osx.jar,libs/
 Bundle-License: http://www.apache.org/licenses/LICENSE-2.0
 Bundle-ManifestVersion: 2
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-SymbolicName: net.tourbook.ext.vtm
 Bundle-Vendor: It's me
-Bundle-Version: 0.1.0.v20170514-1710
+Bundle-Version: 0.1.0.v20170524-1158
 Export-Package: assets.patterns;version="0.1.0",assets.shaders;version
  ="0.1.0",assets.symbols;version="0.1.0",assets.symbols.accommodation;
  version="0.1.0",assets.symbols.amenity;version="0.1.0",assets.symbols
@@ -112,4 +112,4 @@ Export-Package: assets.patterns;version="0.1.0",assets.shaders;version
  scim.utils.math;version="0.1.0",org.oscim.utils.pool;version="0.1.0",
  org.oscim.utils.quadtree;version="0.1.0",org.slf4j;version="1.7.21",o
  rg.slf4j.event;version="1.7.21",org.slf4j.helpers;version="1.7.21",or
- g.slf4j.spi;version="1.7.21"
+ g.slf4j.impl;version="1.7.21",org.slf4j.spi;version="1.7.21"
