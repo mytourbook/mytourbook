@@ -15,5 +15,6 @@ subprojects {
 
 allprojects {
 
-    ext.gdxVersion = "1.9.6"
+    ext.gdxVersion		= "1.9.6"
+    ext.slf4jVersion	= "1.7.25"
 }

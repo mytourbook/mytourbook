@@ -1,21 +1,21 @@
 Manifest-Version: 1.0
 Bundle-ClassPath: libs/vtm.jar,libs/vtm-desktop.jar,libs/vtm-gdx.jar,l
- ibs/vtm-http.jar,libs/vtm-themes.jar,libs/slf4j-simple-1.7.21.jar,lib
- s/slf4j-api-1.7.21.jar,libs/gdx-platform-1.9.6-natives-desktop.jar,li
+ ibs/vtm-http.jar,libs/vtm-themes.jar,libs/slf4j-simple-1.7.25.jar,lib
+ s/slf4j-api-1.7.25.jar,libs/gdx-platform-1.9.6-natives-desktop.jar,li
  bs/gdx-backend-lwjgl-1.9.6.jar,libs/svg-salamander-0.1.19.jar,libs/gd
- x-1.9.6.jar,libs/okhttp-3.6.0.jar,libs/lwjgl-2.9.2.jar,libs/lwjgl_uti
+ x-1.9.6.jar,libs/okhttp-3.8.0.jar,libs/lwjgl-2.9.2.jar,libs/lwjgl_uti
  l-2.9.2.jar,libs/jlayer-1.0.1-gdx.jar,libs/jorbis-0.0.17.jar,libs/oki
- o-1.11.0.jar,libs/lwjgl-platform-2.9.2-natives-windows.jar,libs/lwjgl
+ o-1.13.0.jar,libs/lwjgl-platform-2.9.2-natives-windows.jar,libs/lwjgl
  -platform-2.9.2-natives-linux.jar,libs/lwjgl-platform-2.9.2-natives-o
  sx.jar,libs/jinput-2.0.5.jar,libs/jutils-1.0.0.jar,libs/jinput-platfo
  rm-2.0.5-natives-linux.jar,libs/jinput-platform-2.0.5-natives-windows
- .jar,libs/jinput-platform-2.0.5-natives-osx.jar,libs/
+ .jar,libs/jinput-platform-2.0.5-natives-osx.jar,libs/,resources/
 Bundle-License: http://www.apache.org/licenses/LICENSE-2.0
 Bundle-ManifestVersion: 2
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-SymbolicName: net.tourbook.ext.vtm
 Bundle-Vendor: It's me
-Bundle-Version: 0.1.0.v20170524-1158
+Bundle-Version: 0.1.0.v20170609-1409
 Export-Package: assets.patterns;version="0.1.0",assets.shaders;version
  ="0.1.0",assets.symbols;version="0.1.0",assets.symbols.accommodation;
  version="0.1.0",assets.symbols.amenity;version="0.1.0",assets.symbols
@@ -80,36 +80,37 @@ Export-Package: assets.patterns;version="0.1.0",assets.shaders;version
  l.connection;version="0.1.0",okhttp3.internal.http;version="0.1.0",ok
  http3.internal.http1;version="0.1.0",okhttp3.internal.http2;version="
  0.1.0",okhttp3.internal.io;version="0.1.0",okhttp3.internal.platform;
- version="0.1.0",okhttp3.internal.tls;version="0.1.0",okhttp3.internal
- .ws;version="0.1.0",okio;version="0.1.0",org.lwjgl;version="0.1.0",or
- g.lwjgl.input;version="0.1.0",org.lwjgl.openal;version="0.1.0",org.lw
- jgl.opencl;version="0.1.0",org.lwjgl.opencl.api;version="0.1.0",org.l
- wjgl.opengl;version="0.1.0",org.lwjgl.opengles;version="0.1.0",org.lw
- jgl.util;version="0.1.0",org.lwjgl.util.glu;version="0.1.0",org.lwjgl
- .util.glu.tessellation;version="0.1.0",org.lwjgl.util.input;version="
- 0.1.0",org.lwjgl.util.jinput;version="0.1.0",org.lwjgl.util.mapped;ve
- rsion="0.1.0",org.lwjgl.util.vector;version="0.1.0",org.oscim.awt;ver
- sion="0.1.0",org.oscim.backend;version="0.1.0",org.oscim.backend.canv
- as;version="0.1.0",org.oscim.core;version="0.1.0",org.oscim.event;ver
- sion="0.1.0",org.oscim.gdx;version="0.1.0",org.oscim.layers;version="
- 0.1.0",org.oscim.layers.marker;version="0.1.0",org.oscim.layers.marke
- r.utils;version="0.1.0",org.oscim.layers.tile;version="0.1.0",org.osc
- im.layers.tile.bitmap;version="0.1.0",org.oscim.layers.tile.buildings
- ;version="0.1.0",org.oscim.layers.tile.example;version="0.1.0",org.os
- cim.layers.tile.vector;version="0.1.0",org.oscim.layers.tile.vector.l
- abeling;version="0.1.0",org.oscim.layers.vector;version="0.1.0",org.o
- scim.map;version="0.1.0",org.oscim.renderer;version="0.1.0",org.oscim
- .renderer.atlas;version="0.1.0",org.oscim.renderer.bucket;version="0.
- 1.0",org.oscim.scalebar;version="0.1.0",org.oscim.theme;version="0.1.
- 0",org.oscim.theme.rule;version="0.1.0",org.oscim.theme.styles;versio
- n="0.1.0",org.oscim.tiling;version="0.1.0",org.oscim.tiling.source;ve
- rsion="0.1.0",org.oscim.tiling.source.bitmap;version="0.1.0",org.osci
- m.tiling.source.mapfile;version="0.1.0",org.oscim.tiling.source.mapfi
- le.header;version="0.1.0",org.oscim.tiling.source.mvt;version="0.1.0"
- ,org.oscim.tiling.source.oscimap4;version="0.1.0",org.oscim.tiling.so
- urce.test;version="0.1.0",org.oscim.utils;version="0.1.0",org.oscim.u
- tils.async;version="0.1.0",org.oscim.utils.geom;version="0.1.0",org.o
- scim.utils.math;version="0.1.0",org.oscim.utils.pool;version="0.1.0",
- org.oscim.utils.quadtree;version="0.1.0",org.slf4j;version="1.7.21",o
- rg.slf4j.event;version="1.7.21",org.slf4j.helpers;version="1.7.21",or
- g.slf4j.impl;version="1.7.21",org.slf4j.spi;version="1.7.21"
+ version="0.1.0",okhttp3.internal.publicsuffix;version="0.1.0",okhttp3
+ .internal.tls;version="0.1.0",okhttp3.internal.ws;version="0.1.0",oki
+ o;version="0.1.0",org.lwjgl;version="0.1.0",org.lwjgl.input;version="
+ 0.1.0",org.lwjgl.openal;version="0.1.0",org.lwjgl.opencl;version="0.1
+ .0",org.lwjgl.opencl.api;version="0.1.0",org.lwjgl.opengl;version="0.
+ 1.0",org.lwjgl.opengles;version="0.1.0",org.lwjgl.util;version="0.1.0
+ ",org.lwjgl.util.glu;version="0.1.0",org.lwjgl.util.glu.tessellation;
+ version="0.1.0",org.lwjgl.util.input;version="0.1.0",org.lwjgl.util.j
+ input;version="0.1.0",org.lwjgl.util.mapped;version="0.1.0",org.lwjgl
+ .util.vector;version="0.1.0",org.oscim.awt;version="0.1.0",org.oscim.
+ backend;version="0.1.0",org.oscim.backend.canvas;version="0.1.0",org.
+ oscim.core;version="0.1.0",org.oscim.event;version="0.1.0",org.oscim.
+ gdx;version="0.1.0",org.oscim.layers;version="0.1.0",org.oscim.layers
+ .marker;version="0.1.0",org.oscim.layers.marker.utils;version="0.1.0"
+ ,org.oscim.layers.tile;version="0.1.0",org.oscim.layers.tile.bitmap;v
+ ersion="0.1.0",org.oscim.layers.tile.buildings;version="0.1.0",org.os
+ cim.layers.tile.example;version="0.1.0",org.oscim.layers.tile.vector;
+ version="0.1.0",org.oscim.layers.tile.vector.labeling;version="0.1.0"
+ ,org.oscim.layers.vector;version="0.1.0",org.oscim.map;version="0.1.0
+ ",org.oscim.renderer;version="0.1.0",org.oscim.renderer.atlas;version
+ ="0.1.0",org.oscim.renderer.bucket;version="0.1.0",org.oscim.scalebar
+ ;version="0.1.0",org.oscim.theme;version="0.1.0",org.oscim.theme.rule
+ ;version="0.1.0",org.oscim.theme.styles;version="0.1.0",org.oscim.til
+ ing;version="0.1.0",org.oscim.tiling.source;version="0.1.0",org.oscim
+ .tiling.source.bitmap;version="0.1.0",org.oscim.tiling.source.mapfile
+ ;version="0.1.0",org.oscim.tiling.source.mapfile.header;version="0.1.
+ 0",org.oscim.tiling.source.mvt;version="0.1.0",org.oscim.tiling.sourc
+ e.oscimap4;version="0.1.0",org.oscim.tiling.source.test;version="0.1.
+ 0",org.oscim.utils;version="0.1.0",org.oscim.utils.async;version="0.1
+ .0",org.oscim.utils.geom;version="0.1.0",org.oscim.utils.math;version
+ ="0.1.0",org.oscim.utils.pool;version="0.1.0",org.oscim.utils.quadtre
+ e;version="0.1.0",org.slf4j;version="1.7.25",org.slf4j.event;version=
+ "1.7.25",org.slf4j.helpers;version="1.7.25",org.slf4j.impl;version="1
+ .7.25",org.slf4j.spi;version="1.7.25"

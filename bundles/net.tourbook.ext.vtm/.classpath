@@ -7,18 +7,18 @@
 	<classpathentry kind="lib" path="libs/vtm-gdx.jar" exported="true" sourcepath="/vtm-gdx"/>
 	<classpathentry kind="lib" path="libs/vtm-themes.jar" exported="true" sourcepath="/vtm-themes"/>
 	<classpathentry kind="lib" path="libs/vtm-http.jar" exported="true" sourcepath="/vtm-http"/>
-	<classpathentry sourcepath="C:/Users/WolfgangSchramm/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-simple/1.7.21/58eb8609a8f14e5bbf4d260ce5f364724079227/slf4j-simple-1.7.21-sources.jar" kind="lib" path="libs/slf4j-simple-1.7.21.jar" exported="true"/>
-	<classpathentry sourcepath="C:/Users/WolfgangSchramm/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-api/1.7.21/f285ac123f201fb4b028bac556928d7cf527ef48/slf4j-api-1.7.21-sources.jar" kind="lib" path="libs/slf4j-api-1.7.21.jar" exported="true"/>
+	<classpathentry sourcepath="C:/Users/WolfgangSchramm/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-simple/1.7.25/af3cd3ad1ea4b08b27b54f12529b4bf343bc5ca1/slf4j-simple-1.7.25-sources.jar" kind="lib" path="libs/slf4j-simple-1.7.25.jar" exported="true"/>
+	<classpathentry sourcepath="C:/Users/WolfgangSchramm/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-api/1.7.25/962153db4a9ea71b79d047dfd1b2a0d80d8f4739/slf4j-api-1.7.25-sources.jar" kind="lib" path="libs/slf4j-api-1.7.25.jar" exported="true"/>
 	<classpathentry kind="lib" path="libs/gdx-platform-1.9.6-natives-desktop.jar" exported="true"/>
 	<classpathentry sourcepath="C:/Users/WolfgangSchramm/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx-backend-lwjgl/1.9.6/54887b828ab0c6c55deae03b0cca70c31531bacd/gdx-backend-lwjgl-1.9.6-sources.jar" kind="lib" path="libs/gdx-backend-lwjgl-1.9.6.jar" exported="true"/>
 	<classpathentry sourcepath="C:/Users/WolfgangSchramm/.gradle/caches/modules-2/files-2.1/com.metsci.ext.com.kitfox.svg/svg-salamander/0.1.19/f4051be4d352fab032e7e762cb848e2f48f8c2d7/svg-salamander-0.1.19-sources.jar" kind="lib" path="libs/svg-salamander-0.1.19.jar" exported="true"/>
 	<classpathentry sourcepath="C:/Users/WolfgangSchramm/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx/1.9.6/7d903ecd6b0df2ec334814b8e70618e4c93fd37c/gdx-1.9.6-sources.jar" kind="lib" path="libs/gdx-1.9.6.jar" exported="true"/>
-	<classpathentry sourcepath="C:/Users/WolfgangSchramm/.gradle/caches/modules-2/files-2.1/com.squareup.okhttp3/okhttp/3.6.0/7ebc06b0cc7c2752a4883747e2c70b2b301df9c0/okhttp-3.6.0-sources.jar" kind="lib" path="libs/okhttp-3.6.0.jar" exported="true"/>
+	<classpathentry sourcepath="C:/Users/WolfgangSchramm/.gradle/caches/modules-2/files-2.1/com.squareup.okhttp3/okhttp/3.8.0/db21293949e200f08d5325e8a8eefdcc9134b752/okhttp-3.8.0-sources.jar" kind="lib" path="libs/okhttp-3.8.0.jar" exported="true"/>
 	<classpathentry sourcepath="C:/Users/WolfgangSchramm/.gradle/caches/modules-2/files-2.1/org.lwjgl.lwjgl/lwjgl/2.9.2/4d114b5ef3ad3bf571b1f090cb00855991067e0b/lwjgl-2.9.2-sources.jar" kind="lib" path="libs/lwjgl-2.9.2.jar" exported="true"/>
 	<classpathentry sourcepath="C:/Users/WolfgangSchramm/.gradle/caches/modules-2/files-2.1/org.lwjgl.lwjgl/lwjgl_util/2.9.2/308d4ebe8d7b240d3490b6a7e0424807ea3ad98b/lwjgl_util-2.9.2-sources.jar" kind="lib" path="libs/lwjgl_util-2.9.2.jar" exported="true"/>
 	<classpathentry sourcepath="C:/Users/WolfgangSchramm/.gradle/caches/modules-2/files-2.1/com.badlogicgames.jlayer/jlayer/1.0.1-gdx/f1c4ffebc5e4f68be914404faab580c20de8ea1f/jlayer-1.0.1-gdx-sources.jar" kind="lib" path="libs/jlayer-1.0.1-gdx.jar" exported="true"/>
 	<classpathentry sourcepath="C:/Users/WolfgangSchramm/.gradle/caches/modules-2/files-2.1/org.jcraft/jorbis/0.0.17/5446be5d62e4c6b347c8e6cd28dc00a936417ba2/jorbis-0.0.17-sources.jar" kind="lib" path="libs/jorbis-0.0.17.jar" exported="true"/>
-	<classpathentry sourcepath="C:/Users/WolfgangSchramm/.gradle/caches/modules-2/files-2.1/com.squareup.okio/okio/1.11.0/46bdbd0e079883accbf581986e7f8f0d999a2637/okio-1.11.0-sources.jar" kind="lib" path="libs/okio-1.11.0.jar" exported="true"/>
+	<classpathentry sourcepath="C:/Users/WolfgangSchramm/.gradle/caches/modules-2/files-2.1/com.squareup.okio/okio/1.13.0/f4c91e12121af963e3ef76e81c82aa75ba6e8533/okio-1.13.0-sources.jar" kind="lib" path="libs/okio-1.13.0.jar" exported="true"/>
 	<classpathentry kind="lib" path="libs/lwjgl-platform-2.9.2-natives-windows.jar" exported="true"/>
 	<classpathentry kind="lib" path="libs/lwjgl-platform-2.9.2-natives-linux.jar" exported="true"/>
 	<classpathentry kind="lib" path="libs/lwjgl-platform-2.9.2-natives-osx.jar" exported="true"/>

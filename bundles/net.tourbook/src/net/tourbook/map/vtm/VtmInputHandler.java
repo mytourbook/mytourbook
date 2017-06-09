@@ -15,10 +15,13 @@
  *******************************************************************************/
 package net.tourbook.map.vtm;
 
-public enum TileSourceProvider {
+import org.oscim.gdx.GdxMap;
+import org.oscim.gdx.InputHandler;
 
-	Mapzen, //
-	OpenScienceMap, //
-	CustomTileProvider, //
+public class VtmInputHandler extends InputHandler {
+
+	public VtmInputHandler(final GdxMap map) {
+		super(map);
+	}
 
 }
