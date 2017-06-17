@@ -30,13 +30,17 @@ dependencies {
 	compile project(':vtm-http')
 	compile project(':vtm-themes')
 	
-	/* this is fixed with slf4j-simple
+	/*
+		This error is fixed with slf4j-simple
 	
 		SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
 		SLF4J: Defaulting to no-operation (NOP) logger implementation
 		SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
 	*/
     compile 'org.slf4j:slf4j-simple:1.7.25'
+    
+    // http logging
+    compile 'com.squareup.okhttp3:logging-interceptor:3.8.0'
 }
 
 // -----------------------------------

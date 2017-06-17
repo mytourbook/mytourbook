@@ -8,6 +8,7 @@
 	<classpathentry kind="lib" path="libs/vtm-themes.jar" exported="true" sourcepath="/vtm-themes"/>
 	<classpathentry kind="lib" path="libs/vtm-http.jar" exported="true" sourcepath="/vtm-http"/>
 	<classpathentry sourcepath="C:/Users/WolfgangSchramm/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-simple/1.7.25/af3cd3ad1ea4b08b27b54f12529b4bf343bc5ca1/slf4j-simple-1.7.25-sources.jar" kind="lib" path="libs/slf4j-simple-1.7.25.jar" exported="true"/>
+	<classpathentry sourcepath="C:/Users/WolfgangSchramm/.gradle/caches/modules-2/files-2.1/com.squareup.okhttp3/logging-interceptor/3.8.0/9044a042ae60a8b7403a5c7a4c5a4f78f45250bb/logging-interceptor-3.8.0-sources.jar" kind="lib" path="libs/logging-interceptor-3.8.0.jar" exported="true"/>
 	<classpathentry sourcepath="C:/Users/WolfgangSchramm/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-api/1.7.25/962153db4a9ea71b79d047dfd1b2a0d80d8f4739/slf4j-api-1.7.25-sources.jar" kind="lib" path="libs/slf4j-api-1.7.25.jar" exported="true"/>
 	<classpathentry kind="lib" path="libs/gdx-platform-1.9.6-natives-desktop.jar" exported="true"/>
 	<classpathentry sourcepath="C:/Users/WolfgangSchramm/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx-backend-lwjgl/1.9.6/54887b828ab0c6c55deae03b0cca70c31531bacd/gdx-backend-lwjgl-1.9.6-sources.jar" kind="lib" path="libs/gdx-backend-lwjgl-1.9.6.jar" exported="true"/>

@@ -1848,6 +1848,7 @@
    
    </extension>
 
+
 	<!-- 
 	
 	 MAP VTM  -  MAP VTM  -  MAP VTM  -  MAP VTM  -  MAP VTM  -  MAP VTM  -  MAP VTM   
@@ -1911,6 +1912,14 @@
 			icon="icons/map-vtm-view.png"
 			id="net.tourbook.map.vtm.MapVtmView"
 			name="%View_Name_TourMapVtm"
+		/>
+
+		<view
+			category="net.tourbook.category.map"
+			class="net.tourbook.map.vtm.MapVtmDebugView"
+			icon="icons/map-vtm-debug-view.png"
+			id="net.tourbook.map.vtm.MapVtmDebugView"
+			name="%View_Name_TourMapVtmDebug"
 		/>
    
    </extension>

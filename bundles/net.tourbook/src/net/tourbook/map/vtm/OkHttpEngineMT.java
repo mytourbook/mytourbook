@@ -19,6 +19,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import net.tourbook.map.vtm.HttpLoggingInterceptorMT.Level;
+
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
@@ -35,23 +37,24 @@ import okhttp3.Response;
 
 public class OkHttpEngineMT extends OkHttpEngine {
 
-	public static final Logger			log	= LoggerFactory.getLogger(OkHttpEngineMT.class);
+	public static final Logger						log			= LoggerFactory.getLogger(OkHttpEngineMT.class);
 
-	private static OkHttpClient			_httpClient;
+	private static OkHttpClient						_httpClient;
+	private static Cache							_httpCache;
 
-	private static Cache				_httpCache;
+	private static final HttpLoggingInterceptorMT	LOGGING_INTERCEPTOR;
+	private static final Interceptor				REWRITE_CACHE_CONTROL_INTERCEPTOR;
 
-	private static final Interceptor	REWRITE_CACHE_CONTROL_INTERCEPTOR;
+	public static boolean							_isLogHttp	= false;
 	static {
+
+		LOGGING_INTERCEPTOR = new HttpLoggingInterceptorMT().setLevel(Level.BODY);
 
 		REWRITE_CACHE_CONTROL_INTERCEPTOR = new Interceptor() {
 			@Override
 			public Response intercept(final Chain chain) throws IOException {
 
 				final Response originalResponse = chain.proceed(chain.request());
-
-
-				log.debug(chain.toString());
 
 				return originalResponse
 						.newBuilder()
@@ -72,7 +75,9 @@ public class OkHttpEngineMT extends OkHttpEngine {
 
 			_httpCache = new Cache(new File(getCacheDir()), Integer.MAX_VALUE);
 
-			_httpClient = new OkHttpClient.Builder()
+			final OkHttpClient.Builder httpBuilder = new OkHttpClient.Builder();
+
+			httpBuilder
 
 					.cache(_httpCache)
 
@@ -80,9 +85,13 @@ public class OkHttpEngineMT extends OkHttpEngine {
 					.readTimeout(60, TimeUnit.SECONDS)
 					.writeTimeout(60, TimeUnit.SECONDS)
 
-					.addNetworkInterceptor(REWRITE_CACHE_CONTROL_INTERCEPTOR)
+					.addNetworkInterceptor(REWRITE_CACHE_CONTROL_INTERCEPTOR);
 
-					.build();
+			if (_isLogHttp) {
+				httpBuilder.addInterceptor(LOGGING_INTERCEPTOR);
+			}
+
+			_httpClient = httpBuilder.build();
 		}
 
 		@Override
@@ -112,5 +121,9 @@ public class OkHttpEngineMT extends OkHttpEngine {
 		}
 
 		return tileCachePath.toOSString();
+	}
+
+	static Cache getHttpCache() {
+		return _httpCache;
 	}
 }

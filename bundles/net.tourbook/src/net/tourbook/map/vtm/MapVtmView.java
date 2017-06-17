@@ -86,7 +86,7 @@ public class MapVtmView extends ViewPart {
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == MapVtmView.this) {
-//					saveState();
+
 				}
 			}
 
