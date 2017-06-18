@@ -29,6 +29,7 @@ import org.oscim.gdx.GdxMap;
 import org.oscim.gdx.GestureHandlerImpl;
 import org.oscim.gdx.LwjglGL20;
 import org.oscim.gdx.MotionHandler;
+import org.oscim.layers.PathLayer;
 import org.oscim.layers.tile.TileManager;
 import org.oscim.layers.tile.buildings.BuildingLayer;
 import org.oscim.layers.tile.vector.VectorTileLayer;
@@ -55,27 +56,41 @@ import okhttp3.Cache;
 
 public class VtmMap extends GdxMap {
 
-	private static final String	STATE_MAP_POS_X				= "STATE_MAP_POS_X";					//$NON-NLS-1$
-	private static final String	STATE_MAP_POS_Y				= "STATE_MAP_POS_Y";					//$NON-NLS-1$
-	private static final String	STATE_MAP_POS_ZOOM_LEVEL	= "STATE_MAP_POS_ZOOM_LEVEL";			//$NON-NLS-1$
-	private static final String	STATE_MAP_POS_BEARING		= "STATE_MAP_POS_BEARING";				//$NON-NLS-1$
-	private static final String	STATE_MAP_POS_SCALE			= "STATE_MAP_POS_SCALE";				//$NON-NLS-1$
-	private static final String	STATE_MAP_POS_TILT			= "STATE_MAP_POS_TILT";					//$NON-NLS-1$
+	private static final String		STATE_MAP_POS_X				= "STATE_MAP_POS_X";					//$NON-NLS-1$
+	private static final String		STATE_MAP_POS_Y				= "STATE_MAP_POS_Y";					//$NON-NLS-1$
+	private static final String		STATE_MAP_POS_ZOOM_LEVEL	= "STATE_MAP_POS_ZOOM_LEVEL";			//$NON-NLS-1$
+	private static final String		STATE_MAP_POS_BEARING		= "STATE_MAP_POS_BEARING";				//$NON-NLS-1$
+	private static final String		STATE_MAP_POS_SCALE			= "STATE_MAP_POS_SCALE";				//$NON-NLS-1$
+	private static final String		STATE_MAP_POS_TILT			= "STATE_MAP_POS_TILT";					//$NON-NLS-1$
 
-	public static final Logger	log							= LoggerFactory.getLogger(VtmMap.class);
+	public static final Logger		log							= LoggerFactory.getLogger(VtmMap.class);
 
-	private IDialogSettings		_state;
+	private static IDialogSettings	_state;
 
-	private LwjglApplication	_lwjglApp;
+	private static LwjglApplication	_lwjglApp;
 
-	private TileGridLayerMT		_gridLayer;
-	private TileManager			_tileManager;
+	private TileGridLayerMT			_gridLayer;
+	private TileManager				_tileManager;
 
-	private long				_lastRenderTime;
+	private long					_lastRenderTime;
+	private PathLayer				_tourLayer;
 
 	public VtmMap(final IDialogSettings state) {
 
 		_state = state;
+	}
+
+	public static VtmMap createMap(final IDialogSettings state, final Canvas canvas) {
+
+		init();
+
+		_state = state;
+
+		final VtmMap mapApp = new VtmMap(state);
+		
+		_lwjglApp = new LwjglApplication(mapApp, getConfig(null), canvas);
+		
+		return mapApp;
 	}
 
 	protected static LwjglApplicationConfiguration getConfig(final String title) {
@@ -194,6 +209,11 @@ public class VtmMap extends GdxMap {
 		super.dispose();
 	}
 
+	PathLayer getTourLayer() {
+
+		return _tourLayer;
+	}
+
 	@Override
 	protected boolean onKeyDown(final int keycode) {
 
@@ -201,9 +221,28 @@ public class VtmMap extends GdxMap {
 
 		switch (keycode) {
 
+		case Input.Keys.T:
+
+			// show/hide tour layer
+
+			if (_tourLayer.isEnabled()) {
+
+				_tourLayer.setEnabled(false);
+				mMap.layers().remove(_tourLayer);
+
+			} else {
+
+				_tourLayer.setEnabled(true);
+				mMap.layers().add(_tourLayer);
+			}
+
+			mMap.render();
+
+			return true;
+
 		case Input.Keys.G:
 
-			// use custom grid layer
+			// show/hide grid layer
 
 			if (_gridLayer == null) {
 				_gridLayer = new TileGridLayerMT(mMap);
@@ -223,7 +262,7 @@ public class VtmMap extends GdxMap {
 
 			return true;
 
-		case Input.Keys.E:
+		case Input.Keys.O:
 
 			// reset bearing
 
@@ -235,7 +274,7 @@ public class VtmMap extends GdxMap {
 
 			return true;
 
-		case Input.Keys.T:
+		case Input.Keys.I:
 
 			// reset tilt
 
@@ -308,13 +347,6 @@ public class VtmMap extends GdxMap {
 
 	}
 
-	public void run(final Canvas canvas) {
-
-		init();
-
-		_lwjglApp = new LwjglApplication(new VtmMap(_state), getConfig(null), canvas);
-	}
-
 	private void saveState() {
 
 		final MapPosition mapPosition = mMap.getMapPosition();
@@ -344,6 +376,16 @@ public class VtmMap extends GdxMap {
 
 		layers.add(new BuildingLayer(mMap, mapLayer));
 		layers.add(new LabelLayer(mMap, mapLayer));
+
+		/*
+		 * Tour layer
+		 */
+		final int lineColor = 0xffff0000;
+		final float lineWidth = 25f;
+
+		_tourLayer = new PathLayer(mMap, lineColor, lineWidth);
+		_tourLayer.setEnabled(true);
+		layers.add(_tourLayer);
 
 		mMap.setTheme(themes);
 

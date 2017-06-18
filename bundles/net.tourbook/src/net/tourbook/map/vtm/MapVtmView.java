@@ -18,10 +18,12 @@ package net.tourbook.map.vtm;
 import java.awt.BorderLayout;
 import java.awt.Canvas;
 import java.awt.Frame;
+import java.util.ArrayList;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
+import net.tourbook.data.TourData;
 import net.tourbook.map.vtm.action.ActionMapProviderOpenSciMap;
 import net.tourbook.map2.view.SelectionMapPosition;
 import net.tourbook.photo.PhotoSelection;
@@ -46,6 +48,8 @@ import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
+import org.oscim.core.GeoPoint;
+import org.oscim.layers.PathLayer;
 
 import de.byteholder.gpx.PointOfInterest;
 
@@ -209,8 +213,7 @@ public class MapVtmView extends ViewPart {
 		awtCanvas.setFocusable(true);
 		awtCanvas.requestFocus();
 
-		_vtmMap = new VtmMap(_state);
-		_vtmMap.run(awtCanvas);
+		_vtmMap = VtmMap.createMap(_state, awtCanvas);
 	}
 
 	@Override
@@ -276,12 +279,11 @@ public class MapVtmView extends ViewPart {
 
 		} else if (selection instanceof SelectionTourId) {
 
-//			final SelectionTourId tourIdSelection = (SelectionTourId) selection;
-//			final TourData tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
-//
-//			paintTours_20_One(tourData, false);
-//			paintPhotoSelection(selection);
-//
+			final SelectionTourId tourIdSelection = (SelectionTourId) selection;
+			final TourData tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
+
+			paintTour(tourData);
+
 //			enableActions();
 
 		} else if (selection instanceof SelectionTourIds) {
@@ -536,6 +538,29 @@ public class MapVtmView extends ViewPart {
 
 			clearView();
 		}
+	}
+
+	private void paintTour(final TourData tourData) {
+
+		// check if GPS data are available
+		if (tourData.latitudeSerie == null) {
+			return;
+		}
+
+		final ArrayList<GeoPoint> geoPoints = new ArrayList<>();
+
+		final double[] latitudeSerie = tourData.latitudeSerie;
+		final double[] longitudeSerie = tourData.longitudeSerie;
+
+		// create vtm geo points
+		for (int index = 0; index < latitudeSerie.length; index++) {
+			geoPoints.add(new GeoPoint(latitudeSerie[index], longitudeSerie[index]));
+		}
+
+		final PathLayer tourLayer = _vtmMap.getTourLayer();
+		tourLayer.setPoints(geoPoints);
+
+		_vtmMap.getMap().updateMap(true);
 	}
 
 	@Override
