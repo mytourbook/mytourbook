@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package net.tourbook.map.vtm;
+package net.tourbook.map25;
 
 import org.oscim.backend.canvas.Color;
 import org.oscim.backend.canvas.Paint;

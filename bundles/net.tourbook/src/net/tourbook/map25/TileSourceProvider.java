@@ -13,26 +13,12 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.map.vtm.action;
+package net.tourbook.map25;
 
-import net.tourbook.map.vtm.MapVtmView;
+public enum TileSourceProvider {
 
-import org.eclipse.jface.action.Action;
-
-public class ActionMapProviderOpenSciMap extends Action {
-
-	private final MapVtmView _mapView;
-
-	public ActionMapProviderOpenSciMap(final MapVtmView mapVtmView) {
-
-		super("OpenScience Map", AS_CHECK_BOX);
-
-		_mapView = mapVtmView;
-	}
-
-	@Override
-	public void run() {
-		_mapView.action_MapProvider_OpenScience();
-	}
+	Mapzen, //
+	OpenScienceMap, //
+	CustomTileProvider, //
 
 }

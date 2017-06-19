@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.map.vtm;
+package net.tourbook.map25;
 
 import java.awt.Canvas;
 
@@ -54,7 +54,7 @@ import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.utils.SharedLibraryLoader;
 import okhttp3.Cache;
 
-public class VtmMap extends GdxMap {
+public class VtmMapApp extends GdxMap {
 
 	private static final String		STATE_MAP_POS_X				= "STATE_MAP_POS_X";					//$NON-NLS-1$
 	private static final String		STATE_MAP_POS_Y				= "STATE_MAP_POS_Y";					//$NON-NLS-1$
@@ -63,7 +63,7 @@ public class VtmMap extends GdxMap {
 	private static final String		STATE_MAP_POS_SCALE			= "STATE_MAP_POS_SCALE";				//$NON-NLS-1$
 	private static final String		STATE_MAP_POS_TILT			= "STATE_MAP_POS_TILT";					//$NON-NLS-1$
 
-	public static final Logger		log							= LoggerFactory.getLogger(VtmMap.class);
+	public static final Logger		log							= LoggerFactory.getLogger(VtmMapApp.class);
 
 	private static IDialogSettings	_state;
 
@@ -75,18 +75,18 @@ public class VtmMap extends GdxMap {
 	private long					_lastRenderTime;
 	private PathLayer				_tourLayer;
 
-	public VtmMap(final IDialogSettings state) {
+	public VtmMapApp(final IDialogSettings state) {
 
 		_state = state;
 	}
 
-	public static VtmMap createMap(final IDialogSettings state, final Canvas canvas) {
+	public static VtmMapApp createMap(final IDialogSettings state, final Canvas canvas) {
 
 		init();
 
 		_state = state;
 
-		final VtmMap mapApp = new VtmMap(state);
+		final VtmMapApp mapApp = new VtmMapApp(state);
 		
 		_lwjglApp = new LwjglApplication(mapApp, getConfig(null), canvas);
 		

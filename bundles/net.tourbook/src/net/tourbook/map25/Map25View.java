@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.map.vtm;
+package net.tourbook.map25;
 
 import java.awt.BorderLayout;
 import java.awt.Canvas;
@@ -24,8 +24,8 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
-import net.tourbook.map.vtm.action.ActionMapProviderOpenSciMap;
 import net.tourbook.map2.view.SelectionMapPosition;
+import net.tourbook.map25.action.ActionMapProviderOpenSciMap;
 import net.tourbook.photo.PhotoSelection;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
@@ -44,7 +44,9 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
@@ -53,17 +55,18 @@ import org.oscim.layers.PathLayer;
 
 import de.byteholder.gpx.PointOfInterest;
 
-public class MapVtmView extends ViewPart {
+public class Map25View extends ViewPart {
 
-	public static final String				ID		= "net.tourbook.map.vtm.MapVtmView";	//$NON-NLS-1$
+	public static final String				ID				= "net.tourbook.map.vtm.MapVtmView";	//$NON-NLS-1$
 
-	private static final IDialogSettings	_state	= TourbookPlugin.getState(ID);
+	private static final IDialogSettings	_state			= TourbookPlugin.getState(ID);
 
-	private VtmMap							_vtmMap;
+	private VtmMapApp						_vtmMapApp;
 
 	protected boolean						_isPartVisible;
 
 	private IPartListener2					_partListener;
+	private ISelectionListener				_postSelectionListener;
 	private ITourEventListener				_tourEventListener;
 
 	private ISelection						_lastHiddenSelection;
@@ -71,6 +74,15 @@ public class MapVtmView extends ViewPart {
 
 	private ActionMapProviderOpenSciMap		_action_MapProvider_OpenScience;
 	private ActionMapProviderOpenSciMap		_action_MapProvider_Custom;
+
+	private ArrayList<TourData>				_allTourData	= new ArrayList<>();
+	private int								_hashTourId;
+	private int								_hashTourData;
+
+	/*
+	 * UI controls
+	 */
+	private Composite						_swtContainer;
 
 	public void action_MapProvider_OpenScience() {
 		// TODO Auto-generated method stub
@@ -89,7 +101,7 @@ public class MapVtmView extends ViewPart {
 
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == MapVtmView.this) {
+				if (partRef.getPart(false) == Map25View.this) {
 
 				}
 			}
@@ -99,7 +111,7 @@ public class MapVtmView extends ViewPart {
 
 			@Override
 			public void partHidden(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == MapVtmView.this) {
+				if (partRef.getPart(false) == Map25View.this) {
 					_isPartVisible = false;
 				}
 			}
@@ -112,7 +124,7 @@ public class MapVtmView extends ViewPart {
 
 			@Override
 			public void partVisible(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == MapVtmView.this) {
+				if (partRef.getPart(false) == Map25View.this) {
 
 					_isPartVisible = true;
 
@@ -128,13 +140,28 @@ public class MapVtmView extends ViewPart {
 		getViewSite().getPage().addPartListener(_partListener);
 	}
 
+	/**
+	 * listen for events when a tour is selected
+	 */
+	private void addSelectionListener() {
+
+		_postSelectionListener = new ISelectionListener() {
+			@Override
+			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
+				onSelectionChanged(selection);
+			}
+		};
+
+		getSite().getPage().addPostSelectionListener(_postSelectionListener);
+	}
+
 	private void addTourEventListener() {
 
 		_tourEventListener = new ITourEventListener() {
 			@Override
 			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
-				if (part == MapVtmView.this) {
+				if (part == Map25View.this) {
 					return;
 				}
 
@@ -198,12 +225,15 @@ public class MapVtmView extends ViewPart {
 
 		addPartListener();
 		addTourEventListener();
+		addSelectionListener();
+
+		showToursFromTourProvider();
 	}
 
 	private void createUI(final Composite parent) {
 
-		final Composite swtContainer = new Composite(parent, SWT.EMBEDDED | SWT.NO_BACKGROUND);
-		final Frame awtContainer = SWT_AWT.new_Frame(swtContainer);
+		_swtContainer = new Composite(parent, SWT.EMBEDDED | SWT.NO_BACKGROUND);
+		final Frame awtContainer = SWT_AWT.new_Frame(_swtContainer);
 
 		final Canvas awtCanvas = new Canvas();
 		awtContainer.setLayout(new BorderLayout());
@@ -213,7 +243,7 @@ public class MapVtmView extends ViewPart {
 		awtCanvas.setFocusable(true);
 		awtCanvas.requestFocus();
 
-		_vtmMap = VtmMap.createMap(_state, awtCanvas);
+		_vtmMapApp = VtmMapApp.createMap(_state, awtCanvas);
 	}
 
 	@Override
@@ -221,7 +251,7 @@ public class MapVtmView extends ViewPart {
 
 		getViewSite().getPage().removePartListener(_partListener);
 
-		_vtmMap.stop();
+		_vtmMapApp.stop();
 
 		super.dispose();
 	}
@@ -269,13 +299,12 @@ public class MapVtmView extends ViewPart {
 
 		if (selection instanceof SelectionTourData) {
 
-//			final SelectionTourData selectionTourData = (SelectionTourData) selection;
-//			final TourData tourData = selectionTourData.getTourData();
-//
-//			paintTours_20_One(tourData, false);
-//			paintPhotoSelection(selection);
-//
-//			enableActions();
+			final SelectionTourData selectionTourData = (SelectionTourData) selection;
+			final TourData tourData = selectionTourData.getTourData();
+
+			paintTour(tourData);
+
+			enableActions();
 
 		} else if (selection instanceof SelectionTourId) {
 
@@ -284,47 +313,35 @@ public class MapVtmView extends ViewPart {
 
 			paintTour(tourData);
 
-//			enableActions();
+			enableActions();
 
 		} else if (selection instanceof SelectionTourIds) {
 
 			// paint all selected tours
 
-//			final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
-//			if (tourIds.size() == 0) {
-//
-//				// history tour (without tours) is displayed
-//
-//				final ArrayList<Photo> allPhotos = paintPhotoSelection(selection);
-//
-//				if (allPhotos.size() > 0) {
-//
-////					centerPhotos(allPhotos, false);
-//					showDefaultMap(true);
-//
-//					enableActions();
-//				}
-//
-//			} else if (tourIds.size() == 1) {
-//
-//				// only 1 tour is displayed, synch with this tour !!!
-//
-//				final TourData tourData = TourManager.getInstance().getTourData(tourIds.get(0));
-//
-//				paintTours_20_One(tourData, false);
-//				paintPhotoSelection(selection);
-//
-//				enableActions();
-//
-//			} else {
-//
-//				// paint multiple tours
-//
-//				paintTours(tourIds);
-//				paintPhotoSelection(selection);
-//
-//				enableActions(true);
-//			}
+			final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
+			if (tourIds.size() == 0) {
+
+				// history tour (without tours) is displayed
+
+			} else if (tourIds.size() == 1) {
+
+				// only 1 tour is displayed, synch with this tour !!!
+
+				final TourData tourData = TourManager.getInstance().getTourData(tourIds.get(0));
+
+				paintTour(tourData);
+
+				enableActions();
+
+			} else {
+
+				// paint multiple tours
+
+				paintTours(tourIds);
+
+				enableActions();
+			}
 
 		} else if (selection instanceof SelectionChartInfo) {
 
@@ -542,28 +559,87 @@ public class MapVtmView extends ViewPart {
 
 	private void paintTour(final TourData tourData) {
 
-		// check if GPS data are available
-		if (tourData.latitudeSerie == null) {
-			return;
-		}
+		_allTourData.clear();
+		_allTourData.add(tourData);
+
+		paintTours();
+	}
+
+	private void paintTours() {
 
 		final ArrayList<GeoPoint> geoPoints = new ArrayList<>();
 
-		final double[] latitudeSerie = tourData.latitudeSerie;
-		final double[] longitudeSerie = tourData.longitudeSerie;
+		for (final TourData tourData : _allTourData) {
 
-		// create vtm geo points
-		for (int index = 0; index < latitudeSerie.length; index++) {
-			geoPoints.add(new GeoPoint(latitudeSerie[index], longitudeSerie[index]));
+			// check if GPS data are available
+			if (tourData.latitudeSerie == null) {
+				continue;
+			}
+
+			final double[] latitudeSerie = tourData.latitudeSerie;
+			final double[] longitudeSerie = tourData.longitudeSerie;
+
+			// create vtm geo points
+			for (int index = 0; index < latitudeSerie.length; index++) {
+				geoPoints.add(new GeoPoint(latitudeSerie[index], longitudeSerie[index]));
+			}
 		}
 
-		final PathLayer tourLayer = _vtmMap.getTourLayer();
+		final PathLayer tourLayer = _vtmMapApp.getTourLayer();
 		tourLayer.setPoints(geoPoints);
 
-		_vtmMap.getMap().updateMap(true);
+		_vtmMapApp.getMap().updateMap(true);
+	}
+
+	private void paintTours(final ArrayList<Long> tourIdList) {
+
+		/*
+		 * TESTING if a map redraw can be avoided, 15.6.2015
+		 */
+		final int tourIdsHashCode = tourIdList.hashCode();
+		final int allToursHashCode = _allTourData.hashCode();
+		if (tourIdsHashCode == _hashTourId && allToursHashCode == _hashTourData) {
+			// skip redrawing
+			return;
+		}
+
+		if (tourIdList.hashCode() != _hashTourId || _allTourData.hashCode() != _hashTourData) {
+
+			// tour data needs to be loaded
+
+			TourManager.loadTourData(tourIdList, _allTourData, true);
+
+			_hashTourId = tourIdList.hashCode();
+			_hashTourData = _allTourData.hashCode();
+		}
+
+		paintTours();
 	}
 
 	@Override
 	public void setFocus() {}
+
+	private void showToursFromTourProvider() {
+
+		Display.getCurrent().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+
+				// validate widget
+				if (_swtContainer.isDisposed()) {
+					return;
+				}
+
+				final ArrayList<TourData> tourDataList = TourManager.getSelectedTours();
+				if (tourDataList != null) {
+
+					_allTourData.clear();
+					_allTourData.addAll(tourDataList);
+
+					paintTours();
+				}
+			}
+		});
+	}
 
 }

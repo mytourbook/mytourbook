@@ -13,12 +13,22 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.map.vtm;
+package net.tourbook.map25.action;
 
-public enum TileSourceProvider {
+import net.tourbook.common.util.Util;
+import net.tourbook.map25.Map25View;
 
-	Mapzen, //
-	OpenScienceMap, //
-	CustomTileProvider, //
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
+
+public class ActionHandlerOpenTourMapVtmView extends AbstractHandler {
+
+	public Object execute(final ExecutionEvent event) throws ExecutionException {
+
+		Util.showView(Map25View.ID, true);
+
+		return null;
+	}
 
 }

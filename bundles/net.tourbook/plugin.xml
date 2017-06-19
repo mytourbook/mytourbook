@@ -1787,7 +1787,7 @@
       <command
             id="net.tourbook.map.vtm.command.TourMapVtm"
             name="%View_Name_TourMapVtm"
-            defaultHandler="net.tourbook.map.vtm.action.ActionHandlerOpenTourMapVtmView"
+            defaultHandler="net.tourbook.map25.action.ActionHandlerOpenTourMapVtmView"
             />
 	            
    </extension>
@@ -1832,7 +1832,7 @@
 
 		<view
 			category="net.tourbook.category.map"
-			class="net.tourbook.map.vtm.MapVtmView"
+			class="net.tourbook.map25.Map25View"
 			icon="icons/map25-view.png"
 			id="net.tourbook.map.vtm.MapVtmView"
 			name="%View_Name_TourMapVtm"
@@ -1840,7 +1840,7 @@
 
 		<view
 			category="net.tourbook.category.map"
-			class="net.tourbook.map.vtm.MapVtmDebugView"
+			class="net.tourbook.map25.MapVtmDebugView"
 			icon="icons/map25-debug-view.png"
 			id="net.tourbook.map.vtm.MapVtmDebugView"
 			name="%View_Name_TourMapVtmDebug"

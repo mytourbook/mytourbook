@@ -13,13 +13,13 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.map.vtm;
+package net.tourbook.map25;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-import net.tourbook.map.vtm.HttpLoggingInterceptorMT.Level;
+import net.tourbook.map25.HttpLoggingInterceptorMT.Level;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;

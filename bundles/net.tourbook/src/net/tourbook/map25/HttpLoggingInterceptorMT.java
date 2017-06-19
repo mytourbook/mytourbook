@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.tourbook.map.vtm;
+package net.tourbook.map25;
 
 import java.io.EOFException;
 import java.io.IOException;
