@@ -33,9 +33,9 @@ import org.oscim.map.Map;
 
 import okhttp3.Cache;
 
-public class MapVtmDebugView extends ViewPart {
+public class Map25DebugView extends ViewPart {
 
-	public static final String				ID		= "net.tourbook.map.vtm.MapVtmDebugView";	//$NON-NLS-1$
+	public static final String				ID		= "net.tourbook.map25.Map25DebugView";	//$NON-NLS-1$
 
 	private static final IDialogSettings	_state	= TourbookPlugin.getState(ID);
 
@@ -57,8 +57,8 @@ public class MapVtmDebugView extends ViewPart {
 
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == MapVtmDebugView.this) {
-					MapVtmManager.setDebugView(null);
+				if (partRef.getPart(false) == Map25DebugView.this) {
+					Map25Manager.setDebugView(null);
 				}
 			}
 
@@ -67,8 +67,8 @@ public class MapVtmDebugView extends ViewPart {
 
 			@Override
 			public void partHidden(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == MapVtmDebugView.this) {
-					MapVtmManager.setDebugViewVisible(false);
+				if (partRef.getPart(false) == Map25DebugView.this) {
+					Map25Manager.setDebugViewVisible(false);
 				}
 			}
 
@@ -77,13 +77,13 @@ public class MapVtmDebugView extends ViewPart {
 
 			@Override
 			public void partOpened(final IWorkbenchPartReference partRef) {
-				MapVtmManager.setDebugView(MapVtmDebugView.this);
+				Map25Manager.setDebugView(Map25DebugView.this);
 			}
 
 			@Override
 			public void partVisible(final IWorkbenchPartReference partRef) {
-				if (partRef.getPart(false) == MapVtmDebugView.this) {
-					MapVtmManager.setDebugViewVisible(true);
+				if (partRef.getPart(false) == Map25DebugView.this) {
+					Map25Manager.setDebugViewVisible(true);
 				}
 			}
 		};

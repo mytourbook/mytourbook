@@ -57,11 +57,11 @@ import de.byteholder.gpx.PointOfInterest;
 
 public class Map25View extends ViewPart {
 
-	public static final String				ID				= "net.tourbook.map.vtm.MapVtmView";	//$NON-NLS-1$
+	public static final String				ID				= "net.tourbook.map25.Map25View";	//$NON-NLS-1$
 
 	private static final IDialogSettings	_state			= TourbookPlugin.getState(ID);
 
-	private VtmMapApp						_vtmMapApp;
+	private Map25App						_vtmMapApp;
 
 	protected boolean						_isPartVisible;
 
@@ -243,7 +243,7 @@ public class Map25View extends ViewPart {
 		awtCanvas.setFocusable(true);
 		awtCanvas.requestFocus();
 
-		_vtmMapApp = VtmMapApp.createMap(_state, awtCanvas);
+		_vtmMapApp = Map25App.createMap(_state, awtCanvas);
 	}
 
 	@Override

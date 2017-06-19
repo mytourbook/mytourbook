@@ -15,18 +15,18 @@
  *******************************************************************************/
 package net.tourbook.map25;
 
-public class MapVtmManager {
+public class Map25Manager {
 
 	private static boolean			_isDebugViewVisible;
-	private static MapVtmDebugView	_mapVtmDebugView;
+	private static Map25DebugView	_map25DebugView;
 
 	/**
 	 * @return Returns the map vtm debug view when it is visible, otherwise <code>null</code>
 	 */
-	public static MapVtmDebugView getMapVtmDebugView() {
+	public static Map25DebugView getMap25DebugView() {
 
-		if (_mapVtmDebugView != null && _isDebugViewVisible) {
-			return _mapVtmDebugView;
+		if (_map25DebugView != null && _isDebugViewVisible) {
+			return _map25DebugView;
 		}
 
 		return null;
@@ -36,8 +36,8 @@ public class MapVtmManager {
 		return _isDebugViewVisible;
 	}
 
-	static void setDebugView(final MapVtmDebugView mapVtmDebugView) {
-		_mapVtmDebugView = mapVtmDebugView;
+	static void setDebugView(final Map25DebugView map25DebugView) {
+		_map25DebugView = map25DebugView;
 	}
 
 	static void setDebugViewVisible(final boolean isDebugVisible) {

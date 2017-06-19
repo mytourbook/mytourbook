@@ -23,11 +23,11 @@ public class ActionMapProviderOpenSciMap extends Action {
 
 	private final Map25View _mapView;
 
-	public ActionMapProviderOpenSciMap(final Map25View mapVtmView) {
+	public ActionMapProviderOpenSciMap(final Map25View map25View) {
 
 		super("OpenScience Map", AS_CHECK_BOX);
 
-		_mapView = mapVtmView;
+		_mapView = map25View;
 	}
 
 	@Override

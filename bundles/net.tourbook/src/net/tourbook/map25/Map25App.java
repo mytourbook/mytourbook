@@ -54,7 +54,7 @@ import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.utils.SharedLibraryLoader;
 import okhttp3.Cache;
 
-public class VtmMapApp extends GdxMap {
+public class Map25App extends GdxMap {
 
 	private static final String		STATE_MAP_POS_X				= "STATE_MAP_POS_X";					//$NON-NLS-1$
 	private static final String		STATE_MAP_POS_Y				= "STATE_MAP_POS_Y";					//$NON-NLS-1$
@@ -63,7 +63,7 @@ public class VtmMapApp extends GdxMap {
 	private static final String		STATE_MAP_POS_SCALE			= "STATE_MAP_POS_SCALE";				//$NON-NLS-1$
 	private static final String		STATE_MAP_POS_TILT			= "STATE_MAP_POS_TILT";					//$NON-NLS-1$
 
-	public static final Logger		log							= LoggerFactory.getLogger(VtmMapApp.class);
+	public static final Logger		log							= LoggerFactory.getLogger(Map25App.class);
 
 	private static IDialogSettings	_state;
 
@@ -75,18 +75,18 @@ public class VtmMapApp extends GdxMap {
 	private long					_lastRenderTime;
 	private PathLayer				_tourLayer;
 
-	public VtmMapApp(final IDialogSettings state) {
+	public Map25App(final IDialogSettings state) {
 
 		_state = state;
 	}
 
-	public static VtmMapApp createMap(final IDialogSettings state, final Canvas canvas) {
+	public static Map25App createMap(final IDialogSettings state, final Canvas canvas) {
 
 		init();
 
 		_state = state;
 
-		final VtmMapApp mapApp = new VtmMapApp(state);
+		final Map25App mapApp = new Map25App(state);
 		
 		_lwjglApp = new LwjglApplication(mapApp, getConfig(null), canvas);
 		
@@ -298,7 +298,7 @@ public class VtmMapApp extends GdxMap {
 
 			_lastRenderTime = renderTime;
 
-			final MapVtmDebugView vtmDebugView = MapVtmManager.getMapVtmDebugView();
+			final Map25DebugView vtmDebugView = Map25Manager.getMap25DebugView();
 
 			if (vtmDebugView != null) {
 

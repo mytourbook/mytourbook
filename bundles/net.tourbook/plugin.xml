@@ -1785,9 +1785,9 @@
    <extension point="org.eclipse.ui.commands">
 
       <command
-            id="net.tourbook.map.vtm.command.TourMapVtm"
-            name="%View_Name_TourMapVtm"
-            defaultHandler="net.tourbook.map25.action.ActionHandlerOpenTourMapVtmView"
+            id="net.tourbook.map25.command.TourMap25"
+            name="%View_Name_TourMap25"
+            defaultHandler="net.tourbook.map25.action.ActionHandlerOpenTourMap25View"
             />
 	            
    </extension>
@@ -1800,10 +1800,10 @@
 
 		<menuContribution locationURI="menu:m_Tour?endof=sep_Map" >
 		            
-			<command commandId="net.tourbook.map.vtm.command.TourMapVtm"
+			<command commandId="net.tourbook.map25.command.TourMap25"
 				icon="icons/map25-view.png"
-				label="%View_Name_TourMapVtm"
-				mnemonic="%View_Name_TourMapVtm_Mnemonic"/>
+				label="%View_Name_TourMap25"
+				mnemonic="%View_Name_TourMap25_Mnemonic"/>
 		
 		</menuContribution>
 
@@ -1812,10 +1812,10 @@
 			<toolbar id="mc_tb_Tour">
 		            
 				<command
-					commandId="net.tourbook.map.vtm.command.TourMapVtm"
+					commandId="net.tourbook.map25.command.TourMap25"
 					icon="icons/map25-view.png"
-					label="%View_Name_TourMapVtm"
-					tooltip="%View_Name_TourMapVtm_Tooltip"/>
+					label="%View_Name_TourMap25"
+					tooltip="%View_Name_TourMap25_Tooltip"/>
 
 			</toolbar>
 		
@@ -1834,16 +1834,16 @@
 			category="net.tourbook.category.map"
 			class="net.tourbook.map25.Map25View"
 			icon="icons/map25-view.png"
-			id="net.tourbook.map.vtm.MapVtmView"
-			name="%View_Name_TourMapVtm"
+			id="net.tourbook.map25.Map25View"
+			name="%View_Name_TourMap25"
 		/>
 
 		<view
 			category="net.tourbook.category.map"
-			class="net.tourbook.map25.MapVtmDebugView"
+			class="net.tourbook.map25.Map25DebugView"
 			icon="icons/map25-debug-view.png"
-			id="net.tourbook.map.vtm.MapVtmDebugView"
-			name="%View_Name_TourMapVtmDebug"
+			id="net.tourbook.map25.Map25DebugView"
+			name="%View_Name_TourMap25Debug"
 		/>
    
    </extension>
