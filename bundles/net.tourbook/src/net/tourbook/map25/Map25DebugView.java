@@ -15,8 +15,12 @@
  *******************************************************************************/
 package net.tourbook.map25;
 
+import java.io.IOException;
+import java.text.NumberFormat;
+
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.util.StatusUtil;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -28,9 +32,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
-import org.oscim.core.MapPosition;
 import org.oscim.map.Map;
 
+import de.byteholder.geoclipse.preferences.Messages;
 import okhttp3.Cache;
 
 public class Map25DebugView extends ViewPart {
@@ -39,11 +43,21 @@ public class Map25DebugView extends ViewPart {
 
 	private static final IDialogSettings	_state	= TourbookPlugin.getState(ID);
 
-	private IPartListener2					_partListener;
+	private final static NumberFormat		_nf2	= NumberFormat.getNumberInstance();
+	{
+		_nf2.setMinimumIntegerDigits(2);
+		_nf2.setMaximumFractionDigits(2);
+	}
 
-	private Label							_lblCacheHits;
-	private Label							_lblRequestedTiles;
-	private Label							_lblNetworkRequests;
+	private IPartListener2	_partListener;
+
+	/*
+	 * UI controls
+	 */
+	private Label			_lblCacheHits;
+	private Label			_lblRequestedTiles;
+	private Label			_lblNetworkRequests;
+	private Label			_lblCacheSize;
 
 	private void addPartListener() {
 
@@ -102,8 +116,12 @@ public class Map25DebugView extends ViewPart {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+		GridLayoutFactory
+				.swtDefaults()//
+				.numColumns(2)
+				.spacing(10, 2)
+				.applyTo(container);
+		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 		{
 			{
 				/*
@@ -120,6 +138,19 @@ public class Map25DebugView extends ViewPart {
 			}
 			{
 				/*
+				 * Network Requests
+				 */
+
+				final Label label = new Label(container, SWT.NONE);
+				GridDataFactory.fillDefaults().applyTo(label);
+				label.setText("Network requests");
+
+				_lblNetworkRequests = new Label(container, SWT.NONE);
+				GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblNetworkRequests);
+				_lblNetworkRequests.setText(UI.EMPTY_STRING);
+			}
+			{
+				/*
 				 * Cache Hits
 				 */
 
@@ -133,16 +164,16 @@ public class Map25DebugView extends ViewPart {
 			}
 			{
 				/*
-				 * Network Requests
+				 * Cache Size
 				 */
 
 				final Label label = new Label(container, SWT.NONE);
 				GridDataFactory.fillDefaults().applyTo(label);
-				label.setText("Network requests");
+				label.setText("Cache Size");
 
-				_lblNetworkRequests = new Label(container, SWT.NONE);
-				GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblNetworkRequests);
-				_lblNetworkRequests.setText(UI.EMPTY_STRING);
+				_lblCacheSize = new Label(container, SWT.NONE);
+				GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblCacheSize);
+				_lblCacheSize.setText(UI.EMPTY_STRING);
 			}
 		}
 	}
@@ -160,31 +191,41 @@ public class Map25DebugView extends ViewPart {
 
 	void updateUI(final Map map, final Cache httpCache) {
 
+//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tupdateUI"));
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
 		Display.getDefault().asyncExec(new Runnable() {
 			@Override
 			public void run() {
 
-				_lblRequestedTiles.setText(Integer.toString(httpCache.requestCount()));
-				_lblCacheHits.setText(Integer.toString(httpCache.hitCount()));
-				_lblNetworkRequests.setText(Integer.toString(httpCache.networkCount()));
+				try {
+
+					_lblRequestedTiles.setText(Integer.toString(httpCache.requestCount()));
+					_lblNetworkRequests.setText(Integer.toString(httpCache.networkCount()));
+
+					_lblCacheHits.setText(Integer.toString(httpCache.hitCount()));
+					_lblCacheSize.setText(_nf2.format(//
+							(float) httpCache.size() / 1024 / 1024) + Messages.prefPage_cache_MByte);
+
+				} catch (final IOException e) {
+					StatusUtil.log(e);
+				}
 			}
 		});
 
-		final MapPosition mapPos = map.getMapPosition();
-
-		System.out.println(
-				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\trender()") //
-						+ ("\ttilt: " + mapPos.tilt)
-						+ ("\tbearing: " + mapPos.bearing)
-						+ ("\tx: " + mapPos.x)
-						+ ("\ty: " + mapPos.y)
-						+ ("\tscale: " + mapPos.scale)
-						+ ("\t")
-						+ ("\t")
-		//
-		);
-		// TODO remove SYSTEM.OUT.PRINTLN
-
+//		final MapPosition mapPos = map.getMapPosition();
+//		System.out.println(
+//				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\trender()") //
+//						+ ("\ttilt: " + mapPos.tilt)
+//						+ ("\tbearing: " + mapPos.bearing)
+//						+ ("\tx: " + mapPos.x)
+//						+ ("\ty: " + mapPos.y)
+//						+ ("\tscale: " + mapPos.scale)
+//						+ ("\t")
+//						+ ("\t")
+//		//
+//		);
+//		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
 }

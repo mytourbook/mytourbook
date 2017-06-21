@@ -124,10 +124,8 @@ public class GridRendererMT extends BucketRenderer {
 				final String labelLat = String.format("lat %.4f", latitude);
 				final String labelLon = String.format("lon %.4f", longitude);
 
-//				final String labelTilt = String.format(
-//						"tilt:%.2f bear:%.2f",
-//						mapPosition.tilt,
-//						mapPosition.bearing);
+//				final String labelProjectedX = String.format("x %.18f", mapPosition.x);
+//				final String labelProjectedY = String.format("y %.18f", mapPosition.y);
 
 				final int textX = s * xx + s / 2;
 				final int textY = s * yy + s / 2;
@@ -136,6 +134,9 @@ public class GridRendererMT extends BucketRenderer {
 				textItem.set(textX, textY, labelTile, _textStyle);
 				textBucket.addText(textItem);
 
+				/*
+				 * Lat/Lon
+				 */
 				textItem = TextItem.pool.get();
 				textItem.set(textX, textY + lineHeight, labelLat, _textStyle);
 				textBucket.addText(textItem);
@@ -143,6 +144,19 @@ public class GridRendererMT extends BucketRenderer {
 				textItem = TextItem.pool.get();
 				textItem.set(textX, textY + lineHeight * 2, labelLon, _textStyle);
 				textBucket.addText(textItem);
+
+// THIS IS DISABLED BECAUSE IT HAS THE SAME VALUE FOR ALL TILES
+//
+//				/*
+//				 * Projected x/y
+//				 */
+//				textItem = TextItem.pool.get();
+//				textItem.set(textX, textY + lineHeight * 3, labelProjectedX, _textStyle);
+//				textBucket.addText(textItem);
+//
+//				textItem = TextItem.pool.get();
+//				textItem.set(textX, textY + lineHeight * 4, labelProjectedY, _textStyle);
+//				textBucket.addText(textItem);
 			}
 		}
 	}

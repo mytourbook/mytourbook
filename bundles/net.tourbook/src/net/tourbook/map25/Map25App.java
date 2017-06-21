@@ -29,7 +29,6 @@ import org.oscim.gdx.GdxMap;
 import org.oscim.gdx.GestureHandlerImpl;
 import org.oscim.gdx.LwjglGL20;
 import org.oscim.gdx.MotionHandler;
-import org.oscim.layers.PathLayer;
 import org.oscim.layers.tile.TileManager;
 import org.oscim.layers.tile.buildings.BuildingLayer;
 import org.oscim.layers.tile.vector.VectorTileLayer;
@@ -56,12 +55,12 @@ import okhttp3.Cache;
 
 public class Map25App extends GdxMap {
 
-	private static final String		STATE_MAP_POS_X				= "STATE_MAP_POS_X";					//$NON-NLS-1$
-	private static final String		STATE_MAP_POS_Y				= "STATE_MAP_POS_Y";					//$NON-NLS-1$
-	private static final String		STATE_MAP_POS_ZOOM_LEVEL	= "STATE_MAP_POS_ZOOM_LEVEL";			//$NON-NLS-1$
-	private static final String		STATE_MAP_POS_BEARING		= "STATE_MAP_POS_BEARING";				//$NON-NLS-1$
-	private static final String		STATE_MAP_POS_SCALE			= "STATE_MAP_POS_SCALE";				//$NON-NLS-1$
-	private static final String		STATE_MAP_POS_TILT			= "STATE_MAP_POS_TILT";					//$NON-NLS-1$
+	private static final String		STATE_MAP_POS_X				= "STATE_MAP_POS_X";						//$NON-NLS-1$
+	private static final String		STATE_MAP_POS_Y				= "STATE_MAP_POS_Y";						//$NON-NLS-1$
+	private static final String		STATE_MAP_POS_ZOOM_LEVEL	= "STATE_MAP_POS_ZOOM_LEVEL";				//$NON-NLS-1$
+	private static final String		STATE_MAP_POS_BEARING		= "STATE_MAP_POS_BEARING";					//$NON-NLS-1$
+	private static final String		STATE_MAP_POS_SCALE			= "STATE_MAP_POS_SCALE";					//$NON-NLS-1$
+	private static final String		STATE_MAP_POS_TILT			= "STATE_MAP_POS_TILT";						//$NON-NLS-1$
 
 	public static final Logger		log							= LoggerFactory.getLogger(Map25App.class);
 
@@ -73,7 +72,7 @@ public class Map25App extends GdxMap {
 	private TileManager				_tileManager;
 
 	private long					_lastRenderTime;
-	private PathLayer				_tourLayer;
+	private PathLayerMT				_tourLayer;
 
 	public Map25App(final IDialogSettings state) {
 
@@ -87,9 +86,9 @@ public class Map25App extends GdxMap {
 		_state = state;
 
 		final Map25App mapApp = new Map25App(state);
-		
+
 		_lwjglApp = new LwjglApplication(mapApp, getConfig(null), canvas);
-		
+
 		return mapApp;
 	}
 
@@ -209,8 +208,7 @@ public class Map25App extends GdxMap {
 		super.dispose();
 	}
 
-	PathLayer getTourLayer() {
-
+	PathLayerMT getTourLayer() {
 		return _tourLayer;
 	}
 
@@ -296,11 +294,10 @@ public class Map25App extends GdxMap {
 		final long renderTime = System.currentTimeMillis();
 		if (renderTime > _lastRenderTime + 1000) {
 
-			_lastRenderTime = renderTime;
-
 			final Map25DebugView vtmDebugView = Map25Manager.getMap25DebugView();
-
 			if (vtmDebugView != null) {
+
+				_lastRenderTime = renderTime;
 
 				final Cache httpCache = OkHttpEngineMT.getHttpCache();
 
@@ -374,18 +371,28 @@ public class Map25App extends GdxMap {
 
 		final Layers layers = mMap.layers();
 
-		layers.add(new BuildingLayer(mMap, mapLayer));
-		layers.add(new LabelLayer(mMap, mapLayer));
-
 		/*
 		 * Tour layer
 		 */
 		final int lineColor = 0xffff0000;
-		final float lineWidth = 25f;
+		final float lineWidth = 2.5f;
 
-		_tourLayer = new PathLayer(mMap, lineColor, lineWidth);
+		_tourLayer = new PathLayerMT(mMap, lineColor, lineWidth);
 		_tourLayer.setEnabled(true);
 		layers.add(_tourLayer);
+
+		/*
+		 * Other layers
+		 */
+		layers.add(new BuildingLayer(mMap, mapLayer));
+		layers.add(new LabelLayer(mMap, mapLayer));
+
+		/*
+		 * Grid layer
+		 */
+		_gridLayer = new TileGridLayerMT(mMap);
+		_gridLayer.setEnabled(true);
+		layers.add(_gridLayer);
 
 		mMap.setTheme(themes);
 

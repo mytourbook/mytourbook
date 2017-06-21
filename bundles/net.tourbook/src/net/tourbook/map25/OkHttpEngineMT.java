@@ -73,7 +73,7 @@ public class OkHttpEngineMT extends OkHttpEngine {
 		 */
 		public OkHttpFactoryMT() {
 
-			_httpCache = new Cache(new File(getCacheDir()), Integer.MAX_VALUE);
+			_httpCache = new Cache(new File(getCacheDir()), Long.MAX_VALUE);
 
 			final OkHttpClient.Builder httpBuilder = new OkHttpClient.Builder();
 

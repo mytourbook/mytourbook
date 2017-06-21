@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.map25;
 
+import gnu.trove.list.array.TIntArrayList;
+
 import java.awt.BorderLayout;
 import java.awt.Canvas;
 import java.awt.Frame;
@@ -51,7 +53,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 import org.oscim.core.GeoPoint;
-import org.oscim.layers.PathLayer;
+import org.oscim.map.Map;
 
 import de.byteholder.gpx.PointOfInterest;
 
@@ -568,6 +570,8 @@ public class Map25View extends ViewPart {
 	private void paintTours() {
 
 		final ArrayList<GeoPoint> geoPoints = new ArrayList<>();
+		final TIntArrayList tourStarts = new TIntArrayList();
+		int tourIndex = 0;
 
 		for (final TourData tourData : _allTourData) {
 
@@ -576,19 +580,27 @@ public class Map25View extends ViewPart {
 				continue;
 			}
 
+			tourStarts.add(tourIndex);
+
 			final double[] latitudeSerie = tourData.latitudeSerie;
 			final double[] longitudeSerie = tourData.longitudeSerie;
 
 			// create vtm geo points
-			for (int index = 0; index < latitudeSerie.length; index++) {
+			for (int index = 0; index < latitudeSerie.length; index++, tourIndex++) {
 				geoPoints.add(new GeoPoint(latitudeSerie[index], longitudeSerie[index]));
 			}
 		}
 
-		final PathLayer tourLayer = _vtmMapApp.getTourLayer();
-		tourLayer.setPoints(geoPoints);
+		final PathLayerMT tourLayer = _vtmMapApp.getTourLayer();
+		tourLayer.setPoints(geoPoints, tourStarts);
 
-		_vtmMapApp.getMap().updateMap(true);
+		final Map gdxMap = _vtmMapApp.getMap();
+		gdxMap.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				gdxMap.updateMap(true);
+			}
+		}, 10);
 	}
 
 	private void paintTours(final ArrayList<Long> tourIdList) {

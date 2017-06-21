@@ -1676,9 +1676,9 @@
 	      </view>
 	      <view
 	            category="net.tourbook.category.system"
-	            class="net.tourbook.map2.view.TourMapPropertyView"
+	            class="net.tourbook.map2.view.Map2DebugView"
 	            icon="icons/tour-map-properties.png"
-	            id="net.tourbook.mapping.TourMapPropertyView"
+	            id="net.tourbook.map2.view.Map2DebugView"
 	            name="%view_name_map_properties">
 	      </view>
 
