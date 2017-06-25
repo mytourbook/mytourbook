@@ -19,7 +19,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-	private static final String	BUNDLE_NAME	= "net.tourbook.messages";//$NON-NLS-1$
+	private static final String	BUNDLE_NAME	= "net.tourbook.messages";										//$NON-NLS-1$
 
 	public static String		Action_Cadence_Set;
 	public static String		Action_Cadence_Set_Rpm;
@@ -376,9 +376,11 @@ public class Messages extends NLS {
 	public static String		app_unit_seconds;
 
 	public static String		App_Action_About;
+	public static String		App_Action_Add;
 	public static String		App_Action_Cancel;
 	public static String		App_Action_Close_ToolTip;
 	public static String		App_Action_Columns;
+	public static String		App_Action_Delete;
 	public static String		App_Action_Dialog_ActionIsInProgress_Message;
 	public static String		App_Action_Dialog_ActionIsInProgress_Title;
 	public static String		App_Action_Duplicate;
@@ -1262,6 +1264,34 @@ public class Messages extends NLS {
 
 	public static String		Pref_LiveUpdate_Checkbox;
 	public static String		Pref_LiveUpdate_Checkbox_Tooltip;
+
+	public static String		Pref_Map25_Column_APIKey;
+	public static String		Pref_Map25_Column_ProviderName;
+	public static String		Pref_Map25_Column_TilePath;
+	public static String		Pref_Map25_Column_Url;
+
+	public static String Pref_Map25_Dialog_ConfirmDeleteMapProvider_Message;
+
+	public static String Pref_Map25_Dialog_ConfirmDeleteMapProvider_Title;
+
+	public static String Pref_Map25_Dialog_SaveModifiedProvider_Message;
+
+	public static String Pref_Map25_Dialog_SaveModifiedProvider_Title;
+
+	public static String Pref_Map25_Error_ProviderNameIsRequired;
+
+	public static String Pref_Map25_Error_TilePathIsRequired;
+
+	public static String Pref_Map25_Error_UrlIsRequired;
+	public static String		Pref_Map25_Label_APIKey;
+
+	public static String Pref_Map25_Label_Description;
+	public static String		Pref_Map25_Label_ProviderName;
+	public static String		Pref_Map25_Label_TilePath;
+
+	public static String Pref_Map25_Label_TileUrl;
+	public static String		Pref_Map25_Label_Title;
+	public static String		Pref_Map25_Label_Url;
 
 	public static String		Pref_MapLayout_Checkbox_BorderColor_Color;
 	public static String		Pref_MapLayout_Checkbox_BorderColor_Darker;

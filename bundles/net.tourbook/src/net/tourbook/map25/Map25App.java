@@ -387,14 +387,12 @@ public class Map25App extends GdxMap {
 		layers.add(new BuildingLayer(mMap, mapLayer));
 		layers.add(new LabelLayer(mMap, mapLayer));
 
-		/*
-		 * Grid layer
-		 */
-		_gridLayer = new TileGridLayerMT(mMap);
-		_gridLayer.setEnabled(true);
-		layers.add(_gridLayer);
-
-		mMap.setTheme(themes);
+//		/*
+//		 * Grid layer
+//		 */
+//		_gridLayer = new TileGridLayerMT(mMap);
+//		_gridLayer.setEnabled(true);
+//		layers.add(_gridLayer);
 
 //		/*
 //		 * Map Scale
@@ -414,6 +412,8 @@ public class Map25App extends GdxMap {
 //		renderer.setPosition(GLViewport.Position.BOTTOM_RIGHT);
 //		renderer.setOffset(5, 0);
 //		layers.add(mapScaleBarLayer);
+
+		mMap.setTheme(themes);
 
 		/*
 		 * Map Viewport

@@ -253,6 +253,29 @@
 
 
 		<!--
+			2.5D Map
+		-->
+		
+		<page
+			name="%Pref_Page_Map25"
+			id="net.tourbook.preferences.PrefPage_Map25"
+			class="net.tourbook.preferences.PrefPageMap25"
+		/>
+			<page
+				name="%Pref_Page_Map25_MapProvider"
+				id="net.tourbook.preferences.PrefPage_Map25_Provider"
+				class="net.tourbook.preferences.PrefPageMap25Provider"
+				category="net.tourbook.preferences.PrefPage_Map25"
+			/>
+			<page
+				name="%Pref_Page_Map25_OfflineMap"
+				id="net.tourbook.preferences.PrefPage_Map25_OfflineMap"
+				class="net.tourbook.preferences.PrefPageMap25OfflineMap"
+				category="net.tourbook.preferences.PrefPage_Map25"
+			/>
+
+
+		<!--
 			3D Map
 		-->
 		

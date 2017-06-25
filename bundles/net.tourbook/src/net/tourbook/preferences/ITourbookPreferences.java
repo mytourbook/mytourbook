@@ -23,6 +23,8 @@ import net.tourbook.ui.UI;
 
 public interface ITourbookPreferences {
 
+// SET_FORMATTING_OFF
+
 	/*
 	 * dummy field used by field editors so they don't assert
 	 */
@@ -446,6 +448,12 @@ public interface ITourbookPreferences {
 	 * Value point tool tip
 	 */
 	public static final String	VALUE_POINT_TOOL_TIP_IS_VISIBLE					= "VALUE_POINT_TOOL_TIP_IS_VISIBLE";						//$NON-NLS-1$
+	
+	/*
+	 * Map 2.5D
+	 */
+	public static final String MAP25_OFFLINE_MAP_CUSTOM_LOCATION				= "MAP25_OFFLINE_MAP_CUSTOM_LOCATION";						//$NON-NLS-1$
+	public static final String MAP25_OFFLINE_MAP_IS_DEFAULT_LOCATION			= "MAP25_OFFLINE_MAP_IS_DEFAULT_LOCATION";					//$NON-NLS-1$
 
 	/*
 	 * Pref page: Map3 color
@@ -486,5 +494,7 @@ public interface ITourbookPreferences {
 	 */
 	public static final String	DIALOG_SET_TIME_ZONE_ACTION						= "DIALOG_SET_TIME_ZONE_ACTION";							//$NON-NLS-1$
 	public static final String	DIALOG_SET_TIME_ZONE_SELECTED_ZONE_ID			= "DIALOG_SET_TIME_ZONE_SELECTED_ZONE_ID";					//$NON-NLS-1$
+
+// SET_FORMATTING_ON
 
 }
