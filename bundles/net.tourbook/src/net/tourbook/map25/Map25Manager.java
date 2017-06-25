@@ -50,6 +50,15 @@ public class Map25Manager {
 
 	private static ArrayList<Map25Provider>	_allMapProvider;
 
+//    private final static String 	DEFAULT_URL 	= "http://opensciencemap.org/tiles/vtm";
+//    private final static String 	DEFAULT_PATH	= "/{Z}/{X}/{Y}.vtm";
+
+//    private final static String 	DEFAULT_URL 	= "https://tile.mapzen.com/mapzen/vector/v1/all";
+//    private final static String 	DEFAULT_PATH 	= "/{Z}/{X}/{Y}.mvt";
+
+//	  private final static String	DEFAULT_URL		= "http://192.168.99.99:8080/all";
+//	  private final static String	DEFAULT_PATH	= "/{Z}/{X}/{Y}.mvt";
+
 	/**
 	 * @return
 	 */
@@ -90,7 +99,7 @@ public class Map25Manager {
 		return mapProvider;
 	}
 
-	public static void saveMapProvider() {
+	public static void saveMapProvider(final ArrayList<Map25Provider> allMapProvider) {
 
 		final XMLMemento xmlRoot = saveMapProvider_10();
 		final File xmlFile = getXmlFile();
@@ -145,6 +154,11 @@ public class Map25Manager {
 
 	static void setDebugViewVisible(final boolean isDebugVisible) {
 		_isDebugViewVisible = isDebugVisible;
+	}
+
+	public static void updateOfflineLocation() {
+		// TODO Auto-generated method stub
+
 	}
 
 }

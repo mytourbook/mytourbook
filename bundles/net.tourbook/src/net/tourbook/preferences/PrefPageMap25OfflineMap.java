@@ -15,8 +15,10 @@
  *******************************************************************************/
 package net.tourbook.preferences;
 
+import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.Util;
+import net.tourbook.map25.Map25Manager;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -31,15 +33,12 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-import de.byteholder.geoclipse.preferences.Messages;
 
 /**
  * Cache for offline map tiles
@@ -54,7 +53,6 @@ public class PrefPageMap25OfflineMap extends FieldEditorPreferencePage implement
 	 * UI controls
 	 */
 	private Composite				_editorContainerLocation;
-
 	private BooleanFieldEditor		_editorBool_UseDefaultLocation;
 	private DirectoryFieldEditor	_editorDir_ThumbnailLocation;
 
@@ -66,27 +64,23 @@ public class PrefPageMap25OfflineMap extends FieldEditorPreferencePage implement
 		// content is set in initialize() !!!;
 	}
 
-	private Control createUI(final Composite parent) {
+	private void createUI(final Composite parent) {
+
+		// VERY IMPORTANT, otherwise nothing is displayed
+		GridLayoutFactory.fillDefaults().applyTo(parent);
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+		GridLayoutFactory.fillDefaults().applyTo(container);
 		{
 			createUI_10_OfflineFolder(container);
 		}
-
-		return container;
 	}
 
 	private void createUI_10_OfflineFolder(final Composite parent) {
 
-		final Label label = new Label(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().applyTo(label);
-		label.setText("text");
-
 		final Group group = new Group(parent, SWT.NONE);
-		group.setText(Messages.Pref_Map25_Group_OfflineMap);
+		group.setText(Messages.Pref_Map25_Offline_Group_OfflineMap);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
 		{
 			/*
@@ -94,7 +88,7 @@ public class PrefPageMap25OfflineMap extends FieldEditorPreferencePage implement
 			 */
 			_editorBool_UseDefaultLocation = new BooleanFieldEditor(
 					ITourbookPreferences.MAP25_OFFLINE_MAP_IS_DEFAULT_LOCATION,
-					Messages.Pref_Map25_Label_UseDefaultLocation,
+					Messages.Pref_Map25_Offline_Label_UseDefaultLocation,
 					group);
 			_editorBool_UseDefaultLocation.setPage(this);
 			_editorBool_UseDefaultLocation.setPreferenceStore(_prefStore);
@@ -112,7 +106,7 @@ public class PrefPageMap25OfflineMap extends FieldEditorPreferencePage implement
 				 */
 				_editorDir_ThumbnailLocation = new DirectoryFieldEditor(
 						ITourbookPreferences.MAP25_OFFLINE_MAP_CUSTOM_LOCATION,
-						Messages.Pref_Map25_Label_Location,
+						Messages.Pref_Map25_Offline_Label_Location,
 						_editorContainerLocation);
 
 				_editorDir_ThumbnailLocation.setPage(this);
@@ -132,7 +126,7 @@ public class PrefPageMap25OfflineMap extends FieldEditorPreferencePage implement
 		}
 
 		// !!! set layout after the editor was created because the editor sets the parents layout
-//		GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
+		GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
 	}
 
 	private void enableControls() {
@@ -200,14 +194,13 @@ public class PrefPageMap25OfflineMap extends FieldEditorPreferencePage implement
 
 				isValid = false;
 
-				setErrorMessage(Messages.Pref_Map25_Error_Location);
+				setErrorMessage(Messages.Pref_Map25_Offline_Error_Location);
 				_editorDir_ThumbnailLocation.setFocus();
 			}
 		}
 
 		if (isValid) {
 			setErrorMessage(null);
-			setErrorMessage("fehler");
 		}
 
 		setValid(isValid);
@@ -260,7 +253,7 @@ public class PrefPageMap25OfflineMap extends FieldEditorPreferencePage implement
 
 	private void saveState() {
 
-//		Map25Manager.updateOfflineMapLocation();
+		Map25Manager.updateOfflineLocation();
 	}
 
 }

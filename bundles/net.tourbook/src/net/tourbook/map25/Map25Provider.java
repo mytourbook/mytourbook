@@ -23,10 +23,14 @@ public class Map25Provider implements Cloneable {
 
 	public int			id;
 
-	public String		name		= UI.EMPTY_STRING;
-	public String		url			= UI.EMPTY_STRING;
-	public String		tilePath	= UI.EMPTY_STRING;
-	public String		apiKey		= UI.EMPTY_STRING;
+	public String		name			= UI.EMPTY_STRING;
+	public String		description		= UI.EMPTY_STRING;
+	public String		offlineFolder	= UI.EMPTY_STRING;
+
+	public String		url				= UI.EMPTY_STRING;
+	public String		tilePath		= UI.EMPTY_STRING;
+
+	public String		apiKey			= UI.EMPTY_STRING;
 
 	public Map25Provider() {
 
@@ -38,15 +42,46 @@ public class Map25Provider implements Cloneable {
 
 		try {
 
-			final Map25Provider v = (Map25Provider) super.clone();
+			final Map25Provider clonedProvider = (Map25Provider) super.clone();
 
-			return v;
+			return clonedProvider;
 
 		} catch (final CloneNotSupportedException e) {
 
 			// this shouldn't happen, since we are Cloneable
 			throw new InternalError(e);
 		}
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+
+		final Map25Provider other = (Map25Provider) obj;
+		if (id != other.id) {
+			return false;
+		}
+
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + id;
+
+		return result;
 	}
 
 }

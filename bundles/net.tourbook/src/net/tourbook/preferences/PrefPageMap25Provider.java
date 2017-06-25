@@ -18,10 +18,13 @@ package net.tourbook.preferences;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.util.Util;
 import net.tourbook.map25.Map25Manager;
 import net.tourbook.map25.Map25Provider;
 
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -48,7 +51,6 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -62,11 +64,13 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchPreferencePage {
 
-//	private static final String			ID		= "net.tourbook.preferences.PrefPageMap25Provider";			//$NON-NLS-1$
-
 // SET_FORMATTING_OFF
+
+	private static final String			ID									= "net.tourbook.preferences.PrefPageMap25Provider";		//$NON-NLS-1$
 	
-//	private final IDialogSettings		_state	= TourbookPlugin.getDefault().getDialogSettingsSection(ID);
+	private static final String			STATE_LAST_SELECTED_MAP_PROVIDER	= "STATE_LAST_SELECTED_MAP_PROVIDER";					//$NON-NLS-1$
+	
+	private final IDialogSettings		_state	= TourbookPlugin.getDefault().getDialogSettingsSection(ID);
 	
 // SET_FORMATTING_ON
 
@@ -77,8 +81,8 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 	private Map25Provider				_newProvider;
 	private Map25Provider				_selectedMapProvider;
 
-	private boolean						_isProviderModified;
-	private boolean						_isUpdateUI;
+	private boolean						_isModelModified;
+	private boolean						_isInUpdateUI;
 
 	private PixelConverter				_pc;
 
@@ -90,10 +94,11 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 	private Button						_btnAddProvider;
 	private Button						_btnCancel;
 	private Button						_btnDeleteProvider;
-	private Button						_btnSaveProvider;
+	private Button						_btnUpdateProvider;
 
 	private Text						_txtAPIKey;
 	private Text						_txtDescription;
+	private Text						_txtOfflineFolder;
 	private Text						_txtProviderName;
 	private Text						_txtTilePath;
 	private Text						_txtTileUrl;
@@ -136,7 +141,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 		// reselect previous map provider
 		restoreState();
 
-		enableActions();
+		enableControls();
 		addPrefListener();
 
 		return container;
@@ -158,13 +163,13 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory
 				.fillDefaults()//
-//				.grab(true, true)
+				//				.grab(true, true)
 				.applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
 		{
 
 			final Label label = new Label(container, SWT.WRAP);
-			label.setText(Messages.Pref_Map25_Label_Title);
+			label.setText(Messages.Pref_Map25_Provider_Label_Title);
 
 			final Composite innerContainer = new Composite(container, SWT.NONE);
 			GridDataFactory
@@ -204,7 +209,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 		 */
 		final Table table = new Table(
 				layoutContainer,
-				(SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI));
+				(SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION));
 
 		table.setHeaderVisible(true);
 
@@ -237,9 +242,9 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 		_mapProviderViewer.addDoubleClickListener(new IDoubleClickListener() {
 			@Override
 			public void doubleClick(final DoubleClickEvent event) {
-//				_tabFolderPerson.setSelection(0);
-//				_txtFirstName.setFocus();
-//				_txtFirstName.selectAll();
+
+				_txtProviderName.setFocus();
+				_txtProviderName.selectAll();
 			}
 		});
 
@@ -250,7 +255,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory
 				.fillDefaults()//
-//				.grab(false, true)
+				//				.grab(false, true)
 				.applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
@@ -299,7 +304,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 				 * Field: Provider name
 				 */
 				final Label label = new Label(container, SWT.NONE);
-				label.setText(Messages.Pref_Map25_Label_ProviderName);
+				label.setText(Messages.Pref_Map25_Provider_Label_ProviderName);
 
 				_txtProviderName = new Text(container, SWT.BORDER);
 				GridDataFactory
@@ -310,26 +315,24 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 			}
 			{
 				/*
-				 * Field: Description
+				 * Field: Offline folder
 				 */
 				final Label label = new Label(container, SWT.NONE);
-				label.setText(Messages.Pref_Map25_Label_Description);
+				label.setText(Messages.Pref_Map25_Provider_Label_OfflineFolder);
 
-				_txtDescription = new Text(container, SWT.BORDER | SWT.WRAP | SWT.V_SCROLL | SWT.H_SCROLL);
+				_txtOfflineFolder = new Text(container, SWT.BORDER);
 				GridDataFactory
 						.fillDefaults()//
-						.hint(_pc.convertWidthInCharsToPixels(20), _pc.convertHeightInCharsToPixels(5))
 						.grab(true, false)
-						.applyTo(_txtDescription);
-				_txtDescription.addModifyListener(_defaultModifyListener);
+						.applyTo(_txtOfflineFolder);
+				_txtOfflineFolder.addModifyListener(_defaultModifyListener);
 			}
-
 			{
 				/*
 				 * Field: Url
 				 */
 				final Label label = new Label(container, SWT.NONE);
-				label.setText(Messages.Pref_Map25_Label_Url);
+				label.setText(Messages.Pref_Map25_Provider_Label_Url);
 
 				_txtUrl = new Text(container, SWT.BORDER);
 				GridDataFactory
@@ -344,7 +347,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 				 * Field: Tile path
 				 */
 				final Label label = new Label(container, SWT.NONE);
-				label.setText(Messages.Pref_Map25_Label_TilePath);
+				label.setText(Messages.Pref_Map25_Provider_Label_TilePath);
 
 				_txtTilePath = new Text(container, SWT.BORDER);
 				GridDataFactory
@@ -353,13 +356,25 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 						.applyTo(_txtTilePath);
 				_txtTilePath.addModifyListener(_defaultModifyListener);
 			}
+			{
+				/*
+				 * Field: Tile Url
+				 */
+				final Label label = new Label(container, SWT.NONE);
+				label.setText(Messages.Pref_Map25_Provider_Label_TileUrl);
 
+				_txtTileUrl = new Text(container, SWT.READ_ONLY);
+				GridDataFactory
+						.fillDefaults()//
+						.grab(true, false)
+						.applyTo(_txtTileUrl);
+			}
 			{
 				/*
 				 * Field: API key
 				 */
 				final Label label = new Label(container, SWT.NONE);
-				label.setText(Messages.Pref_Map25_Label_APIKey);
+				label.setText(Messages.Pref_Map25_Provider_Label_APIKey);
 
 				_txtAPIKey = new Text(container, SWT.BORDER);
 				GridDataFactory
@@ -370,16 +385,22 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 			}
 			{
 				/*
-				 * Field: Tile Url
+				 * Field: Description
 				 */
 				final Label label = new Label(container, SWT.NONE);
-				label.setText(Messages.Pref_Map25_Label_TileUrl);
-
-				_txtTileUrl = new Text(container, SWT.BORDER | SWT.READ_ONLY);
+				label.setText(Messages.Pref_Map25_Provider_Label_Description);
 				GridDataFactory
 						.fillDefaults()//
+						.align(SWT.FILL, SWT.BEGINNING)
+						.applyTo(label);
+
+				_txtDescription = new Text(container, SWT.BORDER | SWT.WRAP | SWT.V_SCROLL | SWT.H_SCROLL);
+				GridDataFactory
+						.fillDefaults()//
+						.hint(_pc.convertWidthInCharsToPixels(20), _pc.convertHeightInCharsToPixels(5))
 						.grab(true, false)
-						.applyTo(_txtTileUrl);
+						.applyTo(_txtDescription);
+				_txtDescription.addModifyListener(_defaultModifyListener);
 			}
 		}
 
@@ -390,11 +411,25 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory
 				.fillDefaults()//
-//				.grab(false, true)
+				//				.grab(false, true)
 				.applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
+			{
+				/*
+				 * Button: Update
+				 */
+				_btnUpdateProvider = new Button(container, SWT.NONE);
+				_btnUpdateProvider.setText(Messages.app_action_update);
+				_btnUpdateProvider.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						onProvider_Update();
+					}
+				});
+				setButtonLayoutData(_btnUpdateProvider);
+			}
 			{
 				/*
 				 * Button: Cancel
@@ -409,23 +444,9 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 				});
 				setButtonLayoutData(_btnCancel);
 
-				final GridData gd = (GridData) _btnCancel.getLayoutData();
-				gd.verticalAlignment = SWT.BOTTOM;
-				gd.grabExcessVerticalSpace = true;
-			}
-			{
-				/*
-				 * Button: Save
-				 */
-				_btnSaveProvider = new Button(container, SWT.NONE);
-				_btnSaveProvider.setText(Messages.App_Action_Save);
-				_btnSaveProvider.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(final SelectionEvent e) {
-						onProvider_Save();
-					}
-				});
-				setButtonLayoutData(_btnSaveProvider);
+//				final GridData gd = (GridData) _btnCancel.getLayoutData();
+//				gd.verticalAlignment = SWT.BOTTOM;
+//				gd.grabExcessVerticalSpace = true;
 			}
 		}
 	}
@@ -443,7 +464,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 			 */
 			tvc = new TableViewerColumn(_mapProviderViewer, SWT.LEAD);
 			tc = tvc.getColumn();
-			tc.setText(Messages.Pref_Map25_Column_ProviderName);
+			tc.setText(Messages.Pref_Map25_Provider_Column_ProviderName);
 			tvc.setLabelProvider(new CellLabelProvider() {
 				@Override
 				public void update(final ViewerCell cell) {
@@ -458,7 +479,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 			 */
 			tvc = new TableViewerColumn(_mapProviderViewer, SWT.LEAD);
 			tc = tvc.getColumn();
-			tc.setText(Messages.Pref_Map25_Column_Url);
+			tc.setText(Messages.Pref_Map25_Provider_Column_Url);
 			tvc.setLabelProvider(new CellLabelProvider() {
 				@Override
 				public void update(final ViewerCell cell) {
@@ -473,7 +494,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 			 */
 			tvc = new TableViewerColumn(_mapProviderViewer, SWT.LEAD);
 			tc = tvc.getColumn();
-			tc.setText(Messages.Pref_Map25_Column_TilePath);
+			tc.setText(Messages.Pref_Map25_Provider_Column_TilePath);
 			tvc.setLabelProvider(new CellLabelProvider() {
 				@Override
 				public void update(final ViewerCell cell) {
@@ -488,7 +509,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 			 */
 			tvc = new TableViewerColumn(_mapProviderViewer, SWT.LEAD);
 			tc = tvc.getColumn();
-			tc.setText(Messages.Pref_Map25_Column_APIKey);
+			tc.setText(Messages.Pref_Map25_Provider_Column_APIKey);
 			tvc.setLabelProvider(new CellLabelProvider() {
 				@Override
 				public void update(final ViewerCell cell) {
@@ -499,36 +520,27 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 		}
 	}
 
-	private void enableActions() {
+	private void enableControls() {
 
 		final boolean isSelected = _selectedMapProvider != null;
 		final boolean isNew = _newProvider != null;
 		final boolean canEdit = isSelected || isNew;
 
-		final boolean isValid = isProviderValid();
+		final boolean isValid = isDataValid();
 
-		_mapProviderViewer.getTable().setEnabled(!_isProviderModified && isValid);
+		_mapProviderViewer.getTable().setEnabled(!_isModelModified && isValid);
 
-		_btnAddProvider.setEnabled(!_isProviderModified && isValid);
-		_btnSaveProvider.setEnabled(_isProviderModified && isValid);
-		_btnCancel.setEnabled(_isProviderModified);
+		_btnAddProvider.setEnabled(!_isModelModified && isValid);
+		_btnUpdateProvider.setEnabled(_isModelModified && isValid);
+		_btnCancel.setEnabled(_isModelModified);
 		_btnDeleteProvider.setEnabled(isSelected);
 
 		_txtAPIKey.setEnabled(canEdit);
+		_txtDescription.setEnabled(canEdit);
+		_txtOfflineFolder.setEnabled(canEdit);
 		_txtProviderName.setEnabled(canEdit);
 		_txtTilePath.setEnabled(canEdit);
 		_txtUrl.setEnabled(canEdit);
-	}
-
-	/**
-	 * @return Returns person which is currently displayed, one person is at least available
-	 *         therefor this should never return <code>null</code> but it can be <code>null</code>
-	 *         when the application is started the first time and people are not yet created.
-	 */
-	private Map25Provider getCurrentProvider() {
-
-		final boolean isNewPerson = _newProvider != null;
-		return isNewPerson ? _newProvider : _selectedMapProvider;
 	}
 
 	@Override
@@ -552,27 +564,33 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 	/**
 	 * @return Returns <code>true</code> when person is valid, otherwise <code>false</code>.
 	 */
-	private boolean isProviderValid() {
+	private boolean isDataValid() {
 
 		final boolean isNewProvider = _newProvider != null;
 
-		if (isNewProvider || _isProviderModified) {
+		if (isNewProvider || _isModelModified) {
 
 			if (_txtProviderName.getText().trim().equals(UI.EMPTY_STRING)) {
 
-				setErrorMessage(Messages.Pref_Map25_Error_ProviderNameIsRequired);
+				setErrorMessage(Messages.Pref_Map25_Provider_Error_ProviderNameIsRequired);
+
+				return false;
+
+			} else if (_txtOfflineFolder.getText().trim().equals(UI.EMPTY_STRING)) {
+
+				setErrorMessage(Messages.Pref_Map25_Provider_Error_OfflineFolderIsRequired);
 
 				return false;
 
 			} else if (_txtUrl.getText().trim().equals(UI.EMPTY_STRING)) {
 
-				setErrorMessage(Messages.Pref_Map25_Error_UrlIsRequired);
+				setErrorMessage(Messages.Pref_Map25_Provider_Error_UrlIsRequired);
 
 				return false;
 
 			} else if (_txtTilePath.getText().trim().equals(UI.EMPTY_STRING)) {
 
-				setErrorMessage(Messages.Pref_Map25_Error_TilePathIsRequired);
+				setErrorMessage(Messages.Pref_Map25_Provider_Error_TilePathIsRequired);
 
 				return false;
 			}
@@ -583,26 +601,51 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 		return true;
 	}
 
+	private boolean isSaveMapProvider() {
+
+		return (MessageDialog.openQuestion(
+				Display.getCurrent().getActiveShell(),
+				Messages.Pref_Map25_Provider_Dialog_SaveModifiedProvider_Title,
+				NLS.bind(
+						Messages.Pref_Map25_Provider_Dialog_SaveModifiedProvider_Message,
+
+						// use name from the ui because it could be modified
+						_txtProviderName.getText())) == false);
+	}
+
+	@Override
+	public boolean okToLeave() {
+
+		if (_isModelModified && isDataValid()) {
+
+			updateModelAndUI();
+			saveMapProviders(true);
+		}
+
+		saveState();
+
+		return super.okToLeave();
+	}
+
 	private void onProvider_Add() {
 
 		_newProvider = new Map25Provider();
-		_isProviderModified = true;
+		_isModelModified = true;
 
-		updateUIFromProvider(_newProvider);
-		enableActions();
+		updateUI_FromProvider(_newProvider);
+		enableControls();
 
 		// edit name
-		_txtProviderName.selectAll();
 		_txtProviderName.setFocus();
 	}
 
 	private void onProvider_Cancel() {
 
 		_newProvider = null;
-		_isProviderModified = false;
+		_isModelModified = false;
 
-		updateUIFromProvider(_selectedMapProvider);
-		enableActions();
+		updateUI_FromProvider(_selectedMapProvider);
+		enableControls();
 
 		_mapProviderViewer.getTable().setFocus();
 	}
@@ -611,9 +654,9 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 
 		if (MessageDialog.openConfirm(
 				Display.getCurrent().getActiveShell(),
-				Messages.Pref_Map25_Dialog_ConfirmDeleteMapProvider_Title,
+				Messages.Pref_Map25_Provider_Dialog_ConfirmDeleteMapProvider_Title,
 				NLS.bind(
-						Messages.Pref_Map25_Dialog_ConfirmDeleteMapProvider_Message,
+						Messages.Pref_Map25_Provider_Dialog_ConfirmDeleteMapProvider_Message,
 						_selectedMapProvider.name)) == false) {
 			return;
 		}
@@ -628,16 +671,17 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 		// delete offline files
 //		deleteOfflineMapFiles(_selectedMapProvider);
 
+		// remove from model
+		_allMapProvider.remove(_selectedMapProvider);
+
 		// remove from viewer
 		_mapProviderViewer.remove(_selectedMapProvider);
-
-		// remove from model
-//		_mpMgr.remove(_selectedMapProvider);
-//		_visibleMp.remove(_selectedMapProvider);
 
 		if (nextSelectedMapProvider == null) {
 
 			_selectedMapProvider = null;
+
+			updateUI_FromProvider(_selectedMapProvider);
 
 		} else {
 
@@ -647,33 +691,20 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 			_mapProviderViewer.getTable().setFocus();
 		}
 
-		// custom map provider list must be updated
-//		_isForceUpdateMapProviderList = true;
-
-		enableActions();
+		enableControls();
 	}
 
 	private void onProvider_Modify() {
 
-		if (_isUpdateUI) {
+		if (_isInUpdateUI) {
 			return;
 		}
 
-		_isProviderModified = true;
+		_isModelModified = true;
 
-		enableActions();
-	}
+		updateUI_Data();
 
-	private void onProvider_Save() {
-
-		if (isProviderValid() == false) {
-			return;
-		}
-
-		saveMapProvider(false, false);
-		enableActions();
-
-		_mapProviderViewer.getTable().setFocus();
+		enableControls();
 	}
 
 	private void onProvider_Select() {
@@ -685,71 +716,128 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 
 			_selectedMapProvider = mapProvider;
 
-			updateUIFromProvider(_selectedMapProvider);
+			updateUI_FromProvider(_selectedMapProvider);
 
 		} else {
 			// irgnore, this can happen when a refresh() of the table viewer is done
 		}
 
-		enableActions();
+		enableControls();
+	}
+
+	private void onProvider_Update() {
+
+		if (isDataValid() == false) {
+			return;
+		}
+
+		updateModelAndUI();
+		enableControls();
+
+		_mapProviderViewer.getTable().setFocus();
+	}
+
+	@Override
+	public boolean performCancel() {
+
+		saveState();
+
+		return super.performCancel();
+	}
+
+	@Override
+	public boolean performOk() {
+
+//		final boolean isModified = _isModelModified;
+
+		updateModelAndUI();
+		saveMapProviders(false);
+
+//		if (isModified) {
+//			/*
+//			 * map providers are saved, keep dialog open because this situation happened several
+//			 * times during development of this part
+//			 */
+//			return false;
+//		}
+
+		saveState();
+
+		return true;
 	}
 
 	private void restoreState() {
-		// TODO Auto-generated method stub
 
+		/*
+		 * select last selected map provider
+		 */
+		final String lastMapProviderUrl = Util.getStateString(_state, STATE_LAST_SELECTED_MAP_PROVIDER, null);
+		Map25Provider lastMapProvider = null;
+		for (final Map25Provider mapProvider : _allMapProvider) {
+			if (mapProvider.url.equals(lastMapProviderUrl)) {
+				lastMapProvider = mapProvider;
+				break;
+			}
+		}
+		if (lastMapProvider != null) {
+			_mapProviderViewer.setSelection(new StructuredSelection(lastMapProvider));
+		} else if (_allMapProvider.size() > 0) {
+			_mapProviderViewer.setSelection(new StructuredSelection(_allMapProvider.get(0)));
+		}
+
+		// set focus to selected map provider
+		final Table table = _mapProviderViewer.getTable();
+		table.setSelection(table.getSelectionIndex());
 	}
 
 	/**
 	 * @param isAskToSave
-	 * @param isRevert
-	 * @return Returns <code>false</code> when person is not saved, modifications will be reverted.
+	 * @return Returns <code>false</code> when map provider is not saved.
 	 */
-	private boolean saveMapProvider(final boolean isAskToSave, final boolean isRevert) {
+	private void saveMapProviders(final boolean isAskToSave) {
+
+		if (!_isModelModified) {
+
+			// nothing is to save
+			return;
+		}
+
+		boolean isSaveIt = true;
+
+		if (isAskToSave) {
+			isSaveIt = isSaveMapProvider();
+		}
+
+		if (isSaveIt) {
+			Map25Manager.saveMapProvider(_allMapProvider);
+		}
+	}
+
+	private void saveState() {
+
+		// selected map provider
+		if (_selectedMapProvider != null) {
+			_state.put(
+					STATE_LAST_SELECTED_MAP_PROVIDER,
+					_selectedMapProvider.url);
+		}
+	}
+
+	/**
+	 */
+	private void updateModelAndUI() {
 
 		final boolean isNewProvider = _newProvider != null;
-		final Map25Provider mapProvider = getCurrentProvider();
-		_newProvider = null;
+		final Map25Provider currentMapProvider = isNewProvider ? _newProvider : _selectedMapProvider;
 
-		if (_isProviderModified) {
+		if (_isModelModified && isDataValid()) {
 
-			if (isAskToSave) {
-
-				if (MessageDialog.openQuestion(
-						Display.getCurrent().getActiveShell(),
-						Messages.Pref_Map25_Dialog_SaveModifiedProvider_Title,
-						NLS.bind(
-								Messages.Pref_Map25_Dialog_SaveModifiedProvider_Message,
-
-								// use name from the ui because it could be modified
-								_txtProviderName.getText())) == false) {
-
-					// revert person
-
-					if (isRevert) {
-
-						// update state
-						_isProviderModified = false;
-
-						// update ui from the previous selected person
-						updateUIFromProvider(_selectedMapProvider);
-					}
-
-					return false;
-				}
-			}
-
-			updateProviderFromUI(mapProvider);
-			_allMapProvider.add(mapProvider);
-
-			Map25Manager.saveMapProvider();
-
-			// update state
-//			_isFireModifyEvent = true;
-			_isProviderModified = false;
+			updateModelData(currentMapProvider);
 
 			// update ui
 			if (isNewProvider) {
-				_mapProviderViewer.add(mapProvider);
+				_allMapProvider.add(currentMapProvider);
+				_mapProviderViewer.add(currentMapProvider);
 
 			} else {
 				// !!! refreshing a map provider do not resort the table when sorting has changed so we refresh the viewer !!!
@@ -757,43 +845,58 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 			}
 
 			// select updated/new map provider
-			_mapProviderViewer.setSelection(new StructuredSelection(mapProvider), true);
+			_mapProviderViewer.setSelection(new StructuredSelection(currentMapProvider), true);
 		}
 
-		return true;
+		// update state
+		_isModelModified = false;
+		_newProvider = null;
 	}
 
-	private void updateProviderFromUI(final Map25Provider mapProvider) {
+	private void updateModelData(final Map25Provider mapProvider) {
 
 		/*
-		 * Update provider
+		 * Update map provider
 		 */
 		mapProvider.apiKey = _txtAPIKey.getText();
+		mapProvider.description = _txtDescription.getText();
 		mapProvider.name = _txtProviderName.getText();
+		mapProvider.offlineFolder = _txtOfflineFolder.getText();
 		mapProvider.tilePath = _txtTilePath.getText();
 		mapProvider.url = _txtUrl.getText();
 	}
 
-	private void updateUIFromProvider(final Map25Provider mapProvider) {
+	private void updateUI_Data() {
 
-		_isUpdateUI = true;
+		final String tileUrl = _txtUrl.getText() + _txtTilePath.getText();
+
+		_txtTileUrl.setText(tileUrl);
+	}
+
+	private void updateUI_FromProvider(final Map25Provider mapProvider) {
+
+		_isInUpdateUI = true;
 		{
 			if (mapProvider == null) {
 
+				_txtAPIKey.setText(UI.EMPTY_STRING);
+				_txtDescription.setText(UI.EMPTY_STRING);
+				_txtOfflineFolder.setText(UI.EMPTY_STRING);
 				_txtProviderName.setText(UI.EMPTY_STRING);
 				_txtUrl.setText(UI.EMPTY_STRING);
 				_txtTilePath.setText(UI.EMPTY_STRING);
-				_txtAPIKey.setText(UI.EMPTY_STRING);
 
 			} else {
 
+				_txtAPIKey.setText(mapProvider.apiKey);
+				_txtDescription.setText(mapProvider.description);
+				_txtOfflineFolder.setText(mapProvider.offlineFolder);
 				_txtProviderName.setText(mapProvider.name);
 				_txtUrl.setText(mapProvider.url);
 				_txtTilePath.setText(mapProvider.tilePath);
-				_txtAPIKey.setText(mapProvider.apiKey);
 			}
 		}
-		_isUpdateUI = false;
+		_isInUpdateUI = false;
 	}
 
 }
