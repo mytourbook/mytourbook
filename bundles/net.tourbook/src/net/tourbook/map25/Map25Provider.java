@@ -21,7 +21,7 @@ public class Map25Provider implements Cloneable {
 
 	private static int	_idCounter;
 
-	public int			id;
+	private int			id;
 
 	public String		name			= UI.EMPTY_STRING;
 	public String		description		= UI.EMPTY_STRING;
@@ -82,6 +82,19 @@ public class Map25Provider implements Cloneable {
 		result = prime * result + id;
 
 		return result;
+	}
+
+	@Override
+	public String toString() {
+		return "Map25Provider ["
+//				+ "id=" + id + ", "
+				+ "name=" + name + ", "
+//				+ "description=" + description + ", "
+//				+ "offlineFolder=" + offlineFolder + ", "
+//				+ "url=" + url + ", "
+//				+ "tilePath=" + tilePath + ", "
+//				+ "apiKey=" + apiKey
+				+ "]";
 	}
 
 }

@@ -15,10 +15,14 @@
  *******************************************************************************/
 package net.tourbook.map25;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 
@@ -36,28 +40,21 @@ public class Map25Manager {
 	private static final String				MAP_PROVIDER_FILE_NAME		= "map25-provider.xml";						//$NON-NLS-1$
 	private static final int				MAP_PROVIDER_VERSION		= 1;
 
-	private static final String				TAG_ROOT					= "Map25Provider";							//$NON-NLS-1$
-	private static final String				TAG_PROFILE					= "Profile";								//$NON-NLS-1$
+	private static final String				TAG_ROOT					= "Map25Providers";							//$NON-NLS-1$
+	private static final String				TAG_MAP_PROVIDER			= "MapProvider";							//$NON-NLS-1$
 
 	private static final String				ATTR_API_KEY				= "APIKey";									//$NON-NLS-1$
+	private static final String				ATTR_DESCRIPTION			= "Description";							//$NON-NLS-1$
+	private static final String				ATTR_OFFLINE_FOLDER			= "OfflineFolder";							//$NON-NLS-1$
+	private static final String				ATTR_MAP_PROVIDER_VERSION	= "Version";								//$NON-NLS-1$
 	private static final String				ATTR_NAME					= "Name";									//$NON-NLS-1$
 	private static final String				ATTR_TILE_PATH				= "TilePath";								//$NON-NLS-1$
 	private static final String				ATTR_URL					= "Url";									//$NON-NLS-1$
-	private static final String				ATTR_MAP_PROVIDER_VERSION	= "Version";								//$NON-NLS-1$
 
 	private static boolean					_isDebugViewVisible;
 	private static Map25DebugView			_map25DebugView;
 
 	private static ArrayList<Map25Provider>	_allMapProvider;
-
-//    private final static String 	DEFAULT_URL 	= "http://opensciencemap.org/tiles/vtm";
-//    private final static String 	DEFAULT_PATH	= "/{Z}/{X}/{Y}.vtm";
-
-//    private final static String 	DEFAULT_URL 	= "https://tile.mapzen.com/mapzen/vector/v1/all";
-//    private final static String 	DEFAULT_PATH 	= "/{Z}/{X}/{Y}.mvt";
-
-//	  private final static String	DEFAULT_URL		= "http://192.168.99.99:8080/all";
-//	  private final static String	DEFAULT_PATH	= "/{Z}/{X}/{Y}.mvt";
 
 	/**
 	 * @return
@@ -94,14 +91,95 @@ public class Map25Manager {
 
 	private static ArrayList<Map25Provider> loadMapProvider() {
 
-		final ArrayList<Map25Provider> mapProvider = new ArrayList<>();
+		final ArrayList<Map25Provider> allMapProvider = new ArrayList<>();
 
-		return mapProvider;
+		final File xmlFile = getXmlFile();
+
+		if (xmlFile.exists()) {
+
+			try (BufferedReader reader = Files.newBufferedReader(Paths.get(xmlFile.toURI()))) {
+
+				final XMLMemento xmlRoot = XMLMemento.createReadRoot(reader);
+				for (final IMemento mementoChild : xmlRoot.getChildren()) {
+
+					final XMLMemento xml = (XMLMemento) mementoChild;
+					if (TAG_MAP_PROVIDER.equals(xml.getType())) {
+
+						final Map25Provider mp = new Map25Provider();
+
+						mp.apiKey = Util.getXmlString(xml, ATTR_API_KEY, UI.EMPTY_STRING);
+						mp.description = Util.getXmlString(xml, ATTR_DESCRIPTION, UI.EMPTY_STRING);
+						mp.name = Util.getXmlString(xml, ATTR_NAME, UI.EMPTY_STRING);
+						mp.offlineFolder = Util.getXmlString(xml, ATTR_OFFLINE_FOLDER, UI.EMPTY_STRING);
+						mp.tilePath = Util.getXmlString(xml, ATTR_TILE_PATH, UI.EMPTY_STRING);
+						mp.url = Util.getXmlString(xml, ATTR_URL, UI.EMPTY_STRING);
+
+						allMapProvider.add(mp);
+					}
+				}
+
+			} catch (final Exception e) {
+				StatusUtil.log(e);
+			}
+
+		} else {
+
+			/*
+			 * Create default map providers
+			 */
+
+			Map25Provider mapProvider;
+
+			/*
+			 * opensciencemap.org
+			 */
+			mapProvider = new Map25Provider();
+			mapProvider.name = "Open Science Map";
+			mapProvider.url = "http://opensciencemap.org/tiles/vtm";
+			mapProvider.tilePath = "/{Z}/{X}/{Y}.vtm";
+			mapProvider.offlineFolder = "open-science-map";
+			mapProvider.description = "This server is sometimes very slow !\n\n"
+					+ "http://opensciencemap.org";
+
+			allMapProvider.add(mapProvider);
+
+			/*
+			 * mapzen
+			 */
+			mapProvider = new Map25Provider();
+			mapProvider.name = "Mapzen Vector Tiles";
+			mapProvider.url = "https://tile.mapzen.com/mapzen/vector/v1/all";
+			mapProvider.tilePath = "/{Z}/{X}/{Y}.mvt";
+			mapProvider.apiKey = "mapzen-xxxxxxx";
+			mapProvider.offlineFolder = "mapzen";
+			mapProvider.description = "https://mapzen.com/projects/vector-tiles/";
+
+			allMapProvider.add(mapProvider);
+
+			/*
+			 * Own map tile server
+			 */
+			mapProvider = new Map25Provider();
+			mapProvider.name = "My Tile Server";
+			mapProvider.url = "http://192.168.99.99:8080/all";
+			mapProvider.tilePath = "/{Z}/{X}/{Y}.mvt";
+			mapProvider.offlineFolder = "my-tile-server";
+			mapProvider.description = "How to build an own tile server is described here\n\n"
+					+ "https://github.com/tilezen/vector-datasource/wiki/Mapzen-Vector-Tile-Service";
+
+			allMapProvider.add(mapProvider);
+		}
+
+		return allMapProvider;
 	}
 
 	public static void saveMapProvider(final ArrayList<Map25Provider> allMapProvider) {
 
-		final XMLMemento xmlRoot = saveMapProvider_10();
+		// update model
+		_allMapProvider.clear();
+		_allMapProvider.addAll(allMapProvider);
+
+		final XMLMemento xmlRoot = saveMapProvider_10_CreateXml();
 		final File xmlFile = getXmlFile();
 
 		Util.writeXml(xmlRoot, xmlFile);
@@ -110,23 +188,25 @@ public class Map25Manager {
 	/**
 	 * @return
 	 */
-	private static XMLMemento saveMapProvider_10() {
+	private static XMLMemento saveMapProvider_10_CreateXml() {
 
 		XMLMemento xmlRoot = null;
 
 		try {
 
-			xmlRoot = saveMapProvider_20_Root();
+			xmlRoot = saveMapProvider_20_CreateRoot();
 
 			// loop: profiles
 			for (final Map25Provider mapProvider : _allMapProvider) {
 
-				final IMemento xmlProfile = xmlRoot.createChild(TAG_PROFILE);
+				final IMemento xml = xmlRoot.createChild(TAG_MAP_PROVIDER);
 
-				xmlProfile.putString(ATTR_API_KEY, mapProvider.apiKey);
-				xmlProfile.putString(ATTR_NAME, mapProvider.name);
-				xmlProfile.putString(ATTR_TILE_PATH, mapProvider.tilePath);
-				xmlProfile.putString(ATTR_URL, mapProvider.url);
+				xml.putString(ATTR_API_KEY, mapProvider.apiKey);
+				xml.putString(ATTR_NAME, mapProvider.name);
+				xml.putString(ATTR_TILE_PATH, mapProvider.tilePath);
+				xml.putString(ATTR_URL, mapProvider.url);
+				xml.putString(ATTR_DESCRIPTION, mapProvider.description);
+				xml.putString(ATTR_OFFLINE_FOLDER, mapProvider.offlineFolder);
 			}
 
 		} catch (final Exception e) {
@@ -136,7 +216,7 @@ public class Map25Manager {
 		return xmlRoot;
 	}
 
-	private static XMLMemento saveMapProvider_20_Root() {
+	private static XMLMemento saveMapProvider_20_CreateRoot() {
 
 		final XMLMemento xmlRoot = XMLMemento.createWriteRoot(TAG_ROOT);
 

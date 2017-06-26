@@ -1270,6 +1270,7 @@ public class Messages extends NLS {
 	public static String		Pref_Map25_Offline_Label_Location;
 	public static String		Pref_Map25_Offline_Label_UseDefaultLocation;
 	public static String		Pref_Map25_Provider_Column_APIKey;
+	public static String		Pref_Map25_Provider_Column_OfflineFolder;
 	public static String		Pref_Map25_Provider_Column_ProviderName;
 	public static String		Pref_Map25_Provider_Column_TilePath;
 	public static String		Pref_Map25_Provider_Column_Url;

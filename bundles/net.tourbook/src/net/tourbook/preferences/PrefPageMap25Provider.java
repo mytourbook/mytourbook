@@ -16,6 +16,8 @@
 package net.tourbook.preferences;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -28,7 +30,6 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.viewers.CellLabelProvider;
@@ -81,10 +82,9 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 	private Map25Provider				_newProvider;
 	private Map25Provider				_selectedMapProvider;
 
-	private boolean						_isModelModified;
+	private boolean						_isModified;
+	private boolean						_isMapProviderModified;
 	private boolean						_isInUpdateUI;
-
-	private PixelConverter				_pc;
 
 	/*
 	 * UI Controls
@@ -149,11 +149,25 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 
 	private ArrayList<Map25Provider> createMapProviderClone() {
 
+		/*
+		 * Clone original data
+		 */
 		final ArrayList<Map25Provider> clonedMapProvider = new ArrayList<>();
 
 		for (final Map25Provider mapProvider : Map25Manager.getAllMapProviders()) {
 			clonedMapProvider.add((Map25Provider) mapProvider.clone());
 		}
+
+		/*
+		 * Sort by name
+		 */
+		Collections.sort(clonedMapProvider, new Comparator<Map25Provider>() {
+
+			@Override
+			public int compare(final Map25Provider mp1, final Map25Provider mp2) {
+				return mp1.name.compareTo(mp2.name);
+			}
+		});
 
 		return clonedMapProvider;
 	}
@@ -201,7 +215,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 		GridDataFactory
 				.fillDefaults() //
 				.grab(true, true)
-				.hint(convertWidthInCharsToPixels(30), convertHeightInCharsToPixels(5))
+				.hint(convertWidthInCharsToPixels(70), convertHeightInCharsToPixels(10))
 				.applyTo(layoutContainer);
 
 		/*
@@ -294,8 +308,14 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 	private void createUI_30_Details(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		GridDataFactory
+				.fillDefaults()//
+				.grab(true, false)
+				.applyTo(container);
+		GridLayoutFactory
+				.fillDefaults()//
+				.numColumns(2)
+				.applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
 
@@ -397,7 +417,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 				_txtDescription = new Text(container, SWT.BORDER | SWT.WRAP | SWT.V_SCROLL | SWT.H_SCROLL);
 				GridDataFactory
 						.fillDefaults()//
-						.hint(_pc.convertWidthInCharsToPixels(20), _pc.convertHeightInCharsToPixels(5))
+						.hint(convertWidthInCharsToPixels(20), convertHeightInCharsToPixels(5))
 						.grab(true, false)
 						.applyTo(_txtDescription);
 				_txtDescription.addModifyListener(_defaultModifyListener);
@@ -475,6 +495,21 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 		}
 		{
 			/*
+			 * Column: Offline folder
+			 */
+			tvc = new TableViewerColumn(_mapProviderViewer, SWT.LEAD);
+			tc = tvc.getColumn();
+			tc.setText(Messages.Pref_Map25_Provider_Column_OfflineFolder);
+			tvc.setLabelProvider(new CellLabelProvider() {
+				@Override
+				public void update(final ViewerCell cell) {
+					cell.setText(((Map25Provider) cell.getElement()).offlineFolder);
+				}
+			});
+			tableLayout.setColumnData(tc, new ColumnWeightData(5, minWidth));
+		}
+		{
+			/*
 			 * Column: Url
 			 */
 			tvc = new TableViewerColumn(_mapProviderViewer, SWT.LEAD);
@@ -486,7 +521,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 					cell.setText(((Map25Provider) cell.getElement()).url);
 				}
 			});
-			tableLayout.setColumnData(tc, new ColumnWeightData(10, minWidth));
+			tableLayout.setColumnData(tc, new ColumnWeightData(7, minWidth));
 		}
 		{
 			/*
@@ -520,6 +555,22 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 		}
 	}
 
+	private void deleteOfflineMapFiles(final Map25Provider map25Provider) {
+
+//		if (MapProviderManager.deleteOfflineMap(map25Provider, false)) {
+//
+//			map25Provider.setStateToReloadOfflineCounter();
+//
+//			// update viewer
+//			_mpViewer.update(map25Provider, null);
+//
+//			updateUIOfflineInfoTotal();
+//
+//			// clear map image cache
+//			map25Provider.disposeTileImages();
+//		}
+	}
+
 	private void enableControls() {
 
 		final boolean isSelected = _selectedMapProvider != null;
@@ -528,11 +579,11 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 
 		final boolean isValid = isDataValid();
 
-		_mapProviderViewer.getTable().setEnabled(!_isModelModified && isValid);
+		_mapProviderViewer.getTable().setEnabled(!_isMapProviderModified && isValid);
 
-		_btnAddProvider.setEnabled(!_isModelModified && isValid);
-		_btnUpdateProvider.setEnabled(_isModelModified && isValid);
-		_btnCancel.setEnabled(_isModelModified);
+		_btnAddProvider.setEnabled(!_isMapProviderModified && isValid);
+		_btnUpdateProvider.setEnabled(_isMapProviderModified && isValid);
+		_btnCancel.setEnabled(_isMapProviderModified);
 		_btnDeleteProvider.setEnabled(isSelected);
 
 		_txtAPIKey.setEnabled(canEdit);
@@ -558,7 +609,6 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 
 	private void initUI(final Composite parent) {
 
-		_pc = new PixelConverter(parent);
 	}
 
 	/**
@@ -568,7 +618,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 
 		final boolean isNewProvider = _newProvider != null;
 
-		if (isNewProvider || _isModelModified) {
+		if (isNewProvider || _isMapProviderModified) {
 
 			if (_txtProviderName.getText().trim().equals(UI.EMPTY_STRING)) {
 
@@ -616,7 +666,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 	@Override
 	public boolean okToLeave() {
 
-		if (_isModelModified && isDataValid()) {
+		if (_isMapProviderModified && isDataValid()) {
 
 			updateModelAndUI();
 			saveMapProviders(true);
@@ -630,7 +680,9 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 	private void onProvider_Add() {
 
 		_newProvider = new Map25Provider();
-		_isModelModified = true;
+
+		_isModified = true;
+		_isMapProviderModified = true;
 
 		updateUI_FromProvider(_newProvider);
 		enableControls();
@@ -642,7 +694,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 	private void onProvider_Cancel() {
 
 		_newProvider = null;
-		_isModelModified = false;
+		_isMapProviderModified = false;
 
 		updateUI_FromProvider(_selectedMapProvider);
 		enableControls();
@@ -651,6 +703,9 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 	}
 
 	private void onProvider_Delete() {
+
+//		Delete Map Provider
+//		Are you sure to delete the map provider "{0}" and all it's offline images?
 
 		if (MessageDialog.openConfirm(
 				Display.getCurrent().getActiveShell(),
@@ -669,7 +724,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 		}
 
 		// delete offline files
-//		deleteOfflineMapFiles(_selectedMapProvider);
+		deleteOfflineMapFiles(_selectedMapProvider);
 
 		// remove from model
 		_allMapProvider.remove(_selectedMapProvider);
@@ -700,7 +755,8 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 			return;
 		}
 
-		_isModelModified = true;
+		_isModified = true;
+		_isMapProviderModified = true;
 
 		updateUI_Data();
 
@@ -783,6 +839,8 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 			_mapProviderViewer.setSelection(new StructuredSelection(lastMapProvider));
 		} else if (_allMapProvider.size() > 0) {
 			_mapProviderViewer.setSelection(new StructuredSelection(_allMapProvider.get(0)));
+		} else {
+			// nothing can be selected
 		}
 
 		// set focus to selected map provider
@@ -796,7 +854,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 	 */
 	private void saveMapProviders(final boolean isAskToSave) {
 
-		if (!_isModelModified) {
+		if (!_isModified) {
 
 			// nothing is to save
 			return;
@@ -810,6 +868,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 
 		if (isSaveIt) {
 			Map25Manager.saveMapProvider(_allMapProvider);
+			_isModified = false;
 		}
 	}
 
@@ -830,7 +889,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 		final boolean isNewProvider = _newProvider != null;
 		final Map25Provider currentMapProvider = isNewProvider ? _newProvider : _selectedMapProvider;
 
-		if (_isModelModified && isDataValid()) {
+		if (_isMapProviderModified && isDataValid()) {
 
 			updateModelData(currentMapProvider);
 
@@ -849,7 +908,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 		}
 
 		// update state
-		_isModelModified = false;
+		_isMapProviderModified = false;
 		_newProvider = null;
 	}
 
@@ -895,6 +954,8 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 				_txtUrl.setText(mapProvider.url);
 				_txtTilePath.setText(mapProvider.tilePath);
 			}
+
+			updateUI_Data();
 		}
 		_isInUpdateUI = false;
 	}
