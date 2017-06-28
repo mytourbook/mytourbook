@@ -15,26 +15,55 @@
  *******************************************************************************/
 package net.tourbook.map25;
 
+import java.util.UUID;
+
+import org.oscim.theme.VtmThemes;
+
 import de.byteholder.geoclipse.map.UI;
 
 public class Map25Provider implements Cloneable {
 
-	private static int	_idCounter;
+	private String		_id;
+	private UUID		_uuid;
 
-	private int			id;
+	public String		name		= UI.EMPTY_STRING;
+	public String		description	= UI.EMPTY_STRING;
 
-	public String		name			= UI.EMPTY_STRING;
-	public String		description		= UI.EMPTY_STRING;
-	public String		offlineFolder	= UI.EMPTY_STRING;
+	public String		url			= UI.EMPTY_STRING;
+	public String		tilePath	= UI.EMPTY_STRING;
 
-	public String		url				= UI.EMPTY_STRING;
-	public String		tilePath		= UI.EMPTY_STRING;
+	public String		apiKey		= UI.EMPTY_STRING;
 
-	public String		apiKey			= UI.EMPTY_STRING;
+	public TileEncoding	tileEncoding;
+	public VtmThemes	theme;
+
+	private boolean		_canBeToggled;
 
 	public Map25Provider() {
 
-		id = ++_idCounter;
+		_uuid = UUID.randomUUID();
+		_id = _uuid.toString();
+	}
+
+	/**
+	 * @param notCheckedUUID
+	 *            Contains a UUID string but it can be invalid.
+	 */
+	public Map25Provider(final String notCheckedUUID) {
+
+		UUID uuid;
+		try {
+			uuid = UUID.fromString(notCheckedUUID);
+		} catch (final Exception e) {
+			uuid = UUID.randomUUID();
+		}
+
+		_uuid = uuid;
+		_id = _uuid.toString();
+	}
+
+	public boolean canBeToggled() {
+		return _canBeToggled;
 	}
 
 	@Override
@@ -67,21 +96,36 @@ public class Map25Provider implements Cloneable {
 		}
 
 		final Map25Provider other = (Map25Provider) obj;
-		if (id != other.id) {
+		if (_uuid == null) {
+			if (other._uuid != null) {
+				return false;
+			}
+		} else if (!_uuid.equals(other._uuid)) {
 			return false;
 		}
 
 		return true;
 	}
 
+	/**
+	 * @return Returns the map provider {@link UUID}.
+	 */
+	public String getId() {
+		return _id;
+	}
+
+	public UUID getUuid() {
+		return _uuid;
+	}
+
 	@Override
 	public int hashCode() {
 
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + id;
+		return _uuid.hashCode();
+	}
 
-		return result;
+	public void setCanBeToggled(final boolean canBeToggled) {
+		_canBeToggled = canBeToggled;
 	}
 
 	@Override
@@ -89,11 +133,11 @@ public class Map25Provider implements Cloneable {
 		return "Map25Provider ["
 //				+ "id=" + id + ", "
 				+ "name=" + name + ", "
-//				+ "description=" + description + ", "
-//				+ "offlineFolder=" + offlineFolder + ", "
-//				+ "url=" + url + ", "
-//				+ "tilePath=" + tilePath + ", "
-//				+ "apiKey=" + apiKey
+				//				+ "description=" + description + ", "
+				//				+ "offlineFolder=" + offlineFolder + ", "
+				//				+ "url=" + url + ", "
+				//				+ "tilePath=" + tilePath + ", "
+				//				+ "apiKey=" + apiKey
 				+ "]";
 	}
 

@@ -16,40 +16,56 @@
 package net.tourbook.map25;
 
 import org.oscim.tiling.ITileDataSource;
+import org.oscim.tiling.source.ITileDecoder;
 import org.oscim.tiling.source.UrlTileDataSource;
 import org.oscim.tiling.source.UrlTileSource;
-import org.oscim.tiling.source.mvt.TileDecoder;
 
-public class CustomTileSource extends UrlTileSource {
+public class Map25TileSource extends UrlTileSource {
 
-//	http://192.168.99.99:8080/all/16/19293/24641.mvt
-
-	private final static String	DEFAULT_URL		= "http://192.168.99.99:8080/all";
-	private final static String	DEFAULT_PATH	= "/{Z}/{X}/{Y}.mvt";
+	private static Map25Provider _mapProvider;
 
 	public static class Builder<T extends Builder<T>> extends UrlTileSource.Builder<T> {
 
 		public Builder() {
-			super(DEFAULT_URL, DEFAULT_PATH, 1, 17);
+			super(_mapProvider.url, _mapProvider.tilePath, 1, 17);
 		}
 
 		@Override
-		public CustomTileSource build() {
-			return new CustomTileSource(this);
+		public Map25TileSource build() {
+			return new Map25TileSource(this);
 		}
 	}
 
-	private CustomTileSource(final Builder<?> builder) {
+	private Map25TileSource(final Builder<?> builder) {
 		super(builder);
 	}
 
 	@SuppressWarnings("rawtypes")
-	public static Builder<?> builder() {
+	public static Builder<?> builder(final Map25Provider mapProvider) {
+
+		_mapProvider = mapProvider;
+
 		return new Builder();
 	}
 
 	@Override
 	public ITileDataSource getDataSource() {
-		return new UrlTileDataSource(this, new TileDecoder(), getHttpEngine());
+
+		ITileDecoder tileDecoder;
+
+		switch (_mapProvider.tileEncoding) {
+		case MVT:
+
+			tileDecoder = new org.oscim.tiling.source.mvt.TileDecoder();
+
+			break;
+
+		case VTM:
+		default:
+			tileDecoder = new org.oscim.tiling.source.oscimap4.TileDecoder();
+			break;
+		}
+
+		return new UrlTileDataSource(this, tileDecoder, getHttpEngine());
 	}
 }

@@ -1810,7 +1810,7 @@
       <command
             id="net.tourbook.map25.command.TourMap25"
             name="%View_Name_TourMap25"
-            defaultHandler="net.tourbook.map25.action.ActionHandlerOpenTourMap25View"
+            defaultHandler="net.tourbook.map25.action.ActionHandlerOpenMap25View"
             />
 	            
    </extension>

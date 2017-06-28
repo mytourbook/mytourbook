@@ -27,7 +27,7 @@ import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
 import net.tourbook.map2.view.SelectionMapPosition;
-import net.tourbook.map25.action.ActionMapProviderOpenSciMap;
+import net.tourbook.map25.action.ActionSelectMap25Provider;
 import net.tourbook.photo.PhotoSelection;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
@@ -40,6 +40,7 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -63,7 +64,7 @@ public class Map25View extends ViewPart {
 
 	private static final IDialogSettings	_state			= TourbookPlugin.getState(ID);
 
-	private Map25App						_vtmMapApp;
+	private Map25App						_mapApp;
 
 	protected boolean						_isPartVisible;
 
@@ -74,8 +75,7 @@ public class Map25View extends ViewPart {
 	private ISelection						_lastHiddenSelection;
 	private ISelection						_selectionWhenHidden;
 
-	private ActionMapProviderOpenSciMap		_action_MapProvider_OpenScience;
-	private ActionMapProviderOpenSciMap		_action_MapProvider_Custom;
+	private ActionSelectMap25Provider		_actionSelectMapProvider;
 
 	private ArrayList<TourData>				_allTourData	= new ArrayList<>();
 	private int								_hashTourId;
@@ -214,7 +214,7 @@ public class Map25View extends ViewPart {
 
 	private void createActions() {
 
-		_action_MapProvider_OpenScience = new ActionMapProviderOpenSciMap(this);
+		_actionSelectMapProvider = new ActionSelectMap25Provider(this);
 	}
 
 	@Override
@@ -245,7 +245,7 @@ public class Map25View extends ViewPart {
 		awtCanvas.setFocusable(true);
 		awtCanvas.requestFocus();
 
-		_vtmMapApp = Map25App.createMap(_state, awtCanvas);
+		_mapApp = Map25App.createMap(_state, awtCanvas);
 	}
 
 	@Override
@@ -253,7 +253,7 @@ public class Map25View extends ViewPart {
 
 		getViewSite().getPage().removePartListener(_partListener);
 
-		_vtmMapApp.stop();
+		_mapApp.stop();
 
 		super.dispose();
 	}
@@ -268,9 +268,9 @@ public class Map25View extends ViewPart {
 		/*
 		 * fill view toolbar
 		 */
-//		final IToolBarManager viewTbm = getViewSite().getActionBars().getToolBarManager();
-//
-//		viewTbm.add(_action_MapProvider_OpenScience);
+		final IToolBarManager viewTbm = getViewSite().getActionBars().getToolBarManager();
+
+		viewTbm.add(_actionSelectMapProvider);
 //		viewTbm.add(new Separator());
 
 		/*
@@ -279,6 +279,10 @@ public class Map25View extends ViewPart {
 //		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
 
 //		fillMapContextMenu(menuMgr);
+	}
+
+	public Map25App getMapApp() {
+		return _mapApp;
 	}
 
 	private void onSelectionChanged(final ISelection selection) {
@@ -591,10 +595,10 @@ public class Map25View extends ViewPart {
 			}
 		}
 
-		final PathLayerMT tourLayer = _vtmMapApp.getTourLayer();
+		final PathLayerMT tourLayer = _mapApp.getTourLayer();
 		tourLayer.setPoints(geoPoints, tourStarts);
 
-		final Map gdxMap = _vtmMapApp.getMap();
+		final Map gdxMap = _mapApp.getMap();
 		gdxMap.postDelayed(new Runnable() {
 			@Override
 			public void run() {

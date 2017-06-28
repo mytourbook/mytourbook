@@ -1265,6 +1265,10 @@ public class Messages extends NLS {
 	public static String		Pref_LiveUpdate_Checkbox;
 	public static String		Pref_LiveUpdate_Checkbox_Tooltip;
 
+	public static String Pref_Map25_Encoding_Mapzen;
+
+	public static String Pref_Map25_Encoding_OpenScienceMap;
+
 	public static String		Pref_Map25_Offline_Error_Location;
 	public static String		Pref_Map25_Offline_Group_OfflineMap;
 	public static String		Pref_Map25_Offline_Label_Location;
@@ -1272,6 +1276,9 @@ public class Messages extends NLS {
 	public static String		Pref_Map25_Provider_Column_APIKey;
 	public static String		Pref_Map25_Provider_Column_OfflineFolder;
 	public static String		Pref_Map25_Provider_Column_ProviderName;
+
+	public static String Pref_Map25_Provider_Column_TileEncoding;
+
 	public static String		Pref_Map25_Provider_Column_TilePath;
 	public static String		Pref_Map25_Provider_Column_Url;
 	public static String		Pref_Map25_Provider_Dialog_ConfirmDeleteMapProvider_Message;
@@ -1286,6 +1293,8 @@ public class Messages extends NLS {
 	public static String		Pref_Map25_Provider_Label_Description;
 	public static String		Pref_Map25_Provider_Label_OfflineFolder;
 	public static String		Pref_Map25_Provider_Label_ProviderName;
+	public static String Pref_Map25_Provider_Label_TileEncoding;
+
 	public static String		Pref_Map25_Provider_Label_TilePath;
 	public static String		Pref_Map25_Provider_Label_TileUrl;
 	public static String		Pref_Map25_Provider_Label_Title;

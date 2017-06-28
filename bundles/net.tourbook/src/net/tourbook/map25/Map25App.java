@@ -18,6 +18,8 @@ package net.tourbook.map25;
 import java.awt.Canvas;
 
 import net.tourbook.common.util.Util;
+import net.tourbook.map25.Map25TileSource.Builder;
+import net.tourbook.map25.OkHttpEngineMT.OkHttpFactoryMT;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.oscim.awt.AwtGraphics;
@@ -31,16 +33,11 @@ import org.oscim.gdx.LwjglGL20;
 import org.oscim.gdx.MotionHandler;
 import org.oscim.layers.tile.TileManager;
 import org.oscim.layers.tile.buildings.BuildingLayer;
-import org.oscim.layers.tile.vector.VectorTileLayer;
 import org.oscim.layers.tile.vector.labeling.LabelLayer;
 import org.oscim.map.Layers;
 import org.oscim.map.Map;
 import org.oscim.map.ViewController;
-import org.oscim.theme.VtmThemes;
-import org.oscim.tiling.source.OkHttpEngine;
 import org.oscim.tiling.source.UrlTileSource;
-import org.oscim.tiling.source.mvt.MapboxTileSource;
-import org.oscim.tiling.source.oscimap4.OSciMap4TileSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,23 +53,26 @@ import okhttp3.Cache;
 public class Map25App extends GdxMap {
 
 	private static final String		STATE_MAP_POS_X				= "STATE_MAP_POS_X";						//$NON-NLS-1$
+
 	private static final String		STATE_MAP_POS_Y				= "STATE_MAP_POS_Y";						//$NON-NLS-1$
 	private static final String		STATE_MAP_POS_ZOOM_LEVEL	= "STATE_MAP_POS_ZOOM_LEVEL";				//$NON-NLS-1$
 	private static final String		STATE_MAP_POS_BEARING		= "STATE_MAP_POS_BEARING";					//$NON-NLS-1$
 	private static final String		STATE_MAP_POS_SCALE			= "STATE_MAP_POS_SCALE";					//$NON-NLS-1$
 	private static final String		STATE_MAP_POS_TILT			= "STATE_MAP_POS_TILT";						//$NON-NLS-1$
-
 	public static final Logger		log							= LoggerFactory.getLogger(Map25App.class);
 
 	private static IDialogSettings	_state;
 
 	private static LwjglApplication	_lwjglApp;
 
+	private OsmTileLayerMT			_baseMap;
+
 	private TileGridLayerMT			_gridLayer;
+	private PathLayerMT				_tourLayer;
+	private OkHttpFactoryMT			_httpFactory;
 	private TileManager				_tileManager;
 
 	private long					_lastRenderTime;
-	private PathLayerMT				_tourLayer;
 
 	public Map25App(final IDialogSettings state) {
 
@@ -147,54 +147,30 @@ public class Map25App extends GdxMap {
 	@Override
 	public void createLayers() {
 
-		final OkHttpEngine.OkHttpFactory httpFactory = new OkHttpEngineMT.OkHttpFactoryMT();
+		_httpFactory = new OkHttpEngineMT.OkHttpFactoryMT();
 
-		final TileSourceProvider tileSourceProvider = TileSourceProvider.CustomTileProvider;
-//		final TileSourceProvider tileSourceProvider = TileSourceProvider.OpenScienceMap;
-//		final TileSourceProvider tileSourceProvider = TileSourceProvider.Mapzen;
+		final Map25Provider mapProvider = Map25Manager.getDefaultMapProvider();
+		final UrlTileSource tileSource = createTileSource(mapProvider, _httpFactory);
 
-		VtmThemes theme;
-		UrlTileSource tileSource;
-
-		switch (tileSourceProvider) {
-		case CustomTileProvider:
-
-			theme = VtmThemes.MAPZEN;
-			tileSource = CustomTileSource
-					//
-					.builder()
-					.httpFactory(httpFactory)
-					.build();
-			break;
-
-		case Mapzen:
-
-			theme = VtmThemes.MAPZEN;
-
-			// Mapzen requires an API key that the tiles can be loaded
-			final String apiKey = System.getProperty("MapzenApiKey", "mapzen-xxxxxxx");
-
-			tileSource = MapboxTileSource
-					.builder()
-					.apiKey(apiKey) // Put a proper API key
-					.httpFactory(httpFactory)
-					.build();
-			break;
-
-		default:
-
-			theme = VtmThemes.DEFAULT;
-			tileSource = OSciMap4TileSource
-					//
-					.builder()
-					.httpFactory(httpFactory)
-					.build();
-			break;
-		}
-
-		setupMap(tileSource, theme);
+		setupMap(mapProvider, tileSource);
 
 		restoreState();
+	}
+
+	private UrlTileSource createTileSource(final Map25Provider mapProvider, final OkHttpFactoryMT httpFactory) {
+
+		final Builder<?> map25Builder = Map25TileSource
+				.builder(mapProvider)
+				.url(mapProvider.url)
+				.tilePath(mapProvider.tilePath)
+				.httpFactory(httpFactory);
+
+		final String apiKey = mapProvider.apiKey;
+		if (apiKey != null && apiKey.trim().length() > 0) {
+			map25Builder.apiKey(apiKey);
+		}
+
+		return map25Builder.build();
 	}
 
 	@Override
@@ -356,18 +332,23 @@ public class Map25App extends GdxMap {
 		_state.put(STATE_MAP_POS_ZOOM_LEVEL, mapPosition.zoomLevel);
 	}
 
-	private void setupMap(final UrlTileSource tileSource, final VtmThemes themes) {
+	public void setMapProvider(final Map25Provider selectedMapProivder) {
 
-		final VectorTileLayer mapLayer = new OsmTileLayerMT(mMap);
+//		_baseMap.setTileSource(tileSource);
+	}
 
-		_tileManager = mapLayer.getManager();
+	private void setupMap(final Map25Provider mapProvider, final UrlTileSource tileSource) {
 
-		mapLayer.setTileSource(tileSource);
+		_baseMap = new OsmTileLayerMT(mMap);
+
+		_tileManager = _baseMap.getManager();
+
+		_baseMap.setTileSource(tileSource);
 
 // THIS IS NOT YET WORKING
 //		mapLayer.setNumLoaders(10);
 
-		mMap.setBaseMap(mapLayer);
+		mMap.setBaseMap(_baseMap);
 
 		final Layers layers = mMap.layers();
 
@@ -384,8 +365,8 @@ public class Map25App extends GdxMap {
 		/*
 		 * Other layers
 		 */
-		layers.add(new BuildingLayer(mMap, mapLayer));
-		layers.add(new LabelLayer(mMap, mapLayer));
+		layers.add(new BuildingLayer(mMap, _baseMap));
+		layers.add(new LabelLayer(mMap, _baseMap));
 
 //		/*
 //		 * Grid layer
@@ -413,7 +394,7 @@ public class Map25App extends GdxMap {
 //		renderer.setOffset(5, 0);
 //		layers.add(mapScaleBarLayer);
 
-		mMap.setTheme(themes);
+		mMap.setTheme(mapProvider.theme);
 
 		/*
 		 * Map Viewport

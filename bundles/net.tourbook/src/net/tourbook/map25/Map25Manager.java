@@ -27,10 +27,14 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
+import org.oscim.theme.VtmThemes;
 import org.osgi.framework.Bundle;
+
+import de.byteholder.geoclipse.mapprovider.IMapProviderListener;
 
 public class Map25Manager {
 
@@ -45,19 +49,101 @@ public class Map25Manager {
 
 	private static final String				ATTR_API_KEY				= "APIKey";									//$NON-NLS-1$
 	private static final String				ATTR_DESCRIPTION			= "Description";							//$NON-NLS-1$
-	private static final String				ATTR_OFFLINE_FOLDER			= "OfflineFolder";							//$NON-NLS-1$
 	private static final String				ATTR_MAP_PROVIDER_VERSION	= "Version";								//$NON-NLS-1$
 	private static final String				ATTR_NAME					= "Name";									//$NON-NLS-1$
 	private static final String				ATTR_TILE_PATH				= "TilePath";								//$NON-NLS-1$
+	private static final String				ATTR_TILE_ENCODING			= "TileEncoding";							//$NON-NLS-1$
+	private static final String				ATTR_VTM_THEME				= "VtmTheme";								//$NON-NLS-1$
 	private static final String				ATTR_URL					= "Url";									//$NON-NLS-1$
+	private static final String				ATTR_UUID					= "UUID";									//$NON-NLS-1$
 
 	private static boolean					_isDebugViewVisible;
 	private static Map25DebugView			_map25DebugView;
 
 	private static ArrayList<Map25Provider>	_allMapProvider;
+	private static Map25Provider			_defaultMapProvider			= createMapProvider_Default();
+
+	private static final ListenerList		_mapProviderListeners		= new ListenerList(ListenerList.IDENTITY);
+
+	public static void addMapProviderListener(final IMapProviderListener listener) {
+		_mapProviderListeners.add(listener);
+	}
 
 	/**
-	 * @return
+	 * opensciencemap.org
+	 */
+	private static Map25Provider createMapProvider_Default() {
+
+		final Map25Provider mapProvider = new Map25Provider();
+
+		mapProvider.name = "Open Science Map";
+		mapProvider.url = "http://opensciencemap.org/tiles/vtm";
+		mapProvider.tilePath = "/{Z}/{X}/{Y}.vtm";
+		mapProvider.description = "This server is sometimes very slow !\n\nhttp://opensciencemap.org";
+
+		mapProvider.theme = VtmThemes.DEFAULT;
+		mapProvider.tileEncoding = TileEncoding.VTM;
+
+		_defaultMapProvider = mapProvider;
+
+		return mapProvider;
+	}
+
+	/**
+	 * mapzen
+	 */
+	private static Map25Provider createMapProvider_Mapzen() {
+
+		final Map25Provider mapProvider = new Map25Provider();
+
+		mapProvider.name = "Mapzen Vector Tiles";
+		mapProvider.url = "https://tile.mapzen.com/mapzen/vector/v1/all";
+		mapProvider.tilePath = "/{Z}/{X}/{Y}.mvt";
+		mapProvider.apiKey = "mapzen-xxxxxxx";
+		mapProvider.description =
+				"https://mapzen.com/projects/vector-tiles/"
+						+ "\n\n" +
+						"This server requires an API key which can be requested from"
+						+ "\n"
+						+ "https://mapzen.com/documentation/overview/api-keys/ "
+						+ "\n"
+						+ "50'000 tiles per month are free (June 2017)";
+
+		mapProvider.theme = VtmThemes.MAPZEN;
+		mapProvider.tileEncoding = TileEncoding.MVT;
+
+		return mapProvider;
+	}
+
+	/**
+	 * Own map tile server
+	 */
+	private static Map25Provider createMapProvider_MyTileServer() {
+
+		final Map25Provider mapProvider = new Map25Provider();
+
+		mapProvider.name = "My Tile Server";
+		mapProvider.url = "http://192.168.99.99:8080/all";
+		mapProvider.tilePath = "/{Z}/{X}/{Y}.mvt";
+		mapProvider.description = "How to build an own tile server is described here\n\n"
+				+ "https://github.com/tilezen/vector-datasource/wiki/Mapzen-Vector-Tile-Service";
+
+		mapProvider.theme = VtmThemes.MAPZEN;
+		mapProvider.tileEncoding = TileEncoding.MVT;
+
+		return mapProvider;
+	}
+
+	private static void fireChangeEvent() {
+
+		final Object[] allListeners = _mapProviderListeners.getListeners();
+		for (final Object listener : allListeners) {
+			((IMapProviderListener) listener).mapProviderListChanged();
+		}
+	}
+
+	/**
+	 * @return Returns all available {@link Map25Provider}.
 	 */
 	public static ArrayList<Map25Provider> getAllMapProviders() {
 
@@ -66,6 +152,10 @@ public class Map25Manager {
 		}
 
 		return _allMapProvider;
+	}
+
+	public static Map25Provider getDefaultMapProvider() {
+		return _defaultMapProvider;
 	}
 
 	/**
@@ -105,14 +195,18 @@ public class Map25Manager {
 					final XMLMemento xml = (XMLMemento) mementoChild;
 					if (TAG_MAP_PROVIDER.equals(xml.getType())) {
 
-						final Map25Provider mp = new Map25Provider();
+						final String xmlUUID = Util.getXmlString(xml, ATTR_UUID, UI.EMPTY_STRING);
+
+						final Map25Provider mp = new Map25Provider(xmlUUID);
 
 						mp.apiKey = Util.getXmlString(xml, ATTR_API_KEY, UI.EMPTY_STRING);
 						mp.description = Util.getXmlString(xml, ATTR_DESCRIPTION, UI.EMPTY_STRING);
 						mp.name = Util.getXmlString(xml, ATTR_NAME, UI.EMPTY_STRING);
-						mp.offlineFolder = Util.getXmlString(xml, ATTR_OFFLINE_FOLDER, UI.EMPTY_STRING);
 						mp.tilePath = Util.getXmlString(xml, ATTR_TILE_PATH, UI.EMPTY_STRING);
 						mp.url = Util.getXmlString(xml, ATTR_URL, UI.EMPTY_STRING);
+
+						mp.theme = (VtmThemes) Util.getXmlEnum(xml, ATTR_VTM_THEME, VtmThemes.DEFAULT);
+						mp.tileEncoding = (TileEncoding) Util.getXmlEnum(xml, ATTR_TILE_ENCODING, TileEncoding.VTM);
 
 						allMapProvider.add(mp);
 					}
@@ -127,50 +221,19 @@ public class Map25Manager {
 			/*
 			 * Create default map providers
 			 */
-
-			Map25Provider mapProvider;
-
-			/*
-			 * opensciencemap.org
-			 */
-			mapProvider = new Map25Provider();
-			mapProvider.name = "Open Science Map";
-			mapProvider.url = "http://opensciencemap.org/tiles/vtm";
-			mapProvider.tilePath = "/{Z}/{X}/{Y}.vtm";
-			mapProvider.offlineFolder = "open-science-map";
-			mapProvider.description = "This server is sometimes very slow !\n\n"
-					+ "http://opensciencemap.org";
-
-			allMapProvider.add(mapProvider);
-
-			/*
-			 * mapzen
-			 */
-			mapProvider = new Map25Provider();
-			mapProvider.name = "Mapzen Vector Tiles";
-			mapProvider.url = "https://tile.mapzen.com/mapzen/vector/v1/all";
-			mapProvider.tilePath = "/{Z}/{X}/{Y}.mvt";
-			mapProvider.apiKey = "mapzen-xxxxxxx";
-			mapProvider.offlineFolder = "mapzen";
-			mapProvider.description = "https://mapzen.com/projects/vector-tiles/";
-
-			allMapProvider.add(mapProvider);
-
-			/*
-			 * Own map tile server
-			 */
-			mapProvider = new Map25Provider();
-			mapProvider.name = "My Tile Server";
-			mapProvider.url = "http://192.168.99.99:8080/all";
-			mapProvider.tilePath = "/{Z}/{X}/{Y}.mvt";
-			mapProvider.offlineFolder = "my-tile-server";
-			mapProvider.description = "How to build an own tile server is described here\n\n"
-					+ "https://github.com/tilezen/vector-datasource/wiki/Mapzen-Vector-Tile-Service";
-
-			allMapProvider.add(mapProvider);
+			allMapProvider.add(_defaultMapProvider);
+			allMapProvider.add(createMapProvider_Mapzen());
+			allMapProvider.add(createMapProvider_MyTileServer());
 		}
 
 		return allMapProvider;
+	}
+
+	public static void removeMapProviderListener(final IMapProviderListener listener) {
+
+		if (listener != null) {
+			_mapProviderListeners.remove(listener);
+		}
 	}
 
 	public static void saveMapProvider(final ArrayList<Map25Provider> allMapProvider) {
@@ -183,6 +246,8 @@ public class Map25Manager {
 		final File xmlFile = getXmlFile();
 
 		Util.writeXml(xmlRoot, xmlFile);
+
+		fireChangeEvent();
 	}
 
 	/**
@@ -202,11 +267,14 @@ public class Map25Manager {
 				final IMemento xml = xmlRoot.createChild(TAG_MAP_PROVIDER);
 
 				xml.putString(ATTR_API_KEY, mapProvider.apiKey);
+				xml.putString(ATTR_DESCRIPTION, mapProvider.description);
 				xml.putString(ATTR_NAME, mapProvider.name);
 				xml.putString(ATTR_TILE_PATH, mapProvider.tilePath);
 				xml.putString(ATTR_URL, mapProvider.url);
-				xml.putString(ATTR_DESCRIPTION, mapProvider.description);
-				xml.putString(ATTR_OFFLINE_FOLDER, mapProvider.offlineFolder);
+				xml.putString(ATTR_UUID, mapProvider.getId().toString());
+
+				Util.setXmlEnum(xml, ATTR_TILE_ENCODING, mapProvider.tileEncoding);
+				Util.setXmlEnum(xml, ATTR_VTM_THEME, mapProvider.theme);
 			}
 
 		} catch (final Exception e) {
@@ -240,5 +308,4 @@ public class Map25Manager {
 		// TODO Auto-generated method stub
 
 	}
-
 }

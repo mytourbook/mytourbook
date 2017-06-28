@@ -19,11 +19,15 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.map25.HttpLoggingInterceptorMT.Level;
+import net.tourbook.preferences.ITourbookPreferences;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.oscim.tiling.source.HttpEngine;
 import org.oscim.tiling.source.OkHttpEngine;
 import org.oscim.tiling.source.UrlTileSource;
@@ -37,6 +41,8 @@ import okhttp3.Response;
 
 public class OkHttpEngineMT extends OkHttpEngine {
 
+	private static IPreferenceStore					_prefStore	= TourbookPlugin.getPrefStore();
+
 	public static final Logger						log			= LoggerFactory.getLogger(OkHttpEngineMT.class);
 
 	private static OkHttpClient						_httpClient;
@@ -45,7 +51,7 @@ public class OkHttpEngineMT extends OkHttpEngine {
 	private static final HttpLoggingInterceptorMT	LOGGING_INTERCEPTOR;
 	private static final Interceptor				REWRITE_CACHE_CONTROL_INTERCEPTOR;
 
-	public static boolean							_isLogHttp	= false;
+	public static boolean							_isLogHttp	= true;
 	static {
 
 		LOGGING_INTERCEPTOR = new HttpLoggingInterceptorMT().setLevel(Level.BODY);
@@ -59,8 +65,8 @@ public class OkHttpEngineMT extends OkHttpEngine {
 				return originalResponse
 						.newBuilder()
 						.header(
-								"Cache-Control",
-								"public, max-age=31536000") // 365 days
+								"Cache-Control", //$NON-NLS-1$
+								"public, max-age=31536000") // 365 days //$NON-NLS-1$
 						.build();
 			}
 		};
@@ -112,12 +118,22 @@ public class OkHttpEngineMT extends OkHttpEngine {
 	 */
 	static String getCacheDir() {
 
-		final String workingDirectory = Platform.getInstanceLocation().getURL().getPath();
+		final boolean isDefaultLocation = _prefStore.getBoolean(
+				ITourbookPreferences.MAP25_OFFLINE_MAP_IS_DEFAULT_LOCATION);
 
-		final IPath tileCachePath = new Path(workingDirectory).append("vtm-tile-cache");
+		final String tileCacheLocation = isDefaultLocation //
+				? Platform.getInstanceLocation().getURL().getPath() //
+				: _prefStore.getString(ITourbookPreferences.MAP25_OFFLINE_MAP_CUSTOM_LOCATION);
+
+		final IPath tileCachePath = new Path(tileCacheLocation).append("vtm-tile-cache"); //$NON-NLS-1$
 
 		if (tileCachePath.toFile().exists() == false) {
-			tileCachePath.toFile().mkdirs();
+
+			if (tileCachePath.toFile().mkdirs()) {
+				StatusUtil.log("Created tile cache folder " + tileCachePath.toOSString()); //$NON-NLS-1$
+			} else {
+				throw new RuntimeException("Cannot created tile cache folder " + tileCachePath.toOSString()); //$NON-NLS-1$
+			}
 		}
 
 		return tileCachePath.toOSString();

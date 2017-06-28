@@ -13,26 +13,24 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.map25.action;
+package net.tourbook.map25;
 
-import net.tourbook.map25.Map25View;
+import org.oscim.theme.VtmThemes;
+import org.oscim.tiling.source.ITileDecoder;
 
-import org.eclipse.jface.action.Action;
+/**
+ * Tile encoding format. {@link VtmThemes} and {@link ITileDecoder} depends on this.
+ */
+public enum TileEncoding {
 
-public class ActionMapProviderOpenSciMap extends Action {
+	/**
+	 * Mapzen tile encoding
+	 */
+	MVT,
 
-	private final Map25View _mapView;
-
-	public ActionMapProviderOpenSciMap(final Map25View map25View) {
-
-		super("OpenScience Map", AS_CHECK_BOX);
-
-		_mapView = map25View;
-	}
-
-	@Override
-	public void run() {
-		_mapView.action_MapProvider_OpenScience();
-	}
+	/**
+	 * Open Science Map encoding
+	 */
+	VTM,
 
 }

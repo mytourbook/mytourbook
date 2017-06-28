@@ -25,6 +25,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 import net.tourbook.map25.Map25Manager;
 import net.tourbook.map25.Map25Provider;
+import net.tourbook.map25.TileEncoding;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -52,7 +53,9 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -67,42 +70,50 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 
 // SET_FORMATTING_OFF
 
-	private static final String			ID									= "net.tourbook.preferences.PrefPageMap25Provider";		//$NON-NLS-1$
+	private static final String				ID									= "net.tourbook.preferences.PrefPageMap25Provider";		//$NON-NLS-1$
+
+	private static final String				STATE_LAST_SELECTED_MAP_PROVIDER	= "STATE_LAST_SELECTED_MAP_PROVIDER";					//$NON-NLS-1$
 	
-	private static final String			STATE_LAST_SELECTED_MAP_PROVIDER	= "STATE_LAST_SELECTED_MAP_PROVIDER";					//$NON-NLS-1$
-	
-	private final IDialogSettings		_state	= TourbookPlugin.getDefault().getDialogSettingsSection(ID);
-	
+	private static final TileEncodingData[] _allTileEncoding					= new TileEncodingData[] {
+
+		new TileEncodingData(TileEncoding.MVT,Messages.Pref_Map25_Encoding_Mapzen),
+		new TileEncodingData(TileEncoding.VTM,Messages.Pref_Map25_Encoding_OpenScienceMap)
+	};
+
 // SET_FORMATTING_ON
 
-	private ArrayList<Map25Provider>	_allMapProvider;
+	private final IDialogSettings			_state								= TourbookPlugin.getState(ID);
 
-	private ModifyListener				_defaultModifyListener;
+	private ArrayList<Map25Provider>		_allMapProvider;
 
-	private Map25Provider				_newProvider;
-	private Map25Provider				_selectedMapProvider;
+	private ModifyListener					_defaultModifyListener;
 
-	private boolean						_isModified;
-	private boolean						_isMapProviderModified;
-	private boolean						_isInUpdateUI;
+	private SelectionListener				_defaultSelectionListener;
+	private Map25Provider					_newProvider;
 
+	private Map25Provider					_selectedMapProvider;
+	private boolean							_isModified;
+
+	private boolean							_isMapProviderModified;
+	private boolean							_isInUpdateUI;
 	/*
 	 * UI Controls
 	 */
-	private TableViewer					_mapProviderViewer;
+	private TableViewer						_mapProviderViewer;
 
-	private Button						_btnAddProvider;
-	private Button						_btnCancel;
-	private Button						_btnDeleteProvider;
-	private Button						_btnUpdateProvider;
+	private Button							_btnAddProvider;
 
-	private Text						_txtAPIKey;
-	private Text						_txtDescription;
-	private Text						_txtOfflineFolder;
-	private Text						_txtProviderName;
-	private Text						_txtTilePath;
-	private Text						_txtTileUrl;
-	private Text						_txtUrl;
+	private Button							_btnCancel;
+	private Button							_btnDeleteProvider;
+	private Button							_btnUpdateProvider;
+	private Text							_txtAPIKey;
+
+	private Text							_txtDescription;
+	private Text							_txtProviderName;
+	private Text							_txtTilePath;
+	private Text							_txtTileUrl;
+	private Text							_txtUrl;
+	private Combo							_comboTileEncoding;
 
 	private class MapProvider_ContentProvider implements IStructuredContentProvider {
 
@@ -119,6 +130,17 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 		@Override
 		public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {
 
+		}
+	}
+
+	public static class TileEncodingData {
+
+		private TileEncoding	__encoding;
+		private String			__text;
+
+		public TileEncodingData(final TileEncoding encoding, final String text) {
+			__encoding = encoding;
+			__text = text;
 		}
 	}
 
@@ -335,20 +357,6 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 			}
 			{
 				/*
-				 * Field: Offline folder
-				 */
-				final Label label = new Label(container, SWT.NONE);
-				label.setText(Messages.Pref_Map25_Provider_Label_OfflineFolder);
-
-				_txtOfflineFolder = new Text(container, SWT.BORDER);
-				GridDataFactory
-						.fillDefaults()//
-						.grab(true, false)
-						.applyTo(_txtOfflineFolder);
-				_txtOfflineFolder.addModifyListener(_defaultModifyListener);
-			}
-			{
-				/*
 				 * Field: Url
 				 */
 				final Label label = new Label(container, SWT.NONE);
@@ -391,6 +399,23 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 			}
 			{
 				/*
+				 * Field: Tile Encoding
+				 */
+				final Label label = new Label(container, SWT.NONE);
+				label.setText(Messages.Pref_Map25_Provider_Label_TileEncoding);
+
+				_comboTileEncoding = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
+//				GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).applyTo(_comboTileEncoding);
+				_comboTileEncoding.setVisibleItemCount(20);
+				_comboTileEncoding.addSelectionListener(_defaultSelectionListener);
+
+				// fill combobox
+				for (final TileEncodingData encodingData : _allTileEncoding) {
+					_comboTileEncoding.add(encodingData.__text);
+				}
+			}
+			{
+				/*
 				 * Field: API key
 				 */
 				final Label label = new Label(container, SWT.NONE);
@@ -417,7 +442,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 				_txtDescription = new Text(container, SWT.BORDER | SWT.WRAP | SWT.V_SCROLL | SWT.H_SCROLL);
 				GridDataFactory
 						.fillDefaults()//
-						.hint(convertWidthInCharsToPixels(20), convertHeightInCharsToPixels(5))
+						.hint(convertWidthInCharsToPixels(20), convertHeightInCharsToPixels(8))
 						.grab(true, false)
 						.applyTo(_txtDescription);
 				_txtDescription.addModifyListener(_defaultModifyListener);
@@ -495,15 +520,15 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 		}
 		{
 			/*
-			 * Column: Offline folder
+			 * Column: Type
 			 */
 			tvc = new TableViewerColumn(_mapProviderViewer, SWT.LEAD);
 			tc = tvc.getColumn();
-			tc.setText(Messages.Pref_Map25_Provider_Column_OfflineFolder);
+			tc.setText(Messages.Pref_Map25_Provider_Column_TileEncoding);
 			tvc.setLabelProvider(new CellLabelProvider() {
 				@Override
 				public void update(final ViewerCell cell) {
-					cell.setText(((Map25Provider) cell.getElement()).offlineFolder);
+					cell.setText(((Map25Provider) cell.getElement()).tileEncoding.name());
 				}
 			});
 			tableLayout.setColumnData(tc, new ColumnWeightData(5, minWidth));
@@ -588,10 +613,51 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 
 		_txtAPIKey.setEnabled(canEdit);
 		_txtDescription.setEnabled(canEdit);
-		_txtOfflineFolder.setEnabled(canEdit);
 		_txtProviderName.setEnabled(canEdit);
 		_txtTilePath.setEnabled(canEdit);
 		_txtUrl.setEnabled(canEdit);
+	}
+
+	private int getEncodingIndex(final TileEncoding tileEncoding) {
+
+		for (int encodingIndex = 0; encodingIndex < _allTileEncoding.length; encodingIndex++) {
+
+			final TileEncodingData tileEncodingData = _allTileEncoding[encodingIndex];
+
+			if (tileEncoding.equals(tileEncodingData.__encoding)) {
+				return encodingIndex;
+			}
+		}
+
+		/*
+		 * return default, open science map
+		 */
+		int defaultIndex = 0;
+
+		for (int encodingIndex = 0; encodingIndex < _allTileEncoding.length; encodingIndex++) {
+
+			final TileEncodingData tileEncodingData = _allTileEncoding[encodingIndex];
+
+			if (tileEncodingData.__encoding.equals(TileEncoding.VTM)) {
+				defaultIndex = encodingIndex;
+				break;
+			}
+		}
+
+		return defaultIndex;
+	}
+
+	private TileEncoding getSelectedEncoding() {
+
+		final int selectedIndex = _comboTileEncoding.getSelectionIndex();
+
+		if (selectedIndex < 0) {
+
+			// return default
+			return TileEncoding.VTM;
+		}
+
+		return _allTileEncoding[selectedIndex].__encoding;
 	}
 
 	@Override
@@ -602,6 +668,13 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 		_defaultModifyListener = new ModifyListener() {
 			@Override
 			public void modifyText(final ModifyEvent e) {
+				onProvider_Modify();
+			}
+		};
+
+		_defaultSelectionListener = new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
 				onProvider_Modify();
 			}
 		};
@@ -623,12 +696,6 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 			if (_txtProviderName.getText().trim().equals(UI.EMPTY_STRING)) {
 
 				setErrorMessage(Messages.Pref_Map25_Provider_Error_ProviderNameIsRequired);
-
-				return false;
-
-			} else if (_txtOfflineFolder.getText().trim().equals(UI.EMPTY_STRING)) {
-
-				setErrorMessage(Messages.Pref_Map25_Provider_Error_OfflineFolderIsRequired);
 
 				return false;
 
@@ -920,9 +987,10 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 		mapProvider.apiKey = _txtAPIKey.getText();
 		mapProvider.description = _txtDescription.getText();
 		mapProvider.name = _txtProviderName.getText();
-		mapProvider.offlineFolder = _txtOfflineFolder.getText();
 		mapProvider.tilePath = _txtTilePath.getText();
 		mapProvider.url = _txtUrl.getText();
+		
+		mapProvider.tileEncoding=getSelectedEncoding();
 	}
 
 	private void updateUI_Data() {
@@ -940,7 +1008,6 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 
 				_txtAPIKey.setText(UI.EMPTY_STRING);
 				_txtDescription.setText(UI.EMPTY_STRING);
-				_txtOfflineFolder.setText(UI.EMPTY_STRING);
 				_txtProviderName.setText(UI.EMPTY_STRING);
 				_txtUrl.setText(UI.EMPTY_STRING);
 				_txtTilePath.setText(UI.EMPTY_STRING);
@@ -949,10 +1016,11 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 
 				_txtAPIKey.setText(mapProvider.apiKey);
 				_txtDescription.setText(mapProvider.description);
-				_txtOfflineFolder.setText(mapProvider.offlineFolder);
 				_txtProviderName.setText(mapProvider.name);
 				_txtUrl.setText(mapProvider.url);
 				_txtTilePath.setText(mapProvider.tilePath);
+
+				_comboTileEncoding.select(getEncodingIndex(mapProvider.tileEncoding));
 			}
 
 			updateUI_Data();

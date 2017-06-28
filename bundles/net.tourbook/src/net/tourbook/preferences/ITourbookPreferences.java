@@ -452,8 +452,10 @@ public interface ITourbookPreferences {
 	/*
 	 * Map 2.5D
 	 */
-	public static final String MAP25_OFFLINE_MAP_CUSTOM_LOCATION				= "MAP25_OFFLINE_MAP_CUSTOM_LOCATION";						//$NON-NLS-1$
-	public static final String MAP25_OFFLINE_MAP_IS_DEFAULT_LOCATION			= "MAP25_OFFLINE_MAP_IS_DEFAULT_LOCATION";					//$NON-NLS-1$
+	public static final String	MAP25_OFFLINE_MAP_CUSTOM_LOCATION				= "MAP25_OFFLINE_MAP_CUSTOM_LOCATION";						//$NON-NLS-1$
+	public static final String	MAP25_OFFLINE_MAP_IS_DEFAULT_LOCATION			= "MAP25_OFFLINE_MAP_IS_DEFAULT_LOCATION";					//$NON-NLS-1$
+	public static final String	MAP25_PROVIDER_SORT_ORDER 						= "MAP25_PROVIDER_SORT_ORDER";								//$NON-NLS-1$
+	public static final String	MAP25_PROVIDER_TOGGLE_LIST						= "MAP25_PROVIDER_TOGGLE_LIST";								//$NON-NLS-1$
 
 	/*
 	 * Pref page: Map3 color
@@ -494,6 +496,8 @@ public interface ITourbookPreferences {
 	 */
 	public static final String	DIALOG_SET_TIME_ZONE_ACTION						= "DIALOG_SET_TIME_ZONE_ACTION";							//$NON-NLS-1$
 	public static final String	DIALOG_SET_TIME_ZONE_SELECTED_ZONE_ID			= "DIALOG_SET_TIME_ZONE_SELECTED_ZONE_ID";					//$NON-NLS-1$
+
+
 
 // SET_FORMATTING_ON
 
