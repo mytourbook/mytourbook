@@ -70,7 +70,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 
 // SET_FORMATTING_OFF
 
-	private static final String				ID									= "net.tourbook.preferences.PrefPageMap25Provider";		//$NON-NLS-1$
+	public static final String				ID									= "net.tourbook.preferences.PrefPage_Map25_Provider";		//$NON-NLS-1$
 
 	private static final String				STATE_LAST_SELECTED_MAP_PROVIDER	= "STATE_LAST_SELECTED_MAP_PROVIDER";					//$NON-NLS-1$
 	
@@ -85,34 +85,36 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 	private final IDialogSettings			_state								= TourbookPlugin.getState(ID);
 
 	private ArrayList<Map25Provider>		_allMapProvider;
-
+	//
 	private ModifyListener					_defaultModifyListener;
-
 	private SelectionListener				_defaultSelectionListener;
+	//
 	private Map25Provider					_newProvider;
-
 	private Map25Provider					_selectedMapProvider;
+	//
 	private boolean							_isModified;
-
 	private boolean							_isMapProviderModified;
 	private boolean							_isInUpdateUI;
+	//
 	/*
 	 * UI Controls
 	 */
 	private TableViewer						_mapProviderViewer;
-
+	//
+	private Button							_chkIsEnabled;
+	//
 	private Button							_btnAddProvider;
-
 	private Button							_btnCancel;
 	private Button							_btnDeleteProvider;
 	private Button							_btnUpdateProvider;
+	//
 	private Text							_txtAPIKey;
-
 	private Text							_txtDescription;
 	private Text							_txtProviderName;
 	private Text							_txtTilePath;
 	private Text							_txtTileUrl;
 	private Text							_txtUrl;
+	//
 	private Combo							_comboTileEncoding;
 
 	private class MapProvider_ContentProvider implements IStructuredContentProvider {
@@ -343,6 +345,23 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 
 			{
 				/*
+				 * Checkbox: Is enabled
+				 */
+				// spacer
+				new Label(container, SWT.NONE);
+
+				_chkIsEnabled = new Button(container, SWT.CHECK);
+				_chkIsEnabled.setText(Messages.Pref_Map25_Provider_Checkbox_IsEnabled);
+				_chkIsEnabled.setToolTipText(Messages.Pref_Map25_Provider_Checkbox_IsEnabled_Tooltip);
+				_chkIsEnabled.addSelectionListener(_defaultSelectionListener);
+				GridDataFactory
+						.fillDefaults()//
+						.grab(true, false)
+//						.span(2, 1)
+						.applyTo(_chkIsEnabled);
+			}
+			{
+				/*
 				 * Field: Provider name
 				 */
 				final Label label = new Label(container, SWT.NONE);
@@ -505,6 +524,24 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 
 		{
 			/*
+			 * Column: Can be used
+			 */
+			tvc = new TableViewerColumn(_mapProviderViewer, SWT.LEAD);
+			tc = tvc.getColumn();
+			tc.setText(Messages.Pref_Map25_Provider_Column_Enabled);
+			tvc.setLabelProvider(new CellLabelProvider() {
+				@Override
+				public void update(final ViewerCell cell) {
+
+					final boolean isEnabled = ((Map25Provider) cell.getElement()).isEnabled;
+
+					cell.setText(isEnabled ? Messages.App_Label_BooleanYes : Messages.App_Label_BooleanNo);
+				}
+			});
+			tableLayout.setColumnData(tc, new ColumnWeightData(4, minWidth));
+		}
+		{
+			/*
 			 * Column: Provider name
 			 */
 			tvc = new TableViewerColumn(_mapProviderViewer, SWT.LEAD);
@@ -520,7 +557,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 		}
 		{
 			/*
-			 * Column: Type
+			 * Column: Tile encoding
 			 */
 			tvc = new TableViewerColumn(_mapProviderViewer, SWT.LEAD);
 			tc = tvc.getColumn();
@@ -531,7 +568,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 					cell.setText(((Map25Provider) cell.getElement()).tileEncoding.name());
 				}
 			});
-			tableLayout.setColumnData(tc, new ColumnWeightData(5, minWidth));
+			tableLayout.setColumnData(tc, new ColumnWeightData(4, minWidth));
 		}
 		{
 			/*
@@ -599,8 +636,10 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 	private void enableControls() {
 
 		final boolean isSelected = _selectedMapProvider != null;
+		final boolean isDefault = _selectedMapProvider.isDefault;
 		final boolean isNew = _newProvider != null;
 		final boolean canEdit = isSelected || isNew;
+		final boolean isNotDefault = isDefault == false;
 
 		final boolean isValid = isDataValid();
 
@@ -609,8 +648,9 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 		_btnAddProvider.setEnabled(!_isMapProviderModified && isValid);
 		_btnUpdateProvider.setEnabled(_isMapProviderModified && isValid);
 		_btnCancel.setEnabled(_isMapProviderModified);
-		_btnDeleteProvider.setEnabled(isSelected);
+		_btnDeleteProvider.setEnabled(isSelected && isNotDefault);
 
+		_chkIsEnabled.setEnabled(canEdit && isNotDefault);
 		_txtAPIKey.setEnabled(canEdit);
 		_txtDescription.setEnabled(canEdit);
 		_txtProviderName.setEnabled(canEdit);
@@ -711,6 +751,28 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 
 				return false;
 			}
+
+			/*
+			 * Check that at least 1 map provider is enabled
+			 */
+			final boolean isCurrentEnabled = _chkIsEnabled.getSelection();
+			int numEnabledOtherMapProviders = 0;
+
+			for (final Map25Provider map25Provider : _allMapProvider) {
+
+				if (map25Provider.isEnabled && map25Provider != _selectedMapProvider) {
+					numEnabledOtherMapProviders++;
+				}
+			}
+
+			if (isCurrentEnabled || numEnabledOtherMapProviders > 0) {
+				// at least one is enabled
+			} else {
+
+				setErrorMessage(Messages.Pref_Map25_Provider_Error_EnableMapProvider);
+
+				return false;
+			}
 		}
 
 		setErrorMessage(null);
@@ -782,6 +844,9 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 						_selectedMapProvider.name)) == false) {
 			return;
 		}
+
+		_isModified = true;
+		_isMapProviderModified = false;
 
 		// get map provider which will be selected when the current will be removed
 		final int selectionIndex = _mapProviderViewer.getTable().getSelectionIndex();
@@ -989,8 +1054,9 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 		mapProvider.name = _txtProviderName.getText();
 		mapProvider.tilePath = _txtTilePath.getText();
 		mapProvider.url = _txtUrl.getText();
-		
-		mapProvider.tileEncoding=getSelectedEncoding();
+		mapProvider.isEnabled = _chkIsEnabled.getSelection();
+
+		mapProvider.tileEncoding = getSelectedEncoding();
 	}
 
 	private void updateUI_Data() {
@@ -1006,6 +1072,8 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 		{
 			if (mapProvider == null) {
 
+				_chkIsEnabled.setSelection(false);
+
 				_txtAPIKey.setText(UI.EMPTY_STRING);
 				_txtDescription.setText(UI.EMPTY_STRING);
 				_txtProviderName.setText(UI.EMPTY_STRING);
@@ -1013,6 +1081,8 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 				_txtTilePath.setText(UI.EMPTY_STRING);
 
 			} else {
+
+				_chkIsEnabled.setSelection(mapProvider.isEnabled);
 
 				_txtAPIKey.setText(mapProvider.apiKey);
 				_txtDescription.setText(mapProvider.description);

@@ -220,10 +220,10 @@ public class Map25View extends ViewPart {
 	@Override
 	public void createPartControl(final Composite parent) {
 
-		createUI(parent);
-
 		createActions();
 		fillActionBars();
+
+		createUI(parent);
 
 		addPartListener();
 		addTourEventListener();
@@ -245,7 +245,7 @@ public class Map25View extends ViewPart {
 		awtCanvas.setFocusable(true);
 		awtCanvas.requestFocus();
 
-		_mapApp = Map25App.createMap(_state, awtCanvas);
+		_mapApp = Map25App.createMap(this, _state, awtCanvas);
 	}
 
 	@Override
@@ -656,6 +656,11 @@ public class Map25View extends ViewPart {
 				}
 			}
 		});
+	}
+
+	void updateUI_SelectedMapProvider(final Map25Provider selectedMapProvider) {
+
+		_actionSelectMapProvider.updateUI_SelectedMapProvider(selectedMapProvider);
 	}
 
 }

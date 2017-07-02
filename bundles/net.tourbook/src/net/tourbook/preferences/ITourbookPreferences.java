@@ -454,8 +454,6 @@ public interface ITourbookPreferences {
 	 */
 	public static final String	MAP25_OFFLINE_MAP_CUSTOM_LOCATION				= "MAP25_OFFLINE_MAP_CUSTOM_LOCATION";						//$NON-NLS-1$
 	public static final String	MAP25_OFFLINE_MAP_IS_DEFAULT_LOCATION			= "MAP25_OFFLINE_MAP_IS_DEFAULT_LOCATION";					//$NON-NLS-1$
-	public static final String	MAP25_PROVIDER_SORT_ORDER 						= "MAP25_PROVIDER_SORT_ORDER";								//$NON-NLS-1$
-	public static final String	MAP25_PROVIDER_TOGGLE_LIST						= "MAP25_PROVIDER_TOGGLE_LIST";								//$NON-NLS-1$
 
 	/*
 	 * Pref page: Map3 color

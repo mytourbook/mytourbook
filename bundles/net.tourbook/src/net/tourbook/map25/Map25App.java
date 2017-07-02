@@ -37,6 +37,8 @@ import org.oscim.layers.tile.vector.labeling.LabelLayer;
 import org.oscim.map.Layers;
 import org.oscim.map.Map;
 import org.oscim.map.ViewController;
+import org.oscim.theme.ThemeFile;
+import org.oscim.theme.VtmThemes;
 import org.oscim.tiling.source.UrlTileSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,25 +54,28 @@ import okhttp3.Cache;
 
 public class Map25App extends GdxMap {
 
-	private static final String		STATE_MAP_POS_X				= "STATE_MAP_POS_X";						//$NON-NLS-1$
+	private static final String		STATE_MAP_POS_X						= "STATE_MAP_POS_X";						//$NON-NLS-1$
+	private static final String		STATE_MAP_POS_Y						= "STATE_MAP_POS_Y";						//$NON-NLS-1$
+	private static final String		STATE_MAP_POS_ZOOM_LEVEL			= "STATE_MAP_POS_ZOOM_LEVEL";				//$NON-NLS-1$
+	private static final String		STATE_MAP_POS_BEARING				= "STATE_MAP_POS_BEARING";					//$NON-NLS-1$
+	private static final String		STATE_MAP_POS_SCALE					= "STATE_MAP_POS_SCALE";					//$NON-NLS-1$
+	private static final String		STATE_MAP_POS_TILT					= "STATE_MAP_POS_TILT";						//$NON-NLS-1$
+	private static final String		STATE_SELECTED_MAP25_PROVIDER_ID	= "STATE_SELECTED_MAP25_PROVIDER_ID";		//$NON-NLS-1$
 
-	private static final String		STATE_MAP_POS_Y				= "STATE_MAP_POS_Y";						//$NON-NLS-1$
-	private static final String		STATE_MAP_POS_ZOOM_LEVEL	= "STATE_MAP_POS_ZOOM_LEVEL";				//$NON-NLS-1$
-	private static final String		STATE_MAP_POS_BEARING		= "STATE_MAP_POS_BEARING";					//$NON-NLS-1$
-	private static final String		STATE_MAP_POS_SCALE			= "STATE_MAP_POS_SCALE";					//$NON-NLS-1$
-	private static final String		STATE_MAP_POS_TILT			= "STATE_MAP_POS_TILT";						//$NON-NLS-1$
-	public static final Logger		log							= LoggerFactory.getLogger(Map25App.class);
+	public static final Logger		log									= LoggerFactory.getLogger(Map25App.class);
 
 	private static IDialogSettings	_state;
 
+	private static Map25View		_map25View;
 	private static LwjglApplication	_lwjglApp;
 
-	private OsmTileLayerMT			_baseMap;
+	private Map25Provider			_selectedMapProvider;
 
+	private TileManager				_tileManager;
+	private OsmTileLayerMT			_baseMap;
 	private TileGridLayerMT			_gridLayer;
 	private PathLayerMT				_tourLayer;
 	private OkHttpFactoryMT			_httpFactory;
-	private TileManager				_tileManager;
 
 	private long					_lastRenderTime;
 
@@ -79,10 +84,11 @@ public class Map25App extends GdxMap {
 		_state = state;
 	}
 
-	public static Map25App createMap(final IDialogSettings state, final Canvas canvas) {
+	public static Map25App createMap(final Map25View map25View, final IDialogSettings state, final Canvas canvas) {
 
 		init();
 
+		_map25View = map25View;
 		_state = state;
 
 		final Map25App mapApp = new Map25App(state);
@@ -147,12 +153,15 @@ public class Map25App extends GdxMap {
 	@Override
 	public void createLayers() {
 
+		_selectedMapProvider = restoreState_MapProvider();
+
+		_map25View.updateUI_SelectedMapProvider(_selectedMapProvider);
+
 		_httpFactory = new OkHttpEngineMT.OkHttpFactoryMT();
 
-		final Map25Provider mapProvider = Map25Manager.getDefaultMapProvider();
-		final UrlTileSource tileSource = createTileSource(mapProvider, _httpFactory);
+		final UrlTileSource tileSource = createTileSource(_selectedMapProvider, _httpFactory);
 
-		setupMap(mapProvider, tileSource);
+		setupMap(_selectedMapProvider, tileSource);
 
 		restoreState();
 	}
@@ -182,6 +191,23 @@ public class Map25App extends GdxMap {
 		saveState();
 
 		super.dispose();
+	}
+
+	public Map25Provider getSelectedMapProvider() {
+		return _selectedMapProvider;
+	}
+
+	private ThemeFile getTheme(final Map25Provider mapProvider) {
+
+		switch (mapProvider.tileEncoding) {
+		case MVT:
+			return VtmThemes.MAPZEN;
+
+		// Open Science Map
+		case VTM:
+		default:
+			return VtmThemes.DEFAULT;
+		}
 	}
 
 	PathLayerMT getTourLayer() {
@@ -320,6 +346,16 @@ public class Map25App extends GdxMap {
 
 	}
 
+	private Map25Provider restoreState_MapProvider() {
+
+		final String mpId = Util.getStateString(
+				_state,
+				STATE_SELECTED_MAP25_PROVIDER_ID,
+				Map25Manager.getDefaultMapProvider().getId());
+
+		return Map25Manager.getMapProvider(mpId);
+	}
+
 	private void saveState() {
 
 		final MapPosition mapPosition = mMap.getMapPosition();
@@ -330,11 +366,18 @@ public class Map25App extends GdxMap {
 		_state.put(STATE_MAP_POS_SCALE, mapPosition.scale);
 		_state.put(STATE_MAP_POS_TILT, mapPosition.tilt);
 		_state.put(STATE_MAP_POS_ZOOM_LEVEL, mapPosition.zoomLevel);
+
+		STATE_SELECTED_MAP25_PROVIDER_ID
 	}
 
-	public void setMapProvider(final Map25Provider selectedMapProivder) {
+	public void setMapProvider(final Map25Provider mapProvider) {
 
-//		_baseMap.setTileSource(tileSource);
+		final UrlTileSource tileSource = createTileSource(mapProvider, _httpFactory);
+
+		_baseMap.setTileSource(tileSource);
+		mMap.setTheme(getTheme(mapProvider));
+
+		_selectedMapProvider = mapProvider;
 	}
 
 	private void setupMap(final Map25Provider mapProvider, final UrlTileSource tileSource) {
@@ -349,6 +392,24 @@ public class Map25App extends GdxMap {
 //		mapLayer.setNumLoaders(10);
 
 		mMap.setBaseMap(_baseMap);
+
+		setupMap_Layers();
+
+		mMap.setTheme(getTheme(mapProvider));
+
+		/*
+		 * Map Viewport
+		 */
+		final ViewController mapViewport = mMap.viewport();
+
+		// extend default tilt
+		mapViewport.setMaxTilt((float) MercatorProjection.LATITUDE_MAX);
+//		mapViewport.setMaxTilt(77.0f);
+
+		mapViewport.setMinScale(2);
+	}
+
+	private void setupMap_Layers() {
 
 		final Layers layers = mMap.layers();
 
@@ -393,19 +454,6 @@ public class Map25App extends GdxMap {
 //		renderer.setPosition(GLViewport.Position.BOTTOM_RIGHT);
 //		renderer.setOffset(5, 0);
 //		layers.add(mapScaleBarLayer);
-
-		mMap.setTheme(mapProvider.theme);
-
-		/*
-		 * Map Viewport
-		 */
-		final ViewController mapViewport = mMap.viewport();
-
-		// extend default tilt
-		mapViewport.setMaxTilt((float) MercatorProjection.LATITUDE_MAX);
-//		mapViewport.setMaxTilt(77.0f);
-
-		mapViewport.setMinScale(2);
 	}
 
 	void stop() {

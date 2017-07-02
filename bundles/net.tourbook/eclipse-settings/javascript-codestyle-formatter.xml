@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?><profiles version="11">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<profiles version="11">
 <profile kind="CodeFormatterProfile" name="Wolfgangs JS Formatter" version="11">
 <setting id="org.eclipse.wst.jsdt.core.formatter.alignment_for_binary_expression" value="16"/>
 <setting id="org.eclipse.wst.jsdt.core.formatter.insert_space_before_opening_brace_in_block" value="insert"/>
@@ -9,7 +10,7 @@
 <setting id="org.eclipse.wst.jsdt.core.formatter.insert_space_after_comma_in_parameterized_type_reference" value="insert"/>
 <setting id="org.eclipse.wst.jsdt.core.formatter.insert_space_after_opening_paren_in_annotation" value="do not insert"/>
 <setting id="org.eclipse.wst.jsdt.core.formatter.never_indent_block_comments_on_first_column" value="false"/>
-<setting id="org.eclipse.wst.jsdt.core.formatter.comment.format_header" value="true"/>
+<setting id="org.eclipse.wst.jsdt.core.formatter.comment.format_header" value="false"/>
 <setting id="org.eclipse.wst.jsdt.core.formatter.insert_space_before_comma_in_method_declaration_throws" value="do not insert"/>
 <setting id="org.eclipse.wst.jsdt.core.formatter.compact_else_if" value="true"/>
 <setting id="org.eclipse.wst.jsdt.core.formatter.comment.clear_blank_lines_in_javadoc_comment" value="true"/>
@@ -135,6 +136,7 @@
 <setting id="org.eclipse.wst.jsdt.core.formatter.insert_space_after_assignment_operator" value="insert"/>
 <setting id="org.eclipse.wst.jsdt.core.formatter.insert_space_after_opening_paren_in_if" value="do not insert"/>
 <setting id="org.eclipse.wst.jsdt.core.formatter.insert_space_after_opening_paren_in_catch" value="do not insert"/>
+<setting id="org.eclipse.wst.jsdt.core.formatter.insert_space_after_function_keyword" value="do not insert"/>
 <setting id="org.eclipse.wst.jsdt.core.formatter.insert_space_after_comma_in_type_arguments" value="insert"/>
 <setting id="org.eclipse.wst.jsdt.core.formatter.insert_space_before_opening_paren_in_for" value="insert"/>
 <setting id="org.eclipse.wst.jsdt.core.formatter.alignment_for_arguments_in_allocation_expression" value="52"/>

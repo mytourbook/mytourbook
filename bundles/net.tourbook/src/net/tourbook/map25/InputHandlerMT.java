@@ -16,16 +16,17 @@
 package net.tourbook.map25;
 
 import org.oscim.core.GeoPoint;
-import org.oscim.gdx.GdxMap;
 import org.oscim.gdx.InputHandler;
 import org.oscim.map.Map;
 import org.oscim.map.ViewController;
 import org.oscim.utils.Easing;
 
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Buttons;
 
 public class InputHandlerMT extends InputHandler {
 
+	private Map25App		_mapApp;
 	private Map				_map;
 	private ViewController	_viewport;
 
@@ -35,12 +36,42 @@ public class InputHandlerMT extends InputHandler {
 	 */
 	private boolean			_isReCenter;
 
-	public InputHandlerMT(final GdxMap map) {
+	public InputHandlerMT(final Map25App mapApp) {
 
-		super(map);
+		super(mapApp);
 
-		_map = map.getMap();
+		_mapApp = mapApp;
+		_map = mapApp.getMap();
 		_viewport = _map.viewport();
+	}
+
+	@Override
+	public boolean keyDown(final int keycode) {
+
+		if (keycode == Input.Keys.ESCAPE) {
+
+			// disable app exit
+			return true;
+		}
+
+		/*
+		 * Disable keys which work ONLY with openscimap
+		 */
+		final Map25Provider selectedMapProvider = _mapApp.getSelectedMapProvider();
+		if (selectedMapProvider.tileEncoding != TileEncoding.VTM) {
+
+			// disable themes
+			switch (keycode) {
+			case Input.Keys.NUM_1:
+			case Input.Keys.NUM_2:
+			case Input.Keys.NUM_3:
+			case Input.Keys.NUM_4:
+			case Input.Keys.NUM_5:
+				return true;
+			}
+		}
+
+		return super.keyDown(keycode);
 	}
 
 	@Override

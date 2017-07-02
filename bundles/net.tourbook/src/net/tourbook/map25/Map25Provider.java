@@ -17,14 +17,15 @@ package net.tourbook.map25;
 
 import java.util.UUID;
 
-import org.oscim.theme.VtmThemes;
-
 import de.byteholder.geoclipse.map.UI;
 
 public class Map25Provider implements Cloneable {
 
 	private String		_id;
 	private UUID		_uuid;
+
+	public boolean		isEnabled;
+	public boolean		isDefault;
 
 	public String		name		= UI.EMPTY_STRING;
 	public String		description	= UI.EMPTY_STRING;
@@ -35,9 +36,6 @@ public class Map25Provider implements Cloneable {
 	public String		apiKey		= UI.EMPTY_STRING;
 
 	public TileEncoding	tileEncoding;
-	public VtmThemes	theme;
-
-	private boolean		_canBeToggled;
 
 	public Map25Provider() {
 
@@ -60,10 +58,6 @@ public class Map25Provider implements Cloneable {
 
 		_uuid = uuid;
 		_id = _uuid.toString();
-	}
-
-	public boolean canBeToggled() {
-		return _canBeToggled;
 	}
 
 	@Override
@@ -108,7 +102,7 @@ public class Map25Provider implements Cloneable {
 	}
 
 	/**
-	 * @return Returns the map provider {@link UUID}.
+	 * @return Returns the map provider {@link UUID} as string.
 	 */
 	public String getId() {
 		return _id;
@@ -122,10 +116,6 @@ public class Map25Provider implements Cloneable {
 	public int hashCode() {
 
 		return _uuid.hashCode();
-	}
-
-	public void setCanBeToggled(final boolean canBeToggled) {
-		_canBeToggled = canBeToggled;
 	}
 
 	@Override

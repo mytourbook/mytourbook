@@ -16,22 +16,21 @@
 package net.tourbook.map25.action;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.util.StringToArrayConverter;
 import net.tourbook.map2.Messages;
 import net.tourbook.map25.Map25App;
 import net.tourbook.map25.Map25Manager;
 import net.tourbook.map25.Map25Provider;
 import net.tourbook.map25.Map25View;
-import net.tourbook.preferences.ITourbookPreferences;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
-import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 
@@ -39,36 +38,31 @@ import de.byteholder.geoclipse.mapprovider.IMapProviderListener;
 
 public class ActionSelectMap25Provider extends Action implements IMenuCreator, IMapProviderListener {
 
-	private static IPreferenceStore						_prefStore			= TourbookPlugin.getPrefStore();
-
 	private final Map25View								_map25View;
+
+	private final ActionManageMap25Providers			_actionModifyMapProvider;
 
 	private Menu										_menu;
 
-	private Map25Provider								_selectedMapProvider;
-	private ArrayList<Map25Provider>					_sortedMapProviders;
-
-	private ArrayList<MapProviderAction>				_sortedMapProviderActions;
-	private final HashMap<String, MapProviderAction>	_mapProviderActions	= new HashMap<>();
+	private final HashMap<String, Map25ProviderAction>	_mapProviderActions	= new HashMap<>();
+	private ArrayList<Map25ProviderAction>				_sortedMapProvidersActions;
 
 	private int											_mpToggleCounter;
 
 	/**
 	 * Action for a map provider
 	 */
-	private class MapProviderAction extends Action {
+	private class Map25ProviderAction extends Action {
 
 		private final Map25Provider	__mapProvider;
 
-		private final String		__actionLabel;
 		private boolean				__canBeToggled;
 
-		public MapProviderAction(final Map25Provider mp, final String label) {
+		public Map25ProviderAction(final Map25Provider mp, final String label) {
 
 			super(label, AS_RADIO_BUTTON);
 
 			__mapProvider = mp;
-			__actionLabel = label;
 		}
 
 		boolean isCanBeToggled() {
@@ -82,50 +76,29 @@ public class ActionSelectMap25Provider extends Action implements IMenuCreator, I
 			selectMapProvider_10(__mapProvider);
 		}
 
-		void setCanBeToggled(final boolean canBeToggled) {
-			__canBeToggled = canBeToggled;
-		}
 	}
 
 	public ActionSelectMap25Provider(final Map25View map25View) {
 
 		super(null, AS_DROP_DOWN_MENU);
+
 		setMenuCreator(this);
 
 		_map25View = map25View;
 
-		setToolTipText(Messages.map_action_change_tile_factory_tooltip);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.image_action_change_tile_factory));
 
 		Map25Manager.addMapProviderListener(this);
 
+		_actionModifyMapProvider = new ActionManageMap25Providers();
+
 		createMapProviderActions();
-		updateMapProviders();
 	}
 
 	private void addActionToMenu(final Action action) {
 
 		final ActionContributionItem item = new ActionContributionItem(action);
 		item.fill(_menu, -1);
-	}
-
-	/**
-	 * check action for the selected map provider
-	 * 
-	 * @param selectedMapProvider
-	 */
-	private void checkSelectedMP(final Map25Provider selectedMapProvider) {
-
-		final String selectedId = selectedMapProvider.getId();
-
-		for (final MapProviderAction mapProviderAction : _sortedMapProviderActions) {
-
-			if (mapProviderAction.__mapProvider.getId().equals(selectedId)) {
-				mapProviderAction.setChecked(true);
-			} else {
-				mapProviderAction.setChecked(false);
-			}
-		}
 	}
 
 	/**
@@ -137,8 +110,26 @@ public class ActionSelectMap25Provider extends Action implements IMenuCreator, I
 
 		final ArrayList<Map25Provider> allMapProviders = Map25Manager.getAllMapProviders();
 
-		for (final Map25Provider mp : allMapProviders) {
-			_mapProviderActions.put(mp.getId(), new MapProviderAction(mp, mp.name));
+		Collections.sort(allMapProviders, new Comparator<Map25Provider>() {
+
+			@Override
+			public int compare(final Map25Provider mp1, final Map25Provider mp2) {
+				return mp1.name.compareTo(mp2.name);
+			}
+		});
+
+		_sortedMapProvidersActions = new ArrayList<>();
+
+		// create an action for each map provider
+		for (final Map25Provider mapProvider : allMapProviders) {
+
+			if (mapProvider.isEnabled) {
+
+				final Map25ProviderAction mpAction = new Map25ProviderAction(mapProvider, mapProvider.name);
+
+				_mapProviderActions.put(mapProvider.getId(), mpAction);
+				_sortedMapProvidersActions.add(mpAction);
+			}
 		}
 	}
 
@@ -163,20 +154,25 @@ public class ActionSelectMap25Provider extends Action implements IMenuCreator, I
 
 		_menu = new Menu(parent);
 
-//		addActionToMenu(_actionSetDefaultMapProvider);
-//		addActionToMenu(_actionModifyMapProvider);
-//
-//		(new Separator()).fill(_menu, -1);
+		final Map25Provider selectedMapProvider = getSelectedMapProvider();
 
 		// add all map providers
-		for (final Map25Provider mp : _sortedMapProviders) {
+		for (final Map25ProviderAction mapProviderAction : _sortedMapProvidersActions) {
 
-			final MapProviderAction mpAction = _mapProviderActions.get(mp.getId());
-
-			updateActionToggleState(mp, mpAction);
+			final Map25Provider mapProvider = mapProviderAction.__mapProvider;
+			final Map25ProviderAction mpAction = _mapProviderActions.get(mapProvider.getId());
 
 			addActionToMenu(mpAction);
+
+			if (mapProvider == selectedMapProvider) {
+				mpAction.setChecked(true);
+			} else {
+				mpAction.setChecked(false);
+			}
 		}
+
+		(new Separator()).fill(_menu, -1);
+		addActionToMenu(_actionModifyMapProvider);
 
 		return _menu;
 	}
@@ -186,32 +182,17 @@ public class ActionSelectMap25Provider extends Action implements IMenuCreator, I
 		return null;
 	}
 
-	/**
-	 * @return Returns the map provider {@link Map25Provider} which is currently selected or OSM
-	 *         when there is no selected map provider
-	 */
-	public Map25Provider getSelectedMapProvider() {
+	private Map25Provider getSelectedMapProvider() {
 
-		if (_selectedMapProvider == null) {
-			return Map25Manager.getDefaultMapProvider();
-		}
-
-		return _selectedMapProvider;
+		return _map25View.getMapApp().getSelectedMapProvider();
 	}
 
 	@Override
 	public void mapProviderListChanged() {
 
-//		if (_selectedMapProvider != null) {
-//
-//			// map profile tile offline images are deleted, reset state
-//			_selectedMapProvider.resetTileImageAvailability();
-//		}
-
 		createMapProviderActions();
-		updateMapProviders();
 
-		selectMapProvider(_selectedMapProvider == null ? null : _selectedMapProvider.getId());
+		selectMapProvider(getSelectedMapProvider());
 	}
 
 	@Override
@@ -221,10 +202,10 @@ public class ActionSelectMap25Provider extends Action implements IMenuCreator, I
 		 * toggle map providers
 		 */
 
-		final ArrayList<MapProviderAction> sortedToggleMapProviderActions = new ArrayList<MapProviderAction>();
+		final ArrayList<Map25ProviderAction> sortedToggleMapProviderActions = new ArrayList<Map25ProviderAction>();
 
 		// get all map provider actions which can be toggled
-		for (final MapProviderAction mapProviderAction : _sortedMapProviderActions) {
+		for (final Map25ProviderAction mapProviderAction : _sortedMapProvidersActions) {
 			if (mapProviderAction.isCanBeToggled()) {
 				sortedToggleMapProviderActions.add(mapProviderAction);
 			}
@@ -251,8 +232,9 @@ public class ActionSelectMap25Provider extends Action implements IMenuCreator, I
 			 */
 			int toggleCounter = -1;
 			int actionCounter = 0;
+			final Map25Provider _selectedMapProvider = getSelectedMapProvider();
 
-			for (final MapProviderAction mpAction : sortedToggleMapProviderActions) {
+			for (final Map25ProviderAction mpAction : sortedToggleMapProviderActions) {
 				if (_selectedMapProvider == mpAction.__mapProvider) {
 					toggleCounter = actionCounter;
 					break;
@@ -284,10 +266,9 @@ public class ActionSelectMap25Provider extends Action implements IMenuCreator, I
 			// toggle all available map factories
 
 			// get next factory
-			newMp = _sortedMapProviders.get(++_mpToggleCounter % _sortedMapProviders.size());
+			final int nextIndex = ++_mpToggleCounter % _sortedMapProvidersActions.size();
+			newMp = _sortedMapProvidersActions.get(nextIndex).__mapProvider;
 		}
-
-		checkSelectedMP(newMp);
 
 		// select map provider in the map
 		selectMapProvider_10(newMp);
@@ -296,187 +277,48 @@ public class ActionSelectMap25Provider extends Action implements IMenuCreator, I
 	/**
 	 * Select a map provider by it's map provider ID
 	 * 
-	 * @param id
+	 * @param selectedMapProvider
 	 *            map provider id or <code>null</code> to select the default factory (OSM)
 	 */
-	public void selectMapProvider(final String id) {
+	public void selectMapProvider(final Map25Provider selectedMapProvider) {
 
-		if (id != null) {
-
-			for (final MapProviderAction mapProviderAction : _mapProviderActions.values()) {
-
-				final Map25Provider mp = mapProviderAction.__mapProvider;
-
-				if (mp.getId().equals(id)) {
-
-					// map provider is available
-					mapProviderAction.setChecked(true);
-					selectMapProvider_10(mp);
-
-					return;
-				}
-			}
-		}
-
-		/*
-		 * When map provider is not set, get default map provider
-		 */
-		final String defaultId = Map25Manager.getDefaultMapProvider().getId();
-		for (final MapProviderAction mapProviderAction : _mapProviderActions.values()) {
+		for (final Map25ProviderAction mapProviderAction : _mapProviderActions.values()) {
 
 			final Map25Provider mp = mapProviderAction.__mapProvider;
 
-			if (mp.getId().equals(defaultId)) {
+			if (mp == selectedMapProvider) {
 
+				// map provider is available
 				mapProviderAction.setChecked(true);
 				selectMapProvider_10(mp);
 
 				return;
 			}
 		}
-
-		/*
-		 * if map provider is not set, get first one
-		 */
-		final MapProviderAction mpAction = _mapProviderActions.values().iterator().next();
-		if (mpAction != null) {
-
-			mpAction.setChecked(true);
-			selectMapProvider_10(mpAction.__mapProvider);
-		}
 	}
 
-	private void selectMapProvider_10(final Map25Provider mapProivder) {
+	private void selectMapProvider_10(final Map25Provider newMapProvider) {
 
 		// check if a new map provider is selected
-		if (_selectedMapProvider != null && _selectedMapProvider == mapProivder) {
+		if (getSelectedMapProvider() == newMapProvider) {
 			return;
 		}
 
-		_selectedMapProvider = mapProivder;
-
 		final Map25App mapApp = _map25View.getMapApp();
 
-		mapApp.setMapProvider(mapProivder);
+		mapApp.setMapProvider(newMapProvider);
 
-		// update tooltip, show selected map provider
-		setToolTipText(mapProivder.name);
+		updateUI_SelectedMapProvider(newMapProvider);
 	}
 
 	/**
-	 * Update the toggle state from the map provider into the action
+	 * Update tooltip, show selected map provider.
 	 * 
-	 * @param mapProvider
-	 * @param mapProviderAction
+	 * @param selectedMapProvider
 	 */
-	private void updateActionToggleState(final Map25Provider mapProvider, final MapProviderAction mapProviderAction) {
+	public void updateUI_SelectedMapProvider(final Map25Provider selectedMapProvider) {
 
-		final boolean canBeToggled = mapProvider.canBeToggled();
-
-		// update action label
-		if (canBeToggled) {
-			mapProviderAction.setText(mapProviderAction.__actionLabel + Messages.Map_Action_ToggleMarker);
-		} else {
-			mapProviderAction.setText(mapProviderAction.__actionLabel);
-		}
-
-		mapProviderAction.setCanBeToggled(canBeToggled);
+		setToolTipText(selectedMapProvider.name);
 	}
 
-	/**
-	 * @return update the map providers with information from the pref store, the customized order
-	 *         and the toggle status
-	 */
-	public void updateMapProviders() {
-
-		final List<Map25Provider> allMapProviders = Map25Manager.getAllMapProviders();
-
-		// get sorted map providers from the pref store
-		final String[] storedProviderIds = StringToArrayConverter.convertStringToArray(//
-				_prefStore.getString(ITourbookPreferences.MAP25_PROVIDER_SORT_ORDER));
-
-		final ArrayList<Map25Provider> mapProviders = new ArrayList<>();
-		final ArrayList<String> validMapProviderIds = new ArrayList<>();
-
-		// set all map provider which are in the pref store
-		for (final String storeProviderId : storedProviderIds) {
-
-			/*
-			 * ensure that a map provider is unique and not duplicated, this happend during
-			 * debugging
-			 */
-			boolean ignoreMP = false;
-			for (final Map25Provider mp : mapProviders) {
-				if (mp.getId().equals(storeProviderId)) {
-					ignoreMP = true;
-					break;
-				}
-			}
-			if (ignoreMP) {
-				continue;
-			}
-
-			// find the stored map provider in the available map providers
-			for (final Map25Provider mapProviderp : allMapProviders) {
-				if (mapProviderp.getId().equals(storeProviderId)) {
-					mapProviders.add(mapProviderp);
-					validMapProviderIds.add(mapProviderp.getId());
-					break;
-				}
-			}
-		}
-
-		// make sure that all available map providers are in the list
-		for (final Map25Provider mapProvider : allMapProviders) {
-			if (!mapProviders.contains(mapProvider)) {
-				mapProviders.add(mapProvider);
-			}
-		}
-
-		/*
-		 * save valid mp id's
-		 */
-		_prefStore.setValue(
-				ITourbookPreferences.MAP25_PROVIDER_SORT_ORDER, //
-				StringToArrayConverter.convertArrayToString(//
-						validMapProviderIds.toArray(new String[validMapProviderIds.size()])));
-
-		/*
-		 * set status if the map provider can be toggled with the map provider button
-		 */
-		final String[] toggleIds = StringToArrayConverter.convertStringToArray(//
-				_prefStore.getString(ITourbookPreferences.MAP25_PROVIDER_TOGGLE_LIST));
-
-		for (final Map25Provider mapProvider : allMapProviders) {
-
-			final String mapProviderId = mapProvider.getId();
-
-			for (final String toggleId : toggleIds) {
-
-				if (mapProviderId == (toggleId)) {
-					mapProvider.setCanBeToggled(true);
-					break;
-				}
-			}
-		}
-
-		_sortedMapProviders = mapProviders;
-
-		/*
-		 * sort map provider actions
-		 */
-		final ArrayList<MapProviderAction> sortedMapProviderActions = new ArrayList<MapProviderAction>();
-
-		// add all map providers
-		for (final Map25Provider mp : _sortedMapProviders) {
-
-			final MapProviderAction mapProviderAction = _mapProviderActions.get(mp.getId());
-
-			updateActionToggleState(mp, mapProviderAction);
-
-			sortedMapProviderActions.add(mapProviderAction);
-		}
-
-		_sortedMapProviderActions = sortedMapProviderActions;
-	}
 }

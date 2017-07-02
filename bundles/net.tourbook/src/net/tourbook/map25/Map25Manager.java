@@ -31,15 +31,16 @@ import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
-import org.oscim.theme.VtmThemes;
 import org.osgi.framework.Bundle;
 
 import de.byteholder.geoclipse.mapprovider.IMapProviderListener;
 
 public class Map25Manager {
 
+// SET_FORMATTING_OFF
 	private static final Bundle				_bundle						= TourbookPlugin.getDefault().getBundle();
 	private static final IPath				_stateLocation				= Platform.getStateLocation(_bundle);
+// SET_FORMATTING_ON
 
 	private static final String				MAP_PROVIDER_FILE_NAME		= "map25-provider.xml";						//$NON-NLS-1$
 	private static final int				MAP_PROVIDER_VERSION		= 1;
@@ -49,11 +50,12 @@ public class Map25Manager {
 
 	private static final String				ATTR_API_KEY				= "APIKey";									//$NON-NLS-1$
 	private static final String				ATTR_DESCRIPTION			= "Description";							//$NON-NLS-1$
+	private static final String				ATTR_IS_DEFAULT				= "IsDefault";								//$NON-NLS-1$
+	private static final String				ATTR_IS_ENABLED				= "IsEnabled";								//$NON-NLS-1$
 	private static final String				ATTR_MAP_PROVIDER_VERSION	= "Version";								//$NON-NLS-1$
 	private static final String				ATTR_NAME					= "Name";									//$NON-NLS-1$
 	private static final String				ATTR_TILE_PATH				= "TilePath";								//$NON-NLS-1$
 	private static final String				ATTR_TILE_ENCODING			= "TileEncoding";							//$NON-NLS-1$
-	private static final String				ATTR_VTM_THEME				= "VtmTheme";								//$NON-NLS-1$
 	private static final String				ATTR_URL					= "Url";									//$NON-NLS-1$
 	private static final String				ATTR_UUID					= "UUID";									//$NON-NLS-1$
 
@@ -61,9 +63,14 @@ public class Map25Manager {
 	private static Map25DebugView			_map25DebugView;
 
 	private static ArrayList<Map25Provider>	_allMapProvider;
+
+	/**
+	 * Contains the default default map provider
+	 */
 	private static Map25Provider			_defaultMapProvider			= createMapProvider_Default();
 
-	private static final ListenerList		_mapProviderListeners		= new ListenerList(ListenerList.IDENTITY);
+	private static final ListenerList		_mapProviderListeners		= new ListenerList(
+			ListenerList.IDENTITY);
 
 	public static void addMapProviderListener(final IMapProviderListener listener) {
 		_mapProviderListeners.add(listener);
@@ -76,13 +83,13 @@ public class Map25Manager {
 
 		final Map25Provider mapProvider = new Map25Provider();
 
+		mapProvider.isDefault = true;
+		mapProvider.isEnabled = true;
 		mapProvider.name = "Open Science Map";
 		mapProvider.url = "http://opensciencemap.org/tiles/vtm";
 		mapProvider.tilePath = "/{Z}/{X}/{Y}.vtm";
-		mapProvider.description = "This server is sometimes very slow !\n\nhttp://opensciencemap.org";
-
-		mapProvider.theme = VtmThemes.DEFAULT;
 		mapProvider.tileEncoding = TileEncoding.VTM;
+		mapProvider.description = "This server is sometimes very slow !\n\nhttp://opensciencemap.org";
 
 		_defaultMapProvider = mapProvider;
 
@@ -96,21 +103,20 @@ public class Map25Manager {
 
 		final Map25Provider mapProvider = new Map25Provider();
 
+		mapProvider.isEnabled = false;
 		mapProvider.name = "Mapzen Vector Tiles";
 		mapProvider.url = "https://tile.mapzen.com/mapzen/vector/v1/all";
 		mapProvider.tilePath = "/{Z}/{X}/{Y}.mvt";
+		mapProvider.tileEncoding = TileEncoding.MVT;
 		mapProvider.apiKey = "mapzen-xxxxxxx";
 		mapProvider.description =
 				"https://mapzen.com/projects/vector-tiles/"
-						+ "\n\n" +
-						"This server requires an API key which can be requested from"
-						+ "\n"
+						+ "\n\n"
+						+ "This server requires an API key which can be requested from"
+						+ "\n\n"
 						+ "https://mapzen.com/documentation/overview/api-keys/ "
-						+ "\n"
-						+ "50'000 tiles per month are free (June 2017)";
-
-		mapProvider.theme = VtmThemes.MAPZEN;
-		mapProvider.tileEncoding = TileEncoding.MVT;
+						+ "\n\n"
+						+ "50'000 tiles per month are free (July 2017)";
 
 		return mapProvider;
 	}
@@ -122,14 +128,15 @@ public class Map25Manager {
 
 		final Map25Provider mapProvider = new Map25Provider();
 
+		mapProvider.isEnabled = false;
 		mapProvider.name = "My Tile Server";
 		mapProvider.url = "http://192.168.99.99:8080/all";
 		mapProvider.tilePath = "/{Z}/{X}/{Y}.mvt";
-		mapProvider.description = "How to build an own tile server is described here\n\n"
-				+ "https://github.com/tilezen/vector-datasource/wiki/Mapzen-Vector-Tile-Service";
-
-		mapProvider.theme = VtmThemes.MAPZEN;
 		mapProvider.tileEncoding = TileEncoding.MVT;
+		mapProvider.description = "How to build an own tile server is described here\n\n"
+				+ "https://github.com/tilezen/vector-datasource/wiki/Mapzen-Vector-Tile-Service"
+				+ "\n\n"
+				+ "Vector tile data can be used from https://download.geofabrik.de/";
 
 		return mapProvider;
 	}
@@ -170,6 +177,18 @@ public class Map25Manager {
 		return null;
 	}
 
+	public static Map25Provider getMapProvider(final String mapProviderId) {
+
+		for (final Map25Provider map25Provider : getAllMapProviders()) {
+
+			if (mapProviderId.equals(map25Provider.getId())) {
+				return map25Provider;
+			}
+		}
+
+		return getDefaultMapProvider();
+	}
+
 	private static File getXmlFile() {
 
 		return _stateLocation.append(MAP_PROVIDER_FILE_NAME).toFile();
@@ -179,7 +198,16 @@ public class Map25Manager {
 		return _isDebugViewVisible;
 	}
 
-	private static ArrayList<Map25Provider> loadMapProvider() {
+	/**
+	 * This can be called also from the map app thread.
+	 * 
+	 * @return
+	 */
+	private static synchronized ArrayList<Map25Provider> loadMapProvider() {
+
+		if (_allMapProvider != null) {
+			return _allMapProvider;
+		}
 
 		final ArrayList<Map25Provider> allMapProvider = new ArrayList<>();
 
@@ -199,13 +227,15 @@ public class Map25Manager {
 
 						final Map25Provider mp = new Map25Provider(xmlUUID);
 
+						mp.isDefault = Util.getXmlBoolean(xml, ATTR_IS_DEFAULT, false);
+						mp.isEnabled = Util.getXmlBoolean(xml, ATTR_IS_ENABLED, false);
+
 						mp.apiKey = Util.getXmlString(xml, ATTR_API_KEY, UI.EMPTY_STRING);
 						mp.description = Util.getXmlString(xml, ATTR_DESCRIPTION, UI.EMPTY_STRING);
 						mp.name = Util.getXmlString(xml, ATTR_NAME, UI.EMPTY_STRING);
 						mp.tilePath = Util.getXmlString(xml, ATTR_TILE_PATH, UI.EMPTY_STRING);
 						mp.url = Util.getXmlString(xml, ATTR_URL, UI.EMPTY_STRING);
 
-						mp.theme = (VtmThemes) Util.getXmlEnum(xml, ATTR_VTM_THEME, VtmThemes.DEFAULT);
 						mp.tileEncoding = (TileEncoding) Util.getXmlEnum(xml, ATTR_TILE_ENCODING, TileEncoding.VTM);
 
 						allMapProvider.add(mp);
@@ -216,6 +246,8 @@ public class Map25Manager {
 				StatusUtil.log(e);
 			}
 
+			replaceDefault(allMapProvider);
+
 		} else {
 
 			/*
@@ -224,6 +256,22 @@ public class Map25Manager {
 			allMapProvider.add(_defaultMapProvider);
 			allMapProvider.add(createMapProvider_Mapzen());
 			allMapProvider.add(createMapProvider_MyTileServer());
+		}
+
+		/*
+		 * Ensure that at least one map provider is enabled
+		 */
+		boolean isOneEnabled = false;
+		for (final Map25Provider map25Provider : allMapProvider) {
+			if (map25Provider.isEnabled) {
+				isOneEnabled = true;
+				break;
+			}
+		}
+
+		if (!isOneEnabled) {
+			// enable default
+			_defaultMapProvider.isEnabled = true;
 		}
 
 		return allMapProvider;
@@ -236,7 +284,25 @@ public class Map25Manager {
 		}
 	}
 
+	/**
+	 * Replace default with new default provider (cloned/loaded) that the uuid is correctly setup
+	 * 
+	 * @param allMapProvider
+	 */
+	private static void replaceDefault(final ArrayList<Map25Provider> allMapProvider) {
+
+		for (final Map25Provider map25Provider1 : allMapProvider) {
+
+			if (map25Provider1.isDefault) {
+				_defaultMapProvider = map25Provider1;
+				break;
+			}
+		}
+	}
+
 	public static void saveMapProvider(final ArrayList<Map25Provider> allMapProvider) {
+
+		replaceDefault(allMapProvider);
 
 		// update model
 		_allMapProvider.clear();
@@ -266,6 +332,9 @@ public class Map25Manager {
 
 				final IMemento xml = xmlRoot.createChild(TAG_MAP_PROVIDER);
 
+				xml.putBoolean(ATTR_IS_ENABLED, mapProvider.isEnabled);
+				xml.putBoolean(ATTR_IS_DEFAULT, mapProvider.isDefault);
+
 				xml.putString(ATTR_API_KEY, mapProvider.apiKey);
 				xml.putString(ATTR_DESCRIPTION, mapProvider.description);
 				xml.putString(ATTR_NAME, mapProvider.name);
@@ -274,7 +343,6 @@ public class Map25Manager {
 				xml.putString(ATTR_UUID, mapProvider.getId().toString());
 
 				Util.setXmlEnum(xml, ATTR_TILE_ENCODING, mapProvider.tileEncoding);
-				Util.setXmlEnum(xml, ATTR_VTM_THEME, mapProvider.theme);
 			}
 
 		} catch (final Exception e) {
