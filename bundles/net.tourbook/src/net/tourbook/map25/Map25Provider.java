@@ -120,15 +120,15 @@ public class Map25Provider implements Cloneable {
 
 	@Override
 	public String toString() {
-		return "Map25Provider ["
+		return "Map25Provider [" //$NON-NLS-1$
 //				+ "id=" + id + ", "
-				+ "name=" + name + ", "
+				+ "name=" + name + ", " //$NON-NLS-1$ //$NON-NLS-2$
 				//				+ "description=" + description + ", "
 				//				+ "offlineFolder=" + offlineFolder + ", "
 				//				+ "url=" + url + ", "
 				//				+ "tilePath=" + tilePath + ", "
 				//				+ "apiKey=" + apiKey
-				+ "]";
+				+ "]"; //$NON-NLS-1$
 	}
 
 }

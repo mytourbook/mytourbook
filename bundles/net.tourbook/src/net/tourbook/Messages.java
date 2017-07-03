@@ -1266,9 +1266,7 @@ public class Messages extends NLS {
 	public static String		Pref_LiveUpdate_Checkbox_Tooltip;
 
 	public static String		Pref_Map25_Encoding_Mapzen;
-
 	public static String		Pref_Map25_Encoding_OpenScienceMap;
-
 	public static String		Pref_Map25_Offline_Error_Location;
 	public static String		Pref_Map25_Offline_Group_OfflineMap;
 	public static String		Pref_Map25_Offline_Label_Location;
@@ -1277,7 +1275,6 @@ public class Messages extends NLS {
 	public static String		Pref_Map25_Provider_Checkbox_IsEnabled_Tooltip;
 	public static String		Pref_Map25_Provider_Column_APIKey;
 	public static String		Pref_Map25_Provider_Column_Enabled;
-	public static String		Pref_Map25_Provider_Column_OfflineFolder;
 	public static String		Pref_Map25_Provider_Column_ProviderName;
 	public static String		Pref_Map25_Provider_Column_TileEncoding;
 	public static String		Pref_Map25_Provider_Column_TilePath;
@@ -1287,16 +1284,13 @@ public class Messages extends NLS {
 	public static String		Pref_Map25_Provider_Dialog_SaveModifiedProvider_Message;
 	public static String		Pref_Map25_Provider_Dialog_SaveModifiedProvider_Title;
 	public static String		Pref_Map25_Provider_Error_EnableMapProvider;
-	public static String		Pref_Map25_Provider_Error_OfflineFolderIsRequired;
 	public static String		Pref_Map25_Provider_Error_ProviderNameIsRequired;
 	public static String		Pref_Map25_Provider_Error_TilePathIsRequired;
 	public static String		Pref_Map25_Provider_Error_UrlIsRequired;
 	public static String		Pref_Map25_Provider_Label_APIKey;
 	public static String		Pref_Map25_Provider_Label_Description;
-	public static String		Pref_Map25_Provider_Label_OfflineFolder;
 	public static String		Pref_Map25_Provider_Label_ProviderName;
 	public static String		Pref_Map25_Provider_Label_TileEncoding;
-
 	public static String		Pref_Map25_Provider_Label_TilePath;
 	public static String		Pref_Map25_Provider_Label_TileUrl;
 	public static String		Pref_Map25_Provider_Label_Title;

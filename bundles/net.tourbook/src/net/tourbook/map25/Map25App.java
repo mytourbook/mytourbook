@@ -103,7 +103,7 @@ public class Map25App extends GdxMap {
 		LwjglApplicationConfiguration.disableAudio = true;
 		final LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
 
-		cfg.title = title != null ? title : "vtm-gdx";
+		cfg.title = title != null ? title : "vtm-gdx"; //$NON-NLS-1$
 		cfg.width = 1200;
 		cfg.height = 1000;
 		cfg.stencil = 8;
@@ -119,12 +119,12 @@ public class Map25App extends GdxMap {
 	public static void init() {
 
 		// load native library
-		new SharedLibraryLoader().load("vtm-jni");
+		new SharedLibraryLoader().load("vtm-jni"); //$NON-NLS-1$
 
 		// init canvas
 		AwtGraphics.init();
 
-		GdxAssets.init("assets/");
+		GdxAssets.init("assets/"); //$NON-NLS-1$
 
 		GLAdapter.init(new LwjglGL20());
 

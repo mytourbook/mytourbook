@@ -143,14 +143,11 @@ public class Messages extends NLS {
 
 	public static String		Image___Empty16;
 
-	public static String		Image__App_Close;
 	public static String		Image__App_Close_Themed;
-	public static String		Image__BookOpen;
 	public static String		Image__BookOpen_Themed;
 	public static String		Image__ColumnCategory;
 	public static String		Image__CustomizeProfilesColumns;
 	public static String		Image__options;
-	public static String		Image__Pin_Blue;
 	public static String		Image__Pin_Themed;
 	public static String		Image__TourOptions;
 	public static String		Image__TourOptions_Disabled;

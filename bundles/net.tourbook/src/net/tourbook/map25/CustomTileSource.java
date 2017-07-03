@@ -24,8 +24,8 @@ public class CustomTileSource extends UrlTileSource {
 
 //	http://192.168.99.99:8080/all/16/19293/24641.mvt
 
-	private final static String	DEFAULT_URL		= "http://192.168.99.99:8080/all";
-	private final static String	DEFAULT_PATH	= "/{Z}/{X}/{Y}.mvt";
+	private final static String	DEFAULT_URL		= "http://192.168.99.99:8080/all"; //$NON-NLS-1$
+	private final static String	DEFAULT_PATH	= "/{Z}/{X}/{Y}.mvt"; //$NON-NLS-1$
 
 	public static class Builder<T extends Builder<T>> extends UrlTileSource.Builder<T> {
 

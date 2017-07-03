@@ -119,10 +119,10 @@ public class GridRendererMT extends BucketRenderer {
 				final double latitude = MercatorProjection.toLatitude((double) tileY / tileZ);
 				final double longitude = MercatorProjection.toLongitude((double) tileX / tileZ);
 
-				final String labelTile = String.format("%d / %d / %d", z, tileX, tileY);
+				final String labelTile = String.format("%d / %d / %d", z, tileX, tileY); //$NON-NLS-1$
 
-				final String labelLat = String.format("lat %.4f", latitude);
-				final String labelLon = String.format("lon %.4f", longitude);
+				final String labelLat = String.format("lat %.4f", latitude); //$NON-NLS-1$
+				final String labelLon = String.format("lon %.4f", longitude); //$NON-NLS-1$
 
 //				final String labelProjectedX = String.format("x %.18f", mapPosition.x);
 //				final String labelProjectedY = String.format("y %.18f", mapPosition.y);
