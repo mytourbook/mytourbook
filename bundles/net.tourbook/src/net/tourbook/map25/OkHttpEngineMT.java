@@ -87,9 +87,12 @@ public class OkHttpEngineMT extends OkHttpEngine {
 
 					.cache(_httpCache)
 
-					.connectTimeout(60, TimeUnit.SECONDS)
+					.connectTimeout(10, TimeUnit.SECONDS)
+
+					// increased for tile creation on local server
 					.readTimeout(60, TimeUnit.SECONDS)
-					.writeTimeout(60, TimeUnit.SECONDS)
+
+//					.writeTimeout(60, TimeUnit.SECONDS)
 
 					.addNetworkInterceptor(REWRITE_CACHE_CONTROL_INTERCEPTOR);
 

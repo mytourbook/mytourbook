@@ -367,7 +367,7 @@ public class Map25App extends GdxMap {
 		_state.put(STATE_MAP_POS_TILT, mapPosition.tilt);
 		_state.put(STATE_MAP_POS_ZOOM_LEVEL, mapPosition.zoomLevel);
 
-		STATE_SELECTED_MAP25_PROVIDER_ID
+		_state.put(STATE_SELECTED_MAP25_PROVIDER_ID, _selectedMapProvider.getId());
 	}
 
 	public void setMapProvider(final Map25Provider mapProvider) {

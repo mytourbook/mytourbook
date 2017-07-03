@@ -17,6 +17,9 @@ package net.tourbook.map25;
 
 import org.oscim.core.GeoPoint;
 import org.oscim.gdx.InputHandler;
+import org.oscim.layers.Layer;
+import org.oscim.layers.tile.vector.labeling.LabelLayer;
+import org.oscim.map.Layers;
 import org.oscim.map.Map;
 import org.oscim.map.ViewController;
 import org.oscim.utils.Easing;
@@ -67,11 +70,38 @@ public class InputHandlerMT extends InputHandler {
 			case Input.Keys.NUM_3:
 			case Input.Keys.NUM_4:
 			case Input.Keys.NUM_5:
+
 				return true;
 			}
 		}
 
+		switch (keycode) {
+
+		case Input.Keys.L:
+
+			toggleLabelLayer(_map.layers());
+			_map.render();
+
+			break;
+
+		default:
+			break;
+		}
+
 		return super.keyDown(keycode);
+	}
+
+	private void toggleLabelLayer(final Layers layers) {
+
+		for (final Layer layer : layers) {
+
+			if (layer instanceof LabelLayer) {
+
+				layer.setEnabled(!layer.isEnabled());
+
+				return;
+			}
+		}
 	}
 
 	@Override
