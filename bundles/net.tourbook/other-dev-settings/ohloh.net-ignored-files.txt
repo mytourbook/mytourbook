@@ -11,6 +11,7 @@ Disallow: net.tourbook.ext.ejb3_3.4.0/
 Disallow: net.tourbook.ext.jars/
 Disallow: net.tourbook.ext.jars.printing/
 Disallow: net.tourbook.ext.velocity/
+Disallow: net.tourbook.ext.vtm/
 
 Disallow: net.tourbook.rxtx_2.2/
 Disallow: net.tourbook.rxtx.linux32_2.2/

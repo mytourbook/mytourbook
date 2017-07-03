@@ -1,6 +1,6 @@
 # these settings are merged into the file plugin.properties
 # version is also set in net.tourbook.application.ApplicationVersion 
-0=17.4.1
+0=17.7.0
 1=2017
 
 #this do not work but it can when ALL is correctly configured

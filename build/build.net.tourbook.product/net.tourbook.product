@@ -3,7 +3,7 @@
 
 <product 
 
-	version				="17.4.1.qualifier" 
+	version				="17.7.0.qualifier" 
 
 	name				="MyTourbook Product" 
 	id					="net.tourbook.product" 
@@ -98,6 +98,7 @@
       <feature id="feature.net.tourbook.ext.ejb3"			installMode="root"/>
       <feature id="feature.net.tourbook.ext.jars"			installMode="root"/>
       <feature id="feature.net.tourbook.ext.rxtx"			installMode="root"/>
+      <feature id="feature.net.tourbook.ext.vtm"			installMode="root"/>
       <feature id="feature.net.tourbook.ext.worldwind"		installMode="root"/>
       
       <feature id="feature.net.tourbook.app"				installMode="root"/>
