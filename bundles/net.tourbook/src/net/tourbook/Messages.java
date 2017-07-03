@@ -1267,6 +1267,8 @@ public class Messages extends NLS {
 
 	public static String		Pref_Map25_Encoding_Mapzen;
 	public static String		Pref_Map25_Encoding_OpenScienceMap;
+	public static String		Pref_Map25_Offline_Dialog_Restart_Message;
+	public static String		Pref_Map25_Offline_Dialog_Restart_Title;
 	public static String		Pref_Map25_Offline_Error_Location;
 	public static String		Pref_Map25_Offline_Group_OfflineMap;
 	public static String		Pref_Map25_Offline_Label_Location;

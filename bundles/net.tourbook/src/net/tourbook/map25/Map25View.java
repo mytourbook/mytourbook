@@ -573,6 +573,13 @@ public class Map25View extends ViewPart {
 
 	private void paintTours() {
 
+		final PathLayerMT tourLayer = _mapApp.getTourLayer();
+		if (tourLayer == null) {
+
+			// tour layer is not yet created, this happened
+			return;
+		}
+
 		final ArrayList<GeoPoint> geoPoints = new ArrayList<>();
 		final TIntArrayList tourStarts = new TIntArrayList();
 		int tourIndex = 0;
@@ -595,7 +602,6 @@ public class Map25View extends ViewPart {
 			}
 		}
 
-		final PathLayerMT tourLayer = _mapApp.getTourLayer();
 		tourLayer.setPoints(geoPoints, tourStarts);
 
 		final Map gdxMap = _mapApp.getMap();

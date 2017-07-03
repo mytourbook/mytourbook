@@ -19,9 +19,9 @@ import org.oscim.core.GeoPoint;
 import org.oscim.gdx.InputHandler;
 import org.oscim.layers.Layer;
 import org.oscim.layers.tile.vector.labeling.LabelLayer;
-import org.oscim.map.Layers;
 import org.oscim.map.Map;
 import org.oscim.map.ViewController;
+import org.oscim.scalebar.MapScaleBarLayer;
 import org.oscim.utils.Easing;
 
 import com.badlogic.gdx.Input;
@@ -79,7 +79,18 @@ public class InputHandlerMT extends InputHandler {
 
 		case Input.Keys.L:
 
-			toggleLabelLayer(_map.layers());
+			// toggle label
+
+			toggle_Label_Layer();
+			_map.render();
+
+			break;
+
+		case Input.Keys.C:
+
+			// toggle scale
+
+			toggle_Scale_Layer();
 			_map.render();
 
 			break;
@@ -91,11 +102,24 @@ public class InputHandlerMT extends InputHandler {
 		return super.keyDown(keycode);
 	}
 
-	private void toggleLabelLayer(final Layers layers) {
+	private void toggle_Label_Layer() {
 
-		for (final Layer layer : layers) {
+		for (final Layer layer : _map.layers()) {
 
 			if (layer instanceof LabelLayer) {
+
+				layer.setEnabled(!layer.isEnabled());
+
+				return;
+			}
+		}
+	}
+
+	private void toggle_Scale_Layer() {
+
+		for (final Layer layer : _map.layers()) {
+
+			if (layer instanceof MapScaleBarLayer) {
 
 				layer.setEnabled(!layer.isEnabled());
 

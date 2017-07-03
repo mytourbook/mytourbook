@@ -357,7 +357,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 				GridDataFactory
 						.fillDefaults()//
 						.grab(true, false)
-//						.span(2, 1)
+						//						.span(2, 1)
 						.applyTo(_chkIsEnabled);
 			}
 			{
@@ -636,9 +636,10 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 	private void enableControls() {
 
 		final boolean isSelected = _selectedMapProvider != null;
+		final boolean isEnabled = isSelected ? _selectedMapProvider.isEnabled : false;
 		final boolean isDefault = _selectedMapProvider.isDefault;
 		final boolean isNew = _newProvider != null;
-		final boolean canEdit = isSelected || isNew;
+		final boolean canEdit = isEnabled && (isSelected || isNew);
 		final boolean isNotDefault = isDefault == false;
 
 		final boolean isValid = isDataValid();
@@ -650,7 +651,8 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 		_btnCancel.setEnabled(_isMapProviderModified);
 		_btnDeleteProvider.setEnabled(isSelected && isNotDefault);
 
-		_chkIsEnabled.setEnabled(canEdit && isNotDefault);
+		_chkIsEnabled.setEnabled((isSelected || isNew) && isNotDefault);
+		_comboTileEncoding.setEnabled(canEdit);
 		_txtAPIKey.setEnabled(canEdit);
 		_txtDescription.setEnabled(canEdit);
 		_txtProviderName.setEnabled(canEdit);

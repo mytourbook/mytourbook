@@ -21,6 +21,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.map25.Map25Manager;
 
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.BooleanFieldEditor;
@@ -33,12 +34,13 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
-
+import org.eclipse.ui.PlatformUI;
 
 /**
  * Cache for offline map tiles
@@ -48,6 +50,8 @@ public class PrefPageMap25OfflineMap extends FieldEditorPreferencePage implement
 	private IPreferenceStore		_prefStore					= TourbookPlugin.getPrefStore();
 
 	private final String			_defaultOfflineMapFolder	= Platform.getInstanceLocation().getURL().getPath();
+
+	private boolean					_isModified;
 
 	/*
 	 * UI controls
@@ -117,6 +121,9 @@ public class PrefPageMap25OfflineMap extends FieldEditorPreferencePage implement
 				textDirEditor.addModifyListener(new ModifyListener() {
 					@Override
 					public void modifyText(final ModifyEvent e) {
+
+						_isModified = true;
+
 						isDataValid();
 					}
 				});
@@ -242,6 +249,22 @@ public class PrefPageMap25OfflineMap extends FieldEditorPreferencePage implement
 		final boolean isOk = super.performOk();
 
 		saveState();
+
+		if (_isModified) {
+
+			if (MessageDialog.openQuestion(
+					Display.getDefault().getActiveShell(),
+					Messages.Pref_Map25_Offline_Dialog_Restart_Title,
+					Messages.Pref_Map25_Offline_Dialog_Restart_Message)) {
+
+				Display.getCurrent().asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						PlatformUI.getWorkbench().restart();
+					}
+				});
+			}
+		}
 
 		return isOk;
 	}

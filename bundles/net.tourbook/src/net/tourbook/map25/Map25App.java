@@ -37,6 +37,12 @@ import org.oscim.layers.tile.vector.labeling.LabelLayer;
 import org.oscim.map.Layers;
 import org.oscim.map.Map;
 import org.oscim.map.ViewController;
+import org.oscim.renderer.BitmapRenderer;
+import org.oscim.renderer.GLViewport;
+import org.oscim.scalebar.DefaultMapScaleBar;
+import org.oscim.scalebar.MapScaleBar;
+import org.oscim.scalebar.MapScaleBarLayer;
+import org.oscim.scalebar.MetricUnitAdapter;
 import org.oscim.theme.ThemeFile;
 import org.oscim.theme.VtmThemes;
 import org.oscim.tiling.source.UrlTileSource;
@@ -429,31 +435,25 @@ public class Map25App extends GdxMap {
 		layers.add(new BuildingLayer(mMap, _baseMap));
 		layers.add(new LabelLayer(mMap, _baseMap));
 
-//		/*
-//		 * Grid layer
-//		 */
-//		_gridLayer = new TileGridLayerMT(mMap);
-//		_gridLayer.setEnabled(true);
-//		layers.add(_gridLayer);
 
-//		/*
-//		 * Map Scale
-//		 */
-//		final DefaultMapScaleBar mapScaleBar = new DefaultMapScaleBar(mMap);
-//
-//		mapScaleBar.setScaleBarMode(DefaultMapScaleBar.ScaleBarMode.SINGLE);
-////		mapScaleBar.setScaleBarMode(DefaultMapScaleBar.ScaleBarMode.BOTH);
-//
-//		mapScaleBar.setDistanceUnitAdapter(MetricUnitAdapter.INSTANCE);
-////		mapScaleBar.setSecondaryDistanceUnitAdapter(ImperialUnitAdapter.INSTANCE);
-//
-//		mapScaleBar.setScaleBarPosition(MapScaleBar.ScaleBarPosition.BOTTOM_LEFT);
-//
-//		final MapScaleBarLayer mapScaleBarLayer = new MapScaleBarLayer(mMap, mapScaleBar);
-//		final BitmapRenderer renderer = mapScaleBarLayer.getRenderer();
-//		renderer.setPosition(GLViewport.Position.BOTTOM_RIGHT);
-//		renderer.setOffset(5, 0);
-//		layers.add(mapScaleBarLayer);
+		/*
+		 * Map Scale
+		 */
+		final DefaultMapScaleBar mapScaleBar = new DefaultMapScaleBar(mMap);
+
+		mapScaleBar.setScaleBarMode(DefaultMapScaleBar.ScaleBarMode.SINGLE);
+//		mapScaleBar.setScaleBarMode(DefaultMapScaleBar.ScaleBarMode.BOTH);
+
+		mapScaleBar.setDistanceUnitAdapter(MetricUnitAdapter.INSTANCE);
+//		mapScaleBar.setSecondaryDistanceUnitAdapter(ImperialUnitAdapter.INSTANCE);
+
+		mapScaleBar.setScaleBarPosition(MapScaleBar.ScaleBarPosition.BOTTOM_LEFT);
+
+		final MapScaleBarLayer mapScaleBarLayer = new MapScaleBarLayer(mMap, mapScaleBar);
+		final BitmapRenderer renderer = mapScaleBarLayer.getRenderer();
+		renderer.setPosition(GLViewport.Position.BOTTOM_RIGHT);
+		renderer.setOffset(5, 0);
+		layers.add(mapScaleBarLayer);
 	}
 
 	void stop() {
