@@ -1,0 +1,52 @@
+Version 17.4                                                5. July 2017
+
+New 	
+===
+
+* 2.5 D Tour Map
+
+1st Time Start
+--------------
+When opening this map the 1st time, it may show no map, the map view is 
+white. Press key <G> then it shows the tile grid and you know the map 
+works. Because the default map provider can be very slow, therefore it 
+also takes some seconds or more until the map tiles are being loaded.
+
+
+These features are currently available in the 2.5D map
+------------------------------------------------------
+- Navigate map
+
+- Show multiple tours
+
+- Show/hide map layers
+
+- Select map provider
+
+- Keep these settings when the map is reopened
+  - Map position, tilt and rotation
+  - Map provider
+ 
+
+This map is still VERY experimental !
+=====================================
+
+It is far from feature complete and there are still some raw edges.
+
+- When map is resized, it can be displayed just black, moving it 
+  slightly will show it again
+
+- Sometimes it needs the workaround by moving the map slightly that a 
+  tour or a newly selected tour is displayed in the map
+
+- When multiple tours are selected then it can take some seconds until 
+  the tours are rendered. This is done in the background and is not 
+  visible, the map can still be navigated and sometimes the selected 
+  tours appear.
+
+- To log the map http requests, add this to the command line
+  -debug -consolelog 
+  -vmargs -Dorg.slf4j.simpleLogger.defaultLogLevel=DEBUG
+
+
+  
