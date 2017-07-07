@@ -91,13 +91,16 @@ public class PathLayerMT extends Layer {
 
 		@Override
 		public synchronized void update(final GLViewport v) {
+
 			final int tz = 1 << v.pos.zoomLevel;
 			final int tx = (int) (v.pos.x * tz);
 			final int ty = (int) (v.pos.y * tz);
 
 			/* update layers when map moved by at least one tile */
 			if ((tx != mCurX || ty != mCurY || tz != mCurZ)) {
+
 				mWorker.submit(100);
+
 				mCurX = tx;
 				mCurY = ty;
 				mCurZ = tz;
@@ -338,6 +341,7 @@ public class PathLayerMT extends Layer {
 
 			// trigger redraw to let renderer fetch the result.
 			mMap.render();
+//			mMap.updateMap(true);
 
 			return true;
 		}
@@ -510,7 +514,8 @@ public class PathLayerMT extends Layer {
 	}
 
 	private void updatePoints() {
-		mWorker.submit(10);
+
+		mWorker.submit(1);
 		mUpdatePoints = true;
 	}
 }

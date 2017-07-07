@@ -25,9 +25,10 @@ import java.util.ArrayList;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
-import net.tourbook.map2.view.SelectionMapPosition;
 import net.tourbook.map25.action.ActionSelectMap25Provider;
+import net.tourbook.map25.action.ActionSyncMapWithTour;
 import net.tourbook.photo.PhotoSelection;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
@@ -53,16 +54,21 @@ import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
+import org.oscim.core.BoundingBox;
 import org.oscim.core.GeoPoint;
+import org.oscim.map.Animator;
 import org.oscim.map.Map;
+import org.oscim.utils.Easing;
 
 import de.byteholder.gpx.PointOfInterest;
 
 public class Map25View extends ViewPart {
 
-	public static final String				ID				= "net.tourbook.map25.Map25View";	//$NON-NLS-1$
+	public static final String				ID							= "net.tourbook.map25.Map25View";	//$NON-NLS-1$
 
-	private static final IDialogSettings	_state			= TourbookPlugin.getState(ID);
+	private static final IDialogSettings	_state						= TourbookPlugin.getState(ID);
+
+	private static final String				STATE_SYNCH_MAP_WITH_TOUR	= "STATE_SYNCH_MAP_WITH_TOUR";		//$NON-NLS-1$
 
 	private Map25App						_mapApp;
 
@@ -76,10 +82,13 @@ public class Map25View extends ViewPart {
 	private ISelection						_selectionWhenHidden;
 
 	private ActionSelectMap25Provider		_actionSelectMapProvider;
+	private ActionSyncMapWithTour			_actionSynchMapWithTour;
 
-	private ArrayList<TourData>				_allTourData	= new ArrayList<>();
+	private ArrayList<TourData>				_allTourData				= new ArrayList<>();
 	private int								_hashTourId;
 	private int								_hashTourData;
+
+	private boolean							_isMapSynchedWithTour;
 
 	/*
 	 * UI controls
@@ -89,6 +98,30 @@ public class Map25View extends ViewPart {
 	public void action_MapProvider_OpenScience() {
 		// TODO Auto-generated method stub
 
+	}
+
+	public void actionSynchMapViewWithTour() {
+
+		_isMapSynchedWithTour = _actionSynchMapWithTour.isChecked();
+
+		paintTours();
+
+//		if (_isMapSynchedWithTour) {
+//
+//			// force tour to be repainted, that it is synched immediately
+//			_previousTourData = null;
+//
+//			_actionShowTourInMap.setChecked(true);
+//			gdxMap.setShowOverlays(true);
+//
+//			paintTours_20_One(_allTourData.get(0), true);
+//
+//		} else {
+//
+//			// disable synch with slider
+//			_isMapSynchedWithSlider = false;
+//			_actionSynchWithSlider.setChecked(false);
+//		}
 	}
 
 	private void addPartListener() {
@@ -104,7 +137,7 @@ public class Map25View extends ViewPart {
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == Map25View.this) {
-
+					saveState();
 				}
 			}
 
@@ -215,6 +248,7 @@ public class Map25View extends ViewPart {
 	private void createActions() {
 
 		_actionSelectMapProvider = new ActionSelectMap25Provider(this);
+		_actionSynchMapWithTour = new ActionSyncMapWithTour(this);
 	}
 
 	@Override
@@ -259,7 +293,10 @@ public class Map25View extends ViewPart {
 	}
 
 	private void enableActions() {
-		// TODO Auto-generated method stub
+
+		final boolean canSyncTour = _allTourData.size() > 0;
+
+		_actionSynchMapWithTour.setEnabled(canSyncTour);
 
 	}
 
@@ -270,6 +307,7 @@ public class Map25View extends ViewPart {
 		 */
 		final IToolBarManager viewTbm = getViewSite().getActionBars().getToolBarManager();
 
+		viewTbm.add(_actionSynchMapWithTour);
 		viewTbm.add(_actionSelectMapProvider);
 //		viewTbm.add(new Separator());
 
@@ -310,16 +348,12 @@ public class Map25View extends ViewPart {
 
 			paintTour(tourData);
 
-			enableActions();
-
 		} else if (selection instanceof SelectionTourId) {
 
 			final SelectionTourId tourIdSelection = (SelectionTourId) selection;
 			final TourData tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
 
 			paintTour(tourData);
-
-			enableActions();
 
 		} else if (selection instanceof SelectionTourIds) {
 
@@ -338,15 +372,12 @@ public class Map25View extends ViewPart {
 
 				paintTour(tourData);
 
-				enableActions();
-
 			} else {
 
 				// paint multiple tours
 
 				paintTours(tourIds);
 
-				enableActions();
 			}
 
 		} else if (selection instanceof SelectionChartInfo) {
@@ -452,8 +483,8 @@ public class Map25View extends ViewPart {
 //
 //			onSelectionChanged_TourMarker(markerSelection, true);
 
-		} else if (selection instanceof SelectionMapPosition) {
-
+//		} else if (selection instanceof SelectionMapPosition) {
+//
 //			final SelectionMapPosition mapPositionSelection = (SelectionMapPosition) selection;
 //
 //			final int valueIndex1 = mapPositionSelection.getSlider1ValueIndex();
@@ -573,6 +604,8 @@ public class Map25View extends ViewPart {
 
 	private void paintTours() {
 
+		enableActions();
+
 		final PathLayerMT tourLayer = _mapApp.getTourLayer();
 		if (tourLayer == null) {
 
@@ -605,12 +638,30 @@ public class Map25View extends ViewPart {
 		tourLayer.setPoints(geoPoints, tourStarts);
 
 		final Map gdxMap = _mapApp.getMap();
-		gdxMap.postDelayed(new Runnable() {
+
+		gdxMap.post(new Runnable() {
+
 			@Override
 			public void run() {
+
+				if (_isMapSynchedWithTour) {
+
+					final BoundingBox bbox = new BoundingBox(geoPoints);
+
+					final Animator animator = gdxMap.animator();
+
+					animator.cancel();
+
+					animator.animateTo(800, bbox, Easing.Type.LINEAR);
+
+//					final GeoPoint p = bbox.getCenterPoint();
+//
+//					animator.animateTo(800, p, 1, true, Easing.Type.SINE_INOUT);
+				}
+
 				gdxMap.updateMap(true);
 			}
-		}, 10);
+		});
 	}
 
 	private void paintTours(final ArrayList<Long> tourIdList) {
@@ -638,8 +689,25 @@ public class Map25View extends ViewPart {
 		paintTours();
 	}
 
+	private void restoreState() {
+
+		// checkbox: synch map with tour
+		final boolean isSynchTour = Util.getStateBoolean(_state, STATE_SYNCH_MAP_WITH_TOUR, true);
+		_actionSynchMapWithTour.setChecked(isSynchTour);
+		_isMapSynchedWithTour = isSynchTour;
+
+	}
+
+	private void saveState() {
+
+		_state.put(STATE_SYNCH_MAP_WITH_TOUR, _actionSynchMapWithTour.isChecked());
+	}
+
 	@Override
-	public void setFocus() {}
+	public void setFocus() {
+
+//		_swtContainer.setFocus();
+	}
 
 	private void showToursFromTourProvider() {
 
@@ -651,6 +719,8 @@ public class Map25View extends ViewPart {
 				if (_swtContainer.isDisposed()) {
 					return;
 				}
+
+				restoreState();
 
 				final ArrayList<TourData> tourDataList = TourManager.getSelectedTours();
 				if (tourDataList != null) {

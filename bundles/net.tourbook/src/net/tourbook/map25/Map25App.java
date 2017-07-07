@@ -435,7 +435,6 @@ public class Map25App extends GdxMap {
 		layers.add(new BuildingLayer(mMap, _baseMap));
 		layers.add(new LabelLayer(mMap, _baseMap));
 
-
 		/*
 		 * Map Scale
 		 */
