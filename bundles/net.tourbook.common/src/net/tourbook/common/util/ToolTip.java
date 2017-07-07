@@ -38,6 +38,17 @@ import org.eclipse.swt.widgets.Shell;
  * @since 3.3
  */
 public abstract class ToolTip {
+	/**
+	 * Recreate the tooltip on every mouse move
+	 */
+	public static final int				RECREATE				= 1;
+
+	/**
+	 * Don't recreate the tooltip as long the mouse doesn't leave the area triggering the tooltip
+	 * creation
+	 */
+	public static final int				NO_RECREATE				= 1 << 1;
+
 	private Control						control;
 
 	private int							xShift					= 3;
@@ -55,17 +66,6 @@ public abstract class ToolTip {
 	// Ensure that only one tooltip is active in time
 //	private static Shell				CURRENT_TOOLTIP;
 	private Shell						CURRENT_TOOLTIP;
-
-	/**
-	 * Recreate the tooltip on every mouse move
-	 */
-	public static final int				RECREATE				= 1;
-
-	/**
-	 * Don't recreate the tooltip as long the mouse doesn't leave the area triggering the tooltip
-	 * creation
-	 */
-	public static final int				NO_RECREATE				= 1 << 1;
 
 	private TooltipHideListener			hideListener			= new TooltipHideListener();
 
@@ -118,7 +118,8 @@ public abstract class ToolTip {
 					 * the mouse tries to mover over the tooltip <br>
 					 * <br>
 					 * it seems to work on windows and linux with margin 1, when set to 0 the
-					 * tooltip do sometime not be poped up again and the i-icons is not deaktivated<br>
+					 * tooltip do sometime not be poped up again and the i-icons is not
+					 * deaktivated<br>
 					 * wolfgang 2010-07-23
 					 */
 					final Rectangle rect = shell.getBounds();
@@ -686,7 +687,9 @@ public abstract class ToolTip {
 	}
 
 	private Shell toolTipCreate(final Event event) {
+
 		if (shouldCreateToolTip(event)) {
+
 			final Shell shell = new Shell(control.getShell(), SWT.ON_TOP | SWT.TOOL | SWT.NO_FOCUS);
 			shell.setLayout(new FillLayout());
 
@@ -699,8 +702,11 @@ public abstract class ToolTip {
 	}
 
 	private void toolTipHide(final Shell tip, final Event event) {
-		if (tip != null && !tip.isDisposed() && shouldHideToolTip(event)) {
+
+		if (control != null && !control.isDisposed() && tip != null && !tip.isDisposed() && shouldHideToolTip(event)) {
+
 			control.getShell().removeListener(SWT.Deactivate, shellListener);
+
 			currentArea = null;
 			passOnEvent(tip, event);
 			tip.dispose();
