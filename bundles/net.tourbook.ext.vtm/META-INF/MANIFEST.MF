@@ -16,7 +16,7 @@ Bundle-ManifestVersion: 2
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-SymbolicName: net.tourbook.ext.vtm
 Bundle-Vendor: It's me
-Bundle-Version: 17.7.1.v20170707-1613
+Bundle-Version: 17.7.1.v20170710-1255
 Export-Package: assets.patterns;version="17.7.1",assets.shaders;versio
  n="17.7.1",assets.symbols;version="17.7.1",assets.symbols.accommodati
  on;version="17.7.1",assets.symbols.amenity;version="17.7.1",assets.sy

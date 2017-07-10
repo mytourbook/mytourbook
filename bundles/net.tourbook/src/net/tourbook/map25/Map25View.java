@@ -21,14 +21,19 @@ import java.awt.BorderLayout;
 import java.awt.Canvas;
 import java.awt.Frame;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.chart.Chart;
+import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
+import net.tourbook.importdata.RawDataManager;
 import net.tourbook.map25.action.ActionSelectMap25Provider;
-import net.tourbook.map25.action.ActionSyncMapWithTour;
+import net.tourbook.map25.action.ActionSynchMapWithChartSlider;
+import net.tourbook.map25.action.ActionSynchMapWithTour;
 import net.tourbook.photo.PhotoSelection;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
@@ -42,6 +47,7 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -56,6 +62,7 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 import org.oscim.core.BoundingBox;
 import org.oscim.core.GeoPoint;
+import org.oscim.core.MapPosition;
 import org.oscim.map.Animator;
 import org.oscim.map.Map;
 import org.oscim.utils.Easing;
@@ -64,11 +71,12 @@ import de.byteholder.gpx.PointOfInterest;
 
 public class Map25View extends ViewPart {
 
-	public static final String				ID							= "net.tourbook.map25.Map25View";	//$NON-NLS-1$
+	public static final String				ID									= "net.tourbook.map25.Map25View";		//$NON-NLS-1$
 
-	private static final IDialogSettings	_state						= TourbookPlugin.getState(ID);
+	private static final IDialogSettings	_state								= TourbookPlugin.getState(ID);
 
-	private static final String				STATE_SYNCH_MAP_WITH_TOUR	= "STATE_SYNCH_MAP_WITH_TOUR";		//$NON-NLS-1$
+	private static final String				STATE_SYNCH_MAP_WITH_CHART_SLIDER	= "STATE_SYNCH_MAP_WITH_CHART_SLIDER";	//$NON-NLS-1$
+	private static final String				STATE_SYNCH_MAP_WITH_TOUR			= "STATE_SYNCH_MAP_WITH_TOUR";			//$NON-NLS-1$
 
 	private Map25App						_mapApp;
 
@@ -82,13 +90,15 @@ public class Map25View extends ViewPart {
 	private ISelection						_selectionWhenHidden;
 
 	private ActionSelectMap25Provider		_actionSelectMapProvider;
-	private ActionSyncMapWithTour			_actionSynchMapWithTour;
+	private ActionSynchMapWithChartSlider	_actionSynchMapWithChartSlider;
+	private ActionSynchMapWithTour			_actionSynchMapWithTour;
 
-	private ArrayList<TourData>				_allTourData				= new ArrayList<>();
+	private ArrayList<TourData>				_allTourData						= new ArrayList<>();
 	private int								_hashTourId;
 	private int								_hashTourData;
 
-	private boolean							_isMapSynchedWithTour;
+	private boolean							_isSynchMapWithChartSlider;
+	private boolean							_isSynchMapWithTour;
 
 	/*
 	 * UI controls
@@ -100,9 +110,24 @@ public class Map25View extends ViewPart {
 
 	}
 
+	public void actionSynchMapPositionWithSlider() {
+
+		final boolean isSync = _actionSynchMapWithChartSlider.isChecked();
+
+		_isSynchMapWithChartSlider = isSync;
+
+		if (isSync) {
+
+			// ensure that the track sliders are displayed
+
+//			_actionShowTrackSlider.setChecked(true);
+		}
+
+	}
+
 	public void actionSynchMapViewWithTour() {
 
-		_isMapSynchedWithTour = _actionSynchMapWithTour.isChecked();
+		_isSynchMapWithTour = _actionSynchMapWithTour.isChecked();
 
 		paintTours();
 
@@ -248,7 +273,8 @@ public class Map25View extends ViewPart {
 	private void createActions() {
 
 		_actionSelectMapProvider = new ActionSelectMap25Provider(this);
-		_actionSynchMapWithTour = new ActionSyncMapWithTour(this);
+		_actionSynchMapWithTour = new ActionSynchMapWithTour(this);
+		_actionSynchMapWithChartSlider = new ActionSynchMapWithChartSlider(this);
 	}
 
 	@Override
@@ -285,9 +311,12 @@ public class Map25View extends ViewPart {
 	@Override
 	public void dispose() {
 
-		getViewSite().getPage().removePartListener(_partListener);
+		if (_partListener != null) {
 
-		_mapApp.stop();
+			getViewSite().getPage().removePartListener(_partListener);
+
+			_mapApp.stop();
+		}
 
 		super.dispose();
 	}
@@ -308,8 +337,10 @@ public class Map25View extends ViewPart {
 		final IToolBarManager viewTbm = getViewSite().getActionBars().getToolBarManager();
 
 		viewTbm.add(_actionSynchMapWithTour);
+		viewTbm.add(_actionSynchMapWithChartSlider);
+		viewTbm.add(new Separator());
+
 		viewTbm.add(_actionSelectMapProvider);
-//		viewTbm.add(new Separator());
 
 		/*
 		 * fill view menu
@@ -382,100 +413,55 @@ public class Map25View extends ViewPart {
 
 		} else if (selection instanceof SelectionChartInfo) {
 
-//			final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
-//
-//			TourData tourData = null;
-//
-//			final Chart chart = chartInfo.getChart();
-//			if (chart instanceof TourChart) {
-//				final TourChart tourChart = (TourChart) chart;
-//				tourData = tourChart.getTourData();
+//			if (isTrackSliderVisible == false) {
+//				return;
 //			}
-//
-//			if (tourData != null && tourData.isMultipleTours()) {
-//
-//				// multiple tours are selected
-//
-//			} else {
-//
-//				// use old behaviour
-//
-//				final ChartDataModel chartDataModel = chartInfo.chartDataModel;
-//				if (chartDataModel != null) {
-//
-//					final Object tourId = chartDataModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
-//					if (tourId instanceof Long) {
-//
-//						tourData = TourManager.getInstance().getTourData((Long) tourId);
-//						if (tourData == null) {
-//
-//							// tour is not in the database, try to get it from the raw data manager
-//
-//							final HashMap<Long, TourData> rawData = RawDataManager.getInstance().getImportedTours();
-//							tourData = rawData.get(tourId);
-//						}
-//					}
-//				}
-//			}
-//
-//			if (tourData != null) {
-//
-//				positionMapTo_TourSliders(
-//						tourData,
-//						chartInfo.leftSliderValuesIndex,
-//						chartInfo.rightSliderValuesIndex,
-//						chartInfo.selectedSliderValuesIndex,
-//						null);
-//
-//				enableActions();
-//			}
+
+			final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
+
+			final ChartDataModel chartDataModel = chartInfo.chartDataModel;
+			if (chartDataModel != null) {
+
+				final Object tourId = chartDataModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
+				if (tourId instanceof Long) {
+
+					syncMapWith_ChartSlider(chartInfo, (Long) tourId);
+				}
+			}
 
 		} else if (selection instanceof SelectionChartXSliderPosition) {
 
-//			final SelectionChartXSliderPosition xSliderPos = (SelectionChartXSliderPosition) selection;
-//			final Chart chart = xSliderPos.getChart();
-//			if (chart == null) {
-//				return;
-//			}
-//
-//			final Object customData = xSliderPos.getCustomData();
-//			if (customData instanceof SelectedTourSegmenterSegments) {
-//
-//				/*
-//				 * This event is fired in the tour chart when a toursegmenter segment is selected
-//				 */
-//
-//				selectTourSegments((SelectedTourSegmenterSegments) customData);
-//
-//			} else {
-//
-//				final ChartDataModel chartDataModel = chart.getChartDataModel();
-//				final Object tourId = chartDataModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
-//
-//				if (tourId instanceof Long) {
-//
-//					final TourData tourData = TourManager.getInstance().getTourData((Long) tourId);
-//					if (tourData != null) {
-//
-//						final int leftSliderValueIndex = xSliderPos.getLeftSliderValueIndex();
-//						int rightSliderValueIndex = xSliderPos.getRightSliderValueIndex();
-//
-//						rightSliderValueIndex =
-//								rightSliderValueIndex == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION
-//										? leftSliderValueIndex
-//										: rightSliderValueIndex;
-//
-//						positionMapTo_TourSliders(//
-//								tourData,
-//								leftSliderValueIndex,
-//								rightSliderValueIndex,
-//								leftSliderValueIndex,
-//								null);
-//
-//						enableActions();
-//					}
-//				}
-//			}
+			final SelectionChartXSliderPosition xSliderPos = (SelectionChartXSliderPosition) selection;
+			final Chart chart = xSliderPos.getChart();
+			if (chart == null) {
+				return;
+			}
+
+			final ChartDataModel chartDataModel = chart.getChartDataModel();
+
+			final Object tourId = chartDataModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
+			if (tourId instanceof Long) {
+
+				final TourData tourData = TourManager.getInstance().getTourData((Long) tourId);
+				if (tourData != null) {
+
+					final int leftSliderValueIndex = xSliderPos.getLeftSliderValueIndex();
+					int rightSliderValueIndex = xSliderPos.getRightSliderValueIndex();
+
+					rightSliderValueIndex =
+							rightSliderValueIndex == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION
+									? leftSliderValueIndex
+									: rightSliderValueIndex;
+
+					syncMapWith_ChartSlider(//
+							tourData,
+							leftSliderValueIndex,
+							rightSliderValueIndex,
+							leftSliderValueIndex);
+
+					enableActions();
+				}
+			}
 
 		} else if (selection instanceof SelectionTourMarker) {
 
@@ -613,9 +599,22 @@ public class Map25View extends ViewPart {
 			return;
 		}
 
-		final ArrayList<GeoPoint> geoPoints = new ArrayList<>();
+		int geoSize = 0;
+
+		for (final TourData tourData : _allTourData) {
+
+			// check if GPS data are available
+			if (tourData.latitudeSerie != null) {
+				geoSize += tourData.latitudeSerie.length;
+			}
+		}
+
+		// use array to optimize performance when millions of points are created
+		final GeoPoint[] geoPoints = new GeoPoint[geoSize];
 		final TIntArrayList tourStarts = new TIntArrayList();
+
 		int tourIndex = 0;
+		int geoIndex = 0;
 
 		for (final TourData tourData : _allTourData) {
 
@@ -630,8 +629,8 @@ public class Map25View extends ViewPart {
 			final double[] longitudeSerie = tourData.longitudeSerie;
 
 			// create vtm geo points
-			for (int index = 0; index < latitudeSerie.length; index++, tourIndex++) {
-				geoPoints.add(new GeoPoint(latitudeSerie[index], longitudeSerie[index]));
+			for (int serieIndex = 0; serieIndex < latitudeSerie.length; serieIndex++, tourIndex++) {
+				geoPoints[geoIndex++] = (new GeoPoint(latitudeSerie[serieIndex], longitudeSerie[serieIndex]));
 			}
 		}
 
@@ -644,19 +643,30 @@ public class Map25View extends ViewPart {
 			@Override
 			public void run() {
 
-				if (_isMapSynchedWithTour) {
+				if (_isSynchMapWithTour) {
 
-					final BoundingBox bbox = new BoundingBox(geoPoints);
+					// this is optimized for performance by using an array which BoundingBox do no support
+					int minLat = Integer.MAX_VALUE;
+					int minLon = Integer.MAX_VALUE;
+					int maxLat = Integer.MIN_VALUE;
+					int maxLon = Integer.MIN_VALUE;
+					for (final GeoPoint geoPoint : geoPoints) {
+						minLat = Math.min(minLat, geoPoint.latitudeE6);
+						minLon = Math.min(minLon, geoPoint.longitudeE6);
+						maxLat = Math.max(maxLat, geoPoint.latitudeE6);
+						maxLon = Math.max(maxLon, geoPoint.longitudeE6);
+					}
+
+					final BoundingBox bbox = new BoundingBox(minLat, minLon, maxLat, maxLon);
 
 					final Animator animator = gdxMap.animator();
 
 					animator.cancel();
-
-					animator.animateTo(800, bbox, Easing.Type.LINEAR);
-
-//					final GeoPoint p = bbox.getCenterPoint();
-//
-//					animator.animateTo(800, p, 1, true, Easing.Type.SINE_INOUT);
+					animator.animateTo(//
+							800,
+							bbox,
+							Easing.Type.LINEAR,
+							Animator.ANIM_MOVE | Animator.ANIM_SCALE);
 				}
 
 				gdxMap.updateMap(true);
@@ -694,12 +704,18 @@ public class Map25View extends ViewPart {
 		// checkbox: synch map with tour
 		final boolean isSynchTour = Util.getStateBoolean(_state, STATE_SYNCH_MAP_WITH_TOUR, true);
 		_actionSynchMapWithTour.setChecked(isSynchTour);
-		_isMapSynchedWithTour = isSynchTour;
+		_isSynchMapWithTour = isSynchTour;
+
+		// checkbox: synch map with chart slider
+		final boolean isSynchWithSlider = Util.getStateBoolean(_state, STATE_SYNCH_MAP_WITH_CHART_SLIDER, true);
+		_actionSynchMapWithChartSlider.setChecked(isSynchWithSlider);
+		_isSynchMapWithChartSlider = isSynchWithSlider;
 
 	}
 
 	private void saveState() {
 
+		_state.put(STATE_SYNCH_MAP_WITH_CHART_SLIDER, _actionSynchMapWithChartSlider.isChecked());
 		_state.put(STATE_SYNCH_MAP_WITH_TOUR, _actionSynchMapWithTour.isChecked());
 	}
 
@@ -732,6 +748,102 @@ public class Map25View extends ViewPart {
 				}
 			}
 		});
+	}
+
+	private void syncMapWith_ChartSlider(final SelectionChartInfo chartInfo, final Long tourId) {
+
+//		final TrackSliderLayer chartSliderLayer = getLayerTrackSlider();
+//		if (chartSliderLayer == null) {
+//			return;
+//		}
+
+		TourData tourData = TourManager.getInstance().getTourData(tourId);
+		if (tourData == null) {
+
+			// tour is not in the database, try to get it from the raw data manager
+
+			final HashMap<Long, TourData> rawData = RawDataManager.getInstance().getImportedTours();
+			tourData = rawData.get(tourId);
+		}
+
+		if (tourData == null || tourData.latitudeSerie == null) {
+
+//			chartSliderLayer.setSliderVisible(false);
+
+		} else {
+
+			// sync map with chart slider
+
+			final int valuesIndex = chartInfo.selectedSliderValuesIndex;
+
+			syncMapWith_SliderPosition(tourData, /* chartSliderLayer, */ valuesIndex);
+
+//			// update slider UI
+//			updateTrackSlider_10_Position(//
+//					tourData,
+//					chartInfo.leftSliderValuesIndex,
+//					chartInfo.rightSliderValuesIndex);
+//
+//			updateActionsState();
+		}
+	}
+
+	private void syncMapWith_ChartSlider(	final TourData tourData,
+											final int leftSliderValuesIndex,
+											final int rightSliderValuesIndex,
+											final int selectedSliderIndex) {
+
+//		final TrackSliderLayer chartSliderLayer = getLayerTrackSlider();
+//		if (chartSliderLayer == null) {
+//			return;
+//		}
+
+		if (tourData == null || tourData.latitudeSerie == null) {
+
+//			chartSliderLayer.setSliderVisible(false);
+
+		} else {
+
+			// sync map with chart slider
+
+			syncMapWith_SliderPosition(tourData, /* chartSliderLayer, */ selectedSliderIndex);
+
+//			// update slider UI
+//			updateTrackSlider_10_Position(//
+//					tourData,
+//					leftSliderValuesIndex,
+//					rightSliderValuesIndex);
+//
+//			updateActionsState();
+		}
+	}
+
+	private void syncMapWith_SliderPosition(final TourData tourData,
+//											final TrackSliderLayer chartSliderLayer,
+											int valuesIndex) {
+
+		final double[] latitudeSerie = tourData.latitudeSerie;
+
+		// check bounds
+		if (valuesIndex >= latitudeSerie.length) {
+			valuesIndex = latitudeSerie.length;
+		}
+
+		final double latitude = latitudeSerie[valuesIndex];
+		final double longitude = tourData.longitudeSerie[valuesIndex];
+
+		final Map map = _mapApp.getMap();
+		final MapPosition currentMapPos = new MapPosition();
+
+		// get current position
+		map.viewport().getMapPosition(currentMapPos);
+
+		// set new position
+		currentMapPos.setPosition(latitude, longitude);
+
+		// update map
+		map.setMapPosition(currentMapPos);
+		map.render();
 	}
 
 	void updateUI_SelectedMapProvider(final Map25Provider selectedMapProvider) {

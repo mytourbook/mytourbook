@@ -37,9 +37,7 @@ package net.tourbook.map25;
 
 import gnu.trove.list.array.TIntArrayList;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.time.LocalTime;
 
 import org.oscim.backend.canvas.Paint.Cap;
 import org.oscim.core.GeoPoint;
@@ -66,28 +64,37 @@ public class PathLayerMT extends Layer {
 	/**
 	 * Stores points, converted to the map projection.
 	 */
-	protected final ArrayList<GeoPoint>	mPoints;
-	protected TIntArrayList				_tourStarts;
+	protected GeoPoint[]	_geoPoints;
+	protected TIntArrayList	_tourStarts;
 
-	protected boolean					mUpdatePoints;
+	protected boolean		_isUpdatePoints;
 
 	/**
 	 * Line style
 	 */
-	LineStyle							mLineStyle;
+	LineStyle				_lineStyle;
 
-	final Worker						mWorker;
+	final Worker			_simpleWorker;
 
-	GeometryBuffer						mGeom;
+	GeometryBuffer			_geoBuffer;
 
-	/***
+	private boolean			_isUpdateLayer;
+
+	/*
 	 * everything below runs on GL- and Worker-Thread
-	 ***/
-	final class RenderPath extends BucketRenderer {
+	 */
 
-		private int	mCurX	= -1;
-		private int	mCurY	= -1;
-		private int	mCurZ	= -1;
+	final static class PathLayerTask {
+
+		RenderBuckets	__renderBuckets	= new RenderBuckets();
+		MapPosition		__mapPos		= new MapPosition();
+	}
+
+	final class RenderPathLayer extends BucketRenderer {
+
+		private int	__curX	= -1;
+		private int	__curY	= -1;
+		private int	__curZ	= -1;
 
 		@Override
 		public synchronized void update(final GLViewport v) {
@@ -97,147 +104,154 @@ public class PathLayerMT extends Layer {
 			final int ty = (int) (v.pos.y * tz);
 
 			/* update layers when map moved by at least one tile */
-			if ((tx != mCurX || ty != mCurY || tz != mCurZ)) {
+			if (tx != __curX || ty != __curY || tz != __curZ || _isUpdateLayer) {
 
-				mWorker.submit(100);
+				_isUpdateLayer = false;
 
-				mCurX = tx;
-				mCurY = ty;
-				mCurZ = tz;
+				_simpleWorker.submit(007);
+
+				__curX = tx;
+				__curY = ty;
+				__curZ = tz;
 			}
 
-			final Task t = mWorker.poll();
-			if (t == null) {
+			final PathLayerTask workerTask = _simpleWorker.poll();
+			if (workerTask == null) {
 				return;
 			}
 
 			/* keep position to render relative to current state */
-			mMapPosition.copy(t.pos);
+			mMapPosition.copy(workerTask.__mapPos);
 
 			/* compile new layers */
-			buckets.set(t.bucket.get());
+			buckets.set(workerTask.__renderBuckets.get());
 			compile();
 		}
 	}
 
-	final static class Task {
-		RenderBuckets	bucket	= new RenderBuckets();
-		MapPosition		pos		= new MapPosition();
-	}
+	final class Worker extends SimpleWorker<PathLayerTask> {
 
-	final class Worker extends SimpleWorker<Task> {
-
-		private static final int	MIN_DIST		= 3;
+		private static final int	MIN_DIST				= 3;
 
 		// limit coords
-		private final int			max				= 2048;
+		private final int			__max					= 2048;
 
 		// pre-projected points
-		private double[]			mPreprojected	= new double[2];
+		private double[]			__preProjectedPoints	= new double[2];
 
 		// projected points
-		private float[]				mPPoints;
+		private float[]				__projectedPoints;
 
-		private final LineClipper	mClipper;
-		private int					mNumPoints;
+		private final LineClipper	__lineClipper;
+		private int					__numPoints;
 
 		public Worker(final Map map) {
-			super(map, 0, new Task(), new Task());
-			mClipper = new LineClipper(-max, -max, max, max);
-			mPPoints = new float[0];
+
+			super(map, 55, new PathLayerTask(), new PathLayerTask());
+
+			__lineClipper = new LineClipper(-__max, -__max, __max, __max);
+			__projectedPoints = new float[0];
 		}
 
 		private int addPoint(final float[] points, int i, final int x, final int y) {
+
 			points[i++] = x;
 			points[i++] = y;
+
 			return i;
 		}
 
 		@Override
-		public void cleanup(final Task task) {
-			task.bucket.clear();
+		public void cleanup(final PathLayerTask task) {
+			task.__renderBuckets.clear();
 		}
 
 		@Override
-		public boolean doWork(final Task task) {
+		public boolean doWork(final PathLayerTask task) {
 
-			int size = mNumPoints;
+			int size = __numPoints;
 
-			if (mUpdatePoints) {
-				synchronized (mPoints) {
-					mUpdatePoints = false;
-					mNumPoints = size = mPoints.size();
+			if (_isUpdatePoints) {
 
-					final ArrayList<GeoPoint> geopoints = mPoints;
-					double[] points = mPreprojected;
+				synchronized (_geoPoints) {
+
+					_isUpdatePoints = false;
+					__numPoints = size = _geoPoints.length;
+
+					double[] points = __preProjectedPoints;
 
 					if (size * 2 >= points.length) {
-						points = mPreprojected = new double[size * 2];
-						mPPoints = new float[size * 2];
+						points = __preProjectedPoints = new double[size * 2];
+						__projectedPoints = new float[size * 2];
 					}
 
-					for (int i = 0; i < size; i++) {
-						MercatorProjection.project(geopoints.get(i), points, i);
+					for (int pointIndex = 0; pointIndex < size; pointIndex++) {
+						MercatorProjection.project(_geoPoints[pointIndex], points, pointIndex);
 					}
 				}
 
-			} else if (mGeom != null) {
-				final GeometryBuffer geom = mGeom;
-				mGeom = null;
-				size = geom.index[0];
+			} else if (_geoBuffer != null) {
 
-				double[] points = mPreprojected;
+				final GeometryBuffer geoBuffer = _geoBuffer;
+				_geoBuffer = null;
+				size = geoBuffer.index[0];
+
+				double[] points = __preProjectedPoints;
 
 				if (size > points.length) {
-					points = mPreprojected = new double[size * 2];
-					mPPoints = new float[size * 2];
+					points = __preProjectedPoints = new double[size * 2];
+					__projectedPoints = new float[size * 2];
 				}
 
-				for (int i = 0; i < size; i += 2) {
+				for (int pointIndex = 0; pointIndex < size; pointIndex += 2) {
+
 					MercatorProjection.project(
-							geom.points[i + 1],
-							geom.points[i],
+							geoBuffer.points[pointIndex + 1],
+							geoBuffer.points[pointIndex],
 							points,
-							i >> 1);
+							pointIndex >> 1);
 				}
-				mNumPoints = size = size >> 1;
 
+				__numPoints = size = size >> 1;
 			}
+
 			if (size == 0) {
-				if (task.bucket.get() != null) {
-					task.bucket.clear();
+
+				if (task.__renderBuckets.get() != null) {
+					task.__renderBuckets.clear();
 					mMap.render();
 				}
+
 				return true;
 			}
 
 			LineBucket ll;
 
-			if (mLineStyle.stipple == 0 && mLineStyle.texture == null) {
-				ll = task.bucket.getLineBucket(0);
+			if (_lineStyle.stipple == 0 && _lineStyle.texture == null) {
+				ll = task.__renderBuckets.getLineBucket(0);
 			} else {
-				ll = task.bucket.getLineTexBucket(0);
+				ll = task.__renderBuckets.getLineTexBucket(0);
 			}
 
-			ll.line = mLineStyle;
+			ll.line = _lineStyle;
 
 			//ll.scale = ll.line.width;
 
-			mMap.getMapPosition(task.pos);
+			mMap.getMapPosition(task.__mapPos);
 
-			final int zoomlevel = task.pos.zoomLevel;
-			task.pos.scale = 1 << zoomlevel;
+			final int zoomlevel = task.__mapPos.zoomLevel;
+			task.__mapPos.scale = 1 << zoomlevel;
 
-			final double mx = task.pos.x;
-			final double my = task.pos.y;
-			final double scale = Tile.SIZE * task.pos.scale;
+			final double mx = task.__mapPos.x;
+			final double my = task.__mapPos.y;
+			final double scale = Tile.SIZE * task.__mapPos.scale;
 
 			// flip around dateline
 			int flip = 0;
 			final int maxx = Tile.SIZE << (zoomlevel - 1);
 
-			int x = (int) ((mPreprojected[0] - mx) * scale);
-			int y = (int) ((mPreprojected[1] - my) * scale);
+			int x = (int) ((__preProjectedPoints[0] - mx) * scale);
+			int y = (int) ((__preProjectedPoints[1] - my) * scale);
 
 			if (x > maxx) {
 				x -= (maxx * 2);
@@ -253,9 +267,9 @@ public class PathLayerMT extends Layer {
 			int tourIndex = 0;
 			int nextTourStartIndex = getNextTourStartIndex(tourIndex);
 
-			mClipper.clipStart(x, y);
+			__lineClipper.clipStart(x, y);
 
-			final float[] projected = mPPoints;
+			final float[] projected = __projectedPoints;
 			int i = addPoint(projected, 0, x, y);
 
 			float prevX = x;
@@ -265,8 +279,8 @@ public class PathLayerMT extends Layer {
 
 			for (int j = 2; j < size * 2; j += 2) {
 
-				x = (int) ((mPreprojected[j + 0] - mx) * scale);
-				y = (int) ((mPreprojected[j + 1] - my) * scale);
+				x = (int) ((__preProjectedPoints[j + 0] - mx) * scale);
+				y = (int) ((__preProjectedPoints[j + 1] - my) * scale);
 
 				int flipDirection = 0;
 				if (x > maxx) {
@@ -283,7 +297,7 @@ public class PathLayerMT extends Layer {
 						ll.addLine(projected, i, false);
 					}
 
-					mClipper.clipStart(x, y);
+					__lineClipper.clipStart(x, y);
 					i = addPoint(projected, 0, x, y);
 					continue;
 				}
@@ -298,12 +312,12 @@ public class PathLayerMT extends Layer {
 						ll.addLine(projected, i, false);
 					}
 
-					mClipper.clipStart(x, y);
+					__lineClipper.clipStart(x, y);
 					i = addPoint(projected, 0, x, y);
 					continue;
 				}
 
-				final int clip = mClipper.clipNext(x, y);
+				final int clip = __lineClipper.clipNext(x, y);
 				if (clip < 1) {
 					if (i > 2) {
 						ll.addLine(projected, i, false);
@@ -311,7 +325,7 @@ public class PathLayerMT extends Layer {
 
 					if (clip < 0) {
 						/* add line segment */
-						segment = mClipper.getLine(segment, 0);
+						segment = __lineClipper.getLine(segment, 0);
 						ll.addLine(segment, 4, false);
 						// the prev point is the real point not the clipped point
 						//prevX = mClipper.outX2;
@@ -321,7 +335,7 @@ public class PathLayerMT extends Layer {
 					}
 					i = 0;
 					// if the end point is inside, add it
-					if (mClipper.getPrevOutcode() == 0) {
+					if (__lineClipper.getPrevOutcode() == 0) {
 						projected[i++] = prevX;
 						projected[i++] = prevY;
 					}
@@ -335,6 +349,7 @@ public class PathLayerMT extends Layer {
 					projected[i++] = prevY = y;
 				}
 			}
+
 			if (i > 2) {
 				ll.addLine(projected, i, false);
 			}
@@ -368,139 +383,24 @@ public class PathLayerMT extends Layer {
 
 		super(map);
 
-		mLineStyle = style;
+		_lineStyle = style;
 
-		mPoints = new ArrayList<>();
+		_geoPoints = new GeoPoint[] {};
 		_tourStarts = new TIntArrayList();
 
-		mRenderer = new RenderPath();
-		mWorker = new Worker(map);
+		mRenderer = new RenderPathLayer();
+		_simpleWorker = new Worker(map);
 	}
 
-	/**
-	 * Draw a great circle. Calculate a point for every 100km along the path.
-	 *
-	 * @param startPoint
-	 *            start point of the great circle
-	 * @param endPoint
-	 *            end point of the great circle
-	 */
-	public void addGreatCircle(final GeoPoint startPoint, final GeoPoint endPoint) {
-		synchronized (mPoints) {
+	public void setPoints(final GeoPoint[] geoPoints, final TIntArrayList tourStarts) {
 
-			/* get the great circle path length in meters */
-			final double length = startPoint.sphericalDistance(endPoint);
+		System.out.println(
+				(LocalTime.now().toString() + " [" + getClass().getSimpleName() + "] ") + ("\tupdatePoints()"));
+		// TODO remove SYSTEM.OUT.PRINTLN
 
-			/* add one point for every 100kms of the great circle path */
-			final int numberOfPoints = (int) (length / 100000);
+		synchronized (_geoPoints) {
 
-			addGreatCircle(startPoint, endPoint, numberOfPoints);
-		}
-	}
-
-	/**
-	 * Draw a great circle.
-	 *
-	 * @param startPoint
-	 *            start point of the great circle
-	 * @param endPoint
-	 *            end point of the great circle
-	 * @param numberOfPoints
-	 *            number of points to calculate along the path
-	 */
-	public void addGreatCircle(	final GeoPoint startPoint,
-								final GeoPoint endPoint,
-								final int numberOfPoints) {
-		// adapted from page
-		// http://compastic.blogspot.co.uk/2011/07/how-to-draw-great-circle-on-map-in.html
-		// which was adapted from page http://maps.forum.nu/gm_flight_path.html
-
-		// convert to radians
-		final double lat1 = startPoint.getLatitude() * Math.PI / 180;
-		final double lon1 = startPoint.getLongitude() * Math.PI / 180;
-		final double lat2 = endPoint.getLatitude() * Math.PI / 180;
-		final double lon2 = endPoint.getLongitude() * Math.PI / 180;
-
-		final double d = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin((lat1 - lat2) / 2), 2)
-				+ Math.cos(lat1) * Math.cos(lat2)
-						* Math.pow(Math.sin((lon1 - lon2) / 2), 2)));
-		double bearing = Math.atan2(
-				Math.sin(lon1 - lon2) * Math.cos(lat2),
-				Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1)
-						* Math.cos(lat2)
-						* Math.cos(lon1 - lon2))
-				/ -(Math.PI / 180);
-		bearing = bearing < 0 ? 360 + bearing : bearing;
-
-		for (int i = 0, j = numberOfPoints + 1; i < j; i++) {
-			final double f = 1.0 / numberOfPoints * i;
-			final double A = Math.sin((1 - f) * d) / Math.sin(d);
-			final double B = Math.sin(f * d) / Math.sin(d);
-			final double x = A * Math.cos(lat1) * Math.cos(lon1) + B * Math.cos(lat2)
-					* Math.cos(lon2);
-			final double y = A * Math.cos(lat1) * Math.sin(lon1) + B * Math.cos(lat2)
-					* Math.sin(lon2);
-			final double z = A * Math.sin(lat1) + B * Math.sin(lat2);
-
-			final double latN = Math.atan2(z, Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2)));
-			final double lonN = Math.atan2(y, x);
-			addPoint((int) (latN / (Math.PI / 180) * 1E6), (int) (lonN / (Math.PI / 180) * 1E6));
-		}
-	}
-
-	public void addPoint(final GeoPoint pt) {
-		synchronized (mPoints) {
-			mPoints.add(pt);
-		}
-		updatePoints();
-	}
-
-	public void addPoint(final int latitudeE6, final int longitudeE6) {
-		synchronized (mPoints) {
-			mPoints.add(new GeoPoint(latitudeE6, longitudeE6));
-		}
-		updatePoints();
-	}
-
-	public void addPoints(final Collection<? extends GeoPoint> pts) {
-		synchronized (mPoints) {
-			mPoints.addAll(pts);
-		}
-		updatePoints();
-	}
-
-	public void clearPath() {
-		if (mPoints.isEmpty()) {
-			return;
-		}
-
-		synchronized (mPoints) {
-			mPoints.clear();
-		}
-		updatePoints();
-	}
-
-	public List<GeoPoint> getPoints() {
-		return mPoints;
-	}
-
-	/**
-	 * FIXME To be removed
-	 *
-	 * @deprecated
-	 */
-	@Deprecated
-	public void setGeom(final GeometryBuffer geom) {
-		mGeom = geom;
-		mWorker.submit(10);
-	}
-
-	public void setPoints(final Collection<? extends GeoPoint> pts, final TIntArrayList tourStarts) {
-
-		synchronized (mPoints) {
-
-			mPoints.clear();
-			mPoints.addAll(pts);
+			_geoPoints = geoPoints;
 
 			_tourStarts.clear();
 			_tourStarts.addAll(tourStarts);
@@ -510,12 +410,20 @@ public class PathLayerMT extends Layer {
 	}
 
 	public void setStyle(final LineStyle style) {
-		mLineStyle = style;
+		_lineStyle = style;
 	}
 
 	private void updatePoints() {
 
-		mWorker.submit(1);
-		mUpdatePoints = true;
+//		synchronized (_simpleWorker) {
+//			if (_simpleWorker.isRunning()) {
+//				_simpleWorker.cancel(true);
+//			}
+//		}
+
+//		_simpleWorker.submit(66);
+
+		_isUpdatePoints = true;
+		_isUpdateLayer = true;
 	}
 }
