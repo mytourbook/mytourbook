@@ -32,6 +32,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.map25.action.ActionSelectMap25Provider;
+import net.tourbook.map25.action.ActionShowEntireTour;
 import net.tourbook.map25.action.ActionSynchMapWithChartSlider;
 import net.tourbook.map25.action.ActionSynchMapWithTour;
 import net.tourbook.photo.PhotoSelection;
@@ -92,8 +93,13 @@ public class Map25View extends ViewPart {
 	private ActionSelectMap25Provider		_actionSelectMapProvider;
 	private ActionSynchMapWithChartSlider	_actionSynchMapWithChartSlider;
 	private ActionSynchMapWithTour			_actionSynchMapWithTour;
+	private ActionShowEntireTour			_actionShowEntireTour;
 
 	private ArrayList<TourData>				_allTourData						= new ArrayList<>();
+	private TIntArrayList					_allTourStarts						= new TIntArrayList();
+	private GeoPoint[]						_allGeoPoints;
+	private BoundingBox						_allBoundingBox;
+
 	private int								_hashTourId;
 	private int								_hashTourData;
 
@@ -129,7 +135,7 @@ public class Map25View extends ViewPart {
 
 		_isSynchMapWithTour = _actionSynchMapWithTour.isChecked();
 
-		paintTours();
+		paintTours_AndUpdateMap();
 
 //		if (_isMapSynchedWithTour) {
 //
@@ -147,6 +153,30 @@ public class Map25View extends ViewPart {
 //			_isMapSynchedWithSlider = false;
 //			_actionSynchWithSlider.setChecked(false);
 //		}
+	}
+
+	public void actionZoomShowEntireTour() {
+
+		final Map map25 = _mapApp.getMap();
+
+		map25.post(new Runnable() {
+
+			@Override
+			public void run() {
+
+				final Animator animator = map25.animator();
+
+				animator.cancel();
+				animator.animateTo(//
+						2000,
+						_allBoundingBox,
+						Easing.Type.SINE_INOUT,
+						Animator.ANIM_MOVE | Animator.ANIM_SCALE);
+
+				map25.updateMap(true);
+			}
+		});
+
 	}
 
 	private void addPartListener() {
@@ -273,8 +303,27 @@ public class Map25View extends ViewPart {
 	private void createActions() {
 
 		_actionSelectMapProvider = new ActionSelectMap25Provider(this);
+		_actionShowEntireTour = new ActionShowEntireTour(this);
 		_actionSynchMapWithTour = new ActionSynchMapWithTour(this);
 		_actionSynchMapWithChartSlider = new ActionSynchMapWithChartSlider(this);
+	}
+
+	private BoundingBox createBoundingBox(final GeoPoint[] geoPoints) {
+
+		// this is optimized for performance by using an array which BoundingBox do no support
+		int minLat = Integer.MAX_VALUE;
+		int minLon = Integer.MAX_VALUE;
+		int maxLat = Integer.MIN_VALUE;
+		int maxLon = Integer.MIN_VALUE;
+
+		for (final GeoPoint geoPoint : geoPoints) {
+			minLat = Math.min(minLat, geoPoint.latitudeE6);
+			minLon = Math.min(minLon, geoPoint.longitudeE6);
+			maxLat = Math.max(maxLat, geoPoint.latitudeE6);
+			maxLon = Math.max(maxLon, geoPoint.longitudeE6);
+		}
+
+		return new BoundingBox(minLat, minLon, maxLat, maxLon);
 	}
 
 	@Override
@@ -334,13 +383,17 @@ public class Map25View extends ViewPart {
 		/*
 		 * fill view toolbar
 		 */
-		final IToolBarManager viewTbm = getViewSite().getActionBars().getToolBarManager();
+		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
-		viewTbm.add(_actionSynchMapWithTour);
-		viewTbm.add(_actionSynchMapWithChartSlider);
-		viewTbm.add(new Separator());
+//		tbm.add(new Separator());
 
-		viewTbm.add(_actionSelectMapProvider);
+//		tbm.add(_actionShowTourInMap3);
+		tbm.add(_actionShowEntireTour);
+		tbm.add(_actionSynchMapWithTour);
+		tbm.add(_actionSynchMapWithChartSlider);
+		tbm.add(new Separator());
+
+		tbm.add(_actionSelectMapProvider);
 
 		/*
 		 * fill view menu
@@ -585,93 +638,7 @@ public class Map25View extends ViewPart {
 		_allTourData.clear();
 		_allTourData.add(tourData);
 
-		paintTours();
-	}
-
-	private void paintTours() {
-
-		enableActions();
-
-		final PathLayerMT tourLayer = _mapApp.getTourLayer();
-		if (tourLayer == null) {
-
-			// tour layer is not yet created, this happened
-			return;
-		}
-
-		int geoSize = 0;
-
-		for (final TourData tourData : _allTourData) {
-
-			// check if GPS data are available
-			if (tourData.latitudeSerie != null) {
-				geoSize += tourData.latitudeSerie.length;
-			}
-		}
-
-		// use array to optimize performance when millions of points are created
-		final GeoPoint[] geoPoints = new GeoPoint[geoSize];
-		final TIntArrayList tourStarts = new TIntArrayList();
-
-		int tourIndex = 0;
-		int geoIndex = 0;
-
-		for (final TourData tourData : _allTourData) {
-
-			// check if GPS data are available
-			if (tourData.latitudeSerie == null) {
-				continue;
-			}
-
-			tourStarts.add(tourIndex);
-
-			final double[] latitudeSerie = tourData.latitudeSerie;
-			final double[] longitudeSerie = tourData.longitudeSerie;
-
-			// create vtm geo points
-			for (int serieIndex = 0; serieIndex < latitudeSerie.length; serieIndex++, tourIndex++) {
-				geoPoints[geoIndex++] = (new GeoPoint(latitudeSerie[serieIndex], longitudeSerie[serieIndex]));
-			}
-		}
-
-		tourLayer.setPoints(geoPoints, tourStarts);
-
-		final Map gdxMap = _mapApp.getMap();
-
-		gdxMap.post(new Runnable() {
-
-			@Override
-			public void run() {
-
-				if (_isSynchMapWithTour) {
-
-					// this is optimized for performance by using an array which BoundingBox do no support
-					int minLat = Integer.MAX_VALUE;
-					int minLon = Integer.MAX_VALUE;
-					int maxLat = Integer.MIN_VALUE;
-					int maxLon = Integer.MIN_VALUE;
-					for (final GeoPoint geoPoint : geoPoints) {
-						minLat = Math.min(minLat, geoPoint.latitudeE6);
-						minLon = Math.min(minLon, geoPoint.longitudeE6);
-						maxLat = Math.max(maxLat, geoPoint.latitudeE6);
-						maxLon = Math.max(maxLon, geoPoint.longitudeE6);
-					}
-
-					final BoundingBox bbox = new BoundingBox(minLat, minLon, maxLat, maxLon);
-
-					final Animator animator = gdxMap.animator();
-
-					animator.cancel();
-					animator.animateTo(//
-							800,
-							bbox,
-							Easing.Type.LINEAR,
-							Animator.ANIM_MOVE | Animator.ANIM_SCALE);
-				}
-
-				gdxMap.updateMap(true);
-			}
-		});
+		paintTours_AndUpdateMap();
 	}
 
 	private void paintTours(final ArrayList<Long> tourIdList) {
@@ -696,7 +663,82 @@ public class Map25View extends ViewPart {
 			_hashTourData = _allTourData.hashCode();
 		}
 
-		paintTours();
+		paintTours_AndUpdateMap();
+	}
+
+	private void paintTours_AndUpdateMap() {
+
+		enableActions();
+
+		final PathLayerMT tourLayer = _mapApp.getTourLayer();
+		if (tourLayer == null) {
+
+			// tour layer is not yet created, this happened
+			return;
+		}
+
+		int geoSize = 0;
+
+		for (final TourData tourData : _allTourData) {
+
+			// check if GPS data are available
+			if (tourData.latitudeSerie != null) {
+				geoSize += tourData.latitudeSerie.length;
+			}
+		}
+
+		// use array to optimize performance when millions of points are created
+		_allGeoPoints = new GeoPoint[geoSize];
+		_allTourStarts.clear();
+
+		int tourIndex = 0;
+		int geoIndex = 0;
+
+		for (final TourData tourData : _allTourData) {
+
+			// check if GPS data are available
+			if (tourData.latitudeSerie == null) {
+				continue;
+			}
+
+			_allTourStarts.add(tourIndex);
+
+			final double[] latitudeSerie = tourData.latitudeSerie;
+			final double[] longitudeSerie = tourData.longitudeSerie;
+
+			// create vtm geo points
+			for (int serieIndex = 0; serieIndex < latitudeSerie.length; serieIndex++, tourIndex++) {
+				_allGeoPoints[geoIndex++] = (new GeoPoint(latitudeSerie[serieIndex], longitudeSerie[serieIndex]));
+			}
+		}
+
+		tourLayer.setPoints(_allGeoPoints, _allTourStarts);
+
+		final Map map25 = _mapApp.getMap();
+
+		map25.post(new Runnable() {
+
+			@Override
+			public void run() {
+
+				// create outside isSynch that data are available when map is zoomed to show the whole tour
+				_allBoundingBox = createBoundingBox(_allGeoPoints);
+
+				if (_isSynchMapWithTour) {
+
+					final Animator animator = map25.animator();
+
+					animator.cancel();
+					animator.animateTo(//
+							2000,
+							_allBoundingBox,
+							Easing.Type.SINE_INOUT,
+							Animator.ANIM_MOVE | Animator.ANIM_SCALE);
+				}
+
+				map25.updateMap(true);
+			}
+		});
 	}
 
 	private void restoreState() {
@@ -744,7 +786,7 @@ public class Map25View extends ViewPart {
 					_allTourData.clear();
 					_allTourData.addAll(tourDataList);
 
-					paintTours();
+					paintTours_AndUpdateMap();
 				}
 			}
 		});
@@ -832,18 +874,18 @@ public class Map25View extends ViewPart {
 		final double latitude = latitudeSerie[valuesIndex];
 		final double longitude = tourData.longitudeSerie[valuesIndex];
 
-		final Map map = _mapApp.getMap();
+		final Map map25 = _mapApp.getMap();
 		final MapPosition currentMapPos = new MapPosition();
 
 		// get current position
-		map.viewport().getMapPosition(currentMapPos);
+		map25.viewport().getMapPosition(currentMapPos);
 
 		// set new position
 		currentMapPos.setPosition(latitude, longitude);
 
 		// update map
-		map.setMapPosition(currentMapPos);
-		map.render();
+		map25.setMapPosition(currentMapPos);
+		map25.render();
 	}
 
 	void updateUI_SelectedMapProvider(final Map25Provider selectedMapProvider) {
