@@ -32,6 +32,7 @@ import org.oscim.gdx.GestureHandlerImpl;
 import org.oscim.gdx.LwjglGL20;
 import org.oscim.gdx.MotionHandler;
 import org.oscim.layers.tile.TileManager;
+import org.oscim.layers.tile.vector.labeling.LabelLayer;
 import org.oscim.map.Layers;
 import org.oscim.map.Map;
 import org.oscim.map.ViewController;
@@ -421,12 +422,12 @@ public class Map25App extends GdxMap {
 		_tourLayer.setEnabled(true);
 		layers.add(_tourLayer);
 
-//		/*
-//		 * Other layers
-//		 */
+		/*
+		 * Other layers
+		 */
 //		layers.add(new BuildingLayer(mMap, _baseMap));
-//		layers.add(new LabelLayer(mMap, _baseMap));
-//
+		layers.add(new LabelLayer(mMap, _baseMap));
+
 //		/*
 //		 * Map Scale
 //		 */

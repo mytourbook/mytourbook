@@ -1070,6 +1070,16 @@ public class UI {
 		return isShiftKey;
 	}
 
+	public static String nanoTime(final int nanoValue) {
+
+		if (nanoValue > 0) {
+
+			return "0." + Integer.toString(nanoValue + 1000_000_000).substring(1);
+		}
+
+		return "0.0";
+	}
+
 	/**
 	 * Opens the control context menu, the menue is aligned below the control to the right side
 	 * 

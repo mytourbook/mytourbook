@@ -37,8 +37,6 @@ package net.tourbook.map25;
 
 import gnu.trove.list.array.TIntArrayList;
 
-import java.time.LocalTime;
-
 import org.oscim.backend.canvas.Paint.Cap;
 import org.oscim.core.GeoPoint;
 import org.oscim.core.GeometryBuffer;
@@ -106,9 +104,18 @@ public class PathLayerMT extends Layer {
 			/* update layers when map moved by at least one tile */
 			if (tx != __curX || ty != __curY || tz != __curZ || _isUpdateLayer) {
 
+				/*
+				 * It took me many days to find this solution that a newly selected tour is
+				 * displayed after the map position was moved/tilt/rotated. It works but I don't
+				 * know exacly why.
+				 */
+				if (_isUpdateLayer) {
+					_simpleWorker.cancel(true);
+				}
+
 				_isUpdateLayer = false;
 
-				_simpleWorker.submit(007);
+				_simpleWorker.submit(0);
 
 				__curX = tx;
 				__curY = ty;
@@ -169,23 +176,23 @@ public class PathLayerMT extends Layer {
 		@Override
 		public boolean doWork(final PathLayerTask task) {
 
-			int size = __numPoints;
+			int numPoints = __numPoints;
 
 			if (_isUpdatePoints) {
 
 				synchronized (_geoPoints) {
 
 					_isUpdatePoints = false;
-					__numPoints = size = _geoPoints.length;
+					__numPoints = numPoints = _geoPoints.length;
 
 					double[] points = __preProjectedPoints;
 
-					if (size * 2 >= points.length) {
-						points = __preProjectedPoints = new double[size * 2];
-						__projectedPoints = new float[size * 2];
+					if (numPoints * 2 >= points.length) {
+						points = __preProjectedPoints = new double[numPoints * 2];
+						__projectedPoints = new float[numPoints * 2];
 					}
 
-					for (int pointIndex = 0; pointIndex < size; pointIndex++) {
+					for (int pointIndex = 0; pointIndex < numPoints; pointIndex++) {
 						MercatorProjection.project(_geoPoints[pointIndex], points, pointIndex);
 					}
 				}
@@ -194,16 +201,16 @@ public class PathLayerMT extends Layer {
 
 				final GeometryBuffer geoBuffer = _geoBuffer;
 				_geoBuffer = null;
-				size = geoBuffer.index[0];
+				numPoints = geoBuffer.index[0];
 
 				double[] points = __preProjectedPoints;
 
-				if (size > points.length) {
-					points = __preProjectedPoints = new double[size * 2];
-					__projectedPoints = new float[size * 2];
+				if (numPoints > points.length) {
+					points = __preProjectedPoints = new double[numPoints * 2];
+					__projectedPoints = new float[numPoints * 2];
 				}
 
-				for (int pointIndex = 0; pointIndex < size; pointIndex += 2) {
+				for (int pointIndex = 0; pointIndex < numPoints; pointIndex += 2) {
 
 					MercatorProjection.project(
 							geoBuffer.points[pointIndex + 1],
@@ -212,10 +219,10 @@ public class PathLayerMT extends Layer {
 							pointIndex >> 1);
 				}
 
-				__numPoints = size = size >> 1;
+				__numPoints = numPoints = numPoints >> 1;
 			}
 
-			if (size == 0) {
+			if (numPoints == 0) {
 
 				if (task.__renderBuckets.get() != null) {
 					task.__renderBuckets.clear();
@@ -224,6 +231,16 @@ public class PathLayerMT extends Layer {
 
 				return true;
 			}
+
+			doWork_Rendering(task, numPoints);
+
+			// trigger redraw to let renderer fetch the result.
+			mMap.render();
+
+			return true;
+		}
+
+		private void doWork_Rendering(final PathLayerTask task, final int numPoints) {
 
 			LineBucket ll;
 
@@ -277,10 +294,10 @@ public class PathLayerMT extends Layer {
 
 			float[] segment = null;
 
-			for (int j = 2; j < size * 2; j += 2) {
+			for (int pointIndex = 2; pointIndex < numPoints * 2; pointIndex += 2) {
 
-				x = (int) ((__preProjectedPoints[j + 0] - mx) * scale);
-				y = (int) ((__preProjectedPoints[j + 1] - my) * scale);
+				x = (int) ((__preProjectedPoints[pointIndex + 0] - mx) * scale);
+				y = (int) ((__preProjectedPoints[pointIndex + 1] - my) * scale);
 
 				int flipDirection = 0;
 				if (x > maxx) {
@@ -302,7 +319,7 @@ public class PathLayerMT extends Layer {
 					continue;
 				}
 
-				if (j >= nextTourStartIndex) {
+				if (pointIndex >= nextTourStartIndex) {
 
 					// setup next tour
 					nextTourStartIndex = getNextTourStartIndex(++tourIndex);
@@ -353,12 +370,6 @@ public class PathLayerMT extends Layer {
 			if (i > 2) {
 				ll.addLine(projected, i, false);
 			}
-
-			// trigger redraw to let renderer fetch the result.
-			mMap.render();
-//			mMap.updateMap(true);
-
-			return true;
 		}
 
 		private int getNextTourStartIndex(final int tourIndex) {
@@ -394,10 +405,6 @@ public class PathLayerMT extends Layer {
 
 	public void setPoints(final GeoPoint[] geoPoints, final TIntArrayList tourStarts) {
 
-		System.out.println(
-				(LocalTime.now().toString() + " [" + getClass().getSimpleName() + "] ") + ("\tupdatePoints()"));
-		// TODO remove SYSTEM.OUT.PRINTLN
-
 		synchronized (_geoPoints) {
 
 			_geoPoints = geoPoints;
@@ -415,13 +422,7 @@ public class PathLayerMT extends Layer {
 
 	private void updatePoints() {
 
-//		synchronized (_simpleWorker) {
-//			if (_simpleWorker.isRunning()) {
-//				_simpleWorker.cancel(true);
-//			}
-//		}
-
-//		_simpleWorker.submit(66);
+		_simpleWorker.cancel(true);
 
 		_isUpdatePoints = true;
 		_isUpdateLayer = true;
