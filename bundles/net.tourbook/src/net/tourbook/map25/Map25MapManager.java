@@ -29,16 +29,20 @@ import net.tourbook.common.util.Util;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
 import org.osgi.framework.Bundle;
 
 import de.byteholder.geoclipse.mapprovider.IMapProviderListener;
 
-public class Map25Manager {
+public class Map25MapManager {
+
+	private static final String				ID							= "net.tourbook.map25.Map25Manager";		//$NON-NLS-1$
 
 // SET_FORMATTING_OFF
 	private static final Bundle				_bundle						= TourbookPlugin.getDefault().getBundle();
+	private static final IDialogSettings	_state						= TourbookPlugin.getState(ID);
 	private static final IPath				_stateLocation				= Platform.getStateLocation(_bundle);
 // SET_FORMATTING_ON
 

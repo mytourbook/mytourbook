@@ -37,6 +37,10 @@ package net.tourbook.map25;
 
 import gnu.trove.list.array.TIntArrayList;
 
+import net.tourbook.common.color.ColorUtil;
+import net.tourbook.map25.layer.tourtrack.TourTrackConfig;
+
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.oscim.backend.canvas.Paint.Cap;
 import org.oscim.core.GeoPoint;
 import org.oscim.core.GeometryBuffer;
@@ -56,8 +60,11 @@ import org.oscim.utils.geom.LineClipper;
 
 /**
  * This class draws a path line in given color or texture.
+ * <p>
+ * Example to handle track hover/selection
+ * org.oscim.layers.marker.ItemizedLayer.activateSelectedItems(MotionEvent, ActiveItem)
  */
-public class PathLayerMT extends Layer {
+public class TourLayer extends Layer {
 
 	/**
 	 * Stores points, converted to the map projection.
@@ -96,6 +103,10 @@ public class PathLayerMT extends Layer {
 
 		@Override
 		public synchronized void update(final GLViewport v) {
+
+			if (!isEnabled()) {
+				return;
+			}
 
 			final int tz = 1 << v.pos.zoomLevel;
 			final int tx = (int) (v.pos.x * tz);
@@ -176,6 +187,8 @@ public class PathLayerMT extends Layer {
 		@Override
 		public boolean doWork(final PathLayerTask task) {
 
+			final long start = System.nanoTime();
+
 			int numPoints = __numPoints;
 
 			if (_isUpdatePoints) {
@@ -237,20 +250,25 @@ public class PathLayerMT extends Layer {
 			// trigger redraw to let renderer fetch the result.
 			mMap.render();
 
+//			System.out.println(
+//					(UI.timeStampNano() + " " + this.getClass().getName() + " \t")
+//							+ (((float) (System.nanoTime() - start) / 1000000) + " ms"));
+//			// TODO remove SYSTEM.OUT.PRINTLN
+
 			return true;
 		}
 
 		private void doWork_Rendering(final PathLayerTask task, final int numPoints) {
 
-			LineBucket ll;
+			LineBucket lineBucket;
 
 			if (_lineStyle.stipple == 0 && _lineStyle.texture == null) {
-				ll = task.__renderBuckets.getLineBucket(0);
+				lineBucket = task.__renderBuckets.getLineBucket(0);
 			} else {
-				ll = task.__renderBuckets.getLineTexBucket(0);
+				lineBucket = task.__renderBuckets.getLineTexBucket(0);
 			}
 
-			ll.line = _lineStyle;
+			lineBucket.line = _lineStyle;
 
 			//ll.scale = ll.line.width;
 
@@ -311,7 +329,7 @@ public class PathLayerMT extends Layer {
 				if (flip != flipDirection) {
 					flip = flipDirection;
 					if (i > 2) {
-						ll.addLine(projected, i, false);
+						lineBucket.addLine(projected, i, false);
 					}
 
 					__lineClipper.clipStart(x, y);
@@ -326,7 +344,7 @@ public class PathLayerMT extends Layer {
 
 					// start a new line (copied from flip code)
 					if (i > 2) {
-						ll.addLine(projected, i, false);
+						lineBucket.addLine(projected, i, false);
 					}
 
 					__lineClipper.clipStart(x, y);
@@ -337,13 +355,13 @@ public class PathLayerMT extends Layer {
 				final int clip = __lineClipper.clipNext(x, y);
 				if (clip < 1) {
 					if (i > 2) {
-						ll.addLine(projected, i, false);
+						lineBucket.addLine(projected, i, false);
 					}
 
 					if (clip < 0) {
 						/* add line segment */
 						segment = __lineClipper.getLine(segment, 0);
-						ll.addLine(segment, 4, false);
+						lineBucket.addLine(segment, 4, false);
 						// the prev point is the real point not the clipped point
 						//prevX = mClipper.outX2;
 						//prevY = mClipper.outY2;
@@ -368,7 +386,7 @@ public class PathLayerMT extends Layer {
 			}
 
 			if (i > 2) {
-				ll.addLine(projected, i, false);
+				lineBucket.addLine(projected, i, false);
 			}
 		}
 
@@ -382,19 +400,11 @@ public class PathLayerMT extends Layer {
 		}
 	}
 
-	public PathLayerMT(final Map map, final int lineColor) {
-		this(map, lineColor, 2);
-	}
-
-	public PathLayerMT(final Map map, final int lineColor, final float lineWidth) {
-		this(map, new LineStyle(lineColor, lineWidth, Cap.BUTT));
-	}
-
-	public PathLayerMT(final Map map, final LineStyle style) {
+	public TourLayer(final Map map) {
 
 		super(map);
 
-		_lineStyle = style;
+		_lineStyle = createLineStyle();
 
 		_geoPoints = new GeoPoint[] {};
 		_tourStarts = new TIntArrayList();
@@ -403,21 +413,68 @@ public class PathLayerMT extends Layer {
 		_simpleWorker = new Worker(map);
 	}
 
+	private LineStyle createLineStyle() {
+
+		final TourTrackConfig trackConfig = TourTrackConfigManager.getActiveConfig();
+
+		return LineStyle
+
+				.builder()//
+
+				.strokeWidth(trackConfig.outlineWidth)
+				.color(ColorUtil.getARGB(trackConfig.outlineColor))
+				.cap(Cap.BUTT)
+
+				// this is not yet working
+				// .isOutline(true)
+
+				.build();
+	}
+
+	public void onModifyConfig() {
+
+		_lineStyle = createLineStyle();
+
+		_simpleWorker.submit(0);
+
+//		mMap.render();
+
+//		if (trackConfig.isRecreateTracks()) {
+//
+//			// track data has changed
+//
+//			Map3Manager.getMap3View().showAllTours(false);
+//
+//		} else {
+//
+//			for (final Renderable renderable : getRenderables()) {
+//
+//				if (renderable instanceof ITrackPath) {
+//					setPathAttributes((ITrackPath) renderable);
+//				}
+//			}
+//
+//			// ensure path modifications are redrawn
+//			Map3Manager.getWWCanvas().redraw();
+//		}
+	}
+
+	public void saveState(final IDialogSettings state) {
+
+		TourTrackConfigManager.saveState();
+	}
+
 	public void setPoints(final GeoPoint[] geoPoints, final TIntArrayList tourStarts) {
 
 		synchronized (_geoPoints) {
 
-			_geoPoints = geoPoints;
-
 			_tourStarts.clear();
 			_tourStarts.addAll(tourStarts);
+
+			_geoPoints = geoPoints;
 		}
 
 		updatePoints();
-	}
-
-	public void setStyle(final LineStyle style) {
-		_lineStyle = style;
 	}
 
 	private void updatePoints() {

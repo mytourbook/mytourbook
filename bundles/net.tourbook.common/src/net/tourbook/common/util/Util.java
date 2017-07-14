@@ -2180,6 +2180,19 @@ public class Util {
 
 	/**
 	 * @param xmlColor
+	 * @param rgb
+	 */
+	public static void setXmlRgb(final IMemento xmlColor, final RGB rgb) {
+
+		xmlColor.putInteger(ATTR_COLOR_RED, rgb.red);
+		xmlColor.putInteger(ATTR_COLOR_GREEN, rgb.green);
+		xmlColor.putInteger(ATTR_COLOR_BLUE, rgb.blue);
+	}
+
+	/**
+	 * Creates a child for the color.
+	 * 
+	 * @param xmlColor
 	 * @param tagName
 	 * @param rgb
 	 */

@@ -23,7 +23,7 @@ import java.util.HashMap;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.map2.Messages;
 import net.tourbook.map25.Map25App;
-import net.tourbook.map25.Map25Manager;
+import net.tourbook.map25.Map25MapManager;
 import net.tourbook.map25.Map25Provider;
 import net.tourbook.map25.Map25View;
 
@@ -88,7 +88,7 @@ public class ActionSelectMap25Provider extends Action implements IMenuCreator, I
 
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.image_action_change_tile_factory));
 
-		Map25Manager.addMapProviderListener(this);
+		Map25MapManager.addMapProviderListener(this);
 
 		_actionModifyMapProvider = new ActionManageMap25Providers();
 
@@ -108,7 +108,7 @@ public class ActionSelectMap25Provider extends Action implements IMenuCreator, I
 
 		_mapProviderActions.clear();
 
-		final ArrayList<Map25Provider> allMapProviders = Map25Manager.getAllMapProviders();
+		final ArrayList<Map25Provider> allMapProviders = Map25MapManager.getAllMapProviders();
 
 		Collections.sort(allMapProviders, new Comparator<Map25Provider>() {
 
@@ -141,7 +141,7 @@ public class ActionSelectMap25Provider extends Action implements IMenuCreator, I
 			_menu = null;
 		}
 
-		Map25Manager.removeMapProviderListener(this);
+		Map25MapManager.removeMapProviderListener(this);
 	}
 
 	@Override

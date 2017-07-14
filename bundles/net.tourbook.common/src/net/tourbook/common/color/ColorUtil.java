@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -93,5 +93,15 @@ public class ColorUtil {
 		} else {
 			return new Color(1, 1, 1, newAlpha);
 		}
+	}
+
+	public static int getARGB(final RGB color) {
+
+		final int graphColor = ((color.blue & 0xFF) << 0) //
+				| ((color.green & 0xFF) << 8)
+				| ((color.red & 0xFF) << 16)
+				| ((0xFF) << 24);
+
+		return graphColor;
 	}
 }

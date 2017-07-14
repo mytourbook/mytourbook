@@ -22,6 +22,7 @@ import net.tourbook.map25.Map25TileSource.Builder;
 import net.tourbook.map25.OkHttpEngineMT.OkHttpFactoryMT;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.swt.widgets.Display;
 import org.oscim.awt.AwtGraphics;
 import org.oscim.backend.GLAdapter;
 import org.oscim.core.MapPosition;
@@ -32,6 +33,7 @@ import org.oscim.gdx.GestureHandlerImpl;
 import org.oscim.gdx.LwjglGL20;
 import org.oscim.gdx.MotionHandler;
 import org.oscim.layers.tile.TileManager;
+import org.oscim.layers.tile.buildings.BuildingLayer;
 import org.oscim.layers.tile.vector.labeling.LabelLayer;
 import org.oscim.map.Layers;
 import org.oscim.map.Map;
@@ -71,9 +73,11 @@ public class Map25App extends GdxMap {
 	private Map25Provider			_selectedMapProvider;
 
 	private TileManager				_tileManager;
-	private OsmTileLayerMT			_baseMap;
-	private TileGridLayerMT			_gridLayer;
-	private PathLayerMT				_tourLayer;
+
+	private OsmTileLayerMT			_layer_baseMap;
+	private TileGridLayerMT			_layer_tileGrid;
+	private TourLayer				_layer_Tour;
+
 	private OkHttpFactoryMT			_httpFactory;
 
 	private long					_lastRenderTime;
@@ -163,6 +167,14 @@ public class Map25App extends GdxMap {
 		setupMap(_selectedMapProvider, tileSource);
 
 		restoreState();
+
+		// update actions in UI thread, run this AFTER the layers are created
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				_map25View.restoreState();
+			}
+		});
 	}
 
 	private UrlTileSource createTileSource(final Map25Provider mapProvider, final OkHttpFactoryMT httpFactory) {
@@ -209,8 +221,8 @@ public class Map25App extends GdxMap {
 		}
 	}
 
-	PathLayerMT getTourLayer() {
-		return _tourLayer;
+	public TourLayer getTourLayer() {
+		return _layer_Tour;
 	}
 
 	@Override
@@ -223,19 +235,17 @@ public class Map25App extends GdxMap {
 		case Input.Keys.T:
 
 			// show/hide tour layer
-
-			if (_tourLayer.isEnabled()) {
-
-				_tourLayer.setEnabled(false);
-				mMap.layers().remove(_tourLayer);
-
-			} else {
-
-				_tourLayer.setEnabled(true);
-				mMap.layers().add(_tourLayer);
-			}
+			_layer_Tour.setEnabled(!_layer_Tour.isEnabled());
 
 			mMap.render();
+
+			// update actions in UI thread
+			Display.getDefault().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					_map25View.updateActionsState();
+				}
+			});
 
 			return true;
 
@@ -243,17 +253,17 @@ public class Map25App extends GdxMap {
 
 			// show/hide grid layer
 
-			if (_gridLayer == null) {
-				_gridLayer = new TileGridLayerMT(mMap);
-				_gridLayer.setEnabled(true);
-				mMap.layers().add(_gridLayer);
+			if (_layer_tileGrid == null) {
+				_layer_tileGrid = new TileGridLayerMT(mMap);
+				_layer_tileGrid.setEnabled(true);
+				mMap.layers().add(_layer_tileGrid);
 			} else {
-				if (_gridLayer.isEnabled()) {
-					_gridLayer.setEnabled(false);
-					mMap.layers().remove(_gridLayer);
+				if (_layer_tileGrid.isEnabled()) {
+					_layer_tileGrid.setEnabled(false);
+					mMap.layers().remove(_layer_tileGrid);
 				} else {
-					_gridLayer.setEnabled(true);
-					mMap.layers().add(_gridLayer);
+					_layer_tileGrid.setEnabled(true);
+					mMap.layers().add(_layer_tileGrid);
 				}
 			}
 
@@ -295,7 +305,7 @@ public class Map25App extends GdxMap {
 		final long renderTime = System.currentTimeMillis();
 		if (renderTime > _lastRenderTime + 1000) {
 
-			final Map25DebugView vtmDebugView = Map25Manager.getMap25DebugView();
+			final Map25DebugView vtmDebugView = Map25MapManager.getMap25DebugView();
 			if (vtmDebugView != null) {
 
 				_lastRenderTime = renderTime;
@@ -350,9 +360,9 @@ public class Map25App extends GdxMap {
 		final String mpId = Util.getStateString(
 				_state,
 				STATE_SELECTED_MAP25_PROVIDER_ID,
-				Map25Manager.getDefaultMapProvider().getId());
+				Map25MapManager.getDefaultMapProvider().getId());
 
-		return Map25Manager.getMapProvider(mpId);
+		return Map25MapManager.getMapProvider(mpId);
 	}
 
 	private void saveState() {
@@ -373,7 +383,7 @@ public class Map25App extends GdxMap {
 
 		final UrlTileSource tileSource = createTileSource(mapProvider, _httpFactory);
 
-		_baseMap.setTileSource(tileSource);
+		_layer_baseMap.setTileSource(tileSource);
 		mMap.setTheme(getTheme(mapProvider));
 
 		_selectedMapProvider = mapProvider;
@@ -381,16 +391,16 @@ public class Map25App extends GdxMap {
 
 	private void setupMap(final Map25Provider mapProvider, final UrlTileSource tileSource) {
 
-		_baseMap = new OsmTileLayerMT(mMap);
+		_layer_baseMap = new OsmTileLayerMT(mMap);
 
-		_tileManager = _baseMap.getManager();
+		_tileManager = _layer_baseMap.getManager();
 
-		_baseMap.setTileSource(tileSource);
+		_layer_baseMap.setTileSource(tileSource);
 
 // THIS IS NOT YET WORKING
 //		mapLayer.setNumLoaders(10);
 
-		mMap.setBaseMap(_baseMap);
+		mMap.setBaseMap(_layer_baseMap);
 
 		setupMap_Layers();
 
@@ -415,18 +425,16 @@ public class Map25App extends GdxMap {
 		/*
 		 * Tour layer
 		 */
-		final int lineColor = 0xffff0000;
-		final float lineWidth = 2.5f;
 
-		_tourLayer = new PathLayerMT(mMap, lineColor, lineWidth);
-		_tourLayer.setEnabled(true);
-		layers.add(_tourLayer);
+		_layer_Tour = new TourLayer(mMap);
+//		_layer_Tour.setEnabled(true);
+		layers.add(_layer_Tour);
 
 		/*
 		 * Other layers
 		 */
-//		layers.add(new BuildingLayer(mMap, _baseMap));
-		layers.add(new LabelLayer(mMap, _baseMap));
+		layers.add(new BuildingLayer(mMap, _layer_baseMap));
+		layers.add(new LabelLayer(mMap, _layer_baseMap));
 
 //		/*
 //		 * Map Scale

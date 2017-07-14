@@ -28,13 +28,20 @@ import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
+import net.tourbook.common.tooltip.ActionToolbarSlideout;
+import net.tourbook.common.tooltip.IOpeningDialog;
+import net.tourbook.common.tooltip.OpenDialogManager;
+import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.importdata.RawDataManager;
+import net.tourbook.map2.Messages;
 import net.tourbook.map25.action.ActionSelectMap25Provider;
 import net.tourbook.map25.action.ActionShowEntireTour;
 import net.tourbook.map25.action.ActionSynchMapWithChartSlider;
 import net.tourbook.map25.action.ActionSynchMapWithTour;
+import net.tourbook.map25.ui.SlideoutMap25Options;
+import net.tourbook.map25.ui.SlideoutTourTrackConfig;
 import net.tourbook.photo.PhotoSelection;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
@@ -50,12 +57,14 @@ import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
@@ -72,16 +81,26 @@ import de.byteholder.gpx.PointOfInterest;
 
 public class Map25View extends ViewPart {
 
-	public static final String				ID									= "net.tourbook.map25.Map25View";		//$NON-NLS-1$
+// SET_FORMATTING_OFF
+	
+	public static final String		ID										= "net.tourbook.map25.Map25View";				//$NON-NLS-1$
+	
+	private static final String		STATE_IS_TOUR_VISIBLE					= "STATE_IS_TOUR_VISIBLE";						//$NON-NLS-1$
+	private static final String		STATE_IS_SYNCH_MAP_WITH_CHART_SLIDER	= "STATE_SYNCH_MAP_WITH_CHART_SLIDER";			//$NON-NLS-1$
+	private static final String		STATE_IS_SYNCH_MAP_WITH_TOUR			= "STATE_SYNCH_MAP_WITH_TOUR";					//$NON-NLS-1$
+	
+	private static final ImageDescriptor	_actionImageDescriptor			= TourbookPlugin.getImageDescriptor(Messages.image_action_show_tour_in_map);
+	private static final ImageDescriptor	_actionImageDescriptorDisabled	= TourbookPlugin.getImageDescriptor(Messages.image_action_show_tour_in_map_disabled);
+	
+// SET_FORMATTING_ON
 
-	private static final IDialogSettings	_state								= TourbookPlugin.getState(ID);
-
-	private static final String				STATE_SYNCH_MAP_WITH_CHART_SLIDER	= "STATE_SYNCH_MAP_WITH_CHART_SLIDER";	//$NON-NLS-1$
-	private static final String				STATE_SYNCH_MAP_WITH_TOUR			= "STATE_SYNCH_MAP_WITH_TOUR";			//$NON-NLS-1$
+	private static final IDialogSettings	_state									= TourbookPlugin.getState(ID);
 
 	private Map25App						_mapApp;
 
-	protected boolean						_isPartVisible;
+	private OpenDialogManager				_openDlgMgr								= new OpenDialogManager();
+
+	private boolean							_isPartVisible;
 
 	private IPartListener2					_partListener;
 	private ISelectionListener				_postSelectionListener;
@@ -90,13 +109,15 @@ public class Map25View extends ViewPart {
 	private ISelection						_lastHiddenSelection;
 	private ISelection						_selectionWhenHidden;
 
+	private ActionMap25Options				_actionMap25Options;
 	private ActionSelectMap25Provider		_actionSelectMapProvider;
 	private ActionSynchMapWithChartSlider	_actionSynchMapWithChartSlider;
 	private ActionSynchMapWithTour			_actionSynchMapWithTour;
 	private ActionShowEntireTour			_actionShowEntireTour;
+	private ActionTourTrackConfig			_actionTourTrackConfig;
 
-	private ArrayList<TourData>				_allTourData						= new ArrayList<>();
-	private TIntArrayList					_allTourStarts						= new TIntArrayList();
+	private ArrayList<TourData>				_allTourData							= new ArrayList<>();
+	private TIntArrayList					_allTourStarts							= new TIntArrayList();
 	private GeoPoint[]						_allGeoPoints;
 	private BoundingBox						_allBoundingBox;
 
@@ -110,10 +131,58 @@ public class Map25View extends ViewPart {
 	 * UI controls
 	 */
 	private Composite						_swtContainer;
+	private Composite						_parent;
 
-	public void action_MapProvider_OpenScience() {
-		// TODO Auto-generated method stub
+	private class ActionMap25Options extends ActionToolbarSlideout {
 
+		@Override
+		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+
+			return new SlideoutMap25Options(_parent, toolbar, Map25View.this);
+		}
+
+		@Override
+		protected void onBeforeOpenSlideout() {
+			closeOpenedDialogs(this);
+		}
+	}
+
+	private class ActionTourTrackConfig extends ActionToolbarSlideout {
+
+		public ActionTourTrackConfig() {
+
+			super(_actionImageDescriptor, _actionImageDescriptorDisabled);
+
+			isToggleAction = true;
+			notSelectedTooltip = Messages.map_action_show_tour_in_map;
+		}
+
+		@Override
+		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+
+			return new SlideoutTourTrackConfig(_parent, toolbar, Map25View.this);
+		}
+
+		@Override
+		protected void onBeforeOpenSlideout() {
+			closeOpenedDialogs(this);
+		}
+
+		@Override
+		protected void onSelect() {
+
+			super.onSelect();
+
+			actionShowTour(getSelection());
+		}
+	}
+
+	public void actionShowTour(final boolean isTrackVisible) {
+
+		_mapApp.getTourLayer().setEnabled(isTrackVisible);
+		_mapApp.getMap().render();
+
+		updateActionsState();
 	}
 
 	public void actionSynchMapPositionWithSlider() {
@@ -156,6 +225,15 @@ public class Map25View extends ViewPart {
 	}
 
 	public void actionZoomShowEntireTour() {
+
+		if (_allBoundingBox == null) {
+
+			// a tour is not yet displayed
+
+			showToursFromTourProvider();
+
+			return;
+		}
 
 		final Map map25 = _mapApp.getMap();
 
@@ -300,12 +378,23 @@ public class Map25View extends ViewPart {
 
 	}
 
+	/**
+	 * Close all opened dialogs except the opening dialog.
+	 * 
+	 * @param openingDialog
+	 */
+	public void closeOpenedDialogs(final IOpeningDialog openingDialog) {
+		_openDlgMgr.closeOpenedDialogs(openingDialog);
+	}
+
 	private void createActions() {
 
+		_actionMap25Options = new ActionMap25Options();
 		_actionSelectMapProvider = new ActionSelectMap25Provider(this);
 		_actionShowEntireTour = new ActionShowEntireTour(this);
 		_actionSynchMapWithTour = new ActionSynchMapWithTour(this);
 		_actionSynchMapWithChartSlider = new ActionSynchMapWithChartSlider(this);
+		_actionTourTrackConfig = new ActionTourTrackConfig();
 	}
 
 	private BoundingBox createBoundingBox(final GeoPoint[] geoPoints) {
@@ -328,6 +417,8 @@ public class Map25View extends ViewPart {
 
 	@Override
 	public void createPartControl(final Composite parent) {
+
+		_parent = parent;
 
 		createActions();
 		fillActionBars();
@@ -372,10 +463,6 @@ public class Map25View extends ViewPart {
 
 	private void enableActions() {
 
-		final boolean canSyncTour = _allTourData.size() > 0;
-
-		_actionSynchMapWithTour.setEnabled(canSyncTour);
-
 	}
 
 	private void fillActionBars() {
@@ -385,14 +472,14 @@ public class Map25View extends ViewPart {
 		 */
 		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
-//		tbm.add(new Separator());
-
-//		tbm.add(_actionShowTourInMap3);
+		tbm.add(_actionTourTrackConfig);
 		tbm.add(_actionShowEntireTour);
 		tbm.add(_actionSynchMapWithTour);
 		tbm.add(_actionSynchMapWithChartSlider);
+
 		tbm.add(new Separator());
 
+		tbm.add(_actionMap25Options);
 		tbm.add(_actionSelectMapProvider);
 
 		/*
@@ -405,6 +492,11 @@ public class Map25View extends ViewPart {
 
 	public Map25App getMapApp() {
 		return _mapApp;
+	}
+
+	public void onModifyConfig() {
+		// TODO Auto-generated method stub
+
 	}
 
 	private void onSelectionChanged(final ISelection selection) {
@@ -669,8 +761,9 @@ public class Map25View extends ViewPart {
 	private void paintTours_AndUpdateMap() {
 
 		enableActions();
+		updateActionsState();
 
-		final PathLayerMT tourLayer = _mapApp.getTourLayer();
+		final TourLayer tourLayer = _mapApp.getTourLayer();
 		if (tourLayer == null) {
 
 			// tour layer is not yet created, this happened
@@ -741,24 +834,36 @@ public class Map25View extends ViewPart {
 		});
 	}
 
-	private void restoreState() {
+	void restoreState() {
+
+		// tour
+		final boolean isTourVisible = Util.getStateBoolean(_state, STATE_IS_TOUR_VISIBLE, true);
+		_actionTourTrackConfig.setSelection(isTourVisible);
+		_mapApp.getTourLayer().setEnabled(isTourVisible);
 
 		// checkbox: synch map with tour
-		final boolean isSynchTour = Util.getStateBoolean(_state, STATE_SYNCH_MAP_WITH_TOUR, true);
+		final boolean isSynchTour = Util.getStateBoolean(_state, STATE_IS_SYNCH_MAP_WITH_TOUR, true);
 		_actionSynchMapWithTour.setChecked(isSynchTour);
 		_isSynchMapWithTour = isSynchTour;
 
 		// checkbox: synch map with chart slider
-		final boolean isSynchWithSlider = Util.getStateBoolean(_state, STATE_SYNCH_MAP_WITH_CHART_SLIDER, true);
+		final boolean isSynchWithSlider = Util.getStateBoolean(_state, STATE_IS_SYNCH_MAP_WITH_CHART_SLIDER, true);
 		_actionSynchMapWithChartSlider.setChecked(isSynchWithSlider);
 		_isSynchMapWithChartSlider = isSynchWithSlider;
 
+		updateActionsState();
 	}
 
 	private void saveState() {
 
-		_state.put(STATE_SYNCH_MAP_WITH_CHART_SLIDER, _actionSynchMapWithChartSlider.isChecked());
-		_state.put(STATE_SYNCH_MAP_WITH_TOUR, _actionSynchMapWithTour.isChecked());
+		final TourLayer tourLayer = _mapApp.getTourLayer();
+
+		_state.put(STATE_IS_SYNCH_MAP_WITH_CHART_SLIDER, _actionSynchMapWithChartSlider.isChecked());
+		_state.put(STATE_IS_SYNCH_MAP_WITH_TOUR, _actionSynchMapWithTour.isChecked());
+
+		_state.put(STATE_IS_TOUR_VISIBLE, tourLayer.isEnabled());
+
+		tourLayer.saveState(_state);
 	}
 
 	@Override
@@ -778,8 +883,6 @@ public class Map25View extends ViewPart {
 					return;
 				}
 
-				restoreState();
-
 				final ArrayList<TourData> tourDataList = TourManager.getSelectedTours();
 				if (tourDataList != null) {
 
@@ -788,6 +891,8 @@ public class Map25View extends ViewPart {
 
 					paintTours_AndUpdateMap();
 				}
+
+				updateActionsState();
 			}
 		});
 	}
@@ -825,8 +930,8 @@ public class Map25View extends ViewPart {
 //					tourData,
 //					chartInfo.leftSliderValuesIndex,
 //					chartInfo.rightSliderValuesIndex);
-//
-//			updateActionsState();
+
+			updateActionsState();
 		}
 	}
 
@@ -855,8 +960,8 @@ public class Map25View extends ViewPart {
 //					tourData,
 //					leftSliderValuesIndex,
 //					rightSliderValuesIndex);
-//
-//			updateActionsState();
+
+			updateActionsState();
 		}
 	}
 
@@ -886,6 +991,28 @@ public class Map25View extends ViewPart {
 		// update map
 		map25.setMapPosition(currentMapPos);
 		map25.render();
+	}
+
+	/**
+	 * Enable actions according to the available tours in {@link #_allTours}.
+	 */
+	void updateActionsState() {
+
+		final TourLayer tourLayer = _mapApp.getTourLayer();
+
+		final boolean isTourAvailable = _allTourData.size() > 0;
+		final boolean isTrackLayerVisible = tourLayer == null ? false : tourLayer.isEnabled();
+		final boolean isTrackSliderVisible = true;
+
+		final boolean canShowTour = isTourAvailable && isTrackLayerVisible;
+
+		_actionSynchMapWithChartSlider.setEnabled(canShowTour);
+		_actionSynchMapWithTour.setEnabled(canShowTour);
+		_actionShowEntireTour.setEnabled(canShowTour);
+
+		_actionTourTrackConfig.setSelection(isTrackLayerVisible);
+		_actionTourTrackConfig.setEnabled(isTourAvailable);
+
 	}
 
 	void updateUI_SelectedMapProvider(final Map25Provider selectedMapProvider) {
