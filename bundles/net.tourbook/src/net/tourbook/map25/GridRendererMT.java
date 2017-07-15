@@ -39,11 +39,9 @@ public class GridRendererMT extends BucketRenderer {
 	private final LineBucket		mLineBucket;
 	private final GeometryBuffer	mLines;
 
-	private int						mCurX, mCurY, mCurZ;
+	private TileGridLayerMT			_tileGridLayerMT;
 
-	public GridRendererMT() {
-		this(1);
-	}
+	private int						mCurX, mCurY, mCurZ;
 
 	public GridRendererMT(final float scale) {
 
@@ -98,6 +96,13 @@ public class GridRendererMT extends BucketRenderer {
 			mLineBucket.addLine(mLines);
 			buckets.set(mLineBucket);
 		}
+	}
+
+	public GridRendererMT(final TileGridLayerMT tileGridLayerMT) {
+
+		this(1);
+
+		_tileGridLayerMT = tileGridLayerMT;
 	}
 
 	private void addLabels(final int x, final int y, final int z, final MapPosition mapPosition) {
@@ -163,6 +168,10 @@ public class GridRendererMT extends BucketRenderer {
 
 	@Override
 	public void update(final GLViewport viewport) {
+
+		if (!_tileGridLayerMT.isEnabled()) {
+			return;
+		}
 
 		final MapPosition mapPosition = viewport.pos;
 

@@ -17,27 +17,16 @@
  */
 package net.tourbook.map25;
 
-import org.oscim.backend.canvas.Paint.Cap;
-import org.oscim.layers.GenericLayer;
+import org.oscim.layers.Layer;
 import org.oscim.map.Map;
-import org.oscim.theme.styles.LineStyle;
-import org.oscim.theme.styles.TextStyle;
 
-public class TileGridLayerMT extends GenericLayer {
+public class TileGridLayerMT extends Layer {
 
 	public TileGridLayerMT(final Map map) {
-		super(map, new GridRendererMT());
+
+		super(map);
+
+		mRenderer = new GridRendererMT(this);
 	}
 
-	public TileGridLayerMT(final Map map, final float scale) {
-		super(map, new GridRendererMT(scale));
-	}
-
-	public TileGridLayerMT(final Map map, final int color, final float width, final int repeat) {
-		super(map, new GridRendererMT(repeat, new LineStyle(color, width, Cap.BUTT), null));
-	}
-
-	public TileGridLayerMT(final Map map, final int color, final float width, final TextStyle text, final int repeat) {
-		super(map, new GridRendererMT(repeat, new LineStyle(color, width, Cap.BUTT), text));
-	}
 }

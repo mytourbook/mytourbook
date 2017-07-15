@@ -15,12 +15,10 @@
  *******************************************************************************/
 package net.tourbook.map25.ui;
 
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.map25.Map25App;
 import net.tourbook.map25.Map25View;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -42,9 +40,9 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class SlideoutMap25Options extends ToolbarSlideout {
 
-	private SelectionAdapter	_defaultSelectionListener;
+	private SelectionAdapter	_layerSelectionListener;
 
-	private Action				_actionRestoreDefaults;
+//	private Action				_actionRestoreDefaults;
 
 	private PixelConverter		_pc;
 
@@ -59,9 +57,10 @@ public class SlideoutMap25Options extends ToolbarSlideout {
 	 * UI controls
 	 */
 	private Button		_chkShowLayer_Building;
-	private Button		_chkShowLayer_Map;
+	private Button		_chkShowLayer_TileInfo;
+	private Button		_chkShowLayer_BaseMap;
 	private Button		_chkShowLayer_Scale;
-	private Button		_chkShowLayer_TextLabel;
+	private Button		_chkShowLayer_Label;
 
 	/**
 	 * @param ownerControl
@@ -82,16 +81,16 @@ public class SlideoutMap25Options extends ToolbarSlideout {
 		/*
 		 * Action: Restore default
 		 */
-		_actionRestoreDefaults = new Action() {
-			@Override
-			public void run() {
-				resetToDefaults();
-			}
-		};
-
-		_actionRestoreDefaults.setImageDescriptor(//
-				TourbookPlugin.getImageDescriptor(Messages.Image__App_RestoreDefault));
-		_actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
+//		_actionRestoreDefaults = new Action() {
+//			@Override
+//			public void run() {
+//				resetToDefaults();
+//			}
+//		};
+//
+//		_actionRestoreDefaults.setImageDescriptor(//
+//				TourbookPlugin.getImageDescriptor(Messages.Image__App_RestoreDefault));
+//		_actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
 	}
 
 	@Override
@@ -157,7 +156,7 @@ public class SlideoutMap25Options extends ToolbarSlideout {
 
 		final ToolBarManager tbm = new ToolBarManager(toolbar);
 
-		tbm.add(_actionRestoreDefaults);
+//		tbm.add(_actionRestoreDefaults);
 
 		tbm.update(true);
 	}
@@ -177,17 +176,17 @@ public class SlideoutMap25Options extends ToolbarSlideout {
 				/*
 				 * Text label
 				 */
-				_chkShowLayer_TextLabel = new Button(group, SWT.CHECK);
-				_chkShowLayer_TextLabel.setText("Text &label");
-				_chkShowLayer_TextLabel.addSelectionListener(_defaultSelectionListener);
+				_chkShowLayer_Label = new Button(group, SWT.CHECK);
+				_chkShowLayer_Label.setText("&Label + Symbol");
+				_chkShowLayer_Label.addSelectionListener(_layerSelectionListener);
 			}
 			{
 				/*
 				 * Building
 				 */
 				_chkShowLayer_Building = new Button(group, SWT.CHECK);
-				_chkShowLayer_Building.setText("&Building");
-				_chkShowLayer_Building.addSelectionListener(_defaultSelectionListener);
+				_chkShowLayer_Building.setText("&3D Building");
+				_chkShowLayer_Building.addSelectionListener(_layerSelectionListener);
 			}
 			{
 				/*
@@ -195,15 +194,25 @@ public class SlideoutMap25Options extends ToolbarSlideout {
 				 */
 				_chkShowLayer_Scale = new Button(group, SWT.CHECK);
 				_chkShowLayer_Scale.setText("&Scale bar");
-				_chkShowLayer_Scale.addSelectionListener(_defaultSelectionListener);
+				_chkShowLayer_Scale.addSelectionListener(_layerSelectionListener);
 			}
 			{
 				/*
 				 * Map
 				 */
-				_chkShowLayer_Map = new Button(group, SWT.CHECK);
-				_chkShowLayer_Map.setText("&Map (background)");
-				_chkShowLayer_Map.addSelectionListener(_defaultSelectionListener);
+				_chkShowLayer_BaseMap = new Button(group, SWT.CHECK);
+				_chkShowLayer_BaseMap.setText("&Cartography");
+				_chkShowLayer_BaseMap.setToolTipText(
+						"When hiding this layer then label + symbols will not be updated !");
+				_chkShowLayer_BaseMap.addSelectionListener(_layerSelectionListener);
+			}
+			{
+				/*
+				 * Tile info
+				 */
+				_chkShowLayer_TileInfo = new Button(group, SWT.CHECK);
+				_chkShowLayer_TileInfo.setText("&Tile info");
+				_chkShowLayer_TileInfo.addSelectionListener(_layerSelectionListener);
 			}
 		}
 	}
@@ -212,30 +221,36 @@ public class SlideoutMap25Options extends ToolbarSlideout {
 
 		_pc = new PixelConverter(parent);
 
-		_defaultSelectionListener = new SelectionAdapter() {
+		_layerSelectionListener = new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
-				onChangeUI();
+				onModifyLayer();
 			}
 		};
 	}
 
-	private void onChangeUI() {
+	private void onModifyLayer() {
 
-		saveState();
-	}
+		final Map25App mapApp = _map25View.getMapApp();
 
-	private void resetToDefaults() {
+		mapApp.getLayer_BaseMap().setEnabled(_chkShowLayer_BaseMap.getSelection());
+		mapApp.getLayer_Building().setEnabled(_chkShowLayer_Building.getSelection());
+		mapApp.getLayer_Label().setEnabled(_chkShowLayer_Label.getSelection());
+		mapApp.getLayer_TileInfo().setEnabled(_chkShowLayer_TileInfo.getSelection());
+		mapApp.getLayer_ScaleBar().setEnabled(_chkShowLayer_Scale.getSelection());
 
-		onChangeUI();
+		mapApp.getMap().updateMap(true);
 	}
 
 	private void restoreState() {
 
-	}
+		final Map25App mapApp = _map25View.getMapApp();
 
-	private void saveState() {
-
+		_chkShowLayer_BaseMap.setSelection(mapApp.getLayer_BaseMap().isEnabled());
+		_chkShowLayer_Building.setSelection(mapApp.getLayer_Building().isEnabled());
+		_chkShowLayer_Label.setSelection(mapApp.getLayer_Label().isEnabled());
+		_chkShowLayer_TileInfo.setSelection(mapApp.getLayer_TileInfo().isEnabled());
+		_chkShowLayer_Scale.setSelection(mapApp.getLayer_ScaleBar().isEnabled());
 	}
 
 }

@@ -85,7 +85,13 @@ public class Map25View extends ViewPart {
 	
 	public static final String		ID										= "net.tourbook.map25.Map25View";				//$NON-NLS-1$
 	
-	private static final String		STATE_IS_TOUR_VISIBLE					= "STATE_IS_TOUR_VISIBLE";						//$NON-NLS-1$
+	private static final String		STATE_IS_LAYER_BASE_MAP_VISIBLE			= "STATE_IS_LAYER_BASE_MAP_VISIBLE";			//$NON-NLS-1$
+	private static final String		STATE_IS_LAYER_BUILDING_VISIBLE			= "STATE_IS_LAYER_BUILDING_VISIBLE";			//$NON-NLS-1$
+	private static final String		STATE_IS_LAYER_LABEL_VISIBLE			= "STATE_IS_LAYER_LABEL_VISIBLE";				//$NON-NLS-1$
+	private static final String		STATE_IS_LAYER_TILE_INFO_VISIBLE		= "STATE_IS_LAYER_TILE_INFO_VISIBLE";			//$NON-NLS-1$
+	private static final String		STATE_IS_LAYER_TOUR_VISIBLE				= "STATE_IS_LAYER_TOUR_VISIBLE";				//$NON-NLS-1$
+	private static final String		STATE_IS_LAYER_SCALE_BAR_VISIBLE		= "STATE_IS_LAYER_SCALE_BAR_VISIBLE";			//$NON-NLS-1$
+	
 	private static final String		STATE_IS_SYNCH_MAP_WITH_CHART_SLIDER	= "STATE_SYNCH_MAP_WITH_CHART_SLIDER";			//$NON-NLS-1$
 	private static final String		STATE_IS_SYNCH_MAP_WITH_TOUR			= "STATE_SYNCH_MAP_WITH_TOUR";					//$NON-NLS-1$
 	
@@ -179,7 +185,7 @@ public class Map25View extends ViewPart {
 
 	public void actionShowTour(final boolean isTrackVisible) {
 
-		_mapApp.getTourLayer().setEnabled(isTrackVisible);
+		_mapApp.getLayer_Tour().setEnabled(isTrackVisible);
 		_mapApp.getMap().render();
 
 		updateActionsState();
@@ -763,7 +769,7 @@ public class Map25View extends ViewPart {
 		enableActions();
 		updateActionsState();
 
-		final TourLayer tourLayer = _mapApp.getTourLayer();
+		final TourLayer tourLayer = _mapApp.getLayer_Tour();
 		if (tourLayer == null) {
 
 			// tour layer is not yet created, this happened
@@ -836,11 +842,24 @@ public class Map25View extends ViewPart {
 
 	void restoreState() {
 
+		/*
+		 * Layer
+		 */
 		// tour
-		final boolean isTourVisible = Util.getStateBoolean(_state, STATE_IS_TOUR_VISIBLE, true);
+		final boolean isTourVisible = Util.getStateBoolean(_state, STATE_IS_LAYER_TOUR_VISIBLE, true);
 		_actionTourTrackConfig.setSelection(isTourVisible);
-		_mapApp.getTourLayer().setEnabled(isTourVisible);
+		_mapApp.getLayer_Tour().setEnabled(isTourVisible);
 
+		// other layers
+		_mapApp.getLayer_BaseMap().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_BASE_MAP_VISIBLE, true));
+		_mapApp.getLayer_Building().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_BUILDING_VISIBLE, true));
+		_mapApp.getLayer_Label().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_LABEL_VISIBLE, true));
+		_mapApp.getLayer_ScaleBar().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_SCALE_BAR_VISIBLE, true));
+		_mapApp.getLayer_TileInfo().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_TILE_INFO_VISIBLE, false));
+
+		/*
+		 * Other actions
+		 */
 		// checkbox: synch map with tour
 		final boolean isSynchTour = Util.getStateBoolean(_state, STATE_IS_SYNCH_MAP_WITH_TOUR, true);
 		_actionSynchMapWithTour.setChecked(isSynchTour);
@@ -856,14 +875,17 @@ public class Map25View extends ViewPart {
 
 	private void saveState() {
 
-		final TourLayer tourLayer = _mapApp.getTourLayer();
-
 		_state.put(STATE_IS_SYNCH_MAP_WITH_CHART_SLIDER, _actionSynchMapWithChartSlider.isChecked());
 		_state.put(STATE_IS_SYNCH_MAP_WITH_TOUR, _actionSynchMapWithTour.isChecked());
 
-		_state.put(STATE_IS_TOUR_VISIBLE, tourLayer.isEnabled());
+		_state.put(STATE_IS_LAYER_BASE_MAP_VISIBLE, _mapApp.getLayer_BaseMap().isEnabled());
+		_state.put(STATE_IS_LAYER_BUILDING_VISIBLE, _mapApp.getLayer_Building().isEnabled());
+		_state.put(STATE_IS_LAYER_LABEL_VISIBLE, _mapApp.getLayer_Label().isEnabled());
+		_state.put(STATE_IS_LAYER_TILE_INFO_VISIBLE, _mapApp.getLayer_TileInfo().isEnabled());
+		_state.put(STATE_IS_LAYER_TOUR_VISIBLE, _mapApp.getLayer_Tour().isEnabled());
+		_state.put(STATE_IS_LAYER_SCALE_BAR_VISIBLE, _mapApp.getLayer_ScaleBar().isEnabled());
 
-		tourLayer.saveState(_state);
+		Map25ConfigManager.saveState();
 	}
 
 	@Override
@@ -998,7 +1020,7 @@ public class Map25View extends ViewPart {
 	 */
 	void updateActionsState() {
 
-		final TourLayer tourLayer = _mapApp.getTourLayer();
+		final TourLayer tourLayer = _mapApp.getLayer_Tour();
 
 		final boolean isTourAvailable = _allTourData.size() > 0;
 		final boolean isTrackLayerVisible = tourLayer == null ? false : tourLayer.isEnabled();

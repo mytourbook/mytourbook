@@ -37,7 +37,7 @@ import org.eclipse.ui.XMLMemento;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
-public class TourTrackConfigManager {
+public class Map25ConfigManager {
 
 // SET_FORMATTING_OFF
 	private static final Bundle		_bundle							= TourbookPlugin.getDefault().getBundle();
@@ -78,13 +78,14 @@ public class TourTrackConfigManager {
 
 	// root
 	private static final String						TAG_ROOT						= "Map25Configuration";				//$NON-NLS-1$
-	private static final String						ATTR_ACTIVE_CONFIG_ID			= "activeConfigId";					//$NON-NLS-1$
 	private static final String						ATTR_CONFIG_VERSION				= "configVersion";					//$NON-NLS-1$
 
 	/*
 	 * Tour tracks
 	 */
 	private static final String						TAG_TOUR_TRACKS					= "TourTracks";						//$NON-NLS-1$
+	private static final String						ATTR_ACTIVE_CONFIG_ID			= "activeConfigId";					//$NON-NLS-1$
+
 	private static final String						TAG_TRACK						= "Track";							//$NON-NLS-1$
 	private static final String						ATTR_ID							= "id";								//$NON-NLS-1$
 	private static final String						ATTR_DEFAULT_ID					= "defaultId";						//$NON-NLS-1$
@@ -100,7 +101,7 @@ public class TourTrackConfigManager {
 	 */
 	private static final ArrayList<TourTrackConfig>	_allTourTrackConfigs			= new ArrayList<TourTrackConfig>();
 
-	private static TourTrackConfig					_activeConfig;
+	private static TourTrackConfig					_activeTourTrackConfig;
 	private static String							_activeConfigIdFromXml;
 
 	private static XMLMemento create_Root() {
@@ -207,21 +208,12 @@ public class TourTrackConfigManager {
 		}
 	}
 
-	public static TourTrackConfig getActiveConfig() {
-
-		if (_activeConfig == null) {
-			readConfigFromXml();
-		}
-
-		return _activeConfig;
-	}
-
 	/**
 	 * @return Returns the index of the active config within all configs.
 	 */
 	public static int getActiveConfigIndex() {
 
-		final TourTrackConfig activeConfig = getActiveConfig();
+		final TourTrackConfig activeConfig = getActiveTourTrackConfig();
 
 		for (int configIndex = 0; configIndex < _allTourTrackConfigs.size(); configIndex++) {
 
@@ -234,7 +226,7 @@ public class TourTrackConfigManager {
 
 		// this case should not happen but ensure that the correct config is set
 
-		_activeConfig = _allTourTrackConfigs.get(0);
+		_activeTourTrackConfig = _allTourTrackConfigs.get(0);
 
 		return 0;
 	}
@@ -245,7 +237,7 @@ public class TourTrackConfigManager {
 
 			final TourTrackConfig config = _allTourTrackConfigs.get(configIndex);
 
-			if (config.id.equals(_activeConfig.id)) {
+			if (config.id.equals(_activeTourTrackConfig.id)) {
 				return configIndex;
 			}
 		}
@@ -253,10 +245,19 @@ public class TourTrackConfigManager {
 		return 0;
 	}
 
+	public static TourTrackConfig getActiveTourTrackConfig() {
+
+		if (_activeTourTrackConfig == null) {
+			readConfigFromXml();
+		}
+
+		return _activeTourTrackConfig;
+	}
+
 	public static ArrayList<TourTrackConfig> getAllConfigurations() {
 
 		// ensure configs are loaded
-		getActiveConfig();
+		getActiveTourTrackConfig();
 
 		return _allTourTrackConfigs;
 	}
@@ -470,7 +471,7 @@ public class TourTrackConfigManager {
 				overwriteConfig_DefaultValues_ForAll();
 			}
 
-			_activeConfig = readConfigFromXml_GetActive();
+			_activeTourTrackConfig = readConfigFromXml_GetActive();
 
 		} catch (final Exception e) {
 			StatusUtil.log(e);
@@ -530,10 +531,10 @@ public class TourTrackConfigManager {
 	 */
 	public static void resetActiveConfig() {
 
-		final String backupConfigName = _activeConfig.name;
+		final String backupConfigName = _activeTourTrackConfig.name;
 
 		// create xml with default values for the active config
-		final XMLMemento xmlRoot = resetConfig(_activeConfig.defaultId);
+		final XMLMemento xmlRoot = resetConfig(_activeTourTrackConfig.defaultId);
 
 		// parse xml
 		final ArrayList<TourTrackConfig> newConfigs = new ArrayList<TourTrackConfig>();
@@ -549,7 +550,7 @@ public class TourTrackConfigManager {
 		// replace config
 		_allTourTrackConfigs.set(getActiveConfigIndexFromId(), newConfig);
 
-		_activeConfig = newConfig;
+		_activeTourTrackConfig = newConfig;
 	}
 
 	public static void resetAllConfigurations() {
@@ -557,7 +558,7 @@ public class TourTrackConfigManager {
 		createAllDefaults();
 		overwriteConfig_DefaultValues_ForAll();
 
-		_activeConfig = _allTourTrackConfigs.get(0);
+		_activeTourTrackConfig = _allTourTrackConfigs.get(0);
 	}
 
 	private static XMLMemento resetConfig(final String defaultId) throws Error {
@@ -579,7 +580,7 @@ public class TourTrackConfigManager {
 
 	public static void saveState() {
 
-		if (_activeConfig == null) {
+		if (_activeTourTrackConfig == null) {
 
 			// this can happen when not yet used
 
@@ -590,7 +591,7 @@ public class TourTrackConfigManager {
 
 		final IMemento xmlTourTracks = xmlRoot.createChild(TAG_TOUR_TRACKS);
 		{
-			xmlTourTracks.putString(ATTR_ACTIVE_CONFIG_ID, _activeConfig.id);
+			xmlTourTracks.putString(ATTR_ACTIVE_CONFIG_ID, _activeTourTrackConfig.id);
 
 			for (final TourTrackConfig config : _allTourTrackConfigs) {
 				createXml_FromConfig(xmlTourTracks, config);
@@ -601,6 +602,6 @@ public class TourTrackConfigManager {
 	}
 
 	public static void setActiveConfig(final TourTrackConfig newConfig) {
-		_activeConfig = newConfig;
+		_activeTourTrackConfig = newConfig;
 	}
 }

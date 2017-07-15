@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.map25.layer.tourtrack;
 
-import net.tourbook.map25.TourTrackConfigManager;
+import net.tourbook.map25.Map25ConfigManager;
 
 import org.eclipse.swt.graphics.RGB;
 
@@ -27,11 +27,11 @@ public class TourTrackConfig implements Cloneable {
 	 */
 
 	public String	id				= Long.toString(System.nanoTime());
-	public String	defaultId		= TourTrackConfigManager.DEFAULT_ID_DEFAULT;
-	public String	name			= TourTrackConfigManager.CONFIG_NAME_UNKNOWN;
+	public String	defaultId		= Map25ConfigManager.DEFAULT_ID_DEFAULT;
+	public String	name			= Map25ConfigManager.CONFIG_NAME_UNKNOWN;
 
 	// outline
-	public float	outlineWidth	= TourTrackConfigManager.OUTLINE_WIDTH_DEFAULT;
+	public float	outlineWidth	= Map25ConfigManager.OUTLINE_WIDTH_DEFAULT;
 	public RGB		outlineColor;
 
 	public TourTrackConfig() {}

@@ -21,8 +21,8 @@ import net.tourbook.common.color.ColorSelectorExtended;
 import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
+import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.map25.Map25View;
-import net.tourbook.map25.TourTrackConfigManager;
 import net.tourbook.map25.layer.tourtrack.TourTrackConfig;
 import net.tourbook.map3.Messages;
 
@@ -42,7 +42,6 @@ import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
@@ -76,7 +75,7 @@ public class SlideoutTourTrackConfig extends ToolbarSlideout implements IColorSe
 	 * UI controls
 	 */
 	private Composite				_shellContainer;
-	private Button					_btnReset;
+//	private Button					_btnReset;
 	private Combo					_comboName;
 
 	private Label					_lblConfigName;
@@ -185,22 +184,22 @@ public class SlideoutTourTrackConfig extends ToolbarSlideout implements IColorSe
 				}
 			});
 
-			/*
-			 * Button: Reset
-			 */
-			_btnReset = new Button(container, SWT.PUSH);
-			GridDataFactory
-					.fillDefaults()//
-					.align(SWT.END, SWT.CENTER)
-					.applyTo(_btnReset);
-			_btnReset.setText(Messages.TourTrack_Properties_Button_Default);
-			_btnReset.setToolTipText(Messages.TourTrack_Properties_Button_Default_Tooltip);
-			_btnReset.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onSelectDefaultConfig(e);
-				}
-			});
+//			/*
+//			 * Button: Reset
+//			 */
+//			_btnReset = new Button(container, SWT.PUSH);
+//			GridDataFactory
+//					.fillDefaults()//
+//					.align(SWT.END, SWT.CENTER)
+//					.applyTo(_btnReset);
+//			_btnReset.setText(Messages.TourTrack_Properties_Button_Default);
+//			_btnReset.setToolTipText(Messages.TourTrack_Properties_Button_Default_Tooltip);
+//			_btnReset.addSelectionListener(new SelectionAdapter() {
+//				@Override
+//				public void widgetSelected(final SelectionEvent e) {
+//					onSelectDefaultConfig(e);
+//				}
+//			});
 		}
 	}
 
@@ -224,8 +223,8 @@ public class SlideoutTourTrackConfig extends ToolbarSlideout implements IColorSe
 					.align(SWT.BEGINNING, SWT.FILL)
 					.applyTo(_spinnerOutlineWidth);
 			_spinnerOutlineWidth.setDigits(1);
-			_spinnerOutlineWidth.setMinimum((int) (TourTrackConfigManager.OUTLINE_WIDTH_MIN * 10.0f));
-			_spinnerOutlineWidth.setMaximum((int) (TourTrackConfigManager.OUTLINE_WIDTH_MAX * 10.0f));
+			_spinnerOutlineWidth.setMinimum((int) (Map25ConfigManager.OUTLINE_WIDTH_MIN * 10.0f));
+			_spinnerOutlineWidth.setMaximum((int) (Map25ConfigManager.OUTLINE_WIDTH_MAX * 10.0f));
 			_spinnerOutlineWidth.setIncrement(1);
 			_spinnerOutlineWidth.setPageIncrement(10);
 			_spinnerOutlineWidth.addSelectionListener(_defaultSelectionListener);
@@ -279,7 +278,7 @@ public class SlideoutTourTrackConfig extends ToolbarSlideout implements IColorSe
 
 	private void enableControls() {
 
-		final TourTrackConfig config = TourTrackConfigManager.getActiveConfig();
+		final TourTrackConfig config = Map25ConfigManager.getActiveTourTrackConfig();
 
 	}
 
@@ -335,7 +334,7 @@ public class SlideoutTourTrackConfig extends ToolbarSlideout implements IColorSe
 
 		enableControls();
 
-		_map25View.getMapApp().getTourLayer().onModifyConfig();
+		_map25View.getMapApp().getLayer_Tour().onModifyConfig();
 
 		// update sliders
 //		updateUI_Map25();
@@ -358,10 +357,10 @@ public class SlideoutTourTrackConfig extends ToolbarSlideout implements IColorSe
 	private void onSelectConfig() {
 
 		final int selectedIndex = _comboName.getSelectionIndex();
-		final ArrayList<TourTrackConfig> allConfigurations = TourTrackConfigManager.getAllConfigurations();
+		final ArrayList<TourTrackConfig> allConfigurations = Map25ConfigManager.getAllConfigurations();
 
 		final TourTrackConfig selectedConfig = allConfigurations.get(selectedIndex);
-		final TourTrackConfig trackConfig = TourTrackConfigManager.getActiveConfig();
+		final TourTrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
 		if (selectedConfig == trackConfig) {
 
@@ -372,9 +371,9 @@ public class SlideoutTourTrackConfig extends ToolbarSlideout implements IColorSe
 		// keep data from previous config
 		saveState();
 
-		final TourTrackConfig previousConfig = (TourTrackConfig) TourTrackConfigManager.getActiveConfig().clone();
+		final TourTrackConfig previousConfig = (TourTrackConfig) Map25ConfigManager.getActiveTourTrackConfig().clone();
 
-		TourTrackConfigManager.setActiveConfig(selectedConfig);
+		Map25ConfigManager.setActiveConfig(selectedConfig);
 
 		updateUI_SetActiveConfig(previousConfig);
 	}
@@ -387,7 +386,7 @@ public class SlideoutTourTrackConfig extends ToolbarSlideout implements IColorSe
 
 			// reset All configurations
 
-			TourTrackConfigManager.resetAllConfigurations();
+			Map25ConfigManager.resetAllConfigurations();
 
 			updateUI_ComboConfigName(true);
 
@@ -395,9 +394,9 @@ public class SlideoutTourTrackConfig extends ToolbarSlideout implements IColorSe
 
 			// reset active config
 
-			previousConfig = (TourTrackConfig) TourTrackConfigManager.getActiveConfig().clone();
+			previousConfig = (TourTrackConfig) Map25ConfigManager.getActiveTourTrackConfig().clone();
 
-			TourTrackConfigManager.resetActiveConfig();
+			Map25ConfigManager.resetActiveConfig();
 		}
 
 		updateUI_SetActiveConfig(previousConfig);
@@ -410,10 +409,10 @@ public class SlideoutTourTrackConfig extends ToolbarSlideout implements IColorSe
 
 		_isUpdateUI = true;
 
-		final TourTrackConfig config = TourTrackConfigManager.getActiveConfig();
+		final TourTrackConfig config = Map25ConfigManager.getActiveTourTrackConfig();
 
 		// get active config AFTER getting the index because this could change the active config
-		final int activeConfigIndex = TourTrackConfigManager.getActiveConfigIndex();
+		final int activeConfigIndex = Map25ConfigManager.getActiveConfigIndex();
 
 		_comboName.select(activeConfigIndex);
 		_textConfigName.setText(config.name);
@@ -434,7 +433,7 @@ public class SlideoutTourTrackConfig extends ToolbarSlideout implements IColorSe
 
 		// update config
 
-		final TourTrackConfig config = TourTrackConfigManager.getActiveConfig();
+		final TourTrackConfig config = Map25ConfigManager.getActiveTourTrackConfig();
 
 		config.name = _textConfigName.getText();
 
@@ -448,7 +447,7 @@ public class SlideoutTourTrackConfig extends ToolbarSlideout implements IColorSe
 	 */
 	private void saveStateWithRecreateCheck() {
 
-		final TourTrackConfig activeConfig = TourTrackConfigManager.getActiveConfig();
+		final TourTrackConfig activeConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
 		final TourTrackConfig clonedTrackConfig = (TourTrackConfig) activeConfig.clone();
 
@@ -459,7 +458,7 @@ public class SlideoutTourTrackConfig extends ToolbarSlideout implements IColorSe
 
 	private void updateUI() {
 
-		final TourTrackConfig config = TourTrackConfigManager.getActiveConfig();
+		final TourTrackConfig config = Map25ConfigManager.getActiveTourTrackConfig();
 
 		_lblConfigName.setToolTipText(
 				NLS.bind(//
@@ -479,7 +478,7 @@ public class SlideoutTourTrackConfig extends ToolbarSlideout implements IColorSe
 				_comboName.removeAll();
 			}
 
-			for (final TourTrackConfig config : TourTrackConfigManager.getAllConfigurations()) {
+			for (final TourTrackConfig config : Map25ConfigManager.getAllConfigurations()) {
 				_comboName.add(config.name);
 			}
 
@@ -510,10 +509,10 @@ public class SlideoutTourTrackConfig extends ToolbarSlideout implements IColorSe
 
 		enableControls();
 
-		final TourTrackConfig config = TourTrackConfigManager.getActiveConfig();
+		final TourTrackConfig config = Map25ConfigManager.getActiveTourTrackConfig();
 		config.checkTrackRecreation(previousConfig);
 
-		_map25View.getMapApp().getTourLayer().onModifyConfig();
+		_map25View.getMapApp().getLayer_Tour().onModifyConfig();
 
 //		updateUI_Map25();
 	}

@@ -38,6 +38,12 @@ import org.oscim.layers.tile.vector.labeling.LabelLayer;
 import org.oscim.map.Layers;
 import org.oscim.map.Map;
 import org.oscim.map.ViewController;
+import org.oscim.renderer.BitmapRenderer;
+import org.oscim.renderer.GLViewport;
+import org.oscim.scalebar.DefaultMapScaleBar;
+import org.oscim.scalebar.MapScaleBar;
+import org.oscim.scalebar.MapScaleBarLayer;
+import org.oscim.scalebar.MetricUnitAdapter;
 import org.oscim.theme.ThemeFile;
 import org.oscim.theme.VtmThemes;
 import org.oscim.tiling.source.UrlTileSource;
@@ -74,8 +80,11 @@ public class Map25App extends GdxMap {
 
 	private TileManager				_tileManager;
 
-	private OsmTileLayerMT			_layer_baseMap;
-	private TileGridLayerMT			_layer_tileGrid;
+	private OsmTileLayerMT			_layer_BaseMap;
+	private BuildingLayer			_layer_Building;
+	private LabelLayer				_layer_Label;
+	private MapScaleBarLayer		_layer_ScaleBar;
+	private TileGridLayerMT			_layer_TileInfo;
 	private TourLayer				_layer_Tour;
 
 	private OkHttpFactoryMT			_httpFactory;
@@ -204,6 +213,30 @@ public class Map25App extends GdxMap {
 		super.dispose();
 	}
 
+	public OsmTileLayerMT getLayer_BaseMap() {
+		return _layer_BaseMap;
+	}
+
+	public BuildingLayer getLayer_Building() {
+		return _layer_Building;
+	}
+
+	public LabelLayer getLayer_Label() {
+		return _layer_Label;
+	}
+
+	public MapScaleBarLayer getLayer_ScaleBar() {
+		return _layer_ScaleBar;
+	}
+
+	public TileGridLayerMT getLayer_TileInfo() {
+		return _layer_TileInfo;
+	}
+
+	public TourLayer getLayer_Tour() {
+		return _layer_Tour;
+	}
+
 	public Map25Provider getSelectedMapProvider() {
 		return _selectedMapProvider;
 	}
@@ -219,10 +252,6 @@ public class Map25App extends GdxMap {
 		default:
 			return VtmThemes.DEFAULT;
 		}
-	}
-
-	public TourLayer getTourLayer() {
-		return _layer_Tour;
 	}
 
 	@Override
@@ -253,19 +282,7 @@ public class Map25App extends GdxMap {
 
 			// show/hide grid layer
 
-			if (_layer_tileGrid == null) {
-				_layer_tileGrid = new TileGridLayerMT(mMap);
-				_layer_tileGrid.setEnabled(true);
-				mMap.layers().add(_layer_tileGrid);
-			} else {
-				if (_layer_tileGrid.isEnabled()) {
-					_layer_tileGrid.setEnabled(false);
-					mMap.layers().remove(_layer_tileGrid);
-				} else {
-					_layer_tileGrid.setEnabled(true);
-					mMap.layers().add(_layer_tileGrid);
-				}
-			}
+			_layer_TileInfo.setEnabled(!_layer_TileInfo.isEnabled());
 
 			mMap.render();
 
@@ -305,7 +322,7 @@ public class Map25App extends GdxMap {
 		final long renderTime = System.currentTimeMillis();
 		if (renderTime > _lastRenderTime + 1000) {
 
-			final Map25DebugView vtmDebugView = Map25MapManager.getMap25DebugView();
+			final Map25DebugView vtmDebugView = Map25ProviderManager.getMap25DebugView();
 			if (vtmDebugView != null) {
 
 				_lastRenderTime = renderTime;
@@ -360,9 +377,9 @@ public class Map25App extends GdxMap {
 		final String mpId = Util.getStateString(
 				_state,
 				STATE_SELECTED_MAP25_PROVIDER_ID,
-				Map25MapManager.getDefaultMapProvider().getId());
+				Map25ProviderManager.getDefaultMapProvider().getId());
 
-		return Map25MapManager.getMapProvider(mpId);
+		return Map25ProviderManager.getMapProvider(mpId);
 	}
 
 	private void saveState() {
@@ -383,7 +400,7 @@ public class Map25App extends GdxMap {
 
 		final UrlTileSource tileSource = createTileSource(mapProvider, _httpFactory);
 
-		_layer_baseMap.setTileSource(tileSource);
+		_layer_BaseMap.setTileSource(tileSource);
 		mMap.setTheme(getTheme(mapProvider));
 
 		_selectedMapProvider = mapProvider;
@@ -391,16 +408,16 @@ public class Map25App extends GdxMap {
 
 	private void setupMap(final Map25Provider mapProvider, final UrlTileSource tileSource) {
 
-		_layer_baseMap = new OsmTileLayerMT(mMap);
+		_layer_BaseMap = new OsmTileLayerMT(mMap);
 
-		_tileManager = _layer_baseMap.getManager();
+		_tileManager = _layer_BaseMap.getManager();
 
-		_layer_baseMap.setTileSource(tileSource);
+		_layer_BaseMap.setTileSource(tileSource);
 
 // THIS IS NOT YET WORKING
 //		mapLayer.setNumLoaders(10);
 
-		mMap.setBaseMap(_layer_baseMap);
+		mMap.setBaseMap(_layer_BaseMap);
 
 		setupMap_Layers();
 
@@ -427,33 +444,47 @@ public class Map25App extends GdxMap {
 		 */
 
 		_layer_Tour = new TourLayer(mMap);
-//		_layer_Tour.setEnabled(true);
+		_layer_Tour.setEnabled(false);
 		layers.add(_layer_Tour);
 
 		/*
 		 * Other layers
 		 */
-		layers.add(new BuildingLayer(mMap, _layer_baseMap));
-		layers.add(new LabelLayer(mMap, _layer_baseMap));
+		_layer_Building = new BuildingLayer(mMap, _layer_BaseMap);
+		_layer_Building.setEnabled(false);
 
-//		/*
-//		 * Map Scale
-//		 */
-//		final DefaultMapScaleBar mapScaleBar = new DefaultMapScaleBar(mMap);
-//
-//		mapScaleBar.setScaleBarMode(DefaultMapScaleBar.ScaleBarMode.SINGLE);
-////		mapScaleBar.setScaleBarMode(DefaultMapScaleBar.ScaleBarMode.BOTH);
-//
-//		mapScaleBar.setDistanceUnitAdapter(MetricUnitAdapter.INSTANCE);
-////		mapScaleBar.setSecondaryDistanceUnitAdapter(ImperialUnitAdapter.INSTANCE);
-//
-//		mapScaleBar.setScaleBarPosition(MapScaleBar.ScaleBarPosition.BOTTOM_LEFT);
-//
-//		final MapScaleBarLayer mapScaleBarLayer = new MapScaleBarLayer(mMap, mapScaleBar);
-//		final BitmapRenderer renderer = mapScaleBarLayer.getRenderer();
-//		renderer.setPosition(GLViewport.Position.BOTTOM_RIGHT);
-//		renderer.setOffset(5, 0);
-//		layers.add(mapScaleBarLayer);
+		_layer_Label = new LabelLayer(mMap, _layer_BaseMap);
+		_layer_Label.setEnabled(false);
+		layers.add(_layer_Building);
+		layers.add(_layer_Label);
+
+		/*
+		 * Layer: Scale bar
+		 */
+		final DefaultMapScaleBar mapScaleBar = new DefaultMapScaleBar(mMap);
+
+		mapScaleBar.setScaleBarMode(DefaultMapScaleBar.ScaleBarMode.SINGLE);
+//		mapScaleBar.setScaleBarMode(DefaultMapScaleBar.ScaleBarMode.BOTH);
+
+		mapScaleBar.setDistanceUnitAdapter(MetricUnitAdapter.INSTANCE);
+//		mapScaleBar.setSecondaryDistanceUnitAdapter(ImperialUnitAdapter.INSTANCE);
+
+		mapScaleBar.setScaleBarPosition(MapScaleBar.ScaleBarPosition.BOTTOM_LEFT);
+
+		_layer_ScaleBar = new MapScaleBarLayer(mMap, mapScaleBar);
+		_layer_ScaleBar.setEnabled(false);
+
+		final BitmapRenderer renderer = _layer_ScaleBar.getRenderer();
+		renderer.setPosition(GLViewport.Position.BOTTOM_RIGHT);
+		renderer.setOffset(5, 0);
+		layers.add(_layer_ScaleBar);
+
+		/*
+		 * Tile info
+		 */
+		_layer_TileInfo = new TileGridLayerMT(mMap);
+		_layer_TileInfo.setEnabled(false);
+		layers.add(_layer_TileInfo);
 	}
 
 	void stop() {

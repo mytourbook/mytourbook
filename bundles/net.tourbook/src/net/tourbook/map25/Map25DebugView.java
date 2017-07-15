@@ -72,7 +72,7 @@ public class Map25DebugView extends ViewPart {
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == Map25DebugView.this) {
-					Map25MapManager.setDebugView(null);
+					Map25ProviderManager.setDebugView(null);
 				}
 			}
 
@@ -82,7 +82,7 @@ public class Map25DebugView extends ViewPart {
 			@Override
 			public void partHidden(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == Map25DebugView.this) {
-					Map25MapManager.setDebugViewVisible(false);
+					Map25ProviderManager.setDebugViewVisible(false);
 				}
 			}
 
@@ -91,13 +91,13 @@ public class Map25DebugView extends ViewPart {
 
 			@Override
 			public void partOpened(final IWorkbenchPartReference partRef) {
-				Map25MapManager.setDebugView(Map25DebugView.this);
+				Map25ProviderManager.setDebugView(Map25DebugView.this);
 			}
 
 			@Override
 			public void partVisible(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == Map25DebugView.this) {
-					Map25MapManager.setDebugViewVisible(true);
+					Map25ProviderManager.setDebugViewVisible(true);
 				}
 			}
 		};

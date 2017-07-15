@@ -36,7 +36,7 @@ import org.osgi.framework.Bundle;
 
 import de.byteholder.geoclipse.mapprovider.IMapProviderListener;
 
-public class Map25MapManager {
+public class Map25ProviderManager {
 
 	private static final String				ID							= "net.tourbook.map25.Map25Manager";		//$NON-NLS-1$
 

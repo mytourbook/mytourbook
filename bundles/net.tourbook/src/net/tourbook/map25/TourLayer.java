@@ -40,7 +40,6 @@ import gnu.trove.list.array.TIntArrayList;
 import net.tourbook.common.color.ColorUtil;
 import net.tourbook.map25.layer.tourtrack.TourTrackConfig;
 
-import org.eclipse.jface.dialogs.IDialogSettings;
 import org.oscim.backend.canvas.Paint.Cap;
 import org.oscim.core.GeoPoint;
 import org.oscim.core.GeometryBuffer;
@@ -415,7 +414,7 @@ public class TourLayer extends Layer {
 
 	private LineStyle createLineStyle() {
 
-		final TourTrackConfig trackConfig = TourTrackConfigManager.getActiveConfig();
+		final TourTrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
 		return LineStyle
 
@@ -457,11 +456,6 @@ public class TourLayer extends Layer {
 //			// ensure path modifications are redrawn
 //			Map3Manager.getWWCanvas().redraw();
 //		}
-	}
-
-	public void saveState(final IDialogSettings state) {
-
-		TourTrackConfigManager.saveState();
 	}
 
 	public void setPoints(final GeoPoint[] geoPoints, final TIntArrayList tourStarts) {

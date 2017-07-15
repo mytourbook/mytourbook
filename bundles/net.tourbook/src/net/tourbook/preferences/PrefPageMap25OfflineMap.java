@@ -18,7 +18,7 @@ package net.tourbook.preferences;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.Util;
-import net.tourbook.map25.Map25MapManager;
+import net.tourbook.map25.Map25ProviderManager;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -276,7 +276,7 @@ public class PrefPageMap25OfflineMap extends FieldEditorPreferencePage implement
 
 	private void saveState() {
 
-		Map25MapManager.updateOfflineLocation();
+		Map25ProviderManager.updateOfflineLocation();
 	}
 
 }

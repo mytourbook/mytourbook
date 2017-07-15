@@ -23,7 +23,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
-import net.tourbook.map25.Map25MapManager;
+import net.tourbook.map25.Map25ProviderManager;
 import net.tourbook.map25.Map25Provider;
 import net.tourbook.map25.TileEncoding;
 
@@ -178,7 +178,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 		 */
 		final ArrayList<Map25Provider> clonedMapProvider = new ArrayList<>();
 
-		for (final Map25Provider mapProvider : Map25MapManager.getAllMapProviders()) {
+		for (final Map25Provider mapProvider : Map25ProviderManager.getAllMapProviders()) {
 			clonedMapProvider.add((Map25Provider) mapProvider.clone());
 		}
 
@@ -1001,7 +1001,7 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 		}
 
 		if (isSaveIt) {
-			Map25MapManager.saveMapProvider(_allMapProvider);
+			Map25ProviderManager.saveMapProvider(_allMapProvider);
 			_isModified = false;
 		}
 	}
