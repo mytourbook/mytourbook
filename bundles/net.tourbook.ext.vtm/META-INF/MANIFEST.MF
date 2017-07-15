@@ -15,8 +15,8 @@ Bundle-License: http://www.apache.org/licenses/LICENSE-2.0
 Bundle-ManifestVersion: 2
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-SymbolicName: net.tourbook.ext.vtm
-Bundle-Vendor: It's me
-Bundle-Version: 17.7.1.v20170710-1255
+Bundle-Vendor: MyTourbook
+Bundle-Version: 17.7.1.v20170715-0856
 Export-Package: assets.patterns;version="17.7.1",assets.shaders;versio
  n="17.7.1",assets.symbols;version="17.7.1",assets.symbols.accommodati
  on;version="17.7.1",assets.symbols.amenity;version="17.7.1",assets.sy

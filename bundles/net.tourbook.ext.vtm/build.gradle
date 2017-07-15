@@ -199,7 +199,7 @@ jar.manifest.attributes(
 	// qualifier is an easy readable time stamp
 	'Bundle-Version':							bundleVersion + '.v${tstamp;yyyyMMdd-HHmm}',
 
-	'Bundle-Vendor':							"It's me",
+	'Bundle-Vendor':							"MyTourbook",
 	'Bundle-License': 							'http://www.apache.org/licenses/LICENSE-2.0',
 	
 	// eclipse 4.6 manifest editor creates this property and not 'Require-Capability'

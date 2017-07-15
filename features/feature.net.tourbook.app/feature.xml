@@ -2,7 +2,7 @@
 <feature
       id="feature.net.tourbook.app"
       label="MyTourbook Application"
-      version="17.7.0.qualifier"
+      version="17.7.1.qualifier"
       provider-name="MyTourbook"
       plugin="net.tourbook.branding">
 

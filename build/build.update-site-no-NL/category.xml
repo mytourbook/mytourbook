@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/feature.net.tourbook.app_17.7.0.qualifier.jar" id="feature.net.tourbook.app" version="17.7.0.qualifier">
+   <feature url="features/feature.net.tourbook.app_17.7.1.qualifier.jar" id="feature.net.tourbook.app" version="17.7.1.qualifier">
       <category name="MyTourbook"/>
    </feature>
    <feature url="features/feature.net.tourbook.ext.worldwind_2.1.20170207.jar" id="feature.net.tourbook.ext.worldwind" version="2.1.20170207">
