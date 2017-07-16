@@ -500,11 +500,6 @@ public class Map25View extends ViewPart {
 		return _mapApp;
 	}
 
-	public void onModifyConfig() {
-		// TODO Auto-generated method stub
-
-	}
-
 	private void onSelectionChanged(final ISelection selection) {
 
 //		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
@@ -827,9 +822,16 @@ public class Map25View extends ViewPart {
 
 					final Animator animator = map25.animator();
 
+					int animationTime = Map25ConfigManager.getActiveTourTrackConfig().animationTime;
+
+					// zero will not move the map !
+					if (animationTime == 0) {
+						animationTime = 1;
+					}
+
 					animator.cancel();
 					animator.animateTo(//
-							2000,
+							animationTime,
 							_allBoundingBox,
 							Easing.Type.SINE_INOUT,
 							Animator.ANIM_MOVE | Animator.ANIM_SCALE);

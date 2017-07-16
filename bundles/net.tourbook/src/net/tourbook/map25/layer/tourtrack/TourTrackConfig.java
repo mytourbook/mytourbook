@@ -34,12 +34,12 @@ public class TourTrackConfig implements Cloneable {
 	public float	outlineWidth	= Map25ConfigManager.OUTLINE_WIDTH_DEFAULT;
 	public RGB		outlineColor;
 
+	/**
+	 * Animation time in milli seconds when a tour is synched with the map
+	 */
+	public int		animationTime;
+
 	public TourTrackConfig() {}
-
-	public void checkTrackRecreation(final TourTrackConfig trackConfig) {
-		// TODO Auto-generated method stub
-
-	}
 
 	/**
 	 * Create a copy of this object.

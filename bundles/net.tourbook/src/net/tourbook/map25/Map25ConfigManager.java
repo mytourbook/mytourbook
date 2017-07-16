@@ -39,7 +39,7 @@ import org.osgi.framework.Version;
 
 public class Map25ConfigManager {
 
-// SET_FORMATTING_OFF
+	// SET_FORMATTING_OFF
 	private static final Bundle		_bundle							= TourbookPlugin.getDefault().getBundle();
 	private static final IPath		_stateLocation					= Platform.getStateLocation(_bundle);
 	
@@ -59,6 +59,9 @@ public class Map25ConfigManager {
 
 	// colors
 	public static final RGB		RGB_DEFAULT;
+
+	// other properties
+	private static final int	DEFAULT_ANIMATION_TIME	= 2000;
 
 	static {
 
@@ -90,6 +93,8 @@ public class Map25ConfigManager {
 	private static final String						ATTR_ID							= "id";								//$NON-NLS-1$
 	private static final String						ATTR_DEFAULT_ID					= "defaultId";						//$NON-NLS-1$
 	private static final String						ATTR_CONFIG_NAME				= "name";							//$NON-NLS-1$
+
+	private static final String						ATTR_ANIMATION_TIME				= "animationTime";					//$NON-NLS-1$
 
 	// outline
 	private static final String						TAG_OUTLINE						= "Outline";						//$NON-NLS-1$
@@ -181,6 +186,8 @@ public class Map25ConfigManager {
 			xmlConfig.putString(ATTR_DEFAULT_ID, defaultId);
 			xmlConfig.putString(ATTR_CONFIG_NAME, configName);
 
+			xmlConfig.putInteger(ATTR_ANIMATION_TIME, DEFAULT_ANIMATION_TIME);
+
 			// <outline>
 			final IMemento xmlOutline = xmlConfig.createChild(TAG_OUTLINE);
 			{
@@ -198,6 +205,8 @@ public class Map25ConfigManager {
 			xmlConfig.putString(ATTR_ID, config.id);
 			xmlConfig.putString(ATTR_DEFAULT_ID, config.defaultId);
 			xmlConfig.putString(ATTR_CONFIG_NAME, config.name);
+
+			xmlConfig.putInteger(ATTR_ANIMATION_TIME, config.animationTime);
 
 			// <outline>
 			final IMemento xmlOutline = xmlConfig.createChild(TAG_OUTLINE);
@@ -407,6 +416,8 @@ public class Map25ConfigManager {
 				OUTLINE_WIDTH_MAX);
 
 		config.outlineColor = Util.getXmlRgb(xmlOutline, RGB_DEFAULT);
+
+		config.animationTime = Util.getXmlInteger(xmlOutline, ATTR_ANIMATION_TIME, DEFAULT_ANIMATION_TIME);
 	}
 
 	/**

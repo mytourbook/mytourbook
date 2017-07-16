@@ -19,7 +19,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-	private static final String	BUNDLE_NAME	= "net.tourbook.map3.messages";				//$NON-NLS-1$
+	private static final String	BUNDLE_NAME	= "net.tourbook.map3.messages";					//$NON-NLS-1$
 
 	public static String		Custom_Layer_Status;
 	public static String		Custom_Layer_TerrainProfile;
@@ -100,11 +100,11 @@ public class Messages extends NLS {
 	public static String		Map3Color_Dialog_Spinner_ColorValue_Tooltip;
 	public static String		Map3Color_Dialog_Title;
 
-	public static String	Map3Layer_Viewer_Column_Layer;
+	public static String		Map3Layer_Viewer_Column_Layer;
 
-	public static String	Map3Layer_Viewer_Column_Opacity;
+	public static String		Map3Layer_Viewer_Column_Opacity;
 
-	public static String	Map3Layer_Viewer_Column_Opacity_Tooltip;
+	public static String		Map3Layer_Viewer_Column_Opacity_Tooltip;
 
 	public static String		Map3SelectColor_Dialog_Action_AddColor_Tooltip;
 	public static String		Map3SelectColor_Dialog_Action_EditAllColors;
@@ -175,6 +175,8 @@ public class Messages extends NLS {
 	public static String		TourTrack_Properties_Checkbox_ShowTrackPositions_Tooltip;
 	public static String		TourTrack_Properties_Label_Altitude;
 	public static String		TourTrack_Properties_Label_Altitude_Tooltip;
+	public static String		TourTrack_Properties_Label_AnimationTime;
+	public static String		TourTrack_Properties_Label_AnimationTime_Tooltip;
 	public static String		TourTrack_Properties_Label_ConfigName;
 	public static String		TourTrack_Properties_Label_ConfigName_Tooltip;
 	public static String		TourTrack_Properties_Label_CurtainColor;

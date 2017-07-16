@@ -80,6 +80,7 @@ public class SlideoutTourTrackConfig extends ToolbarSlideout implements IColorSe
 
 	private Label					_lblConfigName;
 
+	private Spinner					_spinnerAnimationTime;
 	private Spinner					_spinnerOutlineWidth;
 
 	private Text					_textConfigName;
@@ -218,10 +219,6 @@ public class SlideoutTourTrackConfig extends ToolbarSlideout implements IColorSe
 
 			// spinner
 			_spinnerOutlineWidth = new Spinner(parent, SWT.BORDER);
-			GridDataFactory
-					.fillDefaults() //
-					.align(SWT.BEGINNING, SWT.FILL)
-					.applyTo(_spinnerOutlineWidth);
 			_spinnerOutlineWidth.setDigits(1);
 			_spinnerOutlineWidth.setMinimum((int) (Map25ConfigManager.OUTLINE_WIDTH_MIN * 10.0f));
 			_spinnerOutlineWidth.setMaximum((int) (Map25ConfigManager.OUTLINE_WIDTH_MAX * 10.0f));
@@ -229,6 +226,10 @@ public class SlideoutTourTrackConfig extends ToolbarSlideout implements IColorSe
 			_spinnerOutlineWidth.setPageIncrement(10);
 			_spinnerOutlineWidth.addSelectionListener(_defaultSelectionListener);
 			_spinnerOutlineWidth.addMouseWheelListener(_defaultMouseWheelListener);
+			GridDataFactory
+					.fillDefaults() //
+					.align(SWT.BEGINNING, SWT.FILL)
+					.applyTo(_spinnerOutlineWidth);
 		}
 		{
 			/*
@@ -237,7 +238,7 @@ public class SlideoutTourTrackConfig extends ToolbarSlideout implements IColorSe
 
 			// label
 			final Label label = new Label(parent, SWT.NONE);
-			label.setText("C&olor");
+			label.setText(Messages.TourTrack_Properties_Label_OutlineColor);
 			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
 
 			// Color: Segment alternate color
@@ -245,6 +246,31 @@ public class SlideoutTourTrackConfig extends ToolbarSlideout implements IColorSe
 			_colorOutlineColor.addListener(_defaultPropertyChangeListener);
 			_colorOutlineColor.addOpenListener(this);
 
+		}
+		{
+			/*
+			 * Animation time
+			 */
+
+			// label
+			final Label label = new Label(parent, SWT.NONE);
+			label.setText(Messages.TourTrack_Properties_Label_AnimationTime);
+			label.setToolTipText(Messages.TourTrack_Properties_Label_AnimationTime_Tooltip);
+			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+
+			// spinner
+			_spinnerAnimationTime = new Spinner(parent, SWT.BORDER);
+			_spinnerAnimationTime.setDigits(1);
+			_spinnerAnimationTime.setMinimum(0);
+			_spinnerAnimationTime.setMaximum(100);
+			_spinnerAnimationTime.setIncrement(1);
+			_spinnerAnimationTime.setPageIncrement(10);
+			_spinnerAnimationTime.addSelectionListener(_defaultSelectionListener);
+			_spinnerAnimationTime.addMouseWheelListener(_defaultMouseWheelListener);
+			GridDataFactory
+					.fillDefaults() //
+					.align(SWT.BEGINNING, SWT.FILL)
+					.applyTo(_spinnerAnimationTime);
 		}
 	}
 
@@ -277,8 +303,6 @@ public class SlideoutTourTrackConfig extends ToolbarSlideout implements IColorSe
 	}
 
 	private void enableControls() {
-
-		final TourTrackConfig config = Map25ConfigManager.getActiveTourTrackConfig();
 
 	}
 
@@ -328,7 +352,7 @@ public class SlideoutTourTrackConfig extends ToolbarSlideout implements IColorSe
 
 	private void onModifyConfig() {
 
-		saveStateWithRecreateCheck();
+		saveState();
 
 		updateUI();
 
@@ -378,30 +402,6 @@ public class SlideoutTourTrackConfig extends ToolbarSlideout implements IColorSe
 		updateUI_SetActiveConfig(previousConfig);
 	}
 
-	private void onSelectDefaultConfig(final SelectionEvent selectionEvent) {
-
-		TourTrackConfig previousConfig = null;
-
-		if (Util.isCtrlKeyPressed(selectionEvent)) {
-
-			// reset All configurations
-
-			Map25ConfigManager.resetAllConfigurations();
-
-			updateUI_ComboConfigName(true);
-
-		} else {
-
-			// reset active config
-
-			previousConfig = (TourTrackConfig) Map25ConfigManager.getActiveTourTrackConfig().clone();
-
-			Map25ConfigManager.resetActiveConfig();
-		}
-
-		updateUI_SetActiveConfig(previousConfig);
-	}
-
 	/**
 	 * Restores state values from the tour track configuration and update the UI.
 	 */
@@ -421,15 +421,14 @@ public class SlideoutTourTrackConfig extends ToolbarSlideout implements IColorSe
 		_colorOutlineColor.setColorValue(config.outlineColor);
 		_spinnerOutlineWidth.setSelection((int) (config.outlineWidth * 10));
 
+		_spinnerAnimationTime.setSelection(config.animationTime / 100);
+
 		updateUI();
 
 		_isUpdateUI = false;
 	}
 
 	private void saveState() {
-
-// SET_FORMATTING_OFF
-// SET_FORMATTING_ON
 
 		// update config
 
@@ -440,20 +439,8 @@ public class SlideoutTourTrackConfig extends ToolbarSlideout implements IColorSe
 		// line
 		config.outlineColor = _colorOutlineColor.getColorValue();
 		config.outlineWidth = _spinnerOutlineWidth.getSelection() / 10.0f;
-	}
 
-	/**
-	 * Saves state values from the UI in the tour track configuration.
-	 */
-	private void saveStateWithRecreateCheck() {
-
-		final TourTrackConfig activeConfig = Map25ConfigManager.getActiveTourTrackConfig();
-
-		final TourTrackConfig clonedTrackConfig = (TourTrackConfig) activeConfig.clone();
-
-		saveState();
-
-		activeConfig.checkTrackRecreation(clonedTrackConfig);
+		config.animationTime = _spinnerAnimationTime.getSelection() * 100;
 	}
 
 	private void updateUI() {
@@ -498,19 +485,11 @@ public class SlideoutTourTrackConfig extends ToolbarSlideout implements IColorSe
 		updateUI_ComboConfigName(false);
 	}
 
-	private void updateUI_Map25() {
-
-		_map25View.onModifyConfig();
-	}
-
 	private void updateUI_SetActiveConfig(final TourTrackConfig previousConfig) {
 
 		restoreState();
 
 		enableControls();
-
-		final TourTrackConfig config = Map25ConfigManager.getActiveTourTrackConfig();
-		config.checkTrackRecreation(previousConfig);
 
 		_map25View.getMapApp().getLayer_Tour().onModifyConfig();
 
