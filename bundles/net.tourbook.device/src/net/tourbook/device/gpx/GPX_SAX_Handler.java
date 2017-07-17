@@ -57,17 +57,17 @@ import org.xml.sax.helpers.DefaultHandler;
 public class GPX_SAX_Handler extends DefaultHandler {
 
 //	// A CDATA section starts with "<![CDATA[" and ends with "]]>"
-//	private static final String				CDATA_START					= "<![CDATA[";										//$NON-NLS-1$
-//	private static final String				CDATA_END					= "]]>";											//$NON-NLS-1$
+//	private static final String				CDATA_START					= "<![CDATA[";								//$NON-NLS-1$
+//	private static final String				CDATA_END					= "]]>";									//$NON-NLS-1$
 
-	private static final String				ATTR_GPX_VERSION				= "version";								//$NON-NLS-1$
-	private static final String				ATTR_GPX_VERSION_1_0			= "1.0";									//$NON-NLS-1$
+	private static final String				ATTR_GPX_VERSION				= "version";							//$NON-NLS-1$
+	private static final String				ATTR_GPX_VERSION_1_0			= "1.0";								//$NON-NLS-1$
 	private static final String				ATTR_GPX_VERSION_1_1			= "1.1";								//$NON-NLS-1$
 
-	private static final String				NAME_SPACE_GPX_1_0				= "http://www.topografix.com/GPX/1/0";		//$NON-NLS-1$
-	private static final String				NAME_SPACE_GPX_1_1				= "http://www.topografix.com/GPX/1/1";		//$NON-NLS-1$
-	private static final String				POLAR_WEBSYNC_CREATOR_2_3		= "Polar WebSync 2.3 - www.polar.fi";		//$NON_NLS-1$ //$NON-NLS-1$
-	private static final String				GH600							= "code.google.com/p/GH615";				//$NON-NLS-1$
+	private static final String				NAME_SPACE_GPX_1_0				= "http://www.topografix.com/GPX/1/0";	//$NON-NLS-1$
+	private static final String				NAME_SPACE_GPX_1_1				= "http://www.topografix.com/GPX/1/1";	//$NON-NLS-1$
+	private static final String				POLAR_WEBSYNC_CREATOR_2_3		= "Polar WebSync 2.3 - www.polar.fi";	//$NON_NLS-1$ //$NON-NLS-1$
+	private static final String				GH600							= "code.google.com/p/GH615";			//$NON-NLS-1$
 
 	// namespace for extensions used by Garmin
 //	private static final String				NAME_SPACE_TPEXT		= "http://www.garmin.com/xmlschemas/TrackPointExtension/v1";	//$NON-NLS-1$
@@ -78,67 +78,70 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	/*
 	 * gpx tags, attributes
 	 */
-	private static final String				TAG_GPX							= "gpx";									//$NON-NLS-1$
-	private static final String				TAG_METADATA					= "metadata";								//$NON-NLS-1$
+	private static final String				TAG_GPX							= "gpx";								//$NON-NLS-1$
+	private static final String				TAG_METADATA					= "metadata";							//$NON-NLS-1$
 
-	private static final String				TAG_TRK							= "trk";									//$NON-NLS-1$
-	private static final String				TAG_TRK_NAME					= "name";									//$NON-NLS-1$
-	private static final String				TAG_TRK_DESC					= "desc";									//$NON-NLS-1$
-	private static final String				TAG_TRKPT						= "trkpt";									//$NON-NLS-1$
+	private static final String				TAG_RTE							= "rte";								//$NON-NLS-1$
+	private static final String				TAG_RTEPT						= "rtept";								//$NON-NLS-1$
 
-	private static final String				TAG_TIME						= "time";									//$NON-NLS-1$
-	private static final String				TAG_ELE							= "ele";									//$NON-NLS-1$
+	private static final String				TAG_TRK							= "trk";								//$NON-NLS-1$
+	private static final String				TAG_TRK_NAME					= "name";								//$NON-NLS-1$
+	private static final String				TAG_TRK_DESC					= "desc";								//$NON-NLS-1$
+	private static final String				TAG_TRKPT						= "trkpt";								//$NON-NLS-1$
 
-	private static final String				TAG_WPT							= "wpt";									//$NON-NLS-1$
-	private static final String				TAG_WPT_CMT						= "cmt";									//$NON-NLS-1$
-	private static final String				TAG_WPT_DESC					= "desc";									//$NON-NLS-1$
-	private static final String				TAG_WPT_ELE						= "ele";									//$NON-NLS-1$
-	private static final String				TAG_WPT_NAME					= "name";									//$NON-NLS-1$
-	private static final String				TAG_WPT_SYM						= "sym";									//$NON-NLS-1$
-	private static final String				TAG_WPT_TIME					= "time";									//$NON-NLS-1$
-	private static final String				TAG_WPT_TYPE					= "type";									//$NON-NLS-1$
+	private static final String				TAG_TIME						= "time";								//$NON-NLS-1$
+	private static final String				TAG_ELE							= "ele";								//$NON-NLS-1$
+
+	private static final String				TAG_WPT							= "wpt";								//$NON-NLS-1$
+	private static final String				TAG_WPT_CMT						= "cmt";								//$NON-NLS-1$
+	private static final String				TAG_WPT_DESC					= "desc";								//$NON-NLS-1$
+	private static final String				TAG_WPT_ELE						= "ele";								//$NON-NLS-1$
+	private static final String				TAG_WPT_NAME					= "name";								//$NON-NLS-1$
+	private static final String				TAG_WPT_SYM						= "sym";								//$NON-NLS-1$
+	private static final String				TAG_WPT_TIME					= "time";								//$NON-NLS-1$
+	private static final String				TAG_WPT_TYPE					= "type";								//$NON-NLS-1$
 
 	// <url> URL associated with the waypoint
-	private static final String				TAG_WPT_URL						= "url";									//$NON-NLS-1$
+	private static final String				TAG_WPT_URL						= "url";								//$NON-NLS-1$
 
 	// <urlname> Text to display on the <url> hyperlink
-	private static final String				TAG_WPT_URLNAME					= "urlname";								//$NON-NLS-1$
+	private static final String				TAG_WPT_URLNAME					= "urlname";							//$NON-NLS-1$
 
 	// http://www.cluetrust.com/XML/GPXDATA/1/0
 	// http://www.cluetrust.com/Schemas/gpxdata10.xsd
-	private static final String				TAG_EXT_DATA_DISTANCE			= "gpxdata:distance";						//$NON-NLS-1$
-	private static final String				TAG_EXT_DATA_ELAPSED_TIME		= "gpxdata:elapsedTime";					//$NON-NLS-1$
-	private static final String				TAG_EXT_DATA_END_POINT			= "gpxdata:endPoint";						//$NON-NLS-1$
+	private static final String				TAG_EXT_DATA_DISTANCE			= "gpxdata:distance";					//$NON-NLS-1$
+	private static final String				TAG_EXT_DATA_ELAPSED_TIME		= "gpxdata:elapsedTime";				//$NON-NLS-1$
+	private static final String				TAG_EXT_DATA_END_POINT			= "gpxdata:endPoint";					//$NON-NLS-1$
 	private static final String				TAG_EXT_DATA_HR					= "gpxdata:hr";							//$NON-NLS-1$
-	private static final String				TAG_EXT_DATA_INDEX				= "gpxdata:index";							//$NON-NLS-1$
-	private static final String				TAG_EXT_DATA_LAP				= "gpxdata:lap";							//$NON-NLS-1$
-	private static final String				TAG_EXT_DATA_START_TIME			= "gpxdata:startTime";						//$NON-NLS-1$
-	private static final String				TAG_EXT_DATA_TEMPERATURE		= "gpxdata:temp";							//$NON-NLS-1$
+	private static final String				TAG_EXT_DATA_INDEX				= "gpxdata:index";						//$NON-NLS-1$
+	private static final String				TAG_EXT_DATA_LAP				= "gpxdata:lap";						//$NON-NLS-1$
+	private static final String				TAG_EXT_DATA_START_TIME			= "gpxdata:startTime";					//$NON-NLS-1$
+	private static final String				TAG_EXT_DATA_TEMPERATURE		= "gpxdata:temp";						//$NON-NLS-1$
 
-	private static final String				TAG_EXT_CAD						= "cadence";								//$NON-NLS-1$
-	private static final String				TAG_EXT_HR						= "heartrate";								//$NON-NLS-1$
+	private static final String				TAG_EXT_CAD						= "cadence";							//$NON-NLS-1$
+	private static final String				TAG_EXT_HR						= "heartrate";							//$NON-NLS-1$
 
 	private static final String				TAG_EXT_TPX_CAD					= "gpxtpx:cad";							//$NON-NLS-1$
-	private static final String				TAG_EXT_TPX_HR					= "gpxtpx:hr";								//$NON-NLS-1$
-	private static final String				TAG_EXT_TPX_TEMP				= "gpxtpx:atemp";							//$NON-NLS-1$
+	private static final String				TAG_EXT_TPX_HR					= "gpxtpx:hr";							//$NON-NLS-1$
+	private static final String				TAG_EXT_TPX_TEMP				= "gpxtpx:atemp";						//$NON-NLS-1$
 
 	// xmlns:un="http://www.falk.de/GPX/OutdoorExtension"
 	private static final String				TAG_EXT_UN_CAD					= "un:cad";								//$NON-NLS-1$
-	private static final String				TAG_EXT_UN_HR					= "un:hr";									//$NON-NLS-1$
-	private static final String				TAG_EXT_UN_POWER				= "un:power";								//$NON-NLS-1$
+	private static final String				TAG_EXT_UN_HR					= "un:hr";								//$NON-NLS-1$
+	private static final String				TAG_EXT_UN_POWER				= "un:power";							//$NON-NLS-1$
 
 	// xmlns:mt="net.tourbook/1"
 	// marker
-	private static final String				TAG_MT_MARKER_DISTANCE			= "mt:distance";							//$NON-NLS-1$
-	private static final String				TAG_MT_MARKER_IS_VISIBLE		= "mt:isVisible";							//$NON-NLS-1$
-	private static final String				TAG_MT_MARKER_LABEL_POS			= "mt:labelPos";							//$NON-NLS-1$
-	private static final String				TAG_MT_MARKER_LABEL_X_OFFSET	= "mt:labelXOffset";						//$NON-NLS-1$
-	private static final String				TAG_MT_MARKER_LABEL_Y_OFFSET	= "mt:labelYOffset";						//$NON-NLS-1$
-	private static final String				TAG_MT_MARKER_SERIE_INDEX		= "mt:serieIndex";							//$NON-NLS-1$
-	private static final String				TAG_MT_MARKER_TYPE				= "mt:type";								//$NON-NLS-1$
+	private static final String				TAG_MT_MARKER_DISTANCE			= "mt:distance";						//$NON-NLS-1$
+	private static final String				TAG_MT_MARKER_IS_VISIBLE		= "mt:isVisible";						//$NON-NLS-1$
+	private static final String				TAG_MT_MARKER_LABEL_POS			= "mt:labelPos";						//$NON-NLS-1$
+	private static final String				TAG_MT_MARKER_LABEL_X_OFFSET	= "mt:labelXOffset";					//$NON-NLS-1$
+	private static final String				TAG_MT_MARKER_LABEL_Y_OFFSET	= "mt:labelYOffset";					//$NON-NLS-1$
+	private static final String				TAG_MT_MARKER_SERIE_INDEX		= "mt:serieIndex";						//$NON-NLS-1$
+	private static final String				TAG_MT_MARKER_TYPE				= "mt:type";							//$NON-NLS-1$
 
 	// serie data
-	private static final String				TAG_MT_SERIE_GEAR				= "mt:gear";								//$NON-NLS-1$
+	private static final String				TAG_MT_SERIE_GEAR				= "mt:gear";							//$NON-NLS-1$
 
 	// tour
 
@@ -154,59 +157,60 @@ public class GPX_SAX_Handler extends DefaultHandler {
 //	</mt:tags>
 
 	private static final String				TAG_MT_TOUR_DESCRIPTION			= "mt:tourDescription";					//$NON-NLS-1$
-	private static final String				TAG_MT_TOUR_TITLE				= "mt:tourTitle";							//$NON-NLS-1$
-	private static final String				TAG_MT_TOUR_START_PLACE			= "mt:tourStartPlace";						//$NON-NLS-1$
-	private static final String				TAG_MT_TOUR_END_PLACE			= "mt:tourEndPlace";						//$NON-NLS-1$
+	private static final String				TAG_MT_TOUR_TITLE				= "mt:tourTitle";						//$NON-NLS-1$
+	private static final String				TAG_MT_TOUR_START_PLACE			= "mt:tourStartPlace";					//$NON-NLS-1$
+	private static final String				TAG_MT_TOUR_END_PLACE			= "mt:tourEndPlace";					//$NON-NLS-1$
 
-	private static final String				TAG_MT_TOUR_START_TIME			= "mt:tourStartTime";						//$NON-NLS-1$
+	private static final String				TAG_MT_TOUR_START_TIME			= "mt:tourStartTime";					//$NON-NLS-1$
 	private static final String				TAG_MT_TOUR_END_TIME			= "mt:tourEndTime";						//$NON-NLS-1$
 	private static final String				TAG_MT_TOUR_DRIVING_TIME		= "mt:tourDrivingTime";					//$NON-NLS-1$
-	private static final String				TAG_MT_TOUR_RECORDING_TIME		= "mt:tourRecordingTime";					//$NON-NLS-1$
+	private static final String				TAG_MT_TOUR_RECORDING_TIME		= "mt:tourRecordingTime";				//$NON-NLS-1$
 
-	private static final String				TAG_MT_TOUR_ALTITUDE_UP			= "mt:tourAltUp";							//$NON-NLS-1$
+	private static final String				TAG_MT_TOUR_ALTITUDE_UP			= "mt:tourAltUp";						//$NON-NLS-1$
 	private static final String				TAG_MT_TOUR_ALTITUDE_DOWN		= "mt:tourAltDown";						//$NON-NLS-1$
-	private static final String				TAG_MT_TOUR_DISTANCE			= "mt:tourDistance";						//$NON-NLS-1$
+	private static final String				TAG_MT_TOUR_DISTANCE			= "mt:tourDistance";					//$NON-NLS-1$
 
-	private static final String				TAG_MT_TOUR_CALORIES			= "mt:calories";							//$NON-NLS-1$
-	private static final String				TAG_MT_TOUR_REST_PULSE			= "mt:restPulse";							//$NON-NLS-1$
+	private static final String				TAG_MT_TOUR_CALORIES			= "mt:calories";						//$NON-NLS-1$
+	private static final String				TAG_MT_TOUR_REST_PULSE			= "mt:restPulse";						//$NON-NLS-1$
 
 	private static final String				TAG_MT_TOUR_BIKER_WEIGHT		= "mt:bikerWeight";						//$NON-NLS-1$
-	private static final String				TAG_MT_TOUR_CONCONI_DEFLECTION	= "mt:conconiDeflection";					//$NON-NLS-1$
+	private static final String				TAG_MT_TOUR_CONCONI_DEFLECTION	= "mt:conconiDeflection";				//$NON-NLS-1$
 	private static final String				TAG_MT_TOUR_DP_TOLERANCE		= "mt:dpTolerance";						//$NON-NLS-1$
 
 	private static final String				TAG_MT_TOUR_TEMPERATURE			= "mt:temperature";						//$NON-NLS-1$
 	private static final String				TAG_MT_TOUR_WEATHER				= "mt:weather";							//$NON-NLS-1$
-	private static final String				TAG_MT_TOUR_WEATHER_CLOUDS		= "mt:weatherClouds";						//$NON-NLS-1$
-	private static final String				TAG_MT_TOUR_WEATHER_WIND_DIR	= "mt:weatherWindDirection";				//$NON-NLS-1$
-	private static final String				TAG_MT_TOUR_WEATHER_WIND_SPEED	= "mt:weatherWindSpeed";					//$NON-NLS-1$
+	private static final String				TAG_MT_TOUR_WEATHER_CLOUDS		= "mt:weatherClouds";					//$NON-NLS-1$
+	private static final String				TAG_MT_TOUR_WEATHER_WIND_DIR	= "mt:weatherWindDirection";			//$NON-NLS-1$
+	private static final String				TAG_MT_TOUR_WEATHER_WIND_SPEED	= "mt:weatherWindSpeed";				//$NON-NLS-1$
 
 	private static final String				TAG_MT_TOUR_TAG					= "mt:tag";								//$NON-NLS-1$
-	private static final String				TAG_MT_TOUR_TYPE				= "mt:tourType";							//$NON-NLS-1$
-	private static final String				TAG_MT_TOUR_SUB_NAME			= "mt:name";								//$NON-NLS-1$
+	private static final String				TAG_MT_TOUR_TYPE				= "mt:tourType";						//$NON-NLS-1$
+	private static final String				TAG_MT_TOUR_SUB_NAME			= "mt:name";							//$NON-NLS-1$
 
-	private static final String				ATTR_LATITUDE					= "lat";									//$NON-NLS-1$
-	private static final String				ATTR_LONGITUDE					= "lon";									//$NON-NLS-1$
+	private static final String				ATTR_LATITUDE					= "lat";								//$NON-NLS-1$
+	private static final String				ATTR_LONGITUDE					= "lon";								//$NON-NLS-1$
 
-	private static final SimpleDateFormat	GPX_TIME_FORMAT					= new SimpleDateFormat(
-																					"yyyy-MM-dd'T'HH:mm:ss'Z'");		//$NON-NLS-1$
-	private static final SimpleDateFormat	GPX_TIME_FORMAT_SSSZ			= new SimpleDateFormat(
-																					"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");	//$NON-NLS-1$
-	private static final SimpleDateFormat	GPX_TIME_FORMAT_RFC822			= new SimpleDateFormat(
-																					"yyyy-MM-dd'T'HH:mm:ssZ");			//$NON-NLS-1$
+	private static final SimpleDateFormat	GPX_TIME_FORMAT;
+	private static final SimpleDateFormat	GPX_TIME_FORMAT_SSSZ;
+	private static final SimpleDateFormat	GPX_TIME_FORMAT_RFC822;
 	private static final long				DEFAULT_DATE_TIME;
+
 	static {
+
+		GPX_TIME_FORMAT_RFC822 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ"); //$NON-NLS-1$
+		GPX_TIME_FORMAT_SSSZ = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); //$NON-NLS-1$
+		GPX_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"); //$NON-NLS-1$
+
 		DEFAULT_DATE_TIME = ZonedDateTime
 				.of(2000, 1, 1, 0, 0, 0, 0, TimeTools.getDefaultTimeZone())
 				.toInstant()
 				.toEpochMilli();
 	}
 
-	private IPreferenceStore				_prefStore						= Activator
-																					.getDefault()
-																					.getPreferenceStore();
+	private IPreferenceStore				_prefStore				= Activator.getDefault().getPreferenceStore();
 
-	private int								_gpxVersion						= -1;
-	private boolean							_gpxHasLocalTime;															// To work around a Polar Websync export bug...
+	private int								_gpxVersion				= -1;
+	private boolean							_gpxHasLocalTime;														// To work around a Polar Websync export bug...
 
 	private boolean							_isInMetaData;
 	private boolean							_isInTrk;
@@ -251,7 +255,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	private boolean							_isInWpt_UrlAddress;
 	private boolean							_isInWpt_UrlText;
 
-	private final ArrayList<TimeData>		_timeDataList					= new ArrayList<TimeData>();
+	private final ArrayList<TimeData>		_timeDataList			= new ArrayList<TimeData>();
 	private TimeData						_timeSlice;
 	private TimeData						_prevTimeSlice;
 	private String							_trkDesc;
@@ -263,16 +267,16 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	private HashMap<Long, TourData>			_newlyImportedTours;
 	private int								_trackCounter;
 
-	private final Set<TourMarker>			_allMarker						= new HashSet<TourMarker>();
-	private final ArrayList<TourWayPoint>	_allWayPoints					= new ArrayList<TourWayPoint>();
-	private final ArrayList<String>			_allImportedTagNames			= new ArrayList<String>();
+	private final Set<TourMarker>			_allMarker				= new HashSet<TourMarker>();
+	private final ArrayList<TourWayPoint>	_allWayPoints			= new ArrayList<TourWayPoint>();
+	private final ArrayList<String>			_allImportedTagNames	= new ArrayList<String>();
 
 	private TourData						_tourData;
 	private TourMarker						_tempTourMarker;
 	private TourWayPoint					_wayPoint;
 	private String							_tourTypeName;
 
-	private final ArrayList<GPXDataLap>		_gpxDataList					= new ArrayList<GPXDataLap>();
+	private final ArrayList<GPXDataLap>		_gpxDataList			= new ArrayList<GPXDataLap>();
 	private GPXDataLap						_gpxDataLap;
 
 	private boolean							_isSetTrackMarker;
@@ -283,7 +287,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	private boolean							_isImported;
 	private boolean							_isError;
 
-	private final StringBuilder				_characters						= new StringBuilder();
+	private final StringBuilder				_characters				= new StringBuilder();
 
 	private boolean							_isAbsoluteDistance;
 	private float							_gpxAbsoluteDistance;
@@ -467,7 +471,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 				}
 			}
 
-			if (name.equals(TAG_TRKPT)) {
+			if (TAG_TRKPT.equals(name) || TAG_RTEPT.equals(name)) {
 
 				/*
 				 * trackpoint ends
@@ -477,7 +481,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 				finalizeTrackpoint();
 
-			} else if (name.equals(TAG_TRK)) {
+			} else if (TAG_TRK.equals(name) || TAG_RTE.equals(name)) {
 
 				/*
 				 * track ends
@@ -1200,7 +1204,8 @@ public class GPX_SAX_Handler extends DefaultHandler {
 			final String labelText = Integer.toString(_trackCounter) + //
 					(originalTime == Long.MIN_VALUE //
 							? UI.EMPTY_STRING
-							: UI.DASH_WITH_SPACE + TimeTools.getZonedDateTime(_timeSlice.absoluteTime)//
+							: UI.DASH_WITH_SPACE + TimeTools
+									.getZonedDateTime(_timeSlice.absoluteTime)//
 									.format(TimeTools.Formatter_DateTime_M));
 
 			final String markerLabel = NLS.bind(Messages.Marker_Label_Track, labelText);
@@ -1497,7 +1502,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 				startElement_META(name);
 
-			} else if (name.equals(TAG_TRK)) {
+			} else if (TAG_TRK.equals(name) || TAG_RTE.equals(name)) {
 
 				/*
 				 * new track starts
@@ -1639,7 +1644,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 				_characters.delete(0, _characters.length());
 			}
 
-		} else if (name.equals(TAG_TRKPT) /* || name.equals(TAG_RTEPT) */) {
+		} else if (TAG_TRKPT.equals(name) || TAG_RTEPT.equals(name)) {
 
 			/*
 			 * new trackpoing
