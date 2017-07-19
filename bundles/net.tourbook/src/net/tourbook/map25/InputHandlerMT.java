@@ -132,7 +132,11 @@ public class InputHandlerMT extends InputHandler {
 	public boolean touchDown(final int screenX, final int screenY, final int pointer, final int button) {
 
 		if (button == Buttons.LEFT) {
-			_isReCenter = true;
+
+			if (!_mapApp.getAndReset_IsMapItemHit()) {
+
+				_isReCenter = true;
+			}
 		}
 
 		return super.touchDown(screenX, screenY, pointer, button);

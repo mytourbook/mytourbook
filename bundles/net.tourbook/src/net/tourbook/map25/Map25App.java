@@ -16,15 +16,23 @@
 package net.tourbook.map25;
 
 import java.awt.Canvas;
+import java.awt.Graphics2D;
+import java.awt.geom.Ellipse2D;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 import net.tourbook.map25.Map25TileSource.Builder;
 import net.tourbook.map25.OkHttpEngineMT.OkHttpFactoryMT;
+import net.tourbook.map25.layer.tourtrack.TourLayer;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.widgets.Display;
+import org.oscim.awt.AwtBitmap;
 import org.oscim.awt.AwtGraphics;
 import org.oscim.backend.GLAdapter;
+import org.oscim.backend.canvas.Color;
 import org.oscim.core.MapPosition;
 import org.oscim.core.MercatorProjection;
 import org.oscim.gdx.GdxAssets;
@@ -32,6 +40,12 @@ import org.oscim.gdx.GdxMap;
 import org.oscim.gdx.GestureHandlerImpl;
 import org.oscim.gdx.LwjglGL20;
 import org.oscim.gdx.MotionHandler;
+import org.oscim.layers.marker.ClusterMarkerRenderer;
+import org.oscim.layers.marker.ItemizedLayer;
+import org.oscim.layers.marker.ItemizedLayer.OnItemGestureListener;
+import org.oscim.layers.marker.MarkerItem;
+import org.oscim.layers.marker.MarkerRendererFactory;
+import org.oscim.layers.marker.MarkerSymbol;
 import org.oscim.layers.tile.TileManager;
 import org.oscim.layers.tile.buildings.BuildingLayer;
 import org.oscim.layers.tile.vector.labeling.LabelLayer;
@@ -61,35 +75,40 @@ import okhttp3.Cache;
 
 public class Map25App extends GdxMap {
 
-	private static final String		STATE_MAP_POS_X						= "STATE_MAP_POS_X";						//$NON-NLS-1$
-	private static final String		STATE_MAP_POS_Y						= "STATE_MAP_POS_Y";						//$NON-NLS-1$
-	private static final String		STATE_MAP_POS_ZOOM_LEVEL			= "STATE_MAP_POS_ZOOM_LEVEL";				//$NON-NLS-1$
-	private static final String		STATE_MAP_POS_BEARING				= "STATE_MAP_POS_BEARING";					//$NON-NLS-1$
-	private static final String		STATE_MAP_POS_SCALE					= "STATE_MAP_POS_SCALE";					//$NON-NLS-1$
-	private static final String		STATE_MAP_POS_TILT					= "STATE_MAP_POS_TILT";						//$NON-NLS-1$
-	private static final String		STATE_SELECTED_MAP25_PROVIDER_ID	= "STATE_SELECTED_MAP25_PROVIDER_ID";		//$NON-NLS-1$
+	private static final String			STATE_MAP_POS_X						= "STATE_MAP_POS_X";						//$NON-NLS-1$
+	private static final String			STATE_MAP_POS_Y						= "STATE_MAP_POS_Y";						//$NON-NLS-1$
+	private static final String			STATE_MAP_POS_ZOOM_LEVEL			= "STATE_MAP_POS_ZOOM_LEVEL";				//$NON-NLS-1$
+	private static final String			STATE_MAP_POS_BEARING				= "STATE_MAP_POS_BEARING";					//$NON-NLS-1$
+	private static final String			STATE_MAP_POS_SCALE					= "STATE_MAP_POS_SCALE";					//$NON-NLS-1$
+	private static final String			STATE_MAP_POS_TILT					= "STATE_MAP_POS_TILT";						//$NON-NLS-1$
+	private static final String			STATE_SELECTED_MAP25_PROVIDER_ID	= "STATE_SELECTED_MAP25_PROVIDER_ID";		//$NON-NLS-1$
 
-	public static final Logger		log									= LoggerFactory.getLogger(Map25App.class);
+	public static final Logger			log									= LoggerFactory.getLogger(Map25App.class);
 
-	private static IDialogSettings	_state;
+	private static IDialogSettings		_state;
 
-	private static Map25View		_map25View;
-	private static LwjglApplication	_lwjglApp;
+	private static Map25View			_map25View;
+	private static LwjglApplication		_lwjglApp;
 
-	private Map25Provider			_selectedMapProvider;
+	private Map25Provider				_selectedMapProvider;
+	private TileManager					_tileManager;
 
-	private TileManager				_tileManager;
+	private OsmTileLayerMT				_layer_BaseMap;
+	private BuildingLayer				_layer_Building;
+	private LabelLayer					_layer_Label;
+	private ItemizedLayer<MarkerItem>	_layer_Marker;
+	private MapScaleBarLayer			_layer_ScaleBar;
+	private TileGridLayerMT				_layer_TileInfo;
+	private TourLayer					_layer_Tour;
 
-	private OsmTileLayerMT			_layer_BaseMap;
-	private BuildingLayer			_layer_Building;
-	private LabelLayer				_layer_Label;
-	private MapScaleBarLayer		_layer_ScaleBar;
-	private TileGridLayerMT			_layer_TileInfo;
-	private TourLayer				_layer_Tour;
+	private OkHttpFactoryMT				_httpFactory;
 
-	private OkHttpFactoryMT			_httpFactory;
+	private long						_lastRenderTime;
 
-	private long					_lastRenderTime;
+	/**
+	 * Is <code>true</code> when a tour marker is hit.
+	 */
+	private boolean						_isMapItemHit;
 
 	public Map25App(final IDialogSettings state) {
 
@@ -162,6 +181,98 @@ public class Map25App extends GdxMap {
 		Gdx.input.setInputProcessor(mux);
 	}
 
+	private ItemizedLayer<MarkerItem> createLayer_Marker() {
+
+		final BufferedImage buImage = new BufferedImage(20, 20, BufferedImage.TYPE_INT_ARGB_PRE);
+
+		final Graphics2D g2d_2 = buImage.createGraphics();
+		{
+			g2d_2.setColor(java.awt.Color.red);
+			g2d_2.fill(new Ellipse2D.Float(0, 0, 20, 20));
+		}
+		g2d_2.dispose();
+
+		final AwtBitmap awtBitmap = new AwtBitmap(buImage);
+
+		MarkerSymbol symbol;
+//		symbol = new MarkerSymbol(awtBitmap, MarkerSymbol.HotspotPlace.BOTTOM_CENTER);
+		symbol = new MarkerSymbol(awtBitmap, MarkerSymbol.HotspotPlace.CENTER, true);
+
+		final MarkerRendererFactory markerRenderFactory = ClusterMarkerRenderer.factory(
+				symbol,
+				new ClusterMarkerRenderer.ClusterStyle(Color.WHITE, Color.BLUE));
+
+		final OnItemGestureListener<MarkerItem> onItemGestureListener = new OnItemGestureListener<MarkerItem>() {
+
+			@Override
+			public boolean onItemLongPress(final int index, final MarkerItem item) {
+
+				System.out.println(
+						(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
+								+ ("\tonItemLongPress")
+								+ ("\tindex:" + index)
+								+ ("\t_isMapItemHit:" + _isMapItemHit + " -> true")
+				//
+				);
+				// TODO remove SYSTEM.OUT.PRINTLN
+
+				_isMapItemHit = true;
+
+				return true;
+			}
+
+			@Override
+			public boolean onItemSingleTapUp(final int index, final MarkerItem item) {
+
+				System.out.println(
+						(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
+								+ ("\tonItemSingleTapUp")//
+								+ ("\tindex:" + index)
+								+ ("\t_isMapItemHit:" + _isMapItemHit + " -> true")
+				//
+				);
+				// TODO remove SYSTEM.OUT.PRINTLN
+
+				_isMapItemHit = true;
+
+				return true;
+			}
+		};
+
+		final ItemizedLayer<MarkerItem> mMarkerLayer = new ItemizedLayer<>(//
+				mMap,
+				new ArrayList<MarkerItem>(),
+				markerRenderFactory,
+				onItemGestureListener);
+
+		return mMarkerLayer;
+	}
+
+	/**
+	 * Layer: Scale bar
+	 */
+	private MapScaleBarLayer createLayer_ScaleBar() {
+
+		final DefaultMapScaleBar mapScaleBar = new DefaultMapScaleBar(mMap);
+
+		mapScaleBar.setScaleBarMode(DefaultMapScaleBar.ScaleBarMode.SINGLE);
+//		mapScaleBar.setScaleBarMode(DefaultMapScaleBar.ScaleBarMode.BOTH);
+
+		mapScaleBar.setDistanceUnitAdapter(MetricUnitAdapter.INSTANCE);
+//		mapScaleBar.setSecondaryDistanceUnitAdapter(ImperialUnitAdapter.INSTANCE);
+
+		mapScaleBar.setScaleBarPosition(MapScaleBar.ScaleBarPosition.BOTTOM_LEFT);
+
+		final MapScaleBarLayer layer = new MapScaleBarLayer(mMap, mapScaleBar);
+		layer.setEnabled(false);
+
+		final BitmapRenderer renderer = layer.getRenderer();
+		renderer.setPosition(GLViewport.Position.BOTTOM_RIGHT);
+		renderer.setOffset(5, 0);
+
+		return layer;
+	}
+
 	@Override
 	public void createLayers() {
 
@@ -213,6 +324,20 @@ public class Map25App extends GdxMap {
 		super.dispose();
 	}
 
+	public boolean getAndReset_IsMapItemHit() {
+
+		System.out.println(
+				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
+						+ ("\tgetAndReset_IsMapItemHit:" + _isMapItemHit));
+		// TODO remove SYSTEM.OUT.PRINTLN
+
+		final boolean isMapItemHit = _isMapItemHit;
+
+		_isMapItemHit = false;
+
+		return isMapItemHit;
+	}
+
 	public OsmTileLayerMT getLayer_BaseMap() {
 		return _layer_BaseMap;
 	}
@@ -223,6 +348,10 @@ public class Map25App extends GdxMap {
 
 	public LabelLayer getLayer_Label() {
 		return _layer_Label;
+	}
+
+	public ItemizedLayer<MarkerItem> getLayer_Marker() {
+		return _layer_Marker;
 	}
 
 	public MapScaleBarLayer getLayer_ScaleBar() {
@@ -439,49 +568,30 @@ public class Map25App extends GdxMap {
 
 		final Layers layers = mMap.layers();
 
-		/*
-		 * Tour layer
-		 */
-
+		// tour
 		_layer_Tour = new TourLayer(mMap);
 		_layer_Tour.setEnabled(false);
 		layers.add(_layer_Tour);
 
-		/*
-		 * Other layers
-		 */
+		// building
 		_layer_Building = new BuildingLayer(mMap, _layer_BaseMap);
 		_layer_Building.setEnabled(false);
+		layers.add(_layer_Building);
 
+		// label
 		_layer_Label = new LabelLayer(mMap, _layer_BaseMap);
 		_layer_Label.setEnabled(false);
-		layers.add(_layer_Building);
 		layers.add(_layer_Label);
 
-		/*
-		 * Layer: Scale bar
-		 */
-		final DefaultMapScaleBar mapScaleBar = new DefaultMapScaleBar(mMap);
+		// marker
+		_layer_Marker = createLayer_Marker();
+		layers.add(_layer_Marker);
 
-		mapScaleBar.setScaleBarMode(DefaultMapScaleBar.ScaleBarMode.SINGLE);
-//		mapScaleBar.setScaleBarMode(DefaultMapScaleBar.ScaleBarMode.BOTH);
-
-		mapScaleBar.setDistanceUnitAdapter(MetricUnitAdapter.INSTANCE);
-//		mapScaleBar.setSecondaryDistanceUnitAdapter(ImperialUnitAdapter.INSTANCE);
-
-		mapScaleBar.setScaleBarPosition(MapScaleBar.ScaleBarPosition.BOTTOM_LEFT);
-
-		_layer_ScaleBar = new MapScaleBarLayer(mMap, mapScaleBar);
-		_layer_ScaleBar.setEnabled(false);
-
-		final BitmapRenderer renderer = _layer_ScaleBar.getRenderer();
-		renderer.setPosition(GLViewport.Position.BOTTOM_RIGHT);
-		renderer.setOffset(5, 0);
+		// scale bar
+		_layer_ScaleBar = createLayer_ScaleBar();
 		layers.add(_layer_ScaleBar);
 
-		/*
-		 * Tile info
-		 */
+		// tile info
 		_layer_TileInfo = new TileGridLayerMT(mMap);
 		_layer_TileInfo.setEnabled(false);
 		layers.add(_layer_TileInfo);

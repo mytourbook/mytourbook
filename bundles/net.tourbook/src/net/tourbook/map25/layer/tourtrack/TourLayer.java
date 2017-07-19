@@ -33,12 +33,12 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.map25;
+package net.tourbook.map25.layer.tourtrack;
 
 import gnu.trove.list.array.TIntArrayList;
 
 import net.tourbook.common.color.ColorUtil;
-import net.tourbook.map25.layer.tourtrack.TourTrackConfig;
+import net.tourbook.map25.Map25ConfigManager;
 
 import org.oscim.backend.canvas.Paint.Cap;
 import org.oscim.core.GeoPoint;

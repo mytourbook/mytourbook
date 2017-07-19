@@ -22,6 +22,8 @@ import java.awt.Canvas;
 import java.awt.Frame;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
@@ -34,12 +36,14 @@ import net.tourbook.common.tooltip.OpenDialogManager;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourMarker;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.map2.Messages;
 import net.tourbook.map25.action.ActionSelectMap25Provider;
 import net.tourbook.map25.action.ActionShowEntireTour;
 import net.tourbook.map25.action.ActionSynchMapWithChartSlider;
 import net.tourbook.map25.action.ActionSynchMapWithTour;
+import net.tourbook.map25.layer.tourtrack.TourLayer;
 import net.tourbook.map25.ui.SlideoutMap25Options;
 import net.tourbook.map25.ui.SlideoutTourTrackConfig;
 import net.tourbook.photo.PhotoSelection;
@@ -73,6 +77,8 @@ import org.eclipse.ui.part.ViewPart;
 import org.oscim.core.BoundingBox;
 import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
+import org.oscim.layers.marker.ItemizedLayer;
+import org.oscim.layers.marker.MarkerItem;
 import org.oscim.map.Animator;
 import org.oscim.map.Map;
 import org.oscim.utils.Easing;
@@ -419,6 +425,60 @@ public class Map25View extends ViewPart {
 		}
 
 		return new BoundingBox(minLat, minLon, maxLat, maxLon);
+	}
+
+	private List<MarkerItem> createMarker(final ArrayList<TourData> allTourData) {
+
+		final List<MarkerItem> allMarkerItems = new ArrayList<>();
+
+		for (final TourData tourData : allTourData) {
+
+			final Set<TourMarker> tourMarkerList = tourData.getTourMarkers();
+			if (tourMarkerList.size() == 0) {
+				continue;
+			}
+
+			// check if geo position is available
+			final double[] latitudeSerie = tourData.latitudeSerie;
+			final double[] longitudeSerie = tourData.longitudeSerie;
+			if (latitudeSerie == null || longitudeSerie == null) {
+				continue;
+			}
+
+			for (final TourMarker tourMarker : tourMarkerList) {
+
+				// skip marker when hidden or not set
+				if (tourMarker.isMarkerVisible() == false || tourMarker.getLabel().length() == 0) {
+					continue;
+				}
+
+				final int serieIndex = tourMarker.getSerieIndex();
+
+				/*
+				 * check bounds because when a tour is split, it can happen that the marker serie
+				 * index is out of scope
+				 */
+				if (serieIndex >= latitudeSerie.length) {
+					continue;
+				}
+
+				/*
+				 * draw tour marker
+				 */
+
+				final double latitude = latitudeSerie[serieIndex];
+				final double longitude = longitudeSerie[serieIndex];
+
+				final MarkerItem item = new MarkerItem(
+						tourMarker.getLabel(),
+						tourMarker.getDescription(),
+						new GeoPoint(latitude, longitude));
+
+				allMarkerItems.add(item);
+			}
+		}
+
+		return allMarkerItems;
 	}
 
 	@Override
@@ -807,6 +867,16 @@ public class Map25View extends ViewPart {
 		}
 
 		tourLayer.setPoints(_allGeoPoints, _allTourStarts);
+
+		/*
+		 * Marker
+		 */
+		final ItemizedLayer<MarkerItem> markerLayer = _mapApp.getLayer_Marker();
+		if (markerLayer.isEnabled()) {
+
+			markerLayer.removeAllItems(false);
+			markerLayer.addItems(createMarker(_allTourData));
+		}
 
 		final Map map25 = _mapApp.getMap();
 
