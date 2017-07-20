@@ -38,7 +38,7 @@ import org.eclipse.swt.widgets.ToolBar;
 /**
  * Map 2.5D properties slideout.
  */
-public class SlideoutMap25Options extends ToolbarSlideout {
+public class SlideoutMap25_Options extends ToolbarSlideout {
 
 	private SelectionAdapter	_layerSelectionListener;
 
@@ -67,7 +67,7 @@ public class SlideoutMap25Options extends ToolbarSlideout {
 	 * @param toolBar
 	 * @param map25View
 	 */
-	public SlideoutMap25Options(final Control ownerControl,
+	public SlideoutMap25_Options(final Control ownerControl,
 								final ToolBar toolBar,
 								final Map25View map25View) {
 

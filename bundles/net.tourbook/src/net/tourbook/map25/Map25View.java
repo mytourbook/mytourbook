@@ -39,13 +39,14 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.map2.Messages;
+import net.tourbook.map25.action.ActionMap25_ShowMarker;
 import net.tourbook.map25.action.ActionSelectMap25Provider;
 import net.tourbook.map25.action.ActionShowEntireTour;
 import net.tourbook.map25.action.ActionSynchMapWithChartSlider;
 import net.tourbook.map25.action.ActionSynchMapWithTour;
 import net.tourbook.map25.layer.tourtrack.TourLayer;
-import net.tourbook.map25.ui.SlideoutMap25Options;
-import net.tourbook.map25.ui.SlideoutTourTrackConfig;
+import net.tourbook.map25.ui.SlideoutMap25_Options;
+import net.tourbook.map25.ui.SlideoutMap25_TourTrackConfig;
 import net.tourbook.photo.PhotoSelection;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
@@ -94,9 +95,10 @@ public class Map25View extends ViewPart {
 	private static final String		STATE_IS_LAYER_BASE_MAP_VISIBLE			= "STATE_IS_LAYER_BASE_MAP_VISIBLE";			//$NON-NLS-1$
 	private static final String		STATE_IS_LAYER_BUILDING_VISIBLE			= "STATE_IS_LAYER_BUILDING_VISIBLE";			//$NON-NLS-1$
 	private static final String		STATE_IS_LAYER_LABEL_VISIBLE			= "STATE_IS_LAYER_LABEL_VISIBLE";				//$NON-NLS-1$
+	private static final String		STATE_IS_LAYER_MARKER_VISIBLE			= "STATE_IS_LAYER_MARKER_VISIBLE";				//$NON-NLS-1$
+	private static final String		STATE_IS_LAYER_SCALE_BAR_VISIBLE		= "STATE_IS_LAYER_SCALE_BAR_VISIBLE";			//$NON-NLS-1$
 	private static final String		STATE_IS_LAYER_TILE_INFO_VISIBLE		= "STATE_IS_LAYER_TILE_INFO_VISIBLE";			//$NON-NLS-1$
 	private static final String		STATE_IS_LAYER_TOUR_VISIBLE				= "STATE_IS_LAYER_TOUR_VISIBLE";				//$NON-NLS-1$
-	private static final String		STATE_IS_LAYER_SCALE_BAR_VISIBLE		= "STATE_IS_LAYER_SCALE_BAR_VISIBLE";			//$NON-NLS-1$
 	
 	private static final String		STATE_IS_SYNCH_MAP_WITH_CHART_SLIDER	= "STATE_SYNCH_MAP_WITH_CHART_SLIDER";			//$NON-NLS-1$
 	private static final String		STATE_IS_SYNCH_MAP_WITH_TOUR			= "STATE_SYNCH_MAP_WITH_TOUR";					//$NON-NLS-1$
@@ -107,6 +109,7 @@ public class Map25View extends ViewPart {
 // SET_FORMATTING_ON
 
 	private static final IDialogSettings	_state									= TourbookPlugin.getState(ID);
+
 
 	private Map25App						_mapApp;
 
@@ -121,7 +124,8 @@ public class Map25View extends ViewPart {
 	private ISelection						_lastHiddenSelection;
 	private ISelection						_selectionWhenHidden;
 
-	private ActionMap25Options				_actionMap25Options;
+	private ActionMap25_Options				_actionMap25_Options;
+	private ActionMap25_ShowMarker			_actionMap25_Marker;
 	private ActionSelectMap25Provider		_actionSelectMapProvider;
 	private ActionSynchMapWithChartSlider	_actionSynchMapWithChartSlider;
 	private ActionSynchMapWithTour			_actionSynchMapWithTour;
@@ -145,12 +149,12 @@ public class Map25View extends ViewPart {
 	private Composite						_swtContainer;
 	private Composite						_parent;
 
-	private class ActionMap25Options extends ActionToolbarSlideout {
+	private class ActionMap25_Options extends ActionToolbarSlideout {
 
 		@Override
 		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
-			return new SlideoutMap25Options(_parent, toolbar, Map25View.this);
+			return new SlideoutMap25_Options(_parent, toolbar, Map25View.this);
 		}
 
 		@Override
@@ -172,7 +176,7 @@ public class Map25View extends ViewPart {
 		@Override
 		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
-			return new SlideoutTourTrackConfig(_parent, toolbar, Map25View.this);
+			return new SlideoutMap25_TourTrackConfig(_parent, toolbar, Map25View.this);
 		}
 
 		@Override
@@ -192,6 +196,14 @@ public class Map25View extends ViewPart {
 	public void actionShowTour(final boolean isTrackVisible) {
 
 		_mapApp.getLayer_Tour().setEnabled(isTrackVisible);
+		_mapApp.getMap().render();
+
+		updateActionsState();
+	}
+
+	public void actionShowTourMarker(final boolean isMarkerVisible) {
+
+		_mapApp.getLayer_Marker().setEnabled(isMarkerVisible);
 		_mapApp.getMap().render();
 
 		updateActionsState();
@@ -401,12 +413,14 @@ public class Map25View extends ViewPart {
 
 	private void createActions() {
 
-		_actionMap25Options = new ActionMap25Options();
+		_actionMap25_Marker = new ActionMap25_ShowMarker(this, _parent);
+		_actionMap25_Options = new ActionMap25_Options();
 		_actionSelectMapProvider = new ActionSelectMap25Provider(this);
 		_actionShowEntireTour = new ActionShowEntireTour(this);
 		_actionSynchMapWithTour = new ActionSynchMapWithTour(this);
 		_actionSynchMapWithChartSlider = new ActionSynchMapWithChartSlider(this);
 		_actionTourTrackConfig = new ActionTourTrackConfig();
+
 	}
 
 	private BoundingBox createBoundingBox(final GeoPoint[] geoPoints) {
@@ -538,6 +552,10 @@ public class Map25View extends ViewPart {
 		 */
 		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
+		tbm.add(_actionMap25_Marker);
+
+		tbm.add(new Separator());
+
 		tbm.add(_actionTourTrackConfig);
 		tbm.add(_actionShowEntireTour);
 		tbm.add(_actionSynchMapWithTour);
@@ -545,7 +563,7 @@ public class Map25View extends ViewPart {
 
 		tbm.add(new Separator());
 
-		tbm.add(_actionMap25Options);
+		tbm.add(_actionMap25_Options);
 		tbm.add(_actionSelectMapProvider);
 
 		/*
@@ -926,6 +944,7 @@ public class Map25View extends ViewPart {
 		_mapApp.getLayer_BaseMap().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_BASE_MAP_VISIBLE, true));
 		_mapApp.getLayer_Building().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_BUILDING_VISIBLE, true));
 		_mapApp.getLayer_Label().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_LABEL_VISIBLE, true));
+		_mapApp.getLayer_Marker().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_MARKER_VISIBLE, true));
 		_mapApp.getLayer_ScaleBar().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_SCALE_BAR_VISIBLE, true));
 		_mapApp.getLayer_TileInfo().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_TILE_INFO_VISIBLE, false));
 
@@ -953,6 +972,7 @@ public class Map25View extends ViewPart {
 		_state.put(STATE_IS_LAYER_BASE_MAP_VISIBLE, _mapApp.getLayer_BaseMap().isEnabled());
 		_state.put(STATE_IS_LAYER_BUILDING_VISIBLE, _mapApp.getLayer_Building().isEnabled());
 		_state.put(STATE_IS_LAYER_LABEL_VISIBLE, _mapApp.getLayer_Label().isEnabled());
+		_state.put(STATE_IS_LAYER_MARKER_VISIBLE, _mapApp.getLayer_Marker().isEnabled());
 		_state.put(STATE_IS_LAYER_TILE_INFO_VISIBLE, _mapApp.getLayer_TileInfo().isEnabled());
 		_state.put(STATE_IS_LAYER_TOUR_VISIBLE, _mapApp.getLayer_Tour().isEnabled());
 		_state.put(STATE_IS_LAYER_SCALE_BAR_VISIBLE, _mapApp.getLayer_ScaleBar().isEnabled());
@@ -1100,9 +1120,11 @@ public class Map25View extends ViewPart {
 
 		final boolean canShowTour = isTourAvailable && isTrackLayerVisible;
 
+		_actionMap25_Marker.setEnabled(canShowTour);
+		_actionMap25_Options.setEnabled(canShowTour);
+		_actionShowEntireTour.setEnabled(canShowTour);
 		_actionSynchMapWithChartSlider.setEnabled(canShowTour);
 		_actionSynchMapWithTour.setEnabled(canShowTour);
-		_actionShowEntireTour.setEnabled(canShowTour);
 
 		_actionTourTrackConfig.setSelection(isTrackLayerVisible);
 		_actionTourTrackConfig.setEnabled(isTourAvailable);

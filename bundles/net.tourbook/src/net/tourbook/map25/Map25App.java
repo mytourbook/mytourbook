@@ -585,6 +585,7 @@ public class Map25App extends GdxMap {
 
 		// marker
 		_layer_Marker = createLayer_Marker();
+		_layer_Marker.setEnabled(false);
 		layers.add(_layer_Marker);
 
 		// scale bar
