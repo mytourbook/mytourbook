@@ -44,6 +44,8 @@ import net.tourbook.map25.action.ActionSelectMap25Provider;
 import net.tourbook.map25.action.ActionShowEntireTour;
 import net.tourbook.map25.action.ActionSynchMapWithChartSlider;
 import net.tourbook.map25.action.ActionSynchMapWithTour;
+import net.tourbook.map25.layer.marker.ItemizedLayer;
+import net.tourbook.map25.layer.marker.MarkerItem;
 import net.tourbook.map25.layer.tourtrack.TourLayer;
 import net.tourbook.map25.ui.SlideoutMap25_Options;
 import net.tourbook.map25.ui.SlideoutMap25_TourTrackConfig;
@@ -78,8 +80,6 @@ import org.eclipse.ui.part.ViewPart;
 import org.oscim.core.BoundingBox;
 import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
-import org.oscim.layers.marker.ItemizedLayer;
-import org.oscim.layers.marker.MarkerItem;
 import org.oscim.map.Animator;
 import org.oscim.map.Map;
 import org.oscim.utils.Easing;
@@ -110,7 +110,6 @@ public class Map25View extends ViewPart {
 
 	private static final IDialogSettings	_state									= TourbookPlugin.getState(ID);
 
-
 	private Map25App						_mapApp;
 
 	private OpenDialogManager				_openDlgMgr								= new OpenDialogManager();
@@ -123,6 +122,7 @@ public class Map25View extends ViewPart {
 
 	private ISelection						_lastHiddenSelection;
 	private ISelection						_selectionWhenHidden;
+	private int								_lastSelectionHash;
 
 	private ActionMap25_Options				_actionMap25_Options;
 	private ActionMap25_ShowMarker			_actionMap25_Marker;
@@ -580,9 +580,23 @@ public class Map25View extends ViewPart {
 
 	private void onSelectionChanged(final ISelection selection) {
 
-//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//				+ ("\tonSelectionChanged: " + selection));
+//		System.out.println(
+//				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//						+ ("\tonSelectionChanged: " + selection) //
+//						+ ("\thash:") + selection.hashCode());
 //		// TODO remove SYSTEM.OUT.PRINTLN
+
+		final int selectionHash = selection.hashCode();
+		if (_lastSelectionHash == selectionHash) {
+
+			/*
+			 * Last selection has not changed, this can occure when the app lost the focus and got
+			 * the focus again.
+			 */
+			return;
+		}
+
+		_lastSelectionHash = selectionHash;
 
 		if (_isPartVisible == false) {
 
@@ -935,16 +949,21 @@ public class Map25View extends ViewPart {
 		/*
 		 * Layer
 		 */
+
 		// tour
 		final boolean isTourVisible = Util.getStateBoolean(_state, STATE_IS_LAYER_TOUR_VISIBLE, true);
 		_actionTourTrackConfig.setSelection(isTourVisible);
 		_mapApp.getLayer_Tour().setEnabled(isTourVisible);
 
+		// marker
+		final boolean isMarkerVisible = Util.getStateBoolean(_state, STATE_IS_LAYER_MARKER_VISIBLE, true);
+		_actionMap25_Marker.setSelected(isMarkerVisible);
+		_mapApp.getLayer_Marker().setEnabled(isMarkerVisible);
+
 		// other layers
 		_mapApp.getLayer_BaseMap().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_BASE_MAP_VISIBLE, true));
 		_mapApp.getLayer_Building().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_BUILDING_VISIBLE, true));
 		_mapApp.getLayer_Label().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_LABEL_VISIBLE, true));
-		_mapApp.getLayer_Marker().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_MARKER_VISIBLE, true));
 		_mapApp.getLayer_ScaleBar().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_SCALE_BAR_VISIBLE, true));
 		_mapApp.getLayer_TileInfo().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_TILE_INFO_VISIBLE, false));
 

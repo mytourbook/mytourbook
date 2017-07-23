@@ -178,6 +178,17 @@ public class Util {
 		}
 	}
 
+	public static void close(final InputStreamReader reader) {
+
+		if (reader != null) {
+			try {
+				reader.close();
+			} catch (final IOException e) {
+				StatusUtil.log(e);
+			}
+		}
+	}
+
 	/**
 	 * @param os
 	 * @return Returns <code>false</code> when an exception occures.
@@ -2179,31 +2190,23 @@ public class Util {
 	}
 
 	/**
-	 * @param xmlColor
-	 * @param rgb
-	 */
-	public static void setXmlRgb(final IMemento xmlColor, final RGB rgb) {
-
-		xmlColor.putInteger(ATTR_COLOR_RED, rgb.red);
-		xmlColor.putInteger(ATTR_COLOR_GREEN, rgb.green);
-		xmlColor.putInteger(ATTR_COLOR_BLUE, rgb.blue);
-	}
-
-	/**
 	 * Creates a child for the color.
 	 * 
 	 * @param xmlColor
 	 * @param tagName
 	 * @param rgb
+	 * @return
 	 */
-	public static void setXmlRgb(final IMemento xmlColor, final String tagName, final RGB rgb) {
+	public static IMemento setXmlRgb(final IMemento xmlColor, final String tagName, final RGB rgb) {
 
-		final IMemento colorValue = xmlColor.createChild(tagName);
+		final IMemento xmlColorTag = xmlColor.createChild(tagName);
 		{
-			colorValue.putInteger(ATTR_COLOR_RED, rgb.red);
-			colorValue.putInteger(ATTR_COLOR_GREEN, rgb.green);
-			colorValue.putInteger(ATTR_COLOR_BLUE, rgb.blue);
+			xmlColorTag.putInteger(ATTR_COLOR_RED, rgb.red);
+			xmlColorTag.putInteger(ATTR_COLOR_GREEN, rgb.green);
+			xmlColorTag.putInteger(ATTR_COLOR_BLUE, rgb.blue);
 		}
+
+		return xmlColorTag;
 	}
 
 	/**

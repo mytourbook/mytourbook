@@ -25,6 +25,12 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 import net.tourbook.map25.Map25TileSource.Builder;
 import net.tourbook.map25.OkHttpEngineMT.OkHttpFactoryMT;
+import net.tourbook.map25.layer.marker.ClusterMarkerRenderer;
+import net.tourbook.map25.layer.marker.ItemizedLayer;
+import net.tourbook.map25.layer.marker.ItemizedLayer.OnItemGestureListener;
+import net.tourbook.map25.layer.marker.MarkerItem;
+import net.tourbook.map25.layer.marker.MarkerRendererFactory;
+import net.tourbook.map25.layer.marker.MarkerSymbol;
 import net.tourbook.map25.layer.tourtrack.TourLayer;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -40,12 +46,6 @@ import org.oscim.gdx.GdxMap;
 import org.oscim.gdx.GestureHandlerImpl;
 import org.oscim.gdx.LwjglGL20;
 import org.oscim.gdx.MotionHandler;
-import org.oscim.layers.marker.ClusterMarkerRenderer;
-import org.oscim.layers.marker.ItemizedLayer;
-import org.oscim.layers.marker.ItemizedLayer.OnItemGestureListener;
-import org.oscim.layers.marker.MarkerItem;
-import org.oscim.layers.marker.MarkerRendererFactory;
-import org.oscim.layers.marker.MarkerSymbol;
 import org.oscim.layers.tile.TileManager;
 import org.oscim.layers.tile.buildings.BuildingLayer;
 import org.oscim.layers.tile.vector.labeling.LabelLayer;
@@ -194,12 +194,12 @@ public class Map25App extends GdxMap {
 
 		final AwtBitmap awtBitmap = new AwtBitmap(buImage);
 
-		MarkerSymbol symbol;
+		MarkerSymbol markerSymbol;
 //		symbol = new MarkerSymbol(awtBitmap, MarkerSymbol.HotspotPlace.BOTTOM_CENTER);
-		symbol = new MarkerSymbol(awtBitmap, MarkerSymbol.HotspotPlace.CENTER, true);
+		markerSymbol = new MarkerSymbol(awtBitmap, MarkerSymbol.HotspotPlace.CENTER, true);
 
 		final MarkerRendererFactory markerRenderFactory = ClusterMarkerRenderer.factory(
-				symbol,
+				markerSymbol,
 				new ClusterMarkerRenderer.ClusterStyle(Color.WHITE, Color.BLUE));
 
 		final OnItemGestureListener<MarkerItem> onItemGestureListener = new OnItemGestureListener<MarkerItem>() {
@@ -239,13 +239,13 @@ public class Map25App extends GdxMap {
 			}
 		};
 
-		final ItemizedLayer<MarkerItem> mMarkerLayer = new ItemizedLayer<>(//
+		final ItemizedLayer<MarkerItem> markerLayer = new ItemizedLayer<>(
 				mMap,
 				new ArrayList<MarkerItem>(),
 				markerRenderFactory,
 				onItemGestureListener);
 
-		return mMarkerLayer;
+		return markerLayer;
 	}
 
 	/**
@@ -285,6 +285,7 @@ public class Map25App extends GdxMap {
 		final UrlTileSource tileSource = createTileSource(_selectedMapProvider, _httpFactory);
 
 		setupMap(_selectedMapProvider, tileSource);
+		updateUI_MarkerLayer();
 
 		restoreState();
 
@@ -445,6 +446,13 @@ public class Map25App extends GdxMap {
 		return false;
 	}
 
+	public void onModifyMarkerConfig() {
+
+		updateUI_MarkerLayer();
+
+		mMap.render();
+	}
+
 	@Override
 	public void render() {
 
@@ -486,6 +494,9 @@ public class Map25App extends GdxMap {
 
 	private void restoreState() {
 
+		/*
+		 * Map position
+		 */
 		final MapPosition mapPosition = new MapPosition();
 
 		mapPosition.x = Util.getStateDouble(_state, STATE_MAP_POS_X, 0.5);
@@ -498,7 +509,6 @@ public class Map25App extends GdxMap {
 		mapPosition.zoomLevel = Util.getStateInt(_state, STATE_MAP_POS_ZOOM_LEVEL, 1);
 
 		mMap.setMapPosition(mapPosition);
-
 	}
 
 	private Map25Provider restoreState_MapProvider() {
@@ -601,6 +611,16 @@ public class Map25App extends GdxMap {
 	void stop() {
 
 		_lwjglApp.stop();
+	}
+
+	private void updateUI_MarkerLayer() {
+		
+		final ClusterMarkerRenderer markerRenderer = (ClusterMarkerRenderer) _layer_Marker.getRenderer();
+		final Map25MarkerConfig markerConfig = Map25ConfigManager.getActiveMarkerConfig();
+
+		markerRenderer.setClusterColor(//
+				markerConfig.clusterColorForeground,
+				markerConfig.clusterColorBackground);
 	}
 
 }

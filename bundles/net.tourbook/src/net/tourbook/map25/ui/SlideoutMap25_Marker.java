@@ -15,35 +15,40 @@
  *******************************************************************************/
 package net.tourbook.map25.ui;
 
+import java.util.ArrayList;
+
 import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.color.ColorSelectorExtended;
 import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.map25.Map25ConfigManager;
+import net.tourbook.map25.Map25MarkerConfig;
 import net.tourbook.map25.Map25View;
-import net.tourbook.preferences.ITourbookPreferences;
 
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 
 /**
@@ -51,18 +56,216 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelectorListener {
 
-	private final IPreferenceStore	_prefStore	= TourbookPlugin.getPrefStore();
-
-	private SelectionAdapter		_defaultSelectionAdapter;
+	private SelectionListener		_defaultSelectionListener;
 	private MouseWheelListener		_defaultMouseWheelListener;
 	private IPropertyChangeListener	_defaultPropertyChangeListener;
 	private FocusListener			_keepOpenListener;
 
+	private PixelConverter			_pc;
+
+	private Map25View				_map25View;
+
+	private boolean					_isUpdateUI;
+
+	private Font					_boldFont;
+
 	{
-		_defaultSelectionAdapter = new SelectionAdapter() {
+		_boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
+	}
+
+	/*
+	 * UI controls
+	 */
+	private Composite				_shellContainer;
+
+	private ColorSelectorExtended	_colorCluster_Background;
+	private ColorSelectorExtended	_colorCluster_Foreground;
+
+	private Combo					_comboConfigName;
+
+	private Label					_lblConfigName;
+
+	private Text					_textConfigName;
+
+	public SlideoutMap25_Marker(final Control ownerControl,
+								final ToolBar toolBar,
+								final IDialogSettings state,
+								final Map25View map25View) {
+
+		super(ownerControl, toolBar);
+
+		_map25View = map25View;
+	}
+
+	@Override
+	public void colorDialogOpened(final boolean isDialogOpened) {
+
+		setIsAnotherDialogOpened(isDialogOpened);
+	}
+
+	private void createActions() {
+
+	}
+
+	@Override
+	protected Composite createToolTipContentArea(final Composite parent) {
+
+		initUI();
+		createActions();
+
+		final Composite ui = createUI(parent);
+
+		fillUI();
+		restoreState();
+		enableControls();
+
+		return ui;
+	}
+
+	private Composite createUI(final Composite parent) {
+
+		_pc = new PixelConverter(parent);
+
+		_shellContainer = new Composite(parent, SWT.NONE);
+		GridLayoutFactory.fillDefaults().margins(UI.SHELL_MARGIN, UI.SHELL_MARGIN).applyTo(_shellContainer);
+//		_shellContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+		{
+			final Composite container = new Composite(_shellContainer, SWT.NO_FOCUS);
+			GridLayoutFactory
+					.fillDefaults()//
+					.numColumns(2)
+					.applyTo(container);
+//			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+			{
+				createUI_000_Title(container);
+				createUI_20_Properties(container);
+				createUI_999_ConfigName(container);
+			}
+		}
+
+		return _shellContainer;
+	}
+
+	private void createUI_000_Title(final Composite parent) {
+
+		/*
+		 * Label: Title
+		 */
+		final Label title = new Label(parent, SWT.LEAD);
+		title.setFont(_boldFont);
+		title.setText(Messages.Slideout_Map25MarkerOptions_Label_Title);
+		GridDataFactory
+				.fillDefaults()//
+				.grab(true, false)
+				.align(SWT.BEGINNING, SWT.CENTER)
+				.applyTo(title);
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		{
+
+			/*
+			 * Combo: Configuration
+			 */
+			_comboConfigName = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
+			GridDataFactory
+					.fillDefaults()
+					.grab(true, false)
+					.align(SWT.BEGINNING, SWT.CENTER)
+					// this is too small in linux
+					//					.hint(_pc.convertHorizontalDLUsToPixels(15 * 4), SWT.DEFAULT)
+					.applyTo(_comboConfigName);
+			_comboConfigName.setVisibleItemCount(20);
+			_comboConfigName.addFocusListener(_keepOpenListener);
+			_comboConfigName.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onSelectConfig();
+				}
+			});
+		}
+	}
+
+	private void createUI_20_Properties(final Composite parent) {
+
+		{
+			/*
+			 * Cluster color
+			 */
+
+			// label
+			final Label label = new Label(parent, SWT.NONE);
+			label.setText(Messages.Slideout_Map25MarkerOptions_Label_ClusterColor);
+			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+
+			final Composite container = new Composite(parent, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+			{
+				// foreground color
+				_colorCluster_Foreground = new ColorSelectorExtended(container);
+				_colorCluster_Foreground.addListener(_defaultPropertyChangeListener);
+				_colorCluster_Foreground.addOpenListener(this);
+
+				// foreground color
+				_colorCluster_Background = new ColorSelectorExtended(container);
+				_colorCluster_Background.addListener(_defaultPropertyChangeListener);
+				_colorCluster_Background.addOpenListener(this);
+			}
+		}
+	}
+
+	private void createUI_999_ConfigName(final Composite parent) {
+
+		/*
+		 * Name
+		 */
+		{
+			/*
+			 * Label
+			 */
+			_lblConfigName = new Label(parent, SWT.NONE);
+			_lblConfigName.setText("&Name");
+			_lblConfigName.setToolTipText("Name for the currently selected tour marker configuration");
+			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_lblConfigName);
+
+			/*
+			 * Text
+			 */
+			_textConfigName = new Text(parent, SWT.BORDER);
+			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_textConfigName);
+			_textConfigName.addModifyListener(new ModifyListener() {
+				@Override
+				public void modifyText(final ModifyEvent e) {
+					onModifyName();
+				}
+			});
+		}
+	}
+
+	private void enableControls() {
+
+	}
+
+	private void fillUI() {
+
+		final boolean backupIsUpdateUI = _isUpdateUI;
+		_isUpdateUI = true;
+		{
+			for (final Map25MarkerConfig config : Map25ConfigManager.getAllMarkerConfigs()) {
+				_comboConfigName.add(config.name);
+			}
+		}
+		_isUpdateUI = backupIsUpdateUI;
+	}
+
+	private void initUI() {
+
+		_defaultSelectionListener = new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
-				onChangeUI();
+				onModifyConfig();
 			}
 		};
 
@@ -70,14 +273,14 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 			@Override
 			public void mouseScrolled(final MouseEvent event) {
 				UI.adjustSpinnerValueOnMouseScroll(event);
-				onChangeUI();
+				onModifyConfig();
 			}
 		};
 
 		_defaultPropertyChangeListener = new IPropertyChangeListener() {
 			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
-				onChangeUI();
+				onModifyConfig();
 			}
 		};
 
@@ -100,174 +303,86 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 		};
 	}
 
-	private PixelConverter			_pc;
+	private void onModifyConfig() {
 
-	private Action					_actionRestoreDefaults;
+		saveState();
 
-	private Map25View				_map25View;
-	
-	private Font				_boldFont;
-	{
-		_boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
-	}
-	/*
-	 * UI controls
-	 */
+		enableControls();
 
-	public SlideoutMap25_Marker(	final Control ownerControl,
-									final ToolBar toolBar,
-									final IDialogSettings state,
-									final Map25View map25View) {
-
-		super(ownerControl, toolBar);
-
-		_map25View = map25View;
+		_map25View.getMapApp().onModifyMarkerConfig();
 	}
 
-	@Override
-	public void colorDialogOpened(final boolean isDialogOpened) {
+	private void onModifyName() {
 
-		setIsAnotherDialogOpened(isDialogOpened);
+		if (_isUpdateUI) {
+			return;
+		}
+
+		// update text in the combo
+		final int selectedIndex = _comboConfigName.getSelectionIndex();
+
+		_comboConfigName.setItem(selectedIndex, _textConfigName.getText());
+
+		saveState();
 	}
 
-	private void createActions() {
+	private void onSelectConfig() {
 
-		/*
-		 * Action: Restore default
-		 */
-		_actionRestoreDefaults = new Action() {
-			@Override
-			public void run() {
-				resetToDefaults();
-			}
-		};
+		final int selectedIndex = _comboConfigName.getSelectionIndex();
+		final ArrayList<Map25MarkerConfig> allConfigurations = Map25ConfigManager.getAllMarkerConfigs();
 
-		_actionRestoreDefaults.setImageDescriptor(//
-				TourbookPlugin.getImageDescriptor(Messages.Image__App_RestoreDefault));
-		_actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
-	}
+		final Map25MarkerConfig selectedConfig = allConfigurations.get(selectedIndex);
+		final Map25MarkerConfig activeConfig = Map25ConfigManager.getActiveMarkerConfig();
 
-	@Override
-	protected Composite createToolTipContentArea(final Composite parent) {
+		if (selectedConfig.equals(activeConfig)) {
 
-		createActions();
+			// config has not changed
+			return;
+		}
 
-		final Composite ui = createUI(parent);
+		// keep data from previous config
+		saveState();
 
-		fillUI();
+		Map25ConfigManager.setActiveMarkerConfig(selectedConfig);
+
 		restoreState();
-		enableControls();
-
-		return ui;
-	}
-
-	private Composite createUI(final Composite parent) {
-
-		_pc = new PixelConverter(parent);
-
-		final Composite shellContainer = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.swtDefaults().applyTo(shellContainer);
-		{
-			final Composite container = new Composite(shellContainer, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-			GridLayoutFactory.fillDefaults().applyTo(container);
-//			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-			{
-				createUI_10_Header(container);
-				createUI_20_Properties(container);
-
-			}
-		}
-
-		return shellContainer;
-	}
-
-	private void createUI_10_Header(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-		{
-			{
-				/*
-				 * Label: Slideout title
-				 */
-				final Label label = new Label(container, SWT.NONE);
-				label.setText(Messages.Slideout_Map25MarkerOptions_Label_Title);
-				label.setFont(_boldFont);
-				GridDataFactory.fillDefaults().applyTo(label);
-			}
-			{
-				final ToolBar toolbar = new ToolBar(container, SWT.FLAT);
-				GridDataFactory
-						.fillDefaults()//
-						.grab(true, false)
-						.align(SWT.END, SWT.BEGINNING)
-						.applyTo(toolbar);
-
-				final ToolBarManager tbm = new ToolBarManager(toolbar);
-
-//				tbm.add(_actionRestoreDefaults);
-
-				tbm.update(true);
-			}
-		}
-	}
-
-	private void createUI_20_Properties(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-		{
-			{
-				final Composite ttContainer = new Composite(container, SWT.NONE);
-				GridDataFactory
-						.fillDefaults()//
-						.grab(true, false)
-						.span(2, 1)
-						.applyTo(ttContainer);
-				GridLayoutFactory.fillDefaults().numColumns(2).applyTo(ttContainer);
-				{
-				}
-			}
-
-		}
-	}
-
-
-	private void enableControls() {
-
-	}
-
-	private void fillUI() {
-
-	}
-
-	private void onChangeUI() {
-
-
-		// update chart with new settings
-//		_map25View.updateUI_MarkerLayer();
 
 		enableControls();
 
-		// notify pref listener
-		TourbookPlugin.getPrefStore().setValue(ITourbookPreferences.GRAPH_MARKER_IS_MODIFIED, Math.random());
+		_map25View.getMapApp().onModifyMarkerConfig();
 	}
 
-	private void resetToDefaults() {
+	/**
+	 * Restores state values from the tour marker configuration and update the UI.
+	 */
+	public void restoreState() {
 
-		/*
-		 * Update UI with defaults from pref store
-		 */
+		_isUpdateUI = true;
+		{
+			final Map25MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
-		onChangeUI();
+			// get active config AFTER getting the index because this could change the active config
+			final int activeConfigIndex = Map25ConfigManager.getActiveMarkerConfigIndex();
+
+			_comboConfigName.select(activeConfigIndex);
+			_textConfigName.setText(config.name);
+
+			_colorCluster_Foreground.setColorValue(config.clusterColorForeground);
+			_colorCluster_Background.setColorValue(config.clusterColorBackground);
+		}
+		_isUpdateUI = false;
 	}
 
-	private void restoreState() {
+	private void saveState() {
 
+		// update config
+
+		final Map25MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
+
+		config.name = _textConfigName.getText();
+
+		config.clusterColorForeground = _colorCluster_Foreground.getColorValue();
+		config.clusterColorBackground = _colorCluster_Background.getColorValue();
 	}
 
 }

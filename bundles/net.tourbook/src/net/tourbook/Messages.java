@@ -1571,6 +1571,7 @@ public class Messages extends NLS {
 	public static String		Slideout_HVROptions_Label_2xToleranceResult_Tooltip;
 	public static String		Slideout_HVROptions_Label_Title;
 
+	public static String		Slideout_Map25MarkerOptions_Label_ClusterColor;
 	public static String		Slideout_Map25MarkerOptions_Label_Title;
 
 	public static String		Slideout_RefTour_YearStatisticOptions_Label_Title;

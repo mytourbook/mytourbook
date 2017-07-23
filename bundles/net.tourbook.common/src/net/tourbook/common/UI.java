@@ -87,6 +87,8 @@ import org.joda.time.format.PeriodFormatterBuilder;
 
 public class UI {
 
+	public static final int				SHELL_MARGIN							= 5;
+
 	public static final char			SPACE									= ' ';
 	public static final char			NEW_LINE								= '\n';
 	public static final char			TAB										= '\t';
@@ -155,8 +157,8 @@ public class UI {
 	public static final String			SYMBOL_QUESTION_MARK					= "?";												//$NON-NLS-1$
 	public static final char			SYMBOL_SEMICOLON						= ';';
 	public static final String			SYMBOL_STAR								= "*";												//$NON-NLS-1$
-	public static final String			SYMBOL_TEMPERATURE_CELCIUS				= "\u00b0C";																								//$NON-NLS-1$
-	public static final String			SYMBOL_TEMPERATURE_FAHRENHEIT			= "\u00b0F";																								//$NON-NLS-1$
+	public static final String			SYMBOL_TEMPERATURE_CELCIUS				= "\u00b0C";										//$NON-NLS-1$
+	public static final String			SYMBOL_TEMPERATURE_FAHRENHEIT			= "\u00b0F";										//$NON-NLS-1$
 	public static final String			SYMBOL_UNDERSCORE						= "_";												//$NON-NLS-1$
 	public static final String			SYMBOL_WIND_WITH_SPACE					= "W ";												//$NON-NLS-1$
 
@@ -176,22 +178,22 @@ public class UI {
 	public static final String			ELLIPSIS_WITH_SPACE						= " ... ";											//$NON-NLS-1$
 
 	private static final char[]			INVALID_FILENAME_CHARS					= new char[] {
-																								'\\',
-																								'/',
-																								':',
-																								'*',
-																								'?',
-																								'"',
-																								'<',
-																								'>',
-																								'|', };
+			'\\',
+			'/',
+			':',
+			'*',
+			'?',
+			'"',
+			'<',
+			'>',
+			'|', };
 	private static final char[]			INVALID_FILEPATH_CHARS					= new char[] {
-																								'*',
-																								'?',
-																								'"',
-																								'<',
-																								'>',
-																								'|', };
+			'*',
+			'?',
+			'"',
+			'<',
+			'>',
+			'|', };
 
 	public static final boolean			IS_LINUX								= "gtk".equals(SWT.getPlatform());					//$NON-NLS-1$
 	public static final boolean			IS_OSX									= "carbon".equals(SWT.getPlatform())				//$NON-NLS-1$
@@ -331,15 +333,19 @@ public class UI {
 	public static final Font			AWT_FONT_ARIAL_BOLD_12					= Font.decode("Arial-bold-12");						//$NON-NLS-1$
 	public static final Font			AWT_FONT_ARIAL_BOLD_24					= Font.decode("Arial-bold-24");						//$NON-NLS-1$
 
+// SET_FORMATTING_OFF
+
 	/*
 	 * image keys for images which are stored in the image registry
 	 */
 	public static final String			IMAGE_ACTION_PHOTO_FILTER				= "IMAGE_ACTION_PHOTO_FILTER";						//$NON-NLS-1$
 	public static final String			IMAGE_ACTION_PHOTO_FILTER_NO_PHOTOS		= "IMAGE_ACTION_PHOTO_FILTER_NO_PHOTOS";			//$NON-NLS-1$
-	public static final String			IMAGE_ACTION_PHOTO_FILTER_WITH_PHOTOS	= "IMAGE_ACTION_PHOTO_FILTER_WITH_PHOTOS";			//$NON-NLS-1$
+	public static final String			IMAGE_ACTION_PHOTO_FILTER_WITH_PHOTOS	= "IMAGE_ACTION_PHOTO_FILTER_WITH_PHOTOS";																				//$NON-NLS-1$
 	public static final String			IMAGE_ACTION_PHOTO_FILTER_DISABLED		= "IMAGE_ACTION_PHOTO_FILTER_DISABLED";				//$NON-NLS-1$
 	public static final String			IMAGE_CONFIGURE_COLUMNS					= "IMAGE_CONFIGURE_COLUMNS";						//$NON-NLS-1$
 	public static final String			IMAGE_EMPTY_16							= "_empty16";										//$NON-NLS-1$
+
+// SET_FORMATTING_ON
 
 	public final static ImageRegistry	IMAGE_REGISTRY;
 
@@ -781,10 +787,12 @@ public class UI {
 
 			// ignore hours
 
-			return _formatter.format(//
-					Messages.Format_hhmm,
-					((time % 3600) / 60),
-					((time % 3600) % 60)).toString();
+			return _formatter
+					.format(
+							Messages.Format_hhmm,
+							((time % 3600) / 60),
+							((time % 3600) % 60))
+					.toString();
 		}
 	}
 
@@ -798,11 +806,13 @@ public class UI {
 
 		_formatterSB.setLength(0);
 
-		return _formatter.format(//
-				Messages.Format_hhmmss,
-				(time / 3600),
-				((time % 3600) / 60),
-				((time % 3600) % 60)).toString();
+		return _formatter
+				.format(
+						Messages.Format_hhmmss,
+						(time / 3600),
+						((time % 3600) / 60),
+						((time % 3600) % 60))
+				.toString();
 	}
 
 	public static String format_mm_ss(final long time) {
@@ -900,10 +910,12 @@ public class UI {
 
 			// ignore hours
 
-			timeText = _formatter.format(//
-					Messages.Format_hhmm,
-					((time % 3600) / 60),
-					((time % 3600) % 60)).toString();
+			timeText = _formatter
+					.format(
+							Messages.Format_hhmm,
+							((time % 3600) / 60),
+							((time % 3600) % 60))
+					.toString();
 
 		}
 

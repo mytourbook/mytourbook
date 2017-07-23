@@ -17,13 +17,14 @@ package net.tourbook.map25.ui;
 
 import java.util.ArrayList;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorSelectorExtended;
 import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
 import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.map25.Map25View;
-import net.tourbook.map25.layer.tourtrack.TourTrackConfig;
+import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
 import net.tourbook.map3.Messages;
 
 import org.eclipse.jface.layout.GridDataFactory;
@@ -31,7 +32,6 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
@@ -53,8 +53,6 @@ import org.eclipse.swt.widgets.ToolBar;
  * Slideout for 2.5D tour track configuration.
  */
 public class SlideoutMap25_TourTrackConfig extends ToolbarSlideout implements IColorSelectorListener {
-
-	private static final int		SHELL_MARGIN	= 5;
 
 	private Map25View				_map25View;
 
@@ -87,7 +85,9 @@ public class SlideoutMap25_TourTrackConfig extends ToolbarSlideout implements IC
 
 	private ColorSelectorExtended	_colorOutlineColor;
 
-	public SlideoutMap25_TourTrackConfig(final Composite ownerControl, final ToolBar toolbar, final Map25View map25View) {
+	public SlideoutMap25_TourTrackConfig(	final Composite ownerControl,
+											final ToolBar toolbar,
+											final Map25View map25View) {
 
 		super(ownerControl, toolbar);
 
@@ -113,8 +113,7 @@ public class SlideoutMap25_TourTrackConfig extends ToolbarSlideout implements IC
 
 		final Composite ui = createUI(parent);
 
-		updateUI_Initial();
-
+		fillUI();
 		restoreState();
 
 		return ui;
@@ -125,7 +124,7 @@ public class SlideoutMap25_TourTrackConfig extends ToolbarSlideout implements IC
 //		_pc = new PixelConverter(parent);
 
 		_shellContainer = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.fillDefaults().margins(SHELL_MARGIN, SHELL_MARGIN).applyTo(_shellContainer);
+		GridLayoutFactory.fillDefaults().margins(UI.SHELL_MARGIN, UI.SHELL_MARGIN).applyTo(_shellContainer);
 //		_shellContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
 			final Composite container = new Composite(_shellContainer, SWT.NO_FOCUS);
@@ -151,8 +150,7 @@ public class SlideoutMap25_TourTrackConfig extends ToolbarSlideout implements IC
 		 */
 		final Label title = new Label(parent, SWT.LEAD);
 		title.setFont(_boldFont);
-//		title.setFont(JFaceResources.getHeaderFont());
-		title.setText(Messages.TourTrack_Properties_Label_ConfigName);
+		title.setText("Track &Options");
 		title.setToolTipText(Messages.TourTrack_Properties_Label_ConfigName_Tooltip);
 		GridDataFactory
 				.fillDefaults()//
@@ -284,9 +282,9 @@ public class SlideoutMap25_TourTrackConfig extends ToolbarSlideout implements IC
 			 * Label
 			 */
 			_lblConfigName = new Label(parent, SWT.NONE);
-			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_lblConfigName);
-
 			_lblConfigName.setText(Messages.TourTrack_Properties_Label_Name);
+			_lblConfigName.setToolTipText("Name for the currently selected tour track configuration");
+			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_lblConfigName);
 
 			/*
 			 * Text
@@ -304,6 +302,19 @@ public class SlideoutMap25_TourTrackConfig extends ToolbarSlideout implements IC
 
 	private void enableControls() {
 
+	}
+
+	private void fillUI() {
+
+		final boolean backupIsUpdateUI = _isUpdateUI;
+		_isUpdateUI = true;
+		{
+
+			for (final Map25TrackConfig config : Map25ConfigManager.getAllTourTrackConfigs()) {
+				_comboName.add(config.name);
+			}
+		}
+		_isUpdateUI = backupIsUpdateUI;
 	}
 
 	private void initUI() {
@@ -354,14 +365,9 @@ public class SlideoutMap25_TourTrackConfig extends ToolbarSlideout implements IC
 
 		saveState();
 
-		updateUI();
-
 		enableControls();
 
 		_map25View.getMapApp().getLayer_Tour().onModifyConfig();
-
-		// update sliders
-//		updateUI_Map25();
 	}
 
 	private void onModifyName() {
@@ -381,10 +387,10 @@ public class SlideoutMap25_TourTrackConfig extends ToolbarSlideout implements IC
 	private void onSelectConfig() {
 
 		final int selectedIndex = _comboName.getSelectionIndex();
-		final ArrayList<TourTrackConfig> allConfigurations = Map25ConfigManager.getAllConfigurations();
+		final ArrayList<Map25TrackConfig> allConfigurations = Map25ConfigManager.getAllTourTrackConfigs();
 
-		final TourTrackConfig selectedConfig = allConfigurations.get(selectedIndex);
-		final TourTrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
+		final Map25TrackConfig selectedConfig = allConfigurations.get(selectedIndex);
+		final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
 		if (selectedConfig == trackConfig) {
 
@@ -395,11 +401,11 @@ public class SlideoutMap25_TourTrackConfig extends ToolbarSlideout implements IC
 		// keep data from previous config
 		saveState();
 
-		final TourTrackConfig previousConfig = (TourTrackConfig) Map25ConfigManager.getActiveTourTrackConfig().clone();
+		// update model
+		Map25ConfigManager.setActiveTrackConfig(selectedConfig);
 
-		Map25ConfigManager.setActiveConfig(selectedConfig);
-
-		updateUI_SetActiveConfig(previousConfig);
+		// update UI
+		updateUI_SetActiveConfig();
 	}
 
 	/**
@@ -409,10 +415,10 @@ public class SlideoutMap25_TourTrackConfig extends ToolbarSlideout implements IC
 
 		_isUpdateUI = true;
 
-		final TourTrackConfig config = Map25ConfigManager.getActiveTourTrackConfig();
+		final Map25TrackConfig config = Map25ConfigManager.getActiveTourTrackConfig();
 
 		// get active config AFTER getting the index because this could change the active config
-		final int activeConfigIndex = Map25ConfigManager.getActiveConfigIndex();
+		final int activeConfigIndex = Map25ConfigManager.getActiveTourTrackConfigIndex();
 
 		_comboName.select(activeConfigIndex);
 		_textConfigName.setText(config.name);
@@ -423,8 +429,6 @@ public class SlideoutMap25_TourTrackConfig extends ToolbarSlideout implements IC
 
 		_spinnerAnimationTime.setSelection(config.animationTime / 100);
 
-		updateUI();
-
 		_isUpdateUI = false;
 	}
 
@@ -432,7 +436,7 @@ public class SlideoutMap25_TourTrackConfig extends ToolbarSlideout implements IC
 
 		// update config
 
-		final TourTrackConfig config = Map25ConfigManager.getActiveTourTrackConfig();
+		final Map25TrackConfig config = Map25ConfigManager.getActiveTourTrackConfig();
 
 		config.name = _textConfigName.getText();
 
@@ -443,56 +447,12 @@ public class SlideoutMap25_TourTrackConfig extends ToolbarSlideout implements IC
 		config.animationTime = _spinnerAnimationTime.getSelection() * 100;
 	}
 
-	private void updateUI() {
-
-		final TourTrackConfig config = Map25ConfigManager.getActiveTourTrackConfig();
-
-		_lblConfigName.setToolTipText(
-				NLS.bind(//
-						Messages.TourTrack_Properties_Label_Name_Tooltip,
-						config.defaultId));
-	}
-
-	private void updateUI_ComboConfigName(final boolean isReplaceItems) {
-
-		final boolean backupIsUpdateUI = _isUpdateUI;
-		_isUpdateUI = true;
-		{
-			int backupNameIndex = 0;
-
-			if (isReplaceItems) {
-				backupNameIndex = _comboName.getSelectionIndex();
-				_comboName.removeAll();
-			}
-
-			for (final TourTrackConfig config : Map25ConfigManager.getAllConfigurations()) {
-				_comboName.add(config.name);
-			}
-
-			if (isReplaceItems) {
-
-				if (backupNameIndex < 0) {
-					backupNameIndex = 0;
-				}
-				_comboName.select(backupNameIndex);
-			}
-		}
-		_isUpdateUI = backupIsUpdateUI;
-	}
-
-	private void updateUI_Initial() {
-
-		updateUI_ComboConfigName(false);
-	}
-
-	private void updateUI_SetActiveConfig(final TourTrackConfig previousConfig) {
+	private void updateUI_SetActiveConfig() {
 
 		restoreState();
 
 		enableControls();
 
 		_map25View.getMapApp().getLayer_Tour().onModifyConfig();
-
-//		updateUI_Map25();
 	}
 }

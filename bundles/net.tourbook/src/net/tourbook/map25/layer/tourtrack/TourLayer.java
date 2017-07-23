@@ -414,7 +414,7 @@ public class TourLayer extends Layer {
 
 	private LineStyle createLineStyle() {
 
-		final TourTrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
+		final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
 		return LineStyle
 
