@@ -15,9 +15,11 @@
  *******************************************************************************/
 package net.tourbook.map25;
 
+import net.tourbook.common.util.StatusUtil;
+
 import org.eclipse.swt.graphics.RGB;
 
-public class Map25MarkerConfig {
+public class Map25MarkerConfig implements Cloneable {
 
 	/*
 	 * Set default values also here to ensure that a valid value is set. A default value would not
@@ -30,6 +32,42 @@ public class Map25MarkerConfig {
 
 	public RGB		clusterColorForeground	= Map25ConfigManager.DEFAULT_CLUSTER_FOREGROUND;
 	public RGB		clusterColorBackground	= Map25ConfigManager.DEFAULT_CLUSTER_BACKGROUND;
+
+	public String	defaultId				= Map25ConfigManager.MARKER_DEFAULT_ID_1;
+
+	/**
+	 * Create a copy of this object.
+	 * 
+	 * @return a copy of this <code>Insets</code> object.
+	 */
+	@Override
+	public Object clone() {
+
+		try {
+
+			// create clones for shallow copied fields so that they can be modified
+
+			final Map25MarkerConfig newConfig = (Map25MarkerConfig) super.clone();
+
+			newConfig.clusterColorBackground = new RGB(
+					clusterColorBackground.red,
+					clusterColorBackground.green,
+					clusterColorBackground.blue);
+
+			newConfig.clusterColorForeground = new RGB(
+					clusterColorForeground.red,
+					clusterColorForeground.green,
+					clusterColorForeground.blue);
+
+			return newConfig;
+
+		} catch (final CloneNotSupportedException e) {
+
+			// this shouldn't happen, since we are Cloneable
+			StatusUtil.log(e);
+			throw new InternalError();
+		}
+	}
 
 	@Override
 	public boolean equals(final Object obj) {
@@ -71,12 +109,13 @@ public class Map25MarkerConfig {
 
 	@Override
 	public String toString() {
-
 		return "Map25MarkerConfig ["
 
-//				+ "id=" + id + ", "
-				+ "name=" + name
+				+ "id=" + id + ", "
+				+ "name=" + name + ", "
+				+ "clusterColorForeground=" + clusterColorForeground + ", "
+				+ "clusterColorBackground=" + clusterColorBackground +
 
-				+ "]";
+				"]\n";
 	}
 }

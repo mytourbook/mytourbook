@@ -38,14 +38,25 @@ import org.osgi.framework.Version;
 
 public class Map25ConfigManager {
 
+	private static final String	CONFIG_NAME_DEFAULT			= Messages.Track_Config_ConfigName_Default;
+	public static final String	CONFIG_NAME_UNKNOWN			= Messages.Track_Config_ConfigName_Unknown;
+
 // SET_FORMATTING_OFF
 // SET_FORMATTING_ON
 
+	static final String			MARKER_DEFAULT_ID_1			= "#1";										//$NON-NLS-1$
+	static final String			MARKER_DEFAULT_ID_2			= "#2";										//$NON-NLS-1$
+	static final String			MARKER_DEFAULT_ID_3			= "#3";										//$NON-NLS-1$
+	static final String			MARKER_DEFAULT_ID_4			= "#4";										//$NON-NLS-1$
+	static final String			MARKER_DEFAULT_ID_5			= "#5";										//$NON-NLS-1$
+	static final String			MARKER_DEFAULT_ID_6			= "#6";										//$NON-NLS-1$
+	static final String			MARKER_DEFAULT_ID_7			= "#7";										//$NON-NLS-1$
+	static final String			MARKER_DEFAULT_ID_8			= "#8";										//$NON-NLS-1$
+	static final String			MARKER_DEFAULT_ID_9			= "#9";										//$NON-NLS-1$
+	static final String			MARKER_DEFAULT_ID_10		= "#10";									//$NON-NLS-1$
+
 	private static final Bundle	_bundle						= TourbookPlugin.getDefault().getBundle();
 	private static final IPath	_stateLocation				= Platform.getStateLocation(_bundle);
-
-	private static final String	CONFIG_NAME_DEFAULT			= Messages.Track_Config_ConfigName_Default;
-	public static final String	CONFIG_NAME_UNKNOWN			= Messages.Track_Config_ConfigName_Unknown;
 
 	private static final String	CONFIG_FILE_NAME			= "map25-config.xml";						//$NON-NLS-1$
 
@@ -137,48 +148,90 @@ public class Map25ConfigManager {
 
 		_allMarkerConfigs.clear();
 
-		_allMarkerConfigs.add(createDefaults_Markers_One(CONFIG_NAME_DEFAULT));
-
 		// append custom configurations
-		for (int customIndex = 0; customIndex < 10; customIndex++) {
-
-			final Map25MarkerConfig markerConfig = createDefaults_Markers_One(//
-					String.format("%s #%d", CONFIG_NAME_DEFAULT, (customIndex + 1)));
-
-			/*
-			 * Individualize custom configurations
-			 */
-			switch (customIndex) {
-			case 0:
-				markerConfig.clusterColorBackground = new RGB(0x03, 0xAD, 0xFF);
-				break;
-
-			case 1:
-				markerConfig.clusterColorBackground = new RGB(0xC6, 0x00, 0xA2);
-				break;
-
-			case 2:
-				markerConfig.clusterColorBackground = new RGB(0x00, 0xBC, 0xC4);
-				break;
-
-//			case :
-//				markerConfig.clusterColorBackground = new RGB();
-//				break;
-//
-			default:
-				break;
-			}
-			_allMarkerConfigs.add(markerConfig);
+		for (int customIndex = 1; customIndex < 11; customIndex++) {
+			_allMarkerConfigs.add(createDefaults_Markers_One(customIndex));
 		}
 	}
 
-	private static Map25MarkerConfig createDefaults_Markers_One(final String name) {
+	/**
+	 * @param defaultIndex
+	 *            Index starts with 1.
+	 * @return
+	 */
+	private static Map25MarkerConfig createDefaults_Markers_One(final int defaultIndex) {
 
-		final Map25MarkerConfig markerConfig = new Map25MarkerConfig();
+		final Map25MarkerConfig config = new Map25MarkerConfig();
 
-		markerConfig.name = name;
+		final RGB fgWhite = new RGB(0xff, 0xff, 0xff);
+		final RGB fgBlack = new RGB(0x0, 0x0, 0x0);
 
-		return markerConfig;
+		final RGB bg1 = new RGB(0x00, 0xA0, 0xED);
+		final RGB bg2 = new RGB(0xC6, 0x00, 0xA2);
+		final RGB bg3 = new RGB(0x00, 0xC4, 0x2C);
+		final RGB bg4 = new RGB(0xFF, 0xC9, 0x00);
+		final RGB bg5 = new RGB(0xFF, 0x00, 0x62);
+
+		switch (defaultIndex) {
+
+		case 1:
+			config.name = config.defaultId = MARKER_DEFAULT_ID_1;
+			config.clusterColorForeground = fgWhite;
+			config.clusterColorBackground = bg1;
+			break;
+		case 2:
+			config.name = config.defaultId = MARKER_DEFAULT_ID_2;
+			config.clusterColorForeground = fgBlack;
+			config.clusterColorBackground = bg1;
+			break;
+
+		case 3:
+			config.name = config.defaultId = MARKER_DEFAULT_ID_3;
+			config.clusterColorForeground = fgWhite;
+			config.clusterColorBackground = bg2;
+			break;
+		case 4:
+			config.name = config.defaultId = MARKER_DEFAULT_ID_4;
+			config.clusterColorForeground = fgBlack;
+			config.clusterColorBackground = bg2;
+			break;
+
+		case 5:
+			config.name = config.defaultId = MARKER_DEFAULT_ID_5;
+			config.clusterColorForeground = fgWhite;
+			config.clusterColorBackground = bg3;
+			break;
+		case 6:
+			config.name = config.defaultId = MARKER_DEFAULT_ID_6;
+			config.clusterColorForeground = fgBlack;
+			config.clusterColorBackground = bg3;
+			break;
+
+		case 7:
+			config.name = config.defaultId = MARKER_DEFAULT_ID_7;
+			config.clusterColorForeground = fgWhite;
+			config.clusterColorBackground = bg4;
+			break;
+		case 8:
+			config.name = config.defaultId = MARKER_DEFAULT_ID_8;
+			config.clusterColorForeground = fgBlack;
+			config.clusterColorBackground = bg4;
+			break;
+
+		case 9:
+			config.name = config.defaultId = MARKER_DEFAULT_ID_9;
+			config.clusterColorForeground = fgWhite;
+			config.clusterColorBackground = bg5;
+			break;
+		case 10:
+			config.name = config.defaultId = MARKER_DEFAULT_ID_10;
+			config.clusterColorForeground = fgBlack;
+			config.clusterColorBackground = bg5;
+			break;
+
+		}
+
+		return config;
 	}
 
 	private static void createDefaults_Tracks() {
@@ -195,6 +248,7 @@ public class Map25ConfigManager {
 					createDefaults_Tracks_One(
 
 							String.format("%s #%d", CONFIG_NAME_DEFAULT, (customIndex + 1)),
+
 							customIndex + 1
 
 					));
@@ -252,6 +306,9 @@ public class Map25ConfigManager {
 		return _activeMarkerConfig;
 	}
 
+	/**
+	 * @return Returns the index for the {@link #_activeMarkerConfig}, the index starts with 0.
+	 */
 	public static int getActiveMarkerConfigIndex() {
 
 		final Map25MarkerConfig activeConfig = getActiveMarkerConfig();
@@ -426,24 +483,8 @@ public class Map25ConfigManager {
 
 					final Map25TrackConfig trackConfig = new Map25TrackConfig();
 
-					parse_010_ConfigAttr(xmlConfig, trackConfig);
-
-					for (final IMemento mementoConfigChild : xmlConfig.getChildren()) {
-
-						final XMLMemento xmlConfigChild = (XMLMemento) mementoConfigChild;
-						final String configTag = xmlConfigChild.getType();
-
-						if (configTag.equals(TAG_OUTLINE)) {
-
-							// <Outline>
-
-							parse_030_Outline(xmlConfigChild, trackConfig);
-
-//						} else if (configTag.equals(TAG_ALTITUDE)) {
-//
-//							parse_600_Altitude(xmlConfigChild, trackConfig);
-						}
-					}
+					parse_010_Configuration(xmlConfig, trackConfig);
+					parse_020_Track(xmlConfig, trackConfig);
 
 					allTourTrackConfig.add(trackConfig);
 				}
@@ -454,7 +495,7 @@ public class Map25ConfigManager {
 		}
 	}
 
-	private static void parse_010_ConfigAttr(final XMLMemento xmlConfig, final Map25TrackConfig config) {
+	private static void parse_010_Configuration(final XMLMemento xmlConfig, final Map25TrackConfig config) {
 
 		config.id = Util.getXmlString(
 				xmlConfig, //
@@ -468,18 +509,28 @@ public class Map25ConfigManager {
 
 	}
 
-	private static void parse_030_Outline(final XMLMemento xmlOutline, final Map25TrackConfig config) {
+	private static void parse_020_Track(final XMLMemento xmlConfig, final Map25TrackConfig config) {
 
-		config.outlineWidth = Util.getXmlFloatFloat(
-				xmlOutline,
-				ATTR_OUTLINE_WIDTH,
-				DEFAULT_OUTLINE_WIDTH,
-				OUTLINE_WIDTH_MIN,
-				OUTLINE_WIDTH_MAX);
+		for (final IMemento mementoConfigChild : xmlConfig.getChildren()) {
 
-		config.outlineColor = Util.getXmlRgb(xmlOutline, DEFAULT_OUTLINE_COLOR);
+			final XMLMemento xmlConfigChild = (XMLMemento) mementoConfigChild;
+			final String configTag = xmlConfigChild.getType();
 
-		config.animationTime = Util.getXmlInteger(xmlOutline, ATTR_ANIMATION_TIME, DEFAULT_ANIMATION_TIME);
+// SET_FORMATTING_OFF
+			
+			switch (configTag) {
+
+			case TAG_OUTLINE:
+
+				config.outlineWidth = Util.getXmlFloatFloat(xmlConfigChild, ATTR_OUTLINE_WIDTH, DEFAULT_OUTLINE_WIDTH, OUTLINE_WIDTH_MIN, OUTLINE_WIDTH_MAX);
+				config.outlineColor = Util.getXmlRgb(xmlConfigChild, DEFAULT_OUTLINE_COLOR);
+				config.animationTime = Util.getXmlInteger(xmlConfigChild, ATTR_ANIMATION_TIME, DEFAULT_ANIMATION_TIME);
+
+				break;
+			}
+			
+// SET_FORMATTING_ON
+		}
 	}
 
 	private static void parse_200_Markers(	final XMLMemento xmlRoot,
@@ -511,24 +562,8 @@ public class Map25ConfigManager {
 
 					final Map25MarkerConfig markerConfig = new Map25MarkerConfig();
 
-					parse_210_ConfigAttr(xmlConfig, markerConfig);
-
-					for (final IMemento mementoConfigChild : xmlConfig.getChildren()) {
-
-//						final XMLMemento xmlConfigChild = (XMLMemento) mementoConfigChild;
-//						final String configTag = xmlConfigChild.getType();
-//
-//						if (configTag.equals(TAG_OUTLINE)) {
-//
-//							// <Outline>
-//
-//							parse_030_Outline(xmlConfigChild, markerConfig);
-//
-////						} else if (configTag.equals(TAG_ALTITUDE)) {
-////
-////							parse_600_Altitude(xmlConfigChild, trackConfig);
-//						}
-					}
+					parse_210_Configuration(xmlConfig, markerConfig);
+					parse_220_Marker(xmlConfig, markerConfig);
 
 					allMarkerConfigs.add(markerConfig);
 				}
@@ -539,7 +574,7 @@ public class Map25ConfigManager {
 		}
 	}
 
-	private static void parse_210_ConfigAttr(final XMLMemento xmlConfig, final Map25MarkerConfig config) {
+	private static void parse_210_Configuration(final XMLMemento xmlConfig, final Map25MarkerConfig config) {
 
 		config.id = Util.getXmlString(
 				xmlConfig, //
@@ -550,6 +585,26 @@ public class Map25ConfigManager {
 				xmlConfig, //
 				ATTR_CONFIG_NAME,
 				CONFIG_NAME_UNKNOWN);
+	}
+
+	private static void parse_220_Marker(final XMLMemento xmlConfig, final Map25MarkerConfig config) {
+
+		for (final IMemento mementoConfigChild : xmlConfig.getChildren()) {
+
+			final XMLMemento xmlConfigChild = (XMLMemento) mementoConfigChild;
+			final String configTag = xmlConfigChild.getType();
+
+			switch (configTag) {
+
+			case TAG_CLUSTER_BACKGROUND:
+				config.clusterColorBackground = Util.getXmlRgb(xmlConfigChild, DEFAULT_CLUSTER_BACKGROUND);
+				break;
+
+			case TAG_CLUSTER_FOREGROUND:
+				config.clusterColorForeground = Util.getXmlRgb(xmlConfigChild, DEFAULT_CLUSTER_FOREGROUND);
+				break;
+			}
+		}
 	}
 
 	/**
@@ -605,6 +660,29 @@ public class Map25ConfigManager {
 		}
 	}
 
+	public static void resetActiveMarkerConfiguration() {
+
+		final int activeMarkerConfigIndex = getActiveMarkerConfigIndex();
+
+		// remove old config
+		_allMarkerConfigs.remove(_activeMarkerConfig);
+
+		// create new config
+		final int configIndex = activeMarkerConfigIndex + 1;
+		final Map25MarkerConfig newConfig = createDefaults_Markers_One(configIndex);
+
+		// update model
+		_activeMarkerConfig = newConfig;
+		_allMarkerConfigs.add(newConfig);
+	}
+
+	public static void resetAllMarkerConfigurations() {
+
+		createDefaults_Markers();
+
+		_activeMarkerConfig = _allMarkerConfigs.get(0);
+	}
+
 	public static void saveState() {
 
 		if (_activeTrackConfig == null) {
@@ -616,9 +694,32 @@ public class Map25ConfigManager {
 
 		final XMLMemento xmlRoot = create_Root();
 
-		/*
-		 * Tracks
-		 */
+		saveState_Tracks(xmlRoot);
+		saveState_Markers(xmlRoot);
+
+		Util.writeXml(xmlRoot, getConfigXmlFile());
+	}
+
+	/**
+	 * Markers
+	 */
+	private static void saveState_Markers(final XMLMemento xmlRoot) {
+
+		final IMemento xmlMarkers = xmlRoot.createChild(TAG_TOUR_MARKERS);
+		{
+			xmlMarkers.putString(ATTR_ACTIVE_CONFIG_ID, _activeMarkerConfig.id);
+
+			for (final Map25MarkerConfig config : _allMarkerConfigs) {
+				createXml_FromMarkerConfig(config, xmlMarkers);
+			}
+		}
+	}
+
+	/**
+	 * Tracks
+	 */
+	private static void saveState_Tracks(final XMLMemento xmlRoot) {
+
 		final IMemento xmlTourTracks = xmlRoot.createChild(TAG_TOUR_TRACKS);
 		{
 			xmlTourTracks.putString(ATTR_ACTIVE_CONFIG_ID, _activeTrackConfig.id);
@@ -627,20 +728,6 @@ public class Map25ConfigManager {
 				createXml_FromTrackConfig(config, xmlTourTracks);
 			}
 		}
-
-		/*
-		 * Markers
-		 */
-		final IMemento xmlMarkers = xmlRoot.createChild(TAG_TOUR_MARKERS);
-		{
-			xmlMarkers.putString(ATTR_ACTIVE_CONFIG_ID, _activeTrackConfig.id);
-
-			for (final Map25MarkerConfig config : _allMarkerConfigs) {
-				createXml_FromMarkerConfig(config, xmlMarkers);
-			}
-		}
-
-		Util.writeXml(xmlRoot, getConfigXmlFile());
 	}
 
 	public static void setActiveMarkerConfig(final Map25MarkerConfig newConfig) {

@@ -59,12 +59,13 @@ public class ScreenUtils {
 		private void draw(final Canvas canvas) {
 
 			final int halfsize = mSize >> 1;
+			final int noneClippingRadius = halfsize - getPixels(2);
 
 			// fill
-			canvas.drawCircle(halfsize, halfsize, halfsize - 2, mPaintCircle);
+			canvas.drawCircle(halfsize, halfsize, noneClippingRadius, mPaintCircle);
 
 			// outline
-			canvas.drawCircle(halfsize, halfsize, halfsize - 2, mPaintBorder);
+			canvas.drawCircle(halfsize, halfsize, noneClippingRadius, mPaintBorder);
 
 			// draw the number at the center
 			canvas.drawText(

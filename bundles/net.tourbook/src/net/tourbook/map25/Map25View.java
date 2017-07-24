@@ -20,6 +20,8 @@ import gnu.trove.list.array.TIntArrayList;
 import java.awt.BorderLayout;
 import java.awt.Canvas;
 import java.awt.Frame;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -524,6 +526,18 @@ public class Map25View extends ViewPart {
 		awtContainer.add(awtCanvas);
 		awtCanvas.setFocusable(true);
 		awtCanvas.requestFocus();
+
+		awtContainer.addComponentListener(new ComponentAdapter() {
+
+			@Override
+			public void componentResized(final ComponentEvent e) {
+
+				/*
+				 * Render map otherwise a black screen is displayed until the map is moved
+				 */
+				_mapApp.getMap().render();
+			}
+		});
 
 		_mapApp = Map25App.createMap(this, _state, awtCanvas);
 	}

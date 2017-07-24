@@ -22,6 +22,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorSelectorExtended;
 import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.common.util.Util;
 import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.map25.Map25MarkerConfig;
 import net.tourbook.map25.Map25View;
@@ -44,6 +45,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -55,6 +57,13 @@ import org.eclipse.swt.widgets.ToolBar;
  * Tour chart marker properties slideout.
  */
 public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelectorListener {
+
+// SET_FORMATTING_OFF
+	
+	private static final String TOUR_TRACK_PROPERTIES_BUTTON_DEFAULT_TOOLTIP	= net.tourbook.map3.Messages.TourTrack_Properties_Button_Default_Tooltip;
+	private static final String TOUR_TRACK_PROPERTIES_BUTTON_DEFAULT			= net.tourbook.map3.Messages.TourTrack_Properties_Button_Default;
+
+// SET_FORMATTING_ON
 
 	private SelectionListener		_defaultSelectionListener;
 	private MouseWheelListener		_defaultMouseWheelListener;
@@ -80,6 +89,8 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 
 	private ColorSelectorExtended	_colorCluster_Background;
 	private ColorSelectorExtended	_colorCluster_Foreground;
+
+	private Button					_btnReset;
 
 	private Combo					_comboConfigName;
 
@@ -164,26 +175,44 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 		{
-
-			/*
-			 * Combo: Configuration
-			 */
-			_comboConfigName = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
-			GridDataFactory
-					.fillDefaults()
-					.grab(true, false)
-					.align(SWT.BEGINNING, SWT.CENTER)
-					// this is too small in linux
-					//					.hint(_pc.convertHorizontalDLUsToPixels(15 * 4), SWT.DEFAULT)
-					.applyTo(_comboConfigName);
-			_comboConfigName.setVisibleItemCount(20);
-			_comboConfigName.addFocusListener(_keepOpenListener);
-			_comboConfigName.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onSelectConfig();
-				}
-			});
+			{
+				/*
+				 * Combo: Configuration
+				 */
+				_comboConfigName = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
+				_comboConfigName.setVisibleItemCount(20);
+				_comboConfigName.addFocusListener(_keepOpenListener);
+				_comboConfigName.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						onSelectConfig();
+					}
+				});
+				GridDataFactory
+						.fillDefaults()
+						.grab(true, false)
+						.align(SWT.BEGINNING, SWT.CENTER)
+						.hint(_pc.convertWidthInCharsToPixels(20), SWT.DEFAULT)
+						.applyTo(_comboConfigName);
+			}
+			{
+				/*
+				 * Button: Reset
+				 */
+				_btnReset = new Button(container, SWT.PUSH);
+				_btnReset.setText(TOUR_TRACK_PROPERTIES_BUTTON_DEFAULT);
+				_btnReset.setToolTipText(TOUR_TRACK_PROPERTIES_BUTTON_DEFAULT_TOOLTIP);
+				_btnReset.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						onSelectConfig_Default(e);
+					}
+				});
+				GridDataFactory
+						.fillDefaults()//
+						.align(SWT.END, SWT.CENTER)
+						.applyTo(_btnReset);
+			}
 		}
 	}
 
@@ -253,6 +282,8 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 		final boolean backupIsUpdateUI = _isUpdateUI;
 		_isUpdateUI = true;
 		{
+			_comboConfigName.removeAll();
+
 			for (final Map25MarkerConfig config : Map25ConfigManager.getAllMarkerConfigs()) {
 				_comboConfigName.add(config.name);
 			}
@@ -348,6 +379,28 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 		restoreState();
 
 		enableControls();
+
+		_map25View.getMapApp().onModifyMarkerConfig();
+	}
+
+	private void onSelectConfig_Default(final SelectionEvent selectionEvent) {
+
+		if (Util.isCtrlKeyPressed(selectionEvent)) {
+
+			// reset All configurations
+
+			Map25ConfigManager.resetAllMarkerConfigurations();
+
+			fillUI();
+
+		} else {
+
+			// reset active config
+
+			Map25ConfigManager.resetActiveMarkerConfiguration();
+		}
+
+		restoreState();
 
 		_map25View.getMapApp().onModifyMarkerConfig();
 	}
