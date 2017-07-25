@@ -50,7 +50,7 @@ import net.tourbook.map25.layer.marker.ItemizedLayer;
 import net.tourbook.map25.layer.marker.MarkerItem;
 import net.tourbook.map25.layer.tourtrack.TourLayer;
 import net.tourbook.map25.ui.SlideoutMap25_Options;
-import net.tourbook.map25.ui.SlideoutMap25_TourTrackConfig;
+import net.tourbook.map25.ui.SlideoutMap25_TrackConfig;
 import net.tourbook.photo.PhotoSelection;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
@@ -178,7 +178,7 @@ public class Map25View extends ViewPart {
 		@Override
 		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
-			return new SlideoutMap25_TourTrackConfig(_parent, toolbar, Map25View.this);
+			return new SlideoutMap25_TrackConfig(_parent, toolbar, Map25View.this);
 		}
 
 		@Override
@@ -535,7 +535,14 @@ public class Map25View extends ViewPart {
 				/*
 				 * Render map otherwise a black screen is displayed until the map is moved
 				 */
-				_mapApp.getMap().render();
+				final Map map = _mapApp.getMap();
+
+				// check if initialized
+				if (map == null) {
+					return;
+				}
+
+				map.render();
 			}
 		});
 

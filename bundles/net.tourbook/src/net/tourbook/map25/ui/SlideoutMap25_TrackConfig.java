@@ -52,7 +52,7 @@ import org.eclipse.swt.widgets.ToolBar;
 /**
  * Slideout for 2.5D tour track configuration.
  */
-public class SlideoutMap25_TourTrackConfig extends ToolbarSlideout implements IColorSelectorListener {
+public class SlideoutMap25_TrackConfig extends ToolbarSlideout implements IColorSelectorListener {
 
 	private Map25View				_map25View;
 
@@ -85,9 +85,9 @@ public class SlideoutMap25_TourTrackConfig extends ToolbarSlideout implements IC
 
 	private ColorSelectorExtended	_colorOutlineColor;
 
-	public SlideoutMap25_TourTrackConfig(	final Composite ownerControl,
-											final ToolBar toolbar,
-											final Map25View map25View) {
+	public SlideoutMap25_TrackConfig(	final Composite ownerControl,
+										final ToolBar toolbar,
+										final Map25View map25View) {
 
 		super(ownerControl, toolbar);
 

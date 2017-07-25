@@ -88,6 +88,14 @@ public class Map25ConfigManager {
 	private static final String	TAG_OUTLINE					= "Outline";								//$NON-NLS-1$
 	private static final String	ATTR_OUTLINE_WIDTH			= "width";									//$NON-NLS-1$
 
+	public static final float	OUTLINE_WIDTH_MIN			= 1.0f;
+	public static final float	OUTLINE_WIDTH_MAX			= 10.0f;
+	public static final float	DEFAULT_OUTLINE_WIDTH		= 2.5f;
+	public static final RGB		DEFAULT_OUTLINE_COLOR		= new RGB(0x80, 0x0, 0x80);
+
+	// other properties
+	public static final int		DEFAULT_ANIMATION_TIME		= 2000;
+
 	/*
 	 * Tour Markers
 	 */
@@ -95,23 +103,24 @@ public class Map25ConfigManager {
 	private static final String	TAG_MARKER					= "Marker";									//$NON-NLS-1$
 	private static final String	TAG_CLUSTER_BACKGROUND		= "ClusterBackground";						//$NON-NLS-1$
 	private static final String	TAG_CLUSTER_FOREGROUND		= "ClusterForeground";						//$NON-NLS-1$
+	private static final String	TAG_MARKER_BACKGROUND		= "MarkerBackground";						//$NON-NLS-1$
+	private static final String	TAG_MARKER_FOREGROUND		= "MarkerForeground";						//$NON-NLS-1$
+	private static final String	ATTR_CLUSTER_ICON_SIZE		= "clusterIconSize";						//$NON-NLS-1$
+	private static final String	ATTR_MARKER_ICON_SIZE		= "markerIconSize";							//$NON-NLS-1$
 
-	// outline
-	public static final float	OUTLINE_WIDTH_MIN			= 1.0f;
-	public static final float	OUTLINE_WIDTH_MAX			= 10.0f;
-	public static final float	DEFAULT_OUTLINE_WIDTH		= 2.5f;
+	// icon
+	public static final int		ICON_MIN_SIZE				= 25;
+	public static final int		ICON_MAX_SIZE				= 200;
+	public static final int		DEFAULT_ICON_SIZE			= 64;
 
 	// colors
-	public static final RGB		DEFAULT_CLUSTER_FOREGROUND	= new RGB(0xff, 0xff, 0xff);
-	public static final RGB		DEFAULT_CLUSTER_BACKGROUND	= new RGB(0xFC, 0x67, 0x00);
-	public static final RGB		DEFAULT_OUTLINE_COLOR		= new RGB(0x80, 0x0, 0x80);
+	static final RGB			DEFAULT_CLUSTER_FOREGROUND	= new RGB(0xff, 0xff, 0xff);
+	static final RGB			DEFAULT_CLUSTER_BACKGROUND	= new RGB(0xFC, 0x67, 0x00);
+	static final RGB			DEFAULT_MARKER_FOREGROUND	= new RGB(0xff, 0xff, 0xff);
+	static final RGB			DEFAULT_MARKER_BACKGROUND	= new RGB(0, 0, 0);
 
-	// other properties
-	public static final int		DEFAULT_ANIMATION_TIME		= 2000;
-
-	static {
-
-	}
+	// !!! this is a code formatting separator !!!
+	static {}
 
 	/**
 	 * Contains all configurations which are loaded from a xml file.
@@ -163,8 +172,8 @@ public class Map25ConfigManager {
 
 		final Map25MarkerConfig config = new Map25MarkerConfig();
 
+		final RGB fgBlack = new RGB(0, 0, 0);
 		final RGB fgWhite = new RGB(0xff, 0xff, 0xff);
-		final RGB fgBlack = new RGB(0x0, 0x0, 0x0);
 
 		final RGB bg1 = new RGB(0x00, 0xA0, 0xED);
 		final RGB bg2 = new RGB(0xC6, 0x00, 0xA2);
@@ -176,56 +185,56 @@ public class Map25ConfigManager {
 
 		case 1:
 			config.name = config.defaultId = MARKER_DEFAULT_ID_1;
-			config.clusterColorForeground = fgWhite;
+			config.clusterColorForeground = fgBlack;
 			config.clusterColorBackground = bg1;
 			break;
 		case 2:
 			config.name = config.defaultId = MARKER_DEFAULT_ID_2;
-			config.clusterColorForeground = fgBlack;
+			config.clusterColorForeground = fgWhite;
 			config.clusterColorBackground = bg1;
 			break;
 
 		case 3:
 			config.name = config.defaultId = MARKER_DEFAULT_ID_3;
-			config.clusterColorForeground = fgWhite;
+			config.clusterColorForeground = fgBlack;
 			config.clusterColorBackground = bg2;
 			break;
 		case 4:
 			config.name = config.defaultId = MARKER_DEFAULT_ID_4;
-			config.clusterColorForeground = fgBlack;
+			config.clusterColorForeground = fgWhite;
 			config.clusterColorBackground = bg2;
 			break;
 
 		case 5:
 			config.name = config.defaultId = MARKER_DEFAULT_ID_5;
-			config.clusterColorForeground = fgWhite;
+			config.clusterColorForeground = fgBlack;
 			config.clusterColorBackground = bg3;
 			break;
 		case 6:
 			config.name = config.defaultId = MARKER_DEFAULT_ID_6;
-			config.clusterColorForeground = fgBlack;
+			config.clusterColorForeground = fgWhite;
 			config.clusterColorBackground = bg3;
 			break;
 
 		case 7:
 			config.name = config.defaultId = MARKER_DEFAULT_ID_7;
-			config.clusterColorForeground = fgWhite;
+			config.clusterColorForeground = fgBlack;
 			config.clusterColorBackground = bg4;
 			break;
 		case 8:
 			config.name = config.defaultId = MARKER_DEFAULT_ID_8;
-			config.clusterColorForeground = fgBlack;
+			config.clusterColorForeground = fgWhite;
 			config.clusterColorBackground = bg4;
 			break;
 
 		case 9:
 			config.name = config.defaultId = MARKER_DEFAULT_ID_9;
-			config.clusterColorForeground = fgWhite;
+			config.clusterColorForeground = fgBlack;
 			config.clusterColorBackground = bg5;
 			break;
 		case 10:
 			config.name = config.defaultId = MARKER_DEFAULT_ID_10;
-			config.clusterColorForeground = fgBlack;
+			config.clusterColorForeground = fgWhite;
 			config.clusterColorBackground = bg5;
 			break;
 
@@ -273,9 +282,15 @@ public class Map25ConfigManager {
 			xmlConfig.putString(ATTR_ID, config.id);
 			xmlConfig.putString(ATTR_CONFIG_NAME, config.name);
 
-			// Cluster color
+			// Cluster
+			xmlConfig.putInteger(ATTR_CLUSTER_ICON_SIZE, config.iconClusterSizeDP);
 			Util.setXmlRgb(xmlConfig, TAG_CLUSTER_FOREGROUND, config.clusterColorForeground);
 			Util.setXmlRgb(xmlConfig, TAG_CLUSTER_BACKGROUND, config.clusterColorBackground);
+
+			// Marker
+			xmlConfig.putInteger(ATTR_MARKER_ICON_SIZE, config.iconMarkerSizeDP);
+			Util.setXmlRgb(xmlConfig, TAG_MARKER_FOREGROUND, config.markerColorForeground);
+			Util.setXmlRgb(xmlConfig, TAG_MARKER_BACKGROUND, config.markerColorBackground);
 		}
 	}
 
@@ -589,6 +604,20 @@ public class Map25ConfigManager {
 
 	private static void parse_220_Marker(final XMLMemento xmlConfig, final Map25MarkerConfig config) {
 
+		config.iconClusterSizeDP = Util.getXmlInteger(
+				xmlConfig,
+				ATTR_CLUSTER_ICON_SIZE,
+				Map25ConfigManager.DEFAULT_ICON_SIZE,
+				Map25ConfigManager.ICON_MIN_SIZE,
+				Map25ConfigManager.ICON_MAX_SIZE);
+
+		config.iconMarkerSizeDP = Util.getXmlInteger(
+				xmlConfig,
+				ATTR_MARKER_ICON_SIZE,
+				Map25ConfigManager.DEFAULT_ICON_SIZE,
+				Map25ConfigManager.ICON_MIN_SIZE,
+				Map25ConfigManager.ICON_MAX_SIZE);
+
 		for (final IMemento mementoConfigChild : xmlConfig.getChildren()) {
 
 			final XMLMemento xmlConfigChild = (XMLMemento) mementoConfigChild;
@@ -596,12 +625,18 @@ public class Map25ConfigManager {
 
 			switch (configTag) {
 
+			case TAG_CLUSTER_FOREGROUND:
+				config.clusterColorForeground = Util.getXmlRgb(xmlConfigChild, DEFAULT_CLUSTER_FOREGROUND);
+				break;
 			case TAG_CLUSTER_BACKGROUND:
 				config.clusterColorBackground = Util.getXmlRgb(xmlConfigChild, DEFAULT_CLUSTER_BACKGROUND);
 				break;
 
-			case TAG_CLUSTER_FOREGROUND:
-				config.clusterColorForeground = Util.getXmlRgb(xmlConfigChild, DEFAULT_CLUSTER_FOREGROUND);
+			case TAG_MARKER_FOREGROUND:
+				config.markerColorBackground = Util.getXmlRgb(xmlConfigChild, DEFAULT_MARKER_FOREGROUND);
+				break;
+			case TAG_MARKER_BACKGROUND:
+				config.markerColorForeground = Util.getXmlRgb(xmlConfigChild, DEFAULT_MARKER_BACKGROUND);
 				break;
 			}
 		}
@@ -662,6 +697,9 @@ public class Map25ConfigManager {
 
 	public static void resetActiveMarkerConfiguration() {
 
+		// do not replace the name
+		final String oldName = _activeMarkerConfig.name;
+
 		final int activeMarkerConfigIndex = getActiveMarkerConfigIndex();
 
 		// remove old config
@@ -670,10 +708,11 @@ public class Map25ConfigManager {
 		// create new config
 		final int configIndex = activeMarkerConfigIndex + 1;
 		final Map25MarkerConfig newConfig = createDefaults_Markers_One(configIndex);
+		newConfig.name = oldName;
 
 		// update model
 		_activeMarkerConfig = newConfig;
-		_allMarkerConfigs.add(newConfig);
+		_allMarkerConfigs.add(activeMarkerConfigIndex, newConfig);
 	}
 
 	public static void resetAllMarkerConfigurations() {

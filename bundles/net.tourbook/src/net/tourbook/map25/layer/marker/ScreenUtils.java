@@ -15,16 +15,33 @@
  */
 package net.tourbook.map25.layer.marker;
 
+import java.awt.Font;
+import java.awt.font.TextAttribute;
+import java.text.AttributedCharacterIterator.Attribute;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.oscim.backend.CanvasAdapter;
 import org.oscim.backend.canvas.Bitmap;
 import org.oscim.backend.canvas.Canvas;
 import org.oscim.backend.canvas.Paint;
+import org.oscim.backend.canvas.Paint.FontFamily;
+import org.oscim.backend.canvas.Paint.FontStyle;
 
 /**
  * A simple utility class to make clustered markers functionality self-contained. Includes a method
  * to translate between DPs and PXs and a circular icon generator.
  */
 public class ScreenUtils {
+
+	private static final Font					DEFAULT_FONT;
+	private static final Map<Attribute, Object>	TEXT_ATTRIBUTES	= new HashMap<>();
+
+	static {
+		TEXT_ATTRIBUTES.put(TextAttribute.KERNING, TextAttribute.KERNING_ON);
+
+		DEFAULT_FONT = new Font("Arial", Font.PLAIN, 14).deriveFont(TEXT_ATTRIBUTES);
+	}
 
 	public static class ClusterDrawable {
 
@@ -101,6 +118,9 @@ public class ScreenUtils {
 
 			mPaintText.setTextSize(getPixels((int) (sizedp * 0.6666666)));
 			mPaintText.setColor(foregroundColor);
+
+			// using a different font that the + is centered, with default it is not which is very ugly!
+			mPaintText.setTypeface(FontFamily.MONOSPACE, FontStyle.BOLD);
 
 			mPaintCircle.setColor(backgroundColor);
 			mPaintCircle.setStyle(Paint.Style.FILL);

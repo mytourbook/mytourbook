@@ -27,13 +27,17 @@ public class Map25MarkerConfig implements Cloneable {
 	 */
 
 	public String	id						= Long.toString(System.nanoTime());
+	public String	defaultId				= Map25ConfigManager.MARKER_DEFAULT_ID_1;
 
 	public String	name					= Map25ConfigManager.CONFIG_NAME_UNKNOWN;
 
 	public RGB		clusterColorForeground	= Map25ConfigManager.DEFAULT_CLUSTER_FOREGROUND;
 	public RGB		clusterColorBackground	= Map25ConfigManager.DEFAULT_CLUSTER_BACKGROUND;
+	public RGB		markerColorForeground	= Map25ConfigManager.DEFAULT_MARKER_FOREGROUND;
+	public RGB		markerColorBackground	= Map25ConfigManager.DEFAULT_MARKER_BACKGROUND;
 
-	public String	defaultId				= Map25ConfigManager.MARKER_DEFAULT_ID_1;
+	public int		iconClusterSizeDP		= Map25ConfigManager.DEFAULT_ICON_SIZE;
+	public int		iconMarkerSizeDP		= Map25ConfigManager.DEFAULT_ICON_SIZE;
 
 	/**
 	 * Create a copy of this object.
@@ -113,6 +117,10 @@ public class Map25MarkerConfig implements Cloneable {
 
 				+ "id=" + id + ", "
 				+ "name=" + name + ", "
+
+				+ "iconClusterSizeDP=" + iconClusterSizeDP + ", "
+				+ "iconMarkerSizeDP=" + iconMarkerSizeDP + ", "
+
 				+ "clusterColorForeground=" + clusterColorForeground + ", "
 				+ "clusterColorBackground=" + clusterColorBackground +
 

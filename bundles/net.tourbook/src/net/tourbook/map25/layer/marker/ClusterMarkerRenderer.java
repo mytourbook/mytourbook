@@ -59,7 +59,7 @@ public class ClusterMarkerRenderer extends MarkerRenderer {
 	 * Map Cluster Icon Size. This is the biggest size for clusters of CLUSTER_MAXSIZE elements.
 	 * Smaller clusters will be slightly smaller
 	 */
-	private static final int	MAP_MARKER_CLUSTER_SIZE_DP	= 64;
+	public static final int		MAP_MARKER_CLUSTER_SIZE_DP	= 64;
 
 	/**
 	 * Clustering grid square size, decrease to cluster more aggresively. Ideally this value is the
@@ -94,6 +94,8 @@ public class ClusterMarkerRenderer extends MarkerRenderer {
 	private boolean				mClusteringEnabled			= false;
 
 	private double				_clusterScale;
+
+	private int					_iconSizeDP					= MAP_MARKER_CLUSTER_SIZE_DP;
 
 	/**
 	 * Class to wrap the cluster icon style properties
@@ -204,7 +206,7 @@ public class ClusterMarkerRenderer extends MarkerRenderer {
 
 		final ScreenUtils.ClusterDrawable drawable = new ScreenUtils.ClusterDrawable(
 
-				MAP_MARKER_CLUSTER_SIZE_DP - CLUSTER_MAXSIZE + size, // make size dependent on cluster size
+				_iconSizeDP - CLUSTER_MAXSIZE + size, // make size dependent on cluster size
 
 				mStyleForeground,
 				mStyleBackground,
@@ -316,7 +318,11 @@ public class ClusterMarkerRenderer extends MarkerRenderer {
 		}
 	}
 
-	public synchronized void setClusterColor(final RGB clusterColorForeground, final RGB clusterColorBackground) {
+	public synchronized void setClusterIconConfig(	final int iconSizeDB,
+													final RGB clusterColorForeground,
+													final RGB clusterColorBackground) {
+
+		_iconSizeDP = iconSizeDB;
 
 		// remove cached bitmaps
 		Arrays.fill(mClusterBitmaps, null);

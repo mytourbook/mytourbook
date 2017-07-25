@@ -16,9 +16,6 @@
 package net.tourbook.map25;
 
 import java.awt.Canvas;
-import java.awt.Graphics2D;
-import java.awt.geom.Ellipse2D;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import net.tourbook.common.UI;
@@ -31,14 +28,17 @@ import net.tourbook.map25.layer.marker.ItemizedLayer.OnItemGestureListener;
 import net.tourbook.map25.layer.marker.MarkerItem;
 import net.tourbook.map25.layer.marker.MarkerRendererFactory;
 import net.tourbook.map25.layer.marker.MarkerSymbol;
+import net.tourbook.map25.layer.marker.ScreenUtils;
 import net.tourbook.map25.layer.tourtrack.TourLayer;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.widgets.Display;
-import org.oscim.awt.AwtBitmap;
 import org.oscim.awt.AwtGraphics;
+import org.oscim.backend.CanvasAdapter;
 import org.oscim.backend.GLAdapter;
+import org.oscim.backend.canvas.Bitmap;
 import org.oscim.backend.canvas.Color;
+import org.oscim.backend.canvas.Paint;
 import org.oscim.core.MapPosition;
 import org.oscim.core.MercatorProjection;
 import org.oscim.gdx.GdxAssets;
@@ -183,16 +183,7 @@ public class Map25App extends GdxMap {
 
 	private ItemizedLayer<MarkerItem> createLayer_Marker() {
 
-		final BufferedImage buImage = new BufferedImage(20, 20, BufferedImage.TYPE_INT_ARGB_PRE);
-
-		final Graphics2D g2d_2 = buImage.createGraphics();
-		{
-			g2d_2.setColor(java.awt.Color.red);
-			g2d_2.fill(new Ellipse2D.Float(0, 0, 20, 20));
-		}
-		g2d_2.dispose();
-
-		final AwtBitmap awtBitmap = new AwtBitmap(buImage);
+		final Bitmap awtBitmap = createMarkerImage();
 
 		MarkerSymbol markerSymbol;
 //		symbol = new MarkerSymbol(awtBitmap, MarkerSymbol.HotspotPlace.BOTTOM_CENTER);
@@ -296,6 +287,27 @@ public class Map25App extends GdxMap {
 				_map25View.restoreState();
 			}
 		});
+	}
+
+	private Bitmap createMarkerImage() {
+
+		final Paint mPaintCircle = CanvasAdapter.newPaint();
+		final Paint mPaintBorder = CanvasAdapter.newPaint();
+
+		final int iconSize = 20;
+
+		final Bitmap bitmap = CanvasAdapter.newBitmap(iconSize, iconSize, 0);
+		final org.oscim.backend.canvas.Canvas canvas = CanvasAdapter.newCanvas();
+		canvas.setBitmap(bitmap);
+
+		final int iconSize2 = iconSize / 2;
+		final int noneClippingRadius = iconSize2 - ScreenUtils.getPixels(2);
+
+		// fill + outline
+		canvas.drawCircle(iconSize2, iconSize2, noneClippingRadius, mPaintCircle);
+		canvas.drawCircle(iconSize2, iconSize2, noneClippingRadius, mPaintBorder);
+
+		return bitmap;
 	}
 
 	private UrlTileSource createTileSource(final Map25Provider mapProvider, final OkHttpFactoryMT httpFactory) {
@@ -614,11 +626,12 @@ public class Map25App extends GdxMap {
 	}
 
 	private void updateUI_MarkerLayer() {
-		
+
 		final ClusterMarkerRenderer markerRenderer = (ClusterMarkerRenderer) _layer_Marker.getRenderer();
 		final Map25MarkerConfig markerConfig = Map25ConfigManager.getActiveMarkerConfig();
 
-		markerRenderer.setClusterColor(//
+		markerRenderer.setClusterIconConfig(//
+				markerConfig.iconClusterSizeDP,
 				markerConfig.clusterColorForeground,
 				markerConfig.clusterColorBackground);
 	}

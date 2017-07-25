@@ -50,6 +50,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 
@@ -87,14 +88,19 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 	 */
 	private Composite				_shellContainer;
 
-	private ColorSelectorExtended	_colorCluster_Background;
 	private ColorSelectorExtended	_colorCluster_Foreground;
+	private ColorSelectorExtended	_colorCluster_Background;
+	private ColorSelectorExtended	_colorMarker_Foreground;
+	private ColorSelectorExtended	_colorMarker_Background;
 
 	private Button					_btnReset;
 
 	private Combo					_comboConfigName;
 
 	private Label					_lblConfigName;
+
+	private Spinner					_spinnerMarkerSize;
+	private Spinner					_spinnerClusterSize;
 
 	private Text					_textConfigName;
 
@@ -220,18 +226,61 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 
 		{
 			/*
-			 * Cluster color
+			 * Marker
 			 */
 
 			// label
 			final Label label = new Label(parent, SWT.NONE);
-			label.setText(Messages.Slideout_Map25MarkerOptions_Label_ClusterColor);
+			label.setText(Messages.Slideout_Map25MarkerOptions_Label_Marker);
 			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
 
 			final Composite container = new Composite(parent, SWT.NONE);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+			GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
 			{
+				// spinner
+				_spinnerMarkerSize = new Spinner(container, SWT.BORDER);
+				_spinnerMarkerSize.setMinimum(Map25ConfigManager.ICON_MIN_SIZE);
+				_spinnerMarkerSize.setMaximum(Map25ConfigManager.ICON_MAX_SIZE);
+				_spinnerMarkerSize.setIncrement(1);
+				_spinnerMarkerSize.setPageIncrement(10);
+				_spinnerMarkerSize.addSelectionListener(_defaultSelectionListener);
+				_spinnerMarkerSize.addMouseWheelListener(_defaultMouseWheelListener);
+
+				// foreground color
+				_colorMarker_Foreground = new ColorSelectorExtended(container);
+				_colorMarker_Foreground.addListener(_defaultPropertyChangeListener);
+				_colorMarker_Foreground.addOpenListener(this);
+
+				// foreground color
+				_colorMarker_Background = new ColorSelectorExtended(container);
+				_colorMarker_Background.addListener(_defaultPropertyChangeListener);
+				_colorMarker_Background.addOpenListener(this);
+			}
+		}
+		{
+			/*
+			 * Cluster
+			 */
+
+			// label
+			final Label label = new Label(parent, SWT.NONE);
+			label.setText(Messages.Slideout_Map25MarkerOptions_Label_Cluster);
+			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+
+			final Composite container = new Composite(parent, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+			GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+			{
+				// spinner
+				_spinnerClusterSize = new Spinner(container, SWT.BORDER);
+				_spinnerClusterSize.setMinimum(Map25ConfigManager.ICON_MIN_SIZE);
+				_spinnerClusterSize.setMaximum(Map25ConfigManager.ICON_MAX_SIZE);
+				_spinnerClusterSize.setIncrement(1);
+				_spinnerClusterSize.setPageIncrement(10);
+				_spinnerClusterSize.addSelectionListener(_defaultSelectionListener);
+				_spinnerClusterSize.addMouseWheelListener(_defaultMouseWheelListener);
+
 				// foreground color
 				_colorCluster_Foreground = new ColorSelectorExtended(container);
 				_colorCluster_Foreground.addListener(_defaultPropertyChangeListener);
@@ -255,8 +304,8 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 			 * Label
 			 */
 			_lblConfigName = new Label(parent, SWT.NONE);
-			_lblConfigName.setText("&Name");
-			_lblConfigName.setToolTipText("Name for the currently selected tour marker configuration");
+			_lblConfigName.setText(Messages.SlideoutMap25_Marker_Slideout_Map25MarkerOptions_Label_Name);
+			_lblConfigName.setToolTipText(Messages.SlideoutMap25_Marker_Slideout_Map25MarkerOptions_Label_Name_Tooltip);
 			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_lblConfigName);
 
 			/*
@@ -418,10 +467,16 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 			final int activeConfigIndex = Map25ConfigManager.getActiveMarkerConfigIndex();
 
 			_comboConfigName.select(activeConfigIndex);
+
 			_textConfigName.setText(config.name);
 
 			_colorCluster_Foreground.setColorValue(config.clusterColorForeground);
 			_colorCluster_Background.setColorValue(config.clusterColorBackground);
+			_colorMarker_Foreground.setColorValue(config.markerColorForeground);
+			_colorMarker_Background.setColorValue(config.markerColorBackground);
+
+			_spinnerClusterSize.setSelection(config.iconClusterSizeDP);
+			_spinnerMarkerSize.setSelection(config.iconMarkerSizeDP);
 		}
 		_isUpdateUI = false;
 	}
@@ -436,6 +491,11 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 
 		config.clusterColorForeground = _colorCluster_Foreground.getColorValue();
 		config.clusterColorBackground = _colorCluster_Background.getColorValue();
+		config.markerColorForeground = _colorMarker_Foreground.getColorValue();
+		config.markerColorBackground = _colorMarker_Background.getColorValue();
+
+		config.iconClusterSizeDP = _spinnerClusterSize.getSelection();
+		config.iconMarkerSizeDP = _spinnerMarkerSize.getSelection();
 	}
 
 }

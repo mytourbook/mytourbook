@@ -38,6 +38,7 @@ public class Map25TrackConfig {
 	 * Animation time in milli seconds when a tour is synched with the map, default is
 	 */
 	public int		animationTime	= Map25ConfigManager.DEFAULT_ANIMATION_TIME;
+
 	public Map25TrackConfig() {}
 
 	/**
