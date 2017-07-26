@@ -45,6 +45,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -93,6 +94,8 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 	private ColorSelectorExtended	_colorMarker_Foreground;
 	private ColorSelectorExtended	_colorMarker_Background;
 
+	private Button					_btnSwapClusterColor;
+	private Button					_btnSwapMarkerColor;
 	private Button					_btnReset;
 
 	private Combo					_comboConfigName;
@@ -236,7 +239,7 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 
 			final Composite container = new Composite(parent, SWT.NONE);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-			GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+			GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
 			{
 				// spinner
 				_spinnerMarkerSize = new Spinner(container, SWT.BORDER);
@@ -256,6 +259,17 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 				_colorMarker_Background = new ColorSelectorExtended(container);
 				_colorMarker_Background.addListener(_defaultPropertyChangeListener);
 				_colorMarker_Background.addOpenListener(this);
+
+				// button: swap color
+				_btnSwapMarkerColor = new Button(container, SWT.PUSH);
+				_btnSwapMarkerColor.setText(UI.SYMBOL_ARROW_LEFT_RIGHT);
+				_btnSwapMarkerColor.setToolTipText(Messages.Slideout_Map25MarkerOptions_Label_SwapColor_Tooltip);
+				_btnSwapMarkerColor.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						onSwapMarkerColor(e);
+					}
+				});
 			}
 		}
 		{
@@ -270,7 +284,7 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 
 			final Composite container = new Composite(parent, SWT.NONE);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-			GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+			GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
 			{
 				// spinner
 				_spinnerClusterSize = new Spinner(container, SWT.BORDER);
@@ -290,6 +304,17 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 				_colorCluster_Background = new ColorSelectorExtended(container);
 				_colorCluster_Background.addListener(_defaultPropertyChangeListener);
 				_colorCluster_Background.addOpenListener(this);
+
+				// button: swap color
+				_btnSwapClusterColor = new Button(container, SWT.PUSH);
+				_btnSwapClusterColor.setText(UI.SYMBOL_ARROW_LEFT_RIGHT);
+				_btnSwapClusterColor.setToolTipText(Messages.Slideout_Map25MarkerOptions_Label_SwapColor_Tooltip);
+				_btnSwapClusterColor.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						onSwapClusterColor(e);
+					}
+				});
 			}
 		}
 	}
@@ -304,8 +329,8 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 			 * Label
 			 */
 			_lblConfigName = new Label(parent, SWT.NONE);
-			_lblConfigName.setText(Messages.SlideoutMap25_Marker_Slideout_Map25MarkerOptions_Label_Name);
-			_lblConfigName.setToolTipText(Messages.SlideoutMap25_Marker_Slideout_Map25MarkerOptions_Label_Name_Tooltip);
+			_lblConfigName.setText(Messages.Slideout_Map25MarkerOptions_Label_Name);
+			_lblConfigName.setToolTipText(Messages.Slideout_Map25MarkerOptions_Label_Name_Tooltip);
 			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_lblConfigName);
 
 			/*
@@ -452,6 +477,34 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 		restoreState();
 
 		_map25View.getMapApp().onModifyMarkerConfig();
+	}
+
+	private void onSwapClusterColor(final SelectionEvent e) {
+		
+		final Map25MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
+
+		final RGB fgColor = config.clusterColorForeground;
+		final RGB bgColor = config.clusterColorBackground;
+
+		config.clusterColorForeground = bgColor;
+		config.clusterColorBackground = fgColor;
+
+		restoreState();
+		onModifyConfig();
+	}
+
+	private void onSwapMarkerColor(final SelectionEvent event) {
+
+		final Map25MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
+
+		final RGB fgColor = config.markerColorForeground;
+		final RGB bgColor = config.markerColorBackground;
+
+		config.markerColorForeground = bgColor;
+		config.markerColorBackground = fgColor;
+
+		restoreState();
+		onModifyConfig();
 	}
 
 	/**

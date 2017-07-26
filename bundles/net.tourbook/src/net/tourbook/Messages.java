@@ -1573,6 +1573,9 @@ public class Messages extends NLS {
 
 	public static String		Slideout_Map25MarkerOptions_Label_Cluster;
 	public static String		Slideout_Map25MarkerOptions_Label_Marker;
+	public static String		Slideout_Map25MarkerOptions_Label_Name;
+	public static String		Slideout_Map25MarkerOptions_Label_Name_Tooltip;
+	public static String		Slideout_Map25MarkerOptions_Label_SwapColor_Tooltip;
 	public static String		Slideout_Map25MarkerOptions_Label_Title;
 
 	public static String		Slideout_RefTour_YearStatisticOptions_Label_Title;
@@ -1654,10 +1657,6 @@ public class Messages extends NLS {
 	public static String		Slideout_TourMarkerFilter_Label_GeoFilterNotAvailable;
 
 	public static String		Slideout_TrainingOptions_Label_Title;
-
-	public static String		SlideoutMap25_Marker_Slideout_Map25MarkerOptions_Label_Name;
-
-	public static String		SlideoutMap25_Marker_Slideout_Map25MarkerOptions_Label_Name_Tooltip;
 
 	public static String		Tooltip_ValuePoint_Action_CloseContextMenu;
 	public static String		Tooltip_ValuePoint_Action_OpenToolTipMenu_ToolTip;

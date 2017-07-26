@@ -126,13 +126,13 @@ public class Map25View extends ViewPart {
 	private ISelection						_selectionWhenHidden;
 	private int								_lastSelectionHash;
 
-	private ActionMap25_Options				_actionMap25_Options;
-	private ActionMap25_ShowMarker			_actionMap25_Marker;
+	private ActionMap25_Options				_actionMapOptions;
+	private ActionMap25_ShowMarker			_actionMarkerOptions;
 	private ActionSelectMap25Provider		_actionSelectMapProvider;
 	private ActionSynchMapWithChartSlider	_actionSynchMapWithChartSlider;
 	private ActionSynchMapWithTour			_actionSynchMapWithTour;
 	private ActionShowEntireTour			_actionShowEntireTour;
-	private ActionTourTrackConfig			_actionTourTrackConfig;
+	private ActionTourTrackConfig			_actionTrackOptions;
 
 	private ArrayList<TourData>				_allTourData							= new ArrayList<>();
 	private TIntArrayList					_allTourStarts							= new TIntArrayList();
@@ -200,7 +200,7 @@ public class Map25View extends ViewPart {
 		_mapApp.getLayer_Tour().setEnabled(isTrackVisible);
 		_mapApp.getMap().render();
 
-		updateActionsState();
+		enableActions();
 	}
 
 	public void actionShowTourMarker(final boolean isMarkerVisible) {
@@ -208,7 +208,7 @@ public class Map25View extends ViewPart {
 		_mapApp.getLayer_Marker().setEnabled(isMarkerVisible);
 		_mapApp.getMap().render();
 
-		updateActionsState();
+		enableActions();
 	}
 
 	public void actionSynchMapPositionWithSlider() {
@@ -415,13 +415,13 @@ public class Map25View extends ViewPart {
 
 	private void createActions() {
 
-		_actionMap25_Marker = new ActionMap25_ShowMarker(this, _parent);
-		_actionMap25_Options = new ActionMap25_Options();
+		_actionMarkerOptions = new ActionMap25_ShowMarker(this, _parent);
+		_actionMapOptions = new ActionMap25_Options();
 		_actionSelectMapProvider = new ActionSelectMap25Provider(this);
 		_actionShowEntireTour = new ActionShowEntireTour(this);
 		_actionSynchMapWithTour = new ActionSynchMapWithTour(this);
 		_actionSynchMapWithChartSlider = new ActionSynchMapWithChartSlider(this);
-		_actionTourTrackConfig = new ActionTourTrackConfig();
+		_actionTrackOptions = new ActionTourTrackConfig();
 
 	}
 
@@ -562,8 +562,28 @@ public class Map25View extends ViewPart {
 		super.dispose();
 	}
 
-	private void enableActions() {
+	/**
+	 * Enable actions according to the available tours in {@link #_allTours}.
+	 */
+	void enableActions() {
 
+		final TourLayer tourLayer = _mapApp.getLayer_Tour();
+
+		final boolean isTourAvailable = _allTourData.size() > 0;
+		final boolean isTrackLayerVisible = tourLayer == null ? false : tourLayer.isEnabled();
+		final boolean isTrackSliderVisible = true;
+
+		final boolean canShowTour = isTourAvailable && isTrackLayerVisible;
+
+		_actionMarkerOptions.setEnabled(isTourAvailable);
+
+		_actionTrackOptions.setSelection(isTrackLayerVisible);
+		_actionTrackOptions.setEnabled(isTourAvailable);
+		_actionShowEntireTour.setEnabled(canShowTour);
+		_actionSynchMapWithTour.setEnabled(canShowTour);
+		_actionSynchMapWithChartSlider.setEnabled(canShowTour);
+
+		_actionMapOptions.setEnabled(isTourAvailable);
 	}
 
 	private void fillActionBars() {
@@ -573,18 +593,18 @@ public class Map25View extends ViewPart {
 		 */
 		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
-		tbm.add(_actionMap25_Marker);
+		tbm.add(_actionMarkerOptions);
 
 		tbm.add(new Separator());
 
-		tbm.add(_actionTourTrackConfig);
+		tbm.add(_actionTrackOptions);
 		tbm.add(_actionShowEntireTour);
 		tbm.add(_actionSynchMapWithTour);
 		tbm.add(_actionSynchMapWithChartSlider);
 
 		tbm.add(new Separator());
 
-		tbm.add(_actionMap25_Options);
+		tbm.add(_actionMapOptions);
 		tbm.add(_actionSelectMapProvider);
 
 		/*
@@ -875,7 +895,7 @@ public class Map25View extends ViewPart {
 	private void paintTours_AndUpdateMap() {
 
 		enableActions();
-		updateActionsState();
+		enableActions();
 
 		final TourLayer tourLayer = _mapApp.getLayer_Tour();
 		if (tourLayer == null) {
@@ -973,12 +993,12 @@ public class Map25View extends ViewPart {
 
 		// tour
 		final boolean isTourVisible = Util.getStateBoolean(_state, STATE_IS_LAYER_TOUR_VISIBLE, true);
-		_actionTourTrackConfig.setSelection(isTourVisible);
+		_actionTrackOptions.setSelection(isTourVisible);
 		_mapApp.getLayer_Tour().setEnabled(isTourVisible);
 
 		// marker
 		final boolean isMarkerVisible = Util.getStateBoolean(_state, STATE_IS_LAYER_MARKER_VISIBLE, true);
-		_actionMap25_Marker.setSelected(isMarkerVisible);
+		_actionMarkerOptions.setSelected(isMarkerVisible);
 		_mapApp.getLayer_Marker().setEnabled(isMarkerVisible);
 
 		// other layers
@@ -1001,7 +1021,7 @@ public class Map25View extends ViewPart {
 		_actionSynchMapWithChartSlider.setChecked(isSynchWithSlider);
 		_isSynchMapWithChartSlider = isSynchWithSlider;
 
-		updateActionsState();
+		enableActions();
 	}
 
 	private void saveState() {
@@ -1046,7 +1066,7 @@ public class Map25View extends ViewPart {
 					paintTours_AndUpdateMap();
 				}
 
-				updateActionsState();
+				enableActions();
 			}
 		});
 	}
@@ -1085,7 +1105,7 @@ public class Map25View extends ViewPart {
 //					chartInfo.leftSliderValuesIndex,
 //					chartInfo.rightSliderValuesIndex);
 
-			updateActionsState();
+			enableActions();
 		}
 	}
 
@@ -1115,7 +1135,7 @@ public class Map25View extends ViewPart {
 //					leftSliderValuesIndex,
 //					rightSliderValuesIndex);
 
-			updateActionsState();
+			enableActions();
 		}
 	}
 
@@ -1145,30 +1165,6 @@ public class Map25View extends ViewPart {
 		// update map
 		map25.setMapPosition(currentMapPos);
 		map25.render();
-	}
-
-	/**
-	 * Enable actions according to the available tours in {@link #_allTours}.
-	 */
-	void updateActionsState() {
-
-		final TourLayer tourLayer = _mapApp.getLayer_Tour();
-
-		final boolean isTourAvailable = _allTourData.size() > 0;
-		final boolean isTrackLayerVisible = tourLayer == null ? false : tourLayer.isEnabled();
-		final boolean isTrackSliderVisible = true;
-
-		final boolean canShowTour = isTourAvailable && isTrackLayerVisible;
-
-		_actionMap25_Marker.setEnabled(canShowTour);
-		_actionMap25_Options.setEnabled(canShowTour);
-		_actionShowEntireTour.setEnabled(canShowTour);
-		_actionSynchMapWithChartSlider.setEnabled(canShowTour);
-		_actionSynchMapWithTour.setEnabled(canShowTour);
-
-		_actionTourTrackConfig.setSelection(isTrackLayerVisible);
-		_actionTourTrackConfig.setEnabled(isTourAvailable);
-
 	}
 
 	void updateUI_SelectedMapProvider(final Map25Provider selectedMapProvider) {

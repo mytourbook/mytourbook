@@ -414,7 +414,7 @@ public class Map25App extends GdxMap {
 			Display.getDefault().asyncExec(new Runnable() {
 				@Override
 				public void run() {
-					_map25View.updateActionsState();
+					_map25View.enableActions();
 				}
 			});
 
