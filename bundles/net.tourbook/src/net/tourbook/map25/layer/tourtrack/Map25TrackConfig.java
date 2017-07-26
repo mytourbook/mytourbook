@@ -27,8 +27,8 @@ public class Map25TrackConfig {
 	 */
 
 	public String	id				= Long.toString(System.nanoTime());
-
-	public String	name			= Map25ConfigManager.CONFIG_NAME_UNKNOWN;
+	public String	defaultId		= Map25ConfigManager.CONFIG_DEFAULT_ID_1;
+	public String	name			= Map25ConfigManager.CONFIG_DEFAULT_ID_1;
 
 	// outline
 	public float	outlineWidth	= Map25ConfigManager.DEFAULT_OUTLINE_WIDTH;

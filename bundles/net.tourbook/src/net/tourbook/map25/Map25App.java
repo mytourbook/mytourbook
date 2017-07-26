@@ -19,12 +19,14 @@ import java.awt.Canvas;
 import java.util.ArrayList;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.color.ColorUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.map25.Map25TileSource.Builder;
 import net.tourbook.map25.OkHttpEngineMT.OkHttpFactoryMT;
 import net.tourbook.map25.layer.marker.ClusterMarkerRenderer;
 import net.tourbook.map25.layer.marker.ItemizedLayer;
 import net.tourbook.map25.layer.marker.ItemizedLayer.OnItemGestureListener;
+import net.tourbook.map25.layer.marker.Map25MarkerConfig;
 import net.tourbook.map25.layer.marker.MarkerItem;
 import net.tourbook.map25.layer.marker.MarkerRendererFactory;
 import net.tourbook.map25.layer.marker.MarkerSymbol;
@@ -183,11 +185,7 @@ public class Map25App extends GdxMap {
 
 	private ItemizedLayer<MarkerItem> createLayer_Marker() {
 
-		final Bitmap awtBitmap = createMarkerImage();
-
-		MarkerSymbol markerSymbol;
-//		symbol = new MarkerSymbol(awtBitmap, MarkerSymbol.HotspotPlace.BOTTOM_CENTER);
-		markerSymbol = new MarkerSymbol(awtBitmap, MarkerSymbol.HotspotPlace.CENTER, true);
+		final MarkerSymbol markerSymbol = createMarkerSymbol();
 
 		final MarkerRendererFactory markerRenderFactory = ClusterMarkerRenderer.factory(
 				markerSymbol,
@@ -289,12 +287,20 @@ public class Map25App extends GdxMap {
 		});
 	}
 
-	private Bitmap createMarkerImage() {
+	private MarkerSymbol createMarkerSymbol() {
 
-		final Paint mPaintCircle = CanvasAdapter.newPaint();
-		final Paint mPaintBorder = CanvasAdapter.newPaint();
+		final Map25MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
-		final int iconSize = 20;
+		final Paint paintFill = CanvasAdapter.newPaint();
+		paintFill.setColor(ColorUtil.getARGB(config.markerColorBackground));
+		paintFill.setStyle(Paint.Style.FILL);
+
+		final Paint paintOutline = CanvasAdapter.newPaint();
+		paintOutline.setColor(ColorUtil.getARGB(config.markerColorForeground));
+		paintOutline.setStyle(Paint.Style.STROKE);
+		paintOutline.setStrokeWidth(ScreenUtils.getPixels(2));
+
+		final int iconSize = ScreenUtils.getPixels(config.iconMarkerSizeDP);
 
 		final Bitmap bitmap = CanvasAdapter.newBitmap(iconSize, iconSize, 0);
 		final org.oscim.backend.canvas.Canvas canvas = CanvasAdapter.newCanvas();
@@ -304,10 +310,12 @@ public class Map25App extends GdxMap {
 		final int noneClippingRadius = iconSize2 - ScreenUtils.getPixels(2);
 
 		// fill + outline
-		canvas.drawCircle(iconSize2, iconSize2, noneClippingRadius, mPaintCircle);
-		canvas.drawCircle(iconSize2, iconSize2, noneClippingRadius, mPaintBorder);
+		canvas.drawCircle(iconSize2, iconSize2, noneClippingRadius, paintFill);
+		canvas.drawCircle(iconSize2, iconSize2, noneClippingRadius, paintOutline);
 
-		return bitmap;
+		final boolean isBillboard = config.markerOrientation == Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
+
+		return new MarkerSymbol(bitmap, MarkerSymbol.HotspotPlace.CENTER, isBillboard);
 	}
 
 	private UrlTileSource createTileSource(final Map25Provider mapProvider, final OkHttpFactoryMT httpFactory) {
@@ -627,13 +635,19 @@ public class Map25App extends GdxMap {
 
 	private void updateUI_MarkerLayer() {
 
-		final ClusterMarkerRenderer markerRenderer = (ClusterMarkerRenderer) _layer_Marker.getRenderer();
-		final Map25MarkerConfig markerConfig = Map25ConfigManager.getActiveMarkerConfig();
+		final Map25MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
+		final boolean isBillboard = config.clusterOrientation == Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
 
-		markerRenderer.setClusterIconConfig(//
-				markerConfig.iconClusterSizeDP,
-				markerConfig.clusterColorForeground,
-				markerConfig.clusterColorBackground);
+		final ClusterMarkerRenderer markerRenderer = (ClusterMarkerRenderer) _layer_Marker.getRenderer();
+
+		markerRenderer.setClusterSymbolConfig(
+				config.iconClusterSizeDP,
+				ColorUtil.getARGB(config.clusterColorForeground),
+				ColorUtil.getARGB(config.clusterColorBackground),
+				isBillboard);
+
+		markerRenderer.setDefaultMarker(createMarkerSymbol());
+		markerRenderer.setClusteringEnabled(config.isMarkerClustered);
 	}
 
 }

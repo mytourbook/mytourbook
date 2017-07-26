@@ -1092,6 +1092,11 @@ public class Messages extends NLS {
 	public static String		Log_Tour_SaveTours;
 	public static String		Log_Tour_SaveTours_File;
 
+	public static String		Map25_Marker_ClusterOrientation_Billboard;
+	public static String		Map25_Marker_ClusterOrientation_ClampToGround;
+	public static String		Map25_Symbol_Orientation_Billboard;
+	public static String		Map25_Symbol_Orientation_Ground;
+
 	public static String		merge_tour_dlg_invalid_serie_data_message;
 	public static String		merge_tour_dlg_invalid_tour_data_message;
 	public static String		merge_tour_dlg_invalid_tour_message;
@@ -1571,12 +1576,19 @@ public class Messages extends NLS {
 	public static String		Slideout_HVROptions_Label_2xToleranceResult_Tooltip;
 	public static String		Slideout_HVROptions_Label_Title;
 
+	public static String		Slideout_Map25MarkerOptions_Checkbox_IsMarkerClustering;
+	public static String		Slideout_Map25MarkerOptions_Color_Background_Tooltip;
+	public static String		Slideout_Map25MarkerOptions_Color_Foreground_Tooltip;
 	public static String		Slideout_Map25MarkerOptions_Label_Cluster;
+	public static String		Slideout_Map25MarkerOptions_Label_Cluster_Tooltip;
+	public static String		Slideout_Map25MarkerOptions_Label_ClusterOrientation;
+	public static String		Slideout_Map25MarkerOptions_Label_ClusterOrientation_Tooltip;
 	public static String		Slideout_Map25MarkerOptions_Label_Marker;
 	public static String		Slideout_Map25MarkerOptions_Label_Name;
 	public static String		Slideout_Map25MarkerOptions_Label_Name_Tooltip;
 	public static String		Slideout_Map25MarkerOptions_Label_SwapColor_Tooltip;
 	public static String		Slideout_Map25MarkerOptions_Label_Title;
+	public static String		Slideout_Map25MarkerOptions_Spinner_SymbolSize_Tooltip;
 
 	public static String		Slideout_RefTour_YearStatisticOptions_Label_Title;
 

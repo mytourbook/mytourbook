@@ -22,9 +22,6 @@ package net.tourbook.map25.layer.marker;
 
 import java.util.Arrays;
 
-import net.tourbook.common.color.ColorUtil;
-
-import org.eclipse.swt.graphics.RGB;
 import org.oscim.backend.canvas.Bitmap;
 import org.oscim.core.MercatorProjection;
 import org.oscim.core.PointF;
@@ -96,6 +93,17 @@ public class ClusterMarkerRenderer extends MarkerRenderer {
 	private double				_clusterScale;
 
 	private int					_iconSizeDP					= MAP_MARKER_CLUSTER_SIZE_DP;
+
+	/**
+	 * When <code>true</code> all items are clustered, otherwise nothing is clustered.
+	 */
+	private boolean				_isClustering				= true;
+
+	/**
+	 * When <code>true</code> then the symbol is displayed as billboard, otherwise it is clamped to
+	 * the ground.
+	 */
+	private boolean				_isBillboard;
 
 	/**
 	 * Class to wrap the cluster icon style properties
@@ -261,7 +269,7 @@ public class ClusterMarkerRenderer extends MarkerRenderer {
 			projectedMarker.py = mMapPoint.y;
 
 			// items can be declared non-clusterable
-			if (!(projectedMarker.item instanceof MarkerItem.NonClusterable)) {
+			if (_isClustering && !(projectedMarker.item instanceof MarkerItem.NonClusterable)) {
 
 				// absolute item X position in the grid
 				final int absposx = (int) (projectedMarker.px * factor);
@@ -318,19 +326,27 @@ public class ClusterMarkerRenderer extends MarkerRenderer {
 		}
 	}
 
-	public synchronized void setClusterIconConfig(	final int iconSizeDB,
-													final RGB clusterColorForeground,
-													final RGB clusterColorBackground) {
+	/**
+	 * @param isEnabled
+	 *            When <code>true</code> then all items are clustered, otherwise nothing is
+	 *            clustered.
+	 */
+	public void setClusteringEnabled(final boolean isEnabled) {
 
-		_iconSizeDP = iconSizeDB;
+		// check if modified
+		if (isEnabled == _isClustering) {
+			return;
+		}
 
-		// remove cached bitmaps
-		Arrays.fill(mClusterBitmaps, null);
+		_isClustering = isEnabled;
 
-		mStyleForeground = ColorUtil.getARGB(clusterColorForeground);
-		mStyleBackground = ColorUtil.getARGB(clusterColorBackground);
-
-		mUpdate = true;
+		// post repopulation to the main thread
+		mMarkerLayer.map().post(new Runnable() {
+			@Override
+			public void run() {
+				repopulateCluster(mItems.length, _clusterScale);
+			}
+		});
 	}
 
 	/**
@@ -347,6 +363,29 @@ public class ClusterMarkerRenderer extends MarkerRenderer {
 
 		mStyleBackground = backgroundColor;
 		mStyleForeground = foregroundColor;
+	}
+
+	public synchronized void setClusterSymbolConfig(final int iconSizeDP,
+													final int clusterForegroundColor,
+													final int clusterBackgroundColor,
+													final boolean isBillboard) {
+
+		_iconSizeDP = iconSizeDP;
+		_isBillboard = isBillboard;
+
+		// remove cached bitmaps
+		Arrays.fill(mClusterBitmaps, null);
+
+		mStyleForeground = clusterForegroundColor;
+		mStyleBackground = clusterBackgroundColor;
+
+		mUpdate = true;
+	}
+
+	public void setDefaultMarker(final MarkerSymbol defaultMarker) {
+
+		mDefaultMarker = defaultMarker;
+		mUpdate = true;
 	}
 
 	@Override
@@ -521,6 +560,7 @@ public class ClusterMarkerRenderer extends MarkerRenderer {
 				markerSymbol.set(projectedMarker.x, projectedMarker.y, bitmap, true);
 				markerSymbol.offset = new PointF(0.5f, 0.5f);
 				markerSymbol.billboard = true; // could be a parameter
+				markerSymbol.billboard = _isBillboard;
 
 			} else {
 

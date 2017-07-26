@@ -13,9 +13,10 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.map25;
+package net.tourbook.map25.layer.marker;
 
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.map25.Map25ConfigManager;
 
 import org.eclipse.swt.graphics.RGB;
 
@@ -27,17 +28,25 @@ public class Map25MarkerConfig implements Cloneable {
 	 */
 
 	public String	id						= Long.toString(System.nanoTime());
-	public String	defaultId				= Map25ConfigManager.MARKER_DEFAULT_ID_1;
+	public String	defaultId				= Map25ConfigManager.CONFIG_DEFAULT_ID_1;
+	public String	name					= Map25ConfigManager.CONFIG_DEFAULT_ID_1;
 
-	public String	name					= Map25ConfigManager.CONFIG_NAME_UNKNOWN;
-
-	public RGB		clusterColorForeground	= Map25ConfigManager.DEFAULT_CLUSTER_FOREGROUND;
-	public RGB		clusterColorBackground	= Map25ConfigManager.DEFAULT_CLUSTER_BACKGROUND;
+	/*
+	 * Marker
+	 */
+	public int		markerOrientation		= Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
+	public int		iconMarkerSizeDP		= Map25ConfigManager.DEFAULT_MARKER_ICON_SIZE;
 	public RGB		markerColorForeground	= Map25ConfigManager.DEFAULT_MARKER_FOREGROUND;
 	public RGB		markerColorBackground	= Map25ConfigManager.DEFAULT_MARKER_BACKGROUND;
 
-	public int		iconClusterSizeDP		= Map25ConfigManager.DEFAULT_ICON_SIZE;
-	public int		iconMarkerSizeDP		= Map25ConfigManager.DEFAULT_ICON_SIZE;
+	/*
+	 * Cluster
+	 */
+	public boolean	isMarkerClustered		= true;
+	public int		clusterOrientation		= Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
+	public int		iconClusterSizeDP		= Map25ConfigManager.DEFAULT_CLUSTER_ICON_SIZE;
+	public RGB		clusterColorForeground	= Map25ConfigManager.DEFAULT_CLUSTER_FOREGROUND;
+	public RGB		clusterColorBackground	= Map25ConfigManager.DEFAULT_CLUSTER_BACKGROUND;
 
 	/**
 	 * Create a copy of this object.
@@ -53,15 +62,15 @@ public class Map25MarkerConfig implements Cloneable {
 
 			final Map25MarkerConfig newConfig = (Map25MarkerConfig) super.clone();
 
-			newConfig.clusterColorBackground = new RGB(
-					clusterColorBackground.red,
-					clusterColorBackground.green,
-					clusterColorBackground.blue);
-
-			newConfig.clusterColorForeground = new RGB(
-					clusterColorForeground.red,
-					clusterColorForeground.green,
-					clusterColorForeground.blue);
+//			newConfig.clusterColorBackground = new RGB(
+//					clusterColorBackground.red,
+//					clusterColorBackground.green,
+//					clusterColorBackground.blue);
+//
+//			newConfig.clusterColorForeground = new RGB(
+//					clusterColorForeground.red,
+//					clusterColorForeground.green,
+//					clusterColorForeground.blue);
 
 			return newConfig;
 

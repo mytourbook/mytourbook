@@ -62,7 +62,7 @@ public class MarkerRenderer extends BucketRenderer {
 		};
 	}
 
-	protected final MarkerSymbol					mDefaultMarker;
+	protected MarkerSymbol							mDefaultMarker;
 	protected final SymbolBucket					mSymbolLayer;
 
 	protected final float[]							mBox		= new float[8];
