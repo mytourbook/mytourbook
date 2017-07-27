@@ -90,12 +90,12 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 	 */
 	private Composite				_shellContainer;
 
-	private ColorSelectorExtended	_colorCluster_Foreground;
-	private ColorSelectorExtended	_colorCluster_Background;
+	private ColorSelectorExtended	_colorClusterSymbol_Foreground;
+	private ColorSelectorExtended	_colorClusterSymbol_Background;
 	private ColorSelectorExtended	_colorMarker_Foreground;
 	private ColorSelectorExtended	_colorMarker_Background;
 
-	private Button					_btnSwapClusterColor;
+	private Button					_btnSwapClusterSymbolColor;
 	private Button					_btnSwapMarkerColor;
 	private Button					_btnReset;
 
@@ -105,12 +105,14 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 	private Combo					_comboConfigName;
 	private Combo					_comboMarkerOrientation;
 
-	private Label					_lblCluster;
+	private Label					_lblClusterSymbol;
 	private Label					_lblConfigName;
 	private Label					_lblClusterOrientation;
+	private Label					_lblClusterGridSize;
 
 	private Spinner					_spinnerMarkerSize;
-	private Spinner					_spinnerClusterSize;
+	private Spinner					_spinnerClusterGridSize;
+	private Spinner					_spinnerClusterSymbolSize;
 
 	private Text					_textConfigName;
 
@@ -166,7 +168,8 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 //			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 			{
 				createUI_000_Title(container);
-				createUI_20_Properties(container);
+				createUI_20_Marker(container);
+				createUI_30_Cluster(container);
 				createUI_999_ConfigName(container);
 			}
 		}
@@ -233,17 +236,22 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 		}
 	}
 
-	private void createUI_20_Properties(final Composite parent) {
+	private void createUI_20_Marker(final Composite parent) {
 
 		{
 			/*
 			 * Marker
 			 */
-
 			// label
 			final Label label = new Label(parent, SWT.NONE);
 			label.setText(Messages.Slideout_Map25MarkerOptions_Label_Marker);
+			label.setToolTipText(Messages.Slideout_Map25MarkerOptions_Label_Marker_Tooltip);
 			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+		}
+		{
+			/*
+			 * Symbol
+			 */
 
 			final Composite container = new Composite(parent, SWT.NONE);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -251,8 +259,8 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 			{
 				// spinner
 				_spinnerMarkerSize = new Spinner(container, SWT.BORDER);
-				_spinnerMarkerSize.setMinimum(Map25ConfigManager.ICON_MIN_SIZE);
-				_spinnerMarkerSize.setMaximum(Map25ConfigManager.ICON_MAX_SIZE);
+				_spinnerMarkerSize.setMinimum(Map25ConfigManager.SYMBOL_MIN_SIZE);
+				_spinnerMarkerSize.setMaximum(Map25ConfigManager.SYMBOL_MAX_SIZE);
 				_spinnerMarkerSize.setIncrement(1);
 				_spinnerMarkerSize.setPageIncrement(10);
 				_spinnerMarkerSize.addSelectionListener(_defaultSelectionListener);
@@ -279,61 +287,69 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 					}
 				});
 			}
-			{
-				/*
-				 * Marker orientation: billboard/ground
-				 */
-				{
-					// label
-					_lblClusterOrientation = new Label(parent, SWT.NONE);
-					_lblClusterOrientation.setText(Messages.Slideout_Map25MarkerOptions_Label_ClusterOrientation);
-					GridDataFactory
-							.fillDefaults()//
-							.align(SWT.FILL, SWT.CENTER)
-							.indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
-							.applyTo(_lblClusterOrientation);
-				}
-				{
-					// combo
-					_comboMarkerOrientation = new Combo(parent, SWT.READ_ONLY | SWT.BORDER);
-					_comboMarkerOrientation.setVisibleItemCount(20);
-					_comboMarkerOrientation.addFocusListener(_keepOpenListener);
-					_comboMarkerOrientation.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(final SelectionEvent e) {
-							onModifyConfig();
-						}
-					});
-					GridDataFactory
-							.fillDefaults()
-							.grab(true, false)
-							.align(SWT.BEGINNING, SWT.CENTER)
-							.hint(_pc.convertWidthInCharsToPixels(20), SWT.DEFAULT)
-							.applyTo(_comboMarkerOrientation);
-				}
-			}
 		}
 		{
 			/*
-			 * Cluster
+			 * Orientation: billboard/ground
 			 */
 			{
-				// checkbox: Cluster markers
-				_chkIsMarkerClustering = new Button(parent, SWT.CHECK);
-				_chkIsMarkerClustering.setText(Messages.Slideout_Map25MarkerOptions_Checkbox_IsMarkerClustering);
-				_chkIsMarkerClustering.addSelectionListener(_defaultSelectionListener);
-				GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsMarkerClustering);
-			}
-			{
 				// label
-				_lblCluster = new Label(parent, SWT.NONE);
-				_lblCluster.setText(Messages.Slideout_Map25MarkerOptions_Label_Cluster);
-				_lblCluster.setToolTipText(Messages.Slideout_Map25MarkerOptions_Label_Cluster_Tooltip);
+				_lblClusterOrientation = new Label(parent, SWT.NONE);
+				_lblClusterOrientation.setText(Messages.Slideout_Map25MarkerOptions_Label_ClusterOrientation);
 				GridDataFactory
 						.fillDefaults()//
 						.align(SWT.FILL, SWT.CENTER)
 						.indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
-						.applyTo(_lblCluster);
+						.applyTo(_lblClusterOrientation);
+			}
+			{
+				// combo
+				_comboMarkerOrientation = new Combo(parent, SWT.READ_ONLY | SWT.BORDER);
+				_comboMarkerOrientation.setVisibleItemCount(20);
+				_comboMarkerOrientation.addFocusListener(_keepOpenListener);
+				_comboMarkerOrientation.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						onModifyConfig();
+					}
+				});
+				GridDataFactory
+						.fillDefaults()
+						.grab(true, false)
+						.align(SWT.BEGINNING, SWT.CENTER)
+						.hint(_pc.convertWidthInCharsToPixels(20), SWT.DEFAULT)
+						.applyTo(_comboMarkerOrientation);
+			}
+		}
+	}
+
+	private void createUI_30_Cluster(final Composite parent) {
+
+		{
+			/*
+			 * Cluster
+			 */
+
+			// checkbox: Is clustering
+			_chkIsMarkerClustering = new Button(parent, SWT.CHECK);
+			_chkIsMarkerClustering.setText(Messages.Slideout_Map25MarkerOptions_Checkbox_IsMarkerClustering);
+			_chkIsMarkerClustering.addSelectionListener(_defaultSelectionListener);
+			GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsMarkerClustering);
+		}
+		{
+			/*
+			 * Symbol
+			 */
+			{
+				// label
+				_lblClusterSymbol = new Label(parent, SWT.NONE);
+				_lblClusterSymbol.setText(Messages.Slideout_Map25MarkerOptions_Label_Cluster);
+				_lblClusterSymbol.setToolTipText(Messages.Slideout_Map25MarkerOptions_Label_Cluster_Tooltip);
+				GridDataFactory
+						.fillDefaults()//
+						.align(SWT.FILL, SWT.CENTER)
+						.indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
+						.applyTo(_lblClusterSymbol);
 			}
 
 			{
@@ -341,71 +357,95 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 				GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 				GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
 
-				// spinner
-				_spinnerClusterSize = new Spinner(container, SWT.BORDER);
-				_spinnerClusterSize.setMinimum(Map25ConfigManager.ICON_MIN_SIZE);
-				_spinnerClusterSize.setMaximum(Map25ConfigManager.ICON_MAX_SIZE);
-				_spinnerClusterSize.setIncrement(1);
-				_spinnerClusterSize.setPageIncrement(10);
-				_spinnerClusterSize.addSelectionListener(_defaultSelectionListener);
-				_spinnerClusterSize.addMouseWheelListener(_defaultMouseWheelListener);
+				// spinner: symbol size
+				_spinnerClusterSymbolSize = new Spinner(container, SWT.BORDER);
+				_spinnerClusterSymbolSize.setMinimum(Map25ConfigManager.SYMBOL_MIN_SIZE);
+				_spinnerClusterSymbolSize.setMaximum(Map25ConfigManager.SYMBOL_MAX_SIZE);
+				_spinnerClusterSymbolSize.setIncrement(1);
+				_spinnerClusterSymbolSize.setPageIncrement(10);
+				_spinnerClusterSymbolSize.addSelectionListener(_defaultSelectionListener);
+				_spinnerClusterSymbolSize.addMouseWheelListener(_defaultMouseWheelListener);
 
 				// foreground color
-				_colorCluster_Foreground = new ColorSelectorExtended(container);
-				_colorCluster_Foreground.addListener(_defaultPropertyChangeListener);
-				_colorCluster_Foreground.addOpenListener(this);
+				_colorClusterSymbol_Foreground = new ColorSelectorExtended(container);
+				_colorClusterSymbol_Foreground.addListener(_defaultPropertyChangeListener);
+				_colorClusterSymbol_Foreground.addOpenListener(this);
 
 				// foreground color
-				_colorCluster_Background = new ColorSelectorExtended(container);
-				_colorCluster_Background.addListener(_defaultPropertyChangeListener);
-				_colorCluster_Background.addOpenListener(this);
+				_colorClusterSymbol_Background = new ColorSelectorExtended(container);
+				_colorClusterSymbol_Background.addListener(_defaultPropertyChangeListener);
+				_colorClusterSymbol_Background.addOpenListener(this);
 
 				// button: swap color
-				_btnSwapClusterColor = new Button(container, SWT.PUSH);
-				_btnSwapClusterColor.setText(UI.SYMBOL_ARROW_LEFT_RIGHT);
-				_btnSwapClusterColor.setToolTipText(Messages.Slideout_Map25MarkerOptions_Label_SwapColor_Tooltip);
-				_btnSwapClusterColor.addSelectionListener(new SelectionAdapter() {
+				_btnSwapClusterSymbolColor = new Button(container, SWT.PUSH);
+				_btnSwapClusterSymbolColor.setText(UI.SYMBOL_ARROW_LEFT_RIGHT);
+				_btnSwapClusterSymbolColor.setToolTipText(Messages.Slideout_Map25MarkerOptions_Label_SwapColor_Tooltip);
+				_btnSwapClusterSymbolColor.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
 						onSwapClusterColor(e);
 					}
 				});
 			}
+		}
 
+		{
+			/*
+			 * Cluster orientation: billboard/ground
+			 */
+			{
+				// label
+				_lblClusterOrientation = new Label(parent, SWT.NONE);
+				_lblClusterOrientation.setText(Messages.Slideout_Map25MarkerOptions_Label_ClusterOrientation);
+				GridDataFactory
+						.fillDefaults()//
+						.align(SWT.FILL, SWT.CENTER)
+						.indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
+						.applyTo(_lblClusterOrientation);
+			}
 			{
 				/*
-				 * Cluster orientation: billboard/ground
+				 * Combo: Orientaion
 				 */
-				{
-					// label
-					_lblClusterOrientation = new Label(parent, SWT.NONE);
-					_lblClusterOrientation.setText(Messages.Slideout_Map25MarkerOptions_Label_ClusterOrientation);
-					GridDataFactory
-							.fillDefaults()//
-							.align(SWT.FILL, SWT.CENTER)
-							.indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
-							.applyTo(_lblClusterOrientation);
-				}
-				{
-					/*
-					 * Combo: Orientaion
-					 */
-					_comboClusterOrientation = new Combo(parent, SWT.READ_ONLY | SWT.BORDER);
-					_comboClusterOrientation.setVisibleItemCount(20);
-					_comboClusterOrientation.addFocusListener(_keepOpenListener);
-					_comboClusterOrientation.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(final SelectionEvent e) {
-							onModifyConfig();
-						}
-					});
-					GridDataFactory
-							.fillDefaults()
-							.grab(true, false)
-							.align(SWT.BEGINNING, SWT.CENTER)
-							.hint(_pc.convertWidthInCharsToPixels(20), SWT.DEFAULT)
-							.applyTo(_comboClusterOrientation);
-				}
+				_comboClusterOrientation = new Combo(parent, SWT.READ_ONLY | SWT.BORDER);
+				_comboClusterOrientation.setVisibleItemCount(20);
+				_comboClusterOrientation.addFocusListener(_keepOpenListener);
+				_comboClusterOrientation.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						onModifyConfig();
+					}
+				});
+				GridDataFactory
+						.fillDefaults()
+						.grab(true, false)
+						.align(SWT.BEGINNING, SWT.CENTER)
+						.hint(_pc.convertWidthInCharsToPixels(20), SWT.DEFAULT)
+						.applyTo(_comboClusterOrientation);
+			}
+		}
+		{
+			/*
+			 * Cluster grid size
+			 */
+			{
+				// label
+				_lblClusterGridSize = new Label(parent, SWT.NONE);
+				_lblClusterGridSize.setText(Messages.Slideout_Map25MarkerOptions_Label_ClusterGridSize);
+				GridDataFactory
+						.fillDefaults()//
+						.align(SWT.FILL, SWT.CENTER)
+						.indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
+						.applyTo(_lblClusterGridSize);
+
+				// spinner
+				_spinnerClusterGridSize = new Spinner(parent, SWT.BORDER);
+				_spinnerClusterGridSize.setMinimum(Map25ConfigManager.CLUSTER_GRID_MIN_SIZE);
+				_spinnerClusterGridSize.setMaximum(Map25ConfigManager.CLUSTER_GRID_MAX_SIZE);
+				_spinnerClusterGridSize.setIncrement(1);
+				_spinnerClusterGridSize.setPageIncrement(10);
+				_spinnerClusterGridSize.addSelectionListener(_defaultSelectionListener);
+				_spinnerClusterGridSize.addMouseWheelListener(_defaultMouseWheelListener);
 			}
 		}
 	}
@@ -449,13 +489,19 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 		/*
 		 * Cluster
 		 */
-		_btnSwapClusterColor.setEnabled(isClustering);
-		_lblCluster.setEnabled(isClustering);
+		_btnSwapClusterSymbolColor.setEnabled(isClustering);
+
+		_lblClusterSymbol.setEnabled(isClustering);
 		_lblClusterOrientation.setEnabled(isClustering);
-		_colorCluster_Foreground.setEnabled(isClustering);
-		_colorCluster_Background.setEnabled(isClustering);
+		_lblClusterGridSize.setEnabled(isClustering);
+
+		_colorClusterSymbol_Foreground.setEnabled(isClustering);
+		_colorClusterSymbol_Background.setEnabled(isClustering);
+
 		_comboClusterOrientation.setEnabled(isClustering);
-		_spinnerClusterSize.setEnabled(isClustering);
+
+		_spinnerClusterSymbolSize.setEnabled(isClustering);
+		_spinnerClusterGridSize.setEnabled(isClustering);
 
 	}
 
@@ -671,16 +717,20 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 			 * Marker
 			 */
 			_comboMarkerOrientation.select(getOrientationIndex(config.markerOrientation));
-			_spinnerMarkerSize.setSelection(config.iconMarkerSizeDP);
-			_colorCluster_Foreground.setColorValue(config.clusterColorForeground);
-			_colorCluster_Background.setColorValue(config.clusterColorBackground);
+			_spinnerMarkerSize.setSelection(config.markerSymbolSizeDP);
+
+			_colorClusterSymbol_Foreground.setColorValue(config.clusterColorForeground);
+			_colorClusterSymbol_Background.setColorValue(config.clusterColorBackground);
 
 			/*
 			 * Cluster
 			 */
 			_chkIsMarkerClustering.setSelection(config.isMarkerClustered);
 			_comboClusterOrientation.select(getOrientationIndex(config.clusterOrientation));
-			_spinnerClusterSize.setSelection(config.iconClusterSizeDP);
+
+			_spinnerClusterGridSize.setSelection(config.clusterGridSize);
+			_spinnerClusterSymbolSize.setSelection(config.clusterSymbolSize);
+
 			_colorMarker_Foreground.setColorValue(config.markerColorForeground);
 			_colorMarker_Background.setColorValue(config.markerColorBackground);
 		}
@@ -699,7 +749,7 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 		 * Marker
 		 */
 		config.markerOrientation = getSelectedOrientation(_comboMarkerOrientation);
-		config.iconMarkerSizeDP = _spinnerMarkerSize.getSelection();
+		config.markerSymbolSizeDP = _spinnerMarkerSize.getSelection();
 		config.markerColorForeground = _colorMarker_Foreground.getColorValue();
 		config.markerColorBackground = _colorMarker_Background.getColorValue();
 
@@ -708,9 +758,12 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 		 */
 		config.isMarkerClustered = _chkIsMarkerClustering.getSelection();
 		config.clusterOrientation = getSelectedOrientation(_comboClusterOrientation);
-		config.iconClusterSizeDP = _spinnerClusterSize.getSelection();
-		config.clusterColorForeground = _colorCluster_Foreground.getColorValue();
-		config.clusterColorBackground = _colorCluster_Background.getColorValue();
+
+		config.clusterGridSize = _spinnerClusterGridSize.getSelection();
+		config.clusterSymbolSize = _spinnerClusterSymbolSize.getSelection();
+
+		config.clusterColorForeground = _colorClusterSymbol_Foreground.getColorValue();
+		config.clusterColorBackground = _colorClusterSymbol_Background.getColorValue();
 	}
 
 }

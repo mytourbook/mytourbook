@@ -110,21 +110,27 @@ public class Map25ConfigManager {
 	// marker
 	private static final String			TAG_MARKER_BACKGROUND			= "MarkerBackground";						//$NON-NLS-1$
 	private static final String			TAG_MARKER_FOREGROUND			= "MarkerForeground";						//$NON-NLS-1$
-	private static final String			ATTR_MARKER_ICON_SIZE			= "markerIconSize";							//$NON-NLS-1$
 	private static final String			ATTR_MARKER_ORIENTATION			= "markerOrientation";						//$NON-NLS-1$
+	private static final String			ATTR_MARKER_SYMBOL_SIZE			= "markerSymbolSize";						//$NON-NLS-1$
 	//
 	// cluster
 	private static final String			TAG_CLUSTER_BACKGROUND			= "ClusterBackground";						//$NON-NLS-1$
 	private static final String			TAG_CLUSTER_FOREGROUND			= "ClusterForeground";						//$NON-NLS-1$
-	private static final String			ATTR_CLUSTER_ICON_SIZE			= "clusterIconSize";						//$NON-NLS-1$
+	private static final String			ATTR_CLUSTER_GRID_SIZE			= "clusterGridSize";						//$NON-NLS-1$
 	private static final String			ATTR_CLUSTER_ORIENTATION		= "clusterOrientation";						//$NON-NLS-1$
+	private static final String			ATTR_CLUSTER_SYMBOL_SIZE		= "clusterSymbolSize";						//$NON-NLS-1$
 	private static final String			ATTR_IS_MARKER_CLUSTERED		= "isMarkerClustered";						//$NON-NLS-1$
 	//
 	// symbol
-	public static final int				ICON_MIN_SIZE					= 20;
-	public static final int				ICON_MAX_SIZE					= 200;
-	public static final int				DEFAULT_CLUSTER_ICON_SIZE		= 60;
-	public static final int				DEFAULT_MARKER_ICON_SIZE		= 20;
+	public static final int				SYMBOL_MIN_SIZE					= 20;
+	public static final int				SYMBOL_MAX_SIZE					= 200;
+	public static final int				DEFAULT_MARKER_SYMBOL_SIZE		= 20;
+
+	// CLUSTER
+	public static final int				DEFAULT_CLUSTER_SYMBOL_SIZE		= 60;
+	public static final int				DEFAULT_CLUSTER_GRID_SIZE		= 60;
+	public static final int				CLUSTER_GRID_MIN_SIZE			= 20;
+	public static final int				CLUSTER_GRID_MAX_SIZE			= 200;
 	//
 	// colors
 	public static final RGB				DEFAULT_CLUSTER_FOREGROUND		= new RGB(0xff, 0xff, 0xff);
@@ -346,13 +352,14 @@ public class Map25ConfigManager {
 			xmlConfig.putString(ATTR_CONFIG_NAME, config.name);
 
 			// Marker
-			xmlConfig.putInteger(ATTR_MARKER_ICON_SIZE, config.iconMarkerSizeDP);
+			xmlConfig.putInteger(ATTR_MARKER_SYMBOL_SIZE, config.markerSymbolSizeDP);
 			xmlConfig.putInteger(ATTR_MARKER_ORIENTATION, config.markerOrientation);
 			Util.setXmlRgb(xmlConfig, TAG_MARKER_FOREGROUND, config.markerColorForeground);
 			Util.setXmlRgb(xmlConfig, TAG_MARKER_BACKGROUND, config.markerColorBackground);
 
 			// Cluster
-			xmlConfig.putInteger(ATTR_CLUSTER_ICON_SIZE, config.iconClusterSizeDP);
+			xmlConfig.putInteger(ATTR_CLUSTER_GRID_SIZE, config.clusterGridSize);
+			xmlConfig.putInteger(ATTR_CLUSTER_SYMBOL_SIZE, config.clusterSymbolSize);
 			xmlConfig.putInteger(ATTR_CLUSTER_ORIENTATION, config.clusterOrientation);
 			xmlConfig.putBoolean(ATTR_IS_MARKER_CLUSTERED, config.isMarkerClustered);
 			Util.setXmlRgb(xmlConfig, TAG_CLUSTER_FOREGROUND, config.clusterColorForeground);
@@ -656,13 +663,13 @@ public class Map25ConfigManager {
 		config.id		= Util.getXmlString(xmlConfig, ATTR_ID, Long.toString(System.nanoTime()));
 		config.name		= Util.getXmlString(xmlConfig, ATTR_CONFIG_NAME, UI.EMPTY_STRING);
 
-		config.iconClusterSizeDP	= Util.getXmlInteger(xmlConfig, ATTR_CLUSTER_ICON_SIZE, DEFAULT_CLUSTER_ICON_SIZE, ICON_MIN_SIZE, ICON_MAX_SIZE);
-		config.iconMarkerSizeDP		= Util.getXmlInteger(xmlConfig, ATTR_MARKER_ICON_SIZE, DEFAULT_MARKER_ICON_SIZE, ICON_MIN_SIZE, ICON_MAX_SIZE);
-		
+		config.clusterGridSize		= Util.getXmlInteger(xmlConfig, ATTR_CLUSTER_GRID_SIZE, DEFAULT_CLUSTER_GRID_SIZE, CLUSTER_GRID_MIN_SIZE, CLUSTER_GRID_MAX_SIZE);
 		config.clusterOrientation	= Util.getXmlInteger(xmlConfig, ATTR_CLUSTER_ORIENTATION, Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD);
-		config.markerOrientation	= Util.getXmlInteger(xmlConfig, ATTR_MARKER_ORIENTATION, Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD);
-
+		config.clusterSymbolSize	= Util.getXmlInteger(xmlConfig, ATTR_CLUSTER_SYMBOL_SIZE, DEFAULT_CLUSTER_SYMBOL_SIZE, SYMBOL_MIN_SIZE, SYMBOL_MAX_SIZE);
 		config.isMarkerClustered	= Util.getXmlBoolean(xmlConfig, ATTR_IS_MARKER_CLUSTERED, true);
+		
+		config.markerOrientation	= Util.getXmlInteger(xmlConfig, ATTR_MARKER_ORIENTATION, Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD);
+		config.markerSymbolSizeDP	= Util.getXmlInteger(xmlConfig, ATTR_MARKER_SYMBOL_SIZE, DEFAULT_MARKER_SYMBOL_SIZE, SYMBOL_MIN_SIZE, SYMBOL_MAX_SIZE);
 
 // SET_FORMATTING_ON
 

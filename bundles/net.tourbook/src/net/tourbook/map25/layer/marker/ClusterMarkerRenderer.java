@@ -22,7 +22,10 @@ package net.tourbook.map25.layer.marker;
 
 import java.util.Arrays;
 
+import net.tourbook.common.UI;
+
 import org.oscim.backend.canvas.Bitmap;
+import org.oscim.core.MapPosition;
 import org.oscim.core.MercatorProjection;
 import org.oscim.core.PointF;
 import org.oscim.core.Tile;
@@ -92,7 +95,8 @@ public class ClusterMarkerRenderer extends MarkerRenderer {
 
 	private double				_clusterScale;
 
-	private int					_iconSizeDP					= MAP_MARKER_CLUSTER_SIZE_DP;
+	private int					_clusterSymbolSizeDP		= MAP_MARKER_CLUSTER_SIZE_DP;
+	private int					_clusterGridSizeDP			= MAP_GRID_SIZE_DP;
 
 	/**
 	 * When <code>true</code> all items are clustered, otherwise nothing is clustered.
@@ -214,7 +218,7 @@ public class ClusterMarkerRenderer extends MarkerRenderer {
 
 		final ScreenUtils.ClusterDrawable drawable = new ScreenUtils.ClusterDrawable(
 
-				_iconSizeDP - CLUSTER_MAXSIZE + size, // make size dependent on cluster size
+				_clusterSymbolSizeDP - CLUSTER_MAXSIZE + size, // make size dependent on cluster size
 
 				mStyleForeground,
 				mStyleBackground,
@@ -247,10 +251,13 @@ public class ClusterMarkerRenderer extends MarkerRenderer {
 		 * the grid slot size in px. increase to group more aggressively. currently set to marker
 		 * size
 		 */
-		final int GRIDSIZE = ScreenUtils.getPixels(MAP_GRID_SIZE_DP);
+		final int GRIDSIZE = ScreenUtils.getPixels(_clusterGridSizeDP);
 
 		/* the factor to map into Grid Coordinates (discrete squares of GRIDSIZE x GRIDSIZE) */
 		final double factor = (mapScale / GRIDSIZE);
+
+//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tfactor:" + factor));
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		final InternalItem.Clustered[] tmp = new InternalItem.Clustered[numMarkers];
 
@@ -287,13 +294,13 @@ public class ClusterMarkerRenderer extends MarkerRenderer {
 				// Lets check if there's already an item in the grid slot
 				final int storedIndexInGridSlot = mGridMap.get(itemGridIndex, -1);
 
-//				System.out.println(
-//						(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
-//								+ ("\titemGridIndex:" + itemGridIndex)
-//								+ ("\tmapScale:" + mapScale)
-//
-//				);
-//				// TODO remove SYSTEM.OUT.PRINTLN
+				System.out.println(
+						(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
+								+ ("\titemGridIndex:" + itemGridIndex)
+								+ ("\tmapScale:" + mapScale)
+
+				);
+				// TODO remove SYSTEM.OUT.PRINTLN
 
 				if (storedIndexInGridSlot == -1) {
 
@@ -318,6 +325,9 @@ public class ClusterMarkerRenderer extends MarkerRenderer {
 			}
 		}
 
+		System.out.println();
+		// TODO remove SYSTEM.OUT.PRINTLN
+
 		/* All ready for update. */
 		synchronized (this) {
 
@@ -330,15 +340,17 @@ public class ClusterMarkerRenderer extends MarkerRenderer {
 	 * @param isEnabled
 	 *            When <code>true</code> then all items are clustered, otherwise nothing is
 	 *            clustered.
+	 * @param clusterGridSize
 	 */
-	public void setClusteringEnabled(final boolean isEnabled) {
+	public void setClusteringEnabled(final boolean isEnabled, final int clusterGridSize) {
 
 		// check if modified
-		if (isEnabled == _isClustering) {
+		if (isEnabled == _isClustering && clusterGridSize == _clusterGridSizeDP) {
 			return;
 		}
 
 		_isClustering = isEnabled;
+		_clusterGridSizeDP = clusterGridSize;
 
 		// post repopulation to the main thread
 		mMarkerLayer.map().post(new Runnable() {
@@ -365,12 +377,12 @@ public class ClusterMarkerRenderer extends MarkerRenderer {
 		mStyleForeground = foregroundColor;
 	}
 
-	public synchronized void setClusterSymbolConfig(final int iconSizeDP,
+	public synchronized void setClusterSymbolConfig(final int clusterSymbolSize,
 													final int clusterForegroundColor,
 													final int clusterBackgroundColor,
 													final boolean isBillboard) {
 
-		_iconSizeDP = iconSizeDP;
+		_clusterSymbolSizeDP = clusterSymbolSize;
 		_isBillboard = isBillboard;
 
 		// remove cached bitmaps
@@ -389,10 +401,13 @@ public class ClusterMarkerRenderer extends MarkerRenderer {
 	}
 
 	@Override
-	public synchronized void update(final GLViewport v) {
+	public synchronized void update(final GLViewport viewport) {
 
-		final double viewPortScale = v.pos.scale;
-		final double scale = Tile.SIZE * viewPortScale;
+		final MapPosition mapPosition = viewport.pos;
+		final double mapScale = mapPosition.scale;
+		final float mapRotation = mapPosition.bearing;
+
+		final double scale = Tile.SIZE * mapScale;
 
 		if (mClusteringEnabled) {
 
@@ -431,14 +446,14 @@ public class ClusterMarkerRenderer extends MarkerRenderer {
 			}
 		}
 
-		if (!v.changed() && !mUpdate) {
+		if (!viewport.changed() && !mUpdate) {
 			return;
 		}
 
 		mUpdate = false;
 
-		final double mx = v.pos.x;
-		final double my = v.pos.y;
+		final double mx = mapPosition.x;
+		final double my = mapPosition.y;
 
 		//int changesInvisible = 0;
 		//int changedVisible = 0;
@@ -446,7 +461,7 @@ public class ClusterMarkerRenderer extends MarkerRenderer {
 
 		mMarkerLayer.map().viewport().getMapExtents(mBox, mExtents);
 
-		final long flip = (long) (Tile.SIZE * viewPortScale) >> 1;
+		final long flip = (long) (Tile.SIZE * mapScale) >> 1;
 
 		if (mItems == null) {
 
@@ -458,7 +473,7 @@ public class ClusterMarkerRenderer extends MarkerRenderer {
 			return;
 		}
 
-		final double angle = Math.toRadians(v.pos.bearing);
+		final double angle = Math.toRadians(mapPosition.bearing);
 		final float cos = (float) Math.cos(angle);
 		final float sin = (float) Math.sin(angle);
 
@@ -508,6 +523,7 @@ public class ClusterMarkerRenderer extends MarkerRenderer {
 				projectedMarker.visible = true;
 				//changedVisible++;
 			}
+
 			numVisible++;
 		}
 
@@ -527,7 +543,7 @@ public class ClusterMarkerRenderer extends MarkerRenderer {
 		}
 
 		/* keep position for current state */
-		mMapPosition.copy(v.pos);
+		mMapPosition.copy(mapPosition);
 		mMapPosition.bearing = -mMapPosition.bearing;
 
 		// why do we sort ? z-index?
@@ -562,6 +578,10 @@ public class ClusterMarkerRenderer extends MarkerRenderer {
 				markerSymbol.billboard = true; // could be a parameter
 				markerSymbol.billboard = _isBillboard;
 
+				if (!_isBillboard) {
+//					markerSymbol.rotation = -mapRotation;
+				}
+
 			} else {
 
 				// normal item, use its marker
@@ -585,4 +605,5 @@ public class ClusterMarkerRenderer extends MarkerRenderer {
 
 		compile();
 	}
+
 }

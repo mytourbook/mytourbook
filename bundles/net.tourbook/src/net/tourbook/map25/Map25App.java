@@ -300,7 +300,7 @@ public class Map25App extends GdxMap {
 		paintOutline.setStyle(Paint.Style.STROKE);
 		paintOutline.setStrokeWidth(ScreenUtils.getPixels(2));
 
-		final int iconSize = ScreenUtils.getPixels(config.iconMarkerSizeDP);
+		final int iconSize = ScreenUtils.getPixels(config.markerSymbolSizeDP);
 
 		final Bitmap bitmap = CanvasAdapter.newBitmap(iconSize, iconSize, 0);
 		final org.oscim.backend.canvas.Canvas canvas = CanvasAdapter.newCanvas();
@@ -641,13 +641,13 @@ public class Map25App extends GdxMap {
 		final ClusterMarkerRenderer markerRenderer = (ClusterMarkerRenderer) _layer_Marker.getRenderer();
 
 		markerRenderer.setClusterSymbolConfig(
-				config.iconClusterSizeDP,
+				config.clusterSymbolSize,
 				ColorUtil.getARGB(config.clusterColorForeground),
 				ColorUtil.getARGB(config.clusterColorBackground),
 				isBillboard);
 
 		markerRenderer.setDefaultMarker(createMarkerSymbol());
-		markerRenderer.setClusteringEnabled(config.isMarkerClustered);
+		markerRenderer.setClusteringEnabled(config.isMarkerClustered, config.clusterGridSize);
 	}
 
 }

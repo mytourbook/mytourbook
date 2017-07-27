@@ -34,19 +34,20 @@ public class Map25MarkerConfig implements Cloneable {
 	/*
 	 * Marker
 	 */
-	public int		markerOrientation		= Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
-	public int		iconMarkerSizeDP		= Map25ConfigManager.DEFAULT_MARKER_ICON_SIZE;
 	public RGB		markerColorForeground	= Map25ConfigManager.DEFAULT_MARKER_FOREGROUND;
 	public RGB		markerColorBackground	= Map25ConfigManager.DEFAULT_MARKER_BACKGROUND;
+	public int		markerOrientation		= Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
+	public int		markerSymbolSizeDP		= Map25ConfigManager.DEFAULT_MARKER_SYMBOL_SIZE;
 
 	/*
 	 * Cluster
 	 */
 	public boolean	isMarkerClustered		= true;
-	public int		clusterOrientation		= Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
-	public int		iconClusterSizeDP		= Map25ConfigManager.DEFAULT_CLUSTER_ICON_SIZE;
 	public RGB		clusterColorForeground	= Map25ConfigManager.DEFAULT_CLUSTER_FOREGROUND;
 	public RGB		clusterColorBackground	= Map25ConfigManager.DEFAULT_CLUSTER_BACKGROUND;
+	public int		clusterGridSize			= Map25ConfigManager.DEFAULT_CLUSTER_GRID_SIZE;
+	public int		clusterOrientation		= Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
+	public int		clusterSymbolSize		= Map25ConfigManager.DEFAULT_CLUSTER_SYMBOL_SIZE;
 
 	/**
 	 * Create a copy of this object.
@@ -127,8 +128,8 @@ public class Map25MarkerConfig implements Cloneable {
 				+ "id=" + id + ", "
 				+ "name=" + name + ", "
 
-				+ "iconClusterSizeDP=" + iconClusterSizeDP + ", "
-				+ "iconMarkerSizeDP=" + iconMarkerSizeDP + ", "
+				+ "iconClusterSizeDP=" + clusterSymbolSize + ", "
+				+ "iconMarkerSizeDP=" + markerSymbolSizeDP + ", "
 
 				+ "clusterColorForeground=" + clusterColorForeground + ", "
 				+ "clusterColorBackground=" + clusterColorBackground +
