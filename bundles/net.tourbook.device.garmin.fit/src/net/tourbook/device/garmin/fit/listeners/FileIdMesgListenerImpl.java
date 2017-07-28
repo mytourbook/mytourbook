@@ -1,9 +1,25 @@
+/*******************************************************************************
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation version 2 of the License.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
+ *******************************************************************************/
 package net.tourbook.device.garmin.fit.listeners;
 
 import net.tourbook.device.garmin.fit.FitContext;
 import net.tourbook.device.garmin.fit.FitDataReaderException;
 import net.tourbook.device.garmin.fit.types.GarminProduct;
 import net.tourbook.device.garmin.fit.types.Manufacturer;
+import net.tourbook.tour.TourLogManager;
 
 import com.garmin.fit.File;
 import com.garmin.fit.FileIdMesg;
@@ -23,10 +39,11 @@ public class FileIdMesgListenerImpl extends AbstractMesgListener implements File
 		 */
 		final File type = mesg.getType();
 		if (type != File.ACTIVITY) {
-			throw new FitDataReaderException("Invalid file type: " //$NON-NLS-1$
-					+ type.name()
-					+ ", expected: " //$NON-NLS-1$
-					+ File.ACTIVITY.name());
+			throw new FitDataReaderException(
+					String.format(//
+							"Invalid file type: %s, expected: %s", //$NON-NLS-1$
+							type.name(),
+							File.ACTIVITY.name()));
 		}
 
 		/*
@@ -34,9 +51,10 @@ public class FileIdMesgListenerImpl extends AbstractMesgListener implements File
 		 */
 		final Long serialNumber = mesg.getSerialNumber();
 		if (serialNumber == null) {
-			throw new FitDataReaderException("File serial number is missing"); //$NON-NLS-1$
+			TourLogManager.logError("File serial number is missing, device id cannot not be set");//$NON-NLS-1$
+		} else {
+			context.setDeviceId(serialNumber.toString());
 		}
-		context.setDeviceId(serialNumber.toString());
 
 		/*
 		 * Manufacturer
