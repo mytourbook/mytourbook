@@ -259,8 +259,8 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 			{
 				// spinner
 				_spinnerMarkerSize = new Spinner(container, SWT.BORDER);
-				_spinnerMarkerSize.setMinimum(Map25ConfigManager.SYMBOL_MIN_SIZE);
-				_spinnerMarkerSize.setMaximum(Map25ConfigManager.SYMBOL_MAX_SIZE);
+				_spinnerMarkerSize.setMinimum(Map25ConfigManager.MARKER_SYMBOL_SIZE_MIN);
+				_spinnerMarkerSize.setMaximum(Map25ConfigManager.MARKER_SYMBOL_SIZE_MAX);
 				_spinnerMarkerSize.setIncrement(1);
 				_spinnerMarkerSize.setPageIncrement(10);
 				_spinnerMarkerSize.addSelectionListener(_defaultSelectionListener);
@@ -359,8 +359,8 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 
 				// spinner: symbol size
 				_spinnerClusterSymbolSize = new Spinner(container, SWT.BORDER);
-				_spinnerClusterSymbolSize.setMinimum(Map25ConfigManager.SYMBOL_MIN_SIZE);
-				_spinnerClusterSymbolSize.setMaximum(Map25ConfigManager.SYMBOL_MAX_SIZE);
+				_spinnerClusterSymbolSize.setMinimum(Map25ConfigManager.CLUSTER_SYMBOL_SIZE_MIN);
+				_spinnerClusterSymbolSize.setMaximum(Map25ConfigManager.CLUSTER_SYMBOL_SIZE_MAX);
 				_spinnerClusterSymbolSize.setIncrement(1);
 				_spinnerClusterSymbolSize.setPageIncrement(10);
 				_spinnerClusterSymbolSize.addSelectionListener(_defaultSelectionListener);

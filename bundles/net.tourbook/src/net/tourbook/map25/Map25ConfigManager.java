@@ -122,15 +122,17 @@ public class Map25ConfigManager {
 	private static final String			ATTR_IS_MARKER_CLUSTERED		= "isMarkerClustered";						//$NON-NLS-1$
 	//
 	// symbol
-	public static final int				SYMBOL_MIN_SIZE					= 20;
-	public static final int				SYMBOL_MAX_SIZE					= 200;
 	public static final int				DEFAULT_MARKER_SYMBOL_SIZE		= 20;
+	public static final int				MARKER_SYMBOL_SIZE_MIN			= 10;
+	public static final int				MARKER_SYMBOL_SIZE_MAX			= 200;
 
 	// CLUSTER
-	public static final int				DEFAULT_CLUSTER_SYMBOL_SIZE		= 60;
 	public static final int				DEFAULT_CLUSTER_GRID_SIZE		= 60;
+	public static final int				DEFAULT_CLUSTER_SYMBOL_SIZE		= 60;
 	public static final int				CLUSTER_GRID_MIN_SIZE			= 20;
 	public static final int				CLUSTER_GRID_MAX_SIZE			= 200;
+	public static final int				CLUSTER_SYMBOL_SIZE_MIN			= 20;
+	public static final int				CLUSTER_SYMBOL_SIZE_MAX			= 200;
 	//
 	// colors
 	public static final RGB				DEFAULT_CLUSTER_FOREGROUND		= new RGB(0xff, 0xff, 0xff);
@@ -665,11 +667,11 @@ public class Map25ConfigManager {
 
 		config.clusterGridSize		= Util.getXmlInteger(xmlConfig, ATTR_CLUSTER_GRID_SIZE, DEFAULT_CLUSTER_GRID_SIZE, CLUSTER_GRID_MIN_SIZE, CLUSTER_GRID_MAX_SIZE);
 		config.clusterOrientation	= Util.getXmlInteger(xmlConfig, ATTR_CLUSTER_ORIENTATION, Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD);
-		config.clusterSymbolSize	= Util.getXmlInteger(xmlConfig, ATTR_CLUSTER_SYMBOL_SIZE, DEFAULT_CLUSTER_SYMBOL_SIZE, SYMBOL_MIN_SIZE, SYMBOL_MAX_SIZE);
+		config.clusterSymbolSize	= Util.getXmlInteger(xmlConfig, ATTR_CLUSTER_SYMBOL_SIZE, DEFAULT_CLUSTER_SYMBOL_SIZE, CLUSTER_SYMBOL_SIZE_MIN, CLUSTER_SYMBOL_SIZE_MAX);
 		config.isMarkerClustered	= Util.getXmlBoolean(xmlConfig, ATTR_IS_MARKER_CLUSTERED, true);
 		
 		config.markerOrientation	= Util.getXmlInteger(xmlConfig, ATTR_MARKER_ORIENTATION, Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD);
-		config.markerSymbolSizeDP	= Util.getXmlInteger(xmlConfig, ATTR_MARKER_SYMBOL_SIZE, DEFAULT_MARKER_SYMBOL_SIZE, SYMBOL_MIN_SIZE, SYMBOL_MAX_SIZE);
+		config.markerSymbolSizeDP	= Util.getXmlInteger(xmlConfig, ATTR_MARKER_SYMBOL_SIZE, DEFAULT_MARKER_SYMBOL_SIZE, MARKER_SYMBOL_SIZE_MIN, MARKER_SYMBOL_SIZE_MAX);
 
 // SET_FORMATTING_ON
 
