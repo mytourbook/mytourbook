@@ -23,6 +23,22 @@ import org.eclipse.swt.widgets.Display;
 
 public class ColorUtil {
 
+	/**
+	 * @param color
+	 * @param alpha
+	 *            0xff is opaque, 0 is transparent
+	 * @return
+	 */
+	public static int getARGB(final RGB color, final int alpha) {
+
+		final int graphColor = ((color.blue & 0xFF) << 0) //
+				| ((color.green & 0xFF) << 8)
+				| ((color.red & 0xFF) << 16)
+				| ((alpha) << 24);
+
+		return graphColor;
+	}
+
 	public static RGB getComplimentColor(final Display display, final RGB color) {
 
 		// get compliment color
@@ -93,15 +109,5 @@ public class ColorUtil {
 		} else {
 			return new Color(1, 1, 1, newAlpha);
 		}
-	}
-
-	public static int getARGB(final RGB color) {
-
-		final int graphColor = ((color.blue & 0xFF) << 0) //
-				| ((color.green & 0xFF) << 8)
-				| ((color.red & 0xFF) << 16)
-				| ((0xFF) << 24);
-
-		return graphColor;
 	}
 }

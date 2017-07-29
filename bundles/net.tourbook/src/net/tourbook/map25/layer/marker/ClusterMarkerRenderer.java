@@ -264,6 +264,10 @@ public class ClusterMarkerRenderer extends MarkerRenderer {
 		// clear grid map to count items that share the same "grid slot"
 		mGridMap.clear();
 
+		System.out.println(
+				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tGRIDSIZE:" + GRIDSIZE));
+		// TODO remove SYSTEM.OUT.PRINTLN
+
 		for (int markerIndex = 0; markerIndex < numMarkers; markerIndex++) {
 
 			final InternalItem.Clustered projectedMarker = tmp[markerIndex] = new InternalItem.Clustered();
@@ -297,7 +301,11 @@ public class ClusterMarkerRenderer extends MarkerRenderer {
 				System.out.println(
 						(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
 								+ ("\titemGridIndex:" + itemGridIndex)
-								+ ("\tmapScale:" + mapScale)
+								+ ("\tabsposx:" + absposx)
+								+ ("\tabsposy:" + absposy)
+								+ ("\tmaxcols:" + maxcols)
+								+ ("\tfactor:" + factor)
+//								+ ("\t:" + )
 
 				);
 				// TODO remove SYSTEM.OUT.PRINTLN
@@ -573,9 +581,10 @@ public class ClusterMarkerRenderer extends MarkerRenderer {
 				// depending on cluster size, instead of its marker
 
 				final Bitmap bitmap = getClusterBitmap(projectedMarker.clusterSize + 1);
+				
 				markerSymbol.set(projectedMarker.x, projectedMarker.y, bitmap, true);
 				markerSymbol.offset = new PointF(0.5f, 0.5f);
-				markerSymbol.billboard = true; // could be a parameter
+//				markerSymbol.billboard = true; // could be a parameter
 				markerSymbol.billboard = _isBillboard;
 
 				if (!_isBillboard) {

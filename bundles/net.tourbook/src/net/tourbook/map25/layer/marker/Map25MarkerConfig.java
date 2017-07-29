@@ -34,17 +34,21 @@ public class Map25MarkerConfig implements Cloneable {
 	/*
 	 * Marker
 	 */
-	public RGB		markerColorForeground	= Map25ConfigManager.DEFAULT_MARKER_FOREGROUND;
-	public RGB		markerColorBackground	= Map25ConfigManager.DEFAULT_MARKER_BACKGROUND;
+	public RGB		markerFill_Color		= Map25ConfigManager.DEFAULT_MARKER_FILL_COLOR;
+	public int		markerFill_Opacity		= Map25ConfigManager.DEFAULT_MARKER_OPACITY;
+	public RGB		markerOutline_Color		= Map25ConfigManager.DEFAULT_MARKER_OUTLINE_COLOR;
+	public int		markerOutline_Opacity	= Map25ConfigManager.DEFAULT_MARKER_OPACITY;
 	public int		markerOrientation		= Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
-	public int		markerSymbolSizeDP		= Map25ConfigManager.DEFAULT_MARKER_SYMBOL_SIZE;
+	public int		markerSymbolSize		= Map25ConfigManager.DEFAULT_MARKER_SYMBOL_SIZE;
 
 	/*
 	 * Cluster
 	 */
 	public boolean	isMarkerClustered		= true;
-	public RGB		clusterColorForeground	= Map25ConfigManager.DEFAULT_CLUSTER_FOREGROUND;
-	public RGB		clusterColorBackground	= Map25ConfigManager.DEFAULT_CLUSTER_BACKGROUND;
+	public int		clusterFill_Opacity		= Map25ConfigManager.DEFAULT_CLUSTER_OPACITY;
+	public RGB		clusterFill_Color		= Map25ConfigManager.DEFAULT_CLUSTER_FILL_COLOR;
+	public int		clusterOutline_Opacity	= Map25ConfigManager.DEFAULT_CLUSTER_OPACITY;
+	public RGB		clusterOutline_Color	= Map25ConfigManager.DEFAULT_CLUSTER_OUTLINE_COLOR;
 	public int		clusterGridSize			= Map25ConfigManager.DEFAULT_CLUSTER_GRID_SIZE;
 	public int		clusterOrientation		= Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
 	public int		clusterSymbolSize		= Map25ConfigManager.DEFAULT_CLUSTER_SYMBOL_SIZE;
@@ -129,10 +133,10 @@ public class Map25MarkerConfig implements Cloneable {
 				+ "name=" + name + ", "
 
 				+ "iconClusterSizeDP=" + clusterSymbolSize + ", "
-				+ "iconMarkerSizeDP=" + markerSymbolSizeDP + ", "
+				+ "iconMarkerSizeDP=" + markerSymbolSize + ", "
 
-				+ "clusterColorForeground=" + clusterColorForeground + ", "
-				+ "clusterColorBackground=" + clusterColorBackground +
+				+ "clusterColorForeground=" + clusterOutline_Color + ", "
+				+ "clusterColorBackground=" + clusterFill_Color +
 
 				"]\n";
 	}

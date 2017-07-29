@@ -292,15 +292,15 @@ public class Map25App extends GdxMap {
 		final Map25MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
 		final Paint paintFill = CanvasAdapter.newPaint();
-		paintFill.setColor(ColorUtil.getARGB(config.markerColorBackground));
+		paintFill.setColor(ColorUtil.getARGB(config.markerFill_Color, config.markerFill_Opacity));
 		paintFill.setStyle(Paint.Style.FILL);
 
 		final Paint paintOutline = CanvasAdapter.newPaint();
-		paintOutline.setColor(ColorUtil.getARGB(config.markerColorForeground));
+		paintOutline.setColor(ColorUtil.getARGB(config.markerOutline_Color, config.markerOutline_Opacity));
 		paintOutline.setStyle(Paint.Style.STROKE);
 		paintOutline.setStrokeWidth(ScreenUtils.getPixels(2));
 
-		final int iconSize = ScreenUtils.getPixels(config.markerSymbolSizeDP);
+		final int iconSize = ScreenUtils.getPixels(config.markerSymbolSize);
 
 		final Bitmap bitmap = CanvasAdapter.newBitmap(iconSize, iconSize, 0);
 		final org.oscim.backend.canvas.Canvas canvas = CanvasAdapter.newCanvas();
@@ -642,8 +642,8 @@ public class Map25App extends GdxMap {
 
 		markerRenderer.setClusterSymbolConfig(
 				config.clusterSymbolSize,
-				ColorUtil.getARGB(config.clusterColorForeground),
-				ColorUtil.getARGB(config.clusterColorBackground),
+				ColorUtil.getARGB(config.clusterOutline_Color, config.clusterOutline_Opacity),
+				ColorUtil.getARGB(config.clusterFill_Color, config.clusterFill_Opacity),
 				isBillboard);
 
 		markerRenderer.setDefaultMarker(createMarkerSymbol());

@@ -421,7 +421,7 @@ public class TourLayer extends Layer {
 				.builder()//
 
 				.strokeWidth(trackConfig.outlineWidth)
-				.color(ColorUtil.getARGB(trackConfig.outlineColor))
+				.color(ColorUtil.getARGB(trackConfig.outlineColor, 0xff))
 				.cap(Cap.BUTT)
 
 				// this is not yet working

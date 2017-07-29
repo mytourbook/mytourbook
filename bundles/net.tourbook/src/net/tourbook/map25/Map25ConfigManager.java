@@ -108,14 +108,14 @@ public class Map25ConfigManager {
 	private static final String			TAG_MARKER						= "Marker";									//$NON-NLS-1$
 	//
 	// marker
-	private static final String			TAG_MARKER_BACKGROUND			= "MarkerBackground";						//$NON-NLS-1$
-	private static final String			TAG_MARKER_FOREGROUND			= "MarkerForeground";						//$NON-NLS-1$
+	private static final String			TAG_MARKER_FILL_COLOR			= "MarkerFillColor";						//$NON-NLS-1$
+	private static final String			TAG_MARKER_OUTLINE_COLOR		= "MarkerOutlineColor";						//$NON-NLS-1$
 	private static final String			ATTR_MARKER_ORIENTATION			= "markerOrientation";						//$NON-NLS-1$
 	private static final String			ATTR_MARKER_SYMBOL_SIZE			= "markerSymbolSize";						//$NON-NLS-1$
 	//
 	// cluster
-	private static final String			TAG_CLUSTER_BACKGROUND			= "ClusterBackground";						//$NON-NLS-1$
-	private static final String			TAG_CLUSTER_FOREGROUND			= "ClusterForeground";						//$NON-NLS-1$
+	private static final String			TAG_CLUSTER_FILL_COLOR			= "ClusterFillColor";						//$NON-NLS-1$
+	private static final String			TAG_CLUSTER_OUTLINE_COLOR		= "ClusterOutlineColor";					//$NON-NLS-1$
 	private static final String			ATTR_CLUSTER_GRID_SIZE			= "clusterGridSize";						//$NON-NLS-1$
 	private static final String			ATTR_CLUSTER_ORIENTATION		= "clusterOrientation";						//$NON-NLS-1$
 	private static final String			ATTR_CLUSTER_SYMBOL_SIZE		= "clusterSymbolSize";						//$NON-NLS-1$
@@ -135,10 +135,12 @@ public class Map25ConfigManager {
 	public static final int				CLUSTER_SYMBOL_SIZE_MAX			= 200;
 	//
 	// colors
-	public static final RGB				DEFAULT_CLUSTER_FOREGROUND		= new RGB(0xff, 0xff, 0xff);
-	public static final RGB				DEFAULT_CLUSTER_BACKGROUND		= new RGB(0xFC, 0x67, 0x00);
-	public static final RGB				DEFAULT_MARKER_FOREGROUND		= new RGB(0, 0, 0);
-	public static final RGB				DEFAULT_MARKER_BACKGROUND		= new RGB(0xFF, 0xFF, 0x00);
+	public static final int				DEFAULT_CLUSTER_OPACITY			= 0xe0;
+	public static final RGB				DEFAULT_CLUSTER_OUTLINE_COLOR	= new RGB(0xff, 0xff, 0xff);
+	public static final RGB				DEFAULT_CLUSTER_FILL_COLOR		= new RGB(0xFC, 0x67, 0x00);
+	public static final int				DEFAULT_MARKER_OPACITY			= 0xe0;
+	public static final RGB				DEFAULT_MARKER_OUTLINE_COLOR	= new RGB(0, 0, 0);
+	public static final RGB				DEFAULT_MARKER_FILL_COLOR		= new RGB(0xFF, 0xFF, 0x00);
 	//
 	// !!! this is a code formatting separator !!!
 	static {}
@@ -202,66 +204,66 @@ public class Map25ConfigManager {
 		final RGB bg4 = new RGB(0xFF, 0xC9, 0x00);
 		final RGB bg5 = new RGB(0xFF, 0x00, 0x62);
 
-		config.markerColorForeground = fgBlack;
-		config.markerColorBackground = fgWhite;
+		config.markerOutline_Color = fgBlack;
+		config.markerFill_Color = fgWhite;
 
 		switch (configIndex) {
 
 		case 1:
 			config.name = config.defaultId = CONFIG_DEFAULT_ID_1;
-			config.clusterColorForeground = fgBlack;
-			config.clusterColorBackground = bg1;
-			config.markerColorForeground = fgBlack;
-			config.markerColorBackground = bg5;
+			config.clusterOutline_Color = fgBlack;
+			config.clusterFill_Color = bg1;
+			config.markerOutline_Color = fgBlack;
+			config.markerFill_Color = bg5;
 			break;
 		case 2:
 			config.name = config.defaultId = CONFIG_DEFAULT_ID_2;
-			config.clusterColorForeground = fgWhite;
-			config.clusterColorBackground = bg1;
+			config.clusterOutline_Color = fgWhite;
+			config.clusterFill_Color = bg1;
 			break;
 
 		case 3:
 			config.name = config.defaultId = CONFIG_DEFAULT_ID_3;
-			config.clusterColorForeground = fgBlack;
-			config.clusterColorBackground = bg2;
+			config.clusterOutline_Color = fgBlack;
+			config.clusterFill_Color = bg2;
 			break;
 		case 4:
 			config.name = config.defaultId = CONFIG_DEFAULT_ID_4;
-			config.clusterColorForeground = fgWhite;
-			config.clusterColorBackground = bg2;
+			config.clusterOutline_Color = fgWhite;
+			config.clusterFill_Color = bg2;
 			break;
 
 		case 5:
 			config.name = config.defaultId = CONFIG_DEFAULT_ID_5;
-			config.clusterColorForeground = fgBlack;
-			config.clusterColorBackground = bg3;
+			config.clusterOutline_Color = fgBlack;
+			config.clusterFill_Color = bg3;
 			break;
 		case 6:
 			config.name = config.defaultId = CONFIG_DEFAULT_ID_6;
-			config.clusterColorForeground = fgWhite;
-			config.clusterColorBackground = bg3;
+			config.clusterOutline_Color = fgWhite;
+			config.clusterFill_Color = bg3;
 			break;
 
 		case 7:
 			config.name = config.defaultId = CONFIG_DEFAULT_ID_7;
-			config.clusterColorForeground = fgBlack;
-			config.clusterColorBackground = bg4;
+			config.clusterOutline_Color = fgBlack;
+			config.clusterFill_Color = bg4;
 			break;
 		case 8:
 			config.name = config.defaultId = CONFIG_DEFAULT_ID_8;
-			config.clusterColorForeground = fgWhite;
-			config.clusterColorBackground = bg4;
+			config.clusterOutline_Color = fgWhite;
+			config.clusterFill_Color = bg4;
 			break;
 
 		case 9:
 			config.name = config.defaultId = CONFIG_DEFAULT_ID_9;
-			config.clusterColorForeground = fgBlack;
-			config.clusterColorBackground = bg5;
+			config.clusterOutline_Color = fgBlack;
+			config.clusterFill_Color = bg5;
 			break;
 		case 10:
 			config.name = config.defaultId = CONFIG_DEFAULT_ID_10;
-			config.clusterColorForeground = fgWhite;
-			config.clusterColorBackground = bg5;
+			config.clusterOutline_Color = fgWhite;
+			config.clusterFill_Color = bg5;
 			break;
 
 		}
@@ -354,18 +356,18 @@ public class Map25ConfigManager {
 			xmlConfig.putString(ATTR_CONFIG_NAME, config.name);
 
 			// Marker
-			xmlConfig.putInteger(ATTR_MARKER_SYMBOL_SIZE, config.markerSymbolSizeDP);
+			xmlConfig.putInteger(ATTR_MARKER_SYMBOL_SIZE, config.markerSymbolSize);
 			xmlConfig.putInteger(ATTR_MARKER_ORIENTATION, config.markerOrientation);
-			Util.setXmlRgb(xmlConfig, TAG_MARKER_FOREGROUND, config.markerColorForeground);
-			Util.setXmlRgb(xmlConfig, TAG_MARKER_BACKGROUND, config.markerColorBackground);
+			Util.setXmlRgb(xmlConfig, TAG_MARKER_OUTLINE_COLOR, config.markerOutline_Color);
+			Util.setXmlRgb(xmlConfig, TAG_MARKER_FILL_COLOR, config.markerFill_Color);
 
 			// Cluster
 			xmlConfig.putInteger(ATTR_CLUSTER_GRID_SIZE, config.clusterGridSize);
 			xmlConfig.putInteger(ATTR_CLUSTER_SYMBOL_SIZE, config.clusterSymbolSize);
 			xmlConfig.putInteger(ATTR_CLUSTER_ORIENTATION, config.clusterOrientation);
 			xmlConfig.putBoolean(ATTR_IS_MARKER_CLUSTERED, config.isMarkerClustered);
-			Util.setXmlRgb(xmlConfig, TAG_CLUSTER_FOREGROUND, config.clusterColorForeground);
-			Util.setXmlRgb(xmlConfig, TAG_CLUSTER_BACKGROUND, config.clusterColorBackground);
+			Util.setXmlRgb(xmlConfig, TAG_CLUSTER_OUTLINE_COLOR, config.clusterOutline_Color);
+			Util.setXmlRgb(xmlConfig, TAG_CLUSTER_FILL_COLOR, config.clusterFill_Color);
 		}
 	}
 
@@ -671,7 +673,7 @@ public class Map25ConfigManager {
 		config.isMarkerClustered	= Util.getXmlBoolean(xmlConfig, ATTR_IS_MARKER_CLUSTERED, true);
 		
 		config.markerOrientation	= Util.getXmlInteger(xmlConfig, ATTR_MARKER_ORIENTATION, Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD);
-		config.markerSymbolSizeDP	= Util.getXmlInteger(xmlConfig, ATTR_MARKER_SYMBOL_SIZE, DEFAULT_MARKER_SYMBOL_SIZE, MARKER_SYMBOL_SIZE_MIN, MARKER_SYMBOL_SIZE_MAX);
+		config.markerSymbolSize	= Util.getXmlInteger(xmlConfig, ATTR_MARKER_SYMBOL_SIZE, DEFAULT_MARKER_SYMBOL_SIZE, MARKER_SYMBOL_SIZE_MIN, MARKER_SYMBOL_SIZE_MAX);
 
 // SET_FORMATTING_ON
 
@@ -685,18 +687,18 @@ public class Map25ConfigManager {
 
 			switch (configTag) {
 
-			case TAG_CLUSTER_FOREGROUND:
-				config.clusterColorForeground = Util.getXmlRgb(xmlConfigChild, DEFAULT_CLUSTER_FOREGROUND);
+			case TAG_CLUSTER_OUTLINE_COLOR:
+				config.clusterOutline_Color = Util.getXmlRgb(xmlConfigChild, DEFAULT_CLUSTER_OUTLINE_COLOR);
 				break;
-			case TAG_CLUSTER_BACKGROUND:
-				config.clusterColorBackground = Util.getXmlRgb(xmlConfigChild, DEFAULT_CLUSTER_BACKGROUND);
+			case TAG_CLUSTER_FILL_COLOR:
+				config.clusterFill_Color = Util.getXmlRgb(xmlConfigChild, DEFAULT_CLUSTER_FILL_COLOR);
 				break;
 
-			case TAG_MARKER_FOREGROUND:
-				config.markerColorBackground = Util.getXmlRgb(xmlConfigChild, DEFAULT_MARKER_FOREGROUND);
+			case TAG_MARKER_OUTLINE_COLOR:
+				config.markerOutline_Color = Util.getXmlRgb(xmlConfigChild, DEFAULT_MARKER_OUTLINE_COLOR);
 				break;
-			case TAG_MARKER_BACKGROUND:
-				config.markerColorForeground = Util.getXmlRgb(xmlConfigChild, DEFAULT_MARKER_BACKGROUND);
+			case TAG_MARKER_FILL_COLOR:
+				config.markerFill_Color = Util.getXmlRgb(xmlConfigChild, DEFAULT_MARKER_FILL_COLOR);
 				break;
 			}
 		}
