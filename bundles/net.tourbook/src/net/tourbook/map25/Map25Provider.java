@@ -27,15 +27,15 @@ public class Map25Provider implements Cloneable {
 	public boolean		isEnabled;
 	public boolean		isDefault;
 
-	public String		name		= UI.EMPTY_STRING;
-	public String		description	= UI.EMPTY_STRING;
+	public String		name			= UI.EMPTY_STRING;
+	public String		description		= UI.EMPTY_STRING;
 
-	public String		url			= UI.EMPTY_STRING;
-	public String		tilePath	= UI.EMPTY_STRING;
+	public String		url				= UI.EMPTY_STRING;
+	public String		tilePath		= UI.EMPTY_STRING;
 
-	public String		apiKey		= UI.EMPTY_STRING;
+	public String		apiKey			= UI.EMPTY_STRING;
 
-	public TileEncoding	tileEncoding;
+	public TileEncoding	tileEncoding	= TileEncoding.MVT;
 
 	public Map25Provider() {
 

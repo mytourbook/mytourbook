@@ -22,8 +22,6 @@ package net.tourbook.map25.layer.marker;
 
 import java.util.Arrays;
 
-import net.tourbook.common.UI;
-
 import org.oscim.backend.canvas.Bitmap;
 import org.oscim.core.MapPosition;
 import org.oscim.core.MercatorProjection;
@@ -264,8 +262,8 @@ public class ClusterMarkerRenderer extends MarkerRenderer {
 		// clear grid map to count items that share the same "grid slot"
 		mGridMap.clear();
 
-		System.out.println(
-				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tGRIDSIZE:" + GRIDSIZE));
+//		System.out.println(
+//				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tGRIDSIZE:" + GRIDSIZE));
 		// TODO remove SYSTEM.OUT.PRINTLN
 
 		for (int markerIndex = 0; markerIndex < numMarkers; markerIndex++) {
@@ -298,16 +296,16 @@ public class ClusterMarkerRenderer extends MarkerRenderer {
 				// Lets check if there's already an item in the grid slot
 				final int storedIndexInGridSlot = mGridMap.get(itemGridIndex, -1);
 
-				System.out.println(
-						(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
-								+ ("\titemGridIndex:" + itemGridIndex)
-								+ ("\tabsposx:" + absposx)
-								+ ("\tabsposy:" + absposy)
-								+ ("\tmaxcols:" + maxcols)
-								+ ("\tfactor:" + factor)
-//								+ ("\t:" + )
-
-				);
+//				System.out.println(
+//						(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
+//								+ ("\titemGridIndex:" + itemGridIndex)
+//								+ ("\tabsposx:" + absposx)
+//								+ ("\tabsposy:" + absposy)
+//								+ ("\tmaxcols:" + maxcols)
+//								+ ("\tfactor:" + factor)
+////								+ ("\t:" + )
+//
+//				);
 				// TODO remove SYSTEM.OUT.PRINTLN
 
 				if (storedIndexInGridSlot == -1) {
@@ -333,8 +331,8 @@ public class ClusterMarkerRenderer extends MarkerRenderer {
 			}
 		}
 
-		System.out.println();
-		// TODO remove SYSTEM.OUT.PRINTLN
+//		System.out.println();
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		/* All ready for update. */
 		synchronized (this) {
