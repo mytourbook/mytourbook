@@ -19,7 +19,7 @@ repositories {
     mavenCentral()
 }
 
-def bundleVersion	= '17.7.1'
+def bundleVersion	= '17.7.2'
 
 
 dependencies {
