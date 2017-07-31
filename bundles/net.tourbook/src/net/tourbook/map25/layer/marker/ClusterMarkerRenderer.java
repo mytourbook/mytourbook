@@ -22,6 +22,8 @@ package net.tourbook.map25.layer.marker;
 
 import java.util.Arrays;
 
+import net.tourbook.common.UI;
+
 import org.oscim.backend.canvas.Bitmap;
 import org.oscim.core.MapPosition;
 import org.oscim.core.MercatorProjection;
@@ -245,6 +247,9 @@ public class ClusterMarkerRenderer extends MarkerRenderer {
 	 */
 	private void repopulateCluster(final int numMarkers, final double mapScale) {
 
+		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\trepopulateCluster()"));
+		// TODO remove SYSTEM.OUT.PRINTLN
+
 		/*
 		 * the grid slot size in px. increase to group more aggressively. currently set to marker
 		 * size
@@ -408,6 +413,9 @@ public class ClusterMarkerRenderer extends MarkerRenderer {
 
 	@Override
 	public synchronized void update(final GLViewport viewport) {
+
+		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tupdate()"));
+		// TODO remove SYSTEM.OUT.PRINTLN
 
 		final MapPosition mapPosition = viewport.pos;
 		final double mapScale = mapPosition.scale;

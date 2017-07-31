@@ -34,6 +34,8 @@ public class Map25MarkerConfig implements Cloneable {
 	/*
 	 * Marker
 	 */
+	public boolean	isShowMarkerLabel		= true;
+	public boolean	isShowMarkerPoint		= true;
 	public RGB		markerFill_Color		= Map25ConfigManager.DEFAULT_MARKER_FILL_COLOR;
 	public int		markerFill_Opacity		= Map25ConfigManager.DEFAULT_MARKER_OPACITY;
 	public RGB		markerOutline_Color		= Map25ConfigManager.DEFAULT_MARKER_OUTLINE_COLOR;

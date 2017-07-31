@@ -232,6 +232,7 @@ public class ItemizedLayer<Item extends MarkerInterface> extends MarkerLayer<Ite
 	public boolean addItems(final Collection<Item> items) {
 
 		final boolean result = mItemList.addAll(items);
+
 		populate();
 
 		return result;

@@ -443,13 +443,14 @@ public class Map25View extends ViewPart {
 		return new BoundingBox(minLat, minLon, maxLat, maxLon);
 	}
 
-	private List<MarkerItem> createMarker(final ArrayList<TourData> allTourData) {
+	private List<MarkerItem> createMapMarkers(final ArrayList<TourData> allTourData) {
 
 		final List<MarkerItem> allMarkerItems = new ArrayList<>();
 
 		for (final TourData tourData : allTourData) {
 
 			final Set<TourMarker> tourMarkerList = tourData.getTourMarkers();
+
 			if (tourMarkerList.size() == 0) {
 				continue;
 			}
@@ -895,8 +896,10 @@ public class Map25View extends ViewPart {
 	private void paintTours_AndUpdateMap() {
 
 		enableActions();
-		enableActions();
 
+		/*
+		 * Tours
+		 */
 		final TourLayer tourLayer = _mapApp.getLayer_Tour();
 		if (tourLayer == null) {
 
@@ -942,15 +945,18 @@ public class Map25View extends ViewPart {
 		tourLayer.setPoints(_allGeoPoints, _allTourStarts);
 
 		/*
-		 * Marker
+		 * Markers
 		 */
 		final ItemizedLayer<MarkerItem> markerLayer = _mapApp.getLayer_Marker();
 		if (markerLayer.isEnabled()) {
 
 			markerLayer.removeAllItems(false);
-			markerLayer.addItems(createMarker(_allTourData));
+			markerLayer.addItems(createMapMarkers(_allTourData));
 		}
 
+		/*
+		 * Update map
+		 */
 		final Map map25 = _mapApp.getMap();
 
 		map25.post(new Runnable() {

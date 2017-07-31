@@ -100,15 +100,21 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 	private Button					_btnReset;
 
 	private Button					_chkIsMarkerClustering;
+	private Button					_chkIsShowMarkerLabel;
+	private Button					_chkIsShowMarkerPoint;
 
 	private Combo					_comboClusterOrientation;
 	private Combo					_comboConfigName;
 	private Combo					_comboMarkerOrientation;
 
-	private Label					_lblClusterSymbol;
 	private Label					_lblConfigName;
-	private Label					_lblClusterOrientation;
 	private Label					_lblClusterGridSize;
+	private Label					_lblClusterOpacity;
+	private Label					_lblClusterOrientation;
+	private Label					_lblClusterSymbol;
+	private Label					_lblMarkerOpacity;
+	private Label					_lblMarkerOrientation;
+	private Label					_lblMarkerSymbol;
 
 	private Spinner					_spinnerClusterSize_Grid;
 	private Spinner					_spinnerClusterSize_Symbol;
@@ -172,7 +178,8 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 //			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 			{
 				createUI_000_Title(container);
-				createUI_20_Marker(container);
+				createUI_10_MarkerLabel(container);
+				createUI_20_MarkerPoint(container);
 				createUI_30_Cluster(container);
 				createUI_999_ConfigName(container);
 			}
@@ -240,26 +247,42 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 		}
 	}
 
-	private void createUI_20_Marker(final Composite parent) {
+	private void createUI_10_MarkerLabel(final Composite parent) {
 
 		{
-			/*
-			 * Marker
-			 */
-			// label
-			final Label label = new Label(parent, SWT.NONE);
-			label.setText(Messages.Slideout_Map25MarkerOptions_Label_Marker);
-			label.setToolTipText(Messages.Slideout_Map25MarkerOptions_Label_Marker_Tooltip);
-			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+			// checkbox: Show label
+			_chkIsShowMarkerLabel = new Button(parent, SWT.CHECK);
+			_chkIsShowMarkerLabel.setText(Messages.Slideout_Map25MarkerOptions_Checkbox_IsShowMarkerLabel);
+			_chkIsShowMarkerLabel.addSelectionListener(_defaultSelectionListener);
+			GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsShowMarkerLabel);
+		}
+	}
 
-			/*
-			 * Symbol
-			 */
+	private void createUI_20_MarkerPoint(final Composite parent) {
+
+		{
+			// checkbox: Show point
+			_chkIsShowMarkerPoint = new Button(parent, SWT.CHECK);
+			_chkIsShowMarkerPoint.setText(Messages.Slideout_Map25MarkerOptions_Checkbox_IsShowMarkerPoint);
+			_chkIsShowMarkerPoint.addSelectionListener(_defaultSelectionListener);
+			GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsShowMarkerPoint);
+		}
+		{
+			// label: symbol
+			_lblMarkerSymbol = new Label(parent, SWT.NONE);
+			_lblMarkerSymbol.setText(Messages.Slideout_Map25MarkerOptions_Label_Marker);
+			_lblMarkerSymbol.setToolTipText(Messages.Slideout_Map25MarkerOptions_Label_Marker_Tooltip);
+			GridDataFactory
+					.fillDefaults()
+					.align(SWT.FILL, SWT.CENTER)
+					.indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
+					.applyTo(_lblMarkerSymbol);
+
 			final Composite container = new Composite(parent, SWT.NONE);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 			GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
 			{
-				// spinner
+				// size
 				_spinnerMarkerSize = new Spinner(container, SWT.BORDER);
 				_spinnerMarkerSize.setMinimum(Map25ConfigManager.MARKER_SYMBOL_SIZE_MIN);
 				_spinnerMarkerSize.setMaximum(Map25ConfigManager.MARKER_SYMBOL_SIZE_MAX);
@@ -295,13 +318,13 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 			 * Opacity
 			 */
 			// label
-			final Label label = new Label(parent, SWT.NONE);
-			label.setText(Messages.Slideout_Map25MarkerOptions_Label_Opacity);
+			_lblMarkerOpacity = new Label(parent, SWT.NONE);
+			_lblMarkerOpacity.setText(Messages.Slideout_Map25MarkerOptions_Label_Opacity);
 			GridDataFactory
 					.fillDefaults()
 					.align(SWT.FILL, SWT.CENTER)
 					.indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
-					.applyTo(label);
+					.applyTo(_lblMarkerOpacity);
 
 			/*
 			 * Symbol
@@ -341,13 +364,13 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 			 */
 			{
 				// label
-				_lblClusterOrientation = new Label(parent, SWT.NONE);
-				_lblClusterOrientation.setText(Messages.Slideout_Map25MarkerOptions_Label_ClusterOrientation);
+				_lblMarkerOrientation = new Label(parent, SWT.NONE);
+				_lblMarkerOrientation.setText(Messages.Slideout_Map25MarkerOptions_Label_MarkerOrientation);
 				GridDataFactory
 						.fillDefaults()//
 						.align(SWT.FILL, SWT.CENTER)
 						.indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
-						.applyTo(_lblClusterOrientation);
+						.applyTo(_lblMarkerOrientation);
 			}
 			{
 				// combo
@@ -381,7 +404,11 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 			_chkIsMarkerClustering = new Button(parent, SWT.CHECK);
 			_chkIsMarkerClustering.setText(Messages.Slideout_Map25MarkerOptions_Checkbox_IsMarkerClustering);
 			_chkIsMarkerClustering.addSelectionListener(_defaultSelectionListener);
-			GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsMarkerClustering);
+			GridDataFactory
+					.fillDefaults()
+					.span(2, 1)
+					.indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
+					.applyTo(_chkIsMarkerClustering);
 		}
 		{
 			/*
@@ -395,7 +422,7 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 				GridDataFactory
 						.fillDefaults()//
 						.align(SWT.FILL, SWT.CENTER)
-						.indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
+						.indent(2 * UI.FORM_FIRST_COLUMN_INDENT, 0)
 						.applyTo(_lblClusterSymbol);
 			}
 
@@ -440,13 +467,13 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 			 * Opacity
 			 */
 			// label
-			final Label label = new Label(parent, SWT.NONE);
-			label.setText(Messages.Slideout_Map25MarkerOptions_Label_Opacity);
+			_lblClusterOpacity = new Label(parent, SWT.NONE);
+			_lblClusterOpacity.setText(Messages.Slideout_Map25MarkerOptions_Label_Opacity);
 			GridDataFactory
 					.fillDefaults()
-					.indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
+					.indent(2 * UI.FORM_FIRST_COLUMN_INDENT, 0)
 					.align(SWT.FILL, SWT.CENTER)
-					.applyTo(label);
+					.applyTo(_lblClusterOpacity);
 
 			/*
 			 * Symbol
@@ -488,7 +515,7 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 				GridDataFactory
 						.fillDefaults()//
 						.align(SWT.FILL, SWT.CENTER)
-						.indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
+						.indent(2 * UI.FORM_FIRST_COLUMN_INDENT, 0)
 						.applyTo(_lblClusterOrientation);
 			}
 			{
@@ -523,7 +550,7 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 				GridDataFactory
 						.fillDefaults()//
 						.align(SWT.FILL, SWT.CENTER)
-						.indent(UI.FORM_FIRST_COLUMN_INDENT, 0)
+						.indent(2 * UI.FORM_FIRST_COLUMN_INDENT, 0)
 						.applyTo(_lblClusterGridSize);
 
 				// spinner
@@ -568,29 +595,37 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 
 	private void enableControls() {
 
-		final boolean isClustering = _chkIsMarkerClustering.getSelection();
+		final boolean isMarkerPoint = _chkIsShowMarkerPoint.getSelection();
+		final boolean isClustering = _chkIsMarkerClustering.getSelection() && isMarkerPoint;
 
-		/*
-		 * Marker
-		 */
-
-		/*
-		 * Cluster
-		 */
 		_btnSwapClusterSymbolColor.setEnabled(isClustering);
+		_btnSwapMarkerColor.setEnabled(isMarkerPoint);
 
-		_lblClusterSymbol.setEnabled(isClustering);
-		_lblClusterOrientation.setEnabled(isClustering);
-		_lblClusterGridSize.setEnabled(isClustering);
+		_chkIsMarkerClustering.setEnabled(isMarkerPoint);
 
 		_colorClusterSymbol_Outline.setEnabled(isClustering);
 		_colorClusterSymbol_Fill.setEnabled(isClustering);
+		_colorMarkerSymbol_Fill.setEnabled(isMarkerPoint);
+		_colorMarkerSymbol_Outline.setEnabled(isMarkerPoint);
 
 		_comboClusterOrientation.setEnabled(isClustering);
+		_comboMarkerOrientation.setEnabled(isMarkerPoint);
+
+		_lblClusterGridSize.setEnabled(isClustering);
+		_lblClusterOrientation.setEnabled(isClustering);
+		_lblClusterOpacity.setEnabled(isClustering);
+		_lblClusterSymbol.setEnabled(isClustering);
+		_lblMarkerOpacity.setEnabled(isMarkerPoint);
+		_lblMarkerOrientation.setEnabled(isMarkerPoint);
+		_lblMarkerSymbol.setEnabled(isMarkerPoint);
 
 		_spinnerClusterSize_Symbol.setEnabled(isClustering);
 		_spinnerClusterSize_Grid.setEnabled(isClustering);
-
+		_spinnerClusterFill_Opacity.setEnabled(isClustering);
+		_spinnerClusterOutline_Opacity.setEnabled(isClustering);
+		_spinnerMarkerFill_Opacity.setEnabled(isMarkerPoint);
+		_spinnerMarkerOutline_Opacity.setEnabled(isMarkerPoint);
+		_spinnerMarkerSize.setEnabled(isMarkerPoint);
 	}
 
 	private void fillUI() {
@@ -754,6 +789,7 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 		}
 
 		restoreState();
+		enableControls();
 
 		_map25View.getMapApp().onModifyMarkerConfig();
 	}
@@ -804,6 +840,8 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 			/*
 			 * Marker
 			 */
+			_chkIsShowMarkerLabel.setSelection(config.isShowMarkerLabel);
+			_chkIsShowMarkerPoint.setSelection(config.isShowMarkerPoint);
 			_comboMarkerOrientation.select(getOrientationIndex(config.markerOrientation));
 
 			_colorClusterSymbol_Outline.setColorValue(config.clusterOutline_Color);
@@ -841,6 +879,8 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 		/*
 		 * Marker
 		 */
+		config.isShowMarkerLabel = _chkIsShowMarkerLabel.getSelection();
+		config.isShowMarkerPoint = _chkIsShowMarkerPoint.getSelection();
 		config.markerOrientation = getSelectedOrientation(_comboMarkerOrientation);
 		config.markerSymbolSize = _spinnerMarkerSize.getSelection();
 		config.markerOutline_Color = _colorMarkerSymbol_Outline.getColorValue();

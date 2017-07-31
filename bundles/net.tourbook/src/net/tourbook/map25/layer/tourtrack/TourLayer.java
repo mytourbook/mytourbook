@@ -37,6 +37,7 @@ package net.tourbook.map25.layer.tourtrack;
 
 import gnu.trove.list.array.TIntArrayList;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorUtil;
 import net.tourbook.map25.Map25ConfigManager;
 
@@ -102,6 +103,9 @@ public class TourLayer extends Layer {
 
 		@Override
 		public synchronized void update(final GLViewport v) {
+
+			System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\t\t\tupdate()"));
+			// TODO remove SYSTEM.OUT.PRINTLN
 
 			if (!isEnabled()) {
 				return;

@@ -110,6 +110,8 @@ public class Map25ConfigManager {
 	// marker
 	private static final String			TAG_MARKER_FILL_COLOR			= "MarkerFillColor";						//$NON-NLS-1$
 	private static final String			TAG_MARKER_OUTLINE_COLOR		= "MarkerOutlineColor";						//$NON-NLS-1$
+	private static final String			ATTR_IS_SHOW_MARKER_LABEL		= "isShowMarkerLabel";						//$NON-NLS-1$
+	private static final String			ATTR_IS_SHOW_MARKER_POINT		= "isShowMarkerPoint";						//$NON-NLS-1$
 	private static final String			ATTR_MARKER_ORIENTATION			= "markerOrientation";						//$NON-NLS-1$
 	private static final String			ATTR_MARKER_SYMBOL_SIZE			= "markerSymbolSize";						//$NON-NLS-1$
 	//
@@ -356,6 +358,8 @@ public class Map25ConfigManager {
 			xmlConfig.putString(ATTR_CONFIG_NAME, config.name);
 
 			// Marker
+			xmlConfig.putBoolean(ATTR_IS_SHOW_MARKER_LABEL, config.isShowMarkerLabel);
+			xmlConfig.putBoolean(ATTR_IS_SHOW_MARKER_POINT, config.isShowMarkerPoint);
 			xmlConfig.putInteger(ATTR_MARKER_SYMBOL_SIZE, config.markerSymbolSize);
 			xmlConfig.putInteger(ATTR_MARKER_ORIENTATION, config.markerOrientation);
 			Util.setXmlRgb(xmlConfig, TAG_MARKER_OUTLINE_COLOR, config.markerOutline_Color);
@@ -672,8 +676,10 @@ public class Map25ConfigManager {
 		config.clusterSymbolSize	= Util.getXmlInteger(xmlConfig, ATTR_CLUSTER_SYMBOL_SIZE, DEFAULT_CLUSTER_SYMBOL_SIZE, CLUSTER_SYMBOL_SIZE_MIN, CLUSTER_SYMBOL_SIZE_MAX);
 		config.isMarkerClustered	= Util.getXmlBoolean(xmlConfig, ATTR_IS_MARKER_CLUSTERED, true);
 		
+		config.isShowMarkerLabel	= Util.getXmlBoolean(xmlConfig, ATTR_IS_SHOW_MARKER_LABEL, true);
+		config.isShowMarkerPoint	= Util.getXmlBoolean(xmlConfig, ATTR_IS_SHOW_MARKER_POINT, true);
 		config.markerOrientation	= Util.getXmlInteger(xmlConfig, ATTR_MARKER_ORIENTATION, Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD);
-		config.markerSymbolSize	= Util.getXmlInteger(xmlConfig, ATTR_MARKER_SYMBOL_SIZE, DEFAULT_MARKER_SYMBOL_SIZE, MARKER_SYMBOL_SIZE_MIN, MARKER_SYMBOL_SIZE_MAX);
+		config.markerSymbolSize		= Util.getXmlInteger(xmlConfig, ATTR_MARKER_SYMBOL_SIZE, DEFAULT_MARKER_SYMBOL_SIZE, MARKER_SYMBOL_SIZE_MIN, MARKER_SYMBOL_SIZE_MAX);
 
 // SET_FORMATTING_ON
 
