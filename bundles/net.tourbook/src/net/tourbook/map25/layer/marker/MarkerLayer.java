@@ -15,8 +15,6 @@ import org.oscim.event.MotionEvent;
 import org.oscim.layers.Layer;
 import org.oscim.map.Map;
 import org.oscim.map.Viewport;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Draws a list of {@link MarkerMap25Interface} as markers to a map. The item with the lowest index
@@ -25,55 +23,52 @@ import org.slf4j.LoggerFactory;
  */
 public class MarkerLayer extends Layer implements GestureListener {
 
-	private static final Logger		log					= LoggerFactory.getLogger(MarkerLayer.class);
+	private final MarkerRenderer	_markerRenderer;
 
-	private final MarkerRenderer	mMarkerRenderer;
-	private Map25Marker				mFocusedItem;
-	private final List<Map25Marker>	mItemList			= new ArrayList<>();
-	private final Point				mTmpPoint			= new Point();
-	private int						mDrawnItemsLimit	= Integer.MAX_VALUE;
+	private final List<MapMarker>		_allMarker			= new ArrayList<>();
+	private MapMarker					_focusedMarker;
 
-	private OnItemGestureListener	mOnItemGestureListener;
+	private final Point				_tmpPoint			= new Point();
+	private int						_drawnMarkerLimit	= Integer.MAX_VALUE;
 
-	private final ActiveItem		mActiveItemSingleTap;
-	private final ActiveItem		mActiveItemLongPress;
+	private OnItemGestureListener	_gestureListener;
+
+	private final ActiveMarker		_activeMarker_SingleTap;
+	private final ActiveMarker		_ActiveMarker_LongPress;
 
 	{
-		mActiveItemSingleTap = new ActiveItem() {
+		_activeMarker_SingleTap = new ActiveMarker() {
 
 			@Override
 			public boolean run(final int index) {
 
 				final MarkerLayer that = MarkerLayer.this;
-				if (mOnItemGestureListener == null) {
+
+				if (_gestureListener == null) {
 					return false;
 				}
 
-				return onSingleTapUpHelper(
-						index,
-						that.mItemList.get(index));
+				return onSingleTapUpHelper(index, that._allMarker.get(index));
 			}
 		};
 
-		mActiveItemLongPress = new ActiveItem() {
+		_ActiveMarker_LongPress = new ActiveMarker() {
 
 			@Override
 			public boolean run(final int index) {
 
 				final MarkerLayer that = MarkerLayer.this;
 
-				if (that.mOnItemGestureListener == null) {
+				if (that._gestureListener == null) {
 					return false;
 				}
 
-				return onLongPressHelper(
-						index,
-						that.mItemList.get(index));
+				return onLongPressHelper(index, that._allMarker.get(index));
 			}
 		};
 	}
 
-	public static interface ActiveItem {
+	public static interface ActiveMarker {
 
 		public boolean run(int aIndex);
 	}
@@ -84,9 +79,9 @@ public class MarkerLayer extends Layer implements GestureListener {
 	 */
 	public static interface OnItemGestureListener {
 
-		public boolean onItemLongPress(int index, Map25Marker item);
+		public boolean onItemLongPress(int index, MapMarker item);
 
-		public boolean onItemSingleTapUp(int index, Map25Marker item);
+		public boolean onItemSingleTapUp(int index, MapMarker item);
 	}
 
 	/**
@@ -116,9 +111,9 @@ public class MarkerLayer extends Layer implements GestureListener {
 
 		super(map);
 
-		mMarkerRenderer = new MarkerRenderer(this, defaultSymbol);
-		mRenderer = mMarkerRenderer;
-		mOnItemGestureListener = listener;
+		mRenderer = _markerRenderer = new MarkerRenderer(this, defaultSymbol);
+
+		_gestureListener = listener;
 
 		populate();
 	}
@@ -129,9 +124,9 @@ public class MarkerLayer extends Layer implements GestureListener {
 	 *
 	 * @return true if event is handled false otherwise
 	 */
-	protected boolean activateSelectedItems(final MotionEvent event, final ActiveItem task) {
+	private boolean activateSelectedMarker(final MotionEvent event, final ActiveMarker task) {
 
-		final int size = mItemList.size();
+		final int size = _allMarker.size();
 		if (size == 0) {
 			return false;
 		}
@@ -151,31 +146,32 @@ public class MarkerLayer extends Layer implements GestureListener {
 		/* squared dist: 50*50 pixel ~ 2mm on 400dpi */
 		double dist = 2500;
 
-		for (int i = 0; i < size; i++) {
+		for (int markerIndex = 0; markerIndex < size; markerIndex++) {
 
-			final Map25Marker item = mItemList.get(i);
+			final MapMarker marker = _allMarker.get(markerIndex);
 
 			if (!box.contains(
-					item.getGeoPoint().longitudeE6,
-					item.getGeoPoint().latitudeE6)) {
+					marker.geoPoint.longitudeE6,
+					marker.geoPoint.latitudeE6)) {
+
 				continue;
 			}
 
-			mapPosition.toScreenPoint(item.getGeoPoint(), mTmpPoint);
+			mapPosition.toScreenPoint(marker.geoPoint, _tmpPoint);
 
-			final float dx = (float) (mTmpPoint.x - eventX);
-			final float dy = (float) (mTmpPoint.y - eventY);
+			final float dx = (float) (_tmpPoint.x - eventX);
+			final float dy = (float) (_tmpPoint.y - eventY);
 
-			MarkerSymbol it = item.getMarkerSymbol();
+			MarkerSymbol markerSymbol = marker.markerSymbol;
 
-			if (it == null) {
-				it = mMarkerRenderer.defaultMarkerSymbol;
+			if (markerSymbol == null) {
+				markerSymbol = _markerRenderer.defaultMarkerSymbol;
 			}
 
-			if (it.isInside(dx, dy)) {
-				if (mTmpPoint.y > insideY) {
-					insideY = mTmpPoint.y;
-					inside = i;
+			if (markerSymbol.isInside(dx, dy)) {
+				if (_tmpPoint.y > insideY) {
+					insideY = _tmpPoint.y;
+					inside = markerIndex;
 				}
 			}
 			if (inside >= 0) {
@@ -188,7 +184,7 @@ public class MarkerLayer extends Layer implements GestureListener {
 			}
 
 			dist = d;
-			nearest = i;
+			nearest = markerIndex;
 		}
 
 		if (inside >= 0) {
@@ -196,7 +192,7 @@ public class MarkerLayer extends Layer implements GestureListener {
 		}
 
 		if (nearest >= 0 && task.run(nearest)) {
-			mMarkerRenderer.update();
+			_markerRenderer.update();
 			mMap.render();
 			return true;
 		}
@@ -204,61 +200,52 @@ public class MarkerLayer extends Layer implements GestureListener {
 		return false;
 	}
 
-	public void addItem(final int location, final Map25Marker item) {
+	public void addItem(final int location, final MapMarker item) {
 
-		mItemList.add(location, item);
+		_allMarker.add(location, item);
 	}
 
-	public boolean addItem(final Map25Marker item) {
+	public boolean addItem(final MapMarker item) {
 
-		final boolean result = mItemList.add(item);
+		final boolean result = _allMarker.add(item);
 		populate();
 
 		return result;
 	}
 
-	public boolean addItems(final Collection<Map25Marker> items) {
-
-		final boolean result = mItemList.addAll(items);
-
-		populate();
-
-		return result;
-	}
-
-	protected Map25Marker createItem(final int index) {
-		return mItemList.get(index);
+	protected MapMarker getMarker(final int index) {
+		return _allMarker.get(index);
 	}
 
 	/**
 	 * @return the currently-focused item, or null if no item is currently focused.
 	 */
-	public Map25Marker getFocus() {
+	public MapMarker getFocus() {
 
-		return mFocusedItem;
+		return _focusedMarker;
 	}
 
-	public List<Map25Marker> getItemList() {
-		return mItemList;
+	public List<MapMarker> getItemList() {
+		return _allMarker;
 	}
 
 	@Override
 	public boolean onGesture(final Gesture g, final MotionEvent e) {
 
 		if (g instanceof Gesture.Tap) {
-			return activateSelectedItems(e, mActiveItemSingleTap);
+			return activateSelectedMarker(e, _activeMarker_SingleTap);
 		}
 
 		if (g instanceof Gesture.LongPress) {
-			return activateSelectedItems(e, mActiveItemLongPress);
+			return activateSelectedMarker(e, _ActiveMarker_LongPress);
 		}
 
 		return false;
 	}
 
-	protected boolean onLongPressHelper(final int index, final Map25Marker item) {
+	protected boolean onLongPressHelper(final int index, final MapMarker item) {
 
-		return this.mOnItemGestureListener.onItemLongPress(index, item);
+		return this._gestureListener.onItemLongPress(index, item);
 	}
 
 	/**
@@ -267,9 +254,9 @@ public class MarkerLayer extends Layer implements GestureListener {
 	 * provided so that child classes may more easily override behavior without resorting to
 	 * overriding the ItemGestureListener methods.
 	 */
-	protected boolean onSingleTapUpHelper(final int index, final Map25Marker item) {
+	protected boolean onSingleTapUpHelper(final int index, final MapMarker item) {
 
-		return mOnItemGestureListener.onItemSingleTapUp(index, item);
+		return _gestureListener.onItemSingleTapUp(index, item);
 	}
 
 	/**
@@ -279,36 +266,15 @@ public class MarkerLayer extends Layer implements GestureListener {
 	 */
 	public final void populate() {
 
-		mMarkerRenderer.populate(size());
+		_markerRenderer.populate(size());
 	}
 
-	public void removeAllItems() {
-		removeAllItems(true);
-	}
+	public void replaceMarkers(final Collection<MapMarker> allMarkers) {
 
-	public void removeAllItems(final boolean withPopulate) {
+		_allMarker.clear();
+		_allMarker.addAll(allMarkers);
 
-		mItemList.clear();
-
-		if (withPopulate) {
-			populate();
-		}
-	}
-
-	public Map25Marker removeItem(final int position) {
-
-		final Map25Marker result = mItemList.remove(position);
 		populate();
-
-		return result;
-	}
-
-	public boolean removeItem(final Map25Marker item) {
-
-		final boolean result = mItemList.remove(item);
-		populate();
-
-		return result;
 	}
 
 	/**
@@ -319,21 +285,21 @@ public class MarkerLayer extends Layer implements GestureListener {
 	 *
 	 * @param item
 	 */
-	public void setFocus(final Map25Marker item) {
+	public void setFocus(final MapMarker item) {
 
-		mFocusedItem = item;
+		_focusedMarker = item;
 	}
 
 	public void setOnItemGestureListener(final OnItemGestureListener listener) {
 
-		mOnItemGestureListener = listener;
+		_gestureListener = listener;
 	}
 
 	public int size() {
-		return Math.min(mItemList.size(), mDrawnItemsLimit);
+		return Math.min(_allMarker.size(), _drawnMarkerLimit);
 	}
 
 	public void update() {
-		mMarkerRenderer.update();
+		_markerRenderer.update();
 	}
 }

@@ -46,7 +46,7 @@ import net.tourbook.map25.action.ActionSelectMap25Provider;
 import net.tourbook.map25.action.ActionShowEntireTour;
 import net.tourbook.map25.action.ActionSynchMapWithChartSlider;
 import net.tourbook.map25.action.ActionSynchMapWithTour;
-import net.tourbook.map25.layer.marker.Map25Marker;
+import net.tourbook.map25.layer.marker.MapMarker;
 import net.tourbook.map25.layer.marker.MarkerLayer;
 import net.tourbook.map25.layer.tourtrack.TourLayer;
 import net.tourbook.map25.ui.SlideoutMap25_Options;
@@ -443,9 +443,9 @@ public class Map25View extends ViewPart {
 		return new BoundingBox(minLat, minLon, maxLat, maxLon);
 	}
 
-	private List<Map25Marker> createMapMarkers(final ArrayList<TourData> allTourData) {
+	private List<MapMarker> createMapMarkers(final ArrayList<TourData> allTourData) {
 
-		final List<Map25Marker> allMarkerItems = new ArrayList<>();
+		final List<MapMarker> allMarkerItems = new ArrayList<>();
 
 		for (final TourData tourData : allTourData) {
 
@@ -486,7 +486,7 @@ public class Map25View extends ViewPart {
 				final double latitude = latitudeSerie[serieIndex];
 				final double longitude = longitudeSerie[serieIndex];
 
-				final Map25Marker item = new Map25Marker(
+				final MapMarker item = new MapMarker(
 						tourMarker.getLabel(),
 						tourMarker.getDescription(),
 						new GeoPoint(latitude, longitude));
@@ -951,8 +951,8 @@ public class Map25View extends ViewPart {
 
 		if (markerLayer.isEnabled()) {
 
-			markerLayer.removeAllItems(false);
-			markerLayer.addItems(createMapMarkers(_allTourData));
+			final List<MapMarker> allMarkers = createMapMarkers(_allTourData);
+			markerLayer.replaceMarkers(allMarkers);
 		}
 
 		/*

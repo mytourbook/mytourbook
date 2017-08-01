@@ -26,7 +26,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.common.widgets.ComboEntry;
 import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.map25.Map25View;
-import net.tourbook.map25.layer.marker.Map25MarkerConfig;
+import net.tourbook.map25.layer.marker.MarkerConfig;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -649,7 +649,7 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 		{
 			_comboConfigName.removeAll();
 
-			for (final Map25MarkerConfig config : Map25ConfigManager.getAllMarkerConfigs()) {
+			for (final MarkerConfig config : Map25ConfigManager.getAllMarkerConfigs()) {
 				_comboConfigName.add(config.name);
 			}
 		}
@@ -748,10 +748,10 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 	private void onSelectConfig() {
 
 		final int selectedIndex = _comboConfigName.getSelectionIndex();
-		final ArrayList<Map25MarkerConfig> allConfigurations = Map25ConfigManager.getAllMarkerConfigs();
+		final ArrayList<MarkerConfig> allConfigurations = Map25ConfigManager.getAllMarkerConfigs();
 
-		final Map25MarkerConfig selectedConfig = allConfigurations.get(selectedIndex);
-		final Map25MarkerConfig activeConfig = Map25ConfigManager.getActiveMarkerConfig();
+		final MarkerConfig selectedConfig = allConfigurations.get(selectedIndex);
+		final MarkerConfig activeConfig = Map25ConfigManager.getActiveMarkerConfig();
 
 		if (selectedConfig.equals(activeConfig)) {
 
@@ -796,7 +796,7 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 
 	private void onSwapClusterColor(final SelectionEvent e) {
 
-		final Map25MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
+		final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
 		final RGB fgColor = config.clusterOutline_Color;
 		final RGB bgColor = config.clusterFill_Color;
@@ -810,7 +810,7 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 
 	private void onSwapMarkerColor(final SelectionEvent event) {
 
-		final Map25MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
+		final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
 		final RGB fgColor = config.markerOutline_Color;
 		final RGB bgColor = config.markerFill_Color;
@@ -829,7 +829,7 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 
 		_isUpdateUI = true;
 		{
-			final Map25MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
+			final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
 			// get active config AFTER getting the index because this could change the active config
 			final int activeConfigIndex = Map25ConfigManager.getActiveMarkerConfigIndex();
@@ -872,7 +872,7 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 
 		// update config
 
-		final Map25MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
+		final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
 		config.name = _textConfigName.getText();
 

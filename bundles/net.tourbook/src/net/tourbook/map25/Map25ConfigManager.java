@@ -27,7 +27,7 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.widgets.ComboEntry;
-import net.tourbook.map25.layer.marker.Map25MarkerConfig;
+import net.tourbook.map25.layer.marker.MarkerConfig;
 import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
 
 import org.eclipse.core.runtime.IPath;
@@ -152,8 +152,8 @@ public class Map25ConfigManager {
 	 */
 	private static final ArrayList<Map25TrackConfig>	_allTrackConfigs	= new ArrayList<>();
 	private static Map25TrackConfig						_activeTrackConfig;
-	private static final ArrayList<Map25MarkerConfig>	_allMarkerConfigs	= new ArrayList<>();
-	private static Map25MarkerConfig					_activeMarkerConfig;
+	private static final ArrayList<MarkerConfig>	_allMarkerConfigs	= new ArrayList<>();
+	private static MarkerConfig					_activeMarkerConfig;
 	//
 	private static String								_fromXml_ActiveMarkerConfigId;
 	private static String								_fromXml_ActiveTrackConfigId;
@@ -193,9 +193,9 @@ public class Map25ConfigManager {
 	 *            Index starts with 1.
 	 * @return
 	 */
-	private static Map25MarkerConfig createDefaults_Markers_One(final int configIndex) {
+	private static MarkerConfig createDefaults_Markers_One(final int configIndex) {
 
-		final Map25MarkerConfig config = new Map25MarkerConfig();
+		final MarkerConfig config = new MarkerConfig();
 
 		final RGB fgBlack = new RGB(0, 0, 0);
 		final RGB fgWhite = new RGB(0xff, 0xff, 0xff);
@@ -349,7 +349,7 @@ public class Map25ConfigManager {
 		return config;
 	}
 
-	private static void createXml_FromMarkerConfig(final Map25MarkerConfig config, final IMemento xmlMarkers) {
+	private static void createXml_FromMarkerConfig(final MarkerConfig config, final IMemento xmlMarkers) {
 
 		// <Marker>
 		final IMemento xmlConfig = xmlMarkers.createChild(TAG_MARKER);
@@ -393,7 +393,7 @@ public class Map25ConfigManager {
 		}
 	}
 
-	public static Map25MarkerConfig getActiveMarkerConfig() {
+	public static MarkerConfig getActiveMarkerConfig() {
 
 		if (_activeMarkerConfig == null) {
 			readConfigFromXml();
@@ -407,11 +407,11 @@ public class Map25ConfigManager {
 	 */
 	public static int getActiveMarkerConfigIndex() {
 
-		final Map25MarkerConfig activeConfig = getActiveMarkerConfig();
+		final MarkerConfig activeConfig = getActiveMarkerConfig();
 
 		for (int configIndex = 0; configIndex < _allMarkerConfigs.size(); configIndex++) {
 
-			final Map25MarkerConfig config = _allMarkerConfigs.get(configIndex);
+			final MarkerConfig config = _allMarkerConfigs.get(configIndex);
 
 			if (config.equals(activeConfig)) {
 				return configIndex;
@@ -457,7 +457,7 @@ public class Map25ConfigManager {
 		return 0;
 	}
 
-	public static ArrayList<Map25MarkerConfig> getAllMarkerConfigs() {
+	public static ArrayList<MarkerConfig> getAllMarkerConfigs() {
 
 		// ensure configs are loaded
 		getActiveMarkerConfig();
@@ -473,15 +473,15 @@ public class Map25ConfigManager {
 		return _allTrackConfigs;
 	}
 
-	private static Map25MarkerConfig getConfig_Marker() {
+	private static MarkerConfig getConfig_Marker() {
 
-		Map25MarkerConfig activeConfig = null;
+		MarkerConfig activeConfig = null;
 
 		if (_fromXml_ActiveMarkerConfigId != null) {
 
 			// ensure config id belongs to a config which is available
 
-			for (final Map25MarkerConfig config : _allMarkerConfigs) {
+			for (final MarkerConfig config : _allMarkerConfigs) {
 
 				if (config.id.equals(_fromXml_ActiveMarkerConfigId)) {
 
@@ -625,7 +625,7 @@ public class Map25ConfigManager {
 	}
 
 	private static void parse_200_Markers(	final XMLMemento xmlRoot,
-											final ArrayList<Map25MarkerConfig> allMarkerConfigs) {
+											final ArrayList<MarkerConfig> allMarkerConfigs) {
 
 		if (xmlRoot == null) {
 			return;
@@ -651,7 +651,7 @@ public class Map25ConfigManager {
 
 					// <Track>
 
-					final Map25MarkerConfig markerConfig = new Map25MarkerConfig();
+					final MarkerConfig markerConfig = new MarkerConfig();
 
 					parse_210_MarkerConfig(xmlConfig, markerConfig);
 
@@ -664,7 +664,7 @@ public class Map25ConfigManager {
 		}
 	}
 
-	private static void parse_210_MarkerConfig(final XMLMemento xmlConfig, final Map25MarkerConfig config) {
+	private static void parse_210_MarkerConfig(final XMLMemento xmlConfig, final MarkerConfig config) {
 
 // SET_FORMATTING_OFF
 		
@@ -775,7 +775,7 @@ public class Map25ConfigManager {
 
 		// create new config
 		final int configIndex = activeMarkerConfigIndex + 1;
-		final Map25MarkerConfig newConfig = createDefaults_Markers_One(configIndex);
+		final MarkerConfig newConfig = createDefaults_Markers_One(configIndex);
 		newConfig.name = oldName;
 
 		// update model
@@ -816,7 +816,7 @@ public class Map25ConfigManager {
 		{
 			xmlMarkers.putString(ATTR_ACTIVE_CONFIG_ID, _activeMarkerConfig.id);
 
-			for (final Map25MarkerConfig config : _allMarkerConfigs) {
+			for (final MarkerConfig config : _allMarkerConfigs) {
 				createXml_FromMarkerConfig(config, xmlMarkers);
 			}
 		}
@@ -837,7 +837,7 @@ public class Map25ConfigManager {
 		}
 	}
 
-	public static void setActiveMarkerConfig(final Map25MarkerConfig newConfig) {
+	public static void setActiveMarkerConfig(final MarkerConfig newConfig) {
 
 		_activeMarkerConfig = newConfig;
 	}

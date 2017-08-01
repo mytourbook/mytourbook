@@ -8,10 +8,10 @@ package net.tourbook.map25.layer.marker;
  */
 class ProjectedMarker {
 
-	Map25Marker	item;
+	MapMarker	mapMarker;
 
-	boolean		visible;
-	boolean		changes;
+	boolean		isVisible;
+	boolean		isModified;
 
 	float		x;
 	float		y;
@@ -22,26 +22,18 @@ class ProjectedMarker {
 	float		dy;
 
 	/**
-	 * Extension to the above class for clustered items. This could be a separate 1st level class,
-	 * but it is included here not to pollute the source tree with tiny new files. It only adds a
-	 * couple properties to InternalItem, and the semantics "InternalItem.Clustered" are not bad.
+	 * If this is true, this item is hidden (because it's represented by another InternalItem acting
+	 * as cluster.
 	 */
-	static class Clustered extends ProjectedMarker {
+	boolean		isClusteredOut;
 
-		/**
-		 * If this is >0, this item will be displayed as a cluster circle, with size clusterSize+1.
-		 */
-		int		clusterSize;
-
-		/**
-		 * If this is true, this item is hidden (because it's represented by another InternalItem
-		 * acting as cluster.
-		 */
-		boolean	clusteredOut;
-	}
+	/**
+	 * If this is >0, this item will be displayed as a cluster circle, with size clusterSize+1.
+	 */
+	int			clusterSize;
 
 	@Override
 	public String toString() {
-		return "\n" + x + ":" + y + " / " + dy + " " + visible;
+		return "\n" + x + ":" + y + " / " + dy + " " + isVisible;
 	}
 }

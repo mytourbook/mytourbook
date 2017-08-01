@@ -22,8 +22,8 @@ import net.tourbook.common.color.ColorUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.map25.Map25TileSource.Builder;
 import net.tourbook.map25.OkHttpEngineMT.OkHttpFactoryMT;
-import net.tourbook.map25.layer.marker.Map25Marker;
-import net.tourbook.map25.layer.marker.Map25MarkerConfig;
+import net.tourbook.map25.layer.marker.MapMarker;
+import net.tourbook.map25.layer.marker.MarkerConfig;
 import net.tourbook.map25.layer.marker.MarkerLayer;
 import net.tourbook.map25.layer.marker.MarkerLayer.OnItemGestureListener;
 import net.tourbook.map25.layer.marker.MarkerRenderer;
@@ -187,7 +187,7 @@ public class Map25App extends GdxMap {
 		final OnItemGestureListener onItemGestureListener = new OnItemGestureListener() {
 
 			@Override
-			public boolean onItemLongPress(final int index, final Map25Marker item) {
+			public boolean onItemLongPress(final int index, final MapMarker item) {
 
 				System.out.println(
 						(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
@@ -204,7 +204,7 @@ public class Map25App extends GdxMap {
 			}
 
 			@Override
-			public boolean onItemSingleTapUp(final int index, final Map25Marker item) {
+			public boolean onItemSingleTapUp(final int index, final MapMarker item) {
 
 				System.out.println(
 						(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
@@ -281,7 +281,7 @@ public class Map25App extends GdxMap {
 
 	private MarkerSymbol createMarkerSymbol() {
 
-		final Map25MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
+		final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
 		final Paint paintFill = CanvasAdapter.newPaint();
 		paintFill.setColor(ColorUtil.getARGB(config.markerFill_Color, config.markerFill_Opacity));
@@ -627,7 +627,7 @@ public class Map25App extends GdxMap {
 
 	private void updateUI_MarkerLayer() {
 
-		final Map25MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
+		final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 		final boolean isBillboard = config.clusterOrientation == Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
 
 		final MarkerRenderer markerRenderer = (MarkerRenderer) _layer_Marker.getRenderer();

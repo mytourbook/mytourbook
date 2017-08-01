@@ -15,12 +15,11 @@
  *******************************************************************************/
 package net.tourbook.map25.layer.marker;
 
-import net.tourbook.common.util.StatusUtil;
 import net.tourbook.map25.Map25ConfigManager;
 
 import org.eclipse.swt.graphics.RGB;
 
-public class Map25MarkerConfig implements Cloneable {
+public class MarkerConfig {
 
 	/*
 	 * Set default values also here to ensure that a valid value is set. A default value would not
@@ -55,40 +54,6 @@ public class Map25MarkerConfig implements Cloneable {
 	public int		clusterOrientation		= Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
 	public int		clusterSymbolSize		= Map25ConfigManager.DEFAULT_CLUSTER_SYMBOL_SIZE;
 
-	/**
-	 * Create a copy of this object.
-	 * 
-	 * @return a copy of this <code>Insets</code> object.
-	 */
-	@Override
-	public Object clone() {
-
-		try {
-
-			// create clones for shallow copied fields so that they can be modified
-
-			final Map25MarkerConfig newConfig = (Map25MarkerConfig) super.clone();
-
-//			newConfig.clusterColorBackground = new RGB(
-//					clusterColorBackground.red,
-//					clusterColorBackground.green,
-//					clusterColorBackground.blue);
-//
-//			newConfig.clusterColorForeground = new RGB(
-//					clusterColorForeground.red,
-//					clusterColorForeground.green,
-//					clusterColorForeground.blue);
-
-			return newConfig;
-
-		} catch (final CloneNotSupportedException e) {
-
-			// this shouldn't happen, since we are Cloneable
-			StatusUtil.log(e);
-			throw new InternalError();
-		}
-	}
-
 	@Override
 	public boolean equals(final Object obj) {
 
@@ -104,7 +69,7 @@ public class Map25MarkerConfig implements Cloneable {
 			return false;
 		}
 
-		final Map25MarkerConfig other = (Map25MarkerConfig) obj;
+		final MarkerConfig other = (MarkerConfig) obj;
 
 		if (id == null) {
 			if (other.id != null) {
