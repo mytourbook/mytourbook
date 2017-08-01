@@ -22,11 +22,11 @@ import net.tourbook.common.color.ColorUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.map25.Map25TileSource.Builder;
 import net.tourbook.map25.OkHttpEngineMT.OkHttpFactoryMT;
-import net.tourbook.map25.layer.marker.ClusterMarkerLayer;
-import net.tourbook.map25.layer.marker.ClusterMarkerLayer.OnItemGestureListener;
-import net.tourbook.map25.layer.marker.ClusterMarkerRenderer;
 import net.tourbook.map25.layer.marker.Map25Marker;
 import net.tourbook.map25.layer.marker.Map25MarkerConfig;
+import net.tourbook.map25.layer.marker.MarkerLayer;
+import net.tourbook.map25.layer.marker.MarkerLayer.OnItemGestureListener;
+import net.tourbook.map25.layer.marker.MarkerRenderer;
 import net.tourbook.map25.layer.marker.MarkerSymbol;
 import net.tourbook.map25.layer.marker.ScreenUtils;
 import net.tourbook.map25.layer.tourtrack.TourLayer;
@@ -95,7 +95,7 @@ public class Map25App extends GdxMap {
 	private OsmTileLayerMT			_layer_BaseMap;
 	private BuildingLayer			_layer_Building;
 	private LabelLayer				_layer_Label;
-	private ClusterMarkerLayer		_layer_Marker;
+	private MarkerLayer				_layer_Marker;
 	private MapScaleBarLayer		_layer_ScaleBar;
 	private TileGridLayerMT			_layer_TileInfo;
 	private TourLayer				_layer_Tour;
@@ -180,20 +180,9 @@ public class Map25App extends GdxMap {
 		Gdx.input.setInputProcessor(mux);
 	}
 
-	private ClusterMarkerLayer createLayer_Marker() {
+	private MarkerLayer createLayer_Marker() {
 
 		final MarkerSymbol markerSymbol = createMarkerSymbol();
-
-//		markerRenderer = new ClusterMarkerRenderer(
-//				markerLayer,
-//				markerSymbol,
-//				new ClusterMarkerRenderer.ClusterStyle(Color.WHITE, Color.BLUE));
-
-//		final Map25MarkerRendererFactory markerRenderFactory = ClusterMarkerRenderer.factory(
-//				markerSymbol,
-//				new ClusterMarkerRenderer.ClusterStyle(Color.WHITE, Color.BLUE));
-//
-//		clusterMarkerRenderer = new ClusterMarkerRenderer(markerLayer, markerSymbol, style);
 
 		final OnItemGestureListener onItemGestureListener = new OnItemGestureListener() {
 
@@ -232,7 +221,7 @@ public class Map25App extends GdxMap {
 			}
 		};
 
-		final ClusterMarkerLayer markerLayer = new ClusterMarkerLayer(
+		final MarkerLayer markerLayer = new MarkerLayer(
 				mMap,
 				markerSymbol,
 				onItemGestureListener);
@@ -374,7 +363,7 @@ public class Map25App extends GdxMap {
 		return _layer_Label;
 	}
 
-	public ClusterMarkerLayer getLayer_Marker() {
+	public MarkerLayer getLayer_Marker() {
 		return _layer_Marker;
 	}
 
@@ -641,7 +630,7 @@ public class Map25App extends GdxMap {
 		final Map25MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 		final boolean isBillboard = config.clusterOrientation == Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
 
-		final ClusterMarkerRenderer markerRenderer = (ClusterMarkerRenderer) _layer_Marker.getRenderer();
+		final MarkerRenderer markerRenderer = (MarkerRenderer) _layer_Marker.getRenderer();
 
 		markerRenderer.setClusterSymbolConfig(
 				config.clusterSymbolSize,

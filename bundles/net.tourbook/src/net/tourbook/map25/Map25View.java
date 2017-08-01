@@ -46,8 +46,8 @@ import net.tourbook.map25.action.ActionSelectMap25Provider;
 import net.tourbook.map25.action.ActionShowEntireTour;
 import net.tourbook.map25.action.ActionSynchMapWithChartSlider;
 import net.tourbook.map25.action.ActionSynchMapWithTour;
-import net.tourbook.map25.layer.marker.ClusterMarkerLayer;
 import net.tourbook.map25.layer.marker.Map25Marker;
+import net.tourbook.map25.layer.marker.MarkerLayer;
 import net.tourbook.map25.layer.tourtrack.TourLayer;
 import net.tourbook.map25.ui.SlideoutMap25_Options;
 import net.tourbook.map25.ui.SlideoutMap25_TrackConfig;
@@ -947,7 +947,7 @@ public class Map25View extends ViewPart {
 		/*
 		 * Markers
 		 */
-		final ClusterMarkerLayer markerLayer = _mapApp.getLayer_Marker();
+		final MarkerLayer markerLayer = _mapApp.getLayer_Marker();
 
 		if (markerLayer.isEnabled()) {
 
