@@ -3,8 +3,8 @@
  */
 package net.tourbook.map25.layer.marker;
 
-import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 
 import org.oscim.backend.canvas.Bitmap;
 import org.oscim.backend.canvas.Color;
@@ -23,11 +23,6 @@ import org.oscim.utils.TimSort;
 import org.oscim.utils.geom.GeometryUtils;
 
 public class MarkerRenderer extends BucketRenderer {
-
-	/**
-	 * Max number to display inside a cluster icon
-	 */
-	private static final int					CLUSTER_MAXSIZE				= 10;
 
 	/**
 	 * default color of number inside the icon. Would be super-cool to cook this into the map theme
@@ -51,11 +46,7 @@ public class MarkerRenderer extends BucketRenderer {
 	 */
 	private static final int					MAP_GRID_SIZE_DP			= 64;
 
-	/**
-	 * cached bitmaps database, we will cache cluster bitmaps from 1 to MAX_SIZE and always use same
-	 * bitmap for efficiency
-	 */
-	private static Bitmap[]						_clusterBitmaps				= new Bitmap[CLUSTER_MAXSIZE + 1];
+	private static HashMap<Integer, Bitmap>		_clusterBitmaps				= new HashMap<>();
 
 	static TimSort<ProjectedMarker>				ZSORT						= new TimSort<ProjectedMarker>();
 
@@ -182,11 +173,12 @@ public class MarkerRenderer extends BucketRenderer {
 
 		setClusterStyle(style.foreground, style.background);
 
-		for (int k = 0; k <= CLUSTER_MAXSIZE; k++) {
-			// cache bitmaps so render thread never creates them
-			// we create CLUSTER_MAXSIZE bitmaps. Bigger clusters will show like "+"
-			getClusterBitmap(k);
-		}
+//		for (int k = 0; k <= CLUSTER_MAXSIZE; k++) {
+//
+//			// cache bitmaps so render thread never creates them
+//			// we create CLUSTER_MAXSIZE bitmaps. Bigger clusters will show like "+"
+//			getClusterBitmap(k);
+//		}
 	}
 
 	public static void sort(final ProjectedMarker[] a, final int lo, final int hi) {
@@ -206,24 +198,13 @@ public class MarkerRenderer extends BucketRenderer {
 	 *            The cluster size. Can be greater than CLUSTER_MAXSIZE.
 	 * @return A somewhat cool bitmap to be used as the cluster marker
 	 */
-	private Bitmap getClusterBitmap(int size) {
-
-		final String strValue;
-
-		if (size >= CLUSTER_MAXSIZE) {
-
-			// restrict cluster indicator size. Bigger clusters will show as "+" instead of ie. "45"
-			size = CLUSTER_MAXSIZE;
-			strValue = "+";
-
-		} else {
-
-			strValue = String.valueOf(size);
-		}
+	private Bitmap getClusterBitmap(final int size) {
 
 		// return cached bitmap if exists. cache hit !
-		if (_clusterBitmaps[size] != null) {
-			return _clusterBitmaps[size];
+		final Bitmap clusterBitmap = _clusterBitmaps.get(size);
+
+		if (clusterBitmap != null) {
+			return clusterBitmap;
 		}
 
 		// create and cache bitmap. This is unacceptable inside the GL thread,
@@ -231,16 +212,18 @@ public class MarkerRenderer extends BucketRenderer {
 
 		final ScreenUtils.ClusterDrawable drawable = new ScreenUtils.ClusterDrawable(
 
-				_clusterSymbolSizeDP - CLUSTER_MAXSIZE + size, // make size dependent on cluster size
+				_clusterSymbolSizeDP,
 
 				_clusterForegroundColor,
 				_clusterBackgroundColor,
 
-				strValue);
+				Integer.toString(size));
 
-		_clusterBitmaps[size] = drawable.getBitmap();
+		final Bitmap paintedBitmap = drawable.getBitmap();
 
-		return _clusterBitmaps[size];
+		_clusterBitmaps.put(size, paintedBitmap);
+
+		return paintedBitmap;
 	}
 
 	void populate(final int size) {
@@ -409,7 +392,7 @@ public class MarkerRenderer extends BucketRenderer {
 		_isBillboard = isBillboard;
 
 		// remove cached bitmaps
-		Arrays.fill(_clusterBitmaps, null);
+		_clusterBitmaps.clear();
 
 		_clusterForegroundColor = clusterForegroundColor;
 		_clusterBackgroundColor = clusterBackgroundColor;
