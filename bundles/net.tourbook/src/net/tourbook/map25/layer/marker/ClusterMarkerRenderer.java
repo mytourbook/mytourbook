@@ -1,30 +1,12 @@
 /*
- * Copyright 2013 Hannes Janetzek
- * Copyright 2016 Izumi Kawashima
- * Copyright 2017 Longri
- * Copyright 2017 devemux86
- * Copyright 2017 nebular
- *
- * This file is part of the OpenScienceMap project (http://www.opensciencemap.org).
- *
- * This program is free software: you can redistribute it and/or modify it under the
- * terms of the GNU Lesser General Public License as published by the Free Software
- * Foundation, either version 3 of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License along with
- * this program. If not, see <http://www.gnu.org/licenses/>.
+ * Original: org.oscim.layers.marker.ClusterMarkerRenderer
  */
 package net.tourbook.map25.layer.marker;
 
 import java.util.Arrays;
 
-import net.tourbook.common.UI;
-
 import org.oscim.backend.canvas.Bitmap;
+import org.oscim.backend.canvas.Color;
 import org.oscim.core.MapPosition;
 import org.oscim.core.MercatorProjection;
 import org.oscim.core.PointF;
@@ -88,11 +70,6 @@ public class ClusterMarkerRenderer extends MarkerRenderer {
 	 */
 	private SparseIntArray		mGridMap					= new SparseIntArray(200);			// initial space for 200 markers, that's not a lot of memory, and in most cases will avoid resizing the array
 
-	/**
-	 * Whether to enable clustering or disable the functionality
-	 */
-	private boolean				mClusteringEnabled			= false;
-
 	private double				_clusterScale;
 
 	private int					_clusterSymbolSizeDP		= MAP_MARKER_CLUSTER_SIZE_DP;
@@ -143,47 +120,20 @@ public class ClusterMarkerRenderer extends MarkerRenderer {
 	 * @param style
 	 *            The desired style, or NULL to disable clustering
 	 */
-	public ClusterMarkerRenderer(	final MarkerLayer<MarkerInterface> markerLayer,
-									final MarkerSymbol defaultSymbol,
-									final ClusterMarkerRenderer.ClusterStyle style) {
+	public ClusterMarkerRenderer(	final MarkerLayer markerLayer,
+									final MarkerSymbol defaultSymbol) {
 
 		super(markerLayer, defaultSymbol);
 
-		mClusteringEnabled = style != null;
+		final ClusterStyle style = new ClusterMarkerRenderer.ClusterStyle(Color.WHITE, Color.BLUE);
 
-		if (mClusteringEnabled) {
+		setClusterStyle(style.foreground, style.background);
 
-			setClusterStyle(style.foreground, style.background);
-
-			for (int k = 0; k <= CLUSTER_MAXSIZE; k++) {
-				// cache bitmaps so render thread never creates them
-				// we create CLUSTER_MAXSIZE bitmaps. Bigger clusters will show like "+"
-				getClusterBitmap(k);
-			}
+		for (int k = 0; k <= CLUSTER_MAXSIZE; k++) {
+			// cache bitmaps so render thread never creates them
+			// we create CLUSTER_MAXSIZE bitmaps. Bigger clusters will show like "+"
+			getClusterBitmap(k);
 		}
-	}
-
-	/**
-	 * Convenience method for instantiating this renderer via a factory, so the layer construction
-	 * semantic is more pleasing to the eye
-	 *
-	 * @param defaultSymbol
-	 *            Default symbol to use if the Marker is not assigned a symbol
-	 * @param style
-	 *            Cluster icon style, or NULL to disable clustering functionality
-	 * @return A factory to be passed to the ItemizedLayer constructor in order to enable the
-	 *         cluster functionality
-	 */
-	public static MarkerRendererFactory factory(final MarkerSymbol defaultSymbol, final ClusterStyle style) {
-
-		return new MarkerRendererFactory() {
-
-			@Override
-			public MarkerRenderer create(final MarkerLayer markerLayer) {
-
-				return new ClusterMarkerRenderer(markerLayer, defaultSymbol, style);
-			}
-		};
 	}
 
 	/**
@@ -247,8 +197,8 @@ public class ClusterMarkerRenderer extends MarkerRenderer {
 	 */
 	private void repopulateCluster(final int numMarkers, final double mapScale) {
 
-		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\trepopulateCluster()"));
-		// TODO remove SYSTEM.OUT.PRINTLN
+//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\trepopulateCluster()"));
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		/*
 		 * the grid slot size in px. increase to group more aggressively. currently set to marker
@@ -262,7 +212,7 @@ public class ClusterMarkerRenderer extends MarkerRenderer {
 //		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tfactor:" + factor));
 //		// TODO remove SYSTEM.OUT.PRINTLN
 
-		final InternalItem.Clustered[] tmp = new InternalItem.Clustered[numMarkers];
+		final ProjectedMarker.Clustered[] tmp = new ProjectedMarker.Clustered[numMarkers];
 
 		// clear grid map to count items that share the same "grid slot"
 		mGridMap.clear();
@@ -273,17 +223,17 @@ public class ClusterMarkerRenderer extends MarkerRenderer {
 
 		for (int markerIndex = 0; markerIndex < numMarkers; markerIndex++) {
 
-			final InternalItem.Clustered projectedMarker = tmp[markerIndex] = new InternalItem.Clustered();
+			final ProjectedMarker.Clustered projectedMarker = tmp[markerIndex] = new ProjectedMarker.Clustered();
 
 			projectedMarker.item = mMarkerLayer.createItem(markerIndex);
 
 			/* pre-project points */
-			MercatorProjection.project(projectedMarker.item.getPoint(), mMapPoint);
+			MercatorProjection.project(projectedMarker.item.getGeoPoint(), mMapPoint);
 			projectedMarker.px = mMapPoint.x;
 			projectedMarker.py = mMapPoint.y;
 
 			// items can be declared non-clusterable
-			if (_isClustering && !(projectedMarker.item instanceof MarkerItem.NonClusterable)) {
+			if (_isClustering) {
 
 				// absolute item X position in the grid
 				final int absposx = (int) (projectedMarker.px * factor);
@@ -342,8 +292,8 @@ public class ClusterMarkerRenderer extends MarkerRenderer {
 		/* All ready for update. */
 		synchronized (this) {
 
-			mUpdate = true;
-			mItems = tmp;
+			isForceUpdateMarkers = true;
+			allProjectedMarker = tmp;
 		}
 	}
 
@@ -367,7 +317,7 @@ public class ClusterMarkerRenderer extends MarkerRenderer {
 		mMarkerLayer.map().post(new Runnable() {
 			@Override
 			public void run() {
-				repopulateCluster(mItems.length, _clusterScale);
+				repopulateCluster(allProjectedMarker.length, _clusterScale);
 			}
 		});
 	}
@@ -402,20 +352,20 @@ public class ClusterMarkerRenderer extends MarkerRenderer {
 		mStyleForeground = clusterForegroundColor;
 		mStyleBackground = clusterBackgroundColor;
 
-		mUpdate = true;
+		isForceUpdateMarkers = true;
 	}
 
 	public void setDefaultMarker(final MarkerSymbol defaultMarker) {
 
-		mDefaultMarker = defaultMarker;
-		mUpdate = true;
+		defaultMarkerSymbol = defaultMarker;
+		isForceUpdateMarkers = true;
 	}
 
 	@Override
 	public synchronized void update(final GLViewport viewport) {
 
-		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tupdate()"));
-		// TODO remove SYSTEM.OUT.PRINTLN
+//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tupdate()"));
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		final MapPosition mapPosition = viewport.pos;
 		final double mapScale = mapPosition.scale;
@@ -423,48 +373,36 @@ public class ClusterMarkerRenderer extends MarkerRenderer {
 
 		final double scale = Tile.SIZE * mapScale;
 
-		if (mClusteringEnabled) {
+		/*
+		 * Clustering check: If clustering is enabled and there's been a significant scale change
+		 * trigger repopulation and return. After repopulation, this will be called again
+		 */
 
-			/*
-			 * Clustering check: If clustering is enabled and there's been a significant scale
-			 * change trigger repopulation and return. After repopulation, this will be called again
-			 */
+		// (int) log of scale gives us adequate steps to trigger clustering
+		final int scalepow = FastMath.log2((int) scale);
 
-			// (int) log of scale gives us adequate steps to trigger clustering
-			final int scalepow = FastMath.log2((int) scale);
+		if (scalepow != mScaleSaved) {
 
-//			System.out.println(
-//					(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
-//							+ ("\tviewPortScale:" + viewPortScale) + ("\t")
-//							+ ("\tscale:" + scale) + ("\t")
-//							+ ("\tscalepow:" + scalepow) + ("\t")
-//
-//			);
-//			// TODO remove SYSTEM.OUT.PRINTLN
+			mScaleSaved = scalepow;
+			_clusterScale = scale;
 
-			if (scalepow != mScaleSaved) {
+			// post repopulation to the main thread
+			mMarkerLayer.map().post(new Runnable() {
+				@Override
+				public void run() {
+					repopulateCluster(allProjectedMarker.length, scale);
+				}
+			});
 
-				mScaleSaved = scalepow;
-				_clusterScale = scale;
-
-				// post repopulation to the main thread
-				mMarkerLayer.map().post(new Runnable() {
-					@Override
-					public void run() {
-						repopulateCluster(mItems.length, scale);
-					}
-				});
-
-				// and get out of here
-				return;
-			}
-		}
-
-		if (!viewport.changed() && !mUpdate) {
+			// and get out of here
 			return;
 		}
 
-		mUpdate = false;
+		if (!viewport.changed() && !isForceUpdateMarkers) {
+			return;
+		}
+
+		isForceUpdateMarkers = false;
 
 		final double mx = mapPosition.x;
 		final double my = mapPosition.y;
@@ -477,7 +415,7 @@ public class ClusterMarkerRenderer extends MarkerRenderer {
 
 		final long flip = (long) (Tile.SIZE * mapScale) >> 1;
 
-		if (mItems == null) {
+		if (allProjectedMarker == null) {
 
 			if (buckets.get() != null) {
 				buckets.clear();
@@ -492,9 +430,9 @@ public class ClusterMarkerRenderer extends MarkerRenderer {
 		final float sin = (float) Math.sin(angle);
 
 		/* check visibility */
-		for (final InternalItem itm : mItems) {
+		for (final ProjectedMarker itm : allProjectedMarker) {
 
-			final InternalItem.Clustered projectedMarker = (InternalItem.Clustered) itm;
+			final ProjectedMarker.Clustered projectedMarker = (ProjectedMarker.Clustered) itm;
 
 			projectedMarker.changes = false;
 
@@ -561,13 +499,13 @@ public class ClusterMarkerRenderer extends MarkerRenderer {
 		mMapPosition.bearing = -mMapPosition.bearing;
 
 		// why do we sort ? z-index?
-		sort(mItems, 0, mItems.length);
+		sort(allProjectedMarker, 0, allProjectedMarker.length);
 
 		//log.debug(Arrays.toString(mItems));
 
-		for (final InternalItem itm : mItems) {
+		for (final ProjectedMarker itm : allProjectedMarker) {
 
-			final InternalItem.Clustered projectedMarker = (InternalItem.Clustered) itm;
+			final ProjectedMarker.Clustered projectedMarker = (ProjectedMarker.Clustered) itm;
 
 			// skip invisible AND clustered-out
 			if ((!projectedMarker.visible) || (projectedMarker.clusteredOut)) {
@@ -587,7 +525,7 @@ public class ClusterMarkerRenderer extends MarkerRenderer {
 				// depending on cluster size, instead of its marker
 
 				final Bitmap bitmap = getClusterBitmap(projectedMarker.clusterSize + 1);
-				
+
 				markerSymbol.set(projectedMarker.x, projectedMarker.y, bitmap, true);
 				markerSymbol.offset = new PointF(0.5f, 0.5f);
 //				markerSymbol.billboard = true; // could be a parameter
@@ -601,10 +539,10 @@ public class ClusterMarkerRenderer extends MarkerRenderer {
 
 				// normal item, use its marker
 
-				MarkerSymbol symbol = projectedMarker.item.getMarker();
+				MarkerSymbol symbol = projectedMarker.item.getMarkerSymbol();
 
 				if (symbol == null) {
-					symbol = mDefaultMarker;
+					symbol = defaultMarkerSymbol;
 				}
 
 				markerSymbol.set(projectedMarker.x, projectedMarker.y, symbol.getBitmap(), true);
@@ -612,10 +550,10 @@ public class ClusterMarkerRenderer extends MarkerRenderer {
 				markerSymbol.billboard = symbol.isBillboard();
 			}
 
-			mSymbolLayer.pushSymbol(markerSymbol);
+			symbolBucket.pushSymbol(markerSymbol);
 		}
 
-		buckets.set(mSymbolLayer);
+		buckets.set(symbolBucket);
 		buckets.prepare();
 
 		compile();

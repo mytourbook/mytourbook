@@ -1,26 +1,5 @@
 /*
- * Copyright 2012 osmdroid authors:
- * Copyright 2012 Nicolas Gramlich
- * Copyright 2012 Theodore Hong
- * Copyright 2012 Fred Eisele
- * 
- * Copyright 2013 Hannes Janetzek
- * Copyright 2016 Stephan Leuschner
- * Copyright 2016 devemux86
- * Copyright 2017 Longri
- *
- * This file is part of the OpenScienceMap project (http://www.opensciencemap.org).
- *
- * This program is free software: you can redistribute it and/or modify it under the
- * terms of the GNU Lesser General Public License as published by the Free Software
- * Foundation, either version 3 of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License along with
- * this program. If not, see <http://www.gnu.org/licenses/>.
+ * Original: org.oscim.layers.marker.MarkerLayer<Item>
  */
 package net.tourbook.map25.layer.marker;
 
@@ -29,14 +8,14 @@ import org.oscim.layers.Layer;
 import org.oscim.map.Map;
 
 /**
- * Draws a list of {@link MarkerInterface} as markers to a map. The item with the lowest index is
- * drawn as last and therefore the 'topmost' marker. It also gets checked for onTap first. This
+ * Draws a list of {@link MarkerMap25Interface} as markers to a map. The item with the lowest index
+ * is drawn as last and therefore the 'topmost' marker. It also gets checked for onTap first. This
  * class is generic, because you then you get your custom item-class passed back in onTap(). << TODO
  */
-public abstract class MarkerLayer<Item extends MarkerInterface> extends Layer {
+public abstract class MarkerLayer extends Layer {
 
 	protected final MarkerRenderer	mMarkerRenderer;
-	protected Item					mFocusedItem;
+	protected Map25Marker			mFocusedItem;
 
 	/**
 	 * TODO Interface definition for overlays that contain items that can be snapped to (for
@@ -61,20 +40,11 @@ public abstract class MarkerLayer<Item extends MarkerInterface> extends Layer {
 		boolean onSnapToItem(int x, int y, Point snapPoint);
 	}
 
-	public MarkerLayer(final Map map, final MarkerRendererFactory markerRendererFactory) {
-
-		super(map);
-
-		mMarkerRenderer = markerRendererFactory.create(this);
-		mRenderer = mMarkerRenderer;
-	}
-
-	@SuppressWarnings("unchecked")
 	public MarkerLayer(final Map map, final MarkerSymbol defaultSymbol) {
 
 		super(map);
 
-		mMarkerRenderer = new MarkerRenderer((MarkerLayer<MarkerInterface>) this, defaultSymbol);
+		mMarkerRenderer = new ClusterMarkerRenderer(this, defaultSymbol);
 		mRenderer = mMarkerRenderer;
 	}
 
@@ -82,12 +52,12 @@ public abstract class MarkerLayer<Item extends MarkerInterface> extends Layer {
 	 * Method by which subclasses create the actual Items. This will only be called from populate()
 	 * we'll cache them for later use.
 	 */
-	protected abstract Item createItem(int i);
+	protected abstract Map25Marker createItem(int i);
 
 	/**
 	 * @return the currently-focused item, or null if no item is currently focused.
 	 */
-	public Item getFocus() {
+	public Map25Marker getFocus() {
 
 		return mFocusedItem;
 	}
@@ -110,7 +80,7 @@ public abstract class MarkerLayer<Item extends MarkerInterface> extends Layer {
 	 *
 	 * @param item
 	 */
-	public void setFocus(final Item item) {
+	public void setFocus(final Map25Marker item) {
 
 		mFocusedItem = item;
 	}

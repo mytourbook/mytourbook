@@ -1,43 +1,10 @@
 /*
- * Copyright 2012 osmdroid authors: Viesturs Zarins, Martin Pearman
- * Copyright 2012 Hannes Janetzek
- * Copyright 2016 devemux86
- * Copyright 2016 Bezzu
- * Copyright 2016 Pedinel
- *
- * This file is part of the OpenScienceMap project (http://www.opensciencemap.org).
- *
- * This program is free software: you can redistribute it and/or modify it under the
- * terms of the GNU Lesser General Public License as published by the Free Software
- * Foundation, either version 3 of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License along with
- * this program. If not, see <http://www.gnu.org/licenses/>.
+ * Original: org.oscim.layers.PathLayer
  */
-/*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
- * 
- * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation version 2 of the License.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License along with
- * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
- *******************************************************************************/
 package net.tourbook.map25.layer.tourtrack;
 
 import gnu.trove.list.array.TIntArrayList;
 
-import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorUtil;
 import net.tourbook.map25.Map25ConfigManager;
 
@@ -85,17 +52,7 @@ public class TourLayer extends Layer {
 
 	private boolean			_isUpdateLayer;
 
-	/*
-	 * everything below runs on GL- and Worker-Thread
-	 */
-
-	final static class PathLayerTask {
-
-		RenderBuckets	__renderBuckets	= new RenderBuckets();
-		MapPosition		__mapPos		= new MapPosition();
-	}
-
-	final class RenderPathLayer extends BucketRenderer {
+	private final class TourRenderer extends BucketRenderer {
 
 		private int	__curX	= -1;
 		private int	__curY	= -1;
@@ -104,8 +61,8 @@ public class TourLayer extends Layer {
 		@Override
 		public synchronized void update(final GLViewport v) {
 
-			System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\t\t\tupdate()"));
-			// TODO remove SYSTEM.OUT.PRINTLN
+//			System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\t\t\tupdate()"));
+//			// TODO remove SYSTEM.OUT.PRINTLN
 
 			if (!isEnabled()) {
 				return;
@@ -136,7 +93,7 @@ public class TourLayer extends Layer {
 				__curZ = tz;
 			}
 
-			final PathLayerTask workerTask = _simpleWorker.poll();
+			final TourRenderTask workerTask = _simpleWorker.poll();
 			if (workerTask == null) {
 				return;
 			}
@@ -150,7 +107,13 @@ public class TourLayer extends Layer {
 		}
 	}
 
-	final class Worker extends SimpleWorker<PathLayerTask> {
+	private final static class TourRenderTask {
+
+		RenderBuckets	__renderBuckets	= new RenderBuckets();
+		MapPosition		__mapPos		= new MapPosition();
+	}
+
+	final class Worker extends SimpleWorker<TourRenderTask> {
 
 		private static final int	MIN_DIST				= 3;
 
@@ -168,7 +131,7 @@ public class TourLayer extends Layer {
 
 		public Worker(final Map map) {
 
-			super(map, 55, new PathLayerTask(), new PathLayerTask());
+			super(map, 55, new TourRenderTask(), new TourRenderTask());
 
 			__lineClipper = new LineClipper(-__max, -__max, __max, __max);
 			__projectedPoints = new float[0];
@@ -183,12 +146,12 @@ public class TourLayer extends Layer {
 		}
 
 		@Override
-		public void cleanup(final PathLayerTask task) {
+		public void cleanup(final TourRenderTask task) {
 			task.__renderBuckets.clear();
 		}
 
 		@Override
-		public boolean doWork(final PathLayerTask task) {
+		public boolean doWork(final TourRenderTask task) {
 
 			final long start = System.nanoTime();
 
@@ -261,7 +224,7 @@ public class TourLayer extends Layer {
 			return true;
 		}
 
-		private void doWork_Rendering(final PathLayerTask task, final int numPoints) {
+		private void doWork_Rendering(final TourRenderTask task, final int numPoints) {
 
 			LineBucket lineBucket;
 
@@ -412,7 +375,7 @@ public class TourLayer extends Layer {
 		_geoPoints = new GeoPoint[] {};
 		_tourStarts = new TIntArrayList();
 
-		mRenderer = new RenderPathLayer();
+		mRenderer = new TourRenderer();
 		_simpleWorker = new Worker(map);
 	}
 

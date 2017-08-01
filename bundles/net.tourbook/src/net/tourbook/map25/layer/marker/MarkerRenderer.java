@@ -1,22 +1,5 @@
 /*
- * Copyright 2013 Hannes Janetzek
- * Copyright 2016 Izumi Kawashima
- * Copyright 2017 Longri
- * Copyright 2017 devemux86
- * Copyright 2017 nebular
- *
- * This file is part of the OpenScienceMap project (http://www.opensciencemap.org).
- *
- * This program is free software: you can redistribute it and/or modify it under the
- * terms of the GNU Lesser General Public License as published by the Free Software
- * Foundation, either version 3 of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License along with
- * this program. If not, see <http://www.gnu.org/licenses/>.
+ * Original: org.oscim.layers.marker.MarkerRenderer
  */
 package net.tourbook.map25.layer.marker;
 
@@ -34,16 +17,17 @@ import org.oscim.utils.geom.GeometryUtils;
 
 public class MarkerRenderer extends BucketRenderer {
 
-	static TimSort<InternalItem>			ZSORT	= new TimSort<InternalItem>();
+	static TimSort<ProjectedMarker>				ZSORT	= new TimSort<ProjectedMarker>();
 
-	final static Comparator<InternalItem>	zComparator;
+	final static Comparator<ProjectedMarker>	zComparator;
+
 	static {
 
-		zComparator = new Comparator<InternalItem>() {
+		zComparator = new Comparator<ProjectedMarker>() {
 
 			@Override
-			public int compare(	final InternalItem a,
-								final InternalItem b) {
+			public int compare(	final ProjectedMarker a,
+								final ProjectedMarker b) {
 				if (a.visible && b.visible) {
 					if (a.dy > b.dy) {
 						return -1;
@@ -62,35 +46,36 @@ public class MarkerRenderer extends BucketRenderer {
 		};
 	}
 
-	protected MarkerSymbol							mDefaultMarker;
-	protected final SymbolBucket					mSymbolLayer;
+	protected MarkerSymbol			defaultMarkerSymbol;
+	protected final SymbolBucket	symbolBucket;
 
-	protected final float[]							mBox		= new float[8];
+	protected final float[]			mBox		= new float[8];
 
-	protected final MarkerLayer<MarkerInterface>	mMarkerLayer;
+	protected final MarkerLayer		mMarkerLayer;
 
-	protected final Point							mMapPoint	= new Point();
+	protected final Point			mMapPoint	= new Point();
 
 	/**
 	 * increase view to show items that are partially visible
 	 */
-	protected int									mExtents	= 100;
+	protected int					mExtents	= 100;
 
 	/**
 	 * flag to force update of markers
 	 */
-	protected boolean								mUpdate;
+	protected boolean				isForceUpdateMarkers;
 
-	protected InternalItem[]						mItems;
+	protected ProjectedMarker[]		allProjectedMarker;
 
-	public MarkerRenderer(final MarkerLayer<MarkerInterface> markerLayer, final MarkerSymbol defaultSymbol) {
+	public MarkerRenderer(final MarkerLayer markerLayer, final MarkerSymbol defaultSymbol) {
 
-		mSymbolLayer = new SymbolBucket();
 		mMarkerLayer = markerLayer;
-		mDefaultMarker = defaultSymbol;
+		defaultMarkerSymbol = defaultSymbol;
+
+		symbolBucket = new SymbolBucket();
 	}
 
-	public static void sort(final InternalItem[] a, final int lo, final int hi) {
+	public static void sort(final ProjectedMarker[] a, final int lo, final int hi) {
 
 		final int nRemaining = hi - lo;
 		if (nRemaining < 2) {
@@ -102,38 +87,38 @@ public class MarkerRenderer extends BucketRenderer {
 
 	protected void populate(final int size) {
 
-		final InternalItem[] tmp = new InternalItem[size];
+		final ProjectedMarker[] tmp = new ProjectedMarker[size];
 
 		for (int markerIndex = 0; markerIndex < size; markerIndex++) {
 
-			final InternalItem projectedMarker = new InternalItem();
+			final ProjectedMarker projectedMarker = new ProjectedMarker();
 			tmp[markerIndex] = projectedMarker;
 			projectedMarker.item = mMarkerLayer.createItem(markerIndex);
 
 			/* pre-project points */
-			MercatorProjection.project(projectedMarker.item.getPoint(), mMapPoint);
+			MercatorProjection.project(projectedMarker.item.getGeoPoint(), mMapPoint);
 			projectedMarker.px = mMapPoint.x;
 			projectedMarker.py = mMapPoint.y;
 		}
 
 		synchronized (this) {
-			mUpdate = true;
-			mItems = tmp;
+			isForceUpdateMarkers = true;
+			allProjectedMarker = tmp;
 		}
 	}
 
 	public void update() {
-		mUpdate = true;
+		isForceUpdateMarkers = true;
 	}
 
 	@Override
 	public synchronized void update(final GLViewport v) {
 
-		if (!v.changed() && !mUpdate) {
+		if (!v.changed() && !isForceUpdateMarkers) {
 			return;
 		}
 
-		mUpdate = false;
+		isForceUpdateMarkers = false;
 
 		final double mx = v.pos.x;
 		final double my = v.pos.y;
@@ -147,7 +132,7 @@ public class MarkerRenderer extends BucketRenderer {
 
 		final long flip = (long) (Tile.SIZE * v.pos.scale) >> 1;
 
-		if (mItems == null) {
+		if (allProjectedMarker == null) {
 
 			if (buckets.get() != null) {
 				buckets.clear();
@@ -162,7 +147,7 @@ public class MarkerRenderer extends BucketRenderer {
 		final float sin = (float) Math.sin(angle);
 
 		/* check visibility */
-		for (final InternalItem projectedMarker : mItems) {
+		for (final ProjectedMarker projectedMarker : allProjectedMarker) {
 
 			projectedMarker.changes = false;
 			projectedMarker.x = (float) ((projectedMarker.px - mx) * scale);
@@ -213,10 +198,10 @@ public class MarkerRenderer extends BucketRenderer {
 		mMapPosition.copy(v.pos);
 		mMapPosition.bearing = -mMapPosition.bearing;
 
-		sort(mItems, 0, mItems.length);
+		sort(allProjectedMarker, 0, allProjectedMarker.length);
 
 		//log.debug(Arrays.toString(mItems));
-		for (final InternalItem it : mItems) {
+		for (final ProjectedMarker it : allProjectedMarker) {
 
 			if (!it.visible) {
 				continue;
@@ -227,9 +212,9 @@ public class MarkerRenderer extends BucketRenderer {
 				continue;
 			}
 
-			MarkerSymbol marker = it.item.getMarker();
+			MarkerSymbol marker = it.item.getMarkerSymbol();
 			if (marker == null) {
-				marker = mDefaultMarker;
+				marker = defaultMarkerSymbol;
 			}
 
 			final SymbolItem s = SymbolItem.pool.get();
@@ -240,33 +225,12 @@ public class MarkerRenderer extends BucketRenderer {
 			}
 
 			s.offset = marker.getHotspot();
-			mSymbolLayer.pushSymbol(s);
+			symbolBucket.pushSymbol(s);
 		}
 
-		buckets.set(mSymbolLayer);
+		buckets.set(symbolBucket);
 		buckets.prepare();
 
 		compile();
 	}
-
-	//    /**
-	//     * Returns the Item at the given index.
-	//     *
-	//     * @param position
-	//     *            the position of the item to return
-	//     * @return the Item of the given index.
-	//     */
-	//    public final Item getItem(int position) {
-	//
-	//        synchronized (lock) {
-	//            InternalItem item = mItems;
-	//            for (int i = mSize - position - 1; i > 0 && item != null; i--)
-	//                item = item.next;
-	//
-	//            if (item != null)
-	//                return item.item;
-	//
-	//            return null;
-	//        }
-	//    }
 }

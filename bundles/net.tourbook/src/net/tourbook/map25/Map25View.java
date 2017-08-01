@@ -46,8 +46,8 @@ import net.tourbook.map25.action.ActionSelectMap25Provider;
 import net.tourbook.map25.action.ActionShowEntireTour;
 import net.tourbook.map25.action.ActionSynchMapWithChartSlider;
 import net.tourbook.map25.action.ActionSynchMapWithTour;
-import net.tourbook.map25.layer.marker.ItemizedLayer;
-import net.tourbook.map25.layer.marker.MarkerItem;
+import net.tourbook.map25.layer.marker.ClusterMarkerLayer;
+import net.tourbook.map25.layer.marker.Map25Marker;
 import net.tourbook.map25.layer.tourtrack.TourLayer;
 import net.tourbook.map25.ui.SlideoutMap25_Options;
 import net.tourbook.map25.ui.SlideoutMap25_TrackConfig;
@@ -443,9 +443,9 @@ public class Map25View extends ViewPart {
 		return new BoundingBox(minLat, minLon, maxLat, maxLon);
 	}
 
-	private List<MarkerItem> createMapMarkers(final ArrayList<TourData> allTourData) {
+	private List<Map25Marker> createMapMarkers(final ArrayList<TourData> allTourData) {
 
-		final List<MarkerItem> allMarkerItems = new ArrayList<>();
+		final List<Map25Marker> allMarkerItems = new ArrayList<>();
 
 		for (final TourData tourData : allTourData) {
 
@@ -486,7 +486,7 @@ public class Map25View extends ViewPart {
 				final double latitude = latitudeSerie[serieIndex];
 				final double longitude = longitudeSerie[serieIndex];
 
-				final MarkerItem item = new MarkerItem(
+				final Map25Marker item = new Map25Marker(
 						tourMarker.getLabel(),
 						tourMarker.getDescription(),
 						new GeoPoint(latitude, longitude));
@@ -947,7 +947,8 @@ public class Map25View extends ViewPart {
 		/*
 		 * Markers
 		 */
-		final ItemizedLayer<MarkerItem> markerLayer = _mapApp.getLayer_Marker();
+		final ClusterMarkerLayer markerLayer = _mapApp.getLayer_Marker();
+
 		if (markerLayer.isEnabled()) {
 
 			markerLayer.removeAllItems(false);

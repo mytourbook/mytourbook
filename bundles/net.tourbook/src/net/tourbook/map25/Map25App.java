@@ -16,19 +16,17 @@
 package net.tourbook.map25;
 
 import java.awt.Canvas;
-import java.util.ArrayList;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.map25.Map25TileSource.Builder;
 import net.tourbook.map25.OkHttpEngineMT.OkHttpFactoryMT;
+import net.tourbook.map25.layer.marker.ClusterMarkerLayer;
+import net.tourbook.map25.layer.marker.ClusterMarkerLayer.OnItemGestureListener;
 import net.tourbook.map25.layer.marker.ClusterMarkerRenderer;
-import net.tourbook.map25.layer.marker.ItemizedLayer;
-import net.tourbook.map25.layer.marker.ItemizedLayer.OnItemGestureListener;
+import net.tourbook.map25.layer.marker.Map25Marker;
 import net.tourbook.map25.layer.marker.Map25MarkerConfig;
-import net.tourbook.map25.layer.marker.MarkerItem;
-import net.tourbook.map25.layer.marker.MarkerRendererFactory;
 import net.tourbook.map25.layer.marker.MarkerSymbol;
 import net.tourbook.map25.layer.marker.ScreenUtils;
 import net.tourbook.map25.layer.tourtrack.TourLayer;
@@ -39,7 +37,6 @@ import org.oscim.awt.AwtGraphics;
 import org.oscim.backend.CanvasAdapter;
 import org.oscim.backend.GLAdapter;
 import org.oscim.backend.canvas.Bitmap;
-import org.oscim.backend.canvas.Color;
 import org.oscim.backend.canvas.Paint;
 import org.oscim.core.MapPosition;
 import org.oscim.core.MercatorProjection;
@@ -77,40 +74,40 @@ import okhttp3.Cache;
 
 public class Map25App extends GdxMap {
 
-	private static final String			STATE_MAP_POS_X						= "STATE_MAP_POS_X";						//$NON-NLS-1$
-	private static final String			STATE_MAP_POS_Y						= "STATE_MAP_POS_Y";						//$NON-NLS-1$
-	private static final String			STATE_MAP_POS_ZOOM_LEVEL			= "STATE_MAP_POS_ZOOM_LEVEL";				//$NON-NLS-1$
-	private static final String			STATE_MAP_POS_BEARING				= "STATE_MAP_POS_BEARING";					//$NON-NLS-1$
-	private static final String			STATE_MAP_POS_SCALE					= "STATE_MAP_POS_SCALE";					//$NON-NLS-1$
-	private static final String			STATE_MAP_POS_TILT					= "STATE_MAP_POS_TILT";						//$NON-NLS-1$
-	private static final String			STATE_SELECTED_MAP25_PROVIDER_ID	= "STATE_SELECTED_MAP25_PROVIDER_ID";		//$NON-NLS-1$
+	private static final String		STATE_MAP_POS_X						= "STATE_MAP_POS_X";						//$NON-NLS-1$
+	private static final String		STATE_MAP_POS_Y						= "STATE_MAP_POS_Y";						//$NON-NLS-1$
+	private static final String		STATE_MAP_POS_ZOOM_LEVEL			= "STATE_MAP_POS_ZOOM_LEVEL";				//$NON-NLS-1$
+	private static final String		STATE_MAP_POS_BEARING				= "STATE_MAP_POS_BEARING";					//$NON-NLS-1$
+	private static final String		STATE_MAP_POS_SCALE					= "STATE_MAP_POS_SCALE";					//$NON-NLS-1$
+	private static final String		STATE_MAP_POS_TILT					= "STATE_MAP_POS_TILT";						//$NON-NLS-1$
+	private static final String		STATE_SELECTED_MAP25_PROVIDER_ID	= "STATE_SELECTED_MAP25_PROVIDER_ID";		//$NON-NLS-1$
 
-	public static final Logger			log									= LoggerFactory.getLogger(Map25App.class);
+	public static final Logger		log									= LoggerFactory.getLogger(Map25App.class);
 
-	private static IDialogSettings		_state;
+	private static IDialogSettings	_state;
 
-	private static Map25View			_map25View;
-	private static LwjglApplication		_lwjglApp;
+	private static Map25View		_map25View;
+	private static LwjglApplication	_lwjglApp;
 
-	private Map25Provider				_selectedMapProvider;
-	private TileManager					_tileManager;
+	private Map25Provider			_selectedMapProvider;
+	private TileManager				_tileManager;
 
-	private OsmTileLayerMT				_layer_BaseMap;
-	private BuildingLayer				_layer_Building;
-	private LabelLayer					_layer_Label;
-	private ItemizedLayer<MarkerItem>	_layer_Marker;
-	private MapScaleBarLayer			_layer_ScaleBar;
-	private TileGridLayerMT				_layer_TileInfo;
-	private TourLayer					_layer_Tour;
+	private OsmTileLayerMT			_layer_BaseMap;
+	private BuildingLayer			_layer_Building;
+	private LabelLayer				_layer_Label;
+	private ClusterMarkerLayer		_layer_Marker;
+	private MapScaleBarLayer		_layer_ScaleBar;
+	private TileGridLayerMT			_layer_TileInfo;
+	private TourLayer				_layer_Tour;
 
-	private OkHttpFactoryMT				_httpFactory;
+	private OkHttpFactoryMT			_httpFactory;
 
-	private long						_lastRenderTime;
+	private long					_lastRenderTime;
 
 	/**
 	 * Is <code>true</code> when a tour marker is hit.
 	 */
-	private boolean						_isMapItemHit;
+	private boolean					_isMapItemHit;
 
 	public Map25App(final IDialogSettings state) {
 
@@ -183,18 +180,25 @@ public class Map25App extends GdxMap {
 		Gdx.input.setInputProcessor(mux);
 	}
 
-	private ItemizedLayer<MarkerItem> createLayer_Marker() {
+	private ClusterMarkerLayer createLayer_Marker() {
 
 		final MarkerSymbol markerSymbol = createMarkerSymbol();
 
-		final MarkerRendererFactory markerRenderFactory = ClusterMarkerRenderer.factory(
-				markerSymbol,
-				new ClusterMarkerRenderer.ClusterStyle(Color.WHITE, Color.BLUE));
+//		markerRenderer = new ClusterMarkerRenderer(
+//				markerLayer,
+//				markerSymbol,
+//				new ClusterMarkerRenderer.ClusterStyle(Color.WHITE, Color.BLUE));
 
-		final OnItemGestureListener<MarkerItem> onItemGestureListener = new OnItemGestureListener<MarkerItem>() {
+//		final Map25MarkerRendererFactory markerRenderFactory = ClusterMarkerRenderer.factory(
+//				markerSymbol,
+//				new ClusterMarkerRenderer.ClusterStyle(Color.WHITE, Color.BLUE));
+//
+//		clusterMarkerRenderer = new ClusterMarkerRenderer(markerLayer, markerSymbol, style);
+
+		final OnItemGestureListener onItemGestureListener = new OnItemGestureListener() {
 
 			@Override
-			public boolean onItemLongPress(final int index, final MarkerItem item) {
+			public boolean onItemLongPress(final int index, final Map25Marker item) {
 
 				System.out.println(
 						(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
@@ -211,7 +215,7 @@ public class Map25App extends GdxMap {
 			}
 
 			@Override
-			public boolean onItemSingleTapUp(final int index, final MarkerItem item) {
+			public boolean onItemSingleTapUp(final int index, final Map25Marker item) {
 
 				System.out.println(
 						(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
@@ -228,10 +232,9 @@ public class Map25App extends GdxMap {
 			}
 		};
 
-		final ItemizedLayer<MarkerItem> markerLayer = new ItemizedLayer<>(
+		final ClusterMarkerLayer markerLayer = new ClusterMarkerLayer(
 				mMap,
-				new ArrayList<MarkerItem>(),
-				markerRenderFactory,
+				markerSymbol,
 				onItemGestureListener);
 
 		return markerLayer;
@@ -371,7 +374,7 @@ public class Map25App extends GdxMap {
 		return _layer_Label;
 	}
 
-	public ItemizedLayer<MarkerItem> getLayer_Marker() {
+	public ClusterMarkerLayer getLayer_Marker() {
 		return _layer_Marker;
 	}
 

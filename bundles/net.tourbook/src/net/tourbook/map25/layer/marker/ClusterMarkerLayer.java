@@ -1,23 +1,5 @@
 /*
- * Copyright 2012 osmdroid authors: Nicolas Gramlich, Theodore Hong, Fred Eisele
- * 
- * Copyright 2013 Hannes Janetzek
- * Copyright 2016 devemux86
- * Copyright 2016 Stephan Leuschner
- * Copyright 2016 Pedinel
- *
- * This file is part of the OpenScienceMap project (http://www.opensciencemap.org).
- *
- * This program is free software: you can redistribute it and/or modify it under the
- * terms of the GNU Lesser General Public License as published by the Free Software
- * Foundation, either version 3 of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License along with
- * this program. If not, see <http://www.gnu.org/licenses/>.
+ * Original: org.oscim.layers.marker.ItemizedLayer<Item>
  */
 package net.tourbook.map25.layer.marker;
 
@@ -35,20 +17,20 @@ import org.oscim.map.Viewport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ItemizedLayer<Item extends MarkerInterface> extends MarkerLayer<Item>
+public class ClusterMarkerLayer extends MarkerLayer
 		implements GestureListener {
 
-	static final Logger						log					= LoggerFactory.getLogger(ItemizedLayer.class);
+	static final Logger					log					= LoggerFactory.getLogger(ClusterMarkerLayer.class);
 
-	protected final List<Item>				mItemList;
-	protected final Point					mTmpPoint			= new Point();
+	protected final List<Map25Marker>	mItemList			= new ArrayList<>();
+	protected final Point				mTmpPoint			= new Point();
 
-	protected int							mDrawnItemsLimit	= Integer.MAX_VALUE;
+	protected int						mDrawnItemsLimit	= Integer.MAX_VALUE;
 
-	protected OnItemGestureListener<Item>	mOnItemGestureListener;
+	protected OnItemGestureListener		mOnItemGestureListener;
 
-	private final ActiveItem				mActiveItemSingleTap;
-	private final ActiveItem				mActiveItemLongPress;
+	private final ActiveItem			mActiveItemSingleTap;
+	private final ActiveItem			mActiveItemLongPress;
 
 	{
 		mActiveItemSingleTap = new ActiveItem() {
@@ -56,7 +38,7 @@ public class ItemizedLayer<Item extends MarkerInterface> extends MarkerLayer<Ite
 			@Override
 			public boolean run(final int index) {
 
-				final ItemizedLayer<Item> that = ItemizedLayer.this;
+				final ClusterMarkerLayer that = ClusterMarkerLayer.this;
 				if (mOnItemGestureListener == null) {
 					return false;
 				}
@@ -72,7 +54,7 @@ public class ItemizedLayer<Item extends MarkerInterface> extends MarkerLayer<Ite
 			@Override
 			public boolean run(final int index) {
 
-				final ItemizedLayer<Item> that = ItemizedLayer.this;
+				final ClusterMarkerLayer that = ClusterMarkerLayer.this;
 
 				if (that.mOnItemGestureListener == null) {
 					return false;
@@ -94,45 +76,22 @@ public class ItemizedLayer<Item extends MarkerInterface> extends MarkerLayer<Ite
 	 * When the item is touched one of these methods may be invoked depending on the type of touch.
 	 * Each of them returns true if the event was completely handled.
 	 */
-	public static interface OnItemGestureListener<T> {
+	public static interface OnItemGestureListener {
 
-		public boolean onItemLongPress(int index, T item);
+		public boolean onItemLongPress(int index, Map25Marker item);
 
-		public boolean onItemSingleTapUp(int index, T item);
+		public boolean onItemSingleTapUp(int index, Map25Marker item);
 	}
 
-	public ItemizedLayer(	final Map map,
-							final List<Item> list,
-							final MarkerRendererFactory markerRendererFactory,
-							final OnItemGestureListener<Item> listener) {
+	public ClusterMarkerLayer(	final Map map,
+								final MarkerSymbol markerSymbol,
+								final OnItemGestureListener listener) {
 
-		super(map, markerRendererFactory);
+		super(map, markerSymbol);
 
-		mItemList = list;
 		mOnItemGestureListener = listener;
 
 		populate();
-	}
-
-	public ItemizedLayer(	final Map map,
-							final List<Item> list,
-							final MarkerSymbol defaultMarker,
-							final OnItemGestureListener<Item> listener) {
-
-		super(map, defaultMarker);
-
-		mItemList = list;
-		mOnItemGestureListener = listener;
-
-		populate();
-	}
-
-	public ItemizedLayer(final Map map, final MarkerRendererFactory markerRendererFactory) {
-		this(map, new ArrayList<Item>(), markerRendererFactory, null);
-	}
-
-	public ItemizedLayer(final Map map, final MarkerSymbol defaultMarker) {
-		this(map, new ArrayList<Item>(), defaultMarker, null);
 	}
 
 	/**
@@ -165,23 +124,23 @@ public class ItemizedLayer<Item extends MarkerInterface> extends MarkerLayer<Ite
 
 		for (int i = 0; i < size; i++) {
 
-			final Item item = mItemList.get(i);
+			final Map25Marker item = mItemList.get(i);
 
 			if (!box.contains(
-					item.getPoint().longitudeE6,
-					item.getPoint().latitudeE6)) {
+					item.getGeoPoint().longitudeE6,
+					item.getGeoPoint().latitudeE6)) {
 				continue;
 			}
 
-			mapPosition.toScreenPoint(item.getPoint(), mTmpPoint);
+			mapPosition.toScreenPoint(item.getGeoPoint(), mTmpPoint);
 
 			final float dx = (float) (mTmpPoint.x - eventX);
 			final float dy = (float) (mTmpPoint.y - eventY);
 
-			MarkerSymbol it = item.getMarker();
+			MarkerSymbol it = item.getMarkerSymbol();
 
 			if (it == null) {
-				it = mMarkerRenderer.mDefaultMarker;
+				it = mMarkerRenderer.defaultMarkerSymbol;
 			}
 
 			if (it.isInside(dx, dy)) {
@@ -216,12 +175,12 @@ public class ItemizedLayer<Item extends MarkerInterface> extends MarkerLayer<Ite
 		return false;
 	}
 
-	public void addItem(final int location, final Item item) {
+	public void addItem(final int location, final Map25Marker item) {
 
 		mItemList.add(location, item);
 	}
 
-	public boolean addItem(final Item item) {
+	public boolean addItem(final Map25Marker item) {
 
 		final boolean result = mItemList.add(item);
 		populate();
@@ -229,7 +188,7 @@ public class ItemizedLayer<Item extends MarkerInterface> extends MarkerLayer<Ite
 		return result;
 	}
 
-	public boolean addItems(final Collection<Item> items) {
+	public boolean addItems(final Collection<Map25Marker> items) {
 
 		final boolean result = mItemList.addAll(items);
 
@@ -239,11 +198,11 @@ public class ItemizedLayer<Item extends MarkerInterface> extends MarkerLayer<Ite
 	}
 
 	@Override
-	protected Item createItem(final int index) {
+	protected Map25Marker createItem(final int index) {
 		return mItemList.get(index);
 	}
 
-	public List<Item> getItemList() {
+	public List<Map25Marker> getItemList() {
 		return mItemList;
 	}
 
@@ -261,7 +220,7 @@ public class ItemizedLayer<Item extends MarkerInterface> extends MarkerLayer<Ite
 		return false;
 	}
 
-	protected boolean onLongPressHelper(final int index, final Item item) {
+	protected boolean onLongPressHelper(final int index, final Map25Marker item) {
 
 		return this.mOnItemGestureListener.onItemLongPress(index, item);
 	}
@@ -276,7 +235,7 @@ public class ItemizedLayer<Item extends MarkerInterface> extends MarkerLayer<Ite
 	//    public boolean onTap(MotionEvent event, MapPosition pos) {
 	//        return activateSelectedItems(event, mActiveItemSingleTap);
 	//    }
-	protected boolean onSingleTapUpHelper(final int index, final Item item) {
+	protected boolean onSingleTapUpHelper(final int index, final Map25Marker item) {
 
 		return mOnItemGestureListener.onItemSingleTapUp(index, item);
 	}
@@ -294,15 +253,15 @@ public class ItemizedLayer<Item extends MarkerInterface> extends MarkerLayer<Ite
 		}
 	}
 
-	public Item removeItem(final int position) {
+	public Map25Marker removeItem(final int position) {
 
-		final Item result = mItemList.remove(position);
+		final Map25Marker result = mItemList.remove(position);
 		populate();
 
 		return result;
 	}
 
-	public boolean removeItem(final Item item) {
+	public boolean removeItem(final Map25Marker item) {
 
 		final boolean result = mItemList.remove(item);
 		populate();
@@ -310,7 +269,8 @@ public class ItemizedLayer<Item extends MarkerInterface> extends MarkerLayer<Ite
 		return result;
 	}
 
-	public void setOnItemGestureListener(final OnItemGestureListener<Item> listener) {
+	public void setOnItemGestureListener(final OnItemGestureListener listener) {
+
 		mOnItemGestureListener = listener;
 	}
 
