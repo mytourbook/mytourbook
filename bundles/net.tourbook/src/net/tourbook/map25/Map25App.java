@@ -72,7 +72,7 @@ import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.utils.SharedLibraryLoader;
 import okhttp3.Cache;
 
-public class Map25App extends GdxMap {
+public class Map25App extends GdxMap implements OnItemGestureListener {
 
 	private static final String		STATE_MAP_POS_X						= "STATE_MAP_POS_X";						//$NON-NLS-1$
 	private static final String		STATE_MAP_POS_Y						= "STATE_MAP_POS_Y";						//$NON-NLS-1$
@@ -184,47 +184,11 @@ public class Map25App extends GdxMap {
 
 		final MarkerSymbol markerSymbol = createMarkerSymbol();
 
-		final OnItemGestureListener onItemGestureListener = new OnItemGestureListener() {
-
-			@Override
-			public boolean onItemLongPress(final int index, final MapMarker item) {
-
-				System.out.println(
-						(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
-								+ ("\tonItemLongPress")
-								+ ("\tindex:" + index)
-								+ ("\t_isMapItemHit:" + _isMapItemHit + " -> true")
-				//
-				);
-				// TODO remove SYSTEM.OUT.PRINTLN
-
-				_isMapItemHit = true;
-
-				return true;
-			}
-
-			@Override
-			public boolean onItemSingleTapUp(final int index, final MapMarker item) {
-
-				System.out.println(
-						(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
-								+ ("\tonItemSingleTapUp")//
-								+ ("\tindex:" + index)
-								+ ("\t_isMapItemHit:" + _isMapItemHit + " -> true")
-				//
-				);
-				// TODO remove SYSTEM.OUT.PRINTLN
-
-				_isMapItemHit = true;
-
-				return true;
-			}
-		};
 
 		final MarkerLayer markerLayer = new MarkerLayer(
 				mMap,
 				markerSymbol,
-				onItemGestureListener);
+				this);
 
 		return markerLayer;
 	}
@@ -339,16 +303,17 @@ public class Map25App extends GdxMap {
 
 	public boolean getAndReset_IsMapItemHit() {
 
-		System.out.println(
-				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
-						+ ("\tgetAndReset_IsMapItemHit:" + _isMapItemHit));
-		// TODO remove SYSTEM.OUT.PRINTLN
-
-		final boolean isMapItemHit = _isMapItemHit;
-
-		_isMapItemHit = false;
-
-		return isMapItemHit;
+//		System.out.println(
+//				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
+//						+ ("\tgetAndReset_IsMapItemHit:" + _isMapItemHit));
+//		// TODO remove SYSTEM.OUT.PRINTLN
+//
+//		final boolean isMapItemHit = _isMapItemHit;
+//
+//		_isMapItemHit = false;
+//
+//		return isMapItemHit;
+		return false;
 	}
 
 	public OsmTileLayerMT getLayer_BaseMap() {
@@ -394,6 +359,40 @@ public class Map25App extends GdxMap {
 		default:
 			return VtmThemes.DEFAULT;
 		}
+	}
+
+	@Override
+	public boolean onItemLongPress(final int index, final MapMarker item) {
+		
+		System.out.println(
+				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
+				+ ("\tonItemLongPress")
+				+ ("\tindex:" + index)
+				+ ("\t_isMapItemHit:" + _isMapItemHit + " -> true")
+				//
+				);
+		// TODO remove SYSTEM.OUT.PRINTLN
+		
+		_isMapItemHit = true;
+		
+		return true;
+	}
+
+	@Override
+	public boolean onItemSingleTapUp(final int index, final MapMarker item) {
+		
+		System.out.println(
+				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
+				+ ("\tonItemSingleTapUp")//
+				+ ("\tindex:" + index)
+				+ ("\t_isMapItemHit:" + _isMapItemHit + " -> true")
+				//
+				);
+		// TODO remove SYSTEM.OUT.PRINTLN
+		
+		_isMapItemHit = true;
+		
+		return true;
 	}
 
 	@Override

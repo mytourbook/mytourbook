@@ -101,12 +101,12 @@ public class ScreenUtils {
 
 			mSize = getPixels(symbolSizeDP);
 
+			final int defaultTextSize = (int) (symbolSizeDP * 0.7f);
 			final int numDigits = mText.length();
-			final int textSizeCluster = (int) (symbolSizeDP * 0.7f);
 
 			final int textSize = numDigits > 2 //
-					? (int) (textSizeCluster / (numDigits * 0.5))
-					: textSizeCluster;
+					? (int) (defaultTextSize / (numDigits * 0.5))
+					: defaultTextSize;
 
 			mPaintText.setTextSize(getPixels(textSize));
 			mPaintText.setColor(foregroundColor);
