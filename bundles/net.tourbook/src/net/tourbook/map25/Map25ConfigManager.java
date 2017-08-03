@@ -132,7 +132,7 @@ public class Map25ConfigManager {
 	public static final int				DEFAULT_CLUSTER_GRID_SIZE		= 60;
 	public static final int				DEFAULT_CLUSTER_SYMBOL_SIZE		= 60;
 	public static final int				CLUSTER_GRID_MIN_SIZE			= 20;
-	public static final int				CLUSTER_GRID_MAX_SIZE			= 200;
+	public static final int				CLUSTER_GRID_MAX_SIZE			= 10000;
 	public static final int				CLUSTER_SYMBOL_SIZE_MIN			= 20;
 	public static final int				CLUSTER_SYMBOL_SIZE_MAX			= 200;
 	//

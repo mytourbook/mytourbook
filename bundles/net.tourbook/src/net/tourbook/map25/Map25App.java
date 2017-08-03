@@ -17,7 +17,6 @@ package net.tourbook.map25;
 
 import java.awt.Canvas;
 
-import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.map25.Map25TileSource.Builder;
@@ -364,35 +363,38 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 	@Override
 	public boolean onItemLongPress(final int index, final MapMarker item) {
 		
-		System.out.println(
-				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
-				+ ("\tonItemLongPress")
-				+ ("\tindex:" + index)
-				+ ("\t_isMapItemHit:" + _isMapItemHit + " -> true")
-				//
-				);
-		// TODO remove SYSTEM.OUT.PRINTLN
+//		System.out.println(
+//				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
+//				+ ("\tonItemLongPress")
+//				+ ("\tindex:" + index)
+//				+ ("\t_isMapItemHit:" + _isMapItemHit + " -> true")
+//				//
+//				);
+//		// TODO remove SYSTEM.OUT.PRINTLN
+//
+//		_isMapItemHit = true;
+//
+//		return true;
 		
-		_isMapItemHit = true;
-		
-		return true;
+		return false;
 	}
 
 	@Override
 	public boolean onItemSingleTapUp(final int index, final MapMarker item) {
 		
-		System.out.println(
-				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
-				+ ("\tonItemSingleTapUp")//
-				+ ("\tindex:" + index)
-				+ ("\t_isMapItemHit:" + _isMapItemHit + " -> true")
-				//
-				);
-		// TODO remove SYSTEM.OUT.PRINTLN
-		
-		_isMapItemHit = true;
-		
-		return true;
+//		System.out.println(
+//				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
+//				+ ("\tonItemSingleTapUp")//
+//				+ ("\tindex:" + index)
+//				+ ("\t_isMapItemHit:" + _isMapItemHit + " -> true")
+//				//
+//				);
+//		// TODO remove SYSTEM.OUT.PRINTLN
+//
+//		_isMapItemHit = true;
+//
+//		return true;
+		return false;
 	}
 
 	@Override

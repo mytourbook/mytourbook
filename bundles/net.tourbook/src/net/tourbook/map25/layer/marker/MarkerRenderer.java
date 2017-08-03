@@ -6,6 +6,8 @@ package net.tourbook.map25.layer.marker;
 import java.util.Comparator;
 import java.util.HashMap;
 
+import net.tourbook.common.UI;
+
 import org.oscim.backend.canvas.Bitmap;
 import org.oscim.backend.canvas.Color;
 import org.oscim.core.MapPosition;
@@ -58,16 +60,22 @@ public class MarkerRenderer extends BucketRenderer {
 			@Override
 			public int compare(	final ProjectedMarker a,
 								final ProjectedMarker b) {
+
 				if (a.isVisible && b.isVisible) {
+
 					if (a.dy > b.dy) {
 						return -1;
 					}
 					if (a.dy < b.dy) {
 						return 1;
 					}
+
 				} else if (a.isVisible) {
+
 					return -1;
+
 				} else if (b.isVisible) {
+
 					return 1;
 				}
 
@@ -109,7 +117,7 @@ public class MarkerRenderer extends BucketRenderer {
 	 * every (x,y) denotes a grid slot, ie. 64x64dp. For efficiency I use a linear sparsearray with
 	 * ARRindex = SLOTypos * max_x + SLOTxpos"
 	 */
-	private SparseIntArray		_gridMap				= new SparseIntArray(200);		// initial space for 200 markers, that's not a lot of memory, and in most cases will avoid resizing the array
+	private SparseIntArray		_clusterCells			= new SparseIntArray(200);		// initial space for 200 markers, that's not a lot of memory, and in most cases will avoid resizing the array
 
 	private double				_clusterScale;
 
@@ -249,30 +257,32 @@ public class MarkerRenderer extends BucketRenderer {
 		 * the grid slot size in px. increase to group more aggressively. currently set to marker
 		 * size
 		 */
-		final int GRIDSIZE = ScreenUtils.getPixels(_clusterGridSizeDP);
+		final int clusterGridSize = ScreenUtils.getPixels(_clusterGridSizeDP);
 
 		/* the factor to map into Grid Coordinates (discrete squares of GRIDSIZE x GRIDSIZE) */
-		final double factor = (mapScale / GRIDSIZE);
+		final long maxCols = (long) (mapScale / clusterGridSize);
 
-//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tfactor:" + factor));
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
-		final ProjectedMarker[] tmp = new ProjectedMarker[numMarkers];
+		final ProjectedMarker[] allProjectedMarker = new ProjectedMarker[numMarkers];
 
 		// clear grid map to count items that share the same "grid slot"
-		_gridMap.clear();
+		_clusterCells.clear();
 
-//		System.out.println(
-//				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tGRIDSIZE:" + GRIDSIZE));
+		System.out.println(
+				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
+						+ ("\tmapScale:" + String.format("%.0f", mapScale))
+						+ ("\tgrid:" + clusterGridSize)
+						+ ("\t> maxCols:" + maxCols)
+
+		);
 		// TODO remove SYSTEM.OUT.PRINTLN
 
 		for (int markerIndex = 0; markerIndex < numMarkers; markerIndex++) {
 
-			final ProjectedMarker projectedMarker = tmp[markerIndex] = new ProjectedMarker();
+			final ProjectedMarker projectedMarker = allProjectedMarker[markerIndex] = new ProjectedMarker();
 
 			projectedMarker.mapMarker = _markerLayer.getMarker(markerIndex);
 
-			/* pre-project points */
+			// pre-project points
 			MercatorProjection.project(projectedMarker.mapMarker.geoPoint, _tmpPoint);
 			projectedMarker.px = _tmpPoint.x;
 			projectedMarker.py = _tmpPoint.y;
@@ -281,31 +291,27 @@ public class MarkerRenderer extends BucketRenderer {
 			if (_isClustering) {
 
 				// absolute item X position in the grid
-				final int absposx = (int) (projectedMarker.px * factor);
-				final int absposy = (int) (projectedMarker.py * factor); // absolute item Y position
-
-				// Grid number of columns
-				final int maxcols = (int) factor;
+				final int colX = (int) (projectedMarker.px * maxCols);
+				final int colY = (int) (projectedMarker.py * maxCols); // absolute item Y position
 
 				// Index in the sparsearray map
-				final int itemGridIndex = absposx + absposy * maxcols;
+				final int clusterIndex = (int) (colX + colY * maxCols);
 
 				// we store in the linear sparsearray the index of the marker,
 				// ie, index = y * maxcols + x; array[index} = markerIndex
 
 				// Lets check if there's already an item in the grid slot
-				final int storedIndexInGridSlot = _gridMap.get(itemGridIndex, -1);
+				final int storedIndexInGridSlot = _clusterCells.get(clusterIndex, -1);
 
-//				System.out.println(
-//						(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
-//								+ ("\titemGridIndex:" + itemGridIndex)
-//								+ ("\tabsposx:" + absposx)
-//								+ ("\tabsposy:" + absposy)
-//								+ ("\tmaxcols:" + maxcols)
-//								+ ("\tfactor:" + factor)
-////								+ ("\t:" + )
-//
-//				);
+				System.out.println(
+						(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
+								+ ("\tcolX:" + colX)
+								+ ("\tcolY:" + colY)
+//								+ ("\t> clusterIndex:" + clusterIndex)
+
+//								+ ("\t:" + )
+
+				);
 				// TODO remove SYSTEM.OUT.PRINTLN
 
 				if (storedIndexInGridSlot == -1) {
@@ -313,8 +319,7 @@ public class MarkerRenderer extends BucketRenderer {
 					// no item at that grid position. The grid slot is free so let's
 					// store this item "i" (we identify every item by its InternalItem index)
 
-					_gridMap.put(itemGridIndex, markerIndex);
-					//Log.v(TAG, "UNclustered item at " + itemGridIndex);
+					_clusterCells.put(clusterIndex, markerIndex);
 
 				} else {
 
@@ -324,21 +329,36 @@ public class MarkerRenderer extends BucketRenderer {
 					projectedMarker.isClusteredOut = true;
 
 					// and increment the count on its "parent" that will from now on act as a cluster
-					tmp[storedIndexInGridSlot].clusterSize++;
+					final ProjectedMarker projectedCluster = allProjectedMarker[storedIndexInGridSlot];
 
-					//Log.v(TAG, "Clustered item at " + itemGridIndex + ", \'parent\' size " + (tmp[storedIndexInGridSlot].clusterSize));
+					// set cluster position to the center of the grid
+					if (projectedCluster.clusterSize == 1) {
+
+//						cluster = new StaticCluster<T>(proj.toLatLng(new Point(Math.floor(p.x) + .5, Math.floor(p.y) + .5)));
+
+//						_markerLayer.map().viewport().
+						_markerLayer.map().viewport().fromScreenPoint(0, 0, _tmpPoint);
+						final double geoX1 = _tmpPoint.x;
+						final double geoY1 = _tmpPoint.y;
+
+//						projectedCluster.clusterColX=colX/numCols;
+
+					}
+
+					projectedCluster.clusterSize++;
+
 				}
 			}
 		}
 
-//		System.out.println();
-//		// TODO remove SYSTEM.OUT.PRINTLN
+		System.out.println();
+		// TODO remove SYSTEM.OUT.PRINTLN
 
 		/* All ready for update. */
 		synchronized (this) {
 
 			_isForceUpdateMarkers = true;
-			_allProjectedMarker = tmp;
+			_allProjectedMarker = allProjectedMarker;
 		}
 	}
 
@@ -413,8 +433,8 @@ public class MarkerRenderer extends BucketRenderer {
 	@Override
 	public synchronized void update(final GLViewport viewport) {
 
-//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tupdate()"));
-//		// TODO remove SYSTEM.OUT.PRINTLN
+		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tupdate()"));
+		// TODO remove SYSTEM.OUT.PRINTLN
 
 		final MapPosition mapPosition = viewport.pos;
 		final double mapScale = mapPosition.scale;
@@ -596,6 +616,16 @@ public class MarkerRenderer extends BucketRenderer {
 				markerSymbol.offset = symbol.getHotspot();
 				markerSymbol.billboard = symbol.isBillboard();
 			}
+
+			System.out.println(
+					(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+
+							+ (String.format("\tx:%10.3f\ty:%10.3f", projectedMarker.x, projectedMarker.y))
+
+//							+ ("\t")
+
+			);
+			// TODO remove SYSTEM.OUT.PRINTLN
 
 			_symbolBucket.pushSymbol(markerSymbol);
 		}
