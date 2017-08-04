@@ -43,15 +43,15 @@ public class MarkerSymbol {
 	 * should be made.
 	 */
 	public enum HotspotPlace {
-		
+
 		NONE, //
 		CENTER, //
-		
+
 		BOTTOM_CENTER, //
 		TOP_CENTER, //
 		RIGHT_CENTER, //
 		LEFT_CENTER, //
-		
+
 		UPPER_RIGHT_CORNER, //
 		LOWER_RIGHT_CORNER, //
 		UPPER_LEFT_CORNER, //
@@ -63,7 +63,7 @@ public class MarkerSymbol {
 	}
 
 	public MarkerSymbol(final Bitmap bitmap, final float relX, final float relY, final boolean billboard) {
-		
+
 		mBitmap = bitmap;
 		mOffset = new PointF(relX, relY);
 		mBillboard = billboard;
@@ -123,8 +123,11 @@ public class MarkerSymbol {
 		this(textureRegion, relX, relY, true);
 	}
 
-	public MarkerSymbol(final TextureRegion textureRegion, final float relX, final float relY, final boolean billboard) {
-		
+	public MarkerSymbol(final TextureRegion textureRegion,
+						final float relX,
+						final float relY,
+						final boolean billboard) {
+
 		mBitmap = null;
 		mTextureRegion = textureRegion;
 		mOffset = new PointF(relX, relY);
@@ -136,7 +139,7 @@ public class MarkerSymbol {
 	}
 
 	public MarkerSymbol(final TextureRegion textureRegion, final HotspotPlace hotspot, final boolean billboard) {
-		
+
 		mBitmap = null;
 		mTextureRegion = textureRegion;
 
@@ -206,7 +209,7 @@ public class MarkerSymbol {
 	}
 
 	public boolean isInside(final float dx, final float dy) {
-		
+
 		/* TODO handle no-billboard */
 		int w, h;
 		if (isBitmap()) {
@@ -224,5 +227,19 @@ public class MarkerSymbol {
 
 	public void setRotation(final float rotation) {
 		this.rotation = rotation;
+	}
+
+	@Override
+	public String toString() {
+
+		return "MarkerSymbol ["
+
+//				+ "mBitmap=" + mBitmap + ", "
+//				+ "mTextureRegion=" + mTextureRegion + ", "
+				+ "mOffset=" + mOffset + ", "
+				+ "mBillboard=" + mBillboard + ", "
+				+ "rotation=" + rotation
+
+				+ "]";
 	}
 }

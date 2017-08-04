@@ -629,7 +629,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 	private void updateUI_MarkerLayer() {
 
 		final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
-		final boolean isBillboard = config.clusterOrientation == Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
+		final boolean isClusterBillboard = config.clusterOrientation == Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
 
 		final MarkerRenderer markerRenderer = (MarkerRenderer) _layer_Marker.getRenderer();
 
@@ -637,7 +637,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 				config.clusterSymbolSize,
 				ColorUtil.getARGB(config.clusterOutline_Color, config.clusterOutline_Opacity),
 				ColorUtil.getARGB(config.clusterFill_Color, config.clusterFill_Opacity),
-				isBillboard);
+				isClusterBillboard);
 
 		markerRenderer.setDefaultMarker(createMarkerSymbol());
 		markerRenderer.setClusteringEnabled(config.isMarkerClustered, config.clusterGridSize);

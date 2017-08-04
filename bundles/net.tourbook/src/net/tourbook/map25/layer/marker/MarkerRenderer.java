@@ -250,9 +250,6 @@ public class MarkerRenderer extends BucketRenderer {
 	 */
 	private void repopulateCluster(final int numMarkers, final double mapScale) {
 
-//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\trepopulateCluster()"));
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
 		/*
 		 * the grid slot size in px. increase to group more aggressively. currently set to marker
 		 * size
@@ -267,15 +264,6 @@ public class MarkerRenderer extends BucketRenderer {
 		// clear grid map to count items that share the same "grid slot"
 		_clusterCells.clear();
 
-		System.out.println(
-				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
-						+ ("\tmapScale:" + String.format("%.0f", mapScale))
-						+ ("\tgrid:" + clusterGridSize)
-						+ ("\t> maxCols:" + maxCols)
-
-		);
-		// TODO remove SYSTEM.OUT.PRINTLN
-
 		for (int markerIndex = 0; markerIndex < numMarkers; markerIndex++) {
 
 			final ProjectedMarker projectedMarker = allProjectedMarker[markerIndex] = new ProjectedMarker();
@@ -284,15 +272,15 @@ public class MarkerRenderer extends BucketRenderer {
 
 			// pre-project points
 			MercatorProjection.project(projectedMarker.mapMarker.geoPoint, _tmpPoint);
-			projectedMarker.px = _tmpPoint.x;
-			projectedMarker.py = _tmpPoint.y;
+			projectedMarker.projectedX = _tmpPoint.x;
+			projectedMarker.projectedY = _tmpPoint.y;
 
 			// items can be declared non-clusterable
 			if (_isClustering) {
 
 				// absolute item X position in the grid
-				final int colX = (int) (projectedMarker.px * maxCols);
-				final int colY = (int) (projectedMarker.py * maxCols); // absolute item Y position
+				final int colX = (int) (projectedMarker.projectedX * maxCols);
+				final int colY = (int) (projectedMarker.projectedY * maxCols); // absolute item Y position
 
 				// Index in the sparsearray map
 				final int clusterIndex = (int) (colX + colY * maxCols);
@@ -302,17 +290,6 @@ public class MarkerRenderer extends BucketRenderer {
 
 				// Lets check if there's already an item in the grid slot
 				final int storedIndexInGridSlot = _clusterCells.get(clusterIndex, -1);
-
-				System.out.println(
-						(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
-								+ ("\tcolX:" + colX)
-								+ ("\tcolY:" + colY)
-//								+ ("\t> clusterIndex:" + clusterIndex)
-
-//								+ ("\t:" + )
-
-				);
-				// TODO remove SYSTEM.OUT.PRINTLN
 
 				if (storedIndexInGridSlot == -1) {
 
@@ -332,17 +309,18 @@ public class MarkerRenderer extends BucketRenderer {
 					final ProjectedMarker projectedCluster = allProjectedMarker[storedIndexInGridSlot];
 
 					// set cluster position to the center of the grid
-					if (projectedCluster.clusterSize == 1) {
+					if (projectedCluster.clusterSize == 0) {
 
-//						cluster = new StaticCluster<T>(proj.toLatLng(new Point(Math.floor(p.x) + .5, Math.floor(p.y) + .5)));
+						final double projectedColX1 = (double) colX / maxCols;
+						final double projectedColX2 = (double) (colX + 1) / maxCols;
+						final double projectedColXhalf = (projectedColX1 - projectedColX2) / 2;
 
-//						_markerLayer.map().viewport().
-						_markerLayer.map().viewport().fromScreenPoint(0, 0, _tmpPoint);
-						final double geoX1 = _tmpPoint.x;
-						final double geoY1 = _tmpPoint.y;
+						final double projectedColY1 = (double) colY / maxCols;
+						final double projectedColY2 = (double) (colY + 1) / maxCols;
+						final double projectedColYhalf = (projectedColY1 - projectedColY2) / 2;
 
-//						projectedCluster.clusterColX=colX/numCols;
-
+						projectedCluster.projectedClusterX = projectedColX2 + projectedColXhalf;
+						projectedCluster.projectedClusterY = projectedColY2 + projectedColYhalf;
 					}
 
 					projectedCluster.clusterSize++;
@@ -433,14 +411,14 @@ public class MarkerRenderer extends BucketRenderer {
 	@Override
 	public synchronized void update(final GLViewport viewport) {
 
-		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tupdate()"));
-		// TODO remove SYSTEM.OUT.PRINTLN
+//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tupdate()"));
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		final MapPosition mapPosition = viewport.pos;
 		final double mapScale = mapPosition.scale;
 		final float mapRotation = mapPosition.bearing;
 
-		final double clusterScale = Tile.SIZE * mapScale;
+		final double tileScale = Tile.SIZE * mapScale;
 
 		/*
 		 * Clustering check: If clustering is enabled and there's been a significant scale change
@@ -448,18 +426,18 @@ public class MarkerRenderer extends BucketRenderer {
 		 */
 
 		// (int) log of scale gives us adequate steps to trigger clustering
-		final int scaleSaved = FastMath.log2((int) clusterScale);
+		final int scaleSaved = FastMath.log2((int) tileScale);
 
 		if (scaleSaved != _scaleSaved) {
 
 			_scaleSaved = scaleSaved;
-			_clusterScale = clusterScale;
+			_clusterScale = tileScale;
 
 			// post repopulation to the main thread
 			_markerLayer.map().post(new Runnable() {
 				@Override
 				public void run() {
-					repopulateCluster(_allProjectedMarker.length, clusterScale);
+					repopulateCluster(_allProjectedMarker.length, tileScale);
 				}
 			});
 
@@ -473,8 +451,8 @@ public class MarkerRenderer extends BucketRenderer {
 
 		_isForceUpdateMarkers = false;
 
-		final double mx = mapPosition.x;
-		final double my = mapPosition.y;
+		final double mapProjectedX = mapPosition.x;
+		final double mapProjectedY = mapPosition.y;
 
 		//int changesInvisible = 0;
 		//int changedVisible = 0;
@@ -482,7 +460,7 @@ public class MarkerRenderer extends BucketRenderer {
 
 		_markerLayer.map().viewport().getMapExtents(_tmpBox, _extents);
 
-		final long flip = (long) (Tile.SIZE * mapScale) >> 1;
+		final long flip = (long) (tileScale) >> 1;
 
 		if (_allProjectedMarker == null) {
 
@@ -503,13 +481,24 @@ public class MarkerRenderer extends BucketRenderer {
 
 			projectedMarker.isModified = false;
 
-			projectedMarker.x = (float) ((projectedMarker.px - mx) * clusterScale);
-			projectedMarker.y = (float) ((projectedMarker.py - my) * clusterScale);
+			projectedMarker.x = (float) ((projectedMarker.projectedX - mapProjectedX) * tileScale);
+			projectedMarker.y = (float) ((projectedMarker.projectedY - mapProjectedY) * tileScale);
+
+			final long flip2 = flip << 1;
 
 			if (projectedMarker.x > flip) {
-				projectedMarker.x -= (flip << 1);
+
+				projectedMarker.x -= flip2;
+
+				System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\t> flip"));
+				// TODO remove SYSTEM.OUT.PRINTLN
+
 			} else if (projectedMarker.x < -flip) {
-				projectedMarker.x += (flip << 1);
+
+				projectedMarker.x += flip2;
+
+				System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\t< -flip"));
+				// TODO remove SYSTEM.OUT.PRINTLN
 			}
 
 			if (projectedMarker.isClusteredOut || !GeometryUtils.pointInPoly(
@@ -584,7 +573,10 @@ public class MarkerRenderer extends BucketRenderer {
 				continue;
 			}
 
-			final SymbolItem markerSymbol = SymbolItem.pool.get();
+			final SymbolItem mapSymbol = SymbolItem.pool.get();
+
+			float projClusterX = 0;
+			float projClusterY = 0;
 
 			if (projectedMarker.clusterSize > 0) {
 
@@ -593,41 +585,59 @@ public class MarkerRenderer extends BucketRenderer {
 
 				final Bitmap bitmap = getClusterBitmap(projectedMarker.clusterSize + 1);
 
-				markerSymbol.set(projectedMarker.x, projectedMarker.y, bitmap, true);
-				markerSymbol.offset = new PointF(0.5f, 0.5f);
-				markerSymbol.billboard = _isBillboard;
+//				switch (key) {
+//				case value:
+//
+//					break;
+//
+//				default:
+//					break;
+//				}
+
+				projClusterX = (float) ((projectedMarker.projectedClusterX - mapProjectedX) * tileScale);
+				projClusterY = (float) ((projectedMarker.projectedClusterY - mapProjectedY) * tileScale);
+
+				mapSymbol.set(projClusterX, projClusterY, bitmap, true);
+//				markerSymbol.set(projectedMarker.x, projectedMarker.y, bitmap, true);
+
+				mapSymbol.offset = new PointF(0.5f, 0.5f);
+				mapSymbol.billboard = _isBillboard;
 
 				if (!_isBillboard) {
 // CLUSTERING IS VERY BUGGY WHEN ROTATION IS SET
-//					markerSymbol.rotation = -mapRotation;
+//					mapSymbol.rotation = -mapRotation;
 				}
 
 			} else {
 
 				// normal item, use its marker
 
-				MarkerSymbol symbol = projectedMarker.mapMarker.markerSymbol;
+				MarkerSymbol markerSymbol = projectedMarker.mapMarker.markerSymbol;
 
-				if (symbol == null) {
-					symbol = defaultMarkerSymbol;
+				if (markerSymbol == null) {
+					markerSymbol = defaultMarkerSymbol;
 				}
 
-				markerSymbol.set(projectedMarker.x, projectedMarker.y, symbol.getBitmap(), true);
-				markerSymbol.offset = symbol.getHotspot();
-				markerSymbol.billboard = symbol.isBillboard();
+				mapSymbol.set(projectedMarker.x, projectedMarker.y, markerSymbol.getBitmap(), markerSymbol.mBillboard);
+				mapSymbol.offset = markerSymbol.getHotspot();
+				mapSymbol.billboard = markerSymbol.isBillboard();
 			}
 
-			System.out.println(
-					(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//			System.out.println(
+//					(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//
+//							+ (String.format("\tx:%10.3f\ty:%10.3f", projectedMarker.x, projectedMarker.y))
+//							+ (String.format(
+//									"\tx:%10.3f\ty:%10.3f",
+//									projClusterX,
+//									projClusterY))
+//
+////							+ ("\t")
+//
+//			);
+//			// TODO remove SYSTEM.OUT.PRINTLN
 
-							+ (String.format("\tx:%10.3f\ty:%10.3f", projectedMarker.x, projectedMarker.y))
-
-//							+ ("\t")
-
-			);
-			// TODO remove SYSTEM.OUT.PRINTLN
-
-			_symbolBucket.pushSymbol(markerSymbol);
+			_symbolBucket.pushSymbol(mapSymbol);
 		}
 
 		buckets.set(_symbolBucket);

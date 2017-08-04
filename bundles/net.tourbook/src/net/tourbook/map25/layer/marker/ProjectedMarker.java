@@ -16,8 +16,15 @@ class ProjectedMarker {
 	float		x;
 	float		y;
 
-	double		px;
-	double		py;
+	/**
+	 * Projected X position 0...1
+	 */
+	double		projectedX;
+
+	/**
+	 * Projected Y position 0...1
+	 */
+	double		projectedY;
 
 	float		dy;
 
@@ -31,6 +38,9 @@ class ProjectedMarker {
 	 * If this is >0, this item will be displayed as a cluster circle, with size clusterSize+1.
 	 */
 	int			clusterSize;
+
+	double		projectedClusterX;
+	double		projectedClusterY;
 
 	@Override
 	public String toString() {
