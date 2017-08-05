@@ -107,11 +107,11 @@ public class MarkerLayer extends Layer implements GestureListener {
 		boolean onSnapToItem(int x, int y, Point snapPoint);
 	}
 
-	public MarkerLayer(final Map map, final MarkerSymbol defaultSymbol, final OnItemGestureListener listener) {
+	public MarkerLayer(final Map map, final OnItemGestureListener listener) {
 
 		super(map);
 
-		mRenderer = _markerRenderer = new MarkerRenderer(this, defaultSymbol);
+		mRenderer = _markerRenderer = new MarkerRenderer(this);
 
 		_gestureListener = listener;
 
@@ -213,10 +213,6 @@ public class MarkerLayer extends Layer implements GestureListener {
 		return result;
 	}
 
-	protected MapMarker getMarker(final int index) {
-		return _allMarker.get(index);
-	}
-
 	/**
 	 * @return the currently-focused item, or null if no item is currently focused.
 	 */
@@ -227,6 +223,10 @@ public class MarkerLayer extends Layer implements GestureListener {
 
 	public List<MapMarker> getItemList() {
 		return _allMarker;
+	}
+
+	protected MapMarker getMarker(final int index) {
+		return _allMarker.get(index);
 	}
 
 	@Override

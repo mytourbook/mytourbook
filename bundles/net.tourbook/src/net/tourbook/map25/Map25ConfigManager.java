@@ -27,6 +27,7 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.widgets.ComboEntry;
+import net.tourbook.map25.layer.marker.ClusterAlgorithm;
 import net.tourbook.map25.layer.marker.MarkerConfig;
 import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
 
@@ -40,109 +41,121 @@ import org.osgi.framework.Version;
 
 public class Map25ConfigManager {
 
-	public static final int				SYMBOL_ORIENTATION_BILLBOARD	= 0;
-	public static final int				SYMBOL_ORIENTATION_GROUND		= 1;
+// SET_FORMATTING_OFF
 
-	public static final ComboEntry[]	SYMBOL_ORIENTATION				= {
-			new ComboEntry(Messages.Map25_Symbol_Orientation_Billboard, SYMBOL_ORIENTATION_BILLBOARD),
-			new ComboEntry(Messages.Map25_Symbol_Orientation_Ground, SYMBOL_ORIENTATION_GROUND),
+	public static final int						SYMBOL_ORIENTATION_BILLBOARD	= 0;
+	public static final int						SYMBOL_ORIENTATION_GROUND		= 1;
+	
+	public static final ComboEntry[]			SYMBOL_ORIENTATION				= {
+			
+		new ComboEntry(Messages.Map25_Config_SymbolOrientation_Billboard,	SYMBOL_ORIENTATION_BILLBOARD),
+		new ComboEntry(Messages.Map25_Config_SymbolOrientation_Ground,		SYMBOL_ORIENTATION_GROUND),
 	};
 
-// SET_FORMATTING_OFF
+	public static final ClusterAlgorithmItem[]	ALL_CLUSTER_ALGORITHM			= {
+			
+		new ClusterAlgorithmItem(Messages.Map25_Config_ClusterAlgorithm_FirstMarker,	ClusterAlgorithm.FirstMarker),
+		new ClusterAlgorithmItem(Messages.Map25_Config_ClusterAlgorithm_Grid,			ClusterAlgorithm.Grid),
+		new ClusterAlgorithmItem(Messages.Map25_Config_ClusterAlgorithm_Distance,		ClusterAlgorithm.Distance),
+	};
+
 // SET_FORMATTING_ON
 
-	public static final String			CONFIG_DEFAULT_ID_1				= "#1";										//$NON-NLS-1$
-	static final String					CONFIG_DEFAULT_ID_2				= "#2";										//$NON-NLS-1$
-	static final String					CONFIG_DEFAULT_ID_3				= "#3";										//$NON-NLS-1$
-	static final String					CONFIG_DEFAULT_ID_4				= "#4";										//$NON-NLS-1$
-	static final String					CONFIG_DEFAULT_ID_5				= "#5";										//$NON-NLS-1$
-	static final String					CONFIG_DEFAULT_ID_6				= "#6";										//$NON-NLS-1$
-	static final String					CONFIG_DEFAULT_ID_7				= "#7";										//$NON-NLS-1$
-	static final String					CONFIG_DEFAULT_ID_8				= "#8";										//$NON-NLS-1$
-	static final String					CONFIG_DEFAULT_ID_9				= "#9";										//$NON-NLS-1$
-	static final String					CONFIG_DEFAULT_ID_10			= "#10";									//$NON-NLS-1$
+	public static final String					CONFIG_DEFAULT_ID_1				= "#1";									//$NON-NLS-1$
+	static final String							CONFIG_DEFAULT_ID_2				= "#2";									//$NON-NLS-1$
+	static final String							CONFIG_DEFAULT_ID_3				= "#3";									//$NON-NLS-1$
+	static final String							CONFIG_DEFAULT_ID_4				= "#4";									//$NON-NLS-1$
+	static final String							CONFIG_DEFAULT_ID_5				= "#5";									//$NON-NLS-1$
+	static final String							CONFIG_DEFAULT_ID_6				= "#6";									//$NON-NLS-1$
+	static final String							CONFIG_DEFAULT_ID_7				= "#7";									//$NON-NLS-1$
+	static final String							CONFIG_DEFAULT_ID_8				= "#8";									//$NON-NLS-1$
+	static final String							CONFIG_DEFAULT_ID_9				= "#9";									//$NON-NLS-1$
+	static final String							CONFIG_DEFAULT_ID_10			= "#10";								//$NON-NLS-1$
 
-	private static final Bundle			_bundle							= TourbookPlugin.getDefault().getBundle();
-	private static final IPath			_stateLocation					= Platform.getStateLocation(_bundle);
-	private static final String			CONFIG_FILE_NAME				= "map25-config.xml";						//$NON-NLS-1$
-
+	private static final Bundle					_bundle							= TourbookPlugin
+			.getDefault()
+			.getBundle();
+	private static final IPath					_stateLocation					= Platform.getStateLocation(_bundle);
+	private static final String					CONFIG_FILE_NAME				= "map25-config.xml";					//$NON-NLS-1$
+	//
 	/**
 	 * Version number is not yet used.
 	 */
-	private static final int			CONFIG_VERSION					= 1;
-
+	private static final int					CONFIG_VERSION					= 1;
+	//
 	// common attributes
-	private static final String			ATTR_ACTIVE_CONFIG_ID			= "activeConfigId";							//$NON-NLS-1$
-	private static final String			ATTR_ID							= "id";										//$NON-NLS-1$
-	private static final String			ATTR_CONFIG_NAME				= "name";									//$NON-NLS-1$
+	private static final String					ATTR_ACTIVE_CONFIG_ID			= "activeConfigId";						//$NON-NLS-1$
+	private static final String					ATTR_ID							= "id";									//$NON-NLS-1$
+	private static final String					ATTR_CONFIG_NAME				= "name";								//$NON-NLS-1$
 	//
 	/*
 	 * Root
 	 */
-	private static final String			TAG_ROOT						= "Map25Configuration";						//$NON-NLS-1$
-	private static final String			ATTR_CONFIG_VERSION				= "configVersion";							//$NON-NLS-1$
+	private static final String					TAG_ROOT						= "Map25Configuration";					//$NON-NLS-1$
+	private static final String					ATTR_CONFIG_VERSION				= "configVersion";						//$NON-NLS-1$
 	//
 	/*
 	 * Tour tracks
 	 */
-	private static final String			TAG_TOUR_TRACKS					= "TourTracks";								//$NON-NLS-1$
-	private static final String			TAG_TRACK						= "Track";									//$NON-NLS-1$
-	private static final String			ATTR_ANIMATION_TIME				= "animationTime";							//$NON-NLS-1$
+	private static final String					TAG_TOUR_TRACKS					= "TourTracks";							//$NON-NLS-1$
+	private static final String					TAG_TRACK						= "Track";								//$NON-NLS-1$
+	private static final String					ATTR_ANIMATION_TIME				= "animationTime";						//$NON-NLS-1$
 	//
 	// outline
-	private static final String			TAG_OUTLINE						= "Outline";								//$NON-NLS-1$
-	private static final String			ATTR_OUTLINE_WIDTH				= "width";									//$NON-NLS-1$
+	private static final String					TAG_OUTLINE						= "Outline";							//$NON-NLS-1$
+	private static final String					ATTR_OUTLINE_WIDTH				= "width";								//$NON-NLS-1$
 	//
-	public static final float			OUTLINE_WIDTH_MIN				= 1.0f;
-	public static final float			OUTLINE_WIDTH_MAX				= 10.0f;
-	public static final float			DEFAULT_OUTLINE_WIDTH			= 2.5f;
-	public static final RGB				DEFAULT_OUTLINE_COLOR			= new RGB(0x80, 0x0, 0x80);
+	public static final float					OUTLINE_WIDTH_MIN				= 0.1f;
+	public static final float					OUTLINE_WIDTH_MAX				= 10.0f;
+	public static final float					DEFAULT_OUTLINE_WIDTH			= 2.5f;
+	public static final RGB						DEFAULT_OUTLINE_COLOR			= new RGB(0x80, 0x0, 0x80);
 	//
 	// other properties
-	public static final int				DEFAULT_ANIMATION_TIME			= 2000;
-
+	public static final int						DEFAULT_ANIMATION_TIME			= 2000;
+	//
 	/*
 	 * Tour Markers
 	 */
-	private static final String			TAG_TOUR_MARKERS				= "TourMarkers";							//$NON-NLS-1$
-	private static final String			TAG_MARKER						= "Marker";									//$NON-NLS-1$
+	private static final String					TAG_TOUR_MARKERS				= "TourMarkers";						//$NON-NLS-1$
+	private static final String					TAG_MARKER						= "Marker";								//$NON-NLS-1$
 	//
 	// marker
-	private static final String			TAG_MARKER_FILL_COLOR			= "MarkerFillColor";						//$NON-NLS-1$
-	private static final String			TAG_MARKER_OUTLINE_COLOR		= "MarkerOutlineColor";						//$NON-NLS-1$
-	private static final String			ATTR_IS_SHOW_MARKER_LABEL		= "isShowMarkerLabel";						//$NON-NLS-1$
-	private static final String			ATTR_IS_SHOW_MARKER_POINT		= "isShowMarkerPoint";						//$NON-NLS-1$
-	private static final String			ATTR_MARKER_ORIENTATION			= "markerOrientation";						//$NON-NLS-1$
-	private static final String			ATTR_MARKER_SYMBOL_SIZE			= "markerSymbolSize";						//$NON-NLS-1$
+	private static final String					TAG_MARKER_FILL_COLOR			= "MarkerFillColor";					//$NON-NLS-1$
+	private static final String					TAG_MARKER_OUTLINE_COLOR		= "MarkerOutlineColor";					//$NON-NLS-1$
+	private static final String					ATTR_IS_SHOW_MARKER_LABEL		= "isShowMarkerLabel";					//$NON-NLS-1$
+	private static final String					ATTR_IS_SHOW_MARKER_POINT		= "isShowMarkerPoint";					//$NON-NLS-1$
+	private static final String					ATTR_MARKER_ORIENTATION			= "markerOrientation";					//$NON-NLS-1$
+	private static final String					ATTR_MARKER_SYMBOL_SIZE			= "markerSymbolSize";					//$NON-NLS-1$
 	//
 	// cluster
-	private static final String			TAG_CLUSTER_FILL_COLOR			= "ClusterFillColor";						//$NON-NLS-1$
-	private static final String			TAG_CLUSTER_OUTLINE_COLOR		= "ClusterOutlineColor";					//$NON-NLS-1$
-	private static final String			ATTR_CLUSTER_GRID_SIZE			= "clusterGridSize";						//$NON-NLS-1$
-	private static final String			ATTR_CLUSTER_ORIENTATION		= "clusterOrientation";						//$NON-NLS-1$
-	private static final String			ATTR_CLUSTER_SYMBOL_SIZE		= "clusterSymbolSize";						//$NON-NLS-1$
-	private static final String			ATTR_IS_MARKER_CLUSTERED		= "isMarkerClustered";						//$NON-NLS-1$
+	private static final String					TAG_CLUSTER_FILL_COLOR			= "ClusterFillColor";					//$NON-NLS-1$
+	private static final String					TAG_CLUSTER_OUTLINE_COLOR		= "ClusterOutlineColor";				//$NON-NLS-1$
+	private static final String					ATTR_CLUSTER_ALGORITHM			= "clusterAlgorithm";					//$NON-NLS-1$
+	private static final String					ATTR_CLUSTER_GRID_SIZE			= "clusterGridSize";					//$NON-NLS-1$
+	private static final String					ATTR_CLUSTER_ORIENTATION		= "clusterOrientation";					//$NON-NLS-1$
+	private static final String					ATTR_CLUSTER_SYMBOL_SIZE		= "clusterSymbolSize";					//$NON-NLS-1$
+	private static final String					ATTR_IS_MARKER_CLUSTERED		= "isMarkerClustered";					//$NON-NLS-1$
 	//
 	// symbol
-	public static final int				DEFAULT_MARKER_SYMBOL_SIZE		= 20;
-	public static final int				MARKER_SYMBOL_SIZE_MIN			= 10;
-	public static final int				MARKER_SYMBOL_SIZE_MAX			= 200;
-
+	public static final int						DEFAULT_MARKER_SYMBOL_SIZE		= 20;
+	public static final int						MARKER_SYMBOL_SIZE_MIN			= 10;
+	public static final int						MARKER_SYMBOL_SIZE_MAX			= 200;
+	//
 	// CLUSTER
-	public static final int				DEFAULT_CLUSTER_GRID_SIZE		= 60;
-	public static final int				DEFAULT_CLUSTER_SYMBOL_SIZE		= 60;
-	public static final int				CLUSTER_GRID_MIN_SIZE			= 20;
-	public static final int				CLUSTER_GRID_MAX_SIZE			= 10000;
-	public static final int				CLUSTER_SYMBOL_SIZE_MIN			= 20;
-	public static final int				CLUSTER_SYMBOL_SIZE_MAX			= 200;
+	public static final int						DEFAULT_CLUSTER_GRID_SIZE		= 60;
+	public static final int						DEFAULT_CLUSTER_SYMBOL_SIZE		= 40;
+	public static final int						CLUSTER_GRID_MIN_SIZE			= 1;
+	public static final int						CLUSTER_GRID_MAX_SIZE			= 10000;
+	public static final int						CLUSTER_SYMBOL_SIZE_MIN			= 20;
+	public static final int						CLUSTER_SYMBOL_SIZE_MAX			= 200;
 	//
 	// colors
-	public static final int				DEFAULT_CLUSTER_OPACITY			= 0xe0;
-	public static final RGB				DEFAULT_CLUSTER_OUTLINE_COLOR	= new RGB(0xff, 0xff, 0xff);
-	public static final RGB				DEFAULT_CLUSTER_FILL_COLOR		= new RGB(0xFC, 0x67, 0x00);
-	public static final int				DEFAULT_MARKER_OPACITY			= 0xe0;
-	public static final RGB				DEFAULT_MARKER_OUTLINE_COLOR	= new RGB(0, 0, 0);
-	public static final RGB				DEFAULT_MARKER_FILL_COLOR		= new RGB(0xFF, 0xFF, 0x00);
+	public static final int						DEFAULT_CLUSTER_OPACITY			= 0xe0;
+	public static final RGB						DEFAULT_CLUSTER_OUTLINE_COLOR	= new RGB(0xff, 0xff, 0xff);
+	public static final RGB						DEFAULT_CLUSTER_FILL_COLOR		= new RGB(0xFC, 0x67, 0x00);
+	public static final int						DEFAULT_MARKER_OPACITY			= 0xe0;
+	public static final RGB						DEFAULT_MARKER_OUTLINE_COLOR	= new RGB(0, 0, 0);
+	public static final RGB						DEFAULT_MARKER_FILL_COLOR		= new RGB(0xFF, 0xFF, 0x00);
 	//
 	// !!! this is a code formatting separator !!!
 	static {}
@@ -152,8 +165,8 @@ public class Map25ConfigManager {
 	 */
 	private static final ArrayList<Map25TrackConfig>	_allTrackConfigs	= new ArrayList<>();
 	private static Map25TrackConfig						_activeTrackConfig;
-	private static final ArrayList<MarkerConfig>	_allMarkerConfigs	= new ArrayList<>();
-	private static MarkerConfig					_activeMarkerConfig;
+	private static final ArrayList<MarkerConfig>		_allMarkerConfigs	= new ArrayList<>();
+	private static MarkerConfig							_activeMarkerConfig;
 	//
 	private static String								_fromXml_ActiveMarkerConfigId;
 	private static String								_fromXml_ActiveTrackConfigId;
@@ -362,6 +375,7 @@ public class Map25ConfigManager {
 			xmlConfig.putBoolean(ATTR_IS_SHOW_MARKER_POINT, config.isShowMarkerPoint);
 			xmlConfig.putInteger(ATTR_MARKER_SYMBOL_SIZE, config.markerSymbolSize);
 			xmlConfig.putInteger(ATTR_MARKER_ORIENTATION, config.markerOrientation);
+
 			Util.setXmlRgb(xmlConfig, TAG_MARKER_OUTLINE_COLOR, config.markerOutline_Color);
 			Util.setXmlRgb(xmlConfig, TAG_MARKER_FILL_COLOR, config.markerFill_Color);
 
@@ -370,6 +384,9 @@ public class Map25ConfigManager {
 			xmlConfig.putInteger(ATTR_CLUSTER_SYMBOL_SIZE, config.clusterSymbolSize);
 			xmlConfig.putInteger(ATTR_CLUSTER_ORIENTATION, config.clusterOrientation);
 			xmlConfig.putBoolean(ATTR_IS_MARKER_CLUSTERED, config.isMarkerClustered);
+
+			Util.setXmlEnum(xmlConfig, ATTR_CLUSTER_ALGORITHM, config.clusterAlgorithm);
+
 			Util.setXmlRgb(xmlConfig, TAG_CLUSTER_OUTLINE_COLOR, config.clusterOutline_Color);
 			Util.setXmlRgb(xmlConfig, TAG_CLUSTER_FILL_COLOR, config.clusterFill_Color);
 		}
@@ -671,15 +688,16 @@ public class Map25ConfigManager {
 		config.id		= Util.getXmlString(xmlConfig, ATTR_ID, Long.toString(System.nanoTime()));
 		config.name		= Util.getXmlString(xmlConfig, ATTR_CONFIG_NAME, UI.EMPTY_STRING);
 
-		config.clusterGridSize		= Util.getXmlInteger(xmlConfig, ATTR_CLUSTER_GRID_SIZE, DEFAULT_CLUSTER_GRID_SIZE, CLUSTER_GRID_MIN_SIZE, CLUSTER_GRID_MAX_SIZE);
-		config.clusterOrientation	= Util.getXmlInteger(xmlConfig, ATTR_CLUSTER_ORIENTATION, Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD);
-		config.clusterSymbolSize	= Util.getXmlInteger(xmlConfig, ATTR_CLUSTER_SYMBOL_SIZE, DEFAULT_CLUSTER_SYMBOL_SIZE, CLUSTER_SYMBOL_SIZE_MIN, CLUSTER_SYMBOL_SIZE_MAX);
-		config.isMarkerClustered	= Util.getXmlBoolean(xmlConfig, ATTR_IS_MARKER_CLUSTERED, true);
+		config.clusterAlgorithm		= Util.getXmlEnum(xmlConfig,	ATTR_CLUSTER_ALGORITHM,		ClusterAlgorithm.FirstMarker);
+		config.clusterGridSize		= Util.getXmlInteger(xmlConfig, ATTR_CLUSTER_GRID_SIZE,		DEFAULT_CLUSTER_GRID_SIZE, CLUSTER_GRID_MIN_SIZE, CLUSTER_GRID_MAX_SIZE);
+		config.clusterOrientation	= Util.getXmlInteger(xmlConfig, ATTR_CLUSTER_ORIENTATION,	Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD);
+		config.clusterSymbolSize	= Util.getXmlInteger(xmlConfig, ATTR_CLUSTER_SYMBOL_SIZE,	DEFAULT_CLUSTER_SYMBOL_SIZE, CLUSTER_SYMBOL_SIZE_MIN, CLUSTER_SYMBOL_SIZE_MAX);
+		config.isMarkerClustered	= Util.getXmlBoolean(xmlConfig, ATTR_IS_MARKER_CLUSTERED,	true);
 		
-		config.isShowMarkerLabel	= Util.getXmlBoolean(xmlConfig, ATTR_IS_SHOW_MARKER_LABEL, true);
-		config.isShowMarkerPoint	= Util.getXmlBoolean(xmlConfig, ATTR_IS_SHOW_MARKER_POINT, true);
-		config.markerOrientation	= Util.getXmlInteger(xmlConfig, ATTR_MARKER_ORIENTATION, Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD);
-		config.markerSymbolSize		= Util.getXmlInteger(xmlConfig, ATTR_MARKER_SYMBOL_SIZE, DEFAULT_MARKER_SYMBOL_SIZE, MARKER_SYMBOL_SIZE_MIN, MARKER_SYMBOL_SIZE_MAX);
+		config.isShowMarkerLabel	= Util.getXmlBoolean(xmlConfig, ATTR_IS_SHOW_MARKER_LABEL,	true);
+		config.isShowMarkerPoint	= Util.getXmlBoolean(xmlConfig, ATTR_IS_SHOW_MARKER_POINT,	true);
+		config.markerOrientation	= Util.getXmlInteger(xmlConfig, ATTR_MARKER_ORIENTATION,	Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD);
+		config.markerSymbolSize		= Util.getXmlInteger(xmlConfig, ATTR_MARKER_SYMBOL_SIZE,	DEFAULT_MARKER_SYMBOL_SIZE, MARKER_SYMBOL_SIZE_MIN, MARKER_SYMBOL_SIZE_MAX);
 
 // SET_FORMATTING_ON
 

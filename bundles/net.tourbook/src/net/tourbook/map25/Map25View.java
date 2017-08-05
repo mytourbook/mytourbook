@@ -50,7 +50,7 @@ import net.tourbook.map25.layer.marker.MapMarker;
 import net.tourbook.map25.layer.marker.MarkerLayer;
 import net.tourbook.map25.layer.tourtrack.TourLayer;
 import net.tourbook.map25.ui.SlideoutMap25_Options;
-import net.tourbook.map25.ui.SlideoutMap25_TrackConfig;
+import net.tourbook.map25.ui.SlideoutMap25_TrackOptions;
 import net.tourbook.photo.PhotoSelection;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
@@ -178,7 +178,7 @@ public class Map25View extends ViewPart {
 		@Override
 		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
-			return new SlideoutMap25_TrackConfig(_parent, toolbar, Map25View.this);
+			return new SlideoutMap25_TrackOptions(_parent, toolbar, Map25View.this);
 		}
 
 		@Override

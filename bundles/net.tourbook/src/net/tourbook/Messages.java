@@ -1092,10 +1092,12 @@ public class Messages extends NLS {
 	public static String		Log_Tour_SaveTours;
 	public static String		Log_Tour_SaveTours_File;
 
-	public static String		Map25_Marker_ClusterOrientation_Billboard;
-	public static String		Map25_Marker_ClusterOrientation_ClampToGround;
-	public static String		Map25_Symbol_Orientation_Billboard;
-	public static String		Map25_Symbol_Orientation_Ground;
+	public static String		Map25_Config_ClusterAlgorithm_Distance;
+
+	public static String Map25_Config_ClusterAlgorithm_FirstMarker;
+	public static String		Map25_Config_ClusterAlgorithm_Grid;
+	public static String		Map25_Config_SymbolOrientation_Billboard;
+	public static String		Map25_Config_SymbolOrientation_Ground;
 
 	public static String		merge_tour_dlg_invalid_serie_data_message;
 	public static String		merge_tour_dlg_invalid_tour_data_message;
@@ -1583,6 +1585,8 @@ public class Messages extends NLS {
 	public static String		Slideout_Map25MarkerOptions_Color_Foreground_Tooltip;
 	public static String		Slideout_Map25MarkerOptions_Label_Cluster;
 	public static String		Slideout_Map25MarkerOptions_Label_Cluster_Tooltip;
+
+	public static String		Slideout_Map25MarkerOptions_Label_ClusterAlgorithm;
 	public static String		Slideout_Map25MarkerOptions_Label_ClusterGridSize;
 	public static String		Slideout_Map25MarkerOptions_Label_ClusterOrientation;
 	public static String		Slideout_Map25MarkerOptions_Label_ClusterOrientation_Tooltip;

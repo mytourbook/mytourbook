@@ -24,8 +24,10 @@ import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.widgets.ComboEntry;
+import net.tourbook.map25.ClusterAlgorithmItem;
 import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.map25.Map25View;
+import net.tourbook.map25.layer.marker.ClusterAlgorithm;
 import net.tourbook.map25.layer.marker.MarkerConfig;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -59,7 +61,7 @@ import org.eclipse.swt.widgets.ToolBar;
 /**
  * Tour chart marker properties slideout.
  */
-public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelectorListener {
+public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements IColorSelectorListener {
 
 // SET_FORMATTING_OFF
 	
@@ -103,6 +105,7 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 	private Button					_chkIsShowMarkerLabel;
 	private Button					_chkIsShowMarkerPoint;
 
+	private Combo					_comboClusterAlgorithm;
 	private Combo					_comboClusterOrientation;
 	private Combo					_comboConfigName;
 	private Combo					_comboMarkerOrientation;
@@ -110,6 +113,7 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 	private Label					_lblConfigName;
 	private Label					_lblClusterGridSize;
 	private Label					_lblClusterOpacity;
+	private Label					_lblClusterAlgorithm;
 	private Label					_lblClusterOrientation;
 	private Label					_lblClusterSymbol;
 	private Label					_lblMarkerOpacity;
@@ -126,10 +130,10 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 
 	private Text					_textConfigName;
 
-	public SlideoutMap25_Marker(final Control ownerControl,
-								final ToolBar toolBar,
-								final IDialogSettings state,
-								final Map25View map25View) {
+	public SlideoutMap25_MarkerOptions(	final Control ownerControl,
+										final ToolBar toolBar,
+										final IDialogSettings state,
+										final Map25View map25View) {
 
 		super(ownerControl, toolBar);
 
@@ -541,6 +545,41 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 		}
 		{
 			/*
+			 * Cluster orientation: billboard/ground
+			 */
+			{
+				// label
+				_lblClusterAlgorithm = new Label(parent, SWT.NONE);
+				_lblClusterAlgorithm.setText(Messages.Slideout_Map25MarkerOptions_Label_ClusterAlgorithm);
+				GridDataFactory
+						.fillDefaults()//
+						.align(SWT.FILL, SWT.CENTER)
+						.indent(2 * UI.FORM_FIRST_COLUMN_INDENT, 0)
+						.applyTo(_lblClusterAlgorithm);
+			}
+			{
+				/*
+				 * Combo: Orientaion
+				 */
+				_comboClusterAlgorithm = new Combo(parent, SWT.READ_ONLY | SWT.BORDER);
+				_comboClusterAlgorithm.setVisibleItemCount(20);
+				_comboClusterAlgorithm.addFocusListener(_keepOpenListener);
+				_comboClusterAlgorithm.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						onModifyConfig();
+					}
+				});
+				GridDataFactory
+						.fillDefaults()
+						.grab(true, false)
+						.align(SWT.BEGINNING, SWT.CENTER)
+						.hint(_pc.convertWidthInCharsToPixels(20), SWT.DEFAULT)
+						.applyTo(_comboClusterAlgorithm);
+			}
+		}
+		{
+			/*
 			 * Cluster grid size
 			 */
 			{
@@ -608,10 +647,12 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 		_colorMarkerSymbol_Fill.setEnabled(isMarkerPoint);
 		_colorMarkerSymbol_Outline.setEnabled(isMarkerPoint);
 
+		_comboClusterAlgorithm.setEnabled(isClustering);
 		_comboClusterOrientation.setEnabled(isClustering);
 		_comboMarkerOrientation.setEnabled(isMarkerPoint);
 
 		_lblClusterGridSize.setEnabled(isClustering);
+		_lblClusterAlgorithm.setEnabled(isClustering);
 		_lblClusterOrientation.setEnabled(isClustering);
 		_lblClusterOpacity.setEnabled(isClustering);
 		_lblClusterSymbol.setEnabled(isClustering);
@@ -638,6 +679,10 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 				_comboClusterOrientation.add(comboItem.label);
 				_comboMarkerOrientation.add(comboItem.label);
 			}
+
+			for (final ClusterAlgorithmItem item : Map25ConfigManager.ALL_CLUSTER_ALGORITHM) {
+				_comboClusterAlgorithm.add(item.label);
+			}
 		}
 		_isUpdateUI = backupIsUpdateUI;
 	}
@@ -656,6 +701,23 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 		_isUpdateUI = backupIsUpdateUI;
 	}
 
+	private int getClusterAlgorithmIndex(final Enum<ClusterAlgorithm> requestedAlgorithm) {
+
+		final ClusterAlgorithmItem[] allClusterAlgorithm = Map25ConfigManager.ALL_CLUSTER_ALGORITHM;
+
+		for (int algorithmIndex = 0; algorithmIndex < allClusterAlgorithm.length; algorithmIndex++) {
+
+			final ClusterAlgorithm algorithm = allClusterAlgorithm[algorithmIndex].clusterAlgorithm;
+
+			if (algorithm == requestedAlgorithm) {
+				return algorithmIndex;
+			}
+		}
+
+		// this should not occure
+		return 0;
+	}
+
 	private int getOrientationIndex(final int orientationId) {
 
 		final ComboEntry[] symbolOrientation = Map25ConfigManager.SYMBOL_ORIENTATION;
@@ -670,6 +732,13 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 		}
 
 		return 0;
+	}
+
+	private Enum<ClusterAlgorithm> getSelectedClusterAlgorithm() {
+
+		final int selectedIndex = Math.max(0, _comboClusterAlgorithm.getSelectionIndex());
+
+		return Map25ConfigManager.ALL_CLUSTER_ALGORITHM[selectedIndex].clusterAlgorithm;
 	}
 
 	private int getSelectedOrientation(final Combo combo) {
@@ -855,6 +924,7 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 			 * Cluster
 			 */
 			_chkIsMarkerClustering.setSelection(config.isMarkerClustered);
+			_comboClusterAlgorithm.select(getClusterAlgorithmIndex(config.clusterAlgorithm));
 			_comboClusterOrientation.select(getOrientationIndex(config.clusterOrientation));
 
 			_colorMarkerSymbol_Outline.setColorValue(config.markerOutline_Color);
@@ -892,6 +962,7 @@ public class SlideoutMap25_Marker extends ToolbarSlideout implements IColorSelec
 		 * Cluster
 		 */
 		config.isMarkerClustered = _chkIsMarkerClustering.getSelection();
+		config.clusterAlgorithm = getSelectedClusterAlgorithm();
 		config.clusterOrientation = getSelectedOrientation(_comboClusterOrientation);
 
 		config.clusterGridSize = _spinnerClusterSize_Grid.getSelection();

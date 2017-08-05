@@ -28,11 +28,11 @@ public class ScreenUtils {
 
 	public static class ClusterDrawable {
 
-		private Paint	mPaintText		= CanvasAdapter.newPaint();
-		private Paint	mPaintCircle	= CanvasAdapter.newPaint();
-		private Paint	mPaintBorder	= CanvasAdapter.newPaint();
+		private Paint	_paintFill		= CanvasAdapter.newPaint();
+		private Paint	_paintOutline	= CanvasAdapter.newPaint();
+		private Paint	_paintText		= CanvasAdapter.newPaint();
 
-		private int		mSize;
+		private int		_symbolSize;
 		private String	mText;
 
 		/**
@@ -59,26 +59,26 @@ public class ScreenUtils {
 
 		private void draw(final Canvas canvas) {
 
-			final int halfsize = mSize >> 1;
+			final int halfsize = _symbolSize >> 1;
 			final int noneClippingRadius = halfsize - getPixels(2);
 
 			// fill
-			canvas.drawCircle(halfsize, halfsize, noneClippingRadius, mPaintCircle);
+			canvas.drawCircle(halfsize, halfsize, noneClippingRadius, _paintFill);
 
 			// outline
-			canvas.drawCircle(halfsize, halfsize, noneClippingRadius, mPaintBorder);
+			canvas.drawCircle(halfsize, halfsize, noneClippingRadius, _paintOutline);
 
 			// draw the number at the center
 			canvas.drawText(
 					mText,
-					(canvas.getWidth() - mPaintText.getTextWidth(mText)) * 0.5f,
-					(canvas.getHeight() + mPaintText.getTextHeight(mText)) * 0.5f,
-					mPaintText);
+					(canvas.getWidth() - _paintText.getTextWidth(mText)) * 0.5f,
+					(canvas.getHeight() + _paintText.getTextHeight(mText)) * 0.5f,
+					_paintText);
 		}
 
 		public Bitmap getBitmap() {
 
-			int width = mSize, height = mSize;
+			int width = _symbolSize, height = _symbolSize;
 
 			width = width > 0 ? width : 1;
 			height = height > 0 ? height : 1;
@@ -99,27 +99,47 @@ public class ScreenUtils {
 		 */
 		private void setup(final int symbolSizeDP, final int foregroundColor, final int backgroundColor) {
 
-			mSize = getPixels(symbolSizeDP);
+			_symbolSize = getPixels(symbolSizeDP);
 
-			final int defaultTextSize = (int) (symbolSizeDP * 0.7f);
+			final float defaultTextSize = _symbolSize * 0.7f;
 			final int numDigits = mText.length();
 
-			final int textSize = numDigits > 2 //
-					? (int) (defaultTextSize / (numDigits * 0.5))
-					: defaultTextSize;
+			float textSize;
+			switch (numDigits) {
 
-			mPaintText.setTextSize(getPixels(textSize));
-			mPaintText.setColor(foregroundColor);
+			case 2:
+				textSize = (int) (defaultTextSize / (numDigits * 0.6));
+				break;
+
+			case 3:
+				textSize = (int) (defaultTextSize / (numDigits * 0.5));
+				break;
+
+			case 4:
+				textSize = (int) (defaultTextSize / (numDigits * 0.5));
+				break;
+
+			case 5:
+				textSize = (int) (defaultTextSize / (numDigits * 0.5));
+				break;
+
+			default:
+				textSize = defaultTextSize;
+				break;
+			}
+
+			_paintText.setTextSize(getPixels(textSize));
+			_paintText.setColor(foregroundColor);
 
 			// using a different font that the + is centered, with default it is not which is very ugly!
-			mPaintText.setTypeface(FontFamily.MONOSPACE, FontStyle.BOLD);
+			_paintText.setTypeface(FontFamily.MONOSPACE, FontStyle.BOLD);
 
-			mPaintCircle.setColor(backgroundColor);
-			mPaintCircle.setStyle(Paint.Style.FILL);
+			_paintFill.setColor(backgroundColor);
+			_paintFill.setStyle(Paint.Style.FILL);
 
-			mPaintBorder.setColor(foregroundColor);
-			mPaintBorder.setStyle(Paint.Style.STROKE);
-			mPaintBorder.setStrokeWidth(getPixels(2.0f));
+			_paintOutline.setColor(foregroundColor);
+			_paintOutline.setStyle(Paint.Style.STROKE);
+			_paintOutline.setStrokeWidth(getPixels(2.0f));
 		}
 	}
 

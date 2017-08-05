@@ -20,7 +20,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.map25.Map25View;
-import net.tourbook.map25.ui.SlideoutMap25_Marker;
+import net.tourbook.map25.ui.SlideoutMap25_MarkerOptions;
 
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -56,7 +56,7 @@ public class ActionMap25_ShowMarker extends ContributionItem implements IOpening
 	private ToolBar					_toolBar;
 	private ToolItem				_actionToolItem;
 
-	private SlideoutMap25_Marker	_slideoutMarkerOptions;
+	private SlideoutMap25_MarkerOptions	_slideoutMarkerOptions;
 
 	/*
 	 * UI controls
@@ -111,7 +111,7 @@ public class ActionMap25_ShowMarker extends ContributionItem implements IOpening
 				}
 			});
 
-			_slideoutMarkerOptions = new SlideoutMap25_Marker(_parent, _toolBar, _state, _map25View);
+			_slideoutMarkerOptions = new SlideoutMap25_MarkerOptions(_parent, _toolBar, _state, _map25View);
 
 			updateUI();
 		}

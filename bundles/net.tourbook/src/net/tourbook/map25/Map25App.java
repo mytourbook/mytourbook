@@ -17,26 +17,19 @@ package net.tourbook.map25;
 
 import java.awt.Canvas;
 
-import net.tourbook.common.color.ColorUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.map25.Map25TileSource.Builder;
 import net.tourbook.map25.OkHttpEngineMT.OkHttpFactoryMT;
 import net.tourbook.map25.layer.marker.MapMarker;
-import net.tourbook.map25.layer.marker.MarkerConfig;
 import net.tourbook.map25.layer.marker.MarkerLayer;
 import net.tourbook.map25.layer.marker.MarkerLayer.OnItemGestureListener;
 import net.tourbook.map25.layer.marker.MarkerRenderer;
-import net.tourbook.map25.layer.marker.MarkerSymbol;
-import net.tourbook.map25.layer.marker.ScreenUtils;
 import net.tourbook.map25.layer.tourtrack.TourLayer;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.widgets.Display;
 import org.oscim.awt.AwtGraphics;
-import org.oscim.backend.CanvasAdapter;
 import org.oscim.backend.GLAdapter;
-import org.oscim.backend.canvas.Bitmap;
-import org.oscim.backend.canvas.Paint;
 import org.oscim.core.MapPosition;
 import org.oscim.core.MercatorProjection;
 import org.oscim.gdx.GdxAssets;
@@ -179,19 +172,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		Gdx.input.setInputProcessor(mux);
 	}
 
-	private MarkerLayer createLayer_Marker() {
-
-		final MarkerSymbol markerSymbol = createMarkerSymbol();
-
-
-		final MarkerLayer markerLayer = new MarkerLayer(
-				mMap,
-				markerSymbol,
-				this);
-
-		return markerLayer;
-	}
-
 	/**
 	 * Layer: Scale bar
 	 */
@@ -240,37 +220,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 				_map25View.restoreState();
 			}
 		});
-	}
-
-	private MarkerSymbol createMarkerSymbol() {
-
-		final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
-
-		final Paint paintFill = CanvasAdapter.newPaint();
-		paintFill.setColor(ColorUtil.getARGB(config.markerFill_Color, config.markerFill_Opacity));
-		paintFill.setStyle(Paint.Style.FILL);
-
-		final Paint paintOutline = CanvasAdapter.newPaint();
-		paintOutline.setColor(ColorUtil.getARGB(config.markerOutline_Color, config.markerOutline_Opacity));
-		paintOutline.setStyle(Paint.Style.STROKE);
-		paintOutline.setStrokeWidth(ScreenUtils.getPixels(2));
-
-		final int iconSize = ScreenUtils.getPixels(config.markerSymbolSize);
-
-		final Bitmap bitmap = CanvasAdapter.newBitmap(iconSize, iconSize, 0);
-		final org.oscim.backend.canvas.Canvas canvas = CanvasAdapter.newCanvas();
-		canvas.setBitmap(bitmap);
-
-		final int iconSize2 = iconSize / 2;
-		final int noneClippingRadius = iconSize2 - ScreenUtils.getPixels(2);
-
-		// fill + outline
-		canvas.drawCircle(iconSize2, iconSize2, noneClippingRadius, paintFill);
-		canvas.drawCircle(iconSize2, iconSize2, noneClippingRadius, paintOutline);
-
-		final boolean isBillboard = config.markerOrientation == Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
-
-		return new MarkerSymbol(bitmap, MarkerSymbol.HotspotPlace.CENTER, isBillboard);
 	}
 
 	private UrlTileSource createTileSource(final Map25Provider mapProvider, final OkHttpFactoryMT httpFactory) {
@@ -362,7 +311,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 
 	@Override
 	public boolean onItemLongPress(final int index, final MapMarker item) {
-		
+
 //		System.out.println(
 //				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
 //				+ ("\tonItemLongPress")
@@ -375,13 +324,13 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 //		_isMapItemHit = true;
 //
 //		return true;
-		
+
 		return false;
 	}
 
 	@Override
 	public boolean onItemSingleTapUp(final int index, final MapMarker item) {
-		
+
 //		System.out.println(
 //				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
 //				+ ("\tonItemSingleTapUp")//
@@ -607,7 +556,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		layers.add(_layer_Label);
 
 		// marker
-		_layer_Marker = createLayer_Marker();
+		_layer_Marker = new MarkerLayer(mMap, this);
 		_layer_Marker.setEnabled(false);
 		layers.add(_layer_Marker);
 
@@ -628,19 +577,9 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 
 	private void updateUI_MarkerLayer() {
 
-		final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
-		final boolean isClusterBillboard = config.clusterOrientation == Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
-
 		final MarkerRenderer markerRenderer = (MarkerRenderer) _layer_Marker.getRenderer();
 
-		markerRenderer.setClusterSymbolConfig(
-				config.clusterSymbolSize,
-				ColorUtil.getARGB(config.clusterOutline_Color, config.clusterOutline_Opacity),
-				ColorUtil.getARGB(config.clusterFill_Color, config.clusterFill_Opacity),
-				isClusterBillboard);
-
-		markerRenderer.setDefaultMarker(createMarkerSymbol());
-		markerRenderer.setClusteringEnabled(config.isMarkerClustered, config.clusterGridSize);
+		markerRenderer.configureRenderer();
 	}
 
 }

@@ -26,6 +26,16 @@ class ProjectedMarker {
 	 */
 	double		projectedY;
 
+	/**
+	 * Projected cluster X position 0...1 when {@link #clusterSize} > 0
+	 */
+	double		projectedClusterX;
+
+	/**
+	 * Projected cluster Y position 0...1 when {@link #clusterSize} > 0
+	 */
+	double		projectedClusterY;
+
 	float		dy;
 
 	/**
@@ -38,9 +48,6 @@ class ProjectedMarker {
 	 * If this is >0, this item will be displayed as a cluster circle, with size clusterSize+1.
 	 */
 	int			clusterSize;
-
-	double		projectedClusterX;
-	double		projectedClusterY;
 
 	@Override
 	public String toString() {
