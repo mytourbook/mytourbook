@@ -550,7 +550,7 @@ public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements ICol
 			{
 				// label
 				_lblClusterAlgorithm = new Label(parent, SWT.NONE);
-				_lblClusterAlgorithm.setText(Messages.Slideout_Map25MarkerOptions_Label_ClusterAlgorithm);
+				_lblClusterAlgorithm.setText(Messages.Slideout_Map25MarkerOptions_Label_ClusterPlacement);
 				GridDataFactory
 						.fillDefaults()//
 						.align(SWT.FILL, SWT.CENTER)

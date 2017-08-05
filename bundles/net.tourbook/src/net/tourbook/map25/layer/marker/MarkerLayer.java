@@ -25,11 +25,10 @@ public class MarkerLayer extends Layer implements GestureListener {
 
 	private final MarkerRenderer	_markerRenderer;
 
-	private final List<MapMarker>		_allMarker			= new ArrayList<>();
-	private MapMarker					_focusedMarker;
+	private final List<MapMarker>	_allMarker	= new ArrayList<>();
+	private MapMarker				_focusedMarker;
 
-	private final Point				_tmpPoint			= new Point();
-	private int						_drawnMarkerLimit	= Integer.MAX_VALUE;
+	private final Point				_tmpPoint	= new Point();
 
 	private OnItemGestureListener	_gestureListener;
 
@@ -146,6 +145,8 @@ public class MarkerLayer extends Layer implements GestureListener {
 		/* squared dist: 50*50 pixel ~ 2mm on 400dpi */
 		double dist = 2500;
 
+		final MarkerSymbol defaultMarkerSymbol = _markerRenderer.getDefaultMarkerSymbol();
+
 		for (int markerIndex = 0; markerIndex < size; markerIndex++) {
 
 			final MapMarker marker = _allMarker.get(markerIndex);
@@ -165,7 +166,7 @@ public class MarkerLayer extends Layer implements GestureListener {
 			MarkerSymbol markerSymbol = marker.markerSymbol;
 
 			if (markerSymbol == null) {
-				markerSymbol = _markerRenderer.defaultMarkerSymbol;
+				markerSymbol = defaultMarkerSymbol;
 			}
 
 			if (markerSymbol.isInside(dx, dy)) {
@@ -200,29 +201,15 @@ public class MarkerLayer extends Layer implements GestureListener {
 		return false;
 	}
 
-	public void addItem(final int location, final MapMarker item) {
-
-		_allMarker.add(location, item);
-	}
-
-	public boolean addItem(final MapMarker item) {
-
-		final boolean result = _allMarker.add(item);
-		populate();
-
-		return result;
+	public List<MapMarker> getAllMarkers() {
+		return _allMarker;
 	}
 
 	/**
 	 * @return the currently-focused item, or null if no item is currently focused.
 	 */
 	public MapMarker getFocus() {
-
 		return _focusedMarker;
-	}
-
-	public List<MapMarker> getItemList() {
-		return _allMarker;
 	}
 
 	protected MapMarker getMarker(final int index) {
@@ -266,7 +253,7 @@ public class MarkerLayer extends Layer implements GestureListener {
 	 */
 	public final void populate() {
 
-		_markerRenderer.populate(size());
+		_markerRenderer.createCluster();
 	}
 
 	public void replaceMarkers(final Collection<MapMarker> allMarkers) {
@@ -293,10 +280,6 @@ public class MarkerLayer extends Layer implements GestureListener {
 	public void setOnItemGestureListener(final OnItemGestureListener listener) {
 
 		_gestureListener = listener;
-	}
-
-	public int size() {
-		return Math.min(_allMarker.size(), _drawnMarkerLimit);
 	}
 
 	public void update() {

@@ -13,8 +13,27 @@ class ProjectedMarker {
 	boolean		isVisible;
 	boolean		isModified;
 
-	float		x;
-	float		y;
+	/**
+	 * Map X position,
+	 * 
+	 * <pre>
+	 * map center     0
+	 * bottom-right   +x +y
+	 * top-left       -x -y
+	 * </pre>
+	 */
+	float		mapX;
+
+	/**
+	 * Map Y position
+	 * 
+	 * <pre>
+	 * map center     0
+	 * bottom-right   +x +y
+	 * top-left       -x -y
+	 * </pre>
+	 */
+	float		mapY;
 
 	/**
 	 * Projected X position 0...1
@@ -51,6 +70,6 @@ class ProjectedMarker {
 
 	@Override
 	public String toString() {
-		return "\n" + x + ":" + y + " / " + dy + " " + isVisible;
+		return "\n" + mapX + ":" + mapY + " / " + dy + " " + isVisible;
 	}
 }

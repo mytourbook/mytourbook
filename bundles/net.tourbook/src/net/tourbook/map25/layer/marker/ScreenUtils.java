@@ -71,7 +71,7 @@ public class ScreenUtils {
 			// draw the number at the center
 			canvas.drawText(
 					mText,
-					(canvas.getWidth() - _paintText.getTextWidth(mText)) * 0.5f,
+					(canvas.getWidth() - _paintText.getTextWidth(mText)) * 0.5f - 0.5f,
 					(canvas.getHeight() + _paintText.getTextHeight(mText)) * 0.5f,
 					_paintText);
 		}
@@ -112,13 +112,7 @@ public class ScreenUtils {
 				break;
 
 			case 3:
-				textSize = (int) (defaultTextSize / (numDigits * 0.5));
-				break;
-
 			case 4:
-				textSize = (int) (defaultTextSize / (numDigits * 0.5));
-				break;
-
 			case 5:
 				textSize = (int) (defaultTextSize / (numDigits * 0.5));
 				break;
@@ -127,6 +121,8 @@ public class ScreenUtils {
 				textSize = defaultTextSize;
 				break;
 			}
+
+			final float outlineWidth = 1.0f;//Math.min(1.0f, _symbolSize * 0.2f);
 
 			_paintText.setTextSize(getPixels(textSize));
 			_paintText.setColor(foregroundColor);
@@ -139,7 +135,7 @@ public class ScreenUtils {
 
 			_paintOutline.setColor(foregroundColor);
 			_paintOutline.setStyle(Paint.Style.STROKE);
-			_paintOutline.setStrokeWidth(getPixels(2.0f));
+			_paintOutline.setStrokeWidth(getPixels(outlineWidth));//getPixels(2.0f));
 		}
 	}
 
@@ -147,7 +143,8 @@ public class ScreenUtils {
 	 * Get pixels from DPs
 	 *
 	 * @param dp
-	 *            Value in DPs
+	 *            Value in DPs "density-independent pixels"
+	 *            {@link https://developer.android.com/guide/practices/screens_support.html}
 	 * @return Value in PX according to screen density
 	 */
 	public static int getPixels(final float dp) {

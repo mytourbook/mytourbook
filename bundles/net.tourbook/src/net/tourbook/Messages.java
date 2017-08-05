@@ -1094,7 +1094,7 @@ public class Messages extends NLS {
 
 	public static String		Map25_Config_ClusterAlgorithm_Distance;
 
-	public static String Map25_Config_ClusterAlgorithm_FirstMarker;
+	public static String		Map25_Config_ClusterAlgorithm_FirstMarker;
 	public static String		Map25_Config_ClusterAlgorithm_Grid;
 	public static String		Map25_Config_SymbolOrientation_Billboard;
 	public static String		Map25_Config_SymbolOrientation_Ground;
@@ -1586,10 +1586,10 @@ public class Messages extends NLS {
 	public static String		Slideout_Map25MarkerOptions_Label_Cluster;
 	public static String		Slideout_Map25MarkerOptions_Label_Cluster_Tooltip;
 
-	public static String		Slideout_Map25MarkerOptions_Label_ClusterAlgorithm;
 	public static String		Slideout_Map25MarkerOptions_Label_ClusterGridSize;
 	public static String		Slideout_Map25MarkerOptions_Label_ClusterOrientation;
 	public static String		Slideout_Map25MarkerOptions_Label_ClusterOrientation_Tooltip;
+	public static String		Slideout_Map25MarkerOptions_Label_ClusterPlacement;
 	public static String		Slideout_Map25MarkerOptions_Label_Marker;
 	public static String		Slideout_Map25MarkerOptions_Label_Marker_Tooltip;
 	public static String		Slideout_Map25MarkerOptions_Label_MarkerOrientation;
