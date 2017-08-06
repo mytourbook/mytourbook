@@ -99,26 +99,39 @@ public class ScreenUtils {
 		 */
 		private void setup(final int symbolSizeDP, final int foregroundColor, final int backgroundColor) {
 
-			_symbolSize = getPixels(symbolSizeDP);
+			final int defaultSymbolSize = getPixels(symbolSizeDP);
 
-			final float defaultTextSize = _symbolSize * 0.7f;
 			final int numDigits = mText.length();
 
 			float textSize;
+			final double symbolSizeFactor = numDigits * 20.0;
+
 			switch (numDigits) {
 
 			case 2:
-				textSize = (int) (defaultTextSize / (numDigits * 0.6));
+				_symbolSize = (int) (defaultSymbolSize + symbolSizeFactor);
+				textSize = (int) (_symbolSize / (numDigits * 0.8));
+
 				break;
 
 			case 3:
+				_symbolSize = (int) (defaultSymbolSize + symbolSizeFactor);
+				textSize = (int) (_symbolSize / (numDigits * 0.7));
+				break;
+
 			case 4:
+				_symbolSize = (int) (defaultSymbolSize + symbolSizeFactor);
+				textSize = (int) (_symbolSize / (numDigits * 0.66));
+				break;
+
 			case 5:
-				textSize = (int) (defaultTextSize / (numDigits * 0.5));
+				_symbolSize = (int) (defaultSymbolSize + symbolSizeFactor);
+				textSize = (int) (_symbolSize / (numDigits * 0.6));
 				break;
 
 			default:
-				textSize = defaultTextSize;
+				_symbolSize = (int) (defaultSymbolSize + symbolSizeFactor);
+				textSize = (int) (_symbolSize / (numDigits * 1.5));
 				break;
 			}
 

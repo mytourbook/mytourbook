@@ -31,10 +31,12 @@ import org.oscim.core.Point;
  */
 public class QuadItem<T extends ClusterItem> implements PointQuadTree.Item, Cluster<T> {
 
-	final T					mClusterItem;
+	public final T			mClusterItem;
 
-	private final Point		mPoint;
+	public final Point		mPoint;
+
 	private final GeoPoint	mPosition;
+
 	private Set<T>			singletonSet;
 
 	QuadItem(final T item) {
@@ -87,7 +89,7 @@ public class QuadItem<T extends ClusterItem> implements PointQuadTree.Item, Clus
 
 		return "\n"
 
-				+ "\tQuadItem\t\t\t["
+				+ "\tQuadItem\t\t["
 
 				+ "mClusterItem=" + mClusterItem + ", "
 				//					+ "mPoint=" + mPoint + ", "

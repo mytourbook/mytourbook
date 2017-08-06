@@ -16,16 +16,16 @@
 package net.tourbook.map25.layer.marker;
 
 /**
- * The internal representation of a marker, this can be a normal marker or a cluster marker.
+ * The internal representation of a marker, this can be a normal map marker or a cluster.
  * <p>
  * Original: {@link org.oscim.layers.marker.InternalItem}
  */
-class ProjectedMarker {
+class ProjectedItem {
 
-	MapMarker	mapMarker;
+	MapMarker		mapMarker;
 
-	boolean		isVisible;
-	boolean		isModified;
+	boolean			isVisible;
+	boolean			isModified;
 
 	/**
 	 * Map X position,
@@ -36,7 +36,7 @@ class ProjectedMarker {
 	 * top-left       -x -y
 	 * </pre>
 	 */
-	float		mapX;
+	float			mapX;
 
 	/**
 	 * Map Y position
@@ -47,40 +47,47 @@ class ProjectedMarker {
 	 * top-left       -x -y
 	 * </pre>
 	 */
-	float		mapY;
+	float			mapY;
 
 	/**
-	 * Projected X position 0...1
+	 * Projected X position <code>0...1</code>
 	 */
-	double		projectedX;
+	double			projectedX;
 
 	/**
-	 * Projected Y position 0...1
+	 * Projected Y position <code>0...1</code>
 	 */
-	double		projectedY;
+	double			projectedY;
 
 	/**
-	 * Projected cluster X position 0...1 when {@link #clusterSize} > 0
+	 * Projected cluster Y position <code>0...1</code>, this is set when {@link #clusterSize} > 0
 	 */
-	double		projectedClusterX;
+	double			projectedClusterX;
 
 	/**
-	 * Projected cluster Y position 0...1 when {@link #clusterSize} > 0
+	 * Projected cluster Y position <code>0...1</code>, this is set when {@link #clusterSize} > 0
 	 */
-	double		projectedClusterY;
+	double			projectedClusterY;
 
-	float		dy;
+	float			dy;
 
 	/**
 	 * If this is true, this item is hidden (because it's represented by another InternalItem acting
 	 * as cluster.
 	 */
-	boolean		isClusteredOut;
+	boolean			isClusteredOut;
 
 	/**
-	 * If this is >0, this item will be displayed as a cluster circle, with size clusterSize+1.
+	 * When <code>> 0</code>, this item is a cluster and is displayed with a number of
+	 * <code>clusterSize + 1</code>.
 	 */
-	int			clusterSize;
+	int				clusterSize;
+
+	/**
+	 * When <code>true</code> then this item is contained in the cluster, this will correct the
+	 * number of clusters.
+	 */
+	public boolean	isInGridCluster;
 
 	@Override
 	public String toString() {

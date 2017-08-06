@@ -33,6 +33,7 @@ import net.tourbook.map25.layer.marker.algorithm.distance.StaticCluster;
 import org.oscim.backend.CanvasAdapter;
 import org.oscim.backend.canvas.Bitmap;
 import org.oscim.backend.canvas.Paint;
+import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
 import org.oscim.core.MercatorProjection;
 import org.oscim.core.Point;
@@ -76,16 +77,16 @@ public class MarkerRenderer extends BucketRenderer {
 
 	private static final HashMap<Integer, Bitmap>	_clusterBitmaps				= new HashMap<>();
 
-	private static final TimSort<ProjectedMarker>	ZSORT						= new TimSort<ProjectedMarker>();
+	private static final TimSort<ProjectedItem>		ZSORT						= new TimSort<ProjectedItem>();
 
-	final static Comparator<ProjectedMarker>		zComparator;
+	final static Comparator<ProjectedItem>			zComparator;
 	static {
 
-		zComparator = new Comparator<ProjectedMarker>() {
+		zComparator = new Comparator<ProjectedItem>() {
 
 			@Override
-			public int compare(	final ProjectedMarker a,
-								final ProjectedMarker b) {
+			public int compare(	final ProjectedItem a,
+								final ProjectedItem b) {
 
 				if (a.isVisible && b.isVisible) {
 
@@ -128,7 +129,7 @@ public class MarkerRenderer extends BucketRenderer {
 	 */
 	private boolean							_isForceUpdateMarkers;
 
-	private ProjectedMarker[]				_allProjectedMarker;
+	private ProjectedItem[]					_allProjectedItems;
 
 	private int								_clusterBackgroundColor	= CLUSTER_COLOR_BACK;
 	private int								_clusterForegroundColor	= CLUSTER_COLOR_TEXT;
@@ -208,7 +209,7 @@ public class MarkerRenderer extends BucketRenderer {
 		configureRenderer();
 	}
 
-	private static void sort(final ProjectedMarker[] a, final int lo, final int hi) {
+	private static void sort(final ProjectedItem[] a, final int lo, final int hi) {
 
 		final int nRemaining = hi - lo;
 		if (nRemaining < 2) {
@@ -262,30 +263,38 @@ public class MarkerRenderer extends BucketRenderer {
 
 	void createClusterItems() {
 
-		ProjectedMarker[] allProjectedMarker;
+		ProjectedItem[] allProjectedMarker;
 
-		switch (_clusterAlgorithm) {
+		if (_isClustering) {
 
-		case Distance:
-			allProjectedMarker = createClusterItems_Distance();
-			break;
+			switch (_clusterAlgorithm) {
 
-		case FirstMarker:
-		case Grid:
-		default:
+			case FirstMarker_Distance:
+				allProjectedMarker = createClusterItems_Distance();
+				break;
+
+			case FirstMarker_Grid:
+			case Grid_Center:
+			default:
+				allProjectedMarker = createClusterItems_Grid();
+				break;
+			}
+		} else {
+
+			// use "default" clustering which supports none clustering
+
 			allProjectedMarker = createClusterItems_Grid();
-			break;
 		}
 
 		// update the UI
 		synchronized (this) {
 
 			_isForceUpdateMarkers = true;
-			_allProjectedMarker = allProjectedMarker;
+			_allProjectedItems = allProjectedMarker;
 		}
 	}
 
-	private ProjectedMarker[] createClusterItems_Distance() {
+	private ProjectedItem[] createClusterItems_Distance() {
 
 		final List<MapMarker> allMarkers = _markerLayer.getAllMarkers();
 
@@ -316,38 +325,63 @@ public class MarkerRenderer extends BucketRenderer {
 //		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\t" + markerClusters));
 //		// TODO remove SYSTEM.OUT.PRINTLN
 
-		final ProjectedMarker[] allProjectedMarker = new ProjectedMarker[markerClusters.size()];
+		final ProjectedItem[] allProjectedMarker = new ProjectedItem[markerClusters.size()];
 
 		int itemIndex = 0;
 
-		for (final Cluster<ClusterItem> clusterItem : markerClusters) {
+		for (final Cluster<ClusterItem> item : markerClusters) {
 
-			final ProjectedMarker projectedMarker = allProjectedMarker[itemIndex++] = new ProjectedMarker();
+			final ProjectedItem projectedMarker = allProjectedMarker[itemIndex++] = new ProjectedItem();
 
-			if (clusterItem instanceof QuadItem) {
+			if (item instanceof QuadItem) {
 
-				final QuadItem quadItem = (QuadItem) clusterItem;
+				// item is a marker
 
-			} else {
+				final QuadItem<?> quadItem = (QuadItem<?>) item;
+				final ClusterItem quadClusterItem = quadItem.mClusterItem;
 
-				if (clusterItem instanceof StaticCluster) {
+				if (quadClusterItem instanceof MapMarker) {
 
-					final StaticCluster<ClusterItem> new_name = (StaticCluster<ClusterItem>) clusterItem;
+					final MapMarker mapMarker = (MapMarker) quadClusterItem;
 
+					projectedMarker.mapMarker = mapMarker;
+
+					projectedMarker.projectedX = quadItem.mPoint.x;
+					projectedMarker.projectedY = quadItem.mPoint.y;
 				}
+
+			} else if (item instanceof StaticCluster) {
+
+				// item is a cluster
+
+				final StaticCluster<?> clusterItem = (StaticCluster<?>) item;
+
+				final ProjectedItem projectedCluster = projectedMarker;
+
+				projectedCluster.clusterSize = clusterItem.getSize();
+
+				final GeoPoint geoPoint = clusterItem.getPosition();
+
+				MercatorProjection.project(geoPoint, _tmpPoint);
+
+				projectedCluster.projectedX = _tmpPoint.x;
+				projectedCluster.projectedY = _tmpPoint.y;
+				projectedCluster.projectedClusterX = _tmpPoint.x;
+				projectedCluster.projectedClusterY = _tmpPoint.y;
+
 			}
 		}
 
 		return allProjectedMarker;
 	}
 
-	private ProjectedMarker[] createClusterItems_Grid() {
+	private ProjectedItem[] createClusterItems_Grid() {
 
 		final List<MapMarker> allMarkers = _markerLayer.getAllMarkers();
 
 		final int numMarkers = allMarkers.size();
 
-		final ProjectedMarker[] allProjectedMarker = new ProjectedMarker[numMarkers];
+		final ProjectedItem[] allProjectedMarker = new ProjectedItem[numMarkers];
 
 		/*
 		 * the grid slot size in px. increase to group more aggressively. currently set to marker
@@ -366,7 +400,7 @@ public class MarkerRenderer extends BucketRenderer {
 		for (int markerIndex = 0; markerIndex < numMarkers; markerIndex++) {
 
 			final MapMarker mapMarker = allMarkers.get(markerIndex);
-			final ProjectedMarker projectedMarker = allProjectedMarker[markerIndex] = new ProjectedMarker();
+			final ProjectedItem projectedMarker = allProjectedMarker[markerIndex] = new ProjectedItem();
 
 			projectedMarker.mapMarker = mapMarker;
 
@@ -406,7 +440,7 @@ public class MarkerRenderer extends BucketRenderer {
 					projectedMarker.isClusteredOut = true;
 
 					// and increment the count on its "parent" that will from now on act as a cluster
-					final ProjectedMarker projectedCluster = allProjectedMarker[storedClusterIndex];
+					final ProjectedItem projectedCluster = allProjectedMarker[storedClusterIndex];
 
 					// set cluster position to the center of the grid
 					if (projectedCluster.clusterSize == 0) {
@@ -424,6 +458,7 @@ public class MarkerRenderer extends BucketRenderer {
 					}
 
 					projectedCluster.clusterSize++;
+					projectedCluster.isInGridCluster = true;
 				}
 			}
 		}
@@ -508,9 +543,6 @@ public class MarkerRenderer extends BucketRenderer {
 	@Override
 	public synchronized void update(final GLViewport viewport) {
 
-//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tupdate()"));
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
 		final MapPosition mapPosition = viewport.pos;
 		final double mapScale = mapPosition.scale;
 		final float mapRotation = mapPosition.bearing;
@@ -548,8 +580,8 @@ public class MarkerRenderer extends BucketRenderer {
 
 		_isForceUpdateMarkers = false;
 
-		final double projMapX = mapPosition.x;
-		final double projMapY = mapPosition.y;
+		final double projectedMapX = mapPosition.x;
+		final double projectedMapY = mapPosition.y;
 
 		//int changesInvisible = 0;
 		//int changedVisible = 0;
@@ -559,7 +591,7 @@ public class MarkerRenderer extends BucketRenderer {
 
 		final long flip = (long) (mapTileScale) >> 1;
 
-		if (_allProjectedMarker == null) {
+		if (_allProjectedItems == null) {
 
 			if (buckets.get() != null) {
 				buckets.clear();
@@ -574,23 +606,23 @@ public class MarkerRenderer extends BucketRenderer {
 		final float sin = (float) Math.sin(angle);
 
 		/* check visibility */
-		for (final ProjectedMarker projectedMarker : _allProjectedMarker) {
+		for (final ProjectedItem projectedItem : _allProjectedItems) {
 
-			projectedMarker.isModified = false;
+			projectedItem.isModified = false;
 
-			projectedMarker.mapX = (float) ((projectedMarker.projectedX - projMapX) * mapTileScale);
-			projectedMarker.mapY = (float) ((projectedMarker.projectedY - projMapY) * mapTileScale);
+			projectedItem.mapX = (float) ((projectedItem.projectedX - projectedMapX) * mapTileScale);
+			projectedItem.mapY = (float) ((projectedItem.projectedY - projectedMapY) * mapTileScale);
 
 			// flip map world border
-			if (projectedMarker.mapX > flip) {
-				projectedMarker.mapX -= (long) mapTileScale;
-			} else if (projectedMarker.mapX < -flip) {
-				projectedMarker.mapX += (long) mapTileScale;
+			if (projectedItem.mapX > flip) {
+				projectedItem.mapX -= (long) mapTileScale;
+			} else if (projectedItem.mapX < -flip) {
+				projectedItem.mapX += (long) mapTileScale;
 			}
 
-			if (projectedMarker.isClusteredOut || !GeometryUtils.pointInPoly(
-					projectedMarker.mapX,
-					projectedMarker.mapY,
+			if (projectedItem.isClusteredOut || !GeometryUtils.pointInPoly(
+					projectedItem.mapX,
+					projectedItem.mapY,
 					_tmpBox,
 					8,
 					0)) {
@@ -599,10 +631,10 @@ public class MarkerRenderer extends BucketRenderer {
 				// on the same-ish position that will be promoted to cluster marker, so this particular item is considered
 				// invisible
 
-				if (projectedMarker.isVisible && (!projectedMarker.isClusteredOut)) {
+				if (projectedItem.isVisible && (!projectedItem.isClusteredOut)) {
 
 					// it was previously visible, but now it won't
-					projectedMarker.isModified = true;
+					projectedItem.isModified = true;
 
 					// changes to invible
 					//changesInvisible++;
@@ -612,10 +644,10 @@ public class MarkerRenderer extends BucketRenderer {
 			}
 
 			// item IS definitely visible
-			projectedMarker.dy = sin * projectedMarker.mapX + cos * projectedMarker.mapY;
+			projectedItem.dy = sin * projectedItem.mapX + cos * projectedItem.mapY;
 
-			if (!projectedMarker.isVisible) {
-				projectedMarker.isVisible = true;
+			if (!projectedItem.isVisible) {
+				projectedItem.isVisible = true;
 				//changedVisible++;
 			}
 
@@ -642,45 +674,45 @@ public class MarkerRenderer extends BucketRenderer {
 		mMapPosition.bearing = -mMapPosition.bearing;
 
 		// why do we sort ? z-index?
-		sort(_allProjectedMarker, 0, _allProjectedMarker.length);
+		sort(_allProjectedItems, 0, _allProjectedItems.length);
 
 		//log.debug(Arrays.toString(mItems));
 
-		for (final ProjectedMarker projMarker : _allProjectedMarker) {
+		for (final ProjectedItem projItem : _allProjectedItems) {
 
 			// skip invisible AND clustered-out
-			if (!projMarker.isVisible || projMarker.isClusteredOut) {
+			if (!projItem.isVisible || projItem.isClusteredOut) {
 				continue;
 			}
 
-			if (projMarker.isModified) {
+			if (projItem.isModified) {
 
-				projMarker.isVisible = false;
+				projItem.isVisible = false;
 
 				continue;
 			}
 
 			final SymbolItem mapSymbol = SymbolItem.pool.get();
 
-			if (projMarker.clusterSize > 0) {
+			if (projItem.clusterSize > 0) {
 
 				// this item will act as a cluster, just use a proper bitmap
 				// depending on cluster size, instead of its marker
 
-				final Bitmap bitmap = getClusterBitmap(projMarker.clusterSize + 1);
+				final int numClusters = projItem.clusterSize + (projItem.isInGridCluster ? 1 : 0);
+
+				final Bitmap bitmap = getClusterBitmap(numClusters);
 
 				float mapX = 0;
 				float mapY = 0;
 
 				switch (_clusterAlgorithm) {
 
-				case Distance:
-					break;
+				case FirstMarker_Distance:
+				case Grid_Center:
 
-				case Grid:
-
-					mapX = (float) ((projMarker.projectedClusterX - projMapX) * mapTileScale);
-					mapY = (float) ((projMarker.projectedClusterY - projMapY) * mapTileScale);
+					mapX = (float) ((projItem.projectedClusterX - projectedMapX) * mapTileScale);
+					mapY = (float) ((projItem.projectedClusterY - projectedMapY) * mapTileScale);
 
 					// flip map world border
 					if (mapX > flip) {
@@ -691,11 +723,11 @@ public class MarkerRenderer extends BucketRenderer {
 
 					break;
 
-				case FirstMarker:
+				case FirstMarker_Grid:
 				default:
 
-					mapX = projMarker.mapX;
-					mapY = projMarker.mapY;
+					mapX = projItem.mapX;
+					mapY = projItem.mapY;
 
 					break;
 				}
@@ -714,30 +746,16 @@ public class MarkerRenderer extends BucketRenderer {
 
 				// normal item, use its marker
 
-				MarkerSymbol markerSymbol = projMarker.mapMarker.markerSymbol;
+				MarkerSymbol markerSymbol = projItem.mapMarker.markerSymbol;
 
 				if (markerSymbol == null) {
 					markerSymbol = _defaultMarkerSymbol;
 				}
 
-				mapSymbol.set(projMarker.mapX, projMarker.mapY, markerSymbol.getBitmap(), markerSymbol.mBillboard);
+				mapSymbol.set(projItem.mapX, projItem.mapY, markerSymbol.getBitmap(), markerSymbol.mBillboard);
 				mapSymbol.offset = markerSymbol.getHotspot();
 				mapSymbol.billboard = markerSymbol.isBillboard();
 			}
-
-//			System.out.println(
-//					(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//
-//							+ (String.format("\tx:%10.3f\ty:%10.3f", projectedMarker.x, projectedMarker.y))
-//							+ (String.format(
-//									"\tx:%10.3f\ty:%10.3f",
-//									projClusterX,
-//									projClusterY))
-//
-////							+ ("\t")
-//
-//			);
-//			// TODO remove SYSTEM.OUT.PRINTLN
 
 			_symbolBucket.pushSymbol(mapSymbol);
 		}

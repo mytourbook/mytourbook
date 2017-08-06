@@ -28,16 +28,16 @@ import org.oscim.core.GeoPoint;
  */
 public class StaticCluster<T extends ClusterItem> implements Cluster<T> {
 
-	private final GeoPoint	mCenter;
+	private final GeoPoint	_geoCenter;
 
-	private final List<T>	mItems	= new ArrayList<T>();
+	private final List<T>	_clusterItems	= new ArrayList<T>();
 
 	public StaticCluster(final GeoPoint center) {
-		mCenter = center;
+		_geoCenter = center;
 	}
 
 	public boolean add(final T t) {
-		return mItems.add(t);
+		return _clusterItems.add(t);
 	}
 
 	@Override
@@ -47,32 +47,32 @@ public class StaticCluster<T extends ClusterItem> implements Cluster<T> {
 			return false;
 		}
 
-		return ((StaticCluster<?>) other).mCenter.equals(mCenter)
-				&& ((StaticCluster<?>) other).mItems.equals(mItems);
+		return ((StaticCluster<?>) other)._geoCenter.equals(_geoCenter)
+				&& ((StaticCluster<?>) other)._clusterItems.equals(_clusterItems);
 	}
 
 	@Override
 	public Collection<T> getItems() {
-		return mItems;
+		return _clusterItems;
 	}
 
 	@Override
 	public GeoPoint getPosition() {
-		return mCenter;
+		return _geoCenter;
 	}
 
 	@Override
 	public int getSize() {
-		return mItems.size();
+		return _clusterItems.size();
 	}
 
 	@Override
 	public int hashCode() {
-		return mCenter.hashCode() + mItems.hashCode();
+		return _geoCenter.hashCode() + _clusterItems.hashCode();
 	}
 
 	public boolean remove(final T t) {
-		return mItems.remove(t);
+		return _clusterItems.remove(t);
 	}
 
 	@Override
@@ -81,8 +81,8 @@ public class StaticCluster<T extends ClusterItem> implements Cluster<T> {
 
 				+ "\tStaticCluster	["
 
-				+ "mItems.size=" + mItems.size() + ", "
-				+ "mCenter=" + mCenter + ", "
+				+ "_clusterItems.size=" + _clusterItems.size() + ", "
+				+ "_geoCenter=" + _geoCenter + ", "
 
 				+ "]";
 	}

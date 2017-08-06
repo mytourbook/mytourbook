@@ -580,7 +580,7 @@ public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements ICol
 		}
 		{
 			/*
-			 * Cluster grid size
+			 * Cluster size
 			 */
 			{
 				// label

@@ -46,7 +46,7 @@ public class MarkerConfig {
 	 * Cluster
 	 */
 	public boolean					isMarkerClustered		= true;
-	public Enum<ClusterAlgorithm>	clusterAlgorithm		= ClusterAlgorithm.FirstMarker;
+	public Enum<ClusterAlgorithm>	clusterAlgorithm		= ClusterAlgorithm.FirstMarker_Grid;
 	public int						clusterFill_Opacity		= Map25ConfigManager.DEFAULT_CLUSTER_OPACITY;
 	public RGB						clusterFill_Color		= Map25ConfigManager.DEFAULT_CLUSTER_FILL_COLOR;
 	public int						clusterOutline_Opacity	= Map25ConfigManager.DEFAULT_CLUSTER_OPACITY;

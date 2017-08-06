@@ -17,10 +17,16 @@ package net.tourbook.map25.layer.marker;
 
 public enum ClusterAlgorithm {
 
-	FirstMarker, //
+	/**
+	 * 
+	 */
+	FirstMarker_Grid, //
 
-	Grid, //
+	/**
+	 * Cluster marker is centered in the grid
+	 */
+	Grid_Center, //
 
-	Distance, //
+	FirstMarker_Distance, //
 
 }

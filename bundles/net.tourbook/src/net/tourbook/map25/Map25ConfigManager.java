@@ -54,9 +54,9 @@ public class Map25ConfigManager {
 
 	public static final ClusterAlgorithmItem[]	ALL_CLUSTER_ALGORITHM			= {
 			
-		new ClusterAlgorithmItem(Messages.Map25_Config_ClusterAlgorithm_FirstMarker,	ClusterAlgorithm.FirstMarker),
-		new ClusterAlgorithmItem(Messages.Map25_Config_ClusterAlgorithm_Distance,		ClusterAlgorithm.Distance),
-		new ClusterAlgorithmItem(Messages.Map25_Config_ClusterAlgorithm_Grid,			ClusterAlgorithm.Grid),
+		new ClusterAlgorithmItem(Messages.Map25_Config_ClusterAlgorithm_FirstMarker_Distance,	ClusterAlgorithm.FirstMarker_Distance),
+		new ClusterAlgorithmItem(Messages.Map25_Config_ClusterAlgorithm_FirstMarker_Grid,		ClusterAlgorithm.FirstMarker_Grid),
+		new ClusterAlgorithmItem(Messages.Map25_Config_ClusterAlgorithm_Grid,					ClusterAlgorithm.Grid_Center),
 	};
 
 // SET_FORMATTING_ON
@@ -143,10 +143,10 @@ public class Map25ConfigManager {
 	//
 	// CLUSTER
 	public static final int						DEFAULT_CLUSTER_GRID_SIZE		= 60;
-	public static final int						DEFAULT_CLUSTER_SYMBOL_SIZE		= 40;
+	public static final int						DEFAULT_CLUSTER_SYMBOL_SIZE		= 10;
 	public static final int						CLUSTER_GRID_MIN_SIZE			= 1;
 	public static final int						CLUSTER_GRID_MAX_SIZE			= 10000;
-	public static final int						CLUSTER_SYMBOL_SIZE_MIN			= 20;
+	public static final int						CLUSTER_SYMBOL_SIZE_MIN			= 1;
 	public static final int						CLUSTER_SYMBOL_SIZE_MAX			= 200;
 	//
 	// colors
@@ -221,6 +221,7 @@ public class Map25ConfigManager {
 
 		config.markerOutline_Color = fgBlack;
 		config.markerFill_Color = fgWhite;
+
 
 		switch (configIndex) {
 
@@ -688,10 +689,10 @@ public class Map25ConfigManager {
 		config.id		= Util.getXmlString(xmlConfig, ATTR_ID, Long.toString(System.nanoTime()));
 		config.name		= Util.getXmlString(xmlConfig, ATTR_CONFIG_NAME, UI.EMPTY_STRING);
 
-		config.clusterAlgorithm		= Util.getXmlEnum(xmlConfig,	ATTR_CLUSTER_ALGORITHM,		ClusterAlgorithm.FirstMarker);
+		config.clusterAlgorithm		= Util.getXmlEnum(xmlConfig,	ATTR_CLUSTER_ALGORITHM,		ClusterAlgorithm.FirstMarker_Distance);
 		config.clusterGridSize		= Util.getXmlInteger(xmlConfig, ATTR_CLUSTER_GRID_SIZE,		DEFAULT_CLUSTER_GRID_SIZE, CLUSTER_GRID_MIN_SIZE, CLUSTER_GRID_MAX_SIZE);
-		config.clusterOrientation	= Util.getXmlInteger(xmlConfig, ATTR_CLUSTER_ORIENTATION,	Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD);
 		config.clusterSymbolSize	= Util.getXmlInteger(xmlConfig, ATTR_CLUSTER_SYMBOL_SIZE,	DEFAULT_CLUSTER_SYMBOL_SIZE, CLUSTER_SYMBOL_SIZE_MIN, CLUSTER_SYMBOL_SIZE_MAX);
+		config.clusterOrientation	= Util.getXmlInteger(xmlConfig, ATTR_CLUSTER_ORIENTATION,	Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD);
 		config.isMarkerClustered	= Util.getXmlBoolean(xmlConfig, ATTR_IS_MARKER_CLUSTERED,	true);
 		
 		config.isShowMarkerLabel	= Util.getXmlBoolean(xmlConfig, ATTR_IS_SHOW_MARKER_LABEL,	true);

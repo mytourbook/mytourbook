@@ -1092,9 +1092,8 @@ public class Messages extends NLS {
 	public static String		Log_Tour_SaveTours;
 	public static String		Log_Tour_SaveTours_File;
 
-	public static String		Map25_Config_ClusterAlgorithm_Distance;
-
-	public static String		Map25_Config_ClusterAlgorithm_FirstMarker;
+	public static String		Map25_Config_ClusterAlgorithm_FirstMarker_Distance;
+	public static String		Map25_Config_ClusterAlgorithm_FirstMarker_Grid;
 	public static String		Map25_Config_ClusterAlgorithm_Grid;
 	public static String		Map25_Config_SymbolOrientation_Billboard;
 	public static String		Map25_Config_SymbolOrientation_Ground;
