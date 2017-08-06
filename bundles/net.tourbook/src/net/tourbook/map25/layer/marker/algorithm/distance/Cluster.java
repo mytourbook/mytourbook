@@ -15,25 +15,18 @@
  */
 package net.tourbook.map25.layer.marker.algorithm.distance;
 
+import java.util.Collection;
+
 /**
- * Original: {@link com.google.maps.android.clustering.ClusterItem}
+ * Original {@link com.google.maps.android.clustering.Cluster}
  * <p>
- * ClusterItem represents a marker on the map.
+ * A collection of ClusterItems that are nearby each other.
  */
-public interface ClusterItem {
+public interface Cluster<T extends ClusterItem> {
 
-	/**
-	 * The position of this marker. This must always return the same value.
-	 */
-	LatLng getPosition();
+	Collection<T> getItems();
 
-	/**
-	 * The description of this marker.
-	 */
-	String getSnippet();
+	public LatLng getPosition();
 
-	/**
-	 * The title of this marker.
-	 */
-	String getTitle();
+	int getSize();
 }

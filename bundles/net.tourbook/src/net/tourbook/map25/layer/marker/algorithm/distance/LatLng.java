@@ -1,8 +1,23 @@
 /*
- * Original: com.google.android.gms.maps.model.LatLng
+ * Copyright 2013 Google Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package net.tourbook.map25.layer.marker.algorithm.distance;
 
+/**
+ * Original: {@link com.google.android.gms.maps.model.LatLng}
+ */
 public final class LatLng {
 
 	private final int	mVersionCode;
@@ -48,13 +63,9 @@ public final class LatLng {
 	@Override
 	public int hashCode() {
 
-		final boolean var1 = true;
-		final boolean var2 = true;
 		long var3 = Double.doubleToLongBits(this.latitude);
-		final boolean var10000 = true;
-		final boolean var10001 = true;
-
 		int var5 = 31 + (int) (var3 ^ var3 >>> 32);
+
 		var3 = Double.doubleToLongBits(this.longitude);
 		var5 = 31 * var5 + (int) (var3 ^ var3 >>> 32);
 

@@ -1,6 +1,18 @@
-/**
- * Original: {@link org.oscim.layers.marker.MarkerRenderer}
- */
+/*******************************************************************************
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * 
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation version 2 of the License.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
+ *******************************************************************************/
 package net.tourbook.map25.layer.marker;
 
 import java.util.Comparator;
@@ -9,6 +21,8 @@ import java.util.List;
 
 import net.tourbook.common.color.ColorUtil;
 import net.tourbook.map25.Map25ConfigManager;
+import net.tourbook.map25.layer.marker.algorithm.distance.ClusterItem;
+import net.tourbook.map25.layer.marker.algorithm.distance.DistanceBasedAlgorithm;
 
 import org.oscim.backend.CanvasAdapter;
 import org.oscim.backend.canvas.Bitmap;
@@ -27,35 +41,38 @@ import org.oscim.utils.FastMath;
 import org.oscim.utils.TimSort;
 import org.oscim.utils.geom.GeometryUtils;
 
+/**
+ * Original: {@link org.oscim.layers.marker.MarkerRenderer}
+ */
 public class MarkerRenderer extends BucketRenderer {
 
 	/**
 	 * default color of number inside the icon. Would be super-cool to cook this into the map theme
 	 */
-	private static final int					CLUSTER_COLOR_TEXT			= 0xff8000c0;
+	private static final int						CLUSTER_COLOR_TEXT			= 0xff8000c0;
 
 	/**
 	 * default color of circle background
 	 */
-	private static final int					CLUSTER_COLOR_BACK			= 0xffffffff;
+	private static final int						CLUSTER_COLOR_BACK			= 0xffffffff;
 
 	/**
 	 * Map Cluster Icon Size. This is the biggest size for clusters of CLUSTER_MAXSIZE elements.
 	 * Smaller clusters will be slightly smaller
 	 */
-	public static final int						MAP_MARKER_CLUSTER_SIZE_DP	= 64;
+	public static final int							MAP_MARKER_CLUSTER_SIZE_DP	= 64;
 
 	/**
 	 * Clustering grid square size, decrease to cluster more aggresively. Ideally this value is the
 	 * typical marker size
 	 */
-	private static final int					MAP_GRID_SIZE_DP			= 64;
+	private static final int						MAP_GRID_SIZE_DP			= 64;
 
-	private static HashMap<Integer, Bitmap>		_clusterBitmaps				= new HashMap<>();
+	private static final HashMap<Integer, Bitmap>	_clusterBitmaps				= new HashMap<>();
 
-	static TimSort<ProjectedMarker>				ZSORT						= new TimSort<ProjectedMarker>();
+	private static final TimSort<ProjectedMarker>	ZSORT						= new TimSort<ProjectedMarker>();
 
-	final static Comparator<ProjectedMarker>	zComparator;
+	final static Comparator<ProjectedMarker>		zComparator;
 	static {
 
 		zComparator = new Comparator<ProjectedMarker>() {
@@ -87,58 +104,60 @@ public class MarkerRenderer extends BucketRenderer {
 		};
 	}
 
-	private MarkerSymbol		_defaultMarkerSymbol;
+	private MarkerSymbol						_defaultMarkerSymbol;
 
-	private final MarkerLayer	_markerLayer;
-	private final SymbolBucket	_symbolBucket;
+	private final MarkerLayer					_markerLayer;
+	private final SymbolBucket					_symbolBucket;
 
-	private final float[]		_tmpBox					= new float[8];
-	private final Point			_tmpPoint				= new Point();
+	private final float[]						_tmpBox					= new float[8];
+	private final Point							_tmpPoint				= new Point();
 
 	/**
 	 * increase view to show items that are partially visible
 	 */
-	private int					_extents				= 100;
+	private int									_extents				= 100;
 
 	/**
 	 * flag to force update of markers
 	 */
-	private boolean				_isForceUpdateMarkers;
+	private boolean								_isForceUpdateMarkers;
 
-	private ProjectedMarker[]	_allProjectedMarker;
+	private ProjectedMarker[]					_allProjectedMarker;
 
-	private int					_clusterBackgroundColor	= CLUSTER_COLOR_BACK;
-	private int					_clusterForegroundColor	= CLUSTER_COLOR_TEXT;
+	private int									_clusterBackgroundColor	= CLUSTER_COLOR_BACK;
+	private int									_clusterForegroundColor	= CLUSTER_COLOR_TEXT;
 
 	/**
 	 * Discrete scale step, used to trigger reclustering on significant scale change
 	 */
-	private int					_scaleSaved				= 0;
+	private int									_scaleSaved				= 0;
 
 	/**
 	 * We use a flat Sparse array to calculate the clusters. The sparse array models a 2D map where
 	 * every (x,y) denotes a grid slot, ie. 64x64dp. For efficiency I use a linear sparsearray with
 	 * ARRindex = SLOTypos * max_x + SLOTxpos"
 	 */
-	private SparseIntArray		_clusterCells			= new SparseIntArray(200);		// initial space for 200 markers, that's not a lot of memory, and in most cases will avoid resizing the array
+	private SparseIntArray						_clusterCells			= new SparseIntArray(200);					// initial space for 200 markers, that's not a lot of memory, and in most cases will avoid resizing the array
 
-	private double				_mapTileScale;
+	private double								_mapTileScale;
 
-	private int					_clusterSymbolSizeDP	= MAP_MARKER_CLUSTER_SIZE_DP;
-	private int					_clusterGridSize		= MAP_GRID_SIZE_DP;
+	private int									_clusterSymbolSizeDP	= MAP_MARKER_CLUSTER_SIZE_DP;
+	private int									_clusterGridSize		= MAP_GRID_SIZE_DP;
 
 	/**
 	 * When <code>true</code> all items are clustered, otherwise nothing is clustered.
 	 */
-	private boolean				_isClustering			= true;
+	private boolean								_isClustering			= true;
 
 	/**
 	 * When <code>true</code> then the symbol is displayed as billboard, otherwise it is clamped to
 	 * the ground.
 	 */
-	private boolean				_isBillboard;
+	private boolean								_isBillboard;
 
-	private ClusterAlgorithm	_clusterAlgorithm;
+	private ClusterAlgorithm					_clusterAlgorithm;
+
+	private DistanceBasedAlgorithm<ClusterItem>	_distanceAlgorithm		= new DistanceBasedAlgorithm<ClusterItem>();
 
 	/**
 	 * Class to wrap the cluster icon style properties
@@ -246,7 +265,7 @@ public class MarkerRenderer extends BucketRenderer {
 			break;
 		}
 
-		/* All ready for update. */
+		// update the UI
 		synchronized (this) {
 
 			_isForceUpdateMarkers = true;
