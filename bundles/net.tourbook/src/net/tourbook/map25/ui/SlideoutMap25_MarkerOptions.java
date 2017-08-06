@@ -545,7 +545,7 @@ public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements ICol
 		}
 		{
 			/*
-			 * Cluster orientation: billboard/ground
+			 * Cluster placement: first marker/distance/grid
 			 */
 			{
 				// label
@@ -559,7 +559,7 @@ public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements ICol
 			}
 			{
 				/*
-				 * Combo: Orientaion
+				 * Combo: Placement
 				 */
 				_comboClusterAlgorithm = new Combo(parent, SWT.READ_ONLY | SWT.BORDER);
 				_comboClusterAlgorithm.setVisibleItemCount(20);

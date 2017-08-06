@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.oscim.core.Point;
+
 /**
  * A quad tree which tracks items with a Point geometry. See http://en.wikipedia.org/wiki/Quadtree
  * for details on the data structure. This class is not thread safe.

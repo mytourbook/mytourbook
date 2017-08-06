@@ -3,6 +3,8 @@
  */
 package net.tourbook.map25.layer.marker.algorithm.distance;
 
+import org.oscim.core.Point;
+
 /**
  * Represents an area in the cartesian plane.
  */

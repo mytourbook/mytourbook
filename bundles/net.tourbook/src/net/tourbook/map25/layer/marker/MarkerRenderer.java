@@ -15,14 +15,20 @@
  *******************************************************************************/
 package net.tourbook.map25.layer.marker;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import net.tourbook.common.color.ColorUtil;
 import net.tourbook.map25.Map25ConfigManager;
+import net.tourbook.map25.layer.marker.algorithm.distance.Cluster;
 import net.tourbook.map25.layer.marker.algorithm.distance.ClusterItem;
-import net.tourbook.map25.layer.marker.algorithm.distance.DistanceBasedAlgorithm;
+import net.tourbook.map25.layer.marker.algorithm.distance.DistanceClustering;
+import net.tourbook.map25.layer.marker.algorithm.distance.QuadItem;
+import net.tourbook.map25.layer.marker.algorithm.distance.StaticCluster;
 
 import org.oscim.backend.CanvasAdapter;
 import org.oscim.backend.canvas.Bitmap;
@@ -104,60 +110,60 @@ public class MarkerRenderer extends BucketRenderer {
 		};
 	}
 
-	private MarkerSymbol						_defaultMarkerSymbol;
+	private MarkerSymbol					_defaultMarkerSymbol;
 
-	private final MarkerLayer					_markerLayer;
-	private final SymbolBucket					_symbolBucket;
+	private final MarkerLayer				_markerLayer;
+	private final SymbolBucket				_symbolBucket;
 
-	private final float[]						_tmpBox					= new float[8];
-	private final Point							_tmpPoint				= new Point();
+	private final float[]					_tmpBox					= new float[8];
+	private final Point						_tmpPoint				= new Point();
 
 	/**
 	 * increase view to show items that are partially visible
 	 */
-	private int									_extents				= 100;
+	private int								_extents				= 100;
 
 	/**
 	 * flag to force update of markers
 	 */
-	private boolean								_isForceUpdateMarkers;
+	private boolean							_isForceUpdateMarkers;
 
-	private ProjectedMarker[]					_allProjectedMarker;
+	private ProjectedMarker[]				_allProjectedMarker;
 
-	private int									_clusterBackgroundColor	= CLUSTER_COLOR_BACK;
-	private int									_clusterForegroundColor	= CLUSTER_COLOR_TEXT;
+	private int								_clusterBackgroundColor	= CLUSTER_COLOR_BACK;
+	private int								_clusterForegroundColor	= CLUSTER_COLOR_TEXT;
 
 	/**
 	 * Discrete scale step, used to trigger reclustering on significant scale change
 	 */
-	private int									_scaleSaved				= 0;
+	private int								_scaleSaved				= 0;
 
 	/**
 	 * We use a flat Sparse array to calculate the clusters. The sparse array models a 2D map where
 	 * every (x,y) denotes a grid slot, ie. 64x64dp. For efficiency I use a linear sparsearray with
 	 * ARRindex = SLOTypos * max_x + SLOTxpos"
 	 */
-	private SparseIntArray						_clusterCells			= new SparseIntArray(200);					// initial space for 200 markers, that's not a lot of memory, and in most cases will avoid resizing the array
+	private SparseIntArray					_clusterCells			= new SparseIntArray(200);				// initial space for 200 markers, that's not a lot of memory, and in most cases will avoid resizing the array
 
-	private double								_mapTileScale;
+	private double							_mapTileScale;
 
-	private int									_clusterSymbolSizeDP	= MAP_MARKER_CLUSTER_SIZE_DP;
-	private int									_clusterGridSize		= MAP_GRID_SIZE_DP;
+	private int								_clusterSymbolSizeDP	= MAP_MARKER_CLUSTER_SIZE_DP;
+	private int								_clusterGridSize		= MAP_GRID_SIZE_DP;
 
 	/**
 	 * When <code>true</code> all items are clustered, otherwise nothing is clustered.
 	 */
-	private boolean								_isClustering			= true;
+	private boolean							_isClustering			= true;
 
 	/**
 	 * When <code>true</code> then the symbol is displayed as billboard, otherwise it is clamped to
 	 * the ground.
 	 */
-	private boolean								_isBillboard;
+	private boolean							_isBillboard;
 
-	private ClusterAlgorithm					_clusterAlgorithm;
+	private ClusterAlgorithm				_clusterAlgorithm;
 
-	private DistanceBasedAlgorithm<ClusterItem>	_distanceAlgorithm		= new DistanceBasedAlgorithm<ClusterItem>();
+	private DistanceClustering<ClusterItem>	_distanceAlgorithm		= new DistanceClustering<ClusterItem>();
 
 	/**
 	 * Class to wrap the cluster icon style properties
@@ -218,7 +224,6 @@ public class MarkerRenderer extends BucketRenderer {
 
 		_clusterSymbolSizeDP = config.clusterSymbolSize;
 		_isBillboard = config.clusterOrientation == Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
-		_clusterAlgorithm = (ClusterAlgorithm) config.clusterAlgorithm;
 
 		_clusterForegroundColor = ColorUtil.getARGB(config.clusterOutline_Color, config.clusterOutline_Opacity);
 		_clusterBackgroundColor = ColorUtil.getARGB(config.clusterFill_Color, config.clusterFill_Opacity);
@@ -230,18 +235,24 @@ public class MarkerRenderer extends BucketRenderer {
 
 		final boolean isClustering = config.isMarkerClustered;
 		final int clusterGridSize = config.clusterGridSize;
+		final ClusterAlgorithm clusterAlgorithm = (ClusterAlgorithm) config.clusterAlgorithm;
 
 		// check if modified, this is an expensive operation
-		if (isClustering != _isClustering || clusterGridSize != _clusterGridSize) {
+		if (isClustering != _isClustering //
+				|| clusterGridSize != _clusterGridSize
+				|| clusterAlgorithm != _clusterAlgorithm) {
+
+			// relevant data are modified, rebuild the cluster
 
 			_isClustering = isClustering;
 			_clusterGridSize = clusterGridSize;
+			_clusterAlgorithm = clusterAlgorithm;
 
 			// post repopulation to the main thread
 			_markerLayer.map().post(new Runnable() {
 				@Override
 				public void run() {
-					createCluster();
+					createClusterItems();
 				}
 			});
 		}
@@ -249,19 +260,20 @@ public class MarkerRenderer extends BucketRenderer {
 		_isForceUpdateMarkers = true;
 	}
 
-	void createCluster() {
+	void createClusterItems() {
 
 		ProjectedMarker[] allProjectedMarker;
+
 		switch (_clusterAlgorithm) {
 
 		case Distance:
-			allProjectedMarker = createCluster_Distance();
+			allProjectedMarker = createClusterItems_Distance();
 			break;
 
 		case FirstMarker:
 		case Grid:
 		default:
-			allProjectedMarker = createCluster_Grid();
+			allProjectedMarker = createClusterItems_Grid();
 			break;
 		}
 
@@ -273,14 +285,63 @@ public class MarkerRenderer extends BucketRenderer {
 		}
 	}
 
-	private ProjectedMarker[] createCluster_Distance() {
+	private ProjectedMarker[] createClusterItems_Distance() {
 
-		final ProjectedMarker[] allProjectedMarker = new ProjectedMarker[0];
+		final List<MapMarker> allMarkers = _markerLayer.getAllMarkers();
+
+		final Collection<ClusterItem> allClusterItems = new ArrayList<>();
+
+		// convert MapMarker list into ClusterItem list
+		allClusterItems.addAll(allMarkers);
+
+		_distanceAlgorithm.clearItems();
+		_distanceAlgorithm.addItems(allClusterItems);
+//		_distanceAlgorithm.addItems((Collection<ClusterItem>) (Object) allMarkers);
+
+		// get current position
+		final MapPosition currentMapPos = new MapPosition();
+		_markerLayer.map().viewport().getMapPosition(currentMapPos);
+		final double zoom = currentMapPos.zoomLevel;
+
+		final int clusterGridSize = ScreenUtils.getPixels(_clusterGridSize);
+
+		final Set<? extends Cluster<ClusterItem>> markerClusters = _distanceAlgorithm.getClusters(
+				zoom,
+				clusterGridSize);
+
+//		System.out.println();
+//		System.out.println(
+//				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")//
+//						+ ("\tmarkerClusters.size:" + markerClusters.size()));
+//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\t" + markerClusters));
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
+		final ProjectedMarker[] allProjectedMarker = new ProjectedMarker[markerClusters.size()];
+
+		int itemIndex = 0;
+
+		for (final Cluster<ClusterItem> clusterItem : markerClusters) {
+
+			final ProjectedMarker projectedMarker = allProjectedMarker[itemIndex++] = new ProjectedMarker();
+
+			if (clusterItem instanceof QuadItem) {
+
+				final QuadItem quadItem = (QuadItem) clusterItem;
+
+			} else {
+
+				if (clusterItem instanceof StaticCluster) {
+
+					final StaticCluster<ClusterItem> new_name = (StaticCluster<ClusterItem>) clusterItem;
+
+				}
+			}
+		}
 
 		return allProjectedMarker;
 	}
 
-	private ProjectedMarker[] createCluster_Grid() {
+	private ProjectedMarker[] createClusterItems_Grid() {
 
 		final List<MapMarker> allMarkers = _markerLayer.getAllMarkers();
 
@@ -473,7 +534,7 @@ public class MarkerRenderer extends BucketRenderer {
 			_markerLayer.map().post(new Runnable() {
 				@Override
 				public void run() {
-					createCluster();
+					createClusterItems();
 				}
 			});
 

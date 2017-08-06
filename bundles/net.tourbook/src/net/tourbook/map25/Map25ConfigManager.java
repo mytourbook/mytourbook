@@ -55,8 +55,8 @@ public class Map25ConfigManager {
 	public static final ClusterAlgorithmItem[]	ALL_CLUSTER_ALGORITHM			= {
 			
 		new ClusterAlgorithmItem(Messages.Map25_Config_ClusterAlgorithm_FirstMarker,	ClusterAlgorithm.FirstMarker),
-		new ClusterAlgorithmItem(Messages.Map25_Config_ClusterAlgorithm_Grid,			ClusterAlgorithm.Grid),
 		new ClusterAlgorithmItem(Messages.Map25_Config_ClusterAlgorithm_Distance,		ClusterAlgorithm.Distance),
+		new ClusterAlgorithmItem(Messages.Map25_Config_ClusterAlgorithm_Grid,			ClusterAlgorithm.Grid),
 	};
 
 // SET_FORMATTING_ON

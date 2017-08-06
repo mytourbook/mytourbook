@@ -3,12 +3,14 @@
  */
 package net.tourbook.map25.layer.marker;
 
+import net.tourbook.map25.layer.marker.algorithm.distance.ClusterItem;
+
 import org.oscim.core.GeoPoint;
 
 /**
  * Immutable class describing a GeoPoint with a Title and a Description.
  */
-public class MapMarker {
+public class MapMarker implements ClusterItem {
 
 	public String		title;
 	public String		description;
@@ -28,6 +30,25 @@ public class MapMarker {
 		this.description = description;
 
 		this.geoPoint = geoPoint;
+	}
+
+	@Override
+	public GeoPoint getPosition() {
+		return geoPoint;
+	}
+
+	@Override
+	public String toString() {
+		return
+//				"\n"
+		"MapMarker ["
+
+				//				+ "title=" + title + ", "
+				//				+ "description=" + description + ", "
+				+ "geoPoint=" + geoPoint + ", "
+				//				+ "markerSymbol=" + markerSymbol
+
+				+ "]";
 	}
 
 }

@@ -253,7 +253,7 @@ public class MarkerLayer extends Layer implements GestureListener {
 	 */
 	public final void populate() {
 
-		_markerRenderer.createCluster();
+		_markerRenderer.createClusterItems();
 	}
 
 	public void replaceMarkers(final Collection<MapMarker> allMarkers) {

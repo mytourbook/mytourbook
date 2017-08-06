@@ -20,8 +20,6 @@ package net.tourbook.map25.layer.marker.algorithm.distance;
  */
 public final class LatLng {
 
-	private final int	mVersionCode;
-
 	public final double	latitude;
 	public final double	longitude;
 
@@ -30,8 +28,6 @@ public final class LatLng {
 	}
 
 	LatLng(final int var1, final double var2, final double var4) {
-
-		this.mVersionCode = var1;
 
 		if (-180.0D <= var4 && var4 < 180.0D) {
 			this.longitude = var4;
@@ -43,21 +39,19 @@ public final class LatLng {
 	}
 
 	@Override
-	public boolean equals(final Object var1) {
+	public boolean equals(final Object otherLatLng) {
 
-		if (this == var1) {
+		if (this == otherLatLng) {
 			return true;
-		} else if (!(var1 instanceof LatLng)) {
+		} else if (!(otherLatLng instanceof LatLng)) {
 			return false;
 		} else {
-			final LatLng var2 = (LatLng) var1;
-			return Double.doubleToLongBits(this.latitude) == Double.doubleToLongBits(var2.latitude) && Double
-					.doubleToLongBits(this.longitude) == Double.doubleToLongBits(var2.longitude);
-		}
-	}
 
-	int getVersionCode() {
-		return this.mVersionCode;
+			final LatLng latLng2 = (LatLng) otherLatLng;
+
+			return Double.doubleToLongBits(this.latitude) == Double.doubleToLongBits(latLng2.latitude) && Double
+					.doubleToLongBits(this.longitude) == Double.doubleToLongBits(latLng2.longitude);
+		}
 	}
 
 	@Override
@@ -77,6 +71,7 @@ public final class LatLng {
 
 		final double var1 = this.latitude;
 		final double var3 = this.longitude;
+
 		return (new StringBuilder(60))
 				.append("lat/lng: (")
 				.append(var1)

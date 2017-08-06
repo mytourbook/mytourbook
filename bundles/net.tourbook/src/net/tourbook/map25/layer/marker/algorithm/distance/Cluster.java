@@ -17,6 +17,8 @@ package net.tourbook.map25.layer.marker.algorithm.distance;
 
 import java.util.Collection;
 
+import org.oscim.core.GeoPoint;
+
 /**
  * Original {@link com.google.maps.android.clustering.Cluster}
  * <p>
@@ -26,7 +28,7 @@ public interface Cluster<T extends ClusterItem> {
 
 	Collection<T> getItems();
 
-	public LatLng getPosition();
+	public GeoPoint getPosition();
 
 	int getSize();
 }

@@ -15,6 +15,8 @@
  */
 package net.tourbook.map25.layer.marker.algorithm.distance;
 
+import org.oscim.core.GeoPoint;
+
 /**
  * Original: {@link com.google.maps.android.clustering.ClusterItem}
  * <p>
@@ -25,15 +27,6 @@ public interface ClusterItem {
 	/**
 	 * The position of this marker. This must always return the same value.
 	 */
-	LatLng getPosition();
+	GeoPoint getPosition();
 
-	/**
-	 * The description of this marker.
-	 */
-	String getSnippet();
-
-	/**
-	 * The title of this marker.
-	 */
-	String getTitle();
 }

@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.oscim.core.GeoPoint;
+
 /**
  * Original: {@link com.google.maps.android.clustering.algo.StaticCluster}
  * <p>
@@ -26,10 +28,11 @@ import java.util.List;
  */
 public class StaticCluster<T extends ClusterItem> implements Cluster<T> {
 
-	private final LatLng	mCenter;
+	private final GeoPoint	mCenter;
+
 	private final List<T>	mItems	= new ArrayList<T>();
 
-	public StaticCluster(final LatLng center) {
+	public StaticCluster(final GeoPoint center) {
 		mCenter = center;
 	}
 
@@ -54,7 +57,7 @@ public class StaticCluster<T extends ClusterItem> implements Cluster<T> {
 	}
 
 	@Override
-	public LatLng getPosition() {
+	public GeoPoint getPosition() {
 		return mCenter;
 	}
 
@@ -74,10 +77,13 @@ public class StaticCluster<T extends ClusterItem> implements Cluster<T> {
 
 	@Override
 	public String toString() {
+		return "\n"
 
-		return "StaticCluster{" +
-				"mCenter=" + mCenter +
-				", mItems.size=" + mItems.size() +
-				'}';
+				+ "\tStaticCluster	["
+
+				+ "mItems.size=" + mItems.size() + ", "
+				+ "mCenter=" + mCenter + ", "
+
+				+ "]";
 	}
 }
