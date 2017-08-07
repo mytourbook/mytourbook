@@ -148,8 +148,9 @@ public class MarkerRenderer extends BucketRenderer {
 
 	private double							_mapTileScale;
 
-	private int								_clusterSymbolSizeDP	= MAP_MARKER_CLUSTER_SIZE_DP;
 	private int								_clusterGridSize		= MAP_GRID_SIZE_DP;
+	private int								_clusterSymbolSizeDP	= MAP_MARKER_CLUSTER_SIZE_DP;
+	private int								_clusterSymbolWeight;
 
 	/**
 	 * When <code>true</code> all items are clustered, otherwise nothing is clustered.
@@ -224,6 +225,7 @@ public class MarkerRenderer extends BucketRenderer {
 		final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
 		_clusterSymbolSizeDP = config.clusterSymbolSize;
+		_clusterSymbolWeight = config.clusterSymbolWeight;
 		_isBillboard = config.clusterOrientation == Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
 
 		_clusterForegroundColor = ColorUtil.getARGB(config.clusterOutline_Color, config.clusterOutline_Opacity);
@@ -523,7 +525,8 @@ public class MarkerRenderer extends BucketRenderer {
 				_clusterForegroundColor,
 				_clusterBackgroundColor,
 
-				Integer.toString(size));
+				Integer.toString(size),
+				_clusterSymbolWeight);
 
 		final Bitmap paintedBitmap = drawable.getBitmap();
 

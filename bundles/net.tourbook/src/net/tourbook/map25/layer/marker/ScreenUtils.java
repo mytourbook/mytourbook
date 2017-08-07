@@ -46,15 +46,17 @@ public class ScreenUtils {
 		 *            Background
 		 * @param text
 		 *            Text inside. Will only work for a single character!
+		 * @param symbolSizeWeight
 		 */
 		public ClusterDrawable(	final int sizedp,
 								final int foregroundColor,
 								final int backgroundColor,
-								final String text) {
+								final String text,
+								final int symbolSizeWeight) {
 
 			mText = text;
 
-			setup(sizedp, foregroundColor, backgroundColor);
+			setup(sizedp, foregroundColor, backgroundColor, symbolSizeWeight);
 		}
 
 		private void draw(final Canvas canvas) {
@@ -96,15 +98,19 @@ public class ScreenUtils {
 		 * @param symbolSizeDP
 		 * @param foregroundColor
 		 * @param backgroundColor
+		 * @param symbolSizeWeight
 		 */
-		private void setup(final int symbolSizeDP, final int foregroundColor, final int backgroundColor) {
+		private void setup(	final int symbolSizeDP,
+							final int foregroundColor,
+							final int backgroundColor,
+							final int symbolSizeWeight) {
 
 			final int defaultSymbolSize = getPixels(symbolSizeDP);
 
 			final int numDigits = mText.length();
 
 			float textSize;
-			final double symbolSizeFactor = numDigits * 20.0;
+			final double symbolSizeFactor = numDigits * symbolSizeWeight;
 
 			switch (numDigits) {
 

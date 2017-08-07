@@ -54,6 +54,7 @@ public class MarkerConfig {
 	public int						clusterGridSize			= Map25ConfigManager.DEFAULT_CLUSTER_GRID_SIZE;
 	public int						clusterOrientation		= Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
 	public int						clusterSymbolSize		= Map25ConfigManager.DEFAULT_CLUSTER_SYMBOL_SIZE;
+	public int						clusterSymbolWeight		= Map25ConfigManager.DEFAULT_CLUSTER_SYMBOL_WEIGHT;
 
 	@Override
 	public boolean equals(final Object obj) {
