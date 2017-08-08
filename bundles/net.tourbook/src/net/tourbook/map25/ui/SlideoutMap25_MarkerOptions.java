@@ -326,6 +326,7 @@ public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements ICol
 			// label
 			_lblMarkerOpacity = new Label(parent, SWT.NONE);
 			_lblMarkerOpacity.setText(Messages.Slideout_Map25MarkerOptions_Label_Opacity);
+			_lblMarkerOpacity.setToolTipText(Messages.Slideout_Map25MarkerOptions_Label_Opacity_Tooltip);
 			GridDataFactory
 					.fillDefaults()
 					.align(SWT.FILL, SWT.CENTER)
@@ -346,7 +347,7 @@ public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements ICol
 					// spinner: outline
 					_spinnerMarkerOutline_Opacity = new Spinner(container, SWT.BORDER);
 					_spinnerMarkerOutline_Opacity.setMinimum(0);
-					_spinnerMarkerOutline_Opacity.setMaximum(0xff);
+					_spinnerMarkerOutline_Opacity.setMaximum(100);
 					_spinnerMarkerOutline_Opacity.setIncrement(1);
 					_spinnerMarkerOutline_Opacity.setPageIncrement(10);
 					_spinnerMarkerOutline_Opacity.addSelectionListener(_defaultSelectionListener);
@@ -356,7 +357,7 @@ public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements ICol
 					// spinner: fill
 					_spinnerMarkerFill_Opacity = new Spinner(container, SWT.BORDER);
 					_spinnerMarkerFill_Opacity.setMinimum(0);
-					_spinnerMarkerFill_Opacity.setMaximum(0xff);
+					_spinnerMarkerFill_Opacity.setMaximum(100);
 					_spinnerMarkerFill_Opacity.setIncrement(1);
 					_spinnerMarkerFill_Opacity.setPageIncrement(10);
 					_spinnerMarkerFill_Opacity.addSelectionListener(_defaultSelectionListener);
@@ -466,6 +467,7 @@ public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements ICol
 			// label
 			_lblClusterOpacity = new Label(parent, SWT.NONE);
 			_lblClusterOpacity.setText(Messages.Slideout_Map25MarkerOptions_Label_Opacity);
+			_lblClusterOpacity.setToolTipText(Messages.Slideout_Map25MarkerOptions_Label_Opacity_Tooltip);
 			GridDataFactory
 					.fillDefaults()
 					.indent(2 * UI.FORM_FIRST_COLUMN_INDENT, 0)
@@ -483,7 +485,7 @@ public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements ICol
 					// spinner: outline
 					_spinnerClusterOutline_Opacity = new Spinner(container, SWT.BORDER);
 					_spinnerClusterOutline_Opacity.setMinimum(0);
-					_spinnerClusterOutline_Opacity.setMaximum(0xff);
+					_spinnerClusterOutline_Opacity.setMaximum(100);
 					_spinnerClusterOutline_Opacity.setIncrement(1);
 					_spinnerClusterOutline_Opacity.setPageIncrement(10);
 					_spinnerClusterOutline_Opacity.addSelectionListener(_defaultSelectionListener);
@@ -493,7 +495,7 @@ public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements ICol
 					// spinner: fill
 					_spinnerClusterFill_Opacity = new Spinner(container, SWT.BORDER);
 					_spinnerClusterFill_Opacity.setMinimum(0);
-					_spinnerClusterFill_Opacity.setMaximum(0xff);
+					_spinnerClusterFill_Opacity.setMaximum(100);
 					_spinnerClusterFill_Opacity.setIncrement(1);
 					_spinnerClusterFill_Opacity.setPageIncrement(10);
 					_spinnerClusterFill_Opacity.addSelectionListener(_defaultSelectionListener);
@@ -584,6 +586,8 @@ public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements ICol
 				// label
 				_lblClusterAlgorithm = new Label(parent, SWT.NONE);
 				_lblClusterAlgorithm.setText(Messages.Slideout_Map25MarkerOptions_Label_ClusterPlacement);
+				_lblClusterAlgorithm.setToolTipText(
+						Messages.Slideout_Map25MarkerOptions_Label_ClusterPlacement_Tooltip);
 				GridDataFactory
 						.fillDefaults()//
 						.align(SWT.FILL, SWT.CENTER)

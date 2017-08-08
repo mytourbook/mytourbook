@@ -17,10 +17,12 @@ package net.tourbook.map25;
 
 import java.awt.Canvas;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 import net.tourbook.map25.Map25TileSource.Builder;
 import net.tourbook.map25.OkHttpEngineMT.OkHttpFactoryMT;
 import net.tourbook.map25.layer.marker.MapMarker;
+import net.tourbook.map25.layer.marker.MarkerConfig;
 import net.tourbook.map25.layer.marker.MarkerLayer;
 import net.tourbook.map25.layer.marker.MarkerLayer.OnItemGestureListener;
 import net.tourbook.map25.layer.marker.MarkerRenderer;
@@ -577,9 +579,23 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 
 	private void updateUI_MarkerLayer() {
 
-		final MarkerRenderer markerRenderer = (MarkerRenderer) _layer_Marker.getRenderer();
+		final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
-		markerRenderer.configureRenderer();
+		final boolean isShowMarkerPoint = config.isShowMarkerPoint;
+
+		System.out.println(
+				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+						+ ("\tisShowMarkerPoint:" + isShowMarkerPoint));
+		// TODO remove SYSTEM.OUT.PRINTLN
+
+		_layer_Marker.setEnabled(isShowMarkerPoint);
+
+		if (isShowMarkerPoint) {
+
+			final MarkerRenderer markerRenderer = (MarkerRenderer) _layer_Marker.getRenderer();
+
+			markerRenderer.configureRenderer();
+		}
 	}
 
 }

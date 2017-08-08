@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorUtil;
 import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.map25.layer.marker.algorithm.distance.Cluster;
@@ -228,8 +229,13 @@ public class MarkerRenderer extends BucketRenderer {
 		_clusterSymbolWeight = config.clusterSymbolWeight;
 		_isBillboard = config.clusterOrientation == Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
 
-		_clusterForegroundColor = ColorUtil.getARGB(config.clusterOutline_Color, config.clusterOutline_Opacity);
-		_clusterBackgroundColor = ColorUtil.getARGB(config.clusterFill_Color, config.clusterFill_Opacity);
+		_clusterForegroundColor = ColorUtil.getARGB(
+				config.clusterOutline_Color,
+				(int) (config.clusterOutline_Opacity / 100.0 * 0xff));
+
+		_clusterBackgroundColor = ColorUtil.getARGB(
+				config.clusterFill_Color,
+				(int) (config.clusterFill_Opacity / 100.0 * 0xff));
 
 		_defaultMarkerSymbol = createMarkerSymbol();
 
@@ -472,14 +478,17 @@ public class MarkerRenderer extends BucketRenderer {
 
 		final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
+		final int markerFill_Opacity = (int) (config.markerFill_Opacity / 100.0 * 0xff);
+		final int markerOutline_Opacity = (int) (config.markerOutline_Opacity / 100.0 * 0xff);
+
 		final Paint paintFill = CanvasAdapter.newPaint();
-		paintFill.setColor(ColorUtil.getARGB(config.markerFill_Color, config.markerFill_Opacity));
 		paintFill.setStyle(Paint.Style.FILL);
+		paintFill.setColor(ColorUtil.getARGB(config.markerFill_Color, markerFill_Opacity));
 
 		final Paint paintOutline = CanvasAdapter.newPaint();
-		paintOutline.setColor(ColorUtil.getARGB(config.markerOutline_Color, config.markerOutline_Opacity));
 		paintOutline.setStyle(Paint.Style.STROKE);
 		paintOutline.setStrokeWidth(ScreenUtils.getPixels(2));
+		paintOutline.setColor(ColorUtil.getARGB(config.markerOutline_Color, markerOutline_Opacity));
 
 		final int iconSize = ScreenUtils.getPixels(config.markerSymbolSize);
 
@@ -545,6 +554,13 @@ public class MarkerRenderer extends BucketRenderer {
 
 	@Override
 	public synchronized void update(final GLViewport viewport) {
+
+		if (!_markerLayer.isEnabled()) {
+			return;
+		}
+
+		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tupdate()"));
+		// TODO remove SYSTEM.OUT.PRINTLN
 
 		final MapPosition mapPosition = viewport.pos;
 		final double mapScale = mapPosition.scale;

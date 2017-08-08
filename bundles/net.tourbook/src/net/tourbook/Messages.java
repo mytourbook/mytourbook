@@ -1586,6 +1586,7 @@ public class Messages extends NLS {
 	public static String		Slideout_Map25MarkerOptions_Label_ClusterOrientation;
 	public static String		Slideout_Map25MarkerOptions_Label_ClusterOrientation_Tooltip;
 	public static String		Slideout_Map25MarkerOptions_Label_ClusterPlacement;
+	public static String		Slideout_Map25MarkerOptions_Label_ClusterPlacement_Tooltip;
 	public static String		Slideout_Map25MarkerOptions_Label_ClusterSymbolColor;
 	public static String		Slideout_Map25MarkerOptions_Label_ClusterSymbolColor_Tooltip;
 	public static String		Slideout_Map25MarkerOptions_Label_ClusterSymbolSize;
@@ -1595,6 +1596,7 @@ public class Messages extends NLS {
 	public static String		Slideout_Map25MarkerOptions_Label_Name;
 	public static String		Slideout_Map25MarkerOptions_Label_Name_Tooltip;
 	public static String		Slideout_Map25MarkerOptions_Label_Opacity;
+	public static String		Slideout_Map25MarkerOptions_Label_Opacity_Tooltip;
 	public static String		Slideout_Map25MarkerOptions_Label_Size_Tooltip;
 	public static String		Slideout_Map25MarkerOptions_Label_SwapColor_Tooltip;
 	public static String		Slideout_Map25MarkerOptions_Label_Title;

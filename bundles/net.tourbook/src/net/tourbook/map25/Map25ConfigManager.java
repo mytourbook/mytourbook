@@ -155,10 +155,10 @@ public class Map25ConfigManager {
 	public static final int						CLUSTER_SYMBOL_WEIGHT_MAX		= 100;
 	//
 	// colors
-	public static final int						DEFAULT_CLUSTER_OPACITY			= 0xe0;
+	public static final int						DEFAULT_CLUSTER_OPACITY			= 80;
 	public static final RGB						DEFAULT_CLUSTER_OUTLINE_COLOR	= new RGB(0xff, 0xff, 0xff);
 	public static final RGB						DEFAULT_CLUSTER_FILL_COLOR		= new RGB(0xFC, 0x67, 0x00);
-	public static final int						DEFAULT_MARKER_OPACITY			= 0xe0;
+	public static final int						DEFAULT_MARKER_OPACITY			= 80;
 	public static final RGB						DEFAULT_MARKER_OUTLINE_COLOR	= new RGB(0, 0, 0);
 	public static final RGB						DEFAULT_MARKER_FILL_COLOR		= new RGB(0xFF, 0xFF, 0x00);
 	//
