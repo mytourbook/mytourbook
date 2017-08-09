@@ -44,13 +44,17 @@ public class LabelTileLoaderHook implements TileLoaderThemeHook {
 	@Override
 	public void complete(final MapTile tile, final boolean success) {}
 
-	private LabelTileData get(final MapTile tile) {
+	private LabelTileData getTileData(final MapTile tile) {
+
 		// FIXME could be 'this'..
 		LabelTileData ld = (LabelTileData) tile.getData(LABEL_DATA);
+
 		if (ld == null) {
+
 			ld = new LabelTileData();
 			tile.addData(LABEL_DATA, ld);
 		}
+
 		return ld;
 	}
 
@@ -62,17 +66,23 @@ public class LabelTileLoaderHook implements TileLoaderThemeHook {
 							final int level) {
 
 		if (style instanceof TextStyle) {
-			final LabelTileData ld = get(tile);
 
-			final TextStyle text = (TextStyle) style.current();
+			final LabelTileData labelTileData = getTileData(tile);
+
+			final TextStyle textStyle = (TextStyle) style.current();
+
 			if (element.type == LINE) {
-				final String value = element.tags.getValue(text.textKey);
+
+				final String value = element.tags.getValue(textStyle.textKey);
+
 				if (value == null || value.length() == 0) {
 					return false;
 				}
 
 				int offset = 0;
+
 				for (final int length : element.index) {
+
 					if (length < 4) {
 						break;
 					}
@@ -81,28 +91,35 @@ public class LabelTileLoaderHook implements TileLoaderThemeHook {
 							null,
 							element.points,
 							value,
-							text,
+							textStyle,
 							offset,
 							length,
-							ld);
+							labelTileData);
+
 					offset += length;
 				}
+
 			} else if (element.type == POLY) {
-				final String value = element.tags.getValue(text.textKey);
+
+				final String value = element.tags.getValue(textStyle.textKey);
+
 				if (value == null || value.length() == 0) {
 					return false;
 				}
 
 				PointF label = element.labelPosition;
+
 				// skip unnecessary calculations if label is outside of visible area
 				if (label != null && (label.x < 0 || label.x > Tile.SIZE || label.y < 0 || label.y > Tile.SIZE)) {
 					return false;
 				}
 
-				if (text.areaSize > 0f) {
+				if (textStyle.areaSize > 0f) {
+
 					final float area = element.area();
 					final float ratio = area / (Tile.SIZE * Tile.SIZE); // we can't use static as it's recalculated based on dpi
-					if (ratio < text.areaSize) {
+
+					if (ratio < textStyle.areaSize) {
 						return false;
 					}
 				}
@@ -111,26 +128,30 @@ public class LabelTileLoaderHook implements TileLoaderThemeHook {
 					label = PolyLabel.get(element);
 				}
 
-				ld.labels.push(TextItem.pool.get().set(label.x, label.y, value, text));
+				labelTileData.labels.push(TextItem.pool.get().set(label.x, label.y, value, textStyle));
+
 			} else if (element.type == POINT) {
-				final String value = element.tags.getValue(text.textKey);
+
+				final String value = element.tags.getValue(textStyle.textKey);
 				if (value == null || value.length() == 0) {
 					return false;
 				}
 
 				for (int i = 0, n = element.getNumPoints(); i < n; i++) {
 					final PointF p = element.getPoint(i);
-					ld.labels.push(TextItem.pool.get().set(p.x, p.y, value, text));
+					labelTileData.labels.push(TextItem.pool.get().set(p.x, p.y, value, textStyle));
 				}
 			}
+
 		} else if (style instanceof SymbolStyle) {
+
 			final SymbolStyle symbol = (SymbolStyle) style.current();
 
 			if (symbol.bitmap == null && symbol.texture == null) {
 				return false;
 			}
 
-			final LabelTileData ld = get(tile);
+			final LabelTileData ld = getTileData(tile);
 
 			if (element.type == POINT) {
 				for (int i = 0, n = element.getNumPoints(); i < n; i++) {
@@ -144,9 +165,13 @@ public class LabelTileLoaderHook implements TileLoaderThemeHook {
 					}
 					ld.symbols.push(it);
 				}
+
 			} else if (element.type == LINE) {
+
 				//TODO: implement
+
 			} else if (element.type == POLY) {
+
 				final PointF centroid = element.labelPosition;
 				if (centroid == null) {
 					return false;
@@ -165,6 +190,7 @@ public class LabelTileLoaderHook implements TileLoaderThemeHook {
 				ld.symbols.push(it);
 			}
 		}
+
 		return false;
 	}
 

@@ -35,123 +35,127 @@ import org.slf4j.LoggerFactory;
  */
 public class LabelLayer extends Layer implements Map.UpdateListener, TileManager.Listener {
 
-    static final Logger log = LoggerFactory.getLogger(LabelLayer.class);
+	static final Logger				log					= LoggerFactory.getLogger(LabelLayer.class);
 
-    public final static String LABEL_DATA = LabelLayer.class.getName();
+	public final static String		LABEL_DATA			= LabelLayer.class.getName();
 
-    private final static long MAX_RELABEL_DELAY = 100;
+	private final static long		MAX_RELABEL_DELAY	= 100;
 
-    private final LabelPlacement mLabelPlacer;
-    private final Worker mWorker;
+	private final LabelPlacement	_labelPlacer;
+	private final Worker			_worker;
 
-    class Worker extends SimpleWorker<LabelTask> {
+	class Worker extends SimpleWorker<LabelTask> {
 
-        public Worker(final Map map) {
-            super(map, 50, new LabelTask(), new LabelTask());
-        }
-
-        @Override
-        public void cleanup(final LabelTask t) {
-        }
-
-        @Override
-        public boolean doWork(final LabelTask t) {
-
-            if (mLabelPlacer.updateLabels(t)) {
-                mMap.render();
-                return true;
-            }
-
-            return false;
-        }
-
-        @Override
-        public void finish() {
-            mLabelPlacer.cleanup();
-        }
-
-        @Override
-		public synchronized boolean isRunning() {
-            return mRunning;
-        }
-    }
-
-    public LabelLayer(final Map map, final VectorTileLayer l) {
-        this(map, l, new LabelTileLoaderHook());
-    }
-
-    public LabelLayer(final Map map, final VectorTileLayer l, final VectorTileLayer.TileLoaderThemeHook h) {
-        super(map);
-        l.getManager().events.bind(this);
-        l.addHook(h);
-
-        mLabelPlacer = new LabelPlacement(map, l.tileRenderer());
-        mWorker = new Worker(map);
-        mRenderer = new TextRenderer(mWorker);
-    }
-
-    public void clearLabels() {
-        mWorker.cancel(true);
-    }
-
-    @Override
-    public void onDetach() {
-        mWorker.cancel(true);
-        super.onDetach();
-    }
-
-    @Override
-    public void onMapEvent(final Event event, final MapPosition mapPosition) {
-
-        if (event == Map.CLEAR_EVENT) {
-			mWorker.cancel(true);
+		public Worker(final Map map) {
+			super(map, 50, new LabelTask(), new LabelTask());
 		}
 
-        if (!isEnabled()) {
-			return;
-		}
+		@Override
+		public void cleanup(final LabelTask t) {}
 
-        if (event == Map.POSITION_EVENT) {
-			mWorker.submit(MAX_RELABEL_DELAY);
-		}
-    }
+		@Override
+		public boolean doWork(final LabelTask t) {
 
-    @Override
-    public void onTileManagerEvent(final Event e, final MapTile tile) {
-        if (e == TileManager.TILE_LOADED) {
-            if (tile.isVisible && isEnabled())
-			 {
-				mWorker.submit(MAX_RELABEL_DELAY / 4);
-            //log.debug("tile loaded: {}", tile);
+			if (_labelPlacer.updateLabels(t)) {
+				mMap.render();
+				return true;
 			}
-        } else if (e == TileManager.TILE_REMOVED) {
-            //log.debug("tile removed: {}", tile);
-        }
-    }
 
-    //    @Override
-    //    public void onMotionEvent(MotionEvent e) {
-    //        //    int action = e.getAction() & MotionEvent.ACTION_MASK;
-    //        //    if (action == MotionEvent.ACTION_POINTER_DOWN) {
-    //        //        multi++;
-    //        //        mTextRenderer.hold(true);
-    //        //    } else if (action == MotionEvent.ACTION_POINTER_UP) {
-    //        //        multi--;
-    //        //        if (multi == 0)
-    //        //            mTextRenderer.hold(false);
-    //        //    } else if (action == MotionEvent.ACTION_CANCEL) {
-    //        //        multi = 0;
-    //        //        log.debug("cancel " + multi);
-    //        //        mTextRenderer.hold(false);
-    //        //    }
-    //    }
+			return false;
+		}
 
-    public void update() {
-        if (!isEnabled()) {
+		@Override
+		public void finish() {
+			_labelPlacer.cleanup();
+		}
+
+		@Override
+		public synchronized boolean isRunning() {
+			return mRunning;
+		}
+	}
+
+	public LabelLayer(final Map map, final VectorTileLayer l) {
+		this(map, l, new LabelTileLoaderHook());
+	}
+
+	public LabelLayer(final Map map, final VectorTileLayer l, final VectorTileLayer.TileLoaderThemeHook h) {
+
+		super(map);
+
+		l.getManager().events.bind(this);
+		l.addHook(h);
+
+		_labelPlacer = new LabelPlacement(map, l.tileRenderer());
+		_worker = new Worker(map);
+
+		mRenderer = new TextRenderer(_worker);
+	}
+
+	public void clearLabels() {
+		_worker.cancel(true);
+	}
+
+	@Override
+	public void onDetach() {
+
+		_worker.cancel(true);
+		super.onDetach();
+	}
+
+	@Override
+	public void onMapEvent(final Event event, final MapPosition mapPosition) {
+
+		if (event == Map.CLEAR_EVENT) {
+			_worker.cancel(true);
+		}
+
+		if (!isEnabled()) {
 			return;
 		}
 
-        mWorker.submit(MAX_RELABEL_DELAY);
-    }
+		if (event == Map.POSITION_EVENT) {
+			_worker.submit(MAX_RELABEL_DELAY);
+		}
+	}
+
+	@Override
+	public void onTileManagerEvent(final Event e, final MapTile tile) {
+
+		if (e == TileManager.TILE_LOADED) {
+			if (tile.isVisible && isEnabled()) {
+				_worker.submit(MAX_RELABEL_DELAY / 4);
+				//log.debug("tile loaded: {}", tile);
+			}
+		} else if (e == TileManager.TILE_REMOVED) {
+			//log.debug("tile removed: {}", tile);
+		}
+	}
+
+	//    @Override
+	//    public void onMotionEvent(MotionEvent e) {
+	//        //    int action = e.getAction() & MotionEvent.ACTION_MASK;
+	//        //    if (action == MotionEvent.ACTION_POINTER_DOWN) {
+	//        //        multi++;
+	//        //        mTextRenderer.hold(true);
+	//        //    } else if (action == MotionEvent.ACTION_POINTER_UP) {
+	//        //        multi--;
+	//        //        if (multi == 0)
+	//        //            mTextRenderer.hold(false);
+	//        //    } else if (action == MotionEvent.ACTION_CANCEL) {
+	//        //        multi = 0;
+	//        //        log.debug("cancel " + multi);
+	//        //        mTextRenderer.hold(false);
+	//        //    }
+	//    }
+
+	public void update() {
+
+		if (!isEnabled()) {
+			return;
+		}
+
+		_worker.submit(MAX_RELABEL_DELAY);
+	}
 
 }

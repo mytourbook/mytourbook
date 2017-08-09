@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorUtil;
 import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.map25.layer.marker.algorithm.distance.Cluster;
@@ -559,8 +558,8 @@ public class MarkerRenderer extends BucketRenderer {
 			return;
 		}
 
-		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tupdate()"));
-		// TODO remove SYSTEM.OUT.PRINTLN
+//		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tupdate()"));
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		final MapPosition mapPosition = viewport.pos;
 		final double mapScale = mapPosition.scale;
