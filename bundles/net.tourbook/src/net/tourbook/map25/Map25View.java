@@ -584,7 +584,7 @@ public class Map25View extends ViewPart {
 		_actionSynchMapWithTour.setEnabled(canShowTour);
 		_actionSynchMapWithChartSlider.setEnabled(canShowTour);
 
-		_actionMapOptions.setEnabled(isTourAvailable);
+		_actionMapOptions.setEnabled(true);
 	}
 
 	private void fillActionBars() {

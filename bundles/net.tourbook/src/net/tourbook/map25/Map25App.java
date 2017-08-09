@@ -21,6 +21,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 import net.tourbook.map25.Map25TileSource.Builder;
 import net.tourbook.map25.OkHttpEngineMT.OkHttpFactoryMT;
+import net.tourbook.map25.layer.labeling.LabelLayer;
 import net.tourbook.map25.layer.marker.MapMarker;
 import net.tourbook.map25.layer.marker.MarkerConfig;
 import net.tourbook.map25.layer.marker.MarkerLayer;
@@ -41,7 +42,6 @@ import org.oscim.gdx.LwjglGL20;
 import org.oscim.gdx.MotionHandler;
 import org.oscim.layers.tile.TileManager;
 import org.oscim.layers.tile.buildings.BuildingLayer;
-import org.oscim.layers.tile.vector.labeling.LabelLayer;
 import org.oscim.map.Layers;
 import org.oscim.map.Map;
 import org.oscim.map.ViewController;
@@ -54,8 +54,6 @@ import org.oscim.scalebar.MetricUnitAdapter;
 import org.oscim.theme.ThemeFile;
 import org.oscim.theme.VtmThemes;
 import org.oscim.tiling.source.UrlTileSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -68,15 +66,13 @@ import okhttp3.Cache;
 
 public class Map25App extends GdxMap implements OnItemGestureListener {
 
-	private static final String		STATE_MAP_POS_X						= "STATE_MAP_POS_X";						//$NON-NLS-1$
-	private static final String		STATE_MAP_POS_Y						= "STATE_MAP_POS_Y";						//$NON-NLS-1$
-	private static final String		STATE_MAP_POS_ZOOM_LEVEL			= "STATE_MAP_POS_ZOOM_LEVEL";				//$NON-NLS-1$
-	private static final String		STATE_MAP_POS_BEARING				= "STATE_MAP_POS_BEARING";					//$NON-NLS-1$
-	private static final String		STATE_MAP_POS_SCALE					= "STATE_MAP_POS_SCALE";					//$NON-NLS-1$
-	private static final String		STATE_MAP_POS_TILT					= "STATE_MAP_POS_TILT";						//$NON-NLS-1$
-	private static final String		STATE_SELECTED_MAP25_PROVIDER_ID	= "STATE_SELECTED_MAP25_PROVIDER_ID";		//$NON-NLS-1$
-
-	public static final Logger		log									= LoggerFactory.getLogger(Map25App.class);
+	private static final String		STATE_MAP_POS_X						= "STATE_MAP_POS_X";					//$NON-NLS-1$
+	private static final String		STATE_MAP_POS_Y						= "STATE_MAP_POS_Y";					//$NON-NLS-1$
+	private static final String		STATE_MAP_POS_ZOOM_LEVEL			= "STATE_MAP_POS_ZOOM_LEVEL";			//$NON-NLS-1$
+	private static final String		STATE_MAP_POS_BEARING				= "STATE_MAP_POS_BEARING";				//$NON-NLS-1$
+	private static final String		STATE_MAP_POS_SCALE					= "STATE_MAP_POS_SCALE";				//$NON-NLS-1$
+	private static final String		STATE_MAP_POS_TILT					= "STATE_MAP_POS_TILT";					//$NON-NLS-1$
+	private static final String		STATE_SELECTED_MAP25_PROVIDER_ID	= "STATE_SELECTED_MAP25_PROVIDER_ID";	//$NON-NLS-1$
 
 	private static IDialogSettings	_state;
 
