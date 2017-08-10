@@ -57,7 +57,9 @@ public class LabelLayer extends Layer implements Map.UpdateListener, TileManager
 		public boolean doWork(final LabelTask t) {
 
 			if (_labelPlacer.updateLabels(t)) {
+
 				mMap.render();
+
 				return true;
 			}
 

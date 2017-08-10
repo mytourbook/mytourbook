@@ -1,0 +1,9 @@
+Version 17.9                                                ?. September 2017
+
+New 	
+===
+
+* 2.5 D Tour Map
+
+  - Set 3 map bookmarks which can be moved to
+  

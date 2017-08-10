@@ -74,6 +74,9 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 	private static final String		STATE_MAP_POS_TILT					= "STATE_MAP_POS_TILT";					//$NON-NLS-1$
 	private static final String		STATE_SELECTED_MAP25_PROVIDER_ID	= "STATE_SELECTED_MAP25_PROVIDER_ID";	//$NON-NLS-1$
 
+	private static final String		STATE_SUFFIX_MAP_CURRENT_POSITION	= "MapCurrentPosition";					//$NON-NLS-1$
+	static final String				STATE_SUFFIX_MAP_DEFAULT_POSITION	= "MapDefaultPosition";					//$NON-NLS-1$
+
 	private static IDialogSettings	_state;
 
 	private static Map25View		_map25View;
@@ -160,10 +163,13 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		 * Overwrite input handler, using own GdxMap.create() method didn't work :-(
 		 */
 		final InputMultiplexer mux = new InputMultiplexer();
+
 		if (!Map.NEW_GESTURES) {
+
 			mGestureDetector = new GestureDetector(new GestureHandlerImpl(mMap));
 			mux.addProcessor(mGestureDetector);
 		}
+
 		mux.addProcessor(new InputHandlerMT(this));
 		mux.addProcessor(new MotionHandler(mMap));
 
@@ -288,6 +294,31 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 
 	public TourLayer getLayer_Tour() {
 		return _layer_Tour;
+	}
+
+	Map25View getMap25View() {
+		return _map25View;
+	}
+
+	/**
+	 * @return Returns map position from the state
+	 */
+	MapPosition getStateMapPosition(final String suffixName) {
+
+		final String stateSuffixName = '_' + suffixName;
+
+		final MapPosition mapPosition = new MapPosition();
+
+		mapPosition.x = Util.getStateDouble(_state, STATE_MAP_POS_X + stateSuffixName, 0.5);
+		mapPosition.y = Util.getStateDouble(_state, STATE_MAP_POS_Y + stateSuffixName, 0.5);
+
+		mapPosition.bearing = Util.getStateFloat(_state, STATE_MAP_POS_BEARING + stateSuffixName, 0);
+		mapPosition.tilt = Util.getStateFloat(_state, STATE_MAP_POS_TILT + stateSuffixName, 0);
+
+		mapPosition.scale = Util.getStateDouble(_state, STATE_MAP_POS_SCALE + stateSuffixName, 1);
+		mapPosition.zoomLevel = Util.getStateInt(_state, STATE_MAP_POS_ZOOM_LEVEL + stateSuffixName, 1);
+
+		return mapPosition;
 	}
 
 	public Map25Provider getSelectedMapProvider() {
@@ -454,20 +485,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 
 	private void restoreState() {
 
-		/*
-		 * Map position
-		 */
-		final MapPosition mapPosition = new MapPosition();
-
-		mapPosition.x = Util.getStateDouble(_state, STATE_MAP_POS_X, 0.5);
-		mapPosition.y = Util.getStateDouble(_state, STATE_MAP_POS_Y, 0.5);
-
-		mapPosition.bearing = Util.getStateFloat(_state, STATE_MAP_POS_BEARING, 0);
-		mapPosition.tilt = Util.getStateFloat(_state, STATE_MAP_POS_TILT, 0);
-
-		mapPosition.scale = Util.getStateDouble(_state, STATE_MAP_POS_SCALE, 1);
-		mapPosition.zoomLevel = Util.getStateInt(_state, STATE_MAP_POS_ZOOM_LEVEL, 1);
-
+		final MapPosition mapPosition = getStateMapPosition(STATE_SUFFIX_MAP_CURRENT_POSITION);
 		mMap.setMapPosition(mapPosition);
 	}
 
@@ -483,16 +501,23 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 
 	private void saveState() {
 
+		_state.put(STATE_SELECTED_MAP25_PROVIDER_ID, _selectedMapProvider.getId());
+
+		saveState_MapPosition(STATE_SUFFIX_MAP_CURRENT_POSITION);
+	}
+
+	void saveState_MapPosition(final String suffixName) {
+
+		final String stateSuffixName = '_' + suffixName;
+
 		final MapPosition mapPosition = mMap.getMapPosition();
 
-		_state.put(STATE_MAP_POS_X, mapPosition.x);
-		_state.put(STATE_MAP_POS_Y, mapPosition.y);
-		_state.put(STATE_MAP_POS_BEARING, mapPosition.bearing);
-		_state.put(STATE_MAP_POS_SCALE, mapPosition.scale);
-		_state.put(STATE_MAP_POS_TILT, mapPosition.tilt);
-		_state.put(STATE_MAP_POS_ZOOM_LEVEL, mapPosition.zoomLevel);
-
-		_state.put(STATE_SELECTED_MAP25_PROVIDER_ID, _selectedMapProvider.getId());
+		_state.put(STATE_MAP_POS_X + stateSuffixName, mapPosition.x);
+		_state.put(STATE_MAP_POS_Y + stateSuffixName, mapPosition.y);
+		_state.put(STATE_MAP_POS_BEARING + stateSuffixName, mapPosition.bearing);
+		_state.put(STATE_MAP_POS_SCALE + stateSuffixName, mapPosition.scale);
+		_state.put(STATE_MAP_POS_TILT + stateSuffixName, mapPosition.tilt);
+		_state.put(STATE_MAP_POS_ZOOM_LEVEL + stateSuffixName, mapPosition.zoomLevel);
 	}
 
 	public void setMapProvider(final Map25Provider mapProvider) {

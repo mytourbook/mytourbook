@@ -36,12 +36,15 @@ import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.tooltip.OpenDialogManager;
 import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.common.util.SWTPopupOverAWT;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.map2.Messages;
 import net.tourbook.map25.action.ActionMap25_ShowMarker;
+import net.tourbook.map25.action.ActionMoveToMapDefaultPosition;
+import net.tourbook.map25.action.ActionSaveMapDefaultPosition;
 import net.tourbook.map25.action.ActionSelectMap25Provider;
 import net.tourbook.map25.action.ActionShowEntireTour;
 import net.tourbook.map25.action.ActionSynchMapWithChartSlider;
@@ -63,6 +66,8 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -71,8 +76,12 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
+import org.eclipse.swt.events.MenuAdapter;
+import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
@@ -128,6 +137,12 @@ public class Map25View extends ViewPart {
 
 	private ActionMap25_Options				_actionMapOptions;
 	private ActionMap25_ShowMarker			_actionMarkerOptions;
+	private ActionMoveToMapDefaultPosition	_actionMoveToMapDefaultPosition1;
+	private ActionMoveToMapDefaultPosition	_actionMoveToMapDefaultPosition2;
+	private ActionMoveToMapDefaultPosition	_actionMoveToMapDefaultPosition3;
+	private ActionSaveMapDefaultPosition	_actionSaveMapDefaultPosition1;
+	private ActionSaveMapDefaultPosition	_actionSaveMapDefaultPosition2;
+	private ActionSaveMapDefaultPosition	_actionSaveMapDefaultPosition3;
 	private ActionSelectMap25Provider		_actionSelectMapProvider;
 	private ActionSynchMapWithChartSlider	_actionSynchMapWithChartSlider;
 	private ActionSynchMapWithTour			_actionSynchMapWithTour;
@@ -144,6 +159,11 @@ public class Map25View extends ViewPart {
 
 	private boolean							_isSynchMapWithChartSlider;
 	private boolean							_isSynchMapWithTour;
+
+	// context menu
+	private boolean							_isContextMenuVisible;
+//	private MouseAdapter					_wwMouseListener;
+	private Menu							_swtContextMenu;
 
 	/*
 	 * UI controls
@@ -193,6 +213,58 @@ public class Map25View extends ViewPart {
 
 			actionShowTour(getSelection());
 		}
+	}
+
+	private class Map3ContextMenu extends SWTPopupOverAWT {
+
+		public Map3ContextMenu(final Display display, final Menu swtContextMenu) {
+			super(display, swtContextMenu);
+		}
+
+	}
+
+	void actionContextMenu(final int relativeX, final int relativeY) {
+
+		// open context menu
+
+		// set state here because opening the context menu is async
+		_isContextMenuVisible = true;
+
+		_swtContainer.getDisplay().asyncExec(new Runnable() {
+
+			@Override
+			public void run() {
+
+				final Point screenPoint = _swtContainer.toDisplay(relativeX, relativeY);
+
+				createContextMenu(screenPoint.x, screenPoint.y);
+			}
+		});
+
+	}
+
+	public void actionMoveToMapDefaultPosition(final int location) {
+
+		final MapPosition mapPosition = _mapApp.getStateMapPosition(
+				Map25App.STATE_SUFFIX_MAP_DEFAULT_POSITION + '_' + location);
+
+		final Map map = _mapApp.getMap();
+
+		// must be run in the map thread
+		map.post(new Runnable() {
+			@Override
+			public void run() {
+
+				map.animator().animateTo(3000, mapPosition, org.oscim.utils.Easing.Type.SINE_INOUT);
+				map.updateMap(false);
+			}
+		});
+
+	}
+
+	public void actionSaveMapDefaultPosition(final int location) {
+
+		_mapApp.saveState_MapPosition(Map25App.STATE_SUFFIX_MAP_DEFAULT_POSITION + '_' + location);
 	}
 
 	public void actionShowTour(final boolean isTrackVisible) {
@@ -423,6 +495,12 @@ public class Map25View extends ViewPart {
 		_actionSynchMapWithChartSlider = new ActionSynchMapWithChartSlider(this);
 		_actionTrackOptions = new ActionTourTrackConfig();
 
+		_actionSaveMapDefaultPosition1 = new ActionSaveMapDefaultPosition(this, 1);
+		_actionSaveMapDefaultPosition2 = new ActionSaveMapDefaultPosition(this, 2);
+		_actionSaveMapDefaultPosition3 = new ActionSaveMapDefaultPosition(this, 3);
+		_actionMoveToMapDefaultPosition1 = new ActionMoveToMapDefaultPosition(this, 1);
+		_actionMoveToMapDefaultPosition2 = new ActionMoveToMapDefaultPosition(this, 2);
+		_actionMoveToMapDefaultPosition3 = new ActionMoveToMapDefaultPosition(this, 3);
 	}
 
 	private BoundingBox createBoundingBox(final GeoPoint[] geoPoints) {
@@ -441,6 +519,70 @@ public class Map25View extends ViewPart {
 		}
 
 		return new BoundingBox(minLat, minLon, maxLat, maxLon);
+	}
+
+	/**
+	 * Context menu with net.tourbook.common.util.SWTPopupOverAWT
+	 * 
+	 * @param xScreenPos
+	 * @param yScreenPos
+	 */
+	private void createContextMenu(final int xScreenPos, final int yScreenPos) {
+
+		disposeContextMenu();
+
+		_swtContextMenu = new Menu(_swtContainer);
+
+		// Add listener to repopulate the menu each time
+		_swtContextMenu.addMenuListener(new MenuAdapter() {
+
+			boolean _isFilled;
+
+			@Override
+			public void menuHidden(final MenuEvent e) {
+
+				_isContextMenuVisible = false;
+
+				/*
+				 * run async that the context state and tour info reset is done after the context
+				 * menu actions has done they tasks
+				 */
+				Display.getCurrent().asyncExec(new Runnable() {
+					@Override
+					public void run() {
+
+//						hideTourInfo();
+					}
+				});
+			}
+
+			@Override
+			public void menuShown(final MenuEvent e) {
+
+				if (_isFilled == false) {
+
+					// Ubuntu filled it twice
+
+					_isFilled = true;
+
+					fillContextMenu((Menu) e.widget);
+				}
+
+				_isContextMenuVisible = true;
+			}
+		});
+
+		final Display display = _swtContainer.getDisplay();
+
+		final Map3ContextMenu swt_awt_ContextMenu = new Map3ContextMenu(display, _swtContextMenu);
+
+		display.asyncExec(new Runnable() {
+			@Override
+			public void run() {
+//				System.out.println("SWT calling menu"); //$NON-NLS-1$
+				swt_awt_ContextMenu.swtIndirectShowMenu(xScreenPos, yScreenPos);
+			}
+		});
 	}
 
 	private List<MapMarker> createMapMarkers(final ArrayList<TourData> allTourData) {
@@ -560,7 +702,18 @@ public class Map25View extends ViewPart {
 			_mapApp.stop();
 		}
 
+//		_wwCanvas.getInputHandler().removeMouseListener(_wwMouseListener);
+
+		disposeContextMenu();
+
 		super.dispose();
+	}
+
+	private void disposeContextMenu() {
+
+		if (_swtContextMenu != null) {
+			_swtContextMenu.dispose();
+		}
 	}
 
 	/**
@@ -585,6 +738,10 @@ public class Map25View extends ViewPart {
 		_actionSynchMapWithChartSlider.setEnabled(canShowTour);
 
 		_actionMapOptions.setEnabled(true);
+	}
+
+	private void enableContextMenuActions() {
+
 	}
 
 	private void fillActionBars() {
@@ -614,6 +771,26 @@ public class Map25View extends ViewPart {
 //		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
 
 //		fillMapContextMenu(menuMgr);
+	}
+
+	private void fillContextMenu(final Menu menu) {
+
+//		(new Separator()).fill(menu, -1);
+
+		fillMenuItem(menu, _actionMoveToMapDefaultPosition1);
+		fillMenuItem(menu, _actionMoveToMapDefaultPosition2);
+		fillMenuItem(menu, _actionMoveToMapDefaultPosition3);
+		fillMenuItem(menu, _actionSaveMapDefaultPosition1);
+		fillMenuItem(menu, _actionSaveMapDefaultPosition2);
+		fillMenuItem(menu, _actionSaveMapDefaultPosition3);
+
+		enableContextMenuActions();
+	}
+
+	private void fillMenuItem(final Menu menu, final Action action) {
+
+		final ActionContributionItem item = new ActionContributionItem(action);
+		item.fill(menu, -1);
 	}
 
 	public Map25App getMapApp() {

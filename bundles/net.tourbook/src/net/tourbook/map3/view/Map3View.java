@@ -168,7 +168,8 @@ public class Map3View extends ViewPart implements ITourProvider {
 	
 // SET_FORMATTING_ON
 
-	private final IDialogSettings				_state						= TourbookPlugin.getState(getClass().getCanonicalName());
+	private final IDialogSettings				_state									= TourbookPlugin.getState(
+			getClass().getCanonicalName());
 
 	private ActionMap3Color						_actionMap3Color;
 	private ActionOpenPrefDialog				_actionMap3Colors;
@@ -1813,10 +1814,6 @@ public class Map3View extends ViewPart implements ITourProvider {
 		}
 
 		showAllTours(false);
-	}
-
-	public void setContextMenuVisible(final boolean isVisible) {
-		_isContextMenuVisible = isVisible;
 	}
 
 	@Override

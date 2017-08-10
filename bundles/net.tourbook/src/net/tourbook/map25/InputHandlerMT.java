@@ -39,6 +39,8 @@ public class InputHandlerMT extends InputHandler {
 	 */
 	private boolean			_isReCenter;
 
+	private boolean			_isMouseRightButtonDown;
+
 	public InputHandlerMT(final Map25App mapApp) {
 
 		super(mapApp);
@@ -137,6 +139,10 @@ public class InputHandlerMT extends InputHandler {
 
 				_isReCenter = true;
 			}
+
+		} else if (button == Buttons.RIGHT) {
+
+			_isMouseRightButtonDown = true;
 		}
 
 		return super.touchDown(screenX, screenY, pointer, button);
@@ -147,11 +153,18 @@ public class InputHandlerMT extends InputHandler {
 
 		_isReCenter = false;
 
+		// prevent opening context menu
+		_isMouseRightButtonDown = false;
+
 		return super.touchDragged(screenX, screenY, pointer);
 	}
 
 	@Override
 	public boolean touchUp(final int screenX, final int screenY, final int pointer, final int button) {
+
+		// keep and reset state
+		final boolean isMouseRightButtonDown = _isMouseRightButtonDown;
+		_isMouseRightButtonDown = false;
 
 		// !!! deactivate default behaviour !!!
 		super.touchUp(screenX, screenY, pointer, button);
@@ -167,6 +180,14 @@ public class InputHandlerMT extends InputHandler {
 			_map.updateMap(false);
 
 //			return true;
+
+		} else if (button == Buttons.RIGHT && isMouseRightButtonDown) {
+
+			// open context menu
+
+			_mapApp.getMap25View().actionContextMenu(screenX, screenY);
+
+			return true;
 		}
 
 		return false;
