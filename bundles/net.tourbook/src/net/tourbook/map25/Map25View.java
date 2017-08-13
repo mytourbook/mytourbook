@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
@@ -41,7 +42,6 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.importdata.RawDataManager;
-import net.tourbook.map2.Messages;
 import net.tourbook.map25.action.ActionMap25_ShowMarker;
 import net.tourbook.map25.action.ActionMoveToMapDefaultPosition;
 import net.tourbook.map25.action.ActionSaveMapDefaultPosition;
@@ -52,6 +52,7 @@ import net.tourbook.map25.action.ActionSynchMapWithTour;
 import net.tourbook.map25.layer.marker.MapMarker;
 import net.tourbook.map25.layer.marker.MarkerLayer;
 import net.tourbook.map25.layer.tourtrack.TourLayer;
+import net.tourbook.map25.ui.SlideoutMap25_Bookmarks;
 import net.tourbook.map25.ui.SlideoutMap25_Options;
 import net.tourbook.map25.ui.SlideoutMap25_TrackOptions;
 import net.tourbook.photo.PhotoSelection;
@@ -100,6 +101,10 @@ import de.byteholder.gpx.PointOfInterest;
 public class Map25View extends ViewPart {
 
 // SET_FORMATTING_OFF
+
+	private static final String		IMAGE_ACTION_SHOW_TOUR_IN_MAP			= net.tourbook.map2.Messages.image_action_show_tour_in_map;
+	private static final String		IMAGE_ACTION_SHOW_TOUR_IN_MAP_DISABLED	= net.tourbook.map2.Messages.image_action_show_tour_in_map_disabled;
+	private static final String		MAP_ACTION_SHOW_TOUR_IN_MAP 			= net.tourbook.map2.Messages.map_action_show_tour_in_map;
 	
 	public static final String		ID										= "net.tourbook.map25.Map25View";				//$NON-NLS-1$
 	
@@ -114,8 +119,8 @@ public class Map25View extends ViewPart {
 	private static final String		STATE_IS_SYNCH_MAP_WITH_CHART_SLIDER	= "STATE_SYNCH_MAP_WITH_CHART_SLIDER";			//$NON-NLS-1$
 	private static final String		STATE_IS_SYNCH_MAP_WITH_TOUR			= "STATE_SYNCH_MAP_WITH_TOUR";					//$NON-NLS-1$
 	
-	private static final ImageDescriptor	_actionImageDescriptor			= TourbookPlugin.getImageDescriptor(Messages.image_action_show_tour_in_map);
-	private static final ImageDescriptor	_actionImageDescriptorDisabled	= TourbookPlugin.getImageDescriptor(Messages.image_action_show_tour_in_map_disabled);
+	private static final ImageDescriptor	_actionImageDescriptor			= TourbookPlugin.getImageDescriptor(IMAGE_ACTION_SHOW_TOUR_IN_MAP);
+	private static final ImageDescriptor	_actionImageDescriptorDisabled	= TourbookPlugin.getImageDescriptor(IMAGE_ACTION_SHOW_TOUR_IN_MAP_DISABLED);
 	
 // SET_FORMATTING_ON
 
@@ -135,6 +140,7 @@ public class Map25View extends ViewPart {
 	private ISelection						_selectionWhenHidden;
 	private int								_lastSelectionHash;
 
+	private ActionMap25_Bookmarks			_actionMapBookmarks;
 	private ActionMap25_Options				_actionMapOptions;
 	private ActionMap25_ShowMarker			_actionMarkerOptions;
 	private ActionMoveToMapDefaultPosition	_actionMoveToMapDefaultPosition1;
@@ -171,11 +177,27 @@ public class Map25View extends ViewPart {
 	private Composite						_swtContainer;
 	private Composite						_parent;
 
+	private class ActionMap25_Bookmarks extends ActionToolbarSlideout {
+
+		public ActionMap25_Bookmarks(final ImageDescriptor actionImage, final ImageDescriptor actionImageDisabled) {
+			super(actionImage, actionImageDisabled);
+		}
+
+		@Override
+		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+			return new SlideoutMap25_Bookmarks(_parent, toolbar, Map25View.this);
+		}
+
+		@Override
+		protected void onBeforeOpenSlideout() {
+			closeOpenedDialogs(this);
+		}
+	}
+
 	private class ActionMap25_Options extends ActionToolbarSlideout {
 
 		@Override
 		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
-
 			return new SlideoutMap25_Options(_parent, toolbar, Map25View.this);
 		}
 
@@ -192,12 +214,11 @@ public class Map25View extends ViewPart {
 			super(_actionImageDescriptor, _actionImageDescriptorDisabled);
 
 			isToggleAction = true;
-			notSelectedTooltip = Messages.map_action_show_tour_in_map;
+			notSelectedTooltip = MAP_ACTION_SHOW_TOUR_IN_MAP;
 		}
 
 		@Override
 		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
-
 			return new SlideoutMap25_TrackOptions(_parent, toolbar, Map25View.this);
 		}
 
@@ -267,6 +288,11 @@ public class Map25View extends ViewPart {
 		_mapApp.saveState_MapPosition(Map25App.STATE_SUFFIX_MAP_DEFAULT_POSITION + '_' + location);
 	}
 
+	/**
+	 * Show/hide tour tracks.
+	 * 
+	 * @param isTrackVisible
+	 */
 	public void actionShowTour(final boolean isTrackVisible) {
 
 		_mapApp.getLayer_Tour().setEnabled(isTrackVisible);
@@ -488,6 +514,10 @@ public class Map25View extends ViewPart {
 	private void createActions() {
 
 		_actionMarkerOptions = new ActionMap25_ShowMarker(this, _parent);
+		_actionMapBookmarks = new ActionMap25_Bookmarks(
+				TourbookPlugin.getImageDescriptor(Messages.Image__MapBookmark),
+				TourbookPlugin.getImageDescriptor(Messages.Image__MapBookmark_Disabled));
+
 		_actionMapOptions = new ActionMap25_Options();
 		_actionSelectMapProvider = new ActionSelectMap25Provider(this);
 		_actionShowEntireTour = new ActionShowEntireTour(this);
@@ -737,6 +767,7 @@ public class Map25View extends ViewPart {
 		_actionSynchMapWithTour.setEnabled(canShowTour);
 		_actionSynchMapWithChartSlider.setEnabled(canShowTour);
 
+		_actionMapBookmarks.setEnabled(true);
 		_actionMapOptions.setEnabled(true);
 	}
 
@@ -762,6 +793,7 @@ public class Map25View extends ViewPart {
 
 		tbm.add(new Separator());
 
+		tbm.add(_actionMapBookmarks);
 		tbm.add(_actionMapOptions);
 		tbm.add(_actionSelectMapProvider);
 
