@@ -300,6 +300,10 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		return _map25View;
 	}
 
+	public Map25Provider getSelectedMapProvider() {
+		return _selectedMapProvider;
+	}
+
 	/**
 	 * @return Returns map position from the state
 	 */
@@ -319,10 +323,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		mapPosition.zoomLevel = Util.getStateInt(_state, STATE_MAP_POS_ZOOM_LEVEL + stateSuffixName, 1);
 
 		return mapPosition;
-	}
-
-	public Map25Provider getSelectedMapProvider() {
-		return _selectedMapProvider;
 	}
 
 	private ThemeFile getTheme(final Map25Provider mapProvider) {
@@ -506,7 +506,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		saveState_MapPosition(STATE_SUFFIX_MAP_CURRENT_POSITION);
 	}
 
-	void saveState_MapPosition(final String suffixName) {
+	private void saveState_MapPosition(final String suffixName) {
 
 		final String stateSuffixName = '_' + suffixName;
 

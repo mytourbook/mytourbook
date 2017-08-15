@@ -33,7 +33,9 @@ import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
+import net.tourbook.common.UI;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
+import net.tourbook.common.tooltip.ICloseOpenedDialogs;
 import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.tooltip.OpenDialogManager;
 import net.tourbook.common.tooltip.ToolbarSlideout;
@@ -42,17 +44,19 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.importdata.RawDataManager;
+import net.tourbook.map.bookmark.ActionMapBookmarks;
+import net.tourbook.map.bookmark.IMapBookmarks;
+import net.tourbook.map.bookmark.MapBookmark;
+import net.tourbook.map.bookmark.MapBookmarkManager;
 import net.tourbook.map25.action.ActionMap25_ShowMarker;
-import net.tourbook.map25.action.ActionMoveToMapDefaultPosition;
-import net.tourbook.map25.action.ActionSaveMapDefaultPosition;
 import net.tourbook.map25.action.ActionSelectMap25Provider;
+import net.tourbook.map25.action.ActionSetMapBookmark;
 import net.tourbook.map25.action.ActionShowEntireTour;
 import net.tourbook.map25.action.ActionSynchMapWithChartSlider;
 import net.tourbook.map25.action.ActionSynchMapWithTour;
 import net.tourbook.map25.layer.marker.MapMarker;
 import net.tourbook.map25.layer.marker.MarkerLayer;
 import net.tourbook.map25.layer.tourtrack.TourLayer;
-import net.tourbook.map25.ui.SlideoutMap25_Bookmarks;
 import net.tourbook.map25.ui.SlideoutMap25_Options;
 import net.tourbook.map25.ui.SlideoutMap25_TrackOptions;
 import net.tourbook.photo.PhotoSelection;
@@ -71,18 +75,24 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.IInputValidator;
+import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
@@ -98,16 +108,16 @@ import org.oscim.utils.Easing;
 
 import de.byteholder.gpx.PointOfInterest;
 
-public class Map25View extends ViewPart {
+public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDialogs {
 
 // SET_FORMATTING_OFF
-
+	//
 	private static final String		IMAGE_ACTION_SHOW_TOUR_IN_MAP			= net.tourbook.map2.Messages.image_action_show_tour_in_map;
 	private static final String		IMAGE_ACTION_SHOW_TOUR_IN_MAP_DISABLED	= net.tourbook.map2.Messages.image_action_show_tour_in_map_disabled;
 	private static final String		MAP_ACTION_SHOW_TOUR_IN_MAP 			= net.tourbook.map2.Messages.map_action_show_tour_in_map;
-	
+	//
 	public static final String		ID										= "net.tourbook.map25.Map25View";				//$NON-NLS-1$
-	
+	//
 	private static final String		STATE_IS_LAYER_BASE_MAP_VISIBLE			= "STATE_IS_LAYER_BASE_MAP_VISIBLE";			//$NON-NLS-1$
 	private static final String		STATE_IS_LAYER_BUILDING_VISIBLE			= "STATE_IS_LAYER_BUILDING_VISIBLE";			//$NON-NLS-1$
 	private static final String		STATE_IS_LAYER_LABEL_VISIBLE			= "STATE_IS_LAYER_LABEL_VISIBLE";				//$NON-NLS-1$
@@ -115,16 +125,14 @@ public class Map25View extends ViewPart {
 	private static final String		STATE_IS_LAYER_SCALE_BAR_VISIBLE		= "STATE_IS_LAYER_SCALE_BAR_VISIBLE";			//$NON-NLS-1$
 	private static final String		STATE_IS_LAYER_TILE_INFO_VISIBLE		= "STATE_IS_LAYER_TILE_INFO_VISIBLE";			//$NON-NLS-1$
 	private static final String		STATE_IS_LAYER_TOUR_VISIBLE				= "STATE_IS_LAYER_TOUR_VISIBLE";				//$NON-NLS-1$
-	
 	private static final String		STATE_IS_SYNCH_MAP_WITH_CHART_SLIDER	= "STATE_SYNCH_MAP_WITH_CHART_SLIDER";			//$NON-NLS-1$
 	private static final String		STATE_IS_SYNCH_MAP_WITH_TOUR			= "STATE_SYNCH_MAP_WITH_TOUR";					//$NON-NLS-1$
-	
+	//
 	private static final ImageDescriptor	_actionImageDescriptor			= TourbookPlugin.getImageDescriptor(IMAGE_ACTION_SHOW_TOUR_IN_MAP);
 	private static final ImageDescriptor	_actionImageDescriptorDisabled	= TourbookPlugin.getImageDescriptor(IMAGE_ACTION_SHOW_TOUR_IN_MAP_DISABLED);
-	
-// SET_FORMATTING_ON
-
 	private static final IDialogSettings	_state									= TourbookPlugin.getState(ID);
+	//
+// SET_FORMATTING_ON
 
 	private Map25App						_mapApp;
 
@@ -133,66 +141,45 @@ public class Map25View extends ViewPart {
 	private boolean							_isPartVisible;
 
 	private IPartListener2					_partListener;
+
 	private ISelectionListener				_postSelectionListener;
 	private ITourEventListener				_tourEventListener;
-
 	private ISelection						_lastHiddenSelection;
+
 	private ISelection						_selectionWhenHidden;
 	private int								_lastSelectionHash;
+	private ActionMapBookmarks				_actionMapBookmarks;
 
-	private ActionMap25_Bookmarks			_actionMapBookmarks;
 	private ActionMap25_Options				_actionMapOptions;
 	private ActionMap25_ShowMarker			_actionMarkerOptions;
-	private ActionMoveToMapDefaultPosition	_actionMoveToMapDefaultPosition1;
-	private ActionMoveToMapDefaultPosition	_actionMoveToMapDefaultPosition2;
-	private ActionMoveToMapDefaultPosition	_actionMoveToMapDefaultPosition3;
-	private ActionSaveMapDefaultPosition	_actionSaveMapDefaultPosition1;
-	private ActionSaveMapDefaultPosition	_actionSaveMapDefaultPosition2;
-	private ActionSaveMapDefaultPosition	_actionSaveMapDefaultPosition3;
+	private ActionSetMapBookmark			_actionSetMapBookmark;
 	private ActionSelectMap25Provider		_actionSelectMapProvider;
 	private ActionSynchMapWithChartSlider	_actionSynchMapWithChartSlider;
 	private ActionSynchMapWithTour			_actionSynchMapWithTour;
 	private ActionShowEntireTour			_actionShowEntireTour;
 	private ActionTourTrackConfig			_actionTrackOptions;
-
 	private ArrayList<TourData>				_allTourData							= new ArrayList<>();
+
 	private TIntArrayList					_allTourStarts							= new TIntArrayList();
 	private GeoPoint[]						_allGeoPoints;
 	private BoundingBox						_allBoundingBox;
-
 	private int								_hashTourId;
+
 	private int								_hashTourData;
-
 	private boolean							_isSynchMapWithChartSlider;
-	private boolean							_isSynchMapWithTour;
 
+	private boolean							_isSynchMapWithTour;
 	// context menu
 	private boolean							_isContextMenuVisible;
-//	private MouseAdapter					_wwMouseListener;
+
+	//	private MouseAdapter					_wwMouseListener;
 	private Menu							_swtContextMenu;
-
-	/*
-	 * UI controls
-	 */
+/*
+ * UI controls
+ */
 	private Composite						_swtContainer;
-	private Composite						_parent;
 
-	private class ActionMap25_Bookmarks extends ActionToolbarSlideout {
-
-		public ActionMap25_Bookmarks(final ImageDescriptor actionImage, final ImageDescriptor actionImageDisabled) {
-			super(actionImage, actionImageDisabled);
-		}
-
-		@Override
-		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
-			return new SlideoutMap25_Bookmarks(_parent, toolbar, Map25View.this);
-		}
-
-		@Override
-		protected void onBeforeOpenSlideout() {
-			closeOpenedDialogs(this);
-		}
-	}
+	Composite								_parent;
 
 	private class ActionMap25_Options extends ActionToolbarSlideout {
 
@@ -236,6 +223,29 @@ public class Map25View extends ViewPart {
 		}
 	}
 
+	public class BookmarkInputDialog extends InputDialog {
+
+		public BookmarkInputDialog(	final Shell parentShell,
+									final String dialogTitle,
+									final String dialogMessage,
+									final String initialValue,
+									final IInputValidator validator) {
+
+			super(parentShell, dialogTitle, dialogMessage, initialValue, validator);
+		}
+
+		@Override
+		protected void createButtonsForButtonBar(final Composite parent) {
+
+			super.createButtonsForButtonBar(parent);
+
+			// set text for the OK button
+			final Button _btnSave = getButton(IDialogConstants.OK_ID);
+			_btnSave.setText(Messages.Dialog_MapBookmark_Button_Add);
+		}
+
+	}
+
 	private class Map3ContextMenu extends SWTPopupOverAWT {
 
 		public Map3ContextMenu(final Display display, final Menu swtContextMenu) {
@@ -264,28 +274,44 @@ public class Map25View extends ViewPart {
 
 	}
 
-	public void actionMoveToMapDefaultPosition(final int location) {
+	public void actionSetMapBookmark() {
 
-		final MapPosition mapPosition = _mapApp.getStateMapPosition(
-				Map25App.STATE_SUFFIX_MAP_DEFAULT_POSITION + '_' + location);
+		final BookmarkInputDialog inputDialog = new BookmarkInputDialog(
 
-		final Map map = _mapApp.getMap();
+				_parent.getShell(),
+				Messages.Dialog_MapBookmark_Dialog_AddBookmark_Title,
+				Messages.Dialog_MapBookmark_Dialog_AddBookmark_Message,
+				UI.EMPTY_STRING,
+				new IInputValidator() {
 
-		// must be run in the map thread
-		map.post(new Runnable() {
-			@Override
-			public void run() {
+					@Override
+					public String isValid(final String newText) {
 
-				map.animator().animateTo(3000, mapPosition, org.oscim.utils.Easing.Type.SINE_INOUT);
-				map.updateMap(false);
-			}
-		});
+						if (newText.trim().length() == 0) {
 
-	}
+		//							return "Set a name for the bookmark";//Messages.Dialog_MapBookmark_Dialog_InvalidName;
+							return Messages.Dialog_MapBookmark_Dialog_InvalidName;
+						}
 
-	public void actionSaveMapDefaultPosition(final int location) {
+						return null;
+					}
+				});
 
-		_mapApp.saveState_MapPosition(Map25App.STATE_SUFFIX_MAP_DEFAULT_POSITION + '_' + location);
+		inputDialog.open();
+
+		if (inputDialog.getReturnCode() != Window.OK) {
+			return;
+		}
+
+		final MapBookmark bookmark = new MapBookmark();
+
+		bookmark.name = inputDialog.getValue();
+
+		final MapPosition mapPosition = _mapApp.getMap().getMapPosition();
+
+		bookmark.setMapPosition(mapPosition);
+
+		MapBookmarkManager.addBookmark(bookmark);
 	}
 
 	/**
@@ -507,6 +533,7 @@ public class Map25View extends ViewPart {
 	 * 
 	 * @param openingDialog
 	 */
+	@Override
 	public void closeOpenedDialogs(final IOpeningDialog openingDialog) {
 		_openDlgMgr.closeOpenedDialogs(openingDialog);
 	}
@@ -514,23 +541,20 @@ public class Map25View extends ViewPart {
 	private void createActions() {
 
 		_actionMarkerOptions = new ActionMap25_ShowMarker(this, _parent);
-		_actionMapBookmarks = new ActionMap25_Bookmarks(
+		_actionMapBookmarks = new ActionMapBookmarks(
+				this._parent,
+				this,
 				TourbookPlugin.getImageDescriptor(Messages.Image__MapBookmark),
 				TourbookPlugin.getImageDescriptor(Messages.Image__MapBookmark_Disabled));
 
 		_actionMapOptions = new ActionMap25_Options();
 		_actionSelectMapProvider = new ActionSelectMap25Provider(this);
+		_actionSetMapBookmark = new ActionSetMapBookmark(this);
 		_actionShowEntireTour = new ActionShowEntireTour(this);
 		_actionSynchMapWithTour = new ActionSynchMapWithTour(this);
 		_actionSynchMapWithChartSlider = new ActionSynchMapWithChartSlider(this);
 		_actionTrackOptions = new ActionTourTrackConfig();
 
-		_actionSaveMapDefaultPosition1 = new ActionSaveMapDefaultPosition(this, 1);
-		_actionSaveMapDefaultPosition2 = new ActionSaveMapDefaultPosition(this, 2);
-		_actionSaveMapDefaultPosition3 = new ActionSaveMapDefaultPosition(this, 3);
-		_actionMoveToMapDefaultPosition1 = new ActionMoveToMapDefaultPosition(this, 1);
-		_actionMoveToMapDefaultPosition2 = new ActionMoveToMapDefaultPosition(this, 2);
-		_actionMoveToMapDefaultPosition3 = new ActionMoveToMapDefaultPosition(this, 3);
 	}
 
 	private BoundingBox createBoundingBox(final GeoPoint[] geoPoints) {
@@ -809,12 +833,7 @@ public class Map25View extends ViewPart {
 
 //		(new Separator()).fill(menu, -1);
 
-		fillMenuItem(menu, _actionMoveToMapDefaultPosition1);
-		fillMenuItem(menu, _actionMoveToMapDefaultPosition2);
-		fillMenuItem(menu, _actionMoveToMapDefaultPosition3);
-		fillMenuItem(menu, _actionSaveMapDefaultPosition1);
-		fillMenuItem(menu, _actionSaveMapDefaultPosition2);
-		fillMenuItem(menu, _actionSaveMapDefaultPosition3);
+		fillMenuItem(menu, _actionSetMapBookmark);
 
 		enableContextMenuActions();
 	}
@@ -827,6 +846,28 @@ public class Map25View extends ViewPart {
 
 	public Map25App getMapApp() {
 		return _mapApp;
+	}
+
+	@Override
+	public void onSelectBookmark(final MapBookmark selectedBookmark) {
+
+		final Map map = _mapApp.getMap();
+
+		// must be run in the map thread
+		map.post(new Runnable() {
+
+			@Override
+			public void run() {
+
+				map.animator().animateTo(
+						3000,
+						selectedBookmark.getMapPosition(),
+						org.oscim.utils.Easing.Type.SINE_INOUT);
+
+				map.updateMap(false);
+			}
+		});
+
 	}
 
 	private void onSelectionChanged(final ISelection selection) {
@@ -1254,6 +1295,7 @@ public class Map25View extends ViewPart {
 		_state.put(STATE_IS_LAYER_SCALE_BAR_VISIBLE, _mapApp.getLayer_ScaleBar().isEnabled());
 
 		Map25ConfigManager.saveState();
+		MapBookmarkManager.saveState();
 	}
 
 	@Override

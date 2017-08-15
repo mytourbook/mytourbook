@@ -13,29 +13,17 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.map25.action;
+package net.tourbook.map.bookmark;
 
-import net.tourbook.map2.Messages;
-import net.tourbook.map25.Map25View;
+import net.tourbook.common.tooltip.ICloseOpenedDialogs;
 
-import org.eclipse.jface.action.Action;
+public interface IMapBookmarks extends ICloseOpenedDialogs {
 
-public class ActionMoveToMapDefaultPosition extends Action {
-
-	private Map25View	_map25View;
-	private int			_location;
-
-	public ActionMoveToMapDefaultPosition(final Map25View map25View, final int location) {
-
-		super(Messages.map_action_set_default_position + " &" + location, AS_PUSH_BUTTON);//$NON-NLS-1$
-
-		_map25View = map25View;
-		_location = location;
-	}
-
-	@Override
-	public void run() {
-		_map25View.actionMoveToMapDefaultPosition(_location);
-	}
+	/**
+	 * Map bookmark is selected in the bookmark viewer.
+	 * 
+	 * @param selectedBookmark
+	 */
+	public void onSelectBookmark(MapBookmark selectedBookmark);
 
 }

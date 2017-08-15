@@ -15,27 +15,25 @@
  *******************************************************************************/
 package net.tourbook.map25.action;
 
-import net.tourbook.map2.Messages;
+import net.tourbook.Messages;
 import net.tourbook.map25.Map25View;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionSaveMapDefaultPosition extends Action {
+public class ActionSetMapBookmark extends Action {
 
-	private Map25View	_map25View;
-	private int			_location;
+	private Map25View _map25View;
 
-	public ActionSaveMapDefaultPosition(final Map25View map25View, final int location) {
+	public ActionSetMapBookmark(final Map25View map25View) {
 
-		super(Messages.map_action_save_default_position + ' ' + location, AS_PUSH_BUTTON);
+		super(Messages.Action_Map_SetMapBookmark, AS_PUSH_BUTTON);
 
 		_map25View = map25View;
-		_location = location;
 	}
 
 	@Override
 	public void run() {
-		_map25View.actionSaveMapDefaultPosition(_location);
+		_map25View.actionSetMapBookmark();
 	}
 
 }

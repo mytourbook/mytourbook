@@ -1312,6 +1312,34 @@ public class Util {
 		return value;
 	}
 
+	/**
+	 * @param xmlMemento
+	 * @param key
+	 * @param defaultValue
+	 * @return Returns default value when not available.
+	 */
+	public static double getXmlDouble(final XMLMemento xmlMemento, final String key, final double defaultValue) {
+
+		final String xmlValue = xmlMemento.getString(key);
+
+		if (xmlValue == null) {
+			return defaultValue;
+		}
+
+		double value = 0;
+
+		try {
+
+			value = Double.parseDouble(xmlValue);
+
+		} catch (final Exception e) {
+
+			return defaultValue;
+		}
+
+		return value;
+	}
+
 	public static <E extends Enum<E>> Enum<E> getXmlEnum(	final IMemento xml,
 															final String attrName,
 															final Enum<E> defaultValue) {
@@ -1332,7 +1360,7 @@ public class Util {
 		}
 	}
 
-	private static Float getXmlFloat(final IMemento xmlMemento, final String key, final Float defaultValue) {
+	public static Float getXmlFloat(final IMemento xmlMemento, final String key, final Float defaultValue) {
 
 		Float value = xmlMemento.getFloat(key);
 
@@ -2173,6 +2201,11 @@ public class Util {
 		xmlHeader.putInteger(Util.ATTR_ROOT_VERSION_MINOR, version.getMinor());
 		xmlHeader.putInteger(Util.ATTR_ROOT_VERSION_MICRO, version.getMicro());
 		xmlHeader.putString(Util.ATTR_ROOT_VERSION_QUALIFIER, version.getQualifier());
+	}
+
+	public static void setXmlDouble(final IMemento memento, final String attributeName, final double doubleValue) {
+
+		memento.putString(attributeName, Double.toString(doubleValue));
 	}
 
 	public static <E extends Enum<E>> void setXmlEnum(final IMemento xml, final String attrName, final Enum<E> value) {
