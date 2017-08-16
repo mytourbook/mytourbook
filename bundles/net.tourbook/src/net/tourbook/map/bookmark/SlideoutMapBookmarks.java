@@ -21,6 +21,9 @@ import net.tourbook.Messages;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.IInputValidator;
+import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
@@ -28,23 +31,31 @@ import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.ToolBar;
@@ -63,6 +74,7 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 	private PixelConverter			_pc;
 
 	private Font					_boldFont;
+
 	{
 		_boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 	}
@@ -70,8 +82,9 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 	/*
 	 * UI controls
 	 */
+	private Composite _parent;
 
-	private class MapBookmarkComparator extends ViewerComparator {
+	private class BookmarkComparator extends ViewerComparator {
 
 		@Override
 		public int compare(final Viewer viewer, final Object e1, final Object e2) {
@@ -94,7 +107,7 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 		}
 	}
 
-	private class MapBookmarkProvider implements IStructuredContentProvider {
+	private class BookmarkProvider implements IStructuredContentProvider {
 
 		@Override
 		public void dispose() {}
@@ -106,6 +119,48 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 
 		@Override
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
+	}
+
+	public class BookmarkRenameDialog extends InputDialog {
+
+		public BookmarkRenameDialog(final Shell parentShell,
+									final String dialogTitle,
+									final String dialogMessage,
+									final String initialValue,
+									final IInputValidator validator) {
+
+			super(parentShell, dialogTitle, dialogMessage, initialValue, validator);
+		}
+
+		@Override
+		protected void createButtonsForButtonBar(final Composite parent) {
+
+			super.createButtonsForButtonBar(parent);
+
+			// set text for the OK button
+			final Button _btnSave = getButton(IDialogConstants.OK_ID);
+			_btnSave.setText(Messages.Slideout_MapBookmark_Button_Rename);
+		}
+
+		@Override
+		protected Point getInitialLocation(final Point initialSize) {
+
+			try {
+
+				final Point cursorLocation = Display.getCurrent().getCursorLocation();
+
+				// center below the cursor location
+				cursorLocation.x -= initialSize.x / 2;
+				cursorLocation.y += 10;
+
+				return cursorLocation;
+
+			} catch (final NumberFormatException ex) {
+
+				return super.getInitialLocation(initialSize);
+			}
+		}
+
 	}
 
 	/**
@@ -129,6 +184,8 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 	@Override
 	protected Composite createToolTipContentArea(final Composite parent) {
 
+		_parent = parent;
+
 		initUI(parent);
 
 		createActions();
@@ -149,7 +206,10 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 		GridLayoutFactory.swtDefaults().applyTo(shellContainer);
 		{
 			final Composite container = new Composite(shellContainer, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+			GridDataFactory
+					.fillDefaults()//
+					//					.grab(true, false)
+					.applyTo(container);
 			GridLayoutFactory
 					.fillDefaults()//
 					.numColumns(2)
@@ -186,7 +246,7 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 		final ToolBar toolbar = new ToolBar(parent, SWT.FLAT);
 		GridDataFactory
 				.fillDefaults()//
-				.grab(true, false)
+				//				.grab(true, false)
 				.align(SWT.END, SWT.BEGINNING)
 				.indent(_pc.convertWidthInCharsToPixels(5), 0)
 				.applyTo(toolbar);
@@ -204,6 +264,7 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 		GridDataFactory
 				.fillDefaults()//
 				//				.grab(true, true)
+				.span(2, 1)
 				.applyTo(layoutContainer);
 
 		final TableColumnLayout tableLayout = new TableColumnLayout();
@@ -249,13 +310,22 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 		/*
 		 * create table viewer
 		 */
-		_bookmarkViewer.setContentProvider(new MapBookmarkProvider());
-		_bookmarkViewer.setComparator(new MapBookmarkComparator());
+		_bookmarkViewer.setContentProvider(new BookmarkProvider());
+		_bookmarkViewer.setComparator(new BookmarkComparator());
 
 		_bookmarkViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+
 			@Override
 			public void selectionChanged(final SelectionChangedEvent event) {
 				onBookmark_Select();
+			}
+		});
+
+		_bookmarkViewer.addDoubleClickListener(new IDoubleClickListener() {
+
+			@Override
+			public void doubleClick(final DoubleClickEvent event) {
+				onBookmark_Rename();
 			}
 		});
 
@@ -274,6 +344,14 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 		});
 	}
 
+	private MapBookmark getSelectedBookmark() {
+
+		final IStructuredSelection selection = (IStructuredSelection) _bookmarkViewer.getSelection();
+		final MapBookmark selectedBookmark = (MapBookmark) selection.getFirstElement();
+
+		return selectedBookmark;
+	}
+
 	private void initUI(final Composite parent) {
 
 		_pc = new PixelConverter(parent);
@@ -281,14 +359,71 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 	}
 
 	private void onBookmark_Delete() {
-		// TODO Auto-generated method stub
 
+		final MapBookmark selectedBookmark = getSelectedBookmark();
+
+		if (selectedBookmark == null) {
+			return;
+		}
+
+		// update model
+		_allBookmarks.remove(selectedBookmark);
+
+		// update UI
+		_bookmarkViewer.refresh();
+	}
+
+	private void onBookmark_Rename() {
+
+		final MapBookmark selectedBookmark = getSelectedBookmark();
+
+		final BookmarkRenameDialog addDialog = new BookmarkRenameDialog(
+
+				_parent.getShell(),
+				Messages.Slideout_MapBookmark_Dialog_RenameBookmark_Title,
+				Messages.Slideout_MapBookmark_Dialog_RenameBookmark_Message,
+				selectedBookmark.name,
+				new IInputValidator() {
+
+					@Override
+					public String isValid(final String newText) {
+
+						if (newText.trim().length() == 0) {
+							return Messages.Slideout_MapBookmark_Dialog_ValidationRename;
+						}
+
+						return null;
+					}
+				});
+
+		setIsAnotherDialogOpened(true);
+		{
+			addDialog.open();
+		}
+		setIsAnotherDialogOpened(false);
+
+		if (addDialog.getReturnCode() != Window.OK) {
+			return;
+		}
+
+		// update model
+		selectedBookmark.name = addDialog.getValue();
+
+		// update ui
+		_bookmarkViewer.refresh();
+
+		// reselect bookmark
+		_bookmarkViewer.setSelection(new StructuredSelection(selectedBookmark), true);
 	}
 
 	private void onBookmark_Select() {
 
-		final IStructuredSelection selection = (IStructuredSelection) _bookmarkViewer.getSelection();
-		final MapBookmark selectedBookmark = (MapBookmark) selection.getFirstElement();
+		final MapBookmark selectedBookmark = getSelectedBookmark();
+
+		if (selectedBookmark == null) {
+			// this happened when deleting a bookmark
+			return;
+		}
 
 		_mapBookmarks.onSelectBookmark(selectedBookmark);
 	}

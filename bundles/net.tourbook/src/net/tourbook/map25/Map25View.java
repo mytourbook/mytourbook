@@ -130,7 +130,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 	//
 	private static final ImageDescriptor	_actionImageDescriptor			= TourbookPlugin.getImageDescriptor(IMAGE_ACTION_SHOW_TOUR_IN_MAP);
 	private static final ImageDescriptor	_actionImageDescriptorDisabled	= TourbookPlugin.getImageDescriptor(IMAGE_ACTION_SHOW_TOUR_IN_MAP_DISABLED);
-	private static final IDialogSettings	_state									= TourbookPlugin.getState(ID);
+	private static final IDialogSettings	_state							= TourbookPlugin.getState(ID);
 	//
 // SET_FORMATTING_ON
 
@@ -223,9 +223,9 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		}
 	}
 
-	public class BookmarkInputDialog extends InputDialog {
+	public class BookmarkAddDialog extends InputDialog {
 
-		public BookmarkInputDialog(	final Shell parentShell,
+		public BookmarkAddDialog(	final Shell parentShell,
 									final String dialogTitle,
 									final String dialogMessage,
 									final String initialValue,
@@ -241,7 +241,26 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 			// set text for the OK button
 			final Button _btnSave = getButton(IDialogConstants.OK_ID);
-			_btnSave.setText(Messages.Dialog_MapBookmark_Button_Add);
+			_btnSave.setText(Messages.Slideout_MapBookmark_Button_Add);
+		}
+
+		@Override
+		protected Point getInitialLocation(final Point initialSize) {
+
+			try {
+
+				final Point cursorLocation = Display.getCurrent().getCursorLocation();
+
+				// center to cursor location
+				cursorLocation.x -= initialSize.x / 2;
+				cursorLocation.y += 10;
+
+				return cursorLocation;
+
+			} catch (final NumberFormatException ex) {
+
+				return super.getInitialLocation(initialSize);
+			}
 		}
 
 	}
@@ -252,6 +271,46 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 			super(display, swtContextMenu);
 		}
 
+	}
+
+	public void actionAddBookmark() {
+
+		final BookmarkAddDialog addDialog = new BookmarkAddDialog(
+
+				_parent.getShell(),
+				Messages.Slideout_MapBookmark_Dialog_AddBookmark_Title,
+				Messages.Slideout_MapBookmark_Dialog_AddBookmark_Message,
+				UI.EMPTY_STRING,
+				new IInputValidator() {
+
+					@Override
+					public String isValid(final String newText) {
+
+						if (newText.trim().length() == 0) {
+
+							//							return "Set a name for the bookmark";//Messages.Dialog_MapBookmark_Dialog_InvalidName;
+							return Messages.Slideout_MapBookmark_Dialog_ValidationAddName;
+						}
+
+						return null;
+					}
+				});
+
+		addDialog.open();
+
+		if (addDialog.getReturnCode() != Window.OK) {
+			return;
+		}
+
+		final MapBookmark bookmark = new MapBookmark();
+
+		bookmark.name = addDialog.getValue();
+
+		final MapPosition mapPosition = _mapApp.getMap().getMapPosition();
+
+		bookmark.setMapPosition(mapPosition);
+
+		MapBookmarkManager.addBookmark(bookmark);
 	}
 
 	void actionContextMenu(final int relativeX, final int relativeY) {
@@ -272,46 +331,6 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 			}
 		});
 
-	}
-
-	public void actionSetMapBookmark() {
-
-		final BookmarkInputDialog inputDialog = new BookmarkInputDialog(
-
-				_parent.getShell(),
-				Messages.Dialog_MapBookmark_Dialog_AddBookmark_Title,
-				Messages.Dialog_MapBookmark_Dialog_AddBookmark_Message,
-				UI.EMPTY_STRING,
-				new IInputValidator() {
-
-					@Override
-					public String isValid(final String newText) {
-
-						if (newText.trim().length() == 0) {
-
-		//							return "Set a name for the bookmark";//Messages.Dialog_MapBookmark_Dialog_InvalidName;
-							return Messages.Dialog_MapBookmark_Dialog_InvalidName;
-						}
-
-						return null;
-					}
-				});
-
-		inputDialog.open();
-
-		if (inputDialog.getReturnCode() != Window.OK) {
-			return;
-		}
-
-		final MapBookmark bookmark = new MapBookmark();
-
-		bookmark.name = inputDialog.getValue();
-
-		final MapPosition mapPosition = _mapApp.getMap().getMapPosition();
-
-		bookmark.setMapPosition(mapPosition);
-
-		MapBookmarkManager.addBookmark(bookmark);
 	}
 
 	/**

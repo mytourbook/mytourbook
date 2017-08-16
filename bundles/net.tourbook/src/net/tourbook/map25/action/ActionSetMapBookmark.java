@@ -26,14 +26,14 @@ public class ActionSetMapBookmark extends Action {
 
 	public ActionSetMapBookmark(final Map25View map25View) {
 
-		super(Messages.Action_Map_SetMapBookmark, AS_PUSH_BUTTON);
+		super(Messages.Action_Map_AddBookmark, AS_PUSH_BUTTON);
 
 		_map25View = map25View;
 	}
 
 	@Override
 	public void run() {
-		_map25View.actionSetMapBookmark();
+		_map25View.actionAddBookmark();
 	}
 
 }

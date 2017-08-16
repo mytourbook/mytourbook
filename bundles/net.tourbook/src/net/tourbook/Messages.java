@@ -27,7 +27,7 @@ public class Messages extends NLS {
 
 	public static String		Action_Compute_ElevationGain;
 
-	public static String		Action_Map_SetMapBookmark;
+	public static String		Action_Map_AddBookmark;
 
 	public static String		Action_MarkerFilter_WithGPS_Tooltip;
 	public static String		Action_MarkerFilter_WithoutGPS_Tooltip;
@@ -615,11 +615,6 @@ public class Messages extends NLS {
 	public static String		Dialog_JoinTours_Label_TourTime;
 	public static String		Dialog_JoinTours_Label_TourType;
 	public static String		Dialog_JoinTours_Link_TourType;
-
-	public static String		Dialog_MapBookmark_Button_Add;
-	public static String		Dialog_MapBookmark_Dialog_AddBookmark_Message;
-	public static String		Dialog_MapBookmark_Dialog_AddBookmark_Title;
-	public static String		Dialog_MapBookmark_Dialog_InvalidName;
 
 	public static String		Dialog_SetTimeZone_Button_AdjustTimeZone;
 	public static String		Dialog_SetTimeZone_Dialog_Title;
@@ -1611,7 +1606,19 @@ public class Messages extends NLS {
 	public static String		Slideout_Map25MarkerOptions_Label_Title;
 	public static String		Slideout_Map25MarkerOptions_Spinner_SymbolSize_Tooltip;
 
+	public static String Slideout_MapBookmark_Button_Add;
+
+	public static String		Slideout_MapBookmark_Button_Rename;
 	public static String		Slideout_MapBookmark_Column_Name;
+	public static String Slideout_MapBookmark_Dialog_AddBookmark_Message;
+
+	public static String Slideout_MapBookmark_Dialog_AddBookmark_Title;
+
+	public static String		Slideout_MapBookmark_Dialog_RenameBookmark_Message;
+	public static String		Slideout_MapBookmark_Dialog_RenameBookmark_Title;
+	public static String Slideout_MapBookmark_Dialog_ValidationAddName;
+
+	public static String		Slideout_MapBookmark_Dialog_ValidationRename;
 	public static String		Slideout_MapBookmark_Label_Title;
 
 	public static String		Slideout_RefTour_YearStatisticOptions_Label_Title;
