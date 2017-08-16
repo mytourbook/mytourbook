@@ -426,6 +426,8 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 		}
 
 		_mapBookmarks.onSelectBookmark(selectedBookmark);
+
+		MapBookmarkManager.lastSelectedBookmark(selectedBookmark);
 	}
 
 	private void restoreState() {

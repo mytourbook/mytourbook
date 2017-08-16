@@ -19,10 +19,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Map.Entry;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.LRUMap;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 
@@ -55,33 +57,40 @@ public class MapBookmarkManager {
 	static {}
 	//
 	// common attributes
-	private static final String				ATTR_ID							= "id";						//$NON-NLS-1$
+	private static final String					ATTR_ID							= "id";							//$NON-NLS-1$
 
 	//
 	/*
 	 * Root
 	 */
-	private static final String				TAG_ROOT						= "MapBookmarks";			//$NON-NLS-1$
-	private static final String				ATTR_CONFIG_VERSION				= "configVersion";			//$NON-NLS-1$
+	private static final String					TAG_ROOT						= "MapBookmarks";				//$NON-NLS-1$
+	private static final String					ATTR_CONFIG_VERSION				= "configVersion";				//$NON-NLS-1$
 	//
 	/*
-	 * Tour tracks
+	 * Bookmarks
 	 */
-	private static final String				TAG_BOOKMARK					= "Bookmark";				//$NON-NLS-1$
-	private static final String				ATTR_NAME						= "name";					//$NON-NLS-1$
-	private static final String				ATTR_MAP_POSITION_X				= "mapPositionX";			//$NON-NLS-1$
-	private static final String				ATTR_MAP_POSITION_Y				= "mapPositionY";			//$NON-NLS-1$
-	private static final String				ATTR_MAP_POSITION_SCALE			= "mapPositionScale";		//$NON-NLS-1$
-	private static final String				ATTR_MAP_POSITION_BEARING		= "mapPositionBearing";		//$NON-NLS-1$
-	private static final String				ATTR_MAP_POSITION_TILT			= "mapPositionTilt";		//$NON-NLS-1$
-	private static final String				ATTR_MAP_POSITION_ZOOM_LEVEL	= "mapPositionZoomLevel";	//$NON-NLS-1$
+	private static final String					TAG_ALL_BOOKMARKS				= "AllBookmarks";				//$NON-NLS-1$
+	private static final String					TAG_BOOKMARK					= "Bookmark";					//$NON-NLS-1$
+	private static final String					TAG_ALL_LRU_BOOKMARKS			= "AllLastRecentUsedBookmarks";	//$NON-NLS-1$
+	private static final String					TAG_LRU_BOOKMARK				= "LastRecentUsedBookmark";		//$NON-NLS-1$
+	private static final String					ATTR_NAME						= "name";						//$NON-NLS-1$
+	private static final String					ATTR_MAP_POSITION_X				= "mapPositionX";				//$NON-NLS-1$
+	private static final String					ATTR_MAP_POSITION_Y				= "mapPositionY";				//$NON-NLS-1$
+	private static final String					ATTR_MAP_POSITION_SCALE			= "mapPositionScale";			//$NON-NLS-1$
+	private static final String					ATTR_MAP_POSITION_BEARING		= "mapPositionBearing";			//$NON-NLS-1$
+	private static final String					ATTR_MAP_POSITION_TILT			= "mapPositionTilt";			//$NON-NLS-1$
+	private static final String					ATTR_MAP_POSITION_ZOOM_LEVEL	= "mapPositionZoomLevel";		//$NON-NLS-1$
 	//
 	//
 	/**
 	 * Contains all configurations which are loaded from a xml file.
 	 */
-	private static ArrayList<MapBookmark>	_allBookmarks					= getAllMapBookmarks();
+	private static ArrayList<MapBookmark>		_allBookmarks					= getAllMapBookmarks();
 	//
+	/**
+	 * Keep last recent used bookmarks
+	 */
+	private static LRUMap<String, MapBookmark>	_allLruBookmarks				= new LRUMap<>(3);
 
 	public static void addBookmark(final MapBookmark bookmark) {
 
@@ -108,6 +117,10 @@ public class MapBookmarkManager {
 		return xmlRoot;
 	}
 
+	public static LRUMap<String, MapBookmark> getAllLruBookmarks() {
+		return _allLruBookmarks;
+	}
+
 	public static ArrayList<MapBookmark> getAllMapBookmarks() {
 
 		// ensure bookmarks are loaded
@@ -123,6 +136,11 @@ public class MapBookmarkManager {
 		return xmlFile;
 	}
 
+	public static void lastSelectedBookmark(final MapBookmark selectedBookmark) {
+
+		_allLruBookmarks.put(selectedBookmark.id, selectedBookmark);
+	}
+
 	/**
 	 * @param xmlRoot
 	 *            Can be <code>null</code> when not available
@@ -135,7 +153,9 @@ public class MapBookmarkManager {
 			return;
 		}
 
-		for (final IMemento mementoBookmark : xmlRoot.getChildren()) {
+		final XMLMemento xmlAllBookmarks = (XMLMemento) xmlRoot.getChild(TAG_ALL_BOOKMARKS);
+
+		for (final IMemento mementoBookmark : xmlAllBookmarks.getChildren()) {
 
 			final XMLMemento xmlBookmark = (XMLMemento) mementoBookmark;
 
@@ -184,6 +204,53 @@ public class MapBookmarkManager {
 		bookmark.setMapPosition(mapPosition);
 	}
 
+	private static void parseLRUs(final XMLMemento xmlRoot, final LRUMap<String, MapBookmark> lruBookmarks) {
+
+		if (xmlRoot == null) {
+			return;
+		}
+
+		// <AllLastRecentUsedBookmarks>
+		final XMLMemento xmlAllLRUs = (XMLMemento) xmlRoot.getChild(TAG_ALL_LRU_BOOKMARKS);
+
+		for (final IMemento mementoLRU : xmlAllLRUs.getChildren()) {
+
+			final XMLMemento xmlLRU = (XMLMemento) mementoLRU;
+
+			try {
+
+				final String xmlConfigType = xmlLRU.getType();
+
+				if (xmlConfigType.equals(TAG_LRU_BOOKMARK)) {
+
+					// <LastRecentUsedBookmark>
+
+					final String lruId = xmlLRU.getString(ATTR_ID);
+
+					if (lruId == null) {
+						continue;
+					}
+
+					for (final MapBookmark mapBookmark : _allBookmarks) {
+
+						if (lruId.equals(mapBookmark.id)) {
+
+							// found lru bookmark
+
+							_allLruBookmarks.put(lruId, mapBookmark);
+
+							break;
+						}
+					}
+				}
+
+			} catch (final Exception e) {
+				StatusUtil.log(Util.dumpMemento(xmlLRU), e);
+			}
+		}
+
+	}
+
 	/**
 	 * Read or create configuration a xml file
 	 * 
@@ -223,6 +290,9 @@ public class MapBookmarkManager {
 			// parse xml
 			parseBookmarks(xmlRoot, _allBookmarks);
 
+			// must be done AFTER the bookmarks are created
+			parseLRUs(xmlRoot, _allLruBookmarks);
+
 		} catch (final Exception e) {
 			StatusUtil.log(e);
 		} finally {
@@ -234,6 +304,7 @@ public class MapBookmarkManager {
 
 		final XMLMemento xmlRoot = create_Root();
 
+		saveState_LRUBookmarks(xmlRoot);
 		saveState_Bookmarks(xmlRoot);
 
 		Util.writeXml(xmlRoot, getXmlFile());
@@ -241,10 +312,13 @@ public class MapBookmarkManager {
 
 	private static void saveState_Bookmarks(final XMLMemento xmlRoot) {
 
+		// <AllBookmarks>
+		final IMemento xmlAllBookmarks = xmlRoot.createChild(TAG_ALL_BOOKMARKS);
+
 		for (final MapBookmark bookmark : _allBookmarks) {
 
 			// <Bookmark>
-			final IMemento xmlBookmark = xmlRoot.createChild(TAG_BOOKMARK);
+			final IMemento xmlBookmark = xmlAllBookmarks.createChild(TAG_BOOKMARK);
 			{
 				xmlBookmark.putString(ATTR_ID, bookmark.id);
 				xmlBookmark.putString(ATTR_NAME, bookmark.name);
@@ -263,6 +337,22 @@ public class MapBookmarkManager {
 				xmlBookmark.putInteger(ATTR_MAP_POSITION_ZOOM_LEVEL, mapPosition.zoomLevel);
 			}
 		}
+	}
+
+	private static void saveState_LRUBookmarks(final XMLMemento xmlRoot) {
+
+		// <AllLastRecentUsedBookmarks>
+		final IMemento xmlAllLRU = xmlRoot.createChild(TAG_ALL_LRU_BOOKMARKS);
+
+		for (final Entry<String, MapBookmark> entry : _allLruBookmarks.entrySet()) {
+
+			// <LastRecentUsedBookmark>
+			final IMemento xmlLRU = xmlAllLRU.createChild(TAG_LRU_BOOKMARK);
+			{
+				xmlLRU.putString(ATTR_ID, entry.getValue().id);
+			}
+		}
+
 	}
 
 }

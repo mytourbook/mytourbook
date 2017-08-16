@@ -25,6 +25,7 @@ import java.awt.event.ComponentEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import net.tourbook.Messages;
@@ -50,7 +51,6 @@ import net.tourbook.map.bookmark.MapBookmark;
 import net.tourbook.map.bookmark.MapBookmarkManager;
 import net.tourbook.map25.action.ActionMap25_ShowMarker;
 import net.tourbook.map25.action.ActionSelectMap25Provider;
-import net.tourbook.map25.action.ActionSetMapBookmark;
 import net.tourbook.map25.action.ActionShowEntireTour;
 import net.tourbook.map25.action.ActionSynchMapWithChartSlider;
 import net.tourbook.map25.action.ActionSynchMapWithTour;
@@ -83,6 +83,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.events.MenuAdapter;
@@ -133,46 +134,47 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 	private static final IDialogSettings	_state							= TourbookPlugin.getState(ID);
 	//
 // SET_FORMATTING_ON
-
+	//
 	private Map25App						_mapApp;
-
+	//
 	private OpenDialogManager				_openDlgMgr								= new OpenDialogManager();
-
+	//
 	private boolean							_isPartVisible;
-
+	//
 	private IPartListener2					_partListener;
-
 	private ISelectionListener				_postSelectionListener;
 	private ITourEventListener				_tourEventListener;
+	//
 	private ISelection						_lastHiddenSelection;
-
 	private ISelection						_selectionWhenHidden;
 	private int								_lastSelectionHash;
+	//
 	private ActionMapBookmarks				_actionMapBookmarks;
-
 	private ActionMap25_Options				_actionMapOptions;
 	private ActionMap25_ShowMarker			_actionMarkerOptions;
-	private ActionSetMapBookmark			_actionSetMapBookmark;
+	private ActionBookmark_Add				_actionBookmark_Add;
+	private ActionBookmark_Update			_actionBookmark_Update;
 	private ActionSelectMap25Provider		_actionSelectMapProvider;
 	private ActionSynchMapWithChartSlider	_actionSynchMapWithChartSlider;
 	private ActionSynchMapWithTour			_actionSynchMapWithTour;
 	private ActionShowEntireTour			_actionShowEntireTour;
 	private ActionTourTrackConfig			_actionTrackOptions;
+	//
 	private ArrayList<TourData>				_allTourData							= new ArrayList<>();
-
 	private TIntArrayList					_allTourStarts							= new TIntArrayList();
 	private GeoPoint[]						_allGeoPoints;
 	private BoundingBox						_allBoundingBox;
+	//
 	private int								_hashTourId;
-
 	private int								_hashTourData;
+	//
 	private boolean							_isSynchMapWithChartSlider;
-
 	private boolean							_isSynchMapWithTour;
+	//
+	private MapBookmark						_lastSelectedBookmark;
 	// context menu
 	private boolean							_isContextMenuVisible;
-
-	//	private MouseAdapter					_wwMouseListener;
+//	private MouseAdapter					_wwMouseListener;
 	private Menu							_swtContextMenu;
 /*
  * UI controls
@@ -180,6 +182,32 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 	private Composite						_swtContainer;
 
 	Composite								_parent;
+
+	private class ActionBookmark_Add extends Action {
+
+		public ActionBookmark_Add() {
+			super(Messages.Action_Map_AddBookmark, AS_PUSH_BUTTON);
+		}
+
+		@Override
+		public void run() {
+			actionBookmark_Add();
+		}
+
+	}
+
+	private class ActionBookmark_Update extends Action {
+
+		public ActionBookmark_Update() {
+			super(Messages.Action_Map_UpdateBookmark, AS_PUSH_BUTTON);
+		}
+
+		@Override
+		public void run() {
+			actionBookmark_Update();
+		}
+
+	}
 
 	private class ActionMap25_Options extends ActionToolbarSlideout {
 
@@ -223,9 +251,9 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		}
 	}
 
-	public class BookmarkAddDialog extends InputDialog {
+	private class DialogAddBookmark extends InputDialog {
 
-		public BookmarkAddDialog(	final Shell parentShell,
+		public DialogAddBookmark(	final Shell parentShell,
 									final String dialogTitle,
 									final String dialogMessage,
 									final String initialValue,
@@ -251,7 +279,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 				final Point cursorLocation = Display.getCurrent().getCursorLocation();
 
-				// center to cursor location
+				// center below cursor location
 				cursorLocation.x -= initialSize.x / 2;
 				cursorLocation.y += 10;
 
@@ -273,9 +301,9 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 	}
 
-	public void actionAddBookmark() {
+	public void actionBookmark_Add() {
 
-		final BookmarkAddDialog addDialog = new BookmarkAddDialog(
+		final DialogAddBookmark addDialog = new DialogAddBookmark(
 
 				_parent.getShell(),
 				Messages.Slideout_MapBookmark_Dialog_AddBookmark_Title,
@@ -311,6 +339,19 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		bookmark.setMapPosition(mapPosition);
 
 		MapBookmarkManager.addBookmark(bookmark);
+	}
+
+	public void actionBookmark_Update() {
+
+		if (_lastSelectedBookmark == null) {
+			// this should not happen
+			return;
+		}
+
+		// update map position
+		final MapPosition mapPosition = _mapApp.getMap().getMapPosition();
+
+		_lastSelectedBookmark.setMapPosition(mapPosition);
 	}
 
 	void actionContextMenu(final int relativeX, final int relativeY) {
@@ -568,7 +609,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 		_actionMapOptions = new ActionMap25_Options();
 		_actionSelectMapProvider = new ActionSelectMap25Provider(this);
-		_actionSetMapBookmark = new ActionSetMapBookmark(this);
+		_actionBookmark_Add = new ActionBookmark_Add();
+		_actionBookmark_Update = new ActionBookmark_Update();
 		_actionShowEntireTour = new ActionShowEntireTour(this);
 		_actionSynchMapWithTour = new ActionSynchMapWithTour(this);
 		_actionSynchMapWithChartSlider = new ActionSynchMapWithChartSlider(this);
@@ -852,7 +894,18 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 //		(new Separator()).fill(menu, -1);
 
-		fillMenuItem(menu, _actionSetMapBookmark);
+		fillMenuItem(menu, _actionBookmark_Add);
+
+		// update last selected bookmark
+		if (_lastSelectedBookmark != null) {
+
+			// set text with last selected bookmark
+			_actionBookmark_Update.setText(NLS.bind(Messages.Action_Map_UpdateBookmark, _lastSelectedBookmark.name));
+
+			fillMenuItem(menu, _actionBookmark_Update);
+		}
+
+		fillRecentBookmarks(menu);
 
 		enableContextMenuActions();
 	}
@@ -863,12 +916,22 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		item.fill(menu, -1);
 	}
 
+	private void fillRecentBookmarks(final Menu menu) {
+
+		for (final Entry<String, MapBookmark> lruEntry : MapBookmarkManager.getAllLruBookmarks().entrySet()) {
+
+			create lru action
+		}
+	}
+
 	public Map25App getMapApp() {
 		return _mapApp;
 	}
 
 	@Override
 	public void onSelectBookmark(final MapBookmark selectedBookmark) {
+
+		_lastSelectedBookmark = selectedBookmark;
 
 		final Map map = _mapApp.getMap();
 
