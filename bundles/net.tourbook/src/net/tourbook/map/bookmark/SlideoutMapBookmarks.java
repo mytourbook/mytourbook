@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.map.bookmark;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
@@ -30,6 +31,7 @@ import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -71,9 +73,15 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 
 	private TableViewer				_bookmarkViewer;
 
-	private PixelConverter			_pc;
+	private final NumberFormat		_nfLatLon	= NumberFormat.getNumberInstance();
+	{
+		_nfLatLon.setMinimumFractionDigits(4);
+		_nfLatLon.setMaximumFractionDigits(4);
+	}
 
-	private Font					_boldFont;
+	private PixelConverter	_pc;
+
+	private Font			_boldFont;
 
 	{
 		_boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
@@ -219,7 +227,7 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 				createUI_10_Title(container);
 				createUI_12_Actions(container);
 
-				createUI_210_BookmarkViewer(container);
+				createUI_50_BookmarkViewer(container);
 
 			}
 		}
@@ -258,13 +266,14 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 		tbm.update(true);
 	}
 
-	private void createUI_210_BookmarkViewer(final Composite parent) {
+	private void createUI_50_BookmarkViewer(final Composite parent) {
 
 		final Composite layoutContainer = new Composite(parent, SWT.NONE);
 		GridDataFactory
 				.fillDefaults()//
 				//				.grab(true, true)
 				.span(2, 1)
+				.hint(_pc.convertWidthInCharsToPixels(50), SWT.DEFAULT)
 				.applyTo(layoutContainer);
 
 		final TableColumnLayout tableLayout = new TableColumnLayout();
@@ -305,6 +314,42 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 				}
 			});
 			tableLayout.setColumnData(tc, new ColumnWeightData(1, false));
+		}
+		{
+			// Column: Latitude
+
+			tvc = new TableViewerColumn(_bookmarkViewer, SWT.TRAIL);
+			tc = tvc.getColumn();
+			tc.setText(net.tourbook.ui.Messages.ColumnFactory_latitude);
+			tvc.setLabelProvider(new CellLabelProvider() {
+				@Override
+				public void update(final ViewerCell cell) {
+
+					final MapBookmark bookmark = (MapBookmark) cell.getElement();
+					final String valueText = _nfLatLon.format(bookmark.getLatitude());
+
+					cell.setText(valueText);
+				}
+			});
+			tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(9), false));
+		}
+		{
+			// Column: Longitude
+
+			tvc = new TableViewerColumn(_bookmarkViewer, SWT.TRAIL);
+			tc = tvc.getColumn();
+			tc.setText(net.tourbook.ui.Messages.ColumnFactory_longitude);
+			tvc.setLabelProvider(new CellLabelProvider() {
+				@Override
+				public void update(final ViewerCell cell) {
+
+					final MapBookmark bookmark = (MapBookmark) cell.getElement();
+					final String valueText = _nfLatLon.format(bookmark.getLongitude());
+
+					cell.setText(valueText);
+				}
+			});
+			tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(9), false));
 		}
 
 		/*
@@ -368,6 +413,7 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 
 		// update model
 		_allBookmarks.remove(selectedBookmark);
+		MapBookmarkManager.getAllRecentBookmarks().remove(selectedBookmark);
 
 		// update UI
 		_bookmarkViewer.refresh();
@@ -426,8 +472,6 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 		}
 
 		_mapBookmarks.onSelectBookmark(selectedBookmark);
-
-		MapBookmarkManager.lastSelectedBookmark(selectedBookmark);
 	}
 
 	private void restoreState() {

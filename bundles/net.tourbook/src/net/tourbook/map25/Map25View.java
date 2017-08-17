@@ -24,8 +24,8 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import net.tourbook.Messages;
@@ -171,7 +171,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 	private boolean							_isSynchMapWithChartSlider;
 	private boolean							_isSynchMapWithTour;
 	//
-	private MapBookmark						_lastSelectedBookmark;
+	private MapBookmark						_lastSelectedForUpdate;
 	// context menu
 	private boolean							_isContextMenuVisible;
 //	private MouseAdapter					_wwMouseListener;
@@ -192,6 +192,24 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		@Override
 		public void run() {
 			actionBookmark_Add();
+		}
+
+	}
+
+	private class ActionBookmark_LastRecentUsed extends Action {
+
+		private String _id;
+
+		public ActionBookmark_LastRecentUsed(final String name, final String id) {
+
+			super(name, AS_PUSH_BUTTON);
+
+			_id = id;
+		}
+
+		@Override
+		public void run() {
+			actionBookmark_LastRecentUsed(_id);
 		}
 
 	}
@@ -341,9 +359,22 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		MapBookmarkManager.addBookmark(bookmark);
 	}
 
+	private void actionBookmark_LastRecentUsed(final String bookmarkId) {
+
+		for (final MapBookmark bookmark : MapBookmarkManager.getAllMapBookmarks()) {
+
+			if (bookmarkId.equals(bookmark.id)) {
+
+				onSelectBookmark(bookmark);
+
+				return;
+			}
+		}
+	}
+
 	public void actionBookmark_Update() {
 
-		if (_lastSelectedBookmark == null) {
+		if (_lastSelectedForUpdate == null) {
 			// this should not happen
 			return;
 		}
@@ -351,7 +382,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		// update map position
 		final MapPosition mapPosition = _mapApp.getMap().getMapPosition();
 
-		_lastSelectedBookmark.setMapPosition(mapPosition);
+		_lastSelectedForUpdate.setMapPosition(mapPosition);
 	}
 
 	void actionContextMenu(final int relativeX, final int relativeY) {
@@ -893,19 +924,26 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 	private void fillContextMenu(final Menu menu) {
 
 //		(new Separator()).fill(menu, -1);
+		{
+			fillMenuItem(menu, _actionBookmark_Add);
 
-		fillMenuItem(menu, _actionBookmark_Add);
+			// update last selected bookmark
+			if (_lastSelectedForUpdate != null) {
 
-		// update last selected bookmark
-		if (_lastSelectedBookmark != null) {
+				// set text with last selected bookmark
+				_actionBookmark_Update.setText(
+						NLS.bind(Messages.Action_Map_UpdateBookmark, _lastSelectedForUpdate.name));
 
-			// set text with last selected bookmark
-			_actionBookmark_Update.setText(NLS.bind(Messages.Action_Map_UpdateBookmark, _lastSelectedBookmark.name));
-
-			fillMenuItem(menu, _actionBookmark_Update);
+				fillMenuItem(menu, _actionBookmark_Update);
+			}
 		}
 
-		fillRecentBookmarks(menu);
+		if (MapBookmarkManager.getAllRecentBookmarks().size() > 0) {
+
+			(new Separator()).fill(menu, -1);
+
+			fillRecentBookmarks(menu);
+		}
 
 		enableContextMenuActions();
 	}
@@ -918,9 +956,15 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 	private void fillRecentBookmarks(final Menu menu) {
 
-		for (final Entry<String, MapBookmark> lruEntry : MapBookmarkManager.getAllLruBookmarks().entrySet()) {
+		int index = 0;
 
-			create lru action
+		final LinkedList<MapBookmark> allRecentBookmarks = MapBookmarkManager.getAllRecentBookmarks();
+
+		for (final MapBookmark bookmark : allRecentBookmarks) {
+
+			final String name = /* UI.SPACE4 + */UI.SYMBOL_MNEMONIC + (++index) + UI.SPACE2 + bookmark.name;
+
+			fillMenuItem(menu, new ActionBookmark_LastRecentUsed(name, bookmark.id));
 		}
 	}
 
@@ -931,7 +975,9 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 	@Override
 	public void onSelectBookmark(final MapBookmark selectedBookmark) {
 
-		_lastSelectedBookmark = selectedBookmark;
+		_lastSelectedForUpdate = selectedBookmark;
+
+		MapBookmarkManager.setLastSelectedBookmark(selectedBookmark);
 
 		final Map map = _mapApp.getMap();
 

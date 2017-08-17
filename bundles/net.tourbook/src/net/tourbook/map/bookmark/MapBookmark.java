@@ -15,16 +15,19 @@
  *******************************************************************************/
 package net.tourbook.map.bookmark;
 
+import java.util.UUID;
+
 import org.oscim.core.MapPosition;
 
 public class MapBookmark {
 
-	public String		id	= Long.toString(System.nanoTime());
+	public String		id	= UUID.randomUUID().toString();
 
 	public String		name;
 
 	private double		_latitude;
 	private double		_longitude;
+
 	private MapPosition	_mapPosition;
 
 	@Override
@@ -88,7 +91,9 @@ public class MapBookmark {
 
 	@Override
 	public String toString() {
-		return "MapBookmark "
+		return "\n"
+
+				+ "MapBookmark "
 
 				+ "["
 
