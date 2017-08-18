@@ -16,6 +16,7 @@
 package net.tourbook.application;
 
 import net.tourbook.Messages;
+import net.tourbook.map.bookmark.MapBookmarkManager;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourTypeFilterManager;
 import net.tourbook.tour.filter.TourFilterManager;
@@ -297,6 +298,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		_personContribItem.saveState(state);
 		TourTypeFilterManager.saveState(state);
 		TourFilterManager.saveState();
+		MapBookmarkManager.saveState();
 
 		return super.saveState(state);
 	}

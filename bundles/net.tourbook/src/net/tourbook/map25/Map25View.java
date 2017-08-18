@@ -1423,7 +1423,6 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		_state.put(STATE_IS_LAYER_SCALE_BAR_VISIBLE, _mapApp.getLayer_ScaleBar().isEnabled());
 
 		Map25ConfigManager.saveState();
-		MapBookmarkManager.saveState();
 	}
 
 	@Override

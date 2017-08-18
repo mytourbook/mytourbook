@@ -1608,18 +1608,16 @@ public class Messages extends NLS {
 	public static String		Slideout_Map25MarkerOptions_Spinner_SymbolSize_Tooltip;
 
 	public static String		Slideout_MapBookmark_Button_Add;
-
 	public static String		Slideout_MapBookmark_Button_Rename;
 	public static String		Slideout_MapBookmark_Column_Name;
 	public static String		Slideout_MapBookmark_Dialog_AddBookmark_Message;
-
 	public static String		Slideout_MapBookmark_Dialog_AddBookmark_Title;
-
 	public static String		Slideout_MapBookmark_Dialog_RenameBookmark_Message;
 	public static String		Slideout_MapBookmark_Dialog_RenameBookmark_Title;
 	public static String		Slideout_MapBookmark_Dialog_ValidationAddName;
-
 	public static String		Slideout_MapBookmark_Dialog_ValidationRename;
+	public static String		Slideout_MapBookmark_Label_ContextMenuEntries;
+	public static String		Slideout_MapBookmark_Label_ContextMenuEntries_Tooltip;
 	public static String		Slideout_MapBookmark_Label_Title;
 
 	public static String		Slideout_RefTour_YearStatisticOptions_Label_Title;
