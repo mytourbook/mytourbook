@@ -20,10 +20,10 @@ import net.tourbook.common.tooltip.ICloseOpenedDialogs;
 public interface IMapBookmarks extends ICloseOpenedDialogs {
 
 	/**
-	 * Map bookmark is selected in the bookmark viewer.
+	 * Move the map location to the bookmark location.
 	 * 
-	 * @param selectedBookmark
+	 * @param bookmarkLocation
 	 */
-	public void onSelectBookmark(MapBookmark selectedBookmark);
+	public void moveToMapLocation(MapBookmark bookmarkLocation);
 
 }

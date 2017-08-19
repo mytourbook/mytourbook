@@ -403,6 +403,7 @@ public class Messages extends NLS {
 	public static String		App_Action_OpenOtherViews;
 	public static String		App_Action_Remove;
 	public static String		App_Action_Remove_Immediate;
+	public static String		App_Action_Rename;
 	public static String		App_Action_RestoreDefault_Tooltip;
 	public static String		App_Action_set_tour_type;
 	public static String		App_Action_Save;
@@ -1609,15 +1610,27 @@ public class Messages extends NLS {
 
 	public static String		Slideout_MapBookmark_Button_Add;
 	public static String		Slideout_MapBookmark_Button_Rename;
+	public static String		Slideout_MapBookmark_Checkbox_IsAnimationLocation;
+	public static String		Slideout_MapBookmark_Checkbox_IsAnimationLocation_Tooltip;
+	public static String		Slideout_MapBookmark_Column_Latitude;
+	public static String		Slideout_MapBookmark_Column_Latitude_Tooltip;
+	public static String		Slideout_MapBookmark_Column_Longitude;
+	public static String		Slideout_MapBookmark_Column_Longitude_Tooltip;
 	public static String		Slideout_MapBookmark_Column_Name;
+	public static String		Slideout_MapBookmark_Column_ZoomLevel;
+	public static String		Slideout_MapBookmark_Column_ZoomLevel_Tooltip;
 	public static String		Slideout_MapBookmark_Dialog_AddBookmark_Message;
 	public static String		Slideout_MapBookmark_Dialog_AddBookmark_Title;
 	public static String		Slideout_MapBookmark_Dialog_RenameBookmark_Message;
 	public static String		Slideout_MapBookmark_Dialog_RenameBookmark_Title;
 	public static String		Slideout_MapBookmark_Dialog_ValidationAddName;
 	public static String		Slideout_MapBookmark_Dialog_ValidationRename;
-	public static String		Slideout_MapBookmark_Label_ContextMenuEntries;
-	public static String		Slideout_MapBookmark_Label_ContextMenuEntries_Tooltip;
+	public static String		Slideout_MapBookmark_Label_AnimationTime;
+	public static String		Slideout_MapBookmark_Label_AnimationTime_Tooltip;
+	public static String		Slideout_MapBookmark_Label_NumBookmarkListItems;
+	public static String		Slideout_MapBookmark_Label_NumBookmarkListItems_Tooltip;
+	public static String		Slideout_MapBookmark_Label_NumContextMenuItems;
+	public static String		Slideout_MapBookmark_Label_NumContextMenuItems_Tooltip;
 	public static String		Slideout_MapBookmark_Label_Title;
 
 	public static String		Slideout_RefTour_YearStatisticOptions_Label_Title;

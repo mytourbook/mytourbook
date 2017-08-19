@@ -1334,10 +1334,14 @@ public class UI {
 	 * @param button
 	 */
 	public static void setButtonLayoutData(final Button button) {
+
 		final GridData data = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
+
 		final int widthHint = convertHorizontalDLUsToPixels(IDialogConstants.BUTTON_WIDTH);
 		final Point minSize = button.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
+
 		data.widthHint = Math.max(widthHint, minSize.x);
+
 		button.setLayoutData(data);
 	}
 

@@ -24,7 +24,6 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -196,24 +195,6 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 	}
 
-	private class ActionBookmark_LastRecentUsed extends Action {
-
-		private String _id;
-
-		public ActionBookmark_LastRecentUsed(final String name, final String id) {
-
-			super(name, AS_PUSH_BUTTON);
-
-			_id = id;
-		}
-
-		@Override
-		public void run() {
-			actionBookmark_LastRecentUsed(_id);
-		}
-
-	}
-
 	private class ActionBookmark_Update extends Action {
 
 		public ActionBookmark_Update() {
@@ -357,19 +338,6 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		bookmark.setMapPosition(mapPosition);
 
 		MapBookmarkManager.addBookmark(bookmark);
-	}
-
-	private void actionBookmark_LastRecentUsed(final String bookmarkId) {
-
-		for (final MapBookmark bookmark : MapBookmarkManager.getAllMapBookmarks()) {
-
-			if (bookmarkId.equals(bookmark.id)) {
-
-				onSelectBookmark(bookmark);
-
-				return;
-			}
-		}
 	}
 
 	public void actionBookmark_Update() {
@@ -938,12 +906,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 			}
 		}
 
-		if (MapBookmarkManager.getAllRecentBookmarks().size() > 0) {
-
-			(new Separator()).fill(menu, -1);
-
-			fillRecentBookmarks(menu);
-		}
+		MapBookmarkManager.fillContextMenu_RecentBookmarks(menu, this);
 
 		enableContextMenuActions();
 	}
@@ -954,26 +917,12 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		item.fill(menu, -1);
 	}
 
-	private void fillRecentBookmarks(final Menu menu) {
-
-		int index = 0;
-
-		final LinkedList<MapBookmark> allRecentBookmarks = MapBookmarkManager.getAllRecentBookmarks();
-
-		for (final MapBookmark bookmark : allRecentBookmarks) {
-
-			final String name = /* UI.SPACE4 + */UI.SYMBOL_MNEMONIC + (++index) + UI.SPACE2 + bookmark.name;
-
-			fillMenuItem(menu, new ActionBookmark_LastRecentUsed(name, bookmark.id));
-		}
-	}
-
 	public Map25App getMapApp() {
 		return _mapApp;
 	}
 
 	@Override
-	public void onSelectBookmark(final MapBookmark selectedBookmark) {
+	public void moveToMapLocation(final MapBookmark selectedBookmark) {
 
 		_lastSelectedForUpdate = selectedBookmark;
 
@@ -987,10 +936,20 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 			@Override
 			public void run() {
 
-				map.animator().animateTo(
-						3000,
-						selectedBookmark.getMapPosition(),
-						org.oscim.utils.Easing.Type.SINE_INOUT);
+				final float animationTime = MapBookmarkManager.animationTime;
+				final MapPosition mapPosition = selectedBookmark.getMapPosition();
+
+				if (animationTime == 0 || MapBookmarkManager.isAnimateLocation == false) {
+
+					map.setMapPosition(mapPosition);
+
+				} else {
+
+					map.animator().animateTo(
+							(long) (animationTime * 1000),
+							mapPosition,
+							org.oscim.utils.Easing.Type.SINE_INOUT);
+				}
 
 				map.updateMap(false);
 			}
