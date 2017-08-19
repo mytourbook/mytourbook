@@ -21,6 +21,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
+import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
@@ -31,11 +32,24 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.IInputValidator;
+import org.eclipse.jface.dialogs.InputDialog;
+import org.eclipse.jface.window.Window;
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
 import org.oscim.core.MapPosition;
+import org.oscim.utils.Easing;
+import org.oscim.utils.Easing.Type;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
@@ -87,6 +101,8 @@ public class MapBookmarkManager {
 	private static final String				ATTR_MAP_POSITION_TILT			= "mapPositionTilt";				//$NON-NLS-1$
 	private static final String				ATTR_MAP_POSITION_ZOOM_LEVEL	= "mapPositionZoomLevel";			//$NON-NLS-1$
 	//
+	private static final String				TAG_OPTIONS						= "Options";						//$NON-NLS-1$
+	private static final String				ATTR_ANIMATION_EASING_TYPE		= "animationEasingType";			//$NON-NLS-1$
 	private static final String				ATTR_ANIMATION_TIME				= "animationTime";					//$NON-NLS-1$
 	private static final String				ATTR_IS_ANIMATE_LOCATION		= "isAnimateLocation";				//$NON-NLS-1$
 	private static final String				ATTR_NUMBER_OF_BOOKMARK_ITEMS	= "numberOfBookmarkItems";			//$NON-NLS-1$
@@ -100,6 +116,7 @@ public class MapBookmarkManager {
 	static final int						NUM_BOOKMARK_ITEMS_MIN			= 10;
 	static final int						NUM_BOOKMARK_ITEMS_MAX			= 100;
 
+	private static final Type				ANIMATION_EASING_TYPE_DEFAULT	= Easing.Type.SINE_INOUT;
 	private static final boolean			IS_ANIMATE_LOCATION_DEFAULT		= true;
 
 	private static final float				LOCATION_ANIMATION_TIME_DEFAULT	= 3.0f;
@@ -118,8 +135,9 @@ public class MapBookmarkManager {
 	private static LinkedList<MapBookmark>	_allRecentBookmarks				= new LinkedList<>();
 
 	/*
-	 * Options
+	 * Bookmark options
 	 */
+	public static Type						animationEasingType				= ANIMATION_EASING_TYPE_DEFAULT;
 	public static float						animationTime					= LOCATION_ANIMATION_TIME_DEFAULT;
 	public static boolean					isAnimateLocation				= IS_ANIMATE_LOCATION_DEFAULT;
 	public static int						numberOfBookmarkItems			= NUM_BOOKMARK_ITEMS_DEFAULT;
@@ -129,6 +147,42 @@ public class MapBookmarkManager {
 
 		// load bookmarks
 		readBookmarksFromXml();
+	}
+
+	public static class ActionBookmark_Add extends Action {
+
+		private IMapBookmarks __mapBookmarks;
+
+		public ActionBookmark_Add(final IMapBookmarks mapBookmarks) {
+
+			super(Messages.Action_Map_AddBookmark, AS_PUSH_BUTTON);
+
+			__mapBookmarks = mapBookmarks;
+		}
+
+		@Override
+		public void run() {
+			actionBookmark_Add(__mapBookmarks);
+		}
+
+	}
+
+	public static class ActionBookmark_Update extends Action {
+
+		private IMapBookmarks __mapBookmarks;
+
+		public ActionBookmark_Update(final String text, final IMapBookmarks mapBookmarks) {
+
+			super(text, AS_PUSH_BUTTON);
+
+			__mapBookmarks = mapBookmarks;
+		}
+
+		@Override
+		public void run() {
+			actionBookmark_Update(__mapBookmarks);
+		}
+
 	}
 
 	private static class ActionRecentBookmark extends Action {
@@ -161,6 +215,106 @@ public class MapBookmarkManager {
 		}
 	}
 
+	private static class DialogAddBookmark extends InputDialog {
+
+		public DialogAddBookmark(	final Shell parentShell,
+									final String dialogTitle,
+									final String dialogMessage,
+									final String initialValue,
+									final IInputValidator validator) {
+
+			super(parentShell, dialogTitle, dialogMessage, initialValue, validator);
+		}
+
+		@Override
+		protected void createButtonsForButtonBar(final Composite parent) {
+
+			super.createButtonsForButtonBar(parent);
+
+			// set text for the OK button
+			final Button _btnSave = getButton(IDialogConstants.OK_ID);
+			_btnSave.setText(Messages.Slideout_MapBookmark_Button_Add);
+		}
+
+		@Override
+		protected Point getInitialLocation(final Point initialSize) {
+
+			try {
+
+				final Point cursorLocation = Display.getCurrent().getCursorLocation();
+
+				// center below cursor location
+				cursorLocation.x -= initialSize.x / 2;
+				cursorLocation.y += 10;
+
+				return cursorLocation;
+
+			} catch (final NumberFormatException ex) {
+
+				return super.getInitialLocation(initialSize);
+			}
+		}
+
+	}
+
+	public static void actionBookmark_Add(final IMapBookmarks mapBookmarks) {
+
+		final DialogAddBookmark addDialog = new DialogAddBookmark(
+
+				Display.getDefault().getActiveShell(),
+
+				Messages.Slideout_MapBookmark_Dialog_AddBookmark_Title,
+				Messages.Slideout_MapBookmark_Dialog_AddBookmark_Message,
+
+				UI.EMPTY_STRING,
+				new IInputValidator() {
+
+					@Override
+					public String isValid(final String newText) {
+
+						if (newText.trim().length() == 0) {
+
+							//							return "Set a name for the bookmark";//Messages.Dialog_MapBookmark_Dialog_InvalidName;
+							return Messages.Slideout_MapBookmark_Dialog_ValidationAddName;
+						}
+
+						return null;
+					}
+				});
+
+		addDialog.open();
+
+		if (addDialog.getReturnCode() != Window.OK) {
+			return;
+		}
+
+		final MapLocation mapLocation = mapBookmarks.getMapLocation();
+
+		final MapBookmark bookmark = new MapBookmark();
+
+		bookmark.name = addDialog.getValue();
+		bookmark.setMapPosition(mapLocation.getMapPosition());
+
+		MapBookmarkManager.addBookmark(bookmark);
+	}
+
+	public static void actionBookmark_Update(final IMapBookmarks mapBookmarks) {
+
+		if (_allRecentBookmarks.size() > 0) {
+
+			final MapBookmark lastSelectedBookmark = _allRecentBookmarks.getFirst();
+
+			// update last selected bookmark
+			if (lastSelectedBookmark != null) {
+
+				// update map position
+				final MapLocation mapLocation = mapBookmarks.getMapLocation();
+
+				lastSelectedBookmark.setMapPosition(mapLocation.getMapPosition());
+			}
+		}
+	}
+
 	public static void addBookmark(final MapBookmark bookmark) {
 
 		_allBookmarks.add(bookmark);
@@ -188,30 +342,111 @@ public class MapBookmarkManager {
 		return xmlRoot;
 	}
 
-	public static void fillContextMenu_RecentBookmarks(final Menu menu, final IMapBookmarks mapBookmarks) {
+	public static void fillContextMenu_RecentBookmarks(final IMenuManager menuMgr, final IMapBookmarks mapBookmarks) {
 
-		if (MapBookmarkManager.getAllRecentBookmarks().size() > 0 && numberOfRecentBookmarks > 0) {
+		// add bookmarks
+		menuMgr.add(new ActionBookmark_Add(mapBookmarks));
 
-			(new Separator()).fill(menu, -1);
+		// update bookmark
+		if (_allRecentBookmarks.size() > 0) {
 
-			int index = 0;
+			final MapBookmark lastSelectedBookmark = _allRecentBookmarks.getFirst();
 
-			final LinkedList<MapBookmark> allRecentBookmarks = MapBookmarkManager.getAllRecentBookmarks();
+			// update last selected bookmark
+			if (lastSelectedBookmark != null) {
 
-			for (final MapBookmark bookmark : allRecentBookmarks) {
+				final ActionBookmark_Update actionUpdateBookmark = new ActionBookmark_Update(
 
-				final String name = UI.SYMBOL_MNEMONIC + (++index) + UI.SPACE2 + bookmark.name;
+						// set text with last selected bookmark
+						NLS.bind(Messages.Action_Map_UpdateBookmark, lastSelectedBookmark.name),
 
-				final ActionRecentBookmark action = new ActionRecentBookmark(name, bookmark.id, mapBookmarks);
-				final ActionContributionItem contribItem = new ActionContributionItem(action);
+						mapBookmarks);
 
-				contribItem.fill(menu, -1);
-
-				if (index >= numberOfRecentBookmarks) {
-					return;
-				}
+				menuMgr.add(actionUpdateBookmark);
 			}
 		}
+
+		if (MapBookmarkManager.getAllRecentBookmarks().size() <= 0 || numberOfRecentBookmarks <= 0) {
+			return;
+		}
+
+		/*
+		 * Recent bookmarks
+		 */
+		menuMgr.add(new Separator());
+
+		int index = 0;
+		final LinkedList<MapBookmark> allRecentBookmarks = MapBookmarkManager.getAllRecentBookmarks();
+
+		for (final MapBookmark bookmark : allRecentBookmarks) {
+
+			final String name = UI.SYMBOL_MNEMONIC + (++index) + UI.SPACE2 + bookmark.name;
+
+			menuMgr.add(new ActionRecentBookmark(name, bookmark.id, mapBookmarks));
+
+			// check if enough items are created
+			if (index >= numberOfRecentBookmarks) {
+				return;
+			}
+		}
+	}
+
+	public static void fillContextMenu_RecentBookmarks(final Menu menu, final IMapBookmarks mapBookmarks) {
+
+		// add bookmarks
+		fillMenuItem(menu, new ActionBookmark_Add(mapBookmarks));
+
+		// update bookmark
+		if (_allRecentBookmarks.size() > 0) {
+
+			final MapBookmark lastSelectedBookmark = _allRecentBookmarks.getFirst();
+
+			// update last selected bookmark
+			if (lastSelectedBookmark != null) {
+
+				final ActionBookmark_Update actionUpdateBookmark = new ActionBookmark_Update(
+
+						// set text with last selected bookmark
+						NLS.bind(Messages.Action_Map_UpdateBookmark, lastSelectedBookmark.name),
+
+						mapBookmarks);
+
+				fillMenuItem(menu, actionUpdateBookmark);
+			}
+		}
+
+		if (MapBookmarkManager.getAllRecentBookmarks().size() <= 0 || numberOfRecentBookmarks <= 0) {
+			return;
+		}
+
+		/*
+		 * Recent bookmarks
+		 */
+		new Separator().fill(menu, -1);
+
+		int index = 0;
+		final LinkedList<MapBookmark> allRecentBookmarks = MapBookmarkManager.getAllRecentBookmarks();
+
+		for (final MapBookmark bookmark : allRecentBookmarks) {
+
+			final String name = UI.SYMBOL_MNEMONIC + (++index) + UI.SPACE2 + bookmark.name;
+
+			final ActionRecentBookmark action = new ActionRecentBookmark(name, bookmark.id, mapBookmarks);
+			final ActionContributionItem contribItem = new ActionContributionItem(action);
+
+			contribItem.fill(menu, -1);
+
+			// check if enough items are created
+			if (index >= numberOfRecentBookmarks) {
+				return;
+			}
+		}
+	}
+
+	private static void fillMenuItem(final Menu menu, final Action action) {
+
+		final ActionContributionItem item = new ActionContributionItem(action);
+		item.fill(menu, -1);
 	}
 
 	public static ArrayList<MapBookmark> getAllMapBookmarks() {
@@ -232,24 +467,35 @@ public class MapBookmarkManager {
 
 	private static void parse_10_Options(final XMLMemento xmlRoot) {
 
+		final XMLMemento xmlOptions = (XMLMemento) xmlRoot.getChild(TAG_OPTIONS);
+
+		if (xmlOptions == null) {
+			return;
+		}
+
 		isAnimateLocation = Util.getXmlBoolean(xmlRoot, ATTR_IS_ANIMATE_LOCATION, IS_ANIMATE_LOCATION_DEFAULT);
 
+		animationEasingType = (Type) Util.getXmlEnum(
+				xmlOptions,
+				ATTR_ANIMATION_EASING_TYPE,
+				ANIMATION_EASING_TYPE_DEFAULT);
+
 		animationTime = Util.getXmlFloatFloat(
-				xmlRoot,
+				xmlOptions,
 				ATTR_ANIMATION_TIME,
 				LOCATION_ANIMATION_TIME_DEFAULT,
 				LOCATION_ANIMATION_TIME_MIN,
 				LOCATION_ANIMATION_TIME_MAX);
 
 		numberOfBookmarkItems = Util.getXmlInteger(
-				xmlRoot,
+				xmlOptions,
 				ATTR_NUMBER_OF_BOOKMARK_ITEMS,
 				NUM_BOOKMARK_ITEMS_DEFAULT,
 				NUM_BOOKMARK_ITEMS_MIN,
 				NUM_BOOKMARK_ITEMS_MAX);
 
 		numberOfRecentBookmarks = Util.getXmlInteger(
-				xmlRoot,
+				xmlOptions,
 				ATTR_NUMBER_OF_RECENT_BOOKMARKS,
 				NUM_RECENT_BOOKMARKS_DEFAULT,
 				NUM_RECENT_BOOKMARKS_MIN,
@@ -440,10 +686,15 @@ public class MapBookmarkManager {
 
 	private static void saveState_10_Options(final XMLMemento xmlRoot) {
 
-		xmlRoot.putInteger(ATTR_NUMBER_OF_RECENT_BOOKMARKS, numberOfRecentBookmarks);
-		xmlRoot.putInteger(ATTR_NUMBER_OF_BOOKMARK_ITEMS, numberOfBookmarkItems);
-		xmlRoot.putBoolean(ATTR_IS_ANIMATE_LOCATION, isAnimateLocation);
-		xmlRoot.putFloat(ATTR_ANIMATION_TIME, animationTime);
+		// <Options>
+		final IMemento xmlOptions = xmlRoot.createChild(TAG_OPTIONS);
+
+		xmlOptions.putInteger(ATTR_NUMBER_OF_RECENT_BOOKMARKS, numberOfRecentBookmarks);
+		xmlOptions.putInteger(ATTR_NUMBER_OF_BOOKMARK_ITEMS, numberOfBookmarkItems);
+		xmlOptions.putBoolean(ATTR_IS_ANIMATE_LOCATION, isAnimateLocation);
+		xmlOptions.putFloat(ATTR_ANIMATION_TIME, animationTime);
+
+		Util.setXmlEnum(xmlOptions, ATTR_ANIMATION_EASING_TYPE, animationEasingType);
 	}
 
 	private static void saveState_20_RecentBookmarks(final XMLMemento xmlRoot) {

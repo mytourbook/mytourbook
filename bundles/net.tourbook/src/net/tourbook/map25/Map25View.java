@@ -27,13 +27,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
-import net.tourbook.common.UI;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.ICloseOpenedDialogs;
 import net.tourbook.common.tooltip.IOpeningDialog;
@@ -48,6 +46,9 @@ import net.tourbook.map.bookmark.ActionMapBookmarks;
 import net.tourbook.map.bookmark.IMapBookmarks;
 import net.tourbook.map.bookmark.MapBookmark;
 import net.tourbook.map.bookmark.MapBookmarkManager;
+import net.tourbook.map.bookmark.MapBookmarkManager.ActionBookmark_Add;
+import net.tourbook.map.bookmark.MapBookmarkManager.ActionBookmark_Update;
+import net.tourbook.map.bookmark.MapLocation;
 import net.tourbook.map25.action.ActionMap25_ShowMarker;
 import net.tourbook.map25.action.ActionSelectMap25Provider;
 import net.tourbook.map25.action.ActionShowEntireTour;
@@ -70,29 +71,20 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.dialogs.IInputValidator;
-import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.window.Window;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
@@ -170,7 +162,6 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 	private boolean							_isSynchMapWithChartSlider;
 	private boolean							_isSynchMapWithTour;
 	//
-	private MapBookmark						_lastSelectedForUpdate;
 	// context menu
 	private boolean							_isContextMenuVisible;
 //	private MouseAdapter					_wwMouseListener;
@@ -181,32 +172,6 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 	private Composite						_swtContainer;
 
 	Composite								_parent;
-
-	private class ActionBookmark_Add extends Action {
-
-		public ActionBookmark_Add() {
-			super(Messages.Action_Map_AddBookmark, AS_PUSH_BUTTON);
-		}
-
-		@Override
-		public void run() {
-			actionBookmark_Add();
-		}
-
-	}
-
-	private class ActionBookmark_Update extends Action {
-
-		public ActionBookmark_Update() {
-			super(Messages.Action_Map_UpdateBookmark, AS_PUSH_BUTTON);
-		}
-
-		@Override
-		public void run() {
-			actionBookmark_Update();
-		}
-
-	}
 
 	private class ActionMap25_Options extends ActionToolbarSlideout {
 
@@ -250,107 +215,12 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		}
 	}
 
-	private class DialogAddBookmark extends InputDialog {
-
-		public DialogAddBookmark(	final Shell parentShell,
-									final String dialogTitle,
-									final String dialogMessage,
-									final String initialValue,
-									final IInputValidator validator) {
-
-			super(parentShell, dialogTitle, dialogMessage, initialValue, validator);
-		}
-
-		@Override
-		protected void createButtonsForButtonBar(final Composite parent) {
-
-			super.createButtonsForButtonBar(parent);
-
-			// set text for the OK button
-			final Button _btnSave = getButton(IDialogConstants.OK_ID);
-			_btnSave.setText(Messages.Slideout_MapBookmark_Button_Add);
-		}
-
-		@Override
-		protected Point getInitialLocation(final Point initialSize) {
-
-			try {
-
-				final Point cursorLocation = Display.getCurrent().getCursorLocation();
-
-				// center below cursor location
-				cursorLocation.x -= initialSize.x / 2;
-				cursorLocation.y += 10;
-
-				return cursorLocation;
-
-			} catch (final NumberFormatException ex) {
-
-				return super.getInitialLocation(initialSize);
-			}
-		}
-
-	}
-
 	private class Map3ContextMenu extends SWTPopupOverAWT {
 
 		public Map3ContextMenu(final Display display, final Menu swtContextMenu) {
 			super(display, swtContextMenu);
 		}
 
-	}
-
-	public void actionBookmark_Add() {
-
-		final DialogAddBookmark addDialog = new DialogAddBookmark(
-
-				_parent.getShell(),
-				Messages.Slideout_MapBookmark_Dialog_AddBookmark_Title,
-				Messages.Slideout_MapBookmark_Dialog_AddBookmark_Message,
-				UI.EMPTY_STRING,
-				new IInputValidator() {
-
-					@Override
-					public String isValid(final String newText) {
-
-						if (newText.trim().length() == 0) {
-
-							//							return "Set a name for the bookmark";//Messages.Dialog_MapBookmark_Dialog_InvalidName;
-							return Messages.Slideout_MapBookmark_Dialog_ValidationAddName;
-						}
-
-						return null;
-					}
-				});
-
-		addDialog.open();
-
-		if (addDialog.getReturnCode() != Window.OK) {
-			return;
-		}
-
-		final MapBookmark bookmark = new MapBookmark();
-
-		bookmark.name = addDialog.getValue();
-
-		final MapPosition mapPosition = _mapApp.getMap().getMapPosition();
-
-		bookmark.setMapPosition(mapPosition);
-
-		MapBookmarkManager.addBookmark(bookmark);
-	}
-
-	public void actionBookmark_Update() {
-
-		if (_lastSelectedForUpdate == null) {
-			// this should not happen
-			return;
-		}
-
-		// update map position
-		final MapPosition mapPosition = _mapApp.getMap().getMapPosition();
-
-		_lastSelectedForUpdate.setMapPosition(mapPosition);
 	}
 
 	void actionContextMenu(final int relativeX, final int relativeY) {
@@ -600,16 +470,10 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 	private void createActions() {
 
 		_actionMarkerOptions = new ActionMap25_ShowMarker(this, _parent);
-		_actionMapBookmarks = new ActionMapBookmarks(
-				this._parent,
-				this,
-				TourbookPlugin.getImageDescriptor(Messages.Image__MapBookmark),
-				TourbookPlugin.getImageDescriptor(Messages.Image__MapBookmark_Disabled));
+		_actionMapBookmarks = new ActionMapBookmarks(this._parent, this, true);
 
 		_actionMapOptions = new ActionMap25_Options();
 		_actionSelectMapProvider = new ActionSelectMap25Provider(this);
-		_actionBookmark_Add = new ActionBookmark_Add();
-		_actionBookmark_Update = new ActionBookmark_Update();
 		_actionShowEntireTour = new ActionShowEntireTour(this);
 		_actionSynchMapWithTour = new ActionSynchMapWithTour(this);
 		_actionSynchMapWithChartSlider = new ActionSynchMapWithChartSlider(this);
@@ -891,30 +755,9 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 	private void fillContextMenu(final Menu menu) {
 
-//		(new Separator()).fill(menu, -1);
-		{
-			fillMenuItem(menu, _actionBookmark_Add);
-
-			// update last selected bookmark
-			if (_lastSelectedForUpdate != null) {
-
-				// set text with last selected bookmark
-				_actionBookmark_Update.setText(
-						NLS.bind(Messages.Action_Map_UpdateBookmark, _lastSelectedForUpdate.name));
-
-				fillMenuItem(menu, _actionBookmark_Update);
-			}
-		}
-
 		MapBookmarkManager.fillContextMenu_RecentBookmarks(menu, this);
 
 		enableContextMenuActions();
-	}
-
-	private void fillMenuItem(final Menu menu, final Action action) {
-
-		final ActionContributionItem item = new ActionContributionItem(action);
-		item.fill(menu, -1);
 	}
 
 	public Map25App getMapApp() {
@@ -922,9 +765,15 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 	}
 
 	@Override
-	public void moveToMapLocation(final MapBookmark selectedBookmark) {
+	public MapLocation getMapLocation() {
 
-		_lastSelectedForUpdate = selectedBookmark;
+		final MapPosition mapPosition = _mapApp.getMap().getMapPosition();
+
+		return new MapLocation(mapPosition);
+	}
+
+	@Override
+	public void moveToMapLocation(final MapBookmark selectedBookmark) {
 
 		MapBookmarkManager.setLastSelectedBookmark(selectedBookmark);
 
@@ -948,7 +797,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 					map.animator().animateTo(
 							(long) (animationTime * 1000),
 							mapPosition,
-							org.oscim.utils.Easing.Type.SINE_INOUT);
+							MapBookmarkManager.animationEasingType);
 				}
 
 				map.updateMap(false);

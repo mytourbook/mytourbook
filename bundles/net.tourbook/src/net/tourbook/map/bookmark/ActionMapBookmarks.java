@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.map.bookmark;
 
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 
@@ -24,29 +26,36 @@ import org.eclipse.swt.widgets.ToolBar;
 
 public class ActionMapBookmarks extends ActionToolbarSlideout {
 
-	private Composite		_ownerControl;
-	private IMapBookmarks	_mapBookmarks;
+// SET_FORMATTING_OFF
+	
+	private static ImageDescriptor	actionImage			= TourbookPlugin.getImageDescriptor(Messages.Image__MapBookmark);
+	private static ImageDescriptor	actionImageDisabled	= TourbookPlugin.getImageDescriptor(Messages.Image__MapBookmark_Disabled);
+	
+// SET_FORMATTING_ON
+
+	private Composite				_ownerControl;
+	private IMapBookmarks			_mapBookmarks;
+	private boolean					_canAnimate;
 
 	/**
 	 * @param ownerControl
-	 * @param closeOpenedDialogs
-	 * @param actionImage
-	 * @param actionImageDisabled
+	 * @param mapBookmarks
+	 * @param canAnimate
 	 */
 	public ActionMapBookmarks(	final Composite ownerControl,
 								final IMapBookmarks mapBookmarks,
-								final ImageDescriptor actionImage,
-								final ImageDescriptor actionImageDisabled) {
+								final boolean canAnimate) {
 
 		super(actionImage, actionImageDisabled);
 
 		_ownerControl = ownerControl;
 		_mapBookmarks = mapBookmarks;
+		_canAnimate = canAnimate;
 	}
 
 	@Override
 	protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
-		return new SlideoutMapBookmarks(_ownerControl, toolbar, this._mapBookmarks);
+		return new SlideoutMapBookmarks(_ownerControl, toolbar, this._mapBookmarks, this._canAnimate);
 	}
 
 	@Override

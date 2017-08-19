@@ -15,20 +15,30 @@
  *******************************************************************************/
 package net.tourbook.map.bookmark;
 
-import net.tourbook.common.tooltip.ICloseOpenedDialogs;
+import net.tourbook.common.map.GeoPosition;
 
-public interface IMapBookmarks extends ICloseOpenedDialogs {
+import org.oscim.core.MapPosition;
 
-	/**
-	 * @return
-	 */
-	public MapLocation getMapLocation();
+/**
+ */
+public class MapLocation {
 
-	/**
-	 * Move the map location to the bookmark location.
-	 * 
-	 * @param bookmarkLocation
-	 */
-	public void moveToMapLocation(MapBookmark bookmarkLocation);
+	private MapPosition _mapPosition;
+
+	public MapLocation(final GeoPosition geoPosition, final int mapZoomLevel) {
+
+		_mapPosition = new MapPosition(geoPosition.latitude, geoPosition.longitude, /* set dummy */1);
+
+		_mapPosition.setZoomLevel(mapZoomLevel);
+	}
+
+	public MapLocation(final MapPosition mapPosition) {
+
+		_mapPosition = mapPosition;
+	}
+
+	public MapPosition getMapPosition() {
+		return _mapPosition;
+	}
 
 }

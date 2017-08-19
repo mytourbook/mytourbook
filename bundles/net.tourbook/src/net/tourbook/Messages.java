@@ -1625,6 +1625,8 @@ public class Messages extends NLS {
 	public static String		Slideout_MapBookmark_Dialog_RenameBookmark_Title;
 	public static String		Slideout_MapBookmark_Dialog_ValidationAddName;
 	public static String		Slideout_MapBookmark_Dialog_ValidationRename;
+	public static String		Slideout_MapBookmark_Label_AnimationEasingType;
+	public static String		Slideout_MapBookmark_Label_AnimationEasingType_Tooltip;
 	public static String		Slideout_MapBookmark_Label_AnimationTime;
 	public static String		Slideout_MapBookmark_Label_AnimationTime_Tooltip;
 	public static String		Slideout_MapBookmark_Label_NumBookmarkListItems;

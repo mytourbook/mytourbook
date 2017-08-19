@@ -16,7 +16,6 @@
 package net.tourbook.map.bookmark;
 
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.util.LinkedList;
 
 import net.tourbook.Messages;
@@ -30,8 +29,6 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.layout.TableColumnLayout;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
@@ -50,6 +47,8 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseEvent;
@@ -58,6 +57,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -68,23 +68,23 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.ToolBar;
 import org.oscim.core.MapPosition;
+import org.oscim.utils.Easing;
+import org.oscim.utils.Easing.Type;
 
 /**
- * Map bookmarks
+ * Slideout for map bookmarks
  */
 public class SlideoutMapBookmarks extends ToolbarSlideout {
 
-	private IMapBookmarks			_mapBookmarks;
+	private IMapBookmarks		_mapBookmarks;
 
-	private ArrayList<MapBookmark>	_allBookmarks;
+	private TableViewer			_bookmarkViewer;
 
-	private TableViewer				_bookmarkViewer;
+	private SelectionAdapter	_defaultSelectionListener;
+	private MouseWheelListener	_defaultMouseWheelListener;
+	private FocusListener		_keepOpenListener;
 
-	private IPropertyChangeListener	_defaultChangePropertyListener;
-	private SelectionAdapter		_defaultSelectionListener;
-	private MouseWheelListener		_defaultMouseWheelListener;
-
-	private final NumberFormat		_nfLatLon	= NumberFormat.getNumberInstance();
+	private final NumberFormat	_nfLatLon	= NumberFormat.getNumberInstance();
 	{
 		_nfLatLon.setMinimumFractionDigits(2);
 		_nfLatLon.setMaximumFractionDigits(2);
@@ -103,11 +103,16 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 	private Button			_chkIsAnimateLocation;
 
 	private Label			_lblAnimationTime;
+	private Label			_lblAnimationEasingType;
 	private Label			_lblSeconds;
 
 	private Spinner			_spinnerAnimationTime;
 	private Spinner			_spinnerNumRecentBookmarks;
 	private Spinner			_spinnerNumBookmarkItems;
+
+	private Combo			_comboAnimationEasingType;
+
+	private boolean			_canAnimate;
 
 	private class BookmarkComparator extends ViewerComparator {
 
@@ -139,7 +144,7 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 
 		@Override
 		public Object[] getElements(final Object inputElement) {
-			return _allBookmarks.toArray();
+			return MapBookmarkManager.getAllMapBookmarks().toArray();
 		}
 
 		@Override
@@ -195,11 +200,13 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 	 */
 	public SlideoutMapBookmarks(final Control ownerControl,
 								final ToolBar toolBar,
-								final IMapBookmarks mapBookmarks) {
+								final IMapBookmarks mapBookmarks,
+								final boolean canAnimate) {
 
 		super(ownerControl, toolBar);
 
 		_mapBookmarks = mapBookmarks;
+		_canAnimate = canAnimate;
 	}
 
 	private void createActions() {
@@ -461,113 +468,184 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 		{
-			{
-				/*
-				 * Is animate location
-				 */
-				_chkIsAnimateLocation = new Button(container, SWT.CHECK);
-				_chkIsAnimateLocation.setText(Messages.Slideout_MapBookmark_Checkbox_IsAnimationLocation);
-				_chkIsAnimateLocation.setToolTipText(
-						Messages.Slideout_MapBookmark_Checkbox_IsAnimationLocation_Tooltip);
-				_chkIsAnimateLocation.addSelectionListener(_defaultSelectionListener);
-				GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsAnimateLocation);
+			if (_canAnimate) {
+				createUI_72_Options_Animation(container);
 			}
-			{
-				/*
-				 * Animation time
-				 */
+			createUI_74_Options_NumItems(container);
+		}
+	}
 
-				// Label
-				_lblAnimationTime = new Label(container, SWT.NONE);
-				_lblAnimationTime.setText(Messages.Slideout_MapBookmark_Label_AnimationTime);
-				_lblAnimationTime.setToolTipText(Messages.Slideout_MapBookmark_Label_AnimationTime_Tooltip);
-				GridDataFactory.fillDefaults().indent(_pc.convertWidthInCharsToPixels(3), 0).applyTo(_lblAnimationTime);
+	private void createUI_72_Options_Animation(final Composite parent) {
 
-				final Composite timeContainer = new Composite(container, SWT.NONE);
+		final SelectionAdapter animationListener = new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				onChangeUI();
+				onSelectAnimation();
+			}
+		};
+
+		{
+			/*
+			 * Is animate location
+			 */
+			_chkIsAnimateLocation = new Button(parent, SWT.CHECK);
+			_chkIsAnimateLocation.setText(Messages.Slideout_MapBookmark_Checkbox_IsAnimationLocation);
+			_chkIsAnimateLocation.setToolTipText(Messages.Slideout_MapBookmark_Checkbox_IsAnimationLocation_Tooltip);
+			_chkIsAnimateLocation.addSelectionListener(_defaultSelectionListener);
+			GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsAnimateLocation);
+		}
+		{
+			/*
+			 * Animation time
+			 */
+
+			// Label
+			_lblAnimationTime = new Label(parent, SWT.NONE);
+			_lblAnimationTime.setText(Messages.Slideout_MapBookmark_Label_AnimationTime);
+			_lblAnimationTime.setToolTipText(Messages.Slideout_MapBookmark_Label_AnimationTime_Tooltip);
+			GridDataFactory.fillDefaults().indent(_pc.convertWidthInCharsToPixels(3), 0).applyTo(_lblAnimationTime);
+
+			final Composite timeContainer = new Composite(parent, SWT.NONE);
 //				GridDataFactory.fillDefaults().grab(true, false).applyTo(timeContainer);
-				GridLayoutFactory.fillDefaults().numColumns(2).applyTo(timeContainer);
-				{
-
-					// Spinner
-					_spinnerAnimationTime = new Spinner(timeContainer, SWT.BORDER);
-					_spinnerAnimationTime.setMinimum((int) (MapBookmarkManager.LOCATION_ANIMATION_TIME_MIN * 10));
-					_spinnerAnimationTime.setMaximum((int) (MapBookmarkManager.LOCATION_ANIMATION_TIME_MAX * 10));
-					_spinnerAnimationTime.setPageIncrement(10);
-					_spinnerAnimationTime.setDigits(1);
-					_spinnerAnimationTime.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(final SelectionEvent e) {
-							onChangeUI();
-							onSelectAnimationTime();
-						}
-					});
-					_spinnerAnimationTime.addMouseWheelListener(new MouseWheelListener() {
-						@Override
-						public void mouseScrolled(final MouseEvent event) {
-							UI.adjustSpinnerValueOnMouseScroll(event);
-							onChangeUI();
-							onSelectAnimationTime();
-						}
-					});
-
-					// Label
-					_lblSeconds = new Label(timeContainer, SWT.NONE);
-					_lblSeconds.setText(Messages.App_Unit_Seconds_Small);
-				}
-			}
+			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(timeContainer);
 			{
-				/*
-				 * Number of bookmark list entries
-				 */
-
-				// Label
-				final Label label = new Label(container, SWT.NONE);
-				label.setText(Messages.Slideout_MapBookmark_Label_NumBookmarkListItems);
-				label.setToolTipText(Messages.Slideout_MapBookmark_Label_NumBookmarkListItems_Tooltip);
 
 				// Spinner
-				_spinnerNumBookmarkItems = new Spinner(container, SWT.BORDER);
-				_spinnerNumBookmarkItems.setMinimum(MapBookmarkManager.NUM_BOOKMARK_ITEMS_MIN);
-				_spinnerNumBookmarkItems.setMaximum(MapBookmarkManager.NUM_BOOKMARK_ITEMS_MAX);
-				_spinnerNumBookmarkItems.setPageIncrement(5);
-				_spinnerNumBookmarkItems.addSelectionListener(_defaultSelectionListener);
-				_spinnerNumBookmarkItems.addMouseWheelListener(_defaultMouseWheelListener);
-			}
-			{
-				/*
-				 * Number of context menu items
-				 */
+				_spinnerAnimationTime = new Spinner(timeContainer, SWT.BORDER);
+				_spinnerAnimationTime.setMinimum((int) (MapBookmarkManager.LOCATION_ANIMATION_TIME_MIN * 10));
+				_spinnerAnimationTime.setMaximum((int) (MapBookmarkManager.LOCATION_ANIMATION_TIME_MAX * 10));
+				_spinnerAnimationTime.setPageIncrement(10);
+				_spinnerAnimationTime.setDigits(1);
+				_spinnerAnimationTime.addSelectionListener(animationListener);
+				_spinnerAnimationTime.addMouseWheelListener(new MouseWheelListener() {
+					@Override
+					public void mouseScrolled(final MouseEvent event) {
+						UI.adjustSpinnerValueOnMouseScroll(event);
+						onChangeUI();
+						onSelectAnimation();
+					}
+				});
 
 				// Label
-				final Label label = new Label(container, SWT.NONE);
-				label.setText(Messages.Slideout_MapBookmark_Label_NumContextMenuItems);
-				label.setToolTipText(Messages.Slideout_MapBookmark_Label_NumContextMenuItems_Tooltip);
-
-				// Spinner
-				_spinnerNumRecentBookmarks = new Spinner(container, SWT.BORDER);
-				_spinnerNumRecentBookmarks.setMinimum(MapBookmarkManager.NUM_RECENT_BOOKMARKS_MIN);
-				_spinnerNumRecentBookmarks.setMaximum(MapBookmarkManager.NUM_RECENT_BOOKMARKS_MAX);
-				_spinnerNumRecentBookmarks.setPageIncrement(5);
-				_spinnerNumRecentBookmarks.addSelectionListener(_defaultSelectionListener);
-				_spinnerNumRecentBookmarks.addMouseWheelListener(_defaultMouseWheelListener);
+				_lblSeconds = new Label(timeContainer, SWT.NONE);
+				_lblSeconds.setText(Messages.App_Unit_Seconds_Small);
 			}
 		}
+		{
+			/*
+			 * Easing type
+			 */
+
+			// Label
+			_lblAnimationEasingType = new Label(parent, SWT.NONE);
+			_lblAnimationEasingType.setText(Messages.Slideout_MapBookmark_Label_AnimationEasingType);
+			_lblAnimationEasingType.setToolTipText(Messages.Slideout_MapBookmark_Label_AnimationEasingType_Tooltip);
+			GridDataFactory
+					.fillDefaults()//
+					.align(SWT.FILL, SWT.CENTER)
+					.indent(_pc.convertWidthInCharsToPixels(3), 0)
+					.applyTo(_lblAnimationEasingType);
+
+			// combo
+			_comboAnimationEasingType = new Combo(parent, SWT.READ_ONLY);
+			_comboAnimationEasingType.addFocusListener(_keepOpenListener);
+			_comboAnimationEasingType.addSelectionListener(animationListener);
+
+			// fill combo
+			for (final Type easingType : Easing.Type.values()) {
+				_comboAnimationEasingType.add(easingType.name());
+			}
+		}
+	}
+
+	private void createUI_74_Options_NumItems(final Composite parent) {
+
+		{
+			/*
+			 * Number of bookmark list entries
+			 */
+
+			// Label
+			final Label label = new Label(parent, SWT.NONE);
+			label.setText(Messages.Slideout_MapBookmark_Label_NumBookmarkListItems);
+			label.setToolTipText(Messages.Slideout_MapBookmark_Label_NumBookmarkListItems_Tooltip);
+
+			// Spinner
+			_spinnerNumBookmarkItems = new Spinner(parent, SWT.BORDER);
+			_spinnerNumBookmarkItems.setMinimum(MapBookmarkManager.NUM_BOOKMARK_ITEMS_MIN);
+			_spinnerNumBookmarkItems.setMaximum(MapBookmarkManager.NUM_BOOKMARK_ITEMS_MAX);
+			_spinnerNumBookmarkItems.setPageIncrement(5);
+			_spinnerNumBookmarkItems.addSelectionListener(_defaultSelectionListener);
+			_spinnerNumBookmarkItems.addMouseWheelListener(_defaultMouseWheelListener);
+		}
+		{
+			/*
+			 * Number of context menu items
+			 */
+
+			// Label
+			final Label label = new Label(parent, SWT.NONE);
+			label.setText(Messages.Slideout_MapBookmark_Label_NumContextMenuItems);
+			label.setToolTipText(Messages.Slideout_MapBookmark_Label_NumContextMenuItems_Tooltip);
+
+			// Spinner
+			_spinnerNumRecentBookmarks = new Spinner(parent, SWT.BORDER);
+			_spinnerNumRecentBookmarks.setMinimum(MapBookmarkManager.NUM_RECENT_BOOKMARKS_MIN);
+			_spinnerNumRecentBookmarks.setMaximum(MapBookmarkManager.NUM_RECENT_BOOKMARKS_MAX);
+			_spinnerNumRecentBookmarks.setPageIncrement(5);
+			_spinnerNumRecentBookmarks.addSelectionListener(_defaultSelectionListener);
+			_spinnerNumRecentBookmarks.addMouseWheelListener(_defaultMouseWheelListener);
+		}
+	}
+
+	private Type easingType_GetSelected() {
+
+		final int selectedIndex = _comboAnimationEasingType.getSelectionIndex();
+
+		final Type[] easingTypes = Easing.Type.values();
+
+		return easingTypes[selectedIndex];
+	}
+
+	private void easingType_SetSelected(final Type selectEasingType) {
+
+		final Type[] easingTypes = Easing.Type.values();
+
+		int selectIndex = 0;
+
+		for (int typeIndex = 0; typeIndex < easingTypes.length; typeIndex++) {
+
+			if (selectEasingType == easingTypes[typeIndex]) {
+
+				selectIndex = typeIndex;
+
+				break;
+			}
+		}
+
+		_comboAnimationEasingType.select(selectIndex);
 	}
 
 	private void enableActions() {
 
 		final MapBookmark selectedBookmark = getSelectedBookmark();
 
-		final boolean isAnimation = _chkIsAnimateLocation.getSelection();
 		final boolean isBookmarkSelected = selectedBookmark != null;
 
 		_btnDelete.setEnabled(isBookmarkSelected);
 		_btnRename.setEnabled(isBookmarkSelected);
 
-		_lblAnimationTime.setEnabled(isAnimation);
-		_lblSeconds.setEnabled(isAnimation);
+		if (_canAnimate) {
 
-		_spinnerAnimationTime.setEnabled(isAnimation);
+			final boolean isAnimation = _chkIsAnimateLocation.getSelection();
+
+			_comboAnimationEasingType.setEnabled(isAnimation);
+			_lblAnimationEasingType.setEnabled(isAnimation);
+			_lblAnimationTime.setEnabled(isAnimation);
+			_lblSeconds.setEnabled(isAnimation);
+			_spinnerAnimationTime.setEnabled(isAnimation);
+		}
 	}
 
 	private MapBookmark getSelectedBookmark() {
@@ -597,13 +675,23 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 			}
 		};
 
-		_defaultChangePropertyListener = new IPropertyChangeListener() {
+		_keepOpenListener = new FocusListener() {
+
 			@Override
-			public void propertyChange(final PropertyChangeEvent event) {
-				onChangeUI();
+			public void focusGained(final FocusEvent e) {
+
+				/*
+				 * This will fix the problem that when the list of a combobox is displayed, then the
+				 * slideout will disappear :-(((
+				 */
+				setIsAnotherDialogOpened(true);
+			}
+
+			@Override
+			public void focusLost(final FocusEvent e) {
+				setIsAnotherDialogOpened(false);
 			}
 		};
-
 	}
 
 	private void onBookmark_Delete() {
@@ -615,7 +703,7 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 		}
 
 		// update model
-		_allBookmarks.remove(selectedBookmark);
+		MapBookmarkManager.getAllMapBookmarks().remove(selectedBookmark);
 		MapBookmarkManager.getAllRecentBookmarks().remove(selectedBookmark);
 
 		// update UI
@@ -683,16 +771,12 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 
 	private void onChangeUI() {
 
-		MapBookmarkManager.isAnimateLocation = _chkIsAnimateLocation.getSelection();
-
-		MapBookmarkManager.animationTime = (float) _spinnerAnimationTime.getSelection() / 10;
-		MapBookmarkManager.numberOfBookmarkItems = _spinnerNumBookmarkItems.getSelection();
-		MapBookmarkManager.numberOfRecentBookmarks = _spinnerNumRecentBookmarks.getSelection();
+		saveState();
 
 		enableActions();
 	}
 
-	private void onSelectAnimationTime() {
+	private void onSelectAnimation() {
 
 		final LinkedList<MapBookmark> recentBookmarks = MapBookmarkManager.getAllRecentBookmarks();
 
@@ -707,14 +791,30 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 
 	private void restoreState() {
 
-		_allBookmarks = MapBookmarkManager.getAllMapBookmarks();
+		if (_canAnimate) {
 
-		_chkIsAnimateLocation.setSelection(MapBookmarkManager.isAnimateLocation);
+			_chkIsAnimateLocation.setSelection(MapBookmarkManager.isAnimateLocation);
+			_spinnerAnimationTime.setSelection((int) (MapBookmarkManager.animationTime * 10));
 
-		_spinnerAnimationTime.setSelection((int) (MapBookmarkManager.animationTime * 10));
+			easingType_SetSelected(MapBookmarkManager.animationEasingType);
+		}
+
 		_spinnerNumBookmarkItems.setSelection(MapBookmarkManager.numberOfBookmarkItems);
 		_spinnerNumRecentBookmarks.setSelection(MapBookmarkManager.numberOfRecentBookmarks);
+	}
 
+	private void saveState() {
+
+		if (_canAnimate) {
+
+			MapBookmarkManager.isAnimateLocation = _chkIsAnimateLocation.getSelection();
+			MapBookmarkManager.animationTime = (float) _spinnerAnimationTime.getSelection() / 10;
+
+			MapBookmarkManager.animationEasingType = easingType_GetSelected();
+		}
+
+		MapBookmarkManager.numberOfBookmarkItems = _spinnerNumBookmarkItems.getSelection();
+		MapBookmarkManager.numberOfRecentBookmarks = _spinnerNumRecentBookmarks.getSelection();
 	}
 
 }
