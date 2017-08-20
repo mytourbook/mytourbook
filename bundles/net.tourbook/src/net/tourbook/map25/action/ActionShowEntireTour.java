@@ -1,5 +1,6 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -33,6 +34,8 @@ public class ActionShowEntireTour extends Action {
 
 		setToolTipText(Messages.map_action_zoom_show_entire_tour);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.image_action_zoom_show_entire_tour));
+		setDisabledImageDescriptor(
+				TourbookPlugin.getImageDescriptor(Messages.image_action_zoom_show_entire_tour_disabled));
 	}
 
 	@Override

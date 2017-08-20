@@ -637,7 +637,7 @@
 				<!-- Tour Editor - this command is displayed in the "Tour" and the "Tools" menu -->
 				<command
 					commandId="net.tourbook.command.tourDataEditor"
-					icon="icons/tour-editor.gif"
+					icon="icons/tour-editor.png"
 					label="%command_view_tourEditor"
 					mnemonic="%command_view_tourEditor_mnemonic"
 					tooltip="%command_view_tourEditor_tooltip"/>
@@ -705,7 +705,7 @@
 				<!-- Tour Editor - is displayed in the "Tour" and the "Tools" menu -->
 				<command
 					commandId="net.tourbook.command.tourDataEditor"
-					icon="icons/tour-editor.gif"
+					icon="icons/tour-editor.png"
 					label="%command_view_tourEditor"
 					mnemonic="%command_view_tourEditor_mnemonic"
 					tooltip="%command_view_tourEditor_tooltip"/>
@@ -886,7 +886,7 @@
 				<!-- Tour Editor -->
 				<command
 					commandId="net.tourbook.command.tourDataEditor"
-					icon="icons/tour-editor.gif"
+					icon="icons/tour-editor.png"
 					label="%command_view_tourEditor"
 					mnemonic="%command_view_tourEditor_mnemonic"
 					tooltip="%command_view_tourEditor_tooltip"/>
@@ -1485,7 +1485,7 @@
 	      <view
 	            category="net.tourbook.category.tour"
 	            class="net.tourbook.ui.views.tourDataEditor.TourDataEditorView"
-	            icon="icons/tour-editor.gif"
+	            icon="icons/tour-editor.png"
 	            id="net.tourbook.views.TourDataEditorView"
 	            name="%command_view_tourEditor">
 	      </view>

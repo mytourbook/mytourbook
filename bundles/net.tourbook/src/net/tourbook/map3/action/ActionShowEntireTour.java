@@ -33,6 +33,8 @@ public class ActionShowEntireTour extends Action {
 
 		setToolTipText(Messages.map_action_zoom_show_entire_tour);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.image_action_zoom_show_entire_tour));
+		setDisabledImageDescriptor(
+				TourbookPlugin.getImageDescriptor(Messages.image_action_zoom_show_entire_tour_disabled));
 	}
 
 	@Override
