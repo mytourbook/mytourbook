@@ -422,14 +422,14 @@ public class MapBookmarkManager {
 		/*
 		 * Recent bookmarks
 		 */
-		new Separator().fill(menu, -1);
+//		new Separator().fill(menu, -1);
 
 		int index = 0;
 		final LinkedList<MapBookmark> allRecentBookmarks = MapBookmarkManager.getAllRecentBookmarks();
 
 		for (final MapBookmark bookmark : allRecentBookmarks) {
 
-			final String name = UI.SYMBOL_MNEMONIC + (++index) + UI.SPACE2 + bookmark.name;
+			final String name = UI.SPACE4 + UI.SYMBOL_MNEMONIC + (++index) + UI.SPACE2 + bookmark.name;
 
 			final ActionRecentBookmark action = new ActionRecentBookmark(name, bookmark.id, mapBookmarks);
 			final ActionContributionItem contribItem = new ActionContributionItem(action);

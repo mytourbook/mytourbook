@@ -55,7 +55,7 @@ public class ActionMapBookmarks extends ActionToolbarSlideout {
 
 	@Override
 	protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
-		return new SlideoutMapBookmarks(_ownerControl, toolbar, this._mapBookmarks, this._canAnimate);
+		return new SlideoutMapBookmarks(_ownerControl, toolbar, _mapBookmarks, _canAnimate);
 	}
 
 	@Override

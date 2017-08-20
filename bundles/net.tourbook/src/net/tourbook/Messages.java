@@ -878,6 +878,8 @@ public class Messages extends NLS {
 	public static String		Image__State_SaveTour;
 	public static String		Image__State_TourMarker;
 	public static String		Image__Synced;
+	public static String		Image__SyncMapWithOtherMap;
+	public static String		Image__SyncMapWithOtherMap_Disabled;
 	public static String		Image__tag;
 	public static String		Image__tag_category;
 	public static String		Image__tag_root;
@@ -1097,6 +1099,8 @@ public class Messages extends NLS {
 	public static String		Log_Tour_DeleteTours;
 	public static String		Log_Tour_SaveTours;
 	public static String		Log_Tour_SaveTours_File;
+
+	public static String		Map_Action_SynchWithOtherMap;
 
 	public static String		Map25_Config_ClusterAlgorithm_FirstMarker_Distance;
 	public static String		Map25_Config_ClusterAlgorithm_FirstMarker_Grid;

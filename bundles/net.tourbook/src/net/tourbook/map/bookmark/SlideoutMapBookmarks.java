@@ -29,6 +29,7 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.layout.TableColumnLayout;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
@@ -55,6 +56,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
@@ -91,6 +93,8 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 	}
 
 	private PixelConverter	_pc;
+
+	private Font			_boldFont;
 
 	/*
 	 * UI controls
@@ -197,6 +201,9 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 	 * @param ownerControl
 	 * @param toolBar
 	 * @param mapBookmarks
+	 * @param canAnimate
+	 *            When <code>true</code> then the UI widgets are displayed to configure the
+	 *            animation
 	 */
 	public SlideoutMapBookmarks(final Control ownerControl,
 								final ToolBar toolBar,
@@ -244,7 +251,7 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 			GridLayoutFactory.fillDefaults().applyTo(container);
 //			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 			{
-//				createUI_10_Title(container);
+				createUI_10_Title(container);
 
 				createUI_50_BookmarkViewer(container);
 				createUI_60_BookmarkActions(container);
@@ -257,19 +264,16 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 		return shellContainer;
 	}
 
-//	private void createUI_10_Title(final Composite parent) {
-//
-//		/*
-//		 * Label: Slideout title
-//		 */
-//		final Label label = new Label(parent, SWT.NONE);
-//		label.setFont(_boldFont);
-//		label.setText(Messages.Slideout_MapBookmark_Label_Title);
-//		GridDataFactory
-//				.fillDefaults()//
-//				.align(SWT.BEGINNING, SWT.CENTER)
-//				.applyTo(label);
-//	}
+	private void createUI_10_Title(final Composite parent) {
+
+		/*
+		 * Label: Slideout title
+		 */
+		final Label label = new Label(parent, SWT.NONE);
+		label.setFont(_boldFont);
+		label.setText(Messages.Slideout_MapBookmark_Label_Title);
+//		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(label);
+	}
 
 	private void createUI_50_BookmarkViewer(final Composite parent) {
 
@@ -659,6 +663,8 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 	private void initUI(final Composite parent) {
 
 		_pc = new PixelConverter(parent);
+
+		_boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 
 		_defaultSelectionListener = new SelectionAdapter() {
 			@Override
