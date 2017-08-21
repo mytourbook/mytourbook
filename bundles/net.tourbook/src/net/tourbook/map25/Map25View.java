@@ -104,8 +104,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 // SET_FORMATTING_OFF
 	//
-	private static final String		IMAGE_ACTION_SHOW_TOUR_IN_MAP			= net.tourbook.map2.Messages.image_action_show_tour_in_map;
-	private static final String		IMAGE_ACTION_SHOW_TOUR_IN_MAP_DISABLED	= net.tourbook.map2.Messages.image_action_show_tour_in_map_disabled;
+	private static final String		IMAGE_ACTION_SHOW_TOUR_IN_MAP			= net.tourbook.map2.Messages.Image__Tour;
+	private static final String		IMAGE_ACTION_SHOW_TOUR_IN_MAP_DISABLED	= net.tourbook.map2.Messages.Image__Tour_Disabled;
 	private static final String		MAP_ACTION_SHOW_TOUR_IN_MAP 			= net.tourbook.map2.Messages.map_action_show_tour_in_map;
 	//
 	public static final String		ID										= "net.tourbook.map25.Map25View";				//$NON-NLS-1$

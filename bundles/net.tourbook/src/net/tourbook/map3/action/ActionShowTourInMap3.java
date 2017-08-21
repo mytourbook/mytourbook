@@ -73,10 +73,10 @@ public class ActionShowTourInMap3 extends ContributionItem implements IOpeningDi
 		_parent = parent;
 
 		_actionImage = TourbookPlugin//
-				.getImageDescriptor(Messages.image_action_show_tour_in_map)
+				.getImageDescriptor(Messages.Image__Tour)
 				.createImage();
 		_actionImageDisabled = TourbookPlugin//
-				.getImageDescriptor(Messages.image_action_show_tour_in_map_disabled)
+				.getImageDescriptor(Messages.Image__Tour_Disabled)
 				.createImage();
 	}
 

@@ -50,8 +50,8 @@ public class Messages extends NLS {
 
 	public static String		image_action_change_tile_factory;
 	public static String		image_action_reload_map;
-	public static String		image_action_show_tour_in_map;
-	public static String		image_action_show_tour_in_map_disabled;
+	public static String		Image__Tour;
+	public static String		Image__Tour_Disabled;
 	public static String		image_action_synch_with_slider;
 	public static String		image_action_synch_with_slider_disabled;
 	public static String		image_action_synch_with_tour;

@@ -33,8 +33,8 @@ public class ActionShowTourInMap extends Action {
 
 		setToolTipText(Messages.map_action_show_tour_in_map);
 
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.image_action_show_tour_in_map));
-		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.image_action_show_tour_in_map_disabled));
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Tour));
+		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Tour_Disabled));
 	}
 
 	@Override
