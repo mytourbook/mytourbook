@@ -88,8 +88,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="29.189189"
-     inkscape:cx="159.19129"
-     inkscape:cy="435.42167"
+     inkscape:cx="159.16879"
+     inkscape:cy="435.96453"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -103,7 +103,7 @@
      inkscape:snap-bbox="true"
      inkscape:bbox-paths="true"
      inkscape:bbox-nodes="true"
-     inkscape:snap-global="false">
+     inkscape:snap-global="true">
     <inkscape:grid
        type="xygrid"
        id="grid2996" />
@@ -224,12 +224,12 @@
        inkscape:export-ydpi="96" />
     <path
        style="display:inline;opacity:0.47345132;fill:none;stroke:#000000;stroke-width:0.11111113;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 153.08989,617.30663 h 14.54559 l -7.27278,-14.54548 z"
+       d="m 173.08989,617.30663 h 14.54559 l -7.27278,-14.54548 z"
        id="path3772-9"
        inkscape:connector-curvature="0" />
     <path
-       style="display:inline;fill:#8cd020;fill-opacity:1;stroke:#8ccf21;stroke-width:0.99999988;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 155.81444,616.86228 h 13.37039 l -2.04413,-4.00002 h -9.26783 z"
+       style="display:inline;fill:#8cd020;fill-opacity:1;stroke:#8ccf21;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 155.81442,616.86233 h 14.36342 l -2.19596,-4.29747 h -9.95615 z"
        id="path3774-1"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="ccccc"
@@ -237,8 +237,8 @@
        inkscape:export-xdpi="96"
        inkscape:export-ydpi="96" />
     <path
-       style="display:inline;fill:#ffa32d;fill-opacity:1;stroke:#ffa42d;stroke-width:0.99999988;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 158.39933,611.86233 h 8.2259 l -2.10191,-3.99958 -4.06732,-4.1e-4 z"
+       style="display:inline;fill:#ffaa13;fill-opacity:1;stroke:none;stroke-width:0.99999988;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 158.36859,612.36219 h 9.24796 l -2.44645,-4.99956 -4.36938,-4.5e-4 z"
        id="path3778-4"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="ccccc"
@@ -246,11 +246,29 @@
        inkscape:export-xdpi="96"
        inkscape:export-ydpi="96" />
     <path
-       style="display:inline;fill:#f62200;fill-opacity:1;stroke:#f62200;stroke-width:0.99999976px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 160.95504,606.86234 h 3.07484 l -1.52499,-3.04463 z"
-       id="path3780-8"
+       style="display:inline;fill:#8cd020;fill-opacity:1;stroke:#4a6d11;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 170.28617,617.10204 -2.55566,-5.05117 m -9.44227,0.0343 -2.60529,5.0683"
+       id="path3774-1-5"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cccc"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\pulse-zones.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <path
+       style="display:inline;fill:#ffa32d;fill-opacity:1;stroke:#7e4800;stroke-width:0.99999988;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 161.05766,606.62786 -2.77471,5.46224 m 9.4535,-4e-5 -2.80616,-5.3933"
+       id="path3778-4-7"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccc"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\pulse-zones.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <path
+       style="display:inline;fill:#ff1111;fill-opacity:1;stroke:#8d1300;stroke-width:0.99999964px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 165.27383,607.38636 -2.27206,-4.53864 -2.31587,4.52151"
+       id="path3780-8-5"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccc"
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\pulse-zones.png"
        inkscape:export-xdpi="96"
        inkscape:export-ydpi="96" />

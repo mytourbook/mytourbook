@@ -712,7 +712,7 @@
 			      
 				<command
 					commandId="net.tourbook.command.tourChart.tool.tourSegmenter"
-					icon="icons/tour-segmenter.gif"
+					icon="icons/tour-segmenter.png"
 					label="%command_tourChart_tool_tourSegmenter"
 					mnemonic="%command_tourChart_tool_tourSegmenter_mnemonic"
 					style="push"
@@ -1571,7 +1571,7 @@
 			<view
 				category="net.tourbook.category.Tools"
 				class="net.tourbook.ui.views.tourSegmenter.TourSegmenterView"
-				icon="icons/tour-segmenter.gif"
+				icon="icons/tour-segmenter.png"
 				id="net.tourbook.views.TourSegmenter"
 				name="%view_name_Segmenter"
 			/>

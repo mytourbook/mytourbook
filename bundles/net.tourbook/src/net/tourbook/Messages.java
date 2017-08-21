@@ -1592,7 +1592,6 @@ public class Messages extends NLS {
 	public static String		Slideout_Map25MarkerOptions_Color_Foreground_Tooltip;
 	public static String		Slideout_Map25MarkerOptions_Label_ClusterGridSize;
 	public static String		Slideout_Map25MarkerOptions_Label_ClusterOrientation;
-	public static String		Slideout_Map25MarkerOptions_Label_ClusterOrientation_Tooltip;
 	public static String		Slideout_Map25MarkerOptions_Label_ClusterPlacement;
 	public static String		Slideout_Map25MarkerOptions_Label_ClusterPlacement_Tooltip;
 	public static String		Slideout_Map25MarkerOptions_Label_ClusterSymbolColor;
