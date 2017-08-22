@@ -526,7 +526,7 @@
 	
 				<command
 					commandId="command.de.byteholder.geoclipse.poi.ShowPOI"
-					icon="icons/find.png"
+					icon="icons/search-poi.png"
 					label="%View_Name_SearchPOI"
 					mnemonic="%View_Name_SearchPOI_Mnemonic"
 				/>
@@ -720,7 +720,7 @@
 				
 				<command
 					commandId="net.tourbook.command.tourChart.tool.graphAnalyzer"
-					icon="icons/chart-analyzer.gif"
+					icon="icons/tour-analyzer.png"
 					label="%command_tourChart_tool_graphAnalyzer"
 					mnemonic="%command_tourChart_tool_graphAnalyzer_mnemonic"
 					style="push"
@@ -945,7 +945,7 @@
 
 				<command
 					commandId="command.de.byteholder.geoclipse.poi.ShowPOI"
-					icon="icons/find.png"
+					icon="icons/search-poi.png"
 					label="%View_Name_SearchPOI"
 					tooltip="%View_Name_SearchPOI_Tooltip"
 				/>
@@ -1539,7 +1539,7 @@
 			<view
 				category="net.tourbook.category.Tools"
 				class="de.byteholder.geoclipse.poi.PoiView"
-				icon="icons/find.png"
+				icon="icons/search-poi.png"
 				id="de.byteholder.geoclipse.poi.poiView"
 				name="%View_Name_SearchPOI"
 			/>
@@ -1563,7 +1563,7 @@
 			<view
 				category="net.tourbook.category.Tools"
 				class="net.tourbook.ui.views.TourChartAnalyzerView"
-				icon="icons/chart-analyzer.gif"
+				icon="icons/tour-analyzer.png"
 				id="net.tourbook.views.TourChartAnalyzer"
 				name="%view_name_Analyzer"
 			/>
