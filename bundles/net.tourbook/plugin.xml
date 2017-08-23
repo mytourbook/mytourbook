@@ -156,7 +156,7 @@
             name="%perspective_name_Statistics"/>
       <perspective
             class="net.tourbook.application.PerspectiveFactoryCompareTours"
-            icon="icons/tour-map-compare-result-perspective.gif"
+            icon="icons/tour-map-compare-result-perspective.png"
             id="net.tourbook.perspective.CompareTours"
             name="%perspective_name_CompareTours"/>
       <perspective
@@ -1609,7 +1609,7 @@
 	      <view
 	            category="net.tourbook.category.compareTours"
 	            class="net.tourbook.ui.views.tourCatalog.TourCompareResultView"
-	            icon="icons/tour-map-compare-result.gif"
+	            icon="icons/tour-map-compare-result.png"
 	            id="net.tourbook.views.tourCatalog.CompareResultView"
 	            name="%view_name_Compare_Result">
 	      </view>
@@ -1623,7 +1623,7 @@
 	      <view
 	            category="net.tourbook.category.compareTours"
 	            class="net.tourbook.ui.views.tourCatalog.TourCatalogViewComparedTour"
-	            icon="icons/tour-map-comparetour.gif"
+	            icon="icons/tour-map-comparetour.png"
 	            id="net.tourbook.views.tourCatalog.comparedTourView"
 	            name="%view_name_tourCatalog_comparedTour">
 	      </view>
