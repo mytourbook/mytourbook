@@ -1630,7 +1630,7 @@
 	      <view
 	            category="net.tourbook.category.compareTours"
 	            class="net.tourbook.ui.views.tourCatalog.YearStatisticView"
-	            icon="icons/tour-map-statistic.gif"
+	            icon="icons/tour-map-statistic.png"
 	            id="net.tourbook.views.tourCatalog.yearStatisticView"
 	            name="%view_name_tourCatalog_statistics">
 	      </view>
