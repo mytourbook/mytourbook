@@ -1436,9 +1436,9 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		viewTbm.add(_actionSelectMapProvider);
 		viewTbm.add(new Separator());
 
-		viewTbm.add(_actionZoomCentered);
 		viewTbm.add(_actionZoomIn);
 		viewTbm.add(_actionZoomOut);
+		viewTbm.add(_actionZoomCentered);
 		viewTbm.add(_actionZoomShowAll);
 		viewTbm.add(_actionShowPOI);
 

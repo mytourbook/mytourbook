@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -51,17 +51,17 @@ public class Chart extends ViewForm {
 	private static final String		ACTION_ID_ZOOM_FIT_GRAPH			= "ACTION_ID_ZOOM_FIT_GRAPH";			//$NON-NLS-1$
 	private static final String		ACTION_ID_ZOOM_IN					= "ACTION_ID_ZOOM_IN";					//$NON-NLS-1$
 	private static final String		ACTION_ID_ZOOM_IN_TO_SLIDER			= "ACTION_ID_ZOOM_IN_TO_SLIDER";		//$NON-NLS-1$
-	private static final String		ACTION_ID_ZOOM_OUT					= "ACTION_ID_ZOOM_OUT";				//$NON-NLS-1$
+	private static final String		ACTION_ID_ZOOM_OUT					= "ACTION_ID_ZOOM_OUT";					//$NON-NLS-1$
 
 	static final int				NO_BAR_SELECTION					= -1;
 
-	public static final String		CUSTOM_DATA_TOUR_ID					= "tourId";							//$NON-NLS-1$
+	public static final String		CUSTOM_DATA_TOUR_ID					= "tourId";								//$NON-NLS-1$
 
 	public static final int			SYNCH_MODE_NO						= 0;
 	public static final int			SYNCH_MODE_BY_SCALE					= 1;
 	public static final int			SYNCH_MODE_BY_SIZE					= 2;
 
-	public static final String		MOUSE_MODE_SLIDER					= "slider";							//$NON-NLS-1$
+	public static final String		MOUSE_MODE_SLIDER					= "slider";								//$NON-NLS-1$
 	public static final String		MOUSE_MODE_ZOOM						= "zoom";								//$NON-NLS-1$
 
 	private static final int		MouseMove							= 10;
@@ -479,12 +479,12 @@ public class Chart extends ViewForm {
 
 				tbm.add(new Separator());
 
+				tbm.add(_allChartActions.get(ACTION_ID_ZOOM_IN));
+				tbm.add(_allChartActions.get(ACTION_ID_ZOOM_OUT));
+
 				if (_isShowMouseMode) {
 					tbm.add(_allChartActions.get(ACTION_ID_MOUSE_MODE));
 				}
-
-				tbm.add(_allChartActions.get(ACTION_ID_ZOOM_IN));
-				tbm.add(_allChartActions.get(ACTION_ID_ZOOM_OUT));
 
 				if (_chartDataModel.getChartType() != ChartType.BAR) {
 					tbm.add(_allChartActions.get(ACTION_ID_ZOOM_FIT_GRAPH));
@@ -839,11 +839,12 @@ public class Chart extends ViewForm {
 
 	void onExternalChartResize() {
 
-		fireChartMouseEvent(new ChartMouseEvent(//
-				Chart.ChartResized,
-				System.currentTimeMillis(),
-				0,
-				0));
+		fireChartMouseEvent(
+				new ChartMouseEvent(//
+						Chart.ChartResized,
+						System.currentTimeMillis(),
+						0,
+						0));
 	}
 
 	ChartKeyEvent onExternalKeyDown(final Event event) {
@@ -1322,8 +1323,8 @@ public class Chart extends ViewForm {
 				(chartDataModel != null //
 						&& chartDataModel.getYData().isEmpty() //
 
-				// history do not have Y values
-				&& chartDataModel.getChartType() != ChartType.HISTORY) //
+						// history do not have Y values
+						&& chartDataModel.getChartType() != ChartType.HISTORY) //
 		) {
 
 			final ChartDataModel emptyModel = new ChartDataModel(ChartType.LINE);
