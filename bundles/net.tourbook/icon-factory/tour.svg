@@ -4254,9 +4254,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2"
-     inkscape:cx="189.194"
-     inkscape:cy="774.84495"
+     inkscape:zoom="5.6568542"
+     inkscape:cx="179.05427"
+     inkscape:cy="626.19456"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -6735,14 +6735,6 @@
        inkscape:export-ydpi="96"
        transform="scale(1,-1)" />
     <path
-       style="fill:#6f0101;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 135.00001,409.36218 h 2 v -2 H 138 v 2 h 2 v 1 h -2 v 2 h -0.99999 v -2 h -2 z"
-       id="path10416-4"
-       inkscape:connector-curvature="0"
-       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\tour-map-compare-wizard.png"
-       inkscape:export-xdpi="96"
-       inkscape:export-ydpi="96" />
-    <path
        style="fill:none;fill-opacity:1;stroke:#435800;stroke-width:1.00000036;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="m 140.50316,422.28114 c -0.03,-3.73953 -2.85552,-8.27334 -7.50003,-8.30232"
        id="path5150-9-29-2-8-7-2-3-1-8-3"
@@ -8131,14 +8123,7 @@
        y="386.36218"
        x="175"
        id="image2045"
-       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAAA3NCSVQICAjb4U/gAAABNElEQVQo
-kZWRvUpDQRBGz8y9IFgoNqZQiKaJYJFUgo2VWKkvkM7exsdIQHwCu6QVDPgAFkogQSzS+C9qczVc
-CBiizVjsriaICQ4LMzvMmW92FjMzs3LTClUrN22s4Vyhao9dK1THA1ppUazxbcUalRajzPUePKN1
-4lKe7TrA8ZYPSvmRCv9+g8OczpjeAIiZDd7fP9LO50wQJzv1N/CS3mb6/Viiliy5lAkYBiuZX8DN
-cyPXTRVF9GRynaBq5sPNRZ+JnVt4uFQTRFFNDARXaIBhwmGbneUA3J0d5DpviCIRqq8ToW5omQMK
-2asLEEQRRaNkmsFFWNDZO2V/jfi8vrvaeUL1B5gNLQUzP535+Yjn7xukKRoFQJOe72xhUY4ENo6I
-567bIIiAIoJo0vMVQx/kBfgCZsQiC8UThQMAAAAASUVORK5CYII=
-"
+       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAAA3NCSVQICAjb4U/gAAABNElEQVQo kZWRvUpDQRBGz8y9IFgoNqZQiKaJYJFUgo2VWKkvkM7exsdIQHwCu6QVDPgAFkogQSzS+C9qczVc CBiizVjsriaICQ4LMzvMmW92FjMzs3LTClUrN22s4Vyhao9dK1THA1ppUazxbcUalRajzPUePKN1 4lKe7TrA8ZYPSvmRCv9+g8OczpjeAIiZDd7fP9LO50wQJzv1N/CS3mb6/Viiliy5lAkYBiuZX8DN cyPXTRVF9GRynaBq5sPNRZ+JnVt4uFQTRFFNDARXaIBhwmGbneUA3J0d5DpviCIRqq8ToW5omQMK 2asLEEQRRaNkmsFFWNDZO2V/jfi8vrvaeUL1B5gNLQUzP535+Yjn7xukKRoFQJOe72xhUY4ENo6I 567bIIiAIoJo0vMVQx/kBfgCZsQiC8UThQMAAAAASUVORK5CYII= "
        style="image-rendering:optimizeSpeed"
        preserveAspectRatio="none"
        height="16"

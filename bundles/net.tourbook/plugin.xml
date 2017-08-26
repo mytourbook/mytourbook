@@ -558,8 +558,15 @@
 					icon="icons/calendar.png"
 					label="%view_name_Calendar"
 					mnemonic="%view_name_Calendar_Mnemonic"/>
-		               
-				<!-- Tour Catalog -->
+
+				<!-- Statistics -->
+				<command 
+					commandId="command.net.tourbook.statistic.StatisticView"
+					icon="icons/statistics.png"
+					label="%view_name_Statistics"
+					mnemonic="%view_name_Statistics_Mnemonic"/>
+
+				<!-- Reference Tours -->
 				<command 
 					commandId="command.net.tourbook.views.tourCatalog.TourCatalogView"
 					icon="icons/reference-tours.png"
@@ -581,29 +588,19 @@
 					label="%View_Name_CollatedTours"
 					mnemonic="%View_Name_CollatedTours_Mnemonic"
 					tooltip="%View_Name_CollatedTours_Tooltip"/>
-		            
-				<!-- Statistics -->
-				<command 
-					commandId="command.net.tourbook.statistic.StatisticView"
-					icon="icons/statistics.png"
-					label="%view_name_Statistics"
-					mnemonic="%view_name_Statistics_Mnemonic"/>
-   
-				<separator	
-					name="net.tourbook.separator.TourMarker"
+
+				<separator
+					name="net.tourbook.separator.OtherDirectories"
 					visible="true"/>
-				 
+
 				<!-- All Tour Marker -->
 				<command
 					commandId="command.net.tourbook.ui.views.TourMarkerAllView"
 					icon="icons/tour-marker-all.png"
 					label="%View_Name_TourMarkerAll"
 					mnemonic="%View_Name_TourMarkerAll_Mnemonic"/>
-   
-				<separator
-					name="net.tourbook.separator.OtherDirectories"
-					visible="true"/>
-				 
+
+
 				<!-- Sign Images 
 				<command
 					commandId="command.net.tourbook.ui.views.signImages.TourSignView"
@@ -620,7 +617,7 @@
 		-->
 		<menuContribution locationURI="menu:m_Tour?before=defaultViews">
 
-			<!-- Tour (whole) -->
+			<!-- Tour -->
 			
 				<separator
 					name="sep_Tour"
@@ -649,28 +646,6 @@
 					label="%View_Name_TourBlog"
 					mnemonic="%View_Name_TourBlog_Mnemonic"/>
 
-
-			<!-- Map -->
-			
-				<separator
-					name="sep_Map"
-					visible="true"/>
-
-				<!-- 2D map -->
-				<command
-					commandId="net.tourbook.mapping.command.tourMap"
-					icon="icons/map2-view.png"
-					label="%command_tour_map_name"
-					mnemonic="%command_tour_map_name_Mnemonic"
-					tooltip="%command_tour_map_name_tooltip"/>
-
-
-			<!-- Tour items -->
-				
-				<separator
-					name="sep_Items"
-					visible="true"/>
-					
 				<!-- Tour Photos -->
 				<command
 					commandId="command.net.tourbook.photo.TourPhotosView"
@@ -691,7 +666,21 @@
 					icon="icons/tour-waypoint.png"
 					label="%View_Name_Waypoint"
 					mnemonic="%View_Name_Waypoint_Mnemonic"/>
-	         
+
+			<!-- Map -->
+			
+				<separator
+					name="sep_Map"
+					visible="true"/>
+
+				<!-- 2D map -->
+				<command
+					commandId="net.tourbook.mapping.command.tourMap"
+					icon="icons/map2-view.png"
+					label="%command_tour_map_name"
+					mnemonic="%command_tour_map_name_Mnemonic"
+					tooltip="%command_tour_map_name_tooltip"/>
+
 		</menuContribution>
 		
 
@@ -884,12 +873,6 @@
 					tooltip="%command_view_selectedTour_tooltip"/>
 				        
 				<!-- Tour Editor -->
-				<command
-					commandId="net.tourbook.command.tourDataEditor"
-					icon="icons/tour-editor.png"
-					label="%command_view_tourEditor"
-					mnemonic="%command_view_tourEditor_mnemonic"
-					tooltip="%command_view_tourEditor_tooltip"/>
 				
 				<!-- 2D Map -->
 				<command
@@ -908,25 +891,33 @@
 		
 		<menuContribution locationURI="toolbar:org.eclipse.ui.main.toolbar">
 		
-		   <toolbar id="net.tourbook.toolbars.tourTools" label="%Toolbar_Name_Tools">
-		
-		      <command
-		            commandId="net.tourbook.command.tourCompareWizard"
-		            icon="icons/tour-map-compare-wizard.png"
-		            label="%command_tourCompare_wizard"
-		            mnemonic="%command_tourCompare_wizard_mnemonic"
-		            style="push"
-		            />
-		      
-		      <command
-		            commandId="net.tourbook.command.createNewTour"
-		            icon="icons/tour-new.png"
-		            label="%command_createNewTour"
-		            mnemonic="%command_createNewTour_mnemonic"
-		            style="push"
-		            />
-		
-		   </toolbar>
+			<toolbar id="net.tourbook.toolbars.tourTools" label="%Toolbar_Name_Tools">
+
+				<command
+					commandId="net.tourbook.command.tourDataEditor"
+					icon="icons/tour-editor.png"
+					label="%command_view_tourEditor"
+					mnemonic="%command_view_tourEditor_mnemonic"
+					tooltip="%command_view_tourEditor_tooltip">
+				</command>
+
+				<command
+					commandId="net.tourbook.command.createNewTour"
+					icon="icons/tour-new.png"
+					label="%command_createNewTour"
+					mnemonic="%command_createNewTour_mnemonic"
+					style="push"
+				/>
+
+				<command
+					commandId="net.tourbook.command.tourCompareWizard"
+					icon="icons/tour-map-compare-wizard.png"
+					label="%command_tourCompare_wizard"
+					mnemonic="%command_tourCompare_wizard_mnemonic"
+					style="push"
+				/>
+
+			</toolbar>
 		</menuContribution>
 		
 		
