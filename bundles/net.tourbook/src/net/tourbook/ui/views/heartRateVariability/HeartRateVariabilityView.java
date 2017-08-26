@@ -386,6 +386,10 @@ public class HeartRateVariabilityView extends ViewPart {
 
 			final TourData tourData = toursArray[serieIndex];
 
+			if (tourData == null) {
+				continue;
+			}
+
 			final int[] tdPulseTimeSerie = tourData.pulseTimeSerie;
 
 			// check if required data series are available

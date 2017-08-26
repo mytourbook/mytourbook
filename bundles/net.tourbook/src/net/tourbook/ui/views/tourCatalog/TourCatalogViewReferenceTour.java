@@ -108,8 +108,14 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart implements I
 
 	@Override
 	public ArrayList<TourData> getSelectedTours() {
+
 		final ArrayList<TourData> selectedTour = new ArrayList<TourData>();
-		selectedTour.add(_tourData);
+
+		if (_tourData != null) {
+
+			selectedTour.add(_tourData);
+		}
+
 		return selectedTour;
 	}
 
@@ -174,8 +180,12 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart implements I
 
 			final SelectionChartXSliderPosition oldXSliderPosition = _tourChart.getXSliderPosition();
 
-			oldRefTourConfig.setXSliderPosition(new SelectionChartXSliderPosition(_tourChart, oldXSliderPosition
-					.getLeftSliderValueIndex(), oldXSliderPosition.getRightSliderValueIndex()));
+			oldRefTourConfig.setXSliderPosition(
+					new SelectionChartXSliderPosition(
+							_tourChart,
+							oldXSliderPosition
+									.getLeftSliderValueIndex(),
+							oldXSliderPosition.getRightSliderValueIndex()));
 		}
 
 		_tourChart.addDataModelListener(new IDataModelListener() {
@@ -198,15 +208,17 @@ public class TourCatalogViewReferenceTour extends TourChartViewPart implements I
 				final double refTourXMarkerValue = xValues[refTour.getEndValueIndex()]
 						- xValues[refTour.getStartValueIndex()];
 
-				TourManager.fireEventWithCustomData(TourEventId.REFERENCE_TOUR_CHANGED, //
+				TourManager.fireEventWithCustomData(
+						TourEventId.REFERENCE_TOUR_CHANGED, //
 						new TourPropertyRefTourChanged(_tourChart, refTour.getRefId(), refTourXMarkerValue),
 						TourCatalogViewReferenceTour.this);
 
 				// set title
-				changedChartDataModel.setTitle(NLS.bind(
-						Messages.tourCatalog_view_label_chart_title_reference_tour,
-						refTour.getLabel(),
-						TourManager.getTourTitleDetailed(_tourData)));
+				changedChartDataModel.setTitle(
+						NLS.bind(
+								Messages.tourCatalog_view_label_chart_title_reference_tour,
+								refTour.getLabel(),
+								TourManager.getTourTitleDetailed(_tourData)));
 
 			}
 		});

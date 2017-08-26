@@ -1264,6 +1264,10 @@ public class TourManager {
 	 */
 	public static String getTourTitleDetailed(final TourData tourData) {
 
+		if (tourData == null) {
+			return UI.EMPTY_STRING;
+		}
+
 		final String tourTitle = tourData.getTourTitle();
 
 		return getTourDateFull(tourData) //
