@@ -3671,9 +3671,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.5393401"
-     inkscape:cx="0.068934897"
-     inkscape:cy="831.15705"
+     inkscape:zoom="6.1573604"
+     inkscape:cx="80.612908"
+     inkscape:cy="913.62073"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -3685,7 +3685,7 @@
      inkscape:snap-grids="true"
      inkscape:snap-page="true"
      inkscape:snap-to-guides="true"
-     inkscape:snap-nodes="false"
+     inkscape:snap-nodes="true"
      inkscape:snap-global="true"
      inkscape:snap-bbox="true"
      showguides="true"
@@ -5640,7 +5640,7 @@
        inkscape:export-xdpi="95.999863"
        inkscape:export-ydpi="95.999863" />
     <path
-       style="fill:#d0ec86;fill-opacity:1;stroke:#435800;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="fill:none;fill-opacity:1;stroke:#435800;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 70.5,106.86218 v 15 h 14.999997 v -15 z"
        id="path1768"
        inkscape:connector-curvature="0"
@@ -5649,8 +5649,8 @@
        inkscape:export-xdpi="95.999863"
        inkscape:export-ydpi="95.999863" />
     <path
-       style="fill:none;stroke:#435800;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 73.5,106.32831 v 6.5414 h 8.999997 v -6.5414"
+       style="fill:none;stroke:#435800;stroke-width:0.99999994px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 73.5,106.36218 v 6.50831 h 8.999997 v -6.50831"
        id="path3499"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cccc"
@@ -5693,12 +5693,7 @@
        y="81.362183"
        x="140"
        id="image3529"
-       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAAA3NCSVQICAjb4U/gAAAAvElEQVQo
-kWP8//8/AymAiSTVDAwMLBBq2aYj+NVF+dmgaGBgYDBwssGl+sI+hHEsyBLbFq/Bpadn+hoGBoaS
-zBAWNAmv2BBceiDGYfG0ODsU6QRXw9ni7FBZLBqYGKGIgYHh5U8ULrofIIAZLxeLBgHvajhbJxjK
-/rC1FaeGr9tb73+Dqr6yFqruyQ+8TlLhQnCR2Sga4LHDiBoQaFwoL8rPBh75TDD0e2crMhe7k7Yt
-XrMNTQSVy0hq8gYAMqwvCTHUhKkAAAAASUVORK5CYII=
-"
+       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAAA3NCSVQICAjb4U/gAAAAvElEQVQo kWP8//8/AymAiSTVDAwMLBBq2aYj+NVF+dmgaGBgYDBwssGl+sI+hHEsyBLbFq/Bpadn+hoGBoaS zBAWNAmv2BBceiDGYfG0ODsU6QRXw9ni7FBZLBqYGKGIgYHh5U8ULrofIIAZLxeLBgHvajhbJxjK /rC1FaeGr9tb73+Dqr6yFqruyQ+8TlLhQnCR2Sga4LHDiBoQaFwoL8rPBh75TDD0e2crMhe7k7Yt XrMNTQSVy0hq8gYAMqwvCTHUhKkAAAAASUVORK5CYII= "
        style="image-rendering:optimizeSpeed"
        preserveAspectRatio="none"
        height="16"
@@ -5707,12 +5702,7 @@ XrMNTQSVy0hq8gYAMqwvCTHUhKkAAAAASUVORK5CYII=
        y="81.362183"
        x="165"
        id="image3540"
-       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAAA3NCSVQICAjb4U/gAAAAnElEQVQo
-kWP8//8/AymAiSTVDAwMLBBq2aYj+NVF+dmgaGBgYDBwssGl+sI+hHEsyBLbFq/Bpadn+hoGBoaS
-zBAWNAmv2BBceiDGoWtgYGAQZ8elBcNJEMDESKIGZnzqsWkQ8K7GFPywtRWnhq/bW+9/Qxd88gOv
-k1S4iHASPHYY8SYXqGSUnw088plwIOxO2rZ4zTZ8FjAwkpq8AXd/JFVNUuQVAAAAAElFTkSuQmCC
-
-"
+       xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAAA3NCSVQICAjb4U/gAAAAnElEQVQo kWP8//8/AymAiSTVDAwMLBBq2aYj+NVF+dmgaGBgYDBwssGl+sI+hHEsyBLbFq/Bpadn+hoGBoaS zBAWNAmv2BBceiDGoWtgYGAQZ8elBcNJEMDESKIGZnzqsWkQ8K7GFPywtRWnhq/bW+9/Qxd88gOv k1S4iHASPHYY8SYXqGSUnw088plwIOxO2rZ4zTZ8FjAwkpq8AXd/JFVNUuQVAAAAAElFTkSuQmCC  "
        style="image-rendering:optimizeSpeed"
        preserveAspectRatio="none"
        height="16"
@@ -5759,5 +5749,13 @@ k1S4iHASPHYY8SYXqGSUnw088plwIOxO2rZ4zTZ8FjAwkpq8AXd/JFVNUuQVAAAAAElFTkSuQmCC
        inkscape:export-xdpi="95.999863"
        inkscape:export-ydpi="95.999863"
        sodipodi:nodetypes="ccccccc" />
+    <path
+       style="fill:#d0ec86;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:1"
+       d="m 71,107.36218 v 14 h 3 v -4 h 8 v 4 h 3 v -14 h -2 v 6 H 73 v -6 z"
+       id="path5016"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\floppy_disc.png"
+       inkscape:export-xdpi="95.999863"
+       inkscape:export-ydpi="95.999863" />
   </g>
 </svg>
