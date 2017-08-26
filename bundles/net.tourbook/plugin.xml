@@ -1938,4 +1938,69 @@
    
 	</extension>
 
+
+	<!-- 
+	
+	 MAP BOOKMARKS   -  MAP BOOKMARKS   -  MAP BOOKMARKS   -  MAP BOOKMARKS   -  MAP BOOKMARKS
+	
+	-->
+
+   <extension point="org.eclipse.ui.commands">
+
+      <command
+            id="net.tourbook.map.bookmark.command.MapBookmarkView"
+            name="%View_Name_MapBookmark"
+            defaultHandler="net.tourbook.map.bookmark.ActionHandler_OpenMapBookmarkView"
+            />
+	            
+   </extension>
+   
+
+	<!-- MENUS -->
+
+   <extension point="org.eclipse.ui.menus">
+
+		<menuContribution locationURI="menu:m_Tour?endof=sep_Map" >
+		            
+			<command commandId="net.tourbook.map.bookmark.command.MapBookmarkView"
+				icon="icons/map-bookmark.png"
+				label="%View_Name_MapBookmark"
+				mnemonic="%View_Name_MapBookmark_Mnemonic"/>
+		
+		</menuContribution>
+
+		<menuContribution locationURI="toolbar:org.eclipse.ui.main.toolbar">
+		            
+			<toolbar id="mc_tb_Tour">
+		            
+				<command
+					commandId="net.tourbook.map.bookmark.command.MapBookmarkView"
+					icon="icons/map-bookmark.png"
+					label="%View_Name_MapBookmark"
+					tooltip="%View_Name_MapBookmark_Tooltip"/>
+
+			</toolbar>
+		
+		</menuContribution>
+
+   </extension>
+
+
+
+	<!-- VIEWS -->
+
+	<extension point="org.eclipse.ui.views">
+
+		<view
+			category="net.tourbook.category.map"
+			class="net.tourbook.map.bookmark.MapBookmarkView"
+			icon="icons/map-bookmark.png"
+			id="net.tourbook.map.bookmark.MapBookmarkView"
+			name="%View_Name_MapBookmark"
+		/>
+   
+	</extension>
+   
+   
 </plugin>
+
