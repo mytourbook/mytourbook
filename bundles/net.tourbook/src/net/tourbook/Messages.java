@@ -804,6 +804,8 @@ public class Messages extends NLS {
 	public static String		Image__link;
 	public static String		Image__MapBookmark;
 	public static String		Image__MapBookmark_Disabled;
+	public static String		Image__MapOptions;
+	public static String		Image__MapOptions_Disabled;
 	public static String		Image__MarkerFilter_WithGPS;
 	public static String		Image__MarkerFilter_WithGPS_Disabled;
 	public static String		Image__MarkerFilter_WithoutGPS;
@@ -1585,6 +1587,21 @@ public class Messages extends NLS {
 	public static String		Slideout_HVROptions_Label_2xToleranceResult_Tooltip;
 	public static String		Slideout_HVROptions_Label_Title;
 
+	public static String		Slideout_Map25MapOptions_Checkbox_IsAnimationLocation;
+	public static String		Slideout_Map25MapOptions_Checkbox_IsAnimationLocation_Tooltip;
+	public static String		Slideout_Map25MapOptions_Checkbox_Layer_3DBuilding;
+	public static String		Slideout_Map25MapOptions_Checkbox_Layer_Cartography;
+	public static String		Slideout_Map25MapOptions_Checkbox_Layer_Cartography_Tooltip;
+	public static String		Slideout_Map25MapOptions_Checkbox_Layer_LabelSymbol;
+	public static String		Slideout_Map25MapOptions_Checkbox_Layer_ScaleBar;
+	public static String		Slideout_Map25MapOptions_Checkbox_Layer_TileInfo;
+	public static String		Slideout_Map25MapOptions_Group_MapLayer;
+	public static String		Slideout_Map25MapOptions_Label_AnimationEasingType;
+	public static String		Slideout_Map25MapOptions_Label_AnimationEasingType_Tooltip;
+	public static String		Slideout_Map25MapOptions_Label_AnimationTime;
+	public static String		Slideout_Map25MapOptions_Label_AnimationTime_Tooltip;
+	public static String		Slideout_Map25MapOptions_Label_MapOptions;
+
 	public static String		Slideout_Map25MarkerOptions_Checkbox_IsMarkerClustering;
 	public static String		Slideout_Map25MarkerOptions_Checkbox_IsShowMarkerLabel;
 	public static String		Slideout_Map25MarkerOptions_Checkbox_IsShowMarkerPoint;
@@ -1611,8 +1628,6 @@ public class Messages extends NLS {
 
 	public static String		Slideout_MapBookmark_Button_Add;
 	public static String		Slideout_MapBookmark_Button_Rename;
-	public static String		Slideout_MapBookmark_Checkbox_IsAnimationLocation;
-	public static String		Slideout_MapBookmark_Checkbox_IsAnimationLocation_Tooltip;
 	public static String		Slideout_MapBookmark_Column_Latitude;
 	public static String		Slideout_MapBookmark_Column_Latitude_Tooltip;
 	public static String		Slideout_MapBookmark_Column_Longitude;
@@ -1626,10 +1641,6 @@ public class Messages extends NLS {
 	public static String		Slideout_MapBookmark_Dialog_RenameBookmark_Title;
 	public static String		Slideout_MapBookmark_Dialog_ValidationAddName;
 	public static String		Slideout_MapBookmark_Dialog_ValidationRename;
-	public static String		Slideout_MapBookmark_Label_AnimationEasingType;
-	public static String		Slideout_MapBookmark_Label_AnimationEasingType_Tooltip;
-	public static String		Slideout_MapBookmark_Label_AnimationTime;
-	public static String		Slideout_MapBookmark_Label_AnimationTime_Tooltip;
 	public static String		Slideout_MapBookmark_Label_NumBookmarkListItems;
 	public static String		Slideout_MapBookmark_Label_NumBookmarkListItems_Tooltip;
 	public static String		Slideout_MapBookmark_Label_NumContextMenuItems;

@@ -1068,7 +1068,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_actionDimMap = new ActionDimMap(this);
 		_actionManageProvider = new ActionManageMapProviders(this);
 
-		_actionMapBookmarks = new ActionMapBookmarks(this._parent, this, false);
+		_actionMapBookmarks = new ActionMapBookmarks(this._parent, this);
 	}
 
 	/**

@@ -17,7 +17,6 @@ package net.tourbook.map25;
 
 import java.awt.Canvas;
 
-import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 import net.tourbook.map25.Map25TileSource.Builder;
 import net.tourbook.map25.OkHttpEngineMT.OkHttpFactoryMT;
@@ -604,9 +603,9 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 
 		final boolean isShowMarkerPoint = config.isShowMarkerPoint;
 
-		System.out.println(
-				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-						+ ("\tisShowMarkerPoint:" + isShowMarkerPoint));
+//		System.out.println(
+//				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//						+ ("\tisShowMarkerPoint:" + isShowMarkerPoint));
 		// TODO remove SYSTEM.OUT.PRINTLN
 
 		_layer_Marker.setEnabled(isShowMarkerPoint);

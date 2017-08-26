@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
@@ -74,7 +75,6 @@ import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
@@ -120,11 +120,9 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 	private static final String		STATE_IS_SYNCH_MAP_WITH_CHART_SLIDER	= "STATE_SYNCH_MAP_WITH_CHART_SLIDER";			//$NON-NLS-1$
 	private static final String		STATE_IS_SYNCH_MAP_WITH_TOUR			= "STATE_SYNCH_MAP_WITH_TOUR";					//$NON-NLS-1$
 	//
-	private static final ImageDescriptor	_actionImageDescriptor			= TourbookPlugin.getImageDescriptor(IMAGE_ACTION_SHOW_TOUR_IN_MAP);
-	private static final ImageDescriptor	_actionImageDescriptorDisabled	= TourbookPlugin.getImageDescriptor(IMAGE_ACTION_SHOW_TOUR_IN_MAP_DISABLED);
-	private static final IDialogSettings	_state							= TourbookPlugin.getState(ID);
-	//
 // SET_FORMATTING_ON
+	//
+	private static final IDialogSettings	_state									= TourbookPlugin.getState(ID);
 	//
 	private Map25App						_mapApp;
 	//
@@ -166,14 +164,22 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 	private boolean							_isContextMenuVisible;
 //	private MouseAdapter					_wwMouseListener;
 	private Menu							_swtContextMenu;
-/*
- * UI controls
- */
+	//
+	/*
+	 * UI controls
+	 */
 	private Composite						_swtContainer;
 
 	Composite								_parent;
 
 	private class ActionMap25_Options extends ActionToolbarSlideout {
+
+		public ActionMap25_Options() {
+
+			super(
+					TourbookPlugin.getImageDescriptor(Messages.Image__MapOptions),
+					TourbookPlugin.getImageDescriptor(Messages.Image__MapOptions_Disabled));
+		}
 
 		@Override
 		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
@@ -190,7 +196,9 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 		public ActionTourTrackConfig() {
 
-			super(_actionImageDescriptor, _actionImageDescriptorDisabled);
+			super(
+					TourbookPlugin.getImageDescriptor(Map25View.IMAGE_ACTION_SHOW_TOUR_IN_MAP),
+					TourbookPlugin.getImageDescriptor(Map25View.IMAGE_ACTION_SHOW_TOUR_IN_MAP_DISABLED));
 
 			isToggleAction = true;
 			notSelectedTooltip = MAP_ACTION_SHOW_TOUR_IN_MAP;
@@ -470,7 +478,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 	private void createActions() {
 
 		_actionMarkerOptions = new ActionMap25_ShowMarker(this, _parent);
-		_actionMapBookmarks = new ActionMapBookmarks(this._parent, this, true);
+		_actionMapBookmarks = new ActionMapBookmarks(this._parent, this);
 
 		_actionMapOptions = new ActionMap25_Options();
 		_actionSelectMapProvider = new ActionSelectMap25Provider(this);
@@ -775,6 +783,11 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 	@Override
 	public void moveToMapLocation(final MapBookmark selectedBookmark) {
 
+//		System.out.println(
+//				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tmoveToMapLocation: "
+//						+ selectedBookmark));
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
 		MapBookmarkManager.setLastSelectedBookmark(selectedBookmark);
 
 		final Map map = _mapApp.getMap();
@@ -785,22 +798,9 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 			@Override
 			public void run() {
 
-				final float animationTime = MapBookmarkManager.animationTime;
 				final MapPosition mapPosition = selectedBookmark.getMapPosition();
 
-				if (animationTime == 0 || MapBookmarkManager.isAnimateLocation == false) {
-
-					map.setMapPosition(mapPosition);
-
-				} else {
-
-					map.animator().animateTo(
-							(long) (animationTime * 1000),
-							mapPosition,
-							MapBookmarkManager.animationEasingType);
-				}
-
-				map.updateMap(false);
+				Map25ConfigManager.setMapLocation(map, mapPosition);
 			}
 		});
 
@@ -1155,22 +1155,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 				_allBoundingBox = createBoundingBox(_allGeoPoints);
 
 				if (_isSynchMapWithTour) {
-
-					final Animator animator = map25.animator();
-
-					int animationTime = Map25ConfigManager.getActiveTourTrackConfig().animationTime;
-
-					// zero will not move the map !
-					if (animationTime == 0) {
-						animationTime = 1;
-					}
-
-					animator.cancel();
-					animator.animateTo(//
-							animationTime,
-							_allBoundingBox,
-							Easing.Type.SINE_INOUT,
-							Animator.ANIM_MOVE | Animator.ANIM_SCALE);
+					final int animationTime = Map25ConfigManager.getActiveTourTrackConfig().animationTime;
+					Map25ConfigManager.setMapLocation(map25, _allBoundingBox, animationTime);
 				}
 
 				map25.updateMap(true);

@@ -48,8 +48,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
 import org.oscim.core.MapPosition;
-import org.oscim.utils.Easing;
-import org.oscim.utils.Easing.Type;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
@@ -75,53 +73,46 @@ public class MapBookmarkManager {
 	static {}
 	//
 	// common attributes
-	private static final String				ATTR_ID							= "id";								//$NON-NLS-1$
+	private static final String				ATTR_ID							= "id";							//$NON-NLS-1$
 
 	//
 	/*
 	 * Root
 	 */
-	private static final String				TAG_ROOT						= "MapBookmarks";					//$NON-NLS-1$
-	private static final String				ATTR_CONFIG_VERSION				= "configVersion";					//$NON-NLS-1$
+	private static final String				TAG_ROOT						= "MapBookmarks";				//$NON-NLS-1$
+	private static final String				ATTR_CONFIG_VERSION				= "configVersion";				//$NON-NLS-1$
 	//
 	/*
 	 * Bookmarks
 	 */
-	private static final String				TAG_ALL_BOOKMARKS				= "AllBookmarks";					//$NON-NLS-1$
-	private static final String				TAG_BOOKMARK					= "Bookmark";						//$NON-NLS-1$
+	private static final String				TAG_ALL_BOOKMARKS				= "AllBookmarks";				//$NON-NLS-1$
+	private static final String				TAG_BOOKMARK					= "Bookmark";					//$NON-NLS-1$
 	//
-	private static final String				TAG_ALL_RECENT_BOOKMARKS		= "AllRecentBookmarks";				//$NON-NLS-1$
-	private static final String				TAG_RECENT_BOOKMARK				= "RecentBookmark";					//$NON-NLS-1$
+	private static final String				TAG_ALL_RECENT_BOOKMARKS		= "AllRecentBookmarks";			//$NON-NLS-1$
+	private static final String				TAG_RECENT_BOOKMARK				= "RecentBookmark";				//$NON-NLS-1$
 	//
-	private static final String				ATTR_NAME						= "name";							//$NON-NLS-1$
-	private static final String				ATTR_MAP_POSITION_X				= "mapPositionX";					//$NON-NLS-1$
-	private static final String				ATTR_MAP_POSITION_Y				= "mapPositionY";					//$NON-NLS-1$
-	private static final String				ATTR_MAP_POSITION_SCALE			= "mapPositionScale";				//$NON-NLS-1$
-	private static final String				ATTR_MAP_POSITION_BEARING		= "mapPositionBearing";				//$NON-NLS-1$
-	private static final String				ATTR_MAP_POSITION_TILT			= "mapPositionTilt";				//$NON-NLS-1$
-	private static final String				ATTR_MAP_POSITION_ZOOM_LEVEL	= "mapPositionZoomLevel";			//$NON-NLS-1$
+	private static final String				ATTR_NAME						= "name";						//$NON-NLS-1$
+	private static final String				ATTR_MAP_POSITION_X				= "mapPositionX";				//$NON-NLS-1$
+	private static final String				ATTR_MAP_POSITION_Y				= "mapPositionY";				//$NON-NLS-1$
+	private static final String				ATTR_MAP_POSITION_SCALE			= "mapPositionScale";			//$NON-NLS-1$
+	private static final String				ATTR_MAP_POSITION_BEARING		= "mapPositionBearing";			//$NON-NLS-1$
+	private static final String				ATTR_MAP_POSITION_TILT			= "mapPositionTilt";			//$NON-NLS-1$
+	private static final String				ATTR_MAP_POSITION_ZOOM_LEVEL	= "mapPositionZoomLevel";		//$NON-NLS-1$
 	//
-	private static final String				TAG_OPTIONS						= "Options";						//$NON-NLS-1$
-	private static final String				ATTR_ANIMATION_EASING_TYPE		= "animationEasingType";			//$NON-NLS-1$
-	private static final String				ATTR_ANIMATION_TIME				= "animationTime";					//$NON-NLS-1$
-	private static final String				ATTR_IS_ANIMATE_LOCATION		= "isAnimateLocation";				//$NON-NLS-1$
-	private static final String				ATTR_NUMBER_OF_BOOKMARK_ITEMS	= "numberOfBookmarkItems";			//$NON-NLS-1$
-	private static final String				ATTR_NUMBER_OF_RECENT_BOOKMARKS	= "numberOfRecentBookmarks";		//$NON-NLS-1$
+	private static final String				TAG_OPTIONS						= "Options";					//$NON-NLS-1$
+//	private static final String				ATTR_ANIMATION_EASING_TYPE		= "animationEasingType";		//$NON-NLS-1$
+//	private static final String				ATTR_ANIMATION_TIME				= "animationTime";				//$NON-NLS-1$
+//	private static final String				ATTR_IS_ANIMATE_LOCATION		= "isAnimateLocation";			//$NON-NLS-1$
+	private static final String				ATTR_NUMBER_OF_BOOKMARK_ITEMS	= "numberOfBookmarkItems";		//$NON-NLS-1$
+	private static final String				ATTR_NUMBER_OF_RECENT_BOOKMARKS	= "numberOfRecentBookmarks";	//$NON-NLS-1$
 	//
 	private static final int				NUM_RECENT_BOOKMARKS_DEFAULT	= 5;
 	static final int						NUM_RECENT_BOOKMARKS_MIN		= 0;
 	static final int						NUM_RECENT_BOOKMARKS_MAX		= 20;
 
 	private static final int				NUM_BOOKMARK_ITEMS_DEFAULT		= 20;
-	static final int						NUM_BOOKMARK_ITEMS_MIN			= 10;
+	static final int						NUM_BOOKMARK_ITEMS_MIN			= 3;
 	static final int						NUM_BOOKMARK_ITEMS_MAX			= 100;
-
-	private static final Type				ANIMATION_EASING_TYPE_DEFAULT	= Easing.Type.SINE_INOUT;
-	private static final boolean			IS_ANIMATE_LOCATION_DEFAULT		= true;
-
-	private static final float				LOCATION_ANIMATION_TIME_DEFAULT	= 3.0f;
-	static final float						LOCATION_ANIMATION_TIME_MIN		= 0f;
-	static final float						LOCATION_ANIMATION_TIME_MAX		= 60.0f;
 
 	//
 	/**
@@ -134,12 +125,6 @@ public class MapBookmarkManager {
 	 */
 	private static LinkedList<MapBookmark>	_allRecentBookmarks				= new LinkedList<>();
 
-	/*
-	 * Bookmark options
-	 */
-	public static Type						animationEasingType				= ANIMATION_EASING_TYPE_DEFAULT;
-	public static float						animationTime					= LOCATION_ANIMATION_TIME_DEFAULT;
-	public static boolean					isAnimateLocation				= IS_ANIMATE_LOCATION_DEFAULT;
 	public static int						numberOfBookmarkItems			= NUM_BOOKMARK_ITEMS_DEFAULT;
 	public static int						numberOfRecentBookmarks			= NUM_RECENT_BOOKMARKS_DEFAULT;
 
@@ -473,20 +458,6 @@ public class MapBookmarkManager {
 			return;
 		}
 
-		isAnimateLocation = Util.getXmlBoolean(xmlRoot, ATTR_IS_ANIMATE_LOCATION, IS_ANIMATE_LOCATION_DEFAULT);
-
-		animationEasingType = (Type) Util.getXmlEnum(
-				xmlOptions,
-				ATTR_ANIMATION_EASING_TYPE,
-				ANIMATION_EASING_TYPE_DEFAULT);
-
-		animationTime = Util.getXmlFloatFloat(
-				xmlOptions,
-				ATTR_ANIMATION_TIME,
-				LOCATION_ANIMATION_TIME_DEFAULT,
-				LOCATION_ANIMATION_TIME_MIN,
-				LOCATION_ANIMATION_TIME_MAX);
-
 		numberOfBookmarkItems = Util.getXmlInteger(
 				xmlOptions,
 				ATTR_NUMBER_OF_BOOKMARK_ITEMS,
@@ -691,10 +662,6 @@ public class MapBookmarkManager {
 
 		xmlOptions.putInteger(ATTR_NUMBER_OF_RECENT_BOOKMARKS, numberOfRecentBookmarks);
 		xmlOptions.putInteger(ATTR_NUMBER_OF_BOOKMARK_ITEMS, numberOfBookmarkItems);
-		xmlOptions.putBoolean(ATTR_IS_ANIMATE_LOCATION, isAnimateLocation);
-		xmlOptions.putFloat(ATTR_ANIMATION_TIME, animationTime);
-
-		Util.setXmlEnum(xmlOptions, ATTR_ANIMATION_EASING_TYPE, animationEasingType);
 	}
 
 	private static void saveState_20_RecentBookmarks(final XMLMemento xmlRoot) {

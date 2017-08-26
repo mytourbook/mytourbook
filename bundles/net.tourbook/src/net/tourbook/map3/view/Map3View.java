@@ -803,7 +803,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks {
 		_actionMap3Colors = new ActionOpenPrefDialog(Messages.Map3_Action_TrackColors, PrefPageMap3Color.ID, _graphId);
 		_actionMap3Colors.setImageDescriptor(TourbookPlugin.getImageDescriptor(IMAGE_GRAPH_ALL));
 
-		_actionMapBookmarks = new ActionMapBookmarks(_parent, this, false);
+		_actionMapBookmarks = new ActionMapBookmarks(_parent, this);
 		_actionSetTrackSliderLeft = new ActionSetTrackSliderPositionLeft(this);
 		_actionSetTrackSliderRight = new ActionSetTrackSliderPositionRight(this);
 		_actionShowTrackSlider = new ActionShowTrackSlider(this);

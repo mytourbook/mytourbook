@@ -35,7 +35,6 @@ public class ActionMapBookmarks extends ActionToolbarSlideout {
 
 	private Composite				_ownerControl;
 	private IMapBookmarks			_mapBookmarks;
-	private boolean					_canAnimate;
 
 	/**
 	 * @param ownerControl
@@ -43,19 +42,17 @@ public class ActionMapBookmarks extends ActionToolbarSlideout {
 	 * @param canAnimate
 	 */
 	public ActionMapBookmarks(	final Composite ownerControl,
-								final IMapBookmarks mapBookmarks,
-								final boolean canAnimate) {
+								final IMapBookmarks mapBookmarks) {
 
 		super(actionImage, actionImageDisabled);
 
 		_ownerControl = ownerControl;
 		_mapBookmarks = mapBookmarks;
-		_canAnimate = canAnimate;
 	}
 
 	@Override
 	protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
-		return new SlideoutMapBookmarks(_ownerControl, toolbar, _mapBookmarks, _canAnimate);
+		return new SlideoutMapBookmarks(_ownerControl, toolbar, _mapBookmarks);
 	}
 
 	@Override
