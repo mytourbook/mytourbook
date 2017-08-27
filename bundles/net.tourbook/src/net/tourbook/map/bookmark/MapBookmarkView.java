@@ -23,43 +23,44 @@ import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.TableColumnDefinition;
-import net.tourbook.data.TourMarker;
-import net.tourbook.tour.ActionOpenMarkerDialog;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.action.ActionModifyColumns;
 
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
-import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IPartListener2;
-import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 import org.oscim.core.MapPosition;
@@ -68,37 +69,57 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 
 	public static final String		ID			= "net.tourbook.map.bookmark.MapBookmarkView";	//$NON-NLS-1$
 
-	private final IPreferenceStore	_prefStore	= TourbookPlugin.getPrefStore();
 	private final IDialogSettings	_state		= TourbookPlugin.getState(ID);
 
 	private ITourEventListener		_tourEventListener;
 	private IPartListener2			_partListener;
 
-	private ActionOpenMarkerDialog	_actionEditTourMarkers;
+	private ActionDeleteBookmark	_actionDeleteBookmark;
 	private ActionModifyColumns		_actionModifyColumns;
+	private ActionRenameBookmark	_actionRenameBookmark;
 
 	private PixelConverter			_pc;
 
 	private TableViewer				_bookmarkViewer;
 	private ColumnManager			_columnManager;
 
-	private boolean					_isInUpdate;
-
-	private ColumnDefinition		_colDefName;
-	private ColumnDefinition		_colDefVisibility;
-
-	private final NumberFormat		_nf3		= NumberFormat.getNumberInstance();
+	private final NumberFormat		_nfLatLon	= NumberFormat.getNumberInstance();
 	{
-		_nf3.setMinimumFractionDigits(3);
-		_nf3.setMaximumFractionDigits(3);
+		_nfLatLon.setMinimumFractionDigits(2);
+		_nfLatLon.setMaximumFractionDigits(2);
 	}
 
 	/*
 	 * UI controls
 	 */
+	private Composite	_parent;
 	private Font		_boldFont;
 
 	private Composite	_viewerContainer;
+
+	private class ActionDeleteBookmark extends Action {
+
+		public ActionDeleteBookmark() {
+			super(Messages.Map_Bookmark_Action_Bookmark_Delete, AS_PUSH_BUTTON);
+		}
+
+		@Override
+		public void run() {
+			onBookmark_Rename(true);
+		}
+	}
+
+	private class ActionRenameBookmark extends Action {
+
+		public ActionRenameBookmark() {
+			super(Messages.Map_Bookmark_Action_Bookmark_Rename, AS_PUSH_BUTTON);
+		}
+
+		@Override
+		public void run() {
+			onBookmark_Rename(true);
+		}
+	}
 
 	private class BookmarkComparator extends ViewerComparator {
 
@@ -130,7 +151,7 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 
 		@Override
 		public Object[] getElements(final Object inputElement) {
-			return MapBookmarkManager.getAllMapBookmarks().toArray();
+			return MapBookmarkManager.getAllBookmarks().toArray();
 		}
 
 		@Override
@@ -146,15 +167,19 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 		_partListener = new IPartListener2() {
 
 			@Override
-			public void partActivated(final IWorkbenchPartReference partRef) {}
+			public void partActivated(final IWorkbenchPartReference partRef) {
+
+			}
 
 			@Override
 			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
+
 				if (partRef.getPart(false) == MapBookmarkView.this) {
 					saveState();
+					MapBookmarkManager.setMapBookmarkView(null);
 				}
 			}
 
@@ -168,7 +193,13 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 			public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
 			@Override
-			public void partOpened(final IWorkbenchPartReference partRef) {}
+			public void partOpened(final IWorkbenchPartReference partRef) {
+
+				if (partRef.getPart(false) == MapBookmarkView.this) {
+					saveState();
+					MapBookmarkManager.setMapBookmarkView(MapBookmarkView.this);
+				}
+			}
 
 			@Override
 			public void partVisible(final IWorkbenchPartReference partRef) {}
@@ -179,23 +210,23 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 
 	private void clearView() {
 
-		updateUI_MarkerViewer();
+		updateUI_Viewer();
 	}
 
 	private void createActions() {
 
 		_actionModifyColumns = new ActionModifyColumns(this);
+		_actionDeleteBookmark = new ActionDeleteBookmark();
+		_actionRenameBookmark = new ActionRenameBookmark();
 	}
 
 	@Override
 	public void createPartControl(final Composite parent) {
 
-		_pc = new PixelConverter(parent);
-		_boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
+		initUI(parent);
 
 		// define all columns for the viewer
 		_columnManager = new ColumnManager(this, _state);
-		_columnManager.setIsCategoryAvailable(true);
 		defineAllColumns();
 
 		createUI(parent);
@@ -205,7 +236,7 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 		createActions();
 		fillToolbar();
 
-		updateUI_MarkerViewer();
+		updateUI_Viewer();
 	}
 
 	private void createUI(final Composite parent) {
@@ -247,19 +278,44 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 		_bookmarkViewer.setComparator(new BookmarkComparator());
 
 		_bookmarkViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+
 			@Override
 			public void selectionChanged(final SelectionChangedEvent event) {
-
+				onBookmark_Select();
 			}
 		});
 
 		_bookmarkViewer.addDoubleClickListener(new IDoubleClickListener() {
+
 			@Override
 			public void doubleClick(final DoubleClickEvent event) {
-
+				onBookmark_Rename(true);
 			}
 		});
 
+		_bookmarkViewer.getTable().addKeyListener(new KeyListener() {
+
+			@Override
+			public void keyPressed(final KeyEvent e) {
+
+				switch (e.keyCode) {
+
+				case SWT.DEL:
+					onBookmark_Delete();
+					break;
+
+				case SWT.F2:
+					onBookmark_Rename(false);
+					break;
+
+				default:
+					break;
+				}
+			}
+
+			@Override
+			public void keyReleased(final KeyEvent e) {}
+		});
 		createUI_20_ContextMenu();
 	}
 
@@ -285,21 +341,24 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 
 	private void defineAllColumns() {
 
-		defineColumn_Name();
+		defineColumn_10_Name();
+		defineColumn_20_Zoomlevel();
+		defineColumn_30_Latitude();
+		defineColumn_40_Longitude();
 	}
 
 	/**
 	 * Column: Name
 	 */
-	private void defineColumn_Name() {
+	private void defineColumn_10_Name() {
 
 		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "name", SWT.LEAD); //$NON-NLS-1$
 
-		colDef.setColumnLabel(Messages.Slideout_MapBookmark_Column_Name);
-		colDef.setColumnHeaderText(Messages.Slideout_MapBookmark_Column_Name);
+		colDef.setColumnLabel(Messages.Map_Bookmark_Column_Name);
+		colDef.setColumnHeaderText(Messages.Map_Bookmark_Column_Name);
 
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(30));
-		colDef.setColumnWeightData(new ColumnWeightData(30));
+//		colDef.setColumnWeightData(new ColumnWeightData(30));
 
 		colDef.setIsDefaultColumn();
 		colDef.setCanModifyVisibility(false);
@@ -317,15 +376,17 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 	/**
 	 * Column: Zoomlevel
 	 */
-	private void defineColumn_Zoomlevel() {
+	private void defineColumn_20_Zoomlevel() {
 
-		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "zoomLebel", SWT.LEAD); //$NON-NLS-1$
+		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "zoomLevel", SWT.TRAIL); //$NON-NLS-1$
 
-		colDef.setColumnLabel(Messages.Slideout_MapBookmark_Column_ZoomLevel_Tooltip);
-		colDef.setColumnHeaderText(Messages.Slideout_MapBookmark_Column_ZoomLevel_Tooltip);
+		colDef.setColumnLabel(Messages.Map_Bookmark_Column_ZoomLevel_Tooltip);
+		colDef.setColumnHeaderText(Messages.Map_Bookmark_Column_ZoomLevel);
+		colDef.setColumnHeaderToolTipText(Messages.Map_Bookmark_Column_ZoomLevel_Tooltip);
 
+		colDef.setIsDefaultColumn();
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(5));
-		colDef.setColumnWeightData(new ColumnWeightData(5));
+//		colDef.setColumnWeightData(new ColumnWeightData(5));
 
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -335,6 +396,60 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 				final MapPosition mapPos = bookmark.getMapPosition();
 
 				cell.setText(Integer.toString(mapPos.zoomLevel));
+			}
+		});
+	}
+
+	/**
+	 * Column: Latitude
+	 */
+	private void defineColumn_30_Latitude() {
+
+		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "latitude", SWT.TRAIL); //$NON-NLS-1$
+
+		colDef.setColumnLabel(Messages.Map_Bookmark_Column_Latitude_Tooltip);
+		colDef.setColumnHeaderText(Messages.Map_Bookmark_Column_Latitude);
+		colDef.setColumnHeaderToolTipText(Messages.Map_Bookmark_Column_Latitude_Tooltip);
+
+		colDef.setIsDefaultColumn();
+		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(9));
+//		colDef.setColumnWeightData(new ColumnWeightData(9));
+
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final MapBookmark bookmark = (MapBookmark) cell.getElement();
+				final String valueText = _nfLatLon.format(bookmark.getLatitude());
+
+				cell.setText(valueText);
+			}
+		});
+	}
+
+	/**
+	 * Column: Longitude
+	 */
+	private void defineColumn_40_Longitude() {
+
+		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "longitude", SWT.TRAIL); //$NON-NLS-1$
+
+		colDef.setColumnLabel(Messages.Map_Bookmark_Column_Longitude_Tooltip);
+		colDef.setColumnHeaderText(Messages.Map_Bookmark_Column_Longitude);
+		colDef.setColumnHeaderToolTipText(Messages.Map_Bookmark_Column_Longitude_Tooltip);
+
+		colDef.setIsDefaultColumn();
+		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(9));
+//		colDef.setColumnWeightData(new ColumnWeightData(9));
+
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final MapBookmark bookmark = (MapBookmark) cell.getElement();
+				final String valueText = _nfLatLon.format(bookmark.getLongitude());
+
+				cell.setText(valueText);
 			}
 		});
 	}
@@ -354,19 +469,17 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 	 */
 	private void enableActions() {
 
-//		_actionEditTourMarkers.setEnabled(isTourInDb && isSingleTour);
+		final MapBookmark selectedBookmark = getSelectedBookmark();
+		final boolean isSelected = selectedBookmark != null;
+
+		_actionDeleteBookmark.setEnabled(isSelected);
+		_actionRenameBookmark.setEnabled(isSelected);
 	}
 
 	private void fillContextMenu(final IMenuManager menuMgr) {
 
-		menuMgr.add(_actionEditTourMarkers);
-
-		// add standard group which allows other plug-ins to contribute here
-		menuMgr.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-
-		// set the marker which should be selected in the marker dialog
-		final IStructuredSelection selection = (IStructuredSelection) _bookmarkViewer.getSelection();
-		_actionEditTourMarkers.setTourMarker((TourMarker) selection.getFirstElement());
+		menuMgr.add(_actionRenameBookmark);
+		menuMgr.add(_actionDeleteBookmark);
 
 		enableActions();
 	}
@@ -400,9 +513,116 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 		return _bookmarkViewer;
 	}
 
+	/**
+	 * @return Returns the selected bookmark or <code>null</code> if not selected
+	 */
+	private MapBookmark getSelectedBookmark() {
+
+		final IStructuredSelection selection = (IStructuredSelection) _bookmarkViewer.getSelection();
+		final MapBookmark selectedBookmark = (MapBookmark) selection.getFirstElement();
+
+		return selectedBookmark;
+	}
+
 	@Override
 	public ColumnViewer getViewer() {
 		return _bookmarkViewer;
+	}
+
+	private void initUI(final Composite parent) {
+
+		_parent = parent;
+
+		_pc = new PixelConverter(parent);
+		_boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
+	}
+
+	private void onBookmark_Delete() {
+
+		final MapBookmark selectedBookmark = getSelectedBookmark();
+
+		if (selectedBookmark == null) {
+			// this happened when deleting a bookmark
+			return;
+		}
+
+		// update model
+		MapBookmarkManager.getAllBookmarks().remove(selectedBookmark);
+		MapBookmarkManager.getAllRecentBookmarks().remove(selectedBookmark);
+
+		// update UI
+		_bookmarkViewer.refresh();
+
+		enableActions();
+	}
+
+	/**
+	 * @param isOpenedWithMouse
+	 *            Is <code>true</code> when the action is opened with the mouse, otherwise with the
+	 *            keyboard
+	 */
+	private void onBookmark_Rename(final boolean isOpenedWithMouse) {
+
+		final MapBookmark selectedBookmark = getSelectedBookmark();
+
+		final BookmarkRenameDialog addDialog = new BookmarkRenameDialog(
+
+				_parent.getShell(),
+				Messages.Map_Bookmark_Dialog_RenameBookmark_Title,
+				Messages.Map_Bookmark_Dialog_RenameBookmark_Message,
+				selectedBookmark.name,
+				isOpenedWithMouse,
+				new IInputValidator() {
+
+					@Override
+					public String isValid(final String newText) {
+
+						if (newText.trim().length() == 0) {
+							return Messages.Map_Bookmark_Dialog_ValidationRename;
+						}
+
+						return null;
+					}
+				});
+
+		addDialog.open();
+
+		if (addDialog.getReturnCode() != Window.OK) {
+			return;
+		}
+
+		// update model
+		selectedBookmark.name = addDialog.getValue();
+
+		// update ui
+		_bookmarkViewer.refresh();
+
+		// reselect bookmark
+		_bookmarkViewer.setSelection(new StructuredSelection(selectedBookmark), true);
+	}
+
+	private void onBookmark_Select() {
+
+		final MapBookmark selectedBookmark = getSelectedBookmark();
+
+		if (selectedBookmark == null) {
+			// this happened when deleting a bookmark
+			return;
+		}
+
+		MapBookmarkManager.fireBookmarkEvent(selectedBookmark);
+
+		enableActions();
+	}
+
+	void onDeleteBookmark(final MapBookmark deletedBookmark) {
+
+		_bookmarkViewer.refresh();
+	}
+
+	void onUpdateBookmark(final MapBookmark updatedBookmark) {
+
+		_bookmarkViewer.refresh(true, true);
 	}
 
 	@Override
@@ -426,7 +646,7 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 	@Override
 	public void reloadViewer() {
 
-		updateUI_MarkerViewer();
+		updateUI_Viewer();
 	}
 
 	private void saveState() {
@@ -443,13 +663,9 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 	@Override
 	public void updateColumnHeader(final ColumnDefinition colDef) {}
 
-	private void updateUI_MarkerViewer() {
+	private void updateUI_Viewer() {
 
-		_isInUpdate = true;
-		{
-			_bookmarkViewer.setInput(new Object[0]);
-		}
-		_isInUpdate = false;
+		_bookmarkViewer.setInput(new Object[0]);
 
 		enableActions();
 	}

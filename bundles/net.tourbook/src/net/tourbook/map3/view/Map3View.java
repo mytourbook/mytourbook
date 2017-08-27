@@ -64,6 +64,7 @@ import net.tourbook.extension.export.ActionExport;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.map.MapColorProvider;
 import net.tourbook.map.bookmark.ActionMapBookmarks;
+import net.tourbook.map.bookmark.IMapBookmarkListener;
 import net.tourbook.map.bookmark.IMapBookmarks;
 import net.tourbook.map.bookmark.MapBookmark;
 import net.tourbook.map.bookmark.MapBookmarkManager;
@@ -145,7 +146,7 @@ import org.eclipse.ui.part.ViewPart;
 /**
  * Display 3-D map with tour tracks.
  */
-public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks {
+public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, IMapBookmarkListener {
 
 // SET_FORMATTING_OFF
 	
@@ -918,6 +919,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks {
 		addSelectionListener();
 		addTourEventListener();
 		addMap3Listener();
+		MapBookmarkManager.addBookmarkListener(this);
 
 		createActions(parent);
 		fillActionBars();
@@ -1075,6 +1077,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks {
 		getViewSite().getPage().removePostSelectionListener(_postSelectionListener);
 		getViewSite().getPage().removePartListener(_partListener);
 
+		MapBookmarkManager.removeBookmarkListener(this);
 		TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
 		_wwCanvas.getInputHandler().removeMouseListener(_wwMouseListener);
@@ -1497,6 +1500,12 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks {
 		updateTrackSlider();
 
 		Map3Manager.getLayer_Marker().onModifyConfig(_allTours);
+	}
+
+	@Override
+	public void onSelectBookmark(final MapBookmark mapBookmark) {
+		
+		moveToMapLocation(mapBookmark);
 	}
 
 	private void onSelectionChanged(final ISelection selection) {
@@ -1988,23 +1997,6 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks {
 		Map3Manager.redrawMap();
 	}
 
-	private void showAllTours_Final(final boolean isSyncMapViewWithTour,
-									final ArrayList<TourMap3Position> allPositions) {
-
-		if (isSyncMapViewWithTour) {
-
-			final Map3ViewController viewController = Map3ViewController.create(_wwCanvas);
-
-			viewController.goToDefaultView(allPositions);
-		}
-
-		updateTrackSlider();
-
-		Map3Manager.redrawMap();
-
-		enableActions();
-	}
-
 	//	public static final String	ALL						= "gov.nasa.worldwind.perfstat.All";
 //
 //	public static final String	FRAME_RATE				= "gov.nasa.worldwind.perfstat.FrameRate";
@@ -2042,6 +2034,23 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks {
 
 //2013-10-06 10:12:12.318'118 [Map3View] 	    463659  JVM total memory (Kb)
 //2013-10-06 10:12:12.318'141 [Map3View] 	    431273  JVM used memory (Kb)
+
+	private void showAllTours_Final(final boolean isSyncMapViewWithTour,
+									final ArrayList<TourMap3Position> allPositions) {
+
+		if (isSyncMapViewWithTour) {
+
+			final Map3ViewController viewController = Map3ViewController.create(_wwCanvas);
+
+			viewController.goToDefaultView(allPositions);
+		}
+
+		updateTrackSlider();
+
+		Map3Manager.redrawMap();
+
+		enableActions();
+	}
 
 	private void showAllTours_InternalTours() {
 

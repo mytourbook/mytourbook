@@ -29,6 +29,7 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
@@ -65,10 +66,6 @@ public class MapBookmarkManager {
 	 */
 	private static final int			CONFIG_VERSION					= 1;
 	//
-
-// SET_FORMATTING_ON
-
-	//
 	// !!! this is a code formatting separator !!!
 	static {}
 	//
@@ -100,20 +97,18 @@ public class MapBookmarkManager {
 	private static final String				ATTR_MAP_POSITION_ZOOM_LEVEL	= "mapPositionZoomLevel";		//$NON-NLS-1$
 	//
 	private static final String				TAG_OPTIONS						= "Options";					//$NON-NLS-1$
-//	private static final String				ATTR_ANIMATION_EASING_TYPE		= "animationEasingType";		//$NON-NLS-1$
-//	private static final String				ATTR_ANIMATION_TIME				= "animationTime";				//$NON-NLS-1$
-//	private static final String				ATTR_IS_ANIMATE_LOCATION		= "isAnimateLocation";			//$NON-NLS-1$
 	private static final String				ATTR_NUMBER_OF_BOOKMARK_ITEMS	= "numberOfBookmarkItems";		//$NON-NLS-1$
 	private static final String				ATTR_NUMBER_OF_RECENT_BOOKMARKS	= "numberOfRecentBookmarks";	//$NON-NLS-1$
 	//
 	private static final int				NUM_RECENT_BOOKMARKS_DEFAULT	= 5;
 	static final int						NUM_RECENT_BOOKMARKS_MIN		= 0;
 	static final int						NUM_RECENT_BOOKMARKS_MAX		= 20;
-
+	//
 	private static final int				NUM_BOOKMARK_ITEMS_DEFAULT		= 20;
 	static final int						NUM_BOOKMARK_ITEMS_MIN			= 3;
 	static final int						NUM_BOOKMARK_ITEMS_MAX			= 100;
-
+	//
+// SET_FORMATTING_ON
 	//
 	/**
 	 * Contains all configurations which are loaded from a xml file.
@@ -128,13 +123,20 @@ public class MapBookmarkManager {
 	public static int						numberOfBookmarkItems			= NUM_BOOKMARK_ITEMS_DEFAULT;
 	public static int						numberOfRecentBookmarks			= NUM_RECENT_BOOKMARKS_DEFAULT;
 
+	/**
+	 * Instance of the map bookmark view or <code>null</code> when not opened
+	 */
+	private static MapBookmarkView			_mapBookmarkView;
+
+	private static final ListenerList		_bookmarkListeners				= new ListenerList(ListenerList.IDENTITY);
+
 	static {
 
 		// load bookmarks
 		readBookmarksFromXml();
 	}
 
-	public static class ActionBookmark_Add extends Action {
+	private static class ActionBookmark_Add extends Action {
 
 		private IMapBookmarks __mapBookmarks;
 
@@ -152,7 +154,7 @@ public class MapBookmarkManager {
 
 	}
 
-	public static class ActionBookmark_Update extends Action {
+	private static class ActionBookmark_Update extends Action {
 
 		private IMapBookmarks __mapBookmarks;
 
@@ -188,7 +190,7 @@ public class MapBookmarkManager {
 		@Override
 		public void run() {
 
-			for (final MapBookmark bookmark : MapBookmarkManager.getAllMapBookmarks()) {
+			for (final MapBookmark bookmark : getAllBookmarks()) {
 
 				if (__bookmarkId.equals(bookmark.id)) {
 
@@ -218,7 +220,7 @@ public class MapBookmarkManager {
 
 			// set text for the OK button
 			final Button _btnSave = getButton(IDialogConstants.OK_ID);
-			_btnSave.setText(Messages.Slideout_MapBookmark_Button_Add);
+			_btnSave.setText(Messages.Map_Bookmark_Button_Add);
 		}
 
 		@Override
@@ -242,14 +244,14 @@ public class MapBookmarkManager {
 
 	}
 
-	public static void actionBookmark_Add(final IMapBookmarks mapBookmarks) {
+	private static void actionBookmark_Add(final IMapBookmarks mapBookmarks) {
 
 		final DialogAddBookmark addDialog = new DialogAddBookmark(
 
 				Display.getDefault().getActiveShell(),
 
-				Messages.Slideout_MapBookmark_Dialog_AddBookmark_Title,
-				Messages.Slideout_MapBookmark_Dialog_AddBookmark_Message,
+				Messages.Map_Bookmark_Dialog_AddBookmark_Title,
+				Messages.Map_Bookmark_Dialog_AddBookmark_Message,
 
 				UI.EMPTY_STRING,
 				new IInputValidator() {
@@ -260,7 +262,7 @@ public class MapBookmarkManager {
 						if (newText.trim().length() == 0) {
 
 							//							return "Set a name for the bookmark";//Messages.Dialog_MapBookmark_Dialog_InvalidName;
-							return Messages.Slideout_MapBookmark_Dialog_ValidationAddName;
+							return Messages.Map_Bookmark_Dialog_ValidationAddName;
 						}
 
 						return null;
@@ -280,10 +282,10 @@ public class MapBookmarkManager {
 		bookmark.name = addDialog.getValue();
 		bookmark.setMapPosition(mapLocation.getMapPosition());
 
-		MapBookmarkManager.addBookmark(bookmark);
+		addBookmark(bookmark);
 	}
 
-	public static void actionBookmark_Update(final IMapBookmarks mapBookmarks) {
+	private static void actionBookmark_Update(final IMapBookmarks mapBookmarks) {
 
 		if (_allRecentBookmarks.size() > 0) {
 
@@ -305,6 +307,10 @@ public class MapBookmarkManager {
 		_allBookmarks.add(bookmark);
 
 		setLastSelectedBookmark(bookmark);
+	}
+
+	public static void addBookmarkListener(final IMapBookmarkListener listener) {
+		_bookmarkListeners.add(listener);
 	}
 
 	private static XMLMemento create_Root() {
@@ -351,7 +357,7 @@ public class MapBookmarkManager {
 			}
 		}
 
-		if (MapBookmarkManager.getAllRecentBookmarks().size() <= 0 || numberOfRecentBookmarks <= 0) {
+		if (getAllRecentBookmarks().size() <= 0 || numberOfRecentBookmarks <= 0) {
 			return;
 		}
 
@@ -361,7 +367,7 @@ public class MapBookmarkManager {
 		menuMgr.add(new Separator());
 
 		int index = 0;
-		final LinkedList<MapBookmark> allRecentBookmarks = MapBookmarkManager.getAllRecentBookmarks();
+		final LinkedList<MapBookmark> allRecentBookmarks = getAllRecentBookmarks();
 
 		for (final MapBookmark bookmark : allRecentBookmarks) {
 
@@ -400,7 +406,7 @@ public class MapBookmarkManager {
 			}
 		}
 
-		if (MapBookmarkManager.getAllRecentBookmarks().size() <= 0 || numberOfRecentBookmarks <= 0) {
+		if (getAllRecentBookmarks().size() <= 0 || numberOfRecentBookmarks <= 0) {
 			return;
 		}
 
@@ -410,7 +416,7 @@ public class MapBookmarkManager {
 //		new Separator().fill(menu, -1);
 
 		int index = 0;
-		final LinkedList<MapBookmark> allRecentBookmarks = MapBookmarkManager.getAllRecentBookmarks();
+		final LinkedList<MapBookmark> allRecentBookmarks = getAllRecentBookmarks();
 
 		for (final MapBookmark bookmark : allRecentBookmarks) {
 
@@ -434,8 +440,15 @@ public class MapBookmarkManager {
 		item.fill(menu, -1);
 	}
 
-	public static ArrayList<MapBookmark> getAllMapBookmarks() {
+	public static void fireBookmarkEvent(final MapBookmark mapBookmark) {
 
+		final Object[] allListeners = _bookmarkListeners.getListeners();
+		for (final Object listener : allListeners) {
+			((IMapBookmarkListener) (listener)).onSelectBookmark(mapBookmark);
+		}
+	}
+
+	public static ArrayList<MapBookmark> getAllBookmarks() {
 		return _allBookmarks;
 	}
 
@@ -448,6 +461,23 @@ public class MapBookmarkManager {
 		final File xmlFile = _stateLocation.append(CONFIG_FILE_NAME).toFile();
 
 		return xmlFile;
+	}
+
+	public static void onDeleteBookmark(final MapBookmark deletedBookmark) {
+
+		MapBookmarkManager.getAllBookmarks().remove(deletedBookmark);
+		MapBookmarkManager.getAllRecentBookmarks().remove(deletedBookmark);
+
+		if (_mapBookmarkView != null) {
+			_mapBookmarkView.onDeleteBookmark(deletedBookmark);
+		}
+	}
+
+	public static void onUpdateBookmark(final MapBookmark updatedBookmark) {
+		
+		if (_mapBookmarkView != null) {
+			_mapBookmarkView.onUpdateBookmark(updatedBookmark);
+		}
 	}
 
 	private static void parse_10_Options(final XMLMemento xmlRoot) {
@@ -644,6 +674,10 @@ public class MapBookmarkManager {
 		}
 	}
 
+	public static void removeBookmarkListener(final IMapBookmarkListener listener) {
+		_bookmarkListeners.remove(listener);
+	}
+
 	public static void saveState() {
 
 		final XMLMemento xmlRoot = create_Root();
@@ -712,6 +746,11 @@ public class MapBookmarkManager {
 
 		_allRecentBookmarks.remove(selectedBookmark);
 		_allRecentBookmarks.addFirst(selectedBookmark);
+	}
+
+	public static void setMapBookmarkView(final MapBookmarkView mapBookmarkView) {
+
+		_mapBookmarkView = mapBookmarkView;
 	}
 
 }

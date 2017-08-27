@@ -44,6 +44,7 @@ import net.tourbook.importdata.RawDataManager;
 import net.tourbook.map.MapColorProvider;
 import net.tourbook.map.MapUtils;
 import net.tourbook.map.bookmark.ActionMapBookmarks;
+import net.tourbook.map.bookmark.IMapBookmarkListener;
 import net.tourbook.map.bookmark.IMapBookmarks;
 import net.tourbook.map.bookmark.MapBookmark;
 import net.tourbook.map.bookmark.MapBookmarkManager;
@@ -161,7 +162,7 @@ import de.byteholder.gpx.PointOfInterest;
  * @since 1.3.0
  */
 public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEventListener, IPhotoPropertiesListener,
-		IMapBookmarks {
+		IMapBookmarks, IMapBookmarkListener {
 
 // SET_FORMATTING_OFF
 	
@@ -1243,6 +1244,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		addSelectionListener();
 		addTourEventListener();
 		addMapListener();
+		MapBookmarkManager.addBookmarkListener(this);
 		PhotoManager.addPhotoEventListener(this);
 
 		// register overlays which draw the tour
@@ -1296,8 +1298,9 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		getViewSite().getPage().removePostSelectionListener(_postSelectionListener);
 		getViewSite().getPage().removePartListener(_partListener);
 
-		TourManager.getInstance().removeTourEventListener(_tourEventListener);
+		MapBookmarkManager.removeBookmarkListener(this);
 		PhotoManager.removePhotoEventListener(this);
+		TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
 		_prefStore.removePropertyChangeListener(_prefChangeListener);
 
@@ -1689,8 +1692,14 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 		final MapPosition mapPosition = mapBookmark.getMapPosition();
 
-		_map.setZoom(mapPosition.zoomLevel + 2);
+		_map.setZoom(mapPosition.zoomLevel + 1);
 		_map.setMapCenter(new GeoPosition(mapPosition.getLatitude(), mapPosition.getLongitude()));
+	}
+
+	@Override
+	public void onSelectBookmark(final MapBookmark mapBookmark) {
+
+		moveToMapLocation(mapBookmark);
 	}
 
 	private void onSelectionChanged(final ISelection selection) {

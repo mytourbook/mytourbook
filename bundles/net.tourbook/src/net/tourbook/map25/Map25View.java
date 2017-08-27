@@ -44,11 +44,10 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.map.bookmark.ActionMapBookmarks;
+import net.tourbook.map.bookmark.IMapBookmarkListener;
 import net.tourbook.map.bookmark.IMapBookmarks;
 import net.tourbook.map.bookmark.MapBookmark;
 import net.tourbook.map.bookmark.MapBookmarkManager;
-import net.tourbook.map.bookmark.MapBookmarkManager.ActionBookmark_Add;
-import net.tourbook.map.bookmark.MapBookmarkManager.ActionBookmark_Update;
 import net.tourbook.map.bookmark.MapLocation;
 import net.tourbook.map25.action.ActionMap25_ShowMarker;
 import net.tourbook.map25.action.ActionSelectMap25Provider;
@@ -100,7 +99,7 @@ import org.oscim.utils.Easing;
 
 import de.byteholder.gpx.PointOfInterest;
 
-public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDialogs {
+public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDialogs, IMapBookmarkListener {
 
 // SET_FORMATTING_OFF
 	//
@@ -141,8 +140,6 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 	private ActionMapBookmarks				_actionMapBookmarks;
 	private ActionMap25_Options				_actionMapOptions;
 	private ActionMap25_ShowMarker			_actionMarkerOptions;
-	private ActionBookmark_Add				_actionBookmark_Add;
-	private ActionBookmark_Update			_actionBookmark_Update;
 	private ActionSelectMap25Provider		_actionSelectMapProvider;
 	private ActionSynchMapWithChartSlider	_actionSynchMapWithChartSlider;
 	private ActionSynchMapWithTour			_actionSynchMapWithTour;
@@ -639,6 +636,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		addPartListener();
 		addTourEventListener();
 		addSelectionListener();
+		MapBookmarkManager.addBookmarkListener(this);
 
 		showToursFromTourProvider();
 	}
@@ -688,7 +686,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 			_mapApp.stop();
 		}
 
-//		_wwCanvas.getInputHandler().removeMouseListener(_wwMouseListener);
+		MapBookmarkManager.removeBookmarkListener(this);
+		TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
 		disposeContextMenu();
 
@@ -804,6 +803,12 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 			}
 		});
 
+	}
+
+	@Override
+	public void onSelectBookmark(final MapBookmark mapBookmark) {
+
+		moveToMapLocation(mapBookmark);
 	}
 
 	private void onSelectionChanged(final ISelection selection) {

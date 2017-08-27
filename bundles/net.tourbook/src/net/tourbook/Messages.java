@@ -1102,6 +1102,24 @@ public class Messages extends NLS {
 
 	public static String		Map_Action_SynchWithOtherMap;
 
+	public static String		Map_Bookmark_Action_Bookmark_Delete;
+	public static String		Map_Bookmark_Action_Bookmark_Rename;
+	public static String		Map_Bookmark_Button_Add;
+	public static String		Map_Bookmark_Button_Rename;
+	public static String		Map_Bookmark_Column_Latitude;
+	public static String		Map_Bookmark_Column_Latitude_Tooltip;
+	public static String		Map_Bookmark_Column_Longitude;
+	public static String		Map_Bookmark_Column_Longitude_Tooltip;
+	public static String		Map_Bookmark_Column_Name;
+	public static String		Map_Bookmark_Column_ZoomLevel;
+	public static String		Map_Bookmark_Column_ZoomLevel_Tooltip;
+	public static String		Map_Bookmark_Dialog_AddBookmark_Message;
+	public static String		Map_Bookmark_Dialog_AddBookmark_Title;
+	public static String		Map_Bookmark_Dialog_RenameBookmark_Message;
+	public static String		Map_Bookmark_Dialog_RenameBookmark_Title;
+	public static String		Map_Bookmark_Dialog_ValidationAddName;
+	public static String		Map_Bookmark_Dialog_ValidationRename;
+
 	public static String		Map25_Config_ClusterAlgorithm_FirstMarker_Distance;
 	public static String		Map25_Config_ClusterAlgorithm_FirstMarker_Grid;
 	public static String		Map25_Config_ClusterAlgorithm_Grid;
@@ -1626,21 +1644,6 @@ public class Messages extends NLS {
 	public static String		Slideout_Map25MarkerOptions_Label_Title;
 	public static String		Slideout_Map25MarkerOptions_Spinner_SymbolSize_Tooltip;
 
-	public static String		Slideout_MapBookmark_Button_Add;
-	public static String		Slideout_MapBookmark_Button_Rename;
-	public static String		Slideout_MapBookmark_Column_Latitude;
-	public static String		Slideout_MapBookmark_Column_Latitude_Tooltip;
-	public static String		Slideout_MapBookmark_Column_Longitude;
-	public static String		Slideout_MapBookmark_Column_Longitude_Tooltip;
-	public static String		Slideout_MapBookmark_Column_Name;
-	public static String		Slideout_MapBookmark_Column_ZoomLevel;
-	public static String		Slideout_MapBookmark_Column_ZoomLevel_Tooltip;
-	public static String		Slideout_MapBookmark_Dialog_AddBookmark_Message;
-	public static String		Slideout_MapBookmark_Dialog_AddBookmark_Title;
-	public static String		Slideout_MapBookmark_Dialog_RenameBookmark_Message;
-	public static String		Slideout_MapBookmark_Dialog_RenameBookmark_Title;
-	public static String		Slideout_MapBookmark_Dialog_ValidationAddName;
-	public static String		Slideout_MapBookmark_Dialog_ValidationRename;
 	public static String		Slideout_MapBookmark_Label_NumBookmarkListItems;
 	public static String		Slideout_MapBookmark_Label_NumBookmarkListItems_Tooltip;
 	public static String		Slideout_MapBookmark_Label_NumContextMenuItems;

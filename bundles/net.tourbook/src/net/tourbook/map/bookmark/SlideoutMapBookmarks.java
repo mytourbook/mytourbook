@@ -21,9 +21,7 @@ import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 
-import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IInputValidator;
-import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
@@ -54,13 +52,10 @@ import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -97,11 +92,8 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 	private Button			_btnDelete;
 	private Button			_btnRename;
 
-
-
 	private Spinner			_spinnerNumRecentBookmarks;
 	private Spinner			_spinnerNumBookmarkItems;
-
 
 	private class BookmarkComparator extends ViewerComparator {
 
@@ -133,53 +125,11 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 
 		@Override
 		public Object[] getElements(final Object inputElement) {
-			return MapBookmarkManager.getAllMapBookmarks().toArray();
+			return MapBookmarkManager.getAllBookmarks().toArray();
 		}
 
 		@Override
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
-	}
-
-	public class BookmarkRenameDialog extends InputDialog {
-
-		public BookmarkRenameDialog(final Shell parentShell,
-									final String dialogTitle,
-									final String dialogMessage,
-									final String initialValue,
-									final IInputValidator validator) {
-
-			super(parentShell, dialogTitle, dialogMessage, initialValue, validator);
-		}
-
-		@Override
-		protected void createButtonsForButtonBar(final Composite parent) {
-
-			super.createButtonsForButtonBar(parent);
-
-			// set text for the OK button
-			final Button _btnSave = getButton(IDialogConstants.OK_ID);
-			_btnSave.setText(Messages.Slideout_MapBookmark_Button_Rename);
-		}
-
-		@Override
-		protected Point getInitialLocation(final Point initialSize) {
-
-			try {
-
-				final Point cursorLocation = Display.getCurrent().getCursorLocation();
-
-				// center below the cursor location
-				cursorLocation.x -= initialSize.x / 2;
-				cursorLocation.y += 50;
-
-				return cursorLocation;
-
-			} catch (final NumberFormatException ex) {
-
-				return super.getInitialLocation(initialSize);
-			}
-		}
-
 	}
 
 	/**
@@ -292,7 +242,7 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 
 			tvc = new TableViewerColumn(_bookmarkViewer, SWT.LEAD);
 			tc = tvc.getColumn();
-			tc.setText(Messages.Slideout_MapBookmark_Column_Name);
+			tc.setText(Messages.Map_Bookmark_Column_Name);
 			tvc.setLabelProvider(new CellLabelProvider() {
 				@Override
 				public void update(final ViewerCell cell) {
@@ -309,8 +259,8 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 
 			tvc = new TableViewerColumn(_bookmarkViewer, SWT.TRAIL);
 			tc = tvc.getColumn();
-			tc.setText(Messages.Slideout_MapBookmark_Column_ZoomLevel);
-			tc.setToolTipText(Messages.Slideout_MapBookmark_Column_ZoomLevel_Tooltip);
+			tc.setText(Messages.Map_Bookmark_Column_ZoomLevel);
+			tc.setToolTipText(Messages.Map_Bookmark_Column_ZoomLevel_Tooltip);
 			tvc.setLabelProvider(new CellLabelProvider() {
 				@Override
 				public void update(final ViewerCell cell) {
@@ -328,8 +278,8 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 
 			tvc = new TableViewerColumn(_bookmarkViewer, SWT.TRAIL);
 			tc = tvc.getColumn();
-			tc.setText(Messages.Slideout_MapBookmark_Column_Latitude);
-			tc.setToolTipText(Messages.Slideout_MapBookmark_Column_Latitude_Tooltip);
+			tc.setText(Messages.Map_Bookmark_Column_Latitude);
+			tc.setToolTipText(Messages.Map_Bookmark_Column_Latitude_Tooltip);
 			tvc.setLabelProvider(new CellLabelProvider() {
 				@Override
 				public void update(final ViewerCell cell) {
@@ -347,8 +297,8 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 
 			tvc = new TableViewerColumn(_bookmarkViewer, SWT.TRAIL);
 			tc = tvc.getColumn();
-			tc.setText(Messages.Slideout_MapBookmark_Column_Longitude);
-			tc.setToolTipText(Messages.Slideout_MapBookmark_Column_Longitude_Tooltip);
+			tc.setText(Messages.Map_Bookmark_Column_Longitude);
+			tc.setToolTipText(Messages.Map_Bookmark_Column_Longitude_Tooltip);
 			tvc.setLabelProvider(new CellLabelProvider() {
 				@Override
 				public void update(final ViewerCell cell) {
@@ -380,7 +330,7 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 
 			@Override
 			public void doubleClick(final DoubleClickEvent event) {
-				onBookmark_Rename();
+				onBookmark_Rename(true);
 			}
 		});
 
@@ -389,8 +339,18 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 			@Override
 			public void keyPressed(final KeyEvent e) {
 
-				if (e.keyCode == SWT.DEL) {
+				switch (e.keyCode) {
+
+				case SWT.DEL:
 					onBookmark_Delete();
+					break;
+
+				case SWT.F2:
+					onBookmark_Rename(false);
+					break;
+
+				default:
+					break;
 				}
 			}
 
@@ -418,7 +378,7 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 				_btnRename.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
-						onBookmark_Rename();
+						onBookmark_Rename(false);
 					}
 				});
 
@@ -499,7 +459,6 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 		}
 	}
 
-
 	private void enableActions() {
 
 		final MapBookmark selectedBookmark = getSelectedBookmark();
@@ -550,8 +509,7 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 		}
 
 		// update model
-		MapBookmarkManager.getAllMapBookmarks().remove(selectedBookmark);
-		MapBookmarkManager.getAllRecentBookmarks().remove(selectedBookmark);
+		MapBookmarkManager.onDeleteBookmark(selectedBookmark);
 
 		// update UI
 		_bookmarkViewer.refresh();
@@ -559,23 +517,24 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 		enableActions();
 	}
 
-	private void onBookmark_Rename() {
+	private void onBookmark_Rename(final boolean isOpenedWithMouse) {
 
 		final MapBookmark selectedBookmark = getSelectedBookmark();
 
 		final BookmarkRenameDialog addDialog = new BookmarkRenameDialog(
 
 				_parent.getShell(),
-				Messages.Slideout_MapBookmark_Dialog_RenameBookmark_Title,
-				Messages.Slideout_MapBookmark_Dialog_RenameBookmark_Message,
+				Messages.Map_Bookmark_Dialog_RenameBookmark_Title,
+				Messages.Map_Bookmark_Dialog_RenameBookmark_Message,
 				selectedBookmark.name,
+				isOpenedWithMouse,
 				new IInputValidator() {
 
 					@Override
 					public String isValid(final String newText) {
 
 						if (newText.trim().length() == 0) {
-							return Messages.Slideout_MapBookmark_Dialog_ValidationRename;
+							return Messages.Map_Bookmark_Dialog_ValidationRename;
 						}
 
 						return null;
@@ -594,6 +553,7 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 
 		// update model
 		selectedBookmark.name = addDialog.getValue();
+		MapBookmarkManager.onUpdateBookmark(selectedBookmark);
 
 		// update ui
 		_bookmarkViewer.refresh();
