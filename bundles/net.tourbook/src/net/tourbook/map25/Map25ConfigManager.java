@@ -42,6 +42,7 @@ import org.oscim.map.Animator;
 import org.oscim.map.Map;
 import org.oscim.utils.Easing;
 import org.oscim.utils.Easing.Type;
+import org.oscim.utils.ThreadUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
@@ -965,6 +966,25 @@ public class Map25ConfigManager {
 //		System.out.println((UI.timeStampNano() + " [" + "] ") + ("\tsetMapLocation: " + mapPosition));
 //		// TODO remove SYSTEM.OUT.PRINTLN
 
+		if (ThreadUtils.isMainThread()) {
+
+			setMapLocation_InMapThread(map, mapPosition);
+
+		} else {
+
+			map.post(new Runnable() {
+				@Override
+				public void run() {
+
+					setMapLocation_InMapThread(map, mapPosition);
+				}
+			});
+		}
+
+	}
+
+	private static void setMapLocation_InMapThread(final Map map, final MapPosition mapPosition) {
+
 		if (animationTime == 0 || isAnimateLocation == false) {
 
 			map.setMapPosition(mapPosition);
@@ -977,6 +997,6 @@ public class Map25ConfigManager {
 					animationEasingType);
 		}
 
-		map.updateMap(false);
+		map.updateMap(true);
 	}
 }

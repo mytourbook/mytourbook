@@ -41,7 +41,9 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.importdata.RawDataManager;
+import net.tourbook.map.IMapSyncListener;
 import net.tourbook.map.MapColorProvider;
+import net.tourbook.map.MapManager;
 import net.tourbook.map.MapUtils;
 import net.tourbook.map.bookmark.ActionMapBookmarks;
 import net.tourbook.map.bookmark.IMapBookmarkListener;
@@ -70,6 +72,7 @@ import net.tourbook.map2.action.ActionShowTourInMap;
 import net.tourbook.map2.action.ActionShowTourInfoInMap;
 import net.tourbook.map2.action.ActionShowTourMarker;
 import net.tourbook.map2.action.ActionShowWayPoints;
+import net.tourbook.map2.action.ActionSyncMap2WithOtherMap;
 import net.tourbook.map2.action.ActionSynchTourZoomLevel;
 import net.tourbook.map2.action.ActionSynchWithPhoto;
 import net.tourbook.map2.action.ActionSynchWithSlider;
@@ -147,6 +150,7 @@ import de.byteholder.geoclipse.GeoclipseExtensions;
 import de.byteholder.geoclipse.map.IMapContextProvider;
 import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.MapLegend;
+import de.byteholder.geoclipse.map.event.IMapPanListener;
 import de.byteholder.geoclipse.map.event.IPOIListener;
 import de.byteholder.geoclipse.map.event.IPositionListener;
 import de.byteholder.geoclipse.map.event.IZoomListener;
@@ -162,7 +166,7 @@ import de.byteholder.gpx.PointOfInterest;
  * @since 1.3.0
  */
 public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEventListener, IPhotoPropertiesListener,
-		IMapBookmarks, IMapBookmarkListener {
+		IMapBookmarks, IMapBookmarkListener, IMapPanListener, IMapSyncListener {
 
 // SET_FORMATTING_OFF
 	
@@ -179,34 +183,36 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	private static final String			IMAGE_ACTION_TOUR_COLOR_SPEED				= net.tourbook.Messages.Image__graph_speed;
 	private static final String			IMAGE_ACTION_TOUR_COLOR_SPEED_DISABLED		= net.tourbook.Messages.Image__graph_speed_disabled;
 
-	private static final String			STATE_IS_SHOW_TOUR_IN_MAP					= "STATE_IS_SHOW_TOUR_IN_MAP";		//$NON-NLS-1$
-	private static final String			STATE_IS_SHOW_PHOTO_IN_MAP					= "STATE_IS_SHOW_PHOTO_IN_MAP";		//$NON-NLS-1$
-	private static final String			STATE_IS_SHOW_LEGEND_IN_MAP					= "STATE_IS_SHOW_LEGEND_IN_MAP";	//$NON-NLS-1$
-	private static final String			STATE_SYNC_WITH_PHOTO						= "STATE_SYNC_WITH_PHOTO";			//$NON-NLS-1$
-	private static final String			MEMENTO_SHOW_START_END_IN_MAP				= "action.show-start-end-in-map";							//$NON-NLS-1$
-	private static final String			MEMENTO_SHOW_TOUR_MARKER					= "action.show-tour-marker";		//$NON-NLS-1$
-	private static final String			MEMENTO_SHOW_SLIDER_IN_MAP					= "action.show-slider-in-map";		//$NON-NLS-1$
-	private static final String			MEMENTO_SHOW_SLIDER_IN_LEGEND				= "action.show-slider-in-legend";							//$NON-NLS-1$
-	private static final String			MEMENTO_SHOW_SCALE_IN_MAP					= "action.show-scale-in-map";		//$NON-NLS-1$
-	private static final String			MEMENTO_SHOW_TOUR_INFO_IN_MAP				= "action.show-tour-info-in-map";							//$NON-NLS-1$
-	private static final String			MEMENTO_SHOW_WAY_POINTS						= "action.show-way-points-in-map";							//$NON-NLS-1$
-	private static final String			MEMENTO_SYNCH_WITH_SELECTED_TOUR			= "action.synch-with-selected-tour";						//$NON-NLS-1$
-	private static final String			MEMENTO_SYNCH_WITH_TOURCHART_SLIDER			= "action.synch-with-tourchart-slider";					//$NON-NLS-1$
-	private static final String			MEMENTO_ZOOM_CENTERED						= "action.zoom-centered";			//$NON-NLS-1$
-	private static final String			MEMENTO_MAP_DIM_LEVEL						= "action.map-dim-level";			//$NON-NLS-1$
+	private static final String			STATE_IS_SHOW_TOUR_IN_MAP					= "STATE_IS_SHOW_TOUR_IN_MAP";				//$NON-NLS-1$
+	private static final String			STATE_IS_SHOW_PHOTO_IN_MAP					= "STATE_IS_SHOW_PHOTO_IN_MAP";				//$NON-NLS-1$
+	private static final String			STATE_IS_SHOW_LEGEND_IN_MAP					= "STATE_IS_SHOW_LEGEND_IN_MAP";			//$NON-NLS-1$
+	private static final String 		STATE_IS_SYNC_MAP2_WITH_OTHER_MAP			= "STATE_IS_SYNC_MAP2_WITH_OTHER_MAP";		//$NON-NLS-1$
+	private static final String			STATE_SYNC_WITH_PHOTO						= "STATE_SYNC_WITH_PHOTO";					//$NON-NLS-1$
+	private static final String			MEMENTO_SHOW_START_END_IN_MAP				= "action.show-start-end-in-map";			//$NON-NLS-1$
+	private static final String			MEMENTO_SHOW_TOUR_MARKER					= "action.show-tour-marker";				//$NON-NLS-1$
+	private static final String			MEMENTO_SHOW_SLIDER_IN_MAP					= "action.show-slider-in-map";				//$NON-NLS-1$
+	private static final String			MEMENTO_SHOW_SLIDER_IN_LEGEND				= "action.show-slider-in-legend";			//$NON-NLS-1$
+	private static final String			MEMENTO_SHOW_SCALE_IN_MAP					= "action.show-scale-in-map";				//$NON-NLS-1$
+	private static final String			MEMENTO_SHOW_TOUR_INFO_IN_MAP				= "action.show-tour-info-in-map";			//$NON-NLS-1$
+	private static final String			MEMENTO_SHOW_WAY_POINTS						= "action.show-way-points-in-map";			//$NON-NLS-1$
+	private static final String			MEMENTO_SYNCH_WITH_SELECTED_TOUR			= "action.synch-with-selected-tour";		//$NON-NLS-1$
+	private static final String			MEMENTO_SYNCH_WITH_TOURCHART_SLIDER			= "action.synch-with-tourchart-slider";		//$NON-NLS-1$
+	private static final String			MEMENTO_ZOOM_CENTERED						= "action.zoom-centered";					//$NON-NLS-1$
+	private static final String			MEMENTO_MAP_DIM_LEVEL						= "action.map-dim-level";					//$NON-NLS-1$
 
-	private static final String			MEMENTO_SYNCH_TOUR_ZOOM_LEVEL				= "synch-tour-zoom-level";			//$NON-NLS-1$
-	private static final String			MEMENTO_SELECTED_MAP_PROVIDER_ID			= "selected.map-provider-id";		//$NON-NLS-1$
+	private static final String			MEMENTO_SYNCH_TOUR_ZOOM_LEVEL				= "synch-tour-zoom-level";					//$NON-NLS-1$
+	private static final String			MEMENTO_SELECTED_MAP_PROVIDER_ID			= "selected.map-provider-id";				//$NON-NLS-1$
 
-	private static final String			MEMENTO_DEFAULT_POSITION_ZOOM				= "default.position.zoom-level";	//$NON-NLS-1$
-	private static final String			MEMENTO_DEFAULT_POSITION_LATITUDE			= "default.position.latitude";		//$NON-NLS-1$
-	private static final String			MEMENTO_DEFAULT_POSITION_LONGITUDE			= "default.position.longitude";		//$NON-NLS-1$
+	private static final String			MEMENTO_DEFAULT_POSITION_ZOOM				= "default.position.zoom-level";			//$NON-NLS-1$
+	private static final String			MEMENTO_DEFAULT_POSITION_LATITUDE			= "default.position.latitude";				//$NON-NLS-1$
+	private static final String			MEMENTO_DEFAULT_POSITION_LONGITUDE			= "default.position.longitude";				//$NON-NLS-1$
 
-	private static final String			MEMENTO_TOUR_COLOR_ID						= "tour-color-id";					//$NON-NLS-1$
+	private static final String			MEMENTO_TOUR_COLOR_ID						= "tour-color-id";							//$NON-NLS-1$
 
-	static final String					PREF_SHOW_TILE_INFO							= "MapDebug.ShowTileInfo";			//$NON-NLS-1$
-	static final String					PREF_SHOW_TILE_BORDER						= "MapDebug.ShowTileBorder";		//$NON-NLS-1$
-	static final String					PREF_DEBUG_MAP_DIM_LEVEL					= "MapDebug.MapDimLevel";			//$NON-NLS-1$
+	static final String					PREF_SHOW_TILE_INFO							= "MapDebug.ShowTileInfo";					//$NON-NLS-1$
+	static final String					PREF_SHOW_TILE_BORDER						= "MapDebug.ShowTileBorder";				//$NON-NLS-1$
+	static final String					PREF_DEBUG_MAP_DIM_LEVEL					= "MapDebug.MapDimLevel";					//$NON-NLS-1$
+
 
 	private final IPreferenceStore		_prefStore									= TourbookPlugin.getPrefStore();
 	private final IDialogSettings		_state										= TourbookPlugin.getState(ID);
@@ -246,13 +252,15 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	private boolean							_isShowPhoto;
 	private boolean							_isShowLegend;
 
+	private boolean							_isSyncMap2WithOtherMap;
 	private boolean							_isMapSynchedWithPhoto;
 	private boolean							_isMapSynchedWithTour;
 	private boolean							_isMapSynchedWithSlider;
 	private boolean							_isPositionCentered;
 
 	private int								_defaultZoom;
-	private GeoPosition						_defaultPosition							= null;
+	private GeoPosition						_defaultPosition;
+	private MapPosition						_panMapPosition;
 
 	/**
 	 * when <code>true</code> a tour is painted, <code>false</code> a point of interrest is painted
@@ -336,10 +344,11 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	private ActionShowTourInfoInMap			_actionShowTourInfoInMap;
 	private ActionShowTourMarker			_actionShowTourMarker;
 	private ActionShowWayPoints				_actionShowWayPoints;
+	private ActionSynchTourZoomLevel		_actionSynchTourZoomLevel;
+	private ActionSyncMap2WithOtherMap		_actionSynchMap2WithOtherMap;
 	private ActionSynchWithPhoto			_actionSynchWithPhoto;
 	private ActionSynchWithSlider			_actionSynchWithSlider;
 	private ActionSynchWithTour				_actionSynchWithTour;
-	private ActionSynchTourZoomLevel		_actionSynchTourZoomLevel;
 
 	private ActionZoomIn					_actionZoomIn;
 	private ActionZoomOut					_actionZoomOut;
@@ -561,6 +570,11 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		paintTours_10_All();
 	}
 
+	public void actionSynchMapWithOtherMap() {
+		// TODO Auto-generated method stub
+
+	}
+
 	/**
 	 * Sync map with photo
 	 */
@@ -701,6 +715,8 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 				_actionShowPOI.setChecked(true);
 			}
 		});
+
+		_map.addMapPanListener(this);
 
 		_map.setMapContextProvider(this);
 	}
@@ -1037,6 +1053,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_actionZoomShowAll = new ActionZoomShowEntireEarth(this);
 		_actionShowEntireTour = new ActionZoomShowEntireTour(this);
 
+		_actionSynchMap2WithOtherMap = new ActionSyncMap2WithOtherMap(this);
 		_actionSynchWithPhoto = new ActionSynchWithPhoto(this);
 		_actionSynchWithTour = new ActionSynchWithTour(this);
 		_actionSynchWithSlider = new ActionSynchWithSlider(this);
@@ -1246,6 +1263,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		addMapListener();
 		MapBookmarkManager.addBookmarkListener(this);
 		PhotoManager.addPhotoEventListener(this);
+		MapManager.addMapSyncListener(this);
 
 		// register overlays which draw the tour
 		GeoclipseExtensions.registerOverlays(_map);
@@ -1433,6 +1451,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		viewTbm.add(_actionShowEntireTour);
 		viewTbm.add(_actionSynchWithTour);
 		viewTbm.add(_actionSynchWithSlider);
+		viewTbm.add(_actionSynchMap2WithOtherMap);
 		viewTbm.add(new Separator());
 
 		viewTbm.add(_actionMapBookmarks);
@@ -1694,6 +1713,14 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 		_map.setZoom(mapPosition.zoomLevel + 1);
 		_map.setMapCenter(new GeoPosition(mapPosition.getLatitude(), mapPosition.getLongitude()));
+	}
+
+	@Override
+	public void onDragMap(final GeoPosition geoCenter, final int zoomLevel) {
+
+		_panMapPosition = new MapLocation(geoCenter, zoomLevel - 1).getMapPosition();
+
+		MapManager.fireSyncMapEvent(_panMapPosition);
 	}
 
 	@Override
@@ -2584,7 +2611,11 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_actionZoomCentered.setChecked(isTourCentered);
 		_isPositionCentered = isTourCentered;
 
-		// checkbox: synch map with tour
+		// synch map with another map
+		_isSyncMap2WithOtherMap = Util.getStateBoolean(_state, STATE_IS_SYNC_MAP2_WITH_OTHER_MAP, true);
+		_actionSynchMap2WithOtherMap.setChecked(_isSyncMap2WithOtherMap);
+
+		// synch map with tour
 		final boolean isSynchTour = Util.getStateBoolean(_state, MEMENTO_SYNCH_WITH_SELECTED_TOUR, true);
 		_actionSynchWithTour.setChecked(isSynchTour);
 		_isMapSynchedWithTour = isSynchTour;
@@ -2795,6 +2826,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_state.put(STATE_IS_SHOW_PHOTO_IN_MAP, _isShowPhoto);
 		_state.put(STATE_IS_SHOW_LEGEND_IN_MAP, _isShowLegend);
 
+		_state.put(STATE_IS_SYNC_MAP2_WITH_OTHER_MAP, _isSyncMap2WithOtherMap);
 		_state.put(STATE_SYNC_WITH_PHOTO, _isMapSynchedWithPhoto);
 
 		_state.put(MEMENTO_ZOOM_CENTERED, _actionZoomCentered.isChecked());
@@ -3047,6 +3079,28 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 					paintTours_10_All();
 				}
+			}
+		});
+	}
+
+	@Override
+	public void syncMapWithOtherMap(final MapPosition mapPosition) {
+
+		if (_panMapPosition == mapPosition) {
+
+			// event is fired from this map -> ignore
+
+			return;
+		}
+
+		// run in UI thread
+
+		_parent.getDisplay().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+
+				_map.setZoom(mapPosition.zoomLevel + 1);
+				_map.setMapCenter(new GeoPosition(mapPosition.getLatitude(), mapPosition.getLongitude()));
 			}
 		});
 	}

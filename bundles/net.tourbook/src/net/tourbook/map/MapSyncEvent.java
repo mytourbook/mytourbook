@@ -13,33 +13,8 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.map3.action;
+package net.tourbook.map;
 
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.map3.view.Map3View;
-
-import org.eclipse.jface.action.Action;
-
-public class ActionSyncMapWithOtherMaps extends Action {
-
-	private Map3View _map3View;
-
-	public ActionSyncMapWithOtherMaps(final Map3View mapView) {
-
-		super(null, AS_CHECK_BOX);
-
-		_map3View = mapView;
-
-		setToolTipText(Messages.Map_Action_SynchWithOtherMap);
-
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__SyncMapWithOtherMap));
-		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__SyncMapWithOtherMap_Disabled));
-	}
-
-	@Override
-	public void run() {
-		_map3View.actionSynchMapWithOtherMap();
-	}
+public interface MapSyncEvent {
 
 }

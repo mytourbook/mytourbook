@@ -43,6 +43,8 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.importdata.RawDataManager;
+import net.tourbook.map.IMapSyncListener;
+import net.tourbook.map.MapManager;
 import net.tourbook.map.bookmark.ActionMapBookmarks;
 import net.tourbook.map.bookmark.IMapBookmarkListener;
 import net.tourbook.map.bookmark.IMapBookmarks;
@@ -52,6 +54,7 @@ import net.tourbook.map.bookmark.MapLocation;
 import net.tourbook.map25.action.ActionMap25_ShowMarker;
 import net.tourbook.map25.action.ActionSelectMap25Provider;
 import net.tourbook.map25.action.ActionShowEntireTour;
+import net.tourbook.map25.action.ActionSyncMap2WithOtherMap;
 import net.tourbook.map25.action.ActionSynchMapWithChartSlider;
 import net.tourbook.map25.action.ActionSynchMapWithTour;
 import net.tourbook.map25.layer.marker.MapMarker;
@@ -99,7 +102,8 @@ import org.oscim.utils.Easing;
 
 import de.byteholder.gpx.PointOfInterest;
 
-public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDialogs, IMapBookmarkListener {
+public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDialogs, IMapBookmarkListener,
+		IMapSyncListener {
 
 // SET_FORMATTING_OFF
 	//
@@ -116,6 +120,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 	private static final String		STATE_IS_LAYER_SCALE_BAR_VISIBLE		= "STATE_IS_LAYER_SCALE_BAR_VISIBLE";			//$NON-NLS-1$
 	private static final String		STATE_IS_LAYER_TILE_INFO_VISIBLE		= "STATE_IS_LAYER_TILE_INFO_VISIBLE";			//$NON-NLS-1$
 	private static final String		STATE_IS_LAYER_TOUR_VISIBLE				= "STATE_IS_LAYER_TOUR_VISIBLE";				//$NON-NLS-1$
+	private static final String 	STATE_IS_SYNC_MAP25_WITH_OTHER_MAP		= "STATE_IS_SYNC_MAP25_WITH_OTHER_MAP";			//$NON-NLS-1$
 	private static final String		STATE_IS_SYNCH_MAP_WITH_CHART_SLIDER	= "STATE_SYNCH_MAP_WITH_CHART_SLIDER";			//$NON-NLS-1$
 	private static final String		STATE_IS_SYNCH_MAP_WITH_TOUR			= "STATE_SYNCH_MAP_WITH_TOUR";					//$NON-NLS-1$
 	//
@@ -143,6 +148,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 	private ActionSelectMap25Provider		_actionSelectMapProvider;
 	private ActionSynchMapWithChartSlider	_actionSynchMapWithChartSlider;
 	private ActionSynchMapWithTour			_actionSynchMapWithTour;
+	private ActionSyncMap2WithOtherMap		_actionSynchMap25WithOtherMap;
 	private ActionShowEntireTour			_actionShowEntireTour;
 	private ActionTourTrackConfig			_actionTrackOptions;
 	//
@@ -154,6 +160,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 	private int								_hashTourId;
 	private int								_hashTourData;
 	//
+	private boolean							_isSyncMap25WithOtherMap;
 	private boolean							_isSynchMapWithChartSlider;
 	private boolean							_isSynchMapWithTour;
 	//
@@ -306,6 +313,11 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 //			_isMapSynchedWithSlider = false;
 //			_actionSynchWithSlider.setChecked(false);
 //		}
+	}
+
+	public void actionSynchMapWithOtherMap() {
+		// TODO Auto-generated method stub
+
 	}
 
 	public void actionZoomShowEntireTour() {
@@ -480,6 +492,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		_actionMapOptions = new ActionMap25_Options();
 		_actionSelectMapProvider = new ActionSelectMap25Provider(this);
 		_actionShowEntireTour = new ActionShowEntireTour(this);
+		_actionSynchMap25WithOtherMap = new ActionSyncMap2WithOtherMap(this);
 		_actionSynchMapWithTour = new ActionSynchMapWithTour(this);
 		_actionSynchMapWithChartSlider = new ActionSynchMapWithChartSlider(this);
 		_actionTrackOptions = new ActionTourTrackConfig();
@@ -637,6 +650,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		addTourEventListener();
 		addSelectionListener();
 		MapBookmarkManager.addBookmarkListener(this);
+		MapManager.addMapSyncListener(this);
 
 		showToursFromTourProvider();
 	}
@@ -687,6 +701,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		}
 
 		MapBookmarkManager.removeBookmarkListener(this);
+		MapManager.removeMapSyncListener(this);
 		TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
 		disposeContextMenu();
@@ -745,6 +760,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		tbm.add(_actionShowEntireTour);
 		tbm.add(_actionSynchMapWithTour);
 		tbm.add(_actionSynchMapWithChartSlider);
+		tbm.add(_actionSynchMap25WithOtherMap);
 
 		tbm.add(new Separator());
 
@@ -790,19 +806,16 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		MapBookmarkManager.setLastSelectedBookmark(selectedBookmark);
 
 		final Map map = _mapApp.getMap();
+		final MapPosition mapPosition = selectedBookmark.getMapPosition();
 
-		// must be run in the map thread
-		map.post(new Runnable() {
+		Map25ConfigManager.setMapLocation(map, mapPosition);
+	}
 
-			@Override
-			public void run() {
+	public boolean onDragMap(final int screenX, final int screenY, final int pointer, final MapPosition mapPosition) {
 
-				final MapPosition mapPosition = selectedBookmark.getMapPosition();
+		MapManager.fireSyncMapEvent(mapPosition);
 
-				Map25ConfigManager.setMapLocation(map, mapPosition);
-			}
-		});
-
+		return false;
 	}
 
 	@Override
@@ -1160,6 +1173,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 				_allBoundingBox = createBoundingBox(_allGeoPoints);
 
 				if (_isSynchMapWithTour) {
+
 					final int animationTime = Map25ConfigManager.getActiveTourTrackConfig().animationTime;
 					Map25ConfigManager.setMapLocation(map25, _allBoundingBox, animationTime);
 				}
@@ -1205,6 +1219,10 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		_actionSynchMapWithChartSlider.setChecked(isSynchWithSlider);
 		_isSynchMapWithChartSlider = isSynchWithSlider;
 
+		// synch map with another map
+		_isSyncMap25WithOtherMap = Util.getStateBoolean(_state, STATE_IS_SYNC_MAP25_WITH_OTHER_MAP, true);
+		_actionSynchMap25WithOtherMap.setChecked(_isSyncMap25WithOtherMap);
+
 		enableActions();
 	}
 
@@ -1212,6 +1230,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 		_state.put(STATE_IS_SYNCH_MAP_WITH_CHART_SLIDER, _actionSynchMapWithChartSlider.isChecked());
 		_state.put(STATE_IS_SYNCH_MAP_WITH_TOUR, _actionSynchMapWithTour.isChecked());
+		_state.put(STATE_IS_SYNC_MAP25_WITH_OTHER_MAP, _isSyncMap25WithOtherMap);
 
 		_state.put(STATE_IS_LAYER_BASE_MAP_VISIBLE, _mapApp.getLayer_BaseMap().isEnabled());
 		_state.put(STATE_IS_LAYER_BUILDING_VISIBLE, _mapApp.getLayer_Building().isEnabled());
@@ -1349,6 +1368,14 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		// update map
 		map25.setMapPosition(currentMapPos);
 		map25.render();
+	}
+
+	@Override
+	public void syncMapWithOtherMap(final MapPosition mapPosition) {
+
+		final Map map = _mapApp.getMap();
+
+		Map25ConfigManager.setMapLocation(map, mapPosition);
 	}
 
 	void updateUI_SelectedMapProvider(final Map25Provider selectedMapProvider) {

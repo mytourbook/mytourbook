@@ -16,6 +16,7 @@
 package net.tourbook.map25;
 
 import org.oscim.core.GeoPoint;
+import org.oscim.core.MapPosition;
 import org.oscim.gdx.InputHandler;
 import org.oscim.layers.Layer;
 import org.oscim.layers.tile.vector.labeling.LabelLayer;
@@ -155,6 +156,14 @@ public class InputHandlerMT extends InputHandler {
 
 		// prevent opening context menu
 		_isMouseRightButtonDown = false;
+
+		final MapPosition mapPosition = new MapPosition();
+		_viewport.getMapPosition(mapPosition);
+
+		if (_mapApp.getMap25View().onDragMap(screenX, screenY, pointer, mapPosition)) {
+
+			return true;
+		}
 
 		return super.touchDragged(screenX, screenY, pointer);
 	}

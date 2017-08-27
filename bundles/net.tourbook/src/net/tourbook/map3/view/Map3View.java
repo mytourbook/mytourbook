@@ -83,8 +83,8 @@ import net.tourbook.map3.action.ActionShowMap3Layer;
 import net.tourbook.map3.action.ActionShowMarker;
 import net.tourbook.map3.action.ActionShowTourInMap3;
 import net.tourbook.map3.action.ActionShowTrackSlider;
+import net.tourbook.map3.action.ActionSyncMap3WithOtherMap;
 import net.tourbook.map3.action.ActionSyncMapWithChartSlider;
-import net.tourbook.map3.action.ActionSyncMapWithOtherMaps;
 import net.tourbook.map3.action.ActionSyncMapWithTour;
 import net.tourbook.map3.action.ActionTourColor;
 import net.tourbook.map3.layer.MarkerLayer;
@@ -153,22 +153,23 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 	private static final String		IMAGE_GRAPH_ALL							= net.tourbook.Messages.Image__options;
 	private static final String		GRAPH_LABEL_HEARTBEAT_UNIT				= net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
 
-	private static final String		SLIDER_TEXT_ALTITUDE					= "%.1f %s";								//$NON-NLS-1$
-	private static final String		SLIDER_TEXT_GRADIENT					= "%.1f %%";								//$NON-NLS-1$
-	private static final String		SLIDER_TEXT_PACE						= "%s %s";									//$NON-NLS-1$
-	private static final String		SLIDER_TEXT_PULSE						= "%.0f %s";								//$NON-NLS-1$
-	private static final String		SLIDER_TEXT_SPEED						= "%.1f %s";								//$NON-NLS-1$
-
-	public static final String		ID										= "net.tourbook.map3.view.Map3ViewId";		//$NON-NLS-1$
-
-	private static final String		STATE_IS_LEGEND_VISIBLE					= "STATE_IS_LEGEND_VISIBLE";				//$NON-NLS-1$
-	private static final String		STATE_IS_MARKER_VISIBLE					= "STATE_IS_MARKER_VISIBLE";				//$NON-NLS-1$
-	private static final String		STATE_IS_SYNC_MAP_VIEW_WITH_TOUR		= "STATE_IS_SYNC_MAP_VIEW_WITH_TOUR";		//$NON-NLS-1$
-	private static final String		STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER	= "STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER";	//$NON-NLS-1$
-	private static final String		STATE_IS_TOUR_VISIBLE					= "STATE_IS_TOUR_VISIBLE";					//$NON-NLS-1$
-	private static final String		STATE_IS_TRACK_SLIDER_VISIBLE			= "STATE_IS_TRACK_SLIDERVISIBLE";																				//$NON-NLS-1$
-	private static final String		STATE_MAP3_VIEW							= "STATE_MAP3_VIEW";						//$NON-NLS-1$
-	private static final String		STATE_TOUR_COLOR_ID						= "STATE_TOUR_COLOR_ID";					//$NON-NLS-1$
+	private static final String		SLIDER_TEXT_ALTITUDE					= "%.1f %s";									//$NON-NLS-1$
+	private static final String		SLIDER_TEXT_GRADIENT					= "%.1f %%";									//$NON-NLS-1$
+	private static final String		SLIDER_TEXT_PACE						= "%s %s";										//$NON-NLS-1$
+	private static final String		SLIDER_TEXT_PULSE						= "%.0f %s";									//$NON-NLS-1$
+	private static final String		SLIDER_TEXT_SPEED						= "%.1f %s";									//$NON-NLS-1$
+                                                                                                                            
+	public static final String		ID										= "net.tourbook.map3.view.Map3ViewId";			//$NON-NLS-1$
+                                                                                                                            
+	private static final String		STATE_IS_LEGEND_VISIBLE					= "STATE_IS_LEGEND_VISIBLE";					//$NON-NLS-1$
+	private static final String		STATE_IS_MARKER_VISIBLE					= "STATE_IS_MARKER_VISIBLE";					//$NON-NLS-1$
+	private static final String		STATE_IS_SYNC_MAP_VIEW_WITH_TOUR		= "STATE_IS_SYNC_MAP_VIEW_WITH_TOUR";			//$NON-NLS-1$
+	private static final String		STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER	= "STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER";		//$NON-NLS-1$
+	private static final String 	STATE_IS_SYNC_MAP3_WITH_OTHER_MAP		= "STATE_IS_SYNC_MAP3_WITH_OTHER_MAP";			//$NON-NLS-1$
+	private static final String		STATE_IS_TOUR_VISIBLE					= "STATE_IS_TOUR_VISIBLE";						//$NON-NLS-1$
+	private static final String		STATE_IS_TRACK_SLIDER_VISIBLE			= "STATE_IS_TRACK_SLIDERVISIBLE";				//$NON-NLS-1$
+	private static final String		STATE_MAP3_VIEW							= "STATE_MAP3_VIEW";							//$NON-NLS-1$
+	private static final String		STATE_TOUR_COLOR_ID						= "STATE_TOUR_COLOR_ID";						//$NON-NLS-1$
 
 	private static final WorldWindowGLCanvas	_wwCanvas					= Map3Manager.getWWCanvas();
 	private final IPreferenceStore				_prefStore					= TourbookPlugin.getPrefStore();
@@ -193,7 +194,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 	private ActionShowMarker					_actionShowMarker;
 	private ActionShowTourInMap3				_actionShowTourInMap3;
 	private ActionSyncMapWithChartSlider		_actionSyncMapWithChartSlider;
-	private ActionSyncMapWithOtherMaps			_actionSyncMapWithOtherMaps;
+	private ActionSyncMap3WithOtherMap			_actionSyncMap3WithOtherMap;
 	private ActionSyncMapWithTour				_actionSyncMapWithTour;
 	private ActionTourColor						_actionTourColorAltitude;
 	private ActionTourColor						_actionTourColorGradient;
@@ -225,6 +226,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 	//
 	private ISelection							_lastHiddenSelection;
 	//
+	private boolean								_isSyncMap3WithOtherMap;
 	private boolean								_isSyncMapWithChartSlider;
 	private boolean								_isSyncMapViewWithTour;
 
@@ -815,7 +817,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 		_actionShowMarker = new ActionShowMarker(this);
 		_actionShowTourInMap3 = new ActionShowTourInMap3(this, parent);
 		_actionSyncMapWithChartSlider = new ActionSyncMapWithChartSlider(this);
-		_actionSyncMapWithOtherMaps = new ActionSyncMapWithOtherMaps(this);
+		_actionSyncMap3WithOtherMap = new ActionSyncMap3WithOtherMap(this);
 		_actionSyncMapWithTour = new ActionSyncMapWithTour(this);
 
 		_actionTourColorAltitude = ActionTourColor.createAction(MapGraphId.Altitude, this, parent);
@@ -1161,7 +1163,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 		tbm.add(_actionShowEntireTour);
 		tbm.add(_actionSyncMapWithTour);
 		tbm.add(_actionSyncMapWithChartSlider);
-		tbm.add(_actionSyncMapWithOtherMaps);
+		tbm.add(_actionSyncMap3WithOtherMap);
 		tbm.add(new Separator());
 
 		tbm.add(_actionMapBookmarks);
@@ -1263,21 +1265,6 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 		final float legendValue = dataSerie == null ? legendMinValue : dataSerie[positionIndex];
 
 		return legendValue;
-	}
-
-	/**
-	 * @return Returns {@link MarkerLayer} or <code>null</code> when layer is not displayed.
-	 */
-	private MarkerLayer getLayerMarker() {
-
-		final MarkerLayer layer = Map3Manager.getLayer_Marker();
-
-		if (layer.isEnabled() == false) {
-			// layer is not displayed
-			return null;
-		}
-
-		return layer;
 	}
 
 	/**
@@ -1504,7 +1491,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
 	@Override
 	public void onSelectBookmark(final MapBookmark mapBookmark) {
-		
+
 		moveToMapLocation(mapBookmark);
 	}
 
@@ -1646,6 +1633,10 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 		_isSyncMapWithChartSlider = Util.getStateBoolean(_state, STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER, false);
 		_actionSyncMapWithChartSlider.setChecked(_isSyncMapWithChartSlider);
 
+		// synch map with another map
+		_isSyncMap3WithOtherMap = Util.getStateBoolean(_state, STATE_IS_SYNC_MAP3_WITH_OTHER_MAP, true);
+		_actionSyncMap3WithOtherMap.setChecked(_isSyncMap3WithOtherMap);
+
 		/*
 		 * Tour
 		 */
@@ -1748,6 +1739,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 		_state.put(STATE_IS_MARKER_VISIBLE, isMarkerVisible);
 		_state.put(STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER, _isSyncMapWithChartSlider);
 		_state.put(STATE_IS_SYNC_MAP_VIEW_WITH_TOUR, _isSyncMapViewWithTour);
+		_state.put(STATE_IS_SYNC_MAP3_WITH_OTHER_MAP, _isSyncMap3WithOtherMap);
 		_state.put(STATE_IS_TOUR_VISIBLE, isTrackVisible);
 		_state.put(STATE_IS_TRACK_SLIDER_VISIBLE, isSliderVisible);
 
