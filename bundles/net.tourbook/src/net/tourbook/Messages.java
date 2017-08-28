@@ -1106,11 +1106,14 @@ public class Messages extends NLS {
 	public static String		Map_Bookmark_Action_Bookmark_Rename;
 	public static String		Map_Bookmark_Button_Add;
 	public static String		Map_Bookmark_Button_Rename;
+	public static String		Map_Bookmark_Column_Bearing;
 	public static String		Map_Bookmark_Column_Latitude;
 	public static String		Map_Bookmark_Column_Latitude_Tooltip;
 	public static String		Map_Bookmark_Column_Longitude;
 	public static String		Map_Bookmark_Column_Longitude_Tooltip;
 	public static String		Map_Bookmark_Column_Name;
+	public static String		Map_Bookmark_Column_Scale;
+	public static String		Map_Bookmark_Column_Tilt;
 	public static String		Map_Bookmark_Column_ZoomLevel;
 	public static String		Map_Bookmark_Column_ZoomLevel_Tooltip;
 	public static String		Map_Bookmark_Dialog_AddBookmark_Message;

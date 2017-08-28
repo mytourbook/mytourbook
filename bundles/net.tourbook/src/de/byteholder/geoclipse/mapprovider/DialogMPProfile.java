@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -114,10 +114,8 @@ import de.byteholder.geoclipse.map.Tile;
 import de.byteholder.geoclipse.map.UI;
 import de.byteholder.geoclipse.map.event.IPositionListener;
 import de.byteholder.geoclipse.map.event.ITileListener;
-import de.byteholder.geoclipse.map.event.IZoomListener;
 import de.byteholder.geoclipse.map.event.MapPositionEvent;
 import de.byteholder.geoclipse.map.event.TileEventId;
-import de.byteholder.geoclipse.map.event.ZoomEvent;
 import de.byteholder.geoclipse.preferences.PrefPageMapProviders;
 import de.byteholder.geoclipse.ui.ViewerDetailForm;
 
@@ -249,24 +247,30 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 	private class MapContentProvider implements ITreeContentProvider {
 
+		@Override
 		public void dispose() {}
 
+		@Override
 		public Object[] getChildren(final Object parentElement) {
 			return ((TreeViewerItem) parentElement).getFetchedChildrenAsArray();
 		}
 
+		@Override
 		public Object[] getElements(final Object inputElement) {
 			return _rootItem.getFetchedChildrenAsArray();
 		}
 
+		@Override
 		public Object getParent(final Object element) {
 			return ((TreeViewerItem) element).getParentItem();
 		}
 
+		@Override
 		public boolean hasChildren(final Object element) {
 			return ((TreeViewerItem) element).hasChildren();
 		}
 
+		@Override
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 	}
 
@@ -292,16 +296,19 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		_mpDefault = MapProviderManager.getInstance().getDefaultMapProvider();
 	}
 
+	@Override
 	public void actionZoomIn() {
 		_map.setZoom(_map.getZoom() + 1);
 		_map.paint();
 	}
 
+	@Override
 	public void actionZoomOut() {
 		_map.setZoom(_map.getZoom() - 1);
 		_map.paint();
 	}
 
+	@Override
 	public void actionZoomOutToMinZoom() {
 		_map.setZoom(_map.getMapProvider().getMinimumZoomLevel());
 		_map.paint();
@@ -311,6 +318,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 	protected void cancelPressed() {
 
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+			@Override
 			public void run() {
 
 				// stop downloading images
@@ -381,6 +389,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		shell.setText(Messages.Dialog_MapProfile_DialogTitle);
 
 		shell.addDisposeListener(new DisposeListener() {
+			@Override
 			public void widgetDisposed(final DisposeEvent e) {
 				onDispose();
 			}
@@ -529,10 +538,12 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			_propContainer.setText(Messages.Dialog_MapConfig_Label_Properties);
 			_propContainer.addExpansionListener(new IExpansionListener() {
 
+				@Override
 				public void expansionStateChanged(final ExpansionEvent e) {
 					_propContainer.getParent().layout(true);
 				}
 
+				@Override
 				public void expansionStateChanging(final ExpansionEvent e) {}
 			});
 
@@ -575,6 +586,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			_treeViewer.setUseHashlookup(true);
 
 			_treeViewer.addDoubleClickListener(new IDoubleClickListener() {
+				@Override
 				public void doubleClick(final DoubleClickEvent event) {
 
 					final Object selectedItem = ((IStructuredSelection) _treeViewer.getSelection()).getFirstElement();
@@ -611,6 +623,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			});
 
 			_treeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+				@Override
 				public void selectionChanged(final SelectionChangedEvent event) {
 					onSelectMP(event.getSelection());
 				}
@@ -621,6 +634,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 					new Transfer[] { LocalSelectionTransfer.getTransfer() },
 					new DragSourceListener() {
 
+						@Override
 						public void dragFinished(final DragSourceEvent event) {
 
 							final LocalSelectionTransfer transfer = LocalSelectionTransfer.getTransfer();
@@ -633,10 +647,12 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 							transfer.setSelectionSetTime(0);
 						}
 
+						@Override
 						public void dragSetData(final DragSourceEvent event) {
 							// data are set in LocalSelectionTransfer
 						}
 
+						@Override
 						public void dragStart(final DragSourceEvent event) {
 
 							final LocalSelectionTransfer transfer = LocalSelectionTransfer.getTransfer();
@@ -659,6 +675,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 			tree.addKeyListener(new KeyListener() {
 
+				@Override
 				public void keyPressed(final KeyEvent e) {
 
 					/*
@@ -669,6 +686,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 					}
 				}
 
+				@Override
 				public void keyReleased(final KeyEvent e) {}
 			});
 
@@ -994,6 +1012,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			_spinBright.setToolTipText(Messages.Dialog_MapProfile_Scale_Brightness_Tooltip);
 
 			_spinBright.addMouseWheelListener(new MouseWheelListener() {
+				@Override
 				public void mouseScrolled(final MouseEvent event) {
 					Util.adjustSpinnerValueOnMouseScroll(event);
 				}
@@ -1007,6 +1026,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			});
 
 			_spinBright.addModifyListener(new ModifyListener() {
+				@Override
 				public void modifyText(final ModifyEvent e) {
 					onModifyBrightSpinner();
 				}
@@ -1053,6 +1073,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 			// center scale on mouse double click
 			_scaleAlpha.addListener(SWT.MouseDoubleClick, new Listener() {
+				@Override
 				public void handleEvent(final Event event) {
 					onScaleDoubleClick(event.widget);
 				}
@@ -1066,6 +1087,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			_spinAlpha.setToolTipText(Messages.Dialog_CustomConfig_Label_Alpha_Tooltip);
 
 			_spinAlpha.addMouseWheelListener(new MouseWheelListener() {
+				@Override
 				public void mouseScrolled(final MouseEvent event) {
 					Util.adjustSpinnerValueOnMouseScroll(event);
 				}
@@ -1079,6 +1101,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 			});
 
 			_spinAlpha.addModifyListener(new ModifyListener() {
+				@Override
 				public void modifyText(final ModifyEvent e) {
 					onModifyAlphaSpinner();
 				}
@@ -1143,11 +1166,13 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		_transparentContainer.setBackground(parentBackground);
 		_transparentContainer.addExpansionListener(new IExpansionListener() {
 
+			@Override
 			public void expansionStateChanged(final ExpansionEvent e) {
 //				fPropInnerContainer.layout(true);
 				_innerContainer.layout(true);
 			}
 
+			@Override
 			public void expansionStateChanging(final ExpansionEvent e) {}
 		});
 
@@ -1170,6 +1195,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 	private void createUI124ColorSelector2(final Composite parent) {
 
 		final IPropertyChangeListener colorListener = new IPropertyChangeListener() {
+			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 				onModifyTransparentColor();
 			}
@@ -1225,6 +1251,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 		Label label;
 		final MouseWheelListener mouseWheelListener = new MouseWheelListener() {
+			@Override
 			public void mouseScrolled(final MouseEvent event) {
 
 				Util.adjustSpinnerValueOnMouseScroll(event);
@@ -1269,6 +1296,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 					}
 				});
 				_spinMinZoom.addModifyListener(new ModifyListener() {
+					@Override
 					public void modifyText(final ModifyEvent e) {
 						if (_isInitUI) {
 							return;
@@ -1301,6 +1329,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 					}
 				});
 				_spinMaxZoom.addModifyListener(new ModifyListener() {
+					@Override
 					public void modifyText(final ModifyEvent e) {
 						if (_isInitUI) {
 							return;
@@ -1329,6 +1358,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 					.applyTo(_colorImageBackground.getButton());
 
 			_colorImageBackground.addListener(new IPropertyChangeListener() {
+				@Override
 				public void propertyChange(final PropertyChangeEvent event) {
 					onModifyImageBgColor();
 				}
@@ -1440,16 +1470,17 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		_map.setPainting(false);
 		_map.setShowScale(true);
 
-		_map.addZoomListener(new IZoomListener() {
-			public void zoomChanged(final ZoomEvent event) {
-				// DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG
-//				resetMapProfile();
-// DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG
-			}
-		});
+//		_map.addZoomListener(new IZoomListener() {
+//			public void zoomChanged(final ZoomEvent event) {
+//				// DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG
+////				resetMapProfile();
+//// DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG
+//			}
+//		});
 
 		_map.addMousePositionListener(new IPositionListener() {
 
+			@Override
 			public void setPosition(final MapPositionEvent event) {
 
 				final GeoPosition mousePosition = event.mapGeoPosition;
@@ -1511,10 +1542,12 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		_logContainer.setToolTipText(Messages.Dialog_MapConfig_Button_ShowTileLog_Tooltip);
 		_logContainer.addExpansionListener(new IExpansionListener() {
 
+			@Override
 			public void expansionStateChanged(final ExpansionEvent e) {
 				_logContainer.getParent().layout(true);
 			}
 
+			@Override
 			public void expansionStateChanging(final ExpansionEvent e) {}
 		});
 
@@ -1837,6 +1870,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 	protected void okPressed() {
 
 		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+			@Override
 			public void run() {
 
 				// stop downloading images
@@ -2257,6 +2291,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 		}
 	}
 
+	@Override
 	public void tileEvent(final TileEventId tileEventId, final Tile tile) {
 
 		// check if logging is enable
@@ -2308,6 +2343,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
 			final int	fRunnableCounter	= _statUpdateCounter;
 
+			@Override
 			public void run() {
 
 				// check if this is the last created runnable

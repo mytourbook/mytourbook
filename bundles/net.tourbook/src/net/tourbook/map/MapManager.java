@@ -28,6 +28,11 @@ public class MapManager {
 
 	public static void fireSyncMapEvent(final MapPosition mapPosition) {
 
+//		System.out.println(
+//				(UI.timeStampNano() + " [" + "] ") + ("\tfireSyncMapEvent: "
+//						+ mapPosition));
+//		// TODO remove SYSTEM.OUT.PRINTLN
+
 		final Object[] allListeners = _allMapSyncListener.getListeners();
 
 		for (final Object listener : allListeners) {

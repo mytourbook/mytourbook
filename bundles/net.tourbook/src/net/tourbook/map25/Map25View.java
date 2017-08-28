@@ -141,6 +141,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 	private ISelection						_lastHiddenSelection;
 	private ISelection						_selectionWhenHidden;
 	private int								_lastSelectionHash;
+	private MapPosition						_lastFiredMapPosition;
 	//
 	private ActionMapBookmarks				_actionMapBookmarks;
 	private ActionMap25_Options				_actionMapOptions;
@@ -160,9 +161,10 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 	private int								_hashTourId;
 	private int								_hashTourData;
 	//
-	private boolean							_isSyncMap25WithOtherMap;
-	private boolean							_isSynchMapWithChartSlider;
-	private boolean							_isSynchMapWithTour;
+	private boolean							_isMapSynchedWithOtherMap;
+	private boolean							_isMapSynchedWithChartSlider;
+	private boolean							_isMapSynchedWithTour;
+	//
 	//
 	// context menu
 	private boolean							_isContextMenuVisible;
@@ -280,7 +282,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 		final boolean isSync = _actionSynchMapWithChartSlider.isChecked();
 
-		_isSynchMapWithChartSlider = isSync;
+		_isMapSynchedWithChartSlider = isSync;
 
 		if (isSync) {
 
@@ -293,7 +295,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 	public void actionSynchMapViewWithTour() {
 
-		_isSynchMapWithTour = _actionSynchMapWithTour.isChecked();
+		_isMapSynchedWithTour = _actionSynchMapWithTour.isChecked();
 
 		paintTours_AndUpdateMap();
 
@@ -315,9 +317,9 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 //		}
 	}
 
-	public void actionSynchMapWithOtherMap() {
-		// TODO Auto-generated method stub
+	public void actionSynchMapWithOtherMap(final boolean isSelected) {
 
+		_isMapSynchedWithOtherMap = isSelected;
 	}
 
 	public void actionZoomShowEntireTour() {
@@ -811,7 +813,9 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		Map25ConfigManager.setMapLocation(map, mapPosition);
 	}
 
-	public boolean onDragMap(final int screenX, final int screenY, final int pointer, final MapPosition mapPosition) {
+	public boolean onMapPosition(final MapPosition mapPosition) {
+
+		_lastFiredMapPosition = mapPosition;
 
 		MapManager.fireSyncMapEvent(mapPosition);
 
@@ -1172,7 +1176,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 				// create outside isSynch that data are available when map is zoomed to show the whole tour
 				_allBoundingBox = createBoundingBox(_allGeoPoints);
 
-				if (_isSynchMapWithTour) {
+				if (_isMapSynchedWithTour) {
 
 					final int animationTime = Map25ConfigManager.getActiveTourTrackConfig().animationTime;
 					Map25ConfigManager.setMapLocation(map25, _allBoundingBox, animationTime);
@@ -1212,16 +1216,16 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		// checkbox: synch map with tour
 		final boolean isSynchTour = Util.getStateBoolean(_state, STATE_IS_SYNCH_MAP_WITH_TOUR, true);
 		_actionSynchMapWithTour.setChecked(isSynchTour);
-		_isSynchMapWithTour = isSynchTour;
+		_isMapSynchedWithTour = isSynchTour;
 
 		// checkbox: synch map with chart slider
 		final boolean isSynchWithSlider = Util.getStateBoolean(_state, STATE_IS_SYNCH_MAP_WITH_CHART_SLIDER, true);
 		_actionSynchMapWithChartSlider.setChecked(isSynchWithSlider);
-		_isSynchMapWithChartSlider = isSynchWithSlider;
+		_isMapSynchedWithChartSlider = isSynchWithSlider;
 
 		// synch map with another map
-		_isSyncMap25WithOtherMap = Util.getStateBoolean(_state, STATE_IS_SYNC_MAP25_WITH_OTHER_MAP, true);
-		_actionSynchMap25WithOtherMap.setChecked(_isSyncMap25WithOtherMap);
+		_isMapSynchedWithOtherMap = Util.getStateBoolean(_state, STATE_IS_SYNC_MAP25_WITH_OTHER_MAP, true);
+		_actionSynchMap25WithOtherMap.setChecked(_isMapSynchedWithOtherMap);
 
 		enableActions();
 	}
@@ -1230,7 +1234,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 		_state.put(STATE_IS_SYNCH_MAP_WITH_CHART_SLIDER, _actionSynchMapWithChartSlider.isChecked());
 		_state.put(STATE_IS_SYNCH_MAP_WITH_TOUR, _actionSynchMapWithTour.isChecked());
-		_state.put(STATE_IS_SYNC_MAP25_WITH_OTHER_MAP, _isSyncMap25WithOtherMap);
+		_state.put(STATE_IS_SYNC_MAP25_WITH_OTHER_MAP, _isMapSynchedWithOtherMap);
 
 		_state.put(STATE_IS_LAYER_BASE_MAP_VISIBLE, _mapApp.getLayer_BaseMap().isEnabled());
 		_state.put(STATE_IS_LAYER_BUILDING_VISIBLE, _mapApp.getLayer_Building().isEnabled());
@@ -1372,6 +1376,20 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 	@Override
 	public void syncMapWithOtherMap(final MapPosition mapPosition) {
+
+		if (!_isMapSynchedWithOtherMap) {
+
+			// sync feature is disabled
+
+			return;
+		}
+
+		if (_lastFiredMapPosition == mapPosition) {
+
+			// event is fired from this map -> ignore
+
+			return;
+		}
 
 		final Map map = _mapApp.getMap();
 

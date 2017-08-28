@@ -51,6 +51,14 @@ public class InputHandlerMT extends InputHandler {
 		_viewport = _map.viewport();
 	}
 
+	private void fireMapPosition() {
+
+		final MapPosition mapPosition = new MapPosition();
+		_viewport.getMapPosition(mapPosition);
+
+		_mapApp.getMap25View().onMapPosition(mapPosition);
+	}
+
 	@Override
 	public boolean keyDown(final int keycode) {
 
@@ -157,13 +165,7 @@ public class InputHandlerMT extends InputHandler {
 		// prevent opening context menu
 		_isMouseRightButtonDown = false;
 
-		final MapPosition mapPosition = new MapPosition();
-		_viewport.getMapPosition(mapPosition);
-
-		if (_mapApp.getMap25View().onDragMap(screenX, screenY, pointer, mapPosition)) {
-
-			return true;
-		}
+//		fireMapPosition();
 
 		return super.touchDragged(screenX, screenY, pointer);
 	}

@@ -39,7 +39,8 @@ public class ActionSyncMap2WithOtherMap extends Action {
 
 	@Override
 	public void run() {
-		_map2View.actionSynchMapWithOtherMap();
+
+		_map2View.actionSynchMapWithOtherMap(isChecked());
 	}
 
 }

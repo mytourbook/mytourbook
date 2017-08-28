@@ -20,7 +20,7 @@ import org.oscim.core.MapPosition;
 public interface IMapSyncListener {
 
 	/**
-	 * Sync map with another map
+	 * Sync map location and zoomlevel with another map
 	 * 
 	 * @param mapPosition
 	 *            Map position of the other map

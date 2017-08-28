@@ -17,8 +17,8 @@ package de.byteholder.geoclipse.map.event;
 
 import net.tourbook.common.map.GeoPosition;
 
-public interface IMapPanListener {
+public interface IMapPositionListener {
 
-	public void onDragMap(GeoPosition mapCenter, int mapZoomLevel);
+	public void onMapPosition(GeoPosition mapCenter, int mapZoomLevel);
 
 }

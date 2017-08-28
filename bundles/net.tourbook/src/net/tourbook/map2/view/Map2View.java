@@ -150,13 +150,11 @@ import de.byteholder.geoclipse.GeoclipseExtensions;
 import de.byteholder.geoclipse.map.IMapContextProvider;
 import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.MapLegend;
-import de.byteholder.geoclipse.map.event.IMapPanListener;
+import de.byteholder.geoclipse.map.event.IMapPositionListener;
 import de.byteholder.geoclipse.map.event.IPOIListener;
 import de.byteholder.geoclipse.map.event.IPositionListener;
-import de.byteholder.geoclipse.map.event.IZoomListener;
 import de.byteholder.geoclipse.map.event.MapPOIEvent;
 import de.byteholder.geoclipse.map.event.MapPositionEvent;
-import de.byteholder.geoclipse.map.event.ZoomEvent;
 import de.byteholder.geoclipse.mapprovider.MP;
 import de.byteholder.geoclipse.mapprovider.MapProviderManager;
 import de.byteholder.gpx.PointOfInterest;
@@ -166,7 +164,7 @@ import de.byteholder.gpx.PointOfInterest;
  * @since 1.3.0
  */
 public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEventListener, IPhotoPropertiesListener,
-		IMapBookmarks, IMapBookmarkListener, IMapPanListener, IMapSyncListener {
+		IMapBookmarks, IMapBookmarkListener, IMapPositionListener, IMapSyncListener {
 
 // SET_FORMATTING_OFF
 	
@@ -252,15 +250,19 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	private boolean							_isShowPhoto;
 	private boolean							_isShowLegend;
 
-	private boolean							_isSyncMap2WithOtherMap;
+	private boolean							_isMapSynchedWithOtherMap;
 	private boolean							_isMapSynchedWithPhoto;
-	private boolean							_isMapSynchedWithTour;
 	private boolean							_isMapSynchedWithSlider;
+	private boolean							_isMapSynchedWithTour;
 	private boolean							_isPositionCentered;
+
+	private boolean							_isInSyncMap;
+	private boolean							_isInSelectBookmark;
 
 	private int								_defaultZoom;
 	private GeoPosition						_defaultPosition;
-	private MapPosition						_panMapPosition;
+	private MapPosition						_lastFiredMapPosition;
+	private long							_lastMapPositioningTime;
 
 	/**
 	 * when <code>true</code> a tour is painted, <code>false</code> a point of interrest is painted
@@ -570,9 +572,9 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		paintTours_10_All();
 	}
 
-	public void actionSynchMapWithOtherMap() {
-		// TODO Auto-generated method stub
+	public void actionSynchMapWithOtherMap(final boolean isSelected) {
 
+		_isMapSynchedWithOtherMap = isSelected;
 	}
 
 	/**
@@ -688,14 +690,6 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 	private void addMapListener() {
 
-		_map.addZoomListener(new IZoomListener() {
-			@Override
-			public void zoomChanged(final ZoomEvent event) {
-				_mapInfoManager.setZoom(event.getZoom());
-				centerTour();
-			}
-		});
-
 		_map.addMousePositionListener(new IPositionListener() {
 			@Override
 			public void setPosition(final MapPositionEvent event) {
@@ -716,7 +710,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 			}
 		});
 
-		_map.addMapPanListener(this);
+		_map.addMapPositionListener(this);
 
 		_map.setMapContextProvider(this);
 	}
@@ -1317,6 +1311,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		getViewSite().getPage().removePartListener(_partListener);
 
 		MapBookmarkManager.removeBookmarkListener(this);
+		MapManager.removeMapSyncListener(this);
 		PhotoManager.removePhotoEventListener(this);
 		TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
@@ -1716,17 +1711,34 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	}
 
 	@Override
-	public void onDragMap(final GeoPosition geoCenter, final int zoomLevel) {
+	public void onMapPosition(final GeoPosition geoCenter, final int zoomLevel) {
 
-		_panMapPosition = new MapLocation(geoCenter, zoomLevel - 1).getMapPosition();
+		if (_isInSelectBookmark) {
+			// prevent fire the sync event
+			return;
+		}
 
-		MapManager.fireSyncMapEvent(_panMapPosition);
+		_mapInfoManager.setZoom(zoomLevel);
+		centerTour();
+
+		if (_isInSyncMap) {
+			// do not fire an event when map positioning is caused from this map
+			return;
+		}
+
+		_lastFiredMapPosition = new MapLocation(geoCenter, zoomLevel - 1).getMapPosition();
+
+		MapManager.fireSyncMapEvent(_lastFiredMapPosition);
 	}
 
 	@Override
 	public void onSelectBookmark(final MapBookmark mapBookmark) {
 
-		moveToMapLocation(mapBookmark);
+		_isInSelectBookmark = true;
+		{
+			moveToMapLocation(mapBookmark);
+		}
+		_isInSelectBookmark = false;
 	}
 
 	private void onSelectionChanged(final ISelection selection) {
@@ -2612,8 +2624,8 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_isPositionCentered = isTourCentered;
 
 		// synch map with another map
-		_isSyncMap2WithOtherMap = Util.getStateBoolean(_state, STATE_IS_SYNC_MAP2_WITH_OTHER_MAP, true);
-		_actionSynchMap2WithOtherMap.setChecked(_isSyncMap2WithOtherMap);
+		_isMapSynchedWithOtherMap = Util.getStateBoolean(_state, STATE_IS_SYNC_MAP2_WITH_OTHER_MAP, true);
+		_actionSynchMap2WithOtherMap.setChecked(_isMapSynchedWithOtherMap);
 
 		// synch map with tour
 		final boolean isSynchTour = Util.getStateBoolean(_state, MEMENTO_SYNCH_WITH_SELECTED_TOUR, true);
@@ -2826,7 +2838,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_state.put(STATE_IS_SHOW_PHOTO_IN_MAP, _isShowPhoto);
 		_state.put(STATE_IS_SHOW_LEGEND_IN_MAP, _isShowLegend);
 
-		_state.put(STATE_IS_SYNC_MAP2_WITH_OTHER_MAP, _isSyncMap2WithOtherMap);
+		_state.put(STATE_IS_SYNC_MAP2_WITH_OTHER_MAP, _isMapSynchedWithOtherMap);
 		_state.put(STATE_SYNC_WITH_PHOTO, _isMapSynchedWithPhoto);
 
 		_state.put(MEMENTO_ZOOM_CENTERED, _actionZoomCentered.isChecked());
@@ -3086,23 +3098,59 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	@Override
 	public void syncMapWithOtherMap(final MapPosition mapPosition) {
 
-		if (_panMapPosition == mapPosition) {
+		if (_isInSyncMap) {
+			return;
+		}
+
+		if (_lastFiredMapPosition != null && _lastFiredMapPosition == mapPosition) {
 
 			// event is fired from this map -> ignore
 
 			return;
 		}
 
-		// run in UI thread
+		final long currentTime = System.currentTimeMillis();
+		final long timeDiff = currentTime - _lastMapPositioningTime;
 
-		_parent.getDisplay().asyncExec(new Runnable() {
-			@Override
-			public void run() {
+		System.out.println(
+				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\ttimeDiff:" + timeDiff));
+		// TODO remove SYSTEM.OUT.PRINTLN
 
-				_map.setZoom(mapPosition.zoomLevel + 1);
-				_map.setMapCenter(new GeoPosition(mapPosition.getLatitude(), mapPosition.getLongitude()));
-			}
-		});
+		if (timeDiff < 2000) {
+
+			/*
+			 * This sync event was caused from this map but other map (2.5) throw the events
+			 */
+
+			return;
+		}
+
+		System.out.println(
+				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tsyncMapWithOtherMap 2:"
+						+ mapPosition));
+		// TODO remove SYSTEM.OUT.PRINTLN
+
+		if (_isMapSynchedWithOtherMap) {
+
+			// run in UI thread
+
+			_parent.getDisplay().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+
+					_isInSyncMap = true;
+					{
+
+						_map.setZoom(mapPosition.zoomLevel + 1);
+						_map.setMapCenter(new GeoPosition(mapPosition.getLatitude(), mapPosition.getLongitude()));
+
+						_lastMapPositioningTime = System.currentTimeMillis();
+
+					}
+					_isInSyncMap = false;
+				}
+			});
+		}
 	}
 
 	private void updateFilteredPhotos() {

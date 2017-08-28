@@ -34,6 +34,7 @@ import org.oscim.awt.AwtGraphics;
 import org.oscim.backend.GLAdapter;
 import org.oscim.core.MapPosition;
 import org.oscim.core.MercatorProjection;
+import org.oscim.event.Event;
 import org.oscim.gdx.GdxAssets;
 import org.oscim.gdx.GdxMap;
 import org.oscim.gdx.GestureHandlerImpl;
@@ -43,6 +44,7 @@ import org.oscim.layers.tile.TileManager;
 import org.oscim.layers.tile.buildings.BuildingLayer;
 import org.oscim.map.Layers;
 import org.oscim.map.Map;
+import org.oscim.map.Map.UpdateListener;
 import org.oscim.map.ViewController;
 import org.oscim.renderer.BitmapRenderer;
 import org.oscim.renderer.GLViewport;
@@ -173,6 +175,24 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		mux.addProcessor(new MotionHandler(mMap));
 
 		Gdx.input.setInputProcessor(mux);
+
+		mMap.events.bind(new UpdateListener() {
+			@Override
+			public void onMapEvent(final Event e, final MapPosition mapPosition) {
+
+//				final MapPosition mapPosition = new MapPosition();
+//				_viewport.getMapPosition(mapPosition);
+
+				_map25View.onMapPosition(mapPosition);
+
+//				System.out.println(
+//						(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
+//								+ ("\tevent:" + e.toString())
+//								+ ("\tmapPosition:" + mapPosition));
+//				// TODO remove SYSTEM.OUT.PRINTLN
+
+			}
+		});
 	}
 
 	/**

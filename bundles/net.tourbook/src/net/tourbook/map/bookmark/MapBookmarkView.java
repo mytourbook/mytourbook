@@ -19,6 +19,7 @@ import java.text.NumberFormat;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
@@ -37,7 +38,6 @@ import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -55,7 +55,6 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
@@ -83,17 +82,19 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 	private TableViewer				_bookmarkViewer;
 	private ColumnManager			_columnManager;
 
+	private final NumberFormat		_nf0		= NumberFormat.getNumberInstance();
 	private final NumberFormat		_nfLatLon	= NumberFormat.getNumberInstance();
 	{
-		_nfLatLon.setMinimumFractionDigits(2);
-		_nfLatLon.setMaximumFractionDigits(2);
+		_nf0.setMinimumFractionDigits(0);
+		_nf0.setMaximumFractionDigits(0);
+		_nfLatLon.setMinimumFractionDigits(4);
+		_nfLatLon.setMaximumFractionDigits(4);
 	}
 
 	/*
 	 * UI controls
 	 */
 	private Composite	_parent;
-	private Font		_boldFont;
 
 	private Composite	_viewerContainer;
 
@@ -206,11 +207,6 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 		};
 
 		getViewSite().getPage().addPartListener(_partListener);
-	}
-
-	private void clearView() {
-
-		updateUI_Viewer();
 	}
 
 	private void createActions() {
@@ -343,8 +339,11 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 
 		defineColumn_10_Name();
 		defineColumn_20_Zoomlevel();
+		defineColumn_22_Scale();
 		defineColumn_30_Latitude();
 		defineColumn_40_Longitude();
+		defineColumn_60_Bearing();
+		defineColumn_70_Tile();
 	}
 
 	/**
@@ -401,6 +400,39 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 	}
 
 	/**
+	 * Column: Scale
+	 */
+	private void defineColumn_22_Scale() {
+
+		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "scale", SWT.TRAIL); //$NON-NLS-1$
+
+		colDef.setColumnLabel(Messages.Map_Bookmark_Column_Scale);
+		colDef.setColumnHeaderText(Messages.Map_Bookmark_Column_Scale);
+
+		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(9));
+//		colDef.setColumnWeightData(new ColumnWeightData(9));
+
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final MapBookmark bookmark = (MapBookmark) cell.getElement();
+
+				final double value = bookmark.getMapPosition().scale;
+
+				String valueText;
+				if (value == 0) {
+					valueText = UI.EMPTY_STRING;
+				} else {
+					valueText = _nf0.format(value);
+				}
+
+				cell.setText(valueText);
+			}
+		});
+	}
+
+	/**
 	 * Column: Latitude
 	 */
 	private void defineColumn_30_Latitude() {
@@ -448,6 +480,72 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 
 				final MapBookmark bookmark = (MapBookmark) cell.getElement();
 				final String valueText = _nfLatLon.format(bookmark.getLongitude());
+
+				cell.setText(valueText);
+			}
+		});
+	}
+
+	/**
+	 * Column: Bearing
+	 */
+	private void defineColumn_60_Bearing() {
+
+		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "bearing", SWT.TRAIL); //$NON-NLS-1$
+
+		colDef.setColumnLabel(Messages.Map_Bookmark_Column_Bearing);
+		colDef.setColumnHeaderText(Messages.Map_Bookmark_Column_Bearing);
+
+		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(9));
+//		colDef.setColumnWeightData(new ColumnWeightData(9));
+
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final MapBookmark bookmark = (MapBookmark) cell.getElement();
+
+				final float value = bookmark.getMapPosition().bearing;
+				String valueText;
+
+				if (value == 0) {
+					valueText = UI.EMPTY_STRING;
+				} else {
+					valueText = _nf0.format(value);
+				}
+
+				cell.setText(valueText);
+			}
+		});
+	}
+
+	/**
+	 * Column: Tilt
+	 */
+	private void defineColumn_70_Tile() {
+
+		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "tilt", SWT.TRAIL); //$NON-NLS-1$
+
+		colDef.setColumnLabel(Messages.Map_Bookmark_Column_Tilt);
+		colDef.setColumnHeaderText(Messages.Map_Bookmark_Column_Tilt);
+
+		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(9));
+//		colDef.setColumnWeightData(new ColumnWeightData(9));
+
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final MapBookmark bookmark = (MapBookmark) cell.getElement();
+
+				final float value = bookmark.getMapPosition().tilt;
+				String valueText;
+
+				if (value == 0) {
+					valueText = UI.EMPTY_STRING;
+				} else {
+					valueText = _nf0.format(value);
+				}
 
 				cell.setText(valueText);
 			}
@@ -534,7 +632,6 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 		_parent = parent;
 
 		_pc = new PixelConverter(parent);
-		_boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 	}
 
 	private void onBookmark_Delete() {

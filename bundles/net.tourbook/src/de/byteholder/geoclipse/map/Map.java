@@ -108,13 +108,11 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
 import de.byteholder.geoclipse.Messages;
-import de.byteholder.geoclipse.map.event.IMapPanListener;
+import de.byteholder.geoclipse.map.event.IMapPositionListener;
 import de.byteholder.geoclipse.map.event.IPOIListener;
 import de.byteholder.geoclipse.map.event.IPositionListener;
-import de.byteholder.geoclipse.map.event.IZoomListener;
 import de.byteholder.geoclipse.map.event.MapPOIEvent;
 import de.byteholder.geoclipse.map.event.MapPositionEvent;
-import de.byteholder.geoclipse.map.event.ZoomEvent;
 import de.byteholder.geoclipse.mapprovider.ImageDataResources;
 import de.byteholder.geoclipse.mapprovider.MP;
 import de.byteholder.geoclipse.mapprovider.MapProviderManager;
@@ -406,10 +404,8 @@ public class Map extends Canvas {
 	 */
 	private Rectangle							_clientArea;
 
-	private final List<IZoomListener>			_zoomListeners;
-
 // SET_FORMATTING_OFF
-	private final ListenerList					_allMapPanListener			= new ListenerList(ListenerList.IDENTITY);
+	private final ListenerList					_allMapPositionListener		= new ListenerList(ListenerList.IDENTITY);
 	private final ListenerList					_mousePositionListeners		= new ListenerList(ListenerList.IDENTITY);
 	private final ListenerList					_poiListeners				= new ListenerList(ListenerList.IDENTITY);
 // SET_FORMATTING_ON
@@ -528,8 +524,6 @@ public class Map extends Canvas {
 
 		_display = getDisplay();
 		_displayThread = _display.getThread();
-
-		_zoomListeners = new ArrayList<IZoomListener>();
 
 		addAllListener();
 
@@ -779,8 +773,8 @@ public class Map extends Canvas {
 		});
 	}
 
-	public void addMapPanListener(final IMapPanListener mapPanListener) {
-		_allMapPanListener.add(mapPanListener);
+	public void addMapPositionListener(final IMapPositionListener mapPanListener) {
+		_allMapPositionListener.add(mapPanListener);
 	}
 
 	public void addMousePositionListener(final IPositionListener mapListener) {
@@ -802,10 +796,6 @@ public class Map extends Canvas {
 
 	public void addPOIListener(final IPOIListener poiListener) {
 		_poiListeners.add(poiListener);
-	}
-
-	public void addZoomListener(final IZoomListener listener) {
-		_zoomListeners.add(listener);
 	}
 
 	/**
@@ -1016,14 +1006,14 @@ public class Map extends Canvas {
 		_mp.disposeTiles();
 	}
 
-	private void fireMapPanEvent() {
+	private void fireMapPositionEvent() {
 
 		final GeoPosition geoCenter = getGeoCenter();
 
-		final Object[] listeners = _allMapPanListener.getListeners();
+		final Object[] listeners = _allMapPositionListener.getListeners();
 
 		for (final Object listener : listeners) {
-			((IMapPanListener) listener).onDragMap(geoCenter, _mapZoomLevel);
+			((IMapPositionListener) listener).onMapPosition(geoCenter, _mapZoomLevel);
 		}
 	}
 
@@ -1058,14 +1048,6 @@ public class Map extends Canvas {
 		final Object[] listeners = _poiListeners.getListeners();
 		for (final Object listener : listeners) {
 			((IPOIListener) listener).setPOI(event);
-		}
-	}
-
-	private void fireZoomEvent(final int zoom) {
-
-		final ZoomEvent event = new ZoomEvent(zoom);
-		for (final IZoomListener l : _zoomListeners) {
-			l.zoomChanged(event);
 		}
 	}
 
@@ -3339,7 +3321,7 @@ public class Map extends Canvas {
 
 		paint();
 
-		fireMapPanEvent();
+		fireMapPositionEvent();
 	}
 
 	private boolean parsePOIText(String text) {
@@ -3633,6 +3615,8 @@ public class Map extends Canvas {
 		updateViewPortData();
 
 		paint();
+
+		fireMapPositionEvent();
 	}
 
 	/**
@@ -3660,10 +3644,6 @@ public class Map extends Canvas {
 	public void removeOverlayPainter(final MapPainter overlay) {
 		_overlays.remove(overlay);
 		paint();
-	}
-
-	public void removeZoomListener(final IZoomListener listner) {
-		_zoomListeners.remove(listner);
 	}
 
 	/**
@@ -4192,7 +4172,7 @@ public class Map extends Canvas {
 		updateTourToolTip();
 //		updatePoiVisibility();
 
-		fireZoomEvent(adjustedZoomLevel);
+		fireMapPositionEvent();
 	}
 
 	private void showPoi() {
