@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.map;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.oscim.core.MapPosition;
 
 public interface IMapSyncListener {
@@ -22,9 +24,12 @@ public interface IMapSyncListener {
 	/**
 	 * Sync map location and zoomlevel with another map
 	 * 
-	 * @param mapPosition
+	 * @param newMapPosition
 	 *            Map position of the other map
+	 * @param lastReceivedSyncMapPositions
+	 *            Map position from the previous received sync event, can be <code>null</code>
 	 */
-	void syncMapWithOtherMap(MapPosition mapPosition);
+	void syncMapWithOtherMap(	MapPosition newMapPosition,
+								ConcurrentHashMap<MapPosition, Long> lastReceivedSyncMapPositions);
 
 }

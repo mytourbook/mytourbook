@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
@@ -217,152 +218,160 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	
 // SET_FORMATTING_ON
 
-	private boolean							_isPartVisible;
+	private boolean									_isPartVisible;
 
 	/**
 	 * contains selection which was set when the part is hidden
 	 */
-	private ISelection						_selectionWhenHidden;
+	private ISelection								_selectionWhenHidden;
 
-	private IPartListener2					_partListener;
-	private ISelectionListener				_postSelectionListener;
-	private IPropertyChangeListener			_prefChangeListener;
-	private ITourEventListener				_tourEventListener;
+	private IPartListener2							_partListener;
+	private ISelectionListener						_postSelectionListener;
+	private IPropertyChangeListener					_prefChangeListener;
+	private ITourEventListener						_tourEventListener;
 
 	/**
 	 * Contains all tours which are displayed in the map.
 	 */
-	private final ArrayList<TourData>		_allTourData								= new ArrayList<TourData>();
-	private TourData						_previousTourData;
+	private final ArrayList<TourData>				_allTourData								=
+			new ArrayList<TourData>();
+	private TourData								_previousTourData;
 
 	/**
 	 * contains photos which are displayed in the map
 	 */
-	private final ArrayList<Photo>			_allPhotos									= new ArrayList<Photo>();
-	private final ArrayList<Photo>			_filteredPhotos								= new ArrayList<Photo>();
+	private final ArrayList<Photo>					_allPhotos									=
+			new ArrayList<Photo>();
+	private final ArrayList<Photo>					_filteredPhotos								=
+			new ArrayList<Photo>();
 
-	private boolean							_isPhotoFilterActive;
+	private boolean									_isPhotoFilterActive;
 
-	private int								_photoFilterRatingStars;
-	private int								_photoFilterRatingStarOperator;
+	private int										_photoFilterRatingStars;
+	private int										_photoFilterRatingStarOperator;
 
-	private boolean							_isShowTour;
-	private boolean							_isShowPhoto;
-	private boolean							_isShowLegend;
+	private boolean									_isShowTour;
+	private boolean									_isShowPhoto;
+	private boolean									_isShowLegend;
 
-	private boolean							_isMapSynchedWithOtherMap;
-	private boolean							_isMapSynchedWithPhoto;
-	private boolean							_isMapSynchedWithSlider;
-	private boolean							_isMapSynchedWithTour;
-	private boolean							_isPositionCentered;
+	private boolean									_isMapSynchedWithOtherMap;
+	private boolean									_isMapSynchedWithPhoto;
+	private boolean									_isMapSynchedWithSlider;
+	private boolean									_isMapSynchedWithTour;
+	private boolean									_isPositionCentered;
 
-	private boolean							_isInSyncMap;
-	private boolean							_isInSelectBookmark;
+	private boolean									_isInSyncMap;
+	private boolean									_isInSelectBookmark;
 
-	private int								_defaultZoom;
-	private GeoPosition						_defaultPosition;
-	private MapPosition						_lastFiredMapPosition;
-	private long							_lastMapPositioningTime;
+	private int										_defaultZoom;
+	private GeoPosition								_defaultPosition;
+	private MapPosition								_lastFiredMapPosition;
+	private ConcurrentHashMap<MapPosition, Long>	_lastReceivedSyncMapPosition				=
+			new ConcurrentHashMap<>();
 
 	/**
 	 * when <code>true</code> a tour is painted, <code>false</code> a point of interrest is painted
 	 */
-	private boolean							_isTourOrWayPoint;
+	private boolean									_isTourOrWayPoint;
 
 	/*
 	 * tool tips
 	 */
-	private TourToolTip						_tourToolTip;
+	private TourToolTip								_tourToolTip;
 
-	private TourInfoIconToolTipProvider		_tourInfoToolTipProvider					=
+	private TourInfoIconToolTipProvider				_tourInfoToolTipProvider					=
 			new TourInfoIconToolTipProvider();
-	private ITourToolTipProvider			_wayPointToolTipProvider					= new WayPointToolTipProvider();
+	private ITourToolTipProvider					_wayPointToolTipProvider					=
+			new WayPointToolTipProvider();
 
-	private String							_poiName;
-	private GeoPosition						_poiPosition;
-	private int								_poiZoomLevel;
+	private String									_poiName;
+	private GeoPosition								_poiPosition;
+	private int										_poiZoomLevel;
 
-	private final DirectMappingPainter		_directMappingPainter						= new DirectMappingPainter();
+	private final DirectMappingPainter				_directMappingPainter						=
+			new DirectMappingPainter();
 
 	/*
 	 * current position for the x-sliders
 	 */
-	private int								_currentLeftSliderValueIndex;
-	private int								_currentRightSliderValueIndex;
-	private int								_currentSelectedSliderValueIndex;
+	private int										_currentLeftSliderValueIndex;
+	private int										_currentRightSliderValueIndex;
+	private int										_currentSelectedSliderValueIndex;
 
-	private MapLegend						_mapLegend;
+	private MapLegend								_mapLegend;
 
-	private long							_previousOverlayKey;
+	private long									_previousOverlayKey;
 
-	private int								_mapDimLevel								= -1;
-	private RGB								_mapDimColor;
+	private int										_mapDimLevel								= -1;
+	private RGB										_mapDimColor;
 
-	private int								_selectedProfileKey							= 0;
+	private int										_selectedProfileKey							= 0;
 
-	private final MapInfoManager			_mapInfoManager								= MapInfoManager.getInstance();
-	private final TourPainterConfiguration	_tourPainterConfig							= TourPainterConfiguration
+	private final MapInfoManager					_mapInfoManager								= MapInfoManager
 			.getInstance();
-	private MapGraphId						_tourColorId;
+	private final TourPainterConfiguration			_tourPainterConfig							=
+			TourPainterConfiguration
+					.getInstance();
+	private MapGraphId								_tourColorId;
 
-	private int								_hashTourId;
-	private int								_hashTourData;
-	private long							_hashTourOverlayKey;
+	private int										_hashTourId;
+	private int										_hashTourData;
+	private long									_hashTourOverlayKey;
 
-	private int								_hashAllPhotos;
+	private int										_hashAllPhotos;
 
 	/**
 	 * Is <code>true</code> when a link photo is displayed, otherwise a tour photo (photo which is
 	 * save in a tour) is displayed.
 	 */
-	private boolean							_isLinkPhotoDisplayed;
+	private boolean									_isLinkPhotoDisplayed;
 
-	private ActionTourColor					_actionTourColorAltitude;
-	private ActionTourColor					_actionTourColorGradient;
-	private ActionTourColor					_actionTourColorPulse;
-	private ActionTourColor					_actionTourColorSpeed;
-	private ActionTourColor					_actionTourColorPace;
-	private ActionTourColor					_actionTourColorHrZone;
+	private ActionTourColor							_actionTourColorAltitude;
+	private ActionTourColor							_actionTourColorGradient;
+	private ActionTourColor							_actionTourColorPulse;
+	private ActionTourColor							_actionTourColorSpeed;
+	private ActionTourColor							_actionTourColorPace;
+	private ActionTourColor							_actionTourColorHrZone;
 
-	private ActionDimMap					_actionDimMap;
-	private ActionOpenPrefDialog			_actionEdit2DMapPreferences;
-	private ActionMapBookmarks				_actionMapBookmarks;
-	private ActionMap2Color					_actionMapColor;
-	private ActionManageMapProviders		_actionManageProvider;
-	private ActionPhotoProperties			_actionPhotoFilter;
-	private ActionReloadFailedMapImages		_actionReloadFailedMapImages;
-	private ActionSaveDefaultPosition		_actionSaveDefaultPosition;
-	private ActionSelectMapProvider			_actionSelectMapProvider;
-	private ActionSetDefaultPosition		_actionSetDefaultPosition;
-	private ActionShowAllFilteredPhotos		_actionShowAllFilteredPhotos;
-	private ActionShowLegendInMap			_actionShowLegendInMap;
-	private ActionShowPhotos				_actionShowPhotos;
-	private ActionShowPOI					_actionShowPOI;
-	private ActionShowScaleInMap			_actionShowScaleInMap;
-	private ActionShowSliderInMap			_actionShowSliderInMap;
-	private ActionShowSliderInLegend		_actionShowSliderInLegend;
-	private ActionShowStartEndInMap			_actionShowStartEndInMap;
-	private ActionShowTourInMap				_actionShowTourInMap;
-	private ActionShowTourInfoInMap			_actionShowTourInfoInMap;
-	private ActionShowTourMarker			_actionShowTourMarker;
-	private ActionShowWayPoints				_actionShowWayPoints;
-	private ActionSynchTourZoomLevel		_actionSynchTourZoomLevel;
-	private ActionSyncMap2WithOtherMap		_actionSynchMap2WithOtherMap;
-	private ActionSynchWithPhoto			_actionSynchWithPhoto;
-	private ActionSynchWithSlider			_actionSynchWithSlider;
-	private ActionSynchWithTour				_actionSynchWithTour;
+	private ActionDimMap							_actionDimMap;
+	private ActionOpenPrefDialog					_actionEdit2DMapPreferences;
+	private ActionMapBookmarks						_actionMapBookmarks;
+	private ActionMap2Color							_actionMapColor;
+	private ActionManageMapProviders				_actionManageProvider;
+	private ActionPhotoProperties					_actionPhotoFilter;
+	private ActionReloadFailedMapImages				_actionReloadFailedMapImages;
+	private ActionSaveDefaultPosition				_actionSaveDefaultPosition;
+	private ActionSelectMapProvider					_actionSelectMapProvider;
+	private ActionSetDefaultPosition				_actionSetDefaultPosition;
+	private ActionShowAllFilteredPhotos				_actionShowAllFilteredPhotos;
+	private ActionShowLegendInMap					_actionShowLegendInMap;
+	private ActionShowPhotos						_actionShowPhotos;
+	private ActionShowPOI							_actionShowPOI;
+	private ActionShowScaleInMap					_actionShowScaleInMap;
+	private ActionShowSliderInMap					_actionShowSliderInMap;
+	private ActionShowSliderInLegend				_actionShowSliderInLegend;
+	private ActionShowStartEndInMap					_actionShowStartEndInMap;
+	private ActionShowTourInMap						_actionShowTourInMap;
+	private ActionShowTourInfoInMap					_actionShowTourInfoInMap;
+	private ActionShowTourMarker					_actionShowTourMarker;
+	private ActionShowWayPoints						_actionShowWayPoints;
+	private ActionSynchTourZoomLevel				_actionSynchTourZoomLevel;
+	private ActionSyncMap2WithOtherMap				_actionSynchMap2WithOtherMap;
+	private ActionSynchWithPhoto					_actionSynchWithPhoto;
+	private ActionSynchWithSlider					_actionSynchWithSlider;
+	private ActionSynchWithTour						_actionSynchWithTour;
 
-	private ActionZoomIn					_actionZoomIn;
-	private ActionZoomOut					_actionZoomOut;
-	private ActionZoomCentered				_actionZoomCentered;
-	private ActionZoomShowEntireEarth		_actionZoomShowAll;
-	private ActionZoomShowEntireTour		_actionShowEntireTour;
+	private ActionZoomIn							_actionZoomIn;
+	private ActionZoomOut							_actionZoomOut;
+	private ActionZoomCentered						_actionZoomCentered;
+	private ActionZoomShowEntireEarth				_actionZoomShowAll;
+	private ActionZoomShowEntireTour				_actionShowEntireTour;
 
 	/*
 	 * UI controls
 	 */
-	private Composite						_parent;
-	private Map								_map;
+	private Composite								_parent;
+	private Map										_map;
 
 	public Map2View() {}
 
@@ -1728,7 +1737,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 		_lastFiredMapPosition = new MapLocation(geoCenter, zoomLevel - 1).getMapPosition();
 
-		MapManager.fireSyncMapEvent(_lastFiredMapPosition);
+		MapManager.fireSyncMapEvent(_lastFiredMapPosition, _lastReceivedSyncMapPosition);
 	}
 
 	@Override
@@ -3096,7 +3105,15 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	}
 
 	@Override
-	public void syncMapWithOtherMap(final MapPosition mapPosition) {
+	public void syncMapWithOtherMap(final MapPosition mapPosition,
+									final ConcurrentHashMap<MapPosition, Long> lastReceivedSyncMapPosition) {
+
+		if (!_isMapSynchedWithOtherMap) {
+
+			// sync feature is disabled
+
+			return;
+		}
 
 		if (_isInSyncMap) {
 			return;
@@ -3109,48 +3126,31 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 			return;
 		}
 
-		final long currentTime = System.currentTimeMillis();
-		final long timeDiff = currentTime - _lastMapPositioningTime;
-
-		System.out.println(
-				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\ttimeDiff:" + timeDiff));
-		// TODO remove SYSTEM.OUT.PRINTLN
-
-		if (timeDiff < 2000) {
+		if (MapManager.isOwnMapPosition(_lastReceivedSyncMapPosition, lastReceivedSyncMapPosition)) {
 
 			/*
-			 * This sync event was caused from this map but other map (2.5) throw the events
+			 * This is a subsequent event which was fired from here but the other map posted
+			 * additional sync events because of an animation
 			 */
-
 			return;
 		}
 
-		System.out.println(
-				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tsyncMapWithOtherMap 2:"
-						+ mapPosition));
-		// TODO remove SYSTEM.OUT.PRINTLN
 
-		if (_isMapSynchedWithOtherMap) {
+		_lastReceivedSyncMapPosition.put(mapPosition, System.currentTimeMillis());
 
-			// run in UI thread
+		// run in UI thread
+		_parent.getDisplay().asyncExec(new Runnable() {
+			@Override
+			public void run() {
 
-			_parent.getDisplay().asyncExec(new Runnable() {
-				@Override
-				public void run() {
-
-					_isInSyncMap = true;
-					{
-
-						_map.setZoom(mapPosition.zoomLevel + 1);
-						_map.setMapCenter(new GeoPosition(mapPosition.getLatitude(), mapPosition.getLongitude()));
-
-						_lastMapPositioningTime = System.currentTimeMillis();
-
-					}
-					_isInSyncMap = false;
+				_isInSyncMap = true;
+				{
+					_map.setZoom(mapPosition.zoomLevel + 1);
+					_map.setMapCenter(new GeoPosition(mapPosition.getLatitude(), mapPosition.getLongitude()));
 				}
-			});
-		}
+				_isInSyncMap = false;
+			}
+		});
 	}
 
 	private void updateFilteredPhotos() {
