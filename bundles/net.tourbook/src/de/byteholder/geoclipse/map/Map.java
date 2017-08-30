@@ -1609,23 +1609,23 @@ public class Map extends Canvas {
 			// check if command (OSX) is set
 			offset = (event.stateMask & SWT.COMMAND) != 0 ? 20 : 1;
 		}
-		offset *= (event.stateMask & SWT.SHIFT) != 0 ? 10 : 1;
+		offset *= (event.stateMask & SWT.SHIFT) != 0 ? 1 : 40;
 
 		int xDiff = 0;
 		int yDiff = 0;
 
 		switch (event.keyCode) {
 		case SWT.ARROW_LEFT:
-			xDiff = -offset;
-			break;
-		case SWT.ARROW_RIGHT:
 			xDiff = offset;
 			break;
+		case SWT.ARROW_RIGHT:
+			xDiff = -offset;
+			break;
 		case SWT.ARROW_UP:
-			yDiff = -offset;
+			yDiff = offset;
 			break;
 		case SWT.ARROW_DOWN:
-			yDiff = offset;
+			yDiff = -offset;
 			break;
 		}
 
