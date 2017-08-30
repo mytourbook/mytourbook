@@ -39,7 +39,7 @@ public class ActionSynchWithSlider extends Action {
 
 	@Override
 	public void run() {
-		fMapView.actionSynchWithSlider();
+		fMapView.actionSync_WithSlider();
 	}
 
 }

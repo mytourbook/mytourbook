@@ -16,7 +16,6 @@
 package net.tourbook.map25;
 
 import org.oscim.core.GeoPoint;
-import org.oscim.core.MapPosition;
 import org.oscim.gdx.InputHandler;
 import org.oscim.layers.Layer;
 import org.oscim.layers.tile.vector.labeling.LabelLayer;
@@ -49,14 +48,6 @@ public class InputHandlerMT extends InputHandler {
 		_mapApp = mapApp;
 		_map = mapApp.getMap();
 		_viewport = _map.viewport();
-	}
-
-	private void fireMapPosition() {
-
-		final MapPosition mapPosition = new MapPosition();
-		_viewport.getMapPosition(mapPosition);
-
-		_mapApp.getMap25View().onMapPosition(mapPosition);
 	}
 
 	@Override

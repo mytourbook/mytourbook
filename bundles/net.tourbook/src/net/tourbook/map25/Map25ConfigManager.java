@@ -963,9 +963,6 @@ public class Map25ConfigManager {
 
 	public static void setMapLocation(final Map map, final MapPosition mapPosition) {
 
-//		System.out.println((UI.timeStampNano() + " [" + "] ") + ("\tsetMapLocation: " + mapPosition));
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
 		if (ThreadUtils.isMainThread()) {
 
 			setMapLocation_InMapThread(map, mapPosition);
@@ -985,16 +982,20 @@ public class Map25ConfigManager {
 
 	private static void setMapLocation_InMapThread(final Map map, final MapPosition mapPosition) {
 
-		if (animationTime == 0 || isAnimateLocation == false) {
+		final boolean isAnimation = animationTime != 0 && isAnimateLocation;
 
-			map.setMapPosition(mapPosition);
+		if (isAnimation) {
 
-		} else {
+			final Animator animator = map.animator();
 
-			map.animator().animateTo(
+			animator.cancel();
+			animator.animateTo(
 					(long) (animationTime * 1000),
 					mapPosition,
 					animationEasingType);
+		} else {
+
+			map.setMapPosition(mapPosition);
 		}
 
 		map.updateMap(true);

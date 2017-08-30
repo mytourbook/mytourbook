@@ -339,11 +339,11 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 
 		defineColumn_10_Name();
 		defineColumn_20_Zoomlevel();
-		defineColumn_22_Scale();
-		defineColumn_30_Latitude();
-		defineColumn_40_Longitude();
-		defineColumn_60_Bearing();
-		defineColumn_70_Tile();
+		defineColumn_30_Scale();
+		defineColumn_40_Bearing();
+		defineColumn_50_Tilt();
+		defineColumn_60_Latitude();
+		defineColumn_70_Longitude();
 	}
 
 	/**
@@ -402,13 +402,14 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 	/**
 	 * Column: Scale
 	 */
-	private void defineColumn_22_Scale() {
+	private void defineColumn_30_Scale() {
 
 		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "scale", SWT.TRAIL); //$NON-NLS-1$
 
 		colDef.setColumnLabel(Messages.Map_Bookmark_Column_Scale);
 		colDef.setColumnHeaderText(Messages.Map_Bookmark_Column_Scale);
 
+		colDef.setIsDefaultColumn();
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(9));
 //		colDef.setColumnWeightData(new ColumnWeightData(9));
 
@@ -433,69 +434,16 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 	}
 
 	/**
-	 * Column: Latitude
-	 */
-	private void defineColumn_30_Latitude() {
-
-		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "latitude", SWT.TRAIL); //$NON-NLS-1$
-
-		colDef.setColumnLabel(Messages.Map_Bookmark_Column_Latitude_Tooltip);
-		colDef.setColumnHeaderText(Messages.Map_Bookmark_Column_Latitude);
-		colDef.setColumnHeaderToolTipText(Messages.Map_Bookmark_Column_Latitude_Tooltip);
-
-		colDef.setIsDefaultColumn();
-		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(9));
-//		colDef.setColumnWeightData(new ColumnWeightData(9));
-
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final MapBookmark bookmark = (MapBookmark) cell.getElement();
-				final String valueText = _nfLatLon.format(bookmark.getLatitude());
-
-				cell.setText(valueText);
-			}
-		});
-	}
-
-	/**
-	 * Column: Longitude
-	 */
-	private void defineColumn_40_Longitude() {
-
-		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "longitude", SWT.TRAIL); //$NON-NLS-1$
-
-		colDef.setColumnLabel(Messages.Map_Bookmark_Column_Longitude_Tooltip);
-		colDef.setColumnHeaderText(Messages.Map_Bookmark_Column_Longitude);
-		colDef.setColumnHeaderToolTipText(Messages.Map_Bookmark_Column_Longitude_Tooltip);
-
-		colDef.setIsDefaultColumn();
-		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(9));
-//		colDef.setColumnWeightData(new ColumnWeightData(9));
-
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final MapBookmark bookmark = (MapBookmark) cell.getElement();
-				final String valueText = _nfLatLon.format(bookmark.getLongitude());
-
-				cell.setText(valueText);
-			}
-		});
-	}
-
-	/**
 	 * Column: Bearing
 	 */
-	private void defineColumn_60_Bearing() {
+	private void defineColumn_40_Bearing() {
 
 		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "bearing", SWT.TRAIL); //$NON-NLS-1$
 
 		colDef.setColumnLabel(Messages.Map_Bookmark_Column_Bearing);
 		colDef.setColumnHeaderText(Messages.Map_Bookmark_Column_Bearing);
 
+		colDef.setIsDefaultColumn();
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(9));
 //		colDef.setColumnWeightData(new ColumnWeightData(9));
 
@@ -522,13 +470,14 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 	/**
 	 * Column: Tilt
 	 */
-	private void defineColumn_70_Tile() {
+	private void defineColumn_50_Tilt() {
 
 		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "tilt", SWT.TRAIL); //$NON-NLS-1$
 
 		colDef.setColumnLabel(Messages.Map_Bookmark_Column_Tilt);
 		colDef.setColumnHeaderText(Messages.Map_Bookmark_Column_Tilt);
 
+		colDef.setIsDefaultColumn();
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(9));
 //		colDef.setColumnWeightData(new ColumnWeightData(9));
 
@@ -546,6 +495,60 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 				} else {
 					valueText = _nf0.format(value);
 				}
+
+				cell.setText(valueText);
+			}
+		});
+	}
+
+	/**
+	 * Column: Latitude
+	 */
+	private void defineColumn_60_Latitude() {
+
+		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "latitude", SWT.TRAIL); //$NON-NLS-1$
+
+		colDef.setColumnLabel(Messages.Map_Bookmark_Column_Latitude_Tooltip);
+		colDef.setColumnHeaderText(Messages.Map_Bookmark_Column_Latitude);
+		colDef.setColumnHeaderToolTipText(Messages.Map_Bookmark_Column_Latitude_Tooltip);
+
+		colDef.setIsDefaultColumn();
+		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(9));
+//		colDef.setColumnWeightData(new ColumnWeightData(9));
+
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final MapBookmark bookmark = (MapBookmark) cell.getElement();
+				final String valueText = _nfLatLon.format(bookmark.getLatitude());
+
+				cell.setText(valueText);
+			}
+		});
+	}
+
+	/**
+	 * Column: Longitude
+	 */
+	private void defineColumn_70_Longitude() {
+
+		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "longitude", SWT.TRAIL); //$NON-NLS-1$
+
+		colDef.setColumnLabel(Messages.Map_Bookmark_Column_Longitude_Tooltip);
+		colDef.setColumnHeaderText(Messages.Map_Bookmark_Column_Longitude);
+		colDef.setColumnHeaderToolTipText(Messages.Map_Bookmark_Column_Longitude_Tooltip);
+
+		colDef.setIsDefaultColumn();
+		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(9));
+//		colDef.setColumnWeightData(new ColumnWeightData(9));
+
+		colDef.setLabelProvider(new CellLabelProvider() {
+			@Override
+			public void update(final ViewerCell cell) {
+
+				final MapBookmark bookmark = (MapBookmark) cell.getElement();
+				final String valueText = _nfLatLon.format(bookmark.getLongitude());
 
 				cell.setText(valueText);
 			}
@@ -662,7 +665,7 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 
 		final MapBookmark selectedBookmark = getSelectedBookmark();
 
-		final BookmarkRenameDialog addDialog = new BookmarkRenameDialog(
+		final BookmarkRenameDialog renameDialog = new BookmarkRenameDialog(
 
 				_parent.getShell(),
 				Messages.Map_Bookmark_Dialog_RenameBookmark_Title,
@@ -682,14 +685,14 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 					}
 				});
 
-		addDialog.open();
+		renameDialog.open();
 
-		if (addDialog.getReturnCode() != Window.OK) {
+		if (renameDialog.getReturnCode() != Window.OK) {
 			return;
 		}
 
 		// update model
-		selectedBookmark.name = addDialog.getValue();
+		selectedBookmark.name = renameDialog.getValue();
 
 		// update ui
 		_bookmarkViewer.refresh();

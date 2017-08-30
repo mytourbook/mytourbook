@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -127,62 +126,59 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 	//
 // SET_FORMATTING_ON
 	//
-	private static final IDialogSettings			_state									= TourbookPlugin
+	private static final IDialogSettings	_state									= TourbookPlugin
 			.getState(
 					ID);
 	//
-	private Map25App								_mapApp;
+	private Map25App						_mapApp;
 	//
-	private OpenDialogManager						_openDlgMgr								=
+	private OpenDialogManager				_openDlgMgr								=
 			new OpenDialogManager();
 	//
-	private boolean									_isPartVisible;
+	private boolean							_isPartVisible;
 	//
-	private IPartListener2							_partListener;
-	private ISelectionListener						_postSelectionListener;
-	private ITourEventListener						_tourEventListener;
+	private IPartListener2					_partListener;
+	private ISelectionListener				_postSelectionListener;
+	private ITourEventListener				_tourEventListener;
 	//
-	private ISelection								_lastHiddenSelection;
-	private ISelection								_selectionWhenHidden;
-	private int										_lastSelectionHash;
-	private MapPosition								_lastFiredMapPosition;
-	private ConcurrentHashMap<MapPosition, Long>	_lastOwnReceivedSyncMapPosition			= new ConcurrentHashMap<>();
-	private ConcurrentHashMap<MapPosition, Long>	_lastOtherReceivedSyncMapPosition;
+	private ISelection						_lastHiddenSelection;
+	private ISelection						_selectionWhenHidden;
+	private int								_lastSelectionHash;
 	//
-	private ActionMapBookmarks						_actionMapBookmarks;
-	private ActionMap25_Options						_actionMapOptions;
-	private ActionMap25_ShowMarker					_actionMarkerOptions;
-	private ActionSelectMap25Provider				_actionSelectMapProvider;
-	private ActionSynchMapWithChartSlider			_actionSynchMapWithChartSlider;
-	private ActionSynchMapWithTour					_actionSynchMapWithTour;
-	private ActionSyncMap2WithOtherMap				_actionSynchMap25WithOtherMap;
-	private ActionShowEntireTour					_actionShowEntireTour;
-	private ActionTourTrackConfig					_actionTrackOptions;
+	private ActionMapBookmarks				_actionMapBookmarks;
+	private ActionMap25_Options				_actionMapOptions;
+	private ActionMap25_ShowMarker			_actionMarkerOptions;
+	private ActionSelectMap25Provider		_actionSelectMapProvider;
+	private ActionSynchMapWithChartSlider	_actionSynchMapWithChartSlider;
+	private ActionSynchMapWithTour			_actionSynchMapWithTour;
+	private ActionSyncMap2WithOtherMap		_actionSynchMap25WithOtherMap;
+	private ActionShowEntireTour			_actionShowEntireTour;
+	private ActionTourTrackConfig			_actionTrackOptions;
 	//
-	private ArrayList<TourData>						_allTourData							= new ArrayList<>();
-	private TIntArrayList							_allTourStarts							= new TIntArrayList();
-	private GeoPoint[]								_allGeoPoints;
-	private BoundingBox								_allBoundingBox;
+	private ArrayList<TourData>				_allTourData							= new ArrayList<>();
+	private TIntArrayList					_allTourStarts							= new TIntArrayList();
+	private GeoPoint[]						_allGeoPoints;
+	private BoundingBox						_allBoundingBox;
 	//
-	private int										_hashTourId;
-	private int										_hashTourData;
+	private int								_hashTourId;
+	private int								_hashTourData;
 	//
-	private boolean									_isMapSynchedWithOtherMap;
-	private boolean									_isMapSynchedWithChartSlider;
-	private boolean									_isMapSynchedWithTour;
+	private boolean							_isMapSynchedWithOtherMap;
+	private boolean							_isMapSynchedWithChartSlider;
+	private boolean							_isMapSynchedWithTour;
 	//
 	//
 	// context menu
-	private boolean									_isContextMenuVisible;
+	private boolean							_isContextMenuVisible;
 //	private MouseAdapter					_wwMouseListener;
-	private Menu									_swtContextMenu;
+	private Menu							_swtContextMenu;
 	//
 	/*
 	 * UI controls
 	 */
-	private Composite								_swtContainer;
+	private Composite						_swtContainer;
 
-	Composite										_parent;
+	Composite								_parent;
 
 	private class ActionMap25_Options extends ActionToolbarSlideout {
 
@@ -821,18 +817,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 	boolean onMapPosition(final MapPosition mapPosition) {
 
-		_lastFiredMapPosition = mapPosition;
-
-		if (MapManager.isOwnMapPosition(_lastOwnReceivedSyncMapPosition, _lastOtherReceivedSyncMapPosition)) {
-
-			/*
-			 * This is a subsequent event which was fired from here but the other map posted
-			 * additional sync events because of an animation
-			 */
-			return false;
-		}
-
-		MapManager.fireSyncMapEvent(_lastFiredMapPosition, _lastOwnReceivedSyncMapPosition);
+		MapManager.fireSyncMapEvent(mapPosition, this);
 
 		return false;
 	}
@@ -1391,7 +1376,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 	@Override
 	public void syncMapWithOtherMap(final MapPosition mapPosition,
-									final ConcurrentHashMap<MapPosition, Long> lastReceivedSyncMapPosition) {
+									final ViewPart viewPart) {
 
 		if (!_isMapSynchedWithOtherMap) {
 
@@ -1400,20 +1385,14 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 			return;
 		}
 
-		if (_lastFiredMapPosition == mapPosition) {
+		if (viewPart == this || !_isPartVisible) {
 
 			// event is fired from this map -> ignore
 
 			return;
 		}
 
-		_lastOtherReceivedSyncMapPosition = lastReceivedSyncMapPosition;
-
-		_lastOwnReceivedSyncMapPosition.put(mapPosition, System.currentTimeMillis());
-
-		final Map map = _mapApp.getMap();
-
-		Map25ConfigManager.setMapLocation(map, mapPosition);
+		Map25ConfigManager.setMapLocation(_mapApp.getMap(), mapPosition);
 	}
 
 	void updateUI_SelectedMapProvider(final Map25Provider selectedMapProvider) {

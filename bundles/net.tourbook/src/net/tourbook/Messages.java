@@ -28,6 +28,7 @@ public class Messages extends NLS {
 	public static String		Action_Compute_ElevationGain;
 
 	public static String		Action_Map_AddBookmark;
+	public static String		Action_Map_RenameBookmark;
 	public static String		Action_Map_UpdateBookmark;
 
 	public static String		Action_MarkerFilter_WithGPS_Tooltip;

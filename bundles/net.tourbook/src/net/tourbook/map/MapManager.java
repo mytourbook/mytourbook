@@ -18,9 +18,9 @@ package net.tourbook.map;
 import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentHashMap.KeySetView;
 
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.ui.part.ViewPart;
 import org.oscim.core.MapPosition;
 
 public class MapManager {
@@ -32,75 +32,94 @@ public class MapManager {
 	}
 
 	public static void fireSyncMapEvent(final MapPosition mapPosition,
-										final ConcurrentHashMap<MapPosition, Long> lastReceivedSyncMapPosition) {
+										final ViewPart viewPart) {
 
 		final Object[] allListeners = _allMapSyncListener.getListeners();
 
 		for (final Object listener : allListeners) {
-			((IMapSyncListener) (listener)).syncMapWithOtherMap(mapPosition, lastReceivedSyncMapPosition);
+			((IMapSyncListener) (listener)).syncMapWithOtherMap(mapPosition, viewPart);
 		}
 	}
 
-	public static boolean isOwnMapPosition(	final ConcurrentHashMap<MapPosition, Long> ownMapPositions,
-											final ConcurrentHashMap<MapPosition, Long> otherMapPositions) {
+	public static boolean isInOwnMapPosition(	final ConcurrentHashMap<MapPosition, Long> ownMapPositions,
+												final ConcurrentHashMap<MapPosition, Long> otherMapPositions) {
 
 		if (otherMapPositions == null) {
 			return false;
 		}
 
 		final long currentTime = System.currentTimeMillis();
+		final int keepingTime = 5000;
 
-		final HashSet<MapPosition> removePositions = new HashSet<>();
+		final HashSet<MapPosition> removeOwnPositions = new HashSet<>();
+		final HashSet<MapPosition> removeOtherPositions = new HashSet<>();
+		final ConcurrentHashMap<MapPosition, Long> keepOtherPositions = new ConcurrentHashMap<>();
 
-		final KeySetView<MapPosition, Long> allOtherPos = otherMapPositions.keySet();
+		boolean returnValue = false;
+		try {
 
-		for (final Entry<MapPosition, Long> ownEntry : ownMapPositions.entrySet()) {
+			for (final Entry<MapPosition, Long> otherEntry : otherMapPositions.entrySet()) {
 
-			final MapPosition ownPos = ownEntry.getKey();
+				final MapPosition otherPos = otherEntry.getKey();
+				final Long otherValue = otherEntry.getValue();
 
-			final long timeDiff = currentTime - ownEntry.getValue();
+				final long timeDiff = currentTime - otherValue;
 
-//			System.out.println(
-//					(UI.timeStampNano() + " [" + "] ") + ("\ttimeDiff:" + timeDiff) + ("\tsize:" + ownMapPositions
-//							.size()));
-//			// TODO remove SYSTEM.OUT.PRINTLN
+				if (timeDiff > keepingTime) {
 
-			if (timeDiff > 1000) {
+					removeOtherPositions.add(otherPos);
 
-				removePositions.add(ownPos);
+				} else {
 
-			} else {
+					keepOtherPositions.put(otherPos, otherValue);
+				}
+			}
 
-				final double ownX = ownPos.x;
-				final double ownY = ownPos.y;
-				final double ownScale = ownPos.scale;
+			outerLoop:
 
-				for (final MapPosition otherPos : allOtherPos) {
+			for (final Entry<MapPosition, Long> ownEntry : ownMapPositions.entrySet()) {
 
-					if (ownX == otherPos.x && ownY == otherPos.y && ownScale == otherPos.scale) {
+				final MapPosition ownKey = ownEntry.getKey();
 
-						/*
-						 * This is a subsequent event which was fired from here but the other map
-						 * posted additional sync events because of an animation
-						 */
+				final long timeDiff = currentTime - ownEntry.getValue();
 
-						return true;
+				if (timeDiff > keepingTime) {
+
+					removeOwnPositions.add(ownKey);
+
+				} else {
+
+					for (final MapPosition otherKey : keepOtherPositions.keySet()) {
+
+						if (ownKey.x == otherKey.x && ownKey.y == otherKey.y && ownKey.scale == otherKey.scale) {
+
+							/*
+							 * This is a subsequent event which was fired from here but the other
+							 * map posted additional sync events because of an animation
+							 */
+
+							returnValue = true;
+
+							break outerLoop;
+						}
 					}
 				}
 			}
+
+		} finally {
+
+			/*
+			 * remove old positions
+			 */
+			for (final MapPosition mapPosition : removeOwnPositions) {
+				ownMapPositions.remove(mapPosition);
+			}
+			for (final MapPosition mapPosition : removeOtherPositions) {
+				otherMapPositions.remove(mapPosition);
+			}
 		}
 
-//		System.out.println();
-//		System.out.println();
-//		System.out.println();
-		/*
-		 * remove old positions from the own set
-		 */
-		for (final MapPosition mapPosition : removePositions) {
-			ownMapPositions.remove(mapPosition);
-		}
-
-		return false;
+		return returnValue;
 	}
 
 	public static void removeMapSyncListener(final IMapSyncListener listener) {

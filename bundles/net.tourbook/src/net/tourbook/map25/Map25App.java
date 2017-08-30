@@ -180,16 +180,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 			@Override
 			public void onMapEvent(final Event e, final MapPosition mapPosition) {
 
-//				final MapPosition mapPosition = new MapPosition();
-//				_viewport.getMapPosition(mapPosition);
-
 				_map25View.onMapPosition(mapPosition);
-
-//				System.out.println(
-//						(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
-//								+ ("\tevent:" + e.toString())
-//								+ ("\tmapPosition:" + mapPosition));
-//				// TODO remove SYSTEM.OUT.PRINTLN
 
 			}
 		});

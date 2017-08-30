@@ -154,6 +154,24 @@ public class MapBookmarkManager {
 
 	}
 
+	private static class ActionBookmark_Rename extends Action {
+
+		private IMapBookmarks __mapBookmarks;
+
+		public ActionBookmark_Rename(final String text, final IMapBookmarks mapBookmarks) {
+
+			super(text, AS_PUSH_BUTTON);
+
+			__mapBookmarks = mapBookmarks;
+		}
+
+		@Override
+		public void run() {
+			actionBookmark_Rename(__mapBookmarks);
+		}
+
+	}
+
 	private static class ActionBookmark_Update extends Action {
 
 		private IMapBookmarks __mapBookmarks;
@@ -285,8 +303,54 @@ public class MapBookmarkManager {
 		_allBookmarks.add(newBookmark);
 
 		setLastSelectedBookmark(newBookmark);
-		
+
 		onUpdateBookmark(newBookmark);
+	}
+
+	private static void actionBookmark_Rename(final IMapBookmarks mapBookmarks) {
+
+		if (_allRecentBookmarks.size() > 0) {
+
+			final MapBookmark lastSelectedBookmark = _allRecentBookmarks.getFirst();
+
+			if (lastSelectedBookmark != null) {
+
+				// rename last selected bookmark
+
+				final BookmarkRenameDialog renameDialog = new BookmarkRenameDialog(
+
+						Display.getDefault().getActiveShell(),
+						Messages.Map_Bookmark_Dialog_RenameBookmark_Title,
+						Messages.Map_Bookmark_Dialog_RenameBookmark_Message,
+						lastSelectedBookmark.name,
+						true,
+
+						new IInputValidator() {
+
+							@Override
+							public String isValid(final String newText) {
+
+								if (newText.trim().length() == 0) {
+									return Messages.Map_Bookmark_Dialog_ValidationRename;
+								}
+
+								return null;
+							}
+						});
+
+				renameDialog.open();
+
+				if (renameDialog.getReturnCode() != Window.OK) {
+					return;
+				}
+
+				// update model
+				lastSelectedBookmark.name = renameDialog.getValue();
+
+				// update UI
+				onUpdateBookmark(lastSelectedBookmark);
+			}
+		}
 	}
 
 	private static void actionBookmark_Update(final IMapBookmarks mapBookmarks) {
@@ -345,6 +409,13 @@ public class MapBookmarkManager {
 			// update last selected bookmark
 			if (lastSelectedBookmark != null) {
 
+				final ActionBookmark_Rename actionRenameBookmark = new ActionBookmark_Rename(
+
+						// set text with last selected bookmark
+						NLS.bind(Messages.Action_Map_RenameBookmark, lastSelectedBookmark.name),
+
+						mapBookmarks);
+
 				final ActionBookmark_Update actionUpdateBookmark = new ActionBookmark_Update(
 
 						// set text with last selected bookmark
@@ -352,6 +423,7 @@ public class MapBookmarkManager {
 
 						mapBookmarks);
 
+				menuMgr.add(actionRenameBookmark);
 				menuMgr.add(actionUpdateBookmark);
 			}
 		}
@@ -394,6 +466,13 @@ public class MapBookmarkManager {
 			// update last selected bookmark
 			if (lastSelectedBookmark != null) {
 
+				final ActionBookmark_Rename actionRenameBookmark = new ActionBookmark_Rename(
+
+						// set text with last selected bookmark
+						NLS.bind(Messages.Action_Map_RenameBookmark, lastSelectedBookmark.name),
+
+						mapBookmarks);
+
 				final ActionBookmark_Update actionUpdateBookmark = new ActionBookmark_Update(
 
 						// set text with last selected bookmark
@@ -401,6 +480,7 @@ public class MapBookmarkManager {
 
 						mapBookmarks);
 
+				fillMenuItem(menu, actionRenameBookmark);
 				fillMenuItem(menu, actionUpdateBookmark);
 			}
 		}
@@ -473,7 +553,7 @@ public class MapBookmarkManager {
 	}
 
 	public static void onUpdateBookmark(final MapBookmark updatedBookmark) {
-		
+
 		if (_mapBookmarkView != null) {
 			_mapBookmarkView.onUpdateBookmark(updatedBookmark);
 		}

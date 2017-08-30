@@ -15,8 +15,7 @@
  *******************************************************************************/
 package net.tourbook.map;
 
-import java.util.concurrent.ConcurrentHashMap;
-
+import org.eclipse.ui.part.ViewPart;
 import org.oscim.core.MapPosition;
 
 public interface IMapSyncListener {
@@ -26,10 +25,10 @@ public interface IMapSyncListener {
 	 * 
 	 * @param newMapPosition
 	 *            Map position of the other map
-	 * @param lastReceivedSyncMapPositions
-	 *            Map position from the previous received sync event, can be <code>null</code>
+	 * @param viewPart
+	 *            View which fired this event
 	 */
 	void syncMapWithOtherMap(	MapPosition newMapPosition,
-								ConcurrentHashMap<MapPosition, Long> lastReceivedSyncMapPositions);
+								ViewPart viewPart);
 
 }
