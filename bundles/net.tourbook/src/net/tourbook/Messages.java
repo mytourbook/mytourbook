@@ -394,6 +394,7 @@ public class Messages extends NLS {
 	public static String		App_Action_JoinTours;
 	public static String		App_Action_Menu_Directory;
 	public static String		App_Action_Menu_help;
+	public static String		App_Action_Menu_Map;
 	public static String		App_Action_Menu_New;
 	public static String		App_Action_Menu_tools;
 	public static String		App_Action_Menu_Tour;

@@ -617,73 +617,77 @@
 		-->
 		<menuContribution locationURI="menu:m_Tour?before=defaultViews">
 
-			<!-- Tour -->
-			
-				<separator
-					name="sep_Tour"
-					visible="true"/>
+			<separator
+				name="sep_Tour"
+				visible="true"/>
 
-				<!-- Tour Chart -->
-				<command
-					commandId="net.tourbook.command.selectedTour"
-					icon="icons/tour-chart.png"
-					label="%command_view_selectedTour"
-					mnemonic="%command_view_selectedTour_mnemonic"
-					tooltip="%command_view_selectedTour_tooltip"/>
+			<!-- Tour Chart -->
+			<command
+				commandId="net.tourbook.command.selectedTour"
+				icon="icons/tour-chart.png"
+				label="%command_view_selectedTour"
+				mnemonic="%command_view_selectedTour_mnemonic"
+				tooltip="%command_view_selectedTour_tooltip"/>
 
-				<!-- Tour Editor - this command is displayed in the "Tour" and the "Tools" menu -->
-				<command
-					commandId="net.tourbook.command.tourDataEditor"
-					icon="icons/tour-editor.png"
-					label="%command_view_tourEditor"
-					mnemonic="%command_view_tourEditor_mnemonic"
-					tooltip="%command_view_tourEditor_tooltip"/>
-				 
-				<!-- Tour Blog -->
-				<command
-					commandId="command.net.tourbook.views.TourBlogView"
-					icon="icons/tour-blog.png"
-					label="%View_Name_TourBlog"
-					mnemonic="%View_Name_TourBlog_Mnemonic"/>
+			<!-- Tour Editor - this command is displayed in the "Tour" and the "Tools" menu -->
+			<command
+				commandId="net.tourbook.command.tourDataEditor"
+				icon="icons/tour-editor.png"
+				label="%command_view_tourEditor"
+				mnemonic="%command_view_tourEditor_mnemonic"
+				tooltip="%command_view_tourEditor_tooltip"/>
+			 
+			<!-- Tour Blog -->
+			<command
+				commandId="command.net.tourbook.views.TourBlogView"
+				icon="icons/tour-blog.png"
+				label="%View_Name_TourBlog"
+				mnemonic="%View_Name_TourBlog_Mnemonic"/>
 
-				<!-- Tour Photos -->
-				<command
-					commandId="command.net.tourbook.photo.TourPhotosView"
-					icon="icons/photo-tour-photos.png"
-					label="%View_Name_PhotoTourPhotos"
-					mnemonic="%View_Name_PhotoTourPhotos_Mnemonic"/>
+			<!-- Tour Photos -->
+			<command
+				commandId="command.net.tourbook.photo.TourPhotosView"
+				icon="icons/photo-tour-photos.png"
+				label="%View_Name_PhotoTourPhotos"
+				mnemonic="%View_Name_PhotoTourPhotos_Mnemonic"/>
 
-				<!-- Tour Marker -->
-				<command
-					commandId="command.net.tourbook.views.TourMarkerView"
-					icon="icons/tour-marker.png"
-					label="%view_name_Marker"
-					mnemonic="%view_name_Marker_Mnemonic"/>
-				 
-				<!-- Waypoints -->
-				<command
-					commandId="command.net.tourbook.views.TourWaypointView"
-					icon="icons/tour-waypoint.png"
-					label="%View_Name_Waypoint"
-					mnemonic="%View_Name_Waypoint_Mnemonic"/>
-
-			<!-- Map -->
-			
-				<separator
-					name="sep_Map"
-					visible="true"/>
-
-				<!-- 2D map -->
-				<command
-					commandId="net.tourbook.mapping.command.tourMap"
-					icon="icons/map2-view.png"
-					label="%command_tour_map_name"
-					mnemonic="%command_tour_map_name_Mnemonic"
-					tooltip="%command_tour_map_name_tooltip"/>
+			<!-- Tour Marker -->
+			<command
+				commandId="command.net.tourbook.views.TourMarkerView"
+				icon="icons/tour-marker.png"
+				label="%view_name_Marker"
+				mnemonic="%view_name_Marker_Mnemonic"/>
+			 
+			<!-- Waypoints -->
+			<command
+				commandId="command.net.tourbook.views.TourWaypointView"
+				icon="icons/tour-waypoint.png"
+				label="%View_Name_Waypoint"
+				mnemonic="%View_Name_Waypoint_Mnemonic"/>
 
 		</menuContribution>
 		
+		
+		<!-- 
+			Map
+		-->
+		<menuContribution locationURI="menu:m_Map?before=defaultViews">
+		
+			<separator
+				name="sep_Map"
+				visible="true"/>
 
+			<!-- 2D map -->
+			<command
+				commandId="net.tourbook.mapping.command.tourMap"
+				icon="icons/map2-view.png"
+				label="%command_tour_map_name"
+				mnemonic="%command_tour_map_name_Mnemonic"
+				tooltip="%command_tour_map_name_tooltip"/>
+
+		</menuContribution>
+		
+		
 		<!-- 
 			Tools
 		-->
@@ -909,13 +913,6 @@
 					style="push"
 				/>
 
-				<command
-					commandId="net.tourbook.command.tourCompareWizard"
-					icon="icons/tour-map-compare-wizard.png"
-					label="%command_tourCompare_wizard"
-					mnemonic="%command_tourCompare_wizard_mnemonic"
-					style="push"
-				/>
 
 			</toolbar>
 		</menuContribution>
@@ -1812,7 +1809,7 @@
 
    <extension point="org.eclipse.ui.menus">
 
-		<menuContribution locationURI="menu:m_Tour?endof=sep_Map" >
+		<menuContribution locationURI="menu:m_Map?endof=sep_Map" >
 		            
 			<command commandId="net.tourbook.map25.command.TourMap25"
 				icon="icons/map25-view.png"
@@ -1889,7 +1886,7 @@
 
    <extension point="org.eclipse.ui.menus">
 
-		<menuContribution locationURI="menu:m_Tour?endof=sep_Map" >
+		<menuContribution locationURI="menu:m_Map?endof=sep_Map" >
 		            
 			<command commandId="net.tourbook.map3.command.TourMap3"
 				icon="icons/map3-view.png"
@@ -1960,7 +1957,7 @@
 
    <extension point="org.eclipse.ui.menus">
 
-		<menuContribution locationURI="menu:m_Tour?endof=sep_Map" >
+		<menuContribution locationURI="menu:m_Map?endof=sep_Map" >
 		            
 			<command commandId="net.tourbook.map.bookmark.command.MapBookmarkView"
 				icon="icons/map-bookmark.png"

@@ -135,6 +135,15 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		return tourMenu;
 	}
 
+	private MenuManager createMenu_35_Map() {
+
+		final MenuManager mapMenu = new MenuManager(Messages.App_Action_Menu_Map, "m_Map"); //$NON-NLS-1$
+
+		mapMenu.add(new Separator("defaultViews")); //$NON-NLS-1$
+
+		return mapMenu;
+	}
+
 	private MenuManager createMenu_40_Tool() {
 
 		final MenuManager toolMenu = new MenuManager(Messages.App_Action_Menu_tools, "m_Tools"); //$NON-NLS-1$
@@ -236,6 +245,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		menuBar.add(createMenu_10_New());
 		menuBar.add(createMenu_20_Directories());
 		menuBar.add(createMenu_30_Tour());
+		menuBar.add(createMenu_35_Map());
 		menuBar.add(createMenu_40_Tool());
 		menuBar.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
 		menuBar.add(createMenu_50_Help());
