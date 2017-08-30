@@ -34,6 +34,7 @@ public class Messages extends NLS {
 	public static String		Image_Action_POI;
 	public static String		Image_Action_POI_Disabled;
 	public static String		Image_Action_ShowAllPhotosInMap;
+	public static String		Image_Action_ShowAllPhotosInMap_Disabled;
 	public static String		Image_Action_ShowPhotosInMap;
 	public static String		Image_Action_ShowSliderInMap;
 	public static String		Image_Action_ShowSliderInMap_Left;
