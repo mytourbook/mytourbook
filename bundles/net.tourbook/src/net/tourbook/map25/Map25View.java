@@ -72,6 +72,7 @@ import net.tourbook.tour.SelectionTourMarker;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 
 import org.eclipse.jface.action.IToolBarManager;
@@ -136,6 +137,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 			new OpenDialogManager();
 	//
 	private boolean							_isPartVisible;
+	private boolean							_isShowTour;
 	//
 	private IPartListener2					_partListener;
 	private ISelectionListener				_postSelectionListener;
@@ -149,11 +151,11 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 	private ActionMap25_Options				_actionMapOptions;
 	private ActionMap25_ShowMarker			_actionMarkerOptions;
 	private ActionSelectMap25Provider		_actionSelectMapProvider;
-	private ActionSynchMapWithChartSlider	_actionSynchMapWithChartSlider;
-	private ActionSynchMapWithTour			_actionSynchMapWithTour;
-	private ActionSyncMap2WithOtherMap		_actionSynchMap25WithOtherMap;
+	private ActionSynchMapWithChartSlider	_actionSyncMap_WithChartSlider;
+	private ActionSynchMapWithTour			_actionSyncMap_WithTour;
+	private ActionSyncMap2WithOtherMap		_actionSyncMap_WithOtherMap;
 	private ActionShowEntireTour			_actionShowEntireTour;
-	private ActionTourTrackConfig			_actionTrackOptions;
+	private ActionShowTour_WithConfig		_actionShowTour_WithOptions;
 	//
 	private ArrayList<TourData>				_allTourData							= new ArrayList<>();
 	private TIntArrayList					_allTourStarts							= new TIntArrayList();
@@ -200,9 +202,9 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		}
 	}
 
-	private class ActionTourTrackConfig extends ActionToolbarSlideout {
+	private class ActionShowTour_WithConfig extends ActionToolbarSlideout {
 
-		public ActionTourTrackConfig() {
+		public ActionShowTour_WithConfig() {
 
 			super(
 					TourbookPlugin.getImageDescriptor(Map25View.IMAGE_ACTION_SHOW_TOUR_IN_MAP),
@@ -266,7 +268,9 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 	 */
 	public void actionShowTour(final boolean isTrackVisible) {
 
-		_mapApp.getLayer_Tour().setEnabled(isTrackVisible);
+		_isShowTour = isTrackVisible;
+
+		_mapApp.getLayer_Tour().setEnabled(_isShowTour);
 		_mapApp.getMap().render();
 
 		enableActions();
@@ -280,48 +284,56 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		enableActions();
 	}
 
-	public void actionSynchMapPositionWithSlider() {
+	public void actionSync_WithChartSlider() {
 
-		final boolean isSync = _actionSynchMapWithChartSlider.isChecked();
+		_isMapSynchedWithChartSlider = _actionSyncMap_WithChartSlider.isChecked();
 
-		_isMapSynchedWithChartSlider = isSync;
-
-		if (isSync) {
+		if (_isMapSynchedWithChartSlider) {
 
 			// ensure that the track sliders are displayed
 
-//			_actionShowTrackSlider.setChecked(true);
+			deactivateMapSync();
+
+			_actionShowTour_WithOptions.setSelection(true);
+
+			// map must be synched with selected tour
+			_actionSyncMap_WithTour.setChecked(true);
+			_actionSyncMap_WithOtherMap.setChecked(false);
+			_isMapSynchedWithTour = true;
+
+			paintTours_AndUpdateMap();
 		}
 
 	}
 
-	public void actionSynchMapViewWithTour() {
-
-		_isMapSynchedWithTour = _actionSynchMapWithTour.isChecked();
-
-		paintTours_AndUpdateMap();
-
-//		if (_isMapSynchedWithTour) {
-//
-//			// force tour to be repainted, that it is synched immediately
-//			_previousTourData = null;
-//
-//			_actionShowTourInMap.setChecked(true);
-//			gdxMap.setShowOverlays(true);
-//
-//			paintTours_20_One(_allTourData.get(0), true);
-//
-//		} else {
-//
-//			// disable synch with slider
-//			_isMapSynchedWithSlider = false;
-//			_actionSynchWithSlider.setChecked(false);
-//		}
-	}
-
-	public void actionSynchMapWithOtherMap(final boolean isSelected) {
+	public void actionSync_WithOtherMap(final boolean isSelected) {
 
 		_isMapSynchedWithOtherMap = isSelected;
+
+		if (_isMapSynchedWithOtherMap) {
+
+			deactivateTourSync();
+			deactivateSliderSync();
+		}
+	}
+
+	public void actionSync_WithTour() {
+
+		_isMapSynchedWithTour = _actionSyncMap_WithTour.isChecked();
+
+		if (_isMapSynchedWithTour) {
+
+			deactivateMapSync();
+
+			_actionShowTour_WithOptions.setSelection(true);
+
+			paintTours_AndUpdateMap();
+
+		} else {
+
+			deactivateSliderSync();
+		}
+
 	}
 
 	public void actionZoomShowEntireTour() {
@@ -474,7 +486,6 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 	}
 
 	private void clearView() {
-		// TODO Auto-generated method stub
 
 	}
 
@@ -496,10 +507,10 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		_actionMapOptions = new ActionMap25_Options();
 		_actionSelectMapProvider = new ActionSelectMap25Provider(this);
 		_actionShowEntireTour = new ActionShowEntireTour(this);
-		_actionSynchMap25WithOtherMap = new ActionSyncMap2WithOtherMap(this);
-		_actionSynchMapWithTour = new ActionSynchMapWithTour(this);
-		_actionSynchMapWithChartSlider = new ActionSynchMapWithChartSlider(this);
-		_actionTrackOptions = new ActionTourTrackConfig();
+		_actionSyncMap_WithOtherMap = new ActionSyncMap2WithOtherMap(this);
+		_actionSyncMap_WithTour = new ActionSynchMapWithTour(this);
+		_actionSyncMap_WithChartSlider = new ActionSynchMapWithChartSlider(this);
+		_actionShowTour_WithOptions = new ActionShowTour_WithConfig();
 
 	}
 
@@ -694,6 +705,30 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		_mapApp = Map25App.createMap(this, _state, awtCanvas);
 	}
 
+	private void deactivateMapSync() {
+
+		// disable map sync
+
+		_isMapSynchedWithOtherMap = false;
+		_actionSyncMap_WithOtherMap.setChecked(false);
+	}
+
+	private void deactivateSliderSync() {
+
+		// disable slider sync
+
+		_isMapSynchedWithChartSlider = false;
+		_actionSyncMap_WithChartSlider.setChecked(false);
+	}
+
+	private void deactivateTourSync() {
+
+		// disable tour sync
+
+		_isMapSynchedWithTour = false;
+		_actionSyncMap_WithTour.setChecked(false);
+	}
+
 	@Override
 	public void dispose() {
 
@@ -726,20 +761,19 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 	void enableActions() {
 
 		final TourLayer tourLayer = _mapApp.getLayer_Tour();
+		final boolean isTourLayerVisible = tourLayer == null ? false : tourLayer.isEnabled();
 
 		final boolean isTourAvailable = _allTourData.size() > 0;
-		final boolean isTrackLayerVisible = tourLayer == null ? false : tourLayer.isEnabled();
-		final boolean isTrackSliderVisible = true;
 
-		final boolean canShowTour = isTourAvailable && isTrackLayerVisible;
+		final boolean canShowTour = isTourAvailable && isTourLayerVisible;
 
 		_actionMarkerOptions.setEnabled(isTourAvailable);
 
-		_actionTrackOptions.setSelection(isTrackLayerVisible);
-		_actionTrackOptions.setEnabled(isTourAvailable);
+		_actionShowTour_WithOptions.setSelection(isTourLayerVisible);
+		_actionShowTour_WithOptions.setEnabled(isTourAvailable);
 		_actionShowEntireTour.setEnabled(canShowTour);
-		_actionSynchMapWithTour.setEnabled(canShowTour);
-		_actionSynchMapWithChartSlider.setEnabled(canShowTour);
+		_actionSyncMap_WithTour.setEnabled(canShowTour);
+		_actionSyncMap_WithChartSlider.setEnabled(canShowTour);
 
 		_actionMapBookmarks.setEnabled(true);
 		_actionMapOptions.setEnabled(true);
@@ -760,11 +794,11 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 		tbm.add(new Separator());
 
-		tbm.add(_actionTrackOptions);
+		tbm.add(_actionShowTour_WithOptions);
 		tbm.add(_actionShowEntireTour);
-		tbm.add(_actionSynchMapWithTour);
-		tbm.add(_actionSynchMapWithChartSlider);
-		tbm.add(_actionSynchMap25WithOtherMap);
+		tbm.add(_actionSyncMap_WithTour);
+		tbm.add(_actionSyncMap_WithChartSlider);
+		tbm.add(_actionSyncMap_WithOtherMap);
 
 		tbm.add(new Separator());
 
@@ -802,11 +836,6 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 	@Override
 	public void moveToMapLocation(final MapBookmark selectedBookmark) {
 
-//		System.out.println(
-//				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tmoveToMapLocation: "
-//						+ selectedBookmark));
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
 		MapBookmarkManager.setLastSelectedBookmark(selectedBookmark);
 
 		final Map map = _mapApp.getMap();
@@ -829,12 +858,6 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 	}
 
 	private void onSelectionChanged(final ISelection selection) {
-
-//		System.out.println(
-//				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//						+ ("\tonSelectionChanged: " + selection) //
-//						+ ("\thash:") + selection.hashCode());
-//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		final int selectionHash = selection.hashCode();
 		if (_lastSelectionHash == selectionHash) {
@@ -901,9 +924,65 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 		} else if (selection instanceof SelectionChartInfo) {
 
-//			if (isTrackSliderVisible == false) {
-//				return;
-//			}
+		} else if (selection instanceof SelectionChartInfo) {
+
+		} else if (selection instanceof SelectionChartInfo) {
+
+		} else if (selection instanceof SelectionChartInfo) {
+
+			final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
+
+			TourData tourData = null;
+
+			final Chart chart = chartInfo.getChart();
+			if (chart instanceof TourChart) {
+				final TourChart tourChart = (TourChart) chart;
+				tourData = tourChart.getTourData();
+			}
+
+			if (tourData != null && tourData.isMultipleTours()) {
+
+				// multiple tours are selected
+
+			} else {
+
+				// use old behaviour
+
+				final ChartDataModel chartDataModel = chartInfo.chartDataModel;
+				if (chartDataModel != null) {
+
+					final Object tourId = chartDataModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
+					if (tourId instanceof Long) {
+
+						tourData = TourManager.getInstance().getTourData((Long) tourId);
+						if (tourData == null) {
+
+							// tour is not in the database, try to get it from the raw data manager
+
+							final HashMap<Long, TourData> rawData = RawDataManager.getInstance().getImportedTours();
+							tourData = rawData.get(tourId);
+						}
+					}
+				}
+			}
+
+			if (tourData != null) {
+
+				positionMapTo_TourSliders(
+						tourData,
+						chartInfo.leftSliderValuesIndex,
+						chartInfo.rightSliderValuesIndex,
+						chartInfo.selectedSliderValuesIndex,
+						null);
+
+				enableActions();
+			}
+
+		} else if (selection instanceof SelectionChartInfo) {
+
+			if (!_isMapSynchedWithChartSlider) {
+				return;
+			}
 
 			final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
 
@@ -918,6 +997,10 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 			}
 
 		} else if (selection instanceof SelectionChartXSliderPosition) {
+
+			if (!_isMapSynchedWithChartSlider) {
+				return;
+			}
 
 			final SelectionChartXSliderPosition xSliderPos = (SelectionChartXSliderPosition) selection;
 			final Chart chart = xSliderPos.getChart();
@@ -1105,6 +1188,10 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 		enableActions();
 
+		if (!_isShowTour) {
+			return;
+		}
+
 		/*
 		 * Tours
 		 */
@@ -1194,9 +1281,9 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		 */
 
 		// tour
-		final boolean isTourVisible = Util.getStateBoolean(_state, STATE_IS_LAYER_TOUR_VISIBLE, true);
-		_actionTrackOptions.setSelection(isTourVisible);
-		_mapApp.getLayer_Tour().setEnabled(isTourVisible);
+		_isShowTour = Util.getStateBoolean(_state, STATE_IS_LAYER_TOUR_VISIBLE, true);
+		_actionShowTour_WithOptions.setSelection(_isShowTour);
+		_mapApp.getLayer_Tour().setEnabled(_isShowTour);
 
 		// marker
 		final boolean isMarkerVisible = Util.getStateBoolean(_state, STATE_IS_LAYER_MARKER_VISIBLE, true);
@@ -1215,25 +1302,25 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		 */
 		// checkbox: synch map with tour
 		final boolean isSynchTour = Util.getStateBoolean(_state, STATE_IS_SYNCH_MAP_WITH_TOUR, true);
-		_actionSynchMapWithTour.setChecked(isSynchTour);
+		_actionSyncMap_WithTour.setChecked(isSynchTour);
 		_isMapSynchedWithTour = isSynchTour;
 
 		// checkbox: synch map with chart slider
 		final boolean isSynchWithSlider = Util.getStateBoolean(_state, STATE_IS_SYNCH_MAP_WITH_CHART_SLIDER, true);
-		_actionSynchMapWithChartSlider.setChecked(isSynchWithSlider);
+		_actionSyncMap_WithChartSlider.setChecked(isSynchWithSlider);
 		_isMapSynchedWithChartSlider = isSynchWithSlider;
 
 		// synch map with another map
 		_isMapSynchedWithOtherMap = Util.getStateBoolean(_state, STATE_IS_SYNC_MAP25_WITH_OTHER_MAP, true);
-		_actionSynchMap25WithOtherMap.setChecked(_isMapSynchedWithOtherMap);
+		_actionSyncMap_WithOtherMap.setChecked(_isMapSynchedWithOtherMap);
 
 		enableActions();
 	}
 
 	private void saveState() {
 
-		_state.put(STATE_IS_SYNCH_MAP_WITH_CHART_SLIDER, _actionSynchMapWithChartSlider.isChecked());
-		_state.put(STATE_IS_SYNCH_MAP_WITH_TOUR, _actionSynchMapWithTour.isChecked());
+		_state.put(STATE_IS_SYNCH_MAP_WITH_CHART_SLIDER, _actionSyncMap_WithChartSlider.isChecked());
+		_state.put(STATE_IS_SYNCH_MAP_WITH_TOUR, _actionSyncMap_WithTour.isChecked());
 		_state.put(STATE_IS_SYNC_MAP25_WITH_OTHER_MAP, _isMapSynchedWithOtherMap);
 
 		_state.put(STATE_IS_LAYER_BASE_MAP_VISIBLE, _mapApp.getLayer_BaseMap().isEnabled());
@@ -1254,6 +1341,10 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 	}
 
 	private void showToursFromTourProvider() {
+
+		if (!_isShowTour) {
+			return;
+		}
 
 		Display.getCurrent().asyncExec(new Runnable() {
 			@Override

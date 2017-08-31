@@ -141,10 +141,11 @@ public class Map extends Canvas {
 	private static final String		DIRECTION_E									= "E";									//$NON-NLS-1$
 	private static final String		DIRECTION_N									= "N";									//$NON-NLS-1$
 
+// SET_FORMATTING_OFF
 	/*
 	 * Wikipedia data
 	 */
-//	private static final String							WIKI_PARAMETER_DIM							= "dim";																	//$NON-NLS-1$
+//	private static final String		WIKI_PARAMETER_DIM							= "dim";																	//$NON-NLS-1$
 	private static final String		WIKI_PARAMETER_TYPE							= "type";								//$NON-NLS-1$
 
 //	http://toolserver.org/~geohack/geohack.php?pagename=Sydney&language=de&params=33.85_S_151.2_E_region:AU-NSW_type:city(3641422)
@@ -166,58 +167,53 @@ public class Map extends Canvas {
 
 	private static final String		PATTERN_DOUBLE								= "([-+]?[0-9]*\\.?[0-9]+)";			//$NON-NLS-1$
 	private static final String		PATTERN_DOUBLE_SEP							= PATTERN_DOUBLE
-			+ PATTERN_SEPARATOR;
+																				+ PATTERN_SEPARATOR;
 
 	private static final String		PATTERN_DIRECTION_NS						= "([NS])_";							//$NON-NLS-1$
 	private static final String		PATTERN_DIRECTION_WE						= "([WE])";								//$NON-NLS-1$
 
-//	private static final String							PATTERN_WIKI_POSITION_10					= "([-+]?[0-9]*\\.?[0-9]+)_([NS])_([-+]?[0-9]*\\.?[0-9]+)_([WE])_?(.*)";	//$NON-NLS-1$
-//	private static final String							PATTERN_WIKI_POSITION_20					= "([0-9]*)_([NS])_([0-9]*)_([WE])_?(.*)";									//$NON-NLS-1$
-//	private static final String							PATTERN_WIKI_POSITION_21					= "([0-9]*)_([0-9]*)_([NS])_([0-9]*)_([0-9]*)_([WE])_?(.*)";				//$NON-NLS-1$
-//	private static final String							PATTERN_WIKI_POSITION_22					= "([0-9]*)_([0-9]*)_([0-9]*)_([NS])_([0-9]*)_([0-9]*)_([0-9]*)_([WE])_?(.*)";	//$NON-NLS-1$
+//	private static final String		PATTERN_WIKI_POSITION_10					= "([-+]?[0-9]*\\.?[0-9]+)_([NS])_([-+]?[0-9]*\\.?[0-9]+)_([WE])_?(.*)";	//$NON-NLS-1$
+//	private static final String		PATTERN_WIKI_POSITION_20					= "([0-9]*)_([NS])_([0-9]*)_([WE])_?(.*)";									//$NON-NLS-1$
+//	private static final String		PATTERN_WIKI_POSITION_21					= "([0-9]*)_([0-9]*)_([NS])_([0-9]*)_([0-9]*)_([WE])_?(.*)";				//$NON-NLS-1$
+//	private static final String		PATTERN_WIKI_POSITION_22					= "([0-9]*)_([0-9]*)_([0-9]*)_([NS])_([0-9]*)_([0-9]*)_([0-9]*)_([WE])_?(.*)";	//$NON-NLS-1$
 
 	private static final String		PATTERN_WIKI_POSITION_D_D					= PATTERN_DOUBLE + ";"					//$NON-NLS-1$
-			+ PATTERN_DOUBLE
-			+ PATTERN_END;
+																				+ PATTERN_DOUBLE
+																				+ PATTERN_END;
 
 	private static final String		PATTERN_WIKI_POSITION_D_N_D_E				= PATTERN_DOUBLE_SEP
-			+ PATTERN_DIRECTION_NS
-			+ PATTERN_DOUBLE_SEP
-			+ PATTERN_DIRECTION_WE
-			+ PATTERN_END;
+																				+ PATTERN_DIRECTION_NS
+																				+ PATTERN_DOUBLE_SEP
+																				+ PATTERN_DIRECTION_WE
+																				+ PATTERN_END;
 
 	private static final String		PATTERN_WIKI_POSITION_D_M_N_D_M_E			= PATTERN_DOUBLE_SEP
-			+ PATTERN_DOUBLE_SEP
-			+ PATTERN_DIRECTION_NS
-			+ PATTERN_DOUBLE_SEP
-			+ PATTERN_DOUBLE_SEP
-			+ PATTERN_DIRECTION_WE
-			+ PATTERN_END;
+																				+ PATTERN_DOUBLE_SEP
+																				+ PATTERN_DIRECTION_NS
+																				+ PATTERN_DOUBLE_SEP
+																				+ PATTERN_DOUBLE_SEP
+																				+ PATTERN_DIRECTION_WE
+																				+ PATTERN_END;
 
 	private static final String		PATTERN_WIKI_POSITION_D_M_S_N_D_M_S_E		= PATTERN_DOUBLE_SEP
-			+ PATTERN_DOUBLE_SEP
-			+ PATTERN_DOUBLE_SEP
-			+ PATTERN_DIRECTION_NS
-			+ PATTERN_DOUBLE_SEP
-			+ PATTERN_DOUBLE_SEP
-			+ PATTERN_DOUBLE_SEP
-			+ PATTERN_DIRECTION_WE
-			+ PATTERN_END;
+																				+ PATTERN_DOUBLE_SEP
+																				+ PATTERN_DOUBLE_SEP
+																				+ PATTERN_DIRECTION_NS
+																				+ PATTERN_DOUBLE_SEP
+																				+ PATTERN_DOUBLE_SEP
+																				+ PATTERN_DOUBLE_SEP
+																				+ PATTERN_DIRECTION_WE
+																				+ PATTERN_END;
 
-	private static final Pattern	_patternWikiUrl								= Pattern
-			.compile(PATTERN_WIKI_URL);
-	private static final Pattern	_patternWikiPosition_D_D					= Pattern
-			.compile(PATTERN_WIKI_POSITION_D_D);
-	private static final Pattern	_patternWikiPosition_D_N_D_E				= Pattern
-			.compile(PATTERN_WIKI_POSITION_D_N_D_E);
-	private static final Pattern	_patternWikiPosition_D_M_N_D_M_E			= Pattern
-			.compile(PATTERN_WIKI_POSITION_D_M_N_D_M_E);
-	private static final Pattern	_patternWikiPosition_D_M_S_N_D_M_S_E		= Pattern
-			.compile(PATTERN_WIKI_POSITION_D_M_S_N_D_M_S_E);
-	private static final Pattern	_patternWikiParamter						= Pattern
-			.compile(PATTERN_SEPARATOR);
-	private static final Pattern	_patternWikiKeyValue						= Pattern
-			.compile(PATTERN_WIKI_PARAMETER_KEY_VALUE_SEPARATOR);
+	private static final Pattern	_patternWikiUrl								= Pattern.compile(PATTERN_WIKI_URL);
+	private static final Pattern	_patternWikiPosition_D_D					= Pattern.compile(PATTERN_WIKI_POSITION_D_D);
+	private static final Pattern	_patternWikiPosition_D_N_D_E				= Pattern.compile(PATTERN_WIKI_POSITION_D_N_D_E);
+	private static final Pattern	_patternWikiPosition_D_M_N_D_M_E			= Pattern.compile(PATTERN_WIKI_POSITION_D_M_N_D_M_E);
+	private static final Pattern	_patternWikiPosition_D_M_S_N_D_M_S_E		= Pattern.compile(PATTERN_WIKI_POSITION_D_M_S_N_D_M_S_E);
+	private static final Pattern	_patternWikiParamter						= Pattern.compile(PATTERN_SEPARATOR);
+	private static final Pattern	_patternWikiKeyValue						= Pattern.compile(PATTERN_WIKI_PARAMETER_KEY_VALUE_SEPARATOR);
+
+// SET_FORMATTING_ON
 
 	// [181,208,208] is the color of water in the standard OSM material
 	public static final RGB			OSM_BACKGROUND_RGB							= new RGB(181, 208, 208);
@@ -302,15 +298,16 @@ public class Map extends Canvas {
 	private Thread					_overlayThread;
 	private long					_nextOverlayRedrawTime;
 
-	private final NumberFormat		_nf1						= NumberFormat
-			.getNumberInstance();
-	private final NumberFormat		_nf2						= NumberFormat
-			.getNumberInstance();
-	private final NumberFormat		_nf3						= NumberFormat
-			.getNumberInstance();
-	private final NumberFormat		_nfLatLon					= NumberFormat
-			.getNumberInstance();
+	private final NumberFormat		_nf1;
+	private final NumberFormat		_nf2;
+	private final NumberFormat		_nf3;
+	private final NumberFormat		_nfLatLon;
 	{
+		_nf1 = NumberFormat.getNumberInstance();
+		_nf2 = NumberFormat.getNumberInstance();
+		_nf3 = NumberFormat.getNumberInstance();
+		_nfLatLon = NumberFormat.getNumberInstance();
+
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
 		_nf2.setMinimumFractionDigits(2);
@@ -455,7 +452,11 @@ public class Map extends Canvas {
 
 	private final Display						_display;
 	private final Thread						_displayThread;
+	//
 	private int									_jobCounterSplitImages		= 0;
+	private Object								_splitJobFamily				= new Object();
+	private boolean								_isCancelSplitJobs;
+	//
 	/**
 	 * when <code>true</code> the tour is painted in the map in the enhanced mode otherwise in the
 	 * simple mode
@@ -1954,6 +1955,11 @@ public class Map extends Canvas {
 
 		final int redrawCounter = _redrawMapCounter.incrementAndGet();
 
+//		System.out.println(
+//				(net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//						+ ("\tredrawCounter:" + redrawCounter));
+//// TODO remove SYSTEM.OUT.PRINTLN
+
 		if (isDisposed() || _mp == null || _isRedrawEnabled == false) {
 			return;
 		}
@@ -1968,8 +1974,9 @@ public class Map extends Canvas {
 
 		// get time when the redraw is requested
 		final long requestedRedrawTime = System.currentTimeMillis();
+		final long timeDiff = requestedRedrawTime - _lastMapDrawTime;
 
-		if (requestedRedrawTime > _lastMapDrawTime + 100) {
+		if (timeDiff > 100) {
 
 			// update display even when this is not the last created runnable
 
@@ -2657,14 +2664,25 @@ public class Map extends Canvas {
 				final Job splitJob = new Job("SplitOverlayImages() " + _jobCounterSplitImages++) { //$NON-NLS-1$
 
 					@Override
+					public boolean belongsTo(final Object family) {
+
+						return family == _splitJobFamily;
+					}
+
+					@Override
 					protected IStatus run(final IProgressMonitor monitor) {
 
 						paintOverlay_31_SplitParts(tile, imageData9Parts);
+
+						if (_isCancelSplitJobs) {
+							return Status.CANCEL_STATUS;
+						}
 
 						paint();
 
 						return Status.OK_STATUS;
 					}
+
 				};
 
 				splitJob.setSystem(true);
@@ -2713,6 +2731,10 @@ public class Map extends Canvas {
 
 		for (int yIndex = 0; yIndex < 3; yIndex++) {
 			for (int xIndex = 0; xIndex < 3; xIndex++) {
+
+				if (_isCancelSplitJobs) {
+					return;
+				}
 
 				// check if the tile is within the map border
 				if (((tileX - xIndex < -1) //
@@ -3705,11 +3727,12 @@ public class Map extends Canvas {
 	 * @param geoPosition
 	 *            Center position in lat/lon
 	 */
-	public void setMapCenter(final GeoPosition geoPosition) {
+	public synchronized void setMapCenter(final GeoPosition geoPosition) {
 
-//		System.out.println((net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//				+ ("\tsetMapCenter: " + geoPosition));
-//		// TODO remove SYSTEM.OUT.PRINTLN
+		System.out.println(
+				(net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+						+ ("\tsetMapCenter: " + geoPosition));
+		// TODO remove SYSTEM.OUT.PRINTLN
 
 		final java.awt.Point newMapCenter = _mp.geoToPixel(geoPosition, _mapZoomLevel);
 
@@ -3733,6 +3756,11 @@ public class Map extends Canvas {
 
 		updateViewPortData();
 		updateTourToolTip();
+
+		// stop old painting jobs
+		_isCancelSplitJobs = true;
+		Job.getJobManager().cancel(_splitJobFamily);
+		_isCancelSplitJobs = false;
 
 		paint();
 	}

@@ -21,11 +21,11 @@ import net.tourbook.map2.view.Map2View;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionSynchWithSlider extends Action {
+public class ActionSyncMapWithSlider extends Action {
 
 	private Map2View	fMapView;
 
-	public ActionSynchWithSlider(final Map2View mapView) {
+	public ActionSyncMapWithSlider(final Map2View mapView) {
 
 		super(null, AS_CHECK_BOX);
 
@@ -39,7 +39,7 @@ public class ActionSynchWithSlider extends Action {
 
 	@Override
 	public void run() {
-		fMapView.actionSync_WithSlider();
+		fMapView.actionSync_WithChartSlider();
 	}
 
 }

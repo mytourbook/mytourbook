@@ -21,11 +21,11 @@ import net.tourbook.map2.view.Map2View;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionSynchWithPhoto extends Action {
+public class ActionSyncMapWithPhoto extends Action {
 
 	private Map2View	_mapView;
 
-	public ActionSynchWithPhoto(final Map2View mapView) {
+	public ActionSyncMapWithPhoto(final Map2View mapView) {
 
 		super(null, AS_CHECK_BOX);
 
