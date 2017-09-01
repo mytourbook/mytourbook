@@ -3729,11 +3729,6 @@ public class Map extends Canvas {
 	 */
 	public synchronized void setMapCenter(final GeoPosition geoPosition) {
 
-		System.out.println(
-				(net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-						+ ("\tsetMapCenter: " + geoPosition));
-		// TODO remove SYSTEM.OUT.PRINTLN
-
 		final java.awt.Point newMapCenter = _mp.geoToPixel(geoPosition, _mapZoomLevel);
 
 		if (Thread.currentThread() == _displayThread) {
@@ -4147,9 +4142,6 @@ public class Map extends Canvas {
 			return;
 		}
 
-		// stop downloading images for the old zoom level
-		_mp.resetAll(true);
-
 		/*
 		 * check if the requested zoom level is within the bounds of the map provider
 		 */
@@ -4165,6 +4157,12 @@ public class Map extends Canvas {
 		if (_mapZoomLevel == adjustedZoomLevel) {
 			// this is disabled that a double click can set the center of the map
 			// return;
+		}
+
+		if (_mapZoomLevel != adjustedZoomLevel) {
+
+			// zoomlevel has changed -> stop downloading images for the old zoom level
+			_mp.resetAll(true);
 		}
 
 		final int oldzoom = _mapZoomLevel;

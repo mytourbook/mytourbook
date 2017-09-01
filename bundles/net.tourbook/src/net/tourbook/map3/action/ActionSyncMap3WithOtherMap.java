@@ -39,7 +39,7 @@ public class ActionSyncMap3WithOtherMap extends Action {
 
 	@Override
 	public void run() {
-		_map3View.actionSynchMapWithOtherMap();
+		_map3View.actionSynch_WithOtherMap();
 	}
 
 }

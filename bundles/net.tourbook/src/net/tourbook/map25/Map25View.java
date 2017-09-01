@@ -298,7 +298,6 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 			// map must be synched with selected tour
 			_actionSyncMap_WithTour.setChecked(true);
-			_actionSyncMap_WithOtherMap.setChecked(false);
 			_isMapSynchedWithTour = true;
 
 			paintTours_AndUpdateMap();
@@ -324,8 +323,6 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		if (_isMapSynchedWithTour) {
 
 			deactivateMapSync();
-
-			_actionShowTour_WithOptions.setSelection(true);
 
 			paintTours_AndUpdateMap();
 
@@ -769,8 +766,6 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 		_actionMarkerOptions.setEnabled(isTourAvailable);
 
-		_actionShowTour_WithOptions.setSelection(isTourLayerVisible);
-		_actionShowTour_WithOptions.setEnabled(isTourAvailable);
 		_actionShowEntireTour.setEnabled(canShowTour);
 		_actionSyncMap_WithTour.setEnabled(canShowTour);
 		_actionSyncMap_WithChartSlider.setEnabled(canShowTour);
@@ -924,18 +919,17 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 		} else if (selection instanceof SelectionChartInfo) {
 
-		} else if (selection instanceof SelectionChartInfo) {
-
-		} else if (selection instanceof SelectionChartInfo) {
-
-		} else if (selection instanceof SelectionChartInfo) {
-
-			final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
+			if (!_isMapSynchedWithChartSlider) {
+				return;
+			}
 
 			TourData tourData = null;
 
+			final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
+
 			final Chart chart = chartInfo.getChart();
 			if (chart instanceof TourChart) {
+
 				final TourChart tourChart = (TourChart) chart;
 				tourData = tourChart.getTourData();
 			}
@@ -968,32 +962,13 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 			if (tourData != null) {
 
-				positionMapTo_TourSliders(
+				syncMapWith_ChartSlider(//
 						tourData,
 						chartInfo.leftSliderValuesIndex,
 						chartInfo.rightSliderValuesIndex,
-						chartInfo.selectedSliderValuesIndex,
-						null);
+						chartInfo.selectedSliderValuesIndex);
 
 				enableActions();
-			}
-
-		} else if (selection instanceof SelectionChartInfo) {
-
-			if (!_isMapSynchedWithChartSlider) {
-				return;
-			}
-
-			final SelectionChartInfo chartInfo = (SelectionChartInfo) selection;
-
-			final ChartDataModel chartDataModel = chartInfo.chartDataModel;
-			if (chartDataModel != null) {
-
-				final Object tourId = chartDataModel.getCustomData(Chart.CUSTOM_DATA_TOUR_ID);
-				if (tourId instanceof Long) {
-
-					syncMapWith_ChartSlider(chartInfo, (Long) tourId);
-				}
 			}
 
 		} else if (selection instanceof SelectionChartXSliderPosition) {
@@ -1367,44 +1342,6 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 				enableActions();
 			}
 		});
-	}
-
-	private void syncMapWith_ChartSlider(final SelectionChartInfo chartInfo, final Long tourId) {
-
-//		final TrackSliderLayer chartSliderLayer = getLayerTrackSlider();
-//		if (chartSliderLayer == null) {
-//			return;
-//		}
-
-		TourData tourData = TourManager.getInstance().getTourData(tourId);
-		if (tourData == null) {
-
-			// tour is not in the database, try to get it from the raw data manager
-
-			final HashMap<Long, TourData> rawData = RawDataManager.getInstance().getImportedTours();
-			tourData = rawData.get(tourId);
-		}
-
-		if (tourData == null || tourData.latitudeSerie == null) {
-
-//			chartSliderLayer.setSliderVisible(false);
-
-		} else {
-
-			// sync map with chart slider
-
-			final int valuesIndex = chartInfo.selectedSliderValuesIndex;
-
-			syncMapWith_SliderPosition(tourData, /* chartSliderLayer, */ valuesIndex);
-
-//			// update slider UI
-//			updateTrackSlider_10_Position(//
-//					tourData,
-//					chartInfo.leftSliderValuesIndex,
-//					chartInfo.rightSliderValuesIndex);
-
-			enableActions();
-		}
 	}
 
 	private void syncMapWith_ChartSlider(	final TourData tourData,

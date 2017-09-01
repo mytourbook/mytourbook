@@ -258,10 +258,10 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	private boolean								_isShowPhoto;
 	private boolean								_isShowLegend;
 
-	private boolean								_isMapSynchedWithOtherMap;
-	private boolean								_isMapSynchedWithPhoto;
-	private boolean								_isMapSynchedWithSlider;
-	private boolean								_isMapSynchedWithTour;
+	private boolean								_isMapSynched_WithOtherMap;
+	private boolean								_isMapSynched_WithPhoto;
+	private boolean								_isMapSynched_WithChartSlider;
+	private boolean								_isMapSynched_WithTour;
 	private boolean								_isPositionCentered;
 
 	private boolean								_isInSelectBookmark;
@@ -349,7 +349,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	private ActionSyncTourZoomLevel				_actionSyncTourZoomLevel;
 	private ActionSyncMapWithOtherMap			_actionSyncMap_WithOtherMap;
 	private ActionSyncMapWithPhoto				_actionSyncMap_WithPhoto;
-	private ActionSyncMapWithSlider				_actionSyncMap_WithSlider;
+	private ActionSyncMapWithSlider				_actionSyncMap_WithChartSlider;
 	private ActionSyncMapWithTour				_actionSyncMap_WithTour;
 
 	private ActionZoomIn						_actionZoomIn;
@@ -578,16 +578,17 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 			return;
 		}
 
-		_isMapSynchedWithSlider = _actionSyncMap_WithSlider.isChecked();
+		_isMapSynched_WithChartSlider = _actionSyncMap_WithChartSlider.isChecked();
 
-		if (_isMapSynchedWithSlider) {
+		if (_isMapSynched_WithChartSlider) {
 
 			deactivateMapSync();
 			deactivatePhotoSync();
 
-			// map must be synched with selected tour
 			_actionShowTourInMap.setChecked(true);
-			_isMapSynchedWithTour = true;
+
+			// map must be synched with selected tour
+			_isMapSynched_WithTour = true;
 			_actionSyncMap_WithTour.setChecked(true);
 
 			_map.setShowOverlays(true);
@@ -601,9 +602,9 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 	public void actionSync_WithOtherMap(final boolean isSelected) {
 
-		_isMapSynchedWithOtherMap = isSelected;
+		_isMapSynched_WithOtherMap = isSelected;
 
-		if (_isMapSynchedWithOtherMap) {
+		if (_isMapSynched_WithOtherMap) {
 
 			deactivatePhotoSync();
 			deactivateTourSync();
@@ -616,9 +617,9 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	 */
 	public void actionSync_WithPhoto() {
 
-		_isMapSynchedWithPhoto = _actionSyncMap_WithPhoto.isChecked();
+		_isMapSynched_WithPhoto = _actionSyncMap_WithPhoto.isChecked();
 
-		if (_isMapSynchedWithPhoto) {
+		if (_isMapSynched_WithPhoto) {
 
 			deactivateMapSync();
 			deactivateTourSync();
@@ -638,9 +639,9 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 			return;
 		}
 
-		_isMapSynchedWithTour = _actionSyncMap_WithTour.isChecked();
+		_isMapSynched_WithTour = _actionSyncMap_WithTour.isChecked();
 
-		if (_isMapSynchedWithTour) {
+		if (_isMapSynched_WithTour) {
 
 			deactivateMapSync();
 			deactivatePhotoSync();
@@ -1064,7 +1065,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_actionSyncMap_WithOtherMap = new ActionSyncMapWithOtherMap(this);
 		_actionSyncMap_WithPhoto = new ActionSyncMapWithPhoto(this);
 		_actionSyncMap_WithTour = new ActionSyncMapWithTour(this);
-		_actionSyncMap_WithSlider = new ActionSyncMapWithSlider(this);
+		_actionSyncMap_WithChartSlider = new ActionSyncMapWithSlider(this);
 		_actionSyncTourZoomLevel = new ActionSyncTourZoomLevel(this);
 
 		_actionEdit2DMapPreferences = new ActionOpenPrefDialog(
@@ -1308,7 +1309,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 		// disable map sync
 
-		_isMapSynchedWithOtherMap = false;
+		_isMapSynched_WithOtherMap = false;
 		_actionSyncMap_WithOtherMap.setChecked(false);
 	}
 
@@ -1316,7 +1317,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 		// disable photo sync
 
-		_isMapSynchedWithPhoto = false;
+		_isMapSynched_WithPhoto = false;
 		_actionSyncMap_WithPhoto.setChecked(false);
 	}
 
@@ -1324,15 +1325,15 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 		// disable slider sync
 
-		_isMapSynchedWithSlider = false;
-		_actionSyncMap_WithSlider.setChecked(false);
+		_isMapSynched_WithChartSlider = false;
+		_actionSyncMap_WithChartSlider.setChecked(false);
 	}
 
 	private void deactivateTourSync() {
 
 		// disable tour sync
 
-		_isMapSynchedWithTour = false;
+		_isMapSynched_WithTour = false;
 		_actionSyncMap_WithTour.setChecked(false);
 	}
 
@@ -1423,7 +1424,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 		_actionSyncTourZoomLevel.setEnabled(isOneTour);
 		_actionSyncMap_WithOtherMap.setEnabled(true);
-		_actionSyncMap_WithSlider.setEnabled(isTourAvailable);
+		_actionSyncMap_WithChartSlider.setEnabled(isTourAvailable);
 		_actionSyncMap_WithTour.setEnabled(isTourAvailable);
 
 		if (numberOfTours == 0) {
@@ -1492,7 +1493,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		viewTbm.add(_actionShowTourInMap);
 		viewTbm.add(_actionShowEntireTour);
 		viewTbm.add(_actionSyncMap_WithTour);
-		viewTbm.add(_actionSyncMap_WithSlider);
+		viewTbm.add(_actionSyncMap_WithChartSlider);
 		viewTbm.add(_actionSyncMap_WithOtherMap);
 		viewTbm.add(new Separator());
 
@@ -2126,7 +2127,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 			}
 		}
 
-		if (_isMapSynchedWithTour || _isMapSynchedWithSlider) {
+		if (_isMapSynched_WithTour || _isMapSynched_WithChartSlider) {
 
 			if (isDrawSlider) {
 
@@ -2236,7 +2237,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 //			// TODO remove SYSTEM.OUT.PRINTLN
 //		}
 
-		if (_isShowPhoto && _isMapSynchedWithPhoto) {
+		if (_isShowPhoto && _isMapSynched_WithPhoto) {
 			centerPhotos(_filteredPhotos, false);
 		}
 
@@ -2334,7 +2335,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 			_map.disposeOverlayImageCache();
 		}
 
-		if (_isMapSynchedWithTour) {
+		if (_isMapSynched_WithTour) {
 
 			// use default position for the tour
 
@@ -2447,7 +2448,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		/*
 		 * set position and zoom level for the tour
 		 */
-		if (_isMapSynchedWithTour) {
+		if (_isMapSynched_WithTour) {
 
 			if (((forceRedraw == false) && (_previousTourData != null)) || (tourData == _previousTourData)) {
 
@@ -2594,7 +2595,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 				_actionShowSliderInMap.isChecked(),
 				_actionShowSliderInLegend.isChecked());
 
-		if (_isMapSynchedWithSlider) {
+		if (_isMapSynched_WithChartSlider) {
 
 			if (geoPositions != null) {
 
@@ -2665,8 +2666,8 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_actionShowLegendInMap.setChecked(_isShowLegend);
 
 		// is sync with photo
-		_isMapSynchedWithPhoto = Util.getStateBoolean(_state, STATE_SYNC_WITH_PHOTO, true);
-		_actionSyncMap_WithPhoto.setChecked(_isMapSynchedWithPhoto);
+		_isMapSynched_WithPhoto = Util.getStateBoolean(_state, STATE_SYNC_WITH_PHOTO, true);
+		_actionSyncMap_WithPhoto.setChecked(_isMapSynched_WithPhoto);
 
 		// checkbox: is tour centered
 		final boolean isTourCentered = _state.getBoolean(MEMENTO_ZOOM_CENTERED);
@@ -2674,18 +2675,18 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_isPositionCentered = isTourCentered;
 
 		// synch map with another map
-		_isMapSynchedWithOtherMap = Util.getStateBoolean(_state, STATE_IS_SYNC_MAP2_WITH_OTHER_MAP, true);
-		_actionSyncMap_WithOtherMap.setChecked(_isMapSynchedWithOtherMap);
+		_isMapSynched_WithOtherMap = Util.getStateBoolean(_state, STATE_IS_SYNC_MAP2_WITH_OTHER_MAP, true);
+		_actionSyncMap_WithOtherMap.setChecked(_isMapSynched_WithOtherMap);
 
 		// synch map with tour
 		final boolean isSynchTour = Util.getStateBoolean(_state, MEMENTO_SYNCH_WITH_SELECTED_TOUR, true);
 		_actionSyncMap_WithTour.setChecked(isSynchTour);
-		_isMapSynchedWithTour = isSynchTour;
+		_isMapSynched_WithTour = isSynchTour;
 
 		// ckeckbox: synch with tour chart slider
 		final boolean isSynchSlider = _state.getBoolean(MEMENTO_SYNCH_WITH_TOURCHART_SLIDER);
-		_actionSyncMap_WithSlider.setChecked(isSynchSlider);
-		_isMapSynchedWithSlider = isSynchSlider;
+		_actionSyncMap_WithChartSlider.setChecked(isSynchSlider);
+		_isMapSynched_WithChartSlider = isSynchSlider;
 
 		//
 		_actionSyncTourZoomLevel.setZoomLevel(Util.getStateInt(_state, MEMENTO_SYNCH_TOUR_ZOOM_LEVEL, 0));
@@ -2888,12 +2889,12 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_state.put(STATE_IS_SHOW_PHOTO_IN_MAP, _isShowPhoto);
 		_state.put(STATE_IS_SHOW_LEGEND_IN_MAP, _isShowLegend);
 
-		_state.put(STATE_IS_SYNC_MAP2_WITH_OTHER_MAP, _isMapSynchedWithOtherMap);
-		_state.put(STATE_SYNC_WITH_PHOTO, _isMapSynchedWithPhoto);
+		_state.put(STATE_IS_SYNC_MAP2_WITH_OTHER_MAP, _isMapSynched_WithOtherMap);
+		_state.put(STATE_SYNC_WITH_PHOTO, _isMapSynched_WithPhoto);
 
 		_state.put(MEMENTO_ZOOM_CENTERED, _actionZoomCentered.isChecked());
 		_state.put(MEMENTO_SYNCH_WITH_SELECTED_TOUR, _actionSyncMap_WithTour.isChecked());
-		_state.put(MEMENTO_SYNCH_WITH_TOURCHART_SLIDER, _actionSyncMap_WithSlider.isChecked());
+		_state.put(MEMENTO_SYNCH_WITH_TOURCHART_SLIDER, _actionSyncMap_WithChartSlider.isChecked());
 		_state.put(MEMENTO_SYNCH_TOUR_ZOOM_LEVEL, _actionSyncTourZoomLevel.getZoomLevel());
 
 		_state.put(MEMENTO_MAP_DIM_LEVEL, _mapDimLevel);
@@ -3149,7 +3150,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	public void syncMapWithOtherMap(final MapPosition mapPosition,
 									final ViewPart viewPart) {
 
-		if (!_isMapSynchedWithOtherMap) {
+		if (!_isMapSynched_WithOtherMap) {
 
 			// sync feature is disabled
 
@@ -3186,11 +3187,6 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 					// a newer queryRedraw is available
 					return;
 				}
-
-				System.out.println(
-						(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\t__asynchRunnableCounter:"
-								+ __asynchRunnableCounter));
-				// TODO remove SYSTEM.OUT.PRINTLN
 
 				_isInMapSync = true;
 				{

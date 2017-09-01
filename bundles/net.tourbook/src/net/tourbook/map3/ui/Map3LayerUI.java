@@ -499,6 +499,9 @@ public class Map3LayerUI {
 
 					// update viewer
 					_layerViewer.update(tviLayer, null);
+
+					// check/uncheck actions in the map view
+					Map3Manager.enableMap3Actions();
 				}
 			}
 

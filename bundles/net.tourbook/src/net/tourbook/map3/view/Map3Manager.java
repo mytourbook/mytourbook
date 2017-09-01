@@ -814,7 +814,7 @@ public class Map3Manager {
 			return;
 		}
 
-		_map3View.updateActionsState();
+		_map3View.enableActions();
 	}
 
 	public static MarkerLayer getLayer_Marker() {

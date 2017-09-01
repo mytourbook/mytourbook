@@ -192,10 +192,10 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 	private ActionShowLegend					_actionShowLegendInMap;
 	private ActionShowMap3Layer					_actionShowMap3Layer;
 	private ActionShowMarker					_actionShowMarker;
-	private ActionShowTourInMap3				_actionShowTourInMap3;
-	private ActionSyncMapWithChartSlider		_actionSyncMapWithChartSlider;
-	private ActionSyncMap3WithOtherMap			_actionSyncMap3WithOtherMap;
-	private ActionSyncMapWithTour				_actionSyncMapWithTour;
+	private ActionShowTourInMap3				_actionShowTourInMap;
+	private ActionSyncMapWithChartSlider		_actionSyncMap_WithChartSlider;
+	private ActionSyncMap3WithOtherMap			_actionSyncMap_WithOtherMap;
+	private ActionSyncMapWithTour				_actionSyncMap_WithTour;
 	private ActionTourColor						_actionTourColorAltitude;
 	private ActionTourColor						_actionTourColorGradient;
 	private ActionTourColor						_actionTourColorPulse;
@@ -226,9 +226,9 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 	//
 	private ISelection							_lastHiddenSelection;
 	//
-	private boolean								_isSyncMap3WithOtherMap;
-	private boolean								_isSyncMapWithChartSlider;
-	private boolean								_isSyncMapViewWithTour;
+	private boolean								_isMapSynched_WithChartSlider;
+	private boolean								_isMapSynched_WithOtherMap;
+	private boolean								_isMapSynched_WithTour;
 
 	/**
 	 * Contains all tours which are displayed in the map.
@@ -445,32 +445,45 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 		setTrackSliderVisible(isVisible);
 	}
 
-	public void actionSynchMapPositionWithSlider() {
+	public void actionSynch_WithChartSlider() {
 
-		final boolean isSync = _actionSyncMapWithChartSlider.isChecked();
+		_isMapSynched_WithChartSlider = _actionSyncMap_WithChartSlider.isChecked();
 
-		_isSyncMapWithChartSlider = isSync;
+		if (_isMapSynched_WithChartSlider) {
 
-		if (isSync) {
+			deactivateMapSync();
+
+			_actionShowTourInMap.setState(true, true);
+
+			_actionSyncMap_WithTour.setChecked(true);
+			_isMapSynched_WithTour = true;
 
 			// ensure that the track sliders are displayed
-
 			_actionShowTrackSlider.setChecked(true);
 		}
 	}
 
-	public void actionSynchMapViewWithTour() {
+	public void actionSynch_WithOtherMap() {
 
-		_isSyncMapViewWithTour = _actionSyncMapWithTour.isChecked();
+		_isMapSynched_WithOtherMap = _actionSyncMap_WithOtherMap.isChecked();
 
-		if (_isSyncMapViewWithTour) {
-			showAllTours_InternalTours();
+		if (_isMapSynched_WithOtherMap) {
+
+			deactivateTourSync();
+			deactivateSliderSync();
 		}
 	}
 
-	public void actionSynchMapWithOtherMap() {
-		// TODO Auto-generated method stub
+	public void actionSynch_WithTour() {
 
+		_isMapSynched_WithTour = _actionSyncMap_WithTour.isChecked();
+
+		if (_isMapSynched_WithTour) {
+
+			deactivateMapSync();
+
+			showAllTours_InternalTours();
+		}
 	}
 
 	public void actionZoomShowEntireTour() {
@@ -602,7 +615,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
 				} else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
 
-					_actionShowTourInMap3.updateMeasurementSystem();
+					_actionShowTourInMap.updateMeasurementSystem();
 				}
 			}
 		};
@@ -815,10 +828,10 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 		_actionShowLegendInMap = new ActionShowLegend(this);
 		_actionShowMap3Layer = new ActionShowMap3Layer(this, parent);
 		_actionShowMarker = new ActionShowMarker(this);
-		_actionShowTourInMap3 = new ActionShowTourInMap3(this, parent);
-		_actionSyncMapWithChartSlider = new ActionSyncMapWithChartSlider(this);
-		_actionSyncMap3WithOtherMap = new ActionSyncMap3WithOtherMap(this);
-		_actionSyncMapWithTour = new ActionSyncMapWithTour(this);
+		_actionShowTourInMap = new ActionShowTourInMap3(this, parent);
+		_actionSyncMap_WithChartSlider = new ActionSyncMapWithChartSlider(this);
+		_actionSyncMap_WithOtherMap = new ActionSyncMap3WithOtherMap(this);
+		_actionSyncMap_WithTour = new ActionSyncMapWithTour(this);
 
 		_actionTourColorAltitude = ActionTourColor.createAction(MapGraphId.Altitude, this, parent);
 		_actionTourColorGradient = ActionTourColor.createAction(MapGraphId.Gradient, this, parent);
@@ -941,7 +954,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 			public void run() {
 
 				restoreState();
-				updateActionsState();
+				enableActions();
 
 				_isRestored = true;
 
@@ -1069,6 +1082,30 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 		parent.layout();
 	}
 
+	private void deactivateMapSync() {
+
+		// disable map sync
+
+		_isMapSynched_WithOtherMap = false;
+		_actionSyncMap_WithOtherMap.setChecked(false);
+	}
+
+	private void deactivateSliderSync() {
+
+		// disable slider sync
+
+		_isMapSynched_WithChartSlider = false;
+		_actionSyncMap_WithChartSlider.setChecked(false);
+	}
+
+	private void deactivateTourSync() {
+
+		// disable tour sync
+
+		_isMapSynched_WithTour = false;
+		_actionSyncMap_WithTour.setChecked(false);
+	}
+
 	@Override
 	public void dispose() {
 
@@ -1101,9 +1138,13 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 		}
 	}
 
-	private void enableActions() {
+	void enableActions() {
 
+		final boolean isLegendVisible = Map3Manager.getLayer_TourLegend().isEnabled();
+		final boolean isMarkerVisible = Map3Manager.getLayer_Marker().isEnabled();
+		final boolean isTrackSliderVisible = Map3Manager.getLayer_TrackSlider().isEnabled();
 		final boolean isTrackVisible = Map3Manager.getLayer_TourTrack().isEnabled();
+
 		final boolean isTourAvailable = _allTours.size() > 0;
 		final boolean canTourBeDisplayed = isTrackVisible && isTourAvailable;
 
@@ -1115,7 +1156,19 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 		_actionTourColorHrZone.setEnabled(canTourBeDisplayed);
 
 		_actionShowEntireTour.setEnabled(canTourBeDisplayed);
-		_actionShowMarker.setEnabled(canTourBeDisplayed);
+		_actionShowTourInMap.setState(isTrackVisible, canTourBeDisplayed);
+
+		_actionSyncMap_WithChartSlider.setEnabled(isTrackSliderVisible && isTourAvailable);
+		_actionSyncMap_WithTour.setEnabled(canTourBeDisplayed);
+
+		// set checked/enabled
+		_actionShowLegendInMap.setChecked(isLegendVisible);
+
+		_actionShowMarker.setChecked(isMarkerVisible && isTourAvailable);
+		_actionShowMarker.setEnabled(isTourAvailable);
+
+		_actionShowTrackSlider.setChecked(isTrackSliderVisible);
+		_actionShowTrackSlider.setEnabled(isTrackSliderVisible && canTourBeDisplayed);
 	}
 
 	private void enableContextMenuActions() {
@@ -1159,11 +1212,11 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 		tbm.add(_actionTourColorHrZone);
 		tbm.add(new Separator());
 
-		tbm.add(_actionShowTourInMap3);
+		tbm.add(_actionShowTourInMap);
 		tbm.add(_actionShowEntireTour);
-		tbm.add(_actionSyncMapWithTour);
-		tbm.add(_actionSyncMapWithChartSlider);
-		tbm.add(_actionSyncMap3WithOtherMap);
+		tbm.add(_actionSyncMap_WithTour);
+		tbm.add(_actionSyncMap_WithChartSlider);
+		tbm.add(_actionSyncMap_WithOtherMap);
 		tbm.add(new Separator());
 
 		tbm.add(_actionMapBookmarks);
@@ -1626,22 +1679,22 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 		final boolean isTourAvailable = _allTours.size() > 0;
 
 		// sync map with tour
-		_isSyncMapViewWithTour = Util.getStateBoolean(_state, STATE_IS_SYNC_MAP_VIEW_WITH_TOUR, true);
-		_actionSyncMapWithTour.setChecked(_isSyncMapViewWithTour);
+		_isMapSynched_WithTour = Util.getStateBoolean(_state, STATE_IS_SYNC_MAP_VIEW_WITH_TOUR, true);
+		_actionSyncMap_WithTour.setChecked(_isMapSynched_WithTour);
 
 		// sync map position with slider
-		_isSyncMapWithChartSlider = Util.getStateBoolean(_state, STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER, false);
-		_actionSyncMapWithChartSlider.setChecked(_isSyncMapWithChartSlider);
+		_isMapSynched_WithChartSlider = Util.getStateBoolean(_state, STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER, false);
+		_actionSyncMap_WithChartSlider.setChecked(_isMapSynched_WithChartSlider);
 
 		// synch map with another map
-		_isSyncMap3WithOtherMap = Util.getStateBoolean(_state, STATE_IS_SYNC_MAP3_WITH_OTHER_MAP, true);
-		_actionSyncMap3WithOtherMap.setChecked(_isSyncMap3WithOtherMap);
+		_isMapSynched_WithOtherMap = Util.getStateBoolean(_state, STATE_IS_SYNC_MAP3_WITH_OTHER_MAP, true);
+		_actionSyncMap_WithOtherMap.setChecked(_isMapSynched_WithOtherMap);
 
 		/*
 		 * Tour
 		 */
 		final boolean isTourVisible = Util.getStateBoolean(_state, STATE_IS_TOUR_VISIBLE, true);
-		_actionShowTourInMap3.setState(isTourVisible, isTourAvailable);
+		_actionShowTourInMap.setState(isTourVisible, isTourAvailable);
 		Map3Manager.setLayerVisible_TourTrack(isTourVisible);
 
 		/*
@@ -1737,9 +1790,9 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
 		_state.put(STATE_IS_LEGEND_VISIBLE, isLegendVisible);
 		_state.put(STATE_IS_MARKER_VISIBLE, isMarkerVisible);
-		_state.put(STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER, _isSyncMapWithChartSlider);
-		_state.put(STATE_IS_SYNC_MAP_VIEW_WITH_TOUR, _isSyncMapViewWithTour);
-		_state.put(STATE_IS_SYNC_MAP3_WITH_OTHER_MAP, _isSyncMap3WithOtherMap);
+		_state.put(STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER, _isMapSynched_WithChartSlider);
+		_state.put(STATE_IS_SYNC_MAP_VIEW_WITH_TOUR, _isMapSynched_WithTour);
+		_state.put(STATE_IS_SYNC_MAP3_WITH_OTHER_MAP, _isMapSynched_WithOtherMap);
 		_state.put(STATE_IS_TOUR_VISIBLE, isTrackVisible);
 		_state.put(STATE_IS_TRACK_SLIDER_VISIBLE, isSliderVisible);
 
@@ -1956,7 +2009,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 		// !!! set state in model before enable actions !!!
 		Map3Manager.setLayerVisible_TrackSlider(isVisible);
 
-		updateActionsState();
+		enableActions();
 	}
 
 	/**
@@ -1967,7 +2020,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 	 */
 	public void showAllTours(final boolean isSyncMapViewWithTour) {
 
-		updateActionsState();
+		enableActions();
 
 		final TourTrackLayer tourTrackLayer = Map3Manager.getLayer_TourTrack();
 
@@ -2046,7 +2099,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
 	private void showAllTours_InternalTours() {
 
-		showAllTours(_isSyncMapViewWithTour);
+		showAllTours(_isMapSynched_WithTour);
 	}
 
 	private void showAllTours_NewTours(final ArrayList<TourData> newTours) {
@@ -2090,7 +2143,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 						return;
 					}
 
-					showAllTours_Final(_isSyncMapViewWithTour, trackPositions);
+					showAllTours_Final(_isMapSynched_WithTour, trackPositions);
 				}
 
 				return;
@@ -2182,7 +2235,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 					chartInfo.leftSliderValuesIndex,
 					chartInfo.rightSliderValuesIndex);
 
-			updateActionsState();
+			enableActions();
 		}
 	}
 
@@ -2212,7 +2265,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 					leftSliderValuesIndex,
 					rightSliderValuesIndex);
 
-			updateActionsState();
+			enableActions();
 		}
 	}
 
@@ -2288,7 +2341,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
 				final Position newEyePos = new Position(newEyeLatLon, newEyeElev);
 
-				if (_isSyncMapWithChartSlider) {
+				if (_isMapSynched_WithChartSlider) {
 					orbitView.setOrientation(newEyePos, mapSliderPosition);
 				}
 
@@ -2299,7 +2352,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 			// Fallback to setting center position.
 			catch (final Exception e) {
 
-				if (_isSyncMapWithChartSlider) {
+				if (_isMapSynched_WithChartSlider) {
 
 					orbitView.setCenterPosition(mapSliderPosition);
 					// View/OrbitView will have logged the exception, no need to log it here.
@@ -2331,27 +2384,6 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 		syncMapWith_SliderPosition(tourData, chartSliderLayer, valuesIndex);
 
 		updateTrackSlider_10_Position(tourData, allTourMarker);
-	}
-
-	/**
-	 * Enable actions according to the available tours in {@link #_allTours}.
-	 */
-	void updateActionsState() {
-
-		final boolean isTrackSliderVisible = Map3Manager.getLayer_TrackSlider().isEnabled();
-		final boolean isLegendVisible = Map3Manager.getLayer_TourLegend().isEnabled();
-		final boolean isTrackVisible = Map3Manager.getLayer_TourTrack().isEnabled();
-		final boolean isMarkerVisible = Map3Manager.getLayer_Marker().isEnabled();
-
-		final boolean isTourAvailable = _allTours.size() > 0;
-
-		_actionShowTourInMap3.setState(isTrackVisible, isTourAvailable);
-		_actionSyncMapWithChartSlider.setEnabled(isTourAvailable && isTrackSliderVisible);
-		_actionSyncMapWithTour.setEnabled(isTourAvailable);
-
-		_actionShowLegendInMap.setChecked(isLegendVisible);
-		_actionShowTrackSlider.setChecked(isTrackSliderVisible);
-		_actionShowMarker.setChecked(isMarkerVisible);
 	}
 
 	private void updateModifiedTours(final ArrayList<TourData> modifiedTours) {
