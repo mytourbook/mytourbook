@@ -90,12 +90,14 @@ public class ActionShowTourInMap3 extends ContributionItem implements IOpeningDi
 			_toolBar = toolbar;
 
 			toolbar.addDisposeListener(new DisposeListener() {
+				@Override
 				public void widgetDisposed(final DisposeEvent e) {
 					onDispose();
 				}
 			});
 
 			toolbar.addMouseMoveListener(new MouseMoveListener() {
+				@Override
 				public void mouseMove(final MouseEvent e) {
 
 					final Point mousePosition = new Point(e.x, e.y);
@@ -218,17 +220,35 @@ public class ActionShowTourInMap3 extends ContributionItem implements IOpeningDi
 	 * @param isSelected
 	 * @param isEnabled
 	 */
-	public void setState(final boolean isSelected, final boolean isEnabled) {
+	public void setEnabled(final boolean isEnabled) {
+		
+		if (_actionTrackLayer == null) {
+			
+			_isActionEnabled = isEnabled;
+			
+		} else {
+			
+			_actionTrackLayer.setEnabled(isEnabled);
+		}
+		
+		updateUI_Tooltip();
+	}
+
+	/**
+	 * Set enable/disable and selection for this action.
+	 * 
+	 * @param isSelected
+	 * @param isEnabled
+	 */
+	public void setSelection(final boolean isSelected) {
 
 		if (_actionTrackLayer == null) {
 
-			_isActionEnabled = isEnabled;
 			_isActionSelected = isSelected;
 
 		} else {
 
 			_actionTrackLayer.setSelection(isSelected);
-			_actionTrackLayer.setEnabled(isEnabled);
 		}
 
 		updateUI_Tooltip();
