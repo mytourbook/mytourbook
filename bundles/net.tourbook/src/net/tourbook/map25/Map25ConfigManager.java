@@ -982,21 +982,22 @@ public class Map25ConfigManager {
 
 	private static void setMapLocation_InMapThread(final Map map, final MapPosition mapPosition) {
 
-		final boolean isAnimation = animationTime != 0 && isAnimateLocation;
-
-		if (isAnimation) {
-
-			final Animator animator = map.animator();
-
-			animator.cancel();
-			animator.animateTo(
-					(long) (animationTime * 1000),
-					mapPosition,
-					animationEasingType);
-		} else {
-
-			map.setMapPosition(mapPosition);
-		}
+//		final boolean isAnimation = animationTime != 0 && isAnimateLocation;
+//
+//		if (isAnimation) {
+//
+//			final Animator animator = map.animator();
+//
+//			animator.cancel();
+//			animator.animateTo(
+//					(long) (animationTime * 1000),
+//					mapPosition,
+//					animationEasingType);
+//		} else {
+//
+		map.setMapPosition(mapPosition);
+		map.setMapPosition(mapPosition);
+//		}
 
 		map.updateMap(true);
 	}
