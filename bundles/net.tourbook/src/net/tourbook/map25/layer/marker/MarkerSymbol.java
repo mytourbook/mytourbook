@@ -232,14 +232,14 @@ public class MarkerSymbol {
 	@Override
 	public String toString() {
 
-		return "MarkerSymbol ["
+		return "MarkerSymbol [" //$NON-NLS-1$
 
 //				+ "mBitmap=" + mBitmap + ", "
 //				+ "mTextureRegion=" + mTextureRegion + ", "
-				+ "mOffset=" + mOffset + ", "
-				+ "mBillboard=" + mBillboard + ", "
-				+ "rotation=" + rotation
+				+ "mOffset=" + mOffset + ", " //$NON-NLS-1$ //$NON-NLS-2$
+				+ "mBillboard=" + mBillboard + ", " //$NON-NLS-1$ //$NON-NLS-2$
+				+ "rotation=" + rotation //$NON-NLS-1$
 
-				+ "]";
+				+ "]"; //$NON-NLS-1$
 	}
 }

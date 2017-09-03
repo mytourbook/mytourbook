@@ -77,13 +77,13 @@ public class StaticCluster<T extends ClusterItem> implements Cluster<T> {
 
 	@Override
 	public String toString() {
-		return "\n"
+		return "\n" //$NON-NLS-1$
 
-				+ "\tStaticCluster	["
+				+ "\tStaticCluster	[" //$NON-NLS-1$
 
-				+ "_clusterItems.size=" + _clusterItems.size() + ", "
-				+ "_geoCenter=" + _geoCenter + ", "
+				+ "_clusterItems.size=" + _clusterItems.size() + ", " //$NON-NLS-1$ //$NON-NLS-2$
+				+ "_geoCenter=" + _geoCenter + ", " //$NON-NLS-1$ //$NON-NLS-2$
 
-				+ "]";
+				+ "]"; //$NON-NLS-1$
 	}
 }

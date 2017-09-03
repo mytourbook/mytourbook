@@ -150,7 +150,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 		 */
 		final Label title = new Label(parent, SWT.LEAD);
 		title.setFont(_boldFont);
-		title.setText("Track &Options");
+		title.setText(Messages.TourTrack_Properties_Label_Title);
 		title.setToolTipText(Messages.TourTrack_Properties_Label_ConfigName_Tooltip);
 		GridDataFactory
 				.fillDefaults()//
@@ -283,7 +283,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 			 */
 			_lblConfigName = new Label(parent, SWT.NONE);
 			_lblConfigName.setText(Messages.TourTrack_Properties_Label_Name);
-			_lblConfigName.setToolTipText("Name for the currently selected tour track configuration");
+			_lblConfigName.setToolTipText(Messages.TourTrack_Properties_Label_Title_Tooltip);
 			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_lblConfigName);
 
 			/*

@@ -91,18 +91,18 @@ public class MapBookmark {
 
 	@Override
 	public String toString() {
-		return "\n"
+		return "\n" //$NON-NLS-1$
 
-				+ "MapBookmark "
+				+ "MapBookmark " //$NON-NLS-1$
 
-				+ "["
+				+ "[" //$NON-NLS-1$
 
-				+ "id=" + id + ", "
-				+ "name=" + name + ", "
+				+ "id=" + id + ", " //$NON-NLS-1$ //$NON-NLS-2$
+				+ "name=" + name + ", " //$NON-NLS-1$ //$NON-NLS-2$
 				//				+ "latitude=" + latitude + ", "
 				//				+ "longitude=" + longitude
 
-				+ "]";
+				+ "]"; //$NON-NLS-1$
 	}
 
 }

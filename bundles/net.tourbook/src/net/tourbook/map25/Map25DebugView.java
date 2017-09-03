@@ -130,7 +130,7 @@ public class Map25DebugView extends ViewPart {
 
 				final Label label = new Label(container, SWT.NONE);
 				GridDataFactory.fillDefaults().applyTo(label);
-				label.setText("Requested Tiles");
+				label.setText("Requested Tiles"); //$NON-NLS-1$
 
 				_lblRequestedTiles = new Label(container, SWT.NONE);
 				GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblRequestedTiles);
@@ -143,7 +143,7 @@ public class Map25DebugView extends ViewPart {
 
 				final Label label = new Label(container, SWT.NONE);
 				GridDataFactory.fillDefaults().applyTo(label);
-				label.setText("Network requests");
+				label.setText("Network requests"); //$NON-NLS-1$
 
 				_lblNetworkRequests = new Label(container, SWT.NONE);
 				GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblNetworkRequests);
@@ -156,7 +156,7 @@ public class Map25DebugView extends ViewPart {
 
 				final Label label = new Label(container, SWT.NONE);
 				GridDataFactory.fillDefaults().applyTo(label);
-				label.setText("Cache Hits");
+				label.setText("Cache Hits"); //$NON-NLS-1$
 
 				_lblCacheHits = new Label(container, SWT.NONE);
 				GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblCacheHits);
@@ -169,7 +169,7 @@ public class Map25DebugView extends ViewPart {
 
 				final Label label = new Label(container, SWT.NONE);
 				GridDataFactory.fillDefaults().applyTo(label);
-				label.setText("Cache Size");
+				label.setText("Cache Size"); //$NON-NLS-1$
 
 				_lblCacheSize = new Label(container, SWT.NONE);
 				GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblCacheSize);

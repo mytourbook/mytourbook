@@ -21,6 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
+import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
@@ -29,7 +30,6 @@ import net.tourbook.common.util.Util;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
 import org.osgi.framework.Bundle;
@@ -38,11 +38,10 @@ import de.byteholder.geoclipse.mapprovider.IMapProviderListener;
 
 public class Map25ProviderManager {
 
-	private static final String				ID							= "net.tourbook.map25.Map25Manager";		//$NON-NLS-1$
+//	private static final String				ID							= "net.tourbook.map25.Map25Manager";		//$NON-NLS-1$
 
 // SET_FORMATTING_OFF
 	private static final Bundle				_bundle						= TourbookPlugin.getDefault().getBundle();
-	private static final IDialogSettings	_state						= TourbookPlugin.getState(ID);
 	private static final IPath				_stateLocation				= Platform.getStateLocation(_bundle);
 // SET_FORMATTING_ON
 
@@ -89,11 +88,11 @@ public class Map25ProviderManager {
 
 		mapProvider.isDefault = true;
 		mapProvider.isEnabled = true;
-		mapProvider.name = "Open Science Map";
-		mapProvider.url = "http://opensciencemap.org/tiles/vtm";
-		mapProvider.tilePath = "/{Z}/{X}/{Y}.vtm";
+		mapProvider.name = Messages.Map25_Provider_OpenScienceMap_Name;
+		mapProvider.url = "http://opensciencemap.org/tiles/vtm"; //$NON-NLS-1$
+		mapProvider.tilePath = "/{Z}/{X}/{Y}.vtm"; //$NON-NLS-1$
 		mapProvider.tileEncoding = TileEncoding.VTM;
-		mapProvider.description = "This server is sometimes very slow !\n\nhttp://opensciencemap.org";
+		mapProvider.description = Messages.Map25_Provider_OpenScienceMap_Description;
 
 		_defaultMapProvider = mapProvider;
 
@@ -108,19 +107,12 @@ public class Map25ProviderManager {
 		final Map25Provider mapProvider = new Map25Provider();
 
 		mapProvider.isEnabled = false;
-		mapProvider.name = "Mapzen Vector Tiles";
-		mapProvider.url = "https://tile.mapzen.com/mapzen/vector/v1/all";
-		mapProvider.tilePath = "/{Z}/{X}/{Y}.mvt";
+		mapProvider.name = Messages.Map25_Provider_MapzenVectorTiles_Name;
+		mapProvider.url = "https://tile.mapzen.com/mapzen/vector/v1/all"; //$NON-NLS-1$
+		mapProvider.tilePath = "/{Z}/{X}/{Y}.mvt"; //$NON-NLS-1$
 		mapProvider.tileEncoding = TileEncoding.MVT;
-		mapProvider.apiKey = "mapzen-xxxxxxx";
-		mapProvider.description =
-				"https://mapzen.com/projects/vector-tiles/"
-						+ "\n\n"
-						+ "This server requires an API key which can be requested from"
-						+ "\n\n"
-						+ "https://mapzen.com/documentation/overview/api-keys/ "
-						+ "\n\n"
-						+ "50'000 tiles per month are free (July 2017)";
+		mapProvider.apiKey = "mapzen-xxxxxxx"; //$NON-NLS-1$
+		mapProvider.description = Messages.Map25_Provider_MapzenVectorTiles_Description;
 
 		return mapProvider;
 	}
@@ -133,14 +125,11 @@ public class Map25ProviderManager {
 		final Map25Provider mapProvider = new Map25Provider();
 
 		mapProvider.isEnabled = false;
-		mapProvider.name = "My Tile Server";
-		mapProvider.url = "http://192.168.99.99:8080/all";
-		mapProvider.tilePath = "/{Z}/{X}/{Y}.mvt";
+		mapProvider.name = Messages.Map25_Provider_MyTileServer_Name;
+		mapProvider.url = "http://192.168.99.99:8080/all"; //$NON-NLS-1$
+		mapProvider.tilePath = "/{Z}/{X}/{Y}.mvt"; //$NON-NLS-1$
 		mapProvider.tileEncoding = TileEncoding.MVT;
-		mapProvider.description = "How to build an own tile server is described here\n\n"
-				+ "https://github.com/tilezen/vector-datasource/wiki/Mapzen-Vector-Tile-Service"
-				+ "\n\n"
-				+ "Vector tile data can be used from https://download.geofabrik.de/";
+		mapProvider.description = Messages.Map25_Provider_MyTileServer_Description;
 
 		return mapProvider;
 	}

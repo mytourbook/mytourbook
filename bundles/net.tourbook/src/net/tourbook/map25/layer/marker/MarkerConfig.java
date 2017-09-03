@@ -96,17 +96,17 @@ public class MarkerConfig {
 
 	@Override
 	public String toString() {
-		return "Map25MarkerConfig ["
+		return "Map25MarkerConfig [" //$NON-NLS-1$
 
-				+ "id=" + id + ", "
-				+ "name=" + name + ", "
+				+ "id=" + id + ", " //$NON-NLS-1$ //$NON-NLS-2$
+				+ "name=" + name + ", " //$NON-NLS-1$ //$NON-NLS-2$
 
-				+ "iconClusterSizeDP=" + clusterSymbolSize + ", "
-				+ "iconMarkerSizeDP=" + markerSymbolSize + ", "
+				+ "iconClusterSizeDP=" + clusterSymbolSize + ", " //$NON-NLS-1$ //$NON-NLS-2$
+				+ "iconMarkerSizeDP=" + markerSymbolSize + ", " //$NON-NLS-1$ //$NON-NLS-2$
 
-				+ "clusterColorForeground=" + clusterOutline_Color + ", "
-				+ "clusterColorBackground=" + clusterFill_Color +
+				+ "clusterColorForeground=" + clusterOutline_Color + ", " //$NON-NLS-1$ //$NON-NLS-2$
+				+ "clusterColorBackground=" + clusterFill_Color + //$NON-NLS-1$
 
-				"]\n";
+				"]\n"; //$NON-NLS-1$
 	}
 }

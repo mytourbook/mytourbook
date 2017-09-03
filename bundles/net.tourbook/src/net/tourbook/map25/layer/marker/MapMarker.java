@@ -41,14 +41,14 @@ public class MapMarker implements ClusterItem {
 	public String toString() {
 		return
 //				"\n"
-		"MapMarker ["
+		"MapMarker [" //$NON-NLS-1$
 
 				//				+ "title=" + title + ", "
 				//				+ "description=" + description + ", "
-				+ "geoPoint=" + geoPoint + ", "
+				+ "geoPoint=" + geoPoint + ", " //$NON-NLS-1$ //$NON-NLS-2$
 				//				+ "markerSymbol=" + markerSymbol
 
-				+ "]";
+				+ "]"; //$NON-NLS-1$
 	}
 
 }

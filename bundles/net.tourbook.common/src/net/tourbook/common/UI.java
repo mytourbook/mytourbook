@@ -1088,10 +1088,10 @@ public class UI {
 
 		if (nanoValue > 0) {
 
-			return "0." + Integer.toString(nanoValue + 1000_000_000).substring(1);
+			return "0." + Integer.toString(nanoValue + 1000_000_000).substring(1); //$NON-NLS-1$
 		}
 
-		return "0.0";
+		return "0.0"; //$NON-NLS-1$
 	}
 
 	/**

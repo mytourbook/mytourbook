@@ -91,6 +91,6 @@ class ProjectedItem {
 
 	@Override
 	public String toString() {
-		return "\n" + mapX + ":" + mapY + " / " + dy + " " + isVisible;
+		return "\n" + mapX + ":" + mapY + " / " + dy + " " + isVisible; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	}
 }

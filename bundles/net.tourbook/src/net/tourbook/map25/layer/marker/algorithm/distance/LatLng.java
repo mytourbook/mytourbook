@@ -73,11 +73,11 @@ public final class LatLng {
 		final double var3 = this.longitude;
 
 		return (new StringBuilder(60))
-				.append("lat/lng: (")
+				.append("lat/lng: (") //$NON-NLS-1$
 				.append(var1)
-				.append(",")
+				.append(",") //$NON-NLS-1$
 				.append(var3)
-				.append(")")
+				.append(")") //$NON-NLS-1$
 				.toString();
 	}
 }

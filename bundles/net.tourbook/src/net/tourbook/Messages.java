@@ -1131,6 +1131,13 @@ public class Messages extends NLS {
 	public static String		Map25_Config_SymbolOrientation_Billboard;
 	public static String		Map25_Config_SymbolOrientation_Ground;
 
+	public static String		Map25_Provider_MapzenVectorTiles_Description;
+	public static String		Map25_Provider_MapzenVectorTiles_Name;
+	public static String		Map25_Provider_MyTileServer_Description;
+	public static String		Map25_Provider_MyTileServer_Name;
+	public static String		Map25_Provider_OpenScienceMap_Description;
+	public static String		Map25_Provider_OpenScienceMap_Name;
+
 	public static String		merge_tour_dlg_invalid_serie_data_message;
 	public static String		merge_tour_dlg_invalid_tour_data_message;
 	public static String		merge_tour_dlg_invalid_tour_message;
@@ -1610,8 +1617,8 @@ public class Messages extends NLS {
 	public static String		Slideout_HVROptions_Label_2xToleranceResult_Tooltip;
 	public static String		Slideout_HVROptions_Label_Title;
 
-	public static String		Slideout_Map25MapOptions_Checkbox_IsAnimationLocation;
-	public static String		Slideout_Map25MapOptions_Checkbox_IsAnimationLocation_Tooltip;
+//	public static String		Slideout_Map25MapOptions_Checkbox_IsAnimationLocation;
+//	public static String		Slideout_Map25MapOptions_Checkbox_IsAnimationLocation_Tooltip;
 	public static String		Slideout_Map25MapOptions_Checkbox_Layer_3DBuilding;
 	public static String		Slideout_Map25MapOptions_Checkbox_Layer_Cartography;
 	public static String		Slideout_Map25MapOptions_Checkbox_Layer_Cartography_Tooltip;
@@ -1619,17 +1626,15 @@ public class Messages extends NLS {
 	public static String		Slideout_Map25MapOptions_Checkbox_Layer_ScaleBar;
 	public static String		Slideout_Map25MapOptions_Checkbox_Layer_TileInfo;
 	public static String		Slideout_Map25MapOptions_Group_MapLayer;
-	public static String		Slideout_Map25MapOptions_Label_AnimationEasingType;
-	public static String		Slideout_Map25MapOptions_Label_AnimationEasingType_Tooltip;
-	public static String		Slideout_Map25MapOptions_Label_AnimationTime;
-	public static String		Slideout_Map25MapOptions_Label_AnimationTime_Tooltip;
+//	public static String		Slideout_Map25MapOptions_Label_AnimationEasingType;
+//	public static String		Slideout_Map25MapOptions_Label_AnimationEasingType_Tooltip;
+//	public static String		Slideout_Map25MapOptions_Label_AnimationTime;
+//	public static String		Slideout_Map25MapOptions_Label_AnimationTime_Tooltip;
 	public static String		Slideout_Map25MapOptions_Label_MapOptions;
 
 	public static String		Slideout_Map25MarkerOptions_Checkbox_IsMarkerClustering;
-	public static String		Slideout_Map25MarkerOptions_Checkbox_IsShowMarkerLabel;
+//	public static String		Slideout_Map25MarkerOptions_Checkbox_IsShowMarkerLabel;
 	public static String		Slideout_Map25MarkerOptions_Checkbox_IsShowMarkerPoint;
-	public static String		Slideout_Map25MarkerOptions_Color_Background_Tooltip;
-	public static String		Slideout_Map25MarkerOptions_Color_Foreground_Tooltip;
 	public static String		Slideout_Map25MarkerOptions_Label_ClusterGridSize;
 	public static String		Slideout_Map25MarkerOptions_Label_ClusterOrientation;
 	public static String		Slideout_Map25MarkerOptions_Label_ClusterPlacement;
@@ -1647,7 +1652,6 @@ public class Messages extends NLS {
 	public static String		Slideout_Map25MarkerOptions_Label_Size_Tooltip;
 	public static String		Slideout_Map25MarkerOptions_Label_SwapColor_Tooltip;
 	public static String		Slideout_Map25MarkerOptions_Label_Title;
-	public static String		Slideout_Map25MarkerOptions_Spinner_SymbolSize_Tooltip;
 
 	public static String		Slideout_MapBookmark_Label_NumBookmarkListItems;
 	public static String		Slideout_MapBookmark_Label_NumBookmarkListItems_Tooltip;

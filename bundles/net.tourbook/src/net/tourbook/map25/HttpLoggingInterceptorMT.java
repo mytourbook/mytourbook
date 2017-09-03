@@ -50,9 +50,9 @@ import okio.BufferedSource;
  */
 public final class HttpLoggingInterceptorMT implements Interceptor {
 
-	private static final String		FORMAT_HEADER	= "   %-30s%s";
+	private static final String		FORMAT_HEADER	= "   %-30s%s"; //$NON-NLS-1$
 
-	private static final Charset	UTF8			= Charset.forName("UTF-8");
+	private static final Charset	UTF8			= Charset.forName("UTF-8"); //$NON-NLS-1$
 
 	private static final Logger		log				= LoggerFactory.getLogger(HttpLoggingInterceptorMT.class);
 
@@ -158,8 +158,8 @@ public final class HttpLoggingInterceptorMT implements Interceptor {
 	}
 
 	private boolean bodyEncoded(final Headers headers) {
-		final String contentEncoding = headers.get("Content-Encoding");
-		return contentEncoding != null && !contentEncoding.equalsIgnoreCase("identity");
+		final String contentEncoding = headers.get("Content-Encoding"); //$NON-NLS-1$
+		return contentEncoding != null && !contentEncoding.equalsIgnoreCase("identity"); //$NON-NLS-1$
 	}
 
 	public Level getLevel() {
@@ -176,7 +176,7 @@ public final class HttpLoggingInterceptorMT implements Interceptor {
 			return chain.proceed(request);
 		}
 
-		final String logId = Integer.toString(_logId.incrementAndGet()) + " ";
+		final String logId = Integer.toString(_logId.incrementAndGet()) + " "; //$NON-NLS-1$
 
 		final boolean isLogBody = level == Level.BODY;
 		final boolean isLogHeaders = isLogBody || level == Level.HEADERS;
@@ -186,9 +186,9 @@ public final class HttpLoggingInterceptorMT implements Interceptor {
 
 		final Connection connection = chain.connection();
 		final Protocol protocol = connection != null ? connection.protocol() : Protocol.HTTP_1_1;
-		String requestStartMessage = "--> " + request.method() + ' ' + request.url() + ' ' + protocol;
+		String requestStartMessage = "--> " + request.method() + ' ' + request.url() + ' ' + protocol; //$NON-NLS-1$
 		if (!isLogHeaders && hasRequestBody) {
-			requestStartMessage += " (" + requestBody.contentLength() + "-byte body)";
+			requestStartMessage += " (" + requestBody.contentLength() + "-byte body)"; //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		log.debug(logId + requestStartMessage);
 
@@ -198,10 +198,10 @@ public final class HttpLoggingInterceptorMT implements Interceptor {
 				// Request body headers are only present when installed as a network interceptor. Force
 				// them to be included (when available) so there values are known.
 				if (requestBody.contentType() != null) {
-					log.debug(logId + "Content-Type: " + requestBody.contentType());
+					log.debug(logId + "Content-Type: " + requestBody.contentType()); //$NON-NLS-1$
 				}
 				if (requestBody.contentLength() != -1) {
-					log.debug(logId + "Content-Length: " + requestBody.contentLength());
+					log.debug(logId + "Content-Length: " + requestBody.contentLength()); //$NON-NLS-1$
 				}
 			}
 
@@ -211,7 +211,7 @@ public final class HttpLoggingInterceptorMT implements Interceptor {
 				final String name = headers.name(i);
 
 				// Skip headers from the request body as they are explicitly logged above.
-				if (!"Content-Type".equalsIgnoreCase(name) && !"Content-Length".equalsIgnoreCase(name)) {
+				if (!"Content-Type".equalsIgnoreCase(name) && !"Content-Length".equalsIgnoreCase(name)) { //$NON-NLS-1$ //$NON-NLS-2$
 					log.debug(logId + String.format(FORMAT_HEADER, headers.name(i), headers.value(i)));
 				}
 			}
@@ -247,7 +247,7 @@ public final class HttpLoggingInterceptorMT implements Interceptor {
 		try {
 			response = chain.proceed(request);
 		} catch (final Exception e) {
-			log.debug(logId + "<-- HTTP FAILED: " + e);
+			log.debug(logId + "<-- HTTP FAILED: " + e); //$NON-NLS-1$
 			throw e;
 		}
 
@@ -255,12 +255,12 @@ public final class HttpLoggingInterceptorMT implements Interceptor {
 
 		final ResponseBody responseBody = response.body();
 		final long contentLength = responseBody.contentLength();
-		final String bodySize = contentLength != -1 ? contentLength + "-byte" : "unknown-length";
+		final String bodySize = contentLength != -1 ? contentLength + "-byte" : "unknown-length"; //$NON-NLS-1$ //$NON-NLS-2$
 
-		final String logBody = !isLogHeaders ? ", " + bodySize + " body" : "";
+		final String logBody = !isLogHeaders ? ", " + bodySize + " body" : ""; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-		log.debug(logId + "<-- " + response.code() + ' ' + response.message() + ' '
-				+ response.request().url() + " (" + tookMy + " my" + logBody + ')');
+		log.debug(logId + "<-- " + response.code() + ' ' + response.message() + ' ' //$NON-NLS-1$
+				+ response.request().url() + " (" + tookMy + " my" + logBody + ')'); //$NON-NLS-1$ //$NON-NLS-2$
 
 		if (isLogHeaders) {
 
@@ -270,9 +270,9 @@ public final class HttpLoggingInterceptorMT implements Interceptor {
 			}
 
 			if (!isLogBody || !HttpHeaders.hasBody(response)) {
-				log.debug(logId + "<-- END HTTP");
+				log.debug(logId + "<-- END HTTP"); //$NON-NLS-1$
 			} else if (bodyEncoded(response.headers())) {
-				log.debug(logId + "<-- END HTTP (encoded body omitted)");
+				log.debug(logId + "<-- END HTTP (encoded body omitted)"); //$NON-NLS-1$
 			} else {
 				final BufferedSource source = responseBody.source();
 				source.request(Long.MAX_VALUE); // Buffer the entire body.
@@ -285,17 +285,17 @@ public final class HttpLoggingInterceptorMT implements Interceptor {
 				}
 
 				if (!isPlaintext(buffer)) {
-					log.debug(logId + "");
-					log.debug(logId + "<-- END HTTP (binary " + buffer.size() + "-byte body omitted)");
+					log.debug(logId + ""); //$NON-NLS-1$
+					log.debug(logId + "<-- END HTTP (binary " + buffer.size() + "-byte body omitted)"); //$NON-NLS-1$ //$NON-NLS-2$
 					return response;
 				}
 
 				if (contentLength != 0) {
-					log.debug(logId + "");
+					log.debug(logId + ""); //$NON-NLS-1$
 					log.debug(logId + buffer.clone().readString(charset));
 				}
 
-				log.debug(logId + "<-- END HTTP (" + buffer.size() + "-byte body)");
+				log.debug(logId + "<-- END HTTP (" + buffer.size() + "-byte body)"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 
@@ -306,7 +306,7 @@ public final class HttpLoggingInterceptorMT implements Interceptor {
 	public HttpLoggingInterceptorMT setLevel(final Level level) {
 
 		if (level == null) {
-			throw new NullPointerException("level == null. Use Level.NONE instead.");
+			throw new NullPointerException("level == null. Use Level.NONE instead."); //$NON-NLS-1$
 		}
 
 		this.level = level;

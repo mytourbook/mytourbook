@@ -87,15 +87,15 @@ public class QuadItem<T extends ClusterItem> implements PointQuadTree.Item, Clus
 	@Override
 	public String toString() {
 
-		return "\n"
+		return "\n" //$NON-NLS-1$
 
-				+ "\tQuadItem\t\t["
+				+ "\tQuadItem\t\t[" //$NON-NLS-1$
 
-				+ "mClusterItem=" + mClusterItem + ", "
+				+ "mClusterItem=" + mClusterItem + ", " //$NON-NLS-1$ //$NON-NLS-2$
 				//					+ "mPoint=" + mPoint + ", "
 				//					+ "mPosition=" + mPosition + ", "
 				//					+ "singletonSet=" + singletonSet
 
-				+ "]";
+				+ "]"; //$NON-NLS-1$
 	}
 }
