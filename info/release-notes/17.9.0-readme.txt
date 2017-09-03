@@ -12,7 +12,11 @@ New
 Improvements
 ============
 
-* 2.5 D Tour Map
+* 2.5D Tour Map
 
   - Customize cluster for tour markers
   
+ 
+* Icon
+
+  - recreated more than 100 icons
