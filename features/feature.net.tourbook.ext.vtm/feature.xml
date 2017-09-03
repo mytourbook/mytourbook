@@ -2,7 +2,7 @@
 <feature
       id="feature.net.tourbook.ext.vtm"
       label="Feature for vector tile map"
-      version="17.7.2.qualifier"
+      version="17.9.0.qualifier"
       provider-name="MyTourbook"
       plugin="net.tourbook.branding">
 

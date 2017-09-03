@@ -3,7 +3,16 @@ Version 17.9                                                ?. September 2017
 New 	
 ===
 
+* 2D, 2.5D + 3D Maps
+
+  - Create and manage map bookmarks 
+  - Synchonize map with other map
+  
+  
+Improvements
+============
+
 * 2.5 D Tour Map
 
-  - Set 3 map bookmarks which can be moved to
+  - Customize cluster for tour markers
   

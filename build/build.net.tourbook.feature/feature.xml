@@ -2,7 +2,7 @@
 <feature
       id="build.net.tourbook.feature"
       label="MyTourbook Product Features"
-      version="17.7.2.qualifier"
+      version="17.9.0.qualifier"
       provider-name="MyTourbook">
 
    <description>
