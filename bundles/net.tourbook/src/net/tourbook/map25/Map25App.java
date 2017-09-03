@@ -18,6 +18,7 @@ package net.tourbook.map25;
 import java.awt.Canvas;
 
 import net.tourbook.common.util.Util;
+import net.tourbook.map.IMapSyncListener;
 import net.tourbook.map25.Map25TileSource.Builder;
 import net.tourbook.map25.OkHttpEngineMT.OkHttpFactoryMT;
 import net.tourbook.map25.layer.labeling.LabelLayer;
@@ -180,8 +181,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 			@Override
 			public void onMapEvent(final Event e, final MapPosition mapPosition) {
 
-				_map25View.onMapPosition(mapPosition);
-
+				_map25View.fireSyncMapEvent(mapPosition, 0);
 			}
 		});
 	}
@@ -429,6 +429,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 			mMap.setMapPosition(mapPosition);
 			mMap.render();
 
+			_map25View.fireSyncMapEvent(mapPosition, IMapSyncListener.RESET_BEARING);
+
 			return true;
 
 		case Input.Keys.I:
@@ -440,6 +442,10 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 
 			mMap.setMapPosition(mapPosition);
 			mMap.render();
+
+			final MapPosition firedMapPos = new MapPosition();
+
+			_map25View.fireSyncMapEvent(mapPosition, IMapSyncListener.RESET_TILT);
 
 			return true;
 		}

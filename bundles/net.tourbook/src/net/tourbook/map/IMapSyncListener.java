@@ -20,6 +20,12 @@ import org.oscim.core.MapPosition;
 
 public interface IMapSyncListener {
 
+	/*
+	 * Position flags
+	 */
+	public static final int	RESET_TILT		= 1 << 0;
+	public static final int	RESET_BEARING	= 1 << 1;
+
 	/**
 	 * Sync map location and zoomlevel with another map
 	 * 
@@ -27,8 +33,10 @@ public interface IMapSyncListener {
 	 *            Map position of the other map
 	 * @param viewPart
 	 *            View which fired this event
+	 * @param positionFlags
 	 */
 	void syncMapWithOtherMap(	MapPosition newMapPosition,
-								ViewPart viewPart);
+								ViewPart viewPart,
+								int positionFlags);
 
 }

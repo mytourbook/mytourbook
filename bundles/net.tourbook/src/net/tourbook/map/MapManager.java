@@ -32,12 +32,13 @@ public class MapManager {
 	}
 
 	public static void fireSyncMapEvent(final MapPosition mapPosition,
-										final ViewPart viewPart) {
+										final ViewPart viewPart,
+										final int positionFlags) {
 
 		final Object[] allListeners = _allMapSyncListener.getListeners();
 
 		for (final Object listener : allListeners) {
-			((IMapSyncListener) (listener)).syncMapWithOtherMap(mapPosition, viewPart);
+			((IMapSyncListener) (listener)).syncMapWithOtherMap(mapPosition, viewPart, positionFlags);
 		}
 	}
 

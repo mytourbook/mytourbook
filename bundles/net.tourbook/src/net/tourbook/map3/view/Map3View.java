@@ -1503,10 +1503,10 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 	@Override
 	public void moveToMapLocation(final MapBookmark mapBookmark) {
 
-		moveToMapLocation(mapBookmark.getMapPosition());
+		moveToMapLocation(mapBookmark.getMapPosition(), 0);
 	}
 
-	private void moveToMapLocation(final MapPosition mapPosition) {
+	private void moveToMapLocation(final MapPosition mapPosition, final int positionFlags) {
 
 		final int zoomLevel = mapPosition.zoomLevel + 0;
 		final double latitude = mapPosition.getLatitude();
@@ -1525,16 +1525,27 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
 		try {
 
-			final float tiltMapPos = mapPosition.tilt;
 			final float bearingMapPos = mapPosition.bearing;
+			final float tiltMapPos = mapPosition.tilt;
 
-			if (bearingMapPos != 0) {
+			final boolean isResetBearing = (positionFlags & IMapSyncListener.RESET_BEARING) != 0;
+			final boolean isResetTilt = (positionFlags & IMapSyncListener.RESET_TILT) != 0;
+
+			if (isResetBearing) {
+
+				view.setHeading(Angle.ZERO);
+
+			} else if (bearingMapPos != 0) {
 
 				final Angle bearing = Angle.fromDegrees(-bearingMapPos);
 				view.setHeading(bearing);
 			}
 
-			if (tiltMapPos != 0) {
+			if (isResetTilt) {
+
+				view.setPitch(Angle.ZERO);
+
+			} else if (tiltMapPos != 0) {
 
 				final Angle tilt = Angle.fromDegrees(tiltMapPos);
 
@@ -1617,7 +1628,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
 		_lastFiredSyncEventTime = System.currentTimeMillis();
 
-		MapManager.fireSyncMapEvent(mapPosition, this);
+		MapManager.fireSyncMapEvent(mapPosition, this, 0);
 	}
 
 	public void onModifyConfig() {
@@ -2441,7 +2452,8 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
 	@Override
 	public void syncMapWithOtherMap(final MapPosition mapPosition,
-									final ViewPart viewPart) {
+									final ViewPart viewPart,
+									final int positionFlags) {
 
 		if (!_isMapSynched_WithOtherMap) {
 
@@ -2464,7 +2476,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 			return;
 		}
 
-		moveToMapLocation(mapPosition);
+		moveToMapLocation(mapPosition, positionFlags);
 	}
 
 	private void updateModifiedTours(final ArrayList<TourData> modifiedTours) {

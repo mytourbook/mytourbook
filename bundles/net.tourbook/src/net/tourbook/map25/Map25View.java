@@ -817,6 +817,13 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		enableContextMenuActions();
 	}
 
+	void fireSyncMapEvent(final MapPosition mapPosition, final int positionFlags) {
+
+		_lastFiredSyncEventTime = System.currentTimeMillis();
+
+		MapManager.fireSyncMapEvent(mapPosition, this, positionFlags);
+	}
+
 	public Map25App getMapApp() {
 		return _mapApp;
 	}
@@ -838,15 +845,6 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		final MapPosition mapPosition = selectedBookmark.getMapPosition();
 
 		Map25ConfigManager.setMapLocation(map, mapPosition);
-	}
-
-	boolean onMapPosition(final MapPosition mapPosition) {
-
-		_lastFiredSyncEventTime = System.currentTimeMillis();
-
-		MapManager.fireSyncMapEvent(mapPosition, this);
-
-		return false;
 	}
 
 	@Override
@@ -1407,7 +1405,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 	@Override
 	public void syncMapWithOtherMap(final MapPosition mapPosition,
-									final ViewPart viewPart) {
+									final ViewPart viewPart,
+									final int positionFlags) {
 
 		if (!_isMapSynched_WithOtherMap) {
 

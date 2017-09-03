@@ -1779,7 +1779,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 		final MapPosition mapPosition = new MapLocation(geoCenter, zoomLevel - 1).getMapPosition();
 
-		MapManager.fireSyncMapEvent(mapPosition, this);
+		MapManager.fireSyncMapEvent(mapPosition, this, 0);
 	}
 
 	@Override
@@ -3148,7 +3148,8 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 	@Override
 	public void syncMapWithOtherMap(final MapPosition mapPosition,
-									final ViewPart viewPart) {
+									final ViewPart viewPart,
+									final int positionFlags) {
 
 		if (!_isMapSynched_WithOtherMap) {
 
