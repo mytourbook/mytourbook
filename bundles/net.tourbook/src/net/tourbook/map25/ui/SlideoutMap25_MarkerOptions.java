@@ -70,6 +70,8 @@ public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements ICol
 
 // SET_FORMATTING_ON
 
+	private static final int		DEFAULT_COMBO_WIDTH								= 30;
+
 	private SelectionListener		_defaultSelectionListener;
 	private MouseWheelListener		_defaultMouseWheelListener;
 	private IPropertyChangeListener	_defaultPropertyChangeListener;
@@ -229,7 +231,7 @@ public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements ICol
 						.fillDefaults()
 						.grab(true, false)
 						.align(SWT.BEGINNING, SWT.CENTER)
-						.hint(_pc.convertWidthInCharsToPixels(20), SWT.DEFAULT)
+						.hint(_pc.convertWidthInCharsToPixels(10), SWT.DEFAULT)
 						.applyTo(_comboConfigName);
 			}
 			{
@@ -394,7 +396,7 @@ public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements ICol
 						.fillDefaults()
 						.grab(true, false)
 						.align(SWT.BEGINNING, SWT.CENTER)
-						.hint(_pc.convertWidthInCharsToPixels(20), SWT.DEFAULT)
+						.hint(_pc.convertWidthInCharsToPixels(DEFAULT_COMBO_WIDTH), SWT.DEFAULT)
 						.applyTo(_comboMarkerOrientation);
 			}
 		}
@@ -511,7 +513,8 @@ public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements ICol
 				// label
 				_lblClusterSymbolSize = new Label(parent, SWT.NONE);
 				_lblClusterSymbolSize.setText(Messages.Slideout_Map25MarkerOptions_Label_ClusterSymbolSize);
-				_lblClusterSymbolSize.setToolTipText(Messages.Slideout_Map25MarkerOptions_Label_Size_Tooltip);
+				_lblClusterSymbolSize.setToolTipText(
+						Messages.Slideout_Map25MarkerOptions_Label_ClusterSymbolSize_Tooltip);
 				GridDataFactory
 						.fillDefaults()//
 						.align(SWT.FILL, SWT.CENTER)
@@ -574,7 +577,7 @@ public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements ICol
 						.fillDefaults()
 						.grab(true, false)
 						.align(SWT.BEGINNING, SWT.CENTER)
-						.hint(_pc.convertWidthInCharsToPixels(20), SWT.DEFAULT)
+						.hint(_pc.convertWidthInCharsToPixels(DEFAULT_COMBO_WIDTH), SWT.DEFAULT)
 						.applyTo(_comboClusterOrientation);
 			}
 		}
@@ -611,7 +614,7 @@ public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements ICol
 						.fillDefaults()
 						.grab(true, false)
 						.align(SWT.BEGINNING, SWT.CENTER)
-						.hint(_pc.convertWidthInCharsToPixels(20), SWT.DEFAULT)
+						.hint(_pc.convertWidthInCharsToPixels(DEFAULT_COMBO_WIDTH), SWT.DEFAULT)
 						.applyTo(_comboClusterAlgorithm);
 			}
 		}

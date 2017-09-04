@@ -92,7 +92,7 @@ public class PrefPageMap25OfflineMap extends FieldEditorPreferencePage implement
 			 */
 			_editorBool_UseDefaultLocation = new BooleanFieldEditor(
 					ITourbookPreferences.MAP25_OFFLINE_MAP_IS_DEFAULT_LOCATION,
-					Messages.Pref_Map25_Offline_Label_UseDefaultLocation,
+					Messages.Pref_Map25_Offline_Checkbox_UseDefaultLocation,
 					group);
 			_editorBool_UseDefaultLocation.setPage(this);
 			_editorBool_UseDefaultLocation.setPreferenceStore(_prefStore);

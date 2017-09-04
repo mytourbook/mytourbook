@@ -17,6 +17,7 @@ package net.tourbook.map25.ui;
 
 import java.util.ArrayList;
 
+import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorSelectorExtended;
 import net.tourbook.common.color.IColorSelectorListener;
@@ -25,7 +26,6 @@ import net.tourbook.common.util.Util;
 import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.map25.Map25View;
 import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
-import net.tourbook.map3.Messages;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -78,7 +78,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 
 	private Label					_lblConfigName;
 
-	private Spinner					_spinnerAnimationTime;
+//	private Spinner					_spinnerAnimationTime;
 	private Spinner					_spinnerOutlineWidth;
 
 	private Text					_textConfigName;
@@ -150,8 +150,8 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 		 */
 		final Label title = new Label(parent, SWT.LEAD);
 		title.setFont(_boldFont);
-		title.setText(Messages.TourTrack_Properties_Label_Title);
-		title.setToolTipText(Messages.TourTrack_Properties_Label_ConfigName_Tooltip);
+		title.setText(Messages.Slideout_Map25TrackOptions_Label_Title);
+		title.setToolTipText(Messages.Slideout_Map25TrackOptions_Label_ConfigName_Tooltip);
 		GridDataFactory
 				.fillDefaults()//
 				.grab(true, false)
@@ -191,8 +191,8 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 //					.fillDefaults()//
 //					.align(SWT.END, SWT.CENTER)
 //					.applyTo(_btnReset);
-//			_btnReset.setText(Messages.TourTrack_Properties_Button_Default);
-//			_btnReset.setToolTipText(Messages.TourTrack_Properties_Button_Default_Tooltip);
+//			_btnReset.setText(Messages.Slideout_Map25TrackOptions_Button_Default);
+//			_btnReset.setToolTipText(Messages.Slideout_Map25TrackOptions_Button_Default_Tooltip);
 //			_btnReset.addSelectionListener(new SelectionAdapter() {
 //				@Override
 //				public void widgetSelected(final SelectionEvent e) {
@@ -211,8 +211,8 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 
 			// label
 			final Label label = new Label(parent, SWT.NONE);
-			label.setText(Messages.TourTrack_Properties_Label_OutlineWidth);
-			label.setToolTipText(Messages.TourTrack_Properties_Label_OutlineWidth_Tooltip);
+			label.setText(Messages.Slideout_Map25TrackOptions_Label_OutlineWidth);
+			label.setToolTipText(Messages.Slideout_Map25TrackOptions_Label_OutlineWidth_Tooltip);
 			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
 
 			// spinner
@@ -236,7 +236,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 
 			// label
 			final Label label = new Label(parent, SWT.NONE);
-			label.setText(Messages.TourTrack_Properties_Label_OutlineColor);
+			label.setText(Messages.Slideout_Map25TrackOptions_Label_OutlineColor);
 			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
 
 			// Color: Segment alternate color
@@ -245,31 +245,31 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 			_colorOutlineColor.addOpenListener(this);
 
 		}
-		{
-			/*
-			 * Animation time
-			 */
-
-			// label
-			final Label label = new Label(parent, SWT.NONE);
-			label.setText(Messages.TourTrack_Properties_Label_AnimationTime);
-			label.setToolTipText(Messages.TourTrack_Properties_Label_AnimationTime_Tooltip);
-			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
-
-			// spinner
-			_spinnerAnimationTime = new Spinner(parent, SWT.BORDER);
-			_spinnerAnimationTime.setDigits(1);
-			_spinnerAnimationTime.setMinimum(0);
-			_spinnerAnimationTime.setMaximum(100);
-			_spinnerAnimationTime.setIncrement(1);
-			_spinnerAnimationTime.setPageIncrement(10);
-			_spinnerAnimationTime.addSelectionListener(_defaultSelectionListener);
-			_spinnerAnimationTime.addMouseWheelListener(_defaultMouseWheelListener);
-			GridDataFactory
-					.fillDefaults() //
-					.align(SWT.BEGINNING, SWT.FILL)
-					.applyTo(_spinnerAnimationTime);
-		}
+//		{
+//			/*
+//			 * Animation time
+//			 */
+//
+//			// label
+//			final Label label = new Label(parent, SWT.NONE);
+//			label.setText(Messages.Slideout_Map25TrackOptions_Label_AnimationTime);
+//			label.setToolTipText(Messages.Slideout_Map25TrackOptions_Label_AnimationTime_Tooltip);
+//			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+//
+//			// spinner
+//			_spinnerAnimationTime = new Spinner(parent, SWT.BORDER);
+//			_spinnerAnimationTime.setDigits(1);
+//			_spinnerAnimationTime.setMinimum(0);
+//			_spinnerAnimationTime.setMaximum(100);
+//			_spinnerAnimationTime.setIncrement(1);
+//			_spinnerAnimationTime.setPageIncrement(10);
+//			_spinnerAnimationTime.addSelectionListener(_defaultSelectionListener);
+//			_spinnerAnimationTime.addMouseWheelListener(_defaultMouseWheelListener);
+//			GridDataFactory
+//					.fillDefaults() //
+//					.align(SWT.BEGINNING, SWT.FILL)
+//					.applyTo(_spinnerAnimationTime);
+//		}
 	}
 
 	private void createUI_999_ConfigName(final Composite parent) {
@@ -282,8 +282,8 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 			 * Label
 			 */
 			_lblConfigName = new Label(parent, SWT.NONE);
-			_lblConfigName.setText(Messages.TourTrack_Properties_Label_Name);
-			_lblConfigName.setToolTipText(Messages.TourTrack_Properties_Label_Title_Tooltip);
+			_lblConfigName.setText(Messages.Slideout_Map25TrackOptions_Label_Name);
+			_lblConfigName.setToolTipText(Messages.Slideout_Map25TrackOptions_Label_Title_Tooltip);
 			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_lblConfigName);
 
 			/*
@@ -427,7 +427,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 		_colorOutlineColor.setColorValue(config.outlineColor);
 		_spinnerOutlineWidth.setSelection((int) (config.outlineWidth * 10));
 
-		_spinnerAnimationTime.setSelection(config.animationTime / 100);
+//		_spinnerAnimationTime.setSelection(config.animationTime / 100);
 
 		_isUpdateUI = false;
 	}
@@ -444,7 +444,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 		config.outlineColor = _colorOutlineColor.getColorValue();
 		config.outlineWidth = _spinnerOutlineWidth.getSelection() / 10.0f;
 
-		config.animationTime = _spinnerAnimationTime.getSelection() * 100;
+//		config.animationTime = _spinnerAnimationTime.getSelection() * 100;
 	}
 
 	private void updateUI_SetActiveConfig() {

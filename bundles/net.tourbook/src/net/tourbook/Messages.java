@@ -1109,6 +1109,7 @@ public class Messages extends NLS {
 	public static String		Map_Bookmark_Button_Add;
 	public static String		Map_Bookmark_Button_Rename;
 	public static String		Map_Bookmark_Column_Bearing;
+	public static String		Map_Bookmark_Column_Bearing_Tooltip;
 	public static String		Map_Bookmark_Column_Latitude;
 	public static String		Map_Bookmark_Column_Latitude_Tooltip;
 	public static String		Map_Bookmark_Column_Longitude;
@@ -1116,6 +1117,7 @@ public class Messages extends NLS {
 	public static String		Map_Bookmark_Column_Name;
 	public static String		Map_Bookmark_Column_Scale;
 	public static String		Map_Bookmark_Column_Tilt;
+	public static String		Map_Bookmark_Column_Tilt_Tooltip;
 	public static String		Map_Bookmark_Column_ZoomLevel;
 	public static String		Map_Bookmark_Column_ZoomLevel_Tooltip;
 	public static String		Map_Bookmark_Dialog_AddBookmark_Message;
@@ -1318,7 +1320,7 @@ public class Messages extends NLS {
 	public static String		Pref_Map25_Offline_Error_Location;
 	public static String		Pref_Map25_Offline_Group_OfflineMap;
 	public static String		Pref_Map25_Offline_Label_Location;
-	public static String		Pref_Map25_Offline_Label_UseDefaultLocation;
+	public static String		Pref_Map25_Offline_Checkbox_UseDefaultLocation;
 	public static String		Pref_Map25_Provider_Checkbox_IsEnabled;
 	public static String		Pref_Map25_Provider_Checkbox_IsEnabled_Tooltip;
 	public static String		Pref_Map25_Provider_Column_APIKey;
@@ -1617,8 +1619,16 @@ public class Messages extends NLS {
 	public static String		Slideout_HVROptions_Label_2xToleranceResult_Tooltip;
 	public static String		Slideout_HVROptions_Label_Title;
 
-//	public static String		Slideout_Map25MapOptions_Checkbox_IsAnimationLocation;
-//	public static String		Slideout_Map25MapOptions_Checkbox_IsAnimationLocation_Tooltip;
+	public static String		Slideout_Map25TrackOptions_Label_AnimationTime;
+	public static String		Slideout_Map25TrackOptions_Label_AnimationTime_Tooltip;
+	public static String		Slideout_Map25TrackOptions_Label_ConfigName_Tooltip;
+	public static String		Slideout_Map25TrackOptions_Label_Name;
+	public static String		Slideout_Map25TrackOptions_Label_OutlineColor;
+	public static String		Slideout_Map25TrackOptions_Label_OutlineWidth;
+	public static String		Slideout_Map25TrackOptions_Label_OutlineWidth_Tooltip;
+	public static String		Slideout_Map25TrackOptions_Label_Title;
+	public static String		Slideout_Map25TrackOptions_Label_Title_Tooltip;
+
 	public static String		Slideout_Map25MapOptions_Checkbox_Layer_3DBuilding;
 	public static String		Slideout_Map25MapOptions_Checkbox_Layer_Cartography;
 	public static String		Slideout_Map25MapOptions_Checkbox_Layer_Cartography_Tooltip;
@@ -1626,14 +1636,16 @@ public class Messages extends NLS {
 	public static String		Slideout_Map25MapOptions_Checkbox_Layer_ScaleBar;
 	public static String		Slideout_Map25MapOptions_Checkbox_Layer_TileInfo;
 	public static String		Slideout_Map25MapOptions_Group_MapLayer;
+	public static String		Slideout_Map25MapOptions_Label_MapOptions;
+//	public static String		Slideout_Map25MapOptions_Checkbox_IsAnimationLocation;
+//	public static String		Slideout_Map25MapOptions_Checkbox_IsAnimationLocation_Tooltip;
 //	public static String		Slideout_Map25MapOptions_Label_AnimationEasingType;
 //	public static String		Slideout_Map25MapOptions_Label_AnimationEasingType_Tooltip;
 //	public static String		Slideout_Map25MapOptions_Label_AnimationTime;
 //	public static String		Slideout_Map25MapOptions_Label_AnimationTime_Tooltip;
-	public static String		Slideout_Map25MapOptions_Label_MapOptions;
 
-	public static String		Slideout_Map25MarkerOptions_Checkbox_IsMarkerClustering;
 //	public static String		Slideout_Map25MarkerOptions_Checkbox_IsShowMarkerLabel;
+	public static String		Slideout_Map25MarkerOptions_Checkbox_IsMarkerClustering;
 	public static String		Slideout_Map25MarkerOptions_Checkbox_IsShowMarkerPoint;
 	public static String		Slideout_Map25MarkerOptions_Label_ClusterGridSize;
 	public static String		Slideout_Map25MarkerOptions_Label_ClusterOrientation;
@@ -1649,7 +1661,7 @@ public class Messages extends NLS {
 	public static String		Slideout_Map25MarkerOptions_Label_Name_Tooltip;
 	public static String		Slideout_Map25MarkerOptions_Label_Opacity;
 	public static String		Slideout_Map25MarkerOptions_Label_Opacity_Tooltip;
-	public static String		Slideout_Map25MarkerOptions_Label_Size_Tooltip;
+	public static String		Slideout_Map25MarkerOptions_Label_ClusterSymbolSize_Tooltip;
 	public static String		Slideout_Map25MarkerOptions_Label_SwapColor_Tooltip;
 	public static String		Slideout_Map25MarkerOptions_Label_Title;
 

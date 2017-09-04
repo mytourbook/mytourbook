@@ -442,6 +442,8 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 
 		colDef.setColumnLabel(Messages.Map_Bookmark_Column_Bearing);
 		colDef.setColumnHeaderText(Messages.Map_Bookmark_Column_Bearing);
+		colDef.setColumnHeaderToolTipText(Messages.Map_Bookmark_Column_Bearing_Tooltip);
+		colDef.setColumnUnit(UI.SYMBOL_DEGREE);
 
 		colDef.setIsDefaultColumn();
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(9));
@@ -476,6 +478,8 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 
 		colDef.setColumnLabel(Messages.Map_Bookmark_Column_Tilt);
 		colDef.setColumnHeaderText(Messages.Map_Bookmark_Column_Tilt);
+		colDef.setColumnHeaderToolTipText(Messages.Map_Bookmark_Column_Tilt_Tooltip);
+		colDef.setColumnUnit(UI.SYMBOL_DEGREE);
 
 		colDef.setIsDefaultColumn();
 		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(9));

@@ -23,8 +23,8 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
-import net.tourbook.map25.Map25ProviderManager;
 import net.tourbook.map25.Map25Provider;
+import net.tourbook.map25.Map25ProviderManager;
 import net.tourbook.map25.TileEncoding;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -76,8 +76,8 @@ public class PrefPageMap25Provider extends PreferencePage implements IWorkbenchP
 	
 	private static final TileEncodingData[] _allTileEncoding					= new TileEncodingData[] {
 
-		new TileEncodingData(TileEncoding.MVT,Messages.Pref_Map25_Encoding_Mapzen),
-		new TileEncodingData(TileEncoding.VTM,Messages.Pref_Map25_Encoding_OpenScienceMap)
+		new TileEncodingData(TileEncoding.MVT, Messages.Pref_Map25_Encoding_Mapzen),
+		new TileEncodingData(TileEncoding.VTM, Messages.Pref_Map25_Encoding_OpenScienceMap)
 	};
 
 // SET_FORMATTING_ON

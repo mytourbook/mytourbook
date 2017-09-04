@@ -60,7 +60,7 @@ import net.tourbook.map25.action.ActionSynchMapWithTour;
 import net.tourbook.map25.layer.marker.MapMarker;
 import net.tourbook.map25.layer.marker.MarkerLayer;
 import net.tourbook.map25.layer.tourtrack.TourLayer;
-import net.tourbook.map25.ui.SlideoutMap25_Options;
+import net.tourbook.map25.ui.SlideoutMap25_MapOptions;
 import net.tourbook.map25.ui.SlideoutMap25_TrackOptions;
 import net.tourbook.photo.PhotoSelection;
 import net.tourbook.tour.ITourEventListener;
@@ -149,7 +149,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 	//
 	private ActionMapBookmarks				_actionMapBookmarks;
 	private ActionMap25_Options				_actionMapOptions;
-	private ActionMap25_ShowMarker			_actionMarkerOptions;
+	private ActionMap25_ShowMarker			_actionShowMarker_WithOptions;
 	private ActionSelectMap25Provider		_actionSelectMapProvider;
 	private ActionSynchMapWithChartSlider	_actionSyncMap_WithChartSlider;
 	private ActionSynchMapWithTour			_actionSyncMap_WithTour;
@@ -194,7 +194,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 		@Override
 		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
-			return new SlideoutMap25_Options(_parent, toolbar, Map25View.this);
+			return new SlideoutMap25_MapOptions(_parent, toolbar, Map25View.this);
 		}
 
 		@Override
@@ -499,7 +499,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 	private void createActions() {
 
-		_actionMarkerOptions = new ActionMap25_ShowMarker(this, _parent);
+		_actionShowMarker_WithOptions = new ActionMap25_ShowMarker(this, _parent);
 		_actionMapBookmarks = new ActionMapBookmarks(this._parent, this);
 
 		_actionMapOptions = new ActionMap25_Options();
@@ -765,8 +765,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 		final boolean canShowTour = isTourAvailable && isTourLayerVisible;
 
-		_actionMarkerOptions.setEnabled(isTourAvailable);
-
+		_actionShowTour_WithOptions.setEnabled(isTourAvailable);
+		_actionShowMarker_WithOptions.setEnabled(isTourAvailable);
 		_actionShowEntireTour.setEnabled(canShowTour);
 		_actionSyncMap_WithTour.setEnabled(canShowTour);
 		_actionSyncMap_WithChartSlider.setEnabled(canShowTour);
@@ -786,7 +786,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		 */
 		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
-		tbm.add(_actionMarkerOptions);
+		tbm.add(_actionShowMarker_WithOptions);
 
 		tbm.add(new Separator());
 
@@ -1263,7 +1263,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 		// marker
 		final boolean isMarkerVisible = Util.getStateBoolean(_state, STATE_IS_LAYER_MARKER_VISIBLE, true);
-		_actionMarkerOptions.setSelected(isMarkerVisible);
+		_actionShowMarker_WithOptions.setSelected(isMarkerVisible);
 		_mapApp.getLayer_Marker().setEnabled(isMarkerVisible);
 
 		// other layers

@@ -1368,8 +1368,47 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
 	@Override
 	public MapLocation getMapLocation() {
-		// TODO Auto-generated method stub
-		return null;
+
+		final MapPosition mapPosition = getMapPosition();
+
+		if (mapPosition == null) {
+			return null;
+		}
+
+		return new MapLocation(mapPosition);
+	}
+
+	private MapPosition getMapPosition() {
+
+		final View view = _wwCanvas.getView();
+
+		if (!(view instanceof BasicView)) {
+			return null;
+		}
+
+		final BasicView basicView = (BasicView) view;
+		final Position centerPosition = basicView.getCenterPosition();
+		final Position eyePosition = basicView.getEyePosition();
+
+		final Angle latitudeAngle = centerPosition.latitude;
+		final Angle longitudeAngle = centerPosition.longitude;
+
+		final double latitude = latitudeAngle.degrees;
+		final double longitude = longitudeAngle.degrees;
+
+		final GeoPosition geoCenter = new GeoPosition(latitude, longitude);
+
+		final double eyeElevation = eyePosition.elevation;
+		final double groundElevation = _wwCanvas.getModel().getGlobe().getElevation(latitudeAngle, longitudeAngle);
+		final double elevation = eyeElevation - groundElevation;
+
+		final double zoomLevel = 20 - Math.log(elevation);
+
+		final MapPosition mapPosition = new MapLocation(geoCenter, (int) zoomLevel + 2).getMapPosition();
+
+		mapPosition.bearing = -(float) basicView.getHeading().getDegrees();
+		mapPosition.tilt = (float) basicView.getPitch().getDegrees();
+		return mapPosition;
 	}
 
 	public java.awt.Rectangle getMapSize() {
@@ -1590,41 +1629,11 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
 	private void onAWTMouseDragged(final MouseEvent mouseEvent) {
 
-		final View view = _wwCanvas.getView();
+		final MapPosition mapPosition = getMapPosition();
 
-		if (!(view instanceof BasicView)) {
+		if (mapPosition == null) {
 			return;
 		}
-
-		final BasicView basicView = (BasicView) view;
-		final Position centerPosition = basicView.getCenterPosition();
-		final Position eyePosition = basicView.getEyePosition();
-
-		final Angle latitudeAngle = centerPosition.latitude;
-		final Angle longitudeAngle = centerPosition.longitude;
-
-		final double latitude = latitudeAngle.degrees;
-		final double longitude = longitudeAngle.degrees;
-
-		final GeoPosition geoCenter = new GeoPosition(latitude, longitude);
-
-		final double eyeElevation = eyePosition.elevation;
-		final double groundElevation = _wwCanvas.getModel().getGlobe().getElevation(latitudeAngle, longitudeAngle);
-		final double elevation = eyeElevation - groundElevation;
-
-		final double zoomLevel = 20 - Math.log(elevation);
-
-//		System.out.println(
-//				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
-//						+ ("\tdragged - ")
-//						+ ("\tzoomLevel:" + zoomLevel)
-//						+ ("\televation:" + elevation));
-		// TODO remove SYSTEM.OUT.PRINTLN
-
-		final MapPosition mapPosition = new MapLocation(geoCenter, (int) zoomLevel + 2).getMapPosition();
-
-		mapPosition.bearing = -(float) basicView.getHeading().getDegrees();
-		mapPosition.tilt = (float) basicView.getPitch().getDegrees();
 
 		_lastFiredSyncEventTime = System.currentTimeMillis();
 
