@@ -3,20 +3,30 @@ Version 17.9                                                ?. September 2017
 New 	
 ===
 
-* 2D, 2.5D + 3D Maps
+* All Maps, 2D, 2.5D + 3D
 
-  - Create and manage map bookmarks 
+  - Map bookmarks 
   - Synchonize map with other map
   
-  
-Improvements
-============
 
 * 2.5D Tour Map
 
-  - Customize cluster for tour markers
-  
- 
-* Icon
+  - Clusteralgorithmus for tour markers
 
-  - recreated more than 100 icons
+  
+Art Work 
+========
+ 
+* App Icons
+
+  - Recreated more than 100 icons
+  
+  
+* Tour Type Icon
+
+  Uncluttered painting of the tour type icon
+
+  - Painted with fill color, gradient color is disabled 
+  - Fill color is computed as a mix of the gradient bright and gradient dark color
+  - Top and bottom border are disabled
+  - Left and right border width changed from 2px to 1 px

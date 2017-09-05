@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -40,6 +40,12 @@ public class TourType implements Comparable<Object> {
 	public static final long	IMAGE_KEY_DIALOG_SELECTION	= -2;
 
 	/**
+	 * manually created marker or imported marker create a unique id to identify them, saved marker
+	 * are compared with the marker id
+	 */
+	private static int			_createCounter				= 0;
+
+	/**
 	 * contains the entity id
 	 */
 	@Id
@@ -48,21 +54,21 @@ public class TourType implements Comparable<Object> {
 
 	@Basic(optional = false)
 	private String				name;
-
 	private short				colorBrightRed;
 	private short				colorBrightGreen;
-	private short				colorBrightBlue;
 
+	private short				colorBrightBlue;
 	private short				colorDarkRed;
 	private short				colorDarkGreen;
-	private short				colorDarkBlue;
 
+	private short				colorDarkBlue;
 	private short				colorLineRed;
 	private short				colorLineGreen;
-	private short				colorLineBlue;
 
+	private short				colorLineBlue;
 	private short				colorTextRed;
 	private short				colorTextGreen;
+
 	private short				colorTextBlue;
 
 	/**
@@ -71,12 +77,6 @@ public class TourType implements Comparable<Object> {
 	 */
 	@Transient
 	private long				_createId					= 0;
-
-	/**
-	 * manually created marker or imported marker create a unique id to identify them, saved marker
-	 * are compared with the marker id
-	 */
-	private static int			_createCounter				= 0;
 
 	/**
 	 * default constructor used in ejb
@@ -146,11 +146,24 @@ public class TourType implements Comparable<Object> {
 	}
 
 	public RGB getRGBBright() {
-		return new RGB(colorBrightRed, colorBrightGreen, colorBrightBlue);
+
+		final int red = (colorBrightRed + colorDarkRed) / 2;
+		final int green = (colorBrightGreen + colorDarkGreen) / 2;
+		final int blue = (colorBrightBlue + colorDarkBlue) / 2;
+
+		return new RGB(red, green, blue);
+
+//		return new RGB(colorBrightRed, colorBrightGreen, colorBrightBlue);
 	}
 
 	public RGB getRGBDark() {
-		return new RGB(colorDarkRed, colorDarkGreen, colorDarkBlue);
+		final int red = (colorBrightRed + colorDarkRed) / 2;
+		final int green = (colorBrightGreen + colorDarkGreen) / 2;
+		final int blue = (colorBrightBlue + colorDarkBlue) / 2;
+
+		return new RGB(red, green, blue);
+
+//		return new RGB(colorDarkRed, colorDarkGreen, colorDarkBlue);
 	}
 
 	public RGB getRGBLine() {

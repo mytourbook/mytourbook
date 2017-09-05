@@ -1333,10 +1333,13 @@ public class UI {
 
 			gcImage.setForeground(colorBright);
 			gcImage.setBackground(colorDark);
-			gcImage.fillGradientRectangle(4, 4, imageSize - 8, imageSize - 8, false);
+//			gcImage.fillGradientRectangle(4, 4, imageSize - 8, imageSize - 8, false);
+			gcImage.fillGradientRectangle(2, 1, imageSize - 2, imageSize, false);
 
 			gcImage.setForeground(colorLine);
-			gcImage.drawRectangle(3, 3, imageSize - 7, imageSize - 7);
+//			gcImage.drawRectangle(3, 3, imageSize - 7, imageSize - 7);
+			gcImage.drawLine(1, 1, 1, imageSize - 1);
+			gcImage.drawLine(imageSize - 1, 1, imageSize - 1, imageSize - 1);
 		}
 
 		drawingColors.dispose();
