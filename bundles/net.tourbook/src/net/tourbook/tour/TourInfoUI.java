@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -68,21 +68,27 @@ import org.joda.time.PeriodType;
 
 public class TourInfoUI {
 
-	private static final int					SHELL_MARGIN			= 5;
-	private static final int					MAX_DATA_WIDTH			= 300;
+	private static final int				SHELL_MARGIN		= 5;
+	private static final int				MAX_DATA_WIDTH		= 300;
 
-	private static final String					REAR_SHIFT_FORMAT		= "/  ";								//$NON-NLS-1$
+	private static final String				REAR_SHIFT_FORMAT	= "/  ";								//$NON-NLS-1$
 
-	private final static IPreferenceStore		_prefStoreCommon		= CommonActivator.getPrefStore();
+	private final static IPreferenceStore	_prefStoreCommon	= CommonActivator.getPrefStore();
 
-	public static final DateTimeFormatter		_dtHistoryFormatter		= DateTimeFormatter.ofLocalizedDateTime(
-																				FormatStyle.FULL,
-																				FormatStyle.MEDIUM);
+	public static final DateTimeFormatter	_dtHistoryFormatter	= DateTimeFormatter.ofLocalizedDateTime(
+			FormatStyle.FULL,
+			FormatStyle.MEDIUM);
 
-	private final NumberFormat					_nf0					= NumberFormat.getNumberInstance();
-	private final NumberFormat					_nf1					= NumberFormat.getInstance();
-	private final NumberFormat					_nf2					= NumberFormat.getInstance();
-	private final NumberFormat					_nf3					= NumberFormat.getInstance();
+	private static PeriodType				_tourPeriodTemplate	= PeriodType.yearMonthDayTime()
+	// hide these components
+//																		.withMinutesRemoved()
+			.withSecondsRemoved()
+			.withMillisRemoved();
+	private final NumberFormat				_nf0				= NumberFormat.getNumberInstance();
+	private final NumberFormat				_nf1				= NumberFormat.getInstance();
+	private final NumberFormat				_nf2				= NumberFormat.getInstance();
+	private final NumberFormat				_nf3				= NumberFormat.getInstance();
+
 	{
 		_nf0.setMinimumFractionDigits(0);
 		_nf0.setMaximumFractionDigits(0);
@@ -96,12 +102,6 @@ public class TourInfoUI {
 		_nf3.setMinimumFractionDigits(3);
 		_nf3.setMaximumFractionDigits(3);
 	}
-
-	private static PeriodType					_tourPeriodTemplate		= PeriodType.yearMonthDayTime()
-																		// hide these components
-//																		.withMinutesRemoved()
-																				.withSecondsRemoved()
-																				.withMillisRemoved();
 
 	private boolean								_hasDescription;
 	private boolean								_hasGears;
@@ -283,7 +283,8 @@ public class TourInfoUI {
 			_ttContainer = new Composite(shellContainer, SWT.NONE);
 			_ttContainer.setForeground(_fgColor);
 			_ttContainer.setBackground(_bgColor);
-			GridLayoutFactory.fillDefaults() //
+			GridLayoutFactory
+					.fillDefaults() //
 					.numColumns(2)
 					.equalWidth(true)
 					.margins(SHELL_MARGIN, SHELL_MARGIN)
@@ -308,7 +309,8 @@ public class TourInfoUI {
 		GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(container);
 		container.setForeground(_fgColor);
 		container.setBackground(_bgColor);
-		GridLayoutFactory.fillDefaults()//
+		GridLayoutFactory
+				.fillDefaults()//
 				.numColumns(3)
 				.applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
@@ -319,7 +321,8 @@ public class TourInfoUI {
 			if (_uiTourTypeName != null) {
 
 				_lblTourType = new CLabel(container, SWT.NONE);
-				GridDataFactory.swtDefaults()//
+				GridDataFactory
+						.swtDefaults()//
 						.align(SWT.BEGINNING, SWT.BEGINNING)
 						.applyTo(_lblTourType);
 				_lblTourType.setForeground(_fgColor);
@@ -330,7 +333,8 @@ public class TourInfoUI {
 			 * title
 			 */
 			_lblTitle = new Label(container, SWT.LEAD | SWT.WRAP);
-			GridDataFactory.fillDefaults()//
+			GridDataFactory
+					.fillDefaults()//
 					.hint(MAX_DATA_WIDTH, SWT.DEFAULT)
 					.grab(true, false)
 					.align(SWT.FILL, SWT.CENTER)
@@ -790,7 +794,8 @@ public class TourInfoUI {
 				_firstColumnControls.add(label);
 
 				_lblTourTypeText = createUI_LabelValue(container, SWT.LEAD | SWT.WRAP);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.grab(true, false)
 						.hint(MAX_DATA_WIDTH, SWT.DEFAULT)
 						.applyTo(_lblTourTypeText);
@@ -806,7 +811,8 @@ public class TourInfoUI {
 				_firstColumnControls.add(label);
 
 				_lblTourTags = createUI_LabelValue(container, SWT.LEAD | SWT.WRAP);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.grab(true, false)
 						.hint(MAX_DATA_WIDTH, SWT.DEFAULT)
 						.applyTo(_lblTourTags);
@@ -818,13 +824,15 @@ public class TourInfoUI {
 			if (_hasWeather) {
 
 				label = createUI_Label(container, Messages.Tour_Tooltip_Label_Weather);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.span(2, 1)
 						.indent(0, 5)
 						.applyTo(label);
 
 				_txtWeather = new Text(container, SWT.WRAP | SWT.MULTI | SWT.READ_ONLY | SWT.BORDER);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.span(2, 1)
 						.grab(true, false)
 						.hint(pc.convertWidthInCharsToPixels(80), SWT.DEFAULT)
@@ -841,7 +849,8 @@ public class TourInfoUI {
 
 				// label
 				label = createUI_Label(container, Messages.Tour_Tooltip_Label_Description);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.span(2, 1)
 						.indent(0, 5)
 						.applyTo(label);
@@ -855,7 +864,8 @@ public class TourInfoUI {
 				}
 
 				_txtDescription = new Text(container, style);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.span(2, 1)
 						.grab(true, false)
 						.hint(pc.convertWidthInCharsToPixels(80), SWT.DEFAULT)
@@ -882,7 +892,8 @@ public class TourInfoUI {
 		GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(container);
 		container.setForeground(_fgColor);
 		container.setBackground(_bgColor);
-		GridLayoutFactory.fillDefaults()//
+		GridLayoutFactory
+				.fillDefaults()//
 				.numColumns(2)
 				.equalWidth(true)
 				.spacing(20, 5)
@@ -914,13 +925,15 @@ public class TourInfoUI {
 				 * date/time modified
 				 */
 				_lblDateTimeModified = createUI_Label(containerModified, Messages.Tour_Tooltip_Label_DateTimeModified);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.grab(true, false)
 						.align(SWT.END, SWT.FILL)
 						.applyTo(_lblDateTimeModified);
 
 				_lblDateTimeModifiedValue = createUI_LabelValue(containerModified, SWT.TRAIL);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.align(SWT.END, SWT.FILL)
 						.applyTo(_lblDateTimeModifiedValue);
 			}
@@ -970,7 +983,8 @@ public class TourInfoUI {
 			final Composite container = new Composite(shellContainer, SWT.NONE);
 			container.setForeground(fgColor);
 			container.setBackground(bgColor);
-			GridLayoutFactory.fillDefaults()//
+			GridLayoutFactory
+					.fillDefaults()//
 					.margins(SHELL_MARGIN, SHELL_MARGIN)
 					.applyTo(container);
 			{
@@ -1111,14 +1125,15 @@ public class TourInfoUI {
 
 			// < 1 day
 
-			_lblDate.setText(String.format(//
-					Messages.Tour_Tooltip_Format_DateWeekTime,
-					zdtTourStart.format(TimeTools.Formatter_Date_F),
-					zdtTourStart.format(TimeTools.Formatter_Time_M),
-					zdtTourEnd.format(TimeTools.Formatter_Time_M),
-					zdtTourStart.get(TimeTools.calendarWeek.weekOfWeekBasedYear())
+			_lblDate.setText(
+					String.format(//
+							Messages.Tour_Tooltip_Format_DateWeekTime,
+							zdtTourStart.format(TimeTools.Formatter_Date_F),
+							zdtTourStart.format(TimeTools.Formatter_Time_M),
+							zdtTourEnd.format(TimeTools.Formatter_Time_M),
+							zdtTourStart.get(TimeTools.calendarWeek.weekOfWeekBasedYear())
 
-			));
+					));
 
 			_lblRecordingTimeHour.setVisible(true);
 			_lblMovingTimeHour.setVisible(true);
@@ -1150,10 +1165,11 @@ public class TourInfoUI {
 
 			// > 1 day
 
-			_lblDate.setText(String.format(//
-					Messages.Tour_Tooltip_Format_HistoryDateTime,
-					zdtTourStart.format(_dtHistoryFormatter),
-					zdtTourEnd.format(_dtHistoryFormatter)//
+			_lblDate.setText(
+					String.format(//
+							Messages.Tour_Tooltip_Format_HistoryDateTime,
+							zdtTourStart.format(_dtHistoryFormatter),
+							zdtTourEnd.format(_dtHistoryFormatter)//
 					));
 
 			// hide labels, they are displayed with the period values
@@ -1177,17 +1193,19 @@ public class TourInfoUI {
 		windSpeed = (int) (windSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
 
 		_lblWindSpeed.setText(Integer.toString(windSpeed));
-		_lblWindSpeedUnit.setText(String.format(
-				Messages.Tour_Tooltip_Format_WindSpeedUnit,
-				UI.UNIT_LABEL_SPEED,
-				IWeather.windSpeedTextShort[getWindSpeedTextIndex(windSpeed)]));
+		_lblWindSpeedUnit.setText(
+				String.format(
+						Messages.Tour_Tooltip_Format_WindSpeedUnit,
+						UI.UNIT_LABEL_SPEED,
+						IWeather.windSpeedTextShort[getWindSpeedTextIndex(windSpeed)]));
 
 		// wind direction
 		final int weatherWindDirDegree = _tourData.getWeatherWindDir();
 		_lblWindDirection.setText(Integer.toString(weatherWindDirDegree));
-		_lblWindDirectionUnit.setText(String.format(
-				Messages.Tour_Tooltip_Format_WindDirectionUnit,
-				IWeather.windDirectionText[getWindDirectionTextIndex(weatherWindDirDegree)]));
+		_lblWindDirectionUnit.setText(
+				String.format(
+						Messages.Tour_Tooltip_Format_WindDirectionUnit,
+						IWeather.windDirectionText[getWindDirectionTextIndex(weatherWindDirDegree)]));
 
 		// temperature
 		float temperature = _tourData.getAvgTemperature();
@@ -1214,12 +1232,14 @@ public class TourInfoUI {
 		_lblDistance.setText(FormatManager.formatDistance(distance / 1000.0));
 		_lblDistanceUnit.setText(UI.UNIT_LABEL_DISTANCE);
 
-		_lblAltitudeUp.setText(Integer.toString(//
-				(int) (_tourData.getTourAltUp() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
+		_lblAltitudeUp.setText(
+				Integer.toString(//
+						(int) (_tourData.getTourAltUp() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
 		_lblAltitudeUpUnit.setText(UI.UNIT_LABEL_ALTITUDE);
 
-		_lblAltitudeDown.setText(Integer.toString(//
-				(int) (_tourData.getTourAltDown() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
+		_lblAltitudeDown.setText(
+				Integer.toString(//
+						(int) (_tourData.getTourAltDown() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
 		_lblAltitudeDownUnit.setText(UI.UNIT_LABEL_ALTITUDE);
 
 		final float avgSpeed = movingTime == 0 ? 0 : distance / (movingTime / 3.6f);
@@ -1227,11 +1247,12 @@ public class TourInfoUI {
 		_lblAvgSpeedUnit.setText(UI.UNIT_LABEL_SPEED);
 
 		final int pace = (int) (distance == 0 ? 0 : (movingTime * 1000 / distance));
-		_lblAvgPace.setText(String.format(//
-				Messages.Tour_Tooltip_Format_Pace,
-				pace / 60,
-				pace % 60)//
-				);
+		_lblAvgPace.setText(
+				String.format(//
+						Messages.Tour_Tooltip_Format_Pace,
+						pace / 60,
+						pace % 60)//
+		);
 		_lblAvgPaceUnit.setText(UI.UNIT_LABEL_PACE);
 
 		// avg pulse
@@ -1242,9 +1263,10 @@ public class TourInfoUI {
 		// avg cadence
 		final double avgCadence = _tourData.getAvgCadence() * _tourData.getCadenceMultiplier();
 		_lblAvgCadence.setText(FormatManager.formatCadence(avgCadence));
-		_lblAvgCadenceUnit.setText(_tourData.isCadenceSpm()
-				? Messages.Value_Unit_Cadence_Spm
-				: Messages.Value_Unit_Cadence);
+		_lblAvgCadenceUnit.setText(
+				_tourData.isCadenceSpm()
+						? Messages.Value_Unit_Cadence_Spm
+						: Messages.Value_Unit_Cadence);
 
 		// avg power
 		final double avgPower = _tourData.getPower_Avg();
@@ -1262,8 +1284,9 @@ public class TourInfoUI {
 		/*
 		 * Max values
 		 */
-		_lblMaxAltitude.setText(Integer.toString(//
-				(int) (_tourData.getMaxAltitude() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
+		_lblMaxAltitude.setText(
+				Integer.toString(//
+						(int) (_tourData.getMaxAltitude() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
 		_lblMaxAltitudeUnit.setText(UI.UNIT_LABEL_ALTITUDE);
 
 		_lblMaxPulse.setText(FormatManager.formatPulse(_tourData.getMaxPulse()));
@@ -1306,10 +1329,13 @@ public class TourInfoUI {
 		UI.setEqualizeColumWidths(_firstColumnControls, 5);
 		UI.setEqualizeColumWidths(_secondColumnControls);
 
-		/*
-		 * Reduce width that the decorator is not truncated
-		 */
-		final GridData gd = (GridData) _lblTimeZoneDifference.getLayoutData();
-		gd.widthHint -= UI.DECORATOR_HORIZONTAL_INDENT;
+		if (isSimpleTour()) {
+
+			/*
+			 * Reduce width that the decorator is not truncated
+			 */
+			final GridData gd = (GridData) _lblTimeZoneDifference.getLayoutData();
+			gd.widthHint -= UI.DECORATOR_HORIZONTAL_INDENT;
+		}
 	}
 }
