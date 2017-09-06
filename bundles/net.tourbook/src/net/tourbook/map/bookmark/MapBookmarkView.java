@@ -98,6 +98,9 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 
 	private Composite	_viewerContainer;
 
+	/**
+	 * Delete bookmark
+	 */
 	private class ActionDeleteBookmark extends Action {
 
 		public ActionDeleteBookmark() {
@@ -106,10 +109,13 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 
 		@Override
 		public void run() {
-			onBookmark_Rename(true);
+			onBookmark_Delete();
 		}
 	}
 
+	/**
+	 * Rename bookmark
+	 */
 	private class ActionRenameBookmark extends Action {
 
 		public ActionRenameBookmark() {
@@ -249,7 +255,7 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 		/*
 		 * create table
 		 */
-		final Table table = new Table(parent, SWT.FULL_SELECTION | SWT.MULTI /* | SWT.BORDER */);
+		final Table table = new Table(parent, SWT.FULL_SELECTION /* | SWT.MULTI /* | SWT.BORDER */);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
 
 		table.setHeaderVisible(true);
