@@ -597,6 +597,10 @@ public class Map25ConfigManager {
 
 	private static void parse_010_Options(final XMLMemento xmlRoot) {
 
+		if (xmlRoot == null) {
+			return;
+		}
+
 		final XMLMemento xmlOptions = (XMLMemento) xmlRoot.getChild(TAG_OPTIONS);
 
 		if (xmlOptions == null) {

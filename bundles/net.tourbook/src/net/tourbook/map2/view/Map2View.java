@@ -2665,28 +2665,28 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_isShowLegend = Util.getStateBoolean(_state, STATE_IS_SHOW_LEGEND_IN_MAP, true);
 		_actionShowLegendInMap.setChecked(_isShowLegend);
 
-		// is sync with photo
-		_isMapSynched_WithPhoto = Util.getStateBoolean(_state, STATE_SYNC_WITH_PHOTO, true);
-		_actionSyncMap_WithPhoto.setChecked(_isMapSynched_WithPhoto);
-
 		// checkbox: is tour centered
 		final boolean isTourCentered = _state.getBoolean(MEMENTO_ZOOM_CENTERED);
 		_actionZoomCentered.setChecked(isTourCentered);
 		_isPositionCentered = isTourCentered;
 
-		// synch map with another map
-		_isMapSynched_WithOtherMap = Util.getStateBoolean(_state, STATE_IS_SYNC_MAP2_WITH_OTHER_MAP, true);
-		_actionSyncMap_WithOtherMap.setChecked(_isMapSynched_WithOtherMap);
+		// sync map with photo
+		_isMapSynched_WithPhoto = Util.getStateBoolean(_state, STATE_SYNC_WITH_PHOTO, false);
+		_actionSyncMap_WithPhoto.setChecked(_isMapSynched_WithPhoto);
 
 		// synch map with tour
 		final boolean isSynchTour = Util.getStateBoolean(_state, MEMENTO_SYNCH_WITH_SELECTED_TOUR, true);
 		_actionSyncMap_WithTour.setChecked(isSynchTour);
 		_isMapSynched_WithTour = isSynchTour;
 
-		// ckeckbox: synch with tour chart slider
-		final boolean isSynchSlider = _state.getBoolean(MEMENTO_SYNCH_WITH_TOURCHART_SLIDER);
+		// synch map with chart slider
+		final boolean isSynchSlider = Util.getStateBoolean(_state, MEMENTO_SYNCH_WITH_TOURCHART_SLIDER, true);
 		_actionSyncMap_WithChartSlider.setChecked(isSynchSlider);
 		_isMapSynched_WithChartSlider = isSynchSlider;
+
+		// synch map with another map
+		_isMapSynched_WithOtherMap = Util.getStateBoolean(_state, STATE_IS_SYNC_MAP2_WITH_OTHER_MAP, false);
+		_actionSyncMap_WithOtherMap.setChecked(_isMapSynched_WithOtherMap);
 
 		//
 		_actionSyncTourZoomLevel.setZoomLevel(Util.getStateInt(_state, MEMENTO_SYNCH_TOUR_ZOOM_LEVEL, 0));

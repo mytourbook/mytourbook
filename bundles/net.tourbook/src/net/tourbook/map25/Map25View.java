@@ -1282,12 +1282,12 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		_isMapSynched_WithTour = isSynchTour;
 
 		// checkbox: synch map with chart slider
-		final boolean isSynchWithSlider = Util.getStateBoolean(_state, STATE_IS_SYNCH_MAP_WITH_CHART_SLIDER, true);
+		final boolean isSynchWithSlider = Util.getStateBoolean(_state, STATE_IS_SYNCH_MAP_WITH_CHART_SLIDER, false);
 		_actionSyncMap_WithChartSlider.setChecked(isSynchWithSlider);
 		_isMapSynched_WithChartSlider = isSynchWithSlider;
 
 		// synch map with another map
-		_isMapSynched_WithOtherMap = Util.getStateBoolean(_state, STATE_IS_SYNC_MAP25_WITH_OTHER_MAP, true);
+		_isMapSynched_WithOtherMap = Util.getStateBoolean(_state, STATE_IS_SYNC_MAP25_WITH_OTHER_MAP, false);
 		_actionSyncMap_WithOtherMap.setChecked(_isMapSynched_WithOtherMap);
 
 		enableActions();

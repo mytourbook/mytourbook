@@ -1797,7 +1797,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 		_actionSyncMap_WithChartSlider.setChecked(_isMapSynched_WithChartSlider);
 
 		// synch map with another map
-		_isMapSynched_WithOtherMap = Util.getStateBoolean(_state, STATE_IS_SYNC_MAP3_WITH_OTHER_MAP, true);
+		_isMapSynched_WithOtherMap = Util.getStateBoolean(_state, STATE_IS_SYNC_MAP3_WITH_OTHER_MAP, false);
 		_actionSyncMap_WithOtherMap.setChecked(_isMapSynched_WithOtherMap);
 
 		/*
