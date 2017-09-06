@@ -13,6 +13,10 @@ New
 
   - Clusteralgorithmus for tour markers
 
+
+  There are still some issues that this map is not yet working perfectly. 
+  Workaround: Select another tour and reselected the requested tour
+
   
 Art Work 
 ========
@@ -26,7 +30,7 @@ Art Work
 
   Uncluttered painting of the tour type icon
 
-  - Painted with fill color, gradient color is disabled 
-  - Fill color is computed as a mix of the gradient bright and gradient dark color
-  - Top and bottom border are disabled
+  - Paint with fill color, gradient color is disabled 
+  - Fill color is computed as an average of the gradient bright and gradient dark color
+  - Top and bottom borders are disabled
   - Left and right border width changed from 2px to 1 px
