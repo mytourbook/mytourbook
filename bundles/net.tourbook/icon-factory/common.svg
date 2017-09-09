@@ -3671,9 +3671,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="17.590902"
-     inkscape:cx="84.663228"
-     inkscape:cy="903.93369"
+     inkscape:zoom="24.877292"
+     inkscape:cx="81.472631"
+     inkscape:cy="905.76941"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -3746,6 +3746,15 @@
      inkscape:groupmode="layer"
      id="layer1"
      style="display:inline">
+    <path
+       style="display:inline;fill:#d0ec86;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 82,146.86218 h 3.5 v -15 H 83 v 8.5 H 73 v -8.5 h -2.5 v 15 H 74 v -4.5 h 8"
+       id="path5016-7"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\floppy_disc.png"
+       inkscape:export-xdpi="95.999863"
+       inkscape:export-ydpi="95.999863"
+       sodipodi:nodetypes="cccccccccccc" />
     <rect
        style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:0.98999999;fill:none;fill-opacity:1;stroke:#535353;stroke-width:0;stroke-opacity:1;marker:none;enable-background:accumulate"
        id="rect4525-1-0-2-33-0-9"
@@ -6086,32 +6095,23 @@
        inkscape:export-xdpi="95.999863"
        inkscape:export-ydpi="95.999863" />
     <path
-       style="display:inline;fill:none;fill-opacity:1;stroke:#435800;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 82,146.86218 h 3.499997 v -15 l -2.499997,0 -10,0 h -2.5 v 15 H 74"
+       style="display:inline;fill:none;fill-opacity:1;stroke:#435800;stroke-width:0.49999997;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 85.749996,147.11218 v -15.5 c -5.29182,0 -10.910433,0 -15.499997,0 v 15.5 z"
        id="path1768-0"
        inkscape:connector-curvature="0"
-       sodipodi:nodetypes="cccccccc"
+       sodipodi:nodetypes="ccccc"
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\floppy_disc.png"
        inkscape:export-xdpi="95.999863"
        inkscape:export-ydpi="95.999863" />
     <path
-       style="display:inline;fill:none;fill-opacity:1;stroke:#435800;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="M 75.000003,134.86218 H 81 v 0"
+       style="display:inline;fill:none;fill-opacity:1;stroke:#435800;stroke-width:0.30000001;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 74.000002,134.51218 H 82 v 0"
        id="path3503-6"
        inkscape:connector-curvature="0"
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\floppy_disc.png"
        inkscape:export-xdpi="95.999863"
        inkscape:export-ydpi="95.999863"
        sodipodi:nodetypes="ccc" />
-    <path
-       style="display:inline;fill:#d0ec86;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 82,146.36218 h 3 v -14 h -2 v 6 H 73 v -6 h -2 v 14 h 3 v -4 h 8"
-       id="path5016-7"
-       inkscape:connector-curvature="0"
-       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\floppy_disc.png"
-       inkscape:export-xdpi="95.999863"
-       inkscape:export-ydpi="95.999863"
-       sodipodi:nodetypes="cccccccccccc" />
     <rect
        style="display:inline;fill:#435800;fill-opacity:1;stroke:none;stroke-width:3;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
        id="rect8827-0-2"
@@ -6208,13 +6208,13 @@
        inkscape:export-xdpi="96.000015"
        inkscape:export-ydpi="96.000015" />
     <path
-       style="display:inline;fill:none;stroke:#435800;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 74,146.86217 h 7.5 v 0.50001 0"
-       id="path3501-1-5"
+       style="display:inline;fill:none;fill-opacity:1;stroke:#435800;stroke-width:0.30000001;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 74,137.51218 h 8 v 0"
+       id="path3503-6-0"
        inkscape:connector-curvature="0"
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\floppy_disc.png"
        inkscape:export-xdpi="95.999863"
        inkscape:export-ydpi="95.999863"
-       sodipodi:nodetypes="cccc" />
+       sodipodi:nodetypes="ccc" />
   </g>
 </svg>
