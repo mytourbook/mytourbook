@@ -19,6 +19,7 @@ import java.text.NumberFormat;
 
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
+import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 
 import org.eclipse.jface.dialogs.IInputValidator;
@@ -26,7 +27,6 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.layout.TableColumnLayout;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
@@ -51,7 +51,6 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -81,8 +80,6 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 	}
 
 	private PixelConverter	_pc;
-
-	private Font			_boldFont;
 
 	/*
 	 * UI controls
@@ -203,8 +200,8 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 		 * Label: Slideout title
 		 */
 		final Label label = new Label(parent, SWT.NONE);
-		label.setFont(_boldFont);
 		label.setText(Messages.Slideout_MapBookmark_Label_Title);
+		MTFont.setBannerFont(label);
 //		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(label);
 	}
 
@@ -480,8 +477,6 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 	private void initUI(final Composite parent) {
 
 		_pc = new PixelConverter(parent);
-
-		_boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 
 		_defaultSelectionListener = new SelectionAdapter() {
 			@Override

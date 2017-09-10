@@ -1574,14 +1574,6 @@ public class UI {
 		return gd;
 	}
 
-	public static void setTitleFont(final Label label) {
-		
-//		label.setFont(JFaceResources.getBannerFont());
-//		_boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
-
-		label.setFont(JFaceResources.getHeaderFont());
-	}
-
 	private static boolean setupUI_FontMetrics() {
 
 		if (_fontMetrics != null) {

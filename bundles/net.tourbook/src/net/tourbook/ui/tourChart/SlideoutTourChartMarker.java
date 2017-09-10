@@ -20,6 +20,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorSelectorExtended;
 import net.tourbook.common.color.IColorSelectorListener;
+import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.data.TourMarker;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -32,7 +33,6 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
@@ -223,7 +223,7 @@ public class SlideoutTourChartMarker extends ToolbarSlideout implements IColorSe
 				final Label label = new Label(container, SWT.NONE);
 				GridDataFactory.fillDefaults().applyTo(label);
 				label.setText(Messages.Slideout_ChartMarkerOptions_Label_Title);
-				label.setFont(JFaceResources.getBannerFont());
+				MTFont.setBannerFont(label);
 			}
 			{
 				final ToolBar toolbar = new ToolBar(container, SWT.FLAT);

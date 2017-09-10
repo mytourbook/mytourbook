@@ -24,6 +24,7 @@ import net.tourbook.common.color.ColorSelectorExtended;
 import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.color.Map3GradientColorManager;
 import net.tourbook.common.color.MapGraphId;
+import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.AnimatedToolTipShell;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.widgets.ComboEntry;
@@ -35,7 +36,6 @@ import net.tourbook.map3.view.Map3View;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.osgi.util.NLS;
@@ -297,7 +297,8 @@ public class DialogTourTrackConfig extends AnimatedToolTipShell implements IColo
 				.grab(true, false)
 				.align(SWT.BEGINNING, SWT.CENTER)
 				.applyTo(title);
-		title.setFont(JFaceResources.getBannerFont());
+		MTFont.setBannerFont(title);
+
 		title.setText(Messages.TourTrack_Properties_Label_ConfigName);
 		title.setToolTipText(Messages.TourTrack_Properties_Label_ConfigName_Tooltip);
 

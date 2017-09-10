@@ -18,11 +18,11 @@ package net.tourbook.map3.ui;
 import gov.nasa.worldwind.layers.Layer;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.font.MTFont;
 import net.tourbook.map3.Messages;
 import net.tourbook.map3.view.TVIMap3Layer;
 
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerRow;
 import org.eclipse.swt.SWT;
@@ -30,7 +30,6 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
@@ -63,7 +62,6 @@ public class DialogLayerViewerToolTip extends ToolTip3 {
 	 */
 	private Color						_bgColor;
 	private Color						_fgColor;
-	private Font						_boldFont;
 
 	private final class ToolProvider extends ToolProviderAdapter {
 		@Override
@@ -90,7 +88,6 @@ public class DialogLayerViewerToolTip extends ToolTip3 {
 
 		_bgColor = display.getSystemColor(SWT.COLOR_INFO_BACKGROUND);
 		_fgColor = display.getSystemColor(SWT.COLOR_INFO_FOREGROUND);
-		_boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 	}
 
 	private void createToolTipUI(final Composite parent) {
@@ -122,8 +119,8 @@ public class DialogLayerViewerToolTip extends ToolTip3 {
 			 * layer name
 			 */
 			Label label = new Label(container, SWT.NONE);
-			label.setFont(_boldFont);
 			label.setText(_mapLayer.name);
+			MTFont.setBannerFont(label);
 
 			final Layer wwLayer = _mapLayer.wwLayer;
 

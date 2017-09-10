@@ -18,6 +18,7 @@ package net.tourbook.ui.views.heartRateVariability;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.ChartOptions_Grid;
@@ -27,7 +28,6 @@ import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
@@ -147,7 +147,7 @@ public class SlideoutHRVOptions extends ToolbarSlideout {
 		final Label label = new Label(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().applyTo(label);
 		label.setText(Messages.Slideout_HVROptions_Label_Title);
-		label.setFont(JFaceResources.getBannerFont());
+		MTFont.setBannerFont(label);
 	}
 
 	private void createUI_12_Actions(final Composite parent) {

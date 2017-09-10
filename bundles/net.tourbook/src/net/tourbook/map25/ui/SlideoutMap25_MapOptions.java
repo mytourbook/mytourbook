@@ -17,6 +17,7 @@ package net.tourbook.map25.ui;
 
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
+import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.map25.Map25App;
 import net.tourbook.map25.Map25View;
@@ -25,7 +26,6 @@ import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
@@ -33,7 +33,6 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -46,7 +45,6 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 
-
 	private SelectionAdapter	_defaultSelectionListener;
 	private MouseWheelListener	_defaultMouseWheelListener;
 	private FocusListener		_keepOpenListener;
@@ -54,21 +52,16 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 
 	private PixelConverter		_pc;
 
-	private Font				_boldFont;
-	{
-		_boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
-	}
-
-	private Map25View		_map25View;
+	private Map25View			_map25View;
 
 	/*
 	 * UI controls
 	 */
-	private Button			_chkShowLayer_Building;
-	private Button			_chkShowLayer_TileInfo;
-	private Button			_chkShowLayer_BaseMap;
-	private Button			_chkShowLayer_Scale;
-	private Button			_chkShowLayer_Label;
+	private Button				_chkShowLayer_Building;
+	private Button				_chkShowLayer_TileInfo;
+	private Button				_chkShowLayer_BaseMap;
+	private Button				_chkShowLayer_Scale;
+	private Button				_chkShowLayer_Label;
 
 //	private Button			_chkIsAnimateLocation;
 //
@@ -85,7 +78,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 	 * @param toolBar
 	 * @param map25View
 	 */
-	public SlideoutMap25_MapOptions(	final Control ownerControl,
+	public SlideoutMap25_MapOptions(final Control ownerControl,
 									final ToolBar toolBar,
 									final Map25View map25View) {
 
@@ -143,8 +136,8 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 		 * Label: Slideout title
 		 */
 		final Label label = new Label(parent, SWT.NONE);
-		label.setFont(_boldFont);
 		label.setText(Messages.Slideout_Map25MapOptions_Label_MapOptions);
+		MTFont.setBannerFont(label);
 		GridDataFactory
 				.fillDefaults()//
 				.align(SWT.BEGINNING, SWT.CENTER)

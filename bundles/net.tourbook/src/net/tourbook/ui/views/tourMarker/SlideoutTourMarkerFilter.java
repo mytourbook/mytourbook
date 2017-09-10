@@ -18,6 +18,7 @@ package net.tourbook.ui.views.tourMarker;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.AnimatedToolTipShell;
 import net.tourbook.common.util.Util;
 import net.tourbook.ui.views.tourMarker.TourMarkerAllView.TourMarkerItem;
@@ -25,7 +26,6 @@ import net.tourbook.ui.views.tourMarker.TourMarkerAllView.TourMarkerItem;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackAdapter;
@@ -33,7 +33,6 @@ import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
@@ -66,7 +65,6 @@ public class SlideoutTourMarkerFilter extends AnimatedToolTipShell {
 	private boolean					_canOpenToolTip;
 
 //	private PixelConverter			_pc;
-	private Font					_boldFont;
 
 	/*
 	 * UI controls
@@ -196,7 +194,7 @@ public class SlideoutTourMarkerFilter extends AnimatedToolTipShell {
 						.align(SWT.FILL, SWT.CENTER)
 //					.indent(_pc.convertWidthInCharsToPixels(3), 0)
 						.applyTo(_lblSelectedMarker);
-				_lblSelectedMarker.setFont(_boldFont);
+				MTFont.setBannerFont(_lblSelectedMarker);
 			}
 
 			/*
@@ -336,7 +334,6 @@ public class SlideoutTourMarkerFilter extends AnimatedToolTipShell {
 	private void initUI(final Composite parent) {
 
 //		_pc = new PixelConverter(parent);
-		_boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 	}
 
 	@Override

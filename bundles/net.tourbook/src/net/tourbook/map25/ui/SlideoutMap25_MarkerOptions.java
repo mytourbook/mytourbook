@@ -21,6 +21,7 @@ import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorSelectorExtended;
 import net.tourbook.common.color.IColorSelectorListener;
+import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.widgets.ComboEntry;
@@ -34,7 +35,6 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
@@ -47,7 +47,6 @@ import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
@@ -82,12 +81,6 @@ public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements ICol
 	private Map25View				_map25View;
 
 	private boolean					_isUpdateUI;
-
-	private Font					_boldFont;
-
-	{
-		_boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
-	}
 
 	/*
 	 * UI controls
@@ -202,8 +195,8 @@ public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements ICol
 		 * Label: Title
 		 */
 		final Label title = new Label(parent, SWT.LEAD);
-		title.setFont(_boldFont);
 		title.setText(Messages.Slideout_Map25MarkerOptions_Label_Title);
+		MTFont.setBannerFont(title);
 		GridDataFactory
 				.fillDefaults()//
 				.grab(true, false)

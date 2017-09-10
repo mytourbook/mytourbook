@@ -18,13 +18,13 @@ package net.tourbook.common.tooltip;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.Messages;
 import net.tourbook.common.UI;
+import net.tourbook.common.font.MTFont;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -272,7 +272,8 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 				.applyTo(_labelDragSlideout);
 		_labelDragSlideout.setText(_draggerText);
 		_labelDragSlideout.setToolTipText(Messages.Slideout_Dialog_Action_DragSlideout_ToolTip);
-		_labelDragSlideout.setFont(JFaceResources.getBannerFont());
+		MTFont.setBannerFont(_labelDragSlideout);
+
 //		_labelDragSlideout.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
 
 		_labelDragSlideout.addMouseTrackListener(new MouseTrackListener() {

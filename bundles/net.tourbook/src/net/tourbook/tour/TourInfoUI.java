@@ -24,6 +24,7 @@ import java.util.Set;
 
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
+import net.tourbook.common.font.MTFont;
 import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
@@ -49,12 +50,10 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -147,7 +146,6 @@ public class TourInfoUI {
 	 */
 	private Color								_bgColor;
 	private Color								_fgColor;
-	private Font								_boldFont;
 
 	/*
 	 * UI controls
@@ -234,7 +232,6 @@ public class TourInfoUI {
 
 		_bgColor = display.getSystemColor(SWT.COLOR_INFO_BACKGROUND);
 		_fgColor = display.getSystemColor(SWT.COLOR_INFO_FOREGROUND);
-		_boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 
 		final Set<TourTag> tourTags = _tourData.getTourTags();
 		final String tourDescription = _tourData.getTourDescription();
@@ -339,9 +336,9 @@ public class TourInfoUI {
 					.grab(true, false)
 					.align(SWT.FILL, SWT.CENTER)
 					.applyTo(_lblTitle);
-			_lblTitle.setFont(_boldFont);
 			_lblTitle.setForeground(_fgColor);
 			_lblTitle.setBackground(_bgColor);
+			MTFont.setBannerFont(_lblTitle);
 
 			/*
 			 * action toolbar in the top right corner

@@ -21,6 +21,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.color.ColorSelectorExtended;
 import net.tourbook.common.color.IColorSelectorListener;
+import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageAppearanceTourChart;
@@ -199,7 +200,7 @@ public class SlideoutTourChartInfo extends ToolbarSlideout implements IColorSele
 		GridDataFactory.fillDefaults().applyTo(label);
 		label.setText(Messages.Slideout_TourInfoOptions_Label_Title);
 
-		UI.setTitleFont(label);
+		MTFont.setBannerFont(label);
 	}
 
 	private void createUI_12_Actions(final Composite parent) {

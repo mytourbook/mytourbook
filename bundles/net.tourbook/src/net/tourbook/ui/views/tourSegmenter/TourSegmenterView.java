@@ -66,7 +66,6 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellLabelProvider;
@@ -86,7 +85,6 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Button;
@@ -220,61 +218,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	private static final IDialogSettings			_state												= TourbookPlugin
 																												.getState(ID);
 
-	private final boolean							_isOSX												= net.tourbook.common.UI.IS_OSX;
-
-	private ColumnManager							_columnManager;
-
-	private TourData								_tourData;
-
-	private float									_dpToleranceAltitude;
-	private float									_dpToleranceAltitudeMultipleTours;
-	private float									_dpTolerancePower;
-	private float									_dpTolerancePulse;
-	private float									_savedDpToleranceAltitude							= -1;
-
-	private PostSelectionProvider					_postSelectionProvider;
-	private ISelectionListener						_postSelectionListener;
-	private IPartListener2							_partListener;
-	private IPropertyChangeListener					_prefChangeListener;
-	private ITourEventListener						_tourEventListener;
-
-	private final NumberFormat						_nf_0_0												= NumberFormat
-																												.getNumberInstance();
-	private final NumberFormat						_nf_1_0												= NumberFormat
-																												.getNumberInstance();
-	private final NumberFormat						_nf_1_1												= NumberFormat
-																												.getNumberInstance();
-	private final NumberFormat						_nf_3_3												= NumberFormat
-																												.getNumberInstance();
-	{
-		_nf_0_0.setMinimumFractionDigits(0);
-		_nf_0_0.setMaximumFractionDigits(0);
-
-		_nf_1_0.setMinimumFractionDigits(1);
-		_nf_1_0.setMaximumFractionDigits(0);
-
-		_nf_1_1.setMinimumFractionDigits(1);
-		_nf_1_1.setMaximumFractionDigits(1);
-
-		_nf_3_3.setMinimumFractionDigits(3);
-		_nf_3_3.setMaximumFractionDigits(3);
-	}
-
-	private int										_maxDistanceSpinner;
-	private int										_spinnerDistancePage;
-
-	private boolean									_isTourDirty										= false;
-	private boolean									_isSaving;
-
-	/**
-	 * when <code>true</code>, the tour dirty flag is disabled to load data into the fields
-	 */
-	private boolean									_isDirtyDisabled									= false;
-
-	private boolean									_isClearView;
-	private float									_altitudeUp;
-	private float									_altitudeDown;
-
 	/**
 	 * Contains all available segmenters.
 	 * <p>
@@ -330,6 +273,61 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 				SEGMENTER_REQUIRES_ALTITUDE));
 	}
 
+	private final boolean							_isOSX												= net.tourbook.common.UI.IS_OSX;
+
+	private ColumnManager							_columnManager;
+	private TourData								_tourData;
+	private float									_dpToleranceAltitude;
+	private float									_dpToleranceAltitudeMultipleTours;
+	private float									_dpTolerancePower;
+
+	private float									_dpTolerancePulse;
+	private float									_savedDpToleranceAltitude							= -1;
+	private PostSelectionProvider					_postSelectionProvider;
+	private ISelectionListener						_postSelectionListener;
+	private IPartListener2							_partListener;
+
+	private IPropertyChangeListener					_prefChangeListener;
+	private ITourEventListener						_tourEventListener;
+	private final NumberFormat						_nf_0_0												= NumberFormat
+																												.getNumberInstance();
+	private final NumberFormat						_nf_1_0												= NumberFormat
+																												.getNumberInstance();
+	private final NumberFormat						_nf_1_1												= NumberFormat
+																												.getNumberInstance();
+
+	private final NumberFormat						_nf_3_3												= NumberFormat
+																												.getNumberInstance();
+	{
+		_nf_0_0.setMinimumFractionDigits(0);
+		_nf_0_0.setMaximumFractionDigits(0);
+
+		_nf_1_0.setMinimumFractionDigits(1);
+		_nf_1_0.setMaximumFractionDigits(0);
+
+		_nf_1_1.setMinimumFractionDigits(1);
+		_nf_1_1.setMaximumFractionDigits(1);
+
+		_nf_3_3.setMinimumFractionDigits(3);
+		_nf_3_3.setMaximumFractionDigits(3);
+	}
+
+	private int										_maxDistanceSpinner;
+	private int										_spinnerDistancePage;
+
+	private boolean									_isTourDirty										= false;
+
+	private boolean									_isSaving;
+	/**
+	 * when <code>true</code>, the tour dirty flag is disabled to load data into the fields
+	 */
+	private boolean									_isDirtyDisabled									= false;
+	private boolean									_isClearView;
+
+	private float									_altitudeUp;
+
+	private float									_altitudeDown;
+
 	private ArrayList<TourSegmenter>				_availableSegmenter									= new ArrayList<TourSegmenter>();
 
 	/**
@@ -365,7 +363,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 	/*
 	 * UI resources
 	 */
-	private Font									_boldFont;
 	private final ColorCache						_colorCache											= new ColorCache();
 
 	/*
@@ -905,7 +902,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 		_parent = parent;
 		_pc = new PixelConverter(parent);
 		_spinnerWidth = _pc.convertWidthInCharsToPixels(_isOSX ? 10 : 5);
-		_boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 
 		setMaxDistanceSpinner();
 
@@ -4293,7 +4289,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
 	private void setTotalStyle(final ViewerCell cell) {
 
-//		cell.setFont(_boldFont);
 		cell.setBackground(_colorCache.get(STATE_COLOR_TOTALS));
 	}
 

@@ -46,6 +46,7 @@ import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.font.MTFont;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.time.TimeZoneData;
@@ -2235,6 +2236,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		_tk = new FormToolkit(parent.getDisplay());
 
 		_pageEditorForm = _tk.createForm(_pageBook);
+		MTFont.setHeaderFont(_pageEditorForm);
 		_tk.decorateFormHeading(_pageEditorForm);
 
 		_messageManager = new MessageManager(_pageEditorForm);

@@ -18,6 +18,7 @@ package net.tourbook.statistic;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.preferences.PrefPageStatistic;
 import net.tourbook.ui.ChartOptions_Grid;
@@ -26,7 +27,6 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -102,7 +102,8 @@ public class SlideoutStatisticOptions extends ToolbarSlideout {
 		{
 			final Composite container = new Composite(shellContainer, SWT.NONE);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-			GridLayoutFactory.fillDefaults()//
+			GridLayoutFactory
+					.fillDefaults()//
 					.numColumns(2)
 					.applyTo(container);
 //			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
@@ -130,13 +131,14 @@ public class SlideoutStatisticOptions extends ToolbarSlideout {
 		final Label label = new Label(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().applyTo(label);
 		label.setText(Messages.Slideout_StatisticOptions_Label_Title);
-		label.setFont(JFaceResources.getBannerFont());
+		MTFont.setBannerFont(label);
 	}
 
 	private void createUI_12_Actions(final Composite parent) {
 
 		final ToolBar toolbar = new ToolBar(parent, SWT.FLAT);
-		GridDataFactory.fillDefaults()//
+		GridDataFactory
+				.fillDefaults()//
 				.grab(true, false)
 				.align(SWT.END, SWT.BEGINNING)
 				.applyTo(toolbar);

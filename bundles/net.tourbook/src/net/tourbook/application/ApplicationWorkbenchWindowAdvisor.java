@@ -23,7 +23,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
@@ -53,11 +52,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.equinox.internal.p2.ui.sdk.P2_Activator;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -203,28 +199,6 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 	@Override
 	public void dispose() {
 		net.tourbook.ui.UI.getInstance().dispose();
-	}
-
-	private void dumpFonts() {
-
-		dumpFonts_10(JFaceResources.getDefaultFont());
-		dumpFonts_10(JFaceResources.getDialogFont());
-
-		dumpFonts_10(JFaceResources.getTextFont());
-
-		dumpFonts_10(JFaceResources.getBannerFont());
-		dumpFonts_10(JFaceResources.getHeaderFont());
-	}
-
-	private void dumpFonts_10(final Font font) {
-
-		final FontData[] fontData = font.getFontData();
-
-		System.out.println(
-				(net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\t"
-						+ Arrays.toString(fontData)));
-		// TODO remove SYSTEM.OUT.PRINTLN
-
 	}
 
 	private void firstApplicationStart() {
@@ -488,8 +462,6 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 				setupAppSelectionListener();
 
 				setupProxy();
-
-				dumpFonts();
 			}
 		});
 	}

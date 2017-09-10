@@ -23,6 +23,7 @@ import net.tourbook.common.color.ColorSelectorExtended;
 import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.font.FontFieldEditorExtended;
 import net.tourbook.common.font.IFontDialogListener;
+import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.AnimatedToolTipShell;
 import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -34,7 +35,6 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
@@ -260,7 +260,7 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell
 					.span(3, 1)
 					.applyTo(label);
 			label.setText(Messages.Slideout_SegmenterChartOptions_Label_Title);
-			label.setFont(JFaceResources.getBannerFont());
+			MTFont.setBannerFont(label);
 		}
 	}
 
@@ -473,7 +473,7 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell
 					.span(4, 1)
 					.applyTo(label);
 			label.setText(Messages.Slideout_SegmenterOptions_Label_Title);
-			label.setFont(JFaceResources.getBannerFont());
+			MTFont.setBannerFont(label);
 		}
 	}
 
