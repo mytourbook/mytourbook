@@ -32,7 +32,6 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
@@ -199,7 +198,8 @@ public class SlideoutTourChartInfo extends ToolbarSlideout implements IColorSele
 		final Label label = new Label(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().applyTo(label);
 		label.setText(Messages.Slideout_TourInfoOptions_Label_Title);
-		label.setFont(JFaceResources.getBannerFont());
+
+		UI.setTitleFont(label);
 	}
 
 	private void createUI_12_Actions(final Composite parent) {

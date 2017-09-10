@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,8 +23,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import net.tourbook.Messages;
+import net.tourbook.common.UI;
 import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourPerson;
@@ -42,7 +44,7 @@ import net.tourbook.tour.TourTypeFilterManager;
 import net.tourbook.tour.TourTypeMenuManager;
 import net.tourbook.tour.filter.TourFilterManager;
 import net.tourbook.tour.photo.TourPhotoManager;
-import net.tourbook.ui.UI;
+//import net.tourbook.ui.UI;
 import net.tourbook.ui.views.rawData.RawDataView;
 import net.tourbook.web.WebContentServer;
 
@@ -51,8 +53,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.equinox.internal.p2.ui.sdk.P2_Activator;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -85,8 +90,7 @@ import org.eclipse.ui.internal.WorkbenchPlugin;
 @SuppressWarnings("restriction")
 public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
-
-	private static IPreferenceStore				_prefStore		= TourbookPlugin.getDefault().getPreferenceStore();
+	private static IPreferenceStore				_prefStore		= TourbookPlugin.getPrefStore();
 
 	private ApplicationActionBarAdvisor			_applicationActionBarAdvisor;
 	private IPerspectiveDescriptor				_lastPerspective;
@@ -111,7 +115,6 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 				+ ApplicationVersion.getVersionSimple()
 				+ ApplicationVersion.getDevelopmentId();
 	}
-
 
 	public static void setupProxy() {
 
@@ -199,7 +202,29 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 	@Override
 	public void dispose() {
-		UI.getInstance().dispose();
+		net.tourbook.ui.UI.getInstance().dispose();
+	}
+
+	private void dumpFonts() {
+
+		dumpFonts_10(JFaceResources.getDefaultFont());
+		dumpFonts_10(JFaceResources.getDialogFont());
+
+		dumpFonts_10(JFaceResources.getTextFont());
+
+		dumpFonts_10(JFaceResources.getBannerFont());
+		dumpFonts_10(JFaceResources.getHeaderFont());
+	}
+
+	private void dumpFonts_10(final Font font) {
+
+		final FontData[] fontData = font.getFontData();
+
+		System.out.println(
+				(net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\t"
+						+ Arrays.toString(fontData)));
+		// TODO remove SYSTEM.OUT.PRINTLN
+
 	}
 
 	private void firstApplicationStart() {
@@ -215,12 +240,13 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		final Boolean isCreatePerson = new Boolean(true);
 
 		// this dialog fires an event that the person list is modified
-		PreferencesUtil.createPreferenceDialogOn(//
-				activeShell,
-				PrefPagePeople.ID,
-				new String[] { PrefPagePeople.ID },
-				isCreatePerson,
-				PreferencesUtil.OPTION_FILTER_LOCKED //
+		PreferencesUtil
+				.createPreferenceDialogOn(//
+						activeShell,
+						PrefPagePeople.ID,
+						new String[] { PrefPagePeople.ID },
+						isCreatePerson,
+						PreferencesUtil.OPTION_FILTER_LOCKED //
 				)
 				.open();
 
@@ -372,14 +398,14 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 			_applicationActionBarAdvisor._personContribItem.selectFirstPerson();
 
 		} catch (final SQLException e) {
-			UI.showSQLException(e);
+			net.tourbook.ui.UI.showSQLException(e);
 		} finally {
 
 			if (conn != null) {
 				try {
 					conn.close();
 				} catch (final SQLException e) {
-					UI.showSQLException(e);
+					net.tourbook.ui.UI.showSQLException(e);
 				}
 			}
 		}
@@ -462,6 +488,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 				setupAppSelectionListener();
 
 				setupProxy();
+
+				dumpFonts();
 			}
 		});
 	}
@@ -544,7 +572,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 		// this is the first entry point - setup unit values otherwise views show "null"
 
-		UI.updateUnits();
+		net.tourbook.ui.UI.updateUnits();
 		P2_Activator.setUpdateSites(memento);
 
 		return super.restoreState(memento);
