@@ -44,6 +44,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.map.IMapSyncListener;
+import net.tourbook.map.MapInfoManager;
 import net.tourbook.map.MapManager;
 import net.tourbook.map.bookmark.ActionMapBookmarks;
 import net.tourbook.map.bookmark.IMapBookmarkListener;
@@ -127,14 +128,12 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 	//
 // SET_FORMATTING_ON
 	//
-	private static final IDialogSettings	_state									= TourbookPlugin
-			.getState(
-					ID);
+	private static final IDialogSettings	_state									= TourbookPlugin.getState(ID);
 	//
 	private Map25App						_mapApp;
 	//
-	private OpenDialogManager				_openDlgMgr								=
-			new OpenDialogManager();
+	private OpenDialogManager				_openDlgMgr								= new OpenDialogManager();
+	private final MapInfoManager			_mapInfoManager							= MapInfoManager.getInstance();
 	//
 	private boolean							_isPartVisible;
 	private boolean							_isShowTour;
@@ -822,6 +821,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		_lastFiredSyncEventTime = System.currentTimeMillis();
 
 		MapManager.fireSyncMapEvent(mapPosition, this, positionFlags);
+
+		updateUI_MapPosition(mapPosition.getLatitude(), mapPosition.getLongitude(), mapPosition.zoomLevel);
 	}
 
 	public Map25App getMapApp() {
@@ -845,6 +846,11 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		final MapPosition mapPosition = selectedBookmark.getMapPosition();
 
 		Map25ConfigManager.setMapLocation(map, mapPosition);
+	}
+
+	void onMapPosition(final GeoPoint mapGeoPoint, final int zoomLevel) {
+
+		updateUI_MapPosition(mapGeoPoint.getLatitude(), mapGeoPoint.getLongitude(), zoomLevel);
 	}
 
 	@Override
@@ -1444,6 +1450,27 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		}
 
 		Map25ConfigManager.setMapLocation(map, mapPosition);
+	}
+
+	private void updateUI_MapPosition(final double latitude, final double longitude, final int zoomLevel) {
+
+		// validate widget
+		if (_swtContainer.isDisposed()) {
+			return;
+		}
+
+		_swtContainer.getDisplay().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+
+				// validate widget
+				if (_swtContainer.isDisposed()) {
+					return;
+				}
+
+				_mapInfoManager.setMapPosition(latitude, longitude, zoomLevel);
+			}
+		});
 	}
 
 	void updateUI_SelectedMapProvider(final Map25Provider selectedMapProvider) {

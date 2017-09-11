@@ -44,6 +44,7 @@ import net.tourbook.data.TourWayPoint;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.map.IMapSyncListener;
 import net.tourbook.map.MapColorProvider;
+import net.tourbook.map.MapInfoManager;
 import net.tourbook.map.MapManager;
 import net.tourbook.map.MapUtils;
 import net.tourbook.map.bookmark.ActionMapBookmarks;
@@ -708,7 +709,11 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_map.addMousePositionListener(new IPositionListener() {
 			@Override
 			public void setPosition(final MapPositionEvent event) {
-				_mapInfoManager.setMousePosition(event.mapGeoPosition);
+
+				_mapInfoManager.setMapPosition(
+						event.mapGeoPosition.latitude,
+						event.mapGeoPosition.longitude,
+						event.mapZoomLevel);
 			}
 		});
 
@@ -1768,7 +1773,6 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 			return;
 		}
 
-		_mapInfoManager.setZoom(zoomLevel);
 		centerTour();
 
 		if (_isInMapSync) {

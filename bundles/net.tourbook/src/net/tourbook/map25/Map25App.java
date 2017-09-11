@@ -443,8 +443,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 			mMap.setMapPosition(mapPosition);
 			mMap.render();
 
-			final MapPosition firedMapPos = new MapPosition();
-
 			_map25View.fireSyncMapEvent(mapPosition, IMapSyncListener.RESET_TILT);
 
 			return true;

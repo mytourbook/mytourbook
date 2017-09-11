@@ -958,7 +958,7 @@
 		   <toolbar id="net.tourbook.mapping.statusline.mapinfo">
 
 		      <control 
-		            class="net.tourbook.map2.view.MapInfoContribution"
+		            class="net.tourbook.map.MapInfoContribution"
 		            id="net.tourbook.mapping.mapinfo">
 		      </control>
 		   </toolbar>

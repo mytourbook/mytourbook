@@ -16,6 +16,7 @@
 package net.tourbook.map25;
 
 import org.oscim.core.GeoPoint;
+import org.oscim.core.MapPosition;
 import org.oscim.gdx.InputHandler;
 import org.oscim.layers.Layer;
 import org.oscim.layers.tile.vector.labeling.LabelLayer;
@@ -102,6 +103,22 @@ public class InputHandlerMT extends InputHandler {
 		}
 
 		return super.keyDown(keycode);
+	}
+
+	@Override
+	public boolean mouseMoved(final int screenX, final int screenY) {
+
+		/*
+		 * Set map geoposition in the app status line
+		 */
+		final GeoPoint mapGeoPoint = _map.viewport().fromScreenPoint(screenX, screenY);
+
+		final MapPosition mapPosition = new MapPosition();
+		_map.viewport().getMapPosition(mapPosition);
+
+		_mapApp.getMap25View().onMapPosition(mapGeoPoint, mapPosition.zoomLevel);
+
+		return super.mouseMoved(screenX, screenY);
 	}
 
 	private void toggle_Label_Layer() {
