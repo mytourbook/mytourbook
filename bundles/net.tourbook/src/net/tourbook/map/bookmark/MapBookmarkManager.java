@@ -34,7 +34,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
@@ -144,6 +143,8 @@ public class MapBookmarkManager {
 
 			super(Messages.Action_Map_AddBookmark, AS_PUSH_BUTTON);
 
+			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__MapBookmark_New));
+
 			__mapBookmarks = mapBookmarks;
 		}
 
@@ -200,6 +201,8 @@ public class MapBookmarkManager {
 									final IMapBookmarks mapBookmarks) {
 
 			super(name, AS_PUSH_BUTTON);
+
+			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__MapBookmark_Location));
 
 			__bookmarkId = bookmarkId;
 			__mapBookmarks = mapBookmarks;
@@ -435,7 +438,7 @@ public class MapBookmarkManager {
 		/*
 		 * Recent bookmarks
 		 */
-		menuMgr.add(new Separator());
+//		menuMgr.add(new Separator());
 
 		int index = 0;
 		final LinkedList<MapBookmark> allRecentBookmarks = getAllRecentBookmarks();
@@ -499,7 +502,7 @@ public class MapBookmarkManager {
 
 		for (final MapBookmark bookmark : allRecentBookmarks) {
 
-			final String name = UI.SPACE4 + UI.SYMBOL_MNEMONIC + (++index) + UI.SPACE2 + bookmark.name;
+			final String name = UI.SYMBOL_MNEMONIC + (++index) + UI.SPACE2 + bookmark.name;
 
 			final ActionRecentBookmark action = new ActionRecentBookmark(name, bookmark.id, mapBookmarks);
 			final ActionContributionItem contribItem = new ActionContributionItem(action);

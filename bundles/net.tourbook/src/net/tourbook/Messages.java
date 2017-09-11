@@ -806,6 +806,8 @@ public class Messages extends NLS {
 	public static String		Image__link;
 	public static String		Image__MapBookmark;
 	public static String		Image__MapBookmark_Disabled;
+	public static String		Image__MapBookmark_Location;
+	public static String		Image__MapBookmark_New;
 	public static String		Image__MapOptions;
 	public static String		Image__MapOptions_Disabled;
 	public static String		Image__MarkerFilter_WithGPS;
