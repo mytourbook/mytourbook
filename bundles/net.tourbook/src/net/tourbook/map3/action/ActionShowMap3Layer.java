@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -39,24 +39,26 @@ import org.eclipse.swt.widgets.ToolItem;
 
 public class ActionShowMap3Layer extends ContributionItem implements IOpeningDialog {
 
-	private Map3View		_map3View;
+	private static final String	IMAGE_MAP_OPTIONS	= net.tourbook.Messages.Image__MapOptions;
 
-	private DialogMap3Layer	_map3LayerDialog;
+	private Map3View			_map3View;
 
-	private ToolBar			_toolBar;
-	private ToolItem		_actionToolItem;
+	private DialogMap3Layer		_map3LayerDialog;
 
-	private String			_dialogId	= getClass().getCanonicalName();
+	private ToolBar				_toolBar;
+	private ToolItem			_actionToolItem;
+
+	private String				_dialogId			= getClass().getCanonicalName();
 
 	/*
 	 * UI controls
 	 */
-	private Control			_parent;
+	private Control				_parent;
 
 	/*
 	 * UI resources
 	 */
-	private Image			_actionImage;
+	private Image				_actionImage;
 
 	public ActionShowMap3Layer(final Map3View map3View, final Control parent) {
 
@@ -64,7 +66,7 @@ public class ActionShowMap3Layer extends ContributionItem implements IOpeningDia
 
 		_parent = parent;
 
-		_actionImage = TourbookPlugin.getImageDescriptor(Messages.Image_Map3_Map3PropertiesView).createImage();
+		_actionImage = TourbookPlugin.getImageDescriptor(IMAGE_MAP_OPTIONS).createImage();
 	}
 
 	@Override

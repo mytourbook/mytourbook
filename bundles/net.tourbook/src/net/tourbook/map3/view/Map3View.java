@@ -1250,8 +1250,8 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 		tbm.add(_actionSyncMap_WithOtherMap);
 		tbm.add(new Separator());
 
-		tbm.add(_actionMapBookmarks);
 		tbm.add(_actionShowMarker);
+		tbm.add(_actionMapBookmarks);
 		tbm.add(_actionShowMap3Layer);
 
 		/*

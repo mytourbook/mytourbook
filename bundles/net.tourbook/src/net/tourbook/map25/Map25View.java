@@ -785,10 +785,6 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		 */
 		final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
-		tbm.add(_actionShowMarker_WithOptions);
-
-		tbm.add(new Separator());
-
 		tbm.add(_actionShowTour_WithOptions);
 		tbm.add(_actionShowEntireTour);
 		tbm.add(_actionSyncMap_WithTour);
@@ -797,6 +793,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 		tbm.add(new Separator());
 
+		tbm.add(_actionShowMarker_WithOptions);
 		tbm.add(_actionMapBookmarks);
 		tbm.add(_actionMapOptions);
 		tbm.add(_actionSelectMapProvider);

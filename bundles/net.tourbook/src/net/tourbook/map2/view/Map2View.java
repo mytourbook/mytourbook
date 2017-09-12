@@ -83,7 +83,7 @@ import net.tourbook.map2.action.ActionTourColor;
 import net.tourbook.map2.action.ActionZoomCentered;
 import net.tourbook.map2.action.ActionZoomIn;
 import net.tourbook.map2.action.ActionZoomOut;
-import net.tourbook.map2.action.ActionZoomShowEntireEarth;
+import net.tourbook.map2.action.ActionZoomShowEntireMap;
 import net.tourbook.map2.action.ActionZoomShowEntireTour;
 import net.tourbook.photo.IPhotoEventListener;
 import net.tourbook.photo.Photo;
@@ -353,11 +353,11 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	private ActionSyncMapWithSlider				_actionSyncMap_WithChartSlider;
 	private ActionSyncMapWithTour				_actionSyncMap_WithTour;
 
-	private ActionZoomIn						_actionZoomIn;
-	private ActionZoomOut						_actionZoomOut;
-	private ActionZoomCentered					_actionZoomCentered;
-	private ActionZoomShowEntireEarth			_actionZoomShowAll;
-	private ActionZoomShowEntireTour			_actionShowEntireTour;
+	private ActionZoomIn						_actionZoom_In;
+	private ActionZoomOut						_actionZoom_Out;
+	private ActionZoomCentered					_actionZoom_Centered;
+	private ActionZoomShowEntireMap				_actionZoom_ShowEntireMap;
+	private ActionZoomShowEntireTour			_actionZoom_ShowEntireTour;
 
 	/*
 	 * UI controls
@@ -513,7 +513,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	}
 
 	public void actionSetZoomCentered() {
-		_isPositionCentered = _actionZoomCentered.isChecked();
+		_isPositionCentered = _actionZoom_Centered.isChecked();
 	}
 
 	public void actionShowLegend() {
@@ -1061,11 +1061,11 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 				Messages.Image__PulseZones,
 				Messages.Image__PulseZones_Disabled);
 
-		_actionZoomIn = new ActionZoomIn(this);
-		_actionZoomOut = new ActionZoomOut(this);
-		_actionZoomCentered = new ActionZoomCentered(this);
-		_actionZoomShowAll = new ActionZoomShowEntireEarth(this);
-		_actionShowEntireTour = new ActionZoomShowEntireTour(this);
+		_actionZoom_In = new ActionZoomIn(this);
+		_actionZoom_Out = new ActionZoomOut(this);
+		_actionZoom_Centered = new ActionZoomCentered(this);
+		_actionZoom_ShowEntireMap = new ActionZoomShowEntireMap(this);
+		_actionZoom_ShowEntireTour = new ActionZoomShowEntireTour(this);
 
 		_actionSyncMap_WithOtherMap = new ActionSyncMapWithOtherMap(this);
 		_actionSyncMap_WithPhoto = new ActionSyncMapWithPhoto(this);
@@ -1417,7 +1417,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		final boolean isOneTour = _isTourOrWayPoint && (isMultipleTours == false) && _isShowTour;
 
 		_actionMapColor.setEnabled(isTourAvailable);
-		_actionShowEntireTour.setEnabled(_isTourOrWayPoint && _isShowTour && isTourAvailable);
+		_actionZoom_ShowEntireTour.setEnabled(_isTourOrWayPoint && _isShowTour && isTourAvailable);
 		_actionShowLegendInMap.setEnabled(_isTourOrWayPoint);
 		_actionShowSliderInLegend.setEnabled(_isTourOrWayPoint && _isShowLegend);
 		_actionShowSliderInMap.setEnabled(_isTourOrWayPoint);
@@ -1496,21 +1496,20 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		viewTbm.add(new Separator());
 
 		viewTbm.add(_actionShowTourInMap);
-		viewTbm.add(_actionShowEntireTour);
+		viewTbm.add(_actionZoom_ShowEntireTour);
 		viewTbm.add(_actionSyncMap_WithTour);
 		viewTbm.add(_actionSyncMap_WithChartSlider);
 		viewTbm.add(_actionSyncMap_WithOtherMap);
 		viewTbm.add(new Separator());
 
-		viewTbm.add(_actionMapBookmarks);
-		viewTbm.add(_actionSelectMapProvider);
+		viewTbm.add(_actionZoom_In);
+		viewTbm.add(_actionZoom_Out);
+		viewTbm.add(_actionZoom_ShowEntireMap);
+		viewTbm.add(_actionZoom_Centered);
 		viewTbm.add(new Separator());
 
-		viewTbm.add(_actionZoomIn);
-		viewTbm.add(_actionZoomOut);
-		viewTbm.add(_actionZoomCentered);
-		viewTbm.add(_actionZoomShowAll);
-		viewTbm.add(_actionShowPOI);
+		viewTbm.add(_actionMapBookmarks);
+		viewTbm.add(_actionSelectMapProvider);
 
 		/*
 		 * fill view menu
@@ -2671,7 +2670,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 		// checkbox: is tour centered
 		final boolean isTourCentered = _state.getBoolean(MEMENTO_ZOOM_CENTERED);
-		_actionZoomCentered.setChecked(isTourCentered);
+		_actionZoom_Centered.setChecked(isTourCentered);
 		_isPositionCentered = isTourCentered;
 
 		// sync map with photo
@@ -2896,7 +2895,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_state.put(STATE_IS_SYNC_MAP2_WITH_OTHER_MAP, _isMapSynched_WithOtherMap);
 		_state.put(STATE_SYNC_WITH_PHOTO, _isMapSynched_WithPhoto);
 
-		_state.put(MEMENTO_ZOOM_CENTERED, _actionZoomCentered.isChecked());
+		_state.put(MEMENTO_ZOOM_CENTERED, _actionZoom_Centered.isChecked());
 		_state.put(MEMENTO_SYNCH_WITH_SELECTED_TOUR, _actionSyncMap_WithTour.isChecked());
 		_state.put(MEMENTO_SYNCH_WITH_TOURCHART_SLIDER, _actionSyncMap_WithChartSlider.isChecked());
 		_state.put(MEMENTO_SYNCH_TOUR_ZOOM_LEVEL, _actionSyncTourZoomLevel.getZoomLevel());

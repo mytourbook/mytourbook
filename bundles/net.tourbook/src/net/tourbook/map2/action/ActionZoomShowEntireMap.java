@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,28 +13,31 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.chart;
+package net.tourbook.map2.action;
+
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.map2.Messages;
+import net.tourbook.map2.view.Map2View;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionZoomFitGraph extends Action {
+public class ActionZoomShowEntireMap extends Action {
 
-	private Chart _chart;
+	private Map2View	_mapView;
 
-	public ActionZoomFitGraph(final Chart chart) {
+	public ActionZoomShowEntireMap(final Map2View mapView) {
 
-		_chart = chart;
+		super(null, AS_PUSH_BUTTON);
 
-		setText(Messages.Action_zoom_fit_to_graph);
-		setToolTipText(Messages.Action_zoom_fit_to_graph_tooltip);
+		_mapView = mapView;
 
-		setImageDescriptor(Activator.getImageDescriptor(Messages.Image__Zoom_FitToWindow));
-		setDisabledImageDescriptor(Activator.getImageDescriptor(Messages.Image__Zoom_FitToWindow_Disabled));
+		setToolTipText(Messages.map_action_zoom_show_all);
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_Action_Zoom_ShowEntireMap));
 	}
 
 	@Override
 	public void run() {
-		_chart.onExecuteZoomFitGraph();
+		_mapView.actionZoomShowEntireMap();
 	}
 
 }

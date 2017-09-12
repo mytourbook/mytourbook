@@ -434,27 +434,32 @@ public class Chart extends ViewForm {
 			// set text for mouse wheel mode
 			final Action actionMouseMode = _allChartActions.get(ACTION_ID_MOUSE_MODE);
 			if (_mouseMode.equals(MOUSE_MODE_SLIDER)) {
+
 				// mouse mode: slider
 				actionMouseMode.setText(Messages.Action_mouse_mode_zoom);
 
 			} else {
+
 				// mouse mode: zoom
 				actionMouseMode.setText(Messages.Action_mouse_mode_slider);
 			}
 
 			// fill slider context menu
 			if (_chartContextProvider != null) {
+
 				menuMgr.add(new Separator());
 				_chartContextProvider.fillXSliderContextMenu(menuMgr, leftSlider, rightSlider);
 			}
 
 			if (_isShowZoomActions) {
+
 				menuMgr.add(new Separator());
 				menuMgr.add(actionMouseMode);
 				menuMgr.add(_allChartActions.get(ACTION_ID_MOVE_LEFT_SLIDER_HERE));
 				menuMgr.add(_allChartActions.get(ACTION_ID_MOVE_RIGHT_SLIDER_HERE));
 				menuMgr.add(_allChartActions.get(ACTION_ID_MOVE_SLIDERS_TO_BORDER));
 				menuMgr.add(_allChartActions.get(ACTION_ID_ZOOM_IN_TO_SLIDER));
+				menuMgr.add(_allChartActions.get(ACTION_ID_ZOOM_FIT_GRAPH));
 			}
 		}
 	}
@@ -481,14 +486,6 @@ public class Chart extends ViewForm {
 
 				tbm.add(_allChartActions.get(ACTION_ID_ZOOM_IN));
 				tbm.add(_allChartActions.get(ACTION_ID_ZOOM_OUT));
-
-				if (_isShowMouseMode) {
-					tbm.add(_allChartActions.get(ACTION_ID_MOUSE_MODE));
-				}
-
-				if (_chartDataModel.getChartType() != ChartType.BAR) {
-					tbm.add(_allChartActions.get(ACTION_ID_ZOOM_FIT_GRAPH));
-				}
 			}
 
 			if (refreshToolbar) {

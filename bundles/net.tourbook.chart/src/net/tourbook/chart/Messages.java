@@ -46,6 +46,10 @@ public class Messages extends NLS {
 
 	public static String		Error_Message_001_Default;
 
+	public static String		Image__MouseMode;
+	public static String		Image__Zoom_FitToWindow;
+	public static String		Image__Zoom_FitToWindow_Disabled;
+
 	public static String		Image_arrow_left;
 	public static String		Image_arrow_left_disabled;
 	public static String		Image_arrow_right;
