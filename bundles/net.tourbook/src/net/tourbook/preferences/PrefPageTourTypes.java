@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -68,7 +68,6 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -86,9 +85,10 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPreferencePage, IColorTreeViewer {
 
-	private static final String					COLOR_UNIQUE_ID_PREFIX	= "crId";														//$NON-NLS-1$
+	private static final String					COLOR_UNIQUE_ID_PREFIX	= "crId";						//$NON-NLS-1$
 
-	private static final String[]				SORT_PROPERTY			= new String[] { "this property is needed for sorting !!!" };	//$NON-NLS-1$
+	private static final String[]				SORT_PROPERTY			= new String[] {
+			"this property is needed for sorting !!!" };												//$NON-NLS-1$
 
 	private final IPreferenceStore				_prefStore				= TourbookPlugin.getPrefStore();
 
@@ -117,7 +117,6 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 	private Button								_btnDelete;
 	private Button								_btnRename;
-	private CLabel								_iconTourTypeImage;
 
 	private ColorSelector						_colorSelector;
 
@@ -302,7 +301,8 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		 * create tree layout
 		 */
 		final Composite layoutContainer = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
+		GridDataFactory
+				.fillDefaults()//
 				.grab(true, true)
 				.hint(200, 100)
 				.applyTo(layoutContainer);
@@ -313,11 +313,13 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		/*
 		 * create viewer
 		 */
-		final Tree tree = new Tree(layoutContainer, SWT.H_SCROLL
-				| SWT.V_SCROLL
-				| SWT.BORDER
-				| SWT.MULTI
-				| SWT.FULL_SELECTION);
+		final Tree tree = new Tree(
+				layoutContainer,
+				SWT.H_SCROLL
+						| SWT.V_SCROLL
+						| SWT.BORDER
+						| SWT.MULTI
+						| SWT.FULL_SELECTION);
 
 		tree.setHeaderVisible(false);
 		tree.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
@@ -485,18 +487,6 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 				});
 				setButtonLayoutData(_btnDelete);
 			}
-
-			/*
-			 * Tour type image
-			 */
-			{
-				_iconTourTypeImage = new CLabel(container, SWT.NONE);
-				_iconTourTypeImage.setImage(_ui.getTourTypeImage(-1));
-				GridDataFactory.fillDefaults()//
-						.grab(true, true)
-						.align(SWT.CENTER, SWT.CENTER)
-						.applyTo(_iconTourTypeImage);
-			}
 		}
 	}
 
@@ -516,10 +506,11 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		TreeColumn tc;
 		TreeViewerColumn tvc;
 
-		/*
-		 * 1. column: color item/color definition
-		 */
 		{
+			/*
+			 * 1. column: color item/color definition
+			 */
+
 			tvc = new TreeViewerColumn(_tourTypeViewer, SWT.TRAIL);
 			tc = tvc.getColumn();
 			tvc.setLabelProvider(new StyledCellLabelProvider() {
@@ -528,27 +519,35 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 					final Object element = cell.getElement();
 
-					if (element instanceof ColorDefinition) {
+					if (element instanceof TourTypeColorDefinition) {
 
-						cell.setText(((ColorDefinition) (element)).getVisibleName());
+						cell.setText(((TourTypeColorDefinition) (element)).getVisibleName());
+
+						final TourType tourType = ((TourTypeColorDefinition) element).getTourType();
+						final Image tourTypeImage = _ui.getTourTypeImage(tourType.getTypeId());
+
+						cell.setImage(tourTypeImage);
 
 					} else if (element instanceof GraphColorItem) {
 
 						cell.setText(((GraphColorItem) (element)).getName());
+						cell.setImage(null);
 
 					} else {
 
 						cell.setText(UI.EMPTY_STRING);
+						cell.setImage(null);
 					}
 				}
 			});
 			treeLayout.setColumnData(tc, new ColumnWeightData(1, true));
 		}
 
-		/*
-		 * 2. column: color for definition/item
-		 */
 		{
+			/*
+			 * 2. column: color for definition/item
+			 */
+
 			tvc = new TreeViewerColumn(_tourTypeViewer, SWT.TRAIL);
 			tc = tvc.getColumn();
 			tvc.setLabelProvider(new StyledCellLabelProvider() {
@@ -581,6 +580,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 			});
 			treeLayout.setColumnData(tc, new ColumnPixelData(colorImageWidth, true));
 		}
+
 	}
 
 	private boolean deleteTourType(final TourType tourType) {
@@ -709,7 +709,6 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		_btnDelete.setEnabled(isSelected);
 		_btnRename.setEnabled(isSelected);
 
-		_iconTourTypeImage.setEnabled(isSelected);
 		_colorSelector.setEnabled(isGraphSelected);
 	}
 
@@ -856,7 +855,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 	}
 
 	/**
-	 * is called when the color in the color selector has changed
+	 * Is called when the color in the color selector has changed
 	 * 
 	 * @param event
 	 */
@@ -904,24 +903,18 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 				_selectedGraphColor.getColorId(),
 				selectedColorDefinition.getColorDefinitionId());
 
+		// update UI
+		_ui.setTourTypeImagesDirty();
+//		TourDatabase.clearTourTypes();
+
 		/*
 		 * update the tree viewer, the color images will be recreated in the label provider
 		 */
 		_tourTypeViewer.update(_selectedGraphColor, null);
 		_tourTypeViewer.update(selectedColorDefinition, null);
 
-		// update UI
-		_ui.setTourTypeImagesDirty();
-//		TourDatabase.clearTourTypes();
-
-		final long typeId = savedTourType.getTypeId();
-		final Image tourTypeImage = _ui.getTourTypeImage(typeId);
-
-		/*
-		 * The same but modified image MUST be removed otherwise it is not painted!!!
-		 */
-		_iconTourTypeImage.setImage(null);
-		_iconTourTypeImage.setImage(tourTypeImage);
+		// without a repaint the color def image is not updated
+		_tourTypeViewer.getTree().redraw();
 
 		_isModified = true;
 	}
@@ -1030,22 +1023,9 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 			_colorSelector.setColorValue(graphColor.getRGB());
 			_colorSelector.setEnabled(true);
 
-			final TourType tourType = ((TourTypeColorDefinition) graphColor.getColorDefinition()).getTourType();
-			final long typeId = tourType.getTypeId();
-
-			_iconTourTypeImage.setImage(_ui.getTourTypeImage(typeId));
-
-		} else if (firstElement instanceof TourTypeColorDefinition) {
-
-			final TourType tourType = ((TourTypeColorDefinition) firstElement).getTourType();
-			final long typeId = tourType.getTypeId();
-
-			_iconTourTypeImage.setImage(_ui.getTourTypeImage(typeId));
-
 		} else {
 
 			_colorSelector.setEnabled(false);
-			_iconTourTypeImage.setImage(null);
 		}
 
 		setFocusToViewer();
