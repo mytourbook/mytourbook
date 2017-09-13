@@ -19,6 +19,6 @@ import net.tourbook.common.map.GeoPosition;
 
 public interface IMapPositionListener {
 
-	public void onMapPosition(GeoPosition mapCenter, int mapZoomLevel);
+	public void onMapPosition(GeoPosition mapCenter, int mapZoomLevel, boolean isZoomed);
 
 }

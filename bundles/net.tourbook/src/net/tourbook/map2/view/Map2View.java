@@ -266,6 +266,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	private boolean								_isPositionCentered;
 
 	private boolean								_isInSelectBookmark;
+	private boolean								_isInZoom;
 
 	private int									_defaultZoom;
 	private GeoPosition							_defaultPosition;
@@ -513,7 +514,14 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	}
 
 	public void actionSetZoomCentered() {
+
 		_isPositionCentered = _actionZoom_Centered.isChecked();
+
+		_isInZoom = true;
+		{
+			centerTour();
+		}
+		_isInZoom = false;
 	}
 
 	public void actionShowLegend() {
@@ -663,7 +671,12 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 	public void actionZoomIn() {
 
-		_map.setZoom(_map.getZoom() + 1);
+		_isInZoom = true;
+		{
+			_map.setZoom(_map.getZoom() + 1);
+		}
+		_isInZoom = false;
+
 		centerTour();
 
 		_map.paint();
@@ -671,7 +684,12 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 
 	public void actionZoomOut() {
 
-		_map.setZoom(_map.getZoom() - 1);
+		_isInZoom = true;
+		{
+			_map.setZoom(_map.getZoom() - 1);
+		}
+		_isInZoom = false;
+
 		centerTour();
 
 		_map.paint();
@@ -965,7 +983,7 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	 */
 	private void centerTour() {
 
-		if (_isPositionCentered) {
+		if (_isInZoom && _isPositionCentered) {
 
 			final int zoom = _map.getZoom();
 
@@ -1765,14 +1783,18 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 	}
 
 	@Override
-	public void onMapPosition(final GeoPosition geoCenter, final int zoomLevel) {
+	public void onMapPosition(final GeoPosition geoCenter, final int zoomLevel, final boolean isZoomed) {
 
 		if (_isInSelectBookmark) {
 			// prevent fire the sync event
 			return;
 		}
 
-		centerTour();
+		_isInZoom = isZoomed;
+		{
+			centerTour();
+		}
+		_isInZoom = false;
 
 		if (_isInMapSync) {
 			return;

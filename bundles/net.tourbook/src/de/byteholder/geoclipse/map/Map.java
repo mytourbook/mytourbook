@@ -1007,14 +1007,18 @@ public class Map extends Canvas {
 		_mp.disposeTiles();
 	}
 
-	private void fireMapPositionEvent() {
+	/**
+	 * @param isZoomed
+	 *            Is <code>true</code> when the event is fired by zooming
+	 */
+	private void fireMapPositionEvent(final boolean isZoomed) {
 
 		final GeoPosition geoCenter = getGeoCenter();
 
 		final Object[] listeners = _allMapPositionListener.getListeners();
 
 		for (final Object listener : listeners) {
-			((IMapPositionListener) listener).onMapPosition(geoCenter, _mapZoomLevel);
+			((IMapPositionListener) listener).onMapPosition(geoCenter, _mapZoomLevel, isZoomed);
 		}
 	}
 
@@ -3343,7 +3347,7 @@ public class Map extends Canvas {
 
 		paint();
 
-		fireMapPositionEvent();
+		fireMapPositionEvent(false);
 	}
 
 	private boolean parsePOIText(String text) {
@@ -3638,7 +3642,7 @@ public class Map extends Canvas {
 
 		paint();
 
-		fireMapPositionEvent();
+		fireMapPositionEvent(false);
 	}
 
 	/**
@@ -4198,7 +4202,7 @@ public class Map extends Canvas {
 		updateTourToolTip();
 //		updatePoiVisibility();
 
-		fireMapPositionEvent();
+		fireMapPositionEvent(true);
 	}
 
 	private void showPoi() {
