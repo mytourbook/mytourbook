@@ -1557,10 +1557,11 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		menuMgr.add(_actionShowTourInfoInMap);
 
 		menuMgr.add(new Separator());
-		menuMgr.add(_actionSetDefaultPosition);
-		menuMgr.add(_actionSaveDefaultPosition);
 
 		MapBookmarkManager.fillContextMenu_RecentBookmarks(menuMgr, this);
+
+		menuMgr.add(_actionSetDefaultPosition);
+		menuMgr.add(_actionSaveDefaultPosition);
 
 		menuMgr.add(new Separator());
 
