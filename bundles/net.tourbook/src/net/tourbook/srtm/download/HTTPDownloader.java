@@ -68,7 +68,9 @@ public class HTTPDownloader {
 			}
 		};
 
-		final Job downloadJob = new Job(Messages.job_name_httpDownload) {
+		final String jobName = Messages.job_name_httpDownload + ": " + remoteFileName;
+
+		final Job downloadJob = new Job(jobName) {
 			@Override
 			protected IStatus run(final IProgressMonitor monitor) {
 
@@ -93,7 +95,7 @@ public class HTTPDownloader {
 
 					long startTime = System.currentTimeMillis();
 
-					monitor.beginTask(Messages.job_name_httpDownload, IProgressMonitor.UNKNOWN);
+					monitor.beginTask(jobName, IProgressMonitor.UNKNOWN);
 
 					while ((numRead = inputStream.read(buffer)) != -1) {
 

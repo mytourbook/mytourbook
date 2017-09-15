@@ -111,22 +111,25 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 	private static final String				TAG_IMAGE_PATH			= "imagePath";								//$NON-NLS-1$
 	private static final String				TAG_IS_SHADOW			= "isShadow";								//$NON-NLS-1$
 	private static final String				TAG_SHADOW_VALUE		= "shadowValue";							//$NON-NLS-1$
-	private static final String				TAG_RESOLUTION			= "resolution";							//$NON-NLS-1$
+	private static final String				TAG_RESOLUTION			= "resolution";								//$NON-NLS-1$
 
-	private static final String				MEMENTO_CHILD_VERTEX	= "vertex";								//$NON-NLS-1$
+	private static final String				MEMENTO_CHILD_VERTEX	= "vertex";									//$NON-NLS-1$
 	private static final String				TAG_ALTITUDE			= "altitude";								//$NON-NLS-1$
 	private static final String				TAG_RED					= "red";									//$NON-NLS-1$
 	private static final String				TAG_GREEN				= "green";									//$NON-NLS-1$
 	private static final String				TAG_BLUE				= "blue";									//$NON-NLS-1$
 
 	private final static IPreferenceStore	_prefStore				= TourbookPlugin.getPrefStore();
-	private final IDialogSettings			_state					= TourbookPlugin.getState("SRTMColors");	//$NON-NLS-1$
-
 	private static ArrayList<SRTMProfile>	_profileList			= new ArrayList<SRTMProfile>();
-	private static SRTMProfile				_selectedProfile		= null;
 
+	private static SRTMProfile				_selectedProfile		= null;
+	private static int						_maxProfileId;
+
+	private static boolean					_isCreateDefault;
+	private final IDialogSettings			_state					= TourbookPlugin.getState("SRTMColors");	//$NON-NLS-1$
 	private Button							_btnEditProfile;
 	private Button							_btnAddProfile			= null;
+
 	private Button							_btnRemoveProfile		= null;
 	private Button							_btnDuplicateProfile;
 
@@ -137,6 +140,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 	private Composite						_viewerContainer;
 
 	private CheckboxTableViewer				_profileViewer;
+
 	private ColumnManager					_columnManager;
 
 	/**
@@ -145,7 +149,6 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 	private TableColumn						_tcProfileImage;
 
 	private TableColumnDefinition			_colDefImage;
-
 	/**
 	 * index of the profile image, this can be changed when the columns are reordered with the mouse
 	 * or the column manager
@@ -153,11 +156,8 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 	private int								_profileImageColumn		= 0;
 
 	private BooleanFieldEditor				_booleanEditorApplyOption;
+
 	private PixelConverter					_pc;
-
-	private static int						_maxProfileId;
-
-	private static boolean					_isCreateDefault;
 
 	private class ProfileContentProvider implements IStructuredContentProvider {
 
@@ -199,7 +199,8 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 			final XMLMemento xmlRoot = getXMLRoot();
 
-			IMemento profile = createXmlProfile(xmlRoot,//
+			IMemento profile = createXmlProfile(
+					xmlRoot, //
 					++profileId,
 					"Default 1", //$NON-NLS-1$
 					"profile-default-1", //$NON-NLS-1$
@@ -216,7 +217,8 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 			createXmlVertex(profile, 2000, 223, 223, 240);
 			createXmlVertex(profile, 8000, 255, 255, 255);
 
-			profile = createXmlProfile(xmlRoot, //
+			profile = createXmlProfile(
+					xmlRoot, //
 					++profileId,
 					"Default 2", //$NON-NLS-1$
 					"profile-default-2", //$NON-NLS-1$
@@ -236,7 +238,8 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 			createXmlVertex(profile, 900, 255, 204, 204);
 			createXmlVertex(profile, 1000, 204, 255, 255);
 
-			profile = createXmlProfile(xmlRoot, //
+			profile = createXmlProfile(
+					xmlRoot, //
 					++profileId,
 					"Default 3", //$NON-NLS-1$
 					"profile-default-3", //$NON-NLS-1$
@@ -253,7 +256,8 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 			createXmlVertex(profile, 4000, 204, 255, 255);
 			createXmlVertex(profile, 8850, 255, 255, 255);
 
-			profile = createXmlProfile(xmlRoot,//
+			profile = createXmlProfile(
+					xmlRoot, //
 					++profileId,
 					"Default 4", //$NON-NLS-1$
 					"profile-default-4", //$NON-NLS-1$
@@ -267,7 +271,8 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 			createXmlVertex(profile, 2000, 100, 0, 59);
 			createXmlVertex(profile, 3000, 0, 102, 127);
 
-			profile = createXmlProfile(xmlRoot,//
+			profile = createXmlProfile(
+					xmlRoot, //
 					++profileId,
 					"Default 5", //$NON-NLS-1$
 					"profile-default-5", //$NON-NLS-1$
@@ -286,7 +291,8 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 			createXmlVertex(profile, 7000, 105, 231, 202);
 			createXmlVertex(profile, 8000, 255, 255, 255);
 
-			profile = createXmlProfile(xmlRoot, //
+			profile = createXmlProfile(
+					xmlRoot, //
 					++profileId,
 					"Default 6", //$NON-NLS-1$
 					"profile-default-6", //$NON-NLS-1$
@@ -432,7 +438,8 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 			// check again after the file was created
 			if (createdProfileFile.exists() == false) {
-				MessageDialog.openError(Display.getCurrent().getActiveShell(),//
+				MessageDialog.openError(
+						Display.getCurrent().getActiveShell(), //
 						"Default Profile", //$NON-NLS-1$
 						NLS.bind("SRTM color profile file {0} could not be created", profileFile.getAbsolutePath())); //$NON-NLS-1$
 				return;
@@ -681,7 +688,9 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 	private void createUI_12_ProfileViewer_Table(final Composite parent) {
 
-		final Table table = new Table(parent, SWT.FULL_SELECTION | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.CHECK);
+		final Table table = new Table(
+				parent,
+				SWT.FULL_SELECTION | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.CHECK);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
 
 		table.setLayout(new TableLayout());
@@ -858,49 +867,19 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 	private void defineAllColumns() {
 
-		defineColumn_ColorImage();
-		defineColumn_ProfileId();
-		defineColumn_ProfileName();
-		defineColumn_Resolution();
-		defineColumn_ShadowState();
-		defineColumn_ShadowValue();
-		defineColumn_TileImagePath();
-	}
-
-	/**
-	 * Column: Color image
-	 */
-	private void defineColumn_ColorImage() {
-
-		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "color", SWT.LEAD); //$NON-NLS-1$
-		_colDefImage = colDef;
-
-		colDef.setColumnLabel(Messages.profileViewer_column_label_color);
-		colDef.setColumnHeaderText(Messages.profileViewer_column_label_color_header);
-		colDef.setColumnHeaderToolTipText(Messages.profileViewer_column_label_color_tooltip);
-		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(50));
-		colDef.setIsDefaultColumn();
-		colDef.setCanModifyVisibility(false);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			/*
-			 * !!! set dummy label provider, otherwise an error occures !!!
-			 */
-			@Override
-			public void update(final ViewerCell cell) {}
-		});
-
-		colDef.setControlListener(new ControlAdapter() {
-			@Override
-			public void controlResized(final ControlEvent e) {
-				onResizeImageColumn();
-			}
-		});
+		defineColumn_10_ProfileId();
+		defineColumn_20_ProfileName();
+		defineColumn_30_ColorImage();
+		defineColumn_50_Resolution();
+		defineColumn_60_ShadowState();
+		defineColumn_70_ShadowValue();
+		defineColumn_80_TileImagePath();
 	}
 
 	/**
 	 * column: id
 	 */
-	private void defineColumn_ProfileId() {
+	private void defineColumn_10_ProfileId() {
 
 		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "profileId", SWT.TRAIL); //$NON-NLS-1$
 
@@ -921,7 +900,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 	/**
 	 * column: profile name
 	 */
-	private void defineColumn_ProfileName() {
+	private void defineColumn_20_ProfileName() {
 
 		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "profileName", SWT.LEAD); //$NON-NLS-1$
 
@@ -941,16 +920,46 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 	}
 
 	/**
+	 * Column: Color image
+	 */
+	private void defineColumn_30_ColorImage() {
+
+		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "color", SWT.LEAD); //$NON-NLS-1$
+		_colDefImage = colDef;
+
+		colDef.setColumnLabel(Messages.profileViewer_column_label_color);
+		colDef.setColumnHeaderText(Messages.profileViewer_column_label_color_header);
+		colDef.setColumnHeaderToolTipText(Messages.profileViewer_column_label_color_tooltip);
+		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(30));
+		colDef.setIsDefaultColumn();
+		colDef.setCanModifyVisibility(false);
+		colDef.setLabelProvider(new CellLabelProvider() {
+			/*
+			 * !!! set dummy label provider, otherwise an error occures !!!
+			 */
+			@Override
+			public void update(final ViewerCell cell) {}
+		});
+
+		colDef.setControlListener(new ControlAdapter() {
+			@Override
+			public void controlResized(final ControlEvent e) {
+				onResizeImageColumn();
+			}
+		});
+	}
+
+	/**
 	 * column: resolution
 	 */
-	private void defineColumn_Resolution() {
+	private void defineColumn_50_Resolution() {
 
 		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "resolution", SWT.LEAD); //$NON-NLS-1$
 
 		colDef.setColumnLabel(Messages.profileViewer_column_label_resolution);
 		colDef.setColumnHeaderText(Messages.profileViewer_column_label_resolution_header);
 		colDef.setColumnHeaderToolTipText(Messages.profileViewer_column_label_resolution_tooltip);
-		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(20));
+		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -965,7 +974,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 	/**
 	 * column: shadow state
 	 */
-	private void defineColumn_ShadowState() {
+	private void defineColumn_60_ShadowState() {
 
 		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "shadowState", SWT.LEAD); //$NON-NLS-1$
 
@@ -987,14 +996,14 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 	/**
 	 * column: shadow value
 	 */
-	private void defineColumn_ShadowValue() {
+	private void defineColumn_70_ShadowValue() {
 
 		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "shadowValue", SWT.LEAD); //$NON-NLS-1$
 
 		colDef.setColumnLabel(Messages.profileViewer_column_label_shadowValue);
 		colDef.setColumnHeaderText(Messages.profileViewer_column_label_shadowValue_header);
 		colDef.setColumnHeaderToolTipText(Messages.profileViewer_column_label_shadowValue_tooltip);
-		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
+		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(5));
 		colDef.setIsDefaultColumn();
 		colDef.setLabelProvider(new CellLabelProvider() {
 			@Override
@@ -1009,7 +1018,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 	/**
 	 * column: image path
 	 */
-	private void defineColumn_TileImagePath() {
+	private void defineColumn_80_TileImagePath() {
 
 		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "tileImagePath", SWT.LEAD); //$NON-NLS-1$
 		colDef.setColumnLabel(Messages.profileViewer_column_label_imagePath);
@@ -1330,7 +1339,17 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 			final Rectangle rect = image.getBounds();
 
 			switch (event.type) {
+
 			case SWT.MeasureItem:
+
+//				System.out.println(
+//						(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
+//								+ ("\tevent.width:" + event.width)
+//								+ ("\trect.width:" + rect.width)
+//								+ ("\tboth:" + (event.width + rect.width))
+//
+//				);
+//				// TODO remove SYSTEM.OUT.PRINTLN
 
 				event.width += rect.width;
 				event.height = Math.max(event.height, rect.height + 2);
@@ -1341,6 +1360,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
 				final int x = event.x + event.width;
 				final int offset = Math.max(0, (event.height - rect.height) / 2);
+
 				event.gc.drawImage(image, x, event.y + offset);
 
 				break;
