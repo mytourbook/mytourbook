@@ -68,7 +68,7 @@ public class HTTPDownloader {
 			}
 		};
 
-		final String jobName = Messages.job_name_httpDownload + ": " + remoteFileName;
+		final String jobName = remoteFileName + " - " + Messages.job_name_httpDownload;
 
 		final Job downloadJob = new Job(jobName) {
 			@Override
