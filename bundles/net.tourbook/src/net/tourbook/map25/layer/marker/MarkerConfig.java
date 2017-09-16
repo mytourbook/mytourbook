@@ -21,40 +21,46 @@ import org.eclipse.swt.graphics.RGB;
 
 public class MarkerConfig {
 
+// SET_FORMATTING_OFF
+	
 	/*
 	 * Set default values also here to ensure that a valid value is set. A default value would not
 	 * be set when an xml tag is not available.
 	 */
 
-	public String					id						= Long.toString(System.nanoTime());
-	public String					defaultId				= Map25ConfigManager.CONFIG_DEFAULT_ID_1;
-	public String					name					= Map25ConfigManager.CONFIG_DEFAULT_ID_1;
+	public String					id							= Long.toString(System.nanoTime());
+	public String					defaultId					= Map25ConfigManager.CONFIG_DEFAULT_ID_1;
+	public String					name						= Map25ConfigManager.CONFIG_DEFAULT_ID_1;
 
 	/*
 	 * Marker
 	 */
-	public boolean					isShowMarkerLabel		= true;
-	public boolean					isShowMarkerPoint		= true;
-	public RGB						markerFill_Color		= Map25ConfigManager.DEFAULT_MARKER_FILL_COLOR;
-	public int						markerFill_Opacity		= Map25ConfigManager.DEFAULT_MARKER_OPACITY;
-	public RGB						markerOutline_Color		= Map25ConfigManager.DEFAULT_MARKER_OUTLINE_COLOR;
-	public int						markerOutline_Opacity	= Map25ConfigManager.DEFAULT_MARKER_OPACITY;
-	public int						markerOrientation		= Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
-	public int						markerSymbolSize		= Map25ConfigManager.DEFAULT_MARKER_SYMBOL_SIZE;
+	public boolean					isShowMarkerLabel			= true;
+	public boolean					isShowMarkerPoint			= true;
+	public RGB						markerFill_Color			= Map25ConfigManager.DEFAULT_MARKER_FILL_COLOR;
+	public int						markerFill_Opacity			= Map25ConfigManager.DEFAULT_MARKER_OPACITY;
+	public RGB						markerOutline_Color			= Map25ConfigManager.DEFAULT_MARKER_OUTLINE_COLOR;
+	public int						markerOutline_Opacity		= Map25ConfigManager.DEFAULT_MARKER_OPACITY;
+	public int						markerOrientation			= Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
+	public int						markerSymbolSize			= Map25ConfigManager.DEFAULT_MARKER_SYMBOL_SIZE;
+	public float					markerSymbolSize_Outline	= Map25ConfigManager.DEFAULT_MARKER_SYMBOL_SIZE_OUTLINE;
 
 	/*
 	 * Cluster
 	 */
-	public boolean					isMarkerClustered		= true;
-	public Enum<ClusterAlgorithm>	clusterAlgorithm		= ClusterAlgorithm.FirstMarker_Grid;
-	public int						clusterFill_Opacity		= Map25ConfigManager.DEFAULT_CLUSTER_OPACITY;
-	public RGB						clusterFill_Color		= Map25ConfigManager.DEFAULT_CLUSTER_FILL_COLOR;
-	public int						clusterOutline_Opacity	= Map25ConfigManager.DEFAULT_CLUSTER_OPACITY;
-	public RGB						clusterOutline_Color	= Map25ConfigManager.DEFAULT_CLUSTER_OUTLINE_COLOR;
-	public int						clusterGridSize			= Map25ConfigManager.DEFAULT_CLUSTER_GRID_SIZE;
-	public int						clusterOrientation		= Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
-	public int						clusterSymbolSize		= Map25ConfigManager.DEFAULT_CLUSTER_SYMBOL_SIZE;
-	public int						clusterSymbolWeight		= Map25ConfigManager.DEFAULT_CLUSTER_SYMBOL_WEIGHT;
+	public boolean					isMarkerClustered			= true;
+	public Enum<ClusterAlgorithm>	clusterAlgorithm			= ClusterAlgorithm.FirstMarker_Grid;
+	public int						clusterFill_Opacity			= Map25ConfigManager.DEFAULT_CLUSTER_OPACITY;
+	public RGB						clusterFill_Color			= Map25ConfigManager.DEFAULT_CLUSTER_FILL_COLOR;
+	public int						clusterOutline_Opacity		= Map25ConfigManager.DEFAULT_CLUSTER_OPACITY;
+	public RGB						clusterOutline_Color		= Map25ConfigManager.DEFAULT_CLUSTER_OUTLINE_COLOR;
+	public int						clusterGridSize				= Map25ConfigManager.DEFAULT_CLUSTER_GRID_SIZE;
+	public int						clusterOrientation			= Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
+	public int						clusterSymbolSize			= Map25ConfigManager.DEFAULT_CLUSTER_SYMBOL_SIZE;
+	public float					clusterSymbolSize_Outline	= Map25ConfigManager.DEFAULT_CLUSTER_SYMBOL_SIZE_OUTLINE;
+	public int						clusterSymbolWeight			= Map25ConfigManager.DEFAULT_CLUSTER_SYMBOL_WEIGHT;
+	
+// SET_FORMATTING_ON
 
 	@Override
 	public boolean equals(final Object obj) {

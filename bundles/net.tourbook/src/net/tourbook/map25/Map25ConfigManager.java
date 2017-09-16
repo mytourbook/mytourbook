@@ -48,12 +48,12 @@ import org.osgi.framework.Version;
 
 public class Map25ConfigManager {
 
-	private static final String					CONFIG_FILE_NAME				= "map25-config.xml";					//$NON-NLS-1$
+	private static final String					CONFIG_FILE_NAME					= "map25-config.xml";				//$NON-NLS-1$
 	//
 	/**
 	 * Version number is not yet used.
 	 */
-	private static final int					CONFIG_VERSION					= 1;
+	private static final int					CONFIG_VERSION						= 1;
 
 // SET_FORMATTING_OFF
 	
@@ -78,114 +78,120 @@ public class Map25ConfigManager {
 	
 // SET_FORMATTING_ON
 
-	public static final String					CONFIG_DEFAULT_ID_1				= "#1";									//$NON-NLS-1$
+	public static final String					CONFIG_DEFAULT_ID_1					= "#1";								//$NON-NLS-1$
 
-	static final String							CONFIG_DEFAULT_ID_2				= "#2";									//$NON-NLS-1$
-	static final String							CONFIG_DEFAULT_ID_3				= "#3";									//$NON-NLS-1$
-	static final String							CONFIG_DEFAULT_ID_4				= "#4";									//$NON-NLS-1$
-	static final String							CONFIG_DEFAULT_ID_5				= "#5";									//$NON-NLS-1$
-	static final String							CONFIG_DEFAULT_ID_6				= "#6";									//$NON-NLS-1$
-	static final String							CONFIG_DEFAULT_ID_7				= "#7";									//$NON-NLS-1$
-	static final String							CONFIG_DEFAULT_ID_8				= "#8";									//$NON-NLS-1$
-	static final String							CONFIG_DEFAULT_ID_9				= "#9";									//$NON-NLS-1$
-	static final String							CONFIG_DEFAULT_ID_10			= "#10";								//$NON-NLS-1$
+	static final String							CONFIG_DEFAULT_ID_2					= "#2";								//$NON-NLS-1$
+	static final String							CONFIG_DEFAULT_ID_3					= "#3";								//$NON-NLS-1$
+	static final String							CONFIG_DEFAULT_ID_4					= "#4";								//$NON-NLS-1$
+	static final String							CONFIG_DEFAULT_ID_5					= "#5";								//$NON-NLS-1$
+	static final String							CONFIG_DEFAULT_ID_6					= "#6";								//$NON-NLS-1$
+	static final String							CONFIG_DEFAULT_ID_7					= "#7";								//$NON-NLS-1$
+	static final String							CONFIG_DEFAULT_ID_8					= "#8";								//$NON-NLS-1$
+	static final String							CONFIG_DEFAULT_ID_9					= "#9";								//$NON-NLS-1$
+	static final String							CONFIG_DEFAULT_ID_10				= "#10";							//$NON-NLS-1$
 	//
 	// common attributes
-	private static final String					ATTR_ACTIVE_CONFIG_ID			= "activeConfigId";						//$NON-NLS-1$
+	private static final String					ATTR_ACTIVE_CONFIG_ID				= "activeConfigId";					//$NON-NLS-1$
 
-	private static final String					ATTR_ID							= "id";									//$NON-NLS-1$
-	private static final String					ATTR_CONFIG_NAME				= "name";								//$NON-NLS-1$
+	private static final String					ATTR_ID								= "id";								//$NON-NLS-1$
+	private static final String					ATTR_CONFIG_NAME					= "name";							//$NON-NLS-1$
 	//
 	/*
 	 * Root
 	 */
-	private static final String					TAG_ROOT						= "Map25Configuration";					//$NON-NLS-1$
-	private static final String					ATTR_CONFIG_VERSION				= "configVersion";						//$NON-NLS-1$
+	private static final String					TAG_ROOT							= "Map25Configuration";				//$NON-NLS-1$
+	private static final String					ATTR_CONFIG_VERSION					= "configVersion";					//$NON-NLS-1$
 	//
 	/*
 	 * Tour options
 	 */
-	private static final String					TAG_OPTIONS						= "Options";							//$NON-NLS-1$
-	private static final String					ATTR_ANIMATION_EASING_TYPE		= "animationEasingType";				//$NON-NLS-1$
-	private static final String					ATTR_ANIMATION_TIME				= "animationTime";						//$NON-NLS-1$
-	private static final String					ATTR_IS_ANIMATE_LOCATION		= "isAnimateLocation";					//$NON-NLS-1$
+	private static final String					TAG_OPTIONS							= "Options";						//$NON-NLS-1$
+	private static final String					ATTR_ANIMATION_EASING_TYPE			= "animationEasingType";			//$NON-NLS-1$
+	private static final String					ATTR_ANIMATION_TIME					= "animationTime";					//$NON-NLS-1$
+	private static final String					ATTR_IS_ANIMATE_LOCATION			= "isAnimateLocation";				//$NON-NLS-1$
 	//
 	/*
 	 * Tour tracks
 	 */
-	private static final String					TAG_TOUR_TRACKS					= "TourTracks";							//$NON-NLS-1$
-	private static final String					TAG_TRACK						= "Track";								//$NON-NLS-1$
+	private static final String					TAG_TOUR_TRACKS						= "TourTracks";						//$NON-NLS-1$
+	private static final String					TAG_TRACK							= "Track";							//$NON-NLS-1$
 	//
 	// outline
-	private static final String					TAG_OUTLINE						= "Outline";							//$NON-NLS-1$
-	private static final String					ATTR_OUTLINE_WIDTH				= "width";								//$NON-NLS-1$
+	private static final String					TAG_OUTLINE							= "Outline";						//$NON-NLS-1$
+	private static final String					ATTR_OUTLINE_WIDTH					= "width";							//$NON-NLS-1$
 	//
-	public static final float					OUTLINE_WIDTH_MIN				= 0.1f;
-	public static final float					OUTLINE_WIDTH_MAX				= 10.0f;
-	public static final float					DEFAULT_OUTLINE_WIDTH			= 2.5f;
-	public static final RGB						DEFAULT_OUTLINE_COLOR			= new RGB(0x80, 0x0, 0x80);
+	public static final float					OUTLINE_WIDTH_MIN					= 0.1f;
+	public static final float					OUTLINE_WIDTH_MAX					= 10.0f;
+	public static final float					DEFAULT_OUTLINE_WIDTH				= 2.5f;
+	public static final RGB						DEFAULT_OUTLINE_COLOR				= new RGB(0x80, 0x0, 0x80);
 	//
 	// other properties
-	public static final int						DEFAULT_ANIMATION_TIME			= 2000;
+	public static final int						DEFAULT_ANIMATION_TIME				= 2000;
 	//
 	/*
 	 * Tour Markers
 	 */
-	private static final String					TAG_TOUR_MARKERS				= "TourMarkers";						//$NON-NLS-1$
-	private static final String					TAG_MARKER						= "Marker";								//$NON-NLS-1$
+	private static final String					TAG_TOUR_MARKERS					= "TourMarkers";					//$NON-NLS-1$
+	private static final String					TAG_MARKER							= "Marker";							//$NON-NLS-1$
 	//
 	// marker
-	private static final String					TAG_MARKER_FILL_COLOR			= "MarkerFillColor";					//$NON-NLS-1$
-	private static final String					TAG_MARKER_OUTLINE_COLOR		= "MarkerOutlineColor";					//$NON-NLS-1$
-	private static final String					ATTR_IS_SHOW_MARKER_LABEL		= "isShowMarkerLabel";					//$NON-NLS-1$
-	private static final String					ATTR_IS_SHOW_MARKER_POINT		= "isShowMarkerPoint";					//$NON-NLS-1$
-	private static final String					ATTR_MARKER_ORIENTATION			= "markerOrientation";					//$NON-NLS-1$
-	private static final String					ATTR_MARKER_SYMBOL_SIZE			= "markerSymbolSize";					//$NON-NLS-1$
+	private static final String					TAG_MARKER_FILL_COLOR				= "MarkerFillColor";				//$NON-NLS-1$
+	private static final String					TAG_MARKER_OUTLINE_COLOR			= "MarkerOutlineColor";				//$NON-NLS-1$
+	private static final String					ATTR_IS_SHOW_MARKER_LABEL			= "isShowMarkerLabel";				//$NON-NLS-1$
+	private static final String					ATTR_IS_SHOW_MARKER_POINT			= "isShowMarkerPoint";				//$NON-NLS-1$
+	private static final String					ATTR_MARKER_ORIENTATION				= "markerOrientation";				//$NON-NLS-1$
+	private static final String					ATTR_MARKER_SYMBOL_SIZE				= "markerSymbolSize";				//$NON-NLS-1$
 	//
 	// cluster
-	private static final String					TAG_CLUSTER_FILL_COLOR			= "ClusterFillColor";					//$NON-NLS-1$
-	private static final String					TAG_CLUSTER_OUTLINE_COLOR		= "ClusterOutlineColor";				//$NON-NLS-1$
-	private static final String					ATTR_CLUSTER_ALGORITHM			= "clusterAlgorithm";					//$NON-NLS-1$
-	private static final String					ATTR_CLUSTER_GRID_SIZE			= "clusterGridSize";					//$NON-NLS-1$
-	private static final String					ATTR_CLUSTER_ORIENTATION		= "clusterOrientation";					//$NON-NLS-1$
-	private static final String					ATTR_CLUSTER_SYMBOL_SIZE		= "clusterSymbolSize";					//$NON-NLS-1$
-	private static final String					ATTR_CLUSTER_SYMBOL_WEIGHT		= "clusterSymbolWeight";				//$NON-NLS-1$
-	private static final String					ATTR_IS_MARKER_CLUSTERED		= "isMarkerClustered";					//$NON-NLS-1$
+	private static final String					TAG_CLUSTER_FILL_COLOR				= "ClusterFillColor";				//$NON-NLS-1$
+	private static final String					TAG_CLUSTER_OUTLINE_COLOR			= "ClusterOutlineColor";			//$NON-NLS-1$
+	private static final String					ATTR_CLUSTER_ALGORITHM				= "clusterAlgorithm";				//$NON-NLS-1$
+	private static final String					ATTR_CLUSTER_GRID_SIZE				= "clusterGridSize";				//$NON-NLS-1$
+	private static final String					ATTR_CLUSTER_ORIENTATION			= "clusterOrientation";				//$NON-NLS-1$
+	private static final String					ATTR_CLUSTER_SYMBOL_SIZE			= "clusterSymbolSize";				//$NON-NLS-1$
+	private static final String					ATTR_CLUSTER_SYMBOL_WEIGHT			= "clusterSymbolWeight";			//$NON-NLS-1$
+	private static final String					ATTR_IS_MARKER_CLUSTERED			= "isMarkerClustered";				//$NON-NLS-1$
 	//
 	// symbol
-	public static final int						DEFAULT_MARKER_SYMBOL_SIZE		= 20;
-	public static final int						MARKER_SYMBOL_SIZE_MIN			= 10;
-	public static final int						MARKER_SYMBOL_SIZE_MAX			= 200;
+	public static final int						DEFAULT_MARKER_SYMBOL_SIZE			= 20;
+	public static final float					DEFAULT_MARKER_SYMBOL_SIZE_OUTLINE	= 2.0f;
+	public static final int						MARKER_SYMBOL_SIZE_MIN				= 10;
+	public static final int						MARKER_SYMBOL_SIZE_MAX				= 200;
+	public static final float					MARKER_SYMBOL_SIZE_OUTLINE_MIN		= 0;
+	public static final float					MARKER_SYMBOL_SIZE_OUTLINE_MAX		= 10;
 	//
 	// CLUSTER
-	public static final int						DEFAULT_CLUSTER_GRID_SIZE		= 60;
-	public static final int						DEFAULT_CLUSTER_SYMBOL_SIZE		= 10;
-	public static final int						DEFAULT_CLUSTER_SYMBOL_WEIGHT	= 20;
-	public static final int						CLUSTER_GRID_MIN_SIZE			= 1;
-	public static final int						CLUSTER_GRID_MAX_SIZE			= 10000;
-	public static final int						CLUSTER_SYMBOL_SIZE_MIN			= 5;
-	public static final int						CLUSTER_SYMBOL_SIZE_MAX			= 200;
-	public static final int						CLUSTER_SYMBOL_WEIGHT_MIN		= 0;
-	public static final int						CLUSTER_SYMBOL_WEIGHT_MAX		= 100;
+	public static final int						DEFAULT_CLUSTER_GRID_SIZE			= 60;
+	public static final int						DEFAULT_CLUSTER_SYMBOL_SIZE			= 10;
+	public static final int						DEFAULT_CLUSTER_SYMBOL_WEIGHT		= 20;
+	public static final int						CLUSTER_GRID_MIN_SIZE				= 1;
+	public static final int						CLUSTER_GRID_MAX_SIZE				= 10000;
+	public static final int						CLUSTER_SYMBOL_SIZE_MIN				= 5;
+	public static final int						CLUSTER_SYMBOL_SIZE_MAX				= 200;
+	public static final int						CLUSTER_SYMBOL_SIZE_OUTLINE_MIN		= 0;
+	public static final int						CLUSTER_SYMBOL_SIZE_OUTLINE_MAX		= 10;
+	public static final int						CLUSTER_SYMBOL_WEIGHT_MIN			= 0;
+	public static final int						CLUSTER_SYMBOL_WEIGHT_MAX			= 100;
 	//
 	// colors
-	public static final int						DEFAULT_CLUSTER_OPACITY			= 80;
-	public static final RGB						DEFAULT_CLUSTER_OUTLINE_COLOR	= new RGB(0xff, 0xff, 0xff);
-	public static final RGB						DEFAULT_CLUSTER_FILL_COLOR		= new RGB(0xFC, 0x67, 0x00);
-	public static final int						DEFAULT_MARKER_OPACITY			= 80;
-	public static final RGB						DEFAULT_MARKER_OUTLINE_COLOR	= new RGB(0, 0, 0);
-	public static final RGB						DEFAULT_MARKER_FILL_COLOR		= new RGB(0xFF, 0xFF, 0x00);
+	public static final int						DEFAULT_CLUSTER_OPACITY				= 80;
+	public static final RGB						DEFAULT_CLUSTER_OUTLINE_COLOR		= new RGB(0xff, 0xff, 0xff);
+	public static final RGB						DEFAULT_CLUSTER_FILL_COLOR			= new RGB(0xFC, 0x67, 0x00);
+	public static final float					DEFAULT_CLUSTER_SYMBOL_SIZE_OUTLINE	= 2.0f;
+	public static final int						DEFAULT_MARKER_OPACITY				= 80;
+	public static final RGB						DEFAULT_MARKER_OUTLINE_COLOR		= new RGB(0, 0, 0);
+	public static final RGB						DEFAULT_MARKER_FILL_COLOR			= new RGB(0xFF, 0xFF, 0x00);
 	//
 	// map movement with animation
-	private static final Type					ANIMATION_EASING_TYPE_DEFAULT	= Easing.Type.SINE_INOUT;
-	private static final boolean				IS_ANIMATE_LOCATION_DEFAULT		= true;
-	private static final float					LOCATION_ANIMATION_TIME_DEFAULT	= 3.0f;
-	public static final float					LOCATION_ANIMATION_TIME_MIN		= 0f;
-	public static final float					LOCATION_ANIMATION_TIME_MAX		= 60.0f;
+	private static final Type					ANIMATION_EASING_TYPE_DEFAULT		= Easing.Type.SINE_INOUT;
+	private static final boolean				IS_ANIMATE_LOCATION_DEFAULT			= true;
+	private static final float					LOCATION_ANIMATION_TIME_DEFAULT		= 3.0f;
+	public static final float					LOCATION_ANIMATION_TIME_MIN			= 0f;
+	public static final float					LOCATION_ANIMATION_TIME_MAX			= 60.0f;
 	//
-	public static Type							animationEasingType				= ANIMATION_EASING_TYPE_DEFAULT;
-	public static float							animationTime					= LOCATION_ANIMATION_TIME_DEFAULT;
-	public static boolean						isAnimateLocation				= IS_ANIMATE_LOCATION_DEFAULT;
+	public static Type							animationEasingType					= ANIMATION_EASING_TYPE_DEFAULT;
+	public static float							animationTime						= LOCATION_ANIMATION_TIME_DEFAULT;
+	public static boolean						isAnimateLocation					= IS_ANIMATE_LOCATION_DEFAULT;
 	//
 	// !!! this is a code formatting separator !!!
 	static {}
