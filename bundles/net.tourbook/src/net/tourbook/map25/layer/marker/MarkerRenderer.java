@@ -151,6 +151,7 @@ public class MarkerRenderer extends BucketRenderer {
 	private int								_clusterGridSize		= MAP_GRID_SIZE_DP;
 	private int								_clusterSymbolSizeDP	= MAP_MARKER_CLUSTER_SIZE_DP;
 	private int								_clusterSymbolWeight;
+	private float							_clusterOutlineSize;
 
 	/**
 	 * When <code>true</code> all items are clustered, otherwise nothing is clustered.
@@ -224,8 +225,10 @@ public class MarkerRenderer extends BucketRenderer {
 
 		final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
-		_clusterSymbolSizeDP = config.clusterSymbolSize;
-		_clusterSymbolWeight = config.clusterSymbolWeight;
+		_clusterSymbolSizeDP = config.clusterSymbol_Size;
+		_clusterSymbolWeight = config.clusterSymbol_Weight;
+		_clusterOutlineSize = config.clusterOutline_Size;
+
 		_isBillboard = config.clusterOrientation == Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
 
 		_clusterForegroundColor = ColorUtil.getARGB(
@@ -242,7 +245,7 @@ public class MarkerRenderer extends BucketRenderer {
 		_clusterBitmaps.clear();
 
 		final boolean isClustering = config.isMarkerClustered;
-		final int clusterGridSize = config.clusterGridSize;
+		final int clusterGridSize = config.clusterGrid_Size;
 		final ClusterAlgorithm clusterAlgorithm = (ClusterAlgorithm) config.clusterAlgorithm;
 
 		// check if modified, this is an expensive operation
@@ -319,7 +322,7 @@ public class MarkerRenderer extends BucketRenderer {
 		_markerLayer.map().viewport().getMapPosition(currentMapPos);
 		final double zoom = currentMapPos.zoomLevel;
 
-		final int clusterGridSize = ScreenUtils.getPixels(_clusterGridSize);
+		final int clusterGridSize = (int) ScreenUtils.getPixels(_clusterGridSize);
 
 		final Set<? extends Cluster<ClusterItem>> markerClusters = _distanceAlgorithm.getClusters(
 				zoom,
@@ -394,7 +397,7 @@ public class MarkerRenderer extends BucketRenderer {
 		 * the grid slot size in px. increase to group more aggressively. currently set to marker
 		 * size
 		 */
-		final int clusterGridSize = ScreenUtils.getPixels(_clusterGridSize);
+		final int clusterGridSize = (int) ScreenUtils.getPixels(_clusterGridSize);
 
 		/*
 		 * the factor to map into Grid Coordinates (discrete squares of GRIDSIZE x GRIDSIZE)
@@ -480,27 +483,51 @@ public class MarkerRenderer extends BucketRenderer {
 		final int markerFill_Opacity = (int) (config.markerFill_Opacity / 100.0 * 0xff);
 		final int markerOutline_Opacity = (int) (config.markerOutline_Opacity / 100.0 * 0xff);
 
-		final Paint paintFill = CanvasAdapter.newPaint();
-		paintFill.setStyle(Paint.Style.FILL);
-		paintFill.setColor(ColorUtil.getARGB(config.markerFill_Color, markerFill_Opacity));
+		/**
+		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		 * <p>
+		 * Painting with decimals is not working correctly because AWT do not support it, all is
+		 * converted to integer. It took me some hours to not find a solution.
+		 * <p>
+		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		 */
+		final float outlineWidth = ScreenUtils.getPixels(config.markerOutline_Size);
+		final float symbolSize = ScreenUtils.getPixels(config.markerSymbol_Size);
 
-		final Paint paintOutline = CanvasAdapter.newPaint();
-		paintOutline.setStyle(Paint.Style.STROKE);
-		paintOutline.setStrokeWidth(ScreenUtils.getPixels(2));
-		paintOutline.setColor(ColorUtil.getARGB(config.markerOutline_Color, markerOutline_Opacity));
+		final int outlineWidthInt = (int) Math.ceil(outlineWidth);
+		final int symbolSizeInt = (int) Math.ceil(symbolSize);
 
-		final int iconSize = ScreenUtils.getPixels(config.markerSymbolSize);
+		final float symbolRadius = symbolSizeInt / 2;
 
-		final Bitmap bitmap = CanvasAdapter.newBitmap(iconSize, iconSize, 0);
+		final int bitmapSizeInt = symbolSizeInt + 2 * outlineWidthInt + 6;
+		final int bitmapSize2Int = bitmapSizeInt / 2;
+
+		final float outlineRadius = symbolRadius + outlineWidth / 2;
+		final float fillRadius = outlineRadius - outlineWidth / 2;
+
+		final int noClippingPos = bitmapSize2Int + 1;
+
+		final Paint fillPainter = CanvasAdapter.newPaint();
+		fillPainter.setStyle(Paint.Style.FILL);
+		fillPainter.setColor(ColorUtil.getARGB(config.markerFill_Color, markerFill_Opacity));
+
+		final Bitmap bitmap = CanvasAdapter.newBitmap(bitmapSizeInt, bitmapSizeInt, 0);
 		final org.oscim.backend.canvas.Canvas canvas = CanvasAdapter.newCanvas();
 		canvas.setBitmap(bitmap);
 
-		final int iconSize2 = iconSize / 2;
-		final int noneClippingRadius = iconSize2 - ScreenUtils.getPixels(2);
+		// fill symbol
+		canvas.drawCircle(noClippingPos, noClippingPos, fillRadius, fillPainter);
 
-		// fill + outline
-		canvas.drawCircle(iconSize2, iconSize2, noneClippingRadius, paintFill);
-		canvas.drawCircle(iconSize2, iconSize2, noneClippingRadius, paintOutline);
+		// draw outline
+		if (outlineWidth > 0) {
+
+			final Paint outlinePainter = CanvasAdapter.newPaint();
+			outlinePainter.setStyle(Paint.Style.STROKE);
+			outlinePainter.setStrokeWidth(outlineWidth);
+			outlinePainter.setColor(ColorUtil.getARGB(config.markerOutline_Color, markerOutline_Opacity));
+
+			canvas.drawCircle(noClippingPos, noClippingPos, outlineRadius, outlinePainter);
+		}
 
 		final boolean isBillboard = config.markerOrientation == Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
 
@@ -534,7 +561,8 @@ public class MarkerRenderer extends BucketRenderer {
 				_clusterBackgroundColor,
 
 				Integer.toString(size),
-				_clusterSymbolWeight);
+				_clusterSymbolWeight,
+				_clusterOutlineSize);
 
 		final Bitmap paintedBitmap = drawable.getBitmap();
 

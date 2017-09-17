@@ -28,12 +28,13 @@ public class ScreenUtils {
 
 	public static class ClusterDrawable {
 
-		private Paint	_paintFill		= CanvasAdapter.newPaint();
-		private Paint	_paintOutline	= CanvasAdapter.newPaint();
-		private Paint	_paintText		= CanvasAdapter.newPaint();
+		private Paint	_fillPainter	= CanvasAdapter.newPaint();
+		private Paint	_outlinePainter	= CanvasAdapter.newPaint();
+		private Paint	_textPainter	= CanvasAdapter.newPaint();
 
 		private int		_symbolSize;
-		private String	mText;
+		private String	_text;
+		private float	_outlineWidth;
 
 		/**
 		 * Generates a circle with a number inside
@@ -47,49 +48,62 @@ public class ScreenUtils {
 		 * @param text
 		 *            Text inside. Will only work for a single character!
 		 * @param symbolSizeWeight
+		 * @param clusterOutlineSize
 		 */
 		public ClusterDrawable(	final int sizedp,
 								final int foregroundColor,
 								final int backgroundColor,
 								final String text,
-								final int symbolSizeWeight) {
+								final int symbolSizeWeight,
+								final float clusterOutlineSize) {
 
-			mText = text;
+			_text = text;
+			_outlineWidth = clusterOutlineSize;
 
 			setup(sizedp, foregroundColor, backgroundColor, symbolSizeWeight);
 		}
 
-		private void draw(final Canvas canvas) {
-
-			final int halfsize = _symbolSize >> 1;
-			final int noneClippingRadius = halfsize - getPixels(2);
-
-			// fill
-			canvas.drawCircle(halfsize, halfsize, noneClippingRadius, _paintFill);
-
-			// outline
-			canvas.drawCircle(halfsize, halfsize, noneClippingRadius, _paintOutline);
-
-			// draw the number at the center
-			canvas.drawText(
-					mText,
-					(canvas.getWidth() - _paintText.getTextWidth(mText)) * 0.5f - 0.5f,
-					(canvas.getHeight() + _paintText.getTextHeight(mText)) * 0.5f,
-					_paintText);
-		}
-
 		public Bitmap getBitmap() {
 
-			int width = _symbolSize, height = _symbolSize;
+			/**
+			 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			 * <p>
+			 * Painting with decimals is not working correctly because AWT do not support it, all is
+			 * converted to integer. It took me some hours to not find a solution.
+			 * <p>
+			 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			 */
+			final int outlineWidthInt = (int) Math.ceil(_outlineWidth);
+			final int symbolSizeInt = (int) Math.ceil(_symbolSize);
 
-			width = width > 0 ? width : 1;
-			height = height > 0 ? height : 1;
+			final float symbolRadius = symbolSizeInt / 2;
 
-			final Bitmap bitmap = CanvasAdapter.newBitmap(width, height, 0);
+			final int bitmapSizeInt = symbolSizeInt + 2 * outlineWidthInt + 6;
+			final int bitmapSize2Int = bitmapSizeInt / 2;
+
+			final float outlineRadius = symbolRadius + _outlineWidth / 2;
+			final float fillRadius = outlineRadius - _outlineWidth / 2;
+
+			final int noClippingPos = bitmapSize2Int + 1;
+
+			final Bitmap bitmap = CanvasAdapter.newBitmap(bitmapSizeInt, bitmapSizeInt, 0);
 			final Canvas canvas = CanvasAdapter.newCanvas();
 			canvas.setBitmap(bitmap);
 
-			draw(canvas);
+			// fill symbol
+			canvas.drawCircle(noClippingPos, noClippingPos, fillRadius, _fillPainter);
+
+			// draw outline
+			if (_outlineWidth > 0) {
+				canvas.drawCircle(noClippingPos, noClippingPos, outlineRadius, _outlinePainter);
+			}
+
+			// draw the number at the center
+			canvas.drawText(
+					_text,
+					(canvas.getWidth() - _textPainter.getTextWidth(_text)) * 0.5f - 0.5f,
+					(canvas.getHeight() + _textPainter.getTextHeight(_text)) * 0.5f,
+					_textPainter);
 
 			return bitmap;
 		}
@@ -105,9 +119,9 @@ public class ScreenUtils {
 							final int backgroundColor,
 							final int symbolSizeWeight) {
 
-			final int defaultSymbolSize = getPixels(symbolSizeDP);
+			final float defaultSymbolSize = getPixels(symbolSizeDP);
 
-			final int numDigits = mText.length();
+			final int numDigits = _text.length();
 
 			float textSize;
 			final double symbolSizeFactor = numDigits * symbolSizeWeight;
@@ -141,20 +155,18 @@ public class ScreenUtils {
 				break;
 			}
 
-			final float outlineWidth = 1.0f;//Math.min(1.0f, _symbolSize * 0.2f);
-
-			_paintText.setTextSize(getPixels(textSize));
-			_paintText.setColor(foregroundColor);
+			_textPainter.setTextSize(getPixels(textSize));
+			_textPainter.setColor(foregroundColor);
 
 			// using a different font that the + is centered, with default it is not which is very ugly!
-			_paintText.setTypeface(FontFamily.MONOSPACE, FontStyle.BOLD);
+			_textPainter.setTypeface(FontFamily.MONOSPACE, FontStyle.BOLD);
 
-			_paintFill.setColor(backgroundColor);
-			_paintFill.setStyle(Paint.Style.FILL);
+			_fillPainter.setColor(backgroundColor);
+			_fillPainter.setStyle(Paint.Style.FILL);
 
-			_paintOutline.setColor(foregroundColor);
-			_paintOutline.setStyle(Paint.Style.STROKE);
-			_paintOutline.setStrokeWidth(getPixels(outlineWidth));//getPixels(2.0f));
+			_outlinePainter.setColor(foregroundColor);
+			_outlinePainter.setStyle(Paint.Style.STROKE);
+			_outlinePainter.setStrokeWidth(getPixels(_outlineWidth));
 		}
 	}
 
@@ -166,8 +178,8 @@ public class ScreenUtils {
 	 *            {@link https://developer.android.com/guide/practices/screens_support.html}
 	 * @return Value in PX according to screen density
 	 */
-	public static int getPixels(final float dp) {
+	public static float getPixels(final float dp) {
 
-		return (int) (CanvasAdapter.dpi / CanvasAdapter.DEFAULT_DPI * dp);
+		return CanvasAdapter.dpi / CanvasAdapter.DEFAULT_DPI * dp;
 	}
 }
