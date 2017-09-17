@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -68,7 +68,9 @@ public class HTTPDownloader {
 			}
 		};
 
-		final Job downloadJob = new Job(Messages.job_name_httpDownload) {
+		final String jobName = remoteFileName + " - " + Messages.job_name_httpDownload;
+
+		final Job downloadJob = new Job(jobName) {
 			@Override
 			protected IStatus run(final IProgressMonitor monitor) {
 
@@ -91,19 +93,42 @@ public class HTTPDownloader {
 					final byte[] buffer = new byte[1024];
 					int numRead;
 
+					long startTime = System.currentTimeMillis();
+
+					monitor.beginTask(jobName, IProgressMonitor.UNKNOWN);
+
 					while ((numRead = inputStream.read(buffer)) != -1) {
+
 						outputStream.write(buffer, 0, numRead);
 						numWritten[0] += numRead;
+
+						// show number of received bytes
+						final long currentTime = System.currentTimeMillis();
+						if (currentTime > startTime + 1000) {
+
+							startTime = currentTime;
+
+							monitor.setTaskName("" + numWritten[0]);
+						}
 					}
 
 					System.out.println("# Bytes localName = " + numWritten); //$NON-NLS-1$
 
 				} catch (final UnknownHostException e) {
-					return new Status(IStatus.ERROR, TourbookPlugin.PLUGIN_ID, IStatus.ERROR,//
+
+					return new Status(
+							IStatus.ERROR,
+							TourbookPlugin.PLUGIN_ID,
+							IStatus.ERROR, //
 							NLS.bind(Messages.error_message_cannotConnectToServer, urlBase),
 							e);
+
 				} catch (final SocketTimeoutException e) {
-					return new Status(IStatus.ERROR, TourbookPlugin.PLUGIN_ID, IStatus.ERROR, //
+
+					return new Status(
+							IStatus.ERROR,
+							TourbookPlugin.PLUGIN_ID,
+							IStatus.ERROR, //
 							NLS.bind(Messages.error_message_timeoutWhenConnectingToServer, urlBase),
 							e);
 //				} catch (final FileNotFoundException e) {
@@ -111,6 +136,7 @@ public class HTTPDownloader {
 //							NLS.bind(Messages.error_message_fileNotFoundException, address),
 //							e);
 				} catch (final Exception e) {
+
 					return new Status(IStatus.ERROR, TourbookPlugin.PLUGIN_ID, IStatus.ERROR, e.getMessage(), e);
 
 				} finally {

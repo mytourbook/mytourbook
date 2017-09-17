@@ -1435,7 +1435,6 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		final boolean isOneTour = _isTourOrWayPoint && (isMultipleTours == false) && _isShowTour;
 
 		_actionMapColor.setEnabled(isTourAvailable);
-		_actionZoom_ShowEntireTour.setEnabled(_isTourOrWayPoint && _isShowTour && isTourAvailable);
 		_actionShowLegendInMap.setEnabled(_isTourOrWayPoint);
 		_actionShowSliderInLegend.setEnabled(_isTourOrWayPoint && _isShowLegend);
 		_actionShowSliderInMap.setEnabled(_isTourOrWayPoint);
@@ -1444,7 +1443,8 @@ public class Map2View extends ViewPart implements IMapContextProvider, IPhotoEve
 		_actionShowTourInMap.setEnabled(_isTourOrWayPoint);
 		_actionShowTourMarker.setEnabled(_isTourOrWayPoint);
 		_actionShowWayPoints.setEnabled(_isTourOrWayPoint);
-
+		_actionZoom_Centered.setEnabled(isTourAvailable);
+		_actionZoom_ShowEntireTour.setEnabled(_isTourOrWayPoint && _isShowTour && isTourAvailable);
 		_actionSyncTourZoomLevel.setEnabled(isOneTour);
 		_actionSyncMap_WithOtherMap.setEnabled(true);
 		_actionSyncMap_WithChartSlider.setEnabled(isTourAvailable);

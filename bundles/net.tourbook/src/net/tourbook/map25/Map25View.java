@@ -663,8 +663,6 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		addSelectionListener();
 		MapBookmarkManager.addBookmarkListener(this);
 		MapManager.addMapSyncListener(this);
-
-		showToursFromTourProvider();
 	}
 
 	private void createUI(final Composite parent) {
@@ -1294,6 +1292,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		_actionSyncMap_WithOtherMap.setChecked(_isMapSynched_WithOtherMap);
 
 		enableActions();
+
+		showToursFromTourProvider();
 	}
 
 	private void saveState() {
