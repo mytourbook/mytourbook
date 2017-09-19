@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -62,9 +62,9 @@ import org.eclipse.ui.PlatformUI;
 
 public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-	public static final String			ID								= "net.tourbook.preferences.PrefPageGeneralId"; //$NON-NLS-1$
+	public static final String			ID								= "net.tourbook.preferences.PrefPageGeneralId";	//$NON-NLS-1$
 
-	private static final String			STATE_GENERAL_SELECTED_TAB		= "STATE_GENERAL_SELECTED_TAB";				//$NON-NLS-1$
+	private static final String			STATE_GENERAL_SELECTED_TAB		= "STATE_GENERAL_SELECTED_TAB";					//$NON-NLS-1$
 
 	/*
 	 * contains the tab folder index
@@ -170,7 +170,8 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 		{
 
 			_tabFolder = new TabFolder(parent, SWT.TOP);
-			GridDataFactory.fillDefaults()//
+			GridDataFactory
+					.fillDefaults()//
 					.grab(true, true)
 					.applyTo(_tabFolder);
 			{
@@ -198,7 +199,8 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.swtDefaults()//
+		GridLayoutFactory
+				.swtDefaults()//
 				.numColumns(2)
 				.extendedMargins(5, 5, 10, 5)
 				.spacing(20, 5)
@@ -306,7 +308,8 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 				 */
 				_chkShowMeasurementInAppToolbar = new Button(container, SWT.CHECK);
 				_chkShowMeasurementInAppToolbar.setText(Messages.Pref_general_show_system_in_ui);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.span(2, 1)
 						.indent(0, _pc.convertVerticalDLUsToPixels(8))
 						.applyTo(_chkShowMeasurementInAppToolbar);
@@ -339,10 +342,12 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 		final int defaultTextWidth = _pc.convertWidthInCharsToPixels(60);
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
+		GridDataFactory
+				.fillDefaults()//
 				.grab(true, true)
 				.applyTo(container);
-		GridLayoutFactory.swtDefaults()//
+		GridLayoutFactory
+				.swtDefaults()//
 				.numColumns(2)
 				.extendedMargins(5, 5, 10, 5)
 				.applyTo(container);
@@ -356,7 +361,8 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
 				label.setText(NLS.bind(Messages.Pref_General_Label_DefaultLocalTimeZone, defaultTimeZoneId));
 
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.span(2, 1)
 						.grab(true, false)
 						.indent(0, verticalSpacing)
@@ -370,7 +376,8 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 				_chkUseAnotherTimeZone = new Button(container, SWT.CHECK);
 				_chkUseAnotherTimeZone.setText(NLS.bind(Messages.Pref_General_Checkbox_SetTimeZone, defaultTimeZoneId));
 				_chkUseAnotherTimeZone.addSelectionListener(timeZoneListener);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.span(2, 1)
 						.indent(0, 2 * verticalSpacing)
 						.applyTo(_chkUseAnotherTimeZone);
@@ -383,7 +390,8 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 				_lblTimeZoneInfo = new Label(container, SWT.WRAP);
 				_lblTimeZoneInfo.setText(Messages.Pref_General_Label_SetAnotherTimeZone);
 
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.grab(true, false)
 						.span(2, 1)
 						.indent(columnIndent, verticalSpacing)
@@ -399,7 +407,8 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 				_rdoTimeZone_1 = new Button(container, SWT.RADIO);
 				_rdoTimeZone_1.setText(Messages.Pref_General_Label_LocalTimeZone_1);
 				_rdoTimeZone_1.addSelectionListener(timeZoneListener);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.indent(columnIndent, 2 * verticalSpacing)
 						.applyTo(_rdoTimeZone_1);
 
@@ -407,7 +416,8 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 				_comboTimeZone_1 = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
 				_comboTimeZone_1.setVisibleItemCount(50);
 				_comboTimeZone_1.addSelectionListener(timeZoneListener);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.indent(_pc.convertWidthInCharsToPixels(2), 2 * verticalSpacing)
 						.align(SWT.BEGINNING, SWT.FILL)
 						.applyTo(_comboTimeZone_1);
@@ -426,7 +436,8 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 				_rdoTimeZone_2 = new Button(container, SWT.RADIO);
 				_rdoTimeZone_2.setText(Messages.Pref_General_Label_LocalTimeZone_2);
 				_rdoTimeZone_2.addSelectionListener(timeZoneListener);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.indent(columnIndent, 0)
 						.applyTo(_rdoTimeZone_2);
 
@@ -434,7 +445,8 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 				_comboTimeZone_2 = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
 				_comboTimeZone_2.setVisibleItemCount(50);
 				_comboTimeZone_2.addSelectionListener(timeZoneListener);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.indent(_pc.convertWidthInCharsToPixels(2), 0)
 						.align(SWT.BEGINNING, SWT.FILL)
 						.applyTo(_comboTimeZone_2);
@@ -453,7 +465,8 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 				_rdoTimeZone_3 = new Button(container, SWT.RADIO);
 				_rdoTimeZone_3.setText(Messages.Pref_General_Label_LocalTimeZone_3);
 				_rdoTimeZone_3.addSelectionListener(timeZoneListener);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.indent(columnIndent, 0)
 						.applyTo(_rdoTimeZone_3);
 
@@ -461,7 +474,8 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 				_comboTimeZone_3 = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
 				_comboTimeZone_3.setVisibleItemCount(50);
 				_comboTimeZone_3.addSelectionListener(timeZoneListener);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.indent(_pc.convertWidthInCharsToPixels(2), 0)
 						.align(SWT.BEGINNING, SWT.FILL)
 						.applyTo(_comboTimeZone_3);
@@ -485,7 +499,8 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 						doTimeZoneLiveUpdate();
 					}
 				});
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.grab(true, true)
 						.align(SWT.FILL, SWT.END)
 						.span(2, 1)
@@ -501,7 +516,8 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.swtDefaults()//
+		GridLayoutFactory
+				.swtDefaults()//
 				.numColumns(2)
 				.extendedMargins(5, 5, 10, 5)
 				.spacing(20, 5)
@@ -578,7 +594,8 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 					onComputeCalendarWeek();
 				}
 			});
-			GridDataFactory.fillDefaults()//
+			GridDataFactory
+					.fillDefaults()//
 					.align(SWT.BEGINNING, SWT.FILL)
 					.span(2, 1)
 					.indent(0, _pc.convertHeightInCharsToPixels(2))
@@ -592,7 +609,8 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.swtDefaults()//
+		GridLayoutFactory
+				.swtDefaults()//
 				.extendedMargins(5, 5, 10, 5)
 				.applyTo(container);
 		{
@@ -708,12 +726,14 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 	 */
 	private void onComputeCalendarWeek() {
 
+		// set app wide week settings
 		saveState();
 
-		_currentFirstDayOfWeek = _backupFirstDayOfWeek = _prefStoreCommon
-				.getInt(ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK);
-		_currentMinimalDaysInFirstWeek = _backupMinimalDaysInFirstWeek = _prefStoreCommon
-				.getInt(ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK);
+		_currentFirstDayOfWeek = _backupFirstDayOfWeek =
+				_prefStoreCommon.getInt(ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK);
+
+		_currentMinimalDaysInFirstWeek = _backupMinimalDaysInFirstWeek =
+				_prefStoreCommon.getInt(ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK);
 
 		final IRunnableWithProgress runnable = new IRunnableWithProgress() {
 			@Override
@@ -721,8 +741,10 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
 				Connection conn = null;
 				try {
+
 					conn = TourDatabase.getInstance().getConnection();
-					TourDatabase.updateTourWeek(conn, monitor, _backupFirstDayOfWeek, _backupMinimalDaysInFirstWeek);
+					TourDatabase.updateTourWeek(conn, monitor);
+
 				} catch (final SQLException e) {
 					net.tourbook.ui.UI.showSQLException(e);
 				} finally {
@@ -831,11 +853,12 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
 			// calendar week
 			_backupFirstDayOfWeek = //
-			_currentFirstDayOfWeek = _prefStoreCommon.getDefaultInt(ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK);
+					_currentFirstDayOfWeek = _prefStoreCommon.getDefaultInt(
+							ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK);
 
 			_backupMinimalDaysInFirstWeek = //
-			_currentMinimalDaysInFirstWeek = _prefStoreCommon
-					.getDefaultInt(ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK);
+					_currentMinimalDaysInFirstWeek = _prefStoreCommon
+							.getDefaultInt(ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK);
 
 			updateUI_CalendarWeek();
 		}
@@ -881,8 +904,9 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 		{
 			// measurement system
 
-			_chkShowMeasurementInAppToolbar.setSelection(_prefStore
-					.getBoolean(ITourbookPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI));
+			_chkShowMeasurementInAppToolbar.setSelection(
+					_prefStore
+							.getBoolean(ITourbookPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI));
 			MeasurementSystemContributionItem.selectSystemFromPrefStore(_comboSystem);
 			onSelectSystem();
 		}
@@ -892,8 +916,9 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
 			final int activeZone = _prefStoreCommon.getInt(ICommonPreferences.TIME_ZONE_SELECTED_CUSTOM_ZONE);
 
-			_chkTimeZoneLiveUpdate.setSelection(_prefStoreCommon
-					.getBoolean(ICommonPreferences.TIME_ZONE_IS_LIVE_UPDATE));
+			_chkTimeZoneLiveUpdate.setSelection(
+					_prefStoreCommon
+							.getBoolean(ICommonPreferences.TIME_ZONE_IS_LIVE_UPDATE));
 			_chkUseAnotherTimeZone.setSelection(//
 					_prefStoreCommon.getBoolean(ICommonPreferences.TIME_ZONE_IS_USE_SYSTEM_TIME_ZONE) == false);
 
@@ -912,11 +937,12 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 			// calendar week
 
 			_backupFirstDayOfWeek = //
-			_currentFirstDayOfWeek = _prefStoreCommon.getInt(ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK);
+					_currentFirstDayOfWeek = _prefStoreCommon.getInt(
+							ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK);
 
 			_backupMinimalDaysInFirstWeek = //
-			_currentMinimalDaysInFirstWeek = _prefStoreCommon
-					.getInt(ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK);
+					_currentMinimalDaysInFirstWeek = _prefStoreCommon
+							.getInt(ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK);
 
 			updateUI_CalendarWeek();
 		}
@@ -961,7 +987,8 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 			TimeTools.setDefaultTimeZone(selectedTimeZoneId);
 
 			// time zone
-			_prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_IS_LIVE_UPDATE,//
+			_prefStoreCommon.setValue(
+					ICommonPreferences.TIME_ZONE_IS_LIVE_UPDATE, //
 					_chkTimeZoneLiveUpdate.getSelection());
 			_prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_IS_USE_SYSTEM_TIME_ZONE, isUseSystemTimeZone);
 			_prefStoreCommon.setValue(ICommonPreferences.TIME_ZONE_SELECTED_CUSTOM_ZONE, selectedZone);
@@ -979,6 +1006,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
 			_prefStoreCommon.setValue(ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK, firstDayOfWeek);
 			_prefStoreCommon.setValue(ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK, minDays);
+
 			TimeTools.setCalendarWeek(firstDayOfWeek, minDays);
 		}
 

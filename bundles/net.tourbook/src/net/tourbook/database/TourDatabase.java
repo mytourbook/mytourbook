@@ -29,14 +29,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.NumberFormat;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.temporal.TemporalField;
+import java.time.temporal.WeekFields;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -97,47 +98,48 @@ import com.skedgo.converter.TimezoneMapper;
 
 public class TourDatabase {
 
+// SET_FORMATTING_OFF
+	
 	/**
 	 * version for the database which is required that the tourbook application works successfully
 	 */
-	private static final int						TOURBOOK_DB_VERSION							= 32;
-//	private static final int						TOURBOOK_DB_VERSION							= 32;	// 16.10
+	private static final int			TOURBOOK_DB_VERSION							= 32;
+//	private static final int			TOURBOOK_DB_VERSION							= 32;	// 16.10
 
-//	private static final int						TOURBOOK_DB_VERSION							= 31;	// 16.5
-//	private static final int						TOURBOOK_DB_VERSION							= 30;	// 16.1
-//	private static final int						TOURBOOK_DB_VERSION							= 29;	// 15.12
-//	private static final int						TOURBOOK_DB_VERSION							= 28;	// 15.6
-//	private static final int						TOURBOOK_DB_VERSION							= 27;	// 15.3.1
-//	private static final int						TOURBOOK_DB_VERSION							= 26;	// 14.14 / 15.3
-//	private static final int						TOURBOOK_DB_VERSION							= 25;	// 14.10
-//	private static final int						TOURBOOK_DB_VERSION							= 24;	// 14.7
-//	private static final int						TOURBOOK_DB_VERSION							= 23;	// 13.2.0
-//	private static final int						TOURBOOK_DB_VERSION							= 22;	// 12.12.0
-//	private static final int						TOURBOOK_DB_VERSION							= 21;	// 12.1.1
-//	private static final int						TOURBOOK_DB_VERSION							= 20;	// 12.1
-//	private static final int						TOURBOOK_DB_VERSION							= 19;	// 11.8
-//	private static final int						TOURBOOK_DB_VERSION							= 18;	// 11.8
-//	private static final int						TOURBOOK_DB_VERSION							= 17;	// 11.8
-//	private static final int						TOURBOOK_DB_VERSION							= 16;	// 11.8
-//	private static final int						TOURBOOK_DB_VERSION							= 15;	// 11.8
-//	private static final int						TOURBOOK_DB_VERSION							= 14;	// 11.3
-//	private static final int						TOURBOOK_DB_VERSION							= 13;	// 10.11
-//	private static final int						TOURBOOK_DB_VERSION							= 12;	// 10.9.1
-//	private static final int						TOURBOOK_DB_VERSION							= 11;	// 10.7.0 - 11-07-2010
-//	private static final int						TOURBOOK_DB_VERSION							= 10;	// 10.5.0 not released
-//	private static final int						TOURBOOK_DB_VERSION							= 9;	// 10.3.0
-//	private static final int						TOURBOOK_DB_VERSION							= 8;	// 10.2.1 Mod by Kenny
-//	private static final int						TOURBOOK_DB_VERSION							= 7;	// 9.01
-//	private static final int						TOURBOOK_DB_VERSION							= 6;	// 8.12
-//	private static final int						TOURBOOK_DB_VERSION							= 5;	// 8.11
+//	private static final int			TOURBOOK_DB_VERSION							= 31;	// 16.5
+//	private static final int			TOURBOOK_DB_VERSION							= 30;	// 16.1
+//	private static final int			TOURBOOK_DB_VERSION							= 29;	// 15.12
+//	private static final int			TOURBOOK_DB_VERSION							= 28;	// 15.6
+//	private static final int			TOURBOOK_DB_VERSION							= 27;	// 15.3.1
+//	private static final int			TOURBOOK_DB_VERSION							= 26;	// 14.14 / 15.3
+//	private static final int			TOURBOOK_DB_VERSION							= 25;	// 14.10
+//	private static final int			TOURBOOK_DB_VERSION							= 24;	// 14.7
+//	private static final int			TOURBOOK_DB_VERSION							= 23;	// 13.2.0
+//	private static final int			TOURBOOK_DB_VERSION							= 22;	// 12.12.0
+//	private static final int			TOURBOOK_DB_VERSION							= 21;	// 12.1.1
+//	private static final int			TOURBOOK_DB_VERSION							= 20;	// 12.1
+//	private static final int			TOURBOOK_DB_VERSION							= 19;	// 11.8
+//	private static final int			TOURBOOK_DB_VERSION							= 18;	// 11.8
+//	private static final int			TOURBOOK_DB_VERSION							= 17;	// 11.8
+//	private static final int			TOURBOOK_DB_VERSION							= 16;	// 11.8
+//	private static final int			TOURBOOK_DB_VERSION							= 15;	// 11.8
+//	private static final int			TOURBOOK_DB_VERSION							= 14;	// 11.3
+//	private static final int			TOURBOOK_DB_VERSION							= 13;	// 10.11
+//	private static final int			TOURBOOK_DB_VERSION							= 12;	// 10.9.1
+//	private static final int			TOURBOOK_DB_VERSION							= 11;	// 10.7.0 - 11-07-2010
+//	private static final int			TOURBOOK_DB_VERSION							= 10;	// 10.5.0 not released
+//	private static final int			TOURBOOK_DB_VERSION							= 9;	// 10.3.0
+//	private static final int			TOURBOOK_DB_VERSION							= 8;	// 10.2.1 Mod by Kenny
+//	private static final int			TOURBOOK_DB_VERSION							= 7;	// 9.01
+//	private static final int			TOURBOOK_DB_VERSION							= 6;	// 8.12
+//	private static final int			TOURBOOK_DB_VERSION							= 5;	// 8.11
 
-//	private static final String						SQL_STATE_XJ004_DATABASE_NOT_FOUND			= "XJ004";									//$NON-NLS-1$
+//	private static final String			SQL_STATE_XJ004_DATABASE_NOT_FOUND			= "XJ004";									//$NON-NLS-1$
 
-	public static boolean							IS_POST_UPDATE_019_to_020					= false;
+	public static boolean				IS_POST_UPDATE_019_to_020					= false;
 
-	private static final int						MAX_TRIES_TO_PING_SERVER					= 10;
+	private static final int			MAX_TRIES_TO_PING_SERVER					= 10;
 
-// SET_FORMATTING_OFF
 	
 	/**
 	 * <b> !!! Table names are set to uppercase otherwise conn.getMetaData().getColumns() would not
@@ -536,7 +538,7 @@ public class TourDatabase {
 				throws SQLException {
 
 			final String sql = "CREATE INDEX " + indexAndColumnName + " ON " + tableName + " (" + indexAndColumnName //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
-					+ ")";    //$NON-NLS-1$
+					+ ")"; //$NON-NLS-1$
 
 			exec(stmt, sql);
 		}
@@ -803,9 +805,10 @@ public class TourDatabase {
 		for (final Long tourId : tourList) {
 
 			if (monitor != null) {
-				monitor.subTask(NLS.bind(
-						Messages.Tour_Database_update_tour,//
-						new Object[] { tourCounter++, tourList.size() }));
+				monitor.subTask(
+						NLS.bind(
+								Messages.Tour_Database_update_tour, //
+								new Object[] { tourCounter++, tourList.size() }));
 			}
 
 			final TourData tourData = getTourFromDb(tourId);
@@ -886,9 +889,10 @@ public class TourDatabase {
 
 						// create sub task text
 						final StringBuilder sb = new StringBuilder();
-						sb.append(NLS.bind(
-								Messages.tour_database_computeComputeValues_subTask,//
-								new Object[] { tourCounter[0], tourListSize[0], }));
+						sb.append(
+								NLS.bind(
+										Messages.tour_database_computeComputeValues_subTask, //
+										new Object[] { tourCounter[0], tourListSize[0], }));
 
 						sb.append(UI.DASH_WITH_DOUBLE_SPACE);
 						sb.append(tourCounter[0] * 100 / tourListSize[0]);
@@ -929,10 +933,11 @@ public class TourDatabase {
 
 			// create result text
 			final StringBuilder sb = new StringBuilder();
-			sb.append(NLS.bind(
-					Messages.tour_database_computeComputedValues_resultMessage,
-					tourCounter[0],
-					tourListSize[0]));
+			sb.append(
+					NLS.bind(
+							Messages.tour_database_computeComputedValues_resultMessage,
+							tourCounter[0],
+							tourListSize[0]));
 
 			final String runnerResultText = runner.getResultText();
 			if (runnerResultText != null) {
@@ -1263,9 +1268,10 @@ public class TourDatabase {
 			final EntityManager em = TourDatabase.getInstance().getEntityManager();
 			if (em != null) {
 
-				final Query emQuery = em.createQuery("" //$NON-NLS-1$
-						+ "SELECT tourTag" //$NON-NLS-1$
-						+ (" FROM " + TourTag.class.getSimpleName() + " AS tourTag")); //$NON-NLS-1$ //$NON-NLS-2$
+				final Query emQuery = em.createQuery(
+						"" //$NON-NLS-1$
+								+ "SELECT tourTag" //$NON-NLS-1$
+								+ (" FROM " + TourTag.class.getSimpleName() + " AS tourTag")); //$NON-NLS-1$ //$NON-NLS-2$
 
 				_tourTags = new HashMap<Long, TourTag>();
 
@@ -1733,9 +1739,11 @@ public class TourDatabase {
 
 					if (isForceTruncation) {
 						returnValue[0] = FIELD_VALIDATION.TRUNCATE;
-						StatusUtil.log(new Exception(NLS.bind(
-								"Field \"{0}\" with content \"{1}\" is truncated to {2} characters.",//$NON-NLS-1$
-								new Object[] { uiFieldName, field, maxLength })));
+						StatusUtil.log(
+								new Exception(
+										NLS.bind(
+												"Field \"{0}\" with content \"{1}\" is truncated to {2} characters.", //$NON-NLS-1$
+												new Object[] { uiFieldName, field, maxLength })));
 						return;
 					}
 
@@ -1810,9 +1818,9 @@ public class TourDatabase {
 
 		if (isSaved == false) {
 			MessageDialog.openError(
-					Display.getCurrent().getActiveShell(),//
+					Display.getCurrent().getActiveShell(), //
 					"Error", //$NON-NLS-1$
-					"Error occured when saving an entity");  //$NON-NLS-1$
+					"Error occured when saving an entity"); //$NON-NLS-1$
 		}
 
 		return savedEntity;
@@ -1868,9 +1876,9 @@ public class TourDatabase {
 
 		if (isSaved == false) {
 			MessageDialog.openError(
-					Display.getCurrent().getActiveShell(),//
+					Display.getCurrent().getActiveShell(), //
 					"Error", //$NON-NLS-1$
-					"Error occured when saving an entity");  //$NON-NLS-1$
+					"Error occured when saving an entity"); //$NON-NLS-1$
 		}
 
 		return savedEntity;
@@ -2101,19 +2109,16 @@ public class TourDatabase {
 	}
 
 	/**
-	 * Update calendar week for all tours
+	 * Update calendar week for all tours with the app week settings from
+	 * {@link TimeTools#calendarWeek}
 	 * 
 	 * @param conn
 	 * @param monitor
-	 * @param firstDayOfWeek
-	 * @param minimalDaysInFirstWeek
 	 * @return Returns <code>true</code> when the week is computed
 	 * @throws SQLException
 	 */
 	public static boolean updateTourWeek(	final Connection conn,
-											final IProgressMonitor monitor,
-											final int firstDayOfWeek,
-											final int minimalDaysInFirstWeek) throws SQLException {
+											final IProgressMonitor monitor) throws SQLException {
 
 		final ArrayList<Long> tourList = getAllTourIds();
 
@@ -2135,25 +2140,26 @@ public class TourDatabase {
 						+ " WHERE tourId=?"); //$NON-NLS-1$
 
 		int tourIdx = 1;
-		final Calendar calendar = GregorianCalendar.getInstance();
 
-		// set ISO 8601 week date
-		calendar.setFirstDayOfWeek(firstDayOfWeek);
-		calendar.setMinimalDaysInFirstWeek(minimalDaysInFirstWeek);
+		// use week settings from the app
+		final WeekFields cw = TimeTools.calendarWeek;
+		final TemporalField year_WeekBasedYear_Field = cw.weekBasedYear();
+		final TemporalField week_OfWeekBasedYear_Field = cw.weekOfWeekBasedYear();
 
 		// loop over all tours and calculate and set new columns
 		for (final Long tourId : tourList) {
 
 			if (monitor != null) {
+
 				final String msg = NLS.bind(
 						Messages.Tour_Database_Update_TourWeek,
 						new Object[] { tourIdx++, tourList.size() });
+
 				monitor.subTask(msg);
 			}
 
 			// get tour date
 			stmtSelect.setLong(1, tourId);
-//				stmtSelect.execute();
 
 			final ResultSet result = stmtSelect.executeQuery();
 			while (result.next()) {
@@ -2163,15 +2169,22 @@ public class TourDatabase {
 				final short dbMonth = result.getShort(2);
 				final short dbDay = result.getShort(3);
 
-				calendar.set(dbYear, dbMonth - 1, dbDay);
+//				if (dbYear == 2012 && dbMonth == 12 && dbDay == 31) {
+//
+//					int a = 0;
+//					a++;
+//				}
 
-				final short weekNo = (short) calendar.get(Calendar.WEEK_OF_YEAR);
-				final short weekYear = (short) Util.getYearForWeek(calendar);
+				// get week no/year
+				final LocalDate tourDate = LocalDate.of(dbYear, dbMonth, dbDay);
+				final short weekNo = (short) tourDate.get(week_OfWeekBasedYear_Field);
+				final short weekYear = (short) tourDate.get(year_WeekBasedYear_Field);
 
 				// update week number/week year in the database
 				stmtUpdate.setShort(1, weekNo);
 				stmtUpdate.setShort(2, weekYear);
 				stmtUpdate.setLong(3, tourId);
+
 				stmtUpdate.executeUpdate();
 
 				isUpdated = true;
@@ -2906,10 +2919,12 @@ public class TourDatabase {
 
 		// Add Constraint
 		final String fkName = "fk_" + JOINTABLE__TOURDATA__TOURTAG + "_" + KEY_TOUR; //							//$NON-NLS-1$ //$NON-NLS-2$
-		exec(stmt, "ALTER TABLE " + JOINTABLE__TOURDATA__TOURTAG + "										\n" //$NON-NLS-1$ //$NON-NLS-2$
-				+ "	ADD CONSTRAINT " + fkName + "															\n" //$NON-NLS-1$ //$NON-NLS-2$
-				+ "	FOREIGN KEY (" + KEY_TOUR + ")															\n" //$NON-NLS-1$ //$NON-NLS-2$
-				+ "	REFERENCES " + TABLE_TOUR_DATA + " (" + ENTITY_ID_TOUR + ")								"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		exec(
+				stmt,
+				"ALTER TABLE " + JOINTABLE__TOURDATA__TOURTAG + "										\n" //$NON-NLS-1$ //$NON-NLS-2$
+						+ "	ADD CONSTRAINT " + fkName + "															\n" //$NON-NLS-1$ //$NON-NLS-2$
+						+ "	FOREIGN KEY (" + KEY_TOUR + ")															\n" //$NON-NLS-1$ //$NON-NLS-2$
+						+ "	REFERENCES " + TABLE_TOUR_DATA + " (" + ENTITY_ID_TOUR + ")								"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	/**
@@ -2951,16 +2966,20 @@ public class TourDatabase {
 		final String fkTag = "fk_" + jtabTag + "_" + KEY_TAG; //											//$NON-NLS-1$ //$NON-NLS-2$
 		final String fkCat = "fk_" + jtabTag + "_" + TABLE_TOUR_TAG_CATEGORY + "_" + KEY_TAG_CATEGORY; //	//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-		exec(stmt, "ALTER TABLE " + jtabTag + "																\n"//$NON-NLS-1$ //$NON-NLS-2$
-				+ "	ADD CONSTRAINT " + fkTag + "															\n"//$NON-NLS-1$ //$NON-NLS-2$
-				+ "	FOREIGN KEY (" + KEY_TAG + ")															\n"//$NON-NLS-1$ //$NON-NLS-2$
-				+ "	REFERENCES " + TABLE_TOUR_TAG + " (" + ENTITY_ID_TAG + ")								\n"//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		exec(
+				stmt,
+				"ALTER TABLE " + jtabTag + "																\n"//$NON-NLS-1$ //$NON-NLS-2$
+						+ "	ADD CONSTRAINT " + fkTag + "															\n"//$NON-NLS-1$ //$NON-NLS-2$
+						+ "	FOREIGN KEY (" + KEY_TAG + ")															\n"//$NON-NLS-1$ //$NON-NLS-2$
+						+ "	REFERENCES " + TABLE_TOUR_TAG + " (" + ENTITY_ID_TAG + ")								\n"//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		);
 
-		exec(stmt, "ALTER TABLE " + jtabTag + "																\n"//$NON-NLS-1$ //$NON-NLS-2$
-				+ "	ADD CONSTRAINT " + fkCat + "															\n"//$NON-NLS-1$ //$NON-NLS-2$
-				+ "	FOREIGN KEY (" + KEY_TAG_CATEGORY + ")													\n"//$NON-NLS-1$ //$NON-NLS-2$
-				+ "	REFERENCES " + TABLE_TOUR_TAG_CATEGORY + " (" + ENTITY_ID_TAG_CATEGORY + ")				\n"//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		exec(
+				stmt,
+				"ALTER TABLE " + jtabTag + "																\n"//$NON-NLS-1$ //$NON-NLS-2$
+						+ "	ADD CONSTRAINT " + fkCat + "															\n"//$NON-NLS-1$ //$NON-NLS-2$
+						+ "	FOREIGN KEY (" + KEY_TAG_CATEGORY + ")													\n"//$NON-NLS-1$ //$NON-NLS-2$
+						+ "	REFERENCES " + TABLE_TOUR_TAG_CATEGORY + " (" + ENTITY_ID_TAG_CATEGORY + ")				\n"//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		);
 
 		/*
@@ -2979,16 +2998,20 @@ public class TourDatabase {
 		final String fk1 = "fk_" + jtabCategory + "_" + KEY_TAG_CATEGORY + "1"; //							//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		final String fk2 = "fk_" + jtabCategory + "_" + KEY_TAG_CATEGORY + "2"; //							//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-		exec(stmt, "ALTER TABLE " + jtabCategory + "														\n"//$NON-NLS-1$ //$NON-NLS-2$
-				+ "	ADD CONSTRAINT " + fk1 + "																\n"//$NON-NLS-1$ //$NON-NLS-2$
-				+ "	FOREIGN KEY (" + KEY_TAG_CATEGORY + "1)													\n"//$NON-NLS-1$ //$NON-NLS-2$
-				+ "	REFERENCES " + TABLE_TOUR_TAG_CATEGORY + " (" + ENTITY_ID_TAG_CATEGORY + ")				\n"//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		exec(
+				stmt,
+				"ALTER TABLE " + jtabCategory + "														\n"//$NON-NLS-1$ //$NON-NLS-2$
+						+ "	ADD CONSTRAINT " + fk1 + "																\n"//$NON-NLS-1$ //$NON-NLS-2$
+						+ "	FOREIGN KEY (" + KEY_TAG_CATEGORY + "1)													\n"//$NON-NLS-1$ //$NON-NLS-2$
+						+ "	REFERENCES " + TABLE_TOUR_TAG_CATEGORY + " (" + ENTITY_ID_TAG_CATEGORY + ")				\n"//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		);
 
-		exec(stmt, "ALTER TABLE " + jtabCategory + "														\n"//$NON-NLS-1$ //$NON-NLS-2$
-				+ "	ADD CONSTRAINT " + fk2 + "																\n"//$NON-NLS-1$ //$NON-NLS-2$
-				+ "	FOREIGN KEY (" + KEY_TAG_CATEGORY + "2)													\n"//$NON-NLS-1$ //$NON-NLS-2$
-				+ "	REFERENCES " + TABLE_TOUR_TAG_CATEGORY + " (" + ENTITY_ID_TAG_CATEGORY + ")				\n"//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		exec(
+				stmt,
+				"ALTER TABLE " + jtabCategory + "														\n"//$NON-NLS-1$ //$NON-NLS-2$
+						+ "	ADD CONSTRAINT " + fk2 + "																\n"//$NON-NLS-1$ //$NON-NLS-2$
+						+ "	FOREIGN KEY (" + KEY_TAG_CATEGORY + "2)													\n"//$NON-NLS-1$ //$NON-NLS-2$
+						+ "	REFERENCES " + TABLE_TOUR_TAG_CATEGORY + " (" + ENTITY_ID_TAG_CATEGORY + ")				\n"//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		);
 	}
 
@@ -3445,9 +3468,11 @@ public class TourDatabase {
 			MessageDialog.openError(
 					Display.getDefault().getActiveShell(),
 					Messages.Tour_Database_CannotConnectToDerbyServer_Title,
-					NLS.bind(Messages.Tour_Database_CannotConnectToDerbyServer_Message, e
-							.getTargetException()
-							.getMessage()));
+					NLS.bind(
+							Messages.Tour_Database_CannotConnectToDerbyServer_Message,
+							e
+									.getTargetException()
+									.getMessage()));
 
 			PlatformUI.getWorkbench().close();
 
@@ -3530,10 +3555,11 @@ public class TourDatabase {
 								throw new InvocationTargetException(e1);
 							}
 
-							StatusUtil.logInfo(NLS.bind(
-									"...waiting ({0} ms) for derby server startup: {1}", //$NON-NLS-1$
-									threadSleepTime,
-									pingCounter++));
+							StatusUtil.logInfo(
+									NLS.bind(
+											"...waiting ({0} ms) for derby server startup: {1}", //$NON-NLS-1$
+											threadSleepTime,
+											pingCounter++));
 
 							try {
 								Thread.sleep(threadSleepTime);
@@ -3877,10 +3903,12 @@ public class TourDatabase {
 				Display.getDefault().getActiveShell(),
 				Messages.Database_Confirm_update_title,
 				null,
-				NLS.bind(Messages.Database_Confirm_update, new Object[] {
-						currentDbVersion,
-						TOURBOOK_DB_VERSION,
-						_databasePath }),
+				NLS.bind(
+						Messages.Database_Confirm_update,
+						new Object[] {
+								currentDbVersion,
+								TOURBOOK_DB_VERSION,
+								_databasePath }),
 				MessageDialog.QUESTION,
 				buttons,
 				1).open()) != Window.OK) {
@@ -4247,19 +4275,19 @@ public class TourDatabase {
 			exec(stmt, sql);
 
 			sql = ("ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN	tourTitle			VARCHAR(" //$NON-NLS-1$//$NON-NLS-2$
-					+ TourData.DB_LENGTH_TOUR_TITLE + ")\n");   //$NON-NLS-1$
+					+ TourData.DB_LENGTH_TOUR_TITLE + ")\n"); //$NON-NLS-1$
 			exec(stmt, sql);
 
 			sql = ("ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN	tourDescription		VARCHAR(" //$NON-NLS-1$//$NON-NLS-2$
-					+ TourData.DB_LENGTH_TOUR_DESCRIPTION + ")\n");   //$NON-NLS-1$
+					+ TourData.DB_LENGTH_TOUR_DESCRIPTION + ")\n"); //$NON-NLS-1$
 			exec(stmt, sql);
 
 			sql = ("ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN	tourStartPlace		VARCHAR(" //$NON-NLS-1$//$NON-NLS-2$
-					+ TourData.DB_LENGTH_TOUR_START_PLACE + ")\n");   //$NON-NLS-1$
+					+ TourData.DB_LENGTH_TOUR_START_PLACE + ")\n"); //$NON-NLS-1$
 			exec(stmt, sql);
 
 			sql = ("ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN	tourEndPlace		VARCHAR(" //$NON-NLS-1$//$NON-NLS-2$
-					+ TourData.DB_LENGTH_TOUR_END_PLACE + ")\n");   //$NON-NLS-1$
+					+ TourData.DB_LENGTH_TOUR_END_PLACE + ")\n"); //$NON-NLS-1$
 			exec(stmt, sql);
 
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN	calories			INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
@@ -4273,12 +4301,12 @@ public class TourDatabase {
 
 			// from wolfgang
 			sql = ("ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN	devicePluginName	VARCHAR(" //$NON-NLS-1$//$NON-NLS-2$
-					+ TourData.DB_LENGTH_DEVICE_PLUGIN_NAME + ")\n");   //$NON-NLS-1$
+					+ TourData.DB_LENGTH_DEVICE_PLUGIN_NAME + ")\n"); //$NON-NLS-1$
 			exec(stmt, sql);
 
 			// from wolfgang
 			sql = ("ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN	deviceModeName		VARCHAR(" //$NON-NLS-1$//$NON-NLS-2$
-					+ TourData.DB_LENGTH_DEVICE_MODE_NAME + ")\n");   //$NON-NLS-1$
+					+ TourData.DB_LENGTH_DEVICE_MODE_NAME + ")\n"); //$NON-NLS-1$
 			exec(stmt, sql);
 		}
 
@@ -4359,7 +4387,7 @@ public class TourDatabase {
 		final Statement stmt = conn.createStatement();
 		{
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN	tourImportFilePath	VARCHAR(" //$NON-NLS-1$//$NON-NLS-2$
-					+ TourData.DB_LENGTH_TOUR_IMPORT_FILE_PATH + ")\n";   //$NON-NLS-1$
+					+ TourData.DB_LENGTH_TOUR_IMPORT_FILE_PATH + ")\n"; //$NON-NLS-1$
 			exec(stmt, sql);
 		}
 		stmt.close();
@@ -4423,7 +4451,7 @@ public class TourDatabase {
 			exec(stmt, sql);
 
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN	weatherClouds			VARCHAR(" //$NON-NLS-1$//$NON-NLS-2$
-					+ TourData.DB_LENGTH_WEATHER_CLOUDS + ")\n";   //$NON-NLS-1$
+					+ TourData.DB_LENGTH_WEATHER_CLOUDS + ")\n"; //$NON-NLS-1$
 			exec(stmt, sql);
 
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN	restPulse    		    INTEGER DEFAULT 0"; //$NON-NLS-1$ //$NON-NLS-2$
@@ -4456,11 +4484,9 @@ public class TourDatabase {
 	private void updateDbDesign_008_009_PostUpdate(final Connection conn, final IProgressMonitor monitor)
 			throws SQLException {
 
-		// set ISO 8601 week number
-		final int firstDayOfWeek = Calendar.MONDAY;
-		final int minimalDaysInFirstWeek = 4;
+		// set app week number/year
+		if (updateTourWeek(conn, monitor)) {
 
-		if (updateTourWeek(conn, monitor, firstDayOfWeek, minimalDaysInFirstWeek)) {
 			MessageDialog.openInformation(
 					Display.getDefault().getActiveShell(),
 					Messages.Database_Confirm_update_title,
@@ -4587,9 +4613,10 @@ public class TourDatabase {
 		for (final Long tourId : tourList) {
 
 			if (monitor != null) {
-				monitor.subTask(NLS.bind(//
-						Messages.Tour_Database_PostUpdate011_SetTourCreateTime,
-						new Object[] { tourIdx++, tourList.size() }));
+				monitor.subTask(
+						NLS.bind(//
+								Messages.Tour_Database_PostUpdate011_SetTourCreateTime,
+								new Object[] { tourIdx++, tourList.size() }));
 			}
 
 			// get tour date
@@ -4647,7 +4674,7 @@ public class TourDatabase {
 			exec(stmt, sql);
 
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN	DeviceFirmwareVersion	VARCHAR(" //$NON-NLS-1$//$NON-NLS-2$
-					+ TourData.DB_LENGTH_DEVICE_FIRMWARE_VERSION + ")\n";   //$NON-NLS-1$
+					+ TourData.DB_LENGTH_DEVICE_FIRMWARE_VERSION + ")\n"; //$NON-NLS-1$
 			exec(stmt, sql);
 		}
 		stmt.close();
@@ -4675,7 +4702,7 @@ public class TourDatabase {
 			exec(stmt, sql);
 
 			sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ADD COLUMN	Weather					VARCHAR(" //$NON-NLS-1$//$NON-NLS-2$
-					+ TourData.DB_LENGTH_WEATHER + ")\n";   //$NON-NLS-1$
+					+ TourData.DB_LENGTH_WEATHER + ")\n"; //$NON-NLS-1$
 			exec(stmt, sql);
 		}
 		stmt.close();
@@ -5086,9 +5113,10 @@ public class TourDatabase {
 
 					final float durationInSeconds = (currentTime - startTime) / 1000;
 
-					monitor.subTask(NLS.bind(//
-							Messages.Tour_Database_PostUpdate020_ConvertIntToFloat,
-							new Object[] { tourIdx, tourList.size(), (int) durationInSeconds }));
+					monitor.subTask(
+							NLS.bind(//
+									Messages.Tour_Database_PostUpdate020_ConvertIntToFloat,
+									new Object[] { tourIdx, tourList.size(), (int) durationInSeconds }));
 
 					tourIdx++;
 				}
@@ -5265,9 +5293,10 @@ public class TourDatabase {
 		for (final Long tourId : tourList) {
 
 			if (monitor != null) {
-				monitor.subTask(NLS.bind(//
-						Messages.Tour_Database_PostUpdate021_SetTourStartEndTime,
-						new Object[] { tourIndex++, tourList.size() }));
+				monitor.subTask(
+						NLS.bind(//
+								Messages.Tour_Database_PostUpdate021_SetTourStartEndTime,
+								new Object[] { tourIndex++, tourList.size() }));
 			}
 
 			// get tour date for 1 tour
@@ -5347,13 +5376,13 @@ public class TourDatabase {
 				final String sqlTourPhoto[] = {
 						//
 						"ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN	imageFileName			VARCHAR(" //$NON-NLS-1$//$NON-NLS-2$
-								+ TourPhoto.DB_LENGTH_FILE_PATH + ")\n",   //$NON-NLS-1$
+								+ TourPhoto.DB_LENGTH_FILE_PATH + ")\n", //$NON-NLS-1$
 						"ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN	imageFileExt			VARCHAR(" //$NON-NLS-1$//$NON-NLS-2$
-								+ TourPhoto.DB_LENGTH_FILE_PATH + ")\n",   //$NON-NLS-1$
+								+ TourPhoto.DB_LENGTH_FILE_PATH + ")\n", //$NON-NLS-1$
 						"ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN	imageFilePath			VARCHAR(" //$NON-NLS-1$//$NON-NLS-2$
-								+ TourPhoto.DB_LENGTH_FILE_PATH + ")\n",   //$NON-NLS-1$
+								+ TourPhoto.DB_LENGTH_FILE_PATH + ")\n", //$NON-NLS-1$
 						"ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN	imageFilePathName		VARCHAR(" //$NON-NLS-1$//$NON-NLS-2$
-								+ TourPhoto.DB_LENGTH_FILE_PATH + ")\n",   //$NON-NLS-1$
+								+ TourPhoto.DB_LENGTH_FILE_PATH + ")\n", //$NON-NLS-1$
 						//
 						"ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN	imageExifTime			BIGINT DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
 						"ALTER TABLE " + TABLE_TOUR_PHOTO + " ADD COLUMN	imageFileLastModified	BIGINT DEFAULT 0", //$NON-NLS-1$ //$NON-NLS-2$
@@ -5421,9 +5450,10 @@ public class TourDatabase {
 
 				if (monitor != null) {
 
-					monitor.subTask(NLS.bind(//
-							Messages.Tour_Database_PostUpdate023_SetTimeSliceNumbers,
-							new Object[] { tourIdx, tourList.size() }));
+					monitor.subTask(
+							NLS.bind(//
+									Messages.Tour_Database_PostUpdate023_SetTimeSliceNumbers,
+									new Object[] { tourIdx, tourList.size() }));
 
 					tourIdx++;
 				}
@@ -5569,9 +5599,10 @@ public class TourDatabase {
 
 				if (monitor != null) {
 
-					monitor.subTask(NLS.bind(//
-							Messages.Tour_Database_PostUpdate025_SetMarkerFields,
-							new Object[] { tourIdx, tourList.size() }));
+					monitor.subTask(
+							NLS.bind(//
+									Messages.Tour_Database_PostUpdate025_SetMarkerFields,
+									new Object[] { tourIdx, tourList.size() }));
 
 					tourIdx++;
 				}
@@ -5629,7 +5660,7 @@ public class TourDatabase {
 
 						final String message = String
 								.format(
-										"Tour: %s - Tour marker: %s - serieIndex: %d - serie length: %d - relative time: %d sec",//$NON-NLS-1$
+										"Tour: %s - Tour marker: %s - serieIndex: %d - serie length: %d - relative time: %d sec", //$NON-NLS-1$
 										TourManager.getTourDateTimeShort(tourData),
 										tourMarker.getLabel(),
 										tourMarker.getSerieIndex(),
@@ -5820,9 +5851,10 @@ public class TourDatabase {
 		while (result.next()) {
 
 			if (monitor != null) {
-				monitor.subTask(NLS.bind(//
-						Messages.Tour_Database_PostUpdate_028_SetAvgPulse,
-						new Object[] { ++compTourCounter, numberOfComparedTours }));
+				monitor.subTask(
+						NLS.bind(//
+								Messages.Tour_Database_PostUpdate_028_SetAvgPulse,
+								new Object[] { ++compTourCounter, numberOfComparedTours }));
 			}
 
 			// get date from database
@@ -5835,10 +5867,11 @@ public class TourDatabase {
 
 			if (tourData == null) {
 
-				StatusUtil.log(NLS.bind(
-						"Cannot get tour {0} from database to update the average pulse in the compared tour {1}.",//$NON-NLS-1$
-						tourId,
-						compareId));
+				StatusUtil.log(
+						NLS.bind(
+								"Cannot get tour {0} from database to update the average pulse in the compared tour {1}.", //$NON-NLS-1$
+								tourId,
+								compareId));
 
 			} else {
 
@@ -5892,26 +5925,28 @@ public class TourDatabase {
 
 		final int numTours = getAllTourIds().size();
 
-		final PreparedStatement stmtSelect = conn.prepareStatement(""// //$NON-NLS-1$
-				//
-				+ "SELECT" //									//$NON-NLS-1$
-							//
-				+ " TourID," // 					// 1 //$NON-NLS-1$
-				+ " TourImportFilePath" //	 		// 2 //$NON-NLS-1$
-				//
-				+ " FROM " + TABLE_TOUR_DATA //		//$NON-NLS-1$
+		final PreparedStatement stmtSelect = conn.prepareStatement(
+				""// //$NON-NLS-1$
+						//
+						+ "SELECT" //									//$NON-NLS-1$
+									//
+						+ " TourID," // 					// 1 //$NON-NLS-1$
+						+ " TourImportFilePath" //	 		// 2 //$NON-NLS-1$
+						//
+						+ " FROM " + TABLE_TOUR_DATA //		//$NON-NLS-1$
 		);
 
-		final PreparedStatement stmtUpdate = conn.prepareStatement(""// //$NON-NLS-1$
-				//
-				+ "UPDATE " + TABLE_TOUR_DATA //				//$NON-NLS-1$
-				//
-				+ " SET" //							//$NON-NLS-1$
-				//
-				+ " TourImportFileName=?," //		// 1 //$NON-NLS-1$
-				+ " TourImportFilePath=?" //		// 1 //$NON-NLS-1$
-				//
-				+ " WHERE TourID=?"); //			// 2 //$NON-NLS-1$
+		final PreparedStatement stmtUpdate = conn.prepareStatement(
+				""// //$NON-NLS-1$
+						//
+						+ "UPDATE " + TABLE_TOUR_DATA //				//$NON-NLS-1$
+						//
+						+ " SET" //							//$NON-NLS-1$
+						//
+						+ " TourImportFileName=?," //		// 1 //$NON-NLS-1$
+						+ " TourImportFilePath=?" //		// 1 //$NON-NLS-1$
+						//
+						+ " WHERE TourID=?"); //			// 2 //$NON-NLS-1$
 
 		int tourIndex = 0;
 
@@ -5920,9 +5955,10 @@ public class TourDatabase {
 		while (result.next()) {
 
 			if (monitor != null) {
-				monitor.subTask(NLS.bind(//
-						Messages.Tour_Database_PostUpdate_029_SetImportFileName,
-						new Object[] { ++tourIndex, numTours }));
+				monitor.subTask(
+						NLS.bind(//
+								Messages.Tour_Database_PostUpdate_029_SetImportFileName,
+								new Object[] { ++tourIndex, numTours }));
 			}
 
 			// get data from database
@@ -5944,9 +5980,11 @@ public class TourDatabase {
 					stmtUpdate.setString(1, fileName.toString());
 
 					//
-					stmtUpdate.setString(2, folderPath == null //
-							? UI.EMPTY_STRING
-							: folderPath.toString());
+					stmtUpdate.setString(
+							2,
+							folderPath == null //
+									? UI.EMPTY_STRING
+									: folderPath.toString());
 
 					stmtUpdate.setLong(3, dbTourId);
 
@@ -6072,9 +6110,10 @@ public class TourDatabase {
 
 						final String percent = String.format("%.1f", (float) tourIdx / tourList.size() * 100.0);//$NON-NLS-1$
 
-						monitor.subTask(NLS.bind(//
-								Messages.Tour_Database_PostUpdate_032_SetTourTimeZone,
-								new Object[] { tourIdx, tourList.size(), percent }));
+						monitor.subTask(
+								NLS.bind(//
+										Messages.Tour_Database_PostUpdate_032_SetTourTimeZone,
+										new Object[] { tourIdx, tourList.size(), percent }));
 					}
 
 					tourIdx++;
