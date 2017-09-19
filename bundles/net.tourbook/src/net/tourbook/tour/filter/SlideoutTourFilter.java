@@ -1412,7 +1412,6 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		comboMonth.addMouseWheelListener(new MouseWheelListener() {
 			@Override
 			public void mouseScrolled(final MouseEvent event) {
-				UI.adjustSpinnerValueOnMouseScroll(event);
 				onField_Select_SeasonMonth(event.widget);
 			}
 		});
