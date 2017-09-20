@@ -23,8 +23,8 @@ class TourInfoFormatAction extends Action {
 
 	@Override
 	public void run() {
-		this.calendarView._calendarGraph.setTourInfoFormatter(forLine, formatter);
-		for (int i = 0; i < this.calendarView._tourInfoFormatter.length; i++) {
+		this.calendarView.getCalendarGraph().setTourInfoFormatter(forLine, formatter);
+		for (int i = 0; i < this.calendarView.tourInfoFormatter.length; i++) {
 			this.calendarView._actionSetTourInfoFormat[forLine][i].setChecked(i == formatter.index);
 		}
 	}

@@ -41,7 +41,7 @@ class WeekSummaryFormatLineAction extends Action implements IMenuCreator {
 	public Menu getMenu(final Menu parent) {
 		summaryMenu = new Menu(parent);
 
-		for (int i = 0; i < this.calendarView._tourWeekSummaryFormatter.length; i++) {
+		for (int i = 0; i < this.calendarView.tourWeekSummaryFormatter.length; i++) {
 			final ActionContributionItem item = new ActionContributionItem(this.calendarView._actionSetWeekSummaryFormat[line][i]);
 			item.fill(summaryMenu, -1);
 		}

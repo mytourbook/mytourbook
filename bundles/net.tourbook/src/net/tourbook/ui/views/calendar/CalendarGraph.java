@@ -734,7 +734,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 			if (infoWidth > 0) {
 				final Rectangle infoRec = new Rectangle(0, Y1, infoWidth, (Y2 - Y1));
-				drawWeekInfo(gc, date, infoRec);
+				drawWeek_Info(gc, date, infoRec);
 			}
 
 			for (int j = 0; j < 7; j++) {
@@ -812,14 +812,18 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			}
 
 			if (summaryWidth > 0) {
+
 				final int X1 = infoWidth + (int) (7 * dX);
 				final int X2 = X1 + summaryWidth;
+
 				final Rectangle weekRec = new Rectangle(X1, Y1, (X2 - X1), (Y2 - Y1));
+
 				final CalendarTourData weekSummary = _dataProvider.getCalendarWeekSummaryData(
 						weekDate.getYear(),
 						weekDate.getWeekOfWeekyear());
+
 				if (weekSummary.numTours > 0) {
-					drawWeekSummary(gc, weekSummary, weekRec);
+					drawWeek_Summary(gc, weekSummary, weekRec);
 				}
 			}
 
@@ -878,7 +882,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 			_tourFocus.add(new ObjectLocation(focus, data[i].tourId, data[i]));
 
-			drawTourInfo(gc, tour, data[i], false);
+			drawTour_Info(gc, tour, data[i], false);
 		}
 	}
 
@@ -931,7 +935,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			} else {
 				color = _colorCache.getColor(_rgbText.get(data.typeColorIndex).hashCode());
 			}
-			drawTourInfoText(gc, r, data, color);
+			drawTour_InfoText(gc, r, data, color);
 		}
 
 	}
@@ -965,7 +969,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		// focus is 1 pixel larger than tour rectangle
 		final Rectangle r = new Rectangle(rec.x + 1, rec.y + 1, rec.width - 2, rec.height - 2);
-		drawTourInfo(gc, r, data, true);
+		drawTour_Info(gc, r, data, true);
 		return;
 
 	}
@@ -998,7 +1002,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 	}
 
-	private void drawTourInfo(final GC gc, final Rectangle r, final CalendarTourData data, final boolean highlight) {
+	private void drawTour_Info(final GC gc, final Rectangle r, final CalendarTourData data, final boolean highlight) {
 
 		final Color line = _colorCache.getColor(_rgbLine.get(data.typeColorIndex).hashCode());
 
@@ -1028,12 +1032,12 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 				fg = _colorCache.getColor(contrastRGB.hashCode());
 			}
 
-			drawTourInfoText(gc, r, data, fg);
+			drawTour_InfoText(gc, r, data, fg);
 		}
 
 	}
 
-	private void drawTourInfoText(final GC gc, final Rectangle r, final CalendarTourData data, final Color fg) {
+	private void drawTour_InfoText(final GC gc, final Rectangle r, final CalendarTourData data, final Color fg) {
 
 		gc.setForeground(fg);
 		gc.setClipping(r.x + 1, r.y, r.width - 2, r.height);
@@ -1043,8 +1047,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		String prevInfo = null;
 
-		for (int formatterIndex = 0; formatterIndex < _tourInfoFormatter.length && y < r.y + r.height
-				- minToShow; formatterIndex++) {
+		for (int formatterIndex = 0; formatterIndex < _tourInfoFormatter.length //
+				&& y < r.y + r.height - minToShow; formatterIndex++) {
 
 			final String info = _tourInfoFormatter[formatterIndex].format(data);
 
@@ -1064,53 +1068,66 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		gc.setClipping(_nullRec);
 	}
 
-	private void drawWeekInfo(final GC gc, final DateTime dt, final Rectangle rec) {
+	private void drawWeek_Info(final GC gc, final DateTime dt, final Rectangle rec) {
 
 		final Font normalFont = gc.getFont();
-		final FontData fd[] = normalFont.getFontData();
-		fd[0].setStyle(SWT.BOLD);
+		final FontData fontData[] = normalFont.getFontData();
+		fontData[0].setStyle(SWT.BOLD);
+
 		// fd[0].setHeight(((rec.height) * 72 / _display.getDPI().y) / 4);
-		final Font boldFont = new Font(_display, fd[0]);
+		final Font boldFont = new Font(_display, fontData[0]);
 
 		gc.setForeground(_darkGray);
 		gc.setBackground(_white);
 
 		gc.setFont(boldFont);
+
 		String text;
+
 		if (_isTinyLayout) {
+
+			// draw month
+
 			if (dt.minusDays(1).getMonthOfYear() != dt.plusDays(6).getMonthOfYear()) { // a new month started on this week
+
 				gc.setClipping(new Rectangle(rec.x, rec.y, rec.width, 4 * rec.height)); // clipp to the room left of this month
 				text = dt.plusDays(6).toString("MMM"); //$NON-NLS-1$
+
 				if (rec.width < (2 * _refTextExtent.x / 3)) {
 					text = text.substring(0, 1);
 				}
+
 				gc.drawText(text, rec.x + 2, rec.y + 2);
 				gc.setClipping(_nullRec);
 			}
+
 		} else {
+
+			// draw week no
+
 			gc.drawText("" + dt.getWeekOfWeekyear(), rec.x + 4, rec.y + 2);//$NON-NLS-1$
 		}
+
 		gc.setFont(normalFont);
 
 		boldFont.dispose();
 
 	}
 
-	private void drawWeekSummary(final GC gc, final CalendarTourData data, final Rectangle rec) {
+	private void drawWeek_Summary(final GC gc, final CalendarTourData data, final Rectangle weekRec) {
 
-		gc.setClipping(rec);
+		gc.setClipping(weekRec);
 		gc.setBackground(_white);
-		final int xr = rec.x + rec.width - 1;
-		final int xl = rec.x + 2;
+
+		final int xr = weekRec.x + weekRec.width - 1;
+		final int xl = weekRec.x + 2;
 		int xx;
-		int y = rec.y + 1;
+		int y = weekRec.y + 1;
 		String text;
 		final boolean doClip = true;
 
-//		final int minToShow = (2 * fontHeight / 3);
-
 		Point extent;
-		final int maxLength = rec.width - 2;
+		final int maxLength = weekRec.width - 2;
 
 		final Font normalFont = gc.getFont();
 		final FontData fd[] = normalFont.getFontData();
@@ -1120,12 +1137,16 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		gc.setFont(boldFont);
 
 		for (final WeekSummaryFormatter formatter : _weekSummaryFormatter) {
+
 			gc.setForeground(_colorCache.getColor(formatter.getColor().hashCode()));
+
 			text = formatter.format(data);
-			// if (text.length() > 0 && y < rec.y + rec.height - minToShow) {
-			if (text.length() > 0 && y < (rec.y + rec.height)) {
+
+			if (text.length() > 0 && y < (weekRec.y + weekRec.height)) {
+
 				extent = gc.stringExtent(text);
 				xx = xr - extent.x;
+
 				if (extent.x > maxLength) {
 					if (doClip && text.contains(UI.SPACE)) {
 						text = text.substring(0, text.lastIndexOf(UI.SPACE));
@@ -1134,8 +1155,10 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 						xx = xl;
 					}
 				}
+
 				gc.drawText(text, xx, y);
 			}
+
 			y += _fontHeight;
 		}
 
@@ -1797,14 +1820,18 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	}
 
 	public void setTourInfoUseLineColor(final boolean checked) {
+
 		_useTextColorForTourInfoText = checked;
 		_isGraphClean = false;
+
 		redraw();
 	};
 
 	public void setWeekSummaryFormatter(final int line, final WeekSummaryFormatter formatter) {
+
 		_weekSummaryFormatter[line] = formatter;
 		_isGraphClean = false;
+
 		redraw();
 	}
 

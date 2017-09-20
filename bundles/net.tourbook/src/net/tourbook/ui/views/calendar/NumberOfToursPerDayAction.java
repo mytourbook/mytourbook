@@ -32,7 +32,7 @@ class NumberOfToursPerDayAction extends Action {
 		@Override
 		public void run() {
 
-			this.calendarView._calendarGraph.setNumberOfToursPerDay(_numberOfTours);
+			this.calendarView.getCalendarGraph().setNumberOfToursPerDay(_numberOfTours);
 
 			for (int j = 0; j < 5; j++) {
 				this.calendarView._actionSetNumberOfToursPerDay[j].setChecked((j == _numberOfTours));

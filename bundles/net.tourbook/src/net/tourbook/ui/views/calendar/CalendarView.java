@@ -22,7 +22,11 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorDefinition;
 import net.tourbook.common.color.GraphColorManager;
+import net.tourbook.common.formatter.ValueFormat;
 import net.tourbook.common.preferences.ICommonPreferences;
+import net.tourbook.common.tooltip.ActionToolbarSlideout;
+import net.tourbook.common.tooltip.IOpeningDialog;
+import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.SelectionProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -35,7 +39,6 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
@@ -51,6 +54,7 @@ import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
@@ -89,25 +93,28 @@ public class CalendarView extends ViewPart implements ITourProvider {
 	private final IPreferenceStore				_prefStore								= TourbookPlugin.getPrefStore();
 	private final IDialogSettings				_state									= TourbookPlugin.getState("TourCalendarView");		//$NON-NLS-1$
 	
+	ColorDefinition[]							_allColorDefinition						= GraphColorManager.getInstance().getGraphColorDefinitions();
+	
 // SET_FORMATTING_ON
 
-	private CalendarComponents					_calendarComponents;
-
-	CalendarGraph								_calendarGraph;
 	private ISelectionProvider					_selectionProvider;
 	private ISelectionListener					_selectionListener;
+
 	private IPartListener2						_partListener;
 	private IPropertyChangeListener				_prefChangeListener;
+	private ITourEventListener					_tourEventListener;
 
-	private ITourEventListener					_tourPropertyListener;
 	private CalendarYearMonthContributionItem	_cymci;
+
+//	private OpenDialogManager					_openDlgMgr								= new OpenDialogManager();
+
+	private ActionCalendarOptions				_actionCalendarOptions;
 
 	private Action								_actionForward, _actionBack;
 	private Action								_actionZoomIn, _actionZoomOut;
 	private Action								_actionSetLinked;
 	private Action								_actionGotoToday;
 	Action[]									_actionSetNumberOfToursPerDay;
-	// private Action							_setTourSizeDynamic;
 	private Action[]							_actionSetTourInfoFormatLine;
 	private Action[]							_actionSetSummaryFormatLine;
 	Action[][]									_actionSetTourInfoFormat;
@@ -120,389 +127,55 @@ public class CalendarView extends ViewPart implements ITourProvider {
 	private Action								_actionSetUseLineColorForWeekSummary;
 	boolean										_useLineColorForWeekSummary				= false;
 
-	// SET_FORMATTING_OFF
-	ColorDefinition[]							_colorDefinitiosn						= GraphColorManager.getInstance().getGraphColorDefinitions();
+	WeekSummaryFormatter[]						tourWeekSummaryFormatter				= {
 
-	WeekSummaryFormatter[]						_tourWeekSummaryFormatter				= {
+			createFormatter_Week_Empty(),
 
-		// fool stupid auto formatter
-			
-		// - Nothing -
-		new WeekSummaryFormatter(this, GraphColorManager.PREF_GRAPH_TIME) {
-		
-			@Override
-			public String format(final CalendarTourData data) {
-				return UI.EMPTY_STRING;
-			}
-
-			@Override
-			public String getText() {
-				return Messages.Calendar_View_Action_ShowNothing;
-			}
-		},
-
-		// - Distance -
-		new WeekSummaryFormatter(this,
-								GraphColorManager.PREF_GRAPH_DISTANCE,
-								Messages.Calendar_View_Action_SummaryDistance) {
-
-			@Override
-			String format(final CalendarTourData data) {
-				
-				if (data.distance > 0) {
-
-					final float distance = (float) (data.distance / 1000.0 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
-
-					return String.format(
-							NLS.bind(Messages.Calendar_View_Format_Distance, UI.UNIT_LABEL_DISTANCE),
-							distance);
-				} else {
-					return UI.DASH;
-				}
-			}
-		},
-
-		// - Moving Time -
-		new WeekSummaryFormatter(this,
-								GraphColorManager.PREF_GRAPH_TIME,
-								Messages.Calendar_View_Action_SummaryMovingTime) {
-
-			@Override
-			String format(final CalendarTourData data) {
-				
-				if (data.recordingTime > 0) {
-					return String
-							.format(
-									Messages.Calendar_View_Format_Time,
-									data.drivingTime / 3600,
-									(data.drivingTime % 3600) / 60)
-							.toString();
-				} else {
-					return UI.DASH;
-				}
-			}
-		},
-
-		// - Altitude -
-		new WeekSummaryFormatter(
-				this,
-				GraphColorManager.PREF_GRAPH_ALTITUDE,
-				Messages.Calendar_View_Action_SummaryAltitude) {
-
-			@Override
-			String format(final CalendarTourData data) {
-				if (data.altitude > 0) {
-					final long alt = (long) (data.altitude / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE);
-					return alt + UI.SPACE + UI.UNIT_LABEL_ALTITUDE;
-				} else {
-					return UI.DASH;
-				}
-			}
-		},
-
-		// - Speed -
-		new WeekSummaryFormatter(this,
-								GraphColorManager.PREF_GRAPH_SPEED,
-								Messages.Calendar_View_Action_SummarySpeed) {
-
-			@Override
-			String format(final CalendarTourData data) {
-				
-				if (data.distance > 0 && data.recordingTime > 0) {
-					
-					return String
-							.format(
-									NLS.bind(Messages.Calendar_View_Format_Speed, UI.UNIT_LABEL_SPEED),
-									data.distance == 0 ? 0 : data.distance / (data.recordingTime / 3.6f))
-							.toString();
-				} else {
-					
-					return UI.DASH;
-				}
-			}
-		},
-
-		// - Pace -
-		new WeekSummaryFormatter(this,
-								GraphColorManager.PREF_GRAPH_PACE,
-								Messages.Calendar_View_Action_SummaryPace) {
-
-			@Override
-			String format(final CalendarTourData data) {
-				
-				if (data.recordingTime > 0 && data.distance > 0) {
-					
-					final int pace = (int) (data.distance == 0
-							? 0
-							: (1000 * data.recordingTime / data.distance * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
-					
-					return String
-							.format(
-									NLS.bind(Messages.Calendar_View_Format_Pace, UI.UNIT_LABEL_PACE),
-									pace / 60,
-									pace % 60)
-							.toString();
-				} else {
-					return UI.DASH;
-				}
-			}
-		},
-
-		// - Recording Time -
-		new WeekSummaryFormatter(this,
-								GraphColorManager.PREF_GRAPH_TIME,
-								Messages.Calendar_View_Action_SummaryRecordingTime) {
-
-			@Override
-			String format(final CalendarTourData data) {
-				
-				if (data.recordingTime > 0) {
-				
-					return String
-							.format(
-									Messages.Calendar_View_Format_Time,
-									data.recordingTime / 3600,
-									(data.recordingTime % 3600) / 60)
-							.toString();
-				} else {
-					
-					return UI.DASH;
-				}
-			}
-		},
+			createFormatter_Week_Altitude(),
+			createFormatter_Week_Distance(),
+			createFormatter_Week_Pace(),
+			createFormatter_Week_Speed(),
+			createFormatter_Week_Time_Moving(),
+			createFormatter_Week_Time_Recording()
 	};
 
-	TourInfoFormatter[]							_tourInfoFormatter						= {
-			
-			// fool stupid auto formatter
-		/*
-		 * nothing
-		 */
-		new TourInfoFormatter() {
-			@Override
-			public String format(final CalendarTourData data) {
-				return UI.EMPTY_STRING;
-			}
+	TourInfoFormatter[]							tourInfoFormatter						= {
 
-			@Override
-			public String getText() {
-				return Messages.Calendar_View_Action_ShowNothing;
-			}
-		},
-		
-		/*
-		 * title
-		 * -
-		 * description
-		 */
-		new TourInfoFormatter() {
-			@Override
-			public String format(final CalendarTourData data) {
-				if (data.tourTitle != null && data.tourTitle.length() > 1) {
-					return data.tourTitle;
-				} else if (data.tourDescription != null && data.tourDescription.length() > 1) {
-					// for now we are only supporting one line descriptions
-					return data.tourDescription.replace("\r\n", UI.SPACE1).replace("\n", UI.SPACE1); //$NON-NLS-1$ //$NON-NLS-2$
-				} else {
-					return UI.EMPTY_STRING;
-				}
-			}
+			createFormatter_Tour_Empty(),
 
-			@Override
-			public String getText() {
-				return Messages.Calendar_View_Action_ShowTitleDescription;
-			}
-		},
+			createFormatter_Tour_Title_Description(),
+			createFormatter_Tour_Description_Title(),
 
-		/*
-		 * description
-		 * -
-		 * title
-		 */
-		new TourInfoFormatter() {
-			@Override
-			public String format(final CalendarTourData data) {
-				if (data.tourDescription != null && data.tourDescription.length() > 1) {
-					// for now we are only supporting one line descriptions
-					return data.tourDescription.replace("\r\n", UI.SPACE1).replace("\n", UI.SPACE1); //$NON-NLS-1$ //$NON-NLS-2$
-				} else if (data.tourTitle != null && data.tourTitle.length() > 1) {
-					return data.tourTitle;
-				} else {
-					return UI.EMPTY_STRING;
-				}
-			}
+			createFormatter_Tour_Distance_Time(),
+			createFormatter_Tour_Distance_Speed(),
+			createFormatter_Tour_Distance_Pace(),
 
-			@Override
-			public String getText() {
-				return Messages.Calendar_View_Action_ShowDescriptionTitle;
-			}
-		},
+			createFormatter_Tour_Time_Distance(),
+			createFormatter_Tour_Time_Speed(),
+			createFormatter_Tour_Time_Pace()
+	};
 
-		/*
-		 * distance
-		 * -
-		 * time
-		 */
-		new TourInfoFormatter() {
-			@Override
-			public String format(final CalendarTourData data) {
-				final float distance = (float) (data.distance / 1000.0 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
-				final int time = data.recordingTime;
-				return String
-						.format(
-								NLS.bind(Messages.Calendar_View_Format_DistanceTime, UI.UNIT_LABEL_DISTANCE),
-								distance,
-								time / 3600,
-								(time % 3600) / 60)
-						.toString();
-			}
+	/*
+	 * UI controls
+	 */
+	private Composite							_parent;
 
-			@Override
-			public String getText() {
-				return Messages.Calendar_View_Action_ShowDistanceTime;
-			}
-		},
+	private CalendarGraph						_calendarGraph;
+	private CalendarComponents					_calendarComponents;
 
-		/*
-		 * distance
-		 * -
-		 * speed
-		 */
-		new TourInfoFormatter() {
-			@Override
-			public String format(final CalendarTourData data) {
-				final float distance = data.distance;
-				final int time = data.recordingTime;
-				return String
-						.format(
-								NLS.bind(
-										Messages.Calendar_View_Format_DistanceSpeed,
-										UI.UNIT_LABEL_DISTANCE,
-										UI.UNIT_LABEL_SPEED),
-								distance / 1000.0f / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE,
-								distance == 0 ? 0 : distance / (time / 3.6f))
-						.toString();
-			}
+	private class ActionCalendarOptions extends ActionToolbarSlideout {
 
-			@Override
-			public String getText() {
-				return Messages.Calendar_View_Action_ShowDistanceSpeed;
-			}
-		},
+		@Override
+		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
-		/*
-		 * distance
-		 * -
-		 * pace
-		 */
-		new TourInfoFormatter() {
-			@Override
-			public String format(final CalendarTourData data) {
-				final int pace = (int) (data.distance == 0
-						? 0
-						: (1000 * data.recordingTime / data.distance * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
-				final float distance = data.distance / 1000.0f / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
-				return String
-						.format(
-								NLS.bind(
-										Messages.Calendar_View_Format_DistancePace,
-										UI.UNIT_LABEL_DISTANCE,
-										UI.UNIT_LABEL_PACE),
-								distance,
-								pace / 60,
-								pace % 60)
-						.toString();
-			}
-
-			@Override
-			public String getText() {
-				return Messages.Calendar_View_Action_DistancePace;
-			}
-		},
-
-		/*
-		 * time
-		 * -
-		 * distance
-		 */
-		new TourInfoFormatter() {
-			@Override
-			public String format(final CalendarTourData data) {
-				final int time = data.recordingTime;
-				final float distance = data.distance / 1000.0f / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
-				return String
-						.format(
-								NLS.bind(Messages.Calendar_View_Format_TimeDistance, UI.UNIT_LABEL_DISTANCE),
-								time / 3600,
-								(time % 3600) / 60,
-								distance)
-						.toString();
-			}
-
-			@Override
-			public String getText() {
-				return Messages.Calendar_View_Action_TimeDistance;
-			}
-		},
-
-		/*
-		 * time
-		 * -
-		 * speed
-		 */
-		new TourInfoFormatter() {
-			@Override
-			public String format(final CalendarTourData data) {
-				final int time = data.recordingTime;
-				return String
-						.format(
-								NLS.bind(Messages.Calendar_View_Format_TimeSpeed, UI.UNIT_LABEL_SPEED),
-								time / 3600,
-								(time % 3600) / 60,
-								data.distance == 0 ? 0 : data.distance
-										/ time
-										* 3.6f
-										/ net.tourbook.ui.UI.UNIT_VALUE_DISTANCE)
-						.toString();
-			}
-
-			@Override
-			public String getText() {
-				return Messages.Calendar_View_Action_TimeSpeed;
-			}
-		},
-
-		/*
-		 * time
-		 * -
-		 * pace
-		 */
-		new TourInfoFormatter() {
-			@Override
-			public String format(final CalendarTourData data) {
-
-				final int pace = (int) (data.distance == 0
-						? 0
-						: (1000 * data.recordingTime / data.distance * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
-
-				return String
-						.format(
-								NLS.bind(Messages.Calendar_View_Format_TimePace, UI.UNIT_LABEL_PACE),
-								data.recordingTime / 3600,
-								(data.recordingTime % 3600) / 60,
-								pace / 60,
-								pace % 60)
-						.toString();
-			}
-
-			@Override
-			public String getText() {
-				return Messages.Calendar_View_Action_TimePace;
-			}
+			return new SlideoutCalendarOptions(_parent, toolbar, CalendarView.this);
 		}
-	};
 
-	// SET_FORMATTING_ON
+		@Override
+		protected void onBeforeOpenSlideout() {
+//			closeOpenedDialogs(this);
+		}
+	}
 
 	abstract class TourInfoFormatter {
 
@@ -620,7 +293,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 
 	private void addTourEventListener() {
 
-		_tourPropertyListener = new ITourEventListener() {
+		_tourEventListener = new ITourEventListener() {
 			@Override
 			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
@@ -631,6 +304,13 @@ public class CalendarView extends ViewPart implements ITourProvider {
 					 */
 					refreshCalendar();
 
+				} else if ((eventId == TourEventId.TOUR_SELECTION //
+						|| eventId == TourEventId.SLIDER_POSITION_CHANGED)
+
+						&& eventData instanceof ISelection) {
+
+					onSelectionChanged((ISelection) eventData);
+
 				} else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED
 						|| eventId == TourEventId.ALL_TOURS_ARE_MODIFIED) {
 
@@ -638,10 +318,22 @@ public class CalendarView extends ViewPart implements ITourProvider {
 				}
 			}
 		};
-		TourManager.getInstance().addTourEventListener(_tourPropertyListener);
+
+		TourManager.getInstance().addTourEventListener(_tourEventListener);
+	}
+
+	/**
+	 * Close all opened dialogs except the opening dialog.
+	 * 
+	 * @param openingDialog
+	 */
+	private void closeOpenedDialogs(final IOpeningDialog openingDialog) {
+//		_openDlgMgr.closeOpenedDialogs(openingDialog);
 	}
 
 	private void createActions() {
+
+		_actionCalendarOptions = new ActionCalendarOptions();
 
 		_actionBack = new Action() {
 			@Override
@@ -683,14 +375,14 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		_actionZoomIn.setToolTipText(Messages.Calendar_View_Action_ZoomIn_Tooltip);
 		_actionZoomIn.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ZoomIn));
 
-		_actionSetLinked = new Action(null, org.eclipse.jface.action.Action.AS_CHECK_BOX) {
+		_actionSetLinked = new Action(null, Action.AS_CHECK_BOX) {
 			@Override
 			public void run() {
 				_calendarGraph.setLinked(_actionSetLinked.isChecked());
 			}
 		};
 		_actionSetLinked.setText(Messages.Calendar_View_Action_LinkWithOtherViews);
-		_actionSetLinked.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Synced));
+		_actionSetLinked.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__SyncViews));
 		_actionSetLinked.setChecked(true);
 
 		_actionGotoToday = new Action() {
@@ -707,14 +399,6 @@ public class CalendarView extends ViewPart implements ITourProvider {
 			_actionSetNumberOfToursPerDay[i] = new NumberOfToursPerDayAction(this, i);
 		}
 
-//		_setTourSizeDynamic = new Action(null, org.eclipse.jface.action.Action.AS_CHECK_BOX) {
-//			@Override
-//			public void run() {
-//				_calendarGraph.setTourFieldSizeDynamic(this.isChecked());
-//			}
-//		};
-//		_setTourSizeDynamic.setText(Messages.Calendar_View_Action_ResizeTours);
-
 		// the tour info line popup menu opener
 		_actionSetTourInfoFormatLine = new Action[numberOfInfoLines];
 		for (int i = 0; i < numberOfInfoLines; i++) {
@@ -727,15 +411,15 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		}
 
 		// the formatter actions used for all tour info lines
-		_actionSetTourInfoFormat = new Action[numberOfInfoLines][_tourInfoFormatter.length];
+		_actionSetTourInfoFormat = new Action[numberOfInfoLines][tourInfoFormatter.length];
 		for (int i = 0; i < numberOfInfoLines; i++) {
-			for (int j = 0; j < _tourInfoFormatter.length; j++) {
-				_tourInfoFormatter[j].index = j;
-				if (null != _tourInfoFormatter[j]) {
+			for (int j = 0; j < tourInfoFormatter.length; j++) {
+				tourInfoFormatter[j].index = j;
+				if (null != tourInfoFormatter[j]) {
 					_actionSetTourInfoFormat[i][j] = new TourInfoFormatAction(
 							this,
-							_tourInfoFormatter[j].getText(),
-							_tourInfoFormatter[j],
+							tourInfoFormatter[j].getText(),
+							tourInfoFormatter[j],
 							i);
 				}
 			}
@@ -753,24 +437,24 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		}
 
 		// the formatter actions used for the week summaries
-		_actionSetWeekSummaryFormat = new Action[numberOfSummaryLines][_tourWeekSummaryFormatter.length];
+		_actionSetWeekSummaryFormat = new Action[numberOfSummaryLines][tourWeekSummaryFormatter.length];
 		for (int i = 0; i < numberOfSummaryLines; i++) {
-			for (int j = 0; j < _tourWeekSummaryFormatter.length; j++) {
+			for (int j = 0; j < tourWeekSummaryFormatter.length; j++) {
 
-				_tourWeekSummaryFormatter[j].index = j;
+				tourWeekSummaryFormatter[j].index = j;
 
-				if (null != _tourWeekSummaryFormatter[j]) {
+				if (null != tourWeekSummaryFormatter[j]) {
 
 					_actionSetWeekSummaryFormat[i][j] = new WeekSummaryFormatAction(
 							this,
-							_tourWeekSummaryFormatter[j].getText(),
-							_tourWeekSummaryFormatter[j],
+							tourWeekSummaryFormatter[j].getText(),
+							tourWeekSummaryFormatter[j],
 							i);
 				}
 			}
 		}
 
-		_actionSetTourInfoTextColor = new Action(null, org.eclipse.jface.action.Action.AS_CHECK_BOX) {
+		_actionSetTourInfoTextColor = new Action(null, Action.AS_CHECK_BOX) {
 			@Override
 			public void run() {
 				_calendarGraph.setTourInfoUseLineColor(this.isChecked());
@@ -778,7 +462,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		};
 		_actionSetTourInfoTextColor.setText(Messages.Calendar_View_Action_TextColor);
 
-		_actionSetTourInfoBlackTextHighlight = new Action(null, org.eclipse.jface.action.Action.AS_CHECK_BOX) {
+		_actionSetTourInfoBlackTextHighlight = new Action(null, Action.AS_CHECK_BOX) {
 			@Override
 			public void run() {
 				_calendarGraph.setTourInfoUseHighlightTextBlack(this.isChecked());
@@ -786,7 +470,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		};
 		_actionSetTourInfoBlackTextHighlight.setText(Messages.Calendar_View_Action_BlackHighlightText);
 
-		_actionSetShowDayNumberInTinyLayout = new Action(null, org.eclipse.jface.action.Action.AS_CHECK_BOX) {
+		_actionSetShowDayNumberInTinyLayout = new Action(null, Action.AS_CHECK_BOX) {
 			@Override
 			public void run() {
 				_calendarGraph.setShowDayNumberInTinyView(this.isChecked());
@@ -794,7 +478,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		};
 		_actionSetShowDayNumberInTinyLayout.setText(Messages.Calendar_View_Action_ShowDayNumberInTinyView);
 
-		_actionSetUseLineColorForWeekSummary = new Action(null, org.eclipse.jface.action.Action.AS_CHECK_BOX) {
+		_actionSetUseLineColorForWeekSummary = new Action(null, Action.AS_CHECK_BOX) {
 			@Override
 			public void run() {
 				_useLineColorForWeekSummary = this.isChecked();
@@ -804,8 +488,508 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		_actionSetUseLineColorForWeekSummary.setText(Messages.Calendar_View_Action_UseLineColorForSummary);
 	}
 
+	/**
+	 * description - title
+	 */
+	private TourInfoFormatter createFormatter_Tour_Description_Title() {
+
+		return new TourInfoFormatter() {
+			@Override
+			public String format(final CalendarTourData data) {
+
+				if (data.tourDescription != null && data.tourDescription.length() > 1) {
+
+					// for now we are only supporting one line descriptions
+					return data.tourDescription.replace("\r\n", UI.SPACE1).replace("\n", UI.SPACE1); //$NON-NLS-1$ //$NON-NLS-2$
+
+				} else if (data.tourTitle != null && data.tourTitle.length() > 1) {
+
+					return data.tourTitle;
+
+				} else {
+					return UI.EMPTY_STRING;
+				}
+			}
+
+			@Override
+			public String getText() {
+				return Messages.Calendar_View_Action_ShowDescriptionTitle;
+			}
+		};
+	}
+
+	/**
+	 * distance - pace
+	 */
+	private TourInfoFormatter createFormatter_Tour_Distance_Pace() {
+
+		return new TourInfoFormatter() {
+			@Override
+			public String format(final CalendarTourData data) {
+				final int pace = (int) (data.distance == 0
+						? 0
+						: (1000 * data.recordingTime / data.distance * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
+				final float distance = data.distance / 1000.0f / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+				return String
+						.format(
+								NLS.bind(
+										Messages.Calendar_View_Format_DistancePace,
+										UI.UNIT_LABEL_DISTANCE,
+										UI.UNIT_LABEL_PACE),
+								distance,
+								pace / 60,
+								pace % 60)
+						.toString();
+			}
+
+			@Override
+			public String getText() {
+				return Messages.Calendar_View_Action_DistancePace;
+			}
+		};
+	}
+
+	/**
+	 * distance - speed
+	 */
+	private TourInfoFormatter createFormatter_Tour_Distance_Speed() {
+
+		return new TourInfoFormatter() {
+			@Override
+			public String format(final CalendarTourData data) {
+				final float distance = data.distance;
+				final int time = data.recordingTime;
+				return String
+						.format(
+								NLS.bind(
+										Messages.Calendar_View_Format_DistanceSpeed,
+										UI.UNIT_LABEL_DISTANCE,
+										UI.UNIT_LABEL_SPEED),
+								distance / 1000.0f / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE,
+								distance == 0 ? 0 : distance / (time / 3.6f))
+						.toString();
+			}
+
+			@Override
+			public String getText() {
+				return Messages.Calendar_View_Action_ShowDistanceSpeed;
+			}
+		};
+	}
+
+	/**
+	 * distance - time
+	 */
+	private TourInfoFormatter createFormatter_Tour_Distance_Time() {
+		return new TourInfoFormatter() {
+			@Override
+			public String format(final CalendarTourData data) {
+				final float distance = (float) (data.distance / 1000.0 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
+				final int time = data.recordingTime;
+				return String
+						.format(
+								NLS.bind(Messages.Calendar_View_Format_DistanceTime, UI.UNIT_LABEL_DISTANCE),
+								distance,
+								time / 3600,
+								(time % 3600) / 60)
+						.toString();
+			}
+
+			@Override
+			public String getText() {
+				return Messages.Calendar_View_Action_ShowDistanceTime;
+			}
+		};
+	}
+
+	private TourInfoFormatter createFormatter_Tour_Empty() {
+
+		return new TourInfoFormatter() {
+			@Override
+			public String format(final CalendarTourData data) {
+				return UI.EMPTY_STRING;
+			}
+
+			@Override
+			public String getText() {
+				return Messages.Calendar_View_Action_ShowNothing;
+			}
+		};
+	}
+
+	/**
+	 * time - distance
+	 */
+	private TourInfoFormatter createFormatter_Tour_Time_Distance() {
+
+		return new TourInfoFormatter() {
+			@Override
+			public String format(final CalendarTourData data) {
+				final int time = data.recordingTime;
+				final float distance = data.distance / 1000.0f / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+				return String
+						.format(
+								NLS.bind(Messages.Calendar_View_Format_TimeDistance, UI.UNIT_LABEL_DISTANCE),
+								time / 3600,
+								(time % 3600) / 60,
+								distance)
+						.toString();
+			}
+
+			@Override
+			public String getText() {
+				return Messages.Calendar_View_Action_TimeDistance;
+			}
+		};
+	}
+
+	/**
+	 * time - pace
+	 */
+	private TourInfoFormatter createFormatter_Tour_Time_Pace() {
+
+		return new TourInfoFormatter() {
+			@Override
+			public String format(final CalendarTourData data) {
+
+				final int pace = (int) (data.distance == 0
+						? 0
+						: (1000 * data.recordingTime / data.distance * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
+
+				return String
+						.format(
+								NLS.bind(Messages.Calendar_View_Format_TimePace, UI.UNIT_LABEL_PACE),
+								data.recordingTime / 3600,
+								(data.recordingTime % 3600) / 60,
+								pace / 60,
+								pace % 60)
+						.toString();
+			}
+
+			@Override
+			public String getText() {
+				return Messages.Calendar_View_Action_TimePace;
+			}
+		};
+	}
+
+	private TourInfoFormatter createFormatter_Tour_Time_Speed() {
+		return /**
+				 * time - speed
+				 */
+		new TourInfoFormatter() {
+			@Override
+			public String format(final CalendarTourData data) {
+				final int time = data.recordingTime;
+				return String
+						.format(
+								NLS.bind(Messages.Calendar_View_Format_TimeSpeed, UI.UNIT_LABEL_SPEED),
+								time / 3600,
+								(time % 3600) / 60,
+								data.distance == 0 ? 0 : data.distance
+										/ time
+										* 3.6f
+										/ net.tourbook.ui.UI.UNIT_VALUE_DISTANCE)
+						.toString();
+			}
+
+			@Override
+			public String getText() {
+				return Messages.Calendar_View_Action_TimeSpeed;
+			}
+		};
+	}
+
+	/**
+	 * title - description
+	 */
+	private TourInfoFormatter createFormatter_Tour_Title_Description() {
+
+		return new TourInfoFormatter() {
+			@Override
+			public String format(final CalendarTourData data) {
+				if (data.tourTitle != null && data.tourTitle.length() > 1) {
+					return data.tourTitle;
+				} else if (data.tourDescription != null && data.tourDescription.length() > 1) {
+					// for now we are only supporting one line descriptions
+					return data.tourDescription.replace("\r\n", UI.SPACE1).replace("\n", UI.SPACE1); //$NON-NLS-1$ //$NON-NLS-2$
+				} else {
+					return UI.EMPTY_STRING;
+				}
+			}
+
+			@Override
+			public String getText() {
+				return Messages.Calendar_View_Action_ShowTitleDescription;
+			}
+		};
+	}
+
+	private WeekSummaryFormatter createFormatter_Week_Altitude() {
+
+		return new WeekSummaryFormatter(
+				this,
+				GraphColorManager.PREF_GRAPH_ALTITUDE,
+				Messages.Calendar_View_Action_SummaryAltitude) {
+
+			@Override
+			String format(final CalendarTourData data) {
+
+				if (data.altitude > 0) {
+
+					final long alt = (long) (data.altitude / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE);
+					return alt + UI.SPACE + UI.UNIT_LABEL_ALTITUDE;
+
+				} else {
+					return UI.DASH;
+				}
+			}
+
+			@Override
+			public ValueFormat getDefaultFormat() {
+				return ValueFormat.NUMBER_1_0;
+			}
+
+			@Override
+			public ValueFormat[] getValueFormats() {
+
+				return new ValueFormat[] {
+
+						ValueFormat.NUMBER_1_0,
+						ValueFormat.NUMBER_1_1 };
+			}
+		};
+	}
+
+	private WeekSummaryFormatter createFormatter_Week_Distance() {
+
+		return new WeekSummaryFormatter(
+				this,
+				GraphColorManager.PREF_GRAPH_DISTANCE,
+				Messages.Calendar_View_Action_SummaryDistance) {
+
+			@Override
+			String format(final CalendarTourData data) {
+
+				if (data.distance > 0) {
+
+					final float distance = (float) (data.distance / 1000.0 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
+
+					return String.format(
+							NLS.bind(Messages.Calendar_View_Format_Distance, UI.UNIT_LABEL_DISTANCE),
+							distance);
+				} else {
+					return UI.DASH;
+				}
+			}
+
+			@Override
+			public ValueFormat getDefaultFormat() {
+				return ValueFormat.NUMBER_1_0;
+			}
+
+			@Override
+			public ValueFormat[] getValueFormats() {
+
+				return new ValueFormat[] {
+						ValueFormat.NUMBER_1_0,
+						ValueFormat.NUMBER_1_1,
+						ValueFormat.NUMBER_1_2,
+						ValueFormat.NUMBER_1_3 };
+			}
+		};
+	}
+
+	private WeekSummaryFormatter createFormatter_Week_Empty() {
+
+		return new WeekSummaryFormatter(this, GraphColorManager.PREF_GRAPH_TIME) {
+
+			@Override
+			public String format(final CalendarTourData data) {
+				return UI.EMPTY_STRING;
+			}
+
+			@Override
+			public ValueFormat getDefaultFormat() {
+				return null;
+			}
+
+			@Override
+			public String getText() {
+				return Messages.Calendar_View_Action_ShowNothing;
+			}
+
+			@Override
+			public ValueFormat[] getValueFormats() {
+				return null;
+			}
+		};
+	}
+
+	private WeekSummaryFormatter createFormatter_Week_Pace() {
+
+		return new WeekSummaryFormatter(
+				this,
+				GraphColorManager.PREF_GRAPH_PACE,
+				Messages.Calendar_View_Action_SummaryPace) {
+
+			@Override
+			String format(final CalendarTourData data) {
+
+				if (data.recordingTime > 0 && data.distance > 0) {
+
+					final int pace = (int) (data.distance == 0
+							? 0
+							: (1000 * data.recordingTime / data.distance * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
+
+					return String
+							.format(
+									NLS.bind(Messages.Calendar_View_Format_Pace, UI.UNIT_LABEL_PACE),
+									pace / 60,
+									pace % 60)
+							.toString();
+				} else {
+					return UI.DASH;
+				}
+			}
+
+			@Override
+			public ValueFormat getDefaultFormat() {
+				return ValueFormat.NUMBER_1_1;
+			}
+
+			@Override
+			public ValueFormat[] getValueFormats() {
+
+				return new ValueFormat[] {
+						ValueFormat.NUMBER_1_0,
+						ValueFormat.NUMBER_1_1,
+						ValueFormat.NUMBER_1_2 };
+			}
+		};
+	}
+
+	private WeekSummaryFormatter createFormatter_Week_Speed() {
+
+		return new WeekSummaryFormatter(
+				this,
+				GraphColorManager.PREF_GRAPH_SPEED,
+				Messages.Calendar_View_Action_SummarySpeed) {
+
+			@Override
+			String format(final CalendarTourData data) {
+
+				if (data.distance > 0 && data.recordingTime > 0) {
+
+					return String
+							.format(
+									NLS.bind(Messages.Calendar_View_Format_Speed, UI.UNIT_LABEL_SPEED),
+									data.distance == 0 ? 0 : data.distance / (data.recordingTime / 3.6f))
+							.toString();
+				} else {
+
+					return UI.DASH;
+				}
+			}
+
+			@Override
+			public ValueFormat getDefaultFormat() {
+				return ValueFormat.NUMBER_1_0;
+			}
+
+			@Override
+			public ValueFormat[] getValueFormats() {
+
+				return new ValueFormat[] {
+						ValueFormat.NUMBER_1_0,
+						ValueFormat.NUMBER_1_1,
+						ValueFormat.NUMBER_1_2 };
+			}
+		};
+	}
+
+	private WeekSummaryFormatter createFormatter_Week_Time_Moving() {
+
+		return new WeekSummaryFormatter(
+				this,
+				GraphColorManager.PREF_GRAPH_TIME,
+				Messages.Calendar_View_Action_SummaryMovingTime) {
+
+			@Override
+			String format(final CalendarTourData data) {
+
+				if (data.recordingTime > 0) {
+					return String
+							.format(
+									Messages.Calendar_View_Format_Time,
+									data.drivingTime / 3600,
+									(data.drivingTime % 3600) / 60)
+							.toString();
+				} else {
+					return UI.DASH;
+				}
+			}
+
+			@Override
+			public ValueFormat getDefaultFormat() {
+				return ValueFormat.TIME_HH_MM;
+			}
+
+			@Override
+			public ValueFormat[] getValueFormats() {
+
+				return new ValueFormat[] {
+						ValueFormat.TIME_HH,
+						ValueFormat.TIME_HH_MM,
+						ValueFormat.TIME_HH_MM_SS };
+			}
+		};
+	}
+
+	private WeekSummaryFormatter createFormatter_Week_Time_Recording() {
+
+		return new WeekSummaryFormatter(
+				this,
+				GraphColorManager.PREF_GRAPH_TIME,
+				Messages.Calendar_View_Action_SummaryRecordingTime) {
+
+			@Override
+			String format(final CalendarTourData data) {
+
+				if (data.recordingTime > 0) {
+
+					return String
+							.format(
+									Messages.Calendar_View_Format_Time,
+									data.recordingTime / 3600,
+									(data.recordingTime % 3600) / 60)
+							.toString();
+				} else {
+
+					return UI.DASH;
+				}
+			}
+
+			@Override
+			public ValueFormat getDefaultFormat() {
+				return ValueFormat.TIME_HH_MM;
+			}
+
+			@Override
+			public ValueFormat[] getValueFormats() {
+
+				return new ValueFormat[] {
+						ValueFormat.TIME_HH,
+						ValueFormat.TIME_HH_MM,
+						ValueFormat.TIME_HH_MM_SS };
+			}
+		};
+	}
+
 	@Override
 	public void createPartControl(final Composite parent) {
+
+		_parent = parent;
 
 		addPartListener();
 		addPrefListener();
@@ -840,7 +1024,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 	@Override
 	public void dispose() {
 
-		TourManager.getInstance().removeTourEventListener(_tourPropertyListener);
+		TourManager.getInstance().removeTourEventListener(_tourEventListener);
 		getSite().getPage().removePostSelectionListener(_selectionListener);
 		_prefStore.removePropertyChangeListener(_prefChangeListener);
 
@@ -850,23 +1034,27 @@ public class CalendarView extends ViewPart implements ITourProvider {
 	private void fillActionBars() {
 
 		final IActionBars bars = getViewSite().getActionBars();
-		final IMenuManager menuManager = bars.getMenuManager();
 
-		menuManager.addMenuListener(new IMenuListener() {
-			@Override
-			public void menuAboutToShow(final IMenuManager manager) {
-				fillLocalPullDown(manager);
-			}
-		});
-
-		fillLocalPullDown(menuManager);
-
-		menuManager.setRemoveAllWhenShown(true);
-
-		fillLocalToolBar(bars.getToolBarManager());
+		fillViewMenu(bars.getMenuManager());
+		fillToolBar(bars.getToolBarManager());
 	}
 
-	private void fillLocalPullDown(final IMenuManager manager) {
+	private void fillToolBar(final IToolBarManager manager) {
+
+		_cymci = new CalendarYearMonthContributionItem(_calendarGraph);
+		_calendarGraph.setYearMonthContributor(_cymci);
+
+		manager.add(_cymci);
+		manager.add(_actionZoomIn);
+		manager.add(_actionZoomOut);
+
+		manager.add(new Separator());
+
+		manager.add(_actionSetLinked);
+		manager.add(_actionCalendarOptions);
+	}
+
+	private void fillViewMenu(final IMenuManager manager) {
 
 		for (final Action element : _actionSetSummaryFormatLine) {
 			manager.add(element);
@@ -894,28 +1082,21 @@ public class CalendarView extends ViewPart implements ITourProvider {
 
 			manager.add(_actionSetTourInfoTextColor);
 			manager.add(_actionSetTourInfoBlackTextHighlight);
-
 		}
-
 	}
 
-	private void fillLocalToolBar(final IToolBarManager manager) {
-
-		_cymci = new CalendarYearMonthContributionItem(_calendarGraph);
-		_calendarGraph.setYearMonthContributor(_cymci);
-
-		manager.add(_cymci);
-		manager.add(_actionZoomIn);
-		manager.add(_actionZoomOut);
-		manager.add(new Separator());
-		manager.add(_actionSetLinked);
+	public CalendarGraph getCalendarGraph() {
+		return _calendarGraph;
 	}
 
 	private ArrayList<Action> getLocalActions() {
+
 		final ArrayList<Action> localActions = new ArrayList<Action>();
+
 		localActions.add(_actionBack);
 		localActions.add(_actionGotoToday);
 		localActions.add(_actionForward);
+
 		return localActions;
 
 	}
@@ -943,6 +1124,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 			final Long oldTourId = _calendarGraph.getSelectedTourId();
 
 			if (newTourId != oldTourId) {
+
 				if (_actionSetLinked.isChecked()) {
 					_calendarGraph.gotoTourId(newTourId);
 				} else {
@@ -994,8 +1176,10 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		}
 
 		for (int i = 0; i < numberOfInfoLines; i++) {
+
 			// the 0. line has the 1. entry selected, the 1. line the 2. ...
 			final int tourInfoFormatterIndex = Util.getStateInt(_state, STATE_TOUR_INFO_FORMATTER_INDEX_ + i, i + 1);
+
 			_actionSetTourInfoFormat[i][tourInfoFormatterIndex].run();
 		}
 
@@ -1004,6 +1188,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 					_state,
 					STATE_WEEK_SUMMARY_FORMATTER_INDEX_ + i,
 					i + 1);
+
 			_actionSetWeekSummaryFormat[i][weekSummaryFormatterIndex].run();
 		}
 

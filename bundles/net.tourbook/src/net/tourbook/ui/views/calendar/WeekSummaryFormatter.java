@@ -2,6 +2,7 @@ package net.tourbook.ui.views.calendar;
 
 import net.tourbook.common.color.ColorDefinition;
 import net.tourbook.common.color.GraphColorManager;
+import net.tourbook.common.formatter.ValueFormat;
 
 import org.eclipse.swt.graphics.RGB;
 
@@ -44,6 +45,11 @@ abstract class WeekSummaryFormatter {
 		}
 	}
 
+	/**
+	 * @return Return the default format for this formatter
+	 */
+	public abstract ValueFormat getDefaultFormat();
+
 	String getText() {
 
 		if (null != _name) {
@@ -52,4 +58,9 @@ abstract class WeekSummaryFormatter {
 			return _colorDefinition.getVisibleName();
 		}
 	}
+
+	/**
+	 * @return Returns <code>null</code> when a format is not available.
+	 */
+	public abstract ValueFormat[] getValueFormats();
 }

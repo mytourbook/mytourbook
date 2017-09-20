@@ -7,23 +7,30 @@ class WeekSummaryFormatAction extends Action {
 	/**
 	 * 
 	 */
-	private final CalendarView calendarView;
-	WeekSummaryFormatter	formatter;
-	int						forLine;
+	private final CalendarView	_calendarView;
+	WeekSummaryFormatter		_formatter;
+	int							_forLine;
 
-	WeekSummaryFormatAction(CalendarView calendarView, final String text, final WeekSummaryFormatter formatter, final int forLine) {
+	WeekSummaryFormatAction(final CalendarView calendarView,
+							final String text,
+							final WeekSummaryFormatter formatter,
+							final int forLine) {
 
 		super(text, AS_RADIO_BUTTON);
-		this.calendarView = calendarView;
-		this.formatter = formatter;
-		this.forLine = forLine;
+
+		_calendarView = calendarView;
+		_formatter = formatter;
+		_forLine = forLine;
 	}
 
 	@Override
 	public void run() {
-		this.calendarView._calendarGraph.setWeekSummaryFormatter(forLine, formatter);
-		for (int i = 0; i < this.calendarView._tourWeekSummaryFormatter.length; i++) {
-			this.calendarView._actionSetWeekSummaryFormat[forLine][i].setChecked(i == formatter.index);
+
+		this._calendarView.getCalendarGraph().setWeekSummaryFormatter(_forLine, _formatter);
+
+		for (int i = 0; i < this._calendarView.tourWeekSummaryFormatter.length; i++) {
+
+			this._calendarView._actionSetWeekSummaryFormat[_forLine][i].setChecked(i == _formatter.index);
 		}
 	}
 }

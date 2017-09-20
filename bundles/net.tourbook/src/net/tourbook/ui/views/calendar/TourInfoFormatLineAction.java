@@ -41,7 +41,7 @@ class TourInfoFormatLineAction extends Action implements IMenuCreator {
 	public Menu getMenu(final Menu parent) {
 		formatMenu = new Menu(parent);
 
-		for (int i = 0; i < this.calendarView._tourInfoFormatter.length; i++) {
+		for (int i = 0; i < this.calendarView.tourInfoFormatter.length; i++) {
 			final ActionContributionItem item = new ActionContributionItem(this.calendarView._actionSetTourInfoFormat[line][i]);
 			item.fill(formatMenu, -1);
 		}

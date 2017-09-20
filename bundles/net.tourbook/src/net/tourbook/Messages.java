@@ -886,6 +886,7 @@ public class Messages extends NLS {
 	public static String		Image__Synced;
 	public static String		Image__SyncMapWithOtherMap;
 	public static String		Image__SyncMapWithOtherMap_Disabled;
+	public static String		Image__SyncViews;
 	public static String		Image__tag;
 	public static String		Image__tag_category;
 	public static String		Image__tag_root;
@@ -1583,6 +1584,11 @@ public class Messages extends NLS {
 	public static String		Search_View_Link_ExternalBrowser;
 	public static String		Search_View_Link_LinuxBrowser;
 	public static String		Search_View_Link_SetupExternalBrowser;
+
+	public static String		Slideout_CalendarOptions_Group_TourInfo;
+	public static String		Slideout_CalendarOptions_Group_WeekSummary;
+	public static String		Slideout_CalendarOptions_Label_N_Line;
+	public static String		Slideout_CalendarOptions_Label_Title;
 
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowAbsoluteValues;
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowAbsoluteValues_Tooltip;
