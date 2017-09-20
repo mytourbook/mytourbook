@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2011-2015 Matthias Helmling and Contributors
+ * Copyright (C) 2011-2017 Matthias Helmling and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -72,95 +72,93 @@ import org.joda.time.Days;
 
 public class CalendarGraph extends Canvas implements ITourProviderAll {
 
-	private final static IPreferenceStore		_prefStoreCommon			= CommonActivator.getPrefStore();
+	private static final IPreferenceStore		_prefStore				= CommonActivator.getPrefStore();
 
-	final static private long					_WEEK_MILLIS				= (1000 * 60 * 60 * 24 * 7);
+	private static final long					_WEEK_MILLIS			= (1000 * 60 * 60 * 24 * 7);
 
-	final static private int					_MIN_SCROLLABLE_WEEKS		= 12;
+	private static final int					_MIN_SCROLLABLE_WEEKS	= 12;
 
-	private Composite							_parent;
+	private boolean								DEBUG_SCROLL			= false;
 
-	private Display								_display					= Display.getCurrent();
+// SET_FORMATTING_OFF
+	private TourInfoFormatter[]					_tourInfoFormatter			= new TourInfoFormatter[CalendarView.numberOfInfoLines];
+	private WeekSummaryFormatter[]				_weekSummaryFormatter		= new WeekSummaryFormatter[CalendarView.numberOfSummaryLines];
+// SET_FORMATTING_ON
 
-	private final TourDoubleClickState			_tourDoubleClickState		= new TourDoubleClickState();
-	private ColorCacheSWT						_colorCache					= new ColorCacheSWT();
-	private Color								_black						= _display.getSystemColor(SWT.COLOR_BLACK);
-	private Color								_gray						= _display.getSystemColor(SWT.COLOR_GRAY);
-	private Color								_white						= _display.getSystemColor(SWT.COLOR_WHITE);
-	private Color								_red						= _display.getSystemColor(SWT.COLOR_RED);
+	private final TourDoubleClickState			_tourDoubleClickState	= new TourDoubleClickState();
+	private ColorCacheSWT						_colorCache				= new ColorCacheSWT();
 
-//	private NavigationStyle						_navigationStyle	= NavigationStyle.PHYSICAL;
-
-	//	private Color								_green				= _display.getSystemColor(SWT.COLOR_GREEN);
-	private Color								_blue						= _display.getSystemColor(SWT.COLOR_BLUE);
-	//	private Color								_magenta				= _display.getSystemColor(SWT.COLOR_MAGENTA);
-//	private Color								_cyan					= _display.getSystemColor(SWT.COLOR_CYAN);
-//	private Color								_darkGray				= _display.getSystemColor(SWT.COLOR_DARK_GRAY);
-	private Color								_darkGray					= _colorCache.getColor(0x404040);
 	private ArrayList<RGB>						_rgbBright;
 	private ArrayList<RGB>						_rgbDark;
-
 	private ArrayList<RGB>						_rgbLine;
 	private ArrayList<RGB>						_rgbText;
-	private DateTime							_dt							= new DateTime();
-	private DateTime							_dt_normal					= _dt;
-	private DateTime							_dt_tiny					= _dt;
-	private int									_numWeeksNormalView			= 5;
 
-	private int									_numWeeksTinyView			= 10;
-	private int									_lastDayOfWeekToGoTo		= -1;
+	private DateTime							_dt						= new DateTime();
+	private DateTime							_dt_normal				= _dt;
+	private DateTime							_dt_tiny				= _dt;
+
+	private int									_numWeeksNormalView		= 5;
+	private int									_numWeeksTinyView		= 10;
+	private int									_lastDayOfWeekToGoTo	= -1;
 
 	private List<ObjectLocation>				_tourFocus;
 	private List<ObjectLocation>				_dayFocus;
-	private Image								_image						= null;
-	private Image								_highlight					= null;
 
-	private boolean								_highlightChanged			= false;
-	private boolean								_isGraphClean				= false;
-	private Selection							_noItem						= new Selection(
+	private boolean								_isHighlightChanged		= false;
+	private boolean								_isGraphClean			= false;
+
+	private Selection							_noItem					= new Selection(
 			new Long(-1),
 			SelectionType.NONE);
-	private Selection							_selectedItem				= _noItem;
+	private Selection							_selectedItem			= _noItem;
+	private Selection							_highlightedItem		= _noItem;
+	private Selection							_lastSelection			= _noItem;
 
-	private Selection							_highlightedItem			= _noItem;
-
-	private Selection							_lastSelection				= _noItem;
-	final private Rectangle						_nullRec					= null;
+	final private Rectangle						_nullRec				= null;
 
 	private CalendarTourDataProvider			_dataProvider;
 
 	private CalendarYearMonthContributionItem	_calendarYearMonthContributor;
-	private ListenerList						_selectionProvider			= new ListenerList();
+	private ListenerList						_selectionProvider		= new ListenerList();
+
 	private int									_scrollBarShift;
-
 	private int									_scrollBarLastSelection;
-	private boolean								_scrollDebug				= false;
 
-	private int									_numberOfToursPerDay		= 3;
-	private boolean								_dynamicTourFieldSize		= true;
+	private int									_numberOfToursPerDay	= 3;
 
-	private TourInfoFormatter[]					_tourInfoFormatter			=
-			new TourInfoFormatter[CalendarView.numberOfInfoLines];
-	private WeekSummaryFormatter[]				_weekSummaryFormatter		=
-			new WeekSummaryFormatter[CalendarView.numberOfSummaryLines];
-
+	private boolean								_isDynamicTourFieldSize	= true;
+	private boolean								_isTinyLayout;
+	private boolean								_isShowDayNumberInTinyView;
+	private boolean								_isScrollbarInitialized;
 	private boolean								_useTextColorForTourInfoText;
 	private boolean								_useBlackForHighlightTourInfoText;
 
 	private Rectangle							_calendarAllDaysRectangle;
-//	private Rectangle _calendarFirstWeekRectangle;
-//	private Rectangle _calendarLastWeekRectangle;
 
-	private String								_refText					= "Tour12";									//$NON-NLS-1$
-	private boolean								_tinyLayout					= false;
-
-	private boolean								_showDayNumberInTinyView	= false;
-	Point										_refTextExtent;
+	private String								_refText				= "Tour12";									//$NON-NLS-1$
+	private Point								_refTextExtent;
 
 	/**
 	 * Cache font height;
 	 */
 	private int									_fontHeight;
+
+	/*
+	 * UI controls
+	 */
+	private Composite							_parent;
+	private Display								_display				= Display.getCurrent();
+
+	private Color								_black					= _display.getSystemColor(SWT.COLOR_BLACK);
+	private Color								_gray					= _display.getSystemColor(SWT.COLOR_GRAY);
+	private Color								_white					= _display.getSystemColor(SWT.COLOR_WHITE);
+	private Color								_red					= _display.getSystemColor(SWT.COLOR_RED);
+	private Color								_blue					= _display.getSystemColor(SWT.COLOR_BLUE);
+
+	private Color								_darkGray				= _colorCache.getColor(0x404040);
+
+	private Image								_image;
+	private Image								_highlight;
 
 	private class Day {
 
@@ -241,7 +239,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 //		gotoMonth(dt.getMonthOfYear());
 
 		addListener();
-
 	}
 
 	private void addListener() {
@@ -249,7 +246,14 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		addPaintListener(new PaintListener() {
 			@Override
 			public void paintControl(final PaintEvent event) {
+
 				drawCalendar(event.gc);
+
+				// fix problem that the scrollbar is initially not correctly setup
+				if (!_isScrollbarInitialized) {
+					_isScrollbarInitialized = true;
+					scrollBarUpdate();
+				}
 			}
 		});
 
@@ -486,6 +490,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		addControlListener(new ControlAdapter() {
 			@Override
 			public void controlResized(final ControlEvent event) {
+
 				_isGraphClean = false;
 				redraw();
 			}
@@ -534,20 +539,22 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	}
 
 	void draw() {
+
 		_isGraphClean = false;
 		redraw();
 	}
 
+	/**
+	 * Paint calendar
+	 * 
+	 * @param gc
+	 */
 	private void drawCalendar(GC gc) {
 
 		final int dayLabelXOffset = 1;
 
 		final int XX = getSize().x;
 		final int YY = getSize().y;
-
-//		System.out.println(_graphClean ? "clean!" : "NOT clean!");
-//		System.out.println(_highlightChanged ? "HL changed!" : "HL NOT changed");
-//		System.out.println("-----------");
 
 		_fontHeight = gc.getFontMetrics().getHeight();
 
@@ -560,9 +567,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 			drawSelection(gc);
 
-			if (_highlightChanged) {
+			if (_isHighlightChanged) {
 				drawHighLight(gc);
-				_highlightChanged = false;
+				_isHighlightChanged = false;
 			}
 
 			gc.dispose();
@@ -571,7 +578,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			return;
 		}
 
-		if (_scrollDebug) {
+		if (DEBUG_SCROLL) {
 			System.out.println("Drawing year: " + _dt.getYear() + " week: " + _dt.getWeekOfWeekyear()); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
@@ -598,11 +605,11 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		gc = new GC(_image);
 
 		_refTextExtent = gc.stringExtent(_refText);
-		final boolean oldLayout = _tinyLayout;
-		_tinyLayout = (_refTextExtent.x > XX / 9); // getNumOfWeeks needs the _tinuLayout set
+		final boolean oldLayout = _isTinyLayout;
+		_isTinyLayout = (_refTextExtent.x > XX / 9); // getNumOfWeeks needs the _tinuLayout set
 
-		if (oldLayout != _tinyLayout) { // the layout style changed, try to restore weeks and make selection visible
-			if (_tinyLayout) {
+		if (oldLayout != _isTinyLayout) { // the layout style changed, try to restore weeks and make selection visible
+			if (_isTinyLayout) {
 				_dt_normal = _dt;
 				_dt = _dt_tiny;
 			} else {
@@ -752,7 +759,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 				data = _dataProvider.getCalendarDayData(date.getYear(), date.getMonthOfYear(), date.getDayOfMonth());
 
 				// Day header box
-				if (!_tinyLayout) {
+				if (!_isTinyLayout) {
 					gc.setForeground(_gray);
 					gc.fillGradientRectangle(X1, Y1, dayRec.width + 1, dayLabelHeight, true); // no clue why I've to add 1 to the width, looks like a bug on Linux and does not hurt as we overwrite with the vertial line at the end anyway
 
@@ -784,7 +791,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 								dayRec.height
 										- dayLabelHeight));
 
-				if (_tinyLayout && _showDayNumberInTinyView) {
+				if (_isTinyLayout && _isShowDayNumberInTinyView) {
 					if (day.dayId == todayDayId) {
 						gc.setForeground(_blue);
 					} else if (weekDay == DateTimeConstants.SATURDAY || weekDay == DateTimeConstants.SUNDAY) {
@@ -845,22 +852,22 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		int max;
 
-		if ((0 == _numberOfToursPerDay) || _tinyLayout) {
+		if ((0 == _numberOfToursPerDay) || _isTinyLayout) {
 			max = data.length;
 		} else {
-			max = _dynamicTourFieldSize ? data.length : Math.min(_numberOfToursPerDay, data.length);
+			max = _isDynamicTourFieldSize ? data.length : Math.min(_numberOfToursPerDay, data.length);
 		}
 
 		for (int i = 0; i < max; i++) {
 
 			int ddy;
 
-			if ((0 == _numberOfToursPerDay) || _tinyLayout) {
+			if ((0 == _numberOfToursPerDay) || _isTinyLayout) {
 				ddy = rec.height / data.length;
 			} else {
 				final int dy = rec.height / _numberOfToursPerDay;
 				// narrow the tour fields to fit if more than _numberOfTourPerDay tours
-				ddy = _dynamicTourFieldSize ? (data.length <= _numberOfToursPerDay ? dy : (_numberOfToursPerDay * dy)
+				ddy = _isDynamicTourFieldSize ? (data.length <= _numberOfToursPerDay ? dy : (_numberOfToursPerDay * dy)
 						/ data.length) : dy;
 			}
 
@@ -917,7 +924,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		// focus is 1 pixel larger than tour rectangle
 		final Rectangle r = new Rectangle(rec.x + 1, rec.y + 1, rec.width - 2, rec.height - 2);
 		// only fill in text if the tour rectangle has a reasonable size
-		if (!_tinyLayout) {
+		if (!_isTinyLayout) {
 			Color color;
 			if (_useBlackForHighlightTourInfoText) {
 				color = _black;
@@ -1006,7 +1013,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		gc.fillGradientRectangle(r.x + 1, r.y + 1, r.width - 1, r.height - 1, false);
 
 		// only fill in text if the tour rectangle has a reasonable size
-		if (!_tinyLayout) {
+		if (!_isTinyLayout) {
 
 			Color fg;
 
@@ -1015,8 +1022,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			} else if (_useTextColorForTourInfoText) {
 				fg = _colorCache.getColor(_rgbText.get(data.typeColorIndex).hashCode());
 			} else {
-
-//				fg = _darkGray;
 
 				final RGB contrastRGB = ColorUtil.getContrastRGB(rgbBackground);
 
@@ -1072,7 +1077,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		gc.setFont(boldFont);
 		String text;
-		if (_tinyLayout) {
+		if (_isTinyLayout) {
 			if (dt.minusDays(1).getMonthOfYear() != dt.plusDays(6).getMonthOfYear()) { // a new month started on this week
 				gc.setClipping(new Rectangle(rec.x, rec.y, rec.width, 4 * rec.height)); // clipp to the room left of this month
 				text = dt.plusDays(6).toString("MMM"); //$NON-NLS-1$
@@ -1179,7 +1184,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 	private int getFirstDayOfWeek() {
 
-		final int firstDayOfWeek = _prefStoreCommon.getInt(ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK);
+		final int firstDayOfWeek = _prefStore.getInt(ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK);
 
 //		int firstDayOfWeek = _prefStore.getInt(ITourbookPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK);
 //		firstDayOfWeek--; // the prefStore is using Calendar Constants (SO=1 ... SA=7) we are using Joda (MO=1 .. SO=7)
@@ -1195,8 +1200,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		return _numberOfToursPerDay;
 	}
 
-	int getNumOfWeeks() {
-		if (_tinyLayout) {
+	private int getNumOfWeeks() {
+
+		if (_isTinyLayout) {
 			return _numWeeksTinyView;
 		} else {
 			return _numWeeksNormalView;
@@ -1230,7 +1236,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	}
 
 	public boolean getShowDayNumberInTinyView() {
-		return _showDayNumberInTinyView;
+		return _isShowDayNumberInTinyView;
 	}
 
 	public int getTourInfoFormatterIndex(final int line) {
@@ -1256,11 +1262,13 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		_dt = _dt.withDayOfWeek(getFirstDayOfWeek()); // set first day to start of week
 
 		_isGraphClean = false;
+
 		redraw();
 		scrollBarUpdate();
 	}
 
 	public void gotoFirstTour() {
+
 		_dt = _dataProvider.getFirstDateTime();
 		gotoDate(_dt);
 	}
@@ -1272,13 +1280,16 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		_dt = _dt.withDayOfWeek(getFirstDayOfWeek()); // set first day to start of week
 
 		_isGraphClean = false;
+
 		redraw();
 		scrollBarUpdate();
 	}
 
 	public void gotoNextScreen() {
+
 		_dt = _dt.plusWeeks(getNumOfWeeks());
 		_isGraphClean = false;
+
 		redraw();
 		scrollBarUpdate();
 	}
@@ -1288,15 +1299,19 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	}
 
 	public void gotoNextWeek() {
+
 		_dt = _dt.plusWeeks(1);
 		_isGraphClean = false;
+
 		redraw();
 		scrollBarUpdate();
 	}
 
 	public void gotoPrevScreen() {
+
 		_dt = _dt.minusWeeks(getNumOfWeeks());
 		_isGraphClean = false;
+
 		redraw();
 		scrollBarUpdate();
 	}
@@ -1306,8 +1321,10 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	}
 
 	public void gotoPrevWeek() {
+
 		_dt = _dt.minusWeeks(1);
 		_isGraphClean = false;
+
 		redraw();
 		scrollBarUpdate();
 	}
@@ -1318,6 +1335,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		final Days d = Days.daysBetween(new DateTime(0), _dt);
 		_selectedItem = new Selection((long) d.getDays(), SelectionType.DAY);
+
 		gotoDate(_dt);
 
 	}
@@ -1385,28 +1403,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 
 	}
-
-	/*
-	 * private void gotoTourOtherWeekday(final int direction) { if (_tourFocus.size() < 1) { if
-	 * (direction < 0) { gotoPrevWeek(); } else { gotoNextWeek(); } return; } if
-	 * (!_selectedItem.isTour()) { // if no tour is selected, count from first/last tour and select
-	 * this tour if (direction > 0) { _selectedItem = new Selection(_tourFocus.get(0).id,
-	 * SelectionType.TOUR); } else { _selectedItem = new Selection(new
-	 * Long(_tourFocus.get(_tourFocus.size() - 1).id), SelectionType.TOUR); } redraw(); return; }
-	 * int index = 0; CalendarTourData ctd = null; for (final ObjectLocation ol : _tourFocus) { if
-	 * (_selectedItem.id == ol.id) { ctd = (CalendarTourData) (ol.o); break; } index++; } if (null
-	 * == ctd) { // selected tour scrolled out of the window, select first/last tour if
-	 * (_tourFocus.size() > 0) { ObjectLocation ol; if (direction > 0) { ol = _tourFocus.get(0); }
-	 * else { ol = _tourFocus.get(_tourFocus.size() - 1); } _selectedItem = new Selection(ol.id,
-	 * SelectionType.TOUR); redraw(); return; } } if (null != ctd) { index += direction; for (int i
-	 * = index; i >= 0 && i < _tourFocus.size(); i += direction) { final ObjectLocation ol =
-	 * _tourFocus.get(i); // if (ctd.dayOfWeek != ((CalendarTourData) (ol.o)).dayOfWeek) { final
-	 * CalendarTourData ctdNext = (CalendarTourData) (ol.o); if (ctd.day != ctdNext.day || ctd.week
-	 * != ctdNext.week || ctd.year != ctdNext.year) { _selectedItem = new Selection(ol.id,
-	 * SelectionType.TOUR); redraw(); return; } } } else { // selected Item is not on the screen any
-	 * more // _selectedItem = _noItem; keep selection } if (direction < 0) { gotoPrevWeek(); } else
-	 * { gotoNextWeek(); } }
-	 */
 
 	private void gotoTourSameWeekday(final int direction) {
 
@@ -1478,12 +1474,13 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		_dt = _dt.withDayOfWeek(getFirstDayOfWeek());
 
 		_isGraphClean = false;
+
 		redraw();
 		scrollBarUpdate();
 	}
 
 	boolean isTinyLayout() {
-		return _tinyLayout;
+		return _isTinyLayout;
 	}
 
 	/**
@@ -1566,8 +1563,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			return;
 		}
 
-		_highlightChanged = (!oldHighlight.equals(_highlightedItem));
-		if (_highlightChanged) { // only draw the highlighting on top of the calendar image
+		_isHighlightChanged = (!oldHighlight.equals(_highlightedItem));
+		if (_isHighlightChanged) { // only draw the highlighting on top of the calendar image
 			redraw();
 		}
 		return;
@@ -1582,7 +1579,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		final int selection = sb.getSelection();
 		final int change = selection - _scrollBarLastSelection;
 
-		if (_scrollDebug) {
+		if (DEBUG_SCROLL) {
 			System.out.println("Last Selection: " + _scrollBarLastSelection + " - New Selection: " + selection); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
@@ -1622,7 +1619,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		// sb.setMaximum(weeks);
 		// sb.setPageIncrement(getNumWeeks());
 
-		if (_scrollDebug) {
+		if (DEBUG_SCROLL) {
 			System.out.println("SbarStart: " + scrollBarStart().getWeekOfWeekyear()); //$NON-NLS-1$
 			System.out.println("SbarShift: " + _scrollBarShift + " - Selected Week: " + selection); //$NON-NLS-1$ //$NON-NLS-2$
 		}
@@ -1637,15 +1634,20 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	}
 
 	public void refreshCalendar() {
+
 		_dataProvider.invalidate();
 		_isGraphClean = false;
+
 		redraw();
 	}
 
 	public void removeSelection() {
+
 		if (!_selectedItem.equals(_noItem)) {
+
 			_selectedItem = _noItem;
 			_isGraphClean = false;
+
 			redraw();
 		}
 	}
@@ -1655,6 +1657,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	}
 
 	private DateTime scrollBarEnd() {
+
 		final DateTime dt = new DateTime().plusWeeks(_scrollBarShift);
 
 		// ensure the date return is a "FirstDayOfTheWeek" !!!
@@ -1662,6 +1665,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	}
 
 	private DateTime scrollBarStart() {
+
 		// DateTime dt = _dataProvider.getFirstDateTime().plusWeeks(_scrollBarShift);
 		DateTime dt = _dataProvider.getFirstDateTime();
 		final DateTime now = new DateTime();
@@ -1670,36 +1674,53 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			dt = now.minusWeeks(_MIN_SCROLLABLE_WEEKS);
 		}
 		dt = dt.plusWeeks(_scrollBarShift);
+
 		// ensure the date return is a "FirstDayOfTheWeek" !!!
 		return dt.minusWeeks(1).withDayOfWeek(getFirstDayOfWeek());
 	}
 
 	private void scrollBarUpdate() {
+
 		_scrollBarShift = 0;
+
 		final ScrollBar sb = _parent.getVerticalBar();
+
 		final long dt1 = scrollBarStart().getMillis();
 		final long dt2 = _dt.getMillis();
 		final long dt3 = scrollBarEnd().getMillis();
+
 		int maxWeeks = (int) ((dt3 - dt1) / _WEEK_MILLIS);
 		final int thumbSize = Math.max(getNumOfWeeks(), maxWeeks / 20); // ensure the thumb isn't getting to small
-		sb.setThumb(thumbSize);
+
 		int thisWeek;
+
 		if (dt2 < dt1) {
+
 			// shift negative
+
 			_scrollBarShift = (int) ((dt2 - dt1) / _WEEK_MILLIS);
 			thisWeek = 1;
+
 		} else if (dt2 > dt3) {
+
 			// shift positive
+
 			_scrollBarShift = (int) ((dt2 - dt3) / _WEEK_MILLIS);
 			thisWeek = maxWeeks - 1;
+
 		} else {
+
 			thisWeek = (int) ((dt2 - dt1) / _WEEK_MILLIS);
 		}
+
 		maxWeeks += thumbSize;
+
 		sb.setMinimum(0);
 		sb.setMaximum(maxWeeks);
+		sb.setThumb(thumbSize);
 		sb.setPageIncrement(getNumOfWeeks());
 		sb.setSelection(thisWeek);
+
 		_scrollBarLastSelection = thisWeek;
 	}
 
@@ -1721,18 +1742,17 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 	}
 
-//	void setNavigationStyle(final NavigationStyle navigationStyle) {
-//		_navigationStyle = navigationStyle;
-//	}
-
 	void setNumberOfToursPerDay(final int numberOfToursPerDay) {
+
 		_numberOfToursPerDay = numberOfToursPerDay;
 		_isGraphClean = false;
+
 		redraw();
 	}
 
-	void setNumOfWeeks(final int numberOfWeeks) {
-		if (_tinyLayout) {
+	private void setNumOfWeeks(final int numberOfWeeks) {
+
+		if (_isTinyLayout) {
 			_numWeeksTinyView = numberOfWeeks;
 		} else {
 			_numWeeksNormalView = numberOfWeeks;
@@ -1752,14 +1772,14 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	}
 
 	public void setShowDayNumberInTinyView(final boolean checked) {
-		_showDayNumberInTinyView = checked;
+		_isShowDayNumberInTinyView = checked;
 		_isGraphClean = false;
 		redraw();
 	}
 
 	void setTourFieldSizeDynamic(final boolean dynamicTourFieldSize) {
 		_isGraphClean = false;
-		_dynamicTourFieldSize = dynamicTourFieldSize;
+		_isDynamicTourFieldSize = dynamicTourFieldSize;
 		redraw();
 	}
 
@@ -1819,16 +1839,20 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	}
 
 	void zoomIn() {
+
 		int numWeeksDisplayed = getNumOfWeeks();
 		setNumOfWeeks(numWeeksDisplayed > 1 ? --numWeeksDisplayed : numWeeksDisplayed);
 		_isGraphClean = false;
+
 		redraw();
 		scrollBarUpdate();
 	}
 
 	void zoomOut() {
+
 		setNumOfWeeks(getNumOfWeeks() + 1);
 		_isGraphClean = false;
+
 		redraw();
 		scrollBarUpdate();
 	}

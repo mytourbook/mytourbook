@@ -56,7 +56,6 @@ import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
-import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 import org.joda.time.DateTime;
 
@@ -69,12 +68,12 @@ public class CalendarView extends ViewPart implements ITourProvider {
 	 */
 	public static final String					ID										= "net.tourbook.views.calendar.CalendarView";		//$NON-NLS-1$
 	
-	private static final String					STATE_SELECTED_TOURS					= "SelectedTours";									// $NON-NLS-1$ //$NON-NLS-1$
 	private static final String					STATE_FIRST_DAY							= "FirstDayDisplayed";								// $NON-NLS-1$ //$NON-NLS-1$
-	private static final String					STATE_NUM_OF_WEEKS_NORMAL				= "NumberOfWeeksDisplayed";							// $NON-NLS-1$ //$NON-NLS-1$
-	private static final String					STATE_NUM_OF_WEEKS_TINY					= "NumberOfWeeksDisplayedTinyView";					// $NON-NLS-1$ //$NON-NLS-1$
 	private static final String					STATE_IS_LINKED							= "Linked";											// $NON-NLS-1$ //$NON-NLS-1$
-	private static final String					STATE_NUMBER_OF_TOURS_PER_DAY			= "NumberOfToursPerDay";							// $NON-NLS-1$ //$NON-NLS-1$
+	private static final String					STATE_NUM_WEEKS_NORMAL					= "NumberOfWeeksDisplayed";							// $NON-NLS-1$ //$NON-NLS-1$
+	private static final String					STATE_NUM_WEEKS_TINY					= "NumberOfWeeksDisplayedTinyView";					// $NON-NLS-1$ //$NON-NLS-1$
+	private static final String					STATE_NUM_TOURS_PER_DAY					= "NumberOfToursPerDay";							// $NON-NLS-1$ //$NON-NLS-1$
+	private static final String					STATE_SELECTED_TOURS					= "SelectedTours";									// $NON-NLS-1$ //$NON-NLS-1$
 	private static final String					STATE_TOUR_INFO_FORMATTER_INDEX_		= "TourInfoFormatterIndex";							//$NON-NLS-1$
 	private static final String					STATE_WEEK_SUMMARY_FORMATTER_INDEX_		= "WeekSummaryFormatterIndex";						//$NON-NLS-1$
 	
@@ -92,7 +91,6 @@ public class CalendarView extends ViewPart implements ITourProvider {
 	
 // SET_FORMATTING_ON
 
-	private PageBook							_pageBook;
 	private CalendarComponents					_calendarComponents;
 
 	CalendarGraph								_calendarGraph;
@@ -551,7 +549,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		getViewSite().getPage().addPartListener(_partListener);
 	}
 
-	private void addPropListener() {
+	private void addPrefListener() {
 
 		_prefChangeListener = new IPropertyChangeListener() {
 
@@ -651,7 +649,6 @@ public class CalendarView extends ViewPart implements ITourProvider {
 				_calendarGraph.gotoPrevScreen();
 			}
 		};
-		_actionBack.setId("net.tourbook.calendar.back"); //$NON-NLS-1$
 		_actionBack.setText(Messages.Calendar_View_Action_Back);
 		_actionBack.setToolTipText(Messages.Calendar_View_Action_Back_Tooltip);
 		_actionBack.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ArrowDown));
@@ -811,7 +808,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 	public void createPartControl(final Composite parent) {
 
 		addPartListener();
-		addPropListener();
+		addPrefListener();
 		addTourEventListener();
 
 		createUI(parent);
@@ -836,10 +833,8 @@ public class CalendarView extends ViewPart implements ITourProvider {
 
 	private void createUI(final Composite parent) {
 
-		_pageBook = new PageBook(parent, SWT.NONE);
-		_calendarComponents = new CalendarComponents(_pageBook, SWT.NORMAL);
+		_calendarComponents = new CalendarComponents(parent, SWT.NORMAL);
 		_calendarGraph = _calendarComponents.getGraph();
-		_pageBook.showPage(_calendarComponents);
 	}
 
 	@Override
@@ -853,21 +848,21 @@ public class CalendarView extends ViewPart implements ITourProvider {
 	}
 
 	private void fillActionBars() {
-		
+
 		final IActionBars bars = getViewSite().getActionBars();
 		final IMenuManager menuManager = bars.getMenuManager();
-		
+
 		menuManager.addMenuListener(new IMenuListener() {
 			@Override
 			public void menuAboutToShow(final IMenuManager manager) {
 				fillLocalPullDown(manager);
 			}
 		});
-		
+
 		fillLocalPullDown(menuManager);
-		
+
 		menuManager.setRemoveAllWhenShown(true);
-		
+
 		fillLocalToolBar(bars.getToolBarManager());
 	}
 
@@ -892,12 +887,11 @@ public class CalendarView extends ViewPart implements ITourProvider {
 			}
 
 			manager.add(new Separator());
+
 			for (final Action element : _actionSetNumberOfToursPerDay) {
 				manager.add(element);
 			}
-//			manager.add(new Separator());
-//			manager.add(_setTourSizeDynamic);
-//			manager.add(new Separator());
+
 			manager.add(_actionSetTourInfoTextColor);
 			manager.add(_actionSetTourInfoBlackTextHighlight);
 
@@ -911,12 +905,6 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		_calendarGraph.setYearMonthContributor(_cymci);
 
 		manager.add(_cymci);
-		// don't repeat context menu...
-		// manager.add(new Separator());
-		// manager.add(_back);
-		// manager.add(_forward);
-		// manager.add(_gotoToday);
-		// manager.add(new Separator());
 		manager.add(_actionZoomIn);
 		manager.add(_actionZoomOut);
 		manager.add(new Separator());
@@ -983,8 +971,8 @@ public class CalendarView extends ViewPart implements ITourProvider {
 
 	private void restoreState() {
 
-		_calendarGraph.setNumWeeksNormalLayout(Util.getStateInt(_state, STATE_NUM_OF_WEEKS_NORMAL, 5));
-		_calendarGraph.setNumWeeksTinyLayout(Util.getStateInt(_state, STATE_NUM_OF_WEEKS_TINY, 15));
+		_calendarGraph.setNumWeeksNormalLayout(Util.getStateInt(_state, STATE_NUM_WEEKS_NORMAL, 5));
+		_calendarGraph.setNumWeeksTinyLayout(Util.getStateInt(_state, STATE_NUM_WEEKS_TINY, 15));
 
 		final Long dateTimeMillis = Util.getStateLong(_state, STATE_FIRST_DAY, 0);
 		if (dateTimeMillis > 0) {
@@ -996,24 +984,11 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		final Long selectedTourId = Util.getStateLong(_state, STATE_SELECTED_TOURS, new Long(-1));
 		_calendarGraph.setSelectionTourId(selectedTourId);
 
-//		final String[] selectedTourIds = _state.getArray(STATE_SELECTED_TOURS);
-//		_selectedTourIds.clear();
-//
-//		if (selectedTourIds != null) {
-//			for (final String tourId : selectedTourIds) {
-//				try {
-//					_selectedTourIds.add(Long.valueOf(tourId));
-//				} catch (final NumberFormatException e) {
-//					// ignore
-//				}
-//			}
-//		}
-
 		_actionSetLinked.setChecked(Util.getStateBoolean(_state, STATE_IS_LINKED, false));
 
 		// _setTourSizeDynamic.setChecked(Util.getStateBoolean(_state, STATE_TOUR_SIZE_DYNAMIC, true));
 
-		final int numberOfTours = Util.getStateInt(_state, STATE_NUMBER_OF_TOURS_PER_DAY, 3);
+		final int numberOfTours = Util.getStateInt(_state, STATE_NUM_TOURS_PER_DAY, 3);
 		if (numberOfTours < _actionSetNumberOfToursPerDay.length) {
 			_actionSetNumberOfToursPerDay[numberOfTours].run();
 		}
@@ -1061,21 +1036,16 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		_state.put(STATE_FIRST_DAY, _calendarGraph.getFirstDay().getMillis());
 
 		// save number of weeks displayed
-		_state.put(STATE_NUM_OF_WEEKS_NORMAL, _calendarGraph.getNumWeeksNormalLayout());
-		_state.put(STATE_NUM_OF_WEEKS_TINY, _calendarGraph.getNumWeeksTinyLayout());
+		_state.put(STATE_NUM_WEEKS_NORMAL, _calendarGraph.getNumWeeksNormalLayout());
+		_state.put(STATE_NUM_WEEKS_TINY, _calendarGraph.getNumWeeksTinyLayout());
 
-		// convert tour id's into string
-		// final ArrayList<String> selectedTourIds = new ArrayList<String>();
-		// for (final Long tourId : _selectedTourIds) {
-		// 	selectedTourIds.add(tourId.toString());
-		// }
 		// until now we only implement single tour selection
 		_state.put(STATE_SELECTED_TOURS, _calendarGraph.getSelectedTourId());
 
 		_state.put(STATE_IS_LINKED, _actionSetLinked.isChecked());
 		// _state.put(STATE_TOUR_SIZE_DYNAMIC, _setTourSizeDynamic.isChecked());
 
-		_state.put(STATE_NUMBER_OF_TOURS_PER_DAY, _calendarGraph.getNumberOfToursPerDay());
+		_state.put(STATE_NUM_TOURS_PER_DAY, _calendarGraph.getNumberOfToursPerDay());
 
 		for (int i = 0; i < numberOfInfoLines; i++) {
 			_state.put(STATE_TOUR_INFO_FORMATTER_INDEX_ + i, _calendarGraph.getTourInfoFormatterIndex(i));
@@ -1099,9 +1069,5 @@ public class CalendarView extends ViewPart implements ITourProvider {
 	public void setFocus() {
 		_calendarComponents.setFocus();
 	}
-
-//	private void showMessage(final String message) {
-//		MessageDialog.openInformation(_pageBook.getShell(), "%view_name_Calendar", message);
-//	}
 
 }

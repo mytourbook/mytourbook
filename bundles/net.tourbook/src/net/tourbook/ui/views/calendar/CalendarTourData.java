@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2011  Matthias Helmling and Contributors
+ * Copyright (C) 2011-2017 Matthias Helmling and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,13 +18,12 @@ package net.tourbook.ui.views.calendar;
 
 import java.util.ArrayList;
 
-
 public class CalendarTourData {
 
-	long	tourId;
-	long	typeId;
+	long			tourId;
+	long			typeId;
 
-	int		typeColorIndex;
+	int				typeColorIndex;
 
 	int				year;
 	int				month;
@@ -45,7 +44,6 @@ public class CalendarTourData {
 	String			tourDescription;
 
 	int				numTours;
-
 
 	ArrayList<Long>	tagIds;
 

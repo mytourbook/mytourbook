@@ -1,6 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2011  Matthias Helmling and Contributors
- * 
+ * Copyright (C) 2011-2017 Matthias Helmling and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -35,10 +34,9 @@ public class CalendarTourDataProvider {
 
 	private static CalendarTourDataProvider				_instance;
 
-//	private ArrayList<Long>					_tourIds;
-
 	private HashMap<Integer, CalendarTourData[][][]>	_dayCache;
 	private HashMap<Integer, CalendarTourData[]>		_weekCache;
+
 	private DateTime									_firstDateTime;
 
 	private CalendarTourDataProvider() {
@@ -46,28 +44,17 @@ public class CalendarTourDataProvider {
 	};
 
 	public static CalendarTourDataProvider getInstance() {
+
 		if (_instance == null) {
 			_instance = new CalendarTourDataProvider();
 		}
+
 		return _instance;
 	}
 
 	CalendarTourData[] getCalendarDayData(final int year, final int month, final int day) {
 
 		CalendarTourData[] data;
-
-//		if (!_dayCache.containsKey(year)) {
-//			_dayCache.put(year, new CalendarTourData[12][31][]);
-//		}
-//
-//		if (_dayCache.get(year)[month - 1][day - 1] != null) {
-//			data = _dayCache.get(year)[month - 1][day - 1];
-//			// System.out.println("Cache Hit");
-//		} else {
-//			data = getCalendarDayDataFromDb(year, month, day);
-//			_dayCache.get(year)[month - 1][day - 1] = data;
-//			// System.out.println("Cache miss");
-//		}
 
 		if (!_dayCache.containsKey(year)) {
 			_dayCache.put(year, new CalendarTourData[12][][]);
@@ -78,6 +65,7 @@ public class CalendarTourDataProvider {
 		} else {
 			_dayCache.get(year)[month - 1] = getCalendarMonthDataFromDb(year, month);
 		}
+
 		data = _dayCache.get(year)[month - 1][day - 1];
 
 		return data;
@@ -729,8 +717,10 @@ public class CalendarTourDataProvider {
 	}
 
 	public void invalidate() {
+
 		_dayCache = new HashMap<Integer, CalendarTourData[][][]>();
 		_weekCache = new HashMap<Integer, CalendarTourData[]>();
+
 		_firstDateTime = null;
 	}
 
