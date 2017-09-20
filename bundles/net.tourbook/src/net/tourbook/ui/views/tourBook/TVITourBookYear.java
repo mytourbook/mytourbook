@@ -127,6 +127,7 @@ public class TVITourBookYear extends TVITourBookItem {
 
 					final TemporalField weekBasedYear = TimeTools.calendarWeek.weekBasedYear();
 					final TemporalField weekOfYear = TimeTools.calendarWeek.weekOfYear();
+//					final TemporalField weekOfYear = TimeTools.calendarWeek.weekOfWeekBasedYear();
 
 					categoryDate = tourWeekLocal//
 							.with(weekBasedYear, dbYear)

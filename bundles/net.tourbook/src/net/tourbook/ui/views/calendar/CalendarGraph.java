@@ -30,7 +30,6 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProviderAll;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.views.calendar.CalendarView.TourInfoFormatter;
-import net.tourbook.ui.views.calendar.CalendarView.WeekSummaryFormatter;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.preference.IPreferenceStore;
