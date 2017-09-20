@@ -64,7 +64,7 @@ public class ColorUtil {
 	}
 
 	/**
-	 * Compute a background color that contrasts with the text color.
+	 * Compute a color that contrasts with the given color.
 	 * 
 	 * @param red
 	 * @param green
@@ -91,7 +91,7 @@ public class ColorUtil {
 	}
 
 	/**
-	 * Compute a background color that contrasts with the text color.
+	 * Compute a color that contrasts with the given color.
 	 * 
 	 * @param red
 	 * @param green
@@ -109,5 +109,32 @@ public class ColorUtil {
 		} else {
 			return new Color(1, 1, 1, newAlpha);
 		}
+	}
+
+	/**
+	 * Compute a color that contrasts with the given color.
+	 * 
+	 * @param red
+	 * @param green
+	 * @param blue
+	 * @return Returns white or black that contrasts with the background color.
+	 */
+	public static RGB getContrastRGB(
+										final int red,
+										final int green,
+										final int blue) {
+
+		final int yiq = ((red * 299) + (green * 587) + (blue * 114)) / 1000;
+
+		if (yiq >= 128) {
+			return new RGB(0, 0, 0);
+		} else {
+			return new RGB(0xff, 0xff, 0xff);
+		}
+	}
+
+	public static RGB getContrastRGB(final RGB rgb) {
+
+		return getContrastRGB(rgb.red, rgb.green, rgb.blue);
 	}
 }

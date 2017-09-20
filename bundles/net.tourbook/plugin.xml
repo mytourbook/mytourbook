@@ -860,6 +860,20 @@
 					icon="icons/tourbook-tours.png"
 					label="%view_name_Book"
 					mnemonic="%view_name_Book_Mnemonic"/>
+					
+				<!-- Calendar -->
+				<command 
+					commandId="command.net.tourbook.views.calendar.CalendarView"
+					icon="icons/calendar.png"
+					label="%view_name_Calendar"
+					mnemonic="%view_name_Calendar_Mnemonic"/>
+
+				<!-- Statistics -->
+				<command 
+					commandId="command.net.tourbook.statistic.StatisticView"
+					icon="icons/statistics.png"
+					label="%view_name_Statistics"
+					mnemonic="%view_name_Statistics_Mnemonic"/>
 				
 			</toolbar>
 		</menuContribution>
@@ -1712,6 +1726,21 @@
 			id="net.tourbook.scheme"
 			name="MyTourbook Scheme"
 			parentId="org.eclipse.ui.defaultAcceleratorConfiguration"/>
+
+		<!-- Directories -->            
+
+		<key
+			commandId="command.net.tourbook.views.calendar.CalendarView"
+			sequence="%Shortcut_Key_App_Calendar"
+			contextId="org.eclipse.ui.contexts.window"
+			schemeId="net.tourbook.scheme"/>
+
+		<key
+			commandId="command.net.tourbook.statistic.StatisticView"
+			sequence="%Shortcut_Key_App_Statistic"
+			contextId="org.eclipse.ui.contexts.window"
+			schemeId="net.tourbook.scheme"/>
+
 
 		<!-- New -->
 	
