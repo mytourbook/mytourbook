@@ -26,7 +26,7 @@ public class CalendarConfig {
 	public String	defaultId	= CalendarConfigManager.CONFIG_DEFAULT_ID_1;
 	public String	name		= CalendarConfigManager.CONFIG_DEFAULT_ID_1;
 
-	public int		weekHeight;
+	public int		weekHeight	= CalendarConfigManager.DEFAULT_CELL_HEIGHT;
 
 	@Override
 	public boolean equals(final Object obj) {

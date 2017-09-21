@@ -77,6 +77,8 @@ public class CalendarConfigManager {
 	static final int			CELL_HEIGHT_MIN			= 3;
 	static final int			CELL_HEIGHT_MAX			= 200;
 	//
+	static final int			DEFAULT_CELL_HEIGHT		= 70;
+	//
 	// !!! this is a code formatting separator !!!
 	static {}
 	//

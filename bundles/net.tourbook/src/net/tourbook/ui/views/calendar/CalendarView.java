@@ -1255,4 +1255,17 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		_calendarComponents.setFocus();
 	}
 
+	void updateUI_Layout() {
+
+		if (null != _calendarGraph) {
+
+			BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+				@Override
+				public void run() {
+					_calendarGraph.updateUI_Layout();
+				}
+			});
+		}
+	}
+
 }

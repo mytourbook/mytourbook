@@ -714,7 +714,7 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 
 	private void updateUI() {
 
-//		_map25View.getMapApp().onModifyMarkerConfig();
+		_calendarView.updateUI_Layout();
 	}
 
 }

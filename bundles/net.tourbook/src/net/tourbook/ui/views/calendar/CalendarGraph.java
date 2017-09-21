@@ -551,17 +551,20 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	 */
 	private void drawCalendar(GC gc) {
 
+		final CalendarConfig calConfig = CalendarConfigManager.getActiveCalendarConfig();
+
 		final int dayLabelXOffset = 1;
 
-		final int XX = getSize().x;
-		final int YY = getSize().y;
+		final Point canvasSize = getSize();
+		final int canvasWidth = canvasSize.x;
+		final int canvasHeight = canvasSize.y;
 
 		_fontHeight = gc.getFontMetrics().getHeight();
 
 		if (_isGraphClean && _image != null) {
 
 			final GC oldGc = gc;
-			_highlight = new Image(getDisplay(), XX, YY);
+			_highlight = new Image(getDisplay(), canvasWidth, canvasHeight);
 			gc = new GC(_highlight);
 			gc.drawImage(_image, 0, 0);
 
@@ -587,7 +590,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 
 		DateTime date = new DateTime(_dt);
-		_image = new Image(getDisplay(), XX, YY);
+		_image = new Image(getDisplay(), canvasWidth, canvasHeight);
 
 		// update month/year dropdown box
 		// look at the 1st day of the week after the first day displayed because if we go to
@@ -606,9 +609,12 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		_refTextExtent = gc.stringExtent(_refText);
 		final boolean oldLayout = _isTinyLayout;
-		_isTinyLayout = (_refTextExtent.x > XX / 9); // getNumOfWeeks needs the _tinuLayout set
+		_isTinyLayout = (_refTextExtent.x > canvasWidth / 9); // getNumOfWeeks needs the _tinuLayout set
 
-		if (oldLayout != _isTinyLayout) { // the layout style changed, try to restore weeks and make selection visible
+		if (oldLayout != _isTinyLayout) {
+
+			// the layout style changed, try to restore weeks and make selection visible
+
 			if (_isTinyLayout) {
 				_dt_normal = _dt;
 				_dt = _dt_tiny;
@@ -616,7 +622,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 				_dt_tiny = _dt;
 				_dt = _dt_normal;
 			}
+
 			scrollBarUpdate();
+
 			if (_selectedItem.id > 0) {
 				switch (_selectedItem.type) {
 				case DAY:
@@ -630,7 +638,12 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 
 		final int numCols = 9; // one col left and right of the week + 7 week days
-		final int numRows = getNumOfWeeks(); // number of weeks per month displayed (make sure _tinyLayout is already defined!)
+//		int numRows = getNumOfWeeks(); // number of weeks per month displayed (make sure _tinyLayout is already defined!)
+
+		final int weekHeight = calConfig.weekHeight;
+		final int numRows = canvasHeight / weekHeight;
+
+		setNumOfWeeks(numRows);
 
 		final Color alternate = _colorCache.getColor(0xf0f0f0);
 
@@ -649,35 +662,35 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		gc.setForeground(_black);
 		gc.fillRectangle(area);
 
-		final float dY = (float) YY / (float) numRows;
-		float dX = (float) XX / (float) numCols;
+//		final float weekHeight = (float) canvasHeight / (float) numRows;
+		float cellWidth = (float) canvasWidth / (float) numCols;
 
 		// keep the summary column at a minimal width and hide it completely if height goes blow usable value
 		final int minSummaryWidth = _refTextExtent.x;
 		final int minSummaryHeigth = (_refTextExtent.y * 2) / 3;
 		int summaryWidth = 0;
-		if (dY > minSummaryHeigth) {
-			if (dX < minSummaryWidth) {
+		if (weekHeight > minSummaryHeigth) {
+			if (cellWidth < minSummaryWidth) {
 				summaryWidth = minSummaryWidth;
 			} else {
-				summaryWidth = (int) dX;
+				summaryWidth = (int) cellWidth;
 			}
 		}
 
 		final int minInfoWidth = _refTextExtent.x / 2;
 		final int minInfoHeigth = (_refTextExtent.y / 3);
 		int infoWidth = 0;
-		if (dY > minInfoHeigth) {
-			if (dX < minInfoWidth) {
+		if (weekHeight > minInfoHeigth) {
+			if (cellWidth < minInfoWidth) {
 				infoWidth = minInfoWidth;
 			} else {
-				infoWidth = (int) dX;
+				infoWidth = (int) cellWidth;
 			}
 		}
 
-		dX = (float) (XX - summaryWidth - infoWidth) / (numCols - 2);
+		cellWidth = (float) (canvasWidth - summaryWidth - infoWidth) / (numCols - 2);
 
-		_calendarAllDaysRectangle = new Rectangle(infoWidth, 0, (int) (7 * dX), YY);
+		_calendarAllDaysRectangle = new Rectangle(infoWidth, 0, (int) (7 * cellWidth), canvasHeight);
 //		_calendarFirstWeekRectangle = new Rectangle(infoWidth, 0, (int) (7 * dX), (int) dY);
 //		_calendarLastWeekRectangle = new Rectangle( infoWidth, (int) ((getNumOfWeeks() - 1) * dY), (int) (7 * dX), (int) dY);
 
@@ -685,7 +698,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		gc.setBackground(_white);
 		gc.setForeground(_gray);
 		for (int i = 0; i <= numRows; i++) {
-			gc.drawLine(0, (int) (i * dY), XX, (int) (i * dY));
+			gc.drawLine(0, i * weekHeight, canvasWidth, i * weekHeight);
 		}
 
 //		final Rectangle selectedRec = null;
@@ -706,7 +719,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		// Find a format for the day header which fits into the rectangle available;
 		int g = 0;
-		while (g < headerSizes.length && headerSizes[g].x > (dX - dayLabelXOffset)) {
+		while (g < headerSizes.length && headerSizes[g].x > (cellWidth - dayLabelXOffset)) {
 			g++;
 		}
 		g = Math.min(g, headerSizes.length - 1); // if the cell is smaller than the shortest format (no index 'g' was found) we use the shortest format and relay on clipping
@@ -725,8 +738,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		// Weeks
 		for (int i = 0; i < numRows; i++) {
 
-			final int Y1 = (int) (i * dY);
-			final int Y2 = (int) ((i + 1) * dY);
+			final int Y1 = i * weekHeight;
+			final int Y2 = (i + 1) * weekHeight;
 
 			// Days per week
 			Rectangle dayRec = null;
@@ -739,8 +752,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 			for (int j = 0; j < 7; j++) {
 
-				final int X1 = infoWidth + (int) (j * dX);
-				final int X2 = infoWidth + (int) ((j + 1) * dX);
+				final int X1 = infoWidth + (int) (j * cellWidth);
+				final int X2 = infoWidth + (int) ((j + 1) * cellWidth);
 //				final Rectangle dayRec = new Rectangle(X1, Y1, (X2 - X1), (Y2 - Y1));
 				dayRec = new Rectangle(X1, Y1, (X2 - X1), (Y2 - Y1));
 				final Day day = new Day(dayId);
@@ -813,7 +826,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 			if (summaryWidth > 0) {
 
-				final int X1 = infoWidth + (int) (7 * dX);
+				final int X1 = infoWidth + (int) (7 * cellWidth);
 				final int X2 = X1 + summaryWidth;
 
 				final Rectangle weekRec = new Rectangle(X1, Y1, (X2 - X1), (Y2 - Y1));
@@ -833,11 +846,11 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		// and finally the vertical lines
 		gc.setForeground(_display.getSystemColor(SWT.COLOR_GRAY));
 		for (int i = 0; i <= 7; i++) {
-			gc.drawLine(infoWidth + (int) (i * dX), 0, infoWidth + (int) (i * dX), YY);
+			gc.drawLine(infoWidth + (int) (i * cellWidth), 0, infoWidth + (int) (i * cellWidth), canvasHeight);
 		}
 
 		// draw the selection on top of our calendar graph image so we can reuse that image
-		_highlight = new Image(getDisplay(), XX, YY);
+		_highlight = new Image(getDisplay(), canvasWidth, canvasHeight);
 		gc = new GC(_highlight);
 		gc.drawImage(_image, 0, 0);
 		drawSelection(gc);
@@ -1865,12 +1878,20 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 	}
 
+	void updateUI_Layout() {
+
+		// invalidate layout
+		_isGraphClean = false;
+
+		redraw();
+	}
+
 	void zoomIn() {
 
 		int numWeeksDisplayed = getNumOfWeeks();
 		setNumOfWeeks(numWeeksDisplayed > 1 ? --numWeeksDisplayed : numWeeksDisplayed);
-		_isGraphClean = false;
 
+		_isGraphClean = false;
 		redraw();
 		scrollBarUpdate();
 	}
@@ -1878,8 +1899,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	void zoomOut() {
 
 		setNumOfWeeks(getNumOfWeeks() + 1);
-		_isGraphClean = false;
 
+		_isGraphClean = false;
 		redraw();
 		scrollBarUpdate();
 	}
