@@ -832,7 +832,7 @@ public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements ICol
 
 		enableControls();
 
-		_map25View.getMapApp().onModifyMarkerConfig();
+		updateUI_Map();
 	}
 
 	private void onModifyName() {
@@ -872,7 +872,7 @@ public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements ICol
 
 		enableControls();
 
-		_map25View.getMapApp().onModifyMarkerConfig();
+		updateUI_Map();
 	}
 
 	private void onSelectConfig_Default(final SelectionEvent selectionEvent) {
@@ -895,7 +895,7 @@ public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements ICol
 		restoreState();
 		enableControls();
 
-		_map25View.getMapApp().onModifyMarkerConfig();
+		updateUI_Map();
 	}
 
 	private void onSwapClusterColor(final SelectionEvent e) {
@@ -1009,6 +1009,11 @@ public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements ICol
 		config.clusterFill_Opacity = _spinnerClusterFill_Opacity.getSelection();
 		config.clusterOutline_Color = _colorClusterSymbol_Outline.getColorValue();
 		config.clusterOutline_Opacity = _spinnerClusterOutline_Opacity.getSelection();
+	}
+
+	private void updateUI_Map() {
+		
+		_map25View.getMapApp().onModifyMarkerConfig();
 	}
 
 }

@@ -406,6 +406,8 @@ public class Messages extends NLS {
 	public static String		App_Action_Remove;
 	public static String		App_Action_Remove_Immediate;
 	public static String		App_Action_Rename;
+	public static String		App_Action_Reset;
+	public static String		App_Action_ResetConfig_Tooltip;
 	public static String		App_Action_RestoreDefault_Tooltip;
 	public static String		App_Action_set_tour_type;
 	public static String		App_Action_Save;
@@ -1588,6 +1590,10 @@ public class Messages extends NLS {
 	public static String		Slideout_CalendarOptions_Group_TourInfo;
 	public static String		Slideout_CalendarOptions_Group_WeekSummary;
 	public static String		Slideout_CalendarOptions_Label_N_Line;
+
+	public static String		Slideout_CalendarOptions_Label_RowHeight;
+
+	public static String		Slideout_CalendarOptions_Label_RowHeight_Tooltip;
 	public static String		Slideout_CalendarOptions_Label_Title;
 
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowAbsoluteValues;
