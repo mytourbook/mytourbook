@@ -39,19 +39,19 @@ import org.joda.time.DateTimeConstants;
 
 public class CalendarYearMonthContributionItem extends ControlContribution {
 
-	private final boolean						_isOSX						= net.tourbook.common.UI.IS_OSX;
-	private final boolean						_isLinux					= net.tourbook.common.UI.IS_LINUX;
-	
-	private Combo	_cboYear;
-	private Combo	_cboMonth;
-	private ArrayList<Integer>	_cboYearValues;
-	private ArrayList<Integer>	_cboMonthValues;
-	private HashMap<Integer, Integer>	_cboYearKeys;
-	private HashMap<Integer, Integer>	_cboMonthKeys;
-	
-	private CalendarGraph		_calendarGraph;
+	private static final String			ID			= "net.tourbook.calendar.yearmonthselector";	//$NON-NLS-1$
+	private final boolean				_isOSX		= net.tourbook.common.UI.IS_OSX;
 
-	private static final String	ID	= "net.tourbook.calendar.yearmonthselector"; //$NON-NLS-1$
+	private final boolean				_isLinux	= net.tourbook.common.UI.IS_LINUX;
+	private Combo						_cboYear;
+	private Combo						_cboMonth;
+	private ArrayList<Integer>			_cboYearValues;
+	private ArrayList<Integer>			_cboMonthValues;
+	private HashMap<Integer, Integer>	_cboYearKeys;
+
+	private HashMap<Integer, Integer>	_cboMonthKeys;
+
+	private CalendarGraph				_calendarGraph;
 
 	protected CalendarYearMonthContributionItem() {
 		this(ID);
@@ -68,68 +68,62 @@ public class CalendarYearMonthContributionItem extends ControlContribution {
 
 	@Override
 	protected Control createControl(final Composite parent) {
-		
+
 		final PixelConverter pc = new PixelConverter(parent);
 
-		Composite content;
-
-		content = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(content);
-		GridLayoutFactory.fillDefaults()//
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory
+				.fillDefaults()//
 				.numColumns(2)
-				.extendedMargins(0, 0, 0, 1)
-				.spacing(0, 0)
-				.applyTo(content);
-
-		// label
-		// final Label label = new Label(content, SWT.NONE);
-		// GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).indent(10, 0).applyTo(label);
-		// label.setText("Go: ");
-
-		// month combo
-		_cboMonth = new Combo(content, SWT.DROP_DOWN | SWT.READ_ONLY);
-		_cboMonth.setToolTipText(Messages.Calendar_View_Combo_Month_Tooltip);
-		_cboMonth.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onSelectMonth();
+				.extendedMargins(0, 10, 0, 0)
+				//				.spacing(0, 0)
+				.applyTo(container);
+		{
+			{
+				// month combo
+				_cboMonth = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+				_cboMonth.setToolTipText(Messages.Calendar_View_Combo_Month_Tooltip);
+				_cboMonth.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						onSelectMonth();
+					}
+				});
 			}
-		});
+			{
+				// year combo
+				_cboYear = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+				_cboYear.setToolTipText(Messages.Calendar_View_Combo_Year_Tooltip);
+				_cboYear.setVisibleItemCount(20);
+				GridDataFactory
+						.fillDefaults()//
+						.hint(pc.convertWidthInCharsToPixels(_isOSX ? 12 : _isLinux ? 12 : 5), SWT.DEFAULT)
+						.applyTo(_cboYear);
+				_cboYear.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						onSelectYear();
+					}
+				});
+				_cboYear.addTraverseListener(new TraverseListener() {
 
-		// year combo
-		_cboYear = new Combo(content, SWT.DROP_DOWN);
-		_cboYear.setToolTipText(Messages.Calendar_View_Combo_Year_Tooltip);
-		_cboYear.setVisibleItemCount(20);
-		GridDataFactory.fillDefaults()//
-				.hint(pc.convertWidthInCharsToPixels(_isOSX ? 12 : _isLinux ? 12 : 5), SWT.DEFAULT)
-				.applyTo(_cboYear);
-		_cboYear.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onSelectYear();
+					@Override
+					public void keyTraversed(final TraverseEvent e) {
+						if (e.detail == SWT.TRAVERSE_RETURN) {
+							onSelectYear();
+						}
+
+					}
+
+				});
 			}
-		});
-		_cboYear.addTraverseListener(new TraverseListener() {
-
-			@Override
-			public void keyTraversed(final TraverseEvent e) {
-				if (e.detail == SWT.TRAVERSE_RETURN) {
-					onSelectYear();
-				}
-
-			}
-
-		});
+		}
 
 		fillMonthComboBox();
 		fillYearComboBox();
 
-		// TODO
-		// addPrefListener();
-		// TODO
-		// reselectLastPerson();
-
-		return content;
+		return container;
 
 	}
 
@@ -157,7 +151,7 @@ public class CalendarYearMonthContributionItem extends ControlContribution {
 	private void fillYearComboBox() {
 
 		final int thisYear = (new DateTime()).getYear();
-		
+
 		_cboYearValues = new ArrayList<Integer>();
 		_cboYearKeys = new HashMap<Integer, Integer>();
 

@@ -74,10 +74,14 @@ public class CalendarConfigManager {
 	private static final String	TAG_CALENDAR_CONFIG		= "CalendarConfig";							//$NON-NLS-1$
 	private static final String	TAG_CALENDAR			= "Calendar";								//$NON-NLS-1$
 	//
-	static final int			CELL_HEIGHT_MIN			= 3;
-	static final int			CELL_HEIGHT_MAX			= 200;
+	private static final String	ATTR_IS_TINY_LAYOUT		= "isTinyLayout";							//$NON-NLS-1$
+	private static final String	ATTR_WEEK_HEIGHT		= "weekHeight";								//$NON-NLS-1$
 	//
-	static final int			DEFAULT_CELL_HEIGHT		= 70;
+	static final int			WEEK_HEIGHT_MIN			= 3;
+	static final int			WEEK_HEIGHT_MAX			= 200;
+	//
+	static final int			DEFAULT_WEEK_HEIGHT		= 70;
+	static final boolean		DEFAULT_IS_TINY_LAYOUT	= false;
 	//
 	// !!! this is a code formatting separator !!!
 	static {}
@@ -183,6 +187,9 @@ public class CalendarConfigManager {
 		{
 			xmlConfig.putString(ATTR_ID, config.id);
 			xmlConfig.putString(ATTR_CONFIG_NAME, config.name);
+
+			xmlConfig.putInteger(ATTR_WEEK_HEIGHT, config.weekHeight);
+			xmlConfig.putBoolean(ATTR_IS_TINY_LAYOUT, config.isTinyLayout);
 		}
 	}
 
@@ -290,7 +297,7 @@ public class CalendarConfigManager {
 
 				if (xmlConfigType.equals(TAG_CALENDAR)) {
 
-					// <Track>
+					// <Calendar>
 
 					final CalendarConfig calendarConfig = new CalendarConfig();
 
@@ -309,8 +316,11 @@ public class CalendarConfigManager {
 
 // SET_FORMATTING_OFF
 		
-		config.id		= Util.getXmlString(xmlConfig, ATTR_ID, Long.toString(System.nanoTime()));
-		config.name		= Util.getXmlString(xmlConfig, ATTR_CONFIG_NAME, UI.EMPTY_STRING);
+		config.id			= Util.getXmlString(xmlConfig, ATTR_ID, Long.toString(System.nanoTime()));
+		config.name			= Util.getXmlString(xmlConfig, ATTR_CONFIG_NAME, UI.EMPTY_STRING);
+		
+		config.isTinyLayout	= Util.getXmlBoolean(xmlConfig, ATTR_IS_TINY_LAYOUT, DEFAULT_IS_TINY_LAYOUT);
+		config.weekHeight	= Util.getXmlInteger(xmlConfig, ATTR_WEEK_HEIGHT, DEFAULT_WEEK_HEIGHT);
 
 // SET_FORMATTING_ON
 

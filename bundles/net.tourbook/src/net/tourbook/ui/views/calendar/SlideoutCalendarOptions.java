@@ -109,6 +109,8 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 
 	private Text					_textConfigName;
 
+	private Button					_chkIsTinyLayout;
+
 	/**
 	 * @param ownerControl
 	 * @param toolBar
@@ -231,19 +233,29 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 
 	private void createUI_20_Layout(final Composite parent) {
 
-		// label: symbol
-		final Label label = new Label(parent, SWT.NONE);
-		label.setText(Messages.Slideout_CalendarOptions_Label_RowHeight);
-		label.setToolTipText(Messages.Slideout_CalendarOptions_Label_RowHeight_Tooltip);
+		{
+			// label: symbol
+			final Label label = new Label(parent, SWT.NONE);
+			label.setText(Messages.Slideout_CalendarOptions_Label_RowHeight);
+			label.setToolTipText(Messages.Slideout_CalendarOptions_Label_RowHeight_Tooltip);
 
-		// size
-		_spinnerWeekHeight = new Spinner(parent, SWT.BORDER);
-		_spinnerWeekHeight.setMinimum(CalendarConfigManager.CELL_HEIGHT_MIN);
-		_spinnerWeekHeight.setMaximum(CalendarConfigManager.CELL_HEIGHT_MAX);
-		_spinnerWeekHeight.setIncrement(1);
-		_spinnerWeekHeight.setPageIncrement(10);
-		_spinnerWeekHeight.addSelectionListener(_defaultSelectionListener);
-		_spinnerWeekHeight.addMouseWheelListener(_defaultMouseWheelListener);
+			// size
+			_spinnerWeekHeight = new Spinner(parent, SWT.BORDER);
+			_spinnerWeekHeight.setMinimum(CalendarConfigManager.WEEK_HEIGHT_MIN);
+			_spinnerWeekHeight.setMaximum(CalendarConfigManager.WEEK_HEIGHT_MAX);
+			_spinnerWeekHeight.setIncrement(1);
+			_spinnerWeekHeight.setPageIncrement(10);
+			_spinnerWeekHeight.addSelectionListener(_defaultSelectionListener);
+			_spinnerWeekHeight.addMouseWheelListener(_defaultMouseWheelListener);
+		}
+
+		{
+			// checkbox: Show point
+			_chkIsTinyLayout = new Button(parent, SWT.CHECK);
+			_chkIsTinyLayout.setText(Messages.Slideout_CalendarOptions_Checkbox_IsTinyLayout);
+			_chkIsTinyLayout.addSelectionListener(_defaultSelectionListener);
+			GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsTinyLayout);
+		}
 
 	}
 
@@ -502,6 +514,7 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 		}
 		_isUpdateUI = backupIsUpdateUI;
 	}
+
 	private void fillUI_Config() {
 
 		final boolean backupIsUpdateUI = _isUpdateUI;
@@ -695,6 +708,7 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 			_comboConfigName.select(activeConfigIndex);
 			_textConfigName.setText(config.name);
 
+			_chkIsTinyLayout.setSelection(config.isTinyLayout);
 			_spinnerWeekHeight.setSelection(config.weekHeight);
 		}
 		_isUpdateUI = false;
@@ -708,9 +722,9 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 
 		config.name = _textConfigName.getText();
 
+		config.isTinyLayout = _chkIsTinyLayout.getSelection();
 		config.weekHeight = _spinnerWeekHeight.getSelection();
 	}
-
 
 	private void updateUI() {
 

@@ -104,14 +104,13 @@ public class CalendarView extends ViewPart implements ITourProvider {
 	private IPropertyChangeListener				_prefChangeListener;
 	private ITourEventListener					_tourEventListener;
 
-	private CalendarYearMonthContributionItem	_cymci;
+	private CalendarYearMonthContributionItem	_yearMonth;
 
 //	private OpenDialogManager					_openDlgMgr								= new OpenDialogManager();
 
 	private ActionCalendarOptions				_actionCalendarOptions;
 
 	private Action								_actionForward, _actionBack;
-	private Action								_actionZoomIn, _actionZoomOut;
 	private Action								_actionSetLinked;
 	private Action								_actionGotoToday;
 	Action[]									_actionSetNumberOfToursPerDay;
@@ -355,25 +354,6 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		_actionForward.setToolTipText(Messages.Calendar_View_Action_Forward_Tooltip);
 		_actionForward.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ArrowUp));
 
-		_actionZoomOut = new Action() {
-			@Override
-			public void run() {
-				_calendarGraph.zoomOut();
-			}
-		};
-		_actionZoomOut.setText(Messages.Calendar_View_Action_ZoomOut);
-		_actionZoomOut.setToolTipText(Messages.Calendar_View_Action_ZoomOut_Tooltip);
-		_actionZoomOut.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ZoomOut));
-
-		_actionZoomIn = new Action() {
-			@Override
-			public void run() {
-				_calendarGraph.zoomIn();
-			}
-		};
-		_actionZoomIn.setText(Messages.Calendar_View_Action_ZoomIn);
-		_actionZoomIn.setToolTipText(Messages.Calendar_View_Action_ZoomIn_Tooltip);
-		_actionZoomIn.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ZoomIn));
 
 		_actionSetLinked = new Action(null, Action.AS_CHECK_BOX) {
 			@Override
@@ -1041,14 +1021,10 @@ public class CalendarView extends ViewPart implements ITourProvider {
 
 	private void fillToolBar(final IToolBarManager manager) {
 
-		_cymci = new CalendarYearMonthContributionItem(_calendarGraph);
-		_calendarGraph.setYearMonthContributor(_cymci);
+		_yearMonth = new CalendarYearMonthContributionItem(_calendarGraph);
+		_calendarGraph.setYearMonthContributor(_yearMonth);
 
-		manager.add(_cymci);
-		manager.add(_actionZoomIn);
-		manager.add(_actionZoomOut);
-
-		manager.add(new Separator());
+		manager.add(_yearMonth);
 
 		manager.add(_actionSetLinked);
 		manager.add(_actionCalendarOptions);
@@ -1245,6 +1221,8 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		_state.put(STATE_SHOW_DAY_NUMBER_IN_TINY_LAYOUT, _calendarGraph.getShowDayNumberInTinyView());
 
 		_state.put(STATE_USE_LINE_COLOR_FOR_WEEK_SUMMARY, _useLineColorForWeekSummary);
+
+		CalendarConfigManager.saveState();
 	}
 
 	/**

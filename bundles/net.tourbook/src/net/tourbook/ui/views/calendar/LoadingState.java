@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2011-2017 Matthias Helmling and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,40 +15,12 @@
  *******************************************************************************/
 package net.tourbook.ui.views.calendar;
 
-import java.util.ArrayList;
+public enum LoadingState {
 
-public class CalendarTourData {
+	NOT_LOADED, //
 
-	LoadingState	loadingState	= LoadingState.NOT_LOADED;
+	IS_QUEUED, //
 
-	long			tourId;
-	long			typeId;
-
-	int				typeColorIndex;
-
-	int				year;
-	int				month;
-	int				day;
-	int				week;
-	int				dayOfWeek;
-
-	int				startTime;
-	int				endTime;
-
-	int				altitude;
-	int				distance;
-
-	int				recordingTime;
-	int				drivingTime;
-
-	String			tourTitle;
-	String			tourDescription;
-
-	ArrayList<Long>	tagIds;
-
-	/**
-	 * Number of tours in a week
-	 */
-	int				numTours;
+	IS_LOADED, //
 
 }
