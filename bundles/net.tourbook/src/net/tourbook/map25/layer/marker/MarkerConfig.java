@@ -21,6 +21,9 @@ import org.eclipse.swt.graphics.RGB;
 
 public class MarkerConfig {
 
+// SET_FORMATTING_OFF
+// SET_FORMATTING_ON
+
 	/*
 	 * Set default values also here to ensure that a valid value is set. A default value would not
 	 * be set when an xml tag is not available.
@@ -35,26 +38,30 @@ public class MarkerConfig {
 	 */
 	public boolean					isShowMarkerLabel		= true;
 	public boolean					isShowMarkerPoint		= true;
-	public RGB						markerFill_Color		= Map25ConfigManager.DEFAULT_MARKER_FILL_COLOR;
-	public int						markerFill_Opacity		= Map25ConfigManager.DEFAULT_MARKER_OPACITY;
-	public RGB						markerOutline_Color		= Map25ConfigManager.DEFAULT_MARKER_OUTLINE_COLOR;
-	public int						markerOutline_Opacity	= Map25ConfigManager.DEFAULT_MARKER_OPACITY;
 	public int						markerOrientation		= Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
-	public int						markerSymbolSize		= Map25ConfigManager.DEFAULT_MARKER_SYMBOL_SIZE;
+
+	public RGB						markerFill_Color		= Map25ConfigManager.DEFAULT_MARKER_FILL_COLOR;
+	public int						markerFill_Opacity		= Map25ConfigManager.DEFAULT_MARKER_FILL_OPACITY;
+	public RGB						markerOutline_Color		= Map25ConfigManager.DEFAULT_MARKER_OUTLINE_COLOR;
+	public int						markerOutline_Opacity	= Map25ConfigManager.DEFAULT_MARKER_OUTLINE_OPACITY;
+	public float					markerOutline_Size		= Map25ConfigManager.DEFAULT_MARKER_OUTLINE_SIZE;
+	public int						markerSymbol_Size		= Map25ConfigManager.DEFAULT_MARKER_SYMBOL_SIZE;
 
 	/*
 	 * Cluster
 	 */
 	public boolean					isMarkerClustered		= true;
 	public Enum<ClusterAlgorithm>	clusterAlgorithm		= ClusterAlgorithm.FirstMarker_Grid;
-	public int						clusterFill_Opacity		= Map25ConfigManager.DEFAULT_CLUSTER_OPACITY;
-	public RGB						clusterFill_Color		= Map25ConfigManager.DEFAULT_CLUSTER_FILL_COLOR;
-	public int						clusterOutline_Opacity	= Map25ConfigManager.DEFAULT_CLUSTER_OPACITY;
-	public RGB						clusterOutline_Color	= Map25ConfigManager.DEFAULT_CLUSTER_OUTLINE_COLOR;
-	public int						clusterGridSize			= Map25ConfigManager.DEFAULT_CLUSTER_GRID_SIZE;
+	public int						clusterGrid_Size		= Map25ConfigManager.DEFAULT_CLUSTER_GRID_SIZE;
 	public int						clusterOrientation		= Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
-	public int						clusterSymbolSize		= Map25ConfigManager.DEFAULT_CLUSTER_SYMBOL_SIZE;
-	public int						clusterSymbolWeight		= Map25ConfigManager.DEFAULT_CLUSTER_SYMBOL_WEIGHT;
+	
+	public RGB						clusterFill_Color		= Map25ConfigManager.DEFAULT_CLUSTER_FILL_COLOR;
+	public int						clusterFill_Opacity		= Map25ConfigManager.DEFAULT_CLUSTER_FILL_OPACITY;
+	public RGB						clusterOutline_Color	= Map25ConfigManager.DEFAULT_CLUSTER_OUTLINE_COLOR;
+	public int						clusterOutline_Opacity	= Map25ConfigManager.DEFAULT_CLUSTER_OUTLINE_OPACITY;
+	public float					clusterOutline_Size		= Map25ConfigManager.DEFAULT_CLUSTER_OUTLINE_SIZE;
+	public int						clusterSymbol_Size		= Map25ConfigManager.DEFAULT_CLUSTER_SYMBOL_SIZE;
+	public int						clusterSymbol_Weight	= Map25ConfigManager.DEFAULT_CLUSTER_SYMBOL_WEIGHT;
 
 	@Override
 	public boolean equals(final Object obj) {
@@ -101,8 +108,8 @@ public class MarkerConfig {
 				+ "id=" + id + ", " //$NON-NLS-1$ //$NON-NLS-2$
 				+ "name=" + name + ", " //$NON-NLS-1$ //$NON-NLS-2$
 
-				+ "iconClusterSizeDP=" + clusterSymbolSize + ", " //$NON-NLS-1$ //$NON-NLS-2$
-				+ "iconMarkerSizeDP=" + markerSymbolSize + ", " //$NON-NLS-1$ //$NON-NLS-2$
+				+ "iconClusterSizeDP=" + clusterSymbol_Size + ", " //$NON-NLS-1$ //$NON-NLS-2$
+				+ "iconMarkerSizeDP=" + markerSymbol_Size + ", " //$NON-NLS-1$ //$NON-NLS-2$
 
 				+ "clusterColorForeground=" + clusterOutline_Color + ", " //$NON-NLS-1$ //$NON-NLS-2$
 				+ "clusterColorBackground=" + clusterFill_Color + //$NON-NLS-1$

@@ -44,7 +44,6 @@ import org.oscim.gdx.MotionHandler;
 import org.oscim.layers.tile.TileManager;
 import org.oscim.layers.tile.buildings.BuildingLayer;
 import org.oscim.map.Layers;
-import org.oscim.map.Map;
 import org.oscim.map.Map.UpdateListener;
 import org.oscim.map.ViewController;
 import org.oscim.renderer.BitmapRenderer;
@@ -56,6 +55,7 @@ import org.oscim.scalebar.MetricUnitAdapter;
 import org.oscim.theme.ThemeFile;
 import org.oscim.theme.VtmThemes;
 import org.oscim.tiling.source.UrlTileSource;
+import org.oscim.utils.Parameters;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -161,12 +161,12 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 
 		super.create();
 
-		/*
+		/**
 		 * Overwrite input handler, using own GdxMap.create() method didn't work :-(
 		 */
 		final InputMultiplexer mux = new InputMultiplexer();
 
-		if (!Map.NEW_GESTURES) {
+		if (!Parameters.MAP_EVENT_LAYER2) {
 
 			mGestureDetector = new GestureDetector(new GestureHandlerImpl(mMap));
 			mux.addProcessor(mGestureDetector);

@@ -140,20 +140,34 @@ public class Map25ConfigManager {
 	private static final String					ATTR_IS_SHOW_MARKER_LABEL		= "isShowMarkerLabel";					//$NON-NLS-1$
 	private static final String					ATTR_IS_SHOW_MARKER_POINT		= "isShowMarkerPoint";					//$NON-NLS-1$
 	private static final String					ATTR_MARKER_ORIENTATION			= "markerOrientation";					//$NON-NLS-1$
+	//
+	private static final String					ATTR_MARKER_FILL_OPACITY		= "markerFillOpacity";					//$NON-NLS-1$
+	private static final String					ATTR_MARKER_OUTLINE_OPACITY		= "markerOutlineOpacity";				//$NON-NLS-1$
+	private static final String					ATTR_MARKER_OUTLINE_SIZE		= "markerOutlineSize";					//$NON-NLS-1$
 	private static final String					ATTR_MARKER_SYMBOL_SIZE			= "markerSymbolSize";					//$NON-NLS-1$
 	//
 	// cluster
 	private static final String					TAG_CLUSTER_FILL_COLOR			= "ClusterFillColor";					//$NON-NLS-1$
 	private static final String					TAG_CLUSTER_OUTLINE_COLOR		= "ClusterOutlineColor";				//$NON-NLS-1$
 	private static final String					ATTR_CLUSTER_ALGORITHM			= "clusterAlgorithm";					//$NON-NLS-1$
-	private static final String					ATTR_CLUSTER_GRID_SIZE			= "clusterGridSize";					//$NON-NLS-1$
 	private static final String					ATTR_CLUSTER_ORIENTATION		= "clusterOrientation";					//$NON-NLS-1$
-	private static final String					ATTR_CLUSTER_SYMBOL_SIZE		= "clusterSymbolSize";					//$NON-NLS-1$
-	private static final String					ATTR_CLUSTER_SYMBOL_WEIGHT		= "clusterSymbolWeight";				//$NON-NLS-1$
+	private static final String					ATTR_CLUSTER_GRID_SIZE			= "clusterGridSize";					//$NON-NLS-1$
 	private static final String					ATTR_IS_MARKER_CLUSTERED		= "isMarkerClustered";					//$NON-NLS-1$
 	//
+	private static final String					ATTR_CLUSTER_FILL_OPACITY		= "clusterFillOpacity";					//$NON-NLS-1$
+	private static final String					ATTR_CLUSTER_OUTLINE_OPACITY	= "cluserOutlineOpacity";				//$NON-NLS-1$
+	private static final String					ATTR_CLUSTER_OUTLINE_SIZE		= "clusterOutlineSize";					//$NON-NLS-1$
+	private static final String					ATTR_CLUSTER_SYMBOL_SIZE		= "clusterSymbolSize";					//$NON-NLS-1$
+	private static final String					ATTR_CLUSTER_SYMBOL_WEIGHT		= "clusterSymbolWeight";				//$NON-NLS-1$
+	//
+	/*
+	 * Defaults, min/max
+	 */
 	// symbol
 	public static final int						DEFAULT_MARKER_SYMBOL_SIZE		= 20;
+	public static final float					DEFAULT_MARKER_OUTLINE_SIZE		= 2.0f;
+	public static final float					MARKER_OUTLINE_SIZE_MIN			= 0;
+	public static final float					MARKER_OUTLINE_SIZE_MAX			= 100;
 	public static final int						MARKER_SYMBOL_SIZE_MIN			= 10;
 	public static final int						MARKER_SYMBOL_SIZE_MAX			= 200;
 	//
@@ -163,18 +177,23 @@ public class Map25ConfigManager {
 	public static final int						DEFAULT_CLUSTER_SYMBOL_WEIGHT	= 20;
 	public static final int						CLUSTER_GRID_MIN_SIZE			= 1;
 	public static final int						CLUSTER_GRID_MAX_SIZE			= 10000;
+	public static final int						CLUSTER_OUTLINE_SIZE_MIN		= 0;
+	public static final int						CLUSTER_OUTLINE_SIZE_MAX		= 100;
 	public static final int						CLUSTER_SYMBOL_SIZE_MIN			= 5;
 	public static final int						CLUSTER_SYMBOL_SIZE_MAX			= 200;
 	public static final int						CLUSTER_SYMBOL_WEIGHT_MIN		= 0;
 	public static final int						CLUSTER_SYMBOL_WEIGHT_MAX		= 100;
 	//
 	// colors
-	public static final int						DEFAULT_CLUSTER_OPACITY			= 80;
-	public static final RGB						DEFAULT_CLUSTER_OUTLINE_COLOR	= new RGB(0xff, 0xff, 0xff);
 	public static final RGB						DEFAULT_CLUSTER_FILL_COLOR		= new RGB(0xFC, 0x67, 0x00);
-	public static final int						DEFAULT_MARKER_OPACITY			= 80;
-	public static final RGB						DEFAULT_MARKER_OUTLINE_COLOR	= new RGB(0, 0, 0);
+	public static final int						DEFAULT_CLUSTER_FILL_OPACITY	= 80;
+	public static final RGB						DEFAULT_CLUSTER_OUTLINE_COLOR	= new RGB(0xff, 0xff, 0xff);
+	public static final int						DEFAULT_CLUSTER_OUTLINE_OPACITY	= 80;
+	public static final float					DEFAULT_CLUSTER_OUTLINE_SIZE	= 2.0f;
 	public static final RGB						DEFAULT_MARKER_FILL_COLOR		= new RGB(0xFF, 0xFF, 0x00);
+	public static final int						DEFAULT_MARKER_FILL_OPACITY		= 80;
+	public static final RGB						DEFAULT_MARKER_OUTLINE_COLOR	= new RGB(0, 0, 0);
+	public static final int						DEFAULT_MARKER_OUTLINE_OPACITY	= 80;
 	//
 	// map movement with animation
 	private static final Type					ANIMATION_EASING_TYPE_DEFAULT	= Easing.Type.SINE_INOUT;
@@ -397,33 +416,46 @@ public class Map25ConfigManager {
 
 	private static void createXml_FromMarkerConfig(final MarkerConfig config, final IMemento xmlMarkers) {
 
+// SET_FORMATTING_OFF
 		// <Marker>
 		final IMemento xmlConfig = xmlMarkers.createChild(TAG_MARKER);
 		{
 			xmlConfig.putString(ATTR_ID, config.id);
 			xmlConfig.putString(ATTR_CONFIG_NAME, config.name);
 
-			// Marker
-			xmlConfig.putBoolean(ATTR_IS_SHOW_MARKER_LABEL, config.isShowMarkerLabel);
-			xmlConfig.putBoolean(ATTR_IS_SHOW_MARKER_POINT, config.isShowMarkerPoint);
-			xmlConfig.putInteger(ATTR_MARKER_SYMBOL_SIZE, config.markerSymbolSize);
-			xmlConfig.putInteger(ATTR_MARKER_ORIENTATION, config.markerOrientation);
+			/*
+			 * Marker
+			 */
+			xmlConfig.putBoolean(		ATTR_IS_SHOW_MARKER_LABEL, 		config.isShowMarkerLabel);
+			xmlConfig.putBoolean(		ATTR_IS_SHOW_MARKER_POINT, 		config.isShowMarkerPoint);
+			xmlConfig.putInteger(		ATTR_MARKER_ORIENTATION,		config.markerOrientation);
 
-			Util.setXmlRgb(xmlConfig, TAG_MARKER_OUTLINE_COLOR, config.markerOutline_Color);
-			Util.setXmlRgb(xmlConfig, TAG_MARKER_FILL_COLOR, config.markerFill_Color);
+			xmlConfig.putInteger(		ATTR_MARKER_FILL_OPACITY, 		config.markerFill_Opacity);
+			xmlConfig.putInteger(		ATTR_MARKER_OUTLINE_OPACITY,	config.markerOutline_Opacity);
+			xmlConfig.putFloat(			ATTR_MARKER_OUTLINE_SIZE, 		config.markerOutline_Size);
+			xmlConfig.putInteger(		ATTR_MARKER_SYMBOL_SIZE, 		config.markerSymbol_Size);
 
-			// Cluster
-			xmlConfig.putInteger(ATTR_CLUSTER_GRID_SIZE, config.clusterGridSize);
-			xmlConfig.putInteger(ATTR_CLUSTER_SYMBOL_SIZE, config.clusterSymbolSize);
-			xmlConfig.putInteger(ATTR_CLUSTER_SYMBOL_WEIGHT, config.clusterSymbolWeight);
-			xmlConfig.putInteger(ATTR_CLUSTER_ORIENTATION, config.clusterOrientation);
-			xmlConfig.putBoolean(ATTR_IS_MARKER_CLUSTERED, config.isMarkerClustered);
+			Util.setXmlRgb(xmlConfig, 	TAG_MARKER_OUTLINE_COLOR, 		config.markerOutline_Color);
+			Util.setXmlRgb(xmlConfig, 	TAG_MARKER_FILL_COLOR, 			config.markerFill_Color);
 
-			Util.setXmlEnum(xmlConfig, ATTR_CLUSTER_ALGORITHM, config.clusterAlgorithm);
+			/*
+			 * Cluster
+			 */
+			Util.setXmlEnum(xmlConfig, 	ATTR_CLUSTER_ALGORITHM, 		config.clusterAlgorithm);
+			xmlConfig.putInteger(		ATTR_CLUSTER_GRID_SIZE, 		config.clusterGrid_Size);
+			xmlConfig.putInteger(		ATTR_CLUSTER_ORIENTATION, 		config.clusterOrientation);
+			xmlConfig.putBoolean(		ATTR_IS_MARKER_CLUSTERED, 		config.isMarkerClustered);
 
-			Util.setXmlRgb(xmlConfig, TAG_CLUSTER_OUTLINE_COLOR, config.clusterOutline_Color);
-			Util.setXmlRgb(xmlConfig, TAG_CLUSTER_FILL_COLOR, config.clusterFill_Color);
+			xmlConfig.putInteger(		ATTR_CLUSTER_FILL_OPACITY, 		config.clusterFill_Opacity);
+			xmlConfig.putInteger(		ATTR_CLUSTER_OUTLINE_OPACITY,	config.clusterOutline_Opacity);
+			xmlConfig.putFloat(			ATTR_CLUSTER_OUTLINE_SIZE, 		config.clusterOutline_Size);
+			xmlConfig.putInteger(		ATTR_CLUSTER_SYMBOL_SIZE, 		config.clusterSymbol_Size);
+			xmlConfig.putInteger(		ATTR_CLUSTER_SYMBOL_WEIGHT, 	config.clusterSymbol_Weight);
+
+			Util.setXmlRgb(xmlConfig, 	TAG_CLUSTER_OUTLINE_COLOR, 		config.clusterOutline_Color);
+			Util.setXmlRgb(xmlConfig, 	TAG_CLUSTER_FILL_COLOR, 		config.clusterFill_Color);
 		}
+// SET_FORMATTING_ON
 	}
 
 	private static void createXml_FromTrackConfig(final Map25TrackConfig config, final IMemento xmlTourTracks) {
@@ -750,17 +782,26 @@ public class Map25ConfigManager {
 		config.id		= Util.getXmlString(xmlConfig, ATTR_ID, Long.toString(System.nanoTime()));
 		config.name		= Util.getXmlString(xmlConfig, ATTR_CONFIG_NAME, UI.EMPTY_STRING);
 
-		config.clusterAlgorithm		= Util.getXmlEnum(xmlConfig,	ATTR_CLUSTER_ALGORITHM,		ClusterAlgorithm.FirstMarker_Distance);
-		config.clusterGridSize		= Util.getXmlInteger(xmlConfig, ATTR_CLUSTER_GRID_SIZE,		DEFAULT_CLUSTER_GRID_SIZE, CLUSTER_GRID_MIN_SIZE, CLUSTER_GRID_MAX_SIZE);
-		config.clusterSymbolSize	= Util.getXmlInteger(xmlConfig, ATTR_CLUSTER_SYMBOL_SIZE,	DEFAULT_CLUSTER_SYMBOL_SIZE, CLUSTER_SYMBOL_SIZE_MIN, CLUSTER_SYMBOL_SIZE_MAX);
-		config.clusterSymbolWeight	= Util.getXmlInteger(xmlConfig, ATTR_CLUSTER_SYMBOL_WEIGHT,	DEFAULT_CLUSTER_SYMBOL_WEIGHT, CLUSTER_SYMBOL_WEIGHT_MIN, CLUSTER_SYMBOL_WEIGHT_MAX);
-		config.clusterOrientation	= Util.getXmlInteger(xmlConfig, ATTR_CLUSTER_ORIENTATION,	Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD);
-		config.isMarkerClustered	= Util.getXmlBoolean(xmlConfig, ATTR_IS_MARKER_CLUSTERED,	true);
+
+		config.isMarkerClustered		= Util.getXmlBoolean(xmlConfig, 	ATTR_IS_MARKER_CLUSTERED,		true);
+		config.clusterAlgorithm			= Util.getXmlEnum(xmlConfig,		ATTR_CLUSTER_ALGORITHM,			ClusterAlgorithm.FirstMarker_Distance);
+		config.clusterGrid_Size			= Util.getXmlInteger(xmlConfig, 	ATTR_CLUSTER_GRID_SIZE,			DEFAULT_CLUSTER_GRID_SIZE, CLUSTER_GRID_MIN_SIZE, CLUSTER_GRID_MAX_SIZE);
+		config.clusterOrientation		= Util.getXmlInteger(xmlConfig, 	ATTR_CLUSTER_ORIENTATION,		Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD);
 		
-		config.isShowMarkerLabel	= Util.getXmlBoolean(xmlConfig, ATTR_IS_SHOW_MARKER_LABEL,	true);
-		config.isShowMarkerPoint	= Util.getXmlBoolean(xmlConfig, ATTR_IS_SHOW_MARKER_POINT,	true);
-		config.markerOrientation	= Util.getXmlInteger(xmlConfig, ATTR_MARKER_ORIENTATION,	Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD);
-		config.markerSymbolSize		= Util.getXmlInteger(xmlConfig, ATTR_MARKER_SYMBOL_SIZE,	DEFAULT_MARKER_SYMBOL_SIZE, MARKER_SYMBOL_SIZE_MIN, MARKER_SYMBOL_SIZE_MAX);
+		config.clusterFill_Opacity		= Util.getXmlInteger(xmlConfig, 	ATTR_CLUSTER_FILL_OPACITY, 		DEFAULT_CLUSTER_FILL_OPACITY);
+		config.clusterOutline_Opacity	= Util.getXmlInteger(xmlConfig, 	ATTR_CLUSTER_OUTLINE_OPACITY, 	DEFAULT_CLUSTER_OUTLINE_OPACITY);
+		config.clusterOutline_Size		= Util.getXmlFloatFloat(xmlConfig, 	ATTR_CLUSTER_OUTLINE_SIZE,		DEFAULT_CLUSTER_OUTLINE_SIZE, CLUSTER_OUTLINE_SIZE_MIN, CLUSTER_OUTLINE_SIZE_MAX);
+		config.clusterSymbol_Size		= Util.getXmlInteger(xmlConfig, 	ATTR_CLUSTER_SYMBOL_SIZE,		DEFAULT_CLUSTER_SYMBOL_SIZE, CLUSTER_SYMBOL_SIZE_MIN, CLUSTER_SYMBOL_SIZE_MAX);
+		config.clusterSymbol_Weight		= Util.getXmlInteger(xmlConfig, 	ATTR_CLUSTER_SYMBOL_WEIGHT,		DEFAULT_CLUSTER_SYMBOL_WEIGHT, CLUSTER_SYMBOL_WEIGHT_MIN, CLUSTER_SYMBOL_WEIGHT_MAX);
+
+		config.isShowMarkerLabel		= Util.getXmlBoolean(xmlConfig, 	ATTR_IS_SHOW_MARKER_LABEL,		true);
+		config.isShowMarkerPoint		= Util.getXmlBoolean(xmlConfig, 	ATTR_IS_SHOW_MARKER_POINT,		true);
+		config.markerOrientation		= Util.getXmlInteger(xmlConfig, 	ATTR_MARKER_ORIENTATION,		Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD);
+		
+		config.markerFill_Opacity		= Util.getXmlInteger(xmlConfig, 	ATTR_MARKER_FILL_OPACITY, 		Map25ConfigManager.DEFAULT_MARKER_FILL_OPACITY);
+		config.markerOutline_Opacity	= Util.getXmlInteger(xmlConfig, 	ATTR_MARKER_OUTLINE_OPACITY, 	Map25ConfigManager.DEFAULT_MARKER_FILL_OPACITY);
+		config.markerOutline_Size		= Util.getXmlFloatFloat(xmlConfig,	ATTR_MARKER_OUTLINE_SIZE,		DEFAULT_MARKER_OUTLINE_SIZE, MARKER_OUTLINE_SIZE_MIN, MARKER_OUTLINE_SIZE_MAX);
+		config.markerSymbol_Size		= Util.getXmlInteger(xmlConfig, 	ATTR_MARKER_SYMBOL_SIZE,		DEFAULT_MARKER_SYMBOL_SIZE, MARKER_SYMBOL_SIZE_MIN, MARKER_SYMBOL_SIZE_MAX);
 
 // SET_FORMATTING_ON
 
