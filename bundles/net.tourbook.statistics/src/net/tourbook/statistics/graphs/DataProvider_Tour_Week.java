@@ -141,6 +141,16 @@ public class DataProvider_Tour_Week extends DataProvider {
 
 				final int weekIndex = allWeeks + dbWeek - 1;
 
+				if (weekIndex < 0) {
+
+					/**
+					 * This can occure when dbWeek == 0, tour is in the previous year and not
+					 * displayed in the week stats
+					 */
+
+					continue;
+				}
+
 				if (weekIndex >= numWeeks) {
 
 					/**

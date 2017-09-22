@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,7 +15,8 @@
  *******************************************************************************/
 package net.tourbook.common.time;
 
-import static java.time.temporal.ChronoField.DAY_OF_WEEK;
+import static java.time.temporal.ChronoField.*;
+
 import gnu.trove.map.hash.TIntObjectHashMap;
 
 import java.time.DayOfWeek;
@@ -54,18 +55,9 @@ import com.skedgo.converter.TimezoneMapper;
 
 public class TimeTools {
 
-
-
-
-
-
-
-
-
-
-	private static final String						ZERO_0					= ":0";											//$NON-NLS-1$
-	private static final String						ZERO_00_00				= "+00:00";										//$NON-NLS-1$
-	private static final String						ZERO_00_00_DEFAULT		= "*";											//$NON-NLS-1$
+	private static final String						ZERO_0					= ":0";										//$NON-NLS-1$
+	private static final String						ZERO_00_00				= "+00:00";									//$NON-NLS-1$
+	private static final String						ZERO_00_00_DEFAULT		= "*";										//$NON-NLS-1$
 
 	/**
 	 * Cached time zone labels.
@@ -81,10 +73,10 @@ public class TimeTools {
 
 	private static final PeriodFormatter			DURATION_FORMATTER;
 
-	public static final ZoneId						UTC						= ZoneId.of("UTC");								//$NON-NLS-1$
+	public static final ZoneId						UTC						= ZoneId.of("UTC");							//$NON-NLS-1$
 
 	/**
-	 * Calendar week which is defined in the preferences.
+	 * Calendar week which is defined in the preferences and applied in the whole app.
 	 */
 	public static WeekFields						calendarWeek;
 
@@ -98,7 +90,7 @@ public class TimeTools {
 	 * output "Monday".
 	 */
 	public static String[]							weekDays_Full;
-	
+
 // SET_FORMATTING_OFF
 		
 	public static final DateTimeFormatter	Formatter_Date_S		= DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
@@ -126,10 +118,13 @@ public class TimeTools {
 	public static final DateTimeFormatter	Formatter_Weekday_L		= DateTimeFormatter.ofPattern("EEEE");						//$NON-NLS-1$
 
 	public static final DateTimeFormatter	Formatter_Time_ISO		= new DateTimeFormatterBuilder()//
+			
 																			.appendValue(ChronoField.HOUR_OF_DAY, 2)
 																			.appendLiteral(':')
+																			
 																			.appendValue(ChronoField.MINUTE_OF_HOUR, 2)
 																			.appendLiteral(':')
+																			
 																			.appendValue(ChronoField.SECOND_OF_MINUTE, 2)
 																			.toFormatter();
 // SET_FORMATTING_ON
@@ -150,7 +145,7 @@ public class TimeTools {
 	static {
 
 		DURATION_FORMATTER = new PeriodFormatterBuilder()
-		//
+				//
 				.appendHours()
 				.appendSuffix(Messages.Period_Format_Hour_Short, Messages.Period_Format_Hour_Short)
 
@@ -164,13 +159,10 @@ public class TimeTools {
 		/*
 		 * Set calendar week
 		 */
-		final int firstDayOfWeek = _prefStoreCommon.getInt(//
-				ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK);
+		final int firstDayOfWeek = _prefStoreCommon.getInt(ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK);
+		final int minDaysInFirstWeek = _prefStoreCommon.getInt(ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK);
 
-		final int minimalDaysInFirstWeek = _prefStoreCommon.getInt(//
-				ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK);
-
-		setCalendarWeek(firstDayOfWeek, minimalDaysInFirstWeek);
+		setCalendarWeek(firstDayOfWeek, minDaysInFirstWeek);
 
 		/*
 		 * Create week day names. Found no better solution, the old API contained
@@ -186,24 +178,24 @@ public class TimeTools {
 
 		weekDays_Short = new String[] {
 
-			weekDayFormatter_Short.format(DayOfWeek.MONDAY),
-			weekDayFormatter_Short.format(DayOfWeek.TUESDAY),
-			weekDayFormatter_Short.format(DayOfWeek.WEDNESDAY),
-			weekDayFormatter_Short.format(DayOfWeek.THURSDAY),
-			weekDayFormatter_Short.format(DayOfWeek.FRIDAY),
-			weekDayFormatter_Short.format(DayOfWeek.SATURDAY),
-			weekDayFormatter_Short.format(DayOfWeek.SUNDAY) //
+				weekDayFormatter_Short.format(DayOfWeek.MONDAY),
+				weekDayFormatter_Short.format(DayOfWeek.TUESDAY),
+				weekDayFormatter_Short.format(DayOfWeek.WEDNESDAY),
+				weekDayFormatter_Short.format(DayOfWeek.THURSDAY),
+				weekDayFormatter_Short.format(DayOfWeek.FRIDAY),
+				weekDayFormatter_Short.format(DayOfWeek.SATURDAY),
+				weekDayFormatter_Short.format(DayOfWeek.SUNDAY) //
 		};
 
 		weekDays_Full = new String[] {
 
-			weekDayFormatter_Full.format(DayOfWeek.MONDAY),
-			weekDayFormatter_Full.format(DayOfWeek.TUESDAY),
-			weekDayFormatter_Full.format(DayOfWeek.WEDNESDAY),
-			weekDayFormatter_Full.format(DayOfWeek.THURSDAY),
-			weekDayFormatter_Full.format(DayOfWeek.FRIDAY),
-			weekDayFormatter_Full.format(DayOfWeek.SATURDAY),
-			weekDayFormatter_Full.format(DayOfWeek.SUNDAY) //
+				weekDayFormatter_Full.format(DayOfWeek.MONDAY),
+				weekDayFormatter_Full.format(DayOfWeek.TUESDAY),
+				weekDayFormatter_Full.format(DayOfWeek.WEDNESDAY),
+				weekDayFormatter_Full.format(DayOfWeek.THURSDAY),
+				weekDayFormatter_Full.format(DayOfWeek.FRIDAY),
+				weekDayFormatter_Full.format(DayOfWeek.SATURDAY),
+				weekDayFormatter_Full.format(DayOfWeek.SUNDAY) //
 		};
 	}
 
@@ -254,8 +246,8 @@ public class TimeTools {
 		}
 
 		final int weekDayIndex = tourZonedDateTime.getDayOfWeek().getValue()
-		// use an offset to have the index in the week array
-		- 1;
+				// use an offset to have the index in the week array
+				- 1;
 
 		return new TourDateTime(tourZonedDateTime, timeZoneOffsetLabel, weekDays_Short[weekDayIndex]);
 	}
@@ -611,9 +603,15 @@ public class TimeTools {
 		}
 	}
 
+	/**
+	 * Define when a calendar week starts for the whole app.
+	 * 
+	 * @param firstDayOfWeek
+	 * @param minimalDaysInFirstWeek
+	 */
 	public static void setCalendarWeek(final int firstDayOfWeek, final int minimalDaysInFirstWeek) {
 
-		final DayOfWeek dow = DayOfWeek.SUNDAY.plus(firstDayOfWeek - 1);
+		final DayOfWeek dow = DayOfWeek.SUNDAY.plus(firstDayOfWeek);
 
 		calendarWeek = WeekFields.of(dow, minimalDaysInFirstWeek);
 	}

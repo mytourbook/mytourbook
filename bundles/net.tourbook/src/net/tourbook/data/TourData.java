@@ -6765,7 +6765,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 
 		final WeekFields cw = TimeTools.calendarWeek;
 
-		startWeek = (short) dateTime.get(cw.weekOfYear());
+		startWeek = (short) dateTime.get(cw.weekOfWeekBasedYear());
 		startWeekYear = (short) dateTime.get(cw.weekBasedYear());
 	}
 

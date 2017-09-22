@@ -1,36 +1,56 @@
-Version 17.9                                                ?. September 2017
+Version 17.9                                          18. September 2017
 
-New 	
+New 
 ===
 
-* All Maps, 2D, 2.5D + 3D
+* 2D - 2.5D - 3D Maps
 
-  - Map bookmarks 
-  - Synchonize map with other map
-  
+ - Map bookmarks
+ - Synchonize 2D, 2.5D and 3D map with the other maps
+ - Equalized toolbars
+
 
 * 2.5D Tour Map
 
-  - Clusteralgorithmus for tour markers
+ - Two new cluster-algorithms for clustering tour markers
 
 
-  There are still some issues that this map is not yet working perfectly. 
-  Workaround: Select another tour and reselected the requested tour
+* 2.5D Map Issues
 
-  
-Art Work 
-========
+ This map has still some issues, it is not yet working perfectly but it 
+ will not damaging your data
+
+ Flickering
+ The 2.5D map could be flickering when moving the mouse and using a 
+ NVIDIA graphics card.
+
+ This problem can be solved by setting the 'Buffer-flipping mode' to 
+ 'Use block transfer' in the NVIDIA Control Panel, this is also 
+ documented here https://github.com/mapsforge/vtm/issues/257
+
  
+Artwork
+=======	
+
 * App Icons
 
   - Recreated more than 100 icons
-  
-  
-* Tour Type Icon
 
-  Uncluttered painting of the tour type icon
 
-  - Paint with fill color, gradient color is disabled 
-  - Fill color is computed as an average of the gradient bright and gradient dark color
+* Tour Type Icon 
+
+  Uncluttered design
+
+  - Paint with fill color, gradient color is disable
+  - Fill color is computed as an average of the gradient bright and 
+    gradient dark color
   - Top and bottom borders are disabled
   - Left and right border width changed from 2px to 1 px
+
+
+* Design Guidelines
+
+  These are the main guidelines which were applied to the new icons:
+
+  - Max 2 different color, a bright/dark color is 1 color
+  - Dark outlines but only when necessary to unclutter the design

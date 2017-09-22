@@ -3381,9 +3381,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="5.1702432"
-     inkscape:cx="552.74831"
-     inkscape:cy="962.89488"
+     inkscape:zoom="20.680973"
+     inkscape:cx="594.60334"
+     inkscape:cy="956.27003"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -3452,8 +3452,8 @@
        x="595"
        y="76.36219"
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\application\tourbook16.png"
-       inkscape:export-xdpi="96.000275"
-       inkscape:export-ydpi="96.000275" />
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
     <flowRoot
        xml:space="preserve"
        id="flowRoot4160"
@@ -3600,25 +3600,25 @@
        id="path4529-2-9-2-4-6-7"
        inkscape:connector-curvature="0"
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\application\tourbook16.png"
-       inkscape:export-xdpi="96.000275"
-       inkscape:export-ydpi="96.000275" />
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
     <path
-       inkscape:export-ydpi="96.000275"
-       inkscape:export-xdpi="96.000275"
+       inkscape:export-ydpi="96"
+       inkscape:export-xdpi="96"
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\application\tourbook16.png"
        sodipodi:nodetypes="ccsc"
        inkscape:connector-curvature="0"
        id="path3829-9-2-3-0-1-6-5-4-2-9-1-7-7"
        d="m 602.76766,77.474 c 2.14878,-0.265813 4.50103,0.734905 5.96607,2.344133 0.96884,-3.020051 -1.7089,-3.500711 -2.72675,-3.452868 -0.14344,0.0066 -1.65847,-0.0778 -3.23932,1.108735 z"
-       style="fill:#72871b;fill-opacity:1;stroke:none;stroke-width:0.50000024;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:3.04999995;stroke-dasharray:none;stroke-opacity:1" />
+       style="fill:#6c7b1b;fill-opacity:1;stroke:none;stroke-width:0.50000024;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:3.04999995;stroke-dasharray:none;stroke-opacity:1" />
     <path
-       style="fill:#72871b;fill-opacity:1;stroke:none;stroke-width:0.50000024;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#6c7b1b;fill-opacity:1;stroke:none;stroke-width:0.50000024;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="m 598.6995,92.21094 c 0.54086,0 0.63022,-0.407635 1.14307,-0.390099 0.40207,0.01349 0.32501,-0.0027 0.84739,0.213727 0.52247,0.215874 2.098,0.230862 3.18234,0.106096 1.27607,-0.146253 2.98174,-0.563792 2.98174,-1.614874 0,-0.72048 -1.06415,-0.646171 -1.33099,-0.635643 -0.63637,0.02482 -0.84135,0.07046 -1.96839,-0.313548 -1.23624,-0.62382 -2.72634,-2.036109 -3.59709,-2.036109 -0.63607,0 -1.58786,0.66193 -2.14664,0.784163 -0.55888,0.121843 -0.65122,-0.07701 -1.14585,-0.599396 0,0 -0.1343,-0.121977 -0.35133,-0.004 -0.21742,0.117171 -0.36897,1.056834 -0.59154,2.081642 -0.22259,1.025646 -0.38447,1.578813 0.0559,2.135291 0.22999,0.290836 0.76734,0.275527 1.07135,0.275527 0.73472,0 1.40648,-0.01068 1.85047,-0.0027 z"
        id="path4333-0-52-7-1-9-8-0"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cscssscscszsascc"
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\application\tourbook16.png"
-       inkscape:export-xdpi="96.000275"
-       inkscape:export-ydpi="96.000275" />
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
   </g>
 </svg>
