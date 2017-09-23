@@ -107,18 +107,26 @@ public class FitContext {
 				tourData.setIsStrideSensorPresent(_isStrideSensorPresent);
 
 				final long recordStartTime = timeDataList.get(0).absoluteTime;
-				final long sessionStartTime = _sessionTime.toInstant().toEpochMilli();
 
-				if (recordStartTime != sessionStartTime) {
+				if (_sessionTime != null) {
 
-					final String message = "Import file %s has other session start time, sessionStartTime=%s recordStartTime=%s, Difference=%d sec";//$NON-NLS-1$
+					final long sessionStartTime = _sessionTime.toInstant().toEpochMilli();
 
-					TourLogManager.logSubInfo(String.format(
-							message,
-							_importFilePathName,
-							TimeTools.getZonedDateTime(sessionStartTime).format(TimeTools.Formatter_DateTime_M),
-							TimeTools.getZonedDateTime(recordStartTime).format(TimeTools.Formatter_DateTime_M),
-							(recordStartTime - sessionStartTime) / 1000));
+					if (recordStartTime != sessionStartTime) {
+
+						final String message =
+								"Import file %s has other session start time, sessionStartTime=%s recordStartTime=%s, Difference=%d sec";//$NON-NLS-1$
+
+						TourLogManager.logSubInfo(
+								String.format(
+										message,
+										_importFilePathName,
+										TimeTools.getZonedDateTime(sessionStartTime).format(
+												TimeTools.Formatter_DateTime_M),
+										TimeTools.getZonedDateTime(recordStartTime).format(
+												TimeTools.Formatter_DateTime_M),
+										(recordStartTime - sessionStartTime) / 1000));
+					}
 				}
 
 				final ZonedDateTime zonedStartTime = TimeTools.getZonedDateTime(recordStartTime);

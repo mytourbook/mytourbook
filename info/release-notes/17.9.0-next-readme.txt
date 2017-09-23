@@ -14,10 +14,15 @@ Improvements
 
 * Calendar
 
+  - Loading week data in background -> UI is much more responsive
+  - Switched Home/End key -> home is now top (oldes tours), End is now bottom (newest tours)
 
  
 Bugfix
 ======
+
+* FIT Import
+  Fixed NPE when importing Orux FIT files
 
 * Week of Year
   Old versions of MyTourbook created a wrong value for week of year. 
