@@ -22,22 +22,28 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.atomic.AtomicLong;
 
 import net.tourbook.common.UI;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.SQLFilter;
 
+import org.eclipse.swt.widgets.Display;
 import org.joda.time.DateTime;
 
 public class CalendarTourDataProvider {
 
-	private static CalendarTourDataProvider	_instance;
+	private static CalendarTourDataProvider					_instance;
 
-	private static ThreadPoolExecutor		_dbLoadingExecutor;
+	private static final AtomicLong							_weekExecuterId		= new AtomicLong();
 
+	private static final LinkedBlockingDeque<WeekLoader>	_weekWaitingQueue	= new LinkedBlockingDeque<>();
+
+	private static ThreadPoolExecutor						_weekLoadingExecutor;
 	static {
 
 		final ThreadFactory threadFactoryFolder = new ThreadFactory() {
@@ -53,11 +59,14 @@ public class CalendarTourDataProvider {
 				return thread;
 			}
 		};
-		_dbLoadingExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(1, threadFactoryFolder);
+
+		_weekLoadingExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10, threadFactoryFolder);
 	}
 
-	private HashMap<Integer, CalendarTourData[][][]>	_dayCache;
-	private HashMap<Integer, CalendarTourData[]>		_weekCache;
+	private CalendarGraph								_calendarGraph;
+
+	private HashMap<Integer, CalendarTourData[][][]>	_dayCache	= new HashMap<Integer, CalendarTourData[][][]>();
+	private HashMap<Integer, CalendarTourData[]>		_weekCache	= new HashMap<Integer, CalendarTourData[]>();
 
 	private DateTime									_firstDateTime;
 
@@ -68,6 +77,7 @@ public class CalendarTourDataProvider {
 	static CalendarTourDataProvider getInstance() {
 
 		if (_instance == null) {
+
 			_instance = new CalendarTourDataProvider();
 		}
 
@@ -404,7 +414,7 @@ public class CalendarTourDataProvider {
 		return dt;
 	}
 
-	CalendarTourData getCalendarWeekSummaryData(final int year, final int week) {
+	CalendarTourData getCalendarWeekSummaryData(final int year, final int week, final CalendarView calendarView) {
 
 		if (!_weekCache.containsKey(year)) {
 
@@ -415,78 +425,71 @@ public class CalendarTourDataProvider {
 			_weekCache.put(year, new CalendarTourData[54]);
 		}
 
-		CalendarTourData data;
+		CalendarTourData weekData;
 
-		if (_weekCache.get(year)[week] == null) {
+		final CalendarTourData cachedWeekData = _weekCache.get(year)[week];
 
-			data = getCalendarWeekSummaryData_FromDb(year, week);
+		if (cachedWeekData == null) {
 
-			_weekCache.get(year)[week] = data;
+			weekData = getCalendarWeekSummaryData_FromDb(year, week);
+
+			_weekCache.get(year)[week] = weekData;
+
+		} else if (cachedWeekData.loadingState == LoadingState.NOT_LOADED) {
+
+			// load again
+
+			System.out.println(
+					(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
+							+ ("\treloading week data"));
+			// TODO remove SYSTEM.OUT.PRINTLN
+
+			weekData = getCalendarWeekSummaryData_FromDb(year, week);
 
 		} else {
 
-			data = _weekCache.get(year)[week];
+			weekData = cachedWeekData;
 		}
 
-		return data;
+		return weekData;
 
 	}
 
 	private CalendarTourData getCalendarWeekSummaryData_FromDb(final int year, final int week) {
 
-		final long start = System.currentTimeMillis();
+		final CalendarTourData weekData = new CalendarTourData();
 
-		final CalendarTourData data = new CalendarTourData();
-		final SQLFilter filter = new SQLFilter();
+		weekData.loadingState = LoadingState.IS_QUEUED;
 
-		final String select = "SELECT " //$NON-NLS-1$
-				+ "SUM(TourDistance)," //			1 //$NON-NLS-1$
-				+ "SUM(TourAltUp)," //				2 //$NON-NLS-1$
-				+ "SUM(TourRecordingTime)," //		3 //$NON-NLS-1$
-				+ "SUM(TourDrivingTime),"//			4 //$NON-NLS-1$
-				+ "SUM(1)"//			            5 //$NON-NLS-1$
+		_weekWaitingQueue.add(new WeekLoader(year, week, weekData, _weekExecuterId.get()));
 
-				+ UI.NEW_LINE
+		final Runnable executorTask = new Runnable() {
+			@Override
+			public void run() {
 
-				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + UI.NEW_LINE) //$NON-NLS-1$
+				// get last added loader item
+				final WeekLoader weekLoader = _weekWaitingQueue.pollFirst();
 
-				+ (" WHERE startWeekYear=?" + UI.NEW_LINE) //$NON-NLS-1$
-				+ (" AND   startWeek=?" + UI.NEW_LINE) //$NON-NLS-1$
-				+ filter.getWhereClause();
+				if (weekLoader == null) {
+					return;
+				}
 
-		try {
+				if (loadWeek_FromDB(weekLoader)) {
 
-			final Connection conn = TourDatabase.getInstance().getConnection();
-			final PreparedStatement statement = conn.prepareStatement(select);
-
-			statement.setInt(1, year);
-			statement.setInt(2, week);
-			filter.setParameters(statement, 3);
-
-			final ResultSet result = statement.executeQuery();
-			while (result.next()) {
-
-				data.year = year;
-				data.week = week;
-				data.distance = result.getInt(1);
-				data.altitude = result.getInt(2);
-
-				data.recordingTime = result.getInt(3);
-				data.drivingTime = result.getInt(4);
-				data.numTours = result.getInt(5);
-
+					// update UI
+					Display.getDefault().asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							_calendarGraph.updateUI_Layout();
+						}
+					});
+				}
 			}
+		};
 
-			conn.close();
+		_weekLoadingExecutor.submit(executorTask);
 
-		} catch (final SQLException e) {
-			net.tourbook.ui.UI.showSQLException(e);
-		}
-
-		System.out.println("getCalendarWeekSummaryData_FromDb\t" + (System.currentTimeMillis() - start) + " ms");
-		// TODO remove SYSTEM.OUT.PRINTLN
-
-		return data;
+		return weekData;
 
 	}
 
@@ -516,9 +519,6 @@ public class CalendarTourDataProvider {
 				final int month = result.getShort(2);
 				final int day = result.getShort(3);
 
-//				System.out.println(net.tourbook.common.UI.timeStampNano() + " " + year + "-" + month + " " + day);
-//				// TODO remove SYSTEM.OUT.PRINTLN
-
 				if (year != 0 && month != 0 && day != 0) {
 
 					// this case happened that year/month/day is 0
@@ -542,12 +542,122 @@ public class CalendarTourDataProvider {
 
 	}
 
-	void invalidate() {
+	synchronized void invalidate() {
 
-		_dayCache = new HashMap<Integer, CalendarTourData[][][]>();
-		_weekCache = new HashMap<Integer, CalendarTourData[]>();
+		// reset all cached data
+
+		_weekExecuterId.incrementAndGet();
+
+		_dayCache.clear();
+		_weekCache.clear();
 
 		_firstDateTime = null;
+	}
+
+	private boolean loadWeek_FromDB(final WeekLoader weekLoader) {
+
+//		if (weekLoader.executorId < _weekExecuterId.get()) {
+//
+//			// reset loading state
+//			weekLoader.weekData.loadingState = LoadingState.NOT_LOADED;
+//
+//			System.out.println(
+//					(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
+//							+ ("executer id " + _weekExecuterId.get() + " >  task id " + weekLoader.executorId));
+//			// TODO remove SYSTEM.OUT.PRINTLN
+//
+//			return false;
+//		}
+
+		final int year = weekLoader.year;
+		final int week = weekLoader.week;
+
+//		final LocalDate requestedDate = LocalDate.of(year, 1, 1).with(IsoFields.WEEK_OF_WEEK_BASED_YEAR, week);
+//
+////		final TemporalAdjuster adjuster = TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY);
+////		LocalDate mondayOfWeekByNumber = weekByNumber.with(adjuster);
+//		final LocalDate viewportStartDate = _calendarGraph.getViewportStartDate();
+//		final LocalDate viewportEndDate = _calendarGraph.getViewportEndDate();
+//
+//		if (requestedDate.isBefore(viewportStartDate) || requestedDate.isAfter(viewportEndDate)) {
+//
+//			// reset loading state
+//			weekLoader.weekData.loadingState = LoadingState.NOT_LOADED;
+//
+//			System.out.println(
+//					(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
+//							+ (requestedDate + " < " + viewportStartDate + " OR > " + viewportEndDate));
+//			// TODO remove SYSTEM.OUT.PRINTLN
+//
+//			return false;
+//		}
+
+		final long start = System.currentTimeMillis();
+
+		final CalendarTourData weekData = weekLoader.weekData;
+
+		try {
+
+			final SQLFilter filter = new SQLFilter();
+
+			final String select = "SELECT " //			  //$NON-NLS-1$
+
+					+ "SUM(TourDistance)," //			1 //$NON-NLS-1$
+					+ "SUM(TourAltUp)," //				2 //$NON-NLS-1$
+					+ "SUM(TourRecordingTime)," //		3 //$NON-NLS-1$
+					+ "SUM(TourDrivingTime),"//			4 //$NON-NLS-1$
+					+ "SUM(1)"//			            5 //$NON-NLS-1$
+
+					+ UI.NEW_LINE
+
+					+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + UI.NEW_LINE) //$NON-NLS-1$
+
+					+ (" WHERE startWeekYear=?" + UI.NEW_LINE) //$NON-NLS-1$
+					+ (" AND   startWeek=?" + UI.NEW_LINE) //$NON-NLS-1$
+
+					+ filter.getWhereClause();
+
+			final Connection conn = TourDatabase.getInstance().getConnection();
+			final PreparedStatement statement = conn.prepareStatement(select);
+
+			statement.setInt(1, year);
+			statement.setInt(2, week);
+			filter.setParameters(statement, 3);
+
+			final ResultSet result = statement.executeQuery();
+
+			while (result.next()) {
+
+				weekData.year = year;
+				weekData.week = week;
+
+				weekData.distance = result.getInt(1);
+				weekData.altitude = result.getInt(2);
+				weekData.recordingTime = result.getInt(3);
+				weekData.drivingTime = result.getInt(4);
+				weekData.numTours = result.getInt(5);
+			}
+
+			conn.close();
+
+		} catch (final SQLException e) {
+
+			net.tourbook.ui.UI.showSQLException(e);
+
+		} finally {
+
+			weekData.loadingState = LoadingState.IS_LOADED;
+		}
+
+		System.out.println("getCalendarWeekSummaryData_FromDb\t" + (System.currentTimeMillis() - start) + " ms");
+		// TODO remove SYSTEM.OUT.PRINTLN
+
+		return true;
+	}
+
+	public void setCalendarGraph(final CalendarGraph calendarGraph) {
+
+		_calendarGraph = calendarGraph;
 	}
 
 }

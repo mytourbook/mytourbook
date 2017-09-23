@@ -43,6 +43,8 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -158,9 +160,9 @@ public class CalendarView extends ViewPart implements ITourProvider {
 	 * UI controls
 	 */
 	private Composite							_parent;
+	private Composite							_calendarContainer;
 
 	private CalendarGraph						_calendarGraph;
-	private CalendarComponents					_calendarComponents;
 
 	private class ActionCalendarOptions extends ActionToolbarSlideout {
 
@@ -353,7 +355,6 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		_actionForward.setText(Messages.Calendar_View_Action_Forward);
 		_actionForward.setToolTipText(Messages.Calendar_View_Action_Forward_Tooltip);
 		_actionForward.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ArrowUp));
-
 
 		_actionSetLinked = new Action(null, Action.AS_CHECK_BOX) {
 			@Override
@@ -997,8 +998,14 @@ public class CalendarView extends ViewPart implements ITourProvider {
 
 	private void createUI(final Composite parent) {
 
-		_calendarComponents = new CalendarComponents(parent, SWT.NORMAL);
-		_calendarGraph = _calendarComponents.getGraph();
+		// create composite with vertical scrollbars
+		_calendarContainer = new Composite(parent, SWT.NO_BACKGROUND | SWT.V_SCROLL);
+//		GridDataFactory.fillDefaults().grab(true, true).applyTo(_calendarContainer);
+		GridLayoutFactory.fillDefaults().spacing(0, 0).margins(0, 0).numColumns(1).applyTo(_calendarContainer);
+		{
+			_calendarGraph = new CalendarGraph(_calendarContainer, SWT.NO_BACKGROUND, this);
+			GridDataFactory.fillDefaults().grab(true, true).applyTo(_calendarGraph);
+		}
 	}
 
 	@Override
@@ -1230,7 +1237,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 	 */
 	@Override
 	public void setFocus() {
-		_calendarComponents.setFocus();
+		_calendarContainer.setFocus();
 	}
 
 	void updateUI_Layout() {
