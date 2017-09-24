@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.views.calendar;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
@@ -22,8 +23,10 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorDefinition;
 import net.tourbook.common.color.GraphColorManager;
+import net.tourbook.common.font.MTFont;
 import net.tourbook.common.formatter.ValueFormat;
 import net.tourbook.common.preferences.ICommonPreferences;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.tooltip.ToolbarSlideout;
@@ -45,6 +48,7 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -53,8 +57,12 @@ import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IActionBars;
@@ -156,13 +164,22 @@ public class CalendarView extends ViewPart implements ITourProvider {
 			createFormatter_Tour_Time_Pace()
 	};
 
+	private LocalDate							_titleFirstDay;
+	private LocalDate							_titleLastDay;
+
+	private PixelConverter						_pc;
+
 	/*
 	 * UI controls
 	 */
+	private CalendarGraph						_calendarGraph;
+
 	private Composite							_parent;
 	private Composite							_calendarContainer;
 
-	private CalendarGraph						_calendarGraph;
+	private Combo								_comboConfigName;
+
+	private Label								_lblTitle;
 
 	private class ActionCalendarOptions extends ActionToolbarSlideout {
 
@@ -202,6 +219,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == CalendarView.this) {
 					saveState();
+					CalendarConfigManager.setCalendarView(null);
 				}
 			}
 
@@ -215,7 +233,11 @@ public class CalendarView extends ViewPart implements ITourProvider {
 			public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
 			@Override
-			public void partOpened(final IWorkbenchPartReference partRef) {}
+			public void partOpened(final IWorkbenchPartReference partRef) {
+				if (partRef.getPart(false) == CalendarView.this) {
+					CalendarConfigManager.setCalendarView(CalendarView.this);
+				}
+			}
 
 			@Override
 			public void partVisible(final IWorkbenchPartReference partRef) {}
@@ -976,6 +998,8 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		addPrefListener();
 		addTourEventListener();
 
+		initUI(parent);
+
 		createUI(parent);
 
 		createActions();
@@ -985,26 +1009,76 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		addSelectionProvider();
 
 		restoreState();
+		updateUI_CalendarConfig();
 
 		// restore selection
 		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
 
-		// final Menu contextMenu = TourContextMenu.getInstance().createContextMenu(this, _calendarGraph);
 		final Menu contextMenu = (new TourContextMenu()).createContextMenu(this, _calendarGraph, getLocalActions());
-
 		_calendarGraph.setMenu(contextMenu);
-
 	}
 
 	private void createUI(final Composite parent) {
 
-		// create composite with vertical scrollbars
-		_calendarContainer = new Composite(parent, SWT.NO_BACKGROUND | SWT.V_SCROLL);
-//		GridDataFactory.fillDefaults().grab(true, true).applyTo(_calendarContainer);
-		GridLayoutFactory.fillDefaults().spacing(0, 0).margins(0, 0).numColumns(1).applyTo(_calendarContainer);
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+		GridLayoutFactory
+				.fillDefaults()//
+				.numColumns(1)
+				.spacing(0, 0)
+				.applyTo(container);
 		{
-			_calendarGraph = new CalendarGraph(_calendarContainer, SWT.NO_BACKGROUND, this);
-			GridDataFactory.fillDefaults().grab(true, true).applyTo(_calendarGraph);
+			createUI_10_Header(container);
+
+			// create composite with vertical scrollbars
+			_calendarContainer = new Composite(container, SWT.NO_BACKGROUND | SWT.V_SCROLL);
+			GridDataFactory.fillDefaults().grab(true, true).applyTo(_calendarContainer);
+			GridLayoutFactory.fillDefaults().spacing(0, 0).margins(0, 0).numColumns(1).applyTo(_calendarContainer);
+			{
+				_calendarGraph = new CalendarGraph(_calendarContainer, SWT.NO_BACKGROUND, this);
+				GridDataFactory.fillDefaults().grab(true, true).applyTo(_calendarGraph);
+			}
+		}
+	}
+
+	private void createUI_10_Header(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(container);
+		{
+			{
+				/*
+				 * Title
+				 */
+				_lblTitle = new Label(container, SWT.NONE);
+				GridDataFactory
+						.fillDefaults()//
+						.grab(true, false)
+						//						.indent(5, 0)
+						.applyTo(_lblTitle);
+				MTFont.setHeaderFont(_lblTitle);
+			}
+			{
+				/*
+				 * Combo: Configuration
+				 */
+				_comboConfigName = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
+				_comboConfigName.setVisibleItemCount(20);
+				_comboConfigName.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						onSelectConfig();
+					}
+				});
+				GridDataFactory
+						.fillDefaults()
+						//						.grab(true, false)
+						.align(SWT.BEGINNING, SWT.CENTER)
+						//						.indent(10, 0)
+						.hint(_pc.convertWidthInCharsToPixels(10), SWT.DEFAULT)
+						.applyTo(_comboConfigName);
+			}
 		}
 	}
 
@@ -1035,6 +1109,15 @@ public class CalendarView extends ViewPart implements ITourProvider {
 
 		manager.add(_actionSetLinked);
 		manager.add(_actionCalendarOptions);
+	}
+
+	private void fillUI_Config() {
+
+		_comboConfigName.removeAll();
+
+		for (final CalendarConfig config : CalendarConfigManager.getAllCalendarConfigs()) {
+			_comboConfigName.add(config.name);
+		}
 	}
 
 	private void fillViewMenu(final IMenuManager manager) {
@@ -1096,6 +1179,30 @@ public class CalendarView extends ViewPart implements ITourProvider {
 			}
 		}
 		return selectedTourData;
+	}
+
+	private void initUI(final Composite parent) {
+
+		_pc = new PixelConverter(parent);
+	}
+
+	private void onSelectConfig() {
+
+		final int selectedIndex = _comboConfigName.getSelectionIndex();
+		final ArrayList<CalendarConfig> allConfigurations = CalendarConfigManager.getAllCalendarConfigs();
+
+		final CalendarConfig selectedConfig = allConfigurations.get(selectedIndex);
+		final CalendarConfig activeConfig = CalendarConfigManager.getActiveCalendarConfig();
+
+		if (selectedConfig.equals(activeConfig)) {
+
+			// config has not changed
+			return;
+		}
+
+		CalendarConfigManager.setActiveCalendarConfig(selectedConfig);
+
+		updateUI_Layout();
 	}
 
 	private void onSelectionChanged(final ISelection selection) {
@@ -1240,6 +1347,16 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		_calendarContainer.setFocus();
 	}
 
+	void updateUI_CalendarConfig() {
+
+		fillUI_Config();
+		
+		// get active config AFTER getting the index because this could change the active config
+		final int activeConfigIndex = CalendarConfigManager.getActiveCalendarConfigIndex();
+
+		_comboConfigName.select(activeConfigIndex);
+	}
+
 	void updateUI_Layout() {
 
 		if (null != _calendarGraph) {
@@ -1251,6 +1368,22 @@ public class CalendarView extends ViewPart implements ITourProvider {
 				}
 			});
 		}
+	}
+
+	void updateUI_Title(final LocalDate calendarFirstDay, final LocalDate calendarLastDay) {
+
+		if (calendarFirstDay.equals(_titleFirstDay) && calendarLastDay.equals(_titleLastDay)) {
+			// these dates are already displayed
+			return;
+		}
+
+		_titleFirstDay = calendarFirstDay;
+		_titleLastDay = calendarLastDay;
+
+		_lblTitle.setText(
+				calendarFirstDay.format(TimeTools.Formatter_Date_L)
+						+ UI.DASH_WITH_DOUBLE_SPACE
+						+ calendarLastDay.format(TimeTools.Formatter_Date_L));
 	}
 
 }

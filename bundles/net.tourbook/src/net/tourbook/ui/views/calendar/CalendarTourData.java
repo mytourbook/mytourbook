@@ -51,4 +51,18 @@ public class CalendarTourData {
 	 */
 	int				numTours;
 
+	@Override
+	public String toString() {
+		return "CalendarTourData [" //$NON-NLS-1$
+
+				+ "loadingState=" + loadingState + ", " //$NON-NLS-1$ //$NON-NLS-2$
+				+ "year=" + year + ", " //$NON-NLS-1$ //$NON-NLS-2$
+				+ "month=" + month + ", " //$NON-NLS-1$ //$NON-NLS-2$
+				+ "day=" + day + ", " //$NON-NLS-1$ //$NON-NLS-2$
+				+ "week=" + week + ", " //$NON-NLS-1$ //$NON-NLS-2$
+				+ "numTours=" + numTours //$NON-NLS-1$
+
+				+ "]"; //$NON-NLS-1$
+	}
+
 }

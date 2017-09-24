@@ -19,6 +19,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.Executors;
@@ -28,6 +30,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicLong;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.SQLFilter;
@@ -370,8 +373,11 @@ public class CalendarTourDataProvider {
 			net.tourbook.ui.UI.showSQLException(e);
 		}
 
-		System.out.println("getCalendarMonthData_FromDb\t\t\t" + (System.currentTimeMillis() - start) + " ms");
-		// TODO remove SYSTEM.OUT.PRINTLN
+//		System.out.println(
+//				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") +
+//						"getCalendarMonthData_FromDb\t\t\t" + (System.currentTimeMillis() - start) + " ms - "
+//						+ "\t" + year + " " + month);
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		return monthData;
 	}
@@ -414,7 +420,12 @@ public class CalendarTourDataProvider {
 		return dt;
 	}
 
-	CalendarTourData getCalendarWeekSummaryData(final int year, final int week, final CalendarView calendarView) {
+	public CalendarTourData getCalendarWeekSummaryData(final LocalDate week1stDay, final CalendarView calendarView) {
+
+		final WeekFields cw = TimeTools.calendarWeek;
+
+		final int year = week1stDay.get(cw.weekBasedYear());
+		final int week = week1stDay.get(cw.weekOfWeekBasedYear());
 
 		if (!_weekCache.containsKey(year)) {
 
@@ -431,7 +442,7 @@ public class CalendarTourDataProvider {
 
 		if (cachedWeekData == null) {
 
-			weekData = getCalendarWeekSummaryData_FromDb(year, week);
+			weekData = getCalendarWeekSummaryData_FromDb(week1stDay, year, week);
 
 			_weekCache.get(year)[week] = weekData;
 
@@ -439,12 +450,10 @@ public class CalendarTourDataProvider {
 
 			// load again
 
-			System.out.println(
-					(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
-							+ ("\treloading week data"));
-			// TODO remove SYSTEM.OUT.PRINTLN
+			weekData = getCalendarWeekSummaryData_FromDb(week1stDay, year, week);
 
-			weekData = getCalendarWeekSummaryData_FromDb(year, week);
+			// update cached data otherwise an endless loop occures !!!
+			_weekCache.get(year)[week] = weekData;
 
 		} else {
 
@@ -455,13 +464,15 @@ public class CalendarTourDataProvider {
 
 	}
 
-	private CalendarTourData getCalendarWeekSummaryData_FromDb(final int year, final int week) {
+	private CalendarTourData getCalendarWeekSummaryData_FromDb(	final LocalDate week1stDay,
+																final int year,
+																final int week) {
 
 		final CalendarTourData weekData = new CalendarTourData();
 
 		weekData.loadingState = LoadingState.IS_QUEUED;
 
-		_weekWaitingQueue.add(new WeekLoader(year, week, weekData, _weekExecuterId.get()));
+		_weekWaitingQueue.add(new WeekLoader(week1stDay, year, week, weekData, _weekExecuterId.get()));
 
 		final Runnable executorTask = new Runnable() {
 			@Override
@@ -556,44 +567,37 @@ public class CalendarTourDataProvider {
 
 	private boolean loadWeek_FromDB(final WeekLoader weekLoader) {
 
-//		if (weekLoader.executorId < _weekExecuterId.get()) {
-//
-//			// reset loading state
-//			weekLoader.weekData.loadingState = LoadingState.NOT_LOADED;
-//
-//			System.out.println(
-//					(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
-//							+ ("executer id " + _weekExecuterId.get() + " >  task id " + weekLoader.executorId));
-//			// TODO remove SYSTEM.OUT.PRINTLN
-//
-//			return false;
-//		}
+		if (weekLoader.executorId < _weekExecuterId.get()) {
 
-		final int year = weekLoader.year;
-		final int week = weekLoader.week;
+			// current executer was invalidated
 
-//		final LocalDate requestedDate = LocalDate.of(year, 1, 1).with(IsoFields.WEEK_OF_WEEK_BASED_YEAR, week);
-//
-////		final TemporalAdjuster adjuster = TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY);
-////		LocalDate mondayOfWeekByNumber = weekByNumber.with(adjuster);
-//		final LocalDate viewportStartDate = _calendarGraph.getViewportStartDate();
-//		final LocalDate viewportEndDate = _calendarGraph.getViewportEndDate();
-//
-//		if (requestedDate.isBefore(viewportStartDate) || requestedDate.isAfter(viewportEndDate)) {
-//
-//			// reset loading state
-//			weekLoader.weekData.loadingState = LoadingState.NOT_LOADED;
-//
-//			System.out.println(
-//					(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
-//							+ (requestedDate + " < " + viewportStartDate + " OR > " + viewportEndDate));
-//			// TODO remove SYSTEM.OUT.PRINTLN
-//
-//			return false;
-//		}
+			// reset loading state
+			weekLoader.weekData.loadingState = LoadingState.NOT_LOADED;
+
+			return false;
+		}
+
+		final LocalDate week1stDay = weekLoader.week1stDay;
+		final LocalDate weekLastDay = week1stDay.plusDays(6);
+
+		final LocalDate viewportStartDate = _calendarGraph.getCalendarFirstDay();
+		final LocalDate viewportEndDate = _calendarGraph.getCalendarLastDay();
+
+		final boolean isBefore = weekLastDay.isBefore(viewportStartDate);
+		final boolean isAfter = week1stDay.isAfter(viewportEndDate);
+
+		if (isBefore || isAfter) {
+
+			// reset loading state
+			weekLoader.weekData.loadingState = LoadingState.NOT_LOADED;
+
+			return false;
+		}
 
 		final long start = System.currentTimeMillis();
 
+		final int year = weekLoader.year;
+		final int week = weekLoader.week;
 		final CalendarTourData weekData = weekLoader.weekData;
 
 		try {
@@ -649,8 +653,8 @@ public class CalendarTourDataProvider {
 			weekData.loadingState = LoadingState.IS_LOADED;
 		}
 
-		System.out.println("getCalendarWeekSummaryData_FromDb\t" + (System.currentTimeMillis() - start) + " ms");
-		// TODO remove SYSTEM.OUT.PRINTLN
+//		System.out.println("getCalendarWeekSummaryData_FromDb\t" + (System.currentTimeMillis() - start) + " ms");
+//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		return true;
 	}

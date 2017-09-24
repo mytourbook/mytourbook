@@ -77,7 +77,7 @@ public class CalendarConfigManager {
 	private static final String	ATTR_IS_TINY_LAYOUT		= "isTinyLayout";							//$NON-NLS-1$
 	private static final String	ATTR_WEEK_HEIGHT		= "weekHeight";								//$NON-NLS-1$
 	//
-	static final int			WEEK_HEIGHT_MIN			= 3;
+	static final int			WEEK_HEIGHT_MIN			= 1;
 	static final int			WEEK_HEIGHT_MAX			= 200;
 	//
 	static final int			DEFAULT_WEEK_HEIGHT		= 70;
@@ -93,6 +93,11 @@ public class CalendarConfigManager {
 	private static CalendarConfig					_activeCalendarConfig;
 	//
 	private static String							_fromXml_ActiveCalendarConfigId;
+
+	/**
+	 * Calendarview or <code>null</code> when closed.
+	 */
+	private static CalendarView						_calendarView;
 
 	private static XMLMemento create_Root() {
 
@@ -220,7 +225,7 @@ public class CalendarConfigManager {
 
 		// this case should not happen but ensure that a correct config is set
 
-		_activeCalendarConfig = _allCalendarConfigs.get(0);
+		setActiveCalendarConfigIntern(_allCalendarConfigs.get(0));
 
 		return 0;
 	}
@@ -364,7 +369,7 @@ public class CalendarConfigManager {
 				createDefaults_Calendars();
 			}
 
-			_activeCalendarConfig = getConfig_Calendar();
+			setActiveCalendarConfigIntern(getConfig_Calendar());
 
 		} catch (final Exception e) {
 			StatusUtil.log(e);
@@ -389,15 +394,15 @@ public class CalendarConfigManager {
 		newConfig.name = oldName;
 
 		// update model
-		_activeCalendarConfig = newConfig;
 		_allCalendarConfigs.add(activeCalendarConfigIndex, newConfig);
+		setActiveCalendarConfigIntern(newConfig);
 	}
 
 	public static void resetAllCalendarConfigurations() {
 
 		createDefaults_Calendars();
 
-		_activeCalendarConfig = _allCalendarConfigs.get(0);
+		setActiveCalendarConfigIntern(_allCalendarConfigs.get(0));
 	}
 
 	public static void saveState() {
@@ -433,7 +438,21 @@ public class CalendarConfigManager {
 
 	public static void setActiveCalendarConfig(final CalendarConfig newConfig) {
 
-		_activeCalendarConfig = newConfig;
+		setActiveCalendarConfigIntern(newConfig);
+	}
+
+	private static void setActiveCalendarConfigIntern(final CalendarConfig calendarConfig) {
+
+		_activeCalendarConfig = calendarConfig;
+
+		if (_calendarView != null) {
+			_calendarView.updateUI_CalendarConfig();
+		}
+	}
+
+	public static void setCalendarView(final CalendarView calendarView) {
+
+		_calendarView = calendarView;
 	}
 
 }

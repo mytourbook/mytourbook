@@ -15,8 +15,11 @@
  *******************************************************************************/
 package net.tourbook.ui.views.calendar;
 
+import java.time.LocalDate;
+
 public class WeekLoader {
 
+	LocalDate			week1stDay;
 	int					year;
 	int					week;
 
@@ -26,7 +29,13 @@ public class WeekLoader {
 	CalendarTourData	weekData;
 	long				executorId;
 
-	public WeekLoader(final int year, final int week, final CalendarTourData weekData, final long executorId) {
+	public WeekLoader(	final LocalDate week1stDay,
+						final int year,
+						final int week,
+						final CalendarTourData weekData,
+						final long executorId) {
+
+		this.week1stDay = week1stDay;
 
 		this.year = year;
 		this.week = week;

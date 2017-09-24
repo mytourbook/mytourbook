@@ -147,8 +147,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	 */
 	private int									_fontHeight;
 
-	private LocalDate							_viewportStartDate;
-	private LocalDate							_viewportEndDate;
+	private LocalDate							_calendarFirstDay;
+	private LocalDate							_calendarLastDay;
 
 	/*
 	 * UI controls
@@ -559,8 +559,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	 */
 	private void drawCalendar(GC gc) {
 
-		final long start = System.nanoTime();
-
 		final int dayLabelXOffset = 1;
 
 		final Point canvasSize = getSize();
@@ -600,21 +598,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			System.out.println("Drawing year: " + _firstDay.getYear() + " week: " + _firstDay.getWeekOfWeekyear()); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
-//
-//		_viewportEndDate = LocalDate.of(endDate.getYear(), endDate.getMonthOfYear(), endDate.getDayOfMonth());
-//
-//		System.out.println(
-//				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("End\t" + _viewportEndDate));
-//		// TODO remove SYSTEM.OUT.PRINTLN
-//
-//
-//		_viewportStartDate = LocalDate.of(startDate.getYear(), startDate.getMonthOfYear(), startDate.getDayOfMonth());
-//
-//		System.out.println(
-//				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("Start\t" + _viewportStartDate));
-//		// TODO remove SYSTEM.OUT.PRINTLN
-//
-
 		if (_image != null && !_image.isDisposed()) {
 			_image.dispose();
 		}
@@ -635,10 +618,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			_calendarYearMonthContributor.selectMonth(currentDate.getMonthOfYear());
 		}
 
-		final GC oldGc = gc;
-		gc = new GC(_image);
-
-		_refTextExtent = gc.stringExtent(_refText);
 		final boolean oldLayout = _isTinyLayout;
 //		_isTinyLayout = (_refTextExtent.x > canvasWidth / 9); // getNumOfWeeks needs the _tinuLayout set
 		_isTinyLayout = calConfig.isTinyLayout;
@@ -658,10 +637,13 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			scrollBarUpdate();
 
 			if (_selectedItem.id > 0) {
+
 				switch (_selectedItem.type) {
+
 				case DAY:
 					gotoDate(new DateTime(0).plusDays(_selectedItem.id.intValue()));
 					return;
+
 				case TOUR:
 					gotoTourId(_selectedItem.id);
 					return;
@@ -669,9 +651,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			}
 		}
 
-		final int numCols = 9; // one col left and right of the week + 7 week days
-//		int numRows = getNumOfWeeks(); // number of weeks per month displayed (make sure _tinyLayout is already defined!)
-
+		// one col left and right of the week + 7 week days
+		final int numCols = 9;
 		final int weekHeight = calConfig.weekHeight;
 
 		final int numRows = canvasHeight / weekHeight
@@ -679,6 +660,20 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 				+ 1;
 
 		setNumOfWeeks(numRows);
+
+		// keep calendar viewport dates
+		_calendarFirstDay = LocalDate.of(
+				currentDate.getYear(),
+				currentDate.getMonthOfYear(),
+				currentDate.getDayOfMonth());
+		_calendarLastDay = _calendarFirstDay.plusWeeks(numRows).minusDays(1);
+
+		_calendarView.updateUI_Title(_calendarFirstDay, _calendarLastDay);
+
+		final GC oldGc = gc;
+		gc = new GC(_image);
+
+		_refTextExtent = gc.stringExtent(_refText);
 
 		final Color alternate = _colorCache.getColor(0xf0f0f0);
 
@@ -754,20 +749,23 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		final int dayLabelWidht = headerSizes[g].x;
 		int dayLabelHeight = headerSizes[g].y;
 
-		DateTime weekDate;
 		long dayId = (new Day(currentDate)).dayId; // we use simple ids
 
 		// Weeks
-		for (int i = 0; i < numRows; i++) {
+		for (int rowIndex = 0; rowIndex < numRows; rowIndex++) {
 
-			final int Y1 = i * weekHeight;
-			final int Y2 = (i + 1) * weekHeight;
+			final int Y1 = rowIndex * weekHeight;
+			final int Y2 = (rowIndex + 1) * weekHeight;
 
 			// Days per week
 			Rectangle dayRec = null;
-			weekDate = currentDate; // save the first day of this week as a pointer to this week
+			final LocalDate week1stDay = LocalDate.of(
+					currentDate.getYear(),
+					currentDate.getMonthOfYear(),
+					currentDate.getDayOfMonth()); // save the first day of this week as a pointer to this week
 
 			if (infoWidth > 0) {
+
 				final Rectangle infoRec = new Rectangle(0, Y1, infoWidth, (Y2 - Y1));
 				drawWeek_Info(gc, currentDate, infoRec);
 			}
@@ -833,6 +831,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 										- dayLabelHeight));
 
 				if (_isTinyLayout && _isShowDayNumberInTinyView) {
+
 					if (day.dayId == todayDayId) {
 						gc.setForeground(_blue);
 					} else if (weekDay == DateTimeConstants.SATURDAY || weekDay == DateTimeConstants.SUNDAY) {
@@ -840,6 +839,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 					} else {
 						gc.setForeground(_darkGray);
 					}
+
 					gc.setAlpha(0x50);
 					gc.setFont(boldFont);
 					gc.setClipping(dayRec);
@@ -860,8 +860,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 				final Rectangle weekRec = new Rectangle(X1, Y1, (X2 - X1), (Y2 - Y1));
 
 				final CalendarTourData weekSummary = _dataProvider.getCalendarWeekSummaryData(
-						weekDate.getYear(),
-						weekDate.getWeekOfWeekyear(),
+						week1stDay,
 						_calendarView);
 
 				if (weekSummary.loadingState == LoadingState.IS_LOADED && weekSummary.numTours > 0) {
@@ -891,11 +890,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		gc.dispose();
 
 		_isGraphClean = true;
-
-//		System.out.println(
-//				(UI.timeStampNano() + " " + this.getClass().getName() + "drawCalendar\t")
-//						+ (((float) (System.nanoTime() - start) / 1000000) + " ms"));
-//		// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
 	private void drawDayTours(final GC gc, final CalendarTourData[] data, final Rectangle rec) {
@@ -1253,6 +1247,20 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		return getSelectedTours();
 	}
 
+	/**
+	 * @return Returns the first day which is displayed in the calendar view.
+	 */
+	LocalDate getCalendarFirstDay() {
+		return _calendarFirstDay;
+	}
+
+	/**
+	 * @return Returns the last day which is displayed in the calendar view.
+	 */
+	LocalDate getCalendarLastDay() {
+		return _calendarLastDay;
+	}
+
 	public DateTime getFirstDay() {
 		return _firstDay;
 	}
@@ -1324,14 +1332,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 	public boolean getTourInfoUseTextColor() {
 		return _useTextColorForTourInfoText;
-	}
-
-	public LocalDate getViewportEndDate() {
-		return _viewportEndDate;
-	}
-
-	public LocalDate getViewportStartDate() {
-		return _viewportStartDate;
 	}
 
 	public int getWeekSummaryFormatter(final int line) {
@@ -1679,24 +1679,42 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 
 		if (_scrollBarShift != 0) {
+
 			if (_scrollBarLastSelection == selectableMax) {
 				sb.setSelection(selectableMax);
 			} else if (_scrollBarLastSelection == selectableMin) {
 				sb.setSelection(selectableMin);
 			}
-			if (change > 0 && _scrollBarShift < 0) { // ensure we are not shifting over "0"
+
+			if (change > 0 && _scrollBarShift < 0) {
+
+				// ensure we are not shifting over "0"
 				_scrollBarShift = Math.min(0, _scrollBarShift + change);
+
 			} else if (change < 0 && _scrollBarShift > 0) {
+
 				_scrollBarShift = Math.max(0, _scrollBarShift + change);
+
 			} else {
 				_scrollBarShift += change;
 			}
-		} else { // do we need start shifting the scroll bar ?
-			if (selection < selectableMin) { // we are at the upper border
+
+		} else {
+
+			// do we need start shifting the scroll bar ?
+
+			if (selection < selectableMin) {
+
+				// we are at the upper border
+
 				sb.setSelection(selectableMin);
 				_scrollBarShift += change;
 			}
-			if (selection > selectableMax) { // we are at the lower border
+
+			if (selection > selectableMax) {
+
+				// we are at the lower border
+
 				sb.setSelection(selectableMax);
 				_scrollBarShift += change;
 
