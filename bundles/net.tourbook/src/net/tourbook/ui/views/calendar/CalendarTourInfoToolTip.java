@@ -13,11 +13,10 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.views;
+package net.tourbook.ui.views.calendar;
 
 import java.util.ArrayList;
 
-import net.tourbook.common.UI;
 import net.tourbook.common.util.ITourToolTipProvider;
 import net.tourbook.common.util.ToolTip;
 import net.tourbook.common.util.TourToolTip;
@@ -25,10 +24,8 @@ import net.tourbook.data.TourData;
 import net.tourbook.tour.TourInfoUI;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.views.calendar.CalendarGraph.CalendarItem;
 
-import org.eclipse.jface.viewers.CellLabelProvider;
-import org.eclipse.jface.viewers.ColumnViewer;
-import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.GC;
@@ -44,7 +41,7 @@ import org.eclipse.swt.widgets.Event;
  * {@link org.eclipse.jface.viewers.ColumnViewerToolTipSupport}
  */
 @SuppressWarnings("restriction")
-public abstract class ColumnViewerTourInfoToolTip extends ToolTip implements ITourProvider, ITourToolTipProvider {
+public class CalendarTourInfoToolTip extends ToolTip implements ITourProvider, ITourToolTipProvider {
 
 	private final TourInfoUI	_tourInfoUI	= new TourInfoUI();
 
@@ -53,17 +50,22 @@ public abstract class ColumnViewerTourInfoToolTip extends ToolTip implements ITo
 
 	private Control				_ttControl;
 
-	private ColumnViewer		_columnViewer;
-	private ViewerCell			_viewerCell;
+	private CalendarGraph		_calendarGraph;
+	private CalendarView		_calendarView;
 
-	public ColumnViewerTourInfoToolTip(final Control control, final int style, final ColumnViewer columnViewer) {
+	private CalendarItem		_hoveredIdem;
 
-		super(control, style, false);
+	public CalendarTourInfoToolTip(final CalendarView calendarView) {
 
-		_ttControl = control;
-		_columnViewer = columnViewer;
+		super(calendarView.getCalendarGraph(), NO_RECREATE, false);
+
+		_calendarView = calendarView;
+
+		_ttControl = calendarView.getCalendarGraph();
+		_calendarGraph = calendarView.getCalendarGraph();
 
 		setHideOnMouseDown(false);
+		setPopupDelay(20);
 	}
 
 	@Override
@@ -76,7 +78,7 @@ public abstract class ColumnViewerTourInfoToolTip extends ToolTip implements ITo
 
 		super.afterHideToolTip(event);
 
-		_viewerCell = null;
+		_hoveredIdem = null;
 	}
 
 	@Override
@@ -85,6 +87,7 @@ public abstract class ColumnViewerTourInfoToolTip extends ToolTip implements ITo
 		Composite container;
 
 		if (_tourId != null && _tourId != -1) {
+
 			// first get data from the tour id when it is set
 			_tourData = TourManager.getInstance().getTourData(_tourId);
 		}
@@ -95,7 +98,7 @@ public abstract class ColumnViewerTourInfoToolTip extends ToolTip implements ITo
 
 			container = _tourInfoUI.createUI_NoData(parent);
 
-			// allow the actions to be selected
+			// prevent that the actions can be selected
 			setHideOnMouseDown(true);
 
 		} else {
@@ -123,12 +126,11 @@ public abstract class ColumnViewerTourInfoToolTip extends ToolTip implements ITo
 	@Override
 	public Point getLocation(final Point tipSize, final Event event) {
 
-		// try to position the tooltip at the bottom of the cell
-		final ViewerCell cell = _columnViewer.getCell(new Point(event.x, event.y));
+		final CalendarItem hoveredItem = _calendarGraph.getHoveredTour();
 
-		if (cell != null) {
+		if (hoveredItem.isTour() && hoveredItem.itemRectangle != null) {
 
-			final Rectangle cellBounds = cell.getBounds();
+			final Rectangle cellBounds = hoveredItem.itemRectangle;
 			final int cellWidth2 = cellBounds.width / 2;
 			final int cellHeight = cellBounds.height;
 
@@ -203,7 +205,7 @@ public abstract class ColumnViewerTourInfoToolTip extends ToolTip implements ITo
 	protected Object getToolTipArea(final Event event) {
 
 		// Ensure that the tooltip is hidden when the cell is left
-		final ViewerCell ttArea = _viewerCell = _columnViewer.getCell(new Point(event.x, event.y));
+		final CalendarItem ttArea = _hoveredIdem = _calendarGraph.getHoveredTour();
 
 		return ttArea;
 	}
@@ -220,6 +222,7 @@ public abstract class ColumnViewerTourInfoToolTip extends ToolTip implements ITo
 
 	@Override
 	public boolean setHoveredLocation(final int x, final int y) {
+
 		// not used
 		return false;
 	}
@@ -236,34 +239,21 @@ public abstract class ColumnViewerTourInfoToolTip extends ToolTip implements ITo
 	@Override
 	protected boolean shouldCreateToolTip(final Event event) {
 
+		if (_calendarView.isShowTourTooltip() == false) {
+			return false;
+		}
+
 		if (!super.shouldCreateToolTip(event)) {
 			return false;
 		}
 
-		if (_viewerCell == null) {
+		if (_hoveredIdem == null || _hoveredIdem.id < 0) {
 			return false;
 		}
 
-		/*
-		 * get tour id from hovered cell label provider
-		 */
-		Long tourId = null;
-		final CellLabelProvider labelProvider = _columnViewer.getLabelProvider(_viewerCell.getColumnIndex());
+		// get tour id from hovered item
+		_tourId = _hoveredIdem.id;
 
-		if (labelProvider instanceof IColumnViewerTourIdProvider) {
-			tourId = ((IColumnViewerTourIdProvider) labelProvider).getTourId(_viewerCell);
-		}
-
-		_tourId = tourId;
-
-		if (tourId == null) {
-			// show default tooltip
-			_ttControl.setToolTipText(null);
-		} else {
-			// hide default tooltip and display the custom tooltip
-			_ttControl.setToolTipText(UI.EMPTY_STRING);
-		}
-
-		return tourId != null;
+		return true;
 	}
 }

@@ -18,6 +18,6 @@ package net.tourbook.ui.views.calendar;
 
 public interface ICalendarSelectionProvider {
 
-	void selectionChanged(CalendarGraph.Selection selection);
+	void selectionChanged(CalendarGraph.CalendarItem selection);
 
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2016 IBM Corporation and others.
+ * Copyright (c) 2006, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     Tom Schindl <tom.schindl@bestsolution.at> - initial API and implementation
  *                                                 bugfix in: 195137, 198089, 225190
  *******************************************************************************/
-
 package net.tourbook.common.util;
 
 import java.util.HashMap;
@@ -38,6 +37,7 @@ import org.eclipse.swt.widgets.Shell;
  * @since 3.3
  */
 public abstract class ToolTip {
+
 	/**
 	 * Recreate the tooltip on every mouse move
 	 */
@@ -52,11 +52,9 @@ public abstract class ToolTip {
 	private Control						control;
 
 	private int							xShift					= 3;
-
 	private int							yShift					= 0;
 
 	private int							popupDelay				= 0;
-
 	private int							hideDelay				= 0;
 
 	private ToolTipOwnerControlListener	listener;
@@ -71,11 +69,9 @@ public abstract class ToolTip {
 
 	private Listener					shellListener;
 
-	private boolean						hideOnMouseDown			= true;
-
-	private boolean						respectDisplayBounds	= true;
-
-	private boolean						respectMonitorBounds	= true;
+	private boolean						isHideOnMouseDown		= true;
+	private boolean						isRespectDisplayBounds	= true;
+	private boolean						isRespectMonitorBounds	= true;
 
 	private int							style;
 
@@ -299,13 +295,13 @@ public abstract class ToolTip {
 	}
 
 	private Point fixupDisplayBounds(final Point tipSize, final Point location) {
-		if (respectDisplayBounds || respectMonitorBounds) {
+		if (isRespectDisplayBounds || isRespectMonitorBounds) {
 			Rectangle bounds;
 			final Point rightBounds = new Point(tipSize.x + location.x, tipSize.y + location.y);
 
 			final Monitor[] ms = control.getDisplay().getMonitors();
 
-			if (respectMonitorBounds && ms.length > 1) {
+			if (isRespectMonitorBounds && ms.length > 1) {
 				// By default present in the monitor of the control
 				bounds = control.getMonitor().getBounds();
 				final Point p = new Point(location.x, location.y);
@@ -473,7 +469,7 @@ public abstract class ToolTip {
 	 * @return <code>true</code> if hiding on mouse down in the tool tip is on
 	 */
 	public boolean isHideOnMouseDown() {
-		return hideOnMouseDown;
+		return isHideOnMouseDown;
 	}
 
 	public boolean isHideOnMouseMove() {
@@ -486,7 +482,7 @@ public abstract class ToolTip {
 	 * @return <code>true</code> if the tooltip respects bounds of the display
 	 */
 	public boolean isRespectDisplayBounds() {
-		return respectDisplayBounds;
+		return isRespectDisplayBounds;
 	}
 
 	/**
@@ -495,7 +491,7 @@ public abstract class ToolTip {
 	 * @return <code>true</code> if tooltip respects the bounds of the monitor
 	 */
 	public boolean isRespectMonitorBounds() {
-		return respectMonitorBounds;
+		return isRespectMonitorBounds;
 	}
 
 	private void passOnEvent(final Shell tip, final Event event) {
@@ -548,7 +544,7 @@ public abstract class ToolTip {
 		// Only needed if there's currently a tooltip active
 		if (CURRENT_TOOLTIP != null && !CURRENT_TOOLTIP.isDisposed()) {
 			// Only change if value really changed
-			if (hideOnMouseDown != this.hideOnMouseDown) {
+			if (hideOnMouseDown != this.isHideOnMouseDown) {
 				control.getDisplay().syncExec(new Runnable() {
 
 					@Override
@@ -562,7 +558,7 @@ public abstract class ToolTip {
 			}
 		}
 
-		this.hideOnMouseDown = hideOnMouseDown;
+		this.isHideOnMouseDown = hideOnMouseDown;
 	}
 
 	public void setHideOnMouseMove(final boolean isHideOnMouseMove) {
@@ -590,7 +586,7 @@ public abstract class ToolTip {
 	 * @param respectDisplayBounds
 	 */
 	public void setRespectDisplayBounds(final boolean respectDisplayBounds) {
-		this.respectDisplayBounds = respectDisplayBounds;
+		this.isRespectDisplayBounds = respectDisplayBounds;
 	}
 
 	/**
@@ -604,7 +600,7 @@ public abstract class ToolTip {
 	 * @param respectMonitorBounds
 	 */
 	public void setRespectMonitorBounds(final boolean respectMonitorBounds) {
-		this.respectMonitorBounds = respectMonitorBounds;
+		this.isRespectMonitorBounds = respectMonitorBounds;
 	}
 
 	/**
@@ -632,17 +628,24 @@ public abstract class ToolTip {
 	 * @return <code>true</code> if tooltip should be displayed
 	 */
 	protected boolean shouldCreateToolTip(final Event event) {
-		if ((style & NO_RECREATE) != 0) {
+
+		final boolean isNoReCreate = (style & NO_RECREATE) != 0;
+
+		if (isNoReCreate) {
+
 			final Object tmp = getToolTipArea(event);
 
 			// No new area close the current tooltip
 			if (tmp == null) {
+
 				hide();
+
 				return false;
 			}
 
-			final boolean rv = !tmp.equals(currentArea);
-			return rv;
+			final boolean isCurrentArea = tmp.equals(currentArea);
+
+			return !isCurrentArea;
 		}
 
 		return true;
@@ -656,17 +659,25 @@ public abstract class ToolTip {
 	 * @return <code>true</code> if the tooltip should be hidden
 	 */
 	private boolean shouldHideToolTip(final Event event) {
-		if (event != null && event.type == SWT.MouseMove && (style & NO_RECREATE) != 0) {
+
+		final boolean isMouseMoveEvent = event != null && event.type == SWT.MouseMove;
+		final boolean isNoReCreate = (style & NO_RECREATE) != 0;
+
+		if (isMouseMoveEvent && isNoReCreate) {
+
 			final Object tmp = getToolTipArea(event);
 
 			// No new area close the current tooltip
 			if (tmp == null) {
+
 				hide();
+
 				return false;
 			}
 
-			final boolean rv = !tmp.equals(currentArea);
-			return rv;
+			final boolean isInCurrentArea = tmp.equals(currentArea);
+
+			return !isInCurrentArea;
 		}
 
 		return true;

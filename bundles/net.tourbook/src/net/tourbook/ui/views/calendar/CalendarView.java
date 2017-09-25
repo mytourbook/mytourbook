@@ -29,6 +29,7 @@ import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.IOpeningDialog;
+import net.tourbook.common.tooltip.OpenDialogManager;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.SelectionProvider;
 import net.tourbook.common.util.Util;
@@ -80,63 +81,69 @@ public class CalendarView extends ViewPart implements ITourProvider {
 	/**
 	 * The ID of the view as specified by the extension.
 	 */
-	public static final String					ID										= "net.tourbook.views.calendar.CalendarView";		//$NON-NLS-1$
+	public static final String		ID										= "net.tourbook.views.calendar.CalendarView";		//$NON-NLS-1$
 	
-	private static final String					STATE_FIRST_DAY							= "FirstDayDisplayed";								// $NON-NLS-1$ //$NON-NLS-1$
-	private static final String					STATE_IS_LINKED							= "Linked";											// $NON-NLS-1$ //$NON-NLS-1$
-	private static final String					STATE_NUM_WEEKS_NORMAL					= "NumberOfWeeksDisplayed";							// $NON-NLS-1$ //$NON-NLS-1$
-	private static final String					STATE_NUM_WEEKS_TINY					= "NumberOfWeeksDisplayedTinyView";					// $NON-NLS-1$ //$NON-NLS-1$
-	private static final String					STATE_NUM_TOURS_PER_DAY					= "NumberOfToursPerDay";							// $NON-NLS-1$ //$NON-NLS-1$
-	private static final String					STATE_SELECTED_TOURS					= "SelectedTours";									// $NON-NLS-1$ //$NON-NLS-1$
-	private static final String					STATE_TOUR_INFO_FORMATTER_INDEX_		= "TourInfoFormatterIndex";							//$NON-NLS-1$
-	private static final String					STATE_WEEK_SUMMARY_FORMATTER_INDEX_		= "WeekSummaryFormatterIndex";						//$NON-NLS-1$
-	
-	private static final String					STATE_TOUR_INFO_TEXT_COLOR				= "TourInfoUseTextColor";							//$NON-NLS-1$
-	private static final String					STATE_TOUR_INFO_BLACK_TEXT_HIGHLIGHT	= "TourInfoUseBlackTextHightlight";					//$NON-NLS-1$
-	
-	private static final String					STATE_SHOW_DAY_NUMBER_IN_TINY_LAYOUT	= "ShowDayNumberInTinyView";						//$NON-NLS-1$
-	private static final String					STATE_USE_LINE_COLOR_FOR_WEEK_SUMMARY	= "UseLineColorForWeekSummary";						//$NON-NLS-1$
+	private static final String		STATE_IS_LINKED							= "STATE_IS_LINKED"; 								//$NON-NLS-1$
+	private static final String		STATE_IS_SHOW_TOUR_INFO					= "STATE_IS_SHOW_TOUR_INFO";	 					//$NON-NLS-1$
+	public static final String 		STATE_IS_TOUR_TOOLTIP_VISIBLE 			= "STATE_IS_TOUR_TOOLTIP_VISIBLE"; 					//$NON-NLS-1$
+	public static final String 		STATE_TOUR_TOOLTIP_DELAY	 			= "STATE_TOUR_TOOLTIP_DELAY"; 						//$NON-NLS-1$
 
-	static final int							numberOfInfoLines						= 3;
-	static final int							numberOfSummaryLines					= 5;
+	/////////////////////////////////////////////////////////////////
+	// old states
+	/////////////////////////////////////////////////////////////////
+	private static final String		STATE_FIRST_DAY							= "FirstDayDisplayed";								//$NON-NLS-1$
+	private static final String		STATE_NUM_WEEKS_NORMAL					= "NumberOfWeeksDisplayed";							//$NON-NLS-1$
+	private static final String		STATE_NUM_WEEKS_TINY					= "NumberOfWeeksDisplayedTinyView";					//$NON-NLS-1$
+	private static final String		STATE_NUM_TOURS_PER_DAY					= "NumberOfToursPerDay";							//$NON-NLS-1$
+	private static final String		STATE_SELECTED_TOURS					= "SelectedTours";									//$NON-NLS-1$
+	private static final String		STATE_TOUR_INFO_FORMATTER_INDEX_		= "TourInfoFormatterIndex";							//$NON-NLS-1$
+	private static final String		STATE_WEEK_SUMMARY_FORMATTER_INDEX_		= "WeekSummaryFormatterIndex";						//$NON-NLS-1$
 	
-	private final IPreferenceStore				_prefStore								= TourbookPlugin.getPrefStore();
-	private final IDialogSettings				_state									= TourbookPlugin.getState("TourCalendarView");		//$NON-NLS-1$
+	private static final String		STATE_TOUR_INFO_TEXT_COLOR				= "TourInfoUseTextColor";							//$NON-NLS-1$
+	private static final String		STATE_TOUR_INFO_BLACK_TEXT_HIGHLIGHT	= "TourInfoUseBlackTextHightlight";					//$NON-NLS-1$
 	
-	ColorDefinition[]							_allColorDefinition						= GraphColorManager.getInstance().getGraphColorDefinitions();
+	private static final String		STATE_SHOW_DAY_NUMBER_IN_TINY_LAYOUT	= "ShowDayNumberInTinyView";						//$NON-NLS-1$
+	private static final String		STATE_USE_LINE_COLOR_FOR_WEEK_SUMMARY	= "UseLineColorForWeekSummary";						//$NON-NLS-1$
+
+	static final int				numberOfInfoLines						= 3;
+	static final int				numberOfSummaryLines					= 5;
+
+	public static final int			DEFAULT_TOUR_TOOLTIP_DELAY				= 200; // ms
+
+	
+	private final IPreferenceStore	_prefStore								= TourbookPlugin.getPrefStore();
+	private final IDialogSettings	_state									= TourbookPlugin.getState("TourCalendarView");		//$NON-NLS-1$
+	
+	ColorDefinition[]				_allColorDefinition						= GraphColorManager.getInstance().getGraphColorDefinitions();
 	
 // SET_FORMATTING_ON
 
-	private ISelectionProvider					_selectionProvider;
-	private ISelectionListener					_selectionListener;
+	private ISelectionProvider		_selectionProvider;
+	//
+	private ISelectionListener		_selectionListener;
+	private IPartListener2			_partListener;
+	private IPropertyChangeListener	_prefChangeListener;
+	private ITourEventListener		_tourEventListener;
 
-	private IPartListener2						_partListener;
-	private IPropertyChangeListener				_prefChangeListener;
-	private ITourEventListener					_tourEventListener;
+	private ActionCalendarOptions	_actionCalendarOptions;
 
-	private CalendarYearMonthContributionItem	_yearMonth;
+	private Action					_actionForward, _actionBack;
+	private Action					_actionSetLinked;
+	private Action					_actionGotoToday;
+	Action[]						_actionSetNumberOfToursPerDay;
+	private Action[]				_actionSetTourInfoFormatLine;
+	private Action[]				_actionSetSummaryFormatLine;
+	Action[][]						_actionSetTourInfoFormat;
+	Action[][]						_actionSetWeekSummaryFormat;
+	private Action					_actionSetTourInfoTextColor;
+	private Action					_actionSetTourInfoBlackTextHighlight;
+	private Action					_actionSetShowDayNumberInTinyLayout;
+	private Action					_actionSetUseLineColorForWeekSummary;
+	private ActionTourInfo			_actionTourInfo;
+	//
+	boolean							_useLineColorForWeekSummary				= false;
 
-//	private OpenDialogManager					_openDlgMgr								= new OpenDialogManager();
-
-	private ActionCalendarOptions				_actionCalendarOptions;
-
-	private Action								_actionForward, _actionBack;
-	private Action								_actionSetLinked;
-	private Action								_actionGotoToday;
-	Action[]									_actionSetNumberOfToursPerDay;
-	private Action[]							_actionSetTourInfoFormatLine;
-	private Action[]							_actionSetSummaryFormatLine;
-	Action[][]									_actionSetTourInfoFormat;
-	Action[][]									_actionSetWeekSummaryFormat;
-	private Action								_actionSetTourInfoTextColor;
-	private Action								_actionSetTourInfoBlackTextHighlight;
-
-	private Action								_actionSetShowDayNumberInTinyLayout;
-
-	private Action								_actionSetUseLineColorForWeekSummary;
-	boolean										_useLineColorForWeekSummary				= false;
-
-	WeekSummaryFormatter[]						tourWeekSummaryFormatter				= {
+	WeekSummaryFormatter[]			tourWeekSummaryFormatter				= {
 
 			createFormatter_Week_Empty(),
 
@@ -148,7 +155,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 			createFormatter_Week_Time_Recording()
 	};
 
-	TourInfoFormatter[]							tourInfoFormatter						= {
+	TourInfoFormatter[]				tourInfoFormatter						= {
 
 			createFormatter_Tour_Empty(),
 
@@ -164,22 +171,25 @@ public class CalendarView extends ViewPart implements ITourProvider {
 			createFormatter_Tour_Time_Pace()
 	};
 
-	private LocalDate							_titleFirstDay;
-	private LocalDate							_titleLastDay;
+	private LocalDate				_titleFirstDay;
+	private LocalDate				_titleLastDay;
 
-	private PixelConverter						_pc;
+	private PixelConverter			_pc;
+
+	private CalendarTourInfoToolTip	_tourInfoToolTip;
+	private OpenDialogManager		_openDlgMgr								= new OpenDialogManager();
 
 	/*
 	 * UI controls
 	 */
-	private CalendarGraph						_calendarGraph;
+	private CalendarGraph			_calendarGraph;
 
-	private Composite							_parent;
-	private Composite							_calendarContainer;
+	private Composite				_parent;
+	private Composite				_calendarContainer;
 
-	private Combo								_comboConfigName;
+	private Combo					_comboConfigName;
 
-	private Label								_lblTitle;
+	private Label					_lblTitle;
 
 	private class ActionCalendarOptions extends ActionToolbarSlideout {
 
@@ -305,7 +315,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		_calendarGraph.addSelectionProvider(new ICalendarSelectionProvider() {
 
 			@Override
-			public void selectionChanged(final CalendarGraph.Selection selection) {
+			public void selectionChanged(final CalendarGraph.CalendarItem selection) {
 				if (selection.isTour()) {
 					_selectionProvider.setSelection(new SelectionTourId(selection.id));
 				}
@@ -350,13 +360,15 @@ public class CalendarView extends ViewPart implements ITourProvider {
 	 * 
 	 * @param openingDialog
 	 */
-	private void closeOpenedDialogs(final IOpeningDialog openingDialog) {
-//		_openDlgMgr.closeOpenedDialogs(openingDialog);
+	void closeOpenedDialogs(final IOpeningDialog openingDialog) {
+
+		_openDlgMgr.closeOpenedDialogs(openingDialog);
 	}
 
 	private void createActions() {
 
 		_actionCalendarOptions = new ActionCalendarOptions();
+		_actionTourInfo = new ActionTourInfo(this, _parent);
 
 		_actionBack = new Action() {
 			@Override
@@ -1003,7 +1015,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		createUI(parent);
 
 		createActions();
-		fillActionBars();
+		fillActions();
 
 		addSelectionListener();
 		addSelectionProvider();
@@ -1014,8 +1026,12 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		// restore selection
 		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
 
+		// set context menu
 		final Menu contextMenu = (new TourContextMenu()).createContextMenu(this, _calendarGraph, getLocalActions());
 		_calendarGraph.setMenu(contextMenu);
+
+		// set tour tooltip
+		_tourInfoToolTip = new CalendarTourInfoToolTip(this);
 	}
 
 	private void createUI(final Composite parent) {
@@ -1092,23 +1108,55 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		super.dispose();
 	}
 
-	private void fillActionBars() {
+	private void fillActions() {
 
 		final IActionBars bars = getViewSite().getActionBars();
 
-		fillViewMenu(bars.getMenuManager());
-		fillToolBar(bars.getToolBarManager());
-	}
+		final IToolBarManager toolbarMrg = bars.getToolBarManager();
+		final IMenuManager viewMgr = bars.getMenuManager();
 
-	private void fillToolBar(final IToolBarManager manager) {
+		/*
+		 * Toolbar
+		 */
+		final CalendarYearMonthContributionItem yearMonthItem = new CalendarYearMonthContributionItem(_calendarGraph);
+		_calendarGraph.setYearMonthContributor(yearMonthItem);
 
-		_yearMonth = new CalendarYearMonthContributionItem(_calendarGraph);
-		_calendarGraph.setYearMonthContributor(_yearMonth);
+		toolbarMrg.add(yearMonthItem);
 
-		manager.add(_yearMonth);
+		toolbarMrg.add(_actionSetLinked);
+		toolbarMrg.add(_actionTourInfo);
+		toolbarMrg.add(_actionCalendarOptions);
 
-		manager.add(_actionSetLinked);
-		manager.add(_actionCalendarOptions);
+		/*
+		 * View menu
+		 */
+		for (final Action element : _actionSetSummaryFormatLine) {
+			viewMgr.add(element);
+		}
+
+		viewMgr.add(new Separator());
+		viewMgr.add(_actionSetUseLineColorForWeekSummary);
+		viewMgr.add(new Separator());
+
+		if (_calendarGraph.isTinyLayout()) {
+
+			viewMgr.add(_actionSetShowDayNumberInTinyLayout);
+
+		} else {
+
+			for (final Action element : _actionSetTourInfoFormatLine) {
+				viewMgr.add(element);
+			}
+
+			viewMgr.add(new Separator());
+
+			for (final Action element : _actionSetNumberOfToursPerDay) {
+				viewMgr.add(element);
+			}
+
+			viewMgr.add(_actionSetTourInfoTextColor);
+			viewMgr.add(_actionSetTourInfoBlackTextHighlight);
+		}
 	}
 
 	private void fillUI_Config() {
@@ -1117,37 +1165,6 @@ public class CalendarView extends ViewPart implements ITourProvider {
 
 		for (final CalendarConfig config : CalendarConfigManager.getAllCalendarConfigs()) {
 			_comboConfigName.add(config.name);
-		}
-	}
-
-	private void fillViewMenu(final IMenuManager manager) {
-
-		for (final Action element : _actionSetSummaryFormatLine) {
-			manager.add(element);
-		}
-
-		manager.add(new Separator());
-		manager.add(_actionSetUseLineColorForWeekSummary);
-		manager.add(new Separator());
-
-		if (_calendarGraph.isTinyLayout()) {
-
-			manager.add(_actionSetShowDayNumberInTinyLayout);
-
-		} else {
-
-			for (final Action element : _actionSetTourInfoFormatLine) {
-				manager.add(element);
-			}
-
-			manager.add(new Separator());
-
-			for (final Action element : _actionSetNumberOfToursPerDay) {
-				manager.add(element);
-			}
-
-			manager.add(_actionSetTourInfoTextColor);
-			manager.add(_actionSetTourInfoBlackTextHighlight);
 		}
 	}
 
@@ -1181,9 +1198,18 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		return selectedTourData;
 	}
 
+	IDialogSettings getState() {
+		return _state;
+	}
+
 	private void initUI(final Composite parent) {
 
 		_pc = new PixelConverter(parent);
+	}
+
+	boolean isShowTourTooltip() {
+		
+		return _actionTourInfo.isChecked();
 	}
 
 	private void onSelectConfig() {
@@ -1243,6 +1269,13 @@ public class CalendarView extends ViewPart implements ITourProvider {
 
 	private void restoreState() {
 
+		_actionSetLinked.setChecked(Util.getStateBoolean(_state, STATE_IS_LINKED, false));
+		_actionTourInfo.setSelected(Util.getStateBoolean(_state, STATE_IS_SHOW_TOUR_INFO, true));
+
+		/////////////////////////////////////////////////////////////////////////////////////
+		// old states
+		/////////////////////////////////////////////////////////////////////////////////////
+
 		_calendarGraph.setNumWeeksNormalLayout(Util.getStateInt(_state, STATE_NUM_WEEKS_NORMAL, 5));
 		_calendarGraph.setNumWeeksTinyLayout(Util.getStateInt(_state, STATE_NUM_WEEKS_TINY, 15));
 
@@ -1255,10 +1288,6 @@ public class CalendarView extends ViewPart implements ITourProvider {
 
 		final Long selectedTourId = Util.getStateLong(_state, STATE_SELECTED_TOURS, new Long(-1));
 		_calendarGraph.setSelectionTourId(selectedTourId);
-
-		_actionSetLinked.setChecked(Util.getStateBoolean(_state, STATE_IS_LINKED, false));
-
-		// _setTourSizeDynamic.setChecked(Util.getStateBoolean(_state, STATE_TOUR_SIZE_DYNAMIC, true));
 
 		final int numberOfTours = Util.getStateInt(_state, STATE_NUM_TOURS_PER_DAY, 3);
 		if (numberOfTours < _actionSetNumberOfToursPerDay.length) {
@@ -1307,6 +1336,9 @@ public class CalendarView extends ViewPart implements ITourProvider {
 
 	private void saveState() {
 
+		_state.put(STATE_IS_LINKED, _actionSetLinked.isChecked());
+		_state.put(STATE_IS_SHOW_TOUR_INFO, _actionTourInfo.isChecked());
+
 		// save current date displayed
 		_state.put(STATE_FIRST_DAY, _calendarGraph.getFirstDay().getMillis());
 
@@ -1316,9 +1348,6 @@ public class CalendarView extends ViewPart implements ITourProvider {
 
 		// until now we only implement single tour selection
 		_state.put(STATE_SELECTED_TOURS, _calendarGraph.getSelectedTourId());
-
-		_state.put(STATE_IS_LINKED, _actionSetLinked.isChecked());
-		// _state.put(STATE_TOUR_SIZE_DYNAMIC, _setTourSizeDynamic.isChecked());
 
 		_state.put(STATE_NUM_TOURS_PER_DAY, _calendarGraph.getNumberOfToursPerDay());
 
@@ -1350,7 +1379,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 	void updateUI_CalendarConfig() {
 
 		fillUI_Config();
-		
+
 		// get active config AFTER getting the index because this could change the active config
 		final int activeConfigIndex = CalendarConfigManager.getActiveCalendarConfigIndex();
 
