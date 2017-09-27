@@ -20,6 +20,7 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
+import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
@@ -35,69 +36,92 @@ import org.osgi.framework.Version;
 
 public class CalendarConfigManager {
 
-	private static final String	CONFIG_FILE_NAME		= "calendar-config.xml";					//$NON-NLS-1$
+	private static final String	CONFIG_FILE_NAME			= "calendar-config.xml";					//$NON-NLS-1$
+
 	//
 	/**
 	 * Version number is not yet used.
 	 */
-	private static final int	CONFIG_VERSION			= 1;
-
-	private static final Bundle	_bundle					= TourbookPlugin.getDefault().getBundle();
-	private static final IPath	_stateLocation			= Platform.getStateLocation(_bundle);
-
-	static final String			CONFIG_DEFAULT_ID_1		= "#1";										//$NON-NLS-1$
-	private static final String	CONFIG_DEFAULT_ID_2		= "#2";										//$NON-NLS-1$
-	private static final String	CONFIG_DEFAULT_ID_3		= "#3";										//$NON-NLS-1$
-	private static final String	CONFIG_DEFAULT_ID_4		= "#4";										//$NON-NLS-1$
-	private static final String	CONFIG_DEFAULT_ID_5		= "#5";										//$NON-NLS-1$
-	private static final String	CONFIG_DEFAULT_ID_6		= "#6";										//$NON-NLS-1$
-	private static final String	CONFIG_DEFAULT_ID_7		= "#7";										//$NON-NLS-1$
-	private static final String	CONFIG_DEFAULT_ID_8		= "#8";										//$NON-NLS-1$
-	private static final String	CONFIG_DEFAULT_ID_9		= "#9";										//$NON-NLS-1$
-	private static final String	CONFIG_DEFAULT_ID_10	= "#10";									//$NON-NLS-1$
+	private static final int	CONFIG_VERSION				= 1;
+	//
+	private static final Bundle	_bundle						= TourbookPlugin.getDefault().getBundle();
+	private static final IPath	_stateLocation				= Platform.getStateLocation(_bundle);
+	//
+	static final String			CONFIG_DEFAULT_ID_1			= "#1";										//$NON-NLS-1$
+	private static final String	CONFIG_DEFAULT_ID_2			= "#2";										//$NON-NLS-1$
+	private static final String	CONFIG_DEFAULT_ID_3			= "#3";										//$NON-NLS-1$
+	private static final String	CONFIG_DEFAULT_ID_4			= "#4";										//$NON-NLS-1$
+	private static final String	CONFIG_DEFAULT_ID_5			= "#5";										//$NON-NLS-1$
+	private static final String	CONFIG_DEFAULT_ID_6			= "#6";										//$NON-NLS-1$
+	private static final String	CONFIG_DEFAULT_ID_7			= "#7";										//$NON-NLS-1$
+	private static final String	CONFIG_DEFAULT_ID_8			= "#8";										//$NON-NLS-1$
+	private static final String	CONFIG_DEFAULT_ID_9			= "#9";										//$NON-NLS-1$
+	private static final String	CONFIG_DEFAULT_ID_10		= "#10";									//$NON-NLS-1$
 	//
 	// common attributes
-	private static final String	ATTR_ACTIVE_CONFIG_ID	= "activeConfigId";							//$NON-NLS-1$
+	private static final String	ATTR_ACTIVE_CONFIG_ID		= "activeConfigId";							//$NON-NLS-1$
+	private static final String	ATTR_ID						= "id";										//$NON-NLS-1$
 
-	private static final String	ATTR_ID					= "id";										//$NON-NLS-1$
-	private static final String	ATTR_CONFIG_NAME		= "name";									//$NON-NLS-1$
+	private static final String	ATTR_CONFIG_NAME			= "name";									//$NON-NLS-1$
 	//
 	/*
 	 * Root
 	 */
-	private static final String	TAG_ROOT				= "CalendarConfiguration";					//$NON-NLS-1$
-	private static final String	ATTR_CONFIG_VERSION		= "configVersion";							//$NON-NLS-1$
+	private static final String	TAG_ROOT					= "CalendarConfiguration";					//$NON-NLS-1$
+	private static final String	ATTR_CONFIG_VERSION			= "configVersion";							//$NON-NLS-1$
 	//
 	/*
 	 * Calendars
 	 */
-	private static final String	TAG_CALENDAR_CONFIG		= "CalendarConfig";							//$NON-NLS-1$
-	private static final String	TAG_CALENDAR			= "Calendar";								//$NON-NLS-1$
+	private static final String	TAG_CALENDAR_CONFIG			= "CalendarConfig";							//$NON-NLS-1$
+	private static final String	TAG_CALENDAR				= "Calendar";								//$NON-NLS-1$
 	//
-	private static final String	ATTR_IS_TINY_LAYOUT		= "isTinyLayout";							//$NON-NLS-1$
-	private static final String	ATTR_WEEK_HEIGHT		= "weekHeight";								//$NON-NLS-1$
+	private static final String	ATTR_IS_TINY_LAYOUT			= "isTinyLayout";							//$NON-NLS-1$
+	private static final String	ATTR_WEEK_HEIGHT			= "weekHeight";								//$NON-NLS-1$
+	private static final String	ATTR_IS_SHOW_INFO_COLUMN	= "isShowInfoColumn";						//$NON-NLS-1$
+	private static final String	ATTR_IS_SHOW_SUMMARY_COLUMN	= "isShowSummaryColumn";					//$NON-NLS-1$
+	private static final String	ATTR_INFO_COLUMN_CONTENT	= "infoColumnContent";						//$NON-NLS-1$
 	//
-	static final int			WEEK_HEIGHT_MIN			= 1;
-	static final int			WEEK_HEIGHT_MAX			= 200;
+	static final int			WEEK_HEIGHT_MIN				= 1;
+	static final int			WEEK_HEIGHT_MAX				= 500;
 	//
-	static final int			DEFAULT_WEEK_HEIGHT		= 70;
-	static final boolean		DEFAULT_IS_TINY_LAYOUT	= false;
+	static final int			DEFAULT_WEEK_HEIGHT			= 70;
+	static final boolean		DEFAULT_IS_TINY_LAYOUT		= false;
 	//
 	// !!! this is a code formatting separator !!!
 	static {}
+	//
+	private static final InfoColumnData[]			_allInfoColumnData	= new InfoColumnData[] {
+
+			new InfoColumnData(InfoColumnContent.WEEK_NUMBER, Messages.Calendar_Config_InfoColumn_WeekNumber),
+			new InfoColumnData(InfoColumnContent.MONTH, Messages.Calendar_Config_InfoColumn_Month),
+			new InfoColumnData(InfoColumnContent.YEAR, Messages.Calendar_Config_InfoColumn_Year),
+	};																											//
 	//
 	/**
 	 * Contains all configurations which are loaded from a xml file.
 	 */
 	private static final ArrayList<CalendarConfig>	_allCalendarConfigs	= new ArrayList<>();
+
 	private static CalendarConfig					_activeCalendarConfig;
 	//
 	private static String							_fromXml_ActiveCalendarConfigId;
-
 	/**
 	 * Calendarview or <code>null</code> when closed.
 	 */
 	private static CalendarView						_calendarView;
+
+	static class InfoColumnData {
+
+		InfoColumnContent	infoColumn;
+		String				label;
+
+		public InfoColumnData(final InfoColumnContent infoColumn, final String label) {
+
+			this.infoColumn = infoColumn;
+			this.label = label;
+		}
+	}
 
 	private static XMLMemento create_Root() {
 
@@ -193,7 +217,12 @@ public class CalendarConfigManager {
 			xmlConfig.putString(ATTR_ID, config.id);
 			xmlConfig.putString(ATTR_CONFIG_NAME, config.name);
 
+			xmlConfig.putBoolean(ATTR_IS_SHOW_INFO_COLUMN, config.isShowInfoColumn);
+			xmlConfig.putBoolean(ATTR_IS_SHOW_SUMMARY_COLUMN, config.isShowSummaryColumn);
+			Util.setXmlEnum(xmlConfig, ATTR_INFO_COLUMN_CONTENT, config.infoColumnContent);
+
 			xmlConfig.putInteger(ATTR_WEEK_HEIGHT, config.weekHeight);
+
 			xmlConfig.putBoolean(ATTR_IS_TINY_LAYOUT, config.isTinyLayout);
 		}
 	}
@@ -236,6 +265,10 @@ public class CalendarConfigManager {
 		getActiveCalendarConfig();
 
 		return _allCalendarConfigs;
+	}
+
+	static InfoColumnData[] getAllInfoColumnData() {
+		return _allInfoColumnData;
 	}
 
 	private static CalendarConfig getConfig_Calendar() {
@@ -321,13 +354,22 @@ public class CalendarConfigManager {
 
 // SET_FORMATTING_OFF
 		
-		config.id			= Util.getXmlString(xmlConfig, ATTR_ID, Long.toString(System.nanoTime()));
-		config.name			= Util.getXmlString(xmlConfig, ATTR_CONFIG_NAME, UI.EMPTY_STRING);
+		config.id					= Util.getXmlString(xmlConfig, ATTR_ID,							Long.toString(System.nanoTime()));
+		config.name					= Util.getXmlString(xmlConfig, ATTR_CONFIG_NAME,				UI.EMPTY_STRING);
 		
-		config.isTinyLayout	= Util.getXmlBoolean(xmlConfig, ATTR_IS_TINY_LAYOUT, DEFAULT_IS_TINY_LAYOUT);
-		config.weekHeight	= Util.getXmlInteger(xmlConfig, ATTR_WEEK_HEIGHT, DEFAULT_WEEK_HEIGHT);
+		config.isShowInfoColumn		= Util.getXmlBoolean(xmlConfig, ATTR_IS_SHOW_INFO_COLUMN,		true);
+		config.isShowSummaryColumn	= Util.getXmlBoolean(xmlConfig, ATTR_IS_SHOW_SUMMARY_COLUMN,	true);
+		
+		config.weekHeight			= Util.getXmlInteger(xmlConfig, ATTR_WEEK_HEIGHT,				DEFAULT_WEEK_HEIGHT);
+		
+		config.isTinyLayout			= Util.getXmlBoolean(xmlConfig, ATTR_IS_TINY_LAYOUT,			DEFAULT_IS_TINY_LAYOUT);
 
 // SET_FORMATTING_ON
+
+		config.infoColumnContent = (InfoColumnContent) Util.getXmlEnum(
+				xmlConfig,
+				ATTR_INFO_COLUMN_CONTENT,
+				InfoColumnContent.WEEK_NUMBER);
 
 	}
 

@@ -22,12 +22,18 @@ public class CalendarConfig {
 	 * be set when an xml tag is not available.
 	 */
 
-	public String	id				= Long.toString(System.nanoTime());
-	public String	defaultId		= CalendarConfigManager.CONFIG_DEFAULT_ID_1;
-	public String	name			= CalendarConfigManager.CONFIG_DEFAULT_ID_1;
+	public String				id					= Long.toString(System.nanoTime());
+	public String				defaultId			= CalendarConfigManager.CONFIG_DEFAULT_ID_1;
 
-	public int		weekHeight		= CalendarConfigManager.DEFAULT_WEEK_HEIGHT;
-	public boolean	isTinyLayout	= CalendarConfigManager.DEFAULT_IS_TINY_LAYOUT;
+	public String				name				= CalendarConfigManager.CONFIG_DEFAULT_ID_1;
+
+	public int					weekHeight			= CalendarConfigManager.DEFAULT_WEEK_HEIGHT;
+	public boolean				isTinyLayout		= CalendarConfigManager.DEFAULT_IS_TINY_LAYOUT;
+
+	public boolean				isShowInfoColumn	= true;
+	public boolean				isShowSummaryColumn	= true;
+
+	public InfoColumnContent	infoColumnContent	= InfoColumnContent.WEEK_NUMBER;
 
 	@Override
 	public boolean equals(final Object obj) {

@@ -30,7 +30,6 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -70,8 +69,6 @@ public class SlideoutTourInfo extends ToolbarSlideout {
 	 * UI controls
 	 */
 	private CalendarView	_calendarView;
-
-	private Button			_chkShowInfoTooltip;
 
 	private Label			_lblTooltipDelay;
 
@@ -165,19 +162,6 @@ public class SlideoutTourInfo extends ToolbarSlideout {
 		{
 			{
 				/*
-				 * Show info tooltip
-				 */
-				_chkShowInfoTooltip = new Button(ttContainer, SWT.CHECK);
-				GridDataFactory
-						.fillDefaults()//
-						.span(2, 1)
-						.applyTo(_chkShowInfoTooltip);
-				_chkShowInfoTooltip.setText(//
-						Messages.Slideout_TourInfoOptions_Checkbox_IsShowInfoTooltip);
-				_chkShowInfoTooltip.addSelectionListener(_defaultSelectionListener);
-			}
-			{
-				/*
 				 * Tooltip delay
 				 */
 				// Label
@@ -185,7 +169,7 @@ public class SlideoutTourInfo extends ToolbarSlideout {
 				GridDataFactory
 						.fillDefaults()//
 						.align(SWT.FILL, SWT.CENTER)
-						.indent(_pc.convertWidthInCharsToPixels(3), 0)
+						//						.indent(_pc.convertWidthInCharsToPixels(3), 0)
 						.applyTo(_lblTooltipDelay);
 				_lblTooltipDelay.setText(Messages.Slideout_TourInfoOptions_Label_TooltipDelay);
 				_lblTooltipDelay.setToolTipText(Messages.Slideout_TourInfoOptions_Label_TooltipDelay_Tooltip);
@@ -203,10 +187,6 @@ public class SlideoutTourInfo extends ToolbarSlideout {
 
 	private void enableControls() {
 
-		final boolean isShowInfoTooltip = _chkShowInfoTooltip.getSelection();
-
-		_lblTooltipDelay.setEnabled(isShowInfoTooltip);
-		_spinnerTooltipDelay.setEnabled(isShowInfoTooltip);
 	}
 
 	private void initUI(final Composite parent) {
@@ -216,19 +196,16 @@ public class SlideoutTourInfo extends ToolbarSlideout {
 
 	private void onChangeUI() {
 
-		final boolean isShowInfoTooltip = _chkShowInfoTooltip.getSelection();
 		final int tooltipDelay = _spinnerTooltipDelay.getSelection();
 
-		_state.put(CalendarView.STATE_IS_TOUR_TOOLTIP_VISIBLE, isShowInfoTooltip);
 		_state.put(CalendarView.STATE_TOUR_TOOLTIP_DELAY, tooltipDelay);
 
 		enableControls();
+
+		_calendarView.updateUI_CalendarConfig();
 	}
 
 	private void restoreState() {
-
-		_chkShowInfoTooltip.setSelection(
-				Util.getStateBoolean(_state, CalendarView.STATE_IS_TOUR_TOOLTIP_VISIBLE, true));
 
 		_spinnerTooltipDelay.setSelection(
 				Util.getStateInt(

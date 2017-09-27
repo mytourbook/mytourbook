@@ -85,8 +85,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 	
 	private static final String		STATE_IS_LINKED							= "STATE_IS_LINKED"; 								//$NON-NLS-1$
 	private static final String		STATE_IS_SHOW_TOUR_INFO					= "STATE_IS_SHOW_TOUR_INFO";	 					//$NON-NLS-1$
-	public static final String 		STATE_IS_TOUR_TOOLTIP_VISIBLE 			= "STATE_IS_TOUR_TOOLTIP_VISIBLE"; 					//$NON-NLS-1$
-	public static final String 		STATE_TOUR_TOOLTIP_DELAY	 			= "STATE_TOUR_TOOLTIP_DELAY"; 						//$NON-NLS-1$
+	static final String 			STATE_TOUR_TOOLTIP_DELAY	 			= "STATE_TOUR_TOOLTIP_DELAY"; 						//$NON-NLS-1$
 
 	/////////////////////////////////////////////////////////////////
 	// old states
@@ -108,7 +107,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 	static final int				numberOfInfoLines						= 3;
 	static final int				numberOfSummaryLines					= 5;
 
-	public static final int			DEFAULT_TOUR_TOOLTIP_DELAY				= 200; // ms
+	static final int				DEFAULT_TOUR_TOOLTIP_DELAY				= 100; // ms
 
 	
 	private final IPreferenceStore	_prefStore								= TourbookPlugin.getPrefStore();
@@ -201,7 +200,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 
 		@Override
 		protected void onBeforeOpenSlideout() {
-//			closeOpenedDialogs(this);
+			closeOpenedDialogs(this);
 		}
 	}
 
@@ -1020,18 +1019,18 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		addSelectionListener();
 		addSelectionProvider();
 
-		restoreState();
-		updateUI_CalendarConfig();
-
-		// restore selection
-		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
-
 		// set context menu
 		final Menu contextMenu = (new TourContextMenu()).createContextMenu(this, _calendarGraph, getLocalActions());
 		_calendarGraph.setMenu(contextMenu);
 
 		// set tour tooltip
 		_tourInfoToolTip = new CalendarTourInfoToolTip(this);
+
+		restoreState();
+		updateUI_CalendarConfig();
+
+		// restore selection
+		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
 	}
 
 	private void createUI(final Composite parent) {
@@ -1071,9 +1070,11 @@ public class CalendarView extends ViewPart implements ITourProvider {
 				GridDataFactory
 						.fillDefaults()//
 						.grab(true, false)
+						//						.align(SWT.CENTER, SWT.CENTER)
 						//						.indent(5, 0)
 						.applyTo(_lblTitle);
 				MTFont.setHeaderFont(_lblTitle);
+//				_lblTitle.setText(UI.DASH);
 			}
 			{
 				/*
@@ -1208,7 +1209,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 	}
 
 	boolean isShowTourTooltip() {
-		
+
 		return _actionTourInfo.isChecked();
 	}
 
@@ -1376,6 +1377,9 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		_calendarContainer.setFocus();
 	}
 
+	/**
+	 * Calendar config has changed, update the UI accordingly
+	 */
 	void updateUI_CalendarConfig() {
 
 		fillUI_Config();
@@ -1384,6 +1388,8 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		final int activeConfigIndex = CalendarConfigManager.getActiveCalendarConfigIndex();
 
 		_comboConfigName.select(activeConfigIndex);
+
+		_tourInfoToolTip.setPopupDelay(Util.getStateInt(_state, STATE_TOUR_TOOLTIP_DELAY, DEFAULT_TOUR_TOOLTIP_DELAY));
 	}
 
 	void updateUI_Layout() {
@@ -1413,6 +1419,8 @@ public class CalendarView extends ViewPart implements ITourProvider {
 				calendarFirstDay.format(TimeTools.Formatter_Date_L)
 						+ UI.DASH_WITH_DOUBLE_SPACE
 						+ calendarLastDay.format(TimeTools.Formatter_Date_L));
+
+//		_lblTitle.getParent().layout(true, true);
 	}
 
 }
