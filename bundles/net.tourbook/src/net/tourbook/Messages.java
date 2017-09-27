@@ -1591,17 +1591,20 @@ public class Messages extends NLS {
 	public static String		Search_View_Link_LinuxBrowser;
 	public static String		Search_View_Link_SetupExternalBrowser;
 
+	public static String		Slideout_CalendarOptions_Checkbox_IsShowDayHeader;
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowInfoColumn;
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowInfoColumn_Tooltip;
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowSummaryColumn;
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowSummaryColumn_Tooltip;
 	public static String		Slideout_CalendarOptions_Checkbox_IsTinyLayout;
-	public static String		Slideout_CalendarOptions_Group_TourInfo;
+	public static String		Slideout_CalendarOptions_Group_Day;
 	public static String		Slideout_CalendarOptions_Group_WeekSummary;
 	public static String		Slideout_CalendarOptions_Label_DateColumn_Width;
 	public static String		Slideout_CalendarOptions_Label_DateColumn_Width_Tooltip;
 	public static String		Slideout_CalendarOptions_Label_DateColumnContent;
 	public static String		Slideout_CalendarOptions_Label_DateColumnContent_Tooltip;
+	public static String		Slideout_CalendarOptions_Label_DayHeaderFormat;
+	public static String		Slideout_CalendarOptions_Label_DayHeaderLayout;
 	public static String		Slideout_CalendarOptions_Label_N_Line;
 	public static String		Slideout_CalendarOptions_Label_Name;
 	public static String		Slideout_CalendarOptions_Label_Name_Tooltip;

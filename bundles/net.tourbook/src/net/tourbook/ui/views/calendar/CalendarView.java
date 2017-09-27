@@ -91,8 +91,6 @@ public class CalendarView extends ViewPart implements ITourProvider {
 	// old states
 	/////////////////////////////////////////////////////////////////
 	private static final String		STATE_FIRST_DAY							= "FirstDayDisplayed";								//$NON-NLS-1$
-	private static final String		STATE_NUM_WEEKS_NORMAL					= "NumberOfWeeksDisplayed";							//$NON-NLS-1$
-	private static final String		STATE_NUM_WEEKS_TINY					= "NumberOfWeeksDisplayedTinyView";					//$NON-NLS-1$
 	private static final String		STATE_NUM_TOURS_PER_DAY					= "NumberOfToursPerDay";							//$NON-NLS-1$
 	private static final String		STATE_SELECTED_TOURS					= "SelectedTours";									//$NON-NLS-1$
 	private static final String		STATE_TOUR_INFO_FORMATTER_INDEX_		= "TourInfoFormatterIndex";							//$NON-NLS-1$
@@ -101,7 +99,6 @@ public class CalendarView extends ViewPart implements ITourProvider {
 	private static final String		STATE_TOUR_INFO_TEXT_COLOR				= "TourInfoUseTextColor";							//$NON-NLS-1$
 	private static final String		STATE_TOUR_INFO_BLACK_TEXT_HIGHLIGHT	= "TourInfoUseBlackTextHightlight";					//$NON-NLS-1$
 	
-	private static final String		STATE_SHOW_DAY_NUMBER_IN_TINY_LAYOUT	= "ShowDayNumberInTinyView";						//$NON-NLS-1$
 	private static final String		STATE_USE_LINE_COLOR_FOR_WEEK_SUMMARY	= "UseLineColorForWeekSummary";						//$NON-NLS-1$
 
 	static final int				numberOfInfoLines						= 3;
@@ -136,7 +133,6 @@ public class CalendarView extends ViewPart implements ITourProvider {
 	Action[][]						_actionSetWeekSummaryFormat;
 	private Action					_actionSetTourInfoTextColor;
 	private Action					_actionSetTourInfoBlackTextHighlight;
-	private Action					_actionSetShowDayNumberInTinyLayout;
 	private Action					_actionSetUseLineColorForWeekSummary;
 	private ActionTourInfo			_actionTourInfo;
 	//
@@ -483,14 +479,6 @@ public class CalendarView extends ViewPart implements ITourProvider {
 			}
 		};
 		_actionSetTourInfoBlackTextHighlight.setText(Messages.Calendar_View_Action_BlackHighlightText);
-
-		_actionSetShowDayNumberInTinyLayout = new Action(null, Action.AS_CHECK_BOX) {
-			@Override
-			public void run() {
-				_calendarGraph.setShowDayNumberInTinyView(this.isChecked());
-			}
-		};
-		_actionSetShowDayNumberInTinyLayout.setText(Messages.Calendar_View_Action_ShowDayNumberInTinyView);
 
 		_actionSetUseLineColorForWeekSummary = new Action(null, Action.AS_CHECK_BOX) {
 			@Override
@@ -1139,25 +1127,18 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		viewMgr.add(_actionSetUseLineColorForWeekSummary);
 		viewMgr.add(new Separator());
 
-		if (_calendarGraph.isTinyLayout()) {
-
-			viewMgr.add(_actionSetShowDayNumberInTinyLayout);
-
-		} else {
-
-			for (final Action element : _actionSetTourInfoFormatLine) {
-				viewMgr.add(element);
-			}
-
-			viewMgr.add(new Separator());
-
-			for (final Action element : _actionSetNumberOfToursPerDay) {
-				viewMgr.add(element);
-			}
-
-			viewMgr.add(_actionSetTourInfoTextColor);
-			viewMgr.add(_actionSetTourInfoBlackTextHighlight);
+		for (final Action element : _actionSetTourInfoFormatLine) {
+			viewMgr.add(element);
 		}
+
+		viewMgr.add(new Separator());
+
+		for (final Action element : _actionSetNumberOfToursPerDay) {
+			viewMgr.add(element);
+		}
+
+		viewMgr.add(_actionSetTourInfoTextColor);
+		viewMgr.add(_actionSetTourInfoBlackTextHighlight);
 	}
 
 	private void fillUI_Config() {
@@ -1277,9 +1258,6 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		// old states
 		/////////////////////////////////////////////////////////////////////////////////////
 
-		_calendarGraph.setNumWeeksNormalLayout(Util.getStateInt(_state, STATE_NUM_WEEKS_NORMAL, 5));
-		_calendarGraph.setNumWeeksTinyLayout(Util.getStateInt(_state, STATE_NUM_WEEKS_TINY, 15));
-
 		final Long dateTimeMillis = Util.getStateLong(_state, STATE_FIRST_DAY, 0);
 		if (dateTimeMillis > 0) {
 			_calendarGraph.setFirstDay(new DateTime(dateTimeMillis));
@@ -1323,13 +1301,6 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		_actionSetTourInfoBlackTextHighlight.setChecked(useBlackForTextHightlight);
 		_actionSetTourInfoBlackTextHighlight.run();
 
-		final boolean showDayNumberInTinyView = Util.getStateBoolean(
-				_state,
-				STATE_SHOW_DAY_NUMBER_IN_TINY_LAYOUT,
-				false);
-		_actionSetShowDayNumberInTinyLayout.setChecked(showDayNumberInTinyView);
-		_actionSetShowDayNumberInTinyLayout.run();
-
 		_useLineColorForWeekSummary = Util.getStateBoolean(_state, STATE_USE_LINE_COLOR_FOR_WEEK_SUMMARY, false);
 		_actionSetUseLineColorForWeekSummary.setChecked(_useLineColorForWeekSummary);
 
@@ -1342,10 +1313,6 @@ public class CalendarView extends ViewPart implements ITourProvider {
 
 		// save current date displayed
 		_state.put(STATE_FIRST_DAY, _calendarGraph.getFirstDay().getMillis());
-
-		// save number of weeks displayed
-		_state.put(STATE_NUM_WEEKS_NORMAL, _calendarGraph.getNumWeeksNormalLayout());
-		_state.put(STATE_NUM_WEEKS_TINY, _calendarGraph.getNumWeeksTinyLayout());
 
 		// until now we only implement single tour selection
 		_state.put(STATE_SELECTED_TOURS, _calendarGraph.getSelectedTourId());
@@ -1362,7 +1329,6 @@ public class CalendarView extends ViewPart implements ITourProvider {
 
 		_state.put(STATE_TOUR_INFO_TEXT_COLOR, _calendarGraph.getTourInfoUseTextColor());
 		_state.put(STATE_TOUR_INFO_BLACK_TEXT_HIGHLIGHT, _calendarGraph.getTourInfoUseHighlightTextBlack());
-		_state.put(STATE_SHOW_DAY_NUMBER_IN_TINY_LAYOUT, _calendarGraph.getShowDayNumberInTinyView());
 
 		_state.put(STATE_USE_LINE_COLOR_FOR_WEEK_SUMMARY, _useLineColorForWeekSummary);
 

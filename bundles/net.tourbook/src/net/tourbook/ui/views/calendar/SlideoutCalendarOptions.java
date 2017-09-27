@@ -27,6 +27,8 @@ import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.Util;
 import net.tourbook.ui.views.calendar.CalendarConfigManager.DateColumnData;
+import net.tourbook.ui.views.calendar.CalendarConfigManager.DayHeaderDateFormatData;
+import net.tourbook.ui.views.calendar.CalendarConfigManager.DayHeaderLayoutData;
 import net.tourbook.ui.views.calendar.CalendarView.TourInfoFormatter;
 
 import org.eclipse.jface.action.Action;
@@ -106,15 +108,19 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 	private Combo					_comboWeek_Format_4;
 	private Combo					_comboWeek_Format_5;
 
-	private Combo					_comboConfigName;
-	private Combo					_comboInfoColumn;
-
-	private Button					_chkIsTinyLayout;
 	private Button					_chkIsShowDateColumn;
+	private Button					_chkIsShowDayHeader;
 	private Button					_chkIsShowSummaryColumn;
+
+	private Combo					_comboConfigName;
+	private Combo					_comboDateColumn;
+	private Combo					_comboDayHeaderDateFormat;
+	private Combo					_comboDayHeaderLayout;
 
 	private Label					_lblDateColumnContent;
 	private Label					_lblDateColumnWidth;
+	private Label					_lblDayHeaderFormat;
+	private Label					_lblDayHeaderLayout;
 	private Label					_lblSummaryColumnWidth;
 
 	private Spinner					_spinnerDateColumnWidth;
@@ -174,11 +180,10 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 			{
 				createUI_10_Title(container);
 
-				createUI_100_Layout(container);
 				createUI_200_InfoSummary(container);
-
-				createUI_400_TourInfo(container);
+				createUI_400_Day(container);
 				createUI_500_WeekSummary(container);
+				createUI_800_WeekLayout(container);
 
 				createUI_999_ConfigName(container);
 			}
@@ -246,34 +251,6 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 		}
 	}
 
-	private void createUI_100_Layout(final Composite parent) {
-
-		{
-			// label: symbol
-			final Label label = new Label(parent, SWT.NONE);
-			label.setText(Messages.Slideout_CalendarOptions_Label_RowHeight);
-			label.setToolTipText(Messages.Slideout_CalendarOptions_Label_RowHeight_Tooltip);
-
-			// size
-			_spinnerWeekHeight = new Spinner(parent, SWT.BORDER);
-			_spinnerWeekHeight.setMinimum(CalendarConfigManager.WEEK_HEIGHT_MIN);
-			_spinnerWeekHeight.setMaximum(CalendarConfigManager.WEEK_HEIGHT_MAX);
-			_spinnerWeekHeight.setIncrement(1);
-			_spinnerWeekHeight.setPageIncrement(10);
-			_spinnerWeekHeight.addSelectionListener(_defaultSelectionListener);
-			_spinnerWeekHeight.addMouseWheelListener(_defaultMouseWheelListener);
-		}
-
-		{
-			// checkbox: Show point
-			_chkIsTinyLayout = new Button(parent, SWT.CHECK);
-			_chkIsTinyLayout.setText(Messages.Slideout_CalendarOptions_Checkbox_IsTinyLayout);
-			_chkIsTinyLayout.addSelectionListener(_defaultSelectionListener);
-			GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsTinyLayout);
-		}
-
-	}
-
 	private void createUI_200_InfoSummary(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
@@ -338,7 +315,7 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 			}
 			{
 				/*
-				 * Info content
+				 * Date content
 				 */
 
 				// label
@@ -353,10 +330,10 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 						.applyTo(_lblDateColumnContent);
 
 				// value
-				_comboInfoColumn = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-				_comboInfoColumn.setVisibleItemCount(20);
-				_comboInfoColumn.addSelectionListener(_defaultSelectionListener);
-				_comboInfoColumn.addFocusListener(_keepOpenListener);
+				_comboDateColumn = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+				_comboDateColumn.setVisibleItemCount(20);
+				_comboDateColumn.addSelectionListener(_defaultSelectionListener);
+				_comboDateColumn.addFocusListener(_keepOpenListener);
 			}
 		}
 	}
@@ -413,35 +390,115 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 		}
 	}
 
-	private void createUI_400_TourInfo(final Composite parent) {
+	private void createUI_400_Day(final Composite parent) {
 
 		final Group group = new Group(parent, SWT.NONE);
-		group.setText(Messages.Slideout_CalendarOptions_Group_TourInfo);
+		group.setText(Messages.Slideout_CalendarOptions_Group_Day);
 		GridDataFactory.fillDefaults().span(2, 1).applyTo(group);
-		GridLayoutFactory.swtDefaults().numColumns(4).applyTo(group);
+		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
+		{
+			createUI_410_DayHeader(group);
+			createUI_450_TourInfo(group);
+		}
+	}
+
+	private void createUI_410_DayHeader(final Composite parent) {
+
+		{
+			/*
+			 * Day header
+			 */
+
+			// checkbox
+			_chkIsShowDayHeader = new Button(parent, SWT.CHECK);
+			_chkIsShowDayHeader.setText(Messages.Slideout_CalendarOptions_Checkbox_IsShowDayHeader);
+			_chkIsShowDayHeader.addSelectionListener(_defaultSelectionListener);
+			GridDataFactory
+					.fillDefaults()//
+					.align(SWT.FILL, SWT.BEGINNING)
+					.span(2, 1)
+					.applyTo(_chkIsShowDayHeader);
+		}
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
+		{
+			{
+				/*
+				 * Day date format
+				 */
+
+				// label
+				_lblDayHeaderFormat = new Label(container, SWT.NONE);
+				_lblDayHeaderFormat.setText(Messages.Slideout_CalendarOptions_Label_DayHeaderFormat);
+				GridDataFactory
+						.fillDefaults()//
+						.align(SWT.FILL, SWT.CENTER)
+						.indent(_subItemIndent, 0)
+						.applyTo(_lblDayHeaderFormat);
+
+				// value
+				_comboDayHeaderDateFormat = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+				_comboDayHeaderDateFormat.setVisibleItemCount(20);
+				_comboDayHeaderDateFormat.addSelectionListener(_defaultSelectionListener);
+				_comboDayHeaderDateFormat.addFocusListener(_keepOpenListener);
+			}
+			{
+				/*
+				 * Layout
+				 */
+
+				// label
+				_lblDayHeaderLayout = new Label(container, SWT.NONE);
+				_lblDayHeaderLayout.setText(Messages.Slideout_CalendarOptions_Label_DayHeaderLayout);
+				GridDataFactory
+						.fillDefaults()//
+						.align(SWT.FILL, SWT.CENTER)
+						.indent(_subItemIndent, 0)
+						.applyTo(_lblDayHeaderLayout);
+
+				// value
+				_comboDayHeaderLayout = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+				_comboDayHeaderLayout.setVisibleItemCount(20);
+				_comboDayHeaderLayout.addSelectionListener(_defaultSelectionListener);
+				_comboDayHeaderLayout.addFocusListener(_keepOpenListener);
+			}
+		}
+	}
+
+	private void createUI_450_TourInfo(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory
+				.fillDefaults()//
+				.span(2, 1)
+				.indent(0, 10)
+				.applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
 		{
 			/*
 			 * 1. Line
 			 */
 
 			// label
-			final Label label = new Label(group, SWT.NONE);
+			final Label label = new Label(container, SWT.NONE);
 			label.setText(NLS.bind(Messages.Slideout_CalendarOptions_Label_N_Line, 1));
 
 			// value
-			_comboTour_Value_1 = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
+			_comboTour_Value_1 = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
 			_comboTour_Value_1.setVisibleItemCount(20);
 			_comboTour_Value_1.addSelectionListener(_defaultSelectionListener);
 			_comboTour_Value_1.addFocusListener(_keepOpenListener);
 
 			// value 1 format
-			_comboTour_Format_1_1 = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
+			_comboTour_Format_1_1 = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
 			_comboTour_Format_1_1.setVisibleItemCount(20);
 			_comboTour_Format_1_1.addSelectionListener(_defaultSelectionListener);
 			_comboTour_Format_1_1.addFocusListener(_keepOpenListener);
 
 			// value 2 format
-			_comboTour_Format_1_2 = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
+			_comboTour_Format_1_2 = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
 			_comboTour_Format_1_2.setVisibleItemCount(20);
 			_comboTour_Format_1_2.addSelectionListener(_defaultSelectionListener);
 			_comboTour_Format_1_2.addFocusListener(_keepOpenListener);
@@ -450,22 +507,22 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 			/*
 			 * 2. Line
 			 */
-			final Label label = new Label(group, SWT.NONE);
+			final Label label = new Label(container, SWT.NONE);
 			label.setText(NLS.bind(Messages.Slideout_CalendarOptions_Label_N_Line, 2));
 
-			_comboTour_Value_2 = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
+			_comboTour_Value_2 = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
 			_comboTour_Value_2.setVisibleItemCount(20);
 			_comboTour_Value_2.addSelectionListener(_defaultSelectionListener);
 			_comboTour_Value_2.addFocusListener(_keepOpenListener);
 
 			// value 1 format
-			_comboTour_Format_2_1 = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
+			_comboTour_Format_2_1 = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
 			_comboTour_Format_2_1.setVisibleItemCount(20);
 			_comboTour_Format_2_1.addSelectionListener(_defaultSelectionListener);
 			_comboTour_Format_2_1.addFocusListener(_keepOpenListener);
 
 			// value 2 format
-			_comboTour_Format_2_2 = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
+			_comboTour_Format_2_2 = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
 			_comboTour_Format_2_2.setVisibleItemCount(20);
 			_comboTour_Format_2_2.addSelectionListener(_defaultSelectionListener);
 			_comboTour_Format_2_2.addFocusListener(_keepOpenListener);
@@ -474,22 +531,22 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 			/*
 			 * 3. Line
 			 */
-			final Label label = new Label(group, SWT.NONE);
+			final Label label = new Label(container, SWT.NONE);
 			label.setText(NLS.bind(Messages.Slideout_CalendarOptions_Label_N_Line, 3));
 
-			_comboTour_Value_3 = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
+			_comboTour_Value_3 = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
 			_comboTour_Value_3.setVisibleItemCount(20);
 			_comboTour_Value_3.addSelectionListener(_defaultSelectionListener);
 			_comboTour_Value_3.addFocusListener(_keepOpenListener);
 
 			// value 1 format
-			_comboTour_Format_3_1 = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
+			_comboTour_Format_3_1 = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
 			_comboTour_Format_3_1.setVisibleItemCount(20);
 			_comboTour_Format_3_1.addSelectionListener(_defaultSelectionListener);
 			_comboTour_Format_3_1.addFocusListener(_keepOpenListener);
 
 			// value 2 format
-			_comboTour_Format_3_2 = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
+			_comboTour_Format_3_2 = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
 			_comboTour_Format_3_2.setVisibleItemCount(20);
 			_comboTour_Format_3_2.addSelectionListener(_defaultSelectionListener);
 			_comboTour_Format_3_2.addFocusListener(_keepOpenListener);
@@ -597,6 +654,26 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 		}
 	}
 
+	private void createUI_800_WeekLayout(final Composite parent) {
+
+		{
+			// label: symbol
+			final Label label = new Label(parent, SWT.NONE);
+			label.setText(Messages.Slideout_CalendarOptions_Label_RowHeight);
+			label.setToolTipText(Messages.Slideout_CalendarOptions_Label_RowHeight_Tooltip);
+
+			// size
+			_spinnerWeekHeight = new Spinner(parent, SWT.BORDER);
+			_spinnerWeekHeight.setMinimum(CalendarConfigManager.WEEK_HEIGHT_MIN);
+			_spinnerWeekHeight.setMaximum(CalendarConfigManager.WEEK_HEIGHT_MAX);
+			_spinnerWeekHeight.setIncrement(1);
+			_spinnerWeekHeight.setPageIncrement(10);
+			_spinnerWeekHeight.addSelectionListener(_defaultSelectionListener);
+			_spinnerWeekHeight.addMouseWheelListener(_defaultMouseWheelListener);
+		}
+
+	}
+
 	private void createUI_999_ConfigName(final Composite parent) {
 
 		/*
@@ -631,14 +708,23 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 
 		final boolean isShowInfoColumn = _chkIsShowDateColumn.getSelection();
 		final boolean isShowSummaryColumn = _chkIsShowSummaryColumn.getSelection();
+		final boolean isShowDayHeader = _chkIsShowDayHeader.getSelection();
 
-		_comboInfoColumn.setEnabled(isShowInfoColumn);
+		// date column
+		_comboDateColumn.setEnabled(isShowInfoColumn);
 		_lblDateColumnContent.setEnabled(isShowInfoColumn);
 		_lblDateColumnWidth.setEnabled(isShowInfoColumn);
 		_spinnerDateColumnWidth.setEnabled(isShowInfoColumn);
 
+		// summary column
 		_lblSummaryColumnWidth.setEnabled(isShowSummaryColumn);
 		_spinnerSummaryColumnWidth.setEnabled(isShowSummaryColumn);
+
+		// day
+		_lblDayHeaderFormat.setEnabled(isShowDayHeader);
+		_lblDayHeaderLayout.setEnabled(isShowDayHeader);
+		_comboDayHeaderDateFormat.setEnabled(isShowDayHeader);
+		_comboDayHeaderLayout.setEnabled(isShowDayHeader);
 	}
 
 	private void fillUI() {
@@ -651,8 +737,16 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 			 * Fill Combos
 			 */
 
-			for (final DateColumnData infoColumn : CalendarConfigManager.getAllDateColumnData()) {
-				_comboInfoColumn.add(infoColumn.label);
+			for (final DateColumnData data : CalendarConfigManager.getAllDateColumnData()) {
+				_comboDateColumn.add(data.label);
+			}
+
+			for (final DayHeaderDateFormatData data : CalendarConfigManager.getAllDayHeaderDateFormatData()) {
+				_comboDayHeaderDateFormat.add(data.label);
+			}
+
+			for (final DayHeaderLayoutData data : CalendarConfigManager.getAllDayHeaderLayoutData()) {
+				_comboDayHeaderLayout.add(data.label);
 			}
 
 			for (final TourInfoFormatter tourFormatter : _calendarView.tourInfoFormatter) {
@@ -671,14 +765,14 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 				_comboWeek_Value_5.add(weekFormatter.getText());
 			}
 
-			final String formatName_HH = ColumnManager.getValueFormatterName(ValueFormat.TIME_HH);
-			final String formatName_HH_MM = ColumnManager.getValueFormatterName(ValueFormat.TIME_HH_MM);
-			final String formatName_HH_MM_SS = ColumnManager.getValueFormatterName(ValueFormat.TIME_HH_MM_SS);
-
-			final String formatName_1_0 = ColumnManager.getValueFormatterName(ValueFormat.NUMBER_1_0);
-			final String formatName_1_1 = ColumnManager.getValueFormatterName(ValueFormat.NUMBER_1_1);
-			final String formatName_1_2 = ColumnManager.getValueFormatterName(ValueFormat.NUMBER_1_2);
-			final String formatName_1_3 = ColumnManager.getValueFormatterName(ValueFormat.NUMBER_1_3);
+//			final String formatName_HH = ColumnManager.getValueFormatterName(ValueFormat.TIME_HH);
+//			final String formatName_HH_MM = ColumnManager.getValueFormatterName(ValueFormat.TIME_HH_MM);
+//			final String formatName_HH_MM_SS = ColumnManager.getValueFormatterName(ValueFormat.TIME_HH_MM_SS);
+//
+//			final String formatName_1_0 = ColumnManager.getValueFormatterName(ValueFormat.NUMBER_1_0);
+//			final String formatName_1_1 = ColumnManager.getValueFormatterName(ValueFormat.NUMBER_1_1);
+//			final String formatName_1_2 = ColumnManager.getValueFormatterName(ValueFormat.NUMBER_1_2);
+//			final String formatName_1_3 = ColumnManager.getValueFormatterName(ValueFormat.NUMBER_1_3);
 
 		}
 		_isUpdateUI = backupIsUpdateUI;
@@ -738,7 +832,7 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 		comboWeek_Format.select(defaultIndex);
 	}
 
-	private int getInfoColumnIndex(final DateColumnContent infoColumn) {
+	private int getDateColumnIndex(final DateColumnContent infoColumn) {
 
 		final DateColumnData[] allInfoColumnData = CalendarConfigManager.getAllDateColumnData();
 
@@ -746,7 +840,7 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 
 			final DateColumnData infoColumnData = allInfoColumnData[dataIndex];
 
-			if (infoColumnData.infoColumn.equals(infoColumn)) {
+			if (infoColumnData.dateColumn.equals(infoColumn)) {
 				return dataIndex;
 			}
 		}
@@ -755,17 +849,78 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 		return 0;
 	}
 
-	private DateColumnContent getSelectedInfoColumn() {
+	private int getDayHeaderDateFormatIndex(final DayHeaderDateFormat requestedData) {
 
-		final int selectedInfoIndex = _comboInfoColumn.getSelectionIndex();
+		final DayHeaderDateFormatData[] allData = CalendarConfigManager.getAllDayHeaderDateFormatData();
 
-		if (selectedInfoIndex < 0) {
+		for (int dataIndex = 0; dataIndex < allData.length; dataIndex++) {
+
+			final DayHeaderDateFormatData Data = allData[dataIndex];
+
+			if (Data.dayHeaderDateFormat.equals(requestedData)) {
+				return dataIndex;
+			}
+		}
+
+		// this should not happen
+		return 0;
+	}
+
+	private int getDayHeaderLayoutIndex(final DayHeaderLayout requestedData) {
+
+		final DayHeaderLayoutData[] allData = CalendarConfigManager.getAllDayHeaderLayoutData();
+
+		for (int dataIndex = 0; dataIndex < allData.length; dataIndex++) {
+
+			final DayHeaderLayoutData Data = allData[dataIndex];
+
+			if (Data.dayHeaderLayout.equals(requestedData)) {
+				return dataIndex;
+			}
+		}
+
+		// this should not happen
+		return 0;
+	}
+
+	private DateColumnContent getSelectedDateColumn() {
+
+		final int selectedIndex = _comboDateColumn.getSelectionIndex();
+
+		if (selectedIndex < 0) {
 			return DateColumnContent.WEEK_NUMBER;
 		}
 
-		final DateColumnData selectedInfoColumnData = CalendarConfigManager.getAllDateColumnData()[selectedInfoIndex];
+		final DateColumnData selectedInfoColumnData = CalendarConfigManager.getAllDateColumnData()[selectedIndex];
 
-		return selectedInfoColumnData.infoColumn;
+		return selectedInfoColumnData.dateColumn;
+	}
+
+	private DayHeaderDateFormat getSelectedDayHeaderFormat() {
+
+		final int selectedIndex = _comboDayHeaderDateFormat.getSelectionIndex();
+
+		if (selectedIndex < 0) {
+			return DayHeaderDateFormat.WEEK_NUMBER;
+		}
+
+		final DayHeaderDateFormatData selectedData = CalendarConfigManager
+				.getAllDayHeaderDateFormatData()[selectedIndex];
+
+		return selectedData.dayHeaderDateFormat;
+	}
+
+	private DayHeaderLayout getSelectedDayHeaderLayout() {
+
+		final int selectedIndex = _comboDayHeaderLayout.getSelectionIndex();
+
+		if (selectedIndex < 0) {
+			return DayHeaderLayout.WEEK_NUMBER;
+		}
+
+		final DayHeaderLayoutData selectedData = CalendarConfigManager.getAllDayHeaderLayoutData()[selectedIndex];
+
+		return selectedData.dayHeaderLayout;
 	}
 
 	private void initUI(final Composite parent) {
@@ -902,18 +1057,26 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 			// get active config AFTER getting the index because this could change the active config
 			final int activeConfigIndex = CalendarConfigManager.getActiveCalendarConfigIndex();
 
+			// config
 			_comboConfigName.select(activeConfigIndex);
 			_textConfigName.setText(config.name);
 
-			_spinnerWeekHeight.setSelection(config.weekHeight);
+			// day header
+			_chkIsShowDayHeader.setSelection(config.isShowDayHeader);
+			_comboDayHeaderDateFormat.select(getDayHeaderDateFormatIndex(config.dayHeaderFormat));
+			_comboDayHeaderLayout.select(getDayHeaderLayoutIndex(config.dayHeaderLayout));
+
+			// date column
+			_chkIsShowDateColumn.setSelection(config.isShowDateColumn);
 			_spinnerDateColumnWidth.setSelection(config.dateColumnWidth);
+			_comboDateColumn.select(getDateColumnIndex(config.dateColumnContent));
+
+			// summary column
+			_chkIsShowSummaryColumn.setSelection(config.isShowSummaryColumn);
 			_spinnerSummaryColumnWidth.setSelection(config.summaryColumnWidth);
 
-			_chkIsShowDateColumn.setSelection(config.isShowDateColumn);
-			_chkIsShowSummaryColumn.setSelection(config.isShowSummaryColumn);
-			_comboInfoColumn.select(getInfoColumnIndex(config.dateColumnContent));
-
-			_chkIsTinyLayout.setSelection(config.isTinyLayout);
+			// layout
+			_spinnerWeekHeight.setSelection(config.weekHeight);
 		}
 		_isUpdateUI = false;
 
@@ -926,17 +1089,25 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 
 		final CalendarConfig config = CalendarConfigManager.getActiveCalendarConfig();
 
+		// config
 		config.name = _textConfigName.getText();
 
+		// day header
+		config.isShowDayHeader = _chkIsShowDayHeader.getSelection();
+		config.dayHeaderFormat = getSelectedDayHeaderFormat();
+		config.dayHeaderLayout = getSelectedDayHeaderLayout();
+
+		// date column
 		config.isShowDateColumn = _chkIsShowDateColumn.getSelection();
-		config.isShowSummaryColumn = _chkIsShowSummaryColumn.getSelection();
-		config.dateColumnContent = getSelectedInfoColumn();
+		config.dateColumnContent = getSelectedDateColumn();
 		config.dateColumnWidth = _spinnerDateColumnWidth.getSelection();
+
+		// summary column
+		config.isShowSummaryColumn = _chkIsShowSummaryColumn.getSelection();
 		config.summaryColumnWidth = _spinnerSummaryColumnWidth.getSelection();
 
+		// layout
 		config.weekHeight = _spinnerWeekHeight.getSelection();
-
-		config.isTinyLayout = _chkIsTinyLayout.getSelection();
 
 		_calendarView.updateUI_CalendarConfig();
 	}

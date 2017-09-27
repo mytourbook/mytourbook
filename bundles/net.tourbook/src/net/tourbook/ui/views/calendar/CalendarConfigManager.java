@@ -36,76 +36,96 @@ import org.osgi.framework.Version;
 
 public class CalendarConfigManager {
 
-	private static final String	CONFIG_FILE_NAME				= "calendar-config.xml";					//$NON-NLS-1$
+	private static final String			CONFIG_FILE_NAME				= "calendar-config.xml";					//$NON-NLS-1$
 
 	//
 	/**
 	 * Version number is not yet used.
 	 */
-	private static final int	CONFIG_VERSION					= 1;
+	private static final int			CONFIG_VERSION					= 1;
 	//
-	private static final Bundle	_bundle							= TourbookPlugin.getDefault().getBundle();
-	private static final IPath	_stateLocation					= Platform.getStateLocation(_bundle);
+	private static final Bundle			_bundle							= TourbookPlugin.getDefault().getBundle();
+	private static final IPath			_stateLocation					= Platform.getStateLocation(_bundle);
 	//
-	static final String			CONFIG_DEFAULT_ID_1				= "#1";										//$NON-NLS-1$
-	private static final String	CONFIG_DEFAULT_ID_2				= "#2";										//$NON-NLS-1$
-	private static final String	CONFIG_DEFAULT_ID_3				= "#3";										//$NON-NLS-1$
-	private static final String	CONFIG_DEFAULT_ID_4				= "#4";										//$NON-NLS-1$
-	private static final String	CONFIG_DEFAULT_ID_5				= "#5";										//$NON-NLS-1$
-	private static final String	CONFIG_DEFAULT_ID_6				= "#6";										//$NON-NLS-1$
-	private static final String	CONFIG_DEFAULT_ID_7				= "#7";										//$NON-NLS-1$
-	private static final String	CONFIG_DEFAULT_ID_8				= "#8";										//$NON-NLS-1$
-	private static final String	CONFIG_DEFAULT_ID_9				= "#9";										//$NON-NLS-1$
-	private static final String	CONFIG_DEFAULT_ID_10			= "#10";									//$NON-NLS-1$
+	static final String					CONFIG_DEFAULT_ID_1				= "#1";										//$NON-NLS-1$
+	private static final String			CONFIG_DEFAULT_ID_2				= "#2";										//$NON-NLS-1$
+	private static final String			CONFIG_DEFAULT_ID_3				= "#3";										//$NON-NLS-1$
+	private static final String			CONFIG_DEFAULT_ID_4				= "#4";										//$NON-NLS-1$
+	private static final String			CONFIG_DEFAULT_ID_5				= "#5";										//$NON-NLS-1$
+	private static final String			CONFIG_DEFAULT_ID_6				= "#6";										//$NON-NLS-1$
+	private static final String			CONFIG_DEFAULT_ID_7				= "#7";										//$NON-NLS-1$
+	private static final String			CONFIG_DEFAULT_ID_8				= "#8";										//$NON-NLS-1$
+	private static final String			CONFIG_DEFAULT_ID_9				= "#9";										//$NON-NLS-1$
+	private static final String			CONFIG_DEFAULT_ID_10			= "#10";									//$NON-NLS-1$
 	//
 	// common attributes
-	private static final String	ATTR_ACTIVE_CONFIG_ID			= "activeConfigId";							//$NON-NLS-1$
-	private static final String	ATTR_ID							= "id";										//$NON-NLS-1$
+	private static final String			ATTR_ACTIVE_CONFIG_ID			= "activeConfigId";							//$NON-NLS-1$
+	private static final String			ATTR_ID							= "id";										//$NON-NLS-1$
 
-	private static final String	ATTR_CONFIG_NAME				= "name";									//$NON-NLS-1$
+	private static final String			ATTR_CONFIG_NAME				= "name";									//$NON-NLS-1$
 	//
 	/*
 	 * Root
 	 */
-	private static final String	TAG_ROOT						= "CalendarConfiguration";					//$NON-NLS-1$
-	private static final String	ATTR_CONFIG_VERSION				= "configVersion";							//$NON-NLS-1$
+	private static final String			TAG_ROOT						= "CalendarConfiguration";					//$NON-NLS-1$
+	private static final String			ATTR_CONFIG_VERSION				= "configVersion";							//$NON-NLS-1$
 	//
 	/*
 	 * Calendars
 	 */
-	private static final String	TAG_CALENDAR_CONFIG				= "CalendarConfig";							//$NON-NLS-1$
-	private static final String	TAG_CALENDAR					= "Calendar";								//$NON-NLS-1$
+	private static final String			TAG_CALENDAR_CONFIG				= "CalendarConfig";							//$NON-NLS-1$
+	private static final String			TAG_CALENDAR					= "Calendar";								//$NON-NLS-1$
 	//
-	private static final String	ATTR_IS_TINY_LAYOUT				= "isTinyLayout";							//$NON-NLS-1$
-	private static final String	ATTR_WEEK_HEIGHT				= "weekHeight";								//$NON-NLS-1$
-	private static final String	ATTR_IS_SHOW_DATE_COLUMN		= "isShowDateColumn";						//$NON-NLS-1$
-	private static final String	ATTR_IS_SHOW_SUMMARY_COLUMN		= "isShowSummaryColumn";					//$NON-NLS-1$
-	private static final String	ATTR_DATE_COLUMN_CONTENT		= "dateColumnContent";						//$NON-NLS-1$
-	private static final String	ATTR_DATE_COLUMN_WIDTH			= "dateColumnWidth";						//$NON-NLS-1$
-	private static final String	ATTR_SUMMARY_COLUMN_WIDTH		= "summaryColumnWidth";						//$NON-NLS-1$
+	private static final String			ATTR_WEEK_HEIGHT				= "weekHeight";								//$NON-NLS-1$
+	private static final String			ATTR_IS_SHOW_DATE_COLUMN		= "isShowDateColumn";						//$NON-NLS-1$
+	private static final String			ATTR_IS_SHOW_DAY_HEADER			= "isShowDayHeader";						//$NON-NLS-1$
+	private static final String			ATTR_IS_SHOW_SUMMARY_COLUMN		= "isShowSummaryColumn";					//$NON-NLS-1$
+	private static final String			ATTR_DATE_COLUMN_CONTENT		= "dateColumnContent";						//$NON-NLS-1$
+	private static final String			ATTR_DATE_COLUMN_WIDTH			= "dateColumnWidth";						//$NON-NLS-1$
+	private static final String			ATTR_DAY_HEADER_DATE_FORMAT		= "dayHeaderDateFormat";					//$NON-NLS-1$
+	private static final String			ATTR_DAY_HEADER_LAYOUT			= "dayHeaderLayout";						//$NON-NLS-1$
+	private static final String			ATTR_SUMMARY_COLUMN_WIDTH		= "summaryColumnWidth";						//$NON-NLS-1$
 	//
-	static final boolean		DEFAULT_IS_TINY_LAYOUT			= false;
-	static final int			DEFAULT_DATE_COLUMN_WIDTH		= 5;
-	public static final int		DEFAULT_SUMMARY_COLUMN_WIDTH	= 10;
-	static final int			DEFAULT_WEEK_HEIGHT				= 70;
+	static final int					DEFAULT_DATE_COLUMN_WIDTH		= 5;
+	static final DateColumnContent		DEFAULT_DATE_COLUMN_CONTENT		= DateColumnContent.WEEK_NUMBER;
+	static final int					DEFAULT_SUMMARY_COLUMN_WIDTH	= 10;
+	static final int					DEFAULT_WEEK_HEIGHT				= 70;
+	static final DayHeaderDateFormat	DEFAULT_DAY_HEADER_FORMAT		= DayHeaderDateFormat.WEEK_NUMBER;
+	static final DayHeaderLayout		DEFAULT_DAY_HEADER_LAYOUT		= DayHeaderLayout.WEEK_NUMBER;
 	//
-	static final int			WEEK_HEIGHT_MIN					= 1;
-	static final int			WEEK_HEIGHT_MAX					= 500;
+	static final int					WEEK_HEIGHT_MIN					= 1;
+	static final int					WEEK_HEIGHT_MAX					= 500;
 	//
 	// !!! this is a code formatting separator !!!
 	static {}
 	//
-	private static final DateColumnData[]			_allDateColumnData	= new DateColumnData[] {
+	private static final DateColumnData[]			_allDateColumnData				= new DateColumnData[] {
 
 			new DateColumnData(DateColumnContent.WEEK_NUMBER, Messages.Calendar_Config_DateColumn_WeekNumber),
 			new DateColumnData(DateColumnContent.MONTH, Messages.Calendar_Config_DateColumn_Month),
 			new DateColumnData(DateColumnContent.YEAR, Messages.Calendar_Config_DateColumn_Year),
-	};																											//
+	};																													//
+	//
+	private static final DayHeaderDateFormatData[]	_allDateHeaderDateFormatData	= new DayHeaderDateFormatData[] {
+
+			new DayHeaderDateFormatData(
+					DayHeaderDateFormat.WEEK_NUMBER,
+					Messages.Calendar_Config_DateColumn_WeekNumber),
+			new DayHeaderDateFormatData(DayHeaderDateFormat.MONTH, Messages.Calendar_Config_DateColumn_Month),
+			new DayHeaderDateFormatData(DayHeaderDateFormat.YEAR, Messages.Calendar_Config_DateColumn_Year),
+	};																													//
+	//
+	private static final DayHeaderLayoutData[]		_allDayHeaderLayoutData			= new DayHeaderLayoutData[] {
+
+			new DayHeaderLayoutData(DayHeaderLayout.WEEK_NUMBER, Messages.Calendar_Config_DateColumn_WeekNumber),
+			new DayHeaderLayoutData(DayHeaderLayout.MONTH, Messages.Calendar_Config_DateColumn_Month),
+			new DayHeaderLayoutData(DayHeaderLayout.YEAR, Messages.Calendar_Config_DateColumn_Year),
+	};																													//
 	//
 	/**
 	 * Contains all configurations which are loaded from a xml file.
 	 */
-	private static final ArrayList<CalendarConfig>	_allCalendarConfigs	= new ArrayList<>();
+	private static final ArrayList<CalendarConfig>	_allCalendarConfigs				= new ArrayList<>();
 
 	private static CalendarConfig					_activeCalendarConfig;
 	//
@@ -117,12 +137,36 @@ public class CalendarConfigManager {
 
 	static class DateColumnData {
 
-		DateColumnContent	infoColumn;
+		DateColumnContent	dateColumn;
 		String				label;
 
-		public DateColumnData(final DateColumnContent infoColumn, final String label) {
+		public DateColumnData(final DateColumnContent dateColumn, final String label) {
 
-			this.infoColumn = infoColumn;
+			this.dateColumn = dateColumn;
+			this.label = label;
+		}
+	}
+
+	static class DayHeaderDateFormatData {
+
+		DayHeaderDateFormat	dayHeaderDateFormat;
+		String				label;
+
+		public DayHeaderDateFormatData(final DayHeaderDateFormat dayHeaderDateFormat, final String label) {
+
+			this.dayHeaderDateFormat = dayHeaderDateFormat;
+			this.label = label;
+		}
+	}
+
+	static class DayHeaderLayoutData {
+
+		DayHeaderLayout	dayHeaderLayout;
+		String			label;
+
+		public DayHeaderLayoutData(final DayHeaderLayout dayHeaderLayout, final String label) {
+
+			this.dayHeaderLayout = dayHeaderLayout;
 			this.label = label;
 		}
 	}
@@ -218,22 +262,30 @@ public class CalendarConfigManager {
 		// <Calendar>
 		final IMemento xmlConfig = xmlCalendars.createChild(TAG_CALENDAR);
 		{
+			// config
 			xmlConfig.putString(ATTR_ID, config.id);
 			xmlConfig.putString(ATTR_CONFIG_NAME, config.name);
 
+			// day
+			xmlConfig.putBoolean(ATTR_IS_SHOW_DAY_HEADER, config.isShowDayHeader);
+			Util.setXmlEnum(xmlConfig, ATTR_DAY_HEADER_DATE_FORMAT, config.dayHeaderFormat);
+			Util.setXmlEnum(xmlConfig, ATTR_DAY_HEADER_LAYOUT, config.dayHeaderLayout);
+
+			// date column
 			xmlConfig.putBoolean(ATTR_IS_SHOW_DATE_COLUMN, config.isShowDateColumn);
+			xmlConfig.putInteger(ATTR_DATE_COLUMN_WIDTH, config.dateColumnWidth);
+
+			// summary column
 			xmlConfig.putBoolean(ATTR_IS_SHOW_SUMMARY_COLUMN, config.isShowSummaryColumn);
+			xmlConfig.putInteger(ATTR_SUMMARY_COLUMN_WIDTH, config.summaryColumnWidth);
 			Util.setXmlEnum(xmlConfig, ATTR_DATE_COLUMN_CONTENT, config.dateColumnContent);
 
-			xmlConfig.putInteger(ATTR_DATE_COLUMN_WIDTH, config.dateColumnWidth);
-			xmlConfig.putInteger(ATTR_SUMMARY_COLUMN_WIDTH, config.summaryColumnWidth);
+			// layout
 			xmlConfig.putInteger(ATTR_WEEK_HEIGHT, config.weekHeight);
-
-			xmlConfig.putBoolean(ATTR_IS_TINY_LAYOUT, config.isTinyLayout);
 		}
 	}
 
-	public static CalendarConfig getActiveCalendarConfig() {
+	static CalendarConfig getActiveCalendarConfig() {
 
 		if (_activeCalendarConfig == null) {
 			readConfigFromXml();
@@ -245,7 +297,7 @@ public class CalendarConfigManager {
 	/**
 	 * @return Returns the index for the {@link #_activeCalendarConfig}, the index starts with 0.
 	 */
-	public static int getActiveCalendarConfigIndex() {
+	static int getActiveCalendarConfigIndex() {
 
 		final CalendarConfig activeConfig = getActiveCalendarConfig();
 
@@ -265,7 +317,7 @@ public class CalendarConfigManager {
 		return 0;
 	}
 
-	public static ArrayList<CalendarConfig> getAllCalendarConfigs() {
+	static ArrayList<CalendarConfig> getAllCalendarConfigs() {
 
 		// ensure configs are loaded
 		getActiveCalendarConfig();
@@ -275,6 +327,14 @@ public class CalendarConfigManager {
 
 	static DateColumnData[] getAllDateColumnData() {
 		return _allDateColumnData;
+	}
+
+	static DayHeaderDateFormatData[] getAllDayHeaderDateFormatData() {
+		return _allDateHeaderDateFormatData;
+	}
+
+	static DayHeaderLayoutData[] getAllDayHeaderLayoutData() {
+		return _allDayHeaderLayoutData;
 	}
 
 	private static CalendarConfig getConfig_Calendar() {
@@ -360,17 +420,23 @@ public class CalendarConfigManager {
 
 // SET_FORMATTING_OFF
 		
+		// config
 		config.id					= Util.getXmlString(xmlConfig, ATTR_ID,							Long.toString(System.nanoTime()));
 		config.name					= Util.getXmlString(xmlConfig, ATTR_CONFIG_NAME,				UI.EMPTY_STRING);
 		
+		// day
+		config.isShowDayHeader		= Util.getXmlBoolean(xmlConfig, ATTR_IS_SHOW_DAY_HEADER,		true);
+		
+		// date column
 		config.isShowDateColumn		= Util.getXmlBoolean(xmlConfig, ATTR_IS_SHOW_DATE_COLUMN,		true);
-		config.isShowSummaryColumn	= Util.getXmlBoolean(xmlConfig, ATTR_IS_SHOW_SUMMARY_COLUMN,	true);
-		
 		config.dateColumnWidth		= Util.getXmlInteger(xmlConfig, ATTR_DATE_COLUMN_WIDTH,			DEFAULT_DATE_COLUMN_WIDTH);
-		config.summaryColumnWidth	= Util.getXmlInteger(xmlConfig, ATTR_SUMMARY_COLUMN_WIDTH,		DEFAULT_SUMMARY_COLUMN_WIDTH);
-		config.weekHeight			= Util.getXmlInteger(xmlConfig, ATTR_WEEK_HEIGHT,				DEFAULT_WEEK_HEIGHT);
 		
-		config.isTinyLayout			= Util.getXmlBoolean(xmlConfig, ATTR_IS_TINY_LAYOUT,			DEFAULT_IS_TINY_LAYOUT);
+		// summary column
+		config.isShowSummaryColumn	= Util.getXmlBoolean(xmlConfig, ATTR_IS_SHOW_SUMMARY_COLUMN,	true);
+		config.summaryColumnWidth	= Util.getXmlInteger(xmlConfig, ATTR_SUMMARY_COLUMN_WIDTH,		DEFAULT_SUMMARY_COLUMN_WIDTH);
+
+		// layout
+		config.weekHeight			= Util.getXmlInteger(xmlConfig, ATTR_WEEK_HEIGHT,				DEFAULT_WEEK_HEIGHT);
 
 // SET_FORMATTING_ON
 
@@ -379,6 +445,15 @@ public class CalendarConfigManager {
 				ATTR_DATE_COLUMN_CONTENT,
 				DateColumnContent.WEEK_NUMBER);
 
+		config.dayHeaderFormat = (DayHeaderDateFormat) Util.getXmlEnum(
+				xmlConfig,
+				ATTR_DAY_HEADER_DATE_FORMAT,
+				DayHeaderDateFormat.WEEK_NUMBER);
+
+		config.dayHeaderLayout = (DayHeaderLayout) Util.getXmlEnum(
+				xmlConfig,
+				ATTR_DAY_HEADER_LAYOUT,
+				DayHeaderLayout.WEEK_NUMBER);
 	}
 
 	/**
@@ -428,7 +503,7 @@ public class CalendarConfigManager {
 		}
 	}
 
-	public static void resetActiveCalendarConfiguration() {
+	static void resetActiveCalendarConfiguration() {
 
 		// do not replace the name
 		final String oldName = _activeCalendarConfig.name;
@@ -448,14 +523,14 @@ public class CalendarConfigManager {
 		setActiveCalendarConfigIntern(newConfig);
 	}
 
-	public static void resetAllCalendarConfigurations() {
+	static void resetAllCalendarConfigurations() {
 
 		createDefaults_Calendars();
 
 		setActiveCalendarConfigIntern(_allCalendarConfigs.get(0));
 	}
 
-	public static void saveState() {
+	static void saveState() {
 
 		if (_activeCalendarConfig == null) {
 
@@ -486,7 +561,7 @@ public class CalendarConfigManager {
 		}
 	}
 
-	public static void setActiveCalendarConfig(final CalendarConfig newConfig) {
+	static void setActiveCalendarConfig(final CalendarConfig newConfig) {
 
 		setActiveCalendarConfigIntern(newConfig);
 	}
@@ -500,7 +575,7 @@ public class CalendarConfigManager {
 		}
 	}
 
-	public static void setCalendarView(final CalendarView calendarView) {
+	static void setCalendarView(final CalendarView calendarView) {
 
 		_calendarView = calendarView;
 	}
