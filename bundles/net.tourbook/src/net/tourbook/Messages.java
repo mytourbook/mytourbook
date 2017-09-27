@@ -42,9 +42,9 @@ public class Messages extends NLS {
 	public static String		Action_ToolTip_Hide;
 	public static String		Action_ToolTip_SetDefaults;
 
-	public static String		Calendar_Config_InfoColumn_Month;
-	public static String		Calendar_Config_InfoColumn_WeekNumber;
-	public static String		Calendar_Config_InfoColumn_Year;
+	public static String		Calendar_Config_DateColumn_Month;
+	public static String		Calendar_Config_DateColumn_WeekNumber;
+	public static String		Calendar_Config_DateColumn_Year;
 
 	public static String		Calendar_View_Action_Back;
 	public static String		Calendar_View_Action_Back_Tooltip;
@@ -1592,15 +1592,23 @@ public class Messages extends NLS {
 	public static String		Search_View_Link_SetupExternalBrowser;
 
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowInfoColumn;
+	public static String		Slideout_CalendarOptions_Checkbox_IsShowInfoColumn_Tooltip;
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowSummaryColumn;
+	public static String		Slideout_CalendarOptions_Checkbox_IsShowSummaryColumn_Tooltip;
 	public static String		Slideout_CalendarOptions_Checkbox_IsTinyLayout;
 	public static String		Slideout_CalendarOptions_Group_TourInfo;
 	public static String		Slideout_CalendarOptions_Group_WeekSummary;
-	public static String		Slideout_CalendarOptions_Label_InfoColumnContent;
-	public static String		Slideout_CalendarOptions_Label_InfoColumnContent_Tooltip;
+	public static String		Slideout_CalendarOptions_Label_DateColumn_Width;
+	public static String		Slideout_CalendarOptions_Label_DateColumn_Width_Tooltip;
+	public static String		Slideout_CalendarOptions_Label_DateColumnContent;
+	public static String		Slideout_CalendarOptions_Label_DateColumnContent_Tooltip;
 	public static String		Slideout_CalendarOptions_Label_N_Line;
+	public static String		Slideout_CalendarOptions_Label_Name;
+	public static String		Slideout_CalendarOptions_Label_Name_Tooltip;
 	public static String		Slideout_CalendarOptions_Label_RowHeight;
 	public static String		Slideout_CalendarOptions_Label_RowHeight_Tooltip;
+	public static String		Slideout_CalendarOptions_Label_SummaryColumn_Width;
+	public static String		Slideout_CalendarOptions_Label_SummaryColumn_Width_Tooltip;
 	public static String		Slideout_CalendarOptions_Label_SummaryColumnContent;
 	public static String		Slideout_CalendarOptions_Label_SummaryColumnContent_Tooltip;
 	public static String		Slideout_CalendarOptions_Label_Title;
@@ -1768,6 +1776,8 @@ public class Messages extends NLS {
 	public static String		Slideout_TourInfoOptions_Label_Title;
 	public static String		Slideout_TourInfoOptions_Label_TooltipDelay;
 	public static String		Slideout_TourInfoOptions_Label_TooltipDelay_Tooltip;
+
+	public static String		Slideout_TourInfoOptions_Label_TooltipDelaySimple_Tooltip;
 
 	public static String		Slideout_TourMarkerFilter_Checkbox_IsReduceLatLonDigits;
 	public static String		Slideout_TourMarkerFilter_Checkbox_IsReduceLatLonDigits_Tooltip;

@@ -172,7 +172,7 @@ public class SlideoutTourInfo extends ToolbarSlideout {
 						//						.indent(_pc.convertWidthInCharsToPixels(3), 0)
 						.applyTo(_lblTooltipDelay);
 				_lblTooltipDelay.setText(Messages.Slideout_TourInfoOptions_Label_TooltipDelay);
-				_lblTooltipDelay.setToolTipText(Messages.Slideout_TourInfoOptions_Label_TooltipDelay_Tooltip);
+				_lblTooltipDelay.setToolTipText(Messages.Slideout_TourInfoOptions_Label_TooltipDelaySimple_Tooltip);
 
 				// Spinner
 				_spinnerTooltipDelay = new Spinner(ttContainer, SWT.BORDER);

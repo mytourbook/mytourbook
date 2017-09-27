@@ -30,10 +30,12 @@ public class CalendarConfig {
 	public int					weekHeight			= CalendarConfigManager.DEFAULT_WEEK_HEIGHT;
 	public boolean				isTinyLayout		= CalendarConfigManager.DEFAULT_IS_TINY_LAYOUT;
 
-	public boolean				isShowInfoColumn	= true;
+	public boolean				isShowDateColumn	= true;
 	public boolean				isShowSummaryColumn	= true;
 
-	public InfoColumnContent	infoColumnContent	= InfoColumnContent.WEEK_NUMBER;
+	public DateColumnContent	dateColumnContent	= DateColumnContent.WEEK_NUMBER;
+	public int					dateColumnWidth		= CalendarConfigManager.DEFAULT_DATE_COLUMN_WIDTH;
+	public int					summaryColumnWidth	= CalendarConfigManager.DEFAULT_SUMMARY_COLUMN_WIDTH;
 
 	@Override
 	public boolean equals(final Object obj) {

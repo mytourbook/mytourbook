@@ -26,7 +26,7 @@ import net.tourbook.common.formatter.ValueFormat;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.Util;
-import net.tourbook.ui.views.calendar.CalendarConfigManager.InfoColumnData;
+import net.tourbook.ui.views.calendar.CalendarConfigManager.DateColumnData;
 import net.tourbook.ui.views.calendar.CalendarView.TourInfoFormatter;
 
 import org.eclipse.jface.action.Action;
@@ -74,6 +74,7 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 	private boolean					_isUpdateUI;
 
 	private PixelConverter			_pc;
+	private int						_subItemIndent;
 
 	/*
 	 * UI controls
@@ -109,10 +110,15 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 	private Combo					_comboInfoColumn;
 
 	private Button					_chkIsTinyLayout;
-	private Button					_chkIsShowInfoColumn;
+	private Button					_chkIsShowDateColumn;
 	private Button					_chkIsShowSummaryColumn;
 
-	private Label					_lblInfoColumn;
+	private Label					_lblDateColumnContent;
+	private Label					_lblDateColumnWidth;
+	private Label					_lblSummaryColumnWidth;
+
+	private Spinner					_spinnerDateColumnWidth;
+	private Spinner					_spinnerSummaryColumnWidth;
 	private Spinner					_spinnerWeekHeight;
 
 	private Text					_textConfigName;
@@ -168,9 +174,8 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 			{
 				createUI_10_Title(container);
 
-				createUI_200_InfoColumn(container);
-
-				createUI_300_Layout(container);
+				createUI_100_Layout(container);
+				createUI_200_InfoSummary(container);
 
 				createUI_400_TourInfo(container);
 				createUI_500_WeekSummary(container);
@@ -241,73 +246,7 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 		}
 	}
 
-	private void createUI_200_InfoColumn(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().span(2, 1).grab(true, false).applyTo(container);
-		GridLayoutFactory
-				.fillDefaults()//
-				.numColumns(2)
-				.spacing(20, LayoutConstants.getSpacing().y)
-				.applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
-		{
-
-			final Composite infoContainer = new Composite(container, SWT.NONE);
-			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(infoContainer);
-//			infoContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
-			{
-
-				/*
-				 * Info column
-				 */
-				// checkbox
-				_chkIsShowInfoColumn = new Button(infoContainer, SWT.CHECK);
-				_chkIsShowInfoColumn.setText(Messages.Slideout_CalendarOptions_Checkbox_IsShowInfoColumn);
-				_chkIsShowInfoColumn.addSelectionListener(_defaultSelectionListener);
-				GridDataFactory
-						.fillDefaults()//
-						.span(2, 1)
-						.applyTo(_chkIsShowInfoColumn);
-
-				{
-					// label
-					_lblInfoColumn = new Label(infoContainer, SWT.NONE);
-					_lblInfoColumn.setText(Messages.Slideout_CalendarOptions_Label_InfoColumnContent);
-					_lblInfoColumn.setToolTipText(Messages.Slideout_CalendarOptions_Label_InfoColumnContent_Tooltip);
-					GridDataFactory
-							.fillDefaults()//
-							.align(SWT.FILL, SWT.CENTER)
-							.indent(_pc.convertHorizontalDLUsToPixels(12), 0)
-							.applyTo(_lblInfoColumn);
-
-					// value
-					_comboInfoColumn = new Combo(infoContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
-					_comboInfoColumn.setVisibleItemCount(20);
-					_comboInfoColumn.addSelectionListener(_defaultSelectionListener);
-					_comboInfoColumn.addFocusListener(_keepOpenListener);
-				}
-			}
-
-			{
-				/*
-				 * Summary column
-				 */
-
-				// checkbox
-				_chkIsShowSummaryColumn = new Button(container, SWT.CHECK);
-				_chkIsShowSummaryColumn.setText(Messages.Slideout_CalendarOptions_Checkbox_IsShowSummaryColumn);
-				_chkIsShowSummaryColumn.addSelectionListener(_defaultSelectionListener);
-				GridDataFactory
-						.fillDefaults()//
-						.align(SWT.FILL, SWT.BEGINNING)
-						//						.span(2, 1)
-						.applyTo(_chkIsShowSummaryColumn);
-			}
-		}
-	}
-
-	private void createUI_300_Layout(final Composite parent) {
+	private void createUI_100_Layout(final Composite parent) {
 
 		{
 			// label: symbol
@@ -333,6 +272,145 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 			GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsTinyLayout);
 		}
 
+	}
+
+	private void createUI_200_InfoSummary(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().span(2, 1).grab(true, false).applyTo(container);
+		GridLayoutFactory
+				.fillDefaults()//
+				.numColumns(2)
+				.spacing(20, LayoutConstants.getSpacing().y)
+				.applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+		{
+			createUI_210_InfoColumn(container);
+			createUI_220_SummaryColumn(container);
+		}
+	}
+
+	private void createUI_210_InfoColumn(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+		{
+			/*
+			 * Info column
+			 */
+			// checkbox
+			_chkIsShowDateColumn = new Button(container, SWT.CHECK);
+			_chkIsShowDateColumn.setText(Messages.Slideout_CalendarOptions_Checkbox_IsShowInfoColumn);
+			_chkIsShowDateColumn.setToolTipText(
+					Messages.Slideout_CalendarOptions_Checkbox_IsShowInfoColumn_Tooltip);
+			_chkIsShowDateColumn.addSelectionListener(_defaultSelectionListener);
+			GridDataFactory
+					.fillDefaults()//
+					.span(2, 1)
+					.applyTo(_chkIsShowDateColumn);
+
+			{
+				/*
+				 * Column width
+				 */
+
+				// label
+				_lblDateColumnWidth = new Label(container, SWT.NONE);
+				_lblDateColumnWidth.setText(Messages.Slideout_CalendarOptions_Label_DateColumn_Width);
+				_lblDateColumnWidth.setToolTipText(
+						Messages.Slideout_CalendarOptions_Label_DateColumn_Width_Tooltip);
+				GridDataFactory
+						.fillDefaults()//
+						.align(SWT.FILL, SWT.CENTER)
+						.indent(_subItemIndent, 0)
+						.applyTo(_lblDateColumnWidth);
+
+				// size
+				_spinnerDateColumnWidth = new Spinner(container, SWT.BORDER);
+				_spinnerDateColumnWidth.setMinimum(1);
+				_spinnerDateColumnWidth.setMaximum(50);
+				_spinnerDateColumnWidth.setIncrement(1);
+				_spinnerDateColumnWidth.setPageIncrement(10);
+				_spinnerDateColumnWidth.addSelectionListener(_defaultSelectionListener);
+				_spinnerDateColumnWidth.addMouseWheelListener(_defaultMouseWheelListener);
+			}
+			{
+				/*
+				 * Info content
+				 */
+
+				// label
+				_lblDateColumnContent = new Label(container, SWT.NONE);
+				_lblDateColumnContent.setText(Messages.Slideout_CalendarOptions_Label_DateColumnContent);
+				_lblDateColumnContent.setToolTipText(
+						Messages.Slideout_CalendarOptions_Label_DateColumnContent_Tooltip);
+				GridDataFactory
+						.fillDefaults()//
+						.align(SWT.FILL, SWT.CENTER)
+						.indent(_subItemIndent, 0)
+						.applyTo(_lblDateColumnContent);
+
+				// value
+				_comboInfoColumn = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+				_comboInfoColumn.setVisibleItemCount(20);
+				_comboInfoColumn.addSelectionListener(_defaultSelectionListener);
+				_comboInfoColumn.addFocusListener(_keepOpenListener);
+			}
+		}
+	}
+
+	private void createUI_220_SummaryColumn(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+		{
+			{
+				/*
+				 * Summary column
+				 */
+
+				// checkbox
+				_chkIsShowSummaryColumn = new Button(container, SWT.CHECK);
+				_chkIsShowSummaryColumn.setText(Messages.Slideout_CalendarOptions_Checkbox_IsShowSummaryColumn);
+				_chkIsShowSummaryColumn.setToolTipText(
+						Messages.Slideout_CalendarOptions_Checkbox_IsShowSummaryColumn_Tooltip);
+				_chkIsShowSummaryColumn.addSelectionListener(_defaultSelectionListener);
+				GridDataFactory
+						.fillDefaults()//
+						.align(SWT.FILL, SWT.BEGINNING)
+						.span(2, 1)
+						.applyTo(_chkIsShowSummaryColumn);
+			}
+			{
+				/*
+				 * Column width
+				 */
+
+				// label
+				_lblSummaryColumnWidth = new Label(container, SWT.NONE);
+				_lblSummaryColumnWidth.setText(Messages.Slideout_CalendarOptions_Label_SummaryColumn_Width);
+				_lblSummaryColumnWidth.setToolTipText(
+						Messages.Slideout_CalendarOptions_Label_SummaryColumn_Width_Tooltip);
+				GridDataFactory
+						.fillDefaults()//
+						.align(SWT.FILL, SWT.CENTER)
+						.indent(_subItemIndent, 0)
+						.applyTo(_lblSummaryColumnWidth);
+
+				// size
+				_spinnerSummaryColumnWidth = new Spinner(container, SWT.BORDER);
+				_spinnerSummaryColumnWidth.setMinimum(1);
+				_spinnerSummaryColumnWidth.setMaximum(50);
+				_spinnerSummaryColumnWidth.setIncrement(1);
+				_spinnerSummaryColumnWidth.setPageIncrement(10);
+				_spinnerSummaryColumnWidth.addSelectionListener(_defaultSelectionListener);
+				_spinnerSummaryColumnWidth.addMouseWheelListener(_defaultMouseWheelListener);
+			}
+		}
 	}
 
 	private void createUI_400_TourInfo(final Composite parent) {
@@ -529,8 +607,10 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 			 * Label
 			 */
 			final Label lable = new Label(parent, SWT.NONE);
-			lable.setText(Messages.Slideout_Map25MarkerOptions_Label_Name);
-			lable.setToolTipText(Messages.Slideout_Map25MarkerOptions_Label_Name_Tooltip);
+			lable.setText(Messages.Slideout_CalendarOptions_Label_Name);
+			lable.setToolTipText(Messages.Slideout_CalendarOptions_Label_Name_Tooltip);
+			// Name for the currently selected tour marker configuration
+
 			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(lable);
 
 			/*
@@ -549,10 +629,16 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 
 	private void enableControls() {
 
-		final boolean isShowInfoColumn = _chkIsShowInfoColumn.getSelection();
+		final boolean isShowInfoColumn = _chkIsShowDateColumn.getSelection();
+		final boolean isShowSummaryColumn = _chkIsShowSummaryColumn.getSelection();
 
 		_comboInfoColumn.setEnabled(isShowInfoColumn);
-		_lblInfoColumn.setEnabled(isShowInfoColumn);
+		_lblDateColumnContent.setEnabled(isShowInfoColumn);
+		_lblDateColumnWidth.setEnabled(isShowInfoColumn);
+		_spinnerDateColumnWidth.setEnabled(isShowInfoColumn);
+
+		_lblSummaryColumnWidth.setEnabled(isShowSummaryColumn);
+		_spinnerSummaryColumnWidth.setEnabled(isShowSummaryColumn);
 	}
 
 	private void fillUI() {
@@ -565,7 +651,7 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 			 * Fill Combos
 			 */
 
-			for (final InfoColumnData infoColumn : CalendarConfigManager.getAllInfoColumnData()) {
+			for (final DateColumnData infoColumn : CalendarConfigManager.getAllDateColumnData()) {
 				_comboInfoColumn.add(infoColumn.label);
 			}
 
@@ -652,13 +738,13 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 		comboWeek_Format.select(defaultIndex);
 	}
 
-	private int getInfoColumnIndex(final InfoColumnContent infoColumn) {
+	private int getInfoColumnIndex(final DateColumnContent infoColumn) {
 
-		final InfoColumnData[] allInfoColumnData = CalendarConfigManager.getAllInfoColumnData();
+		final DateColumnData[] allInfoColumnData = CalendarConfigManager.getAllDateColumnData();
 
 		for (int dataIndex = 0; dataIndex < allInfoColumnData.length; dataIndex++) {
 
-			final InfoColumnData infoColumnData = allInfoColumnData[dataIndex];
+			final DateColumnData infoColumnData = allInfoColumnData[dataIndex];
 
 			if (infoColumnData.infoColumn.equals(infoColumn)) {
 				return dataIndex;
@@ -669,15 +755,15 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 		return 0;
 	}
 
-	private InfoColumnContent getSelectedInfoColumn() {
+	private DateColumnContent getSelectedInfoColumn() {
 
 		final int selectedInfoIndex = _comboInfoColumn.getSelectionIndex();
 
 		if (selectedInfoIndex < 0) {
-			return InfoColumnContent.WEEK_NUMBER;
+			return DateColumnContent.WEEK_NUMBER;
 		}
 
-		final InfoColumnData selectedInfoColumnData = CalendarConfigManager.getAllInfoColumnData()[selectedInfoIndex];
+		final DateColumnData selectedInfoColumnData = CalendarConfigManager.getAllDateColumnData()[selectedInfoIndex];
 
 		return selectedInfoColumnData.infoColumn;
 	}
@@ -685,6 +771,7 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 	private void initUI(final Composite parent) {
 
 		_pc = new PixelConverter(parent);
+		_subItemIndent = _pc.convertHorizontalDLUsToPixels(12);
 
 		_defaultSelectionListener = new SelectionAdapter() {
 			@Override
@@ -819,10 +906,12 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 			_textConfigName.setText(config.name);
 
 			_spinnerWeekHeight.setSelection(config.weekHeight);
+			_spinnerDateColumnWidth.setSelection(config.dateColumnWidth);
+			_spinnerSummaryColumnWidth.setSelection(config.summaryColumnWidth);
 
-			_chkIsShowInfoColumn.setSelection(config.isShowInfoColumn);
+			_chkIsShowDateColumn.setSelection(config.isShowDateColumn);
 			_chkIsShowSummaryColumn.setSelection(config.isShowSummaryColumn);
-			_comboInfoColumn.select(getInfoColumnIndex(config.infoColumnContent));
+			_comboInfoColumn.select(getInfoColumnIndex(config.dateColumnContent));
 
 			_chkIsTinyLayout.setSelection(config.isTinyLayout);
 		}
@@ -839,9 +928,11 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 
 		config.name = _textConfigName.getText();
 
-		config.isShowInfoColumn = _chkIsShowInfoColumn.getSelection();
+		config.isShowDateColumn = _chkIsShowDateColumn.getSelection();
 		config.isShowSummaryColumn = _chkIsShowSummaryColumn.getSelection();
-		config.infoColumnContent = getSelectedInfoColumn();
+		config.dateColumnContent = getSelectedInfoColumn();
+		config.dateColumnWidth = _spinnerDateColumnWidth.getSelection();
+		config.summaryColumnWidth = _spinnerSummaryColumnWidth.getSelection();
 
 		config.weekHeight = _spinnerWeekHeight.getSelection();
 

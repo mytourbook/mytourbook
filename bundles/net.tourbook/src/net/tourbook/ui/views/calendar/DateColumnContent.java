@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.views.calendar;
 
-public enum InfoColumnContent {
+public enum DateColumnContent {
 
 	WEEK_NUMBER, //
 	MONTH, //  

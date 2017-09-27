@@ -34,6 +34,7 @@ import net.tourbook.ui.views.calendar.CalendarView.TourInfoFormatter;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
@@ -54,7 +55,7 @@ import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -146,9 +147,14 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	 * Cache font height;
 	 */
 	private int									_fontHeight;
+	private int									_fontAverageCharWidth;
 
 	private LocalDate							_calendarFirstDay;
 	private LocalDate							_calendarLastDay;
+
+	private int									_lastWeekDateYPos;
+	private int									_lastWeekDateYear;
+	private int									_rowHeight;
 
 	/*
 	 * UI controls
@@ -163,6 +169,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	private Color								_blue					= _display.getSystemColor(SWT.COLOR_BLUE);
 
 	private Color								_darkGray				= _colorCache.getColor(0x404040);
+
+	private FontMetrics							_fontMetrics;
+	private Font								_boldFont;
 
 	private Image								_image;
 	private Image								_highlight;
@@ -250,6 +259,17 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		_parent = parent;
 		_calendarView = calendarView;
+
+		final GC gc = new GC(parent);
+		{
+			gc.setFont(JFaceResources.getDialogFont());
+			_fontMetrics = gc.getFontMetrics();
+			_fontHeight = _fontMetrics.getHeight();
+			_fontAverageCharWidth = _fontMetrics.getAverageCharWidth();
+		}
+		gc.dispose();
+
+		_boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 
 		_dataProvider = CalendarTourDataProvider.getInstance();
 		_dataProvider.setCalendarGraph(this);
@@ -563,8 +583,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		final int canvasWidth = canvas.width;
 		final int canvasHeight = canvas.height;
 
-		_fontHeight = gc.getFontMetrics().getHeight();
-
 		if (_isGraphClean && _image != null) {
 
 			_highlight = new Image(getDisplay(), canvasWidth, canvasHeight);
@@ -590,7 +608,10 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			return;
 		}
 
-		final CalendarConfig calConfig = CalendarConfigManager.getActiveCalendarConfig();
+		final CalendarConfig config = CalendarConfigManager.getActiveCalendarConfig();
+
+		_lastWeekDateYPos = -1;
+		_lastWeekDateYear = -1;
 
 		if (_image != null && !_image.isDisposed()) {
 			_image.dispose();
@@ -614,7 +635,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		final boolean oldLayout = _isTinyLayout;
 //		_isTinyLayout = (_refTextExtent.x > canvasWidth / 9); // getNumOfWeeks needs the _tinuLayout set
-		_isTinyLayout = calConfig.isTinyLayout;
+		_isTinyLayout = config.isTinyLayout;
 
 		if (oldLayout != _isTinyLayout) {
 
@@ -646,12 +667,10 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 
 		// one col left and right of the week + 7 week days
-		final int numCols = 9;
-		final int weekHeight = calConfig.weekHeight;
-//		int infoWidth = calConfig.weekNoWidth;
-		int infoWidth = 0;
+		final int numDayColumns = 7;
+		_rowHeight = config.weekHeight;
 
-		final int numRows = canvasHeight / weekHeight
+		final int numRows = canvasHeight / _rowHeight
 				// add another week that the bottom is not empty
 				+ 1;
 
@@ -679,56 +698,35 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		CalendarTourData[] data;
 
 		final Font normalFont = gc.getFont();
-		final FontData fd[] = normalFont.getFontData();
-		fd[0].setStyle(SWT.BOLD);
-		final Font boldFont = new Font(_display, fd[0]);
 
 		gc.setBackground(_white);
 		gc.setForeground(_black);
 		gc.fillRectangle(canvas);
 
-		float dayWidth = (float) canvasWidth / (float) numCols;
+		float dayWidth = (float) canvasWidth / (float) numDayColumns;
 
-		// keep the summary column at a minimal width and hide it completely if height goes blow usable value
-		final int minSummaryWidth = _refTextExtent.x;
-		final int minSummaryHeigth = (_refTextExtent.y * 2) / 3;
-		int summaryWidth = 0;
-		if (weekHeight > minSummaryHeigth) {
-			if (dayWidth < minSummaryWidth) {
-				summaryWidth = minSummaryWidth;
-			} else {
-				summaryWidth = (int) dayWidth;
-			}
+		int dateColumnWidth = 0;
+		if (config.isShowDateColumn) {
+			dateColumnWidth = config.dateColumnWidth * _fontAverageCharWidth;
 		}
 
-		final int minInfoWidth = _refTextExtent.x / 2;
-		final int minInfoHeigth = (_refTextExtent.y / 3);
-		if (weekHeight > minInfoHeigth) {
-			if (dayWidth < minInfoWidth) {
-				infoWidth = minInfoWidth;
-			} else {
-				infoWidth = (int) dayWidth;
-			}
+		int summaryColumnWidth = 0;
+		if (config.isShowSummaryColumn) {
+			summaryColumnWidth = config.summaryColumnWidth * _fontAverageCharWidth;
 		}
 
-		dayWidth = (float) (canvasWidth - summaryWidth - infoWidth) / (numCols - 2);
+		dayWidth = (float) (canvasWidth - dateColumnWidth - summaryColumnWidth) / numDayColumns;
 
-		_calendarAllDaysRectangle = new Rectangle(infoWidth, 0, (int) (7 * dayWidth), canvasHeight);
-
-		// first draw the horizontal lines
-//		gc.setBackground(_white);
-//		gc.setForeground(_gray);
+		_calendarAllDaysRectangle = new Rectangle(dateColumnWidth, 0, (int) (7 * dayWidth), canvasHeight);
 
 		final long todayDayId = (new Day(new DateTime())).dayId;
 
-		gc.setFont(boldFont);
-
 		// a rough guess about the max size of the label
+		gc.setFont(_boldFont);
 		final Point[] headerSizes = {
 				gc.stringExtent("22. May 99"), //$NON-NLS-1$
 				gc.stringExtent("22. May"), //$NON-NLS-1$
 				gc.stringExtent("22") }; //$NON-NLS-1$
-
 		gc.setFont(normalFont);
 
 		final String[] headerFormats = {
@@ -753,8 +751,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		// Weeks
 		for (int rowIndex = 0; rowIndex < numRows; rowIndex++) {
 
-			final int Y1 = rowIndex * weekHeight;
-			final int Y2 = (rowIndex + 1) * weekHeight;
+			final int rowTop = rowIndex * _rowHeight;
 
 			// Days per week
 			Rectangle dayRec = null;
@@ -763,17 +760,18 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 					currentDate.getMonthOfYear(),
 					currentDate.getDayOfMonth()); // save the first day of this week as a pointer to this week
 
-			if (infoWidth > 0) {
+//			int weekHeight = rowBottom - rowTop;
+			if (dateColumnWidth > 0) {
 
-				final Rectangle infoRec = new Rectangle(0, Y1, infoWidth, (Y2 - Y1));
-				drawWeek_Info(gc, currentDate, infoRec);
+				final Rectangle infoRec = new Rectangle(0, rowTop, dateColumnWidth, _rowHeight);
+				drawWeek_Date(gc, currentDate, infoRec, config.dateColumnContent);
 			}
 
 			for (int j = 0; j < 7; j++) {
 
-				final int X1 = infoWidth + (int) (j * dayWidth);
-				final int X2 = infoWidth + (int) ((j + 1) * dayWidth);
-				dayRec = new Rectangle(X1, Y1, (X2 - X1), (Y2 - Y1));
+				final int X1 = dateColumnWidth + (int) (j * dayWidth);
+				final int X2 = dateColumnWidth + (int) ((j + 1) * dayWidth);
+				dayRec = new Rectangle(X1, rowTop, (X2 - X1), _rowHeight);
 				final Day day = new Day(dayId);
 				_dayFocus.add(new ObjectLocation(dayRec, dayId, day));
 				dayId = day.dayId + 1;
@@ -807,14 +805,14 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 					// gradient background
 					gc.setForeground(_gray);
-					gc.fillGradientRectangle(X1, Y1, dayRec.width + 1, dayLabelHeight, true); // no clue why I've to add 1 to the width, looks like a bug on Linux and does not hurt as we overwrite with the vertial line at the end anyway
+					gc.fillGradientRectangle(X1, rowTop, dayRec.width + 1, dayLabelHeight, true); // no clue why I've to add 1 to the width, looks like a bug on Linux and does not hurt as we overwrite with the vertial line at the end anyway
 
 					// day header label
-					gc.setFont(boldFont);
+					gc.setFont(_boldFont);
 					gc.setForeground(headerColor);
-					gc.setClipping(X1, Y1, dayRec.width, dayLabelHeight); // this clipping should only kick in if shortest label format is still longer than the cell width
+					gc.setClipping(X1, rowTop, dayRec.width, dayLabelHeight); // this clipping should only kick in if shortest label format is still longer than the cell width
 
-					gc.drawText(currentDate.toString(headerFormat), X2 - dayLabelWidth - dayLabelXOffset, Y1, true);
+					gc.drawText(currentDate.toString(headerFormat), X2 - dayLabelWidth - dayLabelXOffset, rowTop, true);
 
 					gc.setFont(normalFont);
 					gc.setClipping(_nullRec);
@@ -844,10 +842,10 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 					}
 
 					gc.setAlpha(0x50);
-					gc.setFont(boldFont);
+					gc.setFont(_boldFont);
 					gc.setClipping(dayRec);
 
-					gc.drawText(currentDate.toString(headerFormat), X2 - dayLabelWidth - dayLabelXOffset, Y1, true);
+					gc.drawText(currentDate.toString(headerFormat), X2 - dayLabelWidth - dayLabelXOffset, rowTop, true);
 
 					gc.setFont(normalFont);
 					gc.setClipping(_nullRec);
@@ -857,12 +855,12 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 				currentDate = currentDate.plusDays(1);
 			}
 
-			if (summaryWidth > 0) {
+			if (summaryColumnWidth > 0) {
 
-				final int X1 = infoWidth + (int) (7 * dayWidth);
-				final int X2 = X1 + summaryWidth;
+				final int X1 = dateColumnWidth + (int) (7 * dayWidth);
+				final int X2 = X1 + summaryColumnWidth;
 
-				final Rectangle weekRec = new Rectangle(X1, Y1, (X2 - X1), (Y2 - Y1));
+				final Rectangle weekRec = new Rectangle(X1, rowTop, (X2 - X1), _rowHeight);
 
 				final CalendarTourData weekSummary = _dataProvider.getCalendarWeekSummaryData(
 						week1stDay,
@@ -879,7 +877,11 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		// and finally the vertical lines
 		gc.setForeground(_display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 		for (int i = 0; i <= 7; i++) {
-			gc.drawLine(infoWidth + (int) (i * dayWidth), 0, infoWidth + (int) (i * dayWidth), canvasHeight);
+			gc.drawLine(
+					dateColumnWidth + (int) (i * dayWidth),
+					0,
+					dateColumnWidth + (int) (i * dayWidth),
+					canvasHeight);
 		}
 
 		// draw the selection on top of our calendar graph image so we can reuse that image
@@ -890,7 +892,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		oldGc.drawImage(_highlight, 0, 0);
 		_highlight.dispose();
 
-		boldFont.dispose();
 		oldGc.dispose();
 		gc.dispose();
 
@@ -1124,50 +1125,79 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		gc.setClipping(_nullRec);
 	}
 
-	private void drawWeek_Info(final GC gc, final DateTime dt, final Rectangle rec) {
+	private void drawWeek_Date(	final GC gc,
+								final DateTime dt,
+								final Rectangle rec,
+								final DateColumnContent dateColumnContent) {
 
 		final Font normalFont = gc.getFont();
-		final FontData fontData[] = normalFont.getFontData();
-		fontData[0].setStyle(SWT.BOLD);
-
-		// fd[0].setHeight(((rec.height) * 72 / _display.getDPI().y) / 4);
-		final Font boldFont = new Font(_display, fontData[0]);
 
 		gc.setForeground(_darkGray);
 		gc.setBackground(_white);
 
-		gc.setFont(boldFont);
+		gc.setFont(_boldFont);
 
-		String text;
+		final int posX = rec.x + 4;
+		final int posY = rec.y + 2;
 
-		if (_isTinyLayout) {
+		switch (dateColumnContent) {
+		case MONTH:
 
 			// draw month
 
-			if (dt.minusDays(1).getMonthOfYear() != dt.plusDays(6).getMonthOfYear()) { // a new month started on this week
+			if (dt.minusDays(1).getMonthOfYear() != dt.plusDays(6).getMonthOfYear()) {
 
-				gc.setClipping(new Rectangle(rec.x, rec.y, rec.width, 4 * rec.height)); // clipp to the room left of this month
-				text = dt.plusDays(6).toString("MMM"); //$NON-NLS-1$
+				// a new month started on this week
 
-				if (rec.width < (2 * _refTextExtent.x / 3)) {
-					text = text.substring(0, 1);
+				// prevent overlapping
+				if (posY > _lastWeekDateYPos + _fontHeight - 2) {
+
+					final String monthText = dt.plusDays(6).toString("MMM"); //$NON-NLS-1$
+
+					gc.drawText(monthText, posX, posY);
+
+					_lastWeekDateYPos = posY;
 				}
-
-				gc.drawText(text, rec.x + 2, rec.y + 2);
-				gc.setClipping(_nullRec);
 			}
 
-		} else {
+			break;
 
-			// draw week no
+		case YEAR:
 
-			gc.drawText("" + dt.getWeekOfWeekyear(), rec.x + 4, rec.y + 2);//$NON-NLS-1$
+			final int year = dt.getYear();
+
+			// prevent to repeat the year
+			if (year != _lastWeekDateYear) {
+
+				// prevent overlapping
+				if (posY > _lastWeekDateYPos + _fontHeight - 2) {
+
+					gc.drawText(Integer.toString(year), posX, posY);
+
+					_lastWeekDateYear = year;
+					_lastWeekDateYPos = posY;
+				}
+			}
+
+			break;
+
+		case WEEK_NUMBER:
+		default:
+
+			// default is week number
+
+			// prevent overlapping
+			if (posY > _lastWeekDateYPos + _fontHeight - 2) {
+
+				gc.drawText(Integer.toString(dt.getWeekOfWeekyear()), posX, posY);
+
+				_lastWeekDateYPos = posY;
+			}
+
+			break;
 		}
 
 		gc.setFont(normalFont);
-
-		boldFont.dispose();
-
 	}
 
 	private void drawWeek_Summary(final GC gc, final CalendarTourData data, final Rectangle weekRec) {
@@ -1186,11 +1216,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		final int maxLength = weekRec.width - 2;
 
 		final Font normalFont = gc.getFont();
-		final FontData fd[] = normalFont.getFontData();
-		fd[0].setStyle(SWT.BOLD);
-		final Font boldFont = new Font(_display, fd[0]);
 
-		gc.setFont(boldFont);
+		gc.setFont(_boldFont);
 
 		for (final WeekSummaryFormatter formatter : _weekSummaryFormatter) {
 
@@ -1219,8 +1246,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 
 		gc.setFont(normalFont);
-		boldFont.dispose();
-
 		gc.setClipping(_nullRec);
 	}
 

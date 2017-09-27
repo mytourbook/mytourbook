@@ -36,66 +36,70 @@ import org.osgi.framework.Version;
 
 public class CalendarConfigManager {
 
-	private static final String	CONFIG_FILE_NAME			= "calendar-config.xml";					//$NON-NLS-1$
+	private static final String	CONFIG_FILE_NAME				= "calendar-config.xml";					//$NON-NLS-1$
 
 	//
 	/**
 	 * Version number is not yet used.
 	 */
-	private static final int	CONFIG_VERSION				= 1;
+	private static final int	CONFIG_VERSION					= 1;
 	//
-	private static final Bundle	_bundle						= TourbookPlugin.getDefault().getBundle();
-	private static final IPath	_stateLocation				= Platform.getStateLocation(_bundle);
+	private static final Bundle	_bundle							= TourbookPlugin.getDefault().getBundle();
+	private static final IPath	_stateLocation					= Platform.getStateLocation(_bundle);
 	//
-	static final String			CONFIG_DEFAULT_ID_1			= "#1";										//$NON-NLS-1$
-	private static final String	CONFIG_DEFAULT_ID_2			= "#2";										//$NON-NLS-1$
-	private static final String	CONFIG_DEFAULT_ID_3			= "#3";										//$NON-NLS-1$
-	private static final String	CONFIG_DEFAULT_ID_4			= "#4";										//$NON-NLS-1$
-	private static final String	CONFIG_DEFAULT_ID_5			= "#5";										//$NON-NLS-1$
-	private static final String	CONFIG_DEFAULT_ID_6			= "#6";										//$NON-NLS-1$
-	private static final String	CONFIG_DEFAULT_ID_7			= "#7";										//$NON-NLS-1$
-	private static final String	CONFIG_DEFAULT_ID_8			= "#8";										//$NON-NLS-1$
-	private static final String	CONFIG_DEFAULT_ID_9			= "#9";										//$NON-NLS-1$
-	private static final String	CONFIG_DEFAULT_ID_10		= "#10";									//$NON-NLS-1$
+	static final String			CONFIG_DEFAULT_ID_1				= "#1";										//$NON-NLS-1$
+	private static final String	CONFIG_DEFAULT_ID_2				= "#2";										//$NON-NLS-1$
+	private static final String	CONFIG_DEFAULT_ID_3				= "#3";										//$NON-NLS-1$
+	private static final String	CONFIG_DEFAULT_ID_4				= "#4";										//$NON-NLS-1$
+	private static final String	CONFIG_DEFAULT_ID_5				= "#5";										//$NON-NLS-1$
+	private static final String	CONFIG_DEFAULT_ID_6				= "#6";										//$NON-NLS-1$
+	private static final String	CONFIG_DEFAULT_ID_7				= "#7";										//$NON-NLS-1$
+	private static final String	CONFIG_DEFAULT_ID_8				= "#8";										//$NON-NLS-1$
+	private static final String	CONFIG_DEFAULT_ID_9				= "#9";										//$NON-NLS-1$
+	private static final String	CONFIG_DEFAULT_ID_10			= "#10";									//$NON-NLS-1$
 	//
 	// common attributes
-	private static final String	ATTR_ACTIVE_CONFIG_ID		= "activeConfigId";							//$NON-NLS-1$
-	private static final String	ATTR_ID						= "id";										//$NON-NLS-1$
+	private static final String	ATTR_ACTIVE_CONFIG_ID			= "activeConfigId";							//$NON-NLS-1$
+	private static final String	ATTR_ID							= "id";										//$NON-NLS-1$
 
-	private static final String	ATTR_CONFIG_NAME			= "name";									//$NON-NLS-1$
+	private static final String	ATTR_CONFIG_NAME				= "name";									//$NON-NLS-1$
 	//
 	/*
 	 * Root
 	 */
-	private static final String	TAG_ROOT					= "CalendarConfiguration";					//$NON-NLS-1$
-	private static final String	ATTR_CONFIG_VERSION			= "configVersion";							//$NON-NLS-1$
+	private static final String	TAG_ROOT						= "CalendarConfiguration";					//$NON-NLS-1$
+	private static final String	ATTR_CONFIG_VERSION				= "configVersion";							//$NON-NLS-1$
 	//
 	/*
 	 * Calendars
 	 */
-	private static final String	TAG_CALENDAR_CONFIG			= "CalendarConfig";							//$NON-NLS-1$
-	private static final String	TAG_CALENDAR				= "Calendar";								//$NON-NLS-1$
+	private static final String	TAG_CALENDAR_CONFIG				= "CalendarConfig";							//$NON-NLS-1$
+	private static final String	TAG_CALENDAR					= "Calendar";								//$NON-NLS-1$
 	//
-	private static final String	ATTR_IS_TINY_LAYOUT			= "isTinyLayout";							//$NON-NLS-1$
-	private static final String	ATTR_WEEK_HEIGHT			= "weekHeight";								//$NON-NLS-1$
-	private static final String	ATTR_IS_SHOW_INFO_COLUMN	= "isShowInfoColumn";						//$NON-NLS-1$
-	private static final String	ATTR_IS_SHOW_SUMMARY_COLUMN	= "isShowSummaryColumn";					//$NON-NLS-1$
-	private static final String	ATTR_INFO_COLUMN_CONTENT	= "infoColumnContent";						//$NON-NLS-1$
+	private static final String	ATTR_IS_TINY_LAYOUT				= "isTinyLayout";							//$NON-NLS-1$
+	private static final String	ATTR_WEEK_HEIGHT				= "weekHeight";								//$NON-NLS-1$
+	private static final String	ATTR_IS_SHOW_DATE_COLUMN		= "isShowDateColumn";						//$NON-NLS-1$
+	private static final String	ATTR_IS_SHOW_SUMMARY_COLUMN		= "isShowSummaryColumn";					//$NON-NLS-1$
+	private static final String	ATTR_DATE_COLUMN_CONTENT		= "dateColumnContent";						//$NON-NLS-1$
+	private static final String	ATTR_DATE_COLUMN_WIDTH			= "dateColumnWidth";						//$NON-NLS-1$
+	private static final String	ATTR_SUMMARY_COLUMN_WIDTH		= "summaryColumnWidth";						//$NON-NLS-1$
 	//
-	static final int			WEEK_HEIGHT_MIN				= 1;
-	static final int			WEEK_HEIGHT_MAX				= 500;
+	static final boolean		DEFAULT_IS_TINY_LAYOUT			= false;
+	static final int			DEFAULT_DATE_COLUMN_WIDTH		= 5;
+	public static final int		DEFAULT_SUMMARY_COLUMN_WIDTH	= 10;
+	static final int			DEFAULT_WEEK_HEIGHT				= 70;
 	//
-	static final int			DEFAULT_WEEK_HEIGHT			= 70;
-	static final boolean		DEFAULT_IS_TINY_LAYOUT		= false;
+	static final int			WEEK_HEIGHT_MIN					= 1;
+	static final int			WEEK_HEIGHT_MAX					= 500;
 	//
 	// !!! this is a code formatting separator !!!
 	static {}
 	//
-	private static final InfoColumnData[]			_allInfoColumnData	= new InfoColumnData[] {
+	private static final DateColumnData[]			_allDateColumnData	= new DateColumnData[] {
 
-			new InfoColumnData(InfoColumnContent.WEEK_NUMBER, Messages.Calendar_Config_InfoColumn_WeekNumber),
-			new InfoColumnData(InfoColumnContent.MONTH, Messages.Calendar_Config_InfoColumn_Month),
-			new InfoColumnData(InfoColumnContent.YEAR, Messages.Calendar_Config_InfoColumn_Year),
+			new DateColumnData(DateColumnContent.WEEK_NUMBER, Messages.Calendar_Config_DateColumn_WeekNumber),
+			new DateColumnData(DateColumnContent.MONTH, Messages.Calendar_Config_DateColumn_Month),
+			new DateColumnData(DateColumnContent.YEAR, Messages.Calendar_Config_DateColumn_Year),
 	};																											//
 	//
 	/**
@@ -111,12 +115,12 @@ public class CalendarConfigManager {
 	 */
 	private static CalendarView						_calendarView;
 
-	static class InfoColumnData {
+	static class DateColumnData {
 
-		InfoColumnContent	infoColumn;
+		DateColumnContent	infoColumn;
 		String				label;
 
-		public InfoColumnData(final InfoColumnContent infoColumn, final String label) {
+		public DateColumnData(final DateColumnContent infoColumn, final String label) {
 
 			this.infoColumn = infoColumn;
 			this.label = label;
@@ -217,10 +221,12 @@ public class CalendarConfigManager {
 			xmlConfig.putString(ATTR_ID, config.id);
 			xmlConfig.putString(ATTR_CONFIG_NAME, config.name);
 
-			xmlConfig.putBoolean(ATTR_IS_SHOW_INFO_COLUMN, config.isShowInfoColumn);
+			xmlConfig.putBoolean(ATTR_IS_SHOW_DATE_COLUMN, config.isShowDateColumn);
 			xmlConfig.putBoolean(ATTR_IS_SHOW_SUMMARY_COLUMN, config.isShowSummaryColumn);
-			Util.setXmlEnum(xmlConfig, ATTR_INFO_COLUMN_CONTENT, config.infoColumnContent);
+			Util.setXmlEnum(xmlConfig, ATTR_DATE_COLUMN_CONTENT, config.dateColumnContent);
 
+			xmlConfig.putInteger(ATTR_DATE_COLUMN_WIDTH, config.dateColumnWidth);
+			xmlConfig.putInteger(ATTR_SUMMARY_COLUMN_WIDTH, config.summaryColumnWidth);
 			xmlConfig.putInteger(ATTR_WEEK_HEIGHT, config.weekHeight);
 
 			xmlConfig.putBoolean(ATTR_IS_TINY_LAYOUT, config.isTinyLayout);
@@ -267,8 +273,8 @@ public class CalendarConfigManager {
 		return _allCalendarConfigs;
 	}
 
-	static InfoColumnData[] getAllInfoColumnData() {
-		return _allInfoColumnData;
+	static DateColumnData[] getAllDateColumnData() {
+		return _allDateColumnData;
 	}
 
 	private static CalendarConfig getConfig_Calendar() {
@@ -357,19 +363,21 @@ public class CalendarConfigManager {
 		config.id					= Util.getXmlString(xmlConfig, ATTR_ID,							Long.toString(System.nanoTime()));
 		config.name					= Util.getXmlString(xmlConfig, ATTR_CONFIG_NAME,				UI.EMPTY_STRING);
 		
-		config.isShowInfoColumn		= Util.getXmlBoolean(xmlConfig, ATTR_IS_SHOW_INFO_COLUMN,		true);
+		config.isShowDateColumn		= Util.getXmlBoolean(xmlConfig, ATTR_IS_SHOW_DATE_COLUMN,		true);
 		config.isShowSummaryColumn	= Util.getXmlBoolean(xmlConfig, ATTR_IS_SHOW_SUMMARY_COLUMN,	true);
 		
+		config.dateColumnWidth		= Util.getXmlInteger(xmlConfig, ATTR_DATE_COLUMN_WIDTH,			DEFAULT_DATE_COLUMN_WIDTH);
+		config.summaryColumnWidth	= Util.getXmlInteger(xmlConfig, ATTR_SUMMARY_COLUMN_WIDTH,		DEFAULT_SUMMARY_COLUMN_WIDTH);
 		config.weekHeight			= Util.getXmlInteger(xmlConfig, ATTR_WEEK_HEIGHT,				DEFAULT_WEEK_HEIGHT);
 		
 		config.isTinyLayout			= Util.getXmlBoolean(xmlConfig, ATTR_IS_TINY_LAYOUT,			DEFAULT_IS_TINY_LAYOUT);
 
 // SET_FORMATTING_ON
 
-		config.infoColumnContent = (InfoColumnContent) Util.getXmlEnum(
+		config.dateColumnContent = (DateColumnContent) Util.getXmlEnum(
 				xmlConfig,
-				ATTR_INFO_COLUMN_CONTENT,
-				InfoColumnContent.WEEK_NUMBER);
+				ATTR_DATE_COLUMN_CONTENT,
+				DateColumnContent.WEEK_NUMBER);
 
 	}
 
