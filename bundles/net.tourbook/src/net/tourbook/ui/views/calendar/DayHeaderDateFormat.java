@@ -17,12 +17,9 @@ package net.tourbook.ui.views.calendar;
 
 public enum DayHeaderDateFormat {
 
-//	"dd. MMM yy", //$NON-NLS-1$
-//	"dd. MMM", //$NON-NLS-1$
-//	"dd" }; //$NON-NLS-1$
-
-	WEEK_NUMBER, //
-	MONTH, //
-	YEAR, //
+	AUTOMATIC, //
+	DAY, //
+	DAY_MONTH, //
+	DAY_MONTH_YEAR, //
 
 }

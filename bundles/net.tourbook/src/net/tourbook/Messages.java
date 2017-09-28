@@ -45,6 +45,10 @@ public class Messages extends NLS {
 	public static String		Calendar_Config_DateColumn_Month;
 	public static String		Calendar_Config_DateColumn_WeekNumber;
 	public static String		Calendar_Config_DateColumn_Year;
+	public static String		Calendar_Config_DayHeaderDateFormat_Automatic;
+	public static String		Calendar_Config_DayHeaderDateFormat_Day;
+	public static String		Calendar_Config_DayHeaderDateFormat_DayMonth;
+	public static String		Calendar_Config_DayHeaderDateFormat_DayMonthYear;
 
 	public static String		Calendar_View_Action_Back;
 	public static String		Calendar_View_Action_Back_Tooltip;
@@ -1592,6 +1596,7 @@ public class Messages extends NLS {
 	public static String		Search_View_Link_SetupExternalBrowser;
 
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowDayHeader;
+	public static String		Slideout_CalendarOptions_Checkbox_IsShowDayHeaderBold;
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowInfoColumn;
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowInfoColumn_Tooltip;
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowSummaryColumn;

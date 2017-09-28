@@ -112,22 +112,19 @@ public class TimeTools {
 	
 	public static final DateTimeFormatter	Formatter_FileName		= DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");		//$NON-NLS-1$
 	
+	public static final DateTimeFormatter	Formatter_Day			= DateTimeFormatter.ofPattern("dd");
+	public static final DateTimeFormatter	Formatter_DayMonth		= DateTimeFormatter.ofPattern("d MMM");
+	public static final DateTimeFormatter	Formatter_DayMonthYear	= DateTimeFormatter.ofPattern("d MMM uu");
 	public static final DateTimeFormatter	Formatter_Month			= DateTimeFormatter.ofPattern("MMM");						//$NON-NLS-1$
 	public static final DateTimeFormatter	Formatter_Week_Month	= DateTimeFormatter.ofPattern("dd MMM");					//$NON-NLS-1$
 	public static final DateTimeFormatter	Formatter_Weekday		= DateTimeFormatter.ofPattern("E");							//$NON-NLS-1$
 	public static final DateTimeFormatter	Formatter_Weekday_L		= DateTimeFormatter.ofPattern("EEEE");						//$NON-NLS-1$
 
-	public static final DateTimeFormatter	Formatter_Time_ISO		= new DateTimeFormatterBuilder()//
-			
-																			.appendValue(ChronoField.HOUR_OF_DAY, 2)
-																			.appendLiteral(':')
-																			
-																			.appendValue(ChronoField.MINUTE_OF_HOUR, 2)
-																			.appendLiteral(':')
-																			
-																			.appendValue(ChronoField.SECOND_OF_MINUTE, 2)
-																			.toFormatter();
+	
 // SET_FORMATTING_ON
+
+	public static final DateTimeFormatter			Formatter_Time_ISO;
+
 
 	private final static IPreferenceStore			_prefStoreCommon		= CommonActivator.getPrefStore();
 
@@ -143,6 +140,17 @@ public class TimeTools {
 	 */
 	private static LocalDate						_dateToGetNumOfWeeks	= LocalDate.of(2000, 5, 5);
 	static {
+
+		Formatter_Time_ISO = new DateTimeFormatterBuilder()//
+
+				.appendValue(ChronoField.HOUR_OF_DAY, 2)
+				.appendLiteral(':')
+
+				.appendValue(ChronoField.MINUTE_OF_HOUR, 2)
+				.appendLiteral(':')
+
+				.appendValue(ChronoField.SECOND_OF_MINUTE, 2)
+				.toFormatter();
 
 		DURATION_FORMATTER = new PeriodFormatterBuilder()
 				//

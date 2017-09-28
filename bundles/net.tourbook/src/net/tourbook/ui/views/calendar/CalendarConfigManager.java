@@ -18,6 +18,7 @@ package net.tourbook.ui.views.calendar;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
@@ -29,6 +30,7 @@ import net.tourbook.common.util.Util;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
 import org.osgi.framework.Bundle;
@@ -79,6 +81,7 @@ public class CalendarConfigManager {
 	private static final String			ATTR_WEEK_HEIGHT				= "weekHeight";								//$NON-NLS-1$
 	private static final String			ATTR_IS_SHOW_DATE_COLUMN		= "isShowDateColumn";						//$NON-NLS-1$
 	private static final String			ATTR_IS_SHOW_DAY_HEADER			= "isShowDayHeader";						//$NON-NLS-1$
+	private static final String			ATTR_IS_SHOW_DAY_HEADER_BOLD	= "isShowDayHeaderBold";					//$NON-NLS-1$
 	private static final String			ATTR_IS_SHOW_SUMMARY_COLUMN		= "isShowSummaryColumn";					//$NON-NLS-1$
 	private static final String			ATTR_DATE_COLUMN_CONTENT		= "dateColumnContent";						//$NON-NLS-1$
 	private static final String			ATTR_DATE_COLUMN_WIDTH			= "dateColumnWidth";						//$NON-NLS-1$
@@ -90,7 +93,7 @@ public class CalendarConfigManager {
 	static final DateColumnContent		DEFAULT_DATE_COLUMN_CONTENT		= DateColumnContent.WEEK_NUMBER;
 	static final int					DEFAULT_SUMMARY_COLUMN_WIDTH	= 10;
 	static final int					DEFAULT_WEEK_HEIGHT				= 70;
-	static final DayHeaderDateFormat	DEFAULT_DAY_HEADER_FORMAT		= DayHeaderDateFormat.WEEK_NUMBER;
+	static final DayHeaderDateFormat	DEFAULT_DAY_HEADER_DATE_FORMAT	= DayHeaderDateFormat.AUTOMATIC;
 	static final DayHeaderLayout		DEFAULT_DAY_HEADER_LAYOUT		= DayHeaderLayout.WEEK_NUMBER;
 	//
 	static final int					WEEK_HEIGHT_MIN					= 1;
@@ -109,10 +112,22 @@ public class CalendarConfigManager {
 	private static final DayHeaderDateFormatData[]	_allDateHeaderDateFormatData	= new DayHeaderDateFormatData[] {
 
 			new DayHeaderDateFormatData(
-					DayHeaderDateFormat.WEEK_NUMBER,
-					Messages.Calendar_Config_DateColumn_WeekNumber),
-			new DayHeaderDateFormatData(DayHeaderDateFormat.MONTH, Messages.Calendar_Config_DateColumn_Month),
-			new DayHeaderDateFormatData(DayHeaderDateFormat.YEAR, Messages.Calendar_Config_DateColumn_Year),
+					DayHeaderDateFormat.AUTOMATIC,
+					Messages.Calendar_Config_DayHeaderDateFormat_Automatic),
+
+			new DayHeaderDateFormatData(
+					DayHeaderDateFormat.DAY,
+					NLS.bind(
+							Messages.Calendar_Config_DayHeaderDateFormat_Day,
+							TimeTools.Formatter_Day.format(LocalDate.now()))),
+
+			new DayHeaderDateFormatData(
+					DayHeaderDateFormat.DAY_MONTH,
+					TimeTools.Formatter_DayMonth.format(LocalDate.now())),
+
+			new DayHeaderDateFormatData(
+					DayHeaderDateFormat.DAY_MONTH_YEAR,
+					TimeTools.Formatter_DayMonthYear.format(LocalDate.now())),
 	};																													//
 	//
 	private static final DayHeaderLayoutData[]		_allDayHeaderLayoutData			= new DayHeaderLayoutData[] {
@@ -268,6 +283,7 @@ public class CalendarConfigManager {
 
 			// day
 			xmlConfig.putBoolean(ATTR_IS_SHOW_DAY_HEADER, config.isShowDayHeader);
+			xmlConfig.putBoolean(ATTR_IS_SHOW_DAY_HEADER_BOLD, config.isShowDayHeaderBold);
 			Util.setXmlEnum(xmlConfig, ATTR_DAY_HEADER_DATE_FORMAT, config.dayHeaderFormat);
 			Util.setXmlEnum(xmlConfig, ATTR_DAY_HEADER_LAYOUT, config.dayHeaderLayout);
 
@@ -426,6 +442,7 @@ public class CalendarConfigManager {
 		
 		// day
 		config.isShowDayHeader		= Util.getXmlBoolean(xmlConfig, ATTR_IS_SHOW_DAY_HEADER,		true);
+		config.isShowDayHeaderBold	= Util.getXmlBoolean(xmlConfig, ATTR_IS_SHOW_DAY_HEADER_BOLD,	false);
 		
 		// date column
 		config.isShowDateColumn		= Util.getXmlBoolean(xmlConfig, ATTR_IS_SHOW_DATE_COLUMN,		true);
@@ -448,7 +465,7 @@ public class CalendarConfigManager {
 		config.dayHeaderFormat = (DayHeaderDateFormat) Util.getXmlEnum(
 				xmlConfig,
 				ATTR_DAY_HEADER_DATE_FORMAT,
-				DayHeaderDateFormat.WEEK_NUMBER);
+				DEFAULT_DAY_HEADER_DATE_FORMAT);
 
 		config.dayHeaderLayout = (DayHeaderLayout) Util.getXmlEnum(
 				xmlConfig,

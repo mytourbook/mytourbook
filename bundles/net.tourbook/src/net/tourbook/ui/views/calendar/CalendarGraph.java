@@ -16,6 +16,8 @@
 package net.tourbook.ui.views.calendar;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +26,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorCacheSWT;
 import net.tourbook.common.color.ColorUtil;
 import net.tourbook.common.preferences.ICommonPreferences;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
@@ -68,7 +71,6 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
 import org.joda.time.Days;
 
 public class CalendarGraph extends Canvas implements ITourProviderAll {
@@ -164,6 +166,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 	private FontMetrics							_fontMetrics;
 	private Font								_boldFont;
+	private int									_boldFontHeight;
 
 	private Image								_image;
 	private Image								_highlight;
@@ -216,13 +219,13 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		private long dayId;
 
-		Day(final DateTime date) {
+		Day(final LocalDate date) {
 
-			final Days days = Days.daysBetween(new DateTime(0), date);
-			this.dayId = days.getDays();
+			this.dayId = ChronoUnit.DAYS.between(LocalDate.now(), date);
 		}
 
 		Day(final long dayId) {
+
 			this.dayId = dayId;
 		}
 	}
@@ -252,16 +255,22 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		_parent = parent;
 		_calendarView = calendarView;
 
+		_boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
+
 		final GC gc = new GC(parent);
 		{
 			gc.setFont(JFaceResources.getDialogFont());
+
 			_fontMetrics = gc.getFontMetrics();
 			_fontHeight = _fontMetrics.getHeight();
 			_fontAverageCharWidth = _fontMetrics.getAverageCharWidth();
+
+			gc.setFont(_boldFont);
+
+			final FontMetrics fontMetrics = gc.getFontMetrics();
+			_boldFontHeight = fontMetrics.getHeight();
 		}
 		gc.dispose();
-
-		_boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 
 		_dataProvider = CalendarTourDataProvider.getInstance();
 		_dataProvider.setCalendarGraph(this);
@@ -539,8 +548,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	 */
 	private void drawCalendar(GC gc) {
 
-		final int dayLabelXOffset = 1;
-
 		final Rectangle canvas = getClientArea();
 		final int canvasWidth = canvas.width;
 		final int canvasHeight = canvas.height;
@@ -580,7 +587,11 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 
 		// get the first day of the viewport
-		DateTime currentDate = new DateTime(_firstDay);
+		LocalDate currentDate = LocalDate.of(
+				_firstDay.getYear(),
+				_firstDay.getMonthOfYear(),
+				_firstDay.getDayOfMonth());
+
 		_image = new Image(getDisplay(), canvasWidth, canvasHeight);
 
 		// one col left and right of the week + 7 week days
@@ -596,10 +607,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 				- 1;
 
 		// keep calendar viewport dates
-		_calendarFirstDay = LocalDate.of(
-				currentDate.getYear(),
-				currentDate.getMonthOfYear(),
-				currentDate.getDayOfMonth());
+		_calendarFirstDay = currentDate;
 		_calendarLastDay = _calendarFirstDay.plusWeeks(numRows).minusDays(1);
 
 		_calendarView.updateUI_Title(_calendarFirstDay, _calendarLastDay);
@@ -620,7 +628,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		gc.setForeground(_black);
 		gc.fillRectangle(canvas);
 
-		float dayWidth = (float) canvasWidth / (float) numDayColumns;
+		float cellWidth = (float) canvasWidth / (float) numDayColumns;
 
 		int dateColumnWidth = 0;
 		if (config.isShowDateColumn) {
@@ -632,38 +640,19 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			summaryColumnWidth = config.summaryColumnWidth * _fontAverageCharWidth;
 		}
 
-		dayWidth = (float) (canvasWidth - dateColumnWidth - summaryColumnWidth) / numDayColumns;
+		cellWidth = (float) (canvasWidth - dateColumnWidth - summaryColumnWidth) / numDayColumns;
 
-		_calendarAllDaysRectangle = new Rectangle(dateColumnWidth, 0, (int) (7 * dayWidth), canvasHeight);
+		_calendarAllDaysRectangle = new Rectangle(dateColumnWidth, 0, (int) (7 * cellWidth), canvasHeight);
 
-		final long todayDayId = (new Day(new DateTime())).dayId;
+		final long todayDayId = (new Day(LocalDate.now())).dayId;
 
-		// a rough guess about the max size of the label
-		gc.setFont(_boldFont);
-		final Point[] headerSizes = {
-				gc.stringExtent("22. May 99"), //$NON-NLS-1$
-				gc.stringExtent("22. May"), //$NON-NLS-1$
-				gc.stringExtent("22") }; //$NON-NLS-1$
-		gc.setFont(normalFont);
+		final int dayLabelXOffset = 2;
+		final int dayHeaderHeight = config.isShowDayHeader ? _boldFontHeight : 0;
 
-		final String[] headerFormats = {
-				"dd. MMM yy", //$NON-NLS-1$
-				"dd. MMM", //$NON-NLS-1$
-				"dd" }; //$NON-NLS-1$
-		String headerFormat = UI.EMPTY_STRING;
+		final DateTimeFormatter headerFormatter = getUI_HeaderFormatter(config, gc, cellWidth, dayLabelXOffset);
 
-		// Find a format for the day header which fits into the rectangle available;
-		int headerSizeIndex = 0;
-		while (headerSizeIndex < headerSizes.length && headerSizes[headerSizeIndex].x > (dayWidth - dayLabelXOffset)) {
-			headerSizeIndex++;
-		}
-		headerSizeIndex = Math.min(headerSizeIndex, headerSizes.length - 1); // if the cell is smaller than the shortest format (no index 'g' was found) we use the shortest format and relay on clipping
-		headerFormat = headerFormats[headerSizeIndex];
-
-		final int dayLabelWidth = headerSizes[headerSizeIndex].x;
-		int dayLabelHeight = headerSizes[headerSizeIndex].y;
-
-		long dayId = (new Day(currentDate)).dayId; // we use simple ids
+		// we use simple ids
+		long dayId = new Day(currentDate).dayId;
 
 		// Weeks
 		for (int rowIndex = 0; rowIndex < numRows; rowIndex++) {
@@ -672,10 +661,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 			// Days per week
 			Rectangle dayRec = null;
-			final LocalDate week1stDay = LocalDate.of(
-					currentDate.getYear(),
-					currentDate.getMonthOfYear(),
-					currentDate.getDayOfMonth()); // save the first day of this week as a pointer to this week
+
+			// save the first day of this week as a pointer to this week
+			final LocalDate week1stDay = currentDate;
 
 			if (dateColumnWidth > 0) {
 
@@ -685,19 +673,20 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 			for (int dayIndex = 0; dayIndex < 7; dayIndex++) {
 
-				final int posX = dateColumnWidth + (int) (dayIndex * dayWidth);
-				final int posXNext = dateColumnWidth + (int) ((dayIndex + 1) * dayWidth);
+				final int posX = dateColumnWidth + (int) (dayIndex * cellWidth);
+				final int posXNext = dateColumnWidth + (int) ((dayIndex + 1) * cellWidth);
 
 				dayRec = new Rectangle(posX, rowTop, (posXNext - posX), _rowHeight);
 				final Day day = new Day(dayId);
 				_dayFocus.add(new ObjectLocation(dayRec, dayId, day));
 				dayId = day.dayId + 1;
-				final int weekDay = currentDate.getDayOfWeek();
+
+				final int weekDay = currentDate.getDayOfWeek().getValue();
 
 				gc.setBackground(_white);
 
 				// Day background rectangle
-				if ((currentDate.getMonthOfYear() % 2) == 1) {
+				if ((currentDate.getMonthValue() % 2) == 1) {
 
 					gc.setBackground(alternate);
 					gc.fillRectangle(dayRec.x, dayRec.y + 1, dayRec.width, dayRec.height - 1);
@@ -705,59 +694,69 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 				data = _dataProvider.getCalendarDayData(
 						currentDate.getYear(),
-						currentDate.getMonthOfYear(),
+						currentDate.getMonthValue(),
 						currentDate.getDayOfMonth());
 
-				// Day header box
+				// day header
 				if (config.isShowDayHeader) {
 
 					Color headerColor;
 					if (day.dayId == todayDayId) {
+
 						headerColor = (_blue);
-					} else if (weekDay == DateTimeConstants.SATURDAY || weekDay == DateTimeConstants.SUNDAY) {
+
+					} else if (weekDay == 6 || weekDay == 7) {
+
+						// ISO: 6 == saturday, 7 == sunday
 						headerColor = (_red);
+
 					} else {
 						headerColor = (_darkGray);
 					}
 
 					// gradient background
-					gc.setForeground(_gray);
-					gc.fillGradientRectangle(posX, rowTop, dayRec.width + 1, dayLabelHeight, true); // no clue why I've to add 1 to the width, looks like a bug on Linux and does not hurt as we overwrite with the vertial line at the end anyway
+//					gc.setForeground(_gray);
+//					gc.fillGradientRectangle(posX, rowTop, dayRec.width + 1, dayHeaderHeight, true); // no clue why I've to add 1 to the width, looks like a bug on Linux and does not hurt as we overwrite with the vertial line at the end anyway
+
+					// get label width
+					if (config.isShowDayHeaderBold) {
+						gc.setFont(_boldFont);
+					}
+
+					final String dayLabel = headerFormatter.format(currentDate);
+					final int dayLabelWidth = gc.textExtent(dayLabel).x;
+					final int labelWidthWithOffset = dayLabelWidth + dayLabelXOffset;
 
 					// day header label
-					gc.setFont(_boldFont);
 					gc.setForeground(headerColor);
-					gc.setClipping(posX, rowTop, dayRec.width, dayLabelHeight); // this clipping should only kick in if shortest label format is still longer than the cell width
+					gc.setClipping(posX, rowTop, dayRec.width, dayHeaderHeight); // this clipping should only kick in if shortest label format is still longer than the cell width
 
 					gc.drawText(
-							currentDate.toString(headerFormat),
-							posXNext - dayLabelWidth - dayLabelXOffset,
+							dayLabel,
+							posXNext - labelWidthWithOffset,
 							rowTop,
 							true);
 
-					gc.setFont(normalFont);
 					gc.setClipping(_nullRec);
-
-				} else {
-
-					dayLabelHeight = 0;
 				}
+
+				gc.setFont(normalFont);
 
 				drawDayTours(
 						gc,
 						data,
 						new Rectangle(
 								dayRec.x,
-								dayRec.y + dayLabelHeight,
+								dayRec.y + dayHeaderHeight,
 								dayRec.width,
-								dayRec.height - dayLabelHeight));
+								dayRec.height - dayHeaderHeight));
 
 				currentDate = currentDate.plusDays(1);
 			}
 
 			if (summaryColumnWidth > 0) {
 
-				final int X1 = dateColumnWidth + (int) (7 * dayWidth);
+				final int X1 = dateColumnWidth + (int) (7 * cellWidth);
 				final int X2 = X1 + summaryColumnWidth;
 
 				final Rectangle weekRec = new Rectangle(X1, rowTop, (X2 - X1), _rowHeight);
@@ -778,9 +777,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		gc.setForeground(_display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 		for (int i = 0; i <= 7; i++) {
 			gc.drawLine(
-					dateColumnWidth + (int) (i * dayWidth),
+					dateColumnWidth + (int) (i * cellWidth),
 					0,
-					dateColumnWidth + (int) (i * dayWidth),
+					dateColumnWidth + (int) (i * cellWidth),
 					canvasHeight);
 		}
 
@@ -1025,7 +1024,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	}
 
 	private void drawWeek_Date(	final GC gc,
-								final DateTime dt,
+								final LocalDate currentDate,
 								final Rectangle rec,
 								final DateColumnContent dateColumnContent) {
 
@@ -1044,16 +1043,16 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 			// draw month
 
-			if (dt.minusDays(1).getMonthOfYear() != dt.plusDays(6).getMonthOfYear()) {
+			if (currentDate.minusDays(1).getMonthValue() != currentDate.plusDays(6).getMonthValue()) {
 
 				// a new month started on this week
 
 				// prevent overlapping
 				if (posY > _lastWeekDateYPos + _fontHeight - 2) {
 
-					final String monthText = dt.plusDays(6).toString("MMM"); //$NON-NLS-1$
+					final String monthLabel = TimeTools.Formatter_Month.format(currentDate.plusDays(6));
 
-					gc.drawText(monthText, posX, posY);
+					gc.drawText(monthLabel, posX, posY);
 
 					_lastWeekDateYPos = posY;
 				}
@@ -1063,7 +1062,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		case YEAR:
 
-			final int year = dt.getYear();
+			final int year = currentDate.getYear();
 
 			// prevent to repeat the year
 			if (year != _lastWeekDateYear) {
@@ -1088,7 +1087,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			// prevent overlapping
 			if (posY > _lastWeekDateYPos + _fontHeight - 2) {
 
-				gc.drawText(Integer.toString(dt.getWeekOfWeekyear()), posX, posY);
+				final int week = currentDate.get(TimeTools.calendarWeek.weekOfWeekBasedYear());
+
+				gc.drawText(Integer.toString(week), posX, posY);
 
 				_lastWeekDateYPos = posY;
 			}
@@ -1253,6 +1254,71 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 	public boolean getTourInfoUseTextColor() {
 		return _useTextColorForTourInfoText;
+	}
+
+	private DateTimeFormatter getUI_HeaderFormatter(final CalendarConfig config,
+													final GC gc,
+													final float cellWidth,
+													final int dayLabelXOffset) {
+
+		DateTimeFormatter headerFormatter;
+
+		switch (config.dayHeaderFormat) {
+		case DAY:
+
+			headerFormatter = TimeTools.Formatter_Day;
+			break;
+
+		case DAY_MONTH:
+
+			headerFormatter = TimeTools.Formatter_DayMonth;
+			break;
+
+		case DAY_MONTH_YEAR:
+
+			headerFormatter = TimeTools.Formatter_DayMonthYear;
+			break;
+
+		case AUTOMATIC:
+		default:
+
+			final DateTimeFormatter[] allHeaderFormatter = {
+
+					TimeTools.Formatter_DayMonthYear,
+					TimeTools.Formatter_DayMonth,
+					TimeTools.Formatter_Day,
+			};
+
+			// a rough guess about the max size of the label
+			gc.setFont(_boldFont);
+			final Point[] headerDateSizes = {
+
+					gc.stringExtent("22. MMM 99"), //$NON-NLS-1$
+					gc.stringExtent("22. MMM"), //$NON-NLS-1$
+					gc.stringExtent("22"), //$NON-NLS-1$
+
+//					gc.stringExtent(TimeTools.Formatter_DayMonthYear.format(currentDate)),
+//					gc.stringExtent(TimeTools.Formatter_DayMonth.format(currentDate)),
+//					gc.stringExtent(TimeTools.Formatter_Day.format(currentDate)),
+			};
+
+			// Find a format for the day header which fits into the rectangle available;
+			int headerSizeIndex = 0;
+			while (headerSizeIndex < headerDateSizes.length //
+					&& headerDateSizes[headerSizeIndex].x > (cellWidth - dayLabelXOffset)) {
+				headerSizeIndex++;
+			}
+
+			// if the cell is smaller than the shortest format (no index 'g' was found)
+			// we use the shortest format and relay on clipping
+			headerSizeIndex = Math.min(headerSizeIndex, headerDateSizes.length - 1);
+
+			headerFormatter = allHeaderFormatter[headerSizeIndex];
+
+			break;
+		}
+
+		return headerFormatter;
 	}
 
 	public int getWeekSummaryFormatter(final int line) {
@@ -1842,19 +1908,21 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		redraw();
 	}
 
-	private void updateUI_YearMonth(final DateTime currentDate) {
-		/**
-		 * Update month/year dropdown box.
-		 * <p>
-		 * Look at the 1st day of the week after the first day displayed because if we go to a
-		 * specific month we ensure that the first day of the month is displayed in the first line,
-		 * meaning the first day in calendar normally contains a day of the *previous* month
-		 */
+	/**
+	 * Update month/year dropdown box.
+	 * <p>
+	 * Look at the 1st day of the week after the first day displayed because if we go to a specific
+	 * month we ensure that the first day of the month is displayed in the first line, meaning the
+	 * first day in calendar normally contains a day of the *previous* month
+	 */
+	private void updateUI_YearMonth(final LocalDate currentDate) {
+
 		if (_calendarYearMonthContributor.getSelectedYear() != currentDate.plusDays(7).getYear()) {
 			_calendarYearMonthContributor.selectYear(currentDate.getYear());
 		}
-		if (_calendarYearMonthContributor.getSelectedMonth() != currentDate.plusDays(7).getMonthOfYear()) {
-			_calendarYearMonthContributor.selectMonth(currentDate.getMonthOfYear());
+
+		if (_calendarYearMonthContributor.getSelectedMonth() != currentDate.plusDays(7).getMonthValue()) {
+			_calendarYearMonthContributor.selectMonth(currentDate.getMonthValue());
 		}
 	}
 

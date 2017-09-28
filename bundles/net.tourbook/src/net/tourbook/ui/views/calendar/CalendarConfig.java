@@ -32,7 +32,8 @@ public class CalendarConfig {
 
 	// day
 	public boolean				isShowDayHeader		= true;
-	public DayHeaderDateFormat	dayHeaderFormat		= CalendarConfigManager.DEFAULT_DAY_HEADER_FORMAT;
+	public boolean				isShowDayHeaderBold	= false;
+	public DayHeaderDateFormat	dayHeaderFormat		= CalendarConfigManager.DEFAULT_DAY_HEADER_DATE_FORMAT;
 	public DayHeaderLayout		dayHeaderLayout		= CalendarConfigManager.DEFAULT_DAY_HEADER_LAYOUT;
 
 	// date column

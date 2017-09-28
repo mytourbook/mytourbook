@@ -246,15 +246,15 @@ ${imp:import(javax.annotation.PostConstruct)}
 public void preDestroy() {
 }
 ${imp:import(javax.annotation.PreDestroy)}
-</template><template autoinsert="false" context="java-members" deleted="false" description="private method" enabled="true" id="org.eclipse.jdt.ui.templates.private_method" name="private_method">private ${return_type} ${name}(${}) {
+</template><template autoinsert="false" context="java-members" deleted="false" description="private method" enabled="true" id="org.eclipse.jdt.ui.templates.private_method" name="private_method">private ${void} ${name}(${}) {
 	${cursor}
-}</template><template autoinsert="false" context="java-members" deleted="false" description="private static method" enabled="true" id="org.eclipse.jdt.ui.templates.private_static_method" name="private_static_method">private static ${return_type} ${name}(${}) {
+}</template><template autoinsert="false" context="java-members" deleted="false" description="private static method" enabled="true" id="org.eclipse.jdt.ui.templates.private_static_method" name="private_static_method">private static ${void} ${name}(${}) {
 	${cursor}
-}</template><template autoinsert="false" context="java-members" deleted="false" description="protected method" enabled="true" id="org.eclipse.jdt.ui.templates.protected_method" name="protected_method">protected ${return_type} ${name}(${}) {
+}</template><template autoinsert="false" context="java-members" deleted="false" description="protected method" enabled="true" id="org.eclipse.jdt.ui.templates.protected_method" name="protected_method">protected ${void} ${name}(${}) {
 	${cursor}
-}</template><template autoinsert="false" context="java-members" deleted="false" description="public method" enabled="true" id="org.eclipse.jdt.ui.templates.public_method" name="public_method">public ${return_type} ${name}(${}) {
+}</template><template autoinsert="false" context="java-members" deleted="false" description="public method" enabled="true" id="org.eclipse.jdt.ui.templates.public_method" name="public_method">public ${void} ${name}(${}) {
 	${cursor}
-}</template><template autoinsert="false" context="java-members" deleted="false" description="public static method" enabled="true" id="org.eclipse.jdt.ui.templates.public_static_method" name="public_static_method">public static ${return_type} ${name}(${}) {
+}</template><template autoinsert="false" context="java-members" deleted="false" description="public static method" enabled="true" id="org.eclipse.jdt.ui.templates.public_static_method" name="public_static_method">public static ${void} ${name}(${}) {
 	${cursor}
 }</template><template autoinsert="false" context="java" deleted="false" description="runnable" enabled="true" id="org.eclipse.jdt.ui.templates.runnable" name="runnable">new Runnable() {
 	public void run() {
@@ -319,7 +319,11 @@ ${imp:import(org.eclipse.swt.SWT, org.eclipse.swt.widgets.Display)}${cursor}</te
 </template><template autoinsert="false" context="java-statements" deleted="false" description="synchronized block" enabled="true" id="org.eclipse.jdt.ui.templates.synchronized" name="synchronized">synchronized (${mutex:var}) {
 	${line_selection}
 }</template><template autoinsert="true" context="java" deleted="false" description="System Color" enabled="true" name="syscol">Display.getCurrent().getSystemColor(SWT.COLOR_${cursor})</template><template autoinsert="true" context="java-statements" deleted="false" description="print to standard error" enabled="true" id="org.eclipse.jdt.ui.templates.syserr" name="syserr">System.err.println(${word_selection}${});${cursor}</template><template autoinsert="true" context="java-statements" deleted="false" description="system out with system time" enabled="true" name="sysn">System.out.println((System.currentTimeMillis() + " [" + getClass().getSimpleName() + "]") + (" \t" + ${cursor}));&#13;
-// ${todo} remove SYSTEM.OUT.PRINTLN</template><template autoinsert="true" context="java-statements" deleted="false" description="system out with nano system time" enabled="true" id="org.eclipse.jdt.ui.templates.sysout" name="sysout">System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\t${cursor}"));&#13;
+// ${todo} remove SYSTEM.OUT.PRINTLN</template><template autoinsert="true" context="java-statements" deleted="false" description="system out with nano system time" enabled="true" id="org.eclipse.jdt.ui.templates.sysout" name="sysout">System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") &#13;
+	+ ("\t:" + ${cursor})&#13;
+	+ ("\t:" + )&#13;
+	+ ("\t:" + )&#13;
+);&#13;
 // ${todo} remove SYSTEM.OUT.PRINTLN&#13;
 </template><template autoinsert="true" context="java-statements" deleted="false" description="print current method to standard out" enabled="true" id="org.eclipse.jdt.ui.templates.systrace" name="systrace">System.out.println("${enclosing_type}.${enclosing_method}()");</template><template autoinsert="false" context="swt-statements" deleted="false" description="new TabFolder" enabled="true" id="org.eclipse.jdt.ui.text.codetemplates.swt.tabfolder" name="TabFolder">${type:newType(org.eclipse.swt.widgets.TabFolder)} ${folder:newName(org.eclipse.swt.widgets.TabFolder)}= new ${type}(${parent:var(org.eclipse.swt.widgets.Composite)}, ${style:link(SWT.TOP, SWT.BOTTOM)});
 ${folder}.setLayoutData(new ${gridDataType:newType(org.eclipse.swt.layout.GridData)}(SWT.${horizontal:link(FILL, BEGINNING, CENTER, END)}, SWT.${vertical:link(FILL, TOP, CENTER, BOTTOM)}, ${hex:link(true, false)}, ${vex:link(true, false)}));

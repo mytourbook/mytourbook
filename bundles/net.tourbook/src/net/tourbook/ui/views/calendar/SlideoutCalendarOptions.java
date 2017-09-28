@@ -110,6 +110,7 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 
 	private Button					_chkIsShowDateColumn;
 	private Button					_chkIsShowDayHeader;
+	private Button					_chkIsShowDayHeaderBold;
 	private Button					_chkIsShowSummaryColumn;
 
 	private Combo					_comboConfigName;
@@ -422,7 +423,24 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
+		GridLayoutFactory
+				.fillDefaults()//
+				.numColumns(2)
+				.spacing(20, LayoutConstants.getSpacing().y)
+				.applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+		{
+			createUI_412_1st_Column(container);
+			createUI_412_2nd_Column(container);
+		}
+	}
+
+	private void createUI_412_1st_Column(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+//		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
 			{
 				/*
@@ -463,6 +481,31 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 				_comboDayHeaderLayout.setVisibleItemCount(20);
 				_comboDayHeaderLayout.addSelectionListener(_defaultSelectionListener);
 				_comboDayHeaderLayout.addFocusListener(_keepOpenListener);
+			}
+		}
+	}
+
+	private void createUI_412_2nd_Column(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		{
+			{
+				/*
+				 * Bold font
+				 */
+
+				// checkbox
+				_chkIsShowDayHeaderBold = new Button(container, SWT.CHECK);
+				_chkIsShowDayHeaderBold.setText(Messages.Slideout_CalendarOptions_Checkbox_IsShowDayHeaderBold);
+				_chkIsShowDayHeaderBold.addSelectionListener(_defaultSelectionListener);
+				GridDataFactory
+						.fillDefaults()//
+						.align(SWT.FILL, SWT.BEGINNING)
+						//					.indent(_subItemIndent, 0)
+						.span(2, 1)
+						.applyTo(_chkIsShowDayHeaderBold);
 			}
 		}
 	}
@@ -721,10 +764,11 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 		_spinnerSummaryColumnWidth.setEnabled(isShowSummaryColumn);
 
 		// day
-		_lblDayHeaderFormat.setEnabled(isShowDayHeader);
-		_lblDayHeaderLayout.setEnabled(isShowDayHeader);
+		_chkIsShowDayHeaderBold.setEnabled(isShowDayHeader);
 		_comboDayHeaderDateFormat.setEnabled(isShowDayHeader);
 		_comboDayHeaderLayout.setEnabled(isShowDayHeader);
+		_lblDayHeaderFormat.setEnabled(isShowDayHeader);
+		_lblDayHeaderLayout.setEnabled(isShowDayHeader);
 	}
 
 	private void fillUI() {
@@ -901,7 +945,7 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 		final int selectedIndex = _comboDayHeaderDateFormat.getSelectionIndex();
 
 		if (selectedIndex < 0) {
-			return DayHeaderDateFormat.WEEK_NUMBER;
+			return DayHeaderDateFormat.AUTOMATIC;
 		}
 
 		final DayHeaderDateFormatData selectedData = CalendarConfigManager
@@ -1063,6 +1107,7 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 
 			// day header
 			_chkIsShowDayHeader.setSelection(config.isShowDayHeader);
+			_chkIsShowDayHeaderBold.setSelection(config.isShowDayHeaderBold);
 			_comboDayHeaderDateFormat.select(getDayHeaderDateFormatIndex(config.dayHeaderFormat));
 			_comboDayHeaderLayout.select(getDayHeaderLayoutIndex(config.dayHeaderLayout));
 
@@ -1094,6 +1139,7 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 
 		// day header
 		config.isShowDayHeader = _chkIsShowDayHeader.getSelection();
+		config.isShowDayHeaderBold = _chkIsShowDayHeaderBold.getSelection();
 		config.dayHeaderFormat = getSelectedDayHeaderFormat();
 		config.dayHeaderLayout = getSelectedDayHeaderLayout();
 
