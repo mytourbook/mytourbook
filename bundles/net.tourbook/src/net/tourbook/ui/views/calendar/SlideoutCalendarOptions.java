@@ -25,7 +25,7 @@ import net.tourbook.common.font.IFontEditorListener;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.font.SimpleFontEditor;
 import net.tourbook.common.formatter.ValueFormat;
-import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.Util;
 import net.tourbook.ui.views.calendar.CalendarConfigManager.DateColumnData;
@@ -34,6 +34,7 @@ import net.tourbook.ui.views.calendar.CalendarConfigManager.DayHeaderLayoutData;
 import net.tourbook.ui.views.calendar.CalendarView.TourInfoFormatter;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.LayoutConstants;
@@ -53,7 +54,6 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
@@ -64,7 +64,7 @@ import org.eclipse.swt.widgets.Widget;
 /**
  * Properties slideout for the calendar view.
  */
-public class SlideoutCalendarOptions extends ToolbarSlideout {
+public class SlideoutCalendarOptions extends AdvancedSlideout {
 
 	private final IPreferenceStore	_prefStore	= TourbookPlugin.getPrefStore();
 
@@ -139,16 +139,20 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 	/**
 	 * @param ownerControl
 	 * @param toolBar
-	 * @param tourChart
+	 * @param state
+	 * @param calendarView
 	 * @param gridPrefPrefix
 	 */
-	public SlideoutCalendarOptions(	final Control ownerControl,
-									final ToolBar toolBar,
-									final CalendarView tourChart) {
+	public SlideoutCalendarOptions(	final ToolBar toolBar,
+									final IDialogSettings state,
+									final CalendarView calendarView) {
 
-		super(ownerControl, toolBar);
+		super(toolBar, state, null);
 
-		_calendarView = tourChart;
+		_calendarView = calendarView;
+
+		setTitleText(Messages.Slideout_CalendarOptions_Label_Title);
+//		setVerticalPosition(isAboveToolItem);
 	}
 
 	private void createActions() {
@@ -156,20 +160,17 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 	}
 
 	@Override
-	protected Composite createToolTipContentArea(final Composite parent) {
+	protected void createSlideoutContent(final Composite parent) {
 
 		initUI(parent);
 
 		createActions();
-
-		final Composite ui = createUI(parent);
+		createUI(parent);
 
 		fillUI();
 		fillUI_Config();
 
 		restoreState();
-
-		return ui;
 	}
 
 	private Composite createUI(final Composite parent) {
@@ -366,7 +367,7 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 
 					@Override
 					public void fontDialogOpened(final boolean isDialogOpened) {
-						setIsAnotherDialogOpened(isDialogOpened);
+						setIsKeepOpenInternally(isDialogOpened);
 					}
 
 					@Override
@@ -1052,12 +1053,12 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 				 * This will fix the problem that when the list of a combobox is displayed, then the
 				 * slideout will disappear :-(((
 				 */
-				setIsAnotherDialogOpened(true);
+				setIsKeepOpenInternally(true);
 			}
 
 			@Override
 			public void focusLost(final FocusEvent e) {
-				setIsAnotherDialogOpened(false);
+				setIsKeepOpenInternally(false);
 			}
 		};
 
@@ -1070,6 +1071,12 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 		fillWeekFormats(widget, _comboWeek_Value_3, _comboWeek_Format_3);
 		fillWeekFormats(widget, _comboWeek_Value_4, _comboWeek_Format_4);
 		fillWeekFormats(widget, _comboWeek_Value_5, _comboWeek_Format_5);
+	}
+
+	@Override
+	protected void onFocus() {
+
+		_comboConfigName.setFocus();
 	}
 
 	private void onModifyConfig() {

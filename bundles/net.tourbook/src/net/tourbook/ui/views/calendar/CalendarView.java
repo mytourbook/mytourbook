@@ -27,10 +27,8 @@ import net.tourbook.common.font.MTFont;
 import net.tourbook.common.formatter.ValueFormat;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
-import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.tooltip.OpenDialogManager;
-import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.SelectionProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -65,7 +63,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
@@ -186,19 +183,19 @@ public class CalendarView extends ViewPart implements ITourProvider {
 
 	private Label					_lblTitle;
 
-	private class ActionCalendarOptions extends ActionToolbarSlideout {
-
-		@Override
-		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
-
-			return new SlideoutCalendarOptions(_parent, toolbar, CalendarView.this);
-		}
-
-		@Override
-		protected void onBeforeOpenSlideout() {
-			closeOpenedDialogs(this);
-		}
-	}
+//	private class ActionCalendarOptions3 extends ActionToolbarSlideout {
+//
+//		@Override
+//		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+//
+//			return new SlideoutCalendarOptions(_parent, toolbar, CalendarView.this);
+//		}
+//
+//		@Override
+//		protected void onBeforeOpenSlideout() {
+//			closeOpenedDialogs(this);
+//		}
+//	}
 
 	abstract class TourInfoFormatter {
 
@@ -362,7 +359,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 
 	private void createActions() {
 
-		_actionCalendarOptions = new ActionCalendarOptions();
+		_actionCalendarOptions = new ActionCalendarOptions(this);
 		_actionTourInfo = new ActionTourInfo(this, _parent);
 
 		_actionBack = new Action() {

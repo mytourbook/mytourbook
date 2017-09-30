@@ -72,7 +72,7 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 	 */
 	private boolean				   _isShowAboveToolItem;
 
-	private String				   _draggerText			   = UI.EMPTY_STRING;
+	private String					_titleText				= UI.EMPTY_STRING;
 
 	/*
 	 * UI controls
@@ -264,14 +264,14 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 	private void createUI_12_ActionBar_Draggable(final Composite container) {
 
 		_labelDragSlideout = new Label(container, SWT.NONE);
+		_labelDragSlideout.setText(_titleText);
+		_labelDragSlideout.setToolTipText(Messages.Slideout_Dialog_Action_DragSlideout_ToolTip);
 		GridDataFactory
 				.fillDefaults()//
 				.grab(true, false)
 				.align(SWT.FILL, SWT.CENTER)
 //				.indent(3, 0)
 				.applyTo(_labelDragSlideout);
-		_labelDragSlideout.setText(_draggerText);
-		_labelDragSlideout.setToolTipText(Messages.Slideout_Dialog_Action_DragSlideout_ToolTip);
 		MTFont.setBannerFont(_labelDragSlideout);
 
 //		_labelDragSlideout.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
@@ -383,6 +383,7 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 	private void initUI(final Control ownerControl) {
 
 		final Display display = ownerControl.getDisplay();
+
 		_cursorResize = new Cursor(display, SWT.CURSOR_SIZEALL);
 		_cursorHand = new Cursor(display, SWT.CURSOR_HAND);
 
@@ -524,10 +525,6 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 		_actionPinSlideout.setChecked(isToolTipPinned);
 	}
 
-	protected void setDraggerText(final String draggerText) {
-		_draggerText = draggerText;
-	}
-
 	/**
 	 * Set the toolbar horizontal position
 	 * 
@@ -537,6 +534,10 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 	 */
 	public void setIsToolbarPosition(final boolean isToolbarPositionRight) {
 		_isToolbarPositionRight = isToolbarPositionRight;
+	}
+
+	protected void setTitleText(final String draggerText) {
+		_titleText = draggerText;
 	}
 
 	public void setVerticalPosition(final boolean isAboveToolItem) {

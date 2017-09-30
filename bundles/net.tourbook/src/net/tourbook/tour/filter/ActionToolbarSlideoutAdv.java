@@ -33,7 +33,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
@@ -44,7 +43,6 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
 
 	private String				_dialogId			= getClass().getCanonicalName();
 
-	private ToolBar				_toolBar;
 	private ToolItem			_actionToolItem;
 
 	private AdvancedSlideout	_toolbarSlideout;
@@ -77,7 +75,7 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
 		_imageDisabled = actionImageDisabled.createImage();
 	}
 
-	protected abstract AdvancedSlideout createSlideout(Control ownerControl, ToolItem toolItem);
+	protected abstract AdvancedSlideout createSlideout(ToolItem toolItem);
 
 	@Override
 	public void fill(final ToolBar toolbar, final int index) {
@@ -90,8 +88,6 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
 					onDispose();
 				}
 			});
-
-			_toolBar = toolbar;
 
 			if (isToggleAction) {
 				_actionToolItem = new ToolItem(toolbar, SWT.CHECK);
@@ -119,7 +115,7 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
 				}
 			});
 
-			_toolbarSlideout = createSlideout(toolbar, _actionToolItem);
+			_toolbarSlideout = createSlideout(_actionToolItem);
 
 			updateUI_Tooltip();
 		}
@@ -191,15 +187,7 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
 			return;
 		}
 
-		// get tooltip position
-		final Rectangle itemBounds = hoveredItem.getBounds();
-
-		final Point itemDisplayPosition = _toolBar.toDisplay(itemBounds.x, itemBounds.y);
-
-		itemBounds.x = itemDisplayPosition.x;
-		itemBounds.y = itemDisplayPosition.y;
-
-		openSlideout(itemBounds, true);
+		openSlideout(true);
 	}
 
 	/**
@@ -219,14 +207,7 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
 
 			// tooltip is hidden, open it
 
-			final Rectangle toolItemBounds = _actionToolItem.getBounds();
-
-			final Point itemDisplayPosition = _toolBar.toDisplay(toolItemBounds.x, toolItemBounds.y);
-
-			toolItemBounds.x = itemDisplayPosition.x;
-			toolItemBounds.y = itemDisplayPosition.y;
-
-			openSlideout(toolItemBounds, false);
+			openSlideout(false);
 
 		} else {
 
@@ -234,12 +215,20 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
 		}
 	}
 
-	private void openSlideout(final Rectangle slideoutParentBounds, final boolean isOpenDelayed) {
+	private void openSlideout(final boolean isOpenDelayed) {
+
+		// get tooltip position
+		final Rectangle itemBounds = _actionToolItem.getBounds();
+
+		// update position, relative -> absolute
+		final Point itemDisplayPosition = _actionToolItem.getParent().toDisplay(itemBounds.x, itemBounds.y);
+		itemBounds.x = itemDisplayPosition.x;
+		itemBounds.y = itemDisplayPosition.y;
 
 		// ensure other dialogs are closed
 		onBeforeOpenSlideout();
 
-		_toolbarSlideout.open(slideoutParentBounds, isOpenDelayed);
+		_toolbarSlideout.open(itemBounds, isOpenDelayed);
 	}
 
 	public void setEnabled(final boolean isEnabled) {

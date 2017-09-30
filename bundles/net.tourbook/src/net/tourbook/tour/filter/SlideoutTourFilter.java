@@ -200,8 +200,6 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
 	private SashLeftFixedForm					_sashForm;
 
-	private ToolBar								_ownerToolbar;
-
 	private class FilterProfileComparator extends ViewerComparator {
 
 		@Override
@@ -239,18 +237,16 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 	}
 
-	public SlideoutTourFilter(	final Control ownerControl,
-								final ToolItem toolItem,
+	public SlideoutTourFilter(	final ToolItem toolItem,
 								final IDialogSettings state) {
 
-		super(ownerControl, state, new int[] { 900, 200, 900, 200 });
+		super(toolItem.getParent(), state, new int[] { 900, 200, 900, 200 });
 
 		_state = state;
-		_ownerToolbar = (ToolBar) ownerControl;
 		_tourFilterItem = toolItem;
 
 		setShellFadeOutDelaySteps(30);
-		setDraggerText(Messages.Slideout_TourFilter_Label_Title);
+		setTitleText(Messages.Slideout_TourFilter_Label_Title);
 	}
 
 	void action_PropertyDelete(final TourFilterProperty filterProperty) {
@@ -827,7 +823,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 					final Composite fieldContainer = new Composite(_filterScrolled_Content, SWT.NONE);
 					GridDataFactory
 							.fillDefaults()//
-//							.grab(true, false)
+							//							.grab(true, false)
 							.applyTo(fieldContainer);
 					GridLayoutFactory.fillDefaults().numColumns(1).applyTo(fieldContainer);
 //					fieldDetailOuterContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
@@ -912,7 +908,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 		final Composite fieldContainer = filterProp.fieldDetailContainer;
 		GridDataFactory
 				.fillDefaults()//
-//				.grab(true, false)
+				//				.grab(true, false)
 				.align(SWT.FILL, SWT.CENTER)
 				.applyTo(fieldContainer);
 //		fieldContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
@@ -1578,7 +1574,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 
 		// get tooltip position
 		final Rectangle itemBounds = _tourFilterItem.getBounds();
-		final Point itemDisplayPosition = _ownerToolbar.toDisplay(itemBounds.x, itemBounds.y);
+		final Point itemDisplayPosition = _tourFilterItem.getParent().toDisplay(itemBounds.x, itemBounds.y);
 
 		final int slideoutWidth = slideoutSize.x;
 		final int slideoutHeight = slideoutSize.y;
@@ -1822,7 +1818,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 				&& _selectedProfile.name != null
 				&& _selectedProfile.name.equals(Messages.Tour_Filter_Default_ProfileName)) {
 
-			// default profile is selected, make is easy to rename it
+			// default profile is selected, make it easy to rename it
 
 			_txtProfileName.selectAll();
 			_txtProfileName.setFocus();
