@@ -15,6 +15,9 @@
  *******************************************************************************/
 package net.tourbook.ui.views.calendar;
 
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.swt.graphics.FontData;
+
 public class CalendarConfig {
 
 	/*
@@ -39,6 +42,7 @@ public class CalendarConfig {
 	// date column
 	public boolean				isShowDateColumn	= true;
 	public DateColumnContent	dateColumnContent	= CalendarConfigManager.DEFAULT_DATE_COLUMN_CONTENT;
+	public FontData				dateColumnFont		= JFaceResources.getFontRegistry().defaultFont().getFontData()[0];
 	public int					dateColumnWidth		= CalendarConfigManager.DEFAULT_DATE_COLUMN_WIDTH;
 
 	// summary column

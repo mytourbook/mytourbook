@@ -15,7 +15,9 @@
  *******************************************************************************/
 package net.tourbook.common.font;
 
-public interface IFontDialogListener {
+import org.eclipse.swt.graphics.FontData;
+
+public interface IFontEditorListener {
 
 	/**
 	 * @param isDialogOpened
@@ -23,5 +25,11 @@ public interface IFontDialogListener {
 	 *            <code>false</code>.
 	 */
 	void fontDialogOpened(boolean isDialogOpened);
+
+	/**
+	 * @param font
+	 *            Selected font
+	 */
+	void fontSelected(FontData font);
 
 }

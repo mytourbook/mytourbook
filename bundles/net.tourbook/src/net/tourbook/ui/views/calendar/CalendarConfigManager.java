@@ -30,7 +30,9 @@ import net.tourbook.common.util.Util;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
 import org.osgi.framework.Bundle;
@@ -84,6 +86,7 @@ public class CalendarConfigManager {
 	private static final String			ATTR_IS_SHOW_DAY_HEADER_BOLD	= "isShowDayHeaderBold";					//$NON-NLS-1$
 	private static final String			ATTR_IS_SHOW_SUMMARY_COLUMN		= "isShowSummaryColumn";					//$NON-NLS-1$
 	private static final String			ATTR_DATE_COLUMN_CONTENT		= "dateColumnContent";						//$NON-NLS-1$
+	private static final String			ATTR_DATE_COLUMN_FONT			= "dateColumnFont";							//$NON-NLS-1$
 	private static final String			ATTR_DATE_COLUMN_WIDTH			= "dateColumnWidth";						//$NON-NLS-1$
 	private static final String			ATTR_DAY_HEADER_DATE_FORMAT		= "dayHeaderDateFormat";					//$NON-NLS-1$
 	private static final String			ATTR_DAY_HEADER_LAYOUT			= "dayHeaderLayout";						//$NON-NLS-1$
@@ -290,11 +293,12 @@ public class CalendarConfigManager {
 			// date column
 			xmlConfig.putBoolean(ATTR_IS_SHOW_DATE_COLUMN, config.isShowDateColumn);
 			xmlConfig.putInteger(ATTR_DATE_COLUMN_WIDTH, config.dateColumnWidth);
+			Util.setXmlEnum(xmlConfig, ATTR_DATE_COLUMN_CONTENT, config.dateColumnContent);
+			Util.setXmlFont(xmlConfig, ATTR_DATE_COLUMN_FONT, config.dateColumnFont);
 
 			// summary column
 			xmlConfig.putBoolean(ATTR_IS_SHOW_SUMMARY_COLUMN, config.isShowSummaryColumn);
 			xmlConfig.putInteger(ATTR_SUMMARY_COLUMN_WIDTH, config.summaryColumnWidth);
-			Util.setXmlEnum(xmlConfig, ATTR_DATE_COLUMN_CONTENT, config.dateColumnContent);
 
 			// layout
 			xmlConfig.putInteger(ATTR_WEEK_HEIGHT, config.weekHeight);
@@ -461,6 +465,11 @@ public class CalendarConfigManager {
 				xmlConfig,
 				ATTR_DATE_COLUMN_CONTENT,
 				DateColumnContent.WEEK_NUMBER);
+
+		config.dateColumnFont = (FontData) Util.getXmlFont(
+				xmlConfig,
+				ATTR_DATE_COLUMN_FONT,
+				JFaceResources.getFontRegistry().defaultFont().getFontData()[0]);
 
 		config.dayHeaderFormat = (DayHeaderDateFormat) Util.getXmlEnum(
 				xmlConfig,

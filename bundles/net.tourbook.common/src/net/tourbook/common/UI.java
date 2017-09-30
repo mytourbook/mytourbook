@@ -729,6 +729,13 @@ public class UI {
 		return null;
 	}
 
+	public static void disposeResource(final org.eclipse.swt.graphics.Font font) {
+
+		if (font != null && font.isDisposed() == false) {
+			font.dispose();
+		}
+	}
+
 	public static void dumpSuperClasses(final Object o) {
 
 		Class<?> subclass = o.getClass();

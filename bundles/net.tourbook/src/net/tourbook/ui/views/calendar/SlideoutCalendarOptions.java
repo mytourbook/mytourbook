@@ -21,7 +21,9 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.font.IFontEditorListener;
 import net.tourbook.common.font.MTFont;
+import net.tourbook.common.font.SimpleFontEditor;
 import net.tourbook.common.formatter.ValueFormat;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.ColumnManager;
@@ -47,6 +49,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -119,6 +122,7 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 	private Combo					_comboDayHeaderLayout;
 
 	private Label					_lblDateColumnContent;
+	private Label					_lblDateColumnFont;
 	private Label					_lblDateColumnWidth;
 	private Label					_lblDayHeaderFormat;
 	private Label					_lblDayHeaderLayout;
@@ -129,6 +133,8 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 	private Spinner					_spinnerWeekHeight;
 
 	private Text					_textConfigName;
+
+	private SimpleFontEditor		_fontEditorDateColumn;
 
 	/**
 	 * @param ownerControl
@@ -259,30 +265,34 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 		GridLayoutFactory
 				.fillDefaults()//
 				.numColumns(2)
-				.spacing(20, LayoutConstants.getSpacing().y)
+				//				.spacing(20, LayoutConstants.getSpacing().y)
 				.applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 		{
-			createUI_210_InfoColumn(container);
+			createUI_210_DateColumn(container);
 			createUI_220_SummaryColumn(container);
 		}
 	}
 
-	private void createUI_210_InfoColumn(final Composite parent) {
+	private void createUI_210_DateColumn(final Composite parent) {
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+		final Group group = new Group(parent, SWT.NONE);
+		group.setText(Messages.Slideout_CalendarOptions_Group_DateColumn);
+		GridDataFactory
+				.fillDefaults()//
+				.grab(true, true)
+				.applyTo(group);
+		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
+//		group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 		{
 			/*
 			 * Info column
 			 */
 			// checkbox
-			_chkIsShowDateColumn = new Button(container, SWT.CHECK);
-			_chkIsShowDateColumn.setText(Messages.Slideout_CalendarOptions_Checkbox_IsShowInfoColumn);
+			_chkIsShowDateColumn = new Button(group, SWT.CHECK);
+			_chkIsShowDateColumn.setText(Messages.Slideout_CalendarOptions_Checkbox_IsShowDateColumn);
 			_chkIsShowDateColumn.setToolTipText(
-					Messages.Slideout_CalendarOptions_Checkbox_IsShowInfoColumn_Tooltip);
+					Messages.Slideout_CalendarOptions_Checkbox_IsShowDateColumn_Tooltip);
 			_chkIsShowDateColumn.addSelectionListener(_defaultSelectionListener);
 			GridDataFactory
 					.fillDefaults()//
@@ -295,7 +305,7 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 				 */
 
 				// label
-				_lblDateColumnWidth = new Label(container, SWT.NONE);
+				_lblDateColumnWidth = new Label(group, SWT.NONE);
 				_lblDateColumnWidth.setText(Messages.Slideout_CalendarOptions_Label_DateColumn_Width);
 				_lblDateColumnWidth.setToolTipText(
 						Messages.Slideout_CalendarOptions_Label_DateColumn_Width_Tooltip);
@@ -306,7 +316,7 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 						.applyTo(_lblDateColumnWidth);
 
 				// size
-				_spinnerDateColumnWidth = new Spinner(container, SWT.BORDER);
+				_spinnerDateColumnWidth = new Spinner(group, SWT.BORDER);
 				_spinnerDateColumnWidth.setMinimum(1);
 				_spinnerDateColumnWidth.setMaximum(50);
 				_spinnerDateColumnWidth.setIncrement(1);
@@ -320,7 +330,7 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 				 */
 
 				// label
-				_lblDateColumnContent = new Label(container, SWT.NONE);
+				_lblDateColumnContent = new Label(group, SWT.NONE);
 				_lblDateColumnContent.setText(Messages.Slideout_CalendarOptions_Label_DateColumnContent);
 				_lblDateColumnContent.setToolTipText(
 						Messages.Slideout_CalendarOptions_Label_DateColumnContent_Tooltip);
@@ -331,20 +341,59 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 						.applyTo(_lblDateColumnContent);
 
 				// value
-				_comboDateColumn = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+				_comboDateColumn = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
 				_comboDateColumn.setVisibleItemCount(20);
 				_comboDateColumn.addSelectionListener(_defaultSelectionListener);
 				_comboDateColumn.addFocusListener(_keepOpenListener);
+			}
+			{
+				/*
+				 * Font
+				 */
+
+				// label
+				_lblDateColumnFont = new Label(group, SWT.NONE);
+				_lblDateColumnFont.setText(Messages.Slideout_CalendarOptions_Label_DateColumnFont);
+				GridDataFactory
+						.fillDefaults()//
+						.align(SWT.FILL, SWT.CENTER)
+						.indent(_subItemIndent, 0)
+						.applyTo(_lblDateColumnFont);
+
+				// value
+				_fontEditorDateColumn = new SimpleFontEditor(group, SWT.NONE);
+				_fontEditorDateColumn.addFontListener(new IFontEditorListener() {
+
+					@Override
+					public void fontDialogOpened(final boolean isDialogOpened) {
+						setIsAnotherDialogOpened(isDialogOpened);
+					}
+
+					@Override
+					public void fontSelected(final FontData font) {
+						onModifyConfig();
+					}
+				});
+//				GridDataFactory
+//						.fillDefaults()//
+//						.align(SWT.FILL, SWT.CENTER)
+////						.indent(_subItemIndent, 0)
+//						.applyTo(_fontEditorDateColumn);
 			}
 		}
 	}
 
 	private void createUI_220_SummaryColumn(final Composite parent) {
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+		final Group group = new Group(parent, SWT.NONE);
+		group.setText(Messages.Slideout_CalendarOptions_Group_SummaryColumn);
+		GridDataFactory
+				.fillDefaults()//
+				//				.align(SWT.FILL, SWT.FILL)
+				.grab(true, true)
+				.applyTo(group);
+		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
+//		group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 		{
 			{
 				/*
@@ -352,7 +401,7 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 				 */
 
 				// checkbox
-				_chkIsShowSummaryColumn = new Button(container, SWT.CHECK);
+				_chkIsShowSummaryColumn = new Button(group, SWT.CHECK);
 				_chkIsShowSummaryColumn.setText(Messages.Slideout_CalendarOptions_Checkbox_IsShowSummaryColumn);
 				_chkIsShowSummaryColumn.setToolTipText(
 						Messages.Slideout_CalendarOptions_Checkbox_IsShowSummaryColumn_Tooltip);
@@ -369,7 +418,7 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 				 */
 
 				// label
-				_lblSummaryColumnWidth = new Label(container, SWT.NONE);
+				_lblSummaryColumnWidth = new Label(group, SWT.NONE);
 				_lblSummaryColumnWidth.setText(Messages.Slideout_CalendarOptions_Label_SummaryColumn_Width);
 				_lblSummaryColumnWidth.setToolTipText(
 						Messages.Slideout_CalendarOptions_Label_SummaryColumn_Width_Tooltip);
@@ -380,7 +429,7 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 						.applyTo(_lblSummaryColumnWidth);
 
 				// size
-				_spinnerSummaryColumnWidth = new Spinner(container, SWT.BORDER);
+				_spinnerSummaryColumnWidth = new Spinner(group, SWT.BORDER);
 				_spinnerSummaryColumnWidth.setMinimum(1);
 				_spinnerSummaryColumnWidth.setMaximum(50);
 				_spinnerSummaryColumnWidth.setIncrement(1);
@@ -1115,6 +1164,7 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 			_chkIsShowDateColumn.setSelection(config.isShowDateColumn);
 			_spinnerDateColumnWidth.setSelection(config.dateColumnWidth);
 			_comboDateColumn.select(getDateColumnIndex(config.dateColumnContent));
+			_fontEditorDateColumn.setSelection(config.dateColumnFont);
 
 			// summary column
 			_chkIsShowSummaryColumn.setSelection(config.isShowSummaryColumn);
@@ -1147,6 +1197,7 @@ public class SlideoutCalendarOptions extends ToolbarSlideout {
 		config.isShowDateColumn = _chkIsShowDateColumn.getSelection();
 		config.dateColumnContent = getSelectedDateColumn();
 		config.dateColumnWidth = _spinnerDateColumnWidth.getSelection();
+		config.dateColumnFont = _fontEditorDateColumn.getSelection();
 
 		// summary column
 		config.isShowSummaryColumn = _chkIsShowSummaryColumn.getSelection();

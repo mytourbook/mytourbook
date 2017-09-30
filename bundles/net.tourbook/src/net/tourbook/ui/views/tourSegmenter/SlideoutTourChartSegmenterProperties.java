@@ -449,6 +449,7 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell
 					.span(4, 1)
 					.applyTo(_fontContainer);
 			GridLayoutFactory.fillDefaults().numColumns(1).applyTo(_fontContainer);
+			_fontContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 			{
 				_valueFontEditor = new FontFieldEditorExtended(ITourbookPreferences.TOUR_SEGMENTER_CHART_VALUE_FONT,
 						Messages.Slideout_SegmenterChartOptions_Label_ValueFont,

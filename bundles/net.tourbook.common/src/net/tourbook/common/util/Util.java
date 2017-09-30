@@ -52,6 +52,7 @@ import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Resource;
 import org.eclipse.swt.widgets.Combo;
@@ -1429,6 +1430,24 @@ public class Util {
 		return value;
 	}
 
+	public static FontData getXmlFont(final XMLMemento memento, final String attrName, final FontData defaultValue) {
+
+		final String valueText = memento.getString(attrName);
+
+		FontData fontData;
+
+		if (valueText == null) {
+
+			fontData = defaultValue;
+
+		} else {
+
+			fontData = new FontData(valueText);
+		}
+
+		return fontData;
+	}
+
 	/**
 	 * @param xmlMemento
 	 * @param key
@@ -2215,6 +2234,11 @@ public class Util {
 		}
 
 		xml.putString(attrName, value.name());
+	}
+
+	public static void setXmlFont(final IMemento memento, final String attributeName, final FontData fontData) {
+
+		memento.putString(attributeName, fontData.toString());
 	}
 
 	public static void setXmlLong(final IMemento memento, final String attributeName, final long longValue) {

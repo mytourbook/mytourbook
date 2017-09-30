@@ -583,18 +583,30 @@ public class CalendarView extends ViewPart implements ITourProvider {
 	 * distance - time
 	 */
 	private TourInfoFormatter createFormatter_Tour_Distance_Time() {
+
 		return new TourInfoFormatter() {
 			@Override
 			public String format(final CalendarTourData data) {
+
 				final float distance = (float) (data.distance / 1000.0 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
 				final int time = data.recordingTime;
+
 				return String
 						.format(
-								NLS.bind(Messages.Calendar_View_Format_DistanceTime, UI.UNIT_LABEL_DISTANCE),
-								distance,
-								time / 3600,
-								(time % 3600) / 60)
+								NLS.bind("%4.0f {0}", UI.UNIT_LABEL_DISTANCE),
+								distance
+//								,
+//								time / 3600,
+//								(time % 3600) / 60
+				)
 						.toString();
+//				return String
+//						.format(
+//								NLS.bind(Messages.Calendar_View_Format_DistanceTime, UI.UNIT_LABEL_DISTANCE),
+//								distance,
+//								time / 3600,
+//								(time % 3600) / 60)
+//						.toString();
 			}
 
 			@Override
@@ -777,9 +789,12 @@ public class CalendarView extends ViewPart implements ITourProvider {
 
 					final float distance = (float) (data.distance / 1000.0 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
 
-					return String.format(
-							NLS.bind(Messages.Calendar_View_Format_Distance, UI.UNIT_LABEL_DISTANCE),
-							distance);
+//					return String.format(
+//							NLS.bind(Messages.Calendar_View_Format_Distance, UI.UNIT_LABEL_DISTANCE),
+//							distance);
+
+					return String.format("%4.0f", distance);
+
 				} else {
 					return UI.DASH;
 				}
