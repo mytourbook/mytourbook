@@ -22,7 +22,6 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.font.IFontEditorListener;
-import net.tourbook.common.font.MTFont;
 import net.tourbook.common.font.SimpleFontEditor;
 import net.tourbook.common.formatter.ValueFormat;
 import net.tourbook.common.tooltip.AdvancedSlideout;
@@ -182,6 +181,32 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		restoreState();
 	}
 
+	@Override
+	protected void createTitleBarControls(final Composite parent) {
+
+		{
+			/*
+			 * Combo: Configuration
+			 */
+			_comboConfigName = new Combo(parent, SWT.READ_ONLY | SWT.BORDER);
+			_comboConfigName.setVisibleItemCount(20);
+			_comboConfigName.addFocusListener(_keepOpenListener);
+			_comboConfigName.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent e) {
+					onSelectConfig();
+				}
+			});
+			GridDataFactory
+					.fillDefaults()
+					.grab(true, false)
+					.align(SWT.FILL, SWT.CENTER)
+					.indent(20, 0)
+					.hint(_pc.convertWidthInCharsToPixels(10), SWT.DEFAULT)
+					.applyTo(_comboConfigName);
+		}
+	}
+
 	private Composite createUI(final Composite parent) {
 
 		final Composite shellContainer = new Composite(parent, SWT.NONE);
@@ -195,8 +220,6 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 					.applyTo(container);
 //			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 			{
-				createUI_10_Title(container);
-
 				createUI_200_InfoSummary(container);
 				createUI_400_Day(container);
 				createUI_500_WeekSummary(container);
@@ -207,65 +230,6 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		}
 
 		return shellContainer;
-	}
-
-	private void createUI_10_Title(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
-		{
-			{
-				/*
-				 * Label: Slideout title
-				 */
-				final Label label = new Label(container, SWT.NONE);
-				label.setText(Messages.Slideout_CalendarOptions_Label_Title);
-				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
-				MTFont.setBannerFont(label);
-			}
-			{
-				/*
-				 * Combo: Configuration
-				 */
-				_comboConfigName = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
-				_comboConfigName.setVisibleItemCount(20);
-				_comboConfigName.addFocusListener(_keepOpenListener);
-				_comboConfigName.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(final SelectionEvent e) {
-						onSelectConfig();
-					}
-				});
-				GridDataFactory
-						.fillDefaults()
-						//						.grab(true, false)
-						.align(SWT.BEGINNING, SWT.CENTER)
-						.indent(20, 0)
-						.hint(_pc.convertWidthInCharsToPixels(10), SWT.DEFAULT)
-						.applyTo(_comboConfigName);
-			}
-			{
-				/*
-				 * Button: Reset
-				 */
-				_btnReset = new Button(container, SWT.PUSH);
-				_btnReset.setText(Messages.App_Action_Reset);
-				_btnReset.setToolTipText(Messages.App_Action_ResetConfig_Tooltip);
-				_btnReset.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(final SelectionEvent e) {
-						onSelectConfig_Default(e);
-					}
-				});
-				GridDataFactory
-						.fillDefaults()//
-						.grab(true, false)
-						.align(SWT.END, SWT.CENTER)
-						.applyTo(_btnReset);
-			}
-		}
 	}
 
 	private void createUI_200_InfoSummary(final Composite parent) {
@@ -788,21 +752,49 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			final Label lable = new Label(parent, SWT.NONE);
 			lable.setText(Messages.Slideout_CalendarOptions_Label_Name);
 			lable.setToolTipText(Messages.Slideout_CalendarOptions_Label_Name_Tooltip);
-			// Name for the currently selected tour marker configuration
-
 			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(lable);
+		}
 
-			/*
-			 * Text
-			 */
-			_textConfigName = new Text(parent, SWT.BORDER);
-			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_textConfigName);
-			_textConfigName.addModifyListener(new ModifyListener() {
-				@Override
-				public void modifyText(final ModifyEvent e) {
-					onModifyName();
-				}
-			});
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		{
+			{
+				/*
+				 * Text
+				 */
+				_textConfigName = new Text(container, SWT.BORDER);
+				_textConfigName.addModifyListener(new ModifyListener() {
+					@Override
+					public void modifyText(final ModifyEvent e) {
+						onModifyName();
+					}
+				});
+				GridDataFactory
+						.fillDefaults()//
+						.align(SWT.FILL, SWT.CENTER)
+						.grab(true, false)
+						.applyTo(_textConfigName);
+			}
+			{
+				/*
+				 * Button: Reset
+				 */
+				_btnReset = new Button(container, SWT.PUSH);
+				_btnReset.setText(Messages.App_Action_Reset);
+				_btnReset.setToolTipText(Messages.App_Action_ResetConfig_Tooltip);
+				_btnReset.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						onSelectConfig_Default(e);
+					}
+				});
+				GridDataFactory
+						.fillDefaults()//
+						//						.grab(true, false)
+						.align(SWT.END, SWT.CENTER)
+						.applyTo(_btnReset);
+			}
 		}
 	}
 

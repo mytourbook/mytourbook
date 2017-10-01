@@ -48,7 +48,7 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 
-	private final WaitTimer			_waitTimer				= new WaitTimer();
+	private final WaitTimer			_waitTimer			= new WaitTimer();
 
 	private boolean					_isWaitTimerStarted;
 	private boolean					_canOpenToolTip;
@@ -61,9 +61,7 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 	private ActionSlideoutKeepOpen	_actionKeepSlideoutOpen;
 	private ActionPinSlideout		_actionPinSlideout;
 
-	private boolean					_isToolbarPositionRight	= true;
-
-	private String					_titleText				= UI.EMPTY_STRING;
+	private String					_titleText			= UI.EMPTY_STRING;
 
 	/*
 	 * UI controls
@@ -75,7 +73,7 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 	private Cursor					_cursorResize;
 	private Cursor					_cursorHand;
 
-	private SlideoutLocation		_slideoutLocation		= SlideoutLocation.BELOW_CENTER;
+	private SlideoutLocation		_slideoutLocation	= SlideoutLocation.BELOW_CENTER;
 
 	private class ActionCloseSlideout extends Action {
 
@@ -209,6 +207,14 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 		return container;
 	}
 
+	protected void createTitleBarControls(final Composite parent) {
+
+		// create default content
+		final Label label = new Label(parent, SWT.NONE);
+		label.setText(UI.EMPTY_STRING);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
+	}
+
 	private Composite createUI(final Composite parent) {
 
 		final Composite shellContainer = new Composite(parent, SWT.NONE);
@@ -233,35 +239,25 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory
 				.fillDefaults()//
-				.numColumns(2)
+				.numColumns(3)
 				.extendedMargins(0, 0, 0, 5)
 				.applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
-
 		{
-			if (_isToolbarPositionRight) {
-
-				createUI_12_ActionBar_Draggable(container);
-				createUI_14_ActionBar_Toolbar(container);
-
-			} else {
-
-				// toolbar is on the left side
-
-				createUI_14_ActionBar_Toolbar(container);
-				createUI_12_ActionBar_Draggable(container);
-			}
+			createUI_12_Header_Draggable(container);
+			createTitleBarControls(container);
+			createUI_14_Header_Toolbar(container);
 		}
 	}
 
-	private void createUI_12_ActionBar_Draggable(final Composite container) {
+	private void createUI_12_Header_Draggable(final Composite container) {
 
 		_labelDragSlideout = new Label(container, SWT.NONE);
 		_labelDragSlideout.setText(_titleText);
 		_labelDragSlideout.setToolTipText(Messages.Slideout_Dialog_Action_DragSlideout_ToolTip);
 		GridDataFactory
 				.fillDefaults()//
-				.grab(true, false)
+				//				.grab(true, false)
 				.align(SWT.FILL, SWT.CENTER)
 				//				.indent(3, 0)
 				.applyTo(_labelDragSlideout);
@@ -309,13 +305,13 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 	/**
 	 * Create toolbar for the exit button
 	 */
-	private void createUI_14_ActionBar_Toolbar(final Composite container) {
+	private void createUI_14_Header_Toolbar(final Composite container) {
 
 		_toolbarSlideoutActions = new ToolBar(container, SWT.FLAT);
 		GridDataFactory
 				.fillDefaults()//
+				.indent(20, 0)
 				.applyTo(_toolbarSlideoutActions);
-//			_ttToolbarControlExit.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 	}
 
 	private void fillActionBar() {
@@ -325,18 +321,9 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 		 */
 		final ToolBarManager exitToolbarManager = new ToolBarManager(_toolbarSlideoutActions);
 
-		if (_isToolbarPositionRight) {
-
-			exitToolbarManager.add(_actionPinSlideout);
-			exitToolbarManager.add(_actionKeepSlideoutOpen);
-			exitToolbarManager.add(_actionCloseSlideout);
-
-		} else {
-
-			exitToolbarManager.add(_actionCloseSlideout);
-			exitToolbarManager.add(_actionKeepSlideoutOpen);
-			exitToolbarManager.add(_actionPinSlideout);
-		}
+		exitToolbarManager.add(_actionPinSlideout);
+		exitToolbarManager.add(_actionKeepSlideoutOpen);
+		exitToolbarManager.add(_actionCloseSlideout);
 
 		exitToolbarManager.update(true);
 	}
@@ -543,23 +530,12 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 		_actionPinSlideout.setChecked(isToolTipPinned);
 	}
 
-	/**
-	 * Set the toolbar horizontal position
-	 * 
-	 * @param isToolbarPositionRight
-	 *            When <code>true</code> the toolbar is positioned on the right side otherwise on
-	 *            the left side.
-	 */
-	public void setIsToolbarPosition(final boolean isToolbarPositionRight) {
-		_isToolbarPositionRight = isToolbarPositionRight;
-	}
-
 	public void setSlideoutLocation(final SlideoutLocation slideoutLocation) {
 		_slideoutLocation = slideoutLocation;
 	}
 
-	protected void setTitleText(final String draggerText) {
-		_titleText = draggerText;
+	protected void setTitleText(final String titleText) {
+		_titleText = titleText;
 	}
 
 }

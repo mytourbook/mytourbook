@@ -149,7 +149,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	private LocalDate							_calendarFirstDay;
 	private LocalDate							_calendarLastDay;
 
-	private int									_lastWeekDateYPos;
+	private int									_nextWeekDateYPos;
 	private int									_lastWeekDateYear;
 	private int									_rowHeight;
 
@@ -582,7 +582,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		final CalendarConfig config = CalendarConfigManager.getActiveCalendarConfig();
 
-		_lastWeekDateYPos = -1;
+		_nextWeekDateYPos = 0;
 		_lastWeekDateYear = -1;
 
 		if (_image != null && !_image.isDisposed()) {
@@ -671,7 +671,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			if (dateColumnWidth > 0) {
 
 				final Rectangle infoRec = new Rectangle(0, rowTop, dateColumnWidth, _rowHeight);
-				drawWeek_Date(gc, currentDate, infoRec, config.dateColumnContent);
+				drawWeek_Date(gc, currentDate, rowTop, config.dateColumnContent);
 			}
 
 			for (int dayIndex = 0; dayIndex < 7; dayIndex++) {
@@ -1029,7 +1029,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 	private void drawWeek_Date(	final GC gc,
 								final LocalDate currentDate,
-								final Rectangle rec,
+								final int rowTop,
 								final DateColumnContent dateColumnContent) {
 
 		gc.setForeground(_darkGray);
@@ -1037,8 +1037,19 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		gc.setFont(getFont_DateColumn());
 
-		final int posX = rec.x + 4;
-		final int posY = rec.y + 2;
+		final int posX = 2;
+		final int thisWeekYPos = rowTop;
+
+		final int lastWeekCoveredYPos = _nextWeekDateYPos + _fontHeight_DateColumn;
+
+		// prevent overlapping
+		final boolean isInLastWeek = thisWeekYPos < _nextWeekDateYPos;
+
+		if (isInLastWeek) {
+			return;
+		}
+
+		final int nextWeekYPos = thisWeekYPos + _fontHeight_DateColumn + 10;
 
 		switch (dateColumnContent) {
 		case MONTH:
@@ -1049,15 +1060,11 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 				// a new month started on this week
 
-				// prevent overlapping
-				if (posY > _lastWeekDateYPos + _fontHeight_DateColumn - 2) {
+				final String monthLabel = TimeTools.Formatter_Month.format(currentDate.plusDays(6));
 
-					final String monthLabel = TimeTools.Formatter_Month.format(currentDate.plusDays(6));
+				gc.drawString(monthLabel, posX, thisWeekYPos, true);
 
-					gc.drawText(monthLabel, posX, posY);
-
-					_lastWeekDateYPos = posY;
-				}
+				_nextWeekDateYPos = nextWeekYPos;
 			}
 
 			break;
@@ -1069,14 +1076,10 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			// prevent to repeat the year
 			if (year != _lastWeekDateYear) {
 
-				// prevent overlapping
-				if (posY > _lastWeekDateYPos + _fontHeight_DateColumn - 2) {
+				gc.drawString(Integer.toString(year), posX, thisWeekYPos, true);
 
-					gc.drawText(Integer.toString(year), posX, posY);
-
-					_lastWeekDateYear = year;
-					_lastWeekDateYPos = posY;
-				}
+				_lastWeekDateYear = year;
+				_nextWeekDateYPos = nextWeekYPos;
 			}
 
 			break;
@@ -1086,15 +1089,11 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 			// default is week number
 
-			// prevent overlapping
-			if (posY > _lastWeekDateYPos + _fontHeight_DateColumn - 2) {
+			final int week = currentDate.get(TimeTools.calendarWeek.weekOfWeekBasedYear());
 
-				final int week = currentDate.get(TimeTools.calendarWeek.weekOfWeekBasedYear());
+			gc.drawString(Integer.toString(week), posX, thisWeekYPos, true);
 
-				gc.drawText(Integer.toString(week), posX, posY);
-
-				_lastWeekDateYPos = posY;
-			}
+			_nextWeekDateYPos = nextWeekYPos;
 
 			break;
 		}
@@ -1222,15 +1221,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 			_fontDateColumn = new Font(_display, dateColumnFontData);
 			_fontHeight_DateColumn = dateColumnFontData.getHeight();
-
-			System.out.println(
-					(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-							+ ("\theight:" + _fontHeight_DateColumn)
-							+ ("\tfont:" + dateColumnFontData)
-//					+ ("\t:" + )
-			);
-// TODO remove SYSTEM.OUT.PRINTLN
-
 		}
 
 		return _fontDateColumn;
