@@ -48,41 +48,34 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 
-	// initialize with default values which are (should) never be used
-	private Rectangle			   _slideoutParentBounds   = new Rectangle(0, 0, 50, 50);
+	private final WaitTimer			_waitTimer				= new WaitTimer();
 
-	private final WaitTimer		   _waitTimer			   = new WaitTimer();
+	private boolean					_isWaitTimerStarted;
+	private boolean					_canOpenToolTip;
 
-	private boolean				   _isWaitTimerStarted;
-	private boolean				   _canOpenToolTip;
+	private boolean					_isShellDragged;
+	private int						_devXMousedown;
+	private int						_devYMousedown;
 
-	private boolean				   _isShellDragged;
-	private int					   _devXMousedown;
-	private int					   _devYMousedown;
+	private ActionCloseSlideout		_actionCloseSlideout;
+	private ActionSlideoutKeepOpen	_actionKeepSlideoutOpen;
+	private ActionPinSlideout		_actionPinSlideout;
 
-	private ActionCloseSlideout	   _actionCloseSlideout;
-	private ActionSlideoutKeepOpen _actionKeepSlideoutOpen;
-	private ActionPinSlideout	   _actionPinSlideout;
-
-	private boolean				   _isToolbarPositionRight = true;
-
-	/**
-	 * When <code>true</code> then the slideout is displayed above the toolitem, otherwise below
-	 * which is the default.
-	 */
-	private boolean				   _isShowAboveToolItem;
+	private boolean					_isToolbarPositionRight	= true;
 
 	private String					_titleText				= UI.EMPTY_STRING;
 
 	/*
 	 * UI controls
 	 */
-	private ToolBar				   _toolbarSlideoutActions;
+	private ToolBar					_toolbarSlideoutActions;
 
-	private Label				   _labelDragSlideout;
+	private Label					_labelDragSlideout;
 
-	private Cursor				   _cursorResize;
-	private Cursor				   _cursorHand;
+	private Cursor					_cursorResize;
+	private Cursor					_cursorHand;
+
+	private SlideoutLocation		_slideoutLocation		= SlideoutLocation.BELOW_CENTER;
 
 	private class ActionCloseSlideout extends Action {
 
@@ -270,7 +263,7 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 				.fillDefaults()//
 				.grab(true, false)
 				.align(SWT.FILL, SWT.CENTER)
-//				.indent(3, 0)
+				//				.indent(3, 0)
 				.applyTo(_labelDragSlideout);
 		MTFont.setBannerFont(_labelDragSlideout);
 
@@ -348,33 +341,73 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 		exitToolbarManager.update(true);
 	}
 
+	protected abstract Rectangle getParentBounds();
+
+	protected SlideoutLocation getSlideoutLocation() {
+		return _slideoutLocation;
+	}
+
 	@Override
 	public Point getToolTipLocation(final Point slideoutSize) {
 
 		final int slideoutWidth = slideoutSize.x;
 		final int slideoutHeight = slideoutSize.y;
 
+		final Rectangle _slideoutParentBounds = getParentBounds();
+
+		// toolitem top left position and size
+		final int devXParent = _slideoutParentBounds.x;
+		final int devYParent = _slideoutParentBounds.y;
 		final int itemWidth = _slideoutParentBounds.width;
 		final int itemHeight = _slideoutParentBounds.height;
 
 		// center horizontally
 
-		int devX = _slideoutParentBounds.x;
-		devX += itemWidth / 2 - slideoutWidth / 2;
+		final int devXCenter = devXParent + itemWidth / 2 - slideoutWidth / 2;
+		final int devXRight = devXParent;
 
-		int devY = _slideoutParentBounds.y + itemHeight + 0;
+		final int devYAbove = devYParent - slideoutHeight;
+		final int devYBelow = devYParent + itemHeight;
 
 		final Rectangle displayBounds = Display.getCurrent().getBounds();
 
-		if (_isShowAboveToolItem) {
+		int devX;
+		int devY;
+		boolean isCheckBelow = false;
+		boolean isCheckAbove = false;
 
-			devY = _slideoutParentBounds.y - slideoutHeight;
+		switch (_slideoutLocation) {
+		case ABOVE_CENTER:
 
-		} else if (devY + slideoutHeight > displayBounds.height) {
+			devX = devXCenter;
+			devY = devYAbove;
+			isCheckAbove = true;
 
-			// slideout is below bottom, show it above the action button
+			break;
 
-			devY = _slideoutParentBounds.y - slideoutHeight;
+		case BELOW_RIGHT:
+
+			devX = devXRight;
+			devY = devYBelow;
+			isCheckBelow = true;
+
+			break;
+
+		case BELOW_CENTER:
+		default:
+
+			devX = devXCenter;
+			devY = devYBelow;
+			isCheckBelow = true;
+
+			break;
+		}
+
+		if (isCheckAbove && (devY < 0)) {
+			devY = devYBelow;
+		}
+		if (isCheckBelow & (devY + slideoutHeight > displayBounds.height)) {
+			devY = devYAbove;
 		}
 
 		return new Point(devX, devY);
@@ -393,10 +426,6 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 				onDispose();
 			}
 		});
-	}
-
-	protected boolean isShowAboveToolItem() {
-		return _isShowAboveToolItem;
 	}
 
 	@Override
@@ -466,33 +495,16 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 	 * @param slideoutParentBounds
 	 * @param isOpenDelayed
 	 */
-	public void open(final Rectangle slideoutParentBounds, final boolean isOpenDelayed) {
+	public void open(final boolean isOpenDelayed) {
 
 		if (isVisible()) {
 			return;
 		}
 
-		if (isOpenDelayed == false) {
+		if (isOpenDelayed) {
 
-			if (slideoutParentBounds != null) {
+			// open delayed
 
-				_slideoutParentBounds = slideoutParentBounds;
-
-				showShell();
-			}
-
-		} else {
-
-			if (slideoutParentBounds == null) {
-
-				// item is not hovered any more
-
-				_canOpenToolTip = false;
-
-				return;
-			}
-
-			_slideoutParentBounds = slideoutParentBounds;
 			_canOpenToolTip = true;
 
 			if (_isWaitTimerStarted == false) {
@@ -501,6 +513,12 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 
 				Display.getCurrent().timerExec(50, _waitTimer);
 			}
+
+		} else {
+
+			// open now
+
+			showShell();
 		}
 	}
 
@@ -536,13 +554,12 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 		_isToolbarPositionRight = isToolbarPositionRight;
 	}
 
+	public void setSlideoutLocation(final SlideoutLocation slideoutLocation) {
+		_slideoutLocation = slideoutLocation;
+	}
+
 	protected void setTitleText(final String draggerText) {
 		_titleText = draggerText;
 	}
-
-	public void setVerticalPosition(final boolean isAboveToolItem) {
-		_isShowAboveToolItem = isAboveToolItem;
-	}
-
 
 }

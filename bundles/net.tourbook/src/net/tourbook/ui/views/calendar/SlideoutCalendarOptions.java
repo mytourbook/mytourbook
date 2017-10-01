@@ -26,11 +26,13 @@ import net.tourbook.common.font.MTFont;
 import net.tourbook.common.font.SimpleFontEditor;
 import net.tourbook.common.formatter.ValueFormat;
 import net.tourbook.common.tooltip.AdvancedSlideout;
+import net.tourbook.common.tooltip.SlideoutLocation;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.Util;
 import net.tourbook.ui.views.calendar.CalendarConfigManager.DateColumnData;
 import net.tourbook.ui.views.calendar.CalendarConfigManager.DayHeaderDateFormatData;
 import net.tourbook.ui.views.calendar.CalendarConfigManager.DayHeaderLayoutData;
+import net.tourbook.ui.views.calendar.CalendarConfigManager.ICalendarConfigProvider;
 import net.tourbook.ui.views.calendar.CalendarView.TourInfoFormatter;
 
 import org.eclipse.jface.action.Action;
@@ -42,6 +44,8 @@ import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.ModifyEvent;
@@ -51,6 +55,8 @@ import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -58,13 +64,13 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Widget;
 
 /**
  * Properties slideout for the calendar view.
  */
-public class SlideoutCalendarOptions extends AdvancedSlideout {
+public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalendarConfigProvider {
 
 	private final IPreferenceStore	_prefStore	= TourbookPlugin.getPrefStore();
 
@@ -134,25 +140,28 @@ public class SlideoutCalendarOptions extends AdvancedSlideout {
 
 	private Text					_textConfigName;
 
+	private ToolItem				_toolItem;
+
 	private SimpleFontEditor		_fontEditorDateColumn;
 
 	/**
 	 * @param ownerControl
-	 * @param toolBar
+	 * @param toolItem
 	 * @param state
 	 * @param calendarView
 	 * @param gridPrefPrefix
 	 */
-	public SlideoutCalendarOptions(	final ToolBar toolBar,
+	public SlideoutCalendarOptions(	final ToolItem toolItem,
 									final IDialogSettings state,
 									final CalendarView calendarView) {
 
-		super(toolBar, state, null);
+		super(toolItem.getParent(), state, null);
 
 		_calendarView = calendarView;
+		_toolItem = toolItem;
 
 		setTitleText(Messages.Slideout_CalendarOptions_Label_Title);
-//		setVerticalPosition(isAboveToolItem);
+		setSlideoutLocation(SlideoutLocation.BELOW_RIGHT);
 	}
 
 	private void createActions() {
@@ -977,6 +986,18 @@ public class SlideoutCalendarOptions extends AdvancedSlideout {
 		return 0;
 	}
 
+	@Override
+	protected Rectangle getParentBounds() {
+
+		final Rectangle itemBounds = _toolItem.getBounds();
+		final Point itemDisplayPosition = _toolItem.getParent().toDisplay(itemBounds.x, itemBounds.y);
+
+		itemBounds.x = itemDisplayPosition.x;
+		itemBounds.y = itemDisplayPosition.y;
+
+		return itemBounds;
+	}
+
 	private DateColumnContent getSelectedDateColumn() {
 
 		final int selectedIndex = _comboDateColumn.getSelectionIndex();
@@ -1062,6 +1083,15 @@ public class SlideoutCalendarOptions extends AdvancedSlideout {
 			}
 		};
 
+		CalendarConfigManager.setConfigProvider(this);
+
+		parent.addDisposeListener(new DisposeListener() {
+
+			@Override
+			public void widgetDisposed(final DisposeEvent e) {
+				CalendarConfigManager.setConfigProvider((SlideoutCalendarOptions) null);
+			}
+		});
 	}
 
 	private void onChange_WeekValue(final Widget widget) {
@@ -1119,7 +1149,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout {
 		// keep data from previous config
 		saveState();
 
-		CalendarConfigManager.setActiveCalendarConfig(selectedConfig);
+		CalendarConfigManager.setActiveCalendarConfig(selectedConfig, this);
 
 		restoreState();
 
@@ -1218,7 +1248,17 @@ public class SlideoutCalendarOptions extends AdvancedSlideout {
 
 	private void updateUI() {
 
-		_calendarView.updateUI_Layout();
+		_calendarView.updateUI_Layout(true);
+	}
+
+	@Override
+	public void updateUI_CalendarConfig() {
+
+		fillUI_Config();
+
+		restoreState();
+
+		updateUI();
 	}
 
 }

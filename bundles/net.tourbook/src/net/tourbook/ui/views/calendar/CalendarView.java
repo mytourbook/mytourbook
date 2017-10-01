@@ -39,6 +39,7 @@ import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.views.calendar.CalendarConfigManager.ICalendarConfigProvider;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
@@ -71,7 +72,7 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 import org.joda.time.DateTime;
 
-public class CalendarView extends ViewPart implements ITourProvider {
+public class CalendarView extends ViewPart implements ITourProvider, ICalendarConfigProvider {
 
 // SET_FORMATTING_OFF
 	
@@ -183,20 +184,6 @@ public class CalendarView extends ViewPart implements ITourProvider {
 
 	private Label					_lblTitle;
 
-//	private class ActionCalendarOptions3 extends ActionToolbarSlideout {
-//
-//		@Override
-//		protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
-//
-//			return new SlideoutCalendarOptions(_parent, toolbar, CalendarView.this);
-//		}
-//
-//		@Override
-//		protected void onBeforeOpenSlideout() {
-//			closeOpenedDialogs(this);
-//		}
-//	}
-
 	abstract class TourInfoFormatter {
 
 		int index;
@@ -221,7 +208,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == CalendarView.this) {
 					saveState();
-					CalendarConfigManager.setCalendarView(null);
+					CalendarConfigManager.setConfigProvider((CalendarView) null);
 				}
 			}
 
@@ -237,7 +224,7 @@ public class CalendarView extends ViewPart implements ITourProvider {
 			@Override
 			public void partOpened(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == CalendarView.this) {
-					CalendarConfigManager.setCalendarView(CalendarView.this);
+					CalendarConfigManager.setConfigProvider(CalendarView.this);
 				}
 			}
 
@@ -1220,9 +1207,9 @@ public class CalendarView extends ViewPart implements ITourProvider {
 			return;
 		}
 
-		CalendarConfigManager.setActiveCalendarConfig(selectedConfig);
+		CalendarConfigManager.setActiveCalendarConfig(selectedConfig, this);
 
-		updateUI_Layout();
+		updateUI_Layout(true);
 	}
 
 	private void onSelectionChanged(final ISelection selection) {
@@ -1355,10 +1342,8 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		_calendarContainer.setFocus();
 	}
 
-	/**
-	 * Calendar config has changed, update the UI accordingly
-	 */
-	void updateUI_CalendarConfig() {
+	@Override
+	public void updateUI_CalendarConfig() {
 
 		fillUI_Config();
 
@@ -1370,14 +1355,14 @@ public class CalendarView extends ViewPart implements ITourProvider {
 		_tourInfoToolTip.setPopupDelay(Util.getStateInt(_state, STATE_TOUR_TOOLTIP_DELAY, DEFAULT_TOUR_TOOLTIP_DELAY));
 	}
 
-	void updateUI_Layout() {
+	void updateUI_Layout(final boolean isResetUIResources) {
 
 		if (null != _calendarGraph) {
 
 			BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
 				@Override
 				public void run() {
-					_calendarGraph.updateUI_Layout();
+					_calendarGraph.updateUI_Layout(isResetUIResources);
 				}
 			});
 		}
@@ -1397,8 +1382,6 @@ public class CalendarView extends ViewPart implements ITourProvider {
 				calendarFirstDay.format(TimeTools.Formatter_Date_L)
 						+ UI.DASH_WITH_DOUBLE_SPACE
 						+ calendarLastDay.format(TimeTools.Formatter_Date_L));
-
-//		_lblTitle.getParent().layout(true, true);
 	}
 
 }

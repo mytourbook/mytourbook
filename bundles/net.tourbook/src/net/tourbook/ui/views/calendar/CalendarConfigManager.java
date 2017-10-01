@@ -32,7 +32,6 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.graphics.FontData;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
 import org.osgi.framework.Bundle;
@@ -47,6 +46,7 @@ public class CalendarConfigManager {
 	 * Version number is not yet used.
 	 */
 	private static final int			CONFIG_VERSION					= 1;
+
 	//
 	private static final Bundle			_bundle							= TourbookPlugin.getDefault().getBundle();
 	private static final IPath			_stateLocation					= Platform.getStateLocation(_bundle);
@@ -65,8 +65,8 @@ public class CalendarConfigManager {
 	// common attributes
 	private static final String			ATTR_ACTIVE_CONFIG_ID			= "activeConfigId";							//$NON-NLS-1$
 	private static final String			ATTR_ID							= "id";										//$NON-NLS-1$
-
 	private static final String			ATTR_CONFIG_NAME				= "name";									//$NON-NLS-1$
+
 	//
 	/*
 	 * Root
@@ -144,14 +144,16 @@ public class CalendarConfigManager {
 	 * Contains all configurations which are loaded from a xml file.
 	 */
 	private static final ArrayList<CalendarConfig>	_allCalendarConfigs				= new ArrayList<>();
-
 	private static CalendarConfig					_activeCalendarConfig;
+
 	//
 	private static String							_fromXml_ActiveCalendarConfigId;
+
 	/**
 	 * Calendarview or <code>null</code> when closed.
 	 */
-	private static CalendarView						_calendarView;
+	private static ICalendarConfigProvider			_configProvider_CalendarView;
+	private static ICalendarConfigProvider			_configProvider_SlideoutCalendarOptions;
 
 	static class DateColumnData {
 
@@ -187,6 +189,14 @@ public class CalendarConfigManager {
 			this.dayHeaderLayout = dayHeaderLayout;
 			this.label = label;
 		}
+	}
+
+	interface ICalendarConfigProvider {
+
+		/**
+		 * Calendar config has changed, update the UI.
+		 */
+		void updateUI_CalendarConfig();
 	}
 
 	private static XMLMemento create_Root() {
@@ -332,7 +342,7 @@ public class CalendarConfigManager {
 
 		// this case should not happen but ensure that a correct config is set
 
-		setActiveCalendarConfigIntern(_allCalendarConfigs.get(0));
+		setActiveCalendarConfigIntern(_allCalendarConfigs.get(0), null);
 
 		return 0;
 	}
@@ -466,7 +476,7 @@ public class CalendarConfigManager {
 				ATTR_DATE_COLUMN_CONTENT,
 				DateColumnContent.WEEK_NUMBER);
 
-		config.dateColumnFont = (FontData) Util.getXmlFont(
+		config.dateColumnFont = Util.getXmlFont(
 				xmlConfig,
 				ATTR_DATE_COLUMN_FONT,
 				JFaceResources.getFontRegistry().defaultFont().getFontData()[0]);
@@ -520,7 +530,7 @@ public class CalendarConfigManager {
 				createDefaults_Calendars();
 			}
 
-			setActiveCalendarConfigIntern(getConfig_Calendar());
+			setActiveCalendarConfigIntern(getConfig_Calendar(), null);
 
 		} catch (final Exception e) {
 			StatusUtil.log(e);
@@ -546,14 +556,14 @@ public class CalendarConfigManager {
 
 		// update model
 		_allCalendarConfigs.add(activeCalendarConfigIndex, newConfig);
-		setActiveCalendarConfigIntern(newConfig);
+		setActiveCalendarConfigIntern(newConfig, null);
 	}
 
 	static void resetAllCalendarConfigurations() {
 
 		createDefaults_Calendars();
 
-		setActiveCalendarConfigIntern(_allCalendarConfigs.get(0));
+		setActiveCalendarConfigIntern(_allCalendarConfigs.get(0), null);
 	}
 
 	static void saveState() {
@@ -587,23 +597,36 @@ public class CalendarConfigManager {
 		}
 	}
 
-	static void setActiveCalendarConfig(final CalendarConfig newConfig) {
+	static void setActiveCalendarConfig(final CalendarConfig selectedConfig,
+										final ICalendarConfigProvider configProvider) {
 
-		setActiveCalendarConfigIntern(newConfig);
+		setActiveCalendarConfigIntern(selectedConfig, configProvider);
 	}
 
-	private static void setActiveCalendarConfigIntern(final CalendarConfig calendarConfig) {
+	private static void setActiveCalendarConfigIntern(	final CalendarConfig calendarConfig,
+														final ICalendarConfigProvider configProvider) {
 
 		_activeCalendarConfig = calendarConfig;
 
-		if (_calendarView != null) {
-			_calendarView.updateUI_CalendarConfig();
+		if (configProvider != null) {
+
+			if (_configProvider_CalendarView != null && _configProvider_CalendarView != configProvider) {
+				_configProvider_CalendarView.updateUI_CalendarConfig();
+			}
+
+			if (_configProvider_SlideoutCalendarOptions != null
+					&& _configProvider_SlideoutCalendarOptions != configProvider) {
+				_configProvider_SlideoutCalendarOptions.updateUI_CalendarConfig();
+			}
 		}
 	}
 
-	static void setCalendarView(final CalendarView calendarView) {
+	static void setConfigProvider(final CalendarView calendarView) {
+		_configProvider_CalendarView = calendarView;
+	}
 
-		_calendarView = calendarView;
+	static void setConfigProvider(final SlideoutCalendarOptions slideoutCalendarOptions) {
+		_configProvider_SlideoutCalendarOptions = slideoutCalendarOptions;
 	}
 
 }

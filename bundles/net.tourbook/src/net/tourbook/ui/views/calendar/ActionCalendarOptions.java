@@ -39,8 +39,9 @@ public class ActionCalendarOptions extends ActionToolbarSlideoutAdv {
 	@Override
 	protected AdvancedSlideout createSlideout(final ToolItem toolItem) {
 
-		_slideoutCalendarOptions = new SlideoutCalendarOptions(toolItem.getParent(), _state, _calendarView);
+		_slideoutCalendarOptions = new SlideoutCalendarOptions(toolItem, _state, _calendarView);
 
 		return _slideoutCalendarOptions;
 	}
+
 }

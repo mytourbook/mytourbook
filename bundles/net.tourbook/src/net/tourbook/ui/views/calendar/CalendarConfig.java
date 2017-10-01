@@ -87,4 +87,9 @@ public class CalendarConfig {
 		return result;
 	}
 
+	@Override
+	public String toString() {
+		return "CalendarConfig [name=" + name + "]";
+	}
+
 }

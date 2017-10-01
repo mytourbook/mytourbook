@@ -228,7 +228,7 @@ public abstract class ActionToolbarSlideoutAdv extends ContributionItem implemen
 		// ensure other dialogs are closed
 		onBeforeOpenSlideout();
 
-		_toolbarSlideout.open(itemBounds, isOpenDelayed);
+		_toolbarSlideout.open(isOpenDelayed);
 	}
 
 	public void setEnabled(final boolean isEnabled) {

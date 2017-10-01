@@ -1570,45 +1570,15 @@ public class SlideoutTourFilter extends AdvancedSlideout {
 	}
 
 	@Override
-	public Point getToolTipLocation(final Point slideoutSize) {
+	protected Rectangle getParentBounds() {
 
-		// get tooltip position
 		final Rectangle itemBounds = _tourFilterItem.getBounds();
 		final Point itemDisplayPosition = _tourFilterItem.getParent().toDisplay(itemBounds.x, itemBounds.y);
 
-		final int slideoutWidth = slideoutSize.x;
-		final int slideoutHeight = slideoutSize.y;
+		itemBounds.x = itemDisplayPosition.x;
+		itemBounds.y = itemDisplayPosition.y;
 
-		final int itemWidth = itemBounds.width;
-		final int itemHeight = itemBounds.height;
-
-		// center horizontally
-		int devX = itemDisplayPosition.x;
-		devX += itemWidth / 2 - slideoutWidth / 2;
-
-		int devY = itemDisplayPosition.y + itemHeight;
-
-		final Rectangle displayBounds = Display.getCurrent().getBounds();
-
-		if (isShowAboveToolItem()) {
-
-			devY = itemDisplayPosition.y - slideoutHeight;
-
-			if (devY < 0) {
-
-				// slideout will hide the tool item, show it below
-
-				devY = itemDisplayPosition.y + itemHeight;
-			}
-
-		} else if (devY + slideoutHeight > displayBounds.height) {
-
-			// slideout is below bottom, show it above the action button
-
-			devY = itemDisplayPosition.y - slideoutHeight;
-		}
-
-		return new Point(devX, devY);
+		return itemBounds;
 	}
 
 	/**

@@ -58,6 +58,7 @@ import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -142,6 +143,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	 */
 	private int									_fontHeight;
 	private int									_fontAverageCharWidth;
+	private int									_fontHeight_DateColumn;
+	private int									_fontHeight_Bold;
 
 	private LocalDate							_calendarFirstDay;
 	private LocalDate							_calendarLastDay;
@@ -166,7 +169,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 	private FontMetrics							_fontMetrics;
 	private Font								_boldFont;
-	private int									_boldFontHeight;
+	private Font								_fontDateColumn;
 
 	private Image								_image;
 	private Image								_highlight;
@@ -268,7 +271,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			gc.setFont(_boldFont);
 
 			final FontMetrics fontMetrics = gc.getFontMetrics();
-			_boldFontHeight = fontMetrics.getHeight();
+			_fontHeight_Bold = fontMetrics.getHeight();
 		}
 		gc.dispose();
 
@@ -480,7 +483,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		addDisposeListener(new DisposeListener() {
 			@Override
 			public void widgetDisposed(final DisposeEvent e) {
-				_colorCache.dispose();
+				onDispose();
 			}
 		});
 
@@ -647,7 +650,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		final long todayDayId = (new Day(LocalDate.now())).dayId;
 
 		final int dayLabelXOffset = 2;
-		final int dayHeaderHeight = config.isShowDayHeader ? _boldFontHeight : 0;
+		final int dayHeaderHeight = config.isShowDayHeader ? _fontHeight_Bold : 0;
 
 		final DateTimeFormatter headerFormatter = getUI_HeaderFormatter(config, gc, cellWidth, dayLabelXOffset);
 
@@ -683,6 +686,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 				final int weekDay = currentDate.getDayOfWeek().getValue();
 
+				gc.setFont(normalFont);
 				gc.setBackground(_white);
 
 				// Day background rectangle
@@ -1028,12 +1032,10 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 								final Rectangle rec,
 								final DateColumnContent dateColumnContent) {
 
-		final Font normalFont = gc.getFont();
-
 		gc.setForeground(_darkGray);
 		gc.setBackground(_white);
 
-		gc.setFont(_boldFont);
+		gc.setFont(getFont_DateColumn());
 
 		final int posX = rec.x + 4;
 		final int posY = rec.y + 2;
@@ -1048,7 +1050,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 				// a new month started on this week
 
 				// prevent overlapping
-				if (posY > _lastWeekDateYPos + _fontHeight - 2) {
+				if (posY > _lastWeekDateYPos + _fontHeight_DateColumn - 2) {
 
 					final String monthLabel = TimeTools.Formatter_Month.format(currentDate.plusDays(6));
 
@@ -1068,7 +1070,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			if (year != _lastWeekDateYear) {
 
 				// prevent overlapping
-				if (posY > _lastWeekDateYPos + _fontHeight - 2) {
+				if (posY > _lastWeekDateYPos + _fontHeight_DateColumn - 2) {
 
 					gc.drawText(Integer.toString(year), posX, posY);
 
@@ -1085,7 +1087,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			// default is week number
 
 			// prevent overlapping
-			if (posY > _lastWeekDateYPos + _fontHeight - 2) {
+			if (posY > _lastWeekDateYPos + _fontHeight_DateColumn - 2) {
 
 				final int week = currentDate.get(TimeTools.calendarWeek.weekOfWeekBasedYear());
 
@@ -1096,8 +1098,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 			break;
 		}
-
-		gc.setFont(normalFont);
 	}
 
 	private void drawWeek_Summary(final GC gc, final CalendarTourData data, final Rectangle weekRec) {
@@ -1212,6 +1212,28 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		return firstDayOfWeek;
 
+	}
+
+	private Font getFont_DateColumn() {
+
+		if (_fontDateColumn == null) {
+
+			final FontData dateColumnFontData = CalendarConfigManager.getActiveCalendarConfig().dateColumnFont;
+
+			_fontDateColumn = new Font(_display, dateColumnFontData);
+			_fontHeight_DateColumn = dateColumnFontData.getHeight();
+
+			System.out.println(
+					(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+							+ ("\theight:" + _fontHeight_DateColumn)
+							+ ("\tfont:" + dateColumnFontData)
+//					+ ("\t:" + )
+			);
+// TODO remove SYSTEM.OUT.PRINTLN
+
+		}
+
+		return _fontDateColumn;
 	}
 
 	/**
@@ -1544,6 +1566,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	public void gotoYear(final int year) {
 
 		_firstDay = _firstDay.withYear(year);
+
 		// scroll to first day of the week
 		_firstDay = _firstDay.withDayOfWeek(getFirstDayOfWeek());
 
@@ -1551,6 +1574,13 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		redraw();
 		scrollBarUpdate();
+	}
+
+	private void onDispose() {
+
+		_colorCache.dispose();
+
+		_fontDateColumn = UI.disposeResource(_fontDateColumn);
 	}
 
 	/**
@@ -1839,13 +1869,13 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		_isGraphClean = false;
 		_isDynamicTourFieldSize = dynamicTourFieldSize;
 		redraw();
-	}
+	};
 
 	public void setTourInfoFormatter(final int line, final TourInfoFormatter formatter) {
 		_tourInfoFormatter[line] = formatter;
 		_isGraphClean = false;
 		redraw();
-	};
+	}
 
 	public void setTourInfoUseHighlightTextBlack(final boolean checked) {
 		_useBlackForHighlightTourInfoText = checked;
@@ -1900,10 +1930,20 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 	}
 
-	void updateUI_Layout() {
+	/**
+	 * @param isResetUIResources
+	 *            When <code>true</code> then UI resources will be reset and recreated by the next
+	 *            drawing.
+	 */
+	void updateUI_Layout(final boolean isResetUIResources) {
 
 		// invalidate layout
 		_isGraphClean = false;
+
+		if (isResetUIResources) {
+
+			_fontDateColumn = UI.disposeResource(_fontDateColumn);
+		}
 
 		redraw();
 	}

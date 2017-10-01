@@ -491,7 +491,7 @@ public class CalendarTourDataProvider {
 					Display.getDefault().asyncExec(new Runnable() {
 						@Override
 						public void run() {
-							_calendarGraph.updateUI_Layout();
+							_calendarGraph.updateUI_Layout(false);
 						}
 					});
 				}
