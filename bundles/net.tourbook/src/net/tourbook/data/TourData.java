@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -752,8 +752,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	 * <p>
 	 * The array {@link #timeSerie} is <code>null</code> for a manually created tour, it is
 	 * <b>always</b> set when tour is from a device or an imported file.
-	 * <p>
-	 * This field has a copy in {@link #timeSerieFloat}.
 	 */
 	@Transient
 	public int[]												timeSerie;

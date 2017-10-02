@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -48,35 +48,45 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
 	public static final int		DB_LENGTH_SYMBOL			= 1024;
 	public static final int		DB_LENGTH_CATEGORY			= 1024;
 
+	@Transient
+	private static Image		_twpHoveredImage;
+
+	/**
+	 * manually created way points or imported way points create a unique id to identify them, saved
+	 * way points are compared with the way point id
+	 */
+	@Transient
+	private static int			_createCounter				= 0;
+
 	/**
 	 * Unique id for the {@link TourWayPoint} entity
 	 */
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long				wayPointId					= TourDatabase.ENTITY_IS_NOT_SAVED;
-
 	@ManyToOne(optional = false)
 	private TourData			tourData;
 
 	// initialize with invalid values
 	private double				longitude					= Double.MIN_VALUE;
+
 	private double				latitude					= Double.MIN_VALUE;
 
 	/**
-	 * absolute time
+	 * Absolute time in milliseconds since 1970-01-01T00:00:00Z with the default time zone.
 	 */
-	private long				time						= 0;
+	private long				time;
 
 	/**
 	 * Altitude in meters or {@link Float#MIN_VALUE} when not available.
 	 */
 	private float				altitude					= Float.MIN_VALUE;
-
 	private String				name;
-
 	private String				description;
 	private String				comment;
+
 	private String				symbol;
+
 	private String				category;
 
 	/**
@@ -104,15 +114,6 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
 	 */
 	@Transient
 	private long				_createId					= 0;
-
-	@Transient
-	private static Image		_twpHoveredImage;
-
-	/**
-	 * manually created way points or imported way points create a unique id to identify them, saved
-	 * way points are compared with the way point id
-	 */
-	private static int			_createCounter				= 0;
 
 	public TourWayPoint() {}
 
@@ -288,6 +289,10 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
 		return symbol;
 	}
 
+	/**
+	 * @return Returns the waypoint time in milliseconds since 1970-01-01T00:00:00Z with the default
+	 *         time zone.
+	 */
 	public long getTime() {
 		return time;
 	}
@@ -412,6 +417,10 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
 
 	public void setTime(final long time) {
 		this.time = time;
+	}
+
+	public void setTourData(final TourData newTourData) {
+		tourData = newTourData;
 	}
 
 	public void setUrlAddress(final String urlAddress) {
