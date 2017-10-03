@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -56,7 +56,6 @@ import org.eclipse.swt.graphics.Rectangle;
  * 	- a marker can have another position than the tour track
  * 
  * 	icons from http://mapicons.nicolasmollet.com/
- * 
  * </pre>
  */
 
@@ -66,8 +65,8 @@ import org.eclipse.swt.graphics.Rectangle;
 @XmlAccessorType(XmlAccessType.NONE)
 public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializable {
 
-	public static final int			DB_LENGTH_URL_TEXT							= 1024;
-	public static final int			DB_LENGTH_URL_ADDRESS						= 4096;
+	public static final int			DB_LENGTH_URL_TEXT		= 1024;
+	public static final int			DB_LENGTH_URL_ADDRESS	= 4096;
 
 	/**
 	 * Visual position for markers, they must correspond to the position id LABEL_POS_*.
@@ -77,44 +76,45 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	static {
 
 		LABEL_POSITIONS = new String[] { //
-		//
-			Messages.Tour_Marker_Position_vertical_above, // 				0
-			Messages.Tour_Marker_Position_vertical_below, //				1
-			Messages.Tour_Marker_Position_vertical_chart_top, // 			2
-			Messages.Tour_Marker_Position_vertical_chart_bottom, // 		3
-			Messages.Tour_Marker_Position_horizontal_above_left, // 		4
-			Messages.Tour_Marker_Position_horizontal_above_centered, // 	5
-			Messages.Tour_Marker_Position_horizontal_above_right, // 		6
-			Messages.Tour_Marker_Position_horizontal_below_left, // 		7
-			Messages.Tour_Marker_Position_horizontal_below_centered, // 	8
-			Messages.Tour_Marker_Position_horizontal_below_right, // 		9
-			Messages.Tour_Marker_Position_horizontal_left, // 				10
-			Messages.Tour_Marker_Position_horizontal_right, // 				11
+				//
+				Messages.Tour_Marker_Position_vertical_above, // 				0
+				Messages.Tour_Marker_Position_vertical_below, //				1
+				Messages.Tour_Marker_Position_vertical_chart_top, // 			2
+				Messages.Tour_Marker_Position_vertical_chart_bottom, // 		3
+				Messages.Tour_Marker_Position_horizontal_above_left, // 		4
+				Messages.Tour_Marker_Position_horizontal_above_centered, // 	5
+				Messages.Tour_Marker_Position_horizontal_above_right, // 		6
+				Messages.Tour_Marker_Position_horizontal_below_left, // 		7
+				Messages.Tour_Marker_Position_horizontal_below_centered, // 	8
+				Messages.Tour_Marker_Position_horizontal_below_right, // 		9
+				Messages.Tour_Marker_Position_horizontal_left, // 				10
+				Messages.Tour_Marker_Position_horizontal_right, // 				11
 		};
 	}
 
-	public final static int			LABEL_POS_VERTICAL_ABOVE_GRAPH				= 0;
-	public final static int			LABEL_POS_VERTICAL_BELOW_GRAPH				= 1;
-	public final static int			LABEL_POS_VERTICAL_TOP_CHART				= 2;
-	public final static int			LABEL_POS_VERTICAL_BOTTOM_CHART				= 3;
-	public final static int			LABEL_POS_HORIZONTAL_ABOVE_GRAPH_LEFT		= 4;
-	public final static int			LABEL_POS_HORIZONTAL_ABOVE_GRAPH_CENTERED	= 5;
-	public final static int			LABEL_POS_HORIZONTAL_ABOVE_GRAPH_RIGHT		= 6;
-	public final static int			LABEL_POS_HORIZONTAL_BELOW_GRAPH_LEFT		= 7;
-	public final static int			LABEL_POS_HORIZONTAL_BELOW_GRAPH_CENTERED	= 8;
-	public final static int			LABEL_POS_HORIZONTAL_BELOW_GRAPH_RIGHT		= 9;
-	public final static int			LABEL_POS_HORIZONTAL_GRAPH_LEFT				= 10;
-	public final static int			LABEL_POS_HORIZONTAL_GRAPH_RIGHT			= 11;
+	public final static int	LABEL_POS_VERTICAL_ABOVE_GRAPH				= 0;
+	public final static int	LABEL_POS_VERTICAL_BELOW_GRAPH				= 1;
+	public final static int	LABEL_POS_VERTICAL_TOP_CHART				= 2;
+	public final static int	LABEL_POS_VERTICAL_BOTTOM_CHART				= 3;
+	public final static int	LABEL_POS_HORIZONTAL_ABOVE_GRAPH_LEFT		= 4;
+	public final static int	LABEL_POS_HORIZONTAL_ABOVE_GRAPH_CENTERED	= 5;
+	public final static int	LABEL_POS_HORIZONTAL_ABOVE_GRAPH_RIGHT		= 6;
+	public final static int	LABEL_POS_HORIZONTAL_BELOW_GRAPH_LEFT		= 7;
+	public final static int	LABEL_POS_HORIZONTAL_BELOW_GRAPH_CENTERED	= 8;
+	public final static int	LABEL_POS_HORIZONTAL_BELOW_GRAPH_RIGHT		= 9;
+	public final static int	LABEL_POS_HORIZONTAL_GRAPH_LEFT				= 10;
+	public final static int	LABEL_POS_HORIZONTAL_GRAPH_RIGHT			= 11;
 
 	/**
-	 * Unique id for the {@link TourMarker} entity
+	 * 
 	 */
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long					markerId									= TourDatabase.ENTITY_IS_NOT_SAVED;
+	private static int		_defaultSignImageMaxSize					= -1;
 
-	@ManyToOne(optional = false)
-	private TourData				tourData;
+	/**
+	 * manually created marker or imported marker create a unique id to identify them, saved marker
+	 * are compared with the marker id
+	 */
+	private static int		_createCounter								= 0;
 
 //	/**
 //	 * Marker sign image, can be <code>null</code>.
@@ -125,30 +125,40 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 //	private TourSign				tourSign;
 
 	/**
+	 * Unique id for the {@link TourMarker} entity
+	 */
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private long			markerId									= TourDatabase.ENTITY_IS_NOT_SAVED;
+
+	@ManyToOne(optional = false)
+	private TourData		tourData;
+
+	/**
 	 * Contains the marker type which is defined in {@link ChartLabel} like
 	 * {@link ChartLabel#MARKER_TYPE_DEVICE}
 	 */
-	private int						type;
+	private int				type;
 
 	/**
 	 * Time in seconds relative to the tour start. When value is not available it is set to
 	 * <code>-1</code>.
 	 */
 	@XmlElement
-	private int						time										= -1;
+	private int				time										= -1;
 
 	/**
 	 * Absolute time of the tour marker in milliseconds since 1970-01-01T00:00:00Z.
 	 * 
 	 * @since Db version 25
 	 */
-	private long					tourTime									= Long.MIN_VALUE;
+	private long			tourTime									= Long.MIN_VALUE;
 
 	/**
 	 * Distance field before db version 20, this field is required for data conversion AND <b>to
 	 * load entities</b> !!!
 	 */
-	private int						distance									= -1;
+	private int				distance									= -1;
 
 	/**
 	 * Distance in meters in the metric system or <code>-1</code> when the distance is not
@@ -157,86 +167,85 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	 * 20 == db version 20
 	 */
 	@XmlElement
-	private float					distance20									= -1;
-
+	private float			distance20									= -1;
 	/**
 	 * Contains the marker label visual position which is defined in {@link ChartLabel} like
 	 * {@link ChartLabel#LABEL_POS_HORIZONTAL_ABOVE_GRAPH_CENTERED}.
 	 */
-	private int						visualPosition								= TourMarker.LABEL_POS_HORIZONTAL_ABOVE_GRAPH_CENTERED;
+	private int				visualPosition								=
+			TourMarker.LABEL_POS_HORIZONTAL_ABOVE_GRAPH_CENTERED;
 
-	private int						labelXOffset;
-	private int						labelYOffset;
+	private int				labelXOffset;
+
+	private int				labelYOffset;
 
 	/**
 	 * Contains the type of the marker, this can be: crossing, hotel, view point.
 	 * <p>
 	 * THIS IS NOT USED.
 	 */
-	private long					markerType;
+	private long			markerType;
 
 	/**
 	 * position of this marker in the data serie
 	 */
 	@XmlAttribute
-	private int						serieIndex;
+	private int				serieIndex;
 
 	@XmlElement
-	private String					label										= UI.EMPTY_STRING;
+	private String			label										= UI.EMPTY_STRING;
 
 	/**
 	 * This field is disabled since db version 24 because a {@link TourSign} can be categorized.
 	 */
 	@SuppressWarnings("unused")
-	private String					category									= UI.EMPTY_STRING;
+	private String			category									= UI.EMPTY_STRING;
 
 	/**
 	 * Can be <code>null</code>
 	 * 
 	 * @since db version 24
 	 */
-	private String					description;
+	private String			description;
 
 	/**
 	 * Can be <code>null</code>
 	 * 
 	 * @since DB version 24
 	 */
-	private String					urlText;
+	private String			urlText;
 
 	/**
 	 * Can be <code>null</code>
 	 * 
 	 * @since DB version 24
 	 */
-	private String					urlAddress;
+	private String			urlAddress;
 
 	/**
 	 * @since Db version 25
 	 */
-	private float					altitude									= TourDatabase.DEFAULT_FLOAT;
+	private float			altitude									= TourDatabase.DEFAULT_FLOAT;
 
 	/**
 	 * @since Db version 25
 	 */
-	private double					latitude									= TourDatabase.DEFAULT_DOUBLE;
+	private double			latitude									= TourDatabase.DEFAULT_DOUBLE;
 
 	/**
 	 * @since Db version 25
 	 */
-	private double					longitude									= TourDatabase.DEFAULT_DOUBLE;
+	private double			longitude									= TourDatabase.DEFAULT_DOUBLE;
 
-	private int						isMarkerVisible								= 1;
+	private int				isMarkerVisible								= 1;
 
-	/*
-	 * NO ENTITY FIELDS
-	 */
-
+	// NO ENTITY FIELDS
+	
 	/**
 	 * visibleType is used to show the marker with different visible effects (color)
 	 */
 	@Transient
-	private int						_visibleType;
+	private int				_visibleType;
 
 	/**
 	 * Contains <b>width</b> and <b>height</b> of the marker image.
@@ -245,37 +254,26 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 	 * label text including the border
 	 */
 	@Transient
-	private Rectangle				_markerBounds;
+	private Rectangle		_markerBounds;
 
 	/**
 	 * unique id for manually created markers because the {@link #markerId} is 0 when the marker is
 	 * not persisted
 	 */
 	@Transient
-	private long					_createId									= 0;
+	private long			_createId									= 0;
 
 	/**
 	 * Device time in ms.
 	 */
 	@Transient
-	private long					_deviceLapTime								= Long.MIN_VALUE;
+	private long			_deviceLapTime								= Long.MIN_VALUE;
 
 	/**
 	 * Serie index in {@link TourData} when tour is {@link TourData#isMultipleTours}.
 	 */
 	@Transient
-	private int						_multiTourSerieIndex						= -1;
-
-	/**
-	 * 
-	 */
-	private static int				_defaultSignImageMaxSize					= -1;
-
-	/**
-	 * manually created marker or imported marker create a unique id to identify them, saved marker
-	 * are compared with the marker id
-	 */
-	private static int				_createCounter								= 0;
+	private int				_multiTourSerieIndex						= -1;
 
 	public TourMarker() {}
 
@@ -833,6 +831,10 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 		this.tourTime = absoluteTourTime;
 	}
 
+	public void setTourData(final TourData newTourData) {
+		this.tourData = newTourData;
+	}
+
 	public void setType(final int markerType) {
 		this.type = markerType;
 	}
@@ -856,19 +858,19 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 //				+ ("tourData=" + tourData + ", ")
 //				+ ("type=" + type + ", ")
 				+ ("time=" + time + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-//				+ ("distance=" + distance + ", ")
-//				+ ("distance20=" + distance20 + ", ")
-//				+ ("visualPosition=" + visualPosition + ", ")
-//				+ ("labelXOffset=" + labelXOffset + ", ")
-//				+ ("labelYOffset=" + labelYOffset + ", ")
-//				+ ("markerType=" + markerType + ", ")
+				//				+ ("distance=" + distance + ", ")
+				//				+ ("distance20=" + distance20 + ", ")
+				//				+ ("visualPosition=" + visualPosition + ", ")
+				//				+ ("labelXOffset=" + labelXOffset + ", ")
+				//				+ ("labelYOffset=" + labelYOffset + ", ")
+				//				+ ("markerType=" + markerType + ", ")
 				+ ("serieIndex=" + serieIndex + ", ") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("label=" + label + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-//				+ ("category=" + category + ", ")
-//				+ ("isMarkerVisible=" + isMarkerVisible + ", ")
-//				+ ("_visibleType=" + _visibleType + ", ")
-//				+ ("_markerBounds=" + _markerBounds + ", ")
-//				+ ("_createId=" + _createId)
+				//				+ ("category=" + category + ", ")
+				//				+ ("isMarkerVisible=" + isMarkerVisible + ", ")
+				//				+ ("_visibleType=" + _visibleType + ", ")
+				//				+ ("_markerBounds=" + _markerBounds + ", ")
+				//				+ ("_createId=" + _createId)
 				+ "]"; //$NON-NLS-1$
 	}
 

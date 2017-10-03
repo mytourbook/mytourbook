@@ -267,7 +267,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	private HashMap<Long, TourData>			_newlyImportedTours;
 	private int								_trackCounter;
 
-	private final Set<TourMarker>			_allMarker				= new HashSet<TourMarker>();
+	private final Set<TourMarker>			_allTourMarker			= new HashSet<TourMarker>();
 	private final ArrayList<TourWayPoint>	_allWayPoints			= new ArrayList<TourWayPoint>();
 	private final ArrayList<String>			_allImportedTagNames	= new ArrayList<String>();
 
@@ -390,11 +390,19 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 		if (_newlyImportedTours.size() == 1 && _device.isMergeTracks) {
 
+			final TourData tourData = (TourData) _newlyImportedTours.values().toArray()[0];
+
+			// set tourmarkers/waypoints for the only 1 tour
+			tourData.setTourMarkers(_allTourMarker);
+			tourData.setWayPoints(_allWayPoints);
+
+			if (_device.isConvertWayPoints) {
+				_tourData.convertWayPoints();
+			}
+
 			/*
 			 * Remove annoying marker when only 1 tour is imported
 			 */
-
-			final TourData tourData = (TourData) _newlyImportedTours.values().toArray()[0];
 
 			final Set<TourMarker> tourMarkers = tourData.getTourMarkers();
 
@@ -409,6 +417,17 @@ public class GPX_SAX_Handler extends DefaultHandler {
 				final TourMarker firstMarker = sortedMarkers.get(0);
 				tourMarkers.remove(firstMarker);
 			}
+
+		} else {
+
+			/**
+			 * Set tourmarker/waypoints AFTER all tours are created that tourmarker/waypoints are
+			 * set only ONCE, otherwise this exception occures:
+			 * <p>
+			 * org.hibernate.PersistentObjectException: detached entity passed to persist:
+			 * net.tourbook.data.TourMarker
+			 */
+			updateTMandWP();
 		}
 	}
 
@@ -1023,9 +1042,6 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 		_tourData.setImportFilePath(_importFilePath);
 
-		_tourData.setTourMarkers(_allMarker);
-		_tourData.setWayPoints(_allWayPoints);
-
 		_tourData.setDeviceId(_device.deviceId);
 		_tourData.setDeviceName(_device.visibleName);
 
@@ -1048,10 +1064,6 @@ public class GPX_SAX_Handler extends DefaultHandler {
 			finalizeTour_AdjustMarker();
 			finalizeTour_TourType();
 			finalizeTour_Tags();
-
-			if (_device.isConvertWayPoints) {
-				_tourData.convertWayPoints();
-			}
 		}
 
 		_tourData = null;
@@ -1253,7 +1265,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 					tourMarker.setLabelYOffset(_tempTourMarker.getLabelYOffset());
 					tourMarker.setSerieIndex(_tempTourMarker.getSerieIndex());
 
-					_allMarker.add(tourMarker);
+					_allTourMarker.add(tourMarker);
 
 				} else {
 
@@ -1770,5 +1782,152 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 			_isTourMarkerImported = true;
 		}
+	}
+
+	/**
+	 * Set tour markers and way points when multiple tours are created, ensure that a marker/point
+	 * is set only ONCE.
+	 */
+	private void updateTMandWP() {
+
+		for (final TourData tourData : _newlyImportedTours.values()) {
+
+			updateTMandWP_TourMarkers(tourData, _allTourMarker);
+			updateTMandWP_WayPoints(tourData, _allWayPoints);
+
+			if (_device.isConvertWayPoints) {
+				tourData.convertWayPoints();
+			}
+		}
+	}
+
+	private void updateTMandWP_TourMarkers(final TourData tourData, final Set<TourMarker> allTourMarker) {
+
+		final double[] tourLatSerie = tourData.latitudeSerie;
+		final double[] tourLonSerie = tourData.longitudeSerie;
+		final int[] tourTimeSerie = tourData.timeSerie;
+		final long tourStartTime = tourData.getTourStartTimeMS();
+
+		// remove used markers
+		final ArrayList<TourMarker> usedTourMarkers = new ArrayList<>();
+		final Set<TourMarker> tourMarkers = tourData.getTourMarkers();
+
+		for (final TourMarker tourMarker : allTourMarker) {
+
+			marker:
+
+			if (tourLatSerie != null) {
+
+				final double markerLatitude = tourMarker.getLatitude();
+				final double markerLontitude = tourMarker.getLongitude();
+
+				if (markerLatitude != TourDatabase.DEFAULT_DOUBLE
+						&& markerLontitude != TourDatabase.DEFAULT_DOUBLE) {
+
+					for (int tourSerieIndex = 0; tourSerieIndex < tourLatSerie.length; tourSerieIndex++) {
+
+						if (markerLatitude == tourLatSerie[tourSerieIndex]
+								&& markerLontitude == tourLonSerie[tourSerieIndex]) {
+
+							// move tour marker to the current tour
+							tourMarker.setTourData(tourData);
+
+							tourMarkers.add(tourMarker);
+							usedTourMarkers.add(tourMarker);
+
+							break marker;
+						}
+					}
+				}
+
+			} else if (tourTimeSerie != null) {
+
+				final long markerTime = tourMarker.getMarkerTime();
+
+				for (final int relativeTourTime : tourTimeSerie) {
+
+					final long tourTime = tourStartTime + (relativeTourTime * 1000);
+
+					if (markerTime == tourTime) {
+
+						// move tour marker to the current tour
+						tourMarker.setTourData(tourData);
+
+						tourMarkers.add(tourMarker);
+						usedTourMarkers.add(tourMarker);
+
+						break marker;
+					}
+				}
+
+			}
+		}
+
+		allTourMarker.removeAll(usedTourMarkers);
+	}
+
+	private void updateTMandWP_WayPoints(final TourData tourData, final ArrayList<TourWayPoint> allWayPoints) {
+
+		final double[] tourLatSerie = tourData.latitudeSerie;
+		final double[] tourLonSerie = tourData.longitudeSerie;
+		final int[] tourTimeSerie = tourData.timeSerie;
+		final long tourStartTime = tourData.getTourStartTimeMS();
+
+		final ArrayList<TourWayPoint> usedWayPoints = new ArrayList<>();
+
+		final Set<TourWayPoint> tourWayPoints = tourData.getTourWayPoints();
+
+		for (final TourWayPoint tourWayPoint : allWayPoints) {
+
+			wayPoint:
+
+			if (tourLatSerie != null) {
+
+				final double markerLatitude = tourWayPoint.getLatitude();
+				final double markerLontitude = tourWayPoint.getLongitude();
+
+				if (markerLatitude != TourDatabase.DEFAULT_DOUBLE
+						&& markerLontitude != TourDatabase.DEFAULT_DOUBLE) {
+
+					for (int tourSerieIndex = 0; tourSerieIndex < tourLatSerie.length; tourSerieIndex++) {
+
+						if (markerLatitude == tourLatSerie[tourSerieIndex]
+								&& markerLontitude == tourLonSerie[tourSerieIndex]) {
+
+							// move tour waypoint to the current tour
+							tourWayPoint.setTourData(tourData);
+
+							tourWayPoints.add(tourWayPoint);
+							usedWayPoints.add(tourWayPoint);
+
+							break wayPoint;
+						}
+					}
+				}
+
+			} else if (tourTimeSerie != null) {
+
+				final long markerTime = tourWayPoint.getTime();
+
+				for (final int relativeTourTime : tourTimeSerie) {
+
+					final long tourTime = tourStartTime + (relativeTourTime * 1000);
+
+					if (markerTime == tourTime) {
+
+						// move tour waypoint to the current tour
+						tourWayPoint.setTourData(tourData);
+
+						tourWayPoints.add(tourWayPoint);
+						usedWayPoints.add(tourWayPoint);
+
+						break wayPoint;
+					}
+				}
+			}
+		}
+
+		// remove used waypoints
+		allWayPoints.removeAll(usedWayPoints);
 	}
 }
