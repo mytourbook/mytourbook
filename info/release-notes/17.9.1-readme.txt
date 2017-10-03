@@ -1,0 +1,21 @@
+Version 17.9.1                                          ?. October 2017
+
+ 
+Bugfix
+======
+
+* FIT Import
+  Fixed NPE when importing Orux FIT files
+
+* Week of Year
+  Old versions of MyTourbook created a wrong value for week of year. 
+  This problem can be fixed by running the action 'Update calendar week 
+  in all tours' in the preferences 'General/Calendar Week'
+  
+* Fixed org.hibernate.PersistentObjectException 
+  This occured when 
+  - Import gpx file 
+  - Multiple tours and waypoints in one file 
+  - All tours are not merged into a single tour, this is the default 
+    setting
+  - Saving the tours

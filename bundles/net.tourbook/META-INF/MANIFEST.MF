@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Application_Name
 Bundle-SymbolicName: net.tourbook;singleton:=true
-Bundle-Version: 17.9.0.qualifier
+Bundle-Version: 17.9.1.qualifier
 Bundle-Activator: net.tourbook.application.TourbookPlugin
 Bundle-Vendor: %Bundle-Vendor
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
