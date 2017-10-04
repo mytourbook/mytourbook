@@ -15,6 +15,9 @@
  *******************************************************************************/
 package net.tourbook.data;
 
+import java.time.Instant;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -40,54 +43,55 @@ import org.eclipse.swt.graphics.Image;
 @Entity
 public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea {
 
-	private static final String	IMAGE_MAP_WAY_POINT_HOVERED	= net.tourbook.map2.Messages.Image_Map_WayPoint_Hovered;
+	private static final String			IMAGE_MAP_WAY_POINT_HOVERED	=
+			net.tourbook.map2.Messages.Image_Map_WayPoint_Hovered;
 
-	public static final int		DB_LENGTH_NAME				= 1024;
-	public static final int		DB_LENGTH_DESCRIPTION		= 4096;
-	public static final int		DB_LENGTH_COMMENT			= 4096;
-	public static final int		DB_LENGTH_SYMBOL			= 1024;
-	public static final int		DB_LENGTH_CATEGORY			= 1024;
+	public static final int				DB_LENGTH_NAME				= 1024;
+	public static final int				DB_LENGTH_DESCRIPTION		= 4096;
+	public static final int				DB_LENGTH_COMMENT			= 4096;
+	public static final int				DB_LENGTH_SYMBOL			= 1024;
+	public static final int				DB_LENGTH_CATEGORY			= 1024;
 
 	@Transient
-	private static Image		_twpHoveredImage;
+	private static Image				_twpHoveredImage;
 
 	/**
-	 * manually created way points or imported way points create a unique id to identify them, saved
-	 * way points are compared with the way point id
+	 * Manually created way points or imported way points need a unique id to identify them, saved
+	 * way points are compared with the way point id.
 	 */
 	@Transient
-	private static int			_createCounter				= 0;
+	private static final AtomicInteger	_createCounter				= new AtomicInteger();
 
 	/**
 	 * Unique id for the {@link TourWayPoint} entity
 	 */
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long				wayPointId					= TourDatabase.ENTITY_IS_NOT_SAVED;
+	private long						wayPointId					= TourDatabase.ENTITY_IS_NOT_SAVED;
 	@ManyToOne(optional = false)
-	private TourData			tourData;
+	private TourData					tourData;
 
 	// initialize with invalid values
-	private double				longitude					= Double.MIN_VALUE;
+	private double						longitude					= Double.MIN_VALUE;
 
-	private double				latitude					= Double.MIN_VALUE;
+	private double						latitude					= Double.MIN_VALUE;
 
 	/**
 	 * Absolute time in milliseconds since 1970-01-01T00:00:00Z with the default time zone.
 	 */
-	private long				time;
+	private long						time;
 
 	/**
 	 * Altitude in meters or {@link Float#MIN_VALUE} when not available.
 	 */
-	private float				altitude					= Float.MIN_VALUE;
-	private String				name;
-	private String				description;
-	private String				comment;
+	private float						altitude					= Float.MIN_VALUE;
+	private String						name;
+	private String						description;
+	private String						comment;
 
-	private String				symbol;
+	private String						symbol;
 
-	private String				category;
+	private String						category;
 
 	/**
 	 * Text to display on the hyperlink, can be <code>null</code>
@@ -95,7 +99,7 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
 	 * @since DB version 28
 	 */
 	// <urlname> Text to display on the <url> hyperlink
-	private String				urlText;
+	private String						urlText;
 
 	/**
 	 * URL associated with the waypoint, can be <code>null</code>
@@ -103,17 +107,17 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
 	 * @since DB version 28
 	 */
 	// <url> URL associated with the waypoint
-	private String				urlAddress;
+	private String						urlAddress;
 
 	@Transient
-	private GeoPosition			_geoPosition;
+	private GeoPosition					_geoPosition;
 
 	/**
 	 * Unique id for manually created waypoints because the {@link #wayPointId} is 0 when the
 	 * waypoint is not persisted.
 	 */
 	@Transient
-	private long				_createId					= 0;
+	private long						_createId					= _createCounter.incrementAndGet();
 
 	public TourWayPoint() {}
 
@@ -125,7 +129,7 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
 			final TourWayPoint newWayPoint = (TourWayPoint) super.clone();
 
 			// set create id to uniquely identify the way point
-			newWayPoint._createId = ++_createCounter;
+			newWayPoint._createId = _createCounter.incrementAndGet();
 
 			newWayPoint.wayPointId = TourDatabase.ENTITY_IS_NOT_SAVED;
 
@@ -144,38 +148,48 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
 	public int compareTo(final Object other) {
 
 		/*
-		 * set default sorting by time or by id (creation time)
+		 * Set default sorting by time or by id (creation time)
 		 */
 
 		if (other instanceof TourWayPoint) {
 
 			final TourWayPoint otherWP = (TourWayPoint) other;
 
+			/*
+			 * Compare by time
+			 */
 			if (time != 0 && otherWP.time != 0) {
+
 				return time > otherWP.time ? 1 : -1;
 			}
 
-			if (_createId == 0) {
+			/*
+			 * Compare by id
+			 */
+			if (wayPointId == TourDatabase.ENTITY_IS_NOT_SAVED) {
 
-				if (otherWP._createId == 0) {
+				// waypoint is not yet persisted
 
-					// both way points are persisted
-					return wayPointId > otherWP.wayPointId ? 1 : -1;
-				}
-
-				return 1;
-
-			} else {
-
-				// _createId != 0
-
-				if (otherWP._createId != 0) {
+				if (otherWP.wayPointId == TourDatabase.ENTITY_IS_NOT_SAVED) {
 
 					// both way points are created and not persisted
+
 					return _createId > otherWP._createId ? 1 : -1;
 				}
 
 				return -1;
+
+			} else {
+
+				// waypoint is persisted
+
+				if (otherWP.wayPointId != TourDatabase.ENTITY_IS_NOT_SAVED) {
+
+					// both way point is also persisted
+					return wayPointId > otherWP.wayPointId ? 1 : -1;
+				}
+
+				return 1;
 			}
 		}
 
@@ -184,31 +198,39 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
 
 	@Override
 	public boolean equals(final Object obj) {
+
 		if (this == obj) {
 			return true;
 		}
+
 		if (obj == null) {
 			return false;
 		}
+
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
 
-		final TourWayPoint other = (TourWayPoint) obj;
-		if (_createId == 0) {
+		final TourWayPoint otherWP = (TourWayPoint) obj;
 
-			// tour is from the database
-			if (wayPointId != other.wayPointId) {
-				return false;
-			}
-		} else {
+		if (wayPointId == TourDatabase.ENTITY_IS_NOT_SAVED) {
 
 			// tour was create or imported
-			if (_createId != other._createId) {
-				return false;
+
+			if (_createId == otherWP._createId) {
+				return true;
+			}
+
+		} else {
+
+			// tour is from the database
+
+			if (wayPointId == otherWP.wayPointId) {
+				return true;
 			}
 		}
-		return true;
+
+		return false;
 	}
 
 	/**
@@ -319,10 +341,16 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
 
 	@Override
 	public int hashCode() {
+
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + (int) (_createId ^ (_createId >>> 32));
-		result = prime * result + (int) (wayPointId ^ (wayPointId >>> 32));
+
+		if (wayPointId == TourDatabase.ENTITY_IS_NOT_SAVED) {
+			result = prime * result + (int) (_createId ^ (_createId >>> 32));
+		} else {
+			result = prime * result + (int) (wayPointId ^ (wayPointId >>> 32));
+		}
+
 		return result;
 	}
 
@@ -435,16 +463,17 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
 	public String toString() {
 		return "TourWayPoint [" //$NON-NLS-1$
 
-				+ ("time=" + time + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("time=" + Instant.ofEpochMilli(time) + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				+ ("_createId=" + _createId + ", ") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("wayPointId=" + wayPointId + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("longitude=" + longitude + ", ") //$NON-NLS-1$ //$NON-NLS-2$
 				+ ("latitude=" + latitude + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("altitude=" + altitude + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("name=" + name + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("description=" + description + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("comment=" + comment + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("symbol=" + symbol + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("category=" + category) //$NON-NLS-1$
+				+ ("longitude=" + longitude + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				//				+ ("altitude=" + altitude + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				//				+ ("name=" + name + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				//				+ ("description=" + description + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				//				+ ("comment=" + comment + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				//				+ ("symbol=" + symbol + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+				//				+ ("category=" + category) //$NON-NLS-1$
 
 				+ "]\n"; //$NON-NLS-1$
 	}

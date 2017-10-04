@@ -183,7 +183,7 @@ public class TourDatabase {
 	private final static String			TABLE_TOUR_CATEGORY							= "TourCategory";												//$NON-NLS-1$
 	private final static String			TABLE_TOURCATEGORY__TOURDATA				= TABLE_TOUR_CATEGORY		+ "_" + TABLE_TOUR_DATA;			//$NON-NLS-1$
 	/**
-	 * Is <code>-1</code> which is the id for a not saved entity.
+	 * Is <code>-1</code>, this is the id for a not saved entity
 	 */
 	public static final int				ENTITY_IS_NOT_SAVED							= -1;
 	//

@@ -128,42 +128,44 @@ import org.eclipse.ui.IWorkbenchPart;
  */
 public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdater, ILineSelectionPainter {
 
-	private static final String				ID										= "net.tourbook.ui.tourChart";							//$NON-NLS-1$
+// SET_FORMATTING_OFF
+	
+	private static final String		ID										= "net.tourbook.ui.tourChart";			//$NON-NLS-1$
 	//
-	private static final int				PAGE_NAVIGATION_SEGMENTS				= 10;
+	private static final int		PAGE_NAVIGATION_SEGMENTS				= 10;
 	//
-	private static final String				GRAPH_LABEL_ALTIMETER					= net.tourbook.common.Messages.Graph_Label_Altimeter;
-	private static final String				GRAPH_LABEL_ALTITUDE					= net.tourbook.common.Messages.Graph_Label_Altitude;
-	private static final String				GRAPH_LABEL_CADENCE						= net.tourbook.common.Messages.Graph_Label_Cadence;
-	private static final String				GRAPH_LABEL_GEARS						= net.tourbook.common.Messages.Graph_Label_Gears;
-	private static final String				GRAPH_LABEL_GRADIENT					= net.tourbook.common.Messages.Graph_Label_Gradient;
-	private static final String				GRAPH_LABEL_HEARTBEAT					= net.tourbook.common.Messages.Graph_Label_Heartbeat;
-	private static final String				GRAPH_LABEL_PACE						= net.tourbook.common.Messages.Graph_Label_Pace;
-	private static final String				GRAPH_LABEL_POWER						= net.tourbook.common.Messages.Graph_Label_Power;
-	private static final String				GRAPH_LABEL_SPEED						= net.tourbook.common.Messages.Graph_Label_Speed;
-	private static final String				GRAPH_LABEL_TEMPERATURE					= net.tourbook.common.Messages.Graph_Label_Temperature;
-	private static final String				GRAPH_LABEL_TOUR_COMPARE				= net.tourbook.common.Messages.Graph_Label_Tour_Compare;
+	private static final String		GRAPH_LABEL_ALTIMETER					= net.tourbook.common.Messages.Graph_Label_Altimeter;
+	private static final String		GRAPH_LABEL_ALTITUDE					= net.tourbook.common.Messages.Graph_Label_Altitude;
+	private static final String		GRAPH_LABEL_CADENCE						= net.tourbook.common.Messages.Graph_Label_Cadence;
+	private static final String		GRAPH_LABEL_GEARS						= net.tourbook.common.Messages.Graph_Label_Gears;
+	private static final String		GRAPH_LABEL_GRADIENT					= net.tourbook.common.Messages.Graph_Label_Gradient;
+	private static final String		GRAPH_LABEL_HEARTBEAT					= net.tourbook.common.Messages.Graph_Label_Heartbeat;
+	private static final String		GRAPH_LABEL_PACE						= net.tourbook.common.Messages.Graph_Label_Pace;
+	private static final String		GRAPH_LABEL_POWER						= net.tourbook.common.Messages.Graph_Label_Power;
+	private static final String		GRAPH_LABEL_SPEED						= net.tourbook.common.Messages.Graph_Label_Speed;
+	private static final String		GRAPH_LABEL_TEMPERATURE					= net.tourbook.common.Messages.Graph_Label_Temperature;
+	private static final String		GRAPH_LABEL_TOUR_COMPARE				= net.tourbook.common.Messages.Graph_Label_Tour_Compare;
 	//
-	public static final String				ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER		= "ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER";					//$NON-NLS-1$
-	public static final String				ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED	= "ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED";				//$NON-NLS-1$
-	public static final String				ACTION_ID_EDIT_CHART_PREFERENCES		= "ACTION_ID_EDIT_CHART_PREFERENCES";					//$NON-NLS-1$
-	private static final String				ACTION_ID_IS_GRAPH_OVERLAPPED			= "ACTION_ID_IS_GRAPH_OVERLAPPED";						//$NON-NLS-1$
-	public static final String				ACTION_ID_IS_SHOW_TOUR_PHOTOS			= "ACTION_ID_IS_SHOW_TOUR_PHOTOS";						//$NON-NLS-1$
-	public static final String				ACTION_ID_HR_ZONE_DROPDOWN_MENU			= "ACTION_ID_HR_ZONE_DROPDOWN_MENU";					//$NON-NLS-1$
-	public static final String				ACTION_ID_HR_ZONE_STYLE_GRAPH_TOP		= "ACTION_ID_HR_ZONE_STYLE_GRAPH_TOP";					//$NON-NLS-1$
-	public static final String				ACTION_ID_HR_ZONE_STYLE_NO_GRADIENT		= "ACTION_ID_HR_ZONE_STYLE_NO_GRADIENT";				//$NON-NLS-1$
-	public static final String				ACTION_ID_HR_ZONE_STYLE_WHITE_BOTTOM	= "ACTION_ID_HR_ZONE_STYLE_WHITE_BOTTOM";				//$NON-NLS-1$
-	public static final String				ACTION_ID_HR_ZONE_STYLE_WHITE_TOP		= "ACTION_ID_HR_ZONE_STYLE_WHITE_TOP";					//$NON-NLS-1$
-	public static final String				ACTION_ID_X_AXIS_DISTANCE				= "ACTION_ID_X_AXIS_DISTANCE";							//$NON-NLS-1$
-	public static final String				ACTION_ID_X_AXIS_TIME					= "ACTION_ID_X_AXIS_TIME";								//$NON-NLS-1$
+	public static final String		ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER		= "ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER";					//$NON-NLS-1$
+	public static final String		ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED	= "ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED";				//$NON-NLS-1$
+	public static final String		ACTION_ID_EDIT_CHART_PREFERENCES		= "ACTION_ID_EDIT_CHART_PREFERENCES";					//$NON-NLS-1$
+	private static final String		ACTION_ID_IS_GRAPH_OVERLAPPED			= "ACTION_ID_IS_GRAPH_OVERLAPPED";		//$NON-NLS-1$
+	public static final String		ACTION_ID_IS_SHOW_TOUR_PHOTOS			= "ACTION_ID_IS_SHOW_TOUR_PHOTOS";		//$NON-NLS-1$
+	public static final String		ACTION_ID_HR_ZONE_DROPDOWN_MENU			= "ACTION_ID_HR_ZONE_DROPDOWN_MENU";	//$NON-NLS-1$
+	public static final String		ACTION_ID_HR_ZONE_STYLE_GRAPH_TOP		= "ACTION_ID_HR_ZONE_STYLE_GRAPH_TOP";					//$NON-NLS-1$
+	public static final String		ACTION_ID_HR_ZONE_STYLE_NO_GRADIENT		= "ACTION_ID_HR_ZONE_STYLE_NO_GRADIENT";				//$NON-NLS-1$
+	public static final String		ACTION_ID_HR_ZONE_STYLE_WHITE_BOTTOM	= "ACTION_ID_HR_ZONE_STYLE_WHITE_BOTTOM";				//$NON-NLS-1$
+	public static final String		ACTION_ID_HR_ZONE_STYLE_WHITE_TOP		= "ACTION_ID_HR_ZONE_STYLE_WHITE_TOP";					//$NON-NLS-1$
+	public static final String		ACTION_ID_X_AXIS_DISTANCE				= "ACTION_ID_X_AXIS_DISTANCE";			//$NON-NLS-1$
+	public static final String		ACTION_ID_X_AXIS_TIME					= "ACTION_ID_X_AXIS_TIME";				//$NON-NLS-1$
 	//
-	private static final String				GRID_PREF_PREFIX						= "GRID_TOUR_CHART__";									//$NON-NLS-1$
-	//SET_FORMATTING_OFF
-	private static final String				GRID_IS_SHOW_VERTICAL_GRIDLINES			= (GRID_PREF_PREFIX	+ ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES);
-	private static final String				GRID_IS_SHOW_HORIZONTAL_GRIDLINES		= (GRID_PREF_PREFIX	+ ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
-	private static final String				GRID_VERTICAL_DISTANCE					= (GRID_PREF_PREFIX	+ ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE);
-	private static final String				GRID_HORIZONTAL_DISTANCE				= (GRID_PREF_PREFIX	+ ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE);
-	//SET_FORMATTING_ON
+	private static final String		GRID_PREF_PREFIX						= "GRID_TOUR_CHART__";					//$NON-NLS-1$
+	private static final String		GRID_IS_SHOW_VERTICAL_GRIDLINES			= (GRID_PREF_PREFIX	+ ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES);
+	private static final String		GRID_IS_SHOW_HORIZONTAL_GRIDLINES		= (GRID_PREF_PREFIX	+ ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
+	private static final String		GRID_VERTICAL_DISTANCE					= (GRID_PREF_PREFIX	+ ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE);
+	private static final String		GRID_HORIZONTAL_DISTANCE				= (GRID_PREF_PREFIX	+ ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE);
+	
+//SET_FORMATTING_ON
 	/**
 	 * 1e-5 is too small for the min value, it do not correct the graph.
 	 */
@@ -213,10 +215,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	 * it.
 	 */
 	private TourMarker						_selectedTourMarker;
-	//SET_FORMATTING_OFF
+	//
+//SET_FORMATTING_OFF
+	//
 	private ImageDescriptor					_imagePhoto								= TourbookPlugin.getImageDescriptor(Messages.Image__PhotoPhotos);
 	private ImageDescriptor					_imagePhotoTooltip						= TourbookPlugin.getImageDescriptor(Messages.Image__PhotoImage);
-	//SET_FORMATTING_ON
 
 	private IFillPainter					_hrZonePainter;
 
@@ -238,6 +241,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 	private IMouseListener					_mouseSegmentLabel_MoveListener			= new MouseListener_SegmenterSegment_Move();
 	private IMouseListener					_mouseSegmentTitle_Listener				= new MouseListener_SegmentTitle();
 	private IMouseListener					_mouseSegmentTitle_MoveListener			= new MouseListener_SegmentTitle_Move();
+	//
+//SET_FORMATTING_ON
+	//
 	private long							_hoveredSegmentTitleEventTime;
 	//
 	private boolean							_isSegmenterSegmentHovered;
@@ -1306,9 +1312,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 		_allTourChartActions.put(ACTION_ID_X_AXIS_DISTANCE, new ActionXAxisDistance(this));
 		_allTourChartActions.put(ACTION_ID_X_AXIS_TIME, new ActionXAxisTime(this));
 
-		_allTourChartActions.put(ACTION_ID_EDIT_CHART_PREFERENCES, new ActionOpenPrefDialog(//
-				Messages.Tour_Action_EditChartPreferences,
-				PrefPageAppearanceTourChart.ID));
+		_allTourChartActions.put(
+				ACTION_ID_EDIT_CHART_PREFERENCES,
+				new ActionOpenPrefDialog(//
+						Messages.Tour_Action_EditChartPreferences,
+						PrefPageAppearanceTourChart.ID));
 
 		/*
 		 * hr zone actions
@@ -1484,9 +1492,14 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 		final boolean isTimeSerie = timeSerie != null;
 
-		final boolean isMultipleTours = _tourData.isMultipleTours();
 		final int[] multipleStartTimeIndex = _tourData.multipleTourStartIndex;
 		final long[] multipleStartTime = _tourData.multipleTourStartTime;
+
+		/*
+		 * Is is possible, that multiple tours contain manually created tours which do not have data
+		 * series !!!
+		 */
+		final boolean isMultipleTours = _tourData.isMultipleTours() && multipleStartTime.length > 1;
 
 		final long tourStart = _tourData.getTourStartTimeMS() / 1000;
 		final int numberOfTimeSlices = isTimeSerie ? timeSerie.length : historySerie.length;
@@ -1750,6 +1763,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 			final int[] multipleStartTimeIndex = _tourData.multipleTourStartIndex;
 			final int[] multipleNumberOfMarkers = _tourData.multipleNumberOfMarkers;
+
+			// fixing ArrayIndexOutOfBoundsException: 0
+			if (multipleStartTimeIndex.length == 0) {
+				return;
+			}
 
 			int tourIndex = 0;
 			int numberOfMultiMarkers = 0;

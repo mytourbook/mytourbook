@@ -89,85 +89,88 @@ import org.eclipse.ui.PlatformUI;
 
 public class TourManager {
 
-	private static final String				GRAPH_LABEL_ALTIMETER							= net.tourbook.common.Messages.Graph_Label_Altimeter;
-	private static final String				GRAPH_LABEL_ALTITUDE							= net.tourbook.common.Messages.Graph_Label_Altitude;
-	private static final String				GRAPH_LABEL_CADENCE								= net.tourbook.common.Messages.Graph_Label_Cadence;
-	private static final String				GRAPH_LABEL_CADENCE_UNIT						= net.tourbook.common.Messages.Graph_Label_Cadence_Unit;
-	private static final String				GRAPH_LABEL_CADENCE_UNIT_SPM					= net.tourbook.common.Messages.Graph_Label_Cadence_Unit_Spm;
-	private static final String				GRAPH_LABEL_CADENCE_UNIT_RPM_SPM				= net.tourbook.common.Messages.Graph_Label_Cadence_Unit_RpmSpm;
-	private static final String				GRAPH_LABEL_GEARS								= net.tourbook.common.Messages.Graph_Label_Gears;
-	private static final String				GRAPH_LABEL_GRADIENT							= net.tourbook.common.Messages.Graph_Label_Gradient;
-	private static final String				GRAPH_LABEL_GRADIENT_UNIT						= net.tourbook.common.Messages.Graph_Label_Gradient_Unit;
-	private static final String				GRAPH_LABEL_HEARTBEAT							= net.tourbook.common.Messages.Graph_Label_Heartbeat;
-	private static final String				GRAPH_LABEL_HEARTBEAT_UNIT						= net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
-	private static final String				GRAPH_LABEL_PACE								= net.tourbook.common.Messages.Graph_Label_Pace;
-	private static final String				GRAPH_LABEL_POWER								= net.tourbook.common.Messages.Graph_Label_Power;
-	private static final String				GRAPH_LABEL_POWER_UNIT							= net.tourbook.common.Messages.Graph_Label_Power_Unit;
-	private static final String				GRAPH_LABEL_SPEED								= net.tourbook.common.Messages.Graph_Label_Speed;
-	private static final String				GRAPH_LABEL_TEMPERATURE							= net.tourbook.common.Messages.Graph_Label_Temperature;
-	private static final String				GRAPH_LABEL_TOUR_COMPARE						= net.tourbook.common.Messages.Graph_Label_Tour_Compare;
-	private static final String				GRAPH_LABEL_TOUR_COMPARE_UNIT					= net.tourbook.common.Messages.Graph_Label_Tour_Compare_Unit;
+// SET_FORMATTING_OFF
+	
+	private static final String		GRAPH_LABEL_ALTIMETER							= net.tourbook.common.Messages.Graph_Label_Altimeter;
+	private static final String		GRAPH_LABEL_ALTITUDE							= net.tourbook.common.Messages.Graph_Label_Altitude;
+	private static final String		GRAPH_LABEL_CADENCE								= net.tourbook.common.Messages.Graph_Label_Cadence;
+	private static final String		GRAPH_LABEL_CADENCE_UNIT						= net.tourbook.common.Messages.Graph_Label_Cadence_Unit;
+	private static final String		GRAPH_LABEL_CADENCE_UNIT_SPM					= net.tourbook.common.Messages.Graph_Label_Cadence_Unit_Spm;
+	private static final String		GRAPH_LABEL_CADENCE_UNIT_RPM_SPM				= net.tourbook.common.Messages.Graph_Label_Cadence_Unit_RpmSpm;
+	private static final String		GRAPH_LABEL_GEARS								= net.tourbook.common.Messages.Graph_Label_Gears;
+	private static final String		GRAPH_LABEL_GRADIENT							= net.tourbook.common.Messages.Graph_Label_Gradient;
+	private static final String		GRAPH_LABEL_GRADIENT_UNIT						= net.tourbook.common.Messages.Graph_Label_Gradient_Unit;
+	private static final String		GRAPH_LABEL_HEARTBEAT							= net.tourbook.common.Messages.Graph_Label_Heartbeat;
+	private static final String		GRAPH_LABEL_HEARTBEAT_UNIT						= net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
+	private static final String		GRAPH_LABEL_PACE								= net.tourbook.common.Messages.Graph_Label_Pace;
+	private static final String		GRAPH_LABEL_POWER								= net.tourbook.common.Messages.Graph_Label_Power;
+	private static final String		GRAPH_LABEL_POWER_UNIT							= net.tourbook.common.Messages.Graph_Label_Power_Unit;
+	private static final String		GRAPH_LABEL_SPEED								= net.tourbook.common.Messages.Graph_Label_Speed;
+	private static final String		GRAPH_LABEL_TEMPERATURE							= net.tourbook.common.Messages.Graph_Label_Temperature;
+	private static final String		GRAPH_LABEL_TOUR_COMPARE						= net.tourbook.common.Messages.Graph_Label_Tour_Compare;
+	private static final String		GRAPH_LABEL_TOUR_COMPARE_UNIT					= net.tourbook.common.Messages.Graph_Label_Tour_Compare_Unit;
 	//
-	public static final String				LOG_TEMP_ADJUST_001_START						= Messages.Log_TemperatureAdjustment_001_Start;
-	public static final String				LOG_TEMP_ADJUST_002_END							= Messages.Log_TemperatureAdjustment_002_End;
-	public static final String				LOG_TEMP_ADJUST_003_TOUR_CHANGES				= Messages.Log_TemperatureAdjustment_003_TourChanges;
-	public static final String				LOG_TEMP_ADJUST_005_TOUR_IS_TOO_SHORT			= Messages.Log_TemperatureAdjustment_005_TourIsTooShort;
-	public static final String				LOG_TEMP_ADJUST_006_IS_ABOVE_TEMPERATURE		= Messages.Log_TemperatureAdjustment_006_IsAboveTemperature;
-	public static final String				LOG_TEMP_ADJUST_010_NO_TEMPERATURE_DATA_SERIE	= Messages.Log_TemperatureAdjustment_010_NoTemperatureDataSeries;
-	public static final String				LOG_TEMP_ADJUST_011_NO_TIME_DATA_SERIE			= Messages.Log_TemperatureAdjustment_011_NoTimeDataSeries;
+	public static final String		LOG_TEMP_ADJUST_001_START						= Messages.Log_TemperatureAdjustment_001_Start;
+	public static final String		LOG_TEMP_ADJUST_002_END							= Messages.Log_TemperatureAdjustment_002_End;
+	public static final String		LOG_TEMP_ADJUST_003_TOUR_CHANGES				= Messages.Log_TemperatureAdjustment_003_TourChanges;
+	public static final String		LOG_TEMP_ADJUST_005_TOUR_IS_TOO_SHORT			= Messages.Log_TemperatureAdjustment_005_TourIsTooShort;
+	public static final String		LOG_TEMP_ADJUST_006_IS_ABOVE_TEMPERATURE		= Messages.Log_TemperatureAdjustment_006_IsAboveTemperature;
+	public static final String		LOG_TEMP_ADJUST_010_NO_TEMPERATURE_DATA_SERIE	= Messages.Log_TemperatureAdjustment_010_NoTemperatureDataSeries;
+	public static final String		LOG_TEMP_ADJUST_011_NO_TIME_DATA_SERIE			= Messages.Log_TemperatureAdjustment_011_NoTimeDataSeries;
 	//
-	public static final String				CUSTOM_DATA_TOUR_DATA							= "tourData";														//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_TOUR_CHART_CONFIGURATION			= "tourChartConfig";												//$NON-NLS-1$
+	public static final String		CUSTOM_DATA_TOUR_DATA							= "tourData";						//$NON-NLS-1$
+	public static final String		CUSTOM_DATA_TOUR_CHART_CONFIGURATION			= "tourChartConfig";				//$NON-NLS-1$
 	//
-	public static final String				CUSTOM_DATA_ALTIMETER							= "altimeter";														//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_ALTITUDE							= "altitude";														//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_CADENCE								= "cadence";														//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_DISTANCE							= "distance";														//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_GEAR_RATIO							= "gearRatio";														//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_GRADIENT							= "gradient";														//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_HISTORY								= "history";														//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_PACE								= "pace";															//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_POWER								= "power";															//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_PULSE								= "pulse";															//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_SPEED								= "speed";															//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_TEMPERATURE							= "temperature";													//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_TIME								= "time";															//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_SEGMENT_VALUES						= "segmentValues";													//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_ANALYZER_INFO						= "analyzerInfo";													//$NON-NLS-1$
-	public static final String				CUSTOM_DATA_CONCONI_TEST						= "CUSTOM_DATA_CONCONI_TEST";										//$NON-NLS-1$
+	public static final String		CUSTOM_DATA_ALTIMETER							= "altimeter";						//$NON-NLS-1$
+	public static final String		CUSTOM_DATA_ALTITUDE							= "altitude";						//$NON-NLS-1$
+	public static final String		CUSTOM_DATA_CADENCE								= "cadence";						//$NON-NLS-1$
+	public static final String		CUSTOM_DATA_DISTANCE							= "distance";						//$NON-NLS-1$
+	public static final String		CUSTOM_DATA_GEAR_RATIO							= "gearRatio";						//$NON-NLS-1$
+	public static final String		CUSTOM_DATA_GRADIENT							= "gradient";						//$NON-NLS-1$
+	public static final String		CUSTOM_DATA_HISTORY								= "history";						//$NON-NLS-1$
+	public static final String		CUSTOM_DATA_PACE								= "pace";							//$NON-NLS-1$
+	public static final String		CUSTOM_DATA_POWER								= "power";							//$NON-NLS-1$
+	public static final String		CUSTOM_DATA_PULSE								= "pulse";							//$NON-NLS-1$
+	public static final String		CUSTOM_DATA_SPEED								= "speed";							//$NON-NLS-1$
+	public static final String		CUSTOM_DATA_TEMPERATURE							= "temperature";					//$NON-NLS-1$
+	public static final String		CUSTOM_DATA_TIME								= "time";							//$NON-NLS-1$
+	public static final String		CUSTOM_DATA_SEGMENT_VALUES						= "segmentValues";					//$NON-NLS-1$
+	public static final String		CUSTOM_DATA_ANALYZER_INFO						= "analyzerInfo";					//$NON-NLS-1$
+	public static final String		CUSTOM_DATA_CONCONI_TEST						= "CUSTOM_DATA_CONCONI_TEST";		//$NON-NLS-1$
 	//
-	public static final String				X_AXIS_TIME										= "time";															//$NON-NLS-1$
-	public static final String				X_AXIS_DISTANCE									= "distance";														//$NON-NLS-1$
+	public static final String		X_AXIS_TIME										= "time";							//$NON-NLS-1$
+	public static final String		X_AXIS_DISTANCE									= "distance";						//$NON-NLS-1$
 	//
-	private final static String				FORMAT_MM_SS									= "%d:%02d";														//$NON-NLS-1$
-	public static final String				GEAR_TEETH_FORMAT								= "%2d:%2d";														//$NON-NLS-1$
-	public static final String				GEAR_VALUE_FORMAT								=																	//
-			GEAR_TEETH_FORMAT + " - %1.2f";																														//$NON-NLS-1$
+	private final static String		FORMAT_MM_SS									= "%d:%02d";						//$NON-NLS-1$
+	public static final String		GEAR_TEETH_FORMAT								= "%2d:%2d";						//$NON-NLS-1$
+	public static final String		GEAR_VALUE_FORMAT								= GEAR_TEETH_FORMAT + " - %1.2f";	//$NON-NLS-1$
 	//
-	public static final int					GRAPH_ALTITUDE									= 1000;
-	public static final int					GRAPH_SPEED										= 1001;
-	public static final int					GRAPH_ALTIMETER									= 1002;
-	public static final int					GRAPH_PULSE										= 1003;
-	public static final int					GRAPH_TEMPERATURE								= 1004;
-	public static final int					GRAPH_CADENCE									= 1005;
-	public static final int					GRAPH_GRADIENT									= 1006;
-	public static final int					GRAPH_POWER										= 1007;
-	public static final int					GRAPH_PACE										= 1008;
-	public static final int					GRAPH_GEARS										= 1009;
-	public static final int					GRAPH_TOUR_COMPARE								= 2000;
+	public static final int			GRAPH_ALTITUDE									= 1000;
+	public static final int			GRAPH_SPEED										= 1001;
+	public static final int			GRAPH_ALTIMETER									= 1002;
+	public static final int			GRAPH_PULSE										= 1003;
+	public static final int			GRAPH_TEMPERATURE								= 1004;
+	public static final int			GRAPH_CADENCE									= 1005;
+	public static final int			GRAPH_GRADIENT									= 1006;
+	public static final int			GRAPH_POWER										= 1007;
+	public static final int			GRAPH_PACE										= 1008;
+	public static final int			GRAPH_GEARS										= 1009;
+	public static final int			GRAPH_TOUR_COMPARE								= 2000;
+	
+// SET_FORMATTING_ON
 
 	private static final int[]				_allGraphIDs									= new int[] {
-																											GRAPH_ALTITUDE,
-																											GRAPH_SPEED,
-																											GRAPH_ALTIMETER,
-																											GRAPH_PULSE,
-																											GRAPH_TEMPERATURE,
-																											GRAPH_CADENCE,
-																											GRAPH_GRADIENT,
-																											GRAPH_POWER,
-																											GRAPH_PACE,
-																											GRAPH_GEARS,
-																											GRAPH_TOUR_COMPARE };
+			GRAPH_ALTITUDE,
+			GRAPH_SPEED,
+			GRAPH_ALTIMETER,
+			GRAPH_PULSE,
+			GRAPH_TEMPERATURE,
+			GRAPH_CADENCE,
+			GRAPH_GRADIENT,
+			GRAPH_POWER,
+			GRAPH_PACE,
+			GRAPH_GEARS,
+			GRAPH_TOUR_COMPARE };
 
 	private final static IPreferenceStore	_prefStore										= TourbookPlugin
 			.getPrefStore();
@@ -231,10 +234,12 @@ public class TourManager {
 
 			final long timeAbsolute = (long) (graphValue < 0 ? 0 - graphValue : graphValue);
 
-			return _formatter.format(
-					FORMAT_MM_SS, //
-					(timeAbsolute / 60),
-					(timeAbsolute % 60)).toString();
+			return _formatter
+					.format(
+							FORMAT_MM_SS, //
+							(timeAbsolute / 60),
+							(timeAbsolute % 60))
+					.toString();
 		}
 	}
 
@@ -303,18 +308,20 @@ public class TourManager {
 		// ensure data are available
 		if (temperatureSerie == null) {
 
-			TourLogManager.logSubError(String.format(//
-					LOG_TEMP_ADJUST_010_NO_TEMPERATURE_DATA_SERIE,
-					getTourDateTimeShort(tourData)));
+			TourLogManager.logSubError(
+					String.format(//
+							LOG_TEMP_ADJUST_010_NO_TEMPERATURE_DATA_SERIE,
+							getTourDateTimeShort(tourData)));
 
 			return false;
 		}
 
 		if (timeSerie == null) {
 
-			TourLogManager.logSubError(String.format(//
-					LOG_TEMP_ADJUST_011_NO_TIME_DATA_SERIE,
-					getTourDateTimeShort(tourData)));
+			TourLogManager.logSubError(
+					String.format(//
+							LOG_TEMP_ADJUST_011_NO_TIME_DATA_SERIE,
+							getTourDateTimeShort(tourData)));
 
 			return false;
 		}
@@ -337,9 +344,10 @@ public class TourManager {
 		// an initial temperature could not be computed because the tour is too short
 		if (initialTemperature == Integer.MIN_VALUE) {
 
-			TourLogManager.logSubError(String.format(//
-					LOG_TEMP_ADJUST_005_TOUR_IS_TOO_SHORT,
-					getTourDateTimeShort(tourData)));
+			TourLogManager.logSubError(
+					String.format(//
+							LOG_TEMP_ADJUST_005_TOUR_IS_TOO_SHORT,
+							getTourDateTimeShort(tourData)));
 
 			return false;
 		}
@@ -662,6 +670,11 @@ public class TourManager {
 		final int[] allTourMarkerNumbers = multiTourData.multipleNumberOfMarkers = new int[numTours];
 
 		final HashSet<TourPhoto> allTourPhoto = new HashSet<>();
+
+		// fixing IndexOutOfBoundsException: Index: 0, Size: 0
+		if (numTours == 0) {
+			return multiTourData;
+		}
 
 		int toStartIndex = 0;
 		int tourRecordingTime = 0;
@@ -1384,10 +1397,11 @@ public class TourManager {
 
 						for (final Long tourId : allTourIds) {
 
-							monitor.subTask(NLS.bind(//
-									Messages.Tour_Data_LoadTourData_Monitor_SubTask,
-									++loadCounter,
-									idSize));
+							monitor.subTask(
+									NLS.bind(//
+											Messages.Tour_Data_LoadTourData_Monitor_SubTask,
+											++loadCounter,
+											idSize));
 
 							if (monitor.isCanceled()) {
 								break;
@@ -1920,10 +1934,11 @@ public class TourManager {
 
 						for (final TourData tourData : modifiedTours) {
 
-							monitor.subTask(NLS.bind(//
-									Messages.Tour_Data_SaveTour_MonitorSubtask,
-									++saveCounter,
-									tourSize));
+							monitor.subTask(
+									NLS.bind(//
+											Messages.Tour_Data_SaveTour_MonitorSubtask,
+											++saveCounter,
+											tourSize));
 
 							saveModifiedTours_OneTour(savedTours, tourDataEditorSavedTour, doFireChangeEvent, tourData);
 
@@ -2128,6 +2143,11 @@ public class TourManager {
 
 		final int[] multipleStartTimeIndex = tourData.multipleTourStartIndex;
 		final int[] multipleNumberOfMarkers = tourData.multipleNumberOfMarkers;
+
+		// fixing ArrayIndexOutOfBoundsException: 0
+		if (multipleStartTimeIndex.length == 0) {
+			return;
+		}
 
 		int tourIndex = 0;
 		int numberOfMultiMarkers = 0;
@@ -2943,9 +2963,10 @@ public class TourManager {
 
 				final double maxAdjust = 1e-2;
 				// set max value after min value, adjust max otherwise values above the max are painted
-				yDataAltimeter.forceYAxisMaxValue(maxValue > 0 //
-						? maxValue - maxAdjust
-						: maxValue + maxAdjust);
+				yDataAltimeter.forceYAxisMaxValue(
+						maxValue > 0 //
+								? maxValue - maxAdjust
+								: maxValue + maxAdjust);
 			}
 
 			// adjust pulse min/max values when it's defined in the pref store
@@ -3066,11 +3087,11 @@ public class TourManager {
 
 			final float[][] chartGearSerie = new float[][] //
 			{
-				// gear ratio
-				gearSerie[0],
+					// gear ratio
+					gearSerie[0],
 
-				// front gear number, starting with 1 for the large chainwheel (Kettenblatt)
-				gearSerie[3] //
+					// front gear number, starting with 1 for the large chainwheel (Kettenblatt)
+					gearSerie[3] //
 			};
 
 			yDataGears = createChartDataSerieNoZero(chartGearSerie, ChartType.HORIZONTAL_BAR);
@@ -3596,9 +3617,10 @@ public class TourManager {
 
 			} else {
 
-				yData.forceYAxisMaxValue(maxValue > 0 //
-						? maxValue - maxValueAdjustment
-						: maxValue + maxValueAdjustment);
+				yData.forceYAxisMaxValue(
+						maxValue > 0 //
+								? maxValue - maxValueAdjustment
+								: maxValue + maxValueAdjustment);
 			}
 		}
 	}

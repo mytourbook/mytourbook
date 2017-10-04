@@ -1886,13 +1886,17 @@ public class GPX_SAX_Handler extends DefaultHandler {
 				final double markerLatitude = tourWayPoint.getLatitude();
 				final double markerLontitude = tourWayPoint.getLongitude();
 
+
 				if (markerLatitude != TourDatabase.DEFAULT_DOUBLE
 						&& markerLontitude != TourDatabase.DEFAULT_DOUBLE) {
 
 					for (int tourSerieIndex = 0; tourSerieIndex < tourLatSerie.length; tourSerieIndex++) {
 
-						if (markerLatitude == tourLatSerie[tourSerieIndex]
-								&& markerLontitude == tourLonSerie[tourSerieIndex]) {
+						final double tourLatitude = tourLatSerie[tourSerieIndex];
+						final double tourLongitude = tourLonSerie[tourSerieIndex];
+
+
+						if (markerLatitude == tourLatitude && markerLontitude == tourLongitude) {
 
 							// move tour waypoint to the current tour
 							tourWayPoint.setTourData(tourData);
