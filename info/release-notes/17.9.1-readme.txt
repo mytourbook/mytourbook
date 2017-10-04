@@ -1,4 +1,4 @@
-Version 17.9.1                                          ?. October 2017
+Version 17.9.1                                          5. October 2017
 
  
 Bugfix
@@ -19,3 +19,6 @@ Bugfix
   - All tours are not merged into a single tour, this is the default 
     setting
   - Saving the tours
+  
+* Fixed some out of bounds exceptions when multiple, only manually 
+  created tours are selected

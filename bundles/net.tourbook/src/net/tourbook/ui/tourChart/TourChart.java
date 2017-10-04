@@ -1492,9 +1492,14 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
 		final boolean isTimeSerie = timeSerie != null;
 
-		final boolean isMultipleTours = _tourData.isMultipleTours();
 		final int[] multipleStartTimeIndex = _tourData.multipleTourStartIndex;
 		final long[] multipleStartTime = _tourData.multipleTourStartTime;
+
+		/*
+		 * Is is possible, that multiple tours contain manually created tours which do not have data
+		 * series !!!
+		 */
+		final boolean isMultipleTours = _tourData.isMultipleTours() && multipleStartTime.length > 1;
 
 		final long tourStart = _tourData.getTourStartTimeMS() / 1000;
 		final int numberOfTimeSlices = isTimeSerie ? timeSerie.length : historySerie.length;
