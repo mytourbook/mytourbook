@@ -141,10 +141,10 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	/**
 	 * Cache font height;
 	 */
-	private int									_fontHeight;
-	private int									_fontAverageCharWidth;
+	private int									_defaultFontHeight;
+	private int									_defaultFontAverageCharWidth;
 	private int									_fontHeight_DateColumn;
-	private int									_fontHeight_Bold;
+	private int									_fontHeight_DayHeader;
 
 	private LocalDate							_calendarFirstDay;
 	private LocalDate							_calendarLastDay;
@@ -167,9 +167,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 	private Color								_darkGray				= _colorCache.getColor(0x404040);
 
-	private FontMetrics							_fontMetrics;
 	private Font								_boldFont;
 	private Font								_fontDateColumn;
+	private Font								_fontDayHeader;
 
 	private Image								_image;
 	private Image								_highlight;
@@ -264,14 +264,10 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		{
 			gc.setFont(JFaceResources.getDialogFont());
 
-			_fontMetrics = gc.getFontMetrics();
-			_fontHeight = _fontMetrics.getHeight();
-			_fontAverageCharWidth = _fontMetrics.getAverageCharWidth();
-
-			gc.setFont(_boldFont);
-
 			final FontMetrics fontMetrics = gc.getFontMetrics();
-			_fontHeight_Bold = fontMetrics.getHeight();
+
+			_defaultFontHeight = fontMetrics.getHeight();
+			_defaultFontAverageCharWidth = fontMetrics.getAverageCharWidth();
 		}
 		gc.dispose();
 
@@ -538,6 +534,12 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		_selectionProvider.add(provider);
 	}
 
+	private void disposeFonts() {
+
+		_fontDateColumn = UI.disposeResource(_fontDateColumn);
+		_fontDayHeader = UI.disposeResource(_fontDayHeader);
+	}
+
 	void draw() {
 
 		_isGraphClean = false;
@@ -635,12 +637,12 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		int dateColumnWidth = 0;
 		if (config.isShowDateColumn) {
-			dateColumnWidth = config.dateColumnWidth * _fontAverageCharWidth;
+			dateColumnWidth = config.dateColumnWidth * _defaultFontAverageCharWidth;
 		}
 
 		int summaryColumnWidth = 0;
 		if (config.isShowSummaryColumn) {
-			summaryColumnWidth = config.summaryColumnWidth * _fontAverageCharWidth;
+			summaryColumnWidth = config.summaryColumnWidth * _defaultFontAverageCharWidth;
 		}
 
 		cellWidth = (float) (canvasWidth - dateColumnWidth - summaryColumnWidth) / numDayColumns;
@@ -650,7 +652,13 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		final long todayDayId = (new Day(LocalDate.now())).dayId;
 
 		final int dayLabelXOffset = 2;
-		final int dayHeaderHeight = config.isShowDayHeader ? _fontHeight_Bold : 0;
+
+		Font dayHeaderFont = null;
+		int dayHeaderHeight = 0;
+		if (config.isShowDayHeader) {
+			dayHeaderFont = getFont_DayHeader();
+			dayHeaderHeight = _fontHeight_DayHeader;
+		}
 
 		final DateTimeFormatter headerFormatter = getUI_HeaderFormatter(config, gc, cellWidth, dayLabelXOffset);
 
@@ -670,7 +678,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 			if (dateColumnWidth > 0) {
 
-				final Rectangle infoRec = new Rectangle(0, rowTop, dateColumnWidth, _rowHeight);
+//				final Rectangle infoRec = new Rectangle(0, rowTop, dateColumnWidth, _rowHeight);
 				drawWeek_Date(gc, currentDate, rowTop, config.dateColumnContent);
 			}
 
@@ -704,6 +712,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 				// day header
 				if (config.isShowDayHeader) {
 
+					gc.setFont(dayHeaderFont);
+
 					Color headerColor;
 					if (day.dayId == todayDayId) {
 
@@ -723,22 +733,22 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 //					gc.fillGradientRectangle(posX, rowTop, dayRec.width + 1, dayHeaderHeight, true); // no clue why I've to add 1 to the width, looks like a bug on Linux and does not hurt as we overwrite with the vertial line at the end anyway
 
 					// get label width
-					if (config.isShowDayHeaderBold) {
-						gc.setFont(_boldFont);
-					}
-
 					final String dayLabel = headerFormatter.format(currentDate);
 					final int dayLabelWidth = gc.textExtent(dayLabel).x;
 					final int labelWidthWithOffset = dayLabelWidth + dayLabelXOffset;
 
 					// day header label
 					gc.setForeground(headerColor);
-					gc.setClipping(posX, rowTop, dayRec.width, dayHeaderHeight); // this clipping should only kick in if shortest label format is still longer than the cell width
+
+//					gc.drawRectangle(posX, rowTop, dayRec.width - 2, dayHeaderHeight);
+
+					// this clipping should only kick in if shortest label format is still longer than the cell width
+					gc.setClipping(posX, rowTop, dayRec.width, dayHeaderHeight);
 
 					gc.drawText(
 							dayLabel,
 							posXNext - labelWidthWithOffset,
-							rowTop,
+							rowTop - 0,
 							true);
 
 					gc.setClipping(_nullRec);
@@ -1002,7 +1012,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		gc.setClipping(r.x + 1, r.y, r.width - 2, r.height);
 
 		int y = r.y + 1;
-		final int minToShow = (2 * _fontHeight / 3);
+		final int minToShow = (2 * _defaultFontHeight / 3);
 
 		String prevInfo = null;
 
@@ -1018,7 +1028,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 				gc.drawText(info, r.x + 2, y, true);
 
-				y += _fontHeight;
+				y += _defaultFontHeight;
 			}
 
 			prevInfo = info;
@@ -1039,8 +1049,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		final int posX = 2;
 		final int thisWeekYPos = rowTop;
-
-		final int lastWeekCoveredYPos = _nextWeekDateYPos + _fontHeight_DateColumn;
 
 		// prevent overlapping
 		final boolean isInLastWeek = thisWeekYPos < _nextWeekDateYPos;
@@ -1141,7 +1149,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 				gc.drawText(text, xx, y);
 			}
 
-			y += _fontHeight;
+			y += _defaultFontHeight;
 		}
 
 		gc.setFont(normalFont);
@@ -1220,10 +1228,35 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			final FontData dateColumnFontData = CalendarConfigManager.getActiveCalendarConfig().dateColumnFont;
 
 			_fontDateColumn = new Font(_display, dateColumnFontData);
-			_fontHeight_DateColumn = dateColumnFontData.getHeight();
+
+			final GC gc = new GC(_display);
+			{
+				gc.setFont(_fontDateColumn);
+				_fontHeight_DateColumn = gc.getFontMetrics().getHeight();
+			}
+			gc.dispose();
 		}
 
 		return _fontDateColumn;
+	}
+
+	private Font getFont_DayHeader() {
+
+		if (_fontDayHeader == null) {
+
+			final FontData dateColumnFontData = CalendarConfigManager.getActiveCalendarConfig().dayHeaderFont;
+
+			_fontDayHeader = new Font(_display, dateColumnFontData);
+
+			final GC gc = new GC(_display);
+			{
+				gc.setFont(_fontDayHeader);
+				_fontHeight_DayHeader = gc.getFontMetrics().getHeight();
+			}
+			gc.dispose();
+		}
+
+		return _fontDayHeader;
 	}
 
 	/**
@@ -1570,7 +1603,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		_colorCache.dispose();
 
-		_fontDateColumn = UI.disposeResource(_fontDateColumn);
+		disposeFonts();
 	}
 
 	/**
@@ -1931,8 +1964,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		_isGraphClean = false;
 
 		if (isResetUIResources) {
-
-			_fontDateColumn = UI.disposeResource(_fontDateColumn);
+			disposeFonts();
 		}
 
 		redraw();

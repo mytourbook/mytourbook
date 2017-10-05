@@ -18,9 +18,7 @@ package net.tourbook.ui.views.calendar;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
-import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.font.IFontEditorListener;
 import net.tourbook.common.font.SimpleFontEditor;
 import net.tourbook.common.formatter.ValueFormat;
@@ -34,13 +32,11 @@ import net.tourbook.ui.views.calendar.CalendarConfigManager.DayHeaderLayoutData;
 import net.tourbook.ui.views.calendar.CalendarConfigManager.ICalendarConfigProvider;
 import net.tourbook.ui.views.calendar.CalendarView.TourInfoFormatter;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.LayoutConstants;
 import org.eclipse.jface.layout.PixelConverter;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
@@ -71,15 +67,16 @@ import org.eclipse.swt.widgets.Widget;
  */
 public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalendarConfigProvider {
 
-	private final IPreferenceStore	_prefStore	= TourbookPlugin.getPrefStore();
+//	private final IPreferenceStore	_prefStore	= TourbookPlugin.getPrefStore();
 
-	private SelectionAdapter		_defaultSelectionListener;
+	private IFontEditorListener		_defaultFontEditorListener;
 	private MouseWheelListener		_defaultMouseWheelListener;
-	private SelectionAdapter		_weekValueListener;
+	private SelectionAdapter		_defaultSelectionListener;
 	private FocusListener			_keepOpenListener;
+	private SelectionAdapter		_weekValueListener;
 
-	private ActionOpenPrefDialog	_actionPrefDialog;
-	private Action					_actionRestoreDefaults;
+//	private ActionOpenPrefDialog	_actionPrefDialog;
+//	private Action					_actionRestoreDefaults;
 
 	private boolean					_isUpdateUI;
 
@@ -118,7 +115,6 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 	private Button					_chkIsShowDateColumn;
 	private Button					_chkIsShowDayHeader;
-	private Button					_chkIsShowDayHeaderBold;
 	private Button					_chkIsShowSummaryColumn;
 
 	private Combo					_comboConfigName;
@@ -126,9 +122,13 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	private Combo					_comboDayHeaderDateFormat;
 	private Combo					_comboDayHeaderLayout;
 
+	private SimpleFontEditor		_fontEditorDayHeader;
+	private SimpleFontEditor		_fontEditorDateColumn;
+
 	private Label					_lblDateColumnContent;
 	private Label					_lblDateColumnFont;
 	private Label					_lblDateColumnWidth;
+	private Label					_lblDayHeaderFont;
 	private Label					_lblDayHeaderFormat;
 	private Label					_lblDayHeaderLayout;
 	private Label					_lblSummaryColumnWidth;
@@ -140,8 +140,6 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	private Text					_textConfigName;
 
 	private ToolItem				_toolItem;
-
-	private SimpleFontEditor		_fontEditorDateColumn;
 
 	/**
 	 * @param ownerControl
@@ -170,8 +168,6 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	@Override
 	protected void createSlideoutContent(final Composite parent) {
 
-		initUI(parent);
-
 		createActions();
 		createUI(parent);
 
@@ -183,6 +179,10 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 	@Override
 	protected void createTitleBarControls(final Composite parent) {
+
+		// this method is called 1st
+
+		initUI(parent);
 
 		{
 			/*
@@ -336,23 +336,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 				// value
 				_fontEditorDateColumn = new SimpleFontEditor(group, SWT.NONE);
-				_fontEditorDateColumn.addFontListener(new IFontEditorListener() {
-
-					@Override
-					public void fontDialogOpened(final boolean isDialogOpened) {
-						setIsKeepOpenInternally(isDialogOpened);
-					}
-
-					@Override
-					public void fontSelected(final FontData font) {
-						onModifyConfig();
-					}
-				});
-//				GridDataFactory
-//						.fillDefaults()//
-//						.align(SWT.FILL, SWT.CENTER)
-////						.indent(_subItemIndent, 0)
-//						.applyTo(_fontEditorDateColumn);
+				_fontEditorDateColumn.addFontListener(_defaultFontEditorListener);
 			}
 		}
 	}
@@ -516,19 +500,21 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		{
 			{
 				/*
-				 * Bold font
+				 * Font
 				 */
 
-				// checkbox
-				_chkIsShowDayHeaderBold = new Button(container, SWT.CHECK);
-				_chkIsShowDayHeaderBold.setText(Messages.Slideout_CalendarOptions_Checkbox_IsShowDayHeaderBold);
-				_chkIsShowDayHeaderBold.addSelectionListener(_defaultSelectionListener);
+				// label
+				_lblDayHeaderFont = new Label(container, SWT.NONE);
+				_lblDayHeaderFont.setText(Messages.Slideout_CalendarOptions_Label_DayHeaderFont);
 				GridDataFactory
 						.fillDefaults()//
-						.align(SWT.FILL, SWT.BEGINNING)
-						//					.indent(_subItemIndent, 0)
-						.span(2, 1)
-						.applyTo(_chkIsShowDayHeaderBold);
+						.align(SWT.FILL, SWT.CENTER)
+						.indent(_subItemIndent, 0)
+						.applyTo(_lblDayHeaderFont);
+
+				// value
+				_fontEditorDayHeader = new SimpleFontEditor(container, SWT.NONE);
+				_fontEditorDayHeader.addFontListener(_defaultFontEditorListener);
 			}
 		}
 	}
@@ -815,11 +801,12 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		_spinnerSummaryColumnWidth.setEnabled(isShowSummaryColumn);
 
 		// day
-		_chkIsShowDayHeaderBold.setEnabled(isShowDayHeader);
 		_comboDayHeaderDateFormat.setEnabled(isShowDayHeader);
 		_comboDayHeaderLayout.setEnabled(isShowDayHeader);
 		_lblDayHeaderFormat.setEnabled(isShowDayHeader);
 		_lblDayHeaderLayout.setEnabled(isShowDayHeader);
+		_lblDayHeaderFont.setEnabled(isShowDayHeader);
+		_fontEditorDayHeader.setEnabled(isShowDayHeader);
 	}
 
 	private void fillUI() {
@@ -1075,6 +1062,19 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			}
 		};
 
+		_defaultFontEditorListener = new IFontEditorListener() {
+
+			@Override
+			public void fontDialogOpened(final boolean isDialogOpened) {
+				setIsKeepOpenInternally(isDialogOpened);
+			}
+
+			@Override
+			public void fontSelected(final FontData font) {
+				onModifyConfig();
+			}
+		};
+
 		CalendarConfigManager.setConfigProvider(this);
 
 		parent.addDisposeListener(new DisposeListener() {
@@ -1185,9 +1185,9 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 			// day header
 			_chkIsShowDayHeader.setSelection(config.isShowDayHeader);
-			_chkIsShowDayHeaderBold.setSelection(config.isShowDayHeaderBold);
 			_comboDayHeaderDateFormat.select(getDayHeaderDateFormatIndex(config.dayHeaderFormat));
 			_comboDayHeaderLayout.select(getDayHeaderLayoutIndex(config.dayHeaderLayout));
+			_fontEditorDayHeader.setSelection(config.dayHeaderFont);
 
 			// date column
 			_chkIsShowDateColumn.setSelection(config.isShowDateColumn);
@@ -1218,9 +1218,9 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 		// day header
 		config.isShowDayHeader = _chkIsShowDayHeader.getSelection();
-		config.isShowDayHeaderBold = _chkIsShowDayHeaderBold.getSelection();
 		config.dayHeaderFormat = getSelectedDayHeaderFormat();
 		config.dayHeaderLayout = getSelectedDayHeaderLayout();
+		config.dayHeaderFont = _fontEditorDayHeader.getSelection();
 
 		// date column
 		config.isShowDateColumn = _chkIsShowDateColumn.getSelection();

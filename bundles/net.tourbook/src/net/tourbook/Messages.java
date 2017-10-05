@@ -1595,27 +1595,23 @@ public class Messages extends NLS {
 	public static String		Search_View_Link_LinuxBrowser;
 	public static String		Search_View_Link_SetupExternalBrowser;
 
-	public static String Slideout_CalendarOptions_Checkbox_IsShowDateColumn;
-
-	public static String Slideout_CalendarOptions_Checkbox_IsShowDateColumn_Tooltip;
-
+	public static String		Slideout_CalendarOptions_Checkbox_IsShowDateColumn;
+	public static String		Slideout_CalendarOptions_Checkbox_IsShowDateColumn_Tooltip;
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowDayHeader;
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowDayHeaderBold;
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowSummaryColumn;
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowSummaryColumn_Tooltip;
 	public static String		Slideout_CalendarOptions_Checkbox_IsTinyLayout;
-	public static String Slideout_CalendarOptions_Group_DateColumn;
-
+	public static String		Slideout_CalendarOptions_Group_DateColumn;
 	public static String		Slideout_CalendarOptions_Group_Day;
-
-	public static String Slideout_CalendarOptions_Group_SummaryColumn;
+	public static String		Slideout_CalendarOptions_Group_SummaryColumn;
 	public static String		Slideout_CalendarOptions_Group_WeekSummary;
 	public static String		Slideout_CalendarOptions_Label_DateColumn_Width;
 	public static String		Slideout_CalendarOptions_Label_DateColumn_Width_Tooltip;
 	public static String		Slideout_CalendarOptions_Label_DateColumnContent;
 	public static String		Slideout_CalendarOptions_Label_DateColumnContent_Tooltip;
-
-	public static String Slideout_CalendarOptions_Label_DateColumnFont;
+	public static String		Slideout_CalendarOptions_Label_DateColumnFont;
+	public static String		Slideout_CalendarOptions_Label_DayHeaderFont;
 	public static String		Slideout_CalendarOptions_Label_DayHeaderFormat;
 	public static String		Slideout_CalendarOptions_Label_DayHeaderLayout;
 	public static String		Slideout_CalendarOptions_Label_N_Line;

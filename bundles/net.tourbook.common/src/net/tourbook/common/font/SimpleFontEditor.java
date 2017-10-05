@@ -211,12 +211,12 @@ public class SimpleFontEditor extends Composite {
 	}
 
 	@Override
-	public void setEnabled(final boolean isEenabled) {
+	public void setEnabled(final boolean isEnabled) {
 
-		_lblSelectedFont.setEnabled(isEenabled);
-		_btnChangeFont.setEnabled(isEenabled);
+		_lblSelectedFont.setEnabled(isEnabled);
+		_btnChangeFont.setEnabled(isEnabled);
 
-		super.setEnabled(isEenabled);
+		super.setEnabled(isEnabled);
 	}
 
 	public void setSelection(final FontData fontData) {
