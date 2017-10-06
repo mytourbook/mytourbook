@@ -27,6 +27,7 @@ import net.tourbook.common.color.ColorCacheSWT;
 import net.tourbook.common.color.ColorUtil;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.ui.TextWrapPainter;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
@@ -144,6 +145,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	private int									_defaultFontHeight;
 	private int									_defaultFontAverageCharWidth;
 	private int									_fontHeight_DateColumn;
+	private int									_fontHeight_DayContent;
 	private int									_fontHeight_DayHeader;
 
 	private LocalDate							_calendarFirstDay;
@@ -152,6 +154,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	private int									_nextWeekDateYPos;
 	private int									_lastWeekDateYear;
 	private int									_rowHeight;
+
+	private TextWrapPainter						_textWrapPainter;
 
 	/*
 	 * UI controls
@@ -169,6 +173,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 	private Font								_boldFont;
 	private Font								_fontDateColumn;
+	private Font								_fontDayContent;
 	private Font								_fontDayHeader;
 
 	private Image								_image;
@@ -259,6 +264,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		_calendarView = calendarView;
 
 		_boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
+
+		_textWrapPainter = new TextWrapPainter();
 
 		final GC gc = new GC(parent);
 		{
@@ -537,6 +544,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	private void disposeFonts() {
 
 		_fontDateColumn = UI.disposeResource(_fontDateColumn);
+		_fontDayContent = UI.disposeResource(_fontDayContent);
 		_fontDayHeader = UI.disposeResource(_fontDayHeader);
 	}
 
@@ -754,7 +762,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 					gc.setClipping(_nullRec);
 				}
 
-				gc.setFont(normalFont);
+				gc.setFont(getFont_DayContent());
 
 				drawDayTours(
 						gc,
@@ -1006,32 +1014,26 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 	}
 
-	private void drawTour_InfoText(final GC gc, final Rectangle r, final CalendarTourData data, final Color fg) {
+	private void drawTour_InfoText(final GC gc, final Rectangle dayRect, final CalendarTourData data, final Color fg) {
 
 		gc.setForeground(fg);
-		gc.setClipping(r.x + 1, r.y, r.width - 2, r.height);
+		gc.setClipping(dayRect.x + 1, dayRect.y, dayRect.width - 2, dayRect.height);
 
-		int y = r.y + 1;
-		final int minToShow = (2 * _defaultFontHeight / 3);
+		final String infoText = _tourInfoFormatter[0].format(data);
 
-		String prevInfo = null;
+		if (infoText.length() > 0) {
 
-		for (int formatterIndex = 0; formatterIndex < _tourInfoFormatter.length //
-				&& y < r.y + r.height - minToShow; formatterIndex++) {
+			final int topBorder = 0;
+			final int leftBorder = 0;
 
-			final String info = _tourInfoFormatter[formatterIndex].format(data);
-
-			// Prevent that the same text is displayed multiple times.
-			if (info.length() > 0 && info.equals(prevInfo) == false) {
-
-				// this is another text
-
-				gc.drawText(info, r.x + 2, y, true);
-
-				y += _defaultFontHeight;
-			}
-
-			prevInfo = info;
+			_textWrapPainter.drawText(
+					gc,
+					infoText,
+					dayRect.x,
+					dayRect.y,
+					dayRect.width - leftBorder,
+					dayRect.height - topBorder,
+					_fontHeight_DayContent);
 		}
 
 		gc.setClipping(_nullRec);
@@ -1225,9 +1227,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		if (_fontDateColumn == null) {
 
-			final FontData dateColumnFontData = CalendarConfigManager.getActiveCalendarConfig().dateColumnFont;
+			final FontData fontData = CalendarConfigManager.getActiveCalendarConfig().dateColumnFont;
 
-			_fontDateColumn = new Font(_display, dateColumnFontData);
+			_fontDateColumn = new Font(_display, fontData);
 
 			final GC gc = new GC(_display);
 			{
@@ -1240,13 +1242,32 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		return _fontDateColumn;
 	}
 
+	private Font getFont_DayContent() {
+
+		if (_fontDayContent == null) {
+
+			final FontData fontData = CalendarConfigManager.getActiveCalendarConfig().dayContentFont;
+
+			_fontDayContent = new Font(_display, fontData);
+
+			final GC gc = new GC(_display);
+			{
+				gc.setFont(_fontDayContent);
+				_fontHeight_DayContent = gc.getFontMetrics().getHeight();
+			}
+			gc.dispose();
+		}
+
+		return _fontDayContent;
+	}
+
 	private Font getFont_DayHeader() {
 
 		if (_fontDayHeader == null) {
 
-			final FontData dateColumnFontData = CalendarConfigManager.getActiveCalendarConfig().dayHeaderFont;
+			final FontData fontData = CalendarConfigManager.getActiveCalendarConfig().dayHeaderFont;
 
-			_fontDayHeader = new Font(_display, dateColumnFontData);
+			_fontDayHeader = new Font(_display, fontData);
 
 			final GC gc = new GC(_display);
 			{

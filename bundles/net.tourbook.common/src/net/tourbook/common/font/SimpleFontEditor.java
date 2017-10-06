@@ -29,6 +29,7 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
@@ -37,6 +38,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FontDialog;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Spinner;
 
 public class SimpleFontEditor extends Composite {
 
@@ -52,6 +54,8 @@ public class SimpleFontEditor extends Composite {
 	private Label				_lblSelectedFont;
 
 	private Font				_selectedFont;
+
+	private Spinner				_spinnerFontSize;
 
 	public SimpleFontEditor(final Composite parent, final int style) {
 
@@ -72,10 +76,51 @@ public class SimpleFontEditor extends Composite {
 		final PixelConverter pc = new PixelConverter(this);
 
 		final Composite container = new Composite(this, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).spacing(5, 2).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
 		{
+			{
+				/*
+				 * Button: Change
+				 */
+				final String buttonText = JFaceResources.getString("openChange"); //$NON-NLS-1$
+
+				_btnChangeFont = new Button(container, SWT.PUSH);
+				_btnChangeFont.setText(buttonText);
+				_btnChangeFont.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent event) {
+						onChangeFont();
+					}
+				});
+			}
+			{
+				// Spinner
+				_spinnerFontSize = new Spinner(container, SWT.BORDER);
+				_spinnerFontSize.setMinimum(2);
+				_spinnerFontSize.setMaximum(100);
+				_spinnerFontSize.setPageIncrement(5);
+				_spinnerFontSize.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						onChangeFontSize();
+					}
+				});
+				_spinnerFontSize.addMouseWheelListener(new MouseWheelListener() {
+
+					@Override
+					public void mouseScrolled(final MouseEvent event) {
+						UI.adjustSpinnerValueOnMouseScroll(event);
+						onChangeFontSize();
+					}
+				});
+
+				GridDataFactory
+						.fillDefaults()//
+						.align(SWT.BEGINNING, SWT.CENTER)
+						.applyTo(_spinnerFontSize);
+			}
 			{
 				/*
 				 * Font text
@@ -102,24 +147,11 @@ public class SimpleFontEditor extends Composite {
 
 				GridDataFactory
 						.fillDefaults()//
-						.align(SWT.FILL, SWT.CENTER)
+						//						.align(SWT.FILL, SWT.CENTER)
+						.grab(true, false)
 						.hint(pc.convertWidthInCharsToPixels(12), SWT.DEFAULT)
+						.span(2, 1)
 						.applyTo(_lblSelectedFont);
-			}
-			{
-				/*
-				 * Button: Change
-				 */
-				final String buttonText = JFaceResources.getString("openChange"); //$NON-NLS-1$
-
-				_btnChangeFont = new Button(container, SWT.PUSH);
-				_btnChangeFont.setText(buttonText);
-				_btnChangeFont.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(final SelectionEvent event) {
-						onChangeFont();
-					}
-				});
 			}
 		}
 	}
@@ -129,7 +161,7 @@ public class SimpleFontEditor extends Composite {
 		FontData[] oldFont = _selectedFontData;
 
 		if (oldFont == null) {
-			oldFont = JFaceResources.getDefaultFont().getFontData();
+			oldFont = JFaceResources.getFontRegistry().defaultFont().getFontData();
 		}
 
 		final FontData[] newFontData = new FontData[1];
@@ -206,6 +238,18 @@ public class SimpleFontEditor extends Composite {
 		}
 	}
 
+	private void onChangeFontSize() {
+
+		final FontData[] selectedFont = _selectedFontData;
+
+		final FontData font = selectedFont[0];
+		font.setHeight(_spinnerFontSize.getSelection());
+
+		final FontData[] validFont = JFaceResources.getFontRegistry().filterData(selectedFont, getDisplay());
+
+		fireFontChanged(validFont[0]);
+	}
+
 	public void removeOpenListener(final IFontEditorListener listener) {
 		_fontListeners.remove(listener);
 	}
@@ -213,8 +257,9 @@ public class SimpleFontEditor extends Composite {
 	@Override
 	public void setEnabled(final boolean isEnabled) {
 
-		_lblSelectedFont.setEnabled(isEnabled);
 		_btnChangeFont.setEnabled(isEnabled);
+		_lblSelectedFont.setEnabled(isEnabled);
+		_spinnerFontSize.setEnabled(isEnabled);
 
 		super.setEnabled(isEnabled);
 	}
@@ -253,8 +298,10 @@ public class SimpleFontEditor extends Composite {
 
 			_selectedFont = new Font(getDisplay(), _selectedFontData);
 			_lblSelectedFont.setFont(_selectedFont);
+			_spinnerFontSize.setSelection(_selectedFontData[0].getHeight());
 
 			// ensure that the selected font is displayed
+			_spinnerFontSize.getParent().layout(true, true);
 			this.getShell().pack(true);
 		}
 	}

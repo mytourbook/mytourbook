@@ -32,7 +32,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
 import org.osgi.framework.Bundle;
@@ -88,6 +88,7 @@ public class CalendarConfigManager {
 	private static final String			ATTR_DATE_COLUMN_CONTENT		= "dateColumnContent";						//$NON-NLS-1$
 	private static final String			ATTR_DATE_COLUMN_FONT			= "dateColumnFont";							//$NON-NLS-1$
 	private static final String			ATTR_DATE_COLUMN_WIDTH			= "dateColumnWidth";						//$NON-NLS-1$
+	private static final String			ATTR_DAY_CONTENT_FONT			= "dayContentFont";							//$NON-NLS-1$
 	private static final String			ATTR_DAY_HEADER_DATE_FORMAT		= "dayHeaderDateFormat";					//$NON-NLS-1$
 	private static final String			ATTR_DAY_HEADER_FONT			= "dayHeaderFont";							//$NON-NLS-1$
 	private static final String			ATTR_DAY_HEADER_LAYOUT			= "dayHeaderLayout";						//$NON-NLS-1$
@@ -97,7 +98,7 @@ public class CalendarConfigManager {
 	static final DateColumnContent		DEFAULT_DATE_COLUMN_CONTENT		= DateColumnContent.WEEK_NUMBER;
 	static final int					DEFAULT_SUMMARY_COLUMN_WIDTH	= 10;
 	static final int					DEFAULT_WEEK_HEIGHT				= 70;
-	static final DayHeaderDateFormat	DEFAULT_DAY_HEADER_DATE_FORMAT	= DayHeaderDateFormat.AUTOMATIC;
+	static final DayHeaderDateFormat	DEFAULT_DAY_HEADER_DATE_FORMAT	= DayHeaderDateFormat.DAY;
 	static final DayHeaderLayout		DEFAULT_DAY_HEADER_LAYOUT		= DayHeaderLayout.WEEK_NUMBER;
 	//
 	static final int					WEEK_HEIGHT_MIN					= 1;
@@ -116,10 +117,6 @@ public class CalendarConfigManager {
 	private static final DayHeaderDateFormatData[]	_allDateHeaderDateFormatData	= new DayHeaderDateFormatData[] {
 
 			new DayHeaderDateFormatData(
-					DayHeaderDateFormat.AUTOMATIC,
-					Messages.Calendar_Config_DayHeaderDateFormat_Automatic),
-
-			new DayHeaderDateFormatData(
 					DayHeaderDateFormat.DAY,
 					NLS.bind(
 							Messages.Calendar_Config_DayHeaderDateFormat_Day,
@@ -132,6 +129,10 @@ public class CalendarConfigManager {
 			new DayHeaderDateFormatData(
 					DayHeaderDateFormat.DAY_MONTH_YEAR,
 					TimeTools.Formatter_DayMonthYear.format(LocalDate.now())),
+
+			new DayHeaderDateFormatData(
+					DayHeaderDateFormat.AUTOMATIC,
+					Messages.Calendar_Config_DayHeaderDateFormat_Automatic),
 	};																													//
 	//
 	private static final DayHeaderLayoutData[]		_allDayHeaderLayoutData			= new DayHeaderLayoutData[] {
@@ -145,6 +146,7 @@ public class CalendarConfigManager {
 	 * Contains all configurations which are loaded from a xml file.
 	 */
 	private static final ArrayList<CalendarConfig>	_allCalendarConfigs				= new ArrayList<>();
+
 
 	private static CalendarConfig					_activeCalendarConfig;
 
@@ -296,11 +298,14 @@ public class CalendarConfigManager {
 			xmlConfig.putString(ATTR_ID, config.id);
 			xmlConfig.putString(ATTR_CONFIG_NAME, config.name);
 
-			// day
+			// day header
 			xmlConfig.putBoolean(ATTR_IS_SHOW_DAY_HEADER, config.isShowDayHeader);
 			Util.setXmlEnum(xmlConfig, ATTR_DAY_HEADER_DATE_FORMAT, config.dayHeaderFormat);
 			Util.setXmlEnum(xmlConfig, ATTR_DAY_HEADER_LAYOUT, config.dayHeaderLayout);
 			Util.setXmlFont(xmlConfig, ATTR_DAY_HEADER_FONT, config.dayHeaderFont);
+
+			// day content
+			Util.setXmlFont(xmlConfig, ATTR_DAY_CONTENT_FONT, config.dayContentFont);
 
 			// date column
 			xmlConfig.putBoolean(ATTR_IS_SHOW_DATE_COLUMN, config.isShowDateColumn);
@@ -450,21 +455,25 @@ public class CalendarConfigManager {
 
 	private static void parse_210_CalendarConfig(final XMLMemento xmlConfig, final CalendarConfig config) {
 
-		final FontData defaultFont = JFaceResources.getFontRegistry().defaultFont().getFontData()[0];
+		// !!! getFontData() MUST be created for EVERY font otherwise they use all the SAME font !!!
+		final Font defaultFont = JFaceResources.getFontRegistry().defaultFont();
 
 // SET_FORMATTING_OFF
 		
 		// config
-		config.id					= Util.getXmlString(xmlConfig, ATTR_ID,							Long.toString(System.nanoTime()));
-		config.name					= Util.getXmlString(xmlConfig, ATTR_CONFIG_NAME,				UI.EMPTY_STRING);
+		config.id					= Util.getXmlString(xmlConfig,	ATTR_ID,						Long.toString(System.nanoTime()));
+		config.name					= Util.getXmlString(xmlConfig,	ATTR_CONFIG_NAME,				UI.EMPTY_STRING);
 		
 		// day
 		config.isShowDayHeader		= Util.getXmlBoolean(xmlConfig, ATTR_IS_SHOW_DAY_HEADER,		true);
-		config.dayHeaderFont 		= Util.getXmlFont(xmlConfig, 	ATTR_DAY_HEADER_FONT, 			defaultFont);
+		config.dayHeaderFont 		= Util.getXmlFont(xmlConfig, 	ATTR_DAY_HEADER_FONT, 			defaultFont.getFontData()[0]);
+		
+		// day content
+		config.dayContentFont 		= Util.getXmlFont(xmlConfig, 	ATTR_DAY_CONTENT_FONT, 			defaultFont.getFontData()[0]);
 		
 		// date column
 		config.isShowDateColumn		= Util.getXmlBoolean(xmlConfig, ATTR_IS_SHOW_DATE_COLUMN,		true);
-		config.dateColumnFont 		= Util.getXmlFont(xmlConfig, 	ATTR_DATE_COLUMN_FONT, 			defaultFont);
+		config.dateColumnFont 		= Util.getXmlFont(xmlConfig, 	ATTR_DATE_COLUMN_FONT, 			defaultFont.getFontData()[0]);
 		config.dateColumnWidth		= Util.getXmlInteger(xmlConfig, ATTR_DATE_COLUMN_WIDTH,			DEFAULT_DATE_COLUMN_WIDTH);
 		
 		// summary column

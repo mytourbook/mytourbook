@@ -1611,6 +1611,8 @@ public class Messages extends NLS {
 	public static String		Slideout_CalendarOptions_Label_DateColumnContent;
 	public static String		Slideout_CalendarOptions_Label_DateColumnContent_Tooltip;
 	public static String		Slideout_CalendarOptions_Label_DateColumnFont;
+	public static String Slideout_CalendarOptions_Label_DayContentFont;
+
 	public static String		Slideout_CalendarOptions_Label_DayHeaderFont;
 	public static String		Slideout_CalendarOptions_Label_DayHeaderFormat;
 	public static String		Slideout_CalendarOptions_Label_DayHeaderLayout;
