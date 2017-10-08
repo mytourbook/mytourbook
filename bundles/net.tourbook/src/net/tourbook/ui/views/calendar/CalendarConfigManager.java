@@ -40,69 +40,75 @@ import org.osgi.framework.Version;
 
 public class CalendarConfigManager {
 
-	private static final String			CONFIG_FILE_NAME				= "calendar-config.xml";					//$NON-NLS-1$
+	private static final String			CONFIG_FILE_NAME						= "calendar-config.xml";				//$NON-NLS-1$
 
 	//
 	/**
 	 * Version number is not yet used.
 	 */
-	private static final int			CONFIG_VERSION					= 1;
+	private static final int			CONFIG_VERSION							= 1;
 
 	//
-	private static final Bundle			_bundle							= TourbookPlugin.getDefault().getBundle();
-	private static final IPath			_stateLocation					= Platform.getStateLocation(_bundle);
+	private static final Bundle			_bundle									= TourbookPlugin
+			.getDefault()
+			.getBundle();
+	private static final IPath			_stateLocation							= Platform.getStateLocation(_bundle);
 	//
-	static final String					CONFIG_DEFAULT_ID_1				= "#1";										//$NON-NLS-1$
-	private static final String			CONFIG_DEFAULT_ID_2				= "#2";										//$NON-NLS-1$
-	private static final String			CONFIG_DEFAULT_ID_3				= "#3";										//$NON-NLS-1$
-	private static final String			CONFIG_DEFAULT_ID_4				= "#4";										//$NON-NLS-1$
-	private static final String			CONFIG_DEFAULT_ID_5				= "#5";										//$NON-NLS-1$
-	private static final String			CONFIG_DEFAULT_ID_6				= "#6";										//$NON-NLS-1$
-	private static final String			CONFIG_DEFAULT_ID_7				= "#7";										//$NON-NLS-1$
-	private static final String			CONFIG_DEFAULT_ID_8				= "#8";										//$NON-NLS-1$
-	private static final String			CONFIG_DEFAULT_ID_9				= "#9";										//$NON-NLS-1$
-	private static final String			CONFIG_DEFAULT_ID_10			= "#10";									//$NON-NLS-1$
+	static final String					CONFIG_DEFAULT_ID_1						= "#1";									//$NON-NLS-1$
+	private static final String			CONFIG_DEFAULT_ID_2						= "#2";									//$NON-NLS-1$
+	private static final String			CONFIG_DEFAULT_ID_3						= "#3";									//$NON-NLS-1$
+	private static final String			CONFIG_DEFAULT_ID_4						= "#4";									//$NON-NLS-1$
+	private static final String			CONFIG_DEFAULT_ID_5						= "#5";									//$NON-NLS-1$
+	private static final String			CONFIG_DEFAULT_ID_6						= "#6";									//$NON-NLS-1$
+	private static final String			CONFIG_DEFAULT_ID_7						= "#7";									//$NON-NLS-1$
+	private static final String			CONFIG_DEFAULT_ID_8						= "#8";									//$NON-NLS-1$
+	private static final String			CONFIG_DEFAULT_ID_9						= "#9";									//$NON-NLS-1$
+	private static final String			CONFIG_DEFAULT_ID_10					= "#10";								//$NON-NLS-1$
 	//
 	// common attributes
-	private static final String			ATTR_ACTIVE_CONFIG_ID			= "activeConfigId";							//$NON-NLS-1$
-	private static final String			ATTR_ID							= "id";										//$NON-NLS-1$
-	private static final String			ATTR_CONFIG_NAME				= "name";									//$NON-NLS-1$
+	private static final String			ATTR_ACTIVE_CONFIG_ID					= "activeConfigId";						//$NON-NLS-1$
+	private static final String			ATTR_ID									= "id";									//$NON-NLS-1$
+	private static final String			ATTR_CONFIG_NAME						= "name";								//$NON-NLS-1$
 
 	//
 	/*
 	 * Root
 	 */
-	private static final String			TAG_ROOT						= "CalendarConfiguration";					//$NON-NLS-1$
-	private static final String			ATTR_CONFIG_VERSION				= "configVersion";							//$NON-NLS-1$
+	private static final String			TAG_ROOT								= "CalendarConfiguration";				//$NON-NLS-1$
+	private static final String			ATTR_CONFIG_VERSION						= "configVersion";						//$NON-NLS-1$
 	//
 	/*
 	 * Calendars
 	 */
-	private static final String			TAG_CALENDAR_CONFIG				= "CalendarConfig";							//$NON-NLS-1$
-	private static final String			TAG_CALENDAR					= "Calendar";								//$NON-NLS-1$
+	private static final String			TAG_CALENDAR_CONFIG						= "CalendarConfig";						//$NON-NLS-1$
+	private static final String			TAG_CALENDAR							= "Calendar";							//$NON-NLS-1$
 	//
-	private static final String			ATTR_WEEK_HEIGHT				= "weekHeight";								//$NON-NLS-1$
-	private static final String			ATTR_IS_SHOW_DATE_COLUMN		= "isShowDateColumn";						//$NON-NLS-1$
-	private static final String			ATTR_IS_SHOW_DAY_HEADER			= "isShowDayHeader";						//$NON-NLS-1$
-	private static final String			ATTR_IS_SHOW_SUMMARY_COLUMN		= "isShowSummaryColumn";					//$NON-NLS-1$
-	private static final String			ATTR_DATE_COLUMN_CONTENT		= "dateColumnContent";						//$NON-NLS-1$
-	private static final String			ATTR_DATE_COLUMN_FONT			= "dateColumnFont";							//$NON-NLS-1$
-	private static final String			ATTR_DATE_COLUMN_WIDTH			= "dateColumnWidth";						//$NON-NLS-1$
-	private static final String			ATTR_DAY_CONTENT_FONT			= "dayContentFont";							//$NON-NLS-1$
-	private static final String			ATTR_DAY_HEADER_DATE_FORMAT		= "dayHeaderDateFormat";					//$NON-NLS-1$
-	private static final String			ATTR_DAY_HEADER_FONT			= "dayHeaderFont";							//$NON-NLS-1$
-	private static final String			ATTR_DAY_HEADER_LAYOUT			= "dayHeaderLayout";						//$NON-NLS-1$
-	private static final String			ATTR_SUMMARY_COLUMN_WIDTH		= "summaryColumnWidth";						//$NON-NLS-1$
+	private static final String			ATTR_IS_HIDE_DAY_DATE_WHEN_EMPTY		= "isHideDayDateWhenEmpty";				//$NON-NLS-1$
+	private static final String			ATTR_IS_SHOW_DATE_COLUMN				= "isShowDateColumn";					//$NON-NLS-1$
+	private static final String			ATTR_IS_SHOW_DAY_DATE					= "isShowDayDate";						//$NON-NLS-1$
+	private static final String			ATTR_IS_SHOW_DAY_DATE_WEEKEND_COLOR		= "isShowDayDateWeekendColor";			//$NON-NLS-1$
+	private static final String			ATTR_IS_SHOW_SUMMARY_COLUMN				= "isShowSummaryColumn";				//$NON-NLS-1$
+	private static final String			ATTR_IS_TOGGLE_MONTH_COLOR				= "isToggleMonthColor";					//$NON-NLS-1$
+	private static final String			ATTR_DATE_COLUMN_CONTENT				= "dateColumnContent";					//$NON-NLS-1$
+	private static final String			ATTR_DATE_COLUMN_FONT					= "dateColumnFont";						//$NON-NLS-1$
+	private static final String			ATTR_DATE_COLUMN_WIDTH					= "dateColumnWidth";					//$NON-NLS-1$
+	private static final String			ATTR_DAY_CONTENT_FONT					= "dayContentFont";						//$NON-NLS-1$
+	private static final String			ATTR_DAY_DATE_FORMAT					= "dayDateFormat";						//$NON-NLS-1$
+	private static final String			ATTR_DAY_DATE_FONT						= "dayDateFont";						//$NON-NLS-1$
+	private static final String			ATTR_SUMMARY_COLUMN_WIDTH				= "summaryColumnWidth";					//$NON-NLS-1$
+	private static final String			ATTR_TOUR_LAYOUT						= "tourLayout";							//$NON-NLS-1$
+	private static final String			ATTR_WEEK_HEIGHT						= "weekHeight";							//$NON-NLS-1$
 	//
-	static final int					DEFAULT_DATE_COLUMN_WIDTH		= 5;
-	static final DateColumnContent		DEFAULT_DATE_COLUMN_CONTENT		= DateColumnContent.WEEK_NUMBER;
-	static final int					DEFAULT_SUMMARY_COLUMN_WIDTH	= 10;
-	static final int					DEFAULT_WEEK_HEIGHT				= 70;
-	static final DayHeaderDateFormat	DEFAULT_DAY_HEADER_DATE_FORMAT	= DayHeaderDateFormat.DAY;
-	static final DayHeaderLayout		DEFAULT_DAY_HEADER_LAYOUT		= DayHeaderLayout.WEEK_NUMBER;
+	static final int					DEFAULT_DATE_COLUMN_WIDTH				= 5;
+	static final DateColumnContent		DEFAULT_DATE_COLUMN_CONTENT				= DateColumnContent.WEEK_NUMBER;
+	static final boolean				DEFAULT_IS_SHOW_DAY_DATE_WEEKEND_COLOR	= false;
+	static final int					DEFAULT_SUMMARY_COLUMN_WIDTH			= 10;
+	static final int					DEFAULT_WEEK_HEIGHT						= 70;
+	static final DayHeaderDateFormat	DEFAULT_DAY_HEADER_DATE_FORMAT			= DayHeaderDateFormat.DAY;
+	static final TourLayout				DEFAULT_TOUR_LAYOUT						= TourLayout.WITH_TOURTYPE_BACKGROUND;
 	//
-	static final int					WEEK_HEIGHT_MIN					= 1;
-	static final int					WEEK_HEIGHT_MAX					= 500;
+	static final int					WEEK_HEIGHT_MIN							= 1;
+	static final int					WEEK_HEIGHT_MAX							= 500;
 	//
 	// !!! this is a code formatting separator !!!
 	static {}
@@ -135,18 +141,16 @@ public class CalendarConfigManager {
 					Messages.Calendar_Config_DayHeaderDateFormat_Automatic),
 	};																													//
 	//
-	private static final DayHeaderLayoutData[]		_allDayHeaderLayoutData			= new DayHeaderLayoutData[] {
+	private static final TourLayoutData[]			_allTourLayoutData				= new TourLayoutData[] {
 
-			new DayHeaderLayoutData(DayHeaderLayout.WEEK_NUMBER, Messages.Calendar_Config_DateColumn_WeekNumber),
-			new DayHeaderLayoutData(DayHeaderLayout.MONTH, Messages.Calendar_Config_DateColumn_Month),
-			new DayHeaderLayoutData(DayHeaderLayout.YEAR, Messages.Calendar_Config_DateColumn_Year),
+			new TourLayoutData(TourLayout.WITH_TOURTYPE_BACKGROUND, Messages.Calendar_Config_TourLayout_WithBackground),
+			new TourLayoutData(TourLayout.NO_BACKGROUND, Messages.Calendar_Config_TourLayout_NoBackground),
 	};																													//
 	//
 	/**
 	 * Contains all configurations which are loaded from a xml file.
 	 */
 	private static final ArrayList<CalendarConfig>	_allCalendarConfigs				= new ArrayList<>();
-
 
 	private static CalendarConfig					_activeCalendarConfig;
 
@@ -183,24 +187,24 @@ public class CalendarConfigManager {
 		}
 	}
 
-	static class DayHeaderLayoutData {
-
-		DayHeaderLayout	dayHeaderLayout;
-		String			label;
-
-		public DayHeaderLayoutData(final DayHeaderLayout dayHeaderLayout, final String label) {
-
-			this.dayHeaderLayout = dayHeaderLayout;
-			this.label = label;
-		}
-	}
-
 	interface ICalendarConfigProvider {
 
 		/**
 		 * Calendar config has changed, update the UI.
 		 */
 		void updateUI_CalendarConfig();
+	}
+
+	static class TourLayoutData {
+
+		TourLayout	tourLayout;
+		String		label;
+
+		public TourLayoutData(final TourLayout tourLayout, final String label) {
+
+			this.tourLayout = tourLayout;
+			this.label = label;
+		}
 	}
 
 	private static XMLMemento create_Root() {
@@ -298,14 +302,17 @@ public class CalendarConfigManager {
 			xmlConfig.putString(ATTR_ID, config.id);
 			xmlConfig.putString(ATTR_CONFIG_NAME, config.name);
 
-			// day header
-			xmlConfig.putBoolean(ATTR_IS_SHOW_DAY_HEADER, config.isShowDayHeader);
-			Util.setXmlEnum(xmlConfig, ATTR_DAY_HEADER_DATE_FORMAT, config.dayHeaderFormat);
-			Util.setXmlEnum(xmlConfig, ATTR_DAY_HEADER_LAYOUT, config.dayHeaderLayout);
-			Util.setXmlFont(xmlConfig, ATTR_DAY_HEADER_FONT, config.dayHeaderFont);
+			// day date
+			xmlConfig.putBoolean(ATTR_IS_HIDE_DAY_DATE_WHEN_EMPTY, config.isHideDayDateWhenEmpty);
+			xmlConfig.putBoolean(ATTR_IS_SHOW_DAY_DATE, config.isShowDayDate);
+			xmlConfig.putBoolean(ATTR_IS_SHOW_DAY_DATE_WEEKEND_COLOR, config.isShowDayDateWeekendColor);
+			Util.setXmlEnum(xmlConfig, ATTR_DAY_DATE_FORMAT, config.dayDateFormat);
+			Util.setXmlFont(xmlConfig, ATTR_DAY_DATE_FONT, config.dayDateFont);
 
 			// day content
+			xmlConfig.putBoolean(ATTR_IS_TOGGLE_MONTH_COLOR, config.isToggleMonthColor);
 			Util.setXmlFont(xmlConfig, ATTR_DAY_CONTENT_FONT, config.dayContentFont);
+			Util.setXmlEnum(xmlConfig, ATTR_TOUR_LAYOUT, config.tourLayout);
 
 			// date column
 			xmlConfig.putBoolean(ATTR_IS_SHOW_DATE_COLUMN, config.isShowDateColumn);
@@ -370,8 +377,8 @@ public class CalendarConfigManager {
 		return _allDateHeaderDateFormatData;
 	}
 
-	static DayHeaderLayoutData[] getAllDayHeaderLayoutData() {
-		return _allDayHeaderLayoutData;
+	public static TourLayoutData[] getAllTourLayoutData() {
+		return _allTourLayoutData;
 	}
 
 	private static CalendarConfig getConfig_Calendar() {
@@ -461,27 +468,30 @@ public class CalendarConfigManager {
 // SET_FORMATTING_OFF
 		
 		// config
-		config.id					= Util.getXmlString(xmlConfig,	ATTR_ID,						Long.toString(System.nanoTime()));
-		config.name					= Util.getXmlString(xmlConfig,	ATTR_CONFIG_NAME,				UI.EMPTY_STRING);
+		config.id							= Util.getXmlString(xmlConfig,	ATTR_ID,								Long.toString(System.nanoTime()));
+		config.name							= Util.getXmlString(xmlConfig,	ATTR_CONFIG_NAME,						UI.EMPTY_STRING);
 		
-		// day
-		config.isShowDayHeader		= Util.getXmlBoolean(xmlConfig, ATTR_IS_SHOW_DAY_HEADER,		true);
-		config.dayHeaderFont 		= Util.getXmlFont(xmlConfig, 	ATTR_DAY_HEADER_FONT, 			defaultFont.getFontData()[0]);
-		
+		// day date
+		config.isHideDayDateWhenEmpty		= Util.getXmlBoolean(xmlConfig, ATTR_IS_HIDE_DAY_DATE_WHEN_EMPTY,		true);
+		config.isShowDayDate				= Util.getXmlBoolean(xmlConfig, ATTR_IS_SHOW_DAY_DATE,					true);
+		config.isShowDayDateWeekendColor	= Util.getXmlBoolean(xmlConfig, ATTR_IS_SHOW_DAY_DATE_WEEKEND_COLOR,	DEFAULT_IS_SHOW_DAY_DATE_WEEKEND_COLOR);
+		config.dayDateFont 					= Util.getXmlFont(xmlConfig, 	ATTR_DAY_DATE_FONT, 					defaultFont.getFontData()[0]);
+		                                    
 		// day content
-		config.dayContentFont 		= Util.getXmlFont(xmlConfig, 	ATTR_DAY_CONTENT_FONT, 			defaultFont.getFontData()[0]);
-		
+		config.dayContentFont 				= Util.getXmlFont(xmlConfig, 	ATTR_DAY_CONTENT_FONT, 					defaultFont.getFontData()[0]);
+		config.isToggleMonthColor			= Util.getXmlBoolean(xmlConfig, ATTR_IS_TOGGLE_MONTH_COLOR,				true);
+		                                                                                                            
 		// date column
-		config.isShowDateColumn		= Util.getXmlBoolean(xmlConfig, ATTR_IS_SHOW_DATE_COLUMN,		true);
-		config.dateColumnFont 		= Util.getXmlFont(xmlConfig, 	ATTR_DATE_COLUMN_FONT, 			defaultFont.getFontData()[0]);
-		config.dateColumnWidth		= Util.getXmlInteger(xmlConfig, ATTR_DATE_COLUMN_WIDTH,			DEFAULT_DATE_COLUMN_WIDTH);
-		
+		config.isShowDateColumn				= Util.getXmlBoolean(xmlConfig, ATTR_IS_SHOW_DATE_COLUMN,				true);
+		config.dateColumnFont 				= Util.getXmlFont(xmlConfig, 	ATTR_DATE_COLUMN_FONT, 					defaultFont.getFontData()[0]);
+		config.dateColumnWidth				= Util.getXmlInteger(xmlConfig, ATTR_DATE_COLUMN_WIDTH,					DEFAULT_DATE_COLUMN_WIDTH);
+		                                                                                                            
 		// summary column
-		config.isShowSummaryColumn	= Util.getXmlBoolean(xmlConfig, ATTR_IS_SHOW_SUMMARY_COLUMN,	true);
-		config.summaryColumnWidth	= Util.getXmlInteger(xmlConfig, ATTR_SUMMARY_COLUMN_WIDTH,		DEFAULT_SUMMARY_COLUMN_WIDTH);
-
+		config.isShowSummaryColumn			= Util.getXmlBoolean(xmlConfig, ATTR_IS_SHOW_SUMMARY_COLUMN,			true);
+		config.summaryColumnWidth			= Util.getXmlInteger(xmlConfig, ATTR_SUMMARY_COLUMN_WIDTH,				DEFAULT_SUMMARY_COLUMN_WIDTH);
+                                                                                                                    
 		// layout
-		config.weekHeight			= Util.getXmlInteger(xmlConfig, ATTR_WEEK_HEIGHT,				DEFAULT_WEEK_HEIGHT);
+		config.weekHeight					= Util.getXmlInteger(xmlConfig, ATTR_WEEK_HEIGHT,						DEFAULT_WEEK_HEIGHT);
 
 // SET_FORMATTING_ON
 
@@ -496,15 +506,15 @@ public class CalendarConfigManager {
 		/*
 		 * Day
 		 */
-		config.dayHeaderFormat = (DayHeaderDateFormat) Util.getXmlEnum(
+		config.dayDateFormat = (DayHeaderDateFormat) Util.getXmlEnum(
 				xmlConfig,
-				ATTR_DAY_HEADER_DATE_FORMAT,
+				ATTR_DAY_DATE_FORMAT,
 				DEFAULT_DAY_HEADER_DATE_FORMAT);
 
-		config.dayHeaderLayout = (DayHeaderLayout) Util.getXmlEnum(
+		config.tourLayout = (TourLayout) Util.getXmlEnum(
 				xmlConfig,
-				ATTR_DAY_HEADER_LAYOUT,
-				DayHeaderLayout.WEEK_NUMBER);
+				ATTR_TOUR_LAYOUT,
+				DEFAULT_TOUR_LAYOUT);
 	}
 
 	/**

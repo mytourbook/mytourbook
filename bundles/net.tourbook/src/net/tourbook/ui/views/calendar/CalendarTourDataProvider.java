@@ -87,7 +87,11 @@ public class CalendarTourDataProvider {
 		return _instance;
 	}
 
-	CalendarTourData[] getCalendarDayData(final int year, final int month, final int day) {
+	CalendarTourData[] getCalendarDayData(final LocalDate currentDate) {
+
+		final int year = currentDate.getYear();
+		final int month = currentDate.getMonthValue();
+		final int day = currentDate.getDayOfMonth();
 
 		if (!_dayCache.containsKey(year)) {
 

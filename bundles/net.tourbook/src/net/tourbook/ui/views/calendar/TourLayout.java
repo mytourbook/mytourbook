@@ -15,10 +15,9 @@
  *******************************************************************************/
 package net.tourbook.ui.views.calendar;
 
-public enum DayHeaderLayout {
+public enum TourLayout {
 
-	WEEK_NUMBER, //
-	MONTH, //  
-	YEAR, //
+	WITH_TOURTYPE_BACKGROUND, //
+	NO_BACKGROUND, //
 
 }

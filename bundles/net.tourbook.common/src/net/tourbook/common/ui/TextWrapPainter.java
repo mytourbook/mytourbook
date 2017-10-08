@@ -16,13 +16,15 @@
 package net.tourbook.common.ui;
 
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 
 /*
  * This is partly copied from Snippet133
  */
 public class TextWrapPainter {
 
-	private StringBuilder	sb	= new StringBuilder();
+	private StringBuilder	_wordbuffer	= new StringBuilder();
 
 	private int				_lineHeight;
 	private int				_tabWidth;
@@ -62,6 +64,7 @@ public class TextWrapPainter {
 	 * @param viewportHeight
 	 *            Viewport height
 	 * @param fontHeight
+	 * @param noOverlapRect
 	 */
 	public void drawText(	final GC gc,
 							final String textToPrint,
@@ -69,7 +72,8 @@ public class TextWrapPainter {
 							final int devY,
 							final int viewportWidth,
 							final int viewportHeight,
-							final int fontHeight) {
+							final int fontHeight,
+							final Rectangle noOverlapRect) {
 
 		_tabWidth = gc.stringExtent(_tabText).x;
 		_lineHeight = fontHeight;
@@ -83,7 +87,7 @@ public class TextWrapPainter {
 		final int bottom = devY + viewportHeight;
 
 		// truncate buffer
-		sb.setLength(0);
+		_wordbuffer.setLength(0);
 
 		int index = 0;
 		final int end = textToPrint.length();
@@ -101,7 +105,7 @@ public class TextWrapPainter {
 						index++; // if this is cr-lf, skip the lf
 					}
 
-					printWordBuffer(gc);
+					printWordBuffer(gc, noOverlapRect);
 					newline();
 
 					if (_devY > bottom) {
@@ -111,12 +115,12 @@ public class TextWrapPainter {
 				} else {
 
 					if (c != '\t') {
-						sb.append(c);
+						_wordbuffer.append(c);
 					}
 
 					if (Character.isWhitespace(c) || c == '/' || c == ',' || c == '&' || c == '-') {
 
-						printWordBuffer(gc);
+						printWordBuffer(gc, noOverlapRect);
 
 						if (c == '\t') {
 							_devX += _tabWidth;
@@ -127,7 +131,7 @@ public class TextWrapPainter {
 		}
 
 		// print final buffer
-		printWordBuffer(gc);
+		printWordBuffer(gc, noOverlapRect);
 	}
 
 	private void newline() {
@@ -136,12 +140,30 @@ public class TextWrapPainter {
 		_devY += _lineHeight;
 	}
 
-	private void printWordBuffer(final GC gc) {
+	private void printWordBuffer(final GC gc, final Rectangle noOverlapRect) {
 
-		if (sb.length() > 0) {
+		if (_wordbuffer.length() > 0) {
 
-			final String word = sb.toString();
-			final int devWordWidth = gc.stringExtent(word).x;
+			final String word = _wordbuffer.toString();
+			final Point wordExtent = gc.stringExtent(word);
+			final int devWordWidth = wordExtent.x;
+			final int devWordHeight = wordExtent.y;
+
+			if (noOverlapRect != null) {
+
+				final int max = 5;
+				int current = 0;
+
+				while (current++ < max) {
+
+					final Rectangle wordRect = new Rectangle(_devX, _devY, devWordWidth, devWordHeight);
+
+					if (wordRect.intersects(noOverlapRect)) {
+						newline();
+					}
+				}
+
+			}
 
 			if (_devX + devWordWidth > _devRightMargin) {
 
@@ -153,13 +175,6 @@ public class TextWrapPainter {
 				}
 			}
 
-//			if (_devX != _devLeftMargin) {
-//
-//				// add additional space to display the / correctly
-//				_devX++;
-//				_devX++;
-//			}
-
 			gc.drawString(word, _devX, _devY, true);
 
 			_is1stPainted = true;
@@ -170,7 +185,7 @@ public class TextWrapPainter {
 			_devX += devWordWidth;
 
 			// truncate buffer
-			sb.setLength(0);
+			_wordbuffer.setLength(0);
 		}
 	}
 }

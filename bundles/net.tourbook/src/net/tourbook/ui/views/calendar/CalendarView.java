@@ -89,7 +89,6 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarCo
 	// old states
 	/////////////////////////////////////////////////////////////////
 	private static final String		STATE_FIRST_DAY							= "FirstDayDisplayed";								//$NON-NLS-1$
-	private static final String		STATE_NUM_TOURS_PER_DAY					= "NumberOfToursPerDay";							//$NON-NLS-1$
 	private static final String		STATE_SELECTED_TOURS					= "SelectedTours";									//$NON-NLS-1$
 	private static final String		STATE_TOUR_INFO_FORMATTER_INDEX_		= "TourInfoFormatterIndex";							//$NON-NLS-1$
 	private static final String		STATE_WEEK_SUMMARY_FORMATTER_INDEX_		= "WeekSummaryFormatterIndex";						//$NON-NLS-1$
@@ -124,7 +123,6 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarCo
 	private Action					_actionForward, _actionBack;
 	private Action					_actionSetLinked;
 	private Action					_actionGotoToday;
-	Action[]						_actionSetNumberOfToursPerDay;
 	private Action[]				_actionSetTourInfoFormatLine;
 	private Action[]				_actionSetSummaryFormatLine;
 	Action[][]						_actionSetTourInfoFormat;
@@ -387,11 +385,6 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarCo
 		};
 		_actionGotoToday.setText(Messages.Calendar_View_Action_GotoToday);
 		_actionGotoToday.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ZoomCentered));
-
-		_actionSetNumberOfToursPerDay = new Action[5];
-		for (int i = 0; i < 5; i++) {
-			_actionSetNumberOfToursPerDay[i] = new NumberOfToursPerDayAction(this, i);
-		}
 
 		// the tour info line popup menu opener
 		_actionSetTourInfoFormatLine = new Action[numberOfInfoLines];
@@ -1137,10 +1130,6 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarCo
 
 		viewMgr.add(new Separator());
 
-		for (final Action element : _actionSetNumberOfToursPerDay) {
-			viewMgr.add(element);
-		}
-
 		viewMgr.add(_actionSetTourInfoTextColor);
 		viewMgr.add(_actionSetTourInfoBlackTextHighlight);
 	}
@@ -1272,11 +1261,6 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarCo
 		final Long selectedTourId = Util.getStateLong(_state, STATE_SELECTED_TOURS, new Long(-1));
 		_calendarGraph.setSelectionTourId(selectedTourId);
 
-		final int numberOfTours = Util.getStateInt(_state, STATE_NUM_TOURS_PER_DAY, 3);
-		if (numberOfTours < _actionSetNumberOfToursPerDay.length) {
-			_actionSetNumberOfToursPerDay[numberOfTours].run();
-		}
-
 		for (int i = 0; i < numberOfInfoLines; i++) {
 
 			// the 0. line has the 1. entry selected, the 1. line the 2. ...
@@ -1320,8 +1304,6 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarCo
 
 		// until now we only implement single tour selection
 		_state.put(STATE_SELECTED_TOURS, _calendarGraph.getSelectedTourId());
-
-		_state.put(STATE_NUM_TOURS_PER_DAY, _calendarGraph.getNumberOfToursPerDay());
 
 		for (int i = 0; i < numberOfInfoLines; i++) {
 			_state.put(STATE_TOUR_INFO_FORMATTER_INDEX_ + i, _calendarGraph.getTourInfoFormatterIndex(i));
