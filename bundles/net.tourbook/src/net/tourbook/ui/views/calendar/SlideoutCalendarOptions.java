@@ -29,7 +29,8 @@ import net.tourbook.common.util.Util;
 import net.tourbook.ui.views.calendar.CalendarConfigManager.DateColumnData;
 import net.tourbook.ui.views.calendar.CalendarConfigManager.DayHeaderDateFormatData;
 import net.tourbook.ui.views.calendar.CalendarConfigManager.ICalendarConfigProvider;
-import net.tourbook.ui.views.calendar.CalendarConfigManager.TourLayoutData;
+import net.tourbook.ui.views.calendar.CalendarConfigManager.TourBackgroundData;
+import net.tourbook.ui.views.calendar.CalendarConfigManager.TourBorderData;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -118,7 +119,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	private Combo				_comboWeek_Format_4;
 	private Combo				_comboWeek_Format_5;
 
-	private Button				_chkIsHideDayDateWhenEmpty;
+	private Button				_chkIsHideDayDateWhenNoTour;
 	private Button				_chkIsShowDateColumn;
 	private Button				_chkIsShowDayDateWeekendColor;
 	private Button				_chkIsShowDayDate;
@@ -128,7 +129,8 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	private Combo				_comboConfigName;
 	private Combo				_comboDateColumn;
 	private Combo				_comboDayHeaderDateFormat;
-	private Combo				_comboTourLayout;
+	private Combo				_comboTourBackground;
+	private Combo				_comboTourBorder;
 
 	private SimpleFontEditor	_fontEditorDayContent;
 	private SimpleFontEditor	_fontEditorDayDate;
@@ -228,12 +230,9 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 //			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 			{
 				createUI_200_DateColumn(container);
-
 				createUI_300_DayDate(container);
 				createUI_400_DayContent(container);
-
 				createUI_500_SummaryColumn(container);
-
 
 //				createUI_900_TourInfo(container);
 //				createUI_910_WeekSummary(container);
@@ -366,115 +365,43 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
 //		group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 		{
-			createUI_410_DayDate(group);
-		}
-	}
-
-	private void createUI_400_DayContent(final Composite parent) {
-
-		final Group group = new Group(parent, SWT.NONE);
-		group.setText(Messages.Slideout_CalendarOptions_Group_DayContent);
-		GridDataFactory
-				.fillDefaults()//
-				.grab(true, false)
-				.applyTo(group);
-		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_CYAN));
-		{
 			{
 				/*
-				 * Font
+				 * Day date
 				 */
 
-				// label
-				final Label label = new Label(group, SWT.NONE);
-				label.setText(Messages.Slideout_CalendarOptions_Label_DayContentFont);
-				GridDataFactory
-						.fillDefaults()//
-						//						.grab(true, true)
-						.indent(0, _fontLabelVIndent)
-						.applyTo(label);
-
-				// value
-				_fontEditorDayContent = new SimpleFontEditor(group, SWT.NONE);
-				_fontEditorDayContent.addFontListener(_defaultFontEditorListener);
-				GridDataFactory.fillDefaults().grab(true, false).applyTo(_fontEditorDayContent);
-			}
-			{
-				/*
-				 * Date column
-				 */
 				// checkbox
-				_chkIsShowMonthWithAlternateColor = new Button(group, SWT.CHECK);
-				_chkIsShowMonthWithAlternateColor.setText(
-						Messages.Slideout_CalendarOptions_Checkbox_IsShowMonthWithAlternatingColor);
-				_chkIsShowMonthWithAlternateColor.addSelectionListener(_defaultSelectionListener);
+				_chkIsShowDayDate = new Button(group, SWT.CHECK);
+				_chkIsShowDayDate.setText(Messages.Slideout_CalendarOptions_Checkbox_IsShowDayDate);
+				_chkIsShowDayDate.addSelectionListener(_defaultSelectionListener);
 				GridDataFactory
 						.fillDefaults()//
+						.align(SWT.FILL, SWT.BEGINNING)
 						.span(2, 1)
-						.applyTo(_chkIsShowMonthWithAlternateColor);
+						.applyTo(_chkIsShowDayDate);
 			}
 			{
-				/*
-				 * Tour layout
-				 */
-
-				// label
-				final Label label = new Label(group, SWT.NONE);
-				label.setText(Messages.Slideout_CalendarOptions_Label_TourContentLayout);
+				final Composite container = new Composite(group, SWT.NONE);
+//				container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 				GridDataFactory
 						.fillDefaults()//
-						.align(SWT.FILL, SWT.CENTER)
-						//						.indent(_subItemIndent, 0)
-						.applyTo(label);
-
-				// value
-				_comboTourLayout = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
-				_comboTourLayout.setVisibleItemCount(20);
-				_comboTourLayout.addSelectionListener(_defaultSelectionListener);
-				_comboTourLayout.addFocusListener(_keepOpenListener);
+						.grab(true, false)
+						.span(2, 1)
+						.applyTo(container);
+				GridLayoutFactory
+						.fillDefaults()//
+						.numColumns(2)
+						.spacing(10, LayoutConstants.getSpacing().y)
+						.applyTo(container);
+				{
+					createUI_320_Column_1(container);
+					createUI_330_Column_2(container);
+				}
 			}
 		}
 	}
 
-	private void createUI_410_DayDate(final Composite parent) {
-
-		{
-			/*
-			 * Day date
-			 */
-
-			// checkbox
-			_chkIsShowDayDate = new Button(parent, SWT.CHECK);
-			_chkIsShowDayDate.setText(Messages.Slideout_CalendarOptions_Checkbox_IsShowDayDate);
-			_chkIsShowDayDate.addSelectionListener(_defaultSelectionListener);
-			GridDataFactory
-					.fillDefaults()//
-					.align(SWT.FILL, SWT.BEGINNING)
-					.span(2, 1)
-					.applyTo(_chkIsShowDayDate);
-		}
-		{
-			final Composite container = new Composite(parent, SWT.NONE);
-//			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
-			GridDataFactory
-					.fillDefaults()//
-					.grab(true, false)
-					.span(2, 1)
-					.applyTo(container);
-			GridLayoutFactory
-					.fillDefaults()//
-					.numColumns(2)
-					.spacing(10, LayoutConstants.getSpacing().y)
-					.applyTo(container);
-			{
-				createUI_412_1st_Column(container);
-				createUI_412_2nd_Column(container);
-			}
-		}
-	}
-
-	private void createUI_412_1st_Column(final Composite parent) {
+	private void createUI_320_Column_1(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -507,15 +434,15 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				 */
 
 				// checkbox
-				_chkIsHideDayDateWhenEmpty = new Button(container, SWT.CHECK);
-				_chkIsHideDayDateWhenEmpty.setText(Messages.Slideout_CalendarOptions_Checkbox_IsHideDayWhenEmpty);
-				_chkIsHideDayDateWhenEmpty.addSelectionListener(_defaultSelectionListener);
+				_chkIsHideDayDateWhenNoTour = new Button(container, SWT.CHECK);
+				_chkIsHideDayDateWhenNoTour.setText(Messages.Slideout_CalendarOptions_Checkbox_IsHideDayWhenEmpty);
+				_chkIsHideDayDateWhenNoTour.addSelectionListener(_defaultSelectionListener);
 				GridDataFactory
 						.fillDefaults()//
 						.align(SWT.FILL, SWT.BEGINNING)
 						.indent(_subItemIndent, 0)
 						.span(2, 1)
-						.applyTo(_chkIsHideDayDateWhenEmpty);
+						.applyTo(_chkIsHideDayDateWhenNoTour);
 			}
 			{
 				/*
@@ -536,7 +463,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		}
 	}
 
-	private void createUI_412_2nd_Column(final Composite parent) {
+	private void createUI_330_Column_2(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -561,6 +488,91 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				_fontEditorDayDate = new SimpleFontEditor(container, SWT.NONE);
 				_fontEditorDayDate.addFontListener(_defaultFontEditorListener);
 				GridDataFactory.fillDefaults().grab(true, false).applyTo(_fontEditorDayDate);
+			}
+		}
+	}
+
+	private void createUI_400_DayContent(final Composite parent) {
+
+		final Group group = new Group(parent, SWT.NONE);
+		group.setText(Messages.Slideout_CalendarOptions_Group_DayContent);
+		GridDataFactory
+				.fillDefaults()//
+				.grab(true, false)
+				.applyTo(group);
+		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_CYAN));
+		{
+			{
+				/*
+				 * Tour background
+				 */
+
+				// label
+				final Label label = new Label(group, SWT.NONE);
+				label.setText(Messages.Slideout_CalendarOptions_Label_TourBackground);
+				GridDataFactory
+						.fillDefaults()//
+						.align(SWT.FILL, SWT.CENTER)
+						.applyTo(label);
+
+				// value
+				_comboTourBackground = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
+				_comboTourBackground.setVisibleItemCount(20);
+				_comboTourBackground.addSelectionListener(_defaultSelectionListener);
+				_comboTourBackground.addFocusListener(_keepOpenListener);
+			}
+			{
+				/*
+				 * Tour border
+				 */
+
+				// label
+				final Label label = new Label(group, SWT.NONE);
+				label.setText(Messages.Slideout_CalendarOptions_Label_TourBorder);
+				GridDataFactory
+						.fillDefaults()//
+						.align(SWT.FILL, SWT.CENTER)
+						.applyTo(label);
+
+				// value
+				_comboTourBorder = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
+				_comboTourBorder.setVisibleItemCount(20);
+				_comboTourBorder.addSelectionListener(_defaultSelectionListener);
+				_comboTourBorder.addFocusListener(_keepOpenListener);
+			}
+			{
+				/*
+				 * Font
+				 */
+
+				// label
+				final Label label = new Label(group, SWT.NONE);
+				label.setText(Messages.Slideout_CalendarOptions_Label_DayContentFont);
+				GridDataFactory
+						.fillDefaults()//
+						//						.grab(true, true)
+						.indent(0, _fontLabelVIndent)
+						.applyTo(label);
+
+				// value
+				_fontEditorDayContent = new SimpleFontEditor(group, SWT.NONE);
+				_fontEditorDayContent.addFontListener(_defaultFontEditorListener);
+				GridDataFactory.fillDefaults().grab(true, false).applyTo(_fontEditorDayContent);
+			}
+			{
+				/*
+				 * Date column
+				 */
+				// checkbox
+				_chkIsShowMonthWithAlternateColor = new Button(group, SWT.CHECK);
+				_chkIsShowMonthWithAlternateColor.setText(
+						Messages.Slideout_CalendarOptions_Checkbox_IsShowMonthWithAlternatingColor);
+				_chkIsShowMonthWithAlternateColor.addSelectionListener(_defaultSelectionListener);
+				GridDataFactory
+						.fillDefaults()//
+						.span(2, 1)
+						.applyTo(_chkIsShowMonthWithAlternateColor);
 			}
 		}
 	}
@@ -907,7 +919,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 		// day
 		_chkIsShowDayDateWeekendColor.setEnabled(isShowDayDate);
-		_chkIsHideDayDateWhenEmpty.setEnabled(isShowDayDate);
+		_chkIsHideDayDateWhenNoTour.setEnabled(isShowDayDate);
 		_comboDayHeaderDateFormat.setEnabled(isShowDayDate);
 		_fontEditorDayDate.setEnabled(isShowDayDate);
 		_lblDayHeaderFormat.setEnabled(isShowDayDate);
@@ -932,8 +944,12 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				_comboDayHeaderDateFormat.add(data.label);
 			}
 
-			for (final TourLayoutData data : CalendarConfigManager.getAllTourLayoutData()) {
-				_comboTourLayout.add(data.label);
+			for (final TourBackgroundData data : CalendarConfigManager.getAllTourBackgroundData()) {
+				_comboTourBackground.add(data.label);
+			}
+
+			for (final TourBorderData data : CalendarConfigManager.getAllTourBorderData()) {
+				_comboTourBorder.add(data.label);
 			}
 
 //			for (final TourInfoFormatter tourFormatter : _calendarView.tourInfoFormatter) {
@@ -1036,7 +1052,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		return 0;
 	}
 
-	private int getDayHeaderDateFormatIndex(final DayHeaderDateFormat requestedData) {
+	private int getDayHeaderDateFormatIndex(final DayDateFormat requestedData) {
 
 		final DayHeaderDateFormatData[] allData = CalendarConfigManager.getAllDayHeaderDateFormatData();
 
@@ -1078,12 +1094,12 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		return selectedInfoColumnData.dateColumn;
 	}
 
-	private DayHeaderDateFormat getSelectedDayDateFormat() {
+	private DayDateFormat getSelectedDayDateFormat() {
 
 		final int selectedIndex = _comboDayHeaderDateFormat.getSelectionIndex();
 
 		if (selectedIndex < 0) {
-			return DayHeaderDateFormat.AUTOMATIC;
+			return DayDateFormat.AUTOMATIC;
 		}
 
 		final DayHeaderDateFormatData selectedData = CalendarConfigManager
@@ -1092,28 +1108,58 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		return selectedData.dayHeaderDateFormat;
 	}
 
-	private TourLayout getSelectedTourLayout() {
+	private TourBackground getSelectedTourBackground() {
 
-		final int selectedIndex = _comboTourLayout.getSelectionIndex();
+		final int selectedIndex = _comboTourBackground.getSelectionIndex();
 
 		if (selectedIndex < 0) {
-			return CalendarConfigManager.DEFAULT_TOUR_LAYOUT;
+			return CalendarConfigManager.DEFAULT_TOUR_BACKGROUND;
 		}
 
-		final TourLayoutData selectedData = CalendarConfigManager.getAllTourLayoutData()[selectedIndex];
+		final TourBackgroundData selectedData = CalendarConfigManager.getAllTourBackgroundData()[selectedIndex];
 
-		return selectedData.tourLayout;
+		return selectedData.tourBackground;
 	}
 
-	private int getTourLayoutIndex(final TourLayout requestedData) {
+	private TourBorder getSelectedTourBorder() {
 
-		final TourLayoutData[] allData = CalendarConfigManager.getAllTourLayoutData();
+		final int selectedIndex = _comboTourBorder.getSelectionIndex();
+
+		if (selectedIndex < 0) {
+			return CalendarConfigManager.DEFAULT_TOUR_BORDER;
+		}
+
+		final TourBorderData selectedData = CalendarConfigManager.getAllTourBorderData()[selectedIndex];
+
+		return selectedData.tourBorder;
+	}
+
+	private int getTourBackgroundIndex(final TourBackground requestedData) {
+
+		final TourBackgroundData[] allData = CalendarConfigManager.getAllTourBackgroundData();
 
 		for (int dataIndex = 0; dataIndex < allData.length; dataIndex++) {
 
-			final TourLayoutData data = allData[dataIndex];
+			final TourBackgroundData data = allData[dataIndex];
 
-			if (data.tourLayout.equals(requestedData)) {
+			if (data.tourBackground.equals(requestedData)) {
+				return dataIndex;
+			}
+		}
+
+		// this should not happen
+		return 0;
+	}
+
+	private int getTourBorderIndex(final TourBorder requestedData) {
+
+		final TourBorderData[] allData = CalendarConfigManager.getAllTourBorderData();
+
+		for (int dataIndex = 0; dataIndex < allData.length; dataIndex++) {
+
+			final TourBorderData data = allData[dataIndex];
+
+			if (data.tourBorder.equals(requestedData)) {
 				return dataIndex;
 			}
 		}
@@ -1289,7 +1335,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			_textConfigName.setText(config.name);
 
 			// day date
-			_chkIsHideDayDateWhenEmpty.setSelection(config.isHideDayDateWhenEmpty);
+			_chkIsHideDayDateWhenNoTour.setSelection(config.isHideDayDateWhenNoTour);
 			_chkIsShowDayDate.setSelection(config.isShowDayDate);
 			_chkIsShowDayDateWeekendColor.setSelection(config.isShowDayDateWeekendColor);
 			_comboDayHeaderDateFormat.select(getDayHeaderDateFormatIndex(config.dayDateFormat));
@@ -1298,7 +1344,8 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			// day content
 			_chkIsShowMonthWithAlternateColor.setSelection(config.isToggleMonthColor);
 			_fontEditorDayContent.setSelection(config.dayContentFont);
-			_comboTourLayout.select(getTourLayoutIndex(config.tourLayout));
+			_comboTourBackground.select(getTourBackgroundIndex(config.tourBackground));
+			_comboTourBorder.select(getTourBorderIndex(config.tourBorder));
 
 			// date column
 			_chkIsShowDateColumn.setSelection(config.isShowDateColumn);
@@ -1328,7 +1375,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		config.name = _textConfigName.getText();
 
 		// day date
-		config.isHideDayDateWhenEmpty = _chkIsHideDayDateWhenEmpty.getSelection();
+		config.isHideDayDateWhenNoTour = _chkIsHideDayDateWhenNoTour.getSelection();
 		config.isShowDayDate = _chkIsShowDayDate.getSelection();
 		config.isShowDayDateWeekendColor = _chkIsShowDayDateWeekendColor.getSelection();
 		config.dayDateFormat = getSelectedDayDateFormat();
@@ -1337,7 +1384,8 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		// day content
 		config.dayContentFont = _fontEditorDayContent.getSelection();
 		config.isToggleMonthColor = _chkIsShowMonthWithAlternateColor.getSelection();
-		config.tourLayout = getSelectedTourLayout();
+		config.tourBackground = getSelectedTourBackground();
+		config.tourBorder = getSelectedTourBorder();
 
 		// date column
 		config.isShowDateColumn = _chkIsShowDateColumn.getSelection();

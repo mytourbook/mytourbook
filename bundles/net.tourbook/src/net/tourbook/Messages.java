@@ -49,15 +49,22 @@ public class Messages extends NLS {
 	public static String		Calendar_Config_DayHeaderDateFormat_Day;
 	public static String		Calendar_Config_DayHeaderDateFormat_DayMonth;
 	public static String		Calendar_Config_DayHeaderDateFormat_DayMonthYear;
+	public static String		Calendar_Config_TourBackground_NoBackground;
+	public static String		Calendar_Config_TourBackground_WithBackground;
+	public static String		Calendar_Config_TourBorder_All;
+	public static String		Calendar_Config_TourBorder_Bottom;
+	public static String		Calendar_Config_TourBorder_Left;
+	public static String		Calendar_Config_TourBorder_LeftRight;
+	public static String		Calendar_Config_TourBorder_NoBorder;
+	public static String		Calendar_Config_TourBorder_Right;
+	public static String		Calendar_Config_TourBorder_Top;
+	public static String		Calendar_Config_TourBorder_TopBottom;
 	public static String		Calendar_Config_TourLayout_BorderAll;
 	public static String		Calendar_Config_TourLayout_BorderBottom;
 	public static String		Calendar_Config_TourLayout_BorderLeftRight;
 	public static String		Calendar_Config_TourLayout_BorderTop;
 	public static String		Calendar_Config_TourLayout_BorderTopBottom;
-	public static String		Calendar_Config_TourLayout_NoBackground;
 	public static String		Calendar_Config_TourLayout_NoBorder;
-	public static String		Calendar_Config_TourLayout_WithBackground;
-
 	public static String		Calendar_View_Action_Back;
 	public static String		Calendar_View_Action_Back_Tooltip;
 	public static String		Calendar_View_Action_BlackHighlightText;
@@ -1648,7 +1655,9 @@ public class Messages extends NLS {
 	public static String		Slideout_CalendarOptions_Label_SummaryColumnContent_Tooltip;
 	public static String		Slideout_CalendarOptions_Label_Title;
 
-	public static String		Slideout_CalendarOptions_Label_TourContentLayout;
+	public static String		Slideout_CalendarOptions_Label_TourBackground;
+
+	public static String		Slideout_CalendarOptions_Label_TourBorder;
 
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowAbsoluteValues;
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowAbsoluteValues_Tooltip;

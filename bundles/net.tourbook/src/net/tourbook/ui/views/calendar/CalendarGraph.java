@@ -717,50 +717,45 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 							dayRect.height - 1);
 				}
 
-				Rectangle headerLabelRect = null;
-
 				// get label width
-				final String dayLabel = headerFormatter.format(currentDate);
+				final String dayDateLabel = headerFormatter.format(currentDate);
 
 				gc.setFont(dayDateFont);
-				final Point labelExtent = gc.textExtent(dayLabel);
+				final Point labelExtent = gc.textExtent(dayDateLabel);
 				final int dayLabelWidth = labelExtent.x;
 				final int dayLabelHeight = labelExtent.y;
 
 				final int labelWidthWithOffset = dayLabelWidth + dayLabelRightBorder;
-				final int labelPosX = posXNext - labelWidthWithOffset;
+				final int dateLabelPosX = posXNext - labelWidthWithOffset;
 
+				Rectangle dateLabelRect = null;
 				if (_currentConfig.isShowDayDate) {
-					headerLabelRect = new Rectangle(labelPosX, rowTop, dayLabelWidth, dayLabelHeight);
+					dateLabelRect = new Rectangle(dateLabelPosX, rowTop, dayLabelWidth, dayLabelHeight);
 				}
 
 				final CalendarTourData[] calendarData = _dataProvider.getCalendarDayData(currentDate);
 
 				final boolean isCalendarDataAvailable = calendarData.length > 0;
 
-				final boolean isShowDayDate = _currentConfig.isHideDayDateWhenEmpty == false //
-						|| _currentConfig.isHideDayDateWhenEmpty && isCalendarDataAvailable;
+				final boolean isShowDayDate = _currentConfig.isHideDayDateWhenNoTour == false //
+						|| _currentConfig.isHideDayDateWhenNoTour && isCalendarDataAvailable;
 
 				if (isCalendarDataAvailable) {
 
 					// tours are available
-
-//					final int dayYOffset = dayHeaderHeight;
-					final int dayYOffset = 0;
 
 					drawDayTours(
 							gc,
 							calendarData,
 							new Rectangle(
 									dayRect.x,
-									dayRect.y + dayYOffset,
+									dayRect.y,
 									dayRect.width,
-									dayRect.height - dayYOffset),
-							headerLabelRect);
+									dayRect.height),
+							dateLabelRect);
 				}
 
-				// day header
-
+				// day date
 				if (_currentConfig.isShowDayDate && isShowDayDate) {
 
 					// this clipping should only kick in if shortest label format is still longer than the cell width
@@ -796,18 +791,20 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 					if (isWeekendColor && isCalendarDataAvailable) {
 
+						// paint outline, red is not very good visible with a dark background
+
 						gc.setForeground(_white);
 
-						gc.drawText(dayLabel, labelPosX + 1, rowTop + 1, true);
-						gc.drawText(dayLabel, labelPosX + 1, rowTop - 1, true);
-						gc.drawText(dayLabel, labelPosX - 1, rowTop + 1, true);
-						gc.drawText(dayLabel, labelPosX - 1, rowTop - 1, true);
+						gc.drawText(dayDateLabel, dateLabelPosX + 1, rowTop + 1, true);
+						gc.drawText(dayDateLabel, dateLabelPosX + 1, rowTop - 1, true);
+						gc.drawText(dayDateLabel, dateLabelPosX - 1, rowTop + 1, true);
+						gc.drawText(dayDateLabel, dateLabelPosX - 1, rowTop - 1, true);
 					}
 
 					gc.setForeground(headerColor);
 					gc.drawText(
-							dayLabel,
-							labelPosX,
+							dayDateLabel,
+							dateLabelPosX,
 							rowTop,
 							true);
 
@@ -1025,22 +1022,71 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 								final boolean highlight,
 								final Rectangle headerLabelRect) {
 
-		final Color line = _colorCache.getColor(_rgbLine.get(data.typeColorIndex).hashCode());
-
-		gc.setForeground(line);
-//		gc.drawRectangle(dayRect);
-
+		/*
+		 * Tour background
+		 */
 		final RGB rgbBackground = _rgbBright.get(data.typeColorIndex);
-
 		gc.setBackground(_colorCache.getColor(rgbBackground.hashCode()));
 		gc.setForeground(_colorCache.getColor(_rgbDark.get(data.typeColorIndex).hashCode()));
 
-		switch (_currentConfig.tourLayout) {
+		final int devX = tourRect.x;
+		final int devY = tourRect.y;
+		final int cellWidth = tourRect.width;
+		final int cellHeight = tourRect.height;
+		final int devXRight = devX + cellWidth - 1;
+		final int devYBottom = devY + cellHeight - 1;
+		final int borderWidth = 3;
 
+		switch (_currentConfig.tourBackground) {
 		case WITH_TOURTYPE_BACKGROUND:
-			gc.fillGradientRectangle(tourRect.x, tourRect.y, tourRect.width, tourRect.height, false);
+			gc.fillGradientRectangle(devX, devY, cellWidth, cellHeight, false);
 
 		case NO_BACKGROUND:
+		default:
+			break;
+		}
+
+		/*
+		 * Tour border
+		 */
+		final Color line = _colorCache.getColor(_rgbLine.get(data.typeColorIndex).hashCode());
+		gc.setForeground(line);
+		gc.setBackground(line);
+
+		switch (_currentConfig.tourBorder) {
+
+		case BORDER_ALL:
+			gc.drawRectangle(devX, devY, cellWidth - 1, cellHeight - 1);
+			break;
+
+		case BORDER_TOP:
+			gc.fillRectangle(devX, devY, cellWidth - 1, borderWidth);
+			break;
+
+		case BORDER_BOTTOM:
+			gc.drawLine(devX, devYBottom, devXRight, devYBottom);
+			break;
+
+		case BORDER_TOP_BOTTOM:
+			gc.drawLine(devX, devY, devXRight, devY);
+			gc.drawLine(devX, devYBottom, devXRight, devYBottom);
+			break;
+
+		case BORDER_LEFT_RIGHT:
+			gc.drawLine(devX, devY, devX, devYBottom);
+			gc.drawLine(devXRight, devY, devXRight, devYBottom);
+
+			break;
+
+		case BORDER_LEFT:
+			gc.drawLine(devX, devY, devX, devYBottom);
+			break;
+
+		case BORDER_RIGHT:
+			gc.drawLine(devXRight, devY, devXRight, devYBottom);
+			break;
+
+		case NO_BORDER:
 		default:
 			break;
 		}
@@ -1052,7 +1098,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			fg = _black;
 		} else if (_useTextColorForTourInfoText) {
 			fg = _colorCache.getColor(_rgbText.get(data.typeColorIndex).hashCode());
-		} else if (_currentConfig.tourLayout == TourLayout.NO_BACKGROUND) {
+		} else if (_currentConfig.tourBackground == TourBackground.NO_BACKGROUND) {
 
 			fg = Display.getCurrent().getSystemColor(SWT.COLOR_BLACK);
 		} else {

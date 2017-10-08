@@ -15,9 +15,15 @@
  *******************************************************************************/
 package net.tourbook.ui.views.calendar;
 
-public enum TourLayout {
+public enum TourBorder {
 
-	WITH_TOURTYPE_BACKGROUND, //
-	NO_BACKGROUND, //
+	NO_BORDER, //
+	BORDER_ALL, //
+	BORDER_TOP, //
+	BORDER_BOTTOM, //
+	BORDER_TOP_BOTTOM, //
+	BORDER_LEFT, //
+	BORDER_RIGHT, //
+	BORDER_LEFT_RIGHT//
 
 }
