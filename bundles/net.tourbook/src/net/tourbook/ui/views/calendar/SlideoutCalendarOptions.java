@@ -145,6 +145,8 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 	private Spinner				_spinnerDateColumnWidth;
 	private Spinner				_spinnerSummaryColumnWidth;
+	private Spinner				_spinnerTourBackgroundWidth;
+	private Spinner				_spinnerTourBorderWidth;
 	private Spinner				_spinnerWeekHeight;
 
 	private Text				_textConfigName;
@@ -500,8 +502,8 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				.fillDefaults()//
 				.grab(true, false)
 				.applyTo(group);
-		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_CYAN));
+		GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
+//		group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_CYAN));
 		{
 			{
 				/*
@@ -521,6 +523,15 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				_comboTourBackground.setVisibleItemCount(20);
 				_comboTourBackground.addSelectionListener(_defaultSelectionListener);
 				_comboTourBackground.addFocusListener(_keepOpenListener);
+
+				// background width
+				_spinnerTourBackgroundWidth = new Spinner(group, SWT.BORDER);
+				_spinnerTourBackgroundWidth.setMinimum(0);
+				_spinnerTourBackgroundWidth.setMaximum(100);
+				_spinnerTourBackgroundWidth.setIncrement(1);
+				_spinnerTourBackgroundWidth.setPageIncrement(10);
+				_spinnerTourBackgroundWidth.addSelectionListener(_defaultSelectionListener);
+				_spinnerTourBackgroundWidth.addMouseWheelListener(_defaultMouseWheelListener);
 			}
 			{
 				/*
@@ -540,6 +551,15 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				_comboTourBorder.setVisibleItemCount(20);
 				_comboTourBorder.addSelectionListener(_defaultSelectionListener);
 				_comboTourBorder.addFocusListener(_keepOpenListener);
+
+				// border width
+				_spinnerTourBorderWidth = new Spinner(group, SWT.BORDER);
+				_spinnerTourBorderWidth.setMinimum(0);
+				_spinnerTourBorderWidth.setMaximum(100);
+				_spinnerTourBorderWidth.setIncrement(1);
+				_spinnerTourBorderWidth.setPageIncrement(10);
+				_spinnerTourBorderWidth.addSelectionListener(_defaultSelectionListener);
+				_spinnerTourBorderWidth.addMouseWheelListener(_defaultMouseWheelListener);
 			}
 			{
 				/*
@@ -558,7 +578,11 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				// value
 				_fontEditorDayContent = new SimpleFontEditor(group, SWT.NONE);
 				_fontEditorDayContent.addFontListener(_defaultFontEditorListener);
-				GridDataFactory.fillDefaults().grab(true, false).applyTo(_fontEditorDayContent);
+				GridDataFactory
+						.fillDefaults()//
+						.grab(true, false)
+						.span(2, 1)
+						.applyTo(_fontEditorDayContent);
 			}
 			{
 				/*
@@ -571,7 +595,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				_chkIsShowMonthWithAlternateColor.addSelectionListener(_defaultSelectionListener);
 				GridDataFactory
 						.fillDefaults()//
-						.span(2, 1)
+						.span(3, 1)
 						.applyTo(_chkIsShowMonthWithAlternateColor);
 			}
 		}
@@ -917,13 +941,17 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		_lblSummaryColumnWidth.setEnabled(isShowSummaryColumn);
 		_spinnerSummaryColumnWidth.setEnabled(isShowSummaryColumn);
 
-		// day
+		// day date
 		_chkIsShowDayDateWeekendColor.setEnabled(isShowDayDate);
 		_chkIsHideDayDateWhenNoTour.setEnabled(isShowDayDate);
 		_comboDayHeaderDateFormat.setEnabled(isShowDayDate);
 		_fontEditorDayDate.setEnabled(isShowDayDate);
 		_lblDayHeaderFormat.setEnabled(isShowDayDate);
 		_lblDayHeaderFont.setEnabled(isShowDayDate);
+
+		// day content
+		_spinnerTourBackgroundWidth.setEnabled(getSelectedTourBackgroundData().canSetWidth);
+		_spinnerTourBorderWidth.setEnabled(getSelectedTourBorder() != TourBorder.NO_BORDER);
 	}
 
 	private void fillUI() {
@@ -1119,6 +1147,30 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		final TourBackgroundData selectedData = CalendarConfigManager.getAllTourBackgroundData()[selectedIndex];
 
 		return selectedData.tourBackground;
+	}
+
+	private TourBackgroundData getSelectedTourBackgroundData() {
+
+		final int selectedIndex = _comboTourBackground.getSelectionIndex();
+
+		final TourBackgroundData[] allTourBackgroundData = CalendarConfigManager.getAllTourBackgroundData();
+
+		if (selectedIndex < 0) {
+
+			for (final TourBackgroundData data : allTourBackgroundData) {
+
+				if (data.tourBackground == CalendarConfigManager.DEFAULT_TOUR_BACKGROUND) {
+					return data;
+				}
+			}
+
+			// return default default
+			return allTourBackgroundData[0];
+		}
+
+		final TourBackgroundData selectedData = allTourBackgroundData[selectedIndex];
+
+		return selectedData;
 	}
 
 	private TourBorder getSelectedTourBorder() {
@@ -1343,9 +1395,11 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 			// day content
 			_chkIsShowMonthWithAlternateColor.setSelection(config.isToggleMonthColor);
-			_fontEditorDayContent.setSelection(config.dayContentFont);
 			_comboTourBackground.select(getTourBackgroundIndex(config.tourBackground));
 			_comboTourBorder.select(getTourBorderIndex(config.tourBorder));
+			_fontEditorDayContent.setSelection(config.dayContentFont);
+			_spinnerTourBackgroundWidth.setSelection(config.tourBackgroundWidth);
+			_spinnerTourBorderWidth.setSelection(config.tourBorderWidth);
 
 			// date column
 			_chkIsShowDateColumn.setSelection(config.isShowDateColumn);
@@ -1385,7 +1439,9 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		config.dayContentFont = _fontEditorDayContent.getSelection();
 		config.isToggleMonthColor = _chkIsShowMonthWithAlternateColor.getSelection();
 		config.tourBackground = getSelectedTourBackground();
+		config.tourBackgroundWidth = _spinnerTourBackgroundWidth.getSelection();
 		config.tourBorder = getSelectedTourBorder();
+		config.tourBorderWidth = _spinnerTourBorderWidth.getSelection();
 
 		// date column
 		config.isShowDateColumn = _chkIsShowDateColumn.getSelection();

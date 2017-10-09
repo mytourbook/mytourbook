@@ -52,7 +52,9 @@ public class CalendarConfig {
                                                             
 	// tour
 	TourBackground		tourBackground				= CalendarConfigManager.DEFAULT_TOUR_BACKGROUND;
+	int					tourBackgroundWidth			= CalendarConfigManager.DEFAULT_TOUR_BACKGROUND_WIDTH;
 	TourBorder 			tourBorder					= CalendarConfigManager.DEFAULT_TOUR_BORDER;
+	int		 			tourBorderWidth				= CalendarConfigManager.DEFAULT_TOUR_BORDER_WIDTH;
                                                             
 	// date column
 	boolean				isShowDateColumn			= true;

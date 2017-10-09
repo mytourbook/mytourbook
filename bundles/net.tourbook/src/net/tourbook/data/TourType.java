@@ -147,23 +147,24 @@ public class TourType implements Comparable<Object> {
 
 	public RGB getRGBBright() {
 
-		final int red = (colorBrightRed + colorDarkRed) / 2;
-		final int green = (colorBrightGreen + colorDarkGreen) / 2;
-		final int blue = (colorBrightBlue + colorDarkBlue) / 2;
+//		final int red = (colorBrightRed + colorDarkRed) / 2;
+//		final int green = (colorBrightGreen + colorDarkGreen) / 2;
+//		final int blue = (colorBrightBlue + colorDarkBlue) / 2;
+//
+//		return new RGB(red, green, blue);
 
-		return new RGB(red, green, blue);
-
-//		return new RGB(colorBrightRed, colorBrightGreen, colorBrightBlue);
+		return new RGB(colorBrightRed, colorBrightGreen, colorBrightBlue);
 	}
 
 	public RGB getRGBDark() {
-		final int red = (colorBrightRed + colorDarkRed) / 2;
-		final int green = (colorBrightGreen + colorDarkGreen) / 2;
-		final int blue = (colorBrightBlue + colorDarkBlue) / 2;
 
-		return new RGB(red, green, blue);
+//		final int red = (colorBrightRed + colorDarkRed) / 2;
+//		final int green = (colorBrightGreen + colorDarkGreen) / 2;
+//		final int blue = (colorBrightBlue + colorDarkBlue) / 2;
+//
+//		return new RGB(red, green, blue);
 
-//		return new RGB(colorDarkRed, colorDarkGreen, colorDarkBlue);
+		return new RGB(colorDarkRed, colorDarkGreen, colorDarkBlue);
 	}
 
 	public RGB getRGBLine() {

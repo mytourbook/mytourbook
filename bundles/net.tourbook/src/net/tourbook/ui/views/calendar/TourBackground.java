@@ -17,7 +17,14 @@ package net.tourbook.ui.views.calendar;
 
 public enum TourBackground {
 
-	WITH_TOURTYPE_BACKGROUND, //
+	WITH_TOURTYPE_BRIGHT, //
+	WITH_TOURTYPE_BRIGHT_LEFT, //
+	WITH_TOURTYPE_BRIGHT_RIGHT, //
+
+	WITH_TOURTYPE_DARK, //
+	WITH_TOURTYPE_DARK_LEFT, //
+	WITH_TOURTYPE_DARK_RIGHT, //
+
 	NO_BACKGROUND, //
 
 }

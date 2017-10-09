@@ -49,6 +49,12 @@ public class Messages extends NLS {
 	public static String		Calendar_Config_DayHeaderDateFormat_Day;
 	public static String		Calendar_Config_DayHeaderDateFormat_DayMonth;
 	public static String		Calendar_Config_DayHeaderDateFormat_DayMonthYear;
+	public static String		Calendar_Config_TourBackground_Bright;
+	public static String		Calendar_Config_TourBackground_BrightLeft;
+	public static String		Calendar_Config_TourBackground_BrightRight;
+	public static String		Calendar_Config_TourBackground_Dark;
+	public static String		Calendar_Config_TourBackground_DarkLeft;
+	public static String		Calendar_Config_TourBackground_DarkRight;
 	public static String		Calendar_Config_TourBackground_NoBackground;
 	public static String		Calendar_Config_TourBackground_WithBackground;
 	public static String		Calendar_Config_TourBorder_All;

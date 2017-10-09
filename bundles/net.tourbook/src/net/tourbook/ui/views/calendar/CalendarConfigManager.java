@@ -40,7 +40,7 @@ import org.osgi.framework.Version;
 
 public class CalendarConfigManager {
 
-	private static final String		CONFIG_FILE_NAME						= "calendar-config.xml";					//$NON-NLS-1$
+	private static final String		CONFIG_FILE_NAME						= "calendar-config.xml";				//$NON-NLS-1$
 
 	//
 	/**
@@ -54,51 +54,53 @@ public class CalendarConfigManager {
 			.getBundle();
 	private static final IPath		_stateLocation							= Platform.getStateLocation(_bundle);
 	//
-	static final String				CONFIG_DEFAULT_ID_1						= "#1";										//$NON-NLS-1$
-	private static final String		CONFIG_DEFAULT_ID_2						= "#2";										//$NON-NLS-1$
-	private static final String		CONFIG_DEFAULT_ID_3						= "#3";										//$NON-NLS-1$
-	private static final String		CONFIG_DEFAULT_ID_4						= "#4";										//$NON-NLS-1$
-	private static final String		CONFIG_DEFAULT_ID_5						= "#5";										//$NON-NLS-1$
-	private static final String		CONFIG_DEFAULT_ID_6						= "#6";										//$NON-NLS-1$
-	private static final String		CONFIG_DEFAULT_ID_7						= "#7";										//$NON-NLS-1$
-	private static final String		CONFIG_DEFAULT_ID_8						= "#8";										//$NON-NLS-1$
-	private static final String		CONFIG_DEFAULT_ID_9						= "#9";										//$NON-NLS-1$
-	private static final String		CONFIG_DEFAULT_ID_10					= "#10";									//$NON-NLS-1$
+	static final String				CONFIG_DEFAULT_ID_1						= "#1";									//$NON-NLS-1$
+	private static final String		CONFIG_DEFAULT_ID_2						= "#2";									//$NON-NLS-1$
+	private static final String		CONFIG_DEFAULT_ID_3						= "#3";									//$NON-NLS-1$
+	private static final String		CONFIG_DEFAULT_ID_4						= "#4";									//$NON-NLS-1$
+	private static final String		CONFIG_DEFAULT_ID_5						= "#5";									//$NON-NLS-1$
+	private static final String		CONFIG_DEFAULT_ID_6						= "#6";									//$NON-NLS-1$
+	private static final String		CONFIG_DEFAULT_ID_7						= "#7";									//$NON-NLS-1$
+	private static final String		CONFIG_DEFAULT_ID_8						= "#8";									//$NON-NLS-1$
+	private static final String		CONFIG_DEFAULT_ID_9						= "#9";									//$NON-NLS-1$
+	private static final String		CONFIG_DEFAULT_ID_10					= "#10";								//$NON-NLS-1$
 	//
 	// common attributes
-	private static final String		ATTR_ACTIVE_CONFIG_ID					= "activeConfigId";							//$NON-NLS-1$
-	private static final String		ATTR_ID									= "id";										//$NON-NLS-1$
-	private static final String		ATTR_CONFIG_NAME						= "name";									//$NON-NLS-1$
+	private static final String		ATTR_ACTIVE_CONFIG_ID					= "activeConfigId";						//$NON-NLS-1$
+	private static final String		ATTR_ID									= "id";									//$NON-NLS-1$
+	private static final String		ATTR_CONFIG_NAME						= "name";								//$NON-NLS-1$
 
 	//
 	/*
 	 * Root
 	 */
-	private static final String		TAG_ROOT								= "CalendarConfiguration";					//$NON-NLS-1$
-	private static final String		ATTR_CONFIG_VERSION						= "configVersion";							//$NON-NLS-1$
+	private static final String		TAG_ROOT								= "CalendarConfiguration";				//$NON-NLS-1$
+	private static final String		ATTR_CONFIG_VERSION						= "configVersion";						//$NON-NLS-1$
 	//
 	/*
 	 * Calendars
 	 */
-	private static final String		TAG_CALENDAR_CONFIG						= "CalendarConfig";							//$NON-NLS-1$
-	private static final String		TAG_CALENDAR							= "Calendar";								//$NON-NLS-1$
+	private static final String		TAG_CALENDAR_CONFIG						= "CalendarConfig";						//$NON-NLS-1$
+	private static final String		TAG_CALENDAR							= "Calendar";							//$NON-NLS-1$
 	//
-	private static final String		ATTR_IS_HIDE_DAY_DATE_WHEN_NO_TOUR		= "isHideDayDateWhenNoTour";				//$NON-NLS-1$
-	private static final String		ATTR_IS_SHOW_DATE_COLUMN				= "isShowDateColumn";						//$NON-NLS-1$
-	private static final String		ATTR_IS_SHOW_DAY_DATE					= "isShowDayDate";							//$NON-NLS-1$
-	private static final String		ATTR_IS_SHOW_DAY_DATE_WEEKEND_COLOR		= "isShowDayDateWeekendColor";				//$NON-NLS-1$
-	private static final String		ATTR_IS_SHOW_SUMMARY_COLUMN				= "isShowSummaryColumn";					//$NON-NLS-1$
-	private static final String		ATTR_IS_TOGGLE_MONTH_COLOR				= "isToggleMonthColor";						//$NON-NLS-1$
-	private static final String		ATTR_DATE_COLUMN_CONTENT				= "dateColumnContent";						//$NON-NLS-1$
-	private static final String		ATTR_DATE_COLUMN_FONT					= "dateColumnFont";							//$NON-NLS-1$
-	private static final String		ATTR_DATE_COLUMN_WIDTH					= "dateColumnWidth";						//$NON-NLS-1$
-	private static final String		ATTR_DAY_CONTENT_FONT					= "dayContentFont";							//$NON-NLS-1$
-	private static final String		ATTR_DAY_DATE_FORMAT					= "dayDateFormat";							//$NON-NLS-1$
-	private static final String		ATTR_DAY_DATE_FONT						= "dayDateFont";							//$NON-NLS-1$
-	private static final String		ATTR_SUMMARY_COLUMN_WIDTH				= "summaryColumnWidth";						//$NON-NLS-1$
-	private static final String		ATTR_TOUR_BACKGROUND					= "tourBackground";							//$NON-NLS-1$
-	private static final String		ATTR_TOUR_BORDER						= "tourBorder";								//$NON-NLS-1$
-	private static final String		ATTR_WEEK_HEIGHT						= "weekHeight";								//$NON-NLS-1$
+	private static final String		ATTR_IS_HIDE_DAY_DATE_WHEN_NO_TOUR		= "isHideDayDateWhenNoTour";			//$NON-NLS-1$
+	private static final String		ATTR_IS_SHOW_DATE_COLUMN				= "isShowDateColumn";					//$NON-NLS-1$
+	private static final String		ATTR_IS_SHOW_DAY_DATE					= "isShowDayDate";						//$NON-NLS-1$
+	private static final String		ATTR_IS_SHOW_DAY_DATE_WEEKEND_COLOR		= "isShowDayDateWeekendColor";			//$NON-NLS-1$
+	private static final String		ATTR_IS_SHOW_SUMMARY_COLUMN				= "isShowSummaryColumn";				//$NON-NLS-1$
+	private static final String		ATTR_IS_TOGGLE_MONTH_COLOR				= "isToggleMonthColor";					//$NON-NLS-1$
+	private static final String		ATTR_DATE_COLUMN_CONTENT				= "dateColumnContent";					//$NON-NLS-1$
+	private static final String		ATTR_DATE_COLUMN_FONT					= "dateColumnFont";						//$NON-NLS-1$
+	private static final String		ATTR_DATE_COLUMN_WIDTH					= "dateColumnWidth";					//$NON-NLS-1$
+	private static final String		ATTR_DAY_CONTENT_FONT					= "dayContentFont";						//$NON-NLS-1$
+	private static final String		ATTR_DAY_DATE_FORMAT					= "dayDateFormat";						//$NON-NLS-1$
+	private static final String		ATTR_DAY_DATE_FONT						= "dayDateFont";						//$NON-NLS-1$
+	private static final String		ATTR_SUMMARY_COLUMN_WIDTH				= "summaryColumnWidth";					//$NON-NLS-1$
+	private static final String		ATTR_TOUR_BACKGROUND					= "tourBackground";						//$NON-NLS-1$
+	private static final String		ATTR_TOUR_BORDER_WIDTH					= "tourBackgroundWidth";				//$NON-NLS-1$
+	private static final String		ATTR_TOUR_BORDER						= "tourBorder";							//$NON-NLS-1$
+	private static final String		ATTR_TOUR_BACKGROUND_WIDTH				= "tourBorderWidth";					//$NON-NLS-1$
+	private static final String		ATTR_WEEK_HEIGHT						= "weekHeight";							//$NON-NLS-1$
 	//
 	static final int				DEFAULT_DATE_COLUMN_WIDTH				= 5;
 	static final DateColumnContent	DEFAULT_DATE_COLUMN_CONTENT				= DateColumnContent.WEEK_NUMBER;
@@ -106,8 +108,10 @@ public class CalendarConfigManager {
 	static final int				DEFAULT_SUMMARY_COLUMN_WIDTH			= 10;
 	static final int				DEFAULT_WEEK_HEIGHT						= 70;
 	static final DayDateFormat		DEFAULT_DAY_DATE_FORMAT					= DayDateFormat.DAY;
-	static final TourBackground		DEFAULT_TOUR_BACKGROUND					= TourBackground.WITH_TOURTYPE_BACKGROUND;
+	static final TourBackground		DEFAULT_TOUR_BACKGROUND					= TourBackground.WITH_TOURTYPE_BRIGHT;
 	static final TourBorder			DEFAULT_TOUR_BORDER						= TourBorder.NO_BORDER;
+	static final int				DEFAULT_TOUR_BACKGROUND_WIDTH			= 3;
+	static final int				DEFAULT_TOUR_BORDER_WIDTH				= 1;
 	//
 	static final int				WEEK_HEIGHT_MIN							= 1;
 	static final int				WEEK_HEIGHT_MAX							= 500;
@@ -146,12 +150,36 @@ public class CalendarConfigManager {
 	private static final TourBackgroundData[]		_allTourBackgroundData			= new TourBackgroundData[] {
 
 			new TourBackgroundData(
-					TourBackground.WITH_TOURTYPE_BACKGROUND,
-					Messages.Calendar_Config_TourBackground_WithBackground),
+					TourBackground.WITH_TOURTYPE_DARK,
+					Messages.Calendar_Config_TourBackground_Dark,
+					false),
+			new TourBackgroundData(
+					TourBackground.WITH_TOURTYPE_BRIGHT,
+					Messages.Calendar_Config_TourBackground_Bright,
+					false),
+
+			new TourBackgroundData(
+					TourBackground.WITH_TOURTYPE_BRIGHT_LEFT,
+					Messages.Calendar_Config_TourBackground_BrightLeft,
+					true),
+			new TourBackgroundData(
+					TourBackground.WITH_TOURTYPE_BRIGHT_RIGHT,
+					Messages.Calendar_Config_TourBackground_BrightRight,
+					true),
+
+			new TourBackgroundData(
+					TourBackground.WITH_TOURTYPE_DARK_LEFT,
+					Messages.Calendar_Config_TourBackground_DarkLeft,
+					true),
+			new TourBackgroundData(
+					TourBackground.WITH_TOURTYPE_DARK_RIGHT,
+					Messages.Calendar_Config_TourBackground_DarkRight,
+					true),
 
 			new TourBackgroundData(
 					TourBackground.NO_BACKGROUND,
-					Messages.Calendar_Config_TourBackground_NoBackground),
+					Messages.Calendar_Config_TourBackground_NoBackground,
+					false),
 	};
 	//
 	private static final TourBorderData[]			_allTourBorderData				= new TourBorderData[] {
@@ -159,10 +187,6 @@ public class CalendarConfigManager {
 			new TourBorderData(
 					TourBorder.NO_BORDER,
 					Messages.Calendar_Config_TourBorder_NoBorder),
-
-			new TourBorderData(
-					TourBorder.BORDER_ALL,
-					Messages.Calendar_Config_TourBorder_All),
 
 			new TourBorderData(
 					TourBorder.BORDER_TOP,
@@ -187,6 +211,10 @@ public class CalendarConfigManager {
 			new TourBorderData(
 					TourBorder.BORDER_LEFT_RIGHT,
 					Messages.Calendar_Config_TourBorder_LeftRight),
+
+			new TourBorderData(
+					TourBorder.BORDER_ALL,
+					Messages.Calendar_Config_TourBorder_All),
 	};
 	//
 	/**
@@ -241,11 +269,13 @@ public class CalendarConfigManager {
 
 		TourBackground	tourBackground;
 		String			label;
+		boolean			canSetWidth;
 
-		public TourBackgroundData(final TourBackground tourBackground, final String label) {
+		public TourBackgroundData(final TourBackground tourBackground, final String label, final boolean canSetWidth) {
 
 			this.tourBackground = tourBackground;
 			this.label = label;
+			this.canSetWidth = canSetWidth;
 		}
 	}
 
@@ -365,6 +395,8 @@ public class CalendarConfigManager {
 
 			// day content
 			xmlConfig.putBoolean(ATTR_IS_TOGGLE_MONTH_COLOR, config.isToggleMonthColor);
+			xmlConfig.putInteger(ATTR_TOUR_BACKGROUND_WIDTH, config.tourBackgroundWidth);
+			xmlConfig.putInteger(ATTR_TOUR_BORDER_WIDTH, config.tourBorderWidth);
 			Util.setXmlFont(xmlConfig, ATTR_DAY_CONTENT_FONT, config.dayContentFont);
 			Util.setXmlEnum(xmlConfig, ATTR_TOUR_BACKGROUND, config.tourBackground);
 			Util.setXmlEnum(xmlConfig, ATTR_TOUR_BORDER, config.tourBorder);
@@ -539,6 +571,8 @@ public class CalendarConfigManager {
 		// day content
 		config.dayContentFont 				= Util.getXmlFont(xmlConfig, 	ATTR_DAY_CONTENT_FONT, 					defaultFont.getFontData()[0]);
 		config.isToggleMonthColor			= Util.getXmlBoolean(xmlConfig, ATTR_IS_TOGGLE_MONTH_COLOR,				true);
+		config.tourBackgroundWidth			= Util.getXmlInteger(xmlConfig, ATTR_TOUR_BACKGROUND_WIDTH, 			DEFAULT_TOUR_BACKGROUND_WIDTH, 1, 100);
+		config.tourBorderWidth				= Util.getXmlInteger(xmlConfig, ATTR_TOUR_BORDER_WIDTH,		 			DEFAULT_TOUR_BORDER_WIDTH, 1, 100);
 		                                                                                                            
 		// date column
 		config.isShowDateColumn				= Util.getXmlBoolean(xmlConfig, ATTR_IS_SHOW_DATE_COLUMN,				true);
