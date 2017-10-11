@@ -43,6 +43,7 @@ import net.tourbook.tour.TourTypeFilterManager;
 import net.tourbook.tour.TourTypeMenuManager;
 import net.tourbook.tour.filter.TourFilterManager;
 import net.tourbook.tour.photo.TourPhotoManager;
+import net.tourbook.ui.TourTypeManager;
 //import net.tourbook.ui.UI;
 import net.tourbook.ui.views.rawData.RawDataView;
 import net.tourbook.web.WebContentServer;
@@ -441,6 +442,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		 * DISPLAY THE WRONG DATA. E.G. COLLATED TOURS SHOWS ALL TOURS AND NOT FOR THE SELECTED
 		 * TOURTYPE.
 		 */
+		TourTypeManager.restoreState();
 		TourTypeFilterManager.restoreState();
 		TourFilterManager.restoreState();
 	}
@@ -511,6 +513,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 		TagMenuManager.saveTagState();
 		TourTypeMenuManager.saveState();
+		TourTypeManager.saveState();
 		TourPhotoManager.saveState();
 
 		FTSearchManager.close();

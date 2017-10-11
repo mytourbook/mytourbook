@@ -13,11 +13,13 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.views.calendar;
+package net.tourbook.ui;
 
-public enum TourBorder {
+/**
+ * Tour type border layout
+ */
+public enum TourTypeBorder {
 
-	NO_BORDER, //
 	BORDER_ALL, //
 
 	BORDER_TOP, //
@@ -27,5 +29,4 @@ public enum TourBorder {
 	BORDER_LEFT, //
 	BORDER_RIGHT, //
 	BORDER_LEFT_RIGHT//
-
 }

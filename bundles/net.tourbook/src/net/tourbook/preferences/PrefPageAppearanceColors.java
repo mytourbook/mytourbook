@@ -472,13 +472,15 @@ public class PrefPageAppearanceColors extends PreferencePage implements IWorkben
 
 					cell.setImage(_graphColorPainter.drawColorDefinitionImage(
 							(ColorDefinition) element,
-							numberOfHorizontalImages));
+									numberOfHorizontalImages,
+									false));
 
 				} else if (element instanceof GraphColorItem) {
 
 					cell.setImage(_graphColorPainter.drawGraphColorImage(//
 							(GraphColorItem) element,
-							numberOfHorizontalImages));
+									numberOfHorizontalImages,
+									false));
 
 				} else {
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,7 +19,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-	private static final String	BUNDLE_NAME	= "net.tourbook.ui.messages";					//$NON-NLS-1$
+	private static final String	BUNDLE_NAME	= "net.tourbook.ui.messages";				//$NON-NLS-1$
 
 	public static String		ColumnFactory_altitude_computed_difference_tooltip;
 	public static String		ColumnFactory_altitude_difference_label;
@@ -426,6 +426,23 @@ public class Messages extends NLS {
 	public static String		Tour_Tooltip_Label_Weather;
 	public static String		Tour_Tooltip_Label_WindDirection;
 	public static String		Tour_Tooltip_Label_WindSpeed;
+
+	public static String		TourType_Config_Border_All;
+	public static String		TourType_Config_Border_Bottom;
+	public static String		TourType_Config_Border_Left;
+	public static String		TourType_Config_Border_LeftRight;
+	public static String		TourType_Config_Border_Right;
+	public static String		TourType_Config_Border_Top;
+	public static String		TourType_Config_Border_TopBottom;
+	public static String		TourType_Config_Layout_Fill_Circle_Bright;
+	public static String		TourType_Config_Layout_Fill_Circle_Dark;
+	public static String		TourType_Config_Layout_Fill_Rect_Bright;
+	public static String		TourType_Config_Layout_Fill_Rect_Dark;
+	public static String		TourType_Config_Layout_Gradient_BottomTop;
+	public static String		TourType_Config_Layout_Gradient_LeftRight;
+	public static String		TourType_Config_Layout_Gradient_RightLeft;
+	public static String		TourType_Config_Layout_Gradient_TopBottom;
+	public static String		TourType_Config_Layout_Nothing;
 
 	public static String		Value_Unit_Cadence;
 	public static String		Value_Unit_Cadence_Spm;

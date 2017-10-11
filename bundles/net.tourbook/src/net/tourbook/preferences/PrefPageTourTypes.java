@@ -25,6 +25,7 @@ import javax.persistence.Query;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorDefinition;
 import net.tourbook.common.color.GraphColorItem;
 import net.tourbook.common.color.GraphColorManager;
@@ -34,7 +35,11 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.UI;
+import net.tourbook.ui.TourTypeBorder;
+import net.tourbook.ui.TourTypeLayout;
+import net.tourbook.ui.TourTypeManager;
+import net.tourbook.ui.TourTypeManager.TourTypeBorderData;
+import net.tourbook.ui.TourTypeManager.TourTypeLayoutData;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.InputDialog;
@@ -68,16 +73,20 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IWorkbench;
@@ -105,8 +114,9 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 	private ArrayList<TourTypeColorDefinition>	_colorDefinitions;
 
 	private boolean								_isModified				= false;
+	private boolean								_isRecreateTourTypeImages;
 
-	private UI									_ui;
+	private net.tourbook.ui.UI					_ui;
 
 	/*
 	 * UI controls
@@ -114,11 +124,15 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 	private TreeViewer							_tourTypeViewer;
 
 	private Button								_btnAdd;
-
 	private Button								_btnDelete;
 	private Button								_btnRename;
 
 	private ColorSelector						_colorSelector;
+
+	private Combo								_comboFillLayout;
+	private Combo								_comboBorderLayout;
+
+	private Spinner								_spinnerBorder;
 
 	private class ColorDefinitionContentProvider implements ITreeContentProvider {
 
@@ -206,7 +220,9 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 		initUI();
 
-		final Composite viewerContainer = createUI(parent);
+		final Composite ui = createUI(parent);
+
+		fillUI();
 
 		// read tour types from the database
 		_dbTourTypes = TourDatabase.getAllTourTypes();
@@ -244,11 +260,12 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 			}
 		}
 
+		restoreState();
 		enableActions();
 
 		_tourTypeViewer.setInput(this);
 
-		return viewerContainer;
+		return ui;
 	}
 
 	/**
@@ -287,6 +304,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		{
 			createUI_10_ColorViewer(container);
 			createUI_20_Actions(container);
+			createUI_30_ImageLayout(container);
 		}
 
 		// must be set after the viewer is created
@@ -490,6 +508,90 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		}
 	}
 
+	private void createUI_30_ImageLayout(final Composite parent) {
+
+		final SelectionAdapter selectionListener = new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				onSelectImageLayout();
+			}
+		};
+
+		final MouseWheelListener mouseWheelListener = new MouseWheelListener() {
+			@Override
+			public void mouseScrolled(final MouseEvent event) {
+				net.tourbook.common.UI.adjustSpinnerValueOnMouseScroll(event);
+				onSelectImageLayout();
+			}
+		};
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		{
+			{
+				/*
+				 * Image layout
+				 */
+
+				// label
+				final Label label = new Label(container, SWT.NONE);
+				label.setText(Messages.Pref_TourTypes_Label_ImageLayout);
+				GridDataFactory
+						.fillDefaults()//
+						.align(SWT.FILL, SWT.CENTER)
+						.applyTo(label);
+
+				// combo
+				_comboFillLayout = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+				_comboFillLayout.setVisibleItemCount(20);
+				_comboFillLayout.addSelectionListener(selectionListener);
+//				GridDataFactory.fillDefaults().span(2, 1).applyTo(_comboFillLayout);
+			}
+			{
+				/*
+				 * Border layout
+				 */
+
+				// label
+				final Label label = new Label(container, SWT.NONE);
+				label.setText(Messages.Pref_TourTypes_Label_BorderLayout);
+				GridDataFactory
+						.fillDefaults()//
+						.align(SWT.FILL, SWT.CENTER)
+						.applyTo(label);
+
+				// combo
+				_comboBorderLayout = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+				_comboBorderLayout.setVisibleItemCount(20);
+				_comboBorderLayout.addSelectionListener(selectionListener);
+//				GridDataFactory.fillDefaults().span(2, 1).applyTo(_comboBorderLayout);
+			}
+			{
+				/*
+				 * Border width
+				 */
+
+				// label
+				final Label label = new Label(container, SWT.NONE);
+				label.setText(Messages.Pref_TourTypes_Label_BorderWidth);
+				GridDataFactory
+						.fillDefaults()//
+						.align(SWT.FILL, SWT.CENTER)
+						.applyTo(label);
+
+				// spinner
+				_spinnerBorder = new Spinner(container, SWT.BORDER);
+				_spinnerBorder.setMinimum(0);
+				_spinnerBorder.setMaximum(10);
+				_spinnerBorder.addSelectionListener(selectionListener);
+				_spinnerBorder.addMouseWheelListener(mouseWheelListener);
+			}
+		}
+
+	}
+
 	/**
 	 * create columns
 	 */
@@ -560,7 +662,8 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 						final Image image = _graphColorPainter.drawColorDefinitionImage(
 								(ColorDefinition) element,
-								numberOfHorizontalImages);
+								numberOfHorizontalImages,
+								_isRecreateTourTypeImages);
 
 						cell.setImage(image);
 
@@ -568,7 +671,8 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 						final Image image = _graphColorPainter.drawGraphColorImage(//
 								(GraphColorItem) element,
-								numberOfHorizontalImages);
+								numberOfHorizontalImages,
+								_isRecreateTourTypeImages);
 
 						cell.setImage(image);
 
@@ -712,6 +816,19 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		_colorSelector.setEnabled(isGraphSelected);
 	}
 
+	private void fillUI() {
+
+		// image layout
+		for (final TourTypeLayoutData data : TourTypeManager.getAllTourTypeLayoutData()) {
+			_comboFillLayout.add(data.label);
+		}
+
+		// border layout
+		for (final TourTypeBorderData data : TourTypeManager.getAllTourTypeBorderData()) {
+			_comboBorderLayout.add(data.label);
+		}
+	}
+
 	private void fireModifyEvent() {
 
 		if (_isModified) {
@@ -753,6 +870,28 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		return selectedColorDefinition;
 	}
 
+	private TourTypeBorder getSelectedTourTypeBorderLayout() {
+
+		final int selectedIndex = _comboBorderLayout.getSelectionIndex();
+
+		if (selectedIndex < 0) {
+			return TourTypeManager.DEFAULT_BORDER_LAYOUT;
+		}
+
+		return TourTypeManager.getAllTourTypeBorderData()[selectedIndex].tourTypeBorder;
+	}
+
+	private TourTypeLayout getSelectedTourTypeLayout() {
+
+		final int selectedIndex = _comboFillLayout.getSelectionIndex();
+
+		if (selectedIndex < 0) {
+			return TourTypeManager.DEFAULT_IMAGE_LAYOUT;
+		}
+
+		return TourTypeManager.getAllTourTypeLayoutData()[selectedIndex].tourTypeLayout;
+	}
+
 	@Override
 	public TreeViewer getTreeViewer() {
 		return _tourTypeViewer;
@@ -766,7 +905,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 	private void initUI() {
 
-		_ui = UI.getInstance();
+		_ui = net.tourbook.ui.UI.getInstance();
 	}
 
 	@Override
@@ -905,7 +1044,6 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 		// update UI
 		_ui.setTourTypeImagesDirty();
-//		TourDatabase.clearTourTypes();
 
 		/*
 		 * update the tree viewer, the color images will be recreated in the label provider
@@ -1031,6 +1169,30 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		setFocusToViewer();
 	}
 
+	private void onSelectImageLayout() {
+
+		TourTypeManager.setTourTypeLayout(
+				getSelectedTourTypeLayout(),
+				getSelectedTourTypeBorderLayout(),
+				_spinnerBorder.getSelection());
+
+		// set tour type images dirty
+		_ui.setTourTypeImagesDirty();
+
+		_isRecreateTourTypeImages = true;
+		{
+			_tourTypeViewer.refresh(true);
+
+			// do a redraw in the tree viewer, the color images will be recreated in the label provider
+			_tourTypeViewer.getTree().redraw();
+		}
+		_isRecreateTourTypeImages = false;
+
+		_isModified = true;
+
+//		fireModifyEvent();
+	}
+
 	@Override
 	public boolean performCancel() {
 
@@ -1045,6 +1207,14 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		fireModifyEvent();
 
 		return super.performOk();
+	}
+
+	private void restoreState() {
+
+		_comboBorderLayout.select(TourTypeManager.getTourTypeBorderIndex());
+		_comboFillLayout.select(TourTypeManager.getTourTypeLayoutIndex());
+
+		_spinnerBorder.setSelection(TourTypeManager.getCurrentBorderWidth());
 	}
 
 	private TourType saveTourType(final TourType tourType) {

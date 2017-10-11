@@ -69,14 +69,17 @@ public class GraphColorPainter {
 	 * Draw graph and map colors into the defintion image.
 	 * 
 	 * @param horizontalImages
+	 * @param isRecreateTourTypeImages
 	 */
-	Image drawColorDefinitionImage(final ColorDefinition colorDefinition, final int horizontalImages) {
+	Image drawColorDefinitionImage(	final ColorDefinition colorDefinition,
+									final int horizontalImages,
+									final boolean isRecreateTourTypeImages) {
 
 		final Display display = Display.getCurrent();
 
 		final String colorDefinitionId = colorDefinition.getColorDefinitionId();
 
-		if (colorDefinitionId.equals(_recreateColorDefinitionId)) {
+		if (isRecreateTourTypeImages || colorDefinitionId.equals(_recreateColorDefinitionId)) {
 
 			/*
 			 * Dispose image for the color definition
@@ -170,13 +173,15 @@ public class GraphColorPainter {
 		return colorDefinitionImage;
 	}
 
-	Image drawGraphColorImage(final GraphColorItem graphColorItem, final int horizontalImages) {
+	Image drawGraphColorImage(	final GraphColorItem graphColorItem,
+								final int horizontalImages,
+								final boolean isRecreateTourTypeImages) {
 
 		final Display display = Display.getCurrent();
 
 		final String colorId = graphColorItem.getColorId();
 
-		if (colorId.equals(_recreateColorId)) {
+		if (isRecreateTourTypeImages || colorId.equals(_recreateColorId)) {
 
 			/*
 			 * Dispose graph color image/color

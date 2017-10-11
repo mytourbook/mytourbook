@@ -99,75 +99,76 @@ public class UI {
 																							  "wpf".equals(SWT.getPlatform());			//$NON-NLS-1$
 // SET_FORMATTING_ON
 
-	private static final String								ICONS_PATH						= "/icons/";								//$NON-NLS-1$
+	private static final String								ICONS_PATH						= "/icons/";				//$NON-NLS-1$
 
-	public static final String								EMPTY_STRING					= "";										//$NON-NLS-1$
-	public static final String								SPACE							= " ";										//$NON-NLS-1$
-	public static final String								SPACE2							= "  ";										//$NON-NLS-1$
-	public static final String								SPACE4							= "    ";									//$NON-NLS-1$
-	public static final String								COLON_SPACE						= ": ";										//$NON-NLS-1$
-	public static final String								COMMA_SPACE						= ", ";										//$NON-NLS-1$
-	public static final String								UNDERSCORE						= "_";										//$NON-NLS-1$
-	public static final String								DASH							= "-";										//$NON-NLS-1$
-	public static final String								DASH_WITH_SPACE					= " - ";									//$NON-NLS-1$
-	public static final String								DASH_WITH_DOUBLE_SPACE			= "   -   ";								//$NON-NLS-1$
-	public static final String								SLASH_WITH_SPACE				= " / ";									//$NON-NLS-1$
-	public static final String								EMPTY_STRING_FORMAT				= "%s";										//$NON-NLS-1$
-	public static final String								MNEMONIC						= "&";										//$NON-NLS-1$
-	public static final String								BREAK_TIME_MARKER				= "x";										//$NON-NLS-1$
+	public static final String								EMPTY_STRING					= "";						//$NON-NLS-1$
+	public static final String								SPACE							= " ";						//$NON-NLS-1$
+	public static final String								SPACE2							= "  ";						//$NON-NLS-1$
+	public static final String								SPACE4							= "    ";					//$NON-NLS-1$
+	public static final String								COLON_SPACE						= ": ";						//$NON-NLS-1$
+	public static final String								COMMA_SPACE						= ", ";						//$NON-NLS-1$
+	public static final String								UNDERSCORE						= "_";						//$NON-NLS-1$
+	public static final String								DASH							= "-";						//$NON-NLS-1$
+	public static final String								DASH_WITH_SPACE					= " - ";					//$NON-NLS-1$
+	public static final String								DASH_WITH_DOUBLE_SPACE			= "   -   ";				//$NON-NLS-1$
+	public static final String								SLASH_WITH_SPACE				= " / ";					//$NON-NLS-1$
+	public static final String								EMPTY_STRING_FORMAT				= "%s";						//$NON-NLS-1$
+	public static final String								MNEMONIC						= "&";						//$NON-NLS-1$
+	public static final String								BREAK_TIME_MARKER				= "x";						//$NON-NLS-1$
 
 	/**
 	 * contains a new line
 	 */
-	public static final String								NEW_LINE						= "\n";										//$NON-NLS-1$
+	public static final String								NEW_LINE						= "\n";						//$NON-NLS-1$
 
 	/**
 	 * contains 2 new lines
 	 */
-	public static final String								NEW_LINE2						= "\n\n";									//$NON-NLS-1$
+	public static final String								NEW_LINE2						= "\n\n";					//$NON-NLS-1$
 
 	public static final String								SYSTEM_NEW_LINE					= System
-			.getProperty("line.separator");																								//$NON-NLS-1$
+			.getProperty("line.separator");																				//$NON-NLS-1$
 
-	public static final String								IS_NOT_INITIALIZED				= "IS NOT INITIALIZED";						//$NON-NLS-1$
+	public static final String								IS_NOT_INITIALIZED				= "IS NOT INITIALIZED";		//$NON-NLS-1$
 
-	public static final String								GRAPH_ALTIMETER					= "GRAPH_ALTIMETER";						//$NON-NLS-1$
-	public static final String								GRAPH_ALTITUDE					= "GRAPH_ALTITUDE";							//$NON-NLS-1$
-	public static final String								GRAPH_CADENCE					= "GRAPH_CADENCE";							//$NON-NLS-1$
-	public static final String								GRAPH_GRADIENT					= "GRAPH_GRADIENT";							//$NON-NLS-1$
-	public static final String								GRAPH_PACE						= "GRAPH_PACE";								//$NON-NLS-1$
-	public static final String								GRAPH_POWER						= "GRAPH_POWER";							//$NON-NLS-1$
-	public static final String								GRAPH_PULSE						= "GRAPH_PULSE";							//$NON-NLS-1$
-	public static final String								GRAPH_SPEED						= "GRAPH_SPEED";							//$NON-NLS-1$
-	public static final String								GRAPH_TEMPERATURE				= "GRAPH_TEMPERATURE";						//$NON-NLS-1$
+	public static final String								GRAPH_ALTIMETER					= "GRAPH_ALTIMETER";		//$NON-NLS-1$
+	public static final String								GRAPH_ALTITUDE					= "GRAPH_ALTITUDE";			//$NON-NLS-1$
+	public static final String								GRAPH_CADENCE					= "GRAPH_CADENCE";			//$NON-NLS-1$
+	public static final String								GRAPH_GRADIENT					= "GRAPH_GRADIENT";			//$NON-NLS-1$
+	public static final String								GRAPH_PACE						= "GRAPH_PACE";				//$NON-NLS-1$
+	public static final String								GRAPH_POWER						= "GRAPH_POWER";			//$NON-NLS-1$
+	public static final String								GRAPH_PULSE						= "GRAPH_PULSE";			//$NON-NLS-1$
+	public static final String								GRAPH_SPEED						= "GRAPH_SPEED";			//$NON-NLS-1$
+	public static final String								GRAPH_TEMPERATURE				= "GRAPH_TEMPERATURE";		//$NON-NLS-1$
 
-	public static final String								VIEW_COLOR_CATEGORY				= "view.color.category";					//$NON-NLS-1$
-	public static final String								VIEW_COLOR_TITLE				= "view.color.title";						//$NON-NLS-1$
-	public static final String								VIEW_COLOR_SUB					= "view.color.sub";							//$NON-NLS-1$
-	public static final String								VIEW_COLOR_SUB_SUB				= "view.color.sub-sub";						//$NON-NLS-1$
-	public static final String								VIEW_COLOR_TOUR					= "view.color.tour";						//$NON-NLS-1$
-	public static final String								VIEW_COLOR_BG_HISTORY_TOUR		= "VIEW_COLOR_BG_HISTORY_TOUR";				//$NON-NLS-1$
+	public static final String								VIEW_COLOR_CATEGORY				= "view.color.category";	//$NON-NLS-1$
+	public static final String								VIEW_COLOR_TITLE				= "view.color.title";		//$NON-NLS-1$
+	public static final String								VIEW_COLOR_SUB					= "view.color.sub";			//$NON-NLS-1$
+	public static final String								VIEW_COLOR_SUB_SUB				= "view.color.sub-sub";		//$NON-NLS-1$
+	public static final String								VIEW_COLOR_TOUR					= "view.color.tour";		//$NON-NLS-1$
+	public static final String								VIEW_COLOR_BG_HISTORY_TOUR		=
+			"VIEW_COLOR_BG_HISTORY_TOUR";																				//$NON-NLS-1$
 
-	public static final String								SYMBOL_AVERAGE					= "\u00f8";									//$NON-NLS-1$
-	public static final String								SYMBOL_AVERAGE_WITH_SPACE		= "\u00f8 ";								//$NON-NLS-1$
-	public static final String								SYMBOL_DASH						= "-";										//$NON-NLS-1$
-	public static final String								SYMBOL_DOUBLE_HORIZONTAL		= "\u2550";									//$NON-NLS-1$
-	public static final String								SYMBOL_DOUBLE_VERTICAL			= "\u2551";									//$NON-NLS-1$
-	public static final String								SYMBOL_DEGREE					= "\u00B0";									//$NON-NLS-1$
-	public static final String								SYMBOL_INFINITY					= "\u221E";									//$NON-NLS-1$
-	public static final String								SYMBOL_SUM_WITH_SPACE			= "\u2211 ";								//$NON-NLS-1$
-	public static final String								SYMBOL_TAU						= "\u03c4";									//$NON-NLS-1$
+	public static final String								SYMBOL_AVERAGE					= "\u00f8";					//$NON-NLS-1$
+	public static final String								SYMBOL_AVERAGE_WITH_SPACE		= "\u00f8 ";				//$NON-NLS-1$
+	public static final String								SYMBOL_DASH						= "-";						//$NON-NLS-1$
+	public static final String								SYMBOL_DOUBLE_HORIZONTAL		= "\u2550";					//$NON-NLS-1$
+	public static final String								SYMBOL_DOUBLE_VERTICAL			= "\u2551";					//$NON-NLS-1$
+	public static final String								SYMBOL_DEGREE					= "\u00B0";					//$NON-NLS-1$
+	public static final String								SYMBOL_INFINITY					= "\u221E";					//$NON-NLS-1$
+	public static final String								SYMBOL_SUM_WITH_SPACE			= "\u2211 ";				//$NON-NLS-1$
+	public static final String								SYMBOL_TAU						= "\u03c4";					//$NON-NLS-1$
 
-	public static final String								SYMBOL_BRACKET_LEFT				= "(";										//$NON-NLS-1$
-	public static final String								SYMBOL_BRACKET_RIGHT			= ")";										//$NON-NLS-1$
-	public static final String								SYMBOL_COLON					= ":";										//$NON-NLS-1$
-	public static final String								SYMBOL_DOT						= ".";										//$NON-NLS-1$
-	public static final String								SYMBOL_EQUAL					= "=";										//$NON-NLS-1$
-	public static final String								SYMBOL_GREATER_THAN				= ">";										//$NON-NLS-1$
-	public static final String								SYMBOL_LESS_THAN				= "<";										//$NON-NLS-1$
-	public static final String								SYMBOL_PERCENTAGE				= "%";										//$NON-NLS-1$
-	public static final String								SYMBOL_WIND_WITH_SPACE			= "W ";										//$NON-NLS-1$
-	public static final String								SYMBOL_EXCLAMATION_POINT		= "!";										//$NON-NLS-1$
+	public static final String								SYMBOL_BRACKET_LEFT				= "(";						//$NON-NLS-1$
+	public static final String								SYMBOL_BRACKET_RIGHT			= ")";						//$NON-NLS-1$
+	public static final String								SYMBOL_COLON					= ":";						//$NON-NLS-1$
+	public static final String								SYMBOL_DOT						= ".";						//$NON-NLS-1$
+	public static final String								SYMBOL_EQUAL					= "=";						//$NON-NLS-1$
+	public static final String								SYMBOL_GREATER_THAN				= ">";						//$NON-NLS-1$
+	public static final String								SYMBOL_LESS_THAN				= "<";						//$NON-NLS-1$
+	public static final String								SYMBOL_PERCENTAGE				= "%";						//$NON-NLS-1$
+	public static final String								SYMBOL_WIND_WITH_SPACE			= "W ";						//$NON-NLS-1$
+	public static final String								SYMBOL_EXCLAMATION_POINT		= "!";						//$NON-NLS-1$
 
 	/**
 	 * Convert Joule in Calorie
@@ -234,14 +235,14 @@ public class UI {
 	public static final float								UNIT_FAHRENHEIT_MULTI			= 1.8f;
 	public static final float								UNIT_FAHRENHEIT_ADD				= 32;
 
-	private static final String								TOUR_TYPE_PREFIX				= "tourType";								//$NON-NLS-1$
+	private static final String								TOUR_TYPE_PREFIX				= "tourType";				//$NON-NLS-1$
 
 	public final static ImageRegistry						IMAGE_REGISTRY;
-	private static final String								PART_NAME_GRAPH_ID				= "graphId-";								//$NON-NLS-1$
-	private static final String								PART_NAME_DISABLED				= "-disabled";								//$NON-NLS-1$
+	private static final String								PART_NAME_GRAPH_ID				= "graphId-";				//$NON-NLS-1$
+	private static final String								PART_NAME_DISABLED				= "-disabled";				//$NON-NLS-1$
 
-	public static final String								IMAGE_TOUR_TYPE_FILTER			= "tourType-filter";						//$NON-NLS-1$
-	public static final String								IMAGE_TOUR_TYPE_FILTER_SYSTEM	= "tourType-filter-system";					//$NON-NLS-1$
+	public static final String								IMAGE_TOUR_TYPE_FILTER			= "tourType-filter";		//$NON-NLS-1$
+	public static final String								IMAGE_TOUR_TYPE_FILTER_SYSTEM	= "tourType-filter-system";	//$NON-NLS-1$
 
 	private static UI										instance;
 
@@ -256,9 +257,12 @@ public class UI {
 	public static Styler									TAG_CATEGORY_STYLER;
 	public static Styler									TAG_SUB_STYLER;
 
-	private final static HashMap<String, Image>				_imageCache						= new HashMap<String, Image>();
-	private final static HashMap<String, ImageDescriptor>	_imageCacheDescriptor			= new HashMap<String, ImageDescriptor>();
-	private final static HashMap<String, Boolean>			_dirtyImages					= new HashMap<String, Boolean>();
+	private final static HashMap<String, Image>				_imageCache						=
+			new HashMap<String, Image>();
+	private final static HashMap<String, ImageDescriptor>	_imageCacheDescriptor			=
+			new HashMap<String, ImageDescriptor>();
+	private final static HashMap<String, Boolean>			_dirtyImages					=
+			new HashMap<String, Boolean>();
 
 	static {
 
@@ -273,56 +277,70 @@ public class UI {
 		/*
 		 * Chart and map graphs.
 		 */
-		createGraphImageInRegistry(MapGraphId.Altimeter,
+		createGraphImageInRegistry(
+				MapGraphId.Altimeter,
 				Messages.Image__graph_altimeter,
 				Messages.Image__graph_altimeter_disabled);
 
-		createGraphImageInRegistry(MapGraphId.Altitude,
+		createGraphImageInRegistry(
+				MapGraphId.Altitude,
 				Messages.Image__graph_altitude,
 				Messages.Image__graph_altitude_disabled);
 
-		createGraphImageInRegistry(MapGraphId.Cadence,
+		createGraphImageInRegistry(
+				MapGraphId.Cadence,
 				Messages.Image__graph_cadence,
 				Messages.Image__graph_cadence_disabled);
 
-		createGraphImageInRegistry(MapGraphId.Gradient,
+		createGraphImageInRegistry(
+				MapGraphId.Gradient,
 				Messages.Image__graph_gradient,
 				Messages.Image__graph_gradient_disabled);
 
-		createGraphImageInRegistry(MapGraphId.HrZone, //
+		createGraphImageInRegistry(
+				MapGraphId.HrZone, //
 				Messages.Image__PulseZones,
 				Messages.Image__PulseZones_Disabled);
 
-		createGraphImageInRegistry(MapGraphId.Pace, //
+		createGraphImageInRegistry(
+				MapGraphId.Pace, //
 				Messages.Image__graph_pace,
 				Messages.Image__graph_pace_disabled);
 
-		createGraphImageInRegistry(MapGraphId.Power, //
+		createGraphImageInRegistry(
+				MapGraphId.Power, //
 				Messages.Image__graph_power,
 				Messages.Image__graph_power_disabled);
 
-		createGraphImageInRegistry(MapGraphId.Pulse,
+		createGraphImageInRegistry(
+				MapGraphId.Pulse,
 				Messages.Image__graph_heartbeat,
 				Messages.Image__graph_heartbeat_disabled);
 
-		createGraphImageInRegistry(MapGraphId.Speed, //
+		createGraphImageInRegistry(
+				MapGraphId.Speed, //
 				Messages.Image__graph_speed,
 				Messages.Image__graph_speed_disabled);
 
-		createGraphImageInRegistry(MapGraphId.Temperature,
+		createGraphImageInRegistry(
+				MapGraphId.Temperature,
 				Messages.Image__graph_temperature,
 				Messages.Image__graph_temperature_disabled);
 
 		// tour type images
-		IMAGE_REGISTRY.put(IMAGE_TOUR_TYPE_FILTER,
+		IMAGE_REGISTRY.put(
+				IMAGE_TOUR_TYPE_FILTER,
 				TourbookPlugin.getImageDescriptor(Messages.Image__undo_tour_type_filter));
-		IMAGE_REGISTRY.put(IMAGE_TOUR_TYPE_FILTER_SYSTEM,
+		IMAGE_REGISTRY.put(
+				IMAGE_TOUR_TYPE_FILTER_SYSTEM,
 				TourbookPlugin.getImageDescriptor(Messages.Image__undo_tour_type_filter_system));
 
 		// photo
-		IMAGE_REGISTRY.put(TourPhotoLinkView.IMAGE_PIC_DIR_VIEW,
+		IMAGE_REGISTRY.put(
+				TourPhotoLinkView.IMAGE_PIC_DIR_VIEW,
 				TourbookPlugin.getImageDescriptor(Messages.Image__PhotoDirectoryView));
-		IMAGE_REGISTRY.put(TourPhotoLinkView.IMAGE_PHOTO_PHOTO,
+		IMAGE_REGISTRY.put(
+				TourPhotoLinkView.IMAGE_PHOTO_PHOTO,
 				TourbookPlugin.getImageDescriptor(Messages.Image__PhotoPhotos));
 
 		/*
@@ -332,6 +350,9 @@ public class UI {
 		TAG_STYLER = StyledString.createColorRegistryStyler(VIEW_COLOR_TITLE, null);
 		TAG_SUB_STYLER = StyledString.createColorRegistryStyler(VIEW_COLOR_SUB, null);
 	}
+
+	// pref store var cannot be set from a static field because it can be null !!!
+	private final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
 	private UI() {}
 
@@ -544,11 +565,13 @@ public class UI {
 													final String graphImageNameDisabled) {
 
 		// create enabled image
-		IMAGE_REGISTRY.put(createGraphImage_Name(graphId), //
+		IMAGE_REGISTRY.put(
+				createGraphImage_Name(graphId), //
 				TourbookPlugin.getImageDescriptor(graphImageName));
 
 		// create disabled image
-		IMAGE_REGISTRY.put(createGraphImage_NameDisabled(graphId),
+		IMAGE_REGISTRY.put(
+				createGraphImage_NameDisabled(graphId),
 				TourbookPlugin.getImageDescriptor(graphImageNameDisabled));
 	}
 
@@ -609,14 +632,15 @@ public class UI {
 
 		final ZonedDateTime dt = tourData.getTourStartTime();
 
-		return _formatter.format(//
-				Messages.Format_yyyymmdd_hhmmss,
-				dt.getYear(),
-				dt.getMonthValue(),
-				dt.getDayOfMonth(),
-				dt.getHour(),
-				dt.getMinute(),
-				dt.getSecond())//
+		return _formatter
+				.format(//
+						Messages.Format_yyyymmdd_hhmmss,
+						dt.getYear(),
+						dt.getMonthValue(),
+						dt.getDayOfMonth(),
+						dt.getHour(),
+						dt.getMinute(),
+						dt.getSecond())//
 				.toString();
 	}
 
@@ -1001,20 +1025,26 @@ public class UI {
 
 		final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
 
-		colorRegistry.put(VIEW_COLOR_CATEGORY, //
+		colorRegistry.put(
+				VIEW_COLOR_CATEGORY, //
 				PreferenceConverter.getColor(prefStore, ITourbookPreferences.VIEW_LAYOUT_COLOR_CATEGORY));
-		colorRegistry.put(VIEW_COLOR_TITLE, //
+		colorRegistry.put(
+				VIEW_COLOR_TITLE, //
 				PreferenceConverter.getColor(prefStore, ITourbookPreferences.VIEW_LAYOUT_COLOR_TITLE));
 
-		colorRegistry.put(VIEW_COLOR_SUB, // year
+		colorRegistry.put(
+				VIEW_COLOR_SUB, // year
 				PreferenceConverter.getColor(prefStore, ITourbookPreferences.VIEW_LAYOUT_COLOR_SUB));
-		colorRegistry.put(VIEW_COLOR_SUB_SUB, // month
+		colorRegistry.put(
+				VIEW_COLOR_SUB_SUB, // month
 				PreferenceConverter.getColor(prefStore, ITourbookPreferences.VIEW_LAYOUT_COLOR_SUB_SUB));
 
-		colorRegistry.put(VIEW_COLOR_TOUR, //
+		colorRegistry.put(
+				VIEW_COLOR_TOUR, //
 				PreferenceConverter.getColor(prefStore, ITourbookPreferences.VIEW_LAYOUT_COLOR_TOUR));
 
-		colorRegistry.put(VIEW_COLOR_BG_HISTORY_TOUR, //
+		colorRegistry.put(
+				VIEW_COLOR_BG_HISTORY_TOUR, //
 				PreferenceConverter.getColor(prefStore, ITourbookPreferences.VIEW_LAYOUT_COLOR_BG_HISTORY_TOUR));
 	}
 
@@ -1050,7 +1080,8 @@ public class UI {
 					// log also the stacktrace
 					StatusUtil.log(sqlExceptionText + Util.getStackTrace(e));
 
-					MessageDialog.openError(Display.getDefault().getActiveShell(), //
+					MessageDialog.openError(
+							Display.getDefault().getActiveShell(), //
 							"SQL Error", //$NON-NLS-1$
 							sqlExceptionText);
 
@@ -1080,10 +1111,12 @@ public class UI {
 				Util.getPrefixPrefInt(prefStore, gridPrefix, ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE),
 				Util.getPrefixPrefInt(prefStore, gridPrefix, ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE),
 
-				Util.getPrefixPrefBoolean(prefStore,
+				Util.getPrefixPrefBoolean(
+						prefStore,
 						gridPrefix,
 						ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES),
-				Util.getPrefixPrefBoolean(prefStore,
+				Util.getPrefixPrefBoolean(
+						prefStore,
 						gridPrefix,
 						ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES),
 
@@ -1227,7 +1260,8 @@ public class UI {
 
 	private ImageData createTourTypeImage(final long typeId) {
 
-		final Image tourTypeImage = new Image(Display.getCurrent(),
+		final Image tourTypeImage = new Image(
+				Display.getCurrent(),
 				TourType.TOUR_TYPE_IMAGE_SIZE,
 				TourType.TOUR_TYPE_IMAGE_SIZE);
 
@@ -1243,8 +1277,9 @@ public class UI {
 		final ImageData imageData = tourTypeImage.getImageData();
 		tourTypeImage.dispose();
 
-		final int transparentPixel = imageData.getPixel(0, 0);
-		imageData.transparentPixel = transparentPixel;
+		imageData.transparentPixel = imageData.palette.getPixel(TourType.TRANSPARENT_COLOR);
+
+//		imageData.transparentPixel = TourType.TRANSPARENT_COLOR_VALUE;
 
 		return imageData;
 	}
@@ -1307,7 +1342,7 @@ public class UI {
 		_imageCacheDescriptor.clear();
 	}
 
-	private void drawTourTypeImage(final long typeId, final GC gcImage) {
+	private void drawTourTypeImage(final long typeId, final GC gc) {
 
 		if (typeId == TourType.IMAGE_KEY_DIALOG_SELECTION) {
 
@@ -1319,6 +1354,10 @@ public class UI {
 			return;
 		}
 
+		final TourTypeLayout imageLayout = TourTypeManager.getCurrentImageLayout();
+		final TourTypeBorder borderLayout = TourTypeManager.getCurrentBorderLayout();
+		final int borderWidth = TourTypeManager.getCurrentBorderWidth();
+
 		final int imageSize = TourType.TOUR_TYPE_IMAGE_SIZE;
 		final Display display = Display.getCurrent();
 		final DrawingColors drawingColors = getTourTypeColors(display, typeId);
@@ -1326,24 +1365,174 @@ public class UI {
 		final Color colorBright = drawingColors.colorBright;
 		final Color colorDark = drawingColors.colorDark;
 		final Color colorLine = drawingColors.colorLine;
+
 		final Color colorTransparent = new Color(display, TourType.TRANSPARENT_COLOR);
 		{
-			gcImage.setBackground(colorTransparent);
-			gcImage.fillRectangle(0, 0, imageSize, imageSize);
+			gc.setBackground(colorTransparent);
+			gc.fillRectangle(0, 0, imageSize, imageSize);
 
-			gcImage.setForeground(colorBright);
-			gcImage.setBackground(colorDark);
-//			gcImage.fillGradientRectangle(4, 4, imageSize - 8, imageSize - 8, false);
-			gcImage.fillGradientRectangle(2, 1, imageSize - 2, imageSize, false);
+			drawTourTypeImage_Background(gc, imageLayout, borderWidth, imageSize, colorBright, colorDark);
 
-			gcImage.setForeground(colorLine);
-//			gcImage.drawRectangle(3, 3, imageSize - 7, imageSize - 7);
-			gcImage.drawLine(1, 1, 1, imageSize - 1);
-			gcImage.drawLine(imageSize - 1, 1, imageSize - 1, imageSize - 1);
+//			gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_CYAN));
+//			gc.fillRectangle(0, 0, imageSize, imageSize);
+
+			if (borderWidth > 0) {
+				drawTourTypeImage_Border(gc, borderLayout, borderWidth, imageSize, colorLine);
+			}
 		}
 
 		drawingColors.dispose();
 		colorTransparent.dispose();
+	}
+
+	private void drawTourTypeImage_Background(	final GC gc,
+												final TourTypeLayout imageLayout,
+												final int borderWidth,
+												final int imageSize,
+												final Color colorBright,
+												final Color colorDark) {
+
+		boolean isFillRectangle = false;
+		boolean isOval = false;
+		boolean isGradient = false;
+		boolean isVertical = false;
+
+		final int ovalSize = imageSize - 4;
+
+		switch (imageLayout) {
+
+		case FILL_RECT_BRIGHT:
+			isFillRectangle = true;
+			gc.setBackground(colorBright);
+			break;
+		case FILL_RECT_DARK:
+			isFillRectangle = true;
+			gc.setBackground(colorDark);
+			break;
+
+		case FILL_OVAL_BRIGHT:
+			isOval = true;
+			gc.setBackground(colorBright);
+			break;
+		case FILL_OVAL_DARK:
+			isOval = true;
+			gc.setBackground(colorDark);
+			break;
+
+		case GRADIENT_LEFT_RIGHT:
+			isGradient = true;
+			gc.setBackground(colorBright);
+			gc.setForeground(colorDark);
+			break;
+		case GRADIENT_RIGHT_LEFT:
+			isGradient = true;
+			gc.setBackground(colorDark);
+			gc.setForeground(colorBright);
+			break;
+
+		case GRADIENT_TOP_BOTTOM:
+			isGradient = true;
+			isVertical = true;
+			gc.setBackground(colorBright);
+			gc.setForeground(colorDark);
+			break;
+		case GRADIENT_BOTTOM_TOP:
+			isGradient = true;
+			isVertical = true;
+			gc.setBackground(colorDark);
+			gc.setForeground(colorBright);
+			break;
+
+		case NOTHING:
+		default:
+			break;
+		}
+
+		if (isFillRectangle) {
+
+			gc.fillRectangle(0, 0, imageSize, imageSize);
+
+		} else if (isGradient) {
+
+			gc.fillGradientRectangle(0, 0, imageSize, imageSize, isVertical);
+
+		} else if (isOval) {
+
+			gc.setAntialias(SWT.ON);
+			gc.fillOval(//
+					imageSize / 2 - ovalSize / 2,
+					imageSize / 2 - ovalSize / 2,
+					ovalSize,
+					ovalSize);
+		}
+	}
+
+	private void drawTourTypeImage_Border(	final GC gc,
+											final TourTypeBorder borderLayout,
+											final int borderSize,
+											final int imageSize,
+											final Color colorLine) {
+
+		boolean isLeft = false;
+		boolean isRight = false;
+		boolean isTop = false;
+		boolean isBottom = false;
+
+		switch (borderLayout) {
+
+		case BORDER_ALL:
+			isLeft = true;
+			isRight = true;
+			isTop = true;
+			isBottom = true;
+			break;
+
+		case BORDER_LEFT:
+			isLeft = true;
+			break;
+		case BORDER_RIGHT:
+			isRight = true;
+			break;
+		case BORDER_LEFT_RIGHT:
+			isLeft = true;
+			isRight = true;
+			break;
+
+		case BORDER_BOTTOM:
+			isBottom = true;
+			break;
+		case BORDER_TOP:
+			isTop = true;
+			break;
+		case BORDER_TOP_BOTTOM:
+			isTop = true;
+			isBottom = true;
+			break;
+
+		default:
+			break;
+		}
+
+		if (isLeft || isRight || isTop || isBottom) {
+
+			gc.setBackground(colorLine);
+
+			if (isLeft) {
+				gc.fillRectangle(0, 0, borderSize, imageSize);
+			}
+
+			if (isRight) {
+				gc.fillRectangle(imageSize - borderSize, 0, borderSize, imageSize);
+			}
+
+			if (isTop) {
+				gc.fillRectangle(0, 0, imageSize, borderSize);
+			}
+
+			if (isBottom) {
+				gc.fillRectangle(0, imageSize - borderSize, imageSize, borderSize);
+			}
+		}
 	}
 
 	/**
@@ -1449,7 +1638,7 @@ public class UI {
 	}
 
 	/**
-	 * set dirty state for all tour type images, images cannot be disposed because they are
+	 * Set dirty state for all tour type images, images cannot be disposed because they are
 	 * displayed in the UI
 	 */
 	public void setTourTypeImagesDirty() {

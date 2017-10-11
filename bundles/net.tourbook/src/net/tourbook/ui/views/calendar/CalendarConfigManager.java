@@ -102,16 +102,16 @@ public class CalendarConfigManager {
 	private static final String		ATTR_TOUR_BACKGROUND_WIDTH				= "tourBorderWidth";					//$NON-NLS-1$
 	private static final String		ATTR_WEEK_HEIGHT						= "weekHeight";							//$NON-NLS-1$
 	//
-	static final int				DEFAULT_DATE_COLUMN_WIDTH				= 5;
+	static final DayDateFormat		DEFAULT_DAY_DATE_FORMAT					= DayDateFormat.DAY;
+	static final int				DEFAULT_DATE_COLUMN_WIDTH				= 10;
 	static final DateColumnContent	DEFAULT_DATE_COLUMN_CONTENT				= DateColumnContent.WEEK_NUMBER;
 	static final boolean			DEFAULT_IS_SHOW_DAY_DATE_WEEKEND_COLOR	= false;
 	static final int				DEFAULT_SUMMARY_COLUMN_WIDTH			= 10;
-	static final int				DEFAULT_WEEK_HEIGHT						= 70;
-	static final DayDateFormat		DEFAULT_DAY_DATE_FORMAT					= DayDateFormat.DAY;
-	static final TourBackground		DEFAULT_TOUR_BACKGROUND					= TourBackground.WITH_TOURTYPE_BRIGHT;
+	static final TourBackground		DEFAULT_TOUR_BACKGROUND					= TourBackground.WITH_TOURTYPE_DARK;
 	static final TourBorder			DEFAULT_TOUR_BORDER						= TourBorder.NO_BORDER;
 	static final int				DEFAULT_TOUR_BACKGROUND_WIDTH			= 3;
 	static final int				DEFAULT_TOUR_BORDER_WIDTH				= 1;
+	static final int				DEFAULT_WEEK_HEIGHT						= 70;
 	//
 	static final int				WEEK_HEIGHT_MIN							= 1;
 	static final int				WEEK_HEIGHT_MAX							= 500;

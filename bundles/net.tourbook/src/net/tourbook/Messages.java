@@ -1555,6 +1555,10 @@ public class Messages extends NLS {
 	public static String		Pref_TourTypes_Dlg_rename_tour_type_msg;
 	public static String		Pref_TourTypes_Dlg_rename_tour_type_title;
 	public static String		Pref_TourTypes_dnd_hint;
+	public static String		Pref_TourTypes_Label_BorderLayout;
+	public static String		Pref_TourTypes_Label_BorderWidth;
+	public static String		Pref_TourTypes_Label_ImageLayout;
+
 	public static String		Pref_TourTypes_root_title;
 	public static String		Pref_TourTypes_Title;
 
