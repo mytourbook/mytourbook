@@ -60,11 +60,11 @@ public class TourTypeManager {
 					Messages.TourType_Config_Layout_Fill_Rect_Bright),
 
 			new TourTypeLayoutData(
-					TourTypeLayout.FILL_OVAL_DARK,
+					TourTypeLayout.FILL_CIRCLE_DARK,
 					Messages.TourType_Config_Layout_Fill_Circle_Dark),
 
 			new TourTypeLayoutData(
-					TourTypeLayout.FILL_OVAL_BRIGHT,
+					TourTypeLayout.FILL_CIRCLE_BRIGHT,
 					Messages.TourType_Config_Layout_Fill_Circle_Bright),
 
 			new TourTypeLayoutData(
@@ -91,8 +91,12 @@ public class TourTypeManager {
 	private static final TourTypeBorderData[]	_allTourTypeBorderData			= new TourTypeBorderData[] {
 
 			new TourTypeBorderData(
-					TourTypeBorder.BORDER_ALL,
-					Messages.TourType_Config_Border_All),
+					TourTypeBorder.BORDER_RECTANGLE,
+					Messages.TourType_Config_Border_Rectangle),
+
+			new TourTypeBorderData(
+					TourTypeBorder.BORDER_CIRCLE,
+					Messages.TourType_Config_Border_Circle),
 
 			new TourTypeBorderData(
 					TourTypeBorder.BORDER_LEFT,

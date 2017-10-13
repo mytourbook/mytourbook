@@ -20,7 +20,8 @@ package net.tourbook.ui;
  */
 public enum TourTypeBorder {
 
-	BORDER_ALL, //
+	BORDER_RECTANGLE, //
+	BORDER_CIRCLE, //
 
 	BORDER_TOP, //
 	BORDER_BOTTOM, //

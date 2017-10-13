@@ -13,23 +13,12 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui;
+package net.tourbook.common;
 
-/**
- * Tour type image background layouts
- */
-public enum TourTypeLayout {
+import org.eclipse.swt.graphics.GC;
 
-	FILL_RECT_DARK, //
-	FILL_RECT_BRIGHT, //
+public interface ImagePainter {
 
-	FILL_CIRCLE_DARK, //
-	FILL_CIRCLE_BRIGHT, //
+	public void drawImage(GC gc);
 
-	GRADIENT_LEFT_RIGHT, //
-	GRADIENT_RIGHT_LEFT, //
-	GRADIENT_TOP_BOTTOM, //
-	GRADIENT_BOTTOM_TOP, //
-
-	NOTHING, //
 }

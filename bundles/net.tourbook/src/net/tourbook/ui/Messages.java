@@ -427,10 +427,11 @@ public class Messages extends NLS {
 	public static String		Tour_Tooltip_Label_WindDirection;
 	public static String		Tour_Tooltip_Label_WindSpeed;
 
-	public static String		TourType_Config_Border_All;
 	public static String		TourType_Config_Border_Bottom;
+	public static String		TourType_Config_Border_Circle;
 	public static String		TourType_Config_Border_Left;
 	public static String		TourType_Config_Border_LeftRight;
+	public static String		TourType_Config_Border_Rectangle;
 	public static String		TourType_Config_Border_Right;
 	public static String		TourType_Config_Border_Top;
 	public static String		TourType_Config_Border_TopBottom;

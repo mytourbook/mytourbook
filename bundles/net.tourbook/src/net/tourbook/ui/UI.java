@@ -30,6 +30,7 @@ import java.util.Set;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
+import net.tourbook.common.ImagePainter;
 import net.tourbook.common.color.MapGraphId;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
@@ -1258,70 +1259,24 @@ public class UI {
 		TourFilterManager.updateUnits();
 	}
 
-	private ImageData createTourTypeImage(final long typeId) {
+	private Image createTourTypeImage(final long typeId, final String colorId, final Image existingImage) {
 
-		final Image tourTypeImage = new Image(
-				Display.getCurrent(),
+		final Image tourTypeImage = net.tourbook.common.UI.createTransparentImage(
 				TourType.TOUR_TYPE_IMAGE_SIZE,
-				TourType.TOUR_TYPE_IMAGE_SIZE);
+				TourType.TOUR_TYPE_IMAGE_SIZE,
+				existingImage,
+				new ImagePainter() {
 
-		final GC gcImage = new GC(tourTypeImage);
-		{
-			drawTourTypeImage(typeId, gcImage);
-		}
-		gcImage.dispose();
-
-		/*
-		 * set transparency
-		 */
-		final ImageData imageData = tourTypeImage.getImageData();
-		tourTypeImage.dispose();
-
-		imageData.transparentPixel = imageData.palette.getPixel(TourType.TRANSPARENT_COLOR);
-
-//		imageData.transparentPixel = TourType.TRANSPARENT_COLOR_VALUE;
-
-		return imageData;
-	}
-
-	/**
-	 * create image tour type image from scratch
-	 */
-	private Image createTourTypeImage_New(final long typeId, final String colorId) {
-
-		final ImageData imageData = createTourTypeImage(typeId);
-
-		final Image transparentImage = new Image(Display.getCurrent(), imageData);
+					@Override
+					public void drawImage(final GC gc) {
+						drawTourTypeImage(typeId, gc);
+					}
+				});
 
 		// keep image in cache
-		_imageCache.put(colorId, transparentImage);
+		_imageCache.put(colorId, tourTypeImage);
 
-		return transparentImage;
-	}
-
-	/**
-	 * updates an existing tour type image
-	 * 
-	 * @param existingImage
-	 */
-	private Image createTourTypeImage_Update(final Image existingImage, final long typeId, final String keyColorId) {
-
-		final ImageData imageData = createTourTypeImage(typeId);
-
-		/*
-		 * update existing image
-		 */
-		final Image transparentImage = new Image(Display.getCurrent(), imageData);
-		final GC gc = new GC(existingImage);
-		{
-			gc.drawImage(transparentImage, 0, 0);
-		}
-		gc.dispose();
-		transparentImage.dispose();
-
-		_dirtyImages.remove(keyColorId);
-
-		return existingImage;
+		return tourTypeImage;
 	}
 
 	/**
@@ -1360,29 +1315,20 @@ public class UI {
 
 		final int imageSize = TourType.TOUR_TYPE_IMAGE_SIZE;
 		final Display display = Display.getCurrent();
+
 		final DrawingColors drawingColors = getTourTypeColors(display, typeId);
-
-		final Color colorBright = drawingColors.colorBright;
-		final Color colorDark = drawingColors.colorDark;
-		final Color colorLine = drawingColors.colorLine;
-
-		final Color colorTransparent = new Color(display, TourType.TRANSPARENT_COLOR);
 		{
-			gc.setBackground(colorTransparent);
-			gc.fillRectangle(0, 0, imageSize, imageSize);
+			final Color colorBright = drawingColors.colorBright;
+			final Color colorDark = drawingColors.colorDark;
+			final Color colorLine = drawingColors.colorLine;
 
 			drawTourTypeImage_Background(gc, imageLayout, borderWidth, imageSize, colorBright, colorDark);
-
-//			gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_CYAN));
-//			gc.fillRectangle(0, 0, imageSize, imageSize);
 
 			if (borderWidth > 0) {
 				drawTourTypeImage_Border(gc, borderLayout, borderWidth, imageSize, colorLine);
 			}
 		}
-
 		drawingColors.dispose();
-		colorTransparent.dispose();
 	}
 
 	private void drawTourTypeImage_Background(	final GC gc,
@@ -1397,8 +1343,6 @@ public class UI {
 		boolean isGradient = false;
 		boolean isVertical = false;
 
-		final int ovalSize = imageSize - 4;
-
 		switch (imageLayout) {
 
 		case FILL_RECT_BRIGHT:
@@ -1410,11 +1354,11 @@ public class UI {
 			gc.setBackground(colorDark);
 			break;
 
-		case FILL_OVAL_BRIGHT:
+		case FILL_CIRCLE_BRIGHT:
 			isOval = true;
 			gc.setBackground(colorBright);
 			break;
-		case FILL_OVAL_DARK:
+		case FILL_CIRCLE_DARK:
 			isOval = true;
 			gc.setBackground(colorDark);
 			break;
@@ -1458,6 +1402,8 @@ public class UI {
 
 		} else if (isOval) {
 
+			final int ovalSize = imageSize - 0;
+
 			gc.setAntialias(SWT.ON);
 			gc.fillOval(//
 					imageSize / 2 - ovalSize / 2,
@@ -1477,10 +1423,11 @@ public class UI {
 		boolean isRight = false;
 		boolean isTop = false;
 		boolean isBottom = false;
+		boolean isCircle = false;
 
 		switch (borderLayout) {
 
-		case BORDER_ALL:
+		case BORDER_RECTANGLE:
 			isLeft = true;
 			isRight = true;
 			isTop = true;
@@ -1509,6 +1456,10 @@ public class UI {
 			isBottom = true;
 			break;
 
+		case BORDER_CIRCLE:
+			isCircle = true;
+			break;
+
 		default:
 			break;
 		}
@@ -1532,6 +1483,20 @@ public class UI {
 			if (isBottom) {
 				gc.fillRectangle(0, imageSize - borderSize, imageSize, borderSize);
 			}
+
+		} else if (isCircle) {
+
+			final int ovalSize = imageSize - 0;
+
+			gc.setForeground(colorLine);
+			gc.setAntialias(SWT.ON);
+
+			gc.drawOval(//
+					imageSize / 2 - ovalSize / 2 - 0,
+					imageSize / 2 - ovalSize / 2 - 0,
+					ovalSize - 1,
+					ovalSize - 1);
+
 		}
 	}
 
@@ -1602,13 +1567,13 @@ public class UI {
 
 		if (existingImage == null || existingImage.isDisposed()) {
 
-			return createTourTypeImage_New(typeId, keyColorId);
+			return createTourTypeImage(typeId, keyColorId, null);
 
 		} else {
 
 			// old tour type image is available and not disposed but needs to be updated
 
-			return createTourTypeImage_Update(existingImage, typeId, keyColorId);
+			return createTourTypeImage(typeId, keyColorId, existingImage);
 		}
 	}
 
