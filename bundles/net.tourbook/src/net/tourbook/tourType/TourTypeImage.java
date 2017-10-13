@@ -15,86 +15,100 @@
  *******************************************************************************/
 package net.tourbook.tourType;
 
+import java.awt.GradientPaint;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import net.tourbook.common.ImagePainter;
+import net.tourbook.common.util.ImageConverter;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.ui.DrawingColors;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 
 public class TourTypeImage {
 
-	private static final String								TOUR_TYPE_PREFIX		= "tourType";	//$NON-NLS-1$
+	private static final String								TOUR_TYPE_PREFIX		= "tourType";						//$NON-NLS-1$
 
-	private final static HashMap<String, Image>				_imageCache				=
-			new HashMap<String, Image>();
-	private final static HashMap<String, ImageDescriptor>	_imageCacheDescriptor	=
-			new HashMap<String, ImageDescriptor>();
-	private final static HashMap<String, Boolean>			_dirtyImages			=
-			new HashMap<String, Boolean>();
-
-//	final BufferedImage image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_4BYTE_ABGR);
-//
-//	final Graphics2D g2d = image.createGraphics();
-//	try {
-//
-////		g2d.setColor(java.awt.Color.ORANGE);
-////		g2d.fillRect(0, 0, image.getWidth(), image.getHeight());
-//
-//		drawMapLegend_GradientColors_AWT(
-//				g2d,
-//				colorProvider,
-//				config,
-//				imageWidth,
-//				imageHeight,
-//				isVertical,
-//				isDrawUnits,
-//				isDrawBorder);
-//
-//	} finally {
-//		g2d.dispose();
-//	}
-//
-//	return ImageConverter.convertIntoSWT(image);
+// SET_FORMATTING_OFF
+	
+	private final static HashMap<String, Image>				_imageCache				= new HashMap<String, Image>();
+	private final static HashMap<String, ImageDescriptor>	_imageCacheDescriptor	= new HashMap<String, ImageDescriptor>();
+	private final static HashMap<String, Boolean>			_dirtyImages			= new HashMap<String, Boolean>();
+	
+// SET_FORMATTING_ON
 
 	private static Image createTourTypeImage(final long typeId, final String colorId, final Image existingImage) {
 
-		final Image tourTypeImage = net.tourbook.common.UI.createTransparentImage(
-				TourType.TOUR_TYPE_IMAGE_SIZE,
-				TourType.TOUR_TYPE_IMAGE_SIZE,
-				existingImage,
-				new ImagePainter() {
+//		final Image swtTourTypeImage = net.tourbook.common.UI.createTransparentImage(
+//				TourType.TOUR_TYPE_IMAGE_SIZE,
+//				TourType.TOUR_TYPE_IMAGE_SIZE,
+//				existingImage,
+//				new ImagePainter() {
+//
+//					@Override
+//					public void drawImage(final GC gc) {
+//						drawTourTypeImage_SWT(typeId, gc);
+//					}
+//				});
 
-					@Override
-					public void drawImage(final GC gc) {
-						drawTourTypeImage(typeId, gc);
-					}
-				});
+		final Image swtTourTypeImage = createTourTypeImage_AWT(typeId, existingImage);
 
 		// keep image in cache
-		_imageCache.put(colorId, tourTypeImage);
+		_imageCache.put(colorId, swtTourTypeImage);
 
-		return tourTypeImage;
+		return swtTourTypeImage;
+	}
+
+	private static Image createTourTypeImage_AWT(final long typeId, final Image existingImageSWT) {
+
+		final BufferedImage awtImage = new BufferedImage(
+				TourType.TOUR_TYPE_IMAGE_SIZE,
+				TourType.TOUR_TYPE_IMAGE_SIZE,
+				BufferedImage.TYPE_4BYTE_ABGR);
+
+		final Graphics2D g2d = awtImage.createGraphics();
+
+		try {
+
+			drawTourTypeImage_AWT(typeId, g2d);
+
+			final Image newImageSWT = ImageConverter.convertIntoSWT(awtImage);
+
+			if (existingImageSWT == null) {
+
+				return newImageSWT;
+
+			} else {
+
+				// draw into existing image
+
+				final GC gc = new GC(existingImageSWT);
+				{
+					gc.drawImage(newImageSWT, 0, 0);
+				}
+				gc.dispose();
+
+				return existingImageSWT;
+			}
+
+		} finally {
+			g2d.dispose();
+		}
 	}
 
 	/**
 	 * dispose resources
 	 */
 	public static void dispose() {
-		disposeImages();
-	}
 
-	private static void disposeImages() {
-
-//		System.out.println("disposeImages:\t");
 		for (final Image image : _imageCache.values()) {
 			image.dispose();
 		}
@@ -103,7 +117,7 @@ public class TourTypeImage {
 		_imageCacheDescriptor.clear();
 	}
 
-	private static void drawTourTypeImage(final long typeId, final GC gc) {
+	private static void drawTourTypeImage_AWT(final long typeId, final Graphics2D g2d) {
 
 		if (typeId == TourType.IMAGE_KEY_DIALOG_SELECTION) {
 
@@ -122,27 +136,102 @@ public class TourTypeImage {
 		final int imageSize = TourType.TOUR_TYPE_IMAGE_SIZE;
 		final Display display = Display.getCurrent();
 
-		final DrawingColors drawingColors = getTourTypeColors(display, typeId);
-		{
-			final Color colorBright = drawingColors.colorBright;
-			final Color colorDark = drawingColors.colorDark;
-			final Color colorLine = drawingColors.colorLine;
+		final DrawingColorsAWT drawingColors = getTourTypeColors_AWT(display, typeId);
+		final java.awt.Color colorBright = drawingColors.colorBright;
+		final java.awt.Color colorDark = drawingColors.colorDark;
+		final java.awt.Color colorLine = drawingColors.colorLine;
 
-			drawTourTypeImage_Background(gc, imageLayout, borderWidth, imageSize, colorBright, colorDark);
+		drawTourTypeImage_Background_AWT(g2d, imageLayout, borderWidth, imageSize, colorBright, colorDark);
 
-			if (borderWidth > 0) {
-				drawTourTypeImage_Border(gc, borderLayout, borderWidth, imageSize, colorLine);
-			}
+		if (borderWidth > 0) {
+			drawTourTypeImage_Border_AWT(g2d, borderLayout, borderWidth, imageSize, colorLine);
 		}
-		drawingColors.dispose();
 	}
 
-	private static void drawTourTypeImage_Background(	final GC gc,
-												final TourTypeLayout imageLayout,
-												final int borderWidth,
-												final int imageSize,
-												final Color colorBright,
-												final Color colorDark) {
+	private static void drawTourTypeImage_Background_AWT(	final Graphics2D g2d,
+															final TourTypeLayout imageLayout,
+															final int borderWidth,
+															final int imageSize,
+															final java.awt.Color colorBright,
+															final java.awt.Color colorDark) {
+
+		boolean isFillRectangle = false;
+		boolean isOval = false;
+		boolean isGradient = false;
+		boolean isVertical = false;
+
+		switch (imageLayout) {
+
+		case FILL_RECT_BRIGHT:
+			isFillRectangle = true;
+			g2d.setColor(colorBright);
+			break;
+		case FILL_RECT_DARK:
+			isFillRectangle = true;
+			g2d.setColor(colorDark);
+			break;
+
+		case FILL_CIRCLE_BRIGHT:
+			isOval = true;
+			g2d.setColor(colorBright);
+			break;
+		case FILL_CIRCLE_DARK:
+			isOval = true;
+			g2d.setColor(colorDark);
+			break;
+
+		case GRADIENT_LEFT_RIGHT:
+			isGradient = true;
+			g2d.setPaint(new GradientPaint(0, 0, colorBright, imageSize, imageSize, colorDark));
+			break;
+		case GRADIENT_RIGHT_LEFT:
+			isGradient = true;
+			g2d.setColor(colorBright);
+			break;
+
+		case GRADIENT_TOP_BOTTOM:
+			isGradient = true;
+			isVertical = true;
+			g2d.setColor(colorBright);
+			break;
+		case GRADIENT_BOTTOM_TOP:
+			isGradient = true;
+			isVertical = true;
+			g2d.setColor(colorBright);
+			break;
+
+		case NOTHING:
+		default:
+			break;
+		}
+
+		if (isFillRectangle || isGradient) {
+
+			g2d.fillRect(0, 0, imageSize, imageSize);
+
+//		} else if (isGradient) {
+//
+//			gc.fillGradientRectangle(0, 0, imageSize, imageSize, isVertical);
+
+		} else if (isOval) {
+
+//			final int ovalSize = imageSize - 0;
+//
+//			gc.setAntialias(SWT.ON);
+//			gc.fillOval(//
+//					imageSize / 2 - ovalSize / 2,
+//					imageSize / 2 - ovalSize / 2,
+//					ovalSize,
+//					ovalSize);
+		}
+	}
+
+	private static void drawTourTypeImage_Background_SWT(	final GC gc,
+															final TourTypeLayout imageLayout,
+															final int borderWidth,
+															final int imageSize,
+															final Color colorBright,
+															final Color colorDark) {
 
 		boolean isFillRectangle = false;
 		boolean isOval = false;
@@ -219,11 +308,20 @@ public class TourTypeImage {
 		}
 	}
 
-	private static void drawTourTypeImage_Border(	final GC gc,
-											final TourTypeBorder borderLayout,
-											final int borderSize,
-											final int imageSize,
-											final Color colorLine) {
+	private static void drawTourTypeImage_Border_AWT(	final Graphics2D g2d,
+														final TourTypeBorder borderLayout,
+														final int borderWidth,
+														final int imageSize,
+														final java.awt.Color colorLine) {
+		// TODO Auto-generated method stub
+
+	}
+
+	private static void drawTourTypeImage_Border_SWT(	final GC gc,
+														final TourTypeBorder borderLayout,
+														final int borderSize,
+														final int imageSize,
+														final Color colorLine) {
 
 		boolean isLeft = false;
 		boolean isRight = false;
@@ -306,14 +404,91 @@ public class TourTypeImage {
 		}
 	}
 
+	private static void drawTourTypeImage_SWT(final long typeId, final GC gc) {
+
+		if (typeId == TourType.IMAGE_KEY_DIALOG_SELECTION) {
+
+			// create a default image
+
+		} else if (typeId == TourDatabase.ENTITY_IS_NOT_SAVED) {
+
+			// make the image invisible
+			return;
+		}
+
+		final TourTypeLayout imageLayout = TourTypeManager.getCurrentImageLayout();
+		final TourTypeBorder borderLayout = TourTypeManager.getCurrentBorderLayout();
+		final int borderWidth = TourTypeManager.getCurrentBorderWidth();
+
+		final int imageSize = TourType.TOUR_TYPE_IMAGE_SIZE;
+		final Display display = Display.getCurrent();
+
+		final DrawingColorsSWT drawingColors = getTourTypeColors_SWT(display, typeId);
+		{
+			final Color colorBright = drawingColors.colorBright;
+			final Color colorDark = drawingColors.colorDark;
+			final Color colorLine = drawingColors.colorLine;
+
+			drawTourTypeImage_Background_SWT(gc, imageLayout, borderWidth, imageSize, colorBright, colorDark);
+
+			if (borderWidth > 0) {
+				drawTourTypeImage_Border_SWT(gc, borderLayout, borderWidth, imageSize, colorLine);
+			}
+		}
+		drawingColors.dispose();
+	}
+
 	/**
 	 * @param display
 	 * @param graphColor
 	 * @return return the color for the graph
 	 */
-	private static DrawingColors getTourTypeColors(final Display display, final long tourTypeId) {
+	private static DrawingColorsAWT getTourTypeColors_AWT(final Display display, final long tourTypeId) {
 
-		final DrawingColors drawingColors = new DrawingColors();
+		final DrawingColorsAWT drawingColors = new DrawingColorsAWT();
+		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
+
+		TourType colorTourType = null;
+
+		for (final TourType tourType : tourTypes) {
+			if (tourType.getTypeId() == tourTypeId) {
+				colorTourType = tourType;
+				break;
+			}
+		}
+
+		if (tourTypeId == TourType.IMAGE_KEY_DIALOG_SELECTION
+				|| colorTourType == null
+				|| colorTourType.getTypeId() == TourDatabase.ENTITY_IS_NOT_SAVED) {
+
+			// tour type was not found use default color
+
+			drawingColors.colorBright = java.awt.Color.YELLOW;
+			drawingColors.colorDark = java.awt.Color.PINK;
+			drawingColors.colorLine = java.awt.Color.DARK_GRAY;
+
+		} else {
+
+			final RGB rgbBright = colorTourType.getRGBBright();
+			final RGB rgbDark = colorTourType.getRGBDark();
+			final RGB rgbLine = colorTourType.getRGBLine();
+
+			drawingColors.colorBright = new java.awt.Color(rgbBright.red, rgbBright.green, rgbBright.blue);
+			drawingColors.colorDark = new java.awt.Color(rgbDark.red, rgbDark.green, rgbDark.blue);
+			drawingColors.colorLine = new java.awt.Color(rgbLine.red, rgbLine.green, rgbLine.blue);
+		}
+
+		return drawingColors;
+	}
+
+	/**
+	 * @param display
+	 * @param graphColor
+	 * @return return the color for the graph
+	 */
+	private static DrawingColorsSWT getTourTypeColors_SWT(final Display display, final long tourTypeId) {
+
+		final DrawingColorsSWT drawingColors = new DrawingColorsSWT();
 		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
 
 		TourType colorTourType = null;

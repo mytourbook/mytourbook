@@ -700,6 +700,7 @@ public class UI {
 												final int imageHeight,
 												final Image existingImage,
 												final ImagePainter gcPainter) {
+
 		final Device display = Display.getDefault();
 		final RGB rgbTransparent = new RGB(0xfa, 0xfb, 0xfc);
 
