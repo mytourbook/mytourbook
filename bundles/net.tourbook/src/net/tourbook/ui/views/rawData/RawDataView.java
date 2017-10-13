@@ -15,9 +15,8 @@
  *******************************************************************************/
 package net.tourbook.ui.views.rawData;
 
-import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
-import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
-import static net.tourbook.ui.UI.getIconUrl;
+import static java.nio.file.StandardWatchEventKinds.*;
+import static net.tourbook.ui.UI.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -98,6 +97,7 @@ import net.tourbook.tour.TourLogState;
 import net.tourbook.tour.TourLogView;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourTypeMenuManager;
+import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.ITourProviderAll;
 import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.action.ActionEditQuick;
@@ -3207,16 +3207,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 			@Override
 			public void update(final ViewerCell cell) {
 
-				final net.tourbook.ui.UI ui = net.tourbook.ui.UI.getInstance();
 
 				final TourType tourType = ((TourData) cell.getElement()).getTourType();
 
 				if (tourType == null) {
-					cell.setImage(ui.getTourTypeImage(TourDatabase.ENTITY_IS_NOT_SAVED));
+					cell.setImage(TourTypeImage.getTourTypeImage(TourDatabase.ENTITY_IS_NOT_SAVED));
 				} else {
 
 					final long tourTypeId = tourType.getTypeId();
-					final Image tourTypeImage = ui.getTourTypeImage(tourTypeId);
+					final Image tourTypeImage = TourTypeImage.getTourTypeImage(tourTypeId);
 
 					/*
 					 * when a tour type image is modified, it will keep the same image resource only
@@ -3794,7 +3793,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 		final Display display = _parent.getDisplay();
 
 		final Enum<TourTypeConfig> tourTypeConfig = importConfig.tourTypeConfig;
-		final net.tourbook.ui.UI ui = net.tourbook.ui.UI.getInstance();
 
 		if (TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED.equals(tourTypeConfig)) {
 
@@ -3814,7 +3812,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
 						final SpeedTourType vertex = speedVertices.get(imageIndex);
 
-						final Image ttImage = ui.getTourTypeImage(vertex.tourTypeId);
+						final Image ttImage = TourTypeImage.getTourTypeImage(vertex.tourTypeId);
 
 						gcImage.drawImage(ttImage, //
 								0,
@@ -3858,7 +3856,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 						gcImage.setBackground(colorTransparent);
 						gcImage.fillRectangle(0, 0, TourType.TOUR_TYPE_IMAGE_SIZE, TourType.TOUR_TYPE_IMAGE_SIZE);
 
-						final Image ttImage = ui.getTourTypeImage(tourType.getTypeId());
+						final Image ttImage = TourTypeImage.getTourTypeImage(tourType.getTypeId());
 						gcImage.drawImage(ttImage, 0, 0);
 					}
 					gcImage.dispose();

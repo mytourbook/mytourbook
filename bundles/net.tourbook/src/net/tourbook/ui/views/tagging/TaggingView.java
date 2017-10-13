@@ -54,6 +54,7 @@ import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourTypeMenuManager;
+import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.TreeColumnFactory;
 import net.tourbook.ui.UI;
@@ -774,7 +775,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer 
 
 					styledString.append(viewItem.treeColumn);
 
-					cell.setImage(UI.getInstance().getTourTypeImage(((TVITagViewTour) viewItem).tourTypeId));
+					cell.setImage(TourTypeImage.getTourTypeImage(((TVITagViewTour) viewItem).tourTypeId));
 					setCellColor(cell, element);
 
 				} else if (viewItem instanceof TVITagViewTag) {

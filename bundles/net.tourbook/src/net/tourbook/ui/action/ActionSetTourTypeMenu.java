@@ -23,8 +23,8 @@ import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourTypeMenuManager;
+import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.ITourProvider;
-import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
@@ -70,7 +70,7 @@ public class ActionSetTourTypeMenu extends Action implements IMenuCreator {
 			if (isChecked == false) {
 
 				// show image when tour type can be selected, disabled images look ugly on win
-				final Image tourTypeImage = UI.getInstance().getTourTypeImage(tourType.getTypeId());
+				final Image tourTypeImage = TourTypeImage.getTourTypeImage(tourType.getTypeId());
 				setImageDescriptor(ImageDescriptor.createFromImage(tourTypeImage));
 			}
 

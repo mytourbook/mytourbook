@@ -35,11 +35,12 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.TourTypeBorder;
-import net.tourbook.ui.TourTypeLayout;
-import net.tourbook.ui.TourTypeManager;
-import net.tourbook.ui.TourTypeManager.TourTypeBorderData;
-import net.tourbook.ui.TourTypeManager.TourTypeLayoutData;
+import net.tourbook.tourType.TourTypeBorder;
+import net.tourbook.tourType.TourTypeImage;
+import net.tourbook.tourType.TourTypeLayout;
+import net.tourbook.tourType.TourTypeManager;
+import net.tourbook.tourType.TourTypeManager.TourTypeBorderData;
+import net.tourbook.tourType.TourTypeManager.TourTypeLayoutData;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.InputDialog;
@@ -116,7 +117,6 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 	private boolean								_isModified				= false;
 	private boolean								_isRecreateTourTypeImages;
 
-	private net.tourbook.ui.UI					_ui;
 
 	/*
 	 * UI controls
@@ -218,7 +218,6 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 	@Override
 	protected Control createContents(final Composite parent) {
 
-		initUI();
 
 		final Composite ui = createUI(parent);
 
@@ -626,7 +625,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 						cell.setText(((TourTypeColorDefinition) (element)).getVisibleName());
 
 						final TourType tourType = ((TourTypeColorDefinition) element).getTourType();
-						final Image tourTypeImage = _ui.getTourTypeImage(tourType.getTypeId());
+						final Image tourTypeImage = TourTypeImage.getTourTypeImage(tourType.getTypeId());
 
 						cell.setImage(tourTypeImage);
 
@@ -903,10 +902,6 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 //		noDefaultAndApplyButton();
 	}
 
-	private void initUI() {
-
-		_ui = net.tourbook.ui.UI.getInstance();
-	}
 
 	@Override
 	public boolean okToLeave() {
@@ -1043,7 +1038,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 				selectedColorDefinition.getColorDefinitionId());
 
 		// update UI
-		_ui.setTourTypeImagesDirty();
+		TourTypeImage.setTourTypeImagesDirty();
 
 		/*
 		 * update the tree viewer, the color images will be recreated in the label provider
@@ -1177,7 +1172,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 				_spinnerBorder.getSelection());
 
 		// set tour type images dirty
-		_ui.setTourTypeImagesDirty();
+		TourTypeImage.setTourTypeImagesDirty();
 
 		_isRecreateTourTypeImages = true;
 		{

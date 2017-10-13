@@ -42,6 +42,7 @@ import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourTypeMenuManager;
+import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.IReferenceTourProvider;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.TreeColumnFactory;
@@ -860,7 +861,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 			public void update(final ViewerCell cell) {
 				final Object element = cell.getElement();
 				if (element instanceof TVICatalogComparedTour) {
-					cell.setImage(UI.getInstance().getTourTypeImage(((TVICatalogComparedTour) element).tourTypeId));
+					cell.setImage(TourTypeImage.getTourTypeImage(((TVICatalogComparedTour) element).tourTypeId));
 				}
 			}
 		});

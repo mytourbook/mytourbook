@@ -24,13 +24,11 @@ import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Formatter;
-import java.util.HashMap;
 import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
-import net.tourbook.common.ImagePainter;
 import net.tourbook.common.color.MapGraphId;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
@@ -45,6 +43,7 @@ import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.filter.TourFilterManager;
 import net.tourbook.tour.photo.TourPhotoLinkView;
+import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 import net.tourbook.web.WEB;
 
@@ -66,8 +65,6 @@ import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.layout.GridData;
@@ -100,76 +97,76 @@ public class UI {
 																							  "wpf".equals(SWT.getPlatform());			//$NON-NLS-1$
 // SET_FORMATTING_ON
 
-	private static final String								ICONS_PATH						= "/icons/";				//$NON-NLS-1$
+	private static final String			ICONS_PATH						= "/icons/";											//$NON-NLS-1$
 
-	public static final String								EMPTY_STRING					= "";						//$NON-NLS-1$
-	public static final String								SPACE							= " ";						//$NON-NLS-1$
-	public static final String								SPACE2							= "  ";						//$NON-NLS-1$
-	public static final String								SPACE4							= "    ";					//$NON-NLS-1$
-	public static final String								COLON_SPACE						= ": ";						//$NON-NLS-1$
-	public static final String								COMMA_SPACE						= ", ";						//$NON-NLS-1$
-	public static final String								UNDERSCORE						= "_";						//$NON-NLS-1$
-	public static final String								DASH							= "-";						//$NON-NLS-1$
-	public static final String								DASH_WITH_SPACE					= " - ";					//$NON-NLS-1$
-	public static final String								DASH_WITH_DOUBLE_SPACE			= "   -   ";				//$NON-NLS-1$
-	public static final String								SLASH_WITH_SPACE				= " / ";					//$NON-NLS-1$
-	public static final String								EMPTY_STRING_FORMAT				= "%s";						//$NON-NLS-1$
-	public static final String								MNEMONIC						= "&";						//$NON-NLS-1$
-	public static final String								BREAK_TIME_MARKER				= "x";						//$NON-NLS-1$
+	public static final String			EMPTY_STRING					= "";													//$NON-NLS-1$
+	public static final String			SPACE							= " ";													//$NON-NLS-1$
+	public static final String			SPACE2							= "  ";													//$NON-NLS-1$
+	public static final String			SPACE4							= "    ";												//$NON-NLS-1$
+	public static final String			COLON_SPACE						= ": ";													//$NON-NLS-1$
+	public static final String			COMMA_SPACE						= ", ";													//$NON-NLS-1$
+	public static final String			UNDERSCORE						= "_";													//$NON-NLS-1$
+	public static final String			DASH							= "-";													//$NON-NLS-1$
+	public static final String			DASH_WITH_SPACE					= " - ";												//$NON-NLS-1$
+	public static final String			DASH_WITH_DOUBLE_SPACE			= "   -   ";											//$NON-NLS-1$
+	public static final String			SLASH_WITH_SPACE				= " / ";												//$NON-NLS-1$
+	public static final String			EMPTY_STRING_FORMAT				= "%s";													//$NON-NLS-1$
+	public static final String			MNEMONIC						= "&";													//$NON-NLS-1$
+	public static final String			BREAK_TIME_MARKER				= "x";													//$NON-NLS-1$
 
 	/**
 	 * contains a new line
 	 */
-	public static final String								NEW_LINE						= "\n";						//$NON-NLS-1$
+	public static final String			NEW_LINE						= "\n";													//$NON-NLS-1$
 
 	/**
 	 * contains 2 new lines
 	 */
-	public static final String								NEW_LINE2						= "\n\n";					//$NON-NLS-1$
+	public static final String			NEW_LINE2						= "\n\n";												//$NON-NLS-1$
 
-	public static final String								SYSTEM_NEW_LINE					= System
-			.getProperty("line.separator");																				//$NON-NLS-1$
+	public static final String			SYSTEM_NEW_LINE					= System
+			.getProperty("line.separator");																						//$NON-NLS-1$
 
-	public static final String								IS_NOT_INITIALIZED				= "IS NOT INITIALIZED";		//$NON-NLS-1$
+	public static final String			IS_NOT_INITIALIZED				= "IS NOT INITIALIZED";									//$NON-NLS-1$
 
-	public static final String								GRAPH_ALTIMETER					= "GRAPH_ALTIMETER";		//$NON-NLS-1$
-	public static final String								GRAPH_ALTITUDE					= "GRAPH_ALTITUDE";			//$NON-NLS-1$
-	public static final String								GRAPH_CADENCE					= "GRAPH_CADENCE";			//$NON-NLS-1$
-	public static final String								GRAPH_GRADIENT					= "GRAPH_GRADIENT";			//$NON-NLS-1$
-	public static final String								GRAPH_PACE						= "GRAPH_PACE";				//$NON-NLS-1$
-	public static final String								GRAPH_POWER						= "GRAPH_POWER";			//$NON-NLS-1$
-	public static final String								GRAPH_PULSE						= "GRAPH_PULSE";			//$NON-NLS-1$
-	public static final String								GRAPH_SPEED						= "GRAPH_SPEED";			//$NON-NLS-1$
-	public static final String								GRAPH_TEMPERATURE				= "GRAPH_TEMPERATURE";		//$NON-NLS-1$
+	public static final String			GRAPH_ALTIMETER					= "GRAPH_ALTIMETER";									//$NON-NLS-1$
+	public static final String			GRAPH_ALTITUDE					= "GRAPH_ALTITUDE";										//$NON-NLS-1$
+	public static final String			GRAPH_CADENCE					= "GRAPH_CADENCE";										//$NON-NLS-1$
+	public static final String			GRAPH_GRADIENT					= "GRAPH_GRADIENT";										//$NON-NLS-1$
+	public static final String			GRAPH_PACE						= "GRAPH_PACE";											//$NON-NLS-1$
+	public static final String			GRAPH_POWER						= "GRAPH_POWER";										//$NON-NLS-1$
+	public static final String			GRAPH_PULSE						= "GRAPH_PULSE";										//$NON-NLS-1$
+	public static final String			GRAPH_SPEED						= "GRAPH_SPEED";										//$NON-NLS-1$
+	public static final String			GRAPH_TEMPERATURE				= "GRAPH_TEMPERATURE";									//$NON-NLS-1$
 
-	public static final String								VIEW_COLOR_CATEGORY				= "view.color.category";	//$NON-NLS-1$
-	public static final String								VIEW_COLOR_TITLE				= "view.color.title";		//$NON-NLS-1$
-	public static final String								VIEW_COLOR_SUB					= "view.color.sub";			//$NON-NLS-1$
-	public static final String								VIEW_COLOR_SUB_SUB				= "view.color.sub-sub";		//$NON-NLS-1$
-	public static final String								VIEW_COLOR_TOUR					= "view.color.tour";		//$NON-NLS-1$
-	public static final String								VIEW_COLOR_BG_HISTORY_TOUR		=
-			"VIEW_COLOR_BG_HISTORY_TOUR";																				//$NON-NLS-1$
+	public static final String			VIEW_COLOR_CATEGORY				= "view.color.category";								//$NON-NLS-1$
+	public static final String			VIEW_COLOR_TITLE				= "view.color.title";									//$NON-NLS-1$
+	public static final String			VIEW_COLOR_SUB					= "view.color.sub";										//$NON-NLS-1$
+	public static final String			VIEW_COLOR_SUB_SUB				= "view.color.sub-sub";									//$NON-NLS-1$
+	public static final String			VIEW_COLOR_TOUR					= "view.color.tour";									//$NON-NLS-1$
+	public static final String			VIEW_COLOR_BG_HISTORY_TOUR		=
+			"VIEW_COLOR_BG_HISTORY_TOUR";																						//$NON-NLS-1$
 
-	public static final String								SYMBOL_AVERAGE					= "\u00f8";					//$NON-NLS-1$
-	public static final String								SYMBOL_AVERAGE_WITH_SPACE		= "\u00f8 ";				//$NON-NLS-1$
-	public static final String								SYMBOL_DASH						= "-";						//$NON-NLS-1$
-	public static final String								SYMBOL_DOUBLE_HORIZONTAL		= "\u2550";					//$NON-NLS-1$
-	public static final String								SYMBOL_DOUBLE_VERTICAL			= "\u2551";					//$NON-NLS-1$
-	public static final String								SYMBOL_DEGREE					= "\u00B0";					//$NON-NLS-1$
-	public static final String								SYMBOL_INFINITY					= "\u221E";					//$NON-NLS-1$
-	public static final String								SYMBOL_SUM_WITH_SPACE			= "\u2211 ";				//$NON-NLS-1$
-	public static final String								SYMBOL_TAU						= "\u03c4";					//$NON-NLS-1$
+	public static final String			SYMBOL_AVERAGE					= "\u00f8";												//$NON-NLS-1$
+	public static final String			SYMBOL_AVERAGE_WITH_SPACE		= "\u00f8 ";											//$NON-NLS-1$
+	public static final String			SYMBOL_DASH						= "-";													//$NON-NLS-1$
+	public static final String			SYMBOL_DOUBLE_HORIZONTAL		= "\u2550";												//$NON-NLS-1$
+	public static final String			SYMBOL_DOUBLE_VERTICAL			= "\u2551";												//$NON-NLS-1$
+	public static final String			SYMBOL_DEGREE					= "\u00B0";												//$NON-NLS-1$
+	public static final String			SYMBOL_INFINITY					= "\u221E";												//$NON-NLS-1$
+	public static final String			SYMBOL_SUM_WITH_SPACE			= "\u2211 ";											//$NON-NLS-1$
+	public static final String			SYMBOL_TAU						= "\u03c4";												//$NON-NLS-1$
 
-	public static final String								SYMBOL_BRACKET_LEFT				= "(";						//$NON-NLS-1$
-	public static final String								SYMBOL_BRACKET_RIGHT			= ")";						//$NON-NLS-1$
-	public static final String								SYMBOL_COLON					= ":";						//$NON-NLS-1$
-	public static final String								SYMBOL_DOT						= ".";						//$NON-NLS-1$
-	public static final String								SYMBOL_EQUAL					= "=";						//$NON-NLS-1$
-	public static final String								SYMBOL_GREATER_THAN				= ">";						//$NON-NLS-1$
-	public static final String								SYMBOL_LESS_THAN				= "<";						//$NON-NLS-1$
-	public static final String								SYMBOL_PERCENTAGE				= "%";						//$NON-NLS-1$
-	public static final String								SYMBOL_WIND_WITH_SPACE			= "W ";						//$NON-NLS-1$
-	public static final String								SYMBOL_EXCLAMATION_POINT		= "!";						//$NON-NLS-1$
+	public static final String			SYMBOL_BRACKET_LEFT				= "(";													//$NON-NLS-1$
+	public static final String			SYMBOL_BRACKET_RIGHT			= ")";													//$NON-NLS-1$
+	public static final String			SYMBOL_COLON					= ":";													//$NON-NLS-1$
+	public static final String			SYMBOL_DOT						= ".";													//$NON-NLS-1$
+	public static final String			SYMBOL_EQUAL					= "=";													//$NON-NLS-1$
+	public static final String			SYMBOL_GREATER_THAN				= ">";													//$NON-NLS-1$
+	public static final String			SYMBOL_LESS_THAN				= "<";													//$NON-NLS-1$
+	public static final String			SYMBOL_PERCENTAGE				= "%";													//$NON-NLS-1$
+	public static final String			SYMBOL_WIND_WITH_SPACE			= "W ";													//$NON-NLS-1$
+	public static final String			SYMBOL_EXCLAMATION_POINT		= "!";													//$NON-NLS-1$
 
 	/**
 	 * Convert Joule in Calorie
@@ -177,7 +174,7 @@ public class UI {
 	 * 1 cal = 4.1868 J<br>
 	 * 1 J = 0.238846 cal
 	 */
-	public static final float								UNIT_CALORIE_2_JOULE			= 4.1868f;
+	public static final float			UNIT_CALORIE_2_JOULE			= 4.1868f;
 
 	/**
 	 * Convert Calorie to Joule
@@ -185,85 +182,74 @@ public class UI {
 	 * 1 cal = 4.1868 J<br>
 	 * 1 J = 0.238846 cal
 	 */
-	public static final float								UNIT_JOULE_2_CALORY				= 1.0f / 4.1868f;
+	public static final float			UNIT_JOULE_2_CALORY				= 1.0f / 4.1868f;
 
 	/**
 	 * Imperial system for distance
 	 */
-	public static final float								UNIT_MILE						= 1.609344f;
+	public static final float			UNIT_MILE						= 1.609344f;
 
 	/**
 	 * Imperial system for small distance, 1 yard = 3 feet = 36 inches = 0,9144 Meter
 	 */
-	public static final float								UNIT_YARD						= 0.9144f;
+	public static final float			UNIT_YARD						= 0.9144f;
 
 	/**
 	 * Imperial system for height
 	 */
-	public static final float								UNIT_FOOT						= 0.3048f;
+	public static final float			UNIT_FOOT						= 0.3048f;
 
 	/**
 	 * contains the system of measurement value for distances relative to the metric system, the
 	 * metric system is <code>1</code>
 	 */
-	public static float										UNIT_VALUE_DISTANCE				= 1;
+	public static float					UNIT_VALUE_DISTANCE				= 1;
 
 	/**
 	 * contains the system of measurement value for small distances relative to the metric system,
 	 * the metric system is <code>1</code>
 	 */
-	public static float										UNIT_VALUE_DISTANCE_SMALL		= 1;
+	public static float					UNIT_VALUE_DISTANCE_SMALL		= 1;
 
 	/**
 	 * contains the system of measurement value for altitudes relative to the metric system, the
 	 * metric system is <code>1</code>
 	 */
-	public static float										UNIT_VALUE_ALTITUDE				= 1;
+	public static float					UNIT_VALUE_ALTITUDE				= 1;
 
 	/**
 	 * contains the system of measurement value for the temperature, is set to <code>1</code> for
 	 * the metric system
 	 */
-	public static float										UNIT_VALUE_TEMPERATURE			= 1;
+	public static float					UNIT_VALUE_TEMPERATURE			= 1;
 
 	/**
 	 * Contains the system of measurement value for the power, is set to <code>1</code> for the
 	 * metric system Watt/Kg.
 	 */
-	public static float										UNIT_VALUE_POWER;
+	public static float					UNIT_VALUE_POWER;
 
 	// (Celcius * 9/5) + 32 = Fahrenheit
-	public static final float								UNIT_FAHRENHEIT_MULTI			= 1.8f;
-	public static final float								UNIT_FAHRENHEIT_ADD				= 32;
+	public static final float			UNIT_FAHRENHEIT_MULTI			= 1.8f;
+	public static final float			UNIT_FAHRENHEIT_ADD				= 32;
 
-	private static final String								TOUR_TYPE_PREFIX				= "tourType";				//$NON-NLS-1$
+	public final static ImageRegistry	IMAGE_REGISTRY;
+	private static final String			PART_NAME_GRAPH_ID				= "graphId-";											//$NON-NLS-1$
+	private static final String			PART_NAME_DISABLED				= "-disabled";											//$NON-NLS-1$
 
-	public final static ImageRegistry						IMAGE_REGISTRY;
-	private static final String								PART_NAME_GRAPH_ID				= "graphId-";				//$NON-NLS-1$
-	private static final String								PART_NAME_DISABLED				= "-disabled";				//$NON-NLS-1$
+	public static final String			IMAGE_TOUR_TYPE_FILTER			= "tourType-filter";									//$NON-NLS-1$
+	public static final String			IMAGE_TOUR_TYPE_FILTER_SYSTEM	= "tourType-filter-system";								//$NON-NLS-1$
 
-	public static final String								IMAGE_TOUR_TYPE_FILTER			= "tourType-filter";		//$NON-NLS-1$
-	public static final String								IMAGE_TOUR_TYPE_FILTER_SYSTEM	= "tourType-filter-system";	//$NON-NLS-1$
-
-	private static UI										instance;
-
-	private static StringBuilder							_formatterSB					= new StringBuilder();
-	private static Formatter								_formatter						= new Formatter(
+	private static StringBuilder		_formatterSB					= new StringBuilder();
+	private static Formatter			_formatter						= new Formatter(
 			_formatterSB);
 
-	private static DateFormat								_dateFormatterShort;
-	private static DateFormat								_timeFormatterShort;
+	private static DateFormat			_dateFormatterShort;
+	private static DateFormat			_timeFormatterShort;
 
-	public static Styler									TAG_STYLER;
-	public static Styler									TAG_CATEGORY_STYLER;
-	public static Styler									TAG_SUB_STYLER;
-
-	private final static HashMap<String, Image>				_imageCache						=
-			new HashMap<String, Image>();
-	private final static HashMap<String, ImageDescriptor>	_imageCacheDescriptor			=
-			new HashMap<String, ImageDescriptor>();
-	private final static HashMap<String, Boolean>			_dirtyImages					=
-			new HashMap<String, Boolean>();
+	public static Styler				TAG_STYLER;
+	public static Styler				TAG_CATEGORY_STYLER;
+	public static Styler				TAG_SUB_STYLER;
 
 	static {
 
@@ -353,7 +339,7 @@ public class UI {
 	}
 
 	// pref store var cannot be set from a static field because it can be null !!!
-	private final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
+//	private final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
 	private UI() {}
 
@@ -872,15 +858,6 @@ public class UI {
 		return EMPTY_STRING;
 	}
 
-	public static UI getInstance() {
-
-		if (instance == null) {
-			instance = new UI();
-		}
-
-		return instance;
-	}
-
 	/**
 	 * Checks if propertyData has the same tour as the oldTourData
 	 * 
@@ -1161,9 +1138,9 @@ public class UI {
 		// tour type
 		if (tourType == null) {
 			lblTourType.setText(UI.EMPTY_STRING);
-			lblTourType.setImage(UI.getInstance().getTourTypeImage(TourDatabase.ENTITY_IS_NOT_SAVED));
+			lblTourType.setImage(TourTypeImage.getTourTypeImage(TourDatabase.ENTITY_IS_NOT_SAVED));
 		} else {
-			lblTourType.setImage(UI.getInstance().getTourTypeImage(tourType.getTypeId()));
+			lblTourType.setImage(TourTypeImage.getTourTypeImage(tourType.getTypeId()));
 			lblTourType.setText(isTextDisplayed ? tourType.getName() : UI.EMPTY_STRING);
 		}
 
@@ -1259,362 +1236,4 @@ public class UI {
 		TourFilterManager.updateUnits();
 	}
 
-	private Image createTourTypeImage(final long typeId, final String colorId, final Image existingImage) {
-
-		final Image tourTypeImage = net.tourbook.common.UI.createTransparentImage(
-				TourType.TOUR_TYPE_IMAGE_SIZE,
-				TourType.TOUR_TYPE_IMAGE_SIZE,
-				existingImage,
-				new ImagePainter() {
-
-					@Override
-					public void drawImage(final GC gc) {
-						drawTourTypeImage(typeId, gc);
-					}
-				});
-
-		// keep image in cache
-		_imageCache.put(colorId, tourTypeImage);
-
-		return tourTypeImage;
-	}
-
-	/**
-	 * dispose resources
-	 */
-	public void dispose() {
-		disposeImages();
-	}
-
-	private void disposeImages() {
-
-//		System.out.println("disposeImages:\t");
-		for (final Image image : _imageCache.values()) {
-			image.dispose();
-		}
-
-		_imageCache.clear();
-		_imageCacheDescriptor.clear();
-	}
-
-	private void drawTourTypeImage(final long typeId, final GC gc) {
-
-		if (typeId == TourType.IMAGE_KEY_DIALOG_SELECTION) {
-
-			// create a default image
-
-		} else if (typeId == TourDatabase.ENTITY_IS_NOT_SAVED) {
-
-			// make the image invisible
-			return;
-		}
-
-		final TourTypeLayout imageLayout = TourTypeManager.getCurrentImageLayout();
-		final TourTypeBorder borderLayout = TourTypeManager.getCurrentBorderLayout();
-		final int borderWidth = TourTypeManager.getCurrentBorderWidth();
-
-		final int imageSize = TourType.TOUR_TYPE_IMAGE_SIZE;
-		final Display display = Display.getCurrent();
-
-		final DrawingColors drawingColors = getTourTypeColors(display, typeId);
-		{
-			final Color colorBright = drawingColors.colorBright;
-			final Color colorDark = drawingColors.colorDark;
-			final Color colorLine = drawingColors.colorLine;
-
-			drawTourTypeImage_Background(gc, imageLayout, borderWidth, imageSize, colorBright, colorDark);
-
-			if (borderWidth > 0) {
-				drawTourTypeImage_Border(gc, borderLayout, borderWidth, imageSize, colorLine);
-			}
-		}
-		drawingColors.dispose();
-	}
-
-	private void drawTourTypeImage_Background(	final GC gc,
-												final TourTypeLayout imageLayout,
-												final int borderWidth,
-												final int imageSize,
-												final Color colorBright,
-												final Color colorDark) {
-
-		boolean isFillRectangle = false;
-		boolean isOval = false;
-		boolean isGradient = false;
-		boolean isVertical = false;
-
-		switch (imageLayout) {
-
-		case FILL_RECT_BRIGHT:
-			isFillRectangle = true;
-			gc.setBackground(colorBright);
-			break;
-		case FILL_RECT_DARK:
-			isFillRectangle = true;
-			gc.setBackground(colorDark);
-			break;
-
-		case FILL_CIRCLE_BRIGHT:
-			isOval = true;
-			gc.setBackground(colorBright);
-			break;
-		case FILL_CIRCLE_DARK:
-			isOval = true;
-			gc.setBackground(colorDark);
-			break;
-
-		case GRADIENT_LEFT_RIGHT:
-			isGradient = true;
-			gc.setBackground(colorBright);
-			gc.setForeground(colorDark);
-			break;
-		case GRADIENT_RIGHT_LEFT:
-			isGradient = true;
-			gc.setBackground(colorDark);
-			gc.setForeground(colorBright);
-			break;
-
-		case GRADIENT_TOP_BOTTOM:
-			isGradient = true;
-			isVertical = true;
-			gc.setBackground(colorBright);
-			gc.setForeground(colorDark);
-			break;
-		case GRADIENT_BOTTOM_TOP:
-			isGradient = true;
-			isVertical = true;
-			gc.setBackground(colorDark);
-			gc.setForeground(colorBright);
-			break;
-
-		case NOTHING:
-		default:
-			break;
-		}
-
-		if (isFillRectangle) {
-
-			gc.fillRectangle(0, 0, imageSize, imageSize);
-
-		} else if (isGradient) {
-
-			gc.fillGradientRectangle(0, 0, imageSize, imageSize, isVertical);
-
-		} else if (isOval) {
-
-			final int ovalSize = imageSize - 0;
-
-			gc.setAntialias(SWT.ON);
-			gc.fillOval(//
-					imageSize / 2 - ovalSize / 2,
-					imageSize / 2 - ovalSize / 2,
-					ovalSize,
-					ovalSize);
-		}
-	}
-
-	private void drawTourTypeImage_Border(	final GC gc,
-											final TourTypeBorder borderLayout,
-											final int borderSize,
-											final int imageSize,
-											final Color colorLine) {
-
-		boolean isLeft = false;
-		boolean isRight = false;
-		boolean isTop = false;
-		boolean isBottom = false;
-		boolean isCircle = false;
-
-		switch (borderLayout) {
-
-		case BORDER_RECTANGLE:
-			isLeft = true;
-			isRight = true;
-			isTop = true;
-			isBottom = true;
-			break;
-
-		case BORDER_LEFT:
-			isLeft = true;
-			break;
-		case BORDER_RIGHT:
-			isRight = true;
-			break;
-		case BORDER_LEFT_RIGHT:
-			isLeft = true;
-			isRight = true;
-			break;
-
-		case BORDER_BOTTOM:
-			isBottom = true;
-			break;
-		case BORDER_TOP:
-			isTop = true;
-			break;
-		case BORDER_TOP_BOTTOM:
-			isTop = true;
-			isBottom = true;
-			break;
-
-		case BORDER_CIRCLE:
-			isCircle = true;
-			break;
-
-		default:
-			break;
-		}
-
-		if (isLeft || isRight || isTop || isBottom) {
-
-			gc.setBackground(colorLine);
-
-			if (isLeft) {
-				gc.fillRectangle(0, 0, borderSize, imageSize);
-			}
-
-			if (isRight) {
-				gc.fillRectangle(imageSize - borderSize, 0, borderSize, imageSize);
-			}
-
-			if (isTop) {
-				gc.fillRectangle(0, 0, imageSize, borderSize);
-			}
-
-			if (isBottom) {
-				gc.fillRectangle(0, imageSize - borderSize, imageSize, borderSize);
-			}
-
-		} else if (isCircle) {
-
-			final int ovalSize = imageSize - 0;
-
-			gc.setForeground(colorLine);
-			gc.setAntialias(SWT.ON);
-
-			gc.drawOval(//
-					imageSize / 2 - ovalSize / 2 - 0,
-					imageSize / 2 - ovalSize / 2 - 0,
-					ovalSize - 1,
-					ovalSize - 1);
-
-		}
-	}
-
-	/**
-	 * @param display
-	 * @param graphColor
-	 * @return return the color for the graph
-	 */
-	private DrawingColors getTourTypeColors(final Display display, final long tourTypeId) {
-
-		final DrawingColors drawingColors = new DrawingColors();
-		final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
-
-		TourType colorTourType = null;
-
-		for (final TourType tourType : tourTypes) {
-			if (tourType.getTypeId() == tourTypeId) {
-				colorTourType = tourType;
-				break;
-			}
-		}
-
-		if (tourTypeId == TourType.IMAGE_KEY_DIALOG_SELECTION
-				|| colorTourType == null
-				|| colorTourType.getTypeId() == TourDatabase.ENTITY_IS_NOT_SAVED) {
-
-			// tour type was not found use default color
-
-			drawingColors.colorBright = display.getSystemColor(SWT.COLOR_YELLOW);
-			drawingColors.colorDark = display.getSystemColor(SWT.COLOR_DARK_YELLOW);
-			drawingColors.colorLine = display.getSystemColor(SWT.COLOR_BLACK);
-
-			// prevent disposing the colors
-			drawingColors.mustBeDisposed = false;
-
-		} else {
-
-			drawingColors.colorBright = new Color(display, colorTourType.getRGBBright());
-			drawingColors.colorDark = new Color(display, colorTourType.getRGBDark());
-			drawingColors.colorLine = new Color(display, colorTourType.getRGBLine());
-		}
-
-		return drawingColors;
-	}
-
-	/**
-	 * @param typeId
-	 * @return Returns an image which represents the tour type. This image must not be disposed,
-	 *         this is done when the app closes.
-	 */
-	public Image getTourTypeImage(final long typeId) {
-
-		final String keyColorId = TOUR_TYPE_PREFIX + typeId;
-		final Image existingImage = _imageCache.get(keyColorId);
-
-		// check if image is available
-		if (existingImage != null && existingImage.isDisposed() == false) {
-
-			// check if the image is dirty
-			if (_dirtyImages.size() == 0 || _dirtyImages.containsKey(keyColorId) == false) {
-
-				// image is available and not dirty
-				return existingImage;
-			}
-		}
-
-		// create image for the tour type
-
-		if (existingImage == null || existingImage.isDisposed()) {
-
-			return createTourTypeImage(typeId, keyColorId, null);
-
-		} else {
-
-			// old tour type image is available and not disposed but needs to be updated
-
-			return createTourTypeImage(typeId, keyColorId, existingImage);
-		}
-	}
-
-	/**
-	 * The image descriptor is cached because the creation takes system resources and it's called
-	 * very often
-	 * 
-	 * @param tourTypeId
-	 *            Tour type id
-	 * @return Returns image descriptor for the tour type id
-	 */
-	public ImageDescriptor getTourTypeImageDescriptor(final long tourTypeId) {
-
-		final String keyColorId = TOUR_TYPE_PREFIX + tourTypeId;
-		final ImageDescriptor existingDescriptor = _imageCacheDescriptor.get(keyColorId);
-
-		if (existingDescriptor != null) {
-			return existingDescriptor;
-		}
-
-		final Image tourTypeImage = getTourTypeImage(tourTypeId);
-		final ImageDescriptor newImageDesc = ImageDescriptor.createFromImage(tourTypeImage);
-
-		_imageCacheDescriptor.put(keyColorId, newImageDesc);
-
-		return newImageDesc;
-	}
-
-	/**
-	 * Set dirty state for all tour type images, images cannot be disposed because they are
-	 * displayed in the UI
-	 */
-	public void setTourTypeImagesDirty() {
-
-		for (final String imageId : _imageCache.keySet()) {
-
-			if (imageId.startsWith(TOUR_TYPE_PREFIX)) {
-				_dirtyImages.put(imageId, true);
-			}
-		}
-
-		_imageCacheDescriptor.clear();
-	}
 }

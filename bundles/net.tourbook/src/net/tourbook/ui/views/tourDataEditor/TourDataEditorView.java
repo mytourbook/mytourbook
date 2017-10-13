@@ -84,6 +84,7 @@ import net.tourbook.tour.SelectionTourMarker;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.ITourProvider2;
 import net.tourbook.ui.MessageManager;
 import net.tourbook.ui.TableColumnFactory;
@@ -6746,7 +6747,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 		if (tourType == null) {
 			_pageEditorForm.setImage(null);
 		} else {
-			_pageEditorForm.setImage(net.tourbook.ui.UI.getInstance().getTourTypeImage(tourType.getTypeId()));
+			_pageEditorForm.setImage(TourTypeImage.getTourTypeImage(tourType.getTypeId()));
 		}
 
 		updateUI_TitleAsynch(getTourTitle());

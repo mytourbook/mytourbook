@@ -43,7 +43,8 @@ import net.tourbook.tour.TourTypeFilterManager;
 import net.tourbook.tour.TourTypeMenuManager;
 import net.tourbook.tour.filter.TourFilterManager;
 import net.tourbook.tour.photo.TourPhotoManager;
-import net.tourbook.ui.TourTypeManager;
+import net.tourbook.tourType.TourTypeImage;
+import net.tourbook.tourType.TourTypeManager;
 //import net.tourbook.ui.UI;
 import net.tourbook.ui.views.rawData.RawDataView;
 import net.tourbook.web.WebContentServer;
@@ -199,7 +200,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 	@Override
 	public void dispose() {
-		net.tourbook.ui.UI.getInstance().dispose();
+
+		TourTypeImage.dispose();
 	}
 
 	private void firstApplicationStart() {

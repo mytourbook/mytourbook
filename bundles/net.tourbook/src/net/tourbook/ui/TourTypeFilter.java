@@ -20,6 +20,7 @@ import java.util.ArrayList;
 
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
+import net.tourbook.tourType.TourTypeImage;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
@@ -104,7 +105,7 @@ public class TourTypeFilter {
 		switch (filterType) {
 		case TourTypeFilter.FILTER_TYPE_DB:
 			final TourType tourType = filter.getTourType();
-			filterImage = UI.getInstance().getTourTypeImage(tourType.getTypeId());
+			filterImage = TourTypeImage.getTourTypeImage(tourType.getTypeId());
 			break;
 
 		case TourTypeFilter.FILTER_TYPE_SYSTEM:
@@ -132,7 +133,7 @@ public class TourTypeFilter {
 		switch (filterType) {
 		case TourTypeFilter.FILTER_TYPE_DB:
 			final TourType tourType = filter.getTourType();
-			filterImageDescriptor = UI.getInstance().getTourTypeImageDescriptor(tourType.getTypeId());
+			filterImageDescriptor = TourTypeImage.getTourTypeImageDescriptor(tourType.getTypeId());
 			break;
 
 		case TourTypeFilter.FILTER_TYPE_SYSTEM:

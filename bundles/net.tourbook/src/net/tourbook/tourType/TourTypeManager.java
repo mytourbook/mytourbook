@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui;
+package net.tourbook.tourType;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -24,6 +24,7 @@ import java.io.Writer;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
+import net.tourbook.ui.Messages;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.ui.WorkbenchException;
@@ -31,7 +32,7 @@ import org.eclipse.ui.XMLMemento;
 
 public class TourTypeManager {
 
-	private static final IDialogSettings _state = TourbookPlugin.getState("net.tourbook.ui.TourTypeManager");//$NON-NLS-1$
+	private static final IDialogSettings _state = TourbookPlugin.getState("net.tourbook.tourType.TourTypeManager");//$NON-NLS-1$
 
 	static {}
 

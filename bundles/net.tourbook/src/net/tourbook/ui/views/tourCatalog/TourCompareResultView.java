@@ -44,6 +44,7 @@ import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourTypeMenuManager;
+import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.TreeColumnFactory;
 import net.tourbook.ui.action.ActionCollapseAll;
@@ -892,7 +893,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 					final TourData comparedTourData = ((TVICompareResultComparedTour) element).comparedTourData;
 					final TourType tourType = comparedTourData.getTourType();
 					if (tourType != null) {
-						cell.setImage(net.tourbook.ui.UI.getInstance().getTourTypeImage(tourType.getTypeId()));
+						cell.setImage(TourTypeImage.getTourTypeImage(tourType.getTypeId()));
 					}
 				}
 			}

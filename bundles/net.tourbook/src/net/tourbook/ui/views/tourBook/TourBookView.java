@@ -65,6 +65,7 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourTypeMenuManager;
 import net.tourbook.tour.printing.ActionPrint;
+import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.ITourProvider2;
 import net.tourbook.ui.ITourProviderByID;
 import net.tourbook.ui.TreeColumnFactory;
@@ -2142,7 +2143,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 				if (element instanceof TVITourBookTour) {
 
 					final long tourTypeId = ((TVITourBookTour) element).getTourTypeId();
-					final Image tourTypeImage = net.tourbook.ui.UI.getInstance().getTourTypeImage(tourTypeId);
+					final Image tourTypeImage = TourTypeImage.getTourTypeImage(tourTypeId);
 
 					/*
 					 * when a tour type image is modified, it will keep the same image resource only

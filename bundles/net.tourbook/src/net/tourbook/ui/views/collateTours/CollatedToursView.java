@@ -53,6 +53,7 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourTypeMenuManager;
 import net.tourbook.tour.printing.ActionPrint;
+import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourProviderByID;
 import net.tourbook.ui.TourTypeFilter;
@@ -1553,7 +1554,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
 				if (element instanceof TVICollatedTour_Tour) {
 
 					final long tourTypeId = ((TVICollatedTour_Tour) element).getTourTypeId();
-					final Image tourTypeImage = net.tourbook.ui.UI.getInstance().getTourTypeImage(tourTypeId);
+					final Image tourTypeImage = TourTypeImage.getTourTypeImage(tourTypeId);
 
 					/*
 					 * when a tour type image is modified, it will keep the same image resource only

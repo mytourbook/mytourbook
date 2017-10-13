@@ -44,6 +44,7 @@ import net.tourbook.photo.PicDirView;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.action.ActionModifyColumns;
@@ -120,6 +121,8 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 	public static final String					IMAGE_PIC_DIR_VIEW					= "IMAGE_PIC_DIR_VIEW";						//$NON-NLS-1$
 	public static final String					IMAGE_PHOTO_PHOTO					= "IMAGE_PHOTO_PHOTO";							//$NON-NLS-1$
 
+	private static final TourPhotoManager		_photoMgr							= TourPhotoManager.getInstance();
+
 	private final IPreferenceStore				_prefStore							= TourbookPlugin
 																							.getDefault()
 																							.getPreferenceStore();
@@ -128,8 +131,6 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 																							.getDefault()
 																							.getDialogSettingsSection(
 																									ID);
-
-	private static final TourPhotoManager		_photoMgr							= TourPhotoManager.getInstance();
 
 	private ArrayList<TourPhotoLink>			_visibleTourPhotoLinks				= new ArrayList<TourPhotoLink>();
 
@@ -1162,7 +1163,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
 						} else {
 
-							final Image tourTypeImage = net.tourbook.ui.UI.getInstance().getTourTypeImage(tourTypeId);
+							final Image tourTypeImage = TourTypeImage.getTourTypeImage(tourTypeId);
 
 							/*
 							 * when a tour type image is modified, it will keep the same image

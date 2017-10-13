@@ -23,6 +23,7 @@ import net.tourbook.common.util.TableLayoutComposite;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourTypeFilterManager;
+import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.TourTypeFilterSet;
 import net.tourbook.ui.UI;
@@ -215,7 +216,7 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 				case TourTypeFilter.FILTER_TYPE_DB:
 					final TourType tourType = filter.getTourType();
 					filterName = tourType.getName();
-					filterImage = UI.getInstance().getTourTypeImage(tourType.getTypeId());
+					filterImage = TourTypeImage.getTourTypeImage(tourType.getTypeId());
 					break;
 
 				case TourTypeFilter.FILTER_TYPE_SYSTEM:
@@ -428,7 +429,7 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
 			public void update(final ViewerCell cell) {
 				final TourType tourType = ((TourType) cell.getElement());
 				cell.setText(tourType.getName());
-				cell.setImage(UI.getInstance().getTourTypeImage(tourType.getTypeId()));
+				cell.setImage(TourTypeImage.getTourTypeImage(tourType.getTypeId()));
 			}
 		});
 		layouter.addColumnData(new ColumnWeightData(1));

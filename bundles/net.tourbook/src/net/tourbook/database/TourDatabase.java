@@ -72,6 +72,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.TagCollection;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 
@@ -782,7 +783,7 @@ public class TourDatabase {
 			_dbTourTypes = null;
 		}
 
-		UI.getInstance().setTourTypeImagesDirty();
+		TourTypeImage.setTourTypeImagesDirty();
 	}
 
 	public static void closeConnection(final Connection conn) {

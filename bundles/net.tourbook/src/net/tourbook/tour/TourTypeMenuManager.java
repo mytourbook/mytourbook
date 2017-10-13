@@ -23,6 +23,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourProvider2;
 import net.tourbook.ui.UI;
@@ -92,6 +93,7 @@ public class TourTypeMenuManager {
 	private static void addPrefChangeListener() {
 		// create pref listener
 		_prefChangeListener = new IPropertyChangeListener() {
+			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
 				final String property = event.getProperty();
 
@@ -169,7 +171,7 @@ public class TourTypeMenuManager {
 //					final Image tourTypeImage = UI.getInstance().getTourTypeImage(tourTypeId);
 //					actionRecentTourType.setImageDescriptor(ImageDescriptor.createFromImage(tourTypeImage));
 
-					actionRecentTourType.setImageDescriptor(UI.getInstance().getTourTypeImageDescriptor(tourTypeId));
+					actionRecentTourType.setImageDescriptor(TourTypeImage.getTourTypeImageDescriptor(tourTypeId));
 				}
 
 			} else {
@@ -312,6 +314,7 @@ public class TourTypeMenuManager {
 											final boolean isSaveTour) {
 
 		final Runnable runnable = new Runnable() {
+			@Override
 			public void run() {
 
 				final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
