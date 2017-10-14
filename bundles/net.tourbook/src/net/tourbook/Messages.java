@@ -437,6 +437,7 @@ public class Messages extends NLS {
 	public static String		App_Action_Rename;
 	public static String		App_Action_Reset;
 	public static String		App_Action_ResetConfig_Tooltip;
+	public static String		App_Action_RestartApp;
 	public static String		App_Action_RestoreDefault_Tooltip;
 	public static String		App_Action_set_tour_type;
 	public static String		App_Action_Save;
@@ -1548,6 +1549,8 @@ public class Messages extends NLS {
 	public static String		Pref_TourTypes_Button_add;
 	public static String		Pref_TourTypes_Button_delete;
 	public static String		Pref_TourTypes_Button_rename;
+	public static String		Pref_TourTypes_Dialog_Restart_Message;
+	public static String		Pref_TourTypes_Dialog_Restart_Title;
 	public static String		Pref_TourTypes_Dlg_delete_tour_type_msg;
 	public static String		Pref_TourTypes_Dlg_delete_tour_type_title;
 	public static String		Pref_TourTypes_Dlg_new_tour_type_msg;
@@ -1558,7 +1561,7 @@ public class Messages extends NLS {
 	public static String		Pref_TourTypes_Label_BorderLayout;
 	public static String		Pref_TourTypes_Label_BorderWidth;
 	public static String		Pref_TourTypes_Label_ImageLayout;
-
+	public static String		Pref_TourTypes_Label_TourIsDirty;
 	public static String		Pref_TourTypes_root_title;
 	public static String		Pref_TourTypes_Title;
 

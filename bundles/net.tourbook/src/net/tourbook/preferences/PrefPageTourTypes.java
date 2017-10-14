@@ -92,6 +92,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.eclipse.ui.PlatformUI;
 
 public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPreferencePage, IColorTreeViewer {
 
@@ -117,6 +118,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 	private boolean								_isModified				= false;
 	private boolean								_isRecreateTourTypeImages;
 
+	private boolean								_isUIEmpty;
 
 	/*
 	 * UI controls
@@ -218,6 +220,18 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 	@Override
 	protected Control createContents(final Composite parent) {
 
+		/*
+		 * Ensure that a tour is NOT modified because changing the tour type needs an app restart
+		 * because the tour type images are DISPOSED
+		 */
+		if (_isUIEmpty) {
+
+			final Label label = new Label(parent, SWT.WRAP);
+			label.setText(Messages.Pref_TourTypes_Label_TourIsDirty);
+			GridDataFactory.fillDefaults().applyTo(label);
+
+			return label;
+		}
 
 		final Composite ui = createUI(parent);
 
@@ -625,7 +639,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 						cell.setText(((TourTypeColorDefinition) (element)).getVisibleName());
 
 						final TourType tourType = ((TourTypeColorDefinition) element).getTourType();
-						final Image tourTypeImage = TourTypeImage.getTourTypeImage(tourType.getTypeId());
+						final Image tourTypeImage = TourTypeImage.getTourTypeImage(tourType.getTypeId(), true);
 
 						cell.setImage(tourTypeImage);
 
@@ -786,7 +800,9 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 	@Override
 	public void dispose() {
 
-		_graphColorPainter.disposeAllResources();
+		if (_graphColorPainter != null) {
+			_graphColorPainter.disposeAllResources();
+		}
 
 		super.dispose();
 	}
@@ -833,11 +849,30 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		if (_isModified) {
 
 			_isModified = false;
+//
+//			TourManager.getInstance().clearTourDataCache();
+//
+//			// fire modify event
+//			_prefStore.setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED, Math.random());
 
-			TourManager.getInstance().clearTourDataCache();
+			TourTypeManager.saveState();
 
-			// fire modify event
-			_prefStore.setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED, Math.random());
+			// show restart info
+			new MessageDialog(
+					this.getShell(),
+					Messages.Pref_TourTypes_Dialog_Restart_Title,
+					null,
+					Messages.Pref_TourTypes_Dialog_Restart_Message,
+					MessageDialog.INFORMATION,
+					new String[] { Messages.App_Action_RestartApp },
+					1).open();
+
+			Display.getCurrent().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					PlatformUI.getWorkbench().restart();
+				}
+			});
 		}
 	}
 
@@ -898,15 +933,29 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 	@Override
 	public void init(final IWorkbench workbench) {
-		setPreferenceStore(_prefStore);
-//		noDefaultAndApplyButton();
-	}
 
+		setPreferenceStore(_prefStore);
+
+		/*
+		 * Ensure that a tour is NOT modified because changing the tour type needs an app restart
+		 * because the tour type images are DISPOSED
+		 */
+		if (TourManager.isTourEditorModified(false)) {
+
+			_isUIEmpty = true;
+
+			noDefaultAndApplyButton();
+		}
+
+	}
 
 	@Override
 	public boolean okToLeave() {
 
-		fireModifyEvent();
+		if (!_isUIEmpty) {
+
+			fireModifyEvent();
+		}
 
 		return super.okToLeave();
 	}
@@ -1058,15 +1107,13 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		final TourType selectedTourType = selectedColorDefinition.getTourType();
 
 		// confirm deletion
-		final String[] buttons = new String[] { IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL };
-
 		final MessageDialog dialog = new MessageDialog(
 				this.getShell(),
 				Messages.Pref_TourTypes_Dlg_delete_tour_type_title,
 				null,
 				NLS.bind(Messages.Pref_TourTypes_Dlg_delete_tour_type_msg, selectedTourType.getName()),
 				MessageDialog.QUESTION,
-				buttons,
+				new String[] { IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL },
 				1);
 
 		if (dialog.open() != Window.OK) {
@@ -1191,15 +1238,37 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 	@Override
 	public boolean performCancel() {
 
-		fireModifyEvent();
+		if (!_isUIEmpty) {
+
+			fireModifyEvent();
+		}
 
 		return super.performCancel();
 	}
 
 	@Override
+	protected void performDefaults() {
+
+		if (!_isUIEmpty) {
+
+			_comboBorderLayout.select(TourTypeManager.getTourTypeBorderIndex(TourTypeManager.DEFAULT_BORDER_LAYOUT));
+			_comboFillLayout.select(TourTypeManager.getTourTypeLayoutIndex(TourTypeManager.DEFAULT_IMAGE_LAYOUT));
+
+			_spinnerBorder.setSelection(TourTypeManager.DEFAULT_BORDER_WIDTH);
+
+			onSelectImageLayout();
+		}
+
+		super.performDefaults();
+	}
+
+	@Override
 	public boolean performOk() {
 
-		fireModifyEvent();
+		if (!_isUIEmpty) {
+
+			fireModifyEvent();
+		}
 
 		return super.performOk();
 	}

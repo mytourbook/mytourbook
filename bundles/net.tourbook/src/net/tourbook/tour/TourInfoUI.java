@@ -1091,7 +1091,12 @@ public class TourInfoUI {
 
 		String tourTitle = _tourData.getTourTitle();
 		if (tourTitle == null || tourTitle.trim().length() == 0) {
-			tourTitle = Messages.Tour_Tooltip_Label_DefaultTitle;
+
+			if (_uiTourTypeName == null) {
+				tourTitle = Messages.Tour_Tooltip_Label_DefaultTitle;
+			} else {
+				tourTitle = _uiTourTypeName;
+			}
 		}
 		_lblTitle.setText(tourTitle);
 

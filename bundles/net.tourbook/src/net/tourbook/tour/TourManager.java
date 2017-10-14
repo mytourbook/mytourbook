@@ -1343,6 +1343,15 @@ public class TourManager {
 		return isTourEditorModified(true);
 	}
 
+	/**
+	 * Checks if a tour in the {@link TourDataEditorView} is modified and shows the editor when it's
+	 * modified. A message dialog informs the user about the modified tour and that the requested
+	 * actions cannot be done.
+	 * 
+	 * @param isOpenEditor
+	 *            When <code>true</code> then the tour editor is displayed.
+	 * @return Returns <code>true</code> when the tour is modified in the {@link TourDataEditorView}
+	 */
 	public static boolean isTourEditorModified(final boolean isOpenEditor) {
 
 		final TourDataEditorView tourDataEditor = getTourDataEditor();
@@ -1447,6 +1456,10 @@ public class TourManager {
 		return newOverlayKey[0];
 	}
 
+	/**
+	 * @param isActive
+	 * @return
+	 */
 	public static TourDataEditorView openTourEditor(final boolean isActive) {
 
 		final TourDataEditorView tourDataEditorView[] = { null };

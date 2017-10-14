@@ -53,20 +53,24 @@ public class TourTypeManager {
 	private static final TourTypeLayoutData[]	_allTourTypeLayoutData			= new TourTypeLayoutData[] {
 
 			new TourTypeLayoutData(
-					TourTypeLayout.FILL_RECT_DARK,
-					Messages.TourType_Config_Layout_Fill_Rect_Dark),
-
-			new TourTypeLayoutData(
 					TourTypeLayout.FILL_RECT_BRIGHT,
 					Messages.TourType_Config_Layout_Fill_Rect_Bright),
-
 			new TourTypeLayoutData(
-					TourTypeLayout.FILL_CIRCLE_DARK,
-					Messages.TourType_Config_Layout_Fill_Circle_Dark),
+					TourTypeLayout.FILL_RECT_DARK,
+					Messages.TourType_Config_Layout_Fill_Rect_Dark),
+			new TourTypeLayoutData(
+					TourTypeLayout.FILL_RECT_BORDER,
+					Messages.TourType_Config_Layout_Fill_Rect_Border),
 
 			new TourTypeLayoutData(
 					TourTypeLayout.FILL_CIRCLE_BRIGHT,
 					Messages.TourType_Config_Layout_Fill_Circle_Bright),
+			new TourTypeLayoutData(
+					TourTypeLayout.FILL_CIRCLE_DARK,
+					Messages.TourType_Config_Layout_Fill_Circle_Dark),
+			new TourTypeLayoutData(
+					TourTypeLayout.FILL_CIRCLE_BORDER,
+					Messages.TourType_Config_Layout_Fill_Circle_Border),
 
 			new TourTypeLayoutData(
 					TourTypeLayout.GRADIENT_LEFT_RIGHT,

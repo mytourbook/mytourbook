@@ -87,15 +87,15 @@ public class ImageConverter {
 	 * an <code>Image</code> that has 24 bit depth regardless of the type of AWT buffered image that
 	 * is passed into the method.
 	 * 
-	 * @param srcImage
+	 * @param awtImage
 	 *            the {@link java.awt.image.BufferedImage} to be converted to an <code>Image</code>
 	 * @return an <code>Image</code> that represents the same image data as the AWT
 	 *         <code>BufferedImage</code> type.
 	 */
-	public static Image convertIntoSWT(final BufferedImage srcImage) {
+	public static Image convertIntoSWT(final BufferedImage awtImage) {
 
-		final int imageWidth = srcImage.getWidth();
-		final int imageHeight = srcImage.getHeight();
+		final int imageWidth = awtImage.getWidth();
+		final int imageHeight = awtImage.getHeight();
 
 		// We can force bitdepth to be 24 bit because BufferedImage getRGB allows us to always
 		// retrieve 24 bit data regardless of source color depth.
@@ -104,12 +104,12 @@ public class ImageConverter {
 		// ensure scansize is aligned on 32 bit.
 		final int scansize = (((imageWidth * 3) + 3) * 4) / 4;
 
-		final WritableRaster alphaRaster = srcImage.getAlphaRaster();
+		final WritableRaster alphaRaster = awtImage.getAlphaRaster();
 		final byte[] alphaBytes = new byte[imageWidth];
 
 		for (int y = 0; y < imageHeight; y++) {
 
-			final int[] buff = srcImage.getRGB(0, y, imageWidth, 1, null, 0, scansize);
+			final int[] buff = awtImage.getRGB(0, y, imageWidth, 1, null, 0, scansize);
 
 			swtImageData.setPixels(0, y, imageWidth, buff, 0);
 
