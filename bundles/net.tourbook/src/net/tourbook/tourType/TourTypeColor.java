@@ -16,15 +16,11 @@
 package net.tourbook.tourType;
 
 /**
- * Tour type image background layouts
+ * Tour type colors
  */
-public enum TourTypeLayout {
+public enum TourTypeColor {
 
-	RECTANGLE, //
-	CIRCLE, //
-
-	GRADIENT_HORIZONTAL, //
-	GRADIENT_VERTICAL, //
-
-	NOTHING, //
+	COLOR_BRIGHT, //
+	COLOR_DARK, //
+	COLOR_LINE, //
 }

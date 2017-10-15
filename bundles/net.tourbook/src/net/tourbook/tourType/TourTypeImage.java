@@ -16,6 +16,7 @@
 package net.tourbook.tourType;
 
 import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.GradientPaint;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -129,100 +130,78 @@ public class TourTypeImage {
 			return;
 		}
 
-		final TourTypeLayout imageLayout = TourTypeManager.getCurrentImageLayout();
-		final TourTypeBorder borderLayout = TourTypeManager.getCurrentBorderLayout();
-		final int borderWidth = TourTypeManager.getCurrentBorderWidth();
-
 		final int imageSize = TourType.TOUR_TYPE_IMAGE_SIZE;
 		final DrawingColorsAWT drawingColors = getTourTypeColors(typeId);
 
-		drawTourTypeImage_Background(g2d, imageLayout, borderWidth, imageSize, drawingColors);
-
-		if (borderWidth > 0) {
-			drawTourTypeImage_Border(g2d, borderLayout, borderWidth, imageSize, drawingColors);
-		}
+		drawTourTypeImage_Background(g2d, imageSize, drawingColors);
+		drawTourTypeImage_Border(g2d, imageSize, drawingColors);
 	}
 
 	private static void drawTourTypeImage_Background(	final Graphics2D g2d,
-														final TourTypeLayout imageLayout,
-														final int borderWidth,
 														final int imageSize,
 														final DrawingColorsAWT drawingColors) {
 
-		final java.awt.Color colorBright = drawingColors.colorBright;
-		final java.awt.Color colorDark = drawingColors.colorDark;
-		final java.awt.Color colorLine = drawingColors.colorLine;
+		final TourTypeImageConfig imageConfig = TourTypeManager.getImageConfig();
+
+		if (imageConfig.imageLayout == TourTypeLayout.NOTHING) {
+			// nothing to do
+			return;
+		}
 
 		final int imageSize2 = imageSize / 2;
 
 		boolean isRectangle = false;
 		boolean isOval = false;
+		boolean isGradient = false;
+		boolean isHorizontal = false;
+		boolean isVertical = false;
 
-		boolean isBrightColor = false;
-		boolean isDarkColor = false;
-		boolean isLineColor = false;
+		switch (imageConfig.imageLayout) {
 
-		switch (imageLayout) {
-
-		case FILL_RECT_BRIGHT:
+		case RECTANGLE:
 			isRectangle = true;
-			isBrightColor = true;
-			break;
-		case FILL_RECT_DARK:
-			isRectangle = true;
-			isDarkColor = true;
-			break;
-		case FILL_RECT_BORDER:
-			isRectangle = true;
-			isLineColor = true;
 			break;
 
-		case FILL_CIRCLE_BRIGHT:
+		case CIRCLE:
 			isOval = true;
-			isBrightColor = true;
-			break;
-		case FILL_CIRCLE_DARK:
-			isOval = true;
-			isDarkColor = true;
-			break;
-		case FILL_CIRCLE_BORDER:
-			isOval = true;
-			isLineColor = true;
 			break;
 
-		case GRADIENT_LEFT_RIGHT:
+		case GRADIENT_HORIZONTAL:
 			isRectangle = true;
-			g2d.setPaint(new GradientPaint(0, imageSize2, colorBright, imageSize, imageSize2, colorDark));
+			isGradient = true;
+			isHorizontal = true;
 			break;
-		case GRADIENT_RIGHT_LEFT:
+
+		case GRADIENT_VERTICAL:
 			isRectangle = true;
-			g2d.setPaint(new GradientPaint(0, imageSize2, colorDark, imageSize, imageSize2, colorBright));
-			break;
-		case GRADIENT_TOP_BOTTOM:
-			isRectangle = true;
-			g2d.setPaint(new GradientPaint(imageSize2, 0, colorBright, imageSize2, imageSize, colorDark));
-			break;
-		case GRADIENT_BOTTOM_TOP:
-			isRectangle = true;
-			g2d.setPaint(new GradientPaint(imageSize2, 0, colorDark, imageSize2, imageSize, colorBright));
+			isGradient = true;
+			isVertical = true;
 			break;
 
 		case NOTHING:
-		default:
 			break;
 		}
 
-		if (isBrightColor) {
+		if (isGradient) {
 
-			g2d.setColor(colorBright);
+			final Color color1 = getColor(imageConfig.imageColor1, drawingColors);
+			final Color color2 = getColor(imageConfig.imageColor2, drawingColors);
 
-		} else if (isDarkColor) {
+			if (isHorizontal) {
 
-			g2d.setColor(colorDark);
+				g2d.setPaint(new GradientPaint(0, imageSize2, color1, imageSize, imageSize2, color2));
 
-		} else if (isLineColor) {
+			} else if (isVertical) {
 
-			g2d.setColor(colorLine);
+				g2d.setPaint(new GradientPaint(imageSize2, 0, color1, imageSize2, imageSize, color2));
+			}
+
+		} else {
+
+			// no gradient
+
+			final Color color = getColor(imageConfig.imageColor1, drawingColors);
+			g2d.setColor(color);
 		}
 
 		if (isRectangle) {
@@ -236,12 +215,17 @@ public class TourTypeImage {
 	}
 
 	private static void drawTourTypeImage_Border(	final Graphics2D g2d,
-													final TourTypeBorder borderLayout,
-													final int borderWidth,
 													final int imageSize,
 													final DrawingColorsAWT drawingColors) {
 
-		final java.awt.Color colorLine = drawingColors.colorLine;
+		final TourTypeImageConfig imageConfig = TourTypeManager.getImageConfig();
+		final int borderWidth = imageConfig.borderWidth;
+
+		if (borderWidth == 0) {
+			// nothing to do
+			return;
+		}
+
 
 		boolean isCircle = false;
 
@@ -250,7 +234,7 @@ public class TourTypeImage {
 		boolean isTop = false;
 		boolean isBottom = false;
 
-		switch (borderLayout) {
+		switch (imageConfig.borderLayout) {
 
 		case BORDER_RECTANGLE:
 			isLeft = true;
@@ -289,10 +273,12 @@ public class TourTypeImage {
 			break;
 		}
 
+		final Color color1 = getColor(imageConfig.borderColor, drawingColors);
+
 		if (isCircle) {
 
 			g2d.setStroke(new BasicStroke(borderWidth));
-			g2d.setColor(colorLine);
+			g2d.setColor(color1);
 
 			/*
 			 * Highly complicated formula that the oval outline has the correct size, needed some
@@ -311,7 +297,7 @@ public class TourTypeImage {
 
 		} else if (isLeft || isRight || isTop || isBottom) {
 
-			g2d.setColor(colorLine);
+			g2d.setColor(color1);
 
 			if (isLeft) {
 
@@ -334,6 +320,21 @@ public class TourTypeImage {
 			}
 		}
 
+	}
+
+	private static Color getColor(final TourTypeColor imageColor, final DrawingColorsAWT drawingColors) {
+
+		switch (imageColor) {
+		case COLOR_BRIGHT:
+			return drawingColors.colorBright;
+
+		case COLOR_LINE:
+			return drawingColors.colorLine;
+
+		case COLOR_DARK:
+		default:
+			return drawingColors.colorDark;
+		}
 	}
 
 	/**

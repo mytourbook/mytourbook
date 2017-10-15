@@ -36,10 +36,13 @@ import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tourType.TourTypeBorder;
+import net.tourbook.tourType.TourTypeColor;
 import net.tourbook.tourType.TourTypeImage;
+import net.tourbook.tourType.TourTypeImageConfig;
 import net.tourbook.tourType.TourTypeLayout;
 import net.tourbook.tourType.TourTypeManager;
 import net.tourbook.tourType.TourTypeManager.TourTypeBorderData;
+import net.tourbook.tourType.TourTypeManager.TourTypeColorData;
 import net.tourbook.tourType.TourTypeManager.TourTypeLayoutData;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -131,7 +134,10 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 	private ColorSelector						_colorSelector;
 
+	private Combo								_comboFillColor1;
+	private Combo								_comboFillColor2;
 	private Combo								_comboFillLayout;
+	private Combo								_comboBorderColor;
 	private Combo								_comboBorderLayout;
 
 	private Spinner								_spinnerBorder;
@@ -556,11 +562,25 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 						.align(SWT.FILL, SWT.CENTER)
 						.applyTo(label);
 
-				// combo
-				_comboFillLayout = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-				_comboFillLayout.setVisibleItemCount(20);
-				_comboFillLayout.addSelectionListener(selectionListener);
-//				GridDataFactory.fillDefaults().span(2, 1).applyTo(_comboFillLayout);
+				final Composite containerImage = new Composite(container, SWT.NONE);
+				GridDataFactory.fillDefaults().grab(true, false).applyTo(containerImage);
+				GridLayoutFactory.fillDefaults().numColumns(3).applyTo(containerImage);
+				{
+					// combo fill layout
+					_comboFillLayout = new Combo(containerImage, SWT.DROP_DOWN | SWT.READ_ONLY);
+					_comboFillLayout.setVisibleItemCount(20);
+					_comboFillLayout.addSelectionListener(selectionListener);
+
+					// combo color
+					_comboFillColor1 = new Combo(containerImage, SWT.DROP_DOWN | SWT.READ_ONLY);
+					_comboFillColor1.setVisibleItemCount(20);
+					_comboFillColor1.addSelectionListener(selectionListener);
+
+					// combo color
+					_comboFillColor2 = new Combo(containerImage, SWT.DROP_DOWN | SWT.READ_ONLY);
+					_comboFillColor2.setVisibleItemCount(20);
+					_comboFillColor2.addSelectionListener(selectionListener);
+				}
 			}
 			{
 				/*
@@ -575,11 +595,20 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 						.align(SWT.FILL, SWT.CENTER)
 						.applyTo(label);
 
-				// combo
-				_comboBorderLayout = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-				_comboBorderLayout.setVisibleItemCount(20);
-				_comboBorderLayout.addSelectionListener(selectionListener);
-//				GridDataFactory.fillDefaults().span(2, 1).applyTo(_comboBorderLayout);
+				final Composite containerBorder = new Composite(container, SWT.NONE);
+				GridDataFactory.fillDefaults().grab(true, false).applyTo(containerBorder);
+				GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerBorder);
+				{
+					// combo
+					_comboBorderLayout = new Combo(containerBorder, SWT.DROP_DOWN | SWT.READ_ONLY);
+					_comboBorderLayout.setVisibleItemCount(20);
+					_comboBorderLayout.addSelectionListener(selectionListener);
+
+					// combo color
+					_comboBorderColor = new Combo(containerBorder, SWT.DROP_DOWN | SWT.READ_ONLY);
+					_comboBorderColor.setVisibleItemCount(20);
+					_comboBorderColor.addSelectionListener(selectionListener);
+				}
 			}
 			{
 				/*
@@ -831,16 +860,37 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		_colorSelector.setEnabled(isGraphSelected);
 	}
 
+	private void enableLayoutControls() {
+
+		final TourTypeLayoutData layoutData = getSelectedTourTypeLayoutData();
+
+		_comboFillColor1.setEnabled(layoutData.isColor1);
+		_comboFillColor2.setEnabled(layoutData.isColor2);
+	}
+
 	private void fillUI() {
 
-		// image layout
+		/*
+		 * Image layout
+		 */
 		for (final TourTypeLayoutData data : TourTypeManager.getAllTourTypeLayoutData()) {
 			_comboFillLayout.add(data.label);
 		}
+		for (final TourTypeColorData data : TourTypeManager.getAllTourTypeColorData()) {
+			_comboFillColor1.add(data.label);
+		}
+		for (final TourTypeColorData data : TourTypeManager.getAllTourTypeColorData()) {
+			_comboFillColor2.add(data.label);
+		}
 
-		// border layout
+		/*
+		 * Border layout
+		 */
 		for (final TourTypeBorderData data : TourTypeManager.getAllTourTypeBorderData()) {
 			_comboBorderLayout.add(data.label);
+		}
+		for (final TourTypeColorData data : TourTypeManager.getAllTourTypeColorData()) {
+			_comboBorderColor.add(data.label);
 		}
 	}
 
@@ -915,6 +965,17 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		return TourTypeManager.getAllTourTypeBorderData()[selectedIndex].tourTypeBorder;
 	}
 
+	private TourTypeColor getSelectedTourTypeColor(final Combo comboColor) {
+
+		final int selectedIndex = comboColor.getSelectionIndex();
+
+		if (selectedIndex < 0) {
+			return TourTypeManager.DEFAULT_BORDER_COLOR;
+		}
+
+		return TourTypeManager.getAllTourTypeColorData()[selectedIndex].tourTypeColor;
+	}
+
 	private TourTypeLayout getSelectedTourTypeLayout() {
 
 		final int selectedIndex = _comboFillLayout.getSelectionIndex();
@@ -924,6 +985,19 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 		}
 
 		return TourTypeManager.getAllTourTypeLayoutData()[selectedIndex].tourTypeLayout;
+	}
+
+	private TourTypeLayoutData getSelectedTourTypeLayoutData() {
+
+		final TourTypeLayoutData[] allTourTypeLayoutData = TourTypeManager.getAllTourTypeLayoutData();
+
+		final int selectedIndex = _comboFillLayout.getSelectionIndex();
+
+		if (selectedIndex < 0) {
+			return allTourTypeLayoutData[0];
+		}
+
+		return allTourTypeLayoutData[selectedIndex];
 	}
 
 	@Override
@@ -1213,10 +1287,15 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 	private void onSelectImageLayout() {
 
-		TourTypeManager.setTourTypeLayout(
-				getSelectedTourTypeLayout(),
-				getSelectedTourTypeBorderLayout(),
-				_spinnerBorder.getSelection());
+		final TourTypeImageConfig imageConfig = TourTypeManager.getImageConfig();
+
+		imageConfig.imageColor1 = getSelectedTourTypeColor(_comboFillColor1);
+		imageConfig.imageColor2 = getSelectedTourTypeColor(_comboFillColor2);
+		imageConfig.imageLayout = getSelectedTourTypeLayout();
+
+		imageConfig.borderColor = getSelectedTourTypeColor(_comboBorderColor);
+		imageConfig.borderLayout = getSelectedTourTypeBorderLayout();
+		imageConfig.borderWidth = _spinnerBorder.getSelection();
 
 		// set tour type images dirty
 		TourTypeImage.setTourTypeImagesDirty();
@@ -1232,7 +1311,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 		_isModified = true;
 
-//		fireModifyEvent();
+		enableLayoutControls();
 	}
 
 	@Override
@@ -1251,10 +1330,13 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 		if (!_isUIEmpty) {
 
+			_comboBorderColor.select(TourTypeManager.getTourTypeColorIndex(TourTypeManager.DEFAULT_BORDER_COLOR));
 			_comboBorderLayout.select(TourTypeManager.getTourTypeBorderIndex(TourTypeManager.DEFAULT_BORDER_LAYOUT));
-			_comboFillLayout.select(TourTypeManager.getTourTypeLayoutIndex(TourTypeManager.DEFAULT_IMAGE_LAYOUT));
-
 			_spinnerBorder.setSelection(TourTypeManager.DEFAULT_BORDER_WIDTH);
+
+			_comboFillColor1.select(TourTypeManager.getTourTypeColorIndex(TourTypeManager.DEFAULT_IMAGE_COLOR1));
+			_comboFillColor2.select(TourTypeManager.getTourTypeColorIndex(TourTypeManager.DEFAULT_IMAGE_COLOR2));
+			_comboFillLayout.select(TourTypeManager.getTourTypeLayoutIndex(TourTypeManager.DEFAULT_IMAGE_LAYOUT));
 
 			onSelectImageLayout();
 		}
@@ -1275,10 +1357,17 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 
 	private void restoreState() {
 
-		_comboBorderLayout.select(TourTypeManager.getTourTypeBorderIndex());
-		_comboFillLayout.select(TourTypeManager.getTourTypeLayoutIndex());
+		final TourTypeImageConfig imageConfig = TourTypeManager.getImageConfig();
 
-		_spinnerBorder.setSelection(TourTypeManager.getCurrentBorderWidth());
+		_comboBorderColor.select(TourTypeManager.getTourTypeColorIndex(imageConfig.borderColor));
+		_comboBorderLayout.select(TourTypeManager.getTourTypeBorderIndex(imageConfig.borderLayout));
+		_spinnerBorder.setSelection(imageConfig.borderWidth);
+
+		_comboFillColor1.select(TourTypeManager.getTourTypeColorIndex(imageConfig.imageColor1));
+		_comboFillColor2.select(TourTypeManager.getTourTypeColorIndex(imageConfig.imageColor2));
+		_comboFillLayout.select(TourTypeManager.getTourTypeLayoutIndex(imageConfig.imageLayout));
+
+		enableLayoutControls();
 	}
 
 	private TourType saveTourType(final TourType tourType) {

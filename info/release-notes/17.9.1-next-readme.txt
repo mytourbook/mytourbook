@@ -1,0 +1,13 @@
+Version 17.9.1 next                                          ?. October 2017
+
+
+Improvements
+============
+
+* Customize tour type image
+
+
+Bugfix
+======
+
+* 

@@ -435,16 +435,19 @@ public class Messages extends NLS {
 	public static String		TourType_Config_Border_Right;
 	public static String		TourType_Config_Border_Top;
 	public static String		TourType_Config_Border_TopBottom;
+	public static String		TourType_Config_Color_Bright;
+	public static String		TourType_Config_Color_Dark;
+	public static String		TourType_Config_Color_Line;
 	public static String		TourType_Config_Layout_Fill_Circle_Border;
 	public static String		TourType_Config_Layout_Fill_Circle_Bright;
+	public static String		TourType_Config_Layout_Fill_Circle;
 	public static String		TourType_Config_Layout_Fill_Circle_Dark;
 	public static String		TourType_Config_Layout_Fill_Rect_Border;
-	public static String		TourType_Config_Layout_Fill_Rect_Bright;
-	public static String		TourType_Config_Layout_Fill_Rect_Dark;
+	public static String		TourType_Config_Layout_Fill_Rectangle;
 	public static String		TourType_Config_Layout_Gradient_BottomTop;
-	public static String		TourType_Config_Layout_Gradient_LeftRight;
-	public static String		TourType_Config_Layout_Gradient_RightLeft;
+	public static String		TourType_Config_Layout_Gradient_Horizontal;
 	public static String		TourType_Config_Layout_Gradient_TopBottom;
+	public static String		TourType_Config_Layout_Gradient_Vertical;
 	public static String		TourType_Config_Layout_Nothing;
 
 	public static String		Value_Unit_Cadence;

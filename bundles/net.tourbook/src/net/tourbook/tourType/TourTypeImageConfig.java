@@ -15,16 +15,14 @@
  *******************************************************************************/
 package net.tourbook.tourType;
 
-/**
- * Tour type image background layouts
- */
-public enum TourTypeLayout {
+public class TourTypeImageConfig {
 
-	RECTANGLE, //
-	CIRCLE, //
+	public TourTypeColor	borderColor		= TourTypeManager.DEFAULT_BORDER_COLOR;
+	public TourTypeBorder	borderLayout	= TourTypeManager.DEFAULT_BORDER_LAYOUT;
+	public int				borderWidth		= TourTypeManager.DEFAULT_BORDER_WIDTH;
 
-	GRADIENT_HORIZONTAL, //
-	GRADIENT_VERTICAL, //
+	public TourTypeColor	imageColor1		= TourTypeManager.DEFAULT_IMAGE_COLOR1;
+	public TourTypeColor	imageColor2		= TourTypeManager.DEFAULT_IMAGE_COLOR2;
+	public TourTypeLayout	imageLayout		= TourTypeManager.DEFAULT_IMAGE_LAYOUT;
 
-	NOTHING, //
 }
