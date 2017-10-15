@@ -1,6 +1,6 @@
 # MyTourbook
 
-All documentations for this project is available at the website <http://mytourbook.sourceforge.net>
+All documentations for this project are available on the website <http://mytourbook.sourceforge.net>
 
 **Some contributor links**
 
