@@ -49,11 +49,15 @@ public class CalendarConfig {
 	boolean				isShowDayDate				= true;
 	boolean				isToggleMonthColor			= true;
 	FontData			dayContentFont				= JFaceResources.getFontRegistry().defaultFont().getFontData()[0];
+	DayContentColor		dayContentColor				= CalendarConfigManager.DEFAULT_DAY_CONTENT_COLOR;
                                                             
 	// tour
 	TourBackground		tourBackground				= CalendarConfigManager.DEFAULT_TOUR_BACKGROUND;
+	CalendarColor		tourBackgroundColor1		= CalendarConfigManager.DEFAULT_TOUR_BACKGROUND_COLOR1;
+	CalendarColor		tourBackgroundColor2		= CalendarConfigManager.DEFAULT_TOUR_BACKGROUND_COLOR2;
 	int					tourBackgroundWidth			= CalendarConfigManager.DEFAULT_TOUR_BACKGROUND_WIDTH;
 	TourBorder 			tourBorder					= CalendarConfigManager.DEFAULT_TOUR_BORDER;
+	CalendarColor 		tourBorderColor				= CalendarConfigManager.DEFAULT_TOUR_BORDER_COLOR;
 	int		 			tourBorderWidth				= CalendarConfigManager.DEFAULT_TOUR_BORDER_WIDTH;
                                                             
 	// date column

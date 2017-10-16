@@ -571,12 +571,12 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
 					_comboFillLayout.setVisibleItemCount(20);
 					_comboFillLayout.addSelectionListener(selectionListener);
 
-					// combo color
+					// combo color 1
 					_comboFillColor1 = new Combo(containerImage, SWT.DROP_DOWN | SWT.READ_ONLY);
 					_comboFillColor1.setVisibleItemCount(20);
 					_comboFillColor1.addSelectionListener(selectionListener);
 
-					// combo color
+					// combo color 2
 					_comboFillColor2 = new Combo(containerImage, SWT.DROP_DOWN | SWT.READ_ONLY);
 					_comboFillColor2.setVisibleItemCount(20);
 					_comboFillColor2.addSelectionListener(selectionListener);

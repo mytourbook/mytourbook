@@ -26,7 +26,9 @@ import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.tooltip.SlideoutLocation;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.Util;
+import net.tourbook.ui.views.calendar.CalendarConfigManager.CalendarColorData;
 import net.tourbook.ui.views.calendar.CalendarConfigManager.DateColumnData;
+import net.tourbook.ui.views.calendar.CalendarConfigManager.DayContentColorData;
 import net.tourbook.ui.views.calendar.CalendarConfigManager.DayHeaderDateFormatData;
 import net.tourbook.ui.views.calendar.CalendarConfigManager.ICalendarConfigProvider;
 import net.tourbook.ui.views.calendar.CalendarConfigManager.TourBackgroundData;
@@ -128,13 +130,13 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 	private Combo				_comboConfigName;
 	private Combo				_comboDateColumn;
+	private Combo				_comboDayContentColor;
 	private Combo				_comboDayHeaderDateFormat;
 	private Combo				_comboTourBackground;
+	private Combo				_comboTourBackgroundColor1;
+	private Combo				_comboTourBackgroundColor2;
 	private Combo				_comboTourBorder;
-
-	private SimpleFontEditor	_fontEditorDayContent;
-	private SimpleFontEditor	_fontEditorDayDate;
-	private SimpleFontEditor	_fontEditorDateColumn;
+	private Combo				_comboTourBorderColor;
 
 	private Label				_lblDateColumnContent;
 	private Label				_lblDateColumnFont;
@@ -142,6 +144,10 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	private Label				_lblDayHeaderFont;
 	private Label				_lblDayHeaderFormat;
 	private Label				_lblSummaryColumnWidth;
+
+	private SimpleFontEditor	_fontEditorDayContent;
+	private SimpleFontEditor	_fontEditorDayDate;
+	private SimpleFontEditor	_fontEditorDateColumn;
 
 	private Spinner				_spinnerDateColumnWidth;
 	private Spinner				_spinnerSummaryColumnWidth;
@@ -502,7 +508,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				.fillDefaults()//
 				.grab(true, false)
 				.applyTo(group);
-		GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
+		GridLayoutFactory.swtDefaults().numColumns(5).applyTo(group);
 //		group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_CYAN));
 		{
 			{
@@ -523,6 +529,16 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				_comboTourBackground.setVisibleItemCount(20);
 				_comboTourBackground.addSelectionListener(_defaultSelectionListener);
 				_comboTourBackground.addFocusListener(_keepOpenListener);
+
+				// combo color 1
+				_comboTourBackgroundColor1 = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
+				_comboTourBackgroundColor1.setVisibleItemCount(20);
+				_comboTourBackgroundColor1.addSelectionListener(_defaultSelectionListener);
+
+				// combo color 2
+				_comboTourBackgroundColor2 = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
+				_comboTourBackgroundColor2.setVisibleItemCount(20);
+				_comboTourBackgroundColor2.addSelectionListener(_defaultSelectionListener);
 
 				// background width
 				_spinnerTourBackgroundWidth = new Spinner(group, SWT.BORDER);
@@ -552,6 +568,14 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				_comboTourBorder.addSelectionListener(_defaultSelectionListener);
 				_comboTourBorder.addFocusListener(_keepOpenListener);
 
+				// combo color
+				_comboTourBorderColor = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
+				_comboTourBorderColor.setVisibleItemCount(20);
+				_comboTourBorderColor.addSelectionListener(_defaultSelectionListener);
+
+				// spacer
+				new Label(group, SWT.NONE);
+
 				// border width
 				_spinnerTourBorderWidth = new Spinner(group, SWT.BORDER);
 				_spinnerTourBorderWidth.setMinimum(0);
@@ -575,14 +599,23 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 						.indent(0, _fontLabelVIndent)
 						.applyTo(label);
 
-				// value
+				// font/size
 				_fontEditorDayContent = new SimpleFontEditor(group, SWT.NONE);
 				_fontEditorDayContent.addFontListener(_defaultFontEditorListener);
 				GridDataFactory
 						.fillDefaults()//
 						.grab(true, false)
-						.span(2, 1)
 						.applyTo(_fontEditorDayContent);
+
+				// combo color
+				_comboDayContentColor = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
+				_comboDayContentColor.setVisibleItemCount(20);
+				_comboDayContentColor.addSelectionListener(_defaultSelectionListener);
+				GridDataFactory
+						.fillDefaults()//
+						.align(SWT.BEGINNING, SWT.BEGINNING)
+						.span(3, 1)
+						.applyTo(_comboDayContentColor);
 			}
 			{
 				/*
@@ -595,7 +628,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				_chkIsShowMonthWithAlternateColor.addSelectionListener(_defaultSelectionListener);
 				GridDataFactory
 						.fillDefaults()//
-						.span(3, 1)
+						.span(5, 1)
 						.applyTo(_chkIsShowMonthWithAlternateColor);
 			}
 		}
@@ -950,8 +983,15 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		_lblDayHeaderFont.setEnabled(isShowDayDate);
 
 		// day content
-		_spinnerTourBackgroundWidth.setEnabled(getSelectedTourBackgroundData().canSetWidth);
-		_spinnerTourBorderWidth.setEnabled(getSelectedTourBorder() != TourBorder.NO_BORDER);
+		final TourBackgroundData selectedTourBackgroundData = getSelectedTourBackgroundData();
+		final TourBorderData selectedTourBorderData = getSelectedTourBorderData();
+
+		_comboTourBackgroundColor1.setEnabled(selectedTourBackgroundData.isColor1);
+		_comboTourBackgroundColor2.setEnabled(selectedTourBackgroundData.isColor2);
+		_spinnerTourBackgroundWidth.setEnabled(selectedTourBackgroundData.isWidth);
+
+		_comboTourBorderColor.setEnabled(selectedTourBorderData.isColor);
+		_spinnerTourBorderWidth.setEnabled(selectedTourBorderData.isWidth);
 	}
 
 	private void fillUI() {
@@ -972,12 +1012,31 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				_comboDayHeaderDateFormat.add(data.label);
 			}
 
+			/*
+			 * Tour background
+			 */
 			for (final TourBackgroundData data : CalendarConfigManager.getAllTourBackgroundData()) {
 				_comboTourBackground.add(data.label);
 			}
+			for (final CalendarColorData data : CalendarConfigManager.getAllCalendarColorData()) {
+				_comboTourBackgroundColor1.add(data.label);
+			}
+			for (final CalendarColorData data : CalendarConfigManager.getAllCalendarColorData()) {
+				_comboTourBackgroundColor2.add(data.label);
+			}
 
+			/*
+			 * Tour border
+			 */
 			for (final TourBorderData data : CalendarConfigManager.getAllTourBorderData()) {
 				_comboTourBorder.add(data.label);
+			}
+			for (final CalendarColorData data : CalendarConfigManager.getAllCalendarColorData()) {
+				_comboTourBorderColor.add(data.label);
+			}
+
+			for (final DayContentColorData data : CalendarConfigManager.getAllDayContentColorData()) {
+				_comboDayContentColor.add(data.label);
 			}
 
 //			for (final TourInfoFormatter tourFormatter : _calendarView.tourInfoFormatter) {
@@ -1063,15 +1122,49 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		comboWeek_Format.select(defaultIndex);
 	}
 
-	private int getDateColumnIndex(final DateColumnContent infoColumn) {
+	private int getCalendarColorIndex(final CalendarColor requestedData) {
+
+		final CalendarColorData[] allData = CalendarConfigManager.getAllCalendarColorData();
+
+		for (int dataIndex = 0; dataIndex < allData.length; dataIndex++) {
+
+			final CalendarColorData data = allData[dataIndex];
+
+			if (data.color.equals(requestedData)) {
+				return dataIndex;
+			}
+		}
+
+		// this should not happen
+		return 0;
+	}
+
+	private int getDateColumnIndex(final DateColumnContent requestedData) {
 
 		final DateColumnData[] allInfoColumnData = CalendarConfigManager.getAllDateColumnData();
 
 		for (int dataIndex = 0; dataIndex < allInfoColumnData.length; dataIndex++) {
 
-			final DateColumnData infoColumnData = allInfoColumnData[dataIndex];
+			final DateColumnData data = allInfoColumnData[dataIndex];
 
-			if (infoColumnData.dateColumn.equals(infoColumn)) {
+			if (data.dateColumn.equals(requestedData)) {
+				return dataIndex;
+			}
+		}
+
+		// this should not happen
+		return 0;
+	}
+
+	private int getDayContentColorIndex(final DayContentColor requestedData) {
+
+		final DayContentColorData[] allData = CalendarConfigManager.getAllDayContentColorData();
+
+		for (int dataIndex = 0; dataIndex < allData.length; dataIndex++) {
+
+			final DayContentColorData data = allData[dataIndex];
+
+			if (data.dayContentColor.equals(requestedData)) {
 				return dataIndex;
 			}
 		}
@@ -1086,9 +1179,9 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 		for (int dataIndex = 0; dataIndex < allData.length; dataIndex++) {
 
-			final DayHeaderDateFormatData Data = allData[dataIndex];
+			final DayHeaderDateFormatData data = allData[dataIndex];
 
-			if (Data.dayHeaderDateFormat.equals(requestedData)) {
+			if (data.dayHeaderDateFormat.equals(requestedData)) {
 				return dataIndex;
 			}
 		}
@@ -1109,6 +1202,19 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		return itemBounds;
 	}
 
+	private CalendarColor getSelectedCalendarColor(final Combo comboColor) {
+
+		final int selectedIndex = comboColor.getSelectionIndex();
+
+		final CalendarColorData[] allCalendarColorData = CalendarConfigManager.getAllCalendarColorData();
+
+		if (selectedIndex < 0) {
+			return allCalendarColorData[0].color;
+		}
+
+		return allCalendarColorData[selectedIndex].color;
+	}
+
 	private DateColumnContent getSelectedDateColumn() {
 
 		final int selectedIndex = _comboDateColumn.getSelectionIndex();
@@ -1120,6 +1226,28 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		final DateColumnData selectedInfoColumnData = CalendarConfigManager.getAllDateColumnData()[selectedIndex];
 
 		return selectedInfoColumnData.dateColumn;
+	}
+
+	private DayContentColorData getSelectedDayContentColor() {
+
+		final int selectedIndex = _comboDayContentColor.getSelectionIndex();
+
+		final DayContentColorData[] allData = CalendarConfigManager.getAllDayContentColorData();
+
+		if (selectedIndex < 0) {
+
+			for (final DayContentColorData data : allData) {
+
+				if (data.dayContentColor == CalendarConfigManager.DEFAULT_DAY_CONTENT_COLOR) {
+					return data;
+				}
+			}
+
+			// return default default
+			return allData[0];
+		}
+
+		return allData[selectedIndex];
 	}
 
 	private DayDateFormat getSelectedDayDateFormat() {
@@ -1134,19 +1262,6 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				.getAllDayHeaderDateFormatData()[selectedIndex];
 
 		return selectedData.dayHeaderDateFormat;
-	}
-
-	private TourBackground getSelectedTourBackground() {
-
-		final int selectedIndex = _comboTourBackground.getSelectionIndex();
-
-		if (selectedIndex < 0) {
-			return CalendarConfigManager.DEFAULT_TOUR_BACKGROUND;
-		}
-
-		final TourBackgroundData selectedData = CalendarConfigManager.getAllTourBackgroundData()[selectedIndex];
-
-		return selectedData.tourBackground;
 	}
 
 	private TourBackgroundData getSelectedTourBackgroundData() {
@@ -1168,22 +1283,29 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			return allTourBackgroundData[0];
 		}
 
-		final TourBackgroundData selectedData = allTourBackgroundData[selectedIndex];
-
-		return selectedData;
+		return allTourBackgroundData[selectedIndex];
 	}
 
-	private TourBorder getSelectedTourBorder() {
+	private TourBorderData getSelectedTourBorderData() {
 
 		final int selectedIndex = _comboTourBorder.getSelectionIndex();
 
+		final TourBorderData[] allTourBorderData = CalendarConfigManager.getAllTourBorderData();
+
 		if (selectedIndex < 0) {
-			return CalendarConfigManager.DEFAULT_TOUR_BORDER;
+
+			for (final TourBorderData data : allTourBorderData) {
+
+				if (data.tourBorder == CalendarConfigManager.DEFAULT_TOUR_BORDER) {
+					return data;
+				}
+			}
+
+			// return default default
+			return allTourBorderData[0];
 		}
 
-		final TourBorderData selectedData = CalendarConfigManager.getAllTourBorderData()[selectedIndex];
-
-		return selectedData.tourBorder;
+		return allTourBorderData[selectedIndex];
 	}
 
 	private int getTourBackgroundIndex(final TourBackground requestedData) {
@@ -1391,12 +1513,16 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			_chkIsShowDayDate.setSelection(config.isShowDayDate);
 			_chkIsShowDayDateWeekendColor.setSelection(config.isShowDayDateWeekendColor);
 			_comboDayHeaderDateFormat.select(getDayHeaderDateFormatIndex(config.dayDateFormat));
+			_comboDayContentColor.select(getDayContentColorIndex(config.dayContentColor));
 			_fontEditorDayDate.setSelection(config.dayDateFont);
 
 			// day content
 			_chkIsShowMonthWithAlternateColor.setSelection(config.isToggleMonthColor);
 			_comboTourBackground.select(getTourBackgroundIndex(config.tourBackground));
+			_comboTourBackgroundColor1.select(getCalendarColorIndex(config.tourBackgroundColor1));
+			_comboTourBackgroundColor2.select(getCalendarColorIndex(config.tourBackgroundColor2));
 			_comboTourBorder.select(getTourBorderIndex(config.tourBorder));
+			_comboTourBorderColor.select(getCalendarColorIndex(config.tourBorderColor));
 			_fontEditorDayContent.setSelection(config.dayContentFont);
 			_spinnerTourBackgroundWidth.setSelection(config.tourBackgroundWidth);
 			_spinnerTourBorderWidth.setSelection(config.tourBorderWidth);
@@ -1436,11 +1562,15 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		config.dayDateFont = _fontEditorDayDate.getSelection();
 
 		// day content
+		config.dayContentColor = getSelectedDayContentColor().dayContentColor;
 		config.dayContentFont = _fontEditorDayContent.getSelection();
 		config.isToggleMonthColor = _chkIsShowMonthWithAlternateColor.getSelection();
-		config.tourBackground = getSelectedTourBackground();
+		config.tourBackground = getSelectedTourBackgroundData().tourBackground;
+		config.tourBackgroundColor1 = getSelectedCalendarColor(_comboTourBackgroundColor1);
+		config.tourBackgroundColor2 = getSelectedCalendarColor(_comboTourBackgroundColor2);
 		config.tourBackgroundWidth = _spinnerTourBackgroundWidth.getSelection();
-		config.tourBorder = getSelectedTourBorder();
+		config.tourBorder = getSelectedTourBorderData().tourBorder;
+		config.tourBorderColor = getSelectedCalendarColor(_comboTourBorderColor);
 		config.tourBorderWidth = _spinnerTourBorderWidth.getSelection();
 
 		// date column

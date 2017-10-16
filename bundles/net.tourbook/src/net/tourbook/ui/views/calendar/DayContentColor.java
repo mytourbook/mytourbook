@@ -15,17 +15,14 @@
  *******************************************************************************/
 package net.tourbook.ui.views.calendar;
 
-public enum TourBackground {
+public enum DayContentColor {
 
-	NO_BACKGROUND, //
+	BRIGHT, //
+	DARK, //
+	LINE, //
 
-	FILL, //
-	FILL_LEFT, //
-	FILL_RIGHT, //
+	BLACK, //
+	WHITE, //
 
-	CIRCLE, //
-
-	GRADIENT_HORIZONTAL, //
-	GRADIENT_VERTICAL, //
-
+	CONTRAST, //
 }

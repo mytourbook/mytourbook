@@ -52,7 +52,9 @@ public class CalendarConfigManager {
 	private static final Bundle		_bundle									= TourbookPlugin
 			.getDefault()
 			.getBundle();
+
 	private static final IPath		_stateLocation							= Platform.getStateLocation(_bundle);
+
 	//
 	static final String				CONFIG_DEFAULT_ID_1						= "#1";									//$NON-NLS-1$
 	private static final String		CONFIG_DEFAULT_ID_2						= "#2";									//$NON-NLS-1$
@@ -69,13 +71,13 @@ public class CalendarConfigManager {
 	private static final String		ATTR_ACTIVE_CONFIG_ID					= "activeConfigId";						//$NON-NLS-1$
 	private static final String		ATTR_ID									= "id";									//$NON-NLS-1$
 	private static final String		ATTR_CONFIG_NAME						= "name";								//$NON-NLS-1$
-
 	//
 	/*
 	 * Root
 	 */
 	private static final String		TAG_ROOT								= "CalendarConfiguration";				//$NON-NLS-1$
 	private static final String		ATTR_CONFIG_VERSION						= "configVersion";						//$NON-NLS-1$
+
 	//
 	/*
 	 * Calendars
@@ -93,23 +95,31 @@ public class CalendarConfigManager {
 	private static final String		ATTR_DATE_COLUMN_FONT					= "dateColumnFont";						//$NON-NLS-1$
 	private static final String		ATTR_DATE_COLUMN_WIDTH					= "dateColumnWidth";					//$NON-NLS-1$
 	private static final String		ATTR_DAY_CONTENT_FONT					= "dayContentFont";						//$NON-NLS-1$
+	private static final String		ATTR_DAY_CONTENT_COLOR					= "dayContentColor";					//$NON-NLS-1$
 	private static final String		ATTR_DAY_DATE_FORMAT					= "dayDateFormat";						//$NON-NLS-1$
 	private static final String		ATTR_DAY_DATE_FONT						= "dayDateFont";						//$NON-NLS-1$
 	private static final String		ATTR_SUMMARY_COLUMN_WIDTH				= "summaryColumnWidth";					//$NON-NLS-1$
 	private static final String		ATTR_TOUR_BACKGROUND					= "tourBackground";						//$NON-NLS-1$
+	private static final String		ATTR_TOUR_BACKGROUND_COLOR1				= "tourBackgroundColor1";				//$NON-NLS-1$
+	private static final String		ATTR_TOUR_BACKGROUND_COLOR2				= "tourBackgroundColor2";				//$NON-NLS-1$
 	private static final String		ATTR_TOUR_BORDER_WIDTH					= "tourBackgroundWidth";				//$NON-NLS-1$
 	private static final String		ATTR_TOUR_BORDER						= "tourBorder";							//$NON-NLS-1$
+	private static final String		ATTR_TOUR_BORDER_COLOR					= "tourBorderColor";					//$NON-NLS-1$
 	private static final String		ATTR_TOUR_BACKGROUND_WIDTH				= "tourBorderWidth";					//$NON-NLS-1$
 	private static final String		ATTR_WEEK_HEIGHT						= "weekHeight";							//$NON-NLS-1$
 	//
+	static final DayContentColor	DEFAULT_DAY_CONTENT_COLOR				= DayContentColor.CONTRAST;
 	static final DayDateFormat		DEFAULT_DAY_DATE_FORMAT					= DayDateFormat.DAY;
 	static final int				DEFAULT_DATE_COLUMN_WIDTH				= 10;
 	static final DateColumnContent	DEFAULT_DATE_COLUMN_CONTENT				= DateColumnContent.WEEK_NUMBER;
 	static final boolean			DEFAULT_IS_SHOW_DAY_DATE_WEEKEND_COLOR	= false;
 	static final int				DEFAULT_SUMMARY_COLUMN_WIDTH			= 10;
-	static final TourBackground		DEFAULT_TOUR_BACKGROUND					= TourBackground.WITH_TOURTYPE_DARK;
-	static final TourBorder			DEFAULT_TOUR_BORDER						= TourBorder.NO_BORDER;
+	static final TourBackground		DEFAULT_TOUR_BACKGROUND					= TourBackground.FILL;
+	static final CalendarColor		DEFAULT_TOUR_BACKGROUND_COLOR1			= CalendarColor.DARK;
+	static final CalendarColor		DEFAULT_TOUR_BACKGROUND_COLOR2			= CalendarColor.BRIGHT;
 	static final int				DEFAULT_TOUR_BACKGROUND_WIDTH			= 3;
+	static final TourBorder			DEFAULT_TOUR_BORDER						= TourBorder.NO_BORDER;
+	static final CalendarColor		DEFAULT_TOUR_BORDER_COLOR				= CalendarColor.LINE;
 	static final int				DEFAULT_TOUR_BORDER_WIDTH				= 1;
 	static final int				DEFAULT_WEEK_HEIGHT						= 70;
 	//
@@ -119,13 +129,27 @@ public class CalendarConfigManager {
 	// !!! this is a code formatting separator !!!
 	static {}
 	//
+	private static final CalendarColorData[]		_allCalendarColorData			= new CalendarColorData[] {
+
+			new CalendarColorData(
+					CalendarColor.BRIGHT,
+					Messages.Calendar_Config_Color_Bright),
+
+			new CalendarColorData(
+					CalendarColor.DARK,
+					Messages.Calendar_Config_Color_Dark),
+
+			new CalendarColorData(
+					CalendarColor.LINE,
+					Messages.Calendar_Config_Color_Line),
+	};
 	private static final DateColumnData[]			_allDateColumnData				= new DateColumnData[] {
 
 			new DateColumnData(DateColumnContent.WEEK_NUMBER, Messages.Calendar_Config_DateColumn_WeekNumber),
 			new DateColumnData(DateColumnContent.MONTH, Messages.Calendar_Config_DateColumn_Month),
 			new DateColumnData(DateColumnContent.YEAR, Messages.Calendar_Config_DateColumn_Year),
-	};																													//
-	//
+	};
+
 	private static final DayHeaderDateFormatData[]	_allDateHeaderDateFormatData	= new DayHeaderDateFormatData[] {
 
 			new DayHeaderDateFormatData(
@@ -146,76 +170,120 @@ public class CalendarConfigManager {
 					DayDateFormat.AUTOMATIC,
 					Messages.Calendar_Config_DayHeaderDateFormat_Automatic),
 	};
-	//
+
 	private static final TourBackgroundData[]		_allTourBackgroundData			= new TourBackgroundData[] {
-
-			new TourBackgroundData(
-					TourBackground.WITH_TOURTYPE_DARK,
-					Messages.Calendar_Config_TourBackground_Dark,
-					false),
-			new TourBackgroundData(
-					TourBackground.WITH_TOURTYPE_BRIGHT,
-					Messages.Calendar_Config_TourBackground_Bright,
-					false),
-
-			new TourBackgroundData(
-					TourBackground.WITH_TOURTYPE_BRIGHT_LEFT,
-					Messages.Calendar_Config_TourBackground_BrightLeft,
-					true),
-			new TourBackgroundData(
-					TourBackground.WITH_TOURTYPE_BRIGHT_RIGHT,
-					Messages.Calendar_Config_TourBackground_BrightRight,
-					true),
-
-			new TourBackgroundData(
-					TourBackground.WITH_TOURTYPE_DARK_LEFT,
-					Messages.Calendar_Config_TourBackground_DarkLeft,
-					true),
-			new TourBackgroundData(
-					TourBackground.WITH_TOURTYPE_DARK_RIGHT,
-					Messages.Calendar_Config_TourBackground_DarkRight,
-					true),
 
 			new TourBackgroundData(
 					TourBackground.NO_BACKGROUND,
 					Messages.Calendar_Config_TourBackground_NoBackground,
+					false,
+					false,
+					false),
+
+			new TourBackgroundData(
+					TourBackground.FILL,
+					Messages.Calendar_Config_TourBackground_Fill,
+					true,
+					false,
+					false),
+
+			new TourBackgroundData(
+					TourBackground.FILL_LEFT,
+					Messages.Calendar_Config_TourBackground_Fill_Left,
+					true,
+					false,
+					true),
+
+			new TourBackgroundData(
+					TourBackground.FILL_RIGHT,
+					Messages.Calendar_Config_TourBackground_Fill_Right,
+					true,
+					false,
+					true),
+
+			new TourBackgroundData(
+					TourBackground.CIRCLE,
+					Messages.Calendar_Config_TourBackground_Circle,
+					true,
+					false,
+					false),
+
+			new TourBackgroundData(
+					TourBackground.GRADIENT_HORIZONTAL,
+					Messages.Calendar_Config_TourBackground_GradientHorizontal,
+					true,
+					true,
+					false),
+
+			new TourBackgroundData(
+					TourBackground.GRADIENT_VERTICAL,
+					Messages.Calendar_Config_TourBackground_GradientVertical,
+					true,
+					true,
 					false),
 	};
-	//
+
 	private static final TourBorderData[]			_allTourBorderData				= new TourBorderData[] {
 
 			new TourBorderData(
 					TourBorder.NO_BORDER,
-					Messages.Calendar_Config_TourBorder_NoBorder),
+					Messages.Calendar_Config_TourBorder_NoBorder,
+					false,
+					false),
 
 			new TourBorderData(
 					TourBorder.BORDER_TOP,
-					Messages.Calendar_Config_TourBorder_Top),
+					Messages.Calendar_Config_TourBorder_Top,
+					true,
+					true),
 
 			new TourBorderData(
 					TourBorder.BORDER_BOTTOM,
-					Messages.Calendar_Config_TourBorder_Bottom),
+					Messages.Calendar_Config_TourBorder_Bottom,
+					true,
+					true),
 
 			new TourBorderData(
 					TourBorder.BORDER_TOP_BOTTOM,
-					Messages.Calendar_Config_TourBorder_TopBottom),
+					Messages.Calendar_Config_TourBorder_TopBottom,
+					true,
+					true),
 
 			new TourBorderData(
 					TourBorder.BORDER_LEFT,
-					Messages.Calendar_Config_TourBorder_Left),
+					Messages.Calendar_Config_TourBorder_Left,
+					true,
+					true),
 
 			new TourBorderData(
 					TourBorder.BORDER_RIGHT,
-					Messages.Calendar_Config_TourBorder_Right),
+					Messages.Calendar_Config_TourBorder_Right,
+					true,
+					true),
 
 			new TourBorderData(
 					TourBorder.BORDER_LEFT_RIGHT,
-					Messages.Calendar_Config_TourBorder_LeftRight),
+					Messages.Calendar_Config_TourBorder_LeftRight,
+					true,
+					true),
 
 			new TourBorderData(
 					TourBorder.BORDER_ALL,
-					Messages.Calendar_Config_TourBorder_All),
+					Messages.Calendar_Config_TourBorder_All,
+					true,
+					true),
 	};
+
+	private static DayContentColorData[]			_allDayContentColorData			= new DayContentColorData[] {
+
+			new DayContentColorData(DayContentColor.CONTRAST, Messages.Calendar_Config_DayContentColor_Contrast),
+			new DayContentColorData(DayContentColor.BRIGHT, Messages.Calendar_Config_DayContentColor_Bright),
+			new DayContentColorData(DayContentColor.DARK, Messages.Calendar_Config_DayContentColor_Dark),
+			new DayContentColorData(DayContentColor.LINE, Messages.Calendar_Config_DayContentColor_Line),
+			new DayContentColorData(DayContentColor.BLACK, Messages.Calendar_Config_DayContentColor_Black),
+			new DayContentColorData(DayContentColor.WHITE, Messages.Calendar_Config_DayContentColor_White),
+	};
+
 	//
 	/**
 	 * Contains all configurations which are loaded from a xml file.
@@ -223,7 +291,6 @@ public class CalendarConfigManager {
 	private static final ArrayList<CalendarConfig>	_allCalendarConfigs				= new ArrayList<>();
 
 	private static CalendarConfig					_activeCalendarConfig;
-
 	//
 	private static String							_fromXml_ActiveCalendarConfigId;
 
@@ -231,12 +298,26 @@ public class CalendarConfigManager {
 	 * Calendarview or <code>null</code> when closed.
 	 */
 	private static ICalendarConfigProvider			_configProvider_CalendarView;
+
 	private static ICalendarConfigProvider			_configProvider_SlideoutCalendarOptions;
+
+	public static class CalendarColorData {
+
+		String			label;
+		CalendarColor	color;
+
+		public CalendarColorData(final CalendarColor color, final String label) {
+
+			this.color = color;
+			this.label = label;
+		}
+
+	}
 
 	static class DateColumnData {
 
-		DateColumnContent	dateColumn;
 		String				label;
+		DateColumnContent	dateColumn;
 
 		public DateColumnData(final DateColumnContent dateColumn, final String label) {
 
@@ -245,10 +326,23 @@ public class CalendarConfigManager {
 		}
 	}
 
+	static class DayContentColorData {
+
+		String			label;
+		DayContentColor	dayContentColor;
+
+		DayContentColorData(final DayContentColor dayContentColor, final String label) {
+
+			this.label = label;
+			this.dayContentColor = dayContentColor;
+		}
+
+	}
+
 	static class DayHeaderDateFormatData {
 
-		DayDateFormat	dayHeaderDateFormat;
 		String			label;
+		DayDateFormat	dayHeaderDateFormat;
 
 		public DayHeaderDateFormatData(final DayDateFormat dayHeaderDateFormat, final String label) {
 
@@ -269,13 +363,23 @@ public class CalendarConfigManager {
 
 		TourBackground	tourBackground;
 		String			label;
-		boolean			canSetWidth;
 
-		public TourBackgroundData(final TourBackground tourBackground, final String label, final boolean canSetWidth) {
+		boolean			isWidth;
+		boolean			isColor1;
+		boolean			isColor2;
+
+		public TourBackgroundData(	final TourBackground tourBackground,
+									final String label,
+									final boolean isColor1,
+									final boolean isColor2,
+									final boolean isWidth) {
 
 			this.tourBackground = tourBackground;
 			this.label = label;
-			this.canSetWidth = canSetWidth;
+
+			this.isWidth = isWidth;
+			this.isColor1 = isColor1;
+			this.isColor2 = isColor2;
 		}
 	}
 
@@ -284,10 +388,18 @@ public class CalendarConfigManager {
 		TourBorder	tourBorder;
 		String		label;
 
-		public TourBorderData(final TourBorder tourBorder, final String label) {
+		boolean		isColor;
+		boolean		isWidth;
+
+		public TourBorderData(	final TourBorder tourBorder,
+								final String label,
+								final boolean isColor,
+								final boolean isWidth) {
 
 			this.tourBorder = tourBorder;
 			this.label = label;
+			this.isColor = isColor;
+			this.isWidth = isWidth;
 		}
 	}
 
@@ -397,9 +509,13 @@ public class CalendarConfigManager {
 			xmlConfig.putBoolean(ATTR_IS_TOGGLE_MONTH_COLOR, config.isToggleMonthColor);
 			xmlConfig.putInteger(ATTR_TOUR_BACKGROUND_WIDTH, config.tourBackgroundWidth);
 			xmlConfig.putInteger(ATTR_TOUR_BORDER_WIDTH, config.tourBorderWidth);
+			Util.setXmlEnum(xmlConfig, ATTR_DAY_CONTENT_COLOR, config.dayContentColor);
 			Util.setXmlFont(xmlConfig, ATTR_DAY_CONTENT_FONT, config.dayContentFont);
 			Util.setXmlEnum(xmlConfig, ATTR_TOUR_BACKGROUND, config.tourBackground);
+			Util.setXmlEnum(xmlConfig, ATTR_TOUR_BACKGROUND_COLOR1, config.tourBackgroundColor1);
+			Util.setXmlEnum(xmlConfig, ATTR_TOUR_BACKGROUND_COLOR2, config.tourBackgroundColor2);
 			Util.setXmlEnum(xmlConfig, ATTR_TOUR_BORDER, config.tourBorder);
+			Util.setXmlEnum(xmlConfig, ATTR_TOUR_BORDER_COLOR, config.tourBorderColor);
 
 			// date column
 			xmlConfig.putBoolean(ATTR_IS_SHOW_DATE_COLUMN, config.isShowDateColumn);
@@ -448,6 +564,10 @@ public class CalendarConfigManager {
 		return 0;
 	}
 
+	static CalendarColorData[] getAllCalendarColorData() {
+		return _allCalendarColorData;
+	}
+
 	static ArrayList<CalendarConfig> getAllCalendarConfigs() {
 
 		// ensure configs are loaded
@@ -458,6 +578,10 @@ public class CalendarConfigManager {
 
 	static DateColumnData[] getAllDateColumnData() {
 		return _allDateColumnData;
+	}
+
+	static DayContentColorData[] getAllDayContentColorData() {
+		return _allDayContentColorData;
 	}
 
 	static DayHeaderDateFormatData[] getAllDayHeaderDateFormatData() {
@@ -604,15 +728,35 @@ public class CalendarConfigManager {
 				ATTR_DAY_DATE_FORMAT,
 				DEFAULT_DAY_DATE_FORMAT);
 
+		config.dayContentColor = (DayContentColor) Util.getXmlEnum(
+				xmlConfig,
+				ATTR_DAY_CONTENT_COLOR,
+				DEFAULT_DAY_CONTENT_COLOR);
+
 		config.tourBackground = (TourBackground) Util.getXmlEnum(
 				xmlConfig,
 				ATTR_TOUR_BACKGROUND,
 				DEFAULT_TOUR_BACKGROUND);
 
+		config.tourBackgroundColor1 = (CalendarColor) Util.getXmlEnum(
+				xmlConfig,
+				ATTR_TOUR_BACKGROUND_COLOR1,
+				DEFAULT_TOUR_BACKGROUND_COLOR1);
+
+		config.tourBackgroundColor2 = (CalendarColor) Util.getXmlEnum(
+				xmlConfig,
+				ATTR_TOUR_BACKGROUND_COLOR2,
+				DEFAULT_TOUR_BACKGROUND_COLOR2);
+
 		config.tourBorder = (TourBorder) Util.getXmlEnum(
 				xmlConfig,
 				ATTR_TOUR_BORDER,
 				DEFAULT_TOUR_BORDER);
+
+		config.tourBorderColor = (CalendarColor) Util.getXmlEnum(
+				xmlConfig,
+				ATTR_TOUR_BORDER_COLOR,
+				DEFAULT_TOUR_BORDER_COLOR);
 	}
 
 	/**
