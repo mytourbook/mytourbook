@@ -108,7 +108,7 @@ public class CalendarConfigManager {
 	private static final String		ATTR_TOUR_BACKGROUND_WIDTH				= "tourBorderWidth";					//$NON-NLS-1$
 	private static final String		ATTR_WEEK_HEIGHT						= "weekHeight";							//$NON-NLS-1$
 	//
-	static final DayContentColor	DEFAULT_DAY_CONTENT_COLOR				= DayContentColor.CONTRAST;
+	static final CalendarColor		DEFAULT_DAY_CONTENT_COLOR				= CalendarColor.CONTRAST;
 	static final DayDateFormat		DEFAULT_DAY_DATE_FORMAT					= DayDateFormat.DAY;
 	static final int				DEFAULT_DATE_COLUMN_WIDTH				= 10;
 	static final DateColumnContent	DEFAULT_DATE_COLUMN_CONTENT				= DateColumnContent.WEEK_NUMBER;
@@ -142,6 +142,14 @@ public class CalendarConfigManager {
 			new CalendarColorData(
 					CalendarColor.LINE,
 					Messages.Calendar_Config_Color_Line),
+
+			new CalendarColorData(
+					CalendarColor.BLACK,
+					Messages.Calendar_Config_Color_Black),
+
+			new CalendarColorData(
+					CalendarColor.WHITE,
+					Messages.Calendar_Config_Color_White),
 	};
 	private static final DateColumnData[]			_allDateColumnData				= new DateColumnData[] {
 
@@ -232,6 +240,12 @@ public class CalendarConfigManager {
 					false),
 
 			new TourBorderData(
+					TourBorder.BORDER_ALL,
+					Messages.Calendar_Config_TourBorder_All,
+					true,
+					true),
+
+			new TourBorderData(
 					TourBorder.BORDER_TOP,
 					Messages.Calendar_Config_TourBorder_Top,
 					true,
@@ -266,22 +280,16 @@ public class CalendarConfigManager {
 					Messages.Calendar_Config_TourBorder_LeftRight,
 					true,
 					true),
-
-			new TourBorderData(
-					TourBorder.BORDER_ALL,
-					Messages.Calendar_Config_TourBorder_All,
-					true,
-					true),
 	};
 
 	private static DayContentColorData[]			_allDayContentColorData			= new DayContentColorData[] {
 
-			new DayContentColorData(DayContentColor.CONTRAST, Messages.Calendar_Config_DayContentColor_Contrast),
-			new DayContentColorData(DayContentColor.BRIGHT, Messages.Calendar_Config_DayContentColor_Bright),
-			new DayContentColorData(DayContentColor.DARK, Messages.Calendar_Config_DayContentColor_Dark),
-			new DayContentColorData(DayContentColor.LINE, Messages.Calendar_Config_DayContentColor_Line),
-			new DayContentColorData(DayContentColor.BLACK, Messages.Calendar_Config_DayContentColor_Black),
-			new DayContentColorData(DayContentColor.WHITE, Messages.Calendar_Config_DayContentColor_White),
+			new DayContentColorData(CalendarColor.CONTRAST, Messages.Calendar_Config_Color_Contrast),
+			new DayContentColorData(CalendarColor.BRIGHT, Messages.Calendar_Config_Color_Bright),
+			new DayContentColorData(CalendarColor.DARK, Messages.Calendar_Config_Color_Dark),
+			new DayContentColorData(CalendarColor.LINE, Messages.Calendar_Config_Color_Line),
+			new DayContentColorData(CalendarColor.BLACK, Messages.Calendar_Config_Color_Black),
+			new DayContentColorData(CalendarColor.WHITE, Messages.Calendar_Config_Color_White),
 	};
 
 	//
@@ -329,9 +337,9 @@ public class CalendarConfigManager {
 	static class DayContentColorData {
 
 		String			label;
-		DayContentColor	dayContentColor;
+		CalendarColor	dayContentColor;
 
-		DayContentColorData(final DayContentColor dayContentColor, final String label) {
+		DayContentColorData(final CalendarColor dayContentColor, final String label) {
 
 			this.label = label;
 			this.dayContentColor = dayContentColor;
@@ -728,7 +736,7 @@ public class CalendarConfigManager {
 				ATTR_DAY_DATE_FORMAT,
 				DEFAULT_DAY_DATE_FORMAT);
 
-		config.dayContentColor = (DayContentColor) Util.getXmlEnum(
+		config.dayContentColor = (CalendarColor) Util.getXmlEnum(
 				xmlConfig,
 				ATTR_DAY_CONTENT_COLOR,
 				DEFAULT_DAY_CONTENT_COLOR);

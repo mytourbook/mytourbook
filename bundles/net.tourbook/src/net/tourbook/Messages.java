@@ -42,18 +42,18 @@ public class Messages extends NLS {
 	public static String		Action_ToolTip_Hide;
 	public static String		Action_ToolTip_SetDefaults;
 
+	public static String		Calendar_Config_Color_Black;
 	public static String		Calendar_Config_Color_Bright;
+	public static String		Calendar_Config_Color_Contrast;
 	public static String		Calendar_Config_Color_Dark;
 	public static String		Calendar_Config_Color_Line;
+	public static String		Calendar_Config_Color_White;
 	public static String		Calendar_Config_DateColumn_Month;
 	public static String		Calendar_Config_DateColumn_WeekNumber;
 	public static String		Calendar_Config_DateColumn_Year;
-	public static String		Calendar_Config_DayContentColor_Black;
 	public static String		Calendar_Config_DayContentColor_Bright;
-	public static String		Calendar_Config_DayContentColor_Contrast;
 	public static String		Calendar_Config_DayContentColor_Dark;
 	public static String		Calendar_Config_DayContentColor_Line;
-	public static String		Calendar_Config_DayContentColor_White;
 	public static String		Calendar_Config_DayHeaderDateFormat_Automatic;
 	public static String		Calendar_Config_DayHeaderDateFormat_Day;
 	public static String		Calendar_Config_DayHeaderDateFormat_DayMonth;

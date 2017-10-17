@@ -1156,7 +1156,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		return 0;
 	}
 
-	private int getDayContentColorIndex(final DayContentColor requestedData) {
+	private int getDayContentColorIndex(final CalendarColor requestedData) {
 
 		final DayContentColorData[] allData = CalendarConfigManager.getAllDayContentColorData();
 

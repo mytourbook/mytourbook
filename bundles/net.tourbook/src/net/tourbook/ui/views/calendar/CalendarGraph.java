@@ -175,6 +175,10 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 	private Color								_darkGray				= _colorCache.getColor(0x404040);
 
+	private RGB									_tourBackgroundRGB;
+	private RGB									_whiteRGB				= _white.getRGB();
+	private RGB									_blackRGB				= _black.getRGB();
+
 	private Font								_boldFont;
 	private Font								_fontDateColumn;
 	private Font								_fontDayContent;
@@ -182,8 +186,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 	private Image								_image;
 	private Image								_highlight;
-
-	private RGB									_tourBackgroundRGB;
 
 	class CalendarItem {
 
@@ -614,6 +616,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		_image = new Image(getDisplay(), canvasWidth, canvasHeight);
 
 		// one col left and right of the week + 7 week days
+		final int numCalendarColumns = 1;
 		final int numDayColumns = 7;
 		_rowHeight = _currentConfig.weekHeight;
 
@@ -655,7 +658,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			summaryColumnWidth = _currentConfig.summaryColumnWidth * _defaultFontAverageCharWidth;
 		}
 
-		final float cellWidth = (float) (canvasWidth - dateColumnWidth - summaryColumnWidth) / numDayColumns;
+		final int calendarColumnWidth = canvasWidth / numCalendarColumns;
+		final float cellWidth = (float) (calendarColumnWidth - dateColumnWidth - summaryColumnWidth) / numDayColumns;
 
 		_calendarAllDaysRectangle = new Rectangle(dateColumnWidth, 0, (int) (7 * cellWidth), canvasHeight);
 
@@ -679,154 +683,157 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		// we use simple ids
 		long dayId = new Day(currentDate).dayId;
 
-		// week rows
-		for (int rowIndex = 0; rowIndex < numRows; rowIndex++) {
+		for (int columnIndex = 0; columnIndex < numCalendarColumns; columnIndex++) {
 
-			final int rowTop = rowIndex * _rowHeight;
+			// week rows
+			for (int rowIndex = 0; rowIndex < numRows; rowIndex++) {
 
-			// save the first day of this week as a pointer to this week
-			final LocalDate week1stDay = currentDate;
+				final int rowTop = rowIndex * _rowHeight;
 
-			// draw date column
-			if (dateColumnWidth > 0) {
-				drawDateColumn(gc, currentDate, rowTop, _currentConfig.dateColumnContent);
-			}
+				// save the first day of this week as a pointer to this week
+				final LocalDate week1stDay = currentDate;
 
-			for (int columnIndex = 0; columnIndex < 7; columnIndex++) {
-
-				final int posX = dateColumnWidth + (int) (columnIndex * cellWidth);
-				final int posXNext = dateColumnWidth + (int) ((columnIndex + 1) * cellWidth);
-
-				// rectangle for the whole day cell
-				final Rectangle dayRect = new Rectangle(//
-						posX,
-						rowTop,
-						posXNext - posX,
-						_rowHeight);
-
-				final Day day = new Day(dayId);
-				_dayFocus.add(new ObjectLocation(dayRect, dayId, day));
-				dayId = day.dayId + 1;
-
-				final int weekDay = currentDate.getDayOfWeek().getValue();
-
-				gc.setFont(normalFont);
-				gc.setBackground(_white);
-
-				// Day background with alternate color
-				if (_currentConfig.isToggleMonthColor && currentDate.getMonthValue() % 2 == 1) {
-
-					gc.setBackground(monthAlternateColor);
-					gc.fillRectangle(//
-							dayRect.x,
-							dayRect.y,
-							dayRect.width - 1,
-							dayRect.height - 1);
+				// draw date column
+				if (dateColumnWidth > 0) {
+					drawDateColumn(gc, currentDate, rowTop, _currentConfig.dateColumnContent);
 				}
 
-				// get date label width
-				final String dayDateLabel = dayDateFormatter.format(currentDate);
+				for (int dayIndex = 0; dayIndex < 7; dayIndex++) {
 
-				gc.setFont(dayDateFont);
-				final Point labelExtent = gc.textExtent(dayDateLabel);
-				final int dayLabelWidth = labelExtent.x;
-				final int dayLabelHeight = labelExtent.y;
+					final int posX = dateColumnWidth + (int) (dayIndex * cellWidth);
+					final int posXNext = dateColumnWidth + (int) ((dayIndex + 1) * cellWidth);
 
-				final int labelWidthWithOffset = dayLabelWidth + dayLabelRightBorder;
-				final int dateLabelPosX = posXNext - labelWidthWithOffset;
-
-				_dayDateLabelRect = null;
-				if (_currentConfig.isShowDayDate) {
-					_dayDateLabelRect = new Rectangle(dateLabelPosX, rowTop, dayLabelWidth, dayLabelHeight);
-				}
-
-				final CalendarTourData[] calendarData = _dataProvider.getCalendarDayData(currentDate);
-
-				final boolean isCalendarDataAvailable = calendarData.length > 0;
-
-				final boolean isShowDayDate = _currentConfig.isHideDayDateWhenNoTour == false //
-						|| _currentConfig.isHideDayDateWhenNoTour && isCalendarDataAvailable;
-
-				if (isCalendarDataAvailable) {
-
-					// tours are available
-
-					drawDay(gc, calendarData, dayRect);
-				}
-
-				// draw day date AFTER the tour is painted
-				if (_currentConfig.isShowDayDate && isShowDayDate) {
-
-					// this clipping should only kick in if shortest label format is still longer than the cell width
-					gc.setClipping(posX, rowTop, dayRect.width, dayDateHeight);
-
-					final boolean isWeekendColor = _currentConfig.isShowDayDateWeekendColor //
-							// ISO: 6 == saturday, 7 == sunday
-							&& (weekDay == 6 || weekDay == 7);
-
-					Color dayDateForegroundColor;
-
-					if (day.dayId == todayDayId) {
-
-						dayDateForegroundColor = (_blue);
-
-					} else if (isWeekendColor) {
-
-						dayDateForegroundColor = (_red);
-
-					} else if (isCalendarDataAvailable) {
-
-						dayDateForegroundColor = getUI_ContentColor(calendarData[0]);
-
-					} else {
-
-						dayDateForegroundColor = (_darkGray);
-					}
-
-					// day header label
-					gc.setFont(dayDateFont);
-
-					if (isWeekendColor && isCalendarDataAvailable) {
-
-						// paint outline, red is not very good visible with a dark background
-
-						gc.setForeground(_white);
-
-						gc.drawText(dayDateLabel, dateLabelPosX + 1, rowTop + 1, true);
-						gc.drawText(dayDateLabel, dateLabelPosX + 1, rowTop - 1, true);
-						gc.drawText(dayDateLabel, dateLabelPosX - 1, rowTop + 1, true);
-						gc.drawText(dayDateLabel, dateLabelPosX - 1, rowTop - 1, true);
-					}
-
-					gc.setForeground(dayDateForegroundColor);
-					gc.drawText(
-							dayDateLabel,
-							dateLabelPosX,
+					// rectangle for the whole day cell
+					final Rectangle dayRect = new Rectangle(//
+							posX,
 							rowTop,
-							true);
+							posXNext - posX,
+							_rowHeight);
 
-					gc.setClipping(_nullRec);
+					final Day day = new Day(dayId);
+					_dayFocus.add(new ObjectLocation(dayRect, dayId, day));
+					dayId = day.dayId + 1;
+
+					final int weekDay = currentDate.getDayOfWeek().getValue();
+
+					gc.setFont(normalFont);
+					gc.setBackground(_white);
+
+					// Day background with alternate color
+					if (_currentConfig.isToggleMonthColor && currentDate.getMonthValue() % 2 == 1) {
+
+						gc.setBackground(monthAlternateColor);
+						gc.fillRectangle(//
+								dayRect.x,
+								dayRect.y,
+								dayRect.width - 1,
+								dayRect.height - 1);
+					}
+
+					// get date label width
+					final String dayDateLabel = dayDateFormatter.format(currentDate);
+
+					gc.setFont(dayDateFont);
+					final Point labelExtent = gc.textExtent(dayDateLabel);
+					final int dayLabelWidth = labelExtent.x;
+					final int dayLabelHeight = labelExtent.y;
+
+					final int labelWidthWithOffset = dayLabelWidth + dayLabelRightBorder;
+					final int dateLabelPosX = posXNext - labelWidthWithOffset;
+
+					_dayDateLabelRect = null;
+					if (_currentConfig.isShowDayDate) {
+						_dayDateLabelRect = new Rectangle(dateLabelPosX, rowTop, dayLabelWidth, dayLabelHeight);
+					}
+
+					final CalendarTourData[] calendarData = _dataProvider.getCalendarDayData(currentDate);
+
+					final boolean isCalendarDataAvailable = calendarData.length > 0;
+
+					final boolean isShowDayDate = _currentConfig.isHideDayDateWhenNoTour == false //
+							|| _currentConfig.isHideDayDateWhenNoTour && isCalendarDataAvailable;
+
+					if (isCalendarDataAvailable) {
+
+						// tours are available
+
+						drawDay(gc, calendarData, dayRect);
+					}
+
+					// draw day date AFTER the tour is painted
+					if (_currentConfig.isShowDayDate && isShowDayDate) {
+
+						// this clipping should only kick in if shortest label format is still longer than the cell width
+						gc.setClipping(posX, rowTop, dayRect.width, dayDateHeight);
+
+						final boolean isWeekendColor = _currentConfig.isShowDayDateWeekendColor //
+								// ISO: 6 == saturday, 7 == sunday
+								&& (weekDay == 6 || weekDay == 7);
+
+						Color dayDateForegroundColor;
+
+						if (day.dayId == todayDayId) {
+
+							dayDateForegroundColor = (_blue);
+
+						} else if (isWeekendColor) {
+
+							dayDateForegroundColor = (_red);
+
+						} else if (isCalendarDataAvailable) {
+
+							dayDateForegroundColor = getUI_ContentColor(calendarData[0]);
+
+						} else {
+
+							dayDateForegroundColor = (_darkGray);
+						}
+
+						// day header label
+						gc.setFont(dayDateFont);
+
+						if (isWeekendColor && isCalendarDataAvailable) {
+
+							// paint outline, red is not very good visible with a dark background
+
+							gc.setForeground(_white);
+
+							gc.drawText(dayDateLabel, dateLabelPosX + 1, rowTop + 1, true);
+							gc.drawText(dayDateLabel, dateLabelPosX + 1, rowTop - 1, true);
+							gc.drawText(dayDateLabel, dateLabelPosX - 1, rowTop + 1, true);
+							gc.drawText(dayDateLabel, dateLabelPosX - 1, rowTop - 1, true);
+						}
+
+						gc.setForeground(dayDateForegroundColor);
+						gc.drawText(
+								dayDateLabel,
+								dateLabelPosX,
+								rowTop,
+								true);
+
+						gc.setClipping(_nullRec);
+					}
+
+					currentDate = currentDate.plusDays(1);
 				}
 
-				currentDate = currentDate.plusDays(1);
-			}
+				if (summaryColumnWidth > 0) {
 
-			if (summaryColumnWidth > 0) {
+					final int X1 = dateColumnWidth + (int) (7 * cellWidth);
+					final int X2 = X1 + summaryColumnWidth;
 
-				final int X1 = dateColumnWidth + (int) (7 * cellWidth);
-				final int X2 = X1 + summaryColumnWidth;
+					final Rectangle weekRec = new Rectangle(X1, rowTop, (X2 - X1), _rowHeight);
 
-				final Rectangle weekRec = new Rectangle(X1, rowTop, (X2 - X1), _rowHeight);
+					final CalendarTourData weekSummary = _dataProvider.getCalendarWeekSummaryData(
+							week1stDay,
+							_calendarView);
 
-				final CalendarTourData weekSummary = _dataProvider.getCalendarWeekSummaryData(
-						week1stDay,
-						_calendarView);
-
-				if (weekSummary.loadingState == LoadingState.IS_LOADED && weekSummary.numTours > 0) {
-					drawWeek_Summary(gc, weekSummary, weekRec);
+					if (weekSummary.loadingState == LoadingState.IS_LOADED && weekSummary.numTours > 0) {
+						drawWeek_Summary(gc, weekSummary, weekRec);
+					}
 				}
-			}
 
+			}
 		}
 
 		// draw the selection on top of our calendar graph image so we can reuse that image
@@ -969,7 +976,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		final int devYBottom = devY + cellHeight - 1;
 
 		drawDay_TourBackground(gc, data, devX, devY, cellWidth, cellHeight, devXRight, devYBottom);
-		drawTour_Border(gc, data, devX, devY, cellWidth, cellHeight, devXRight, devYBottom);
+		drawDay_TourBorder(gc, data, devX, devY, cellWidth, cellHeight, devXRight, devYBottom);
 		drawDay_TourText(gc, tourRect, data);
 	}
 
@@ -1017,14 +1024,14 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			break;
 
 		case CIRCLE:
-			final int minCellSize = Math.min(cellWidth, cellHeight);
+			final int ovalSize = Math.min(cellWidth, cellHeight);
 			gc.setAntialias(SWT.ON);
 			gc.setBackground(backgroundColor);
 			gc.fillOval(
-					devX + cellWidth / 4,
+					devX + cellWidth / 2 - ovalSize / 2,
 					devY,
-					minCellSize,
-					minCellSize);
+					ovalSize,
+					ovalSize);
 			break;
 
 		case GRADIENT_HORIZONTAL:
@@ -1053,6 +1060,110 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 					cellWidth,
 					cellHeight,
 					isVertical);
+		}
+	}
+
+	/**
+	 * Tour border
+	 */
+	private void drawDay_TourBorder(final GC gc,
+									final CalendarTourData data,
+									final int devX,
+									final int devY,
+									final int cellWidth,
+									final int cellHeight,
+									final int devXRight,
+									final int devYBottom) {
+
+		final RGB tourBorderRGB = getUI_CalendarRGB(_currentConfig.tourBorderColor, data);
+		final Color line = _colorCache.getColor(tourBorderRGB.hashCode());
+
+		gc.setForeground(line);
+		gc.setBackground(line);
+
+		final int tourBorderWidth = _currentConfig.tourBorderWidth;
+
+		final int borderWidth = (int) (tourBorderWidth <= 10 ? tourBorderWidth //
+				: cellWidth * (tourBorderWidth / 100.0));
+
+		final int borderHeight = (int) (tourBorderWidth <= 10 ? tourBorderWidth //
+				: cellHeight * (tourBorderWidth / 100.0));
+
+		boolean isTop = false;
+		boolean isLeft = false;
+		boolean isRight = false;
+		boolean isBottom = false;
+
+		switch (_currentConfig.tourBorder) {
+
+		case BORDER_ALL:
+			isTop = true;
+			isBottom = true;
+			isLeft = true;
+			isRight = true;
+			break;
+
+		case BORDER_TOP:
+			isTop = true;
+			break;
+
+		case BORDER_BOTTOM:
+			isBottom = true;
+			break;
+
+		case BORDER_TOP_BOTTOM:
+			isTop = true;
+			isBottom = true;
+			break;
+
+		case BORDER_LEFT_RIGHT:
+			isLeft = true;
+			isRight = true;
+			break;
+
+		case BORDER_LEFT:
+			isLeft = true;
+			break;
+
+		case BORDER_RIGHT:
+			isRight = true;
+			break;
+
+		case NO_BORDER:
+		default:
+			break;
+		}
+
+		if (isTop) {
+			gc.fillRectangle(//
+					devX,
+					devY,
+					cellWidth,
+					borderHeight);
+		}
+
+		if (isBottom) {
+			gc.fillRectangle(//
+					devX,
+					devY + cellHeight - borderHeight,
+					cellWidth,
+					borderHeight);
+		}
+
+		if (isLeft) {
+			gc.fillRectangle(//
+					devX,
+					devY,
+					borderWidth,
+					cellHeight);
+		}
+
+		if (isRight) {
+			gc.fillRectangle(//
+					devX + cellWidth - borderWidth,
+					devY,
+					borderWidth,
+					cellHeight);
 		}
 	}
 
@@ -1210,70 +1321,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 				}
 				return;
 			}
-		}
-	}
-
-	/**
-	 * Tour border
-	 */
-	private void drawTour_Border(	final GC gc,
-									final CalendarTourData data,
-									final int devX,
-									final int devY,
-									final int cellWidth,
-									final int cellHeight,
-									final int devXRight,
-									final int devYBottom) {
-
-		final Color line = _colorCache.getColor(_rgbLine.get(data.typeColorIndex).hashCode());
-
-		gc.setForeground(line);
-		gc.setBackground(line);
-
-		final int tourBorderWidth = _currentConfig.tourBorderWidth;
-
-		final int borderWidth = (int) (tourBorderWidth <= 10 ? tourBorderWidth //
-				: cellWidth * (tourBorderWidth / 100.0));
-
-		final int borderHeight = (int) (tourBorderWidth <= 10 ? tourBorderWidth //
-				: cellHeight * (tourBorderWidth / 100.0));
-
-		switch (_currentConfig.tourBorder) {
-
-		case BORDER_ALL:
-			gc.drawRectangle(devX, devY, cellWidth - 1, cellHeight - 1);
-			break;
-
-		case BORDER_TOP:
-			gc.fillRectangle(devX, devY, cellWidth, borderHeight);
-			break;
-
-		case BORDER_BOTTOM:
-			gc.fillRectangle(devX, devY + cellHeight - borderHeight, cellWidth, borderHeight);
-			break;
-
-		case BORDER_TOP_BOTTOM:
-			gc.drawLine(devX, devY, devXRight, devY);
-			gc.drawLine(devX, devYBottom, devXRight, devYBottom);
-			break;
-
-		case BORDER_LEFT_RIGHT:
-			gc.drawLine(devX, devY, devX, devYBottom);
-			gc.drawLine(devXRight, devY, devXRight, devYBottom);
-
-			break;
-
-		case BORDER_LEFT:
-			gc.drawLine(devX, devY, devX, devYBottom);
-			break;
-
-		case BORDER_RIGHT:
-			gc.drawLine(devXRight, devY, devXRight, devYBottom);
-			break;
-
-		case NO_BORDER:
-		default:
-			break;
 		}
 	}
 
@@ -1494,6 +1541,12 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		case LINE:
 			return _rgbLine.get(data.typeColorIndex);
+
+		case WHITE:
+			return _whiteRGB;
+
+		case BLACK:
+			return _blackRGB;
 
 		case DARK:
 		default:

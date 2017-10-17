@@ -21,4 +21,9 @@ public enum CalendarColor {
 	DARK, //
 	LINE, //
 
+	BLACK, //
+	WHITE, //
+
+	CONTRAST, //
+
 }

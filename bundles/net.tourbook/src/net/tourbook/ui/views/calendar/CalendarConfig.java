@@ -49,7 +49,7 @@ public class CalendarConfig {
 	boolean				isShowDayDate				= true;
 	boolean				isToggleMonthColor			= true;
 	FontData			dayContentFont				= JFaceResources.getFontRegistry().defaultFont().getFontData()[0];
-	DayContentColor		dayContentColor				= CalendarConfigManager.DEFAULT_DAY_CONTENT_COLOR;
+	CalendarColor		dayContentColor				= CalendarConfigManager.DEFAULT_DAY_CONTENT_COLOR;
                                                             
 	// tour
 	TourBackground		tourBackground				= CalendarConfigManager.DEFAULT_TOUR_BACKGROUND;
