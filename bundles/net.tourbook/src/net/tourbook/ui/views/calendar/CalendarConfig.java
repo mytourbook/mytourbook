@@ -37,6 +37,7 @@ public class CalendarConfig {
 	String				name						= CalendarConfigManager.CONFIG_DEFAULT_ID_1;
                                                             
 	// layout
+	int					calendarColumns				= CalendarConfigManager.DEFAULT_CALENDAR_COLUMNS;
 	int					weekHeight					= CalendarConfigManager.DEFAULT_WEEK_HEIGHT;
 
 	// day date

@@ -149,6 +149,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	private SimpleFontEditor	_fontEditorDayDate;
 	private SimpleFontEditor	_fontEditorDateColumn;
 
+	private Spinner				_spinnerCalendarColumns;
 	private Spinner				_spinnerDateColumnWidth;
 	private Spinner				_spinnerSummaryColumnWidth;
 	private Spinner				_spinnerTourBackgroundWidth;
@@ -308,7 +309,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 					// size
 					_spinnerDateColumnWidth = new Spinner(container, SWT.BORDER);
 					_spinnerDateColumnWidth.setMinimum(1);
-					_spinnerDateColumnWidth.setMaximum(50);
+					_spinnerDateColumnWidth.setMaximum(200);
 					_spinnerDateColumnWidth.setIncrement(1);
 					_spinnerDateColumnWidth.setPageIncrement(10);
 					_spinnerDateColumnWidth.addSelectionListener(_defaultSelectionListener);
@@ -693,20 +694,46 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 	private void createUI_800_CommonLayout(final Composite parent) {
 
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
 		{
-			// label: symbol
-			final Label label = new Label(parent, SWT.NONE);
-			label.setText(Messages.Slideout_CalendarOptions_Label_RowHeight);
-			label.setToolTipText(Messages.Slideout_CalendarOptions_Label_RowHeight_Tooltip);
+			{
+				/*
+				 * Week height
+				 */
+				// label
+				final Label label = new Label(container, SWT.NONE);
+				label.setText(Messages.Slideout_CalendarOptions_Label_RowHeight);
+				label.setToolTipText(Messages.Slideout_CalendarOptions_Label_RowHeight_Tooltip);
 
-			// size
-			_spinnerWeekHeight = new Spinner(parent, SWT.BORDER);
-			_spinnerWeekHeight.setMinimum(CalendarConfigManager.WEEK_HEIGHT_MIN);
-			_spinnerWeekHeight.setMaximum(CalendarConfigManager.WEEK_HEIGHT_MAX);
-			_spinnerWeekHeight.setIncrement(1);
-			_spinnerWeekHeight.setPageIncrement(10);
-			_spinnerWeekHeight.addSelectionListener(_defaultSelectionListener);
-			_spinnerWeekHeight.addMouseWheelListener(_defaultMouseWheelListener);
+				// spinner: height
+				_spinnerWeekHeight = new Spinner(container, SWT.BORDER);
+				_spinnerWeekHeight.setMinimum(CalendarConfigManager.WEEK_HEIGHT_MIN);
+				_spinnerWeekHeight.setMaximum(CalendarConfigManager.WEEK_HEIGHT_MAX);
+				_spinnerWeekHeight.setIncrement(1);
+				_spinnerWeekHeight.setPageIncrement(10);
+				_spinnerWeekHeight.addSelectionListener(_defaultSelectionListener);
+				_spinnerWeekHeight.addMouseWheelListener(_defaultMouseWheelListener);
+			}
+			{
+				/*
+				 * Calendar columns
+				 */
+				// label
+				final Label label = new Label(container, SWT.NONE);
+				label.setText(Messages.Slideout_CalendarOptions_Label_CalendarColumns);
+				label.setToolTipText(Messages.Slideout_CalendarOptions_Label_CalendarColumns_Tooltip);
+
+				// spinner: columns
+				_spinnerCalendarColumns = new Spinner(container, SWT.BORDER);
+				_spinnerCalendarColumns.setMinimum(CalendarConfigManager.CALENDAR_COLUMNS_MIN);
+				_spinnerCalendarColumns.setMaximum(CalendarConfigManager.CALENDAR_COLUMNS_MAX);
+				_spinnerCalendarColumns.setIncrement(1);
+				_spinnerCalendarColumns.setPageIncrement(2);
+				_spinnerCalendarColumns.addSelectionListener(_defaultSelectionListener);
+				_spinnerCalendarColumns.addMouseWheelListener(_defaultMouseWheelListener);
+			}
 		}
 
 	}
@@ -1538,6 +1565,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			_spinnerSummaryColumnWidth.setSelection(config.summaryColumnWidth);
 
 			// layout
+			_spinnerCalendarColumns.setSelection(config.calendarColumns);
 			_spinnerWeekHeight.setSelection(config.weekHeight);
 		}
 		_isUpdateUI = false;
@@ -1584,6 +1612,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		config.summaryColumnWidth = _spinnerSummaryColumnWidth.getSelection();
 
 		// layout
+		config.calendarColumns = _spinnerCalendarColumns.getSelection();
 		config.weekHeight = _spinnerWeekHeight.getSelection();
 
 		_calendarView.updateUI_CalendarConfig();

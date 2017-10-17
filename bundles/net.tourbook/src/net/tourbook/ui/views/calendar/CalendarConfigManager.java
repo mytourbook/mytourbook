@@ -91,6 +91,7 @@ public class CalendarConfigManager {
 	private static final String		ATTR_IS_SHOW_DAY_DATE_WEEKEND_COLOR		= "isShowDayDateWeekendColor";			//$NON-NLS-1$
 	private static final String		ATTR_IS_SHOW_SUMMARY_COLUMN				= "isShowSummaryColumn";				//$NON-NLS-1$
 	private static final String		ATTR_IS_TOGGLE_MONTH_COLOR				= "isToggleMonthColor";					//$NON-NLS-1$
+	private static final String		ATTR_CALENDAR_COLUMNS					= "calendarColumns";					//$NON-NLS-1$
 	private static final String		ATTR_DATE_COLUMN_CONTENT				= "dateColumnContent";					//$NON-NLS-1$
 	private static final String		ATTR_DATE_COLUMN_FONT					= "dateColumnFont";						//$NON-NLS-1$
 	private static final String		ATTR_DATE_COLUMN_WIDTH					= "dateColumnWidth";					//$NON-NLS-1$
@@ -108,12 +109,13 @@ public class CalendarConfigManager {
 	private static final String		ATTR_TOUR_BACKGROUND_WIDTH				= "tourBorderWidth";					//$NON-NLS-1$
 	private static final String		ATTR_WEEK_HEIGHT						= "weekHeight";							//$NON-NLS-1$
 	//
+	static final int				DEFAULT_CALENDAR_COLUMNS				= 1;
 	static final CalendarColor		DEFAULT_DAY_CONTENT_COLOR				= CalendarColor.CONTRAST;
 	static final DayDateFormat		DEFAULT_DAY_DATE_FORMAT					= DayDateFormat.DAY;
-	static final int				DEFAULT_DATE_COLUMN_WIDTH				= 10;
+	static final int				DEFAULT_DATE_COLUMN_WIDTH				= 50;
 	static final DateColumnContent	DEFAULT_DATE_COLUMN_CONTENT				= DateColumnContent.WEEK_NUMBER;
 	static final boolean			DEFAULT_IS_SHOW_DAY_DATE_WEEKEND_COLOR	= false;
-	static final int				DEFAULT_SUMMARY_COLUMN_WIDTH			= 10;
+	static final int				DEFAULT_SUMMARY_COLUMN_WIDTH			= 50;
 	static final TourBackground		DEFAULT_TOUR_BACKGROUND					= TourBackground.FILL;
 	static final CalendarColor		DEFAULT_TOUR_BACKGROUND_COLOR1			= CalendarColor.DARK;
 	static final CalendarColor		DEFAULT_TOUR_BACKGROUND_COLOR2			= CalendarColor.BRIGHT;
@@ -123,6 +125,8 @@ public class CalendarConfigManager {
 	static final int				DEFAULT_TOUR_BORDER_WIDTH				= 1;
 	static final int				DEFAULT_WEEK_HEIGHT						= 70;
 	//
+	static final int				CALENDAR_COLUMNS_MIN					= 1;
+	static final int				CALENDAR_COLUMNS_MAX					= 20;
 	static final int				WEEK_HEIGHT_MIN							= 1;
 	static final int				WEEK_HEIGHT_MAX							= 500;
 	//
@@ -536,6 +540,7 @@ public class CalendarConfigManager {
 			xmlConfig.putInteger(ATTR_SUMMARY_COLUMN_WIDTH, config.summaryColumnWidth);
 
 			// layout
+			xmlConfig.putInteger(ATTR_CALENDAR_COLUMNS, config.calendarColumns);
 			xmlConfig.putInteger(ATTR_WEEK_HEIGHT, config.weekHeight);
 		}
 	}
@@ -716,6 +721,7 @@ public class CalendarConfigManager {
 		config.summaryColumnWidth			= Util.getXmlInteger(xmlConfig, ATTR_SUMMARY_COLUMN_WIDTH,				DEFAULT_SUMMARY_COLUMN_WIDTH);
                                                                                                                     
 		// layout
+		config.calendarColumns				= Util.getXmlInteger(xmlConfig, ATTR_CALENDAR_COLUMNS,					DEFAULT_CALENDAR_COLUMNS);
 		config.weekHeight					= Util.getXmlInteger(xmlConfig, ATTR_WEEK_HEIGHT,						DEFAULT_WEEK_HEIGHT);
 
 // SET_FORMATTING_ON
