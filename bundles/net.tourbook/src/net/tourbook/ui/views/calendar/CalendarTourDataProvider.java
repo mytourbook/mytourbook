@@ -20,6 +20,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,7 +37,6 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.SQLFilter;
 
 import org.eclipse.swt.widgets.Display;
-import org.joda.time.DateTime;
 
 public class CalendarTourDataProvider {
 
@@ -71,7 +71,7 @@ public class CalendarTourDataProvider {
 	private HashMap<Integer, CalendarTourData[][][]>	_dayCache	= new HashMap<Integer, CalendarTourData[][][]>();
 	private HashMap<Integer, CalendarTourData[]>		_weekCache	= new HashMap<Integer, CalendarTourData[]>();
 
-	private DateTime									_firstDateTime;
+	private LocalDateTime								_firstTourDateTime;
 
 	private CalendarTourDataProvider() {
 		invalidate();
@@ -361,7 +361,7 @@ public class CalendarTourDataProvider {
 					data.tourTitle = dbTourTitle.get(tourIndex);
 					data.tourDescription = dbTourDescription.get(tourIndex);
 
-					data.dayOfWeek = (new DateTime(year, month, data.day, 12, 0, 0, 0)).getDayOfWeek();
+					data.dayOfWeek = LocalDate.of(year, month, data.day).getDayOfWeek().getValue();
 
 					dayData[tourIndex] = data;
 
@@ -386,14 +386,14 @@ public class CalendarTourDataProvider {
 		return monthData;
 	}
 
-	DateTime getCalendarTourDateTime(final Long tourId) {
+	LocalDateTime getCalendarTourDateTime(final Long tourId) {
 
-		DateTime dt = new DateTime();
+		LocalDateTime dt = LocalDateTime.now();
 
 		final String select = "SELECT " //$NON-NLS-1$
 				+ "StartYear," //				2 //$NON-NLS-1$
 				+ "StartMonth," //				3 //$NON-NLS-1$
-				+ "StartDay," //				4 //$NON-NLS-1$
+				+ "StartDay" //					4 //$NON-NLS-1$
 				+ "StartHour," //				5 //$NON-NLS-1$
 				+ "StartMinute" //				6 //$NON-NLS-1$
 				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + UI.NEW_LINE) //$NON-NLS-1$
@@ -407,13 +407,16 @@ public class CalendarTourDataProvider {
 
 			statement.setLong(1, tourId);
 			final ResultSet result = statement.executeQuery();
+
 			while (result.next()) {
+
 				final int year = result.getShort(1);
 				final int month = result.getShort(2);
 				final int day = result.getShort(3);
 				final int hour = result.getShort(4);
 				final int minute = result.getShort(5);
-				dt = new DateTime(year, month, day, hour, minute, 0, 0);
+
+				dt = LocalDateTime.of(year, month, day, hour, minute);
 			}
 			conn.close();
 
@@ -508,10 +511,13 @@ public class CalendarTourDataProvider {
 
 	}
 
-	DateTime getFirstDateTime() {
+	/**
+	 * @return Returns the date/time of the first available tour
+	 */
+	LocalDateTime getFirstTourDateTime() {
 
-		if (null != _firstDateTime) {
-			return _firstDateTime;
+		if (null != _firstTourDateTime) {
+			return _firstTourDateTime;
 		}
 
 		final String select = "SELECT " //$NON-NLS-1$
@@ -538,7 +544,7 @@ public class CalendarTourDataProvider {
 
 					// this case happened that year/month/day is 0
 
-					_firstDateTime = new DateTime(year, month, day, 12, 0, 0, 0);
+					_firstTourDateTime = LocalDateTime.of(year, month, day, 12, 0);
 
 					break;
 				}
@@ -549,11 +555,11 @@ public class CalendarTourDataProvider {
 			net.tourbook.ui.UI.showSQLException(e);
 		}
 
-		if (_firstDateTime == null) {
-			_firstDateTime = (new DateTime()).minusYears(1);
+		if (_firstTourDateTime == null) {
+			_firstTourDateTime = LocalDateTime.now().minusYears(1);
 		}
 
-		return _firstDateTime;
+		return _firstTourDateTime;
 
 	}
 
@@ -566,7 +572,7 @@ public class CalendarTourDataProvider {
 		_dayCache.clear();
 		_weekCache.clear();
 
-		_firstDateTime = null;
+		_firstTourDateTime = null;
 	}
 
 	private boolean loadWeek_FromDB(final WeekLoader weekLoader) {

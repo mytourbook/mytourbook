@@ -125,7 +125,6 @@ public class TimeTools {
 
 	public static final DateTimeFormatter			Formatter_Time_ISO;
 
-
 	private final static IPreferenceStore			_prefStoreCommon		= CommonActivator.getPrefStore();
 
 	private static ArrayList<TimeZoneData>			_allSortedTimeZones;
@@ -373,6 +372,14 @@ public class TimeTools {
 		final Period period = new Period(tzOffset * 1000);
 
 		return period.toString(DURATION_FORMATTER);
+	}
+
+	/**
+	 * @return Returns the app first day of week
+	 */
+	public static DayOfWeek getFirstDayOfWeek() {
+
+		return calendarWeek.getFirstDayOfWeek();
 	}
 
 	/**
@@ -644,6 +651,16 @@ public class TimeTools {
 	public static long toEpochMilli(final ZonedDateTime zonedDateTime) {
 
 		return zonedDateTime.toInstant().toEpochMilli();
+	}
+
+	/**
+	 * @param epochOfMilli
+	 *            The number of milliseconds from 1970-01-01T00:00:00Z
+	 * @return Returns a date from epochOfMilli.
+	 */
+	public static LocalDate toLocalDate(final long epochOfMilli) {
+
+		return LocalDate.ofEpochDay(epochOfMilli / 86400000L);
 	}
 
 	/**

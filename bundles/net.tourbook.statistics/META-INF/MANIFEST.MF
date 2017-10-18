@@ -28,10 +28,4 @@ Import-Package: gnu.trove.list.array,
  net.tourbook.tour,
  net.tourbook.ui,
  net.tourbook.ui.action,
- org.eclipse.ui.forms.widgets,
- org.joda.time,
- org.joda.time.base,
- org.joda.time.chrono,
- org.joda.time.convert,
- org.joda.time.field,
- org.joda.time.format
+ org.eclipse.ui.forms.widgets

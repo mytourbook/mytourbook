@@ -70,7 +70,6 @@ import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
-import org.joda.time.DateTime;
 
 public class CalendarView extends ViewPart implements ITourProvider, ICalendarConfigProvider {
 
@@ -85,10 +84,11 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarCo
 	private static final String		STATE_IS_SHOW_TOUR_INFO					= "STATE_IS_SHOW_TOUR_INFO";	 					//$NON-NLS-1$
 	static final String 			STATE_TOUR_TOOLTIP_DELAY	 			= "STATE_TOUR_TOOLTIP_DELAY"; 						//$NON-NLS-1$
 
+	private static final String		STATE_FIRST_DISPLAYED_EPOCH_DAY			= "STATE_FIRST_DISPLAYED_EPOCH_DAY";				//$NON-NLS-1$
+	
 	/////////////////////////////////////////////////////////////////
 	// old states
 	/////////////////////////////////////////////////////////////////
-	private static final String		STATE_FIRST_DAY							= "FirstDayDisplayed";								//$NON-NLS-1$
 	private static final String		STATE_SELECTED_TOURS					= "SelectedTours";									//$NON-NLS-1$
 	private static final String		STATE_TOUR_INFO_FORMATTER_INDEX_		= "TourInfoFormatterIndex";							//$NON-NLS-1$
 	private static final String		STATE_WEEK_SUMMARY_FORMATTER_INDEX_		= "WeekSummaryFormatterIndex";						//$NON-NLS-1$
@@ -1247,16 +1247,16 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarCo
 		_actionSetLinked.setChecked(Util.getStateBoolean(_state, STATE_IS_LINKED, false));
 		_actionTourInfo.setSelected(Util.getStateBoolean(_state, STATE_IS_SHOW_TOUR_INFO, true));
 
+		final long epochDay = Util.getStateLong(_state, STATE_FIRST_DISPLAYED_EPOCH_DAY, Long.MIN_VALUE);
+		if (epochDay == Long.MIN_VALUE) {
+			_calendarGraph.gotoDate(LocalDate.now());
+		} else {
+			_calendarGraph.setFirstDay(LocalDate.ofEpochDay(epochDay));
+		}
+
 		/////////////////////////////////////////////////////////////////////////////////////
 		// old states
 		/////////////////////////////////////////////////////////////////////////////////////
-
-		final Long dateTimeMillis = Util.getStateLong(_state, STATE_FIRST_DAY, 0);
-		if (dateTimeMillis > 0) {
-			_calendarGraph.setFirstDay(new DateTime(dateTimeMillis));
-		} else {
-			_calendarGraph.gotoDate(new DateTime());
-		}
 
 		final Long selectedTourId = Util.getStateLong(_state, STATE_SELECTED_TOURS, new Long(-1));
 		_calendarGraph.setSelectionTourId(selectedTourId);
@@ -1300,7 +1300,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarCo
 		_state.put(STATE_IS_SHOW_TOUR_INFO, _actionTourInfo.isChecked());
 
 		// save current date displayed
-		_state.put(STATE_FIRST_DAY, _calendarGraph.getFirstDay().getMillis());
+		_state.put(STATE_FIRST_DISPLAYED_EPOCH_DAY, _calendarGraph.getFirstDay().toLocalDate().toEpochDay());
 
 		// until now we only implement single tour selection
 		_state.put(STATE_SELECTED_TOURS, _calendarGraph.getSelectedTourId());

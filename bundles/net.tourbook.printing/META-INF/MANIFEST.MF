@@ -20,6 +20,4 @@ Import-Package: net.tourbook.application,
  net.tourbook.tour.printing,
  net.tourbook.ui,
  org.apache.fop.apps,
- org.apache.xmlgraphics.util,
- org.joda.time,
- org.joda.time.format
+ org.apache.xmlgraphics.util

@@ -16,10 +16,13 @@
 
 package net.tourbook.ui.views.calendar;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import net.tourbook.Messages;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.ControlContribution;
@@ -34,8 +37,6 @@ import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
 
 public class CalendarYearMonthContributionItem extends ControlContribution {
 
@@ -129,18 +130,21 @@ public class CalendarYearMonthContributionItem extends ControlContribution {
 
 	private void fillMonthComboBox() {
 
-		DateTime dt = new DateTime();
-		final int thisMonth = dt.getMonthOfYear();
-		dt = dt.withMonthOfYear(DateTimeConstants.JANUARY);
+		LocalDate dt = LocalDate.now();
+		final int thisMonth = dt.getMonthValue();
+		dt = dt.withMonth(1);
 
 		_cboMonthValues = new ArrayList<Integer>();
 		_cboMonthKeys = new HashMap<Integer, Integer>();
 
-		for (int i = 0; i < 12; i++) {
-			// _cboMonth.add(dt.toString("MMMM"));
-			_cboMonth.add(dt.toString("MMM")); // make the toolbar fit more likely into one line //$NON-NLS-1$
-			_cboMonthValues.add(dt.getMonthOfYear());
-			_cboMonthKeys.put(dt.getMonthOfYear(), i);
+		for (int monthIndex = 0; monthIndex < 12; monthIndex++) {
+
+			// make the toolbar fit more likely into one line //$NON-NLS-1$
+			_cboMonth.add(TimeTools.Formatter_Month.format(dt));
+
+			_cboMonthValues.add(dt.getMonthValue());
+			_cboMonthKeys.put(dt.getMonthValue(), monthIndex);
+
 			dt = dt.plusMonths(1);
 		}
 
@@ -150,16 +154,18 @@ public class CalendarYearMonthContributionItem extends ControlContribution {
 
 	private void fillYearComboBox() {
 
-		final int thisYear = (new DateTime()).getYear();
+		final int thisYear = (LocalDate.now()).getYear();
 
 		_cboYearValues = new ArrayList<Integer>();
 		_cboYearKeys = new HashMap<Integer, Integer>();
 
 		// for (int i = thisYear, j = 0; j < 21; i--, j++) {
 		// changed to be consistent with the statistic charts
-		final DateTime firstTourDateTime = CalendarTourDataProvider.getInstance().getFirstDateTime();
+
+		final LocalDateTime firstTourDateTime = CalendarTourDataProvider.getInstance().getFirstTourDateTime();
 		final int firstYear = firstTourDateTime.getYear();
 		final int years = Math.max(thisYear - firstYear, 1);
+
 		for (int i = thisYear - years, j = 0; j <= years; i++, j++) {
 			_cboYear.add(UI.EMPTY_STRING + i);
 			_cboYearValues.add(i);
