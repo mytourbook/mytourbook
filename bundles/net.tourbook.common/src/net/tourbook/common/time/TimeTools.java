@@ -24,6 +24,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.time.Year;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -91,6 +92,11 @@ public class TimeTools {
 	 */
 	public static String[]							weekDays_Full;
 
+	/**
+	 * Contains the full text of a month
+	 */
+	public static String[]							month_Full;
+
 // SET_FORMATTING_OFF
 		
 	public static final DateTimeFormatter	Formatter_Date_S		= DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
@@ -116,6 +122,7 @@ public class TimeTools {
 	public static final DateTimeFormatter	Formatter_DayMonth		= DateTimeFormatter.ofPattern("d MMM");
 	public static final DateTimeFormatter	Formatter_DayMonthYear	= DateTimeFormatter.ofPattern("d MMM uu");
 	public static final DateTimeFormatter	Formatter_Month			= DateTimeFormatter.ofPattern("MMM");						//$NON-NLS-1$
+	public static final DateTimeFormatter	Formatter_Month_Full	= DateTimeFormatter.ofPattern("MMMM");						//$NON-NLS-1$
 	public static final DateTimeFormatter	Formatter_Week_Month	= DateTimeFormatter.ofPattern("dd MMM");					//$NON-NLS-1$
 	public static final DateTimeFormatter	Formatter_Weekday		= DateTimeFormatter.ofPattern("E");							//$NON-NLS-1$
 	public static final DateTimeFormatter	Formatter_Weekday_L		= DateTimeFormatter.ofPattern("EEEE");						//$NON-NLS-1$
@@ -171,6 +178,21 @@ public class TimeTools {
 
 		setCalendarWeek(firstDayOfWeek, minDaysInFirstWeek);
 
+		month_Full = new String[] {
+
+				Formatter_Month_Full.format(Month.JANUARY),
+				Formatter_Month_Full.format(Month.FEBRUARY),
+				Formatter_Month_Full.format(Month.MARCH),
+				Formatter_Month_Full.format(Month.APRIL),
+				Formatter_Month_Full.format(Month.MAY),
+				Formatter_Month_Full.format(Month.JUNE),
+				Formatter_Month_Full.format(Month.JULY),
+				Formatter_Month_Full.format(Month.AUGUST),
+				Formatter_Month_Full.format(Month.SEPTEMBER),
+				Formatter_Month_Full.format(Month.OCTOBER),
+				Formatter_Month_Full.format(Month.NOVEMBER),
+				Formatter_Month_Full.format(Month.DECEMBER)
+		};
 		/*
 		 * Create week day names. Found no better solution, the old API contained
 		 * "DateFormatSymbols.getInstance().getShortWeekdays()"

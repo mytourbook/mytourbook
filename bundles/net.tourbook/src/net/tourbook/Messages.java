@@ -48,6 +48,7 @@ public class Messages extends NLS {
 	public static String		Calendar_Config_Color_Dark;
 	public static String		Calendar_Config_Color_Line;
 	public static String		Calendar_Config_Color_White;
+	public static String		Calendar_Config_ColumnLayout_Continuously;
 	public static String		Calendar_Config_DateColumn_Month;
 	public static String		Calendar_Config_DateColumn_WeekNumber;
 	public static String		Calendar_Config_DateColumn_Year;
@@ -1651,6 +1652,12 @@ public class Messages extends NLS {
 	public static String		Slideout_CalendarOptions_Group_WeekSummary;
 	public static String		Slideout_CalendarOptions_Label_CalendarColumns;
 	public static String		Slideout_CalendarOptions_Label_CalendarColumns_Tooltip;
+
+	public static String		Slideout_CalendarOptions_Label_CalendarColumnsSpace;
+
+	public static String		Slideout_CalendarOptions_Label_CalendarColumnsSpace_Tooltip;
+
+	public static String		Slideout_CalendarOptions_Label_ColumnLayout;
 	public static String		Slideout_CalendarOptions_Label_DateColumn_Width;
 	public static String		Slideout_CalendarOptions_Label_DateColumn_Width_Tooltip;
 	public static String		Slideout_CalendarOptions_Label_DateColumnContent;

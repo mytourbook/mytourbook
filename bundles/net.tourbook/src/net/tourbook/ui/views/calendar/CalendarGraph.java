@@ -18,6 +18,7 @@ package net.tourbook.ui.views.calendar;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjuster;
@@ -620,8 +621,18 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 				// remove additional week, it may be invisible when height is very small
 				- 1;
 
-		// get the first day of the viewport
-		LocalDate currentDate = _firstDayTime.toLocalDate();
+		/*
+		 * Get first day of the viewport
+		 */
+		LocalDateTime firstDayTime = _firstDayTime;
+
+		// adjust to column layout
+		final boolean isColumnLayoutContinuously = _currentConfig.calendarColumnsLayout == ColumnLayout.CONTINUOUSLY;
+		if (!isColumnLayoutContinuously) {
+			firstDayTime = _firstDayTime = getColumnLayoutFirstDay(_currentConfig.calendarColumnsLayout, firstDayTime);
+		}
+
+		LocalDate currentDate = firstDayTime.toLocalDate();
 
 		// keep calendar viewport dates
 		_calendarFirstDay = currentDate;
@@ -653,7 +664,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			summaryColumnWidth = _currentConfig.summaryColumnWidth;// * _defaultFontAverageCharWidth;
 		}
 
-		final int calendarColumnWidth = canvasWidth / numCalendarColumns;
+		final int columnSpacing = _currentConfig.calendarColumnsSpacing;
+		final int allColumnSpace = (numCalendarColumns - 1) * columnSpacing;
+		final int calendarColumnWidth = (canvasWidth - allColumnSpace) / numCalendarColumns;
 		final float dayWidth = (float) (calendarColumnWidth - dateColumnWidth - summaryColumnWidth) / numDayColumns;
 
 		_calendarAllDaysRectangle = new Rectangle(dateColumnWidth, 0, (int) (7 * dayWidth), canvasHeight);
@@ -682,14 +695,15 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 			_nextWeekDateYPos = 0;
 
-			final int calendarColumnOffset = columnIndex * calendarColumnWidth;
+			final int columnColumSpacing = columnIndex == 0 ? 0 : columnSpacing;
+			final int calendarColumnOffset = columnIndex * calendarColumnWidth + columnColumSpacing * columnIndex;
 
 			// week rows
 			for (int rowIndex = 0; rowIndex < numRows; rowIndex++) {
 
 				final int rowTop = rowIndex * rowHeight;
 
-				// save the first day of this week as a pointer to this week
+				// keep 1st day of the week to get week data in the summary column
 				final LocalDate week1stDay = currentDate;
 
 				// draw date column
@@ -704,14 +718,14 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 				for (int dayIndex = 0; dayIndex < 7; dayIndex++) {
 
-					final int posX = calendarColumnOffset + dateColumnWidth + (int) (dayIndex * dayWidth);
-					final int posXNext = calendarColumnOffset + dateColumnWidth + (int) ((dayIndex + 1) * dayWidth);
+					final int dayPosX = calendarColumnOffset + dateColumnWidth + (int) (dayIndex * dayWidth);
+					final int dayPosXNext = calendarColumnOffset + dateColumnWidth + (int) ((dayIndex + 1) * dayWidth);
 
 					// rectangle for the whole day cell
 					final Rectangle dayRect = new Rectangle(//
-							posX,
+							dayPosX,
 							rowTop,
-							posXNext - posX,
+							dayPosXNext - dayPosX,
 							rowHeight);
 
 					final Day day = new Day(dayId);
@@ -741,7 +755,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 					final int dayLabelHeight = labelExtent.y;
 
 					final int labelWidthWithOffset = dayLabelWidth + dayLabelRightBorder;
-					final int dateLabelPosX = posXNext - labelWidthWithOffset;
+					final int dateLabelPosX = dayPosXNext - labelWidthWithOffset;
 
 					_dayDateLabelRect = null;
 					if (_currentConfig.isShowDayDate) {
@@ -766,7 +780,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 					if (_currentConfig.isShowDayDate && isShowDayDate) {
 
 						// this clipping should only kick in if shortest label format is still longer than the cell width
-						gc.setClipping(posX, rowTop, dayRect.width, dayDateHeight);
+						gc.setClipping(dayPosX, rowTop, dayRect.width, dayDateHeight);
 
 						final int weekDay = currentDate.getDayOfWeek().getValue();
 
@@ -1423,6 +1437,57 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	 */
 	LocalDate getCalendarLastDay() {
 		return _calendarLastDay;
+	}
+
+	private LocalDateTime getColumnLayoutFirstDay(	final ColumnLayout calendarColumnsLayout,
+													final LocalDateTime currentFirstDay) {
+
+		final LocalDateTime firstDayOfMonth = currentFirstDay.with(TemporalAdjusters.firstDayOfMonth());
+
+		switch (calendarColumnsLayout) {
+
+		case JAN:
+			return firstDayOfMonth.withMonth(Month.JANUARY.getValue());
+
+		case FEB:
+			return firstDayOfMonth.withMonth(Month.FEBRUARY.getValue());
+
+		case MAR:
+			return firstDayOfMonth.withMonth(Month.MARCH.getValue());
+
+		case APR:
+			return firstDayOfMonth.withMonth(Month.APRIL.getValue());
+
+		case MAY:
+			return firstDayOfMonth.withMonth(Month.MAY.getValue());
+
+		case JUN:
+			return firstDayOfMonth.withMonth(Month.JUNE.getValue());
+
+		case JUL:
+			return firstDayOfMonth.withMonth(Month.JULY.getValue());
+
+		case AUG:
+			return firstDayOfMonth.withMonth(Month.AUGUST.getValue());
+
+		case SEP:
+			return firstDayOfMonth.withMonth(Month.SEPTEMBER.getValue());
+
+		case OCT:
+			return firstDayOfMonth.withMonth(Month.OCTOBER.getValue());
+
+		case NOV:
+			return firstDayOfMonth.withMonth(Month.NOVEMBER.getValue());
+
+		case DEC:
+			return firstDayOfMonth.withMonth(Month.DECEMBER.getValue());
+
+		default:
+			break;
+		}
+
+		// this should not happen
+		return currentFirstDay;
 	}
 
 	public LocalDateTime getFirstDay() {
