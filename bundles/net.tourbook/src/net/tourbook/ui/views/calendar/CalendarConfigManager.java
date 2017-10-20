@@ -93,7 +93,7 @@ public class CalendarConfigManager {
 	private static final String		ATTR_IS_TOGGLE_MONTH_COLOR				= "isToggleMonthColor";					//$NON-NLS-1$
 	private static final String		ATTR_CALENDAR_COLUMNS					= "calendarColumns";					//$NON-NLS-1$
 	private static final String		ATTR_CALENDAR_COLUMNS_SPACING			= "calendarColumnsSpacing";				//$NON-NLS-1$
-	private static final String		ATTR_CALENDAR_COLUMNS_LAYOUT			= "calendarColumnsLayout";				//$NON-NLS-1$
+	private static final String		ATTR_CALENDAR_COLUMNS_START				= "calendarColumnsStart";				//$NON-NLS-1$
 	private static final String		ATTR_DATE_COLUMN_CONTENT				= "dateColumnContent";					//$NON-NLS-1$
 	private static final String		ATTR_DATE_COLUMN_FONT					= "dateColumnFont";						//$NON-NLS-1$
 	private static final String		ATTR_DATE_COLUMN_WIDTH					= "dateColumnWidth";					//$NON-NLS-1$
@@ -112,7 +112,7 @@ public class CalendarConfigManager {
 	private static final String		ATTR_WEEK_HEIGHT						= "weekHeight";							//$NON-NLS-1$
 	//
 	static final int				DEFAULT_CALENDAR_COLUMNS				= 1;
-	static final ColumnLayout		DEFAULT_CALENDAR_COLUMNS_LAYOUT			= ColumnLayout.CONTINUOUSLY;
+	static final ColumnStart		DEFAULT_CALENDAR_COLUMNS_LAYOUT			= ColumnStart.CONTINUOUSLY;
 	static final int				DEFAULT_CALENDAR_COLUMNS_SPACING		= 10;
 	static final CalendarColor		DEFAULT_DAY_CONTENT_COLOR				= CalendarColor.CONTRAST;
 	static final DayDateFormat		DEFAULT_DAY_DATE_FORMAT					= DayDateFormat.DAY;
@@ -130,7 +130,7 @@ public class CalendarConfigManager {
 	static final int				DEFAULT_WEEK_HEIGHT						= 70;
 	//
 	static final int				CALENDAR_COLUMNS_MIN					= 1;
-	static final int				CALENDAR_COLUMNS_MAX					= 20;
+	static final int				CALENDAR_COLUMNS_MAX					= 100;
 	static final int				CALENDAR_COLUMNS_SPACE_MIN				= 0;
 	static final int				CALENDAR_COLUMNS_SPACE_MAX				= 100;
 	static final int				WEEK_HEIGHT_MIN							= 1;
@@ -171,19 +171,19 @@ public class CalendarConfigManager {
 
 	private static final ColumnLayoutData[]			_allColumnLayoutData			= new ColumnLayoutData[] {
 
-			new ColumnLayoutData(ColumnLayout.CONTINUOUSLY, Messages.Calendar_Config_ColumnLayout_Continuously),
-			new ColumnLayoutData(ColumnLayout.JAN, TimeTools.month_Full[0]),
-			new ColumnLayoutData(ColumnLayout.FEB, TimeTools.month_Full[1]),
-			new ColumnLayoutData(ColumnLayout.MAR, TimeTools.month_Full[2]),
-			new ColumnLayoutData(ColumnLayout.APR, TimeTools.month_Full[3]),
-			new ColumnLayoutData(ColumnLayout.MAY, TimeTools.month_Full[4]),
-			new ColumnLayoutData(ColumnLayout.JUN, TimeTools.month_Full[5]),
-			new ColumnLayoutData(ColumnLayout.JUL, TimeTools.month_Full[6]),
-			new ColumnLayoutData(ColumnLayout.AUG, TimeTools.month_Full[7]),
-			new ColumnLayoutData(ColumnLayout.SEP, TimeTools.month_Full[8]),
-			new ColumnLayoutData(ColumnLayout.OCT, TimeTools.month_Full[9]),
-			new ColumnLayoutData(ColumnLayout.NOV, TimeTools.month_Full[10]),
-			new ColumnLayoutData(ColumnLayout.DEC, TimeTools.month_Full[11]),
+			new ColumnLayoutData(ColumnStart.CONTINUOUSLY, Messages.Calendar_Config_ColumnLayout_Continuously),
+			new ColumnLayoutData(ColumnStart.JAN, TimeTools.month_Full[0]),
+			new ColumnLayoutData(ColumnStart.FEB, TimeTools.month_Full[1]),
+			new ColumnLayoutData(ColumnStart.MAR, TimeTools.month_Full[2]),
+			new ColumnLayoutData(ColumnStart.APR, TimeTools.month_Full[3]),
+			new ColumnLayoutData(ColumnStart.MAY, TimeTools.month_Full[4]),
+			new ColumnLayoutData(ColumnStart.JUN, TimeTools.month_Full[5]),
+			new ColumnLayoutData(ColumnStart.JUL, TimeTools.month_Full[6]),
+			new ColumnLayoutData(ColumnStart.AUG, TimeTools.month_Full[7]),
+			new ColumnLayoutData(ColumnStart.SEP, TimeTools.month_Full[8]),
+			new ColumnLayoutData(ColumnStart.OCT, TimeTools.month_Full[9]),
+			new ColumnLayoutData(ColumnStart.NOV, TimeTools.month_Full[10]),
+			new ColumnLayoutData(ColumnStart.DEC, TimeTools.month_Full[11]),
 	};
 
 	private static final DayHeaderDateFormatData[]	_allDateHeaderDateFormatData	= new DayHeaderDateFormatData[] {
@@ -353,9 +353,9 @@ public class CalendarConfigManager {
 	static class ColumnLayoutData {
 
 		String			label;
-		ColumnLayout	columnLayout;
+		ColumnStart	columnLayout;
 
-		public ColumnLayoutData(final ColumnLayout columnLayout, final String label) {
+		public ColumnLayoutData(final ColumnStart columnLayout, final String label) {
 
 			this.columnLayout = columnLayout;
 			this.label = label;
@@ -579,7 +579,7 @@ public class CalendarConfigManager {
 			xmlConfig.putInteger(ATTR_CALENDAR_COLUMNS, config.calendarColumns);
 			xmlConfig.putInteger(ATTR_CALENDAR_COLUMNS_SPACING, config.calendarColumnsSpacing);
 			xmlConfig.putInteger(ATTR_WEEK_HEIGHT, config.weekHeight);
-			Util.setXmlEnum(xmlConfig, ATTR_CALENDAR_COLUMNS_LAYOUT, config.calendarColumnsLayout);
+			Util.setXmlEnum(xmlConfig, ATTR_CALENDAR_COLUMNS_START, config.calendarColumnsStart);
 		}
 	}
 
@@ -775,7 +775,7 @@ public class CalendarConfigManager {
 		config.calendarColumns				= Util.getXmlInteger(xmlConfig, ATTR_CALENDAR_COLUMNS,					DEFAULT_CALENDAR_COLUMNS);
 		config.calendarColumnsSpacing		= Util.getXmlInteger(xmlConfig, ATTR_CALENDAR_COLUMNS_SPACING,			DEFAULT_CALENDAR_COLUMNS_SPACING);
 		config.weekHeight					= Util.getXmlInteger(xmlConfig, ATTR_WEEK_HEIGHT,						DEFAULT_WEEK_HEIGHT);
-		config.calendarColumnsLayout		= (ColumnLayout) Util.getXmlEnum(xmlConfig,	ATTR_CALENDAR_COLUMNS_LAYOUT,	DEFAULT_CALENDAR_COLUMNS_LAYOUT);
+		config.calendarColumnsStart			= (ColumnStart) Util.getXmlEnum(xmlConfig,		ATTR_CALENDAR_COLUMNS_START,	DEFAULT_CALENDAR_COLUMNS_LAYOUT);
 
 // SET_FORMATTING_ON
 	}

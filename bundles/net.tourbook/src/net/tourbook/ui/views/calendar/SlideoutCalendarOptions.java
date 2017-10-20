@@ -785,12 +785,12 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			}
 			{
 				/*
-				 * Column layout
+				 * Column start
 				 */
 
 				// label
 				final Label label = new Label(container, SWT.NONE);
-				label.setText(Messages.Slideout_CalendarOptions_Label_ColumnLayout);
+				label.setText(Messages.Slideout_CalendarOptions_Label_CalendarColumnsStart);
 				GridDataFactory
 						.fillDefaults()//
 						.align(SWT.FILL, SWT.CENTER)
@@ -1242,7 +1242,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		return 0;
 	}
 
-	private int getCalendarColumLayoutIndex(final ColumnLayout requestedData) {
+	private int getCalendarColumLayoutIndex(final ColumnStart requestedData) {
 
 		final ColumnLayoutData[] allData = CalendarConfigManager.getAllColumnLayoutData();
 
@@ -1335,12 +1335,12 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		return allCalendarColorData[selectedIndex].color;
 	}
 
-	private ColumnLayout getSelectedColumnLayout() {
+	private ColumnStart getSelectedColumnLayout() {
 
 		final int selectedIndex = _comboColumnLayout.getSelectionIndex();
 
 		if (selectedIndex < 0) {
-			return ColumnLayout.CONTINUOUSLY;
+			return ColumnStart.CONTINUOUSLY;
 		}
 
 		final ColumnLayoutData data = CalendarConfigManager.getAllColumnLayoutData()[selectedIndex];
@@ -1671,7 +1671,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			_spinnerSummaryColumnWidth.setSelection(config.summaryColumnWidth);
 
 			// layout
-			_comboColumnLayout.select(getCalendarColumLayoutIndex(config.calendarColumnsLayout));
+			_comboColumnLayout.select(getCalendarColumLayoutIndex(config.calendarColumnsStart));
 			_spinnerCalendarColumns.setSelection(config.calendarColumns);
 			_spinnerCalendarColumnsSpacing.setSelection(config.calendarColumnsSpacing);
 			_spinnerWeekHeight.setSelection(config.weekHeight);
@@ -1721,7 +1721,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 		// layout
 		config.calendarColumns = _spinnerCalendarColumns.getSelection();
-		config.calendarColumnsLayout = getSelectedColumnLayout();
+		config.calendarColumnsStart = getSelectedColumnLayout();
 		config.calendarColumnsSpacing = _spinnerCalendarColumnsSpacing.getSelection();
 		config.weekHeight = _spinnerWeekHeight.getSelection();
 

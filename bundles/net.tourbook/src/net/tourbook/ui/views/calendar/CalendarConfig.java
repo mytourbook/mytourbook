@@ -39,7 +39,7 @@ public class CalendarConfig {
 	// layout
 	int					calendarColumns				= CalendarConfigManager.DEFAULT_CALENDAR_COLUMNS;
 	int 				calendarColumnsSpacing		= CalendarConfigManager.DEFAULT_CALENDAR_COLUMNS_SPACING;
-	ColumnLayout		calendarColumnsLayout		= CalendarConfigManager.DEFAULT_CALENDAR_COLUMNS_LAYOUT;
+	ColumnStart		calendarColumnsStart		= CalendarConfigManager.DEFAULT_CALENDAR_COLUMNS_LAYOUT;
 	int					weekHeight					= CalendarConfigManager.DEFAULT_WEEK_HEIGHT;
 
 	// day date

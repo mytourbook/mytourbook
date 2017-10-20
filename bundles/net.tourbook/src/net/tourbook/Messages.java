@@ -1652,12 +1652,9 @@ public class Messages extends NLS {
 	public static String		Slideout_CalendarOptions_Group_WeekSummary;
 	public static String		Slideout_CalendarOptions_Label_CalendarColumns;
 	public static String		Slideout_CalendarOptions_Label_CalendarColumns_Tooltip;
-
 	public static String		Slideout_CalendarOptions_Label_CalendarColumnsSpace;
-
 	public static String		Slideout_CalendarOptions_Label_CalendarColumnsSpace_Tooltip;
-
-	public static String		Slideout_CalendarOptions_Label_ColumnLayout;
+	public static String		Slideout_CalendarOptions_Label_CalendarColumnsStart;
 	public static String		Slideout_CalendarOptions_Label_DateColumn_Width;
 	public static String		Slideout_CalendarOptions_Label_DateColumn_Width_Tooltip;
 	public static String		Slideout_CalendarOptions_Label_DateColumnContent;

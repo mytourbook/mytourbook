@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.views.calendar;
 
-public enum ColumnLayout {
+public enum ColumnStart {
 
 	CONTINUOUSLY, //
 
