@@ -1644,17 +1644,16 @@ public class Messages extends NLS {
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowMonthWithAlternatingColor;
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowSummaryColumn;
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowSummaryColumn_Tooltip;
+	public static String		Slideout_CalendarOptions_Checkbox_IsShowYearColumns;
+	public static String		Slideout_CalendarOptions_Checkbox_IsShowYearColumns_Tooltip;
 	public static String		Slideout_CalendarOptions_Checkbox_IsTinyLayout;
 	public static String		Slideout_CalendarOptions_Group_DateColumn;
 	public static String		Slideout_CalendarOptions_Group_DayContent;
 	public static String		Slideout_CalendarOptions_Group_DayDate;
+	public static String		Slideout_CalendarOptions_Group_Layout;
 	public static String		Slideout_CalendarOptions_Group_SummaryColumn;
 	public static String		Slideout_CalendarOptions_Group_WeekSummary;
-	public static String		Slideout_CalendarOptions_Label_CalendarColumns;
-	public static String		Slideout_CalendarOptions_Label_CalendarColumns_Tooltip;
-	public static String		Slideout_CalendarOptions_Label_CalendarColumnsSpace;
-	public static String		Slideout_CalendarOptions_Label_CalendarColumnsSpace_Tooltip;
-	public static String		Slideout_CalendarOptions_Label_CalendarColumnsStart;
+	public static String		Slideout_CalendarOptions_Group_YearColumns;
 	public static String		Slideout_CalendarOptions_Label_DateColumn_Width;
 	public static String		Slideout_CalendarOptions_Label_DateColumn_Width_Tooltip;
 	public static String		Slideout_CalendarOptions_Label_DateColumnContent;
@@ -1667,6 +1666,8 @@ public class Messages extends NLS {
 	public static String		Slideout_CalendarOptions_Label_N_Line;
 	public static String		Slideout_CalendarOptions_Label_Name;
 	public static String		Slideout_CalendarOptions_Label_Name_Tooltip;
+	public static String		Slideout_CalendarOptions_Label_NumYearColumns;
+	public static String		Slideout_CalendarOptions_Label_NumYearColumns_Tooltip;
 	public static String		Slideout_CalendarOptions_Label_RowHeight;
 	public static String		Slideout_CalendarOptions_Label_RowHeight_Tooltip;
 	public static String		Slideout_CalendarOptions_Label_SummaryColumn_Width;
@@ -1676,6 +1677,10 @@ public class Messages extends NLS {
 	public static String		Slideout_CalendarOptions_Label_Title;
 	public static String		Slideout_CalendarOptions_Label_TourBackground;
 	public static String		Slideout_CalendarOptions_Label_TourBorder;
+	public static String		Slideout_CalendarOptions_Label_YearColumnsSpace;
+	public static String		Slideout_CalendarOptions_Label_YearColumnsSpace_Tooltip;
+	public static String		Slideout_CalendarOptions_Label_YearColumnsStart;
+	public static String		Slideout_CalendarOptions_Label_YearHeaderFont;
 
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowAbsoluteValues;
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowAbsoluteValues_Tooltip;

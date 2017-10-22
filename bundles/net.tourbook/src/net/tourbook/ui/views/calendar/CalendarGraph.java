@@ -95,15 +95,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	private ArrayList<RGB>						_rgbLine;
 	private ArrayList<RGB>						_rgbText;
 
-	/**
-	 * Date of the first day of a week and the first day in the calendar viewport.
-	 * <p>
-	 * Date/time is necessary otherwise {@link Duration} will NOT work !!!
-	 */
-	private LocalDateTime						_firstCalendarDay		= LocalDateTime
-			.now()
-			.with(getFirstDayOfWeek_SameOrPrevious());
-
 	private int									_lastDayOfWeekToGoTo	= -1;
 
 	private List<ObjectLocation>				_tourFocus;
@@ -130,9 +121,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	private int									_scrollBarLastSelection;
 
 	/** Visible weeks in one column */
-	private int									_navigateWeeks;
+	private int									_weeksInOneColumn;
 
-	private boolean								_isCalendarColumnContinuously;
+	private boolean								_isYearColumn;
 	private boolean								_isScrollbarInitialized;
 	private boolean								_useTextColorForTourInfoText;
 	private boolean								_useBlackForHighlightTourInfoText;
@@ -155,11 +146,27 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	private int									_fontHeight_DateColumn;
 	private int									_fontHeight_DayContent;
 	private int									_fontHeight_DayHeader;
+	private int									_fontHeight_YearHeader;
+
+	/**
+	 * Date of the first day of a week and the first day in the calendar viewport.
+	 * <p>
+	 * Date/time is necessary otherwise {@link Duration} will NOT work !!!
+	 */
+	private LocalDateTime						_firstCalendarDay		= LocalDateTime
+			.now()
+			.with(getFirstDayOfWeek_SameOrPrevious());
+
+	private LocalDateTime						_yearColumn_FirstYear	= LocalDateTime
+			.now()
+			.withMonth(1)
+			.withDayOfMonth(1);
+
+	private LocalDateTime						_yearColumn_CurrentYear;
+	private LocalDateTime						_yearColumn_NextYear;
 
 	private LocalDate							_calendarFirstDay;
 	private LocalDate							_calendarLastDay;
-	private LocalDateTime						_column_YearMonth;
-	private LocalDateTime						_column_YearMonth_NextYear;
 
 	private int									_nextWeekDateYPos;
 	private int									_lastWeekDateYear;
@@ -189,6 +196,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	private Font								_fontDateColumn;
 	private Font								_fontDayContent;
 	private Font								_fontDayHeader;
+	private Font								_fontYearHeader;
 
 	private Image								_image;
 	private Image								_highlight;
@@ -382,7 +390,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 						_tourDoubleClickState.canAdjustAltitude = true;
 						TourManager.getInstance().tourDoubleClickAction(CalendarGraph.this, _tourDoubleClickState);
 					} else {
-						gotoNextTour();
+						gotoTour_Next();
 					}
 					break;
 				case SWT.TRAVERSE_ESCAPE:
@@ -405,12 +413,12 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 				switch (event.keyCode) {
 				case SWT.ARROW_LEFT:
 				case 'h':
-					gotoPrevTour();
+					gotoTour_Prev();
 					break;
 
 				case SWT.ARROW_RIGHT:
 				case 'l':
-					gotoNextTour();
+					gotoTour_Next();
 					break;
 
 				case SWT.ARROW_UP:
@@ -418,7 +426,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 					if (_selectedItem.isTour()) {
 						gotoTourSameWeekday(-1);
 					} else {
-						gotoPrevWeek();
+						gotoWeek_Prev();
 					}
 					break;
 
@@ -427,18 +435,18 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 					if (_selectedItem.isTour()) {
 						gotoTourSameWeekday(+1);
 					} else {
-						gotoNextWeek();
+						gotoWeek_Next();
 					}
 					break;
 
 				case SWT.PAGE_DOWN:
 				case 'n':
-					gotoNextScreen();
+					gotoScreen_Next();
 					break;
 
 				case SWT.PAGE_UP:
 				case 'p':
-					gotoPrevScreen();
+					gotoScreen_Prev();
 					break;
 
 				case SWT.HOME:
@@ -456,7 +464,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 						_selectedItem = _noItem;
 						redraw();
 					} else {
-						gotoPrevTour();
+						gotoTour_Prev();
 					}
 					break;
 				}
@@ -474,15 +482,15 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 					if (event.count > 0) {
 						if (_selectedItem.isTour()) {
-							gotoPrevTour();
+							gotoTour_Prev();
 						} else {
-							gotoPrevWeek();
+							gotoWeek_Next();
 						}
 					} else {
 						if (_selectedItem.isTour()) {
-							gotoNextTour();
+							gotoTour_Next();
 						} else {
-							gotoNextWeek();
+							gotoWeek_Prev();
 						}
 					}
 
@@ -490,30 +498,10 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 					// left or right column, scroll by pages
 
-					if (_isCalendarColumnContinuously) {
-
-						if (event.count > 0) {
-							gotoPrevScreen();
-						} else {
-							gotoNextScreen();
-						}
+					if (event.count > 0) {
+						gotoScreen_Prev();
 					} else {
-
-						if (UI.isCtrlKey(event)) {
-
-							if (event.count > 0) {
-								gotoPrevScreen();
-							} else {
-								gotoNextScreen();
-							}
-						} else {
-
-							if (event.count > 0) {
-								gotoYear_Previous();
-							} else {
-								gotoYear_Next();
-							}
-						}
+						gotoScreen_Next();
 					}
 				}
 			}
@@ -582,6 +570,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		_fontDateColumn = UI.disposeResource(_fontDateColumn);
 		_fontDayContent = UI.disposeResource(_fontDayContent);
 		_fontDayHeader = UI.disposeResource(_fontDayHeader);
+		_fontYearHeader = UI.disposeResource(_fontYearHeader);
 	}
 
 	void draw() {
@@ -634,63 +623,92 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		_image = new Image(getDisplay(), canvasWidth, canvasHeight);
 
+		_isYearColumn = _currentConfig.isShowYearColumns;
+
 		// one col left and right of the week + 7 week days
-		final int numCalendarColumns = _currentConfig.calendarColumns;
+		final int numYearColumns = _isYearColumn ? _currentConfig.numYearColumns : 1;
 		final int numDayColumns = 7;
+
 		final int weekHeight = _currentConfig.weekHeight;
 
-		/*
-		 * Get first day of the viewport
-		 */
+		// set year header font
+		getFont_YearHeader();
 
-		_isCalendarColumnContinuously = _currentConfig.calendarColumnsStart == ColumnStart.CONTINUOUSLY;
+		final int yearHeaderHeight = _isYearColumn ? _fontHeight_YearHeader + 20 : 0;
+		int numVisibleRows = (canvasHeight - yearHeaderHeight) / weekHeight;
 
-		int numVisibleRows = canvasHeight / weekHeight;
-
-		if (!_isCalendarColumnContinuously) {
+		if (_isYearColumn) {
 
 			// adjust column start
 
-			_column_YearMonth = getColumnStart_FirstDayOfMonth(_currentConfig.calendarColumnsStart, _firstCalendarDay);
-			_column_YearMonth_NextYear = _column_YearMonth.plusYears(1);
+			_yearColumn_FirstYear = yearColumn_getFirstDayOfMonth(_yearColumn_FirstYear);
+			_yearColumn_CurrentYear = _yearColumn_FirstYear;
+			_yearColumn_NextYear = _yearColumn_CurrentYear.plusYears(1);
 
 			// set first day to start of week
-			_firstCalendarDay = _column_YearMonth.with(getFirstDayOfWeek_SameOrPrevious());
+			_firstCalendarDay = _yearColumn_CurrentYear.with(getFirstDayOfWeek_SameOrPrevious());
 
-			final LocalDateTime firstCalendarDay_NextYear = _column_YearMonth_NextYear
+			final LocalDateTime firstCalendarDay_NextYear = _yearColumn_NextYear
 
 					// set first day to start of week
 					.with(getFirstDayOfWeek_SameOrPrevious());
 
-			// adjust number of weeks
-			final int numYearWeeks = (int) ChronoUnit.WEEKS.between(
-					_firstCalendarDay,
-					firstCalendarDay_NextYear) + 1;
+			/*
+			 * adjust number of weeks
+			 */
+			if (_currentConfig.yearColumnsStart != ColumnStart.CONTINUOUSLY) {
 
-			if (numYearWeeks < numVisibleRows) {
+				final int numYearWeeks = (int) ChronoUnit.WEEKS.between(
+						_firstCalendarDay,
+						firstCalendarDay_NextYear.plusWeeks(1).with(getFirstDayOfWeek_SameOrNext()));
 
-				// less weeks in one year than visible rows -> show weeks for only one year
+				if (numYearWeeks < numVisibleRows) {
 
-				numVisibleRows = numYearWeeks;
+					// less weeks in one year than visible rows -> show weeks for only one year
+
+					numVisibleRows = numYearWeeks;
+				}
 			}
 		}
 
-		_navigateWeeks = numVisibleRows;
+		_weeksInOneColumn = numVisibleRows;
 
 		LocalDate currentDate = _firstCalendarDay.toLocalDate();
 
-		// keep calendar viewport dates
+		/*
+		 * Set calendar viewport dates
+		 */
 		_calendarFirstDay = currentDate;
-		_calendarLastDay = _isCalendarColumnContinuously //
-				? _calendarFirstDay.plusWeeks(numVisibleRows * numCalendarColumns).minusDays(1)
-				: _calendarFirstDay.plusYears(numCalendarColumns).minusDays(1);
+
+		if (_isYearColumn) {
+
+			if (_currentConfig.yearColumnsStart == ColumnStart.CONTINUOUSLY) {
+
+				_calendarLastDay = _calendarFirstDay.plusWeeks(numVisibleRows * numYearColumns).minusDays(1);
+
+			} else {
+
+				_calendarLastDay = _yearColumn_FirstYear
+
+						.toLocalDate()
+						.plusYears(numYearColumns)
+						.minusDays(1)
+
+						.with(getFirstDayOfWeek_SameOrNext())
+						.minusDays(1);
+			}
+
+		} else {
+
+			_calendarLastDay = _calendarFirstDay.plusWeeks(numVisibleRows * numYearColumns).minusDays(1);
+		}
 
 		_calendarView.updateUI_Title(_calendarFirstDay, _calendarLastDay);
 
 		final GC oldGc = gc;
 		gc = new GC(_image);
 
-		final Color monthAlternateColor = _colorCache.getColor(0xf0f0f0);
+		final Color monthAlternateColor = _colorCache.getColor(_currentConfig.alternateMonthRGB);
 
 		_tourFocus = new ArrayList<ObjectLocation>();
 		_dayFocus = new ArrayList<ObjectLocation>();
@@ -711,9 +729,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			summaryColumnWidth = _currentConfig.summaryColumnWidth;// * _defaultFontAverageCharWidth;
 		}
 
-		final int columnSpacing = _currentConfig.calendarColumnsSpacing;
-		final int allColumnSpace = (numCalendarColumns - 1) * columnSpacing;
-		final int calendarColumnWidth = (canvasWidth - allColumnSpace) / numCalendarColumns;
+		final int columnSpacing = _currentConfig.yearColumnsSpacing;
+		final int allColumnSpace = (numYearColumns - 1) * columnSpacing;
+		final int calendarColumnWidth = (canvasWidth - allColumnSpace) / numYearColumns;
 		final float dayWidth = (float) (calendarColumnWidth - dateColumnWidth - summaryColumnWidth) / numDayColumns;
 
 		_calendarAllDaysRectangle = new Rectangle(dateColumnWidth, 0, (int) (7 * dayWidth), canvasHeight);
@@ -738,80 +756,82 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		// we use simple ids
 		long dayId = new Day(currentDate).dayId;
 
-		for (int columnIndex = 0; columnIndex < numCalendarColumns; columnIndex++) {
+		for (int columnIndex = 0; columnIndex < numYearColumns; columnIndex++) {
 
 			_nextWeekDateYPos = 0;
 
 			final int columnColumSpacing = columnIndex == 0 ? 0 : columnSpacing;
 			final int calendarColumnOffset = columnIndex * calendarColumnWidth + columnColumSpacing * columnIndex;
 
-			if (columnIndex > 0 && !_isCalendarColumnContinuously) {
+			if (_isYearColumn) {
 
 				// move to the next year
 
-//				currentDate = _calendarCurrentColumnFirstDayNextYear;
-//
-//				_calendarCurrentColumnFirstDayNextYear = _calendarCurrentColumnFirstDayNextYear
-//						.plusYears(1)
-//
-//						// set first day to start of week
-//						.with(getFirstDayOfWeek_SameOrPrevious());
-//
-//				// adjust number of weeks
-//				final int numColumnWeeks = (int) ChronoUnit.WEEKS.between(
-//						_firstCalendarDay,
-//						_calendarCurrentColumnFirstDayNextYear.atStartOfDay());
+				if (_currentConfig.yearColumnsStart == ColumnStart.CONTINUOUSLY) {
 
-				///////////////////////////////////////////////////////////////////////
-				///////////////////////////////////////////////////////////////////////
-				///////////////////////////////////////////////////////////////////////
-				///////////////////////////////////////////////////////////////////////
+					_yearColumn_CurrentYear = currentDate.atStartOfDay();
 
-				_column_YearMonth = _column_YearMonth_NextYear;
-				_column_YearMonth_NextYear = _column_YearMonth.plusYears(1);
+				} else {
 
-				// set first day to start of week
-				_firstCalendarDay = _column_YearMonth.with(getFirstDayOfWeek_SameOrPrevious());
+					_yearColumn_CurrentYear = columnIndex == 0 ? _yearColumn_FirstYear : _yearColumn_NextYear;
+					_yearColumn_NextYear = _yearColumn_CurrentYear.plusYears(1);
 
-				currentDate = _firstCalendarDay.toLocalDate();
+					// set first day to start of week
+					currentDate = _yearColumn_CurrentYear.with(getFirstDayOfWeek_SameOrPrevious()).toLocalDate();
 
-				final LocalDateTime firstCalendarDay_NextYear = _column_YearMonth_NextYear
+					final LocalDateTime firstCalendarDay_NextYear = _yearColumn_NextYear
 
-						// set first day to start of week
-						.with(getFirstDayOfWeek_SameOrPrevious());
+							// set first day to start of week
+							.with(getFirstDayOfWeek_SameOrPrevious());
 
-				// adjust number of weeks
-				final int numYearWeeks = (int) ChronoUnit.WEEKS.between(
-						_firstCalendarDay,
-						firstCalendarDay_NextYear) + 1;
+					/*
+					 * Adjust number of weeks
+					 */
 
-				if (numYearWeeks < numVisibleRows) {
+					final int numYearWeeks = (int) ChronoUnit.WEEKS.between(
+							currentDate,
+							firstCalendarDay_NextYear) + 1;
 
-					// less weeks in one year than visible rows -> show weeks for only one year
+					if (numYearWeeks < numVisibleRows) {
 
-					numVisibleRows = numYearWeeks;
+						// less weeks in one year than visible rows -> show weeks for only one year
+
+						numVisibleRows = numYearWeeks;
+					}
+
+					_weeksInOneColumn = numYearWeeks;
 				}
 
-				_navigateWeeks = numYearWeeks;
+				/*
+				 * Year header
+				 */
+				final Rectangle yearHeaderRect = new Rectangle(
+						calendarColumnOffset + dateColumnWidth,
+						0,
+						calendarColumnWidth - dateColumnWidth - summaryColumnWidth,
+						yearHeaderHeight);
 
+				drawWeek_YearHeader(gc, yearHeaderRect);
 			}
 
 			// week rows
-			for (int weekIndex = 0; weekIndex < numVisibleRows; weekIndex++) {
+			for (int rowIndex = 0; rowIndex < numVisibleRows; rowIndex++) {
 
-				final int rowTop = weekIndex * weekHeight;
+				final int rowTop = yearHeaderHeight + rowIndex * weekHeight;
 
 				// keep 1st day of the week to get week data in the summary column
 				final LocalDate week1stDay = currentDate;
 
 				// draw date column
 				if (dateColumnWidth > 0) {
+
 					drawWeek_DateColumn(
 							gc,
 							currentDate,
 							rowTop,
 							calendarColumnOffset,
-							_currentConfig.dateColumnContent);
+							_currentConfig.dateColumnContent,
+							rowIndex == 0);
 				}
 
 				for (int dayIndex = 0; dayIndex < 7; dayIndex++) {
@@ -1373,7 +1393,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 										final LocalDate currentDate,
 										final int rowTop,
 										final int calendarColumnOffset,
-										final DateColumnContent dateColumnContent) {
+										final DateColumnContent dateColumnContent,
+										final boolean isFirstRow) {
 
 		gc.setForeground(_darkGray);
 		gc.setBackground(_white);
@@ -1390,7 +1411,28 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			return;
 		}
 
-		final int nextWeekYPos = thisWeekYPos + _fontHeight_DateColumn + 10;
+		final int nextWeekYPos = thisWeekYPos + _fontHeight_DateColumn + 0;
+
+		if (_currentConfig.isShowYearColumns
+				&& _currentConfig.yearColumnsStart == ColumnStart.CONTINUOUSLY) {
+
+			// draw year always in first row
+
+			final boolean isInJanuary = currentDate.getMonthValue() == 1
+					|| currentDate.plusDays(6).getMonthValue() == 1;
+
+			final int yearColumnYear = _yearColumn_CurrentYear.getYear();
+
+			if (isInJanuary && _lastWeekDateYear != yearColumnYear) {
+
+				gc.drawString(Integer.toString(yearColumnYear), posX, thisWeekYPos, true);
+
+				_lastWeekDateYear = yearColumnYear;
+				_nextWeekDateYPos = nextWeekYPos;
+
+				return;
+			}
+		}
 
 		switch (dateColumnContent) {
 		case MONTH:
@@ -1420,7 +1462,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 				gc.drawString(Integer.toString(year), posX, thisWeekYPos, true);
 
 				_lastWeekDateYear = year;
-
 				_nextWeekDateYPos = nextWeekYPos;
 			}
 
@@ -1491,6 +1532,26 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		gc.setClipping(_nullRec);
 	}
 
+	private void drawWeek_YearHeader(final GC gc, final Rectangle yearHeaderRect) {
+
+		final String yearText = Integer.toString(_yearColumn_CurrentYear.getYear());
+
+		gc.setForeground(_darkGray);
+		gc.setBackground(_white);
+
+		gc.setFont(getFont_YearHeader());
+
+		final Point textSize = gc.textExtent(yearText);
+
+		final int posX = yearHeaderRect.x + yearHeaderRect.width / 2 - textSize.x / 2;
+		final int posY = yearHeaderRect.y + 10;
+
+		gc.drawString(yearText, posX, posY);
+
+//		gc.setForeground(_red);
+//		gc.drawRectangle(yearHeaderRect);
+	}
+
 	void fireSelectionEvent(final CalendarItem selection) {
 
 		final Object[] listeners = _selectionProvider.getListeners();
@@ -1536,57 +1597,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	 */
 	LocalDate getCalendarLastDay() {
 		return _calendarLastDay;
-	}
-
-	private LocalDateTime getColumnStart_FirstDayOfMonth(	final ColumnStart calendarColumnsLayout,
-															final LocalDateTime currentFirstDay) {
-
-		final LocalDateTime firstDayOfMonth = currentFirstDay.with(TemporalAdjusters.firstDayOfMonth());
-
-		switch (calendarColumnsLayout) {
-
-		case JAN:
-			return firstDayOfMonth.withMonth(Month.JANUARY.getValue());
-
-		case FEB:
-			return firstDayOfMonth.withMonth(Month.FEBRUARY.getValue());
-
-		case MAR:
-			return firstDayOfMonth.withMonth(Month.MARCH.getValue());
-
-		case APR:
-			return firstDayOfMonth.withMonth(Month.APRIL.getValue());
-
-		case MAY:
-			return firstDayOfMonth.withMonth(Month.MAY.getValue());
-
-		case JUN:
-			return firstDayOfMonth.withMonth(Month.JUNE.getValue());
-
-		case JUL:
-			return firstDayOfMonth.withMonth(Month.JULY.getValue());
-
-		case AUG:
-			return firstDayOfMonth.withMonth(Month.AUGUST.getValue());
-
-		case SEP:
-			return firstDayOfMonth.withMonth(Month.SEPTEMBER.getValue());
-
-		case OCT:
-			return firstDayOfMonth.withMonth(Month.OCTOBER.getValue());
-
-		case NOV:
-			return firstDayOfMonth.withMonth(Month.NOVEMBER.getValue());
-
-		case DEC:
-			return firstDayOfMonth.withMonth(Month.DECEMBER.getValue());
-
-		default:
-			break;
-		}
-
-		// this should not happen
-		return currentFirstDay;
 	}
 
 	public LocalDateTime getFirstDay() {
@@ -1658,6 +1668,25 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 
 		return _fontDayHeader;
+	}
+
+	private Font getFont_YearHeader() {
+
+		if (_fontYearHeader == null) {
+
+			final FontData fontData = CalendarConfigManager.getActiveCalendarConfig().yearHeaderFont;
+
+			_fontYearHeader = new Font(_display, fontData);
+
+			final GC gc = new GC(_display);
+			{
+				gc.setFont(_fontYearHeader);
+				_fontHeight_YearHeader = gc.getFontMetrics().getHeight();
+			}
+			gc.dispose();
+		}
+
+		return _fontYearHeader;
 	}
 
 	/**
@@ -1827,7 +1856,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		_firstCalendarDay = date//
 
 				// center date on screen
-				.minusWeeks(_navigateWeeks / 2)
+				.minusWeeks(_weeksInOneColumn / 2)
 
 				// set first day to start of week
 				.with(getFirstDayOfWeek_SameOrNext())
@@ -1866,44 +1895,52 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		scrollBarUpdate();
 	}
 
-	public void gotoNextScreen() {
+	public void gotoScreen_Next() {
 
-		_firstCalendarDay = _firstCalendarDay.plusWeeks(_navigateWeeks);
+		_firstCalendarDay = _firstCalendarDay.plusWeeks(_weeksInOneColumn);
 
-		_isGraphClean = false;
-		redraw();
-		scrollBarUpdate();
-	}
+		if (_isYearColumn) {
 
-	public void gotoNextTour() {
-		gotoTourOffset(+1);
-	}
+			if (_currentConfig.yearColumnsStart == ColumnStart.CONTINUOUSLY) {
 
-	public void gotoNextWeek() {
+				_yearColumn_FirstYear = _yearColumn_FirstYear
 
-		_firstCalendarDay = _firstCalendarDay.plusWeeks(1);
+						.plusWeeks(_weeksInOneColumn)
 
-		_isGraphClean = false;
-		redraw();
-		scrollBarUpdate();
-	}
+						// must start ALWAYS with 1st of month
+						.withDayOfMonth(1);
 
-	public void gotoPrevScreen() {
+			} else {
 
-		_firstCalendarDay = _firstCalendarDay.minusWeeks(_navigateWeeks);
+				_yearColumn_FirstYear = _yearColumn_FirstYear.plusYears(1);
+			}
+		}
 
 		_isGraphClean = false;
 		redraw();
 		scrollBarUpdate();
 	}
 
-	public void gotoPrevTour() {
-		gotoTourOffset(-1);
-	}
+	public void gotoScreen_Prev() {
 
-	public void gotoPrevWeek() {
+		_firstCalendarDay = _firstCalendarDay.minusWeeks(_weeksInOneColumn);
 
-		_firstCalendarDay = _firstCalendarDay.minusWeeks(1);
+		if (_isYearColumn) {
+
+			if (_currentConfig.yearColumnsStart == ColumnStart.CONTINUOUSLY) {
+
+				_yearColumn_FirstYear = _yearColumn_FirstYear
+
+						.minusWeeks(_weeksInOneColumn)
+
+						// must start ALWAYS with 1st of month
+						.withDayOfMonth(1);
+
+			} else {
+
+				_yearColumn_FirstYear = _yearColumn_FirstYear.minusYears(1);
+			}
+		}
 
 		_isGraphClean = false;
 		redraw();
@@ -1922,13 +1959,21 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 	}
 
+	public void gotoTour_Next() {
+		gotoTourOffset(+1);
+	}
+
+	public void gotoTour_Prev() {
+		gotoTourOffset(-1);
+	}
+
 	public void gotoTourId(final long tourId) {
 
 		final LocalDateTime dt = _dataProvider.getCalendarTourDateTime(tourId);
 
 		_selectedItem = new CalendarItem(tourId, SelectionType.TOUR);
 
-		if (dt.isBefore(_firstCalendarDay) || dt.isAfter(_firstCalendarDay.plusWeeks(_navigateWeeks))) {
+		if (dt.isBefore(_firstCalendarDay) || dt.isAfter(_firstCalendarDay.plusWeeks(_weeksInOneColumn))) {
 
 			_isGraphClean = false;
 			gotoDate(dt.toLocalDate());
@@ -1942,9 +1987,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		if (_tourFocus.size() < 1) {
 			if (offset < 0) {
-				gotoPrevWeek();
+				gotoWeek_Prev();
 			} else {
-				gotoNextWeek();
+				gotoWeek_Next();
 			}
 			return;
 		}
@@ -1977,10 +2022,10 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 		final int newIndex = index + offset;
 		if (newIndex < 0) {
-			gotoPrevWeek();
+			gotoWeek_Prev();
 			return;
 		} else if (newIndex >= _tourFocus.size()) {
-			gotoNextWeek();
+			gotoWeek_Next();
 			return;
 		} else {
 			_selectedItem = new CalendarItem(_tourFocus.get(newIndex).id, SelectionType.TOUR);
@@ -1994,9 +2039,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		if (_tourFocus.size() < 1) {
 			if (direction < 0) {
-				gotoPrevWeek();
+				gotoWeek_Prev();
 			} else {
-				gotoNextWeek();
+				gotoWeek_Next();
 			}
 			return;
 		}
@@ -2048,11 +2093,37 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 
 		if (direction < 0) {
-			gotoPrevWeek();
+			gotoWeek_Prev();
 		} else {
-			gotoNextWeek();
+			gotoWeek_Next();
 		}
 
+	}
+
+	public void gotoWeek_Next() {
+
+		_firstCalendarDay = _firstCalendarDay.plusWeeks(1);
+
+		if (_isYearColumn) {
+			_yearColumn_FirstYear = _yearColumn_FirstYear.plusMonths(1);
+		}
+
+		_isGraphClean = false;
+		redraw();
+		scrollBarUpdate();
+	}
+
+	public void gotoWeek_Prev() {
+
+		_firstCalendarDay = _firstCalendarDay.minusWeeks(1);
+
+		if (_isYearColumn) {
+			_yearColumn_FirstYear = _yearColumn_FirstYear.minusMonths(1);
+		}
+
+		_isGraphClean = false;
+		redraw();
+		scrollBarUpdate();
 	}
 
 	public void gotoYear(final int year) {
@@ -2063,26 +2134,10 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 				// scroll to first day of the week
 				.with(getFirstDayOfWeek_SameOrNext());
 
-		_isGraphClean = false;
-
-		redraw();
-		scrollBarUpdate();
-	}
-
-	private void gotoYear_Next() {
-
-		_firstCalendarDay = _firstCalendarDay.plusYears(1);
+		_yearColumn_FirstYear = _yearColumn_FirstYear.withYear(year);
 
 		_isGraphClean = false;
-		redraw();
-		scrollBarUpdate();
-	}
 
-	private void gotoYear_Previous() {
-
-		_firstCalendarDay = _firstCalendarDay.minusYears(1);
-
-		_isGraphClean = false;
 		redraw();
 		scrollBarUpdate();
 	}
@@ -2193,63 +2248,65 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 	private void onScroll(final SelectionEvent event) {
 
-		final ScrollBar sb = _parent.getVerticalBar();
+		return;
 
-		final int selectableMax = sb.getMaximum() - sb.getThumb() - 1;
-		final int selectableMin = 0 + 1;
-		final int selection = sb.getSelection();
-		final int change = selection - _scrollBarLastSelection;
-
-		if (_scrollBarShiftWeeks != 0) {
-
-			if (_scrollBarLastSelection == selectableMax) {
-				sb.setSelection(selectableMax);
-			} else if (_scrollBarLastSelection == selectableMin) {
-				sb.setSelection(selectableMin);
-			}
-
-			if (change > 0 && _scrollBarShiftWeeks < 0) {
-
-				// ensure we are not shifting over "0"
-				_scrollBarShiftWeeks = Math.min(0, _scrollBarShiftWeeks + change);
-
-			} else if (change < 0 && _scrollBarShiftWeeks > 0) {
-
-				_scrollBarShiftWeeks = Math.max(0, _scrollBarShiftWeeks + change);
-
-			} else {
-				_scrollBarShiftWeeks += change;
-			}
-
-		} else {
-
-			// do we need start shifting the scroll bar ?
-
-			if (selection < selectableMin) {
-
-				// we are at the upper border
-
-				sb.setSelection(selectableMin);
-				_scrollBarShiftWeeks += change;
-			}
-
-			if (selection > selectableMax) {
-
-				// we are at the lower border
-
-				sb.setSelection(selectableMax);
-				_scrollBarShiftWeeks += change;
-
-			}
-		}
-
-		_scrollBarLastSelection = sb.getSelection();
-
-		// goto the selected week
-		_firstCalendarDay = scrollBarStart().atStartOfDay().plusDays(selection * 7);
-
-		_isGraphClean = false;
-		redraw();
+//		final ScrollBar sb = _parent.getVerticalBar();
+//
+//		final int selectableMax = sb.getMaximum() - sb.getThumb() - 1;
+//		final int selectableMin = 0 + 1;
+//		final int selection = sb.getSelection();
+//		final int change = selection - _scrollBarLastSelection;
+//
+//		if (_scrollBarShiftWeeks != 0) {
+//
+//			if (_scrollBarLastSelection == selectableMax) {
+//				sb.setSelection(selectableMax);
+//			} else if (_scrollBarLastSelection == selectableMin) {
+//				sb.setSelection(selectableMin);
+//			}
+//
+//			if (change > 0 && _scrollBarShiftWeeks < 0) {
+//
+//				// ensure we are not shifting over "0"
+//				_scrollBarShiftWeeks = Math.min(0, _scrollBarShiftWeeks + change);
+//
+//			} else if (change < 0 && _scrollBarShiftWeeks > 0) {
+//
+//				_scrollBarShiftWeeks = Math.max(0, _scrollBarShiftWeeks + change);
+//
+//			} else {
+//				_scrollBarShiftWeeks += change;
+//			}
+//
+//		} else {
+//
+//			// do we need start shifting the scroll bar ?
+//
+//			if (selection < selectableMin) {
+//
+//				// we are at the upper border
+//
+//				sb.setSelection(selectableMin);
+//				_scrollBarShiftWeeks += change;
+//			}
+//
+//			if (selection > selectableMax) {
+//
+//				// we are at the lower border
+//
+//				sb.setSelection(selectableMax);
+//				_scrollBarShiftWeeks += change;
+//
+//			}
+//		}
+//
+//		_scrollBarLastSelection = sb.getSelection();
+//
+//		// goto the selected week
+//		_firstCalendarDay = scrollBarStart().atStartOfDay().plusDays(selection * 7);
+//
+//		_isGraphClean = false;
+//		redraw();
 	}
 
 	public void refreshCalendar() {
@@ -2321,7 +2378,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		final long numEndDays = scrollBarEnd().toEpochDay();
 
 		int maxWeeks = (int) ((numEndDays - numStartDays) / 7);
-		final int thumbSize = Math.max(_navigateWeeks, maxWeeks / 20); // ensure the thumb isn't getting to small
+		final int thumbSize = Math.max(_weeksInOneColumn, maxWeeks / 20); // ensure the thumb isn't getting to small
 
 		int thisWeek;
 
@@ -2354,7 +2411,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		sb.setMinimum(0);
 		sb.setMaximum(maxWeeks);
 		sb.setThumb(thumbSize);
-		sb.setPageIncrement(_navigateWeeks);
+		sb.setPageIncrement(_weeksInOneColumn);
 		sb.setSelection(thisWeek);
 
 		_scrollBarLastSelection = thisWeek;
@@ -2473,6 +2530,56 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		if (_calendarYearMonthContributor.getSelectedMonth() != currentDate.plusDays(7).getMonthValue()) {
 			_calendarYearMonthContributor.selectMonth(currentDate.getMonthValue());
 		}
+	}
+
+	private LocalDateTime yearColumn_getFirstDayOfMonth(final LocalDateTime currentFirstDay) {
+
+		final LocalDateTime firstDayOfMonth = currentFirstDay.with(TemporalAdjusters.firstDayOfMonth());
+
+		switch (_currentConfig.yearColumnsStart) {
+
+		case JAN:
+			return firstDayOfMonth.withMonth(Month.JANUARY.getValue());
+
+		case FEB:
+			return firstDayOfMonth.withMonth(Month.FEBRUARY.getValue());
+
+		case MAR:
+			return firstDayOfMonth.withMonth(Month.MARCH.getValue());
+
+		case APR:
+			return firstDayOfMonth.withMonth(Month.APRIL.getValue());
+
+		case MAY:
+			return firstDayOfMonth.withMonth(Month.MAY.getValue());
+
+		case JUN:
+			return firstDayOfMonth.withMonth(Month.JUNE.getValue());
+
+		case JUL:
+			return firstDayOfMonth.withMonth(Month.JULY.getValue());
+
+		case AUG:
+			return firstDayOfMonth.withMonth(Month.AUGUST.getValue());
+
+		case SEP:
+			return firstDayOfMonth.withMonth(Month.SEPTEMBER.getValue());
+
+		case OCT:
+			return firstDayOfMonth.withMonth(Month.OCTOBER.getValue());
+
+		case NOV:
+			return firstDayOfMonth.withMonth(Month.NOVEMBER.getValue());
+
+		case DEC:
+			return firstDayOfMonth.withMonth(Month.DECEMBER.getValue());
+
+		default:
+			break;
+		}
+
+		// this is used for continuously column start
+		return currentFirstDay;
 	}
 
 }

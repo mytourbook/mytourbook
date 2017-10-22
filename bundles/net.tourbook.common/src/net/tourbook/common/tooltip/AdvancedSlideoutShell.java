@@ -66,16 +66,16 @@ public abstract class AdvancedSlideoutShell {
 
 	private static final int			ALPHA_OPAQUE						= 0xff;
 
-	private static final String			STATE_HORIZ_SLIDEOUT_WIDTH			= "STATE_HORIZ_SLIDEOUT_WIDTH";			//$NON-NLS-1$
+	private static final String			STATE_HORIZ_SLIDEOUT_WIDTH			= "STATE_HORIZ_SLIDEOUT_WIDTH";				//$NON-NLS-1$
 	private static final String			STATE_HORIZ_SLIDEOUT_HEIGHT			= "STATE_HORIZ_SLIDEOUT_HEIGHT";			//$NON-NLS-1$
 	private static final String			STATE_VERT_SLIDEOUT_WIDTH			= "STATE_VERT_SLIDEOUT_WIDTH";				//$NON-NLS-1$
-	private static final String			STATE_VERT_SLIDEOUT_HEIGHT			= "STATE_VERT_SLIDEOUT_HEIGHT";			//$NON-NLS-1$
+	private static final String			STATE_VERT_SLIDEOUT_HEIGHT			= "STATE_VERT_SLIDEOUT_HEIGHT";				//$NON-NLS-1$
 
 	private static final String			STATE_IS_SLIDEOUT_PINNED			= "STATE_IS_SLIDEOUT_PINNED";				//$NON-NLS-1$
 	private static final String			STATE_HORIZ_SLIDEOUT_PIN_LOCATION_X	= "STATE_HORIZ_SLIDEOUT_PIN_LOCATION_X";	//$NON-NLS-1$
 	private static final String			STATE_HORIZ_SLIDEOUT_PIN_LOCATION_Y	= "STATE_HORIZ_SLIDEOUT_PIN_LOCATION_Y";	//$NON-NLS-1$
-	private static final String			STATE_VERT_SLIDEOUT_PIN_LOCATION_X	= "STATE_VERT_SLIDEOUT_PIN_LOCATION_X";	//$NON-NLS-1$
-	private static final String			STATE_VERT_SLIDEOUT_PIN_LOCATION_Y	= "STATE_VERT_SLIDEOUT_PIN_LOCATION_Y";	//$NON-NLS-1$
+	private static final String			STATE_VERT_SLIDEOUT_PIN_LOCATION_X	= "STATE_VERT_SLIDEOUT_PIN_LOCATION_X";		//$NON-NLS-1$
+	private static final String			STATE_VERT_SLIDEOUT_PIN_LOCATION_Y	= "STATE_VERT_SLIDEOUT_PIN_LOCATION_Y";		//$NON-NLS-1$
 
 	private static final String			STATE_IS_KEEP_SLIDEOUT_OPEN			= "STATE_IS_KEEP_SLIDEOUT_OPEN";			//$NON-NLS-1$
 
@@ -143,6 +143,11 @@ public abstract class AdvancedSlideoutShell {
 	 * This is used from the UI with a keep open action.
 	 */
 	private boolean						_isKeepSlideoutOpen;
+
+	/**
+	 * Keep slideout open when another dialog (e.g. color selector) is currently opened.
+	 */
+	private boolean						_isAnotherDialogOpened;
 
 	private boolean						_isInShellResize;
 	private boolean						_isDoNotStopAnimation;
@@ -593,7 +598,7 @@ public abstract class AdvancedSlideoutShell {
 			return true;
 		}
 
-		if (_isKeepOpenInternally || _isKeepSlideoutOpen) {
+		if (_isKeepOpenInternally || _isKeepSlideoutOpen || _isAnotherDialogOpened) {
 			return false;
 		}
 
@@ -656,7 +661,7 @@ public abstract class AdvancedSlideoutShell {
 		_rrShellWithResize = new RRShell(
 				_ownerControl.getShell(), //
 				SWT.ON_TOP //
-//						| SWT.TOOL
+						//						| SWT.TOOL
 						| SWT.RESIZE
 						| SWT.NO_FOCUS,
 				getShellTitle_WithResize(),
@@ -678,7 +683,7 @@ public abstract class AdvancedSlideoutShell {
 		_rrShellNoResize = new RRShell(
 				_ownerControl.getShell(), //
 				SWT.ON_TOP //
-//						| SWT.TOOL
+						//						| SWT.TOOL
 						| SWT.NO_FOCUS,
 				getShellTitle_NoResize(),
 				false);
@@ -1434,6 +1439,11 @@ public abstract class AdvancedSlideoutShell {
 
 		_visibleRRShell = rrShell;
 		_visibleShell = rrShell.getShell();
+	}
+
+	protected void setIsAnotherDialogOpened(final boolean isDialogOpened) {
+
+		_isAnotherDialogOpened = isDialogOpened;
 	}
 
 	/**

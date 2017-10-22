@@ -1514,6 +1514,30 @@ public class Util {
 		return new RGB(red, green, blue);
 	}
 
+	/**
+	 * RBG values are in child tag as attributes
+	 * 
+	 * @param xmlConfig
+	 * @param childTag
+	 * @param defaultRgb
+	 * @return
+	 */
+	public static RGB getXmlRgb(final XMLMemento xmlConfig, final String childTag, final RGB defaultRgb) {
+
+		for (final IMemento mementoConfigChild : xmlConfig.getChildren()) {
+
+			final XMLMemento xmlConfigChild = (XMLMemento) mementoConfigChild;
+			final String configTag = xmlConfigChild.getType();
+
+			if (configTag.equals(childTag)) {
+
+				return Util.getXmlRgb(xmlConfigChild, defaultRgb);
+			}
+		}
+
+		return defaultRgb;
+	}
+
 	public static String getXmlString(final IMemento xmlConfig, final String key, final String defaultValue) {
 
 		String value = xmlConfig.getString(key);

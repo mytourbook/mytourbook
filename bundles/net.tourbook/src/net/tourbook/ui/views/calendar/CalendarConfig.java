@@ -17,6 +17,7 @@ package net.tourbook.ui.views.calendar;
 
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.RGB;
 
 public class CalendarConfig {
 
@@ -35,13 +36,7 @@ public class CalendarConfig {
 	String				id							= Long.toString(System.nanoTime());
 	String				defaultId					= CalendarConfigManager.CONFIG_DEFAULT_ID_1;
 	String				name						= CalendarConfigManager.CONFIG_DEFAULT_ID_1;
-                                                            
-	// layout
-	int					calendarColumns				= CalendarConfigManager.DEFAULT_CALENDAR_COLUMNS;
-	int 				calendarColumnsSpacing		= CalendarConfigManager.DEFAULT_CALENDAR_COLUMNS_SPACING;
-	ColumnStart		calendarColumnsStart		= CalendarConfigManager.DEFAULT_CALENDAR_COLUMNS_LAYOUT;
-	int					weekHeight					= CalendarConfigManager.DEFAULT_WEEK_HEIGHT;
-
+    
 	// day date
 	boolean				isHideDayDateWhenNoTour		= false;
 	boolean 			isShowDayDateWeekendColor	= CalendarConfigManager.DEFAULT_IS_SHOW_DAY_DATE_WEEKEND_COLOR;
@@ -51,6 +46,7 @@ public class CalendarConfig {
 	// day
 	boolean				isShowDayDate				= true;
 	boolean				isToggleMonthColor			= true;
+	RGB 				alternateMonthRGB			= CalendarConfigManager.DEFAULT_ALTERNATE_MONTH_RGB;
 	FontData			dayContentFont				= JFaceResources.getFontRegistry().defaultFont().getFontData()[0];
 	CalendarColor		dayContentColor				= CalendarConfigManager.DEFAULT_DAY_CONTENT_COLOR;
                                                             
@@ -73,6 +69,16 @@ public class CalendarConfig {
 	boolean				isShowSummaryColumn			= true;
 	int					summaryColumnWidth			= CalendarConfigManager.DEFAULT_SUMMARY_COLUMN_WIDTH;
 
+	// year columns
+	boolean 			isShowYearColumns			= true;
+	int					numYearColumns				= CalendarConfigManager.DEFAULT_NUM_YEAR_COLUMNS;
+	int 				yearColumnsSpacing			= CalendarConfigManager.DEFAULT_YEAR_COLUMNS_SPACING;
+	ColumnStart			yearColumnsStart			= CalendarConfigManager.DEFAULT_YEAR_COLUMNS_LAYOUT;
+	FontData 			yearHeaderFont				= JFaceResources.getFontRegistry().defaultFont().getFontData()[0];
+	
+	// layout
+	int					weekHeight					= CalendarConfigManager.DEFAULT_WEEK_HEIGHT;
+	
 // SET_FORMATTING_ON
 
 	@Override
