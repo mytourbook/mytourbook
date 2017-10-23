@@ -350,7 +350,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarCo
 		_actionBack = new Action() {
 			@Override
 			public void run() {
-				_calendarGraph.gotoScreen_Prev();
+				_calendarGraph.scroll_Screen(false);
 			}
 		};
 		_actionBack.setText(Messages.Calendar_View_Action_Back);
@@ -360,7 +360,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarCo
 		_actionForward = new Action() {
 			@Override
 			public void run() {
-				_calendarGraph.gotoScreen_Next();
+				_calendarGraph.scroll_Screen(true);
 			}
 		};
 		_actionForward.setText(Messages.Calendar_View_Action_Forward);

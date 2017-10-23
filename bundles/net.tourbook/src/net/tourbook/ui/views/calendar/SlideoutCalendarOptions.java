@@ -131,6 +131,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	private Combo					_comboWeek_Format_5;
 
 	private Button					_chkIsHideDayDateWhenNoTour;
+	private Button					_chkUseDraggedScrolling;
 	private Button					_chkIsShowDateColumn;
 	private Button					_chkIsShowDayDateWeekendColor;
 	private Button					_chkIsShowDayDate;
@@ -881,17 +882,28 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				.applyTo(group);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 		{
+			createUI_910_Col1(group);
+			createUI_910_Col2(group);
+		}
+	}
+
+	private void createUI_910_Col1(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		{
 			{
 				/*
 				 * Week height
 				 */
 				// label
-				final Label label = new Label(group, SWT.NONE);
+				final Label label = new Label(container, SWT.NONE);
 				label.setText(Messages.Slideout_CalendarOptions_Label_RowHeight);
 				label.setToolTipText(Messages.Slideout_CalendarOptions_Label_RowHeight_Tooltip);
 
 				// spinner: height
-				_spinnerWeekHeight = new Spinner(group, SWT.BORDER);
+				_spinnerWeekHeight = new Spinner(container, SWT.BORDER);
 				_spinnerWeekHeight.setMinimum(CalendarConfigManager.WEEK_HEIGHT_MIN);
 				_spinnerWeekHeight.setMaximum(CalendarConfigManager.WEEK_HEIGHT_MAX);
 				_spinnerWeekHeight.setIncrement(1);
@@ -902,7 +914,87 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		}
 	}
 
-	private void createUI_980_TourInfo(final Composite parent) {
+	private void createUI_910_Col2(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		{
+			{
+				/*
+				 * Mouse wheel scrolling
+				 */
+
+				// checkbox
+				_chkUseDraggedScrolling = new Button(container, SWT.CHECK);
+				_chkUseDraggedScrolling.setText(Messages.Slideout_CalendarOptions_Checkbox_UseDraggedScrolling);
+				_chkUseDraggedScrolling.setToolTipText(
+						Messages.Slideout_CalendarOptions_Checkbox_UseDraggedScrolling_Tooltip);
+				_chkUseDraggedScrolling.addSelectionListener(_defaultSelectionListener);
+				GridDataFactory
+						.fillDefaults()//
+						.align(SWT.FILL, SWT.BEGINNING)
+						.span(2, 1)
+						.applyTo(_chkUseDraggedScrolling);
+			}
+		}
+	}
+
+	private void createUI_999_Configuration(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+		{
+			{
+				/*
+				 * Name
+				 */
+				final Label label = new Label(container, SWT.NONE);
+				label.setText(Messages.Slideout_CalendarOptions_Label_Name);
+				label.setToolTipText(Messages.Slideout_CalendarOptions_Label_Name_Tooltip);
+				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+			}
+			{
+				/*
+				 * Text
+				 */
+				_textConfigName = new Text(container, SWT.BORDER);
+				_textConfigName.addModifyListener(new ModifyListener() {
+					@Override
+					public void modifyText(final ModifyEvent e) {
+						onModifyName();
+					}
+				});
+				GridDataFactory
+						.fillDefaults()//
+						.align(SWT.FILL, SWT.CENTER)
+						.grab(true, false)
+						.applyTo(_textConfigName);
+			}
+			{
+				/*
+				 * Button: Reset
+				 */
+				_btnReset = new Button(container, SWT.PUSH);
+				_btnReset.setText(Messages.App_Action_Reset);
+				_btnReset.setToolTipText(Messages.App_Action_ResetConfig_Tooltip);
+				_btnReset.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						onSelectConfig_Default(e);
+					}
+				});
+				GridDataFactory
+						.fillDefaults()//
+						//						.grab(true, false)
+						.align(SWT.END, SWT.CENTER)
+						.applyTo(_btnReset);
+			}
+		}
+	}
+
+	private void createUI_a980_TourInfo(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory
@@ -987,7 +1079,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		}
 	}
 
-	private void createUI_981_WeekSummary(final Composite parent) {
+	private void createUI_a981_WeekSummary(final Composite parent) {
 
 		final Group group = new Group(parent, SWT.NONE);
 		group.setText(Messages.Slideout_CalendarOptions_Group_WeekSummary);
@@ -1085,64 +1177,6 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			_comboWeek_Format_5.setVisibleItemCount(20);
 			_comboWeek_Format_5.addSelectionListener(_defaultSelectionListener);
 			_comboWeek_Format_5.addFocusListener(_keepOpenListener);
-		}
-	}
-
-	private void createUI_999_Configuration(final Composite parent) {
-
-		/*
-		 * Name
-		 */
-		{
-			/*
-			 * Label
-			 */
-			final Label lable = new Label(parent, SWT.NONE);
-			lable.setText(Messages.Slideout_CalendarOptions_Label_Name);
-			lable.setToolTipText(Messages.Slideout_CalendarOptions_Label_Name_Tooltip);
-			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(lable);
-		}
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-		{
-			{
-				/*
-				 * Text
-				 */
-				_textConfigName = new Text(container, SWT.BORDER);
-				_textConfigName.addModifyListener(new ModifyListener() {
-					@Override
-					public void modifyText(final ModifyEvent e) {
-						onModifyName();
-					}
-				});
-				GridDataFactory
-						.fillDefaults()//
-						.align(SWT.FILL, SWT.CENTER)
-						.grab(true, false)
-						.applyTo(_textConfigName);
-			}
-			{
-				/*
-				 * Button: Reset
-				 */
-				_btnReset = new Button(container, SWT.PUSH);
-				_btnReset.setText(Messages.App_Action_Reset);
-				_btnReset.setToolTipText(Messages.App_Action_ResetConfig_Tooltip);
-				_btnReset.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(final SelectionEvent e) {
-						onSelectConfig_Default(e);
-					}
-				});
-				GridDataFactory
-						.fillDefaults()//
-						//						.grab(true, false)
-						.align(SWT.END, SWT.CENTER)
-						.applyTo(_btnReset);
-			}
 		}
 	}
 
@@ -1789,6 +1823,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 			// layout
 			_spinnerWeekHeight.setSelection(config.weekHeight);
+			_chkUseDraggedScrolling.setSelection(config.useDraggedScrolling);
 		}
 		_isUpdateUI = false;
 
@@ -1843,6 +1878,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 		// layout
 		config.weekHeight = _spinnerWeekHeight.getSelection();
+		config.useDraggedScrolling = _chkUseDraggedScrolling.getSelection();
 
 		_calendarView.updateUI_CalendarConfig();
 	}

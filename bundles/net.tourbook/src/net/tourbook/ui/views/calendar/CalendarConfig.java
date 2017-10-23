@@ -78,6 +78,7 @@ public class CalendarConfig {
 	
 	// layout
 	int					weekHeight					= CalendarConfigManager.DEFAULT_WEEK_HEIGHT;
+	boolean 			useDraggedScrolling			= true;
 	
 // SET_FORMATTING_ON
 

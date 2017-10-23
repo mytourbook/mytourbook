@@ -113,6 +113,7 @@ public class CalendarConfigManager {
 	private static final String		ATTR_TOUR_BORDER						= "tourBorder";							//$NON-NLS-1$
 	private static final String		ATTR_TOUR_BORDER_COLOR					= "tourBorderColor";					//$NON-NLS-1$
 	private static final String		ATTR_TOUR_BACKGROUND_WIDTH				= "tourBorderWidth";					//$NON-NLS-1$
+	private static final String		ATTR_USE_DRAGGED_SCROLLING				= "useDraggedScrolling";				//$NON-NLS-1$
 	private static final String		ATTR_WEEK_HEIGHT						= "weekHeight";							//$NON-NLS-1$
 	private static final String		ATTR_YEAR_HEADER_FONT					= "yearHeaderFont";						//$NON-NLS-1$
 	//
@@ -177,6 +178,8 @@ public class CalendarConfigManager {
 
 	private static final ColumnLayoutData[]			_allColumnLayoutData			= new ColumnLayoutData[] {
 
+			new ColumnLayoutData(ColumnStart.CONTINUOUSLY, Messages.Calendar_Config_ColumnLayout_Continuously),
+
 			new ColumnLayoutData(ColumnStart.JAN, TimeTools.month_Full[0]),
 			new ColumnLayoutData(ColumnStart.FEB, TimeTools.month_Full[1]),
 			new ColumnLayoutData(ColumnStart.MAR, TimeTools.month_Full[2]),
@@ -190,6 +193,7 @@ public class CalendarConfigManager {
 			new ColumnLayoutData(ColumnStart.NOV, TimeTools.month_Full[10]),
 			new ColumnLayoutData(ColumnStart.DEC, TimeTools.month_Full[11]),
 
+			// repeat continuously -> is more handier
 			new ColumnLayoutData(ColumnStart.CONTINUOUSLY, Messages.Calendar_Config_ColumnLayout_Continuously),
 	};
 
@@ -594,6 +598,7 @@ public class CalendarConfigManager {
 			Util.setXmlFont(xmlConfig, ATTR_YEAR_HEADER_FONT, 			config.yearHeaderFont);
 			
 			// layout
+			xmlConfig.putBoolean(ATTR_USE_DRAGGED_SCROLLING, 			config.useDraggedScrolling);
 			xmlConfig.putInteger(ATTR_WEEK_HEIGHT, 						config.weekHeight);
 			
 // SET_FORMATTING_ON
@@ -798,6 +803,7 @@ public class CalendarConfigManager {
 		
 		// layout
 		config.weekHeight					= Util.getXmlInteger(xmlConfig, 			ATTR_WEEK_HEIGHT,				DEFAULT_WEEK_HEIGHT);
+		config.useDraggedScrolling			= Util.getXmlBoolean(xmlConfig, 			ATTR_USE_DRAGGED_SCROLLING,		true);
 
 // SET_FORMATTING_ON
 	}

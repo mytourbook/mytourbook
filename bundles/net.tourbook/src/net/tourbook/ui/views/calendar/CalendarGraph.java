@@ -390,7 +390,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 						_tourDoubleClickState.canAdjustAltitude = true;
 						TourManager.getInstance().tourDoubleClickAction(CalendarGraph.this, _tourDoubleClickState);
 					} else {
-						gotoTour_Next();
+						scroll_Tour(true);
 					}
 					break;
 				case SWT.TRAVERSE_ESCAPE:
@@ -413,12 +413,12 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 				switch (event.keyCode) {
 				case SWT.ARROW_LEFT:
 				case 'h':
-					gotoTour_Prev();
+					scroll_Tour(false);
 					break;
 
 				case SWT.ARROW_RIGHT:
 				case 'l':
-					gotoTour_Next();
+					scroll_Tour(true);
 					break;
 
 				case SWT.ARROW_UP:
@@ -426,7 +426,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 					if (_selectedItem.isTour()) {
 						gotoTourSameWeekday(-1);
 					} else {
-						gotoWeek_Prev();
+						scroll_Week(false);
 					}
 					break;
 
@@ -435,18 +435,18 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 					if (_selectedItem.isTour()) {
 						gotoTourSameWeekday(+1);
 					} else {
-						gotoWeek_Next();
+						scroll_Week(true);
 					}
 					break;
 
 				case SWT.PAGE_DOWN:
 				case 'n':
-					gotoScreen_Next();
+					scroll_Screen(true);
 					break;
 
 				case SWT.PAGE_UP:
 				case 'p':
-					gotoScreen_Prev();
+					scroll_Screen(false);
 					break;
 
 				case SWT.HOME:
@@ -464,7 +464,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 						_selectedItem = _noItem;
 						redraw();
 					} else {
-						gotoTour_Prev();
+						scroll_Tour(false);
 					}
 					break;
 				}
@@ -480,17 +480,19 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 				if (_calendarAllDaysRectangle.contains(p)) {
 
+					final boolean isTour = _selectedItem.isTour();
+
 					if (event.count > 0) {
-						if (_selectedItem.isTour()) {
-							gotoTour_Prev();
+						if (isTour) {
+							scroll_Tour(false);
 						} else {
-							gotoWeek_Next();
+							scroll_Week(true);
 						}
 					} else {
-						if (_selectedItem.isTour()) {
-							gotoTour_Next();
+						if (isTour) {
+							scroll_Tour(true);
 						} else {
-							gotoWeek_Prev();
+							scroll_Week(false);
 						}
 					}
 
@@ -499,9 +501,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 					// left or right column, scroll by pages
 
 					if (event.count > 0) {
-						gotoScreen_Prev();
+						scroll_Screen(true);
 					} else {
-						gotoScreen_Next();
+						scroll_Screen(false);
 					}
 				}
 			}
@@ -1413,26 +1415,26 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		final int nextWeekYPos = thisWeekYPos + _fontHeight_DateColumn + 0;
 
-		if (_currentConfig.isShowYearColumns
-				&& _currentConfig.yearColumnsStart == ColumnStart.CONTINUOUSLY) {
-
-			// draw year always in first row
-
-			final boolean isInJanuary = currentDate.getMonthValue() == 1
-					|| currentDate.plusDays(6).getMonthValue() == 1;
-
-			final int yearColumnYear = _yearColumn_CurrentYear.getYear();
-
-			if (isInJanuary && _lastWeekDateYear != yearColumnYear) {
-
-				gc.drawString(Integer.toString(yearColumnYear), posX, thisWeekYPos, true);
-
-				_lastWeekDateYear = yearColumnYear;
-				_nextWeekDateYPos = nextWeekYPos;
-
-				return;
-			}
-		}
+//		if (_currentConfig.isShowYearColumns
+//				&& _currentConfig.yearColumnsStart == ColumnStart.CONTINUOUSLY) {
+//
+//			// draw year always in first row
+//
+//			final boolean isInJanuary = currentDate.getMonthValue() == 1
+//					|| currentDate.plusDays(6).getMonthValue() == 1;
+//
+//			final int yearColumnYear = _yearColumn_CurrentYear.getYear();
+//
+//			if (isInJanuary && _lastWeekDateYear != yearColumnYear) {
+//
+//				gc.drawString(Integer.toString(yearColumnYear), posX, thisWeekYPos, true);
+//
+//				_lastWeekDateYear = yearColumnYear;
+//				_nextWeekDateYPos = nextWeekYPos;
+//
+//				return;
+//			}
+//		}
 
 		switch (dateColumnContent) {
 		case MONTH:
@@ -1895,58 +1897,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		scrollBarUpdate();
 	}
 
-	public void gotoScreen_Next() {
-
-		_firstCalendarDay = _firstCalendarDay.plusWeeks(_weeksInOneColumn);
-
-		if (_isYearColumn) {
-
-			if (_currentConfig.yearColumnsStart == ColumnStart.CONTINUOUSLY) {
-
-				_yearColumn_FirstYear = _yearColumn_FirstYear
-
-						.plusWeeks(_weeksInOneColumn)
-
-						// must start ALWAYS with 1st of month
-						.withDayOfMonth(1);
-
-			} else {
-
-				_yearColumn_FirstYear = _yearColumn_FirstYear.plusYears(1);
-			}
-		}
-
-		_isGraphClean = false;
-		redraw();
-		scrollBarUpdate();
-	}
-
-	public void gotoScreen_Prev() {
-
-		_firstCalendarDay = _firstCalendarDay.minusWeeks(_weeksInOneColumn);
-
-		if (_isYearColumn) {
-
-			if (_currentConfig.yearColumnsStart == ColumnStart.CONTINUOUSLY) {
-
-				_yearColumn_FirstYear = _yearColumn_FirstYear
-
-						.minusWeeks(_weeksInOneColumn)
-
-						// must start ALWAYS with 1st of month
-						.withDayOfMonth(1);
-
-			} else {
-
-				_yearColumn_FirstYear = _yearColumn_FirstYear.minusYears(1);
-			}
-		}
-
-		_isGraphClean = false;
-		redraw();
-		scrollBarUpdate();
-	}
-
 	public void gotoToday() {
 
 		_firstCalendarDay = LocalDateTime.now();
@@ -1957,14 +1907,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		gotoDate(_firstCalendarDay.toLocalDate());
 
-	}
-
-	public void gotoTour_Next() {
-		gotoTourOffset(+1);
-	}
-
-	public void gotoTour_Prev() {
-		gotoTourOffset(-1);
 	}
 
 	public void gotoTourId(final long tourId) {
@@ -1987,9 +1929,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		if (_tourFocus.size() < 1) {
 			if (offset < 0) {
-				gotoWeek_Prev();
+				scroll_Week(false);
 			} else {
-				gotoWeek_Next();
+				scroll_Week(true);
 			}
 			return;
 		}
@@ -2022,10 +1964,10 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 		final int newIndex = index + offset;
 		if (newIndex < 0) {
-			gotoWeek_Prev();
+			scroll_Week(false);
 			return;
 		} else if (newIndex >= _tourFocus.size()) {
-			gotoWeek_Next();
+			scroll_Week(true);
 			return;
 		} else {
 			_selectedItem = new CalendarItem(_tourFocus.get(newIndex).id, SelectionType.TOUR);
@@ -2039,9 +1981,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		if (_tourFocus.size() < 1) {
 			if (direction < 0) {
-				gotoWeek_Prev();
+				scroll_Week(false);
 			} else {
-				gotoWeek_Next();
+				scroll_Week(true);
 			}
 			return;
 		}
@@ -2093,37 +2035,11 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 
 		if (direction < 0) {
-			gotoWeek_Prev();
+			scroll_Week(false);
 		} else {
-			gotoWeek_Next();
+			scroll_Week(true);
 		}
 
-	}
-
-	public void gotoWeek_Next() {
-
-		_firstCalendarDay = _firstCalendarDay.plusWeeks(1);
-
-		if (_isYearColumn) {
-			_yearColumn_FirstYear = _yearColumn_FirstYear.plusMonths(1);
-		}
-
-		_isGraphClean = false;
-		redraw();
-		scrollBarUpdate();
-	}
-
-	public void gotoWeek_Prev() {
-
-		_firstCalendarDay = _firstCalendarDay.minusWeeks(1);
-
-		if (_isYearColumn) {
-			_yearColumn_FirstYear = _yearColumn_FirstYear.minusMonths(1);
-		}
-
-		_isGraphClean = false;
-		redraw();
-		scrollBarUpdate();
 	}
 
 	public void gotoYear(final int year) {
@@ -2330,6 +2246,89 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 	void removeSelectionListener(final ICalendarSelectionProvider listener) {
 		_selectionProvider.remove(listener);
+	}
+
+	public void scroll_Screen(final boolean isNext) {
+
+		final boolean useDraggedScrolling = _currentConfig.useDraggedScrolling;
+
+		if (isNext) {
+			_firstCalendarDay = useDraggedScrolling
+					? _firstCalendarDay.plusWeeks(_weeksInOneColumn)
+					: _firstCalendarDay.minusWeeks(_weeksInOneColumn);
+		} else {
+			_firstCalendarDay = useDraggedScrolling
+					? _firstCalendarDay.minusWeeks(_weeksInOneColumn)
+					: _firstCalendarDay.plusWeeks(_weeksInOneColumn);
+		}
+
+		if (_isYearColumn) {
+
+			if (_currentConfig.yearColumnsStart == ColumnStart.CONTINUOUSLY) {
+
+				LocalDateTime yearColumn_WithAdjustedWeeks;
+
+				if (isNext) {
+					yearColumn_WithAdjustedWeeks = useDraggedScrolling
+							? _yearColumn_FirstYear.plusWeeks(_weeksInOneColumn)
+							: _yearColumn_FirstYear.minusWeeks(_weeksInOneColumn);
+				} else {
+					yearColumn_WithAdjustedWeeks = useDraggedScrolling
+							? _yearColumn_FirstYear.minusWeeks(_weeksInOneColumn)
+							: _yearColumn_FirstYear.plusWeeks(_weeksInOneColumn);
+				}
+
+				_yearColumn_FirstYear = yearColumn_WithAdjustedWeeks
+
+						// must start ALWAYS with 1st of month
+						.withDayOfMonth(1);
+
+			} else {
+
+				// scroll by month/year column
+
+				if (isNext) {
+					_yearColumn_FirstYear = useDraggedScrolling
+							? _yearColumn_FirstYear.plusYears(1)
+							: _yearColumn_FirstYear.minusYears(1);
+				} else {
+
+					_yearColumn_FirstYear = useDraggedScrolling
+							? _yearColumn_FirstYear.minusYears(1)
+							: _yearColumn_FirstYear.plusYears(1);
+				}
+			}
+		}
+
+		_isGraphClean = false;
+		redraw();
+		scrollBarUpdate();
+	}
+
+	public void scroll_Tour(final boolean isNext) {
+
+		gotoTourOffset(isNext ? +1 : -1);
+	}
+
+	public void scroll_Week(final boolean isNext) {
+
+		if (isNext) {
+			_firstCalendarDay = _currentConfig.useDraggedScrolling
+					? _firstCalendarDay.plusWeeks(1)
+					: _firstCalendarDay.minusWeeks(1);
+		} else {
+			_firstCalendarDay = _currentConfig.useDraggedScrolling
+					? _firstCalendarDay.minusWeeks(1)
+					: _firstCalendarDay.plusWeeks(1);
+		}
+
+		if (_isYearColumn) {
+			_yearColumn_FirstYear = _yearColumn_FirstYear.plusMonths(1);
+		}
+
+		_isGraphClean = false;
+		redraw();
+		scrollBarUpdate();
 	}
 
 	private LocalDate scrollBarEnd() {
