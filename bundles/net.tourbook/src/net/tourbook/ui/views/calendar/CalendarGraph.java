@@ -323,7 +323,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 				// fix problem that the scrollbar is initially not correctly setup
 				if (!_isScrollbarInitialized) {
+
 					_isScrollbarInitialized = true;
+
 					scrollBarUpdate();
 				}
 			}
@@ -333,11 +335,13 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			@Override
 			public void mouseDoubleClick(final MouseEvent e) {
 				if (_selectedItem.isTour()) {
+
 					_tourDoubleClickState.canEditTour = true;
 					_tourDoubleClickState.canOpenTour = true;
 					_tourDoubleClickState.canQuickEditTour = true;
 					_tourDoubleClickState.canEditMarker = true;
 					_tourDoubleClickState.canAdjustAltitude = true;
+
 					TourManager.getInstance().tourDoubleClickAction(CalendarGraph.this, _tourDoubleClickState);
 				}
 
@@ -2186,7 +2190,66 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 	private void onScroll(final SelectionEvent event) {
 
-		return;
+		final ScrollBar sb = _parent.getVerticalBar();
+
+		final int selectableMax = sb.getMaximum() - sb.getThumb() - 1;
+		final int selectableMin = 0 + 1;
+		final int selection = sb.getSelection();
+		final int change = selection - _scrollBarLastSelection;
+
+		if (_scrollBarShiftWeeks != 0) {
+
+			if (_scrollBarLastSelection == selectableMax) {
+				sb.setSelection(selectableMax);
+			} else if (_scrollBarLastSelection == selectableMin) {
+				sb.setSelection(selectableMin);
+			}
+
+			if (change > 0 && _scrollBarShiftWeeks < 0) {
+
+				// ensure we are not shifting over "0"
+				_scrollBarShiftWeeks = Math.min(0, _scrollBarShiftWeeks + change);
+
+			} else if (change < 0 && _scrollBarShiftWeeks > 0) {
+
+				_scrollBarShiftWeeks = Math.max(0, _scrollBarShiftWeeks + change);
+
+			} else {
+				_scrollBarShiftWeeks += change;
+			}
+
+		} else {
+
+			// do we need start shifting the scroll bar ?
+
+			if (selection < selectableMin) {
+
+				// we are at the upper border
+
+				sb.setSelection(selectableMin);
+				_scrollBarShiftWeeks += change;
+			}
+
+			if (selection > selectableMax) {
+
+				// we are at the lower border
+
+				sb.setSelection(selectableMax);
+				_scrollBarShiftWeeks += change;
+
+			}
+		}
+
+		_scrollBarLastSelection = sb.getSelection();
+
+		// goto the selected week
+		_firstCalendarDay = scrollBar_10_getStart().atStartOfDay().plusDays(selection * 7);
+
+		_isGraphClean = false;
+		redraw();
+	}
+
+	private void onScroll_OLD(final SelectionEvent event) {
 
 //		final ScrollBar sb = _parent.getVerticalBar();
 //
@@ -2195,55 +2258,57 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 //		final int selection = sb.getSelection();
 //		final int change = selection - _scrollBarLastSelection;
 //
-//		if (_scrollBarShiftWeeks != 0) {
+//		if (_scrollDebug) {
+//			System.out.println("Last Selection: " + _scrollBarLastSelection + " - New Selection: " + selection); //$NON-NLS-1$ //$NON-NLS-2$
+//		}
 //
+//		if (_scrollBarShift != 0) {
 //			if (_scrollBarLastSelection == selectableMax) {
 //				sb.setSelection(selectableMax);
 //			} else if (_scrollBarLastSelection == selectableMin) {
 //				sb.setSelection(selectableMin);
 //			}
-//
-//			if (change > 0 && _scrollBarShiftWeeks < 0) {
-//
-//				// ensure we are not shifting over "0"
-//				_scrollBarShiftWeeks = Math.min(0, _scrollBarShiftWeeks + change);
-//
-//			} else if (change < 0 && _scrollBarShiftWeeks > 0) {
-//
-//				_scrollBarShiftWeeks = Math.max(0, _scrollBarShiftWeeks + change);
-//
+//			if (change > 0 && _scrollBarShift < 0) { // ensure we are not shifting over "0"
+//				_scrollBarShift = Math.min(0, _scrollBarShift + change);
+//			} else if (change < 0 && _scrollBarShift > 0) {
+//				_scrollBarShift = Math.max(0, _scrollBarShift + change);
 //			} else {
-//				_scrollBarShiftWeeks += change;
+//				_scrollBarShift += change;
 //			}
-//
-//		} else {
-//
-//			// do we need start shifting the scroll bar ?
-//
-//			if (selection < selectableMin) {
-//
-//				// we are at the upper border
-//
+//		} else { // do we need start shifting the scroll bar ?
+//			if (selection < selectableMin) { // we are at the upper border
 //				sb.setSelection(selectableMin);
-//				_scrollBarShiftWeeks += change;
+//				_scrollBarShift += change;
 //			}
-//
-//			if (selection > selectableMax) {
-//
-//				// we are at the lower border
-//
+//			if (selection > selectableMax) { // we are at the lower border
 //				sb.setSelection(selectableMax);
-//				_scrollBarShiftWeeks += change;
+//				_scrollBarShift += change;
 //
 //			}
+//		}
+//
+//		// selection = sb.getSelection();
+//		// final DateTime dt1 = scrollBarStart();
+//		// final DateTime dt2 = scrollBarEnd();
+//		// int weeks = (int) ((dt2.getMillis() - dt1.getMillis()) / (1000 * 60 * 60 * 24 * 7));
+//		// final int thumbSize = Math.max(getNumWeeks(), weeks / 20); // ensure the thumb isn't getting to small
+//		// sb.setThumb(thumbSize);
+//		// weeks += thumbSize;
+//		// sb.setMinimum(0);
+//		// sb.setMaximum(weeks);
+//		// sb.setPageIncrement(getNumWeeks());
+//
+//		if (_scrollDebug) {
+//			System.out.println("SbarStart: " + scrollBarStart().getWeekOfWeekyear()); //$NON-NLS-1$
+//			System.out.println("SbarShift: " + _scrollBarShift + " - Selected Week: " + selection); //$NON-NLS-1$ //$NON-NLS-2$
 //		}
 //
 //		_scrollBarLastSelection = sb.getSelection();
 //
 //		// goto the selected week
-//		_firstCalendarDay = scrollBarStart().atStartOfDay().plusDays(selection * 7);
+//		_dt = scrollBarStart().plusDays(selection * 7);
 //
-//		_isGraphClean = false;
+//		_graphClean = false;
 //		redraw();
 	}
 
@@ -2386,26 +2451,12 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		scrollBarUpdate();
 	}
 
-	private LocalDate scrollBar_getEnd() {
-
-		final LocalDate dt = LocalDate.now().plusWeeks(_scrollBarShiftWeeks);
-
-		// ensure the date return is a "FirstDayOfTheWeek" !!!
-		final LocalDate endDate = dt
-				.plusWeeks(1)
-				.with(getFirstDayOfWeek_SameOrNext());
-
-		return endDate;
-	}
-
-	private LocalDate scrollBar_getStart() {
+	private LocalDate scrollBar_10_getStart() {
 
 		LocalDateTime firstTourDate = _dataProvider.getFirstTourDateTime();
 		final LocalDateTime today = LocalDateTime.now();
 
-		final Duration duration = Duration.between(today, firstTourDate);
-
-		final int numWeeks = (int) (duration.toDays() / 7);
+		final int numWeeks = (int) ((today.toLocalDate().toEpochDay() - firstTourDate.toLocalDate().toEpochDay()) / 7);
 
 		// ensure the scrollable area has a reasonable size
 		if (numWeeks < _MIN_SCROLLABLE_WEEKS) {
@@ -2423,39 +2474,87 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		return startDate;
 	}
 
+	private LocalDate scrollBar_20_getEnd() {
+
+		final LocalDate dt = LocalDate.now().plusWeeks(_scrollBarShiftWeeks);
+
+		// ensure the date return is a "FirstDayOfTheWeek" !!!
+		final LocalDate endDate = dt
+				.plusWeeks(1)
+				.with(getFirstDayOfWeek_SameOrNext());
+
+		return endDate;
+	}
+
+//	private DateTime scrollBarEnd() {
+//
+//		final DateTime dt = new DateTime().plusWeeks(_scrollBarShift);
+//
+//		// ensure the date return is a "FirstDayOfTheWeek" !!!
+//		return dt.plusWeeks(1).withDayOfWeek(getFirstDayOfWeek());
+//	}
+//
+//	private DateTime scrollBarStart() {
+//
+//		// DateTime dt = _dataProvider.getFirstDateTime().plusWeeks(_scrollBarShift);
+//		DateTime dt = _dataProvider.getFirstDateTime();
+//		final DateTime now = new DateTime();
+//		final int weeks = (int) ((now.getMillis() - dt.getMillis()) / _WEEK_MILLIS);
+//		if (weeks < _MIN_SCROLLABLE_WEEKS) { // ensure the scrollable area has a reasonable size
+//			dt = now.minusWeeks(_MIN_SCROLLABLE_WEEKS);
+//		}
+//		dt = dt.plusWeeks(_scrollBarShift);
+//		// ensure the date return is a "FirstDayOfTheWeek" !!!
+//		return dt.minusWeeks(1).withDayOfWeek(getFirstDayOfWeek());
+//	}
+
 	private void scrollBarUpdate() {
 
 		_scrollBarShiftWeeks = 0;
 
-		final long numStartDays = scrollBar_getStart().toEpochDay();
-		final long numFirstDays = _firstCalendarDay.toLocalDate().toEpochDay();
-		final long numEndDays = scrollBar_getEnd().toEpochDay();
+		final long scrollStart = scrollBar_10_getStart().toEpochDay();
+		final long scrollEnd = scrollBar_20_getEnd().toEpochDay();
 
-		int maxWeeks = (int) ((numEndDays - numStartDays) / 7);
+		final long firstCalDay = _firstCalendarDay.toLocalDate().toEpochDay();
+
+		int maxWeeks = (int) ((scrollEnd - scrollStart) / 7);
 		final int thumbSize = Math.max(_weeksInOneColumn, maxWeeks / 20); // ensure the thumb isn't getting to small
 
 		int thisWeek;
 
-		if (numFirstDays < numStartDays) {
+		if (firstCalDay < scrollStart) {
 
 			// shift negative
 
-			_scrollBarShiftWeeks = (int) ((numFirstDays - numStartDays) / 7);
+			_scrollBarShiftWeeks = (int) ((firstCalDay - scrollStart) / 7);
 			thisWeek = 1;
 
-		} else if (numFirstDays > numEndDays) {
+		} else if (firstCalDay > scrollEnd) {
 
 			// shift positive
 
-			_scrollBarShiftWeeks = (int) ((numFirstDays - numEndDays) / 7);
+			_scrollBarShiftWeeks = (int) ((firstCalDay - scrollEnd) / 7);
 			thisWeek = maxWeeks - 1;
 
 		} else {
 
-			thisWeek = (int) ((numFirstDays - numStartDays) / 7);
+			thisWeek = (int) ((firstCalDay - scrollStart) / 7);
 		}
 
 		maxWeeks += thumbSize;
+
+		System.out.println(
+				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+						+ ("\tStart:" + scrollStart)
+						+ ("\tEnd:" + scrollEnd)
+						+ ("\tFirst:" + firstCalDay)
+						+ ("\tmaxWeeks:" + maxWeeks)
+						+ ("\tthisWeek:" + thisWeek)
+						+ ("\tthumbSize:" + thumbSize)
+						+ ("\t_scrollBarShiftWeeks:" + _scrollBarShiftWeeks)
+//				+ ("\t:" + )
+		);
+// TODO remove SYSTEM.OUT.PRINTLN
 
 		/*
 		 * Update scrollbar
