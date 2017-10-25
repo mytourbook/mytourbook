@@ -125,7 +125,7 @@ public class CalendarConfigManager {
 	static final DayDateFormat		DEFAULT_DAY_DATE_FORMAT					= DayDateFormat.DAY;
 	static final int				DEFAULT_DATE_COLUMN_WIDTH				= 50;
 	static final DateColumnContent	DEFAULT_DATE_COLUMN_CONTENT				= DateColumnContent.MONTH;
-	static final boolean			DEFAULT_IS_SHOW_DAY_DATE_WEEKEND_COLOR	= false;
+	static final boolean			DEFAULT_IS_SHOW_DAY_DATE_WEEKEND_COLOR	= true;
 	static final int				DEFAULT_SUMMARY_COLUMN_WIDTH			= 50;
 	static final TourBackground		DEFAULT_TOUR_BACKGROUND					= TourBackground.FILL;
 	static final CalendarColor		DEFAULT_TOUR_BACKGROUND_COLOR1			= CalendarColor.DARK;
