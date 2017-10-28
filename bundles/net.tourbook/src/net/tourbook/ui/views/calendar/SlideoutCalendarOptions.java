@@ -64,6 +64,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolItem;
@@ -108,29 +109,30 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	private ColorSelectorExtended	_colorAlternateMonthColor;
 
 	private Combo					_comboTour_Value_1;
+
 	private Combo					_comboTour_Value_2;
 	private Combo					_comboTour_Value_3;
-
 	private Combo					_comboTour_Format_1_1;
+
 	private Combo					_comboTour_Format_1_2;
 	private Combo					_comboTour_Format_2_1;
 	private Combo					_comboTour_Format_2_2;
 	private Combo					_comboTour_Format_3_1;
 	private Combo					_comboTour_Format_3_2;
-
 	private Combo					_comboWeek_Value_1;
+
 	private Combo					_comboWeek_Value_2;
 	private Combo					_comboWeek_Value_3;
 	private Combo					_comboWeek_Value_4;
 	private Combo					_comboWeek_Value_5;
-
 	private Combo					_comboWeek_Format_1;
+
 	private Combo					_comboWeek_Format_2;
 	private Combo					_comboWeek_Format_3;
 	private Combo					_comboWeek_Format_4;
 	private Combo					_comboWeek_Format_5;
-
 	private Button					_chkIsHideDayDateWhenNoTour;
+
 	private Button					_chkUseDraggedScrolling;
 	private Button					_chkIsShowDateColumn;
 	private Button					_chkIsShowDayDateWeekendColor;
@@ -138,8 +140,8 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	private Button					_chkIsShowSummaryColumn;
 	private Button					_chkIsShowMonthWithAlternateColor;
 	private Button					_chkIsShowYearColumns;
-
 	private Combo					_comboColumnLayout;
+
 	private Combo					_comboConfigName;
 	private Combo					_comboDateColumn;
 	private Combo					_comboDayContentColor;
@@ -149,8 +151,8 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	private Combo					_comboTourBackgroundColor2;
 	private Combo					_comboTourBorder;
 	private Combo					_comboTourBorderColor;
-
 	private Label					_lblDateColumnContent;
+
 	private Label					_lblDateColumnFont;
 	private Label					_lblDateColumnWidth;
 	private Label					_lblDayHeaderFont;
@@ -160,20 +162,19 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	private Label					_lblYearColumnHeaderFont;
 	private Label					_lblYearColumnSpacing;
 	private Label					_lblYearColumnStart;
-
 	private SimpleFontEditor		_fontEditorDayContent;
+
 	private SimpleFontEditor		_fontEditorDayDate;
 	private SimpleFontEditor		_fontEditorDateColumn;
 	private SimpleFontEditor		_fontEditorYearColumnHeader;
-
 	private Spinner					_spinnerNumYearColumns;
+
 	private Spinner					_spinnerYearColumnSpacing;
 	private Spinner					_spinnerDateColumnWidth;
 	private Spinner					_spinnerSummaryColumnWidth;
 	private Spinner					_spinnerTourBackgroundWidth;
 	private Spinner					_spinnerTourBorderWidth;
 	private Spinner					_spinnerWeekHeight;
-
 	private Text					_textConfigName;
 
 	private ToolItem				_toolItem;
@@ -1723,6 +1724,15 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		_comboConfigName.setItem(selectedIndex, _textConfigName.getText());
 
 		saveState();
+	}
+
+	@Override
+	protected void onReparentShell(final Shell reparentedShell) {
+
+		super.onReparentShell(reparentedShell);
+
+		// size for the resizable shell is set to DEFAULT
+		reparentedShell.pack(true);
 	}
 
 	private void onSelectConfig() {
