@@ -44,4 +44,11 @@ public class ActionCalendarOptions extends ActionToolbarSlideoutAdv {
 		return _slideoutCalendarOptions;
 	}
 
+	@Override
+	protected void onBeforeOpenSlideout() {
+
+		// ensure other dialogs are closed
+		_calendarView.closeOpenedDialogs(this);
+	}
+
 }
