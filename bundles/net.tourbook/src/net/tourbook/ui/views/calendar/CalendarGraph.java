@@ -2352,9 +2352,10 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		updateUI();
 	}
 
-	private LocalDate scrollBar_getEnd() {
+	private LocalDate scrollBar_getEndOfTours() {
 
 		final LocalDate endDate = LocalDate//
+
 				.now()
 
 				.with(getFirstDayOfWeek_SameOrNext())
@@ -2369,17 +2370,15 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		return endDate;
 	}
 
-	private LocalDate scrollBar_getStart() {
+	private LocalDate scrollBar_getStartOfTours() {
 
-		LocalDateTime firstTourDate = _dataProvider.getFirstTourDateTime();
-		final LocalDateTime today = LocalDateTime.now();
+		LocalDate firstTourDate = _dataProvider.getFirstTourDateTime().toLocalDate();
+		final LocalDate today = LocalDateTime.now().toLocalDate();
 
-		final long numAvailableTourWeeks = (today.toLocalDate().toEpochDay()
-				- firstTourDate.toLocalDate().toEpochDay())
-				/ 7;
+		final long availableTourWeeks = (today.toEpochDay() - firstTourDate.toEpochDay()) / 7;
 
 		// ensure the scrollable area has a reasonable size
-		if (numAvailableTourWeeks < _MIN_SCROLLABLE_WEEKS) {
+		if (availableTourWeeks < _MIN_SCROLLABLE_WEEKS) {
 			firstTourDate = today.minusWeeks(_MIN_SCROLLABLE_WEEKS);
 		}
 
@@ -2391,7 +2390,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 				.plusWeeks(_scrollBar_OutsideWeeks)
 
-				.toLocalDate();
+		;
 
 		return startDate;
 	}
@@ -2469,18 +2468,19 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		_scrollBar_LastSelection = sb.getSelection();
 
 		// goto the selected week
-		_firstViewportDay = scrollBar_getStart().atStartOfDay().plusDays(currentSelection * 7);
+		_firstViewportDay = scrollBar_getStartOfTours().atStartOfDay().plusDays(currentSelection * 7);
 
 		_isGraphClean = false;
 		redraw();
 
 		System.out.println(
 				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] onScroll")
-						+ ("\tmax: " + sb.getMaximum())
 						+ ("\tselection: " + sb.getSelection())
-						+ ("\tthumb: " + sb.getThumb())
 						+ ("\toutsideWeeks: " + _scrollBar_OutsideWeeks)
+						+ ("\tmax: " + sb.getMaximum())
+						+ ("\tthumb: " + sb.getThumb())
 						+ ("\t_numWeeksInOneColumn: " + _numWeeksInOneColumn)
+						+ ("\tfirstDay: " + _firstViewportDay.toLocalDate())
 //				+ ("\t: " + )
 		);
 // TODO remove SYSTEM.OUT.PRINTLN
@@ -2490,66 +2490,67 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		_scrollBar_OutsideWeeks = 0;
 
-		final long scrollStartDay = scrollBar_getStart().toEpochDay();
-		final long scrollEndDay = scrollBar_getEnd().toEpochDay();
+		final long scrollStartEpochDay = scrollBar_getStartOfTours().toEpochDay();
+		final long scrollEndEpochDay = scrollBar_getEndOfTours().toEpochDay();
 
+		final int tourWeeks = (int) ((scrollEndEpochDay - scrollStartEpochDay) / 7);
 
-		final int scrollWeeks = (int) ((scrollEndDay - scrollStartDay) / 7);
-
-		// ensure that max contains all visible weeks
-		final int scrollbarMax = Math.max(_numWeeksInOneColumn, scrollWeeks) + 2;
+		// ensure max contains all visible weeks in the viewport
+		int scrollbarMax = Math.max(_numWeeksInOneColumn, tourWeeks) + 2;
 
 		// ensure the thumb isn't getting to small
-//		final int thumbSize = Math.max(_numWeeksInOneColumn, scollbarMax / 20);
-		final int thumbSize = _numWeeksInOneColumn;
+		final int thumbSize = Math.max(_numWeeksInOneColumn, scrollbarMax / 20);
 
 		final long firstViewportDay = _firstViewportDay.toLocalDate().toEpochDay();
 		int scrollbarSelection;
 
-		if (firstViewportDay < scrollStartDay) {
+		if (firstViewportDay < scrollStartEpochDay) {
 
 			// shift negative
 
-			_scrollBar_OutsideWeeks = (int) ((firstViewportDay - scrollStartDay) / 7);
-			scrollbarSelection = 0;//1;
+			_scrollBar_OutsideWeeks = (int) ((firstViewportDay - scrollStartEpochDay) / 7);
+			scrollbarSelection = 1;//1;
 
-		} else if (firstViewportDay > scrollEndDay) {
+		} else if (firstViewportDay > scrollEndEpochDay) {
 
 			// shift positive
 
-			_scrollBar_OutsideWeeks = (int) ((firstViewportDay - scrollEndDay) / 7);
-			scrollbarSelection = scrollbarMax - 0;
+			_scrollBar_OutsideWeeks = (int) ((firstViewportDay - scrollEndEpochDay) / 7);
+			scrollbarSelection = scrollbarMax - 1;
 
 		} else {
 
-			scrollbarSelection = (int) ((firstViewportDay - scrollStartDay) / 7);
+			scrollbarSelection = (int) ((firstViewportDay - scrollStartEpochDay) / 7);
 		}
 
-		// thums is difficult to calculate -> there are many parameters
-//		scollbarMax += thumbSize;
+		// scrollbars and thums are complicated !!!
+		scrollbarMax += thumbSize;
 
-		/*
-		 * Update scrollbar
-		 */
-		final ScrollBar sb = _parent.getVerticalBar();
-
-		sb.setMinimum(0);
-		sb.setMaximum(scrollbarMax);
-		sb.setThumb(thumbSize);
-		sb.setPageIncrement(_numWeeksInOneColumn / 2);
-
+		// update scrollbar
 		_isInUpdateScrollbar = true;
-		sb.setSelection(scrollbarSelection);
+		_parent.getVerticalBar().setValues(
+
+				scrollbarSelection,
+
+				0, // min
+				scrollbarMax, // max
+
+				thumbSize,
+
+				1, // increment
+				_numWeeksInOneColumn / 2 // page increment
+		);
 
 		_scrollBar_LastSelection = scrollbarSelection;
 
 		System.out.println(
 				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] upScroll")
-						+ ("\tmax: " + scrollbarMax)
 						+ ("\tselection: " + scrollbarSelection)
-						+ ("\tthumb: " + thumbSize)
 						+ ("\toutsideWeeks: " + _scrollBar_OutsideWeeks)
+						+ ("\tmax: " + scrollbarMax)
+						+ ("\tthumb: " + thumbSize)
 						+ ("\t_numWeeksInOneColumn: " + _numWeeksInOneColumn)
+						+ ("\tfirstDay: " + _firstViewportDay.toLocalDate())
 //				+ ("\t: " + )
 		);
 // TODO remove SYSTEM.OUT.PRINTLN
