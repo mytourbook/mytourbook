@@ -556,7 +556,7 @@ public class CalendarTourDataProvider {
 		}
 
 		if (_firstTourDateTime == null) {
-			_firstTourDateTime = LocalDateTime.now().minusYears(1);
+			_firstTourDateTime = LocalDateTime.now();//.minusYears(1);
 		}
 
 		return _firstTourDateTime;

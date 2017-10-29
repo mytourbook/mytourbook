@@ -380,7 +380,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarCo
 		_actionGotoToday = new Action() {
 			@Override
 			public void run() {
-				_calendarGraph.gotoToday();
+				_calendarGraph.gotoDate_Today();
 			}
 		};
 		_actionGotoToday.setText(Messages.Calendar_View_Action_GotoToday);
@@ -1217,7 +1217,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarCo
 			if (newTourId != oldTourId) {
 
 				if (_actionSetLinked.isChecked()) {
-					_calendarGraph.gotoTourId(newTourId);
+					_calendarGraph.gotoTour_Id(newTourId);
 				} else {
 					_calendarGraph.removeSelection();
 				}
