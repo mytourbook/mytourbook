@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2011  Matthias Helmling and Contributors
+ * Copyright (C) 2011, 2017 Matthias Helmling and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package net.tourbook.ui.views.calendar;
 
 import java.util.ArrayList;
@@ -31,6 +30,7 @@ import net.tourbook.tour.TourTypeMenuManager;
 import net.tourbook.tour.printing.ActionPrint;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.action.ActionComputeDistanceValuesFromGeoposition;
+import net.tourbook.ui.action.ActionDuplicateTour;
 import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.action.ActionJoinTours;
@@ -53,39 +53,28 @@ import org.eclipse.swt.widgets.Menu;
 
 public class TourContextMenu {
 
-//	private static TourContextMenu						_instance;
 	private TagMenuManager								_tagMenuMgr;
 
-	private ActionEditQuick								_actionEditQuick;
-
-	// private ActionDeleteTourMenu						_actionDeleteTour;
-
-	private ActionEditTour								_actionEditTour;
-	private ActionOpenTour								_actionOpenTour;
-	private ActionOpenMarkerDialog						_actionOpenMarkerDialog;
-	private ActionOpenAdjustAltitudeDialog				_actionOpenAdjustAltitudeDialog;
-	private ActionMergeTour								_actionMergeTour;
-	private ActionJoinTours								_actionJoinTours;
 	private ActionComputeDistanceValuesFromGeoposition	_actionComputeDistanceValuesFromGeoposition;
-	private ActionSetAltitudeValuesFromSRTM				_actionSetAltitudeFromSRTM;
-	private ActionSetTourTypeMenu						_actionSetTourType;
-
-	private ActionSetPerson								_actionSetOtherPerson;
-
+	private ActionDuplicateTour							_actionDuplicateTour;
+	private ActionEditQuick								_actionEditQuick;
+	private ActionEditTour								_actionEditTour;
 	private ActionExport								_actionExportTour;
+	private ActionJoinTours								_actionJoinTours;
+	private ActionOpenTour								_actionOpenTour;
+	private ActionOpenAdjustAltitudeDialog				_actionOpenAdjustAltitudeDialog;
+	private ActionOpenMarkerDialog						_actionOpenMarkerDialog;
+	private ActionMergeTour								_actionMergeTour;
 	private ActionPrint									_actionPrintTour;
+	private ActionSetAltitudeValuesFromSRTM				_actionSetAltitudeFromSRTM;
+	private ActionSetPerson								_actionSetOtherPerson;
+	private ActionSetTourTypeMenu						_actionSetTourType;
 
 	public TourContextMenu() {}
 
-//	public static TourContextMenu getInstance() {
-//		if (_instance == null) {
-//			_instance = new TourContextMenu();
-//		}
-//		return _instance;
-//	}
-
 	private void createActions(final ITourProvider tourProvider) {
 
+		_actionDuplicateTour = new ActionDuplicateTour(tourProvider);
 		_actionEditQuick = new ActionEditQuick(tourProvider);
 		_actionEditTour = new ActionEditTour(tourProvider);
 		_actionOpenTour = new ActionOpenTour(tourProvider);
@@ -108,26 +97,25 @@ public class TourContextMenu {
 
 	}
 
-
-	public Menu createContextMenu(final ITourProvider tourProvider, final Control control) {
-		return createContextMenu(tourProvider, control, null);
-	}
-
-	public Menu createContextMenu(	final ITourProvider tourProvider,
+	public Menu createContextMenu(	final CalendarView calendarView,
 									final Control control,
 									final ArrayList<Action> localActions) {
 
-		createActions(tourProvider);
+		createActions(calendarView);
 
 		// final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
 		final MenuManager menuMgr = new MenuManager();
-		final TagMenuManager tagMenuMgr = new TagMenuManager(tourProvider, true);
+		final TagMenuManager tagMenuMgr = new TagMenuManager(calendarView, true);
 
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
 			@Override
 			public void menuAboutToShow(final IMenuManager manager) {
-				fillContextMenu(manager, tourProvider, localActions);
+
+				// hide tour tooltip when opened
+				calendarView.getTourInfoTooltip().hideToolTip();
+
+				fillContextMenu(manager, calendarView, localActions);
 			}
 		});
 
@@ -151,6 +139,7 @@ public class TourContextMenu {
 		menuMgr.add(_actionOpenMarkerDialog);
 		menuMgr.add(_actionOpenAdjustAltitudeDialog);
 		menuMgr.add(_actionOpenTour);
+		menuMgr.add(_actionDuplicateTour);
 		menuMgr.add(_actionMergeTour);
 		// menuMgr.add(_actionJoinTours); // until now we only allow single tour selection
 		menuMgr.add(_actionComputeDistanceValuesFromGeoposition);
@@ -161,7 +150,7 @@ public class TourContextMenu {
 		// tour type actions
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionSetTourType);
-		TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, tourProvider, true);
+		TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, calendarView, true);
 
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionExportTour);
@@ -202,16 +191,18 @@ public class TourContextMenu {
 		// _tourDoubleClickState.canEditMarker = isOneTour;
 		// _tourDoubleClickState.canAdjustAltitude = isOneTour;
 
+		_actionDuplicateTour.setEnabled(isOneTour && !isDeviceTour);
 		_actionEditTour.setEnabled(isOneTour);
-		_actionOpenTour.setEnabled(isOneTour);
 		_actionEditQuick.setEnabled(isOneTour);
-		_actionOpenMarkerDialog.setEnabled(isOneTour && isDeviceTour);
 		_actionOpenAdjustAltitudeDialog.setEnabled(isOneTour && isDeviceTour);
+		_actionOpenMarkerDialog.setEnabled(isOneTour && isDeviceTour);
+		_actionOpenTour.setEnabled(isOneTour);
 
-		_actionMergeTour.setEnabled(isOneTour
-				&& isDeviceTour
-				&& firstSavedTour != null
-				&& firstSavedTour.getMergeSourceTourId() != null);
+		_actionMergeTour.setEnabled(
+				isOneTour
+						&& isDeviceTour
+						&& firstSavedTour != null
+						&& firstSavedTour.getMergeSourceTourId() != null);
 		_actionComputeDistanceValuesFromGeoposition.setEnabled(isTourSelected);
 		_actionSetAltitudeFromSRTM.setEnabled(isTourSelected);
 
@@ -266,6 +257,7 @@ public class TourContextMenu {
 		menuMgr.add(_actionOpenMarkerDialog);
 		menuMgr.add(_actionOpenAdjustAltitudeDialog);
 		menuMgr.add(_actionOpenTour);
+		menuMgr.add(_actionDuplicateTour);
 		menuMgr.add(_actionMergeTour);
 		menuMgr.add(_actionJoinTours);
 		menuMgr.add(_actionComputeDistanceValuesFromGeoposition);

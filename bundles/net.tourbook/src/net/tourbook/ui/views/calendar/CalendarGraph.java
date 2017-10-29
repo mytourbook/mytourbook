@@ -15,6 +15,11 @@
  *******************************************************************************/
 package net.tourbook.ui.views.calendar;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -43,6 +48,16 @@ import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.ByteArrayTransfer;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.DragSource;
+import org.eclipse.swt.dnd.DragSourceEvent;
+import org.eclipse.swt.dnd.DragSourceListener;
+import org.eclipse.swt.dnd.DropTarget;
+import org.eclipse.swt.dnd.DropTargetEvent;
+import org.eclipse.swt.dnd.DropTargetListener;
+import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.DisposeEvent;
@@ -82,41 +97,40 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 // SET_FORMATTING_OFF
 	
-	private TourInfoFormatter[]					_tourInfoFormatter			= new TourInfoFormatter[CalendarView.numberOfInfoLines];
-	private WeekSummaryFormatter[]				_weekSummaryFormatter		= new WeekSummaryFormatter[CalendarView.numberOfSummaryLines];
+	private TourInfoFormatter[]					_tourInfoFormatter		= new TourInfoFormatter[CalendarView.numberOfInfoLines];
+
+	private WeekSummaryFormatter[]				_weekSummaryFormatter	= new WeekSummaryFormatter[CalendarView.numberOfSummaryLines];
+	private final TourDoubleClickState			_tourDoubleClickState	= new TourDoubleClickState();
 	
 // SET_FORMATTING_ON
 
-	private final TourDoubleClickState			_tourDoubleClickState	= new TourDoubleClickState();
 	private ColorCacheSWT						_colorCache				= new ColorCacheSWT();
-
+	//
 	private ArrayList<RGB>						_rgbBright;
 	private ArrayList<RGB>						_rgbDark;
 	private ArrayList<RGB>						_rgbLine;
 	private ArrayList<RGB>						_rgbText;
-
+	//
 	private int									_lastDayOfWeekToGoTo	= -1;
-
-	private List<ObjectLocation>				_tourFocus;
-	private List<ObjectLocation>				_dayFocus;
-
+	//
+	private List<ItemLocation>					_tourFocus;
+	private List<ItemLocation>					_dayFocus;
 	private boolean								_isHighlightChanged		= false;
 	private boolean								_isGraphClean			= false;
-
+	//
 	private CalendarItem						_noItem					= new CalendarItem(-1, SelectionType.NONE);
 	private CalendarItem						_selectedItem			= _noItem;
 	private CalendarItem						_highlightedItem		= _noItem;
 	private CalendarItem						_lastSelection			= _noItem;
 	private CalendarItem						_hoveredTour;
-
 	final private Rectangle						_nullRec				= null;
-
+	//
 	private CalendarView						_calendarView;
 	private CalendarTourDataProvider			_dataProvider;
-
 	private CalendarYearMonthContributionItem	_calendarYearMonthContributor;
+	//
 	private ListenerList						_selectionProvider		= new ListenerList();
-
+	//
 	/**
 	 * Displayed weeks in the calendar which are before the first calendar tour or after today
 	 * (which is the last calendar tour). When the displayed weeks are within the first/last tour
@@ -124,16 +138,15 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	 */
 	private int									_scrollBar_OutsideWeeks;
 	private int									_scrollBar_LastSelection;
-
+	//
 	/** Visible weeks in one column */
 	private int									_numWeeksInOneColumn;
-
+	//
 	private boolean								_isYearColumn;
 	private boolean								_isScrollbarInitialized;
 	private boolean								_isInUpdateScrollbar;
 	private boolean								_useTextColorForTourInfoText;
 	private boolean								_useBlackForHighlightTourInfoText;
-
 	/**
 	 * This rectangle contains all visible days except week no and week info area.
 	 */
@@ -148,12 +161,12 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	 * Cache font height;
 	 */
 	private int									_defaultFontHeight;
-//	private int									_defaultFontAverageCharWidth;
+
+	//	private int									_defaultFontAverageCharWidth;
 	private int									_fontHeight_DateColumn;
 	private int									_fontHeight_DayContent;
 	private int									_fontHeight_DayHeader;
 	private int									_fontHeight_YearHeader;
-
 	/**
 	 * Date of the first day of a week and the first day in the calendar viewport.
 	 * <p>
@@ -167,45 +180,48 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			.now()
 			.withMonth(1)
 			.withDayOfMonth(1);
-
+	//
 	private LocalDateTime						_yearColumn_CurrentYear;
 	private LocalDateTime						_yearColumn_NextYear;
-
 	private LocalDate							_calendarFirstDay;
 	private LocalDate							_calendarLastDay;
-
 	private int									_nextWeekDateYPos;
 	private int									_lastWeekDateYear;
-
+	//
 	private CalendarConfig						_currentConfig;
+	//
 	private TextWrapPainter						_textWrapPainter;
-
+	private CalendarItemTransfer				_calendarItemTransfer	= new CalendarItemTransfer();
+	//
 	/*
 	 * UI controls
 	 */
 	private Composite							_parent;
+	//
 	private Display								_display				= Display.getCurrent();
-
+	//
 	private Color								_black					= _display.getSystemColor(SWT.COLOR_BLACK);
 	private Color								_gray					= _display.getSystemColor(SWT.COLOR_GRAY);
 	private Color								_white					= _display.getSystemColor(SWT.COLOR_WHITE);
 	private Color								_red					= _display.getSystemColor(SWT.COLOR_RED);
 	private Color								_blue					= _display.getSystemColor(SWT.COLOR_BLUE);
-
 	private Color								_darkGray				= _colorCache.getColor(0x404040);
-
+	//
 	private RGB									_day_TourBackgroundRGB;
 	private RGB									_whiteRGB				= _white.getRGB();
 	private RGB									_blackRGB				= _black.getRGB();
-
+	//
 	private Font								_boldFont;
 	private Font								_fontDateColumn;
 	private Font								_fontDayContent;
 	private Font								_fontDayHeader;
 	private Font								_fontYearHeader;
-
+	//
 	private Image								_image;
 	private Image								_highlight;
+	//
+	private DragSource							_dragSource;
+	private DropTarget							_dropTarget;
 
 	class CalendarItem {
 
@@ -251,6 +267,79 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 	};
 
+	private class CalendarItemTransfer extends ByteArrayTransfer {
+
+		private final String	TYPE_NAME	= "net.tourbook.ui.views.calendar.CalendarGraph";	//$NON-NLS-1$
+		private final int		TYPE_ID		= registerType(TYPE_NAME);
+
+		private CalendarItemTransfer() {}
+
+		@Override
+		protected int[] getTypeIds() {
+			return new int[] { TYPE_ID };
+		}
+
+		@Override
+		protected String[] getTypeNames() {
+			return new String[] { TYPE_NAME };
+		}
+
+		@Override
+		protected void javaToNative(final Object data, final TransferData transferData) {
+
+			final CalendarItemTransferData realData = (CalendarItemTransferData) data;
+
+			if (data == null) {
+				return;
+			}
+
+			try {
+				final ByteArrayOutputStream out = new ByteArrayOutputStream();
+				final DataOutputStream dataOut = new DataOutputStream(out);
+
+				dataOut.writeLong(realData.tourId);
+
+				dataOut.close();
+
+				super.javaToNative(out.toByteArray(), transferData);
+
+			} catch (final IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		@Override
+		protected Object nativeToJava(final TransferData transferData) {
+
+			try {
+
+				final byte[] bytes = (byte[]) super.nativeToJava(transferData);
+				final ByteArrayInputStream in = new ByteArrayInputStream(bytes);
+				final DataInputStream dataIn = new DataInputStream(in);
+
+				final long tourId = dataIn.readLong();
+
+				return new CalendarItemTransferData(tourId);
+
+			} catch (final IOException e) {
+				e.printStackTrace();
+			}
+
+			//can't get here
+			return null;
+		}
+	}
+
+	private class CalendarItemTransferData {
+
+		private long tourId;
+
+		public CalendarItemTransferData(final long tourId) {
+			this.tourId = tourId;
+		}
+
+	}
+
 	private class Day {
 
 		private long dayId;
@@ -266,17 +355,28 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 	}
 
-	private class ObjectLocation {
+	private class ItemLocation {
 
 		private Rectangle	rect;
 		private Object		o;
 		private long		id;
 
-		ObjectLocation(final Rectangle r, final long id, final Object o) {
+		ItemLocation(final Rectangle r, final long id, final Object o) {
 
 			this.o = o;
 			this.id = id;
 			this.rect = r;
+		}
+
+		@Override
+		public String toString() {
+			return "ItemLocation ["
+
+					+ "rect=" + rect + ", "
+					+ "id=" + id + ", "
+					+ "o=" + o + ", "
+
+					+ "]";
 		}
 	}
 
@@ -317,6 +417,162 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		updateTourTypeColors();
 
 		addListener();
+		addDragDrop();
+	}
+
+	private void addDragDrop() {
+
+		// Allow data to be copied or moved from the drag source
+		_dragSource = new DragSource(this, DND.DROP_MOVE);
+
+		// Provide data in Text format
+		_dragSource.setTransfer(new Transfer[] { _calendarItemTransfer });
+
+		_dragSource.addDragListener(new DragSourceListener() {
+
+			@Override
+			public void dragFinished(final DragSourceEvent event) {
+
+				// If a move operation has been performed, remove the data
+				// from the source
+				if (event.detail == DND.DROP_MOVE) {
+
+//					dragLabel.setText("");
+				}
+			}
+
+			@Override
+			public void dragSetData(final DragSourceEvent event) {
+
+				// Provide the data of the requested type.
+				if (_calendarItemTransfer.isSupportedType(event.dataType) && _selectedItem.type == SelectionType.TOUR) {
+
+//					event.data = dragLabel.getText();
+					event.data = new CalendarItemTransferData(_selectedItem.id);
+				}
+			}
+
+			@Override
+			public void dragStart(final DragSourceEvent event) {
+
+				// Only start the drag if there is actually text in the
+				// label - this text will be what is dropped on the target.
+//				if (dragLabel.getText().length() == 0) {
+//					event.doit = false;
+//				}
+
+				if (_selectedItem.type != SelectionType.TOUR) {
+					event.doit = false;
+				}
+			}
+		});
+
+		// Allow data to be copied or moved to the drop target
+		_dropTarget = new DropTarget(this, DND.DROP_MOVE | DND.DROP_DEFAULT);
+
+		// Receive data in calendar items
+		_dropTarget.setTransfer(new Transfer[] { _calendarItemTransfer });
+
+		_dropTarget.addDropListener(new DropTargetListener() {
+
+			@Override
+			public void dragEnter(final DropTargetEvent event) {
+
+				System.out.println(
+						(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] dragEnter")
+								+ ("\t: " + event)
+//						+ ("\t: " + )
+				);
+// TODO remove SYSTEM.OUT.PRINTLN
+
+				if (event.detail == DND.DROP_DEFAULT) {
+					if ((event.operations & DND.DROP_COPY) != 0) {
+						event.detail = DND.DROP_COPY;
+					} else {
+						event.detail = DND.DROP_NONE;
+					}
+				}
+			}
+
+			@Override
+			public void dragLeave(final DropTargetEvent event) {
+
+				System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] dragLeave")
+//						+ ("\t: " + )
+				);
+// TODO remove SYSTEM.OUT.PRINTLN
+			}
+
+			@Override
+			public void dragOperationChanged(final DropTargetEvent event) {
+
+				if (event.detail == DND.DROP_DEFAULT) {
+					if ((event.operations & DND.DROP_COPY) != 0) {
+						event.detail = DND.DROP_COPY;
+					} else {
+						event.detail = DND.DROP_NONE;
+					}
+				}
+			}
+
+			@Override
+			public void dragOver(final DropTargetEvent event) {
+
+				if (_calendarItemTransfer.isSupportedType(event.currentDataType)) {
+
+					// NOTE: on unsupported platforms this will return null
+					final Object o = _calendarItemTransfer.nativeToJava(event.currentDataType);
+
+					final Point calendarOverPos = CalendarGraph.this.toControl(event.x, event.y);
+
+//					System.out.println(
+//							(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] dragOver")
+//									+ ("\t: " + calendarOverPos)
+//									+ ("\t: " + event)
+////						+ ("\t: " + )
+//					);
+//// TODO remove SYSTEM.OUT.PRINTLN
+
+					for (final ItemLocation itemLocation : _dayFocus) {
+
+						if (itemLocation.rect.contains(calendarOverPos.x, calendarOverPos.y)) {
+
+							event.feedback = DND.FEEDBACK_SELECT;
+
+							System.out.println(
+									(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+											+ ("\t: " + itemLocation)
+//									+ ("\t: " + )
+							);
+// TODO remove SYSTEM.OUT.PRINTLN
+
+							return;
+						}
+					}
+				}
+
+				event.feedback = DND.FEEDBACK_NONE;
+			}
+
+			@Override
+			public void drop(final DropTargetEvent event) {
+
+				System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] drop")
+//						+ ("\t: " + )
+				);
+// TODO remove SYSTEM.OUT.PRINTLN
+
+				if (_calendarItemTransfer.isSupportedType(event.currentDataType)) {
+
+//					final String text = (String) event.data;
+//					final TableItem item = new TableItem(dropTable, SWT.NONE);
+//					item.setText(text);
+				}
+			}
+
+			@Override
+			public void dropAccept(final DropTargetEvent event) {}
+		});
 	}
 
 	private void addListener() {
@@ -738,8 +994,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		final Color monthAlternateColor = _colorCache.getColor(_currentConfig.alternateMonthRGB);
 
-		_tourFocus = new ArrayList<ObjectLocation>();
-		_dayFocus = new ArrayList<ObjectLocation>();
+		_tourFocus = new ArrayList<ItemLocation>();
+		_dayFocus = new ArrayList<ItemLocation>();
 
 		final Font normalFont = gc.getFont();
 
@@ -881,7 +1137,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 							weekHeight);
 
 					final Day day = new Day(dayId);
-					_dayFocus.add(new ObjectLocation(dayRect, dayId, day));
+					_dayFocus.add(new ItemLocation(dayRect, dayId, day));
 					dayId = day.dayId + 1;
 
 					gc.setFont(normalFont);
@@ -1064,7 +1320,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 					tourRect.width + 2,
 					tourRect.height + 2);
 
-			_tourFocus.add(new ObjectLocation(focusRect, data[tourIndex].tourId, data[tourIndex]));
+			_tourFocus.add(new ItemLocation(focusRect, data[tourIndex].tourId, data[tourIndex]));
 
 			drawDay_Tour(gc, data[tourIndex], tourRect);
 		}
@@ -1308,7 +1564,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 	private void drawHighLight(final GC gc) {
 
-		List<ObjectLocation> objects;
+		List<ItemLocation> objects;
 
 		if (_highlightedItem.type == SelectionType.TOUR) {
 			objects = _tourFocus;
@@ -1318,7 +1574,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			return;
 		}
 
-		for (final ObjectLocation ol : objects) {
+		for (final ItemLocation ol : objects) {
 			if (ol.id == _highlightedItem.id) {
 
 				if (ol.o instanceof CalendarTourData) {
@@ -1412,7 +1668,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			_lastSelection = _selectedItem;
 		}
 
-		List<ObjectLocation> objects;
+		List<ItemLocation> objects;
 		if (_selectedItem.type == SelectionType.TOUR) {
 			objects = _tourFocus;
 		} else if (_selectedItem.type == SelectionType.DAY) {
@@ -1421,7 +1677,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			return;
 		}
 
-		for (final ObjectLocation ol : objects) {
+		for (final ItemLocation ol : objects) {
 			if (ol.id == _selectedItem.id) {
 				if (ol.o instanceof CalendarTourData) {
 					drawSelectedTour(gc, (CalendarTourData) (ol.o), ol.rect);
@@ -2017,7 +2273,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		boolean visible = false;
 		int index = 0;
-		for (final ObjectLocation ol : _tourFocus) {
+		for (final ItemLocation ol : _tourFocus) {
 			if (_selectedItem.id == ol.id) {
 				visible = true; // the selection is visible
 				break;
@@ -2071,7 +2327,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		int index = 0;
 		CalendarTourData ctd = null;
-		for (final ObjectLocation ol : _tourFocus) {
+		for (final ItemLocation ol : _tourFocus) {
 			if (_selectedItem.id == ol.id) {
 				ctd = (CalendarTourData) (ol.o);
 				break;
@@ -2090,7 +2346,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		if (dayOfWeekToGoTo >= 0) {
 			index += direction;
 			for (int i = index; i >= 0 && i < _tourFocus.size(); i += direction) {
-				final ObjectLocation ol = _tourFocus.get(i);
+				final ItemLocation ol = _tourFocus.get(i);
 				if (dayOfWeekToGoTo == ((CalendarTourData) (ol.o)).dayOfWeek) {
 					_selectedItem = new CalendarItem(ol.id, SelectionType.TOUR);
 					_lastDayOfWeekToGoTo = dayOfWeekToGoTo;
@@ -2114,6 +2370,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	private void onDispose() {
 
 		_colorCache.dispose();
+
+		_dragSource.dispose();
+		_dropTarget.dispose();
 
 		disposeFonts();
 	}
@@ -2149,7 +2408,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		boolean isTourHovered = false;
 		boolean isDayHovered = false;
 
-		for (final ObjectLocation ol : _tourFocus) {
+		for (final ItemLocation ol : _tourFocus) {
+
 			if (ol.rect.contains(event.x, event.y)) {
 
 				final long id = ol.id;
@@ -2173,7 +2433,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 
 		if (!isTourHovered) {
-			for (final ObjectLocation ol : _dayFocus) {
+
+			for (final ItemLocation ol : _dayFocus) {
 
 				if (ol.rect.contains(event.x, event.y)) {
 
@@ -2195,20 +2456,26 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			}
 		}
 
-		if (!oldSelection.equals(_selectedItem)) { // highlight selection -> redraw calendar
+		if (!oldSelection.equals(_selectedItem)) {
+
+			// highlight selection -> redraw calendar
 
 			redraw();
 			return;
 		}
 
-		if (!isDayHovered && !isTourHovered) { // only draw base calendar, skip highlighting
+		if (!isDayHovered && !isTourHovered) {
+
+			// only draw base calendar, skip highlighting
 
 			redraw();
 			return;
 		}
 
 		_isHighlightChanged = !oldHighlight.equals(_highlightedItem);
-		if (_isHighlightChanged) { // only draw the highlighting on top of the calendar image
+		if (_isHighlightChanged) {
+
+			// only draw the highlighting on top of the calendar image
 			redraw();
 		}
 

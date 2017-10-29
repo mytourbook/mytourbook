@@ -1,5 +1,18 @@
 Version 17.9.1 next                                          ?. October 2017
 
+New
+===
+
+* Calendar
+
+  - Customize calendar layout and keep it in configurations
+  - Drag & drop a tour to another day
+
+
+* Duplicate a tour which is manually created
+  Can be used for "events", like changing a battery
+
+
 
 Improvements
 ============

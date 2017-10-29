@@ -941,6 +941,8 @@ public class Messages extends NLS {
 	public static String		Image__tour_options_disabled;
 	public static String		Image__tour_viewer;
 	public static String		Image__Tour;
+	public static String		Image__Tour_Duplicate;
+	public static String		Image__Tour_Duplicate_disabled;
 	public static String		Image__TourBook_Month;
 	public static String		Image__TourBook_SelectAll;
 	public static String		Image__TourBook_Week;
@@ -1894,9 +1896,9 @@ public class Messages extends NLS {
 	public static String		Tooltip_ValuePoint_Label_SlicesMax_Tooltip;
 
 	public static String		Tour_Action_AdjustTemperature;
-
 	public static String		Tour_Action_auto_move_sliders_when_zoomed;
 	public static String		Tour_Action_auto_zoom_to_slider_position;
+	public static String		Tour_Action_DuplicateTour;
 	public static String		Tour_Action_EditChartPreferences;
 	public static String		Tour_Action_EditSmoothingPreferences;
 	public static String		Tour_Action_EditStatisticPreferences;

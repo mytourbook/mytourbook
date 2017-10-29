@@ -1177,6 +1177,10 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarCo
 		return _state;
 	}
 
+	CalendarTourInfoToolTip getTourInfoTooltip() {
+		return _tourInfoToolTip;
+	}
+
 	private void initUI(final Composite parent) {
 
 		_pc = new PixelConverter(parent);
