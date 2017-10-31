@@ -292,7 +292,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarCo
 		_calendarGraph.addSelectionProvider(new ICalendarSelectionProvider() {
 
 			@Override
-			public void selectionChanged(final CalendarGraph.CalendarItem selection) {
+			public void selectionChanged(final CalendarGraph.CalendarSelectItem selection) {
 				if (selection.isTour()) {
 					_selectionProvider.setSelection(new SelectionTourId(selection.id));
 				}

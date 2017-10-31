@@ -24,7 +24,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.tour.TourInfoUI;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
-import net.tourbook.ui.views.calendar.CalendarGraph.CalendarItem;
+import net.tourbook.ui.views.calendar.CalendarGraph.CalendarSelectItem;
 
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -53,7 +53,7 @@ public class CalendarTourInfoToolTip extends ToolTip implements ITourProvider, I
 	private CalendarGraph		_calendarGraph;
 	private CalendarView		_calendarView;
 
-	private CalendarItem		_hoveredIdem;
+	private CalendarSelectItem		_hoveredIdem;
 
 	public CalendarTourInfoToolTip(final CalendarView calendarView) {
 
@@ -126,7 +126,7 @@ public class CalendarTourInfoToolTip extends ToolTip implements ITourProvider, I
 	@Override
 	public Point getLocation(final Point tipSize, final Event event) {
 
-		final CalendarItem hoveredItem = _calendarGraph.getHoveredTour();
+		final CalendarSelectItem hoveredItem = _calendarGraph.getHoveredTour();
 
 		if (hoveredItem.isTour() && hoveredItem.itemRectangle != null) {
 
@@ -205,7 +205,7 @@ public class CalendarTourInfoToolTip extends ToolTip implements ITourProvider, I
 	protected Object getToolTipArea(final Event event) {
 
 		// Ensure that the tooltip is hidden when the cell is left
-		final CalendarItem ttArea = _hoveredIdem = _calendarGraph.getHoveredTour();
+		final CalendarSelectItem ttArea = _hoveredIdem = _calendarGraph.getHoveredTour();
 
 		return ttArea;
 	}
