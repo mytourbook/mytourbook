@@ -24,6 +24,7 @@ import java.util.Comparator;
 import java.util.Formatter;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -159,7 +160,9 @@ public class TourManager {
 	
 // SET_FORMATTING_ON
 
-	private static final int[]				_allGraphIDs									= new int[] {
+	static {}
+
+	private static final int[]				_allGraphIDs		= new int[] {
 			GRAPH_ALTITUDE,
 			GRAPH_SPEED,
 			GRAPH_ALTIMETER,
@@ -172,14 +175,12 @@ public class TourManager {
 			GRAPH_GEARS,
 			GRAPH_TOUR_COMPARE };
 
-	private final static IPreferenceStore	_prefStore										= TourbookPlugin
-			.getPrefStore();
+	private final static IPreferenceStore	_prefStore			= TourbookPlugin.getPrefStore();
 
 	private static TourManager				_instance;
 
-	private final static StringBuilder		_sbFormatter									= new StringBuilder();
-	private final static Formatter			_formatter										= new Formatter(
-			_sbFormatter);
+	private final static StringBuilder		_sbFormatter		= new StringBuilder();
+	private final static Formatter			_formatter			= new Formatter(_sbFormatter);
 
 	/**
 	 * contains the instance of the {@link TourDataEditorView} or <code>null</code> when this part
@@ -187,16 +188,16 @@ public class TourManager {
 	 */
 	private static TourDataEditorView		_tourDataEditorInstance;
 	//
-	private static LabelProviderMMSS		_labelProviderMMSS								= new LabelProviderMMSS();
-	private static LabelProviderInt			_labelProviderInt								= new LabelProviderInt();
+	private static LabelProviderMMSS		_labelProviderMMSS	= new LabelProviderMMSS();
+	private static LabelProviderInt			_labelProviderInt	= new LabelProviderInt();
 	//
 	private static TourData					_multipleTourData;
 	private static int						_multipleTourDataHash;
 	//
-	private static final ListenerList		_tourEventListeners								= new ListenerList(
-			ListenerList.IDENTITY);
-	private static final ListenerList		_tourSaveListeners								= new ListenerList(
-			ListenerList.IDENTITY);
+	private static final ListenerList		_tourEventListeners	= new ListenerList(ListenerList.IDENTITY);
+	private static final ListenerList		_tourSaveListeners	= new ListenerList(ListenerList.IDENTITY);
+	//
+	private static AtomicInteger			_tourCopyCounter	= new AtomicInteger();
 	//
 	private ComputeChartValue				_computeAvg_Altimeter;
 	private ComputeChartValue				_computeAvg_Cadence;
@@ -204,6 +205,7 @@ public class TourManager {
 	private ComputeChartValue				_computeAvg_Pace;
 	private ComputeChartValue				_computeAvg_Power;
 	private ComputeChartValue				_computeAvg_Pulse;
+
 	private ComputeChartValue				_computeAvg_Speed;
 
 	private final TourDataCache				_tourDataCache;
@@ -940,6 +942,30 @@ public class TourManager {
 		chartSegments.segmentCustomData = tourData.multipleTourIds;
 
 		xData.setChartSegments(chartSegments);
+	}
+
+	/**
+	 * Copy tour data into another tour, currently only manually created tours are supported
+	 * 
+	 * @param fromTour
+	 * @param toTour
+	 */
+	public static void duplicateTourData(final TourData fromTour, final TourData toTour) {
+
+		toTour.setDeviceId(fromTour.getDeviceId());
+		toTour.setTourPerson(fromTour.getTourPerson());
+
+		toTour.setTourStartTime(fromTour.getTourStartTime());
+
+//		toTour.setTourTitle(
+//				Integer.toString(_tourCopyCounter.incrementAndGet())
+//						+ UI.DASH_WITH_SPACE//
+//						+ fromTour.getTourTitle());
+		toTour.setTourTitle(fromTour.getTourTitle());
+		toTour.setTourDescription(fromTour.getTourDescription());
+
+		toTour.setTourType(fromTour.getTourType());
+		toTour.setTourTags(new HashSet<>(fromTour.getTourTags()));
 	}
 
 	public static void fireEvent(final TourEventId tourEventId) {
@@ -1845,7 +1871,8 @@ public class TourManager {
 	}
 
 	/**
-	 * Saves tours which have been modified and updates the tour data editor.
+	 * Saves tours which have been modified and updates the tour data editor, a notification is
+	 * fired when the data are saved.
 	 * <p>
 	 * If a tour is openend in the {@link TourDataEditorView}, the tour will be saved only when the
 	 * tour is not dirty, if the tour is dirty, saving is not done.

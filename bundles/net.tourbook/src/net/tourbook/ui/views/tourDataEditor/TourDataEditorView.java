@@ -32,11 +32,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import net.sf.swtaddons.autocomplete.combo.AutocompleteComboInput;
 import net.tourbook.Messages;
@@ -239,8 +237,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	//
 	static final String				STATE_LAT_LON_DIGITS			= "STATE_LAT_LON_DIGITS";						//$NON-NLS-1$
 	static final int				DEFAULT_LAT_LON_DIGITS			= 5;
-	//
-	private static AtomicInteger	_createCounter					= new AtomicInteger();
 	//
 	private final IPreferenceStore	_prefStore						= TourbookPlugin.getPrefStore();
 	private final IPreferenceStore	_prefStoreCommon				= CommonActivator.getPrefStore();
@@ -1036,6 +1032,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		final TourData manualTourData = new TourData();
 
+		TourManager.duplicateTourData(copyFromOtherTour, manualTourData);
+
+		/*
+		 * Adjust some copied data
+		 */
+
 		// set tour start date/time
 		manualTourData.setTourStartTime(TimeTools.now());
 
@@ -1044,8 +1046,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		manualTourData.setDeviceId(TourData.DEVICE_ID_FOR_MANUAL_TOUR);
 		manualTourData.setTourPerson(activePerson);
-
-		duplicateTourData(manualTourData, copyFromOtherTour);
 
 		// ensure that the time zone is saved in the tour
 		_isTimeZoneManuallyModified = true;
@@ -4551,26 +4551,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 	@Override
 	public void doSaveAs() {}
-
-	/**
-	 * Copy tour data from another tour.
-	 * 
-	 * @param newTour
-	 * @param otherTour
-	 */
-	private void duplicateTourData(final TourData newTour, final TourData otherTour) {
-
-		newTour.setTourStartTime(otherTour.getTourStartTime());
-
-		newTour.setTourTitle(
-				otherTour.getTourTitle()
-						+ UI.DASH_WITH_SPACE//
-						+ Integer.toString(_createCounter.incrementAndGet()));
-		newTour.setTourDescription(otherTour.getTourDescription());
-
-		newTour.setTourType(otherTour.getTourType());
-		newTour.setTourTags(new HashSet<>(otherTour.getTourTags()));
-	}
 
 	private void enableActions() {
 

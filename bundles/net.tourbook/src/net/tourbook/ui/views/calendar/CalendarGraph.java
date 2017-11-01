@@ -24,6 +24,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjuster;
@@ -44,6 +45,7 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProviderAll;
 import net.tourbook.ui.views.calendar.CalendarView.TourInfoFormatter;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.SafeRunnable;
@@ -193,6 +195,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	private CalendarItemTransfer				_calendarItemTransfer	= new CalendarItemTransfer();
 	//
 	private int									_dndLastOperation;
+	private LocalDate							_dragOverDate;
 	//
 	/*
 	 * UI controls
@@ -387,6 +390,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		CalendarTourData	calendarTourData;
 		DayItem				dayItem;
+		LocalDate			dayDate;
 
 		private FocusItem(final Rectangle r, final long id, final CalendarTourData calendarTourData) {
 
@@ -396,12 +400,13 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			this.calendarTourData = calendarTourData;
 		}
 
-		private FocusItem(final Rectangle r, final long id, final DayItem dayItem) {
+		private FocusItem(final Rectangle r, final long id, final DayItem dayItem, final LocalDate dayDate) {
 
 			this.rect = r;
 			this.id = id;
 
 			this.dayItem = dayItem;
+			this.dayDate = dayDate;
 		}
 
 		@Override
@@ -553,14 +558,15 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 									_dndLastOperation = event.detail;
 								}
 
-								final CalendarTourData calendarTourData =
-										((CalendarItemTransferData) data).calendarTourData;
+								// keep drag date
+								_dragOverDate = dayItem.dayDate;
+
+								final CalendarItemTransferData transferData = (CalendarItemTransferData) data;
 
 								_hoveredItem = new CalendarSelectItem(dayItem.id, ItemType.DAY);
 
-								_hoveredItem.canItemBeDragged = calendarTourData.isManualTour;
 								_hoveredItem.isDragOverItem = true;
-								_hoveredItem.calendarTourData = calendarTourData;
+								_hoveredItem.calendarTourData = transferData.calendarTourData;
 
 								_isHoveredModified = !oldHoveredItem.equals(_hoveredItem);
 
@@ -595,9 +601,15 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 				if (_calendarItemTransfer.isSupportedType(event.currentDataType)) {
 
-//					final String text = (String) event.data;
-//					final TableItem item = new TableItem(dropTable, SWT.NONE);
-//					item.setText(text);
+					final Object data = _calendarItemTransfer.nativeToJava(event.currentDataType);
+					if (data instanceof CalendarItemTransferData) {
+
+						final CalendarItemTransferData transferData = (CalendarItemTransferData) data;
+
+						final CalendarTourData calendarTourData = transferData.calendarTourData;
+
+						onDropTour(transferData.tourId, event);
+					}
 				}
 			}
 
@@ -1168,7 +1180,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 							weekHeight);
 
 					final DayItem day = new DayItem(dayId);
-					_allDayFocusItems.add(new FocusItem(dayRect, dayId, day));
+					_allDayFocusItems.add(new FocusItem(dayRect, dayId, day, currentDate));
 					dayId = day.dayId + 1;
 
 					gc.setFont(normalFont);
@@ -2480,6 +2492,53 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		disposeFonts();
 	}
 
+	private void onDropTour(final long tourId, final DropTargetEvent event) {
+
+		final TourData dragedTourData = TourManager.getInstance().getTourData(tourId);
+
+		Assert.isNotNull(dragedTourData);
+
+		// adjust tour start date
+		final ZonedDateTime tourStartTime = dragedTourData.getTourStartTime();
+		final ZonedDateTime newTourStartTime = tourStartTime//
+				.withYear(_dragOverDate.getYear())
+				.withMonth(_dragOverDate.getMonthValue())
+				.withDayOfMonth(_dragOverDate.getDayOfMonth());
+
+		if (tourStartTime.toLocalDate().toEpochDay() == newTourStartTime.toLocalDate().toEpochDay()) {
+
+			// it is the same day -> do nothing
+			// -> this could be improved that the drop operation is disabled
+
+		} else {
+
+			if (event.detail == DND.DROP_MOVE) {
+
+				// move tour to another date
+
+				dragedTourData.setTourStartTime(newTourStartTime);
+
+				TourManager.saveModifiedTour(dragedTourData);
+
+			} else if (event.detail == DND.DROP_COPY) {
+
+				// copy tour
+
+				final TourData tourDataCopy = new TourData();
+
+				TourManager.duplicateTourData(dragedTourData, tourDataCopy);
+
+				// set tour start date/time AFTER tour is copied !!!
+				tourDataCopy.setTourStartTime(newTourStartTime);
+
+				// tour id must be created after the tour date/time is set
+				tourDataCopy.createTourId();
+
+				TourManager.saveModifiedTour(tourDataCopy);
+			}
+		}
+	}
+
 	/**
 	 * Mouse move event handler
 	 * 
@@ -2512,8 +2571,12 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 				if (1 == event.button || 3 == event.button) {
 
+					final CalendarTourData calendarTourData = tourFocusItem.calendarTourData;
+
 					_selectedItem = new CalendarSelectItem(id, ItemType.TOUR);
-					_selectedItem.calendarTourData = tourFocusItem.calendarTourData;
+
+					_selectedItem.calendarTourData = calendarTourData;
+					_selectedItem.canItemBeDragged = calendarTourData.isManualTour;
 
 				} else if (oldHoveredItem.id != id) {
 
