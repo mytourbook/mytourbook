@@ -38,6 +38,9 @@ public enum TourFilterFieldOperator {
 	INCLUDE_ANY, //
 	EXCLUDE_ALL, //
 
+	IS_AVAILABLE, //
+	IS_NOT_AVAILABLE, //
+
 	IS_EMPTY, //
 	IS_NOT_EMPTY,
 
@@ -48,5 +51,6 @@ public enum TourFilterFieldOperator {
 	SEASON_TODAY_UNTIL_DATE, //
 	SEASON_UNTIL_TODAY_FROM_YEAR_START, //
 	SEASON_UNTIL_TODAY_FROM_DATE, //
+
 
 }

@@ -32,6 +32,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
+import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
 
 import org.eclipse.core.runtime.Assert;
@@ -50,98 +51,96 @@ public class TourFilterManager {
 
 // SET_FORMATTING_OFF
 
-	private static final String							LABEL_POWER_AVG						= net.tourbook.ui.Messages.ColumnFactory_Power_Avg_Tooltip;
-	private static final String							LABEL_POWER_MAX						= net.tourbook.ui.Messages.ColumnFactory_Power_Max_Tooltip;
-	private static final String							LABEL_POWER_NORMALIZED				= net.tourbook.ui.Messages.ColumnFactory_Power_Normalized_Tooltip;
-	private static final String							LABEL_POWER_TOTAL_WORK				= net.tourbook.ui.Messages.ColumnFactory_Power_TotalWork;
+	private static final String		LABEL_POWER_AVG						= net.tourbook.ui.Messages.ColumnFactory_Power_Avg_Tooltip;
+	private static final String		LABEL_POWER_MAX						= net.tourbook.ui.Messages.ColumnFactory_Power_Max_Tooltip;
+	private static final String		LABEL_POWER_NORMALIZED				= net.tourbook.ui.Messages.ColumnFactory_Power_Normalized_Tooltip;
+	private static final String		LABEL_POWER_TOTAL_WORK				= net.tourbook.ui.Messages.ColumnFactory_Power_TotalWork;
 
 	/* Training */
-	private static final String							LABEL_POWER_FTP						= net.tourbook.ui.Messages.ColumnFactory_Power_FTP_Label;
-	private static final String							LABEL_POWERTRAIN_AVG_CADENCE		= net.tourbook.ui.Messages.ColumnFactory_avg_cadence_label;
-	private static final String							LABEL_POWERTRAIN_AVG_CADENCE_UNIT	= net.tourbook.ui.Messages.ColumnFactory_avg_cadence;
-	private static final String							LABEL_POWERTRAIN_GEAR_FRONT_SHIFT	= net.tourbook.ui.Messages.ColumnFactory_GearFrontShiftCount_Label;
-	private static final String							LABEL_POWERTRAIN_GEAR_REAR_SHIFT	= net.tourbook.ui.Messages.ColumnFactory_GearRearShiftCount_Label;
+	private static final String		LABEL_POWER_FTP						= net.tourbook.ui.Messages.ColumnFactory_Power_FTP_Label;
+	private static final String		LABEL_POWERTRAIN_AVG_CADENCE		= net.tourbook.ui.Messages.ColumnFactory_avg_cadence_label;
+	private static final String		LABEL_POWERTRAIN_AVG_CADENCE_UNIT	= net.tourbook.ui.Messages.ColumnFactory_avg_cadence;
+	private static final String		LABEL_POWERTRAIN_GEAR_FRONT_SHIFT	= net.tourbook.ui.Messages.ColumnFactory_GearFrontShiftCount_Label;
+	private static final String		LABEL_POWERTRAIN_GEAR_REAR_SHIFT	= net.tourbook.ui.Messages.ColumnFactory_GearRearShiftCount_Label;
 
-	private static final String							LABEL_CATEGORY_ALTITUDE				= net.tourbook.ui.Messages.ColumnFactory_Category_Altitude;
-	private static final String							LABEL_CATEGORY_BODY					= net.tourbook.ui.Messages.ColumnFactory_Category_Body;
-	private static final String							LABEL_CATEGORY_DATA					= net.tourbook.ui.Messages.ColumnFactory_Category_Data;
-	private static final String							LABEL_CATEGORY_DEVICE				= net.tourbook.ui.Messages.ColumnFactory_Category_Device;
-	private static final String							LABEL_CATEGORY_MARKER				= net.tourbook.ui.Messages.ColumnFactory_Category_Marker;
-	private static final String							LABEL_CATEGORY_MOTION				= net.tourbook.ui.Messages.ColumnFactory_Category_Motion;
-	private static final String							LABEL_CATEGORY_PHOTO				= net.tourbook.ui.Messages.ColumnFactory_Category_Photo;
-	private static final String							LABEL_CATEGORY_POWER				= net.tourbook.ui.Messages.ColumnFactory_Category_Power;
-	private static final String							LABEL_CATEGORY_POWERTRAIN			= net.tourbook.ui.Messages.ColumnFactory_Category_Powertrain;
-	private static final String							LABEL_CATEGORY_STATE				= net.tourbook.ui.Messages.ColumnFactory_Category_State;
-	private static final String							LABEL_CATEGORY_TIME					= net.tourbook.ui.Messages.ColumnFactory_Category_Time;
-	private static final String							LABEL_CATEGORY_TOUR					= net.tourbook.ui.Messages.ColumnFactory_Category_Tour;
-	private static final String							LABEL_CATEGORY_TRAINING				= net.tourbook.ui.Messages.ColumnFactory_Category_Training;
-	private static final String							LABEL_CATEGORY_WAYPOINT				= net.tourbook.ui.Messages.ColumnFactory_Category_Waypoint;
-	private static final String							LABEL_CATEGORY_WEATHER				= net.tourbook.ui.Messages.ColumnFactory_Category_Weather;
+	private static final String		LABEL_CATEGORY_ALTITUDE				= net.tourbook.ui.Messages.ColumnFactory_Category_Altitude;
+	private static final String		LABEL_CATEGORY_BODY					= net.tourbook.ui.Messages.ColumnFactory_Category_Body;
+	private static final String		LABEL_CATEGORY_DATA					= net.tourbook.ui.Messages.ColumnFactory_Category_Data;
+	private static final String		LABEL_CATEGORY_DEVICE				= net.tourbook.ui.Messages.ColumnFactory_Category_Device;
+	private static final String		LABEL_CATEGORY_MARKER				= net.tourbook.ui.Messages.ColumnFactory_Category_Marker;
+	private static final String		LABEL_CATEGORY_MOTION				= net.tourbook.ui.Messages.ColumnFactory_Category_Motion;
+	private static final String		LABEL_CATEGORY_PHOTO				= net.tourbook.ui.Messages.ColumnFactory_Category_Photo;
+	private static final String		LABEL_CATEGORY_POWER				= net.tourbook.ui.Messages.ColumnFactory_Category_Power;
+	private static final String		LABEL_CATEGORY_POWERTRAIN			= net.tourbook.ui.Messages.ColumnFactory_Category_Powertrain;
+	private static final String		LABEL_CATEGORY_STATE				= net.tourbook.ui.Messages.ColumnFactory_Category_State;
+	private static final String		LABEL_CATEGORY_TIME					= net.tourbook.ui.Messages.ColumnFactory_Category_Time;
+	private static final String		LABEL_CATEGORY_TOUR					= net.tourbook.ui.Messages.ColumnFactory_Category_Tour;
+	private static final String		LABEL_CATEGORY_TRAINING				= net.tourbook.ui.Messages.ColumnFactory_Category_Training;
+	private static final String		LABEL_CATEGORY_WAYPOINT				= net.tourbook.ui.Messages.ColumnFactory_Category_Waypoint;
+	private static final String		LABEL_CATEGORY_WEATHER				= net.tourbook.ui.Messages.ColumnFactory_Category_Weather;
 
-	private static final String							TOUR_DATA_ALTITUDE_DOWN 			= "TourData.tourAltDown";					//$NON-NLS-1$
-	private static final String 						TOUR_DATA_ALTITUDE_UP 				= "TourData.tourAltUp";						//$NON-NLS-1$
-	private static final String 						TOUR_DATA_ALTITUDE_MAX 				= "TourData.maxAltitude";					//$NON-NLS-1$
-	private static final String							TOUR_DATA_AVG_TEMPERATURE			= "TourData.avgTemperature";				//$NON-NLS-1$
-	private static final String							TOUR_DATA_NUMBER_OF_PHOTOS			= "TourData.numberOfPhotos";				//$NON-NLS-1$
-	private static final String							TOUR_DATA_POWER_AVG					= "TourData.power_Avg";						//$NON-NLS-1$
-	private static final String							TOUR_DATA_POWER_MAX					= "TourData.power_Max";						//$NON-NLS-1$
-	private static final String							TOUR_DATA_POWER_NORMALIZED			= "TourData.power_Normalized";				//$NON-NLS-1$
-	private static final String							TOUR_DATA_POWER_TOTAL_WORK			= "TourData.power_TotalWork";				//$NON-NLS-1$
-	private static final String							TOUR_DATA_POWERTRAIN_AVG_CADENCE	= "TourData.avgCadence";					//$NON-NLS-1$
-	private static final String							TOUR_DATA_POWERTRAIN_FRONT_SHIFT	= "TourData.frontShiftCount";				//$NON-NLS-1$
-	private static final String							TOUR_DATA_POWERTRAIN_REAR_SHIFT		= "TourData.rearShiftCount";				//$NON-NLS-1$
-	private static final String							TOUR_DATA_TRAINING_FTP				= "TourData.power_FTP";						//$NON-NLS-1$
+	private static final String		TOUR_DATA_ALTITUDE_DOWN 			= "TourData.tourAltDown";					//$NON-NLS-1$
+	private static final String 	TOUR_DATA_ALTITUDE_UP 				= "TourData.tourAltUp";						//$NON-NLS-1$
+	private static final String 	TOUR_DATA_ALTITUDE_MAX 				= "TourData.maxAltitude";					//$NON-NLS-1$
+	private static final String		TOUR_DATA_AVG_TEMPERATURE			= "TourData.avgTemperature";				//$NON-NLS-1$
+	private static final String		TOUR_DATA_MANUAL_TOUR 				= "TourData.devicePluginId";				//$NON-NLS-1$
+	private static final String		TOUR_DATA_NUMBER_OF_PHOTOS			= "TourData.numberOfPhotos";				//$NON-NLS-1$
+	private static final String		TOUR_DATA_POWER_AVG					= "TourData.power_Avg";						//$NON-NLS-1$
+	private static final String		TOUR_DATA_POWER_MAX					= "TourData.power_Max";						//$NON-NLS-1$
+	private static final String		TOUR_DATA_POWER_NORMALIZED			= "TourData.power_Normalized";				//$NON-NLS-1$
+	private static final String		TOUR_DATA_POWER_TOTAL_WORK			= "TourData.power_TotalWork";				//$NON-NLS-1$
+	private static final String		TOUR_DATA_POWERTRAIN_AVG_CADENCE	= "TourData.avgCadence";					//$NON-NLS-1$
+	private static final String		TOUR_DATA_POWERTRAIN_FRONT_SHIFT	= "TourData.frontShiftCount";				//$NON-NLS-1$
+	private static final String		TOUR_DATA_POWERTRAIN_REAR_SHIFT		= "TourData.rearShiftCount";				//$NON-NLS-1$
+	private static final String		TOUR_DATA_TRAINING_FTP				= "TourData.power_FTP";						//$NON-NLS-1$
 
-	private static final String							TOUR_DATA_TOUR_DISTANCE				= "TourData.tourDistance";					//$NON-NLS-1$
-	private static final String							TOUR_DATA_TOUR_DRIVING_TIME			= "TourData.tourDrivingTime";				//$NON-NLS-1$
-	private static final String							TOUR_DATA_TOUR_RECORDING_TIME		= "TourData.tourRecordingTime";				//$NON-NLS-1$
-	private static final String							TOUR_DATA_TOUR_START_TIME			= "TourData.tourStartTime";					//$NON-NLS-1$
-	private static final String							TOUR_DATA_TOUR_TITLE				= "TourData.tourTitle";						//$NON-NLS-1$
-	
+	private static final String		TOUR_DATA_TOUR_DISTANCE				= "TourData.tourDistance";					//$NON-NLS-1$
+	private static final String		TOUR_DATA_TOUR_DRIVING_TIME			= "TourData.tourDrivingTime";				//$NON-NLS-1$
+	private static final String		TOUR_DATA_TOUR_RECORDING_TIME		= "TourData.tourRecordingTime";				//$NON-NLS-1$
+	private static final String		TOUR_DATA_TOUR_START_TIME			= "TourData.tourStartTime";					//$NON-NLS-1$
+	private static final String		TOUR_DATA_TOUR_TITLE				= "TourData.tourTitle";						//$NON-NLS-1$
 
-	private static final String							TOUR_FILTER_FILE_NAME			= "tour-filter.xml";		//$NON-NLS-1$
-	private static final int							TOUR_FILTER_VERSION				= 1;
+	private static final String		TOUR_FILTER_FILE_NAME			= "tour-filter.xml";		//$NON-NLS-1$
+	private static final int		TOUR_FILTER_VERSION				= 1;
 
-	private static final String							TAG_PROFILE						= "Profile";				//$NON-NLS-1$
-	private static final String							TAG_PROPERTY					= "Property";				//$NON-NLS-1$
-	private static final String							TAG_ROOT						= "TourFilterProfiles";		//$NON-NLS-1$
+	private static final String		TAG_PROFILE						= "Profile";				//$NON-NLS-1$
+	private static final String		TAG_PROPERTY					= "Property";				//$NON-NLS-1$
+	private static final String		TAG_ROOT						= "TourFilterProfiles";		//$NON-NLS-1$
 
-	private static final String							ATTR_IS_ENABLED					= "isEnabled";				//$NON-NLS-1$
-	private static final String							ATTR_IS_SELECTED				= "isSelected";				//$NON-NLS-1$
-	private static final String							ATTR_FIELD_ID					= "fieldId";				//$NON-NLS-1$
-	private static final String							ATTR_FIELD_OPERATOR				= "fieldOperator";			//$NON-NLS-1$
-	private static final String							ATTR_NAME						= "name";					//$NON-NLS-1$
-	private static final String							ATTR_SEASON_DAY					= "seasonDay";				//$NON-NLS-1$
-	private static final String							ATTR_SEASON_MONTH				= "seasonMonth";			//$NON-NLS-1$
-	private static final String							ATTR_TOUR_FILTER_VERSION		= "tourFilterVersion";		//$NON-NLS-1$
-	private static final String							ATTR_VALUE						= "value";					//$NON-NLS-1$
+	private static final String		ATTR_IS_ENABLED					= "isEnabled";				//$NON-NLS-1$
+	private static final String		ATTR_IS_SELECTED				= "isSelected";				//$NON-NLS-1$
+	private static final String		ATTR_FIELD_ID					= "fieldId";				//$NON-NLS-1$
+	private static final String		ATTR_FIELD_OPERATOR				= "fieldOperator";			//$NON-NLS-1$
+	private static final String		ATTR_NAME						= "name";					//$NON-NLS-1$
+	private static final String		ATTR_SEASON_DAY					= "seasonDay";				//$NON-NLS-1$
+	private static final String		ATTR_SEASON_MONTH				= "seasonMonth";			//$NON-NLS-1$
+	private static final String		ATTR_TOUR_FILTER_VERSION		= "tourFilterVersion";		//$NON-NLS-1$
+	private static final String		ATTR_VALUE						= "value";					//$NON-NLS-1$
 
-	private static final String							ATTR_DATE_YEAR					= "dateYear";				//$NON-NLS-1$
-	private static final String							ATTR_DATE_MONTH					= "dateMonth";				//$NON-NLS-1$
-	private static final String							ATTR_DATE_DAY					= "dateDay";				//$NON-NLS-1$
-	private static final String							ATTR_TIME_HOUR					= "timeHour";				//$NON-NLS-1$
-	private static final String							ATTR_TIME_MINUTE				= "timeMinute";				//$NON-NLS-1$
+	private static final String		ATTR_DATE_YEAR					= "dateYear";				//$NON-NLS-1$
+	private static final String		ATTR_DATE_MONTH					= "dateMonth";				//$NON-NLS-1$
+	private static final String		ATTR_DATE_DAY					= "dateDay";				//$NON-NLS-1$
+	private static final String		ATTR_TIME_HOUR					= "timeHour";				//$NON-NLS-1$
+	private static final String		ATTR_TIME_MINUTE				= "timeMinute";				//$NON-NLS-1$
 
-	private static final String							OP_BR_OPEN						= "(";						//$NON-NLS-1$
-	private static final String							OP_BR_CLOSE						= ")";						//$NON-NLS-1$
-	private static final String							OP_AND							= " AND ";					//$NON-NLS-1$
-	private static final String							OP_BETWEEN						= " BETWEEN ";				//$NON-NLS-1$
-	private static final String							OP_NOT_BETWEEN					= " NOT BETWEEN ";			//$NON-NLS-1$
-	private static final String							OP_OR							= " OR ";					//$NON-NLS-1$
+	private static final String		OP_BR_OPEN						= "(";						//$NON-NLS-1$
+	private static final String		OP_BR_CLOSE						= ")";						//$NON-NLS-1$
+	private static final String		OP_AND							= " AND ";					//$NON-NLS-1$
+	private static final String		OP_BETWEEN						= " BETWEEN ";				//$NON-NLS-1$
+	private static final String		OP_NOT							= " NOT ";					//$NON-NLS-1$
+	private static final String		OP_NOT_BETWEEN					= " NOT BETWEEN ";			//$NON-NLS-1$
+	private static final String		OP_OR							= " OR ";					//$NON-NLS-1$
 
-	private static final String							OP_PARAMETER					= " ?\n";					//$NON-NLS-1$
-	private static final String							OP_EQUALS						= " = ?\n";					//$NON-NLS-1$
-	private static final String							OP_NOT_EQUALS					= " != ?\n";				//$NON-NLS-1$
-	private static final String							OP_GREATER_THAN					= " > ?\n";					//$NON-NLS-1$
-	private static final String							OP_GREATER_THAN_OR_EQUAL		= " >= ?\n";				//$NON-NLS-1$
-	private static final String							OP_LESS_THAN					= " < ?\n";					//$NON-NLS-1$
-	private static final String							OP_LESS_THAN_OR_EQUAL			= " <= ?\n";				//$NON-NLS-1$
+	private static final String		OP_PARAMETER					= " ?\n";					//$NON-NLS-1$
+	private static final String		OP_EQUALS						= " = ?\n";					//$NON-NLS-1$
+	private static final String		OP_NOT_EQUALS					= " != ?\n";				//$NON-NLS-1$
+	private static final String		OP_GREATER_THAN					= " > ?\n";					//$NON-NLS-1$
+	private static final String		OP_GREATER_THAN_OR_EQUAL		= " >= ?\n";				//$NON-NLS-1$
+	private static final String		OP_LESS_THAN					= " < ?\n";					//$NON-NLS-1$
+	private static final String		OP_LESS_THAN_OR_EQUAL			= " <= ?\n";				//$NON-NLS-1$
 
-	private static final String							OP_NULL							= " IS NULL\n";				//$NON-NLS-1$
-	private static final String							OP_NOT_NULL						= " IS NOT NULL\n";			//$NON-NLS-1$
-
-// SET_FORMATTING_ON
-// SET_FORMATTING_OFF
+	private static final String		OP_NULL							= " IS NULL\n";				//$NON-NLS-1$
+	private static final String		OP_NOT_NULL						= " IS NOT NULL\n";			//$NON-NLS-1$
 
 	public static final TourFilterFieldOperatorConfig[]	TOUR_FILTER_OPERATORS = {
 	                                   		                   			   
@@ -157,6 +156,8 @@ public class TourFilterManager {
 	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.NOT_BETWEEN,					Messages.Tour_Filter_Operator_NotBetween),
 	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.IS_EMPTY,						Messages.Tour_Filter_Operator_IsEmpty),
 	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.IS_NOT_EMPTY,					Messages.Tour_Filter_Operator_IsNotEmpty),
+	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.IS_AVAILABLE,					Messages.Tour_Filter_Operator_IsAvailable),
+	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.IS_NOT_AVAILABLE,				Messages.Tour_Filter_Operator_IsNotAvailable),
 	   
 	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.SEASON_UNTIL_TODAY_FROM_YEAR_START,	Messages.Tour_Filter_Operator_Season_UntilToday_From_YearStart),
 	   new TourFilterFieldOperatorConfig(TourFilterFieldOperator.SEASON_UNTIL_TODAY_FROM_DATE,			Messages.Tour_Filter_Operator_Season_UntilToday_From_Date),
@@ -208,6 +209,12 @@ public class TourFilterManager {
 	                                             			                         
 		TourFilterFieldOperator.IS_EMPTY,
 		TourFilterFieldOperator.IS_NOT_EMPTY,
+	};
+
+	public static final TourFilterFieldOperator[]			FILTER_OPERATORS_BOOLEAN = {
+			
+			TourFilterFieldOperator.IS_AVAILABLE,
+			TourFilterFieldOperator.IS_NOT_AVAILABLE,
 	};
 
 	private static FieldValueConverter		_fieldValueProvider_Altitude		= new FieldValueProvider_Altitude();
@@ -342,27 +349,30 @@ public class TourFilterManager {
 
 		allConfigs.add(new TourFilterFieldConfig(LABEL_CATEGORY_ALTITUDE, TourFilterFieldId.ALTITUDE_UP));
 
-		allConfigs.add(TourFilterFieldConfig//
-				.name(Messages.Tour_Filter_Field_Altitude_Ascent)
-				.unitLabel(UI.UNIT_LABEL_ALTITUDE)
-				.fieldId(TourFilterFieldId.ALTITUDE_UP)
-				.pageIncrement(100)
-				.fieldValueProvider(_fieldValueProvider_Altitude));
+		allConfigs.add(
+				TourFilterFieldConfig//
+						.name(Messages.Tour_Filter_Field_Altitude_Ascent)
+						.unitLabel(UI.UNIT_LABEL_ALTITUDE)
+						.fieldId(TourFilterFieldId.ALTITUDE_UP)
+						.pageIncrement(100)
+						.fieldValueProvider(_fieldValueProvider_Altitude));
 
-		allConfigs.add(TourFilterFieldConfig//
-				.name(Messages.Tour_Filter_Field_Altitude_Descent)
-				.unitLabel(UI.UNIT_LABEL_ALTITUDE)
-				.fieldId(TourFilterFieldId.ALTITUDE_DOWN)
-				.pageIncrement(100)
-				.minValue(Integer.MIN_VALUE)
-				.fieldValueProvider(_fieldValueProvider_Altitude));
+		allConfigs.add(
+				TourFilterFieldConfig//
+						.name(Messages.Tour_Filter_Field_Altitude_Descent)
+						.unitLabel(UI.UNIT_LABEL_ALTITUDE)
+						.fieldId(TourFilterFieldId.ALTITUDE_DOWN)
+						.pageIncrement(100)
+						.minValue(Integer.MIN_VALUE)
+						.fieldValueProvider(_fieldValueProvider_Altitude));
 
-		allConfigs.add(TourFilterFieldConfig//
-				.name(Messages.Tour_Filter_Field_Altitude_Max)
-				.unitLabel(UI.UNIT_LABEL_ALTITUDE)
-				.fieldId(TourFilterFieldId.ALTITUDE_MAX)
-				.pageIncrement(100)
-				.fieldValueProvider(_fieldValueProvider_Altitude));
+		allConfigs.add(
+				TourFilterFieldConfig//
+						.name(Messages.Tour_Filter_Field_Altitude_Max)
+						.unitLabel(UI.UNIT_LABEL_ALTITUDE)
+						.fieldId(TourFilterFieldId.ALTITUDE_MAX)
+						.pageIncrement(100)
+						.fieldValueProvider(_fieldValueProvider_Altitude));
 	}
 
 	private static void createConfig_Body(final ArrayList<TourFilterFieldConfig> allConfigs) {
@@ -412,16 +422,17 @@ public class TourFilterManager {
 //
 		allConfigs.add(new TourFilterFieldConfig(LABEL_CATEGORY_MOTION, TourFilterFieldId.MOTION_DISTANCE));
 
-		allConfigs.add(TourFilterFieldConfig//
-				.name(Messages.Tour_Filter_Field_Distance)
-				.fieldId(TourFilterFieldId.MOTION_DISTANCE)
-				.fieldType(TourFilterFieldType.NUMBER_FLOAT)
-				.fieldOperators(FILTER_OPERATORS_NUMBER)
-				.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
-				.pageIncrement(100)
-				.numDigits(1)
-				.fieldValueProvider(_fieldValueProvider_Distance)
-				.unitLabel(UI.UNIT_LABEL_DISTANCE));
+		allConfigs.add(
+				TourFilterFieldConfig//
+						.name(Messages.Tour_Filter_Field_Distance)
+						.fieldId(TourFilterFieldId.MOTION_DISTANCE)
+						.fieldType(TourFilterFieldType.NUMBER_FLOAT)
+						.fieldOperators(FILTER_OPERATORS_NUMBER)
+						.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
+						.pageIncrement(100)
+						.numDigits(1)
+						.fieldValueProvider(_fieldValueProvider_Distance)
+						.unitLabel(UI.UNIT_LABEL_DISTANCE));
 	}
 
 	private static void createConfig_Power(final ArrayList<TourFilterFieldConfig> allConfigs) {
@@ -440,31 +451,35 @@ public class TourFilterManager {
 
 		allConfigs.add(new TourFilterFieldConfig(LABEL_CATEGORY_POWER, TourFilterFieldId.POWER_AVERAGE));
 
-		allConfigs.add(TourFilterFieldConfig//
-				.name(LABEL_POWER_AVG)
-				.fieldId(TourFilterFieldId.POWER_AVERAGE)
-				.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
-				.unitLabel(UI.UNIT_POWER_SHORT));
+		allConfigs.add(
+				TourFilterFieldConfig//
+						.name(LABEL_POWER_AVG)
+						.fieldId(TourFilterFieldId.POWER_AVERAGE)
+						.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
+						.unitLabel(UI.UNIT_POWER_SHORT));
 
-		allConfigs.add(TourFilterFieldConfig//
-				.name(LABEL_POWER_MAX)
-				.fieldId(TourFilterFieldId.POWER_MAX)
-				.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
-				.unitLabel(UI.UNIT_POWER_SHORT));
+		allConfigs.add(
+				TourFilterFieldConfig//
+						.name(LABEL_POWER_MAX)
+						.fieldId(TourFilterFieldId.POWER_MAX)
+						.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
+						.unitLabel(UI.UNIT_POWER_SHORT));
 
-		allConfigs.add(TourFilterFieldConfig//
-				.name(LABEL_POWER_NORMALIZED)
-				.fieldId(TourFilterFieldId.POWER_NORMALIZED)
-				.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
-				.unitLabel(UI.UNIT_POWER_SHORT));
+		allConfigs.add(
+				TourFilterFieldConfig//
+						.name(LABEL_POWER_NORMALIZED)
+						.fieldId(TourFilterFieldId.POWER_NORMALIZED)
+						.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
+						.unitLabel(UI.UNIT_POWER_SHORT));
 
-		allConfigs.add(TourFilterFieldConfig//
-				.name(LABEL_POWER_TOTAL_WORK)
-				.fieldId(TourFilterFieldId.POWER_TOTAL_WORK)
-				.fieldType(TourFilterFieldType.NUMBER_FLOAT)
-				.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
-				.unitLabel(UI.UNIT_JOULE_MEGA)
-				.numDigits(1));
+		allConfigs.add(
+				TourFilterFieldConfig//
+						.name(LABEL_POWER_TOTAL_WORK)
+						.fieldId(TourFilterFieldId.POWER_TOTAL_WORK)
+						.fieldType(TourFilterFieldType.NUMBER_FLOAT)
+						.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
+						.unitLabel(UI.UNIT_JOULE_MEGA)
+						.numDigits(1));
 	}
 
 	private static void createConfig_Powertrain(final ArrayList<TourFilterFieldConfig> allConfigs) {
@@ -482,23 +497,26 @@ public class TourFilterManager {
 
 		allConfigs.add(new TourFilterFieldConfig(LABEL_CATEGORY_POWERTRAIN, TourFilterFieldId.POWERTRAIN_AVG_CADENCE));
 
-		allConfigs.add(TourFilterFieldConfig//
-				.name(LABEL_POWERTRAIN_AVG_CADENCE)
-				.fieldId(TourFilterFieldId.POWERTRAIN_AVG_CADENCE)
-				.fieldType(TourFilterFieldType.NUMBER_FLOAT)
-				.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
-				.unitLabel(LABEL_POWERTRAIN_AVG_CADENCE_UNIT)
-				.numDigits(1));
+		allConfigs.add(
+				TourFilterFieldConfig//
+						.name(LABEL_POWERTRAIN_AVG_CADENCE)
+						.fieldId(TourFilterFieldId.POWERTRAIN_AVG_CADENCE)
+						.fieldType(TourFilterFieldType.NUMBER_FLOAT)
+						.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
+						.unitLabel(LABEL_POWERTRAIN_AVG_CADENCE_UNIT)
+						.numDigits(1));
 
-		allConfigs.add(TourFilterFieldConfig//
-				.name(LABEL_POWERTRAIN_GEAR_FRONT_SHIFT)
-				.fieldId(TourFilterFieldId.POWERTRAIN_GEAR_FRONT_SHIFT_COUNT)
-				.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN));
+		allConfigs.add(
+				TourFilterFieldConfig//
+						.name(LABEL_POWERTRAIN_GEAR_FRONT_SHIFT)
+						.fieldId(TourFilterFieldId.POWERTRAIN_GEAR_FRONT_SHIFT_COUNT)
+						.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN));
 
-		allConfigs.add(TourFilterFieldConfig//
-				.name(LABEL_POWERTRAIN_GEAR_REAR_SHIFT)
-				.fieldId(TourFilterFieldId.POWERTRAIN_GEAR_REAR_SHIFT_COUNT)
-				.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN));
+		allConfigs.add(
+				TourFilterFieldConfig//
+						.name(LABEL_POWERTRAIN_GEAR_REAR_SHIFT)
+						.fieldId(TourFilterFieldId.POWERTRAIN_GEAR_REAR_SHIFT_COUNT)
+						.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN));
 
 	}
 
@@ -519,47 +537,53 @@ public class TourFilterManager {
 
 		allConfigs.add(new TourFilterFieldConfig(LABEL_CATEGORY_TIME, TourFilterFieldId.TIME_TOUR_DATE));
 
-		allConfigs.add(TourFilterFieldConfig //
-				.name(Messages.Tour_Filter_Field_TourDate)
-				.fieldId(TourFilterFieldId.TIME_TOUR_DATE)
-				.fieldType(TourFilterFieldType.DATE)
-				.fieldOperators(FILTER_OPERATORS_DATE_TIME)
-				.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN));
+		allConfigs.add(
+				TourFilterFieldConfig //
+						.name(Messages.Tour_Filter_Field_TourDate)
+						.fieldId(TourFilterFieldId.TIME_TOUR_DATE)
+						.fieldType(TourFilterFieldType.DATE)
+						.fieldOperators(FILTER_OPERATORS_DATE_TIME)
+						.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN));
 
-		allConfigs.add(TourFilterFieldConfig //
-				.name(Messages.Tour_Filter_Field_TourStartTime)
-				.fieldId(TourFilterFieldId.TIME_TOUR_TIME)
-				.fieldType(TourFilterFieldType.TIME)
-				.fieldOperators(FILTER_OPERATORS_DATE_TIME)
-				.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN));
+		allConfigs.add(
+				TourFilterFieldConfig //
+						.name(Messages.Tour_Filter_Field_TourStartTime)
+						.fieldId(TourFilterFieldId.TIME_TOUR_TIME)
+						.fieldType(TourFilterFieldType.TIME)
+						.fieldOperators(FILTER_OPERATORS_DATE_TIME)
+						.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN));
 
-		allConfigs.add(TourFilterFieldConfig //
-				.name(Messages.Tour_Filter_Field_Season)
-				.fieldId(TourFilterFieldId.TIME_SEASON_DATE)
-				.fieldType(TourFilterFieldType.SEASON)
-				.fieldOperators(FILTER_OPERATORS_SEASON)
-				.defaultFieldOperator(TourFilterFieldOperator.LESS_THAN_OR_EQUAL));
+		allConfigs.add(
+				TourFilterFieldConfig //
+						.name(Messages.Tour_Filter_Field_Season)
+						.fieldId(TourFilterFieldId.TIME_SEASON_DATE)
+						.fieldType(TourFilterFieldType.SEASON)
+						.fieldOperators(FILTER_OPERATORS_SEASON)
+						.defaultFieldOperator(TourFilterFieldOperator.LESS_THAN_OR_EQUAL));
 
-		allConfigs.add(TourFilterFieldConfig //
-				.name(Messages.Tour_Filter_Field_RecordingTime)
-				.fieldId(TourFilterFieldId.TIME_RECORDING_TIME)
-				.fieldType(TourFilterFieldType.DURATION)
-				.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
-				.pageIncrement(60));
+		allConfigs.add(
+				TourFilterFieldConfig //
+						.name(Messages.Tour_Filter_Field_RecordingTime)
+						.fieldId(TourFilterFieldId.TIME_RECORDING_TIME)
+						.fieldType(TourFilterFieldType.DURATION)
+						.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
+						.pageIncrement(60));
 
-		allConfigs.add(TourFilterFieldConfig //
-				.name(Messages.Tour_Filter_Field_DrivingTime)
-				.fieldId(TourFilterFieldId.TIME_DRIVING_TIME)
-				.fieldType(TourFilterFieldType.DURATION)
-				.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
-				.pageIncrement(60));
+		allConfigs.add(
+				TourFilterFieldConfig //
+						.name(Messages.Tour_Filter_Field_DrivingTime)
+						.fieldId(TourFilterFieldId.TIME_DRIVING_TIME)
+						.fieldType(TourFilterFieldType.DURATION)
+						.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
+						.pageIncrement(60));
 
-		allConfigs.add(TourFilterFieldConfig //
-				.name(Messages.Tour_Filter_Field_BreakTime)
-				.fieldId(TourFilterFieldId.TIME_BREAK_TIME)
-				.fieldType(TourFilterFieldType.DURATION)
-				.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
-				.pageIncrement(60));
+		allConfigs.add(
+				TourFilterFieldConfig //
+						.name(Messages.Tour_Filter_Field_BreakTime)
+						.fieldId(TourFilterFieldId.TIME_BREAK_TIME)
+						.fieldType(TourFilterFieldType.DURATION)
+						.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
+						.pageIncrement(60));
 	}
 
 	private static void createConfig_Tour(final ArrayList<TourFilterFieldConfig> allConfigs) {
@@ -574,37 +598,27 @@ public class TourFilterManager {
 
 		allConfigs.add(new TourFilterFieldConfig(LABEL_CATEGORY_TOUR, TourFilterFieldId.TOUR_TITLE));
 
-		allConfigs.add(TourFilterFieldConfig //
-				.name(Messages.Tour_Filter_Field_TourTitle)
-				.fieldId(TourFilterFieldId.TOUR_TITLE)
-				.fieldType(TourFilterFieldType.TEXT)
-				.fieldOperators(FILTER_OPERATORS_TEXT));
+		allConfigs.add(
+				TourFilterFieldConfig //
+						.name(Messages.Tour_Filter_Field_TourTitle)
+						.fieldId(TourFilterFieldId.TOUR_TITLE)
+						.fieldType(TourFilterFieldType.TEXT)
+						.fieldOperators(FILTER_OPERATORS_TEXT));
 
-		allConfigs.add(TourFilterFieldConfig //
-				.name(Messages.Tour_Filter_Field_Photos)
-				.fieldId(TourFilterFieldId.TOUR_PHOTOS)
-				.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
-				.pageIncrement(10));
+		allConfigs.add(
+				TourFilterFieldConfig //
+						.name(Messages.Tour_Filter_Field_Photos)
+						.fieldId(TourFilterFieldId.TOUR_PHOTOS)
+						.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
+						.pageIncrement(10));
 
-//		allConfigs.add(
-//				new TourFilterFieldConfig(
-//						Messages.Tour_Filter_Field_Photos,
-//						TourFilterFieldId.TOUR_PHOTOS,
-//						TourFilterFieldType.NUMBER_INTEGER,
-//						FILTER_OPERATORS_NUMBER,
-//						0,
-//						Integer.MAX_VALUE,
-//						10));
-
-//		allConfigs.add(
-//				new TourFilterFieldConfig(
-//						Messages.Tour_Filter_Field_Markers,
-//						TourFilterFieldId.TOUR_MARKERS,
-//						TourFilterFieldType.NUMBER_INTEGER,
-//						FILTER_OPERATORS_NUMBER,
-//						0,
-//						Integer.MAX_VALUE,
-//						10));
+		allConfigs.add(
+				TourFilterFieldConfig //
+						.name(Messages.Tour_Filter_Field_ManualTour)
+						.fieldId(TourFilterFieldId.TOUR_MANUAL_TOUR)
+						.fieldOperators(FILTER_OPERATORS_BOOLEAN)
+						.defaultFieldOperator(TourFilterFieldOperator.IS_AVAILABLE)
+						.pageIncrement(10));
 	}
 
 	private static void createConfig_Training(final ArrayList<TourFilterFieldConfig> allConfigs) {
@@ -620,11 +634,12 @@ public class TourFilterManager {
 
 		allConfigs.add(new TourFilterFieldConfig(LABEL_CATEGORY_TRAINING, TourFilterFieldId.TRAINING_FTP));
 
-		allConfigs.add(TourFilterFieldConfig//
-				.name(LABEL_POWER_FTP)
-				.fieldId(TourFilterFieldId.TRAINING_FTP)
-				.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
-				.unitLabel(UI.UNIT_POWER_SHORT));
+		allConfigs.add(
+				TourFilterFieldConfig//
+						.name(LABEL_POWER_FTP)
+						.fieldId(TourFilterFieldId.TRAINING_FTP)
+						.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
+						.unitLabel(UI.UNIT_POWER_SHORT));
 
 //		allConfigs.add(TourFilterFieldConfig//
 //				.name(COLUMN_FACTORY_POWER_TO_WEIGHT)
@@ -643,16 +658,17 @@ public class TourFilterManager {
 //
 		allConfigs.add(new TourFilterFieldConfig(LABEL_CATEGORY_WEATHER, TourFilterFieldId.WEATHER_TEMPERATURE));
 
-		allConfigs.add(TourFilterFieldConfig
-				.name(Messages.Tour_Filter_Field_Temperature)
-				.fieldId(TourFilterFieldId.WEATHER_TEMPERATURE)
-				.fieldType(TourFilterFieldType.NUMBER_FLOAT)
-				.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
-				.minValue(-600)
-				.maxValue(1500)
-				.pageIncrement(10)
-				.numDigits(1)
-				.fieldValueProvider(_fieldValueProvider_Temperature));
+		allConfigs.add(
+				TourFilterFieldConfig
+						.name(Messages.Tour_Filter_Field_Temperature)
+						.fieldId(TourFilterFieldId.WEATHER_TEMPERATURE)
+						.fieldType(TourFilterFieldType.NUMBER_FLOAT)
+						.defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
+						.minValue(-600)
+						.maxValue(1500)
+						.pageIncrement(10)
+						.numDigits(1)
+						.fieldValueProvider(_fieldValueProvider_Temperature));
 	}
 
 	/**
@@ -930,6 +946,10 @@ public class TourFilterManager {
 				getSQL__FieldOperators_Number(sqlWhere, sqlParameters, fieldOperator, sql, distance1, distance2);
 				break;
 
+			case TOUR_MANUAL_TOUR:
+				getSQL_ManualTour(sqlWhere, sqlParameters, fieldOperator);
+				break;
+
 			case WEATHER_TEMPERATURE:
 				sql = TOUR_DATA_AVG_TEMPERATURE;
 				getSQL__FieldOperators_Number(sqlWhere, sqlParameters, fieldOperator, sql, double1, double2);
@@ -990,6 +1010,7 @@ public class TourFilterManager {
 				sql = TOUR_DATA_TOUR_TITLE;
 				getSQL__FieldOperators_Text(sqlWhere, sqlParameters, fieldOperator, sql, text1, text2);
 				break;
+
 			}
 		}
 
@@ -998,6 +1019,7 @@ public class TourFilterManager {
 		return tourFilterSQLData;
 	}
 
+	@SuppressWarnings("incomplete-switch")
 	private static void getSQL__FieldOperators_DateTime(final StringBuilder sqlWhere,
 														final ArrayList<Object> sqlParameters,
 														final TourFilterFieldOperator fieldOperator,
@@ -1036,6 +1058,7 @@ public class TourFilterManager {
 		}
 	}
 
+	@SuppressWarnings("incomplete-switch")
 	private static void getSQL__FieldOperators_Number(	final StringBuilder sqlWhere,
 														final ArrayList<Object> sqlParameters,
 														final TourFilterFieldOperator fieldOperator,
@@ -1111,10 +1134,11 @@ public class TourFilterManager {
 
 		case SEASON_UNTIL_TODAY_FROM_DATE:
 
-			sqlWhere.append(OP_AND
-					+ (sql + OP_GREATER_THAN_OR_EQUAL) // date
-					+ OP_AND
-					+ (sql + OP_LESS_THAN_OR_EQUAL) // today
+			sqlWhere.append(
+					OP_AND
+							+ (sql + OP_GREATER_THAN_OR_EQUAL) // date
+							+ OP_AND
+							+ (sql + OP_LESS_THAN_OR_EQUAL) // today
 			);
 
 			sqlParameters.add(dateValue1);
@@ -1124,10 +1148,11 @@ public class TourFilterManager {
 
 		case SEASON_TODAY_UNTIL_DATE:
 
-			sqlWhere.append(OP_AND
-					+ (sql + OP_GREATER_THAN_OR_EQUAL) // date
-					+ OP_AND
-					+ (sql + OP_LESS_THAN_OR_EQUAL) // today
+			sqlWhere.append(
+					OP_AND
+							+ (sql + OP_GREATER_THAN_OR_EQUAL) // date
+							+ OP_AND
+							+ (sql + OP_LESS_THAN_OR_EQUAL) // today
 			);
 
 			sqlParameters.add(todayValue);
@@ -1137,8 +1162,9 @@ public class TourFilterManager {
 
 		case SEASON_CURRENT_DAY:
 
-			sqlWhere.append(OP_AND
-					+ (sql + OP_EQUALS) // today
+			sqlWhere.append(
+					OP_AND
+							+ (sql + OP_EQUALS) // today
 			);
 
 			sqlParameters.add(todayValue);
@@ -1161,13 +1187,14 @@ public class TourFilterManager {
 
 		case BETWEEN:
 
-			sqlWhere.append(OP_AND
+			sqlWhere.append(
+					OP_AND
 
-					+ sql
-					+ OP_BETWEEN
-					+ OP_PARAMETER
-					+ OP_AND
-					+ OP_PARAMETER);
+							+ sql
+							+ OP_BETWEEN
+							+ OP_PARAMETER
+							+ OP_AND
+							+ OP_PARAMETER);
 
 			sqlParameters.add(dateValue1);
 			sqlParameters.add(dateValue2);
@@ -1175,13 +1202,14 @@ public class TourFilterManager {
 
 		case NOT_BETWEEN:
 
-			sqlWhere.append(OP_AND
+			sqlWhere.append(
+					OP_AND
 
-					+ sql
-					+ OP_NOT_BETWEEN
-					+ OP_PARAMETER
-					+ OP_AND
-					+ OP_PARAMETER
+							+ sql
+							+ OP_NOT_BETWEEN
+							+ OP_PARAMETER
+							+ OP_AND
+							+ OP_PARAMETER
 			//
 			);
 
@@ -1191,6 +1219,7 @@ public class TourFilterManager {
 		}
 	}
 
+	@SuppressWarnings("incomplete-switch")
 	private static void getSQL__FieldOperators_Text(final StringBuilder sqlWhere,
 													final ArrayList<Object> sqlParameters,
 													final TourFilterFieldOperator fieldOperator,
@@ -1199,26 +1228,6 @@ public class TourFilterManager {
 													final String value2) {
 
 		switch (fieldOperator) {
-//		case LESS_THAN:
-//			getSQL_LessThan(sqlWhere, sqlParameters, sqlField, value1);
-//			break;
-//		case LESS_THAN_OR_EQUAL:
-//			getSQL_LessThanOrEqual(sqlWhere, sqlParameters, sqlField, value1);
-//			break;
-//
-//		case GREATER_THAN:
-//			getSQL_GreaterThan(sqlWhere, sqlParameters, sqlField, value1);
-//			break;
-//		case GREATER_THAN_OR_EQUAL:
-//			getSQL_GreaterThanOrEqual(sqlWhere, sqlParameters, sqlField, value1);
-//			break;
-//
-//		case EQUALS:
-//			getSQL_Equals(sqlWhere, sqlParameters, sqlField, value1, true);
-//			break;
-//		case NOT_EQUALS:
-//			getSQL_Equals(sqlWhere, sqlParameters, sqlField, value1, false);
-//			break;
 
 		case IS_EMPTY:
 			getSQL_Empty(sqlWhere, sqlParameters, sqlField, true);
@@ -1227,12 +1236,6 @@ public class TourFilterManager {
 			getSQL_Empty(sqlWhere, sqlParameters, sqlField, false);
 			break;
 
-//		case BETWEEN:
-//			getSQL_Between(sqlWhere, sqlParameters, sqlField, value1, value2, true);
-//			break;
-//		case NOT_BETWEEN:
-//			getSQL_Between(sqlWhere, sqlParameters, sqlField, value1, value2, false);
-//			break;
 		}
 	}
 
@@ -1245,14 +1248,15 @@ public class TourFilterManager {
 
 		final String op = isBetween ? OP_BETWEEN : OP_NOT_BETWEEN;
 
-		sqlWhere.append(OP_AND
+		sqlWhere.append(
+				OP_AND
 
-				+ sqlField
-				+ op
+						+ sqlField
+						+ op
 
-				+ OP_PARAMETER
-				+ OP_AND
-				+ OP_PARAMETER
+						+ OP_PARAMETER
+						+ OP_AND
+						+ OP_PARAMETER
 		//
 		);
 
@@ -1267,23 +1271,25 @@ public class TourFilterManager {
 
 		if (isOp) {
 
-			sqlWhere.append(OP_AND //
+			sqlWhere.append(
+					OP_AND //
 
-					+ OP_BR_OPEN
+							+ OP_BR_OPEN
 
-					+ (sqlField + OP_NULL)
-					+ OP_OR
-					+ ("LENGTH(TRIM(" + sqlField + ")) = 0\n") //$NON-NLS-1$ //$NON-NLS-2$
+							+ (sqlField + OP_NULL)
+							+ OP_OR
+							+ ("LENGTH(TRIM(" + sqlField + ")) = 0\n") //$NON-NLS-1$ //$NON-NLS-2$
 
-					+ OP_BR_CLOSE);
+							+ OP_BR_CLOSE);
 
 		} else {
 
-			sqlWhere.append(OP_AND //
+			sqlWhere.append(
+					OP_AND //
 
-					+ (sqlField + OP_NOT_NULL)
-					+ OP_AND
-					+ ("LENGTH(TRIM(" + sqlField + ")) > 0\n") //$NON-NLS-1$ //$NON-NLS-2$
+							+ (sqlField + OP_NOT_NULL)
+							+ OP_AND
+							+ ("LENGTH(TRIM(" + sqlField + ")) > 0\n") //$NON-NLS-1$ //$NON-NLS-2$
 
 			);
 		}
@@ -1341,6 +1347,28 @@ public class TourFilterManager {
 
 		sqlWhere.append(OP_AND + sqlField + OP_LESS_THAN_OR_EQUAL);
 		sqlParameters.add(value1);
+	}
+
+	private static void getSQL_ManualTour(	final StringBuilder sqlWhere,
+											final ArrayList<Object> sqlParameters,
+											final TourFilterFieldOperator fieldOperator) {
+
+		final String sqlField = TOUR_DATA_MANUAL_TOUR;
+
+		final String sql_IN_ManualId = " IN ('"
+				+ TourData.DEVICE_ID_FOR_MANUAL_TOUR + "', '"
+				+ TourData.DEVICE_ID_CSV_TOUR_DATA_READER + "'"
+				+ ")\n";
+
+		if (fieldOperator == TourFilterFieldOperator.IS_AVAILABLE) {
+
+			sqlWhere.append(OP_AND + sqlField + sql_IN_ManualId);
+
+		} else {
+
+			sqlWhere.append(OP_AND + sqlField + OP_NOT + sql_IN_ManualId);
+		}
+
 	}
 
 	private static File getXmlFile() {

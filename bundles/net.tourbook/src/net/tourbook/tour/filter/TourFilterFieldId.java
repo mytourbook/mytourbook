@@ -36,6 +36,7 @@ public enum TourFilterFieldId {
 //	TOUR_MARKERS, //
 	TOUR_PHOTOS, //
 	TOUR_TITLE, //
+	TOUR_MANUAL_TOUR, //
 
 	MOTION_DISTANCE, //
 
@@ -65,5 +66,6 @@ public enum TourFilterFieldId {
 	TRAINING_STRESS_SCORE, //
 
 	WEATHER_TEMPERATURE, //
+
 
 }

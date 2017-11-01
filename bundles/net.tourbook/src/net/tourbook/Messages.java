@@ -2039,6 +2039,7 @@ public class Messages extends NLS {
 	public static String		Tour_Filter_Field_BreakTime;
 	public static String		Tour_Filter_Field_Distance;
 	public static String		Tour_Filter_Field_DrivingTime;
+	public static String		Tour_Filter_Field_ManualTour;
 	public static String		Tour_Filter_Field_Photos;
 	public static String		Tour_Filter_Field_RecordingTime;
 	public static String		Tour_Filter_Field_Season;
@@ -2052,7 +2053,9 @@ public class Messages extends NLS {
 	public static String		Tour_Filter_Operator_Equals;
 	public static String		Tour_Filter_Operator_GreaterThan;
 	public static String		Tour_Filter_Operator_GreaterThanOrEqual;
+	public static String		Tour_Filter_Operator_IsAvailable;
 	public static String		Tour_Filter_Operator_IsEmpty;
+	public static String		Tour_Filter_Operator_IsNotAvailable;
 	public static String		Tour_Filter_Operator_IsNotEmpty;
 	public static String		Tour_Filter_Operator_LessThan;
 	public static String		Tour_Filter_Operator_LessThanOrEqual;

@@ -6,11 +6,16 @@ New
 * Calendar
 
   - Customize calendar layout and keep it in configurations
-  - Drag & drop a tour to another day
+  - Drag & drop a manual tour to another day
 
 
 * Duplicate a tour which is manually created
   Can be used for "events", like changing a battery
+
+
+* Tour Filter
+  
+  - Filter manually created tours
 
 
 
