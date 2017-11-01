@@ -32,6 +32,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.SQLFilter;
@@ -68,8 +69,8 @@ public class CalendarTourDataProvider {
 
 	private CalendarGraph								_calendarGraph;
 
-	private HashMap<Integer, CalendarTourData[][][]>	_dayCache	= new HashMap<Integer, CalendarTourData[][][]>();
-	private HashMap<Integer, CalendarTourData[]>		_weekCache	= new HashMap<Integer, CalendarTourData[]>();
+	private HashMap<Integer, CalendarTourData[][][]>	_dayCache	= new HashMap<>();
+	private HashMap<Integer, CalendarTourData[]>		_weekCache	= new HashMap<>();
 
 	private LocalDateTime								_firstTourDateTime;
 
@@ -161,6 +162,8 @@ public class CalendarTourDataProvider {
 
 		ArrayList<Long> tourIds = null;
 
+		ArrayList<Boolean> dbIsManualTour = null;
+
 		HashMap<Long, ArrayList<Long>> dbTagIds = null;
 
 		long lastTourId = -1;
@@ -181,8 +184,9 @@ public class CalendarTourDataProvider {
 				+ "TourType_typeId,"//			12 //$NON-NLS-1$
 				+ "TourDescription," // 		13 //$NON-NLS-1$
 				+ "startWeek," //				14 //$NON-NLS-1$
+				+ "devicePluginId," //			15 //$NON-NLS-1$
 
-				+ "jTdataTtag.TourTag_tagId"//	15 //$NON-NLS-1$
+				+ "jTdataTtag.TourTag_tagId"//	16 //$NON-NLS-1$
 
 				+ UI.NEW_LINE
 
@@ -226,32 +230,33 @@ public class CalendarTourDataProvider {
 
 					if (firstTourOfDay) {
 
-						dbTourTitle = new ArrayList<String>();
-						dbTourDescription = new ArrayList<String>();
+						dbTourTitle = new ArrayList<>();
+						dbTourDescription = new ArrayList<>();
 
-						dbTourYear = new ArrayList<Integer>();
-						dbTourMonth = new ArrayList<Integer>();
-						dbTourDay = new ArrayList<Integer>();
+						dbTourYear = new ArrayList<>();
+						dbTourMonth = new ArrayList<>();
+						dbTourDay = new ArrayList<>();
 
-						dbTourStartTime = new ArrayList<Integer>();
-						dbTourEndTime = new ArrayList<Integer>();
-						dbTourStartWeek = new ArrayList<Integer>();
+						dbTourStartTime = new ArrayList<>();
+						dbTourEndTime = new ArrayList<>();
+						dbTourStartWeek = new ArrayList<>();
 
-						dbDistance = new ArrayList<Integer>();
-						dbAltitude = new ArrayList<Integer>();
-						dbTourRecordingTime = new ArrayList<Integer>();
-						dbTourDrivingTime = new ArrayList<Integer>();
+						dbDistance = new ArrayList<>();
+						dbAltitude = new ArrayList<>();
+						dbTourRecordingTime = new ArrayList<>();
+						dbTourDrivingTime = new ArrayList<>();
 
 						dbTypeIds = new ArrayList<Long>();
-						dbTypeColorIndex = new ArrayList<Integer>();
+						dbTypeColorIndex = new ArrayList<>();
 
+						dbIsManualTour = new ArrayList<>();
 						dbTagIds = new HashMap<Long, ArrayList<Long>>();
 
 						firstTourOfDay = false;
 					}
 
 					tourId = result.getLong(1);
-					final Object dbTagId = result.getObject(15);
+					final Object dbTagId = result.getObject(16);
 
 					if (tourId == lastTourId) {
 
@@ -294,7 +299,14 @@ public class CalendarTourDataProvider {
 
 						dbTourStartWeek.add(result.getInt(14));
 
+						// is manual tour
+						final String devicePluginId = result.getString(15);
+						final boolean isManualTour = TourData.DEVICE_ID_FOR_MANUAL_TOUR.equals(devicePluginId)
+								|| TourData.DEVICE_ID_CSV_TOUR_DATA_READER.equals(devicePluginId);
+						dbIsManualTour.add(isManualTour);
+
 						if (dbTagId instanceof Long) {
+
 							tagIds = new ArrayList<Long>();
 							tagIds.add((Long) dbTagId);
 
@@ -362,6 +374,8 @@ public class CalendarTourDataProvider {
 					data.tourDescription = dbTourDescription.get(tourIndex);
 
 					data.dayOfWeek = LocalDate.of(year, month, data.day).getDayOfWeek().getValue();
+
+					data.isManualTour = dbIsManualTour.get(tourIndex);
 
 					dayData[tourIndex] = data;
 

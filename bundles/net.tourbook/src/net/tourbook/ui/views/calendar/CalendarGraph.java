@@ -162,7 +162,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	 */
 	private int									_defaultFontHeight;
 
-	//	private int									_defaultFontAverageCharWidth;
 	private int									_fontHeight_DateColumn;
 	private int									_fontHeight_DayContent;
 	private int									_fontHeight_DayHeader;
@@ -192,6 +191,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	//
 	private TextWrapPainter						_textWrapPainter;
 	private CalendarItemTransfer				_calendarItemTransfer	= new CalendarItemTransfer();
+	//
+	private int									_dndLastOperation;
 	//
 	/*
 	 * UI controls
@@ -318,8 +319,13 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		long				id;
 		ItemType			type;
 
-		boolean				isDragOverItem;
 		Rectangle			itemRectangle;
+
+		/**
+		 * Currently only manual created tours can be dragged and dropped.
+		 */
+		boolean				canItemBeDragged;
+		boolean				isDragOverItem;
 
 		CalendarTourData	calendarTourData;
 
@@ -457,11 +463,11 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 	private void addDragDrop() {
 
-		final int operations = DND.DROP_MOVE | DND.DROP_DEFAULT | DND.DROP_NONE;
+		final int allDND_Operations = DND.DROP_COPY | DND.DROP_MOVE;
 		final Transfer[] transferTypes = new Transfer[] { _calendarItemTransfer };
 
 		// Allow data to be copied or moved from the drag source
-		_dragSource = new DragSource(this, operations);
+		_dragSource = new DragSource(this, allDND_Operations);
 		_dragSource.setTransfer(transferTypes);
 
 		_dragSource.addDragListener(new DragSourceListener() {
@@ -481,7 +487,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			public void dragSetData(final DragSourceEvent event) {
 
 				// Provide the data of the requested type.
-				if (_calendarItemTransfer.isSupportedType(event.dataType) && _selectedItem.type == ItemType.TOUR) {
+				if (_selectedItem.canItemBeDragged
+						&& _selectedItem.type == ItemType.TOUR
+						&& _calendarItemTransfer.isSupportedType(event.dataType)) {
 
 					event.data = new CalendarItemTransferData(_selectedItem.id, _selectedItem.calendarTourData);
 				}
@@ -490,24 +498,18 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			@Override
 			public void dragStart(final DragSourceEvent event) {
 
-				event.doit = _selectedItem.type == ItemType.TOUR;
+				event.doit = _selectedItem.canItemBeDragged && _selectedItem.type == ItemType.TOUR;
 			}
 		});
 
 		// Allow data to be copied or moved to the drop target
-		_dropTarget = new DropTarget(this, operations);
+		_dropTarget = new DropTarget(this, allDND_Operations);
 		_dropTarget.setTransfer(transferTypes);
 
 		_dropTarget.addDropListener(new DropTargetListener() {
 
 			@Override
-			public void dragEnter(final DropTargetEvent event) {
-
-				// set new default
-				if (event.detail == DND.DROP_DEFAULT) {
-					event.detail = DND.DROP_MOVE;
-				}
-			}
+			public void dragEnter(final DropTargetEvent event) {}
 
 			@Override
 			public void dragLeave(final DropTargetEvent event) {}
@@ -515,52 +517,52 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			@Override
 			public void dragOperationChanged(final DropTargetEvent event) {
 
-				if (event.detail == DND.DROP_DEFAULT) {
-					event.detail = DND.DROP_MOVE;
+				// highly complicated to keep the operation and changing it
+				if (event.detail != DND.DROP_NONE) {
+
+					// adjust last operation
+					_dndLastOperation = event.detail;
 				}
 			}
 
 			@Override
 			public void dragOver(final DropTargetEvent event) {
 
-				final CalendarSelectItem oldHighlight = _hoveredItem;
+				final CalendarSelectItem oldHoveredItem = _hoveredItem;
 
 				if (_calendarItemTransfer.isSupportedType(event.currentDataType)) {
 
-					// NOTE: on unsupported platforms this will return null
 					final Object data = _calendarItemTransfer.nativeToJava(event.currentDataType);
-
 					if (data instanceof CalendarItemTransferData) {
 
-						final CalendarItemTransferData transferData = (CalendarItemTransferData) data;
-
-						final Point calendarOverPos = CalendarGraph.this.toControl(event.x, event.y);
-
-						System.out.println(
-								(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] dragOver")
-										+ ("\tdata: " + data)
-										+ ("\t: " + calendarOverPos)
-										+ ("\t: " + event)
-//						+ ("\t: " + )
-						);
-// TODO remove SYSTEM.OUT.PRINTLN
+						final Point dragOverPosition = CalendarGraph.this.toControl(event.x, event.y);
 
 						for (final FocusItem dayItem : _allDayFocusItems) {
 
-							if (dayItem.rect.contains(calendarOverPos.x, calendarOverPos.y)) {
+							if (dayItem.rect.contains(dragOverPosition.x, dragOverPosition.y)) {
 
-								if (dayItem.id == _selectedItem.id) {
+								// a day item is hovered
 
+								// highly complicated to keep the operation and changing it
+								if (event.detail == DND.DROP_NONE) {
+
+									// recovery last operation
+									event.detail = _dndLastOperation;
+								} else {
+									// keep last operation
+									_dndLastOperation = event.detail;
 								}
 
-								event.detail = DND.DROP_MOVE;
+								final CalendarTourData calendarTourData =
+										((CalendarItemTransferData) data).calendarTourData;
 
 								_hoveredItem = new CalendarSelectItem(dayItem.id, ItemType.DAY);
 
+								_hoveredItem.canItemBeDragged = calendarTourData.isManualTour;
 								_hoveredItem.isDragOverItem = true;
-								_hoveredItem.calendarTourData = transferData.calendarTourData;
+								_hoveredItem.calendarTourData = calendarTourData;
 
-								_isHoveredModified = !oldHighlight.equals(_hoveredItem);
+								_isHoveredModified = !oldHoveredItem.equals(_hoveredItem);
 
 								// only draw highlighting when modified
 								if (_isHoveredModified) {
@@ -577,13 +579,14 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 				 * Hide previous drag over item
 				 */
 				_hoveredItem = _emptyItem;
-				_isHoveredModified = !oldHighlight.equals(_hoveredItem);
+				_isHoveredModified = !oldHoveredItem.equals(_hoveredItem);
 
 				// only draw highlighting when modified
 				if (_isHoveredModified) {
 					redraw();
 				}
 
+				// disable drop
 				event.detail = DND.DROP_NONE;
 			}
 

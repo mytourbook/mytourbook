@@ -51,6 +51,11 @@ public class CalendarTourData {
 	 */
 	int				numTours;
 
+	/**
+	 * Currently only manually created tours can be copied/dragged
+	 */
+	boolean			isManualTour;
+
 	@Override
 	public String toString() {
 		return "CalendarTourData [" //$NON-NLS-1$
