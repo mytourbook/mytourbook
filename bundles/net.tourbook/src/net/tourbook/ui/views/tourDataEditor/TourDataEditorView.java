@@ -1030,44 +1030,48 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 			return;
 		}
 
-		final TourData manualTourData = new TourData();
+		try {
 
-		TourManager.duplicateTourData(copyFromOtherTour, manualTourData);
+			final TourData manualTourData = (TourData) copyFromOtherTour.clone();
 
-		/*
-		 * Adjust some copied data
-		 */
+			/*
+			 * Adjust some cloned data
+			 */
 
-		// set tour start date/time
-		manualTourData.setTourStartTime(TimeTools.now());
+			// set tour start date/time
+			manualTourData.setTourStartTime(TimeTools.now());
 
-		// tour id must be created after the tour date/time is set
-		manualTourData.createTourId();
+			// tour id must be created after the tour date/time is set
+			manualTourData.createTourId();
 
-		manualTourData.setDeviceId(TourData.DEVICE_ID_FOR_MANUAL_TOUR);
-		manualTourData.setTourPerson(activePerson);
+			manualTourData.setDeviceId(TourData.DEVICE_ID_FOR_MANUAL_TOUR);
+			manualTourData.setTourPerson(activePerson);
 
-		// ensure that the time zone is saved in the tour
-		_isTimeZoneManuallyModified = true;
+			// ensure that the time zone is saved in the tour
+			_isTimeZoneManuallyModified = true;
 
-		// update UI
-		_tourData = manualTourData;
-		_tourChart = null;
-		updateUI_FromModel(manualTourData, false, true);
+			// update UI
+			_tourData = manualTourData;
+			_tourChart = null;
+			updateUI_FromModel(manualTourData, false, true);
 
-		// set editor into edit mode
-		_isEditMode = true;
-		_actionToggleReadEditMode.setChecked(true);
+			// set editor into edit mode
+			_isEditMode = true;
+			_actionToggleReadEditMode.setChecked(true);
 
-		enableActions();
-		enableControls();
+			enableActions();
+			enableControls();
 
-		// select tour tab and first field
-		_tabFolder.setSelection(_tabTour);
-		_comboTitle.setFocus();
+			// select tour tab and first field
+			_tabFolder.setSelection(_tabTour);
+			_comboTitle.setFocus();
 
-		// set tour dirty even when nothing is entered but the user can see that this tour must be saved or discarded
-		setTourDirty();
+			// set tour dirty even when nothing is entered but the user can see that this tour must be saved or discarded
+			setTourDirty();
+
+		} catch (final CloneNotSupportedException e) {
+			StatusUtil.log(e);
+		}
 	}
 
 	void actionCsvTimeSliceExport() {

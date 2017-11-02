@@ -944,30 +944,6 @@ public class TourManager {
 		xData.setChartSegments(chartSegments);
 	}
 
-	/**
-	 * Copy tour data into another tour, currently only manually created tours are supported
-	 * 
-	 * @param fromTour
-	 * @param toTour
-	 */
-	public static void duplicateTourData(final TourData fromTour, final TourData toTour) {
-
-		toTour.setDeviceId(fromTour.getDeviceId());
-		toTour.setTourPerson(fromTour.getTourPerson());
-
-		toTour.setTourStartTime(fromTour.getTourStartTime());
-
-//		toTour.setTourTitle(
-//				Integer.toString(_tourCopyCounter.incrementAndGet())
-//						+ UI.DASH_WITH_SPACE//
-//						+ fromTour.getTourTitle());
-		toTour.setTourTitle(fromTour.getTourTitle());
-		toTour.setTourDescription(fromTour.getTourDescription());
-
-		toTour.setTourType(fromTour.getTourType());
-		toTour.setTourTags(new HashSet<>(fromTour.getTourTags()));
-	}
-
 	public static void fireEvent(final TourEventId tourEventId) {
 
 		final Object[] allListeners = _tourEventListeners.getListeners();

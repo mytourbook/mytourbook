@@ -113,7 +113,7 @@ import com.skedgo.converter.TimezoneMapper;
 @XmlType(name = "TourData")
 @XmlRootElement(name = "TourData")
 @XmlAccessorType(XmlAccessType.NONE)
-public class TourData implements Comparable<Object>, IXmlSerializable {
+public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable {
 
 	public static final int										DB_LENGTH_DEVICE_TOUR_TYPE			= 2;
 	public static final int										DB_LENGTH_DEVICE_PLUGIN_ID			= 255;
@@ -1509,6 +1509,25 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 	public void clearWorldPositions() {
 
 		_tourWorldPosition.clear();
+	}
+
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+
+		final TourData tourDataCopy = new TourData();
+
+		tourDataCopy.setTourPerson(this.getTourPerson());
+		tourDataCopy.setDeviceId(this.getDeviceId());
+
+		tourDataCopy.setTourStartTime(this.getTourStartTime());
+
+		tourDataCopy.setTourTitle(this.getTourTitle());
+		tourDataCopy.setTourDescription(this.getTourDescription());
+
+		tourDataCopy.setTourTags(new HashSet<>(this.getTourTags()));
+		tourDataCopy.setTourType(this.getTourType());
+
+		return tourDataCopy;
 	}
 
 	@Override
@@ -6900,25 +6919,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 					if (currentFrontGear != nextFrontGear) {
 
 						frontShiftCount++;
-
-//						System.out
-//								.println((net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//										+ ("\tcurrentFrontGear: " + currentFrontGear)
-//										+ ("\tnextFrontGear: " + nextFrontGear)
-//										+ ("\tfrontShiftCount: " + frontShiftCount));
-//						// TODO remove SYSTEM.OUT.PRINTLN
 					}
 
 					if (currentRearGear != nextRearGear) {
 
 						rearShiftCount++;
-
-//						System.out
-//								.println((net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//										+ ("\tcurrentRearGear: " + currentRearGear)
-//										+ ("\tnextRearGear: " + nextRearGear)
-//										+ ("\trearShiftCount: " + rearShiftCount));
-//						// TODO remove SYSTEM.OUT.PRINTLN
 					}
 
 					currentFrontGear = nextFrontGear;

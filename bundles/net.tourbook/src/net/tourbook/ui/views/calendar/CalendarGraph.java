@@ -32,15 +32,18 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorCacheSWT;
 import net.tourbook.common.color.ColorUtil;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.ui.TextWrapPainter;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourDoubleClickState;
+import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProviderAll;
 import net.tourbook.ui.views.calendar.CalendarView.TourInfoFormatter;
@@ -49,6 +52,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.SafeRunnable;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.ByteArrayTransfer;
 import org.eclipse.swt.dnd.DND;
@@ -309,7 +313,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		@Override
 		public String toString() {
-			return "CalendarItemTransferData [tourId=" + tourId + "]";
+			return "CalendarItemTransferData [tourId=" + tourId + "]"; //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 	}
@@ -411,14 +415,14 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		@Override
 		public String toString() {
-			return "ItemLocation ["
+			return "ItemLocation [" //$NON-NLS-1$
 
-					+ "rect=" + rect + ", "
-					+ "id=" + id + ", "
-					+ "calendarTourData=" + calendarTourData + ", "
-					+ "dayItem=" + dayItem + ", "
+					+ "rect=" + rect + ", " //$NON-NLS-1$ //$NON-NLS-2$
+					+ "id=" + id + ", " //$NON-NLS-1$ //$NON-NLS-2$
+					+ "calendarTourData=" + calendarTourData + ", " //$NON-NLS-1$ //$NON-NLS-2$
+					+ "dayItem=" + dayItem + ", " //$NON-NLS-1$ //$NON-NLS-2$
 
-					+ "]";
+					+ "]"; //$NON-NLS-1$
 		}
 	}
 
@@ -2520,21 +2524,37 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 				TourManager.saveModifiedTour(dragedTourData);
 
+				TourLogManager.logDefault(
+						NLS.bind(
+								Messages.Log_Tour_MoveTour,
+								TimeTools.Formatter_Date_L.format(tourStartTime),
+								TimeTools.Formatter_Date_L.format(newTourStartTime)));
+
 			} else if (event.detail == DND.DROP_COPY) {
 
 				// copy tour
 
-				final TourData tourDataCopy = new TourData();
+				try {
 
-				TourManager.duplicateTourData(dragedTourData, tourDataCopy);
+					final TourData tourDataCopy = (TourData) dragedTourData.clone();
 
-				// set tour start date/time AFTER tour is copied !!!
-				tourDataCopy.setTourStartTime(newTourStartTime);
+					// set tour start date/time AFTER tour is copied !!!
+					tourDataCopy.setTourStartTime(newTourStartTime);
 
-				// tour id must be created after the tour date/time is set
-				tourDataCopy.createTourId();
+					// tour id must be created after the tour date/time is set
+					tourDataCopy.createTourId();
 
-				TourManager.saveModifiedTour(tourDataCopy);
+					TourManager.saveModifiedTour(tourDataCopy);
+
+					TourLogManager.logDefault(
+							NLS.bind(
+									Messages.Log_Tour_CopyTour,
+									TimeTools.Formatter_Date_L.format(tourStartTime),
+									TimeTools.Formatter_Date_L.format(newTourStartTime)));
+
+				} catch (final CloneNotSupportedException e) {
+					StatusUtil.log(e);
+				}
 			}
 		}
 	}
@@ -2903,13 +2923,13 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		redraw();
 
 		System.out.println(
-				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] onScroll")
-						+ ("\tselection: " + sb.getSelection())
-						+ ("\toutsideWeeks: " + _scrollBar_OutsideWeeks)
-						+ ("\tmax: " + sb.getMaximum())
-						+ ("\tthumb: " + sb.getThumb())
-						+ ("\t_numWeeksInOneColumn: " + _numWeeksInOneColumn)
-						+ ("\tfirstDay: " + _firstViewportDay.toLocalDate())
+				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] onScroll") //$NON-NLS-1$ //$NON-NLS-2$
+						+ ("\tselection: " + sb.getSelection()) //$NON-NLS-1$
+						+ ("\toutsideWeeks: " + _scrollBar_OutsideWeeks) //$NON-NLS-1$
+						+ ("\tmax: " + sb.getMaximum()) //$NON-NLS-1$
+						+ ("\tthumb: " + sb.getThumb()) //$NON-NLS-1$
+						+ ("\t_numWeeksInOneColumn: " + _numWeeksInOneColumn) //$NON-NLS-1$
+						+ ("\tfirstDay: " + _firstViewportDay.toLocalDate()) //$NON-NLS-1$
 //				+ ("\t: " + )
 		);
 // TODO remove SYSTEM.OUT.PRINTLN
@@ -2973,13 +2993,13 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		_scrollBar_LastSelection = scrollbarSelection;
 
 		System.out.println(
-				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] upScroll")
-						+ ("\tselection: " + scrollbarSelection)
-						+ ("\toutsideWeeks: " + _scrollBar_OutsideWeeks)
-						+ ("\tmax: " + scrollbarMax)
-						+ ("\tthumb: " + thumbSize)
-						+ ("\t_numWeeksInOneColumn: " + _numWeeksInOneColumn)
-						+ ("\tfirstDay: " + _firstViewportDay.toLocalDate())
+				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] upScroll") //$NON-NLS-1$ //$NON-NLS-2$
+						+ ("\tselection: " + scrollbarSelection) //$NON-NLS-1$
+						+ ("\toutsideWeeks: " + _scrollBar_OutsideWeeks) //$NON-NLS-1$
+						+ ("\tmax: " + scrollbarMax) //$NON-NLS-1$
+						+ ("\tthumb: " + thumbSize) //$NON-NLS-1$
+						+ ("\t_numWeeksInOneColumn: " + _numWeeksInOneColumn) //$NON-NLS-1$
+						+ ("\tfirstDay: " + _firstViewportDay.toLocalDate()) //$NON-NLS-1$
 //				+ ("\t: " + )
 		);
 // TODO remove SYSTEM.OUT.PRINTLN

@@ -1147,7 +1147,9 @@ public class Messages extends NLS {
 	public static String		Log_TemperatureAdjustment_010_NoTemperatureDataSeries;
 	public static String		Log_TemperatureAdjustment_011_NoTimeDataSeries;
 
+	public static String		Log_Tour_CopyTour;
 	public static String		Log_Tour_DeleteTours;
+	public static String		Log_Tour_MoveTour;
 	public static String		Log_Tour_SaveTours;
 	public static String		Log_Tour_SaveTours_File;
 
