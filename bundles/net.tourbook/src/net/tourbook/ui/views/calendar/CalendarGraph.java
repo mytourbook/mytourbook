@@ -46,7 +46,6 @@ import net.tourbook.tour.TourDoubleClickState;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProviderAll;
-import net.tourbook.ui.views.calendar.CalendarView.TourInfoFormatter;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.ListenerList;
@@ -99,15 +98,9 @@ import org.eclipse.swt.widgets.ScrollBar;
 
 public class CalendarGraph extends Canvas implements ITourProviderAll {
 
-	private static final int					_MIN_SCROLLABLE_WEEKS	= 12;
+	private static final int					MIN_SCROLLABLE_WEEKS	= 12;
 
-// SET_FORMATTING_OFF
-	
-	private TourInfoFormatter[]					_tourInfoFormatter		= new TourInfoFormatter[CalendarView.numberOfInfoLines];
-	private WeekSummaryFormatter[]				_weekSummaryFormatter	= new WeekSummaryFormatter[CalendarView.numberOfSummaryLines];
 	private final TourDoubleClickState			_tourDoubleClickState	= new TourDoubleClickState();
-	
-// SET_FORMATTING_ON
 
 	private ColorCacheSWT						_colorCache				= new ColorCacheSWT();
 	//
@@ -151,8 +144,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	private boolean								_isYearColumn;
 	private boolean								_isScrollbarInitialized;
 	private boolean								_isInUpdateScrollbar;
-	private boolean								_useTextColorForTourInfoText;
-	private boolean								_useBlackForHighlightTourInfoText;
 	/**
 	 * This rectangle contains all visible days except week no and week info area.
 	 */
@@ -482,15 +473,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		_dragSource.addDragListener(new DragSourceListener() {
 
 			@Override
-			public void dragFinished(final DragSourceEvent event) {
-
-				// If a move operation has been performed, remove the data
-				// from the source
-				if (event.detail == DND.DROP_MOVE) {
-
-//					dragLabel.setText("");
-				}
-			}
+			public void dragFinished(final DragSourceEvent event) {}
 
 			@Override
 			public void dragSetData(final DragSourceEvent event) {
@@ -609,8 +592,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 					if (data instanceof CalendarItemTransferData) {
 
 						final CalendarItemTransferData transferData = (CalendarItemTransferData) data;
-
-						final CalendarTourData calendarTourData = transferData.calendarTourData;
 
 						onDropTour(transferData.tourId, event);
 					}
@@ -1594,7 +1575,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		gc.setForeground(fg);
 		gc.setClipping(tourRect.x, tourRect.y, tourRect.width, tourRect.height);
 
-//		final String infoText = _tourInfoFormatter[0].format(data);
 		final String tourTitle = data.tourTitle;
 		final String tourDescription = data.tourDescription;
 		final String infoText = tourTitle == null //
@@ -1914,7 +1894,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		gc.setClipping(weekRec);
 		gc.setBackground(_white);
 
-		for (final WeekSummaryFormatter formatter : _weekSummaryFormatter) {
+		for (final WeekFormatterData formatterData : _currentConfig.allWeekFormatterData) {
+
+			final WeekFormatter formatter = getFormatter(formatterData.id);
 
 			gc.setForeground(_colorCache.getColor(formatter.getColor().hashCode()));
 
@@ -2158,6 +2140,18 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		return _fontYearHeader;
 	}
 
+	private WeekFormatter getFormatter(final WeekFormatterID id) {
+
+		for (final WeekFormatter formatter : CalendarConfigManager.allWeekFormatter) {
+
+			if (id == formatter.id) {
+				return formatter;
+			}
+		}
+
+		return CalendarConfigManager.DEFAULT_WEEK_SUMMARY_FORMATTER;
+	}
+
 	/**
 	 * @return Returns the hovered tour or <code>null</code> when a tour is not hovered.
 	 */
@@ -2182,18 +2176,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			selectedTourData.add(TourManager.getInstance().getTourData(_selectedItem.id));
 		}
 		return selectedTourData;
-	}
-
-	public int getTourInfoFormatterIndex(final int line) {
-		return _tourInfoFormatter[line].index;
-	}
-
-	public boolean getTourInfoUseHighlightTextBlack() {
-		return _useBlackForHighlightTourInfoText;
-	}
-
-	public boolean getTourInfoUseTextColor() {
-		return _useTextColorForTourInfoText;
 	}
 
 	private DateTimeFormatter getUI_DayDateFormatter(	final CalendarConfig config,
@@ -2259,10 +2241,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 
 		return headerFormatter;
-	}
-
-	public int getWeekSummaryFormatter(final int line) {
-		return _weekSummaryFormatter[line].index;
 	}
 
 	public void gotoDate(final LocalDate date) {
@@ -2527,8 +2505,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 				TourLogManager.logDefault(
 						NLS.bind(
 								Messages.Log_Tour_MoveTour,
-								TimeTools.Formatter_Date_L.format(tourStartTime),
-								TimeTools.Formatter_Date_L.format(newTourStartTime)));
+								TimeTools.Formatter_Date_M.format(tourStartTime),
+								TimeTools.Formatter_Date_M.format(newTourStartTime)));
 
 			} else if (event.detail == DND.DROP_COPY) {
 
@@ -2549,8 +2527,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 					TourLogManager.logDefault(
 							NLS.bind(
 									Messages.Log_Tour_CopyTour,
-									TimeTools.Formatter_Date_L.format(tourStartTime),
-									TimeTools.Formatter_Date_L.format(newTourStartTime)));
+									TimeTools.Formatter_Date_M.format(tourStartTime),
+									TimeTools.Formatter_Date_M.format(newTourStartTime)));
 
 				} catch (final CloneNotSupportedException e) {
 					StatusUtil.log(e);
@@ -2827,8 +2805,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		final long availableTourWeeks = (today.toEpochDay() - firstTourDate.toEpochDay()) / 7;
 
 		// ensure the scrollable area has a reasonable size
-		if (availableTourWeeks < _MIN_SCROLLABLE_WEEKS) {
-			firstTourDate = today.minusWeeks(_MIN_SCROLLABLE_WEEKS);
+		if (availableTourWeeks < MIN_SCROLLABLE_WEEKS) {
+			firstTourDate = today.minusWeeks(MIN_SCROLLABLE_WEEKS);
 		}
 
 		// ensure the date return is a "FirstDayOfTheWeek" !!!
@@ -3030,35 +3008,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	public void setSelectionTourId(final long selectedTourId) {
 
 		_selectedItem = new CalendarSelectItem(selectedTourId, ItemType.TOUR);
-	}
-
-	public void setTourInfoFormatter(final int line, final TourInfoFormatter formatter) {
-
-		_tourInfoFormatter[line] = formatter;
-
-		_isGraphClean = false;
-		redraw();
-	}
-
-	public void setTourInfoUseHighlightTextBlack(final boolean checked) {
-
-		_useBlackForHighlightTourInfoText = checked;
-	}
-
-	public void setTourInfoUseLineColor(final boolean checked) {
-
-		_useTextColorForTourInfoText = checked;
-
-		_isGraphClean = false;
-		redraw();
-	}
-
-	public void setWeekSummaryFormatter(final int line, final WeekSummaryFormatter formatter) {
-
-		_weekSummaryFormatter[line] = formatter;
-
-		_isGraphClean = false;
-		redraw();
 	}
 
 	public void setYearMonthContributor(final CalendarYearMonthContributionItem calendarYearMonthContribuor) {

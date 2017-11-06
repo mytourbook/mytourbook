@@ -24,7 +24,6 @@ import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorDefinition;
 import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.font.MTFont;
-import net.tourbook.common.formatter.ValueFormat;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.IOpeningDialog;
@@ -42,9 +41,7 @@ import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.views.calendar.CalendarConfigManager.ICalendarConfigProvider;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -85,20 +82,9 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarCo
 	static final String 			STATE_TOUR_TOOLTIP_DELAY	 			= "STATE_TOUR_TOOLTIP_DELAY"; 						//$NON-NLS-1$
 
 	private static final String		STATE_FIRST_DISPLAYED_EPOCH_DAY			= "STATE_FIRST_DISPLAYED_EPOCH_DAY";				//$NON-NLS-1$
+	private static final String		STATE_SELECTED_TOURS					= "STATE_SELECTED_TOURS";							//$NON-NLS-1$
 	
-	/////////////////////////////////////////////////////////////////
-	// old states
-	/////////////////////////////////////////////////////////////////
-	private static final String		STATE_SELECTED_TOURS					= "SelectedTours";									//$NON-NLS-1$
-	private static final String		STATE_TOUR_INFO_FORMATTER_INDEX_		= "TourInfoFormatterIndex";							//$NON-NLS-1$
-	private static final String		STATE_WEEK_SUMMARY_FORMATTER_INDEX_		= "WeekSummaryFormatterIndex";						//$NON-NLS-1$
-	
-	private static final String		STATE_TOUR_INFO_TEXT_COLOR				= "TourInfoUseTextColor";							//$NON-NLS-1$
-	private static final String		STATE_TOUR_INFO_BLACK_TEXT_HIGHLIGHT	= "TourInfoUseBlackTextHightlight";					//$NON-NLS-1$
-	
-	private static final String		STATE_USE_LINE_COLOR_FOR_WEEK_SUMMARY	= "UseLineColorForWeekSummary";						//$NON-NLS-1$
 
-	static final int				numberOfInfoLines						= 3;
 	static final int				numberOfSummaryLines					= 5;
 
 	static final int				DEFAULT_TOUR_TOOLTIP_DELAY				= 100; // ms
@@ -120,33 +106,16 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarCo
 
 	private ActionCalendarOptions	_actionCalendarOptions;
 
-	private Action					_actionForward, _actionBack;
+	private Action					_actionBack;
+	private Action					_actionForward;
 	private Action					_actionSetLinked;
 	private Action					_actionGotoToday;
-	private Action[]				_actionSetTourInfoFormatLine;
-	private Action[]				_actionSetSummaryFormatLine;
-	Action[][]						_actionSetTourInfoFormat;
-	Action[][]						_actionSetWeekSummaryFormat;
-	private Action					_actionSetTourInfoTextColor;
-	private Action					_actionSetTourInfoBlackTextHighlight;
-	private Action					_actionSetUseLineColorForWeekSummary;
 	private ActionTourInfo			_actionTourInfo;
 	//
-	boolean							_useLineColorForWeekSummary				= false;
 
-	WeekSummaryFormatter[]			tourWeekSummaryFormatter				= {
 
-			createFormatter_Week_Empty(),
 
-			createFormatter_Week_Altitude(),
-			createFormatter_Week_Distance(),
-			createFormatter_Week_Pace(),
-			createFormatter_Week_Speed(),
-			createFormatter_Week_Time_Moving(),
-			createFormatter_Week_Time_Recording()
-	};
-
-	TourInfoFormatter[]				tourInfoFormatter						= {
+	TourInfoFormatter[]				tourInfoFormatter				= {
 
 			createFormatter_Tour_Empty(),
 
@@ -168,7 +137,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarCo
 	private PixelConverter			_pc;
 
 	private CalendarTourInfoToolTip	_tourInfoToolTip;
-	private OpenDialogManager		_openDlgMgr								= new OpenDialogManager();
+	private OpenDialogManager		_openDlgMgr						= new OpenDialogManager();
 
 	/*
 	 * UI controls
@@ -385,86 +354,6 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarCo
 		};
 		_actionGotoToday.setText(Messages.Calendar_View_Action_GotoToday);
 		_actionGotoToday.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ZoomCentered));
-
-		// the tour info line popup menu opener
-		_actionSetTourInfoFormatLine = new Action[numberOfInfoLines];
-		for (int i = 0; i < numberOfInfoLines; i++) {
-			_actionSetTourInfoFormatLine[i] = new TourInfoFormatLineAction(
-					this,
-					NLS.bind(
-							Messages.Calendar_View_Action_LineInfo,
-							i + 1),
-					i);
-		}
-
-		// the formatter actions used for all tour info lines
-		_actionSetTourInfoFormat = new Action[numberOfInfoLines][tourInfoFormatter.length];
-		for (int i = 0; i < numberOfInfoLines; i++) {
-			for (int j = 0; j < tourInfoFormatter.length; j++) {
-				tourInfoFormatter[j].index = j;
-				if (null != tourInfoFormatter[j]) {
-					_actionSetTourInfoFormat[i][j] = new TourInfoFormatAction(
-							this,
-							tourInfoFormatter[j].getText(),
-							tourInfoFormatter[j],
-							i);
-				}
-			}
-		}
-
-		// the week info line popup menu opener
-		_actionSetSummaryFormatLine = new Action[numberOfSummaryLines];
-		for (int i = 0; i < numberOfSummaryLines; i++) {
-			_actionSetSummaryFormatLine[i] = new WeekSummaryFormatLineAction(
-					this,
-					NLS.bind(
-							Messages.Calendar_View_Action_SummaryInfo,
-							i + 1),
-					i);
-		}
-
-		// the formatter actions used for the week summaries
-		_actionSetWeekSummaryFormat = new Action[numberOfSummaryLines][tourWeekSummaryFormatter.length];
-		for (int i = 0; i < numberOfSummaryLines; i++) {
-			for (int j = 0; j < tourWeekSummaryFormatter.length; j++) {
-
-				tourWeekSummaryFormatter[j].index = j;
-
-				if (null != tourWeekSummaryFormatter[j]) {
-
-					_actionSetWeekSummaryFormat[i][j] = new WeekSummaryFormatAction(
-							this,
-							tourWeekSummaryFormatter[j].getText(),
-							tourWeekSummaryFormatter[j],
-							i);
-				}
-			}
-		}
-
-		_actionSetTourInfoTextColor = new Action(null, Action.AS_CHECK_BOX) {
-			@Override
-			public void run() {
-				_calendarGraph.setTourInfoUseLineColor(this.isChecked());
-			}
-		};
-		_actionSetTourInfoTextColor.setText(Messages.Calendar_View_Action_TextColor);
-
-		_actionSetTourInfoBlackTextHighlight = new Action(null, Action.AS_CHECK_BOX) {
-			@Override
-			public void run() {
-				_calendarGraph.setTourInfoUseHighlightTextBlack(this.isChecked());
-			}
-		};
-		_actionSetTourInfoBlackTextHighlight.setText(Messages.Calendar_View_Action_BlackHighlightText);
-
-		_actionSetUseLineColorForWeekSummary = new Action(null, Action.AS_CHECK_BOX) {
-			@Override
-			public void run() {
-				_useLineColorForWeekSummary = this.isChecked();
-				_calendarGraph.draw();
-			}
-		};
-		_actionSetUseLineColorForWeekSummary.setText(Messages.Calendar_View_Action_UseLineColorForSummary);
 	}
 
 	/**
@@ -721,269 +610,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarCo
 		};
 	}
 
-	private WeekSummaryFormatter createFormatter_Week_Altitude() {
 
-		return new WeekSummaryFormatter(
-				this,
-				GraphColorManager.PREF_GRAPH_ALTITUDE,
-				Messages.Calendar_View_Action_SummaryAltitude) {
-
-			@Override
-			String format(final CalendarTourData data) {
-
-				if (data.altitude > 0) {
-
-					final long alt = (long) (data.altitude / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE);
-					return alt + UI.SPACE + UI.UNIT_LABEL_ALTITUDE;
-
-				} else {
-					return UI.DASH;
-				}
-			}
-
-			@Override
-			public ValueFormat getDefaultFormat() {
-				return ValueFormat.NUMBER_1_0;
-			}
-
-			@Override
-			public ValueFormat[] getValueFormats() {
-
-				return new ValueFormat[] {
-
-						ValueFormat.NUMBER_1_0,
-						ValueFormat.NUMBER_1_1 };
-			}
-		};
-	}
-
-	private WeekSummaryFormatter createFormatter_Week_Distance() {
-
-		return new WeekSummaryFormatter(
-				this,
-				GraphColorManager.PREF_GRAPH_DISTANCE,
-				Messages.Calendar_View_Action_SummaryDistance) {
-
-			@Override
-			String format(final CalendarTourData data) {
-
-				if (data.distance > 0) {
-
-					final float distance = (float) (data.distance / 1000.0 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
-
-//					return String.format(
-//							NLS.bind(Messages.Calendar_View_Format_Distance, UI.UNIT_LABEL_DISTANCE),
-//							distance);
-
-					return String.format("%4.0f", distance);
-
-				} else {
-					return UI.DASH;
-				}
-			}
-
-			@Override
-			public ValueFormat getDefaultFormat() {
-				return ValueFormat.NUMBER_1_0;
-			}
-
-			@Override
-			public ValueFormat[] getValueFormats() {
-
-				return new ValueFormat[] {
-						ValueFormat.NUMBER_1_0,
-						ValueFormat.NUMBER_1_1,
-						ValueFormat.NUMBER_1_2,
-						ValueFormat.NUMBER_1_3 };
-			}
-		};
-	}
-
-	private WeekSummaryFormatter createFormatter_Week_Empty() {
-
-		return new WeekSummaryFormatter(this, GraphColorManager.PREF_GRAPH_TIME) {
-
-			@Override
-			public String format(final CalendarTourData data) {
-				return UI.EMPTY_STRING;
-			}
-
-			@Override
-			public ValueFormat getDefaultFormat() {
-				return null;
-			}
-
-			@Override
-			public String getText() {
-				return Messages.Calendar_View_Action_ShowNothing;
-			}
-
-			@Override
-			public ValueFormat[] getValueFormats() {
-				return null;
-			}
-		};
-	}
-
-	private WeekSummaryFormatter createFormatter_Week_Pace() {
-
-		return new WeekSummaryFormatter(
-				this,
-				GraphColorManager.PREF_GRAPH_PACE,
-				Messages.Calendar_View_Action_SummaryPace) {
-
-			@Override
-			String format(final CalendarTourData data) {
-
-				if (data.recordingTime > 0 && data.distance > 0) {
-
-					final int pace = (int) (data.distance == 0
-							? 0
-							: (1000 * data.recordingTime / data.distance * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
-
-					return String
-							.format(
-									NLS.bind(Messages.Calendar_View_Format_Pace, UI.UNIT_LABEL_PACE),
-									pace / 60,
-									pace % 60)
-							.toString();
-				} else {
-					return UI.DASH;
-				}
-			}
-
-			@Override
-			public ValueFormat getDefaultFormat() {
-				return ValueFormat.NUMBER_1_1;
-			}
-
-			@Override
-			public ValueFormat[] getValueFormats() {
-
-				return new ValueFormat[] {
-						ValueFormat.NUMBER_1_0,
-						ValueFormat.NUMBER_1_1,
-						ValueFormat.NUMBER_1_2 };
-			}
-		};
-	}
-
-	private WeekSummaryFormatter createFormatter_Week_Speed() {
-
-		return new WeekSummaryFormatter(
-				this,
-				GraphColorManager.PREF_GRAPH_SPEED,
-				Messages.Calendar_View_Action_SummarySpeed) {
-
-			@Override
-			String format(final CalendarTourData data) {
-
-				if (data.distance > 0 && data.recordingTime > 0) {
-
-					return String
-							.format(
-									NLS.bind(Messages.Calendar_View_Format_Speed, UI.UNIT_LABEL_SPEED),
-									data.distance == 0 ? 0 : data.distance / (data.recordingTime / 3.6f))
-							.toString();
-				} else {
-
-					return UI.DASH;
-				}
-			}
-
-			@Override
-			public ValueFormat getDefaultFormat() {
-				return ValueFormat.NUMBER_1_0;
-			}
-
-			@Override
-			public ValueFormat[] getValueFormats() {
-
-				return new ValueFormat[] {
-						ValueFormat.NUMBER_1_0,
-						ValueFormat.NUMBER_1_1,
-						ValueFormat.NUMBER_1_2 };
-			}
-		};
-	}
-
-	private WeekSummaryFormatter createFormatter_Week_Time_Moving() {
-
-		return new WeekSummaryFormatter(
-				this,
-				GraphColorManager.PREF_GRAPH_TIME,
-				Messages.Calendar_View_Action_SummaryMovingTime) {
-
-			@Override
-			String format(final CalendarTourData data) {
-
-				if (data.recordingTime > 0) {
-					return String
-							.format(
-									Messages.Calendar_View_Format_Time,
-									data.drivingTime / 3600,
-									(data.drivingTime % 3600) / 60)
-							.toString();
-				} else {
-					return UI.DASH;
-				}
-			}
-
-			@Override
-			public ValueFormat getDefaultFormat() {
-				return ValueFormat.TIME_HH_MM;
-			}
-
-			@Override
-			public ValueFormat[] getValueFormats() {
-
-				return new ValueFormat[] {
-						ValueFormat.TIME_HH,
-						ValueFormat.TIME_HH_MM,
-						ValueFormat.TIME_HH_MM_SS };
-			}
-		};
-	}
-
-	private WeekSummaryFormatter createFormatter_Week_Time_Recording() {
-
-		return new WeekSummaryFormatter(
-				this,
-				GraphColorManager.PREF_GRAPH_TIME,
-				Messages.Calendar_View_Action_SummaryRecordingTime) {
-
-			@Override
-			String format(final CalendarTourData data) {
-
-				if (data.recordingTime > 0) {
-
-					return String
-							.format(
-									Messages.Calendar_View_Format_Time,
-									data.recordingTime / 3600,
-									(data.recordingTime % 3600) / 60)
-							.toString();
-				} else {
-
-					return UI.DASH;
-				}
-			}
-
-			@Override
-			public ValueFormat getDefaultFormat() {
-				return ValueFormat.TIME_HH_MM;
-			}
-
-			@Override
-			public ValueFormat[] getValueFormats() {
-
-				return new ValueFormat[] {
-						ValueFormat.TIME_HH,
-						ValueFormat.TIME_HH_MM,
-						ValueFormat.TIME_HH_MM_SS };
-			}
-		};
-	}
 
 	@Override
 	public void createPartControl(final Composite parent) {
@@ -1099,7 +726,6 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarCo
 		final IActionBars bars = getViewSite().getActionBars();
 
 		final IToolBarManager toolbarMrg = bars.getToolBarManager();
-		final IMenuManager viewMgr = bars.getMenuManager();
 
 		/*
 		 * Toolbar
@@ -1112,26 +738,6 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarCo
 		toolbarMrg.add(_actionSetLinked);
 		toolbarMrg.add(_actionTourInfo);
 		toolbarMrg.add(_actionCalendarOptions);
-
-		/*
-		 * View menu
-		 */
-		for (final Action element : _actionSetSummaryFormatLine) {
-			viewMgr.add(element);
-		}
-
-		viewMgr.add(new Separator());
-		viewMgr.add(_actionSetUseLineColorForWeekSummary);
-		viewMgr.add(new Separator());
-
-		for (final Action element : _actionSetTourInfoFormatLine) {
-			viewMgr.add(element);
-		}
-
-		viewMgr.add(new Separator());
-
-		viewMgr.add(_actionSetTourInfoTextColor);
-		viewMgr.add(_actionSetTourInfoBlackTextHighlight);
 	}
 
 	private void fillUI_Config() {
@@ -1258,44 +864,8 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarCo
 			_calendarGraph.setFirstDay(LocalDate.ofEpochDay(epochDay));
 		}
 
-		/////////////////////////////////////////////////////////////////////////////////////
-		// old states
-		/////////////////////////////////////////////////////////////////////////////////////
-
 		final Long selectedTourId = Util.getStateLong(_state, STATE_SELECTED_TOURS, new Long(-1));
 		_calendarGraph.setSelectionTourId(selectedTourId);
-
-		for (int i = 0; i < numberOfInfoLines; i++) {
-
-			// the 0. line has the 1. entry selected, the 1. line the 2. ...
-			final int tourInfoFormatterIndex = Util.getStateInt(_state, STATE_TOUR_INFO_FORMATTER_INDEX_ + i, i + 1);
-
-			_actionSetTourInfoFormat[i][tourInfoFormatterIndex].run();
-		}
-
-		for (int i = 0; i < numberOfSummaryLines; i++) {
-			final int weekSummaryFormatterIndex = Util.getStateInt(
-					_state,
-					STATE_WEEK_SUMMARY_FORMATTER_INDEX_ + i,
-					i + 1);
-
-			_actionSetWeekSummaryFormat[i][weekSummaryFormatterIndex].run();
-		}
-
-		final boolean useTextColorForTourInfo = Util.getStateBoolean(_state, STATE_TOUR_INFO_TEXT_COLOR, false);
-		_actionSetTourInfoTextColor.setChecked(useTextColorForTourInfo);
-		_actionSetTourInfoTextColor.run();
-
-		final boolean useBlackForTextHightlight = Util.getStateBoolean(
-				_state,
-				STATE_TOUR_INFO_BLACK_TEXT_HIGHLIGHT,
-				false);
-		_actionSetTourInfoBlackTextHighlight.setChecked(useBlackForTextHightlight);
-		_actionSetTourInfoBlackTextHighlight.run();
-
-		_useLineColorForWeekSummary = Util.getStateBoolean(_state, STATE_USE_LINE_COLOR_FOR_WEEK_SUMMARY, false);
-		_actionSetUseLineColorForWeekSummary.setChecked(_useLineColorForWeekSummary);
-
 	}
 
 	private void saveState() {
@@ -1308,19 +878,6 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarCo
 
 		// until now we only implement single tour selection
 		_state.put(STATE_SELECTED_TOURS, _calendarGraph.getSelectedTourId());
-
-		for (int i = 0; i < numberOfInfoLines; i++) {
-			_state.put(STATE_TOUR_INFO_FORMATTER_INDEX_ + i, _calendarGraph.getTourInfoFormatterIndex(i));
-		}
-
-		for (int i = 0; i < numberOfSummaryLines; i++) {
-			_state.put(STATE_WEEK_SUMMARY_FORMATTER_INDEX_ + i, _calendarGraph.getWeekSummaryFormatter(i));
-		}
-
-		_state.put(STATE_TOUR_INFO_TEXT_COLOR, _calendarGraph.getTourInfoUseTextColor());
-		_state.put(STATE_TOUR_INFO_BLACK_TEXT_HIGHLIGHT, _calendarGraph.getTourInfoUseHighlightTextBlack());
-
-		_state.put(STATE_USE_LINE_COLOR_FOR_WEEK_SUMMARY, _useLineColorForWeekSummary);
 
 		CalendarConfigManager.saveState();
 	}

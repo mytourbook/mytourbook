@@ -33,53 +33,55 @@ public class CalendarConfig {
 	
 
 	// config
-	String				id							= Long.toString(System.nanoTime());
-	String				defaultId					= CalendarConfigManager.CONFIG_DEFAULT_ID_1;
-	String				name						= CalendarConfigManager.CONFIG_DEFAULT_ID_1;
-    
+	String					id							= Long.toString(System.nanoTime());
+	String					defaultId					= CalendarConfigManager.CONFIG_DEFAULT_ID_1;
+	String					name						= CalendarConfigManager.CONFIG_DEFAULT_ID_1;
+	                        
 	// day date
-	boolean				isHideDayDateWhenNoTour		= false;
-	boolean 			isShowDayDateWeekendColor	= CalendarConfigManager.DEFAULT_IS_SHOW_DAY_DATE_WEEKEND_COLOR;
-	FontData			dayDateFont					= JFaceResources.getFontRegistry().defaultFont().getFontData()[0];
-	DayDateFormat		dayDateFormat				= CalendarConfigManager.DEFAULT_DAY_DATE_FORMAT;
-
+	boolean					isHideDayDateWhenNoTour		= false;
+	boolean 				isShowDayDateWeekendColor	= CalendarConfigManager.DEFAULT_IS_SHOW_DAY_DATE_WEEKEND_COLOR;
+	FontData				dayDateFont					= JFaceResources.getFontRegistry().defaultFont().getFontData()[0];
+	DayDateFormat			dayDateFormat				= CalendarConfigManager.DEFAULT_DAY_DATE_FORMAT;
+	                        
 	// day
-	boolean				isShowDayDate				= true;
-	boolean				isToggleMonthColor			= true;
-	RGB 				alternateMonthRGB			= CalendarConfigManager.DEFAULT_ALTERNATE_MONTH_RGB;
-	FontData			dayContentFont				= JFaceResources.getFontRegistry().defaultFont().getFontData()[0];
-	CalendarColor		dayContentColor				= CalendarConfigManager.DEFAULT_DAY_CONTENT_COLOR;
-                                                            
+	boolean					isShowDayDate				= true;
+	boolean					isToggleMonthColor			= true;
+	RGB 					alternateMonthRGB			= CalendarConfigManager.DEFAULT_ALTERNATE_MONTH_RGB;
+	FontData				dayContentFont				= JFaceResources.getFontRegistry().defaultFont().getFontData()[0];
+	CalendarColor			dayContentColor				= CalendarConfigManager.DEFAULT_DAY_CONTENT_COLOR;
+	                                                            
 	// tour
-	TourBackground		tourBackground				= CalendarConfigManager.DEFAULT_TOUR_BACKGROUND;
-	CalendarColor		tourBackgroundColor1		= CalendarConfigManager.DEFAULT_TOUR_BACKGROUND_COLOR1;
-	CalendarColor		tourBackgroundColor2		= CalendarConfigManager.DEFAULT_TOUR_BACKGROUND_COLOR2;
-	int					tourBackgroundWidth			= CalendarConfigManager.DEFAULT_TOUR_BACKGROUND_WIDTH;
-	TourBorder 			tourBorder					= CalendarConfigManager.DEFAULT_TOUR_BORDER;
-	CalendarColor 		tourBorderColor				= CalendarConfigManager.DEFAULT_TOUR_BORDER_COLOR;
-	int		 			tourBorderWidth				= CalendarConfigManager.DEFAULT_TOUR_BORDER_WIDTH;
-                                                            
+	TourBackground			tourBackground				= CalendarConfigManager.DEFAULT_TOUR_BACKGROUND;
+	CalendarColor			tourBackgroundColor1		= CalendarConfigManager.DEFAULT_TOUR_BACKGROUND_COLOR1;
+	CalendarColor			tourBackgroundColor2		= CalendarConfigManager.DEFAULT_TOUR_BACKGROUND_COLOR2;
+	int						tourBackgroundWidth			= CalendarConfigManager.DEFAULT_TOUR_BACKGROUND_WIDTH;
+	TourBorder 				tourBorder					= CalendarConfigManager.DEFAULT_TOUR_BORDER;
+	CalendarColor 			tourBorderColor				= CalendarConfigManager.DEFAULT_TOUR_BORDER_COLOR;
+	int		 				tourBorderWidth				= CalendarConfigManager.DEFAULT_TOUR_BORDER_WIDTH;
+	                                                            
 	// date column
-	boolean				isShowDateColumn			= true;
-	DateColumnContent	dateColumnContent			= CalendarConfigManager.DEFAULT_DATE_COLUMN_CONTENT;
-	FontData			dateColumnFont				= JFaceResources.getFontRegistry().defaultFont().getFontData()[0];
-	int					dateColumnWidth				= CalendarConfigManager.DEFAULT_DATE_COLUMN_WIDTH;
-                                                            
+	boolean					isShowDateColumn			= true;
+	DateColumnContent		dateColumnContent			= CalendarConfigManager.DEFAULT_DATE_COLUMN_CONTENT;
+	FontData				dateColumnFont				= JFaceResources.getFontRegistry().defaultFont().getFontData()[0];
+	int						dateColumnWidth				= CalendarConfigManager.DEFAULT_DATE_COLUMN_WIDTH;
+	                                                            
 	// summary column
-	boolean				isShowSummaryColumn			= true;
-	int					summaryColumnWidth			= CalendarConfigManager.DEFAULT_SUMMARY_COLUMN_WIDTH;
-
+	boolean					isShowSummaryColumn			= true;
+	int						summaryColumnWidth			= CalendarConfigManager.DEFAULT_SUMMARY_COLUMN_WIDTH;
+	                        
 	// year columns
-	boolean 			isShowYearColumns			= true;
-	int					numYearColumns				= CalendarConfigManager.DEFAULT_NUM_YEAR_COLUMNS;
-	int 				yearColumnsSpacing			= CalendarConfigManager.DEFAULT_YEAR_COLUMNS_SPACING;
-	ColumnStart			yearColumnsStart			= CalendarConfigManager.DEFAULT_YEAR_COLUMNS_LAYOUT;
-	FontData 			yearHeaderFont				= JFaceResources.getFontRegistry().defaultFont().getFontData()[0];
-	
+	boolean 				isShowYearColumns			= true;
+	int						numYearColumns				= CalendarConfigManager.DEFAULT_NUM_YEAR_COLUMNS;
+	int 					yearColumnsSpacing			= CalendarConfigManager.DEFAULT_YEAR_COLUMNS_SPACING;
+	ColumnStart				yearColumnsStart			= CalendarConfigManager.DEFAULT_YEAR_COLUMNS_LAYOUT;
+	FontData 				yearHeaderFont				= JFaceResources.getFontRegistry().defaultFont().getFontData()[0];
+	                        
 	// layout
-	int					weekHeight					= CalendarConfigManager.DEFAULT_WEEK_HEIGHT;
-	boolean 			useDraggedScrolling			= false;
-	
+	int						weekHeight					= CalendarConfigManager.DEFAULT_WEEK_HEIGHT;
+	boolean					useDraggedScrolling			= false;
+
+	WeekFormatterData[]		allWeekFormatterData		= CalendarConfigManager.DEFAULT_WEEK_FORMATTER_DATA;
+
 // SET_FORMATTING_ON
 
 	@Override

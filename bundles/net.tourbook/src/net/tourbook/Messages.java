@@ -83,6 +83,14 @@ public class Messages extends NLS {
 	public static String		Calendar_Config_TourLayout_BorderTop;
 	public static String		Calendar_Config_TourLayout_BorderTopBottom;
 	public static String		Calendar_Config_TourLayout_NoBorder;
+	public static String		Calendar_Config_Value_Altitude;
+	public static String		Calendar_Config_Value_Distance;
+	public static String		Calendar_Config_Value_MovingTime;
+	public static String		Calendar_Config_Value_Pace;
+	public static String		Calendar_Config_Value_RecordingTime;
+	public static String		Calendar_Config_Value_ShowNothing;
+	public static String		Calendar_Config_Value_Speed;
+	
 	public static String		Calendar_View_Action_Back;
 	public static String		Calendar_View_Action_Back_Tooltip;
 	public static String		Calendar_View_Action_BlackHighlightText;
@@ -1669,7 +1677,7 @@ public class Messages extends NLS {
 	public static String		Slideout_CalendarOptions_Label_DayDateFont;
 	public static String		Slideout_CalendarOptions_Label_DayHeaderFormat;
 	public static String		Slideout_CalendarOptions_Label_DayHeaderLayout;
-	public static String		Slideout_CalendarOptions_Label_N_Line;
+	public static String		Slideout_CalendarOptions_Label_Line;
 	public static String		Slideout_CalendarOptions_Label_Name;
 	public static String		Slideout_CalendarOptions_Label_Name_Tooltip;
 	public static String		Slideout_CalendarOptions_Label_NumYearColumns;
@@ -1687,6 +1695,9 @@ public class Messages extends NLS {
 	public static String		Slideout_CalendarOptions_Label_YearColumnsSpace_Tooltip;
 	public static String		Slideout_CalendarOptions_Label_YearColumnsStart;
 	public static String		Slideout_CalendarOptions_Label_YearHeaderFont;
+	public static String		Slideout_CalendarOptions_Tab_DayContent;
+	public static String		Slideout_CalendarOptions_Tab_Layout;
+	public static String		Slideout_CalendarOptions_Tab_WeekSummary;
 
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowAbsoluteValues;
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowAbsoluteValues_Tooltip;
