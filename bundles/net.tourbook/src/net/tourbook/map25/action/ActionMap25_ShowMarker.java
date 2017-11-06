@@ -191,6 +191,11 @@ public class ActionMap25_ShowMarker extends ContributionItem implements IOpening
 
 	public void setEnabled(final boolean isEnabled) {
 
+		if (_actionToolItem == null) {
+			// this happened
+			return;
+		}
+
 		_actionToolItem.setEnabled(isEnabled);
 
 		if (isEnabled && _actionToolItem.getSelection() == false) {
