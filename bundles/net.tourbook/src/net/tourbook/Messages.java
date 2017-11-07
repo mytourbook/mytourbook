@@ -90,7 +90,7 @@ public class Messages extends NLS {
 	public static String		Calendar_Config_Value_RecordingTime;
 	public static String		Calendar_Config_Value_ShowNothing;
 	public static String		Calendar_Config_Value_Speed;
-	
+
 	public static String		Calendar_View_Action_Back;
 	public static String		Calendar_View_Action_Back_Tooltip;
 	public static String		Calendar_View_Action_BlackHighlightText;
@@ -1656,6 +1656,7 @@ public class Messages extends NLS {
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowMonthWithAlternatingColor;
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowSummaryColumn;
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowSummaryColumn_Tooltip;
+	public static String		Slideout_CalendarOptions_Checkbox_IsShowWeekValueUnit;
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowYearColumns;
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowYearColumns_Tooltip;
 	public static String		Slideout_CalendarOptions_Checkbox_IsTinyLayout;

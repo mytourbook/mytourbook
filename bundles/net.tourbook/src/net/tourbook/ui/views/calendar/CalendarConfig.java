@@ -65,9 +65,6 @@ public class CalendarConfig {
 	FontData				dateColumnFont				= JFaceResources.getFontRegistry().defaultFont().getFontData()[0];
 	int						dateColumnWidth				= CalendarConfigManager.DEFAULT_DATE_COLUMN_WIDTH;
 	                                                            
-	// summary column
-	boolean					isShowSummaryColumn			= true;
-	int						summaryColumnWidth			= CalendarConfigManager.DEFAULT_SUMMARY_COLUMN_WIDTH;
 	                        
 	// year columns
 	boolean 				isShowYearColumns			= true;
@@ -80,6 +77,10 @@ public class CalendarConfig {
 	int						weekHeight					= CalendarConfigManager.DEFAULT_WEEK_HEIGHT;
 	boolean					useDraggedScrolling			= false;
 
+	// week summary column
+	boolean					isShowSummaryColumn			= true;
+	boolean 				isShowWeekValueUnit			= true;
+	int						summaryColumnWidth			= CalendarConfigManager.DEFAULT_SUMMARY_COLUMN_WIDTH;
 	WeekFormatterData[]		allWeekFormatterData		= CalendarConfigManager.DEFAULT_WEEK_FORMATTER_DATA;
 
 // SET_FORMATTING_ON

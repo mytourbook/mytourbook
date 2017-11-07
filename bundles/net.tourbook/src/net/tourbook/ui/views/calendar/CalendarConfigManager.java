@@ -25,7 +25,15 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
+import net.tourbook.common.formatter.IValueFormatter;
 import net.tourbook.common.formatter.ValueFormat;
+import net.tourbook.common.formatter.ValueFormatter_Number_1_0;
+import net.tourbook.common.formatter.ValueFormatter_Number_1_1;
+import net.tourbook.common.formatter.ValueFormatter_Number_1_2;
+import net.tourbook.common.formatter.ValueFormatter_Number_1_3;
+import net.tourbook.common.formatter.ValueFormatter_Time_HH;
+import net.tourbook.common.formatter.ValueFormatter_Time_HHMM;
+import net.tourbook.common.formatter.ValueFormatter_Time_HHMMSS;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
@@ -43,153 +51,167 @@ import org.osgi.framework.Version;
 
 public class CalendarConfigManager {
 
-	private static final String			CONFIG_FILE_NAME						= "calendar-config.xml";		//$NON-NLS-1$
-
+	private static final String				CONFIG_FILE_NAME						= "calendar-config.xml";			//$NON-NLS-1$
 	//
 	/**
 	 * Version number is not yet used.
 	 */
-	private static final int			CONFIG_VERSION							= 1;
-
+	private static final int				CONFIG_VERSION							= 1;
 	//
-	private static final Bundle			_bundle									= TourbookPlugin
-			.getDefault()
-			.getBundle();
-
-	private static final IPath			_stateLocation							= Platform.getStateLocation(
-			_bundle);
-
+// SET_FORMATTING_OFF
 	//
-	static final String					CONFIG_DEFAULT_ID_1						= "#1";							//$NON-NLS-1$
-	private static final String			CONFIG_DEFAULT_ID_2						= "#2";							//$NON-NLS-1$
-	private static final String			CONFIG_DEFAULT_ID_3						= "#3";							//$NON-NLS-1$
-	private static final String			CONFIG_DEFAULT_ID_4						= "#4";							//$NON-NLS-1$
-	private static final String			CONFIG_DEFAULT_ID_5						= "#5";							//$NON-NLS-1$
-	private static final String			CONFIG_DEFAULT_ID_6						= "#6";							//$NON-NLS-1$
-	private static final String			CONFIG_DEFAULT_ID_7						= "#7";							//$NON-NLS-1$
-	private static final String			CONFIG_DEFAULT_ID_8						= "#8";							//$NON-NLS-1$
-	private static final String			CONFIG_DEFAULT_ID_9						= "#9";							//$NON-NLS-1$
-	private static final String			CONFIG_DEFAULT_ID_10					= "#10";						//$NON-NLS-1$
+	private static final Bundle				_bundle									= TourbookPlugin.getDefault().getBundle();
+	private static final IPath				_stateLocation							= Platform.getStateLocation(_bundle);
+	//
+// SET_FORMATTING_ON
+	//
+	static final String						CONFIG_DEFAULT_ID_1						= "#1";								//$NON-NLS-1$
+	private static final String				CONFIG_DEFAULT_ID_2						= "#2";								//$NON-NLS-1$
+	private static final String				CONFIG_DEFAULT_ID_3						= "#3";								//$NON-NLS-1$
+	private static final String				CONFIG_DEFAULT_ID_4						= "#4";								//$NON-NLS-1$
+	private static final String				CONFIG_DEFAULT_ID_5						= "#5";								//$NON-NLS-1$
+	private static final String				CONFIG_DEFAULT_ID_6						= "#6";								//$NON-NLS-1$
+	private static final String				CONFIG_DEFAULT_ID_7						= "#7";								//$NON-NLS-1$
+	private static final String				CONFIG_DEFAULT_ID_8						= "#8";								//$NON-NLS-1$
+	private static final String				CONFIG_DEFAULT_ID_9						= "#9";								//$NON-NLS-1$
+	private static final String				CONFIG_DEFAULT_ID_10					= "#10";							//$NON-NLS-1$
 	//
 	// common attributes
-	private static final String			ATTR_ACTIVE_CONFIG_ID					= "activeConfigId";				//$NON-NLS-1$
-	private static final String			ATTR_ID									= "id";							//$NON-NLS-1$
-	private static final String			ATTR_CONFIG_NAME						= "name";						//$NON-NLS-1$
+	private static final String				ATTR_ACTIVE_CONFIG_ID					= "activeConfigId";					//$NON-NLS-1$
+	private static final String				ATTR_ID									= "id";								//$NON-NLS-1$
+	private static final String				ATTR_CONFIG_NAME						= "name";							//$NON-NLS-1$
 	//
 	/*
 	 * Root
 	 */
-	private static final String			TAG_ROOT								= "CalendarConfiguration";		//$NON-NLS-1$
-	private static final String			ATTR_CONFIG_VERSION						= "configVersion";				//$NON-NLS-1$
+	private static final String				TAG_ROOT								= "CalendarConfiguration";			//$NON-NLS-1$
+	private static final String				ATTR_CONFIG_VERSION						= "configVersion";					//$NON-NLS-1$
 
 	//
 	/*
 	 * Calendars
 	 */
-	private static final String			TAG_CALENDAR_CONFIG						= "CalendarConfig";				//$NON-NLS-1$
-	private static final String			TAG_CALENDAR							= "Calendar";					//$NON-NLS-1$
+	private static final String				TAG_CALENDAR_CONFIG						= "CalendarConfig";					//$NON-NLS-1$
+	private static final String				TAG_CALENDAR							= "Calendar";						//$NON-NLS-1$
 	//
-	private static final String			TAG_ALTERNATE_MONTH_RGB					= "AlternateMonthRGB";			//$NON-NLS-1$
-	private static final String			TAG_ALL_WEEK_FORMATTER					= "AllWeekFormatter";			//$NON-NLS-1$
-	private static final String			TAG_WEEK_FORMATTER						= "WeekFormatter";				//$NON-NLS-1$
+	private static final String				TAG_ALTERNATE_MONTH_RGB					= "AlternateMonthRGB";				//$NON-NLS-1$
+	private static final String				TAG_ALL_WEEK_FORMATTER					= "AllWeekFormatter";				//$NON-NLS-1$
+	private static final String				TAG_WEEK_FORMATTER						= "WeekFormatter";					//$NON-NLS-1$
 	//
-	private static final String			ATTR_IS_HIDE_DAY_DATE_WHEN_NO_TOUR		= "isHideDayDateWhenNoTour";	//$NON-NLS-1$
-	private static final String			ATTR_IS_SHOW_DATE_COLUMN				= "isShowDateColumn";			//$NON-NLS-1$
-	private static final String			ATTR_IS_SHOW_DAY_DATE					= "isShowDayDate";				//$NON-NLS-1$
-	private static final String			ATTR_IS_SHOW_DAY_DATE_WEEKEND_COLOR		= "isShowDayDateWeekendColor";	//$NON-NLS-1$
-	private static final String			ATTR_IS_SHOW_SUMMARY_COLUMN				= "isShowSummaryColumn";		//$NON-NLS-1$
-	private static final String			ATTR_IS_SHOW_YEAR_COLUMNS				= "isShowYearColumns";			//$NON-NLS-1$
-	private static final String			ATTR_IS_TOGGLE_MONTH_COLOR				= "isToggleMonthColor";			//$NON-NLS-1$
-	private static final String			ATTR_NUM_YEAR_COLUMNS					= "calendarColumns";			//$NON-NLS-1$
-	private static final String			ATTR_YEAR_COLUMNS_SPACING				= "calendarColumnsSpacing";		//$NON-NLS-1$
-	private static final String			ATTR_YEAR_COLUMNS_START					= "calendarColumnsStart";		//$NON-NLS-1$
-	private static final String			ATTR_DATE_COLUMN_CONTENT				= "dateColumnContent";			//$NON-NLS-1$
-	private static final String			ATTR_DATE_COLUMN_FONT					= "dateColumnFont";				//$NON-NLS-1$
-	private static final String			ATTR_DATE_COLUMN_WIDTH					= "dateColumnWidth";			//$NON-NLS-1$
-	private static final String			ATTR_DAY_CONTENT_FONT					= "dayContentFont";				//$NON-NLS-1$
-	private static final String			ATTR_DAY_CONTENT_COLOR					= "dayContentColor";			//$NON-NLS-1$
-	private static final String			ATTR_DAY_DATE_FORMAT					= "dayDateFormat";				//$NON-NLS-1$
-	private static final String			ATTR_DAY_DATE_FONT						= "dayDateFont";				//$NON-NLS-1$
-	private static final String			ATTR_SUMMARY_COLUMN_WIDTH				= "summaryColumnWidth";			//$NON-NLS-1$
-	private static final String			ATTR_TOUR_BACKGROUND					= "tourBackground";				//$NON-NLS-1$
-	private static final String			ATTR_TOUR_BACKGROUND_COLOR1				= "tourBackgroundColor1";		//$NON-NLS-1$
-	private static final String			ATTR_TOUR_BACKGROUND_COLOR2				= "tourBackgroundColor2";		//$NON-NLS-1$
-	private static final String			ATTR_TOUR_BORDER_WIDTH					= "tourBackgroundWidth";		//$NON-NLS-1$
-	private static final String			ATTR_TOUR_BORDER						= "tourBorder";					//$NON-NLS-1$
-	private static final String			ATTR_TOUR_BORDER_COLOR					= "tourBorderColor";			//$NON-NLS-1$
-	private static final String			ATTR_TOUR_BACKGROUND_WIDTH				= "tourBorderWidth";			//$NON-NLS-1$
-	private static final String			ATTR_USE_DRAGGED_SCROLLING				= "useDraggedScrolling";		//$NON-NLS-1$
-	private static final String			ATTR_WEEK_HEIGHT						= "weekHeight";					//$NON-NLS-1$
-	private static final String			ATTR_WEEK_FORMATTER_ID					= "weekFormatterId";			//$NON-NLS-1$
-	private static final String			ATTR_WEEK_FORMATTER_VALUE_FORMAT		= "WeekFormatterValueFormat";	//$NON-NLS-1$
-	private static final String			ATTR_YEAR_HEADER_FONT					= "yearHeaderFont";				//$NON-NLS-1$
+	private static final String				ATTR_IS_HIDE_DAY_DATE_WHEN_NO_TOUR		= "isHideDayDateWhenNoTour";		//$NON-NLS-1$
+	private static final String				ATTR_IS_SHOW_DATE_COLUMN				= "isShowDateColumn";				//$NON-NLS-1$
+	private static final String				ATTR_IS_SHOW_DAY_DATE					= "isShowDayDate";					//$NON-NLS-1$
+	private static final String				ATTR_IS_SHOW_DAY_DATE_WEEKEND_COLOR		= "isShowDayDateWeekendColor";		//$NON-NLS-1$
+	private static final String				ATTR_IS_SHOW_SUMMARY_COLUMN				= "isShowSummaryColumn";			//$NON-NLS-1$
+	private static final String				ATTR_IS_SHOW_YEAR_COLUMNS				= "isShowYearColumns";				//$NON-NLS-1$
+	private static final String				ATTR_IS_TOGGLE_MONTH_COLOR				= "isToggleMonthColor";				//$NON-NLS-1$
+	private static final String				ATTR_IS_SHOW_WEEK_VALUE_UNIT			= "isShowWeekValueUnit";			//$NON-NLS-1$
+	private static final String				ATTR_NUM_YEAR_COLUMNS					= "calendarColumns";				//$NON-NLS-1$
+	private static final String				ATTR_YEAR_COLUMNS_SPACING				= "calendarColumnsSpacing";			//$NON-NLS-1$
+	private static final String				ATTR_YEAR_COLUMNS_START					= "calendarColumnsStart";			//$NON-NLS-1$
+	private static final String				ATTR_DATE_COLUMN_CONTENT				= "dateColumnContent";				//$NON-NLS-1$
+	private static final String				ATTR_DATE_COLUMN_FONT					= "dateColumnFont";					//$NON-NLS-1$
+	private static final String				ATTR_DATE_COLUMN_WIDTH					= "dateColumnWidth";				//$NON-NLS-1$
+	private static final String				ATTR_DAY_CONTENT_FONT					= "dayContentFont";					//$NON-NLS-1$
+	private static final String				ATTR_DAY_CONTENT_COLOR					= "dayContentColor";				//$NON-NLS-1$
+	private static final String				ATTR_DAY_DATE_FORMAT					= "dayDateFormat";					//$NON-NLS-1$
+	private static final String				ATTR_DAY_DATE_FONT						= "dayDateFont";					//$NON-NLS-1$
+	private static final String				ATTR_SUMMARY_COLUMN_WIDTH				= "summaryColumnWidth";				//$NON-NLS-1$
+	private static final String				ATTR_TOUR_BACKGROUND					= "tourBackground";					//$NON-NLS-1$
+	private static final String				ATTR_TOUR_BACKGROUND_COLOR1				= "tourBackgroundColor1";			//$NON-NLS-1$
+	private static final String				ATTR_TOUR_BACKGROUND_COLOR2				= "tourBackgroundColor2";			//$NON-NLS-1$
+	private static final String				ATTR_TOUR_BORDER_WIDTH					= "tourBackgroundWidth";			//$NON-NLS-1$
+	private static final String				ATTR_TOUR_BORDER						= "tourBorder";						//$NON-NLS-1$
+	private static final String				ATTR_TOUR_BORDER_COLOR					= "tourBorderColor";				//$NON-NLS-1$
+	private static final String				ATTR_TOUR_BACKGROUND_WIDTH				= "tourBorderWidth";				//$NON-NLS-1$
+	private static final String				ATTR_USE_DRAGGED_SCROLLING				= "useDraggedScrolling";			//$NON-NLS-1$
+	private static final String				ATTR_WEEK_HEIGHT						= "weekHeight";						//$NON-NLS-1$
+	private static final String				ATTR_WEEK_FORMATTER_ID					= "weekFormatterId";				//$NON-NLS-1$
+	private static final String				ATTR_WEEK_FORMATTER_VALUE_FORMAT		= "WeekFormatterValueFormat";		//$NON-NLS-1$
+	private static final String				ATTR_YEAR_HEADER_FONT					= "yearHeaderFont";					//$NON-NLS-1$
 	//
-	static final RGB					DEFAULT_ALTERNATE_MONTH_RGB				= new RGB(0xf0, 0xf0, 0xf0);
-	static final int					DEFAULT_NUM_YEAR_COLUMNS				= 2;
-	static final ColumnStart			DEFAULT_YEAR_COLUMNS_LAYOUT				= ColumnStart.CONTINUOUSLY;
-	static final int					DEFAULT_YEAR_COLUMNS_SPACING			= 10;
-	static final CalendarColor			DEFAULT_DAY_CONTENT_COLOR				= CalendarColor.CONTRAST;
-	static final DayDateFormat			DEFAULT_DAY_DATE_FORMAT					= DayDateFormat.DAY;
-	static final int					DEFAULT_DATE_COLUMN_WIDTH				= 50;
-	static final DateColumnContent		DEFAULT_DATE_COLUMN_CONTENT				= DateColumnContent.MONTH;
-	static final boolean				DEFAULT_IS_SHOW_DAY_DATE_WEEKEND_COLOR	= true;
-	static final int					DEFAULT_SUMMARY_COLUMN_WIDTH			= 50;
-	static final TourBackground			DEFAULT_TOUR_BACKGROUND					= TourBackground.FILL;
-	static final CalendarColor			DEFAULT_TOUR_BACKGROUND_COLOR1			= CalendarColor.DARK;
-	static final CalendarColor			DEFAULT_TOUR_BACKGROUND_COLOR2			= CalendarColor.BRIGHT;
-	static final int					DEFAULT_TOUR_BACKGROUND_WIDTH			= 3;
-	static final TourBorder				DEFAULT_TOUR_BORDER						= TourBorder.NO_BORDER;
-	static final CalendarColor			DEFAULT_TOUR_BORDER_COLOR				= CalendarColor.LINE;
-	static final int					DEFAULT_TOUR_BORDER_WIDTH				= 1;
-	static final int					DEFAULT_WEEK_HEIGHT						= 70;
-	static final WeekFormatter			DEFAULT_WEEK_SUMMARY_FORMATTER;
-	static final WeekFormatterData[]	DEFAULT_WEEK_FORMATTER_DATA;
+	static final RGB						DEFAULT_ALTERNATE_MONTH_RGB				= new RGB(0xf0, 0xf0, 0xf0);
+	static final int						DEFAULT_NUM_YEAR_COLUMNS				= 2;
+	static final ColumnStart				DEFAULT_YEAR_COLUMNS_LAYOUT				= ColumnStart.CONTINUOUSLY;
+	static final int						DEFAULT_YEAR_COLUMNS_SPACING			= 10;
+	static final CalendarColor				DEFAULT_DAY_CONTENT_COLOR				= CalendarColor.CONTRAST;
+	static final DayDateFormat				DEFAULT_DAY_DATE_FORMAT					= DayDateFormat.DAY;
+	static final int						DEFAULT_DATE_COLUMN_WIDTH				= 50;
+	static final DateColumnContent			DEFAULT_DATE_COLUMN_CONTENT				= DateColumnContent.MONTH;
+	static final boolean					DEFAULT_IS_SHOW_DAY_DATE_WEEKEND_COLOR	= true;
+	static final int						DEFAULT_SUMMARY_COLUMN_WIDTH			= 50;
+	static final TourBackground				DEFAULT_TOUR_BACKGROUND					= TourBackground.FILL;
+	static final CalendarColor				DEFAULT_TOUR_BACKGROUND_COLOR1			= CalendarColor.DARK;
+	static final CalendarColor				DEFAULT_TOUR_BACKGROUND_COLOR2			= CalendarColor.BRIGHT;
+	static final int						DEFAULT_TOUR_BACKGROUND_WIDTH			= 3;
+	static final TourBorder					DEFAULT_TOUR_BORDER						= TourBorder.NO_BORDER;
+	static final CalendarColor				DEFAULT_TOUR_BORDER_COLOR				= CalendarColor.LINE;
+	static final int						DEFAULT_TOUR_BORDER_WIDTH				= 1;
+	static final int						DEFAULT_WEEK_HEIGHT						= 70;
+	static final WeekFormatter				DEFAULT_WEEK_SUMMARY_FORMATTER;
+	static final WeekFormatterData[]		DEFAULT_WEEK_FORMATTER_DATA;
 	//
-	static final int					YEAR_COLUMNS_MIN						= 1;
-	static final int					YEAR_COLUMNS_MAX						= 100;
-	static final int					CALENDAR_COLUMNS_SPACE_MIN				= 0;
-	static final int					CALENDAR_COLUMNS_SPACE_MAX				= 100;
-	static final int					WEEK_HEIGHT_MIN							= 1;
-	static final int					WEEK_HEIGHT_MAX							= 500;
+	static final int						YEAR_COLUMNS_MIN						= 1;
+	static final int						YEAR_COLUMNS_MAX						= 100;
+	static final int						CALENDAR_COLUMNS_SPACE_MIN				= 0;
+	static final int						CALENDAR_COLUMNS_SPACE_MAX				= 100;
+	static final int						WEEK_HEIGHT_MIN							= 1;
+	static final int						WEEK_HEIGHT_MAX							= 500;
 
-	static final WeekFormatter[]		allWeekFormatter;
+	private static final IValueFormatter	_valueFormatter_Number_1_0				= new ValueFormatter_Number_1_0();
+	private static final IValueFormatter	_valueFormatter_Number_1_1				= new ValueFormatter_Number_1_1();
+	private static final IValueFormatter	_valueFormatter_Number_1_2				= new ValueFormatter_Number_1_2();
+	private static final IValueFormatter	_valueFormatter_Number_1_3				= new ValueFormatter_Number_1_3();
+	private static final IValueFormatter	_valueFormatter_Time_HH					= new ValueFormatter_Time_HH();
+	private static final IValueFormatter	_valueFormatter_Time_HHMM				= new ValueFormatter_Time_HHMM();
+	private static final IValueFormatter	_valueFormatter_Time_HHMMSS				= new ValueFormatter_Time_HHMMSS();
+
+	private static final WeekFormatter		_weekFormatter_Altitude;
+	private static final WeekFormatter		_weekFormatter_Distance;
+	private static final WeekFormatter		_weekFormatter_Pace;
+	private static final WeekFormatter		_weekFormatter_Speed;
+	private static final WeekFormatter		_weekFormatter_Time_Moving;
+	private static final WeekFormatter		_weekFormatter_Time_Recording;
+
+	static final WeekFormatter[]			allWeekFormatter;
+
 	//
 	static {
 
 		DEFAULT_WEEK_SUMMARY_FORMATTER = createFormatter_Week_Empty();
 
-		final WeekFormatter weekFormatter_Altitude = createFormatter_Week_Altitude();
-		final WeekFormatter weekFormatter_Distance = createFormatter_Week_Distance();
-		final WeekFormatter weekFormatter_Pace = createFormatter_Week_Pace();
-		final WeekFormatter weekFormatter_Speed = createFormatter_Week_Speed();
-		final WeekFormatter weekFormatter_Time_Moving = createFormatter_Week_Time_Moving();
-		final WeekFormatter weekFormatter_Time_Recording = createFormatter_Week_Time_Recording();
+		_weekFormatter_Altitude = createFormatter_Week_Altitude();
+		_weekFormatter_Distance = createFormatter_Week_Distance();
+		_weekFormatter_Pace = createFormatter_Week_Pace();
+		_weekFormatter_Speed = createFormatter_Week_Speed();
+		_weekFormatter_Time_Moving = createFormatter_Week_Time_Moving();
+		_weekFormatter_Time_Recording = createFormatter_Week_Time_Recording();
 
 		allWeekFormatter = new WeekFormatter[] {
 
 				DEFAULT_WEEK_SUMMARY_FORMATTER,
 
-				weekFormatter_Altitude,
-				weekFormatter_Distance,
-				weekFormatter_Pace,
-				weekFormatter_Speed,
-				weekFormatter_Time_Moving,
-				weekFormatter_Time_Recording,
+				_weekFormatter_Altitude,
+				_weekFormatter_Distance,
+				_weekFormatter_Pace,
+				_weekFormatter_Speed,
+				_weekFormatter_Time_Moving,
+				_weekFormatter_Time_Recording,
 		};
 
 		DEFAULT_WEEK_FORMATTER_DATA = new WeekFormatterData[] {
 
 				new WeekFormatterData(
 						WeekFormatterID.ALTITUDE,
-						weekFormatter_Altitude.getDefaultFormat()),
+						_weekFormatter_Altitude.getDefaultFormat()),
 
 				new WeekFormatterData(
 						WeekFormatterID.DISTANCE,
-						weekFormatter_Distance.getDefaultFormat()),
+						_weekFormatter_Distance.getDefaultFormat()),
 
 				new WeekFormatterData(
 						WeekFormatterID.TIME_MOVING,
-						weekFormatter_Time_Moving.getDefaultFormat()),
+						_weekFormatter_Time_Moving.getDefaultFormat()),
 		};
 	}
 	//
@@ -215,14 +237,12 @@ public class CalendarConfigManager {
 					CalendarColor.WHITE,
 					Messages.Calendar_Config_Color_White),
 	};
-
 	private static final DateColumnData[]			_allDateColumnData				= new DateColumnData[] {
 
 			new DateColumnData(DateColumnContent.WEEK_NUMBER, Messages.Calendar_Config_DateColumn_WeekNumber),
 			new DateColumnData(DateColumnContent.MONTH, Messages.Calendar_Config_DateColumn_Month),
 			new DateColumnData(DateColumnContent.YEAR, Messages.Calendar_Config_DateColumn_Year),
 	};
-
 	private static final ColumnLayoutData[]			_allColumnLayoutData			= new ColumnLayoutData[] {
 
 			new ColumnLayoutData(ColumnStart.CONTINUOUSLY, Messages.Calendar_Config_ColumnLayout_Continuously),
@@ -385,6 +405,7 @@ public class CalendarConfigManager {
 	private static final ArrayList<CalendarConfig>	_allCalendarConfigs				= new ArrayList<>();
 
 	private static CalendarConfig					_activeCalendarConfig;
+
 	//
 	private static String							_fromXml_ActiveCalendarConfigId;
 
@@ -596,21 +617,27 @@ public class CalendarConfigManager {
 
 	private static WeekFormatter createFormatter_Week_Altitude() {
 
-		return new WeekFormatter(
+		final WeekFormatter weekFormatter = new WeekFormatter(
 				WeekFormatterID.ALTITUDE,
 				Messages.Calendar_Config_Value_Altitude,
 				GraphColorManager.PREF_GRAPH_ALTITUDE) {
 
 			@Override
-			String format(final CalendarTourData data) {
+			String format(final CalendarTourData data, final ValueFormat valueFormat, final boolean isShowValueUnit) {
 
 				if (data.altitude > 0) {
 
-					final long alt = (long) (data.altitude / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE);
-					return alt + UI.SPACE + UI.UNIT_LABEL_ALTITUDE;
+					final float altitude = data.altitude / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+					final String valueText = _valueFormatter.printDouble(altitude);
+
+					if (isShowValueUnit) {
+						return valueText + UI.SPACE + UI.UNIT_LABEL_ALTITUDE;
+					} else {
+						return valueText;
+					}
 
 				} else {
-					return UI.DASH;
+					return UI.EMPTY_STRING;
 				}
 			}
 
@@ -627,31 +654,44 @@ public class CalendarConfigManager {
 						ValueFormat.NUMBER_1_0,
 						ValueFormat.NUMBER_1_1 };
 			}
+
+			@Override
+			void setValueFormat(final ValueFormat valueFormat) {
+
+				_valueFormatter = getNumberFormatter(valueFormat.name());
+			}
 		};
+
+		// setup default formatter
+		weekFormatter.setValueFormat(weekFormatter.getDefaultFormat());
+
+		return weekFormatter;
 	}
 
 	private static WeekFormatter createFormatter_Week_Distance() {
 
-		return new WeekFormatter(
+		final WeekFormatter weekFormatter = new WeekFormatter(
 				WeekFormatterID.DISTANCE,
 				Messages.Calendar_Config_Value_Distance,
 				GraphColorManager.PREF_GRAPH_DISTANCE) {
 
 			@Override
-			String format(final CalendarTourData data) {
+			String format(final CalendarTourData data, final ValueFormat valueFormat, final boolean isShowValueUnit) {
 
 				if (data.distance > 0) {
 
-					final float distance = (float) (data.distance / 1000.0 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
+					final double distance = data.distance / 1000.0 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
-//					return String.format(
-//							NLS.bind(Messages.Calendar_View_Format_Distance, UI.UNIT_LABEL_DISTANCE),
-//							distance);
+					final String valueText = _valueFormatter.printDouble(distance);
 
-					return String.format("%4.0f", distance); //$NON-NLS-1$
+					if (isShowValueUnit) {
+						return valueText + UI.SPACE + UI.UNIT_LABEL_DISTANCE;
+					} else {
+						return valueText;
+					}
 
 				} else {
-					return UI.DASH;
+					return UI.EMPTY_STRING;
 				}
 			}
 
@@ -669,15 +709,26 @@ public class CalendarConfigManager {
 						ValueFormat.NUMBER_1_2,
 						ValueFormat.NUMBER_1_3 };
 			}
+
+			@Override
+			void setValueFormat(final ValueFormat valueFormat) {
+
+				_valueFormatter = getNumberFormatter(valueFormat.name());
+			}
 		};
+
+		// setup default formatter
+		weekFormatter.setValueFormat(weekFormatter.getDefaultFormat());
+
+		return weekFormatter;
 	}
 
 	private static WeekFormatter createFormatter_Week_Empty() {
 
-		return new WeekFormatter(WeekFormatterID.EMPTY) {
+		final WeekFormatter weekFormatter = new WeekFormatter(WeekFormatterID.EMPTY) {
 
 			@Override
-			public String format(final CalendarTourData data) {
+			String format(final CalendarTourData data, final ValueFormat valueFormat, final boolean isShowValueUnit) {
 				return UI.EMPTY_STRING;
 			}
 
@@ -695,61 +746,69 @@ public class CalendarConfigManager {
 			public ValueFormat[] getValueFormats() {
 				return null;
 			}
+
+			@Override
+			void setValueFormat(final ValueFormat valueFormat) {}
 		};
+
+		return weekFormatter;
 	}
 
 	private static WeekFormatter createFormatter_Week_Pace() {
 
-		return new WeekFormatter(
+		final WeekFormatter weekFormatter = new WeekFormatter(
 				WeekFormatterID.PACE,
 				Messages.Calendar_Config_Value_Pace,
 				GraphColorManager.PREF_GRAPH_PACE) {
 
 			@Override
-			String format(final CalendarTourData data) {
+			String format(final CalendarTourData data, final ValueFormat valueFormat, final boolean isShowValueUnit) {
 
 				if (data.recordingTime > 0 && data.distance > 0) {
 
-					final int pace = (int) (data.distance == 0
+					final float pace = data.distance == 0
 							? 0
-							: (1000 * data.recordingTime / data.distance * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
+							: 1000 * data.recordingTime / data.distance * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
-					return String
-							.format(
-									NLS.bind(Messages.Calendar_View_Format_Pace, UI.UNIT_LABEL_PACE),
-									pace / 60,
-									pace % 60)
-							.toString();
+					final String valueText = UI.format_mm_ss((long) pace);
+
+					if (isShowValueUnit) {
+						return valueText + UI.SPACE + UI.UNIT_LABEL_PACE;
+					} else {
+						return valueText;
+					}
+
 				} else {
-					return UI.DASH;
+					return UI.EMPTY_STRING;
 				}
 			}
 
 			@Override
 			public ValueFormat getDefaultFormat() {
-				return ValueFormat.NUMBER_1_1;
+				return null;
 			}
 
 			@Override
 			public ValueFormat[] getValueFormats() {
-
-				return new ValueFormat[] {
-						ValueFormat.NUMBER_1_0,
-						ValueFormat.NUMBER_1_1,
-						ValueFormat.NUMBER_1_2 };
+				return null;
 			}
+
+			@Override
+			void setValueFormat(final ValueFormat valueFormat) {}
 		};
+
+		return weekFormatter;
 	}
 
 	private static WeekFormatter createFormatter_Week_Speed() {
 
-		return new WeekFormatter(
+		final WeekFormatter weekFormatter = new WeekFormatter(
 				WeekFormatterID.SPEED,
 				Messages.Calendar_Config_Value_Speed,
 				GraphColorManager.PREF_GRAPH_SPEED) {
 
 			@Override
-			String format(final CalendarTourData data) {
+			String format(final CalendarTourData data, final ValueFormat valueFormat, final boolean isShowValueUnit) {
 
 				if (data.distance > 0 && data.recordingTime > 0) {
 
@@ -760,7 +819,7 @@ public class CalendarConfigManager {
 							.toString();
 				} else {
 
-					return UI.DASH;
+					return UI.EMPTY_STRING;
 				}
 			}
 
@@ -777,18 +836,29 @@ public class CalendarConfigManager {
 						ValueFormat.NUMBER_1_1,
 						ValueFormat.NUMBER_1_2 };
 			}
+
+			@Override
+			void setValueFormat(final ValueFormat valueFormat) {
+
+				_valueFormatter = getNumberFormatter(valueFormat.name());
+			}
 		};
+
+		// setup default formatter
+		weekFormatter.setValueFormat(weekFormatter.getDefaultFormat());
+
+		return weekFormatter;
 	}
 
 	private static WeekFormatter createFormatter_Week_Time_Moving() {
 
-		return new WeekFormatter(
+		final WeekFormatter weekFormatter = new WeekFormatter(
 				WeekFormatterID.TIME_MOVING,
 				Messages.Calendar_Config_Value_MovingTime,
 				GraphColorManager.PREF_GRAPH_TIME) {
 
 			@Override
-			String format(final CalendarTourData data) {
+			String format(final CalendarTourData data, final ValueFormat valueFormat, final boolean isShowValueUnit) {
 
 				if (data.recordingTime > 0) {
 					return String
@@ -798,7 +868,7 @@ public class CalendarConfigManager {
 									(data.drivingTime % 3600) / 60)
 							.toString();
 				} else {
-					return UI.DASH;
+					return UI.EMPTY_STRING;
 				}
 			}
 
@@ -815,18 +885,29 @@ public class CalendarConfigManager {
 						ValueFormat.TIME_HH_MM,
 						ValueFormat.TIME_HH_MM_SS };
 			}
+
+			@Override
+			void setValueFormat(final ValueFormat valueFormat) {
+
+				_valueFormatter = getTimeFormatter(valueFormat.name());
+			}
 		};
+
+		// setup default formatter
+		weekFormatter.setValueFormat(weekFormatter.getDefaultFormat());
+
+		return weekFormatter;
 	}
 
 	private static WeekFormatter createFormatter_Week_Time_Recording() {
 
-		return new WeekFormatter(
+		final WeekFormatter weekFormatter = new WeekFormatter(
 				WeekFormatterID.TIME_RECORDING,
 				Messages.Calendar_Config_Value_RecordingTime,
 				GraphColorManager.PREF_GRAPH_TIME) {
 
 			@Override
-			String format(final CalendarTourData data) {
+			String format(final CalendarTourData data, final ValueFormat valueFormat, final boolean isShowValueUnit) {
 
 				if (data.recordingTime > 0) {
 
@@ -838,7 +919,7 @@ public class CalendarConfigManager {
 							.toString();
 				} else {
 
-					return UI.DASH;
+					return UI.EMPTY_STRING;
 				}
 			}
 
@@ -855,7 +936,18 @@ public class CalendarConfigManager {
 						ValueFormat.TIME_HH_MM,
 						ValueFormat.TIME_HH_MM_SS };
 			}
+
+			@Override
+			void setValueFormat(final ValueFormat valueFormat) {
+
+				_valueFormatter = getTimeFormatter(valueFormat.name());
+			}
 		};
+
+		// setup default formatter
+		weekFormatter.setValueFormat(weekFormatter.getDefaultFormat());
+
+		return weekFormatter;
 	}
 
 	private static void createXml_FromCalendarConfig(final CalendarConfig config, final IMemento xmlCalendars) {
@@ -896,8 +988,9 @@ public class CalendarConfigManager {
 			Util.setXmlEnum(xmlConfig, ATTR_DATE_COLUMN_CONTENT, 		config.dateColumnContent);
 			Util.setXmlFont(xmlConfig, ATTR_DATE_COLUMN_FONT, 			config.dateColumnFont);
 
-			// summary column
+			// week summary column
 			xmlConfig.putBoolean(ATTR_IS_SHOW_SUMMARY_COLUMN, 			config.isShowSummaryColumn);
+			xmlConfig.putBoolean(ATTR_IS_SHOW_WEEK_VALUE_UNIT, 			config.isShowWeekValueUnit);
 			xmlConfig.putInteger(ATTR_SUMMARY_COLUMN_WIDTH, 			config.summaryColumnWidth);
 
 			// year column
@@ -1035,6 +1128,54 @@ public class CalendarConfigManager {
 		return layerFile;
 	}
 
+	private static IValueFormatter getNumberFormatter(final String formatName) {
+
+		if (formatName.equals(ValueFormat.NUMBER_1_0.name())) {
+
+			return _valueFormatter_Number_1_0;
+
+		} else if (formatName.equals(ValueFormat.NUMBER_1_1.name())) {
+
+			return _valueFormatter_Number_1_1;
+
+		} else if (formatName.equals(ValueFormat.NUMBER_1_2.name())) {
+
+			return _valueFormatter_Number_1_2;
+
+		} else if (formatName.equals(ValueFormat.NUMBER_1_3.name())) {
+
+			return _valueFormatter_Number_1_3;
+
+		} else {
+
+			// default
+
+			return _valueFormatter_Number_1_0;
+		}
+	}
+
+	private static IValueFormatter getTimeFormatter(final String formatName) {
+
+		if (formatName.equals(ValueFormat.TIME_HH.name())) {
+
+			return _valueFormatter_Time_HH;
+
+		} else if (formatName.equals(ValueFormat.TIME_HH_MM.name())) {
+
+			return _valueFormatter_Time_HHMM;
+
+		} else if (formatName.equals(ValueFormat.TIME_HH_MM_SS.name())) {
+
+			return _valueFormatter_Time_HHMMSS;
+
+		} else {
+
+			// default
+
+			return _valueFormatter_Time_HHMMSS;
+		}
+	}
+
 	private static void parse_200_Calendars(final XMLMemento xmlRoot,
 											final ArrayList<CalendarConfig> allCalendarConfigs) {
 
@@ -1115,6 +1256,7 @@ public class CalendarConfigManager {
 		                                                                                                            
 		// summary column
 		config.isShowSummaryColumn			= Util.getXmlBoolean(xmlConfig, 			ATTR_IS_SHOW_SUMMARY_COLUMN,	true);
+		config.isShowWeekValueUnit			= Util.getXmlBoolean(xmlConfig, 			ATTR_IS_SHOW_WEEK_VALUE_UNIT,	true);
 		config.summaryColumnWidth			= Util.getXmlInteger(xmlConfig, 			ATTR_SUMMARY_COLUMN_WIDTH,		DEFAULT_SUMMARY_COLUMN_WIDTH);
         
 		// year columns
@@ -1285,6 +1427,7 @@ public class CalendarConfigManager {
 
 		_activeCalendarConfig = calendarConfig;
 
+		// update config listener/provider
 		if (configProvider != null) {
 
 			if (_configProvider_CalendarView != null && _configProvider_CalendarView != configProvider) {
@@ -1304,6 +1447,47 @@ public class CalendarConfigManager {
 
 	static void setConfigProvider(final SlideoutCalendarOptions slideoutCalendarOptions) {
 		_configProvider_SlideoutCalendarOptions = slideoutCalendarOptions;
+	}
+
+	/**
+	 * Update value formatter
+	 */
+	static void updateFormatterValueFormat() {
+
+		for (final WeekFormatterData weekFormatterData : _activeCalendarConfig.allWeekFormatterData) {
+
+			final ValueFormat valueFormat = weekFormatterData.valueFormat;
+
+			switch (weekFormatterData.id) {
+
+			case ALTITUDE:
+				_weekFormatter_Altitude.setValueFormat(valueFormat);
+				break;
+
+			case DISTANCE:
+				_weekFormatter_Distance.setValueFormat(valueFormat);
+				break;
+
+			case PACE:
+				_weekFormatter_Pace.setValueFormat(valueFormat);
+				break;
+
+			case SPEED:
+				_weekFormatter_Speed.setValueFormat(valueFormat);
+				break;
+
+			case TIME_MOVING:
+				_weekFormatter_Time_Moving.setValueFormat(valueFormat);
+				break;
+
+			case TIME_RECORDING:
+				_weekFormatter_Time_Recording.setValueFormat(valueFormat);
+				break;
+
+			default:
+				break;
+			}
+		}
 	}
 
 }

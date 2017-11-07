@@ -117,6 +117,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	private Button					_chkIsShowDayDate;
 	private Button					_chkIsShowSummaryColumn;
 	private Button					_chkIsShowMonthWithAlternateColor;
+	private Button					_chkIsShowWeekValueUnit;
 	private Button					_chkIsShowYearColumns;
 	//
 	private ColorSelectorExtended	_colorAlternateMonthColor;
@@ -1010,11 +1011,22 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 		{
 			createUI_510_Layout(_weekFormatterContainer);
-			createUI_520_Values(_weekFormatterContainer);
+			createUI_550_Values(_weekFormatterContainer);
 		}
 	}
 
 	private void createUI_510_Layout(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		{
+			createUI_512_Layout_Col1(container);
+			createUI_514_Layout_Col2(container);
+		}
+	}
+
+	private void createUI_512_Layout_Col1(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -1047,7 +1059,31 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		}
 	}
 
-	private void createUI_520_Values(final Composite parent) {
+	private void createUI_514_Layout_Col2(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		{
+			{
+				/*
+				 * Show value unit
+				 */
+
+				// checkbox
+				_chkIsShowWeekValueUnit = new Button(container, SWT.CHECK);
+				_chkIsShowWeekValueUnit.setText(Messages.Slideout_CalendarOptions_Checkbox_IsShowWeekValueUnit);
+				_chkIsShowWeekValueUnit.addSelectionListener(_defaultSelectionListener);
+				GridDataFactory
+						.fillDefaults()//
+						.align(SWT.FILL, SWT.BEGINNING)
+						.span(2, 1)
+						.applyTo(_chkIsShowWeekValueUnit);
+			}
+		}
+	}
+
+	private void createUI_550_Values(final Composite parent) {
 
 		_lblWeekSummary_All = new Label[_numWeekSummaryLines];
 		_comboWeek_AllValues = new Combo[_numWeekSummaryLines];
@@ -1182,9 +1218,6 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		_lblDateColumnWidth.setEnabled(isShowDateColumn);
 		_spinnerDateColumnWidth.setEnabled(isShowDateColumn);
 
-		_lblSummaryColumnWidth.setEnabled(isShowSummaryColumn);
-		_spinnerSummaryColumnWidth.setEnabled(isShowSummaryColumn);
-
 		// day date
 		_chkIsShowDayDateWeekendColor.setEnabled(isShowDayDate);
 		_chkIsHideDayDateWhenNoTour.setEnabled(isShowDayDate);
@@ -1214,6 +1247,10 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		_spinnerNumYearColumns.setEnabled(isYearColumns);
 		_spinnerYearColumnSpacing.setEnabled(isYearColumns);
 
+		// week summary
+		_chkIsShowWeekValueUnit.setEnabled(isShowSummaryColumn);
+		_lblSummaryColumnWidth.setEnabled(isShowSummaryColumn);
+		_spinnerSummaryColumnWidth.setEnabled(isShowSummaryColumn);
 		enableControls_WeekSummary();
 	}
 
@@ -1900,8 +1937,9 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			_comboDateColumn.select(getDateColumnIndex(config.dateColumnContent));
 			_fontEditorDateColumn.setSelection(config.dateColumnFont);
 
-			// summary column
+			// week summary column
 			_chkIsShowSummaryColumn.setSelection(config.isShowSummaryColumn);
+			_chkIsShowWeekValueUnit.setSelection(config.isShowWeekValueUnit);
 			_spinnerSummaryColumnWidth.setSelection(config.summaryColumnWidth);
 			selectWeekFormatter(config.allWeekFormatterData);
 
@@ -1963,6 +2001,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 		// summary column
 		config.isShowSummaryColumn = _chkIsShowSummaryColumn.getSelection();
+		config.isShowWeekValueUnit = _chkIsShowWeekValueUnit.getSelection();
 		config.summaryColumnWidth = _spinnerSummaryColumnWidth.getSelection();
 		config.allWeekFormatterData = getSelectedWeekFormatter();
 
@@ -1978,6 +2017,9 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		config.useDraggedScrolling = _chkUseDraggedScrolling.getSelection();
 
 		_calendarView.updateUI_CalendarConfig();
+
+		CalendarConfigManager.updateFormatterValueFormat();
+
 	}
 
 	private void saveState_UI() {
@@ -2019,22 +2061,26 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 					fillWeekFormats_UI(comboWeekFormat, formatterIndex);
 
 					// select value format
-					int formatterFormatIndex = 0;
 					final ValueFormat[] valueFormats = weekSummaryFormatter.getValueFormats();
 
-					for (int formatIndex = 0; formatIndex < valueFormats.length; formatIndex++) {
+					if (valueFormats != null) {
 
-						final ValueFormat valueFormat = valueFormats[formatIndex];
+						int formatterFormatIndex = 0;
 
-						if (formatterData.valueFormat == valueFormat) {
+						for (int formatIndex = 0; formatIndex < valueFormats.length; formatIndex++) {
 
-							formatterFormatIndex = formatIndex;
-							break;
+							final ValueFormat valueFormat = valueFormats[formatIndex];
+
+							if (formatterData.valueFormat == valueFormat) {
+
+								formatterFormatIndex = formatIndex;
+								break;
+							}
 						}
+
+						comboWeekFormat.select(formatterFormatIndex);
 					}
-
-					comboWeekFormat.select(formatterFormatIndex);
-
+pace is not set
 					numFormatterSet++;
 
 					break;

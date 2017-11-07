@@ -1875,14 +1875,13 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	}
 
 	private void drawWeek_Summary(	final GC gc,
-									final CalendarTourData data,
+									final CalendarTourData calendarTourData,
 									final Rectangle weekRec) {
 
 		final int xr = weekRec.x + weekRec.width - 1;
 		final int xl = weekRec.x + 2;
 		int posX;
 		int posY = weekRec.y + 1;
-		String text;
 		final boolean doClip = true;
 
 		Point extent;
@@ -1900,7 +1899,10 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 			gc.setForeground(_colorCache.getColor(formatter.getColor().hashCode()));
 
-			text = formatter.format(data);
+			String text = formatter.format(
+					calendarTourData,
+					formatterData.valueFormat,
+					_currentConfig.isShowWeekValueUnit);
 
 			if (text.length() > 0 && posY < (weekRec.y + weekRec.height)) {
 
@@ -2900,17 +2902,17 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		_isGraphClean = false;
 		redraw();
 
-		System.out.println(
-				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] onScroll") //$NON-NLS-1$ //$NON-NLS-2$
-						+ ("\tselection: " + sb.getSelection()) //$NON-NLS-1$
-						+ ("\toutsideWeeks: " + _scrollBar_OutsideWeeks) //$NON-NLS-1$
-						+ ("\tmax: " + sb.getMaximum()) //$NON-NLS-1$
-						+ ("\tthumb: " + sb.getThumb()) //$NON-NLS-1$
-						+ ("\t_numWeeksInOneColumn: " + _numWeeksInOneColumn) //$NON-NLS-1$
-						+ ("\tfirstDay: " + _firstViewportDay.toLocalDate()) //$NON-NLS-1$
-//				+ ("\t: " + )
-		);
-// TODO remove SYSTEM.OUT.PRINTLN
+//		System.out.println(
+//				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] onScroll") //$NON-NLS-1$ //$NON-NLS-2$
+//						+ ("\tselection: " + sb.getSelection()) //$NON-NLS-1$
+//						+ ("\toutsideWeeks: " + _scrollBar_OutsideWeeks) //$NON-NLS-1$
+//						+ ("\tmax: " + sb.getMaximum()) //$NON-NLS-1$
+//						+ ("\tthumb: " + sb.getThumb()) //$NON-NLS-1$
+//						+ ("\t_numWeeksInOneColumn: " + _numWeeksInOneColumn) //$NON-NLS-1$
+//						+ ("\tfirstDay: " + _firstViewportDay.toLocalDate()) //$NON-NLS-1$
+////				+ ("\t: " + )
+//		);
+//// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
 	private void scrollBar_updateScrollbar() {
@@ -2970,17 +2972,17 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		_scrollBar_LastSelection = scrollbarSelection;
 
-		System.out.println(
-				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] upScroll") //$NON-NLS-1$ //$NON-NLS-2$
-						+ ("\tselection: " + scrollbarSelection) //$NON-NLS-1$
-						+ ("\toutsideWeeks: " + _scrollBar_OutsideWeeks) //$NON-NLS-1$
-						+ ("\tmax: " + scrollbarMax) //$NON-NLS-1$
-						+ ("\tthumb: " + thumbSize) //$NON-NLS-1$
-						+ ("\t_numWeeksInOneColumn: " + _numWeeksInOneColumn) //$NON-NLS-1$
-						+ ("\tfirstDay: " + _firstViewportDay.toLocalDate()) //$NON-NLS-1$
-//				+ ("\t: " + )
-		);
-// TODO remove SYSTEM.OUT.PRINTLN
+//		System.out.println(
+//				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] upScroll") //$NON-NLS-1$ //$NON-NLS-2$
+//						+ ("\tselection: " + scrollbarSelection) //$NON-NLS-1$
+//						+ ("\toutsideWeeks: " + _scrollBar_OutsideWeeks) //$NON-NLS-1$
+//						+ ("\tmax: " + scrollbarMax) //$NON-NLS-1$
+//						+ ("\tthumb: " + thumbSize) //$NON-NLS-1$
+//						+ ("\t_numWeeksInOneColumn: " + _numWeeksInOneColumn) //$NON-NLS-1$
+//						+ ("\tfirstDay: " + _firstViewportDay.toLocalDate()) //$NON-NLS-1$
+////				+ ("\t: " + )
+//		);
+//// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
 	public void setFirstDay(final LocalDate dt) {
