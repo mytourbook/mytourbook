@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,7 @@
 package net.tourbook.common.util;
 
 import net.tourbook.common.Messages;
+import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.formatter.ValueFormat;
 
 import org.eclipse.jface.action.Action;
@@ -110,7 +111,7 @@ public class ColumnFormatSubMenu extends Action implements IMenuCreator {
 
 			super(null, AS_CHECK_BOX);
 
-			setText(ColumnManager.getValueFormatterName(valueFormat));
+			setText(FormatManager.getValueFormatterName(valueFormat));
 
 			__colDef = colDef;
 			__valueFormat = valueFormat;
@@ -140,7 +141,7 @@ public class ColumnFormatSubMenu extends Action implements IMenuCreator {
 
 			final String actionDetailText = NLS.bind(
 					Messages.Action_ColumnManager_ValueFormatter_Tour,
-					ColumnManager.getValueFormatterName(valueFormat_Detail));
+					FormatManager.getValueFormatterName(valueFormat_Detail));
 
 			addActionToMenu(_menu, new ActionAvailableFormats(actionDetailText, true));
 
@@ -150,7 +151,7 @@ public class ColumnFormatSubMenu extends Action implements IMenuCreator {
 
 				final String actionCategoryText = NLS.bind(
 						Messages.Action_ColumnManager_ValueFormatter_Category,
-						ColumnManager.getValueFormatterName(valueFormat_Category));
+						FormatManager.getValueFormatterName(valueFormat_Category));
 
 				addActionToMenu(_menu, new ActionAvailableFormats(actionCategoryText, false));
 			}
@@ -159,7 +160,7 @@ public class ColumnFormatSubMenu extends Action implements IMenuCreator {
 
 				final String actionDetailText = NLS.bind(
 						Messages.Action_ColumnManager_ValueFormatter_Detail,
-						ColumnManager.getValueFormatterName(valueFormat_Detail));
+						FormatManager.getValueFormatterName(valueFormat_Detail));
 
 				addActionToMenu(_menu, new ActionAvailableFormats(actionDetailText, true));
 			}

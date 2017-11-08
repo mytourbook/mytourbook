@@ -19,7 +19,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-	private static final String	BUNDLE_NAME	= "net.tourbook.common.messages";//$NON-NLS-1$
+	private static final String	BUNDLE_NAME	= "net.tourbook.common.messages";				//$NON-NLS-1$
 
 	public static String		App_Action_Close_Tooltip;
 	public static String		App_Action_New_WithConfirm;
@@ -265,6 +265,7 @@ public class Messages extends NLS {
 	public static String		Value_Formatter_Number_1_1;
 	public static String		Value_Formatter_Number_1_2;
 	public static String		Value_Formatter_Number_1_3;
+	public static String		Value_Formatter_Pace_MM_SS;
 	public static String		Value_Formatter_Time_HH;
 	public static String		Value_Formatter_Time_HH_MM;
 	public static String		Value_Formatter_Time_HH_MM_SS;

@@ -162,7 +162,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	private int									_fontHeight_DateColumn;
 	private int									_fontHeight_DayContent;
 	private int									_fontHeight_DayHeader;
+	private int									_fontHeight_WeekValue;
 	private int									_fontHeight_YearHeader;
+	//
 	/**
 	 * Date of the first day of a week and the first day in the calendar viewport.
 	 * <p>
@@ -214,6 +216,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	private Font								_fontDateColumn;
 	private Font								_fontDayContent;
 	private Font								_fontDayHeader;
+	private Font								_fontWeekValue;
 	private Font								_fontYearHeader;
 	//
 	private Image								_calendarImage;
@@ -877,6 +880,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		_fontDateColumn = UI.disposeResource(_fontDateColumn);
 		_fontDayContent = UI.disposeResource(_fontDayContent);
 		_fontDayHeader = UI.disposeResource(_fontDayHeader);
+		_fontWeekValue = UI.disposeResource(_fontWeekValue);
 		_fontYearHeader = UI.disposeResource(_fontYearHeader);
 	}
 
@@ -1878,8 +1882,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 									final CalendarTourData calendarTourData,
 									final Rectangle weekRec) {
 
-		final int xr = weekRec.x + weekRec.width - 1;
-		final int xl = weekRec.x + 2;
+		final int posXRight = weekRec.x + weekRec.width - 1;
+		final int posXLeft = weekRec.x + 2;
+
 		int posX;
 		int posY = weekRec.y + 1;
 		final boolean doClip = true;
@@ -1889,7 +1894,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		final Font normalFont = gc.getFont();
 
-		gc.setFont(_boldFont);
+		gc.setFont(getFont_WeekValue());
 		gc.setClipping(weekRec);
 		gc.setBackground(_white);
 
@@ -1897,7 +1902,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 			final WeekFormatter formatter = getFormatter(formatterData.id);
 
-			gc.setForeground(_colorCache.getColor(formatter.getColor().hashCode()));
+			gc.setForeground(_colorCache.getColor(getColor_WeekValue(formatter).hashCode()));
 
 			String text = formatter.format(
 					calendarTourData,
@@ -1907,21 +1912,23 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			if (text.length() > 0 && posY < (weekRec.y + weekRec.height)) {
 
 				extent = gc.stringExtent(text);
-				posX = xr - extent.x;
+				posX = posXRight - extent.x;
 
 				if (extent.x > maxLength) {
+
+					// remove unit when not enough horizontal space is available
 					if (doClip && text.contains(UI.SPACE1)) {
 						text = text.substring(0, text.lastIndexOf(UI.SPACE));
-						posX = xr - gc.stringExtent(text).x;
+						posX = posXRight - gc.stringExtent(text).x;
 					} else {
-						posX = xl;
+						posX = posXLeft;
 					}
 				}
 
 				gc.drawText(text, posX, posY);
 			}
 
-			posY += _defaultFontHeight;
+			posY += _fontHeight_WeekValue;
 		}
 
 		gc.setFont(normalFont);
@@ -1997,12 +2004,17 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 	private RGB getColor_CalendarRGB(final CalendarColor imageColor, final CalendarTourData data) {
 
+		final int typeColorIndex = data.typeColorIndex;
+
 		switch (imageColor) {
 		case BRIGHT:
-			return _rgbBright.get(data.typeColorIndex);
+			return _rgbBright.get(typeColorIndex);
 
 		case LINE:
-			return _rgbLine.get(data.typeColorIndex);
+			return _rgbLine.get(typeColorIndex);
+
+		case TEXT:
+			return _rgbText.get(typeColorIndex);
 
 		case WHITE:
 			return _whiteRGB;
@@ -2012,22 +2024,27 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		case DARK:
 		default:
-			return _rgbDark.get(data.typeColorIndex);
+			return _rgbDark.get(typeColorIndex);
 		}
 	}
 
 	private Color getColor_ForDayContent(final CalendarTourData data) {
 
+		final int typeColorIndex = data.typeColorIndex;
+
 		switch (_currentConfig.dayContentColor) {
 
 		case BRIGHT:
-			return _colorCache.getColor(_rgbBright.get(data.typeColorIndex));
+			return _colorCache.getColor(_rgbBright.get(typeColorIndex));
 
 		case DARK:
-			return _colorCache.getColor(_rgbDark.get(data.typeColorIndex));
+			return _colorCache.getColor(_rgbDark.get(typeColorIndex));
 
 		case LINE:
-			return _colorCache.getColor(_rgbLine.get(data.typeColorIndex));
+			return _colorCache.getColor(_rgbLine.get(typeColorIndex));
+
+		case TEXT:
+			return _colorCache.getColor(_rgbText.get(typeColorIndex));
 
 		case CONTRAST:
 
@@ -2049,6 +2066,27 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		case BLACK:
 		default:
 			return _black;
+		}
+	}
+
+	private RGB getColor_WeekValue(final WeekFormatter formatter) {
+
+		final CalendarColor weekValueColor = _currentConfig.weekValueColor;
+
+		switch (weekValueColor) {
+
+		case BRIGHT:
+		case DARK:
+		case LINE:
+		case TEXT:
+			return formatter.getGraphColor(weekValueColor);
+
+		case WHITE:
+			return _whiteRGB;
+
+		case BLACK:
+		default:
+			return _blackRGB;
 		}
 	}
 
@@ -2121,6 +2159,25 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 
 		return _fontDayHeader;
+	}
+
+	private Font getFont_WeekValue() {
+
+		if (_fontWeekValue == null) {
+
+			final FontData fontData = CalendarConfigManager.getActiveCalendarConfig().weekValueFont;
+
+			_fontWeekValue = new Font(_display, fontData);
+
+			final GC gc = new GC(_display);
+			{
+				gc.setFont(_fontWeekValue);
+				_fontHeight_WeekValue = gc.getFontMetrics().getHeight();
+			}
+			gc.dispose();
+		}
+
+		return _fontWeekValue;
 	}
 
 	private Font getFont_YearHeader() {

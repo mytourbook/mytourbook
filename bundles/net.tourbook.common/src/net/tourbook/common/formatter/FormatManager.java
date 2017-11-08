@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,7 @@
 package net.tourbook.common.formatter;
 
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.preferences.ICommonPreferences;
 
@@ -138,6 +139,43 @@ public class FormatManager {
 
 			return _valueFormatter_Time_HHMMSS;
 		}
+	}
+
+	public static String getValueFormatterName(final ValueFormat valueFormat) {
+
+		switch (valueFormat) {
+
+		case NUMBER_1_0:
+			return Messages.Value_Formatter_Number_1_0;
+
+		case NUMBER_1_1:
+			return Messages.Value_Formatter_Number_1_1;
+
+		case NUMBER_1_2:
+			return Messages.Value_Formatter_Number_1_2;
+
+		case NUMBER_1_3:
+			return Messages.Value_Formatter_Number_1_3;
+
+		case PACE_MM_SS:
+			return Messages.Value_Formatter_Pace_MM_SS;
+
+		case TIME_HH:
+			return Messages.Value_Formatter_Time_HH;
+
+		case TIME_HH_MM:
+			return Messages.Value_Formatter_Time_HH_MM;
+
+		case TIME_HH_MM_SS:
+			return Messages.Value_Formatter_Time_HH_MM_SS;
+
+		case DEFAULT:
+		case DUMMY_VALUE:
+		default:
+			break;
+		}
+
+		return UI.EMPTY_STRING;
 	}
 
 	public static void updateDisplayFormats() {

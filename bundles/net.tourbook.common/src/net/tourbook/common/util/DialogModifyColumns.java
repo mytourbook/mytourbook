@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,6 +22,7 @@ import java.util.Comparator;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.Messages;
 import net.tourbook.common.UI;
+import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.formatter.IValueFormatter;
 import net.tourbook.common.formatter.ValueFormat;
 
@@ -1072,7 +1073,7 @@ public class DialogModifyColumns extends TrayDialog {
 				if (valueFormat == null) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(ColumnManager.getValueFormatterName(valueFormat));
+					cell.setText(FormatManager.getValueFormatterName(valueFormat));
 				}
 
 				setColor(cell, colDef);
@@ -1107,7 +1108,7 @@ public class DialogModifyColumns extends TrayDialog {
 				if (valueFormat == null) {
 					cell.setText(UI.EMPTY_STRING);
 				} else {
-					cell.setText(ColumnManager.getValueFormatterName(valueFormat));
+					cell.setText(FormatManager.getValueFormatterName(valueFormat));
 				}
 
 				setColor(cell, colDef);

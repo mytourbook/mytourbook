@@ -127,7 +127,9 @@ public class CalendarConfigManager {
 	private static final String				ATTR_USE_DRAGGED_SCROLLING				= "useDraggedScrolling";			//$NON-NLS-1$
 	private static final String				ATTR_WEEK_HEIGHT						= "weekHeight";						//$NON-NLS-1$
 	private static final String				ATTR_WEEK_FORMATTER_ID					= "weekFormatterId";				//$NON-NLS-1$
-	private static final String				ATTR_WEEK_FORMATTER_VALUE_FORMAT		= "WeekFormatterValueFormat";		//$NON-NLS-1$
+	private static final String				ATTR_WEEK_FORMATTER_VALUE_FORMAT		= "weekFormatterValueFormat";		//$NON-NLS-1$
+	private static final String				ATTR_WEEK_VALUE_COLOR					= "weekValueColor";					//$NON-NLS-1$
+	private static final String				ATTR_WEEK_VALUE_FONT					= "weekValueFont";					//$NON-NLS-1$
 	private static final String				ATTR_YEAR_HEADER_FONT					= "yearHeaderFont";					//$NON-NLS-1$
 	//
 	static final RGB						DEFAULT_ALTERNATE_MONTH_RGB				= new RGB(0xf0, 0xf0, 0xf0);
@@ -139,7 +141,7 @@ public class CalendarConfigManager {
 	static final int						DEFAULT_DATE_COLUMN_WIDTH				= 50;
 	static final DateColumnContent			DEFAULT_DATE_COLUMN_CONTENT				= DateColumnContent.MONTH;
 	static final boolean					DEFAULT_IS_SHOW_DAY_DATE_WEEKEND_COLOR	= true;
-	static final int						DEFAULT_SUMMARY_COLUMN_WIDTH			= 50;
+	static final int						DEFAULT_SUMMARY_COLUMN_WIDTH			= 60;
 	static final TourBackground				DEFAULT_TOUR_BACKGROUND					= TourBackground.FILL;
 	static final CalendarColor				DEFAULT_TOUR_BACKGROUND_COLOR1			= CalendarColor.DARK;
 	static final CalendarColor				DEFAULT_TOUR_BACKGROUND_COLOR2			= CalendarColor.BRIGHT;
@@ -148,8 +150,9 @@ public class CalendarConfigManager {
 	static final CalendarColor				DEFAULT_TOUR_BORDER_COLOR				= CalendarColor.LINE;
 	static final int						DEFAULT_TOUR_BORDER_WIDTH				= 1;
 	static final int						DEFAULT_WEEK_HEIGHT						= 70;
-	static final WeekFormatter				DEFAULT_WEEK_SUMMARY_FORMATTER;
 	static final WeekFormatterData[]		DEFAULT_WEEK_FORMATTER_DATA;
+	static final WeekFormatter				DEFAULT_WEEK_SUMMARY_FORMATTER;
+	static final CalendarColor				DEFAULT_WEEK_VALUE_COLOR				= CalendarColor.TEXT;
 	//
 	static final int						YEAR_COLUMNS_MIN						= 1;
 	static final int						YEAR_COLUMNS_MAX						= 100;
@@ -171,256 +174,220 @@ public class CalendarConfigManager {
 	private static final WeekFormatter		_weekFormatter_Pace;
 	private static final WeekFormatter		_weekFormatter_Speed;
 	private static final WeekFormatter		_weekFormatter_Time_Moving;
+	private static final WeekFormatter		_weekFormatter_Time_Paused;
 	private static final WeekFormatter		_weekFormatter_Time_Recording;
 
 	static final WeekFormatter[]			allWeekFormatter;
 
+// SET_FORMATTING_OFF
 	//
 	static {
 
-		DEFAULT_WEEK_SUMMARY_FORMATTER = createFormatter_Week_Empty();
+		DEFAULT_WEEK_SUMMARY_FORMATTER 		= createFormatter_Week_Empty();
 
-		_weekFormatter_Altitude = createFormatter_Week_Altitude();
-		_weekFormatter_Distance = createFormatter_Week_Distance();
-		_weekFormatter_Pace = createFormatter_Week_Pace();
-		_weekFormatter_Speed = createFormatter_Week_Speed();
-		_weekFormatter_Time_Moving = createFormatter_Week_Time_Moving();
-		_weekFormatter_Time_Recording = createFormatter_Week_Time_Recording();
+		_weekFormatter_Altitude 		= createFormatter_Week_Altitude();
+		_weekFormatter_Distance 		= createFormatter_Week_Distance();
+
+		_weekFormatter_Pace 			= createFormatter_Week_Pace();
+		_weekFormatter_Speed 			= createFormatter_Week_Speed();
+
+		_weekFormatter_Time_Moving 		= createFormatter_Week_Time_Moving();
+		_weekFormatter_Time_Paused 		= createFormatter_Week_Time_Paused();
+		_weekFormatter_Time_Recording 	= createFormatter_Week_Time_Recording();
 
 		allWeekFormatter = new WeekFormatter[] {
 
-				DEFAULT_WEEK_SUMMARY_FORMATTER,
+			DEFAULT_WEEK_SUMMARY_FORMATTER,
 
-				_weekFormatter_Altitude,
-				_weekFormatter_Distance,
-				_weekFormatter_Pace,
-				_weekFormatter_Speed,
-				_weekFormatter_Time_Moving,
-				_weekFormatter_Time_Recording,
+			_weekFormatter_Altitude,
+			_weekFormatter_Distance,
+
+			_weekFormatter_Speed,
+			_weekFormatter_Pace,
+
+			_weekFormatter_Time_Recording,
+			_weekFormatter_Time_Moving,
+			_weekFormatter_Time_Paused,
 		};
 
 		DEFAULT_WEEK_FORMATTER_DATA = new WeekFormatterData[] {
 
-				new WeekFormatterData(
-						WeekFormatterID.ALTITUDE,
-						_weekFormatter_Altitude.getDefaultFormat()),
-
-				new WeekFormatterData(
-						WeekFormatterID.DISTANCE,
-						_weekFormatter_Distance.getDefaultFormat()),
-
-				new WeekFormatterData(
-						WeekFormatterID.TIME_MOVING,
-						_weekFormatter_Time_Moving.getDefaultFormat()),
+			new WeekFormatterData(WeekFormatterID.ALTITUDE,		_weekFormatter_Altitude.getDefaultFormat()),
+			new WeekFormatterData(WeekFormatterID.DISTANCE,		_weekFormatter_Distance.getDefaultFormat()),
+			new WeekFormatterData(WeekFormatterID.TIME_MOVING,	_weekFormatter_Time_Moving.getDefaultFormat()),
 		};
 	}
 	//
-	private static final CalendarColorData[]		_allCalendarColorData			= new CalendarColorData[] {
+	//
+	private static final CalendarColor_ComboData[] _allCalendarColor_ComboData =
 
-			new CalendarColorData(
-					CalendarColor.BRIGHT,
-					Messages.Calendar_Config_Color_Bright),
+		new CalendarColor_ComboData[] {
 
-			new CalendarColorData(
-					CalendarColor.DARK,
-					Messages.Calendar_Config_Color_Dark),
+			new CalendarColor_ComboData(CalendarColor.BRIGHT,	Messages.Calendar_Config_Color_Bright),
+			new CalendarColor_ComboData(CalendarColor.DARK,		Messages.Calendar_Config_Color_Dark),
+			new CalendarColor_ComboData(CalendarColor.LINE,		Messages.Calendar_Config_Color_Line),
+			new CalendarColor_ComboData(CalendarColor.TEXT,		Messages.Calendar_Config_Color_Text),
+			new CalendarColor_ComboData(CalendarColor.BLACK,	Messages.Calendar_Config_Color_Black),
+			new CalendarColor_ComboData(CalendarColor.WHITE,	Messages.Calendar_Config_Color_White),
+		};
 
-			new CalendarColorData(
-					CalendarColor.LINE,
-					Messages.Calendar_Config_Color_Line),
+	private static final DateColumn_ComboData[] _allDateColumn_ComboData =
 
-			new CalendarColorData(
-					CalendarColor.BLACK,
-					Messages.Calendar_Config_Color_Black),
+		new DateColumn_ComboData[] {
 
-			new CalendarColorData(
-					CalendarColor.WHITE,
-					Messages.Calendar_Config_Color_White),
-	};
-	private static final DateColumnData[]			_allDateColumnData				= new DateColumnData[] {
+			new DateColumn_ComboData(DateColumnContent.WEEK_NUMBER,	Messages.Calendar_Config_DateColumn_WeekNumber),
+			new DateColumn_ComboData(DateColumnContent.MONTH, 		Messages.Calendar_Config_DateColumn_Month),
+			new DateColumn_ComboData(DateColumnContent.YEAR, 		Messages.Calendar_Config_DateColumn_Year),
+		};
 
-			new DateColumnData(DateColumnContent.WEEK_NUMBER, Messages.Calendar_Config_DateColumn_WeekNumber),
-			new DateColumnData(DateColumnContent.MONTH, Messages.Calendar_Config_DateColumn_Month),
-			new DateColumnData(DateColumnContent.YEAR, Messages.Calendar_Config_DateColumn_Year),
-	};
-	private static final ColumnLayoutData[]			_allColumnLayoutData			= new ColumnLayoutData[] {
+	private static final ColumnLayout_ComboData[] _allColumnLayout_ComboData =
 
-			new ColumnLayoutData(ColumnStart.CONTINUOUSLY, Messages.Calendar_Config_ColumnLayout_Continuously),
+		new ColumnLayout_ComboData[] {
 
-			new ColumnLayoutData(ColumnStart.JAN, TimeTools.month_Full[0]),
-			new ColumnLayoutData(ColumnStart.FEB, TimeTools.month_Full[1]),
-			new ColumnLayoutData(ColumnStart.MAR, TimeTools.month_Full[2]),
-			new ColumnLayoutData(ColumnStart.APR, TimeTools.month_Full[3]),
-			new ColumnLayoutData(ColumnStart.MAY, TimeTools.month_Full[4]),
-			new ColumnLayoutData(ColumnStart.JUN, TimeTools.month_Full[5]),
-			new ColumnLayoutData(ColumnStart.JUL, TimeTools.month_Full[6]),
-			new ColumnLayoutData(ColumnStart.AUG, TimeTools.month_Full[7]),
-			new ColumnLayoutData(ColumnStart.SEP, TimeTools.month_Full[8]),
-			new ColumnLayoutData(ColumnStart.OCT, TimeTools.month_Full[9]),
-			new ColumnLayoutData(ColumnStart.NOV, TimeTools.month_Full[10]),
-			new ColumnLayoutData(ColumnStart.DEC, TimeTools.month_Full[11]),
+			new ColumnLayout_ComboData(ColumnStart.CONTINUOUSLY, Messages.Calendar_Config_ColumnLayout_Continuously),
+
+			new ColumnLayout_ComboData(ColumnStart.JAN, TimeTools.month_Full[0]),
+			new ColumnLayout_ComboData(ColumnStart.FEB, TimeTools.month_Full[1]),
+			new ColumnLayout_ComboData(ColumnStart.MAR, TimeTools.month_Full[2]),
+			new ColumnLayout_ComboData(ColumnStart.APR, TimeTools.month_Full[3]),
+			new ColumnLayout_ComboData(ColumnStart.MAY, TimeTools.month_Full[4]),
+			new ColumnLayout_ComboData(ColumnStart.JUN, TimeTools.month_Full[5]),
+			new ColumnLayout_ComboData(ColumnStart.JUL, TimeTools.month_Full[6]),
+			new ColumnLayout_ComboData(ColumnStart.AUG, TimeTools.month_Full[7]),
+			new ColumnLayout_ComboData(ColumnStart.SEP, TimeTools.month_Full[8]),
+			new ColumnLayout_ComboData(ColumnStart.OCT, TimeTools.month_Full[9]),
+			new ColumnLayout_ComboData(ColumnStart.NOV, TimeTools.month_Full[10]),
+			new ColumnLayout_ComboData(ColumnStart.DEC, TimeTools.month_Full[11]),
 
 			// repeat continuously -> is more handier
-			new ColumnLayoutData(ColumnStart.CONTINUOUSLY, Messages.Calendar_Config_ColumnLayout_Continuously),
-	};
+			new ColumnLayout_ComboData(ColumnStart.CONTINUOUSLY, Messages.Calendar_Config_ColumnLayout_Continuously),
+		};
 
-	private static final DayHeaderDateFormatData[]	_allDateHeaderDateFormatData	= new DayHeaderDateFormatData[] {
+	private static final DayHeaderDateFormat_ComboData[] _allDateHeaderDateFormat_ComboData =
 
-			new DayHeaderDateFormatData(
-					DayDateFormat.DAY,
+		new DayHeaderDateFormat_ComboData[] {
+
+			new DayHeaderDateFormat_ComboData(DayDateFormat.DAY,
 					NLS.bind(
 							Messages.Calendar_Config_DayHeaderDateFormat_Day,
 							TimeTools.Formatter_Day.format(LocalDate.now()))),
 
-			new DayHeaderDateFormatData(
-					DayDateFormat.DAY_MONTH,
-					TimeTools.Formatter_DayMonth.format(LocalDate.now())),
+			new DayHeaderDateFormat_ComboData(DayDateFormat.DAY_MONTH,				TimeTools.Formatter_DayMonth.format(LocalDate.now())),
+			new DayHeaderDateFormat_ComboData(DayDateFormat.DAY_MONTH_YEAR,			TimeTools.Formatter_DayMonthYear.format(LocalDate.now())),
+			new DayHeaderDateFormat_ComboData(DayDateFormat.AUTOMATIC,				Messages.Calendar_Config_DayHeaderDateFormat_Automatic),
+		};
 
-			new DayHeaderDateFormatData(
-					DayDateFormat.DAY_MONTH_YEAR,
-					TimeTools.Formatter_DayMonthYear.format(LocalDate.now())),
+	private static final TourBackground_ComboData[] _allTourBackground_ComboData =
 
-			new DayHeaderDateFormatData(
-					DayDateFormat.AUTOMATIC,
-					Messages.Calendar_Config_DayHeaderDateFormat_Automatic),
-	};
+		new TourBackground_ComboData[] {
 
-	private static final TourBackgroundData[]		_allTourBackgroundData			= new TourBackgroundData[] {
-
-			new TourBackgroundData(
-					TourBackground.NO_BACKGROUND,
-					Messages.Calendar_Config_TourBackground_NoBackground,
+			new TourBackground_ComboData(TourBackground.NO_BACKGROUND,		Messages.Calendar_Config_TourBackground_NoBackground,
 					false,
 					false,
 					false),
 
-			new TourBackgroundData(
-					TourBackground.FILL,
-					Messages.Calendar_Config_TourBackground_Fill,
+			new TourBackground_ComboData(TourBackground.FILL,				Messages.Calendar_Config_TourBackground_Fill,
 					true,
 					false,
 					false),
 
-			new TourBackgroundData(
-					TourBackground.FILL_LEFT,
-					Messages.Calendar_Config_TourBackground_Fill_Left,
+			new TourBackground_ComboData(TourBackground.FILL_LEFT,			Messages.Calendar_Config_TourBackground_Fill_Left,
 					true,
 					false,
 					true),
 
-			new TourBackgroundData(
-					TourBackground.FILL_RIGHT,
-					Messages.Calendar_Config_TourBackground_Fill_Right,
+			new TourBackground_ComboData(TourBackground.FILL_RIGHT,			Messages.Calendar_Config_TourBackground_Fill_Right,
 					true,
 					false,
 					true),
 
-			new TourBackgroundData(
-					TourBackground.CIRCLE,
-					Messages.Calendar_Config_TourBackground_Circle,
+			new TourBackground_ComboData(TourBackground.CIRCLE,				Messages.Calendar_Config_TourBackground_Circle,
 					true,
 					false,
 					false),
 
-			new TourBackgroundData(
-					TourBackground.GRADIENT_HORIZONTAL,
-					Messages.Calendar_Config_TourBackground_GradientHorizontal,
+			new TourBackground_ComboData(TourBackground.GRADIENT_HORIZONTAL,	Messages.Calendar_Config_TourBackground_GradientHorizontal,
 					true,
 					true,
 					false),
 
-			new TourBackgroundData(
-					TourBackground.GRADIENT_VERTICAL,
-					Messages.Calendar_Config_TourBackground_GradientVertical,
+			new TourBackground_ComboData(TourBackground.GRADIENT_VERTICAL,		Messages.Calendar_Config_TourBackground_GradientVertical,
 					true,
 					true,
 					false),
-	};
+		};
 
-	private static final TourBorderData[]			_allTourBorderData				= new TourBorderData[] {
+	private static final TourBorder_ComboData[] _allTourBorder_ComboData =
 
-			new TourBorderData(
-					TourBorder.NO_BORDER,
-					Messages.Calendar_Config_TourBorder_NoBorder,
+		new TourBorder_ComboData[] {
+
+			new TourBorder_ComboData(TourBorder.NO_BORDER,				Messages.Calendar_Config_TourBorder_NoBorder,
 					false,
 					false),
 
-			new TourBorderData(
-					TourBorder.BORDER_ALL,
-					Messages.Calendar_Config_TourBorder_All,
+			new TourBorder_ComboData(TourBorder.BORDER_ALL,				Messages.Calendar_Config_TourBorder_All,
 					true,
 					true),
 
-			new TourBorderData(
-					TourBorder.BORDER_TOP,
-					Messages.Calendar_Config_TourBorder_Top,
+			new TourBorder_ComboData(TourBorder.BORDER_TOP,				Messages.Calendar_Config_TourBorder_Top,
 					true,
 					true),
 
-			new TourBorderData(
-					TourBorder.BORDER_BOTTOM,
-					Messages.Calendar_Config_TourBorder_Bottom,
+			new TourBorder_ComboData(TourBorder.BORDER_BOTTOM,			Messages.Calendar_Config_TourBorder_Bottom,
 					true,
 					true),
 
-			new TourBorderData(
-					TourBorder.BORDER_TOP_BOTTOM,
-					Messages.Calendar_Config_TourBorder_TopBottom,
+			new TourBorder_ComboData(TourBorder.BORDER_TOP_BOTTOM,		Messages.Calendar_Config_TourBorder_TopBottom,
 					true,
 					true),
 
-			new TourBorderData(
-					TourBorder.BORDER_LEFT,
-					Messages.Calendar_Config_TourBorder_Left,
+			new TourBorder_ComboData(TourBorder.BORDER_LEFT,			Messages.Calendar_Config_TourBorder_Left,
 					true,
 					true),
 
-			new TourBorderData(
-					TourBorder.BORDER_RIGHT,
-					Messages.Calendar_Config_TourBorder_Right,
+			new TourBorder_ComboData(TourBorder.BORDER_RIGHT,			Messages.Calendar_Config_TourBorder_Right,
 					true,
 					true),
 
-			new TourBorderData(
-					TourBorder.BORDER_LEFT_RIGHT,
-					Messages.Calendar_Config_TourBorder_LeftRight,
+			new TourBorder_ComboData(TourBorder.BORDER_LEFT_RIGHT,		Messages.Calendar_Config_TourBorder_LeftRight,
 					true,
 					true),
-	};
+		};
 
-	private static DayContentColorData[]			_allDayContentColorData			= new DayContentColorData[] {
+	private static DayContentColor_ComboData[] _allDayContentColorData =
 
-			new DayContentColorData(CalendarColor.CONTRAST, Messages.Calendar_Config_Color_Contrast),
-			new DayContentColorData(CalendarColor.BRIGHT, Messages.Calendar_Config_Color_Bright),
-			new DayContentColorData(CalendarColor.DARK, Messages.Calendar_Config_Color_Dark),
-			new DayContentColorData(CalendarColor.LINE, Messages.Calendar_Config_Color_Line),
-			new DayContentColorData(CalendarColor.BLACK, Messages.Calendar_Config_Color_Black),
-			new DayContentColorData(CalendarColor.WHITE, Messages.Calendar_Config_Color_White),
-	};
+		new DayContentColor_ComboData[] {
 
+			new DayContentColor_ComboData(CalendarColor.CONTRAST, Messages.Calendar_Config_Color_Contrast),
+			new DayContentColor_ComboData(CalendarColor.BRIGHT, Messages.Calendar_Config_Color_Bright),
+			new DayContentColor_ComboData(CalendarColor.DARK, Messages.Calendar_Config_Color_Dark),
+			new DayContentColor_ComboData(CalendarColor.LINE, Messages.Calendar_Config_Color_Line),
+			new DayContentColor_ComboData(CalendarColor.BLACK, Messages.Calendar_Config_Color_Black),
+			new DayContentColor_ComboData(CalendarColor.WHITE, Messages.Calendar_Config_Color_White),
+		};
+	//
+// SET_FORMATTING_ON
 	//
 	/**
 	 * Contains all configurations which are loaded from a xml file.
 	 */
-	private static final ArrayList<CalendarConfig>	_allCalendarConfigs				= new ArrayList<>();
-
-	private static CalendarConfig					_activeCalendarConfig;
-
+	private static final ArrayList<CalendarConfig>			_allCalendarConfigs					= new ArrayList<>();
+	private static CalendarConfig							_activeCalendarConfig;
 	//
-	private static String							_fromXml_ActiveCalendarConfigId;
-
+	private static String									_fromXml_ActiveCalendarConfigId;
+	//
 	/**
 	 * Calendarview or <code>null</code> when closed.
 	 */
-	private static ICalendarConfigProvider			_configProvider_CalendarView;
-	private static ICalendarConfigProvider			_configProvider_SlideoutCalendarOptions;
+	private static ICalendarConfigProvider					_configProvider_CalendarView;
+	private static ICalendarConfigProvider					_configProvider_SlideoutCalendarOptions;
 
-	public static class CalendarColorData {
+	public static class CalendarColor_ComboData {
 
 		String			label;
 		CalendarColor	color;
 
-		public CalendarColorData(final CalendarColor color, final String label) {
+		public CalendarColor_ComboData(final CalendarColor color, final String label) {
 
 			this.color = color;
 			this.label = label;
@@ -428,36 +395,36 @@ public class CalendarConfigManager {
 
 	}
 
-	static class ColumnLayoutData {
+	static class ColumnLayout_ComboData {
 
 		String		label;
 		ColumnStart	columnLayout;
 
-		public ColumnLayoutData(final ColumnStart columnLayout, final String label) {
+		public ColumnLayout_ComboData(final ColumnStart columnLayout, final String label) {
 
 			this.columnLayout = columnLayout;
 			this.label = label;
 		}
 	}
 
-	static class DateColumnData {
+	static class DateColumn_ComboData {
 
 		String				label;
 		DateColumnContent	dateColumn;
 
-		public DateColumnData(final DateColumnContent dateColumn, final String label) {
+		public DateColumn_ComboData(final DateColumnContent dateColumn, final String label) {
 
 			this.dateColumn = dateColumn;
 			this.label = label;
 		}
 	}
 
-	static class DayContentColorData {
+	static class DayContentColor_ComboData {
 
 		String			label;
 		CalendarColor	dayContentColor;
 
-		DayContentColorData(final CalendarColor dayContentColor, final String label) {
+		DayContentColor_ComboData(final CalendarColor dayContentColor, final String label) {
 
 			this.label = label;
 			this.dayContentColor = dayContentColor;
@@ -465,12 +432,12 @@ public class CalendarConfigManager {
 
 	}
 
-	static class DayHeaderDateFormatData {
+	static class DayHeaderDateFormat_ComboData {
 
 		String			label;
 		DayDateFormat	dayHeaderDateFormat;
 
-		public DayHeaderDateFormatData(final DayDateFormat dayHeaderDateFormat, final String label) {
+		public DayHeaderDateFormat_ComboData(final DayDateFormat dayHeaderDateFormat, final String label) {
 
 			this.dayHeaderDateFormat = dayHeaderDateFormat;
 			this.label = label;
@@ -485,7 +452,7 @@ public class CalendarConfigManager {
 		void updateUI_CalendarConfig();
 	}
 
-	static class TourBackgroundData {
+	static class TourBackground_ComboData {
 
 		TourBackground	tourBackground;
 		String			label;
@@ -494,11 +461,11 @@ public class CalendarConfigManager {
 		boolean			isColor1;
 		boolean			isColor2;
 
-		public TourBackgroundData(	final TourBackground tourBackground,
-									final String label,
-									final boolean isColor1,
-									final boolean isColor2,
-									final boolean isWidth) {
+		public TourBackground_ComboData(final TourBackground tourBackground,
+										final String label,
+										final boolean isColor1,
+										final boolean isColor2,
+										final boolean isWidth) {
 
 			this.tourBackground = tourBackground;
 			this.label = label;
@@ -509,7 +476,7 @@ public class CalendarConfigManager {
 		}
 	}
 
-	static class TourBorderData {
+	static class TourBorder_ComboData {
 
 		TourBorder	tourBorder;
 		String		label;
@@ -517,10 +484,10 @@ public class CalendarConfigManager {
 		boolean		isColor;
 		boolean		isWidth;
 
-		public TourBorderData(	final TourBorder tourBorder,
-								final String label,
-								final boolean isColor,
-								final boolean isWidth) {
+		public TourBorder_ComboData(final TourBorder tourBorder,
+									final String label,
+									final boolean isColor,
+									final boolean isWidth) {
 
 			this.tourBorder = tourBorder;
 			this.label = label;
@@ -615,6 +582,11 @@ public class CalendarConfigManager {
 		return config;
 	}
 
+	/**
+	 * Altitude
+	 * 
+	 * @return
+	 */
 	private static WeekFormatter createFormatter_Week_Altitude() {
 
 		final WeekFormatter weekFormatter = new WeekFormatter(
@@ -630,11 +602,9 @@ public class CalendarConfigManager {
 					final float altitude = data.altitude / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
 					final String valueText = _valueFormatter.printDouble(altitude);
 
-					if (isShowValueUnit) {
-						return valueText + UI.SPACE + UI.UNIT_LABEL_ALTITUDE;
-					} else {
-						return valueText;
-					}
+					return isShowValueUnit
+							? valueText + UI.SPACE + UI.UNIT_LABEL_ALTITUDE
+							: valueText;
 
 				} else {
 					return UI.EMPTY_STRING;
@@ -668,6 +638,11 @@ public class CalendarConfigManager {
 		return weekFormatter;
 	}
 
+	/**
+	 * Distance
+	 * 
+	 * @return
+	 */
 	private static WeekFormatter createFormatter_Week_Distance() {
 
 		final WeekFormatter weekFormatter = new WeekFormatter(
@@ -684,11 +659,9 @@ public class CalendarConfigManager {
 
 					final String valueText = _valueFormatter.printDouble(distance);
 
-					if (isShowValueUnit) {
-						return valueText + UI.SPACE + UI.UNIT_LABEL_DISTANCE;
-					} else {
-						return valueText;
-					}
+					return isShowValueUnit
+							? valueText + UI.SPACE + UI.UNIT_LABEL_DISTANCE
+							: valueText;
 
 				} else {
 					return UI.EMPTY_STRING;
@@ -723,6 +696,11 @@ public class CalendarConfigManager {
 		return weekFormatter;
 	}
 
+	/**
+	 * Empty
+	 * 
+	 * @return
+	 */
 	private static WeekFormatter createFormatter_Week_Empty() {
 
 		final WeekFormatter weekFormatter = new WeekFormatter(WeekFormatterID.EMPTY) {
@@ -754,6 +732,11 @@ public class CalendarConfigManager {
 		return weekFormatter;
 	}
 
+	/**
+	 * Pace
+	 * 
+	 * @return
+	 */
 	private static WeekFormatter createFormatter_Week_Pace() {
 
 		final WeekFormatter weekFormatter = new WeekFormatter(
@@ -772,11 +755,9 @@ public class CalendarConfigManager {
 
 					final String valueText = UI.format_mm_ss((long) pace);
 
-					if (isShowValueUnit) {
-						return valueText + UI.SPACE + UI.UNIT_LABEL_PACE;
-					} else {
-						return valueText;
-					}
+					return isShowValueUnit //
+							? valueText + UI.SPACE + UI.UNIT_LABEL_PACE
+							: valueText;
 
 				} else {
 					return UI.EMPTY_STRING;
@@ -785,12 +766,13 @@ public class CalendarConfigManager {
 
 			@Override
 			public ValueFormat getDefaultFormat() {
-				return null;
+				return ValueFormat.PACE_MM_SS;
 			}
 
 			@Override
 			public ValueFormat[] getValueFormats() {
-				return null;
+
+				return new ValueFormat[] { ValueFormat.PACE_MM_SS };
 			}
 
 			@Override
@@ -800,6 +782,11 @@ public class CalendarConfigManager {
 		return weekFormatter;
 	}
 
+	/**
+	 * Speed
+	 * 
+	 * @return
+	 */
 	private static WeekFormatter createFormatter_Week_Speed() {
 
 		final WeekFormatter weekFormatter = new WeekFormatter(
@@ -812,11 +799,15 @@ public class CalendarConfigManager {
 
 				if (data.distance > 0 && data.recordingTime > 0) {
 
-					return String
-							.format(
-									NLS.bind(Messages.Calendar_View_Format_Speed, UI.UNIT_LABEL_SPEED),
-									data.distance == 0 ? 0 : data.distance / (data.recordingTime / 3.6f))
-							.toString();
+					final float speed = data.distance == 0
+							? 0
+							: data.distance / (data.recordingTime / 3.6f);
+
+					final String valueText = _valueFormatter.printDouble(speed);
+
+					return isShowValueUnit
+							? valueText + UI.SPACE + UI.UNIT_LABEL_SPEED
+							: valueText;
 				} else {
 
 					return UI.EMPTY_STRING;
@@ -850,6 +841,11 @@ public class CalendarConfigManager {
 		return weekFormatter;
 	}
 
+	/**
+	 * Moving time
+	 * 
+	 * @return
+	 */
 	private static WeekFormatter createFormatter_Week_Time_Moving() {
 
 		final WeekFormatter weekFormatter = new WeekFormatter(
@@ -861,12 +857,13 @@ public class CalendarConfigManager {
 			String format(final CalendarTourData data, final ValueFormat valueFormat, final boolean isShowValueUnit) {
 
 				if (data.recordingTime > 0) {
-					return String
-							.format(
-									Messages.Calendar_View_Format_Time,
-									data.drivingTime / 3600,
-									(data.drivingTime % 3600) / 60)
-							.toString();
+
+					final String valueText = _valueFormatter.printLong(data.drivingTime);
+
+					return isShowValueUnit
+							? valueText + UI.SPACE + UI.UNIT_LABEL_TIME
+							: valueText;
+
 				} else {
 					return UI.EMPTY_STRING;
 				}
@@ -899,6 +896,66 @@ public class CalendarConfigManager {
 		return weekFormatter;
 	}
 
+	/**
+	 * Paused time
+	 * 
+	 * @return
+	 */
+	private static WeekFormatter createFormatter_Week_Time_Paused() {
+
+		final WeekFormatter weekFormatter = new WeekFormatter(
+				WeekFormatterID.TIME_PAUSED,
+				Messages.Calendar_Config_Value_PausedTime,
+				GraphColorManager.PREF_GRAPH_TIME) {
+
+			@Override
+			String format(final CalendarTourData data, final ValueFormat valueFormat, final boolean isShowValueUnit) {
+
+				if (data.recordingTime > 0) {
+
+					final String valueText = _valueFormatter.printLong(data.recordingTime - data.drivingTime);
+
+					return isShowValueUnit
+							? valueText + UI.SPACE + UI.UNIT_LABEL_TIME
+							: valueText;
+
+				} else {
+					return UI.EMPTY_STRING;
+				}
+			}
+
+			@Override
+			public ValueFormat getDefaultFormat() {
+				return ValueFormat.TIME_HH_MM;
+			}
+
+			@Override
+			public ValueFormat[] getValueFormats() {
+
+				return new ValueFormat[] {
+						ValueFormat.TIME_HH,
+						ValueFormat.TIME_HH_MM,
+						ValueFormat.TIME_HH_MM_SS };
+			}
+
+			@Override
+			void setValueFormat(final ValueFormat valueFormat) {
+
+				_valueFormatter = getTimeFormatter(valueFormat.name());
+			}
+		};
+
+		// setup default formatter
+		weekFormatter.setValueFormat(weekFormatter.getDefaultFormat());
+
+		return weekFormatter;
+	}
+
+	/**
+	 * Recording time
+	 * 
+	 * @return
+	 */
 	private static WeekFormatter createFormatter_Week_Time_Recording() {
 
 		final WeekFormatter weekFormatter = new WeekFormatter(
@@ -911,12 +968,12 @@ public class CalendarConfigManager {
 
 				if (data.recordingTime > 0) {
 
-					return String
-							.format(
-									Messages.Calendar_View_Format_Time,
-									data.recordingTime / 3600,
-									(data.recordingTime % 3600) / 60)
-							.toString();
+					final String valueText = _valueFormatter.printLong(data.recordingTime);
+
+					return isShowValueUnit
+							? valueText + UI.SPACE + UI.UNIT_LABEL_TIME
+							: valueText;
+
 				} else {
 
 					return UI.EMPTY_STRING;
@@ -992,6 +1049,8 @@ public class CalendarConfigManager {
 			xmlConfig.putBoolean(ATTR_IS_SHOW_SUMMARY_COLUMN, 			config.isShowSummaryColumn);
 			xmlConfig.putBoolean(ATTR_IS_SHOW_WEEK_VALUE_UNIT, 			config.isShowWeekValueUnit);
 			xmlConfig.putInteger(ATTR_SUMMARY_COLUMN_WIDTH, 			config.summaryColumnWidth);
+			Util.setXmlEnum(xmlConfig, ATTR_WEEK_VALUE_COLOR, 			config.weekValueColor);
+			Util.setXmlFont(xmlConfig, ATTR_WEEK_VALUE_FONT, 			config.weekValueFont);
 
 			// year column
 			xmlConfig.putBoolean(ATTR_IS_SHOW_YEAR_COLUMNS, 			config.isShowYearColumns);
@@ -1053,8 +1112,8 @@ public class CalendarConfigManager {
 		return 0;
 	}
 
-	static CalendarColorData[] getAllCalendarColorData() {
-		return _allCalendarColorData;
+	static CalendarColor_ComboData[] getAllCalendarColor_ComboData() {
+		return _allCalendarColor_ComboData;
 	}
 
 	static ArrayList<CalendarConfig> getAllCalendarConfigs() {
@@ -1065,28 +1124,28 @@ public class CalendarConfigManager {
 		return _allCalendarConfigs;
 	}
 
-	public static ColumnLayoutData[] getAllColumnLayoutData() {
-		return _allColumnLayoutData;
+	public static ColumnLayout_ComboData[] getAllColumnLayout_ComboData() {
+		return _allColumnLayout_ComboData;
 	}
 
-	static DateColumnData[] getAllDateColumnData() {
-		return _allDateColumnData;
+	static DateColumn_ComboData[] getAllDateColumnData() {
+		return _allDateColumn_ComboData;
 	}
 
-	static DayContentColorData[] getAllDayContentColorData() {
+	static DayContentColor_ComboData[] getAllDayContentColor_ComboData() {
 		return _allDayContentColorData;
 	}
 
-	static DayHeaderDateFormatData[] getAllDayHeaderDateFormatData() {
-		return _allDateHeaderDateFormatData;
+	static DayHeaderDateFormat_ComboData[] getAllDayHeaderDateFormat_ComboData() {
+		return _allDateHeaderDateFormat_ComboData;
 	}
 
-	static TourBackgroundData[] getAllTourBackgroundData() {
-		return _allTourBackgroundData;
+	static TourBackground_ComboData[] getAllTourBackground_ComboData() {
+		return _allTourBackground_ComboData;
 	}
 
-	static TourBorderData[] getAllTourBorderData() {
-		return _allTourBorderData;
+	static TourBorder_ComboData[] getAllTourBorderData() {
+		return _allTourBorder_ComboData;
 	}
 
 	private static CalendarConfig getConfig_Calendar() {
@@ -1249,15 +1308,17 @@ public class CalendarConfigManager {
 		config.tourBorderColor 				= (CalendarColor) Util.getXmlEnum(xmlConfig,	ATTR_TOUR_BORDER_COLOR,			DEFAULT_TOUR_BORDER_COLOR);
 		                                                                                                            
 		// date column
-		config.isShowDateColumn				= Util.getXmlBoolean(xmlConfig, 				ATTR_IS_SHOW_DATE_COLUMN,	true);
-		config.dateColumnFont 				= Util.getXmlFont(xmlConfig, 					ATTR_DATE_COLUMN_FONT, 		defaultFont.getFontData()[0]);
-		config.dateColumnWidth				= Util.getXmlInteger(xmlConfig, 				ATTR_DATE_COLUMN_WIDTH,		DEFAULT_DATE_COLUMN_WIDTH);
+		config.isShowDateColumn				= Util.getXmlBoolean(xmlConfig, 					ATTR_IS_SHOW_DATE_COLUMN,	true);
+		config.dateColumnFont 				= Util.getXmlFont(xmlConfig, 						ATTR_DATE_COLUMN_FONT, 		defaultFont.getFontData()[0]);
+		config.dateColumnWidth				= Util.getXmlInteger(xmlConfig, 					ATTR_DATE_COLUMN_WIDTH,		DEFAULT_DATE_COLUMN_WIDTH);
 		config.dateColumnContent			= (DateColumnContent) Util.getXmlEnum(xmlConfig,	ATTR_DATE_COLUMN_CONTENT,	DateColumnContent.WEEK_NUMBER);
 		                                                                                                            
-		// summary column
-		config.isShowSummaryColumn			= Util.getXmlBoolean(xmlConfig, 			ATTR_IS_SHOW_SUMMARY_COLUMN,	true);
-		config.isShowWeekValueUnit			= Util.getXmlBoolean(xmlConfig, 			ATTR_IS_SHOW_WEEK_VALUE_UNIT,	true);
-		config.summaryColumnWidth			= Util.getXmlInteger(xmlConfig, 			ATTR_SUMMARY_COLUMN_WIDTH,		DEFAULT_SUMMARY_COLUMN_WIDTH);
+		// week summary column
+		config.isShowSummaryColumn			= Util.getXmlBoolean(xmlConfig, 				ATTR_IS_SHOW_SUMMARY_COLUMN,	true);
+		config.isShowWeekValueUnit			= Util.getXmlBoolean(xmlConfig, 				ATTR_IS_SHOW_WEEK_VALUE_UNIT,	true);
+		config.summaryColumnWidth			= Util.getXmlInteger(xmlConfig, 				ATTR_SUMMARY_COLUMN_WIDTH,		DEFAULT_SUMMARY_COLUMN_WIDTH);
+		config.weekValueColor		 		= (CalendarColor) Util.getXmlEnum(xmlConfig,	ATTR_WEEK_VALUE_COLOR,			DEFAULT_WEEK_VALUE_COLOR);
+		config.weekValueFont				= Util.getXmlFont(xmlConfig, 					ATTR_WEEK_VALUE_FONT,			defaultFont.getFontData()[0]);
         
 		// year columns
 		config.isShowYearColumns			= Util.getXmlBoolean(xmlConfig, 			ATTR_IS_SHOW_YEAR_COLUMNS,	true);
@@ -1478,6 +1539,10 @@ public class CalendarConfigManager {
 
 			case TIME_MOVING:
 				_weekFormatter_Time_Moving.setValueFormat(valueFormat);
+				break;
+
+			case TIME_PAUSED:
+				_weekFormatter_Time_Paused.setValueFormat(valueFormat);
 				break;
 
 			case TIME_RECORDING:

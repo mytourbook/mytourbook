@@ -21,9 +21,12 @@ public enum WeekFormatterID {
 
 	ALTITUDE, //
 	DISTANCE, //
+
 	PACE, //
 	SPEED, //
+
 	TIME_MOVING, //
 	TIME_RECORDING, //
+	TIME_PAUSED, //
 
 }

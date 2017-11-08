@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,7 +20,6 @@ import net.tourbook.common.CommonActivator;
 import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.formatter.ValueFormat;
 import net.tourbook.common.preferences.ICommonPreferences;
-import net.tourbook.common.util.ColumnManager;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -142,9 +141,9 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
 
 	private void createUI_22_Time(final Composite parent) {
 
-		final String formatName_HH = ColumnManager.getValueFormatterName(ValueFormat.TIME_HH);
-		final String formatName_HH_MM = ColumnManager.getValueFormatterName(ValueFormat.TIME_HH_MM);
-		final String formatName_HH_MM_SS = ColumnManager.getValueFormatterName(ValueFormat.TIME_HH_MM_SS);
+		final String formatName_HH = FormatManager.getValueFormatterName(ValueFormat.TIME_HH);
+		final String formatName_HH_MM = FormatManager.getValueFormatterName(ValueFormat.TIME_HH_MM);
+		final String formatName_HH_MM_SS = FormatManager.getValueFormatterName(ValueFormat.TIME_HH_MM_SS);
 		{
 			/*
 			 * Recording time format: hh ... hh:mm:ss
@@ -223,10 +222,10 @@ public class PrefPageAppearanceDisplayFormat extends PreferencePage implements I
 
 	private void createUI_24_Other(final Composite parent) {
 
-		final String formatName_1_0 = ColumnManager.getValueFormatterName(ValueFormat.NUMBER_1_0);
-		final String formatName_1_1 = ColumnManager.getValueFormatterName(ValueFormat.NUMBER_1_1);
-		final String formatName_1_2 = ColumnManager.getValueFormatterName(ValueFormat.NUMBER_1_2);
-		final String formatName_1_3 = ColumnManager.getValueFormatterName(ValueFormat.NUMBER_1_3);
+		final String formatName_1_0 = FormatManager.getValueFormatterName(ValueFormat.NUMBER_1_0);
+		final String formatName_1_1 = FormatManager.getValueFormatterName(ValueFormat.NUMBER_1_1);
+		final String formatName_1_2 = FormatManager.getValueFormatterName(ValueFormat.NUMBER_1_2);
+		final String formatName_1_3 = FormatManager.getValueFormatterName(ValueFormat.NUMBER_1_3);
 
 		{
 			/*

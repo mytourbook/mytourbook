@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,6 +19,8 @@ public enum ValueFormat {
 
 	DEFAULT, //
 	DUMMY_VALUE, //
+
+	PACE_MM_SS, //
 
 	NUMBER_1_0, //
 	NUMBER_1_1, //

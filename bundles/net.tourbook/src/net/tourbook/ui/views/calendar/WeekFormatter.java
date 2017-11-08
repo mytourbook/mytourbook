@@ -31,16 +31,23 @@ abstract class WeekFormatter {
 
 	abstract String format(CalendarTourData data, ValueFormat valueFormat, boolean isShowValueUnit);
 
-	RGB getColor() {
+	RGB getGraphColor(final CalendarColor calendarColor) {
 
-//		if (_calendarView._useLineColorForWeekSummary) {
-//
-//			return _colorDefinition.getLineColor_Active();
-//
-//		} else {
-//
-		return _colorDefinition.getTextColor_Active();
-//		}
+		switch (calendarColor) {
+
+		case BRIGHT:
+			return _colorDefinition.getGradientBright_Active();
+
+		case DARK:
+			return _colorDefinition.getGradientDark_Active();
+
+		case LINE:
+			return _colorDefinition.getLineColor_Active();
+
+		case TEXT:
+		default:
+			return _colorDefinition.getTextColor_Active();
+		}
 	}
 
 	/**

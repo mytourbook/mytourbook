@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -216,38 +216,6 @@ public class ColumnManager {
 
 	public static IValueFormatter getDefaultDefaultValueFormatter() {
 		return _defaultDefaultValueFormatter;
-	}
-
-	public static String getValueFormatterName(final ValueFormat valueFormat) {
-
-		switch (valueFormat) {
-
-		case NUMBER_1_0:
-			return Messages.Value_Formatter_Number_1_0;
-
-		case NUMBER_1_1:
-			return Messages.Value_Formatter_Number_1_1;
-
-		case NUMBER_1_2:
-			return Messages.Value_Formatter_Number_1_2;
-
-		case NUMBER_1_3:
-			return Messages.Value_Formatter_Number_1_3;
-
-		case TIME_HH:
-			return Messages.Value_Formatter_Time_HH;
-
-		case TIME_HH_MM:
-			return Messages.Value_Formatter_Time_HH_MM;
-
-		case TIME_HH_MM_SS:
-			return Messages.Value_Formatter_Time_HH_MM_SS;
-
-		default:
-			break;
-		}
-
-		return UI.EMPTY_STRING;
 	}
 
 	void action_AddColumn(final ColumnDefinition colDef) {

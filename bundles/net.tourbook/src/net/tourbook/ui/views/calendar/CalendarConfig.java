@@ -78,10 +78,12 @@ public class CalendarConfig {
 	boolean					useDraggedScrolling			= false;
 
 	// week summary column
+	WeekFormatterData[]		allWeekFormatterData		= CalendarConfigManager.DEFAULT_WEEK_FORMATTER_DATA;
 	boolean					isShowSummaryColumn			= true;
 	boolean 				isShowWeekValueUnit			= true;
 	int						summaryColumnWidth			= CalendarConfigManager.DEFAULT_SUMMARY_COLUMN_WIDTH;
-	WeekFormatterData[]		allWeekFormatterData		= CalendarConfigManager.DEFAULT_WEEK_FORMATTER_DATA;
+	CalendarColor			weekValueColor				= CalendarConfigManager.DEFAULT_WEEK_VALUE_COLOR;
+	FontData 				weekValueFont				= JFaceResources.getFontRegistry().defaultFont().getFontData()[0];
 
 // SET_FORMATTING_ON
 
