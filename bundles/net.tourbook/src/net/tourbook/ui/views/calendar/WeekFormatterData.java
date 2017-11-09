@@ -19,10 +19,14 @@ import net.tourbook.common.formatter.ValueFormat;
 
 public class WeekFormatterData {
 
+	boolean			isEnabled;
+
 	WeekFormatterID	id;
 	ValueFormat		valueFormat;
 
-	WeekFormatterData(final WeekFormatterID id, final ValueFormat valueFormat) {
+	WeekFormatterData(final boolean isEnabled, final WeekFormatterID id, final ValueFormat valueFormat) {
+
+		this.isEnabled = isEnabled;
 
 		this.id = id;
 		this.valueFormat = valueFormat;
@@ -32,6 +36,7 @@ public class WeekFormatterData {
 	public String toString() {
 		return "WeekFormatterData ["
 
+				+ "isEnabled=" + isEnabled + ", "
 				+ "id=" + id + ", "
 				+ "valueFormat=" + valueFormat
 

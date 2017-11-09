@@ -1658,6 +1658,7 @@ public class Messages extends NLS {
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowMonthWithAlternatingColor;
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowSummaryColumn;
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowSummaryColumn_Tooltipxxx;
+	public static String		Slideout_CalendarOptions_Checkbox_IsShowTourContent;
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowWeekValueUnit;
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowYearColumns;
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowYearColumns_Tooltip;
@@ -1702,6 +1703,7 @@ public class Messages extends NLS {
 	public static String		Slideout_CalendarOptions_Label_YearHeaderFont;
 	public static String		Slideout_CalendarOptions_Tab_DayContent;
 	public static String		Slideout_CalendarOptions_Tab_Layout;
+	public static String		Slideout_CalendarOptions_Tab_Tour;
 	public static String		Slideout_CalendarOptions_Tab_WeekSummary;
 
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowAbsoluteValues;

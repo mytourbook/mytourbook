@@ -103,7 +103,9 @@ public class CalendarConfigManager {
 	private static final String				ATTR_IS_SHOW_DAY_DATE					= "isShowDayDate";					//$NON-NLS-1$
 	private static final String				ATTR_IS_SHOW_DAY_DATE_WEEKEND_COLOR		= "isShowDayDateWeekendColor";		//$NON-NLS-1$
 	private static final String				ATTR_IS_SHOW_SUMMARY_COLUMN				= "isShowSummaryColumn";			//$NON-NLS-1$
+	private static final String				ATTR_IS_SHOW_TOUR_CONTENT				= "isShowTourContent";				//$NON-NLS-1$
 	private static final String				ATTR_IS_SHOW_YEAR_COLUMNS				= "isShowYearColumns";				//$NON-NLS-1$
+	private static final String				ATTR_IS_SHOW_WEEK_LINE					= "isShowWeekLine";					//$NON-NLS-1$
 	private static final String				ATTR_IS_TOGGLE_MONTH_COLOR				= "isToggleMonthColor";				//$NON-NLS-1$
 	private static final String				ATTR_IS_SHOW_WEEK_VALUE_UNIT			= "isShowWeekValueUnit";			//$NON-NLS-1$
 	private static final String				ATTR_NUM_YEAR_COLUMNS					= "calendarColumns";				//$NON-NLS-1$
@@ -212,9 +214,12 @@ public class CalendarConfigManager {
 
 		DEFAULT_WEEK_FORMATTER_DATA = new WeekFormatterData[] {
 
-			new WeekFormatterData(WeekFormatterID.ALTITUDE,		_weekFormatter_Altitude.getDefaultFormat()),
-			new WeekFormatterData(WeekFormatterID.DISTANCE,		_weekFormatter_Distance.getDefaultFormat()),
-			new WeekFormatterData(WeekFormatterID.TIME_MOVING,	_weekFormatter_Time_Moving.getDefaultFormat()),
+			new WeekFormatterData(true,		WeekFormatterID.ALTITUDE,		_weekFormatter_Altitude.getDefaultFormat()),
+			new WeekFormatterData(true,		WeekFormatterID.DISTANCE,		_weekFormatter_Distance.getDefaultFormat()),
+			new WeekFormatterData(true,		WeekFormatterID.TIME_MOVING,	_weekFormatter_Time_Moving.getDefaultFormat()),
+			new WeekFormatterData(false,	WeekFormatterID.EMPTY,			ValueFormat.DUMMY_VALUE),
+			new WeekFormatterData(false,	WeekFormatterID.EMPTY,			ValueFormat.DUMMY_VALUE),
+			new WeekFormatterData(false,	WeekFormatterID.EMPTY,			ValueFormat.DUMMY_VALUE),
 		};
 	}
 	//
@@ -1044,6 +1049,10 @@ public class CalendarConfigManager {
 			xmlConfig.putInteger(ATTR_DATE_COLUMN_WIDTH, 				config.dateColumnWidth);
 			Util.setXmlEnum(xmlConfig, ATTR_DATE_COLUMN_CONTENT, 		config.dateColumnContent);
 			Util.setXmlFont(xmlConfig, ATTR_DATE_COLUMN_FONT, 			config.dateColumnFont);
+			
+			// tour content
+			xmlConfig.putBoolean(ATTR_IS_SHOW_TOUR_CONTENT,				config.isShowTourContent);
+			
 
 			// week summary column
 			xmlConfig.putBoolean(ATTR_IS_SHOW_SUMMARY_COLUMN, 			config.isShowSummaryColumn);
@@ -1074,6 +1083,7 @@ public class CalendarConfigManager {
 
 				final IMemento xmlWeekFormatter = xmlAllWeekFormatter.createChild(TAG_WEEK_FORMATTER);
 
+				xmlWeekFormatter.putBoolean(ATTR_IS_SHOW_WEEK_LINE, weekFormatterData.isEnabled);
 				Util.setXmlEnum(xmlWeekFormatter, ATTR_WEEK_FORMATTER_ID, weekFormatterData.id);
 				Util.setXmlEnum(xmlWeekFormatter, ATTR_WEEK_FORMATTER_VALUE_FORMAT, weekFormatterData.valueFormat);
 			}
@@ -1312,6 +1322,9 @@ public class CalendarConfigManager {
 		config.dateColumnFont 				= Util.getXmlFont(xmlConfig, 						ATTR_DATE_COLUMN_FONT, 		defaultFont.getFontData()[0]);
 		config.dateColumnWidth				= Util.getXmlInteger(xmlConfig, 					ATTR_DATE_COLUMN_WIDTH,		DEFAULT_DATE_COLUMN_WIDTH);
 		config.dateColumnContent			= (DateColumnContent) Util.getXmlEnum(xmlConfig,	ATTR_DATE_COLUMN_CONTENT,	DateColumnContent.WEEK_NUMBER);
+		
+		// tour content
+		config.isShowTourContent			= Util.getXmlBoolean(xmlConfig, 					ATTR_IS_SHOW_TOUR_CONTENT,	true);
 		                                                                                                            
 		// week summary column
 		config.isShowSummaryColumn			= Util.getXmlBoolean(xmlConfig, 				ATTR_IS_SHOW_SUMMARY_COLUMN,	true);
@@ -1343,6 +1356,8 @@ public class CalendarConfigManager {
 
 			for (final IMemento xmlWeekFormatterData : xmlAllWeekFormatter.getChildren()) {
 
+				final boolean isEnabled = Util.getXmlBoolean(xmlWeekFormatterData, ATTR_IS_SHOW_WEEK_LINE, true);
+
 				final WeekFormatterID id = (WeekFormatterID) Util.getXmlEnum(
 						xmlWeekFormatterData,
 						ATTR_WEEK_FORMATTER_ID,
@@ -1353,23 +1368,12 @@ public class CalendarConfigManager {
 						ATTR_WEEK_FORMATTER_VALUE_FORMAT,
 						ValueFormat.DUMMY_VALUE);
 
-				allWeekFormatterData.add(new WeekFormatterData(id, valueFormat));
+				allWeekFormatterData.add(new WeekFormatterData(isEnabled, id, valueFormat));
 			}
 
 			config.allWeekFormatterData = allWeekFormatterData.toArray(
 					new WeekFormatterData[allWeekFormatterData.size()]);
 		}
-
-//		final IMemento xmlAllWeekFormatter = xmlConfig.createChild(TAG_ALL_WEEK_FORMATTER);
-//
-//		for (final WeekFormatterData weekFormatterData : config.allWeekFormatterData) {
-//
-//			final IMemento xmlWeekFormatter = xmlAllWeekFormatter.createChild(TAG_WEEK_FORMATTER);
-//
-//			Util.setXmlEnum(xmlWeekFormatter, ATTR_WEEK_FORMATTER_ID, weekFormatterData.id);
-//			Util.setXmlEnum(xmlWeekFormatter, ATTR_WEEK_FORMATTER_VALUE_FORMAT, weekFormatterData.valueFormat);
-//		}
-
 	}
 
 	/**

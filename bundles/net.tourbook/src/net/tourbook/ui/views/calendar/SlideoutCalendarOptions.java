@@ -82,6 +82,14 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 	private static final String		STATE_SELECTED_TAB		= "STATE_SELECTED_TAB";									//$NON-NLS-1$
 
+	/**
+	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	 * <p>
+	 * Ensure that {@link CalendarConfigManager#DEFAULT_WEEK_FORMATTER_DATA} has the SAME NUMBER of
+	 * lines, otherwise the UI lines are not setup correctly.
+	 * <p>
+	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	 */
 	private static final int		_numWeekSummaryLines	= 6;
 
 	private final IDialogSettings	_state					= TourbookPlugin.getState("SlideoutCalendarOptions");	//$NON-NLS-1$
@@ -111,14 +119,16 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	//
 	private Button					_btnReset;
 	private Button					_chkIsHideDayDateWhenNoTour;
-	private Button					_chkUseDraggedScrolling;
 	private Button					_chkIsShowDateColumn;
 	private Button					_chkIsShowDayDateWeekendColor;
 	private Button					_chkIsShowDayDate;
-	private Button					_chkIsShowSummaryColumn;
 	private Button					_chkIsShowMonthWithAlternateColor;
+	private Button					_chkIsShowSummaryColumn;
+	private Button					_chkIsShowTourContent;
 	private Button					_chkIsShowWeekValueUnit;
 	private Button					_chkIsShowYearColumns;
+	private Button					_chkUseDraggedScrolling;
+	private Button[]				_chkWeek_AllIsShowLines;
 	//
 	private ColorSelectorExtended	_colorAlternateMonthColor;
 	//
@@ -132,19 +142,11 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	private Combo					_comboTourBackgroundColor2;
 	private Combo					_comboTourBorder;
 	private Combo					_comboTourBorderColor;
-	private Combo					_comboTour_Value_1;
-	private Combo					_comboTour_Value_2;
-	private Combo					_comboTour_Value_3;
-	private Combo					_comboTour_Format_1_1;
-	private Combo					_comboTour_Format_1_2;
-	private Combo					_comboTour_Format_2_1;
-	private Combo					_comboTour_Format_2_2;
-	private Combo					_comboTour_Format_3_1;
-	private Combo					_comboTour_Format_3_2;
 	private Combo[]					_comboWeek_AllValues;
 	private Combo[]					_comboWeek_AllFormats;
 	private Combo					_comboWeek_ValueColor;
 	//
+	private Composite				_tourFormatterContainer;
 	private Composite				_weekFormatterContainer;
 	//
 	private Label					_lblDateColumn_Content;
@@ -154,7 +156,6 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	private Label					_lblDayHeader_Format;
 	private Label					_lblNumYearColumn;
 	private Label					_lblWeek_ColumnWidth;
-	private Label[]					_lblWeek_SummaryAll;
 	private Label					_lblWeek_ValueColor;
 	private Label					_lblWeek_ValueFont;
 	private Label					_lblYearColumn_HeaderFont;
@@ -273,8 +274,12 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				tabDayContent.setControl(createUI_020_Tab_DayContent(_tabFolder));
 				tabDayContent.setText(Messages.Slideout_CalendarOptions_Tab_DayContent);
 
+				final TabItem tabTour = new TabItem(_tabFolder, SWT.NONE);
+				tabTour.setControl(createUI_030_Tab_Tour(_tabFolder));
+				tabTour.setText(Messages.Slideout_CalendarOptions_Tab_Tour);
+
 				final TabItem tabWeekSummary = new TabItem(_tabFolder, SWT.NONE);
-				tabWeekSummary.setControl(createUI_030_Tab_WeekSummary(_tabFolder));
+				tabWeekSummary.setControl(createUI_050_Tab_WeekSummary(_tabFolder));
 				tabWeekSummary.setText(Messages.Slideout_CalendarOptions_Tab_WeekSummary);
 			}
 
@@ -311,14 +316,26 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		return container;
 	}
 
-	private Control createUI_030_Tab_WeekSummary(final Composite parent) {
+	private Control createUI_030_Tab_Tour(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
+		{
+			createUI_500_Tour(container);
+		}
+
+		return container;
+	}
+
+	private Control createUI_050_Tab_WeekSummary(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 //		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 		{
-			createUI_500_WeekSummaryColumn(container);
+			createUI_800_WeekSummaryColumn(container);
 		}
 
 		return container;
@@ -983,7 +1000,48 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		}
 	}
 
-	private void createUI_500_WeekSummaryColumn(final Composite parent) {
+	private void createUI_500_Tour(final Composite parent) {
+
+		{
+			/*
+			 * Show tour
+			 */
+
+			// checkbox
+			_chkIsShowTourContent = new Button(parent, SWT.CHECK);
+			_chkIsShowTourContent.setText(Messages.Slideout_CalendarOptions_Checkbox_IsShowTourContent);
+			_chkIsShowTourContent.addSelectionListener(_defaultSelectionListener);
+			GridDataFactory
+					.fillDefaults()//
+					.align(SWT.FILL, SWT.BEGINNING)
+					.applyTo(_chkIsShowTourContent);
+		}
+
+		_tourFormatterContainer = new Composite(parent, SWT.NONE);
+		GridDataFactory
+				.fillDefaults()//
+				.grab(true, true)
+				.indent(_subItemIndent, 0)
+				.applyTo(_tourFormatterContainer);
+		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(_tourFormatterContainer);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+		{
+			createUI_510_Layout(_tourFormatterContainer);
+			createUI_520_Values(_tourFormatterContainer);
+		}
+	}
+
+	private void createUI_510_Layout(final Composite parent) {
+		// TODO Auto-generated method stub
+
+	}
+
+	private void createUI_520_Values(final Composite parent) {
+		// TODO Auto-generated method stub
+
+	}
+
+	private void createUI_800_WeekSummaryColumn(final Composite parent) {
 
 		{
 			/*
@@ -997,7 +1055,6 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			GridDataFactory
 					.fillDefaults()//
 					.align(SWT.FILL, SWT.BEGINNING)
-					//					.span(2, 1)
 					.applyTo(_chkIsShowSummaryColumn);
 		}
 
@@ -1010,24 +1067,24 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(_weekFormatterContainer);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 		{
-			createUI_510_Layout(_weekFormatterContainer);
-			createUI_550_Values(_weekFormatterContainer);
+			createUI_810_Layout(_weekFormatterContainer);
+			createUI_820_Values(_weekFormatterContainer);
 		}
 	}
 
-	private void createUI_510_Layout(final Composite parent) {
+	private void createUI_810_Layout(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 		{
-			createUI_512_Layout_Col1(container);
-			createUI_514_Layout_Col2(container);
+			createUI_812_Layout_Col1(container);
+			createUI_814_Layout_Col2(container);
 		}
 	}
 
-	private void createUI_512_Layout_Col1(final Composite parent) {
+	private void createUI_812_Layout_Col1(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -1092,7 +1149,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		}
 	}
 
-	private void createUI_514_Layout_Col2(final Composite parent) {
+	private void createUI_814_Layout_Col2(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
@@ -1124,9 +1181,9 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		}
 	}
 
-	private void createUI_550_Values(final Composite parent) {
+	private void createUI_820_Values(final Composite parent) {
 
-		_lblWeek_SummaryAll = new Label[_numWeekSummaryLines];
+		_chkWeek_AllIsShowLines = new Button[_numWeekSummaryLines];
 		_comboWeek_AllValues = new Combo[_numWeekSummaryLines];
 		_comboWeek_AllFormats = new Combo[_numWeekSummaryLines];
 
@@ -1143,9 +1200,14 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		{
 			for (int lineIndex = 0; lineIndex < _numWeekSummaryLines; lineIndex++) {
 
-				// label
-				final Label lblWeek = new Label(container, SWT.NONE);
-				lblWeek.setText(NLS.bind(Messages.Slideout_CalendarOptions_Label_Line, 1));
+				// checkbox
+				final Button chkWeek_IsShowLine = new Button(container, SWT.CHECK);
+				chkWeek_IsShowLine.setText(NLS.bind(Messages.Slideout_CalendarOptions_Label_Line, lineIndex + 1));
+				chkWeek_IsShowLine.addSelectionListener(_defaultSelectionListener);
+				GridDataFactory
+						.fillDefaults()//
+						.align(SWT.FILL, SWT.CENTER)
+						.applyTo(chkWeek_IsShowLine);
 
 				// value
 				final Combo comboWeek_Value = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
@@ -1159,95 +1221,10 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				comboWeek_Format.addSelectionListener(_defaultSelectionListener);
 				comboWeek_Format.addFocusListener(_keepOpenListener);
 
-				_lblWeek_SummaryAll[lineIndex] = lblWeek;
+				_chkWeek_AllIsShowLines[lineIndex] = chkWeek_IsShowLine;
 				_comboWeek_AllValues[lineIndex] = comboWeek_Value;
 				_comboWeek_AllFormats[lineIndex] = comboWeek_Format;
 			}
-		}
-	}
-
-	private void createUI_a980_TourInfo(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory
-				.fillDefaults()//
-				.indent(0, 10)
-				.applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
-		{
-			/*
-			 * 1. Line
-			 */
-
-			// label
-			final Label label = new Label(container, SWT.NONE);
-			label.setText(NLS.bind(Messages.Slideout_CalendarOptions_Label_Line, 1));
-
-			// value
-			_comboTour_Value_1 = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-			_comboTour_Value_1.setVisibleItemCount(20);
-			_comboTour_Value_1.addSelectionListener(_defaultSelectionListener);
-			_comboTour_Value_1.addFocusListener(_keepOpenListener);
-
-			// value 1 format
-			_comboTour_Format_1_1 = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-			_comboTour_Format_1_1.setVisibleItemCount(20);
-			_comboTour_Format_1_1.addSelectionListener(_defaultSelectionListener);
-			_comboTour_Format_1_1.addFocusListener(_keepOpenListener);
-
-			// value 2 format
-			_comboTour_Format_1_2 = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-			_comboTour_Format_1_2.setVisibleItemCount(20);
-			_comboTour_Format_1_2.addSelectionListener(_defaultSelectionListener);
-			_comboTour_Format_1_2.addFocusListener(_keepOpenListener);
-		}
-		{
-			/*
-			 * 2. Line
-			 */
-			final Label label = new Label(container, SWT.NONE);
-			label.setText(NLS.bind(Messages.Slideout_CalendarOptions_Label_Line, 2));
-
-			_comboTour_Value_2 = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-			_comboTour_Value_2.setVisibleItemCount(20);
-			_comboTour_Value_2.addSelectionListener(_defaultSelectionListener);
-			_comboTour_Value_2.addFocusListener(_keepOpenListener);
-
-			// value 1 format
-			_comboTour_Format_2_1 = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-			_comboTour_Format_2_1.setVisibleItemCount(20);
-			_comboTour_Format_2_1.addSelectionListener(_defaultSelectionListener);
-			_comboTour_Format_2_1.addFocusListener(_keepOpenListener);
-
-			// value 2 format
-			_comboTour_Format_2_2 = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-			_comboTour_Format_2_2.setVisibleItemCount(20);
-			_comboTour_Format_2_2.addSelectionListener(_defaultSelectionListener);
-			_comboTour_Format_2_2.addFocusListener(_keepOpenListener);
-		}
-		{
-			/*
-			 * 3. Line
-			 */
-			final Label label = new Label(container, SWT.NONE);
-			label.setText(NLS.bind(Messages.Slideout_CalendarOptions_Label_Line, 3));
-
-			_comboTour_Value_3 = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-			_comboTour_Value_3.setVisibleItemCount(20);
-			_comboTour_Value_3.addSelectionListener(_defaultSelectionListener);
-			_comboTour_Value_3.addFocusListener(_keepOpenListener);
-
-			// value 1 format
-			_comboTour_Format_3_1 = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-			_comboTour_Format_3_1.setVisibleItemCount(20);
-			_comboTour_Format_3_1.addSelectionListener(_defaultSelectionListener);
-			_comboTour_Format_3_1.addFocusListener(_keepOpenListener);
-
-			// value 2 format
-			_comboTour_Format_3_2 = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-			_comboTour_Format_3_2.setVisibleItemCount(20);
-			_comboTour_Format_3_2.addSelectionListener(_defaultSelectionListener);
-			_comboTour_Format_3_2.addFocusListener(_keepOpenListener);
 		}
 	}
 
@@ -1313,7 +1290,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 		for (int lineIndex = 0; lineIndex < _numWeekSummaryLines; lineIndex++) {
 
-			final Label labelWeekSummary = _lblWeek_SummaryAll[lineIndex];
+			final Button chkIsShowLine = _chkWeek_AllIsShowLines[lineIndex];
 			final Combo comboWeekValue = _comboWeek_AllValues[lineIndex];
 			final Combo comboWeekFormat = _comboWeek_AllFormats[lineIndex];
 
@@ -1331,9 +1308,11 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				}
 			}
 
-			labelWeekSummary.setEnabled(isShowSummaryColumn);
-			comboWeekValue.setEnabled(isShowSummaryColumn);
-			comboWeekFormat.setEnabled(isShowSummaryColumn && canDoFormatting);
+			final boolean isShowLine = chkIsShowLine.getSelection();
+
+			chkIsShowLine.setEnabled(isShowSummaryColumn);
+			comboWeekValue.setEnabled(isShowSummaryColumn && isShowLine);
+			comboWeekFormat.setEnabled(isShowSummaryColumn && isShowLine && canDoFormatting);
 		}
 	}
 
@@ -1353,7 +1332,8 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				_comboDateColumn.add(data.label);
 			}
 
-			for (final DayHeaderDateFormat_ComboData data : CalendarConfigManager.getAllDayHeaderDateFormat_ComboData()) {
+			for (final DayHeaderDateFormat_ComboData data : CalendarConfigManager
+					.getAllDayHeaderDateFormat_ComboData()) {
 				_comboDayHeaderDateFormat.add(data.label);
 			}
 
@@ -1393,10 +1373,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			 */
 			for (int lineIndex = 0; lineIndex < _numWeekSummaryLines; lineIndex++) {
 
-				final Label labelWeekSummary = _lblWeek_SummaryAll[lineIndex];
 				final Combo comboWeekValue = _comboWeek_AllValues[lineIndex];
-
-				labelWeekSummary.setText(NLS.bind(Messages.Slideout_CalendarOptions_Label_Line, lineIndex + 1));
 
 				for (final WeekFormatter weekFormatter : CalendarConfigManager.allWeekFormatter) {
 
@@ -1708,29 +1685,45 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 		for (int lineIndex = 0; lineIndex < _numWeekSummaryLines; lineIndex++) {
 
+			final Button chkIsShowLine = _chkWeek_AllIsShowLines[lineIndex];
 			final Combo comboWeekValue = _comboWeek_AllValues[lineIndex];
 			final Combo comboWeekFormat = _comboWeek_AllFormats[lineIndex];
+
+			final boolean isShowLine = chkIsShowLine.getSelection();
 
 			final int selectedValueIndex = comboWeekValue.getSelectionIndex();
 			if (selectedValueIndex > -1) {
 
+				final int selectedFormatIndex = comboWeekFormat.getSelectionIndex();
+
 				final WeekFormatter selectedWeekFormatter = tourWeekSummaryFormatter[selectedValueIndex];
-
 				final ValueFormat[] valueFormats = selectedWeekFormatter.getValueFormats();
-				final boolean canDoFormatting = valueFormats != null;
 
-				if (canDoFormatting) {
+				WeekFormatterData formatterData;
 
-					final int selectedFormatIndex = comboWeekFormat.getSelectionIndex();
-					if (selectedFormatIndex > -1) {
+				if (valueFormats != null && selectedFormatIndex > -1) {
 
-						final WeekFormatterData formatterData = new WeekFormatterData(
-								selectedWeekFormatter.id,
-								valueFormats[selectedFormatIndex]);
+					formatterData = new WeekFormatterData(
+							isShowLine,
+							selectedWeekFormatter.id,
+							valueFormats[selectedFormatIndex]);
 
-						selectedFormatterData.add(formatterData);
-					}
+				} else {
+
+					// keep selected formatter
+
+					final WeekFormatterID weekFormatter = valueFormats == null
+							? WeekFormatterID.EMPTY
+							: selectedWeekFormatter.id;
+
+					final ValueFormat valueFormat = selectedFormatIndex == -1
+							? ValueFormat.DUMMY_VALUE
+							: valueFormats[selectedFormatIndex];
+
+					formatterData = new WeekFormatterData(isShowLine, weekFormatter, valueFormat);
 				}
+
+				selectedFormatterData.add(formatterData);
 			}
 		}
 
@@ -1995,6 +1988,9 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			_comboDateColumn.select(getDateColumnIndex(config.dateColumnContent));
 			_fontEditorDateColumn.setSelection(config.dateColumnFont);
 
+			// tour content
+			_chkIsShowTourContent.setSelection(config.isShowTourContent);
+
 			// week summary column
 			_chkIsShowSummaryColumn.setSelection(config.isShowSummaryColumn);
 			_chkIsShowWeekValueUnit.setSelection(config.isShowWeekValueUnit);
@@ -2059,6 +2055,9 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		config.dateColumnFont = _fontEditorDateColumn.getSelection();
 		config.isShowDateColumn = _chkIsShowDateColumn.getSelection();
 
+		// tour content
+		config.isShowTourContent = _chkIsShowTourContent.getSelection();
+
 		// week summary column
 		config.allWeekFormatterData = getSelectedWeekFormatter();
 		config.isShowSummaryColumn = _chkIsShowSummaryColumn.getSelection();
@@ -2099,10 +2098,12 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		// loop: all lines
 		for (int lineIndex = 0; lineIndex < weekFormatterData.length; lineIndex++) {
 
+			final Button chkIsShowLine = _chkWeek_AllIsShowLines[lineIndex];
 			final Combo comboWeekValue = _comboWeek_AllValues[lineIndex];
 
 			final WeekFormatterData formatterData = weekFormatterData[lineIndex];
 			final WeekFormatterID formatterId = formatterData.id;
+
 
 			// loop: all formatter
 			for (int formatterIndex = 0; formatterIndex < allWeekFormatter.length; formatterIndex++) {
@@ -2112,6 +2113,10 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				if (formatterId == weekSummaryFormatter.id) {
 
 					final Combo comboWeekFormat = _comboWeek_AllFormats[lineIndex];
+
+					// enable before setting a value
+					comboWeekValue.setEnabled(true);
+					comboWeekFormat.setEnabled(true);
 
 					// select formatter value
 					comboWeekValue.select(formatterIndex);
@@ -2149,16 +2154,17 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				}
 			}
 
+			chkIsShowLine.setSelection(formatterData.isEnabled);
 		}
 
 		// set remaining formatters empty
-		for (int lineIndex = numFormatterSet; lineIndex < _comboWeek_AllValues.length; lineIndex++) {
-
-			_comboWeek_AllValues[lineIndex].select(0);
-
-			// remove old content
-			_comboWeek_AllFormats[lineIndex].removeAll();
-		}
+//		for (int lineIndex = numFormatterSet; lineIndex < _comboWeek_AllValues.length; lineIndex++) {
+//
+//			_comboWeek_AllValues[lineIndex].select(0);
+//
+//			// remove old content
+//			_comboWeek_AllFormats[lineIndex].removeAll();
+//		}
 
 		_weekFormatterContainer.layout(true, true);
 	}

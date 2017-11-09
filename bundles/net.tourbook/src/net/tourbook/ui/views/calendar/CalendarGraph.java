@@ -1379,7 +1379,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		drawDay_TourBackground(gc, data, devX, devY, cellWidth, cellHeight, devXRight, devYBottom);
 		drawDay_TourBorder(gc, data, devX, devY, cellWidth, cellHeight, devXRight, devYBottom);
-		drawDay_TourText(gc, tourRect, data);
+		drawDay_TourConent(gc, tourRect, data);
 	}
 
 	/**
@@ -1570,9 +1570,13 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 	}
 
-	private void drawDay_TourText(	final GC gc,
+	private void drawDay_TourConent(final GC gc,
 									final Rectangle tourRect,
 									final CalendarTourData data) {
+
+		if (!_currentConfig.isShowTourContent) {
+			return;
+		}
 
 		final Color fg = getColor_ForDayContent(data);
 
@@ -1709,7 +1713,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 //			color = _colorCache.getColor(_rgbText.get(data.typeColorIndex).hashCode());
 //		}
 
-		drawDay_TourText(gc, r, data);
+		drawDay_TourConent(gc, r, data);
 
 	}
 
@@ -1900,35 +1904,40 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		for (final WeekFormatterData formatterData : _currentConfig.allWeekFormatterData) {
 
-			final WeekFormatter formatter = getFormatter(formatterData.id);
+			if (formatterData.isEnabled && formatterData.id != WeekFormatterID.EMPTY) {
 
-			gc.setForeground(_colorCache.getColor(getColor_WeekValue(formatter).hashCode()));
+				// a valid formatter is set
 
-			String text = formatter.format(
-					calendarTourData,
-					formatterData.valueFormat,
-					_currentConfig.isShowWeekValueUnit);
+				final WeekFormatter formatter = getFormatter(formatterData.id);
 
-			if (text.length() > 0 && posY < (weekRec.y + weekRec.height)) {
+				gc.setForeground(_colorCache.getColor(getColor_WeekValue(formatter).hashCode()));
 
-				extent = gc.stringExtent(text);
-				posX = posXRight - extent.x;
+				String text = formatter.format(
+						calendarTourData,
+						formatterData.valueFormat,
+						_currentConfig.isShowWeekValueUnit);
 
-				if (extent.x > maxLength) {
+				if (text.length() > 0 && posY < (weekRec.y + weekRec.height)) {
 
-					// remove unit when not enough horizontal space is available
-					if (doClip && text.contains(UI.SPACE1)) {
-						text = text.substring(0, text.lastIndexOf(UI.SPACE));
-						posX = posXRight - gc.stringExtent(text).x;
-					} else {
-						posX = posXLeft;
+					extent = gc.stringExtent(text);
+					posX = posXRight - extent.x;
+
+					if (extent.x > maxLength) {
+
+						// remove unit when not enough horizontal space is available
+						if (doClip && text.contains(UI.SPACE1)) {
+							text = text.substring(0, text.lastIndexOf(UI.SPACE));
+							posX = posXRight - gc.stringExtent(text).x;
+						} else {
+							posX = posXLeft;
+						}
 					}
+
+					gc.drawText(text, posX, posY);
 				}
 
-				gc.drawText(text, posX, posY);
+				posY += _fontHeight_WeekValue;
 			}
-
-			posY += _fontHeight_WeekValue;
 		}
 
 		gc.setFont(normalFont);

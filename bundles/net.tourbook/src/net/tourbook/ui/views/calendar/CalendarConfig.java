@@ -50,6 +50,12 @@ public class CalendarConfig {
 	FontData				dayContentFont				= JFaceResources.getFontRegistry().defaultFont().getFontData()[0];
 	CalendarColor			dayContentColor				= CalendarConfigManager.DEFAULT_DAY_CONTENT_COLOR;
 	                                                            
+	// date column
+	boolean					isShowDateColumn			= true;
+	DateColumnContent		dateColumnContent			= CalendarConfigManager.DEFAULT_DATE_COLUMN_CONTENT;
+	FontData				dateColumnFont				= JFaceResources.getFontRegistry().defaultFont().getFontData()[0];
+	int						dateColumnWidth				= CalendarConfigManager.DEFAULT_DATE_COLUMN_WIDTH;
+	
 	// tour
 	TourBackground			tourBackground				= CalendarConfigManager.DEFAULT_TOUR_BACKGROUND;
 	CalendarColor			tourBackgroundColor1		= CalendarConfigManager.DEFAULT_TOUR_BACKGROUND_COLOR1;
@@ -58,13 +64,9 @@ public class CalendarConfig {
 	TourBorder 				tourBorder					= CalendarConfigManager.DEFAULT_TOUR_BORDER;
 	CalendarColor 			tourBorderColor				= CalendarConfigManager.DEFAULT_TOUR_BORDER_COLOR;
 	int		 				tourBorderWidth				= CalendarConfigManager.DEFAULT_TOUR_BORDER_WIDTH;
-	                                                            
-	// date column
-	boolean					isShowDateColumn			= true;
-	DateColumnContent		dateColumnContent			= CalendarConfigManager.DEFAULT_DATE_COLUMN_CONTENT;
-	FontData				dateColumnFont				= JFaceResources.getFontRegistry().defaultFont().getFontData()[0];
-	int						dateColumnWidth				= CalendarConfigManager.DEFAULT_DATE_COLUMN_WIDTH;
-	                                                            
+
+	// tour content
+	boolean 				isShowTourContent			= true;
 	                        
 	// year columns
 	boolean 				isShowYearColumns			= true;
