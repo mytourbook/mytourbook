@@ -67,6 +67,7 @@ public class CalendarConfig {
 
 	// tour content
 	boolean 				isShowTourContent			= true;
+	boolean					isShowTourValueUnit			= true;
 	                        
 	// year columns
 	boolean 				isShowYearColumns			= true;

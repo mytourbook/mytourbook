@@ -359,7 +359,7 @@ public class CalendarConfigManager {
 					true),
 		};
 
-	private static DayContentColor_ComboData[] _allDayContentColorData =
+	private static DayContentColor_ComboData[] _allDayContentColor_ComboData =
 
 		new DayContentColor_ComboData[] {
 
@@ -367,6 +367,7 @@ public class CalendarConfigManager {
 			new DayContentColor_ComboData(CalendarColor.BRIGHT, Messages.Calendar_Config_Color_Bright),
 			new DayContentColor_ComboData(CalendarColor.DARK, Messages.Calendar_Config_Color_Dark),
 			new DayContentColor_ComboData(CalendarColor.LINE, Messages.Calendar_Config_Color_Line),
+			new DayContentColor_ComboData(CalendarColor.TEXT, Messages.Calendar_Config_Color_Text),
 			new DayContentColor_ComboData(CalendarColor.BLACK, Messages.Calendar_Config_Color_Black),
 			new DayContentColor_ComboData(CalendarColor.WHITE, Messages.Calendar_Config_Color_White),
 		};
@@ -1075,7 +1076,7 @@ public class CalendarConfigManager {
 // SET_FORMATTING_ON
 
 			/*
-			 * Week formatter
+			 * Week summary formatter
 			 */
 			final IMemento xmlAllWeekFormatter = xmlConfig.createChild(TAG_ALL_WEEK_FORMATTER);
 
@@ -1143,7 +1144,7 @@ public class CalendarConfigManager {
 	}
 
 	static DayContentColor_ComboData[] getAllDayContentColor_ComboData() {
-		return _allDayContentColorData;
+		return _allDayContentColor_ComboData;
 	}
 
 	static DayHeaderDateFormat_ComboData[] getAllDayHeaderDateFormat_ComboData() {
@@ -1520,6 +1521,10 @@ public class CalendarConfigManager {
 	static void updateFormatterValueFormat() {
 
 		for (final WeekFormatterData weekFormatterData : _activeCalendarConfig.allWeekFormatterData) {
+
+			if (!weekFormatterData.isEnabled) {
+				continue;
+			}
 
 			final ValueFormat valueFormat = weekFormatterData.valueFormat;
 
