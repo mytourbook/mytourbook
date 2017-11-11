@@ -142,6 +142,7 @@ public class CalendarConfigManager {
 	static final DayDateFormat				DEFAULT_DAY_DATE_FORMAT					= DayDateFormat.DAY;
 	static final int						DEFAULT_DATE_COLUMN_WIDTH				= 50;
 	static final DateColumnContent			DEFAULT_DATE_COLUMN_CONTENT				= DateColumnContent.MONTH;
+	static final DataFormatter				DEFAULT_EMPTY_FORMATTER;
 	static final boolean					DEFAULT_IS_SHOW_DAY_DATE_WEEKEND_COLOR	= true;
 	static final int						DEFAULT_SUMMARY_COLUMN_WIDTH			= 60;
 	static final TourBackground				DEFAULT_TOUR_BACKGROUND					= TourBackground.FILL;
@@ -151,10 +152,20 @@ public class CalendarConfigManager {
 	static final TourBorder					DEFAULT_TOUR_BORDER						= TourBorder.NO_BORDER;
 	static final CalendarColor				DEFAULT_TOUR_BORDER_COLOR				= CalendarColor.LINE;
 	static final int						DEFAULT_TOUR_BORDER_WIDTH				= 1;
+	static final int						DEFAULT_TOUR_VALUE_COLUMNS				= 2;
 	static final int						DEFAULT_WEEK_HEIGHT						= 70;
-	static final WeekFormatterData[]		DEFAULT_WEEK_FORMATTER_DATA;
-	static final WeekFormatter				DEFAULT_WEEK_SUMMARY_FORMATTER;
 	static final CalendarColor				DEFAULT_WEEK_VALUE_COLOR				= CalendarColor.TEXT;
+	//
+	/**
+	 * MUST contain the same number of entries as in {@link #TOUR_INFO_LINES}
+	 */
+	static final FormatterData[]			DEFAULT_TOUR_FORMATTER_DATA;
+	static final int						TOUR_INFO_LINES							= 8;
+	/**
+	 * MUST contain the same number of entries as in {@link #WEEK_SUMMARY_LINES}
+	 */
+	static final FormatterData[]			DEFAULT_WEEK_FORMATTER_DATA;
+	static final int						WEEK_SUMMARY_LINES						= 6;
 	//
 	static final int						YEAR_COLUMNS_MIN						= 1;
 	static final int						YEAR_COLUMNS_MAX						= 100;
@@ -171,55 +182,91 @@ public class CalendarConfigManager {
 	private static final IValueFormatter	_valueFormatter_Time_HHMM				= new ValueFormatter_Time_HHMM();
 	private static final IValueFormatter	_valueFormatter_Time_HHMMSS				= new ValueFormatter_Time_HHMMSS();
 
-	private static final WeekFormatter		_weekFormatter_Altitude;
-	private static final WeekFormatter		_weekFormatter_Distance;
-	private static final WeekFormatter		_weekFormatter_Pace;
-	private static final WeekFormatter		_weekFormatter_Speed;
-	private static final WeekFormatter		_weekFormatter_Time_Moving;
-	private static final WeekFormatter		_weekFormatter_Time_Paused;
-	private static final WeekFormatter		_weekFormatter_Time_Recording;
+	private static final DataFormatter		_dataFormatter_Altitude;
+	private static final DataFormatter		_dataFormatter_Distance;
+	private static final DataFormatter		_dataFormatter_Pace;
+	private static final DataFormatter		_dataFormatter_Speed;
+	private static final DataFormatter		_dataFormatter_Time_Moving;
+	private static final DataFormatter		_dataFormatter_Time_Paused;
+	private static final DataFormatter		_dataFormatter_Time_Recording;
+	private static final DataFormatter		_dataFormatter_TourDescription;
+	private static final DataFormatter		_dataFormatter_TourTitle;
 
-	static final WeekFormatter[]			allWeekFormatter;
+	static final DataFormatter[]			allTourContentFormatter;
+	static final DataFormatter[]			allWeekFormatter;
 
 // SET_FORMATTING_OFF
 	//
 	static {
 
-		DEFAULT_WEEK_SUMMARY_FORMATTER 		= createFormatter_Week_Empty();
+		DEFAULT_EMPTY_FORMATTER 		= createFormatter_Empty();
 
-		_weekFormatter_Altitude 		= createFormatter_Week_Altitude();
-		_weekFormatter_Distance 		= createFormatter_Week_Distance();
+		_dataFormatter_TourDescription	= createFormatter_TourDescription();
+		_dataFormatter_TourTitle	 	= createFormatter_TourTitle();
+		
+		_dataFormatter_Altitude 		= createFormatter_Altitude();
+		_dataFormatter_Distance 		= createFormatter_Distance();
 
-		_weekFormatter_Pace 			= createFormatter_Week_Pace();
-		_weekFormatter_Speed 			= createFormatter_Week_Speed();
+		_dataFormatter_Pace 			= createFormatter_Pace();
+		_dataFormatter_Speed 			= createFormatter_Speed();
 
-		_weekFormatter_Time_Moving 		= createFormatter_Week_Time_Moving();
-		_weekFormatter_Time_Paused 		= createFormatter_Week_Time_Paused();
-		_weekFormatter_Time_Recording 	= createFormatter_Week_Time_Recording();
+		_dataFormatter_Time_Moving 		= createFormatter_Time_Moving();
+		_dataFormatter_Time_Paused 		= createFormatter_Time_Paused();
+		_dataFormatter_Time_Recording 	= createFormatter_Time_Recording();
 
-		allWeekFormatter = new WeekFormatter[] {
+		allTourContentFormatter = new DataFormatter[] {
 
-			DEFAULT_WEEK_SUMMARY_FORMATTER,
+			DEFAULT_EMPTY_FORMATTER,
+			
+			_dataFormatter_TourTitle,
+			_dataFormatter_TourDescription,
 
-			_weekFormatter_Altitude,
-			_weekFormatter_Distance,
+			_dataFormatter_Altitude,
+			_dataFormatter_Distance,
 
-			_weekFormatter_Speed,
-			_weekFormatter_Pace,
+			_dataFormatter_Speed,
+			_dataFormatter_Pace,
 
-			_weekFormatter_Time_Recording,
-			_weekFormatter_Time_Moving,
-			_weekFormatter_Time_Paused,
+			_dataFormatter_Time_Recording,
+			_dataFormatter_Time_Moving,
+			_dataFormatter_Time_Paused,
+		};
+		
+		allWeekFormatter = new DataFormatter[] {
+				
+				DEFAULT_EMPTY_FORMATTER,
+				
+				_dataFormatter_Altitude,
+				_dataFormatter_Distance,
+				
+				_dataFormatter_Speed,
+				_dataFormatter_Pace,
+				
+				_dataFormatter_Time_Recording,
+				_dataFormatter_Time_Moving,
+				_dataFormatter_Time_Paused,
 		};
 
-		DEFAULT_WEEK_FORMATTER_DATA = new WeekFormatterData[] {
+		DEFAULT_TOUR_FORMATTER_DATA = new FormatterData[] {
 
-			new WeekFormatterData(true,		WeekFormatterID.ALTITUDE,		_weekFormatter_Altitude.getDefaultFormat()),
-			new WeekFormatterData(true,		WeekFormatterID.DISTANCE,		_weekFormatter_Distance.getDefaultFormat()),
-			new WeekFormatterData(true,		WeekFormatterID.TIME_MOVING,	_weekFormatter_Time_Moving.getDefaultFormat()),
-			new WeekFormatterData(false,	WeekFormatterID.EMPTY,			ValueFormat.DUMMY_VALUE),
-			new WeekFormatterData(false,	WeekFormatterID.EMPTY,			ValueFormat.DUMMY_VALUE),
-			new WeekFormatterData(false,	WeekFormatterID.EMPTY,			ValueFormat.DUMMY_VALUE),
+			new FormatterData(true,		FormatterID.TOUR_TITLE,			_dataFormatter_TourTitle.getDefaultFormat()),	// 1
+			new FormatterData(true,		FormatterID.TOUR_DESCRIPTION,	_dataFormatter_TourDescription.getDefaultFormat()),		// 2
+			new FormatterData(true,		FormatterID.ALTITUDE,			_dataFormatter_Altitude.getDefaultFormat()),	// 3
+			new FormatterData(true,		FormatterID.DISTANCE,			_dataFormatter_Distance.getDefaultFormat()),	// 4
+			new FormatterData(true,		FormatterID.TIME_MOVING,		_dataFormatter_Time_Moving.getDefaultFormat()),	// 5
+			new FormatterData(false,	FormatterID.EMPTY,				ValueFormat.DUMMY_VALUE),						// 6
+			new FormatterData(false,	FormatterID.EMPTY,				ValueFormat.DUMMY_VALUE),						// 7
+			new FormatterData(false,	FormatterID.EMPTY,				ValueFormat.DUMMY_VALUE),						// 8
+		};
+
+		DEFAULT_WEEK_FORMATTER_DATA = new FormatterData[] {
+				
+			new FormatterData(true,		FormatterID.ALTITUDE,			_dataFormatter_Altitude.getDefaultFormat()),	// 1
+			new FormatterData(true,		FormatterID.DISTANCE,			_dataFormatter_Distance.getDefaultFormat()),	// 2
+			new FormatterData(true,		FormatterID.TIME_MOVING,		_dataFormatter_Time_Moving.getDefaultFormat()),	// 3
+			new FormatterData(false,	FormatterID.EMPTY,				ValueFormat.DUMMY_VALUE),						// 4
+			new FormatterData(false,	FormatterID.EMPTY,				ValueFormat.DUMMY_VALUE),						// 5
+			new FormatterData(false,	FormatterID.EMPTY,				ValueFormat.DUMMY_VALUE),						// 6
 		};
 	}
 	//
@@ -593,10 +640,10 @@ public class CalendarConfigManager {
 	 * 
 	 * @return
 	 */
-	private static WeekFormatter createFormatter_Week_Altitude() {
+	private static DataFormatter createFormatter_Altitude() {
 
-		final WeekFormatter weekFormatter = new WeekFormatter(
-				WeekFormatterID.ALTITUDE,
+		final DataFormatter dataFormatter = new DataFormatter(
+				FormatterID.ALTITUDE,
 				Messages.Calendar_Config_Value_Altitude,
 				GraphColorManager.PREF_GRAPH_ALTITUDE) {
 
@@ -606,7 +653,7 @@ public class CalendarConfigManager {
 				if (data.altitude > 0) {
 
 					final float altitude = data.altitude / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
-					final String valueText = _valueFormatter.printDouble(altitude);
+					final String valueText = valueFormatter.printDouble(altitude);
 
 					return isShowValueUnit
 							? valueText + UI.SPACE + UI.UNIT_LABEL_ALTITUDE
@@ -634,14 +681,14 @@ public class CalendarConfigManager {
 			@Override
 			void setValueFormat(final ValueFormat valueFormat) {
 
-				_valueFormatter = getNumberFormatter(valueFormat.name());
+				valueFormatter = getFormatter_Number(valueFormat.name());
 			}
 		};
 
 		// setup default formatter
-		weekFormatter.setValueFormat(weekFormatter.getDefaultFormat());
+		dataFormatter.setValueFormat(dataFormatter.getDefaultFormat());
 
-		return weekFormatter;
+		return dataFormatter;
 	}
 
 	/**
@@ -649,10 +696,10 @@ public class CalendarConfigManager {
 	 * 
 	 * @return
 	 */
-	private static WeekFormatter createFormatter_Week_Distance() {
+	private static DataFormatter createFormatter_Distance() {
 
-		final WeekFormatter weekFormatter = new WeekFormatter(
-				WeekFormatterID.DISTANCE,
+		final DataFormatter dataFormatter = new DataFormatter(
+				FormatterID.DISTANCE,
 				Messages.Calendar_Config_Value_Distance,
 				GraphColorManager.PREF_GRAPH_DISTANCE) {
 
@@ -663,7 +710,7 @@ public class CalendarConfigManager {
 
 					final double distance = data.distance / 1000.0 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
-					final String valueText = _valueFormatter.printDouble(distance);
+					final String valueText = valueFormatter.printDouble(distance);
 
 					return isShowValueUnit
 							? valueText + UI.SPACE + UI.UNIT_LABEL_DISTANCE
@@ -692,14 +739,14 @@ public class CalendarConfigManager {
 			@Override
 			void setValueFormat(final ValueFormat valueFormat) {
 
-				_valueFormatter = getNumberFormatter(valueFormat.name());
+				valueFormatter = getFormatter_Number(valueFormat.name());
 			}
 		};
 
 		// setup default formatter
-		weekFormatter.setValueFormat(weekFormatter.getDefaultFormat());
+		dataFormatter.setValueFormat(dataFormatter.getDefaultFormat());
 
-		return weekFormatter;
+		return dataFormatter;
 	}
 
 	/**
@@ -707,9 +754,9 @@ public class CalendarConfigManager {
 	 * 
 	 * @return
 	 */
-	private static WeekFormatter createFormatter_Week_Empty() {
+	private static DataFormatter createFormatter_Empty() {
 
-		final WeekFormatter weekFormatter = new WeekFormatter(WeekFormatterID.EMPTY) {
+		final DataFormatter dataFormatter = new DataFormatter(FormatterID.EMPTY) {
 
 			@Override
 			String format(final CalendarTourData data, final ValueFormat valueFormat, final boolean isShowValueUnit) {
@@ -735,7 +782,7 @@ public class CalendarConfigManager {
 			void setValueFormat(final ValueFormat valueFormat) {}
 		};
 
-		return weekFormatter;
+		return dataFormatter;
 	}
 
 	/**
@@ -743,10 +790,10 @@ public class CalendarConfigManager {
 	 * 
 	 * @return
 	 */
-	private static WeekFormatter createFormatter_Week_Pace() {
+	private static DataFormatter createFormatter_Pace() {
 
-		final WeekFormatter weekFormatter = new WeekFormatter(
-				WeekFormatterID.PACE,
+		final DataFormatter dataFormatter = new DataFormatter(
+				FormatterID.PACE,
 				Messages.Calendar_Config_Value_Pace,
 				GraphColorManager.PREF_GRAPH_PACE) {
 
@@ -785,7 +832,7 @@ public class CalendarConfigManager {
 			void setValueFormat(final ValueFormat valueFormat) {}
 		};
 
-		return weekFormatter;
+		return dataFormatter;
 	}
 
 	/**
@@ -793,10 +840,10 @@ public class CalendarConfigManager {
 	 * 
 	 * @return
 	 */
-	private static WeekFormatter createFormatter_Week_Speed() {
+	private static DataFormatter createFormatter_Speed() {
 
-		final WeekFormatter weekFormatter = new WeekFormatter(
-				WeekFormatterID.SPEED,
+		final DataFormatter dataFormatter = new DataFormatter(
+				FormatterID.SPEED,
 				Messages.Calendar_Config_Value_Speed,
 				GraphColorManager.PREF_GRAPH_SPEED) {
 
@@ -809,7 +856,7 @@ public class CalendarConfigManager {
 							? 0
 							: data.distance / (data.recordingTime / 3.6f);
 
-					final String valueText = _valueFormatter.printDouble(speed);
+					final String valueText = valueFormatter.printDouble(speed);
 
 					return isShowValueUnit
 							? valueText + UI.SPACE + UI.UNIT_LABEL_SPEED
@@ -837,14 +884,14 @@ public class CalendarConfigManager {
 			@Override
 			void setValueFormat(final ValueFormat valueFormat) {
 
-				_valueFormatter = getNumberFormatter(valueFormat.name());
+				valueFormatter = getFormatter_Number(valueFormat.name());
 			}
 		};
 
 		// setup default formatter
-		weekFormatter.setValueFormat(weekFormatter.getDefaultFormat());
+		dataFormatter.setValueFormat(dataFormatter.getDefaultFormat());
 
-		return weekFormatter;
+		return dataFormatter;
 	}
 
 	/**
@@ -852,10 +899,10 @@ public class CalendarConfigManager {
 	 * 
 	 * @return
 	 */
-	private static WeekFormatter createFormatter_Week_Time_Moving() {
+	private static DataFormatter createFormatter_Time_Moving() {
 
-		final WeekFormatter weekFormatter = new WeekFormatter(
-				WeekFormatterID.TIME_MOVING,
+		final DataFormatter dataFormatter = new DataFormatter(
+				FormatterID.TIME_MOVING,
 				Messages.Calendar_Config_Value_MovingTime,
 				GraphColorManager.PREF_GRAPH_TIME) {
 
@@ -864,7 +911,7 @@ public class CalendarConfigManager {
 
 				if (data.recordingTime > 0) {
 
-					final String valueText = _valueFormatter.printLong(data.drivingTime);
+					final String valueText = valueFormatter.printLong(data.drivingTime);
 
 					return isShowValueUnit
 							? valueText + UI.SPACE + UI.UNIT_LABEL_TIME
@@ -892,14 +939,14 @@ public class CalendarConfigManager {
 			@Override
 			void setValueFormat(final ValueFormat valueFormat) {
 
-				_valueFormatter = getTimeFormatter(valueFormat.name());
+				valueFormatter = getFormatter_Time(valueFormat.name());
 			}
 		};
 
 		// setup default formatter
-		weekFormatter.setValueFormat(weekFormatter.getDefaultFormat());
+		dataFormatter.setValueFormat(dataFormatter.getDefaultFormat());
 
-		return weekFormatter;
+		return dataFormatter;
 	}
 
 	/**
@@ -907,10 +954,10 @@ public class CalendarConfigManager {
 	 * 
 	 * @return
 	 */
-	private static WeekFormatter createFormatter_Week_Time_Paused() {
+	private static DataFormatter createFormatter_Time_Paused() {
 
-		final WeekFormatter weekFormatter = new WeekFormatter(
-				WeekFormatterID.TIME_PAUSED,
+		final DataFormatter dataFormatter = new DataFormatter(
+				FormatterID.TIME_PAUSED,
 				Messages.Calendar_Config_Value_PausedTime,
 				GraphColorManager.PREF_GRAPH_TIME) {
 
@@ -919,7 +966,7 @@ public class CalendarConfigManager {
 
 				if (data.recordingTime > 0) {
 
-					final String valueText = _valueFormatter.printLong(data.recordingTime - data.drivingTime);
+					final String valueText = valueFormatter.printLong(data.recordingTime - data.drivingTime);
 
 					return isShowValueUnit
 							? valueText + UI.SPACE + UI.UNIT_LABEL_TIME
@@ -947,14 +994,14 @@ public class CalendarConfigManager {
 			@Override
 			void setValueFormat(final ValueFormat valueFormat) {
 
-				_valueFormatter = getTimeFormatter(valueFormat.name());
+				valueFormatter = getFormatter_Time(valueFormat.name());
 			}
 		};
 
 		// setup default formatter
-		weekFormatter.setValueFormat(weekFormatter.getDefaultFormat());
+		dataFormatter.setValueFormat(dataFormatter.getDefaultFormat());
 
-		return weekFormatter;
+		return dataFormatter;
 	}
 
 	/**
@@ -962,10 +1009,10 @@ public class CalendarConfigManager {
 	 * 
 	 * @return
 	 */
-	private static WeekFormatter createFormatter_Week_Time_Recording() {
+	private static DataFormatter createFormatter_Time_Recording() {
 
-		final WeekFormatter weekFormatter = new WeekFormatter(
-				WeekFormatterID.TIME_RECORDING,
+		final DataFormatter dataFormatter = new DataFormatter(
+				FormatterID.TIME_RECORDING,
 				Messages.Calendar_Config_Value_RecordingTime,
 				GraphColorManager.PREF_GRAPH_TIME) {
 
@@ -974,7 +1021,7 @@ public class CalendarConfigManager {
 
 				if (data.recordingTime > 0) {
 
-					final String valueText = _valueFormatter.printLong(data.recordingTime);
+					final String valueText = valueFormatter.printLong(data.recordingTime);
 
 					return isShowValueUnit
 							? valueText + UI.SPACE + UI.UNIT_LABEL_TIME
@@ -1003,14 +1050,91 @@ public class CalendarConfigManager {
 			@Override
 			void setValueFormat(final ValueFormat valueFormat) {
 
-				_valueFormatter = getTimeFormatter(valueFormat.name());
+				valueFormatter = getFormatter_Time(valueFormat.name());
 			}
 		};
 
 		// setup default formatter
-		weekFormatter.setValueFormat(weekFormatter.getDefaultFormat());
+		dataFormatter.setValueFormat(dataFormatter.getDefaultFormat());
 
-		return weekFormatter;
+		return dataFormatter;
+	}
+
+	/**
+	 * Description
+	 * 
+	 * @return
+	 */
+	private static DataFormatter createFormatter_TourDescription() {
+
+		final DataFormatter dataFormatter = new DataFormatter(
+				FormatterID.TOUR_DESCRIPTION,
+				Messages.Calendar_Config_Value_Description,
+				UI.EMPTY_STRING) {
+
+			@Override
+			String format(final CalendarTourData data, final ValueFormat valueFormat, final boolean isShowValueUnit) {
+
+				return data.tourDescription;
+			}
+
+			@Override
+			public ValueFormat getDefaultFormat() {
+				return ValueFormat.TEXT;
+			}
+
+			@Override
+			public ValueFormat[] getValueFormats() {
+
+				return new ValueFormat[] { ValueFormat.TEXT };
+			}
+
+			@Override
+			void setValueFormat(final ValueFormat valueFormat) {}
+		};
+
+		// setup default formatter
+		dataFormatter.setValueFormat(dataFormatter.getDefaultFormat());
+
+		return dataFormatter;
+	}
+
+	/**
+	 * Title
+	 * 
+	 * @return
+	 */
+	private static DataFormatter createFormatter_TourTitle() {
+
+		final DataFormatter dataFormatter = new DataFormatter(
+				FormatterID.TOUR_TITLE,
+				Messages.Calendar_Config_Value_Title,
+				UI.EMPTY_STRING) {
+
+			@Override
+			String format(final CalendarTourData data, final ValueFormat valueFormat, final boolean isShowValueUnit) {
+
+				return data.tourTitle;
+			}
+
+			@Override
+			public ValueFormat getDefaultFormat() {
+				return ValueFormat.TEXT;
+			}
+
+			@Override
+			public ValueFormat[] getValueFormats() {
+				return new ValueFormat[] { ValueFormat.TEXT };
+			}
+
+			@Override
+			void setValueFormat(final ValueFormat valueFormat) {}
+		};
+
+		// setup default formatter
+		dataFormatter.setValueFormat(dataFormatter.getDefaultFormat());
+
+		return dataFormatter;
 	}
 
 	private static void createXml_FromCalendarConfig(final CalendarConfig config, final IMemento xmlCalendars) {
@@ -1080,7 +1204,7 @@ public class CalendarConfigManager {
 			 */
 			final IMemento xmlAllWeekFormatter = xmlConfig.createChild(TAG_ALL_WEEK_FORMATTER);
 
-			for (final WeekFormatterData weekFormatterData : config.allWeekFormatterData) {
+			for (final FormatterData weekFormatterData : config.allWeekFormatterData) {
 
 				final IMemento xmlWeekFormatter = xmlAllWeekFormatter.createChild(TAG_WEEK_FORMATTER);
 
@@ -1198,7 +1322,7 @@ public class CalendarConfigManager {
 		return layerFile;
 	}
 
-	private static IValueFormatter getNumberFormatter(final String formatName) {
+	private static IValueFormatter getFormatter_Number(final String formatName) {
 
 		if (formatName.equals(ValueFormat.NUMBER_1_0.name())) {
 
@@ -1224,7 +1348,7 @@ public class CalendarConfigManager {
 		}
 	}
 
-	private static IValueFormatter getTimeFormatter(final String formatName) {
+	private static IValueFormatter getFormatter_Time(final String formatName) {
 
 		if (formatName.equals(ValueFormat.TIME_HH.name())) {
 
@@ -1353,27 +1477,27 @@ public class CalendarConfigManager {
 		final XMLMemento xmlAllWeekFormatter = (XMLMemento) xmlConfig.getChild(TAG_ALL_WEEK_FORMATTER);
 		if (xmlAllWeekFormatter != null) {
 
-			final ArrayList<WeekFormatterData> allWeekFormatterData = new ArrayList<>();
+			final ArrayList<FormatterData> allWeekFormatterData = new ArrayList<>();
 
 			for (final IMemento xmlWeekFormatterData : xmlAllWeekFormatter.getChildren()) {
 
 				final boolean isEnabled = Util.getXmlBoolean(xmlWeekFormatterData, ATTR_IS_SHOW_WEEK_LINE, true);
 
-				final WeekFormatterID id = (WeekFormatterID) Util.getXmlEnum(
+				final FormatterID id = (FormatterID) Util.getXmlEnum(
 						xmlWeekFormatterData,
 						ATTR_WEEK_FORMATTER_ID,
-						WeekFormatterID.EMPTY);
+						FormatterID.EMPTY);
 
 				final ValueFormat valueFormat = (ValueFormat) Util.getXmlEnum(
 						xmlWeekFormatterData,
 						ATTR_WEEK_FORMATTER_VALUE_FORMAT,
 						ValueFormat.DUMMY_VALUE);
 
-				allWeekFormatterData.add(new WeekFormatterData(isEnabled, id, valueFormat));
+				allWeekFormatterData.add(new FormatterData(isEnabled, id, valueFormat));
 			}
 
 			config.allWeekFormatterData = allWeekFormatterData.toArray(
-					new WeekFormatterData[allWeekFormatterData.size()]);
+					new FormatterData[allWeekFormatterData.size()]);
 		}
 	}
 
@@ -1520,7 +1644,7 @@ public class CalendarConfigManager {
 	 */
 	static void updateFormatterValueFormat() {
 
-		for (final WeekFormatterData weekFormatterData : _activeCalendarConfig.allWeekFormatterData) {
+		for (final FormatterData weekFormatterData : _activeCalendarConfig.allWeekFormatterData) {
 
 			if (!weekFormatterData.isEnabled) {
 				continue;
@@ -1531,31 +1655,31 @@ public class CalendarConfigManager {
 			switch (weekFormatterData.id) {
 
 			case ALTITUDE:
-				_weekFormatter_Altitude.setValueFormat(valueFormat);
+				_dataFormatter_Altitude.setValueFormat(valueFormat);
 				break;
 
 			case DISTANCE:
-				_weekFormatter_Distance.setValueFormat(valueFormat);
+				_dataFormatter_Distance.setValueFormat(valueFormat);
 				break;
 
 			case PACE:
-				_weekFormatter_Pace.setValueFormat(valueFormat);
+				_dataFormatter_Pace.setValueFormat(valueFormat);
 				break;
 
 			case SPEED:
-				_weekFormatter_Speed.setValueFormat(valueFormat);
+				_dataFormatter_Speed.setValueFormat(valueFormat);
 				break;
 
 			case TIME_MOVING:
-				_weekFormatter_Time_Moving.setValueFormat(valueFormat);
+				_dataFormatter_Time_Moving.setValueFormat(valueFormat);
 				break;
 
 			case TIME_PAUSED:
-				_weekFormatter_Time_Paused.setValueFormat(valueFormat);
+				_dataFormatter_Time_Paused.setValueFormat(valueFormat);
 				break;
 
 			case TIME_RECORDING:
-				_weekFormatter_Time_Recording.setValueFormat(valueFormat);
+				_dataFormatter_Time_Recording.setValueFormat(valueFormat);
 				break;
 
 			default:

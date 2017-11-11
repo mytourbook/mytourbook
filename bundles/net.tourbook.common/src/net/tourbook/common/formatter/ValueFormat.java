@@ -20,6 +20,8 @@ public enum ValueFormat {
 	DEFAULT, //
 	DUMMY_VALUE, //
 
+	TEXT, //
+
 	PACE_MM_SS, //
 
 	NUMBER_1_0, //

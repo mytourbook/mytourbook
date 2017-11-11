@@ -66,8 +66,10 @@ public class CalendarConfig {
 	int		 				tourBorderWidth				= CalendarConfigManager.DEFAULT_TOUR_BORDER_WIDTH;
 
 	// tour content
+	FormatterData[]			allTourFormatterData		= CalendarConfigManager.DEFAULT_TOUR_FORMATTER_DATA;
 	boolean 				isShowTourContent			= true;
 	boolean					isShowTourValueUnit			= true;
+	int 					numTourValueColumns			= CalendarConfigManager.DEFAULT_TOUR_VALUE_COLUMNS;
 	                        
 	// year columns
 	boolean 				isShowYearColumns			= true;
@@ -81,7 +83,7 @@ public class CalendarConfig {
 	boolean					useDraggedScrolling			= false;
 
 	// week summary column
-	WeekFormatterData[]		allWeekFormatterData		= CalendarConfigManager.DEFAULT_WEEK_FORMATTER_DATA;
+	FormatterData[]			allWeekFormatterData		= CalendarConfigManager.DEFAULT_WEEK_FORMATTER_DATA;
 	boolean					isShowSummaryColumn			= true;
 	boolean 				isShowWeekValueUnit			= true;
 	int						summaryColumnWidth			= CalendarConfigManager.DEFAULT_SUMMARY_COLUMN_WIDTH;

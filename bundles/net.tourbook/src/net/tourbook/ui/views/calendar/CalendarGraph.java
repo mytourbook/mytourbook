@@ -1902,13 +1902,13 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		gc.setClipping(weekRec);
 		gc.setBackground(_white);
 
-		for (final WeekFormatterData formatterData : _currentConfig.allWeekFormatterData) {
+		for (final FormatterData formatterData : _currentConfig.allWeekFormatterData) {
 
-			if (formatterData.isEnabled && formatterData.id != WeekFormatterID.EMPTY) {
+			if (formatterData.isEnabled && formatterData.id != FormatterID.EMPTY) {
 
 				// a valid formatter is set
 
-				final WeekFormatter formatter = getFormatter(formatterData.id);
+				final DataFormatter formatter = getFormatter(formatterData.id);
 
 				gc.setForeground(_colorCache.getColor(getColor_WeekValue(formatter).hashCode()));
 
@@ -2078,7 +2078,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 	}
 
-	private RGB getColor_WeekValue(final WeekFormatter formatter) {
+	private RGB getColor_WeekValue(final DataFormatter formatter) {
 
 		final CalendarColor weekValueColor = _currentConfig.weekValueColor;
 
@@ -2208,16 +2208,16 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		return _fontYearHeader;
 	}
 
-	private WeekFormatter getFormatter(final WeekFormatterID id) {
+	private DataFormatter getFormatter(final FormatterID id) {
 
-		for (final WeekFormatter formatter : CalendarConfigManager.allWeekFormatter) {
+		for (final DataFormatter formatter : CalendarConfigManager.allWeekFormatter) {
 
 			if (id == formatter.id) {
 				return formatter;
 			}
 		}
 
-		return CalendarConfigManager.DEFAULT_WEEK_SUMMARY_FORMATTER;
+		return CalendarConfigManager.DEFAULT_EMPTY_FORMATTER;
 	}
 
 	/**

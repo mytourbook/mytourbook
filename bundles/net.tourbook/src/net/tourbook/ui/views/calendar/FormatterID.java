@@ -15,32 +15,21 @@
  *******************************************************************************/
 package net.tourbook.ui.views.calendar;
 
-import net.tourbook.common.formatter.ValueFormat;
+public enum FormatterID {
 
-public class WeekFormatterData {
+	EMPTY, //
 
-	boolean			isEnabled;
+	TOUR_TITLE, //
+	TOUR_DESCRIPTION, //
 
-	WeekFormatterID	id;
-	ValueFormat		valueFormat;
+	ALTITUDE, //
+	DISTANCE, //
 
-	WeekFormatterData(final boolean isEnabled, final WeekFormatterID id, final ValueFormat valueFormat) {
+	PACE, //
+	SPEED, //
 
-		this.isEnabled = isEnabled;
-
-		this.id = id;
-		this.valueFormat = valueFormat;
-	}
-
-	@Override
-	public String toString() {
-		return "WeekFormatterData ["
-
-				+ "isEnabled=" + isEnabled + ", "
-				+ "id=" + id + ", "
-				+ "valueFormat=" + valueFormat
-
-				+ "]";
-	}
+	TIME_MOVING, //
+	TIME_RECORDING, //
+	TIME_PAUSED, //
 
 }
