@@ -1663,6 +1663,7 @@ public class Messages extends NLS {
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowTourContent;
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowTourValueUnit;
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowWeekValueUnit;
+	public static String		Slideout_CalendarOptions_Checkbox_IsShowWrapTourText;
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowYearColumns;
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowYearColumns_Tooltip;
 	public static String		Slideout_CalendarOptions_Checkbox_IsTinyLayout;
@@ -1698,6 +1699,7 @@ public class Messages extends NLS {
 	public static String		Slideout_CalendarOptions_Label_TourBackground;
 	public static String		Slideout_CalendarOptions_Label_TourBorder;
 	public static String		Slideout_CalendarOptions_Label_TourContentFont;
+	public static String		Slideout_CalendarOptions_Label_TourTitleFont;
 	public static String		Slideout_CalendarOptions_Label_ValueColumns;
 	public static String		Slideout_CalendarOptions_Label_ValueColumns_Tooltip;
 	public static String		Slideout_CalendarOptions_Label_WeekValueColor;

@@ -162,6 +162,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	private int									_fontHeight_DateColumn;
 	private int									_fontHeight_DayContent;
 	private int									_fontHeight_DayHeader;
+	private int									_fontHeight_TourTitle;
 	private int									_fontHeight_WeekValue;
 	private int									_fontHeight_YearHeader;
 	//
@@ -216,6 +217,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	private Font								_fontDateColumn;
 	private Font								_fontDayContent;
 	private Font								_fontDayHeader;
+	private Font								_fontTourTitle;
 	private Font								_fontWeekValue;
 	private Font								_fontYearHeader;
 	//
@@ -880,6 +882,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		_fontDateColumn = UI.disposeResource(_fontDateColumn);
 		_fontDayContent = UI.disposeResource(_fontDayContent);
 		_fontDayHeader = UI.disposeResource(_fontDayHeader);
+		_fontTourTitle = UI.disposeResource(_fontTourTitle);
 		_fontWeekValue = UI.disposeResource(_fontWeekValue);
 		_fontYearHeader = UI.disposeResource(_fontYearHeader);
 	}
@@ -1042,7 +1045,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		int summaryColumnWidth = 0;
 		if (_currentConfig.isShowSummaryColumn) {
-			summaryColumnWidth = _currentConfig.summaryColumnWidth;// * _defaultFontAverageCharWidth;
+			summaryColumnWidth = _currentConfig.weekColumnWidth;// * _defaultFontAverageCharWidth;
 		}
 
 		final int columnSpacing = _currentConfig.yearColumnsSpacing;
@@ -1241,7 +1244,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 						} else if (isCalendarDataAvailable) {
 
-							dayDateForegroundColor = getColor_ForDayContent(calendarData[0]);
+							dayDateForegroundColor = getColor_TourContent(
+									calendarData[0],
+									_currentConfig.tourContentColor);
 
 						} else {
 
@@ -1572,39 +1577,103 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 	private void drawDay_TourConent(final GC gc,
 									final Rectangle tourRect,
-									final CalendarTourData data) {
+									final CalendarTourData calendarTourData) {
 
 		if (!_currentConfig.isShowTourContent) {
 			return;
 		}
 
-		final Color fg = getColor_ForDayContent(data);
+		final Color color_TourContent = getColor_TourContent(calendarTourData, _currentConfig.tourContentColor);
 
-		gc.setForeground(fg);
+		gc.setForeground(color_TourContent);
 		gc.setClipping(tourRect.x, tourRect.y, tourRect.width, tourRect.height);
 
-		final String tourTitle = data.tourTitle;
-		final String tourDescription = data.tourDescription;
-		final String infoText = tourTitle == null //
-				? tourDescription == null //
-						? UI.EMPTY_STRING //
-						: tourDescription
-				: tourTitle;
+		int valuePosY = tourRect.y + 1;
+		final int posYBottom = tourRect.y + tourRect.height;
 
-		if (infoText.length() > 0) {
+		final int valueColumns = _currentConfig.tourValueColumns;
 
-			final int topBorder = 0;
-			final int leftBorder = 2;
+		for (final FormatterData formatterData : _currentConfig.allTourFormatterData) {
 
-			_textWrapPainter.drawText(
-					gc,
-					infoText,
-					tourRect.x + leftBorder,
-					tourRect.y + topBorder,
-					tourRect.width - leftBorder,
-					tourRect.height - topBorder,
-					_fontHeight_DayContent,
-					_dayDateLabelRect);
+			if (formatterData.isEnabled == false || formatterData.id == FormatterID.EMPTY) {
+				// formatter is not valid
+				continue;
+			}
+
+			final int maxValueHeight = posYBottom - valuePosY;
+			if (maxValueHeight < 1) {
+				// there is no space any more to draw text
+				break;
+			}
+
+			final DataFormatter formatter = getValueFormatter(
+					formatterData.id,
+					CalendarConfigManager.allTourContentFormatter);
+
+			final String valueText = formatter.format(
+					calendarTourData,
+					formatterData.valueFormat,
+					_currentConfig.isShowTourValueUnit);
+
+			if (valueText != null && valueText.length() > 0) {
+
+				final boolean isTourTitle = formatter.id == FormatterID.TOUR_TITLE;
+				final boolean isTourDescription = formatter.id == FormatterID.TOUR_DESCRIPTION;
+				final boolean isUseColumns = !isTourTitle && !isTourDescription && valueColumns > 1;
+
+				final int fontHeight = isTourTitle
+						? _fontHeight_TourTitle
+						: _fontHeight_DayContent;
+
+				if (isTourTitle) {
+					gc.setFont(getFont_TourTitle());
+					gc.setForeground(getColor_TourContent(calendarTourData, _currentConfig.tourTitleColor));
+				}
+
+				int valuePosX;
+				int valueWidth;
+
+				if (isUseColumns) {
+
+					// complicated formatting with >1 columns
+
+					valuePosX = tourRect.x;
+					valueWidth = tourRect.width;
+
+				} else {
+
+					// easy formatting with 1 column
+
+					valuePosX = tourRect.x;
+					valueWidth = tourRect.width;
+				}
+
+				_textWrapPainter.drawText(
+						gc,
+						valueText,
+
+						valuePosX,
+						valuePosY,
+
+						valueWidth,
+						maxValueHeight,
+
+						fontHeight,
+						_dayDateLabelRect);
+
+				if (_textWrapPainter.isPainted()) {
+
+					// move to the next line
+
+					valuePosY = _textWrapPainter.getLastPaintedY() + fontHeight;
+				}
+
+				// reset title font/color -> content font/color
+				if (isTourTitle) {
+					gc.setFont(getFont_DayContent());
+					gc.setForeground(color_TourContent);
+				}
+			}
 		}
 
 		gc.setClipping(_nullRec);
@@ -1694,16 +1763,19 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 	private void drawHovered_Tour(final GC gc, final CalendarTourData data, final Rectangle rec) {
 
-		gc.setAlpha(0xd0);
+		gc.setAlpha(0x30);
+
 		gc.setBackground(_colorCache.getColor(_rgbBright.get(data.typeColorIndex).hashCode()));
 		gc.setForeground(_colorCache.getColor(_rgbDark.get(data.typeColorIndex).hashCode()));
 		gc.fillGradientRectangle(rec.x - 4, rec.y - 4, rec.width + 9, rec.height + 9, false);
+
 		gc.setForeground(_colorCache.getColor(_rgbLine.get(data.typeColorIndex).hashCode()));
 		gc.drawRoundRectangle(rec.x - 5, rec.y - 5, rec.width + 10, rec.height + 10, 6, 6);
+
 		gc.setAlpha(0xFF);
 
 		// focus is 1 pixel larger than tour rectangle
-		final Rectangle r = new Rectangle(rec.x + 1, rec.y + 1, rec.width - 2, rec.height - 2);
+//		final Rectangle r = new Rectangle(rec.x + 1, rec.y + 1, rec.width - 2, rec.height - 2);
 
 		// only fill in text if the tour rectangle has a reasonable size
 //		Color color;
@@ -1713,7 +1785,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 //			color = _colorCache.getColor(_rgbText.get(data.typeColorIndex).hashCode());
 //		}
 
-		drawDay_TourConent(gc, r, data);
+//		drawDay_TourConent(gc, r, data);
 
 	}
 
@@ -1889,11 +1961,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		final int posXRight = weekRec.x + weekRec.width - 1;
 		final int posXLeft = weekRec.x + 2;
 
-		int posX;
 		int posY = weekRec.y + 1;
-		final boolean doClip = true;
 
-		Point extent;
 		final int maxLength = weekRec.width - 2;
 
 		final Font normalFont = gc.getFont();
@@ -1908,7 +1977,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 				// a valid formatter is set
 
-				final DataFormatter formatter = getFormatter(formatterData.id);
+				final DataFormatter formatter = getValueFormatter(
+						formatterData.id,
+						CalendarConfigManager.allWeekFormatter);
 
 				gc.setForeground(_colorCache.getColor(getColor_WeekValue(formatter).hashCode()));
 
@@ -1919,13 +1990,13 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 				if (text.length() > 0 && posY < (weekRec.y + weekRec.height)) {
 
-					extent = gc.stringExtent(text);
-					posX = posXRight - extent.x;
+					final Point textSize = gc.stringExtent(text);
+					int posX = posXRight - textSize.x;
 
-					if (extent.x > maxLength) {
+					if (textSize.x > maxLength) {
 
 						// remove unit when not enough horizontal space is available
-						if (doClip && text.contains(UI.SPACE1)) {
+						if (text.contains(UI.SPACE1)) {
 							text = text.substring(0, text.lastIndexOf(UI.SPACE));
 							posX = posXRight - gc.stringExtent(text).x;
 						} else {
@@ -2037,11 +2108,11 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 	}
 
-	private Color getColor_ForDayContent(final CalendarTourData data) {
+	private Color getColor_TourContent(final CalendarTourData data, final CalendarColor calendarColor) {
 
 		final int typeColorIndex = data.typeColorIndex;
 
-		switch (_currentConfig.dayContentColor) {
+		switch (calendarColor) {
 
 		case BRIGHT:
 			return _colorCache.getColor(_rgbBright.get(typeColorIndex));
@@ -2136,7 +2207,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		if (_fontDayContent == null) {
 
-			final FontData fontData = CalendarConfigManager.getActiveCalendarConfig().dayContentFont;
+			final FontData fontData = CalendarConfigManager.getActiveCalendarConfig().tourContentFont;
 
 			_fontDayContent = new Font(_display, fontData);
 
@@ -2168,6 +2239,25 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 
 		return _fontDayHeader;
+	}
+
+	private Font getFont_TourTitle() {
+
+		if (_fontTourTitle == null) {
+
+			final FontData fontData = CalendarConfigManager.getActiveCalendarConfig().tourTitleFont;
+
+			_fontTourTitle = new Font(_display, fontData);
+
+			final GC gc = new GC(_display);
+			{
+				gc.setFont(_fontTourTitle);
+				_fontHeight_TourTitle = gc.getFontMetrics().getHeight();
+			}
+			gc.dispose();
+		}
+
+		return _fontTourTitle;
 	}
 
 	private Font getFont_WeekValue() {
@@ -2206,18 +2296,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 
 		return _fontYearHeader;
-	}
-
-	private DataFormatter getFormatter(final FormatterID id) {
-
-		for (final DataFormatter formatter : CalendarConfigManager.allWeekFormatter) {
-
-			if (id == formatter.id) {
-				return formatter;
-			}
-		}
-
-		return CalendarConfigManager.DEFAULT_EMPTY_FORMATTER;
 	}
 
 	/**
@@ -2309,6 +2387,18 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 
 		return headerFormatter;
+	}
+
+	private DataFormatter getValueFormatter(final FormatterID id, final DataFormatter[] allFormatter) {
+
+		for (final DataFormatter formatter : allFormatter) {
+
+			if (id == formatter.id) {
+				return formatter;
+			}
+		}
+
+		return CalendarConfigManager.DEFAULT_EMPTY_FORMATTER;
 	}
 
 	public void gotoDate(final LocalDate date) {

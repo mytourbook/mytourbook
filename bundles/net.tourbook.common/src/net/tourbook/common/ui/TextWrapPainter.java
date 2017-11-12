@@ -37,6 +37,7 @@ public class TextWrapPainter {
 	private String			_tabText;
 
 	private boolean			_is1stPainted;
+	private int				_lastPaintedY;
 
 	{
 		/*
@@ -132,6 +133,23 @@ public class TextWrapPainter {
 
 		// print final buffer
 		printWordBuffer(gc, noOverlapRect);
+
+	}
+
+	/**
+	 * @return Returns the y position of the last painted text when {@link #isPainted} is
+	 *         <code>true</code>.
+	 */
+	public int getLastPaintedY() {
+		return _lastPaintedY;
+	}
+
+	/**
+	 * @return Returns <code>true</code> when the last {@link #drawText} has painted text, otherwise
+	 *         <code>false</code>.
+	 */
+	public boolean isPainted() {
+		return _is1stPainted;
 	}
 
 	private void newline() {
@@ -146,6 +164,7 @@ public class TextWrapPainter {
 
 			final String word = _wordbuffer.toString();
 			final Point wordExtent = gc.stringExtent(word);
+
 			final int devWordWidth = wordExtent.x;
 			final int devWordHeight = wordExtent.y;
 
@@ -176,6 +195,8 @@ public class TextWrapPainter {
 			}
 
 			gc.drawString(word, _devX, _devY, true);
+
+			_lastPaintedY = _devY;
 
 			_is1stPainted = true;
 
