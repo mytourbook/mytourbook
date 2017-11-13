@@ -39,7 +39,7 @@ public class TextWrapPainter {
 	private boolean			_is1stPainted;
 	private int				_lastPaintedY;
 
-	private boolean			_isWrapText;
+	private boolean			_isTruncateText;
 
 	{
 		/*
@@ -68,7 +68,7 @@ public class TextWrapPainter {
 	 *            Viewport height
 	 * @param fontHeight
 	 * @param noOverlapRect
-	 * @param isWrapText
+	 * @param isTruncateText
 	 */
 	public void drawText(	final GC gc,
 							final String textToPrint,
@@ -78,7 +78,7 @@ public class TextWrapPainter {
 							final int viewportHeight,
 							final int fontHeight,
 							final Rectangle noOverlapRect,
-							final boolean isWrapText) {
+							final boolean isTruncateText) {
 
 		_tabWidth = gc.stringExtent(_tabText).x;
 		_lineHeight = fontHeight;
@@ -87,7 +87,7 @@ public class TextWrapPainter {
 		_devY = devY;
 
 		_is1stPainted = false;
-		_isWrapText = isWrapText;
+		_isTruncateText = isTruncateText;
 
 		_devRightMargin = devX + viewportWidth;
 		final int bottom = devY + viewportHeight;
@@ -113,10 +113,10 @@ public class TextWrapPainter {
 
 					printWordBuffer(gc, noOverlapRect);
 
-					if (_isWrapText) {
-						newline();
-					} else {
+					if (_isTruncateText) {
 						return;
+					} else {
+						newline();
 					}
 
 					if (_devY > bottom) {
@@ -189,10 +189,10 @@ public class TextWrapPainter {
 
 					if (wordRect.intersects(noOverlapRect)) {
 
-						if (_isWrapText) {
-							newline();
-						} else {
+						if (_isTruncateText) {
 							return;
+						} else {
+							newline();
 						}
 					}
 				}
@@ -205,10 +205,10 @@ public class TextWrapPainter {
 				if (_is1stPainted) {
 
 					// word doesn't fit on current line, so wrap
-					if (_isWrapText) {
-						newline();
-					} else {
+					if (_isTruncateText) {
 						return;
+					} else {
+						newline();
 					}
 				}
 			}

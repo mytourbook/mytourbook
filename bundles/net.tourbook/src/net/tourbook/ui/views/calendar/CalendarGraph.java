@@ -1329,6 +1329,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 							final CalendarTourData[] allCalendarTourData,
 							final Rectangle dayRect) {
 
+		// setup font to set the font height !!!
+		getFont_TourTitle();
+
 		gc.setFont(getFont_DayContent());
 
 		final int numTours = allCalendarTourData.length;
@@ -1591,17 +1594,25 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		int valuePosY = tourRect.y + 1;
 		final int posYBottom = tourRect.y + tourRect.height;
 
-		final int valueColumns = _currentConfig.tourValueColumns;
+		final int numValueColumns = _currentConfig.tourValueColumns;
+		final int columnWidth = tourRect.width / numValueColumns;
+		int currentColumn = 0;
+
+		boolean isTextValue = false;
+		int lastPaintedY = 0;
+		int lastHeight = -1;
 
 		for (final FormatterData formatterData : _currentConfig.allTourFormatterData) {
 
 			if (formatterData.isEnabled == false || formatterData.id == FormatterID.EMPTY) {
+
 				// formatter is not valid
 				continue;
 			}
 
 			final int maxValueHeight = posYBottom - valuePosY;
 			if (maxValueHeight < 1) {
+
 				// there is no space any more to draw text
 				break;
 			}
@@ -1619,7 +1630,20 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 				final boolean isTourTitle = formatter.id == FormatterID.TOUR_TITLE;
 				final boolean isTourDescription = formatter.id == FormatterID.TOUR_DESCRIPTION;
-				final boolean isUseColumns = !isTourTitle && !isTourDescription && valueColumns > 1;
+				final boolean isUseColumns = !isTourTitle && !isTourDescription && numValueColumns > 1;
+
+				final boolean wasTextValue = isTextValue;
+				isTextValue = isTourTitle || isTourDescription;
+
+				// skip 1st painted line
+				if (lastHeight > -1) {
+
+					// adjust y position accoring which was painted before and which is painted now
+
+					if (isTextValue && wasTextValue == false) {
+						valuePosY = lastPaintedY + lastHeight;
+					}
+				}
 
 				final int fontHeight = isTourTitle
 						? _fontHeight_TourTitle
@@ -1637,8 +1661,10 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 					// complicated formatting with >1 columns
 
-					valuePosX = tourRect.x;
-					valueWidth = tourRect.width;
+					final int columnOffset = currentColumn * columnWidth;
+
+					valueWidth = columnWidth;
+					valuePosX = tourRect.x + columnOffset;
 
 				} else {
 
@@ -1660,13 +1686,29 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 						fontHeight,
 						_dayDateLabelRect,
-						_currentConfig.isWrapTourText);
+						_currentConfig.isTruncateTourText);
 
 				if (_textWrapPainter.isPainted()) {
 
-					// move to the next line
+					lastPaintedY = _textWrapPainter.getLastPaintedY();
+					lastHeight = fontHeight;
 
-					valuePosY = _textWrapPainter.getLastPaintedY() + fontHeight;
+					if (isUseColumns == false || currentColumn >= numValueColumns - 1) {
+
+						// move to the next line
+
+						valuePosY = lastPaintedY + lastHeight;
+					}
+
+					// advance to the next column
+					if (isUseColumns) {
+						currentColumn = currentColumn >= numValueColumns - 1 ? 0 : currentColumn + 1;
+					}
+
+					// reset columns (start from 1st column) after title or description is painted
+					if (isTextValue) {
+						currentColumn = 0;
+					}
 				}
 
 				// reset title font/color -> content font/color

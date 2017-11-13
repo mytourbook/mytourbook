@@ -110,7 +110,7 @@ public class CalendarConfigManager {
 	private static final String				ATTR_IS_SHOW_VALUE						= "isShowValue";					//$NON-NLS-1$
 	private static final String				ATTR_IS_SHOW_WEEK_VALUE_UNIT			= "isShowWeekValueUnit";			//$NON-NLS-1$
 	private static final String				ATTR_IS_TOGGLE_MONTH_COLOR				= "isToggleMonthColor";				//$NON-NLS-1$
-	private static final String				ATTR_IS_WRAP_TOUR_TEXT					= "isWrapTourText";					//$NON-NLS-1$
+	private static final String				ATTR_IS_TRUNCATE_TOUR_TEXT				= "isTruncateTourText";				//$NON-NLS-1$
 	private static final String				ATTR_DATE_COLUMN_CONTENT				= "dateColumnContent";				//$NON-NLS-1$
 	private static final String				ATTR_DATE_COLUMN_FONT					= "dateColumnFont";					//$NON-NLS-1$
 	private static final String				ATTR_DATE_COLUMN_WIDTH					= "dateColumnWidth";				//$NON-NLS-1$
@@ -176,7 +176,7 @@ public class CalendarConfigManager {
 	static final int						YEAR_COLUMNS_MIN						= 1;
 	static final int						YEAR_COLUMNS_MAX						= 100;
 	static final int						CALENDAR_COLUMNS_SPACE_MIN				= 0;
-	static final int						CALENDAR_COLUMNS_SPACE_MAX				= 100;
+	static final int						CALENDAR_COLUMNS_SPACE_MAX				= 300;
 	static final int						WEEK_HEIGHT_MIN							= 1;
 	static final int						WEEK_HEIGHT_MAX							= 500;
 
@@ -1219,7 +1219,7 @@ public class CalendarConfigManager {
 			// tour content
 			xmlConfig.putBoolean(		ATTR_IS_SHOW_TOUR_CONTENT,				config.isShowTourContent);
 			xmlConfig.putBoolean(		ATTR_IS_SHOW_TOUR_VALUE_UNIT,			config.isShowTourValueUnit);
-			xmlConfig.putBoolean(		ATTR_IS_WRAP_TOUR_TEXT,					config.isWrapTourText);
+			xmlConfig.putBoolean(		ATTR_IS_TRUNCATE_TOUR_TEXT,				config.isTruncateTourText);
 			xmlConfig.putInteger(		ATTR_TOUR_VALUE_COLUMNS, 				config.tourValueColumns);
 			Util.setXmlEnum(xmlConfig,	ATTR_TOUR_CONTENT_COLOR, 				config.tourContentColor);
 			Util.setXmlFont(xmlConfig,	ATTR_TOUR_CONTENT_FONT, 				config.tourContentFont);
@@ -1511,7 +1511,7 @@ public class CalendarConfigManager {
 		// tour content
 		config.isShowTourContent			= Util.getXmlBoolean(xmlConfig, 					ATTR_IS_SHOW_TOUR_CONTENT,		true);
 		config.isShowTourValueUnit			= Util.getXmlBoolean(xmlConfig, 					ATTR_IS_SHOW_TOUR_VALUE_UNIT,	true);
-		config.isWrapTourText				= Util.getXmlBoolean(xmlConfig, 					ATTR_IS_WRAP_TOUR_TEXT,			true);
+		config.isTruncateTourText			= Util.getXmlBoolean(xmlConfig, 					ATTR_IS_TRUNCATE_TOUR_TEXT,			true);
 		config.tourContentColor				= (CalendarColor) Util.getXmlEnum(xmlConfig,		ATTR_TOUR_CONTENT_COLOR,		DEFAULT_DAY_CONTENT_COLOR);
 		config.tourContentFont 				= Util.getXmlFont(xmlConfig, 						ATTR_TOUR_CONTENT_FONT, 		defaultFont.getFontData()[0]);
 		config.tourTitleColor				= (CalendarColor) Util.getXmlEnum(xmlConfig,		ATTR_TOUR_TITLE_COLOR,			DEFAULT_DAY_CONTENT_COLOR);

@@ -1666,7 +1666,7 @@ public class Messages extends NLS {
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowYearColumns;
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowYearColumns_Tooltip;
 	public static String		Slideout_CalendarOptions_Checkbox_IsTinyLayout;
-	public static String		Slideout_CalendarOptions_Checkbox_IsWrapTourText;
+	public static String		Slideout_CalendarOptions_Checkbox_IsTruncateTourText;
 	public static String		Slideout_CalendarOptions_Checkbox_UseDraggedScrolling;
 	public static String		Slideout_CalendarOptions_Checkbox_UseDraggedScrolling_Tooltip;
 	public static String		Slideout_CalendarOptions_Group_DateColumn;

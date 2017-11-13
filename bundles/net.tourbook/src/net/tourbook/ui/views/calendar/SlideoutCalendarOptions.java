@@ -119,7 +119,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	private Button					_chkIsShowTourValueUnit;
 	private Button					_chkIsShowWeekValueUnit;
 	private Button					_chkIsShowYearColumns;
-	private Button					_chkIsWrapTourText;
+	private Button					_chkIsTruncateTourText;
 	private Button					_chkUseDraggedScrolling;
 	//
 	private Button[]				_chkTour_AllIsShowLines;
@@ -1014,14 +1014,14 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				 */
 
 				// checkbox
-				_chkIsWrapTourText = new Button(container, SWT.CHECK);
-				_chkIsWrapTourText.setText(Messages.Slideout_CalendarOptions_Checkbox_IsWrapTourText);
-				_chkIsWrapTourText.addSelectionListener(_defaultSelectionListener);
+				_chkIsTruncateTourText = new Button(container, SWT.CHECK);
+				_chkIsTruncateTourText.setText(Messages.Slideout_CalendarOptions_Checkbox_IsTruncateTourText);
+				_chkIsTruncateTourText.addSelectionListener(_defaultSelectionListener);
 				GridDataFactory
 						.fillDefaults()//
 						.align(SWT.FILL, SWT.BEGINNING)
 						.span(2, 1)
-						.applyTo(_chkIsWrapTourText);
+						.applyTo(_chkIsTruncateTourText);
 			}
 			{
 				/*
@@ -1040,7 +1040,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				// spinner
 				_spinnerTour_NumValueColumns = new Spinner(container, SWT.BORDER);
 				_spinnerTour_NumValueColumns.setMinimum(1);
-				_spinnerTour_NumValueColumns.setMaximum(3);
+				_spinnerTour_NumValueColumns.setMaximum(5);
 				_spinnerTour_NumValueColumns.addSelectionListener(_defaultSelectionListener);
 				_spinnerTour_NumValueColumns.addMouseWheelListener(_defaultMouseWheelListener);
 			}
@@ -1462,7 +1462,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 		// tour content
 		_chkIsShowTourValueUnit.setEnabled(isShowTourContent);
-		_chkIsWrapTourText.setEnabled(isShowTourContent);
+		_chkIsTruncateTourText.setEnabled(isShowTourContent);
 		_comboTour_ContentColor.setEnabled(isShowTourContent);
 		_comboTour_TitleColor.setEnabled(isShowTourContent);
 		_fontEditorTourContent.setEnabled(isShowTourContent);
@@ -2311,7 +2311,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			// tour content
 			_chkIsShowTourContent.setSelection(config.isShowTourContent);
 			_chkIsShowTourValueUnit.setSelection(config.isShowTourValueUnit);
-			_chkIsWrapTourText.setSelection(config.isWrapTourText);
+			_chkIsTruncateTourText.setSelection(config.isTruncateTourText);
 			_comboTour_ContentColor.select(getDayContentColorIndex(config.tourContentColor));
 			_comboTour_TitleColor.select(getDayContentColorIndex(config.tourTitleColor));
 			_fontEditorTourContent.setSelection(config.tourContentFont);
@@ -2398,7 +2398,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		// tour content
 		config.isShowTourContent = _chkIsShowTourContent.getSelection();
 		config.isShowTourValueUnit = _chkIsShowTourValueUnit.getSelection();
-		config.isWrapTourText = _chkIsWrapTourText.getSelection();
+		config.isTruncateTourText = _chkIsTruncateTourText.getSelection();
 		config.tourValueColumns = _spinnerTour_NumValueColumns.getSelection();
 		config.tourContentColor = getSelectedTourContentColor(_comboTour_ContentColor).dayContentColor;
 		config.tourContentFont = _fontEditorTourContent.getSelection();

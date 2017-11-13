@@ -77,7 +77,7 @@ public class CalendarConfig {
 	// tour content
 	boolean 				isShowTourContent			= true;
 	boolean					isShowTourValueUnit			= true;
-	boolean					isWrapTourText				= true;
+	boolean					isTruncateTourText				= true;
 	FormatterData[]			allTourFormatterData		= CalendarConfigManager.DEFAULT_TOUR_FORMATTER_DATA;
 	CalendarColor			tourContentColor			= CalendarConfigManager.DEFAULT_DAY_CONTENT_COLOR;
 	FontData				tourContentFont				= defaultFont.getFontData()[0];
