@@ -1015,7 +1015,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 				// checkbox
 				_chkIsWrapTourText = new Button(container, SWT.CHECK);
-				_chkIsWrapTourText.setText(Messages.Slideout_CalendarOptions_Checkbox_IsShowWrapTourText);
+				_chkIsWrapTourText.setText(Messages.Slideout_CalendarOptions_Checkbox_IsWrapTourText);
 				_chkIsWrapTourText.addSelectionListener(_defaultSelectionListener);
 				GridDataFactory
 						.fillDefaults()//

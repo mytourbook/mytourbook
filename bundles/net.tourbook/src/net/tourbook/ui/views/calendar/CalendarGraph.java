@@ -1659,7 +1659,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 						maxValueHeight,
 
 						fontHeight,
-						_dayDateLabelRect);
+						_dayDateLabelRect,
+						_currentConfig.isWrapTourText);
 
 				if (_textWrapPainter.isPainted()) {
 
