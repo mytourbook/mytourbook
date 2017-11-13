@@ -15,10 +15,10 @@
  *******************************************************************************/
 package net.tourbook.ui.views.calendar;
 
-import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.widgets.Display;
 
 public class CalendarConfig {
 
@@ -26,9 +26,6 @@ public class CalendarConfig {
 	 * Set default values also here to ensure that a valid value is set. A default value would not
 	 * be set when an xml tag is not available.
 	 */
-
-	// !!! getFontData() MUST be created for EVERY font otherwise they use all the SAME font !!!
-	final Font			defaultFont					= JFaceResources.getFontRegistry().defaultFont();
 
 // SET_FORMATTING_OFF
 	
@@ -42,12 +39,12 @@ public class CalendarConfig {
 	int						numYearColumns				= CalendarConfigManager.DEFAULT_NUM_YEAR_COLUMNS;
 	int 					yearColumnsSpacing			= CalendarConfigManager.DEFAULT_YEAR_COLUMNS_SPACING;
 	ColumnStart				yearColumnsStart			= CalendarConfigManager.DEFAULT_YEAR_COLUMNS_LAYOUT;
-	FontData 				yearHeaderFont				= defaultFont.getFontData()[0];
+	FontData 				yearHeaderFont				= createFont(2.2f, SWT.BOLD);
 	
 	// date column
 	boolean					isShowDateColumn			= true;
 	DateColumnContent		dateColumnContent			= CalendarConfigManager.DEFAULT_DATE_COLUMN_CONTENT;
-	FontData				dateColumnFont				= defaultFont.getFontData()[0];
+	FontData				dateColumnFont				= createFont(1.5f, SWT.BOLD);
 	int						dateColumnWidth				= CalendarConfigManager.DEFAULT_DATE_COLUMN_WIDTH;
 	
 	// layout
@@ -62,7 +59,7 @@ public class CalendarConfig {
 	boolean					isHideDayDateWhenNoTour		= false;
 	boolean					isShowDayDate				= true;
 	boolean 				isShowDayDateWeekendColor	= CalendarConfigManager.DEFAULT_IS_SHOW_DAY_DATE_WEEKEND_COLOR;
-	FontData				dayDateFont					= defaultFont.getFontData()[0];
+	FontData				dayDateFont					= createFont(1.2f, SWT.BOLD);
 	DayDateFormat			dayDateFormat				= CalendarConfigManager.DEFAULT_DAY_DATE_FORMAT;
 	
 	// tour background
@@ -77,12 +74,12 @@ public class CalendarConfig {
 	// tour content
 	boolean 				isShowTourContent			= true;
 	boolean					isShowTourValueUnit			= true;
-	boolean					isTruncateTourText				= true;
+	boolean					isTruncateTourText			= true;
 	FormatterData[]			allTourFormatterData		= CalendarConfigManager.DEFAULT_TOUR_FORMATTER_DATA;
 	CalendarColor			tourContentColor			= CalendarConfigManager.DEFAULT_DAY_CONTENT_COLOR;
-	FontData				tourContentFont				= defaultFont.getFontData()[0];
+	FontData				tourContentFont				= createFont(0.9f, SWT.NORMAL);
 	CalendarColor 			tourTitleColor				= CalendarConfigManager.DEFAULT_DAY_CONTENT_COLOR;
-	FontData				tourTitleFont				= defaultFont.getFontData()[0];
+	FontData				tourTitleFont				= createFont(1.2f, SWT.BOLD);
 	int 					tourValueColumns			= CalendarConfigManager.DEFAULT_TOUR_VALUE_COLUMNS;
 
 	// week summary column
@@ -91,10 +88,32 @@ public class CalendarConfig {
 	FormatterData[]			allWeekFormatterData		= CalendarConfigManager.DEFAULT_WEEK_FORMATTER_DATA;
 	int						weekColumnWidth				= CalendarConfigManager.DEFAULT_SUMMARY_COLUMN_WIDTH;
 	CalendarColor			weekValueColor				= CalendarConfigManager.DEFAULT_WEEK_VALUE_COLOR;
-	FontData 				weekValueFont				= defaultFont.getFontData()[0];
-
+	FontData 				weekValueFont				= createFont(1.2f, SWT.BOLD);
 
 // SET_FORMATTING_ON
+
+	/**
+	 * @param relSize
+	 * @param style
+	 * @return
+	 */
+	private FontData createFont(final float relSize, final int style) {
+
+		final Display display = Display.getDefault();
+
+		// !!! getFontData() MUST be created for EVERY font otherwise they use all the SAME font !!!
+		final FontData[] fontData = display.getSystemFont().getFontData();
+
+		for (final FontData element : fontData) {
+
+			element.setHeight((int) (element.getHeight() * relSize));
+			element.setStyle(style);
+
+			break;
+		}
+
+		return fontData[0];
+	}
 
 	@Override
 	public boolean equals(final Object obj) {

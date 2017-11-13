@@ -143,7 +143,7 @@ public class CalendarConfigManager {
 	static final RGB						DEFAULT_ALTERNATE_MONTH_RGB				= new RGB(0xf0, 0xf0, 0xf0);
 	static final int						DEFAULT_NUM_YEAR_COLUMNS				= 2;
 	static final ColumnStart				DEFAULT_YEAR_COLUMNS_LAYOUT				= ColumnStart.CONTINUOUSLY;
-	static final int						DEFAULT_YEAR_COLUMNS_SPACING			= 10;
+	static final int						DEFAULT_YEAR_COLUMNS_SPACING			= 30;
 	static final CalendarColor				DEFAULT_DAY_CONTENT_COLOR				= CalendarColor.CONTRAST;
 	static final DayDateFormat				DEFAULT_DAY_DATE_FORMAT					= DayDateFormat.DAY;
 	static final int						DEFAULT_DATE_COLUMN_WIDTH				= 50;
