@@ -42,8 +42,10 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
 import org.osgi.framework.Bundle;
@@ -97,6 +99,8 @@ public class CalendarConfigManager {
 	private static final String				TAG_ALL_TOUR_FORMATTER					= "AllTourFormatter";				//$NON-NLS-1$
 	private static final String				TAG_ALL_WEEK_FORMATTER					= "AllWeekFormatter";				//$NON-NLS-1$
 	private static final String				TAG_ALTERNATE_MONTH_RGB					= "AlternateMonthRGB";				//$NON-NLS-1$
+	private static final String				TAG_CALENDAR_BACKGROUND_RGB				= "CalendarBackgroundRGB";			//$NON-NLS-1$
+	private static final String				TAG_CALENDAR_FOREGROUND_RGB				= "CalendarForegroundRGB";			//$NON-NLS-1$
 	private static final String				TAG_FORMATTER							= "Formatter";						//$NON-NLS-1$
 	//
 	private static final String				ATTR_IS_HIDE_DAY_DATE_WHEN_NO_TOUR		= "isHideDayDateWhenNoTour";		//$NON-NLS-1$
@@ -141,9 +145,8 @@ public class CalendarConfigManager {
 	private static final String				ATTR_YEAR_HEADER_FONT					= "yearHeaderFont";					//$NON-NLS-1$
 	//
 	static final RGB						DEFAULT_ALTERNATE_MONTH_RGB				= new RGB(0xf0, 0xf0, 0xf0);
-	static final int						DEFAULT_NUM_YEAR_COLUMNS				= 2;
-	static final ColumnStart				DEFAULT_YEAR_COLUMNS_LAYOUT				= ColumnStart.CONTINUOUSLY;
-	static final int						DEFAULT_YEAR_COLUMNS_SPACING			= 30;
+	static final RGB						DEFAULT_CALENDAR_BACKGROUND_RGB;
+	static final RGB						DEFAULT_CALENDAR_FOREBACKGROUND_RGB;
 	static final CalendarColor				DEFAULT_DAY_CONTENT_COLOR				= CalendarColor.CONTRAST;
 	static final DayDateFormat				DEFAULT_DAY_DATE_FORMAT					= DayDateFormat.DAY;
 	static final int						DEFAULT_DATE_COLUMN_WIDTH				= 50;
@@ -161,6 +164,9 @@ public class CalendarConfigManager {
 	static final int						DEFAULT_TOUR_VALUE_COLUMNS				= 2;
 	static final int						DEFAULT_WEEK_HEIGHT						= 70;
 	static final CalendarColor				DEFAULT_WEEK_VALUE_COLOR				= CalendarColor.TEXT;
+	static final int						DEFAULT_YEAR_COLUMNS					= 2;
+	static final ColumnStart				DEFAULT_YEAR_COLUMNS_LAYOUT				= ColumnStart.CONTINUOUSLY;
+	static final int						DEFAULT_YEAR_COLUMNS_SPACING			= 30;
 	//
 	/**
 	 * MUST contain the same number of entries as in {@link #TOUR_INFO_LINES}
@@ -213,11 +219,15 @@ public class CalendarConfigManager {
 	//
 	static {
 
-		DEFAULT_EMPTY_FORMATTER 		= createFormatter_Empty();
+		DEFAULT_CALENDAR_BACKGROUND_RGB			= Display.getCurrent().getSystemColor(SWT.COLOR_LIST_BACKGROUND).getRGB();
+		DEFAULT_CALENDAR_FOREBACKGROUND_RGB		= Display.getCurrent().getSystemColor(SWT.COLOR_LIST_FOREGROUND).getRGB();
 
 		/*
-		 * Tour
+		 * Formatter
 		 */
+		DEFAULT_EMPTY_FORMATTER 		= createFormatter_Empty();
+
+		// Tour
 		_tourFormatter_TourDescription	= createFormatter_TourDescription();
 		_tourFormatter_TourTitle	 	= createFormatter_TourTitle();
 		
@@ -249,9 +259,7 @@ public class CalendarConfigManager {
 				_tourFormatter_Time_Paused,
 		};
 		
-		/*
-		 * Week
-		 */
+		// Week
 		_weekFormatter_Altitude 		= createFormatter_Altitude();
 		_weekFormatter_Distance 		= createFormatter_Distance();
 		
@@ -1178,9 +1186,15 @@ public class CalendarConfigManager {
 			xmlConfig.putString(		ATTR_ID, 								config.id);
 			xmlConfig.putString(		ATTR_CONFIG_NAME, 						config.name);
 			
+			// layout
+			xmlConfig.putBoolean(		ATTR_USE_DRAGGED_SCROLLING, 			config.useDraggedScrolling);
+			xmlConfig.putInteger(		ATTR_WEEK_HEIGHT, 						config.weekHeight);
+			Util.setXmlRgb(xmlConfig,	TAG_CALENDAR_BACKGROUND_RGB, 			config.calendarBackgroundRGB);
+			Util.setXmlRgb(xmlConfig,	TAG_CALENDAR_FOREGROUND_RGB, 			config.calendarForegroundRGB);
+			
 			// year columns
 			xmlConfig.putBoolean(		ATTR_IS_SHOW_YEAR_COLUMNS, 				config.isShowYearColumns);
-			xmlConfig.putInteger(		ATTR_YEAR_COLUMNS, 					config.numYearColumns);
+			xmlConfig.putInteger(		ATTR_YEAR_COLUMNS, 						config.numYearColumns);
 			xmlConfig.putInteger(		ATTR_YEAR_COLUMNS_SPACING, 				config.yearColumnsSpacing);
 			Util.setXmlEnum(xmlConfig,	ATTR_YEAR_COLUMNS_START, 				config.yearColumnsStart);
 			Util.setXmlFont(xmlConfig,	ATTR_YEAR_HEADER_FONT, 					config.yearHeaderFont);
@@ -1190,10 +1204,6 @@ public class CalendarConfigManager {
 			xmlConfig.putInteger(		ATTR_DATE_COLUMN_WIDTH, 				config.dateColumnWidth);
 			Util.setXmlEnum(xmlConfig,	ATTR_DATE_COLUMN_CONTENT, 				config.dateColumnContent);
 			Util.setXmlFont(xmlConfig,	ATTR_DATE_COLUMN_FONT, 					config.dateColumnFont);
-			
-			// layout
-			xmlConfig.putBoolean(		ATTR_USE_DRAGGED_SCROLLING, 			config.useDraggedScrolling);
-			xmlConfig.putInteger(		ATTR_WEEK_HEIGHT, 						config.weekHeight);
 			
 			// day
 			xmlConfig.putBoolean(		ATTR_IS_TOGGLE_MONTH_COLOR, 			config.isToggleMonthColor);
@@ -1472,9 +1482,15 @@ public class CalendarConfigManager {
 		config.id							= Util.getXmlString(xmlConfig,						ATTR_ID,						Long.toString(System.nanoTime()));
 		config.name							= Util.getXmlString(xmlConfig,						ATTR_CONFIG_NAME,				UI.EMPTY_STRING);
 		
+		// layout
+		config.weekHeight					= Util.getXmlInteger(xmlConfig, 					ATTR_WEEK_HEIGHT,				DEFAULT_WEEK_HEIGHT);
+		config.useDraggedScrolling			= Util.getXmlBoolean(xmlConfig, 					ATTR_USE_DRAGGED_SCROLLING,		true);
+		config.calendarBackgroundRGB		= Util.getXmlRgb(xmlConfig, 						TAG_CALENDAR_BACKGROUND_RGB,	DEFAULT_CALENDAR_BACKGROUND_RGB);
+		config.calendarForegroundRGB		= Util.getXmlRgb(xmlConfig, 						TAG_CALENDAR_FOREGROUND_RGB,	DEFAULT_CALENDAR_FOREBACKGROUND_RGB);
+		
 		// year columns
 		config.isShowYearColumns			= Util.getXmlBoolean(xmlConfig, 					ATTR_IS_SHOW_YEAR_COLUMNS,		true);
-		config.numYearColumns				= Util.getXmlInteger(xmlConfig,						ATTR_YEAR_COLUMNS,				DEFAULT_NUM_YEAR_COLUMNS);
+		config.numYearColumns				= Util.getXmlInteger(xmlConfig,						ATTR_YEAR_COLUMNS,				DEFAULT_YEAR_COLUMNS);
 		config.yearColumnsSpacing			= Util.getXmlInteger(xmlConfig, 					ATTR_YEAR_COLUMNS_SPACING,		DEFAULT_YEAR_COLUMNS_SPACING);
 		config.yearColumnsStart				= (ColumnStart) Util.getXmlEnum(xmlConfig,			ATTR_YEAR_COLUMNS_START,		DEFAULT_YEAR_COLUMNS_LAYOUT);
 		config.yearHeaderFont				= Util.getXmlFont(xmlConfig, 						ATTR_YEAR_HEADER_FONT,			defaultFont.getFontData()[0]);
@@ -1484,10 +1500,6 @@ public class CalendarConfigManager {
 		config.dateColumnFont 				= Util.getXmlFont(xmlConfig, 						ATTR_DATE_COLUMN_FONT, 			defaultFont.getFontData()[0]);
 		config.dateColumnWidth				= Util.getXmlInteger(xmlConfig, 					ATTR_DATE_COLUMN_WIDTH,			DEFAULT_DATE_COLUMN_WIDTH);
 		config.dateColumnContent			= (DateColumnContent) Util.getXmlEnum(xmlConfig,	ATTR_DATE_COLUMN_CONTENT,		DateColumnContent.WEEK_NUMBER);
-		
-		// layout
-		config.weekHeight					= Util.getXmlInteger(xmlConfig, 					ATTR_WEEK_HEIGHT,				DEFAULT_WEEK_HEIGHT);
-		config.useDraggedScrolling			= Util.getXmlBoolean(xmlConfig, 					ATTR_USE_DRAGGED_SCROLLING,		true);
 
 		// day date
 		config.isHideDayDateWhenNoTour		= Util.getXmlBoolean(xmlConfig, 					ATTR_IS_HIDE_DAY_DATE_WHEN_NO_TOUR,		true);

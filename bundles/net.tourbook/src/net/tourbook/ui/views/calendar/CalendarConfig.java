@@ -34,9 +34,15 @@ public class CalendarConfig {
 	String					defaultId					= CalendarConfigManager.CONFIG_DEFAULT_ID_1;
 	String					name						= CalendarConfigManager.CONFIG_DEFAULT_ID_1;
 	
+	// layout
+	boolean					useDraggedScrolling			= false;
+	RGB						calendarBackgroundRGB		= CalendarConfigManager.DEFAULT_CALENDAR_BACKGROUND_RGB;
+	RGB						calendarForegroundRGB		= CalendarConfigManager.DEFAULT_CALENDAR_FOREBACKGROUND_RGB;
+	int						weekHeight					= CalendarConfigManager.DEFAULT_WEEK_HEIGHT;
+	
 	// year columns
 	boolean 				isShowYearColumns			= true;
-	int						numYearColumns				= CalendarConfigManager.DEFAULT_NUM_YEAR_COLUMNS;
+	int						numYearColumns				= CalendarConfigManager.DEFAULT_YEAR_COLUMNS;
 	int 					yearColumnsSpacing			= CalendarConfigManager.DEFAULT_YEAR_COLUMNS_SPACING;
 	ColumnStart				yearColumnsStart			= CalendarConfigManager.DEFAULT_YEAR_COLUMNS_LAYOUT;
 	FontData 				yearHeaderFont				= createFont(2.2f, SWT.BOLD);
@@ -46,10 +52,6 @@ public class CalendarConfig {
 	DateColumnContent		dateColumnContent			= CalendarConfigManager.DEFAULT_DATE_COLUMN_CONTENT;
 	FontData				dateColumnFont				= createFont(1.5f, SWT.BOLD);
 	int						dateColumnWidth				= CalendarConfigManager.DEFAULT_DATE_COLUMN_WIDTH;
-	
-	// layout
-	boolean					useDraggedScrolling			= false;
-	int						weekHeight					= CalendarConfigManager.DEFAULT_WEEK_HEIGHT;
 	
 	// day
 	boolean					isToggleMonthColor			= true;

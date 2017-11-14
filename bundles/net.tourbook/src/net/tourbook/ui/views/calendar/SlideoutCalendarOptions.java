@@ -126,6 +126,8 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	private Button[]				_chkWeek_AllIsShowLines;
 	//
 	private ColorSelectorExtended	_colorAlternateMonthColor;
+	private ColorSelectorExtended	_colorCalendarBackgroundColor;
+	private ColorSelectorExtended	_colorCalendarForegroundColor;
 	//
 	private Combo					_comboColumnLayout;
 	private Combo					_comboConfigName;
@@ -298,9 +300,9 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
 		{
+			createUI_100_Layout(container);
 			createUI_120_YearColumns(container);
-			createUI_100_DateColumn(container);
-			createUI_140_Layout(container);
+			createUI_140_DateColumn(container);
 		}
 
 		return container;
@@ -344,33 +346,18 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		return container;
 	}
 
-	private void createUI_100_DateColumn(final Composite parent) {
+	private void createUI_100_Layout(final Composite parent) {
 
 		final Group group = new Group(parent, SWT.NONE);
-		group.setText(Messages.Slideout_CalendarOptions_Group_DateColumn);
-		GridDataFactory
-				.fillDefaults()//
-				//				.grab(true, true)
+		group.setText(Messages.Slideout_CalendarOptions_Group_Layout);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
+		GridLayoutFactory
+				.swtDefaults()//
+				.numColumns(2)
+				.spacing(10, LayoutConstants.getSpacing().y)
 				.applyTo(group);
-		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
-//		group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 		{
-			{
-				/*
-				 * Date column
-				 */
-				// checkbox
-				_chkIsShowDateColumn = new Button(group, SWT.CHECK);
-				_chkIsShowDateColumn.setText(Messages.Slideout_CalendarOptions_Checkbox_IsShowDateColumn);
-				_chkIsShowDateColumn.setToolTipText(
-						Messages.Slideout_CalendarOptions_Checkbox_IsShowDateColumn_Tooltip);
-				_chkIsShowDateColumn.addSelectionListener(_defaultSelectionListener);
-				GridDataFactory
-						.fillDefaults()//
-						.span(2, 1)
-						.applyTo(_chkIsShowDateColumn);
-			}
-
 			createUI_102_Col1(group);
 			createUI_104_Col2(group);
 		}
@@ -384,48 +371,27 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		{
 			{
 				/*
-				 * Column width
+				 * Calendar foreground color
 				 */
 
 				// label
-				_lblDateColumn_Width = new Label(container, SWT.NONE);
-				_lblDateColumn_Width.setText(Messages.Slideout_CalendarOptions_Label_DateColumn_Width);
-				GridDataFactory
-						.fillDefaults()//
-						.align(SWT.FILL, SWT.CENTER)
-						.indent(_subItemIndent, 0)
-						.applyTo(_lblDateColumn_Width);
+				final Label label = new Label(container, SWT.NONE);
+				label.setText(Messages.Slideout_CalendarOptions_Label_Calendar_ForegroundColor);
 
-				// size
-				_spinnerDateColumnWidth = new Spinner(container, SWT.BORDER);
-				_spinnerDateColumnWidth.setMinimum(1);
-				_spinnerDateColumnWidth.setMaximum(200);
-				_spinnerDateColumnWidth.setIncrement(1);
-				_spinnerDateColumnWidth.setPageIncrement(10);
-				_spinnerDateColumnWidth.addSelectionListener(_defaultSelectionListener);
-				_spinnerDateColumnWidth.addMouseWheelListener(_defaultMouseWheelListener);
+				// Color selector
+				_colorCalendarForegroundColor = createUI_ColorSelector(container);
 			}
 			{
 				/*
-				 * Date content
+				 * Calendar background color
 				 */
 
 				// label
-				_lblDateColumn_Content = new Label(container, SWT.NONE);
-				_lblDateColumn_Content.setText(Messages.Slideout_CalendarOptions_Label_DateColumnContent);
-				_lblDateColumn_Content.setToolTipText(
-						Messages.Slideout_CalendarOptions_Label_DateColumnContent_Tooltip);
-				GridDataFactory
-						.fillDefaults()//
-						.align(SWT.FILL, SWT.CENTER)
-						.indent(_subItemIndent, 0)
-						.applyTo(_lblDateColumn_Content);
+				final Label label = new Label(container, SWT.NONE);
+				label.setText(Messages.Slideout_CalendarOptions_Label_Calendar_BackgroundColor);
 
-				// value
-				_comboDateColumn = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-				_comboDateColumn.setVisibleItemCount(20);
-				_comboDateColumn.addSelectionListener(_defaultSelectionListener);
-				_comboDateColumn.addFocusListener(_keepOpenListener);
+				// Color selector
+				_colorCalendarBackgroundColor = createUI_ColorSelector(container);
 			}
 		}
 	}
@@ -433,30 +399,43 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	private void createUI_104_Col2(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory
-				.fillDefaults()//
-				//				.grab(true, true)
-				.applyTo(container);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-//			containerRight.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
 			{
 				/*
-				 * Font
+				 * Week height
+				 */
+				// label
+				final Label label = new Label(container, SWT.NONE);
+				label.setText(Messages.Slideout_CalendarOptions_Label_RowHeight);
+				label.setToolTipText(Messages.Slideout_CalendarOptions_Label_RowHeight_Tooltip);
+
+				// spinner: height
+				_spinnerWeekHeight = new Spinner(container, SWT.BORDER);
+				_spinnerWeekHeight.setMinimum(CalendarConfigManager.WEEK_HEIGHT_MIN);
+				_spinnerWeekHeight.setMaximum(CalendarConfigManager.WEEK_HEIGHT_MAX);
+				_spinnerWeekHeight.setIncrement(1);
+				_spinnerWeekHeight.setPageIncrement(10);
+				_spinnerWeekHeight.addSelectionListener(_defaultSelectionListener);
+				_spinnerWeekHeight.addMouseWheelListener(_defaultMouseWheelListener);
+			}
+			{
+				/*
+				 * Mouse wheel scrolling
 				 */
 
-				// label
-				_lblDateColumn_Font = new Label(container, SWT.NONE);
-				_lblDateColumn_Font.setText(Messages.Slideout_CalendarOptions_Label_DateColumnFont);
+				// checkbox
+				_chkUseDraggedScrolling = new Button(container, SWT.CHECK);
+				_chkUseDraggedScrolling.setText(Messages.Slideout_CalendarOptions_Checkbox_UseDraggedScrolling);
+				_chkUseDraggedScrolling.setToolTipText(
+						Messages.Slideout_CalendarOptions_Checkbox_UseDraggedScrolling_Tooltip);
+				_chkUseDraggedScrolling.addSelectionListener(_defaultSelectionListener);
 				GridDataFactory
 						.fillDefaults()//
-						.indent(0, _fontLabelVIndent)
-						.applyTo(_lblDateColumn_Font);
-
-				// value
-				_fontEditorDateColumn = new SimpleFontEditor(container, SWT.NONE);
-				_fontEditorDateColumn.addFontListener(_defaultFontEditorListener);
-				GridDataFactory.fillDefaults().grab(true, true).applyTo(_fontEditorDateColumn);
+						.align(SWT.FILL, SWT.BEGINNING)
+						.span(2, 1)
+						.applyTo(_chkUseDraggedScrolling);
 			}
 		}
 	}
@@ -611,24 +590,39 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		}
 	}
 
-	private void createUI_140_Layout(final Composite parent) {
+	private void createUI_140_DateColumn(final Composite parent) {
 
 		final Group group = new Group(parent, SWT.NONE);
-		group.setText(Messages.Slideout_CalendarOptions_Group_Layout);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
-		GridLayoutFactory
-				.swtDefaults()//
-				.numColumns(2)
-				.spacing(10, LayoutConstants.getSpacing().y)
+		group.setText(Messages.Slideout_CalendarOptions_Group_DateColumn);
+		GridDataFactory
+				.fillDefaults()//
+				//				.grab(true, true)
 				.applyTo(group);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
+//		group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 		{
-			createUI_142_Col1(group);
-			createUI_144_Col2(group);
+			{
+				/*
+				 * Date column
+				 */
+				// checkbox
+				_chkIsShowDateColumn = new Button(group, SWT.CHECK);
+				_chkIsShowDateColumn.setText(Messages.Slideout_CalendarOptions_Checkbox_IsShowDateColumn);
+				_chkIsShowDateColumn.setToolTipText(
+						Messages.Slideout_CalendarOptions_Checkbox_IsShowDateColumn_Tooltip);
+				_chkIsShowDateColumn.addSelectionListener(_defaultSelectionListener);
+				GridDataFactory
+						.fillDefaults()//
+						.span(2, 1)
+						.applyTo(_chkIsShowDateColumn);
+			}
+
+			createUI_143_Col1(group);
+			createUI_145_Col2(group);
 		}
 	}
 
-	private void createUI_142_Col1(final Composite parent) {
+	private void createUI_143_Col1(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -636,47 +630,79 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		{
 			{
 				/*
-				 * Week height
+				 * Column width
 				 */
-				// label
-				final Label label = new Label(container, SWT.NONE);
-				label.setText(Messages.Slideout_CalendarOptions_Label_RowHeight);
-				label.setToolTipText(Messages.Slideout_CalendarOptions_Label_RowHeight_Tooltip);
 
-				// spinner: height
-				_spinnerWeekHeight = new Spinner(container, SWT.BORDER);
-				_spinnerWeekHeight.setMinimum(CalendarConfigManager.WEEK_HEIGHT_MIN);
-				_spinnerWeekHeight.setMaximum(CalendarConfigManager.WEEK_HEIGHT_MAX);
-				_spinnerWeekHeight.setIncrement(1);
-				_spinnerWeekHeight.setPageIncrement(10);
-				_spinnerWeekHeight.addSelectionListener(_defaultSelectionListener);
-				_spinnerWeekHeight.addMouseWheelListener(_defaultMouseWheelListener);
+				// label
+				_lblDateColumn_Width = new Label(container, SWT.NONE);
+				_lblDateColumn_Width.setText(Messages.Slideout_CalendarOptions_Label_DateColumn_Width);
+				GridDataFactory
+						.fillDefaults()//
+						.align(SWT.FILL, SWT.CENTER)
+						.indent(_subItemIndent, 0)
+						.applyTo(_lblDateColumn_Width);
+
+				// size
+				_spinnerDateColumnWidth = new Spinner(container, SWT.BORDER);
+				_spinnerDateColumnWidth.setMinimum(1);
+				_spinnerDateColumnWidth.setMaximum(200);
+				_spinnerDateColumnWidth.setIncrement(1);
+				_spinnerDateColumnWidth.setPageIncrement(10);
+				_spinnerDateColumnWidth.addSelectionListener(_defaultSelectionListener);
+				_spinnerDateColumnWidth.addMouseWheelListener(_defaultMouseWheelListener);
+			}
+			{
+				/*
+				 * Date content
+				 */
+
+				// label
+				_lblDateColumn_Content = new Label(container, SWT.NONE);
+				_lblDateColumn_Content.setText(Messages.Slideout_CalendarOptions_Label_DateColumnContent);
+				_lblDateColumn_Content.setToolTipText(
+						Messages.Slideout_CalendarOptions_Label_DateColumnContent_Tooltip);
+				GridDataFactory
+						.fillDefaults()//
+						.align(SWT.FILL, SWT.CENTER)
+						.indent(_subItemIndent, 0)
+						.applyTo(_lblDateColumn_Content);
+
+				// value
+				_comboDateColumn = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+				_comboDateColumn.setVisibleItemCount(20);
+				_comboDateColumn.addSelectionListener(_defaultSelectionListener);
+				_comboDateColumn.addFocusListener(_keepOpenListener);
 			}
 		}
 	}
 
-	private void createUI_144_Col2(final Composite parent) {
+	private void createUI_145_Col2(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridDataFactory
+				.fillDefaults()//
+				//				.grab(true, true)
+				.applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+//			containerRight.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
 			{
 				/*
-				 * Mouse wheel scrolling
+				 * Font
 				 */
 
-				// checkbox
-				_chkUseDraggedScrolling = new Button(container, SWT.CHECK);
-				_chkUseDraggedScrolling.setText(Messages.Slideout_CalendarOptions_Checkbox_UseDraggedScrolling);
-				_chkUseDraggedScrolling.setToolTipText(
-						Messages.Slideout_CalendarOptions_Checkbox_UseDraggedScrolling_Tooltip);
-				_chkUseDraggedScrolling.addSelectionListener(_defaultSelectionListener);
+				// label
+				_lblDateColumn_Font = new Label(container, SWT.NONE);
+				_lblDateColumn_Font.setText(Messages.Slideout_CalendarOptions_Label_DateColumnFont);
 				GridDataFactory
 						.fillDefaults()//
-						.align(SWT.FILL, SWT.BEGINNING)
-						.span(2, 1)
-						.applyTo(_chkUseDraggedScrolling);
+						.indent(0, _fontLabelVIndent)
+						.applyTo(_lblDateColumn_Font);
+
+				// value
+				_fontEditorDateColumn = new SimpleFontEditor(container, SWT.NONE);
+				_fontEditorDateColumn.addFontListener(_defaultFontEditorListener);
+				GridDataFactory.fillDefaults().grab(true, true).applyTo(_fontEditorDateColumn);
 			}
 		}
 	}
@@ -927,17 +953,8 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				 */
 
 				// Color selector
-				_colorAlternateMonthColor = new ColorSelectorExtended(group);
-				GridDataFactory
-						.swtDefaults()//
-						.grab(false, true)
-						.align(SWT.BEGINNING, SWT.BEGINNING)
-						.applyTo(_colorAlternateMonthColor.getButton());
-
-				_colorAlternateMonthColor.addOpenListener(this);
-				_colorAlternateMonthColor.addListener(_defaultPropertyChangeListener);
+				_colorAlternateMonthColor = createUI_ColorSelector(group);
 			}
-
 		}
 	}
 
@@ -1414,6 +1431,22 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 						.applyTo(_btnReset);
 			}
 		}
+	}
+
+	private ColorSelectorExtended createUI_ColorSelector(final Composite parent) {
+
+		final ColorSelectorExtended colorSelector = new ColorSelectorExtended(parent);
+
+		GridDataFactory
+				.fillDefaults()//
+				.grab(false, true)
+				.align(SWT.BEGINNING, SWT.BEGINNING)
+				.applyTo(colorSelector.getButton());
+
+		colorSelector.addOpenListener(this);
+		colorSelector.addListener(_defaultPropertyChangeListener);
+
+		return colorSelector;
 	}
 
 	private void enableControls() {
@@ -2271,6 +2304,12 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			_comboConfigName.select(activeConfigIndex);
 			_textConfigName.setText(config.name);
 
+			// layout
+			_chkUseDraggedScrolling.setSelection(config.useDraggedScrolling);
+			_colorCalendarBackgroundColor.setColorValue(config.calendarBackgroundRGB);
+			_colorCalendarForegroundColor.setColorValue(config.calendarForegroundRGB);
+			_spinnerWeekHeight.setSelection(config.weekHeight);
+
 			// year columns
 			_chkIsShowYearColumns.setSelection(config.isShowYearColumns);
 			_comboColumnLayout.select(getCalendarColumLayoutIndex(config.yearColumnsStart));
@@ -2283,10 +2322,6 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			_spinnerDateColumnWidth.setSelection(config.dateColumnWidth);
 			_comboDateColumn.select(getDateColumnIndex(config.dateColumnContent));
 			_fontEditorDateColumn.setSelection(config.dateColumnFont);
-
-			// layout
-			_spinnerWeekHeight.setSelection(config.weekHeight);
-			_chkUseDraggedScrolling.setSelection(config.useDraggedScrolling);
 
 			// day date
 			_chkIsHideDayDateWhenNoTour.setSelection(config.isHideDayDateWhenNoTour);
@@ -2358,6 +2393,12 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		// config
 		config.name = _textConfigName.getText();
 
+		// layout
+		config.calendarBackgroundRGB = _colorCalendarBackgroundColor.getColorValue();
+		config.calendarForegroundRGB = _colorCalendarForegroundColor.getColorValue();
+		config.useDraggedScrolling = _chkUseDraggedScrolling.getSelection();
+		config.weekHeight = _spinnerWeekHeight.getSelection();
+
 		// year columns
 		config.isShowYearColumns = _chkIsShowYearColumns.getSelection();
 		config.numYearColumns = _spinnerNumYearColumns.getSelection();
@@ -2370,10 +2411,6 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		config.dateColumnWidth = _spinnerDateColumnWidth.getSelection();
 		config.dateColumnFont = _fontEditorDateColumn.getSelection();
 		config.isShowDateColumn = _chkIsShowDateColumn.getSelection();
-
-		// layout
-		config.weekHeight = _spinnerWeekHeight.getSelection();
-		config.useDraggedScrolling = _chkUseDraggedScrolling.getSelection();
 
 		// day date
 		config.dayDateFont = _fontEditorDayDate.getSelection();

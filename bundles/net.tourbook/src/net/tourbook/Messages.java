@@ -1676,6 +1676,8 @@ public class Messages extends NLS {
 	public static String		Slideout_CalendarOptions_Group_SummaryColumn;
 	public static String		Slideout_CalendarOptions_Group_WeekSummary;
 	public static String		Slideout_CalendarOptions_Group_YearColumns;
+	public static String		Slideout_CalendarOptions_Label_Calendar_BackgroundColor;
+	public static String		Slideout_CalendarOptions_Label_Calendar_ForegroundColor;
 	public static String		Slideout_CalendarOptions_Label_DateColumn_Width;
 	public static String		Slideout_CalendarOptions_Label_DateColumn_Width_Tooltipxxx;
 	public static String		Slideout_CalendarOptions_Label_DateColumnContent;

@@ -83,7 +83,6 @@ import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
-import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -154,11 +153,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	 */
 	private Rectangle							_dayDateLabelRect;
 
-	/**
-	 * Cache font height;
-	 */
-	private int									_defaultFontHeight;
-
 	private int									_fontHeight_DateColumn;
 	private int									_fontHeight_DayContent;
 	private int									_fontHeight_DayHeader;
@@ -207,7 +201,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	private Color								_white					= _display.getSystemColor(SWT.COLOR_WHITE);
 	private Color								_red					= _display.getSystemColor(SWT.COLOR_RED);
 	private Color								_blue					= _display.getSystemColor(SWT.COLOR_BLUE);
-	private Color								_darkGray				= _colorCache.getColor(0x404040);
+//	private Color								_darkGray				= _colorCache.getColor(0x404040);
+	private Color								_calendarFgColor;
+	private Color								_calendarBgColor;
 	//
 	private RGB									_day_TourBackgroundRGB;
 	private RGB									_whiteRGB				= _white.getRGB();
@@ -441,17 +437,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		_textWrapPainter = new TextWrapPainter();
 
-		final GC gc = new GC(parent);
-		{
-			gc.setFont(JFaceResources.getDialogFont());
-
-			final FontMetrics fontMetrics = gc.getFontMetrics();
-
-			_defaultFontHeight = fontMetrics.getHeight();
-//			_defaultFontAverageCharWidth = fontMetrics.getAverageCharWidth();
-		}
-		gc.dispose();
-
 		_dataProvider = CalendarTourDataProvider.getInstance();
 		_dataProvider.setCalendarGraph(this);
 
@@ -459,6 +444,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		_rgbDark = new ArrayList<RGB>();
 		_rgbLine = new ArrayList<RGB>();
 		_rgbText = new ArrayList<RGB>();
+
+		// setup config BEFORE updating tour type colors !!!
+		setupConfig();
 
 		updateTourTypeColors();
 
@@ -928,7 +916,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			return;
 		}
 
-		_currentConfig = CalendarConfigManager.getActiveCalendarConfig();
+		setupConfig();
 
 		if (_calendarImage != null && !_calendarImage.isDisposed()) {
 			_calendarImage.dispose();
@@ -1034,8 +1022,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		final Font normalFont = gc.getFont();
 
-		gc.setBackground(_white);
 		gc.setForeground(_black);
+		gc.setBackground(_calendarBgColor);
 		gc.fillRectangle(canvas);
 
 		int dateColumnWidth = 0;
@@ -1176,7 +1164,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 					dayId = day.dayId + 1;
 
 					gc.setFont(normalFont);
-					gc.setBackground(_white);
+//					gc.setBackground(_white);
 
 					// Day background with alternate color
 					if (_currentConfig.isToggleMonthColor && currentDate.getMonthValue() % 2 == 1) {
@@ -1250,7 +1238,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 						} else {
 
-							dayDateForegroundColor = (_darkGray);
+							dayDateForegroundColor = _calendarFgColor;
 						}
 
 						if (isWeekendColor && isCalendarDataAvailable) {
@@ -1262,7 +1250,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 							// draw without additional background on the right side
 							dateLabelPosX += 2;
 
-							gc.setBackground(_white);
+//							gc.setBackground(_white);
 
 // outline is difficult to read
 //
@@ -1674,6 +1662,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 					valueWidth = tourRect.width;
 				}
 
+				gc.setClipping(valuePosX, valuePosY, valueWidth, maxValueHeight);
+
 				_textWrapPainter.drawText(
 						gc,
 						valueText,
@@ -1777,8 +1767,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 						gc.setAlpha(0xa0);
 
-						gc.setBackground(_white);
 						gc.setForeground(_gray);
+						gc.setBackground(_calendarBgColor);
 
 						gc.fillGradientRectangle(
 								itemRectangle.x - 4,
@@ -1911,9 +1901,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 										final DateColumnContent dateColumnContent,
 										final boolean isFirstRow) {
 
-		gc.setForeground(_darkGray);
-		gc.setBackground(_white);
-
+		gc.setForeground(_calendarFgColor);
 		gc.setFont(getFont_DateColumn());
 
 		final int posX = calendarColumnOffset + 2;
@@ -1927,27 +1915,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 
 		final int nextWeekYPos = thisWeekYPos + _fontHeight_DateColumn + 0;
-
-//		if (_currentConfig.isShowYearColumns
-//				&& _currentConfig.yearColumnsStart == ColumnStart.CONTINUOUSLY) {
-//
-//			// draw year always in first row
-//
-//			final boolean isInJanuary = currentDate.getMonthValue() == 1
-//					|| currentDate.plusDays(6).getMonthValue() == 1;
-//
-//			final int yearColumnYear = _yearColumn_CurrentYear.getYear();
-//
-//			if (isInJanuary && _lastWeekDateYear != yearColumnYear) {
-//
-//				gc.drawString(Integer.toString(yearColumnYear), posX, thisWeekYPos, true);
-//
-//				_lastWeekDateYear = yearColumnYear;
-//				_nextWeekDateYPos = nextWeekYPos;
-//
-//				return;
-//			}
-//		}
 
 		switch (dateColumnContent) {
 		case MONTH:
@@ -2012,7 +1979,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		gc.setFont(getFont_WeekValue());
 		gc.setClipping(weekRec);
-		gc.setBackground(_white);
+
+		gc.setBackground(_calendarBgColor);
 
 		for (final FormatterData formatterData : _currentConfig.allWeekFormatterData) {
 
@@ -2062,8 +2030,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		final String yearText = Integer.toString(_yearColumn_CurrentYear.getYear());
 
-		gc.setForeground(_darkGray);
-		gc.setBackground(_white);
+		gc.setForeground(_calendarFgColor);
+		gc.setBackground(_calendarBgColor);
 
 		gc.setFont(getFont_YearHeader());
 
@@ -3211,6 +3179,15 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		_selectedItem = new CalendarSelectItem(selectedTourId, ItemType.TOUR);
 	}
 
+	private void setupConfig() {
+
+		_currentConfig = CalendarConfigManager.getActiveCalendarConfig();
+
+		// setup calendar foreground and background color
+		_calendarFgColor = _colorCache.getColor(_currentConfig.calendarForegroundRGB);
+		_calendarBgColor = _colorCache.getColor(_currentConfig.calendarBackgroundRGB);
+	}
+
 	public void setYearMonthContributor(final CalendarYearMonthContributionItem calendarYearMonthContribuor) {
 		_calendarYearMonthContributor = calendarYearMonthContribuor;
 
@@ -3226,8 +3203,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		// default colors for no tour type
 		_rgbBright.add(_white.getRGB());
 		_rgbDark.add(_gray.getRGB());
-		_rgbLine.add(_darkGray.getRGB());
-		_rgbText.add(_darkGray.getRGB());
+		_rgbLine.add(_calendarFgColor.getRGB());
+		_rgbText.add(_calendarFgColor.getRGB());
 
 		/*
 		 * color index 1...n+1: tour type colors
