@@ -113,8 +113,6 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarCo
 	private ActionTourInfo			_actionTourInfo;
 	//
 
-
-
 	TourInfoFormatter[]				tourInfoFormatter				= {
 
 			createFormatter_Tour_Empty(),
@@ -610,8 +608,6 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarCo
 		};
 	}
 
-
-
 	@Override
 	public void createPartControl(final Composite parent) {
 
@@ -682,18 +678,15 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarCo
 				GridDataFactory
 						.fillDefaults()//
 						.grab(true, false)
-						//						.align(SWT.CENTER, SWT.CENTER)
-						//						.indent(5, 0)
 						.applyTo(_lblTitle);
 				MTFont.setHeaderFont(_lblTitle);
-//				_lblTitle.setText(UI.DASH);
 			}
 			{
 				/*
 				 * Combo: Configuration
 				 */
 				_comboConfigName = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
-				_comboConfigName.setVisibleItemCount(20);
+				_comboConfigName.setVisibleItemCount(30);
 				_comboConfigName.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
@@ -702,10 +695,8 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarCo
 				});
 				GridDataFactory
 						.fillDefaults()
-						//						.grab(true, false)
 						.align(SWT.BEGINNING, SWT.CENTER)
-						//						.indent(10, 0)
-						.hint(_pc.convertWidthInCharsToPixels(10), SWT.DEFAULT)
+						.hint(_pc.convertWidthInCharsToPixels(20), SWT.DEFAULT)
 						.applyTo(_comboConfigName);
 			}
 		}

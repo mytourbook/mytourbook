@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -60,6 +60,17 @@ public class Messages extends NLS {
 	public static String		Calendar_Config_DayHeaderDateFormat_Day;
 	public static String		Calendar_Config_DayHeaderDateFormat_DayMonth;
 	public static String		Calendar_Config_DayHeaderDateFormat_DayMonthYear;
+	public static String		Calendar_Config_Name_Classic;
+	public static String		Calendar_Config_Name_Col_01;
+	public static String		Calendar_Config_Name_Col_01_Dark;
+	public static String		Calendar_Config_Name_Col_03;
+	public static String		Calendar_Config_Name_Col_03_Dark;
+	public static String		Calendar_Config_Name_Col_10;
+	public static String		Calendar_Config_Name_Col_10_Dark;
+	public static String		Calendar_Config_Name_Col_20;
+	public static String		Calendar_Config_Name_Col_20_Dark;
+	public static String		Calendar_Config_Name_Crazy;
+	public static String		Calendar_Config_Name_Default;
 	public static String		Calendar_Config_TourBackground_Circle;
 	public static String		Calendar_Config_TourBackground_DarkLeft;
 	public static String		Calendar_Config_TourBackground_DarkRight;
@@ -1657,7 +1668,6 @@ public class Messages extends NLS {
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowDayDate;
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowDayHeaderBold;
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowDayWeekendColor;
-	public static String		Slideout_CalendarOptions_Checkbox_IsShowMonthWithAlternatingColor;
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowSummaryColumn;
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowSummaryColumn_Tooltipxxx;
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowTourContent;
@@ -1666,6 +1676,8 @@ public class Messages extends NLS {
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowYearColumns;
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowYearColumns_Tooltip;
 	public static String		Slideout_CalendarOptions_Checkbox_IsTinyLayout;
+	public static String		Slideout_CalendarOptions_Checkbox_IsToggleMonthColor;
+	public static String		Slideout_CalendarOptions_Checkbox_IsToggleMonthColor_Tooltip;
 	public static String		Slideout_CalendarOptions_Checkbox_IsTruncateTourText;
 	public static String		Slideout_CalendarOptions_Checkbox_UseDraggedScrolling;
 	public static String		Slideout_CalendarOptions_Checkbox_UseDraggedScrolling_Tooltip;
@@ -1702,6 +1714,8 @@ public class Messages extends NLS {
 	public static String		Slideout_CalendarOptions_Label_TourBorder;
 	public static String		Slideout_CalendarOptions_Label_TourContentFont;
 	public static String		Slideout_CalendarOptions_Label_TourTitleFont;
+	public static String		Slideout_CalendarOptions_Label_TruncatedLines;
+	public static String		Slideout_CalendarOptions_Label_TruncatedLines_Tooltip;
 	public static String		Slideout_CalendarOptions_Label_ValueColumns;
 	public static String		Slideout_CalendarOptions_Label_ValueColumns_Tooltip;
 	public static String		Slideout_CalendarOptions_Label_WeekValueColor;

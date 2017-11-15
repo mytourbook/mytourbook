@@ -927,7 +927,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		_isYearColumn = _currentConfig.isShowYearColumns;
 
 		// one col left and right of the week + 7 week days
-		final int numYearColumns = _isYearColumn ? _currentConfig.numYearColumns : 1;
+		final int numYearColumns = _isYearColumn ? _currentConfig.yearColumns : 1;
 		final int numDayColumns = 7;
 
 		final int weekHeight = _currentConfig.weekHeight;
@@ -1178,7 +1178,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 					}
 
 					// get date label width
-					final String dayDateLabel = dayDateFormatter.format(currentDate);
+					final String dayDateLabel = UI.SPACE1 + dayDateFormatter.format(currentDate) + UI.SPACE1;
 
 					gc.setFont(dayDateFont);
 					final Point labelExtent = gc.textExtent(dayDateLabel);
@@ -1251,6 +1251,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 							dateLabelPosX += 2;
 
 //							gc.setBackground(_white);
+							gc.setBackground(_calendarBgColor);
 
 // outline is difficult to read
 //
@@ -1676,7 +1677,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 						fontHeight,
 						_dayDateLabelRect,
-						_currentConfig.isTruncateTourText);
+
+						_currentConfig.isTruncateTourText,
+						_currentConfig.tourTruncatedLines);
 
 				if (_textWrapPainter.isPainted()) {
 

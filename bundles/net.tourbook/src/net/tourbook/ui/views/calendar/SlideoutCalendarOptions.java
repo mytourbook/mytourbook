@@ -113,7 +113,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	private Button					_chkIsShowDateColumn;
 	private Button					_chkIsShowDayDateWeekendColor;
 	private Button					_chkIsShowDayDate;
-	private Button					_chkIsShowMonthWithAlternateColor;
+	private Button					_chkIsShowMonthColor;
 	private Button					_chkIsShowSummaryColumn;
 	private Button					_chkIsShowTourContent;
 	private Button					_chkIsShowTourValueUnit;
@@ -155,12 +155,13 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	private Label					_lblDateColumn_Width;
 	private Label					_lblDayHeader_Font;
 	private Label					_lblDayHeader_Format;
-	private Label					_lblNumYearColumn;
 	private Label					_lblTour_ContentFont;
-	private Label					_lblTour_NumValueColumns;
 	private Label					_lblTour_TitleFont;
+	private Label					_lblTour_TruncatedLines;
 	private Label					_lblWeek_ColumnWidth;
+	private Label					_lblTour_ValueColumns;
 	private Label					_lblWeek_ValueFont;
+	private Label					_lblYearColumn;
 	private Label					_lblYearColumn_HeaderFont;
 	private Label					_lblYearColumn_Spacing;
 	private Label					_lblYearColumn_Start;
@@ -172,13 +173,14 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	private SimpleFontEditor		_fontEditorWeekValue;
 	private SimpleFontEditor		_fontEditorYearColumnHeader;
 	//
-	private Spinner					_spinnerNumYearColumns;
+	private Spinner					_spinnerYearColumns;
 	private Spinner					_spinnerYearColumnSpacing;
 	private Spinner					_spinnerDateColumnWidth;
 	private Spinner					_spinnerWeek_ColumnWidth;
 	private Spinner					_spinnerTourBackgroundWidth;
 	private Spinner					_spinnerTourBorderWidth;
-	private Spinner					_spinnerTour_NumValueColumns;
+	private Spinner					_spinnerTour_TruncatedLines;
+	private Spinner					_spinnerTour_ValueColumns;
 	private Spinner					_spinnerWeekHeight;
 	//
 	private TabFolder				_tabFolder;
@@ -393,6 +395,25 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				// Color selector
 				_colorCalendarBackgroundColor = createUI_ColorSelector(container);
 			}
+			{
+				/*
+				 * Month alternate color
+				 */
+
+				// checkbox
+				_chkIsShowMonthColor = new Button(container, SWT.CHECK);
+				_chkIsShowMonthColor.setText(
+						Messages.Slideout_CalendarOptions_Checkbox_IsToggleMonthColor);
+				_chkIsShowMonthColor.setToolTipText(
+						Messages.Slideout_CalendarOptions_Checkbox_IsToggleMonthColor_Tooltip);
+				_chkIsShowMonthColor.addSelectionListener(_defaultSelectionListener);
+				GridDataFactory
+						.fillDefaults()//
+						.applyTo(_chkIsShowMonthColor);
+
+				// Color selector
+				_colorAlternateMonthColor = createUI_ColorSelector(container);
+			}
 		}
 	}
 
@@ -489,23 +510,23 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				 */
 
 				// label
-				_lblNumYearColumn = new Label(container, SWT.NONE);
-				_lblNumYearColumn.setText(Messages.Slideout_CalendarOptions_Label_NumYearColumns);
-				_lblNumYearColumn.setToolTipText(Messages.Slideout_CalendarOptions_Label_NumYearColumns_Tooltip);
+				_lblYearColumn = new Label(container, SWT.NONE);
+				_lblYearColumn.setText(Messages.Slideout_CalendarOptions_Label_NumYearColumns);
+				_lblYearColumn.setToolTipText(Messages.Slideout_CalendarOptions_Label_NumYearColumns_Tooltip);
 				GridDataFactory
 						.fillDefaults()//
 						.align(SWT.FILL, SWT.CENTER)
 						.indent(_subItemIndent, 0)
-						.applyTo(_lblNumYearColumn);
+						.applyTo(_lblYearColumn);
 
 				// spinner: columns
-				_spinnerNumYearColumns = new Spinner(container, SWT.BORDER);
-				_spinnerNumYearColumns.setMinimum(CalendarConfigManager.YEAR_COLUMNS_MIN);
-				_spinnerNumYearColumns.setMaximum(CalendarConfigManager.YEAR_COLUMNS_MAX);
-				_spinnerNumYearColumns.setIncrement(1);
-				_spinnerNumYearColumns.setPageIncrement(2);
-				_spinnerNumYearColumns.addSelectionListener(_defaultSelectionListener);
-				_spinnerNumYearColumns.addMouseWheelListener(_defaultMouseWheelListener);
+				_spinnerYearColumns = new Spinner(container, SWT.BORDER);
+				_spinnerYearColumns.setMinimum(CalendarConfigManager.YEAR_COLUMNS_MIN);
+				_spinnerYearColumns.setMaximum(CalendarConfigManager.YEAR_COLUMNS_MAX);
+				_spinnerYearColumns.setIncrement(1);
+				_spinnerYearColumns.setPageIncrement(2);
+				_spinnerYearColumns.addSelectionListener(_defaultSelectionListener);
+				_spinnerYearColumns.addMouseWheelListener(_defaultMouseWheelListener);
 
 			}
 			{
@@ -933,28 +954,6 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				_spinnerTourBorderWidth.addSelectionListener(_defaultSelectionListener);
 				_spinnerTourBorderWidth.addMouseWheelListener(_defaultMouseWheelListener);
 			}
-			{
-				/*
-				 * Month alternate color
-				 */
-				// checkbox
-				_chkIsShowMonthWithAlternateColor = new Button(group, SWT.CHECK);
-				_chkIsShowMonthWithAlternateColor.setText(
-						Messages.Slideout_CalendarOptions_Checkbox_IsShowMonthWithAlternatingColor);
-				_chkIsShowMonthWithAlternateColor.addSelectionListener(_defaultSelectionListener);
-				GridDataFactory
-						.fillDefaults()//
-						.span(4, 1)
-						.applyTo(_chkIsShowMonthWithAlternateColor);
-			}
-			{
-				/*
-				 * Alternate color
-				 */
-
-				// Color selector
-				_colorAlternateMonthColor = createUI_ColorSelector(group);
-			}
 		}
 	}
 
@@ -1027,7 +1026,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			}
 			{
 				/*
-				 * Wrap text
+				 * Truncate text
 				 */
 
 				// checkbox
@@ -1042,24 +1041,46 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			}
 			{
 				/*
+				 * Number of visible lines when truncated
+				 */
+
+				// label
+				_lblTour_TruncatedLines = new Label(container, SWT.NONE);
+				_lblTour_TruncatedLines.setText(Messages.Slideout_CalendarOptions_Label_TruncatedLines);
+				_lblTour_TruncatedLines.setToolTipText(Messages.Slideout_CalendarOptions_Label_TruncatedLines_Tooltip);
+				GridDataFactory
+						.fillDefaults()//
+						.align(SWT.FILL, SWT.CENTER)
+						.indent(_subItemIndent, 0)
+						.applyTo(_lblTour_TruncatedLines);
+
+				// spinner
+				_spinnerTour_TruncatedLines = new Spinner(container, SWT.BORDER);
+				_spinnerTour_TruncatedLines.setMinimum(1);
+				_spinnerTour_TruncatedLines.setMaximum(10);
+				_spinnerTour_TruncatedLines.addSelectionListener(_defaultSelectionListener);
+				_spinnerTour_TruncatedLines.addMouseWheelListener(_defaultMouseWheelListener);
+			}
+			{
+				/*
 				 * Number of value columns
 				 */
 
 				// label
-				_lblTour_NumValueColumns = new Label(container, SWT.NONE);
-				_lblTour_NumValueColumns.setText(Messages.Slideout_CalendarOptions_Label_ValueColumns);
-				_lblTour_NumValueColumns.setToolTipText(Messages.Slideout_CalendarOptions_Label_ValueColumns_Tooltip);
+				_lblTour_ValueColumns = new Label(container, SWT.NONE);
+				_lblTour_ValueColumns.setText(Messages.Slideout_CalendarOptions_Label_ValueColumns);
+				_lblTour_ValueColumns.setToolTipText(Messages.Slideout_CalendarOptions_Label_ValueColumns_Tooltip);
 				GridDataFactory
 						.fillDefaults()//
 						.align(SWT.FILL, SWT.CENTER)
-						.applyTo(_lblTour_NumValueColumns);
+						.applyTo(_lblTour_ValueColumns);
 
 				// spinner
-				_spinnerTour_NumValueColumns = new Spinner(container, SWT.BORDER);
-				_spinnerTour_NumValueColumns.setMinimum(1);
-				_spinnerTour_NumValueColumns.setMaximum(5);
-				_spinnerTour_NumValueColumns.addSelectionListener(_defaultSelectionListener);
-				_spinnerTour_NumValueColumns.addMouseWheelListener(_defaultMouseWheelListener);
+				_spinnerTour_ValueColumns = new Spinner(container, SWT.BORDER);
+				_spinnerTour_ValueColumns.setMinimum(1);
+				_spinnerTour_ValueColumns.setMaximum(5);
+				_spinnerTour_ValueColumns.addSelectionListener(_defaultSelectionListener);
+				_spinnerTour_ValueColumns.addMouseWheelListener(_defaultMouseWheelListener);
 			}
 		}
 	}
@@ -1455,10 +1476,23 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		final boolean isShowSummaryColumn = _chkIsShowSummaryColumn.getSelection();
 		final boolean isShowDayDate = _chkIsShowDayDate.getSelection();
 		final boolean isYearColumns = _chkIsShowYearColumns.getSelection();
+		final boolean isShowMonthColor = _chkIsShowMonthColor.getSelection();
 		final boolean isShowTourContent = _chkIsShowTourContent.getSelection();
+		final boolean isTruncateText = _chkIsTruncateTourText.getSelection();
 
 		final TourBackground_ComboData selectedTourBackgroundData = getSelectedTourBackgroundData();
 		final TourBorder_ComboData selectedTourBorderData = getSelectedTourBorderData();
+
+		// layout
+		_colorAlternateMonthColor.setEnabled(isShowMonthColor);
+		_comboColumnLayout.setEnabled(isYearColumns);
+		_fontEditorYearColumnHeader.setEnabled(isYearColumns);
+		_lblYearColumn.setEnabled(isYearColumns);
+		_lblYearColumn_HeaderFont.setEnabled(isYearColumns);
+		_lblYearColumn_Spacing.setEnabled(isYearColumns);
+		_lblYearColumn_Start.setEnabled(isYearColumns);
+		_spinnerYearColumns.setEnabled(isYearColumns);
+		_spinnerYearColumnSpacing.setEnabled(isYearColumns);
 
 		// date column
 		_comboDateColumn.setEnabled(isShowDateColumn);
@@ -1483,16 +1517,6 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		_spinnerTourBackgroundWidth.setEnabled(selectedTourBackgroundData.isWidth);
 		_spinnerTourBorderWidth.setEnabled(selectedTourBorderData.isWidth);
 
-		// layout
-		_comboColumnLayout.setEnabled(isYearColumns);
-		_fontEditorYearColumnHeader.setEnabled(isYearColumns);
-		_lblYearColumn_HeaderFont.setEnabled(isYearColumns);
-		_lblYearColumn_Spacing.setEnabled(isYearColumns);
-		_lblYearColumn_Start.setEnabled(isYearColumns);
-		_lblNumYearColumn.setEnabled(isYearColumns);
-		_spinnerNumYearColumns.setEnabled(isYearColumns);
-		_spinnerYearColumnSpacing.setEnabled(isYearColumns);
-
 		// tour content
 		_chkIsShowTourValueUnit.setEnabled(isShowTourContent);
 		_chkIsTruncateTourText.setEnabled(isShowTourContent);
@@ -1501,9 +1525,11 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		_fontEditorTourContent.setEnabled(isShowTourContent);
 		_fontEditorTourTitle.setEnabled(isShowTourContent);
 		_lblTour_ContentFont.setEnabled(isShowTourContent);
-		_lblTour_NumValueColumns.setEnabled(isShowTourContent);
 		_lblTour_TitleFont.setEnabled(isShowTourContent);
-		_spinnerTour_NumValueColumns.setEnabled(isShowTourContent);
+		_lblTour_TruncatedLines.setEnabled(isShowTourContent && isTruncateText);
+		_lblTour_ValueColumns.setEnabled(isShowTourContent);
+		_spinnerTour_TruncatedLines.setEnabled(isShowTourContent && isTruncateText);
+		_spinnerTour_ValueColumns.setEnabled(isShowTourContent);
 		enableControls_TourInfo();
 
 		// week summary
@@ -2305,7 +2331,9 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			_textConfigName.setText(config.name);
 
 			// layout
+			_chkIsShowMonthColor.setSelection(config.isToggleMonthColor);
 			_chkUseDraggedScrolling.setSelection(config.useDraggedScrolling);
+			_colorAlternateMonthColor.setColorValue(config.alternateMonthRGB);
 			_colorCalendarBackgroundColor.setColorValue(config.calendarBackgroundRGB);
 			_colorCalendarForegroundColor.setColorValue(config.calendarForegroundRGB);
 			_spinnerWeekHeight.setSelection(config.weekHeight);
@@ -2313,7 +2341,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			// year columns
 			_chkIsShowYearColumns.setSelection(config.isShowYearColumns);
 			_comboColumnLayout.select(getCalendarColumLayoutIndex(config.yearColumnsStart));
-			_spinnerNumYearColumns.setSelection(config.numYearColumns);
+			_spinnerYearColumns.setSelection(config.yearColumns);
 			_spinnerYearColumnSpacing.setSelection(config.yearColumnsSpacing);
 			_fontEditorYearColumnHeader.setSelection(config.yearHeaderFont);
 
@@ -2329,10 +2357,6 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			_chkIsShowDayDateWeekendColor.setSelection(config.isShowDayDateWeekendColor);
 			_comboDayHeaderDateFormat.select(getDayHeaderDateFormatIndex(config.dayDateFormat));
 			_fontEditorDayDate.setSelection(config.dayDateFont);
-
-			// day content
-			_colorAlternateMonthColor.setColorValue(config.alternateMonthRGB);
-			_chkIsShowMonthWithAlternateColor.setSelection(config.isToggleMonthColor);
 
 			// tour background
 			_comboTourBackground.select(getTourBackgroundIndex(config.tourBackground));
@@ -2351,7 +2375,8 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			_comboTour_TitleColor.select(getDayContentColorIndex(config.tourTitleColor));
 			_fontEditorTourContent.setSelection(config.tourContentFont);
 			_fontEditorTourTitle.setSelection(config.tourTitleFont);
-			_spinnerTour_NumValueColumns.setSelection(config.tourValueColumns);
+			_spinnerTour_TruncatedLines.setSelection(config.tourTruncatedLines);
+			_spinnerTour_ValueColumns.setSelection(config.tourValueColumns);
 			selectDataFormatter(
 					config.allTourFormatterData,
 					CalendarConfigManager.allTourContentFormatter,
@@ -2401,7 +2426,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 		// year columns
 		config.isShowYearColumns = _chkIsShowYearColumns.getSelection();
-		config.numYearColumns = _spinnerNumYearColumns.getSelection();
+		config.yearColumns = _spinnerYearColumns.getSelection();
 		config.yearColumnsStart = getSelectedColumnLayout();
 		config.yearColumnsSpacing = _spinnerYearColumnSpacing.getSelection();
 		config.yearHeaderFont = _fontEditorYearColumnHeader.getSelection();
@@ -2421,7 +2446,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 		// day content
 		config.alternateMonthRGB = _colorAlternateMonthColor.getColorValue();
-		config.isToggleMonthColor = _chkIsShowMonthWithAlternateColor.getSelection();
+		config.isToggleMonthColor = _chkIsShowMonthColor.getSelection();
 
 		// tour background
 		config.tourBackground = getSelectedTourBackgroundData().tourBackground;
@@ -2436,11 +2461,12 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		config.isShowTourContent = _chkIsShowTourContent.getSelection();
 		config.isShowTourValueUnit = _chkIsShowTourValueUnit.getSelection();
 		config.isTruncateTourText = _chkIsTruncateTourText.getSelection();
-		config.tourValueColumns = _spinnerTour_NumValueColumns.getSelection();
 		config.tourContentColor = getSelectedTourContentColor(_comboTour_ContentColor).dayContentColor;
 		config.tourContentFont = _fontEditorTourContent.getSelection();
 		config.tourTitleColor = getSelectedTourContentColor(_comboTour_TitleColor).dayContentColor;
 		config.tourTitleFont = _fontEditorTourTitle.getSelection();
+		config.tourTruncatedLines = _spinnerTour_TruncatedLines.getSelection();
+		config.tourValueColumns = _spinnerTour_ValueColumns.getSelection();
 
 		config.allTourFormatterData = getSelectedFormatterData(
 				CalendarConfigManager.allTourContentFormatter,

@@ -67,16 +67,7 @@ public class CalendarConfigManager {
 	//
 // SET_FORMATTING_ON
 	//
-	static final String						CONFIG_DEFAULT_ID_1						= "#1";								//$NON-NLS-1$
-	private static final String				CONFIG_DEFAULT_ID_2						= "#2";								//$NON-NLS-1$
-	private static final String				CONFIG_DEFAULT_ID_3						= "#3";								//$NON-NLS-1$
-	private static final String				CONFIG_DEFAULT_ID_4						= "#4";								//$NON-NLS-1$
-	private static final String				CONFIG_DEFAULT_ID_5						= "#5";								//$NON-NLS-1$
-	private static final String				CONFIG_DEFAULT_ID_6						= "#6";								//$NON-NLS-1$
-	private static final String				CONFIG_DEFAULT_ID_7						= "#7";								//$NON-NLS-1$
-	private static final String				CONFIG_DEFAULT_ID_8						= "#8";								//$NON-NLS-1$
-	private static final String				CONFIG_DEFAULT_ID_9						= "#9";								//$NON-NLS-1$
-	private static final String				CONFIG_DEFAULT_ID_10					= "#10";							//$NON-NLS-1$
+	private static final String				CUSTOM_DEFAULT_NAME						= "#";
 	//
 	// common attributes
 	private static final String				ATTR_ACTIVE_CONFIG_ID					= "activeConfigId";					//$NON-NLS-1$
@@ -115,6 +106,7 @@ public class CalendarConfigManager {
 	private static final String				ATTR_IS_SHOW_WEEK_VALUE_UNIT			= "isShowWeekValueUnit";			//$NON-NLS-1$
 	private static final String				ATTR_IS_TOGGLE_MONTH_COLOR				= "isToggleMonthColor";				//$NON-NLS-1$
 	private static final String				ATTR_IS_TRUNCATE_TOUR_TEXT				= "isTruncateTourText";				//$NON-NLS-1$
+	private static final String				ATTR_CONFIG_DEFAULT_ID					= "configDefaultId";				//$NON-NLS-1$
 	private static final String				ATTR_DATE_COLUMN_CONTENT				= "dateColumnContent";				//$NON-NLS-1$
 	private static final String				ATTR_DATE_COLUMN_FONT					= "dateColumnFont";					//$NON-NLS-1$
 	private static final String				ATTR_DATE_COLUMN_WIDTH					= "dateColumnWidth";				//$NON-NLS-1$
@@ -133,6 +125,7 @@ public class CalendarConfigManager {
 	private static final String				ATTR_TOUR_CONTENT_COLOR					= "tourContentColor";				//$NON-NLS-1$
 	private static final String				ATTR_TOUR_TITLE_COLOR					= "tourTitleColor";					//$NON-NLS-1$
 	private static final String				ATTR_TOUR_TITLE_FONT					= "tourTitleFont";					//$NON-NLS-1$
+	private static final String				ATTR_TOUR_TRUNCATED_LINES				= "tourTruncatedLines";				//$NON-NLS-1$
 	private static final String				ATTR_TOUR_VALUE_COLUMNS					= "tourValueColumns";				//$NON-NLS-1$
 	private static final String				ATTR_USE_DRAGGED_SCROLLING				= "useDraggedScrolling";			//$NON-NLS-1$
 	private static final String				ATTR_WEEK_COLUMN_WIDTH					= "weekColumnWidth";				//$NON-NLS-1$
@@ -145,6 +138,7 @@ public class CalendarConfigManager {
 	private static final String				ATTR_YEAR_HEADER_FONT					= "yearHeaderFont";					//$NON-NLS-1$
 	//
 	static final RGB						DEFAULT_ALTERNATE_MONTH_RGB				= new RGB(0xf0, 0xf0, 0xf0);
+	static final ConfigDefault				DEFAULT_CONFIG_DEFAULT_ID				= ConfigDefault.DEFAULT;
 	static final RGB						DEFAULT_CALENDAR_BACKGROUND_RGB;
 	static final RGB						DEFAULT_CALENDAR_FOREBACKGROUND_RGB;
 	static final CalendarColor				DEFAULT_DAY_CONTENT_COLOR				= CalendarColor.CONTRAST;
@@ -153,6 +147,7 @@ public class CalendarConfigManager {
 	static final DateColumnContent			DEFAULT_DATE_COLUMN_CONTENT				= DateColumnContent.MONTH;
 	static final DataFormatter				DEFAULT_EMPTY_FORMATTER;
 	static final boolean					DEFAULT_IS_SHOW_DAY_DATE_WEEKEND_COLOR	= true;
+	static final boolean					DEFAULT_IS_TRUNCATE_TOUR_TEXT			= true;
 	static final int						DEFAULT_SUMMARY_COLUMN_WIDTH			= 60;
 	static final TourBackground				DEFAULT_TOUR_BACKGROUND					= TourBackground.FILL;
 	static final CalendarColor				DEFAULT_TOUR_BACKGROUND_COLOR1			= CalendarColor.DARK;
@@ -161,6 +156,7 @@ public class CalendarConfigManager {
 	static final TourBorder					DEFAULT_TOUR_BORDER						= TourBorder.NO_BORDER;
 	static final CalendarColor				DEFAULT_TOUR_BORDER_COLOR				= CalendarColor.LINE;
 	static final int						DEFAULT_TOUR_BORDER_WIDTH				= 1;
+	static final int						DEFAULT_TOUR_TRUNCATED_LINES			= 2;
 	static final int						DEFAULT_TOUR_VALUE_COLUMNS				= 2;
 	static final int						DEFAULT_WEEK_HEIGHT						= 70;
 	static final CalendarColor				DEFAULT_WEEK_VALUE_COLOR				= CalendarColor.TEXT;
@@ -607,70 +603,203 @@ public class CalendarConfigManager {
 		return xmlRoot;
 	}
 
-	private static void createDefaults_Calendars() {
+	private static void createConfig_All() {
 
 		_allCalendarConfigs.clear();
 
-		// append custom configurations
+		// add default default - CONFIG_DEFAULT_ID
+		_allCalendarConfigs.add(new CalendarConfig());
+
+		_allCalendarConfigs.add(createConfig_Classic());
+		_allCalendarConfigs.add(createConfig_Crazy());
+
+		_allCalendarConfigs.add(createConfig_Col_01());
+		_allCalendarConfigs.add(createConfig_Col_03());
+		_allCalendarConfigs.add(createConfig_Col_10());
+		_allCalendarConfigs.add(createConfig_Col_20());
+
+		_allCalendarConfigs.add(createConfig_Col_01_Dark());
+		_allCalendarConfigs.add(createConfig_Col_03_Dark());
+		_allCalendarConfigs.add(createConfig_Col_10_Dark());
+		_allCalendarConfigs.add(createConfig_Col_20_Dark());
+
+		// append 10 custom configurations created from default default config
 		for (int configIndex = 1; configIndex < 11; configIndex++) {
-			_allCalendarConfigs.add(createDefaults_Calendars_One(configIndex));
+
+			final CalendarConfig config = new CalendarConfig();
+
+			config.name = CUSTOM_DEFAULT_NAME + configIndex;
+
+			_allCalendarConfigs.add(config);
 		}
 	}
 
-	/**
-	 * @param configIndex
-	 *            Index starts with 1.
-	 * @return
-	 */
-	private static CalendarConfig createDefaults_Calendars_One(final int configIndex) {
+	private static CalendarConfig createConfig_Classic() {
 
 		final CalendarConfig config = new CalendarConfig();
 
-		switch (configIndex) {
-
-		case 1:
-			config.name = config.defaultId = CONFIG_DEFAULT_ID_1;
-			break;
-
-		case 2:
-			config.name = config.defaultId = CONFIG_DEFAULT_ID_2;
-			break;
-
-		case 3:
-			config.name = config.defaultId = CONFIG_DEFAULT_ID_3;
-			break;
-
-		case 4:
-			config.name = config.defaultId = CONFIG_DEFAULT_ID_4;
-			break;
-
-		case 5:
-			config.name = config.defaultId = CONFIG_DEFAULT_ID_5;
-			break;
-
-		case 6:
-			config.name = config.defaultId = CONFIG_DEFAULT_ID_6;
-			break;
-
-		case 7:
-			config.name = config.defaultId = CONFIG_DEFAULT_ID_7;
-			break;
-
-		case 8:
-			config.name = config.defaultId = CONFIG_DEFAULT_ID_8;
-			break;
-
-		case 9:
-			config.name = config.defaultId = CONFIG_DEFAULT_ID_9;
-			break;
-
-		case 10:
-			config.name = config.defaultId = CONFIG_DEFAULT_ID_10;
-			break;
-
-		}
+// SET_FORMATTING_OFF
+		
+		config.defaultId	= ConfigDefault.CLASSIC;
+		config.name			= Messages.Calendar_Config_Name_Classic;
+		
+// SET_FORMATTING_ON
 
 		return config;
+	}
+
+	private static CalendarConfig createConfig_Col_01() {
+
+		final CalendarConfig config = new CalendarConfig();
+
+// SET_FORMATTING_OFF
+		
+		config.defaultId	= ConfigDefault.COL_1;
+		config.name			= Messages.Calendar_Config_Name_Col_01;
+		
+// SET_FORMATTING_ON
+
+		return config;
+	}
+
+	private static CalendarConfig createConfig_Col_01_Dark() {
+
+		final CalendarConfig config = new CalendarConfig();
+
+// SET_FORMATTING_OFF
+		
+		config.defaultId	= ConfigDefault.DARK_COL_1;
+		config.name			= Messages.Calendar_Config_Name_Col_01_Dark;
+		
+// SET_FORMATTING_ON
+
+		return config;
+	}
+
+	private static CalendarConfig createConfig_Col_03() {
+
+		final CalendarConfig config = new CalendarConfig();
+
+// SET_FORMATTING_OFF
+		
+		config.defaultId	= ConfigDefault.COL_3;
+		config.name			= Messages.Calendar_Config_Name_Col_03;
+		
+// SET_FORMATTING_ON
+
+		return config;
+	}
+
+	private static CalendarConfig createConfig_Col_03_Dark() {
+
+		final CalendarConfig config = new CalendarConfig();
+
+// SET_FORMATTING_OFF
+			
+			config.defaultId	= ConfigDefault.DARK_COL_3;
+			config.name			= Messages.Calendar_Config_Name_Col_03_Dark;
+			
+// SET_FORMATTING_ON
+
+		return config;
+	}
+
+	private static CalendarConfig createConfig_Col_10() {
+
+		final CalendarConfig config = new CalendarConfig();
+
+// SET_FORMATTING_OFF
+		
+		config.defaultId	= ConfigDefault.COL_10;
+		config.name			= Messages.Calendar_Config_Name_Col_10;
+		
+// SET_FORMATTING_ON
+
+		return config;
+	}
+
+	private static CalendarConfig createConfig_Col_10_Dark() {
+
+		final CalendarConfig config = new CalendarConfig();
+
+// SET_FORMATTING_OFF
+		
+		config.defaultId	= ConfigDefault.DARK_COL_10;
+		config.name			= Messages.Calendar_Config_Name_Col_10_Dark;
+		
+// SET_FORMATTING_ON
+
+		return config;
+	}
+
+	private static CalendarConfig createConfig_Col_20() {
+
+		final CalendarConfig config = new CalendarConfig();
+
+// SET_FORMATTING_OFF
+		
+		config.defaultId	= ConfigDefault.COL_20;
+		config.name			= Messages.Calendar_Config_Name_Col_20;
+		
+// SET_FORMATTING_ON
+
+		return config;
+	}
+
+	private static CalendarConfig createConfig_Col_20_Dark() {
+
+		final CalendarConfig config = new CalendarConfig();
+
+// SET_FORMATTING_OFF
+		
+		config.defaultId	= ConfigDefault.DARK_COL_20;
+		config.name			= Messages.Calendar_Config_Name_Col_20_Dark;
+		
+// SET_FORMATTING_ON
+
+		return config;
+	}
+
+	private static CalendarConfig createConfig_Crazy() {
+
+		final CalendarConfig config = new CalendarConfig();
+
+// SET_FORMATTING_OFF
+		
+		config.defaultId	= ConfigDefault.CRAZY;
+		config.name			= Messages.Calendar_Config_Name_Crazy;
+		
+// SET_FORMATTING_ON
+
+		return config;
+	}
+
+	private static CalendarConfig createConfig_FromId(final ConfigDefault defaultId) {
+
+// SET_FORMATTING_OFF
+		
+		switch (defaultId) {
+		
+		case CLASSIC:		return createConfig_Classic();
+		case CRAZY:			return createConfig_Crazy();
+		
+		case COL_1:			return createConfig_Col_01();
+		case COL_3:			return createConfig_Col_03();
+		case COL_10:		return createConfig_Col_10();
+		case COL_20:		return createConfig_Col_20();
+		
+		case DARK_COL_1:	return createConfig_Col_01();
+		case DARK_COL_3:	return createConfig_Col_03();
+		case DARK_COL_10:	return createConfig_Col_10();
+		case DARK_COL_20:	return createConfig_Col_20();
+
+		case DEFAULT:
+		default:
+			// create default default
+			return new CalendarConfig();
+		}
+		
+// SET_FORMATTING_ON
 	}
 
 	/**
@@ -1175,107 +1304,6 @@ public class CalendarConfigManager {
 		return dataFormatter;
 	}
 
-	private static void createXml_FromCalendarConfig(final CalendarConfig config, final IMemento xmlCalendars) {
-
-		// <Calendar>
-		final IMemento xmlConfig = xmlCalendars.createChild(TAG_CALENDAR);
-		{
-// SET_FORMATTING_OFF
-			
-			// config
-			xmlConfig.putString(		ATTR_ID, 								config.id);
-			xmlConfig.putString(		ATTR_CONFIG_NAME, 						config.name);
-			
-			// layout
-			xmlConfig.putBoolean(		ATTR_USE_DRAGGED_SCROLLING, 			config.useDraggedScrolling);
-			xmlConfig.putInteger(		ATTR_WEEK_HEIGHT, 						config.weekHeight);
-			Util.setXmlRgb(xmlConfig,	TAG_CALENDAR_BACKGROUND_RGB, 			config.calendarBackgroundRGB);
-			Util.setXmlRgb(xmlConfig,	TAG_CALENDAR_FOREGROUND_RGB, 			config.calendarForegroundRGB);
-			
-			// year columns
-			xmlConfig.putBoolean(		ATTR_IS_SHOW_YEAR_COLUMNS, 				config.isShowYearColumns);
-			xmlConfig.putInteger(		ATTR_YEAR_COLUMNS, 						config.numYearColumns);
-			xmlConfig.putInteger(		ATTR_YEAR_COLUMNS_SPACING, 				config.yearColumnsSpacing);
-			Util.setXmlEnum(xmlConfig,	ATTR_YEAR_COLUMNS_START, 				config.yearColumnsStart);
-			Util.setXmlFont(xmlConfig,	ATTR_YEAR_HEADER_FONT, 					config.yearHeaderFont);
-			
-			// date column
-			xmlConfig.putBoolean(		ATTR_IS_SHOW_DATE_COLUMN, 				config.isShowDateColumn);
-			xmlConfig.putInteger(		ATTR_DATE_COLUMN_WIDTH, 				config.dateColumnWidth);
-			Util.setXmlEnum(xmlConfig,	ATTR_DATE_COLUMN_CONTENT, 				config.dateColumnContent);
-			Util.setXmlFont(xmlConfig,	ATTR_DATE_COLUMN_FONT, 					config.dateColumnFont);
-			
-			// day
-			xmlConfig.putBoolean(		ATTR_IS_TOGGLE_MONTH_COLOR, 			config.isToggleMonthColor);
-			Util.setXmlRgb(xmlConfig,	TAG_ALTERNATE_MONTH_RGB, 				config.alternateMonthRGB);
-
-			// day date
-			xmlConfig.putBoolean(		ATTR_IS_HIDE_DAY_DATE_WHEN_NO_TOUR, 	config.isHideDayDateWhenNoTour);
-			xmlConfig.putBoolean(		ATTR_IS_SHOW_DAY_DATE, 					config.isShowDayDate);
-			xmlConfig.putBoolean(		ATTR_IS_SHOW_DAY_DATE_WEEKEND_COLOR, 	config.isShowDayDateWeekendColor);
-			Util.setXmlEnum(xmlConfig,	ATTR_DAY_DATE_FORMAT, 					config.dayDateFormat);
-			Util.setXmlFont(xmlConfig,	ATTR_DAY_DATE_FONT, 					config.dayDateFont);
-
-			// tour background
-			xmlConfig.putInteger(		ATTR_TOUR_BACKGROUND_WIDTH, 			config.tourBackgroundWidth);
-			xmlConfig.putInteger(		ATTR_TOUR_BORDER_WIDTH, 				config.tourBorderWidth);
-
-			Util.setXmlEnum(xmlConfig,	ATTR_TOUR_BACKGROUND, 					config.tourBackground);
-			Util.setXmlEnum(xmlConfig,	ATTR_TOUR_BACKGROUND_COLOR1, 			config.tourBackgroundColor1);
-			Util.setXmlEnum(xmlConfig,	ATTR_TOUR_BACKGROUND_COLOR2, 			config.tourBackgroundColor2);
-			Util.setXmlEnum(xmlConfig,	ATTR_TOUR_BORDER, 						config.tourBorder);
-			Util.setXmlEnum(xmlConfig,	ATTR_TOUR_BORDER_COLOR, 				config.tourBorderColor);
-
-			// tour content
-			xmlConfig.putBoolean(		ATTR_IS_SHOW_TOUR_CONTENT,				config.isShowTourContent);
-			xmlConfig.putBoolean(		ATTR_IS_SHOW_TOUR_VALUE_UNIT,			config.isShowTourValueUnit);
-			xmlConfig.putBoolean(		ATTR_IS_TRUNCATE_TOUR_TEXT,				config.isTruncateTourText);
-			xmlConfig.putInteger(		ATTR_TOUR_VALUE_COLUMNS, 				config.tourValueColumns);
-			Util.setXmlEnum(xmlConfig,	ATTR_TOUR_CONTENT_COLOR, 				config.tourContentColor);
-			Util.setXmlFont(xmlConfig,	ATTR_TOUR_CONTENT_FONT, 				config.tourContentFont);
-			Util.setXmlEnum(xmlConfig,	ATTR_TOUR_TITLE_COLOR, 					config.tourTitleColor);
-			Util.setXmlFont(xmlConfig,	ATTR_TOUR_TITLE_FONT, 					config.tourTitleFont);
-			
-
-			// week summary column
-			xmlConfig.putBoolean(		ATTR_IS_SHOW_SUMMARY_COLUMN, 			config.isShowSummaryColumn);
-			xmlConfig.putBoolean(		ATTR_IS_SHOW_WEEK_VALUE_UNIT, 			config.isShowWeekValueUnit);
-			xmlConfig.putInteger(		ATTR_WEEK_COLUMN_WIDTH, 				config.weekColumnWidth);
-			Util.setXmlEnum(xmlConfig,	ATTR_WEEK_VALUE_COLOR, 					config.weekValueColor);
-			Util.setXmlFont(xmlConfig,	ATTR_WEEK_VALUE_FONT, 					config.weekValueFont);
-			
-// SET_FORMATTING_ON
-
-			/*
-			 * Tour content formatter
-			 */
-			final IMemento xmlAllTourFormatter = xmlConfig.createChild(TAG_ALL_TOUR_FORMATTER);
-
-			for (final FormatterData formatterData : config.allTourFormatterData) {
-
-				final IMemento xmlFormatter = xmlAllTourFormatter.createChild(TAG_FORMATTER);
-
-				xmlFormatter.putBoolean(ATTR_IS_SHOW_VALUE, formatterData.isEnabled);
-				Util.setXmlEnum(xmlFormatter, ATTR_FORMATTER_ID, formatterData.id);
-				Util.setXmlEnum(xmlFormatter, ATTR_FORMATTER_VALUE_FORMAT, formatterData.valueFormat);
-			}
-
-			/*
-			 * Week summary formatter
-			 */
-			final IMemento xmlAllWeekFormatter = xmlConfig.createChild(TAG_ALL_WEEK_FORMATTER);
-
-			for (final FormatterData formatterData : config.allWeekFormatterData) {
-
-				final IMemento xmlFormatter = xmlAllWeekFormatter.createChild(TAG_FORMATTER);
-
-				xmlFormatter.putBoolean(ATTR_IS_SHOW_VALUE, formatterData.isEnabled);
-				Util.setXmlEnum(xmlFormatter, ATTR_FORMATTER_ID, formatterData.id);
-				Util.setXmlEnum(xmlFormatter, ATTR_FORMATTER_VALUE_FORMAT, formatterData.valueFormat);
-			}
-		}
-	}
-
 	static CalendarConfig getActiveCalendarConfig() {
 
 		if (_activeCalendarConfig == null) {
@@ -1368,7 +1396,7 @@ public class CalendarConfigManager {
 
 			StatusUtil.log("Created default config for calendar properties");//$NON-NLS-1$
 
-			createDefaults_Calendars();
+			createConfig_All();
 
 			activeConfig = _allCalendarConfigs.get(0);
 		}
@@ -1458,114 +1486,12 @@ public class CalendarConfigManager {
 
 					// <Calendar>
 
-					final CalendarConfig calendarConfig = new CalendarConfig();
-
-					parse_210_CalendarConfig(xmlConfig, calendarConfig);
-
-					allCalendarConfigs.add(calendarConfig);
+					allCalendarConfigs.add(restoreConfig(xmlConfig));
 				}
 
 			} catch (final Exception e) {
 				StatusUtil.log(Util.dumpMemento(xmlConfig), e);
 			}
-		}
-	}
-
-	private static void parse_210_CalendarConfig(final XMLMemento xmlConfig, final CalendarConfig config) {
-
-		// !!! getFontData() MUST be created for EVERY font otherwise they use all the SAME font !!!
-		final Font defaultFont = JFaceResources.getFontRegistry().defaultFont();
-
-// SET_FORMATTING_OFF
-		
-		// config
-		config.id							= Util.getXmlString(xmlConfig,						ATTR_ID,						Long.toString(System.nanoTime()));
-		config.name							= Util.getXmlString(xmlConfig,						ATTR_CONFIG_NAME,				UI.EMPTY_STRING);
-		
-		// layout
-		config.weekHeight					= Util.getXmlInteger(xmlConfig, 					ATTR_WEEK_HEIGHT,				DEFAULT_WEEK_HEIGHT);
-		config.useDraggedScrolling			= Util.getXmlBoolean(xmlConfig, 					ATTR_USE_DRAGGED_SCROLLING,		true);
-		config.calendarBackgroundRGB		= Util.getXmlRgb(xmlConfig, 						TAG_CALENDAR_BACKGROUND_RGB,	DEFAULT_CALENDAR_BACKGROUND_RGB);
-		config.calendarForegroundRGB		= Util.getXmlRgb(xmlConfig, 						TAG_CALENDAR_FOREGROUND_RGB,	DEFAULT_CALENDAR_FOREBACKGROUND_RGB);
-		
-		// year columns
-		config.isShowYearColumns			= Util.getXmlBoolean(xmlConfig, 					ATTR_IS_SHOW_YEAR_COLUMNS,		true);
-		config.numYearColumns				= Util.getXmlInteger(xmlConfig,						ATTR_YEAR_COLUMNS,				DEFAULT_YEAR_COLUMNS);
-		config.yearColumnsSpacing			= Util.getXmlInteger(xmlConfig, 					ATTR_YEAR_COLUMNS_SPACING,		DEFAULT_YEAR_COLUMNS_SPACING);
-		config.yearColumnsStart				= (ColumnStart) Util.getXmlEnum(xmlConfig,			ATTR_YEAR_COLUMNS_START,		DEFAULT_YEAR_COLUMNS_LAYOUT);
-		config.yearHeaderFont				= Util.getXmlFont(xmlConfig, 						ATTR_YEAR_HEADER_FONT,			defaultFont.getFontData()[0]);
-		
-		// date column
-		config.isShowDateColumn				= Util.getXmlBoolean(xmlConfig, 					ATTR_IS_SHOW_DATE_COLUMN,		true);
-		config.dateColumnFont 				= Util.getXmlFont(xmlConfig, 						ATTR_DATE_COLUMN_FONT, 			defaultFont.getFontData()[0]);
-		config.dateColumnWidth				= Util.getXmlInteger(xmlConfig, 					ATTR_DATE_COLUMN_WIDTH,			DEFAULT_DATE_COLUMN_WIDTH);
-		config.dateColumnContent			= (DateColumnContent) Util.getXmlEnum(xmlConfig,	ATTR_DATE_COLUMN_CONTENT,		DateColumnContent.WEEK_NUMBER);
-
-		// day date
-		config.isHideDayDateWhenNoTour		= Util.getXmlBoolean(xmlConfig, 					ATTR_IS_HIDE_DAY_DATE_WHEN_NO_TOUR,		true);
-		config.isShowDayDate				= Util.getXmlBoolean(xmlConfig, 					ATTR_IS_SHOW_DAY_DATE,					true);
-		config.isShowDayDateWeekendColor	= Util.getXmlBoolean(xmlConfig, 					ATTR_IS_SHOW_DAY_DATE_WEEKEND_COLOR,	DEFAULT_IS_SHOW_DAY_DATE_WEEKEND_COLOR);
-		config.dayDateFont 					= Util.getXmlFont(xmlConfig, 						ATTR_DAY_DATE_FONT, 					defaultFont.getFontData()[0]);
-		config.dayDateFormat				= (DayDateFormat) Util.getXmlEnum(xmlConfig,		ATTR_DAY_DATE_FORMAT,					DEFAULT_DAY_DATE_FORMAT);
-		                                    
-		// day content
-		config.alternateMonthRGB			= Util.getXmlRgb(xmlConfig, 						TAG_ALTERNATE_MONTH_RGB,		DEFAULT_ALTERNATE_MONTH_RGB);
-		config.isToggleMonthColor			= Util.getXmlBoolean(xmlConfig, 					ATTR_IS_TOGGLE_MONTH_COLOR,		true);
-		config.tourBackgroundWidth			= Util.getXmlInteger(xmlConfig, 					ATTR_TOUR_BACKGROUND_WIDTH, 	DEFAULT_TOUR_BACKGROUND_WIDTH, 1, 100);
-		config.tourBorderWidth				= Util.getXmlInteger(xmlConfig, 					ATTR_TOUR_BORDER_WIDTH,		 	DEFAULT_TOUR_BORDER_WIDTH, 1, 100);
-		
-		config.tourBackground 				= (TourBackground) Util.getXmlEnum(xmlConfig,		ATTR_TOUR_BACKGROUND,			DEFAULT_TOUR_BACKGROUND);
-		config.tourBackgroundColor1 		= (CalendarColor) Util.getXmlEnum(xmlConfig,		ATTR_TOUR_BACKGROUND_COLOR1,	DEFAULT_TOUR_BACKGROUND_COLOR1);
-		config.tourBackgroundColor2 		= (CalendarColor) Util.getXmlEnum(xmlConfig,		ATTR_TOUR_BACKGROUND_COLOR2,	DEFAULT_TOUR_BACKGROUND_COLOR2);
-		config.tourBorder 					= (TourBorder) Util.getXmlEnum(xmlConfig,			ATTR_TOUR_BORDER,				DEFAULT_TOUR_BORDER);
-		config.tourBorderColor 				= (CalendarColor) Util.getXmlEnum(xmlConfig,		ATTR_TOUR_BORDER_COLOR,			DEFAULT_TOUR_BORDER_COLOR);
-		
-		// tour content
-		config.isShowTourContent			= Util.getXmlBoolean(xmlConfig, 					ATTR_IS_SHOW_TOUR_CONTENT,		true);
-		config.isShowTourValueUnit			= Util.getXmlBoolean(xmlConfig, 					ATTR_IS_SHOW_TOUR_VALUE_UNIT,	true);
-		config.isTruncateTourText			= Util.getXmlBoolean(xmlConfig, 					ATTR_IS_TRUNCATE_TOUR_TEXT,			true);
-		config.tourContentColor				= (CalendarColor) Util.getXmlEnum(xmlConfig,		ATTR_TOUR_CONTENT_COLOR,		DEFAULT_DAY_CONTENT_COLOR);
-		config.tourContentFont 				= Util.getXmlFont(xmlConfig, 						ATTR_TOUR_CONTENT_FONT, 		defaultFont.getFontData()[0]);
-		config.tourTitleColor				= (CalendarColor) Util.getXmlEnum(xmlConfig,		ATTR_TOUR_TITLE_COLOR,			DEFAULT_DAY_CONTENT_COLOR);
-		config.tourTitleFont 				= Util.getXmlFont(xmlConfig, 						ATTR_TOUR_TITLE_FONT, 			defaultFont.getFontData()[0]);
-		config.tourValueColumns				= Util.getXmlInteger(xmlConfig, 					ATTR_TOUR_VALUE_COLUMNS,	 	DEFAULT_TOUR_VALUE_COLUMNS, 1, 3);
-		
-		// week summary column
-		config.isShowSummaryColumn			= Util.getXmlBoolean(xmlConfig, 					ATTR_IS_SHOW_SUMMARY_COLUMN,	true);
-		config.isShowWeekValueUnit			= Util.getXmlBoolean(xmlConfig, 					ATTR_IS_SHOW_WEEK_VALUE_UNIT,	true);
-		config.weekColumnWidth				= Util.getXmlInteger(xmlConfig, 					ATTR_WEEK_COLUMN_WIDTH,			DEFAULT_SUMMARY_COLUMN_WIDTH);
-		config.weekValueColor		 		= (CalendarColor) Util.getXmlEnum(xmlConfig,		ATTR_WEEK_VALUE_COLOR,			DEFAULT_WEEK_VALUE_COLOR);
-		config.weekValueFont				= Util.getXmlFont(xmlConfig, 						ATTR_WEEK_VALUE_FONT,			defaultFont.getFontData()[0]);
-
-// SET_FORMATTING_ON
-
-		/*
-		 * Week formatter
-		 */
-		final XMLMemento xmlAllWeekFormatter = (XMLMemento) xmlConfig.getChild(TAG_ALL_WEEK_FORMATTER);
-		if (xmlAllWeekFormatter != null) {
-
-			final ArrayList<FormatterData> allWeekFormatterData = new ArrayList<>();
-
-			for (final IMemento xmlWeekFormatterData : xmlAllWeekFormatter.getChildren()) {
-
-				final boolean isEnabled = Util.getXmlBoolean(xmlWeekFormatterData, ATTR_IS_SHOW_VALUE, true);
-
-				final FormatterID id = (FormatterID) Util.getXmlEnum(
-						xmlWeekFormatterData,
-						ATTR_FORMATTER_ID,
-						FormatterID.EMPTY);
-
-				final ValueFormat valueFormat = (ValueFormat) Util.getXmlEnum(
-						xmlWeekFormatterData,
-						ATTR_FORMATTER_VALUE_FORMAT,
-						ValueFormat.DUMMY_VALUE);
-
-				allWeekFormatterData.add(new FormatterData(isEnabled, id, valueFormat));
-			}
-
-			config.allWeekFormatterData = allWeekFormatterData.toArray(
-					new FormatterData[allWeekFormatterData.size()]);
 		}
 	}
 
@@ -1604,7 +1530,7 @@ public class CalendarConfigManager {
 
 			// ensure config is created
 			if (_allCalendarConfigs.size() == 0) {
-				createDefaults_Calendars();
+				createConfig_All();
 			}
 
 			setActiveCalendarConfigIntern(getConfig_Calendar(), null);
@@ -1627,8 +1553,7 @@ public class CalendarConfigManager {
 		_allCalendarConfigs.remove(_activeCalendarConfig);
 
 		// create new config
-		final int configIndex = activeCalendarConfigIndex + 1;
-		final CalendarConfig newConfig = createDefaults_Calendars_One(configIndex);
+		final CalendarConfig newConfig = createConfig_FromId(_activeCalendarConfig.defaultId);
 		newConfig.name = oldName;
 
 		// update model
@@ -1638,9 +1563,217 @@ public class CalendarConfigManager {
 
 	static void resetAllCalendarConfigurations() {
 
-		createDefaults_Calendars();
+		createConfig_All();
 
 		setActiveCalendarConfigIntern(_allCalendarConfigs.get(0), null);
+	}
+
+	private static CalendarConfig restoreConfig(final XMLMemento xmlConfig) {
+
+		// !!! getFontData() MUST be created for EVERY font otherwise they use all the SAME font !!!
+		final Font defaultFont = JFaceResources.getFontRegistry().defaultFont();
+
+		final CalendarConfig config = new CalendarConfig();
+
+// SET_FORMATTING_OFF
+		
+		// config
+		config.id							= Util.getXmlString(xmlConfig,						ATTR_ID,						Long.toString(System.nanoTime()));
+		config.name							= Util.getXmlString(xmlConfig,						ATTR_CONFIG_NAME,				UI.EMPTY_STRING);
+		config.defaultId					= (ConfigDefault) Util.getXmlEnum(xmlConfig,		ATTR_CONFIG_DEFAULT_ID,			DEFAULT_CONFIG_DEFAULT_ID);
+		
+		// layout
+		config.isToggleMonthColor			= Util.getXmlBoolean(xmlConfig, 					ATTR_IS_TOGGLE_MONTH_COLOR,		true);
+		config.useDraggedScrolling			= Util.getXmlBoolean(xmlConfig, 					ATTR_USE_DRAGGED_SCROLLING,		true);
+		config.weekHeight					= Util.getXmlInteger(xmlConfig, 					ATTR_WEEK_HEIGHT,				DEFAULT_WEEK_HEIGHT);
+		config.alternateMonthRGB			= Util.getXmlRgb(xmlConfig, 						TAG_ALTERNATE_MONTH_RGB,		DEFAULT_ALTERNATE_MONTH_RGB);
+		config.calendarBackgroundRGB		= Util.getXmlRgb(xmlConfig, 						TAG_CALENDAR_BACKGROUND_RGB,	DEFAULT_CALENDAR_BACKGROUND_RGB);
+		config.calendarForegroundRGB		= Util.getXmlRgb(xmlConfig, 						TAG_CALENDAR_FOREGROUND_RGB,	DEFAULT_CALENDAR_FOREBACKGROUND_RGB);
+		
+		// year columns
+		config.isShowYearColumns			= Util.getXmlBoolean(xmlConfig, 					ATTR_IS_SHOW_YEAR_COLUMNS,		true);
+		config.yearColumns					= Util.getXmlInteger(xmlConfig,						ATTR_YEAR_COLUMNS,				DEFAULT_YEAR_COLUMNS);
+		config.yearColumnsSpacing			= Util.getXmlInteger(xmlConfig, 					ATTR_YEAR_COLUMNS_SPACING,		DEFAULT_YEAR_COLUMNS_SPACING);
+		config.yearColumnsStart				= (ColumnStart) Util.getXmlEnum(xmlConfig,			ATTR_YEAR_COLUMNS_START,		DEFAULT_YEAR_COLUMNS_LAYOUT);
+		config.yearHeaderFont				= Util.getXmlFont(xmlConfig, 						ATTR_YEAR_HEADER_FONT,			defaultFont.getFontData()[0]);
+		
+		// date column
+		config.isShowDateColumn				= Util.getXmlBoolean(xmlConfig, 					ATTR_IS_SHOW_DATE_COLUMN,		true);
+		config.dateColumnFont 				= Util.getXmlFont(xmlConfig, 						ATTR_DATE_COLUMN_FONT, 			defaultFont.getFontData()[0]);
+		config.dateColumnWidth				= Util.getXmlInteger(xmlConfig, 					ATTR_DATE_COLUMN_WIDTH,			DEFAULT_DATE_COLUMN_WIDTH);
+		config.dateColumnContent			= (DateColumnContent) Util.getXmlEnum(xmlConfig,	ATTR_DATE_COLUMN_CONTENT,		DateColumnContent.WEEK_NUMBER);
+
+		// day date
+		config.isHideDayDateWhenNoTour		= Util.getXmlBoolean(xmlConfig, 					ATTR_IS_HIDE_DAY_DATE_WHEN_NO_TOUR,		true);
+		config.isShowDayDate				= Util.getXmlBoolean(xmlConfig, 					ATTR_IS_SHOW_DAY_DATE,					true);
+		config.isShowDayDateWeekendColor	= Util.getXmlBoolean(xmlConfig, 					ATTR_IS_SHOW_DAY_DATE_WEEKEND_COLOR,	DEFAULT_IS_SHOW_DAY_DATE_WEEKEND_COLOR);
+		config.dayDateFont 					= Util.getXmlFont(xmlConfig, 						ATTR_DAY_DATE_FONT, 					defaultFont.getFontData()[0]);
+		config.dayDateFormat				= (DayDateFormat) Util.getXmlEnum(xmlConfig,		ATTR_DAY_DATE_FORMAT,					DEFAULT_DAY_DATE_FORMAT);
+		                                    
+		// day content
+		config.tourBackgroundWidth			= Util.getXmlInteger(xmlConfig, 					ATTR_TOUR_BACKGROUND_WIDTH, 	DEFAULT_TOUR_BACKGROUND_WIDTH, 1, 100);
+		config.tourBorderWidth				= Util.getXmlInteger(xmlConfig, 					ATTR_TOUR_BORDER_WIDTH,		 	DEFAULT_TOUR_BORDER_WIDTH, 1, 100);
+		config.tourBackground 				= (TourBackground) Util.getXmlEnum(xmlConfig,		ATTR_TOUR_BACKGROUND,			DEFAULT_TOUR_BACKGROUND);
+		config.tourBackgroundColor1 		= (CalendarColor) Util.getXmlEnum(xmlConfig,		ATTR_TOUR_BACKGROUND_COLOR1,	DEFAULT_TOUR_BACKGROUND_COLOR1);
+		config.tourBackgroundColor2 		= (CalendarColor) Util.getXmlEnum(xmlConfig,		ATTR_TOUR_BACKGROUND_COLOR2,	DEFAULT_TOUR_BACKGROUND_COLOR2);
+		config.tourBorder 					= (TourBorder) Util.getXmlEnum(xmlConfig,			ATTR_TOUR_BORDER,				DEFAULT_TOUR_BORDER);
+		config.tourBorderColor 				= (CalendarColor) Util.getXmlEnum(xmlConfig,		ATTR_TOUR_BORDER_COLOR,			DEFAULT_TOUR_BORDER_COLOR);
+		
+		// tour content
+		config.isShowTourContent			= Util.getXmlBoolean(xmlConfig, 					ATTR_IS_SHOW_TOUR_CONTENT,		true);
+		config.isShowTourValueUnit			= Util.getXmlBoolean(xmlConfig, 					ATTR_IS_SHOW_TOUR_VALUE_UNIT,	true);
+		config.isTruncateTourText			= Util.getXmlBoolean(xmlConfig, 					ATTR_IS_TRUNCATE_TOUR_TEXT,		DEFAULT_IS_TRUNCATE_TOUR_TEXT);
+		config.tourContentColor				= (CalendarColor) Util.getXmlEnum(xmlConfig,		ATTR_TOUR_CONTENT_COLOR,		DEFAULT_DAY_CONTENT_COLOR);
+		config.tourContentFont 				= Util.getXmlFont(xmlConfig, 						ATTR_TOUR_CONTENT_FONT, 		defaultFont.getFontData()[0]);
+		config.tourTitleColor				= (CalendarColor) Util.getXmlEnum(xmlConfig,		ATTR_TOUR_TITLE_COLOR,			DEFAULT_DAY_CONTENT_COLOR);
+		config.tourTitleFont 				= Util.getXmlFont(xmlConfig, 						ATTR_TOUR_TITLE_FONT, 			defaultFont.getFontData()[0]);
+		config.tourTruncatedLines			= Util.getXmlInteger(xmlConfig, 					ATTR_TOUR_TRUNCATED_LINES,	 	DEFAULT_TOUR_TRUNCATED_LINES, 1, 10);
+		config.tourValueColumns				= Util.getXmlInteger(xmlConfig, 					ATTR_TOUR_VALUE_COLUMNS,	 	DEFAULT_TOUR_VALUE_COLUMNS, 1, 3);
+		
+		// week summary column
+		config.isShowSummaryColumn			= Util.getXmlBoolean(xmlConfig, 					ATTR_IS_SHOW_SUMMARY_COLUMN,	true);
+		config.isShowWeekValueUnit			= Util.getXmlBoolean(xmlConfig, 					ATTR_IS_SHOW_WEEK_VALUE_UNIT,	true);
+		config.weekColumnWidth				= Util.getXmlInteger(xmlConfig, 					ATTR_WEEK_COLUMN_WIDTH,			DEFAULT_SUMMARY_COLUMN_WIDTH);
+		config.weekValueColor		 		= (CalendarColor) Util.getXmlEnum(xmlConfig,		ATTR_WEEK_VALUE_COLOR,			DEFAULT_WEEK_VALUE_COLOR);
+		config.weekValueFont				= Util.getXmlFont(xmlConfig, 						ATTR_WEEK_VALUE_FONT,			defaultFont.getFontData()[0]);
+
+// SET_FORMATTING_ON
+
+		// tour formatter
+		final FormatterData[] tourFormatterData = restoreConfig_FormatterData(
+				xmlConfig,
+				TAG_ALL_TOUR_FORMATTER,
+				config);
+		if (tourFormatterData != null) {
+			config.allTourFormatterData = tourFormatterData;
+		}
+
+		// week formatter
+		final FormatterData[] weekFormatterData = restoreConfig_FormatterData(
+				xmlConfig,
+				TAG_ALL_WEEK_FORMATTER,
+				config);
+		if (weekFormatterData != null) {
+			config.allWeekFormatterData = weekFormatterData;
+		}
+
+		return config;
+	}
+
+	private static FormatterData[] restoreConfig_FormatterData(	final XMLMemento xmlConfig,
+																final String tagAllFormatter,
+																final CalendarConfig config) {
+
+		final XMLMemento xmlAllFormatter = (XMLMemento) xmlConfig.getChild(tagAllFormatter);
+		if (xmlAllFormatter != null) {
+
+			final ArrayList<FormatterData> allFormatterData = new ArrayList<>();
+
+			for (final IMemento xmlFormatterData : xmlAllFormatter.getChildren()) {
+
+				final boolean isEnabled = Util.getXmlBoolean(xmlFormatterData, ATTR_IS_SHOW_VALUE, true);
+
+				final FormatterID id = (FormatterID) Util.getXmlEnum(
+						xmlFormatterData,
+						ATTR_FORMATTER_ID,
+						FormatterID.EMPTY);
+
+				final ValueFormat valueFormat = (ValueFormat) Util.getXmlEnum(
+						xmlFormatterData,
+						ATTR_FORMATTER_VALUE_FORMAT,
+						ValueFormat.DUMMY_VALUE);
+
+				allFormatterData.add(new FormatterData(isEnabled, id, valueFormat));
+			}
+
+			return allFormatterData.toArray(new FormatterData[allFormatterData.size()]);
+		}
+
+		return null;
+	}
+
+	private static void saveConfig(final CalendarConfig config, final IMemento xmlConfig) {
+
+// SET_FORMATTING_OFF
+					
+		// config
+		xmlConfig.putString(		ATTR_ID, 								config.id);
+		xmlConfig.putString(		ATTR_CONFIG_NAME, 						config.name);
+		Util.setXmlEnum(xmlConfig,	ATTR_CONFIG_DEFAULT_ID,			 		config.defaultId);
+		
+		// layout
+		xmlConfig.putBoolean(		ATTR_IS_TOGGLE_MONTH_COLOR, 			config.isToggleMonthColor);
+		xmlConfig.putBoolean(		ATTR_USE_DRAGGED_SCROLLING, 			config.useDraggedScrolling);
+		xmlConfig.putInteger(		ATTR_WEEK_HEIGHT, 						config.weekHeight);
+		Util.setXmlRgb(xmlConfig,	TAG_ALTERNATE_MONTH_RGB, 				config.alternateMonthRGB);
+		Util.setXmlRgb(xmlConfig,	TAG_CALENDAR_BACKGROUND_RGB, 			config.calendarBackgroundRGB);
+		Util.setXmlRgb(xmlConfig,	TAG_CALENDAR_FOREGROUND_RGB, 			config.calendarForegroundRGB);
+		
+		// year columns
+		xmlConfig.putBoolean(		ATTR_IS_SHOW_YEAR_COLUMNS, 				config.isShowYearColumns);
+		xmlConfig.putInteger(		ATTR_YEAR_COLUMNS, 						config.yearColumns);
+		xmlConfig.putInteger(		ATTR_YEAR_COLUMNS_SPACING, 				config.yearColumnsSpacing);
+		Util.setXmlEnum(xmlConfig,	ATTR_YEAR_COLUMNS_START, 				config.yearColumnsStart);
+		Util.setXmlFont(xmlConfig,	ATTR_YEAR_HEADER_FONT, 					config.yearHeaderFont);
+		
+		// date column
+		xmlConfig.putBoolean(		ATTR_IS_SHOW_DATE_COLUMN, 				config.isShowDateColumn);
+		xmlConfig.putInteger(		ATTR_DATE_COLUMN_WIDTH, 				config.dateColumnWidth);
+		Util.setXmlEnum(xmlConfig,	ATTR_DATE_COLUMN_CONTENT, 				config.dateColumnContent);
+		Util.setXmlFont(xmlConfig,	ATTR_DATE_COLUMN_FONT, 					config.dateColumnFont);
+
+		// day date
+		xmlConfig.putBoolean(		ATTR_IS_HIDE_DAY_DATE_WHEN_NO_TOUR, 	config.isHideDayDateWhenNoTour);
+		xmlConfig.putBoolean(		ATTR_IS_SHOW_DAY_DATE, 					config.isShowDayDate);
+		xmlConfig.putBoolean(		ATTR_IS_SHOW_DAY_DATE_WEEKEND_COLOR, 	config.isShowDayDateWeekendColor);
+		Util.setXmlEnum(xmlConfig,	ATTR_DAY_DATE_FORMAT, 					config.dayDateFormat);
+		Util.setXmlFont(xmlConfig,	ATTR_DAY_DATE_FONT, 					config.dayDateFont);
+
+		// tour background
+		xmlConfig.putInteger(		ATTR_TOUR_BACKGROUND_WIDTH, 			config.tourBackgroundWidth);
+		xmlConfig.putInteger(		ATTR_TOUR_BORDER_WIDTH, 				config.tourBorderWidth);
+		Util.setXmlEnum(xmlConfig,	ATTR_TOUR_BACKGROUND, 					config.tourBackground);
+		Util.setXmlEnum(xmlConfig,	ATTR_TOUR_BACKGROUND_COLOR1, 			config.tourBackgroundColor1);
+		Util.setXmlEnum(xmlConfig,	ATTR_TOUR_BACKGROUND_COLOR2, 			config.tourBackgroundColor2);
+		Util.setXmlEnum(xmlConfig,	ATTR_TOUR_BORDER, 						config.tourBorder);
+		Util.setXmlEnum(xmlConfig,	ATTR_TOUR_BORDER_COLOR, 				config.tourBorderColor);
+
+		// tour content
+		xmlConfig.putBoolean(		ATTR_IS_SHOW_TOUR_CONTENT,				config.isShowTourContent);
+		xmlConfig.putBoolean(		ATTR_IS_SHOW_TOUR_VALUE_UNIT,			config.isShowTourValueUnit);
+		xmlConfig.putBoolean(		ATTR_IS_TRUNCATE_TOUR_TEXT,				config.isTruncateTourText);
+		xmlConfig.putInteger(		ATTR_TOUR_TRUNCATED_LINES, 				config.tourTruncatedLines);
+		xmlConfig.putInteger(		ATTR_TOUR_VALUE_COLUMNS, 				config.tourValueColumns);
+		Util.setXmlEnum(xmlConfig,	ATTR_TOUR_CONTENT_COLOR, 				config.tourContentColor);
+		Util.setXmlFont(xmlConfig,	ATTR_TOUR_CONTENT_FONT, 				config.tourContentFont);
+		Util.setXmlEnum(xmlConfig,	ATTR_TOUR_TITLE_COLOR, 					config.tourTitleColor);
+		Util.setXmlFont(xmlConfig,	ATTR_TOUR_TITLE_FONT, 					config.tourTitleFont);
+		
+		// week summary column
+		xmlConfig.putBoolean(		ATTR_IS_SHOW_SUMMARY_COLUMN, 			config.isShowSummaryColumn);
+		xmlConfig.putBoolean(		ATTR_IS_SHOW_WEEK_VALUE_UNIT, 			config.isShowWeekValueUnit);
+		xmlConfig.putInteger(		ATTR_WEEK_COLUMN_WIDTH, 				config.weekColumnWidth);
+		Util.setXmlEnum(xmlConfig,	ATTR_WEEK_VALUE_COLOR, 					config.weekValueColor);
+		Util.setXmlFont(xmlConfig,	ATTR_WEEK_VALUE_FONT, 					config.weekValueFont);
+					
+// SET_FORMATTING_ON
+
+		// formatter
+		saveConfig_FormatterData(xmlConfig.createChild(TAG_ALL_TOUR_FORMATTER), config.allTourFormatterData);
+		saveConfig_FormatterData(xmlConfig.createChild(TAG_ALL_WEEK_FORMATTER), config.allWeekFormatterData);
+	}
+
+	private static void saveConfig_FormatterData(	final IMemento xmlAllTourFormatter,
+													final FormatterData[] allFormatterData) {
+
+		for (final FormatterData formatterData : allFormatterData) {
+
+			final IMemento xmlFormatter = xmlAllTourFormatter.createChild(TAG_FORMATTER);
+
+			xmlFormatter.putBoolean(ATTR_IS_SHOW_VALUE, formatterData.isEnabled);
+			Util.setXmlEnum(xmlFormatter, ATTR_FORMATTER_ID, formatterData.id);
+			Util.setXmlEnum(xmlFormatter, ATTR_FORMATTER_VALUE_FORMAT, formatterData.valueFormat);
+		}
 	}
 
 	static void saveState() {
@@ -1669,8 +1802,17 @@ public class CalendarConfigManager {
 			xmlCalendars.putString(ATTR_ACTIVE_CONFIG_ID, _activeCalendarConfig.id);
 
 			for (final CalendarConfig config : _allCalendarConfigs) {
-				createXml_FromCalendarConfig(config, xmlCalendars);
+				saveState_Calendars_Config(config, xmlCalendars);
 			}
+		}
+	}
+
+	private static void saveState_Calendars_Config(final CalendarConfig config, final IMemento xmlCalendars) {
+
+		// <Calendar>
+		final IMemento xmlConfig = xmlCalendars.createChild(TAG_CALENDAR);
+		{
+			saveConfig(config, xmlConfig);
 		}
 	}
 

@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.ui.views.calendar;
 
+import net.tourbook.Messages;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.RGB;
@@ -31,18 +33,20 @@ public class CalendarConfig {
 	
 	// config
 	String					id							= Long.toString(System.nanoTime());
-	String					defaultId					= CalendarConfigManager.CONFIG_DEFAULT_ID_1;
-	String					name						= CalendarConfigManager.CONFIG_DEFAULT_ID_1;
+	ConfigDefault			defaultId					= CalendarConfigManager.DEFAULT_CONFIG_DEFAULT_ID;
+	String					name						= Messages.Calendar_Config_Name_Default;
 	
 	// layout
+	boolean					isToggleMonthColor			= true;
 	boolean					useDraggedScrolling			= false;
+	RGB 					alternateMonthRGB			= CalendarConfigManager.DEFAULT_ALTERNATE_MONTH_RGB;
 	RGB						calendarBackgroundRGB		= CalendarConfigManager.DEFAULT_CALENDAR_BACKGROUND_RGB;
 	RGB						calendarForegroundRGB		= CalendarConfigManager.DEFAULT_CALENDAR_FOREBACKGROUND_RGB;
 	int						weekHeight					= CalendarConfigManager.DEFAULT_WEEK_HEIGHT;
 	
 	// year columns
 	boolean 				isShowYearColumns			= true;
-	int						numYearColumns				= CalendarConfigManager.DEFAULT_YEAR_COLUMNS;
+	int						yearColumns					= CalendarConfigManager.DEFAULT_YEAR_COLUMNS;
 	int 					yearColumnsSpacing			= CalendarConfigManager.DEFAULT_YEAR_COLUMNS_SPACING;
 	ColumnStart				yearColumnsStart			= CalendarConfigManager.DEFAULT_YEAR_COLUMNS_LAYOUT;
 	FontData 				yearHeaderFont				= createFont(2.2f, SWT.BOLD);
@@ -53,10 +57,6 @@ public class CalendarConfig {
 	FontData				dateColumnFont				= createFont(1.5f, SWT.BOLD);
 	int						dateColumnWidth				= CalendarConfigManager.DEFAULT_DATE_COLUMN_WIDTH;
 	
-	// day
-	boolean					isToggleMonthColor			= true;
-	RGB 					alternateMonthRGB			= CalendarConfigManager.DEFAULT_ALTERNATE_MONTH_RGB;
-	                        
 	// day date
 	boolean					isHideDayDateWhenNoTour		= false;
 	boolean					isShowDayDate				= true;
@@ -76,12 +76,13 @@ public class CalendarConfig {
 	// tour content
 	boolean 				isShowTourContent			= true;
 	boolean					isShowTourValueUnit			= true;
-	boolean					isTruncateTourText			= true;
+	boolean					isTruncateTourText			= CalendarConfigManager.DEFAULT_IS_TRUNCATE_TOUR_TEXT;
 	FormatterData[]			allTourFormatterData		= CalendarConfigManager.DEFAULT_TOUR_FORMATTER_DATA;
 	CalendarColor			tourContentColor			= CalendarConfigManager.DEFAULT_DAY_CONTENT_COLOR;
 	FontData				tourContentFont				= createFont(0.9f, SWT.NORMAL);
 	CalendarColor 			tourTitleColor				= CalendarConfigManager.DEFAULT_DAY_CONTENT_COLOR;
 	FontData				tourTitleFont				= createFont(1.2f, SWT.BOLD);
+	int						tourTruncatedLines			= CalendarConfigManager.DEFAULT_TOUR_TRUNCATED_LINES;
 	int 					tourValueColumns			= CalendarConfigManager.DEFAULT_TOUR_VALUE_COLUMNS;
 
 	// week summary column
@@ -157,7 +158,7 @@ public class CalendarConfig {
 
 	@Override
 	public String toString() {
-		return "CalendarConfig [name=" + name + "]";
+		return "CalendarConfig [name=" + name + "]"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 }

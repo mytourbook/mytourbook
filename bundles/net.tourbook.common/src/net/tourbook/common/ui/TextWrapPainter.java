@@ -40,6 +40,8 @@ public class TextWrapPainter {
 	private int				_lastPaintedY;
 
 	private boolean			_isTruncateText;
+	private int				_maxTruncatedLines;
+	private int				_truncatedLinesCounter;
 
 	{
 		/*
@@ -69,6 +71,7 @@ public class TextWrapPainter {
 	 * @param fontHeight
 	 * @param noOverlapRect
 	 * @param isTruncateText
+	 * @param truncatedLines
 	 */
 	public void drawText(	final GC gc,
 							final String textToPrint,
@@ -78,7 +81,8 @@ public class TextWrapPainter {
 							final int viewportHeight,
 							final int fontHeight,
 							final Rectangle noOverlapRect,
-							final boolean isTruncateText) {
+							final boolean isTruncateText,
+							final int truncatedLines) {
 
 		_tabWidth = gc.stringExtent(_tabText).x;
 		_lineHeight = fontHeight;
@@ -87,7 +91,10 @@ public class TextWrapPainter {
 		_devY = devY;
 
 		_is1stPainted = false;
+
 		_isTruncateText = isTruncateText;
+		_maxTruncatedLines = truncatedLines;
+		_truncatedLinesCounter = 2;
 
 		_devRightMargin = devX + viewportWidth;
 		final int bottom = devY + viewportHeight;
@@ -113,7 +120,7 @@ public class TextWrapPainter {
 
 					printWordBuffer(gc, noOverlapRect);
 
-					if (_isTruncateText) {
+					if (_isTruncateText && _truncatedLinesCounter > _maxTruncatedLines) {
 						return;
 					} else {
 						newline();
@@ -166,6 +173,8 @@ public class TextWrapPainter {
 
 		_devX = _devLeftMargin;
 		_devY += _lineHeight;
+
+		_truncatedLinesCounter++;
 	}
 
 	private void printWordBuffer(final GC gc, final Rectangle noOverlapRect) {
@@ -189,7 +198,7 @@ public class TextWrapPainter {
 
 					if (wordRect.intersects(noOverlapRect)) {
 
-						if (_isTruncateText) {
+						if (_isTruncateText && _truncatedLinesCounter > _maxTruncatedLines) {
 							return;
 						} else {
 							newline();
@@ -205,7 +214,7 @@ public class TextWrapPainter {
 				if (_is1stPainted) {
 
 					// word doesn't fit on current line, so wrap
-					if (_isTruncateText) {
+					if (_isTruncateText && _truncatedLinesCounter > _maxTruncatedLines) {
 						return;
 					} else {
 						newline();
