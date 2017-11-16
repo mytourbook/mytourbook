@@ -1665,12 +1665,12 @@ public class Messages extends NLS {
 	public static String		Slideout_CalendarOptions_Checkbox_IsHideDayWhenEmpty;
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowDateColumn;
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowDateColumn_Tooltip;
-	public static String		Slideout_CalendarOptions_Checkbox_IsShowDayDate;
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowDayHeaderBold;
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowDayWeekendColor;
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowSummaryColumn;
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowSummaryColumn_Tooltipxxx;
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowTourContent;
+	public static String		Slideout_CalendarOptions_Checkbox_IsShowTourDate;
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowTourValueUnit;
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowWeekValueUnit;
 	public static String		Slideout_CalendarOptions_Checkbox_IsShowYearColumns;
@@ -1682,10 +1682,11 @@ public class Messages extends NLS {
 	public static String		Slideout_CalendarOptions_Checkbox_UseDraggedScrolling;
 	public static String		Slideout_CalendarOptions_Checkbox_UseDraggedScrolling_Tooltip;
 	public static String		Slideout_CalendarOptions_Group_DateColumn;
-	public static String		Slideout_CalendarOptions_Group_DayContent;
-	public static String		Slideout_CalendarOptions_Group_DayDate;
 	public static String		Slideout_CalendarOptions_Group_Layout;
 	public static String		Slideout_CalendarOptions_Group_SummaryColumn;
+	public static String		Slideout_CalendarOptions_Group_TourColor;
+	public static String		Slideout_CalendarOptions_Group_TourDate;
+	public static String		Slideout_CalendarOptions_Group_TourFont;
 	public static String		Slideout_CalendarOptions_Group_WeekSummary;
 	public static String		Slideout_CalendarOptions_Group_YearColumns;
 	public static String		Slideout_CalendarOptions_Label_Calendar_BackgroundColor;
@@ -1695,7 +1696,6 @@ public class Messages extends NLS {
 	public static String		Slideout_CalendarOptions_Label_DateColumnContent;
 	public static String		Slideout_CalendarOptions_Label_DateColumnContent_Tooltip;
 	public static String		Slideout_CalendarOptions_Label_DateColumnFont;
-	public static String		Slideout_CalendarOptions_Label_DayDateFont;
 	public static String		Slideout_CalendarOptions_Label_DayHeaderFormat;
 	public static String		Slideout_CalendarOptions_Label_DayHeaderLayout;
 	public static String		Slideout_CalendarOptions_Label_Line;
@@ -1713,7 +1713,9 @@ public class Messages extends NLS {
 	public static String		Slideout_CalendarOptions_Label_TourBackground;
 	public static String		Slideout_CalendarOptions_Label_TourBorder;
 	public static String		Slideout_CalendarOptions_Label_TourContentFont;
+	public static String		Slideout_CalendarOptions_Label_TourDateFont;
 	public static String		Slideout_CalendarOptions_Label_TourTitleFont;
+	public static String		Slideout_CalendarOptions_Label_TourValueFont;
 	public static String		Slideout_CalendarOptions_Label_TruncatedLines;
 	public static String		Slideout_CalendarOptions_Label_TruncatedLines_Tooltip;
 	public static String		Slideout_CalendarOptions_Label_ValueColumns;
@@ -1724,9 +1726,9 @@ public class Messages extends NLS {
 	public static String		Slideout_CalendarOptions_Label_YearColumnsSpace_Tooltip;
 	public static String		Slideout_CalendarOptions_Label_YearColumnsStart;
 	public static String		Slideout_CalendarOptions_Label_YearHeaderFont;
-	public static String		Slideout_CalendarOptions_Tab_DayContent;
-	public static String		Slideout_CalendarOptions_Tab_Layout;
-	public static String		Slideout_CalendarOptions_Tab_Tour;
+	public static String		Slideout_CalendarOptions_Tab_CalendarLayout;
+	public static String		Slideout_CalendarOptions_Tab_TourContent;
+	public static String		Slideout_CalendarOptions_Tab_TourLayout;
 	public static String		Slideout_CalendarOptions_Tab_WeekSummary;
 
 	public static String		Slideout_ChartMarkerOptions_Checkbox_IsShowAbsoluteValues;

@@ -126,7 +126,9 @@ public class CalendarConfigManager {
 	private static final String				ATTR_TOUR_TITLE_COLOR					= "tourTitleColor";					//$NON-NLS-1$
 	private static final String				ATTR_TOUR_TITLE_FONT					= "tourTitleFont";					//$NON-NLS-1$
 	private static final String				ATTR_TOUR_TRUNCATED_LINES				= "tourTruncatedLines";				//$NON-NLS-1$
+	private static final String				ATTR_TOUR_VALUE_COLOR					= "tourValueColor";					//$NON-NLS-1$
 	private static final String				ATTR_TOUR_VALUE_COLUMNS					= "tourValueColumns";				//$NON-NLS-1$
+	private static final String				ATTR_TOUR_VALUE_FONT					= "tourValueFont";					//$NON-NLS-1$
 	private static final String				ATTR_USE_DRAGGED_SCROLLING				= "useDraggedScrolling";			//$NON-NLS-1$
 	private static final String				ATTR_WEEK_COLUMN_WIDTH					= "weekColumnWidth";				//$NON-NLS-1$
 	private static final String				ATTR_WEEK_HEIGHT						= "weekHeight";						//$NON-NLS-1$
@@ -141,7 +143,6 @@ public class CalendarConfigManager {
 	static final ConfigDefault				DEFAULT_CONFIG_DEFAULT_ID				= ConfigDefault.DEFAULT;
 	static final RGB						DEFAULT_CALENDAR_BACKGROUND_RGB;
 	static final RGB						DEFAULT_CALENDAR_FOREBACKGROUND_RGB;
-	static final CalendarColor				DEFAULT_DAY_CONTENT_COLOR				= CalendarColor.CONTRAST;
 	static final DayDateFormat				DEFAULT_DAY_DATE_FORMAT					= DayDateFormat.DAY;
 	static final int						DEFAULT_DATE_COLUMN_WIDTH				= 50;
 	static final DateColumnContent			DEFAULT_DATE_COLUMN_CONTENT				= DateColumnContent.MONTH;
@@ -156,6 +157,7 @@ public class CalendarConfigManager {
 	static final TourBorder					DEFAULT_TOUR_BORDER						= TourBorder.NO_BORDER;
 	static final CalendarColor				DEFAULT_TOUR_BORDER_COLOR				= CalendarColor.LINE;
 	static final int						DEFAULT_TOUR_BORDER_WIDTH				= 1;
+	static final CalendarColor				DEFAULT_TOUR_COLOR						= CalendarColor.CONTRAST;
 	static final int						DEFAULT_TOUR_TRUNCATED_LINES			= 2;
 	static final int						DEFAULT_TOUR_VALUE_COLUMNS				= 2;
 	static final int						DEFAULT_WEEK_HEIGHT						= 70;
@@ -614,13 +616,12 @@ public class CalendarConfigManager {
 		_allCalendarConfigs.add(createConfig_Crazy());
 
 		_allCalendarConfigs.add(createConfig_Col_01());
-		_allCalendarConfigs.add(createConfig_Col_03());
-		_allCalendarConfigs.add(createConfig_Col_10());
-		_allCalendarConfigs.add(createConfig_Col_20());
-
 		_allCalendarConfigs.add(createConfig_Col_01_Dark());
+		_allCalendarConfigs.add(createConfig_Col_03());
 		_allCalendarConfigs.add(createConfig_Col_03_Dark());
+		_allCalendarConfigs.add(createConfig_Col_10());
 		_allCalendarConfigs.add(createConfig_Col_10_Dark());
+		_allCalendarConfigs.add(createConfig_Col_20());
 		_allCalendarConfigs.add(createConfig_Col_20_Dark());
 
 		// append 10 custom configurations created from default default config
@@ -638,12 +639,70 @@ public class CalendarConfigManager {
 
 		final CalendarConfig config = new CalendarConfig();
 
-// SET_FORMATTING_OFF
-		
-		config.defaultId	= ConfigDefault.CLASSIC;
-		config.name			= Messages.Calendar_Config_Name_Classic;
-		
-// SET_FORMATTING_ON
+		// SET_FORMATTING_OFF
+
+//		                                     Classic
+
+		config.defaultId                     = ConfigDefault.CLASSIC;
+
+		// layout
+		config.isToggleMonthColor            = true;
+		config.useDraggedScrolling           = false;
+		config.alternateMonthRGB             = new RGB (240, 240, 240);
+		config.calendarBackgroundRGB         = new RGB (255, 255, 255);
+		config.calendarForegroundRGB         = new RGB (0, 0, 0);
+		config.weekHeight                    = 150;
+		                                                                                         
+		// year columns
+		config.isShowYearColumns             = false;
+		config.yearColumns                   = 2;
+		config.yearColumnsSpacing            = 30;
+		config.yearColumnsStart              = ColumnStart.CONTINUOUSLY;
+		config.yearHeaderFont                = CalendarConfig.createFont(2.2f, SWT.BOLD);
+		                                                                                         
+		// date column
+		config.isShowDateColumn              = true;
+		config.dateColumnContent             = DateColumnContent.WEEK_NUMBER;
+		config.dateColumnFont                = CalendarConfig.createFont(1.5f, SWT.BOLD);
+		config.dateColumnWidth               = 50;
+		                                                                                         
+		// day date
+		config.isHideDayDateWhenNoTour       = false;
+		config.isShowDayDate                 = true;
+		config.isShowDayDateWeekendColor     = true;
+		config.dayDateFont                   = CalendarConfig.createFont(1.2f, SWT.NORMAL);
+		config.dayDateFormat                 = DayDateFormat.DAY_MONTH_YEAR;
+		                                                                                         
+		// tour background
+		config.tourBackground                = TourBackground.FILL;
+		config.tourBackgroundColor1          = CalendarColor.DARK;
+		config.tourBackgroundColor2          = CalendarColor.BRIGHT;
+		config.tourBackgroundWidth           = 3;
+		config.tourBorder                    = TourBorder.NO_BORDER;
+		config.tourBorderColor               = CalendarColor.LINE;
+		config.tourBorderWidth               = 1;
+		                                                                                         
+		// tour content
+		config.isShowTourContent             = true;
+		config.isShowTourValueUnit           = true;
+		config.isTruncateTourText            = true;
+		config.tourContentColor              = CalendarColor.CONTRAST;
+		config.tourContentFont               = CalendarConfig.createFont(0.9f, SWT.NORMAL);
+		config.tourTitleColor                = CalendarColor.CONTRAST;
+		config.tourTitleFont                 = CalendarConfig.createFont(1.3f, SWT.BOLD);
+		config.tourTruncatedLines            = 2;
+		config.tourValueColor                = CalendarColor.CONTRAST;
+		config.tourValueColumns              = 2;
+		config.tourValueFont                 = CalendarConfig.createFont(1.2f, SWT.BOLD);
+		                                                                                         
+		// week summary column
+		config.isShowSummaryColumn           = true;
+		config.isShowWeekValueUnit           = true;
+		config.weekColumnWidth               = 100;
+		config.weekValueColor                = CalendarColor.TEXT;
+		config.weekValueFont                 = CalendarConfig.createFont(1.2f, SWT.NORMAL);
+
+		// SET_FORMATTING_ON
 
 		return config;
 	}
@@ -754,7 +813,7 @@ public class CalendarConfigManager {
 		
 		config.defaultId	= ConfigDefault.DARK_COL_20;
 		config.name			= Messages.Calendar_Config_Name_Col_20_Dark;
-		
+
 // SET_FORMATTING_ON
 
 		return config;
@@ -764,12 +823,70 @@ public class CalendarConfigManager {
 
 		final CalendarConfig config = new CalendarConfig();
 
-// SET_FORMATTING_OFF
-		
-		config.defaultId	= ConfigDefault.CRAZY;
-		config.name			= Messages.Calendar_Config_Name_Crazy;
-		
-// SET_FORMATTING_ON
+		// SET_FORMATTING_OFF
+
+//		                                     Crazy
+
+		config.defaultId                     = ConfigDefault.CRAZY;
+
+		// layout
+		config.isToggleMonthColor            = false;
+		config.useDraggedScrolling           = false;
+		config.alternateMonthRGB             = new RGB (240, 240, 240);
+		config.calendarBackgroundRGB         = new RGB (0, 0, 0);
+		config.calendarForegroundRGB         = new RGB (114, 114, 114);
+		config.weekHeight                    = 13;
+		                                                                                         
+		// year columns
+		config.isShowYearColumns             = true;
+		config.yearColumns                   = 20;
+		config.yearColumnsSpacing            = 0;
+		config.yearColumnsStart              = ColumnStart.JAN;
+		config.yearHeaderFont                = CalendarConfig.createFont(1.6f, SWT.BOLD);
+		                                                                                         
+		// date column
+		config.isShowDateColumn              = false;
+		config.dateColumnContent             = DateColumnContent.MONTH;
+		config.dateColumnFont                = CalendarConfig.createFont(1.5f, SWT.BOLD);
+		config.dateColumnWidth               = 50;
+		                                                                                         
+		// day date
+		config.isHideDayDateWhenNoTour       = true;
+		config.isShowDayDate                 = false;
+		config.isShowDayDateWeekendColor     = false;
+		config.dayDateFont                   = CalendarConfig.createFont(1.2f, SWT.BOLD);
+		config.dayDateFormat                 = DayDateFormat.DAY;
+		                                                                                         
+		// tour background
+		config.tourBackground                = TourBackground.FILL;
+		config.tourBackgroundColor1          = CalendarColor.DARK;
+		config.tourBackgroundColor2          = CalendarColor.WHITE;
+		config.tourBackgroundWidth           = 3;
+		config.tourBorder                    = TourBorder.BORDER_ALL;
+		config.tourBorderColor               = CalendarColor.DARK;
+		config.tourBorderWidth               = 1;
+		                                                                                         
+		// tour content
+		config.isShowTourContent             = false;
+		config.isShowTourValueUnit           = true;
+		config.isTruncateTourText            = true;
+		config.tourContentColor              = CalendarColor.CONTRAST;
+		config.tourContentFont               = CalendarConfig.createFont(0.9f, SWT.NORMAL);
+		config.tourTitleColor                = CalendarColor.CONTRAST;
+		config.tourTitleFont                 = CalendarConfig.createFont(1.2f, SWT.BOLD);
+		config.tourTruncatedLines            = 2;
+		config.tourValueColor                = CalendarColor.CONTRAST;
+		config.tourValueColumns              = 2;
+		config.tourValueFont                 = CalendarConfig.createFont(1.0f, SWT.NORMAL);
+		                                                                                         
+		// week summary column
+		config.isShowSummaryColumn           = false;
+		config.isShowWeekValueUnit           = true;
+		config.weekColumnWidth               = 60;
+		config.weekValueColor                = CalendarColor.TEXT;
+		config.weekValueFont                 = CalendarConfig.createFont(1.2f, SWT.BOLD);
+
+		// SET_FORMATTING_ON
 
 		return config;
 	}
@@ -793,7 +910,6 @@ public class CalendarConfigManager {
 		case DARK_COL_10:	return createConfig_Col_10();
 		case DARK_COL_20:	return createConfig_Col_20();
 
-		case DEFAULT:
 		default:
 			// create default default
 			return new CalendarConfig();
@@ -1623,12 +1739,14 @@ public class CalendarConfigManager {
 		config.isShowTourContent			= Util.getXmlBoolean(xmlConfig, 					ATTR_IS_SHOW_TOUR_CONTENT,		true);
 		config.isShowTourValueUnit			= Util.getXmlBoolean(xmlConfig, 					ATTR_IS_SHOW_TOUR_VALUE_UNIT,	true);
 		config.isTruncateTourText			= Util.getXmlBoolean(xmlConfig, 					ATTR_IS_TRUNCATE_TOUR_TEXT,		DEFAULT_IS_TRUNCATE_TOUR_TEXT);
-		config.tourContentColor				= (CalendarColor) Util.getXmlEnum(xmlConfig,		ATTR_TOUR_CONTENT_COLOR,		DEFAULT_DAY_CONTENT_COLOR);
+		config.tourContentColor				= (CalendarColor) Util.getXmlEnum(xmlConfig,		ATTR_TOUR_CONTENT_COLOR,		DEFAULT_TOUR_COLOR);
 		config.tourContentFont 				= Util.getXmlFont(xmlConfig, 						ATTR_TOUR_CONTENT_FONT, 		defaultFont.getFontData()[0]);
-		config.tourTitleColor				= (CalendarColor) Util.getXmlEnum(xmlConfig,		ATTR_TOUR_TITLE_COLOR,			DEFAULT_DAY_CONTENT_COLOR);
+		config.tourTitleColor				= (CalendarColor) Util.getXmlEnum(xmlConfig,		ATTR_TOUR_TITLE_COLOR,			DEFAULT_TOUR_COLOR);
 		config.tourTitleFont 				= Util.getXmlFont(xmlConfig, 						ATTR_TOUR_TITLE_FONT, 			defaultFont.getFontData()[0]);
 		config.tourTruncatedLines			= Util.getXmlInteger(xmlConfig, 					ATTR_TOUR_TRUNCATED_LINES,	 	DEFAULT_TOUR_TRUNCATED_LINES, 1, 10);
 		config.tourValueColumns				= Util.getXmlInteger(xmlConfig, 					ATTR_TOUR_VALUE_COLUMNS,	 	DEFAULT_TOUR_VALUE_COLUMNS, 1, 3);
+		config.tourValueFont				= Util.getXmlFont(xmlConfig, 						ATTR_TOUR_VALUE_FONT, 			defaultFont.getFontData()[0]);
+		config.tourValueColor				= (CalendarColor) Util.getXmlEnum(xmlConfig,		ATTR_TOUR_VALUE_COLOR,			DEFAULT_TOUR_COLOR);
 		
 		// week summary column
 		config.isShowSummaryColumn			= Util.getXmlBoolean(xmlConfig, 					ATTR_IS_SHOW_SUMMARY_COLUMN,	true);
@@ -1748,6 +1866,8 @@ public class CalendarConfigManager {
 		Util.setXmlFont(xmlConfig,	ATTR_TOUR_CONTENT_FONT, 				config.tourContentFont);
 		Util.setXmlEnum(xmlConfig,	ATTR_TOUR_TITLE_COLOR, 					config.tourTitleColor);
 		Util.setXmlFont(xmlConfig,	ATTR_TOUR_TITLE_FONT, 					config.tourTitleFont);
+		Util.setXmlEnum(xmlConfig,	ATTR_TOUR_VALUE_FONT, 					config.tourValueColor);
+		Util.setXmlFont(xmlConfig,	ATTR_TOUR_VALUE_FONT, 					config.tourValueFont);
 		
 		// week summary column
 		xmlConfig.putBoolean(		ATTR_IS_SHOW_SUMMARY_COLUMN, 			config.isShowSummaryColumn);

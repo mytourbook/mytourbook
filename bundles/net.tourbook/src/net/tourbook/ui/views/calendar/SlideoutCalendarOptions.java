@@ -140,6 +140,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	private Combo					_comboTourBorderColor;
 	private Combo					_comboTour_ContentColor;
 	private Combo					_comboTour_TitleColor;
+	private Combo					_comboTour_ValueColor;
 	private Combo					_comboWeek_ValueColor;
 	//
 	private Combo[]					_comboTour_AllValues;
@@ -158,8 +159,9 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	private Label					_lblTour_ContentFont;
 	private Label					_lblTour_TitleFont;
 	private Label					_lblTour_TruncatedLines;
-	private Label					_lblWeek_ColumnWidth;
 	private Label					_lblTour_ValueColumns;
+	private Label					_lblTour_ValueFont;
+	private Label					_lblWeek_ColumnWidth;
 	private Label					_lblWeek_ValueFont;
 	private Label					_lblYearColumn;
 	private Label					_lblYearColumn_HeaderFont;
@@ -170,6 +172,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	private SimpleFontEditor		_fontEditorDateColumn;
 	private SimpleFontEditor		_fontEditorTourTitle;
 	private SimpleFontEditor		_fontEditorTourContent;
+	private SimpleFontEditor		_fontEditorTourValue;
 	private SimpleFontEditor		_fontEditorWeekValue;
 	private SimpleFontEditor		_fontEditorYearColumnHeader;
 	//
@@ -275,15 +278,15 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			{
 				final TabItem tabLayout = new TabItem(_tabFolder, SWT.NONE);
 				tabLayout.setControl(createUI_010_Tab_Layout(_tabFolder));
-				tabLayout.setText(Messages.Slideout_CalendarOptions_Tab_Layout);
+				tabLayout.setText(Messages.Slideout_CalendarOptions_Tab_CalendarLayout);
 
 				final TabItem tabDayContent = new TabItem(_tabFolder, SWT.NONE);
 				tabDayContent.setControl(createUI_020_Tab_DayContent(_tabFolder));
-				tabDayContent.setText(Messages.Slideout_CalendarOptions_Tab_DayContent);
+				tabDayContent.setText(Messages.Slideout_CalendarOptions_Tab_TourLayout);
 
 				final TabItem tabTour = new TabItem(_tabFolder, SWT.NONE);
 				tabTour.setControl(createUI_030_Tab_Tour(_tabFolder));
-				tabTour.setText(Messages.Slideout_CalendarOptions_Tab_Tour);
+				tabTour.setText(Messages.Slideout_CalendarOptions_Tab_TourContent);
 
 				final TabItem tabWeekSummary = new TabItem(_tabFolder, SWT.NONE);
 				tabWeekSummary.setControl(createUI_040_Tab_WeekSummary(_tabFolder));
@@ -317,7 +320,8 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
 		{
 			createUI_200_DayDate(container);
-			createUI_220_DayContent(container);
+			createUI_220_TourColor(container);
+			createUI_230_TourFont(container);
 		}
 
 		return container;
@@ -731,7 +735,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	private void createUI_200_DayDate(final Composite parent) {
 
 		final Group group = new Group(parent, SWT.NONE);
-		group.setText(Messages.Slideout_CalendarOptions_Group_DayDate);
+		group.setText(Messages.Slideout_CalendarOptions_Group_TourDate);
 		GridDataFactory
 				.fillDefaults()//
 				.grab(true, false)
@@ -746,7 +750,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 				// checkbox
 				_chkIsShowDayDate = new Button(group, SWT.CHECK);
-				_chkIsShowDayDate.setText(Messages.Slideout_CalendarOptions_Checkbox_IsShowDayDate);
+				_chkIsShowDayDate.setText(Messages.Slideout_CalendarOptions_Checkbox_IsShowTourDate);
 				_chkIsShowDayDate.addSelectionListener(_defaultSelectionListener);
 				GridDataFactory
 						.fillDefaults()//
@@ -854,7 +858,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 				// label
 				_lblDayHeader_Font = new Label(container, SWT.NONE);
-				_lblDayHeader_Font.setText(Messages.Slideout_CalendarOptions_Label_DayDateFont);
+				_lblDayHeader_Font.setText(Messages.Slideout_CalendarOptions_Label_TourDateFont);
 				GridDataFactory
 						.fillDefaults()//
 						.grab(true, true)
@@ -869,10 +873,10 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		}
 	}
 
-	private void createUI_220_DayContent(final Composite parent) {
+	private void createUI_220_TourColor(final Composite parent) {
 
 		final Group group = new Group(parent, SWT.NONE);
-		group.setText(Messages.Slideout_CalendarOptions_Group_DayContent);
+		group.setText(Messages.Slideout_CalendarOptions_Group_TourColor);
 		GridDataFactory
 				.fillDefaults()//
 				.grab(true, false)
@@ -957,6 +961,110 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		}
 	}
 
+	private void createUI_230_TourFont(final Composite parent) {
+
+		final Group group = new Group(parent, SWT.NONE);
+		group.setText(Messages.Slideout_CalendarOptions_Group_TourFont);
+		GridDataFactory
+				.fillDefaults()//
+				.grab(true, false)
+				.applyTo(group);
+		GridLayoutFactory.swtDefaults().numColumns(3).applyTo(group);
+//		group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_CYAN));
+		{
+			{
+				/*
+				 * Title font
+				 */
+
+				// label
+				_lblTour_TitleFont = new Label(group, SWT.NONE);
+				_lblTour_TitleFont.setText(Messages.Slideout_CalendarOptions_Label_TourTitleFont);
+				GridDataFactory
+						.fillDefaults()//
+						.indent(0, _fontLabelVIndent)
+						.applyTo(_lblTour_TitleFont);
+
+				// font/size
+				_fontEditorTourTitle = new SimpleFontEditor(group, SWT.NONE);
+				_fontEditorTourTitle.addFontListener(_defaultFontEditorListener);
+				GridDataFactory
+						.fillDefaults()//
+						.grab(true, true)
+						.applyTo(_fontEditorTourTitle);
+
+				// combo color
+				_comboTour_TitleColor = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
+				_comboTour_TitleColor.setVisibleItemCount(20);
+				_comboTour_TitleColor.addSelectionListener(_defaultSelectionListener);
+				GridDataFactory
+						.fillDefaults()//
+						.align(SWT.BEGINNING, SWT.BEGINNING)
+						.applyTo(_comboTour_TitleColor);
+			}
+			{
+				/*
+				 * Content font
+				 */
+
+				// label
+				_lblTour_ContentFont = new Label(group, SWT.NONE);
+				_lblTour_ContentFont.setText(Messages.Slideout_CalendarOptions_Label_TourContentFont);
+				GridDataFactory
+						.fillDefaults()//
+						.indent(0, _fontLabelVIndent)
+						.applyTo(_lblTour_ContentFont);
+
+				// font/size
+				_fontEditorTourContent = new SimpleFontEditor(group, SWT.NONE);
+				_fontEditorTourContent.addFontListener(_defaultFontEditorListener);
+				GridDataFactory
+						.fillDefaults()//
+						.grab(true, true)
+						.applyTo(_fontEditorTourContent);
+
+				// combo color
+				_comboTour_ContentColor = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
+				_comboTour_ContentColor.setVisibleItemCount(20);
+				_comboTour_ContentColor.addSelectionListener(_defaultSelectionListener);
+				GridDataFactory
+						.fillDefaults()//
+						.align(SWT.BEGINNING, SWT.BEGINNING)
+						.applyTo(_comboTour_ContentColor);
+			}
+			{
+				/*
+				 * Value font
+				 */
+
+				// label
+				_lblTour_ValueFont = new Label(group, SWT.NONE);
+				_lblTour_ValueFont.setText(Messages.Slideout_CalendarOptions_Label_TourValueFont);
+				GridDataFactory
+						.fillDefaults()//
+						.indent(0, _fontLabelVIndent)
+						.applyTo(_lblTour_ValueFont);
+
+				// font/size
+				_fontEditorTourValue = new SimpleFontEditor(group, SWT.NONE);
+				_fontEditorTourValue.addFontListener(_defaultFontEditorListener);
+				GridDataFactory
+						.fillDefaults()//
+						.grab(true, true)
+						.applyTo(_fontEditorTourValue);
+
+				// combo color
+				_comboTour_ValueColor = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
+				_comboTour_ValueColor.setVisibleItemCount(20);
+				_comboTour_ValueColor.addSelectionListener(_defaultSelectionListener);
+				GridDataFactory
+						.fillDefaults()//
+						.align(SWT.BEGINNING, SWT.BEGINNING)
+						.applyTo(_comboTour_ValueColor);
+			}
+		}
+	}
+
 	private void createUI_300_TourContent(final Composite parent) {
 
 		{
@@ -1026,6 +1134,36 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			}
 			{
 				/*
+				 * Number of value columns
+				 */
+
+				// label
+				_lblTour_ValueColumns = new Label(container, SWT.NONE);
+				_lblTour_ValueColumns.setText(Messages.Slideout_CalendarOptions_Label_ValueColumns);
+				_lblTour_ValueColumns.setToolTipText(Messages.Slideout_CalendarOptions_Label_ValueColumns_Tooltip);
+				GridDataFactory
+						.fillDefaults()//
+						.align(SWT.FILL, SWT.CENTER)
+						.applyTo(_lblTour_ValueColumns);
+
+				// spinner
+				_spinnerTour_ValueColumns = new Spinner(container, SWT.BORDER);
+				_spinnerTour_ValueColumns.setMinimum(1);
+				_spinnerTour_ValueColumns.setMaximum(5);
+				_spinnerTour_ValueColumns.addSelectionListener(_defaultSelectionListener);
+				_spinnerTour_ValueColumns.addMouseWheelListener(_defaultMouseWheelListener);
+			}
+		}
+	}
+
+	private void createUI_312_Col2(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+		{
+			{
+				/*
 				 * Truncate text
 				 */
 
@@ -1060,99 +1198,6 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				_spinnerTour_TruncatedLines.setMaximum(10);
 				_spinnerTour_TruncatedLines.addSelectionListener(_defaultSelectionListener);
 				_spinnerTour_TruncatedLines.addMouseWheelListener(_defaultMouseWheelListener);
-			}
-			{
-				/*
-				 * Number of value columns
-				 */
-
-				// label
-				_lblTour_ValueColumns = new Label(container, SWT.NONE);
-				_lblTour_ValueColumns.setText(Messages.Slideout_CalendarOptions_Label_ValueColumns);
-				_lblTour_ValueColumns.setToolTipText(Messages.Slideout_CalendarOptions_Label_ValueColumns_Tooltip);
-				GridDataFactory
-						.fillDefaults()//
-						.align(SWT.FILL, SWT.CENTER)
-						.applyTo(_lblTour_ValueColumns);
-
-				// spinner
-				_spinnerTour_ValueColumns = new Spinner(container, SWT.BORDER);
-				_spinnerTour_ValueColumns.setMinimum(1);
-				_spinnerTour_ValueColumns.setMaximum(5);
-				_spinnerTour_ValueColumns.addSelectionListener(_defaultSelectionListener);
-				_spinnerTour_ValueColumns.addMouseWheelListener(_defaultMouseWheelListener);
-			}
-		}
-	}
-
-	private void createUI_312_Col2(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory
-				.fillDefaults()//
-				//				.grab(true, true)
-				.applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
-		{
-			{
-				/*
-				 * Title font
-				 */
-
-				// label
-				_lblTour_TitleFont = new Label(container, SWT.NONE);
-				_lblTour_TitleFont.setText(Messages.Slideout_CalendarOptions_Label_TourTitleFont);
-				GridDataFactory
-						.fillDefaults()//
-						.indent(0, _fontLabelVIndent)
-						.applyTo(_lblTour_TitleFont);
-
-				// font/size
-				_fontEditorTourTitle = new SimpleFontEditor(container, SWT.NONE);
-				_fontEditorTourTitle.addFontListener(_defaultFontEditorListener);
-				GridDataFactory
-						.fillDefaults()//
-						.grab(true, true)
-						.applyTo(_fontEditorTourTitle);
-
-				// combo color
-				_comboTour_TitleColor = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-				_comboTour_TitleColor.setVisibleItemCount(20);
-				_comboTour_TitleColor.addSelectionListener(_defaultSelectionListener);
-				GridDataFactory
-						.fillDefaults()//
-						.align(SWT.BEGINNING, SWT.BEGINNING)
-						.applyTo(_comboTour_TitleColor);
-			}
-			{
-				/*
-				 * Content font
-				 */
-
-				// label
-				_lblTour_ContentFont = new Label(container, SWT.NONE);
-				_lblTour_ContentFont.setText(Messages.Slideout_CalendarOptions_Label_TourContentFont);
-				GridDataFactory
-						.fillDefaults()//
-						.indent(0, _fontLabelVIndent)
-						.applyTo(_lblTour_ContentFont);
-
-				// font/size
-				_fontEditorTourContent = new SimpleFontEditor(container, SWT.NONE);
-				_fontEditorTourContent.addFontListener(_defaultFontEditorListener);
-				GridDataFactory
-						.fillDefaults()//
-						.grab(true, true)
-						.applyTo(_fontEditorTourContent);
-
-				// combo color
-				_comboTour_ContentColor = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-				_comboTour_ContentColor.setVisibleItemCount(20);
-				_comboTour_ContentColor.addSelectionListener(_defaultSelectionListener);
-				GridDataFactory
-						.fillDefaults()//
-						.align(SWT.BEGINNING, SWT.BEGINNING)
-						.applyTo(_comboTour_ContentColor);
 			}
 		}
 	}
@@ -1522,12 +1567,15 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		_chkIsTruncateTourText.setEnabled(isShowTourContent);
 		_comboTour_ContentColor.setEnabled(isShowTourContent);
 		_comboTour_TitleColor.setEnabled(isShowTourContent);
+		_comboTour_ValueColor.setEnabled(isShowTourContent);
 		_fontEditorTourContent.setEnabled(isShowTourContent);
 		_fontEditorTourTitle.setEnabled(isShowTourContent);
+		_fontEditorTourValue.setEnabled(isShowTourContent);
 		_lblTour_ContentFont.setEnabled(isShowTourContent);
 		_lblTour_TitleFont.setEnabled(isShowTourContent);
 		_lblTour_TruncatedLines.setEnabled(isShowTourContent && isTruncateText);
 		_lblTour_ValueColumns.setEnabled(isShowTourContent);
+		_lblTour_ValueFont.setEnabled(isShowTourContent);
 		_spinnerTour_TruncatedLines.setEnabled(isShowTourContent && isTruncateText);
 		_spinnerTour_ValueColumns.setEnabled(isShowTourContent);
 		enableControls_TourInfo();
@@ -1676,6 +1724,10 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			for (final DayContentColor_ComboData data : CalendarConfigManager.getAllTourContentColor_ComboData()) {
 				_comboTour_TitleColor.add(data.label);
 			}
+			// value color
+			for (final DayContentColor_ComboData data : CalendarConfigManager.getAllTourContentColor_ComboData()) {
+				_comboTour_ValueColor.add(data.label);
+			}
 
 			for (int lineIndex = 0; lineIndex < CalendarConfigManager.TOUR_INFO_LINES; lineIndex++) {
 
@@ -1820,23 +1872,6 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			final DateColumn_ComboData data = allInfoColumnData[dataIndex];
 
 			if (data.dateColumn.equals(requestedData)) {
-				return dataIndex;
-			}
-		}
-
-		// this should not happen
-		return 0;
-	}
-
-	private int getDayContentColorIndex(final CalendarColor requestedData) {
-
-		final DayContentColor_ComboData[] allData = CalendarConfigManager.getAllTourContentColor_ComboData();
-
-		for (int dataIndex = 0; dataIndex < allData.length; dataIndex++) {
-
-			final DayContentColor_ComboData data = allData[dataIndex];
-
-			if (data.dayContentColor.equals(requestedData)) {
 				return dataIndex;
 			}
 		}
@@ -2027,7 +2062,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		return allTourBorderData[selectedIndex];
 	}
 
-	private DayContentColor_ComboData getSelectedTourContentColor(final Combo combo) {
+	private DayContentColor_ComboData getSelectedTourColor(final Combo combo) {
 
 		final DayContentColor_ComboData[] allData = CalendarConfigManager.getAllTourContentColor_ComboData();
 
@@ -2037,7 +2072,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 			for (final DayContentColor_ComboData data : allData) {
 
-				if (data.dayContentColor == CalendarConfigManager.DEFAULT_DAY_CONTENT_COLOR) {
+				if (data.dayContentColor == CalendarConfigManager.DEFAULT_TOUR_COLOR) {
 					return data;
 				}
 			}
@@ -2075,6 +2110,23 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			final TourBorder_ComboData data = allData[dataIndex];
 
 			if (data.tourBorder.equals(requestedData)) {
+				return dataIndex;
+			}
+		}
+
+		// this should not happen
+		return 0;
+	}
+
+	private int getTourColorIndex(final CalendarColor requestedData) {
+
+		final DayContentColor_ComboData[] allData = CalendarConfigManager.getAllTourContentColor_ComboData();
+
+		for (int dataIndex = 0; dataIndex < allData.length; dataIndex++) {
+
+			final DayContentColor_ComboData data = allData[dataIndex];
+
+			if (data.dayContentColor.equals(requestedData)) {
 				return dataIndex;
 			}
 		}
@@ -2287,6 +2339,8 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		// keep data from previous config
 		saveState_Config();
 
+		selectedConfig.dump();
+
 		CalendarConfigManager.setActiveCalendarConfig(selectedConfig, this);
 
 		restoreState_Config();
@@ -2371,10 +2425,12 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			_chkIsShowTourContent.setSelection(config.isShowTourContent);
 			_chkIsShowTourValueUnit.setSelection(config.isShowTourValueUnit);
 			_chkIsTruncateTourText.setSelection(config.isTruncateTourText);
-			_comboTour_ContentColor.select(getDayContentColorIndex(config.tourContentColor));
-			_comboTour_TitleColor.select(getDayContentColorIndex(config.tourTitleColor));
+			_comboTour_ContentColor.select(getTourColorIndex(config.tourContentColor));
+			_comboTour_TitleColor.select(getTourColorIndex(config.tourTitleColor));
+			_comboTour_ValueColor.select(getTourColorIndex(config.tourValueColor));
 			_fontEditorTourContent.setSelection(config.tourContentFont);
 			_fontEditorTourTitle.setSelection(config.tourTitleFont);
+			_fontEditorTourValue.setSelection(config.tourValueFont);
 			_spinnerTour_TruncatedLines.setSelection(config.tourTruncatedLines);
 			_spinnerTour_ValueColumns.setSelection(config.tourValueColumns);
 			selectDataFormatter(
@@ -2461,12 +2517,14 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		config.isShowTourContent = _chkIsShowTourContent.getSelection();
 		config.isShowTourValueUnit = _chkIsShowTourValueUnit.getSelection();
 		config.isTruncateTourText = _chkIsTruncateTourText.getSelection();
-		config.tourContentColor = getSelectedTourContentColor(_comboTour_ContentColor).dayContentColor;
+		config.tourContentColor = getSelectedTourColor(_comboTour_ContentColor).dayContentColor;
 		config.tourContentFont = _fontEditorTourContent.getSelection();
-		config.tourTitleColor = getSelectedTourContentColor(_comboTour_TitleColor).dayContentColor;
+		config.tourTitleColor = getSelectedTourColor(_comboTour_TitleColor).dayContentColor;
 		config.tourTitleFont = _fontEditorTourTitle.getSelection();
 		config.tourTruncatedLines = _spinnerTour_TruncatedLines.getSelection();
+		config.tourValueColor = getSelectedTourColor(_comboTour_ValueColor).dayContentColor;
 		config.tourValueColumns = _spinnerTour_ValueColumns.getSelection();
+		config.tourValueFont = _fontEditorTourValue.getSelection();
 
 		config.allTourFormatterData = getSelectedFormatterData(
 				CalendarConfigManager.allTourContentFormatter,

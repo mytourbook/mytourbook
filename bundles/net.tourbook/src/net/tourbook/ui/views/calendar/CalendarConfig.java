@@ -78,12 +78,14 @@ public class CalendarConfig {
 	boolean					isShowTourValueUnit			= true;
 	boolean					isTruncateTourText			= CalendarConfigManager.DEFAULT_IS_TRUNCATE_TOUR_TEXT;
 	FormatterData[]			allTourFormatterData		= CalendarConfigManager.DEFAULT_TOUR_FORMATTER_DATA;
-	CalendarColor			tourContentColor			= CalendarConfigManager.DEFAULT_DAY_CONTENT_COLOR;
+	CalendarColor			tourContentColor			= CalendarConfigManager.DEFAULT_TOUR_COLOR;
 	FontData				tourContentFont				= createFont(0.9f, SWT.NORMAL);
-	CalendarColor 			tourTitleColor				= CalendarConfigManager.DEFAULT_DAY_CONTENT_COLOR;
+	CalendarColor 			tourTitleColor				= CalendarConfigManager.DEFAULT_TOUR_COLOR;
 	FontData				tourTitleFont				= createFont(1.2f, SWT.BOLD);
 	int						tourTruncatedLines			= CalendarConfigManager.DEFAULT_TOUR_TRUNCATED_LINES;
+	CalendarColor			tourValueColor				= CalendarConfigManager.DEFAULT_TOUR_COLOR;
 	int 					tourValueColumns			= CalendarConfigManager.DEFAULT_TOUR_VALUE_COLUMNS;
+	FontData				tourValueFont				= createFont(1.1f, SWT.BOLD);
 
 	// week summary column
 	boolean					isShowSummaryColumn			= true;
@@ -100,7 +102,7 @@ public class CalendarConfig {
 	 * @param style
 	 * @return
 	 */
-	private FontData createFont(final float relSize, final int style) {
+	static FontData createFont(final float relSize, final int style) {
 
 		final Display display = Display.getDefault();
 
@@ -116,6 +118,124 @@ public class CalendarConfig {
 		}
 
 		return fontData[0];
+	}
+
+	void dump() {
+
+		final StringBuilder sb = new StringBuilder();
+		sb.append("");
+		sb.append("");
+
+		final CalendarConfig config = this;
+
+// SET_FORMATTING_OFF
+
+        sb.append("\n");
+        sb.append("\n");
+        sb.append("\n");
+        sb.append("// SET_FORMATTING_OFF");
+        sb.append("\n");
+        sb.append("\n");
+        sb.append("//                                     " + config.name + "\n");
+        sb.append("\n");
+        sb.append("config.defaultId                     = ConfigDefault." + defaultId                   + ";\n");
+        sb.append("\n");
+        sb.append("// layout                                                                                \n");
+        sb.append("config.isToggleMonthColor            = " + isToggleMonthColor                        + ";\n");
+        sb.append("config.useDraggedScrolling           = " + useDraggedScrolling                       + ";\n");
+        sb.append("config.alternateMonthRGB             = " + dump_RGB(config.alternateMonthRGB)        + ";\n");
+        sb.append("config.calendarBackgroundRGB         = " + dump_RGB(config.calendarBackgroundRGB)    + ";\n");
+        sb.append("config.calendarForegroundRGB         = " + dump_RGB(config.calendarForegroundRGB)    + ";\n");
+        sb.append("config.weekHeight                    = " + weekHeight                                + ";\n");
+        sb.append("                                                                                         \n");
+        sb.append("// year columns                                                                          \n");
+        sb.append("config.isShowYearColumns             = " + isShowYearColumns                         + ";\n");
+        sb.append("config.yearColumns                   = " + yearColumns                               + ";\n");
+        sb.append("config.yearColumnsSpacing            = " + yearColumnsSpacing                        + ";\n");
+        sb.append("config.yearColumnsStart              = ColumnStart." + yearColumnsStart             + ";\n");
+        sb.append("config.yearHeaderFont                = " + dump_Font(yearHeaderFont)                 + ";\n");
+        sb.append("                                                                                         \n");
+        sb.append("// date column                                                                           \n");
+        sb.append("config.isShowDateColumn              = " + isShowDateColumn                          + ";\n");
+        sb.append("config.dateColumnContent             = DateColumnContent." + dateColumnContent       + ";\n");
+        sb.append("config.dateColumnFont                = " + dump_Font(dateColumnFont)                 + ";\n");
+        sb.append("config.dateColumnWidth               = " + dateColumnWidth                           + ";\n");
+        sb.append("                                                                                         \n");
+        sb.append("// day date                                                                              \n");
+        sb.append("config.isHideDayDateWhenNoTour       = " + isHideDayDateWhenNoTour                   + ";\n");
+        sb.append("config.isShowDayDate                 = " + isShowDayDate                             + ";\n");
+        sb.append("config.isShowDayDateWeekendColor     = " + isShowDayDateWeekendColor                 + ";\n");
+        sb.append("config.dayDateFont                   = " + dump_Font(dayDateFont)                    + ";\n");
+        sb.append("config.dayDateFormat                 = DayDateFormat." + dayDateFormat               + ";\n");
+        sb.append("                                                                                         \n");
+        sb.append("// tour background                                                                       \n");
+        sb.append("config.tourBackground                = TourBackground." + tourBackground             + ";\n");
+        sb.append("config.tourBackgroundColor1          = CalendarColor." + tourBackgroundColor1        + ";\n");
+        sb.append("config.tourBackgroundColor2          = CalendarColor." + tourBackgroundColor2        + ";\n");
+        sb.append("config.tourBackgroundWidth           = " + tourBackgroundWidth                       + ";\n");
+        sb.append("config.tourBorder                    = TourBorder." + tourBorder                     + ";\n");
+        sb.append("config.tourBorderColor               = CalendarColor." + tourBorderColor             + ";\n");
+        sb.append("config.tourBorderWidth               = " + tourBorderWidth                           + ";\n");
+        sb.append("                                                                                         \n");
+        sb.append("// tour content                                                                          \n");
+        sb.append("config.isShowTourContent             = " + isShowTourContent                         + ";\n");
+        sb.append("config.isShowTourValueUnit           = " + isShowTourValueUnit                       + ";\n");
+        sb.append("config.isTruncateTourText            = " + isTruncateTourText                        + ";\n");
+//        sb.append("config.allTourFormatterData          = " + allTourFormatterData            + ";\n");
+        sb.append("config.tourContentColor              = CalendarColor." + tourContentColor            + ";\n");
+        sb.append("config.tourContentFont               = " + dump_Font(tourContentFont)                + ";\n");
+        sb.append("config.tourTitleColor                = CalendarColor." + tourTitleColor              + ";\n");
+        sb.append("config.tourTitleFont                 = " + dump_Font(tourTitleFont)                  + ";\n");
+        sb.append("config.tourTruncatedLines            = " + tourTruncatedLines                        + ";\n");
+        sb.append("config.tourValueColor                = CalendarColor." + tourValueColor              + ";\n");
+        sb.append("config.tourValueColumns              = " + tourValueColumns                          + ";\n");
+        sb.append("config.tourValueFont                 = " + dump_Font(tourValueFont)                  + ";\n");
+        sb.append("                                                                                         \n");
+        sb.append("// week summary column                                                                   \n");
+        sb.append("config.isShowSummaryColumn           = " + isShowSummaryColumn                       + ";\n");
+        sb.append("config.isShowWeekValueUnit           = " + isShowWeekValueUnit                       + ";\n");
+//        sb.append("config.allWeekFormatterData          = " + allWeekFormatterData            + ";\n");
+        sb.append("config.weekColumnWidth               = " + weekColumnWidth                           + ";\n");
+        sb.append("config.weekValueColor                = CalendarColor." + weekValueColor              + ";\n");
+        sb.append("config.weekValueFont                 = " + dump_Font(weekValueFont)                  + ";\n");
+        sb.append("\n");
+        sb.append("// SET_FORMATTING_ON");
+        sb.append("\n");
+        sb.append("\n");
+        sb.append("\n");
+
+// SET_FORMATTING_ON
+
+		System.out.print(sb.toString());
+	}
+
+	private String dump_Font(final FontData fontData) {
+
+		final Display display = Display.getDefault();
+
+		// !!! getFontData() MUST be created for EVERY font otherwise they use all the SAME font !!!
+		final FontData[] allSystemFontData = display.getSystemFont().getFontData();
+		final FontData systemFontData = allSystemFontData[0];
+
+		final float fontHeight = (float) fontData.getHeight() / (float) systemFontData.getHeight() + 0.05f;
+
+		final int fontStyle = fontData.getStyle();
+		String fontStyleText;
+
+		if (fontStyle == SWT.BOLD) {
+			fontStyleText = "SWT.BOLD";
+		} else if (fontStyle == SWT.ITALIC) {
+			fontStyleText = "SWT.ITALIC";
+		} else {
+			fontStyleText = "SWT.NORMAL";
+		}
+
+		return String.format("CalendarConfig.createFont(%.1ff, %s)", fontHeight, fontStyleText);
+	}
+
+	private String dump_RGB(final RGB rgb) {
+
+		return "new RGB (" + rgb.red + ", " + rgb.green + ", " + rgb.blue + ")";
 	}
 
 	@Override

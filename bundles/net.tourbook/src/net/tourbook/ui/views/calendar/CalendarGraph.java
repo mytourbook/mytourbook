@@ -154,9 +154,10 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	private Rectangle							_dayDateLabelRect;
 
 	private int									_fontHeight_DateColumn;
-	private int									_fontHeight_DayContent;
 	private int									_fontHeight_DayHeader;
+	private int									_fontHeight_TourContent;
 	private int									_fontHeight_TourTitle;
+	private int									_fontHeight_TourValue;
 	private int									_fontHeight_WeekValue;
 	private int									_fontHeight_YearHeader;
 	//
@@ -211,9 +212,10 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	//
 	private Font								_boldFont;
 	private Font								_fontDateColumn;
-	private Font								_fontDayContent;
 	private Font								_fontDayHeader;
+	private Font								_fontTourContent;
 	private Font								_fontTourTitle;
+	private Font								_fontTourValue;
 	private Font								_fontWeekValue;
 	private Font								_fontYearHeader;
 	//
@@ -868,9 +870,10 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	private void disposeFonts() {
 
 		_fontDateColumn = UI.disposeResource(_fontDateColumn);
-		_fontDayContent = UI.disposeResource(_fontDayContent);
 		_fontDayHeader = UI.disposeResource(_fontDayHeader);
+		_fontTourContent = UI.disposeResource(_fontTourContent);
 		_fontTourTitle = UI.disposeResource(_fontTourTitle);
+		_fontTourValue = UI.disposeResource(_fontTourValue);
 		_fontWeekValue = UI.disposeResource(_fontWeekValue);
 		_fontYearHeader = UI.disposeResource(_fontYearHeader);
 	}
@@ -1232,7 +1235,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 						} else if (isCalendarDataAvailable) {
 
-							dayDateForegroundColor = getColor_TourContent(
+							dayDateForegroundColor = getColor_Tour(
 									calendarData[0],
 									_currentConfig.tourContentColor);
 
@@ -1321,7 +1324,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		// setup font to set the font height !!!
 		getFont_TourTitle();
 
-		gc.setFont(getFont_DayContent());
+		gc.setFont(getFont_TourContent());
 
 		final int numTours = allCalendarTourData.length;
 		final int tourHeight = dayRect.height / numTours;
@@ -1575,16 +1578,22 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			return;
 		}
 
-		final Color color_TourContent = getColor_TourContent(calendarTourData, _currentConfig.tourContentColor);
+		final int margin = 2;
+		final int margin2 = margin * 2;
 
-		gc.setForeground(color_TourContent);
-		gc.setClipping(tourRect.x, tourRect.y, tourRect.width, tourRect.height);
+		final Rectangle marginRect = new Rectangle(//
+				tourRect.x + margin,
+				tourRect.y + margin,
+				tourRect.width - margin2,
+				tourRect.height - margin2);
 
-		int valuePosY = tourRect.y + 1;
-		final int posYBottom = tourRect.y + tourRect.height;
+		gc.setClipping(marginRect.x, marginRect.y, marginRect.width, marginRect.height);
+
+		int valuePosY = marginRect.y + 1;
+		final int posYBottom = marginRect.y + marginRect.height;
 
 		final int numValueColumns = _currentConfig.tourValueColumns;
-		final int columnWidth = tourRect.width / numValueColumns;
+		final int columnWidth = marginRect.width / numValueColumns;
 		int currentColumn = 0;
 
 		boolean isTextValue = false;
@@ -1618,11 +1627,11 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			if (valueText != null && valueText.length() > 0) {
 
 				final boolean isTourTitle = formatter.id == FormatterID.TOUR_TITLE;
-				final boolean isTourDescription = formatter.id == FormatterID.TOUR_DESCRIPTION;
-				final boolean isUseColumns = !isTourTitle && !isTourDescription && numValueColumns > 1;
+				final boolean isTourContent = formatter.id == FormatterID.TOUR_DESCRIPTION;
+				final boolean isUseColumns = !isTourTitle && !isTourContent && numValueColumns > 1;
 
 				final boolean wasTextValue = isTextValue;
-				isTextValue = isTourTitle || isTourDescription;
+				isTextValue = isTourTitle || isTourContent;
 
 				// skip 1st painted line
 				if (lastHeight > -1) {
@@ -1634,14 +1643,31 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 					}
 				}
 
-				final int fontHeight = isTourTitle
-						? _fontHeight_TourTitle
-						: _fontHeight_DayContent;
+				final int fontHeight;
 
 				if (isTourTitle) {
+
+					fontHeight = _fontHeight_TourTitle;
 					gc.setFont(getFont_TourTitle());
-					gc.setForeground(getColor_TourContent(calendarTourData, _currentConfig.tourTitleColor));
+					gc.setForeground(getColor_Tour(calendarTourData, _currentConfig.tourTitleColor));
+
+				} else if (isTourContent) {
+
+					fontHeight = _fontHeight_TourContent;
+					gc.setFont(getFont_TourContent());
+					gc.setForeground(getColor_Tour(calendarTourData, _currentConfig.tourContentColor));
+
+				} else {
+
+					// tour value
+
+					fontHeight = _fontHeight_TourValue;
+					gc.setFont(getFont_TourValue());
+					gc.setForeground(getColor_Tour(calendarTourData, _currentConfig.tourValueColor));
 				}
+
+				// reset title font/color -> content font/color
+				if (isTourTitle) {}
 
 				int valuePosX;
 				int valueWidth;
@@ -1653,14 +1679,14 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 					final int columnOffset = currentColumn * columnWidth;
 
 					valueWidth = columnWidth;
-					valuePosX = tourRect.x + columnOffset;
+					valuePosX = marginRect.x + columnOffset;
 
 				} else {
 
 					// easy formatting with 1 column
 
-					valuePosX = tourRect.x;
-					valueWidth = tourRect.width;
+					valuePosX = marginRect.x;
+					valueWidth = marginRect.width;
 				}
 
 				gc.setClipping(valuePosX, valuePosY, valueWidth, maxValueHeight);
@@ -1702,12 +1728,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 					if (isTextValue) {
 						currentColumn = 0;
 					}
-				}
-
-				// reset title font/color -> content font/color
-				if (isTourTitle) {
-					gc.setFont(getFont_DayContent());
-					gc.setForeground(color_TourContent);
 				}
 			}
 		}
@@ -1995,7 +2015,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 						formatterData.id,
 						CalendarConfigManager.allWeekFormatter);
 
-				gc.setForeground(_colorCache.getColor(getColor_WeekValue(formatter).hashCode()));
+				gc.setForeground(_colorCache.getColor(getColor_Week(formatter).hashCode()));
 
 				String text = formatter.format(
 						calendarTourData,
@@ -2122,7 +2142,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 	}
 
-	private Color getColor_TourContent(final CalendarTourData data, final CalendarColor calendarColor) {
+	private Color getColor_Tour(final CalendarTourData data, final CalendarColor calendarColor) {
 
 		final int typeColorIndex = data.typeColorIndex;
 
@@ -2163,7 +2183,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 	}
 
-	private RGB getColor_WeekValue(final DataFormatter formatter) {
+	private RGB getColor_Week(final DataFormatter formatter) {
 
 		final CalendarColor weekValueColor = _currentConfig.weekValueColor;
 
@@ -2217,25 +2237,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		return _fontDateColumn;
 	}
 
-	private Font getFont_DayContent() {
-
-		if (_fontDayContent == null) {
-
-			final FontData fontData = CalendarConfigManager.getActiveCalendarConfig().tourContentFont;
-
-			_fontDayContent = new Font(_display, fontData);
-
-			final GC gc = new GC(_display);
-			{
-				gc.setFont(_fontDayContent);
-				_fontHeight_DayContent = gc.getFontMetrics().getHeight();
-			}
-			gc.dispose();
-		}
-
-		return _fontDayContent;
-	}
-
 	private Font getFont_DayHeader() {
 
 		if (_fontDayHeader == null) {
@@ -2255,6 +2256,25 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		return _fontDayHeader;
 	}
 
+	private Font getFont_TourContent() {
+
+		if (_fontTourContent == null) {
+
+			final FontData fontData = CalendarConfigManager.getActiveCalendarConfig().tourContentFont;
+
+			_fontTourContent = new Font(_display, fontData);
+
+			final GC gc = new GC(_display);
+			{
+				gc.setFont(_fontTourContent);
+				_fontHeight_TourContent = gc.getFontMetrics().getHeight();
+			}
+			gc.dispose();
+		}
+
+		return _fontTourContent;
+	}
+
 	private Font getFont_TourTitle() {
 
 		if (_fontTourTitle == null) {
@@ -2272,6 +2292,25 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 
 		return _fontTourTitle;
+	}
+
+	private Font getFont_TourValue() {
+
+		if (_fontTourValue == null) {
+
+			final FontData fontData = CalendarConfigManager.getActiveCalendarConfig().tourValueFont;
+
+			_fontTourValue = new Font(_display, fontData);
+
+			final GC gc = new GC(_display);
+			{
+				gc.setFont(_fontTourValue);
+				_fontHeight_TourValue = gc.getFontMetrics().getHeight();
+			}
+			gc.dispose();
+		}
+
+		return _fontTourValue;
 	}
 
 	private Font getFont_WeekValue() {
