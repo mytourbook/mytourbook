@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,9 +18,11 @@ package net.tourbook.ui.action;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
+import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourTypeMenuManager;
 import net.tourbook.tourType.TourTypeImage;
@@ -30,7 +32,9 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.graphics.Image;
@@ -44,7 +48,7 @@ public class ActionSetTourTypeMenu extends Action implements IMenuCreator {
 
 	ITourProvider	_tourProvider;
 
-	private static class ActionSetTourType extends Action {
+	private static class Action_SetTourType extends Action {
 
 		private TourType		_tourType;
 		private ITourProvider	_tourProvider;
@@ -60,7 +64,7 @@ public class ActionSetTourTypeMenu extends Action implements IMenuCreator {
 		 *            {@link TourData} from the tour provider is only updated
 		 * @param isChecked
 		 */
-		public ActionSetTourType(	final TourType tourType,
+		public Action_SetTourType(	final TourType tourType,
 									final ITourProvider tourProvider,
 									final boolean isSaveTour,
 									final boolean isChecked) {
@@ -107,7 +111,9 @@ public class ActionSetTourTypeMenu extends Action implements IMenuCreator {
 	 *            {@link TourManager#TOUR_CHANGED} event is fired, otherwise {@link TourData} from
 	 *            the tour provider is only modified
 	 */
-	public static void fillMenu(final IMenuManager menuMgr, final ITourProvider tourProvider, final boolean isSaveTour) {
+	public static void fillMenu(final IMenuManager menuMgr,
+								final ITourProvider tourProvider,
+								final boolean isSaveTour) {
 
 		// get tours which tour type should be changed
 		final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
@@ -131,10 +137,21 @@ public class ActionSetTourTypeMenu extends Action implements IMenuCreator {
 				isChecked = true;
 			}
 
-			final ActionSetTourType action = new ActionSetTourType(tourType, tourProvider, isSaveTour, isChecked);
+			final Action_SetTourType action = new Action_SetTourType(tourType, tourProvider, isSaveTour, isChecked);
 
 			menuMgr.add(action);
 		}
+
+		/*
+		 * Add action to setup the tour type
+		 */
+		menuMgr.add(new Separator());
+
+		menuMgr.add(
+				new ActionOpenPrefDialog(
+						Messages.action_tourType_modify_tourTypes,
+						ITourbookPreferences.PREF_PAGE_TOUR_TYPE));
+		;
 	}
 
 	private void addActionToMenu(final Action action, final Menu menu) {
@@ -175,8 +192,20 @@ public class ActionSetTourTypeMenu extends Action implements IMenuCreator {
 				isChecked = true;
 			}
 
-			addActionToMenu(new ActionSetTourType(tourType, _tourProvider, true, isChecked), menu);
+			addActionToMenu(new Action_SetTourType(tourType, _tourProvider, true, isChecked), menu);
 		}
+
+		/*
+		 * Add action to setup the tour type
+		 */
+		new MenuItem(menu, SWT.SEPARATOR);
+
+		addActionToMenu(
+				new ActionOpenPrefDialog(
+						Messages.action_tourType_modify_tourTypes,
+						ITourbookPreferences.PREF_PAGE_TOUR_TYPE),
+				menu);
+
 	}
 
 	@Override

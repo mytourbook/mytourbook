@@ -45,7 +45,6 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
 import org.osgi.framework.Bundle;
@@ -147,9 +146,9 @@ public class CalendarConfigManager {
 	static final int						DEFAULT_DATE_COLUMN_WIDTH				= 50;
 	static final DateColumnContent			DEFAULT_DATE_COLUMN_CONTENT				= DateColumnContent.MONTH;
 	static final DataFormatter				DEFAULT_EMPTY_FORMATTER;
-	static final boolean					DEFAULT_IS_SHOW_DAY_DATE_WEEKEND_COLOR	= true;
+	static final boolean					DEFAULT_IS_SHOW_DAY_DATE_WEEKEND_COLOR	= false;
 	static final boolean					DEFAULT_IS_TRUNCATE_TOUR_TEXT			= true;
-	static final int						DEFAULT_SUMMARY_COLUMN_WIDTH			= 60;
+	static final int						DEFAULT_SUMMARY_COLUMN_WIDTH			= 100;
 	static final TourBackground				DEFAULT_TOUR_BACKGROUND					= TourBackground.FILL;
 	static final CalendarColor				DEFAULT_TOUR_BACKGROUND_COLOR1			= CalendarColor.DARK;
 	static final CalendarColor				DEFAULT_TOUR_BACKGROUND_COLOR2			= CalendarColor.BRIGHT;
@@ -158,24 +157,18 @@ public class CalendarConfigManager {
 	static final CalendarColor				DEFAULT_TOUR_BORDER_COLOR				= CalendarColor.LINE;
 	static final int						DEFAULT_TOUR_BORDER_WIDTH				= 1;
 	static final CalendarColor				DEFAULT_TOUR_COLOR						= CalendarColor.CONTRAST;
-	static final int						DEFAULT_TOUR_TRUNCATED_LINES			= 2;
-	static final int						DEFAULT_TOUR_VALUE_COLUMNS				= 2;
-	static final int						DEFAULT_WEEK_HEIGHT						= 70;
-	static final CalendarColor				DEFAULT_WEEK_VALUE_COLOR				= CalendarColor.TEXT;
-	static final int						DEFAULT_YEAR_COLUMNS					= 2;
+	static final int						DEFAULT_TOUR_TRUNCATED_LINES			= 3;
+	static final int						DEFAULT_TOUR_VALUE_COLUMNS				= 3;
+	static final int						DEFAULT_WEEK_HEIGHT						= 120;
+	static final CalendarColor				DEFAULT_WEEK_VALUE_COLOR				= CalendarColor.BRIGHT;
+	static final int						DEFAULT_YEAR_COLUMNS					= 1;
 	static final ColumnStart				DEFAULT_YEAR_COLUMNS_LAYOUT				= ColumnStart.CONTINUOUSLY;
 	static final int						DEFAULT_YEAR_COLUMNS_SPACING			= 30;
 	//
-	/**
-	 * MUST contain the same number of entries as in {@link #TOUR_INFO_LINES}
-	 */
 	static final FormatterData[]			DEFAULT_TOUR_FORMATTER_DATA;
-	static final int						TOUR_INFO_LINES							= 8;
-	/**
-	 * MUST contain the same number of entries as in {@link #WEEK_SUMMARY_LINES}
-	 */
 	static final FormatterData[]			DEFAULT_WEEK_FORMATTER_DATA;
-	static final int						WEEK_SUMMARY_LINES						= 6;
+	static final int						NUM_DEFAULT_TOUR_FORMATTER;
+	static final int						NUM_DEFAULT_WEEK_FORMATTER;
 	//
 	static final int						YEAR_COLUMNS_MIN						= 1;
 	static final int						YEAR_COLUMNS_MAX						= 100;
@@ -217,8 +210,11 @@ public class CalendarConfigManager {
 	//
 	static {
 
-		DEFAULT_CALENDAR_BACKGROUND_RGB			= Display.getCurrent().getSystemColor(SWT.COLOR_LIST_BACKGROUND).getRGB();
-		DEFAULT_CALENDAR_FOREBACKGROUND_RGB		= Display.getCurrent().getSystemColor(SWT.COLOR_LIST_FOREGROUND).getRGB();
+		DEFAULT_CALENDAR_BACKGROUND_RGB         = new RGB (59, 59, 59);
+		DEFAULT_CALENDAR_FOREBACKGROUND_RGB     = new RGB (197, 197, 197);
+
+//		DEFAULT_CALENDAR_BACKGROUND_RGB			= Display.getCurrent().getSystemColor(SWT.COLOR_LIST_BACKGROUND).getRGB();
+//		DEFAULT_CALENDAR_FOREBACKGROUND_RGB		= Display.getCurrent().getSystemColor(SWT.COLOR_LIST_FOREGROUND).getRGB();
 
 		/*
 		 * Formatter
@@ -285,25 +281,29 @@ public class CalendarConfigManager {
 
 		DEFAULT_TOUR_FORMATTER_DATA = new FormatterData[] {
 
-			new FormatterData(true,		FormatterID.TOUR_TITLE,			_tourFormatter_TourTitle.getDefaultFormat()),	// 1
-			new FormatterData(true,		FormatterID.TOUR_DESCRIPTION,	_tourFormatter_TourDescription.getDefaultFormat()),		// 2
-			new FormatterData(true,		FormatterID.ALTITUDE,			_tourFormatter_Altitude.getDefaultFormat()),	// 3
-			new FormatterData(true,		FormatterID.DISTANCE,			_tourFormatter_Distance.getDefaultFormat()),	// 4
-			new FormatterData(true,		FormatterID.TIME_MOVING,		_tourFormatter_Time_Moving.getDefaultFormat()),	// 5
-			new FormatterData(false,	FormatterID.EMPTY,				ValueFormat.DUMMY_VALUE),						// 6
-			new FormatterData(false,	FormatterID.EMPTY,				ValueFormat.DUMMY_VALUE),						// 7
-			new FormatterData(false,	FormatterID.EMPTY,				ValueFormat.DUMMY_VALUE),						// 8
+			new FormatterData(true,		FormatterID.TOUR_TITLE,			_tourFormatter_TourTitle.getDefaultFormat()),
+			new FormatterData(true,		FormatterID.TOUR_DESCRIPTION,	_tourFormatter_TourDescription.getDefaultFormat()),
+			new FormatterData(true,		FormatterID.ALTITUDE,			_tourFormatter_Altitude.getDefaultFormat()),
+			new FormatterData(true,		FormatterID.DISTANCE,			_tourFormatter_Distance.getDefaultFormat()),
+			new FormatterData(true,		FormatterID.TIME_MOVING,		_tourFormatter_Time_Moving.getDefaultFormat()),
+			new FormatterData(false,	FormatterID.EMPTY,				ValueFormat.DUMMY_VALUE),
+			new FormatterData(false,	FormatterID.EMPTY,				ValueFormat.DUMMY_VALUE),
+			new FormatterData(false,	FormatterID.EMPTY,				ValueFormat.DUMMY_VALUE),
 		};
+		
+		NUM_DEFAULT_TOUR_FORMATTER = DEFAULT_TOUR_FORMATTER_DATA.length;
 
 		DEFAULT_WEEK_FORMATTER_DATA = new FormatterData[] {
 				
-			new FormatterData(true,		FormatterID.ALTITUDE,			_weekFormatter_Altitude.getDefaultFormat()),	// 1
-			new FormatterData(true,		FormatterID.DISTANCE,			_weekFormatter_Distance.getDefaultFormat()),	// 2
-			new FormatterData(true,		FormatterID.TIME_MOVING,		_weekFormatter_Time_Moving.getDefaultFormat()),	// 3
-			new FormatterData(false,	FormatterID.EMPTY,				ValueFormat.DUMMY_VALUE),						// 4
-			new FormatterData(false,	FormatterID.EMPTY,				ValueFormat.DUMMY_VALUE),						// 5
-			new FormatterData(false,	FormatterID.EMPTY,				ValueFormat.DUMMY_VALUE),						// 6
+			new FormatterData(true,		FormatterID.ALTITUDE,			_weekFormatter_Altitude.getDefaultFormat()),
+			new FormatterData(true,		FormatterID.DISTANCE,			_weekFormatter_Distance.getDefaultFormat()),
+			new FormatterData(true,		FormatterID.SPEED,				_weekFormatter_Speed.getDefaultFormat()),
+			new FormatterData(true,		FormatterID.PACE,				_weekFormatter_Pace.getDefaultFormat()),
+			new FormatterData(true,		FormatterID.TIME_MOVING,		_weekFormatter_Time_Moving.getDefaultFormat()),
+			new FormatterData(false,	FormatterID.EMPTY,				ValueFormat.DUMMY_VALUE),
 		};
+		
+		NUM_DEFAULT_WEEK_FORMATTER = DEFAULT_WEEK_FORMATTER_DATA.length;
 	}
 	//
 	//
@@ -613,7 +613,6 @@ public class CalendarConfigManager {
 		_allCalendarConfigs.add(new CalendarConfig());
 
 		_allCalendarConfigs.add(createConfig_Classic());
-		_allCalendarConfigs.add(createConfig_Crazy());
 
 		_allCalendarConfigs.add(createConfig_Col_01());
 		_allCalendarConfigs.add(createConfig_Col_01_Dark());
@@ -623,6 +622,8 @@ public class CalendarConfigManager {
 		_allCalendarConfigs.add(createConfig_Col_10_Dark());
 		_allCalendarConfigs.add(createConfig_Col_20());
 		_allCalendarConfigs.add(createConfig_Col_20_Dark());
+
+		_allCalendarConfigs.add(createConfig_Crazy());
 
 		// append 10 custom configurations created from default default config
 		for (int configIndex = 1; configIndex < 11; configIndex++) {
@@ -638,6 +639,8 @@ public class CalendarConfigManager {
 	private static CalendarConfig createConfig_Classic() {
 
 		final CalendarConfig config = new CalendarConfig();
+
+		config.name = Messages.Calendar_Config_Name_Classic;
 
 		// SET_FORMATTING_OFF
 
@@ -700,7 +703,7 @@ public class CalendarConfigManager {
 		config.isShowWeekValueUnit           = true;
 		config.weekColumnWidth               = 100;
 		config.weekValueColor                = CalendarColor.TEXT;
-		config.weekValueFont                 = CalendarConfig.createFont(1.2f, SWT.NORMAL);
+		config.weekValueFont                 = CalendarConfig.createFont(1.2f, SWT.BOLD);
 
 		// SET_FORMATTING_ON
 
@@ -725,12 +728,72 @@ public class CalendarConfigManager {
 
 		final CalendarConfig config = new CalendarConfig();
 
-// SET_FORMATTING_OFF
-		
-		config.defaultId	= ConfigDefault.DARK_COL_1;
-		config.name			= Messages.Calendar_Config_Name_Col_01_Dark;
-		
-// SET_FORMATTING_ON
+		config.name = Messages.Calendar_Config_Name_Col_01_Dark;
+
+		// SET_FORMATTING_OFF
+
+//		                                     1 Column
+
+		config.defaultId                     = ConfigDefault.COL_1;
+
+		// layout
+		config.isToggleMonthColor            = false;
+		config.useDraggedScrolling           = false;
+		config.alternateMonthRGB             = new RGB (240, 240, 240);
+		config.calendarBackgroundRGB         = new RGB (59, 59, 59);
+		config.calendarForegroundRGB         = new RGB (197, 197, 197);
+		config.weekHeight                    = 40;
+		                                                                                         
+		// year columns
+		config.isShowYearColumns             = true;
+		config.yearColumns                   = 1;
+		config.yearColumnsSpacing            = 30;
+		config.yearColumnsStart              = ColumnStart.CONTINUOUSLY;
+		config.yearHeaderFont                = CalendarConfig.createFont(2.8f, SWT.BOLD);
+		                                                                                         
+		// date column
+		config.isShowDateColumn              = true;
+		config.dateColumnContent             = DateColumnContent.MONTH;
+		config.dateColumnFont                = CalendarConfig.createFont(1.7f, SWT.BOLD);
+		config.dateColumnWidth               = 50;
+		                                                                                         
+		// day date
+		config.isHideDayDateWhenNoTour       = true;
+		config.isShowDayDate                 = false;
+		config.isShowDayDateWeekendColor     = false;
+		config.dayDateFont                   = CalendarConfig.createFont(1.2f, SWT.BOLD);
+		config.dayDateFormat                 = DayDateFormat.DAY;
+		                                                                                         
+		// tour background
+		config.tourBackground                = TourBackground.FILL;
+		config.tourBackgroundColor1          = CalendarColor.DARK;
+		config.tourBackgroundColor2          = CalendarColor.BRIGHT;
+		config.tourBackgroundWidth           = 3;
+		config.tourBorder                    = TourBorder.NO_BORDER;
+		config.tourBorderColor               = CalendarColor.LINE;
+		config.tourBorderWidth               = 1;
+		                                                                                         
+		// tour content
+		config.isShowTourContent             = true;
+		config.isShowTourValueUnit           = true;
+		config.isTruncateTourText            = true;
+		config.tourContentColor              = CalendarColor.CONTRAST;
+		config.tourContentFont               = CalendarConfig.createFont(0.9f, SWT.NORMAL);
+		config.tourTitleColor                = CalendarColor.CONTRAST;
+		config.tourTitleFont                 = CalendarConfig.createFont(1.2f, SWT.BOLD);
+		config.tourTruncatedLines            = 1;
+		config.tourValueColor                = CalendarColor.CONTRAST;
+		config.tourValueColumns              = 3;
+		config.tourValueFont                 = CalendarConfig.createFont(1.0f, SWT.BOLD);
+		                                                                                         
+		// week summary column
+		config.isShowSummaryColumn           = true;
+		config.isShowWeekValueUnit           = true;
+		config.weekColumnWidth               = 100;
+		config.weekValueColor                = CalendarColor.BRIGHT;
+		config.weekValueFont                 = CalendarConfig.createFont(1.0f, SWT.BOLD);
+
+		// SET_FORMATTING_ON
 
 		return config;
 	}
@@ -939,8 +1002,8 @@ public class CalendarConfigManager {
 					final String valueText = valueFormatter.printDouble(altitude);
 
 					return isShowValueUnit
-							? valueText + UI.SPACE + UI.UNIT_LABEL_ALTITUDE
-							: valueText;
+							? valueText + UI.SPACE + UI.UNIT_LABEL_ALTITUDE + UI.SPACE
+							: valueText + UI.SPACE;
 
 				} else {
 					return UI.EMPTY_STRING;
@@ -996,8 +1059,8 @@ public class CalendarConfigManager {
 					final String valueText = valueFormatter.printDouble(distance);
 
 					return isShowValueUnit
-							? valueText + UI.SPACE + UI.UNIT_LABEL_DISTANCE
-							: valueText;
+							? valueText + UI.SPACE + UI.UNIT_LABEL_DISTANCE + UI.SPACE
+							: valueText + UI.SPACE;
 
 				} else {
 					return UI.EMPTY_STRING;
@@ -1092,8 +1155,8 @@ public class CalendarConfigManager {
 					final String valueText = UI.format_mm_ss((long) pace);
 
 					return isShowValueUnit //
-							? valueText + UI.SPACE + UI.UNIT_LABEL_PACE
-							: valueText;
+							? valueText + UI.SPACE + UI.UNIT_LABEL_PACE + UI.SPACE
+							: valueText + UI.SPACE;
 
 				} else {
 					return UI.EMPTY_STRING;
@@ -1142,8 +1205,8 @@ public class CalendarConfigManager {
 					final String valueText = valueFormatter.printDouble(speed);
 
 					return isShowValueUnit
-							? valueText + UI.SPACE + UI.UNIT_LABEL_SPEED
-							: valueText;
+							? valueText + UI.SPACE + UI.UNIT_LABEL_SPEED + UI.SPACE
+							: valueText + UI.SPACE;
 				} else {
 
 					return UI.EMPTY_STRING;
@@ -1197,8 +1260,8 @@ public class CalendarConfigManager {
 					final String valueText = valueFormatter.printLong(data.drivingTime);
 
 					return isShowValueUnit
-							? valueText + UI.SPACE + UI.UNIT_LABEL_TIME
-							: valueText;
+							? valueText + UI.SPACE + UI.UNIT_LABEL_TIME + UI.SPACE
+							: valueText + UI.SPACE;
 
 				} else {
 					return UI.EMPTY_STRING;
@@ -1252,8 +1315,8 @@ public class CalendarConfigManager {
 					final String valueText = valueFormatter.printLong(data.recordingTime - data.drivingTime);
 
 					return isShowValueUnit
-							? valueText + UI.SPACE + UI.UNIT_LABEL_TIME
-							: valueText;
+							? valueText + UI.SPACE + UI.UNIT_LABEL_TIME + UI.SPACE
+							: valueText + UI.SPACE;
 
 				} else {
 					return UI.EMPTY_STRING;
@@ -1307,8 +1370,8 @@ public class CalendarConfigManager {
 					final String valueText = valueFormatter.printLong(data.recordingTime);
 
 					return isShowValueUnit
-							? valueText + UI.SPACE + UI.UNIT_LABEL_TIME
-							: valueText;
+							? valueText + UI.SPACE + UI.UNIT_LABEL_TIME + UI.SPACE
+							: valueText + UI.SPACE;
 
 				} else {
 
@@ -1661,7 +1724,7 @@ public class CalendarConfigManager {
 	static void resetActiveCalendarConfiguration() {
 
 		// do not replace the name
-		final String oldName = _activeCalendarConfig.name;
+//		final String oldName = _activeCalendarConfig.name;
 
 		final int activeCalendarConfigIndex = getActiveCalendarConfigIndex();
 
@@ -1670,7 +1733,7 @@ public class CalendarConfigManager {
 
 		// create new config
 		final CalendarConfig newConfig = createConfig_FromId(_activeCalendarConfig.defaultId);
-		newConfig.name = oldName;
+//		newConfig.name = oldName;
 
 		// update model
 		_allCalendarConfigs.add(activeCalendarConfigIndex, newConfig);

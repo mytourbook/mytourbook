@@ -247,7 +247,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			 * Combo: Configuration
 			 */
 			_comboConfigName = new Combo(parent, SWT.READ_ONLY | SWT.BORDER);
-			_comboConfigName.setVisibleItemCount(20);
+			_comboConfigName.setVisibleItemCount(50);
 			_comboConfigName.addFocusListener(_keepOpenListener);
 			_comboConfigName.addSelectionListener(new SelectionAdapter() {
 				@Override
@@ -1204,9 +1204,11 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 	private void createUI_320_Values(final Composite parent) {
 
-		_chkTour_AllIsShowLines = new Button[CalendarConfigManager.TOUR_INFO_LINES];
-		_comboTour_AllValues = new Combo[CalendarConfigManager.TOUR_INFO_LINES];
-		_comboTour_AllFormats = new Combo[CalendarConfigManager.TOUR_INFO_LINES];
+		final int defaultTourFormatter = CalendarConfigManager.NUM_DEFAULT_TOUR_FORMATTER;
+
+		_chkTour_AllIsShowLines = new Button[defaultTourFormatter];
+		_comboTour_AllValues = new Combo[defaultTourFormatter];
+		_comboTour_AllFormats = new Combo[defaultTourFormatter];
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -1219,7 +1221,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				.applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
 		{
-			for (int lineIndex = 0; lineIndex < CalendarConfigManager.TOUR_INFO_LINES; lineIndex++) {
+			for (int lineIndex = 0; lineIndex < defaultTourFormatter; lineIndex++) {
 
 				// checkbox
 				final Button chkWeek_IsShowLine = new Button(container, SWT.CHECK);
@@ -1396,9 +1398,11 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 	private void createUI_420_Values(final Composite parent) {
 
-		_chkWeek_AllIsShowLines = new Button[CalendarConfigManager.WEEK_SUMMARY_LINES];
-		_comboWeek_AllValues = new Combo[CalendarConfigManager.WEEK_SUMMARY_LINES];
-		_comboWeek_AllFormats = new Combo[CalendarConfigManager.WEEK_SUMMARY_LINES];
+		final int defaultWeekFormatter = CalendarConfigManager.NUM_DEFAULT_WEEK_FORMATTER;
+
+		_chkWeek_AllIsShowLines = new Button[defaultWeekFormatter];
+		_comboWeek_AllValues = new Combo[defaultWeekFormatter];
+		_comboWeek_AllFormats = new Combo[defaultWeekFormatter];
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -1411,7 +1415,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				.applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
 		{
-			for (int lineIndex = 0; lineIndex < CalendarConfigManager.WEEK_SUMMARY_LINES; lineIndex++) {
+			for (int lineIndex = 0; lineIndex < defaultWeekFormatter; lineIndex++) {
 
 				// checkbox
 				final Button chkWeek_IsShowLine = new Button(container, SWT.CHECK);
@@ -1596,7 +1600,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 		final DataFormatter[] tourContentFormatter = CalendarConfigManager.allTourContentFormatter;
 
-		for (int lineIndex = 0; lineIndex < CalendarConfigManager.TOUR_INFO_LINES; lineIndex++) {
+		for (int lineIndex = 0; lineIndex < CalendarConfigManager.NUM_DEFAULT_TOUR_FORMATTER; lineIndex++) {
 
 			final Button chkIsShowLine = _chkTour_AllIsShowLines[lineIndex];
 			final Combo comboWeekValue = _comboTour_AllValues[lineIndex];
@@ -1635,7 +1639,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 		final DataFormatter[] tourWeekSummaryFormatter = CalendarConfigManager.allWeekFormatter;
 
-		for (int lineIndex = 0; lineIndex < CalendarConfigManager.WEEK_SUMMARY_LINES; lineIndex++) {
+		for (int lineIndex = 0; lineIndex < CalendarConfigManager.NUM_DEFAULT_WEEK_FORMATTER; lineIndex++) {
 
 			final Button chkIsShowLine = _chkWeek_AllIsShowLines[lineIndex];
 			final Combo comboWeekValue = _comboWeek_AllValues[lineIndex];
@@ -1729,7 +1733,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				_comboTour_ValueColor.add(data.label);
 			}
 
-			for (int lineIndex = 0; lineIndex < CalendarConfigManager.TOUR_INFO_LINES; lineIndex++) {
+			for (int lineIndex = 0; lineIndex < CalendarConfigManager.NUM_DEFAULT_TOUR_FORMATTER; lineIndex++) {
 
 				final Combo comboTourValue = _comboTour_AllValues[lineIndex];
 
@@ -1741,7 +1745,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			/*
 			 * Week summary values, formatter is filled when a value is selected
 			 */
-			for (int lineIndex = 0; lineIndex < CalendarConfigManager.WEEK_SUMMARY_LINES; lineIndex++) {
+			for (int lineIndex = 0; lineIndex < CalendarConfigManager.NUM_DEFAULT_WEEK_FORMATTER; lineIndex++) {
 
 				final Combo comboWeekValue = _comboWeek_AllValues[lineIndex];
 
@@ -2248,7 +2252,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 	private void onChange_TourValue(final Widget widget) {
 
-		for (int lineIndex = 0; lineIndex < CalendarConfigManager.TOUR_INFO_LINES; lineIndex++) {
+		for (int lineIndex = 0; lineIndex < CalendarConfigManager.NUM_DEFAULT_TOUR_FORMATTER; lineIndex++) {
 
 			final Combo comboWeekValue = _comboTour_AllValues[lineIndex];
 			final Combo comboWeekFormat = _comboTour_AllFormats[lineIndex];
@@ -2263,7 +2267,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 	private void onChange_WeekValue(final Widget widget) {
 
-		for (int lineIndex = 0; lineIndex < CalendarConfigManager.WEEK_SUMMARY_LINES; lineIndex++) {
+		for (int lineIndex = 0; lineIndex < CalendarConfigManager.NUM_DEFAULT_WEEK_FORMATTER; lineIndex++) {
 
 			final Combo comboWeekValue = _comboWeek_AllValues[lineIndex];
 			final Combo comboWeekFormat = _comboWeek_AllFormats[lineIndex];
@@ -2339,6 +2343,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		// keep data from previous config
 		saveState_Config();
 
+		// debugging: dump config to copy&paste an adjusted config into the configuration manager
 		selectedConfig.dump();
 
 		CalendarConfigManager.setActiveCalendarConfig(selectedConfig, this);
@@ -2528,7 +2533,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 		config.allTourFormatterData = getSelectedFormatterData(
 				CalendarConfigManager.allTourContentFormatter,
-				CalendarConfigManager.TOUR_INFO_LINES,
+				CalendarConfigManager.NUM_DEFAULT_TOUR_FORMATTER,
 				_chkTour_AllIsShowLines,
 				_comboTour_AllValues,
 				_comboTour_AllFormats);
@@ -2542,7 +2547,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 		config.allWeekFormatterData = getSelectedFormatterData(
 				CalendarConfigManager.allWeekFormatter,
-				CalendarConfigManager.WEEK_SUMMARY_LINES,
+				CalendarConfigManager.NUM_DEFAULT_WEEK_FORMATTER,
 				_chkWeek_AllIsShowLines,
 				_comboWeek_AllValues,
 				_comboWeek_AllFormats);

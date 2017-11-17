@@ -37,7 +37,7 @@ public class CalendarConfig {
 	String					name						= Messages.Calendar_Config_Name_Default;
 	
 	// layout
-	boolean					isToggleMonthColor			= true;
+	boolean					isToggleMonthColor			= false;
 	boolean					useDraggedScrolling			= false;
 	RGB 					alternateMonthRGB			= CalendarConfigManager.DEFAULT_ALTERNATE_MONTH_RGB;
 	RGB						calendarBackgroundRGB		= CalendarConfigManager.DEFAULT_CALENDAR_BACKGROUND_RGB;
@@ -49,17 +49,17 @@ public class CalendarConfig {
 	int						yearColumns					= CalendarConfigManager.DEFAULT_YEAR_COLUMNS;
 	int 					yearColumnsSpacing			= CalendarConfigManager.DEFAULT_YEAR_COLUMNS_SPACING;
 	ColumnStart				yearColumnsStart			= CalendarConfigManager.DEFAULT_YEAR_COLUMNS_LAYOUT;
-	FontData 				yearHeaderFont				= createFont(2.2f, SWT.BOLD);
-	
+	FontData 				yearHeaderFont				= createFont(2.8f, SWT.BOLD);
+
 	// date column
 	boolean					isShowDateColumn			= true;
 	DateColumnContent		dateColumnContent			= CalendarConfigManager.DEFAULT_DATE_COLUMN_CONTENT;
-	FontData				dateColumnFont				= createFont(1.5f, SWT.BOLD);
+	FontData				dateColumnFont				= createFont(1.7f, SWT.BOLD);
 	int						dateColumnWidth				= CalendarConfigManager.DEFAULT_DATE_COLUMN_WIDTH;
 	
 	// day date
-	boolean					isHideDayDateWhenNoTour		= false;
-	boolean					isShowDayDate				= true;
+	boolean					isHideDayDateWhenNoTour		= true;
+	boolean					isShowDayDate				= false;
 	boolean 				isShowDayDateWeekendColor	= CalendarConfigManager.DEFAULT_IS_SHOW_DAY_DATE_WEEKEND_COLOR;
 	FontData				dayDateFont					= createFont(1.2f, SWT.BOLD);
 	DayDateFormat			dayDateFormat				= CalendarConfigManager.DEFAULT_DAY_DATE_FORMAT;

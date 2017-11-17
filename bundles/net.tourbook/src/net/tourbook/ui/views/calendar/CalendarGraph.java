@@ -1602,7 +1602,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		for (final FormatterData formatterData : _currentConfig.allTourFormatterData) {
 
-			if (formatterData.isEnabled == false || formatterData.id == FormatterID.EMPTY) {
+			if (formatterData.isEnabled == false /* || formatterData.id == FormatterID.EMPTY */) {
 
 				// formatter is not valid
 				continue;
@@ -1624,7 +1624,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 					formatterData.valueFormat,
 					_currentConfig.isShowTourValueUnit);
 
-			if (valueText != null && valueText.length() > 0) {
+			final boolean isEmptyFormatter = formatterData.id == FormatterID.EMPTY;
+
+			if (valueText != null && valueText.length() > 0 || isEmptyFormatter) {
 
 				final boolean isTourTitle = formatter.id == FormatterID.TOUR_TITLE;
 				final boolean isTourContent = formatter.id == FormatterID.TOUR_DESCRIPTION;
@@ -1643,17 +1645,21 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 					}
 				}
 
+				boolean isTruncateTourText = _currentConfig.isTruncateTourText;
+				int tourTruncatedLines = _currentConfig.tourTruncatedLines;
 				final int fontHeight;
 
 				if (isTourTitle) {
 
 					fontHeight = _fontHeight_TourTitle;
+
 					gc.setFont(getFont_TourTitle());
 					gc.setForeground(getColor_Tour(calendarTourData, _currentConfig.tourTitleColor));
 
 				} else if (isTourContent) {
 
 					fontHeight = _fontHeight_TourContent;
+
 					gc.setFont(getFont_TourContent());
 					gc.setForeground(getColor_Tour(calendarTourData, _currentConfig.tourContentColor));
 
@@ -1662,8 +1668,13 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 					// tour value
 
 					fontHeight = _fontHeight_TourValue;
+
 					gc.setFont(getFont_TourValue());
 					gc.setForeground(getColor_Tour(calendarTourData, _currentConfig.tourValueColor));
+
+					// do not truncate values, it looks ugly when the value unit is at the next line
+					isTruncateTourText = true;
+					tourTruncatedLines = 1;
 				}
 
 				// reset title font/color -> content font/color
@@ -1704,10 +1715,10 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 						fontHeight,
 						_dayDateLabelRect,
 
-						_currentConfig.isTruncateTourText,
-						_currentConfig.tourTruncatedLines);
+						isTruncateTourText,
+						tourTruncatedLines);
 
-				if (_textWrapPainter.isPainted()) {
+				if (_textWrapPainter.isPainted() || isEmptyFormatter) {
 
 					lastPaintedY = _textWrapPainter.getLastPaintedY();
 					lastHeight = fontHeight;

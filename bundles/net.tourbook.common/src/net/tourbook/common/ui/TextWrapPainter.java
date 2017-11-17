@@ -90,6 +90,9 @@ public class TextWrapPainter {
 		_devX = _devLeftMargin = devX;
 		_devY = devY;
 
+		// fix problem when an empty string is painted
+		_lastPaintedY = _devY;
+
 		_is1stPainted = false;
 
 		_isTruncateText = isTruncateText;
