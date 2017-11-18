@@ -202,7 +202,7 @@ public class SlideoutTourInfo extends ToolbarSlideout {
 
 		enableControls();
 
-		_calendarView.updateUI_CalendarConfig();
+		_calendarView.updateUI_CalendarProfile();
 	}
 
 	private void restoreState() {

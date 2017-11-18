@@ -38,7 +38,7 @@ import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
-import net.tourbook.ui.views.calendar.CalendarConfigManager.ICalendarConfigProvider;
+import net.tourbook.ui.views.calendar.CalendarProfileManager.ICalendarProfileProvider;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
@@ -68,7 +68,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 
-public class CalendarView extends ViewPart implements ITourProvider, ICalendarConfigProvider {
+public class CalendarView extends ViewPart implements ITourProvider, ICalendarProfileProvider {
 
 // SET_FORMATTING_OFF
 	
@@ -145,7 +145,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarCo
 	private Composite				_parent;
 	private Composite				_calendarContainer;
 
-	private Combo					_comboConfigName;
+	private Combo					_comboProfileName;
 
 	private Label					_lblTitle;
 
@@ -173,7 +173,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarCo
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == CalendarView.this) {
 					saveState();
-					CalendarConfigManager.setConfigProvider((CalendarView) null);
+					CalendarProfileManager.setProfileProvider((CalendarView) null);
 				}
 			}
 
@@ -189,7 +189,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarCo
 			@Override
 			public void partOpened(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == CalendarView.this) {
-					CalendarConfigManager.setConfigProvider(CalendarView.this);
+					CalendarProfileManager.setProfileProvider(CalendarView.this);
 				}
 			}
 
@@ -635,7 +635,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarCo
 		_tourInfoToolTip = new CalendarTourInfoToolTip(this);
 
 		restoreState();
-		updateUI_CalendarConfig();
+		updateUI_CalendarProfile();
 
 		// restore selection
 		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
@@ -683,21 +683,21 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarCo
 			}
 			{
 				/*
-				 * Combo: Configuration
+				 * Combo: Profiles
 				 */
-				_comboConfigName = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
-				_comboConfigName.setVisibleItemCount(30);
-				_comboConfigName.addSelectionListener(new SelectionAdapter() {
+				_comboProfileName = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
+				_comboProfileName.setVisibleItemCount(30);
+				_comboProfileName.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
-						onSelectConfig();
+						onSelectProfile();
 					}
 				});
 				GridDataFactory
 						.fillDefaults()
 						.align(SWT.BEGINNING, SWT.CENTER)
 						.hint(_pc.convertWidthInCharsToPixels(20), SWT.DEFAULT)
-						.applyTo(_comboConfigName);
+						.applyTo(_comboProfileName);
 			}
 		}
 	}
@@ -731,12 +731,12 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarCo
 		toolbarMrg.add(_actionCalendarOptions);
 	}
 
-	private void fillUI_Config() {
+	private void fillUI_Profiles() {
 
-		_comboConfigName.removeAll();
+		_comboProfileName.removeAll();
 
-		for (final CalendarConfig config : CalendarConfigManager.getAllCalendarConfigs()) {
-			_comboConfigName.add(config.name);
+		for (final CalendarProfile profile : CalendarProfileManager.getAllCalendarProfiles()) {
+			_comboProfileName.add(profile.name);
 		}
 	}
 
@@ -788,25 +788,6 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarCo
 		return _actionTourInfo.isChecked();
 	}
 
-	private void onSelectConfig() {
-
-		final int selectedIndex = _comboConfigName.getSelectionIndex();
-		final ArrayList<CalendarConfig> allConfigurations = CalendarConfigManager.getAllCalendarConfigs();
-
-		final CalendarConfig selectedConfig = allConfigurations.get(selectedIndex);
-		final CalendarConfig activeConfig = CalendarConfigManager.getActiveCalendarConfig();
-
-		if (selectedConfig.equals(activeConfig)) {
-
-			// config has not changed
-			return;
-		}
-
-		CalendarConfigManager.setActiveCalendarConfig(selectedConfig, this);
-
-		updateUI_Layout(true);
-	}
-
 	private void onSelectionChanged(final ISelection selection) {
 
 		// show and select the selected tour
@@ -828,6 +809,25 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarCo
 
 			_calendarGraph.refreshCalendar();
 		}
+	}
+
+	private void onSelectProfile() {
+
+		final int selectedIndex = _comboProfileName.getSelectionIndex();
+		final ArrayList<CalendarProfile> allProfiles = CalendarProfileManager.getAllCalendarProfiles();
+
+		final CalendarProfile selectedProfile = allProfiles.get(selectedIndex);
+		final CalendarProfile activeProfile = CalendarProfileManager.getActiveCalendarProfile();
+
+		if (selectedProfile.equals(activeProfile)) {
+
+			// profile has not changed
+			return;
+		}
+
+		CalendarProfileManager.setActiveCalendarProfile(selectedProfile, this);
+
+		updateUI_Layout(true);
 	}
 
 	private void refreshCalendar() {
@@ -870,7 +870,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarCo
 		// until now we only implement single tour selection
 		_state.put(STATE_SELECTED_TOURS, _calendarGraph.getSelectedTourId());
 
-		CalendarConfigManager.saveState();
+		CalendarProfileManager.saveState();
 	}
 
 	/**
@@ -882,14 +882,14 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarCo
 	}
 
 	@Override
-	public void updateUI_CalendarConfig() {
+	public void updateUI_CalendarProfile() {
 
-		fillUI_Config();
+		fillUI_Profiles();
 
-		// get active config AFTER getting the index because this could change the active config
-		final int activeConfigIndex = CalendarConfigManager.getActiveCalendarConfigIndex();
+		// get active profile AFTER getting the index because this could change the active profile
+		final int activeProfileIndex = CalendarProfileManager.getActiveCalendarProfileIndex();
 
-		_comboConfigName.select(activeConfigIndex);
+		_comboProfileName.select(activeProfileIndex);
 
 		_tourInfoToolTip.setPopupDelay(Util.getStateInt(_state, STATE_TOUR_TOOLTIP_DELAY, DEFAULT_TOUR_TOOLTIP_DELAY));
 	}
