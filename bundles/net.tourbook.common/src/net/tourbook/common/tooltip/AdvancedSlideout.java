@@ -212,7 +212,10 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 		// create default content
 		final Label label = new Label(parent, SWT.NONE);
 		label.setText(UI.EMPTY_STRING);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
+		GridDataFactory
+				.fillDefaults()//
+				//				.grab(true, false)
+				.applyTo(label);
 	}
 
 	private Composite createUI(final Composite parent) {
@@ -257,7 +260,7 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 		_labelDragSlideout.setToolTipText(Messages.Slideout_Dialog_Action_DragSlideout_ToolTip);
 		GridDataFactory
 				.fillDefaults()//
-				//				.grab(true, false)
+				.grab(true, false)
 				.align(SWT.FILL, SWT.CENTER)
 				//				.indent(3, 0)
 				.applyTo(_labelDragSlideout);
