@@ -34,7 +34,7 @@ import net.tourbook.ui.views.calendar.CalendarProfileManager.ColumnLayout_ComboD
 import net.tourbook.ui.views.calendar.CalendarProfileManager.DateColumn_ComboData;
 import net.tourbook.ui.views.calendar.CalendarProfileManager.DayContentColor_ComboData;
 import net.tourbook.ui.views.calendar.CalendarProfileManager.DayHeaderDateFormat_ComboData;
-import net.tourbook.ui.views.calendar.CalendarProfileManager.ICalendarProfileProvider;
+import net.tourbook.ui.views.calendar.CalendarProfileManager.ICalendarProfileListener;
 import net.tourbook.ui.views.calendar.CalendarProfileManager.TourBackground_ComboData;
 import net.tourbook.ui.views.calendar.CalendarProfileManager.TourBorder_ComboData;
 
@@ -47,18 +47,19 @@ import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellLabelProvider;
-import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
@@ -95,13 +96,13 @@ import org.eclipse.swt.widgets.Widget;
 /**
  * Properties slideout for the calendar view.
  */
-public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalendarProfileProvider,
+public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalendarProfileListener,
 		IColorSelectorListener {
 
-	private static final String					STATE_SELECTED_TAB	= "STATE_SELECTED_TAB";							//$NON-NLS-1$
+	private static final String					STATE_SELECTED_TAB	= "STATE_SELECTED_TAB";								//$NON-NLS-1$
 	//
 	private final IDialogSettings				_state				= TourbookPlugin.getState(
-			"SlideoutCalendarOptions");																				//$NON-NLS-1$
+			"SlideoutCalendarOptions");																					//$NON-NLS-1$
 	//
 	private IFontEditorListener					_defaultFontEditorListener;
 	private MouseWheelListener					_defaultMouseWheelListener;
@@ -154,14 +155,15 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	private ColorSelectorExtended				_colorCalendarForegroundColor;
 	//
 	private Combo								_comboColumnLayout;
-	private Combo								_comboProfileName;
 	private Combo								_comboDateColumn;
 	private Combo								_comboDayHeaderDateFormat;
-	private Combo								_comboTourBackground;
-	private Combo								_comboTourBackgroundColor1;
-	private Combo								_comboTourBackgroundColor2;
-	private Combo								_comboTourBorder;
-	private Combo								_comboTourBorderColor;
+	private Combo								_comboProfile_Name;
+	private Combo								_comboProfile_DefaultId;
+	private Combo								_comboTour_Background;
+	private Combo								_comboTour_BackgroundColor1;
+	private Combo								_comboTour_BackgroundColor2;
+	private Combo								_comboTour_Border;
+	private Combo								_comboTour_BorderColor;
 	private Combo								_comboTour_ContentColor;
 	private Combo								_comboTour_TitleColor;
 	private Combo								_comboTour_ValueColor;
@@ -180,6 +182,8 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	private Label								_lblDateColumn_Width;
 	private Label								_lblDayHeader_Font;
 	private Label								_lblDayHeader_Format;
+	private Label								_lblProfile_Name;
+	private Label								_lblProfile_DefaultId;
 	private Label								_lblTour_ContentFont;
 	private Label								_lblTour_TitleFont;
 	private Label								_lblTour_TruncatedLines;
@@ -218,7 +222,30 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	//
 	private ToolItem							_toolItem;
 
-	private class FilterProfileProvider implements IStructuredContentProvider {
+	private class ProfileComparator extends ViewerComparator {
+
+		@Override
+		public int compare(final Viewer viewer, final Object e1, final Object e2) {
+
+			if (e1 == null || e2 == null) {
+				return 0;
+			}
+
+			final CalendarProfile profile1 = (CalendarProfile) e1;
+			final CalendarProfile profile2 = (CalendarProfile) e2;
+
+			return profile1.id.compareTo(profile2.id);
+		}
+
+		@Override
+		public boolean isSorterProperty(final Object element, final String property) {
+
+			// force resorting when a name is renamed
+			return true;
+		}
+	}
+
+	private class ProfileProvider implements IStructuredContentProvider {
 
 		@Override
 		public void dispose() {}
@@ -273,6 +300,9 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 		restoreState_UI();
 		restoreState_Profile();
+
+		// load viewer
+		_profileViewer.setInput(new Object());
 	}
 
 	@Override
@@ -286,10 +316,10 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			/*
 			 * Combo: Profiles
 			 */
-			_comboProfileName = new Combo(parent, SWT.READ_ONLY | SWT.BORDER);
-			_comboProfileName.setVisibleItemCount(50);
-			_comboProfileName.addFocusListener(_keepOpenListener);
-			_comboProfileName.addSelectionListener(new SelectionAdapter() {
+			_comboProfile_Name = new Combo(parent, SWT.READ_ONLY | SWT.BORDER);
+			_comboProfile_Name.setVisibleItemCount(50);
+			_comboProfile_Name.addFocusListener(_keepOpenListener);
+			_comboProfile_Name.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					onSelectProfile();
@@ -299,9 +329,9 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 					.fillDefaults()
 					.grab(true, false)
 					.align(SWT.FILL, SWT.CENTER)
-					.indent(20, 0)
+					.indent(0, 0)
 					.hint(_pc.convertWidthInCharsToPixels(10), SWT.DEFAULT)
-					.applyTo(_comboProfileName);
+					.applyTo(_comboProfile_Name);
 		}
 	}
 
@@ -350,13 +380,11 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	private Control createUI_100_Tab_Profile(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(container);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+		GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
 		{
 			createUI_110_Profiles(container);
-			createUI_130_ProfileActions(container);
-
-			createUI_190_ProfileData(container);
+			createUI_150_ProfileData(container);
 		}
 
 		return container;
@@ -365,23 +393,25 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	private Composite createUI_110_Profiles(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory
-				.fillDefaults()//
-				.applyTo(container);
-		GridLayoutFactory
-				.fillDefaults()//
-				.numColumns(1)
-				.extendedMargins(0, 3, 0, 0)
-				.applyTo(container);
+		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
 		{
 			{
 				final Label label = new Label(container, SWT.NONE);
-				GridDataFactory.fillDefaults().applyTo(label);
 				label.setText(Messages.Slideout_TourFilter_Label_Profiles);
+				GridDataFactory.fillDefaults().span(2, 1).applyTo(label);
 			}
 
 			createUI_120_ProfileViewer(container);
 			createUI_130_ProfileActions(container);
+
+			{
+				// hint to use drag & drop
+				final Label label = new Label(parent, SWT.WRAP);
+				label.setText(Messages.Slideout_CalendarOptions_Label_ProfileDragDropHint);
+				GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(label);
+			}
 		}
 
 		return container;
@@ -393,6 +423,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		GridDataFactory
 				.fillDefaults()//
 				.grab(true, true)
+				.hint(_pc.convertWidthInCharsToPixels(50), _pc.convertHeightInCharsToPixels(10))
 				.applyTo(layoutContainer);
 
 		final TableColumnLayout tableLayout = new TableColumnLayout();
@@ -407,7 +438,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 		// !!! this prevents that the horizontal scrollbar is displayed, but is not always working :-(
 		table.setHeaderVisible(false);
-//		table.setHeaderVisible(true);
+		table.setHeaderVisible(true);
 
 		_profileViewer = new TableViewer(table);
 
@@ -422,43 +453,60 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 			tvc = new TableViewerColumn(_profileViewer, SWT.LEAD);
 			tc = tvc.getColumn();
-			tc.setText(Messages.Slideout_TourFilter_Column_ProfileName);
 			tvc.setLabelProvider(new CellLabelProvider() {
 				@Override
 				public void update(final ViewerCell cell) {
 
 					final CalendarProfile profile = (CalendarProfile) cell.getElement();
 
-//					cell.setText(profile.name);
+					cell.setText(profile.name);
+				}
+			});
+			tableLayout.setColumnData(tc, new ColumnWeightData(2, false));
+		}
+
+		{
+			// Column: Default ID
+
+			tvc = new TableViewerColumn(_profileViewer, SWT.LEAD);
+			tc = tvc.getColumn();
+			tvc.setLabelProvider(new CellLabelProvider() {
+				@Override
+				public void update(final ViewerCell cell) {
+
+					final CalendarProfile profile = (CalendarProfile) cell.getElement();
+
+					cell.setText(profile.defaultId.name());
 				}
 			});
 			tableLayout.setColumnData(tc, new ColumnWeightData(1, false));
 		}
 
-		{
-			// Column: Number of properties
-
-			tvc = new TableViewerColumn(_profileViewer, SWT.TRAIL);
-			tc = tvc.getColumn();
-			tc.setText(Messages.Slideout_TourFilter_Column_Properties);
-			tc.setToolTipText(Messages.Slideout_TourFilter_Column_Properties_Tooltip);
-			tvc.setLabelProvider(new CellLabelProvider() {
-				@Override
-				public void update(final ViewerCell cell) {
-
-					final CalendarProfile profile = (CalendarProfile) cell.getElement();
-
-//					cell.setText(Integer.toString(profile.filterProperties.size()));
-				}
-			});
-			tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(6), false));
-		}
+// this is for debugging
+//		{
+//			// Column: ID
+//
+//			tvc = new TableViewerColumn(_profileViewer, SWT.LEAD);
+//			tc = tvc.getColumn();
+//			tvc.setLabelProvider(new CellLabelProvider() {
+//				@Override
+//				public void update(final ViewerCell cell) {
+//
+//					final CalendarProfile profile = (CalendarProfile) cell.getElement();
+//
+//					cell.setText(profile.id);
+//				}
+//			});
+//			tableLayout.setColumnData(tc, new ColumnWeightData(1, false));
+//		}
 
 		/*
 		 * create table viewer
 		 */
-		_profileViewer.setContentProvider(new FilterProfileProvider());
-//		_profileViewer.setComparator(new FilterProfileComparator());
+		_profileViewer.setContentProvider(new ProfileProvider());
+
+// viewer is not sorted, with drag&drop the sequence can be set
+//		_profileViewer.setComparator(new ProfileComparator());
 
 		_profileViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			@Override
@@ -496,7 +544,11 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	private void createUI_130_ProfileActions(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridDataFactory
+				.fillDefaults()
+				.align(SWT.FILL, SWT.BEGINNING)
+				//				.grab(true, false)
+				.applyTo(container);
 		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
 		{
 			{
@@ -550,33 +602,48 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				// set button default width
 				UI.setButtonLayoutData(_btnProfile_Delete);
 			}
+			{
+				/*
+				 * Button: Reset
+				 */
+				_btnReset = new Button(container, SWT.PUSH);
+				_btnReset.setText(Messages.App_Action_Reset);
+				_btnReset.setToolTipText(Messages.App_Action_ResetProfile_Tooltip);
+				_btnReset.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent e) {
+						onProfile_Reset(e);
+					}
+				});
+
+				// set button default width
+				UI.setButtonLayoutData(_btnReset);
+			}
 		}
 	}
 
-	private void createUI_190_ProfileData(final Composite parent) {
+	private void createUI_150_ProfileData(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 		{
 			{
 				/*
-				 * Name
+				 * Profile Name
 				 */
-				final Label label = new Label(container, SWT.NONE);
-				label.setText(Messages.Slideout_CalendarOptions_Label_Name);
-				label.setToolTipText(Messages.Slideout_CalendarOptions_Label_Name_Tooltip);
-				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
-			}
-			{
-				/*
-				 * Text
-				 */
+
+				// label
+				_lblProfile_Name = new Label(container, SWT.NONE);
+				_lblProfile_Name.setText(Messages.Slideout_CalendarOptions_Label_Name);
+				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_lblProfile_Name);
+
+				// text
 				_txtProfileName = new Text(container, SWT.BORDER);
 				_txtProfileName.addModifyListener(new ModifyListener() {
 					@Override
 					public void modifyText(final ModifyEvent e) {
-						onModifyName();
+						onModify_ProfileName();
 					}
 				});
 				GridDataFactory
@@ -587,22 +654,20 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			}
 			{
 				/*
-				 * Button: Reset
+				 * Profile default ID
 				 */
-				_btnReset = new Button(container, SWT.PUSH);
-				_btnReset.setText(Messages.App_Action_Reset);
-				_btnReset.setToolTipText(Messages.App_Action_ResetConfig_Tooltip);
-				_btnReset.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(final SelectionEvent e) {
-						onSelectProfile_Default(e);
-					}
-				});
-				GridDataFactory
-						.fillDefaults()//
-						//						.grab(true, false)
-						.align(SWT.END, SWT.CENTER)
-						.applyTo(_btnReset);
+
+				// label
+				_lblProfile_DefaultId = new Label(container, SWT.NONE);
+				_lblProfile_DefaultId.setText(Messages.Slideout_CalendarOptions_Label_ProfileDefaultId);
+				_lblProfile_DefaultId.setToolTipText(Messages.Slideout_CalendarOptions_Label_ProfileDefaultId_Tooltip);
+				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_lblProfile_DefaultId);
+
+				// combo
+				_comboProfile_DefaultId = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+				_comboProfile_DefaultId.setVisibleItemCount(20);
+				_comboProfile_DefaultId.addSelectionListener(_defaultSelectionListener);
+				_comboProfile_DefaultId.addFocusListener(_keepOpenListener);
 			}
 		}
 	}
@@ -1181,20 +1246,20 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 						.applyTo(label);
 
 				// value
-				_comboTourBackground = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
-				_comboTourBackground.setVisibleItemCount(20);
-				_comboTourBackground.addSelectionListener(_defaultSelectionListener);
-				_comboTourBackground.addFocusListener(_keepOpenListener);
+				_comboTour_Background = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
+				_comboTour_Background.setVisibleItemCount(20);
+				_comboTour_Background.addSelectionListener(_defaultSelectionListener);
+				_comboTour_Background.addFocusListener(_keepOpenListener);
 
 				// combo color 1
-				_comboTourBackgroundColor1 = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
-				_comboTourBackgroundColor1.setVisibleItemCount(20);
-				_comboTourBackgroundColor1.addSelectionListener(_defaultSelectionListener);
+				_comboTour_BackgroundColor1 = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
+				_comboTour_BackgroundColor1.setVisibleItemCount(20);
+				_comboTour_BackgroundColor1.addSelectionListener(_defaultSelectionListener);
 
 				// combo color 2
-				_comboTourBackgroundColor2 = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
-				_comboTourBackgroundColor2.setVisibleItemCount(20);
-				_comboTourBackgroundColor2.addSelectionListener(_defaultSelectionListener);
+				_comboTour_BackgroundColor2 = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
+				_comboTour_BackgroundColor2.setVisibleItemCount(20);
+				_comboTour_BackgroundColor2.addSelectionListener(_defaultSelectionListener);
 
 				// background width
 				_spinnerTourBackgroundWidth = new Spinner(group, SWT.BORDER);
@@ -1219,15 +1284,15 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 						.applyTo(label);
 
 				// value
-				_comboTourBorder = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
-				_comboTourBorder.setVisibleItemCount(20);
-				_comboTourBorder.addSelectionListener(_defaultSelectionListener);
-				_comboTourBorder.addFocusListener(_keepOpenListener);
+				_comboTour_Border = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
+				_comboTour_Border.setVisibleItemCount(20);
+				_comboTour_Border.addSelectionListener(_defaultSelectionListener);
+				_comboTour_Border.addFocusListener(_keepOpenListener);
 
 				// combo color
-				_comboTourBorderColor = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
-				_comboTourBorderColor.setVisibleItemCount(20);
-				_comboTourBorderColor.addSelectionListener(_defaultSelectionListener);
+				_comboTour_BorderColor = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
+				_comboTour_BorderColor.setVisibleItemCount(20);
+				_comboTour_BorderColor.addSelectionListener(_defaultSelectionListener);
 
 				// spacer
 				new Label(group, SWT.NONE);
@@ -1814,9 +1879,9 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		_lblDayHeader_Font.setEnabled(isShowDayDate);
 
 		// day content
-		_comboTourBackgroundColor1.setEnabled(selectedTourBackgroundData.isColor1);
-		_comboTourBackgroundColor2.setEnabled(selectedTourBackgroundData.isColor2);
-		_comboTourBorderColor.setEnabled(selectedTourBorderData.isColor);
+		_comboTour_BackgroundColor1.setEnabled(selectedTourBackgroundData.isColor1);
+		_comboTour_BackgroundColor2.setEnabled(selectedTourBackgroundData.isColor2);
+		_comboTour_BorderColor.setEnabled(selectedTourBorderData.isColor);
 		_spinnerTourBackgroundWidth.setEnabled(selectedTourBackgroundData.isWidth);
 		_spinnerTourBorderWidth.setEnabled(selectedTourBorderData.isWidth);
 
@@ -1929,10 +1994,17 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			/*
 			 * Fill Combos
 			 */
-
 			final CalendarColor_ComboData[] allCalendarColor_ComboData = CalendarProfileManager
 					.getAllCalendarColor_ComboData();
 
+			// profile defaults
+			for (final ProfileDefault data : ProfileDefault.values()) {
+				_comboProfile_DefaultId.add(data.name());
+			}
+
+			/*
+			 * Layout
+			 */
 			for (final DateColumn_ComboData data : CalendarProfileManager.getAllDateColumnData()) {
 				_comboDateColumn.add(data.label);
 			}
@@ -1950,23 +2022,23 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			 * Tour background
 			 */
 			for (final TourBackground_ComboData data : CalendarProfileManager.getAllTourBackground_ComboData()) {
-				_comboTourBackground.add(data.label);
+				_comboTour_Background.add(data.label);
 			}
 			for (final CalendarColor_ComboData data : allCalendarColor_ComboData) {
-				_comboTourBackgroundColor1.add(data.label);
+				_comboTour_BackgroundColor1.add(data.label);
 			}
 			for (final CalendarColor_ComboData data : allCalendarColor_ComboData) {
-				_comboTourBackgroundColor2.add(data.label);
+				_comboTour_BackgroundColor2.add(data.label);
 			}
 
 			/*
 			 * Tour border
 			 */
 			for (final TourBorder_ComboData data : CalendarProfileManager.getAllTourBorderData()) {
-				_comboTourBorder.add(data.label);
+				_comboTour_Border.add(data.label);
 			}
 			for (final CalendarColor_ComboData data : allCalendarColor_ComboData) {
-				_comboTourBorderColor.add(data.label);
+				_comboTour_BorderColor.add(data.label);
 			}
 
 			/*
@@ -2078,10 +2150,10 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		final boolean backupIsUpdateUI = _isUpdateUI;
 		_isUpdateUI = true;
 		{
-			_comboProfileName.removeAll();
+			_comboProfile_Name.removeAll();
 
 			for (final CalendarProfile profile : _calendarProfiles) {
-				_comboProfileName.add(profile.name);
+				_comboProfile_Name.add(profile.name);
 			}
 		}
 		_isUpdateUI = backupIsUpdateUI;
@@ -2165,6 +2237,23 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		itemBounds.y = itemDisplayPosition.y;
 
 		return itemBounds;
+	}
+
+	private int getProfileDefaultIdIndex(final ProfileDefault defaultId) {
+
+		final ProfileDefault[] profileDefaults = ProfileDefault.values();
+
+		for (int defaultIndex = 0; defaultIndex < profileDefaults.length; defaultIndex++) {
+
+			final ProfileDefault profileDefault = profileDefaults[defaultIndex];
+
+			if (profileDefault.equals(defaultId)) {
+				return defaultIndex;
+			}
+		}
+
+		// return valid value
+		return 0;
 	}
 
 	private CalendarColor getSelectedCalendarColor(final Combo comboColor) {
@@ -2279,7 +2368,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 	private TourBackground_ComboData getSelectedTourBackgroundData() {
 
-		final int selectedIndex = _comboTourBackground.getSelectionIndex();
+		final int selectedIndex = _comboTour_Background.getSelectionIndex();
 
 		final TourBackground_ComboData[] allTourBackgroundData = CalendarProfileManager
 				.getAllTourBackground_ComboData();
@@ -2302,7 +2391,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 	private TourBorder_ComboData getSelectedTourBorderData() {
 
-		final int selectedIndex = _comboTourBorder.getSelectionIndex();
+		final int selectedIndex = _comboTour_Border.getSelectionIndex();
 
 		final TourBorder_ComboData[] allTourBorderData = CalendarProfileManager.getAllTourBorderData();
 
@@ -2403,7 +2492,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		_defaultSelectionListener = new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
-				onModifyProfile();
+				onModify_Profile();
 			}
 		};
 
@@ -2411,28 +2500,28 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			@Override
 			public void mouseScrolled(final MouseEvent event) {
 				UI.adjustSpinnerValueOnMouseScroll(event);
-				onModifyProfile();
+				onModify_Profile();
 			}
 		};
 
 		_defaultPropertyChangeListener = new IPropertyChangeListener() {
 			@Override
 			public void propertyChange(final PropertyChangeEvent event) {
-				onModifyProfile();
+				onModify_Profile();
 			}
 		};
 
 		_tourValueListener = new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
-				onChange_TourValue(e.widget);
+				onModify_TourValue(e.widget);
 			}
 		};
 
 		_weekValueListener = new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
-				onChange_WeekValue(e.widget);
+				onModify_WeekValue(e.widget);
 			}
 		};
 
@@ -2463,11 +2552,11 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 			@Override
 			public void fontSelected(final FontData font) {
-				onModifyProfile();
+				onModify_Profile();
 			}
 		};
 
-		CalendarProfileManager.setProfileProvider(this);
+		CalendarProfileManager.addProfileListener(this);
 
 		parent.addDisposeListener(new DisposeListener() {
 
@@ -2506,7 +2595,44 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		return false;
 	}
 
-	private void onChange_TourValue(final Widget widget) {
+	private void onDisposeSlideout() {
+
+		// reset profile provider
+		CalendarProfileManager.removeProfileListener(this);
+
+		saveState_UI();
+	}
+
+	@Override
+	protected void onFocus() {
+
+		_comboProfile_Name.setFocus();
+	}
+
+	private void onModify_Profile() {
+
+		saveState_Profile();
+
+		enableControls();
+
+		updateUI();
+	}
+
+	private void onModify_ProfileName() {
+
+		if (_isUpdateUI) {
+			return;
+		}
+
+		// update text in the combo
+		final int selectedIndex = _comboProfile_Name.getSelectionIndex();
+
+		_comboProfile_Name.setItem(selectedIndex, _txtProfileName.getText());
+
+		saveState_Profile();
+	}
+
+	private void onModify_TourValue(final Widget widget) {
 
 		for (int lineIndex = 0; lineIndex < CalendarProfileManager.NUM_DEFAULT_TOUR_FORMATTER; lineIndex++) {
 
@@ -2518,10 +2644,10 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 		_tourFormatterContainer.layout(true, true);
 
-		onModifyProfile();
+		onModify_Profile();
 	}
 
-	private void onChange_WeekValue(final Widget widget) {
+	private void onModify_WeekValue(final Widget widget) {
 
 		for (int lineIndex = 0; lineIndex < CalendarProfileManager.NUM_DEFAULT_WEEK_FORMATTER; lineIndex++) {
 
@@ -2533,64 +2659,64 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 		_weekFormatterContainer.layout(true, true);
 
-		onModifyProfile();
+		onModify_Profile();
 	}
 
-	private void onDisposeSlideout() {
+	private void onProfile_Add() {
 
-		// reset profile provider
-		CalendarProfileManager.setProfileProvider((SlideoutCalendarOptions) null);
-
-		saveState_UI();
 	}
 
-	@Override
-	protected void onFocus() {
+	private void onProfile_Copy() {
 
-		_comboProfileName.setFocus();
 	}
 
-	private void onModifyName() {
+	private void onProfile_Delete() {
+
+	}
+
+	private void onProfile_Reset(final SelectionEvent selectionEvent) {
+
+//		if (Util.isCtrlKeyPressed(selectionEvent)) {
+//
+//			// reset All profiles
+//
+//			CalendarProfileManager.resetAllCalendarProfiles();
+//
+//			fillUI_Profile();
+//
+//		} else {
+//
+		// reset active profile
+
+		CalendarProfileManager.resetActiveCalendarProfile();
+//		}
+
+		restoreState_Profile();
+
+		CalendarProfileManager.updateFormatterValueFormat();
+
+		updateUI();
+	}
+
+	/**
+	 * Profile is selected in the profile viewer
+	 */
+	private void onProfile_Select() {
 
 		if (_isUpdateUI) {
 			return;
 		}
 
-		// update text in the combo
-		final int selectedIndex = _comboProfileName.getSelectionIndex();
+		// get selected profile from viewer
+		final StructuredSelection selection = (StructuredSelection) _profileViewer.getSelection();
+		final Object firstElement = selection.getFirstElement();
 
-		_comboProfileName.setItem(selectedIndex, _txtProfileName.getText());
+		CalendarProfile selectedProfile = null;
+		if (firstElement != null) {
+			selectedProfile = (CalendarProfile) firstElement;
+		}
 
-		saveState_Profile();
-	}
-
-	private void onModifyProfile() {
-
-		saveState_Profile();
-
-		enableControls();
-
-		updateUI();
-	}
-
-	private void onProfile_Add() {
-		// TODO Auto-generated method stub
-
-	}
-
-	private void onProfile_Copy() {
-		// TODO Auto-generated method stub
-
-	}
-
-	private void onProfile_Delete() {
-		// TODO Auto-generated method stub
-
-	}
-
-	private void onProfile_Select() {
-		// TODO Auto-generated method stub
-
+		selectOtherProfile(selectedProfile);
 	}
 
 	@Override
@@ -2602,52 +2728,25 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		reparentedShell.pack(true);
 	}
 
+	/**
+	 * Profile is selected in the combo box
+	 */
 	private void onSelectProfile() {
 
-		final int selectedIndex = _comboProfileName.getSelectionIndex();
+		final int selectedIndex = _comboProfile_Name.getSelectionIndex();
 		final ArrayList<CalendarProfile> allProfiles = _calendarProfiles;
 
 		final CalendarProfile selectedProfile = allProfiles.get(selectedIndex);
-		final CalendarProfile activeProfile = CalendarProfileManager.getActiveCalendarProfile();
 
-		if (selectedProfile.equals(activeProfile)) {
-
-			// profile has not changed
-			return;
-		}
-
-		// keep data from previous profile
-		saveState_Profile();
-
-		// debugging: dump profile to copy&paste an adjusted profile into the profile manager
-		selectedProfile.dump();
-
-		CalendarProfileManager.setActiveCalendarProfile(selectedProfile, this);
-
-		restoreState_Profile();
-		updateUI();
+		selectOtherProfile(selectedProfile);
 	}
 
-	private void onSelectProfile_Default(final SelectionEvent selectionEvent) {
+	@Override
+	public void profileIsModified() {
 
-		if (Util.isCtrlKeyPressed(selectionEvent)) {
-
-			// reset All profiles
-
-			CalendarProfileManager.resetAllCalendarProfiles();
-
-			fillUI_Profile();
-
-		} else {
-
-			// reset active profile
-
-			CalendarProfileManager.resetActiveCalendarProfile();
-		}
+		fillUI_Profile();
 
 		restoreState_Profile();
-
-		CalendarProfileManager.updateFormatterValueFormat();
 
 		updateUI();
 	}
@@ -2662,7 +2761,9 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			final int activeProfileIndex = CalendarProfileManager.getActiveCalendarProfileIndex();
 
 			// profile
-			_comboProfileName.select(activeProfileIndex);
+			_comboProfile_Name.select(activeProfileIndex);
+			_comboProfile_DefaultId.select(getProfileDefaultIdIndex(profile.defaultId));
+			_profileViewer.setSelection(new StructuredSelection(profile), true);
 			_txtProfileName.setText(profile.name);
 
 			// layout
@@ -2694,11 +2795,11 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			_fontEditorDayDate.setSelection(profile.dayDateFont);
 
 			// tour background
-			_comboTourBackground.select(getTourBackgroundIndex(profile.tourBackground));
-			_comboTourBackgroundColor1.select(getCalendarColorIndex(profile.tourBackgroundColor1));
-			_comboTourBackgroundColor2.select(getCalendarColorIndex(profile.tourBackgroundColor2));
-			_comboTourBorder.select(getTourBorderIndex(profile.tourBorder));
-			_comboTourBorderColor.select(getCalendarColorIndex(profile.tourBorderColor));
+			_comboTour_Background.select(getTourBackgroundIndex(profile.tourBackground));
+			_comboTour_BackgroundColor1.select(getCalendarColorIndex(profile.tourBackgroundColor1));
+			_comboTour_BackgroundColor2.select(getCalendarColorIndex(profile.tourBackgroundColor2));
+			_comboTour_Border.select(getTourBorderIndex(profile.tourBorder));
+			_comboTour_BorderColor.select(getCalendarColorIndex(profile.tourBorderColor));
 			_spinnerTourBackgroundWidth.setSelection(profile.tourBackgroundWidth);
 			_spinnerTourBorderWidth.setSelection(profile.tourBorderWidth);
 
@@ -2787,11 +2888,11 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 		// tour background
 		profile.tourBackground = getSelectedTourBackgroundData().tourBackground;
-		profile.tourBackgroundColor1 = getSelectedCalendarColor(_comboTourBackgroundColor1);
-		profile.tourBackgroundColor2 = getSelectedCalendarColor(_comboTourBackgroundColor2);
+		profile.tourBackgroundColor1 = getSelectedCalendarColor(_comboTour_BackgroundColor1);
+		profile.tourBackgroundColor2 = getSelectedCalendarColor(_comboTour_BackgroundColor2);
 		profile.tourBackgroundWidth = _spinnerTourBackgroundWidth.getSelection();
 		profile.tourBorder = getSelectedTourBorderData().tourBorder;
-		profile.tourBorderColor = getSelectedCalendarColor(_comboTourBorderColor);
+		profile.tourBorderColor = getSelectedCalendarColor(_comboTour_BorderColor);
 		profile.tourBorderWidth = _spinnerTourBorderWidth.getSelection();
 
 		// tour content
@@ -2916,19 +3017,35 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		formatterContainer.layout(true, true);
 	}
 
+	private void selectOtherProfile(final CalendarProfile selectedProfile) {
+
+		if (selectedProfile == null) {
+			return;
+		}
+
+		// check if another profile is selected
+		final CalendarProfile activeProfile = CalendarProfileManager.getActiveCalendarProfile();
+		if (selectedProfile.equals(activeProfile)) {
+
+			// profile has not changed
+			return;
+		}
+
+		// keep data from previous profile
+		saveState_Profile();
+
+		// debugging: dump profile to copy&paste an adjusted profile into the profile manager
+		selectedProfile.dump();
+
+		CalendarProfileManager.setActiveCalendarProfile(selectedProfile);
+
+		restoreState_Profile();
+		updateUI();
+	}
+
 	private void updateUI() {
 
 		_calendarView.updateUI_Layout(true);
-	}
-
-	@Override
-	public void updateUI_CalendarProfile() {
-
-		fillUI_Profile();
-
-		restoreState_Profile();
-
-		updateUI();
 	}
 
 }

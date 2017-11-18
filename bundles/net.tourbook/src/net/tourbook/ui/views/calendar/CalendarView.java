@@ -38,7 +38,7 @@ import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
-import net.tourbook.ui.views.calendar.CalendarProfileManager.ICalendarProfileProvider;
+import net.tourbook.ui.views.calendar.CalendarProfileManager.ICalendarProfileListener;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
@@ -68,7 +68,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 
-public class CalendarView extends ViewPart implements ITourProvider, ICalendarProfileProvider {
+public class CalendarView extends ViewPart implements ITourProvider, ICalendarProfileListener {
 
 // SET_FORMATTING_OFF
 	
@@ -173,7 +173,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 			public void partClosed(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == CalendarView.this) {
 					saveState();
-					CalendarProfileManager.setProfileProvider((CalendarView) null);
+					CalendarProfileManager.addProfileListener(CalendarView.this);
 				}
 			}
 
@@ -189,7 +189,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 			@Override
 			public void partOpened(final IWorkbenchPartReference partRef) {
 				if (partRef.getPart(false) == CalendarView.this) {
-					CalendarProfileManager.setProfileProvider(CalendarView.this);
+					CalendarProfileManager.removeProfileListener(CalendarView.this);
 				}
 			}
 
@@ -635,7 +635,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 		_tourInfoToolTip = new CalendarTourInfoToolTip(this);
 
 		restoreState();
-		updateUI_CalendarProfile();
+		profileIsModified();
 
 		// restore selection
 		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
@@ -825,9 +825,22 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 			return;
 		}
 
-		CalendarProfileManager.setActiveCalendarProfile(selectedProfile, this);
+		CalendarProfileManager.setActiveCalendarProfile(selectedProfile);
 
 		updateUI_Layout(true);
+	}
+
+	@Override
+	public void profileIsModified() {
+
+		fillUI_Profiles();
+
+		// get active profile AFTER getting the index because this could change the active profile
+		final int activeProfileIndex = CalendarProfileManager.getActiveCalendarProfileIndex();
+
+		_comboProfileName.select(activeProfileIndex);
+
+		_tourInfoToolTip.setPopupDelay(Util.getStateInt(_state, STATE_TOUR_TOOLTIP_DELAY, DEFAULT_TOUR_TOOLTIP_DELAY));
 	}
 
 	private void refreshCalendar() {
@@ -879,19 +892,6 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 	@Override
 	public void setFocus() {
 		_calendarContainer.setFocus();
-	}
-
-	@Override
-	public void updateUI_CalendarProfile() {
-
-		fillUI_Profiles();
-
-		// get active profile AFTER getting the index because this could change the active profile
-		final int activeProfileIndex = CalendarProfileManager.getActiveCalendarProfileIndex();
-
-		_comboProfileName.select(activeProfileIndex);
-
-		_tourInfoToolTip.setPopupDelay(Util.getStateInt(_state, STATE_TOUR_TOOLTIP_DELAY, DEFAULT_TOUR_TOOLTIP_DELAY));
 	}
 
 	void updateUI_Layout(final boolean isResetUIResources) {

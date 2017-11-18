@@ -472,6 +472,7 @@ public class Messages extends NLS {
 	public static String		App_Action_Rename;
 	public static String		App_Action_Reset;
 	public static String		App_Action_ResetConfig_Tooltip;
+	public static String		App_Action_ResetProfile_Tooltip;
 	public static String		App_Action_RestartApp;
 	public static String		App_Action_RestoreDefault_Tooltip;
 	public static String		App_Action_set_tour_type;
@@ -1703,6 +1704,9 @@ public class Messages extends NLS {
 	public static String		Slideout_CalendarOptions_Label_Name_Tooltip;
 	public static String		Slideout_CalendarOptions_Label_NumYearColumns;
 	public static String		Slideout_CalendarOptions_Label_NumYearColumns_Tooltip;
+	public static String		Slideout_CalendarOptions_Label_ProfileDefaultId;
+	public static String		Slideout_CalendarOptions_Label_ProfileDefaultId_Tooltip;
+	public static String		Slideout_CalendarOptions_Label_ProfileDragDropHint;
 	public static String		Slideout_CalendarOptions_Label_RowHeight;
 	public static String		Slideout_CalendarOptions_Label_RowHeight_Tooltip;
 	public static String		Slideout_CalendarOptions_Label_SummaryColumn_Width;

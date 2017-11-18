@@ -39,6 +39,7 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.osgi.util.NLS;
@@ -65,8 +66,6 @@ public class CalendarProfileManager {
 	private static final IPath				_stateLocation							= Platform.getStateLocation(_bundle);
 	//
 // SET_FORMATTING_ON
-	//
-	private static final String				CUSTOM_DEFAULT_NAME						= "#";								//$NON-NLS-1$
 	//
 	// common attributes
 	private static final String				ATTR_ACTIVE_PROFILE_ID					= "activeProfileId";				//$NON-NLS-1$
@@ -465,11 +464,7 @@ public class CalendarProfileManager {
 	//
 	private static String									_fromXml_ActiveCalendarProfileId;
 	//
-	/**
-	 * Calendarview or <code>null</code> when closed.
-	 */
-	private static ICalendarProfileProvider					_profileProvider_CalendarView;
-	private static ICalendarProfileProvider					_profileProvider_SlideoutCalendarOptions;
+	private final static ListenerList						_profileListener					= new ListenerList();
 
 	public static class CalendarColor_ComboData {
 
@@ -533,12 +528,12 @@ public class CalendarProfileManager {
 		}
 	}
 
-	interface ICalendarProfileProvider {
+	interface ICalendarProfileListener {
 
 		/**
 		 * Calendar profile has changed, update the UI.
 		 */
-		void updateUI_CalendarProfile();
+		abstract void profileIsModified();
 	}
 
 	static class TourBackground_ComboData {
@@ -583,6 +578,10 @@ public class CalendarProfileManager {
 			this.isColor = isColor;
 			this.isWidth = isWidth;
 		}
+	}
+
+	static void addProfileListener(final ICalendarProfileListener profileListener) {
+		_profileListener.add(profileListener);
 	}
 
 	private static XMLMemento create_Root() {
@@ -1126,16 +1125,6 @@ public class CalendarProfileManager {
 		_allCalendarProfiles.add(createProfile_Col_20_Dark());
 
 		_allCalendarProfiles.add(createProfile_Crazy());
-
-		// append 10 custom profiles created from default default profile
-		for (int profileIndex = 1; profileIndex < 11; profileIndex++) {
-
-			final CalendarProfile profile = new CalendarProfile();
-
-			profile.name = CUSTOM_DEFAULT_NAME + profileIndex;
-
-			_allCalendarProfiles.add(profile);
-		}
 	}
 
 	private static CalendarProfile createProfile_Classic() {
@@ -1483,6 +1472,20 @@ public class CalendarProfileManager {
 // SET_FORMATTING_ON
 	}
 
+	/**
+	 * Fires an event when the a tour marker is modified.
+	 * 
+	 * @param tourMarker
+	 * @param isTourMarkerDeleted
+	 */
+	private static void fireProfileModifyEvent() {
+
+		final Object[] allListener = _profileListener.getListeners();
+		for (final Object listener : allListener) {
+			((ICalendarProfileListener) listener).profileIsModified();
+		}
+	}
+
 	static CalendarProfile getActiveCalendarProfile() {
 
 		if (_activeCalendarProfile == null) {
@@ -1510,7 +1513,7 @@ public class CalendarProfileManager {
 
 		// this case should not happen but ensure that a correct profile is set
 
-		setActiveCalendarProfileIntern(_allCalendarProfiles.get(0), null);
+		setActiveCalendarProfileIntern(_allCalendarProfiles.get(0));
 
 		return 0;
 	}
@@ -1712,13 +1715,17 @@ public class CalendarProfileManager {
 				createProfile_All();
 			}
 
-			setActiveCalendarProfileIntern(getProfile_Calendar(), null);
+			setActiveCalendarProfileIntern(getProfile_Calendar());
 
 		} catch (final Exception e) {
 			StatusUtil.log(e);
 		} finally {
 			Util.close(reader);
 		}
+	}
+
+	static void removeProfileListener(final ICalendarProfileListener profileListener) {
+		_profileListener.remove(profileListener);
 	}
 
 	static void resetActiveCalendarProfile() {
@@ -1733,14 +1740,14 @@ public class CalendarProfileManager {
 
 		// update model
 		_allCalendarProfiles.add(activeCalendarProfileIndex, newProfile);
-		setActiveCalendarProfileIntern(newProfile, null);
+		setActiveCalendarProfileIntern(newProfile);
 	}
 
 	static void resetAllCalendarProfiles() {
 
 		createProfile_All();
 
-		setActiveCalendarProfileIntern(_allCalendarProfiles.get(0), null);
+		setActiveCalendarProfileIntern(_allCalendarProfiles.get(0));
 	}
 
 	private static CalendarProfile restoreProfile(final XMLMemento xmlProfile) {
@@ -1995,37 +2002,16 @@ public class CalendarProfileManager {
 		}
 	}
 
-	static void setActiveCalendarProfile(	final CalendarProfile selectedProfile,
-											final ICalendarProfileProvider profileProvider) {
+	static void setActiveCalendarProfile(final CalendarProfile selectedProfile) {
 
-		setActiveCalendarProfileIntern(selectedProfile, profileProvider);
+		setActiveCalendarProfileIntern(selectedProfile);
 	}
 
-	private static void setActiveCalendarProfileIntern(	final CalendarProfile calendarProfile,
-														final ICalendarProfileProvider profileProvider) {
+	private static void setActiveCalendarProfileIntern(final CalendarProfile calendarProfile) {
 
 		_activeCalendarProfile = calendarProfile;
 
-		// update profile listener/provider
-		if (profileProvider != null) {
-
-			if (_profileProvider_CalendarView != null && _profileProvider_CalendarView != profileProvider) {
-				_profileProvider_CalendarView.updateUI_CalendarProfile();
-			}
-
-			if (_profileProvider_SlideoutCalendarOptions != null
-					&& _profileProvider_SlideoutCalendarOptions != profileProvider) {
-				_profileProvider_SlideoutCalendarOptions.updateUI_CalendarProfile();
-			}
-		}
-	}
-
-	static void setProfileProvider(final CalendarView calendarView) {
-		_profileProvider_CalendarView = calendarView;
-	}
-
-	static void setProfileProvider(final SlideoutCalendarOptions slideoutCalendarOptions) {
-		_profileProvider_SlideoutCalendarOptions = slideoutCalendarOptions;
+		fireProfileModifyEvent();
 	}
 
 	/**
