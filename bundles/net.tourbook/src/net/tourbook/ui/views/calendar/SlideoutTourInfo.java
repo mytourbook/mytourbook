@@ -200,9 +200,9 @@ public class SlideoutTourInfo extends ToolbarSlideout {
 
 		_state.put(CalendarView.STATE_TOUR_TOOLTIP_DELAY, tooltipDelay);
 
-		enableControls();
+		_calendarView.getTourInfoTooltip().setPopupDelay(tooltipDelay);
 
-		_calendarView.updateUI_CalendarProfile();
+		enableControls();
 	}
 
 	private void restoreState() {

@@ -20,16 +20,7 @@ public enum ProfileDefault {
 	DEFAULT, //
 
 	CLASSIC, //
+	COMPACT, //
+
 	CRAZY, //
-
-	COL_1, //
-	COL_3, //
-	COL_10, //
-	COL_20, //
-
-	DARK_COL_1, //
-	DARK_COL_3, //
-	DARK_COL_10, //
-	DARK_COL_20, //
-
 }

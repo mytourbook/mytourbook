@@ -531,7 +531,7 @@ public class CalendarProfileManager {
 	interface ICalendarProfileListener {
 
 		/**
-		 * Calendar profile has changed, update the UI.
+		 * Calendar profile is modified, update the UI.
 		 */
 		abstract void profileIsModified();
 	}
@@ -1114,16 +1114,7 @@ public class CalendarProfileManager {
 		_allCalendarProfiles.add(new CalendarProfile());
 
 		_allCalendarProfiles.add(createProfile_Classic());
-
-		_allCalendarProfiles.add(createProfile_Col_01());
-		_allCalendarProfiles.add(createProfile_Col_01_Dark());
-		_allCalendarProfiles.add(createProfile_Col_03());
-		_allCalendarProfiles.add(createProfile_Col_03_Dark());
-		_allCalendarProfiles.add(createProfile_Col_10());
-		_allCalendarProfiles.add(createProfile_Col_10_Dark());
-		_allCalendarProfiles.add(createProfile_Col_20());
-		_allCalendarProfiles.add(createProfile_Col_20_Dark());
-
+		_allCalendarProfiles.add(createProfile_Compact());
 		_allCalendarProfiles.add(createProfile_Crazy());
 	}
 
@@ -1201,31 +1192,17 @@ public class CalendarProfileManager {
 		return profile;
 	}
 
-	private static CalendarProfile createProfile_Col_01() {
+	private static CalendarProfile createProfile_Compact() {
 
 		final CalendarProfile profile = new CalendarProfile();
 
-// SET_FORMATTING_OFF
-		
-		profile.defaultId	= ProfileDefault.COL_1;
-		profile.name			= Messages.Calendar_Profile_Name_Col_01;
-		
-// SET_FORMATTING_ON
-
-		return profile;
-	}
-
-	private static CalendarProfile createProfile_Col_01_Dark() {
-
-		final CalendarProfile profile = new CalendarProfile();
-
-		profile.name = Messages.Calendar_Profile_Name_Col_01_Dark;
+		profile.name = Messages.Calendar_Profile_Name_Compact;
 
 		// SET_FORMATTING_OFF
 
 //		                                     1 Column
 
-		profile.defaultId                     = ProfileDefault.COL_1;
+		profile.defaultId                     = ProfileDefault.COMPACT;
 
 		// layout
 		profile.isToggleMonthColor            = false;
@@ -1289,93 +1266,11 @@ public class CalendarProfileManager {
 		return profile;
 	}
 
-	private static CalendarProfile createProfile_Col_03() {
-
-		final CalendarProfile profile = new CalendarProfile();
-
-// SET_FORMATTING_OFF
-		
-		profile.defaultId	= ProfileDefault.COL_3;
-		profile.name			= Messages.Calendar_Profile_Name_Col_03;
-		
-// SET_FORMATTING_ON
-
-		return profile;
-	}
-
-	private static CalendarProfile createProfile_Col_03_Dark() {
-
-		final CalendarProfile profile = new CalendarProfile();
-
-// SET_FORMATTING_OFF
-			
-			profile.defaultId	= ProfileDefault.DARK_COL_3;
-			profile.name			= Messages.Calendar_Profile_Name_Col_03_Dark;
-			
-// SET_FORMATTING_ON
-
-		return profile;
-	}
-
-	private static CalendarProfile createProfile_Col_10() {
-
-		final CalendarProfile profile = new CalendarProfile();
-
-// SET_FORMATTING_OFF
-		
-		profile.defaultId	= ProfileDefault.COL_10;
-		profile.name			= Messages.Calendar_Profile_Name_Col_10;
-		
-// SET_FORMATTING_ON
-
-		return profile;
-	}
-
-	private static CalendarProfile createProfile_Col_10_Dark() {
-
-		final CalendarProfile profile = new CalendarProfile();
-
-// SET_FORMATTING_OFF
-		
-		profile.defaultId	= ProfileDefault.DARK_COL_10;
-		profile.name			= Messages.Calendar_Profile_Name_Col_10_Dark;
-		
-// SET_FORMATTING_ON
-
-		return profile;
-	}
-
-	private static CalendarProfile createProfile_Col_20() {
-
-		final CalendarProfile profile = new CalendarProfile();
-
-// SET_FORMATTING_OFF
-		
-		profile.defaultId	= ProfileDefault.COL_20;
-		profile.name			= Messages.Calendar_Profile_Name_Col_20;
-		
-// SET_FORMATTING_ON
-
-		return profile;
-	}
-
-	private static CalendarProfile createProfile_Col_20_Dark() {
-
-		final CalendarProfile profile = new CalendarProfile();
-
-// SET_FORMATTING_OFF
-		 
-		profile.defaultId	= ProfileDefault.DARK_COL_20;
-		profile.name			= Messages.Calendar_Profile_Name_Col_20_Dark;
-
-// SET_FORMATTING_ON
-
-		return profile;
-	}
-
 	private static CalendarProfile createProfile_Crazy() {
 
 		final CalendarProfile profile = new CalendarProfile();
+
+		profile.name = Messages.Calendar_Profile_Name_Crazy;
 
 		// SET_FORMATTING_OFF
 
@@ -1454,36 +1349,15 @@ public class CalendarProfileManager {
 		case CLASSIC:		return createProfile_Classic();
 		case CRAZY:			return createProfile_Crazy();
 		
-		case COL_1:			return createProfile_Col_01();
-		case COL_3:			return createProfile_Col_03();
-		case COL_10:		return createProfile_Col_10();
-		case COL_20:		return createProfile_Col_20();
-		
-		case DARK_COL_1:	return createProfile_Col_01();
-		case DARK_COL_3:	return createProfile_Col_03();
-		case DARK_COL_10:	return createProfile_Col_10();
-		case DARK_COL_20:	return createProfile_Col_20();
+		case COMPACT:		return createProfile_Compact();
 
+		case DEFAULT:
 		default:
 			// create default default
 			return new CalendarProfile();
 		}
 		
 // SET_FORMATTING_ON
-	}
-
-	/**
-	 * Fires an event when the a tour marker is modified.
-	 * 
-	 * @param tourMarker
-	 * @param isTourMarkerDeleted
-	 */
-	private static void fireProfileModifyEvent() {
-
-		final Object[] allListener = _profileListener.getListeners();
-		for (final Object listener : allListener) {
-			((ICalendarProfileListener) listener).profileIsModified();
-		}
 	}
 
 	static CalendarProfile getActiveCalendarProfile() {
@@ -1513,7 +1387,7 @@ public class CalendarProfileManager {
 
 		// this case should not happen but ensure that a correct profile is set
 
-		setActiveCalendarProfileIntern(_allCalendarProfiles.get(0));
+//		setActiveCalendarProfile(_allCalendarProfiles.get(0));
 
 		return 0;
 	}
@@ -1715,7 +1589,7 @@ public class CalendarProfileManager {
 				createProfile_All();
 			}
 
-			setActiveCalendarProfileIntern(getProfile_Calendar());
+			setActiveCalendarProfile(getProfile_Calendar(), false);
 
 		} catch (final Exception e) {
 			StatusUtil.log(e);
@@ -1730,6 +1604,9 @@ public class CalendarProfileManager {
 
 	static void resetActiveCalendarProfile() {
 
+		// keep old name
+		final String oldProfileName = _activeCalendarProfile.name;
+
 		final int activeCalendarProfileIndex = getActiveCalendarProfileIndex();
 
 		// remove old profile
@@ -1738,16 +1615,20 @@ public class CalendarProfileManager {
 		// create new profile
 		final CalendarProfile newProfile = createProfile_FromId(_activeCalendarProfile.defaultId);
 
+		// set old name
+		newProfile.name = oldProfileName;
+
 		// update model
 		_allCalendarProfiles.add(activeCalendarProfileIndex, newProfile);
-		setActiveCalendarProfileIntern(newProfile);
+
+		setActiveCalendarProfile(newProfile, true);
 	}
 
 	static void resetAllCalendarProfiles() {
 
 		createProfile_All();
 
-		setActiveCalendarProfileIntern(_allCalendarProfiles.get(0));
+		setActiveCalendarProfile(_allCalendarProfiles.get(0), true);
 	}
 
 	private static CalendarProfile restoreProfile(final XMLMemento xmlProfile) {
@@ -2002,16 +1883,29 @@ public class CalendarProfileManager {
 		}
 	}
 
-	static void setActiveCalendarProfile(final CalendarProfile selectedProfile) {
+	/**
+	 * Set a new/modified profile
+	 * 
+	 * @param modifiedProfile
+	 *            Modified or selected profile
+	 * @param isFireModifyEvent
+	 *            Fire modify event when <code>true</code>
+	 */
+	static void setActiveCalendarProfile(final CalendarProfile modifiedProfile, final boolean isFireModifyEvent) {
 
-		setActiveCalendarProfileIntern(selectedProfile);
-	}
+		_activeCalendarProfile = modifiedProfile;
 
-	private static void setActiveCalendarProfileIntern(final CalendarProfile calendarProfile) {
+		updateFormatterValueFormat();
 
-		_activeCalendarProfile = calendarProfile;
+		if (isFireModifyEvent) {
 
-		fireProfileModifyEvent();
+			final Object[] allListener = _profileListener.getListeners();
+
+			// fire modify event
+			for (final Object listener : allListener) {
+				((ICalendarProfileListener) listener).profileIsModified();
+			}
+		}
 	}
 
 	/**

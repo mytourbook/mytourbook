@@ -16,8 +16,9 @@
 package net.tourbook.ui.views.calendar;
 
 import net.tourbook.common.formatter.ValueFormat;
+import net.tourbook.common.util.StatusUtil;
 
-public class FormatterData {
+public class FormatterData implements Cloneable {
 
 	boolean		isEnabled;
 
@@ -33,6 +34,22 @@ public class FormatterData {
 	}
 
 	@Override
+	protected FormatterData clone() {
+
+		FormatterData clonedData = null;
+
+		try {
+
+			clonedData = (FormatterData) super.clone();
+
+		} catch (final CloneNotSupportedException e) {
+			StatusUtil.log(e);
+		}
+
+		return clonedData;
+	}
+
+	@Override
 	public String toString() {
 
 		return "\n"
@@ -45,5 +62,4 @@ public class FormatterData {
 
 				+ "]";
 	}
-
 }

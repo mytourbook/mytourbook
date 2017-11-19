@@ -16,13 +16,15 @@
 package net.tourbook.ui.views.calendar;
 
 import net.tourbook.Messages;
+import net.tourbook.common.UI;
+import net.tourbook.common.util.StatusUtil;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 
-public class CalendarProfile {
+public class CalendarProfile implements Cloneable {
 
 	/*
 	 * Set default values also here to ensure that a valid value is set. A default value would not
@@ -33,8 +35,8 @@ public class CalendarProfile {
 	
 	// profile
 	String					id							= Long.toString(System.nanoTime());
-	ProfileDefault			defaultId					= CalendarProfileManager.DEFAULT_PROFILE_DEFAULT_ID;
 	String					name						= Messages.Calendar_Profile_Name_Default;
+	ProfileDefault			defaultId					= CalendarProfileManager.DEFAULT_PROFILE_DEFAULT_ID;
 	
 	// layout
 	boolean					isToggleMonthColor			= false;
@@ -118,6 +120,67 @@ public class CalendarProfile {
 		}
 
 		return fontData[0];
+	}
+
+	private static FontData createFont(final FontData otherFontData) {
+
+		final Display display = Display.getDefault();
+
+		// !!! getFontData() MUST be created for EVERY font otherwise they use all the SAME font !!!
+		final FontData[] fontData = display.getSystemFont().getFontData();
+
+		final FontData firstFontData = fontData[0];
+
+		firstFontData.setHeight(otherFontData.getHeight());
+		firstFontData.setStyle(otherFontData.getStyle());
+
+		return firstFontData;
+	}
+
+	@Override
+	protected CalendarProfile clone() {
+
+		CalendarProfile clonedProfile = null;
+
+		try {
+
+			clonedProfile = (CalendarProfile) super.clone();
+
+			clonedProfile.id = Long.toString(System.nanoTime());
+
+			// create a unique name
+			clonedProfile.name = name + UI.SPACE + clonedProfile.id;
+
+			clonedProfile.yearHeaderFont = createFont(yearHeaderFont);
+			clonedProfile.dateColumnFont = createFont(dateColumnFont);
+			clonedProfile.dayDateFont = createFont(dayDateFont);
+			clonedProfile.tourContentFont = createFont(tourContentFont);
+			clonedProfile.tourTitleFont = createFont(tourTitleFont);
+			clonedProfile.tourValueFont = createFont(tourValueFont);
+			clonedProfile.weekValueFont = createFont(weekValueFont);
+
+			clonedProfile.allTourFormatterData = clone_FormatterData(allTourFormatterData);
+			clonedProfile.allWeekFormatterData = clone_FormatterData(allWeekFormatterData);
+
+		} catch (final CloneNotSupportedException e) {
+			StatusUtil.log(e);
+		}
+
+		return clonedProfile;
+	}
+
+	private FormatterData[] clone_FormatterData(final FormatterData[] allFormatterData) {
+
+		final FormatterData[] clonedFormatterData = new FormatterData[allFormatterData.length];
+
+		for (int formatterIndex = 0; formatterIndex < allFormatterData.length; formatterIndex++) {
+
+			final FormatterData formatterData = allFormatterData[formatterIndex];
+
+			clonedFormatterData[formatterIndex] = formatterData.clone();
+		}
+
+		return clonedFormatterData;
 	}
 
 	void dump() {

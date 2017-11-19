@@ -171,9 +171,10 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 
 			@Override
 			public void partClosed(final IWorkbenchPartReference partRef) {
+
 				if (partRef.getPart(false) == CalendarView.this) {
 					saveState();
-					CalendarProfileManager.addProfileListener(CalendarView.this);
+					CalendarProfileManager.removeProfileListener(CalendarView.this);
 				}
 			}
 
@@ -188,8 +189,9 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 
 			@Override
 			public void partOpened(final IWorkbenchPartReference partRef) {
+
 				if (partRef.getPart(false) == CalendarView.this) {
-					CalendarProfileManager.removeProfileListener(CalendarView.this);
+					CalendarProfileManager.addProfileListener(CalendarView.this);
 				}
 			}
 
@@ -635,6 +637,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 		_tourInfoToolTip = new CalendarTourInfoToolTip(this);
 
 		restoreState();
+
 		profileIsModified();
 
 		// restore selection
@@ -733,11 +736,29 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 
 	private void fillUI_Profiles() {
 
+		// 1. get the profiles
+		final ArrayList<CalendarProfile> allCalendarProfiles = CalendarProfileManager.getAllCalendarProfiles();
+
+		// 2. get active profile
+		final CalendarProfile activeProfile = CalendarProfileManager.getActiveCalendarProfile();
+
 		_comboProfileName.removeAll();
 
-		for (final CalendarProfile profile : CalendarProfileManager.getAllCalendarProfiles()) {
+		int selectIndex = 0;
+
+		for (int profileIndex = 0; profileIndex < allCalendarProfiles.size(); profileIndex++) {
+
+			final CalendarProfile profile = allCalendarProfiles.get(profileIndex);
+
 			_comboProfileName.add(profile.name);
+
+			// get index for active profile
+			if (activeProfile.equals(profile)) {
+				selectIndex = profileIndex;
+			}
 		}
+
+		_comboProfileName.select(selectIndex);
 	}
 
 	public CalendarGraph getCalendarGraph() {
@@ -825,9 +846,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 			return;
 		}
 
-		CalendarProfileManager.setActiveCalendarProfile(selectedProfile);
-
-		updateUI_Layout(true);
+		CalendarProfileManager.setActiveCalendarProfile(selectedProfile, true);
 	}
 
 	@Override
@@ -835,12 +854,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 
 		fillUI_Profiles();
 
-		// get active profile AFTER getting the index because this could change the active profile
-		final int activeProfileIndex = CalendarProfileManager.getActiveCalendarProfileIndex();
-
-		_comboProfileName.select(activeProfileIndex);
-
-		_tourInfoToolTip.setPopupDelay(Util.getStateInt(_state, STATE_TOUR_TOOLTIP_DELAY, DEFAULT_TOUR_TOOLTIP_DELAY));
+		updateUI_Graph();
 	}
 
 	private void refreshCalendar() {
@@ -870,6 +884,9 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 
 		final Long selectedTourId = Util.getStateLong(_state, STATE_SELECTED_TOURS, new Long(-1));
 		_calendarGraph.setSelectionTourId(selectedTourId);
+
+		// tooltip
+		_tourInfoToolTip.setPopupDelay(Util.getStateInt(_state, STATE_TOUR_TOOLTIP_DELAY, DEFAULT_TOUR_TOOLTIP_DELAY));
 	}
 
 	private void saveState() {
@@ -894,17 +911,23 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 		_calendarContainer.setFocus();
 	}
 
-	void updateUI_Layout(final boolean isResetUIResources) {
+	void updateUI_Graph() {
 
-		if (null != _calendarGraph) {
+		// run async that the calling UI (slideout) is updated immediately
 
-			BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-				@Override
-				public void run() {
-					_calendarGraph.updateUI_Layout(isResetUIResources);
-				}
-			});
-		}
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				_calendarGraph.updateUI_Layout(true);
+			}
+		});
+	}
+
+	void updateUI_ProfileName(final String modifiedProfileName) {
+
+		// update text in the combo
+		final int selectedIndex = _comboProfileName.getSelectionIndex();
+		_comboProfileName.setItem(selectedIndex, modifiedProfileName);
 	}
 
 	void updateUI_Title(final LocalDate calendarFirstDay, final LocalDate calendarLastDay) {

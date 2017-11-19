@@ -3287,14 +3287,31 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		});
 	}
 
-	/**
-	 * @param isResetUIResources
-	 *            When <code>true</code> then UI resources will be reset and recreated by the next
-	 *            drawing.
-	 */
-	void updateUI_Layout(final boolean isResetUIResources) {
+	void updateUI_Layout() {
 
-		if (isResetUIResources) {
+		if (_isGraphClean == false) {
+			// redraw is already forced
+		}
+
+		// update UI
+		Display.getDefault().asyncExec(new Runnable() {
+			@Override
+			public void run() {
+
+				// invalidate layout
+				updateUI();
+			}
+		});
+
+	}
+
+	/**
+	 * @param isResetFonts
+	 *            When <code>true</code> then fonts will be reset and recreated by the next drawing.
+	 */
+	void updateUI_Layout(final boolean isResetFonts) {
+
+		if (isResetFonts) {
 			disposeFonts();
 		}
 

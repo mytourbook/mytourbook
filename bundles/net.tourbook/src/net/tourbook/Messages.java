@@ -69,6 +69,7 @@ public class Messages extends NLS {
 	public static String		Calendar_Profile_Name_Col_10_Dark;
 	public static String		Calendar_Profile_Name_Col_20;
 	public static String		Calendar_Profile_Name_Col_20_Dark;
+	public static String		Calendar_Profile_Name_Compact;
 	public static String		Calendar_Profile_Name_Crazy;
 	public static String		Calendar_Profile_Name_Default;
 	public static String		Calendar_Profile_TourBackground_Circle;
@@ -445,10 +446,13 @@ public class Messages extends NLS {
 
 	public static String		App_Action_About;
 	public static String		App_Action_Add;
+	public static String		App_Action_ApplyDefaults;
+	public static String		App_Action_ApplyDefaults_Tooltip;
 	public static String		App_Action_Cancel;
 	public static String		App_Action_Close_ToolTip;
 	public static String		App_Action_Columns;
 	public static String		App_Action_Delete;
+	public static String		App_Action_DeleteProfile;
 	public static String		App_Action_Dialog_ActionIsInProgress_Message;
 	public static String		App_Action_Dialog_ActionIsInProgress_Title;
 	public static String		App_Action_Duplicate;
@@ -472,7 +476,6 @@ public class Messages extends NLS {
 	public static String		App_Action_Rename;
 	public static String		App_Action_Reset;
 	public static String		App_Action_ResetConfig_Tooltip;
-	public static String		App_Action_ResetProfile_Tooltip;
 	public static String		App_Action_RestartApp;
 	public static String		App_Action_RestoreDefault_Tooltip;
 	public static String		App_Action_set_tour_type;
@@ -1682,6 +1685,8 @@ public class Messages extends NLS {
 	public static String		Slideout_CalendarOptions_Checkbox_IsTruncateTourText;
 	public static String		Slideout_CalendarOptions_Checkbox_UseDraggedScrolling;
 	public static String		Slideout_CalendarOptions_Checkbox_UseDraggedScrolling_Tooltip;
+	public static String		Slideout_CalendarOptions_Dialog_DeleteProfile_Message;
+	public static String		Slideout_CalendarOptions_Dialog_DeleteProfile_Title;
 	public static String		Slideout_CalendarOptions_Group_DateColumn;
 	public static String		Slideout_CalendarOptions_Group_Layout;
 	public static String		Slideout_CalendarOptions_Group_SummaryColumn;

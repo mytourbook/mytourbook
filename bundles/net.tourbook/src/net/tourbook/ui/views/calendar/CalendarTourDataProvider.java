@@ -37,8 +37,6 @@ import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.SQLFilter;
 
-import org.eclipse.swt.widgets.Display;
-
 public class CalendarTourDataProvider {
 
 	private static CalendarTourDataProvider					_instance;
@@ -129,7 +127,7 @@ public class CalendarTourDataProvider {
 	 */
 	private CalendarTourData[][] getCalendarMonthData_FromDb(final int year, final int month) {
 
-		final long start = System.currentTimeMillis();
+//		final long start = System.currentTimeMillis();
 
 		final int colorOffset = 1;
 
@@ -507,14 +505,7 @@ public class CalendarTourDataProvider {
 				}
 
 				if (loadWeek_FromDB(weekLoader)) {
-
-					// update UI
-					Display.getDefault().asyncExec(new Runnable() {
-						@Override
-						public void run() {
-							_calendarGraph.updateUI_Layout(false);
-						}
-					});
+					_calendarGraph.updateUI_Layout();
 				}
 			}
 		};
@@ -618,7 +609,7 @@ public class CalendarTourDataProvider {
 			return false;
 		}
 
-		final long start = System.currentTimeMillis();
+//		final long start = System.currentTimeMillis();
 
 		final int year = weekLoader.year;
 		final int week = weekLoader.week;
