@@ -47,11 +47,13 @@ import org.eclipse.jface.layout.LayoutConstants;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -61,8 +63,15 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.jface.viewers.ViewerDropAdapter;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.DragSourceEvent;
+import org.eclipse.swt.dnd.DragSourceListener;
+import org.eclipse.swt.dnd.DropTargetEvent;
+import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusEvent;
@@ -91,6 +100,7 @@ import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Widget;
@@ -103,133 +113,136 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 // SET_FORMATTING_OFF
 	//
-	private static final String					STATE_SELECTED_TAB		= "STATE_SELECTED_TAB";		//$NON-NLS-1$
+	private static final String							STATE_SELECTED_TAB		= "STATE_SELECTED_TAB";		//$NON-NLS-1$
+	//
+	private static final IDialogSettings				_state					= TourbookPlugin.getState("SlideoutCalendarOptions");																//$NON-NLS-1$
+	private static final ArrayList<CalendarProfile>		_allCalendarProfiles	= CalendarProfileManager.getAllCalendarProfiles();
 	//
 // SET_FORMATTING_ON
 	//
 	static {}
-
 	//
-	private final IDialogSettings				_state					= TourbookPlugin.getState(
-			"SlideoutCalendarOptions");																//$NON-NLS-1$
-	private final ArrayList<CalendarProfile>	_allCalendarProfiles	= CalendarProfileManager
-			.getAllCalendarProfiles();
+	private IFontEditorListener		_defaultFontEditorListener;
+	private MouseWheelListener		_defaultMouseWheelListener;
+	private IPropertyChangeListener	_defaultPropertyChangeListener;
+	private SelectionAdapter		_defaultSelectionListener;
+	private FocusListener			_keepOpenListener;
+	private SelectionAdapter		_tourValueListener;
+	private SelectionAdapter		_weekValueListener;
 	//
-	private IFontEditorListener					_defaultFontEditorListener;
-	private MouseWheelListener					_defaultMouseWheelListener;
-	private IPropertyChangeListener				_defaultPropertyChangeListener;
-	private SelectionAdapter					_defaultSelectionListener;
-	private FocusListener						_keepOpenListener;
-	private SelectionAdapter					_tourValueListener;
-	private SelectionAdapter					_weekValueListener;
+	private long					_dragStartViewerLeft;
 	//
-	private boolean								_isUpdateUI;
-	private PixelConverter						_pc;
-
-	private int									_subItemIndent;
+	private boolean					_isUpdateUI;
+	private PixelConverter			_pc;
+	private int						_subItemIndent;
 
 	/*
 	 * This is a hack to vertical center the font label, otherwise it will be complicated to set it
 	 * correctly
 	 */
-	private int									_fontLabelVIndent		= 5;
+	private int						_fontLabelVIndent	= 5;
 
 	/*
 	 * UI controls
 	 */
-	private CalendarView						_calendarView;
+	private CalendarView			_calendarView;
 	//
-	private Button								_btnProfile_Copy;
-	private Button								_btnProfile_Delete;
-	private Button								_btnApplyDefaults;
+	private Button					_btnProfile_Copy;
+	private Button					_btnProfile_Delete;
+	private Button					_btnApplyDefaults;
 	//
-	private Button								_chkIsHideDayDateWhenNoTour;
-	private Button								_chkIsShowDateColumn;
-	private Button								_chkIsShowDayDateWeekendColor;
-	private Button								_chkIsShowDayDate;
-	private Button								_chkIsShowMonthColor;
-	private Button								_chkIsShowSummaryColumn;
-	private Button								_chkIsShowTourContent;
-	private Button								_chkIsShowTourValueUnit;
-	private Button								_chkIsShowWeekValueUnit;
-	private Button								_chkIsShowYearColumns;
-	private Button								_chkIsTruncateTourText;
-	private Button								_chkUseDraggedScrolling;
+	private Button					_chkIsHideDayDateWhenNoTour;
+	private Button					_chkIsShowDateColumn;
+	private Button					_chkIsShowDayDateWeekendColor;
+	private Button					_chkIsShowDayDate;
+	private Button					_chkIsShowMonthColor;
+	private Button					_chkIsShowSummaryColumn;
+	private Button					_chkIsShowTourContent;
+	private Button					_chkIsShowTourValueUnit;
+	private Button					_chkIsShowWeekValueUnit;
+	private Button					_chkIsShowYearColumns;
+	private Button					_chkIsTruncateTourText;
+	private Button					_chkUseDraggedScrolling;
 	//
-	private Button[]							_chkTour_AllIsShowLines;
-	private Button[]							_chkWeek_AllIsShowLines;
+	private Button[]				_chkTour_AllIsShowLines;
+	private Button[]				_chkWeek_AllIsShowLines;
 	//
-	private ColorSelectorExtended				_colorAlternateMonthColor;
-	private ColorSelectorExtended				_colorCalendarBackgroundColor;
-	private ColorSelectorExtended				_colorCalendarForegroundColor;
+	private ColorSelectorExtended	_colorAlternateMonthColor;
+	private ColorSelectorExtended	_colorCalendarBackgroundColor;
+	private ColorSelectorExtended	_colorCalendarForegroundColor;
 	//
-	private Combo								_comboColumnLayout;
-	private Combo								_comboDateColumn;
-	private Combo								_comboDayHeaderDateFormat;
-	private Combo								_comboProfile_Name;
-	private Combo								_comboProfile_DefaultId;
-	private Combo								_comboTour_Background;
-	private Combo								_comboTour_BackgroundColor1;
-	private Combo								_comboTour_BackgroundColor2;
-	private Combo								_comboTour_Border;
-	private Combo								_comboTour_BorderColor;
-	private Combo								_comboTour_ContentColor;
-	private Combo								_comboTour_TitleColor;
-	private Combo								_comboTour_ValueColor;
-	private Combo								_comboWeek_ValueColor;
+	private Combo					_comboColumnLayout;
+	private Combo					_comboDateColumn;
+	private Combo					_comboDayHeaderDateFormat;
+	private Combo					_comboProfile_Name;
+	private Combo					_comboProfile_DefaultId;
+	private Combo					_comboTour_Background;
+	private Combo					_comboTour_BackgroundColor1;
+	private Combo					_comboTour_BackgroundColor2;
+	private Combo					_comboTour_Border;
+	private Combo					_comboTour_BorderColor;
+	private Combo					_comboTour_ContentColor;
+	private Combo					_comboTour_TitleColor;
+	private Combo					_comboTour_ValueColor;
+	private Combo					_comboWeek_ValueColor;
 	//
-	private Combo[]								_comboTour_AllValues;
-	private Combo[]								_comboTour_AllFormats;
-	private Combo[]								_comboWeek_AllValues;
-	private Combo[]								_comboWeek_AllFormats;
+	private Combo[]					_comboTour_AllValues;
+	private Combo[]					_comboTour_AllFormats;
+	private Combo[]					_comboWeek_AllValues;
+	private Combo[]					_comboWeek_AllFormats;
 	//
-	private Composite							_tourFormatterContainer;
-	private Composite							_weekFormatterContainer;
+	private Composite				_tourFormatterContainer;
+	private Composite				_weekFormatterContainer;
 	//
-	private Label								_lblDateColumn_Content;
-	private Label								_lblDateColumn_Font;
-	private Label								_lblDateColumn_Width;
-	private Label								_lblDayHeader_Font;
-	private Label								_lblDayHeader_Format;
-	private Label								_lblProfile_Name;
-	private Label								_lblProfile_DefaultId;
-	private Label								_lblTour_ContentFont;
-	private Label								_lblTour_TitleFont;
-	private Label								_lblTour_TruncatedLines;
-	private Label								_lblTour_ValueColumns;
-	private Label								_lblTour_ValueFont;
-	private Label								_lblWeek_ColumnWidth;
-	private Label								_lblWeek_ValueFont;
-	private Label								_lblYearColumn;
-	private Label								_lblYearColumn_HeaderFont;
-	private Label								_lblYearColumn_Spacing;
-	private Label								_lblYearColumn_Start;
+	private Label					_lblDateColumn_Content;
+	private Label					_lblDateColumn_Font;
+	private Label					_lblDateColumn_Width;
+	private Label					_lblDayHeader_Font;
+	private Label					_lblDayHeader_Format;
+	private Label					_lblProfile_Name;
+	private Label					_lblProfile_DefaultId;
+	private Label					_lblTour_ContentFont;
+	private Label					_lblTour_Margin;
+	private Label					_lblTour_TitleFont;
+	private Label					_lblTour_TruncatedLines;
+	private Label					_lblTour_ValueColumns;
+	private Label					_lblTour_ValueFont;
+	private Label					_lblWeek_ColumnWidth;
+	private Label					_lblWeek_ValueFont;
+	private Label					_lblYearColumn;
+	private Label					_lblYearColumn_HeaderFont;
+	private Label					_lblYearColumn_Spacing;
+	private Label					_lblYearColumn_Start;
 	//
-	private SimpleFontEditor					_fontEditorDayDate;
-	private SimpleFontEditor					_fontEditorDateColumn;
-	private SimpleFontEditor					_fontEditorTourTitle;
-	private SimpleFontEditor					_fontEditorTourContent;
-	private SimpleFontEditor					_fontEditorTourValue;
-	private SimpleFontEditor					_fontEditorWeekValue;
-	private SimpleFontEditor					_fontEditorYearColumnHeader;
+	private SimpleFontEditor		_fontEditorDayDate;
+	private SimpleFontEditor		_fontEditorDateColumn;
+	private SimpleFontEditor		_fontEditorTourTitle;
+	private SimpleFontEditor		_fontEditorTourContent;
+	private SimpleFontEditor		_fontEditorTourValue;
+	private SimpleFontEditor		_fontEditorWeekValue;
+	private SimpleFontEditor		_fontEditorYearColumnHeader;
 	//
-	private Spinner								_spinnerYearColumns;
-	private Spinner								_spinnerYearColumnSpacing;
-	private Spinner								_spinnerDateColumnWidth;
-	private Spinner								_spinnerWeek_ColumnWidth;
-	private Spinner								_spinnerTourBackgroundWidth;
-	private Spinner								_spinnerTourBorderWidth;
-	private Spinner								_spinnerTour_TruncatedLines;
-	private Spinner								_spinnerTour_ValueColumns;
-	private Spinner								_spinnerWeekHeight;
+	private Spinner					_spinnerDateColumnWidth;
+	private Spinner					_spinnerTour_BackgroundWidth;
+	private Spinner					_spinnerTour_BorderWidth;
+	private Spinner					_spinnerTour_Margin_Top;
+	private Spinner					_spinnerTour_Margin_Bottom;
+	private Spinner					_spinnerTour_Margin_Left;
+	private Spinner					_spinnerTour_Margin_Right;
+	private Spinner					_spinnerTour_TruncatedLines;
+	private Spinner					_spinnerTour_ValueColumns;
+	private Spinner					_spinnerWeek_ColumnWidth;
+	private Spinner					_spinnerWeek_Height;
+	private Spinner					_spinnerYear_Columns;
+	private Spinner					_spinnerYear_ColumnSpacing;
 	//
-	private TabFolder							_tabFolder;
+	private TabFolder				_tabFolder;
 	//
-	private TableViewer							_profileViewer;
+	private TableViewer				_profileViewer;
 	//
-	private Text								_txtProfileName;
+	private Text					_txtProfileName;
 	//
-	private ToolItem							_toolItem;
+	private ToolItem				_toolItem;
 
 //	private class ProfileComparator extends ViewerComparator {
 //
@@ -364,17 +377,17 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 				// calendar layout
 				final TabItem tabLayout = new TabItem(_tabFolder, SWT.NONE);
-				tabLayout.setControl(createUI_200_Tab_Layout(_tabFolder));
+				tabLayout.setControl(createUI_200_Tab_CalendarLayout(_tabFolder));
 				tabLayout.setText(Messages.Slideout_CalendarOptions_Tab_CalendarLayout);
 
 				// tour layout
 				final TabItem tabDayContent = new TabItem(_tabFolder, SWT.NONE);
-				tabDayContent.setControl(createUI_400_Tab_DayContent(_tabFolder));
+				tabDayContent.setControl(createUI_400_Tab_TourLayout(_tabFolder));
 				tabDayContent.setText(Messages.Slideout_CalendarOptions_Tab_TourLayout);
 
 				// tour content
 				final TabItem tabTour = new TabItem(_tabFolder, SWT.NONE);
-				tabTour.setControl(createUI_600_Tab_Tour(_tabFolder));
+				tabTour.setControl(createUI_600_Tab_TourContent(_tabFolder));
 				tabTour.setText(Messages.Slideout_CalendarOptions_Tab_TourContent);
 
 				// week
@@ -419,6 +432,8 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			}
 
 			createUI_120_ProfileViewer(container);
+			createUI_122_DragDrop();
+
 			createUI_130_ProfileActions(container);
 
 			{
@@ -477,7 +492,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 					cell.setText(profile.name);
 				}
 			});
-			tableLayout.setColumnData(tc, new ColumnWeightData(2, false));
+			tableLayout.setColumnData(tc, new ColumnWeightData(3, false));
 		}
 
 		{
@@ -494,7 +509,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 					cell.setText(profile.defaultId.name());
 				}
 			});
-			tableLayout.setColumnData(tc, new ColumnWeightData(1, false));
+			tableLayout.setColumnData(tc, new ColumnWeightData(2, false));
 		}
 
 // this is for debugging
@@ -554,6 +569,151 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			@Override
 			public void keyReleased(final KeyEvent e) {}
 		});
+	}
+
+	private void createUI_122_DragDrop() {
+
+		/*
+		 * set drag adapter
+		 */
+		_profileViewer.addDragSupport(
+				DND.DROP_MOVE,
+				new Transfer[] { LocalSelectionTransfer.getTransfer() },
+				new DragSourceListener() {
+
+					@Override
+					public void dragFinished(final DragSourceEvent event) {
+
+						final LocalSelectionTransfer transfer = LocalSelectionTransfer.getTransfer();
+
+						if (event.doit == false) {
+							return;
+						}
+
+						transfer.setSelection(null);
+						transfer.setSelectionSetTime(0);
+					}
+
+					@Override
+					public void dragSetData(final DragSourceEvent event) {
+						// data are set in LocalSelectionTransfer
+					}
+
+					@Override
+					public void dragStart(final DragSourceEvent event) {
+
+						final LocalSelectionTransfer transfer = LocalSelectionTransfer.getTransfer();
+						final ISelection selection = _profileViewer.getSelection();
+
+						transfer.setSelection(selection);
+						transfer.setSelectionSetTime(_dragStartViewerLeft = event.time & 0xFFFFFFFFL);
+
+						event.doit = !selection.isEmpty();
+					}
+				});
+
+		/*
+		 * set drop adapter
+		 */
+		final ViewerDropAdapter viewerDropAdapter = new ViewerDropAdapter(_profileViewer) {
+
+			private Widget _tableItem;
+
+			@Override
+			public void dragOver(final DropTargetEvent dropEvent) {
+
+				// keep table item
+				_tableItem = dropEvent.item;
+
+				super.dragOver(dropEvent);
+			}
+
+			@Override
+			public boolean performDrop(final Object data) {
+
+				if (data instanceof StructuredSelection) {
+					final StructuredSelection selection = (StructuredSelection) data;
+
+					if (selection.getFirstElement() instanceof CalendarProfile) {
+
+						final CalendarProfile profileItem = (CalendarProfile) selection.getFirstElement();
+
+						final int location = getCurrentLocation();
+						final Table profileTable = _profileViewer.getTable();
+
+						/*
+						 * check if drag was startet from this profile, remove the profile item
+						 * before the moved profile is inserted
+						 */
+						if (LocalSelectionTransfer.getTransfer().getSelectionSetTime() == _dragStartViewerLeft) {
+							_profileViewer.remove(profileItem);
+						}
+
+						int profileIndex;
+
+						if (_tableItem == null) {
+
+							_profileViewer.add(profileItem);
+							profileIndex = profileTable.getItemCount() - 1;
+
+						} else {
+
+							// get index of the target in the table
+							profileIndex = profileTable.indexOf((TableItem) _tableItem);
+							if (profileIndex == -1) {
+								return false;
+							}
+
+							if (location == LOCATION_BEFORE) {
+								_profileViewer.insert(profileItem, profileIndex);
+							} else if (location == LOCATION_AFTER || location == LOCATION_ON) {
+								_profileViewer.insert(profileItem, ++profileIndex);
+							}
+						}
+
+						// update model
+						_allCalendarProfiles.remove(profileItem);
+						_allCalendarProfiles.add(profileIndex, profileItem);
+
+						// reselect profile item
+						_profileViewer.setSelection(new StructuredSelection(profileItem));
+
+						// set focus to selection
+						profileTable.setSelection(profileIndex);
+						profileTable.setFocus();
+
+						return true;
+					}
+				}
+
+				return false;
+			}
+
+			@Override
+			public boolean validateDrop(final Object target, final int operation, final TransferData transferType) {
+
+				final ISelection selection = LocalSelectionTransfer.getTransfer().getSelection();
+				if (selection instanceof StructuredSelection) {
+					final Object dragFilter = ((StructuredSelection) selection).getFirstElement();
+					if (target == dragFilter) {
+						return false;
+					}
+				}
+
+				if (LocalSelectionTransfer.getTransfer().isSupportedType(transferType) == false) {
+					return false;
+				}
+
+				return true;
+			}
+
+		};
+
+		_profileViewer.addDropSupport(
+				DND.DROP_MOVE,
+				new Transfer[] { LocalSelectionTransfer.getTransfer() },
+				viewerDropAdapter);
+
 	}
 
 	private void createUI_130_ProfileActions(final Composite parent) {
@@ -699,7 +859,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		}
 	}
 
-	private Control createUI_200_Tab_Layout(final Composite parent) {
+	private Control createUI_200_Tab_CalendarLayout(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -798,13 +958,13 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				label.setToolTipText(Messages.Slideout_CalendarOptions_Label_RowHeight_Tooltip);
 
 				// spinner: height
-				_spinnerWeekHeight = new Spinner(container, SWT.BORDER);
-				_spinnerWeekHeight.setMinimum(CalendarProfileManager.WEEK_HEIGHT_MIN);
-				_spinnerWeekHeight.setMaximum(CalendarProfileManager.WEEK_HEIGHT_MAX);
-				_spinnerWeekHeight.setIncrement(1);
-				_spinnerWeekHeight.setPageIncrement(10);
-				_spinnerWeekHeight.addSelectionListener(_defaultSelectionListener);
-				_spinnerWeekHeight.addMouseWheelListener(_defaultMouseWheelListener);
+				_spinnerWeek_Height = new Spinner(container, SWT.BORDER);
+				_spinnerWeek_Height.setMinimum(CalendarProfileManager.WEEK_HEIGHT_MIN);
+				_spinnerWeek_Height.setMaximum(CalendarProfileManager.WEEK_HEIGHT_MAX);
+				_spinnerWeek_Height.setIncrement(1);
+				_spinnerWeek_Height.setPageIncrement(10);
+				_spinnerWeek_Height.addSelectionListener(_defaultSelectionListener);
+				_spinnerWeek_Height.addMouseWheelListener(_defaultMouseWheelListener);
 			}
 			{
 				/*
@@ -885,13 +1045,13 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 						.applyTo(_lblYearColumn);
 
 				// spinner: columns
-				_spinnerYearColumns = new Spinner(container, SWT.BORDER);
-				_spinnerYearColumns.setMinimum(CalendarProfileManager.YEAR_COLUMNS_MIN);
-				_spinnerYearColumns.setMaximum(CalendarProfileManager.YEAR_COLUMNS_MAX);
-				_spinnerYearColumns.setIncrement(1);
-				_spinnerYearColumns.setPageIncrement(2);
-				_spinnerYearColumns.addSelectionListener(_defaultSelectionListener);
-				_spinnerYearColumns.addMouseWheelListener(_defaultMouseWheelListener);
+				_spinnerYear_Columns = new Spinner(container, SWT.BORDER);
+				_spinnerYear_Columns.setMinimum(CalendarProfileManager.YEAR_COLUMNS_MIN);
+				_spinnerYear_Columns.setMaximum(CalendarProfileManager.YEAR_COLUMNS_MAX);
+				_spinnerYear_Columns.setIncrement(1);
+				_spinnerYear_Columns.setPageIncrement(2);
+				_spinnerYear_Columns.addSelectionListener(_defaultSelectionListener);
+				_spinnerYear_Columns.addMouseWheelListener(_defaultMouseWheelListener);
 
 			}
 			{
@@ -911,13 +1071,13 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 						.applyTo(_lblYearColumn_Spacing);
 
 				// spinner: columns
-				_spinnerYearColumnSpacing = new Spinner(container, SWT.BORDER);
-				_spinnerYearColumnSpacing.setMinimum(CalendarProfileManager.CALENDAR_COLUMNS_SPACE_MIN);
-				_spinnerYearColumnSpacing.setMaximum(CalendarProfileManager.CALENDAR_COLUMNS_SPACE_MAX);
-				_spinnerYearColumnSpacing.setIncrement(1);
-				_spinnerYearColumnSpacing.setPageIncrement(10);
-				_spinnerYearColumnSpacing.addSelectionListener(_defaultSelectionListener);
-				_spinnerYearColumnSpacing.addMouseWheelListener(_defaultMouseWheelListener);
+				_spinnerYear_ColumnSpacing = new Spinner(container, SWT.BORDER);
+				_spinnerYear_ColumnSpacing.setMinimum(CalendarProfileManager.CALENDAR_COLUMNS_SPACE_MIN);
+				_spinnerYear_ColumnSpacing.setMaximum(CalendarProfileManager.CALENDAR_COLUMNS_SPACE_MAX);
+				_spinnerYear_ColumnSpacing.setIncrement(1);
+				_spinnerYear_ColumnSpacing.setPageIncrement(10);
+				_spinnerYear_ColumnSpacing.addSelectionListener(_defaultSelectionListener);
+				_spinnerYear_ColumnSpacing.addMouseWheelListener(_defaultMouseWheelListener);
 			}
 			{
 				/*
@@ -1093,7 +1253,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		}
 	}
 
-	private Control createUI_400_Tab_DayContent(final Composite parent) {
+	private Control createUI_400_Tab_TourLayout(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -1289,13 +1449,13 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				_comboTour_BackgroundColor2.addSelectionListener(_defaultSelectionListener);
 
 				// background width
-				_spinnerTourBackgroundWidth = new Spinner(group, SWT.BORDER);
-				_spinnerTourBackgroundWidth.setMinimum(0);
-				_spinnerTourBackgroundWidth.setMaximum(100);
-				_spinnerTourBackgroundWidth.setIncrement(1);
-				_spinnerTourBackgroundWidth.setPageIncrement(10);
-				_spinnerTourBackgroundWidth.addSelectionListener(_defaultSelectionListener);
-				_spinnerTourBackgroundWidth.addMouseWheelListener(_defaultMouseWheelListener);
+				_spinnerTour_BackgroundWidth = new Spinner(group, SWT.BORDER);
+				_spinnerTour_BackgroundWidth.setMinimum(0);
+				_spinnerTour_BackgroundWidth.setMaximum(100);
+				_spinnerTour_BackgroundWidth.setIncrement(1);
+				_spinnerTour_BackgroundWidth.setPageIncrement(10);
+				_spinnerTour_BackgroundWidth.addSelectionListener(_defaultSelectionListener);
+				_spinnerTour_BackgroundWidth.addMouseWheelListener(_defaultMouseWheelListener);
 			}
 			{
 				/*
@@ -1325,13 +1485,13 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				new Label(group, SWT.NONE);
 
 				// border width
-				_spinnerTourBorderWidth = new Spinner(group, SWT.BORDER);
-				_spinnerTourBorderWidth.setMinimum(0);
-				_spinnerTourBorderWidth.setMaximum(100);
-				_spinnerTourBorderWidth.setIncrement(1);
-				_spinnerTourBorderWidth.setPageIncrement(10);
-				_spinnerTourBorderWidth.addSelectionListener(_defaultSelectionListener);
-				_spinnerTourBorderWidth.addMouseWheelListener(_defaultMouseWheelListener);
+				_spinnerTour_BorderWidth = new Spinner(group, SWT.BORDER);
+				_spinnerTour_BorderWidth.setMinimum(0);
+				_spinnerTour_BorderWidth.setMaximum(100);
+				_spinnerTour_BorderWidth.setIncrement(1);
+				_spinnerTour_BorderWidth.setPageIncrement(10);
+				_spinnerTour_BorderWidth.addSelectionListener(_defaultSelectionListener);
+				_spinnerTour_BorderWidth.addMouseWheelListener(_defaultMouseWheelListener);
 			}
 		}
 	}
@@ -1440,7 +1600,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		}
 	}
 
-	private Control createUI_600_Tab_Tour(final Composite parent) {
+	private Control createUI_600_Tab_TourContent(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -1479,7 +1639,8 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 		{
 			createUI_620_Layout(_tourFormatterContainer);
-			createUI_630_Values(_tourFormatterContainer);
+			createUI_630_Margin(_tourFormatterContainer);
+			createUI_650_Values(_tourFormatterContainer);
 		}
 	}
 
@@ -1589,7 +1750,44 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		}
 	}
 
-	private void createUI_630_Values(final Composite parent) {
+	private void createUI_630_Margin(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory
+				.fillDefaults()
+				.numColumns(2)
+
+				// make is more visible
+				.extendedMargins(0, 0, 10, 0)
+				.applyTo(container);
+		{
+			/*
+			 * Margins
+			 */
+
+			// label
+			_lblTour_Margin = new Label(container, SWT.NONE);
+			_lblTour_Margin.setText(Messages.Slideout_CalendarOptions_Label_TourMargin);
+			_lblTour_Margin.setToolTipText(Messages.Slideout_CalendarOptions_Label_TourMargin_Tooltip);
+			GridDataFactory
+					.fillDefaults()//
+					.align(SWT.FILL, SWT.CENTER)
+					.applyTo(_lblTour_Margin);
+
+			final Composite valueContainer = new Composite(container, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(valueContainer);
+			GridLayoutFactory.fillDefaults().numColumns(4).applyTo(valueContainer);
+			{
+				_spinnerTour_Margin_Top = createUI_Margin(valueContainer);
+				_spinnerTour_Margin_Left = createUI_Margin(valueContainer);
+				_spinnerTour_Margin_Bottom = createUI_Margin(valueContainer);
+				_spinnerTour_Margin_Right = createUI_Margin(valueContainer);
+			}
+		}
+	}
+
+	private void createUI_650_Values(final Composite parent) {
 
 		final int defaultTourFormatter = CalendarProfileManager.NUM_DEFAULT_TOUR_FORMATTER;
 
@@ -1865,6 +2063,24 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		return colorSelector;
 	}
 
+	private Spinner createUI_Margin(final Composite parent) {
+
+		final Spinner spinner = new Spinner(parent, SWT.BORDER);
+
+		spinner.setMinimum(-20);
+		spinner.setMaximum(20);
+		spinner.addSelectionListener(_defaultSelectionListener);
+		spinner.addMouseWheelListener(_defaultMouseWheelListener);
+
+		// ensure that the -- sign is displayed
+		GridDataFactory
+				.fillDefaults()
+				.hint(_pc.convertWidthInCharsToPixels(3), SWT.DEFAULT)
+				.applyTo(spinner);
+
+		return spinner;
+	}
+
 	private void enableControls() {
 
 		final boolean isShowDateColumn = _chkIsShowDateColumn.getSelection();
@@ -1886,8 +2102,8 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		_lblYearColumn_HeaderFont.setEnabled(isYearColumns);
 		_lblYearColumn_Spacing.setEnabled(isYearColumns);
 		_lblYearColumn_Start.setEnabled(isYearColumns);
-		_spinnerYearColumns.setEnabled(isYearColumns);
-		_spinnerYearColumnSpacing.setEnabled(isYearColumns);
+		_spinnerYear_Columns.setEnabled(isYearColumns);
+		_spinnerYear_ColumnSpacing.setEnabled(isYearColumns);
 
 		// date column
 		_comboDateColumn.setEnabled(isShowDateColumn);
@@ -1909,8 +2125,8 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		_comboTour_BackgroundColor1.setEnabled(selectedTourBackgroundData.isColor1);
 		_comboTour_BackgroundColor2.setEnabled(selectedTourBackgroundData.isColor2);
 		_comboTour_BorderColor.setEnabled(selectedTourBorderData.isColor);
-		_spinnerTourBackgroundWidth.setEnabled(selectedTourBackgroundData.isWidth);
-		_spinnerTourBorderWidth.setEnabled(selectedTourBorderData.isWidth);
+		_spinnerTour_BackgroundWidth.setEnabled(selectedTourBackgroundData.isWidth);
+		_spinnerTour_BorderWidth.setEnabled(selectedTourBorderData.isWidth);
 
 		// tour content
 		_chkIsShowTourValueUnit.setEnabled(isShowTourContent);
@@ -1922,10 +2138,15 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		_fontEditorTourTitle.setEnabled(isShowTourContent);
 		_fontEditorTourValue.setEnabled(isShowTourContent);
 		_lblTour_ContentFont.setEnabled(isShowTourContent);
+		_lblTour_Margin.setEnabled(isShowTourContent);
 		_lblTour_TitleFont.setEnabled(isShowTourContent);
 		_lblTour_TruncatedLines.setEnabled(isShowTourContent && isTruncateText);
 		_lblTour_ValueColumns.setEnabled(isShowTourContent);
 		_lblTour_ValueFont.setEnabled(isShowTourContent);
+		_spinnerTour_Margin_Top.setEnabled(isShowTourContent);
+		_spinnerTour_Margin_Bottom.setEnabled(isShowTourContent);
+		_spinnerTour_Margin_Left.setEnabled(isShowTourContent);
+		_spinnerTour_Margin_Right.setEnabled(isShowTourContent);
 		_spinnerTour_TruncatedLines.setEnabled(isShowTourContent && isTruncateText);
 		_spinnerTour_ValueColumns.setEnabled(isShowTourContent);
 		enableControls_TourInfo();
@@ -2682,6 +2903,9 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 		enableControls();
 
+		// debugging: dump profile to copy&paste an adjusted profile into the profile manager
+		CalendarProfileManager.getActiveCalendarProfile().dump();
+
 		_calendarView.updateUI_Graph();
 	}
 
@@ -2739,18 +2963,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 	private void onProfile_Add() {
 
-		final CalendarProfile calendarProfile = new CalendarProfile();
-
-		// update model
-		_allCalendarProfiles.add(calendarProfile);
-
-		// update viewer
-		_profileViewer.refresh();
-
-		// select new profile
-		selectProfile(calendarProfile);
-
-		_txtProfileName.setFocus();
+		updateUI_NewProfile(new CalendarProfile());
 	}
 
 	private void onProfile_Copy() {
@@ -2762,18 +2975,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			return;
 		}
 
-		final CalendarProfile clonedProfile = selectedProfile.clone();
-
-		// update model
-		_allCalendarProfiles.add(clonedProfile);
-
-		// update viewer
-		_profileViewer.refresh();
-
-		// select new profile
-		selectProfile(clonedProfile);
-
-		_txtProfileName.setFocus();
+		updateUI_NewProfile(selectedProfile.clone());
 	}
 
 	private void onProfile_Delete() {
@@ -2922,13 +3124,13 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			_colorAlternateMonthColor.setColorValue(profile.alternateMonthRGB);
 			_colorCalendarBackgroundColor.setColorValue(profile.calendarBackgroundRGB);
 			_colorCalendarForegroundColor.setColorValue(profile.calendarForegroundRGB);
-			_spinnerWeekHeight.setSelection(profile.weekHeight);
+			_spinnerWeek_Height.setSelection(profile.weekHeight);
 
 			// year columns
 			_chkIsShowYearColumns.setSelection(profile.isShowYearColumns);
 			_comboColumnLayout.select(getCalendarColumLayoutIndex(profile.yearColumnsStart));
-			_spinnerYearColumns.setSelection(profile.yearColumns);
-			_spinnerYearColumnSpacing.setSelection(profile.yearColumnsSpacing);
+			_spinnerYear_Columns.setSelection(profile.yearColumns);
+			_spinnerYear_ColumnSpacing.setSelection(profile.yearColumnsSpacing);
 			_fontEditorYearColumnHeader.setSelection(profile.yearHeaderFont);
 
 			// date column
@@ -2950,8 +3152,8 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			_comboTour_BackgroundColor2.select(getCalendarColorIndex(profile.tourBackgroundColor2));
 			_comboTour_Border.select(getTourBorderIndex(profile.tourBorder));
 			_comboTour_BorderColor.select(getCalendarColorIndex(profile.tourBorderColor));
-			_spinnerTourBackgroundWidth.setSelection(profile.tourBackgroundWidth);
-			_spinnerTourBorderWidth.setSelection(profile.tourBorderWidth);
+			_spinnerTour_BackgroundWidth.setSelection(profile.tourBackgroundWidth);
+			_spinnerTour_BorderWidth.setSelection(profile.tourBorderWidth);
 
 			// tour content
 			_chkIsShowTourContent.setSelection(profile.isShowTourContent);
@@ -2963,6 +3165,10 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			_fontEditorTourContent.setSelection(profile.tourContentFont);
 			_fontEditorTourTitle.setSelection(profile.tourTitleFont);
 			_fontEditorTourValue.setSelection(profile.tourValueFont);
+			_spinnerTour_Margin_Top.setSelection(profile.tourMarginTop);
+			_spinnerTour_Margin_Bottom.setSelection(profile.tourMarginBottom);
+			_spinnerTour_Margin_Left.setSelection(profile.tourMarginLeft);
+			_spinnerTour_Margin_Right.setSelection(profile.tourMarginRight);
 			_spinnerTour_TruncatedLines.setSelection(profile.tourTruncatedLines);
 			_spinnerTour_ValueColumns.setSelection(profile.tourValueColumns);
 			selectDataFormatter(
@@ -3009,13 +3215,13 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		profile.calendarBackgroundRGB = _colorCalendarBackgroundColor.getColorValue();
 		profile.calendarForegroundRGB = _colorCalendarForegroundColor.getColorValue();
 		profile.useDraggedScrolling = _chkUseDraggedScrolling.getSelection();
-		profile.weekHeight = _spinnerWeekHeight.getSelection();
+		profile.weekHeight = _spinnerWeek_Height.getSelection();
 
 		// year columns
 		profile.isShowYearColumns = _chkIsShowYearColumns.getSelection();
-		profile.yearColumns = _spinnerYearColumns.getSelection();
+		profile.yearColumns = _spinnerYear_Columns.getSelection();
 		profile.yearColumnsStart = getSelectedColumnLayout();
-		profile.yearColumnsSpacing = _spinnerYearColumnSpacing.getSelection();
+		profile.yearColumnsSpacing = _spinnerYear_ColumnSpacing.getSelection();
 		profile.yearHeaderFont = _fontEditorYearColumnHeader.getSelection();
 
 		// date column
@@ -3039,10 +3245,10 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		profile.tourBackground = getSelectedTourBackgroundData().tourBackground;
 		profile.tourBackgroundColor1 = getSelectedCalendarColor(_comboTour_BackgroundColor1);
 		profile.tourBackgroundColor2 = getSelectedCalendarColor(_comboTour_BackgroundColor2);
-		profile.tourBackgroundWidth = _spinnerTourBackgroundWidth.getSelection();
+		profile.tourBackgroundWidth = _spinnerTour_BackgroundWidth.getSelection();
 		profile.tourBorder = getSelectedTourBorderData().tourBorder;
 		profile.tourBorderColor = getSelectedCalendarColor(_comboTour_BorderColor);
-		profile.tourBorderWidth = _spinnerTourBorderWidth.getSelection();
+		profile.tourBorderWidth = _spinnerTour_BorderWidth.getSelection();
 
 		// tour content
 		profile.isShowTourContent = _chkIsShowTourContent.getSelection();
@@ -3052,6 +3258,10 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		profile.tourContentFont = _fontEditorTourContent.getSelection();
 		profile.tourTitleColor = getSelectedTourColor(_comboTour_TitleColor).dayContentColor;
 		profile.tourTitleFont = _fontEditorTourTitle.getSelection();
+		profile.tourMarginTop = _spinnerTour_Margin_Top.getSelection();
+		profile.tourMarginBottom = _spinnerTour_Margin_Bottom.getSelection();
+		profile.tourMarginLeft = _spinnerTour_Margin_Left.getSelection();
+		profile.tourMarginRight = _spinnerTour_Margin_Right.getSelection();
 		profile.tourTruncatedLines = _spinnerTour_TruncatedLines.getSelection();
 		profile.tourValueColor = getSelectedTourColor(_comboTour_ValueColor).dayContentColor;
 		profile.tourValueColumns = _spinnerTour_ValueColumns.getSelection();
@@ -3178,10 +3388,22 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		// keep data from previous profile
 		saveState_Profile();
 
-		// debugging: dump profile to copy&paste an adjusted profile into the profile manager
-//		selectedProfile.dump();
-
 		CalendarProfileManager.setActiveCalendarProfile(selectedProfile, true);
+	}
+
+	private void updateUI_NewProfile(final CalendarProfile calendarProfile) {
+
+		// update model
+		_allCalendarProfiles.add(calendarProfile);
+
+		// update viewer
+		_profileViewer.refresh();
+
+		// select new profile
+		selectProfile(calendarProfile);
+
+		_txtProfileName.setFocus();
+		_txtProfileName.selectAll();
 	}
 
 }

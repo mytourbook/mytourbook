@@ -82,6 +82,10 @@ public class CalendarProfile implements Cloneable {
 	FormatterData[]			allTourFormatterData		= CalendarProfileManager.DEFAULT_TOUR_FORMATTER_DATA;
 	CalendarColor			tourContentColor			= CalendarProfileManager.DEFAULT_TOUR_COLOR;
 	FontData				tourContentFont				= createFont(0.9f, SWT.NORMAL);
+	int						tourMarginTop				= CalendarProfileManager.DEFAULT_TOUR_MARGIN_TOP;
+	int						tourMarginLeft				= CalendarProfileManager.DEFAULT_TOUR_MARGIN_LEFT;
+	int						tourMarginBottom			= CalendarProfileManager.DEFAULT_TOUR_MARGIN_BOTTOM;
+	int						tourMarginRight				= CalendarProfileManager.DEFAULT_TOUR_MARGIN_RIGHT;
 	CalendarColor 			tourTitleColor				= CalendarProfileManager.DEFAULT_TOUR_COLOR;
 	FontData				tourTitleFont				= createFont(1.2f, SWT.BOLD);
 	int						tourTruncatedLines			= CalendarProfileManager.DEFAULT_TOUR_TRUNCATED_LINES;
@@ -199,7 +203,7 @@ public class CalendarProfile implements Cloneable {
         sb.append("// SET_FORMATTING_OFF"); //$NON-NLS-1$
         sb.append("\n"); //$NON-NLS-1$
         sb.append("\n"); //$NON-NLS-1$
-        sb.append("//                                     " + profile.name + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("//                                      " + profile.name + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("\n"); //$NON-NLS-1$
         sb.append("profile.defaultId                     = ProfileDefault." + defaultId                   + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("\n"); //$NON-NLS-1$
@@ -244,9 +248,12 @@ public class CalendarProfile implements Cloneable {
         sb.append("profile.isShowTourContent             = " + isShowTourContent                          + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.isShowTourValueUnit           = " + isShowTourValueUnit                        + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.isTruncateTourText            = " + isTruncateTourText                         + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
-//      sb.append("profile.allTourFormatterData          = " + allTourFormatterData         		      + ";\n");
         sb.append("profile.tourContentColor              = CalendarColor." + tourContentColor             + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.tourContentFont               = " + dump_Font(tourContentFont)                 + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.tourMarginTop	             = " + tourMarginTop                              + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.tourMarginBottom              = " + tourMarginBottom                           + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.tourMarginLeft                = " + tourMarginLeft                             + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.tourMarginRight               = " + tourMarginRight                            + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.tourTitleColor                = CalendarColor." + tourTitleColor               + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.tourTitleFont                 = " + dump_Font(tourTitleFont)                   + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.tourTruncatedLines            = " + tourTruncatedLines                         + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -257,10 +264,14 @@ public class CalendarProfile implements Cloneable {
         sb.append("// week summary column                                                                     \n"); //$NON-NLS-1$
         sb.append("profile.isShowSummaryColumn           = " + isShowSummaryColumn                        + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.isShowWeekValueUnit           = " + isShowWeekValueUnit                        + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
-//      sb.append("profile.allWeekFormatterData          = " + allWeekFormatterData                       + ";\n");
         sb.append("profile.weekColumnWidth               = " + weekColumnWidth                            + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.weekValueColor                = CalendarColor." + weekValueColor               + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.weekValueFont                 = " + dump_Font(weekValueFont)                   + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("\n"); //$NON-NLS-1$
+        sb.append("\n"); //$NON-NLS-1$
+        sb.append("profile.allTourFormatterData          = " + dump_Formatter(allTourFormatterData, "tour") + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("\n"); //$NON-NLS-1$
+        sb.append("profile.allWeekFormatterData          = " + dump_Formatter(allWeekFormatterData, "week") + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("\n"); //$NON-NLS-1$
         sb.append("// SET_FORMATTING_ON"); //$NON-NLS-1$
         sb.append("\n"); //$NON-NLS-1$
@@ -294,6 +305,92 @@ public class CalendarProfile implements Cloneable {
 		}
 
 		return String.format("CalendarProfile.createFont(%.1ff, %s)", fontHeight, fontStyleText); //$NON-NLS-1$
+	}
+
+	private String dump_Formatter(final FormatterData[] allFormatterData, final String tourOrWeek) {
+
+//		new FormatterData[] {
+//
+//				new FormatterData(true,		FormatterID.TOUR_TITLE,			_tourFormatter_TourTitle.getDefaultFormat()),
+//				new FormatterData(true,		FormatterID.TOUR_DESCRIPTION,	_tourFormatter_TourDescription.getDefaultFormat()),
+//				new FormatterData(true,		FormatterID.ALTITUDE,			_tourFormatter_Altitude.getDefaultFormat()),
+//				new FormatterData(true,		FormatterID.DISTANCE,			_tourFormatter_Distance.getDefaultFormat()),
+//				new FormatterData(true,		FormatterID.TIME_MOVING,		_tourFormatter_Time_Moving.getDefaultFormat()),
+//				new FormatterData(false,	FormatterID.EMPTY,				ValueFormat.DUMMY_VALUE),
+//				new FormatterData(false,	FormatterID.EMPTY,				ValueFormat.DUMMY_VALUE),
+//				new FormatterData(false,	FormatterID.EMPTY,				ValueFormat.DUMMY_VALUE),
+//			};
+
+		final StringBuilder sb = new StringBuilder();
+
+		sb.append("new FormatterData[] {");
+		sb.append("\n");
+		sb.append("\n");
+
+		for (final FormatterData formatterData : allFormatterData) {
+
+			final String isEnabled = formatterData.isEnabled ? "true" : "false";
+
+			String formatterID = UI.EMPTY_STRING;
+
+			switch (formatterData.id) {
+
+			case ALTITUDE:
+				formatterID = FormatterID.ALTITUDE.name();
+
+				break;
+
+			case DISTANCE:
+				formatterID = FormatterID.DISTANCE.name();
+				break;
+
+			case PACE:
+				formatterID = FormatterID.PACE.name();
+				break;
+
+			case SPEED:
+				formatterID = FormatterID.SPEED.name();
+				break;
+
+			case TIME_MOVING:
+				formatterID = FormatterID.TIME_MOVING.name();
+				break;
+
+			case TIME_PAUSED:
+				formatterID = FormatterID.TIME_PAUSED.name();
+				break;
+
+			case TIME_RECORDING:
+				formatterID = FormatterID.TIME_RECORDING.name();
+				break;
+
+			case TOUR_DESCRIPTION:
+				formatterID = FormatterID.TOUR_DESCRIPTION.name();
+				break;
+
+			case TOUR_TITLE:
+				formatterID = FormatterID.TOUR_TITLE.name();
+				break;
+
+			case EMPTY:
+			default:
+				formatterID = FormatterID.EMPTY.name();
+				break;
+			}
+
+			sb.append(
+					String.format(
+							"\tnew FormatterData(%-10s %-30s ValueFormat.%s),\n",
+							isEnabled + ",",
+							"FormatterID." + formatterID + ",",
+							formatterData.valueFormat.name()));
+
+		}
+
+		sb.append("\n");
+		sb.append("};");
+
+		return sb.toString();
 	}
 
 	private String dump_RGB(final RGB rgb) {

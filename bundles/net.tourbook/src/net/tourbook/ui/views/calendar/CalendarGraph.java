@@ -113,7 +113,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	private List<FocusItem>						_allDayFocusItems		= new ArrayList<FocusItem>();
 	private List<FocusItem>						_allTourFocusItems		= new ArrayList<FocusItem>();
 	private boolean								_isHoveredModified		= false;
-	private boolean								_isGraphClean			= false;
+	private boolean								_isGraphDirty			= true;
 	//
 	private CalendarSelectItem					_emptyItem				= new CalendarSelectItem(-1, ItemType.EMPTY);
 	private CalendarSelectItem					_hoveredItem			= _emptyItem;
@@ -820,7 +820,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			@Override
 			public void controlResized(final ControlEvent event) {
 
-				_isGraphClean = false;
+				_isGraphDirty = true;
 				redraw();
 			}
 		});
@@ -880,7 +880,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 	void draw() {
 
-		_isGraphClean = false;
+		_isGraphDirty = true;
 		redraw();
 	}
 
@@ -895,7 +895,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		final int canvasWidth = canvas.width;
 		final int canvasHeight = canvas.height;
 
-		if (_isGraphClean && _calendarImage != null) {
+		if (!_isGraphDirty && _calendarImage != null) {
 
 			final Image hoveredImage = new Image(getDisplay(), canvasWidth, canvasHeight);
 			final GC gcHovered = new GC(hoveredImage);
@@ -1314,7 +1314,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		updateUI_YearMonthCombo(currentDate);
 
-		_isGraphClean = true;
+		_isGraphDirty = false;
 	}
 
 	private void drawDay(	final GC gc,
@@ -1578,14 +1578,16 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			return;
 		}
 
-		final int margin = 2;
-		final int margin2 = margin * 2;
+		final int marginTop = _currentProfile.tourMarginTop;
+		final int marginBottom = _currentProfile.tourMarginBottom;
+		final int marginLeft = _currentProfile.tourMarginLeft;
+		final int marginRight = _currentProfile.tourMarginRight;
 
 		final Rectangle marginRect = new Rectangle(//
-				tourRect.x + margin,
-				tourRect.y + margin,
-				tourRect.width - margin2,
-				tourRect.height - margin2);
+				tourRect.x + marginLeft,
+				tourRect.y + marginTop,
+				tourRect.width - marginLeft - marginRight,
+				tourRect.height - marginTop - marginBottom);
 
 		gc.setClipping(marginRect.x, marginRect.y, marginRect.width, marginRect.height);
 
@@ -2552,7 +2554,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		if (dt.isBefore(_firstViewportDay) || dt.isAfter(_firstViewportDay.plusWeeks(_numWeeksInOneColumn))) {
 
-			_isGraphClean = false;
+			_isGraphDirty = true;
 			gotoDate(dt.toLocalDate());
 
 		} else {
@@ -2607,7 +2609,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		} else {
 			_selectedItem = new CalendarSelectItem(_allTourFocusItems.get(newIndex).id, ItemType.TOUR);
 
-			_isGraphClean = false;
+			_isGraphDirty = true;
 			redraw();
 		}
 
@@ -2864,10 +2866,10 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		return;
 	}
 
-	public void refreshCalendar() {
+	void refreshCalendar() {
 
 		_dataProvider.invalidate();
-		_isGraphClean = false;
+		_isGraphDirty = true;
 
 		redraw();
 	}
@@ -2877,7 +2879,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		if (!_selectedItem.equals(_emptyItem)) {
 
 			_selectedItem = _emptyItem;
-			_isGraphClean = false;
+			_isGraphDirty = true;
 
 			redraw();
 		}
@@ -3119,7 +3121,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		// goto the selected week
 		_firstViewportDay = scrollBar_getStartOfTours().atStartOfDay().plusDays(currentSelection * 7);
 
-		_isGraphClean = false;
+		_isGraphDirty = true;
 		redraw();
 
 //		System.out.println(
@@ -3222,7 +3224,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 			_selectedItem = _emptyItem;
 
-			_isGraphClean = false;
+			_isGraphDirty = true;
 			redraw();
 		}
 	}
@@ -3274,7 +3276,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 	private void updateUI() {
 
-		_isGraphClean = false;
+		_isGraphDirty = true;
 		redraw();
 
 		// run async that the calendar is drawn first which sets some fields
@@ -3289,7 +3291,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 	void updateUI_Layout() {
 
-		if (_isGraphClean == false) {
+		if (_isGraphDirty) {
 			// redraw is already forced
 		}
 
@@ -3310,6 +3312,10 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	 *            When <code>true</code> then fonts will be reset and recreated by the next drawing.
 	 */
 	void updateUI_Layout(final boolean isResetFonts) {
+
+		if (_isGraphDirty) {
+			// redraw is already forced
+		}
 
 		if (isResetFonts) {
 			disposeFonts();

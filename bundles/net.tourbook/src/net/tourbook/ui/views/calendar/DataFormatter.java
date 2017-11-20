@@ -27,7 +27,9 @@ abstract class DataFormatter {
 	FormatterID				id;
 	private String			_name;
 
+	ValueFormat				valueFormatId;
 	IValueFormatter			valueFormatter;
+
 	private ColorDefinition	_colorDefinition;
 
 	DataFormatter(final FormatterID id) {
