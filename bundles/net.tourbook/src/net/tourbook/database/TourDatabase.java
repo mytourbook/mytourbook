@@ -104,7 +104,8 @@ public class TourDatabase {
 	/**
 	 * version for the database which is required that the tourbook application works successfully
 	 */
-	private static final int			TOURBOOK_DB_VERSION							= 32;
+	private static final int			TOURBOOK_DB_VERSION							= 33;
+//	private static final int			TOURBOOK_DB_VERSION							= 33;	// 17.12
 //	private static final int			TOURBOOK_DB_VERSION							= 32;	// 16.10
 
 //	private static final int			TOURBOOK_DB_VERSION							= 31;	// 16.5
@@ -2268,9 +2269,34 @@ public class TourDatabase {
 		String sql;
 
 		/*
-		 * CREATE INDEX TourEndTime
+		 * CREATE INDEX TourImportFileName
 		 */
 		sql = "CREATE INDEX TourImportFileName ON " + TABLE_TOUR_DATA + " (TourImportFileName)"; //$NON-NLS-1$ //$NON-NLS-2$
+		exec(stmt, sql);
+	}
+
+	/**
+	 * Create index for {@link TourData}. *
+	 * <p>
+	 * 
+	 * @param stmt
+	 * @throws SQLException
+	 * @since Db version 29
+	 */
+	private void createIndex_TourData_033(final Statement stmt) throws SQLException {
+
+		String sql;
+
+		/*
+		 * CREATE INDEX StartWeek
+		 */
+		sql = "CREATE INDEX StartWeek ON " + TABLE_TOUR_DATA + " (StartWeek)"; //$NON-NLS-1$ //$NON-NLS-2$
+		exec(stmt, sql);
+
+		/*
+		 * CREATE INDEX StartWeekYear
+		 */
+		sql = "CREATE INDEX StartWeekYear ON " + TABLE_TOUR_DATA + " (StartWeekYear)"; //$NON-NLS-1$ //$NON-NLS-2$
 		exec(stmt, sql);
 	}
 
@@ -2638,6 +2664,7 @@ public class TourDatabase {
 		createIndex_TourData_005(stmt);
 		createIndex_TourData_022(stmt);
 		createIndex_TourData_029(stmt);
+		createIndex_TourData_033(stmt);
 	}
 
 	/**
@@ -3255,6 +3282,42 @@ public class TourDatabase {
 //						+ ", "
 //						+ result.getString("NULLABLE"));
 //			}
+
+		} catch (final SQLException e) {
+			UI.showSQLException(e);
+		}
+
+		return false;
+	}
+
+	private boolean isIndexAvailable(final Connection conn, final String table, final String column) {
+
+		try {
+
+			final String requestedIndexName = column.toUpperCase();
+
+			final DatabaseMetaData meta = conn.getMetaData();
+			final ResultSet result = meta.getIndexInfo(null, TABLE_SCHEMA, table, false, false);
+
+			while (result.next()) {
+
+				final String dbIndexName = result.getString("COLUMN_NAME");
+
+				if (requestedIndexName.equals(dbIndexName.toUpperCase())) {
+
+					return true;
+				}
+
+//				System.out.println("Table Indicies\n");
+//				System.out.println(
+//
+//						String.format(
+//								"%-20s",
+//								columnName
+//
+//						) //
+//				);
+			}
 
 		} catch (final SQLException e) {
 			UI.showSQLException(e);
@@ -4141,6 +4204,13 @@ public class TourDatabase {
 			if (currentDbVersion == 31) {
 				isPostUpdate32 = true;
 				currentDbVersion = newVersion = updateDbDesign_031_to_032(conn, monitor);
+			}
+
+			/*
+			 * 32 -> 33
+			 */
+			if (currentDbVersion == 32) {
+				currentDbVersion = newVersion = updateDbDesign_032_to_033(conn, monitor);
 			}
 
 			/*
@@ -6143,6 +6213,27 @@ public class TourDatabase {
 
 			em.close();
 		}
+	}
+
+	private int updateDbDesign_032_to_033(final Connection conn, final IProgressMonitor monitor) throws SQLException {
+
+		final int newDbVersion = 33;
+
+		logDb_UpdateStart(newDbVersion);
+		updateMonitor(monitor, newDbVersion);
+
+		try (final Statement stmt = conn.createStatement()) {
+
+			// check if db already contains the index
+			if (isIndexAvailable(conn, TABLE_TOUR_DATA, "StartWeek") == false) { //$NON-NLS-1$
+
+				createIndex_TourData_033(stmt);
+			}
+		}
+
+		logDb_UpdateEnd(newDbVersion);
+
+		return newDbVersion;
 	}
 
 	private void updateDbDesign_VersionNumber(final Connection conn, final int newVersion) throws SQLException {

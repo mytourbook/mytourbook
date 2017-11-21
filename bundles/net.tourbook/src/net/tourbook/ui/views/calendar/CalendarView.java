@@ -852,6 +852,9 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 	@Override
 	public void profileIsModified() {
 
+		// when changing the profile then more/less data are needed
+		_calendarGraph.stopDataProvider();
+
 		fillUI_Profiles();
 
 		updateUI_Graph();

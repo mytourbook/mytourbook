@@ -3248,6 +3248,11 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 	}
 
+	void stopDataProvider() {
+
+		_dataProvider.stopDataProvider();
+	}
+
 	void updateTourTypeColors() {
 
 		_rgbBright.clear();
@@ -3276,6 +3281,15 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 	private void updateUI() {
 
+		if (this.isDisposed()) {
+			return;
+		}
+
+		if (_isGraphDirty) {
+			// redraw is already forced
+			return;
+		}
+
 		_isGraphDirty = true;
 		redraw();
 
@@ -3283,6 +3297,10 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		getDisplay().asyncExec(new Runnable() {
 			@Override
 			public void run() {
+
+				if (CalendarGraph.this.isDisposed()) {
+					return;
+				}
 
 				scrollBar_updateScrollbar();
 			}
@@ -3293,12 +3311,17 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		if (_isGraphDirty) {
 			// redraw is already forced
+			return;
 		}
 
 		// update UI
 		Display.getDefault().asyncExec(new Runnable() {
 			@Override
 			public void run() {
+
+				if (CalendarGraph.this.isDisposed()) {
+					return;
+				}
 
 				// invalidate layout
 				updateUI();
@@ -3315,6 +3338,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		if (_isGraphDirty) {
 			// redraw is already forced
+			return;
 		}
 
 		if (isResetFonts) {

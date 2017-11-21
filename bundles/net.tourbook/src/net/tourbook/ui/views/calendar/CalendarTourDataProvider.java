@@ -679,4 +679,9 @@ public class CalendarTourDataProvider {
 		_calendarGraph = calendarGraph;
 	}
 
+	synchronized void stopDataProvider() {
+
+		_weekExecuterId.incrementAndGet();
+	}
+
 }
