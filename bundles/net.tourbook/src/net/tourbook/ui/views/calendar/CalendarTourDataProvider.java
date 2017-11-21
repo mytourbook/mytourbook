@@ -681,7 +681,7 @@ public class CalendarTourDataProvider {
 
 	synchronized void stopDataProvider() {
 
-		_weekExecuterId.incrementAndGet();
+//		_weekExecuterId.incrementAndGet();
 	}
 
 }

@@ -209,6 +209,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	private Label					_lblTour_ValueFont;
 	private Label					_lblWeek_ColumnWidth;
 	private Label					_lblWeek_ValueFont;
+	private Label					_lblWeek_Margin;
 	private Label					_lblYearColumn;
 	private Label					_lblYearColumn_HeaderFont;
 	private Label					_lblYearColumn_Spacing;
@@ -233,6 +234,10 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	private Spinner					_spinnerTour_ValueColumns;
 	private Spinner					_spinnerWeek_ColumnWidth;
 	private Spinner					_spinnerWeek_Height;
+	private Spinner					_spinnerWeek_Margin_Top;
+	private Spinner					_spinnerWeek_Margin_Left;
+	private Spinner					_spinnerWeek_Margin_Bottom;
+	private Spinner					_spinnerWeek_Margin_Right;
 	private Spinner					_spinnerYear_Columns;
 	private Spinner					_spinnerYear_ColumnSpacing;
 	//
@@ -1768,12 +1773,9 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 			// label
 			_lblTour_Margin = new Label(container, SWT.NONE);
-			_lblTour_Margin.setText(Messages.Slideout_CalendarOptions_Label_TourMargin);
-			_lblTour_Margin.setToolTipText(Messages.Slideout_CalendarOptions_Label_TourMargin_Tooltip);
-			GridDataFactory
-					.fillDefaults()//
-					.align(SWT.FILL, SWT.CENTER)
-					.applyTo(_lblTour_Margin);
+			_lblTour_Margin.setText(Messages.Slideout_CalendarOptions_Label_Margin);
+			_lblTour_Margin.setToolTipText(Messages.Slideout_CalendarOptions_Label_Margin_Tooltip);
+			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_lblTour_Margin);
 
 			final Composite valueContainer = new Composite(container, SWT.NONE);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(valueContainer);
@@ -1880,6 +1882,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 		{
 			createUI_820_Layout(_weekFormatterContainer);
+			createUI_830_Margin(_weekFormatterContainer);
 			createUI_850_Values(_weekFormatterContainer);
 		}
 	}
@@ -1990,6 +1993,40 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				_comboWeek_ValueColor.setVisibleItemCount(20);
 				_comboWeek_ValueColor.addSelectionListener(_defaultSelectionListener);
 				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(_comboWeek_ValueColor);
+			}
+		}
+	}
+
+	private void createUI_830_Margin(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory
+				.fillDefaults()
+				.numColumns(2)
+
+				// make is more visible
+				.extendedMargins(0, 0, 10, 0)
+				.applyTo(container);
+		{
+			/*
+			 * Margins
+			 */
+
+			// label
+			_lblWeek_Margin = new Label(container, SWT.NONE);
+			_lblWeek_Margin.setText(Messages.Slideout_CalendarOptions_Label_Margin);
+			_lblWeek_Margin.setToolTipText(Messages.Slideout_CalendarOptions_Label_Margin_Tooltip);
+			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_lblWeek_Margin);
+
+			final Composite valueContainer = new Composite(container, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(valueContainer);
+			GridLayoutFactory.fillDefaults().numColumns(4).applyTo(valueContainer);
+			{
+				_spinnerWeek_Margin_Top = createUI_Margin(valueContainer);
+				_spinnerWeek_Margin_Left = createUI_Margin(valueContainer);
+				_spinnerWeek_Margin_Bottom = createUI_Margin(valueContainer);
+				_spinnerWeek_Margin_Right = createUI_Margin(valueContainer);
 			}
 		}
 	}
@@ -2156,8 +2193,13 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		_comboWeek_ValueColor.setEnabled(isShowSummaryColumn);
 		_fontEditorWeekValue.setEnabled(isShowSummaryColumn);
 		_lblWeek_ColumnWidth.setEnabled(isShowSummaryColumn);
+		_lblWeek_Margin.setEnabled(isShowSummaryColumn);
 		_lblWeek_ValueFont.setEnabled(isShowSummaryColumn);
 		_spinnerWeek_ColumnWidth.setEnabled(isShowSummaryColumn);
+		_spinnerWeek_Margin_Top.setEnabled(isShowSummaryColumn);
+		_spinnerWeek_Margin_Bottom.setEnabled(isShowSummaryColumn);
+		_spinnerWeek_Margin_Left.setEnabled(isShowSummaryColumn);
+		_spinnerWeek_Margin_Right.setEnabled(isShowSummaryColumn);
 		enableControls_WeekSummary();
 	}
 
@@ -3185,6 +3227,10 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			_comboWeek_ValueColor.select(getCalendarColorIndex(profile.weekValueColor));
 			_fontEditorWeekValue.setSelection(profile.weekValueFont);
 			_spinnerWeek_ColumnWidth.setSelection(profile.weekColumnWidth);
+			_spinnerWeek_Margin_Top.setSelection(profile.weekMarginTop);
+			_spinnerWeek_Margin_Bottom.setSelection(profile.weekMarginBottom);
+			_spinnerWeek_Margin_Left.setSelection(profile.weekMarginLeft);
+			_spinnerWeek_Margin_Right.setSelection(profile.weekMarginRight);
 			selectDataFormatter(
 					profile.allWeekFormatterData,
 					CalendarProfileManager.allWeekFormatter,
@@ -3278,6 +3324,10 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		profile.isShowSummaryColumn = _chkIsShowSummaryColumn.getSelection();
 		profile.isShowWeekValueUnit = _chkIsShowWeekValueUnit.getSelection();
 		profile.weekColumnWidth = _spinnerWeek_ColumnWidth.getSelection();
+		profile.weekMarginTop = _spinnerWeek_Margin_Top.getSelection();
+		profile.weekMarginBottom = _spinnerWeek_Margin_Bottom.getSelection();
+		profile.weekMarginLeft = _spinnerWeek_Margin_Left.getSelection();
+		profile.weekMarginRight = _spinnerWeek_Margin_Right.getSelection();
 		profile.weekValueFont = _fontEditorWeekValue.getSelection();
 		profile.weekValueColor = getSelectedCalendarColor(_comboWeek_ValueColor);
 
@@ -3384,6 +3434,9 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			// profile has not changed
 			return;
 		}
+
+		// when changing the profile then more/less data are needed
+		_calendarView.getCalendarGraph().stopDataProvider();
 
 		// keep data from previous profile
 		saveState_Profile();

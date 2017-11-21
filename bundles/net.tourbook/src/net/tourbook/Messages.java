@@ -70,8 +70,7 @@ public class Messages extends NLS {
 	public static String		Calendar_Profile_Name_Col_20;
 	public static String		Calendar_Profile_Name_Col_20_Dark;
 	public static String		Calendar_Profile_Name_Compact;
-
-	public static String Calendar_Profile_Name_Compact_Altitude;
+	public static String		Calendar_Profile_Name_Compact_II;
 	public static String		Calendar_Profile_Name_Crazy;
 	public static String		Calendar_Profile_Name_Default;
 	public static String		Calendar_Profile_TourBackground_Circle;
@@ -1707,6 +1706,8 @@ public class Messages extends NLS {
 	public static String		Slideout_CalendarOptions_Label_DayHeaderFormat;
 	public static String		Slideout_CalendarOptions_Label_DayHeaderLayout;
 	public static String		Slideout_CalendarOptions_Label_Line;
+	public static String		Slideout_CalendarOptions_Label_Margin;
+	public static String		Slideout_CalendarOptions_Label_Margin_Tooltip;
 	public static String		Slideout_CalendarOptions_Label_Name;
 	public static String		Slideout_CalendarOptions_Label_Name_Tooltip;
 	public static String		Slideout_CalendarOptions_Label_NumYearColumns;
@@ -1725,10 +1726,6 @@ public class Messages extends NLS {
 	public static String		Slideout_CalendarOptions_Label_TourBorder;
 	public static String		Slideout_CalendarOptions_Label_TourContentFont;
 	public static String		Slideout_CalendarOptions_Label_TourDateFont;
-
-	public static String Slideout_CalendarOptions_Label_TourMargin;
-
-	public static String Slideout_CalendarOptions_Label_TourMargin_Tooltip;
 	public static String		Slideout_CalendarOptions_Label_TourTitleFont;
 	public static String		Slideout_CalendarOptions_Label_TourValueFont;
 	public static String		Slideout_CalendarOptions_Label_TruncatedLines;

@@ -22,7 +22,7 @@ public enum ProfileDefault {
 	CLASSIC, //
 
 	COMPACT, //
-	COMPACT_ALTITUDE, //
+	COMPACT_II, //
 
 	CRAZY, //
 }

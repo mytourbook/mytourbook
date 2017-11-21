@@ -98,6 +98,10 @@ public class CalendarProfile implements Cloneable {
 	boolean 				isShowWeekValueUnit			= true;
 	FormatterData[]			allWeekFormatterData		= CalendarProfileManager.DEFAULT_WEEK_FORMATTER_DATA;
 	int						weekColumnWidth				= CalendarProfileManager.DEFAULT_SUMMARY_COLUMN_WIDTH;
+	int						weekMarginTop				= CalendarProfileManager.DEFAULT_WEEK_MARGIN_TOP;
+	int						weekMarginLeft				= CalendarProfileManager.DEFAULT_WEEK_MARGIN_LEFT;
+	int						weekMarginBottom			= CalendarProfileManager.DEFAULT_WEEK_MARGIN_BOTTOM;
+	int						weekMarginRight				= CalendarProfileManager.DEFAULT_WEEK_MARGIN_RIGHT;
 	CalendarColor			weekValueColor				= CalendarProfileManager.DEFAULT_WEEK_VALUE_COLOR;
 	FontData 				weekValueFont				= createFont(1.2f, SWT.BOLD);
 
@@ -189,24 +193,21 @@ public class CalendarProfile implements Cloneable {
 
 	void dump() {
 
-		final StringBuilder sb = new StringBuilder();
-		sb.append(""); //$NON-NLS-1$
-		sb.append(""); //$NON-NLS-1$
-
 		final CalendarProfile profile = this;
+
+		final StringBuilder sb = new StringBuilder();
 
 // SET_FORMATTING_OFF
 
-        sb.append("\n"); //$NON-NLS-1$
-        sb.append("\n"); //$NON-NLS-1$
-        sb.append("\n"); //$NON-NLS-1$
-        sb.append("// SET_FORMATTING_OFF"); //$NON-NLS-1$
-        sb.append("\n"); //$NON-NLS-1$
-        sb.append("\n"); //$NON-NLS-1$
-        sb.append("//                                      " + profile.name + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
-        sb.append("\n"); //$NON-NLS-1$
+        sb.append("\n");                                                                                            //$NON-NLS-1$
+        sb.append("\n");                                                                                            //$NON-NLS-1$
+        sb.append("// SET_FORMATTING_OFF");                                                                         //$NON-NLS-1$
+        sb.append("\n");                                                                                            //$NON-NLS-1$
+        sb.append("\n");                                                                                            //$NON-NLS-1$
+        sb.append("//                                      " + profile.name + "\n");                                //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("\n");                                                                                            //$NON-NLS-1$
         sb.append("profile.defaultId                     = ProfileDefault." + defaultId                   + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
-        sb.append("\n"); //$NON-NLS-1$
+        sb.append("\n");                                                                                            //$NON-NLS-1$
         sb.append("// layout                                                                                  \n"); //$NON-NLS-1$
         sb.append("profile.isToggleMonthColor            = " + isToggleMonthColor                         + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.useDraggedScrolling           = " + useDraggedScrolling                        + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -251,8 +252,8 @@ public class CalendarProfile implements Cloneable {
         sb.append("profile.tourContentColor              = CalendarColor." + tourContentColor             + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.tourContentFont               = " + dump_Font(tourContentFont)                 + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.tourMarginTop	             = " + tourMarginTop                              + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
-        sb.append("profile.tourMarginBottom              = " + tourMarginBottom                           + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.tourMarginLeft                = " + tourMarginLeft                             + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.tourMarginBottom              = " + tourMarginBottom                           + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.tourMarginRight               = " + tourMarginRight                            + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.tourTitleColor                = CalendarColor." + tourTitleColor               + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.tourTitleFont                 = " + dump_Font(tourTitleFont)                   + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -265,18 +266,21 @@ public class CalendarProfile implements Cloneable {
         sb.append("profile.isShowSummaryColumn           = " + isShowSummaryColumn                        + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.isShowWeekValueUnit           = " + isShowWeekValueUnit                        + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.weekColumnWidth               = " + weekColumnWidth                            + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.weekMarginTop	             = " + weekMarginTop                              + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.weekMarginLeft                = " + weekMarginLeft                             + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.weekMarginBottom              = " + weekMarginBottom                           + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.weekMarginRight               = " + weekMarginRight                            + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.weekValueColor                = CalendarColor." + weekValueColor               + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.weekValueFont                 = " + dump_Font(weekValueFont)                   + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
-        sb.append("\n"); //$NON-NLS-1$
-        sb.append("\n"); //$NON-NLS-1$
-        sb.append("profile.allTourFormatterData          = " + dump_Formatter(allTourFormatterData, "tour") + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
-        sb.append("\n"); //$NON-NLS-1$
-        sb.append("profile.allWeekFormatterData          = " + dump_Formatter(allWeekFormatterData, "week") + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
-        sb.append("\n"); //$NON-NLS-1$
-        sb.append("// SET_FORMATTING_ON"); //$NON-NLS-1$
-        sb.append("\n"); //$NON-NLS-1$
-        sb.append("\n"); //$NON-NLS-1$
-        sb.append("\n"); //$NON-NLS-1$
+        sb.append("\n");                                                                                            //$NON-NLS-1$
+        sb.append("\n");                                                                                            //$NON-NLS-1$
+        sb.append("profile.allTourFormatterData          = " + dump_Formatter(allTourFormatterData, "tour") + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        sb.append("\n");                                                                                            //$NON-NLS-1$
+        sb.append("profile.allWeekFormatterData          = " + dump_Formatter(allWeekFormatterData, "week") + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        sb.append("\n");                                                                                            //$NON-NLS-1$
+        sb.append("// SET_FORMATTING_ON");                                                                          //$NON-NLS-1$
+        sb.append("\n");                                                                                            //$NON-NLS-1$
+        sb.append("\n");                                                                                            //$NON-NLS-1$
 
 // SET_FORMATTING_ON
 
@@ -309,27 +313,15 @@ public class CalendarProfile implements Cloneable {
 
 	private String dump_Formatter(final FormatterData[] allFormatterData, final String tourOrWeek) {
 
-//		new FormatterData[] {
-//
-//				new FormatterData(true,		FormatterID.TOUR_TITLE,			_tourFormatter_TourTitle.getDefaultFormat()),
-//				new FormatterData(true,		FormatterID.TOUR_DESCRIPTION,	_tourFormatter_TourDescription.getDefaultFormat()),
-//				new FormatterData(true,		FormatterID.ALTITUDE,			_tourFormatter_Altitude.getDefaultFormat()),
-//				new FormatterData(true,		FormatterID.DISTANCE,			_tourFormatter_Distance.getDefaultFormat()),
-//				new FormatterData(true,		FormatterID.TIME_MOVING,		_tourFormatter_Time_Moving.getDefaultFormat()),
-//				new FormatterData(false,	FormatterID.EMPTY,				ValueFormat.DUMMY_VALUE),
-//				new FormatterData(false,	FormatterID.EMPTY,				ValueFormat.DUMMY_VALUE),
-//				new FormatterData(false,	FormatterID.EMPTY,				ValueFormat.DUMMY_VALUE),
-//			};
-
 		final StringBuilder sb = new StringBuilder();
 
-		sb.append("new FormatterData[] {");
-		sb.append("\n");
-		sb.append("\n");
+		sb.append("new FormatterData[] {"); //$NON-NLS-1$
+		sb.append("\n"); //$NON-NLS-1$
+		sb.append("\n"); //$NON-NLS-1$
 
 		for (final FormatterData formatterData : allFormatterData) {
 
-			final String isEnabled = formatterData.isEnabled ? "true" : "false";
+			final String isEnabled = formatterData.isEnabled ? "true" : "false"; //$NON-NLS-1$ //$NON-NLS-2$
 
 			String formatterID = UI.EMPTY_STRING;
 
@@ -380,15 +372,15 @@ public class CalendarProfile implements Cloneable {
 
 			sb.append(
 					String.format(
-							"\tnew FormatterData(%-10s %-30s ValueFormat.%s),\n",
-							isEnabled + ",",
-							"FormatterID." + formatterID + ",",
+							"\tnew FormatterData(%-10s %-30s ValueFormat.%s),\n", //$NON-NLS-1$
+							isEnabled + ",", //$NON-NLS-1$
+							"FormatterID." + formatterID + ",", //$NON-NLS-1$ //$NON-NLS-2$
 							formatterData.valueFormat.name()));
 
 		}
 
-		sb.append("\n");
-		sb.append("};");
+		sb.append("\n"); //$NON-NLS-1$
+		sb.append("};"); //$NON-NLS-1$
 
 		return sb.toString();
 	}

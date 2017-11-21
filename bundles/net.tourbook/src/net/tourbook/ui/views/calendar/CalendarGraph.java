@@ -1591,7 +1591,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		gc.setClipping(marginRect.x, marginRect.y, marginRect.width, marginRect.height);
 
-		int valuePosY = marginRect.y + 1;
+		int valuePosY = marginRect.y;
 		final int posYBottom = marginRect.y + marginRect.height;
 
 		final int numValueColumns = _currentProfile.tourValueColumns;
@@ -2002,19 +2002,30 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 	private void drawWeek_Summary(	final GC gc,
 									final CalendarTourData calendarTourData,
-									final Rectangle weekRec) {
+									final Rectangle weekRect) {
 
-		final int posXRight = weekRec.x + weekRec.width - 1;
-		final int posXLeft = weekRec.x + 2;
+		final int marginTop = _currentProfile.weekMarginTop;
+		final int marginBottom = _currentProfile.weekMarginBottom;
+		final int marginLeft = _currentProfile.weekMarginLeft;
+		final int marginRight = _currentProfile.weekMarginRight;
 
-		int posY = weekRec.y + 1;
+		final Rectangle marginRect = new Rectangle(//
+				weekRect.x + marginLeft,
+				weekRect.y + marginTop,
+				weekRect.width - marginLeft - marginRight,
+				weekRect.height - marginTop - marginBottom);
 
-		final int maxLength = weekRec.width - 2;
+		final int posXRight = marginRect.x + marginRect.width;
+		final int posXLeft = marginRect.x;
+
+		int posY = marginRect.y;
+
+		final int maxLength = weekRect.width;
 
 		final Font normalFont = gc.getFont();
 
 		gc.setFont(getFont_WeekValue());
-		gc.setClipping(weekRec);
+		gc.setClipping(marginRect);
 
 		gc.setBackground(_calendarBgColor);
 
@@ -2035,7 +2046,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 						formatterData.valueFormat,
 						_currentProfile.isShowWeekValueUnit);
 
-				if (text.length() > 0 && posY < (weekRec.y + weekRec.height)) {
+				if (text.length() > 0 && posY < (marginRect.y + marginRect.height)) {
 
 					final Point textSize = gc.stringExtent(text);
 					int posX = posXRight - textSize.x;
