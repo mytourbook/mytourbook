@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,10 +23,18 @@ public class ValueFormatter_Number_1_2 implements IValueFormatter {
 
 	private final static NumberFormat	_nf2	= NumberFormat.getNumberInstance();
 
-	static {
+
+	public ValueFormatter_Number_1_2() {
 
 		_nf2.setMinimumFractionDigits(2);
 		_nf2.setMaximumFractionDigits(2);
+	}
+
+	public ValueFormatter_Number_1_2(final boolean isGroupingUsed) {
+
+		this();
+
+		_nf2.setGroupingUsed(isGroupingUsed);
 	}
 
 	@Override

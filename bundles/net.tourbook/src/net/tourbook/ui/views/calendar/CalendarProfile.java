@@ -15,6 +15,9 @@
  *******************************************************************************/
 package net.tourbook.ui.views.calendar;
 
+import java.text.NumberFormat;
+import java.util.Locale;
+
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
@@ -26,6 +29,20 @@ import org.eclipse.swt.widgets.Display;
 
 public class CalendarProfile implements Cloneable {
 
+	/**
+	 * <b>VERY IMPORTANT</b>
+	 * <p>
+	 * When using 'simple' formatting WITH the locale de then a , (comma) is set and not a . (dot)
+	 * <p>
+	 * -> this is not a float !!!
+	 */
+	private final static NumberFormat _nf1 = NumberFormat.getNumberInstance(Locale.US);
+	static {
+
+		_nf1.setMinimumFractionDigits(1);
+		_nf1.setMaximumFractionDigits(1);
+	}
+
 	/*
 	 * Set default values also here to ensure that a valid value is set. A default value would not
 	 * be set when an xml tag is not available.
@@ -35,46 +52,48 @@ public class CalendarProfile implements Cloneable {
 	
 	// profile
 	String					id							= Long.toString(System.nanoTime());
+	
 	String					name						= Messages.Calendar_Profile_Name_Default;
 	ProfileDefault			defaultId					= CalendarProfileManager.DEFAULT_PROFILE_DEFAULT_ID;
-	
 	// layout
 	boolean					isToggleMonthColor			= false;
 	boolean					useDraggedScrolling			= false;
 	RGB 					alternateMonthRGB			= CalendarProfileManager.DEFAULT_ALTERNATE_MONTH_RGB;
 	RGB						calendarBackgroundRGB		= CalendarProfileManager.DEFAULT_CALENDAR_BACKGROUND_RGB;
+	
 	RGB						calendarForegroundRGB		= CalendarProfileManager.DEFAULT_CALENDAR_FOREBACKGROUND_RGB;
 	int						weekHeight					= CalendarProfileManager.DEFAULT_WEEK_HEIGHT;
-	
 	// year columns
+	boolean 				isYearColumnWidth			= CalendarProfileManager.DEFAULT_IS_YEAR_COLUMN_WIDTH;
 	boolean 				isShowYearColumns			= true;
 	int						yearColumns					= CalendarProfileManager.DEFAULT_YEAR_COLUMNS;
 	int 					yearColumnsSpacing			= CalendarProfileManager.DEFAULT_YEAR_COLUMNS_SPACING;
 	ColumnStart				yearColumnsStart			= CalendarProfileManager.DEFAULT_YEAR_COLUMNS_LAYOUT;
-	FontData 				yearHeaderFont				= createFont(2.8f, SWT.BOLD);
 
+	int 					yearColumnWidth				= CalendarProfileManager.DEFAULT_YEAR_COLUMN_WIDTH;
+	FontData 				yearHeaderFont				= createFont(2.8f, SWT.BOLD);
 	// date column
 	boolean					isShowDateColumn			= true;
 	DateColumnContent		dateColumnContent			= CalendarProfileManager.DEFAULT_DATE_COLUMN_CONTENT;
+	
 	FontData				dateColumnFont				= createFont(1.7f, SWT.BOLD);
 	int						dateColumnWidth				= CalendarProfileManager.DEFAULT_DATE_COLUMN_WIDTH;
-	
 	// day date
 	boolean					isHideDayDateWhenNoTour		= true;
 	boolean					isShowDayDate				= false;
 	boolean 				isShowDayDateWeekendColor	= CalendarProfileManager.DEFAULT_IS_SHOW_DAY_DATE_WEEKEND_COLOR;
+	
 	FontData				dayDateFont					= createFont(1.2f, SWT.BOLD);
 	DayDateFormat			dayDateFormat				= CalendarProfileManager.DEFAULT_DAY_DATE_FORMAT;
-	
 	// tour background
 	TourBackground			tourBackground				= CalendarProfileManager.DEFAULT_TOUR_BACKGROUND;
 	CalendarColor			tourBackgroundColor1		= CalendarProfileManager.DEFAULT_TOUR_BACKGROUND_COLOR1;
 	CalendarColor			tourBackgroundColor2		= CalendarProfileManager.DEFAULT_TOUR_BACKGROUND_COLOR2;
 	int						tourBackgroundWidth			= CalendarProfileManager.DEFAULT_TOUR_BACKGROUND_WIDTH;
 	TourBorder 				tourBorder					= CalendarProfileManager.DEFAULT_TOUR_BORDER;
+
 	CalendarColor 			tourBorderColor				= CalendarProfileManager.DEFAULT_TOUR_BORDER_COLOR;
 	int		 				tourBorderWidth				= CalendarProfileManager.DEFAULT_TOUR_BORDER_WIDTH;
-
 	// tour content
 	boolean 				isShowTourContent			= true;
 	boolean					isShowTourValueUnit			= true;
@@ -90,22 +109,24 @@ public class CalendarProfile implements Cloneable {
 	FontData				tourTitleFont				= createFont(1.2f, SWT.BOLD);
 	int						tourTruncatedLines			= CalendarProfileManager.DEFAULT_TOUR_TRUNCATED_LINES;
 	CalendarColor			tourValueColor				= CalendarProfileManager.DEFAULT_TOUR_COLOR;
+
 	int 					tourValueColumns			= CalendarProfileManager.DEFAULT_TOUR_VALUE_COLUMNS;
 	FontData				tourValueFont				= createFont(1.1f, SWT.BOLD);
-
 	// week summary column
 	boolean					isShowSummaryColumn			= true;
 	boolean 				isShowWeekValueUnit			= true;
 	FormatterData[]			allWeekFormatterData		= CalendarProfileManager.DEFAULT_WEEK_FORMATTER_DATA;
-	int						weekColumnWidth				= CalendarProfileManager.DEFAULT_SUMMARY_COLUMN_WIDTH;
+	int						weekColumnWidth				= CalendarProfileManager.DEFAULT_WEEK_COLUMN_WIDTH;
 	int						weekMarginTop				= CalendarProfileManager.DEFAULT_WEEK_MARGIN_TOP;
 	int						weekMarginLeft				= CalendarProfileManager.DEFAULT_WEEK_MARGIN_LEFT;
 	int						weekMarginBottom			= CalendarProfileManager.DEFAULT_WEEK_MARGIN_BOTTOM;
 	int						weekMarginRight				= CalendarProfileManager.DEFAULT_WEEK_MARGIN_RIGHT;
-	CalendarColor			weekValueColor				= CalendarProfileManager.DEFAULT_WEEK_VALUE_COLOR;
-	FontData 				weekValueFont				= createFont(1.2f, SWT.BOLD);
 
 // SET_FORMATTING_ON
+
+	CalendarColor		weekValueColor				= CalendarProfileManager.DEFAULT_WEEK_VALUE_COLOR;
+
+	FontData			weekValueFont				= createFont(1.2f, SWT.BOLD);
 
 	/**
 	 * @param relSize
@@ -198,6 +219,12 @@ public class CalendarProfile implements Cloneable {
 		final StringBuilder sb = new StringBuilder();
 
 // SET_FORMATTING_OFF
+//		boolean 				isYearColumnWidth			= CalendarProfileManager.DEFAULT_IS_YEAR_COLUMN_WIDTH;
+//		boolean 				isShowYearColumns			= true;
+//		int						yearColumns					= CalendarProfileManager.DEFAULT_YEAR_COLUMNS;
+//		int 					yearColumnsSpacing			= CalendarProfileManager.DEFAULT_YEAR_COLUMNS_SPACING;
+//		ColumnStart				yearColumnsStart			= CalendarProfileManager.DEFAULT_YEAR_COLUMNS_LAYOUT;
+//		int 					yearColumnWidth				= CalendarProfileManager.DEFAULT_YEAR_COLUMN_WIDTH;
 
         sb.append("\n");                                                                                            //$NON-NLS-1$
         sb.append("\n");                                                                                            //$NON-NLS-1$
@@ -218,9 +245,11 @@ public class CalendarProfile implements Cloneable {
         sb.append("                                                                                           \n"); //$NON-NLS-1$
         sb.append("// year columns                                                                            \n"); //$NON-NLS-1$
         sb.append("profile.isShowYearColumns             = " + isShowYearColumns                          + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.isYearColumnWidth             = " + isYearColumnWidth                          + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.yearColumns                   = " + yearColumns                                + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.yearColumnsSpacing            = " + yearColumnsSpacing                         + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.yearColumnsStart              = ColumnStart." + yearColumnsStart               + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.yearColumnWidth               = " + yearColumnWidth                            + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.yearHeaderFont                = " + dump_Font(yearHeaderFont)                  + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("                                                                                           \n"); //$NON-NLS-1$
         sb.append("// date column                                                                             \n"); //$NON-NLS-1$
@@ -251,7 +280,7 @@ public class CalendarProfile implements Cloneable {
         sb.append("profile.isTruncateTourText            = " + isTruncateTourText                         + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.tourContentColor              = CalendarColor." + tourContentColor             + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.tourContentFont               = " + dump_Font(tourContentFont)                 + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
-        sb.append("profile.tourMarginTop	             = " + tourMarginTop                              + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.tourMarginTop                 = " + tourMarginTop                              + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.tourMarginLeft                = " + tourMarginLeft                             + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.tourMarginBottom              = " + tourMarginBottom                           + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.tourMarginRight               = " + tourMarginRight                            + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -266,7 +295,7 @@ public class CalendarProfile implements Cloneable {
         sb.append("profile.isShowSummaryColumn           = " + isShowSummaryColumn                        + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.isShowWeekValueUnit           = " + isShowWeekValueUnit                        + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.weekColumnWidth               = " + weekColumnWidth                            + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
-        sb.append("profile.weekMarginTop	             = " + weekMarginTop                              + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.weekMarginTop                 = " + weekMarginTop                              + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.weekMarginLeft                = " + weekMarginLeft                             + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.weekMarginBottom              = " + weekMarginBottom                           + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.weekMarginRight               = " + weekMarginRight                            + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -296,6 +325,7 @@ public class CalendarProfile implements Cloneable {
 		final FontData systemFontData = allSystemFontData[0];
 
 		final float fontHeight = (float) fontData.getHeight() / (float) systemFontData.getHeight() + 0.05f;
+		final String fontHeightText = _nf1.format(fontHeight);
 
 		final int fontStyle = fontData.getStyle();
 		String fontStyleText;
@@ -308,7 +338,7 @@ public class CalendarProfile implements Cloneable {
 			fontStyleText = "SWT.NORMAL"; //$NON-NLS-1$
 		}
 
-		return String.format("CalendarProfile.createFont(%.1ff, %s)", fontHeight, fontStyleText); //$NON-NLS-1$
+		return String.format("CalendarProfile.createFont(%sf, %s)", fontHeightText, fontStyleText); //$NON-NLS-1$
 	}
 
 	private String dump_Formatter(final FormatterData[] allFormatterData, final String tourOrWeek) {

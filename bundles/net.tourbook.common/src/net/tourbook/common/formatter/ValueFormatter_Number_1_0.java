@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,12 +21,19 @@ import net.tourbook.common.Messages;
 
 public class ValueFormatter_Number_1_0 implements IValueFormatter {
 
-	private final static NumberFormat	_nf0	= NumberFormat.getNumberInstance();
+	private final NumberFormat _nf0 = NumberFormat.getNumberInstance();
 
-	static {
+	public ValueFormatter_Number_1_0() {
 
 		_nf0.setMinimumFractionDigits(0);
 		_nf0.setMaximumFractionDigits(0);
+	}
+
+	public ValueFormatter_Number_1_0(final boolean isGroupingUsed) {
+
+		this();
+
+		_nf0.setGroupingUsed(isGroupingUsed);
 	}
 
 	@Override

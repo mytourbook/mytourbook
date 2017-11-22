@@ -104,6 +104,7 @@ public class CalendarProfileManager {
 	private static final String				ATTR_IS_SHOW_WEEK_VALUE_UNIT			= "isShowWeekValueUnit";			//$NON-NLS-1$
 	private static final String				ATTR_IS_TOGGLE_MONTH_COLOR				= "isToggleMonthColor";				//$NON-NLS-1$
 	private static final String				ATTR_IS_TRUNCATE_TOUR_TEXT				= "isTruncateTourText";				//$NON-NLS-1$
+	private static final String				ATTR_IS_YEAR_COLUMN_WIDTH				= "isYearColumnWidth";				//$NON-NLS-1$
 	private static final String				ATTR_PROFILE_DEFAULT_ID					= "profileDefaultId";				//$NON-NLS-1$
 	private static final String				ATTR_DATE_COLUMN_CONTENT				= "dateColumnContent";				//$NON-NLS-1$
 	private static final String				ATTR_DATE_COLUMN_FONT					= "dateColumnFont";					//$NON-NLS-1$
@@ -143,6 +144,7 @@ public class CalendarProfileManager {
 	private static final String				ATTR_YEAR_COLUMNS						= "yearColumns";					//$NON-NLS-1$
 	private static final String				ATTR_YEAR_COLUMNS_SPACING				= "yearColumnsSpacing";				//$NON-NLS-1$
 	private static final String				ATTR_YEAR_COLUMNS_START					= "yearColumnsStart";				//$NON-NLS-1$
+	private static final String				ATTR_YEAR_COLUMN_WIDTH					= "yearColumnWidth";				//$NON-NLS-1$
 	private static final String				ATTR_YEAR_HEADER_FONT					= "yearHeaderFont";					//$NON-NLS-1$
 	//
 	static final RGB						DEFAULT_ALTERNATE_MONTH_RGB				= new RGB(0xf0, 0xf0, 0xf0);
@@ -155,7 +157,10 @@ public class CalendarProfileManager {
 	static final DataFormatter				DEFAULT_EMPTY_FORMATTER;
 	static final boolean					DEFAULT_IS_SHOW_DAY_DATE_WEEKEND_COLOR	= false;
 	static final boolean					DEFAULT_IS_TRUNCATE_TOUR_TEXT			= true;
-	static final int						DEFAULT_SUMMARY_COLUMN_WIDTH			= 100;
+	static final boolean					DEFAULT_IS_YEAR_COLUMN_WIDTH			= false;
+	static final int						DEFAULT_MARGIN_MIN						= -20;
+	static final int						DEFAULT_MARGIN_MAX						= 20;
+	static final int						DEFAULT_WEEK_COLUMN_WIDTH				= 100;
 	static final TourBackground				DEFAULT_TOUR_BACKGROUND					= TourBackground.FILL;
 	static final CalendarColor				DEFAULT_TOUR_BACKGROUND_COLOR1			= CalendarColor.DARK;
 	static final CalendarColor				DEFAULT_TOUR_BACKGROUND_COLOR2			= CalendarColor.BRIGHT;
@@ -176,6 +181,7 @@ public class CalendarProfileManager {
 	static final int						DEFAULT_WEEK_MARGIN_BOTTOM				= 1;
 	static final int						DEFAULT_WEEK_MARGIN_RIGHT				= -3;
 	static final CalendarColor				DEFAULT_WEEK_VALUE_COLOR				= CalendarColor.BRIGHT;
+	static final int						DEFAULT_YEAR_COLUMN_WIDTH				= 200;
 	static final int						DEFAULT_YEAR_COLUMNS					= 1;
 	static final ColumnStart				DEFAULT_YEAR_COLUMNS_LAYOUT				= ColumnStart.CONTINUOUSLY;
 	static final int						DEFAULT_YEAR_COLUMNS_SPACING			= 30;
@@ -185,20 +191,29 @@ public class CalendarProfileManager {
 	static final int						NUM_DEFAULT_TOUR_FORMATTER;
 	static final int						NUM_DEFAULT_WEEK_FORMATTER;
 	//
-	static final int						YEAR_COLUMNS_MIN						= 1;
-	static final int						YEAR_COLUMNS_MAX						= 100;
+	/*
+	 * min / MAX values
+	 */
 	static final int						CALENDAR_COLUMNS_SPACE_MIN				= 0;
 	static final int						CALENDAR_COLUMNS_SPACE_MAX				= 300;
+	static final int						DATE_COLUMN_WIDTH_MIN					= 1;
+	static final int						DATE_COLUMN_WIDTH_MAX					= 200;
+	static final int						TOUR_BACKGROUND_WIDTH_MIN				= 0;
+	static final int						TOUR_BACKGROUND_WIDTH_MAX				= 100;
+	static final int						TOUR_BORDER_WIDTH_MIN					= 0;
+	static final int						TOUR_BORDER_WIDTH_MAX					= 100;
+	static final int						TOUR_TRUNCATED_LINES_MIN				= 1;
+	static final int						TOUR_TRUNCATED_LINES_MAX				= 10;
+	static final int						TOUR_VALUE_COLUMNS_MIN					= 1;
+	static final int						TOUR_VALUE_COLUMNS_MAX					= 5;
+	static final int						WEEK_COLUMN_WIDTH_MIN					= 1;
+	static final int						WEEK_COLUMN_WIDTH_MAX					= 200;
 	static final int						WEEK_HEIGHT_MIN							= 1;
 	static final int						WEEK_HEIGHT_MAX							= 500;
-
-	private static final IValueFormatter	_valueFormatter_Number_1_0				= new ValueFormatter_Number_1_0();
-	private static final IValueFormatter	_valueFormatter_Number_1_1				= new ValueFormatter_Number_1_1();
-	private static final IValueFormatter	_valueFormatter_Number_1_2				= new ValueFormatter_Number_1_2();
-	private static final IValueFormatter	_valueFormatter_Number_1_3				= new ValueFormatter_Number_1_3();
-	private static final IValueFormatter	_valueFormatter_Time_HH					= new ValueFormatter_Time_HH();
-	private static final IValueFormatter	_valueFormatter_Time_HHMM				= new ValueFormatter_Time_HHMM();
-	private static final IValueFormatter	_valueFormatter_Time_HHMMSS				= new ValueFormatter_Time_HHMMSS();
+	static final int						YEAR_COLUMNS_MIN						= 1;
+	static final int						YEAR_COLUMNS_MAX						= 100;
+	static final int						YEAR_COLUMN_WIDTH_MIN					= 5;
+	static final int						YEAR_COLUMN_WIDTH_MAX					= 10000;
 
 	private static final DataFormatter		_tourFormatter_Altitude;
 	private static final DataFormatter		_tourFormatter_Distance;
@@ -223,13 +238,18 @@ public class CalendarProfileManager {
 
 // SET_FORMATTING_OFF
 	//
+	private static final IValueFormatter	_valueFormatter_Number_1_0				= new ValueFormatter_Number_1_0(false);
+	private static final IValueFormatter	_valueFormatter_Number_1_1				= new ValueFormatter_Number_1_1(false);
+	private static final IValueFormatter	_valueFormatter_Number_1_2				= new ValueFormatter_Number_1_2(false);
+	private static final IValueFormatter	_valueFormatter_Number_1_3				= new ValueFormatter_Number_1_3(false);
+	private static final IValueFormatter	_valueFormatter_Time_HH					= new ValueFormatter_Time_HH();
+	private static final IValueFormatter	_valueFormatter_Time_HHMM				= new ValueFormatter_Time_HHMM();
+	private static final IValueFormatter	_valueFormatter_Time_HHMMSS				= new ValueFormatter_Time_HHMMSS();
+	//
 	static {
 
 		DEFAULT_CALENDAR_BACKGROUND_RGB         = new RGB (59, 59, 59);
 		DEFAULT_CALENDAR_FOREBACKGROUND_RGB     = new RGB (197, 197, 197);
-
-//		DEFAULT_CALENDAR_BACKGROUND_RGB			= Display.getCurrent().getSystemColor(SWT.COLOR_LIST_BACKGROUND).getRGB();
-//		DEFAULT_CALENDAR_FOREBACKGROUND_RGB		= Display.getCurrent().getSystemColor(SWT.COLOR_LIST_FOREGROUND).getRGB();
 
 		/*
 		 * Formatter
@@ -1319,7 +1339,6 @@ public class CalendarProfileManager {
 
 		// SET_FORMATTING_ON
 
-
 		return profile;
 	}
 
@@ -1341,19 +1360,21 @@ public class CalendarProfileManager {
 		profile.alternateMonthRGB             = new RGB (83, 83, 83);
 		profile.calendarBackgroundRGB         = new RGB (59, 59, 59);
 		profile.calendarForegroundRGB         = new RGB (255, 255, 255);
-		profile.weekHeight                    = 16;
+		profile.weekHeight                    = 15;
 		                                                                                           
 		// year columns
 		profile.isShowYearColumns             = true;
+		profile.isYearColumnWidth             = false;
 		profile.yearColumns                   = 5;
 		profile.yearColumnsSpacing            = 10;
 		profile.yearColumnsStart              = ColumnStart.JAN;
-		profile.yearHeaderFont                = CalendarProfile.createFont(0.9f, SWT.BOLD);
+		profile.yearColumnWidth               = 200;
+		profile.yearHeaderFont                = CalendarProfile.createFont(1.7f, SWT.BOLD);
 		                                                                                           
 		// date column
 		profile.isShowDateColumn              = false;
 		profile.dateColumnContent             = DateColumnContent.YEAR;
-		profile.dateColumnFont                = CalendarProfile.createFont(0.9f, SWT.NORMAL);
+		profile.dateColumnFont                = CalendarProfile.createFont(1.7f, SWT.BOLD);
 		profile.dateColumnWidth               = 5;
 		                                                                                           
 		// day date
@@ -1373,12 +1394,12 @@ public class CalendarProfileManager {
 		profile.tourBorderWidth               = 1;
 		                                                                                           
 		// tour content
-		profile.isShowTourContent             = true;
+		profile.isShowTourContent             = false;
 		profile.isShowTourValueUnit           = false;
 		profile.isTruncateTourText            = false;
 		profile.tourContentColor              = CalendarColor.CONTRAST;
 		profile.tourContentFont               = CalendarProfile.createFont(0.9f, SWT.NORMAL);
-		profile.tourMarginTop	             = 1;
+		profile.tourMarginTop                 = 1;
 		profile.tourMarginLeft                = 0;
 		profile.tourMarginBottom              = 0;
 		profile.tourMarginRight               = -7;
@@ -1387,13 +1408,13 @@ public class CalendarProfileManager {
 		profile.tourTruncatedLines            = 1;
 		profile.tourValueColor                = CalendarColor.CONTRAST;
 		profile.tourValueColumns              = 1;
-		profile.tourValueFont                 = CalendarProfile.createFont(0.8f, SWT.NORMAL);
+		profile.tourValueFont                 = CalendarProfile.createFont(1.0f, SWT.BOLD);
 		                                                                                           
 		// week summary column
 		profile.isShowSummaryColumn           = true;
 		profile.isShowWeekValueUnit           = false;
 		profile.weekColumnWidth               = 40;
-		profile.weekMarginTop	             = -2;
+		profile.weekMarginTop                 = -2;
 		profile.weekMarginLeft                = 0;
 		profile.weekMarginBottom              = 0;
 		profile.weekMarginRight               = 0;
@@ -1438,38 +1459,38 @@ public class CalendarProfileManager {
 
 		// SET_FORMATTING_OFF
 
-//		                                     Crazy
+//		                                      Crazy
 
 		profile.defaultId                     = ProfileDefault.CRAZY;
 
 		// layout
 		profile.isToggleMonthColor            = false;
 		profile.useDraggedScrolling           = false;
-		profile.alternateMonthRGB             = new RGB (240, 240, 240);
+		profile.alternateMonthRGB             = new RGB (30, 30, 30);
 		profile.calendarBackgroundRGB         = new RGB (0, 0, 0);
 		profile.calendarForegroundRGB         = new RGB (114, 114, 114);
-		profile.weekHeight                    = 13;
-		                                                                                         
+		profile.weekHeight                    = 10;
+		                                                                                           
 		// year columns
 		profile.isShowYearColumns             = true;
 		profile.yearColumns                   = 20;
 		profile.yearColumnsSpacing            = 0;
 		profile.yearColumnsStart              = ColumnStart.JAN;
-		profile.yearHeaderFont                = CalendarProfile.createFont(1.6f, SWT.BOLD);
-		                                                                                         
+		profile.yearHeaderFont                = CalendarProfile.createFont(1.4f, SWT.BOLD);
+		                                                                                           
 		// date column
 		profile.isShowDateColumn              = false;
 		profile.dateColumnContent             = DateColumnContent.MONTH;
 		profile.dateColumnFont                = CalendarProfile.createFont(1.5f, SWT.BOLD);
 		profile.dateColumnWidth               = 50;
-		                                                                                         
+		                                                                                           
 		// day date
 		profile.isHideDayDateWhenNoTour       = true;
 		profile.isShowDayDate                 = false;
 		profile.isShowDayDateWeekendColor     = false;
 		profile.dayDateFont                   = CalendarProfile.createFont(1.2f, SWT.BOLD);
 		profile.dayDateFormat                 = DayDateFormat.DAY;
-		                                                                                         
+		                                                                                           
 		// tour background
 		profile.tourBackground                = TourBackground.FILL;
 		profile.tourBackgroundColor1          = CalendarColor.DARK;
@@ -1478,26 +1499,59 @@ public class CalendarProfileManager {
 		profile.tourBorder                    = TourBorder.BORDER_ALL;
 		profile.tourBorderColor               = CalendarColor.DARK;
 		profile.tourBorderWidth               = 1;
-		                                                                                         
+		                                                                                           
 		// tour content
 		profile.isShowTourContent             = false;
 		profile.isShowTourValueUnit           = true;
 		profile.isTruncateTourText            = true;
 		profile.tourContentColor              = CalendarColor.CONTRAST;
 		profile.tourContentFont               = CalendarProfile.createFont(0.9f, SWT.NORMAL);
+		profile.tourMarginTop	             = -3;
+		profile.tourMarginLeft                = 1;
+		profile.tourMarginBottom              = 1;
+		profile.tourMarginRight               = -3;
 		profile.tourTitleColor                = CalendarColor.CONTRAST;
 		profile.tourTitleFont                 = CalendarProfile.createFont(1.2f, SWT.BOLD);
 		profile.tourTruncatedLines            = 2;
 		profile.tourValueColor                = CalendarColor.CONTRAST;
 		profile.tourValueColumns              = 2;
 		profile.tourValueFont                 = CalendarProfile.createFont(1.0f, SWT.NORMAL);
-		                                                                                         
+		                                                                                           
 		// week summary column
 		profile.isShowSummaryColumn           = false;
 		profile.isShowWeekValueUnit           = true;
 		profile.weekColumnWidth               = 60;
+		profile.weekMarginTop	             = -3;
+		profile.weekMarginLeft                = 1;
+		profile.weekMarginBottom              = 1;
+		profile.weekMarginRight               = -3;
 		profile.weekValueColor                = CalendarColor.TEXT;
 		profile.weekValueFont                 = CalendarProfile.createFont(1.2f, SWT.BOLD);
+
+
+		profile.allTourFormatterData          = new FormatterData[] {
+
+			new FormatterData(true,      FormatterID.TOUR_TITLE,        ValueFormat.DUMMY_VALUE),
+			new FormatterData(true,      FormatterID.TOUR_DESCRIPTION,  ValueFormat.DUMMY_VALUE),
+			new FormatterData(true,      FormatterID.ALTITUDE,          ValueFormat.NUMBER_1_0),
+			new FormatterData(true,      FormatterID.DISTANCE,          ValueFormat.NUMBER_1_0),
+			new FormatterData(true,      FormatterID.TIME_MOVING,       ValueFormat.TIME_HH_MM),
+			new FormatterData(false,     FormatterID.EMPTY,             ValueFormat.DUMMY_VALUE),
+			new FormatterData(false,     FormatterID.EMPTY,             ValueFormat.DUMMY_VALUE),
+			new FormatterData(false,     FormatterID.EMPTY,             ValueFormat.DUMMY_VALUE),
+
+		};;
+
+		profile.allWeekFormatterData          = new FormatterData[] {
+
+			new FormatterData(true,      FormatterID.ALTITUDE,          ValueFormat.NUMBER_1_0),
+			new FormatterData(true,      FormatterID.DISTANCE,          ValueFormat.NUMBER_1_0),
+			new FormatterData(true,      FormatterID.SPEED,             ValueFormat.NUMBER_1_0),
+			new FormatterData(true,      FormatterID.PACE,              ValueFormat.PACE_MM_SS),
+			new FormatterData(true,      FormatterID.TIME_MOVING,       ValueFormat.TIME_HH_MM),
+			new FormatterData(false,     FormatterID.EMPTY,             ValueFormat.DUMMY_VALUE),
+
+		};;
 
 		// SET_FORMATTING_ON
 
@@ -1927,9 +1981,11 @@ public class CalendarProfileManager {
 		
 		// year columns
 		profile.isShowYearColumns			= Util.getXmlBoolean(xmlProfile, 					ATTR_IS_SHOW_YEAR_COLUMNS,		true);
+		profile.isYearColumnWidth			= Util.getXmlBoolean(xmlProfile, 					ATTR_IS_YEAR_COLUMN_WIDTH,		DEFAULT_IS_YEAR_COLUMN_WIDTH);
 		profile.yearColumns					= Util.getXmlInteger(xmlProfile,					ATTR_YEAR_COLUMNS,				DEFAULT_YEAR_COLUMNS);
 		profile.yearColumnsSpacing			= Util.getXmlInteger(xmlProfile, 					ATTR_YEAR_COLUMNS_SPACING,		DEFAULT_YEAR_COLUMNS_SPACING);
 		profile.yearColumnsStart			= (ColumnStart) Util.getXmlEnum(xmlProfile,			ATTR_YEAR_COLUMNS_START,		DEFAULT_YEAR_COLUMNS_LAYOUT);
+		profile.yearColumnWidth				= Util.getXmlInteger(xmlProfile, 					ATTR_YEAR_COLUMN_WIDTH,			DEFAULT_YEAR_COLUMN_WIDTH);
 		profile.yearHeaderFont				= Util.getXmlFont(xmlProfile, 						ATTR_YEAR_HEADER_FONT,			defaultFont.getFontData()[0]);
 		
 		// date column
@@ -1946,8 +2002,8 @@ public class CalendarProfileManager {
 		profile.dayDateFormat				= (DayDateFormat) Util.getXmlEnum(xmlProfile,		ATTR_DAY_DATE_FORMAT,					DEFAULT_DAY_DATE_FORMAT);
 		                                    
 		// day content
-		profile.tourBackgroundWidth			= Util.getXmlInteger(xmlProfile, 					ATTR_TOUR_BACKGROUND_WIDTH, 	DEFAULT_TOUR_BACKGROUND_WIDTH, 1, 100);
-		profile.tourBorderWidth				= Util.getXmlInteger(xmlProfile, 					ATTR_TOUR_BORDER_WIDTH,		 	DEFAULT_TOUR_BORDER_WIDTH, 1, 100);
+		profile.tourBackgroundWidth			= Util.getXmlInteger(xmlProfile, 					ATTR_TOUR_BACKGROUND_WIDTH, 	DEFAULT_TOUR_BACKGROUND_WIDTH,	TOUR_BACKGROUND_WIDTH_MIN,	TOUR_BACKGROUND_WIDTH_MAX);
+		profile.tourBorderWidth				= Util.getXmlInteger(xmlProfile, 					ATTR_TOUR_BORDER_WIDTH,		 	DEFAULT_TOUR_BORDER_WIDTH,		TOUR_BORDER_WIDTH_MIN,		TOUR_BORDER_WIDTH_MAX);
 		profile.tourBackground 				= (TourBackground) Util.getXmlEnum(xmlProfile,		ATTR_TOUR_BACKGROUND,			DEFAULT_TOUR_BACKGROUND);
 		profile.tourBackgroundColor1 		= (CalendarColor) Util.getXmlEnum(xmlProfile,		ATTR_TOUR_BACKGROUND_COLOR1,	DEFAULT_TOUR_BACKGROUND_COLOR1);
 		profile.tourBackgroundColor2 		= (CalendarColor) Util.getXmlEnum(xmlProfile,		ATTR_TOUR_BACKGROUND_COLOR2,	DEFAULT_TOUR_BACKGROUND_COLOR2);
@@ -1960,25 +2016,25 @@ public class CalendarProfileManager {
 		profile.isTruncateTourText			= Util.getXmlBoolean(xmlProfile, 					ATTR_IS_TRUNCATE_TOUR_TEXT,		DEFAULT_IS_TRUNCATE_TOUR_TEXT);
 		profile.tourContentColor			= (CalendarColor) Util.getXmlEnum(xmlProfile,		ATTR_TOUR_CONTENT_COLOR,		DEFAULT_TOUR_COLOR);
 		profile.tourContentFont 			= Util.getXmlFont(xmlProfile, 						ATTR_TOUR_CONTENT_FONT, 		defaultFont.getFontData()[0]);
-		profile.tourMarginTop				= Util.getXmlInteger(xmlProfile, 					ATTR_TOUR_MARGIN_TOP,			DEFAULT_TOUR_MARGIN_TOP, 0, 9);
-		profile.tourMarginLeft				= Util.getXmlInteger(xmlProfile, 					ATTR_TOUR_MARGIN_LEFT,			DEFAULT_TOUR_MARGIN_LEFT, 0, 9);
-		profile.tourMarginBottom			= Util.getXmlInteger(xmlProfile, 					ATTR_TOUR_MARGIN_BOTTOM,		DEFAULT_TOUR_MARGIN_BOTTOM, 0, 9);
-		profile.tourMarginRight				= Util.getXmlInteger(xmlProfile, 					ATTR_TOUR_MARGIN_RIGHT,			DEFAULT_TOUR_MARGIN_RIGHT, 0, 9);
+		profile.tourMarginTop				= Util.getXmlInteger(xmlProfile, 					ATTR_TOUR_MARGIN_TOP,			DEFAULT_TOUR_MARGIN_TOP,		DEFAULT_MARGIN_MIN, DEFAULT_MARGIN_MAX);
+		profile.tourMarginLeft				= Util.getXmlInteger(xmlProfile, 					ATTR_TOUR_MARGIN_LEFT,			DEFAULT_TOUR_MARGIN_LEFT,		DEFAULT_MARGIN_MIN, DEFAULT_MARGIN_MAX);
+		profile.tourMarginBottom			= Util.getXmlInteger(xmlProfile, 					ATTR_TOUR_MARGIN_BOTTOM,		DEFAULT_TOUR_MARGIN_BOTTOM,		DEFAULT_MARGIN_MIN, DEFAULT_MARGIN_MAX);
+		profile.tourMarginRight				= Util.getXmlInteger(xmlProfile, 					ATTR_TOUR_MARGIN_RIGHT,			DEFAULT_TOUR_MARGIN_RIGHT,		DEFAULT_MARGIN_MIN, DEFAULT_MARGIN_MAX);
 		profile.tourTitleColor				= (CalendarColor) Util.getXmlEnum(xmlProfile,		ATTR_TOUR_TITLE_COLOR,			DEFAULT_TOUR_COLOR);
 		profile.tourTitleFont 				= Util.getXmlFont(xmlProfile, 						ATTR_TOUR_TITLE_FONT, 			defaultFont.getFontData()[0]);
-		profile.tourTruncatedLines			= Util.getXmlInteger(xmlProfile, 					ATTR_TOUR_TRUNCATED_LINES,	 	DEFAULT_TOUR_TRUNCATED_LINES, 1, 10);
-		profile.tourValueColumns			= Util.getXmlInteger(xmlProfile, 					ATTR_TOUR_VALUE_COLUMNS,	 	DEFAULT_TOUR_VALUE_COLUMNS, 1, 3);
+		profile.tourTruncatedLines			= Util.getXmlInteger(xmlProfile, 					ATTR_TOUR_TRUNCATED_LINES,	 	DEFAULT_TOUR_TRUNCATED_LINES,	TOUR_TRUNCATED_LINES_MIN,	TOUR_TRUNCATED_LINES_MAX);
+		profile.tourValueColumns			= Util.getXmlInteger(xmlProfile, 					ATTR_TOUR_VALUE_COLUMNS,	 	DEFAULT_TOUR_VALUE_COLUMNS,		TOUR_VALUE_COLUMNS_MIN,		TOUR_VALUE_COLUMNS_MAX);
 		profile.tourValueFont				= Util.getXmlFont(xmlProfile, 						ATTR_TOUR_VALUE_FONT, 			defaultFont.getFontData()[0]);
 		profile.tourValueColor				= (CalendarColor) Util.getXmlEnum(xmlProfile,		ATTR_TOUR_VALUE_COLOR,			DEFAULT_TOUR_COLOR);
 		
 		// week summary column
 		profile.isShowSummaryColumn			= Util.getXmlBoolean(xmlProfile, 					ATTR_IS_SHOW_SUMMARY_COLUMN,	true);
 		profile.isShowWeekValueUnit			= Util.getXmlBoolean(xmlProfile, 					ATTR_IS_SHOW_WEEK_VALUE_UNIT,	true);
-		profile.weekColumnWidth				= Util.getXmlInteger(xmlProfile, 					ATTR_WEEK_COLUMN_WIDTH,			DEFAULT_SUMMARY_COLUMN_WIDTH);
-		profile.weekMarginTop				= Util.getXmlInteger(xmlProfile, 					ATTR_WEEK_MARGIN_TOP,			DEFAULT_WEEK_MARGIN_TOP, 0, 9);
-		profile.weekMarginLeft				= Util.getXmlInteger(xmlProfile, 					ATTR_WEEK_MARGIN_LEFT,			DEFAULT_WEEK_MARGIN_LEFT, 0, 9);
-		profile.weekMarginBottom			= Util.getXmlInteger(xmlProfile, 					ATTR_WEEK_MARGIN_BOTTOM,		DEFAULT_WEEK_MARGIN_BOTTOM, 0, 9);
-		profile.weekMarginRight				= Util.getXmlInteger(xmlProfile, 					ATTR_WEEK_MARGIN_RIGHT,			DEFAULT_WEEK_MARGIN_RIGHT, 0, 9);
+		profile.weekColumnWidth				= Util.getXmlInteger(xmlProfile, 					ATTR_WEEK_COLUMN_WIDTH,			DEFAULT_WEEK_COLUMN_WIDTH);
+		profile.weekMarginTop				= Util.getXmlInteger(xmlProfile, 					ATTR_WEEK_MARGIN_TOP,			DEFAULT_WEEK_MARGIN_TOP,		DEFAULT_MARGIN_MIN, DEFAULT_MARGIN_MAX);
+		profile.weekMarginLeft				= Util.getXmlInteger(xmlProfile, 					ATTR_WEEK_MARGIN_LEFT,			DEFAULT_WEEK_MARGIN_LEFT,		DEFAULT_MARGIN_MIN, DEFAULT_MARGIN_MAX);
+		profile.weekMarginBottom			= Util.getXmlInteger(xmlProfile, 					ATTR_WEEK_MARGIN_BOTTOM,		DEFAULT_WEEK_MARGIN_BOTTOM,		DEFAULT_MARGIN_MIN, DEFAULT_MARGIN_MAX);
+		profile.weekMarginRight				= Util.getXmlInteger(xmlProfile, 					ATTR_WEEK_MARGIN_RIGHT,			DEFAULT_WEEK_MARGIN_RIGHT,		DEFAULT_MARGIN_MIN, DEFAULT_MARGIN_MAX);
 		profile.weekValueColor		 		= (CalendarColor) Util.getXmlEnum(xmlProfile,		ATTR_WEEK_VALUE_COLOR,			DEFAULT_WEEK_VALUE_COLOR);
 		profile.weekValueFont				= Util.getXmlFont(xmlProfile, 						ATTR_WEEK_VALUE_FONT,			defaultFont.getFontData()[0]);
 
@@ -2056,8 +2112,10 @@ public class CalendarProfileManager {
 		
 		// year columns
 		xmlProfile.putBoolean(		ATTR_IS_SHOW_YEAR_COLUMNS, 				profile.isShowYearColumns);
+		xmlProfile.putBoolean(		ATTR_IS_YEAR_COLUMN_WIDTH, 				profile.isYearColumnWidth);
 		xmlProfile.putInteger(		ATTR_YEAR_COLUMNS, 						profile.yearColumns);
 		xmlProfile.putInteger(		ATTR_YEAR_COLUMNS_SPACING, 				profile.yearColumnsSpacing);
+		xmlProfile.putInteger(		ATTR_YEAR_COLUMN_WIDTH, 				profile.yearColumnWidth);
 		Util.setXmlEnum(xmlProfile,	ATTR_YEAR_COLUMNS_START, 				profile.yearColumnsStart);
 		Util.setXmlFont(xmlProfile,	ATTR_YEAR_HEADER_FONT, 					profile.yearHeaderFont);
 		

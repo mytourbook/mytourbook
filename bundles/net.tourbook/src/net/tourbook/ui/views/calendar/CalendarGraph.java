@@ -140,7 +140,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	/** Visible weeks in one column */
 	private int									_numWeeksInOneColumn;
 	//
-	private boolean								_isYearColumn;
 	private boolean								_isScrollbarInitialized;
 	private boolean								_isInUpdateScrollbar;
 	/**
@@ -927,21 +926,17 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		_calendarImage = new Image(getDisplay(), canvasWidth, canvasHeight);
 
-		_isYearColumn = _currentProfile.isShowYearColumns;
-
-		// one col left and right of the week + 7 week days
-		final int numYearColumns = _isYearColumn ? _currentProfile.yearColumns : 1;
-		final int numDayColumns = 7;
+		final boolean isYearColumn = _currentProfile.isShowYearColumns;
 
 		final int weekHeight = _currentProfile.weekHeight;
 
 		// set year header font
 		getFont_YearHeader();
 
-		final int yearHeaderHeight = _isYearColumn ? _fontHeight_YearHeader + 20 : 0;
+		final int yearHeaderHeight = isYearColumn ? _fontHeight_YearHeader + 20 : 0;
 		int numVisibleRows = (canvasHeight - yearHeaderHeight) / weekHeight;
 
-		if (_isYearColumn) {
+		if (isYearColumn) {
 
 			// adjust column start
 
@@ -984,37 +979,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		_numWeeksInOneColumn = numVisibleRows;
 
-		LocalDate currentDate = _firstViewportDay.toLocalDate();
-
-		/*
-		 * Set calendar viewport dates
-		 */
-		_calendarFirstDay = currentDate;
-
-		if (_isYearColumn) {
-
-			if (_currentProfile.yearColumnsStart == ColumnStart.CONTINUOUSLY) {
-
-				_calendarLastDay = _calendarFirstDay.plusWeeks(numVisibleRows * numYearColumns).minusDays(1);
-
-			} else {
-
-				_calendarLastDay = _yearColumn_FirstYear
-
-						.toLocalDate()
-						.plusYears(numYearColumns)
-						.minusDays(1)
-
-						.with(getFirstDayOfWeek_SameOrNext())
-						.minusDays(1);
-			}
-
-		} else {
-
-			_calendarLastDay = _calendarFirstDay.plusWeeks(numVisibleRows * numYearColumns).minusDays(1);
-		}
-
-		_calendarView.updateUI_Title(_calendarFirstDay, _calendarLastDay);
+		// one col left and right of the week + 7 week days
+		final int numYearColumns = isYearColumn ? _currentProfile.yearColumns : 1;
+		final int numDayColumns = 7;
 
 		final GC gc = new GC(_calendarImage);
 
@@ -1063,6 +1030,38 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 				dayWidth,
 				dayLabelRightBorder);
 
+		LocalDate currentDate = _firstViewportDay.toLocalDate();
+
+		/*
+		 * Set calendar viewport dates
+		 */
+		_calendarFirstDay = currentDate;
+
+		if (isYearColumn) {
+
+			if (_currentProfile.yearColumnsStart == ColumnStart.CONTINUOUSLY) {
+
+				_calendarLastDay = _calendarFirstDay.plusWeeks(numVisibleRows * numYearColumns).minusDays(1);
+
+			} else {
+
+				_calendarLastDay = _yearColumn_FirstYear
+
+						.toLocalDate()
+						.plusYears(numYearColumns)
+						.minusDays(1)
+
+						.with(getFirstDayOfWeek_SameOrNext())
+						.minusDays(1);
+			}
+
+		} else {
+
+			_calendarLastDay = _calendarFirstDay.plusWeeks(numVisibleRows * numYearColumns).minusDays(1);
+		}
+
+		_calendarView.updateUI_Title(_calendarFirstDay, _calendarLastDay);
+
 		// we use simple ids
 		long dayId = new DayItem(currentDate).dayId;
 
@@ -1079,7 +1078,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 					(int) (7 * dayWidth),
 					canvasHeight);
 
-			if (_isYearColumn) {
+			if (isYearColumn) {
 
 				// move to the next year
 
@@ -2906,7 +2905,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		final int numPageWeeks = _numWeeksInOneColumn / 2;
 
-		if (_isYearColumn) {
+		if (_currentProfile.isShowYearColumns) {
 
 			if (_currentProfile.yearColumnsStart == ColumnStart.CONTINUOUSLY) {
 
@@ -2968,7 +2967,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		final boolean useDraggedScrolling = _currentProfile.useDraggedScrolling;
 
-		if (_isYearColumn) {
+		if (_currentProfile.isShowYearColumns) {
 
 			if (_currentProfile.yearColumnsStart == ColumnStart.CONTINUOUSLY) {
 

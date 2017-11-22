@@ -164,6 +164,9 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	private Button					_chkIsTruncateTourText;
 	private Button					_chkUseDraggedScrolling;
 	//
+	private Button					_rdoYearColumn_Number;
+	private Button					_rdoYearColumn_Width;
+	//
 	private Button[]				_chkTour_AllIsShowLines;
 	private Button[]				_chkWeek_AllIsShowLines;
 	//
@@ -210,7 +213,6 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	private Label					_lblWeek_ColumnWidth;
 	private Label					_lblWeek_ValueFont;
 	private Label					_lblWeek_Margin;
-	private Label					_lblYearColumn;
 	private Label					_lblYearColumn_HeaderFont;
 	private Label					_lblYearColumn_Spacing;
 	private Label					_lblYearColumn_Start;
@@ -240,6 +242,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	private Spinner					_spinnerWeek_Margin_Right;
 	private Spinner					_spinnerYear_Columns;
 	private Spinner					_spinnerYear_ColumnSpacing;
+	private Spinner					_spinnerYear_ColumnWidth;
 	//
 	private TabFolder				_tabFolder;
 	//
@@ -332,6 +335,8 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 		// first load the viewer, then select the profile
 		restoreState_Profile();
+
+		enableControls();
 	}
 
 	@Override
@@ -1039,15 +1044,14 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				 * Number of year columns
 				 */
 
-				// label
-				_lblYearColumn = new Label(container, SWT.NONE);
-				_lblYearColumn.setText(Messages.Slideout_CalendarOptions_Label_NumYearColumns);
-				_lblYearColumn.setToolTipText(Messages.Slideout_CalendarOptions_Label_NumYearColumns_Tooltip);
+				// radio: Set width by number of columns
+				_rdoYearColumn_Number = new Button(container, SWT.RADIO);
+				_rdoYearColumn_Number.setText(Messages.Slideout_CalendarOptions_Radio_YearColumns_ByNumber);
+				_rdoYearColumn_Number.addSelectionListener(_defaultSelectionListener);
 				GridDataFactory
 						.fillDefaults()//
-						.align(SWT.FILL, SWT.CENTER)
 						.indent(_subItemIndent, 0)
-						.applyTo(_lblYearColumn);
+						.applyTo(_rdoYearColumn_Number);
 
 				// spinner: columns
 				_spinnerYear_Columns = new Spinner(container, SWT.BORDER);
@@ -1057,6 +1061,30 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				_spinnerYear_Columns.setPageIncrement(2);
 				_spinnerYear_Columns.addSelectionListener(_defaultSelectionListener);
 				_spinnerYear_Columns.addMouseWheelListener(_defaultMouseWheelListener);
+
+			}
+			{
+				/*
+				 * Year column width
+				 */
+
+				// radio: Set column width
+				_rdoYearColumn_Width = new Button(container, SWT.RADIO);
+				_rdoYearColumn_Width.setText(Messages.Slideout_CalendarOptions_Radio_YearColumns_ByWidth);
+				_rdoYearColumn_Width.addSelectionListener(_defaultSelectionListener);
+				GridDataFactory
+						.fillDefaults()//
+						.indent(_subItemIndent, 0)
+						.applyTo(_rdoYearColumn_Width);
+
+				// spinner: columns
+				_spinnerYear_ColumnWidth = new Spinner(container, SWT.BORDER);
+				_spinnerYear_ColumnWidth.setMinimum(CalendarProfileManager.YEAR_COLUMN_WIDTH_MIN);
+				_spinnerYear_ColumnWidth.setMaximum(CalendarProfileManager.YEAR_COLUMN_WIDTH_MAX);
+				_spinnerYear_ColumnWidth.setIncrement(1);
+				_spinnerYear_ColumnWidth.setPageIncrement(10);
+				_spinnerYear_ColumnWidth.addSelectionListener(_defaultSelectionListener);
+				_spinnerYear_ColumnWidth.addMouseWheelListener(_defaultMouseWheelListener);
 
 			}
 			{
@@ -1195,8 +1223,8 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 				// size
 				_spinnerDateColumnWidth = new Spinner(container, SWT.BORDER);
-				_spinnerDateColumnWidth.setMinimum(1);
-				_spinnerDateColumnWidth.setMaximum(200);
+				_spinnerDateColumnWidth.setMinimum(CalendarProfileManager.DATE_COLUMN_WIDTH_MIN);
+				_spinnerDateColumnWidth.setMaximum(CalendarProfileManager.DATE_COLUMN_WIDTH_MAX);
 				_spinnerDateColumnWidth.setIncrement(1);
 				_spinnerDateColumnWidth.setPageIncrement(10);
 				_spinnerDateColumnWidth.addSelectionListener(_defaultSelectionListener);
@@ -1455,8 +1483,8 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 				// background width
 				_spinnerTour_BackgroundWidth = new Spinner(group, SWT.BORDER);
-				_spinnerTour_BackgroundWidth.setMinimum(0);
-				_spinnerTour_BackgroundWidth.setMaximum(100);
+				_spinnerTour_BackgroundWidth.setMinimum(CalendarProfileManager.TOUR_BACKGROUND_WIDTH_MIN);
+				_spinnerTour_BackgroundWidth.setMaximum(CalendarProfileManager.TOUR_BACKGROUND_WIDTH_MAX);
 				_spinnerTour_BackgroundWidth.setIncrement(1);
 				_spinnerTour_BackgroundWidth.setPageIncrement(10);
 				_spinnerTour_BackgroundWidth.addSelectionListener(_defaultSelectionListener);
@@ -1491,8 +1519,8 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 				// border width
 				_spinnerTour_BorderWidth = new Spinner(group, SWT.BORDER);
-				_spinnerTour_BorderWidth.setMinimum(0);
-				_spinnerTour_BorderWidth.setMaximum(100);
+				_spinnerTour_BorderWidth.setMinimum(CalendarProfileManager.TOUR_BORDER_WIDTH_MIN);
+				_spinnerTour_BorderWidth.setMaximum(CalendarProfileManager.TOUR_BORDER_WIDTH_MAX);
 				_spinnerTour_BorderWidth.setIncrement(1);
 				_spinnerTour_BorderWidth.setPageIncrement(10);
 				_spinnerTour_BorderWidth.addSelectionListener(_defaultSelectionListener);
@@ -1701,8 +1729,8 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 				// spinner
 				_spinnerTour_ValueColumns = new Spinner(container, SWT.BORDER);
-				_spinnerTour_ValueColumns.setMinimum(1);
-				_spinnerTour_ValueColumns.setMaximum(5);
+				_spinnerTour_ValueColumns.setMinimum(CalendarProfileManager.TOUR_VALUE_COLUMNS_MIN);
+				_spinnerTour_ValueColumns.setMaximum(CalendarProfileManager.TOUR_VALUE_COLUMNS_MAX);
 				_spinnerTour_ValueColumns.addSelectionListener(_defaultSelectionListener);
 				_spinnerTour_ValueColumns.addMouseWheelListener(_defaultMouseWheelListener);
 			}
@@ -1747,8 +1775,8 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 				// spinner
 				_spinnerTour_TruncatedLines = new Spinner(container, SWT.BORDER);
-				_spinnerTour_TruncatedLines.setMinimum(1);
-				_spinnerTour_TruncatedLines.setMaximum(10);
+				_spinnerTour_TruncatedLines.setMinimum(CalendarProfileManager.TOUR_TRUNCATED_LINES_MIN);
+				_spinnerTour_TruncatedLines.setMaximum(CalendarProfileManager.TOUR_TRUNCATED_LINES_MAX);
 				_spinnerTour_TruncatedLines.addSelectionListener(_defaultSelectionListener);
 				_spinnerTour_TruncatedLines.addMouseWheelListener(_defaultMouseWheelListener);
 			}
@@ -1941,8 +1969,8 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 				// size
 				_spinnerWeek_ColumnWidth = new Spinner(container, SWT.BORDER);
-				_spinnerWeek_ColumnWidth.setMinimum(1);
-				_spinnerWeek_ColumnWidth.setMaximum(200);
+				_spinnerWeek_ColumnWidth.setMinimum(CalendarProfileManager.WEEK_COLUMN_WIDTH_MIN);
+				_spinnerWeek_ColumnWidth.setMaximum(CalendarProfileManager.WEEK_COLUMN_WIDTH_MAX);
 				_spinnerWeek_ColumnWidth.setIncrement(1);
 				_spinnerWeek_ColumnWidth.setPageIncrement(10);
 				_spinnerWeek_ColumnWidth.addSelectionListener(_defaultSelectionListener);
@@ -2104,8 +2132,8 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 		final Spinner spinner = new Spinner(parent, SWT.BORDER);
 
-		spinner.setMinimum(-20);
-		spinner.setMaximum(20);
+		spinner.setMinimum(CalendarProfileManager.DEFAULT_MARGIN_MIN);
+		spinner.setMaximum(CalendarProfileManager.DEFAULT_MARGIN_MAX);
 		spinner.addSelectionListener(_defaultSelectionListener);
 		spinner.addMouseWheelListener(_defaultMouseWheelListener);
 
@@ -2127,6 +2155,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		final boolean isShowMonthColor = _chkIsShowMonthColor.getSelection();
 		final boolean isShowTourContent = _chkIsShowTourContent.getSelection();
 		final boolean isTruncateText = _chkIsTruncateTourText.getSelection();
+		final boolean isYearColumnWidth = _rdoYearColumn_Width.getSelection();
 
 		final TourBackground_ComboData selectedTourBackgroundData = getSelectedTourBackgroundData();
 		final TourBorder_ComboData selectedTourBorderData = getSelectedTourBorderData();
@@ -2135,12 +2164,14 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		_colorAlternateMonthColor.setEnabled(isShowMonthColor);
 		_comboColumnLayout.setEnabled(isYearColumns);
 		_fontEditorYearColumnHeader.setEnabled(isYearColumns);
-		_lblYearColumn.setEnabled(isYearColumns);
 		_lblYearColumn_HeaderFont.setEnabled(isYearColumns);
 		_lblYearColumn_Spacing.setEnabled(isYearColumns);
 		_lblYearColumn_Start.setEnabled(isYearColumns);
-		_spinnerYear_Columns.setEnabled(isYearColumns);
+		_rdoYearColumn_Number.setEnabled(isYearColumns);
+		_rdoYearColumn_Width.setEnabled(isYearColumns);
+		_spinnerYear_Columns.setEnabled(isYearColumns && isYearColumnWidth == false);
 		_spinnerYear_ColumnSpacing.setEnabled(isYearColumns);
+		_spinnerYear_ColumnWidth.setEnabled(isYearColumns && isYearColumnWidth);
 
 		// date column
 		_comboDateColumn.setEnabled(isShowDateColumn);
@@ -3171,9 +3202,12 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			// year columns
 			_chkIsShowYearColumns.setSelection(profile.isShowYearColumns);
 			_comboColumnLayout.select(getCalendarColumLayoutIndex(profile.yearColumnsStart));
+			_fontEditorYearColumnHeader.setSelection(profile.yearHeaderFont);
+			_rdoYearColumn_Number.setSelection(profile.isYearColumnWidth == false);
+			_rdoYearColumn_Width.setSelection(profile.isYearColumnWidth);
 			_spinnerYear_Columns.setSelection(profile.yearColumns);
 			_spinnerYear_ColumnSpacing.setSelection(profile.yearColumnsSpacing);
-			_fontEditorYearColumnHeader.setSelection(profile.yearHeaderFont);
+			_spinnerYear_ColumnWidth.setSelection(profile.yearColumnWidth);
 
 			// date column
 			_chkIsShowDateColumn.setSelection(profile.isShowDateColumn);
@@ -3265,9 +3299,11 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 		// year columns
 		profile.isShowYearColumns = _chkIsShowYearColumns.getSelection();
+		profile.isYearColumnWidth = _rdoYearColumn_Width.getSelection();
 		profile.yearColumns = _spinnerYear_Columns.getSelection();
 		profile.yearColumnsStart = getSelectedColumnLayout();
 		profile.yearColumnsSpacing = _spinnerYear_ColumnSpacing.getSelection();
+		profile.yearColumnWidth = _spinnerYear_ColumnWidth.getSelection();
 		profile.yearHeaderFont = _fontEditorYearColumnHeader.getSelection();
 
 		// date column
