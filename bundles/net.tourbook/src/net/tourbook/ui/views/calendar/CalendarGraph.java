@@ -928,13 +928,20 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		final boolean isYearColumn = _currentProfile.isShowYearColumns;
 
-		final int weekHeight = _currentProfile.weekHeight;
-
 		// set year header font
 		getFont_YearHeader();
 
 		final int yearHeaderHeight = isYearColumn ? _fontHeight_YearHeader + 20 : 0;
-		int numVisibleRows = (canvasHeight - yearHeaderHeight) / weekHeight;
+
+		final int canvasHeightWithoutYearHeader = canvasHeight - yearHeaderHeight;
+
+		final int weekHeight = _currentProfile.isWeekRowHeight
+				? _currentProfile.weekHeight
+				: Math.max(
+						CalendarProfileManager.WEEK_HEIGHT_MIN,
+						canvasHeightWithoutYearHeader / _currentProfile.weekRows);
+
+		int numVisibleRows = canvasHeightWithoutYearHeader / weekHeight;
 
 		if (isYearColumn) {
 

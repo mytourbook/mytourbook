@@ -52,48 +52,50 @@ public class CalendarProfile implements Cloneable {
 	
 	// profile
 	String					id							= Long.toString(System.nanoTime());
-	
 	String					name						= Messages.Calendar_Profile_Name_Default;
 	ProfileDefault			defaultId					= CalendarProfileManager.DEFAULT_PROFILE_DEFAULT_ID;
+	//
 	// layout
 	boolean					isToggleMonthColor			= false;
+	boolean					isWeekRowHeight				= CalendarProfileManager.DEFAULT_IS_WEEK_ROW_HEIGHT;
 	boolean					useDraggedScrolling			= false;
 	RGB 					alternateMonthRGB			= CalendarProfileManager.DEFAULT_ALTERNATE_MONTH_RGB;
 	RGB						calendarBackgroundRGB		= CalendarProfileManager.DEFAULT_CALENDAR_BACKGROUND_RGB;
-	
 	RGB						calendarForegroundRGB		= CalendarProfileManager.DEFAULT_CALENDAR_FOREBACKGROUND_RGB;
 	int						weekHeight					= CalendarProfileManager.DEFAULT_WEEK_HEIGHT;
+	int						weekRows					= CalendarProfileManager.DEFAULT_WEEK_ROWS;
+	//
 	// year columns
-	boolean 				isYearColumnWidth			= CalendarProfileManager.DEFAULT_IS_YEAR_COLUMN_WIDTH;
 	boolean 				isShowYearColumns			= true;
+	boolean 				isYearColumnWidth			= CalendarProfileManager.DEFAULT_IS_YEAR_COLUMN_WIDTH;
 	int						yearColumns					= CalendarProfileManager.DEFAULT_YEAR_COLUMNS;
 	int 					yearColumnsSpacing			= CalendarProfileManager.DEFAULT_YEAR_COLUMNS_SPACING;
 	ColumnStart				yearColumnsStart			= CalendarProfileManager.DEFAULT_YEAR_COLUMNS_LAYOUT;
-
 	int 					yearColumnWidth				= CalendarProfileManager.DEFAULT_YEAR_COLUMN_WIDTH;
 	FontData 				yearHeaderFont				= createFont(2.8f, SWT.BOLD);
+	//
 	// date column
 	boolean					isShowDateColumn			= true;
 	DateColumnContent		dateColumnContent			= CalendarProfileManager.DEFAULT_DATE_COLUMN_CONTENT;
-	
 	FontData				dateColumnFont				= createFont(1.7f, SWT.BOLD);
 	int						dateColumnWidth				= CalendarProfileManager.DEFAULT_DATE_COLUMN_WIDTH;
+	//
 	// day date
 	boolean					isHideDayDateWhenNoTour		= true;
 	boolean					isShowDayDate				= false;
 	boolean 				isShowDayDateWeekendColor	= CalendarProfileManager.DEFAULT_IS_SHOW_DAY_DATE_WEEKEND_COLOR;
-	
 	FontData				dayDateFont					= createFont(1.2f, SWT.BOLD);
 	DayDateFormat			dayDateFormat				= CalendarProfileManager.DEFAULT_DAY_DATE_FORMAT;
+	//
 	// tour background
 	TourBackground			tourBackground				= CalendarProfileManager.DEFAULT_TOUR_BACKGROUND;
 	CalendarColor			tourBackgroundColor1		= CalendarProfileManager.DEFAULT_TOUR_BACKGROUND_COLOR1;
 	CalendarColor			tourBackgroundColor2		= CalendarProfileManager.DEFAULT_TOUR_BACKGROUND_COLOR2;
 	int						tourBackgroundWidth			= CalendarProfileManager.DEFAULT_TOUR_BACKGROUND_WIDTH;
 	TourBorder 				tourBorder					= CalendarProfileManager.DEFAULT_TOUR_BORDER;
-
 	CalendarColor 			tourBorderColor				= CalendarProfileManager.DEFAULT_TOUR_BORDER_COLOR;
 	int		 				tourBorderWidth				= CalendarProfileManager.DEFAULT_TOUR_BORDER_WIDTH;
+	//
 	// tour content
 	boolean 				isShowTourContent			= true;
 	boolean					isShowTourValueUnit			= true;
@@ -109,10 +111,10 @@ public class CalendarProfile implements Cloneable {
 	FontData				tourTitleFont				= createFont(1.2f, SWT.BOLD);
 	int						tourTruncatedLines			= CalendarProfileManager.DEFAULT_TOUR_TRUNCATED_LINES;
 	CalendarColor			tourValueColor				= CalendarProfileManager.DEFAULT_TOUR_COLOR;
-
 	int 					tourValueColumns			= CalendarProfileManager.DEFAULT_TOUR_VALUE_COLUMNS;
 	FontData				tourValueFont				= createFont(1.1f, SWT.BOLD);
-	// week summary column
+	//
+	// week column
 	boolean					isShowSummaryColumn			= true;
 	boolean 				isShowWeekValueUnit			= true;
 	FormatterData[]			allWeekFormatterData		= CalendarProfileManager.DEFAULT_WEEK_FORMATTER_DATA;
@@ -237,11 +239,13 @@ public class CalendarProfile implements Cloneable {
         sb.append("\n");                                                                                            //$NON-NLS-1$
         sb.append("// layout                                                                                  \n"); //$NON-NLS-1$
         sb.append("profile.isToggleMonthColor            = " + isToggleMonthColor                         + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.isWeekRowHeight               = " + isWeekRowHeight                            + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.useDraggedScrolling           = " + useDraggedScrolling                        + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.alternateMonthRGB             = " + dump_RGB(profile.alternateMonthRGB)        + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.calendarBackgroundRGB         = " + dump_RGB(profile.calendarBackgroundRGB)    + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.calendarForegroundRGB         = " + dump_RGB(profile.calendarForegroundRGB)    + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.weekHeight                    = " + weekHeight                                 + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.weekRows                      = " + weekRows                                   + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("                                                                                           \n"); //$NON-NLS-1$
         sb.append("// year columns                                                                            \n"); //$NON-NLS-1$
         sb.append("profile.isShowYearColumns             = " + isShowYearColumns                          + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$

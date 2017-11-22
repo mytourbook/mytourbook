@@ -104,6 +104,7 @@ public class CalendarProfileManager {
 	private static final String				ATTR_IS_SHOW_WEEK_VALUE_UNIT			= "isShowWeekValueUnit";			//$NON-NLS-1$
 	private static final String				ATTR_IS_TOGGLE_MONTH_COLOR				= "isToggleMonthColor";				//$NON-NLS-1$
 	private static final String				ATTR_IS_TRUNCATE_TOUR_TEXT				= "isTruncateTourText";				//$NON-NLS-1$
+	private static final String				ATTR_IS_WEEK_ROW_HEIGHT					= "isWeekRowHeight";				//$NON-NLS-1$
 	private static final String				ATTR_IS_YEAR_COLUMN_WIDTH				= "isYearColumnWidth";				//$NON-NLS-1$
 	private static final String				ATTR_PROFILE_DEFAULT_ID					= "profileDefaultId";				//$NON-NLS-1$
 	private static final String				ATTR_DATE_COLUMN_CONTENT				= "dateColumnContent";				//$NON-NLS-1$
@@ -139,6 +140,7 @@ public class CalendarProfileManager {
 	private static final String				ATTR_WEEK_MARGIN_LEFT					= "weekMarginLeft";					//$NON-NLS-1$
 	private static final String				ATTR_WEEK_MARGIN_BOTTOM					= "weekMarginBottom";				//$NON-NLS-1$
 	private static final String				ATTR_WEEK_MARGIN_RIGHT					= "weekMarginRight";				//$NON-NLS-1$
+	private static final String				ATTR_WEEK_ROWS							= "weekRows";						//$NON-NLS-1$
 	private static final String				ATTR_WEEK_VALUE_COLOR					= "weekValueColor";					//$NON-NLS-1$
 	private static final String				ATTR_WEEK_VALUE_FONT					= "weekValueFont";					//$NON-NLS-1$
 	private static final String				ATTR_YEAR_COLUMNS						= "yearColumns";					//$NON-NLS-1$
@@ -157,6 +159,7 @@ public class CalendarProfileManager {
 	static final DataFormatter				DEFAULT_EMPTY_FORMATTER;
 	static final boolean					DEFAULT_IS_SHOW_DAY_DATE_WEEKEND_COLOR	= false;
 	static final boolean					DEFAULT_IS_TRUNCATE_TOUR_TEXT			= true;
+	static final boolean					DEFAULT_IS_WEEK_ROW_HEIGHT				= false;
 	static final boolean					DEFAULT_IS_YEAR_COLUMN_WIDTH			= false;
 	static final int						DEFAULT_MARGIN_MIN						= -20;
 	static final int						DEFAULT_MARGIN_MAX						= 20;
@@ -180,6 +183,7 @@ public class CalendarProfileManager {
 	static final int						DEFAULT_WEEK_MARGIN_LEFT				= 1;
 	static final int						DEFAULT_WEEK_MARGIN_BOTTOM				= 1;
 	static final int						DEFAULT_WEEK_MARGIN_RIGHT				= -3;
+	static final int						DEFAULT_WEEK_ROWS						= 10;
 	static final CalendarColor				DEFAULT_WEEK_VALUE_COLOR				= CalendarColor.BRIGHT;
 	static final int						DEFAULT_YEAR_COLUMN_WIDTH				= 200;
 	static final int						DEFAULT_YEAR_COLUMNS					= 1;
@@ -208,8 +212,10 @@ public class CalendarProfileManager {
 	static final int						TOUR_VALUE_COLUMNS_MAX					= 5;
 	static final int						WEEK_COLUMN_WIDTH_MIN					= 1;
 	static final int						WEEK_COLUMN_WIDTH_MAX					= 200;
-	static final int						WEEK_HEIGHT_MIN							= 1;
-	static final int						WEEK_HEIGHT_MAX							= 500;
+	static final int						WEEK_HEIGHT_MIN							= 2;
+	static final int						WEEK_HEIGHT_MAX							= 1000;
+	static final int						WEEK_ROWS_MIN							= 1;
+	static final int						WEEK_ROWS_MAX							= 1000;
 	static final int						YEAR_COLUMNS_MIN						= 1;
 	static final int						YEAR_COLUMNS_MAX						= 100;
 	static final int						YEAR_COLUMN_WIDTH_MIN					= 5;
@@ -1973,8 +1979,10 @@ public class CalendarProfileManager {
 		
 		// layout
 		profile.isToggleMonthColor			= Util.getXmlBoolean(xmlProfile, 					ATTR_IS_TOGGLE_MONTH_COLOR,		true);
+		profile.isWeekRowHeight				= Util.getXmlBoolean(xmlProfile, 					ATTR_IS_WEEK_ROW_HEIGHT,		DEFAULT_IS_WEEK_ROW_HEIGHT);
 		profile.useDraggedScrolling			= Util.getXmlBoolean(xmlProfile, 					ATTR_USE_DRAGGED_SCROLLING,		true);
 		profile.weekHeight					= Util.getXmlInteger(xmlProfile, 					ATTR_WEEK_HEIGHT,				DEFAULT_WEEK_HEIGHT);
+		profile.weekRows					= Util.getXmlInteger(xmlProfile, 					ATTR_WEEK_ROWS,					DEFAULT_WEEK_ROWS);
 		profile.alternateMonthRGB			= Util.getXmlRgb(xmlProfile, 						TAG_ALTERNATE_MONTH_RGB,		DEFAULT_ALTERNATE_MONTH_RGB);
 		profile.calendarBackgroundRGB		= Util.getXmlRgb(xmlProfile, 						TAG_CALENDAR_BACKGROUND_RGB,	DEFAULT_CALENDAR_BACKGROUND_RGB);
 		profile.calendarForegroundRGB		= Util.getXmlRgb(xmlProfile, 						TAG_CALENDAR_FOREGROUND_RGB,	DEFAULT_CALENDAR_FOREBACKGROUND_RGB);
@@ -2104,8 +2112,10 @@ public class CalendarProfileManager {
 		
 		// layout
 		xmlProfile.putBoolean(		ATTR_IS_TOGGLE_MONTH_COLOR, 			profile.isToggleMonthColor);
+		xmlProfile.putBoolean(		ATTR_IS_WEEK_ROW_HEIGHT,	 			profile.isWeekRowHeight);
 		xmlProfile.putBoolean(		ATTR_USE_DRAGGED_SCROLLING, 			profile.useDraggedScrolling);
 		xmlProfile.putInteger(		ATTR_WEEK_HEIGHT, 						profile.weekHeight);
+		xmlProfile.putInteger(		ATTR_WEEK_ROWS, 						profile.weekRows);
 		Util.setXmlRgb(xmlProfile,	TAG_ALTERNATE_MONTH_RGB, 				profile.alternateMonthRGB);
 		Util.setXmlRgb(xmlProfile,	TAG_CALENDAR_BACKGROUND_RGB, 			profile.calendarBackgroundRGB);
 		Util.setXmlRgb(xmlProfile,	TAG_CALENDAR_FOREGROUND_RGB, 			profile.calendarForegroundRGB);
