@@ -1,4 +1,4 @@
-Version 17.9.1 next                                          ?. October 2017
+Version 17.9.1 next                                          ?. December 2017
 
 
 Pendenzen:
@@ -23,6 +23,11 @@ New
 * Duplicate a tour which is manually created
   Can be used for "events", like changing a battery
 
+
+* Tour Type
+
+  - Customize tour type symbol
+  
 
 * Tour Filter
   

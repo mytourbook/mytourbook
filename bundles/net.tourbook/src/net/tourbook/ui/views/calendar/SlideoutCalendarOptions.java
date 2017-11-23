@@ -133,7 +133,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	private long					_dragStartViewerLeft;
 	//
 	private boolean					_isUpdateUI;
-	private boolean					_isLogCalendarProfile	= System.getProperty("logCalendarProfile") != null;
+	private boolean					_isLogCalendarProfile	= System.getProperty("logCalendarProfile") != null; //$NON-NLS-1$
 
 	private PixelConverter			_pc;
 	private int						_subItemIndent;
