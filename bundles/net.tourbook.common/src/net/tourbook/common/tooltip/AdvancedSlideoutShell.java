@@ -594,7 +594,7 @@ public abstract class AdvancedSlideoutShell {
 	 */
 	private boolean canCloseShell() {
 
-		if (_visibleShell == null) {
+		if (_visibleShell == null || _visibleShell.isDisposed()) {
 			return true;
 		}
 
@@ -1732,7 +1732,7 @@ public abstract class AdvancedSlideoutShell {
 			return;
 		}
 
-		if (_visibleShell == null) {
+		if (_visibleShell == null || _visibleShell.isDisposed()) {
 			return;
 		}
 
