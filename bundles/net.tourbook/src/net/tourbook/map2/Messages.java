@@ -59,13 +59,10 @@ public class Messages extends NLS {
 	public static String		image_action_synch_with_slider_disabled;
 	public static String		image_action_synch_with_tour;
 	public static String		image_action_synch_with_tour_disabled;
-	public static String		image_action_zoom_centered;
 	public static String		image_action_zoom_in;
 	public static String		image_action_zoom_in_disabled;
 	public static String		image_action_zoom_out;
 	public static String		image_action_zoom_out_disabled;
-	public static String		image_action_zoom_show_all;
-	public static String		image_action_zoom_show_all_disabled;
 	public static String		image_action_zoom_show_entire_tour;
 	public static String		image_action_zoom_show_entire_tour_disabled;
 

@@ -69,10 +69,6 @@ public class Messages extends NLS {
 	public static String		Image_Cursor_X_Slider_Left;
 	public static String		Image_Cursor_X_Slider_Right;
 
-	public static String		Image_mouse_mode;
-
-	public static String		Image_zoom_fit_to_graph;
-	public static String		Image_zoom_fit_to_graph_disabled;
 	public static String		Image_zoom_in;
 	public static String		Image_zoom_in_disabled;
 	public static String		Image_zoom_out;
