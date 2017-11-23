@@ -70,9 +70,12 @@ public class Messages extends NLS {
 	public static String		Calendar_Profile_Name_Col_20;
 	public static String		Calendar_Profile_Name_Col_20_Dark;
 	public static String		Calendar_Profile_Name_Compact;
-	public static String		Calendar_Profile_Name_Compact_II;
-	public static String		Calendar_Profile_Name_Crazy;
+	public static String		Calendar_Profile_Name_CompactXL;
 	public static String		Calendar_Profile_Name_Default;
+	public static String		Calendar_Profile_Name_Year;
+	public static String		Calendar_Profile_Name_YearXL;
+	public static String		Calendar_Profile_Name_YearXXL;
+
 	public static String		Calendar_Profile_TourBackground_Circle;
 	public static String		Calendar_Profile_TourBackground_DarkLeft;
 	public static String		Calendar_Profile_TourBackground_DarkRight;

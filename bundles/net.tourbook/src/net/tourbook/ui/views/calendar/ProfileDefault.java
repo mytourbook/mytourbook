@@ -19,10 +19,12 @@ public enum ProfileDefault {
 
 	DEFAULT, //
 
-	CLASSIC, //
-
 	COMPACT, //
-	COMPACT_II, //
+	COMPACT_XL, //
 
-	CRAZY, //
+	YEAR, //
+	YEAR_XL, //
+	YEAR_XXL, //
+
+	CLASSIC, //
 }

@@ -221,13 +221,15 @@ public class CalendarProfile implements Cloneable {
 		final StringBuilder sb = new StringBuilder();
 
 // SET_FORMATTING_OFF
-//		boolean 				isYearColumnWidth			= CalendarProfileManager.DEFAULT_IS_YEAR_COLUMN_WIDTH;
-//		boolean 				isShowYearColumns			= true;
-//		int						yearColumns					= CalendarProfileManager.DEFAULT_YEAR_COLUMNS;
-//		int 					yearColumnsSpacing			= CalendarProfileManager.DEFAULT_YEAR_COLUMNS_SPACING;
-//		ColumnStart				yearColumnsStart			= CalendarProfileManager.DEFAULT_YEAR_COLUMNS_LAYOUT;
-//		int 					yearColumnWidth				= CalendarProfileManager.DEFAULT_YEAR_COLUMN_WIDTH;
 
+        sb.append("\n");                                                                                            //$NON-NLS-1$
+        sb.append("\n");                                                                                            //$NON-NLS-1$
+        sb.append("\n");                                                                                            //$NON-NLS-1$
+        sb.append("\n");                                                                                            //$NON-NLS-1$
+        sb.append("\n");                                                                                            //$NON-NLS-1$
+        sb.append("\n");                                                                                            //$NON-NLS-1$
+        sb.append("\n");                                                                                            //$NON-NLS-1$
+        sb.append("\n");                                                                                            //$NON-NLS-1$
         sb.append("\n");                                                                                            //$NON-NLS-1$
         sb.append("\n");                                                                                            //$NON-NLS-1$
         sb.append("// SET_FORMATTING_OFF");                                                                         //$NON-NLS-1$
@@ -312,6 +314,11 @@ public class CalendarProfile implements Cloneable {
         sb.append("profile.allWeekFormatterData          = " + dump_Formatter(allWeekFormatterData, "week") + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         sb.append("\n");                                                                                            //$NON-NLS-1$
         sb.append("// SET_FORMATTING_ON");                                                                          //$NON-NLS-1$
+        sb.append("\n");                                                                                            //$NON-NLS-1$
+        sb.append("\n");                                                                                            //$NON-NLS-1$
+        sb.append("\n");                                                                                            //$NON-NLS-1$
+        sb.append("\n");                                                                                            //$NON-NLS-1$
+        sb.append("\n");                                                                                            //$NON-NLS-1$
         sb.append("\n");                                                                                            //$NON-NLS-1$
         sb.append("\n");                                                                                            //$NON-NLS-1$
 

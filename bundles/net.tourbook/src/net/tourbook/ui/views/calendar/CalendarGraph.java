@@ -926,12 +926,12 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		_calendarImage = new Image(getDisplay(), canvasWidth, canvasHeight);
 
-		final boolean isYearColumn = _currentProfile.isShowYearColumns;
+		final boolean useYearColumns = _currentProfile.isShowYearColumns;
 
 		// set year header font
 		getFont_YearHeader();
 
-		final int yearHeaderHeight = isYearColumn ? _fontHeight_YearHeader + 20 : 0;
+		final int yearHeaderHeight = useYearColumns ? _fontHeight_YearHeader + 20 : 0;
 
 		final int canvasHeightWithoutYearHeader = canvasHeight - yearHeaderHeight;
 
@@ -943,7 +943,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		int numVisibleRows = canvasHeightWithoutYearHeader / weekHeight;
 
-		if (isYearColumn) {
+		if (useYearColumns) {
 
 			// adjust column start
 
@@ -987,7 +987,15 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		_numWeeksInOneColumn = numVisibleRows;
 
 		// one col left and right of the week + 7 week days
-		final int numYearColumns = isYearColumn ? _currentProfile.yearColumns : 1;
+		int numYearColumns = 1;
+		if (useYearColumns) {
+
+			numYearColumns = _currentProfile.isYearColumnWidth
+					? canvasWidth / _currentProfile.yearColumnWidth
+					: _currentProfile.yearColumns;
+
+		}
+
 		final int numDayColumns = 7;
 
 		final GC gc = new GC(_calendarImage);
@@ -1015,7 +1023,17 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		final int columnSpacing = _currentProfile.yearColumnsSpacing;
 		final int allColumnSpace = (numYearColumns - 1) * columnSpacing;
-		final int calendarColumnWidth = (canvasWidth - allColumnSpace) / numYearColumns;
+
+		int calendarColumnWidth;
+		if (_currentProfile.isYearColumnWidth) {
+
+			calendarColumnWidth = _currentProfile.yearColumnWidth;
+
+		} else {
+
+			calendarColumnWidth = (canvasWidth - allColumnSpace) / numYearColumns;
+		}
+
 		final float dayWidth = (float) (calendarColumnWidth - dateColumnWidth - summaryColumnWidth) / numDayColumns;
 
 		_calendarAllDaysRectangle = new Rectangle[numYearColumns];
@@ -1044,7 +1062,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		 */
 		_calendarFirstDay = currentDate;
 
-		if (isYearColumn) {
+		if (useYearColumns) {
 
 			if (_currentProfile.yearColumnsStart == ColumnStart.CONTINUOUSLY) {
 
@@ -1085,7 +1103,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 					(int) (7 * dayWidth),
 					canvasHeight);
 
-			if (isYearColumn) {
+			if (useYearColumns) {
 
 				// move to the next year
 
@@ -1186,19 +1204,23 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 								dayRect.height - 1);
 					}
 
-					// get date label width
-					final String dayDateLabel = UI.SPACE1 + dayDateFormatter.format(currentDate) + UI.SPACE1;
-
-					gc.setFont(dayDateFont);
-					final Point labelExtent = gc.textExtent(dayDateLabel);
-					final int dayLabelWidth = labelExtent.x;
-					final int dayLabelHeight = labelExtent.y;
-
-					final int labelWidthWithOffset = dayLabelWidth + dayLabelRightBorder;
-					int dateLabelPosX = dayPosXNext - labelWidthWithOffset;
-
 					_dayDateLabelRect = null;
+					String dayDateLabel = UI.EMPTY_STRING;
+					int dateLabelPosX = 0;
+
 					if (_currentProfile.isShowDayDate) {
+
+						// get date label width
+						dayDateLabel = UI.SPACE1 + dayDateFormatter.format(currentDate) + UI.SPACE1;
+
+						gc.setFont(dayDateFont);
+						final Point labelExtent = gc.stringExtent(dayDateLabel);
+						final int dayLabelWidth = labelExtent.x;
+						final int dayLabelHeight = labelExtent.y;
+
+						final int labelWidthWithOffset = dayLabelWidth + dayLabelRightBorder;
+						dateLabelPosX = dayPosXNext - labelWidthWithOffset;
+
 						_dayDateLabelRect = new Rectangle(dateLabelPosX, rowTop, dayLabelWidth, dayLabelHeight);
 					}
 
@@ -2088,7 +2110,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		gc.setFont(getFont_YearHeader());
 
-		final Point textSize = gc.textExtent(yearText);
+		final Point textSize = gc.stringExtent(yearText);
 
 		final int posX = yearHeaderRect.x + yearHeaderRect.width / 2 - textSize.x / 2;
 		final int posY = yearHeaderRect.y + 10;
