@@ -68,7 +68,7 @@ public class HTTPDownloader {
 			}
 		};
 
-		final String jobName = remoteFileName + " - " + Messages.job_name_httpDownload;
+		final String jobName = remoteFileName + " - " + Messages.job_name_httpDownload; //$NON-NLS-1$
 
 		final Job downloadJob = new Job(jobName) {
 			@Override
@@ -108,7 +108,7 @@ public class HTTPDownloader {
 
 							startTime = currentTime;
 
-							monitor.setTaskName("" + numWritten[0]);
+							monitor.setTaskName("" + numWritten[0]); //$NON-NLS-1$
 						}
 					}
 

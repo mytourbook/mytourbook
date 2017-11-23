@@ -133,6 +133,8 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	private long					_dragStartViewerLeft;
 	//
 	private boolean					_isUpdateUI;
+	private boolean					_isLogCalendarProfile	= System.getProperty("logCalendarProfile") != null;
+
 	private PixelConverter			_pc;
 	private int						_subItemIndent;
 
@@ -140,7 +142,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	 * This is a hack to vertical center the font label, otherwise it will be complicated to set it
 	 * correctly
 	 */
-	private int						_fontLabelVIndent	= 5;
+	private int						_fontLabelVIndent		= 5;
 
 	/*
 	 * UI controls
@@ -3019,7 +3021,9 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		enableControls();
 
 		// debugging: dump profile to copy&paste an adjusted profile into the profile manager
-		CalendarProfileManager.getActiveCalendarProfile().dump();
+		if (_isLogCalendarProfile) {
+			CalendarProfileManager.getActiveCalendarProfile().dump();
+		}
 
 		_calendarView.updateUI_Graph();
 	}

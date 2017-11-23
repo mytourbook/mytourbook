@@ -51,7 +51,6 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -84,11 +83,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 	private static final String		STATE_FIRST_DISPLAYED_EPOCH_DAY			= "STATE_FIRST_DISPLAYED_EPOCH_DAY";				//$NON-NLS-1$
 	private static final String		STATE_SELECTED_TOURS					= "STATE_SELECTED_TOURS";							//$NON-NLS-1$
 	
-
-	static final int				numberOfSummaryLines					= 5;
-
 	static final int				DEFAULT_TOUR_TOOLTIP_DELAY				= 100; // ms
-
 	
 	private final IPreferenceStore	_prefStore								= TourbookPlugin.getPrefStore();
 	private final IDialogSettings	_state									= TourbookPlugin.getState("TourCalendarView");		//$NON-NLS-1$
@@ -112,23 +107,6 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 	private Action					_actionGotoToday;
 	private ActionTourInfo			_actionTourInfo;
 	//
-
-	TourInfoFormatter[]				tourInfoFormatter				= {
-
-			createFormatter_Tour_Empty(),
-
-			createFormatter_Tour_Title_Description(),
-			createFormatter_Tour_Description_Title(),
-
-			createFormatter_Tour_Distance_Time(),
-			createFormatter_Tour_Distance_Speed(),
-			createFormatter_Tour_Distance_Pace(),
-
-			createFormatter_Tour_Time_Distance(),
-			createFormatter_Tour_Time_Speed(),
-			createFormatter_Tour_Time_Pace()
-	};
-
 	private LocalDate				_titleFirstDay;
 	private LocalDate				_titleLastDay;
 
@@ -148,15 +126,6 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 	private Combo					_comboProfiles;
 
 	private Label					_lblTitle;
-
-	abstract class TourInfoFormatter {
-
-		int index;
-
-		abstract String format(CalendarTourData data);
-
-		abstract String getText();
-	}
 
 	public CalendarView() {}
 
@@ -354,248 +323,6 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 		};
 		_actionGotoToday.setText(Messages.Calendar_View_Action_GotoToday);
 		_actionGotoToday.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ZoomCentered));
-	}
-
-	/**
-	 * description - title
-	 */
-	private TourInfoFormatter createFormatter_Tour_Description_Title() {
-
-		return new TourInfoFormatter() {
-			@Override
-			public String format(final CalendarTourData data) {
-
-				if (data.tourDescription != null && data.tourDescription.length() > 1) {
-
-					// for now we are only supporting one line descriptions
-					return data.tourDescription.replace("\r\n", UI.SPACE1).replace("\n", UI.SPACE1); //$NON-NLS-1$ //$NON-NLS-2$
-
-				} else if (data.tourTitle != null && data.tourTitle.length() > 1) {
-
-					return data.tourTitle;
-
-				} else {
-					return UI.EMPTY_STRING;
-				}
-			}
-
-			@Override
-			public String getText() {
-				return Messages.Calendar_View_Action_ShowDescriptionTitle;
-			}
-		};
-	}
-
-	/**
-	 * distance - pace
-	 */
-	private TourInfoFormatter createFormatter_Tour_Distance_Pace() {
-
-		return new TourInfoFormatter() {
-			@Override
-			public String format(final CalendarTourData data) {
-				final int pace = (int) (data.distance == 0
-						? 0
-						: (1000 * data.recordingTime / data.distance * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
-				final float distance = data.distance / 1000.0f / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
-				return String
-						.format(
-								NLS.bind(
-										Messages.Calendar_View_Format_DistancePace,
-										UI.UNIT_LABEL_DISTANCE,
-										UI.UNIT_LABEL_PACE),
-								distance,
-								pace / 60,
-								pace % 60)
-						.toString();
-			}
-
-			@Override
-			public String getText() {
-				return Messages.Calendar_View_Action_DistancePace;
-			}
-		};
-	}
-
-	/**
-	 * distance - speed
-	 */
-	private TourInfoFormatter createFormatter_Tour_Distance_Speed() {
-
-		return new TourInfoFormatter() {
-			@Override
-			public String format(final CalendarTourData data) {
-				final float distance = data.distance;
-				final int time = data.recordingTime;
-				return String
-						.format(
-								NLS.bind(
-										Messages.Calendar_View_Format_DistanceSpeed,
-										UI.UNIT_LABEL_DISTANCE,
-										UI.UNIT_LABEL_SPEED),
-								distance / 1000.0f / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE,
-								distance == 0 ? 0 : distance / (time / 3.6f))
-						.toString();
-			}
-
-			@Override
-			public String getText() {
-				return Messages.Calendar_View_Action_ShowDistanceSpeed;
-			}
-		};
-	}
-
-	/**
-	 * distance - time
-	 */
-	private TourInfoFormatter createFormatter_Tour_Distance_Time() {
-
-		return new TourInfoFormatter() {
-			@Override
-			public String format(final CalendarTourData data) {
-
-				final float distance = (float) (data.distance / 1000.0 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
-
-				return String
-						.format(
-								NLS.bind("%4.0f {0}", UI.UNIT_LABEL_DISTANCE),
-								distance)
-						.toString();
-			}
-
-			@Override
-			public String getText() {
-				return Messages.Calendar_View_Action_ShowDistanceTime;
-			}
-		};
-	}
-
-	private TourInfoFormatter createFormatter_Tour_Empty() {
-
-		return new TourInfoFormatter() {
-			@Override
-			public String format(final CalendarTourData data) {
-				return UI.EMPTY_STRING;
-			}
-
-			@Override
-			public String getText() {
-				return Messages.Calendar_View_Action_ShowNothing;
-			}
-		};
-	}
-
-	/**
-	 * time - distance
-	 */
-	private TourInfoFormatter createFormatter_Tour_Time_Distance() {
-
-		return new TourInfoFormatter() {
-			@Override
-			public String format(final CalendarTourData data) {
-				final int time = data.recordingTime;
-				final float distance = data.distance / 1000.0f / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
-				return String
-						.format(
-								NLS.bind(Messages.Calendar_View_Format_TimeDistance, UI.UNIT_LABEL_DISTANCE),
-								time / 3600,
-								(time % 3600) / 60,
-								distance)
-						.toString();
-			}
-
-			@Override
-			public String getText() {
-				return Messages.Calendar_View_Action_TimeDistance;
-			}
-		};
-	}
-
-	/**
-	 * time - pace
-	 */
-	private TourInfoFormatter createFormatter_Tour_Time_Pace() {
-
-		return new TourInfoFormatter() {
-			@Override
-			public String format(final CalendarTourData data) {
-
-				final int pace = (int) (data.distance == 0
-						? 0
-						: (1000 * data.recordingTime / data.distance * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
-
-				return String
-						.format(
-								NLS.bind(Messages.Calendar_View_Format_TimePace, UI.UNIT_LABEL_PACE),
-								data.recordingTime / 3600,
-								(data.recordingTime % 3600) / 60,
-								pace / 60,
-								pace % 60)
-						.toString();
-			}
-
-			@Override
-			public String getText() {
-				return Messages.Calendar_View_Action_TimePace;
-			}
-		};
-	}
-
-	private TourInfoFormatter createFormatter_Tour_Time_Speed() {
-		return /**
-				 * time - speed
-				 */
-		new TourInfoFormatter() {
-			@Override
-			public String format(final CalendarTourData data) {
-				final int time = data.recordingTime;
-				return String
-						.format(
-								NLS.bind(Messages.Calendar_View_Format_TimeSpeed, UI.UNIT_LABEL_SPEED),
-								time / 3600,
-								(time % 3600) / 60,
-								data.distance == 0 ? 0 : data.distance
-										/ time
-										* 3.6f
-										/ net.tourbook.ui.UI.UNIT_VALUE_DISTANCE)
-						.toString();
-			}
-
-			@Override
-			public String getText() {
-				return Messages.Calendar_View_Action_TimeSpeed;
-			}
-		};
-	}
-
-	/**
-	 * title - description
-	 */
-	private TourInfoFormatter createFormatter_Tour_Title_Description() {
-
-		return new TourInfoFormatter() {
-			@Override
-			public String format(final CalendarTourData data) {
-				if (data.tourTitle != null && data.tourTitle.length() > 1) {
-
-					return data.tourTitle;
-
-				} else if (data.tourDescription != null && data.tourDescription.length() > 1) {
-
-					// for now we are only supporting one line descriptions
-//					return data.tourDescription.replace("\r\n", UI.SPACE1).replace("\n", UI.SPACE1); //$NON-NLS-1$ //$NON-NLS-2$
-					return data.tourDescription;
-
-				} else {
-					return UI.EMPTY_STRING;
-				}
-			}
-
-			@Override
-			public String getText() {
-				return Messages.Calendar_View_Action_ShowTitleDescription;
-			}
-		};
 	}
 
 	@Override

@@ -3301,7 +3301,7 @@ public class TourDatabase {
 
 			while (result.next()) {
 
-				final String dbIndexName = result.getString("COLUMN_NAME");
+				final String dbIndexName = result.getString("COLUMN_NAME"); //$NON-NLS-1$
 
 				if (requestedIndexName.equals(dbIndexName.toUpperCase())) {
 

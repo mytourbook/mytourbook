@@ -106,7 +106,7 @@ public class MTFont {
 
 		final FontData[] fontData = font.getFontData();
 
-		System.out.println((UI.timeStampNano() + " [" + "] ") + ("\t" + Arrays.toString(fontData)));
+		System.out.println((UI.timeStampNano() + " [" + "] ") + ("\t" + Arrays.toString(fontData))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	public static void setBannerFont(final Control control) {

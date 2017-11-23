@@ -1355,10 +1355,10 @@ public class TourFilterManager {
 
 		final String sqlField = TOUR_DATA_MANUAL_TOUR;
 
-		final String sql_IN_ManualId = " IN ('"
-				+ TourData.DEVICE_ID_FOR_MANUAL_TOUR + "', '"
-				+ TourData.DEVICE_ID_CSV_TOUR_DATA_READER + "'"
-				+ ")\n";
+		final String sql_IN_ManualId = " IN ('" //$NON-NLS-1$
+				+ TourData.DEVICE_ID_FOR_MANUAL_TOUR + "', '" //$NON-NLS-1$
+				+ TourData.DEVICE_ID_CSV_TOUR_DATA_READER + "'" //$NON-NLS-1$
+				+ ")\n"; //$NON-NLS-1$
 
 		if (fieldOperator == TourFilterFieldOperator.IS_AVAILABLE) {
 

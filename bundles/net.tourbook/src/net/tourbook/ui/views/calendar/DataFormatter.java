@@ -91,15 +91,15 @@ abstract class DataFormatter {
 	@Override
 	public String toString() {
 
-		return "\n"
+		return "\n" //$NON-NLS-1$
 
-				+ "DataFormatter ["
+				+ "DataFormatter [" //$NON-NLS-1$
 
-				+ "id=" + id + ", "
-				+ "_name=" + _name + ", "
-				+ "_valueFormatter=" + valueFormatter
-				+ "_colorDefinition=" + _colorDefinition + ", "
+				+ "id=" + id + ", " //$NON-NLS-1$ //$NON-NLS-2$
+				+ "_name=" + _name + ", " //$NON-NLS-1$ //$NON-NLS-2$
+				+ "_valueFormatter=" + valueFormatter //$NON-NLS-1$
+				+ "_colorDefinition=" + _colorDefinition + ", " //$NON-NLS-1$ //$NON-NLS-2$
 
-				+ "]";
+				+ "]"; //$NON-NLS-1$
 	}
 }

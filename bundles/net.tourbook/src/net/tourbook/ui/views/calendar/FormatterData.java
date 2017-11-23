@@ -52,14 +52,14 @@ public class FormatterData implements Cloneable {
 	@Override
 	public String toString() {
 
-		return "\n"
+		return "\n" //$NON-NLS-1$
 
-				+ "FormatterData ["
+				+ "FormatterData [" //$NON-NLS-1$
 
-				+ "isEnabled=" + isEnabled + ", "
-				+ "id=" + id + ", "
-				+ "valueFormat=" + valueFormat
+				+ "isEnabled=" + isEnabled + ", " //$NON-NLS-1$ //$NON-NLS-2$
+				+ "id=" + id + ", " //$NON-NLS-1$ //$NON-NLS-2$
+				+ "valueFormat=" + valueFormat //$NON-NLS-1$
 
-				+ "]";
+				+ "]"; //$NON-NLS-1$
 	}
 }

@@ -185,7 +185,7 @@ public class CalendarYearMonthContributionItem extends ControlContribution {
 	private void onSelectMonth() {
 
 		System.out.println(
-				(net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] onSelectMonth"));
+				(net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] onSelectMonth")); //$NON-NLS-1$ //$NON-NLS-2$
 // TODO remove SYSTEM.OUT.PRINTLN
 
 //		final int month = _comboMonth.getSelectionIndex() + 1;
@@ -196,7 +196,7 @@ public class CalendarYearMonthContributionItem extends ControlContribution {
 	private void onSelectYear() {
 
 		System.out.println(
-				(net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] onSelectYear"));
+				(net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] onSelectYear")); //$NON-NLS-1$ //$NON-NLS-2$
 // TODO remove SYSTEM.OUT.PRINTLN
 
 //		final int index = _comboYear.getSelectionIndex();
