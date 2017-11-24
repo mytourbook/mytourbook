@@ -129,10 +129,30 @@ public class CalendarTourDataProvider {
 
 //		final long start = System.currentTimeMillis();
 
-		final int colorOffset = 1;
-
 		CalendarTourData[][] monthData = null;
 		CalendarTourData[] dayData = null;
+
+		final LocalDate today = LocalDate.now();
+		final LocalDate requestedDate = LocalDate.of(year, month, 1);
+
+		if (requestedDate.isAfter(today)) {
+
+			// requested data are after today -> there should be no data
+
+			/*
+			 * Create dummy data
+			 */
+
+			monthData = new CalendarTourData[31][];
+
+			for (int day = 0; day < 31; day++) {
+				monthData[day] = new CalendarTourData[0];
+			}
+
+			return monthData;
+		}
+
+		final int colorOffset = 1;
 
 		final ArrayList<TourType> tourTypeList = TourDatabase.getAllTourTypes();
 		final TourType[] tourTypes = tourTypeList.toArray(new TourType[tourTypeList.size()]);
@@ -561,7 +581,7 @@ public class CalendarTourDataProvider {
 		}
 
 		if (_firstTourDateTime == null) {
-			_firstTourDateTime = LocalDateTime.now();//.minusYears(1);
+			_firstTourDateTime = LocalDateTime.now().minusYears(1);
 		}
 
 		return _firstTourDateTime;
