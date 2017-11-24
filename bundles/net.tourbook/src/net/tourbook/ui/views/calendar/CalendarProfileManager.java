@@ -283,8 +283,8 @@ public class CalendarProfileManager {
 				_tourFormatter_TourTitle,
 				_tourFormatter_TourDescription,
 				
-				_tourFormatter_Altitude,
 				_tourFormatter_Distance,
+				_tourFormatter_Altitude,
 				
 				_tourFormatter_Speed,
 				_tourFormatter_Pace,
@@ -309,8 +309,8 @@ public class CalendarProfileManager {
 				
 				DEFAULT_EMPTY_FORMATTER,
 				
-				_weekFormatter_Altitude,
 				_weekFormatter_Distance,
+				_weekFormatter_Altitude,
 				
 				_weekFormatter_Speed,
 				_weekFormatter_Pace,
@@ -324,8 +324,8 @@ public class CalendarProfileManager {
 
 			new FormatterData(true,		FormatterID.TOUR_TITLE,			_tourFormatter_TourTitle.getDefaultFormat()),
 			new FormatterData(true,		FormatterID.TOUR_DESCRIPTION,	_tourFormatter_TourDescription.getDefaultFormat()),
-			new FormatterData(true,		FormatterID.ALTITUDE,			_tourFormatter_Altitude.getDefaultFormat()),
 			new FormatterData(true,		FormatterID.DISTANCE,			_tourFormatter_Distance.getDefaultFormat()),
+			new FormatterData(true,		FormatterID.ALTITUDE,			_tourFormatter_Altitude.getDefaultFormat()),
 			new FormatterData(true,		FormatterID.TIME_MOVING,		_tourFormatter_Time_Moving.getDefaultFormat()),
 			new FormatterData(false,	FormatterID.EMPTY,				ValueFormat.DUMMY_VALUE),
 			new FormatterData(false,	FormatterID.EMPTY,				ValueFormat.DUMMY_VALUE),
@@ -336,8 +336,8 @@ public class CalendarProfileManager {
 
 		DEFAULT_WEEK_FORMATTER_DATA = new FormatterData[] {
 				
-			new FormatterData(true,		FormatterID.ALTITUDE,			_weekFormatter_Altitude.getDefaultFormat()),
 			new FormatterData(true,		FormatterID.DISTANCE,			_weekFormatter_Distance.getDefaultFormat()),
+			new FormatterData(true,		FormatterID.ALTITUDE,			_weekFormatter_Altitude.getDefaultFormat()),
 			new FormatterData(true,		FormatterID.SPEED,				_weekFormatter_Speed.getDefaultFormat()),
 			new FormatterData(true,		FormatterID.PACE,				_weekFormatter_Pace.getDefaultFormat()),
 			new FormatterData(true,		FormatterID.TIME_MOVING,		_weekFormatter_Time_Moving.getDefaultFormat()),
@@ -1288,6 +1288,8 @@ public class CalendarProfileManager {
 
 		profile.name = Messages.Calendar_Profile_Name_Compact;
 
+
+
 		// SET_FORMATTING_OFF
 
 //		                                      Compact
@@ -1306,11 +1308,11 @@ public class CalendarProfileManager {
 		                                                                                           
 		// year columns
 		profile.isShowYearColumns             = true;
-		profile.isYearColumnDayWidth             = false;
+		profile.isYearColumnDayWidth          = false;
 		profile.yearColumns                   = 1;
 		profile.yearColumnsSpacing            = 30;
 		profile.yearColumnsStart              = ColumnStart.CONTINUOUSLY;
-		profile.yearColumnDayWidth               = 200;
+		profile.yearColumnDayWidth            = 200;
 		profile.yearHeaderFont                = CalendarProfile.createFont(1.9f, SWT.BOLD);
 		                                                                                           
 		// date column
@@ -1342,7 +1344,7 @@ public class CalendarProfileManager {
 		profile.tourContentColor              = CalendarColor.CONTRAST;
 		profile.tourContentFont               = CalendarProfile.createFont(0.9f, SWT.NORMAL);
 		profile.tourMarginTop                 = -2;
-		profile.tourMarginLeft                = 0;
+		profile.tourMarginLeft                = 1;
 		profile.tourMarginBottom              = 0;
 		profile.tourMarginRight               = 2;
 		profile.tourTitleColor                = CalendarColor.CONTRAST;
@@ -1368,8 +1370,8 @@ public class CalendarProfileManager {
 
 			new FormatterData(true,      FormatterID.TOUR_TITLE,        ValueFormat.DUMMY_VALUE),
 			new FormatterData(true,      FormatterID.TOUR_DESCRIPTION,  ValueFormat.DUMMY_VALUE),
-			new FormatterData(true,      FormatterID.ALTITUDE,          ValueFormat.NUMBER_1_0),
 			new FormatterData(true,      FormatterID.DISTANCE,          ValueFormat.NUMBER_1_0),
+			new FormatterData(true,      FormatterID.ALTITUDE,          ValueFormat.NUMBER_1_0),
 			new FormatterData(true,      FormatterID.TIME_MOVING,       ValueFormat.TIME_HH_MM),
 			new FormatterData(false,     FormatterID.EMPTY,             ValueFormat.DUMMY_VALUE),
 			new FormatterData(false,     FormatterID.EMPTY,             ValueFormat.DUMMY_VALUE),
@@ -1379,8 +1381,8 @@ public class CalendarProfileManager {
 
 		profile.allWeekFormatterData          = new FormatterData[] {
 
-			new FormatterData(true,      FormatterID.ALTITUDE,          ValueFormat.NUMBER_1_0),
 			new FormatterData(true,      FormatterID.DISTANCE,          ValueFormat.NUMBER_1_0),
+			new FormatterData(true,      FormatterID.ALTITUDE,          ValueFormat.NUMBER_1_0),
 			new FormatterData(false,     FormatterID.SPEED,             ValueFormat.NUMBER_1_0),
 			new FormatterData(false,     FormatterID.PACE,              ValueFormat.PACE_MM_SS),
 			new FormatterData(false,     FormatterID.TIME_MOVING,       ValueFormat.TIME_HH_MM),
@@ -1390,6 +1392,8 @@ public class CalendarProfileManager {
 
 		// SET_FORMATTING_ON
 
+
+
 		return profile;
 	}
 
@@ -1398,6 +1402,8 @@ public class CalendarProfileManager {
 		final CalendarProfile profile = new CalendarProfile();
 
 		profile.name = Messages.Calendar_Profile_Name_CompactXL;
+
+
 
 		// SET_FORMATTING_OFF
 
@@ -1417,16 +1423,16 @@ public class CalendarProfileManager {
 		                                                                                           
 		// year columns
 		profile.isShowYearColumns             = true;
-		profile.isYearColumnDayWidth             = false;
+		profile.isYearColumnDayWidth          = false;
 		profile.yearColumns                   = 1;
 		profile.yearColumnsSpacing            = 30;
 		profile.yearColumnsStart              = ColumnStart.CONTINUOUSLY;
-		profile.yearColumnDayWidth               = 200;
+		profile.yearColumnDayWidth            = 200;
 		profile.yearHeaderFont                = CalendarProfile.createFont(1.9f, SWT.BOLD);
 		                                                                                           
 		// date column
 		profile.isShowDateColumn              = true;
-		profile.dateColumnContent             = DateColumnContent.YEAR;
+		profile.dateColumnContent             = DateColumnContent.MONTH;
 		profile.dateColumnFont                = CalendarProfile.createFont(1.4f, SWT.BOLD);
 		profile.dateColumnWidth               = 50;
 		                                                                                           
@@ -1452,8 +1458,8 @@ public class CalendarProfileManager {
 		profile.isTruncateTourText            = true;
 		profile.tourContentColor              = CalendarColor.CONTRAST;
 		profile.tourContentFont               = CalendarProfile.createFont(0.9f, SWT.NORMAL);
-		profile.tourMarginTop                 = -2;
-		profile.tourMarginLeft                = 0;
+		profile.tourMarginTop                 = -1;
+		profile.tourMarginLeft                = 1;
 		profile.tourMarginBottom              = 0;
 		profile.tourMarginRight               = 2;
 		profile.tourTitleColor                = CalendarColor.CONTRAST;
@@ -1479,8 +1485,8 @@ public class CalendarProfileManager {
 
 			new FormatterData(true,      FormatterID.TOUR_TITLE,        ValueFormat.DUMMY_VALUE),
 			new FormatterData(true,      FormatterID.TOUR_DESCRIPTION,  ValueFormat.DUMMY_VALUE),
-			new FormatterData(true,      FormatterID.ALTITUDE,          ValueFormat.NUMBER_1_0),
 			new FormatterData(true,      FormatterID.DISTANCE,          ValueFormat.NUMBER_1_0),
+			new FormatterData(true,      FormatterID.ALTITUDE,          ValueFormat.NUMBER_1_0),
 			new FormatterData(true,      FormatterID.TIME_MOVING,       ValueFormat.TIME_HH),
 			new FormatterData(false,     FormatterID.EMPTY,             ValueFormat.DUMMY_VALUE),
 			new FormatterData(false,     FormatterID.EMPTY,             ValueFormat.DUMMY_VALUE),
@@ -1490,8 +1496,8 @@ public class CalendarProfileManager {
 
 		profile.allWeekFormatterData          = new FormatterData[] {
 
-			new FormatterData(true,      FormatterID.ALTITUDE,          ValueFormat.NUMBER_1_0),
 			new FormatterData(true,      FormatterID.DISTANCE,          ValueFormat.NUMBER_1_0),
+			new FormatterData(false,     FormatterID.ALTITUDE,          ValueFormat.NUMBER_1_0),
 			new FormatterData(false,     FormatterID.SPEED,             ValueFormat.NUMBER_1_0),
 			new FormatterData(false,     FormatterID.PACE,              ValueFormat.PACE_MM_SS),
 			new FormatterData(false,     FormatterID.TIME_MOVING,       ValueFormat.TIME_HH_MM),
@@ -1501,6 +1507,8 @@ public class CalendarProfileManager {
 
 		// SET_FORMATTING_ON
 
+
+
 		return profile;
 	}
 
@@ -1509,6 +1517,7 @@ public class CalendarProfileManager {
 		final CalendarProfile profile = new CalendarProfile();
 
 		profile.name = Messages.Calendar_Profile_Name_Default;
+
 
 		// SET_FORMATTING_OFF
 
@@ -1528,11 +1537,11 @@ public class CalendarProfileManager {
 		                                                                                           
 		// year columns
 		profile.isShowYearColumns             = true;
-		profile.isYearColumnDayWidth             = false;
+		profile.isYearColumnDayWidth          = false;
 		profile.yearColumns                   = 1;
 		profile.yearColumnsSpacing            = 30;
 		profile.yearColumnsStart              = ColumnStart.CONTINUOUSLY;
-		profile.yearColumnDayWidth               = 200;
+		profile.yearColumnDayWidth            = 200;
 		profile.yearHeaderFont                = CalendarProfile.createFont(2.8f, SWT.BOLD);
 		                                                                                           
 		// date column
@@ -1590,8 +1599,8 @@ public class CalendarProfileManager {
 
 			new FormatterData(true,      FormatterID.TOUR_TITLE,        ValueFormat.DUMMY_VALUE),
 			new FormatterData(true,      FormatterID.TOUR_DESCRIPTION,  ValueFormat.DUMMY_VALUE),
-			new FormatterData(true,      FormatterID.ALTITUDE,          ValueFormat.NUMBER_1_0),
 			new FormatterData(true,      FormatterID.DISTANCE,          ValueFormat.NUMBER_1_0),
+			new FormatterData(true,      FormatterID.ALTITUDE,          ValueFormat.NUMBER_1_0),
 			new FormatterData(true,      FormatterID.TIME_MOVING,       ValueFormat.TIME_HH_MM),
 			new FormatterData(false,     FormatterID.EMPTY,             ValueFormat.DUMMY_VALUE),
 			new FormatterData(false,     FormatterID.EMPTY,             ValueFormat.DUMMY_VALUE),
@@ -1601,8 +1610,8 @@ public class CalendarProfileManager {
 
 		profile.allWeekFormatterData          = new FormatterData[] {
 
-			new FormatterData(true,      FormatterID.ALTITUDE,          ValueFormat.NUMBER_1_0),
 			new FormatterData(true,      FormatterID.DISTANCE,          ValueFormat.NUMBER_1_0),
+			new FormatterData(true,      FormatterID.ALTITUDE,          ValueFormat.NUMBER_1_0),
 			new FormatterData(true,      FormatterID.SPEED,             ValueFormat.NUMBER_1_0),
 			new FormatterData(true,      FormatterID.PACE,              ValueFormat.PACE_MM_SS),
 			new FormatterData(true,      FormatterID.TIME_MOVING,       ValueFormat.TIME_HH_MM),
@@ -1612,6 +1621,7 @@ public class CalendarProfileManager {
 
 		// SET_FORMATTING_ON
 
+
 		return profile;
 	}
 
@@ -1620,6 +1630,7 @@ public class CalendarProfileManager {
 		final CalendarProfile profile = new CalendarProfile();
 
 		profile.name = Messages.Calendar_Profile_Name_Year;
+
 
 		// SET_FORMATTING_OFF
 
@@ -1712,8 +1723,8 @@ public class CalendarProfileManager {
 
 		profile.allWeekFormatterData          = new FormatterData[] {
 
-			new FormatterData(false,     FormatterID.ALTITUDE,          ValueFormat.NUMBER_1_0),
 			new FormatterData(true,      FormatterID.DISTANCE,          ValueFormat.NUMBER_1_0),
+			new FormatterData(false,     FormatterID.ALTITUDE,          ValueFormat.NUMBER_1_0),
 			new FormatterData(false,     FormatterID.SPEED,             ValueFormat.NUMBER_1_0),
 			new FormatterData(false,     FormatterID.PACE,              ValueFormat.PACE_MM_SS),
 			new FormatterData(false,     FormatterID.TIME_MOVING,       ValueFormat.TIME_HH),
@@ -1723,6 +1734,7 @@ public class CalendarProfileManager {
 
 		// SET_FORMATTING_ON
 
+
 		return profile;
 	}
 
@@ -1731,6 +1743,7 @@ public class CalendarProfileManager {
 		final CalendarProfile profile = new CalendarProfile();
 
 		profile.name = Messages.Calendar_Profile_Name_YearXL;
+
 
 		// SET_FORMATTING_OFF
 
@@ -1812,8 +1825,8 @@ public class CalendarProfileManager {
 
 			new FormatterData(true,      FormatterID.TOUR_TITLE,        ValueFormat.DUMMY_VALUE),
 			new FormatterData(true,      FormatterID.TOUR_DESCRIPTION,  ValueFormat.DUMMY_VALUE),
-			new FormatterData(true,      FormatterID.ALTITUDE,          ValueFormat.NUMBER_1_0),
 			new FormatterData(true,      FormatterID.DISTANCE,          ValueFormat.NUMBER_1_0),
+			new FormatterData(true,      FormatterID.ALTITUDE,          ValueFormat.NUMBER_1_0),
 			new FormatterData(true,      FormatterID.TIME_MOVING,       ValueFormat.TIME_HH_MM),
 			new FormatterData(false,     FormatterID.EMPTY,             ValueFormat.DUMMY_VALUE),
 			new FormatterData(false,     FormatterID.EMPTY,             ValueFormat.DUMMY_VALUE),
@@ -1823,8 +1836,8 @@ public class CalendarProfileManager {
 
 		profile.allWeekFormatterData          = new FormatterData[] {
 
-			new FormatterData(true,      FormatterID.ALTITUDE,          ValueFormat.NUMBER_1_0),
 			new FormatterData(true,      FormatterID.DISTANCE,          ValueFormat.NUMBER_1_0),
+			new FormatterData(true,      FormatterID.ALTITUDE,          ValueFormat.NUMBER_1_0),
 			new FormatterData(true,      FormatterID.SPEED,             ValueFormat.NUMBER_1_0),
 			new FormatterData(true,      FormatterID.PACE,              ValueFormat.PACE_MM_SS),
 			new FormatterData(true,      FormatterID.TIME_MOVING,       ValueFormat.TIME_HH_MM),
@@ -1834,6 +1847,7 @@ public class CalendarProfileManager {
 
 		// SET_FORMATTING_ON
 
+
 		return profile;
 	}
 
@@ -1842,6 +1856,7 @@ public class CalendarProfileManager {
 		final CalendarProfile profile = new CalendarProfile();
 
 		profile.name = Messages.Calendar_Profile_Name_YearXXL;
+
 
 		// SET_FORMATTING_OFF
 
@@ -1923,8 +1938,8 @@ public class CalendarProfileManager {
 
 			new FormatterData(true,      FormatterID.TOUR_TITLE,        ValueFormat.DUMMY_VALUE),
 			new FormatterData(true,      FormatterID.TOUR_DESCRIPTION,  ValueFormat.DUMMY_VALUE),
-			new FormatterData(true,      FormatterID.ALTITUDE,          ValueFormat.NUMBER_1_0),
 			new FormatterData(true,      FormatterID.DISTANCE,          ValueFormat.NUMBER_1_0),
+			new FormatterData(true,      FormatterID.ALTITUDE,          ValueFormat.NUMBER_1_0),
 			new FormatterData(true,      FormatterID.TIME_MOVING,       ValueFormat.TIME_HH_MM),
 			new FormatterData(false,     FormatterID.EMPTY,             ValueFormat.DUMMY_VALUE),
 			new FormatterData(false,     FormatterID.EMPTY,             ValueFormat.DUMMY_VALUE),
@@ -1934,8 +1949,8 @@ public class CalendarProfileManager {
 
 		profile.allWeekFormatterData          = new FormatterData[] {
 
-			new FormatterData(true,      FormatterID.ALTITUDE,          ValueFormat.NUMBER_1_0),
 			new FormatterData(true,      FormatterID.DISTANCE,          ValueFormat.NUMBER_1_0),
+			new FormatterData(true,      FormatterID.ALTITUDE,          ValueFormat.NUMBER_1_0),
 			new FormatterData(true,      FormatterID.SPEED,             ValueFormat.NUMBER_1_0),
 			new FormatterData(true,      FormatterID.PACE,              ValueFormat.PACE_MM_SS),
 			new FormatterData(true,      FormatterID.TIME_MOVING,       ValueFormat.TIME_HH_MM),
@@ -1944,6 +1959,7 @@ public class CalendarProfileManager {
 		};;
 
 		// SET_FORMATTING_ON
+
 
 		return profile;
 	}

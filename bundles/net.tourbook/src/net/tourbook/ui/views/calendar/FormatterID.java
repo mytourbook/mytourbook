@@ -22,11 +22,11 @@ public enum FormatterID {
 	TOUR_TITLE, //
 	TOUR_DESCRIPTION, //
 
-	ALTITUDE, //
 	DISTANCE, //
+	ALTITUDE, //
 
-	PACE, //
 	SPEED, //
+	PACE, //
 
 	TIME_MOVING, //
 	TIME_RECORDING, //

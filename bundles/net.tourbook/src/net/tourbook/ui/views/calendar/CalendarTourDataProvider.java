@@ -42,7 +42,6 @@ public class CalendarTourDataProvider {
 	private static CalendarTourDataProvider					_instance;
 
 	private static final AtomicLong							_weekExecuterId		= new AtomicLong();
-
 	private static final LinkedBlockingDeque<WeekLoader>	_weekWaitingQueue	= new LinkedBlockingDeque<>();
 
 	private static ThreadPoolExecutor						_weekLoadingExecutor;
@@ -135,9 +134,13 @@ public class CalendarTourDataProvider {
 		final LocalDate today = LocalDate.now();
 		final LocalDate requestedDate = LocalDate.of(year, month, 1);
 
-		if (requestedDate.isAfter(today)) {
+		if (
 
-			// requested data are after today -> there should be no data
+		// requested data are after today -> there should be no data
+		requestedDate.isAfter(today)
+
+				// requested data are before first tour
+				|| (_firstTourDateTime != null && requestedDate.isBefore(_firstTourDateTime.toLocalDate()))) {
 
 			/*
 			 * Create dummy data
@@ -592,6 +595,7 @@ public class CalendarTourDataProvider {
 
 		// reset all cached data
 
+		// stop week downloader
 		_weekExecuterId.incrementAndGet();
 
 		_dayCache.clear();

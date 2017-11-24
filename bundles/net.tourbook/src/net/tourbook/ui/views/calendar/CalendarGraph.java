@@ -2108,7 +2108,13 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 	private void drawWeek_YearHeader(final GC gc, final Rectangle yearHeaderRect) {
 
-		final String yearText = Integer.toString(_yearColumn_CurrentYear.getYear());
+		final String yearText = Integer.toString(
+				_yearColumn_CurrentYear
+
+						// move to end of the week that the year is displayed for the last day of the week
+						.plusDays(6)
+
+						.getYear());
 
 		gc.setForeground(_calendarFgColor);
 		gc.setBackground(_calendarBgColor);
@@ -3260,6 +3266,19 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 				// set first day to start of week
 				.with(getFirstDayOfWeek_SameOrPrevious());
+
+		_yearColumn_FirstYear = dt
+
+				// set default time
+				.atStartOfDay()
+
+				// move after the first week, otherwise the previous year could be set !!!
+				.plusWeeks(1)
+
+				// 1.1.
+				.withMonth(1)
+				.withDayOfMonth(1);
+
 	}
 
 	void setLinked(final boolean linked) {

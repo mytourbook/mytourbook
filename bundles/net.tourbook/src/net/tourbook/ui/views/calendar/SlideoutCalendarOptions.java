@@ -3522,8 +3522,10 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			return;
 		}
 
+		final CalendarGraph calendarGraph = _calendarView.getCalendarGraph();
+
 		// when changing the profile then more/less data are needed
-		_calendarView.getCalendarGraph().stopDataProvider();
+		calendarGraph.stopDataProvider();
 
 		// keep data from previous profile
 		saveState_Profile();
