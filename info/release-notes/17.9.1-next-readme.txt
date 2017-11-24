@@ -18,7 +18,7 @@ New
 
   - Customize calendar layout and keep it in configurations
   - Drag & drop a manual tour to another day
-
+  - log calendar profile modifications -DlogCalendarProfile
 
 * Duplicate a tour which is manually created
   Can be used for "events", like changing a battery

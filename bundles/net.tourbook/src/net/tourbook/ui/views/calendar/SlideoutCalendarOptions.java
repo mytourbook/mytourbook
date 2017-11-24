@@ -257,29 +257,6 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	private Spinner					_spinnerWeek_Rows;
 	private Button					_rdoWeekRow_Height;
 
-//	private class ProfileComparator extends ViewerComparator {
-//
-//		@Override
-//		public int compare(final Viewer viewer, final Object e1, final Object e2) {
-//
-//			if (e1 == null || e2 == null) {
-//				return 0;
-//			}
-//
-//			final CalendarProfile profile1 = (CalendarProfile) e1;
-//			final CalendarProfile profile2 = (CalendarProfile) e2;
-//
-//			return profile1.id.compareTo(profile2.id);
-//		}
-//
-//		@Override
-//		public boolean isSorterProperty(final Object element, final String property) {
-//
-//			// force resorting when a name is renamed
-//			return true;
-//		}
-//	}
-
 	private class ProfileProvider implements IStructuredContentProvider {
 
 		@Override
@@ -3021,9 +2998,9 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		enableControls();
 
 		// debugging: dump profile to copy&paste an adjusted profile into the profile manager
-//		if (_isLogCalendarProfile) {
-		CalendarProfileManager.getActiveCalendarProfile().dump();
-//		}
+		if (_isLogCalendarProfile) {
+			CalendarProfileManager.getActiveCalendarProfile().dump();
+		}
 
 		_calendarView.updateUI_Graph();
 	}
