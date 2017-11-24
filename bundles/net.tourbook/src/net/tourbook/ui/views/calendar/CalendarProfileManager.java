@@ -105,7 +105,7 @@ public class CalendarProfileManager {
 	private static final String				ATTR_IS_TOGGLE_MONTH_COLOR				= "isToggleMonthColor";				//$NON-NLS-1$
 	private static final String				ATTR_IS_TRUNCATE_TOUR_TEXT				= "isTruncateTourText";				//$NON-NLS-1$
 	private static final String				ATTR_IS_WEEK_ROW_HEIGHT					= "isWeekRowHeight";				//$NON-NLS-1$
-	private static final String				ATTR_IS_YEAR_COLUMN_WIDTH				= "isYearColumnWidth";				//$NON-NLS-1$
+	private static final String				ATTR_IS_YEAR_COLUMN_DAY_WIDTH			= "isYearColumnDayWidth";			//$NON-NLS-1$
 	private static final String				ATTR_PROFILE_DEFAULT_ID					= "profileDefaultId";				//$NON-NLS-1$
 	private static final String				ATTR_DATE_COLUMN_CONTENT				= "dateColumnContent";				//$NON-NLS-1$
 	private static final String				ATTR_DATE_COLUMN_FONT					= "dateColumnFont";					//$NON-NLS-1$
@@ -146,7 +146,7 @@ public class CalendarProfileManager {
 	private static final String				ATTR_YEAR_COLUMNS						= "yearColumns";					//$NON-NLS-1$
 	private static final String				ATTR_YEAR_COLUMNS_SPACING				= "yearColumnsSpacing";				//$NON-NLS-1$
 	private static final String				ATTR_YEAR_COLUMNS_START					= "yearColumnsStart";				//$NON-NLS-1$
-	private static final String				ATTR_YEAR_COLUMN_WIDTH					= "yearColumnWidth";				//$NON-NLS-1$
+	private static final String				ATTR_YEAR_COLUMN_DAY_WIDTH				= "yearColumnDayWidth";				//$NON-NLS-1$
 	private static final String				ATTR_YEAR_HEADER_FONT					= "yearHeaderFont";					//$NON-NLS-1$
 	//
 	static final RGB						DEFAULT_ALTERNATE_MONTH_RGB				= new RGB(0xf0, 0xf0, 0xf0);
@@ -160,7 +160,7 @@ public class CalendarProfileManager {
 	static final boolean					DEFAULT_IS_SHOW_DAY_DATE_WEEKEND_COLOR	= false;
 	static final boolean					DEFAULT_IS_TRUNCATE_TOUR_TEXT			= true;
 	static final boolean					DEFAULT_IS_WEEK_ROW_HEIGHT				= false;
-	static final boolean					DEFAULT_IS_YEAR_COLUMN_WIDTH			= false;
+	static final boolean					DEFAULT_IS_YEAR_COLUMN_DAY_WIDTH		= false;
 	static final int						DEFAULT_MARGIN_MIN						= -20;
 	static final int						DEFAULT_MARGIN_MAX						= 20;
 	static final int						DEFAULT_WEEK_COLUMN_WIDTH				= 100;
@@ -185,7 +185,7 @@ public class CalendarProfileManager {
 	static final int						DEFAULT_WEEK_MARGIN_RIGHT				= -3;
 	static final int						DEFAULT_WEEK_ROWS						= 10;
 	static final CalendarColor				DEFAULT_WEEK_VALUE_COLOR				= CalendarColor.BRIGHT;
-	static final int						DEFAULT_YEAR_COLUMN_WIDTH				= 200;
+	static final int						DEFAULT_YEAR_COLUMN_DAY_WIDTH			= 30;
 	static final int						DEFAULT_YEAR_COLUMNS					= 1;
 	static final ColumnStart				DEFAULT_YEAR_COLUMNS_LAYOUT				= ColumnStart.CONTINUOUSLY;
 	static final int						DEFAULT_YEAR_COLUMNS_SPACING			= 30;
@@ -218,8 +218,8 @@ public class CalendarProfileManager {
 	static final int						WEEK_ROWS_MAX							= 1000;
 	static final int						YEAR_COLUMNS_MIN						= 1;
 	static final int						YEAR_COLUMNS_MAX						= 100;
-	static final int						YEAR_COLUMN_WIDTH_MIN					= 5;
-	static final int						YEAR_COLUMN_WIDTH_MAX					= 10000;
+	static final int						YEAR_COLUMN_DAY_WIDTH_MIN				= 1;
+	static final int						YEAR_COLUMN_DAY_WIDTH_MAX				= 500;
 
 	private static final DataFormatter		_tourFormatter_Altitude;
 	private static final DataFormatter		_tourFormatter_Distance;
@@ -1195,11 +1195,11 @@ public class CalendarProfileManager {
 		                                                                                           
 		// year columns
 		profile.isShowYearColumns             = false;
-		profile.isYearColumnWidth             = false;
+		profile.isYearColumnDayWidth             = false;
 		profile.yearColumns                   = 2;
 		profile.yearColumnsSpacing            = 30;
 		profile.yearColumnsStart              = ColumnStart.CONTINUOUSLY;
-		profile.yearColumnWidth               = 200;
+		profile.yearColumnDayWidth               = 200;
 		profile.yearHeaderFont                = CalendarProfile.createFont(2.2f, SWT.BOLD);
 		                                                                                           
 		// date column
@@ -1306,11 +1306,11 @@ public class CalendarProfileManager {
 		                                                                                           
 		// year columns
 		profile.isShowYearColumns             = true;
-		profile.isYearColumnWidth             = false;
+		profile.isYearColumnDayWidth             = false;
 		profile.yearColumns                   = 1;
 		profile.yearColumnsSpacing            = 30;
 		profile.yearColumnsStart              = ColumnStart.CONTINUOUSLY;
-		profile.yearColumnWidth               = 200;
+		profile.yearColumnDayWidth               = 200;
 		profile.yearHeaderFont                = CalendarProfile.createFont(1.9f, SWT.BOLD);
 		                                                                                           
 		// date column
@@ -1417,11 +1417,11 @@ public class CalendarProfileManager {
 		                                                                                           
 		// year columns
 		profile.isShowYearColumns             = true;
-		profile.isYearColumnWidth             = false;
+		profile.isYearColumnDayWidth             = false;
 		profile.yearColumns                   = 1;
 		profile.yearColumnsSpacing            = 30;
 		profile.yearColumnsStart              = ColumnStart.CONTINUOUSLY;
-		profile.yearColumnWidth               = 200;
+		profile.yearColumnDayWidth               = 200;
 		profile.yearHeaderFont                = CalendarProfile.createFont(1.9f, SWT.BOLD);
 		                                                                                           
 		// date column
@@ -1528,11 +1528,11 @@ public class CalendarProfileManager {
 		                                                                                           
 		// year columns
 		profile.isShowYearColumns             = true;
-		profile.isYearColumnWidth             = false;
+		profile.isYearColumnDayWidth             = false;
 		profile.yearColumns                   = 1;
 		profile.yearColumnsSpacing            = 30;
 		profile.yearColumnsStart              = ColumnStart.CONTINUOUSLY;
-		profile.yearColumnWidth               = 200;
+		profile.yearColumnDayWidth               = 200;
 		profile.yearHeaderFont                = CalendarProfile.createFont(2.8f, SWT.BOLD);
 		                                                                                           
 		// date column
@@ -1623,7 +1623,7 @@ public class CalendarProfileManager {
 
 		// SET_FORMATTING_OFF
 
-//		                                      Compact Altitude
+//		                                      Year
 
 		profile.defaultId                     = ProfileDefault.YEAR;
 
@@ -1634,16 +1634,16 @@ public class CalendarProfileManager {
 		profile.alternateMonthRGB             = new RGB (60, 60, 60);
 		profile.calendarBackgroundRGB         = new RGB (40, 40, 40);
 		profile.calendarForegroundRGB         = new RGB (200, 200, 200);
-		profile.weekHeight                    = 13;
+		profile.weekHeight                    = 15;
 		profile.weekRows                      = 10;
 		                                                                                           
 		// year columns
 		profile.isShowYearColumns             = true;
-		profile.isYearColumnWidth             = true;
+		profile.isYearColumnDayWidth          = true;
 		profile.yearColumns                   = 5;
 		profile.yearColumnsSpacing            = 13;
 		profile.yearColumnsStart              = ColumnStart.JAN;
-		profile.yearColumnWidth               = 120;
+		profile.yearColumnDayWidth            = 15;
 		profile.yearHeaderFont                = CalendarProfile.createFont(1.7f, SWT.BOLD);
 		                                                                                           
 		// date column
@@ -1660,7 +1660,7 @@ public class CalendarProfileManager {
 		profile.dayDateFormat                 = DayDateFormat.DAY;
 		                                                                                           
 		// tour background
-		profile.tourBackground                = TourBackground.FILL;
+		profile.tourBackground                = TourBackground.CIRCLE;
 		profile.tourBackgroundColor1          = CalendarColor.DARK;
 		profile.tourBackgroundColor2          = CalendarColor.BRIGHT;
 		profile.tourBackgroundWidth           = 3;
@@ -1734,7 +1734,7 @@ public class CalendarProfileManager {
 
 		// SET_FORMATTING_OFF
 
-//		                                      Crazy
+//		                                      Year XL
 
 		profile.defaultId                     = ProfileDefault.YEAR_XL;
 
@@ -1750,11 +1750,11 @@ public class CalendarProfileManager {
 		                                                                                           
 		// year columns
 		profile.isShowYearColumns             = true;
-		profile.isYearColumnWidth             = true;
+		profile.isYearColumnDayWidth          = true;
 		profile.yearColumns                   = 20;
 		profile.yearColumnsSpacing            = 0;
 		profile.yearColumnsStart              = ColumnStart.JAN;
-		profile.yearColumnWidth               = 60;
+		profile.yearColumnDayWidth            = 10;
 		profile.yearHeaderFont                = CalendarProfile.createFont(1.4f, SWT.BOLD);
 		                                                                                           
 		// date column
@@ -1771,13 +1771,13 @@ public class CalendarProfileManager {
 		profile.dayDateFormat                 = DayDateFormat.DAY;
 		                                                                                           
 		// tour background
-		profile.tourBackground                = TourBackground.FILL;
+		profile.tourBackground                = TourBackground.CIRCLE;
 		profile.tourBackgroundColor1          = CalendarColor.DARK;
 		profile.tourBackgroundColor2          = CalendarColor.WHITE;
 		profile.tourBackgroundWidth           = 3;
 		profile.tourBorder                    = TourBorder.BORDER_ALL;
 		profile.tourBorderColor               = CalendarColor.DARK;
-		profile.tourBorderWidth               = 1;
+		profile.tourBorderWidth               = 0;
 		                                                                                           
 		// tour content
 		profile.isShowTourContent             = false;
@@ -1861,11 +1861,11 @@ public class CalendarProfileManager {
 		                                                                                           
 		// year columns
 		profile.isShowYearColumns             = true;
-		profile.isYearColumnWidth             = true;
+		profile.isYearColumnDayWidth          = true;
 		profile.yearColumns                   = 20;
 		profile.yearColumnsSpacing            = 0;
 		profile.yearColumnsStart              = ColumnStart.JAN;
-		profile.yearColumnWidth               = 30;
+		profile.yearColumnDayWidth            = 4;
 		profile.yearHeaderFont                = CalendarProfile.createFont(1.0f, SWT.NORMAL);
 		                                                                                           
 		// date column
@@ -2266,11 +2266,11 @@ public class CalendarProfileManager {
 		
 		// year columns
 		profile.isShowYearColumns			= Util.getXmlBoolean(xmlProfile, 					ATTR_IS_SHOW_YEAR_COLUMNS,		true);
-		profile.isYearColumnWidth			= Util.getXmlBoolean(xmlProfile, 					ATTR_IS_YEAR_COLUMN_WIDTH,		DEFAULT_IS_YEAR_COLUMN_WIDTH);
+		profile.isYearColumnDayWidth			= Util.getXmlBoolean(xmlProfile, 				ATTR_IS_YEAR_COLUMN_DAY_WIDTH,		DEFAULT_IS_YEAR_COLUMN_DAY_WIDTH);
 		profile.yearColumns					= Util.getXmlInteger(xmlProfile,					ATTR_YEAR_COLUMNS,				DEFAULT_YEAR_COLUMNS);
 		profile.yearColumnsSpacing			= Util.getXmlInteger(xmlProfile, 					ATTR_YEAR_COLUMNS_SPACING,		DEFAULT_YEAR_COLUMNS_SPACING);
 		profile.yearColumnsStart			= (ColumnStart) Util.getXmlEnum(xmlProfile,			ATTR_YEAR_COLUMNS_START,		DEFAULT_YEAR_COLUMNS_LAYOUT);
-		profile.yearColumnWidth				= Util.getXmlInteger(xmlProfile, 					ATTR_YEAR_COLUMN_WIDTH,			DEFAULT_YEAR_COLUMN_WIDTH);
+		profile.yearColumnDayWidth			= Util.getXmlInteger(xmlProfile, 					ATTR_YEAR_COLUMN_DAY_WIDTH,		DEFAULT_YEAR_COLUMN_DAY_WIDTH);
 		profile.yearHeaderFont				= Util.getXmlFont(xmlProfile, 						ATTR_YEAR_HEADER_FONT,			defaultFont.getFontData()[0]);
 		
 		// date column
@@ -2399,10 +2399,10 @@ public class CalendarProfileManager {
 		
 		// year columns
 		xmlProfile.putBoolean(		ATTR_IS_SHOW_YEAR_COLUMNS, 				profile.isShowYearColumns);
-		xmlProfile.putBoolean(		ATTR_IS_YEAR_COLUMN_WIDTH, 				profile.isYearColumnWidth);
+		xmlProfile.putBoolean(		ATTR_IS_YEAR_COLUMN_DAY_WIDTH, 			profile.isYearColumnDayWidth);
 		xmlProfile.putInteger(		ATTR_YEAR_COLUMNS, 						profile.yearColumns);
 		xmlProfile.putInteger(		ATTR_YEAR_COLUMNS_SPACING, 				profile.yearColumnsSpacing);
-		xmlProfile.putInteger(		ATTR_YEAR_COLUMN_WIDTH, 				profile.yearColumnWidth);
+		xmlProfile.putInteger(		ATTR_YEAR_COLUMN_DAY_WIDTH, 			profile.yearColumnDayWidth);
 		Util.setXmlEnum(xmlProfile,	ATTR_YEAR_COLUMNS_START, 				profile.yearColumnsStart);
 		Util.setXmlFont(xmlProfile,	ATTR_YEAR_HEADER_FONT, 					profile.yearHeaderFont);
 		

@@ -67,11 +67,11 @@ public class CalendarProfile implements Cloneable {
 	//
 	// year columns
 	boolean 				isShowYearColumns			= true;
-	boolean 				isYearColumnWidth			= CalendarProfileManager.DEFAULT_IS_YEAR_COLUMN_WIDTH;
+	boolean 				isYearColumnDayWidth		= CalendarProfileManager.DEFAULT_IS_YEAR_COLUMN_DAY_WIDTH;
 	int						yearColumns					= CalendarProfileManager.DEFAULT_YEAR_COLUMNS;
 	int 					yearColumnsSpacing			= CalendarProfileManager.DEFAULT_YEAR_COLUMNS_SPACING;
 	ColumnStart				yearColumnsStart			= CalendarProfileManager.DEFAULT_YEAR_COLUMNS_LAYOUT;
-	int 					yearColumnWidth				= CalendarProfileManager.DEFAULT_YEAR_COLUMN_WIDTH;
+	int 					yearColumnDayWidth			= CalendarProfileManager.DEFAULT_YEAR_COLUMN_DAY_WIDTH;
 	FontData 				yearHeaderFont				= createFont(2.8f, SWT.BOLD);
 	//
 	// date column
@@ -251,11 +251,11 @@ public class CalendarProfile implements Cloneable {
         sb.append("                                                                                           \n"); //$NON-NLS-1$
         sb.append("// year columns                                                                            \n"); //$NON-NLS-1$
         sb.append("profile.isShowYearColumns             = " + isShowYearColumns                          + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
-        sb.append("profile.isYearColumnWidth             = " + isYearColumnWidth                          + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.isYearColumnDayWidth          = " + isYearColumnDayWidth                       + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.yearColumns                   = " + yearColumns                                + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.yearColumnsSpacing            = " + yearColumnsSpacing                         + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.yearColumnsStart              = ColumnStart." + yearColumnsStart               + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
-        sb.append("profile.yearColumnWidth               = " + yearColumnWidth                            + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.yearColumnDayWidth            = " + yearColumnDayWidth                         + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.yearHeaderFont                = " + dump_Font(yearHeaderFont)                  + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("                                                                                           \n"); //$NON-NLS-1$
         sb.append("// date column                                                                             \n"); //$NON-NLS-1$

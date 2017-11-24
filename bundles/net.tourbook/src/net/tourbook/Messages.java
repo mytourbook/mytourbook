@@ -1661,8 +1661,8 @@ public class Messages extends NLS {
 	public static String		Slideout_CalendarOptions_Label_YearHeaderFont;
 	public static String		Slideout_CalendarOptions_Radio_Weeks_ByHeight;
 	public static String		Slideout_CalendarOptions_Radio_Weeks_ByNumber;
+	public static String		Slideout_CalendarOptions_Radio_YearColumns_ByDayWidth;
 	public static String		Slideout_CalendarOptions_Radio_YearColumns_ByNumber;
-	public static String		Slideout_CalendarOptions_Radio_YearColumns_ByWidth;
 	public static String		Slideout_CalendarOptions_Tab_CalendarLayout;
 	public static String		Slideout_CalendarOptions_Tab_Profiles;
 	public static String		Slideout_CalendarOptions_Tab_TourContent;

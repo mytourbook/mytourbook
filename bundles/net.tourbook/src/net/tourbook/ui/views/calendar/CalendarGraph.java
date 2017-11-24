@@ -986,18 +986,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		_numWeeksInOneColumn = numVisibleRows;
 
-		// one col left and right of the week + 7 week days
-		int numYearColumns = 1;
-		if (useYearColumns) {
-
-			numYearColumns = _currentProfile.isYearColumnWidth
-					? canvasWidth / _currentProfile.yearColumnWidth
-					: _currentProfile.yearColumns;
-
-		}
-
-		final int numDayColumns = 7;
-
 		final GC gc = new GC(_calendarImage);
 
 		final Color monthAlternateColor = _colorCache.getColor(_currentProfile.alternateMonthRGB);
@@ -1013,21 +1001,38 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		int dateColumnWidth = 0;
 		if (_currentProfile.isShowDateColumn) {
-			dateColumnWidth = _currentProfile.dateColumnWidth;//* _defaultFontAverageCharWidth;
+			dateColumnWidth = _currentProfile.dateColumnWidth;
 		}
 
 		int summaryColumnWidth = 0;
 		if (_currentProfile.isShowSummaryColumn) {
-			summaryColumnWidth = _currentProfile.weekColumnWidth;// * _defaultFontAverageCharWidth;
+			summaryColumnWidth = _currentProfile.weekColumnWidth;
 		}
 
-		final int columnSpacing = _currentProfile.yearColumnsSpacing;
-		final int allColumnSpace = (numYearColumns - 1) * columnSpacing;
+		final int yearColumnsSpacing = _currentProfile.yearColumnsSpacing;
+		final int yearColumnDayWidth = _currentProfile.yearColumnDayWidth;
+
+		final int numDayColumns = 7;
+		final int yearColumnWidth = dateColumnWidth + (yearColumnDayWidth * numDayColumns) + summaryColumnWidth;
+
+		int numYearColumns = 1;
+		if (useYearColumns) {
+
+			if (_currentProfile.isYearColumnDayWidth) {
+
+				numYearColumns = canvasWidth / yearColumnWidth;
+
+			} else {
+				numYearColumns = _currentProfile.yearColumns;
+			}
+		}
+
+		final int allColumnSpace = (numYearColumns - 1) * yearColumnsSpacing;
 
 		int calendarColumnWidth;
-		if (_currentProfile.isYearColumnWidth) {
+		if (_currentProfile.isYearColumnDayWidth) {
 
-			calendarColumnWidth = _currentProfile.yearColumnWidth;
+			calendarColumnWidth = yearColumnWidth;
 
 		} else {
 
@@ -1094,7 +1099,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 			_nextWeekDateYPos = 0;
 
-			final int columnColumSpacing = columnIndex == 0 ? 0 : columnSpacing;
+			final int columnColumSpacing = columnIndex == 0 ? 0 : yearColumnsSpacing;
 			final int calendarColumnOffset = columnIndex * calendarColumnWidth + columnColumSpacing * columnIndex;
 
 			_calendarAllDaysRectangle[columnIndex] = new Rectangle(
