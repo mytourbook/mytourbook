@@ -185,7 +185,7 @@ public class CalendarProfileManager {
 	static final int						DEFAULT_WEEK_MARGIN_RIGHT				= -3;
 	static final int						DEFAULT_WEEK_ROWS						= 10;
 	static final CalendarColor				DEFAULT_WEEK_VALUE_COLOR				= CalendarColor.BRIGHT;
-	static final int						DEFAULT_YEAR_COLUMN_DAY_WIDTH			= 30;
+	static final int						DEFAULT_YEAR_COLUMN_DAY_WIDTH			= 50;
 	static final int						DEFAULT_YEAR_COLUMNS					= 1;
 	static final ColumnStart				DEFAULT_YEAR_COLUMNS_LAYOUT				= ColumnStart.CONTINUOUSLY;
 	static final int						DEFAULT_YEAR_COLUMNS_SPACING			= 30;
@@ -1175,7 +1175,6 @@ public class CalendarProfileManager {
 
 		profile.name = Messages.Calendar_Profile_Name_Default;
 
-
 		// SET_FORMATTING_OFF
 
 //		                                      Default
@@ -1198,7 +1197,7 @@ public class CalendarProfileManager {
 		profile.yearColumns                   = 1;
 		profile.yearColumnsSpacing            = 30;
 		profile.yearColumnsStart              = ColumnStart.CONTINUOUSLY;
-		profile.yearColumnDayWidth            = 200;
+		profile.yearColumnDayWidth            = 50;
 		profile.yearHeaderFont                = CalendarProfile.createFont(2.8f, SWT.BOLD);
 		                                                                                           
 		// date column
@@ -1232,7 +1231,7 @@ public class CalendarProfileManager {
 		profile.tourMarginTop                 = -2;
 		profile.tourMarginLeft                = 1;
 		profile.tourMarginBottom              = 1;
-		profile.tourMarginRight               = -2;
+		profile.tourMarginRight               = -1;
 		profile.tourTitleColor                = CalendarColor.CONTRAST;
 		profile.tourTitleFont                 = CalendarProfile.createFont(1.2f, SWT.BOLD);
 		profile.tourTruncatedLines            = 3;
@@ -1278,7 +1277,6 @@ public class CalendarProfileManager {
 
 		// SET_FORMATTING_ON
 
-
 		return profile;
 	}
 
@@ -1287,8 +1285,6 @@ public class CalendarProfileManager {
 		final CalendarProfile profile = new CalendarProfile();
 
 		profile.name = Messages.Calendar_Profile_Name_Compact;
-
-
 
 		// SET_FORMATTING_OFF
 
@@ -1312,7 +1308,7 @@ public class CalendarProfileManager {
 		profile.yearColumns                   = 1;
 		profile.yearColumnsSpacing            = 30;
 		profile.yearColumnsStart              = ColumnStart.CONTINUOUSLY;
-		profile.yearColumnDayWidth            = 200;
+		profile.yearColumnDayWidth            = 50;
 		profile.yearHeaderFont                = CalendarProfile.createFont(1.9f, SWT.BOLD);
 		                                                                                           
 		// date column
@@ -1392,8 +1388,6 @@ public class CalendarProfileManager {
 
 		// SET_FORMATTING_ON
 
-
-
 		return profile;
 	}
 
@@ -1402,8 +1396,6 @@ public class CalendarProfileManager {
 		final CalendarProfile profile = new CalendarProfile();
 
 		profile.name = Messages.Calendar_Profile_Name_CompactXL;
-
-
 
 		// SET_FORMATTING_OFF
 
@@ -1427,7 +1419,7 @@ public class CalendarProfileManager {
 		profile.yearColumns                   = 1;
 		profile.yearColumnsSpacing            = 30;
 		profile.yearColumnsStart              = ColumnStart.CONTINUOUSLY;
-		profile.yearColumnDayWidth            = 200;
+		profile.yearColumnDayWidth            = 50;
 		profile.yearHeaderFont                = CalendarProfile.createFont(1.9f, SWT.BOLD);
 		                                                                                           
 		// date column
@@ -1507,8 +1499,6 @@ public class CalendarProfileManager {
 
 		// SET_FORMATTING_ON
 
-
-
 		return profile;
 	}
 
@@ -1517,7 +1507,6 @@ public class CalendarProfileManager {
 		final CalendarProfile profile = new CalendarProfile();
 
 		profile.name = Messages.Calendar_Profile_Name_Year;
-
 
 		// SET_FORMATTING_OFF
 
@@ -1621,7 +1610,6 @@ public class CalendarProfileManager {
 
 		// SET_FORMATTING_ON
 
-
 		return profile;
 	}
 
@@ -1630,7 +1618,6 @@ public class CalendarProfileManager {
 		final CalendarProfile profile = new CalendarProfile();
 
 		profile.name = Messages.Calendar_Profile_Name_YearXL;
-
 
 		// SET_FORMATTING_OFF
 
@@ -1734,7 +1721,6 @@ public class CalendarProfileManager {
 
 		// SET_FORMATTING_ON
 
-
 		return profile;
 	}
 
@@ -1743,7 +1729,6 @@ public class CalendarProfileManager {
 		final CalendarProfile profile = new CalendarProfile();
 
 		profile.name = Messages.Calendar_Profile_Name_YearXXL;
-
 
 		// SET_FORMATTING_OFF
 
@@ -1847,8 +1832,6 @@ public class CalendarProfileManager {
 
 		// SET_FORMATTING_ON
 
-
-
 		return profile;
 	}
 
@@ -1880,7 +1863,7 @@ public class CalendarProfileManager {
 		profile.yearColumns                   = 2;
 		profile.yearColumnsSpacing            = 30;
 		profile.yearColumnsStart              = ColumnStart.CONTINUOUSLY;
-		profile.yearColumnDayWidth               = 200;
+		profile.yearColumnDayWidth            = 50;
 		profile.yearHeaderFont                = CalendarProfile.createFont(2.2f, SWT.BOLD);
 		                                                                                           
 		// date column

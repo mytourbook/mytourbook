@@ -28,7 +28,6 @@ import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.tooltip.OpenDialogManager;
-import net.tourbook.common.util.SelectionProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -50,7 +49,6 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -92,7 +90,6 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 	
 // SET_FORMATTING_ON
 
-	private ISelectionProvider		_selectionProvider;
 	//
 	private ISelectionListener		_selectionListener;
 	private IPartListener2			_partListener;
@@ -222,23 +219,6 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 		getSite().getPage().addPostSelectionListener(_selectionListener);
 	}
 
-	// create and register our selection provider
-	private void addSelectionProvider() {
-
-		getSite().setSelectionProvider(_selectionProvider = new SelectionProvider());
-
-		_calendarGraph.addSelectionProvider(new ICalendarSelectionProvider() {
-
-			@Override
-			public void selectionChanged(final CalendarGraph.CalendarSelectItem selection) {
-				if (selection.isTour()) {
-					_selectionProvider.setSelection(new SelectionTourId(selection.id));
-				}
-			}
-
-		});
-	}
-
 	private void addTourEventListener() {
 
 		_tourEventListener = new ITourEventListener() {
@@ -342,7 +322,6 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 		fillActions();
 
 		addSelectionListener();
-		addSelectionProvider();
 
 		// set context menu
 		final Menu contextMenu = (new TourContextMenu()).createContextMenu(this, _calendarGraph, getLocalActions());
@@ -474,6 +453,11 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 		}
 
 		_comboProfiles.select(selectIndex);
+	}
+
+	void fireSelection(final long tourId) {
+
+		TourManager.fireEventWithCustomData(TourEventId.TOUR_SELECTION, new SelectionTourId(tourId), this);
 	}
 
 	public CalendarGraph getCalendarGraph() {

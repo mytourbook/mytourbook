@@ -528,7 +528,7 @@ public class CalendarTourDataProvider {
 				}
 
 				if (loadWeek_FromDB(weekLoader)) {
-					_calendarGraph.updateUI_Layout();
+					_calendarGraph.updateUI_AfterDataLoading();
 				}
 			}
 		};

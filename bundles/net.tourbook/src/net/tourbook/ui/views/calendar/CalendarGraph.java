@@ -48,9 +48,7 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProviderAll;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.ByteArrayTransfer;
@@ -126,8 +124,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	private CalendarView						_calendarView;
 	private CalendarTourDataProvider			_dataProvider;
 	private CalendarYearMonthContributionItem	_calendarYearMonthContributor;
-	//
-	private ListenerList						_selectionProvider		= new ListenerList();
 	//
 	/**
 	 * Displayed weeks in the calendar which are before the first calendar tour or after today
@@ -620,6 +616,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		addMouseListener(new MouseListener() {
 			@Override
 			public void mouseDoubleClick(final MouseEvent e) {
+
 				if (_selectedItem.isTour()) {
 
 					_tourDoubleClickState.canEditTour = true;
@@ -630,7 +627,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 					TourManager.getInstance().tourDoubleClickAction(CalendarGraph.this, _tourDoubleClickState);
 				}
-
 			}
 
 			@Override
@@ -862,10 +858,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 	}
 
-	void addSelectionProvider(final ICalendarSelectionProvider provider) {
-		_selectionProvider.add(provider);
-	}
-
 	private void disposeFonts() {
 
 		_fontDateColumn = UI.disposeResource(_fontDateColumn);
@@ -917,6 +909,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 			return;
 		}
+
+		// set state very early that data loading can reset it
+		_isGraphDirty = false;
 
 		setupProfile();
 
@@ -1347,7 +1342,17 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		updateUI_YearMonthCombo(currentDate);
 
-		_isGraphDirty = false;
+		if (_isGraphDirty) {
+
+			// graph is dirty again, this can occure when data are loaded -> rescedule a new update
+
+			getDisplay().timerExec(5, new Runnable() {
+				@Override
+				public void run() {
+					redraw();
+				}
+			});
+		}
 	}
 
 	private void drawDay(	final GC gc,
@@ -1895,7 +1900,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		if (!_lastSelectedItem.equals(_selectedItem)) {
 
-			fireSelectionEvent(_selectedItem);
+			_calendarView.fireSelection(_selectedItem.id);
 
 			_lastSelectedItem = _selectedItem;
 		}
@@ -2130,34 +2135,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 //		gc.setForeground(_red);
 //		gc.drawRectangle(yearHeaderRect);
-	}
-
-	void fireSelectionEvent(final CalendarSelectItem selection) {
-
-		final Object[] listeners = _selectionProvider.getListeners();
-		for (final Object listener2 : listeners) {
-			final ICalendarSelectionProvider listener = (ICalendarSelectionProvider) listener2;
-			SafeRunnable.run(new SafeRunnable() {
-				@Override
-				public void run() {
-					listener.selectionChanged(selection);
-				}
-			});
-		}
-	}
-
-	void fireSelectionEvent(final ItemType type, final long id) {
-
-		final Object[] listeners = _selectionProvider.getListeners();
-		for (final Object listener2 : listeners) {
-			final ICalendarSelectionProvider listener = (ICalendarSelectionProvider) listener2;
-			SafeRunnable.run(new SafeRunnable() {
-				@Override
-				public void run() {
-					listener.selectionChanged(_selectedItem);
-				}
-			});
-		}
 	}
 
 	@Override
@@ -2935,10 +2912,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 	}
 
-	void removeSelectionListener(final ICalendarSelectionProvider listener) {
-		_selectionProvider.remove(listener);
-	}
-
 	public void scroll_Screen(final boolean isNext) {
 
 		final boolean useDraggedScrolling = _currentProfile.useDraggedScrolling;
@@ -3370,12 +3343,14 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		});
 	}
 
-	void updateUI_Layout() {
+	void updateUI_AfterDataLoading() {
 
 		if (_isGraphDirty) {
 			// redraw is already forced
 			return;
 		}
+
+		_isGraphDirty = true;
 
 		// update UI
 		Display.getDefault().asyncExec(new Runnable() {
