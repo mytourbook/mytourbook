@@ -58,6 +58,7 @@ public class Messages extends NLS {
 	public static String		Calendar_Profile_Name_Classic;
 	public static String		Calendar_Profile_Name_Compact;
 	public static String		Calendar_Profile_Name_CompactXL;
+	public static String		Calendar_Profile_Name_CompactXLsmall;
 	public static String		Calendar_Profile_Name_Default;
 	public static String		Calendar_Profile_Name_Year;
 	public static String		Calendar_Profile_Name_YearXL;

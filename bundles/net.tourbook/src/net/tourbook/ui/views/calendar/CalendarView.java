@@ -225,6 +225,11 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 			@Override
 			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
+				if (CalendarView.this == part) {
+					// skip own events
+					return;
+				}
+
 				if (eventId == TourEventId.TOUR_CHANGED || eventId == TourEventId.UPDATE_UI) {
 					/*
 					 * it is possible when a tour type was modified, the tour can be hidden or

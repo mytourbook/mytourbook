@@ -1159,8 +1159,10 @@ public class CalendarProfileManager {
 		_allCalendarProfiles.clear();
 
 		_allCalendarProfiles.add(createProfile_10_Default());
+
 		_allCalendarProfiles.add(createProfile_20_Compact());
 		_allCalendarProfiles.add(createProfile_22_Compact_XL());
+		_allCalendarProfiles.add(createProfile_23_Compact_XL_small());
 
 		_allCalendarProfiles.add(createProfile_50_Year());
 		_allCalendarProfiles.add(createProfile_52_YearXL());
@@ -1480,6 +1482,117 @@ public class CalendarProfileManager {
 			new FormatterData(true,      FormatterID.DISTANCE,          ValueFormat.NUMBER_1_0),
 			new FormatterData(true,      FormatterID.ALTITUDE,          ValueFormat.NUMBER_1_0),
 			new FormatterData(true,      FormatterID.TIME_MOVING,       ValueFormat.TIME_HH),
+			new FormatterData(false,     FormatterID.EMPTY,             ValueFormat.DUMMY_VALUE),
+			new FormatterData(false,     FormatterID.EMPTY,             ValueFormat.DUMMY_VALUE),
+			new FormatterData(false,     FormatterID.EMPTY,             ValueFormat.DUMMY_VALUE),
+
+		};;
+
+		profile.allWeekFormatterData          = new FormatterData[] {
+
+			new FormatterData(true,      FormatterID.DISTANCE,          ValueFormat.NUMBER_1_0),
+			new FormatterData(false,     FormatterID.ALTITUDE,          ValueFormat.NUMBER_1_0),
+			new FormatterData(false,     FormatterID.SPEED,             ValueFormat.NUMBER_1_0),
+			new FormatterData(false,     FormatterID.PACE,              ValueFormat.PACE_MM_SS),
+			new FormatterData(false,     FormatterID.TIME_MOVING,       ValueFormat.TIME_HH_MM),
+			new FormatterData(false,     FormatterID.EMPTY,             ValueFormat.DUMMY_VALUE),
+
+		};;
+
+		// SET_FORMATTING_ON
+
+		return profile;
+	}
+
+	private static CalendarProfile createProfile_23_Compact_XL_small() {
+
+		final CalendarProfile profile = new CalendarProfile();
+
+		profile.name = Messages.Calendar_Profile_Name_CompactXLsmall;
+
+		// SET_FORMATTING_OFF
+
+//		                                      Compact XL small
+
+		profile.defaultId                     = ProfileDefault.COMPACT_XL_SMALL;
+
+		// layout
+		profile.isToggleMonthColor            = false;
+		profile.isWeekRowHeight               = true;
+		profile.useDraggedScrolling           = false;
+		profile.alternateMonthRGB             = new RGB (60, 60, 60);
+		profile.calendarBackgroundRGB         = new RGB (40, 40, 40);
+		profile.calendarForegroundRGB         = new RGB (200, 200, 200);
+		profile.weekHeight                    = 11;
+		profile.weekRows                      = 10;
+		                                                                                           
+		// year columns
+		profile.isShowYearColumns             = true;
+		profile.isYearColumnDayWidth          = false;
+		profile.yearColumns                   = 1;
+		profile.yearColumnsSpacing            = 30;
+		profile.yearColumnsStart              = ColumnStart.CONTINUOUSLY;
+		profile.yearColumnDayWidth            = 200;
+		profile.yearHeaderFont                = CalendarProfile.createFont(1.9f, SWT.BOLD);
+		                                                                                           
+		// date column
+		profile.isShowDateColumn              = true;
+		profile.dateColumnContent             = DateColumnContent.MONTH;
+		profile.dateColumnFont                = CalendarProfile.createFont(1.4f, SWT.BOLD);
+		profile.dateColumnWidth               = 50;
+		                                                                                           
+		// day date
+		profile.isHideDayDateWhenNoTour       = true;
+		profile.isShowDayDate                 = false;
+		profile.isShowDayDateWeekendColor     = false;
+		profile.dayDateFont                   = CalendarProfile.createFont(1.2f, SWT.BOLD);
+		profile.dayDateFormat                 = DayDateFormat.DAY;
+		                                                                                           
+		// tour background
+		profile.tourBackground                = TourBackground.FILL;
+		profile.tourBackgroundColor1          = CalendarColor.DARK;
+		profile.tourBackgroundColor2          = CalendarColor.BRIGHT;
+		profile.tourBackgroundWidth           = 3;
+		profile.tourBorder                    = TourBorder.NO_BORDER;
+		profile.tourBorderColor               = CalendarColor.LINE;
+		profile.tourBorderWidth               = 1;
+		                                                                                           
+		// tour content
+		profile.isShowTourContent             = true;
+		profile.isShowTourValueUnit           = false;
+		profile.isTruncateTourText            = true;
+		profile.tourContentColor              = CalendarColor.CONTRAST;
+		profile.tourContentFont               = CalendarProfile.createFont(0.8f, SWT.NORMAL);
+		profile.tourMarginTop                 = -1;
+		profile.tourMarginLeft                = 1;
+		profile.tourMarginBottom              = 0;
+		profile.tourMarginRight               = 2;
+		profile.tourTitleColor                = CalendarColor.CONTRAST;
+		profile.tourTitleFont                 = CalendarProfile.createFont(0.8f, SWT.NORMAL);
+		profile.tourTruncatedLines            = 1;
+		profile.tourValueColor                = CalendarColor.CONTRAST;
+		profile.tourValueColumns              = 3;
+		profile.tourValueFont                 = CalendarProfile.createFont(0.8f, SWT.NORMAL);
+		                                                                                           
+		// week summary column
+		profile.isShowSummaryColumn           = true;
+		profile.isShowWeekValueUnit           = false;
+		profile.weekColumnWidth               = 30;
+		profile.weekMarginTop                 = 0;
+		profile.weekMarginLeft                = 1;
+		profile.weekMarginBottom              = 1;
+		profile.weekMarginRight               = 0;
+		profile.weekValueColor                = CalendarColor.BRIGHT;
+		profile.weekValueFont                 = CalendarProfile.createFont(0.8f, SWT.NORMAL);
+
+
+		profile.allTourFormatterData          = new FormatterData[] {
+
+			new FormatterData(true,      FormatterID.TOUR_TITLE,        ValueFormat.DUMMY_VALUE),
+			new FormatterData(true,      FormatterID.TOUR_DESCRIPTION,  ValueFormat.DUMMY_VALUE),
+			new FormatterData(false,     FormatterID.DISTANCE,          ValueFormat.NUMBER_1_0),
+			new FormatterData(false,     FormatterID.ALTITUDE,          ValueFormat.NUMBER_1_0),
+			new FormatterData(false,     FormatterID.TIME_MOVING,       ValueFormat.TIME_HH),
 			new FormatterData(false,     FormatterID.EMPTY,             ValueFormat.DUMMY_VALUE),
 			new FormatterData(false,     FormatterID.EMPTY,             ValueFormat.DUMMY_VALUE),
 			new FormatterData(false,     FormatterID.EMPTY,             ValueFormat.DUMMY_VALUE),
@@ -1952,12 +2065,16 @@ public class CalendarProfileManager {
 		
 		switch (defaultId) {
 		
-		case CLASSIC:			return createProfile_99_Classic();
-		case COMPACT:			return createProfile_20_Compact();
-		case COMPACT_XL:		return createProfile_22_Compact_XL();
-		case YEAR:				return createProfile_50_Year();
-		case YEAR_XL:			return createProfile_52_YearXL();
-		case YEAR_XXL:			return createProfile_54_YearXXL();
+		case CLASSIC:				return createProfile_99_Classic();
+
+		case COMPACT:				return createProfile_20_Compact();
+		case COMPACT_XL:			return createProfile_22_Compact_XL();
+		case COMPACT_XL_SMALL:		return createProfile_23_Compact_XL_small();
+		
+		case YEAR:					return createProfile_50_Year();
+		case YEAR_XL:				return createProfile_52_YearXL();
+		case YEAR_XXL:				return createProfile_54_YearXXL();
+		
 		case DEFAULT:
 		default:
 			// create default default

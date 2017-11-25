@@ -21,6 +21,7 @@ public enum ProfileDefault {
 
 	COMPACT, //
 	COMPACT_XL, //
+	COMPACT_XL_SMALL, //
 
 	YEAR, //
 	YEAR_XL, //
