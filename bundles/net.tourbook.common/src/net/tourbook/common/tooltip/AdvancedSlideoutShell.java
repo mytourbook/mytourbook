@@ -718,24 +718,35 @@ public abstract class AdvancedSlideoutShell {
 	private Point fixupDisplayBounds(final Point tipSize, final Point location) {
 
 		final Rectangle displayBounds = getDisplayBounds(location);
-		final Point rightBottomBounds = new Point(tipSize.x + location.x, tipSize.y + location.y);
+		final Point tipRightBottom = new Point(location.x + tipSize.x, location.y + tipSize.y);
 
-		if (!(displayBounds.contains(location) && displayBounds.contains(rightBottomBounds))) {
+		if (!(displayBounds.contains(location) && displayBounds.contains(tipRightBottom))) {
 
-			if (rightBottomBounds.x > displayBounds.x + displayBounds.width) {
-				location.x -= rightBottomBounds.x - (displayBounds.x + displayBounds.width);
+			final int minVisibleSize = 50;
+
+			final int displayX = displayBounds.x;
+			final int displayY = displayBounds.y;
+
+			final int displayWidth = displayBounds.width;
+			final int displayHeight = displayBounds.height;
+
+			final int displayRight = displayX + displayWidth;
+			final int displayBottom = displayY + displayHeight;
+
+			if (location.x > displayRight - minVisibleSize) {
+				location.x = displayRight - minVisibleSize;
 			}
 
-			if (rightBottomBounds.y > displayBounds.y + displayBounds.height) {
-				location.y -= rightBottomBounds.y - (displayBounds.y + displayBounds.height);
+			if (location.y > displayBottom - minVisibleSize) {
+				location.y = displayBottom - minVisibleSize;
 			}
 
-			if (location.x < displayBounds.x) {
-				location.x = displayBounds.x;
+			if (location.x < displayX) {
+				location.x = displayX;
 			}
 
-			if (location.y < displayBounds.y) {
-				location.y = displayBounds.y;
+			if (location.y < displayY) {
+				location.y = displayY;
 			}
 		}
 
