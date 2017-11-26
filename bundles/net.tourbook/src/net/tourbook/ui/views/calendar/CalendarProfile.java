@@ -62,10 +62,18 @@ public class CalendarProfile implements Cloneable {
 	RGB 					alternateMonthRGB			= CalendarProfileManager.DEFAULT_ALTERNATE_MONTH_RGB;
 	RGB						calendarBackgroundRGB		= CalendarProfileManager.DEFAULT_CALENDAR_BACKGROUND_RGB;
 	RGB						calendarForegroundRGB		= CalendarProfileManager.DEFAULT_CALENDAR_FOREBACKGROUND_RGB;
+	RGB						dayHoveredRGB				= CalendarProfileManager.DEFAULT_DAY_HOVERED_RGB;
+	RGB						daySelectedRGB				= CalendarProfileManager.DEFAULT_DAY_SELECTED_RGB;
 	int						weekHeight					= CalendarProfileManager.DEFAULT_WEEK_HEIGHT;
 	int						weekRows					= CalendarProfileManager.DEFAULT_WEEK_ROWS;
 	//
-	// year columns
+	// 1. Date column
+	boolean					isShowDateColumn			= true;
+	DateColumnContent		dateColumnContent			= CalendarProfileManager.DEFAULT_DATE_COLUMN_CONTENT;
+	FontData				dateColumnFont				= createFont(1.7f, SWT.BOLD);
+	int						dateColumnWidth				= CalendarProfileManager.DEFAULT_DATE_COLUMN_WIDTH;
+	//
+	// 2. Year columns
 	boolean 				isShowYearColumns			= true;
 	boolean 				isYearColumnDayWidth		= CalendarProfileManager.DEFAULT_IS_YEAR_COLUMN_DAY_WIDTH;
 	int						yearColumns					= CalendarProfileManager.DEFAULT_YEAR_COLUMNS;
@@ -74,11 +82,15 @@ public class CalendarProfile implements Cloneable {
 	int 					yearColumnDayWidth			= CalendarProfileManager.DEFAULT_YEAR_COLUMN_DAY_WIDTH;
 	FontData 				yearHeaderFont				= createFont(2.8f, SWT.BOLD);
 	//
-	// date column
-	boolean					isShowDateColumn			= true;
-	DateColumnContent		dateColumnContent			= CalendarProfileManager.DEFAULT_DATE_COLUMN_CONTENT;
-	FontData				dateColumnFont				= createFont(1.7f, SWT.BOLD);
-	int						dateColumnWidth				= CalendarProfileManager.DEFAULT_DATE_COLUMN_WIDTH;
+	// 3. Week summary column
+	boolean					isShowSummaryColumn			= true;
+	boolean 				isShowWeekValueUnit			= true;
+	FormatterData[]			allWeekFormatterData		= CalendarProfileManager.DEFAULT_WEEK_FORMATTER_DATA;
+	int						weekColumnWidth				= CalendarProfileManager.DEFAULT_WEEK_COLUMN_WIDTH;
+	int						weekMarginTop				= CalendarProfileManager.DEFAULT_WEEK_MARGIN_TOP;
+	int						weekMarginLeft				= CalendarProfileManager.DEFAULT_WEEK_MARGIN_LEFT;
+	int						weekMarginBottom			= CalendarProfileManager.DEFAULT_WEEK_MARGIN_BOTTOM;
+	int						weekMarginRight				= CalendarProfileManager.DEFAULT_WEEK_MARGIN_RIGHT;
 	//
 	// day date
 	boolean					isHideDayDateWhenNoTour		= true;
@@ -89,12 +101,19 @@ public class CalendarProfile implements Cloneable {
 	//
 	// tour background
 	TourBackground			tourBackground				= CalendarProfileManager.DEFAULT_TOUR_BACKGROUND;
-	CalendarColor			tourBackgroundColor1		= CalendarProfileManager.DEFAULT_TOUR_BACKGROUND_COLOR1;
-	CalendarColor			tourBackgroundColor2		= CalendarProfileManager.DEFAULT_TOUR_BACKGROUND_COLOR2;
+	CalendarColor			tourBackground1Color		= CalendarProfileManager.DEFAULT_TOUR_BACKGROUND_COLOR1;
+	CalendarColor			tourBackground2Color		= CalendarProfileManager.DEFAULT_TOUR_BACKGROUND_COLOR2;
+	RGB						tourBackground1RGB			= CalendarProfileManager.DEFAULT_TOUR_BACKGROUND_RGB1;
+	RGB						tourBackground2RGB			= CalendarProfileManager.DEFAULT_TOUR_BACKGROUND_RGB2;
 	int						tourBackgroundWidth			= CalendarProfileManager.DEFAULT_TOUR_BACKGROUND_WIDTH;
 	TourBorder 				tourBorder					= CalendarProfileManager.DEFAULT_TOUR_BORDER;
 	CalendarColor 			tourBorderColor				= CalendarProfileManager.DEFAULT_TOUR_BORDER_COLOR;
+	RGB						tourBorderRGB				= CalendarProfileManager.DEFAULT_TOUR_BORDER_RGB;
 	int		 				tourBorderWidth				= CalendarProfileManager.DEFAULT_TOUR_BORDER_WIDTH;
+	CalendarColor			tourHoveredColor			= CalendarProfileManager.DEFAULT_TOUR_HOVERED_COLOR;
+	RGB						tourHoveredRGB				= CalendarProfileManager.DEFAULT_TOUR_HOVERED_RGB;
+	CalendarColor			tourSelectedColor			= CalendarProfileManager.DEFAULT_TOUR_SELECTED_COLOR;
+	RGB						tourSelectedRGB				= CalendarProfileManager.DEFAULT_TOUR_SELECTED_RGB;
 	//
 	// tour content
 	boolean 				isShowTourContent			= true;
@@ -103,32 +122,27 @@ public class CalendarProfile implements Cloneable {
 	FormatterData[]			allTourFormatterData		= CalendarProfileManager.DEFAULT_TOUR_FORMATTER_DATA;
 	CalendarColor			tourContentColor			= CalendarProfileManager.DEFAULT_TOUR_COLOR;
 	FontData				tourContentFont				= createFont(0.9f, SWT.NORMAL);
+	RGB						tourContentRGB				= CalendarProfileManager.DEFAULT_TOUR_CONTENT_RGB;
 	int						tourMarginTop				= CalendarProfileManager.DEFAULT_TOUR_MARGIN_TOP;
 	int						tourMarginLeft				= CalendarProfileManager.DEFAULT_TOUR_MARGIN_LEFT;
 	int						tourMarginBottom			= CalendarProfileManager.DEFAULT_TOUR_MARGIN_BOTTOM;
 	int						tourMarginRight				= CalendarProfileManager.DEFAULT_TOUR_MARGIN_RIGHT;
 	CalendarColor 			tourTitleColor				= CalendarProfileManager.DEFAULT_TOUR_COLOR;
 	FontData				tourTitleFont				= createFont(1.2f, SWT.BOLD);
+	RGB						tourTitleRGB				= CalendarProfileManager.DEFAULT_TOUR_TITLE_RGB;
 	int						tourTruncatedLines			= CalendarProfileManager.DEFAULT_TOUR_TRUNCATED_LINES;
 	CalendarColor			tourValueColor				= CalendarProfileManager.DEFAULT_TOUR_COLOR;
 	int 					tourValueColumns			= CalendarProfileManager.DEFAULT_TOUR_VALUE_COLUMNS;
 	FontData				tourValueFont				= createFont(1.1f, SWT.BOLD);
-	//
-	// week column
-	boolean					isShowSummaryColumn			= true;
-	boolean 				isShowWeekValueUnit			= true;
-	FormatterData[]			allWeekFormatterData		= CalendarProfileManager.DEFAULT_WEEK_FORMATTER_DATA;
-	int						weekColumnWidth				= CalendarProfileManager.DEFAULT_WEEK_COLUMN_WIDTH;
-	int						weekMarginTop				= CalendarProfileManager.DEFAULT_WEEK_MARGIN_TOP;
-	int						weekMarginLeft				= CalendarProfileManager.DEFAULT_WEEK_MARGIN_LEFT;
-	int						weekMarginBottom			= CalendarProfileManager.DEFAULT_WEEK_MARGIN_BOTTOM;
-	int						weekMarginRight				= CalendarProfileManager.DEFAULT_WEEK_MARGIN_RIGHT;
-
+	RGB						tourValueRGB				= CalendarProfileManager.DEFAULT_TOUR_VALUE_RGB;
+	
 // SET_FORMATTING_ON
 
 	CalendarColor		weekValueColor				= CalendarProfileManager.DEFAULT_WEEK_VALUE_COLOR;
 
 	FontData			weekValueFont				= createFont(1.2f, SWT.BOLD);
+
+
 
 	/**
 	 * @param relSize
@@ -246,10 +260,18 @@ public class CalendarProfile implements Cloneable {
         sb.append("profile.alternateMonthRGB             = " + dump_RGB(profile.alternateMonthRGB)        + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.calendarBackgroundRGB         = " + dump_RGB(profile.calendarBackgroundRGB)    + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.calendarForegroundRGB         = " + dump_RGB(profile.calendarForegroundRGB)    + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.dayHoveredRGB                 = " + dump_RGB(profile.dayHoveredRGB)            + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.daySelectedRGB                = " + dump_RGB(profile.daySelectedRGB)           + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.weekHeight                    = " + weekHeight                                 + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.weekRows                      = " + weekRows                                   + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("                                                                                           \n"); //$NON-NLS-1$
-        sb.append("// year columns                                                                            \n"); //$NON-NLS-1$
+        sb.append("// 1. Date column                                                                          \n"); //$NON-NLS-1$
+        sb.append("profile.isShowDateColumn              = " + isShowDateColumn                           + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.dateColumnContent             = DateColumnContent." + dateColumnContent        + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.dateColumnFont                = " + dump_Font(dateColumnFont)                  + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.dateColumnWidth               = " + dateColumnWidth                            + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("                                                                                           \n"); //$NON-NLS-1$
+        sb.append("// 2. Year columns                                                                         \n"); //$NON-NLS-1$
         sb.append("profile.isShowYearColumns             = " + isShowYearColumns                          + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.isYearColumnDayWidth          = " + isYearColumnDayWidth                       + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.yearColumns                   = " + yearColumns                                + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -258,11 +280,16 @@ public class CalendarProfile implements Cloneable {
         sb.append("profile.yearColumnDayWidth            = " + yearColumnDayWidth                         + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.yearHeaderFont                = " + dump_Font(yearHeaderFont)                  + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("                                                                                           \n"); //$NON-NLS-1$
-        sb.append("// date column                                                                             \n"); //$NON-NLS-1$
-        sb.append("profile.isShowDateColumn              = " + isShowDateColumn                           + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
-        sb.append("profile.dateColumnContent             = DateColumnContent." + dateColumnContent        + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
-        sb.append("profile.dateColumnFont                = " + dump_Font(dateColumnFont)                  + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
-        sb.append("profile.dateColumnWidth               = " + dateColumnWidth                            + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("// 3. Week summary column                                                                  \n"); //$NON-NLS-1$
+        sb.append("profile.isShowSummaryColumn           = " + isShowSummaryColumn                        + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.isShowWeekValueUnit           = " + isShowWeekValueUnit                        + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.weekColumnWidth               = " + weekColumnWidth                            + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.weekMarginTop                 = " + weekMarginTop                              + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.weekMarginLeft                = " + weekMarginLeft                             + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.weekMarginBottom              = " + weekMarginBottom                           + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.weekMarginRight               = " + weekMarginRight                            + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.weekValueColor                = CalendarColor." + weekValueColor               + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.weekValueFont                 = " + dump_Font(weekValueFont)                   + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("                                                                                           \n"); //$NON-NLS-1$
         sb.append("// day date                                                                                \n"); //$NON-NLS-1$
         sb.append("profile.isHideDayDateWhenNoTour       = " + isHideDayDateWhenNoTour                    + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -273,12 +300,19 @@ public class CalendarProfile implements Cloneable {
         sb.append("                                                                                           \n"); //$NON-NLS-1$
         sb.append("// tour background                                                                         \n"); //$NON-NLS-1$
         sb.append("profile.tourBackground                = TourBackground." + tourBackground              + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
-        sb.append("profile.tourBackgroundColor1          = CalendarColor." + tourBackgroundColor1         + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
-        sb.append("profile.tourBackgroundColor2          = CalendarColor." + tourBackgroundColor2         + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.tourBackground1Color          = CalendarColor." + tourBackground1Color         + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.tourBackground2Color          = CalendarColor." + tourBackground2Color         + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.tourBackground1RGB            = " + dump_RGB(profile.tourBackground1RGB)       + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.tourBackground2RGB            = " + dump_RGB(profile.tourBackground2RGB)       + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.tourBackgroundWidth           = " + tourBackgroundWidth                        + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.tourBorder                    = TourBorder." + tourBorder                      + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.tourBorderColor               = CalendarColor." + tourBorderColor              + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.tourBorderWidth               = " + tourBorderWidth                            + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.tourBorderRGB                 = " + dump_RGB(profile.tourBorderRGB)            + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.tourHoveredColor              = CalendarColor." + tourHoveredColor             + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.tourHoveredRGB                = " + dump_RGB(profile.tourHoveredRGB)           + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.tourSelectedColor             = CalendarColor." + tourSelectedColor            + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.tourSelectedRGB               = " + dump_RGB(profile.tourSelectedRGB)          + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("                                                                                           \n"); //$NON-NLS-1$
         sb.append("// tour content                                                                            \n"); //$NON-NLS-1$
         sb.append("profile.isShowTourContent             = " + isShowTourContent                          + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -286,27 +320,19 @@ public class CalendarProfile implements Cloneable {
         sb.append("profile.isTruncateTourText            = " + isTruncateTourText                         + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.tourContentColor              = CalendarColor." + tourContentColor             + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.tourContentFont               = " + dump_Font(tourContentFont)                 + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.tourContentRGB                = " + dump_RGB(profile.tourContentRGB)           + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.tourMarginTop                 = " + tourMarginTop                              + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.tourMarginLeft                = " + tourMarginLeft                             + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.tourMarginBottom              = " + tourMarginBottom                           + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.tourMarginRight               = " + tourMarginRight                            + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.tourTitleColor                = CalendarColor." + tourTitleColor               + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.tourTitleFont                 = " + dump_Font(tourTitleFont)                   + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.tourTitleRGB                  = " + dump_RGB(profile.tourTitleRGB)             + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.tourTruncatedLines            = " + tourTruncatedLines                         + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.tourValueColor                = CalendarColor." + tourValueColor               + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.tourValueColumns              = " + tourValueColumns                           + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.tourValueFont                 = " + dump_Font(tourValueFont)                   + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
-        sb.append("                                                                                           \n"); //$NON-NLS-1$
-        sb.append("// week summary column                                                                     \n"); //$NON-NLS-1$
-        sb.append("profile.isShowSummaryColumn           = " + isShowSummaryColumn                        + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
-        sb.append("profile.isShowWeekValueUnit           = " + isShowWeekValueUnit                        + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
-        sb.append("profile.weekColumnWidth               = " + weekColumnWidth                            + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
-        sb.append("profile.weekMarginTop                 = " + weekMarginTop                              + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
-        sb.append("profile.weekMarginLeft                = " + weekMarginLeft                             + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
-        sb.append("profile.weekMarginBottom              = " + weekMarginBottom                           + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
-        sb.append("profile.weekMarginRight               = " + weekMarginRight                            + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
-        sb.append("profile.weekValueColor                = CalendarColor." + weekValueColor               + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
-        sb.append("profile.weekValueFont                 = " + dump_Font(weekValueFont)                   + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.tourValueRGB                  = " + dump_RGB(profile.tourValueRGB)             + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("\n");                                                                                            //$NON-NLS-1$
         sb.append("\n");                                                                                            //$NON-NLS-1$
         sb.append("profile.allTourFormatterData          = " + dump_Formatter(allTourFormatterData, "tour") + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

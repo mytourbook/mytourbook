@@ -45,6 +45,7 @@ public class Messages extends NLS {
 	public static String		Calendar_Profile_Color_Black;
 	public static String		Calendar_Profile_Color_Bright;
 	public static String		Calendar_Profile_Color_Contrast;
+	public static String		Calendar_Profile_Color_Custom;
 	public static String		Calendar_Profile_Color_Dark;
 	public static String		Calendar_Profile_Color_Line;
 	public static String		Calendar_Profile_Color_Text;
@@ -1630,7 +1631,11 @@ public class Messages extends NLS {
 	public static String		Slideout_CalendarOptions_Group_TourFont;
 	public static String		Slideout_CalendarOptions_Group_YearColumns;
 	public static String		Slideout_CalendarOptions_Label_Calendar_BackgroundColor;
+	public static String		Slideout_CalendarOptions_Label_Calendar_DayHoveredColor;
+	public static String		Slideout_CalendarOptions_Label_Calendar_DaySelectedColor;
 	public static String		Slideout_CalendarOptions_Label_Calendar_ForegroundColor;
+	public static String		Slideout_CalendarOptions_Label_Calendar_TourHoveredColor;
+	public static String		Slideout_CalendarOptions_Label_Calendar_TourSelectedColor;
 	public static String		Slideout_CalendarOptions_Label_DateColumn_Width;
 	public static String		Slideout_CalendarOptions_Label_DateColumnContent;
 	public static String		Slideout_CalendarOptions_Label_DateColumnContent_Tooltip;
