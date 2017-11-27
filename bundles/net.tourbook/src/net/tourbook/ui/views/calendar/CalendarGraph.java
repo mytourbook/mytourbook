@@ -197,7 +197,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	private Color								_white					= _display.getSystemColor(SWT.COLOR_WHITE);
 	private Color								_red					= _display.getSystemColor(SWT.COLOR_RED);
 	private Color								_blue					= _display.getSystemColor(SWT.COLOR_BLUE);
-//	private Color								_darkGray				= _colorCache.getColor(0x404040);
 	private Color								_calendarFgColor;
 	private Color								_calendarBgColor;
 	//
@@ -882,6 +881,11 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	 */
 	private void drawCalendar(final GC calendarGC) {
 
+		System.out.println(
+				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] drawCalendar() 1")
+						+ ("\t_isHoveredModified: " + _isHoveredModified));
+// TODO remove SYSTEM.OUT.PRINTLN
+
 		final Rectangle canvas = getClientArea();
 		final int canvasWidth = canvas.width;
 		final int canvasHeight = canvas.height;
@@ -1354,6 +1358,11 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 				}
 			});
 		}
+
+		System.out.println(
+				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] drawCalendar() 2")
+						+ ("\t_isHoveredModified: " + _isHoveredModified));
+// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
 	private void drawDay(	final GC gc,
@@ -1449,7 +1458,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 				_currentProfile.tourBackground1Color,
 				_currentProfile.tourBackground1RGB);
 
-		final Color backgroundColor = _colorCache.getColor(_day_TourBackgroundRGB.hashCode());
+		final Color backgroundColor = _colorCache.getColor(_day_TourBackgroundRGB);
 
 		switch (_currentProfile.tourBackground) {
 
@@ -1534,7 +1543,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 				data,
 				_currentProfile.tourBorderColor,
 				_currentProfile.tourBorderRGB);
-		final Color line = _colorCache.getColor(tourBorderRGB.hashCode());
+		final Color line = _colorCache.getColor(tourBorderRGB);
 
 		gc.setForeground(line);
 		gc.setBackground(line);
@@ -1817,6 +1826,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 	private void drawHovered(final GC gc) {
 
+
 		List<FocusItem> allFocusItems;
 
 		if (_hoveredItem.type == ItemType.TOUR) {
@@ -1835,15 +1845,38 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 				if (focusItem.calendarTourData instanceof CalendarTourData) {
 
-					// draw tour
+					// tour is hovered
 
-					drawHovered_Tour(gc, focusItem.calendarTourData, itemRectangle);
+					final Color color = getColor_Tour(
+							focusItem.calendarTourData,
+							_currentProfile.tourHoveredColor,
+							_currentProfile.tourHoveredRGB);
+
+					drawItem_Marked(gc, itemRectangle, color, true);
 
 				} else if (focusItem.dayItem instanceof DayItem) {
 
-					// draw day
+					// day is hovered
 
-					drawHovered_Day(gc, itemRectangle);
+					if (_hoveredItem.isDragOverItem) {
+
+						// draw dragged
+
+						final Color color = getColor_Tour(
+								_hoveredItem.calendarTourData,
+								_currentProfile.tourDraggedColor,
+								_currentProfile.tourDraggedRGB);
+
+						drawItem_Marked(gc, itemRectangle, color, true);
+
+					} else {
+
+						// draw day hovered
+
+						final Color color = _colorCache.getColor(_currentProfile.dayHoveredRGB);
+
+						drawItem_Marked(gc, itemRectangle, color, false);
+					}
 				}
 
 				return;
@@ -1851,72 +1884,19 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 	}
 
-	private void drawHovered_Day(final GC gc, final Rectangle itemRectangle) {
+	private void drawItem_Marked(final GC gc, final Rectangle itemRectangle, final Color color, final boolean isTour) {
 
-		final CalendarTourData calendarTourData = _hoveredItem.calendarTourData;
+		final int lineWidth = isTour ? 7 : 3;
+		final int lineWidth2 = lineWidth / 2;
 
-		if (_hoveredItem.isDragOverItem) {
+		gc.setLineWidth(lineWidth);
+		gc.setForeground(color);
 
-			// draw drag over outline
-
-			final int typeColorIndex = calendarTourData.typeColorIndex;
-
-			final int lineWidth = 7;
-			final int lineWidth2 = lineWidth / 2;
-
-			gc.setLineWidth(lineWidth);
-			gc.setForeground(_colorCache.getColor(_rgbLine.get(typeColorIndex).hashCode()));
-
-			gc.drawRectangle(
-					itemRectangle.x - 2 - lineWidth2,
-					itemRectangle.y - 2 - lineWidth2,
-					itemRectangle.width + 2 + lineWidth2 * 2,
-					itemRectangle.height + 2 + lineWidth2 * 2);
-
-		} else {
-
-			// draw day hovered
-
-			final int lineWidth = 7;
-			final int lineWidth2 = lineWidth / 2;
-
-			gc.setLineWidth(lineWidth);
-			gc.setForeground(_colorCache.getColor(_currentProfile.dayHoveredRGB));
-
-			gc.drawRectangle(
-					itemRectangle.x - 2 - lineWidth2,
-					itemRectangle.y - 2 - lineWidth2,
-					itemRectangle.width + 2 + lineWidth2 * 2,
-					itemRectangle.height + 2 + lineWidth2 * 2);
-		}
-	}
-
-	private void drawHovered_Tour(final GC gc, final CalendarTourData data, final Rectangle rec) {
-
-		gc.setAlpha(0x30);
-
-		gc.setBackground(_colorCache.getColor(_rgbBright.get(data.typeColorIndex).hashCode()));
-		gc.setForeground(_colorCache.getColor(_rgbDark.get(data.typeColorIndex).hashCode()));
-		gc.fillGradientRectangle(rec.x - 4, rec.y - 4, rec.width + 9, rec.height + 9, false);
-
-		gc.setForeground(_colorCache.getColor(_rgbLine.get(data.typeColorIndex).hashCode()));
-		gc.drawRoundRectangle(rec.x - 5, rec.y - 5, rec.width + 10, rec.height + 10, 6, 6);
-
-		gc.setAlpha(0xFF);
-
-		// focus is 1 pixel larger than tour rectangle
-//		final Rectangle r = new Rectangle(rec.x + 1, rec.y + 1, rec.width - 2, rec.height - 2);
-
-		// only fill in text if the tour rectangle has a reasonable size
-//		Color color;
-//		if (_useBlackForHighlightTourInfoText) {
-//			color = _black;
-//		} else {
-//			color = _colorCache.getColor(_rgbText.get(data.typeColorIndex).hashCode());
-//		}
-
-//		drawDay_TourConent(gc, r, data);
-
+		gc.drawRectangle(
+				itemRectangle.x - 1 - lineWidth2,
+				itemRectangle.y - 1 - lineWidth2,
+				itemRectangle.width + 1 + lineWidth2 * 2,
+				itemRectangle.height + 1 + lineWidth2 * 2);
 	}
 
 	private void drawSelection(final GC gc) {
@@ -1943,52 +1923,27 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 				if (focusItem.calendarTourData instanceof CalendarTourData) {
 
-					drawSelection_Tour(gc, (focusItem.calendarTourData), focusItem.rect);
+					// tour is selected
+
+					final Color color = getColor_Tour(
+							focusItem.calendarTourData,
+							_currentProfile.tourSelectedColor,
+							_currentProfile.tourSelectedRGB);
+
+					drawItem_Marked(gc, focusItem.rect, color, true);
 
 				} else if (focusItem.dayItem instanceof DayItem) {
 
-					drawSelection_Day(gc, focusItem.rect);
+					// day is selected
+
+					final Color color = _colorCache.getColor(_currentProfile.daySelectedRGB);
+
+					drawItem_Marked(gc, focusItem.rect, color, false);
 				}
 
 				return;
 			}
 		}
-	}
-
-	private void drawSelection_Day(final GC gc, final Rectangle r) {
-
-		// gc.setAlpha(0xd0); // like statistics
-		//	gc.setAlpha(0xa0);
-		gc.setBackground(_blue);
-		gc.setForeground(_blue);
-		// gc.fillGradientRectangle(r.x - 4, r.y - 4, r.width + 9, r.height + 9, false);
-		// gc.drawRoundRectangle(r.x - 5, r.y - 5, r.width + 10, r.height + 10, 6, 6);
-		final int oldLw = gc.getLineWidth();
-		gc.setLineWidth(4);
-		gc.drawRoundRectangle(r.x - 2, r.y - 2, r.width + 5, r.height + 5, 6, 6);
-		gc.setLineWidth(oldLw);
-
-	}
-
-	private void drawSelection_Tour(final GC gc, final CalendarTourData data, final Rectangle rec) {
-
-		final Color lineColor = _colorCache.getColor(_rgbLine.get(data.typeColorIndex).hashCode());
-
-		// - red box -
-//		gc.setBackground(_red);
-//		// gc.setBackground(lineColor);
-//		gc.fillRectangle(rec.x - 4, rec.y - 4, rec.width + 9, rec.height + 9);
-//		// gc.setForeground(_red);
-
-		gc.setLineWidth(6);
-		gc.setForeground(lineColor);
-		gc.drawRoundRectangle(rec.x - 5, rec.y - 5, rec.width + 10, rec.height + 10, 6, 6);
-
-		// focus is 1 pixel larger than tour rectangle
-//		final Rectangle tourRect = new Rectangle(rec.x + 1, rec.y + 1, rec.width - 2, rec.height - 2);
-//		drawDay_Tour(gc, data, tourRect);
-
-		return;
 	}
 
 	private void drawWeek_DateColumn(	final GC gc,
@@ -2100,7 +2055,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 						formatterData.id,
 						CalendarProfileManager.allWeekFormatter);
 
-				gc.setForeground(_colorCache.getColor(getColor_Week(formatter).hashCode()));
+				gc.setForeground(_colorCache.getColor(getColor_Week(formatter)));
 
 				String text = formatter.format(
 						calendarTourData,
@@ -2237,11 +2192,11 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 				final RGB tourBackgroundRGB = getColor_Graph(data, _currentProfile.tourBackground1Color, customRGB);
 				final RGB contrastRGB = ColorUtil.getContrastRGB(tourBackgroundRGB);
 
-				return _colorCache.getColor(contrastRGB.hashCode());
+				return _colorCache.getColor(contrastRGB);
 			}
 
 		case CUSTOM:
-			return _colorCache.getColor(customRGB.hashCode());
+			return _colorCache.getColor(customRGB);
 
 		case WHITE:
 			return _white;
@@ -2911,6 +2866,11 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			redraw();
 			return;
 		}
+
+		System.out.println(
+				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] onMouseMove()")
+						+ ("\t_isHoveredModified: " + _isHoveredModified));
+// TODO remove SYSTEM.OUT.PRINTLN
 
 		_isHoveredModified = !oldHoveredItem.equals(_hoveredItem);
 		if (_isHoveredModified) {

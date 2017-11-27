@@ -1634,6 +1634,7 @@ public class Messages extends NLS {
 	public static String		Slideout_CalendarOptions_Label_Calendar_DayHoveredColor;
 	public static String		Slideout_CalendarOptions_Label_Calendar_DaySelectedColor;
 	public static String		Slideout_CalendarOptions_Label_Calendar_ForegroundColor;
+	public static String		Slideout_CalendarOptions_Label_Calendar_TourDraggedColor;
 	public static String		Slideout_CalendarOptions_Label_Calendar_TourHoveredColor;
 	public static String		Slideout_CalendarOptions_Label_Calendar_TourSelectedColor;
 	public static String		Slideout_CalendarOptions_Label_DateColumn_Width;

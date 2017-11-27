@@ -181,6 +181,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	private ColorSelectorExtended	_colorTour_BackgroundColor2;
 	private ColorSelectorExtended	_colorTour_BorderColor;
 	private ColorSelectorExtended	_colorTour_ContentColor;
+	private ColorSelectorExtended	_colorTour_DraggedColor;
 	private ColorSelectorExtended	_colorTour_HoveredColor;
 	private ColorSelectorExtended	_colorTour_SelectedColor;
 	private ColorSelectorExtended	_colorTour_TitleColor;
@@ -196,6 +197,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	private Combo					_comboTour_BorderLayout;
 	private Combo					_comboTour_BorderColor;
 	private Combo					_comboTour_ContentColor;
+	private Combo					_comboTour_DraggedColor;
 	private Combo					_comboTour_HoveredColor;
 	private Combo					_comboTour_SelectedColor;
 	private Combo					_comboTour_TitleColor;
@@ -1545,7 +1547,11 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				new Label(group, SWT.NONE);
 
 				final Composite containerBg = new Composite(group, SWT.NONE);
-				GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(containerBg);
+				GridDataFactory
+						.fillDefaults()
+						//						.grab(true, false)
+						.span(2, 1)
+						.applyTo(containerBg);
 				GridLayoutFactory.fillDefaults().numColumns(4).applyTo(containerBg);
 				{
 					// combo color 1
@@ -1598,7 +1604,11 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				new Label(group, SWT.NONE);
 
 				final Composite containerBorder = new Composite(group, SWT.NONE);
-				GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(containerBorder);
+				GridDataFactory
+						.fillDefaults()
+						//						.grab(true, false)
+						.span(2, 1)
+						.applyTo(containerBorder);
 				GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerBorder);
 				{
 					// combo color
@@ -1620,7 +1630,11 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				label.setText(Messages.Slideout_CalendarOptions_Label_Calendar_TourHoveredColor);
 
 				final Composite containerHovered = new Composite(group, SWT.NONE);
-				GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(containerHovered);
+				GridDataFactory
+						.fillDefaults()
+						//						.grab(true, false)
+						.span(2, 1)
+						.applyTo(containerHovered);
 				GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerHovered);
 				{
 					// combo color
@@ -1642,7 +1656,11 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				label.setText(Messages.Slideout_CalendarOptions_Label_Calendar_TourSelectedColor);
 
 				final Composite containerSelected = new Composite(group, SWT.NONE);
-				GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(containerSelected);
+				GridDataFactory
+						.fillDefaults()
+						//						.grab(true, false)
+						.span(2, 1)
+						.applyTo(containerSelected);
 				GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerSelected);
 				{
 					// combo color
@@ -1652,6 +1670,33 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 					// color selector
 					_colorTour_SelectedColor = createUI_ColorSelector(containerSelected);
+				}
+			}
+			{
+				/*
+				 * Dragged tour color
+				 */
+
+				// label
+				final Label label = new Label(group, SWT.NONE);
+				label.setText(Messages.Slideout_CalendarOptions_Label_Calendar_TourDraggedColor);
+
+				final Composite containerDragged = new Composite(group, SWT.NONE);
+				GridDataFactory
+						.fillDefaults()
+						//						.grab(true, false)
+						.span(2, 1)
+						.applyTo(containerDragged);
+				GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerDragged);
+				{
+
+					// combo color
+					_comboTour_DraggedColor = new Combo(containerDragged, SWT.DROP_DOWN | SWT.READ_ONLY);
+					_comboTour_DraggedColor.setVisibleItemCount(20);
+					_comboTour_DraggedColor.addSelectionListener(_defaultSelectionListener);
+
+					// color selector
+					_colorTour_DraggedColor = createUI_ColorSelector(containerDragged);
 				}
 			}
 		}
@@ -2298,6 +2343,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		final CalendarColor tourBgColor1 = getSelected_Tour_GraphColor(_comboTour_BackgroundColor1);
 		final CalendarColor tourBgColor2 = getSelected_Tour_GraphColor(_comboTour_BackgroundColor2);
 		final CalendarColor tourBorderColor = getSelected_Tour_GraphColor(_comboTour_BorderColor);
+		final CalendarColor tourDraggedColor = getSelected_Tour_GraphColor(_comboTour_DraggedColor);
 		final CalendarColor tourHoveredColor = getSelected_Tour_GraphColor(_comboTour_HoveredColor);
 		final CalendarColor tourSelectedColor = getSelected_Tour_GraphColor(_comboTour_SelectedColor);
 
@@ -2352,6 +2398,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		_colorTour_BackgroundColor1.setEnabled(isBgColor1 && tourBgColor1 == CalendarColor.CUSTOM);
 		_colorTour_BackgroundColor2.setEnabled(isBgColor2 && tourBgColor2 == CalendarColor.CUSTOM);
 		_colorTour_BorderColor.setEnabled(tourBorderColor == CalendarColor.CUSTOM);
+		_colorTour_DraggedColor.setEnabled(tourDraggedColor == CalendarColor.CUSTOM);
 		_colorTour_HoveredColor.setEnabled(tourHoveredColor == CalendarColor.CUSTOM);
 		_colorTour_SelectedColor.setEnabled(tourSelectedColor == CalendarColor.CUSTOM);
 		_comboTour_BackgroundColor1.setEnabled(isBgColor1);
@@ -2519,6 +2566,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			}
 			fillUI_Combo_GraphColor(_comboTour_BackgroundColor1);
 			fillUI_Combo_GraphColor(_comboTour_BackgroundColor2);
+			fillUI_Combo_GraphColor(_comboTour_DraggedColor);
 			fillUI_Combo_GraphColor(_comboTour_HoveredColor);
 			fillUI_Combo_GraphColor(_comboTour_SelectedColor);
 
@@ -3404,12 +3452,14 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			_spinnerTour_BackgroundWidth.setSelection(profile.tourBackgroundWidth);
 			_spinnerTour_BorderWidth.setSelection(profile.tourBorderWidth);
 
+			_comboTour_DraggedColor.select(getGraphColorIndex(profile.tourDraggedColor));
 			_comboTour_HoveredColor.select(getGraphColorIndex(profile.tourHoveredColor));
 			_comboTour_SelectedColor.select(getGraphColorIndex(profile.tourSelectedColor));
 
 			_colorTour_BackgroundColor1.setColorValue(profile.tourBackground1RGB);
 			_colorTour_BackgroundColor2.setColorValue(profile.tourBackground2RGB);
 			_colorTour_BorderColor.setColorValue(profile.tourBorderRGB);
+			_colorTour_DraggedColor.setColorValue(profile.tourDraggedRGB);
 			_colorTour_HoveredColor.setColorValue(profile.tourHoveredRGB);
 			_colorTour_SelectedColor.setColorValue(profile.tourSelectedRGB);
 
@@ -3530,12 +3580,14 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		profile.tourBackground1Color = getSelected_Tour_GraphColor(_comboTour_BackgroundColor1);
 		profile.tourBackground2Color = getSelected_Tour_GraphColor(_comboTour_BackgroundColor2);
 		profile.tourBorderColor = getSelected_Tour_GraphColor(_comboTour_BorderColor);
+		profile.tourDraggedColor = getSelected_Tour_GraphColor(_comboTour_DraggedColor);
 		profile.tourHoveredColor = getSelected_Tour_GraphColor(_comboTour_HoveredColor);
 		profile.tourSelectedColor = getSelected_Tour_GraphColor(_comboTour_SelectedColor);
 
 		profile.tourBackground1RGB = _colorTour_BackgroundColor1.getColorValue();
 		profile.tourBackground2RGB = _colorTour_BackgroundColor2.getColorValue();
 		profile.tourBorderRGB = _colorTour_BorderColor.getColorValue();
+		profile.tourDraggedRGB = _colorTour_DraggedColor.getColorValue();
 		profile.tourHoveredRGB = _colorTour_HoveredColor.getColorValue();
 		profile.tourSelectedRGB = _colorTour_SelectedColor.getColorValue();
 

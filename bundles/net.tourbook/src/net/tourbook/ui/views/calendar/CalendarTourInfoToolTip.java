@@ -53,7 +53,7 @@ public class CalendarTourInfoToolTip extends ToolTip implements ITourProvider, I
 	private CalendarGraph		_calendarGraph;
 	private CalendarView		_calendarView;
 
-	private CalendarSelectItem		_hoveredIdem;
+	private CalendarSelectItem	_hoveredItem;
 
 	public CalendarTourInfoToolTip(final CalendarView calendarView) {
 
@@ -78,7 +78,7 @@ public class CalendarTourInfoToolTip extends ToolTip implements ITourProvider, I
 
 		super.afterHideToolTip(event);
 
-		_hoveredIdem = null;
+		_hoveredItem = null;
 	}
 
 	@Override
@@ -205,7 +205,7 @@ public class CalendarTourInfoToolTip extends ToolTip implements ITourProvider, I
 	protected Object getToolTipArea(final Event event) {
 
 		// Ensure that the tooltip is hidden when the cell is left
-		final CalendarSelectItem ttArea = _hoveredIdem = _calendarGraph.getHoveredTour();
+		final CalendarSelectItem ttArea = _hoveredItem = _calendarGraph.getHoveredTour();
 
 		return ttArea;
 	}
@@ -247,12 +247,12 @@ public class CalendarTourInfoToolTip extends ToolTip implements ITourProvider, I
 			return false;
 		}
 
-		if (_hoveredIdem == null || _hoveredIdem.id < 0) {
+		if (_hoveredItem == null || _hoveredItem.id < 0) {
 			return false;
 		}
 
 		// get tour id from hovered item
-		_tourId = _hoveredIdem.id;
+		_tourId = _hoveredItem.id;
 
 		return true;
 	}
