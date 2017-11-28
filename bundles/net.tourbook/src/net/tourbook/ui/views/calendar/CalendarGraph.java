@@ -706,7 +706,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 					if (_selectedItem.isTour()) {
 						gotoTour_SameWeekday(-1);
 					} else {
-						scroll_Week(true);
+						scroll_ByDate(true);
 					}
 					break;
 
@@ -715,7 +715,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 					if (_selectedItem.isTour()) {
 						gotoTour_SameWeekday(+1);
 					} else {
-						scroll_Week(false);
+						scroll_ByDate(false);
 					}
 					break;
 
@@ -775,13 +775,13 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 						if (isTour) {
 							scroll_Tour(false);
 						} else {
-							scroll_Week(true);
+							scroll_ByDate(true);
 						}
 					} else {
 						if (isTour) {
 							scroll_Tour(true);
 						} else {
-							scroll_Week(false);
+							scroll_ByDate(false);
 						}
 					}
 
@@ -915,8 +915,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 			return;
 		}
-
-		scrollBar_updateScrollbar();
 
 		// set state very early that data loading can reset it
 		_isGraphDirty = false;
@@ -2577,9 +2575,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		if (_allTourFocusItems.size() < 1) {
 			if (offset < 0) {
-				scroll_Week(false);
+				scroll_ByDate(false);
 			} else {
-				scroll_Week(true);
+				scroll_ByDate(true);
 			}
 			return;
 		}
@@ -2612,10 +2610,10 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 		final int newIndex = index + offset;
 		if (newIndex < 0) {
-			scroll_Week(false);
+			scroll_ByDate(false);
 			return;
 		} else if (newIndex >= _allTourFocusItems.size()) {
-			scroll_Week(true);
+			scroll_ByDate(true);
 			return;
 		} else {
 			_selectedItem = new CalendarSelectItem(_allTourFocusItems.get(newIndex).id, ItemType.TOUR);
@@ -2631,9 +2629,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		if (_allTourFocusItems.size() < 1) {
 
 			if (direction < 0) {
-				scroll_Week(true);
+				scroll_ByDate(true);
 			} else {
-				scroll_Week(false);
+				scroll_ByDate(false);
 			}
 			return;
 		}
@@ -2692,9 +2690,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 
 		if (direction < 0) {
-			scroll_Week(true);
+			scroll_ByDate(true);
 		} else {
-			scroll_Week(false);
+			scroll_ByDate(false);
 		}
 
 	}
@@ -2927,6 +2925,56 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 	}
 
+	public void scroll_ByDate(final boolean isNext) {
+
+		final boolean useDraggedScrolling = _currentProfile.useDraggedScrolling;
+
+		if (_currentProfile.isShowYearColumns) {
+
+			if (_currentProfile.yearColumnsStart == ColumnStart.CONTINUOUSLY) {
+
+				if (isNext) {
+					_yearColumn_FirstYear = useDraggedScrolling
+							? _yearColumn_FirstYear.plusMonths(1)
+							: _yearColumn_FirstYear.minusMonths(1);
+				} else {
+					_yearColumn_FirstYear = useDraggedScrolling
+							? _yearColumn_FirstYear.minusMonths(1)
+							: _yearColumn_FirstYear.plusMonths(1);
+				}
+
+			} else {
+
+				// scroll year column
+
+				if (isNext) {
+					_yearColumn_FirstYear = useDraggedScrolling
+							? _yearColumn_FirstYear.plusYears(1)
+							: _yearColumn_FirstYear.minusYears(1);
+				} else {
+
+					_yearColumn_FirstYear = useDraggedScrolling
+							? _yearColumn_FirstYear.minusYears(1)
+							: _yearColumn_FirstYear.plusYears(1);
+				}
+			}
+
+		} else {
+
+			if (isNext) {
+				_firstViewportDay = useDraggedScrolling
+						? _firstViewportDay.plusWeeks(1)
+						: _firstViewportDay.minusWeeks(1);
+			} else {
+				_firstViewportDay = useDraggedScrolling
+						? _firstViewportDay.minusWeeks(1)
+						: _firstViewportDay.plusWeeks(1);
+			}
+		}
+
+		updateUI();
+	}
+
 	public void scroll_Screen(final boolean isNext) {
 
 		final boolean useDraggedScrolling = _currentProfile.useDraggedScrolling;
@@ -2989,56 +3037,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	public void scroll_Tour(final boolean isNext) {
 
 		gotoTour_Offset(isNext ? +1 : -1);
-	}
-
-	public void scroll_Week(final boolean isNext) {
-
-		final boolean useDraggedScrolling = _currentProfile.useDraggedScrolling;
-
-		if (_currentProfile.isShowYearColumns) {
-
-			if (_currentProfile.yearColumnsStart == ColumnStart.CONTINUOUSLY) {
-
-				if (isNext) {
-					_yearColumn_FirstYear = useDraggedScrolling
-							? _yearColumn_FirstYear.plusMonths(1)
-							: _yearColumn_FirstYear.minusMonths(1);
-				} else {
-					_yearColumn_FirstYear = useDraggedScrolling
-							? _yearColumn_FirstYear.minusMonths(1)
-							: _yearColumn_FirstYear.plusMonths(1);
-				}
-
-			} else {
-
-				// scroll year column
-
-				if (isNext) {
-					_yearColumn_FirstYear = useDraggedScrolling
-							? _yearColumn_FirstYear.plusYears(1)
-							: _yearColumn_FirstYear.minusYears(1);
-				} else {
-
-					_yearColumn_FirstYear = useDraggedScrolling
-							? _yearColumn_FirstYear.minusYears(1)
-							: _yearColumn_FirstYear.plusYears(1);
-				}
-			}
-
-		} else {
-
-			if (isNext) {
-				_firstViewportDay = useDraggedScrolling
-						? _firstViewportDay.plusWeeks(1)
-						: _firstViewportDay.minusWeeks(1);
-			} else {
-				_firstViewportDay = useDraggedScrolling
-						? _firstViewportDay.minusWeeks(1)
-						: _firstViewportDay.plusWeeks(1);
-			}
-		}
-
-		updateUI();
 	}
 
 	private LocalDate scrollBar_getEndOfTours() {
@@ -3219,28 +3217,13 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		_isInUpdateScrollbar = true;
 		final ScrollBar scrollbar = _parent.getVerticalBar();
 
-//		scrollbar.setValues(
-//
-//				scrollbarSelection,
-//
-//				0, // min
-//				scrollbarMax, // max
-//
-//				thumbSize,
-//
-//				1, // increment
-//				_numWeeksInOneColumn / 2 // page increment
-//		);
-
 		scrollbar.setThumb(thumbSize);
 		scrollbar.setPageIncrement(thumbSize);
 
 		scrollbar.setMinimum(0);
 		scrollbar.setMaximum(scrollbarMax);
-//		scrollbar.setPageIncrement(_numWeeksInOneColumn / 2);
-		scrollbar.setSelection(scrollbarSelection);
 
-//		scrollbar.setThumb(value);
+		scrollbar.setSelection(scrollbarSelection);
 
 		_scrollBar_LastSelection = scrollbarSelection;
 
@@ -3378,7 +3361,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 					return;
 				}
 
-//				scrollBar_updateScrollbar();
+				scrollBar_updateScrollbar();
 			}
 		});
 	}
