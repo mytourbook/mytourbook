@@ -3342,13 +3342,17 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			return;
 		}
 
+		/*
+		 * Do a redraw always, it occured when selecting another profile the UI is not updated
+		 */
+		redraw();
+
 		if (_isGraphDirty) {
 			// redraw is already forced
 			return;
 		}
 
 		_isGraphDirty = true;
-		redraw();
 
 		// run async that the calendar is drawn first which sets some fields
 		getDisplay().asyncExec(new Runnable() {

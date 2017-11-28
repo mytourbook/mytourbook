@@ -162,7 +162,6 @@ public class CalendarProfileManager {
 	private static final String				ATTR_YEAR_COLUMNS_START					= "yearColumnsStart";				//$NON-NLS-1$
 	private static final String				ATTR_YEAR_COLUMN_DAY_WIDTH				= "yearColumnDayWidth";				//$NON-NLS-1$
 	private static final String				ATTR_YEAR_HEADER_FONT					= "yearHeaderFont";					//$NON-NLS-1$
-
 	//
 	static final DataFormatter				DEFAULT_EMPTY_FORMATTER;
 	//
@@ -180,19 +179,14 @@ public class CalendarProfileManager {
 	static final RGB						DEFAULT_ALTERNATE_MONTH_RGB				= new RGB(60, 60, 60);
 	static final RGB						DEFAULT_CALENDAR_BACKGROUND_RGB			= new RGB(40, 40, 40);
 	static final RGB						DEFAULT_CALENDAR_FOREBACKGROUND_RGB		= new RGB(200, 200, 200);
-	static final RGB						DEFAULT_DAY_HOVERED_RGB					= new RGB(255, 255, 0);
-	static final RGB						DEFAULT_DAY_SELECTED_RGB				= new RGB(0, 185, 255);
+	static final RGB						DEFAULT_DAY_HOVERED_RGB					= new RGB(255, 255, 255);
+	static final RGB						DEFAULT_DAY_SELECTED_RGB				= new RGB(128, 128, 128);
 	//
+	// tour background
 	static final TourBackground				DEFAULT_TOUR_BACKGROUND					= TourBackground.FILL;
 	static final int						DEFAULT_TOUR_BACKGROUND_WIDTH			= 3;
 	static final TourBorder					DEFAULT_TOUR_BORDER						= TourBorder.NO_BORDER;
 	static final int						DEFAULT_TOUR_BORDER_WIDTH				= 1;
-	static final int						DEFAULT_TOUR_MARGIN_TOP					= -3;
-	static final int						DEFAULT_TOUR_MARGIN_LEFT				= 1;
-	static final int						DEFAULT_TOUR_MARGIN_BOTTOM				= 1;
-	static final int						DEFAULT_TOUR_MARGIN_RIGHT				= -3;
-	static final int						DEFAULT_TOUR_TRUNCATED_LINES			= 3;
-	static final int						DEFAULT_TOUR_VALUE_COLUMNS				= 3;
 	static final CalendarColor				DEFAULT_TOUR_BACKGROUND_COLOR1			= CalendarColor.DARK;
 	static final CalendarColor				DEFAULT_TOUR_BACKGROUND_COLOR2			= CalendarColor.BRIGHT;
 	static final CalendarColor				DEFAULT_TOUR_BORDER_COLOR				= CalendarColor.LINE;
@@ -203,10 +197,17 @@ public class CalendarProfileManager {
 	static final RGB						DEFAULT_TOUR_BACKGROUND_1_RGB			= new RGB(64, 0, 255);
 	static final RGB						DEFAULT_TOUR_BACKGROUND_2_RGB			= new RGB(128, 64, 0);
 	static final RGB						DEFAULT_TOUR_BORDER_RGB					= new RGB(192, 128, 0);
-	static final RGB						DEFAULT_TOUR_DRAGGED_RGB				= new RGB(255, 0, 0);
+	static final RGB						DEFAULT_TOUR_DRAGGED_RGB				= new RGB(255, 255, 0);
 	static final RGB						DEFAULT_TOUR_HOVERED_RGB				= new RGB(255, 255, 255);
-	static final RGB						DEFAULT_TOUR_SELECTED_RGB				= new RGB(219, 255, 72);
+	static final RGB						DEFAULT_TOUR_SELECTED_RGB				= new RGB(192, 192, 192);
 	//
+	// tour content
+	static final int						DEFAULT_TOUR_MARGIN_TOP					= -3;
+	static final int						DEFAULT_TOUR_MARGIN_LEFT				= 1;
+	static final int						DEFAULT_TOUR_MARGIN_BOTTOM				= 1;
+	static final int						DEFAULT_TOUR_MARGIN_RIGHT				= -3;
+	static final int						DEFAULT_TOUR_TRUNCATED_LINES			= 3;
+	static final int						DEFAULT_TOUR_VALUE_COLUMNS				= 3;
 	static final RGB						DEFAULT_TOUR_CONTENT_RGB				= new RGB(255, 192, 255);
 	static final RGB						DEFAULT_TOUR_TITLE_RGB					= new RGB(191, 255, 203);
 	static final RGB						DEFAULT_TOUR_VALUE_RGB					= new RGB(191, 193, 255);
@@ -1226,8 +1227,8 @@ public class CalendarProfileManager {
 		profile.alternateMonthRGB             = new RGB (60, 60, 60);
 		profile.calendarBackgroundRGB         = new RGB (40, 40, 40);
 		profile.calendarForegroundRGB         = new RGB (200, 200, 200);
-		profile.dayHoveredRGB                 = new RGB (255, 255, 0);
-		profile.daySelectedRGB                = new RGB (0, 185, 255);
+		profile.dayHoveredRGB                 = new RGB (255, 255, 255);
+		profile.daySelectedRGB                = new RGB (128, 128, 128);
 		                                                                                           
 		// 1. Date column
 		profile.isShowDateColumn              = true;
@@ -1271,13 +1272,14 @@ public class CalendarProfileManager {
 		profile.tourBackground2Color          = CalendarColor.BRIGHT;
 		profile.tourBorderColor               = CalendarColor.LINE;
 		profile.tourHoveredColor              = CalendarColor.CUSTOM;
+		profile.tourDraggedColor              = CalendarColor.CUSTOM;
 		profile.tourSelectedColor             = CalendarColor.CUSTOM;
-		
 		profile.tourBackground1RGB            = new RGB (64, 0, 255);
 		profile.tourBackground2RGB            = new RGB (128, 64, 0);
 		profile.tourBorderRGB                 = new RGB (192, 128, 0);
+		profile.tourDraggedRGB                = new RGB (255, 255, 0);
 		profile.tourHoveredRGB                = new RGB (255, 255, 255);
-		profile.tourSelectedRGB               = new RGB (219,255,72);
+		profile.tourSelectedRGB               = new RGB (192, 192, 192);
 		                                                                                           
 		// tour content
 		profile.isShowTourContent             = true;
@@ -2013,26 +2015,39 @@ public class CalendarProfileManager {
 		profile.isToggleMonthColor            = true;
 		profile.isWeekRowHeight               = false;
 		profile.useDraggedScrolling           = false;
+		profile.weekHeight                    = 150;
+		profile.weekRows                      = 5;
 		profile.alternateMonthRGB             = new RGB (240, 240, 240);
 		profile.calendarBackgroundRGB         = new RGB (255, 255, 255);
 		profile.calendarForegroundRGB         = new RGB (0, 0, 0);
-		profile.weekHeight                    = 150;
-		profile.weekRows                      = 5;
+		profile.dayHoveredRGB                 = new RGB (153, 153, 153);
+		profile.daySelectedRGB                = new RGB (77, 77, 77);
 		                                                                                           
-		// year columns
-		profile.isShowYearColumns             = false;
-		profile.isYearColumnDayWidth             = false;
-		profile.yearColumns                   = 2;
-		profile.yearColumnsSpacing            = 30;
-		profile.yearColumnsStart              = ColumnStart.CONTINUOUSLY;
-		profile.yearColumnDayWidth            = 50;
-		profile.yearHeaderFont                = CalendarProfile.createFont(2.2f, SWT.BOLD);
-		                                                                                           
-		// date column
+		// 1. Date column
 		profile.isShowDateColumn              = true;
 		profile.dateColumnContent             = DateColumnContent.WEEK_NUMBER;
 		profile.dateColumnFont                = CalendarProfile.createFont(1.5f, SWT.BOLD);
 		profile.dateColumnWidth               = 50;
+		                                                                                           
+		// 2. Year columns
+		profile.isShowYearColumns             = false;
+		profile.isYearColumnDayWidth          = false;
+		profile.yearColumns                   = 2;
+		profile.yearColumnsSpacing            = 30;
+		profile.yearColumnsStart              = ColumnStart.CONTINUOUSLY;
+		profile.yearColumnDayWidth            = 200;
+		profile.yearHeaderFont                = CalendarProfile.createFont(2.2f, SWT.BOLD);
+		                                                                                           
+		// 3. Week summary column
+		profile.isShowSummaryColumn           = true;
+		profile.isShowWeekValueUnit           = true;
+		profile.weekColumnWidth               = 100;
+		profile.weekMarginTop                 = -3;
+		profile.weekMarginLeft                = 1;
+		profile.weekMarginBottom              = 1;
+		profile.weekMarginRight               = -3;
+		profile.weekValueColor                = CalendarColor.TEXT;
+		profile.weekValueFont                 = CalendarProfile.createFont(1.2f, SWT.BOLD);
 		                                                                                           
 		// day date
 		profile.isHideDayDateWhenNoTour       = false;
@@ -2043,40 +2058,41 @@ public class CalendarProfileManager {
 		                                                                                           
 		// tour background
 		profile.tourBackground                = TourBackground.FILL;
-		profile.tourBackground1Color          = CalendarColor.DARK;
-		profile.tourBackground2Color          = CalendarColor.BRIGHT;
 		profile.tourBackgroundWidth           = 3;
 		profile.tourBorder                    = TourBorder.NO_BORDER;
-		profile.tourBorderColor               = CalendarColor.LINE;
 		profile.tourBorderWidth               = 1;
+		profile.tourBackground1Color          = CalendarColor.DARK;
+		profile.tourBackground2Color          = CalendarColor.BRIGHT;
+		profile.tourBorderColor               = CalendarColor.LINE;
+		profile.tourHoveredColor              = CalendarColor.CUSTOM;
+		profile.tourDraggedColor              = CalendarColor.CUSTOM;
+		profile.tourSelectedColor             = CalendarColor.CUSTOM;
+		profile.tourBackground1RGB            = new RGB (64, 0, 255);
+		profile.tourBackground2RGB            = new RGB (128, 64, 0);
+		profile.tourBorderRGB                 = new RGB (192, 128, 0);
+		profile.tourDraggedRGB                = new RGB (0, 0, 255);
+		profile.tourHoveredRGB                = new RGB (162, 162, 162);
+		profile.tourSelectedRGB               = new RGB (53, 53, 53);
 		                                                                                           
 		// tour content
 		profile.isShowTourContent             = true;
 		profile.isShowTourValueUnit           = true;
 		profile.isTruncateTourText            = true;
-		profile.tourContentColor              = CalendarColor.CONTRAST;
-		profile.tourContentFont               = CalendarProfile.createFont(0.9f, SWT.NORMAL);
 		profile.tourMarginTop                 = -3;
 		profile.tourMarginLeft                = 1;
 		profile.tourMarginBottom              = 1;
 		profile.tourMarginRight               = -3;
-		profile.tourTitleColor                = CalendarColor.CONTRAST;
-		profile.tourTitleFont                 = CalendarProfile.createFont(1.3f, SWT.BOLD);
 		profile.tourTruncatedLines            = 2;
-		profile.tourValueColor                = CalendarColor.CONTRAST;
 		profile.tourValueColumns              = 2;
+		profile.tourContentFont               = CalendarProfile.createFont(0.9f, SWT.NORMAL);
+		profile.tourTitleFont                 = CalendarProfile.createFont(1.3f, SWT.BOLD);
 		profile.tourValueFont                 = CalendarProfile.createFont(1.2f, SWT.BOLD);
-		                                                                                           
-		// week summary column
-		profile.isShowSummaryColumn           = true;
-		profile.isShowWeekValueUnit           = true;
-		profile.weekColumnWidth               = 100;
-		profile.weekMarginTop                 = -3;
-		profile.weekMarginLeft                = 1;
-		profile.weekMarginBottom              = 1;
-		profile.weekMarginRight               = -3;
-		profile.weekValueColor                = CalendarColor.TEXT;
-		profile.weekValueFont                 = CalendarProfile.createFont(1.2f, SWT.BOLD);
+		profile.tourContentColor              = CalendarColor.CONTRAST;
+		profile.tourTitleColor                = CalendarColor.CONTRAST;
+		profile.tourValueColor                = CalendarColor.CONTRAST;
+		profile.tourContentRGB                = new RGB (255, 192, 255);
+		profile.tourTitleRGB                  = new RGB (0, 255, 192);
+		profile.tourValueRGB                  = new RGB (255, 0, 64);
 
 
 		profile.allTourFormatterData          = new FormatterData[] {
