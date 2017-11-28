@@ -140,7 +140,13 @@ public class CalendarTourDataProvider {
 		requestedDate.isAfter(today)
 
 				// requested data are before first tour
-				|| (_firstTourDateTime != null && requestedDate.isBefore(_firstTourDateTime.toLocalDate()))) {
+				|| (_firstTourDateTime != null && requestedDate.isBefore(
+
+						// adjust to the last day of the last month,
+						// otherwise data for the first month are not loaded
+						_firstTourDateTime.toLocalDate().withDayOfMonth(1).minusDays(1)
+
+				))) {
 
 			/*
 			 * Create dummy data
@@ -548,13 +554,8 @@ public class CalendarTourDataProvider {
 			return _firstTourDateTime;
 		}
 
-		final String select = "SELECT " //$NON-NLS-1$
-				+ "StartYear," //			1 //$NON-NLS-1$
-				+ "StartMonth," //			2 //$NON-NLS-1$
-				+ "StartDay" //				3 //$NON-NLS-1$
-				+ UI.NEW_LINE
-				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + UI.NEW_LINE) //$NON-NLS-1$
-				+ (" ORDER BY StartYear, StartMonth"); //$NON-NLS-1$
+		final String select = "SELECT MIN(TourStartTime) " //$NON-NLS-1$
+				+ "FROM " + TourDatabase.TABLE_TOUR_DATA; //$NON-NLS-1$
 
 		try {
 
@@ -564,18 +565,11 @@ public class CalendarTourDataProvider {
 			final ResultSet result = statement.executeQuery();
 			while (result.next()) {
 
-				final int year = result.getShort(1);
-				final int month = result.getShort(2);
-				final int day = result.getShort(3);
+				final long tourStartTime = result.getLong(1);
 
-				if (year != 0 && month != 0 && day != 0) {
+				_firstTourDateTime = TimeTools.toLocalDateTime(tourStartTime);
 
-					// this case happened that year/month/day is 0
-
-					_firstTourDateTime = LocalDateTime.of(year, month, day, 12, 0);
-
-					break;
-				}
+				break;
 			}
 
 			conn.close();
@@ -584,7 +578,7 @@ public class CalendarTourDataProvider {
 		}
 
 		if (_firstTourDateTime == null) {
-			_firstTourDateTime = LocalDateTime.now().minusYears(1);
+			_firstTourDateTime = LocalDateTime.now().minusMonths(1);
 		}
 
 		return _firstTourDateTime;

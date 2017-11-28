@@ -775,13 +775,13 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 						if (isTour) {
 							scroll_Tour(false);
 						} else {
-							scroll_ByDate(true);
+							scroll_ByDate(true, true);
 						}
 					} else {
 						if (isTour) {
 							scroll_Tour(true);
 						} else {
-							scroll_ByDate(false);
+							scroll_ByDate(false, true);
 						}
 					}
 
@@ -796,9 +796,13 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 					}
 				}
 
-				/*
-				 * This will fix scrollbar flickering because scrollbar in this canvas WITHOUT ANY
-				 * automatic !!!
+				/**
+				 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+				 * <p>
+				 * This will fix scrollbar flickering because the scrollbar in this canvas is now
+				 * disabled for automatically scrolling
+				 * <p>
+				 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 				 */
 				event.doit = false;
 			}
@@ -2483,9 +2487,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 				// center date vertically on screen
 				.minusWeeks(_numWeeksInOneColumn / 2)
 
-				//				// set first day to start of week
-				//				.with(getFirstDayOfWeek_SameOrNext())
-
 				// set default time
 				.atStartOfDay();
 
@@ -2525,6 +2526,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 				.with(getFirstDayOfWeek_SameOrPrevious());
 
+		// select day
 		_selectedItem = new CalendarSelectItem(0, ItemType.DAY);
 
 		gotoDate(_firstViewportDay.toLocalDate());
@@ -2926,8 +2928,12 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	}
 
 	public void scroll_ByDate(final boolean isNext) {
+		scroll_ByDate(isNext, false);
+	}
 
-		final boolean useDraggedScrolling = _currentProfile.useDraggedScrolling;
+	public void scroll_ByDate(final boolean isNext, final boolean isDraggedEnabled) {
+
+		final boolean useDraggedScrolling = isDraggedEnabled ? _currentProfile.useDraggedScrolling : false;
 
 		if (_currentProfile.isShowYearColumns) {
 
@@ -2979,7 +2985,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		final boolean useDraggedScrolling = _currentProfile.useDraggedScrolling;
 
-		final int numPageWeeks = _numWeeksInOneColumn / 2;
+		final int numPageWeeks = Math.max(1, _numWeeksInOneColumn - 1);
 
 		if (_currentProfile.isShowYearColumns) {
 
