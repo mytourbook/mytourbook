@@ -67,9 +67,10 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
+import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
+import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.PaintEvent;
@@ -110,8 +111,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	//
 	private List<FocusItem>						_allDayFocusItems		= new ArrayList<FocusItem>();
 	private List<FocusItem>						_allTourFocusItems		= new ArrayList<FocusItem>();
-	private boolean								_isHoveredModified		= false;
 	private boolean								_isGraphDirty			= true;
+	private boolean								_isHoveredModified;
+	private boolean								_isHoveredPainted;
 	//
 	private CalendarSelectItem					_emptyItem				= new CalendarSelectItem(-1, ItemType.EMPTY);
 	private CalendarSelectItem					_hoveredItem			= _emptyItem;
@@ -544,7 +546,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 								_hoveredItem.isDragOverItem = true;
 								_hoveredItem.calendarTourData = transferData.calendarTourData;
 
-								_isHoveredModified = !oldHoveredItem.equals(_hoveredItem);
+								setHoveredModified(!oldHoveredItem.equals(_hoveredItem));
 
 								// only draw highlighting when modified
 								if (_isHoveredModified) {
@@ -561,7 +563,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 				 * Hide previous drag over item
 				 */
 				_hoveredItem = _emptyItem;
-				_isHoveredModified = !oldHoveredItem.equals(_hoveredItem);
+				setHoveredModified(!oldHoveredItem.equals(_hoveredItem));
 
 				// only draw highlighting when modified
 				if (_isHoveredModified) {
@@ -612,38 +614,31 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			}
 		});
 
-		addMouseListener(new MouseListener() {
+		addMouseListener(new MouseAdapter() {
+
 			@Override
 			public void mouseDoubleClick(final MouseEvent e) {
-
-				if (_selectedItem.isTour()) {
-
-					_tourDoubleClickState.canEditTour = true;
-					_tourDoubleClickState.canOpenTour = true;
-					_tourDoubleClickState.canQuickEditTour = true;
-					_tourDoubleClickState.canEditMarker = true;
-					_tourDoubleClickState.canAdjustAltitude = true;
-
-					TourManager.getInstance().tourDoubleClickAction(CalendarGraph.this, _tourDoubleClickState);
-				}
+				onMouse_DoubleClick();
 			}
 
 			@Override
 			public void mouseDown(final MouseEvent e) {
-				onMouseMove(e);
+				onMouse_Item(e);
 			}
-
-			@Override
-			public void mouseUp(final MouseEvent e) {
-				// onMouseMove(e);
-			}
-
 		});
 
 		addMouseMoveListener(new MouseMoveListener() {
 			@Override
 			public void mouseMove(final MouseEvent e) {
-				onMouseMove(e);
+				onMouse_Item(e);
+			}
+		});
+
+		addMouseTrackListener(new MouseTrackAdapter() {
+
+			@Override
+			public void mouseExit(final MouseEvent e) {
+				onMouse_Exit();
 			}
 		});
 
@@ -663,6 +658,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		});
 
 		addTraverseListener(new TraverseListener() {
+
 			@Override
 			public void keyTraversed(final TraverseEvent e) {
 				switch (e.detail) {
@@ -881,16 +877,14 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	 */
 	private void drawCalendar(final GC calendarGC) {
 
-		System.out.println(
-				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] drawCalendar() 1")
-						+ ("\t_isHoveredModified: " + _isHoveredModified));
-// TODO remove SYSTEM.OUT.PRINTLN
 
 		final Rectangle canvas = getClientArea();
 		final int canvasWidth = canvas.width;
 		final int canvasHeight = canvas.height;
 
-		if (!_isGraphDirty && _calendarImage != null) {
+		if (_isGraphDirty == false && _calendarImage != null) {
+
+			// graph image must not be updated
 
 			final Image hoveredImage = new Image(getDisplay(), canvasWidth, canvasHeight);
 			final GC gcHovered = new GC(hoveredImage);
@@ -899,11 +893,16 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 				drawSelection(gcHovered);
 
-				if (_isHoveredModified) {
+				/*
+				 * Complex: Ensure with _isHoveredPainted that the hovered state is also painted
+				 * even when _isHoveredModified is set back to false. This problem occured when a
+				 * tour tooltip is displayed (and took some hours to fix this problem) !!!
+				 */
+				if (_isHoveredModified || _isHoveredPainted == false) {
 
 					drawHovered(gcHovered);
 
-					_isHoveredModified = false;
+					setHoveredModified(false);
 				}
 
 				calendarGC.drawImage(hoveredImage, 0, 0);
@@ -1358,11 +1357,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 				}
 			});
 		}
-
-		System.out.println(
-				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] drawCalendar() 2")
-						+ ("\t_isHoveredModified: " + _isHoveredModified));
-// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
 	private void drawDay(	final GC gc,
@@ -1826,6 +1820,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 	private void drawHovered(final GC gc) {
 
+		_isHoveredPainted = true;
 
 		List<FocusItem> allFocusItems;
 
@@ -2772,12 +2767,37 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 	}
 
+	private void onMouse_DoubleClick() {
+
+		if (_selectedItem.isTour()) {
+
+			// do double click action
+
+			_tourDoubleClickState.canEditTour = true;
+			_tourDoubleClickState.canOpenTour = true;
+			_tourDoubleClickState.canQuickEditTour = true;
+			_tourDoubleClickState.canEditMarker = true;
+			_tourDoubleClickState.canAdjustAltitude = true;
+
+			TourManager.getInstance().tourDoubleClickAction(CalendarGraph.this, _tourDoubleClickState);
+		}
+	}
+
+	private void onMouse_Exit() {
+
+		/*
+		 * Remove hovered item that when entering, the same item is displayed again otherwise it
+		 * will not work
+		 */
+		_hoveredItem = _emptyItem;
+	}
+
 	/**
-	 * Mouse move event handler
+	 * Mouse move/down event handler
 	 * 
 	 * @param event
 	 */
-	private void onMouseMove(final MouseEvent event) {
+	private void onMouse_Item(final MouseEvent event) {
 
 		if (_calendarImage == null || _calendarImage.isDisposed()) {
 			return;
@@ -2787,6 +2807,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		final CalendarSelectItem oldSelectedItem = _selectedItem;
 
 		if (1 == event.button || 3 == event.button) {
+
+			// reset selection
 			_selectedItem = _emptyItem;
 		}
 
@@ -2796,6 +2818,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		boolean isTourHovered = false;
 		boolean isDayHovered = false;
 
+		// check if a tour is hovered
 		for (final FocusItem tourFocusItem : _allTourFocusItems) {
 
 			if (tourFocusItem.rect.contains(event.x, event.y)) {
@@ -2803,6 +2826,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 				final long id = tourFocusItem.id;
 
 				if (1 == event.button || 3 == event.button) {
+
+					// set new selection
 
 					final CalendarTourData calendarTourData = tourFocusItem.calendarTourData;
 
@@ -2821,6 +2846,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 				_hoveredTour = new CalendarSelectItem(id, ItemType.TOUR);
 				_hoveredTour.itemRectangle = tourFocusItem.rect;
 
+
 				isTourHovered = true;
 
 				break;
@@ -2829,6 +2855,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		if (!isTourHovered) {
 
+			// check if a day is hovered
 			for (final FocusItem itemLocation : _allDayFocusItems) {
 
 				if (itemLocation.rect.contains(event.x, event.y)) {
@@ -2853,7 +2880,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		if (!oldSelectedItem.equals(_selectedItem)) {
 
-			// highlight selection -> redraw calendar
+			// selection is modified -> redraw calendar
 
 			redraw();
 			return;
@@ -2861,18 +2888,13 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		if (!isDayHovered && !isTourHovered) {
 
-			// only draw base calendar, skip highlighting
+			// only draw base calendar, remove highlighting when it was set
 
 			redraw();
 			return;
 		}
 
-		System.out.println(
-				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] onMouseMove()")
-						+ ("\t_isHoveredModified: " + _isHoveredModified));
-// TODO remove SYSTEM.OUT.PRINTLN
-
-		_isHoveredModified = !oldHoveredItem.equals(_hoveredItem);
+		setHoveredModified(!oldHoveredItem.equals(_hoveredItem));
 		if (_isHoveredModified) {
 
 			// only draw the highlighting on top of the calendar image
@@ -3241,6 +3263,16 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 				.withMonth(1)
 				.withDayOfMonth(1);
 
+	}
+
+	private void setHoveredModified(final boolean isModified) {
+
+
+		_isHoveredModified = isModified;
+
+		if (isModified) {
+			_isHoveredPainted = false;
+		}
 	}
 
 	void setLinked(final boolean linked) {
