@@ -72,7 +72,6 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.MouseTrackListener;
-import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -752,10 +751,10 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			}
 		});
 
-		addMouseWheelListener(new MouseWheelListener() {
+		addListener(SWT.MouseVerticalWheel, new Listener() {
 
 			@Override
-			public void mouseScrolled(final MouseEvent event) {
+			public void handleEvent(final Event event) {
 
 				final Point p = new Point(event.x, event.y);
 				boolean isInDayArea = false;
@@ -796,6 +795,12 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 						scroll_Screen(false);
 					}
 				}
+
+				/*
+				 * This will fix scrollbar flickering because scrollbar in this canvas WITHOUT ANY
+				 * automatic !!!
+				 */
+				event.doit = false;
 			}
 		});
 
@@ -843,8 +848,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			public void mouseHover(final MouseEvent e) {}
 		});
 
-		final ScrollBar sb = _parent.getVerticalBar();
-		sb.addSelectionListener(new SelectionAdapter() {
+		_parent.getVerticalBar().addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
 				scrollBar_onScroll(event);
@@ -876,7 +880,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	 * @param gc
 	 */
 	private void drawCalendar(final GC calendarGC) {
-
 
 		final Rectangle canvas = getClientArea();
 		final int canvasWidth = canvas.width;
@@ -912,6 +915,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 			return;
 		}
+
+		scrollBar_updateScrollbar();
 
 		// set state very early that data loading can reset it
 		_isGraphDirty = false;
@@ -2846,7 +2851,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 				_hoveredTour = new CalendarSelectItem(id, ItemType.TOUR);
 				_hoveredTour.itemRectangle = tourFocusItem.rect;
 
-
 				isTourHovered = true;
 
 				break;
@@ -3096,12 +3100,12 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			return;
 		}
 
-		final ScrollBar sb = _parent.getVerticalBar();
+		final ScrollBar scrollbar = _parent.getVerticalBar();
 
 		final int selectableMin = 0 + 1;
-		final int selectableMax = sb.getMaximum() - sb.getThumb() - 1;
+		final int selectableMax = scrollbar.getMaximum() - scrollbar.getThumb() - 1;
 
-		final int currentSelection = sb.getSelection();
+		final int currentSelection = scrollbar.getSelection();
 		final int selectionDiff = currentSelection - _scrollBar_LastSelection;
 
 		if (_scrollBar_OutsideWeeks == 0) {
@@ -3150,7 +3154,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		}
 
-		_scrollBar_LastSelection = sb.getSelection();
+		_scrollBar_LastSelection = scrollbar.getSelection();
 
 		// goto the selected week
 		_firstViewportDay = scrollBar_getStartOfTours().atStartOfDay().plusDays(currentSelection * 7);
@@ -3158,17 +3162,17 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		_isGraphDirty = true;
 		redraw();
 
-//		System.out.println(
-//				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] onScroll") //$NON-NLS-1$ //$NON-NLS-2$
-//						+ ("\tselection: " + sb.getSelection()) //$NON-NLS-1$
-//						+ ("\toutsideWeeks: " + _scrollBar_OutsideWeeks) //$NON-NLS-1$
-//						+ ("\tmax: " + sb.getMaximum()) //$NON-NLS-1$
-//						+ ("\tthumb: " + sb.getThumb()) //$NON-NLS-1$
-//						+ ("\t_numWeeksInOneColumn: " + _numWeeksInOneColumn) //$NON-NLS-1$
-//						+ ("\tfirstDay: " + _firstViewportDay.toLocalDate()) //$NON-NLS-1$
-////				+ ("\t: " + )
-//		);
-//// TODO remove SYSTEM.OUT.PRINTLN
+		System.out.println(
+				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] onScroll") //$NON-NLS-1$ //$NON-NLS-2$
+						+ ("\tselection: " + scrollbar.getSelection()) //$NON-NLS-1$
+						+ ("\toutsideWeeks: " + _scrollBar_OutsideWeeks) //$NON-NLS-1$
+						+ ("\tmax: " + scrollbar.getMaximum()) //$NON-NLS-1$
+						+ ("\tthumb: " + scrollbar.getThumb()) //$NON-NLS-1$
+						+ ("\t_numWeeksInOneColumn: " + _numWeeksInOneColumn) //$NON-NLS-1$
+						+ ("\tfirstDay: " + _firstViewportDay.toLocalDate()) //$NON-NLS-1$
+//				+ ("\t: " + )
+		);
+// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
 	private void scrollBar_updateScrollbar() {
@@ -3213,32 +3217,44 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		// update scrollbar
 		_isInUpdateScrollbar = true;
-		_parent.getVerticalBar().setValues(
+		final ScrollBar scrollbar = _parent.getVerticalBar();
 
-				scrollbarSelection,
+//		scrollbar.setValues(
+//
+//				scrollbarSelection,
+//
+//				0, // min
+//				scrollbarMax, // max
+//
+//				thumbSize,
+//
+//				1, // increment
+//				_numWeeksInOneColumn / 2 // page increment
+//		);
 
-				0, // min
-				scrollbarMax, // max
+		scrollbar.setThumb(thumbSize);
+		scrollbar.setPageIncrement(thumbSize);
 
-				thumbSize,
+		scrollbar.setMinimum(0);
+		scrollbar.setMaximum(scrollbarMax);
+//		scrollbar.setPageIncrement(_numWeeksInOneColumn / 2);
+		scrollbar.setSelection(scrollbarSelection);
 
-				1, // increment
-				_numWeeksInOneColumn / 2 // page increment
-		);
+//		scrollbar.setThumb(value);
 
 		_scrollBar_LastSelection = scrollbarSelection;
 
-//		System.out.println(
-//				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] upScroll") //$NON-NLS-1$ //$NON-NLS-2$
-//						+ ("\tselection: " + scrollbarSelection) //$NON-NLS-1$
-//						+ ("\toutsideWeeks: " + _scrollBar_OutsideWeeks) //$NON-NLS-1$
-//						+ ("\tmax: " + scrollbarMax) //$NON-NLS-1$
-//						+ ("\tthumb: " + thumbSize) //$NON-NLS-1$
-//						+ ("\t_numWeeksInOneColumn: " + _numWeeksInOneColumn) //$NON-NLS-1$
-//						+ ("\tfirstDay: " + _firstViewportDay.toLocalDate()) //$NON-NLS-1$
-////				+ ("\t: " + )
-//		);
-//// TODO remove SYSTEM.OUT.PRINTLN
+		System.out.println(
+				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] upScroll") //$NON-NLS-1$ //$NON-NLS-2$
+						+ ("\tselection: " + scrollbarSelection) //$NON-NLS-1$
+						+ ("\toutsideWeeks: " + _scrollBar_OutsideWeeks) //$NON-NLS-1$
+						+ ("\tmax: " + scrollbarMax) //$NON-NLS-1$
+						+ ("\tthumb: " + thumbSize) //$NON-NLS-1$
+						+ ("\t_numWeeksInOneColumn: " + _numWeeksInOneColumn) //$NON-NLS-1$
+						+ ("\tfirstDay: " + _firstViewportDay.toLocalDate()) //$NON-NLS-1$
+//				+ ("\t: " + )
+		);
+// TODO remove SYSTEM.OUT.PRINTLN
 	}
 
 	public void setFirstDay(final LocalDate dt) {
@@ -3266,7 +3282,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	}
 
 	private void setHoveredModified(final boolean isModified) {
-
 
 		_isHoveredModified = isModified;
 
@@ -3363,7 +3378,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 					return;
 				}
 
-				scrollBar_updateScrollbar();
+//				scrollBar_updateScrollbar();
 			}
 		});
 	}
