@@ -71,7 +71,6 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackAdapter;
-import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -415,7 +414,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 	}
 
-	enum ItemType {
+	private enum ItemType {
 
 		EMPTY, //
 
@@ -519,9 +518,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 						final Point dragOverPosition = CalendarGraph.this.toControl(event.x, event.y);
 
-						for (final FocusItem dayItem : _allDayFocusItems) {
+						for (final FocusItem dayFocusItem : _allDayFocusItems) {
 
-							if (dayItem.rect.contains(dragOverPosition.x, dragOverPosition.y)) {
+							if (dayFocusItem.rect.contains(dragOverPosition.x, dragOverPosition.y)) {
 
 								// a day item is hovered
 
@@ -536,11 +535,11 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 								}
 
 								// keep drag date
-								_dragOverDate = dayItem.dayDate;
+								_dragOverDate = dayFocusItem.dayDate;
 
 								final CalendarItemTransferData transferData = (CalendarItemTransferData) data;
 
-								_hoveredItem = new CalendarSelectItem(dayItem.id, ItemType.DAY);
+								_hoveredItem = new CalendarSelectItem(dayFocusItem.id, ItemType.DAY);
 
 								_hoveredItem.isDragOverItem = true;
 								_hoveredItem.calendarTourData = transferData.calendarTourData;
@@ -613,6 +612,23 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			}
 		});
 
+		addControlListener(new ControlAdapter() {
+			@Override
+			public void controlResized(final ControlEvent event) {
+
+				_isGraphDirty = true;
+
+				redraw();
+			}
+		});
+
+		addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(final DisposeEvent e) {
+				onDispose();
+			}
+		});
+
 		addMouseListener(new MouseAdapter() {
 
 			@Override
@@ -622,14 +638,14 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 			@Override
 			public void mouseDown(final MouseEvent e) {
-				onMouse_Item(e);
+				onMouse_MoveDown(e);
 			}
 		});
 
 		addMouseMoveListener(new MouseMoveListener() {
 			@Override
 			public void mouseMove(final MouseEvent e) {
-				onMouse_Item(e);
+				onMouse_MoveDown(e);
 			}
 		});
 
@@ -660,8 +676,11 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 			@Override
 			public void keyTraversed(final TraverseEvent e) {
+
 				switch (e.detail) {
+
 				case SWT.TRAVERSE_RETURN:
+
 					if (_selectedItem.isTour()) {
 						_tourDoubleClickState.canEditTour = true;
 						_tourDoubleClickState.canOpenTour = true;
@@ -669,14 +688,19 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 						_tourDoubleClickState.canEditMarker = true;
 						_tourDoubleClickState.canAdjustAltitude = true;
 						TourManager.getInstance().tourDoubleClickAction(CalendarGraph.this, _tourDoubleClickState);
+
 					} else {
-						scroll_Tour(true);
+						scroll_Tour(1);
 					}
+
 					break;
+
 				case SWT.TRAVERSE_ESCAPE:
+
 					_selectedItem = _emptyItem;
 					redraw();
 					break;
+
 				case SWT.TRAVERSE_PAGE_NEXT:
 				case SWT.TRAVERSE_PAGE_PREVIOUS:
 				case SWT.TRAVERSE_TAB_NEXT:
@@ -693,12 +717,12 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 				switch (event.keyCode) {
 				case SWT.ARROW_LEFT:
 				case 'h':
-					scroll_Tour(false);
+					scroll_Tour(-1);
 					break;
 
 				case SWT.ARROW_RIGHT:
 				case 'l':
-					scroll_Tour(true);
+					scroll_Tour(1);
 					break;
 
 				case SWT.ARROW_UP:
@@ -706,27 +730,27 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 					if (_selectedItem.isTour()) {
 						gotoTour_SameWeekday(-1);
 					} else {
-						scroll_ByDate(true);
+						scroll_ByDate_WithKeys(-1);
 					}
 					break;
 
 				case SWT.ARROW_DOWN:
 				case 'j':
 					if (_selectedItem.isTour()) {
-						gotoTour_SameWeekday(+1);
+						gotoTour_SameWeekday(1);
 					} else {
-						scroll_ByDate(false);
+						scroll_ByDate_WithKeys(1);
 					}
-					break;
-
-				case SWT.PAGE_DOWN:
-				case 'n':
-					scroll_Screen(false);
 					break;
 
 				case SWT.PAGE_UP:
 				case 'p':
-					scroll_Screen(true);
+					scroll_Screen(-1);
+					break;
+
+				case SWT.PAGE_DOWN:
+				case 'n':
+					scroll_Screen(1);
 					break;
 
 				case SWT.HOME:
@@ -744,7 +768,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 						_selectedItem = _emptyItem;
 						redraw();
 					} else {
-						scroll_Tour(false);
+						scroll_Tour(1);
 					}
 					break;
 				}
@@ -755,101 +779,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 			@Override
 			public void handleEvent(final Event event) {
-
-				final Point p = new Point(event.x, event.y);
-				boolean isInDayArea = false;
-
-				// check if mouse is in the areas which contains the days
-				for (final Rectangle dateRectangle : _calendarAllDaysRectangle) {
-					if (dateRectangle.contains(p)) {
-						isInDayArea = true;
-						break;
-					}
-				}
-
-				if (isInDayArea) {
-
-					final boolean isTour = _selectedItem.isTour();
-
-					if (event.count > 0) {
-						if (isTour) {
-							scroll_Tour(false);
-						} else {
-							scroll_ByDate(true, true);
-						}
-					} else {
-						if (isTour) {
-							scroll_Tour(true);
-						} else {
-							scroll_ByDate(false, true);
-						}
-					}
-
-				} else {
-
-					// left or right column, scroll by pages
-
-					if (event.count > 0) {
-						scroll_Screen(true);
-					} else {
-						scroll_Screen(false);
-					}
-				}
-
-				/**
-				 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-				 * <p>
-				 * This will fix scrollbar flickering because the scrollbar in this canvas is now
-				 * disabled for automatically scrolling
-				 * <p>
-				 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-				 */
-				event.doit = false;
+				onMouse_Wheel(event);
 			}
-		});
-
-		addDisposeListener(new DisposeListener() {
-			@Override
-			public void widgetDisposed(final DisposeEvent e) {
-				onDispose();
-			}
-		});
-
-		addControlListener(new ControlAdapter() {
-			@Override
-			public void controlResized(final ControlEvent event) {
-
-				_isGraphDirty = true;
-				redraw();
-			}
-		});
-
-		addFocusListener(new FocusListener() {
-
-			@Override
-			public void focusGained(final FocusEvent e) {
-				// redraw();
-			}
-
-			@Override
-			public void focusLost(final FocusEvent e) {
-				// redraw();
-			}
-		});
-
-		addMouseTrackListener(new MouseTrackListener() {
-			@Override
-			public void mouseEnter(final MouseEvent e) {
-				// forceFocus();
-			}
-
-			@Override
-			public void mouseExit(final MouseEvent e) {
-				redraw();
-			}
-
-			@Override
-			public void mouseHover(final MouseEvent e) {}
 		});
 
 		_parent.getVerticalBar().addSelectionListener(new SelectionAdapter() {
@@ -1196,9 +1127,10 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 							dayPosXNext - dayPosX,
 							weekHeight);
 
-					final DayItem day = new DayItem(dayId);
-					_allDayFocusItems.add(new FocusItem(dayRect, dayId, day, currentDate));
-					dayId = day.dayId + 1;
+					final DayItem dayItem = new DayItem(dayId);
+					_allDayFocusItems.add(new FocusItem(dayRect, dayId, dayItem, currentDate));
+
+					dayId = dayItem.dayId + 1;
 
 					gc.setFont(normalFont);
 //					gc.setBackground(_white);
@@ -1263,7 +1195,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 						boolean isDateTransparent = true;
 						Color dayDateForegroundColor;
 
-						if (day.dayId == todayDayId) {
+						if (dayItem.dayId == todayDayId) {
 
 							dayDateForegroundColor = (_blue);
 
@@ -2526,8 +2458,18 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 				.with(getFirstDayOfWeek_SameOrPrevious());
 
-		// select day
-		_selectedItem = new CalendarSelectItem(0, ItemType.DAY);
+		final Long tourId = _dataProvider.getTodaysTourId();
+		if (tourId != null) {
+
+			// select todays tour when available
+			_selectedItem = new CalendarSelectItem(tourId, ItemType.TOUR);
+
+		} else {
+
+			// select day
+
+			_selectedItem = new CalendarSelectItem(0, ItemType.DAY);
+		}
 
 		gotoDate(_firstViewportDay.toLocalDate());
 	}
@@ -2547,12 +2489,26 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 	public void gotoTour_First() {
 
-		_firstViewportDay = _dataProvider
+		final LocalDateTime firstTourDateTime = _dataProvider.getFirstTourDateTime();
 
-				.getFirstTourDateTime()
+		_firstViewportDay = firstTourDateTime
 
 				// set first day to start of week
 				.with(getFirstDayOfWeek_SameOrPrevious());
+
+		final Long tourId = _dataProvider.getFirstTourId();
+		if (tourId != null) {
+
+			// select first tour
+			_selectedItem = new CalendarSelectItem(tourId, ItemType.TOUR);
+
+		} else {
+
+			// select day
+
+			final long dayId = new DayItem(firstTourDateTime.toLocalDate()).dayId;
+			_selectedItem = new CalendarSelectItem(dayId, ItemType.DAY);
+		}
 
 		gotoDate(_firstViewportDay.toLocalDate());
 	}
@@ -2573,51 +2529,72 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 	}
 
-	private void gotoTour_Offset(int offset) {
+	private void gotoTour_Offset(int direction) {
 
 		if (_allTourFocusItems.size() < 1) {
-			if (offset < 0) {
-				scroll_ByDate(false);
+			if (direction < 0) {
+				scroll_ByDate_WithKeys(-1);
 			} else {
-				scroll_ByDate(true);
+				scroll_ByDate_WithKeys(1);
 			}
 			return;
 		}
 
-		if (!_selectedItem.isTour()) { // if no tour is selected, count from first/last tour and select this tour
-			if (offset > 0) {
+		/*
+		 * If no tour is selected, count from first/last tour and select this tour
+		 */
+		if (_selectedItem.isTour() == false) {
+
+			// a day is selected
+
+			if (direction > 0) {
+
+				direction--;
 				_selectedItem = new CalendarSelectItem(_allTourFocusItems.get(0).id, ItemType.TOUR);
-				offset--;
+
 			} else {
+
+				direction++;
 				_selectedItem = new CalendarSelectItem(
 						_allTourFocusItems.get(_allTourFocusItems.size() - 1).id,
 						ItemType.TOUR);
-				offset++;
 			}
 		}
 
 		boolean visible = false;
 		int index = 0;
-		for (final FocusItem ol : _allTourFocusItems) {
-			if (_selectedItem.id == ol.id) {
-				visible = true; // the selection is visible
+		for (final FocusItem tourFocusItem : _allTourFocusItems) {
+
+			if (_selectedItem.id == tourFocusItem.id) {
+
+				// the selection is visible
+				visible = true;
 				break;
 			}
 			index++;
 		}
-		if (!visible) { // if we are scrolling tours forward and the selection got invisible start at the first tour again
-			if (offset > 0) {
+
+		/*
+		 * If we are scrolling tours forward and the selection got invisible start at the first tour
+		 * again
+		 */
+		if (!visible) {
+			if (direction > 0) {
 				index = -1;
 			}
 		}
-		final int newIndex = index + offset;
+
+		final int newIndex = index + direction;
 		if (newIndex < 0) {
-			scroll_ByDate(false);
-			return;
+
+			scroll_ByDate_WithKeys(-1);
+
 		} else if (newIndex >= _allTourFocusItems.size()) {
-			scroll_ByDate(true);
-			return;
+
+			scroll_ByDate_WithKeys(1);
+
 		} else {
+
 			_selectedItem = new CalendarSelectItem(_allTourFocusItems.get(newIndex).id, ItemType.TOUR);
 
 			_isGraphDirty = true;
@@ -2630,11 +2607,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		if (_allTourFocusItems.size() < 1) {
 
-			if (direction < 0) {
-				scroll_ByDate(true);
-			} else {
-				scroll_ByDate(false);
-			}
+			scroll_ByDate_WithKeys(direction);
+
 			return;
 		}
 
@@ -2691,12 +2665,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			_selectedItem = _emptyItem;
 		}
 
-		if (direction < 0) {
-			scroll_ByDate(true);
-		} else {
-			scroll_ByDate(false);
-		}
-
+		scroll_ByDate_WithKeys(direction);
+		redraw();
 	}
 
 	private void onDispose() {
@@ -2795,6 +2765,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		 * will not work
 		 */
 		_hoveredItem = _emptyItem;
+
+		redraw();
 	}
 
 	/**
@@ -2802,7 +2774,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	 * 
 	 * @param event
 	 */
-	private void onMouse_Item(final MouseEvent event) {
+	private void onMouse_MoveDown(final MouseEvent event) {
 
 		if (_calendarImage == null || _calendarImage.isDisposed()) {
 			return;
@@ -2860,19 +2832,19 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		if (!isTourHovered) {
 
 			// check if a day is hovered
-			for (final FocusItem itemLocation : _allDayFocusItems) {
+			for (final FocusItem dayFocusItem : _allDayFocusItems) {
 
-				if (itemLocation.rect.contains(event.x, event.y)) {
+				if (dayFocusItem.rect.contains(event.x, event.y)) {
 
-					final long id = itemLocation.id;
+					final long dayId = dayFocusItem.id;
 
 					if (1 == event.button || 3 == event.button) {
 
-						_selectedItem = new CalendarSelectItem(id, ItemType.DAY);
+						_selectedItem = new CalendarSelectItem(dayId, ItemType.DAY);
 
-					} else if (oldHoveredItem.id != id) { // a new object is highlighted
+					} else if (oldHoveredItem.id != dayId) { // a new object is highlighted
 
-						_hoveredItem = new CalendarSelectItem(id, ItemType.DAY);
+						_hoveredItem = new CalendarSelectItem(dayId, ItemType.DAY);
 					}
 
 					isDayHovered = true;
@@ -2908,6 +2880,59 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		return;
 	}
 
+	private void onMouse_Wheel(final Event event) {
+
+		final Point p = new Point(event.x, event.y);
+		boolean isInDayArea = false;
+
+		// check if mouse is in the areas which contains the days
+		for (final Rectangle dateRectangle : _calendarAllDaysRectangle) {
+			if (dateRectangle.contains(p)) {
+				isInDayArea = true;
+				break;
+			}
+		}
+
+		if (isInDayArea) {
+
+			final boolean isTour = _selectedItem.isTour();
+
+			if (event.count > 0) {
+				if (isTour) {
+					scroll_Tour(1);
+				} else {
+					scroll_ByDate_WithWheel(1);
+				}
+			} else {
+				if (isTour) {
+					scroll_Tour(-1);
+				} else {
+					scroll_ByDate_WithWheel(-1);
+				}
+			}
+
+		} else {
+
+			// left or right column, scroll by pages
+
+			if (event.count > 0) {
+				scroll_Screen(1);
+			} else {
+				scroll_Screen(-1);
+			}
+		}
+
+		/**
+		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		 * <p>
+		 * This will fix scrollbar flickering because the scrollbar in this canvas is now disabled
+		 * for automatically scrolling AND this is the reason why the MouseWheelListener is NOT used
+		 * <p>
+		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		 */
+		event.doit = false;
+	}
+
 	void refreshCalendar() {
 
 		_dataProvider.invalidate();
@@ -2927,19 +2952,38 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 	}
 
-	public void scroll_ByDate(final boolean isNext) {
-		scroll_ByDate(isNext, false);
-	}
-
-	public void scroll_ByDate(final boolean isNext, final boolean isDraggedEnabled) {
-
-		final boolean useDraggedScrolling = isDraggedEnabled ? _currentProfile.useDraggedScrolling : false;
+	void scroll_ByDate_WithKeys(final int direction) {
 
 		if (_currentProfile.isShowYearColumns) {
 
 			if (_currentProfile.yearColumnsStart == ColumnStart.CONTINUOUSLY) {
 
-				if (isNext) {
+				_yearColumn_FirstYear = _yearColumn_FirstYear.plusMonths(direction);
+
+			} else {
+
+				// scroll year column
+
+				_yearColumn_FirstYear = _yearColumn_FirstYear.plusYears(direction);
+			}
+
+		} else {
+
+			_firstViewportDay = _firstViewportDay.plusWeeks(direction);
+		}
+
+		updateUI();
+	}
+
+	void scroll_ByDate_WithWheel(final int direction) {
+
+		final boolean useDraggedScrolling = _currentProfile.useDraggedScrolling;
+
+		if (_currentProfile.isShowYearColumns) {
+
+			if (_currentProfile.yearColumnsStart == ColumnStart.CONTINUOUSLY) {
+
+				if (direction > 0) {
 					_yearColumn_FirstYear = useDraggedScrolling
 							? _yearColumn_FirstYear.plusMonths(1)
 							: _yearColumn_FirstYear.minusMonths(1);
@@ -2953,7 +2997,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 				// scroll year column
 
-				if (isNext) {
+				if (direction > 0) {
 					_yearColumn_FirstYear = useDraggedScrolling
 							? _yearColumn_FirstYear.plusYears(1)
 							: _yearColumn_FirstYear.minusYears(1);
@@ -2967,7 +3011,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		} else {
 
-			if (isNext) {
+			if (direction > 0) {
 				_firstViewportDay = useDraggedScrolling
 						? _firstViewportDay.plusWeeks(1)
 						: _firstViewportDay.minusWeeks(1);
@@ -2981,7 +3025,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		updateUI();
 	}
 
-	public void scroll_Screen(final boolean isNext) {
+	public void scroll_Screen(final int direction) {
 
 		final boolean useDraggedScrolling = _currentProfile.useDraggedScrolling;
 
@@ -2993,7 +3037,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 				LocalDateTime yearColumn_WithAdjustedWeeks;
 
-				if (isNext) {
+				if (direction > 0) {
 					yearColumn_WithAdjustedWeeks = useDraggedScrolling
 							? _yearColumn_FirstYear.plusWeeks(numPageWeeks)
 							: _yearColumn_FirstYear.minusWeeks(numPageWeeks);
@@ -3012,7 +3056,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 				// scroll year column
 
-				if (isNext) {
+				if (direction > 0) {
 					_yearColumn_FirstYear = useDraggedScrolling
 							? _yearColumn_FirstYear.plusYears(1)
 							: _yearColumn_FirstYear.minusYears(1);
@@ -3026,7 +3070,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		} else {
 
-			if (isNext) {
+			if (direction > 0) {
 				_firstViewportDay = useDraggedScrolling
 						? _firstViewportDay.plusWeeks(numPageWeeks)
 						: _firstViewportDay.minusWeeks(numPageWeeks);
@@ -3040,9 +3084,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		updateUI();
 	}
 
-	public void scroll_Tour(final boolean isNext) {
+	public void scroll_Tour(final int direction) {
 
-		gotoTour_Offset(isNext ? +1 : -1);
+		gotoTour_Offset(direction);
 	}
 
 	private LocalDate scrollBar_getEndOfTours() {
@@ -3307,11 +3351,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	public void setYearMonthContributor(final CalendarYearMonthContributionItem calendarYearMonthContribuor) {
 		_calendarYearMonthContributor = calendarYearMonthContribuor;
 
-	}
-
-	void stopDataProvider() {
-
-		_dataProvider.stopDataProvider();
 	}
 
 	void updateTourTypeColors() {

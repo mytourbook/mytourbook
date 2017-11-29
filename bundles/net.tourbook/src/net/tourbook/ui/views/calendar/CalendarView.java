@@ -51,8 +51,11 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -270,44 +273,64 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 		_actionCalendarOptions = new ActionCalendarOptions(this);
 		_actionTourInfo = new ActionTourInfo(this, _parent);
 
-		_actionBack = new Action() {
-			@Override
-			public void run() {
-				_calendarGraph.scroll_Screen(false);
-			}
-		};
-		_actionBack.setText(Messages.Calendar_View_Action_Back);
-		_actionBack.setToolTipText(Messages.Calendar_View_Action_Back_Tooltip);
-		_actionBack.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ArrowDown));
+		/*
+		 * Back
+		 */
+		{
+			_actionBack = new Action() {
+				@Override
+				public void run() {
+					_calendarGraph.scroll_Screen(-1);
+				}
+			};
+			_actionBack.setText(Messages.Calendar_View_Action_Back);
+			_actionBack.setToolTipText(Messages.Calendar_View_Action_Back_Tooltip);
+			_actionBack.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ArrowUp));
+		}
 
-		_actionForward = new Action() {
-			@Override
-			public void run() {
-				_calendarGraph.scroll_Screen(true);
-			}
-		};
-		_actionForward.setText(Messages.Calendar_View_Action_Forward);
-		_actionForward.setToolTipText(Messages.Calendar_View_Action_Forward_Tooltip);
-		_actionForward.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ArrowUp));
+		/*
+		 * Forward
+		 */
+		{
+			_actionForward = new Action() {
+				@Override
+				public void run() {
+					_calendarGraph.scroll_Screen(1);
+				}
+			};
+			_actionForward.setText(Messages.Calendar_View_Action_Forward);
+			_actionForward.setToolTipText(Messages.Calendar_View_Action_Forward_Tooltip);
+			_actionForward.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ArrowDown));
+		}
 
-		_actionSetLinked = new Action(null, Action.AS_CHECK_BOX) {
-			@Override
-			public void run() {
-				_calendarGraph.setLinked(_actionSetLinked.isChecked());
-			}
-		};
-		_actionSetLinked.setText(Messages.Calendar_View_Action_LinkWithOtherViews);
-		_actionSetLinked.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__SyncViews));
-		_actionSetLinked.setChecked(true);
+		/*
+		 * Link with other views
+		 */
+		{
+			_actionSetLinked = new Action(null, Action.AS_CHECK_BOX) {
+				@Override
+				public void run() {
+					_calendarGraph.setLinked(_actionSetLinked.isChecked());
+				}
+			};
+			_actionSetLinked.setText(Messages.Calendar_View_Action_LinkWithOtherViews);
+			_actionSetLinked.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__SyncViews));
+			_actionSetLinked.setChecked(true);
+		}
 
-		_actionGotoToday = new Action() {
-			@Override
-			public void run() {
-				_calendarGraph.gotoDate_Today();
-			}
-		};
-		_actionGotoToday.setText(Messages.Calendar_View_Action_GotoToday);
-		_actionGotoToday.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ZoomCentered));
+		/*
+		 * Today
+		 */
+		{
+			_actionGotoToday = new Action() {
+				@Override
+				public void run() {
+					_calendarGraph.gotoDate_Today();
+				}
+			};
+			_actionGotoToday.setText(Messages.Calendar_View_Action_GotoToday);
+			_actionGotoToday.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ZoomCentered));
+		}
 	}
 
 	@Override
@@ -345,6 +368,14 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 
 	private void createUI(final Composite parent) {
 
+		parent.addControlListener(new ControlAdapter() {
+
+			@Override
+			public void controlResized(final ControlEvent e) {
+				updateUI_Title(null, null);
+			}
+		});
+
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
 		GridLayoutFactory
@@ -371,6 +402,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 		{
 			{
 				/*
@@ -380,8 +412,10 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 				GridDataFactory
 						.fillDefaults()//
 						.grab(true, false)
+						.align(SWT.FILL, SWT.BEGINNING)
 						.applyTo(_lblTitle);
 				MTFont.setHeaderFont(_lblTitle);
+//				_lblTitle.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
 			}
 			{
 				/*
@@ -551,7 +585,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 		}
 
 		// when changing the profile then more/less data are needed
-		_calendarGraph.stopDataProvider();
+//		_calendarGraph.stopDataProvider();
 
 		CalendarProfileManager.setActiveCalendarProfile(selectedProfile, true);
 	}
@@ -639,18 +673,62 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 
 	void updateUI_Title(final LocalDate calendarFirstDay, final LocalDate calendarLastDay) {
 
-		if (calendarFirstDay.equals(_titleFirstDay) && calendarLastDay.equals(_titleLastDay)) {
-			// these dates are already displayed
+		if (calendarFirstDay != null) {
+
+			if (calendarFirstDay.equals(_titleFirstDay) && calendarLastDay.equals(_titleLastDay)) {
+				// these dates are already displayed
+				return;
+			}
+
+			_titleFirstDay = calendarFirstDay;
+			_titleLastDay = calendarLastDay;
+		}
+
+		if (_titleFirstDay == null) {
+			// this can occure when resized and not setup
 			return;
 		}
 
-		_titleFirstDay = calendarFirstDay;
-		_titleLastDay = calendarLastDay;
+		/*
+		 * Get title text
+		 */
+		String titleText = UI.EMPTY_STRING;
+		final GC gc = new GC(_lblTitle);
+		{
+			final int availableWidth = _lblTitle.getSize().x;
 
-		_lblTitle.setText(
-				calendarFirstDay.format(TimeTools.Formatter_Date_L)
+			titleText = _titleFirstDay.format(TimeTools.Formatter_Date_L)
+					+ UI.DASH_WITH_DOUBLE_SPACE
+					+ _titleLastDay.format(TimeTools.Formatter_Date_L);
+
+			int titleWidth = gc.stringExtent(titleText).x;
+
+			if (titleWidth > availableWidth) {
+
+				titleText = _titleFirstDay.format(TimeTools.Formatter_Date_M)
 						+ UI.DASH_WITH_DOUBLE_SPACE
-						+ calendarLastDay.format(TimeTools.Formatter_Date_L));
+						+ _titleLastDay.format(TimeTools.Formatter_Date_M);
+
+				titleWidth = gc.stringExtent(titleText).x;
+
+				if (titleWidth > availableWidth) {
+
+					titleText = _titleFirstDay.format(TimeTools.Formatter_Date_S)
+							+ UI.DASH_WITH_DOUBLE_SPACE
+							+ _titleLastDay.format(TimeTools.Formatter_Date_S);
+
+					titleWidth = gc.stringExtent(titleText).x;
+
+					if (titleWidth > availableWidth) {
+
+						titleText = UI.EMPTY_STRING;
+					}
+				}
+			}
+		}
+		gc.dispose();
+
+		_lblTitle.setText(titleText);
 	}
 
 }

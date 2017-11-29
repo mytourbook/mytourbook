@@ -1016,13 +1016,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 	 * Creates a new manually created tour, editor must not be dirty before this action is called
 	 * 
 	 * @param copyFromOtherTour
-	 *            The new tour is partly copied from this tour.
+	 *            When not <code>null</code> then the new tour is partly copied from this tour.
 	 */
 	public void actionCreateTour(final TourData copyFromOtherTour) {
 
 		// check if a person is selected
 		final TourPerson activePerson = TourbookPlugin.getActivePerson();
 		if (activePerson == null) {
+
 			MessageDialog.openInformation(
 					Display.getCurrent().getActiveShell(),
 					Messages.tour_editor_dlg_create_tour_title,
@@ -1032,7 +1033,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
 		try {
 
-			final TourData manualTourData = (TourData) copyFromOtherTour.clone();
+			final TourData manualTourData = copyFromOtherTour != null
+
+					// clone other tour
+					? (TourData) copyFromOtherTour.clone()
+
+					// create new empty tour
+					: new TourData();
 
 			/*
 			 * Adjust some cloned data
