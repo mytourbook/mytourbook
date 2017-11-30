@@ -1227,8 +1227,8 @@ public class CalendarProfileManager {
 		profile.alternateMonthRGB             = new RGB (60, 60, 60);
 		profile.calendarBackgroundRGB         = new RGB (40, 40, 40);
 		profile.calendarForegroundRGB         = new RGB (200, 200, 200);
-		profile.dayHoveredRGB                 = new RGB (255, 255, 255);
-		profile.daySelectedRGB                = new RGB (128, 128, 128);
+		profile.dayHoveredRGB                 = new RGB (192, 192, 192);
+		profile.daySelectedRGB                = new RGB (255, 255, 255);
 		                                                                                           
 		// 1. Date column
 		profile.isShowDateColumn              = true;
@@ -1278,8 +1278,8 @@ public class CalendarProfileManager {
 		profile.tourBackground2RGB            = new RGB (128, 64, 0);
 		profile.tourBorderRGB                 = new RGB (192, 128, 0);
 		profile.tourDraggedRGB                = new RGB (255, 255, 0);
-		profile.tourHoveredRGB                = new RGB (255, 255, 255);
-		profile.tourSelectedRGB               = new RGB (192, 192, 192);
+		profile.tourHoveredRGB                = new RGB (192, 192, 192);
+		profile.tourSelectedRGB               = new RGB (255, 255, 255);
 		                                                                                           
 		// tour content
 		profile.isShowTourContent             = true;
@@ -1352,8 +1352,8 @@ public class CalendarProfileManager {
 		profile.alternateMonthRGB             = new RGB (60, 60, 60);
 		profile.calendarBackgroundRGB         = new RGB (40, 40, 40);
 		profile.calendarForegroundRGB         = new RGB (200, 200, 200);
-		profile.dayHoveredRGB                 = new RGB (255, 255, 255);
-		profile.daySelectedRGB                = new RGB (128, 128, 128);
+		profile.dayHoveredRGB                 = new RGB (192, 192, 192);
+		profile.daySelectedRGB                = new RGB (255, 255, 255);
 		                                                                                           
 		// 1. Date column
 		profile.isShowDateColumn              = true;
@@ -1403,8 +1403,8 @@ public class CalendarProfileManager {
 		profile.tourBackground2RGB            = new RGB (128, 64, 0);
 		profile.tourBorderRGB                 = new RGB (192, 128, 0);
 		profile.tourDraggedRGB                = new RGB (255, 255, 0);
-		profile.tourHoveredRGB                = new RGB (255, 255, 255);
-		profile.tourSelectedRGB               = new RGB (192, 192, 192);
+		profile.tourHoveredRGB                = new RGB (192, 192, 192);
+		profile.tourSelectedRGB               = new RGB (255, 255, 255);
 		                                                                                           
 		// tour content
 		profile.isShowTourContent             = true;
@@ -1477,8 +1477,8 @@ public class CalendarProfileManager {
 		profile.alternateMonthRGB             = new RGB (60, 60, 60);
 		profile.calendarBackgroundRGB         = new RGB (40, 40, 40);
 		profile.calendarForegroundRGB         = new RGB (200, 200, 200);
-		profile.dayHoveredRGB                 = new RGB (255, 255, 255);
-		profile.daySelectedRGB                = new RGB (128, 128, 128);
+		profile.dayHoveredRGB                 = new RGB (192, 192, 192);
+		profile.daySelectedRGB                = new RGB (255, 255, 255);
 		                                                                                           
 		// 1. Date column
 		profile.isShowDateColumn              = true;
@@ -1528,8 +1528,8 @@ public class CalendarProfileManager {
 		profile.tourBackground2RGB            = new RGB (128, 64, 0);
 		profile.tourBorderRGB                 = new RGB (192, 128, 0);
 		profile.tourDraggedRGB                = new RGB (255, 255, 0);
-		profile.tourHoveredRGB                = new RGB (255, 255, 255);
-		profile.tourSelectedRGB               = new RGB (192, 192, 192);
+		profile.tourHoveredRGB                = new RGB (192, 192, 192);
+		profile.tourSelectedRGB               = new RGB (255, 255, 255);
 		                                                                                           
 		// tour content
 		profile.isShowTourContent             = true;
@@ -1602,8 +1602,8 @@ public class CalendarProfileManager {
 		profile.alternateMonthRGB             = new RGB (60, 60, 60);
 		profile.calendarBackgroundRGB         = new RGB (40, 40, 40);
 		profile.calendarForegroundRGB         = new RGB (200, 200, 200);
-		profile.dayHoveredRGB                 = new RGB (255, 255, 255);
-		profile.daySelectedRGB                = new RGB (128, 128, 128);
+		profile.dayHoveredRGB                 = new RGB (192, 192, 192);
+		profile.daySelectedRGB                = new RGB (255, 255, 255);
 		                                                                                           
 		// 1. Date column
 		profile.isShowDateColumn              = true;
@@ -1653,8 +1653,8 @@ public class CalendarProfileManager {
 		profile.tourBackground2RGB            = new RGB (128, 64, 0);
 		profile.tourBorderRGB                 = new RGB (192, 128, 0);
 		profile.tourDraggedRGB                = new RGB (255, 255, 0);
-		profile.tourHoveredRGB                = new RGB (255, 255, 255);
-		profile.tourSelectedRGB               = new RGB (192, 192, 192);
+		profile.tourHoveredRGB                = new RGB (192, 192, 192);
+		profile.tourSelectedRGB               = new RGB (255, 255, 255);
 		                                                                                           
 		// tour content
 		profile.isShowTourContent             = true;
@@ -1727,8 +1727,8 @@ public class CalendarProfileManager {
 		profile.alternateMonthRGB             = new RGB (60, 60, 60);
 		profile.calendarBackgroundRGB         = new RGB (40, 40, 40);
 		profile.calendarForegroundRGB         = new RGB (200, 200, 200);
-		profile.dayHoveredRGB                 = new RGB (255, 255, 255);
-		profile.daySelectedRGB                = new RGB (128, 128, 128);
+		profile.dayHoveredRGB                 = new RGB (192, 192, 192);
+		profile.daySelectedRGB                = new RGB (255, 255, 255);
 		                                                                                           
 		// 1. Date column
 		profile.isShowDateColumn              = false;
@@ -1778,8 +1778,8 @@ public class CalendarProfileManager {
 		profile.tourBackground2RGB            = new RGB (128, 64, 0);
 		profile.tourBorderRGB                 = new RGB (192, 128, 0);
 		profile.tourDraggedRGB                = new RGB (255, 255, 0);
-		profile.tourHoveredRGB                = new RGB (255, 255, 255);
-		profile.tourSelectedRGB               = new RGB (192, 192, 192);
+		profile.tourHoveredRGB                = new RGB (192, 192, 192);
+		profile.tourSelectedRGB               = new RGB (255, 255, 255);
 		                                                                                           
 		// tour content
 		profile.isShowTourContent             = false;
@@ -1852,8 +1852,8 @@ public class CalendarProfileManager {
 		profile.alternateMonthRGB             = new RGB (60, 60, 60);
 		profile.calendarBackgroundRGB         = new RGB (40, 40, 40);
 		profile.calendarForegroundRGB         = new RGB (200, 200, 200);
-		profile.dayHoveredRGB                 = new RGB (255, 255, 255);
-		profile.daySelectedRGB                = new RGB (128, 128, 128);
+		profile.dayHoveredRGB                 = new RGB (192, 192, 192);
+		profile.daySelectedRGB                = new RGB (255, 255, 255);
 		                                                                                           
 		// 1. Date column
 		profile.isShowDateColumn              = false;
@@ -1903,8 +1903,8 @@ public class CalendarProfileManager {
 		profile.tourBackground2RGB            = new RGB (128, 64, 0);
 		profile.tourBorderRGB                 = new RGB (192, 128, 0);
 		profile.tourDraggedRGB                = new RGB (255, 255, 0);
-		profile.tourHoveredRGB                = new RGB (255, 255, 255);
-		profile.tourSelectedRGB               = new RGB (192, 192, 192);
+		profile.tourHoveredRGB                = new RGB (192, 192, 192);
+		profile.tourSelectedRGB               = new RGB (255, 255, 255);
 		                                                                                           
 		// tour content
 		profile.isShowTourContent             = false;
@@ -1972,13 +1972,13 @@ public class CalendarProfileManager {
 		profile.isToggleMonthColor            = false;
 		profile.isWeekRowHeight               = true;
 		profile.useDraggedScrolling           = false;
-		profile.weekHeight                    = 4;
+		profile.weekHeight                    = 5;
 		profile.weekRows                      = 10;
 		profile.alternateMonthRGB             = new RGB (60, 60, 60);
 		profile.calendarBackgroundRGB         = new RGB (40, 40, 40);
 		profile.calendarForegroundRGB         = new RGB (200, 200, 200);
-		profile.dayHoveredRGB                 = new RGB (255, 255, 255);
-		profile.daySelectedRGB                = new RGB (128, 128, 128);
+		profile.dayHoveredRGB                 = new RGB (192, 192, 192);
+		profile.daySelectedRGB                = new RGB (255, 255, 255);
 		                                                                                           
 		// 1. Date column
 		profile.isShowDateColumn              = false;
@@ -1992,7 +1992,7 @@ public class CalendarProfileManager {
 		profile.yearColumns                   = 20;
 		profile.yearColumnsSpacing            = 0;
 		profile.yearColumnsStart              = ColumnStart.JAN;
-		profile.yearColumnDayWidth            = 4;
+		profile.yearColumnDayWidth            = 5;
 		profile.yearHeaderFont                = CalendarProfile.createFont(0.8f, SWT.NORMAL);
 		                                                                                           
 		// 3. Week summary column
@@ -2028,8 +2028,8 @@ public class CalendarProfileManager {
 		profile.tourBackground2RGB            = new RGB (128, 64, 0);
 		profile.tourBorderRGB                 = new RGB (192, 128, 0);
 		profile.tourDraggedRGB                = new RGB (255, 255, 0);
-		profile.tourHoveredRGB                = new RGB (255, 255, 255);
-		profile.tourSelectedRGB               = new RGB (192, 192, 192);
+		profile.tourHoveredRGB                = new RGB (192, 192, 192);
+		profile.tourSelectedRGB               = new RGB (255, 255, 255);
 		                                                                                           
 		// tour content
 		profile.isShowTourContent             = false;

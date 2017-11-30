@@ -37,11 +37,13 @@ public class CalendarProfile implements Cloneable {
 	 * -> this is not a float !!!
 	 */
 	private final static NumberFormat _nf1 = NumberFormat.getNumberInstance(Locale.US);
+
 	static {
 
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
 	}
+	private boolean						_isLogCalendarProfile	= System.getProperty("logCalendarProfile") != null;	//$NON-NLS-1$
 
 	/*
 	 * Set default values also here to ensure that a valid value is set. A default value would not
@@ -144,7 +146,6 @@ public class CalendarProfile implements Cloneable {
 
 	FontData			weekValueFont				= createFont(1.2f, SWT.BOLD);
 
-
 	/**
 	 * @param relSize
 	 * @param style
@@ -230,6 +231,10 @@ public class CalendarProfile implements Cloneable {
 	}
 
 	void dump() {
+
+		if (_isLogCalendarProfile == false) {
+			return;
+		}
 
 		final CalendarProfile profile = this;
 

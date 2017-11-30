@@ -133,8 +133,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	private long					_dragStartViewerLeft;
 	//
 	private boolean					_isUpdateUI;
-	private boolean					_isLogCalendarProfile	= System.getProperty("logCalendarProfile") != null;	//$NON-NLS-1$
-
+	//
 	private PixelConverter			_pc;
 	private int						_subItemIndent;
 
@@ -2319,14 +2318,6 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		return spinner;
 	}
 
-	private void dumpProfile() {
-
-		// debugging: dump profile to copy&paste an adjusted profile into the profile manager
-
-		if (_isLogCalendarProfile) {
-			CalendarProfileManager.getActiveCalendarProfile().dump();
-		}
-	}
 
 	private void enableControls() {
 
@@ -3193,7 +3184,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 		enableControls();
 
-		dumpProfile();
+		CalendarProfileManager.getActiveCalendarProfile().dump();
 
 		_calendarView.updateUI_Graph();
 	}
@@ -3732,8 +3723,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		saveState_Profile();
 
 		CalendarProfileManager.setActiveCalendarProfile(selectedProfile, true);
-
-		dumpProfile();
+		CalendarProfileManager.getActiveCalendarProfile().dump();
 	}
 
 	private void updateUI_NewProfile(final CalendarProfile calendarProfile) {

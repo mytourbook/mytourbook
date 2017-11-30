@@ -280,7 +280,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 			_actionBack = new Action() {
 				@Override
 				public void run() {
-					_calendarGraph.scroll_Screen(-1);
+					_calendarGraph.scroll_WithWheel_Screen(-1);
 				}
 			};
 			_actionBack.setText(Messages.Calendar_View_Action_Back);
@@ -295,7 +295,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 			_actionForward = new Action() {
 				@Override
 				public void run() {
-					_calendarGraph.scroll_Screen(1);
+					_calendarGraph.scroll_WithWheel_Screen(1);
 				}
 			};
 			_actionForward.setText(Messages.Calendar_View_Action_Forward);
@@ -588,6 +588,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 //		_calendarGraph.stopDataProvider();
 
 		CalendarProfileManager.setActiveCalendarProfile(selectedProfile, true);
+		CalendarProfileManager.getActiveCalendarProfile().dump();
 	}
 
 	@Override

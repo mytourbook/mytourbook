@@ -140,14 +140,14 @@ public class CalendarTourDataProvider {
 		if (
 
 		// requested data are after today -> there should be no data
-		requestedDate.isAfter(today)
+		requestedDate.isAfter(today.plusMonths(1))
 
 				// requested data are before first tour
 				|| (_firstTourDateTime != null && requestedDate.isBefore(
 
-						// adjust to the last day of the last month,
-						// otherwise data for the first month are not loaded
-						_firstTourDateTime.toLocalDate().withDayOfMonth(1).minusDays(1)
+						// adjust a month before the last month, otherwise data
+						// for the first month are not all loaded
+						_firstTourDateTime.toLocalDate().minusMonths(1)
 
 				))) {
 
