@@ -141,7 +141,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	 * This is a hack to vertical center the font label, otherwise it will be complicated to set it
 	 * correctly
 	 */
-	private int						_fontLabelVIndent		= 5;
+	private int						_fontLabelVIndent	= 5;
 
 	/*
 	 * UI controls
@@ -2318,7 +2318,6 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		return spinner;
 	}
 
-
 	private void enableControls() {
 
 		final boolean isShowDateColumn = _chkIsShowDateColumn.getSelection();
@@ -3383,7 +3382,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		enableControls_Profiles();
 	}
 
-	private void restoreState_Profile() {
+	void restoreState_Profile() {
 
 		_isUpdateUI = true;
 		{
@@ -3714,10 +3713,6 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			// profile has not changed
 			return;
 		}
-
-//		// when changing the profile then more/less data are needed
-//		final CalendarGraph calendarGraph = _calendarView.getCalendarGraph();
-//		calendarGraph.stopDataProvider();
 
 		// keep data from previous profile
 		saveState_Profile();

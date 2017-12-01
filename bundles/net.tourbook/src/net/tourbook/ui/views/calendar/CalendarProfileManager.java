@@ -1197,7 +1197,7 @@ public class CalendarProfileManager {
 
 		_allCalendarProfiles.add(createProfile_20_Compact());
 		_allCalendarProfiles.add(createProfile_22_Compact_XL());
-		_allCalendarProfiles.add(createProfile_23_Compact_XL_small());
+		_allCalendarProfiles.add(createProfile_23_Compact_XL_tiny());
 
 		_allCalendarProfiles.add(createProfile_50_Year());
 		_allCalendarProfiles.add(createProfile_52_YearXL());
@@ -1581,34 +1581,34 @@ public class CalendarProfileManager {
 		return profile;
 	}
 
-	private static CalendarProfile createProfile_23_Compact_XL_small() {
+	private static CalendarProfile createProfile_23_Compact_XL_tiny() {
 
 		final CalendarProfile profile = new CalendarProfile();
 
-		profile.name = Messages.Calendar_Profile_Name_CompactXLsmall;
+		profile.name = Messages.Calendar_Profile_Name_CompactXLtiny;
 
 		// SET_FORMATTING_OFF
 
-//		                                      Compact XL small
+//		                                      Compact XL tiny
 
-		profile.defaultId                     = ProfileDefault.COMPACT_XL_SMALL;
+		profile.defaultId                     = ProfileDefault.COMPACT_XL_TINY;
 
 		// layout
 		profile.isToggleMonthColor            = false;
 		profile.isWeekRowHeight               = true;
 		profile.useDraggedScrolling           = false;
-		profile.weekHeight                    = 11;
+		profile.weekHeight                    = 10;
 		profile.weekRows                      = 10;
 		profile.alternateMonthRGB             = new RGB (60, 60, 60);
 		profile.calendarBackgroundRGB         = new RGB (40, 40, 40);
 		profile.calendarForegroundRGB         = new RGB (200, 200, 200);
-		profile.dayHoveredRGB                 = new RGB (192, 192, 192);
-		profile.daySelectedRGB                = new RGB (255, 255, 255);
+		profile.dayHoveredRGB                 = new RGB (255, 255, 255);
+		profile.daySelectedRGB                = new RGB (128, 128, 128);
 		                                                                                           
 		// 1. Date column
 		profile.isShowDateColumn              = true;
 		profile.dateColumnContent             = DateColumnContent.MONTH;
-		profile.dateColumnFont                = CalendarProfile.createFont(1.2f, SWT.BOLD);
+		profile.dateColumnFont                = CalendarProfile.createFont(1.0f, SWT.NORMAL);
 		profile.dateColumnWidth               = 50;
 		                                                                                           
 		// 2. Year columns
@@ -1621,15 +1621,15 @@ public class CalendarProfileManager {
 		profile.yearHeaderFont                = CalendarProfile.createFont(1.7f, SWT.BOLD);
 		                                                                                           
 		// 3. Week summary column
-		profile.isShowSummaryColumn           = true;
+		profile.isShowSummaryColumn           = false;
 		profile.isShowWeekValueUnit           = false;
 		profile.weekColumnWidth               = 30;
-		profile.weekMarginTop                 = 0;
-		profile.weekMarginLeft                = 1;
-		profile.weekMarginBottom              = 1;
+		profile.weekMarginTop                 = -1;
+		profile.weekMarginLeft                = 0;
+		profile.weekMarginBottom              = -1;
 		profile.weekMarginRight               = 0;
 		profile.weekValueColor                = CalendarColor.BRIGHT;
-		profile.weekValueFont                 = CalendarProfile.createFont(0.8f, SWT.NORMAL);
+		profile.weekValueFont                 = CalendarProfile.createFont(0.9f, SWT.NORMAL);
 		                                                                                           
 		// day date
 		profile.isHideDayDateWhenNoTour       = true;
@@ -1653,14 +1653,14 @@ public class CalendarProfileManager {
 		profile.tourBackground2RGB            = new RGB (128, 64, 0);
 		profile.tourBorderRGB                 = new RGB (192, 128, 0);
 		profile.tourDraggedRGB                = new RGB (255, 255, 0);
-		profile.tourHoveredRGB                = new RGB (192, 192, 192);
-		profile.tourSelectedRGB               = new RGB (255, 255, 255);
+		profile.tourHoveredRGB                = new RGB (255, 255, 255);
+		profile.tourSelectedRGB               = new RGB (192, 192, 192);
 		                                                                                           
 		// tour content
 		profile.isShowTourContent             = true;
 		profile.isShowTourValueUnit           = false;
 		profile.isTruncateTourText            = true;
-		profile.tourMarginTop                 = -1;
+		profile.tourMarginTop                 = -2;
 		profile.tourMarginLeft                = 1;
 		profile.tourMarginBottom              = 0;
 		profile.tourMarginRight               = 2;
@@ -1993,7 +1993,7 @@ public class CalendarProfileManager {
 		profile.yearColumnsSpacing            = 0;
 		profile.yearColumnsStart              = ColumnStart.JAN;
 		profile.yearColumnDayWidth            = 5;
-		profile.yearHeaderFont                = CalendarProfile.createFont(0.8f, SWT.NORMAL);
+		profile.yearHeaderFont                = CalendarProfile.createFont(0.9f, SWT.NORMAL);
 		                                                                                           
 		// 3. Week summary column
 		profile.isShowSummaryColumn           = false;
@@ -2216,7 +2216,7 @@ public class CalendarProfileManager {
 
 		case COMPACT:				return createProfile_20_Compact();
 		case COMPACT_XL:			return createProfile_22_Compact_XL();
-		case COMPACT_XL_SMALL:		return createProfile_23_Compact_XL_small();
+		case COMPACT_XL_TINY:		return createProfile_23_Compact_XL_tiny();
 		
 		case YEAR:					return createProfile_50_Year();
 		case YEAR_XL:				return createProfile_52_YearXL();

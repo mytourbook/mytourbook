@@ -44,6 +44,10 @@ public class ActionCalendarOptions extends ActionToolbarSlideoutAdv {
 		return _slideoutCalendarOptions;
 	}
 
+	SlideoutCalendarOptions getSlideout() {
+		return _slideoutCalendarOptions;
+	}
+
 	@Override
 	protected void onBeforeOpenSlideout() {
 

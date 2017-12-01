@@ -503,6 +503,10 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 		return _calendarGraph;
 	}
 
+	SlideoutCalendarOptions getConfigSlideout() {
+		return _actionCalendarOptions.getSlideout();
+	}
+
 	private ArrayList<Action> getLocalActions() {
 
 		final ArrayList<Action> localActions = new ArrayList<Action>();

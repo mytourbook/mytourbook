@@ -628,13 +628,13 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		});
 
 		addFocusListener(new FocusListener() {
-			
+
 			@Override
 			public void focusGained(final FocusEvent e) {
 				// System.out.println("Focus gained");
 				// redraw();
 			}
-			
+
 			@Override
 			public void focusLost(final FocusEvent e) {
 				// System.out.println("Focus lost");
@@ -651,7 +651,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	}
 
 	private void addListener_Key() {
-		
+
 		addTraverseListener(new TraverseListener() {
 
 			@Override
@@ -758,7 +758,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	}
 
 	private void addListener_Mouse() {
-		
+
 		addMouseListener(new MouseAdapter() {
 
 			@Override
@@ -786,8 +786,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 				onMouse_Exit();
 			}
 		});
-
-
 
 		addListener(SWT.MouseVerticalWheel, new Listener() {
 
@@ -833,6 +831,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		final int canvasWidth = canvas.width;
 		final int canvasHeight = canvas.height;
 
+		final int calendarLeftMargin = 5;
+		final int calendarWidth = canvasWidth - calendarLeftMargin * 2;
+
 		if (_isGraphDirty == false && _calendarImage != null) {
 
 			// graph image must not be updated, draw additional only selection/hovered/focus
@@ -867,6 +868,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		// set state very early that data loading can reset it
 		_isGraphDirty = false;
 
+		// set profile and all its parameters
 		setupProfile();
 
 		if (_calendarImage != null && !_calendarImage.isDisposed()) {
@@ -874,6 +876,14 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 
 		_calendarImage = new Image(getDisplay(), canvasWidth, canvasHeight);
+
+		final GC gc = new GC(_calendarImage);
+
+		gc.setForeground(_black);
+		gc.setBackground(_calendarBgColor);
+		gc.fillRectangle(canvas);
+
+		final Font normalFont = gc.getFont();
 
 		final boolean useYearColumns = _currentProfile.isShowYearColumns;
 
@@ -935,18 +945,10 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		_numWeeksInOneColumn = numVisibleRows;
 
-		final GC gc = new GC(_calendarImage);
-
 		final Color monthAlternateColor = _colorCache.getColor(_currentProfile.alternateMonthRGB);
 
 		_allTourFocusItems.clear();
 		_allDayFocusItems.clear();
-
-		final Font normalFont = gc.getFont();
-
-		gc.setForeground(_black);
-		gc.setBackground(_calendarBgColor);
-		gc.fillRectangle(canvas);
 
 		int dateColumnWidth = 0;
 		if (_currentProfile.isShowDateColumn) {
@@ -969,7 +971,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 			if (_currentProfile.isYearColumnDayWidth) {
 
-				_numYearColumns = canvasWidth / yearColumnWidth;
+				_numYearColumns = calendarWidth / yearColumnWidth;
 
 			} else {
 				_numYearColumns = _currentProfile.yearColumns;
@@ -984,7 +986,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		} else {
 
-			calendarColumnWidth = (canvasWidth - allColumnSpace) / _numYearColumns;
+			calendarColumnWidth = (calendarWidth - allColumnSpace) / _numYearColumns;
 		}
 
 		final float dayWidth = (float) (calendarColumnWidth - dateColumnWidth - summaryColumnWidth) / numDayColumns;
@@ -1048,7 +1050,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			_nextWeekDateYPos = 0;
 
 			final int columnColumSpacing = columnIndex == 0 ? 0 : yearColumnsSpacing;
-			final int calendarColumnOffset = columnIndex * calendarColumnWidth + columnColumSpacing * columnIndex;
+			final int calendarColumnOffset = calendarLeftMargin + calendarColumnWidth * columnIndex + columnColumSpacing
+					* columnIndex;
 
 			_calendarAllDaysRectangle[columnIndex] = new Rectangle(
 					calendarColumnOffset + dateColumnWidth,
@@ -2718,6 +2721,21 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		redraw();
 	}
 
+	private boolean isCtrlShift(final Event event) {
+
+		boolean isCtrlKey;
+
+		if (UI.IS_OSX) {
+			isCtrlKey = (event.stateMask & SWT.MOD1) > 0;
+			//			isAltKey = (event.stateMask & SWT.MOD3) > 0;
+		} else {
+			isCtrlKey = (event.stateMask & SWT.MOD1) > 0;
+			//			isAltKey = (event.stateMask & SWT.MOD3) > 0;
+		}
+
+		return isCtrlKey;
+	}
+
 	private void onDispose() {
 
 		_colorCache.dispose();
@@ -2931,37 +2949,77 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 	private void onMouse_Wheel(final Event event) {
 
-		final Point p = new Point(event.x, event.y);
-		boolean isInDayArea = false;
+		if (isCtrlShift(event)) {
 
-		// check if mouse is in the areas which contains the days
-		for (final Rectangle dateRectangle : _calendarAllDaysRectangle) {
-			if (dateRectangle.contains(p)) {
-				isInDayArea = true;
-				break;
+			// zoom calendar
+
+			boolean isShiftKey;
+
+			if (UI.IS_OSX) {
+				isShiftKey = (event.stateMask & SWT.MOD3) > 0;
+			} else {
+				isShiftKey = (event.stateMask & SWT.MOD2) > 0;
 			}
-		}
 
-		final int direction = event.count > 0 ? 1 : -1;
+			// accelerate  Shift key
+			final int accelerator = isShiftKey ? 10 : 1;
 
-		if (isInDayArea) {
+			final int direction = event.count > 0 ? -1 : 1;
+			final int zoomValue = direction * accelerator;
 
-			if (_selectedItem.isTour()) {
+			if (_currentProfile.isWeekRowHeight) {
 
-				// scroll tour
-				scroll_Tour(direction);
+				_currentProfile.weekHeight = Math.min(
+						CalendarProfileManager.WEEK_HEIGHT_MAX,
+						Math.max(CalendarProfileManager.WEEK_HEIGHT_MIN, _currentProfile.weekHeight + zoomValue));
 
 			} else {
 
-				// scroll week
-				scroll_WithWheel_Weeks(direction);
+				_currentProfile.weekRows = Math.min(
+						CalendarProfileManager.WEEK_ROWS_MAX,
+						Math.max(CalendarProfileManager.WEEK_ROWS_MIN, _currentProfile.weekRows + zoomValue));
 			}
+
+			// update slideout
+			final SlideoutCalendarOptions slideout = _calendarView.getConfigSlideout();
+			slideout.restoreState_Profile();
+
+			updateUI();
 
 		} else {
 
-			// left or right column, scroll by pages
+			final Point mousePosition = new Point(event.x, event.y);
+			boolean isInDayArea = false;
 
-			scroll_WithWheel_Screen(direction);
+			// check if mouse is in the areas which contains the days
+			for (final Rectangle dateRectangle : _calendarAllDaysRectangle) {
+				if (dateRectangle.contains(mousePosition)) {
+					isInDayArea = true;
+					break;
+				}
+			}
+
+			final int direction = event.count > 0 ? 1 : -1;
+
+			if (isInDayArea) {
+
+				if (_selectedItem.isTour()) {
+
+					// scroll tour
+					scroll_Tour(direction);
+
+				} else {
+
+					// scroll week
+					scroll_WithWheel_Weeks(direction);
+				}
+
+			} else {
+
+				// left or right column, scroll by pages
+
+				scroll_WithWheel_Screen(direction);
+			}
 		}
 
 		/**
@@ -2980,7 +3038,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		boolean isCtrlKey;
 		boolean isShiftKey;
 
-		if (IS_OSX) {
+		if (UI.IS_OSX) {
 			isCtrlKey = (event.stateMask & SWT.MOD1) > 0;
 			isShiftKey = (event.stateMask & SWT.MOD3) > 0;
 			//			isAltKey = (event.stateMask & SWT.MOD3) > 0;
