@@ -1740,7 +1740,7 @@ public class CalendarProfileManager {
 		profile.isShowYearColumns             = true;
 		profile.isYearColumnDayWidth          = true;
 		profile.yearColumns                   = 5;
-		profile.yearColumnsSpacing            = 13;
+		profile.yearColumnsSpacing            = 15;
 		profile.yearColumnsStart              = ColumnStart.JAN;
 		profile.yearColumnDayWidth            = 15;
 		profile.yearHeaderFont                = CalendarProfile.createFont(1.7f, SWT.BOLD);

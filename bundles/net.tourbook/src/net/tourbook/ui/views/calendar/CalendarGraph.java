@@ -136,6 +136,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	//
 	/** Visible weeks in one column */
 	private int									_numWeeksInOneColumn;
+	private int									_numYearColumns;
 	//
 	private boolean								_isScrollbarInitialized;
 	private boolean								_isInUpdateScrollbar;
@@ -448,6 +449,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		updateTourTypeColors();
 
 		addListener();
+		addListener_Key();
+		addListener_Mouse();
+
 		addDragDrop();
 	}
 
@@ -623,49 +627,14 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			}
 		});
 
-		addDisposeListener(new DisposeListener() {
-			@Override
-			public void widgetDisposed(final DisposeEvent e) {
-				onDispose();
-			}
-		});
-
-		addMouseListener(new MouseAdapter() {
-
-			@Override
-			public void mouseDoubleClick(final MouseEvent e) {
-				onMouse_DoubleClick();
-			}
-
-			@Override
-			public void mouseDown(final MouseEvent e) {
-				onMouse_MoveDown(e);
-			}
-		});
-
-		addMouseMoveListener(new MouseMoveListener() {
-			@Override
-			public void mouseMove(final MouseEvent e) {
-				onMouse_MoveDown(e);
-			}
-		});
-
-		addMouseTrackListener(new MouseTrackAdapter() {
-
-			@Override
-			public void mouseExit(final MouseEvent e) {
-				onMouse_Exit();
-			}
-		});
-
 		addFocusListener(new FocusListener() {
-
+			
 			@Override
 			public void focusGained(final FocusEvent e) {
 				// System.out.println("Focus gained");
 				// redraw();
 			}
-
+			
 			@Override
 			public void focusLost(final FocusEvent e) {
 				// System.out.println("Focus lost");
@@ -673,6 +642,16 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			}
 		});
 
+		addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(final DisposeEvent e) {
+				onDispose();
+			}
+		});
+	}
+
+	private void addListener_Key() {
+		
 		addTraverseListener(new TraverseListener() {
 
 			@Override
@@ -716,6 +695,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			@Override
 			public void handleEvent(final Event event) {
 				switch (event.keyCode) {
+
 				case SWT.ARROW_LEFT:
 				case 'h':
 					scroll_Tour(-1);
@@ -746,12 +726,12 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 				case SWT.PAGE_UP:
 				case 'p':
-					scroll_WithWheel_Screen(-1);
+					scroll_WithKey_Screen(-1);
 					break;
 
 				case SWT.PAGE_DOWN:
 				case 'n':
-					scroll_WithWheel_Screen(1);
+					scroll_WithKey_Screen(1);
 					break;
 
 				case SWT.HOME:
@@ -775,6 +755,39 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 				}
 			}
 		});
+	}
+
+	private void addListener_Mouse() {
+		
+		addMouseListener(new MouseAdapter() {
+
+			@Override
+			public void mouseDoubleClick(final MouseEvent e) {
+				onMouse_DoubleClick();
+			}
+
+			@Override
+			public void mouseDown(final MouseEvent e) {
+				onMouse_MoveDown(e);
+			}
+		});
+
+		addMouseMoveListener(new MouseMoveListener() {
+			@Override
+			public void mouseMove(final MouseEvent e) {
+				onMouse_MoveDown(e);
+			}
+		});
+
+		addMouseTrackListener(new MouseTrackAdapter() {
+
+			@Override
+			public void mouseExit(final MouseEvent e) {
+				onMouse_Exit();
+			}
+		});
+
+
 
 		addListener(SWT.MouseVerticalWheel, new Listener() {
 
@@ -790,7 +803,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 				scrollBar_onScroll(event);
 			}
 		});
-
 	}
 
 	private void disposeFonts() {
@@ -823,7 +835,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		if (_isGraphDirty == false && _calendarImage != null) {
 
-			// graph image must not be updated
+			// graph image must not be updated, draw additional only selection/hovered/focus
 
 			final Image hoveredImage = new Image(getDisplay(), canvasWidth, canvasHeight);
 			final GC gcHovered = new GC(hoveredImage);
@@ -952,20 +964,19 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		final int numDayColumns = 7;
 		final int yearColumnWidth = dateColumnWidth + (yearColumnDayWidth * numDayColumns) + summaryColumnWidth;
 
-		int numYearColumns = 1;
+		_numYearColumns = 1;
 		if (useYearColumns) {
 
 			if (_currentProfile.isYearColumnDayWidth) {
 
-				numYearColumns = canvasWidth / yearColumnWidth;
+				_numYearColumns = canvasWidth / yearColumnWidth;
 
 			} else {
-				numYearColumns = _currentProfile.yearColumns;
+				_numYearColumns = _currentProfile.yearColumns;
 			}
 		}
 
-		final int allColumnSpace = (numYearColumns - 1) * yearColumnsSpacing;
-
+		final int allColumnSpace = (_numYearColumns - 1) * yearColumnsSpacing;
 		int calendarColumnWidth;
 		if (_currentProfile.isYearColumnDayWidth) {
 
@@ -973,12 +984,12 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		} else {
 
-			calendarColumnWidth = (canvasWidth - allColumnSpace) / numYearColumns;
+			calendarColumnWidth = (canvasWidth - allColumnSpace) / _numYearColumns;
 		}
 
 		final float dayWidth = (float) (calendarColumnWidth - dateColumnWidth - summaryColumnWidth) / numDayColumns;
 
-		_calendarAllDaysRectangle = new Rectangle[numYearColumns];
+		_calendarAllDaysRectangle = new Rectangle[_numYearColumns];
 
 		final long todayDayId = (new DayItem(LocalDate.now())).dayId;
 
@@ -1008,14 +1019,14 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 			if (_currentProfile.yearColumnsStart == ColumnStart.CONTINUOUSLY) {
 
-				_calendarLastDay = _calendarFirstDay.plusWeeks(numVisibleRows * numYearColumns).minusDays(1);
+				_calendarLastDay = _calendarFirstDay.plusWeeks(numVisibleRows * _numYearColumns).minusDays(1);
 
 			} else {
 
 				_calendarLastDay = _yearColumn_FirstYear
 
 						.toLocalDate()
-						.plusYears(numYearColumns)
+						.plusYears(_numYearColumns)
 						.minusDays(1)
 
 						.with(getFirstDayOfWeek_SameOrNext())
@@ -1024,7 +1035,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		} else {
 
-			_calendarLastDay = _calendarFirstDay.plusWeeks(numVisibleRows * numYearColumns).minusDays(1);
+			_calendarLastDay = _calendarFirstDay.plusWeeks(numVisibleRows * _numYearColumns).minusDays(1);
 		}
 
 		_calendarView.updateUI_Title(_calendarFirstDay, _calendarLastDay);
@@ -1032,7 +1043,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		// we use simple ids
 		long dayId = new DayItem(currentDate).dayId;
 
-		for (int columnIndex = 0; columnIndex < numYearColumns; columnIndex++) {
+		for (int columnIndex = 0; columnIndex < _numYearColumns; columnIndex++) {
 
 			_nextWeekDateYPos = 0;
 
@@ -2422,13 +2433,41 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 	public void gotoDate(final LocalDate date) {
 
-		_firstVisibleDay = date//
+		if (_currentProfile.isShowYearColumns) {
 
-				// center date vertically on screen
-				.minusWeeks(_numWeeksInOneColumn / 2)
+			if (_currentProfile.yearColumnsStart == ColumnStart.CONTINUOUSLY) {
 
-				// set default time
-				.atStartOfDay();
+				_yearColumn_FirstYear = date//
+
+						// center date vertically on screen
+						.minusWeeks(_numWeeksInOneColumn / 2)
+
+						// set default time
+						.atStartOfDay();
+
+			} else {
+
+				// scroll year column
+
+				_yearColumn_FirstYear = date//
+
+						// center date horizontally on screen
+						.minusYears(_numYearColumns / 2)
+
+						// set default time
+						.atStartOfDay();
+			}
+
+		} else {
+
+			_firstVisibleDay = date//
+
+					// center date vertically on screen
+					.minusWeeks(_numWeeksInOneColumn / 2)
+
+					// set default time
+					.atStartOfDay();
+		}
 
 		updateUI();
 	}
@@ -2465,6 +2504,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 				.now()
 
 				.with(getFirstDayOfWeek_SameOrPrevious());
+
+		_yearColumn_FirstYear = _firstVisibleDay;
 
 		final Long tourId = _dataProvider.getTodaysTourId();
 		if (tourId != null) {
@@ -2986,7 +3027,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			_yearColumn_FirstYear = _currentProfile.yearColumnsStart == ColumnStart.CONTINUOUSLY
 
 					// scroll continuously
-					? _yearColumn_FirstYear.plusMonths(direction)
+					? _yearColumn_FirstYear.plusWeeks(direction)
 
 					// scroll year column
 					: _yearColumn_FirstYear.plusYears(direction);
@@ -3004,13 +3045,39 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		gotoTour_Offset(direction);
 	}
 
+	public void scroll_WithKey_Screen(final int direction) {
+
+		// scroll half of the screen
+		final int numPageWeeks = Math.max(1, _numWeeksInOneColumn / 2);
+		final int scrollWeeks = direction > 0 ? numPageWeeks : -numPageWeeks;
+
+		if (_currentProfile.isShowYearColumns) {
+
+			if (_currentProfile.yearColumnsStart == ColumnStart.CONTINUOUSLY) {
+
+				_yearColumn_FirstYear = _yearColumn_FirstYear.plusWeeks(scrollWeeks);
+
+			} else {
+
+				// scroll year column
+
+				_yearColumn_FirstYear = _yearColumn_FirstYear.plusYears(direction);
+			}
+
+		} else {
+
+			_firstVisibleDay = _firstVisibleDay.plusWeeks(scrollWeeks);
+		}
+
+		updateUI();
+	}
+
 	public void scroll_WithWheel_Screen(final int direction) {
 
 		final boolean useDraggedScrolling = _currentProfile.useDraggedScrolling;
 
 		// scroll half of the screen
 		final int numPageWeeks = Math.max(1, _numWeeksInOneColumn / 2);
-
 		final int scrollWeeks = direction > 0 ? numPageWeeks : -numPageWeeks;
 
 		if (_currentProfile.isShowYearColumns) {
