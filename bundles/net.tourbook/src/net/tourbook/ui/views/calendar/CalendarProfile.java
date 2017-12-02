@@ -43,7 +43,7 @@ public class CalendarProfile implements Cloneable {
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
 	}
-	private boolean						_isLogCalendarProfile	= System.getProperty("logCalendarProfile") != null;	//$NON-NLS-1$
+	private boolean		_isLogCalendarProfile		= System.getProperty("logCalendarProfile") != null;				//$NON-NLS-1$
 
 	/*
 	 * Set default values also here to ensure that a valid value is set. A default value would not
@@ -93,6 +93,8 @@ public class CalendarProfile implements Cloneable {
 	int						weekMarginLeft				= CalendarProfileManager.DEFAULT_WEEK_MARGIN_LEFT;
 	int						weekMarginBottom			= CalendarProfileManager.DEFAULT_WEEK_MARGIN_BOTTOM;
 	int						weekMarginRight				= CalendarProfileManager.DEFAULT_WEEK_MARGIN_RIGHT;
+	CalendarColor			weekValueColor				= CalendarProfileManager.DEFAULT_WEEK_VALUE_COLOR;
+	FontData				weekValueFont				= createFont(1.2f, SWT.BOLD);
 	//
 	// day date
 	boolean					isHideDayDateWhenNoTour		= true;
@@ -100,6 +102,8 @@ public class CalendarProfile implements Cloneable {
 	boolean 				isShowDayDateWeekendColor	= CalendarProfileManager.DEFAULT_IS_SHOW_DAY_DATE_WEEKEND_COLOR;
 	FontData				dayDateFont					= createFont(1.2f, SWT.BOLD);
 	DayDateFormat			dayDateFormat				= CalendarProfileManager.DEFAULT_DAY_DATE_FORMAT;
+	int 					dayDateMarginTop			= CalendarProfileManager.DEFAULT_DAY_DATE_MARGIN_TOP;
+	int 					dayDateMarginLeft			= CalendarProfileManager.DEFAULT_DAY_DATE_MARGIN_LEFT;;
 	//
 	// tour background
 	TourBackground			tourBackground				= CalendarProfileManager.DEFAULT_TOUR_BACKGROUND;
@@ -139,12 +143,9 @@ public class CalendarProfile implements Cloneable {
 	RGB						tourContentRGB				= CalendarProfileManager.DEFAULT_TOUR_CONTENT_RGB;
 	RGB						tourTitleRGB				= CalendarProfileManager.DEFAULT_TOUR_TITLE_RGB;
 	RGB						tourValueRGB				= CalendarProfileManager.DEFAULT_TOUR_VALUE_RGB;
+
 	
 // SET_FORMATTING_ON
-
-	CalendarColor		weekValueColor				= CalendarProfileManager.DEFAULT_WEEK_VALUE_COLOR;
-
-	FontData			weekValueFont				= createFont(1.2f, SWT.BOLD);
 
 	/**
 	 * @param relSize
@@ -301,6 +302,8 @@ public class CalendarProfile implements Cloneable {
         sb.append("profile.isHideDayDateWhenNoTour       = " + isHideDayDateWhenNoTour                    + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.isShowDayDate                 = " + isShowDayDate                              + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.isShowDayDateWeekendColor     = " + isShowDayDateWeekendColor                  + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.dayDateMarginTop              = " + dayDateMarginTop                           + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.dayDateMarginLeft             = " + dayDateMarginLeft                          + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.dayDateFont                   = " + dump_Font(dayDateFont)                     + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.dayDateFormat                 = DayDateFormat." + dayDateFormat                + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("                                                                                           \n"); //$NON-NLS-1$

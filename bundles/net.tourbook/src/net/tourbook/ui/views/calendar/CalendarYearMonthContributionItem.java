@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2011 Matthias Helmling and Contributors
+ * Copyright (C) 2011,2017 Matthias Helmling and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -43,7 +43,7 @@ public class CalendarYearMonthContributionItem extends ControlContribution {
 	private final boolean		_isOSX		= UI.IS_OSX;
 	private final boolean		_isLinux	= UI.IS_LINUX;
 	//
-	private ArrayList<Integer>	_yearValues;
+	private ArrayList<Integer>	_allYearValues;
 	//
 	private CalendarGraph		_calendarGraph;
 
@@ -89,7 +89,7 @@ public class CalendarYearMonthContributionItem extends ControlContribution {
 				_comboMonth.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
-						onSelectMonth();
+						onSelectDate();
 					}
 				});
 			}
@@ -110,7 +110,7 @@ public class CalendarYearMonthContributionItem extends ControlContribution {
 				_comboYear.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
-						onSelectYear();
+						onSelectDate();
 					}
 				});
 
@@ -119,7 +119,7 @@ public class CalendarYearMonthContributionItem extends ControlContribution {
 					@Override
 					public void keyTraversed(final TraverseEvent e) {
 						if (e.detail == SWT.TRAVERSE_RETURN) {
-							onSelectYear();
+							onSelectDate();
 						}
 					}
 				});
@@ -155,7 +155,7 @@ public class CalendarYearMonthContributionItem extends ControlContribution {
 
 		final int thisYear = LocalDate.now().getYear();
 
-		_yearValues = new ArrayList<Integer>();
+		_allYearValues = new ArrayList<Integer>();
 
 		final LocalDateTime firstTourDateTime = CalendarTourDataProvider.getInstance().getFirstTourDateTime();
 		final int firstYear = firstTourDateTime.getYear();
@@ -163,65 +163,31 @@ public class CalendarYearMonthContributionItem extends ControlContribution {
 		for (int year = firstYear; year <= thisYear; year++) {
 
 			_comboYear.add(Integer.toString(year));
-			_yearValues.add(year);
+			_allYearValues.add(year);
 		}
 
 		// select last year
-		_comboYear.select(_yearValues.size() - 1);
+		_comboYear.select(_allYearValues.size() - 1);
 	}
 
-	public int getSelectedMonth() {
+	private void onSelectDate() {
 
-		return _comboMonth.getSelectionIndex() + 1;
-	}
+		int yearIndex = _comboYear.getSelectionIndex();
+		if (yearIndex < 0) {
+			yearIndex = 0;
+		}
 
-	public int getSelectedYear() {
+		final int selectedYear = _allYearValues.get(yearIndex);
+		final int selectedMonth = _comboMonth.getSelectionIndex() + 1;
 
-		final int selectedYearIndex = _comboYear.getSelectionIndex();
-
-		return _yearValues.get(selectedYearIndex);
-	}
-
-	private void onSelectMonth() {
-
-		System.out.println(
-				(net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] onSelectMonth")); //$NON-NLS-1$ //$NON-NLS-2$
-// TODO remove SYSTEM.OUT.PRINTLN
-
-//		final int month = _comboMonth.getSelectionIndex() + 1;
-//
-//		_calendarGraph.gotoDate_Month(month);
-	}
-
-	private void onSelectYear() {
-
-		System.out.println(
-				(net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] onSelectYear")); //$NON-NLS-1$ //$NON-NLS-2$
-// TODO remove SYSTEM.OUT.PRINTLN
-
-//		final int index = _comboYear.getSelectionIndex();
-//		if (index >= 0) {
-//
-//			final int year = _yearValues.get(_comboYear.getSelectionIndex());
-//			_calendarGraph.gotoDate_Year(year);
-//
-//		} else {
-//
-//			final String yearString = _comboYear.getText();
-//			try {
-//				final int year = Integer.parseInt(yearString);
-//				_calendarGraph.gotoDate_Year(year);
-//			} catch (final Exception e) { // TODO specify Execption
-//				// do nothing
-//			}
-//		}
+		_calendarGraph.gotoDate(LocalDate.of(selectedYear, selectedMonth, 1), false);
 	}
 
 	void setDate(final LocalDate requestedDate) {
 
-		final int year = requestedDate.getYear();
+		final int requestedYear = requestedDate.getYear();
 
-		if (year < _yearValues.get(0)) {
+		if (requestedYear < _allYearValues.get(0)) {
 
 			// year is before available years
 
@@ -229,17 +195,32 @@ public class CalendarYearMonthContributionItem extends ControlContribution {
 			_comboMonth.select(0);
 			_comboYear.select(0);
 
-		} else if (year > _yearValues.get(_yearValues.size() - 1)) {
+		} else if (requestedYear > _allYearValues.get(_allYearValues.size() - 1)) {
 
 			// year is after the available years
 
 			// select last date
 			_comboMonth.select(11);
-			_comboYear.select(_yearValues.size() - 1);
+			_comboYear.select(_allYearValues.size() - 1);
 
 		} else {
 
 			// year is available
+
+			for (int yearIndex = 0; yearIndex < _allYearValues.size(); yearIndex++) {
+
+				final int currentYear = _allYearValues.get(yearIndex);
+
+				if (currentYear == requestedYear) {
+
+					final int requestedMonth = requestedDate.getMonthValue();
+
+					_comboMonth.select(requestedMonth - 1);
+					_comboYear.select(yearIndex);
+
+					break;
+				}
+			}
 		}
 
 	}

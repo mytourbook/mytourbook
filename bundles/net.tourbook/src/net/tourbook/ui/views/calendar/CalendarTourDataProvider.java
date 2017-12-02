@@ -592,9 +592,13 @@ public class CalendarTourDataProvider {
 
 				firstTourStartTime = result.getLong(1);
 
-				_firstTourDateTime = TimeTools.toLocalDateTime(firstTourStartTime);
+				// this occures when there are 0 tours
+				if (firstTourStartTime != 0) {
 
-				break;
+					_firstTourDateTime = TimeTools.toLocalDateTime(firstTourStartTime);
+
+					break;
+				}
 			}
 
 			/*

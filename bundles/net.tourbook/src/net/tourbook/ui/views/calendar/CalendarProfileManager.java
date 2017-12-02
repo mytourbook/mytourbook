@@ -121,8 +121,10 @@ public class CalendarProfileManager {
 	private static final String				ATTR_DATE_COLUMN_CONTENT				= "dateColumnContent";				//$NON-NLS-1$
 	private static final String				ATTR_DATE_COLUMN_FONT					= "dateColumnFont";					//$NON-NLS-1$
 	private static final String				ATTR_DATE_COLUMN_WIDTH					= "dateColumnWidth";				//$NON-NLS-1$
-	private static final String				ATTR_DAY_DATE_FORMAT					= "dayDateFormat";					//$NON-NLS-1$
 	private static final String				ATTR_DAY_DATE_FONT						= "dayDateFont";					//$NON-NLS-1$
+	private static final String				ATTR_DAY_DATE_FORMAT					= "dayDateFormat";					//$NON-NLS-1$
+	private static final String				ATTR_DAY_DATE_MARGIN_TOP				= "dayDateMarginTop";				//$NON-NLS-1$
+	private static final String				ATTR_DAY_DATE_MARGIN_LEFT				= "dayDateMarginLeft";				//$NON-NLS-1$
 	private static final String				ATTR_FORMATTER_ID						= "formatterId";					//$NON-NLS-1$
 	private static final String				ATTR_FORMATTER_VALUE_FORMAT				= "formatterValueFormat";			//$NON-NLS-1$
 	private static final String				ATTR_TOUR_BACKGROUND					= "tourBackground";					//$NON-NLS-1$
@@ -166,9 +168,11 @@ public class CalendarProfileManager {
 	static final DataFormatter				DEFAULT_EMPTY_FORMATTER;
 	//
 	static final ProfileDefault				DEFAULT_PROFILE_DEFAULT_ID				= ProfileDefault.DEFAULT;
-	static final DayDateFormat				DEFAULT_DAY_DATE_FORMAT					= DayDateFormat.DAY;
 	static final int						DEFAULT_DATE_COLUMN_WIDTH				= 50;
 	static final DateColumnContent			DEFAULT_DATE_COLUMN_CONTENT				= DateColumnContent.MONTH;
+	static final DayDateFormat				DEFAULT_DAY_DATE_FORMAT					= DayDateFormat.DAY;
+	static final int						DEFAULT_DAY_DATE_MARGIN_TOP				= 0;
+	static final int						DEFAULT_DAY_DATE_MARGIN_LEFT			= 0;
 	static final boolean					DEFAULT_IS_SHOW_DAY_DATE_WEEKEND_COLOR	= false;
 	static final boolean					DEFAULT_IS_TRUNCATE_TOUR_TEXT			= true;
 	static final boolean					DEFAULT_IS_WEEK_ROW_HEIGHT				= false;
@@ -1260,6 +1264,8 @@ public class CalendarProfileManager {
 		profile.isHideDayDateWhenNoTour       = true;
 		profile.isShowDayDate                 = false;
 		profile.isShowDayDateWeekendColor     = false;
+		profile.dayDateMarginTop              = -2;
+		profile.dayDateMarginLeft             = 5;
 		profile.dayDateFont                   = CalendarProfile.createFont(1.2f, SWT.BOLD);
 		profile.dayDateFormat                 = DayDateFormat.DAY;
 		                                                                                           
@@ -1385,6 +1391,8 @@ public class CalendarProfileManager {
 		profile.isHideDayDateWhenNoTour       = true;
 		profile.isShowDayDate                 = false;
 		profile.isShowDayDateWeekendColor     = false;
+		profile.dayDateMarginTop              = -2;
+		profile.dayDateMarginLeft             = 5;
 		profile.dayDateFont                   = CalendarProfile.createFont(1.2f, SWT.BOLD);
 		profile.dayDateFormat                 = DayDateFormat.DAY;
 		                                                                                           
@@ -1483,7 +1491,7 @@ public class CalendarProfileManager {
 		// 1. Date column
 		profile.isShowDateColumn              = true;
 		profile.dateColumnContent             = DateColumnContent.MONTH;
-		profile.dateColumnFont                = CalendarProfile.createFont(1.4f, SWT.BOLD);
+		profile.dateColumnFont                = CalendarProfile.createFont(1.2f, SWT.BOLD);
 		profile.dateColumnWidth               = 50;
 		                                                                                           
 		// 2. Year columns
@@ -1493,7 +1501,7 @@ public class CalendarProfileManager {
 		profile.yearColumnsSpacing            = 30;
 		profile.yearColumnsStart              = ColumnStart.CONTINUOUSLY;
 		profile.yearColumnDayWidth            = 50;
-		profile.yearHeaderFont                = CalendarProfile.createFont(1.9f, SWT.BOLD);
+		profile.yearHeaderFont                = CalendarProfile.createFont(1.7f, SWT.BOLD);
 		                                                                                           
 		// 3. Week summary column
 		profile.isShowSummaryColumn           = true;
@@ -1510,7 +1518,9 @@ public class CalendarProfileManager {
 		profile.isHideDayDateWhenNoTour       = true;
 		profile.isShowDayDate                 = false;
 		profile.isShowDayDateWeekendColor     = false;
-		profile.dayDateFont                   = CalendarProfile.createFont(1.2f, SWT.BOLD);
+		profile.dayDateMarginTop              = -1;
+		profile.dayDateMarginLeft             = 5;
+		profile.dayDateFont                   = CalendarProfile.createFont(1.0f, SWT.BOLD);
 		profile.dayDateFormat                 = DayDateFormat.DAY;
 		                                                                                           
 		// tour background
@@ -1556,9 +1566,9 @@ public class CalendarProfileManager {
 
 			new FormatterData(true,      FormatterID.TOUR_TITLE,        ValueFormat.DUMMY_VALUE),
 			new FormatterData(true,      FormatterID.TOUR_DESCRIPTION,  ValueFormat.DUMMY_VALUE),
-			new FormatterData(true,      FormatterID.DISTANCE,          ValueFormat.NUMBER_1_0),
-			new FormatterData(true,      FormatterID.ALTITUDE,          ValueFormat.NUMBER_1_0),
-			new FormatterData(true,      FormatterID.TIME_MOVING,       ValueFormat.TIME_HH),
+			new FormatterData(false,     FormatterID.DISTANCE,          ValueFormat.NUMBER_1_0),
+			new FormatterData(false,     FormatterID.ALTITUDE,          ValueFormat.NUMBER_1_0),
+			new FormatterData(false,     FormatterID.TIME_MOVING,       ValueFormat.TIME_HH),
 			new FormatterData(false,     FormatterID.EMPTY,             ValueFormat.DUMMY_VALUE),
 			new FormatterData(false,     FormatterID.EMPTY,             ValueFormat.DUMMY_VALUE),
 			new FormatterData(false,     FormatterID.EMPTY,             ValueFormat.DUMMY_VALUE),
@@ -1621,7 +1631,7 @@ public class CalendarProfileManager {
 		profile.yearHeaderFont                = CalendarProfile.createFont(1.7f, SWT.BOLD);
 		                                                                                           
 		// 3. Week summary column
-		profile.isShowSummaryColumn           = false;
+		profile.isShowSummaryColumn           = true;
 		profile.isShowWeekValueUnit           = false;
 		profile.weekColumnWidth               = 30;
 		profile.weekMarginTop                 = -1;
@@ -1629,7 +1639,7 @@ public class CalendarProfileManager {
 		profile.weekMarginBottom              = -1;
 		profile.weekMarginRight               = 0;
 		profile.weekValueColor                = CalendarColor.BRIGHT;
-		profile.weekValueFont                 = CalendarProfile.createFont(0.9f, SWT.NORMAL);
+		profile.weekValueFont                 = CalendarProfile.createFont(0.8f, SWT.NORMAL);
 		                                                                                           
 		// day date
 		profile.isHideDayDateWhenNoTour       = true;
@@ -2558,6 +2568,8 @@ public class CalendarProfileManager {
 		profile.isHideDayDateWhenNoTour		= Util.getXmlBoolean(xmlProfile, 					ATTR_IS_HIDE_DAY_DATE_WHEN_NO_TOUR,		true);
 		profile.isShowDayDate				= Util.getXmlBoolean(xmlProfile, 					ATTR_IS_SHOW_DAY_DATE,					true);
 		profile.isShowDayDateWeekendColor	= Util.getXmlBoolean(xmlProfile, 					ATTR_IS_SHOW_DAY_DATE_WEEKEND_COLOR,	DEFAULT_IS_SHOW_DAY_DATE_WEEKEND_COLOR);
+		profile.dayDateMarginTop			= Util.getXmlInteger(xmlProfile, 					ATTR_DAY_DATE_MARGIN_TOP,				DEFAULT_DAY_DATE_MARGIN_TOP,		DEFAULT_MARGIN_MIN, DEFAULT_MARGIN_MAX);
+		profile.dayDateMarginLeft			= Util.getXmlInteger(xmlProfile, 					ATTR_DAY_DATE_MARGIN_LEFT,				DEFAULT_DAY_DATE_MARGIN_LEFT,		DEFAULT_MARGIN_MIN, DEFAULT_MARGIN_MAX);
 		profile.dayDateFont 				= Util.getXmlFont(xmlProfile, 						ATTR_DAY_DATE_FONT, 					defaultFont.getFontData()[0]);
 		profile.dayDateFormat				= (DayDateFormat) Util.getXmlEnum(xmlProfile,		ATTR_DAY_DATE_FORMAT,					DEFAULT_DAY_DATE_FORMAT);
 		                                    
@@ -2705,6 +2717,8 @@ public class CalendarProfileManager {
 		xmlProfile.putBoolean(		ATTR_IS_HIDE_DAY_DATE_WHEN_NO_TOUR, 	profile.isHideDayDateWhenNoTour);
 		xmlProfile.putBoolean(		ATTR_IS_SHOW_DAY_DATE, 					profile.isShowDayDate);
 		xmlProfile.putBoolean(		ATTR_IS_SHOW_DAY_DATE_WEEKEND_COLOR, 	profile.isShowDayDateWeekendColor);
+		xmlProfile.putInteger(		ATTR_DAY_DATE_MARGIN_TOP, 				profile.dayDateMarginTop);
+		xmlProfile.putInteger(		ATTR_DAY_DATE_MARGIN_LEFT, 				profile.dayDateMarginLeft);
 		Util.setXmlEnum(xmlProfile,	ATTR_DAY_DATE_FORMAT, 					profile.dayDateFormat);
 		Util.setXmlFont(xmlProfile,	ATTR_DAY_DATE_FONT, 					profile.dayDateFont);
 

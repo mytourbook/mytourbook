@@ -1644,6 +1644,7 @@ public class Messages extends NLS {
 	public static String		Slideout_CalendarOptions_Label_DayHeaderFormat;
 	public static String		Slideout_CalendarOptions_Label_Line;
 	public static String		Slideout_CalendarOptions_Label_Margin;
+	public static String		Slideout_CalendarOptions_Label_Margin_DayDate_Tooltip;
 	public static String		Slideout_CalendarOptions_Label_Margin_Tooltip;
 	public static String		Slideout_CalendarOptions_Label_Name;
 	public static String		Slideout_CalendarOptions_Label_ProfileDefaultId;
