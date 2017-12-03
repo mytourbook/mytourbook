@@ -941,6 +941,7 @@ public class Messages extends NLS {
 	public static String		Import_Data_Action_OpenLogView_Tooltip;
 	public static String		Import_Data_Action_Reimport_EntireTour;
 	public static String		Import_Data_Action_Reimport_OnlyAltitudeValues;
+	public static String		Import_Data_Action_Reimport_OnlyCadenceValues;
 	public static String		Import_Data_Action_Reimport_OnlyGearValues;
 	public static String		Import_Data_Action_Reimport_OnlyPowerAndPulseValues;
 	public static String		Import_Data_Action_Reimport_OnlyPowerAndSpeedValues;
@@ -956,6 +957,7 @@ public class Messages extends NLS {
 	public static String		Import_Data_Default_ImportConfig_Name;
 	public static String		Import_Data_Dialog_ConfirmReimport_Message;
 	public static String		Import_Data_Dialog_ConfirmReimportAltitudeValues_Message;
+	public static String		Import_Data_Dialog_ConfirmReimportCadenceValues_Message;
 	public static String		Import_Data_Dialog_ConfirmReimportGearValues_Message;
 	public static String		Import_Data_Dialog_ConfirmReimportPowerAndPulseValues_Message;
 	public static String		Import_Data_Dialog_ConfirmReimportPowerAndSpeedValues_Message;
@@ -1074,6 +1076,7 @@ public class Messages extends NLS {
 
 	public static String		Log_Reimport_AllTimeSlices;
 	public static String		Log_Reimport_Only_Altitude;
+	public static String		Log_Reimport_Only_Cadence;
 	public static String		Log_Reimport_Only_Gear;
 	public static String		Log_Reimport_Only_PowerPulse;
 	public static String		Log_Reimport_Only_PowerSpeed;

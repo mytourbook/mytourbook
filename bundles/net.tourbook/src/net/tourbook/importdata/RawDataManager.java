@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -78,41 +78,48 @@ import org.eclipse.ui.WorkbenchException;
 
 public class RawDataManager {
 
-	private static final String				RAW_DATA_LAST_SELECTED_PATH			= "raw-data-view.last-selected-import-path";				//$NON-NLS-1$
-	private static final String				TEMP_IMPORTED_FILE					= "received-device-data.txt";								//$NON-NLS-1$
+	private static final String			RAW_DATA_LAST_SELECTED_PATH			= "raw-data-view.last-selected-import-path";	//$NON-NLS-1$
+	private static final String			TEMP_IMPORTED_FILE					= "received-device-data.txt";					//$NON-NLS-1$
 	//
-	public static final String				LOG_IMPORT_DELETE_TOUR_FILE			= Messages.Log_Import_DeleteTourFiles;
-	public static final String				LOG_IMPORT_DELETE_TOUR_FILE_END		= Messages.Log_Import_DeleteTourFiles_End;
-	private static final String				LOG_IMPORT_TOUR						= Messages.Log_Import_Tour;
-	public static final String				LOG_IMPORT_TOUR_IMPORTED			= Messages.Log_Import_Tour_Imported;
-	private static final String				LOG_IMPORT_TOUR_END					= Messages.Log_Import_Tour_End;
+	public static final String			LOG_IMPORT_DELETE_TOUR_FILE			= Messages.Log_Import_DeleteTourFiles;
+	public static final String			LOG_IMPORT_DELETE_TOUR_FILE_END		= Messages.Log_Import_DeleteTourFiles_End;
+	private static final String			LOG_IMPORT_TOUR						= Messages.Log_Import_Tour;
+	public static final String			LOG_IMPORT_TOUR_IMPORTED			= Messages.Log_Import_Tour_Imported;
+	private static final String			LOG_IMPORT_TOUR_END					= Messages.Log_Import_Tour_End;
 	//
-	public static final String				LOG_REIMPORT_PREVIOUS_FILES			= Messages.Log_Reimport_PreviousFiles;
-	public static final String				LOG_REIMPORT_END					= Messages.Log_Reimport_PreviousFiles_End;
+	public static final String			LOG_REIMPORT_PREVIOUS_FILES			= Messages.Log_Reimport_PreviousFiles;
+	public static final String			LOG_REIMPORT_END					= Messages.Log_Reimport_PreviousFiles_End;
 	//
-	private static final String				LOG_REIMPORT_ALL_TIME_SLICES		= Messages.Log_Reimport_AllTimeSlices;
-	private static final String				LOG_REIMPORT_ONLY_ALTITUDE			= Messages.Log_Reimport_Only_Altitude;
-	private static final String				LOG_REIMPORT_ONLY_GEAR				= Messages.Log_Reimport_Only_Gear;
-	private static final String				LOG_REIMPORT_ONLY_POWER_SPEED		= Messages.Log_Reimport_Only_PowerSpeed;
-	private static final String				LOG_REIMPORT_ONLY_POWER_PULSE		= Messages.Log_Reimport_Only_PowerPulse;
-	private static final String				LOG_REIMPORT_ONLY_MARKER			= Messages.Log_Reimport_Only_TourMarker;
-	private static final String				LOG_REIMPORT_ONLY_TEMPERATURE		= Messages.Log_Reimport_Only_Temperature;
-	private static final String				LOG_REIMPORT_TOUR					= Messages.Log_Reimport_Tour;
+	private static final String			LOG_REIMPORT_ALL_TIME_SLICES		= Messages.Log_Reimport_AllTimeSlices;
+	private static final String			LOG_REIMPORT_ONLY_ALTITUDE			= Messages.Log_Reimport_Only_Altitude;
+	private static final String			LOG_REIMPORT_ONLY_CADENCE			= Messages.Log_Reimport_Only_Cadence;
+	private static final String			LOG_REIMPORT_ONLY_GEAR				= Messages.Log_Reimport_Only_Gear;
+	private static final String			LOG_REIMPORT_ONLY_MARKER			= Messages.Log_Reimport_Only_TourMarker;
+	private static final String			LOG_REIMPORT_ONLY_POWER_SPEED		= Messages.Log_Reimport_Only_PowerSpeed;
+	private static final String			LOG_REIMPORT_ONLY_POWER_PULSE		= Messages.Log_Reimport_Only_PowerPulse;
+	private static final String			LOG_REIMPORT_ONLY_TEMPERATURE		= Messages.Log_Reimport_Only_Temperature;
+	private static final String			LOG_REIMPORT_TOUR					= Messages.Log_Reimport_Tour;
 	//
-	public static final int					ADJUST_IMPORT_YEAR_IS_DISABLED		= -1;
+	public static final int				ADJUST_IMPORT_YEAR_IS_DISABLED		= -1;
 	//
-	static final ComboEnumEntry<?>[]		ALL_IMPORT_TOUR_TYPE_CONFIG;
-
+	static final ComboEnumEntry<?>[]	ALL_IMPORT_TOUR_TYPE_CONFIG;
+	//
+// SET_FORMATTING_OFF
+	private static boolean				_importState_IsAutoOpenImportLog	= RawDataView.STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW_DEFAULT;
+// SET_FORMATTING_ON
+	//
 	static {
 
 		ALL_IMPORT_TOUR_TYPE_CONFIG = new ComboEnumEntry<?>[] {
 
-		new ComboEnumEntry<>(Messages.Import_Data_TourTypeConfig_OneForAll,//
-				TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL),
+				new ComboEnumEntry<>(
+						Messages.Import_Data_TourTypeConfig_OneForAll, //
+						TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL),
 
-		new ComboEnumEntry<>(Messages.Import_Data_TourTypeConfig_BySpeed, //
-				TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED)
-		//
+				new ComboEnumEntry<>(
+						Messages.Import_Data_TourTypeConfig_BySpeed, //
+						TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED)
+				//
 		};
 	}
 
@@ -148,16 +155,15 @@ public class RawDataManager {
 	private final HashSet<String>			_importedFileNamesChildren			= new HashSet<String>();
 
 	private boolean							_isImported;
-
 	private boolean							_isImportCanceled;
 	//
+// SET_FORMATTING_OFF
 	private int								_importState_ImportYear				= ADJUST_IMPORT_YEAR_IS_DISABLED;
-
-	private static boolean					_importState_IsAutoOpenImportLog	= RawDataView.STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW_DEFAULT;
 	private boolean							_importState_IsConvertWayPoints		= RawDataView.STATE_IS_CONVERT_WAYPOINTS_DEFAULT;
 	private boolean							_importState_IsCreateTourIdWithTime	= RawDataView.STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT;
 	private boolean							_importState_IsChecksumValidation	= RawDataView.STATE_IS_CHECKSUM_VALIDATION_DEFAULT;
 	private boolean							_importState_IsMergeTracks			= RawDataView.STATE_IS_MERGE_TRACKS_DEFAULT;
+// SET_FORMATTING_ON
 
 	private List<TourbookDevice>			_devicesBySortPriority;
 
@@ -187,13 +193,15 @@ public class RawDataManager {
 	public static enum ReImport {
 
 		AllTimeSlices, //
+		Tour, //
+
 		OnlyAltitudeValues, //
+		OnlyCadenceValues, //
 		OnlyGearValues, //
 		OnlyPowerAndSpeedValues, //
 		OnlyPowerAndPulseValues, //
 		OnlyTourMarker, //
 		OnlyTemperatureValues, //
-		Tour, //
 	}
 
 	private RawDataManager() {}
@@ -370,8 +378,10 @@ public class RawDataManager {
 					}
 
 					monitor.worked(1);
-					monitor.subTask(NLS.bind(Messages.Import_Data_Dialog_Reimport_SubTask, //
-							new Object[] { ++imported, importSize }));
+					monitor.subTask(
+							NLS.bind(
+									Messages.Import_Data_Dialog_Reimport_SubTask, //
+									new Object[] { ++imported, importSize }));
 
 					TourData oldTourData = null;
 
@@ -446,108 +456,140 @@ public class RawDataManager {
 
 	private boolean actionReimportTour_10_Confirm(final ReImport reimportTour) {
 
-		if (reimportTour == ReImport.Tour) {
+		switch (reimportTour) {
 
-			if (actionReimportTour_12_ConfirmDialog(
-					ITourbookPreferences.TOGGLE_STATE_REIMPORT_TOUR,
-					Messages.Import_Data_Dialog_ConfirmReimport_Message)) {
-
-				TourLogManager.addLog(TourLogState.DEFAULT, //
-						LOG_REIMPORT_TOUR,
-						TourLogView.CSS_LOG_TITLE);
-
-				return true;
-			}
-
-		} else if (reimportTour == ReImport.AllTimeSlices) {
+		case AllTimeSlices:
 
 			if (actionReimportTour_12_ConfirmDialog(
 					ITourbookPreferences.TOGGLE_STATE_REIMPORT_ALL_TIME_SLICES,
 					Messages.Import_Data_Dialog_ConfirmReimportTimeSlices_Message)) {
 
-				TourLogManager.addLog(TourLogState.DEFAULT,//
+				TourLogManager.addLog(
+						TourLogState.DEFAULT, //
 						LOG_REIMPORT_ALL_TIME_SLICES,
 						TourLogView.CSS_LOG_TITLE);
 
 				return true;
 			}
+			break;
 
-		} else if (reimportTour == ReImport.OnlyAltitudeValues) {
+		case OnlyAltitudeValues:
 
 			if (actionReimportTour_12_ConfirmDialog(
 					ITourbookPreferences.TOGGLE_STATE_REIMPORT_ALTITUDE_VALUES,
 					Messages.Import_Data_Dialog_ConfirmReimportAltitudeValues_Message)) {
 
-				TourLogManager.addLog(TourLogState.DEFAULT,//
+				TourLogManager.addLog(
+						TourLogState.DEFAULT, //
 						LOG_REIMPORT_ONLY_ALTITUDE,
 						TourLogView.CSS_LOG_TITLE);
 				return true;
 			}
+			break;
 
-		} else if (reimportTour == ReImport.OnlyGearValues) {
+		case OnlyCadenceValues:
+
+			if (actionReimportTour_12_ConfirmDialog(
+					ITourbookPreferences.TOGGLE_STATE_REIMPORT_CADENCE_VALUES,
+					Messages.Import_Data_Dialog_ConfirmReimportCadenceValues_Message)) {
+
+				TourLogManager.addLog(
+						TourLogState.DEFAULT, //
+						LOG_REIMPORT_ONLY_CADENCE,
+						TourLogView.CSS_LOG_TITLE);
+				return true;
+			}
+			break;
+
+		case OnlyGearValues:
 
 			if (actionReimportTour_12_ConfirmDialog(
 					ITourbookPreferences.TOGGLE_STATE_REIMPORT_GEAR_VALUES,
 					Messages.Import_Data_Dialog_ConfirmReimportGearValues_Message)) {
 
-				TourLogManager.addLog(TourLogState.DEFAULT,//
+				TourLogManager.addLog(
+						TourLogState.DEFAULT, //
 						LOG_REIMPORT_ONLY_GEAR,
 						TourLogView.CSS_LOG_TITLE);
 
 				return true;
 			}
+			break;
 
-		} else if (reimportTour == ReImport.OnlyPowerAndPulseValues) {
+		case OnlyPowerAndPulseValues:
 
 			if (actionReimportTour_12_ConfirmDialog(
 					ITourbookPreferences.TOGGLE_STATE_REIMPORT_POWER_AND_PULSE_VALUES,
 					Messages.Import_Data_Dialog_ConfirmReimportPowerAndPulseValues_Message)) {
 
-				TourLogManager.addLog(TourLogState.DEFAULT,//
+				TourLogManager.addLog(
+						TourLogState.DEFAULT, //
 						LOG_REIMPORT_ONLY_POWER_PULSE,
 						TourLogView.CSS_LOG_TITLE);
 
 				return true;
 			}
+			break;
 
-		} else if (reimportTour == ReImport.OnlyPowerAndSpeedValues) {
+		case OnlyPowerAndSpeedValues:
 
 			if (actionReimportTour_12_ConfirmDialog(
 					ITourbookPreferences.TOGGLE_STATE_REIMPORT_POWER_AND_SPEED_VALUES,
 					Messages.Import_Data_Dialog_ConfirmReimportPowerAndSpeedValues_Message)) {
 
-				TourLogManager.addLog(TourLogState.DEFAULT,//
+				TourLogManager.addLog(
+						TourLogState.DEFAULT, //
 						LOG_REIMPORT_ONLY_POWER_SPEED,
 						TourLogView.CSS_LOG_TITLE);
 
 				return true;
 			}
+			break;
 
-		} else if (reimportTour == ReImport.OnlyTourMarker) {
-
-			if (actionReimportTour_12_ConfirmDialog(
-					ITourbookPreferences.TOGGLE_STATE_REIMPORT_TOUR_MARKER,
-					Messages.Import_Data_Dialog_ConfirmReimportTourMarker_Message)) {
-
-				TourLogManager.addLog(TourLogState.DEFAULT,//
-						LOG_REIMPORT_ONLY_MARKER,
-						TourLogView.CSS_LOG_TITLE);
-
-				return true;
-			}
-
-		} else if (reimportTour == ReImport.OnlyTemperatureValues) {
+		case OnlyTemperatureValues:
 
 			if (actionReimportTour_12_ConfirmDialog(
 					ITourbookPreferences.TOGGLE_STATE_REIMPORT_TEMPERATURE_VALUES,
 					Messages.Import_Data_Dialog_ConfirmReimportTemperatureValues_Message)) {
 
-				TourLogManager.addLog(TourLogState.DEFAULT,//
+				TourLogManager.addLog(
+						TourLogState.DEFAULT, //
 						LOG_REIMPORT_ONLY_TEMPERATURE,
 						TourLogView.CSS_LOG_TITLE);
 
 				return true;
 			}
+			break;
+
+		case OnlyTourMarker:
+
+			if (actionReimportTour_12_ConfirmDialog(
+					ITourbookPreferences.TOGGLE_STATE_REIMPORT_TOUR_MARKER,
+					Messages.Import_Data_Dialog_ConfirmReimportTourMarker_Message)) {
+
+				TourLogManager.addLog(
+						TourLogState.DEFAULT, //
+						LOG_REIMPORT_ONLY_MARKER,
+						TourLogView.CSS_LOG_TITLE);
+
+				return true;
+			}
+			break;
+
+		case Tour:
+
+			if (actionReimportTour_12_ConfirmDialog(
+					ITourbookPreferences.TOGGLE_STATE_REIMPORT_TOUR,
+					Messages.Import_Data_Dialog_ConfirmReimport_Message)) {
+
+				TourLogManager.addLog(
+						TourLogState.DEFAULT, //
+						LOG_REIMPORT_TOUR,
+						TourLogView.CSS_LOG_TITLE);
+
+				return true;
+			}
+			break;
 		}
 
 		return false;
@@ -562,7 +604,7 @@ public class RawDataManager {
 		} else {
 
 			final MessageDialogWithToggle dialog = MessageDialogWithToggle.openOkCancelConfirm(//
-					Display.getCurrent().getActiveShell(),//
+					Display.getCurrent().getActiveShell(), //
 					Messages.import_data_dlg_reimport_title, //
 					confirmMessage, //
 					Messages.App_ToggleState_DoNotShowAgain, //
@@ -605,7 +647,8 @@ public class RawDataManager {
 					MessageDialog.openInformation(
 							activeShell,
 							NLS.bind(Messages.Import_Data_Dialog_Reimport_Title, tourDateTimeShort),
-							NLS.bind(Messages.Import_Data_Dialog_GetReimportedFilePath_Message,//
+							NLS.bind(
+									Messages.Import_Data_Dialog_GetReimportedFilePath_Message, //
 									tourDateTimeShort,
 									tourDateTimeShort));
 
@@ -641,7 +684,7 @@ public class RawDataManager {
 						if (reimportFilePathName[0] == null) {
 
 							MessageDialog.openInformation(
-							//
+									//
 									activeShell,
 									Messages.import_data_dlg_reimport_title,
 									NLS.bind(
@@ -810,11 +853,13 @@ public class RawDataManager {
 				if (oldLength != reimportedLength) {
 
 					// log error
-					message = NLS.bind(Messages.Import_Data_Log_ReimportIsInvalid_WrongSliceNumbers, new Object[] {
-							oldTourDateTimeShort,
-							reimportedFile.toString(),
-							oldLength,
-							reimportedLength });
+					message = NLS.bind(
+							Messages.Import_Data_Log_ReimportIsInvalid_WrongSliceNumbers,
+							new Object[] {
+									oldTourDateTimeShort,
+									reimportedFile.toString(),
+									oldLength,
+									reimportedLength });
 
 					break;
 				}
@@ -828,11 +873,13 @@ public class RawDataManager {
 
 			if (oldTourId != reimportTourId) {
 
-				message = NLS.bind(Messages.Import_Data_Log_ReimportIsInvalid_DifferentTourId_Message, new Object[] {
-						oldTourDateTimeShort,
-						reimportedFile.toString(),
-						oldTourId,
-						reimportTourId });
+				message = NLS.bind(
+						Messages.Import_Data_Log_ReimportIsInvalid_DifferentTourId_Message,
+						new Object[] {
+								oldTourDateTimeShort,
+								reimportedFile.toString(),
+								oldTourId,
+								reimportTourId });
 
 				break;
 			}
@@ -852,6 +899,7 @@ public class RawDataManager {
 
 			} else if (reimportId == ReImport.AllTimeSlices
 					|| reimportId == ReImport.OnlyAltitudeValues
+					|| reimportId == ReImport.OnlyCadenceValues
 					|| reimportId == ReImport.OnlyGearValues
 					|| reimportId == ReImport.OnlyPowerAndPulseValues
 					|| reimportId == ReImport.OnlyPowerAndSpeedValues
@@ -916,6 +964,15 @@ public class RawDataManager {
 
 			// reimport altitude only
 			oldTourData.altitudeSerie = reimportedTourData.altitudeSerie;
+		}
+
+		// CADENCE
+		if (reimportId == ReImport.AllTimeSlices || reimportId == ReImport.OnlyCadenceValues) {
+
+			// reimport cadence/stride only
+			oldTourData.cadenceSerie = reimportedTourData.cadenceSerie;
+			oldTourData.setCadenceMultiplier(reimportedTourData.getCadenceMultiplier());
+			oldTourData.setIsStrideSensorPresent(reimportedTourData.isStrideSensorPresent());
 		}
 
 		// GEAR
@@ -1003,7 +1060,6 @@ public class RawDataManager {
 			oldTourData.setDeviceId(reimportedTourData.getDeviceId());
 			oldTourData.setDeviceName(reimportedTourData.getDeviceName());
 
-			oldTourData.cadenceSerie = reimportedTourData.cadenceSerie;
 			oldTourData.distanceSerie = reimportedTourData.distanceSerie;
 			oldTourData.latitudeSerie = reimportedTourData.latitudeSerie;
 			oldTourData.longitudeSerie = reimportedTourData.longitudeSerie;
@@ -1373,7 +1429,8 @@ public class RawDataManager {
 					MessageDialog.openError(
 							Display.getDefault().getActiveShell(),
 							Messages.Import_Data_Error_CreatingFileName_Title,
-							NLS.bind(Messages.Import_Data_Error_CreatingFileName_Message, //
+							NLS.bind(
+									Messages.Import_Data_Error_CreatingFileName_Message, //
 									new Object[] {
 											sourceFileName,
 											new org.eclipse.core.runtime.Path(destinationPath)
@@ -1384,15 +1441,17 @@ public class RawDataManager {
 				}
 			}
 		}
-		final File newFile = new File((new org.eclipse.core.runtime.Path(destinationPath)
-				.addTrailingSeparator()
-				.toString() + destFileName));
+		final File newFile = new File(
+				(new org.eclipse.core.runtime.Path(destinationPath)
+						.addTrailingSeparator()
+						.toString() + destFileName));
 
 		// get source file
 		final File fileIn = new File(sourceFileName);
 
 		// check if file already exist
 		if (newFile.exists()) {
+
 			// TODO allow user to rename the file
 
 			boolean keepFile = false; // for MessageDialog result
@@ -1643,7 +1702,8 @@ public class RawDataManager {
 
 					final String osFilePath = filePath.filePath.toOSString();
 
-					final String subTask = NLS.bind(Messages.import_data_importTours_subTask, //
+					final String subTask = NLS.bind(
+							Messages.import_data_importTours_subTask, //
 							new Object[] { ++imported, importSize, osFilePath });
 
 					monitor.worked(1);
@@ -1718,9 +1778,13 @@ public class RawDataManager {
 		}
 
 		final double time = (System.currentTimeMillis() - start) / 1000.0;
-		TourLogManager.addLog(TourLogState.DEFAULT, String.format(isEasyImport
-				? EasyImportManager.LOG_EASY_IMPORT_002_END
-				: RawDataManager.LOG_IMPORT_TOUR_END, time));
+		TourLogManager.addLog(
+				TourLogState.DEFAULT,
+				String.format(
+						isEasyImport
+								? EasyImportManager.LOG_EASY_IMPORT_002_END
+								: RawDataManager.LOG_IMPORT_TOUR_END,
+						time));
 
 		return importRunState;
 	}

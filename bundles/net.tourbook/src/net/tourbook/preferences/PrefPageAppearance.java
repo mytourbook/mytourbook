@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -291,6 +291,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
 		_prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_ALL_TIME_SLICES, false);
 		_prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_ALTITUDE_VALUES, false);
+		_prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_CADENCE_VALUES, false);
 		_prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_GEAR_VALUES, false);
 		_prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_POWER_AND_SPEED_VALUES, false);
 		_prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_REIMPORT_POWER_AND_PULSE_VALUES, false);
