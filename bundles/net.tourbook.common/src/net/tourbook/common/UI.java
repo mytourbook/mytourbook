@@ -1122,6 +1122,19 @@ public class UI {
 		return result;
 	}
 
+	public static boolean isCtrlKey(final Event event) {
+
+		boolean isCtrlKey;
+
+		if (UI.IS_OSX) {
+			isCtrlKey = (event.stateMask & SWT.MOD1) > 0;
+		} else {
+			isCtrlKey = (event.stateMask & SWT.MOD1) > 0;
+		}
+
+		return isCtrlKey;
+	}
+
 	public static boolean isCtrlKey(final MouseEvent event) {
 
 		boolean isCtrlKey;

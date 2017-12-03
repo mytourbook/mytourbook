@@ -183,7 +183,12 @@ public class CalendarYearMonthContributionItem extends ControlContribution {
 		_calendarGraph.gotoDate(LocalDate.of(selectedYear, selectedMonth, 1), false);
 	}
 
-	void setDate(final LocalDate requestedDate) {
+	void setDate(final LocalDate requestedDate, final CalendarProfile calendarProfile) {
+
+		// disable month when year columns are used
+		_comboMonth.setEnabled(
+				!(calendarProfile.isShowYearColumns
+						&& calendarProfile.yearColumnsStart != ColumnStart.CONTINUOUSLY));
 
 		final int requestedYear = requestedDate.getYear();
 

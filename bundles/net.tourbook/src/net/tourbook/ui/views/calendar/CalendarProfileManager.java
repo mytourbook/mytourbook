@@ -1645,7 +1645,9 @@ public class CalendarProfileManager {
 		profile.isHideDayDateWhenNoTour       = true;
 		profile.isShowDayDate                 = false;
 		profile.isShowDayDateWeekendColor     = false;
-		profile.dayDateFont                   = CalendarProfile.createFont(1.2f, SWT.BOLD);
+		profile.dayDateMarginTop              = -2;
+		profile.dayDateMarginLeft             = 3;
+		profile.dayDateFont                   = CalendarProfile.createFont(0.8f, SWT.BOLD);
 		profile.dayDateFormat                 = DayDateFormat.DAY;
 		                                                                                           
 		// tour background

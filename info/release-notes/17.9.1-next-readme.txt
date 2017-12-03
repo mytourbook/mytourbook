@@ -19,7 +19,7 @@ New
   - Customize calendar layout, it can be based on different default configurations
   - Drag & drop (with copy) a manual tour to another day, this is logged in the tour log view
   - Duplicate a tour, it copies only these values: person, device ID, start time, title, description, tags, tour type
-  - Zoom in/out with Ctrl/Shift + mouse wheel
+  - Zoom in/out with Ctrl/Shift and mouse wheel or +/- keys
   - Log calendar profile modifications -DlogCalendarProfile
   - Tours after today + 1 months are not displayed (to optimize performance) !!!
   - Optimized performance when loading day/week data dramatically, e.g. one week was ~200ms, now ~1ms
