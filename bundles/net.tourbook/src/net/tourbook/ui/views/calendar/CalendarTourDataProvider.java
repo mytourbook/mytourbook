@@ -608,8 +608,8 @@ public class CalendarTourDataProvider {
 
 				select = "SELECT TourId" //$NON-NLS-1$
 
-						+ " FROM " + TourDatabase.TABLE_TOUR_DATA
-						+ " WHERE TourStartTime=" + firstTourStartTime;
+						+ " FROM " + TourDatabase.TABLE_TOUR_DATA //$NON-NLS-1$
+						+ " WHERE TourStartTime=" + firstTourStartTime; //$NON-NLS-1$
 
 				statement = conn.prepareStatement(select);
 
@@ -664,11 +664,11 @@ public class CalendarTourDataProvider {
 
 			select = "SELECT TourId \n" //$NON-NLS-1$
 
-					+ " FROM " + TourDatabase.TABLE_TOUR_DATA + "\n"
+					+ " FROM " + TourDatabase.TABLE_TOUR_DATA + "\n" //$NON-NLS-1$ //$NON-NLS-2$
 
-					+ " WHERE StartYear=" + today.getYear()
-					+ " AND   StartMonth=" + today.getMonthValue()
-					+ " AND   StartDay=" + today.getDayOfMonth()
+					+ " WHERE StartYear=" + today.getYear() //$NON-NLS-1$
+					+ " AND   StartMonth=" + today.getMonthValue() //$NON-NLS-1$
+					+ " AND   StartDay=" + today.getDayOfMonth() //$NON-NLS-1$
 
 			;
 

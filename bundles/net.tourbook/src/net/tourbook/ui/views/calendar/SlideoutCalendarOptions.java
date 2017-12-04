@@ -436,7 +436,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		{
 			{
 				final Label label = new Label(container, SWT.NONE);
-				label.setText(Messages.Slideout_TourFilter_Label_Profiles);
+				label.setText(Messages.Slideout_CalendarOptions_Label_Profiles);
 				GridDataFactory.fillDefaults().span(2, 1).applyTo(label);
 			}
 
@@ -448,7 +448,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			{
 				// hint to use drag & drop
 				final Label label = new Label(parent, SWT.WRAP);
-				label.setText(Messages.Slideout_CalendarOptions_Label_ProfileDragDropHint);
+				label.setText(Messages.Slideout_CalendarOptions_Label_Profile_DragDropHint);
 				GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(label);
 			}
 		}
@@ -752,8 +752,8 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				 * Button: New
 				 */
 				final Button button = new Button(container, SWT.PUSH);
-				button.setText(Messages.Slideout_TourFilter_Action_AddProfile);
-				button.setToolTipText(Messages.Slideout_TourFilter_Action_AddProfile_Tooltip);
+				button.setText(Messages.App_Action_New);
+				button.setToolTipText(Messages.Slideout_CalendarOptions_Action_AddProfile_Tooltip);
 				button.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
@@ -769,8 +769,8 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				 * Button: Copy
 				 */
 				_btnProfile_Copy = new Button(container, SWT.PUSH);
-				_btnProfile_Copy.setText(Messages.Slideout_TourFilter_Action_CopyProfile);
-				_btnProfile_Copy.setToolTipText(Messages.Slideout_TourFilter_Action_CopyProfile_Tooltip);
+				_btnProfile_Copy.setText(Messages.App_Action_Copy);
+				_btnProfile_Copy.setToolTipText(Messages.Slideout_CalendarOptions_Action_CopyProfile_Tooltip);
 				_btnProfile_Copy.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
@@ -786,8 +786,8 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				 * Button: Delete
 				 */
 				_btnProfile_Delete = new Button(container, SWT.PUSH);
-				_btnProfile_Delete.setText(Messages.Slideout_TourFilter_Action_DeleteProfile);
-				_btnProfile_Delete.setToolTipText(Messages.Slideout_TourFilter_Action_DeleteProfile_Tooltip);
+				_btnProfile_Delete.setText(Messages.App_Action_Delete);
+				_btnProfile_Delete.setToolTipText(Messages.Slideout_CalendarOptions_Action_DeleteProfile_Tooltip);
 				_btnProfile_Delete.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
@@ -842,8 +842,8 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 				// label
 				_lblProfile_DefaultId = new Label(container, SWT.NONE);
-				_lblProfile_DefaultId.setText(Messages.Slideout_CalendarOptions_Label_ProfileDefaultId);
-				_lblProfile_DefaultId.setToolTipText(Messages.Slideout_CalendarOptions_Label_ProfileDefaultId_Tooltip);
+				_lblProfile_DefaultId.setText(Messages.Slideout_CalendarOptions_Label_Profile_DefaultId);
+				_lblProfile_DefaultId.setToolTipText(Messages.Slideout_CalendarOptions_Label_Profile_DefaultId_Tooltip);
 				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_lblProfile_DefaultId);
 
 				final Composite containerDefaultId = new Composite(container, SWT.NONE);
@@ -956,7 +956,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 				// label
 				final Label label = new Label(container, SWT.NONE);
-				label.setText(Messages.Slideout_CalendarOptions_Label_Calendar_DayHoveredColor);
+				label.setText(Messages.Slideout_CalendarOptions_Label_Day_HoveredColor);
 
 				// Color selector
 				_colorDay_HoveredColor = createUI_ColorSelector(container);
@@ -968,7 +968,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 				// label
 				final Label label = new Label(container, SWT.NONE);
-				label.setText(Messages.Slideout_CalendarOptions_Label_Calendar_DaySelectedColor);
+				label.setText(Messages.Slideout_CalendarOptions_Label_Day_SelectedColor);
 
 				// Color selector
 				_colorDay_SelectedColor = createUI_ColorSelector(container);
@@ -1128,9 +1128,9 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 				// label
 				_lblDateColumn_Content = new Label(container, SWT.NONE);
-				_lblDateColumn_Content.setText(Messages.Slideout_CalendarOptions_Label_DateColumnContent);
+				_lblDateColumn_Content.setText(Messages.Slideout_CalendarOptions_Label_DateColumn_Content);
 				_lblDateColumn_Content.setToolTipText(
-						Messages.Slideout_CalendarOptions_Label_DateColumnContent_Tooltip);
+						Messages.Slideout_CalendarOptions_Label_DateColumn_Content_Tooltip);
 				GridDataFactory
 						.fillDefaults()//
 						.align(SWT.FILL, SWT.CENTER)
@@ -1163,7 +1163,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 				// label
 				_lblDateColumn_Font = new Label(container, SWT.NONE);
-				_lblDateColumn_Font.setText(Messages.Slideout_CalendarOptions_Label_DateColumnFont);
+				_lblDateColumn_Font.setText(Messages.Slideout_CalendarOptions_Label_DateColumn_Font);
 				GridDataFactory
 						.fillDefaults()//
 						.indent(0, _fontLabelVIndent)
@@ -1275,9 +1275,9 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 				// label
 				_lblYear_ColumnSpacing = new Label(container, SWT.NONE);
-				_lblYear_ColumnSpacing.setText(Messages.Slideout_CalendarOptions_Label_YearColumnsSpace);
+				_lblYear_ColumnSpacing.setText(Messages.Slideout_CalendarOptions_Label_YearColumns_Space);
 				_lblYear_ColumnSpacing.setToolTipText(
-						Messages.Slideout_CalendarOptions_Label_YearColumnsSpace_Tooltip);
+						Messages.Slideout_CalendarOptions_Label_YearColumns_Space_Tooltip);
 				GridDataFactory
 						.fillDefaults()//
 						.align(SWT.FILL, SWT.CENTER)
@@ -1300,7 +1300,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 				// label
 				_lblYear_ColumnStart = new Label(container, SWT.NONE);
-				_lblYear_ColumnStart.setText(Messages.Slideout_CalendarOptions_Label_YearColumnsStart);
+				_lblYear_ColumnStart.setText(Messages.Slideout_CalendarOptions_Label_YearColumns_Start);
 				GridDataFactory
 						.fillDefaults()//
 						.align(SWT.FILL, SWT.CENTER)
@@ -1367,7 +1367,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	private void createUI_410_DayDate(final Composite parent) {
 
 		final Group group = new Group(parent, SWT.NONE);
-		group.setText(Messages.Slideout_CalendarOptions_Group_TourDate);
+		group.setText(Messages.Slideout_CalendarOptions_Group_DayDate);
 		GridDataFactory
 				.fillDefaults()//
 				.grab(true, false)
@@ -1382,7 +1382,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 				// checkbox
 				_chkIsShowDayDate = new Button(group, SWT.CHECK);
-				_chkIsShowDayDate.setText(Messages.Slideout_CalendarOptions_Checkbox_IsShowTourDate);
+				_chkIsShowDayDate.setText(Messages.Slideout_CalendarOptions_Checkbox_IsShowDayDate);
 				_chkIsShowDayDate.addSelectionListener(_defaultSelectionListener);
 				GridDataFactory
 						.fillDefaults()//
@@ -1512,7 +1512,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 				// label
 				_lblDayHeader_Font = new Label(container, SWT.NONE);
-				_lblDayHeader_Font.setText(Messages.Slideout_CalendarOptions_Label_TourDateFont);
+				_lblDayHeader_Font.setText(Messages.Slideout_CalendarOptions_Label_Tour_DateFont);
 				GridDataFactory
 						.fillDefaults()//
 						.grab(true, true)
@@ -1545,7 +1545,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 				// label
 				final Label label = new Label(group, SWT.NONE);
-				label.setText(Messages.Slideout_CalendarOptions_Label_TourBackground);
+				label.setText(Messages.Slideout_CalendarOptions_Label_Tour_Background);
 				GridDataFactory
 						.fillDefaults()//
 						.align(SWT.FILL, SWT.CENTER)
@@ -1602,7 +1602,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 				// label
 				final Label label = new Label(group, SWT.NONE);
-				label.setText(Messages.Slideout_CalendarOptions_Label_TourBorder);
+				label.setText(Messages.Slideout_CalendarOptions_Label_Tour_Border);
 				GridDataFactory
 						.fillDefaults()//
 						.align(SWT.FILL, SWT.CENTER)
@@ -1651,7 +1651,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 				// label
 				final Label label = new Label(group, SWT.NONE);
-				label.setText(Messages.Slideout_CalendarOptions_Label_Calendar_TourHoveredColor);
+				label.setText(Messages.Slideout_CalendarOptions_Label_Tour_HoveredColor);
 
 				final Composite containerHovered = new Composite(group, SWT.NONE);
 				GridDataFactory
@@ -1677,7 +1677,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 				// label
 				final Label label = new Label(group, SWT.NONE);
-				label.setText(Messages.Slideout_CalendarOptions_Label_Calendar_TourSelectedColor);
+				label.setText(Messages.Slideout_CalendarOptions_Label_Tour_SelectedColor);
 
 				final Composite containerSelected = new Composite(group, SWT.NONE);
 				GridDataFactory
@@ -1703,7 +1703,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 				// label
 				final Label label = new Label(group, SWT.NONE);
-				label.setText(Messages.Slideout_CalendarOptions_Label_Calendar_TourDraggedColor);
+				label.setText(Messages.Slideout_CalendarOptions_Label_Tour_DraggedColor);
 
 				final Composite containerDragged = new Composite(group, SWT.NONE);
 				GridDataFactory
@@ -1744,7 +1744,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 				// label
 				_lblTour_TitleFont = new Label(group, SWT.NONE);
-				_lblTour_TitleFont.setText(Messages.Slideout_CalendarOptions_Label_TourTitleFont);
+				_lblTour_TitleFont.setText(Messages.Slideout_CalendarOptions_Label_Tour_TitleFont);
 				GridDataFactory.fillDefaults().indent(0, _fontLabelVIndent).applyTo(_lblTour_TitleFont);
 
 				// font/size
@@ -1768,7 +1768,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 				// label
 				_lblTour_ContentFont = new Label(group, SWT.NONE);
-				_lblTour_ContentFont.setText(Messages.Slideout_CalendarOptions_Label_TourContentFont);
+				_lblTour_ContentFont.setText(Messages.Slideout_CalendarOptions_Label_Tour_ContentFont);
 				GridDataFactory
 						.fillDefaults()//
 						.indent(0, _fontLabelVIndent)
@@ -1801,7 +1801,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 				// label
 				_lblTour_ValueFont = new Label(group, SWT.NONE);
-				_lblTour_ValueFont.setText(Messages.Slideout_CalendarOptions_Label_TourValueFont);
+				_lblTour_ValueFont.setText(Messages.Slideout_CalendarOptions_Label_Tour_ValueFont);
 				GridDataFactory
 						.fillDefaults()//
 						.indent(0, _fontLabelVIndent)
@@ -1851,7 +1851,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 			// checkbox
 			_chkIsShowTourContent = new Button(parent, SWT.CHECK);
-			_chkIsShowTourContent.setText(Messages.Slideout_CalendarOptions_Checkbox_IsShowTourContent);
+			_chkIsShowTourContent.setText(Messages.Slideout_CalendarOptions_Checkbox_IsShowTour_Content);
 			_chkIsShowTourContent.addSelectionListener(_defaultSelectionListener);
 			GridDataFactory
 					.fillDefaults()//
@@ -1902,7 +1902,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 				// checkbox
 				_chkIsShowTourValueUnit = new Button(container, SWT.CHECK);
-				_chkIsShowTourValueUnit.setText(Messages.Slideout_CalendarOptions_Checkbox_IsShowTourValueUnit);
+				_chkIsShowTourValueUnit.setText(Messages.Slideout_CalendarOptions_Checkbox_IsShowTour_ValueUnit);
 				_chkIsShowTourValueUnit.addSelectionListener(_defaultSelectionListener);
 				GridDataFactory
 						.fillDefaults()//
@@ -1917,8 +1917,8 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 				// label
 				_lblTour_ValueColumns = new Label(container, SWT.NONE);
-				_lblTour_ValueColumns.setText(Messages.Slideout_CalendarOptions_Label_ValueColumns);
-				_lblTour_ValueColumns.setToolTipText(Messages.Slideout_CalendarOptions_Label_ValueColumns_Tooltip);
+				_lblTour_ValueColumns.setText(Messages.Slideout_CalendarOptions_Label_Tour_ValueColumns);
+				_lblTour_ValueColumns.setToolTipText(Messages.Slideout_CalendarOptions_Label_Tour_ValueColumns_Tooltip);
 				GridDataFactory
 						.fillDefaults()//
 						.align(SWT.FILL, SWT.CENTER)
@@ -1962,8 +1962,8 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 				// label
 				_lblTour_TruncatedLines = new Label(container, SWT.NONE);
-				_lblTour_TruncatedLines.setText(Messages.Slideout_CalendarOptions_Label_TruncatedLines);
-				_lblTour_TruncatedLines.setToolTipText(Messages.Slideout_CalendarOptions_Label_TruncatedLines_Tooltip);
+				_lblTour_TruncatedLines.setText(Messages.Slideout_CalendarOptions_Label_Tour_TruncatedLines);
+				_lblTour_TruncatedLines.setToolTipText(Messages.Slideout_CalendarOptions_Label_Tour_TruncatedLines_Tooltip);
 				GridDataFactory
 						.fillDefaults()//
 						.align(SWT.FILL, SWT.CENTER)
@@ -2089,7 +2089,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 			// checkbox
 			_chkIsShowSummaryColumn = new Button(parent, SWT.CHECK);
-			_chkIsShowSummaryColumn.setText(Messages.Slideout_CalendarOptions_Checkbox_IsShowSummaryColumn);
+			_chkIsShowSummaryColumn.setText(Messages.Slideout_CalendarOptions_Checkbox_IsShowWeek_SummaryColumn);
 			_chkIsShowSummaryColumn.addSelectionListener(_defaultSelectionListener);
 			GridDataFactory
 					.fillDefaults()//
@@ -2143,7 +2143,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 				// checkbox
 				_chkIsShowWeekValueUnit = new Button(container, SWT.CHECK);
-				_chkIsShowWeekValueUnit.setText(Messages.Slideout_CalendarOptions_Checkbox_IsShowWeekValueUnit);
+				_chkIsShowWeekValueUnit.setText(Messages.Slideout_CalendarOptions_Checkbox_IsShowWeek_ValueUnit);
 				_chkIsShowWeekValueUnit.addSelectionListener(_defaultSelectionListener);
 				GridDataFactory
 						.fillDefaults()//
@@ -2158,7 +2158,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 				// label
 				_lblWeek_ColumnWidth = new Label(container, SWT.NONE);
-				_lblWeek_ColumnWidth.setText(Messages.Slideout_CalendarOptions_Label_SummaryColumn_Width);
+				_lblWeek_ColumnWidth.setText(Messages.Slideout_CalendarOptions_Label_Week_ColumnWidth);
 				GridDataFactory
 						.fillDefaults()//
 						.align(SWT.FILL, SWT.CENTER)
@@ -2193,7 +2193,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 				// label
 				_lblWeek_ValueFont = new Label(container, SWT.NONE);
-				_lblWeek_ValueFont.setText(Messages.Slideout_CalendarOptions_Label_WeekValueFont);
+				_lblWeek_ValueFont.setText(Messages.Slideout_CalendarOptions_Label_Week_ValueFont);
 				GridDataFactory
 						.fillDefaults()//
 						//						.grab(true, false)

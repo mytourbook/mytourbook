@@ -2147,6 +2147,8 @@ public class CalendarProfileManager {
 		profile.isHideDayDateWhenNoTour       = false;
 		profile.isShowDayDate                 = true;
 		profile.isShowDayDateWeekendColor     = true;
+		profile.dayDateMarginTop              = -3;
+		profile.dayDateMarginLeft             = 5;
 		profile.dayDateFont                   = CalendarProfile.createFont(1.2f, SWT.NORMAL);
 		profile.dayDateFormat                 = DayDateFormat.DAY_MONTH_YEAR;
 		                                                                                           

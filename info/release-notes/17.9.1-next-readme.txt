@@ -3,7 +3,6 @@ Version 17.9.1 next                                          ?. December 2017
 
 Pendenzen:
 
-- import fr files
 - check 2.5D map
 - check waypoint import
 - import tcx https://sourceforge.net/p/mytourbook/discussion/622811/thread/989bee5e/
@@ -48,4 +47,10 @@ Improvements
 Bugfix
 ======
 
-* 
+* Constantly
+
+
+Translation
+===========
+
+* 17.9 French translation
