@@ -388,7 +388,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 	@Override
 	public void endDocument() throws SAXException {
 
-		if (_newlyImportedTours.size() == 1 && _device.isMergeTracks) {
+		if (_newlyImportedTours.size() == 1) {
 
 			final TourData tourData = (TourData) _newlyImportedTours.values().toArray()[0];
 
@@ -397,26 +397,26 @@ public class GPX_SAX_Handler extends DefaultHandler {
 			tourData.setWayPoints(_allWayPoints);
 
 			if (_device.isConvertWayPoints) {
-				_tourData.convertWayPoints();
+				tourData.convertWayPoints();
 			}
 
 			/*
 			 * Remove annoying marker when only 1 tour is imported
 			 */
 
-			final Set<TourMarker> tourMarkers = tourData.getTourMarkers();
-
-			if (tourMarkers.size() > 0) {
-
-				// this happened
-
-				// sort by serie index
-				final ArrayList<TourMarker> sortedMarkers = new ArrayList<TourMarker>(tourMarkers);
-				Collections.sort(sortedMarkers);
-
-				final TourMarker firstMarker = sortedMarkers.get(0);
-				tourMarkers.remove(firstMarker);
-			}
+//			final Set<TourMarker> tourMarkers = tourData.getTourMarkers();
+//
+//			if (tourMarkers.size() > 0) {
+//
+//				// this happened
+//
+//				// sort by serie index
+//				final ArrayList<TourMarker> sortedMarkers = new ArrayList<TourMarker>(tourMarkers);
+//				Collections.sort(sortedMarkers);
+//
+//				final TourMarker firstMarker = sortedMarkers.get(0);
+//				tourMarkers.remove(firstMarker);
+//			}
 
 		} else {
 
@@ -1868,6 +1868,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 	private void updateTMandWP_WayPoints(final TourData tourData, final ArrayList<TourWayPoint> allWayPoints) {
 
+
 		final double[] tourLatSerie = tourData.latitudeSerie;
 		final double[] tourLonSerie = tourData.longitudeSerie;
 		final int[] tourTimeSerie = tourData.timeSerie;
@@ -1883,20 +1884,28 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
 			if (tourLatSerie != null) {
 
-				final double markerLatitude = tourWayPoint.getLatitude();
-				final double markerLontitude = tourWayPoint.getLongitude();
+				final double wpLat = tourWayPoint.getLatitude();
+				final double wpLon = tourWayPoint.getLongitude();
 
-
-				if (markerLatitude != TourDatabase.DEFAULT_DOUBLE
-						&& markerLontitude != TourDatabase.DEFAULT_DOUBLE) {
+				if (wpLat != TourDatabase.DEFAULT_DOUBLE
+						&& wpLon != TourDatabase.DEFAULT_DOUBLE) {
 
 					for (int tourSerieIndex = 0; tourSerieIndex < tourLatSerie.length; tourSerieIndex++) {
 
-						final double tourLatitude = tourLatSerie[tourSerieIndex];
-						final double tourLongitude = tourLonSerie[tourSerieIndex];
+						final double tourLat = tourLatSerie[tourSerieIndex];
+						final double tourLon = tourLonSerie[tourSerieIndex];
 
+						double latDiff = tourLat - wpLat;
+						double lonDiff = tourLon - wpLon;
 
-						if (markerLatitude == tourLatitude && markerLontitude == tourLongitude) {
+						if (latDiff < 0) {
+							latDiff = -latDiff;
+						}
+						if (lonDiff < 0) {
+							lonDiff = -lonDiff;
+						}
+
+						if (latDiff < TourData.MAX_GEO_DIFF && lonDiff < TourData.MAX_GEO_DIFF) {
 
 							// move tour waypoint to the current tour
 							tourWayPoint.setTourData(tourData);

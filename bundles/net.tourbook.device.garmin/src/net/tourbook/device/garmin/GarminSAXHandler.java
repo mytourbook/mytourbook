@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -46,38 +46,43 @@ import org.xml.sax.helpers.DefaultHandler;
 
 public class GarminSAXHandler extends DefaultHandler {
 
+// SET_FORMATTING_OFF
+	//
 	private static final String				TRAINING_CENTER_DATABASE_V1	= "http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v1"; //$NON-NLS-1$
 	private static final String				TRAINING_CENTER_DATABASE_V2	= "http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2"; //$NON-NLS-1$
 	//
-	private static final String				TAG_DATABASE				= "TrainingCenterDatabase";									//$NON-NLS-1$
-
-	private static final String				TAG_ACTIVITY				= "Activity";													//$NON-NLS-1$
-	private static final String				TAG_COURSE					= "Course";													//$NON-NLS-1$
-	private static final String				TAG_HISTORY					= "History";													//$NON-NLS-1$
+// SET_FORMATTING_ON
 	//
-	private static final String				TAG_CREATOR					= "Creator";													//$NON-NLS-1$
-	private static final String				TAG_CREATOR_NAME			= "Name";														//$NON-NLS-1$
-	private static final String				TAG_CREATOR_VERSION_MAJOR	= "VersionMajor";												//$NON-NLS-1$
-	private static final String				TAG_CREATOR_VERSION_MINOR	= "VersionMinor";												//$NON-NLS-1$
-	//
-	private static final String				TAG_ALTITUDE_METERS			= "AltitudeMeters";											//$NON-NLS-1$
-	private static final String				TAG_CALORIES				= "Calories";													//$NON-NLS-1$
-	private static final String				TAG_CADENCE					= "Cadence";													//$NON-NLS-1$
-	private static final String				TAG_DISTANCE_METERS			= "DistanceMeters";											//$NON-NLS-1$
-	private static final String				TAG_HEART_RATE_BPM			= "HeartRateBpm";												//$NON-NLS-1$
-	private static final String				TAG_LAP						= "Lap";														//$NON-NLS-1$
-	private static final String				TAG_LATITUDE_DEGREES		= "LatitudeDegrees";											//$NON-NLS-1$
-	private static final String				TAG_LONGITUDE_DEGREES		= "LongitudeDegrees";											//$NON-NLS-1$
-	private static final String				TAG_NOTES					= "Notes";														//$NON-NLS-1$
-	private static final String				TAG_SENSOR_STATE			= "SensorState";												//$NON-NLS-1$
-	private static final String				TAG_TRACKPOINT				= "Trackpoint";												//$NON-NLS-1$
-	private static final String				TAG_TIME					= "Time";														//$NON-NLS-1$
-	private static final String				TAG_VALUE					= "Value";														//$NON-NLS-1$
-	private static final String				TAG_NS3_SPEED				= "ns3:Speed";													//$NON-NLS-1$
-	private static final String				TAG_NS3_WATTS				= "ns3:Watts";													//$NON-NLS-1$
+	private static final String				TAG_DATABASE				= "TrainingCenterDatabase";	//$NON-NLS-1$
 
-	private static final String				SENSOR_STATE_PRESENT		= "Present";													//$NON-NLS-1$
-	private static final String				ATTR_VALUE_SPORT			= "Sport";														//$NON-NLS-1$
+	private static final String				TAG_ACTIVITY				= "Activity";				//$NON-NLS-1$
+	private static final String				TAG_COURSE					= "Course";					//$NON-NLS-1$
+	private static final String				TAG_HISTORY					= "History";				//$NON-NLS-1$
+	//
+	private static final String				TAG_CREATOR					= "Creator";				//$NON-NLS-1$
+	private static final String				TAG_CREATOR_NAME			= "Name";					//$NON-NLS-1$
+	private static final String				TAG_CREATOR_VERSION_MAJOR	= "VersionMajor";			//$NON-NLS-1$
+	private static final String				TAG_CREATOR_VERSION_MINOR	= "VersionMinor";			//$NON-NLS-1$
+	//
+	private static final String				TAG_ALTITUDE_METERS			= "AltitudeMeters";			//$NON-NLS-1$
+	private static final String				TAG_CALORIES				= "Calories";				//$NON-NLS-1$
+	private static final String				TAG_CADENCE					= "Cadence";				//$NON-NLS-1$
+	private static final String				TAG_DISTANCE_METERS			= "DistanceMeters";			//$NON-NLS-1$
+	private static final String				TAG_HEART_RATE_BPM			= "HeartRateBpm";			//$NON-NLS-1$
+	private static final String				TAG_LAP						= "Lap";					//$NON-NLS-1$
+	private static final String				TAG_LATITUDE_DEGREES		= "LatitudeDegrees";		//$NON-NLS-1$
+	private static final String				TAG_LONGITUDE_DEGREES		= "LongitudeDegrees";		//$NON-NLS-1$
+	private static final String				TAG_NOTES					= "Notes";					//$NON-NLS-1$
+	private static final String				TAG_RUN_CADENCE				= "RunCadence";				//$NON-NLS-1$
+	private static final String				TAG_SENSOR_STATE			= "SensorState";			//$NON-NLS-1$
+	private static final String				TAG_TRACKPOINT				= "Trackpoint";				//$NON-NLS-1$
+	private static final String				TAG_TIME					= "Time";					//$NON-NLS-1$
+	private static final String				TAG_VALUE					= "Value";					//$NON-NLS-1$
+	private static final String				TAG_NS3_SPEED				= "ns3:Speed";				//$NON-NLS-1$
+	private static final String				TAG_NS3_WATTS				= "ns3:Watts";				//$NON-NLS-1$
+
+	private static final String				SENSOR_STATE_PRESENT		= "Present";				//$NON-NLS-1$
+	private static final String				ATTR_VALUE_SPORT			= "Sport";					//$NON-NLS-1$
 
 	private static final SimpleDateFormat	TIME_FORMAT;
 	private static final SimpleDateFormat	TIME_FORMAT_SSSZ;
@@ -88,68 +93,13 @@ public class GarminSAXHandler extends DefaultHandler {
 	private static final int				DEFAULT_DAY					= 1;
 
 	private static final long				DEFAULT_TIME;
+
 	static {
+
 		DEFAULT_TIME = ZonedDateTime
 				.of(DEFAULT_YEAR, DEFAULT_MONTH, DEFAULT_DAY, 0, 0, 0, 0, TimeTools.getDefaultTimeZone())
 				.toInstant()
 				.toEpochMilli();
-	}
-
-	private boolean							_importState_IsIgnoreSpeedValues;
-
-	private boolean							_isInActivity				= false;
-	private boolean							_isInCourse					= false;
-	private boolean							_isInLap					= false;
-	//
-	private boolean							_isInCalories				= false;
-	private boolean							_isInTrackpoint				= false;
-	private boolean							_isInTime					= false;
-	private boolean							_isInLatitude				= false;
-	private boolean							_isInLongitude				= false;
-	private boolean							_isInAltitude				= false;
-	private boolean							_isInDistance				= false;
-	private boolean							_isInCadence				= false;
-	private boolean							_isInSensorState			= false;
-	private boolean							_isInHeartRate				= false;
-	private boolean							_isInHeartRateValue			= false;
-	private boolean							_isInNotes;
-	private boolean							_isInNs3Speed;
-	private boolean							_isInNs3Watts;
-	//
-	private boolean							_isInCreator;
-	private boolean							_isInCreatorName;
-	private boolean							_isInCreatorVersionMajor;
-	private boolean							_isInCreatorVersionMinor;
-	//
-	private HashMap<Long, TourData>			_alreadyImportedTours;
-	private HashMap<Long, TourData>			_newlyImportedTours;
-	private TourbookDevice					_device;
-	private String							_importFilePath;
-	//
-	private ArrayList<TimeData>				_dtList						= new ArrayList<>();
-	private TimeData						_timeData;
-
-	private int								_dataVersion				= -1;
-
-	private int								_lapCounter;
-	private int								_trackPointCounter;
-
-	private boolean							_isSetLapMarker				= false;
-	private boolean							_isSetLapStartTime			= false;
-	private ArrayList<Long>					_lapStart					= new ArrayList<Long>();
-	private boolean							_isImported;
-
-	private long							_currentTime;
-	private String							_activitySport				= null;
-	private int								_tourCalories;
-	private int								_lapCalories;
-	private boolean							_isDistanceFromSensor		= false;
-	private StringBuilder					_characters					= new StringBuilder();
-
-	private String							_tourNotes;
-	private Sport							_sport;
-
-	static {
 
 		TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"); //$NON-NLS-1$
 		TIME_FORMAT_SSSZ = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); //$NON-NLS-1$
@@ -159,6 +109,61 @@ public class GarminSAXHandler extends DefaultHandler {
 		TIME_FORMAT_SSSZ.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
 		TIME_FORMAT_RFC822.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
 	}
+
+	private boolean					_importState_IsIgnoreSpeedValues;
+	private boolean					_isInActivity;
+	private boolean					_isInCourse;
+	private boolean					_isInLap;
+	//
+	private boolean					_isInCalories;
+	private boolean					_isInTrackpoint;
+	private boolean					_isInTime;
+	private boolean					_isInLatitude;
+	private boolean					_isInLongitude;
+	private boolean					_isInAltitude;
+	private boolean					_isInDistance;
+	private boolean					_isInCadence;
+	private boolean					_isInRunCadence;
+	private boolean					_isInSensorState;
+	private boolean					_isInHeartRate;
+	private boolean					_isInHeartRateValue;
+	private boolean					_isInNotes;
+	private boolean					_isInNs3Speed;
+	private boolean					_isInNs3Watts;
+	//
+	private boolean					_isInCreator;
+	private boolean					_isInCreatorName;
+	private boolean					_isInCreatorVersionMajor;
+	private boolean					_isInCreatorVersionMinor;
+	//
+	private HashMap<Long, TourData>	_alreadyImportedTours;
+	private HashMap<Long, TourData>	_newlyImportedTours;
+	private TourbookDevice			_device;
+	private String					_importFilePath;
+	//
+	private ArrayList<TimeData>		_dtList			= new ArrayList<>();
+
+	private TimeData				_timeData;
+
+	private int						_dataVersion	= -1;
+	private int						_lapCounter;
+	private int						_trackPointCounter;
+
+	private boolean					_isSetLapMarker;
+	private boolean					_isSetLapStartTime;
+	private ArrayList<Long>			_lapStart		= new ArrayList<Long>();
+	private boolean					_isImported;
+
+	private long					_currentTime;
+	private String					_activitySport;
+	private int						_tourCalories;
+	private int						_lapCalories;
+	private boolean					_isDistanceFromSensor;
+	private boolean					_isFromStrideSensor;
+	private StringBuilder			_characters		= new StringBuilder();
+
+	private String					_tourNotes;
+	private Sport					_sport;
 
 	private class Sport {
 
@@ -430,6 +435,7 @@ public class GarminSAXHandler extends DefaultHandler {
 				|| _isInAltitude
 				|| _isInDistance
 				|| _isInCadence
+				|| _isInRunCadence
 				|| _isInSensorState
 				|| _isInHeartRate
 				|| _isInHeartRateValue
@@ -562,6 +568,7 @@ public class GarminSAXHandler extends DefaultHandler {
 		tourData.setTourStartTime(TimeTools.getZonedDateTime(_dtList.get(0).absoluteTime));
 
 		tourData.setIsDistanceFromSensor(_isDistanceFromSensor);
+		tourData.setIsStrideSensorPresent(_isFromStrideSensor);
 		tourData.setDeviceTimeInterval((short) -1);
 		tourData.setImportFilePath(_importFilePath);
 
@@ -574,15 +581,17 @@ public class GarminSAXHandler extends DefaultHandler {
 
 		tourData.setDeviceId(_device.deviceId);
 
-		tourData.setDeviceName(_device.visibleName + (deviceName == null //
-				? UI.EMPTY_STRING
-				: UI.SPACE + deviceName));
-
-		tourData.setDeviceFirmwareVersion(majorVersion == null //
-				? UI.EMPTY_STRING
-				: majorVersion + (minorVersion == null //
+		tourData.setDeviceName(
+				_device.visibleName + (deviceName == null
 						? UI.EMPTY_STRING
-						: UI.SYMBOL_DOT + minorVersion));
+						: UI.SPACE + deviceName));
+
+		tourData.setDeviceFirmwareVersion(
+				majorVersion == null
+						? UI.EMPTY_STRING
+						: majorVersion + (minorVersion == null //
+								? UI.EMPTY_STRING
+								: UI.SYMBOL_DOT + minorVersion));
 
 		tourData.createTimeSeries(_dtList, true);
 
@@ -673,34 +682,47 @@ public class GarminSAXHandler extends DefaultHandler {
 	private void getData_TrackPoint_10_Start(final String name) {
 
 		if (name.equals(TAG_HEART_RATE_BPM)) {
+
 			_isInHeartRate = true;
 			_characters.delete(0, _characters.length());
 
 		} else if (name.equals(TAG_ALTITUDE_METERS)) {
+
 			_isInAltitude = true;
 			_characters.delete(0, _characters.length());
 
 		} else if (name.equals(TAG_DISTANCE_METERS)) {
+
 			_isInDistance = true;
 			_characters.delete(0, _characters.length());
 
 		} else if (name.equals(TAG_CADENCE)) {
+
 			_isInCadence = true;
 			_characters.delete(0, _characters.length());
 
+		} else if (name.equals(TAG_RUN_CADENCE)) {
+
+			_isInRunCadence = true;
+			_characters.delete(0, _characters.length());
+
 		} else if (name.equals(TAG_SENSOR_STATE)) {
+
 			_isInSensorState = true;
 			_characters.delete(0, _characters.length());
 
 		} else if (name.equals(TAG_TIME)) {
+
 			_isInTime = true;
 			_characters.delete(0, _characters.length());
 
 		} else if (name.equals(TAG_LATITUDE_DEGREES)) {
+
 			_isInLatitude = true;
 			_characters.delete(0, _characters.length());
 
 		} else if (name.equals(TAG_LONGITUDE_DEGREES)) {
+
 			_isInLongitude = true;
 			_characters.delete(0, _characters.length());
 
@@ -710,10 +732,12 @@ public class GarminSAXHandler extends DefaultHandler {
 			_characters.delete(0, _characters.length());
 
 		} else if (name.equals(TAG_NS3_WATTS)) {
+
 			_isInNs3Watts = true;
 			_characters.delete(0, _characters.length());
 
 		} else if (_isInHeartRate && name.equals(TAG_VALUE)) {
+
 			_isInHeartRateValue = true;
 			_characters.delete(0, _characters.length());
 		}
@@ -751,6 +775,15 @@ public class GarminSAXHandler extends DefaultHandler {
 		} else if (name.equals(TAG_CADENCE)) {
 
 			_isInCadence = false;
+
+			float cadence = Util.parseFloat(_characters.toString());
+			_timeData.cadence = cadence = cadence == Float.MIN_VALUE ? 0 : cadence;
+
+		} else if (name.equals(TAG_RUN_CADENCE)) {
+
+			_isInRunCadence = false;
+			_isFromStrideSensor = true;
+
 			float cadence = Util.parseFloat(_characters.toString());
 			_timeData.cadence = cadence = cadence == Float.MIN_VALUE ? 0 : cadence;
 
@@ -845,6 +878,7 @@ public class GarminSAXHandler extends DefaultHandler {
 		_isSetLapMarker = false;
 		_lapStart.clear();
 
+		_isFromStrideSensor = false;
 		_dtList.clear();
 		_tourNotes = null;
 		_sport = new Sport();
