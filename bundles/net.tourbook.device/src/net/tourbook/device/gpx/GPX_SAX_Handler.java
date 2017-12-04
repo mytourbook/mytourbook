@@ -397,26 +397,26 @@ public class GPX_SAX_Handler extends DefaultHandler {
 			tourData.setWayPoints(_allWayPoints);
 
 			if (_device.isConvertWayPoints) {
-				_tourData.convertWayPoints();
+				tourData.convertWayPoints();
 			}
 
 			/*
 			 * Remove annoying marker when only 1 tour is imported
 			 */
 
-			final Set<TourMarker> tourMarkers = tourData.getTourMarkers();
-
-			if (tourMarkers.size() > 0) {
-
-				// this happened
-
-				// sort by serie index
-				final ArrayList<TourMarker> sortedMarkers = new ArrayList<TourMarker>(tourMarkers);
-				Collections.sort(sortedMarkers);
-
-				final TourMarker firstMarker = sortedMarkers.get(0);
-				tourMarkers.remove(firstMarker);
-			}
+//			final Set<TourMarker> tourMarkers = tourData.getTourMarkers();
+//
+//			if (tourMarkers.size() > 0) {
+//
+//				// this happened
+//
+//				// sort by serie index
+//				final ArrayList<TourMarker> sortedMarkers = new ArrayList<TourMarker>(tourMarkers);
+//				Collections.sort(sortedMarkers);
+//
+//				final TourMarker firstMarker = sortedMarkers.get(0);
+//				tourMarkers.remove(firstMarker);
+//			}
 
 		} else {
 

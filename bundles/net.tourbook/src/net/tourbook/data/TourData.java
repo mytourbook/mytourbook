@@ -4331,7 +4331,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable {
 		/*
 		 * Set time zone from geo position
 		 */
-		if (isGPS) {
+		if (latitudeSerie != null) {
+
+			// latitude can be null AFTER cleanup data series
 
 			// get time zone from lat/lon
 			final double lat = latitudeSerie[0];
