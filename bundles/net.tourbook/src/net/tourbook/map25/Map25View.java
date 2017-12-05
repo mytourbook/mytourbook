@@ -520,10 +520,14 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 		int maxLon = Integer.MIN_VALUE;
 
 		for (final GeoPoint geoPoint : geoPoints) {
-			minLat = Math.min(minLat, geoPoint.latitudeE6);
-			minLon = Math.min(minLon, geoPoint.longitudeE6);
-			maxLat = Math.max(maxLat, geoPoint.latitudeE6);
-			maxLon = Math.max(maxLon, geoPoint.longitudeE6);
+
+			if (geoPoint != null) {
+
+				minLat = Math.min(minLat, geoPoint.latitudeE6);
+				minLon = Math.min(minLon, geoPoint.longitudeE6);
+				maxLat = Math.max(maxLat, geoPoint.latitudeE6);
+				maxLon = Math.max(maxLon, geoPoint.longitudeE6);
+			}
 		}
 
 		return new BoundingBox(minLat, minLon, maxLat, maxLon);
