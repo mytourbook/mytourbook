@@ -134,35 +134,37 @@ public class CalendarTourDataProvider {
 		CalendarTourData[][] monthData = null;
 		CalendarTourData[] dayData = null;
 
-		final LocalDate today = LocalDate.now();
-		final LocalDate requestedDate = LocalDate.of(year, month, 1);
-
-		if (
-
-		// requested data are after today -> there should be no data
-		requestedDate.isAfter(today.plusMonths(1))
-
-				// requested data are before first tour
-				|| (_firstTourDateTime != null && requestedDate.isBefore(
-
-						// adjust a month before the last month, otherwise data
-						// for the first month are not all loaded
-						_firstTourDateTime.toLocalDate().minusMonths(1)
-
-				))) {
-
-			/*
-			 * Create dummy data
-			 */
-
-			monthData = new CalendarTourData[31][];
-
-			for (int day = 0; day < 31; day++) {
-				monthData[day] = new CalendarTourData[0];
-			}
-
-			return monthData;
-		}
+// disabled because dragged tours are not displayed
+//
+//		final LocalDate today = LocalDate.now();
+//		final LocalDate requestedDate = LocalDate.of(year, month, 1);
+//
+//		if (
+//
+//		// requested data are after today -> there should be no data
+//		requestedDate.isAfter(today.plusMonths(1))
+//
+//				// requested data are before first tour
+//				|| (_firstTourDateTime != null && requestedDate.isBefore(
+//
+//						// adjust a month before the last month, otherwise data
+//						// for the first month are not all loaded
+//						_firstTourDateTime.toLocalDate().minusMonths(1)
+//
+//				))) {
+//
+//			/*
+//			 * Create dummy data
+//			 */
+//
+//			monthData = new CalendarTourData[31][];
+//
+//			for (int day = 0; day < 31; day++) {
+//				monthData[day] = new CalendarTourData[0];
+//			}
+//
+//			return monthData;
+//		}
 
 		final int colorOffset = 1;
 
@@ -440,15 +442,19 @@ public class CalendarTourDataProvider {
 
 		LocalDateTime dt = LocalDateTime.now();
 
-		final String select = "SELECT" //$NON-NLS-1$
-				+ " StartYear," //				2 //$NON-NLS-1$
-				+ " StartMonth," //				3 //$NON-NLS-1$
-				+ " StartDay" //					4 //$NON-NLS-1$
-				+ " StartHour," //				5 //$NON-NLS-1$
-				+ " StartMinute" //				6 //$NON-NLS-1$
-				+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + UI.NEW_LINE) //$NON-NLS-1$
+		final String select =
 
-				+ (" WHERE TourId=?" + UI.NEW_LINE); //$NON-NLS-1$
+				"SELECT" //$NON-NLS-1$
+
+						+ " StartYear," //				1 //$NON-NLS-1$
+						+ " StartMonth," //				2 //$NON-NLS-1$
+						+ " StartDay," //				3 //$NON-NLS-1$
+						+ " StartHour," //				4 //$NON-NLS-1$
+						+ " StartMinute" //				5 //$NON-NLS-1$
+
+						+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + UI.NEW_LINE) //$NON-NLS-1$
+
+						+ (" WHERE TourId=?" + UI.NEW_LINE); //$NON-NLS-1$
 
 		Connection conn = null;
 
@@ -721,22 +727,24 @@ public class CalendarTourDataProvider {
 			return false;
 		}
 
-		final LocalDate week1stDay = weekLoader.week1stDay;
-		final LocalDate weekLastDay = week1stDay.plusDays(6);
-
-		final LocalDate viewportStartDate = _calendarGraph.getCalendarFirstDay();
-		final LocalDate viewportEndDate = _calendarGraph.getCalendarLastDay();
-
-		final boolean isBefore = weekLastDay.isBefore(viewportStartDate);
-		final boolean isAfter = week1stDay.isAfter(viewportEndDate);
-
-		if (isBefore || isAfter) {
-
-			// reset loading state
-			weekLoader.weekData.loadingState = LoadingState.NOT_LOADED;
-
-			return false;
-		}
+// disabled because dragged tours are not displayed
+//
+//		final LocalDate week1stDay = weekLoader.week1stDay;
+//		final LocalDate weekLastDay = week1stDay.plusDays(6);
+//
+//		final LocalDate viewportStartDate = _calendarGraph.getCalendarFirstDay();
+//		final LocalDate viewportEndDate = _calendarGraph.getCalendarLastDay();
+//
+//		final boolean isBefore = weekLastDay.isBefore(viewportStartDate);
+//		final boolean isAfter = week1stDay.isAfter(viewportEndDate);
+//
+//		if (isBefore || isAfter) {
+//
+//			// reset loading state
+//			weekLoader.weekData.loadingState = LoadingState.NOT_LOADED;
+//
+//			return false;
+//		}
 
 //		final long start = System.currentTimeMillis();
 
