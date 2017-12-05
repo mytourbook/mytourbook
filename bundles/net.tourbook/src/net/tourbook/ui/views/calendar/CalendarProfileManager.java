@@ -2150,7 +2150,7 @@ public class CalendarProfileManager {
 		profile.dayDateMarginTop              = -3;
 		profile.dayDateMarginLeft             = 5;
 		profile.dayDateFont                   = CalendarProfile.createFont(1.2f, SWT.NORMAL);
-		profile.dayDateFormat                 = DayDateFormat.DAY_MONTH_YEAR;
+		profile.dayDateFormat                 = DayDateFormat.AUTOMATIC;
 		                                                                                           
 		// tour background
 		profile.tourBackground                = TourBackground.FILL;
