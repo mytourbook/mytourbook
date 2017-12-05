@@ -102,6 +102,7 @@ public class CalendarProfileManager {
 	private static final String				TAG_TOUR_CONTENT_RGB					= "TourContentRGB";					//$NON-NLS-1$;
 	private static final String				TAG_TOUR_TITLE_RGB						= "TourTitleRGB";					//$NON-NLS-1$;
 	private static final String				TAG_TOUR_VALUE_RGB						= "TourValueRGB";					//$NON-NLS-1$;
+	private static final String				TAG_WEEK_VALUE_RGB						= "weekValueRGB";					//$NON-NLS-1$
 	//
 	private static final String				ATTR_IS_HIDE_DAY_DATE_WHEN_NO_TOUR		= "isHideDayDateWhenNoTour";		//$NON-NLS-1$
 	private static final String				ATTR_IS_SHOW_DATE_COLUMN				= "isShowDateColumn";				//$NON-NLS-1$
@@ -223,6 +224,8 @@ public class CalendarProfileManager {
 	static final int						DEFAULT_WEEK_MARGIN_RIGHT				= -3;
 	static final int						DEFAULT_WEEK_ROWS						= 10;
 	static final CalendarColor				DEFAULT_WEEK_VALUE_COLOR				= CalendarColor.BRIGHT;
+	static final RGB						DEFAULT_WEEK_VALUE_RGB					= new RGB(255, 0, 128);
+	//
 	static final int						DEFAULT_YEAR_COLUMN_DAY_WIDTH			= 50;
 	static final int						DEFAULT_YEAR_COLUMNS					= 1;
 	static final ColumnStart				DEFAULT_YEAR_COLUMNS_LAYOUT				= ColumnStart.CONTINUOUSLY;
@@ -1627,7 +1630,7 @@ public class CalendarProfileManager {
 		profile.yearColumns                   = 1;
 		profile.yearColumnsSpacing            = 30;
 		profile.yearColumnsStart              = ColumnStart.CONTINUOUSLY;
-		profile.yearColumnDayWidth            = 200;
+		profile.yearColumnDayWidth            = 50;
 		profile.yearHeaderFont                = CalendarProfile.createFont(1.7f, SWT.BOLD);
 		                                                                                           
 		// 3. Week summary column
@@ -2129,7 +2132,7 @@ public class CalendarProfileManager {
 		profile.yearColumns                   = 2;
 		profile.yearColumnsSpacing            = 30;
 		profile.yearColumnsStart              = ColumnStart.CONTINUOUSLY;
-		profile.yearColumnDayWidth            = 200;
+		profile.yearColumnDayWidth            = 50;
 		profile.yearHeaderFont                = CalendarProfile.createFont(2.2f, SWT.BOLD);
 		                                                                                           
 		// 3. Week summary column
@@ -2567,6 +2570,7 @@ public class CalendarProfileManager {
 		profile.weekMarginRight				= Util.getXmlInteger(xmlProfile, 					ATTR_WEEK_MARGIN_RIGHT,			DEFAULT_WEEK_MARGIN_RIGHT,		DEFAULT_MARGIN_MIN, DEFAULT_MARGIN_MAX);
 		profile.weekValueColor		 		= (CalendarColor) Util.getXmlEnum(xmlProfile,		ATTR_WEEK_VALUE_COLOR,			DEFAULT_WEEK_VALUE_COLOR);
 		profile.weekValueFont				= Util.getXmlFont(xmlProfile, 						ATTR_WEEK_VALUE_FONT,			defaultFont.getFontData()[0]);
+		profile.weekValueRGB				= Util.getXmlRgb(xmlProfile,						TAG_WEEK_VALUE_RGB, 			DEFAULT_WEEK_VALUE_RGB);
 
 		// day date
 		profile.isHideDayDateWhenNoTour		= Util.getXmlBoolean(xmlProfile, 					ATTR_IS_HIDE_DAY_DATE_WHEN_NO_TOUR,		true);
@@ -2716,6 +2720,7 @@ public class CalendarProfileManager {
 		xmlProfile.putInteger(		ATTR_WEEK_MARGIN_RIGHT, 				profile.weekMarginRight);
 		Util.setXmlEnum(xmlProfile,	ATTR_WEEK_VALUE_COLOR, 					profile.weekValueColor);
 		Util.setXmlFont(xmlProfile,	ATTR_WEEK_VALUE_FONT, 					profile.weekValueFont);
+		Util.setXmlRgb(xmlProfile,	TAG_WEEK_VALUE_RGB, 					profile.weekValueRGB);
 		
 		// day date
 		xmlProfile.putBoolean(		ATTR_IS_HIDE_DAY_DATE_WHEN_NO_TOUR, 	profile.isHideDayDateWhenNoTour);
@@ -2763,7 +2768,6 @@ public class CalendarProfileManager {
 		Util.setXmlRgb(xmlProfile,	TAG_TOUR_CONTENT_RGB, 					profile.tourContentRGB);
 		Util.setXmlRgb(xmlProfile,	TAG_TOUR_TITLE_RGB, 					profile.tourTitleRGB);
 		Util.setXmlRgb(xmlProfile,	TAG_TOUR_VALUE_RGB, 					profile.tourValueRGB);
-		
 		
 // SET_FORMATTING_ON
 

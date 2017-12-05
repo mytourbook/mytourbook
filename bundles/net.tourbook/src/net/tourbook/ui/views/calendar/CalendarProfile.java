@@ -95,6 +95,7 @@ public class CalendarProfile implements Cloneable {
 	int						weekMarginRight				= CalendarProfileManager.DEFAULT_WEEK_MARGIN_RIGHT;
 	CalendarColor			weekValueColor				= CalendarProfileManager.DEFAULT_WEEK_VALUE_COLOR;
 	FontData				weekValueFont				= createFont(1.2f, SWT.BOLD);
+	RGB 					weekValueRGB				= CalendarProfileManager.DEFAULT_WEEK_VALUE_RGB;
 	//
 	// day date
 	boolean					isHideDayDateWhenNoTour		= true;
@@ -143,6 +144,7 @@ public class CalendarProfile implements Cloneable {
 	RGB						tourContentRGB				= CalendarProfileManager.DEFAULT_TOUR_CONTENT_RGB;
 	RGB						tourTitleRGB				= CalendarProfileManager.DEFAULT_TOUR_TITLE_RGB;
 	RGB						tourValueRGB				= CalendarProfileManager.DEFAULT_TOUR_VALUE_RGB;
+
 
 	
 // SET_FORMATTING_ON
@@ -295,8 +297,9 @@ public class CalendarProfile implements Cloneable {
         sb.append("profile.weekMarginLeft                = " + weekMarginLeft                             + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.weekMarginBottom              = " + weekMarginBottom                           + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.weekMarginRight               = " + weekMarginRight                            + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
-        sb.append("profile.weekValueColor                = CalendarColor." + weekValueColor               + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.weekValueFont                 = " + dump_Font(weekValueFont)                   + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.weekValueColor                = CalendarColor." + weekValueColor               + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.weekValueRGB                  = " + dump_RGB(profile.weekValueRGB)             + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("                                                                                           \n"); //$NON-NLS-1$
         sb.append("// day date                                                                                \n"); //$NON-NLS-1$
         sb.append("profile.isHideDayDateWhenNoTour       = " + isHideDayDateWhenNoTour                    + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$

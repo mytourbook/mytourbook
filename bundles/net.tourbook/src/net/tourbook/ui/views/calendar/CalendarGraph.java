@@ -2104,7 +2104,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 						formatterData.id,
 						CalendarProfileManager.allWeekFormatter);
 
-				gc.setForeground(_colorCache.getColor(getColor_Week(formatter)));
+				gc.setForeground(_colorCache.getColor(getColor_Week(formatter, _currentProfile.weekValueRGB)));
 
 				String text = formatter.format(
 						calendarTourData,
@@ -2256,7 +2256,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 	}
 
-	private RGB getColor_Week(final DataFormatter formatter) {
+	private RGB getColor_Week(final DataFormatter formatter, final RGB customRGB) {
 
 		final CalendarColor weekValueColor = _currentProfile.weekValueColor;
 
@@ -2267,6 +2267,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		case LINE:
 		case TEXT:
 			return formatter.getGraphColor(weekValueColor);
+
+		case CUSTOM:
+			return customRGB;
 
 		case WHITE:
 			return _whiteRGB;
