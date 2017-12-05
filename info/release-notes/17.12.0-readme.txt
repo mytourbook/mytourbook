@@ -41,13 +41,26 @@ New
 Improvements
 ============
 
-* Customize tour type image
+* Tour Type
+
+  - Customize tour type image
+
+
+* TCX Import
+
+  - Import tcx runCadence tags and reimport cadence values
+
+
 
 
 Bugfix
 ======
 
-* Constantly
+* GPX Import
+
+  - Fixed waypoints for not merged tours
+  - Fixed NPE
+
 
 
 Translation
