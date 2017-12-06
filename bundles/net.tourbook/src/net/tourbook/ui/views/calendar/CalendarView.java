@@ -623,7 +623,13 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 
 		final long epochDay = Util.getStateLong(_state, STATE_FIRST_DISPLAYED_EPOCH_DAY, Long.MIN_VALUE);
 		if (epochDay == Long.MIN_VALUE) {
-			_calendarGraph.gotoDate(LocalDate.now(), true);
+			_calendarGraph.gotoDate(
+					LocalDate
+							.now()
+
+							// adjust that not the week after today are displayed -> this is empty :-(
+							.minusWeeks(4),
+					true);
 		} else {
 			_calendarGraph.setFirstDay(LocalDate.ofEpochDay(epochDay));
 		}

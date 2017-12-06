@@ -1196,7 +1196,7 @@ public class CalendarProfileManager {
 		return dataFormatter;
 	}
 
-	private static void createProfile() {
+	private static void createProfile_0_All() {
 
 		_allCalendarProfiles.clear();
 
@@ -1260,8 +1260,9 @@ public class CalendarProfileManager {
 		profile.weekMarginLeft                = 1;
 		profile.weekMarginBottom              = 1;
 		profile.weekMarginRight               = 0;
+		profile.weekValueFont                 = CalendarProfile.createFont(1.0f, SWT.BOLD);
 		profile.weekValueColor                = CalendarColor.BRIGHT;
-		profile.weekValueFont                 = CalendarProfile.createFont(1.2f, SWT.BOLD);
+		profile.weekValueRGB                  = new RGB (255, 0, 128);
 		                                                                                           
 		// day date
 		profile.isHideDayDateWhenNoTour       = true;
@@ -1299,7 +1300,7 @@ public class CalendarProfileManager {
 		profile.tourMarginBottom              = 1;
 		profile.tourMarginRight               = -1;
 		profile.tourTruncatedLines            = 3;
-		profile.tourValueColumns              = 3;
+		profile.tourValueColumns              = 2;
 		profile.tourContentFont               = CalendarProfile.createFont(0.9f, SWT.NORMAL);
 		profile.tourTitleFont                 = CalendarProfile.createFont(1.2f, SWT.BOLD);
 		profile.tourValueFont                 = CalendarProfile.createFont(1.0f, SWT.BOLD);
@@ -1356,7 +1357,7 @@ public class CalendarProfileManager {
 		profile.isToggleMonthColor            = false;
 		profile.isWeekRowHeight               = true;
 		profile.useDraggedScrolling           = false;
-		profile.weekHeight                    = 43;
+		profile.weekHeight                    = 28;
 		profile.weekRows                      = 10;
 		profile.alternateMonthRGB             = new RGB (60, 60, 60);
 		profile.calendarBackgroundRGB         = new RGB (40, 40, 40);
@@ -1387,8 +1388,9 @@ public class CalendarProfileManager {
 		profile.weekMarginLeft                = 1;
 		profile.weekMarginBottom              = 1;
 		profile.weekMarginRight               = 0;
+		profile.weekValueFont                 = CalendarProfile.createFont(0.9f, SWT.NORMAL);
 		profile.weekValueColor                = CalendarColor.BRIGHT;
-		profile.weekValueFont                 = CalendarProfile.createFont(1.0f, SWT.BOLD);
+		profile.weekValueRGB                  = new RGB (255, 0, 128);
 		                                                                                           
 		// day date
 		profile.isHideDayDateWhenNoTour       = true;
@@ -1420,7 +1422,7 @@ public class CalendarProfileManager {
 		// tour content
 		profile.isShowTourContent             = true;
 		profile.isShowTourValueUnit           = false;
-		profile.isTruncateTourText            = true;
+		profile.isTruncateTourText            = false;
 		profile.tourMarginTop                 = -2;
 		profile.tourMarginLeft                = 1;
 		profile.tourMarginBottom              = 0;
@@ -1428,7 +1430,7 @@ public class CalendarProfileManager {
 		profile.tourTruncatedLines            = 1;
 		profile.tourValueColumns              = 3;
 		profile.tourContentFont               = CalendarProfile.createFont(0.9f, SWT.NORMAL);
-		profile.tourTitleFont                 = CalendarProfile.createFont(1.2f, SWT.BOLD);
+		profile.tourTitleFont                 = CalendarProfile.createFont(1.0f, SWT.BOLD);
 		profile.tourValueFont                 = CalendarProfile.createFont(1.0f, SWT.BOLD);
 		profile.tourContentColor              = CalendarColor.CONTRAST;
 		profile.tourTitleColor                = CalendarColor.CONTRAST;
@@ -1442,9 +1444,9 @@ public class CalendarProfileManager {
 
 			new FormatterData(true,      FormatterID.TOUR_TITLE,        ValueFormat.DUMMY_VALUE),
 			new FormatterData(true,      FormatterID.TOUR_DESCRIPTION,  ValueFormat.DUMMY_VALUE),
-			new FormatterData(true,      FormatterID.DISTANCE,          ValueFormat.NUMBER_1_0),
-			new FormatterData(true,      FormatterID.ALTITUDE,          ValueFormat.NUMBER_1_0),
-			new FormatterData(true,      FormatterID.TIME_MOVING,       ValueFormat.TIME_HH_MM),
+			new FormatterData(false,     FormatterID.DISTANCE,          ValueFormat.NUMBER_1_0),
+			new FormatterData(false,     FormatterID.ALTITUDE,          ValueFormat.NUMBER_1_0),
+			new FormatterData(false,     FormatterID.TIME_MOVING,       ValueFormat.TIME_HH_MM),
 			new FormatterData(false,     FormatterID.EMPTY,             ValueFormat.DUMMY_VALUE),
 			new FormatterData(false,     FormatterID.EMPTY,             ValueFormat.DUMMY_VALUE),
 			new FormatterData(false,     FormatterID.EMPTY,             ValueFormat.DUMMY_VALUE),
@@ -2384,11 +2386,11 @@ public class CalendarProfileManager {
 
 		if (activeProfile == null) {
 
-			// this case should not happen, create a profile
+			// a profile is not yet created
 
 			StatusUtil.log("Created default profile for calendar properties");//$NON-NLS-1$
 
-			createProfile();
+			createProfile_0_All();
 
 			activeProfile = _allCalendarProfiles.get(0);
 		}
@@ -2474,7 +2476,7 @@ public class CalendarProfileManager {
 
 			// ensure profiles are created
 			if (_allCalendarProfiles.size() == 0) {
-				createProfile();
+				createProfile_0_All();
 			}
 
 			setActiveCalendarProfile(getProfile_Calendar(), false);
@@ -2514,7 +2516,7 @@ public class CalendarProfileManager {
 
 	static void resetAllCalendarProfiles() {
 
-		createProfile();
+		createProfile_0_All();
 
 		setActiveCalendarProfile(_allCalendarProfiles.get(0), true);
 	}
