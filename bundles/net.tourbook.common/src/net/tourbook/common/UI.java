@@ -21,6 +21,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Formatter;
+import java.util.Random;
 
 import net.tourbook.common.weather.IWeather;
 
@@ -337,6 +338,10 @@ public class UI {
 	public static final Font			AWT_FONT_ARIAL_BOLD_24					= Font.decode("Arial-bold-24");						//$NON-NLS-1$
 
 // SET_FORMATTING_OFF
+	
+	private static final Random 		RANDOM_GENERATOR						= new Random();
+	private static final String			ALL_SCRAMBLED_CHARS_LOWER				= "abcdefghklmnoprsu";						//$NON-NLS-1$
+	private static final String			ALL_SCRAMBLED_CHARS_UPPER				= "ABCDEFGHKLMNOPRSU";						//$NON-NLS-1$
 
 	/*
 	 * image keys for images which are stored in the image registry
@@ -1378,6 +1383,42 @@ public class UI {
 		for (int weightIndex = 0; weightIndex < weights.length; weightIndex++) {
 			memento.putInteger(weightKey + Integer.toString(weightIndex), weights[weightIndex]);
 		}
+	}
+
+	public static int scrambleNumbers(final int number) {
+
+		return (int) (RANDOM_GENERATOR.nextFloat() * number);
+	}
+
+	public static String scrambleText(final String text) {
+
+		if (text == null) {
+			return text;
+		}
+
+		final int allLowerCharSize = ALL_SCRAMBLED_CHARS_LOWER.length();
+		final int allUpperCharSize = ALL_SCRAMBLED_CHARS_UPPER.length();
+
+		final char[] scrambledText = text.toCharArray();
+
+		for (int charIndex = 0; charIndex < text.length(); charIndex++) {
+
+			final char c = text.charAt(charIndex);
+
+			if (c >= 0x41 && c <= 0x5a) {
+
+				// scramble upper chars
+
+				scrambledText[charIndex] = ALL_SCRAMBLED_CHARS_UPPER.charAt(RANDOM_GENERATOR.nextInt(allUpperCharSize));
+
+			} else if (c != ' ') {
+
+				// scramble other chars except spaces
+				scrambledText[charIndex] = ALL_SCRAMBLED_CHARS_LOWER.charAt(RANDOM_GENERATOR.nextInt(allLowerCharSize));
+			}
+		}
+
+		return new String(scrambledText);
 	}
 
 	public static void setBackgroundColorForAllChildren(final Control parent, final Color bgColor) {

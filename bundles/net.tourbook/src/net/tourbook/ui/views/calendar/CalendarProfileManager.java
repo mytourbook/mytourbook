@@ -1203,12 +1203,12 @@ public class CalendarProfileManager {
 		_allCalendarProfiles.add(createProfile_10_Default());
 
 		_allCalendarProfiles.add(createProfile_20_Compact());
-		_allCalendarProfiles.add(createProfile_22_Compact_XL());
-		_allCalendarProfiles.add(createProfile_23_Compact_XL_tiny());
+		_allCalendarProfiles.add(createProfile_22_Compact_II());
+		_allCalendarProfiles.add(createProfile_23_Compact_III());
 
 		_allCalendarProfiles.add(createProfile_50_Year());
-		_allCalendarProfiles.add(createProfile_52_YearXL());
-		_allCalendarProfiles.add(createProfile_54_YearXXL());
+		_allCalendarProfiles.add(createProfile_52_Year_II());
+		_allCalendarProfiles.add(createProfile_54_Year_III());
 
 		_allCalendarProfiles.add(createProfile_99_Classic());
 	}
@@ -1260,17 +1260,17 @@ public class CalendarProfileManager {
 		profile.weekMarginLeft                = 1;
 		profile.weekMarginBottom              = 1;
 		profile.weekMarginRight               = 0;
-		profile.weekValueFont                 = CalendarProfile.createFont(1.0f, SWT.BOLD);
+		profile.weekValueFont                 = CalendarProfile.createFont(1.2f, SWT.NORMAL);
 		profile.weekValueColor                = CalendarColor.BRIGHT;
 		profile.weekValueRGB                  = new RGB (255, 0, 128);
 		                                                                                           
 		// day date
 		profile.isHideDayDateWhenNoTour       = true;
-		profile.isShowDayDate                 = false;
+		profile.isShowDayDate                 = true;
 		profile.isShowDayDateWeekendColor     = false;
-		profile.dayDateMarginTop              = -2;
-		profile.dayDateMarginLeft             = 5;
-		profile.dayDateFont                   = CalendarProfile.createFont(1.2f, SWT.BOLD);
+		profile.dayDateMarginTop              = -4;
+		profile.dayDateMarginLeft             = 6;
+		profile.dayDateFont                   = CalendarProfile.createFont(1.6f, SWT.BOLD);
 		profile.dayDateFormat                 = DayDateFormat.DAY;
 		                                                                                           
 		// tour background
@@ -1295,11 +1295,11 @@ public class CalendarProfileManager {
 		profile.isShowTourContent             = true;
 		profile.isShowTourValueUnit           = true;
 		profile.isTruncateTourText            = true;
-		profile.tourMarginTop                 = -2;
+		profile.tourMarginTop                 = -1;
 		profile.tourMarginLeft                = 1;
 		profile.tourMarginBottom              = 1;
-		profile.tourMarginRight               = -1;
-		profile.tourTruncatedLines            = 3;
+		profile.tourMarginRight               = 2;
+		profile.tourTruncatedLines            = 2;
 		profile.tourValueColumns              = 2;
 		profile.tourContentFont               = CalendarProfile.createFont(0.9f, SWT.NORMAL);
 		profile.tourTitleFont                 = CalendarProfile.createFont(1.2f, SWT.BOLD);
@@ -1469,17 +1469,17 @@ public class CalendarProfileManager {
 		return profile;
 	}
 
-	private static CalendarProfile createProfile_22_Compact_XL() {
+	private static CalendarProfile createProfile_22_Compact_II() {
 
 		final CalendarProfile profile = new CalendarProfile();
 
-		profile.name = Messages.Calendar_Profile_Name_CompactXL;
+		profile.name = Messages.Calendar_Profile_Name_Compact_II;
 
 		// SET_FORMATTING_OFF
 
-//		                                      Compact XL
+//		                                      Compact II
 
-		profile.defaultId                     = ProfileDefault.COMPACT_XL;
+		profile.defaultId                     = ProfileDefault.COMPACT_II;
 
 		// layout
 		profile.isToggleMonthColor            = false;
@@ -1516,8 +1516,9 @@ public class CalendarProfileManager {
 		profile.weekMarginLeft                = 1;
 		profile.weekMarginBottom              = 1;
 		profile.weekMarginRight               = 0;
-		profile.weekValueColor                = CalendarColor.BRIGHT;
 		profile.weekValueFont                 = CalendarProfile.createFont(1.0f, SWT.NORMAL);
+		profile.weekValueColor                = CalendarColor.BRIGHT;
+		profile.weekValueRGB                  = new RGB (255, 0, 128);
 		                                                                                           
 		// day date
 		profile.isHideDayDateWhenNoTour       = true;
@@ -1596,17 +1597,17 @@ public class CalendarProfileManager {
 		return profile;
 	}
 
-	private static CalendarProfile createProfile_23_Compact_XL_tiny() {
+	private static CalendarProfile createProfile_23_Compact_III() {
 
 		final CalendarProfile profile = new CalendarProfile();
 
-		profile.name = Messages.Calendar_Profile_Name_CompactXLtiny;
+		profile.name = Messages.Calendar_Profile_Name_Compact_III;
 
 		// SET_FORMATTING_OFF
 
-//		                                      Compact XL tiny
+//		                                      Compact III
 
-		profile.defaultId                     = ProfileDefault.COMPACT_XL_TINY;
+		profile.defaultId                     = ProfileDefault.COMPACT_III;
 
 		// layout
 		profile.isToggleMonthColor            = false;
@@ -1643,8 +1644,9 @@ public class CalendarProfileManager {
 		profile.weekMarginLeft                = 0;
 		profile.weekMarginBottom              = -1;
 		profile.weekMarginRight               = 0;
-		profile.weekValueColor                = CalendarColor.BRIGHT;
 		profile.weekValueFont                 = CalendarProfile.createFont(0.8f, SWT.NORMAL);
+		profile.weekValueColor                = CalendarColor.BRIGHT;
+		profile.weekValueRGB                  = new RGB (255, 0, 128);
 		                                                                                           
 		// day date
 		profile.isHideDayDateWhenNoTour       = true;
@@ -1674,7 +1676,7 @@ public class CalendarProfileManager {
 		profile.tourSelectedRGB               = new RGB (192, 192, 192);
 		                                                                                           
 		// tour content
-		profile.isShowTourContent             = true;
+		profile.isShowTourContent             = false;
 		profile.isShowTourValueUnit           = false;
 		profile.isTruncateTourText            = true;
 		profile.tourMarginTop                 = -2;
@@ -1770,13 +1772,16 @@ public class CalendarProfileManager {
 		profile.weekMarginLeft                = 0;
 		profile.weekMarginBottom              = 0;
 		profile.weekMarginRight               = 0;
-		profile.weekValueColor                = CalendarColor.BRIGHT;
 		profile.weekValueFont                 = CalendarProfile.createFont(1.0f, SWT.NORMAL);
+		profile.weekValueColor                = CalendarColor.BRIGHT;
+		profile.weekValueRGB                  = new RGB (255, 0, 128);
 		                                                                                           
 		// day date
 		profile.isHideDayDateWhenNoTour       = true;
 		profile.isShowDayDate                 = false;
 		profile.isShowDayDateWeekendColor     = false;
+		profile.dayDateMarginTop              = 0;
+		profile.dayDateMarginLeft             = 0;
 		profile.dayDateFont                   = CalendarProfile.createFont(1.2f, SWT.BOLD);
 		profile.dayDateFormat                 = DayDateFormat.DAY;
 		                                                                                           
@@ -1848,17 +1853,17 @@ public class CalendarProfileManager {
 		return profile;
 	}
 
-	private static CalendarProfile createProfile_52_YearXL() {
+	private static CalendarProfile createProfile_52_Year_II() {
 
 		final CalendarProfile profile = new CalendarProfile();
 
-		profile.name = Messages.Calendar_Profile_Name_YearXL;
+		profile.name = Messages.Calendar_Profile_Name_Year_II;
 
 		// SET_FORMATTING_OFF
 
-//		                                      Year XL
+//		                                      Year II
 
-		profile.defaultId                     = ProfileDefault.YEAR_XL;
+		profile.defaultId                     = ProfileDefault.YEAR_II;
 
 		// layout
 		profile.isToggleMonthColor            = false;
@@ -1895,13 +1900,16 @@ public class CalendarProfileManager {
 		profile.weekMarginLeft                = 1;
 		profile.weekMarginBottom              = 1;
 		profile.weekMarginRight               = -3;
-		profile.weekValueColor                = CalendarColor.TEXT;
 		profile.weekValueFont                 = CalendarProfile.createFont(1.2f, SWT.BOLD);
+		profile.weekValueColor                = CalendarColor.TEXT;
+		profile.weekValueRGB                  = new RGB (255, 0, 128);
 		                                                                                           
 		// day date
 		profile.isHideDayDateWhenNoTour       = true;
 		profile.isShowDayDate                 = false;
 		profile.isShowDayDateWeekendColor     = false;
+		profile.dayDateMarginTop              = 0;
+		profile.dayDateMarginLeft             = 0;
 		profile.dayDateFont                   = CalendarProfile.createFont(1.2f, SWT.BOLD);
 		profile.dayDateFormat                 = DayDateFormat.DAY;
 		                                                                                           
@@ -1973,18 +1981,17 @@ public class CalendarProfileManager {
 		return profile;
 	}
 
-	private static CalendarProfile createProfile_54_YearXXL() {
+	private static CalendarProfile createProfile_54_Year_III() {
 
 		final CalendarProfile profile = new CalendarProfile();
 
-		profile.name = Messages.Calendar_Profile_Name_YearXXL;
+		profile.name = Messages.Calendar_Profile_Name_Year_III;
 
 		// SET_FORMATTING_OFF
 
-//		                                      Year XXL
+//		                                      Year III
 
-		profile.defaultId                     = ProfileDefault.YEAR_XXL;
-
+		profile.defaultId                     = ProfileDefault.YEAR_III;
 		// layout
 		profile.isToggleMonthColor            = false;
 		profile.isWeekRowHeight               = true;
@@ -2234,12 +2241,12 @@ public class CalendarProfileManager {
 		case CLASSIC:				return createProfile_99_Classic();
 
 		case COMPACT:				return createProfile_20_Compact();
-		case COMPACT_XL:			return createProfile_22_Compact_XL();
-		case COMPACT_XL_TINY:		return createProfile_23_Compact_XL_tiny();
+		case COMPACT_II:			return createProfile_22_Compact_II();
+		case COMPACT_III:			return createProfile_23_Compact_III();
 		
 		case YEAR:					return createProfile_50_Year();
-		case YEAR_XL:				return createProfile_52_YearXL();
-		case YEAR_XXL:				return createProfile_54_YearXXL();
+		case YEAR_II:				return createProfile_52_Year_II();
+		case YEAR_III:				return createProfile_54_Year_III();
 		
 		case DEFAULT:
 		default:

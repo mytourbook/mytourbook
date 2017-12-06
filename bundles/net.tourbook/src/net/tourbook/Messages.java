@@ -58,12 +58,12 @@ public class Messages extends NLS {
 	public static String		Calendar_Profile_DayHeaderDateFormat_Day;
 	public static String		Calendar_Profile_Name_Classic;
 	public static String		Calendar_Profile_Name_Compact;
-	public static String		Calendar_Profile_Name_CompactXL;
-	public static String		Calendar_Profile_Name_CompactXLtiny;
+	public static String		Calendar_Profile_Name_Compact_II;
+	public static String		Calendar_Profile_Name_Compact_III;
 	public static String		Calendar_Profile_Name_Default;
 	public static String		Calendar_Profile_Name_Year;
-	public static String		Calendar_Profile_Name_YearXL;
-	public static String		Calendar_Profile_Name_YearXXL;
+	public static String		Calendar_Profile_Name_Year_II;
+	public static String		Calendar_Profile_Name_Year_III;
 	public static String		Calendar_Profile_TourBackground_Circle;
 	public static String		Calendar_Profile_TourBackground_Fill;
 	public static String		Calendar_Profile_TourBackground_Fill_Left;

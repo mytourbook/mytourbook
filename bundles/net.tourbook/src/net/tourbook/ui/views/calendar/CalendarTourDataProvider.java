@@ -43,6 +43,12 @@ public class CalendarTourDataProvider {
 
 	private static CalendarTourDataProvider					_instance;
 
+// SET_FORMATTING_OFF
+	
+	private static boolean				_isScrambleCalendar	= System.getProperty("scrambleCalendar") != null;	//$NON-NLS-1$
+	
+// SET_FORMATTING_ON
+
 	private static final AtomicLong							_weekExecuterId		= new AtomicLong();
 	private static final LinkedBlockingDeque<WeekLoader>	_weekWaitingQueue	= new LinkedBlockingDeque<>();
 
@@ -81,7 +87,6 @@ public class CalendarTourDataProvider {
 	static CalendarTourDataProvider getInstance() {
 
 		if (_instance == null) {
-
 			_instance = new CalendarTourDataProvider();
 		}
 
@@ -412,6 +417,18 @@ public class CalendarTourDataProvider {
 					data.isManualTour = dbIsManualTour.get(tourIndex);
 
 					dayData[tourIndex] = data;
+
+					if (_isScrambleCalendar) {
+
+						data.tourTitle = UI.scrambleText(data.tourTitle);
+						data.tourDescription = UI.scrambleText(data.tourDescription);
+
+						data.distance = UI.scrambleNumbers(data.distance);
+						data.altitude = UI.scrambleNumbers(data.altitude);
+
+						data.recordingTime = UI.scrambleNumbers(data.recordingTime);
+						data.drivingTime = UI.scrambleNumbers(data.drivingTime);
+					}
 
 				} // create data for this day
 
@@ -795,6 +812,15 @@ public class CalendarTourDataProvider {
 				weekData.recordingTime = result.getInt(3);
 				weekData.drivingTime = result.getInt(4);
 				weekData.numTours = result.getInt(5);
+
+				if (_isScrambleCalendar) {
+
+					weekData.distance = UI.scrambleNumbers(weekData.distance);
+					weekData.altitude = UI.scrambleNumbers(weekData.altitude);
+
+					weekData.recordingTime = UI.scrambleNumbers(weekData.recordingTime);
+					weekData.drivingTime = UI.scrambleNumbers(weekData.drivingTime);
+				}
 			}
 
 		} catch (final SQLException e) {
