@@ -1,69 +1,64 @@
-Version 17.9.1 next                                          ?. December 2017
-
-
-Pendenzen:
-
-- check 2.5D map
-- check waypoint import
-- import tcx https://sourceforge.net/p/mytourbook/discussion/622811/thread/989bee5e/
-- import r-r 25.9.17
-
+Version 17.12.0 Experimental                            7. December 2017
 
 
 New
-===
+===	
 
 * Calendar
 
-  - Customize calendar layout, it can be based on different default configurations
-  - Drag & drop (with copy) a manual tour to another day, this is logged in the tour log view
-  - Duplicate a tour, it copies only these values: person, device ID, start time, title, description, tags, tour type
+  The calendar is not new but greatly enhanced, the old calendar 
+  documentation is not yet updated
+
+  - Calendar layout can be customized with > 80 parameters, a profile 
+    can be based on different default configurations
+
+  - Show tour tooltip for hovered tours
+
+  - Drag & drop (with copy) a manually created tour to another day, 
+    this is logged in the tour log view
+
+  - Duplicate a tour, it copies only these values:
+    Person, Device ID, Start Time, Title, Description, Tags, Tour Type
+
   - Zoom in/out with Ctrl/Shift and mouse wheel or +/- keys
-  - Log calendar profile modifications -DlogCalendarProfile
-  - Tours after today + 1 months are not displayed (to optimize performance) !!!
-  - Optimized performance when loading day/week data dramatically, e.g. one week was ~200ms, now ~1ms
 
-* Duplicate a tour which is manually created
-  Can be used for "events", like changing a battery
+  - Log calendar profile modifications: -DlogCalendarProfile
 
+  - All default profiles are created with this mechanism
+
+  - Optimized performance when loading day/week data, 
+    e.g. one week from ~200ms to ~1ms
+
+
+Improvements
+============	
 
 * Tour Type
 
   - Customize tour type symbol
-  
+
 
 * Tour Filter
-  
+
   - Filter manually created tours
-
-
-
-Improvements
-============
-
-* Tour Type
-
-  - Customize tour type image
 
 
 * TCX Import
 
-  - Import tcx runCadence tags and reimport cadence values
+ - Import TCX <runCadence>  tags and reimport cadence values
 
+
+* Translation
+
+ - 17.9 French translation
 
 
 
 Bugfix
-======
+======	
 
 * GPX Import
 
-  - Fixed waypoints for not merged tours
-  - Fixed NPE
+ - Fixed waypoints for not merged tours
 
-
-
-Translation
-===========
-
-* 17.9 French translation
+ - Fixed NPE
