@@ -2232,7 +2232,7 @@ public class CalendarProfileManager {
 		return profile;
 	}
 
-	private static CalendarProfile createProfileFromId(final ProfileDefault defaultId) {
+	static CalendarProfile createProfileFromId(final ProfileDefault defaultId) {
 
 // SET_FORMATTING_OFF
 		

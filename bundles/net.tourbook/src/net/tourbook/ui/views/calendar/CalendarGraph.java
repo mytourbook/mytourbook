@@ -786,6 +786,15 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 						zoom(event, direction);
 					}
 					break;
+
+				case '0':
+				case SWT.KEYPAD_0:
+					if (UI.isCtrlKey(event)) {
+
+						zoom_ToDefault();
+					}
+
+					break;
 				}
 			}
 		});
@@ -3666,6 +3675,26 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			_currentProfile.weekRows = Math.min(
 					CalendarProfileManager.WEEK_ROWS_MAX,
 					Math.max(CalendarProfileManager.WEEK_ROWS_MIN, _currentProfile.weekRows + zoomValue));
+		}
+
+		// update slideout
+		final SlideoutCalendarOptions slideout = _calendarView.getConfigSlideout();
+		slideout.restoreState_Profile();
+
+		updateUI();
+	}
+
+	private void zoom_ToDefault() {
+
+		final CalendarProfile dummyProfile = CalendarProfileManager.createProfileFromId(_currentProfile.defaultId);
+
+		if (_currentProfile.isWeekRowHeight) {
+
+			_currentProfile.weekHeight = dummyProfile.weekHeight;
+
+		} else {
+
+			_currentProfile.weekRows = dummyProfile.weekRows;
 		}
 
 		// update slideout

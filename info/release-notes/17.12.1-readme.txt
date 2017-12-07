@@ -1,0 +1,20 @@
+Version 17.12.1                                    ?. December 2017
+
+
+New
+===	
+
+
+
+
+Improvements
+============	
+
+* Calendar
+
+  - Ctrl+0 zoom to default
+
+
+Bugfix
+======	
+
