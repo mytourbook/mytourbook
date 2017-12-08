@@ -68,9 +68,14 @@ public class CalendarProfileManager {
 // SET_FORMATTING_ON
 	//
 	// common attributes
-	private static final String				ATTR_ACTIVE_PROFILE_ID					= "activeProfileId";				//$NON-NLS-1$
 	private static final String				ATTR_ID									= "id";								//$NON-NLS-1$
-	private static final String				ATTR_PROFILE_NAME						= "name";							//$NON-NLS-1$
+	private static final String				ATTR_ACTIVE_PROFILE_ID					= "activeProfileId";				//$NON-NLS-1$
+	private static final String				ATTR_PROFILE_NAME						= "profileName";					//$NON-NLS-1$
+	//
+	private static final String				ATTR_IS_APP_DEFAULT_ID					= "isAppDefaultId";					//$NON-NLS-1$
+	private static final String				ATTR_IS_USER_DEFAULT_ID					= "isUserDefaultId";				//$NON-NLS-1$
+	private static final String				ATTR_PROFILE_APP_DEFAULT_ID				= "profileAppDefaultId";			//$NON-NLS-1$
+	private static final String				ATTR_PROFILE_USER_DEFAULT_ID			= "profileUserDefaultId";			//$NON-NLS-1$
 	//
 	/*
 	 * Root
@@ -118,7 +123,6 @@ public class CalendarProfileManager {
 	private static final String				ATTR_IS_TRUNCATE_TOUR_TEXT				= "isTruncateTourText";				//$NON-NLS-1$
 	private static final String				ATTR_IS_WEEK_ROW_HEIGHT					= "isWeekRowHeight";				//$NON-NLS-1$
 	private static final String				ATTR_IS_YEAR_COLUMN_DAY_WIDTH			= "isYearColumnDayWidth";			//$NON-NLS-1$
-	private static final String				ATTR_PROFILE_DEFAULT_ID					= "profileDefaultId";				//$NON-NLS-1$
 	private static final String				ATTR_DATE_COLUMN_CONTENT				= "dateColumnContent";				//$NON-NLS-1$
 	private static final String				ATTR_DATE_COLUMN_FONT					= "dateColumnFont";					//$NON-NLS-1$
 	private static final String				ATTR_DATE_COLUMN_WIDTH					= "dateColumnWidth";				//$NON-NLS-1$
@@ -544,11 +548,16 @@ public class CalendarProfileManager {
 	 * Contains all calendar profiles which are loaded from a xml file.
 	 */
 	private static final ArrayList<CalendarProfile>			_allCalendarProfiles				= new ArrayList<>();
-	private static CalendarProfile							_activeCalendarProfile;
+	private static final ArrayList<CalendarProfile>			_allAppDefaultProfiles				= new ArrayList<>();
+	static {
+		createProfile_0_AllAppProfiles(_allAppDefaultProfiles);
+	}
 	//
-	private static String									_fromXml_ActiveCalendarProfileId;
+	private static CalendarProfile		_activeCalendarProfile;
 	//
-	private final static ListenerList						_profileListener					= new ListenerList();
+	private static String				_fromXml_ActiveCalendarProfileId;
+	//
+	private final static ListenerList	_profileListener	= new ListenerList();
 
 	public static class CalendarColor_ComboData {
 
@@ -1196,34 +1205,38 @@ public class CalendarProfileManager {
 		return dataFormatter;
 	}
 
-	private static void createProfile_0_All() {
+	private static void createProfile_0_AllAppProfiles(final ArrayList<CalendarProfile> allProfiles) {
 
-		_allCalendarProfiles.clear();
+		allProfiles.clear();
 
-		_allCalendarProfiles.add(createProfile_10_Default());
+		allProfiles.add(createProfile_10_Default());
 
-		_allCalendarProfiles.add(createProfile_20_Compact());
-		_allCalendarProfiles.add(createProfile_22_Compact_II());
-		_allCalendarProfiles.add(createProfile_23_Compact_III());
+		allProfiles.add(createProfile_20_Compact());
+		allProfiles.add(createProfile_22_Compact_II());
+		allProfiles.add(createProfile_23_Compact_III());
 
-		_allCalendarProfiles.add(createProfile_50_Year());
-		_allCalendarProfiles.add(createProfile_52_Year_II());
-		_allCalendarProfiles.add(createProfile_54_Year_III());
+		allProfiles.add(createProfile_50_Year());
+		allProfiles.add(createProfile_52_Year_II());
+		allProfiles.add(createProfile_54_Year_III());
 
-		_allCalendarProfiles.add(createProfile_99_Classic());
+		allProfiles.add(createProfile_99_Classic());
+
+		for (final CalendarProfile profile : allProfiles) {
+			profile.isAppDefault = true;
+		}
 	}
 
 	private static CalendarProfile createProfile_10_Default() {
 
 		final CalendarProfile profile = new CalendarProfile();
 
-		profile.name = Messages.Calendar_Profile_Name_Default;
+		profile.profileName = Messages.Calendar_Profile_Name_Default;
 
 		// SET_FORMATTING_OFF
 
 //		                                      Default
 
-		profile.defaultId                     = ProfileDefault.DEFAULT;
+		profile.appDefaultId                  = ProfileDefault.DEFAULT;
 
 		// layout
 		profile.isToggleMonthColor            = false;
@@ -1345,13 +1358,13 @@ public class CalendarProfileManager {
 
 		final CalendarProfile profile = new CalendarProfile();
 
-		profile.name = Messages.Calendar_Profile_Name_Compact;
+		profile.profileName = Messages.Calendar_Profile_Name_Compact;
 
 		// SET_FORMATTING_OFF
 
 //		                                      Compact
 
-		profile.defaultId                     = ProfileDefault.COMPACT;
+		profile.appDefaultId                     = ProfileDefault.COMPACT;
 
 		// layout
 		profile.isToggleMonthColor            = false;
@@ -1473,13 +1486,13 @@ public class CalendarProfileManager {
 
 		final CalendarProfile profile = new CalendarProfile();
 
-		profile.name = Messages.Calendar_Profile_Name_Compact_II;
+		profile.profileName = Messages.Calendar_Profile_Name_Compact_II;
 
 		// SET_FORMATTING_OFF
 
 //		                                      Compact II
 
-		profile.defaultId                     = ProfileDefault.COMPACT_II;
+		profile.appDefaultId                     = ProfileDefault.COMPACT_II;
 
 		// layout
 		profile.isToggleMonthColor            = false;
@@ -1601,13 +1614,13 @@ public class CalendarProfileManager {
 
 		final CalendarProfile profile = new CalendarProfile();
 
-		profile.name = Messages.Calendar_Profile_Name_Compact_III;
+		profile.profileName = Messages.Calendar_Profile_Name_Compact_III;
 
 		// SET_FORMATTING_OFF
 
 //		                                      Compact III
 
-		profile.defaultId                     = ProfileDefault.COMPACT_III;
+		profile.appDefaultId                     = ProfileDefault.COMPACT_III;
 
 		// layout
 		profile.isToggleMonthColor            = false;
@@ -1729,13 +1742,13 @@ public class CalendarProfileManager {
 
 		final CalendarProfile profile = new CalendarProfile();
 
-		profile.name = Messages.Calendar_Profile_Name_Year;
+		profile.profileName = Messages.Calendar_Profile_Name_Year;
 
 		// SET_FORMATTING_OFF
 
 //		                                      Year
 
-		profile.defaultId                     = ProfileDefault.YEAR;
+		profile.appDefaultId                     = ProfileDefault.YEAR;
 
 		// layout
 		profile.isToggleMonthColor            = false;
@@ -1857,13 +1870,13 @@ public class CalendarProfileManager {
 
 		final CalendarProfile profile = new CalendarProfile();
 
-		profile.name = Messages.Calendar_Profile_Name_Year_II;
+		profile.profileName = Messages.Calendar_Profile_Name_Year_II;
 
 		// SET_FORMATTING_OFF
 
 //		                                      Year II
 
-		profile.defaultId                     = ProfileDefault.YEAR_II;
+		profile.appDefaultId                     = ProfileDefault.YEAR_II;
 
 		// layout
 		profile.isToggleMonthColor            = false;
@@ -1985,13 +1998,13 @@ public class CalendarProfileManager {
 
 		final CalendarProfile profile = new CalendarProfile();
 
-		profile.name = Messages.Calendar_Profile_Name_Year_III;
+		profile.profileName = Messages.Calendar_Profile_Name_Year_III;
 
 		// SET_FORMATTING_OFF
 
 //		                                      Year III
 
-		profile.defaultId                     = ProfileDefault.YEAR_III;
+		profile.appDefaultId                     = ProfileDefault.YEAR_III;
 		// layout
 		profile.isToggleMonthColor            = false;
 		profile.isWeekRowHeight               = true;
@@ -2109,13 +2122,13 @@ public class CalendarProfileManager {
 
 		final CalendarProfile profile = new CalendarProfile();
 
-		profile.name = Messages.Calendar_Profile_Name_Classic;
+		profile.profileName = Messages.Calendar_Profile_Name_Classic;
 
 		// SET_FORMATTING_OFF
 
 //		                                      Classic
 
-		profile.defaultId                     = ProfileDefault.CLASSIC;
+		profile.appDefaultId                     = ProfileDefault.CLASSIC;
 
 		// layout
 		profile.isToggleMonthColor            = true;
@@ -2397,7 +2410,7 @@ public class CalendarProfileManager {
 
 			StatusUtil.log("Created default profile for calendar properties");//$NON-NLS-1$
 
-			createProfile_0_All();
+			createProfile_0_AllAppProfiles(_allCalendarProfiles);
 
 			activeProfile = _allCalendarProfiles.get(0);
 		}
@@ -2481,9 +2494,29 @@ public class CalendarProfileManager {
 			// parse xml
 			parse_200_Calendars(xmlRoot, _allCalendarProfiles);
 
+			// ensure all app default profiles are available
+			final ArrayList<CalendarProfile> missingAppDefaultProfiles = new ArrayList<>();
+			for (final CalendarProfile appDefaultProfile : _allAppDefaultProfiles) {
+
+				boolean isAppDefaultAvailable = false;
+
+				for (final CalendarProfile restoredCalendarProfile : _allCalendarProfiles) {
+
+					if (restoredCalendarProfile.appDefaultId.equals(appDefaultProfile.appDefaultId)) {
+						isAppDefaultAvailable = true;
+						break;
+					}
+				}
+
+				if (!isAppDefaultAvailable) {
+					missingAppDefaultProfiles.add(appDefaultProfile);
+				}
+			}
+			_allCalendarProfiles.addAll(missingAppDefaultProfiles);
+
 			// ensure profiles are created
 			if (_allCalendarProfiles.size() == 0) {
-				createProfile_0_All();
+				createProfile_0_AllAppProfiles(_allCalendarProfiles);
 			}
 
 			setActiveCalendarProfile(getProfile_Calendar(), false);
@@ -2502,7 +2535,8 @@ public class CalendarProfileManager {
 	static void resetActiveCalendarProfile() {
 
 		// keep old name
-		final String oldProfileName = _activeCalendarProfile.name;
+		final String oldProfileName = _activeCalendarProfile.profileName;
+		final boolean isAppDefault = _activeCalendarProfile.isAppDefault;
 
 		final int activeCalendarProfileIndex = getActiveCalendarProfileIndex();
 
@@ -2510,10 +2544,15 @@ public class CalendarProfileManager {
 		_allCalendarProfiles.remove(_activeCalendarProfile);
 
 		// create new profile
-		final CalendarProfile newProfile = createProfileFromId(_activeCalendarProfile.defaultId);
+		final CalendarProfile newProfile = createProfileFromId(_activeCalendarProfile.appDefaultId);
 
-		// set old name
-		newProfile.name = oldProfileName;
+		// keep default state
+		newProfile.isAppDefault = isAppDefault;
+
+		// preserve old name
+		if (isAppDefault == false) {
+			newProfile.profileName = oldProfileName;
+		}
 
 		// update model
 		_allCalendarProfiles.add(activeCalendarProfileIndex, newProfile);
@@ -2523,7 +2562,7 @@ public class CalendarProfileManager {
 
 	static void resetAllCalendarProfiles() {
 
-		createProfile_0_All();
+		createProfile_0_AllAppProfiles(_allCalendarProfiles);
 
 		setActiveCalendarProfile(_allCalendarProfiles.get(0), true);
 	}
@@ -2539,8 +2578,11 @@ public class CalendarProfileManager {
 		
 		// profile
 		profile.id							= Util.getXmlString(xmlProfile,						ATTR_ID,						Long.toString(System.nanoTime()));
-		profile.name						= Util.getXmlString(xmlProfile,						ATTR_PROFILE_NAME,				UI.EMPTY_STRING);
-		profile.defaultId					= (ProfileDefault) Util.getXmlEnum(xmlProfile,		ATTR_PROFILE_DEFAULT_ID,		DEFAULT_PROFILE_DEFAULT_ID);
+		profile.profileName					= Util.getXmlString(xmlProfile,						ATTR_PROFILE_NAME,				UI.EMPTY_STRING);
+		profile.isAppDefault				= Util.getXmlBoolean(xmlProfile, 					ATTR_IS_APP_DEFAULT_ID,			false);
+		profile.isUserDefault				= Util.getXmlBoolean(xmlProfile, 					ATTR_IS_USER_DEFAULT_ID,		false);
+		profile.appDefaultId				= (ProfileDefault) Util.getXmlEnum(xmlProfile,		ATTR_PROFILE_APP_DEFAULT_ID,	DEFAULT_PROFILE_DEFAULT_ID);
+		profile.userDefaultId				= Util.getXmlString(xmlProfile,						ATTR_PROFILE_USER_DEFAULT_ID,	UI.EMPTY_STRING);
 		
 		// layout
 		profile.isToggleMonthColor			= Util.getXmlBoolean(xmlProfile, 					ATTR_IS_TOGGLE_MONTH_COLOR,		true);
@@ -2689,8 +2731,11 @@ public class CalendarProfileManager {
 					
 		// profile
 		xmlProfile.putString(		ATTR_ID, 								profile.id);
-		xmlProfile.putString(		ATTR_PROFILE_NAME, 						profile.name);
-		Util.setXmlEnum(xmlProfile,	ATTR_PROFILE_DEFAULT_ID,		 		profile.defaultId);
+		xmlProfile.putString(		ATTR_PROFILE_NAME, 						profile.profileName);
+		xmlProfile.putBoolean(		ATTR_IS_APP_DEFAULT_ID,		 			profile.isAppDefault);
+		xmlProfile.putBoolean(		ATTR_IS_USER_DEFAULT_ID, 				profile.isUserDefault);
+		xmlProfile.putString(		ATTR_PROFILE_USER_DEFAULT_ID,			profile.userDefaultId);
+		Util.setXmlEnum(xmlProfile,	ATTR_PROFILE_APP_DEFAULT_ID,		 	profile.appDefaultId);
 		
 		// layout
 		xmlProfile.putBoolean(		ATTR_IS_TOGGLE_MONTH_COLOR, 			profile.isToggleMonthColor);

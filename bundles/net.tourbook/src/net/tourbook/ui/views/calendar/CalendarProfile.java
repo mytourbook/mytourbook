@@ -29,6 +29,9 @@ import org.eclipse.swt.widgets.Display;
 
 public class CalendarProfile implements Cloneable {
 
+	private static int					_cloneCounter;
+	private static final boolean		_isLogCalendarProfile	= System.getProperty("logCalendarProfile") != null;	//$NON-NLS-1$
+
 	/**
 	 * <b>VERY IMPORTANT</b>
 	 * <p>
@@ -36,14 +39,13 @@ public class CalendarProfile implements Cloneable {
 	 * <p>
 	 * -> this is not a float !!!
 	 */
-	private final static NumberFormat _nf1 = NumberFormat.getNumberInstance(Locale.US);
+	private final static NumberFormat	_nf1					= NumberFormat.getNumberInstance(Locale.US);
 
 	static {
 
 		_nf1.setMinimumFractionDigits(1);
 		_nf1.setMaximumFractionDigits(1);
 	}
-	private boolean		_isLogCalendarProfile		= System.getProperty("logCalendarProfile") != null;				//$NON-NLS-1$
 
 	/*
 	 * Set default values also here to ensure that a valid value is set. A default value would not
@@ -54,8 +56,11 @@ public class CalendarProfile implements Cloneable {
 	
 	// profile
 	String					id							= Long.toString(System.nanoTime());
-	String					name						= Messages.Calendar_Profile_Name_Default;
-	ProfileDefault			defaultId					= CalendarProfileManager.DEFAULT_PROFILE_DEFAULT_ID;
+	String					profileName					= Messages.Calendar_Profile_Name_Default;
+	boolean					isAppDefault				= false;
+	boolean					isUserDefault				= false;
+	ProfileDefault			appDefaultId				= CalendarProfileManager.DEFAULT_PROFILE_DEFAULT_ID;
+	String					userDefaultId				= UI.EMPTY_STRING;
 	//
 	// layout
 	boolean					isToggleMonthColor			= false;
@@ -104,7 +109,7 @@ public class CalendarProfile implements Cloneable {
 	FontData				dayDateFont					= createFont(1.2f, SWT.BOLD);
 	DayDateFormat			dayDateFormat				= CalendarProfileManager.DEFAULT_DAY_DATE_FORMAT;
 	int 					dayDateMarginTop			= CalendarProfileManager.DEFAULT_DAY_DATE_MARGIN_TOP;
-	int 					dayDateMarginLeft			= CalendarProfileManager.DEFAULT_DAY_DATE_MARGIN_LEFT;;
+	int 					dayDateMarginLeft			= CalendarProfileManager.DEFAULT_DAY_DATE_MARGIN_LEFT;
 	//
 	// tour background
 	TourBackground			tourBackground				= CalendarProfileManager.DEFAULT_TOUR_BACKGROUND;
@@ -199,7 +204,7 @@ public class CalendarProfile implements Cloneable {
 			clonedProfile.id = Long.toString(System.nanoTime());
 
 			// create a unique name
-			clonedProfile.name = name + UI.SPACE + clonedProfile.id;
+			clonedProfile.profileName = profileName + UI.SPACE + ++_cloneCounter;
 
 			clonedProfile.yearHeaderFont = createFont(yearHeaderFont);
 			clonedProfile.dateColumnFont = createFont(dateColumnFont);
@@ -258,9 +263,9 @@ public class CalendarProfile implements Cloneable {
         sb.append("// SET_FORMATTING_OFF");                                                                         //$NON-NLS-1$
         sb.append("\n");                                                                                            //$NON-NLS-1$
         sb.append("\n");                                                                                            //$NON-NLS-1$
-        sb.append("//                                      " + profile.name + "\n");                                //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("//                                      " + profile.profileName + "\n");                         //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("\n");                                                                                            //$NON-NLS-1$
-        sb.append("profile.defaultId                     = ProfileDefault." + defaultId                   + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.appDefaultId                  = ProfileDefault." + appDefaultId                + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("\n");                                                                                            //$NON-NLS-1$
         sb.append("// layout                                                                                  \n"); //$NON-NLS-1$
         sb.append("profile.isToggleMonthColor            = " + isToggleMonthColor                         + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -511,7 +516,7 @@ public class CalendarProfile implements Cloneable {
 
 	@Override
 	public String toString() {
-		return "CalendarProfile [name=" + name + "]"; //$NON-NLS-1$ //$NON-NLS-2$
+		return "CalendarProfile [name=" + profileName + "]"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 }

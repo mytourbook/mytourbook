@@ -483,7 +483,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 
 			final CalendarProfile profile = allCalendarProfiles.get(profileIndex);
 
-			_comboProfiles.add(profile.name);
+			_comboProfiles.add(profile.profileName);
 
 			// get index for active profile
 			if (activeProfile.equals(profile)) {

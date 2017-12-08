@@ -150,7 +150,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	//
 	private Button					_btnProfile_Copy;
 	private Button					_btnProfile_Delete;
-	private Button					_btnApplyDefaults;
+	private Button					_btnApplyAppDefaults;
 	//
 	private Button					_chkIsHideDayDateWhenNoTour;
 	private Button					_chkIsShowDateColumn;
@@ -163,6 +163,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	private Button					_chkIsShowWeekValueUnit;
 	private Button					_chkIsShowYearColumns;
 	private Button					_chkIsTruncateTourText;
+	private Button					_chkIsUserDefaultId;
 	private Button					_chkUseDraggedScrolling;
 	//
 	private Button					_rdoYear_ColumnNumber;
@@ -190,7 +191,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	private Combo					_comboDateColumn;
 	private Combo					_comboDayHeaderDateFormat;
 	private Combo					_comboProfiles;
-	private Combo					_comboProfile_DefaultId;
+	private Combo					_comboProfile_AppDefaultId;
 	private Combo					_comboTour_Background;
 	private Combo					_comboTour_BackgroundColor1;
 	private Combo					_comboTour_BackgroundColor2;
@@ -220,7 +221,8 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	private Label					_lblDayHeader_Font;
 	private Label					_lblDayHeader_Format;
 	private Label					_lblProfile_Name;
-	private Label					_lblProfile_DefaultId;
+	private Label					_lblProfile_AppDefaultId;
+	private Label					_lblProfile_UserDefaultId;
 	private Label					_lblTour_ContentFont;
 	private Label					_lblTour_Margin;
 	private Label					_lblTour_TitleFont;
@@ -268,6 +270,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	private TableViewer				_profileViewer;
 	//
 	private Text					_txtProfileName;
+	private Text					_txtUserDefaultId;
 	//
 	private ToolItem				_toolItem;
 	private Button					_rdoWeekRow_Number;
@@ -336,6 +339,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		restoreState_Profile();
 
 		enableControls();
+		enableControls_ProfileProperties();
 	}
 
 	@Override
@@ -477,8 +481,8 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		table.setLayout(new TableLayout());
 
 		// !!! this prevents that the horizontal scrollbar is displayed, but is not always working :-(
-		table.setHeaderVisible(false);
-//		table.setHeaderVisible(true);
+//		table.setHeaderVisible(false);
+		table.setHeaderVisible(true);
 
 		_profileViewer = new TableViewer(table);
 
@@ -493,41 +497,102 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 			tvc = new TableViewerColumn(_profileViewer, SWT.LEAD);
 			tc = tvc.getColumn();
+			tc.setText(Messages.Slideout_CalendarOptions_ColumnHeader_Name);
 			tvc.setLabelProvider(new CellLabelProvider() {
 				@Override
 				public void update(final ViewerCell cell) {
 
 					final CalendarProfile profile = (CalendarProfile) cell.getElement();
 
-					cell.setText(profile.name);
+					cell.setText(profile.profileName);
 				}
 			});
 			tableLayout.setColumnData(tc, new ColumnWeightData(3, false));
 		}
-
 		{
-			// Column: Default ID
+			// Column: App default ID
 
 			tvc = new TableViewerColumn(_profileViewer, SWT.LEAD);
 			tc = tvc.getColumn();
+			tc.setText(Messages.Slideout_CalendarOptions_ColumnHeader_AppDefaultId);
 			tvc.setLabelProvider(new CellLabelProvider() {
 				@Override
 				public void update(final ViewerCell cell) {
 
 					final CalendarProfile profile = (CalendarProfile) cell.getElement();
 
-					cell.setText(profile.defaultId.name());
+					cell.setText(
+							profile.isUserDefault == false
+									? profile.appDefaultId.name()
+									: UI.EMPTY_STRING);
 				}
 			});
-			tableLayout.setColumnData(tc, new ColumnWeightData(2, false));
+			tableLayout.setColumnData(tc, new ColumnWeightData(3, false));
+		}
+		{
+			// Column: User default ID
+
+			tvc = new TableViewerColumn(_profileViewer, SWT.LEAD);
+			tc = tvc.getColumn();
+			tc.setText(Messages.Slideout_CalendarOptions_ColumnHeader_UserDefaultId);
+			tvc.setLabelProvider(new CellLabelProvider() {
+				@Override
+				public void update(final ViewerCell cell) {
+
+					final CalendarProfile profile = (CalendarProfile) cell.getElement();
+
+					cell.setText(
+							profile.isUserDefault
+									? profile.userDefaultId
+									: UI.EMPTY_STRING);
+				}
+			});
+			tableLayout.setColumnData(tc, new ColumnWeightData(3, false));
+		}
+		{
+			// Column: Is App ID
+
+			tvc = new TableViewerColumn(_profileViewer, SWT.CENTER);
+			tc = tvc.getColumn();
+			tc.setText(Messages.Slideout_CalendarOptions_ColumnHeader_IsAppId);
+			tc.setToolTipText(Messages.Slideout_CalendarOptions_ColumnHeader_IsAppId_Tooltip);
+			tvc.setLabelProvider(new CellLabelProvider() {
+				@Override
+				public void update(final ViewerCell cell) {
+
+					final boolean isAppDefault = ((CalendarProfile) cell.getElement()).isAppDefault;
+
+					cell.setText(String.valueOf(isAppDefault ? 'x' : ' '));
+				}
+			});
+			tableLayout.setColumnData(tc, new ColumnWeightData(1, false));
+		}
+		{
+			// Column: Is User ID
+
+			tvc = new TableViewerColumn(_profileViewer, SWT.CENTER);
+			tc = tvc.getColumn();
+			tc.setText(Messages.Slideout_CalendarOptions_ColumnHeader_IsUserId);
+			tc.setToolTipText(Messages.Slideout_CalendarOptions_ColumnHeader_IsUserId_Tooltip);
+			tvc.setLabelProvider(new CellLabelProvider() {
+				@Override
+				public void update(final ViewerCell cell) {
+
+					final boolean isUserDefault = ((CalendarProfile) cell.getElement()).isUserDefault;
+
+					cell.setText(String.valueOf(isUserDefault ? 'x' : ' '));
+				}
+			});
+			tableLayout.setColumnData(tc, new ColumnWeightData(1, false));
 		}
 
-// this is for debugging
+//// this is for debugging
 //		{
 //			// Column: ID
 //
 //			tvc = new TableViewerColumn(_profileViewer, SWT.LEAD);
 //			tc = tvc.getColumn();
+//			tc.setText("Profile ID");//$NON-NLS-1$
 //			tvc.setLabelProvider(new CellLabelProvider() {
 //				@Override
 //				public void update(final ViewerCell cell) {
@@ -804,6 +869,21 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 	private void createUI_150_ProfileData(final Composite parent) {
 
+		final SelectionAdapter selectionListener = new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				onModify_ProfileProperties();
+			}
+		};
+
+		final ModifyListener modifyListener = new ModifyListener() {
+			@Override
+			public void modifyText(final ModifyEvent e) {
+				onModify_ProfileProperties();
+			}
+		};
+
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory
@@ -824,17 +904,8 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 				// text
 				_txtProfileName = new Text(container, SWT.BORDER);
-				_txtProfileName.addModifyListener(new ModifyListener() {
-					@Override
-					public void modifyText(final ModifyEvent e) {
-						onModify_ProfileNameAndId();
-					}
-				});
-				GridDataFactory
-						.fillDefaults()//
-						.align(SWT.FILL, SWT.CENTER)
-						.grab(true, false)
-						.applyTo(_txtProfileName);
+				_txtProfileName.addModifyListener(modifyListener);
+				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).applyTo(_txtProfileName);
 			}
 			{
 				/*
@@ -842,45 +913,71 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				 */
 
 				// label
-				_lblProfile_DefaultId = new Label(container, SWT.NONE);
-				_lblProfile_DefaultId.setText(Messages.Slideout_CalendarOptions_Label_Profile_DefaultId);
-				_lblProfile_DefaultId.setToolTipText(Messages.Slideout_CalendarOptions_Label_Profile_DefaultId_Tooltip);
-				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_lblProfile_DefaultId);
+				_lblProfile_AppDefaultId = new Label(container, SWT.NONE);
+				_lblProfile_AppDefaultId.setText(Messages.Slideout_CalendarOptions_Label_Profile_DefaultId);
+				_lblProfile_AppDefaultId.setToolTipText(
+						Messages.Slideout_CalendarOptions_Label_Profile_DefaultId_Tooltip);
+				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_lblProfile_AppDefaultId);
 
 				final Composite containerDefaultId = new Composite(container, SWT.NONE);
 				GridDataFactory.fillDefaults().grab(true, false).applyTo(containerDefaultId);
 				GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerDefaultId);
 				{
 					// combo
-					_comboProfile_DefaultId = new Combo(containerDefaultId, SWT.DROP_DOWN | SWT.READ_ONLY);
-					_comboProfile_DefaultId.setVisibleItemCount(20);
-					_comboProfile_DefaultId.addSelectionListener(new SelectionAdapter() {
-
-						@Override
-						public void widgetSelected(final SelectionEvent e) {
-							onModify_ProfileNameAndId();
-						}
-					});
-					_comboProfile_DefaultId.addFocusListener(_keepOpenListener);
+					_comboProfile_AppDefaultId = new Combo(containerDefaultId, SWT.DROP_DOWN | SWT.READ_ONLY);
+					_comboProfile_AppDefaultId.setVisibleItemCount(20);
+					_comboProfile_AppDefaultId.addSelectionListener(selectionListener);
+					_comboProfile_AppDefaultId.addFocusListener(_keepOpenListener);
 
 					/*
 					 * Button: Apply defaults
 					 */
-					_btnApplyDefaults = new Button(containerDefaultId, SWT.PUSH);
-					_btnApplyDefaults.setText(Messages.App_Action_ApplyDefaults);
-					_btnApplyDefaults.setToolTipText(Messages.App_Action_ApplyDefaults_Tooltip);
-					_btnApplyDefaults.addSelectionListener(new SelectionAdapter() {
+					_btnApplyAppDefaults = new Button(containerDefaultId, SWT.PUSH);
+					_btnApplyAppDefaults.setText(Messages.App_Action_ApplyDefaults);
+					_btnApplyAppDefaults.setToolTipText(Messages.App_Action_ApplyDefaults_Tooltip);
+					_btnApplyAppDefaults.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(final SelectionEvent e) {
 							onProfile_Reset();
 						}
 					});
-					GridDataFactory.fillDefaults().indent(10, 0).applyTo(_btnApplyDefaults);
+					GridDataFactory.fillDefaults().indent(10, 0).applyTo(_btnApplyAppDefaults);
 
 					// set button default width
-					UI.setButtonLayoutData(_btnApplyDefaults);
+					UI.setButtonLayoutData(_btnApplyAppDefaults);
 				}
+			}
+			{
+				/*
+				 * Is User default profile
+				 */
 
+				// checkbox
+				_chkIsUserDefaultId = new Button(container, SWT.CHECK);
+				_chkIsUserDefaultId.setText(Messages.Slideout_CalendarOptions_Checkbox_IsUserDefaultProfile);
+				_chkIsUserDefaultId.setToolTipText(
+						Messages.Slideout_CalendarOptions_Checkbox_IsUserDefaultProfile_Tooltip);
+				_chkIsUserDefaultId.addSelectionListener(selectionListener);
+				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).span(2, 1).applyTo(_chkIsUserDefaultId);
+			}
+			{
+				/*
+				 * User default profile Name
+				 */
+
+				// label
+				_lblProfile_UserDefaultId = new Label(container, SWT.NONE);
+				_lblProfile_UserDefaultId.setText(Messages.Slideout_CalendarOptions_Label_Profile_UserDefaultID);
+				GridDataFactory
+						.fillDefaults()
+						.align(SWT.FILL, SWT.CENTER)
+						.indent(_subItemIndent, 0)
+						.applyTo(_lblProfile_UserDefaultId);
+
+				// text
+				_txtUserDefaultId = new Text(container, SWT.BORDER);
+				_txtUserDefaultId.addModifyListener(modifyListener);
+				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false).applyTo(_txtUserDefaultId);
 			}
 		}
 	}
@@ -2439,11 +2536,33 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		enableControls_WeekSummary();
 	}
 
+	private void enableControls_ProfileProperties() {
+
+		final CalendarProfile profile = CalendarProfileManager.getActiveCalendarProfile();
+
+		final boolean isAppDefault = profile.isAppDefault;
+		final boolean isUserDefaultId = _chkIsUserDefaultId.getSelection();
+		final boolean isNotUserDefault = isUserDefaultId == false;
+
+		_btnApplyAppDefaults.setEnabled(isNotUserDefault);
+
+		_chkIsUserDefaultId.setEnabled(!isAppDefault);
+		_comboProfile_AppDefaultId.setEnabled(isAppDefault == false);
+
+		_lblProfile_AppDefaultId.setEnabled(isNotUserDefault);
+		_lblProfile_UserDefaultId.setEnabled(isUserDefaultId);
+
+		_txtUserDefaultId.setEnabled(isUserDefaultId);
+	}
+
 	private void enableControls_Profiles() {
 
+		final CalendarProfile activeProfile = CalendarProfileManager.getActiveCalendarProfile();
 		final int numProfiles = _allCalendarProfiles.size();
 
-		_btnProfile_Delete.setEnabled(numProfiles > 1);
+		final boolean isAppDefault = activeProfile.isAppDefault;
+
+		_btnProfile_Delete.setEnabled(numProfiles > 1 && isAppDefault == false);
 	}
 
 	private void enableControls_TourInfo() {
@@ -2524,14 +2643,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		final boolean backupIsUpdateUI = _isUpdateUI;
 		_isUpdateUI = true;
 		{
-			/*
-			 * Fill Combos
-			 */
-
-			// profile defaults
-			for (final ProfileDefault data : ProfileDefault.values()) {
-				_comboProfile_DefaultId.add(data.name());
-			}
+			// Fill Combos
 
 			/*
 			 * Layout
@@ -2689,10 +2801,34 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			_comboProfiles.removeAll();
 
 			for (final CalendarProfile profile : _allCalendarProfiles) {
-				_comboProfiles.add(profile.name);
+				_comboProfiles.add(profile.profileName);
 			}
 		}
 		_isUpdateUI = backupIsUpdateUI;
+	}
+
+	private void fillUI_UserDefaultIds() {
+
+		for (final CalendarProfile profile : getAllUserDefaultIds()) {
+
+			if (profile.isUserDefault) {
+				_comboProfile_AppDefaultId.add(profile.userDefaultId);
+			}
+		}
+	}
+
+	private ArrayList<CalendarProfile> getAllUserDefaultIds() {
+
+		final ArrayList<CalendarProfile> userDefaultIds = new ArrayList<>();
+
+		for (final CalendarProfile profile : _allCalendarProfiles) {
+
+			if (profile.isUserDefault) {
+				userDefaultIds.add(profile);
+			}
+		}
+
+		return userDefaultIds;
 	}
 
 	private int getCalendarColumLayoutIndex(final ColumnStart requestedData) {
@@ -2827,6 +2963,20 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		return allCalendarColorData[selectedIndex].color;
 	}
 
+	private ProfileDefault getSelectedAppDefaultId() {
+
+		final int selectedIndex = _comboProfile_AppDefaultId.getSelectionIndex();
+
+		final ProfileDefault[] profileDefaults = ProfileDefault.values();
+
+		if (selectedIndex < 0) {
+
+			return profileDefaults[0];
+		}
+
+		return profileDefaults[selectedIndex];
+	}
+
 	private ColumnStart getSelectedColumnLayout() {
 
 		final int selectedIndex = _comboYear_ColumnStart.getSelectionIndex();
@@ -2866,20 +3016,6 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				.getAllDayHeaderDateFormat_ComboData()[selectedIndex];
 
 		return selectedData.dayHeaderDateFormat;
-	}
-
-	private ProfileDefault getSelectedDefaultId() {
-
-		final int selectedIndex = _comboProfile_DefaultId.getSelectionIndex();
-
-		final ProfileDefault[] profileDefaults = ProfileDefault.values();
-
-		if (selectedIndex < 0) {
-
-			return profileDefaults[0];
-		}
-
-		return profileDefaults[selectedIndex];
 	}
 
 	private FormatterData[] getSelectedFormatterData(	final DataFormatter[] allFormatter,
@@ -3189,12 +3325,49 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		_calendarView.updateUI_Graph();
 	}
 
-	private void onModify_ProfileNameAndId() {
+	private void onModify_ProfileProperties() {
 
 		if (_isUpdateUI) {
 			return;
 		}
 
+		final CalendarProfile activeProfile = CalendarProfileManager.getActiveCalendarProfile();
+
+		/*
+		 * User id CANNOT be deselected when profiles are based on the user default id
+		 */
+		final boolean isUserDefaultIdOld = activeProfile.isUserDefault;
+		final boolean isUserDefaultId = _chkIsUserDefaultId.getSelection();
+
+		if (isUserDefaultIdOld && isUserDefaultId == false) {
+
+			// user id state is modified from true->false -> check if profiles are based on this user default id
+
+			for (final CalendarProfile profile : _allCalendarProfiles) {
+
+				// skip current profile
+				if (activeProfile == profile) {
+					continue;
+				}
+
+				if (activeProfile.userDefaultId.equals(profile.userDefaultId)) {
+
+					MessageDialog.openInformation(
+							getToolTipShell(),
+							Messages.Slideout_CalendarOptions_Dialog_UserDefaultId_Title,
+							Messages.Slideout_CalendarOptions_Dialog_UserDefaultId_Message);
+
+					// reselect again
+					_chkIsUserDefaultId.setSelection(true);
+
+					return;
+				}
+			}
+		}
+
+		/*
+		 * Update profile name
+		 */
 		final String modifiedProfileName = _txtProfileName.getText();
 
 		// update text in profile combo
@@ -3204,11 +3377,54 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		// update combo in calendar view
 		_calendarView.updateUI_ProfileName(modifiedProfileName);
 
+		/*
+		 * Update default id
+		 */
+		final boolean backupIsUpdateUI = _isUpdateUI;
+		_isUpdateUI = true;
+		{
+
+			final int selectedAppDefaultIndex = _comboProfile_AppDefaultId.getSelectionIndex();
+
+			_comboProfile_AppDefaultId.removeAll();
+
+			if (isUserDefaultId) {
+
+				// a user default has no app default once it is set
+
+			} else {
+
+				// profile defaults
+				for (final ProfileDefault data : ProfileDefault.values()) {
+					_comboProfile_AppDefaultId.add(data.name());
+				}
+
+				fillUI_UserDefaultIds();
+
+				if (selectedAppDefaultIndex >= 0) {
+
+					_comboProfile_AppDefaultId.select(selectedAppDefaultIndex);
+
+				} else {
+
+					final int profileDefaultIdIndex = getProfileDefaultIdIndex(activeProfile.appDefaultId);
+
+					_comboProfile_AppDefaultId.select(profileDefaultIdIndex);
+				}
+			}
+		}
+		_isUpdateUI = backupIsUpdateUI;
+
+		/*
+		 * Update model+viewer
+		 */
 		// update profile BEFORE the viewer is updated
 		saveState_Profile();
 
 		// update profile viewer
 		_profileViewer.update(getSelectedProfile(), null);
+
+		enableControls_ProfileProperties();
 	}
 
 	private void onModify_TourValue(final Widget widget) {
@@ -3255,7 +3471,12 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			return;
 		}
 
-		updateUI_NewProfile(selectedProfile.clone());
+		final CalendarProfile clonedProfile = selectedProfile.clone();
+
+		// a copy can never be an app default
+		clonedProfile.isAppDefault = false;
+
+		updateUI_NewProfile(clonedProfile);
 	}
 
 	private void onProfile_Delete() {
@@ -3279,7 +3500,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 					null,
 					NLS.bind(
 							Messages.Slideout_CalendarOptions_Dialog_DeleteProfile_Message,
-							selectedProfile.name),
+							selectedProfile.profileName),
 					MessageDialog.QUESTION,
 					new String[] {
 							Messages.App_Action_DeleteProfile,
@@ -3381,6 +3602,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 		enableControls();
 		enableControls_Profiles();
+		enableControls_ProfileProperties();
 	}
 
 	void restoreState_Profile() {
@@ -3396,11 +3618,15 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			// get index AFTER getting the active profile because this could change the active profile
 			final int activeProfileIndex = CalendarProfileManager.getActiveCalendarProfileIndex();
 
-			// profile
+			// profile viewer/select
 			_comboProfiles.select(activeProfileIndex);
-			_comboProfile_DefaultId.select(getProfileDefaultIdIndex(profile.defaultId));
 			_profileViewer.setSelection(new StructuredSelection(profile), true);
-			_txtProfileName.setText(profile.name);
+
+			// profile properties
+			_chkIsUserDefaultId.setSelection(profile.isUserDefault);
+			_txtProfileName.setText(profile.profileName);
+			_txtUserDefaultId.setText(profile.userDefaultId);
+			selectAppDefaultId(profile.appDefaultId, profile.isUserDefault);
 
 			// layout
 			_chkIsShowMonthColor.setSelection(profile.isToggleMonthColor);
@@ -3521,8 +3747,10 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		final CalendarProfile profile = CalendarProfileManager.getActiveCalendarProfile();
 
 		// profile
-		profile.name = _txtProfileName.getText();
-		profile.defaultId = getSelectedDefaultId();
+		profile.appDefaultId = getSelectedAppDefaultId();
+		profile.userDefaultId = _txtUserDefaultId.getText();
+		profile.isUserDefault = _chkIsUserDefaultId.getSelection();
+		profile.profileName = _txtProfileName.getText();
 
 		// layout
 		profile.alternateMonthRGB = _colorMonth_AlternateColor.getColorValue();
@@ -3633,6 +3861,34 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 		final int selectedTabIndex = _tabFolder.getSelectionIndex();
 		_state.put(STATE_SELECTED_TAB, selectedTabIndex < 0 ? 0 : selectedTabIndex);
+	}
+
+	private void selectAppDefaultId(final ProfileDefault appDefaultId, final boolean isUserDefault) {
+
+		final boolean backupIsUpdateUI = _isUpdateUI;
+		_isUpdateUI = true;
+		{
+			_comboProfile_AppDefaultId.removeAll();
+
+			if (isUserDefault) {
+
+				// a user default has no app default once it is set
+
+			} else {
+
+				// profile defaults
+				for (final ProfileDefault data : ProfileDefault.values()) {
+					_comboProfile_AppDefaultId.add(data.name());
+				}
+
+				fillUI_UserDefaultIds();
+
+				final int profileDefaultIdIndex = getProfileDefaultIdIndex(appDefaultId);
+
+				_comboProfile_AppDefaultId.select(profileDefaultIdIndex);
+			}
+		}
+		_isUpdateUI = backupIsUpdateUI;
 	}
 
 	private void selectDataFormatter(	final FormatterData[] allFormatterData,

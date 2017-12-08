@@ -79,6 +79,7 @@ public class Messages extends NLS {
 	public static String		Calendar_Profile_TourBorder_Right;
 	public static String		Calendar_Profile_TourBorder_Top;
 	public static String		Calendar_Profile_TourBorder_TopBottom;
+	public static String		Calendar_Profile_UserDefaultName;
 	public static String		Calendar_Profile_Value_Altitude;
 	public static String		Calendar_Profile_Value_Description;
 	public static String		Calendar_Profile_Value_Distance;
@@ -1628,10 +1629,21 @@ public class Messages extends NLS {
 	public static String		Slideout_CalendarOptions_Checkbox_IsToggleMonthColor;
 	public static String		Slideout_CalendarOptions_Checkbox_IsToggleMonthColor_Tooltip;
 	public static String		Slideout_CalendarOptions_Checkbox_IsTruncateTourText;
+	public static String		Slideout_CalendarOptions_Checkbox_IsUserDefaultProfile;
+	public static String		Slideout_CalendarOptions_Checkbox_IsUserDefaultProfile_Tooltip;
 	public static String		Slideout_CalendarOptions_Checkbox_UseDraggedScrolling;
 	public static String		Slideout_CalendarOptions_Checkbox_UseDraggedScrolling_Tooltip;
+	public static String		Slideout_CalendarOptions_ColumnHeader_AppDefaultId;
+	public static String		Slideout_CalendarOptions_ColumnHeader_IsAppId;
+	public static String		Slideout_CalendarOptions_ColumnHeader_IsAppId_Tooltip;
+	public static String		Slideout_CalendarOptions_ColumnHeader_IsUserId;
+	public static String		Slideout_CalendarOptions_ColumnHeader_IsUserId_Tooltip;
+	public static String		Slideout_CalendarOptions_ColumnHeader_Name;
+	public static String		Slideout_CalendarOptions_ColumnHeader_UserDefaultId;
 	public static String		Slideout_CalendarOptions_Dialog_DeleteProfile_Message;
 	public static String		Slideout_CalendarOptions_Dialog_DeleteProfile_Title;
+	public static String		Slideout_CalendarOptions_Dialog_UserDefaultId_Message;
+	public static String		Slideout_CalendarOptions_Dialog_UserDefaultId_Title;
 	public static String		Slideout_CalendarOptions_Group_DateColumn;
 	public static String		Slideout_CalendarOptions_Group_DayDate;
 	public static String		Slideout_CalendarOptions_Group_Layout;
@@ -1655,6 +1667,7 @@ public class Messages extends NLS {
 	public static String		Slideout_CalendarOptions_Label_Profile_DefaultId_Tooltip;
 	public static String		Slideout_CalendarOptions_Label_Profile_DragDropHint;
 	public static String		Slideout_CalendarOptions_Label_Profile_Name;
+	public static String		Slideout_CalendarOptions_Label_Profile_UserDefaultID;
 	public static String		Slideout_CalendarOptions_Label_Profiles;
 	public static String		Slideout_CalendarOptions_Label_Title;
 	public static String		Slideout_CalendarOptions_Label_Tour_BackgroundColor;
