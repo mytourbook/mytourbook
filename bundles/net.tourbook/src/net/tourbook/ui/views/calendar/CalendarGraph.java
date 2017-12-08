@@ -874,8 +874,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		final int canvasWidth = _calendarCanvas.width;
 		final int canvasHeight = _calendarCanvas.height;
 
-		final int calendarLeftMargin = 5;
-		final int calendarWidth = canvasWidth - calendarLeftMargin * 2;
+		final int calendarMargin = 5;
+		final int calendarWidth = canvasWidth - calendarMargin * 2;
+		final int calendarHeight = canvasHeight - calendarMargin;
 
 		/*
 		 * In focus control and focus gained can be different, for win7 it depends if a dialog was
@@ -939,17 +940,19 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		// set year header font
 		getFont_YearHeader();
 
-		final int yearHeaderHeight = useYearColumns ? _fontHeight_YearHeader + 20 : 0;
+		final int yearHeaderHeight = useYearColumns
+				? _fontHeight_YearHeader + 20
+				: calendarMargin;
 
-		final int canvasHeightWithoutYearHeader = canvasHeight - yearHeaderHeight;
+		final int calendarHeightWithoutYearHeader = calendarHeight - yearHeaderHeight;
 
 		final int weekHeight = _currentProfile.isWeekRowHeight
 				? _currentProfile.weekHeight
 				: Math.max(
 						CalendarProfileManager.WEEK_HEIGHT_MIN,
-						canvasHeightWithoutYearHeader / _currentProfile.weekRows);
+						calendarHeightWithoutYearHeader / _currentProfile.weekRows);
 
-		int numVisibleRows = canvasHeightWithoutYearHeader / weekHeight;
+		int numVisibleRows = calendarHeightWithoutYearHeader / weekHeight;
 
 		if (useYearColumns) {
 
@@ -1099,14 +1102,16 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			_nextWeekDateYPos = 0;
 
 			final int columnColumSpacing = columnIndex == 0 ? 0 : yearColumnsSpacing;
-			final int calendarColumnOffset = calendarLeftMargin + calendarColumnWidth * columnIndex + columnColumSpacing
-					* columnIndex;
+
+			final int calendarColumnOffset = calendarMargin
+					+ calendarColumnWidth * columnIndex
+					+ columnColumSpacing * columnIndex;
 
 			_calendarAllDaysRectangle[columnIndex] = new Rectangle(
 					calendarColumnOffset + dateColumnWidth,
 					0,
 					(int) (7 * dayWidth),
-					canvasHeight);
+					calendarHeight);
 
 			if (useYearColumns) {
 
