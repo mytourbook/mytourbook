@@ -57,6 +57,8 @@ public class SimpleFontEditor extends Composite {
 
 	private Spinner				_spinnerFontSize;
 
+	private boolean				_isPackShell;
+
 	public SimpleFontEditor(final Composite parent, final int style) {
 
 		super(parent, style);
@@ -264,6 +266,10 @@ public class SimpleFontEditor extends Composite {
 		super.setEnabled(isEnabled);
 	}
 
+	public void setIsPackShell(final boolean isPackShell) {
+		_isPackShell = isPackShell;
+	}
+
 	public void setSelection(final FontData fontData) {
 
 		updateFont(new FontData[] { fontData });
@@ -300,9 +306,12 @@ public class SimpleFontEditor extends Composite {
 			_lblSelectedFont.setFont(_selectedFont);
 			_spinnerFontSize.setSelection(_selectedFontData[0].getHeight());
 
-			// ensure that the selected font is displayed
-			_spinnerFontSize.getParent().layout(true, true);
-			this.getShell().pack(true);
+			if (_isPackShell) {
+
+				// ensure that the selected font is displayed
+				_spinnerFontSize.getParent().layout(true, true);
+				this.getShell().pack(true);
+			}
 		}
 	}
 }
