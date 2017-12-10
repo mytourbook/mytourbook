@@ -57,9 +57,8 @@ public class CalendarProfile implements Cloneable {
 	// profile
 	String					id							= Long.toString(System.nanoTime());
 	String					profileName					= Messages.Calendar_Profile_Name_Default;
-	boolean					isAppDefault				= false;
+	DefaultId				defaultId					= CalendarProfileManager.DEFAULT_PROFILE_DEFAULT_ID;
 	boolean					isUserDefault				= false;
-	ProfileDefault			appDefaultId				= CalendarProfileManager.DEFAULT_PROFILE_DEFAULT_ID;
 	String					userDefaultId				= UI.EMPTY_STRING;
 	//
 	// layout
@@ -265,7 +264,7 @@ public class CalendarProfile implements Cloneable {
         sb.append("\n");                                                                                            //$NON-NLS-1$
         sb.append("//                                      " + profile.profileName + "\n");                         //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("\n");                                                                                            //$NON-NLS-1$
-        sb.append("profile.appDefaultId                  = ProfileDefault." + appDefaultId                + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.defaultId                     = DefaultId." + defaultId                        + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("\n");                                                                                            //$NON-NLS-1$
         sb.append("// layout                                                                                  \n"); //$NON-NLS-1$
         sb.append("profile.isToggleMonthColor            = " + isToggleMonthColor                         + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$

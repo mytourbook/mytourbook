@@ -3691,7 +3691,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 	private void zoom_ToDefault() {
 
-		final CalendarProfile dummyProfile = CalendarProfileManager.createProfileFromId(_currentProfile.appDefaultId);
+		final CalendarProfile dummyProfile = CalendarProfileManager.createProfileFromId(_currentProfile.defaultId);
 
 		if (_currentProfile.isWeekRowHeight) {
 

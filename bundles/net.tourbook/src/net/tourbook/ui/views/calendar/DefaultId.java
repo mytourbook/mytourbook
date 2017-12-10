@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.views.calendar;
 
-public enum ProfileDefault {
+public enum DefaultId {
 
 	DEFAULT, //
 
@@ -28,4 +28,9 @@ public enum ProfileDefault {
 	YEAR_III, //
 
 	CLASSIC, //
+
+	/**
+	 * This is a special id, when this is a user parent id
+	 */
+	USER_ID
 }

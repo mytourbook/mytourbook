@@ -35,6 +35,7 @@ import net.tourbook.ui.views.calendar.CalendarProfileManager.DateColumn_ComboDat
 import net.tourbook.ui.views.calendar.CalendarProfileManager.DayContentColor_ComboData;
 import net.tourbook.ui.views.calendar.CalendarProfileManager.DayHeaderDateFormat_ComboData;
 import net.tourbook.ui.views.calendar.CalendarProfileManager.ICalendarProfileListener;
+import net.tourbook.ui.views.calendar.CalendarProfileManager.ProfileDefaultId_ComboData;
 import net.tourbook.ui.views.calendar.CalendarProfileManager.TourBackground_ComboData;
 import net.tourbook.ui.views.calendar.CalendarProfileManager.TourBorder_ComboData;
 
@@ -122,160 +123,165 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	//
 	static {}
 	//
-	private IFontEditorListener		_defaultFontEditorListener;
-	private MouseWheelListener		_defaultMouseWheelListener;
-	private IPropertyChangeListener	_defaultPropertyChangeListener;
-	private SelectionAdapter		_defaultSelectionListener;
-	private FocusListener			_keepOpenListener;
-	private SelectionAdapter		_tourValueListener;
-	private SelectionAdapter		_weekValueListener;
+	/**
+	 * Contains the app default id's and the user default id's
+	 */
+	ArrayList<ProfileDefaultId_ComboData>	_allDefaultComboData	= new ArrayList<>();
 	//
-	private long					_dragStartViewerLeft;
+	private IFontEditorListener				_defaultFontEditorListener;
+	private MouseWheelListener				_defaultMouseWheelListener;
+	private IPropertyChangeListener			_defaultPropertyChangeListener;
+	private SelectionAdapter				_defaultSelectionListener;
+	private FocusListener					_keepOpenListener;
+	private SelectionAdapter				_tourValueListener;
+	private SelectionAdapter				_weekValueListener;
 	//
-	private boolean					_isUpdateUI;
+	private long							_dragStartViewerLeft;
 	//
-	private PixelConverter			_pc;
-	private int						_subItemIndent;
+	private boolean							_isUpdateUI;
+	//
+	private PixelConverter					_pc;
+	private int								_subItemIndent;
 
 	/*
 	 * This is a hack to vertical center the font label, otherwise it will be complicated to set it
 	 * correctly
 	 */
-	private int						_fontLabelVIndent	= 5;
+	private int								_fontLabelVIndent		= 5;
 
 	/*
 	 * UI controls
 	 */
-	private CalendarView			_calendarView;
+	private CalendarView					_calendarView;
 	//
-	private Button					_btnProfile_Copy;
-	private Button					_btnProfile_Delete;
-	private Button					_btnApplyAppDefaults;
+	private Button							_btnProfile_Copy;
+	private Button							_btnProfile_Delete;
+	private Button							_btnApplyAppDefaults;
 	//
-	private Button					_chkIsHideDayDateWhenNoTour;
-	private Button					_chkIsShowDateColumn;
-	private Button					_chkIsShowDayDateWeekendColor;
-	private Button					_chkIsShowDayDate;
-	private Button					_chkIsShowMonthColor;
-	private Button					_chkIsShowSummaryColumn;
-	private Button					_chkIsShowTourContent;
-	private Button					_chkIsShowTourValueUnit;
-	private Button					_chkIsShowWeekValueUnit;
-	private Button					_chkIsShowYearColumns;
-	private Button					_chkIsTruncateTourText;
-	private Button					_chkIsUserDefaultId;
-	private Button					_chkUseDraggedScrolling;
+	private Button							_chkIsHideDayDateWhenNoTour;
+	private Button							_chkIsShowDateColumn;
+	private Button							_chkIsShowDayDateWeekendColor;
+	private Button							_chkIsShowDayDate;
+	private Button							_chkIsShowMonthColor;
+	private Button							_chkIsShowSummaryColumn;
+	private Button							_chkIsShowTourContent;
+	private Button							_chkIsShowTourValueUnit;
+	private Button							_chkIsShowWeekValueUnit;
+	private Button							_chkIsShowYearColumns;
+	private Button							_chkIsTruncateTourText;
+	private Button							_chkIsUserDefaultId;
+	private Button							_chkUseDraggedScrolling;
 	//
-	private Button					_rdoYear_ColumnNumber;
-	private Button					_rdoYear_ColumnDayWidth;
+	private Button							_rdoYear_ColumnNumber;
+	private Button							_rdoYear_ColumnDayWidth;
 	//
-	private Button[]				_chkTour_AllIsShowLines;
-	private Button[]				_chkWeek_AllIsShowLines;
+	private Button[]						_chkTour_AllIsShowLines;
+	private Button[]						_chkWeek_AllIsShowLines;
 	//
-	private ColorSelectorExtended	_colorMonth_AlternateColor;
-	private ColorSelectorExtended	_colorCalendar_BackgroundColor;
-	private ColorSelectorExtended	_colorCalendar_ForegroundColor;
-	private ColorSelectorExtended	_colorDay_HoveredColor;
-	private ColorSelectorExtended	_colorDay_SelectedColor;
-	private ColorSelectorExtended	_colorTour_BackgroundColor1;
-	private ColorSelectorExtended	_colorTour_BackgroundColor2;
-	private ColorSelectorExtended	_colorTour_BorderColor;
-	private ColorSelectorExtended	_colorTour_ContentColor;
-	private ColorSelectorExtended	_colorTour_DraggedColor;
-	private ColorSelectorExtended	_colorTour_HoveredColor;
-	private ColorSelectorExtended	_colorTour_SelectedColor;
-	private ColorSelectorExtended	_colorTour_TitleColor;
-	private ColorSelectorExtended	_colorTour_ValueColor;
-	private ColorSelectorExtended	_colorWeek_ValueColor;
+	private ColorSelectorExtended			_colorMonth_AlternateColor;
+	private ColorSelectorExtended			_colorCalendar_BackgroundColor;
+	private ColorSelectorExtended			_colorCalendar_ForegroundColor;
+	private ColorSelectorExtended			_colorDay_HoveredColor;
+	private ColorSelectorExtended			_colorDay_SelectedColor;
+	private ColorSelectorExtended			_colorTour_BackgroundColor1;
+	private ColorSelectorExtended			_colorTour_BackgroundColor2;
+	private ColorSelectorExtended			_colorTour_BorderColor;
+	private ColorSelectorExtended			_colorTour_ContentColor;
+	private ColorSelectorExtended			_colorTour_DraggedColor;
+	private ColorSelectorExtended			_colorTour_HoveredColor;
+	private ColorSelectorExtended			_colorTour_SelectedColor;
+	private ColorSelectorExtended			_colorTour_TitleColor;
+	private ColorSelectorExtended			_colorTour_ValueColor;
+	private ColorSelectorExtended			_colorWeek_ValueColor;
 	//
-	private Combo					_comboDateColumn;
-	private Combo					_comboDayHeaderDateFormat;
-	private Combo					_comboProfiles;
-	private Combo					_comboProfile_AppDefaultId;
-	private Combo					_comboTour_Background;
-	private Combo					_comboTour_BackgroundColor1;
-	private Combo					_comboTour_BackgroundColor2;
-	private Combo					_comboTour_BorderLayout;
-	private Combo					_comboTour_BorderColor;
-	private Combo					_comboTour_ContentColor;
-	private Combo					_comboTour_DraggedColor;
-	private Combo					_comboTour_HoveredColor;
-	private Combo					_comboTour_SelectedColor;
-	private Combo					_comboTour_TitleColor;
-	private Combo					_comboTour_ValueColor;
-	private Combo					_comboWeek_ValueColor;
-	private Combo					_comboYear_ColumnStart;
+	private Combo							_comboDateColumn;
+	private Combo							_comboDayHeaderDateFormat;
+	private Combo							_comboProfiles;
+	private Combo							_comboProfile_AllDefaultId;
+	private Combo							_comboTour_Background;
+	private Combo							_comboTour_BackgroundColor1;
+	private Combo							_comboTour_BackgroundColor2;
+	private Combo							_comboTour_BorderLayout;
+	private Combo							_comboTour_BorderColor;
+	private Combo							_comboTour_ContentColor;
+	private Combo							_comboTour_DraggedColor;
+	private Combo							_comboTour_HoveredColor;
+	private Combo							_comboTour_SelectedColor;
+	private Combo							_comboTour_TitleColor;
+	private Combo							_comboTour_ValueColor;
+	private Combo							_comboWeek_ValueColor;
+	private Combo							_comboYear_ColumnStart;
 	//
-	private Combo[]					_comboTour_AllValues;
-	private Combo[]					_comboTour_AllFormats;
-	private Combo[]					_comboWeek_AllValues;
-	private Combo[]					_comboWeek_AllFormats;
+	private Combo[]							_comboTour_AllValues;
+	private Combo[]							_comboTour_AllFormats;
+	private Combo[]							_comboWeek_AllValues;
+	private Combo[]							_comboWeek_AllFormats;
 	//
-	private Composite				_tourFormatterContainer;
-	private Composite				_weekFormatterContainer;
+	private Composite						_tourFormatterContainer;
+	private Composite						_weekFormatterContainer;
 	//
-	private Label					_lblDateColumn_Content;
-	private Label					_lblDateColumn_Font;
-	private Label					_lblDateColumn_Width;
-	private Label					_lblDayDate_Margin;
-	private Label					_lblDayHeader_Font;
-	private Label					_lblDayHeader_Format;
-	private Label					_lblProfile_Name;
-	private Label					_lblProfile_AppDefaultId;
-	private Label					_lblProfile_UserDefaultId;
-	private Label					_lblTour_ContentFont;
-	private Label					_lblTour_Margin;
-	private Label					_lblTour_TitleFont;
-	private Label					_lblTour_TruncatedLines;
-	private Label					_lblTour_ValueColumns;
-	private Label					_lblTour_ValueFont;
-	private Label					_lblWeek_ColumnWidth;
-	private Label					_lblWeek_ValueFont;
-	private Label					_lblWeek_Margin;
-	private Label					_lblYearColumn_HeaderFont;
-	private Label					_lblYear_ColumnSpacing;
-	private Label					_lblYear_ColumnStart;
+	private Label							_lblDateColumn_Content;
+	private Label							_lblDateColumn_Font;
+	private Label							_lblDateColumn_Width;
+	private Label							_lblDayDate_Margin;
+	private Label							_lblDayHeader_Font;
+	private Label							_lblDayHeader_Format;
+	private Label							_lblProfile_Name;
+	private Label							_lblProfile_AppDefaultId;
+	private Label							_lblProfile_UserDefaultId;
+	private Label							_lblTour_ContentFont;
+	private Label							_lblTour_Margin;
+	private Label							_lblTour_TitleFont;
+	private Label							_lblTour_TruncatedLines;
+	private Label							_lblTour_ValueColumns;
+	private Label							_lblTour_ValueFont;
+	private Label							_lblWeek_ColumnWidth;
+	private Label							_lblWeek_ValueFont;
+	private Label							_lblWeek_Margin;
+	private Label							_lblYearColumn_HeaderFont;
+	private Label							_lblYear_ColumnSpacing;
+	private Label							_lblYear_ColumnStart;
 	//
-	private SimpleFontEditor		_fontEditorDayDate;
-	private SimpleFontEditor		_fontEditorDateColumn;
-	private SimpleFontEditor		_fontEditorTourTitle;
-	private SimpleFontEditor		_fontEditorTourContent;
-	private SimpleFontEditor		_fontEditorTourValue;
-	private SimpleFontEditor		_fontEditorWeekValue;
-	private SimpleFontEditor		_fontEditorYearColumnHeader;
+	private SimpleFontEditor				_fontEditorDayDate;
+	private SimpleFontEditor				_fontEditorDateColumn;
+	private SimpleFontEditor				_fontEditorTourTitle;
+	private SimpleFontEditor				_fontEditorTourContent;
+	private SimpleFontEditor				_fontEditorTourValue;
+	private SimpleFontEditor				_fontEditorWeekValue;
+	private SimpleFontEditor				_fontEditorYearColumnHeader;
 	//
-	private Spinner					_spinnerDateColumnWidth;
-	private Spinner					_spinnerDayDate_Margin_Top;
-	private Spinner					_spinnerDayDate_Margin_Left;
-	private Spinner					_spinnerTour_BackgroundWidth;
-	private Spinner					_spinnerTour_BorderWidth;
-	private Spinner					_spinnerTour_Margin_Top;
-	private Spinner					_spinnerTour_Margin_Bottom;
-	private Spinner					_spinnerTour_Margin_Left;
-	private Spinner					_spinnerTour_Margin_Right;
-	private Spinner					_spinnerTour_TruncatedLines;
-	private Spinner					_spinnerTour_ValueColumns;
-	private Spinner					_spinnerWeek_ColumnWidth;
-	private Spinner					_spinnerWeek_Height;
-	private Spinner					_spinnerWeek_Margin_Top;
-	private Spinner					_spinnerWeek_Margin_Left;
-	private Spinner					_spinnerWeek_Margin_Bottom;
-	private Spinner					_spinnerWeek_Margin_Right;
-	private Spinner					_spinnerYear_Columns;
-	private Spinner					_spinnerYear_ColumnSpacing;
-	private Spinner					_spinnerYear_DayWidth;
+	private Spinner							_spinnerDateColumnWidth;
+	private Spinner							_spinnerDayDate_Margin_Top;
+	private Spinner							_spinnerDayDate_Margin_Left;
+	private Spinner							_spinnerTour_BackgroundWidth;
+	private Spinner							_spinnerTour_BorderWidth;
+	private Spinner							_spinnerTour_Margin_Top;
+	private Spinner							_spinnerTour_Margin_Bottom;
+	private Spinner							_spinnerTour_Margin_Left;
+	private Spinner							_spinnerTour_Margin_Right;
+	private Spinner							_spinnerTour_TruncatedLines;
+	private Spinner							_spinnerTour_ValueColumns;
+	private Spinner							_spinnerWeek_ColumnWidth;
+	private Spinner							_spinnerWeek_Height;
+	private Spinner							_spinnerWeek_Margin_Top;
+	private Spinner							_spinnerWeek_Margin_Left;
+	private Spinner							_spinnerWeek_Margin_Bottom;
+	private Spinner							_spinnerWeek_Margin_Right;
+	private Spinner							_spinnerYear_Columns;
+	private Spinner							_spinnerYear_ColumnSpacing;
+	private Spinner							_spinnerYear_DayWidth;
 	//
-	private TabFolder				_tabFolder;
+	private TabFolder						_tabFolder;
 	//
-	private TableViewer				_profileViewer;
+	private TableViewer						_profileViewer;
 	//
-	private Text					_txtProfileName;
-	private Text					_txtUserDefaultId;
+	private Text							_txtProfileName;
+	private Text							_txtUserDefaultId;
 	//
-	private ToolItem				_toolItem;
-	private Button					_rdoWeekRow_Number;
-	private Spinner					_spinnerWeek_Rows;
-	private Button					_rdoWeekRow_Height;
+	private ToolItem						_toolItem;
+	private Button							_rdoWeekRow_Number;
+	private Spinner							_spinnerWeek_Rows;
+	private Button							_rdoWeekRow_Height;
 
 	private class ProfileProvider implements IStructuredContentProvider {
 
@@ -510,21 +516,28 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			tableLayout.setColumnData(tc, new ColumnWeightData(3, false));
 		}
 		{
-			// Column: App default ID
+			// Column: Default ID
 
 			tvc = new TableViewerColumn(_profileViewer, SWT.LEAD);
 			tc = tvc.getColumn();
-			tc.setText(Messages.Slideout_CalendarOptions_ColumnHeader_AppDefaultId);
+			tc.setText(Messages.Slideout_CalendarOptions_ColumnHeader_DefaultId);
 			tvc.setLabelProvider(new CellLabelProvider() {
 				@Override
 				public void update(final ViewerCell cell) {
 
 					final CalendarProfile profile = (CalendarProfile) cell.getElement();
 
+					final boolean isAppDefault = profile.defaultId != DefaultId.USER_ID;
+
+					final boolean isUserDefault = profile.defaultId == DefaultId.USER_ID
+							&& profile.isUserDefault;
+
 					cell.setText(
-							profile.isUserDefault == false
-									? profile.appDefaultId.name()
-									: UI.EMPTY_STRING);
+							isAppDefault
+									? profile.defaultId.name()
+									: isUserDefault
+											? profile.userDefaultId
+											: UI.EMPTY_STRING);
 				}
 			});
 			tableLayout.setColumnData(tc, new ColumnWeightData(3, false));
@@ -560,7 +573,8 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				@Override
 				public void update(final ViewerCell cell) {
 
-					final boolean isAppDefault = ((CalendarProfile) cell.getElement()).isAppDefault;
+					final CalendarProfile profile = (CalendarProfile) cell.getElement();
+					final boolean isAppDefault = profile.defaultId != DefaultId.USER_ID;
 
 					cell.setText(String.valueOf(isAppDefault ? 'x' : ' '));
 				}
@@ -924,10 +938,10 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerDefaultId);
 				{
 					// combo
-					_comboProfile_AppDefaultId = new Combo(containerDefaultId, SWT.DROP_DOWN | SWT.READ_ONLY);
-					_comboProfile_AppDefaultId.setVisibleItemCount(20);
-					_comboProfile_AppDefaultId.addSelectionListener(selectionListener);
-					_comboProfile_AppDefaultId.addFocusListener(_keepOpenListener);
+					_comboProfile_AllDefaultId = new Combo(containerDefaultId, SWT.DROP_DOWN | SWT.READ_ONLY);
+					_comboProfile_AllDefaultId.setVisibleItemCount(20);
+					_comboProfile_AllDefaultId.addSelectionListener(selectionListener);
+					_comboProfile_AllDefaultId.addFocusListener(_keepOpenListener);
 
 					/*
 					 * Button: Apply defaults
@@ -2540,14 +2554,14 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 		final CalendarProfile profile = CalendarProfileManager.getActiveCalendarProfile();
 
-		final boolean isAppDefault = profile.isAppDefault;
+		final boolean isAppDefault = profile.defaultId != DefaultId.USER_ID;
 		final boolean isUserDefaultId = _chkIsUserDefaultId.getSelection();
 		final boolean isNotUserDefault = isUserDefaultId == false;
 
 		_btnApplyAppDefaults.setEnabled(isNotUserDefault);
 
 		_chkIsUserDefaultId.setEnabled(!isAppDefault);
-		_comboProfile_AppDefaultId.setEnabled(isAppDefault == false);
+		_comboProfile_AllDefaultId.setEnabled(isAppDefault == false);
 
 		_lblProfile_AppDefaultId.setEnabled(isNotUserDefault);
 		_lblProfile_UserDefaultId.setEnabled(isUserDefaultId);
@@ -2560,7 +2574,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		final CalendarProfile activeProfile = CalendarProfileManager.getActiveCalendarProfile();
 		final int numProfiles = _allCalendarProfiles.size();
 
-		final boolean isAppDefault = activeProfile.isAppDefault;
+		final boolean isAppDefault = activeProfile.defaultId != DefaultId.USER_ID;
 
 		_btnProfile_Delete.setEnabled(numProfiles > 1 && isAppDefault == false);
 	}
@@ -2718,6 +2732,41 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		_isUpdateUI = backupIsUpdateUI;
 	}
 
+	private void fillUI_AllDefaultIds() {
+
+		/*
+		 * Create combo data
+		 */
+		_allDefaultComboData.clear();
+
+		// add app default ids
+		for (final ProfileDefaultId_ComboData comboData : CalendarProfileManager.getAllAppDefault_ComboData()) {
+			_allDefaultComboData.add(comboData);
+		}
+
+		// add user default ids
+		for (final CalendarProfile profile : getAllUserDefaultIds()) {
+
+			if (profile.isUserDefault) {
+
+				final ProfileDefaultId_ComboData userDefaultComboData = new ProfileDefaultId_ComboData(
+						DefaultId.USER_ID,
+						profile.userDefaultId);
+
+				_allDefaultComboData.add(userDefaultComboData);
+			}
+		}
+
+		/*
+		 * Fill combo
+		 */
+		_comboProfile_AllDefaultId.removeAll();
+
+		for (final ProfileDefaultId_ComboData comboData : _allDefaultComboData) {
+			_comboProfile_AllDefaultId.add(comboData.label);
+		}
+	}
+
 	private void fillUI_Combo_GraphColor(final Combo combo) {
 
 		final CalendarColor_ComboData[] comboData = CalendarProfileManager.getAllGraphColor_ComboData();
@@ -2805,16 +2854,6 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			}
 		}
 		_isUpdateUI = backupIsUpdateUI;
-	}
-
-	private void fillUI_UserDefaultIds() {
-
-		for (final CalendarProfile profile : getAllUserDefaultIds()) {
-
-			if (profile.isUserDefault) {
-				_comboProfile_AppDefaultId.add(profile.userDefaultId);
-			}
-		}
 	}
 
 	private ArrayList<CalendarProfile> getAllUserDefaultIds() {
@@ -2911,13 +2950,13 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		return itemBounds;
 	}
 
-	private int getProfileDefaultIdIndex(final ProfileDefault defaultId) {
+	private int getProfileDefaultIdIndex(final DefaultId defaultId) {
 
-		final ProfileDefault[] profileDefaults = ProfileDefault.values();
+		final DefaultId[] profileDefaults = DefaultId.values();
 
 		for (int defaultIndex = 0; defaultIndex < profileDefaults.length; defaultIndex++) {
 
-			final ProfileDefault profileDefault = profileDefaults[defaultIndex];
+			final DefaultId profileDefault = profileDefaults[defaultIndex];
 
 			if (profileDefault.equals(defaultId)) {
 				return defaultIndex;
@@ -2963,20 +3002,6 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		return allCalendarColorData[selectedIndex].color;
 	}
 
-	private ProfileDefault getSelectedAppDefaultId() {
-
-		final int selectedIndex = _comboProfile_AppDefaultId.getSelectionIndex();
-
-		final ProfileDefault[] profileDefaults = ProfileDefault.values();
-
-		if (selectedIndex < 0) {
-
-			return profileDefaults[0];
-		}
-
-		return profileDefaults[selectedIndex];
-	}
-
 	private ColumnStart getSelectedColumnLayout() {
 
 		final int selectedIndex = _comboYear_ColumnStart.getSelectionIndex();
@@ -3016,6 +3041,20 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				.getAllDayHeaderDateFormat_ComboData()[selectedIndex];
 
 		return selectedData.dayHeaderDateFormat;
+	}
+
+	private DefaultId getSelectedDefaultId() {
+
+		final int selectedIndex = _comboProfile_AllDefaultId.getSelectionIndex();
+
+		if (selectedIndex < 0) {
+			// this case should not happen
+			return DefaultId.DEFAULT;
+		}
+
+		final ProfileDefaultId_ComboData selectedComboData = _allDefaultComboData.get(selectedIndex);
+
+		return selectedComboData.defaultId;
 	}
 
 	private FormatterData[] getSelectedFormatterData(	final DataFormatter[] allFormatter,
@@ -3352,13 +3391,14 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 				if (activeProfile.userDefaultId.equals(profile.userDefaultId)) {
 
+					// active profile is based on a user default -> reselect checkbox
+
+					_chkIsUserDefaultId.setSelection(true);
+
 					MessageDialog.openInformation(
 							getToolTipShell(),
 							Messages.Slideout_CalendarOptions_Dialog_UserDefaultId_Title,
 							Messages.Slideout_CalendarOptions_Dialog_UserDefaultId_Message);
-
-					// reselect again
-					_chkIsUserDefaultId.setSelection(true);
 
 					return;
 				}
@@ -3384,32 +3424,27 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		_isUpdateUI = true;
 		{
 
-			final int selectedAppDefaultIndex = _comboProfile_AppDefaultId.getSelectionIndex();
-
-			_comboProfile_AppDefaultId.removeAll();
+			final int selectedAppDefaultIndex = _comboProfile_AllDefaultId.getSelectionIndex();
 
 			if (isUserDefaultId) {
 
 				// a user default has no app default once it is set
 
+				_comboProfile_AllDefaultId.removeAll();
+
 			} else {
 
-				// profile defaults
-				for (final ProfileDefault data : ProfileDefault.values()) {
-					_comboProfile_AppDefaultId.add(data.name());
-				}
-
-				fillUI_UserDefaultIds();
+				fillUI_AllDefaultIds();
 
 				if (selectedAppDefaultIndex >= 0) {
 
-					_comboProfile_AppDefaultId.select(selectedAppDefaultIndex);
+					_comboProfile_AllDefaultId.select(selectedAppDefaultIndex);
 
 				} else {
 
-					final int profileDefaultIdIndex = getProfileDefaultIdIndex(activeProfile.appDefaultId);
+					final int profileDefaultIdIndex = getProfileDefaultIdIndex(activeProfile.defaultId);
 
-					_comboProfile_AppDefaultId.select(profileDefaultIdIndex);
+					_comboProfile_AllDefaultId.select(profileDefaultIdIndex);
 				}
 			}
 		}
@@ -3474,7 +3509,9 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		final CalendarProfile clonedProfile = selectedProfile.clone();
 
 		// a copy can never be an app default
-		clonedProfile.isAppDefault = false;
+		clonedProfile.defaultId = DefaultId.USER_ID;
+		clonedProfile.isUserDefault = false;
+		clonedProfile.userDefaultId = UI.EMPTY_STRING;
 
 		updateUI_NewProfile(clonedProfile);
 	}
@@ -3626,7 +3663,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			_chkIsUserDefaultId.setSelection(profile.isUserDefault);
 			_txtProfileName.setText(profile.profileName);
 			_txtUserDefaultId.setText(profile.userDefaultId);
-			selectAppDefaultId(profile.appDefaultId, profile.isUserDefault);
+			selectAppDefaultId(profile.isUserDefault, profile.defaultId, profile.userDefaultId);
 
 			// layout
 			_chkIsShowMonthColor.setSelection(profile.isToggleMonthColor);
@@ -3747,9 +3784,9 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		final CalendarProfile profile = CalendarProfileManager.getActiveCalendarProfile();
 
 		// profile
-		profile.appDefaultId = getSelectedAppDefaultId();
-		profile.userDefaultId = _txtUserDefaultId.getText();
+		profile.defaultId = getSelectedDefaultId();
 		profile.isUserDefault = _chkIsUserDefaultId.getSelection();
+		profile.userDefaultId = _txtUserDefaultId.getText();
 		profile.profileName = _txtProfileName.getText();
 
 		// layout
@@ -3863,29 +3900,26 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		_state.put(STATE_SELECTED_TAB, selectedTabIndex < 0 ? 0 : selectedTabIndex);
 	}
 
-	private void selectAppDefaultId(final ProfileDefault appDefaultId, final boolean isUserDefault) {
+	private void selectAppDefaultId(final boolean isUserDefault,
+									final DefaultId appDefaultId,
+									final String userDefaultId) {
 
 		final boolean backupIsUpdateUI = _isUpdateUI;
 		_isUpdateUI = true;
 		{
-			_comboProfile_AppDefaultId.removeAll();
-
 			if (isUserDefault) {
 
 				// a user default has no app default once it is set
 
+				_comboProfile_AllDefaultId.removeAll();
+
 			} else {
 
-				// profile defaults
-				for (final ProfileDefault data : ProfileDefault.values()) {
-					_comboProfile_AppDefaultId.add(data.name());
-				}
-
-				fillUI_UserDefaultIds();
+				fillUI_AllDefaultIds();
 
 				final int profileDefaultIdIndex = getProfileDefaultIdIndex(appDefaultId);
 
-				_comboProfile_AppDefaultId.select(profileDefaultIdIndex);
+				_comboProfile_AllDefaultId.select(profileDefaultIdIndex);
 			}
 		}
 		_isUpdateUI = backupIsUpdateUI;

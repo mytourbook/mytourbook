@@ -42,6 +42,14 @@ public class Messages extends NLS {
 	public static String		Action_ToolTip_Hide;
 	public static String		Action_ToolTip_SetDefaults;
 
+	public static String		Calendar_Profile_AppDefault_Classic;
+	public static String		Calendar_Profile_AppDefault_Compact;
+	public static String		Calendar_Profile_AppDefault_Compact_II;
+	public static String		Calendar_Profile_AppDefault_Compact_III;
+	public static String		Calendar_Profile_AppDefault_Default;
+	public static String		Calendar_Profile_AppDefault_Year;
+	public static String		Calendar_Profile_AppDefault_Year_II;
+	public static String		Calendar_Profile_AppDefault_Year_III;
 	public static String		Calendar_Profile_Color_Black;
 	public static String		Calendar_Profile_Color_Bright;
 	public static String		Calendar_Profile_Color_Contrast;
@@ -1633,7 +1641,7 @@ public class Messages extends NLS {
 	public static String		Slideout_CalendarOptions_Checkbox_IsUserDefaultProfile_Tooltip;
 	public static String		Slideout_CalendarOptions_Checkbox_UseDraggedScrolling;
 	public static String		Slideout_CalendarOptions_Checkbox_UseDraggedScrolling_Tooltip;
-	public static String		Slideout_CalendarOptions_ColumnHeader_AppDefaultId;
+	public static String		Slideout_CalendarOptions_ColumnHeader_DefaultId;
 	public static String		Slideout_CalendarOptions_ColumnHeader_IsAppId;
 	public static String		Slideout_CalendarOptions_ColumnHeader_IsAppId_Tooltip;
 	public static String		Slideout_CalendarOptions_ColumnHeader_IsUserId;
