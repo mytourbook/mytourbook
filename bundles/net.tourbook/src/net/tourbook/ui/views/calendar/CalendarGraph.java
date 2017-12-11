@@ -998,6 +998,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		_numWeeksInOneColumn = numVisibleRows;
 
 		final Color monthAlternateColor = _colorCache.getColor(_currentProfile.alternateMonthRGB);
+		final Color monthAlternate2Color = _colorCache.getColor(_currentProfile.alternateMonth2RGB);
 
 		_allTourFocusItems.clear();
 		_allDayFocusItems.clear();
@@ -1205,9 +1206,14 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 //					gc.setBackground(_white);
 
 					// Day background with alternate color
-					if (_currentProfile.isToggleMonthColor && currentDate.getMonthValue() % 2 == 1) {
+					if (_currentProfile.isToggleMonthColor) {
 
-						gc.setBackground(monthAlternateColor);
+						if (currentDate.getMonthValue() % 2 == 1) {
+							gc.setBackground(monthAlternateColor);
+						} else {
+							gc.setBackground(monthAlternate2Color);
+						}
+
 						gc.fillRectangle(//
 								dayRect.x,
 								dayRect.y,

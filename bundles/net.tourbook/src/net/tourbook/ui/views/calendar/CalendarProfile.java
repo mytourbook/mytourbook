@@ -58,6 +58,7 @@ public class CalendarProfile implements Cloneable {
 	String					id							= Long.toString(System.nanoTime());
 	String					profileName					= Messages.Calendar_Profile_Name_Default;
 	DefaultId				defaultId					= CalendarProfileManager.DEFAULT_PROFILE_DEFAULT_ID;
+	boolean					isDefaultDefault			= false;
 	boolean					isUserDefault				= false;
 	String					userDefaultId				= UI.EMPTY_STRING;
 	//
@@ -66,6 +67,7 @@ public class CalendarProfile implements Cloneable {
 	boolean					isWeekRowHeight				= CalendarProfileManager.DEFAULT_IS_WEEK_ROW_HEIGHT;
 	boolean					useDraggedScrolling			= false;
 	RGB 					alternateMonthRGB			= CalendarProfileManager.DEFAULT_ALTERNATE_MONTH_RGB;
+	RGB 					alternateMonth2RGB			= CalendarProfileManager.DEFAULT_ALTERNATE_MONTH2_RGB;
 	RGB						calendarBackgroundRGB		= CalendarProfileManager.DEFAULT_CALENDAR_BACKGROUND_RGB;
 	RGB						calendarForegroundRGB		= CalendarProfileManager.DEFAULT_CALENDAR_FOREBACKGROUND_RGB;
 	RGB						dayHoveredRGB				= CalendarProfileManager.DEFAULT_DAY_HOVERED_RGB;
@@ -273,6 +275,7 @@ public class CalendarProfile implements Cloneable {
         sb.append("profile.weekHeight                    = " + weekHeight                                 + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.weekRows                      = " + weekRows                                   + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.alternateMonthRGB             = " + dump_RGB(profile.alternateMonthRGB)        + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.alternateMonth2RGB            = " + dump_RGB(profile.alternateMonth2RGB)       + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.calendarBackgroundRGB         = " + dump_RGB(profile.calendarBackgroundRGB)    + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.calendarForegroundRGB         = " + dump_RGB(profile.calendarForegroundRGB)    + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.dayHoveredRGB                 = " + dump_RGB(profile.dayHoveredRGB)            + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$

@@ -15,6 +15,9 @@
  *******************************************************************************/
 package net.tourbook.ui.views.calendar;
 
+/**
+ * These are the calendar profile default default id's except the {@link #USER_ID} value.
+ */
 public enum DefaultId {
 
 	DEFAULT, //
@@ -30,7 +33,7 @@ public enum DefaultId {
 	CLASSIC, //
 
 	/**
-	 * This is a special id, when this is a user parent id
+	 * This is a special id, this is a user parent id
 	 */
 	USER_ID
 }

@@ -72,8 +72,9 @@ public class CalendarProfileManager {
 	private static final String				ATTR_ACTIVE_PROFILE_ID					= "activeProfileId";				//$NON-NLS-1$
 	private static final String				ATTR_PROFILE_NAME						= "profileName";					//$NON-NLS-1$
 	//
+	private static final String				ATTR_IS_DEFAULT_DEFAULT_ID				= "isDefaultDefaultId";				//$NON-NLS-1$
 	private static final String				ATTR_IS_USER_DEFAULT_ID					= "isUserDefaultId";				//$NON-NLS-1$
-	private static final String				ATTR_PROFILE_APP_DEFAULT_ID				= "profileAppDefaultId";			//$NON-NLS-1$
+	private static final String				ATTR_PROFILE_DEFAULT_DEFAULT_ID			= "profileDefaultDefaultId";		//$NON-NLS-1$
 	private static final String				ATTR_PROFILE_USER_DEFAULT_ID			= "profileUserDefaultId";			//$NON-NLS-1$
 	//
 	/*
@@ -92,6 +93,7 @@ public class CalendarProfileManager {
 	private static final String				TAG_ALL_TOUR_FORMATTER					= "AllTourFormatter";				//$NON-NLS-1$
 	private static final String				TAG_ALL_WEEK_FORMATTER					= "AllWeekFormatter";				//$NON-NLS-1$
 	private static final String				TAG_ALTERNATE_MONTH_RGB					= "AlternateMonthRGB";				//$NON-NLS-1$
+	private static final String				TAG_ALTERNATE_MONTH2_RGB				= "AlternateMonth2RGB";				//$NON-NLS-1$
 	private static final String				TAG_CALENDAR_BACKGROUND_RGB				= "CalendarBackgroundRGB";			//$NON-NLS-1$
 	private static final String				TAG_CALENDAR_FOREGROUND_RGB				= "CalendarForegroundRGB";			//$NON-NLS-1$
 	private static final String				TAG_DAY_HOVERED_RGB						= "DayHoveredRGB";					//$NON-NLS-1$;
@@ -185,6 +187,7 @@ public class CalendarProfileManager {
 	static final int						DEFAULT_MARGIN_MAX						= 20;
 	static final int						DEFAULT_WEEK_COLUMN_WIDTH				= 100;
 	static final RGB						DEFAULT_ALTERNATE_MONTH_RGB				= new RGB(60, 60, 60);
+	static final RGB						DEFAULT_ALTERNATE_MONTH2_RGB			= new RGB(80, 80, 80);
 	static final RGB						DEFAULT_CALENDAR_BACKGROUND_RGB			= new RGB(40, 40, 40);
 	static final RGB						DEFAULT_CALENDAR_FOREBACKGROUND_RGB		= new RGB(200, 200, 200);
 	static final RGB						DEFAULT_DAY_HOVERED_RGB					= new RGB(255, 255, 255);
@@ -646,11 +649,19 @@ public class CalendarProfileManager {
 
 		String		label;
 		DefaultId	defaultId;
+		boolean		isAppDefaultId;
 
 		ProfileDefaultId_ComboData(final DefaultId defaultId, final String label) {
 
 			this.defaultId = defaultId;
 			this.label = label;
+
+			this.isAppDefaultId = true;
+		}
+
+		ProfileDefaultId_ComboData(final String userDefaultId) {
+
+			this.label = userDefaultId;
 		}
 	}
 
@@ -1245,6 +1256,10 @@ public class CalendarProfileManager {
 		allProfiles.add(createProfile_54_Year_III());
 
 		allProfiles.add(createProfile_99_Classic());
+
+		for (final CalendarProfile profile : allProfiles) {
+			profile.isDefaultDefault = true;
+		}
 	}
 
 	private static CalendarProfile createProfile_10_Default() {
@@ -2561,7 +2576,7 @@ public class CalendarProfileManager {
 
 		// keep old name
 		final String oldProfileName = _activeCalendarProfile.profileName;
-		final boolean isUserDefault = _activeCalendarProfile.defaultId == DefaultId.USER_ID;
+		final boolean isDefaultDefault = _activeCalendarProfile.isDefaultDefault;
 
 		final int activeCalendarProfileIndex = getActiveCalendarProfileIndex();
 
@@ -2572,7 +2587,7 @@ public class CalendarProfileManager {
 		final CalendarProfile newProfile = createProfileFromId(_activeCalendarProfile.defaultId);
 
 		// preserve old name
-		if (isUserDefault) {
+		if (isDefaultDefault == false) {
 			newProfile.profileName = oldProfileName;
 		}
 
@@ -2580,13 +2595,6 @@ public class CalendarProfileManager {
 		_allCalendarProfiles.add(activeCalendarProfileIndex, newProfile);
 
 		setActiveCalendarProfile(newProfile, true);
-	}
-
-	static void resetAllCalendarProfiles() {
-
-		createProfile_0_AllAppProfiles(_allCalendarProfiles);
-
-		setActiveCalendarProfile(_allCalendarProfiles.get(0), true);
 	}
 
 	private static CalendarProfile restoreProfile(final XMLMemento xmlProfile) {
@@ -2601,8 +2609,9 @@ public class CalendarProfileManager {
 		// profile
 		profile.id							= Util.getXmlString(xmlProfile,						ATTR_ID,						Long.toString(System.nanoTime()));
 		profile.profileName					= Util.getXmlString(xmlProfile,						ATTR_PROFILE_NAME,				UI.EMPTY_STRING);
+		profile.isDefaultDefault			= Util.getXmlBoolean(xmlProfile, 					ATTR_IS_DEFAULT_DEFAULT_ID,			false);
 		profile.isUserDefault				= Util.getXmlBoolean(xmlProfile, 					ATTR_IS_USER_DEFAULT_ID,		false);
-		profile.defaultId					= (DefaultId) Util.getXmlEnum(xmlProfile,		ATTR_PROFILE_APP_DEFAULT_ID,	DEFAULT_PROFILE_DEFAULT_ID);
+		profile.defaultId					= (DefaultId) Util.getXmlEnum(xmlProfile,			ATTR_PROFILE_DEFAULT_DEFAULT_ID,	DEFAULT_PROFILE_DEFAULT_ID);
 		profile.userDefaultId				= Util.getXmlString(xmlProfile,						ATTR_PROFILE_USER_DEFAULT_ID,	UI.EMPTY_STRING);
 		
 		// layout
@@ -2612,6 +2621,7 @@ public class CalendarProfileManager {
 		profile.weekHeight					= Util.getXmlInteger(xmlProfile, 					ATTR_WEEK_HEIGHT,				DEFAULT_WEEK_HEIGHT);
 		profile.weekRows					= Util.getXmlInteger(xmlProfile, 					ATTR_WEEK_ROWS,					DEFAULT_WEEK_ROWS);
 		profile.alternateMonthRGB			= Util.getXmlRgb(xmlProfile, 						TAG_ALTERNATE_MONTH_RGB,		DEFAULT_ALTERNATE_MONTH_RGB);
+		profile.alternateMonth2RGB			= Util.getXmlRgb(xmlProfile, 						TAG_ALTERNATE_MONTH2_RGB,		DEFAULT_ALTERNATE_MONTH2_RGB);
 		profile.calendarBackgroundRGB		= Util.getXmlRgb(xmlProfile, 						TAG_CALENDAR_BACKGROUND_RGB,	DEFAULT_CALENDAR_BACKGROUND_RGB);
 		profile.calendarForegroundRGB		= Util.getXmlRgb(xmlProfile, 						TAG_CALENDAR_FOREGROUND_RGB,	DEFAULT_CALENDAR_FOREBACKGROUND_RGB);
 		profile.dayHoveredRGB				= Util.getXmlRgb(xmlProfile,						TAG_DAY_HOVERED_RGB, 			DEFAULT_DAY_HOVERED_RGB);
@@ -2755,7 +2765,7 @@ public class CalendarProfileManager {
 		xmlProfile.putString(		ATTR_PROFILE_NAME, 						profile.profileName);
 		xmlProfile.putBoolean(		ATTR_IS_USER_DEFAULT_ID, 				profile.isUserDefault);
 		xmlProfile.putString(		ATTR_PROFILE_USER_DEFAULT_ID,			profile.userDefaultId);
-		Util.setXmlEnum(xmlProfile,	ATTR_PROFILE_APP_DEFAULT_ID,		 	profile.defaultId);
+		Util.setXmlEnum(xmlProfile,	ATTR_PROFILE_DEFAULT_DEFAULT_ID,		 	profile.defaultId);
 		
 		// layout
 		xmlProfile.putBoolean(		ATTR_IS_TOGGLE_MONTH_COLOR, 			profile.isToggleMonthColor);
@@ -2764,6 +2774,7 @@ public class CalendarProfileManager {
 		xmlProfile.putInteger(		ATTR_WEEK_HEIGHT, 						profile.weekHeight);
 		xmlProfile.putInteger(		ATTR_WEEK_ROWS, 						profile.weekRows);
 		Util.setXmlRgb(xmlProfile,	TAG_ALTERNATE_MONTH_RGB, 				profile.alternateMonthRGB);
+		Util.setXmlRgb(xmlProfile,	TAG_ALTERNATE_MONTH2_RGB, 				profile.alternateMonth2RGB);
 		Util.setXmlRgb(xmlProfile,	TAG_CALENDAR_BACKGROUND_RGB, 			profile.calendarBackgroundRGB);
 		Util.setXmlRgb(xmlProfile,	TAG_CALENDAR_FOREGROUND_RGB, 			profile.calendarForegroundRGB);
 		Util.setXmlRgb(xmlProfile,	TAG_DAY_HOVERED_RGB, 					profile.dayHoveredRGB);
