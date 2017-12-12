@@ -47,6 +47,7 @@ public class Messages extends NLS {
 	public static String		Calendar_Profile_AppDefault_Compact_II;
 	public static String		Calendar_Profile_AppDefault_Compact_III;
 	public static String		Calendar_Profile_AppDefault_Default;
+	public static String		Calendar_Profile_AppDefault_UserDefault;
 	public static String		Calendar_Profile_AppDefault_Year;
 	public static String		Calendar_Profile_AppDefault_Year_II;
 	public static String		Calendar_Profile_AppDefault_Year_III;
@@ -1648,6 +1649,7 @@ public class Messages extends NLS {
 	public static String		Slideout_CalendarOptions_ColumnHeader_IsUserId_Tooltip;
 	public static String		Slideout_CalendarOptions_ColumnHeader_Name;
 	public static String		Slideout_CalendarOptions_ColumnHeader_UserDefaultId;
+	public static String		Slideout_CalendarOptions_ColumnHeader_UserParentDefaultId;
 	public static String		Slideout_CalendarOptions_Dialog_DeleteProfile_Message;
 	public static String		Slideout_CalendarOptions_Dialog_DeleteProfile_Title;
 	public static String		Slideout_CalendarOptions_Dialog_UserDefaultId_Message;
@@ -1676,6 +1678,7 @@ public class Messages extends NLS {
 	public static String		Slideout_CalendarOptions_Label_Profile_DragDropHint;
 	public static String		Slideout_CalendarOptions_Label_Profile_Name;
 	public static String		Slideout_CalendarOptions_Label_Profile_UserDefaultID;
+	public static String		Slideout_CalendarOptions_Label_Profile_UserParentDefaultID;
 	public static String		Slideout_CalendarOptions_Label_Profiles;
 	public static String		Slideout_CalendarOptions_Label_Title;
 	public static String		Slideout_CalendarOptions_Label_Tour_BackgroundColor;

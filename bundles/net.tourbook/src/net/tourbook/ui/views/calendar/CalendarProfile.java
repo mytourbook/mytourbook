@@ -52,15 +52,37 @@ public class CalendarProfile implements Cloneable {
 	 * be set when an xml tag is not available.
 	 */
 
-// SET_FORMATTING_OFF
-	
 	// profile
-	String					id							= Long.toString(System.nanoTime());
-	String					profileName					= Messages.Calendar_Profile_Name_Default;
-	DefaultId				defaultId					= CalendarProfileManager.DEFAULT_PROFILE_DEFAULT_ID;
-	boolean					isDefaultDefault			= false;
-	boolean					isUserDefault				= false;
-	String					userDefaultId				= UI.EMPTY_STRING;
+	String				id							= Long.toString(System.nanoTime());
+	String				profileName					= Messages.Calendar_Profile_Name_Default;
+
+	/**
+	 * Profile default id.
+	 */
+	DefaultId			defaultId					= CalendarProfileManager.DEFAULT_PROFILE_DEFAULT_ID;
+
+	/**
+	 * Is <code>true</code> when the profile is an app default
+	 */
+	boolean				isDefaultDefault			= false;
+
+	/**
+	 * Is <code>true</code> when the profile can be a parent of a user default id.
+	 */
+	boolean				isUserParentDefault			= false;
+
+	/**
+	 * Contains the user parent id, {@link DefaultId} is then set to {@link DefaultId#USER_ID} and
+	 * {@link #isUserParentDefault} == <code>true</code>
+	 */
+	String				userParentDefaultId			= UI.EMPTY_STRING;
+
+	/**
+	 * Contains the {@link #userParentDefaultId} when this is a child of a user parent default id.
+	 */
+	String				userDefaultId				= UI.EMPTY_STRING;
+
+// SET_FORMATTING_OFF
 	//
 	// layout
 	boolean					isToggleMonthColor			= false;

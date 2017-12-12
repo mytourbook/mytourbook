@@ -73,9 +73,10 @@ public class CalendarProfileManager {
 	private static final String				ATTR_PROFILE_NAME						= "profileName";					//$NON-NLS-1$
 	//
 	private static final String				ATTR_IS_DEFAULT_DEFAULT_ID				= "isDefaultDefaultId";				//$NON-NLS-1$
-	private static final String				ATTR_IS_USER_DEFAULT_ID					= "isUserDefaultId";				//$NON-NLS-1$
+	private static final String				ATTR_IS_USER_PARENT_DEFAULT_ID			= "isUserParentDefaultId";			//$NON-NLS-1$
 	private static final String				ATTR_PROFILE_DEFAULT_DEFAULT_ID			= "profileDefaultDefaultId";		//$NON-NLS-1$
 	private static final String				ATTR_PROFILE_USER_DEFAULT_ID			= "profileUserDefaultId";			//$NON-NLS-1$
+	private static final String				ATTR_PROFILE_USER_PARENT_DEFAULT_ID		= "profileUserParentDefaultId";		//$NON-NLS-1$
 	//
 	/*
 	 * Root
@@ -542,6 +543,7 @@ public class CalendarProfileManager {
 			new ProfileDefaultId_ComboData(DefaultId.YEAR_II,			Messages.Calendar_Profile_AppDefault_Year_II),
 			new ProfileDefaultId_ComboData(DefaultId.YEAR_III,			Messages.Calendar_Profile_AppDefault_Year_III),
 			new ProfileDefaultId_ComboData(DefaultId.CLASSIC,			Messages.Calendar_Profile_AppDefault_Classic),
+			new ProfileDefaultId_ComboData(DefaultId.USER_ID,			Messages.Calendar_Profile_AppDefault_UserDefault),
 	};
 
 	private static final DayContentColor_ComboData[] _allTourContentColor_ComboData =
@@ -647,22 +649,48 @@ public class CalendarProfileManager {
 
 	static class ProfileDefaultId_ComboData {
 
-		String		label;
+		String		labelOrUserId;
 		DefaultId	defaultId;
-		boolean		isAppDefaultId;
+		boolean		isDefaultDefaultId;
 
+		/**
+		 * This constructor creates combo data for default default id's.
+		 * 
+		 * @param defaultId
+		 * @param label
+		 */
 		ProfileDefaultId_ComboData(final DefaultId defaultId, final String label) {
 
 			this.defaultId = defaultId;
-			this.label = label;
+			this.labelOrUserId = label;
 
-			this.isAppDefaultId = true;
+			this.isDefaultDefaultId = true;
 		}
 
+		/**
+		 * This constructor creates combo data which has a user default id.
+		 * 
+		 * @param userDefaultId
+		 * @param defaultId
+		 */
 		ProfileDefaultId_ComboData(final String userDefaultId) {
 
-			this.label = userDefaultId;
+			this.labelOrUserId = userDefaultId;
+			this.defaultId = DefaultId.USER_ID;
 		}
+
+		@Override
+		public String toString() {
+
+			return "ProfileDefaultId_ComboData [\n" //$NON-NLS-1$
+
+					+ "labelAndId=" + labelOrUserId + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+					+ "defaultId=" + defaultId + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+					+ "isDefaultDefaultId=" + isDefaultDefaultId + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+
+					+ "]"; //$NON-NLS-1$
+		}
+
 	}
 
 	static class TourBackground_ComboData {
@@ -1245,17 +1273,17 @@ public class CalendarProfileManager {
 
 		allProfiles.clear();
 
-		allProfiles.add(createProfile_10_Default());
-
-		allProfiles.add(createProfile_20_Compact());
+//		allProfiles.add(createProfile_10_Default());
+//
+//		allProfiles.add(createProfile_20_Compact());
 		allProfiles.add(createProfile_22_Compact_II());
-		allProfiles.add(createProfile_23_Compact_III());
-
-		allProfiles.add(createProfile_50_Year());
-		allProfiles.add(createProfile_52_Year_II());
-		allProfiles.add(createProfile_54_Year_III());
-
-		allProfiles.add(createProfile_99_Classic());
+//		allProfiles.add(createProfile_23_Compact_III());
+//
+//		allProfiles.add(createProfile_50_Year());
+//		allProfiles.add(createProfile_52_Year_II());
+//		allProfiles.add(createProfile_54_Year_III());
+//
+//		allProfiles.add(createProfile_99_Classic());
 
 		for (final CalendarProfile profile : allProfiles) {
 			profile.isDefaultDefault = true;
@@ -2586,6 +2614,9 @@ public class CalendarProfileManager {
 		// create new profile
 		final CalendarProfile newProfile = createProfileFromId(_activeCalendarProfile.defaultId);
 
+		// default default is reset -> keep as default default
+		newProfile.isDefaultDefault = isDefaultDefault;
+
 		// preserve old name
 		if (isDefaultDefault == false) {
 			newProfile.profileName = oldProfileName;
@@ -2607,12 +2638,14 @@ public class CalendarProfileManager {
 // SET_FORMATTING_OFF
 		
 		// profile
-		profile.id							= Util.getXmlString(xmlProfile,						ATTR_ID,						Long.toString(System.nanoTime()));
-		profile.profileName					= Util.getXmlString(xmlProfile,						ATTR_PROFILE_NAME,				UI.EMPTY_STRING);
-		profile.isDefaultDefault			= Util.getXmlBoolean(xmlProfile, 					ATTR_IS_DEFAULT_DEFAULT_ID,			false);
-		profile.isUserDefault				= Util.getXmlBoolean(xmlProfile, 					ATTR_IS_USER_DEFAULT_ID,		false);
-		profile.defaultId					= (DefaultId) Util.getXmlEnum(xmlProfile,			ATTR_PROFILE_DEFAULT_DEFAULT_ID,	DEFAULT_PROFILE_DEFAULT_ID);
-		profile.userDefaultId				= Util.getXmlString(xmlProfile,						ATTR_PROFILE_USER_DEFAULT_ID,	UI.EMPTY_STRING);
+		profile.id							= Util.getXmlString(xmlProfile,						ATTR_ID,								Long.toString(System.nanoTime()));
+		profile.profileName					= Util.getXmlString(xmlProfile,						ATTR_PROFILE_NAME,						UI.EMPTY_STRING);
+		//
+		profile.isDefaultDefault			= Util.getXmlBoolean(xmlProfile, 					ATTR_IS_DEFAULT_DEFAULT_ID,				false);
+		profile.isUserParentDefault			= Util.getXmlBoolean(xmlProfile, 					ATTR_IS_USER_PARENT_DEFAULT_ID,			false);
+		profile.userDefaultId				= Util.getXmlString(xmlProfile,						ATTR_PROFILE_USER_DEFAULT_ID,			UI.EMPTY_STRING);
+		profile.userParentDefaultId			= Util.getXmlString(xmlProfile,						ATTR_PROFILE_USER_PARENT_DEFAULT_ID,	UI.EMPTY_STRING);
+		profile.defaultId					= (DefaultId) Util.getXmlEnum(xmlProfile,			ATTR_PROFILE_DEFAULT_DEFAULT_ID,		DEFAULT_PROFILE_DEFAULT_ID);
 		
 		// layout
 		profile.isToggleMonthColor			= Util.getXmlBoolean(xmlProfile, 					ATTR_IS_TOGGLE_MONTH_COLOR,		true);
@@ -2763,9 +2796,12 @@ public class CalendarProfileManager {
 		// profile
 		xmlProfile.putString(		ATTR_ID, 								profile.id);
 		xmlProfile.putString(		ATTR_PROFILE_NAME, 						profile.profileName);
-		xmlProfile.putBoolean(		ATTR_IS_USER_DEFAULT_ID, 				profile.isUserDefault);
+		//
+		xmlProfile.putBoolean(		ATTR_IS_DEFAULT_DEFAULT_ID, 			profile.isDefaultDefault);
+		xmlProfile.putBoolean(		ATTR_IS_USER_PARENT_DEFAULT_ID, 		profile.isUserParentDefault);
 		xmlProfile.putString(		ATTR_PROFILE_USER_DEFAULT_ID,			profile.userDefaultId);
-		Util.setXmlEnum(xmlProfile,	ATTR_PROFILE_DEFAULT_DEFAULT_ID,		 	profile.defaultId);
+		xmlProfile.putString(		ATTR_PROFILE_USER_PARENT_DEFAULT_ID,	profile.userParentDefaultId);
+		Util.setXmlEnum(xmlProfile,	ATTR_PROFILE_DEFAULT_DEFAULT_ID,		profile.defaultId);
 		
 		// layout
 		xmlProfile.putBoolean(		ATTR_IS_TOGGLE_MONTH_COLOR, 			profile.isToggleMonthColor);
