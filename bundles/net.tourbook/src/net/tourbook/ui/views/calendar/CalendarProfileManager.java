@@ -1273,17 +1273,17 @@ public class CalendarProfileManager {
 
 		allProfiles.clear();
 
-//		allProfiles.add(createProfile_10_Default());
-//
-//		allProfiles.add(createProfile_20_Compact());
+		allProfiles.add(createProfile_10_Default());
+
+		allProfiles.add(createProfile_20_Compact());
 		allProfiles.add(createProfile_22_Compact_II());
-//		allProfiles.add(createProfile_23_Compact_III());
-//
-//		allProfiles.add(createProfile_50_Year());
-//		allProfiles.add(createProfile_52_Year_II());
-//		allProfiles.add(createProfile_54_Year_III());
-//
-//		allProfiles.add(createProfile_99_Classic());
+		allProfiles.add(createProfile_23_Compact_III());
+
+		allProfiles.add(createProfile_50_Year());
+		allProfiles.add(createProfile_52_Year_II());
+		allProfiles.add(createProfile_54_Year_III());
+
+		allProfiles.add(createProfile_99_Classic());
 
 		for (final CalendarProfile profile : allProfiles) {
 			profile.isDefaultDefault = true;
@@ -2309,29 +2309,49 @@ public class CalendarProfileManager {
 		return profile;
 	}
 
-	static CalendarProfile createProfileFromId(final DefaultId defaultId) {
+	static CalendarProfile createProfileFromId(final CalendarProfile profile) {
+
+		if (profile.defaultId == DefaultId.USER_ID) {
+
+			CalendarProfile userProfile = null;
+
+			for (final CalendarProfile allProfile : getAllCalendarProfiles()) {
+
+				if (allProfile.isUserParentDefault && allProfile.userParentDefaultId.equals(profile.userDefaultId)) {
+
+					userProfile = allProfile;
+					break;
+				}
+			}
+
+			final CalendarProfile clonedProfile = userProfile.clone();
+
+			return clonedProfile;
+
+		} else {
 
 // SET_FORMATTING_OFF
 		
-		switch (defaultId) {
-		
-		case CLASSIC:				return createProfile_99_Classic();
-
-		case COMPACT:				return createProfile_20_Compact();
-		case COMPACT_II:			return createProfile_22_Compact_II();
-		case COMPACT_III:			return createProfile_23_Compact_III();
-		
-		case YEAR:					return createProfile_50_Year();
-		case YEAR_II:				return createProfile_52_Year_II();
-		case YEAR_III:				return createProfile_54_Year_III();
-		
-		case DEFAULT:
-		default:
-			// create default default
-			return createProfile_10_Default();
+			switch (profile.defaultId) {
+			
+			case CLASSIC:				return createProfile_99_Classic();
+	
+			case COMPACT:				return createProfile_20_Compact();
+			case COMPACT_II:			return createProfile_22_Compact_II();
+			case COMPACT_III:			return createProfile_23_Compact_III();
+			
+			case YEAR:					return createProfile_50_Year();
+			case YEAR_II:				return createProfile_52_Year_II();
+			case YEAR_III:				return createProfile_54_Year_III();
+			
+			case DEFAULT:
+			default:
+				// create default default
+				return createProfile_10_Default();
 		}
 		
 // SET_FORMATTING_ON
+		}
 	}
 
 	static CalendarProfile getActiveCalendarProfile() {
@@ -2602,9 +2622,13 @@ public class CalendarProfileManager {
 
 	static void resetActiveCalendarProfile() {
 
-		// keep old name
-		final String oldProfileName = _activeCalendarProfile.profileName;
-		final boolean isDefaultDefault = _activeCalendarProfile.isDefaultDefault;
+		// get old values
+		final String profileNameOld = _activeCalendarProfile.profileName;
+		final DefaultId defaultIdOld = _activeCalendarProfile.defaultId;
+		final boolean isDefaultDefaultOld = _activeCalendarProfile.isDefaultDefault;
+		final boolean isUserParentDefaultOld = _activeCalendarProfile.isUserParentDefault;
+		final String userParentDefaultIdOld = _activeCalendarProfile.userParentDefaultId;
+		final String userDefaultIdOld = _activeCalendarProfile.userDefaultId;
 
 		final int activeCalendarProfileIndex = getActiveCalendarProfileIndex();
 
@@ -2612,14 +2636,18 @@ public class CalendarProfileManager {
 		_allCalendarProfiles.remove(_activeCalendarProfile);
 
 		// create new profile
-		final CalendarProfile newProfile = createProfileFromId(_activeCalendarProfile.defaultId);
+		final CalendarProfile newProfile = createProfileFromId(_activeCalendarProfile);
 
 		// default default is reset -> keep as default default
-		newProfile.isDefaultDefault = isDefaultDefault;
+		newProfile.defaultId = defaultIdOld;
+		newProfile.isDefaultDefault = isDefaultDefaultOld;
+		newProfile.isUserParentDefault = isUserParentDefaultOld;
+		newProfile.userParentDefaultId = userParentDefaultIdOld;
+		newProfile.userDefaultId = userDefaultIdOld;
 
 		// preserve old name
-		if (isDefaultDefault == false) {
-			newProfile.profileName = oldProfileName;
+		if (isDefaultDefaultOld == false) {
+			newProfile.profileName = profileNameOld;
 		}
 
 		// update model
