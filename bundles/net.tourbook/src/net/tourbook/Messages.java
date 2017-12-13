@@ -88,7 +88,6 @@ public class Messages extends NLS {
 	public static String		Calendar_Profile_TourBorder_Right;
 	public static String		Calendar_Profile_TourBorder_Top;
 	public static String		Calendar_Profile_TourBorder_TopBottom;
-	public static String		Calendar_Profile_UserDefaultName;
 	public static String		Calendar_Profile_Value_Altitude;
 	public static String		Calendar_Profile_Value_Description;
 	public static String		Calendar_Profile_Value_Distance;
@@ -1648,18 +1647,15 @@ public class Messages extends NLS {
 	public static String		Slideout_CalendarOptions_ColumnHeader_IsUserId;
 	public static String		Slideout_CalendarOptions_ColumnHeader_IsUserId_Tooltip;
 	public static String		Slideout_CalendarOptions_ColumnHeader_Name;
-	public static String		Slideout_CalendarOptions_ColumnHeader_UserDefaultId;
-	public static String		Slideout_CalendarOptions_ColumnHeader_UserParentDefaultId;
 	public static String		Slideout_CalendarOptions_Dialog_DeleteProfile_Message;
 	public static String		Slideout_CalendarOptions_Dialog_DeleteProfile_Title;
-	public static String		Slideout_CalendarOptions_Dialog_UserDefaultId_Message;
-	public static String		Slideout_CalendarOptions_Dialog_UserDefaultId_Title;
 	public static String		Slideout_CalendarOptions_Group_DateColumn;
 	public static String		Slideout_CalendarOptions_Group_DayDate;
 	public static String		Slideout_CalendarOptions_Group_Layout;
 	public static String		Slideout_CalendarOptions_Group_TourColor;
 	public static String		Slideout_CalendarOptions_Group_TourFont;
 	public static String		Slideout_CalendarOptions_Group_YearColumns;
+	public static String		Slideout_CalendarOptions_Label_AppPrefix;
 	public static String		Slideout_CalendarOptions_Label_Calendar_BackgroundColor;
 	public static String		Slideout_CalendarOptions_Label_Calendar_ForegroundColor;
 	public static String		Slideout_CalendarOptions_Label_DateColumn_Content;
@@ -1677,7 +1673,6 @@ public class Messages extends NLS {
 	public static String		Slideout_CalendarOptions_Label_Profile_DefaultId_Tooltip;
 	public static String		Slideout_CalendarOptions_Label_Profile_DragDropHint;
 	public static String		Slideout_CalendarOptions_Label_Profile_Name;
-	public static String		Slideout_CalendarOptions_Label_Profile_UserDefaultID;
 	public static String		Slideout_CalendarOptions_Label_Profile_UserParentDefaultID;
 	public static String		Slideout_CalendarOptions_Label_Profiles;
 	public static String		Slideout_CalendarOptions_Label_Title;

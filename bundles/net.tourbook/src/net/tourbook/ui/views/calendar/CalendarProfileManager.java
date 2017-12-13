@@ -566,9 +566,9 @@ public class CalendarProfileManager {
 	 * Contains all calendar profiles which are loaded from a xml file.
 	 */
 	private static final ArrayList<CalendarProfile>			_allCalendarProfiles				= new ArrayList<>();
-	private static final ArrayList<CalendarProfile>			_allAppDefaultProfiles				= new ArrayList<>();
+	private static final ArrayList<CalendarProfile>			_allDefaultDefaultProfiles			= new ArrayList<>();
 	static {
-		createProfile_0_AllAppProfiles(_allAppDefaultProfiles);
+		createProfile_0_AllDefaultDefaultProfiles(_allDefaultDefaultProfiles);
 	}
 	//
 	private static CalendarProfile		_activeCalendarProfile;
@@ -1269,7 +1269,7 @@ public class CalendarProfileManager {
 		return dataFormatter;
 	}
 
-	private static void createProfile_0_AllAppProfiles(final ArrayList<CalendarProfile> allProfiles) {
+	private static void createProfile_0_AllDefaultDefaultProfiles(final ArrayList<CalendarProfile> allProfiles) {
 
 		allProfiles.clear();
 
@@ -2498,7 +2498,7 @@ public class CalendarProfileManager {
 
 			StatusUtil.log("Created default profile for calendar properties");//$NON-NLS-1$
 
-			createProfile_0_AllAppProfiles(_allCalendarProfiles);
+			createProfile_0_AllDefaultDefaultProfiles(_allCalendarProfiles);
 
 			activeProfile = _allCalendarProfiles.get(0);
 		}
@@ -2540,7 +2540,24 @@ public class CalendarProfileManager {
 
 					// <Calendar>
 
-					allCalendarProfiles.add(restoreProfile(xmlProfile));
+					final CalendarProfile profile = restoreProfile(xmlProfile);
+
+					// set profile default name
+					if (profile.isDefaultDefault) {
+
+						// use default default profile name, it cannot be modified
+
+						for (final CalendarProfile defaultProfile : _allDefaultDefaultProfiles) {
+
+							if (profile.defaultId == defaultProfile.defaultId) {
+
+								profile.profileName = defaultProfile.profileName;
+								break;
+							}
+						}
+					}
+
+					allCalendarProfiles.add(profile);
 				}
 
 			} catch (final Exception e) {
@@ -2584,7 +2601,7 @@ public class CalendarProfileManager {
 
 			// ensure all app default profiles are available
 			final ArrayList<CalendarProfile> missingAppDefaultProfiles = new ArrayList<>();
-			for (final CalendarProfile appDefaultProfile : _allAppDefaultProfiles) {
+			for (final CalendarProfile appDefaultProfile : _allDefaultDefaultProfiles) {
 
 				boolean isAppDefaultAvailable = false;
 
@@ -2604,7 +2621,7 @@ public class CalendarProfileManager {
 
 			// ensure profiles are created
 			if (_allCalendarProfiles.size() == 0) {
-				createProfile_0_AllAppProfiles(_allCalendarProfiles);
+				createProfile_0_AllDefaultDefaultProfiles(_allCalendarProfiles);
 			}
 
 			setActiveCalendarProfile(getProfile_Calendar(), false);

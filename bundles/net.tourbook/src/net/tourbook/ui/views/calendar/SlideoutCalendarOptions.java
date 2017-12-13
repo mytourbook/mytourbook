@@ -113,7 +113,9 @@ import org.eclipse.swt.widgets.Widget;
 public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalendarProfileListener,
 		IColorSelectorListener {
 
-// SET_FORMATTING_OFF
+	private static final String						DEFAULT_PREFIX			= " : ";					//$NON-NLS-1$
+
+	// SET_FORMATTING_OFF
 	//
 	private static final String							STATE_SELECTED_TAB		= "STATE_SELECTED_TAB";		//$NON-NLS-1$
 	//
@@ -568,8 +570,13 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 					final DefaultId defaultId = profile.defaultId;
 
 					String idPrefix = UI.EMPTY_STRING;
-					if (profile.isUserParentDefault) {
-						idPrefix = profile.userParentDefaultId + " : "; //$NON-NLS-1$
+
+					if (profile.isDefaultDefault) {
+
+						idPrefix = Messages.Slideout_CalendarOptions_Label_AppPrefix + DEFAULT_PREFIX;
+
+					} else if (profile.isUserParentDefault) {
+						idPrefix = profile.userParentDefaultId + DEFAULT_PREFIX;
 					}
 
 					if (defaultId == DefaultId.USER_ID) {
@@ -2581,6 +2588,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 		_lblProfile_UserParentDefaultId.setEnabled(isUserDefaultId && hasChildProfiles == false);
 
+		_txtProfileName.setEnabled(isDefaultDefault == false);
 		_txtUserParentDefaultId.setEnabled(isUserDefaultId && hasChildProfiles == false);
 	}
 
@@ -3415,54 +3423,6 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 		if (_isUpdateUI) {
 			return;
-		}
-
-		final CalendarProfile activeProfile = CalendarProfileManager.getActiveCalendarProfile();
-
-		/*
-		 * User id CANNOT be deselected when profiles are based on the user default id
-		 */
-		final boolean isUserDefaultIdOld = activeProfile.isUserParentDefault;
-		final boolean isUserDefaultId = _chkIsUserDefaultId.getSelection();
-
-		if (isUserDefaultIdOld && isUserDefaultId == false && activeProfile.userDefaultId.trim().length() != 0) {
-
-			// user id state is modified from true->false -> check if profiles are based on this user default id
-
-			for (final CalendarProfile profile : _allCalendarProfiles) {
-
-				// skip current profile
-				if (activeProfile == profile) {
-					continue;
-				}
-
-				// skip default default profiles
-				if (profile.isDefaultDefault) {
-					continue;
-				}
-
-				// skip empty id's
-				if (profile.userDefaultId.length() == 0) {
-					continue;
-				}
-
-				if (activeProfile.userDefaultId.equals(profile.userDefaultId)) {
-
-					// active profile is based on a user default -> reselect checkbox
-
-					_chkIsUserDefaultId.setSelection(true);
-
-					MessageDialog.openInformation(
-							getToolTipShell(),
-							Messages.Slideout_CalendarOptions_Dialog_UserDefaultId_Title,
-							NLS.bind(
-									Messages.Slideout_CalendarOptions_Dialog_UserDefaultId_Message,
-									activeProfile.userDefaultId,
-									profile.profileName));
-
-					return;
-				}
-			}
 		}
 
 		/*
