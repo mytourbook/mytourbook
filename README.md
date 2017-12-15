@@ -14,3 +14,21 @@ All documentations for this project are available on the website <http://mytourb
 
 
 _This document will not repeat already written text in the documentation._
+
+
+
+## Commandline arguments
+
+
+**Log map 2.5 http traffic** 
+
+-Dorg.slf4j.simpleLogger.defaultLogLevel=DEBUG
+
+
+**Log calendar profiles when modified**
+
+-DlogCalendarProfile
+
+**Scramble calendar content/values**
+
+-DscrambleCalendar
