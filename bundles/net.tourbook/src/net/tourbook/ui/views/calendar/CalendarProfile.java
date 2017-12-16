@@ -540,7 +540,20 @@ public class CalendarProfile implements Cloneable {
 
 	@Override
 	public String toString() {
-		return "CalendarProfile [name=" + profileName + "]"; //$NON-NLS-1$ //$NON-NLS-2$
+		return "CalendarProfile [" //$NON-NLS-1$
+
+				+ "id=" + id + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "profileName=" + profileName + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+
+				+ "defaultId=" + defaultId + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+
+				+ "isDefaultDefault=" + isDefaultDefault + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "isUserParentDefault=" + isUserParentDefault + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+
+				+ "userParentDefaultId=" + userParentDefaultId + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+				+ "userDefaultId=" + userDefaultId + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+
+				+ "]"; //$NON-NLS-1$
 	}
 
 }

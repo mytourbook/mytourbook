@@ -2542,10 +2542,24 @@ public class CalendarProfileManager {
 
 					final CalendarProfile profile = restoreProfile(xmlProfile);
 
+					if (profile.defaultId == DefaultId.XML_DEFAULT) {
+
+						/*
+						 * The default id is unknown, this occured when switching vom 17.12.0 ->
+						 * 17.12.1 but it can occure when data are corrup, setup as default
+						 */
+						profile.defaultId = DefaultId.DEFAULT;
+
+						// this cannot be a default default
+						profile.isDefaultDefault = false;
+						profile.isUserParentDefault = false;
+						profile.userParentDefaultId = UI.EMPTY_STRING;
+					}
+
 					// set profile default name
 					if (profile.isDefaultDefault) {
 
-						// use default default profile name, it cannot be modified
+						// overwrite default default profile name, it is readonly
 
 						for (final CalendarProfile defaultProfile : _allDefaultDefaultProfiles) {
 
@@ -2600,24 +2614,26 @@ public class CalendarProfileManager {
 			parse_200_Calendars(xmlRoot, _allCalendarProfiles);
 
 			// ensure all app default profiles are available
-			final ArrayList<CalendarProfile> missingAppDefaultProfiles = new ArrayList<>();
-			for (final CalendarProfile appDefaultProfile : _allDefaultDefaultProfiles) {
+			final ArrayList<CalendarProfile> missingDefaultDefaultProfiles = new ArrayList<>();
+			for (final CalendarProfile defaultDefaultProfile : _allDefaultDefaultProfiles) {
 
-				boolean isAppDefaultAvailable = false;
+				boolean isDefaultDefaultAvailable = false;
 
 				for (final CalendarProfile restoredCalendarProfile : _allCalendarProfiles) {
 
-					if (restoredCalendarProfile.defaultId.equals(appDefaultProfile.defaultId)) {
-						isAppDefaultAvailable = true;
+					if (restoredCalendarProfile.isDefaultDefault == true
+							&& restoredCalendarProfile.defaultId.equals(defaultDefaultProfile.defaultId)) {
+
+						isDefaultDefaultAvailable = true;
 						break;
 					}
 				}
 
-				if (!isAppDefaultAvailable) {
-					missingAppDefaultProfiles.add(appDefaultProfile);
+				if (isDefaultDefaultAvailable == false) {
+					missingDefaultDefaultProfiles.add(defaultDefaultProfile);
 				}
 			}
-			_allCalendarProfiles.addAll(missingAppDefaultProfiles);
+			_allCalendarProfiles.addAll(missingDefaultDefaultProfiles);
 
 			// ensure profiles are created
 			if (_allCalendarProfiles.size() == 0) {
@@ -2690,7 +2706,7 @@ public class CalendarProfileManager {
 		profile.isUserParentDefault			= Util.getXmlBoolean(xmlProfile, 					ATTR_IS_USER_PARENT_DEFAULT_ID,			false);
 		profile.userDefaultId				= Util.getXmlString(xmlProfile,						ATTR_PROFILE_USER_DEFAULT_ID,			UI.EMPTY_STRING);
 		profile.userParentDefaultId			= Util.getXmlString(xmlProfile,						ATTR_PROFILE_USER_PARENT_DEFAULT_ID,	UI.EMPTY_STRING);
-		profile.defaultId					= (DefaultId) Util.getXmlEnum(xmlProfile,			ATTR_PROFILE_DEFAULT_DEFAULT_ID,		DEFAULT_PROFILE_DEFAULT_ID);
+		profile.defaultId					= (DefaultId) Util.getXmlEnum(xmlProfile,			ATTR_PROFILE_DEFAULT_DEFAULT_ID,		DefaultId.XML_DEFAULT);
 		
 		// layout
 		profile.isToggleMonthColor			= Util.getXmlBoolean(xmlProfile, 					ATTR_IS_TOGGLE_MONTH_COLOR,		true);

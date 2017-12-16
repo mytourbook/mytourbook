@@ -35,5 +35,11 @@ public enum DefaultId {
 	/**
 	 * This is a special id, this is a user parent id
 	 */
-	USER_ID
+	USER_ID,
+
+	/**
+	 * This is a special id which is used as default when loading xml config data to identify
+	 * invalid id's
+	 */
+	XML_DEFAULT,
 }
