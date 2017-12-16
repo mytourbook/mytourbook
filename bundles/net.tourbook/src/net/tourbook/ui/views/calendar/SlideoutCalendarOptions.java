@@ -1486,7 +1486,6 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		{
 			createUI_410_DayDate(container);
 			createUI_420_Color(container);
-			createUI_430_Font(container);
 		}
 
 		return container;
@@ -1854,110 +1853,6 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		}
 	}
 
-	private void createUI_430_Font(final Composite parent) {
-
-		final Group group = new Group(parent, SWT.NONE);
-		group.setText(Messages.Slideout_CalendarOptions_Group_TourFont);
-		GridDataFactory
-				.fillDefaults()//
-				.grab(true, false)
-				.applyTo(group);
-		GridLayoutFactory.swtDefaults().numColumns(4).applyTo(group);
-//		group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_CYAN));
-		{
-			{
-				/*
-				 * Title font
-				 */
-
-				// label
-				_lblTour_TitleFont = new Label(group, SWT.NONE);
-				_lblTour_TitleFont.setText(Messages.Slideout_CalendarOptions_Label_Tour_TitleFont);
-				GridDataFactory.fillDefaults().indent(0, _fontLabelVIndent).applyTo(_lblTour_TitleFont);
-
-				// font/size
-				_fontEditorTourTitle = new SimpleFontEditor(group, SWT.NONE);
-				_fontEditorTourTitle.addFontListener(_defaultFontEditorListener);
-				GridDataFactory.fillDefaults().grab(true, true).applyTo(_fontEditorTourTitle);
-
-				// combo color
-				_comboTour_TitleColor = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
-				_comboTour_TitleColor.setVisibleItemCount(20);
-				_comboTour_TitleColor.addSelectionListener(_defaultSelectionListener);
-				GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(_comboTour_TitleColor);
-
-				// color selector
-				_colorTour_TitleColor = createUI_ColorSelector(group);
-			}
-			{
-				/*
-				 * Content font
-				 */
-
-				// label
-				_lblTour_ContentFont = new Label(group, SWT.NONE);
-				_lblTour_ContentFont.setText(Messages.Slideout_CalendarOptions_Label_Tour_ContentFont);
-				GridDataFactory
-						.fillDefaults()//
-						.indent(0, _fontLabelVIndent)
-						.applyTo(_lblTour_ContentFont);
-
-				// font/size
-				_fontEditorTourContent = new SimpleFontEditor(group, SWT.NONE);
-				_fontEditorTourContent.addFontListener(_defaultFontEditorListener);
-				GridDataFactory
-						.fillDefaults()//
-						.grab(true, true)
-						.applyTo(_fontEditorTourContent);
-
-				// combo color
-				_comboTour_ContentColor = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
-				_comboTour_ContentColor.setVisibleItemCount(20);
-				_comboTour_ContentColor.addSelectionListener(_defaultSelectionListener);
-				GridDataFactory
-						.fillDefaults()//
-						.align(SWT.BEGINNING, SWT.BEGINNING)
-						.applyTo(_comboTour_ContentColor);
-
-				// color selector
-				_colorTour_ContentColor = createUI_ColorSelector(group);
-			}
-			{
-				/*
-				 * Value font
-				 */
-
-				// label
-				_lblTour_ValueFont = new Label(group, SWT.NONE);
-				_lblTour_ValueFont.setText(Messages.Slideout_CalendarOptions_Label_Tour_ValueFont);
-				GridDataFactory
-						.fillDefaults()//
-						.indent(0, _fontLabelVIndent)
-						.applyTo(_lblTour_ValueFont);
-
-				// font/size
-				_fontEditorTourValue = new SimpleFontEditor(group, SWT.NONE);
-				_fontEditorTourValue.addFontListener(_defaultFontEditorListener);
-				GridDataFactory
-						.fillDefaults()//
-						.grab(true, true)
-						.applyTo(_fontEditorTourValue);
-
-				// combo color
-				_comboTour_ValueColor = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
-				_comboTour_ValueColor.setVisibleItemCount(20);
-				_comboTour_ValueColor.addSelectionListener(_defaultSelectionListener);
-				GridDataFactory
-						.fillDefaults()//
-						.align(SWT.BEGINNING, SWT.BEGINNING)
-						.applyTo(_comboTour_ValueColor);
-
-				// color selector
-				_colorTour_ValueColor = createUI_ColorSelector(group);
-			}
-		}
-	}
-
 	private Control createUI_600_Tab_TourContent(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
@@ -1997,7 +1892,15 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 		{
 			createUI_620_Layout(_tourFormatterContainer);
-			createUI_630_Margin(_tourFormatterContainer);
+
+			final Composite container = new Composite(_tourFormatterContainer, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+			{
+				createUI_630_Margin(container);
+				createUI_640_Font(container);
+			}
+
 			createUI_650_Values(_tourFormatterContainer);
 		}
 	}
@@ -2111,27 +2014,27 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 	private void createUI_630_Margin(final Composite parent) {
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory
-				.fillDefaults()
-				.numColumns(2)
-
-				// make is more visible
-				.extendedMargins(0, 0, 10, 0)
-				.applyTo(container);
+//		final Composite container = new Composite(parent, SWT.NONE);
+//		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+//		GridLayoutFactory
+//				.fillDefaults()
+//				.numColumns(2)
+//
+//				// make is more visible
+//				.extendedMargins(0, 0, 10, 0)
+//				.applyTo(container);
 		{
 			/*
 			 * Margins
 			 */
 
 			// label
-			_lblTour_Margin = new Label(container, SWT.NONE);
+			_lblTour_Margin = new Label(parent, SWT.NONE);
 			_lblTour_Margin.setText(Messages.Slideout_CalendarOptions_Label_Margin);
 			_lblTour_Margin.setToolTipText(Messages.Slideout_CalendarOptions_Label_Margin_Tooltip);
 			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_lblTour_Margin);
 
-			final Composite valueContainer = new Composite(container, SWT.NONE);
+			final Composite valueContainer = new Composite(parent, SWT.NONE);
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(valueContainer);
 			GridLayoutFactory.fillDefaults().numColumns(4).applyTo(valueContainer);
 			{
@@ -2139,6 +2042,115 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				_spinnerTour_Margin_Left = createUI_Margin(valueContainer);
 				_spinnerTour_Margin_Bottom = createUI_Margin(valueContainer);
 				_spinnerTour_Margin_Right = createUI_Margin(valueContainer);
+			}
+		}
+	}
+
+	private void createUI_640_Font(final Composite parent) {
+
+		{
+			/*
+			 * Title font
+			 */
+
+			// label
+			_lblTour_TitleFont = new Label(parent, SWT.NONE);
+			_lblTour_TitleFont.setText(Messages.Slideout_CalendarOptions_Label_Tour_TitleFont);
+			GridDataFactory.fillDefaults().indent(0, _fontLabelVIndent).applyTo(_lblTour_TitleFont);
+
+			final Composite containerTitle = new Composite(parent, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(containerTitle);
+			GridLayoutFactory.fillDefaults().numColumns(3).applyTo(containerTitle);
+			{
+				// font/size
+				_fontEditorTourTitle = new SimpleFontEditor(containerTitle, SWT.NONE);
+				_fontEditorTourTitle.addFontListener(_defaultFontEditorListener);
+				GridDataFactory.fillDefaults().grab(true, true).applyTo(_fontEditorTourTitle);
+
+				// combo color
+				_comboTour_TitleColor = new Combo(containerTitle, SWT.DROP_DOWN | SWT.READ_ONLY);
+				_comboTour_TitleColor.setVisibleItemCount(20);
+				_comboTour_TitleColor.addSelectionListener(_defaultSelectionListener);
+				GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(_comboTour_TitleColor);
+
+				// color selector
+				_colorTour_TitleColor = createUI_ColorSelector(containerTitle);
+			}
+		}
+		{
+			/*
+			 * Content font
+			 */
+
+			// label
+			_lblTour_ContentFont = new Label(parent, SWT.NONE);
+			_lblTour_ContentFont.setText(Messages.Slideout_CalendarOptions_Label_Tour_ContentFont);
+			GridDataFactory
+					.fillDefaults()//
+					.indent(0, _fontLabelVIndent)
+					.applyTo(_lblTour_ContentFont);
+
+			final Composite containerContent = new Composite(parent, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(containerContent);
+			GridLayoutFactory.fillDefaults().numColumns(3).applyTo(containerContent);
+			{
+				// font/size
+				_fontEditorTourContent = new SimpleFontEditor(containerContent, SWT.NONE);
+				_fontEditorTourContent.addFontListener(_defaultFontEditorListener);
+				GridDataFactory
+						.fillDefaults()//
+						.grab(true, true)
+						.applyTo(_fontEditorTourContent);
+
+				// combo color
+				_comboTour_ContentColor = new Combo(containerContent, SWT.DROP_DOWN | SWT.READ_ONLY);
+				_comboTour_ContentColor.setVisibleItemCount(20);
+				_comboTour_ContentColor.addSelectionListener(_defaultSelectionListener);
+				GridDataFactory
+						.fillDefaults()//
+						.align(SWT.BEGINNING, SWT.BEGINNING)
+						.applyTo(_comboTour_ContentColor);
+
+				// color selector
+				_colorTour_ContentColor = createUI_ColorSelector(containerContent);
+			}
+		}
+		{
+			/*
+			 * Value font
+			 */
+
+			// label
+			_lblTour_ValueFont = new Label(parent, SWT.NONE);
+			_lblTour_ValueFont.setText(Messages.Slideout_CalendarOptions_Label_Tour_ValueFont);
+			GridDataFactory
+					.fillDefaults()//
+					.indent(0, _fontLabelVIndent)
+					.applyTo(_lblTour_ValueFont);
+
+			final Composite containerValue = new Composite(parent, SWT.NONE);
+			GridDataFactory.fillDefaults().grab(true, false).applyTo(containerValue);
+			GridLayoutFactory.fillDefaults().numColumns(3).applyTo(containerValue);
+			{
+				// font/size
+				_fontEditorTourValue = new SimpleFontEditor(containerValue, SWT.NONE);
+				_fontEditorTourValue.addFontListener(_defaultFontEditorListener);
+				GridDataFactory
+						.fillDefaults()//
+						.grab(true, true)
+						.applyTo(_fontEditorTourValue);
+
+				// combo color
+				_comboTour_ValueColor = new Combo(containerValue, SWT.DROP_DOWN | SWT.READ_ONLY);
+				_comboTour_ValueColor.setVisibleItemCount(20);
+				_comboTour_ValueColor.addSelectionListener(_defaultSelectionListener);
+				GridDataFactory
+						.fillDefaults()//
+						.align(SWT.BEGINNING, SWT.BEGINNING)
+						.applyTo(_comboTour_ValueColor);
+
+				// color selector
+				_colorTour_ValueColor = createUI_ColorSelector(containerValue);
 			}
 		}
 	}
@@ -2328,27 +2340,26 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(fontContainer);
 			GridLayoutFactory.fillDefaults().numColumns(3).applyTo(fontContainer);
 			{
+				// value
+				_fontEditorWeekValue = new SimpleFontEditor(fontContainer, SWT.NONE);
+				_fontEditorWeekValue.addFontListener(_defaultFontEditorListener);
+				GridDataFactory
+						.fillDefaults()//
+						.grab(true, true)
+						.applyTo(_fontEditorWeekValue);
+				/*
+				 * Value color
+				 */
 
+				// combo
+				_comboWeek_ValueColor = new Combo(fontContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
+				_comboWeek_ValueColor.setVisibleItemCount(20);
+				_comboWeek_ValueColor.addSelectionListener(_defaultSelectionListener);
+				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(_comboWeek_ValueColor);
+
+				// color selector
+				_colorWeek_ValueColor = createUI_ColorSelector(fontContainer);
 			}
-			// value
-			_fontEditorWeekValue = new SimpleFontEditor(fontContainer, SWT.NONE);
-			_fontEditorWeekValue.addFontListener(_defaultFontEditorListener);
-			GridDataFactory
-					.fillDefaults()//
-					.grab(true, true)
-					.applyTo(_fontEditorWeekValue);
-			/*
-			 * Value color
-			 */
-
-			// combo
-			_comboWeek_ValueColor = new Combo(fontContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
-			_comboWeek_ValueColor.setVisibleItemCount(20);
-			_comboWeek_ValueColor.addSelectionListener(_defaultSelectionListener);
-			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(_comboWeek_ValueColor);
-
-			// color selector
-			_colorWeek_ValueColor = createUI_ColorSelector(fontContainer);
 		}
 	}
 
