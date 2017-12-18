@@ -32,3 +32,6 @@ _This document will not repeat already written text in the documentation._
 **Scramble calendar content/values**
 
 -DscrambleCalendar
+
+**Log FIT data**
+-DlogFitData
