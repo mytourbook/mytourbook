@@ -134,6 +134,9 @@ public class CalendarProfile implements Cloneable {
 	int 					dayDateMarginTop			= CalendarProfileManager.DEFAULT_DAY_DATE_MARGIN_TOP;
 	int 					dayDateMarginLeft			= CalendarProfileManager.DEFAULT_DAY_DATE_MARGIN_LEFT;
 	//
+	// day layout
+	boolean 				isDayContentVertical		= true;
+	//
 	// tour background
 	TourBackground			tourBackground				= CalendarProfileManager.DEFAULT_TOUR_BACKGROUND;
 	CalendarColor			tourBackground1Color		= CalendarProfileManager.DEFAULT_TOUR_BACKGROUND_COLOR1;
@@ -173,8 +176,6 @@ public class CalendarProfile implements Cloneable {
 	RGB						tourTitleRGB				= CalendarProfileManager.DEFAULT_TOUR_TITLE_RGB;
 	RGB						tourValueRGB				= CalendarProfileManager.DEFAULT_TOUR_VALUE_RGB;
 
-
-	
 // SET_FORMATTING_ON
 
 	/**
@@ -338,6 +339,9 @@ public class CalendarProfile implements Cloneable {
         sb.append("profile.dayDateMarginLeft             = " + dayDateMarginLeft                          + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.dayDateFont                   = " + dump_Font(dayDateFont)                     + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.dayDateFormat                 = DayDateFormat." + dayDateFormat                + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("                                                                                           \n"); //$NON-NLS-1$
+        sb.append("// day                                                                                     \n"); //$NON-NLS-1$
+        sb.append("profile.isDayContentVertical          = " + isDayContentVertical                       + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("                                                                                           \n"); //$NON-NLS-1$
         sb.append("// tour background                                                                         \n"); //$NON-NLS-1$
         sb.append("profile.tourBackground                = TourBackground." + tourBackground              + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$

@@ -1650,6 +1650,7 @@ public class Messages extends NLS {
 	public static String		Slideout_CalendarOptions_Dialog_DeleteProfile_Message;
 	public static String		Slideout_CalendarOptions_Dialog_DeleteProfile_Title;
 	public static String		Slideout_CalendarOptions_Group_DateColumn;
+	public static String		Slideout_CalendarOptions_Group_Day;
 	public static String		Slideout_CalendarOptions_Group_DayDate;
 	public static String		Slideout_CalendarOptions_Group_Layout;
 	public static String		Slideout_CalendarOptions_Group_TourColor;
@@ -1663,6 +1664,8 @@ public class Messages extends NLS {
 	public static String		Slideout_CalendarOptions_Label_DateColumn_Width;
 	public static String		Slideout_CalendarOptions_Label_Day_HoveredColor;
 	public static String		Slideout_CalendarOptions_Label_Day_SelectedColor;
+	public static String		Slideout_CalendarOptions_Label_DayContent_Direction;
+	public static String		Slideout_CalendarOptions_Label_DayContent_Direction_Tooltip;
 	public static String		Slideout_CalendarOptions_Label_DayDate_Format;
 	public static String		Slideout_CalendarOptions_Label_Line;
 	public static String		Slideout_CalendarOptions_Label_Margin;
@@ -1694,6 +1697,8 @@ public class Messages extends NLS {
 	public static String		Slideout_CalendarOptions_Label_YearColumn_Space;
 	public static String		Slideout_CalendarOptions_Label_YearColumn_Space_Tooltip;
 	public static String		Slideout_CalendarOptions_Label_YearColumn_Start;
+	public static String		Slideout_CalendarOptions_Radio_DayContent_Direction_Horizontal;
+	public static String		Slideout_CalendarOptions_Radio_DayContent_Direction_Vertical;
 	public static String		Slideout_CalendarOptions_Radio_Weeks_ByHeight;
 	public static String		Slideout_CalendarOptions_Radio_Weeks_ByNumber;
 	public static String		Slideout_CalendarOptions_Radio_YearColumn_ByDayWidth;

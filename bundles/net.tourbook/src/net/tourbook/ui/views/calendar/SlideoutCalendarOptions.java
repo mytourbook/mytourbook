@@ -175,6 +175,8 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	private Button							_chkIsUserDefaultId;
 	private Button							_chkUseDraggedScrolling;
 	//
+	private Button							_rdoDayContent_Direction_Vertical;
+	private Button							_rdoDayContent_Direction_Horizontal;
 	private Button							_rdoWeekRow_Height;
 	private Button							_rdoWeekRow_Number;
 	private Button							_rdoYear_ColumnNumber;
@@ -230,6 +232,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	private Label							_lblDateColumn_Font;
 	private Label							_lblDateColumn_Width;
 	private Label							_lblDayDate_Margin;
+	private Label							_lblDayContent_Direction;
 	private Label							_lblDayHeader_Font;
 	private Label							_lblDayHeader_Format;
 	private Label							_lblProfile_Name;
@@ -401,7 +404,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 				// calendar layout
 				final TabItem tabLayout = new TabItem(_tabFolder, SWT.NONE);
-				tabLayout.setControl(createUI_200_Tab_CalendarLayout(_tabFolder));
+				tabLayout.setControl(createUI_200_Tab_Day(_tabFolder));
 				tabLayout.setText(Messages.Slideout_CalendarOptions_Tab_CalendarLayout);
 
 				// tour layout
@@ -528,6 +531,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			tc.setText(Messages.Slideout_CalendarOptions_ColumnHeader_IsAppId);
 			tc.setToolTipText(Messages.Slideout_CalendarOptions_ColumnHeader_IsAppId_Tooltip);
 			tvc.setLabelProvider(new CellLabelProvider() {
+
 				@Override
 				public void update(final ViewerCell cell) {
 
@@ -632,6 +636,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 //		_profileViewer.setComparator(new ProfileComparator());
 
 		_profileViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+
 			@Override
 			public void selectionChanged(final SelectionChangedEvent event) {
 				onProfile_Select();
@@ -856,6 +861,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				_btnProfile_Copy.setText(Messages.App_Action_Copy);
 				_btnProfile_Copy.setToolTipText(Messages.Slideout_CalendarOptions_Action_CopyProfile_Tooltip);
 				_btnProfile_Copy.addSelectionListener(new SelectionAdapter() {
+
 					@Override
 					public void widgetSelected(final SelectionEvent e) {
 						onProfile_Copy();
@@ -882,6 +888,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				// set button default width
 				UI.setButtonLayoutData(_btnProfile_Delete);
 			}
+
 		}
 	}
 
@@ -1006,7 +1013,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		}
 	}
 
-	private Control createUI_200_Tab_CalendarLayout(final Composite parent) {
+	private Control createUI_200_Tab_Day(final Composite parent) {
 
 		final Composite container = new Composite(parent, SWT.NONE);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -1484,58 +1491,12 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 		GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
 		{
-			createUI_410_DayDate(container);
-			createUI_420_Color(container);
+			createUI_420_Day(container);
+			createUI_430_DayDate(container);
+			createUI_440_Color(container);
 		}
 
 		return container;
-	}
-
-	private void createUI_410_DayDate(final Composite parent) {
-
-		final Group group = new Group(parent, SWT.NONE);
-		group.setText(Messages.Slideout_CalendarOptions_Group_DayDate);
-		GridDataFactory
-				.fillDefaults()//
-				.grab(true, false)
-				.applyTo(group);
-		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
-//		group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
-		{
-			{
-				/*
-				 * Day date
-				 */
-
-				// checkbox
-				_chkIsShowDayDate = new Button(group, SWT.CHECK);
-				_chkIsShowDayDate.setText(Messages.Slideout_CalendarOptions_Checkbox_IsShowDayDate);
-				_chkIsShowDayDate.addSelectionListener(_defaultSelectionListener);
-				GridDataFactory
-						.fillDefaults()//
-						.align(SWT.FILL, SWT.BEGINNING)
-						.span(2, 1)
-						.applyTo(_chkIsShowDayDate);
-			}
-			{
-				final Composite container = new Composite(group, SWT.NONE);
-				GridDataFactory
-						.fillDefaults()//
-						.grab(true, false)
-						.span(2, 1)
-						.applyTo(container);
-				GridLayoutFactory
-						.fillDefaults()//
-						.numColumns(2)
-						.spacing(20, LayoutConstants.getSpacing().y)
-						.applyTo(container);
-//				container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
-				{
-					createUI_412__Col1(container);
-					createUI_414__Col2(container);
-				}
-			}
-		}
 	}
 
 	private void createUI_412__Col1(final Composite parent) {
@@ -1654,7 +1615,109 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		}
 	}
 
-	private void createUI_420_Color(final Composite parent) {
+	private void createUI_420_Day(final Composite parent) {
+
+		final Group group = new Group(parent, SWT.NONE);
+		group.setText(Messages.Slideout_CalendarOptions_Group_Day);
+		GridDataFactory
+				.fillDefaults()
+				.grab(true, false)
+				.applyTo(group);
+		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
+
+		{
+			/*
+			 * V/H-Direction
+			 */
+
+			// label
+			_lblDayContent_Direction = new Label(group, SWT.NONE);
+			_lblDayContent_Direction.setText(Messages.Slideout_CalendarOptions_Label_DayContent_Direction);
+			_lblDayContent_Direction.setToolTipText(
+					Messages.Slideout_CalendarOptions_Label_DayContent_Direction_Tooltip);
+		}
+
+		final Composite container = new Composite(group, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory
+				.fillDefaults()
+				.numColumns(2)
+				.extendedMargins(20, 0, 0, 0)
+				.applyTo(container);
+		{
+			{
+				/*
+				 * Vertical
+				 */
+
+				// radio
+				_rdoDayContent_Direction_Vertical = new Button(container, SWT.RADIO);
+				_rdoDayContent_Direction_Vertical.setText(
+						Messages.Slideout_CalendarOptions_Radio_DayContent_Direction_Vertical);
+				_rdoDayContent_Direction_Vertical.addSelectionListener(_defaultSelectionListener);
+			}
+			{
+				/*
+				 * Horizontal
+				 */
+
+				// radio
+				_rdoDayContent_Direction_Horizontal = new Button(container, SWT.RADIO);
+				_rdoDayContent_Direction_Horizontal.setText(
+						Messages.Slideout_CalendarOptions_Radio_DayContent_Direction_Horizontal);
+				_rdoDayContent_Direction_Horizontal.addSelectionListener(_defaultSelectionListener);
+			}
+		}
+	}
+
+	private void createUI_430_DayDate(final Composite parent) {
+
+		final Group group = new Group(parent, SWT.NONE);
+		group.setText(Messages.Slideout_CalendarOptions_Group_DayDate);
+		GridDataFactory
+				.fillDefaults()//
+				.grab(true, false)
+				.applyTo(group);
+		GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
+//		group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+		{
+			{
+				/*
+				 * Day date
+				 */
+
+				// checkbox
+				_chkIsShowDayDate = new Button(group, SWT.CHECK);
+				_chkIsShowDayDate.setText(Messages.Slideout_CalendarOptions_Checkbox_IsShowDayDate);
+				_chkIsShowDayDate.addSelectionListener(_defaultSelectionListener);
+				GridDataFactory
+						.fillDefaults()//
+						.align(SWT.FILL, SWT.BEGINNING)
+						.span(2, 1)
+						.applyTo(_chkIsShowDayDate);
+			}
+			{
+				final Composite container = new Composite(group, SWT.NONE);
+				GridDataFactory
+						.fillDefaults()//
+						.grab(true, false)
+						.span(2, 1)
+						.applyTo(container);
+				GridLayoutFactory
+						.fillDefaults()//
+						.numColumns(2)
+						.spacing(20, LayoutConstants.getSpacing().y)
+						.applyTo(container);
+//				container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+				{
+					createUI_412__Col1(container);
+					createUI_414__Col2(container);
+				}
+			}
+		}
+	}
+
+	private void createUI_440_Color(final Composite parent) {
 
 		final Group group = new Group(parent, SWT.NONE);
 		group.setText(Messages.Slideout_CalendarOptions_Group_TourColor);
@@ -1897,11 +1960,11 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 			{
-				createUI_630_Margin(container);
-				createUI_640_Font(container);
+				createUI_650_Margin(container);
+				createUI_660_Font(container);
 			}
 
-			createUI_650_Values(_tourFormatterContainer);
+			createUI_680_Values(_tourFormatterContainer);
 		}
 	}
 
@@ -2012,17 +2075,8 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		}
 	}
 
-	private void createUI_630_Margin(final Composite parent) {
+	private void createUI_650_Margin(final Composite parent) {
 
-//		final Composite container = new Composite(parent, SWT.NONE);
-//		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-//		GridLayoutFactory
-//				.fillDefaults()
-//				.numColumns(2)
-//
-//				// make is more visible
-//				.extendedMargins(0, 0, 10, 0)
-//				.applyTo(container);
 		{
 			/*
 			 * Margins
@@ -2046,7 +2100,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		}
 	}
 
-	private void createUI_640_Font(final Composite parent) {
+	private void createUI_660_Font(final Composite parent) {
 
 		{
 			/*
@@ -2155,7 +2209,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		}
 	}
 
-	private void createUI_650_Values(final Composite parent) {
+	private void createUI_680_Values(final Composite parent) {
 
 		final int defaultTourFormatter = CalendarProfileManager.NUM_DEFAULT_TOUR_FORMATTER;
 
@@ -3770,6 +3824,10 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			_spinnerDayDate_Margin_Top.setSelection(profile.dayDateMarginTop);
 			_spinnerDayDate_Margin_Left.setSelection(profile.dayDateMarginLeft);
 
+			// day layout
+			_rdoDayContent_Direction_Horizontal.setSelection(profile.isDayContentVertical == false);
+			_rdoDayContent_Direction_Vertical.setSelection(profile.isDayContentVertical);
+
 			// tour background
 			_comboTour_Background.select(getTourBackgroundIndex(profile.tourBackground));
 			_comboTour_BackgroundColor1.select(getGraphColorIndex(profile.tourBackground1Color));
@@ -3916,6 +3974,9 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		profile.isShowDayDateWeekendColor = _chkIsShowDayDateWeekendColor.getSelection();
 		profile.dayDateMarginTop = _spinnerDayDate_Margin_Top.getSelection();
 		profile.dayDateMarginLeft = _spinnerDayDate_Margin_Left.getSelection();
+
+		// day layout
+		profile.isDayContentVertical = _rdoDayContent_Direction_Vertical.getSelection();
 
 		// tour background
 		profile.tourBackground = getSelectedTourBackgroundData().tourBackground;

@@ -1297,8 +1297,12 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 						} else if (isCalendarDataAvailable) {
 
+							final CalendarTourData calTourData = _currentProfile.isDayContentVertical
+									? calendarData[0]
+									: calendarData[calendarData.length - 1];
+
 							dayDateForegroundColor = getColor_Tour(
-									calendarData[0],
+									calTourData,
 									_currentProfile.tourContentColor,
 									_currentProfile.tourContentRGB);
 
@@ -1389,47 +1393,82 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		gc.setFont(getFont_TourContent());
 
+		final boolean isContentVertical = _currentProfile.isDayContentVertical;
 		final int numTours = allCalendarTourData.length;
-		final int tourHeight = dayRect.height / numTours;
-		final int remainingHeight = dayRect.height % numTours;
 
-		for (int tourIndex = 0; tourIndex < numTours; tourIndex++) {
+		if (isContentVertical) {
 
-			final int devY = dayRect.y + tourIndex * tourHeight;
+			// vertical layout
 
-			int tourCellHeight = tourHeight - 1;
+			final int tourHeight = dayRect.height / numTours;
+			final int remainingHeight = dayRect.height % numTours;
 
-			// prevent that the bottom is not painted with the fill color
-			if (tourIndex == numTours - 1) {
-				// the last tour is using the remaining height
-				tourCellHeight += remainingHeight;
+			for (int tourIndex = 0; tourIndex < numTours; tourIndex++) {
+
+				final int devY = dayRect.y + tourIndex * tourHeight;
+
+				int tourCellHeight = tourHeight - 1;
+
+				// prevent that the bottom is not painted with the fill color
+				if (tourIndex == numTours - 1) {
+
+					// the last tour is using the remaining height
+					tourCellHeight += remainingHeight;
+				}
+
+				final Rectangle tourRect = new Rectangle(
+						dayRect.x,
+						devY,
+						dayRect.width - 1,
+						tourCellHeight);
+
+				drawDay_Tour(gc, tourRect, allCalendarTourData[tourIndex]);
 			}
 
-			final Rectangle tourRect = new Rectangle(
-					dayRect.x,
-					devY,
-					dayRect.width - 1,
-					tourCellHeight);
+		} else {
 
-			final Rectangle focusRect = new Rectangle(
-					tourRect.x - 1,
-					tourRect.y - 1,
-					tourRect.width + 2,
-					tourRect.height + 2);
+			// horizontal layout
 
-			final CalendarTourData calendarTourData = allCalendarTourData[tourIndex];
+			final int tourWidth = dayRect.width / numTours;
+			final int remainingWidth = dayRect.width % numTours;
 
-			final FocusItem tourFocusItem = new FocusItem(focusRect, calendarTourData.tourId, calendarTourData);
+			for (int tourIndex = 0; tourIndex < numTours; tourIndex++) {
 
-			_allTourFocusItems.add(tourFocusItem);
+				final int devX = dayRect.x + tourIndex * tourWidth;
 
-			drawDay_Tour(gc, calendarTourData, tourRect);
+				int tourCellWidth = tourWidth - 1;
+
+				// prevent that the bottom is not painted with the fill color
+				if (tourIndex == numTours - 1) {
+
+					// the last tour is using the remaining height
+					tourCellWidth += remainingWidth;
+				}
+
+				final Rectangle tourRect = new Rectangle(
+						devX,
+						dayRect.y,
+						tourCellWidth,
+						dayRect.height - 1);
+
+				drawDay_Tour(gc, tourRect, allCalendarTourData[tourIndex]);
+			}
 		}
 	}
 
 	private void drawDay_Tour(	final GC gc,
-								final CalendarTourData data,
-								final Rectangle tourRect) {
+								final Rectangle tourRect,
+								final CalendarTourData calendarTourData) {
+
+		final Rectangle focusRect = new Rectangle(
+				tourRect.x - 1,
+				tourRect.y - 1,
+				tourRect.width + 2,
+				tourRect.height + 2);
+
+		final FocusItem tourFocusItem = new FocusItem(focusRect, calendarTourData.tourId, calendarTourData);
+
+		_allTourFocusItems.add(tourFocusItem);
 
 		final int devX = tourRect.x;
 		final int devY = tourRect.y;
@@ -1440,9 +1479,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		final int devXRight = devX + cellWidth - 1;
 		final int devYBottom = devY + cellHeight - 1;
 
-		drawDay_TourBackground(gc, data, devX, devY, cellWidth, cellHeight, devXRight, devYBottom);
-		drawDay_TourBorder(gc, data, devX, devY, cellWidth, cellHeight, devXRight, devYBottom);
-		drawDay_TourConent(gc, tourRect, data);
+		drawDay_TourBackground(gc, calendarTourData, devX, devY, cellWidth, cellHeight, devXRight, devYBottom);
+		drawDay_TourBorder(gc, calendarTourData, devX, devY, cellWidth, cellHeight, devXRight, devYBottom);
+		drawDay_TourConent(gc, tourRect, calendarTourData);
 	}
 
 	/**
@@ -1496,11 +1535,25 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			final int ovalSize = Math.min(cellWidth, cellHeight);
 			gc.setAntialias(SWT.ON);
 			gc.setBackground(backgroundColor);
-			gc.fillOval(
-					devX + cellWidth / 2 - ovalSize / 2,
-					devY,
-					ovalSize,
-					ovalSize);
+
+			if (_currentProfile.isDayContentVertical) {
+
+				// center horizontally
+				gc.fillOval(
+						devX + cellWidth / 2 - ovalSize / 2,
+						devY,
+						ovalSize,
+						ovalSize);
+
+			} else {
+
+				// center vertically
+				gc.fillOval(
+						devX + cellWidth / 2 - ovalSize / 2,
+						devY + cellHeight / 2 - ovalSize / 2,
+						ovalSize,
+						ovalSize);
+			}
 			break;
 
 		case GRADIENT_HORIZONTAL:

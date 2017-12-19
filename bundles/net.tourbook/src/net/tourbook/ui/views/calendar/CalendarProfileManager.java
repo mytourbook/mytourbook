@@ -111,6 +111,7 @@ public class CalendarProfileManager {
 	private static final String				TAG_TOUR_VALUE_RGB						= "TourValueRGB";					//$NON-NLS-1$;
 	private static final String				TAG_WEEK_VALUE_RGB						= "weekValueRGB";					//$NON-NLS-1$
 	//
+	private static final String				ATTR_IS_DAY_CONTENT_VERTICAL			= "isDayContentVertical";			//$NON-NLS-1$
 	private static final String				ATTR_IS_HIDE_DAY_DATE_WHEN_NO_TOUR		= "isHideDayDateWhenNoTour";		//$NON-NLS-1$
 	private static final String				ATTR_IS_SHOW_DATE_COLUMN				= "isShowDateColumn";				//$NON-NLS-1$
 	private static final String				ATTR_IS_SHOW_DAY_DATE					= "isShowDayDate";					//$NON-NLS-1$
@@ -455,16 +456,6 @@ public class CalendarProfileManager {
 					false,
 					false),
 
-			new TourBackground_ComboData(TourBackground.FILL_LEFT,				Messages.Calendar_Profile_TourBackground_Fill_Left,
-					true,
-					false,
-					true),
-
-			new TourBackground_ComboData(TourBackground.FILL_RIGHT,				Messages.Calendar_Profile_TourBackground_Fill_Right,
-					true,
-					false,
-					true),
-
 			new TourBackground_ComboData(TourBackground.CIRCLE,					Messages.Calendar_Profile_TourBackground_Circle,
 					true,
 					false,
@@ -479,6 +470,16 @@ public class CalendarProfileManager {
 					true,
 					true,
 					false),
+			
+			new TourBackground_ComboData(TourBackground.FILL_LEFT,				Messages.Calendar_Profile_TourBackground_Fill_Left,
+					true,
+					false,
+					true),
+			
+			new TourBackground_ComboData(TourBackground.FILL_RIGHT,				Messages.Calendar_Profile_TourBackground_Fill_Right,
+					true,
+					false,
+					true),
 		};
 
 	private static final TourBorder_ComboData[] _allTourBorder_ComboData =
@@ -1437,6 +1438,7 @@ public class CalendarProfileManager {
 		profile.weekHeight                    = 28;
 		profile.weekRows                      = 10;
 		profile.alternateMonthRGB             = new RGB (60, 60, 60);
+		profile.alternateMonth2RGB            = new RGB (80, 80, 80);
 		profile.calendarBackgroundRGB         = new RGB (40, 40, 40);
 		profile.calendarForegroundRGB         = new RGB (200, 200, 200);
 		profile.dayHoveredRGB                 = new RGB (192, 192, 192);
@@ -1477,6 +1479,9 @@ public class CalendarProfileManager {
 		profile.dayDateMarginLeft             = 5;
 		profile.dayDateFont                   = CalendarProfile.createFont(1.2f, SWT.BOLD);
 		profile.dayDateFormat                 = DayDateFormat.DAY;
+		                                                                                           
+		// day
+		profile.isDayContentVertical          = false;
 		                                                                                           
 		// tour background
 		profile.tourBackground                = TourBackground.FILL;
@@ -1565,6 +1570,7 @@ public class CalendarProfileManager {
 		profile.weekHeight                    = 14;
 		profile.weekRows                      = 10;
 		profile.alternateMonthRGB             = new RGB (60, 60, 60);
+		profile.alternateMonth2RGB            = new RGB (80, 80, 80);
 		profile.calendarBackgroundRGB         = new RGB (40, 40, 40);
 		profile.calendarForegroundRGB         = new RGB (200, 200, 200);
 		profile.dayHoveredRGB                 = new RGB (192, 192, 192);
@@ -1605,6 +1611,9 @@ public class CalendarProfileManager {
 		profile.dayDateMarginLeft             = 5;
 		profile.dayDateFont                   = CalendarProfile.createFont(1.0f, SWT.BOLD);
 		profile.dayDateFormat                 = DayDateFormat.DAY;
+		                                                                                           
+		// day
+		profile.isDayContentVertical          = false;
 		                                                                                           
 		// tour background
 		profile.tourBackground                = TourBackground.FILL;
@@ -1693,10 +1702,11 @@ public class CalendarProfileManager {
 		profile.weekHeight                    = 10;
 		profile.weekRows                      = 10;
 		profile.alternateMonthRGB             = new RGB (60, 60, 60);
+		profile.alternateMonth2RGB            = new RGB (80, 80, 80);
 		profile.calendarBackgroundRGB         = new RGB (40, 40, 40);
 		profile.calendarForegroundRGB         = new RGB (200, 200, 200);
-		profile.dayHoveredRGB                 = new RGB (255, 255, 255);
-		profile.daySelectedRGB                = new RGB (128, 128, 128);
+		profile.dayHoveredRGB                 = new RGB (192, 192, 192);
+		profile.daySelectedRGB                = new RGB (255, 255, 255);
 		                                                                                           
 		// 1. Date column
 		profile.isShowDateColumn              = true;
@@ -1734,6 +1744,9 @@ public class CalendarProfileManager {
 		profile.dayDateFont                   = CalendarProfile.createFont(0.8f, SWT.BOLD);
 		profile.dayDateFormat                 = DayDateFormat.DAY;
 		                                                                                           
+		// day
+		profile.isDayContentVertical          = false;
+		                                                                                           
 		// tour background
 		profile.tourBackground                = TourBackground.FILL;
 		profile.tourBackgroundWidth           = 3;
@@ -1749,8 +1762,8 @@ public class CalendarProfileManager {
 		profile.tourBackground2RGB            = new RGB (128, 64, 0);
 		profile.tourBorderRGB                 = new RGB (192, 128, 0);
 		profile.tourDraggedRGB                = new RGB (255, 255, 0);
-		profile.tourHoveredRGB                = new RGB (255, 255, 255);
-		profile.tourSelectedRGB               = new RGB (192, 192, 192);
+		profile.tourHoveredRGB                = new RGB (192, 192, 192);
+		profile.tourSelectedRGB               = new RGB (255, 255, 255);
 		                                                                                           
 		// tour content
 		profile.isShowTourContent             = false;
@@ -2756,6 +2769,10 @@ public class CalendarProfileManager {
 		profile.dayDateMarginLeft			= Util.getXmlInteger(xmlProfile, 					ATTR_DAY_DATE_MARGIN_LEFT,				DEFAULT_DAY_DATE_MARGIN_LEFT,		DEFAULT_MARGIN_MIN, DEFAULT_MARGIN_MAX);
 		profile.dayDateFont 				= Util.getXmlFont(xmlProfile, 						ATTR_DAY_DATE_FONT, 					defaultFont.getFontData()[0]);
 		profile.dayDateFormat				= (DayDateFormat) Util.getXmlEnum(xmlProfile,		ATTR_DAY_DATE_FORMAT,					DEFAULT_DAY_DATE_FORMAT);
+		
+		// day layout
+		profile.isDayContentVertical		= Util.getXmlBoolean(xmlProfile, 					ATTR_IS_DAY_CONTENT_VERTICAL,	true);
+		
 		                                    
 		// tour fill
 		profile.tourBackgroundWidth			= Util.getXmlInteger(xmlProfile, 					ATTR_TOUR_BACKGROUND_WIDTH, 	DEFAULT_TOUR_BACKGROUND_WIDTH,	TOUR_BACKGROUND_WIDTH_MIN,	TOUR_BACKGROUND_WIDTH_MAX);
@@ -2912,6 +2929,9 @@ public class CalendarProfileManager {
 		xmlProfile.putInteger(		ATTR_DAY_DATE_MARGIN_LEFT, 				profile.dayDateMarginLeft);
 		Util.setXmlEnum(xmlProfile,	ATTR_DAY_DATE_FORMAT, 					profile.dayDateFormat);
 		Util.setXmlFont(xmlProfile,	ATTR_DAY_DATE_FONT, 					profile.dayDateFont);
+		
+		// day layout
+		xmlProfile.putBoolean(		ATTR_IS_DAY_CONTENT_VERTICAL, 			profile.isDayContentVertical);
 
 		// tour background
 		xmlProfile.putInteger(		ATTR_TOUR_BACKGROUND_WIDTH, 			profile.tourBackgroundWidth);
