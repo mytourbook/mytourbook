@@ -4,22 +4,36 @@ Version 17.12.1                                    ?. December 2017
 New
 ===	
 
+* Calendar
 
+  - A profile can now be based on a user configuration
 
+  - Updated calendar documentation
 
+ 
+Migrate
+=======	
+
+* Migrate from 17.12.0 -> 17.12.1
+
+  Because of substancial changes in the calendar profile management, new 
+  default profiles are created.
+
+  The old profiles are still available with all it's customized 
+  properties and can be used or deleted. They appear in the profile list
+  with an empty name and a DEFAULT config.
+
+ 
 Improvements
 ============	
 
-* Calendar
-
-  - Ctrl+0 zoom to default
-
 * FIT Import
 
-  - This behaviour has changed: By default, speed values will not be saved anymore, this can be configured in the preferences
   - Import enhanced altitude+speed values
-
-
-Bugfix
-======	
-
+  
+  - This behaviour has changed:
+    By default, speed values will not be saved anymore (when availabel),
+    this can be configured in the preferences
+    
+  - Reorganized fit import preferences
+  
