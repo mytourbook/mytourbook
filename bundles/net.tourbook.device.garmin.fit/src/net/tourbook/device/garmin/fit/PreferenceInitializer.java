@@ -27,6 +27,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
 		final IPreferenceStore store = Activator.getDefault().getPreferenceStore();
 
+		store.setDefault(IPreferences.FIT_IS_IGNORE_SPEED_VALUES, true);
+
 		store.setDefault(IPreferences.FIT_TEMPERATURE_ADJUSTMENT, 0.0f);
 
 		store.setDefault(IPreferences.FIT_IS_IGNORE_LAST_MARKER, false);

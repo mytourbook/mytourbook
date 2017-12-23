@@ -24,6 +24,7 @@ public class RecordMesgListenerImpl extends AbstractMesgListener implements Reco
 
 	private float				_temperatureAdjustment;
 
+	private boolean				_isIgnoreSpeedValues;
 	private boolean				_isReplaceExceededTimeSlice;
 	private long				_exceededTimeSliceLimit;
 	private long				_exceededTimeSliceDuration;
@@ -32,6 +33,8 @@ public class RecordMesgListenerImpl extends AbstractMesgListener implements Reco
 	public RecordMesgListenerImpl(final FitContext context) {
 
 		super(context);
+
+		_isIgnoreSpeedValues = _prefStore.getBoolean(IPreferences.FIT_IS_IGNORE_SPEED_VALUES);
 
 		_temperatureAdjustment = _prefStore.getFloat(IPreferences.FIT_TEMPERATURE_ADJUSTMENT);
 
@@ -106,9 +109,10 @@ public class RecordMesgListenerImpl extends AbstractMesgListener implements Reco
 					final PeriodType periodTemplate = PeriodType.yearMonthDayTime().withMillisRemoved();
 					final Period duration = new Period(0, timeDiff, periodTemplate);
 
-					tourMarker.setLabel(NLS.bind(
-							Messages.Import_Error_TourMarkerLabel_ExceededTimeSlice,
-							duration.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT)));
+					tourMarker.setLabel(
+							NLS.bind(
+									Messages.Import_Error_TourMarkerLabel_ExceededTimeSlice,
+									duration.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT)));
 
 					if (distance != null) {
 						tourMarker.setDistance(distance);
@@ -130,8 +134,15 @@ public class RecordMesgListenerImpl extends AbstractMesgListener implements Reco
 			timeData.longitude = DataConverters.convertSemicirclesToDegrees(positionLong);
 		}
 
+		/*
+		 * Altitude
+		 */
 		final Float altitude = mesg.getAltitude();
-		if (altitude != null) {
+		final Float altitudeEnhanced = mesg.getEnhancedAltitude();
+
+		if (altitudeEnhanced != null) {
+			timeData.absoluteAltitude = altitudeEnhanced;
+		} else if (altitude != null) {
 			timeData.absoluteAltitude = altitude;
 		}
 
@@ -140,6 +151,9 @@ public class RecordMesgListenerImpl extends AbstractMesgListener implements Reco
 			timeData.pulse = heartRate;
 		}
 
+		/*
+		 * Cadence
+		 */
 		final Short cadence = mesg.getCadence();
 		if (cadence != null) {
 
@@ -152,11 +166,26 @@ public class RecordMesgListenerImpl extends AbstractMesgListener implements Reco
 			}
 		}
 
-		final Float speed = mesg.getSpeed();
-		if (speed != null) {
-			timeData.speed = DataConverters.convertSpeed(speed);
+		/*
+		 * Speed
+		 */
+		if (_isIgnoreSpeedValues == false) {
+
+			// use speed values
+
+			final Float speed = mesg.getSpeed();
+			final Float speedEnhanced = mesg.getEnhancedSpeed();
+
+			if (speedEnhanced != null) {
+				timeData.speed = DataConverters.convertSpeed(speedEnhanced);
+			} else if (speed != null) {
+				timeData.speed = DataConverters.convertSpeed(speed);
+			}
 		}
 
+		/*
+		 * Power
+		 */
 		final Integer power = mesg.getPower();
 		if (power != null) {
 			timeData.power = power;

@@ -14,6 +14,11 @@ Improvements
 
   - Ctrl+0 zoom to default
 
+* FIT Import
+
+  - This behaviour has changed: By default, speed values will not be saved anymore, this can be configured in the preferences
+  - Import enhanced altitude+speed values
+
 
 Bugfix
 ======	
