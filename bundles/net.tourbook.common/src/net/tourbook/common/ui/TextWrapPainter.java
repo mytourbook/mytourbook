@@ -18,6 +18,7 @@ package net.tourbook.common.ui;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.graphics.Region;
 
 /*
  * This is partly copied from Snippet133
@@ -42,6 +43,9 @@ public class TextWrapPainter {
 	private boolean			_isTruncateText;
 	private int				_maxTruncatedLines;
 	private int				_truncatedLinesCounter;
+
+	private int				_linesCounter;
+	private int				_linePaintedCounter;
 
 	{
 		/*
@@ -95,6 +99,9 @@ public class TextWrapPainter {
 
 		_is1stPainted = false;
 
+		_linesCounter = 0;
+		_linePaintedCounter = -1;
+
 		_isTruncateText = isTruncateText;
 		_maxTruncatedLines = truncatedLines;
 		_truncatedLinesCounter = 2;
@@ -105,20 +112,41 @@ public class TextWrapPainter {
 		// truncate buffer
 		_wordbuffer.setLength(0);
 
+		final Rectangle textRect = new Rectangle(devX, devY, viewportWidth, viewportHeight);
+		if (noOverlapRect == null || noOverlapRect.width < 1 || noOverlapRect.height < 1) {
+
+			gc.setClipping(textRect);
+
+		} else {
+
+			final Region region = new Region();
+			{
+				region.add(textRect);
+				region.subtract(noOverlapRect);
+
+				gc.setClipping(region);
+			}
+			region.dispose();
+		}
+
 		int index = 0;
 		final int end = textToPrint.length();
 
 		while (index < end) {
 
 			final char c = textToPrint.charAt(index);
+
 			index++;
 
 			if (c != 0) {
 
 				if (c == 0x0a || c == 0x0d) {
 
+					// print line + new line
+
+					// if this is cr-lf, skip the lf
 					if (c == 0x0d && index < end && textToPrint.charAt(index) == 0x0a) {
-						index++; // if this is cr-lf, skip the lf
+						index++;
 					}
 
 					printWordBuffer(gc, noOverlapRect);
@@ -141,6 +169,8 @@ public class TextWrapPainter {
 
 					if (Character.isWhitespace(c) || c == '/' || c == ',' || c == '&' || c == '-') {
 
+						// print word
+
 						printWordBuffer(gc, noOverlapRect);
 
 						if (c == '\t') {
@@ -153,7 +183,6 @@ public class TextWrapPainter {
 
 		// print final buffer
 		printWordBuffer(gc, noOverlapRect);
-
 	}
 
 	/**
@@ -177,67 +206,81 @@ public class TextWrapPainter {
 		_devX = _devLeftMargin;
 		_devY += _lineHeight;
 
+		_linesCounter++;
 		_truncatedLinesCounter++;
 	}
 
 	private void printWordBuffer(final GC gc, final Rectangle noOverlapRect) {
 
-		if (_wordbuffer.length() > 0) {
+		if (_wordbuffer.length() == 0) {
+			return;
+		}
 
-			final String word = _wordbuffer.toString();
-			final Point wordExtent = gc.stringExtent(word);
+		final String word = _wordbuffer.toString();
+		final Point wordExtent = gc.stringExtent(word);
 
-			final int devWordWidth = wordExtent.x;
-			final int devWordHeight = wordExtent.y;
+		final int wordWidth = wordExtent.x;
+		final int wordHeight = wordExtent.y;
 
-			if (noOverlapRect != null) {
+		boolean isSkipNewLine = false;
 
-				final int max = 5;
-				int current = 0;
+		if (noOverlapRect != null) {
 
-				while (current++ < max) {
+			final int max = 5;
+			int current = 0;
 
-					final Rectangle wordRect = new Rectangle(_devX, _devY, devWordWidth, devWordHeight);
+			while (current++ < max) {
 
-					if (wordRect.intersects(noOverlapRect)) {
+				final Rectangle wordRect = new Rectangle(_devX, _devY, wordWidth, wordHeight);
+
+				if (wordRect.intersects(noOverlapRect)) {
+
+					if (_linePaintedCounter < _linesCounter) {
+
+						// this line is not yet painted -> skip newline
+
+						_linePaintedCounter++;
+						isSkipNewLine = true;
+
+						break;
+
+					} else {
 
 						if (_isTruncateText && _truncatedLinesCounter > _maxTruncatedLines) {
 							return;
 						} else {
+
 							newline();
 						}
 					}
 				}
-
 			}
 
-			if (_devX + devWordWidth > _devRightMargin) {
+		}
 
-				// do not draw a newline on the 1st line
-				if (_is1stPainted) {
+		if (_devX + wordWidth > _devRightMargin) {
 
-					// word doesn't fit on current line, so wrap
-					if (_isTruncateText && _truncatedLinesCounter > _maxTruncatedLines) {
-						return;
-					} else {
-						newline();
-					}
+			// do not draw a newline on the 1st line
+			if (_is1stPainted && isSkipNewLine == false) {
+
+				// word doesn't fit on current line, so wrap
+				if (_isTruncateText && _truncatedLinesCounter > _maxTruncatedLines) {
+					return;
+				} else {
+					newline();
 				}
 			}
-
-			gc.drawString(word, _devX, _devY, true);
-
-			_lastPaintedY = _devY;
-
-			_is1stPainted = true;
-
-//			System.out.println("x:" + _devX + "\ty:" + _devY + "\t" + word);
-//// TODO remove SYSTEM.OUT.PRINTLN
-
-			_devX += devWordWidth;
-
-			// truncate buffer
-			_wordbuffer.setLength(0);
 		}
+
+		gc.drawString(word, _devX, _devY, true);
+
+		_lastPaintedY = _devY;
+
+		_is1stPainted = true;
+
+		_devX += wordWidth;
+
+		// truncate buffer
+		_wordbuffer.setLength(0);
 	}
 }

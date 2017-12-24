@@ -1055,7 +1055,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 			dayDateHeight = _fontHeight_DayHeader;
 		}
 
-		final int dayLabelRightBorder = 4;
+		final int dayLabelRightBorder = 1;
 
 		final DateTimeFormatter dayDateFormatter = getUI_DayDateFormatter(
 				_currentProfile,
@@ -1256,6 +1256,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 								dayDateMargin.width,
 								dayDateMargin.height);
 
+//						gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+//						gc.fillRectangle(_dayDateLabelRect);
+
 					}
 
 					final CalendarTourData[] calendarData = _dataProvider.getCalendarDayData(currentDate);
@@ -1276,7 +1279,11 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 					if (_currentProfile.isShowDayDate && isShowDayDate) {
 
 						// this clipping should only kick in if shortest label format is still longer than the cell width
-						gc.setClipping(dayPosX, rowTop, dayRect.width, dayDateHeight);
+						gc.setClipping(
+								dayPosX,
+								rowTop,
+								dayRect.width - 1,
+								dayDateHeight);
 
 						final int weekDay = currentDate.getDayOfWeek().getValue();
 
@@ -1322,6 +1329,13 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 							gc.setBackground(_calendarBgColor);
 						}
+
+						/////////////debugg on
+
+//						gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
+//						isDateTransparent = false;
+
+						/////////////debugg off
 
 						// day header label
 						gc.setFont(dayDateFont);

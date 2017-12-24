@@ -1301,7 +1301,7 @@ public class CalendarProfileManager {
 
 //		                                      Default
 
-		profile.defaultId                  = DefaultId.DEFAULT;
+		profile.defaultId                     = DefaultId.DEFAULT;
 
 		// layout
 		profile.isToggleMonthColor            = false;
@@ -1310,6 +1310,7 @@ public class CalendarProfileManager {
 		profile.weekHeight                    = 120;
 		profile.weekRows                      = 10;
 		profile.alternateMonthRGB             = new RGB (60, 60, 60);
+		profile.alternateMonth2RGB            = new RGB (80, 80, 80);
 		profile.calendarBackgroundRGB         = new RGB (40, 40, 40);
 		profile.calendarForegroundRGB         = new RGB (200, 200, 200);
 		profile.dayHoveredRGB                 = new RGB (192, 192, 192);
@@ -1347,9 +1348,12 @@ public class CalendarProfileManager {
 		profile.isShowDayDate                 = true;
 		profile.isShowDayDateWeekendColor     = false;
 		profile.dayDateMarginTop              = -4;
-		profile.dayDateMarginLeft             = 6;
+		profile.dayDateMarginLeft             = 3;
 		profile.dayDateFont                   = CalendarProfile.createFont(1.6f, SWT.BOLD);
 		profile.dayDateFormat                 = DayDateFormat.DAY;
+		                                                                                           
+		// day
+		profile.isDayContentVertical          = true;
 		                                                                                           
 		// tour background
 		profile.tourBackground                = TourBackground.FILL;
@@ -1476,7 +1480,7 @@ public class CalendarProfileManager {
 		profile.isShowDayDate                 = false;
 		profile.isShowDayDateWeekendColor     = false;
 		profile.dayDateMarginTop              = -2;
-		profile.dayDateMarginLeft             = 5;
+		profile.dayDateMarginLeft             = 2;
 		profile.dayDateFont                   = CalendarProfile.createFont(1.2f, SWT.BOLD);
 		profile.dayDateFormat                 = DayDateFormat.DAY;
 		                                                                                           
@@ -1608,7 +1612,7 @@ public class CalendarProfileManager {
 		profile.isShowDayDate                 = false;
 		profile.isShowDayDateWeekendColor     = false;
 		profile.dayDateMarginTop              = -1;
-		profile.dayDateMarginLeft             = 5;
+		profile.dayDateMarginLeft             = 2;
 		profile.dayDateFont                   = CalendarProfile.createFont(1.0f, SWT.BOLD);
 		profile.dayDateFormat                 = DayDateFormat.DAY;
 		                                                                                           
@@ -1740,7 +1744,7 @@ public class CalendarProfileManager {
 		profile.isShowDayDate                 = false;
 		profile.isShowDayDateWeekendColor     = false;
 		profile.dayDateMarginTop              = -2;
-		profile.dayDateMarginLeft             = 3;
+		profile.dayDateMarginLeft             = 1;
 		profile.dayDateFont                   = CalendarProfile.createFont(0.8f, SWT.BOLD);
 		profile.dayDateFormat                 = DayDateFormat.DAY;
 		                                                                                           
@@ -1831,9 +1835,10 @@ public class CalendarProfileManager {
 		profile.isToggleMonthColor            = false;
 		profile.isWeekRowHeight               = true;
 		profile.useDraggedScrolling           = false;
-		profile.weekHeight                    = 15;
+		profile.weekHeight                    = 14;
 		profile.weekRows                      = 10;
 		profile.alternateMonthRGB             = new RGB (60, 60, 60);
+		profile.alternateMonth2RGB            = new RGB (80, 80, 80);
 		profile.calendarBackgroundRGB         = new RGB (40, 40, 40);
 		profile.calendarForegroundRGB         = new RGB (200, 200, 200);
 		profile.dayHoveredRGB                 = new RGB (192, 192, 192);
@@ -1849,9 +1854,9 @@ public class CalendarProfileManager {
 		profile.isShowYearColumns             = true;
 		profile.isYearColumnDayWidth          = true;
 		profile.yearColumns                   = 5;
-		profile.yearColumnsSpacing            = 15;
+		profile.yearColumnsSpacing            = 20;
 		profile.yearColumnsStart              = ColumnStart.JAN;
-		profile.yearColumnDayWidth            = 15;
+		profile.yearColumnDayWidth            = 14;
 		profile.yearHeaderFont                = CalendarProfile.createFont(1.7f, SWT.BOLD);
 		                                                                                           
 		// 3. Week summary column
@@ -1870,10 +1875,13 @@ public class CalendarProfileManager {
 		profile.isHideDayDateWhenNoTour       = true;
 		profile.isShowDayDate                 = false;
 		profile.isShowDayDateWeekendColor     = false;
-		profile.dayDateMarginTop              = 0;
-		profile.dayDateMarginLeft             = 0;
-		profile.dayDateFont                   = CalendarProfile.createFont(1.2f, SWT.BOLD);
+		profile.dayDateMarginTop              = -1;
+		profile.dayDateMarginLeft             = 4;
+		profile.dayDateFont                   = CalendarProfile.createFont(1.0f, SWT.NORMAL);
 		profile.dayDateFormat                 = DayDateFormat.DAY;
+		                                                                                           
+		// day
+		profile.isDayContentVertical          = true;
 		                                                                                           
 		// tour background
 		profile.tourBackground                = TourBackground.CIRCLE;
@@ -2214,6 +2222,7 @@ public class CalendarProfileManager {
 		profile.weekHeight                    = 150;
 		profile.weekRows                      = 5;
 		profile.alternateMonthRGB             = new RGB (240, 240, 240);
+		profile.alternateMonth2RGB            = new RGB (225, 225, 225);
 		profile.calendarBackgroundRGB         = new RGB (255, 255, 255);
 		profile.calendarForegroundRGB         = new RGB (0, 0, 0);
 		profile.dayHoveredRGB                 = new RGB (153, 153, 153);
@@ -2242,17 +2251,21 @@ public class CalendarProfileManager {
 		profile.weekMarginLeft                = 1;
 		profile.weekMarginBottom              = 1;
 		profile.weekMarginRight               = -3;
-		profile.weekValueColor                = CalendarColor.TEXT;
 		profile.weekValueFont                 = CalendarProfile.createFont(1.2f, SWT.BOLD);
+		profile.weekValueColor                = CalendarColor.TEXT;
+		profile.weekValueRGB                  = new RGB (255, 0, 128);
 		                                                                                           
 		// day date
 		profile.isHideDayDateWhenNoTour       = false;
 		profile.isShowDayDate                 = true;
 		profile.isShowDayDateWeekendColor     = true;
 		profile.dayDateMarginTop              = -3;
-		profile.dayDateMarginLeft             = 5;
+		profile.dayDateMarginLeft             = 2;
 		profile.dayDateFont                   = CalendarProfile.createFont(1.2f, SWT.NORMAL);
 		profile.dayDateFormat                 = DayDateFormat.AUTOMATIC;
+		                                                                                           
+		// day
+		profile.isDayContentVertical          = true;
 		                                                                                           
 		// tour background
 		profile.tourBackground                = TourBackground.FILL;
@@ -2276,7 +2289,7 @@ public class CalendarProfileManager {
 		profile.isShowTourContent             = true;
 		profile.isShowTourValueUnit           = true;
 		profile.isTruncateTourText            = true;
-		profile.tourMarginTop                 = -3;
+		profile.tourMarginTop                 = -2;
 		profile.tourMarginLeft                = 1;
 		profile.tourMarginBottom              = 1;
 		profile.tourMarginRight               = -3;
