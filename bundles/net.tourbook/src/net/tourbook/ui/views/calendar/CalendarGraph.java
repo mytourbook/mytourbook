@@ -2109,7 +2109,10 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 			// draw month
 
-			if (currentDate.minusDays(1).getMonthValue() != currentDate.plusDays(6).getMonthValue()) {
+			final int currentMonth = currentDate.getMonthValue();
+			final int month1WeekAgo = currentDate.minusWeeks(1).getMonthValue();
+
+			if (month1WeekAgo != currentMonth) {
 
 				// a new month started on this week
 
