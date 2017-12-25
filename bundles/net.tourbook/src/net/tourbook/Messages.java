@@ -98,6 +98,7 @@ public class Messages extends NLS {
 	public static String		Calendar_Profile_Value_ShowNothing;
 	public static String		Calendar_Profile_Value_Speed;
 	public static String		Calendar_Profile_Value_Title;
+	public static String		Calendar_Profile_Value_TotalWork;
 
 	public static String		Calendar_View_Action_Back;
 	public static String		Calendar_View_Action_Back_Tooltip;

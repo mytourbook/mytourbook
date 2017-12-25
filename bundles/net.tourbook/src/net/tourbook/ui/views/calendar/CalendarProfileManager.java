@@ -278,6 +278,7 @@ public class CalendarProfileManager {
 	private static final DataFormatter		_tourFormatter_Time_Moving;
 	private static final DataFormatter		_tourFormatter_Time_Paused;
 	private static final DataFormatter		_tourFormatter_Time_Recording;
+	private static final DataFormatter		_tourFormatter_TotalWork;
 	private static final DataFormatter		_tourFormatter_TourDescription;
 	private static final DataFormatter		_tourFormatter_TourTitle;
 
@@ -288,6 +289,7 @@ public class CalendarProfileManager {
 	private static final DataFormatter		_weekFormatter_Time_Moving;
 	private static final DataFormatter		_weekFormatter_Time_Paused;
 	private static final DataFormatter		_weekFormatter_Time_Recording;
+	private static final DataFormatter		_weekFormatter_TotalWork;
 
 	static final DataFormatter[]			allTourContentFormatter;
 	static final DataFormatter[]			allWeekFormatter;
@@ -319,6 +321,8 @@ public class CalendarProfileManager {
 
 		_tourFormatter_Pace 			= createFormatter_Pace();
 		_tourFormatter_Speed 			= createFormatter_Speed();
+		
+		_tourFormatter_TotalWork 		= createFormatter_TotalWork();
 
 		_tourFormatter_Time_Moving 		= createFormatter_Time_Moving();
 		_tourFormatter_Time_Paused 		= createFormatter_Time_Paused();
@@ -337,6 +341,8 @@ public class CalendarProfileManager {
 				_tourFormatter_Speed,
 				_tourFormatter_Pace,
 				
+				_tourFormatter_TotalWork,
+				
 				_tourFormatter_Time_Recording,
 				_tourFormatter_Time_Moving,
 				_tourFormatter_Time_Paused,
@@ -348,6 +354,8 @@ public class CalendarProfileManager {
 		
 		_weekFormatter_Pace 			= createFormatter_Pace();
 		_weekFormatter_Speed 			= createFormatter_Speed();
+		
+		_weekFormatter_TotalWork 		= createFormatter_TotalWork();
 		
 		_weekFormatter_Time_Moving 		= createFormatter_Time_Moving();
 		_weekFormatter_Time_Paused 		= createFormatter_Time_Paused();
@@ -362,6 +370,8 @@ public class CalendarProfileManager {
 				
 				_weekFormatter_Speed,
 				_weekFormatter_Pace,
+				
+				_weekFormatter_TotalWork,
 				
 				_weekFormatter_Time_Recording,
 				_weekFormatter_Time_Moving,
@@ -1184,6 +1194,65 @@ public class CalendarProfileManager {
 
 				valueFormatId = valueFormat;
 				valueFormatter = getFormatter_Time(valueFormat.name());
+			}
+		};
+
+		// setup default formatter
+		dataFormatter.setValueFormat(dataFormatter.getDefaultFormat());
+
+		return dataFormatter;
+	}
+
+	/**
+	 * Total Work
+	 * 
+	 * @return
+	 */
+	private static DataFormatter createFormatter_TotalWork() {
+
+		final DataFormatter dataFormatter = new DataFormatter(
+				FormatterID.TOTAL_WORK,
+				Messages.Calendar_Profile_Value_TotalWork,
+				GraphColorManager.PREF_GRAPH_POWER) {
+
+			@Override
+			String format(final CalendarTourData data, final ValueFormat valueFormat, final boolean isShowValueUnit) {
+
+				if (data.powerTotalWork > 0) {
+
+					final double powerTotalWork = data.powerTotalWork / 1_000_000.0;
+
+					final String valueText = valueFormatter.printDouble(powerTotalWork);
+
+					return isShowValueUnit
+							? valueText + UI.SPACE + UI.UNIT_JOULE_MEGA + UI.SPACE
+							: valueText + UI.SPACE;
+
+				} else {
+					return UI.EMPTY_STRING;
+				}
+			}
+
+			@Override
+			public ValueFormat getDefaultFormat() {
+				return ValueFormat.NUMBER_1_0;
+			}
+
+			@Override
+			public ValueFormat[] getValueFormats() {
+
+				return new ValueFormat[] {
+						ValueFormat.NUMBER_1_0,
+						ValueFormat.NUMBER_1_1,
+						ValueFormat.NUMBER_1_2,
+						ValueFormat.NUMBER_1_3 };
+			}
+
+			@Override
+			void setValueFormat(final ValueFormat valueFormat) {
+
+				valueFormatId = valueFormat;
+				valueFormatter = getFormatter_Number(valueFormat.name());
 			}
 		};
 
@@ -3115,6 +3184,10 @@ public class CalendarProfileManager {
 				_tourFormatter_Time_Recording.setValueFormat(valueFormat);
 				break;
 
+			case TOTAL_WORK:
+				_tourFormatter_TotalWork.setValueFormat(valueFormat);
+				break;
+
 			default:
 				break;
 			}
@@ -3159,6 +3232,10 @@ public class CalendarProfileManager {
 
 			case TIME_RECORDING:
 				_weekFormatter_Time_Recording.setValueFormat(valueFormat);
+				break;
+
+			case TOTAL_WORK:
+				_weekFormatter_TotalWork.setValueFormat(valueFormat);
 				break;
 
 			default:

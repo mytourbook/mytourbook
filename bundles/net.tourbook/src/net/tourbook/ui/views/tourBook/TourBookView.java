@@ -684,6 +684,10 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 			@Override
 			public void run() {
 
+				if (_tourViewer.getTree().isDisposed()) {
+					return;
+				}
+
 				_isInStartup = true;
 
 				_tourViewer.setInput(this);

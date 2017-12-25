@@ -1390,6 +1390,11 @@ public class UI {
 		return (int) (RANDOM_GENERATOR.nextFloat() * number);
 	}
 
+	public static long scrambleNumbers(final long number) {
+
+		return (long) (RANDOM_GENERATOR.nextFloat() * number);
+	}
+
 	public static String scrambleText(final String text) {
 
 		if (text == null) {

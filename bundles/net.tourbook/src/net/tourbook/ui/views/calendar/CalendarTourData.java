@@ -41,6 +41,8 @@ public class CalendarTourData {
 	int				recordingTime;
 	int				drivingTime;
 
+	long			powerTotalWork;
+
 	String			tourTitle;
 	String			tourDescription;
 
@@ -58,6 +60,7 @@ public class CalendarTourData {
 
 	@Override
 	public String toString() {
+
 		return "CalendarTourData [" //$NON-NLS-1$
 
 				+ "loadingState=" + loadingState + ", " //$NON-NLS-1$ //$NON-NLS-2$

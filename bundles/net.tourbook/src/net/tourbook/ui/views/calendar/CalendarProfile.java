@@ -478,6 +478,10 @@ public class CalendarProfile implements Cloneable {
 				formatterID = FormatterID.TOUR_TITLE.name();
 				break;
 
+			case TOTAL_WORK:
+				formatterID = FormatterID.TOTAL_WORK.name();
+				break;
+
 			case EMPTY:
 			default:
 				formatterID = FormatterID.EMPTY.name();

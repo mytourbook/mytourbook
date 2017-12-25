@@ -194,6 +194,8 @@ public class CalendarTourDataProvider {
 		ArrayList<Integer> dbTourRecordingTime = null;
 		ArrayList<Integer> dbTourDrivingTime = null;
 
+		ArrayList<Long> dbPower_TotalWork = null;
+
 		ArrayList<Long> dbTypeIds = null;
 		ArrayList<Integer> dbTypeColorIndex = null;
 
@@ -212,7 +214,7 @@ public class CalendarTourDataProvider {
 				+ " StartMonth," //				3 //$NON-NLS-1$
 				+ " StartDay," //				4 //$NON-NLS-1$
 				+ " StartHour," //				5 //$NON-NLS-1$
-				+ " StartMinute," //				6 //$NON-NLS-1$
+				+ " StartMinute," //			6 //$NON-NLS-1$
 				+ " TourDistance," //			7 //$NON-NLS-1$
 				+ " TourAltUp," //				8 //$NON-NLS-1$
 				+ " TourRecordingTime," //		9 //$NON-NLS-1$
@@ -222,8 +224,9 @@ public class CalendarTourDataProvider {
 				+ " TourDescription," // 		13 //$NON-NLS-1$
 				+ " startWeek," //				14 //$NON-NLS-1$
 				+ " devicePluginId," //			15 //$NON-NLS-1$
+				+ " power_TotalWork, " //		16	//$NON-NLS-1$
 
-				+ " jTdataTtag.TourTag_tagId"//	16 //$NON-NLS-1$
+				+ " jTdataTtag.TourTag_tagId"//	17 //$NON-NLS-1$
 
 				+ UI.NEW_LINE
 
@@ -285,6 +288,8 @@ public class CalendarTourDataProvider {
 						dbTourRecordingTime = new ArrayList<>();
 						dbTourDrivingTime = new ArrayList<>();
 
+						dbPower_TotalWork = new ArrayList<Long>();
+
 						dbTypeIds = new ArrayList<Long>();
 						dbTypeColorIndex = new ArrayList<>();
 
@@ -295,7 +300,7 @@ public class CalendarTourDataProvider {
 					}
 
 					tourId = result.getLong(1);
-					final Object dbTagId = result.getObject(16);
+					final Object dbTagId = result.getObject(17);
 
 					if (tourId == lastTourId) {
 
@@ -343,6 +348,8 @@ public class CalendarTourDataProvider {
 						final boolean isManualTour = TourData.DEVICE_ID_FOR_MANUAL_TOUR.equals(devicePluginId)
 								|| TourData.DEVICE_ID_CSV_TOUR_DATA_READER.equals(devicePluginId);
 						dbIsManualTour.add(isManualTour);
+
+						dbPower_TotalWork.add(result.getLong(16));
 
 						if (dbTagId instanceof Long) {
 
@@ -409,6 +416,8 @@ public class CalendarTourDataProvider {
 					data.recordingTime = dbTourRecordingTime.get(tourIndex);
 					data.drivingTime = dbTourDrivingTime.get(tourIndex);
 
+					data.powerTotalWork = dbPower_TotalWork.get(tourIndex);
+
 					data.tourTitle = dbTourTitle.get(tourIndex);
 					data.tourDescription = dbTourDescription.get(tourIndex);
 
@@ -425,6 +434,7 @@ public class CalendarTourDataProvider {
 
 						data.distance = UI.scrambleNumbers(data.distance);
 						data.altitude = UI.scrambleNumbers(data.altitude);
+						data.powerTotalWork = UI.scrambleNumbers(data.powerTotalWork);
 
 						data.recordingTime = UI.scrambleNumbers(data.recordingTime);
 						data.drivingTime = UI.scrambleNumbers(data.drivingTime);
@@ -781,8 +791,10 @@ public class CalendarTourDataProvider {
 					+ " SUM(TourDistance)," //			1 //$NON-NLS-1$
 					+ " SUM(TourAltUp)," //				2 //$NON-NLS-1$
 					+ " SUM(TourRecordingTime)," //		3 //$NON-NLS-1$
-					+ " SUM(TourDrivingTime),"//			4 //$NON-NLS-1$
-					+ " SUM(1)"//			            5 //$NON-NLS-1$
+					+ " SUM(TourDrivingTime),"//		4 //$NON-NLS-1$
+					+ " SUM(power_TotalWork),"//		5 //$NON-NLS-1$
+
+					+ " SUM(1)"//			            6 //$NON-NLS-1$
 
 					+ UI.NEW_LINE
 
@@ -811,15 +823,19 @@ public class CalendarTourDataProvider {
 				weekData.altitude = result.getInt(2);
 				weekData.recordingTime = result.getInt(3);
 				weekData.drivingTime = result.getInt(4);
-				weekData.numTours = result.getInt(5);
+				weekData.powerTotalWork = result.getLong(5);
+
+				weekData.numTours = result.getInt(6);
 
 				if (_isScrambleCalendar) {
 
-					weekData.distance = UI.scrambleNumbers(weekData.distance);
 					weekData.altitude = UI.scrambleNumbers(weekData.altitude);
+					weekData.distance = UI.scrambleNumbers(weekData.distance);
 
 					weekData.recordingTime = UI.scrambleNumbers(weekData.recordingTime);
 					weekData.drivingTime = UI.scrambleNumbers(weekData.drivingTime);
+
+					weekData.powerTotalWork = UI.scrambleNumbers(weekData.powerTotalWork);
 				}
 			}
 
