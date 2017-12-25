@@ -2114,7 +2114,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 			if (month1WeekAgo != currentMonth) {
 
-				// a new month started on this week
+				// a new month started
 
 				final String monthLabel = TimeTools.Formatter_Month.format(currentDate.plusDays(6));
 
@@ -3513,18 +3513,24 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 				// set first day to start of week
 				.with(getFirstDayOfWeek_SameOrPrevious());
 
-		_yearColumn_FirstYear = dt
+		if (_currentProfile.isShowYearColumns && _currentProfile.yearColumnsStart == ColumnStart.CONTINUOUSLY) {
 
-				// set default time
-				.atStartOfDay()
+			_yearColumn_FirstYear = dt.atStartOfDay();
 
-				// move after the first week, otherwise the previous year could be set !!!
-				.plusWeeks(1)
+		} else {
 
-				// 1.1.
-				.withMonth(1)
-				.withDayOfMonth(1);
+			_yearColumn_FirstYear = dt
 
+					// set default time
+					.atStartOfDay()
+
+					// move after the first week, otherwise the previous year could be set !!!
+					.plusWeeks(1)
+
+					// 1.1.
+					.withMonth(1)
+					.withDayOfMonth(1);
+		}
 	}
 
 	private void setHoveredModified(final boolean isModified) {
