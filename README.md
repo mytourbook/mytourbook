@@ -34,4 +34,5 @@ _This document will not repeat already written text in the documentation._
 -DscrambleCalendar
 
 **Log FIT data**
+
 -DlogFitData
