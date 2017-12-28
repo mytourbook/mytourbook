@@ -2929,7 +2929,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 				_spinCalories = new Spinner(container, SWT.BORDER);
 				GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_spinCalories);
 				_spinCalories.setMinimum(0);
-				_spinCalories.setMaximum(1000000);
+				_spinCalories.setMaximum(1_000_000_000);
+				_spinCalories.setDigits(3);
 
 				_spinCalories.addMouseWheelListener(_mouseWheelListener);
 				_spinCalories.addSelectionListener(_selectionListener);

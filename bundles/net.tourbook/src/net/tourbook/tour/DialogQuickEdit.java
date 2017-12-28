@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -61,7 +61,12 @@ import org.eclipse.ui.forms.widgets.Section;
 
 public class DialogQuickEdit extends TitleAreaDialog {
 
+	// SET_FORMATTING_OFF
+	//
 	private static final String			GRAPH_LABEL_HEARTBEAT_UNIT		= net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
+	private static final String			VALUE_UNIT_K_CALORIES			= net.tourbook.ui.Messages.Value_Unit_KCalories;
+	//
+	// SET_FORMATTING_ON
 
 	private final boolean				_isOSX							= net.tourbook.common.UI.IS_OSX;
 	private final boolean				_isLinux						= net.tourbook.common.UI.IS_LINUX;
@@ -105,17 +110,12 @@ public class DialogQuickEdit extends TitleAreaDialog {
 	private Spinner						_spinFTP;
 	private Spinner						_spinRestPuls;
 	private Spinner						_spinTemperature;
-	private Spinner						_spinTourCalories;
+	private Spinner						_spinCalories;
 	private Spinner						_spinWindSpeedValue;
 	private Spinner						_spinWindDirectionValue;
 
 	private Text						_txtDescription;
 	private Text						_txtWeather;
-
-	/**
-	 * When <code>true</code> the tour is created with the tour editor
-	 */
-	private final boolean				_isManualTour;
 
 	private MouseWheelListener			_mouseWheelListener;
 	{
@@ -137,7 +137,6 @@ public class DialogQuickEdit extends TitleAreaDialog {
 		setDefaultImage(TourbookPlugin.getImageDescriptor(Messages.Image__quick_edit).createImage());
 
 		_tourData = tourData;
-		_isManualTour = _tourData.isManualTour();
 
 		_state = TourbookPlugin.getDefault().getDialogSettingsSection(getClass().getName());
 	}
@@ -166,9 +165,10 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
 		final ZonedDateTime tourStart = _tourData.getTourStartTime();
 
-		setMessage(tourStart.format(TimeTools.Formatter_Date_F)
-				+ UI.SPACE2
-				+ tourStart.format(TimeTools.Formatter_Time_S));
+		setMessage(
+				tourStart.format(TimeTools.Formatter_Date_F)
+						+ UI.SPACE2
+						+ tourStart.format(TimeTools.Formatter_Time_S));
 	}
 
 	@Override
@@ -203,13 +203,13 @@ public class DialogQuickEdit extends TitleAreaDialog {
 	 */
 	private Composite createSection(final Composite parent, final String title, final boolean isGrabVertical) {
 
-		final Section section = _tk.createSection(parent,//
-				//Section.TWISTIE |
+		final Section section = _tk.createSection(parent, //
+		//Section.TWISTIE |
 //				Section.SHORT_TITLE_BAR
 				Section.TITLE_BAR
 		// | Section.DESCRIPTION
 		// | Section.EXPANDED
-				);
+		);
 
 		section.setText(title);
 		GridDataFactory.fillDefaults().grab(true, isGrabVertical).applyTo(section);
@@ -290,7 +290,8 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
 			_tk.adapt(_comboTitle, true, false);
 
-			GridDataFactory.fillDefaults()//
+			GridDataFactory
+					.fillDefaults()//
 					.grab(true, false)
 					.hint(defaultTextWidth, SWT.DEFAULT)
 					.applyTo(_comboTitle);
@@ -310,7 +311,8 @@ public class DialogQuickEdit extends TitleAreaDialog {
 			GridDataFactory.swtDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
 			_firstColumnControls.add(label);
 
-			_txtDescription = _tk.createText(section, //
+			_txtDescription = _tk.createText(
+					section, //
 					UI.EMPTY_STRING,
 					SWT.BORDER | SWT.WRAP | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL//
 			);
@@ -320,7 +322,8 @@ public class DialogQuickEdit extends TitleAreaDialog {
 			int descLines = store.getInt(ITourbookPreferences.TOUR_EDITOR_DESCRIPTION_HEIGHT);
 			descLines = descLines == 0 ? 5 : descLines;
 
-			GridDataFactory.fillDefaults()//
+			GridDataFactory
+					.fillDefaults()//
 					.grab(true, true)
 					//
 					// SWT.DEFAULT causes lot's of problems with the layout therefore the hint is set
@@ -333,7 +336,8 @@ public class DialogQuickEdit extends TitleAreaDialog {
 	private void createUI_130_Personal(final Composite parent) {
 
 		final Composite section = createSection(parent, Messages.tour_editor_section_personal, false);
-		GridLayoutFactory.fillDefaults()//
+		GridLayoutFactory
+				.fillDefaults()//
 				.numColumns(2)
 				.spacing(20, 5)
 				.applyTo(section);
@@ -363,15 +367,16 @@ public class DialogQuickEdit extends TitleAreaDialog {
 				_firstColumnControls.add(label);
 
 				// spinner
-				_spinTourCalories = new Spinner(container, SWT.BORDER);
-				GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_spinTourCalories);
-				_spinTourCalories.setMinimum(0);
-				_spinTourCalories.setMaximum(1000000);
+				_spinCalories = new Spinner(container, SWT.BORDER);
+				GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_spinCalories);
+				_spinCalories.setMinimum(0);
+				_spinCalories.setMaximum(1_000_000_000);
+				_spinCalories.setDigits(3);
 
-				_spinTourCalories.addMouseWheelListener(_mouseWheelListener);
+				_spinCalories.addMouseWheelListener(_mouseWheelListener);
 
-				// label: cal
-				_tk.createLabel(container, Messages.tour_editor_label_tour_calories_unit);
+				// label: kcal
+				_tk.createLabel(container, VALUE_UNIT_K_CALORIES);
 			}
 			{
 				/*
@@ -385,7 +390,8 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
 				// spinner
 				_spinRestPuls = new Spinner(container, SWT.BORDER);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
 						.align(SWT.BEGINNING, SWT.CENTER)
 						.applyTo(_spinRestPuls);
@@ -422,7 +428,8 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
 					// spinner: weight
 					_spinBodyWeight = new Spinner(container, SWT.BORDER);
-					GridDataFactory.fillDefaults()//
+					GridDataFactory
+							.fillDefaults()//
 							.hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
 							.align(SWT.BEGINNING, SWT.CENTER)
 							.applyTo(_spinBodyWeight);
@@ -447,7 +454,8 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
 					// spinner: FTP
 					_spinFTP = new Spinner(container, SWT.BORDER);
-					GridDataFactory.fillDefaults()//
+					GridDataFactory
+							.fillDefaults()//
 							.hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
 							.align(SWT.BEGINNING, SWT.CENTER)
 							.applyTo(_spinFTP);
@@ -466,7 +474,8 @@ public class DialogQuickEdit extends TitleAreaDialog {
 	private void createUI_140_Weather(final Composite parent) {
 
 		final Composite section = createSection(parent, Messages.tour_editor_section_weather, false);
-		GridLayoutFactory.fillDefaults()//
+		GridLayoutFactory
+				.fillDefaults()//
 				.numColumns(2)
 				.spacing(20, 5)
 				.applyTo(section);
@@ -490,12 +499,14 @@ public class DialogQuickEdit extends TitleAreaDialog {
 			GridDataFactory.swtDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
 			_firstColumnControls.add(label);
 
-			_txtWeather = _tk.createText(container, //
+			_txtWeather = _tk.createText(
+					container, //
 					UI.EMPTY_STRING,
 					SWT.BORDER | SWT.WRAP | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL//
 			);
 
-			GridDataFactory.fillDefaults()//
+			GridDataFactory
+					.fillDefaults()//
 					.grab(true, true)
 					//
 					// SWT.DEFAULT causes lot's of problems with the layout therefore the hint is set
@@ -523,7 +534,8 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
 			// spinner
 			_spinWindSpeedValue = new Spinner(container, SWT.BORDER);
-			GridDataFactory.fillDefaults()//
+			GridDataFactory
+					.fillDefaults()//
 					.hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
 					.align(SWT.BEGINNING, SWT.CENTER)
 					.applyTo(_spinWindSpeedValue);
@@ -565,7 +577,8 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
 			// combo: wind speed with text
 			_comboWindSpeedText = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
-			GridDataFactory.fillDefaults()//
+			GridDataFactory
+					.fillDefaults()//
 					.align(SWT.BEGINNING, SWT.FILL)
 					.indent(10, 0)
 					.span(2, 1)
@@ -601,7 +614,8 @@ public class DialogQuickEdit extends TitleAreaDialog {
 			// combo: wind direction text
 			_comboWindDirectionText = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
 			_tk.adapt(_comboWindDirectionText, true, false);
-			GridDataFactory.fillDefaults()//
+			GridDataFactory
+					.fillDefaults()//
 					.align(SWT.BEGINNING, SWT.FILL)
 					.hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
 					.applyTo(_comboWindDirectionText);
@@ -628,7 +642,8 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
 			// spinner: wind direction value
 			_spinWindDirectionValue = new Spinner(container, SWT.BORDER);
-			GridDataFactory.fillDefaults()//
+			GridDataFactory
+					.fillDefaults()//
 					.hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
 					.indent(10, 0)
 					.align(SWT.BEGINNING, SWT.CENTER)
@@ -693,7 +708,8 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
 			// spinner
 			_spinTemperature = new Spinner(container, SWT.BORDER);
-			GridDataFactory.fillDefaults()//
+			GridDataFactory
+					.fillDefaults()//
 					.align(SWT.BEGINNING, SWT.CENTER)
 					.hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
 					.applyTo(_spinTemperature);
@@ -748,7 +764,8 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
 				// icon: clouds
 				_lblCloudIcon = new CLabel(cloudContainer, SWT.NONE);
-				GridDataFactory.fillDefaults()//
+				GridDataFactory
+						.fillDefaults()//
 						.align(SWT.END, SWT.FILL)
 						.grab(true, false)
 						.applyTo(_lblCloudIcon);
@@ -799,8 +816,6 @@ public class DialogQuickEdit extends TitleAreaDialog {
 	}
 
 	private void enableControls() {
-
-		_spinTourCalories.setEnabled(_isManualTour);
 
 		_spinTemperature.setEnabled(_tourData.temperatureSerie == null);
 	}
@@ -923,7 +938,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 		_tourData.setBodyWeight((float) (_spinBodyWeight.getSelection() / 10.0));
 		_tourData.setPower_FTP(_spinFTP.getSelection());
 		_tourData.setRestPulse(_spinRestPuls.getSelection());
-		_tourData.setCalories(_spinTourCalories.getSelection());
+		_tourData.setCalories(_spinCalories.getSelection());
 
 		_tourData.setWeatherWindDir(_spinWindDirectionValue.getSelection());
 		if (_isWindSpeedManuallyModified) {
@@ -947,7 +962,9 @@ public class DialogQuickEdit extends TitleAreaDialog {
 		if (_isTemperatureManuallyModified) {
 			float temperature = (float) _spinTemperature.getSelection() / 10;
 			if (_unitValueTemperature != 1) {
-				temperature = ((temperature - net.tourbook.ui.UI.UNIT_FAHRENHEIT_ADD) / net.tourbook.ui.UI.UNIT_FAHRENHEIT_MULTI);
+
+				temperature = ((temperature - net.tourbook.ui.UI.UNIT_FAHRENHEIT_ADD)
+						/ net.tourbook.ui.UI.UNIT_FAHRENHEIT_MULTI);
 			}
 			_tourData.setAvgTemperature(temperature);
 		}
@@ -971,7 +988,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 			_spinBodyWeight.setSelection(Math.round(_tourData.getBodyWeight() * 10));
 			_spinFTP.setSelection(_tourData.getPower_FTP());
 			_spinRestPuls.setSelection(_tourData.getRestPulse());
-			_spinTourCalories.setSelection(_tourData.getCalories());
+			_spinCalories.setSelection(_tourData.getCalories());
 
 			/*
 			 * wind properties

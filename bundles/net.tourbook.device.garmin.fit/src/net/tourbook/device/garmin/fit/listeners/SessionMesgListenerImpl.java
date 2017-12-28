@@ -62,7 +62,9 @@ public class SessionMesgListenerImpl extends AbstractMesgListener implements Ses
 
 		final Integer totalCalories = mesg.getTotalCalories();
 		if (totalCalories != null) {
-			tourData.setCalories(totalCalories);
+
+			// convert kcal -> cal
+			tourData.setCalories(totalCalories * 1000);
 		}
 
 		final Float totalDistance = mesg.getTotalDistance();

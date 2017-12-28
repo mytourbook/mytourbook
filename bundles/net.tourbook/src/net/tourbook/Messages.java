@@ -1952,6 +1952,10 @@ public class Messages extends NLS {
 	public static String		Tour_Action_Marker_SetLabelPosition;
 	public static String		Tour_Action_Marker_SetVisible;
 	public static String		Tour_Action_MarkerOptions_Tooltip;
+	public static String		Tour_Action_MultiplyCaloriesBy1000;
+	public static String		Tour_Action_MultiplyCaloriesBy1000_Apply;
+	public static String		Tour_Action_MultiplyCaloriesBy1000_Message;
+	public static String		Tour_Action_MultiplyCaloriesBy1000_Title;
 	public static String		Tour_Action_scroll_zoomed_chart;
 	public static String		Tour_Action_show_distance_on_x_axis;
 	public static String		Tour_Action_show_distance_on_x_axis_tooltip;

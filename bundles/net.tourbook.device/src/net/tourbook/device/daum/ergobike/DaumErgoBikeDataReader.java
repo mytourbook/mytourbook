@@ -208,7 +208,7 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 
 			int sumPowerTime = 0;
 			float sumPower = 0;
-			float energy = 0;
+			float kJoule = 0;
 
 			// read all data points
 			while ((tokenLine = fileReader.readLine()) != null) {
@@ -217,7 +217,7 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 
 				time = (short) Integer.parseInt(tokenizer.nextToken()); // 				1  Elapsed Time (s)
 				distance = (int) (parseFloat(tokenizer.nextToken()) * 1000); // 		2  Distance (m)
-				energy = parseFloat(tokenizer.nextToken()); // 							3  Phys. kJoule
+				kJoule = parseFloat(tokenizer.nextToken()); // 							3  Phys. kJoule
 				tokenizer.nextToken(); // 												4  Slope (%)
 				tokenizer.nextToken(); // 												5  NM
 				final float cadence = parseFloat(tokenizer.nextToken()); // 			6  RPM
@@ -274,7 +274,7 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 				return true;
 			}
 
-			final float joule = energy * 1000;
+			final float joule = kJoule * 1000;
 			final float calories = joule * UI.UNIT_JOULE_2_CALORY;
 
 			tourData.setCalories((int) calories);

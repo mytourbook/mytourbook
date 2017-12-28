@@ -33,7 +33,6 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
-import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.time.TourDateTime;
@@ -81,6 +80,7 @@ import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.action.ActionExpandSelection;
 import net.tourbook.ui.action.ActionJoinTours;
 import net.tourbook.ui.action.ActionModifyColumns;
+import net.tourbook.ui.action.ActionMultiplyCaloriesBy1000;
 import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionRefreshView;
 import net.tourbook.ui.action.ActionSetAltitudeValuesFromSRTM;
@@ -280,12 +280,13 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 	private ActionExportViewCSV							_actionExportViewCSV;
 	private ActionDeleteTourMenu						_actionDeleteTour;
 	private ActionEditTour								_actionEditTour;
-	private ActionOpenTour								_actionOpenTour;
-	private ActionOpenMarkerDialog						_actionOpenMarkerDialog;
-	private ActionOpenAdjustAltitudeDialog				_actionOpenAdjustAltitudeDialog;
 	private ActionJoinTours								_actionJoinTours;
 	private ActionMergeTour								_actionMergeTour;
 	private ActionModifyColumns							_actionModifyColumns;
+	private ActionMultiplyCaloriesBy1000				_actionMultiplyCaloriesBy1000;
+	private ActionOpenTour								_actionOpenTour;
+	private ActionOpenMarkerDialog						_actionOpenMarkerDialog;
+	private ActionOpenAdjustAltitudeDialog				_actionOpenAdjustAltitudeDialog;
 	private ActionPrint									_actionPrintTour;
 	private ActionRefreshView							_actionRefreshView;
 	private ActionReimportSubMenu						_actionReimportSubMenu;
@@ -634,6 +635,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 		_actionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this);
 		_actionMergeTour = new ActionMergeTour(this);
 		_actionModifyColumns = new ActionModifyColumns(this);
+		_actionMultiplyCaloriesBy1000 = new ActionMultiplyCaloriesBy1000(this);
 		_actionOpenTour = new ActionOpenTour(this);
 		_actionPrintTour = new ActionPrint(this);
 		_actionRefreshView = new ActionRefreshView(this);
@@ -1076,9 +1078,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 			public void update(final ViewerCell cell) {
 
 				final Object element = cell.getElement();
-				final double value = ((TVITourBookItem) element).colCalories;
+				final double value = ((TVITourBookItem) element).colCalories / 1000.0;
 
-				cell.setText(FormatManager.formatNumber_0(value));
+				colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
 				setCellColor(cell, element);
 			}
@@ -2461,6 +2463,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 		_actionExportViewCSV.setEnabled(selectedItems > 0);
 		_actionJoinTours.setEnabled(tourItems > 1);
 		_actionMergeTour.setEnabled(canMergeTours);
+		_actionMultiplyCaloriesBy1000.setEnabled(isTourSelected);
 		_actionOpenAdjustAltitudeDialog.setEnabled(isOneTour && isDeviceTour);
 		_actionOpenMarkerDialog.setEnabled(isOneTour && isDeviceTour);
 		_actionOpenTour.setEnabled(isOneTour);
@@ -3135,6 +3138,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 		menuMgr.add(_actionSetAltitudeFromSRTM);
 		menuMgr.add(_actionSetCadenceSubMenu);
 		menuMgr.add(_actionSetTimeZone);
+		menuMgr.add(_actionMultiplyCaloriesBy1000);
 
 		menuMgr.add(new Separator());
 		menuMgr.add(_actionReimportSubMenu);

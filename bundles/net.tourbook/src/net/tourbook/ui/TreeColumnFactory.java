@@ -185,6 +185,11 @@ public abstract class TreeColumnFactory {
 				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_calories_tooltip);
 
 				colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
+				colDef.setValueFormats(
+						ValueFormatSet.Number,
+						ValueFormat.NUMBER_1_0,
+						ValueFormat.NUMBER_1_0,
+						columnManager);
 
 				return colDef;
 			};
