@@ -91,6 +91,8 @@ public class Messages extends NLS {
 	public static String		Calendar_Profile_Value_Altitude;
 	public static String		Calendar_Profile_Value_Description;
 	public static String		Calendar_Profile_Value_Distance;
+	public static String		Calendar_Profile_Value_Energy_kcal;
+	public static String		Calendar_Profile_Value_Energy_MJ;
 	public static String		Calendar_Profile_Value_MovingTime;
 	public static String		Calendar_Profile_Value_Pace;
 	public static String		Calendar_Profile_Value_PausedTime;
@@ -98,8 +100,6 @@ public class Messages extends NLS {
 	public static String		Calendar_Profile_Value_ShowNothing;
 	public static String		Calendar_Profile_Value_Speed;
 	public static String		Calendar_Profile_Value_Title;
-	public static String		Calendar_Profile_Value_TotalWork;
-
 	public static String		Calendar_View_Action_Back;
 	public static String		Calendar_View_Action_Back_Tooltip;
 	public static String		Calendar_View_Action_Forward;

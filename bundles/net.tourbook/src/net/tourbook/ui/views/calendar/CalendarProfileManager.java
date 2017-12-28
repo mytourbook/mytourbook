@@ -53,17 +53,21 @@ import org.osgi.framework.Version;
 
 public class CalendarProfileManager {
 
-	private static final String				PROFILE_FILE_NAME						= "calendar-profiles.xml";			//$NON-NLS-1$
+	//
+// SET_FORMATTING_OFF
+	//
+	private static final String				VALUE_UNIT_K_CALORIES			= net.tourbook.ui.Messages.Value_Unit_KCalories;
+
+
+	private static final String				PROFILE_FILE_NAME				= "calendar-profiles.xml";			//$NON-NLS-1$
 	//
 	/**
 	 * Version number is not yet used.
 	 */
-	private static final int				PROFILE_VERSION							= 1;
+	private static final int				PROFILE_VERSION					= 1;
 	//
-// SET_FORMATTING_OFF
-	//
-	private static final Bundle				_bundle									= TourbookPlugin.getDefault().getBundle();
-	private static final IPath				_stateLocation							= Platform.getStateLocation(_bundle);
+	private static final Bundle				_bundle							= TourbookPlugin.getDefault().getBundle();
+	private static final IPath				_stateLocation					= Platform.getStateLocation(_bundle);
 	//
 // SET_FORMATTING_ON
 	//
@@ -273,23 +277,25 @@ public class CalendarProfileManager {
 
 	private static final DataFormatter		_tourFormatter_Altitude;
 	private static final DataFormatter		_tourFormatter_Distance;
+	private static final DataFormatter		_tourFormatter_Energy_kcal;
+	private static final DataFormatter		_tourFormatter_Energy_MJ;
 	private static final DataFormatter		_tourFormatter_Pace;
 	private static final DataFormatter		_tourFormatter_Speed;
 	private static final DataFormatter		_tourFormatter_Time_Moving;
 	private static final DataFormatter		_tourFormatter_Time_Paused;
 	private static final DataFormatter		_tourFormatter_Time_Recording;
-	private static final DataFormatter		_tourFormatter_TotalWork;
 	private static final DataFormatter		_tourFormatter_TourDescription;
 	private static final DataFormatter		_tourFormatter_TourTitle;
 
 	private static final DataFormatter		_weekFormatter_Altitude;
 	private static final DataFormatter		_weekFormatter_Distance;
+	private static final DataFormatter		_weekFormatter_Energy_kcal;
+	private static final DataFormatter		_weekFormatter_Energy_MJ;
 	private static final DataFormatter		_weekFormatter_Pace;
 	private static final DataFormatter		_weekFormatter_Speed;
 	private static final DataFormatter		_weekFormatter_Time_Moving;
 	private static final DataFormatter		_weekFormatter_Time_Paused;
 	private static final DataFormatter		_weekFormatter_Time_Recording;
-	private static final DataFormatter		_weekFormatter_TotalWork;
 
 	static final DataFormatter[]			allTourContentFormatter;
 	static final DataFormatter[]			allWeekFormatter;
@@ -322,7 +328,8 @@ public class CalendarProfileManager {
 		_tourFormatter_Pace 			= createFormatter_Pace();
 		_tourFormatter_Speed 			= createFormatter_Speed();
 		
-		_tourFormatter_TotalWork 		= createFormatter_TotalWork();
+		_tourFormatter_Energy_kcal 		= createFormatter_Energy_kcal();
+		_tourFormatter_Energy_MJ 		= createFormatter_Energy_MJ();
 
 		_tourFormatter_Time_Moving 		= createFormatter_Time_Moving();
 		_tourFormatter_Time_Paused 		= createFormatter_Time_Paused();
@@ -341,7 +348,8 @@ public class CalendarProfileManager {
 				_tourFormatter_Speed,
 				_tourFormatter_Pace,
 				
-				_tourFormatter_TotalWork,
+				_tourFormatter_Energy_kcal,
+				_tourFormatter_Energy_MJ,
 				
 				_tourFormatter_Time_Recording,
 				_tourFormatter_Time_Moving,
@@ -355,7 +363,8 @@ public class CalendarProfileManager {
 		_weekFormatter_Pace 			= createFormatter_Pace();
 		_weekFormatter_Speed 			= createFormatter_Speed();
 		
-		_weekFormatter_TotalWork 		= createFormatter_TotalWork();
+		_weekFormatter_Energy_kcal 		= createFormatter_Energy_kcal();
+		_weekFormatter_Energy_MJ 		= createFormatter_Energy_MJ();
 		
 		_weekFormatter_Time_Moving 		= createFormatter_Time_Moving();
 		_weekFormatter_Time_Paused 		= createFormatter_Time_Paused();
@@ -371,7 +380,8 @@ public class CalendarProfileManager {
 				_weekFormatter_Speed,
 				_weekFormatter_Pace,
 				
-				_weekFormatter_TotalWork,
+				_weekFormatter_Energy_kcal,
+				_weekFormatter_Energy_MJ,
 				
 				_weekFormatter_Time_Recording,
 				_weekFormatter_Time_Moving,
@@ -925,6 +935,129 @@ public class CalendarProfileManager {
 	}
 
 	/**
+	 * Energy kcal
+	 * 
+	 * @return
+	 */
+	private static DataFormatter createFormatter_Energy_kcal() {
+
+		final DataFormatter dataFormatter = new DataFormatter(
+				FormatterID.ENERGY_KCAL,
+				Messages.Calendar_Profile_Value_Energy_kcal,
+				GraphColorManager.PREF_GRAPH_POWER) {
+
+			@Override
+			String format(final CalendarTourData data, final ValueFormat valueFormat, final boolean isShowValueUnit) {
+
+				final int calories = data.calories;
+
+				if (calories > 0) {
+
+					final double kcal = calories / 1000.0;
+
+					final String valueText = valueFormatter.printDouble(kcal);
+
+					return isShowValueUnit
+							? valueText + UI.SPACE + VALUE_UNIT_K_CALORIES + UI.SPACE
+							: valueText + UI.SPACE;
+
+				} else {
+					return UI.EMPTY_STRING;
+				}
+			}
+
+			@Override
+			public ValueFormat getDefaultFormat() {
+				return ValueFormat.NUMBER_1_0;
+			}
+
+			@Override
+			public ValueFormat[] getValueFormats() {
+
+				return new ValueFormat[] {
+						ValueFormat.NUMBER_1_0,
+						ValueFormat.NUMBER_1_1,
+						ValueFormat.NUMBER_1_2,
+						ValueFormat.NUMBER_1_3 };
+			}
+
+			@Override
+			void setValueFormat(final ValueFormat valueFormat) {
+
+				valueFormatId = valueFormat;
+				valueFormatter = getFormatter_Number(valueFormat.name());
+			}
+		};
+
+		// setup default formatter
+		dataFormatter.setValueFormat(dataFormatter.getDefaultFormat());
+
+		return dataFormatter;
+	}
+
+	/**
+	 * Energy MJ
+	 * 
+	 * @return
+	 */
+	private static DataFormatter createFormatter_Energy_MJ() {
+
+		final DataFormatter dataFormatter = new DataFormatter(
+				FormatterID.ENERGY_MJ,
+				Messages.Calendar_Profile_Value_Energy_MJ,
+				GraphColorManager.PREF_GRAPH_POWER) {
+
+			@Override
+			String format(final CalendarTourData data, final ValueFormat valueFormat, final boolean isShowValueUnit) {
+
+				final int calories = data.calories;
+
+				if (calories > 0) {
+
+					final double joule = calories * net.tourbook.ui.UI.UNIT_CALORIE_2_JOULE;
+					final double megaJoule = joule / 1_000_000;
+
+					final String valueText = valueFormatter.printDouble(megaJoule);
+
+					return isShowValueUnit
+							? valueText + UI.SPACE + UI.UNIT_JOULE_MEGA + UI.SPACE
+							: valueText + UI.SPACE;
+
+				} else {
+					return UI.EMPTY_STRING;
+				}
+			}
+
+			@Override
+			public ValueFormat getDefaultFormat() {
+				return ValueFormat.NUMBER_1_0;
+			}
+
+			@Override
+			public ValueFormat[] getValueFormats() {
+
+				return new ValueFormat[] {
+						ValueFormat.NUMBER_1_0,
+						ValueFormat.NUMBER_1_1,
+						ValueFormat.NUMBER_1_2,
+						ValueFormat.NUMBER_1_3 };
+			}
+
+			@Override
+			void setValueFormat(final ValueFormat valueFormat) {
+
+				valueFormatId = valueFormat;
+				valueFormatter = getFormatter_Number(valueFormat.name());
+			}
+		};
+
+		// setup default formatter
+		dataFormatter.setValueFormat(dataFormatter.getDefaultFormat());
+
+		return dataFormatter;
+	}
+
+	/**
 	 * Pace
 	 * 
 	 * @return
@@ -1194,65 +1327,6 @@ public class CalendarProfileManager {
 
 				valueFormatId = valueFormat;
 				valueFormatter = getFormatter_Time(valueFormat.name());
-			}
-		};
-
-		// setup default formatter
-		dataFormatter.setValueFormat(dataFormatter.getDefaultFormat());
-
-		return dataFormatter;
-	}
-
-	/**
-	 * Total Work
-	 * 
-	 * @return
-	 */
-	private static DataFormatter createFormatter_TotalWork() {
-
-		final DataFormatter dataFormatter = new DataFormatter(
-				FormatterID.TOTAL_WORK,
-				Messages.Calendar_Profile_Value_TotalWork,
-				GraphColorManager.PREF_GRAPH_POWER) {
-
-			@Override
-			String format(final CalendarTourData data, final ValueFormat valueFormat, final boolean isShowValueUnit) {
-
-				if (data.powerTotalWork > 0) {
-
-					final double powerTotalWork = data.powerTotalWork / 1_000_000.0;
-
-					final String valueText = valueFormatter.printDouble(powerTotalWork);
-
-					return isShowValueUnit
-							? valueText + UI.SPACE + UI.UNIT_JOULE_MEGA + UI.SPACE
-							: valueText + UI.SPACE;
-
-				} else {
-					return UI.EMPTY_STRING;
-				}
-			}
-
-			@Override
-			public ValueFormat getDefaultFormat() {
-				return ValueFormat.NUMBER_1_0;
-			}
-
-			@Override
-			public ValueFormat[] getValueFormats() {
-
-				return new ValueFormat[] {
-						ValueFormat.NUMBER_1_0,
-						ValueFormat.NUMBER_1_1,
-						ValueFormat.NUMBER_1_2,
-						ValueFormat.NUMBER_1_3 };
-			}
-
-			@Override
-			void setValueFormat(final ValueFormat valueFormat) {
-
-				valueFormatId = valueFormat;
-				valueFormatter = getFormatter_Number(valueFormat.name());
 			}
 		};
 
@@ -3164,6 +3238,14 @@ public class CalendarProfileManager {
 				_tourFormatter_Distance.setValueFormat(valueFormat);
 				break;
 
+			case ENERGY_KCAL:
+				_tourFormatter_Energy_kcal.setValueFormat(valueFormat);
+				break;
+
+			case ENERGY_MJ:
+				_tourFormatter_Energy_MJ.setValueFormat(valueFormat);
+				break;
+
 			case PACE:
 				_tourFormatter_Pace.setValueFormat(valueFormat);
 				break;
@@ -3182,10 +3264,6 @@ public class CalendarProfileManager {
 
 			case TIME_RECORDING:
 				_tourFormatter_Time_Recording.setValueFormat(valueFormat);
-				break;
-
-			case TOTAL_WORK:
-				_tourFormatter_TotalWork.setValueFormat(valueFormat);
 				break;
 
 			default:
@@ -3214,6 +3292,14 @@ public class CalendarProfileManager {
 				_weekFormatter_Distance.setValueFormat(valueFormat);
 				break;
 
+			case ENERGY_KCAL:
+				_weekFormatter_Energy_kcal.setValueFormat(valueFormat);
+				break;
+
+			case ENERGY_MJ:
+				_weekFormatter_Energy_MJ.setValueFormat(valueFormat);
+				break;
+
 			case PACE:
 				_weekFormatter_Pace.setValueFormat(valueFormat);
 				break;
@@ -3232,10 +3318,6 @@ public class CalendarProfileManager {
 
 			case TIME_RECORDING:
 				_weekFormatter_Time_Recording.setValueFormat(valueFormat);
-				break;
-
-			case TOTAL_WORK:
-				_weekFormatter_TotalWork.setValueFormat(valueFormat);
 				break;
 
 			default:

@@ -324,6 +324,19 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		setSlideoutLocation(SlideoutLocation.BELOW_RIGHT);
 	}
 
+	private boolean canDoFormatting(final DataFormatter selectedFormatter) {
+		
+		boolean canDoFormatting;
+		final boolean isOnlyTextFormatter = isOnlyTextFormatter(selectedFormatter);
+		final boolean isOnlyOneFormatter = isOnlyOneFormatter(selectedFormatter);
+
+		canDoFormatting = isOnlyOneFormatter == false
+				&& isOnlyTextFormatter == false
+				&& selectedFormatter.getValueFormats() != null;
+		
+		return canDoFormatting;
+	}
+
 	@Override
 	public void colorDialogOpened(final boolean isDialogOpened) {
 
@@ -2614,7 +2627,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		_spinnerTour_Margin_Right.setEnabled(isShowTourContent);
 		_spinnerTour_TruncatedLines.setEnabled(isShowTourContent && isTruncateText);
 		_spinnerTour_ValueColumns.setEnabled(isShowTourContent);
-		enableControls_TourInfo();
+		enableControls_TourValues();
 
 		// week summary
 		_chkIsShowWeekValueUnit.setEnabled(isShowWeekColumn);
@@ -2629,7 +2642,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		_spinnerWeek_Margin_Bottom.setEnabled(isShowWeekColumn);
 		_spinnerWeek_Margin_Left.setEnabled(isShowWeekColumn);
 		_spinnerWeek_Margin_Right.setEnabled(isShowWeekColumn);
-		enableControls_WeekSummary();
+		enableControls_WeekValues();
 	}
 
 	private void enableControls_ProfileProperties() {
@@ -2674,7 +2687,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 						&& hasChildProfiles == false);
 	}
 
-	private void enableControls_TourInfo() {
+	private void enableControls_TourValues() {
 
 		final boolean isShowTourContent = _chkIsShowTourContent.getSelection();
 
@@ -2696,12 +2709,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 					final DataFormatter selectedFormatter = tourContentFormatter[selectedValueIndex];
 
-					final boolean isOnlyTextFormatter = isOnlyTextFormatter(selectedFormatter);
-					final boolean isOnlyOneFormatter = isOnlyOneFormatter(selectedFormatter);
-
-					canDoFormatting = isOnlyOneFormatter == false
-							&& isOnlyTextFormatter == false
-							&& selectedFormatter.getValueFormats() != null;
+					canDoFormatting = canDoFormatting(selectedFormatter);
 				}
 			}
 
@@ -2713,7 +2721,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		}
 	}
 
-	private void enableControls_WeekSummary() {
+	private void enableControls_WeekValues() {
 
 		final boolean isShowSummaryColumn = _chkIsShowSummaryColumn.getSelection();
 
@@ -2733,9 +2741,9 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 
 				if (selectedValueIndex >= 0) {
 
-					final DataFormatter selectedWeekFormatter = tourWeekSummaryFormatter[selectedValueIndex];
+					final DataFormatter selectedFormatter = tourWeekSummaryFormatter[selectedValueIndex];
 
-					canDoFormatting = selectedWeekFormatter.getValueFormats() != null;
+					canDoFormatting = canDoFormatting(selectedFormatter);
 				}
 			}
 

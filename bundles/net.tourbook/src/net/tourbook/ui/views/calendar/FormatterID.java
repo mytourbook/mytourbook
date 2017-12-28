@@ -28,7 +28,8 @@ public enum FormatterID {
 	SPEED, //
 	PACE, //
 
-	TOTAL_WORK, //
+	ENERGY_KCAL, //
+	ENERGY_MJ, //
 
 	TIME_MOVING, //
 	TIME_RECORDING, //

@@ -41,7 +41,7 @@ public class CalendarTourData {
 	int				recordingTime;
 	int				drivingTime;
 
-	long			powerTotalWork;
+	int				calories;
 
 	String			tourTitle;
 	String			tourDescription;

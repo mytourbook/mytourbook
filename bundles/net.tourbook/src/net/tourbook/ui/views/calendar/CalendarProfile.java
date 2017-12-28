@@ -478,8 +478,12 @@ public class CalendarProfile implements Cloneable {
 				formatterID = FormatterID.TOUR_TITLE.name();
 				break;
 
-			case TOTAL_WORK:
-				formatterID = FormatterID.TOTAL_WORK.name();
+			case ENERGY_KCAL:
+				formatterID = FormatterID.ENERGY_KCAL.name();
+				break;
+
+			case ENERGY_MJ:
+				formatterID = FormatterID.ENERGY_MJ.name();
 				break;
 
 			case EMPTY:
