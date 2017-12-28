@@ -8,7 +8,7 @@ All documentations for this project are available on the website <http://mytourb
 
 [Development](http://mytourbook.sourceforge.net/mytourbook/index.php/development)
 
-[Release Notes](https://github.com/wolfgang-ch/mytourbook/tree/master/info/release-notes "Release Notes") These files are created from the release notes texts on the [webpage](http://mytourbook.sourceforge.net)  
+[Release Notes](https://github.com/wolfgang-ch/mytourbook/tree/master/info/release-notes "Release Notes") - These changelog files are created from the release notes texts on the [webpage](http://mytourbook.sourceforge.net)  
 
 **Build the product** is automated with maven/tycho, the build process for a new version needs still some manual adjustments which are documented [in this file](https://github.com/wolfgang-ch/mytourbook/blob/master/info/_HELP-create-build.txt "build") 
 
