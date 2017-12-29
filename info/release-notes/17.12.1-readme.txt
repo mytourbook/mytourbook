@@ -1,4 +1,4 @@
-Version 17.12.1                                    ?. December 2017
+Version 17.12.1                                        31. December 2017
 
 
 New
@@ -6,11 +6,11 @@ New
 
 * Calendar
 
-  - A profile can now be based on a user configuration
-
+  - A calendar profile can now be based on a user configuration
+  
   - Updated calendar documentation
 
- 
+
 Migrate
 =======	
 
@@ -20,10 +20,10 @@ Migrate
   default profiles are created.
 
   The old profiles are still available with all it's customized 
-  properties and can be used or deleted. They appear in the profile list
+  properties. They can be used or deleted and appear in the profile list
   with an empty name and a DEFAULT config.
 
- 
+
 Improvements
 ============	
 
@@ -31,9 +31,42 @@ Improvements
 
   - Import enhanced altitude+speed values
   
-  - This behaviour has changed:
-    By default, speed values will not be saved anymore (when availabel),
+  - Saving speed data has changed:
+
+  - By default, speed values will not be saved anymore (when availabel),
     this can be configured in the preferences
-    
+
   - Reorganized fit import preferences
+ 
+
+Bugfix
+======
+	
+* FIT Calorie Values
+
+  Until now, ALL calorie values from the FIT import, are saved in kcal 
+  and not in calories, so they are too small by the factor 1000. 
+  With the FIT SDK, the calorie values can only be read in kcal.
+
+  This version contains the new tool...
+  Multiply calories value by 1000...
+  ...in the tour book view to fix the wrong saved values.
+
+  Additional UI updates for the calories values
+
+  - Calories column in the tour book view show now kcal 
+    instead of calories
+    
+  - The calendar view can show kcal/MJ  values
+
+  - Edit kcal  values instead of cal values in the Tour Editor and 
+    Quick Tour Editor
+
+
+System
+======	
+
+* Debug Data
+
+  - Documented debug commandline arguments
   
