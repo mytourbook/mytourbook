@@ -6,62 +6,73 @@ New
 
 * Calendar
 
+  Improvements for version 17.12.0 Experimental
+
   - A calendar profile can now be based on a user configuration
-  
+
+  - Show tour content vertical or horizontal when multiple tours are 
+    available for one day
+
   - Updated calendar documentation
 
 
 Migrate
 =======	
 
-* Migrate from 17.12.0 -> 17.12.1
+* Migrate from 17.12.0 → 17.12.1
 
-  Because of substancial changes in the calendar profile management, new 
-  default profiles are created.
+  Because of substancial changes in the calendar profile management, 
+  new default profiles are created.
 
   The old profiles are still available with all it's customized 
   properties. They can be used or deleted and appear in the profile list
   with an empty name and a DEFAULT config.
-
+ 
 
 Improvements
 ============	
 
 * FIT Import
 
-  - Import enhanced altitude+speed values
-  
-  - Saving speed data has changed:
+  -  Import enhanced altitude+speed values
 
-  - By default, speed values will not be saved anymore (when availabel),
-    this can be configured in the preferences
+  -  Saving speed data has changed:
 
-  - Reorganized fit import preferences
- 
+  -  By default, speed values will not be saved anymore (when 
+     availabel), this can be configured in the preferences
+
+  -  Reorganized fit import preferences
+
 
 Bugfix
 ======
 	
 * FIT Calorie Values
 
-  Until now, ALL calorie values from the FIT import, are saved in kcal 
+  Until now, ALL calorie values from the FIT import, are saved in kcal  
   and not in calories, so they are too small by the factor 1000. 
-  With the FIT SDK, the calorie values can only be read in kcal.
-
+  Calories are used internally for the maths.
+ 
   This version contains the new tool...
+
   Multiply calories value by 1000...
+
   ...in the tour book view to fix the wrong saved values.
+
+  With the FIT SDK, the calorie values can be read only in kcal, so 
+  multiplying by 1000 does not change the accuracy.
+
 
   Additional UI updates for the calories values
 
-  - Calories column in the tour book view show now kcal 
-    instead of calories
-    
-  - The calendar view can show kcal/MJ  values
+  -  Calories column in the tour book view show now kcal  instead of 
+     calories
 
-  - Edit kcal  values instead of cal values in the Tour Editor and 
-    Quick Tour Editor
+  -  The calendar view can show kcal/MJ  values
 
+  -  Edit kcal  values instead of cal values in the Tour Editor and 
+     Quick Tour Editor
+ 
 
 System
 ======	
@@ -69,4 +80,3 @@ System
 * Debug Data
 
   - Documented debug commandline arguments
-  
