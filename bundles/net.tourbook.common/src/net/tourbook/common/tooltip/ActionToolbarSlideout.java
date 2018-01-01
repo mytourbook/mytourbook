@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -71,7 +71,18 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
 	public ActionToolbarSlideout(final ImageDescriptor actionImage, final ImageDescriptor actionImageDisabled) {
 
 		_imageEnabled = actionImage.createImage();
-		_imageDisabled = actionImageDisabled.createImage();
+
+		if (actionImageDisabled == null) {
+
+			if (_imageDisabled != null) {
+				_imageDisabled.dispose();
+				_imageDisabled = null;
+			}
+
+		} else {
+
+			_imageDisabled = actionImageDisabled.createImage();
+		}
 	}
 
 	protected abstract ToolbarSlideout createSlideout(ToolBar toolbar);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2011-2017 Matthias Helmling and Contributors
+ * Copyright (C) 2011-2018 Matthias Helmling and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.views.calendar;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class CalendarTourData {
@@ -57,6 +58,8 @@ public class CalendarTourData {
 	 * Currently only manually created tours can be copied/dragged
 	 */
 	boolean			isManualTour;
+
+	LocalDate		tourDate;
 
 	@Override
 	public String toString() {

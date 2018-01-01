@@ -421,7 +421,9 @@ public class CalendarTourDataProvider {
 					data.tourTitle = dbTourTitle.get(tourIndex);
 					data.tourDescription = dbTourDescription.get(tourIndex);
 
-					data.dayOfWeek = LocalDate.of(year, month, data.day).getDayOfWeek().getValue();
+					final LocalDate tourDate = LocalDate.of(year, month, data.day);
+					data.tourDate = tourDate;
+					data.dayOfWeek = tourDate.getDayOfWeek().getValue();
 
 					data.isManualTour = dbIsManualTour.get(tourIndex);
 

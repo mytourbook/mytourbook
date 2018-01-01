@@ -5944,6 +5944,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 	}
 
+	public short getStartWeek() {
+		return startWeek;
+	}
+
+	public short getStartWeekYear() {
+		return startWeekYear;
+	}
+
 	/**
 	 * @return Returns the temperature serie for the current measurement system or <code>null</code>
 	 *         when temperature is not available

@@ -1747,6 +1747,10 @@ public class Messages extends NLS {
 	public static String		Slideout_HVROptions_Label_2xToleranceResult_Tooltip;
 	public static String		Slideout_HVROptions_Label_Title;
 
+	public static String		Slideout_LinkWithOtherViews_Label_Title;
+	public static String		Slideout_LinkWithOtherViews_Label_Title_Checkbox_IsShowTourTitle;
+	public static String		Slideout_LinkWithOtherViews_Label_Title_Checkbox_IsShowTourTitle_Tooltip;
+
 //	public static String		Slideout_Map25TrackOptions_Label_AnimationTime;
 //	public static String		Slideout_Map25TrackOptions_Label_AnimationTime_Tooltip;
 	public static String		Slideout_Map25TrackOptions_Label_ConfigName_Tooltip;
