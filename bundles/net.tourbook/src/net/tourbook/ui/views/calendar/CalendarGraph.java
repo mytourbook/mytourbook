@@ -968,7 +968,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 						CalendarProfileManager.WEEK_HEIGHT_MIN,
 						calendarHeightWithoutYearHeader / _currentProfile.weekRows);
 
-		int numVisibleRows = calendarHeightWithoutYearHeader / weekHeight;
+		final int availableVisibleRows = calendarHeightWithoutYearHeader / weekHeight;
+		int numVisibleRows = availableVisibleRows;
 
 		if (useYearColumns) {
 
@@ -990,21 +991,24 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 				// set first day to start of week
 				_firstVisibleDay = _yearColumn_CurrentYear.with(getFirstDayOfWeek_SameOrPrevious());
 
-				final LocalDateTime firstCalendarDay_NextYear = _yearColumn_NextYear
-
-						// set first day to start of week
-						.with(getFirstDayOfWeek_SameOrPrevious());
-
 				/*
-				 * adjust number of weeks
+				 * Adjust number of weeks
 				 */
+				final LocalDateTime lastWeekInYear = _yearColumn_NextYear
+
+						.with(getFirstDayOfWeek_SameOrPrevious())
+						.plusWeeks(1)
+//						.with(getFirstDayOfWeek_SameOrNext())
+
+				;
+
 				final int numYearWeeks = (int) ChronoUnit.WEEKS.between(
 						_firstVisibleDay,
-						firstCalendarDay_NextYear.plusWeeks(1).with(getFirstDayOfWeek_SameOrNext()));
+						lastWeekInYear);
 
-				if (numYearWeeks < numVisibleRows) {
+				if (numYearWeeks < availableVisibleRows) {
 
-					// less weeks in one year than visible rows -> show weeks for only one year
+					// less weeks in one year than visible rows, show weeks only for one year
 
 					numVisibleRows = numYearWeeks;
 				}
@@ -1146,20 +1150,25 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 					// set first day to start of week
 					currentDate = _yearColumn_CurrentYear.with(getFirstDayOfWeek_SameOrPrevious()).toLocalDate();
 
-					final LocalDateTime firstCalendarDay_NextYear = _yearColumn_NextYear
-
-							// set first day to start of week
-							.with(getFirstDayOfWeek_SameOrPrevious());
-
 					/*
 					 * Adjust number of weeks
 					 */
+					LocalDateTime lastWeek;
 
-					final int numYearWeeks = (int) ChronoUnit.WEEKS.between(
-							currentDate,
-							firstCalendarDay_NextYear) + 1;
+					lastWeek = _yearColumn_NextYear.with(getFirstDayOfWeek_SameOrPrevious());
+					lastWeek = lastWeek.plusWeeks(1);
+					lastWeek = lastWeek.with(getFirstDayOfWeek_SameOrNext());
 
-					if (numYearWeeks < numVisibleRows) {
+					/*
+					 * The algorithm is a litte bit complex, this will fix an issue which occures
+					 */
+					if (lastWeek.getDayOfMonth() == 8) {
+						lastWeek = lastWeek.minusWeeks(1);
+					}
+
+					final int numYearWeeks = (int) ChronoUnit.WEEKS.between(currentDate, lastWeek);
+
+					if (numYearWeeks < availableVisibleRows) {
 
 						// less weeks in one year than visible rows -> show weeks for only one year
 
