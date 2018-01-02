@@ -210,6 +210,7 @@ public class CalendarProfile implements Cloneable {
 
 		final FontData firstFontData = fontData[0];
 
+		firstFontData.setName(otherFontData.getName());
 		firstFontData.setHeight(otherFontData.getHeight());
 		firstFontData.setStyle(otherFontData.getStyle());
 
