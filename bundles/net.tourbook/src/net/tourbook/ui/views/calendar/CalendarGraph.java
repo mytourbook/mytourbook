@@ -95,9 +95,9 @@ import org.eclipse.swt.widgets.ScrollBar;
 public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 	private static final int					MIN_SCROLLABLE_WEEKS	= 12;
-
+	//
 	private final TourDoubleClickState			_tourDoubleClickState	= new TourDoubleClickState();
-
+	//
 	private ColorCacheSWT						_colorCache				= new ColorCacheSWT();
 	//
 	private ArrayList<RGB>						_rgbBright;
@@ -176,6 +176,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	//
 	private LocalDateTime						_yearColumn_CurrentYear;
 	private LocalDateTime						_yearColumn_NextYear;
+	private LocalDate							_yearColumn_FirstDay;
+	private LocalDate							_yearColumn_LastDay;
 	private LocalDate							_calendarFirstDay;
 	private LocalDate							_calendarLastDay;
 	private int									_nextWeekDateYPos;
@@ -369,12 +371,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		DayItem(final LocalDate date) {
 
-			this.dayId = ChronoUnit.DAYS.between(LocalDate.now(), date);
-		}
-
-		DayItem(final long dayId) {
-
-			this.dayId = dayId;
+			dayId = ChronoUnit.DAYS.between(LocalDate.now(), date);
 		}
 	}
 
@@ -1065,8 +1062,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		_calendarAllDaysRectangle = new Rectangle[_numYearColumns];
 
-		final long todayDayId = new DayItem(LocalDate.now()).dayId;
-
 		Font dayDateFont = null;
 		int dayDateHeight = 0;
 		if (_currentProfile.isShowDayDate) {
@@ -1114,11 +1109,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		_calendarView.updateUI_Title(_calendarFirstDay, _calendarLastDay);
 
-		int todayIdAdjustment = 0;
-
-		// we use simple ids
-		long dayId = new DayItem(currentDate).dayId;
-
 		for (int columnIndex = 0; columnIndex < _numYearColumns; columnIndex++) {
 
 			_nextWeekDateYPos = 0;
@@ -1148,6 +1138,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 					_yearColumn_CurrentYear = columnIndex == 0 ? _yearColumn_FirstYear : _yearColumn_NextYear;
 					_yearColumn_NextYear = _yearColumn_CurrentYear.plusYears(1);
 
+					_yearColumn_FirstDay = _yearColumn_CurrentYear.toLocalDate();
+					_yearColumn_LastDay = _yearColumn_NextYear.minusDays(1).toLocalDate();
+
 					// set first day to start of week
 					currentDate = _yearColumn_CurrentYear.with(getFirstDayOfWeek_SameOrPrevious()).toLocalDate();
 
@@ -1165,10 +1158,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 					 */
 					if (lastWeek.getDayOfMonth() == 8) {
 						lastWeek = lastWeek.minusWeeks(1);
-					}
-
-					if (columnIndex > 0 && currentDate.getDayOfMonth() != 1) {
-						todayIdAdjustment += 7;
 					}
 
 					final int numYearWeeks = (int) ChronoUnit.WEEKS.between(currentDate, lastWeek);
@@ -1203,7 +1192,9 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 				// keep 1st day of the week to get week data in the summary column
 				final LocalDate week1stDay = currentDate;
 
-				// draw date column
+				/*
+				 * Draw date column
+				 */
 				if (dateColumnWidth > 0) {
 
 					drawWeek_DateColumn(
@@ -1217,186 +1208,193 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 				for (int dayIndex = 0; dayIndex < 7; dayIndex++) {
 
-					final int dayPosX = calendarColumnOffset + dateColumnWidth + (int) (dayIndex * dayWidth);
-					final int dayPosXNext = calendarColumnOffset + dateColumnWidth + (int) ((dayIndex + 1) * dayWidth);
-
-					// rectangle for the whole day cell
-					final Rectangle dayRect = new Rectangle(//
-							dayPosX,
-							rowTop,
-							dayPosXNext - dayPosX,
-							weekHeight);
-
-					final DayItem dayItem = new DayItem(dayId);
-					_allDayFocusItems.add(new FocusItem(dayRect, dayId, dayItem, currentDate));
-
-					dayId = dayItem.dayId + 1;
-
-					gc.setFont(normalFont);
-//					gc.setBackground(_white);
-
-					// Day background with alternate color
-					if (_currentProfile.isToggleMonthColor) {
-
-						if (currentDate.getMonthValue() % 2 == 1) {
-							gc.setBackground(monthAlternateColor);
-						} else {
-							gc.setBackground(monthAlternate2Color);
-						}
-
-						gc.fillRectangle(//
-								dayRect.x,
-								dayRect.y,
-								dayRect.width - 1,
-								dayRect.height - 1);
-					}
-
-					_dayDateLabelRect = null;
-					Rectangle dayDateMargin = null;
-					String dayDateLabel = UI.EMPTY_STRING;
-					int dateLabelPosX = 0;
-
-					if (_currentProfile.isShowDayDate) {
-
-						// get date label width
-						dayDateLabel = UI.SPACE1 + dayDateFormatter.format(currentDate) + UI.SPACE1;
-
-						gc.setFont(dayDateFont);
-						final Point labelExtent = gc.stringExtent(dayDateLabel);
-						final int dayLabelWidth = labelExtent.x;
-						final int dayLabelHeight = labelExtent.y;
-
-						final int labelWidthWithOffset = dayLabelWidth + dayLabelRightBorder;
-						dateLabelPosX = dayPosXNext - labelWidthWithOffset;
-
-						final int marginTop = _currentProfile.dayDateMarginTop;
-						final int marginBottom = 0;
-						final int marginLeft = _currentProfile.dayDateMarginLeft;
-						final int marginRight = 0;
-
-						dayDateMargin = new Rectangle(//
-								dateLabelPosX + marginLeft,
-								rowTop + marginTop,
-								dayLabelWidth - marginLeft - marginRight,
-								dayLabelHeight - marginTop - marginBottom);
-
-						_dayDateLabelRect = new Rectangle(
-								dayDateMargin.x,
-								dayDateMargin.y,
-								dayDateMargin.width,
-								dayDateMargin.height);
-					}
-
 					/**
-					 * Check if the day should be skipped.
+					 * Check if the day should be painted.
 					 * <p>
 					 * When year columns are painted then tours in the first and last week are
-					 * painted twice. This causes problems when selecting tours.
+					 * painted twice -> this causes a LOT of problems -> skip these days
 					 */
-					boolean isSkipDay = false;
+					boolean isDrawDay = true;
 					if (useYearColumns && _currentProfile.yearColumnsStart != ColumnStart.CONTINUOUSLY) {
 
-						if (_yearColumn_CurrentYear.getYear() != currentDate.getYear()) {
-							isSkipDay = true;
+						if (currentDate.isBefore(_yearColumn_FirstDay) || currentDate.isAfter(_yearColumn_LastDay)) {
+							isDrawDay = false;
 						}
 					}
 
-					final CalendarTourData[] calendarData = _dataProvider.getCalendarDayData(currentDate);
+					if (isDrawDay) {
 
-					final boolean isCalendarDataAvailable = calendarData.length > 0;
-					final boolean isShowDayDate = _currentProfile.isHideDayDateWhenNoTour == false //
-							|| _currentProfile.isHideDayDateWhenNoTour && isCalendarDataAvailable;
+						final int dayPosX = calendarColumnOffset + dateColumnWidth + (int) (dayIndex * dayWidth);
+						final int dayPosXNext = calendarColumnOffset + dateColumnWidth + (int) ((dayIndex + 1)
+								* dayWidth);
 
-					if (isCalendarDataAvailable && isSkipDay == false) {
-
-						// tours are available for the current day
-
-						drawDay(gc, calendarData, dayRect);
-					}
-
-					// draw day date AFTER the tour is painted
-					if (_currentProfile.isShowDayDate && isShowDayDate) {
-
-						// this clipping should only kick in if shortest label format is still longer than the cell width
-						gc.setClipping(
+						// rectangle for the whole day cell
+						final Rectangle dayRect = new Rectangle(//
 								dayPosX,
 								rowTop,
-								dayRect.width - 1,
-								dayDateHeight);
+								dayPosXNext - dayPosX,
+								weekHeight);
 
-						final int weekDay = currentDate.getDayOfWeek().getValue();
+						final DayItem dayItem = new DayItem(currentDate);
+						
+						_allDayFocusItems.add(new FocusItem(dayRect, dayItem.dayId, dayItem, currentDate));
 
-						final boolean isWeekendColor = _currentProfile.isShowDayDateWeekendColor //
-								// ISO: 6 == saturday, 7 == sunday
-								&& (weekDay == 6 || weekDay == 7);
+						gc.setFont(normalFont);
 
-						boolean isDateTransparent = true;
-						Color dayDateForegroundColor;
+						// Day background with alternate color
+						if (_currentProfile.isToggleMonthColor) {
 
-						/////////////debugg on
+							if (currentDate.getMonthValue() % 2 == 1) {
+								gc.setBackground(monthAlternateColor);
+							} else {
+								gc.setBackground(monthAlternate2Color);
+							}
 
-//						dayDateLabel = dayDateLabel + " " + dayItem.dayId;
-
-						/////////////debugg off
-
-						if (dayItem.dayId == todayDayId + todayIdAdjustment) {
-
-							dayDateForegroundColor = _colorCache.getColor(_currentProfile.dayTodayRGB);
-
-						} else if (isWeekendColor) {
-
-							dayDateForegroundColor = _red;
-
-						} else if (isCalendarDataAvailable) {
-
-							final CalendarTourData calTourData = _currentProfile.isDayContentVertical
-									? calendarData[0]
-									: calendarData[calendarData.length - 1];
-
-							dayDateForegroundColor = getColor_Tour(
-									calTourData,
-									_currentProfile.tourContentColor,
-									_currentProfile.tourContentRGB);
-
-						} else {
-
-							dayDateForegroundColor = _calendarFgColor;
+							gc.fillRectangle(//
+									dayRect.x,
+									dayRect.y,
+									dayRect.width - 1,
+									dayRect.height - 1);
 						}
 
-						if (isWeekendColor && isCalendarDataAvailable) {
+						_dayDateLabelRect = null;
+						Rectangle dayDateMargin = null;
+						String dayDateLabel = UI.EMPTY_STRING;
+						int dateLabelPosX = 0;
 
-							// paint outline, red is not very good visible with a dark background
+						if (_currentProfile.isShowDayDate) {
 
-							isDateTransparent = false;
+							// get date label width
+							dayDateLabel = UI.SPACE1 + dayDateFormatter.format(currentDate) + UI.SPACE1;
 
-							// draw without additional background on the right side
-							dateLabelPosX += 2;
+							gc.setFont(dayDateFont);
+							final Point labelExtent = gc.stringExtent(dayDateLabel);
+							final int dayLabelWidth = labelExtent.x;
+							final int dayLabelHeight = labelExtent.y;
 
-							gc.setBackground(_calendarBgColor);
+							final int labelWidthWithOffset = dayLabelWidth + dayLabelRightBorder;
+							dateLabelPosX = dayPosXNext - labelWidthWithOffset;
+
+							final int marginTop = _currentProfile.dayDateMarginTop;
+							final int marginBottom = 0;
+							final int marginLeft = _currentProfile.dayDateMarginLeft;
+							final int marginRight = 0;
+
+							dayDateMargin = new Rectangle(//
+									dateLabelPosX + marginLeft,
+									rowTop + marginTop,
+									dayLabelWidth - marginLeft - marginRight,
+									dayLabelHeight - marginTop - marginBottom);
+
+							_dayDateLabelRect = new Rectangle(
+									dayDateMargin.x,
+									dayDateMargin.y,
+									dayDateMargin.width,
+									dayDateMargin.height);
 						}
 
-						/////////////debugg on
+						final CalendarTourData[] calendarData = _dataProvider.getCalendarDayData(currentDate);
 
-//						gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
-//						isDateTransparent = false;
+						final boolean isCalendarDataAvailable = calendarData.length > 0;
+						final boolean isShowDayDate = _currentProfile.isHideDayDateWhenNoTour == false //
+								|| _currentProfile.isHideDayDateWhenNoTour && isCalendarDataAvailable;
 
-						/////////////debugg off
+						if (isCalendarDataAvailable) {
 
-						// day header label
-						gc.setFont(dayDateFont);
-						gc.setForeground(dayDateForegroundColor);
-						gc.drawText(
-								dayDateLabel,
-								dayDateMargin.x,
-								dayDateMargin.y,
-								isDateTransparent);
+							// tours are available for the current day
 
-						gc.setClipping(_nullRec);
+							drawDay(gc, calendarData, dayRect);
+						}
+
+						// draw day date AFTER the tour is painted
+						if (_currentProfile.isShowDayDate && isShowDayDate) {
+
+							// this clipping should only kick in if shortest label format is still longer than the cell width
+							gc.setClipping(
+									dayPosX,
+									rowTop,
+									dayRect.width - 1,
+									dayDateHeight);
+
+							final int weekDay = currentDate.getDayOfWeek().getValue();
+
+							final boolean isWeekendColor = _currentProfile.isShowDayDateWeekendColor //
+									// ISO: 6 == saturday, 7 == sunday
+									&& (weekDay == 6 || weekDay == 7);
+
+							boolean isDateTransparent = true;
+							Color dayDateForegroundColor;
+
+							/////////////debugg on
+
+//							dayDateLabel = dayDateLabel + " " + dayItem.dayId;
+
+							/////////////debugg off
+
+							if (dayItem.dayId == 0) {
+
+								// today
+
+								dayDateForegroundColor = _colorCache.getColor(_currentProfile.dayTodayRGB);
+
+							} else if (isWeekendColor) {
+
+								dayDateForegroundColor = _red;
+
+							} else if (isCalendarDataAvailable) {
+
+								final CalendarTourData calTourData = _currentProfile.isDayContentVertical
+										? calendarData[0]
+										: calendarData[calendarData.length - 1];
+
+								dayDateForegroundColor = getColor_Tour(
+										calTourData,
+										_currentProfile.tourContentColor,
+										_currentProfile.tourContentRGB);
+
+							} else {
+
+								dayDateForegroundColor = _calendarFgColor;
+							}
+
+							if (isWeekendColor && isCalendarDataAvailable) {
+
+								// paint outline, red is not very good visible with a dark background
+
+								isDateTransparent = false;
+
+								// draw without additional background on the right side
+								dateLabelPosX += 2;
+
+								gc.setBackground(_calendarBgColor);
+							}
+
+							/////////////debugg on
+
+//							gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
+//							isDateTransparent = false;
+
+							/////////////debugg off
+
+							// day header label
+							gc.setFont(dayDateFont);
+							gc.setForeground(dayDateForegroundColor);
+							gc.drawText(
+									dayDateLabel,
+									dayDateMargin.x,
+									dayDateMargin.y,
+									isDateTransparent);
+
+							gc.setClipping(_nullRec);
+						}
 					}
 
 					currentDate = currentDate.plusDays(1);
 				}
 
+				/*
+				 * Draw week column
+				 */
 				if (summaryColumnWidth > 0) {
 
 					final int devX = calendarColumnOffset + dateColumnWidth + (int) (7 * dayWidth);
