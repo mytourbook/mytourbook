@@ -191,6 +191,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 	private ColorSelectorExtended			_colorCalendar_ForegroundColor;
 	private ColorSelectorExtended			_colorDay_HoveredColor;
 	private ColorSelectorExtended			_colorDay_SelectedColor;
+	private ColorSelectorExtended			_colorDay_TodayColor;
 	private ColorSelectorExtended			_colorTour_BackgroundColor1;
 	private ColorSelectorExtended			_colorTour_BackgroundColor2;
 	private ColorSelectorExtended			_colorTour_BorderColor;
@@ -1115,6 +1116,18 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 				// Color selector
 				_colorDay_SelectedColor = createUI_ColorSelector(container);
 			}
+			{
+				/*
+				 * Today color
+				 */
+
+				// label
+				final Label label = new Label(container, SWT.NONE);
+				label.setText(Messages.Slideout_CalendarOptions_Label_Day_TodayColor);
+
+				// Color selector
+				_colorDay_TodayColor = createUI_ColorSelector(container);
+			}
 		}
 	}
 
@@ -1512,122 +1525,6 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		return container;
 	}
 
-	private void createUI_412__Col1(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory
-				.fillDefaults()
-				//				.grab(true, false)
-				.applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-		{
-			{
-				/*
-				 * Day date format
-				 */
-
-				// label
-				_lblDayHeader_Format = new Label(container, SWT.NONE);
-				_lblDayHeader_Format.setText(Messages.Slideout_CalendarOptions_Label_DayDate_Format);
-				GridDataFactory
-						.fillDefaults()//
-						.align(SWT.FILL, SWT.CENTER)
-						.indent(_subItemIndent, 0)
-						.applyTo(_lblDayHeader_Format);
-
-				// value
-				_comboDayHeaderDateFormat = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-				_comboDayHeaderDateFormat.setVisibleItemCount(20);
-				_comboDayHeaderDateFormat.addSelectionListener(_defaultSelectionListener);
-				_comboDayHeaderDateFormat.addFocusListener(_keepOpenListener);
-			}
-			{
-				/*
-				 * Hide day when empty
-				 */
-
-				// checkbox
-				_chkIsHideDayDateWhenNoTour = new Button(container, SWT.CHECK);
-				_chkIsHideDayDateWhenNoTour.setText(Messages.Slideout_CalendarOptions_Checkbox_IsHideDayWhenEmpty);
-				_chkIsHideDayDateWhenNoTour.addSelectionListener(_defaultSelectionListener);
-				GridDataFactory
-						.fillDefaults()//
-						.align(SWT.FILL, SWT.BEGINNING)
-						.indent(_subItemIndent, 0)
-						.span(2, 1)
-						.applyTo(_chkIsHideDayDateWhenNoTour);
-			}
-			{
-				/*
-				 * Show weekend color
-				 */
-
-				// checkbox
-				_chkIsShowDayDateWeekendColor = new Button(container, SWT.CHECK);
-				_chkIsShowDayDateWeekendColor.setText(Messages.Slideout_CalendarOptions_Checkbox_IsShowDayWeekendColor);
-				_chkIsShowDayDateWeekendColor.addSelectionListener(_defaultSelectionListener);
-				GridDataFactory
-						.fillDefaults()//
-						.align(SWT.FILL, SWT.BEGINNING)
-						.indent(_subItemIndent, 0)
-						.span(2, 1)
-						.applyTo(_chkIsShowDayDateWeekendColor);
-			}
-		}
-	}
-
-	private void createUI_414__Col2(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory
-				.fillDefaults()//
-				.grab(true, true)
-				.applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_CYAN));
-		{
-			{
-				/*
-				 * Margins
-				 */
-
-				// label
-				_lblDayDate_Margin = new Label(container, SWT.NONE);
-				_lblDayDate_Margin.setText(Messages.Slideout_CalendarOptions_Label_Margin);
-				_lblDayDate_Margin.setToolTipText(Messages.Slideout_CalendarOptions_Label_Margin_DayDate_Tooltip);
-				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_lblDayDate_Margin);
-
-				final Composite valueContainer = new Composite(container, SWT.NONE);
-				GridDataFactory.fillDefaults().grab(true, false).applyTo(valueContainer);
-				GridLayoutFactory.fillDefaults().numColumns(2).applyTo(valueContainer);
-				{
-					_spinnerDayDate_Margin_Top = createUI_Margin(valueContainer);
-					_spinnerDayDate_Margin_Left = createUI_Margin(valueContainer);
-				}
-			}
-			{
-				/*
-				 * Font
-				 */
-
-				// label
-				_lblDayHeader_Font = new Label(container, SWT.NONE);
-				_lblDayHeader_Font.setText(Messages.Slideout_CalendarOptions_Label_DayDate_Font);
-				GridDataFactory
-						.fillDefaults()//
-						.grab(true, true)
-						.indent(0, _fontLabelVIndent)
-						.applyTo(_lblDayHeader_Font);
-
-				// value
-				_fontEditorDayDate = new SimpleFontEditor(container, SWT.NONE);
-				_fontEditorDayDate.addFontListener(_defaultFontEditorListener);
-				GridDataFactory.fillDefaults().grab(true, false).applyTo(_fontEditorDayDate);
-			}
-		}
-	}
-
 	private void createUI_420_Day(final Composite parent) {
 
 		final Group group = new Group(parent, SWT.NONE);
@@ -1723,9 +1620,125 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 						.applyTo(container);
 //				container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
 				{
-					createUI_412__Col1(container);
-					createUI_414__Col2(container);
+					createUI_432__Col1(container);
+					createUI_434__Col2(container);
 				}
+			}
+		}
+	}
+
+	private void createUI_432__Col1(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory
+				.fillDefaults()
+				//				.grab(true, false)
+				.applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+		{
+			{
+				/*
+				 * Day date format
+				 */
+
+				// label
+				_lblDayHeader_Format = new Label(container, SWT.NONE);
+				_lblDayHeader_Format.setText(Messages.Slideout_CalendarOptions_Label_DayDate_Format);
+				GridDataFactory
+						.fillDefaults()//
+						.align(SWT.FILL, SWT.CENTER)
+						.indent(_subItemIndent, 0)
+						.applyTo(_lblDayHeader_Format);
+
+				// value
+				_comboDayHeaderDateFormat = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+				_comboDayHeaderDateFormat.setVisibleItemCount(20);
+				_comboDayHeaderDateFormat.addSelectionListener(_defaultSelectionListener);
+				_comboDayHeaderDateFormat.addFocusListener(_keepOpenListener);
+			}
+			{
+				/*
+				 * Hide day when empty
+				 */
+
+				// checkbox
+				_chkIsHideDayDateWhenNoTour = new Button(container, SWT.CHECK);
+				_chkIsHideDayDateWhenNoTour.setText(Messages.Slideout_CalendarOptions_Checkbox_IsHideDayWhenEmpty);
+				_chkIsHideDayDateWhenNoTour.addSelectionListener(_defaultSelectionListener);
+				GridDataFactory
+						.fillDefaults()//
+						.align(SWT.FILL, SWT.BEGINNING)
+						.indent(_subItemIndent, 0)
+						.span(2, 1)
+						.applyTo(_chkIsHideDayDateWhenNoTour);
+			}
+			{
+				/*
+				 * Show weekend color
+				 */
+
+				// checkbox
+				_chkIsShowDayDateWeekendColor = new Button(container, SWT.CHECK);
+				_chkIsShowDayDateWeekendColor.setText(Messages.Slideout_CalendarOptions_Checkbox_IsShowDayWeekendColor);
+				_chkIsShowDayDateWeekendColor.addSelectionListener(_defaultSelectionListener);
+				GridDataFactory
+						.fillDefaults()//
+						.align(SWT.FILL, SWT.BEGINNING)
+						.indent(_subItemIndent, 0)
+						.span(2, 1)
+						.applyTo(_chkIsShowDayDateWeekendColor);
+			}
+		}
+	}
+
+	private void createUI_434__Col2(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory
+				.fillDefaults()//
+				.grab(true, true)
+				.applyTo(container);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_CYAN));
+		{
+			{
+				/*
+				 * Margins
+				 */
+
+				// label
+				_lblDayDate_Margin = new Label(container, SWT.NONE);
+				_lblDayDate_Margin.setText(Messages.Slideout_CalendarOptions_Label_Margin);
+				_lblDayDate_Margin.setToolTipText(Messages.Slideout_CalendarOptions_Label_Margin_DayDate_Tooltip);
+				GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_lblDayDate_Margin);
+
+				final Composite valueContainer = new Composite(container, SWT.NONE);
+				GridDataFactory.fillDefaults().grab(true, false).applyTo(valueContainer);
+				GridLayoutFactory.fillDefaults().numColumns(2).applyTo(valueContainer);
+				{
+					_spinnerDayDate_Margin_Top = createUI_Margin(valueContainer);
+					_spinnerDayDate_Margin_Left = createUI_Margin(valueContainer);
+				}
+			}
+			{
+				/*
+				 * Font
+				 */
+
+				// label
+				_lblDayHeader_Font = new Label(container, SWT.NONE);
+				_lblDayHeader_Font.setText(Messages.Slideout_CalendarOptions_Label_DayDate_Font);
+				GridDataFactory
+						.fillDefaults()//
+						.grab(true, true)
+						.indent(0, _fontLabelVIndent)
+						.applyTo(_lblDayHeader_Font);
+
+				// value
+				_fontEditorDayDate = new SimpleFontEditor(container, SWT.NONE);
+				_fontEditorDayDate.addFontListener(_defaultFontEditorListener);
+				GridDataFactory.fillDefaults().grab(true, false).applyTo(_fontEditorDayDate);
 			}
 		}
 	}
@@ -3802,6 +3815,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 			_colorCalendar_ForegroundColor.setColorValue(profile.calendarForegroundRGB);
 			_colorDay_HoveredColor.setColorValue(profile.dayHoveredRGB);
 			_colorDay_SelectedColor.setColorValue(profile.daySelectedRGB);
+			_colorDay_TodayColor.setColorValue(profile.dayTodayRGB);
 			_rdoWeekRow_Height.setSelection(profile.isWeekRowHeight);
 			_rdoWeekRow_Number.setSelection(profile.isWeekRowHeight == false);
 			_spinnerWeek_Height.setSelection(profile.weekHeight);
@@ -3941,6 +3955,7 @@ public class SlideoutCalendarOptions extends AdvancedSlideout implements ICalend
 		profile.calendarForegroundRGB = _colorCalendar_ForegroundColor.getColorValue();
 		profile.dayHoveredRGB = _colorDay_HoveredColor.getColorValue();
 		profile.daySelectedRGB = _colorDay_SelectedColor.getColorValue();
+		profile.dayTodayRGB = _colorDay_TodayColor.getColorValue();
 		profile.isToggleMonthColor = _chkIsShowMonthColor.getSelection();
 		profile.isWeekRowHeight = _rdoWeekRow_Height.getSelection();
 		profile.useDraggedScrolling = _chkUseDraggedScrolling.getSelection();

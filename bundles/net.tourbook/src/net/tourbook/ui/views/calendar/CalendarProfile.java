@@ -94,6 +94,7 @@ public class CalendarProfile implements Cloneable {
 	RGB						calendarForegroundRGB		= CalendarProfileManager.DEFAULT_CALENDAR_FOREBACKGROUND_RGB;
 	RGB						dayHoveredRGB				= CalendarProfileManager.DEFAULT_DAY_HOVERED_RGB;
 	RGB						daySelectedRGB				= CalendarProfileManager.DEFAULT_DAY_SELECTED_RGB;
+	RGB 					dayTodayRGB					= CalendarProfileManager.DEFAULT_DAY_TODAY_RGB;
 	int						weekHeight					= CalendarProfileManager.DEFAULT_WEEK_HEIGHT;
 	int						weekRows					= CalendarProfileManager.DEFAULT_WEEK_ROWS;
 	//
@@ -304,6 +305,7 @@ public class CalendarProfile implements Cloneable {
         sb.append("profile.calendarForegroundRGB         = " + dump_RGB(profile.calendarForegroundRGB)    + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.dayHoveredRGB                 = " + dump_RGB(profile.dayHoveredRGB)            + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("profile.daySelectedRGB                = " + dump_RGB(profile.daySelectedRGB)           + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
+        sb.append("profile.dayTodayRGB                   = " + dump_RGB(profile.dayTodayRGB)              + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$
         sb.append("                                                                                           \n"); //$NON-NLS-1$
         sb.append("// 1. Date column                                                                          \n"); //$NON-NLS-1$
         sb.append("profile.isShowDateColumn              = " + isShowDateColumn                           + ";\n"); //$NON-NLS-1$ //$NON-NLS-2$

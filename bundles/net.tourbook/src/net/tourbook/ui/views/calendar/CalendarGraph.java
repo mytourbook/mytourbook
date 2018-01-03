@@ -200,7 +200,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 	private Color								_gray					= _display.getSystemColor(SWT.COLOR_GRAY);
 	private Color								_white					= _display.getSystemColor(SWT.COLOR_WHITE);
 	private Color								_red					= _display.getSystemColor(SWT.COLOR_RED);
-	private Color								_blue					= _display.getSystemColor(SWT.COLOR_BLUE);
 	private Color								_calendarFgColor;
 	private Color								_calendarBgColor;
 	//
@@ -1066,7 +1065,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
 		_calendarAllDaysRectangle = new Rectangle[_numYearColumns];
 
-		final long todayDayId = (new DayItem(LocalDate.now())).dayId;
+		final long todayDayId = new DayItem(LocalDate.now()).dayId;
 
 		Font dayDateFont = null;
 		int dayDateHeight = 0;
@@ -1114,6 +1113,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 		}
 
 		_calendarView.updateUI_Title(_calendarFirstDay, _calendarLastDay);
+
+		int todayIdAdjustment = 0;
 
 		// we use simple ids
 		long dayId = new DayItem(currentDate).dayId;
@@ -1164,6 +1165,10 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 					 */
 					if (lastWeek.getDayOfMonth() == 8) {
 						lastWeek = lastWeek.minusWeeks(1);
+					}
+
+					if (columnIndex > 0 && currentDate.getDayOfMonth() != 1) {
+						todayIdAdjustment += 7;
 					}
 
 					final int numYearWeeks = (int) ChronoUnit.WEEKS.between(currentDate, lastWeek);
@@ -1328,13 +1333,19 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 						boolean isDateTransparent = true;
 						Color dayDateForegroundColor;
 
-						if (dayItem.dayId == todayDayId) {
+						/////////////debugg on
 
-							dayDateForegroundColor = (_blue);
+//						dayDateLabel = dayDateLabel + " " + dayItem.dayId;
+
+						/////////////debugg off
+
+						if (dayItem.dayId == todayDayId + todayIdAdjustment) {
+
+							dayDateForegroundColor = _colorCache.getColor(_currentProfile.dayTodayRGB);
 
 						} else if (isWeekendColor) {
 
-							dayDateForegroundColor = (_red);
+							dayDateForegroundColor = _red;
 
 						} else if (isCalendarDataAvailable) {
 
@@ -1376,8 +1387,8 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 						gc.setForeground(dayDateForegroundColor);
 						gc.drawText(
 								dayDateLabel,
-								dayDateMargin.x, //dateLabelPosX,
-								dayDateMargin.y, //rowTop,
+								dayDateMargin.x,
+								dayDateMargin.y,
 								isDateTransparent);
 
 						gc.setClipping(_nullRec);
@@ -2114,14 +2125,6 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 				return;
 			}
 		}
-
-// this seems to be confusing me
-//
-//		/*
-//		 * Selected item is not available any more in the focus items, this occures when scrolled
-//		 * with the mouse -> deselect item
-//		 */
-//		_selectedItem = _emptyItem;
 
 		if (isFocus) {
 			drawFocus(gc);

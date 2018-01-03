@@ -103,6 +103,7 @@ public class CalendarProfileManager {
 	private static final String				TAG_CALENDAR_FOREGROUND_RGB				= "CalendarForegroundRGB";			//$NON-NLS-1$
 	private static final String				TAG_DAY_HOVERED_RGB						= "DayHoveredRGB";					//$NON-NLS-1$;
 	private static final String				TAG_DAY_SELECTED_RGB					= "DaySelectedRGB";					//$NON-NLS-1$;
+	private static final String				TAG_DAY_TODAY_RGB						= "DayTodayRGB";					//$NON-NLS-1$
 	private static final String				TAG_FORMATTER							= "Formatter";						//$NON-NLS-1$
 	private static final String				TAG_TOUR_BACKGROUND_1_RGB				= "TourBackground1RGB";				//$NON-NLS-1$;
 	private static final String				TAG_TOUR_BACKGROUND_2_RGB				= "TourBackground2RGB";				//$NON-NLS-1$;
@@ -189,8 +190,8 @@ public class CalendarProfileManager {
 	static final boolean					DEFAULT_IS_TRUNCATE_TOUR_TEXT			= true;
 	static final boolean					DEFAULT_IS_WEEK_ROW_HEIGHT				= false;
 	static final boolean					DEFAULT_IS_YEAR_COLUMN_DAY_WIDTH		= false;
-	static final int						DEFAULT_MARGIN_MIN						= -20;
-	static final int						DEFAULT_MARGIN_MAX						= 20;
+	static final int						DEFAULT_MARGIN_MIN						= -30;
+	static final int						DEFAULT_MARGIN_MAX						= 30;
 	static final int						DEFAULT_WEEK_COLUMN_WIDTH				= 100;
 	static final RGB						DEFAULT_ALTERNATE_MONTH_RGB				= new RGB(60, 60, 60);
 	static final RGB						DEFAULT_ALTERNATE_MONTH2_RGB			= new RGB(80, 80, 80);
@@ -198,6 +199,7 @@ public class CalendarProfileManager {
 	static final RGB						DEFAULT_CALENDAR_FOREBACKGROUND_RGB		= new RGB(200, 200, 200);
 	static final RGB						DEFAULT_DAY_HOVERED_RGB					= new RGB(255, 255, 255);
 	static final RGB						DEFAULT_DAY_SELECTED_RGB				= new RGB(128, 128, 128);
+	static final RGB						DEFAULT_DAY_TODAY_RGB					= new RGB(255, 255, 0);
 	//
 	// tour background
 	static final TourBackground				DEFAULT_TOUR_BACKGROUND					= TourBackground.FILL;
@@ -2370,6 +2372,7 @@ public class CalendarProfileManager {
 		profile.calendarForegroundRGB         = new RGB (0, 0, 0);
 		profile.dayHoveredRGB                 = new RGB (153, 153, 153);
 		profile.daySelectedRGB                = new RGB (77, 77, 77);
+		profile.dayTodayRGB                   = new RGB (0, 0, 255);
 		                                                                                           
 		// 1. Date column
 		profile.isShowDateColumn              = true;
@@ -2889,6 +2892,7 @@ public class CalendarProfileManager {
 		profile.calendarForegroundRGB		= Util.getXmlRgb(xmlProfile, 						TAG_CALENDAR_FOREGROUND_RGB,	DEFAULT_CALENDAR_FOREBACKGROUND_RGB);
 		profile.dayHoveredRGB				= Util.getXmlRgb(xmlProfile,						TAG_DAY_HOVERED_RGB, 			DEFAULT_DAY_HOVERED_RGB);
 		profile.daySelectedRGB				= Util.getXmlRgb(xmlProfile,						TAG_DAY_SELECTED_RGB,			DEFAULT_DAY_SELECTED_RGB);
+		profile.dayTodayRGB					= Util.getXmlRgb(xmlProfile,						TAG_DAY_TODAY_RGB,				DEFAULT_DAY_TODAY_RGB);
 		
 		// 1. Date column
 		profile.isShowDateColumn			= Util.getXmlBoolean(xmlProfile, 					ATTR_IS_SHOW_DATE_COLUMN,		true);
@@ -3049,6 +3053,7 @@ public class CalendarProfileManager {
 		Util.setXmlRgb(xmlProfile,	TAG_CALENDAR_FOREGROUND_RGB, 			profile.calendarForegroundRGB);
 		Util.setXmlRgb(xmlProfile,	TAG_DAY_HOVERED_RGB, 					profile.dayHoveredRGB);
 		Util.setXmlRgb(xmlProfile,	TAG_DAY_SELECTED_RGB, 					profile.daySelectedRGB);
+		Util.setXmlRgb(xmlProfile,	TAG_DAY_TODAY_RGB,	 					profile.dayTodayRGB);
 		
 		// 1. Date column
 		xmlProfile.putBoolean(		ATTR_IS_SHOW_DATE_COLUMN, 				profile.isShowDateColumn);
