@@ -53,21 +53,21 @@ import org.osgi.framework.Version;
 
 public class CalendarProfileManager {
 
-	//
 // SET_FORMATTING_OFF
 	//
-	private static final String				VALUE_UNIT_K_CALORIES			= net.tourbook.ui.Messages.Value_Unit_KCalories;
-
-
-	private static final String				PROFILE_FILE_NAME				= "calendar-profiles.xml";			//$NON-NLS-1$
+	private static final String				VALUE_UNIT_K_CALORIES	= net.tourbook.ui.Messages.Value_Unit_KCalories;
+	//
+	private static final String				DEFAULT_PREFIX			= " : ";					//$NON-NLS-1$
+	//
+	private static final String				PROFILE_FILE_NAME		= "calendar-profiles.xml";			//$NON-NLS-1$
 	//
 	/**
 	 * Version number is not yet used.
 	 */
-	private static final int				PROFILE_VERSION					= 1;
+	private static final int				PROFILE_VERSION			= 1;
 	//
-	private static final Bundle				_bundle							= TourbookPlugin.getDefault().getBundle();
-	private static final IPath				_stateLocation					= Platform.getStateLocation(_bundle);
+	private static final Bundle				_bundle					= TourbookPlugin.getDefault().getBundle();
+	private static final IPath				_stateLocation			= Platform.getStateLocation(_bundle);
 	//
 // SET_FORMATTING_ON
 	//
@@ -87,7 +87,6 @@ public class CalendarProfileManager {
 	 */
 	private static final String				TAG_ROOT								= "CalendarProfiles";				//$NON-NLS-1$
 	private static final String				ATTR_PROFILE_VERSION					= "profileVersion";					//$NON-NLS-1$
-
 	//
 	/*
 	 * Calendars
@@ -2676,6 +2675,49 @@ public class CalendarProfileManager {
 		}
 
 		return activeProfile;
+	}
+
+	static String getProfileConfigName(final CalendarProfile profile, final String customProfileName) {
+
+		final String profileName = customProfileName == null
+				? profile.profileName
+				: customProfileName;
+
+		if (profile.isDefaultDefault) {
+
+			return Messages.Slideout_CalendarOptions_Label_AppPrefix + DEFAULT_PREFIX + profileName;
+
+		} else if (profile.isUserParentDefault) {
+
+			return Messages.Slideout_CalendarOptions_Label_UserPrefix
+
+					+ DEFAULT_PREFIX + profile.userParentDefaultId;
+		}
+
+		return profileName;
+	}
+
+	static String getProfileName(final CalendarProfile profile, final String customProfileName) {
+
+		final String profileName = customProfileName == null
+				? profile.profileName
+				: customProfileName;
+
+		if (profile.isDefaultDefault) {
+
+			return Messages.Slideout_CalendarOptions_Label_AppPrefix + DEFAULT_PREFIX + profileName;
+
+		} else if (profile.isUserParentDefault) {
+
+			return Messages.Slideout_CalendarOptions_Label_UserPrefix
+
+					+ DEFAULT_PREFIX + profile.userParentDefaultId
+					+ DEFAULT_PREFIX + profileName
+
+			;
+		}
+
+		return profileName;
 	}
 
 	private static File getProfileXmlFile() {

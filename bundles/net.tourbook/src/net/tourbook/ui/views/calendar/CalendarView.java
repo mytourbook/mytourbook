@@ -432,7 +432,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 				GridDataFactory
 						.fillDefaults()
 						.align(SWT.BEGINNING, SWT.CENTER)
-						.hint(_pc.convertWidthInCharsToPixels(20), SWT.DEFAULT)
+						.hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
 						.applyTo(_comboProfiles);
 			}
 		}
@@ -483,7 +483,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 
 			final CalendarProfile profile = allCalendarProfiles.get(profileIndex);
 
-			_comboProfiles.add(profile.profileName);
+			_comboProfiles.add(CalendarProfileManager.getProfileName(profile, profile.profileName));
 
 			// get index for active profile
 			if (activeProfile.equals(profile)) {
@@ -675,11 +675,13 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 		});
 	}
 
-	void updateUI_ProfileName(final String modifiedProfileName) {
+	void updateUI_ProfileName(final CalendarProfile selectedProfile, final String modifiedProfileName) {
 
 		// update text in the combo
 		final int selectedIndex = _comboProfiles.getSelectionIndex();
-		_comboProfiles.setItem(selectedIndex, modifiedProfileName);
+		_comboProfiles.setItem(
+				selectedIndex,
+				CalendarProfileManager.getProfileName(selectedProfile, modifiedProfileName));
 	}
 
 	void updateUI_Title(final LocalDate calendarFirstDay, final LocalDate calendarLastDay) {

@@ -1693,6 +1693,7 @@ public class Messages extends NLS {
 	public static String		Slideout_CalendarOptions_Label_Tour_ValueColumns;
 	public static String		Slideout_CalendarOptions_Label_Tour_ValueColumns_Tooltip;
 	public static String		Slideout_CalendarOptions_Label_Tour_ValueFont;
+	public static String		Slideout_CalendarOptions_Label_UserPrefix;
 	public static String		Slideout_CalendarOptions_Label_Week_ColumnWidth;
 	public static String		Slideout_CalendarOptions_Label_Week_ValueFont;
 	public static String		Slideout_CalendarOptions_Label_YearColumn_HeaderFont;
