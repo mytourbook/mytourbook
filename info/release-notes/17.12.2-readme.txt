@@ -1,0 +1,23 @@
+Version 17.12.2                                        ?. January 2018
+
+
+Improvements
+============	
+
+* Calendar
+
+  - Set color for todays date
+  
+  - Changed week/tour layout:
+  
+    When year columns are displayed and the column start is not 
+    continuously, the last and first week in adjacent columns contained
+    a tour two times. 
+    Now a tour is displayed only once in the correct column, this solved
+    a lot of existing navigation/positioning bugs
+
+
+* Tour Book View
+
+  - Link a tour in the tour book view when a tour is selected in another 
+    directory view

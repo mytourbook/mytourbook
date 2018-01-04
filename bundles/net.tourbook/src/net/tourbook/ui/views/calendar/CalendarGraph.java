@@ -1236,7 +1236,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 								weekHeight);
 
 						final DayItem dayItem = new DayItem(currentDate);
-						
+
 						_allDayFocusItems.add(new FocusItem(dayRect, dayItem.dayId, dayItem, currentDate));
 
 						gc.setFont(normalFont);
@@ -2686,7 +2686,10 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 					_yearColumn_FirstYear = requestedDateTime
 
 							// center date vertically on screen
-							.minusWeeks(_numWeeksInOneColumn / 2);
+							.minusWeeks(_numWeeksInOneColumn / 2)
+
+							// center horizontally
+							.minusYears(_numYearColumns / 2);
 
 				} else {
 
@@ -2700,6 +2703,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 				if (isCenterDate) {
 
 					_yearColumn_FirstYear = requestedDateTime
+
 							// center date horizontally on screen
 							.minusYears(_numYearColumns / 2);
 
