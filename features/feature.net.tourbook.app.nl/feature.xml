@@ -2,7 +2,7 @@
 <feature
       id="feature.net.tourbook.app.nl"
       label="MyTourbook Language Support"
-      version="17.12.1.qualifier"
+      version="17.12.2.qualifier"
       provider-name="MyTourbook"
       plugin="net.tourbook.branding">
 
@@ -23,7 +23,7 @@
    </url>
 
    <requires>
-      <import feature="feature.net.tourbook.app.version" version="17.12.1" match="equivalent"/>
+      <import feature="feature.net.tourbook.app.version" version="17.12.2" match="equivalent"/>
       <import plugin="net.tourbook.chart"/>
       <import plugin="net.tourbook.common"/>
       <import plugin="net.tourbook.device"/>
