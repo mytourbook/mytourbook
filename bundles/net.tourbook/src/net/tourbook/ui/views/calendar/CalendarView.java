@@ -412,7 +412,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 				GridDataFactory
 						.fillDefaults()//
 						.grab(true, false)
-						.align(SWT.FILL, SWT.BEGINNING)
+						.align(SWT.FILL, SWT.CENTER)
 						.applyTo(_lblTitle);
 				MTFont.setHeaderFont(_lblTitle);
 //				_lblTitle.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
@@ -689,6 +689,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 		if (calendarFirstDay != null) {
 
 			if (calendarFirstDay.equals(_titleFirstDay) && calendarLastDay.equals(_titleLastDay)) {
+
 				// these dates are already displayed
 				return;
 			}
@@ -702,11 +703,14 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 			return;
 		}
 
+		// reset to default header font
+		MTFont.setHeaderFont(_lblTitle);
+
 		/*
 		 * Get title text
 		 */
 		String titleText = UI.EMPTY_STRING;
-		final GC gc = new GC(_lblTitle);
+		GC gc = new GC(_lblTitle);
 		{
 			final int availableWidth = _lblTitle.getSize().x;
 
@@ -727,14 +731,29 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 				if (titleWidth > availableWidth) {
 
 					titleText = _titleFirstDay.format(TimeTools.Formatter_Date_S)
-							+ UI.DASH_WITH_DOUBLE_SPACE
+							+ UI.DASH_WITH_SPACE
 							+ _titleLastDay.format(TimeTools.Formatter_Date_S);
 
 					titleWidth = gc.stringExtent(titleText).x;
 
 					if (titleWidth > availableWidth) {
 
-						titleText = UI.EMPTY_STRING;
+						// set default font
+						_lblTitle.setFont(null);
+
+						gc.dispose();
+						gc = new GC(_lblTitle);
+
+						titleWidth = gc.stringExtent(titleText).x;
+
+						if (titleWidth > availableWidth) {
+
+							/*
+							 * Force that the title is displayed the next time. There was a problem
+							 * when resizing the canvas and the title was empty.
+							 */
+							_titleFirstDay = null;
+						}
 					}
 				}
 			}
