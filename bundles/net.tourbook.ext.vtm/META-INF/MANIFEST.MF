@@ -1,22 +1,21 @@
 Manifest-Version: 1.0
-Bundle-ClassPath: libs/vtm.jar,libs/vtm-desktop.jar,libs/vtm-gdx.jar,l
- ibs/vtm-http.jar,libs/vtm-themes.jar,libs/slf4j-simple-1.7.25.jar,lib
- s/logging-interceptor-3.8.0.jar,libs/slf4j-api-1.7.25.jar,libs/gdx-pl
- atform-1.9.6-natives-desktop.jar,libs/gdx-backend-lwjgl-1.9.6.jar,lib
- s/svg-salamander-0.1.19.jar,libs/gdx-1.9.6.jar,libs/okhttp-3.8.0.jar,
- libs/lwjgl-2.9.2.jar,libs/lwjgl_util-2.9.2.jar,libs/jlayer-1.0.1-gdx.
- jar,libs/jorbis-0.0.17.jar,libs/okio-1.13.0.jar,libs/lwjgl-platform-2
- .9.2-natives-windows.jar,libs/lwjgl-platform-2.9.2-natives-linux.jar,
- libs/lwjgl-platform-2.9.2-natives-osx.jar,libs/jinput-2.0.5.jar,libs/
- jutils-1.0.0.jar,libs/jinput-platform-2.0.5-natives-linux.jar,libs/ji
- nput-platform-2.0.5-natives-windows.jar,libs/jinput-platform-2.0.5-na
- tives-osx.jar,libs/,resources/
+Bundle-ClassPath: libs/vtm-desktop.jar,libs/vtm-gdx.jar,libs/vtm-http.
+ jar,libs/vtm-themes.jar,libs/vtm.jar,libs/slf4j-simple-1.7.25.jar,lib
+ s/logging-interceptor-3.8.0.jar,libs/slf4j-api-1.7.25.jar,libs/gdx-ba
+ ckend-lwjgl-1.9.8.jar,libs/svg-salamander-0.1.19.jar,libs/gdx-1.9.8.j
+ ar,libs/okhttp-3.8.0.jar,libs/lwjgl_util-2.9.2.jar,libs/lwjgl-2.9.2.j
+ ar,libs/jlayer-1.0.1-gdx.jar,libs/jorbis-0.0.17.jar,libs/okio-1.13.0.
+ jar,libs/lwjgl-platform-2.9.2-natives-windows.jar,libs/lwjgl-platform
+ -2.9.2-natives-linux.jar,libs/lwjgl-platform-2.9.2-natives-osx.jar,li
+ bs/jinput-2.0.5.jar,libs/jutils-1.0.0.jar,libs/jinput-platform-2.0.5-
+ natives-linux.jar,libs/jinput-platform-2.0.5-natives-windows.jar,libs
+ /jinput-platform-2.0.5-natives-osx.jar,libs/,resources/
 Bundle-License: http://www.apache.org/licenses/LICENSE-2.0
 Bundle-ManifestVersion: 2
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-SymbolicName: net.tourbook.ext.vtm
 Bundle-Vendor: MyTourbook
-Bundle-Version: 17.7.2.v20170922-1208
+Bundle-Version: 17.7.2.v20180109-1354
 Export-Package: assets.patterns;version="17.7.2",assets.shaders;versio
  n="17.7.2",assets.symbols;version="17.7.2",assets.symbols.accommodati
  on;version="17.7.2",assets.symbols.amenity;version="17.7.2",assets.sy

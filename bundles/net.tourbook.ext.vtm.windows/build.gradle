@@ -1,0 +1,34 @@
+//apply plugin: 'application'
+
+//task copyNatives(type: Copy) {
+//
+//	println 'copyNatives copyNatives copyNatives copyNatives copyNatives copyNatives copyNatives copyNatives '
+//
+//	from 		'../../vtm-parent/vtm-desktop/natives/windows'
+//	into 		'win'
+////		include		'**/*'
+//}
+
+// MUST be set AFTER task declaration !!!
+//tasks.dependsOn(
+//
+//	// copy jars from dependencies to 'public' project folder
+//	copyNatives,
+//)
+
+
+//dependencies {
+//
+//    println 'copy natives'
+//        
+//    copyNatives
+//    
+////    file("${rootDir}/../vtm-parent/vtm-desktop/natives").eachDir() { dir ->
+////    
+//////        implementation files(dir.path)
+////
+////		if(dir.path.equals('windows')){ 
+////	        println '\t' + dir.path
+////    	}
+////    }
+//}

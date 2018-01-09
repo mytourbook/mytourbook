@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: net.tourbook.ext.vtm.windows
+Bundle-SymbolicName: net.tourbook.ext.vtm.windows
+Bundle-Version: 17.7.2.qualifier
+Fragment-Host: net.tourbook.ext.vtm;bundle-version="17.7.2"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7

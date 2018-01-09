@@ -19,7 +19,7 @@ final class LabelPool extends Pool<TextItem> {
 
         // drop references
         l.item = null;
-        l.string = null;
+		l.label = null;
         final Label ret = (Label) l.next;
 
         // ignore warning

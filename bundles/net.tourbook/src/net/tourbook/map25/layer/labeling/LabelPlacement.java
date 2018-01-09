@@ -37,13 +37,12 @@ import org.slf4j.LoggerFactory;
  * Original: {@link org.oscim.layers.tile.vector.labeling.LabelPlacement}
  */
 public class LabelPlacement {
-
 	static final boolean		dbg					= false;
 	static final Logger			log					= LoggerFactory.getLogger(LabelPlacement.class);
 
 	private final static float	MIN_CAPTION_DIST	= 5;
-	private final static float	MIN_WAY_DIST		= 3;
 
+	private final static float	MIN_WAY_DIST		= 3;
 	/**
 	 * thread local pool of for unused label items
 	 */
@@ -71,7 +70,6 @@ public class LabelPlacement {
 	}
 
 	private static float flipLongitude(float dx, final int max) {
-
 		// flip around date-line
 		if (dx > max) {
 			dx = dx - max * 2;
@@ -105,7 +103,6 @@ public class LabelPlacement {
 		}
 
 		O: for (final TextItem ti : ld.labels) {
-
 			if (!ti.text.caption) {
 				continue;
 			}
@@ -136,31 +133,24 @@ public class LabelPlacement {
 					l.text.dy);
 
 			for (Label o = mLabels; o != null;) {
-
 				if (l.bbox.overlaps(o.bbox)) {
-
 					if (l.text.priority < o.text.priority) {
 						o = removeLabel(o);
 						continue;
 					}
-
 					continue O;
 				}
-
 				o = (Label) o.next;
 			}
 
 			addLabel(l);
-
 			l.item = TextItem.copy(ti);
 			l.tileX = t.tileX;
 			l.tileY = t.tileY;
 			l.tileZ = t.zoomLevel;
 			l.active = mRelabelCnt;
-
 			l = null;
 		}
-
 		return l;
 	}
 
@@ -243,7 +233,6 @@ public class LabelPlacement {
 	private byte checkOverlap(final Label l) {
 
 		for (Label o = mLabels; o != null;) {
-
 			//check bounding box
 			if (!Label.bboxOverlaps(l, o, 100)) {
 				o = (Label) o.next;
@@ -251,7 +240,6 @@ public class LabelPlacement {
 			}
 
 			if (Label.shareText(l, o)) {
-
 				// keep the label that was active earlier
 				if (o.active <= l.active) {
 					return 1;
@@ -265,7 +253,6 @@ public class LabelPlacement {
 				// keep other
 				return 2;
 			}
-
 			if (l.bbox.overlaps(o.bbox)) {
 				if (o.active <= l.active) {
 					return 1;
@@ -278,25 +265,20 @@ public class LabelPlacement {
 					o = removeLabel(o);
 					continue;
 				}
-
 				// keep other
 				return 1;
 			}
-
 			o = (Label) o.next;
 		}
-
 		return 0;
 	}
 
 	public void cleanup() {
-
 		mLabels = (Label) mPool.releaseAll(mLabels);
 		mTileSet.releaseTiles();
 	}
 
 	private Label getLabel() {
-
 		final Label l = (Label) mPool.get();
 		l.active = Integer.MAX_VALUE;
 
@@ -307,27 +289,24 @@ public class LabelPlacement {
 	 * group labels by string and type
 	 */
 	protected Label groupLabels(final Label labels) {
-
 		for (Label cur = labels; cur != null; cur = (Label) cur.next) {
-
 			/* keep pointer to previous for removal */
 			Label p = cur;
-
 			final TextStyle t = cur.text;
 			final float w = cur.width;
 
 			/* iterate through following */
 			for (Label l = (Label) cur.next; l != null; l = (Label) l.next) {
 
-				if (w != l.width || t != l.text || !cur.string.equals(l.string)) {
+				if (w != l.width || t != l.text || !cur.label.equals(l.label)) {
 					p = l;
 					continue;
 				} else if (cur.next == l) {
-					l.string = cur.string;
+					l.label = cur.label;
 					p = l;
 					continue;
 				}
-				l.string = cur.string;
+				l.label = cur.label;
 
 				/* insert l after cur */
 				final Label tmp = (Label) cur.next;
@@ -344,14 +323,11 @@ public class LabelPlacement {
 				l = p;
 			}
 		}
-
 		return labels;
 	}
 
 	private boolean isVisible(final float x, final float y) {
-
 		// rough filter
-
 		final float dist = x * x + y * y;
 		if (dist > mSquareRadius) {
 			return false;
@@ -361,10 +337,8 @@ public class LabelPlacement {
 	}
 
 	private void placeLabelFrom(final Label l, final TextItem ti) {
-
 		// set line endpoints relative to view to be able to
 		// check intersections with label from other tiles
-
 		final float w = (ti.x2 - ti.x1) / 2f;
 		final float h = (ti.y2 - ti.y1) / 2f;
 
@@ -391,10 +365,6 @@ public class LabelPlacement {
 		if (mTileSet.cnt == 0) {
 			return false;
 		}
-
-//		System.out.println(
-//				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tmTileSet:" + mTileSet.cnt));
-//		// TODO remove SYSTEM.OUT.PRINTLN
 
 		final MapPosition pos = work.pos;
 		final boolean changedPos = mMap.viewport().getMapPosition(pos);
@@ -501,9 +471,7 @@ public class LabelPlacement {
 
 		/* add way labels */
 		for (int i = 0, n = mTileSet.cnt; i < n; i++) {
-
 			final MapTile t = tiles[i];
-
 			if (!t.state(READY | NEW_DATA)) {
 				continue;
 			}
@@ -517,9 +485,7 @@ public class LabelPlacement {
 
 		/* add caption */
 		for (int i = 0, n = mTileSet.cnt; i < n; i++) {
-
 			final MapTile t = tiles[i];
-
 			if (!t.state(READY | NEW_DATA)) {
 				continue;
 			}
@@ -532,7 +498,6 @@ public class LabelPlacement {
 		}
 
 		for (Label ti = mLabels; ti != null; ti = (Label) ti.next) {
-
 			/* add caption symbols */
 			if (ti.text.caption) {
 				if (ti.text.bitmap != null || ti.text.texture != null) {
@@ -547,13 +512,11 @@ public class LabelPlacement {
 					s.billboard = true;
 					sl.addSymbol(s);
 				}
-
 				continue;
 			}
 
 			/* flip way label orientation */
 			if (cos * (ti.x2 - ti.x1) - sin * (ti.y2 - ti.y1) < 0) {
-
 				float tmp = ti.x1;
 				ti.x1 = ti.x2;
 				ti.x2 = tmp;
@@ -566,9 +529,7 @@ public class LabelPlacement {
 
 		/* add symbol items */
 		for (int i = 0, n = mTileSet.cnt; i < n; i++) {
-
 			final MapTile t = tiles[i];
-
 			if (!t.state(READY | NEW_DATA)) {
 				continue;
 			}
@@ -583,7 +544,6 @@ public class LabelPlacement {
 			}
 
 			for (final SymbolItem ti : ld.symbols) {
-
 				if (ti.bitmap == null && ti.texRegion == null) {
 					continue;
 				}
@@ -596,17 +556,14 @@ public class LabelPlacement {
 				}
 
 				final SymbolItem s = SymbolItem.pool.get();
-
 				if (ti.bitmap != null) {
 					s.bitmap = ti.bitmap;
 				} else {
 					s.texRegion = ti.texRegion;
 				}
-
 				s.x = x;
 				s.y = y;
 				s.billboard = true;
-
 				sl.addSymbol(s);
 			}
 		}
@@ -626,9 +583,7 @@ public class LabelPlacement {
 	}
 
 	private boolean wayIsVisible(final Label ti) {
-
 		// rough filter
-
 		float dist = ti.x * ti.x + ti.y * ti.y;
 		if (dist < mSquareRadius) {
 			return true;

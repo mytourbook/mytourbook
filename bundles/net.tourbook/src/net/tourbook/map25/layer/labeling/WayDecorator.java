@@ -166,7 +166,7 @@ public final class WayDecorator {
 			textItem = n;
 			textItem.x = x1 + (x2 - x1) / 2f;
 			textItem.y = y1 + (y2 - y1) / 2f;
-			textItem.string = string;
+			textItem.label = string;
 			textItem.text = textStyle;
 			textItem.width = labelWidth;
 			textItem.x1 = x1;

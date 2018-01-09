@@ -34,7 +34,6 @@ public class OsmTileLayerMT extends VectorTileLayer {
 	private static final int	CACHE_LIMIT		= 1000;
 
 	private static class OsmTileLoader extends VectorTileLoader {
-
 		/*
 		 * Replace tags that should only be matched by key in RenderTheme to avoid caching
 		 * RenderInstructions for each way of the same type only with different name. Maybe this
@@ -52,24 +51,22 @@ public class OsmTileLayerMT extends VectorTileLayer {
 		private final TagSet					mFilteredTags;
 
 		OsmTileLoader(final VectorTileLayer tileLayer) {
-
 			super(tileLayer);
 			mFilteredTags = new TagSet();
 		}
 
 		@Override
 		protected TagSet filterTags(final TagSet tagSet) {
-
-			final Tag[] tags = tagSet.tags;
+			
+			final Tag[] tags = tagSet.getTags();
 
 			mFilteredTags.clear();
 
-			O: for (int i = 0, n = tagSet.numTags; i < n; i++) {
+			O: for (int i = 0, n = tagSet.size(); i < n; i++) {
 				final Tag t = tags[i];
 
 				for (final TagReplacement replacement : mTagReplacement) {
 					if (Utils.equals(t.key, replacement.key)) {
-
 						mFilteredTags.add(replacement.tag);
 						continue O;
 					}
@@ -98,7 +95,6 @@ public class OsmTileLayerMT extends VectorTileLayer {
 	}
 
 	public OsmTileLayerMT(final Map map, final int zoomMin, final int zoomMax) {
-
 		super(map, CACHE_LIMIT);
 //		mTileManager.setZoomLevel(zoomMin, zoomMax);
 	}

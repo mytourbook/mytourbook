@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.map25;
 
+import net.tourbook.common.UI;
+
 import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
 import org.oscim.gdx.InputHandler;
@@ -41,6 +43,9 @@ public class InputHandlerMT extends InputHandler {
 	private boolean			_isReCenter;
 
 	private boolean			_isMouseRightButtonDown;
+
+	private boolean			_isShift;
+	private boolean			_isCtrl;
 
 	public InputHandlerMT(final Map25App mapApp) {
 
@@ -78,7 +83,55 @@ public class InputHandlerMT extends InputHandler {
 			}
 		}
 
+//		69	-, num -
+//		81	num +
+
+		System.out.println(
+				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+						+ ("\tkeyDown:\t" + keycode)
+//				+ ("\t: " + )
+		);
+// TODO remove SYSTEM.OUT.PRINTLN
+
 		switch (keycode) {
+
+		// <shift>
+		case Input.Keys.SHIFT_LEFT:
+		case Input.Keys.SHIFT_RIGHT:
+			_isShift = true;
+			break;
+
+		// <ctrl>
+		case Input.Keys.CONTROL_LEFT:
+		case Input.Keys.CONTROL_RIGHT:
+			_isCtrl = true;
+			break;
+
+		case Input.Keys.D:
+		case Input.Keys.A:
+		case Input.Keys.S:
+		case Input.Keys.W:
+			return false;
+
+		default:
+			break;
+		}
+
+		return super.keyDown(keycode);
+	}
+
+	@Override
+	public boolean keyTyped(final char character) {
+
+		System.out.println(
+				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+						+ ("\tkeyTyped:\t" + Integer.toString(character))
+						+ ("\t" + character)
+//				+ ("\t: " + )
+		);
+// TODO remove SYSTEM.OUT.PRINTLN
+
+		switch (character) {
 
 		case Input.Keys.L:
 
@@ -96,6 +149,58 @@ public class InputHandlerMT extends InputHandler {
 			toggle_Scale_Layer();
 			_map.render();
 
+			break;
+
+		case Input.Keys.D:
+			_viewport.scaleMap(1.05f, 0, 0);
+			_map.updateMap(true);
+			return true;
+
+		case Input.Keys.A:
+			_viewport.scaleMap(0.95f, 0, 0);
+			_map.updateMap(true);
+			return true;
+
+		case Input.Keys.S:
+			_map.animator().animateZoom(500, 0.5, 0, 0);
+			_map.updateMap(false);
+			return true;
+
+		case Input.Keys.W:
+			_map.animator().animateZoom(500, 2, 0, 0);
+			_map.updateMap(false);
+			return true;
+
+		default:
+			break;
+		}
+
+		// TODO Auto-generated method stub
+		return super.keyTyped(character);
+	}
+
+	@Override
+	public boolean keyUp(final int keycode) {
+
+		System.out.println(
+				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+						+ ("\tkeyUp:\t" + keycode)
+//				+ ("\t: " + )
+		);
+// TODO remove SYSTEM.OUT.PRINTLN
+
+		switch (keycode) {
+
+		// <shift>
+		case Input.Keys.SHIFT_LEFT:
+		case Input.Keys.SHIFT_RIGHT:
+			_isShift = false;
+			break;
+
+		// <ctrl>
+		case Input.Keys.CONTROL_LEFT:
+		case Input.Keys.CONTROL_RIGHT:
+			_isCtrl = false;
 			break;
 
 		default:
