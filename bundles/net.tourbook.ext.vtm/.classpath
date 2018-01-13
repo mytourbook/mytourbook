@@ -19,13 +19,7 @@
 	<classpathentry sourcepath="C:/Users/WolfgangSchramm/.gradle/caches/modules-2/files-2.1/com.badlogicgames.jlayer/jlayer/1.0.1-gdx/f1c4ffebc5e4f68be914404faab580c20de8ea1f/jlayer-1.0.1-gdx-sources.jar" kind="lib" path="libs/jlayer-1.0.1-gdx.jar" exported="true"/>
 	<classpathentry sourcepath="C:/Users/WolfgangSchramm/.gradle/caches/modules-2/files-2.1/org.jcraft/jorbis/0.0.17/5446be5d62e4c6b347c8e6cd28dc00a936417ba2/jorbis-0.0.17-sources.jar" kind="lib" path="libs/jorbis-0.0.17.jar" exported="true"/>
 	<classpathentry sourcepath="C:/Users/WolfgangSchramm/.gradle/caches/modules-2/files-2.1/com.squareup.okio/okio/1.13.0/f4c91e12121af963e3ef76e81c82aa75ba6e8533/okio-1.13.0-sources.jar" kind="lib" path="libs/okio-1.13.0.jar" exported="true"/>
-	<classpathentry kind="lib" path="libs/lwjgl-platform-2.9.2-natives-windows.jar" exported="true"/>
-	<classpathentry kind="lib" path="libs/lwjgl-platform-2.9.2-natives-linux.jar" exported="true"/>
-	<classpathentry kind="lib" path="libs/lwjgl-platform-2.9.2-natives-osx.jar" exported="true"/>
 	<classpathentry sourcepath="C:/Users/WolfgangSchramm/.gradle/caches/modules-2/files-2.1/net.java.jinput/jinput/2.0.5/82604cfeb87b9ab70ed70aa19a137de8ceb21504/jinput-2.0.5-sources.jar" kind="lib" path="libs/jinput-2.0.5.jar" exported="true"/>
 	<classpathentry sourcepath="C:/Users/WolfgangSchramm/.gradle/caches/modules-2/files-2.1/net.java.jutils/jutils/1.0.0/d18678a00b216863206a1bb6190507e02a32971b/jutils-1.0.0-sources.jar" kind="lib" path="libs/jutils-1.0.0.jar" exported="true"/>
-	<classpathentry kind="lib" path="libs/jinput-platform-2.0.5-natives-linux.jar" exported="true"/>
-	<classpathentry kind="lib" path="libs/jinput-platform-2.0.5-natives-windows.jar" exported="true"/>
-	<classpathentry kind="lib" path="libs/jinput-platform-2.0.5-natives-osx.jar" exported="true"/>
 	<classpathentry exported="true" kind="lib" path="libs/"/>
 </classpath>

@@ -3,6 +3,8 @@ rootProject.name = 'MyTourbook-Bundles'
 // rcp projects
 include ':net.tourbook.vtm'
 include ':net.tourbook.ext.vtm'
+include ':net.tourbook.ext.vtm.linux'
+include ':net.tourbook.ext.vtm.windows'
 
 // vtm projects
 include ':vtm'

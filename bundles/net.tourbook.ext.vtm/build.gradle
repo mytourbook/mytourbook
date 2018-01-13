@@ -24,12 +24,18 @@ def bundleVersion	= '17.7.2'
 
 dependencies {
 
+	compile project(':net.tourbook.ext.vtm.linux')
+	compile project(':net.tourbook.ext.vtm.windows')
+	
 	compile project(':vtm')
 	compile project(':vtm-desktop')
 	compile project(':vtm-gdx')
 	compile project(':vtm-http')
 	compile project(':vtm-themes')
 	
+	// !!! STRING MUST BE CREATED WITH " OTHERWISE IT IS NOT WORKING !!!
+	compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+	 	
 	/*
 		This error is fixed with slf4j-simple
 	
@@ -59,7 +65,82 @@ eclipse {
     }
 }
 
+task logCompileConfig {
 
+	println 'configurations.compile'
+	
+    configurations.compile.each {
+    	println '\t' + it.name
+    }         
+}
+
+def nativesDir_Linux	= project(':net.tourbook.ext.vtm.linux'		).projectDir.toString() + '/natives'
+def nativesDir_Windows	= project(':net.tourbook.ext.vtm.windows'	).projectDir.toString() + '/natives'
+def nativesDir_Vtm		= project(':vtm-desktop'					).projectDir.toString() + '/natives'
+
+// extract natives from jar files
+task extractNatives {
+
+	println 'extractNatives'
+
+	configurations.compile.files.each { file ->
+	
+		if (file.name.contains('gdx-platform')) {
+
+			println "\t$file.name - $file.path"
+
+			// copy gdx linux natives		    
+			copy {
+			   from zipTree("$file.path")
+			   into nativesDir_Linux
+			   include '*.so'
+			}
+
+			// copy gdx windows natives		    
+			copy {
+			   from zipTree("$file.path")
+			   into nativesDir_Windows
+			   include '*.dll'
+			}
+			
+		} else if (file.name.contains('natives-linux')) {
+
+			println "\t$file.name - $file.path"
+
+			// copy linux natives		    
+			copy {
+			   from zipTree("$file.path")
+			   into nativesDir_Linux
+			   include '*.so'
+			}
+			
+		} else if (file.name.contains('natives-windows')) {
+
+			println "\t$file.name - $file.path"
+
+			// copy windows natives		    
+			copy {
+			   from zipTree("$file.path")
+			   into nativesDir_Windows
+			   include '*.dll'
+			}
+		}
+	}
+}
+
+// copy vtm natives into plugin fragment
+task copyVtmNatives_Linux(type: Copy) {
+
+	from nativesDir_Vtm + '/linux'
+	into nativesDir_Linux
+    include '**/*'
+}
+task copyVtmNatives_Windows(type: Copy) {
+
+	from nativesDir_Vtm + '/windows'
+	into nativesDir_Windows
+    include '**/*'
+}
 
 // sync will remove old jar's !!!
 task copyDependenciesIntoLibFolder(type: Sync) {
@@ -67,10 +148,20 @@ task copyDependenciesIntoLibFolder(type: Sync) {
 	// sync compile jar's (dependencies) into the lib folder
     into 'libs'
     from configurations.compile
+    
+    exclude '*natives*.jar'
+	exclude	'net.tourbook.*.jar' 
 }
 
 // MUST be set AFTER task declaration !!!
 tasks.classes.dependsOn(
+
+	logCompileConfig,
+
+	// copy natives into platform plugin fragments
+	extractNatives,
+	copyVtmNatives_Linux,
+	copyVtmNatives_Windows,
 
 	// copy jars from dependencies to 'public' project folder
 	copyDependenciesIntoLibFolder,
@@ -107,9 +198,17 @@ tasks.classes.dependsOn(
 //	/>
 eclipse.classpath.file { 
 
-	// remove natives classpath entries, they causes errors
+	// cleanup classpath
     whenMerged { classpath ->
+    
+		// remove natives classpath entries, they causes errors
         classpath.entries.removeAll{ entry -> entry.path.contains('vtm-parent/vtm-desktop/natives') }
+
+        // remove natives which are put into platform features
+        classpath.entries.removeAll{ entry -> entry.path.contains('net.tourbook') }
+        classpath.entries.removeAll{ entry -> entry.path.contains('gdx-platform') }
+        classpath.entries.removeAll{ entry -> entry.path.contains('lwjgl-platform') }
+        classpath.entries.removeAll{ entry -> entry.path.contains('jinput-platform') }
     }
 
     
@@ -175,8 +274,18 @@ def createBundleClassPath() {
     
     	def name = it.name
     	
+//    	println '\t' + name
+    	
     	if(name.equals('linux') || name.equals('osx') || name.equals('windows')){ 
+	    	
 	    	// skip /natives/ items: linux, osx, windows
+	    	
+    	} else if (name.startsWith('net.tourbook') 
+    		|| name.startsWith('lwjgl-platform') 
+    		|| name.startsWith('jinput-platform')) { 
+    	
+    		// skip dummy jars (net.tourbook) and platform jars
+    	
     	} else { 
 	        list += 'libs/' + name
     	}

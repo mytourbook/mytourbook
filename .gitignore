@@ -8,6 +8,7 @@ repositories/
 
 # VTM external files
 libs/
+**/natives/
 
 .apt_generated
 
