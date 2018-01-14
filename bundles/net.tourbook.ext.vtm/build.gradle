@@ -281,6 +281,7 @@ def createBundleClassPath() {
 	    	// skip /natives/ items: linux, osx, windows
 	    	
     	} else if (name.startsWith('net.tourbook') 
+    		|| name.startsWith('gdx-platform') 
     		|| name.startsWith('lwjgl-platform') 
     		|| name.startsWith('jinput-platform')) { 
     	
