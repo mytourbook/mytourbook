@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,12 +16,15 @@
 package net.tourbook.map25;
 
 import net.tourbook.common.UI;
+import net.tourbook.map.IMapSyncListener;
+import net.tourbook.map25.layer.labeling.LabelLayerMT;
+import net.tourbook.map25.layer.tourtrack.TourLayer;
 
+import org.eclipse.swt.widgets.Display;
 import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
 import org.oscim.gdx.InputHandler;
 import org.oscim.layers.Layer;
-import org.oscim.layers.tile.vector.labeling.LabelLayer;
 import org.oscim.map.Map;
 import org.oscim.map.ViewController;
 import org.oscim.scalebar.MapScaleBarLayer;
@@ -34,6 +37,7 @@ public class InputHandlerMT extends InputHandler {
 
 	private Map25App		_mapApp;
 	private Map				_map;
+	private Map25View		_mapView;
 	private ViewController	_viewport;
 
 	/**
@@ -52,18 +56,45 @@ public class InputHandlerMT extends InputHandler {
 		super(mapApp);
 
 		_mapApp = mapApp;
+		_mapView = _mapApp.getMap25View();
+
 		_map = mapApp.getMap();
 		_viewport = _map.viewport();
+	}
+
+	private int getNavigatePixel() {
+
+		int navigatePixel = 50;
+
+		if (_isCtrl && _isShift) {
+
+			navigatePixel = 1000;
+
+		} else if (_isCtrl) {
+
+			navigatePixel = 200;
+		}
+
+		if (Map25ConfigManager.useDraggedKeyboardNavigation == false) {
+
+			// invert navigation
+			navigatePixel *= -1;
+		}
+
+		return navigatePixel;
 	}
 
 	@Override
 	public boolean keyDown(final int keycode) {
 
-		if (keycode == Input.Keys.ESCAPE) {
-
-			// disable app exit
-			return true;
-		}
+//		System.out.println(
+//				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//						+ ("\tkeyDown:\t" + keycode)
+////				+ ("\t: " + )
+//		);
+//// TODO remove SYSTEM.OUT.PRINTLN
+//
+//		return false;
 
 		/*
 		 * Disable keys which work ONLY with openscimap
@@ -83,35 +114,178 @@ public class InputHandlerMT extends InputHandler {
 			}
 		}
 
-//		69	-, num -
-//		81	num +
+		/*
+		 * Zoom faster
+		 */
+		if (_isCtrl) {
 
-		System.out.println(
-				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-						+ ("\tkeyDown:\t" + keycode)
-//				+ ("\t: " + )
-		);
-// TODO remove SYSTEM.OUT.PRINTLN
+			switch (keycode) {
+
+			// zoom in faster
+			case Input.Keys.D:
+			case Input.Keys.PLUS:
+
+				_map.animator().animateZoom(500, 2, 0, 0);
+				_map.updateMap(false);
+				return true;
+
+			// zoom out faster
+			case Input.Keys.A:
+			case Input.Keys.MINUS:
+
+				_map.animator().animateZoom(500, 0.5, 0, 0);
+				_map.updateMap(false);
+				return true;
+
+			}
+		}
+
+		/*
+		 * Navigate more pixel
+		 */
+		if (_isCtrl || _isShift) {
+
+			switch (keycode) {
+
+			case Input.Keys.J:
+				_viewport.moveMap(-getNavigatePixel(), 0);
+				_map.updateMap(true);
+				return true;
+
+			case Input.Keys.L:
+				_viewport.moveMap(getNavigatePixel(), 0);
+				_map.updateMap(true);
+				return true;
+
+			case Input.Keys.I:
+				_viewport.moveMap(0, -getNavigatePixel());
+				_map.updateMap(true);
+				return true;
+
+			case Input.Keys.K:
+				_viewport.moveMap(0, getNavigatePixel());
+				_map.updateMap(true);
+				return true;
+			}
+		}
 
 		switch (keycode) {
 
-		// <shift>
+		// disable app exit
+		case Input.Keys.ESCAPE:
+			return true;
+
+		/*
+		 * Navigate
+		 */
+
+		case Input.Keys.LEFT:
+			_viewport.moveMap(-getNavigatePixel(), 0);
+			_map.updateMap(true);
+			return true;
+
+		case Input.Keys.RIGHT:
+			_viewport.moveMap(getNavigatePixel(), 0);
+			_map.updateMap(true);
+			return true;
+
+		case Input.Keys.UP:
+			_viewport.moveMap(0, -getNavigatePixel());
+			_map.updateMap(true);
+			return true;
+
+		case Input.Keys.DOWN:
+			_viewport.moveMap(0, getNavigatePixel());
+			_map.updateMap(true);
+			return true;
+
+		/*
+		 * Layers
+		 */
+
+		// Label
+		case Input.Keys.B:
+
+			toggle_Label_Layer();
+			_map.render();
+
+			return true;
+
+		// Scale
+		case Input.Keys.C:
+
+			toggle_Scale_Layer();
+			_map.render();
+
+			return true;
+
+		// Grid
+		case Input.Keys.G:
+
+			final TileGridLayerMT layerTileInfo = _mapApp.getLayer_TileInfo();
+
+			layerTileInfo.setEnabled(!layerTileInfo.isEnabled());
+
+			_map.render();
+
+			return true;
+
+		// Tour
+		case Input.Keys.T:
+
+			final TourLayer layerTour = _mapApp.getLayer_Tour();
+			layerTour.setEnabled(!layerTour.isEnabled());
+
+			_map.render();
+
+			// update actions in UI thread
+			Display.getDefault().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					_mapView.enableActions();
+				}
+			});
+
+			return true;
+
+		/*
+		 * These keys are processed in keyTyped(), they can be repeated !!!
+		 */
+
+		// navigate
+		case Input.Keys.J: // left
+		case Input.Keys.L: // right
+		case Input.Keys.I: // up
+		case Input.Keys.K: // down
+
+			// zoom
+		case Input.Keys.D: // in
+		case Input.Keys.A: // out
+		case Input.Keys.W: // fast in
+		case Input.Keys.S: // fast out
+		case Input.Keys.PLUS: // in
+		case Input.Keys.MINUS: // out
+
+		case Input.Keys.M: // tilt
+		case Input.Keys.N: // bearing
+
+			return true;
+
+		/*
+		 * Other keys
+		 */
+
+		// set <shift> state
 		case Input.Keys.SHIFT_LEFT:
 		case Input.Keys.SHIFT_RIGHT:
 			_isShift = true;
 			break;
 
-		// <ctrl>
+		// set <ctrl> state
 		case Input.Keys.CONTROL_LEFT:
 		case Input.Keys.CONTROL_RIGHT:
 			_isCtrl = true;
 			break;
-
-		case Input.Keys.D:
-		case Input.Keys.A:
-		case Input.Keys.S:
-		case Input.Keys.W:
-			return false;
 
 		default:
 			break;
@@ -123,71 +297,203 @@ public class InputHandlerMT extends InputHandler {
 	@Override
 	public boolean keyTyped(final char character) {
 
-		System.out.println(
-				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-						+ ("\tkeyTyped:\t" + Integer.toString(character))
-						+ ("\t" + character)
-//				+ ("\t: " + )
-		);
-// TODO remove SYSTEM.OUT.PRINTLN
+		/**
+		 * Repeated key can ONLY be a CHARACTER and NOT other keys, e.g. left, right, up, down,...
+		 */
+
+//		System.out.println(
+//				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//						+ ("\t_isCtrl:\t" + _isCtrl)
+//						+ ("\t_isShift:\t" + _isShift)
+//						+ ("\t" + character)
+//						+ ("\t\tkeyTyped:\t" + Integer.toString(character))
+////				+ ("\t: " + )
+//		);
+//// TODO remove SYSTEM.OUT.PRINTLN
+
+		MapPosition mapPosition;
+		float currentTilt = 0;
+		float tiltDiff = 0;
 
 		switch (character) {
 
-		case Input.Keys.L:
+		/*
+		 * Navigate
+		 */
 
-			// toggle label
+		// left
+		case 'j':
+			_viewport.moveMap(-getNavigatePixel(), 0);
+			_map.updateMap(true);
+			return true;
 
-			toggle_Label_Layer();
-			_map.render();
+		// right
+		case 'l':
+			_viewport.moveMap(getNavigatePixel(), 0);
+			_map.updateMap(true);
+			return true;
 
-			break;
+		// up
+		case 'i':
+			_viewport.moveMap(0, -getNavigatePixel());
+			_map.updateMap(true);
+			return true;
 
-		case Input.Keys.C:
+		// down
+		case 'k':
+			_viewport.moveMap(0, getNavigatePixel());
+			_map.updateMap(true);
+			return true;
 
-			// toggle scale
+		/*
+		 * Zoom
+		 */
 
-			toggle_Scale_Layer();
-			_map.render();
-
-			break;
-
-		case Input.Keys.D:
+		// zoom in
+		case '+':
+		case 'd':
 			_viewport.scaleMap(1.05f, 0, 0);
 			_map.updateMap(true);
 			return true;
 
-		case Input.Keys.A:
+		// zoom out
+		case '-':
+		case 'a':
 			_viewport.scaleMap(0.95f, 0, 0);
 			_map.updateMap(true);
 			return true;
 
-		case Input.Keys.S:
+		case 's':
 			_map.animator().animateZoom(500, 0.5, 0, 0);
 			_map.updateMap(false);
 			return true;
 
-		case Input.Keys.W:
+		case 'w':
 			_map.animator().animateZoom(500, 2, 0, 0);
 			_map.updateMap(false);
 			return true;
+
+		/*
+		 * Orientation
+		 */
+
+		// rotate right
+		case 'm':
+
+			mapPosition = _map.getMapPosition();
+			_viewport.setRotation(mapPosition.bearing + 5);
+
+			_map.updateMap(true);
+
+			return true;
+
+		// rotate left
+		case 'n':
+
+			mapPosition = _map.getMapPosition();
+			_viewport.setRotation(mapPosition.bearing - 5);
+
+			_map.updateMap(true);
+
+			return true;
+
+//		case 'M':
+//		case 'N':
+
+		// Ctrl + M
+		case 13:
+
+			if (_isShift) {
+
+				// Reset tilt
+
+				mapPosition = _map.getMapPosition();
+				mapPosition.tilt = 0;
+
+				_map.setMapPosition(mapPosition);
+				_map.render();
+
+				_mapView.fireSyncMapEvent(mapPosition, IMapSyncListener.RESET_TILT);
+
+				return true;
+
+			} else {
+
+				// tilt up
+
+				mapPosition = _map.getMapPosition();
+				currentTilt = mapPosition.tilt;
+				tiltDiff = currentTilt * 0.05f;
+
+				System.out.println(
+						(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+								+ ("\tcurrentTilt: " + currentTilt)
+								+ ("\ttiltDiff: " + tiltDiff));
+				//TODO remove SYSTEM.OUT.PRINTLN
+
+				_viewport.setTilt(currentTilt - tiltDiff);
+
+				_map.updateMap(true);
+
+				return true;
+			}
+
+			// Ctrl + N
+		case 14:
+
+			if (_isShift) {
+
+				// Reset rotation
+				mapPosition = _map.getMapPosition();
+				mapPosition.bearing = 0;
+
+				_map.setMapPosition(mapPosition);
+				_map.render();
+
+				_mapView.fireSyncMapEvent(mapPosition, IMapSyncListener.RESET_BEARING);
+
+				return true;
+
+			} else {
+
+				// tilt down
+
+				mapPosition = _map.getMapPosition();
+				currentTilt = mapPosition.tilt;
+				tiltDiff = currentTilt * 0.05f;
+
+				System.out.println(
+						(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+								+ ("\tcurrentTilt: " + currentTilt)
+								+ ("\ttiltDiff: " + tiltDiff));
+				//TODO remove SYSTEM.OUT.PRINTLN
+
+				final float newTilt = currentTilt + tiltDiff;
+				_viewport.setTilt(newTilt);
+
+				_map.updateMap(true);
+
+				return true;
+			}
 
 		default:
 			break;
 		}
 
-		// TODO Auto-generated method stub
 		return super.keyTyped(character);
 	}
 
 	@Override
 	public boolean keyUp(final int keycode) {
 
-		System.out.println(
-				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-						+ ("\tkeyUp:\t" + keycode)
-//				+ ("\t: " + )
-		);
-// TODO remove SYSTEM.OUT.PRINTLN
+//		System.out.println(
+//				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//						+ ("\tkeyUp:\t" + keycode)
+////				+ ("\t: " + )
+//		);
+//// TODO remove SYSTEM.OUT.PRINTLN
+//
+//		return false;
 
 		switch (keycode) {
 
@@ -207,7 +513,7 @@ public class InputHandlerMT extends InputHandler {
 			break;
 		}
 
-		return super.keyDown(keycode);
+		return super.keyUp(keycode);
 	}
 
 	@Override
@@ -221,7 +527,7 @@ public class InputHandlerMT extends InputHandler {
 		final MapPosition mapPosition = new MapPosition();
 		_map.viewport().getMapPosition(mapPosition);
 
-		_mapApp.getMap25View().onMapPosition(mapGeoPoint, mapPosition.zoomLevel);
+		_mapView.onMapPosition(mapGeoPoint, mapPosition.zoomLevel);
 
 		return super.mouseMoved(screenX, screenY);
 	}
@@ -230,7 +536,7 @@ public class InputHandlerMT extends InputHandler {
 
 		for (final Layer layer : _map.layers()) {
 
-			if (layer instanceof LabelLayer) {
+			if (layer instanceof LabelLayerMT) {
 
 				layer.setEnabled(!layer.isEnabled());
 
@@ -309,7 +615,7 @@ public class InputHandlerMT extends InputHandler {
 
 			// open context menu
 
-			_mapApp.getMap25View().actionContextMenu(screenX, screenY);
+			_mapView.actionContextMenu(screenX, screenY);
 
 			return true;
 		}

@@ -18,7 +18,7 @@
  */
 package net.tourbook.map25.layer.labeling;
 
-import static net.tourbook.map25.layer.labeling.LabelLayer.*;
+import static net.tourbook.map25.layer.labeling.LabelLayerMT.*;
 import static org.oscim.core.GeometryBuffer.GeometryType.*;
 
 import org.oscim.core.MapElement;

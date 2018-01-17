@@ -81,7 +81,7 @@ public class LabelPlacement {
 	}
 
 	public final static LabelTileData getLabels(final MapTile tile) {
-		return (LabelTileData) tile.getData(LabelLayer.LABEL_DATA);
+		return (LabelTileData) tile.getData(LabelLayerMT.LABEL_DATA);
 	}
 
 	public void addLabel(final Label l) {

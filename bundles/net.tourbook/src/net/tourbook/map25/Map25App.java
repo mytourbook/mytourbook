@@ -18,10 +18,9 @@ package net.tourbook.map25;
 import java.awt.Canvas;
 
 import net.tourbook.common.util.Util;
-import net.tourbook.map.IMapSyncListener;
 import net.tourbook.map25.Map25TileSource.Builder;
 import net.tourbook.map25.OkHttpEngineMT.OkHttpFactoryMT;
-import net.tourbook.map25.layer.labeling.LabelLayer;
+import net.tourbook.map25.layer.labeling.LabelLayerMT;
 import net.tourbook.map25.layer.marker.MapMarker;
 import net.tourbook.map25.layer.marker.MarkerConfig;
 import net.tourbook.map25.layer.marker.MarkerLayer;
@@ -58,7 +57,6 @@ import org.oscim.tiling.source.UrlTileSource;
 import org.oscim.utils.Parameters;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
@@ -89,7 +87,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 
 	private OsmTileLayerMT			_layer_BaseMap;
 	private BuildingLayer			_layer_Building;
-	private LabelLayer				_layer_Label;
+	private LabelLayerMT			_layer_Label;
 	private MarkerLayer				_layer_Marker;
 	private MapScaleBarLayer		_layer_ScaleBar;
 	private TileGridLayerMT			_layer_TileInfo;
@@ -286,7 +284,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		return _layer_Building;
 	}
 
-	public LabelLayer getLayer_Label() {
+	public LabelLayerMT getLayer_Label() {
 		return _layer_Label;
 	}
 
@@ -382,72 +380,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 //		_isMapItemHit = true;
 //
 //		return true;
-		return false;
-	}
-
-	@Override
-	protected boolean onKeyDown(final int keycode) {
-
-		MapPosition mapPosition;
-
-		switch (keycode) {
-
-		case Input.Keys.T:
-
-			// show/hide tour layer
-			_layer_Tour.setEnabled(!_layer_Tour.isEnabled());
-
-			mMap.render();
-
-			// update actions in UI thread
-			Display.getDefault().asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					_map25View.enableActions();
-				}
-			});
-
-			return true;
-
-		case Input.Keys.G:
-
-			// show/hide grid layer
-
-			_layer_TileInfo.setEnabled(!_layer_TileInfo.isEnabled());
-
-			mMap.render();
-
-			return true;
-
-		case Input.Keys.O:
-
-			// reset bearing
-
-			mapPosition = mMap.getMapPosition();
-			mapPosition.bearing = 0;
-
-			mMap.setMapPosition(mapPosition);
-			mMap.render();
-
-			_map25View.fireSyncMapEvent(mapPosition, IMapSyncListener.RESET_BEARING);
-
-			return true;
-
-		case Input.Keys.I:
-
-			// reset tilt
-
-			mapPosition = mMap.getMapPosition();
-			mapPosition.tilt = 0;
-
-			mMap.setMapPosition(mapPosition);
-			mMap.render();
-
-			_map25View.fireSyncMapEvent(mapPosition, IMapSyncListener.RESET_TILT);
-
-			return true;
-		}
-
 		return false;
 	}
 
@@ -588,7 +520,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener {
 		layers.add(_layer_Building);
 
 		// label
-		_layer_Label = new LabelLayer(mMap, _layer_BaseMap);
+		_layer_Label = new LabelLayerMT(mMap, _layer_BaseMap);
 		_layer_Label.setEnabled(false);
 		layers.add(_layer_Label);
 

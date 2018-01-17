@@ -16,7 +16,7 @@
  */
 package net.tourbook.map25.layer.labeling;
 
-import net.tourbook.map25.layer.labeling.LabelLayer.Worker;
+import net.tourbook.map25.layer.labeling.LabelLayerMT.Worker;
 
 import org.oscim.renderer.BucketRenderer;
 import org.oscim.renderer.GLState;

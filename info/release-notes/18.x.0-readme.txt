@@ -1,0 +1,37 @@
+Version 18.?.0                                        ?. January 2018
+
+
+Improvements
+============	
+
+* Map 2.5D
+
+  - Navigation with the keyboard
+  
+
+* Calendar
+
+  - Set color for todays date
+  
+  - Changed week/tour layout:
+  
+    When year columns are displayed and the column start is not 
+    continuously, the last and first week in adjacent columns contained
+    a tour two times. 
+    Now a tour is displayed only once in the correct column, this solved
+    some existing navigation/positioning bugs
+
+
+* Tour Book View
+
+  - Link a tour in the tour book view when a tour is selected in another 
+    directory view
+
+
+
+System
+======
+
+* 2.5D Map
+
+  - Separated platform files into plugin fragments    

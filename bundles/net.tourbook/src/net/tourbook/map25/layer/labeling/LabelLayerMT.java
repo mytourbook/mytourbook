@@ -33,11 +33,11 @@ import org.slf4j.LoggerFactory;
 /**
  * Original: {@link org.oscim.layers.tile.vector.labeling.LabelLayer}
  */
-public class LabelLayer extends Layer implements Map.UpdateListener, TileManager.Listener {
+public class LabelLayerMT extends Layer implements Map.UpdateListener, TileManager.Listener {
 
-	static final Logger				log					= LoggerFactory.getLogger(LabelLayer.class);
+	static final Logger				log					= LoggerFactory.getLogger(LabelLayerMT.class);
 
-	public final static String		LABEL_DATA			= LabelLayer.class.getName();
+	public final static String		LABEL_DATA			= LabelLayerMT.class.getName();
 
 	private final static long		MAX_RELABEL_DELAY	= 100;
 
@@ -77,11 +77,11 @@ public class LabelLayer extends Layer implements Map.UpdateListener, TileManager
 		}
 	}
 
-	public LabelLayer(final Map map, final VectorTileLayer l) {
+	public LabelLayerMT(final Map map, final VectorTileLayer l) {
 		this(map, l, new LabelTileLoaderHook());
 	}
 
-	public LabelLayer(final Map map, final VectorTileLayer l, final VectorTileLayer.TileLoaderThemeHook h) {
+	public LabelLayerMT(final Map map, final VectorTileLayer l, final VectorTileLayer.TileLoaderThemeHook h) {
 
 		super(map);
 

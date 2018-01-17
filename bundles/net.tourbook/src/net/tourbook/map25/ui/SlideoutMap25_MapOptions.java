@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,9 +20,9 @@ import net.tourbook.common.UI;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.map25.Map25App;
+import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.map25.Map25View;
 
-import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
@@ -62,16 +62,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 	private Button				_chkShowLayer_BaseMap;
 	private Button				_chkShowLayer_Scale;
 	private Button				_chkShowLayer_Label;
-
-//	private Button			_chkIsAnimateLocation;
-//
-//	private Label			_lblAnimationTime;
-//	private Label			_lblAnimationEasingType;
-//	private Label			_lblSeconds;
-//
-//	private Spinner			_spinnerAnimationTime;
-//
-//	private Combo			_comboAnimationEasingType;
+	private Button				_chkUseDraggedKeyboardNavigation;
 
 	/**
 	 * @param ownerControl
@@ -115,15 +106,13 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 			GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
 			GridLayoutFactory
 					.fillDefaults()//
-					.numColumns(2)
 					.applyTo(container);
 //			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
 			{
 				createUI_10_Title(container);
-				createUI_12_Actions(container);
 
-//				createUI_40_Options_Animation(container);
 				createUI_50_Layer(container);
+				createUI_80_Other(container);
 			}
 		}
 
@@ -144,107 +133,6 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 				.applyTo(label);
 	}
 
-	private void createUI_12_Actions(final Composite parent) {
-
-		final ToolBar toolbar = new ToolBar(parent, SWT.FLAT);
-		GridDataFactory
-				.fillDefaults()//
-				.grab(true, false)
-				.align(SWT.END, SWT.BEGINNING)
-				.indent(_pc.convertWidthInCharsToPixels(5), 0)
-				.applyTo(toolbar);
-
-		final ToolBarManager tbm = new ToolBarManager(toolbar);
-
-//		tbm.add(_actionRestoreDefaults);
-
-		tbm.update(true);
-	}
-
-	private void createUI_40_Options_Animation(final Composite parent) {
-
-//		final SelectionAdapter animationListener = new SelectionAdapter() {
-//			@Override
-//			public void widgetSelected(final SelectionEvent e) {
-//				onChangeUI();
-//				onSelectAnimation();
-//			}
-//		};
-//
-//		{
-//			/*
-//			 * Is animate location
-//			 */
-//			_chkIsAnimateLocation = new Button(parent, SWT.CHECK);
-//			_chkIsAnimateLocation.setText(Messages.Slideout_Map25MapOptions_Checkbox_IsAnimationLocation);
-//			_chkIsAnimateLocation.setToolTipText(Messages.Slideout_Map25MapOptions_Checkbox_IsAnimationLocation_Tooltip);
-//			_chkIsAnimateLocation.addSelectionListener(_defaultSelectionListener);
-//			GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsAnimateLocation);
-//		}
-//		{
-//			/*
-//			 * Animation time
-//			 */
-//
-//			// Label
-//			_lblAnimationTime = new Label(parent, SWT.NONE);
-//			_lblAnimationTime.setText(Messages.Slideout_Map25MapOptions_Label_AnimationTime);
-//			_lblAnimationTime.setToolTipText(Messages.Slideout_Map25MapOptions_Label_AnimationTime_Tooltip);
-//			GridDataFactory.fillDefaults().indent(_pc.convertWidthInCharsToPixels(3), 0).applyTo(_lblAnimationTime);
-//
-//			final Composite timeContainer = new Composite(parent, SWT.NONE);
-////				GridDataFactory.fillDefaults().grab(true, false).applyTo(timeContainer);
-//			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(timeContainer);
-//			{
-//
-//				// Spinner
-//				_spinnerAnimationTime = new Spinner(timeContainer, SWT.BORDER);
-//				_spinnerAnimationTime.setMinimum((int) (Map25ConfigManager.LOCATION_ANIMATION_TIME_MIN * 10));
-//				_spinnerAnimationTime.setMaximum((int) (Map25ConfigManager.LOCATION_ANIMATION_TIME_MAX * 10));
-//				_spinnerAnimationTime.setPageIncrement(10);
-//				_spinnerAnimationTime.setDigits(1);
-//				_spinnerAnimationTime.addSelectionListener(animationListener);
-//				_spinnerAnimationTime.addMouseWheelListener(new MouseWheelListener() {
-//					@Override
-//					public void mouseScrolled(final MouseEvent event) {
-//						UI.adjustSpinnerValueOnMouseScroll(event);
-//						onChangeUI();
-//						onSelectAnimation();
-//					}
-//				});
-//
-//				// Label
-//				_lblSeconds = new Label(timeContainer, SWT.NONE);
-//				_lblSeconds.setText(Messages.App_Unit_Seconds_Small);
-//			}
-//		}
-//		{
-//			/*
-//			 * Easing type
-//			 */
-//
-//			// Label
-//			_lblAnimationEasingType = new Label(parent, SWT.NONE);
-//			_lblAnimationEasingType.setText(Messages.Slideout_Map25MapOptions_Label_AnimationEasingType);
-//			_lblAnimationEasingType.setToolTipText(Messages.Slideout_Map25MapOptions_Label_AnimationEasingType_Tooltip);
-//			GridDataFactory
-//					.fillDefaults()//
-//					.align(SWT.FILL, SWT.CENTER)
-//					.indent(_pc.convertWidthInCharsToPixels(3), 0)
-//					.applyTo(_lblAnimationEasingType);
-//
-//			// combo
-//			_comboAnimationEasingType = new Combo(parent, SWT.READ_ONLY);
-//			_comboAnimationEasingType.addFocusListener(_keepOpenListener);
-//			_comboAnimationEasingType.addSelectionListener(animationListener);
-//
-//			// fill combo
-//			for (final Type easingType : Easing.Type.values()) {
-//				_comboAnimationEasingType.add(easingType.name());
-//			}
-//		}
-	}
-
 	private void createUI_50_Layer(final Composite parent) {
 
 		final Group group = new Group(parent, SWT.NONE);
@@ -252,7 +140,6 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 		GridDataFactory
 				.fillDefaults()//
 				.grab(true, false)
-				.span(2, 1)
 				.applyTo(group);
 		GridLayoutFactory.swtDefaults().numColumns(1).applyTo(group);
 		{
@@ -301,43 +188,38 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 		}
 	}
 
-//	private Type easingType_GetSelected() {
-//
-//		final int selectedIndex = _comboAnimationEasingType.getSelectionIndex();
-//
-//		final Type[] easingTypes = Easing.Type.values();
-//
-//		return easingTypes[selectedIndex];
-//	}
-//
-//	private void easingType_SetSelected(final Type selectEasingType) {
-//
-//		final Type[] easingTypes = Easing.Type.values();
-//
-//		int selectIndex = 0;
-//
-//		for (int typeIndex = 0; typeIndex < easingTypes.length; typeIndex++) {
-//
-//			if (selectEasingType == easingTypes[typeIndex]) {
-//
-//				selectIndex = typeIndex;
-//
-//				break;
-//			}
-//		}
-//
-//		_comboAnimationEasingType.select(selectIndex);
-//	}
+	private void createUI_80_Other(final Composite parent) {
+
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+		GridLayoutFactory
+				.fillDefaults()
+				.numColumns(2)
+				.applyTo(container);
+		{
+			{
+				/*
+				 * Keyboard navigation
+				 */
+
+				// checkbox
+				_chkUseDraggedKeyboardNavigation = new Button(container, SWT.CHECK);
+				_chkUseDraggedKeyboardNavigation.setText(
+						Messages.Slideout_Map25MapOptions_Checkbox_UseDraggedKeyNavigation);
+				_chkUseDraggedKeyboardNavigation.setToolTipText(
+						Messages.Slideout_Map25MapOptions_Checkbox_UseDraggedKeyNavigation_Tooltip);
+				_chkUseDraggedKeyboardNavigation.addSelectionListener(_defaultSelectionListener);
+				GridDataFactory
+						.fillDefaults()//
+						.align(SWT.FILL, SWT.BEGINNING)
+						.span(2, 1)
+						.applyTo(_chkUseDraggedKeyboardNavigation);
+			}
+		}
+	}
 
 	private void enableActions() {
 
-//		final boolean isAnimation = _chkIsAnimateLocation.getSelection();
-//
-//		_comboAnimationEasingType.setEnabled(isAnimation);
-//		_lblAnimationEasingType.setEnabled(isAnimation);
-//		_lblAnimationTime.setEnabled(isAnimation);
-//		_lblSeconds.setEnabled(isAnimation);
-//		_spinnerAnimationTime.setEnabled(isAnimation);
 	}
 
 	private void initUI(final Composite parent) {
@@ -404,19 +286,6 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 		mapApp.getMap().updateMap(true);
 	}
 
-//	private void onSelectAnimation() {
-//
-//		final LinkedList<MapBookmark> recentBookmarks = MapBookmarkManager.getAllRecentBookmarks();
-//
-//		if (recentBookmarks.size() < 2) {
-//			return;
-//		}
-//
-//		final MapBookmark prevBookmark = recentBookmarks.get(1);
-//
-//		_map25View.moveToMapLocation(prevBookmark);
-//	}
-
 	private void restoreState() {
 
 		final Map25App mapApp = _map25View.getMapApp();
@@ -427,18 +296,12 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 		_chkShowLayer_TileInfo.setSelection(mapApp.getLayer_TileInfo().isEnabled());
 		_chkShowLayer_Scale.setSelection(mapApp.getLayer_ScaleBar().isEnabled());
 
-//		_chkIsAnimateLocation.setSelection(Map25ConfigManager.isAnimateLocation);
-//		_spinnerAnimationTime.setSelection((int) (Map25ConfigManager.animationTime * 10));
-//
-//		easingType_SetSelected(Map25ConfigManager.animationEasingType);
+		_chkUseDraggedKeyboardNavigation.setSelection(Map25ConfigManager.useDraggedKeyboardNavigation);
 	}
 
 	private void saveState() {
 
-//		Map25ConfigManager.isAnimateLocation = _chkIsAnimateLocation.getSelection();
-//		Map25ConfigManager.animationTime = (float) _spinnerAnimationTime.getSelection() / 10;
-//
-//		Map25ConfigManager.animationEasingType = easingType_GetSelected();
+		Map25ConfigManager.useDraggedKeyboardNavigation = _chkUseDraggedKeyboardNavigation.getSelection();
 	}
 
 }

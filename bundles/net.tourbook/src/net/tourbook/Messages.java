@@ -1769,6 +1769,10 @@ public class Messages extends NLS {
 	public static String		Slideout_Map25MapOptions_Checkbox_Layer_LabelSymbol;
 	public static String		Slideout_Map25MapOptions_Checkbox_Layer_ScaleBar;
 	public static String		Slideout_Map25MapOptions_Checkbox_Layer_TileInfo;
+
+	public static String Slideout_Map25MapOptions_Checkbox_UseDraggedKeyNavigation;
+
+	public static String Slideout_Map25MapOptions_Checkbox_UseDraggedKeyNavigation_Tooltip;
 	public static String		Slideout_Map25MapOptions_Group_MapLayer;
 	public static String		Slideout_Map25MapOptions_Label_MapOptions;
 //	public static String		Slideout_Map25MapOptions_Checkbox_IsAnimationLocation;
