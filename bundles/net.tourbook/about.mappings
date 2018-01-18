@@ -1,7 +1,7 @@
 # these settings are merged into the file plugin.properties
 # version is also set in net.tourbook.application.ApplicationVersion 
-0=17.12.2
-1=2017
+0=18.1.0
+1=2018
 
 #this do not work but it can when ALL is correctly configured
 #0=${unqualifiedVersion}-${version-suffix}
