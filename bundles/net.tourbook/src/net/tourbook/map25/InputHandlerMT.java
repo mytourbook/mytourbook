@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.map25;
 
-import net.tourbook.common.UI;
 import net.tourbook.map.IMapSyncListener;
 import net.tourbook.map25.layer.labeling.LabelLayerMT;
 import net.tourbook.map25.layer.tourtrack.TourLayer;
@@ -73,6 +72,10 @@ public class InputHandlerMT extends InputHandler {
 		} else if (_isCtrl) {
 
 			navigatePixel = 200;
+
+		} else if (_isShift) {
+
+			navigatePixel = 1;
 		}
 
 		if (Map25ConfigManager.useDraggedKeyboardNavigation == false) {
@@ -140,34 +143,7 @@ public class InputHandlerMT extends InputHandler {
 			}
 		}
 
-		/*
-		 * Navigate more pixel
-		 */
-		if (_isCtrl || _isShift) {
-
-			switch (keycode) {
-
-			case Input.Keys.J:
-				_viewport.moveMap(-getNavigatePixel(), 0);
-				_map.updateMap(true);
-				return true;
-
-			case Input.Keys.L:
-				_viewport.moveMap(getNavigatePixel(), 0);
-				_map.updateMap(true);
-				return true;
-
-			case Input.Keys.I:
-				_viewport.moveMap(0, -getNavigatePixel());
-				_map.updateMap(true);
-				return true;
-
-			case Input.Keys.K:
-				_viewport.moveMap(0, getNavigatePixel());
-				_map.updateMap(true);
-				return true;
-			}
-		}
+		MapPosition mapPosition;
 
 		switch (keycode) {
 
@@ -203,8 +179,12 @@ public class InputHandlerMT extends InputHandler {
 		 * Layers
 		 */
 
+// Default keys
+//		case Input.Keys.B:	// building
+//		case Input.Keys.G:	// grid
+
 		// Label
-		case Input.Keys.B:
+		case Input.Keys.V:
 
 			toggle_Label_Layer();
 			_map.render();
@@ -272,8 +252,38 @@ public class InputHandlerMT extends InputHandler {
 			return true;
 
 		/*
-		 * Other keys
+		 * Orientation
 		 */
+
+		// Reset bearing/tilt
+		case Input.Keys.O:
+
+			if (_isCtrl) {
+
+				// Reset tilt
+
+				mapPosition = _map.getMapPosition();
+				mapPosition.tilt = 0;
+
+				_map.setMapPosition(mapPosition);
+				_map.render();
+
+				_mapView.fireSyncMapEvent(mapPosition, IMapSyncListener.RESET_TILT);
+
+			} else {
+
+				// Reset rotation
+
+				mapPosition = _map.getMapPosition();
+				mapPosition.bearing = 0;
+
+				_map.setMapPosition(mapPosition);
+				_map.render();
+
+				_mapView.fireSyncMapEvent(mapPosition, IMapSyncListener.RESET_BEARING);
+			}
+
+			return true;
 
 		// set <shift> state
 		case Input.Keys.SHIFT_LEFT:
@@ -311,9 +321,13 @@ public class InputHandlerMT extends InputHandler {
 //		);
 //// TODO remove SYSTEM.OUT.PRINTLN
 
-		MapPosition mapPosition;
-		float currentTilt = 0;
-		float tiltDiff = 0;
+		final MapPosition mapPosition = _map.getMapPosition();
+
+		final float minTilt = _viewport.getMinTilt();
+		final float maxTilt = _viewport.getMaxTilt();
+		float tiltDiff = (maxTilt - minTilt) / 100;
+
+		double bearingDiff;
 
 		switch (character) {
 
@@ -321,29 +335,38 @@ public class InputHandlerMT extends InputHandler {
 		 * Navigate
 		 */
 
-		// left
+		// move left
+		case 'J':
 		case 'j':
+		case 10: // ctrl + J
 			_viewport.moveMap(-getNavigatePixel(), 0);
 			_map.updateMap(true);
 			return true;
 
-		// right
+		// move right
+		case 'L':
 		case 'l':
+		case 12: // ctrl + L
 			_viewport.moveMap(getNavigatePixel(), 0);
 			_map.updateMap(true);
 			return true;
 
-		// up
+		// move up
+		case 'I':
 		case 'i':
+		case 9: // ctrl + I
 			_viewport.moveMap(0, -getNavigatePixel());
 			_map.updateMap(true);
 			return true;
 
-		// down
+		// move down
+		case 'K':
 		case 'k':
+		case 11: // ctrl + K
 			_viewport.moveMap(0, getNavigatePixel());
 			_map.updateMap(true);
 			return true;
+
 
 		/*
 		 * Zoom
@@ -379,9 +402,11 @@ public class InputHandlerMT extends InputHandler {
 
 		// rotate right
 		case 'm':
+		case 'M':
 
-			mapPosition = _map.getMapPosition();
-			_viewport.setRotation(mapPosition.bearing + 5);
+			bearingDiff = character == 'M' ? 0.1 : 5;
+
+			_viewport.setRotation(mapPosition.bearing + bearingDiff);
 
 			_map.updateMap(true);
 
@@ -389,92 +414,45 @@ public class InputHandlerMT extends InputHandler {
 
 		// rotate left
 		case 'n':
+		case 'N':
 
-			mapPosition = _map.getMapPosition();
-			_viewport.setRotation(mapPosition.bearing - 5);
+			bearingDiff = character == 'N' ? 0.1 : 5;
+
+			_viewport.setRotation(mapPosition.bearing - bearingDiff);
 
 			_map.updateMap(true);
 
 			return true;
 
-//		case 'M':
-//		case 'N':
-
 		// Ctrl + M
 		case 13:
 
+			// tilt up
+
 			if (_isShift) {
-
-				// Reset tilt
-
-				mapPosition = _map.getMapPosition();
-				mapPosition.tilt = 0;
-
-				_map.setMapPosition(mapPosition);
-				_map.render();
-
-				_mapView.fireSyncMapEvent(mapPosition, IMapSyncListener.RESET_TILT);
-
-				return true;
-
-			} else {
-
-				// tilt up
-
-				mapPosition = _map.getMapPosition();
-				currentTilt = mapPosition.tilt;
-				tiltDiff = currentTilt * 0.05f;
-
-				System.out.println(
-						(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-								+ ("\tcurrentTilt: " + currentTilt)
-								+ ("\ttiltDiff: " + tiltDiff));
-				//TODO remove SYSTEM.OUT.PRINTLN
-
-				_viewport.setTilt(currentTilt - tiltDiff);
-
-				_map.updateMap(true);
-
-				return true;
+				tiltDiff /= 10;
 			}
 
-			// Ctrl + N
+			_viewport.setTilt(mapPosition.tilt - tiltDiff);
+
+			_map.updateMap(true);
+
+			return true;
+
+		// Ctrl + N
 		case 14:
 
+			// tilt down
+
 			if (_isShift) {
-
-				// Reset rotation
-				mapPosition = _map.getMapPosition();
-				mapPosition.bearing = 0;
-
-				_map.setMapPosition(mapPosition);
-				_map.render();
-
-				_mapView.fireSyncMapEvent(mapPosition, IMapSyncListener.RESET_BEARING);
-
-				return true;
-
-			} else {
-
-				// tilt down
-
-				mapPosition = _map.getMapPosition();
-				currentTilt = mapPosition.tilt;
-				tiltDiff = currentTilt * 0.05f;
-
-				System.out.println(
-						(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-								+ ("\tcurrentTilt: " + currentTilt)
-								+ ("\ttiltDiff: " + tiltDiff));
-				//TODO remove SYSTEM.OUT.PRINTLN
-
-				final float newTilt = currentTilt + tiltDiff;
-				_viewport.setTilt(newTilt);
-
-				_map.updateMap(true);
-
-				return true;
+				tiltDiff /= 10;
 			}
+
+			_viewport.setTilt(mapPosition.tilt + tiltDiff);
+
+			_map.updateMap(true);
+
+			return true;
 
 		default:
 			break;
