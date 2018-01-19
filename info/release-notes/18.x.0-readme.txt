@@ -34,4 +34,8 @@ System
 
 * 2.5D Map
 
-  - Separated platform files into plugin fragments    
+  - Separated platform files into plugin fragments
+  
+  - Flickering is solved https://github.com/mapsforge/vtm/issues/257
+	
+	Now there is no need to adjust the NVIDIA Buffer-flipping mode as described in 17.9.0
