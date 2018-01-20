@@ -1,16 +1,19 @@
 .settings/
 
 bin
-build/
+*/build/
 target/
 repositories/
-
+**/tmp/
 
 # VTM external files
 libs/
 **/natives/
 
 .apt_generated
+
+.gradle
+gradle/
 
 *.js.map
 *.js.uncompressed.js

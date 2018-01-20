@@ -5,8 +5,14 @@
 	<projects>
 	</projects>
 	<buildSpec>
+		<buildCommand>
+			<name>org.eclipse.buildship.core.gradleprojectbuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
 	</buildSpec>
 	<natures>
+		<nature>org.eclipse.buildship.core.gradleprojectnature</nature>
 	</natures>
 	<linkedResources>
 		<link>
@@ -37,7 +43,7 @@
 		<link>
 			<name>pom-update-site.xml</name>
 			<type>1</type>
-			<location>PARENT-2-PROJECT_LOC/build/build.update-site/pom.xml</location>
+			<locationURI>PARENT-2-PROJECT_LOC/build/build.update-site/pom.xml</locationURI>
 		</link>
 		<link>
 			<name>pom.xml</name>

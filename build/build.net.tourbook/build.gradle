@@ -1,0 +1,35 @@
+plugins {
+  id "com.github.dkorotych.gradle-maven-exec" version "1.2.1"
+}
+
+defaultTasks 'buildMT'
+
+task buildMT
+buildMT.dependsOn 'create-build-files'
+buildMT.dependsOn 'tychoMT'
+
+// copy all MT files into a temp folder with task/target 'create-build-files' 
+ant.importBuild 'CREATE_MT_BuildFiles.xml'
+
+
+
+task tychoMT {
+         
+	doLast {
+	
+		//run: mvn verify -P build-release
+
+		def buildDir = file("../..")
+ 	
+        mavenexec {
+        
+            workingDir	buildDir
+            goals		'verify'
+            
+			options {
+				threads				= '2C'
+				activateProfiles	= ['build-release']
+        	}
+		}
+	}
+}

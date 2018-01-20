@@ -67,11 +67,14 @@ eclipse {
 
 task logCompileConfig {
 
-	println 'configurations.compile'
-	
-    configurations.compile.each {
-    	println '\t' + it.name
-    }         
+	doLast {
+	    
+		println 'configurations.compile'
+		
+	    configurations.compile.each {
+	    	println '\t' + it.name
+	    }         
+	}
 }
 
 def nativesDir_Linux	= project(':net.tourbook.ext.vtm.linux'		).projectDir.toString() + '/natives'
@@ -81,48 +84,51 @@ def nativesDir_Vtm		= project(':vtm-desktop'					).projectDir.toString() + '/nat
 // extract natives from jar files
 task extractNatives {
 
-	println 'extractNatives'
+	doLast {
 
-	configurations.compile.files.each { file ->
+		println 'extractNatives'
 	
-		if (file.name.contains('gdx-platform')) {
-
-			println "\t$file.name - $file.path"
-
-			// copy gdx linux natives		    
-			copy {
-			   from zipTree("$file.path")
-			   into nativesDir_Linux
-			   include '*.so'
-			}
-
-			// copy gdx windows natives		    
-			copy {
-			   from zipTree("$file.path")
-			   into nativesDir_Windows
-			   include '*.dll'
-			}
-			
-		} else if (file.name.contains('natives-linux')) {
-
-			println "\t$file.name - $file.path"
-
-			// copy linux natives		    
-			copy {
-			   from zipTree("$file.path")
-			   into nativesDir_Linux
-			   include '*.so'
-			}
-			
-		} else if (file.name.contains('natives-windows')) {
-
-			println "\t$file.name - $file.path"
-
-			// copy windows natives		    
-			copy {
-			   from zipTree("$file.path")
-			   into nativesDir_Windows
-			   include '*.dll'
+		configurations.compile.files.each { file ->
+		
+			if (file.name.contains('gdx-platform')) {
+	
+				println "\t$file.name - $file.path"
+	
+				// copy gdx linux natives		    
+				copy {
+				   from zipTree("$file.path")
+				   into nativesDir_Linux
+				   include '*.so'
+				}
+	
+				// copy gdx windows natives		    
+				copy {
+				   from zipTree("$file.path")
+				   into nativesDir_Windows
+				   include '*.dll'
+				}
+				
+			} else if (file.name.contains('natives-linux')) {
+	
+				println "\t$file.name - $file.path"
+	
+				// copy linux natives		    
+				copy {
+				   from zipTree("$file.path")
+				   into nativesDir_Linux
+				   include '*.so'
+				}
+				
+			} else if (file.name.contains('natives-windows')) {
+	
+				println "\t$file.name - $file.path"
+	
+				// copy windows natives		    
+				copy {
+				   from zipTree("$file.path")
+				   into nativesDir_Windows
+				   include '*.dll'
+				}
 			}
 		}
 	}
