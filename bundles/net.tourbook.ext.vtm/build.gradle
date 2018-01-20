@@ -305,6 +305,7 @@ def createBundleClassPath() {
 jar.manifest.attributes(
 
 	'Bundle-SymbolicName': 						project.name,
+	'Bundle-Name': 								'Vector map from Mapsforge',
 	
 	// qualifier is an easy readable time stamp
 	'Bundle-Version':							bundleVersion + '.v${tstamp;yyyyMMdd-HHmm}',
@@ -319,6 +320,6 @@ jar.manifest.attributes(
 	'Export-Package': 							'*',
     'Bundle-ClassPath': 						createBundleClassPath(),
 
-	'-removeheaders':							'Bnd-LastModified, Bundle-Name, Created-By, Tool, Private-Package, Require-Capability',
+	'-removeheaders':							'Bnd-LastModified, Created-By, Tool, Private-Package, Require-Capability',
 )
 

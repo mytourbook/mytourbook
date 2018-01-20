@@ -8,10 +8,11 @@ Bundle-ClassPath: libs/vtm-desktop.jar,libs/vtm-gdx.jar,libs/vtm-http.
  jar,libs/jinput-2.0.5.jar,libs/jutils-1.0.0.jar,libs/,resources/
 Bundle-License: http://www.apache.org/licenses/LICENSE-2.0
 Bundle-ManifestVersion: 2
+Bundle-Name: Vector map from Mapsforge
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-SymbolicName: net.tourbook.ext.vtm
 Bundle-Vendor: MyTourbook
-Bundle-Version: 18.1.0.v20180119-1525
+Bundle-Version: 18.1.0.v20180120-0816
 Export-Package: assets.patterns;version="18.1.0",assets.shaders;versio
  n="18.1.0",assets.symbols;version="18.1.0",assets.symbols.accommodati
  on;version="18.1.0",assets.symbols.amenity;version="18.1.0",assets.sy

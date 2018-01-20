@@ -1,8 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: net.tourbook.ext.vtm.linux
+Bundle-Name: VTM natives for Linux
 Bundle-SymbolicName: net.tourbook.ext.vtm.linux
 Bundle-Version: 18.1.0.qualifier
 Fragment-Host: net.tourbook.ext.vtm;bundle-version="18.1.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ClassPath: natives/
+Bundle-Vendor: MyTourbook
