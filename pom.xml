@@ -140,8 +140,8 @@
 						</manifestEntries>
 					</archive>
 					
-					<!-- set qualifier date format -->
-					<format>yyyyMMdd-HHmm</format>
+					<!-- set qualifier date format, 'v' is a prefix -->
+					<format>'v'yyyyMMdd-HHmm</format>
 					
 				</configuration>
 			</plugin>			
