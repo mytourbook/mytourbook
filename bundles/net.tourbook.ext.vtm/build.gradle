@@ -19,9 +19,6 @@ repositories {
     mavenCentral()
 }
 
-def bundleVersion	= '18.1.0'
-
-
 dependencies {
 
 	compile project(':net.tourbook.ext.vtm.linux')
@@ -307,6 +304,8 @@ def createBundleClassPath() {
     return list.join(',')
 }
 
+def mtVersion = project(':mytourbook').ext.myTourbookVersion
+
 // set MANIFEST.MF properties to configure OSGi bundle
 jar.manifest.attributes(
 
@@ -314,7 +313,7 @@ jar.manifest.attributes(
 	'Bundle-Name': 								'Vector map from Mapsforge',
 	
 	// qualifier is an easy readable time stamp
-	'Bundle-Version':							bundleVersion + '.v${tstamp;yyyyMMdd-HHmm}',
+	'Bundle-Version':							mtVersion + '.v${tstamp;yyyyMMdd-HHmm}',
 
 	'Bundle-Vendor':							"MyTourbook",
 	'Bundle-License': 							'http://www.apache.org/licenses/LICENSE-2.0',

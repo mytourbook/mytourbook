@@ -1,5 +1,8 @@
 rootProject.name = 'MyTourbook-Bundles'
 
+include ':mytourbook'
+project(':mytourbook'	).projectDir	= new File('..')
+
 // rcp projects
 include ':net.tourbook.vtm'
 include ':net.tourbook.ext.vtm'
