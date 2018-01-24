@@ -10,17 +10,29 @@ def productDirCreated			= file('../build.net.tourbook.product/target/products')
 def productDirArchive			= file('../../../../mytourbook-PRODUCT/' + mtVersion)
 
 def winInnoSetupDir				= file('../../INSTALL-UPDATES/installer-net.tourbook/win-Inno.Setup')
-//def innoSetupCompilerAppName	= file('c:/Program Files (x86)/Inno Setup 5/Compil32.exe').absolutePath
 def innoSetupCompilerAppName	= file('c:/Program Files (x86)/Inno Setup 5/iscc.exe').absolutePath
 
 
+gradle.taskGraph.beforeTask { Task task ->
+    
+    // show a task indicator
+	println '---------------------------------------------------------------------------------------'
+	println ''
+}
+
+gradle.taskGraph.afterTask { Task task ->
+    
+    // show more space
+	println ''
+	println ''
+}
 
 defaultTasks 'mt_0_Build'
 
 task mt_0_Build          
 mt_0_Build.dependsOn( 
-	
-	'create-build-files',
+
+	'mt_1_CreateBuildFiles',
 	'mt_2_BuildProduct',
 	'mt_3_CopyProduct',
 	'mt_4_ExtractWinFiles',
@@ -28,10 +40,17 @@ mt_0_Build.dependsOn(
 	'mt_6_CleanupWinFiles'
 )
 
+
 /*
 * 1. Copy all MT files into a temp folder, it is using task/target 'create-build-files' 
 */
-ant.importBuild 'CREATE_MT_BuildFiles.xml'
+task mt_1_CreateBuildFiles {
+
+	// import Ant build, every target will be a task
+	ant.importBuild 'CREATE_MT_BuildFiles.xml'
+
+	dependsOn('create-build-files')
+}
 
 
 /*
@@ -51,12 +70,12 @@ task mt_2_BuildProduct {
             goals		'verify'
             
 			options {
-//				threads				= '2C'	-> causes warnings and is not working
 				activateProfiles	= ['build-release']
         	}
 		}
 	}
 }
+
 
 /*
 * Copy generated product file into product archive folder
@@ -112,6 +131,7 @@ task mt_4_ExtractWinFiles {
 	}
 }
 
+
 /*
  Create win exe files
 */
@@ -126,17 +146,12 @@ task mt_5_CreateExeFiles {
 		def win32SetupConfigFilename = file(winInnoSetupDirName + '/mytourbook-core-32-create-setup_exe.iss').absolutePath
 		def win64SetupConfigFilename = file(winInnoSetupDirName + '/mytourbook-core-64-create-setup_exe.iss').absolutePath
 		
-//		println winInnoSetupDir
-//		println innoSetupCompilerAppName
-//		println win32SetupConfigFilename
-		
 		exec {
 		
 			println '\twin 32'
 		
 			commandLine 'cmd', '/c', innoSetupCompilerAppName
 			args		win32SetupConfigFilename
-//			args		'/cc', win32SetupConfigFilename
 		}
 
 		exec {
@@ -145,14 +160,13 @@ task mt_5_CreateExeFiles {
 		
 			commandLine 'cmd', '/c', innoSetupCompilerAppName
 			args		win64SetupConfigFilename
-//			args		'/cc', win64SetupConfigFilename
 		}
 	}
 }
 
 
 /*
- Extract win archives in separate dirs that the exe files can be compiled
+ Cleanup win zip files
 */
 task mt_6_CleanupWinFiles {
         
@@ -187,5 +201,3 @@ task mt_6_CleanupWinFiles {
 		}
 	}
 }
-
-

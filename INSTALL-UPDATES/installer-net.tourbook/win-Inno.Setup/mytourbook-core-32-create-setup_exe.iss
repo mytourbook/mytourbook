@@ -17,7 +17,7 @@ DefaultDirName={pf}\MyTourbook
 VersionInfoVersion={#AppVersion}
 VersionInfoCompany=MyTourbook
 
-WizardImageBackColor=clWhite
+;WizardImageBackColor=clWhite
 WizardSmallImageFile={#AppRoot}\mytourbook\bundles\net.tourbook\icons\application\win\tourbook55-32-installer.bmp
 
 LanguageDetectionMethod=locale

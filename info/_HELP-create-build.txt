@@ -1,4 +1,14 @@
 
+##################################
+1 Click build process (since 18.1)
+##################################
+
+* Set version number as described below (Build with POM)
+* Set version number in gradle.properties in the .git root
+* Run gradlew in C:\DAT\MT\mytourbook\build\build.net.tourbook this will run the default task
+
+
+
 ###########################
 
 Build with POM (since 16.4)
