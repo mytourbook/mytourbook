@@ -1,4 +1,4 @@
-Version 18.?.0                                        ?. January 2018
+Version 18.2.0                                        ?. January 2018
 
 
 Improvements
@@ -7,19 +7,24 @@ Improvements
 * Map 2.5D
 
   - Navigation with the keyboard
-  
 
+  - Flickering is solved https://github.com/mapsforge/vtm/issues/257, 
+    now there is no need to adjust the NVIDIA Buffer-flipping mode as 
+    described in 17.9.0
+
+ 
 * Calendar
 
   - Set color for todays date
+
+  - Changed week/tour layout
   
-  - Changed week/tour layout:
-  
-    When year columns are displayed and the column start is not 
-    continuously, the last and first week in adjacent columns contained
-    a tour two times. 
-    Now a tour is displayed only once in the correct column, this solved
-    some existing navigation/positioning bugs
+    Old: When year columns are displayed and the column start is not 
+         continuously, the last and first week in adjacent columns 
+         contained a tour two times
+       
+    New: A tour is displayed only once in the correct column, this 
+         solved some existing navigation/positioning bugs
 
 
 * Tour Book View
@@ -27,15 +32,23 @@ Improvements
   - Link a tour in the tour book view when a tour is selected in another 
     directory view
 
-
-
+ 
 System
-======
+======	
 
-* 2.5D Map
+* Map 2.5D
 
-  - Separated platform files into plugin fragments
+  Separated platform files into plugin fragments, the executables are 
+  now a little bit smaller
+
+* Build process with 1 Click
+
+  All product files are now build with one gradle script. This is 
+  calling already existing build scripts which are producing parts of 
+  the product. This highly complex process takes about 3 minutes and is 
+  using these tools:
   
-  - Flickering is solved https://github.com/mapsforge/vtm/issues/257
+  - Gradle
+  - Ant
+  - Maven with Tycho
 	
-	Now there is no need to adjust the NVIDIA Buffer-flipping mode as described in 17.9.0
