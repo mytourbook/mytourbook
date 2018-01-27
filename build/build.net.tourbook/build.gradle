@@ -1,16 +1,19 @@
 plugins {
-  id 'com.github.dkorotych.gradle-maven-exec' version '1.2.1'
+
+	id 'com.github.dkorotych.gradle-maven-exec' version '1.2.1'
 }
 
 // get MT version and remove quotes
-def mtVersionRaw = project(':mytourbook').ext.myTourbookVersion
-def mtVersion = mtVersionRaw.replaceAll('\'', '')
+def _mtVersionRaw	= project(':mytourbook').ext.myTourbookVersion		// '18.2.0'
+def _mtVersion		= _mtVersionRaw.replaceAll('\'', '')				// 18.2.0
 
-def productDirCreated			= file('../build.net.tourbook.product/target/products')
-def productDirArchive			= file('../../../../mytourbook-PRODUCT/' + mtVersion)
+def _dirProductBuilt			= file('../build.net.tourbook.product/target/products')
+def _dirProductArchive			= file('../../../../mytourbook-PRODUCT/' + _mtVersion)
+def _dirProductReleaseNotes		= file('../../info/release-notes')
+def _pathProductArchive			= _dirProductArchive.absolutePath
 
-def winInnoSetupDir				= file('../../INSTALL-UPDATES/installer-net.tourbook/win-Inno.Setup')
-def innoSetupCompilerAppName	= file('c:/Program Files (x86)/Inno Setup 5/iscc.exe').absolutePath
+def _dirWinInnoSetup			= file('../../INSTALL-UPDATES/installer-net.tourbook/win-Inno.Setup')
+def _pathInnoSetupCompilerApp	= file('c:/Program Files (x86)/Inno Setup 5/iscc.exe').absolutePath
 
 
 gradle.taskGraph.beforeTask { Task task ->
@@ -32,19 +35,20 @@ defaultTasks 'mt_0_Build'
 task mt_0_Build          
 mt_0_Build.dependsOn( 
 
-	'mt_1_CreateBuildFiles',
-	'mt_2_BuildProduct',
-	'mt_3_CopyProduct',
-	'mt_4_ExtractWinFiles',
-	'mt_5_CreateExeFiles',
-	'mt_6_CleanupWinFiles'
+	'mt_10_CreateBuildFiles',
+	'mt_20_BuildProduct',
+	'mt_30_CopyProduct',
+	'mt_40_ExtractWinFiles',
+	'mt_50_CreateExeFiles',
+	'mt_60_CleanupWinFiles',
+	'mt_70_CopyReleaseNotes',
 )
 
 
 /*
 * 1. Copy all MT files into a temp folder, it is using task/target 'create-build-files' 
 */
-task mt_1_CreateBuildFiles {
+task mt_10_CreateBuildFiles {
 
 	// import Ant build, every target will be a task
 	ant.importBuild 'CREATE_MT_BuildFiles.xml'
@@ -56,7 +60,7 @@ task mt_1_CreateBuildFiles {
 /*
 * 2. Build product with maven/tycho
 */
-task mt_2_BuildProduct {
+task mt_20_BuildProduct {
          
 	doLast {
 	
@@ -80,24 +84,24 @@ task mt_2_BuildProduct {
 /*
 * Copy generated product file into product archive folder
 */
-task mt_3_CopyProduct {
+task mt_30_CopyProduct {
 
 	doLast {
 
 //		From:	C:\DAT\MT\mytourbook\build\build.net.tourbook
 //	    Into:	C:\DAT\MT\mytourbook\build\build.net.tourbook.product\target\products
 
-		println '\tFrom ' + productDirCreated       
-		println '\tInto ' + productDirArchive
+		println '\tFrom ' + _dirProductBuilt       
+		println '\tInto ' + _dirProductArchive
 
 		// copy into archive folder
 		copy {
 		
-			from (productDirCreated) {
-				include '*' + mtVersion + '*'
+			from (_dirProductBuilt) {
+				include '*' + _mtVersion + '*'
 			}
 			
-			into productDirArchive
+			into _dirProductArchive
 		}
 	}
 }
@@ -106,20 +110,18 @@ task mt_3_CopyProduct {
 /*
  Extract win archives in separate dirs that the exe files can be compiled
 */
-task mt_4_ExtractWinFiles {
+task mt_40_ExtractWinFiles {
         
 	doLast {
 	    
-		println 'Extracting from ' + productDirArchive
+		println 'Extracting from ' + _dirProductArchive
 		
-		def archiveDirName = productDirArchive.absolutePath
-		
-		file(productDirArchive).eachFileMatch(~/.*win.*.zip/) { winZipFile->
+		file(_dirProductArchive).eachFileMatch(~/.*win.*.zip/) { winZipFile->
 			
 			def winZipFileName = winZipFile.name
 			def winZipName = winZipFileName.take(winZipFileName.lastIndexOf('.'))
 			
-			def outputDir = file(archiveDirName + '/' + winZipName)
+			def outputDir = file(_pathProductArchive + '/' + winZipName)
 
 			println '\t' + outputDir
 			
@@ -135,13 +137,13 @@ task mt_4_ExtractWinFiles {
 /*
  Create win exe files
 */
-task mt_5_CreateExeFiles {
+task mt_50_CreateExeFiles {
         
 	doLast {
 	    
 		println 'Creating Windows setup files'
 		
-		def winInnoSetupDirName = winInnoSetupDir.absolutePath
+		def winInnoSetupDirName = _dirWinInnoSetup.absolutePath
 		
 		def win32SetupConfigFilename = file(winInnoSetupDirName + '/mytourbook-core-32-create-setup_exe.iss').absolutePath
 		def win64SetupConfigFilename = file(winInnoSetupDirName + '/mytourbook-core-64-create-setup_exe.iss').absolutePath
@@ -150,7 +152,7 @@ task mt_5_CreateExeFiles {
 		
 			println '\twin 32'
 		
-			commandLine 'cmd', '/c', innoSetupCompilerAppName
+			commandLine 'cmd', '/c', _pathInnoSetupCompilerApp
 			args		win32SetupConfigFilename
 		}
 
@@ -158,7 +160,7 @@ task mt_5_CreateExeFiles {
 		
 			println '\twin 64'
 		
-			commandLine 'cmd', '/c', innoSetupCompilerAppName
+			commandLine 'cmd', '/c', _pathInnoSetupCompilerApp
 			args		win64SetupConfigFilename
 		}
 	}
@@ -168,21 +170,20 @@ task mt_5_CreateExeFiles {
 /*
  Cleanup win zip files
 */
-task mt_6_CleanupWinFiles {
+task mt_60_CleanupWinFiles {
         
 	doLast {
 	    
-		println 'Deleting extracted files from ' + productDirArchive
+		println 'Deleting extracted files from ' + _dirProductArchive
 		
-		def archiveDirName = productDirArchive.absolutePath
-		def hiddenDir = file(archiveDirName + '/hidden')
+		def hiddenDir = file(_pathProductArchive + '/hidden')
 		
-		file(productDirArchive).eachFileMatch(~/.*win.*.zip/) { winZipFile->
+		file(_dirProductArchive).eachFileMatch(~/.*win.*.zip/) { winZipFile->
 			
 			def winZipFileName = winZipFile.name
 			def winZipName = winZipFileName.take(winZipFileName.lastIndexOf('.'))
 			
-			def outputDir = file(archiveDirName + '/' + winZipName)
+			def outputDir = file(_pathProductArchive + '/' + winZipName)
 
 			println '\tdelete\t\t' + outputDir
 			
@@ -198,6 +199,37 @@ task mt_6_CleanupWinFiles {
 			hiddenFile.delete()
 			
 			winZipFile.renameTo(hiddenFile)
+		}
+	}
+}
+
+
+/*
+* Copy realease notes into product archive folder
+*/
+task mt_70_CopyReleaseNotes {
+
+	doLast {
+
+		def releaseNotesFilename = _mtVersion + '-readme.txt'
+		
+		def fileReleaseNotesFrom = file(_dirProductReleaseNotes.absolutePath + '/' + releaseNotesFilename)
+
+		println '\tFrom ' + fileReleaseNotesFrom       
+		println '\tInto ' + _dirProductArchive
+
+		// copy into archive folder
+		if (fileReleaseNotesFrom.exists()) {
+		
+			println "\tFile ${releaseNotesFilename} copied"
+
+			copy {
+				from fileReleaseNotesFrom
+				into _dirProductArchive
+			}
+		} else {
+
+			println "\tFile \"${fileReleaseNotesFrom}\" is not available"
 		}
 	}
 }

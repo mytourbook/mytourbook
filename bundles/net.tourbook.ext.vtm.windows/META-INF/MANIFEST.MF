@@ -2,8 +2,8 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: VTM natives for Windows
 Bundle-SymbolicName: net.tourbook.ext.vtm.windows
-Bundle-Version: 18.1.0.qualifier
-Fragment-Host: net.tourbook.ext.vtm;bundle-version="18.1.0"
+Bundle-Version: 18.2.0.qualifier
+Fragment-Host: net.tourbook.ext.vtm;bundle-version="18.2.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ClassPath: natives/
 Bundle-Vendor: MyTourbook
