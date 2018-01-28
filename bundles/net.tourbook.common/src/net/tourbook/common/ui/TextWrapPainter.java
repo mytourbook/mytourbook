@@ -88,6 +88,12 @@ public class TextWrapPainter {
 							final boolean isTruncateText,
 							final int truncatedLines) {
 
+		_is1stPainted = false;
+
+		if (viewportWidth < 0 || viewportHeight < 0) {
+			return;
+		}
+
 		_tabWidth = gc.stringExtent(_tabText).x;
 		_lineHeight = fontHeight;
 
@@ -96,8 +102,6 @@ public class TextWrapPainter {
 
 		// fix problem when an empty string is painted
 		_lastPaintedY = _devY;
-
-		_is1stPainted = false;
 
 		_linesCounter = 0;
 		_linePaintedCounter = -1;
